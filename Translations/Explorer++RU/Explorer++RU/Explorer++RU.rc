@@ -1,0 +1,1338 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Russian resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_RUS)
+#ifdef _WIN32
+LANGUAGE LANG_RUSSIAN, SUBLANG_DEFAULT
+#pragma code_page(1251)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUT DIALOGEX 0, 0, 243, 118
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "О программе Explorer++"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,189,96,50,14
+    CONTROL         207,IDC_ABOUT_STATIC_IMAGE,"Static",SS_BITMAP,4,4,235,87,WS_EX_STATICEDGE
+    CONTROL         "",-1,"Static",SS_ETCHEDHORZ,4,91,235,1
+END
+
+IDD_OPTIONS_FILESFOLDERS DIALOGEX 0, 0, 204, 134
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Файлы и Папки"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Скрывать расширения файлов",IDC_SETTINGS_CHECK_EXTENSIONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,6,120,10
+    CONTROL         "Показывать размер папок",IDC_SETTINGS_CHECK_FOLDERSIZES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,17,105,10
+    CONTROL         "Выводить полный путь в строке заголовка",IDC_SETTINGS_CHECK_TITLEPATH,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,28,163,10
+    CONTROL         "Открывать каждую папку в отдельной вкладке",IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,39,182,10
+    CONTROL         "Показывать размеры файлов в байтах",IDC_SETTINGS_CHECK_SIZEBYTES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,50,147,10
+    CONTROL         "Упрощенный режим отображения даты",IDC_SETTINGS_CHECK_FRIENDLYDATES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,61,151,10
+    CONTROL         "Использовать системный стиль",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON,19,84,151,10
+    CONTROL         "Использовать новый стиль",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON,19,95,151,10
+    CONTROL         "Показывать подсказки для файлов и папок:",IDC_OPTIONS_CHECK_SHOWINFOTIPS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,182,10
+END
+
+IDD_OPTIONS_GENERAL DIALOGEX 0, 0, 228, 164
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_CONTEXTHELP
+CAPTION "Общие"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "При загрузке",IDC_STATIC,9,9,171,38
+    CONTROL         "Открывать стандартную папку",IDC_STARTUP_DEFAULTFOLDER,
+                    "Button",BS_AUTORADIOBUTTON,13,32,125,10
+    CONTROL         "Открывать вкладки предыдущего сеанса",IDC_STARTUP_PREVIOUSTABS,
+                    "Button",BS_AUTORADIOBUTTON,13,19,160,10
+    CONTROL         "Показывать сетку в режиме таблица",IDC_OPTION_GRIDLINES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,91,142,10
+    CONTROL         "Отключить задержку при формировании древа папок",IDC_OPTION_TREEVIEWDELAY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,115,201,10
+    CONTROL         "Сохранять настройки в XML файл",IDC_OPTION_XML,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,67,130,10
+    CONTROL         "Extend tab control across entire window",IDC_OPTION_EXTENDTABCONTROL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,127,145,10
+    CONTROL         "Turn on full-row selection in details view",IDC_OPTION_FULLROWSELECT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,139,143,10
+    CONTROL         "Replace Explorer for filesystem folders",IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,55,139,10
+    CONTROL         "Show file previews in display window",IDC_OPTION_FILEPREVIEWS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,79,133,10
+    CONTROL         "Show username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,103,101,10
+END
+
+IDD_OPTIONS_TABS DIALOGEX 0, 0, 263, 135
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Вкладки"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Принудительно выставлять одинаковую ширину ко всем вкладкам",IDC_TABS_SAMEWIDTH,
+                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,10,12,246,10
+    CONTROL         "Максимальная длина заголовка вкладки:",IDC_TABS_MAXIMUMWIDTH,
+                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,10,29,157,10
+    CONTROL         "Спрашивать подтверждения при закрытии всех вкладок",IDC_TABS_CLOSECONFIRMATION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,46,211,10
+    CONTROL         "Открывать новые вкладки рядом с текущей вкладкой",IDC_TABS_OPENNEXTTOCURRENT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,63,203,10
+    EDITTEXT        IDC_EDIT1,165,27,23,15,ES_AUTOHSCROLL | NOT WS_VISIBLE
+END
+
+IDD_CHANGEFILEATTRIBUTES DIALOGEX 0, 0, 284, 150
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Изменение атрибутов файла"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,231,95,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,231,116,50,14
+    CONTROL         "",IDC_MODIFICATIONDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,28,62,13
+    LTEXT           "Дата изменения:",IDC_STATIC,7,29,58,8
+    LTEXT           "Чтобы изменить дату, просто выберите требуемое значение при помощи кнопок управления находящихся ниже.",IDC_STATIC,7,4,264,16
+    CONTROL         "",IDC_MODIFICATIONTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,28,62,13
+    LTEXT           "Дата создания:",IDC_STATIC,7,49,54,8
+    CONTROL         "",IDC_CREATIONDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,48,62,13
+    CONTROL         "",IDC_CREATIONTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,48,62,13
+    LTEXT           "Дата доступа:",IDC_STATIC,7,71,48,8
+    CONTROL         "",IDC_ACCESSDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,68,62,13
+    CONTROL         "",IDC_ACCESSTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,68,62,13
+    PUSHBUTTON      "Сбросить",IDC_MODIFICATION_RESET,231,28,50,13
+    PUSHBUTTON      "Сбросить",IDC_CREATION_RESET,231,48,50,13
+    PUSHBUTTON      "Сбросить",IDC_ACCESS_RESET,231,68,50,13
+    GROUPBOX        "Атрибуты",IDC_STATIC,7,91,220,51
+    CONTROL         "Архив",IDC_CHECK_ARCHIVE,"Button",BS_AUTO3STATE | WS_TABSTOP,19,106,37,10
+    CONTROL         "Только чтение",IDC_CHECK_READONLY,"Button",BS_AUTO3STATE | WS_TABSTOP,19,124,66,10
+    CONTROL         "Скрытый",IDC_CHECK_HIDDEN,"Button",BS_AUTO3STATE | WS_TABSTOP,89,106,47,10
+    CONTROL         "Системный",IDC_CHECK_SYSTEM,"Button",BS_AUTO3STATE | WS_TABSTOP,89,124,53,10
+    CONTROL         "Индексированный",IDC_CHECK_INDEXED,"Button",BS_AUTO3STATE | WS_TABSTOP,145,106,78,10
+END
+
+IDD_DESTROYFILES DIALOGEX 0, 0, 305, 228
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Уничтожение файлов"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,195,210,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,250,210,50,14
+    GROUPBOX        "Метод уничтожения",IDC_STATIC,5,134,238,52
+    CONTROL         "перезапись в 1 проход (быстро)",IDC_DESTROYFILES_RADIO_ONEPASS,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,11,150,125,10
+    CONTROL         "перезапись в 3 прохода",IDC_DESTROYFILES_RADIO_THREEPASS,
+                    "Button",BS_AUTORADIOBUTTON,11,168,97,10
+    CONTROL         "Устанавливать случайные имена и атрибуты уничтожаемым файлам",IDC_DESTROYFILES_CHECK_RANDOMIZE,
+                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,11,195,250,10
+    CONTROL         "",IDC_DESTROYFILES_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,5,5,237,118
+    PUSHBUTTON      "Удалить",IDC_DESTROYFILES_BUTTON_REMOVE,250,5,50,14
+END
+
+IDD_PHYSICALDRIVE DIALOGEX 0, 0, 263, 255
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Информация о дисках"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Закрыть",IDCLOSE,204,232,50,14
+    CONTROL         "",IDC_RICHEDIT_DRIVEINFO,"RichEdit20W",WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP | 0x884,9,9,245,216
+    PUSHBUTTON      "Сохранить...",IDSAVE,151,232,50,14
+END
+
+IDD_MASSRENAME DIALOGEX 0, 0, 300, 156
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Пакетное переименование"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,193,137,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,246,137,50,14
+    LTEXT           "Шаблон:",IDC_STATIC,6,5,30,8
+    EDITTEXT        IDC_MASSRENAME_EDIT,82,4,214,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_MASSRENAME_FILELISTVIEW,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,4,21,292,109
+END
+
+IDD_SELECTGROUP DIALOGEX 0, 0, 276, 41
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Выделение файлов по шаблону:"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,167,22,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,222,22,50,14
+    COMBOBOX        IDC_SELECTGROUP_COMBOBOX,4,4,268,13,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_DISPLAYCOLOURS DIALOGEX 0, 0, 455, 226
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Укажите настройки отображения окна быстрого просмотра"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,349,202,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,402,202,50,14
+    CONTROL         "",IDC_SLIDER_SURROUND_RED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,273,14,148,23
+    LTEXT           "Красный:",IDC_STATIC,237,19,33,8
+    LTEXT           "Зелёный:",IDC_STATIC,237,50,33,8
+    LTEXT           "Синий:",IDC_STATIC,237,81,24,8
+    CONTROL         "",IDC_SLIDER_SURROUND_GREEN,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,273,46,148,23
+    CONTROL         "",IDC_SLIDER_SURROUND_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,273,78,148,23
+    EDITTEXT        IDC_EDIT_SURROUND_RED,421,15,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_SURROUND_GREEN,421,46,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_SURROUND_BLUE,421,77,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "Цвет заливки",IDC_STATIC,229,2,221,104
+    CONTROL         "",IDC_SLIDER_CENTRE_RED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,47,12,148,23
+    LTEXT           "Красный:",IDC_STATIC,8,17,33,8
+    LTEXT           "Зеленый:",IDC_STATIC,8,47,33,8
+    LTEXT           "Синий:",IDC_STATIC,8,79,24,8
+    CONTROL         "",IDC_SLIDER_CENTRE_GREEN,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,47,44,148,23
+    CONTROL         "",IDC_SLIDER_CENTRE_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,47,76,148,23
+    EDITTEXT        IDC_EDIT_CENTRE_RED,195,13,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_CENTRE_GREEN,195,44,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_CENTRE_BLUE,195,74,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "Основной цвет",IDC_STATIC,4,2,221,102
+    LTEXT           "",IDC_STATIC_PREVIEWDISPLAY,4,131,448,56,SS_SUNKEN
+    PUSHBUTTON      "Шрифт...",IDC_BUTTON_DISPLAY_FONT,8,109,60,17
+END
+
+IDD_FILTER DIALOGEX 0, 0, 249, 46
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Задать фильтр"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,142,26,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,195,26,50,14
+    COMBOBOX        IDC_FILTER_COMBOBOX,43,5,202,20,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Фильтр:",IDC_STATIC,6,7,29,8
+END
+
+IDD_ADD_BOOKMARK DIALOGEX 0, 0, 232, 167
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Добавить закладку"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,123,61,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,177,61,50,14
+    LTEXT           "Имя",IDC_STATIC,4,6,19,8
+    LTEXT           "Описание",IDC_STATIC_DESCRIPTION,4,101,36,8
+    EDITTEXT        IDC_BOOKMARK_DESCRIPTION,45,100,182,44,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
+    LTEXT           "Создать в",IDC_STATIC,4,24,32,8
+    LTEXT           "Путь",IDC_STATIC_LOCATION,4,84,30,8
+    PUSHBUTTON      "Новая папка",IDC_BOOKMARK_NEWFOLDER,45,38,89,14
+    PUSHBUTTON      "Детали >>",IDC_BOOKMARK_DETAILS,139,38,89,14
+    EDITTEXT        IDC_BOOKMARK_NAME,46,4,182,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_BOOKMARK_LOCATION,45,83,182,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_BOOKMARK_CREATEIN,"ComboBoxEx32",CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,46,22,182,166
+    CONTROL         "",IDC_BOOKMARK_SEPARATOR,"Static",SS_ETCHEDHORZ,3,56,225,1
+    CONTROL         "Показывать на панели закладок",IDC_BOOKMARK_TOOLBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,45,150,140,10
+END
+
+IDD_ORGANIZE_BOOKMARKS DIALOGEX 0, 0, 470, 206
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Управление закладками"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,417,189,50,14
+    CONTROL         "",IDC_ORGANIZE_BOOKMARKS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,126,5,287,198
+    PUSHBUTTON      "Вверх",IDC_ORGANIZE_MOVEUP,417,5,50,14
+    PUSHBUTTON      "Вниз",IDC_ORGANIZE_MOVEDOWN,417,21,50,14
+    PUSHBUTTON      "Удалить",IDC_ORGANIZE_DELETE,417,37,50,14
+    PUSHBUTTON      "Свойства",IDC_ORGANIZE_PROPERTIES,417,53,50,14
+    CONTROL         "",IDC_ORGANIZE_FOLDERS,"SysTreeView32",TVS_HASBUTTONS | TVS_SHOWSELALWAYS | WS_BORDER | WS_HSCROLL | WS_TABSTOP,3,5,118,198
+END
+
+IDD_OPTIONS_DEFAULT DIALOGEX 0, 0, 254, 173
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Стандартные настройки"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Показывать скрытые файлы",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,101,114,10
+    LTEXT           "Следующие настройки контролируют глобальное стандартное поведение программы. Каждая новая вкладка унаследует эти настройки, затем их можно будет изменить для каждой вкладки отдельно.",IDC_STATIC,9,6,227,32
+    GROUPBOX        "Вид",IDC_STATIC,9,45,199,46
+    CONTROL         "Значки",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON,127,57,40,10
+    CONTROL         "Плитка",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON,72,57,41,10
+    CONTROL         "Маленькие значки",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON,127,73,79,10
+    CONTROL         "Список",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON,17,73,40,10
+    CONTROL         "Таблица",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON,72,73,44,10
+    CONTROL         "Автоматическое упорядочение",IDC_AUTOARRANGEGLOBAL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,124,101,123,10
+    CONTROL         "Показывать по группам",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,116,97,10
+    CONTROL         "Сортировать по возрастанию",IDC_SORTASCENDINGGLOBAL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,124,116,117,10
+    CONTROL         "Эскизы",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON,17,57,41,10
+    LTEXT           "Стандартная папка для новой вкладки:",IDC_STATIC,9,140,138,8
+    EDITTEXT        IDC_DEFAULT_NEWTABDIR_EDIT,15,154,143,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_DEFAULT_NEWTABDIR_BUTTON,161,154,21,14,BS_ICON
+END
+
+IDD_BOOKMARK_PROPERTIES DIALOGEX 0, 0, 212, 134
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Свойства закладок"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,102,115,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,157,115,50,14
+    LTEXT           "Имя",IDC_STATIC,4,6,14,8
+    EDITTEXT        IDC_BP_EDIT_NAME,47,3,160,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_BP_EDIT_LOCATION,47,22,160,14,ES_AUTOHSCROLL
+    LTEXT           "Путь",IDC_STATIC,4,24,18,8
+    LTEXT           "Описание",IDC_STATIC,4,43,34,8
+    EDITTEXT        IDC_BP_EDIT_DESCRIPTION,47,41,160,52,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
+    CONTROL         "Показывать на панели закладок",IDC_BP_SHOWONTOOLBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,47,100,127,10
+END
+
+IDD_SPLITFILE DIALOGEX 0, 0, 266, 86
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Разделить файл"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,159,65,50,14
+    PUSHBUTTON      "Закрыть",IDCANCEL,212,65,50,14
+    LTEXT           "Каталог назначения:",IDC_STATIC,3,24,73,8
+    EDITTEXT        IDC_SPLIT_EDIT_OUTPUT,87,23,153,12,ES_AUTOHSCROLL
+    LTEXT           "Размер куска:",IDC_STATIC,20,6,48,8
+    EDITTEXT        IDC_SPLIT_EDIT_SIZE,87,3,40,12,ES_AUTOHSCROLL | ES_NUMBER
+    COMBOBOX        IDC_SPLIT_COMBOBOX_SIZES,133,3,48,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_SPLIT_BUTTON_OUTPUT,245,23,17,12
+    CONTROL         "",IDC_SPLIT_PROGRESS,"msctls_progress32",WS_BORDER,3,49,238,9
+END
+
+IDD_MERGEFILES DIALOGEX 0, 0, 354, 177
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Склеить файлы"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,249,156,50,14
+    PUSHBUTTON      "Закрыть",IDCANCEL,302,156,50,14
+    CONTROL         "",IDC_MERGE_PROGRESS,"msctls_progress32",WS_BORDER,4,133,294,10
+    CONTROL         "",IDC_MERGE_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,4,5,293,96
+    PUSHBUTTON      "Вверх",IDC_MERGE_BUTTON_MOVEUP,302,5,50,14
+    PUSHBUTTON      "Вниз",IDC_MERGE_BUTTON_MOVEDOWN,302,24,50,14
+    PUSHBUTTON      "Удалить",IDC_MERGE_BUTTON_REMOVE,302,43,50,14
+    LTEXT           "Каталог назначения:",IDC_STATIC,4,112,73,8
+    EDITTEXT        IDC_MERGE_EDIT_FILENAME,83,110,214,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,150,348,1
+    PUSHBUTTON      "...",IDC_MERGE_BUTTON_OUTPUT,305,110,13,12
+END
+
+IDD_OPTIONS_LANGUAGE DIALOGEX 0, 0, 228, 155
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Язык"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Язык",IDC_STATIC,9,54,18,8
+    COMBOBOX        IDC_OPTIONS_LANGUAGE,45,52,101,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Чтобы изменить язык используемый Explorer++, просто выберите нужный язык из списка находящегося ниже. Любое изменения языка осуществится только после перезапуска Explorer++.",IDC_STATIC,9,7,204,33
+END
+
+IDD_NEWBOOKMARKFOLDER DIALOGEX 0, 0, 191, 65
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Новая папка"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,79,45,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,133,45,50,14
+    LTEXT           "Имя",IDC_STATIC,4,7,14,8
+    LTEXT           "Создать в",IDC_STATIC,4,26,36,8
+    EDITTEXT        IDC_NEWFOLDER_NAME,49,4,134,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_NEWFOLDER_CREATEIN,"ComboBoxEx32",CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,49,24,134,135
+END
+
+IDD_BOOKMARKFOLDER_PROPERTIES DIALOGEX 0, 0, 212, 113
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Свойства папки"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,102,95,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,157,95,50,14
+    LTEXT           "Имя",-1,4,6,14,8
+    EDITTEXT        IDC_BFP_NAME,47,3,160,14,ES_AUTOHSCROLL
+    LTEXT           "Описание",-1,4,25,34,8
+    EDITTEXT        IDC_BFP_DESCRIPTION,47,23,160,52,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
+    CONTROL         "Показывать на панели закладок",IDC_BFP_SHOWONTOOLBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,47,81,127,10
+END
+
+IDD_RENAMETAB DIALOGEX 0, 0, 338, 75
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Переименовать вкладку"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,231,57,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,284,57,50,14
+    EDITTEXT        IDC_RENAMETAB_NEWTABNAME,135,32,193,13,ES_AUTOHSCROLL
+    GROUPBOX        "Имя вкладки",IDC_STATIC,3,4,331,45
+    CONTROL         "Использовать текущее имя папки",IDC_RENAMETAB_USEFOLDERNAME,
+                    "Button",BS_AUTORADIOBUTTON,8,18,131,10
+    CONTROL         "Использовать указанное имя:",IDC_RENAMETAB_USECUSTOMNAME,
+                    "Button",BS_AUTORADIOBUTTON,8,33,117,10
+END
+
+IDD_SETDEFAULTCOLUMNS DIALOGEX 0, 0, 236, 258
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Стандартные столбцы в режиме таблицы:"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,114,238,57,14
+    PUSHBUTTON      "Отмена",IDCANCEL,175,238,57,14
+    CONTROL         "",IDC_DEFAULTCOLUMNS_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,3,22,166,174
+    PUSHBUTTON      "Вверх",IDC_DEFAULTCOLUMNS_MOVEUP,175,22,57,14
+    PUSHBUTTON      "Вниз",IDC_DEFAULTCOLUMNS_MOVEDOWN,175,38,57,14
+    PUSHBUTTON      "Задействовать",IDC_DEFAULTCOLUMNS_ENABLE,175,54,57,14
+    PUSHBUTTON      "Отключить",IDC_DEFAULTCOLUMNS_DISABLE,175,70,57,14
+    LTEXT           "Описание:",IDC_STATIC,3,202,36,8
+    LTEXT           "",IDC_DEFAULTCOLUMNS_DESCRIPTION,45,202,149,23
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,233,228,1
+    COMBOBOX        IDC_DEFAULTCOLUMNS_COMBOBOX,46,5,123,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Тип папки:",IDC_STATIC,3,6,38,8
+END
+
+IDD_SELECTCOLUMNS DIALOGEX 0, 0, 236, 236
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Столбцы в режиме таблицы:"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,114,219,57,14
+    PUSHBUTTON      "Отмена",IDCANCEL,175,219,57,14
+    CONTROL         "",IDC_COLUMNS_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,3,3,166,174
+    PUSHBUTTON      "Вверх",IDC_COLUMNS_MOVEUP,175,3,57,14
+    PUSHBUTTON      "Вниз",IDC_COLUMNS_MOVEDOWN,175,19,57,14
+    PUSHBUTTON      "Задействовать",IDC_COLUMNS_ENABLE,175,35,57,14
+    PUSHBUTTON      "Отключить",IDC_COLUMNS_DISABLE,175,51,57,14
+    LTEXT           "Описание:",IDC_STATIC,3,183,36,8
+    LTEXT           "",IDC_COLUMNS_DESCRIPTION,45,183,149,23
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,214,228,1
+END
+
+IDD_EDITAPPLICATIONBUTTON DIALOGEX 0, 0, 249, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Edit Application Button"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,142,45,50,14
+    PUSHBUTTON      "Отмена",IDCANCEL,196,45,50,14
+    LTEXT           "Имя",IDC_STATIC,4,6,19,8
+    LTEXT           "Команда",IDC_STATIC,4,25,32,8
+    PUSHBUTTON      "...",IDC_APP_BUTTON_COMMAND,229,24,17,14
+    EDITTEXT        IDC_APP_EDIT_NAME,41,4,183,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_APP_EDIT_COMMAND,41,24,183,14,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 240
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 111
+    END
+
+    IDD_OPTIONS_GENERAL, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 161
+    END
+
+    IDD_OPTIONS_TABS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 221
+        TOPMARGIN, 7
+    END
+
+    IDD_DESTROYFILES, DIALOG
+    BEGIN
+        RIGHTMARGIN, 303
+    END
+
+    IDD_PHYSICALDRIVE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 258
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 248
+    END
+
+    IDD_DISPLAYCOLOURS, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 431
+        TOPMARGIN, 1
+        BOTTOMMARGIN, 221
+    END
+
+    IDD_ADD_BOOKMARK, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 166
+    END
+
+    IDD_OPTIONS_LANGUAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 221
+        TOPMARGIN, 1
+        BOTTOMMARGIN, 148
+    END
+
+    IDD_SELECTCOLUMNS, DIALOG
+    BEGIN
+        RIGHTMARGIN, 198
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINMENU MENU 
+BEGIN
+    POPUP "&Файл"
+    BEGIN
+        MENUITEM "&Новая вкладка\tCtrl+T",      IDM_FILE_NEWTAB
+        MENUITEM "&Закрыть вкладку\tCtrl+W",    IDM_FILE_CLOSETAB
+        MENUITEM "Clone Window",                IDM_FILE_CLONEWINDOW
+        MENUITEM SEPARATOR
+        MENUITEM "Сохранить &структуру папок",  IDM_FILE_SAVEDIRECTORYLISTING
+        MENUITEM "Показать &командную строку",  IDM_FILE_SHOWCOMMANDPROMPT
+        MENUITEM "Копировать путь к &папке",    IDM_FILE_COPYFOLDERPATH
+        MENUITEM "Копировать путь к &файлу",    IDM_FILE_COPYITEMPATH
+        MENUITEM "Копировать &текст колонки",   IDM_FILE_COPYCOLUMNTEXT
+        MENUITEM SEPARATOR
+        MENUITEM "Установить &атрибуты файла...", IDM_FILE_SETFILEATTRIBUTES
+        MENUITEM "&Удалить в корзину\tDelete",  IDM_FILE_DELETE
+        MENUITEM "Удалить на&всегда\tShift+Delete", IDM_FILE_DELETEPERMANENTLY
+        MENUITEM "Пере&именовать\tF2",          IDM_FILE_RENAME
+        MENUITEM "Сво&йства\tAlt+Enter",        IDM_FILE_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "В&ыход",                      IDM_FILE_EXIT
+    END
+    POPUP "&Правка"
+    BEGIN
+        MENUITEM "&Отменить\tCtrl+Z",           IDM_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Вы&резать\tCtrl+X",           IDM_EDIT_CUT
+        MENUITEM "&Копировать\tCtrl+C",         IDM_EDIT_COPY
+        MENUITEM "&Вставить\tCtrl+V",           IDM_EDIT_PASTE
+        MENUITEM "Вставить &ярлык\tCtrl+Shift+V", IDM_EDIT_PASTESHORTCUT
+        MENUITEM "Вставить &жесткую ссылку",    IDM_EDIT_PASTEHARDLINK
+        MENUITEM SEPARATOR
+        MENUITEM "Копировать в &папку\tCtrl+Shift+C", IDM_EDIT_COPYTOFOLDER
+        MENUITEM "Пере&местить в папку\tCtrl+Shift+M", IDM_EDIT_MOVETOFOLDER
+        MENUITEM SEPARATOR
+        MENUITEM "Сохранить пустот&ы файла",    IDM_EDIT_SHOWFILESLACK
+        MENUITEM "Перейти по &ссылке",          IDM_EDIT_RESOLVELINK
+    END
+    POPUP "В&ыделение"
+    BEGIN
+        MENUITEM "Выделить &все\tCtrl+A",       IDM_EDIT_SELECTALL
+        MENUITEM "&Инвертировать выделение\tCtrl+I", IDM_EDIT_INVERTSELECTION
+        MENUITEM "Выделить все по выбранному &типу", IDM_EDIT_SELECTALLFOLDERS
+        MENUITEM "&Отменить выделение\tCtrl+Shift+N", IDM_EDIT_SELECTNONE
+        MENUITEM "Выделить по &шаблону...",     IDM_EDIT_WILDCARDSELECTION
+        MENUITEM "&Снять выделение по шаблону...", IDM_EDIT_WILDCARDDESELECT
+    END
+    POPUP "&Вид"
+    BEGIN
+        MENUITEM "Строка &состояния",           IDM_VIEW_STATUSBAR
+        MENUITEM "&Папки",                      IDM_VIEW_FOLDERS
+        MENUITEM "Окно &быстро просмотра",      IDM_VIEW_DISPLAYWINDOW
+        POPUP "П&анели"
+        BEGIN
+            MENUITEM "Адресная строка",             IDM_TOOLBARS_ADDRESSBAR
+            MENUITEM "Главная панель",              IDM_TOOLBARS_MAINTOOLBAR
+            MENUITEM "Закладки",                    IDM_TOOLBARS_BOOKMARKSTOOLBAR
+            MENUITEM "Диски",                       IDM_TOOLBARS_DRIVES
+            MENUITEM "Панель приложений",           IDM_TOOLBARS_APPLICATIONTOOLBAR
+            MENUITEM SEPARATOR
+            MENUITEM "Закрепить панели",            IDM_TOOLBARS_LOCKTOOLBARS
+            MENUITEM "Настроить",                   IDM_TOOLBARS_CUSTOMIZE
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "&Эскизы",                     IDM_VIEW_THUMBNAILS
+        MENUITEM "П&литка",                     IDM_VIEW_TILES
+        MENUITEM "&Значки",                     IDM_VIEW_ICONS
+        MENUITEM "&Маленькие значки",           IDM_VIEW_SMALLICONS
+        MENUITEM "Сп&исок",                     IDM_VIEW_LIST
+        MENUITEM "&Таблица",                    IDM_VIEW_DETAILS
+        MENUITEM SEPARATOR
+        MENUITEM "&Упорядочить по",             IDM_VIEW_SORTBY
+        MENUITEM "Показать скрытые &файлы\tCtrl+H", IDM_VIEW_SHOWHIDDENFILES
+        MENUITEM "&Обновить\tF5",               IDM_VIEW_REFRESH
+        MENUITEM "Настроить стд. столбцы...",   IDM_VIEW_SETDEFAULTCOLUMNS
+        MENUITEM "Настроить столб&цы...",       IDM_VIEW_SELECTCOLUMNS
+        MENUITEM "Авто&размер столбцов",        IDM_VIEW_AUTOSIZECOLUMNS
+        MENUITEM "&Настройки окна быстрого просмотра", IDM_VIEW_CHANGEDISPLAYCOLOURS
+        MENUITEM SEPARATOR
+        POPUP "&Фильтр"
+        BEGIN
+            MENUITEM "Задать фильтр",               IDM_FILTER_FILTERRESULTS
+            MENUITEM "Применить фильтр",            IDM_FILTER_APPLYFILTER
+        END
+    END
+    POPUP "&Действия"
+    BEGIN
+        MENUITEM "Новая &папка\tCtrl+N",        IDM_ACTIONS_NEWFOLDER
+        MENUITEM SEPARATOR
+        MENUITEM "&Разделить файл...",          IDM_ACTIONS_SPLITFILE
+        MENUITEM "&Склеить файлы...",           IDM_ACTIONS_MERGEFILES
+        MENUITEM "&Уничтожить файлы...",        IDM_ACTIONS_DESTROYFILES
+    END
+    POPUP "Пере&ход"
+    BEGIN
+        MENUITEM "&Назад\tAlt+Left",            IDM_GO_BACK
+        MENUITEM "&Вперед\tAlt+Right",          IDM_GO_FORWARD
+        MENUITEM "Вверх на один &уровень\tBackspace", IDM_GO_UPONELEVEL
+        MENUITEM SEPARATOR
+        MENUITEM "Placeholder",                 IDM_GO_MYCOMPUTER
+        MENUITEM "Placeholder",                 IDM_GO_MYDOCUMENTS
+        MENUITEM "Placeholder",                 IDM_GO_MYMUSIC
+        MENUITEM "Placeholder",                 IDM_GO_MYPICTURES
+        MENUITEM "Placeholder",                 IDM_GO_DESKTOP
+        MENUITEM SEPARATOR
+        MENUITEM "Placeholder",                 IDM_GO_RECYCLEBIN
+        MENUITEM "Placeholder",                 IDM_GO_CONTROLPANEL
+        MENUITEM "Placeholder",                 IDM_GO_PRINTERS
+        MENUITEM "Placeholder",                 IDM_GO_CDBURNING
+        MENUITEM "Placeholder",                 IDM_GO_MYNETWORKPLACES
+        MENUITEM "Placeholder",                 IDM_GO_NETWORKCONNECTIONS
+    END
+    POPUP "&Закладки"
+    BEGIN
+        MENUITEM "&Заложить закладку...\tCtrl+D", IDM_BOOKMARKS_BOOKMARKTHISTAB
+        MENUITEM "&Управление закладками...\tCtrl+B", IDM_BOOKMARKS_ORGANIZEBOOKMARKS
+        MENUITEM SEPARATOR
+    END
+    POPUP "&Инструменты"
+    BEGIN
+        MENUITEM "&Информация о дисках...",     IDM_TOOLS_SHOWDRIVEINFORMATION
+        MENUITEM SEPARATOR
+        MENUITEM "&Настройки...",               IDM_TOOLS_OPTIONS
+    END
+    POPUP "&Помощь"
+    BEGIN
+        MENUITEM "&Помощь\tF1",                 IDM_HELP_HELP
+        MENUITEM SEPARATOR
+        MENUITEM "&О программе Explorer++",     IDM_HELP_ABOUT
+    END
+END
+
+IDR_MAINMENU_RCLICK MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        POPUP "Вид"
+        BEGIN
+            MENUITEM "Эскизы",                      IDM_VIEW_THUMBNAILS
+            MENUITEM "Плитка",                      IDM_VIEW_TILES
+            MENUITEM "Значки",                      IDM_VIEW_ICONS
+            MENUITEM "Маленькие значки",            IDM_VIEW_SMALLICONS
+            MENUITEM "Список",                      IDM_VIEW_LIST
+            MENUITEM "Таблица",                     IDM_VIEW_DETAILS
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Упорядочить по",              ID_POPUP_SORTBY
+        MENUITEM "Обновить",                    IDM_VIEW_REFRESH
+        MENUITEM SEPARATOR
+        MENUITEM "Вставить",                    IDM_EDIT_PASTE
+        MENUITEM "Вставить ярлык",              IDM_EDIT_PASTESHORTCUT
+        MENUITEM SEPARATOR
+        MENUITEM "Заложить закладку...",        IDM_BOOKMARKS_BOOKMARKTHISTAB
+        MENUITEM "Копировать путь к папке",     IDM_FILE_COPYFOLDERPATH
+        MENUITEM SEPARATOR
+        MENUITEM "Свойства",                    IDM_RCLICK_PROPERTIES
+    END
+END
+
+IDR_ARRANGEMENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM SEPARATOR
+        MENUITEM "Возрастающий",                IDM_ARRANGEICONSBY_ASCENDING
+        MENUITEM "Убывающий",                   IDM_ARRANGEICONSBY_DESCENDING
+        MENUITEM SEPARATOR
+        MENUITEM "Показывать по группам",       IDM_ARRANGEICONSBY_SHOWINGROUPS
+        MENUITEM "Автоматическое упорядочение", IDM_ARRANGEICONSBY_AUTOARRANGE
+    END
+END
+
+IDR_TAB_RCLICK MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "&Новая вкладка\tCtrl+T",      IDM_FILE_NEWTAB
+        MENUITEM "Продублировать вкладку",      IDM_TAB_DUPLICATETAB
+        MENUITEM "Открыть родителя в новой вкладке", IDM_TAB_OPENPARENTINNEWTAB
+        MENUITEM SEPARATOR
+        MENUITEM "&Обновить\tF5",               IDM_TAB_REFRESH
+        MENUITEM "Обновить &все",               IDM_TAB_REFRESHALL
+        MENUITEM SEPARATOR
+        MENUITEM "Переименовать вкладку",       IDM_TAB_RENAMETAB
+        MENUITEM "Закрепить вкладку",           IDM_TAB_LOCKTAB
+        MENUITEM "Закрепить вкладку и адрес",   IDM_TAB_LOCKTABANDADDRESS
+        MENUITEM SEPARATOR
+        MENUITEM "Закрыть &другие вкладки",     IDM_TAB_CLOSEOTHERTABS
+        MENUITEM "&Закрыть вкладку",            IDM_TAB_CLOSETAB
+    END
+END
+
+IDR_VIEWS_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Эскизы",                      IDM_VIEW_THUMBNAILS
+        MENUITEM "Плитка",                      IDM_VIEW_TILES
+        MENUITEM "Значки",                      IDM_VIEW_ICONS
+        MENUITEM "Small Icons",                 IDM_VIEW_SMALLICONS
+        MENUITEM "Список",                      IDM_VIEW_LIST
+        MENUITEM "Таблица",                     IDM_VIEW_DETAILS
+    END
+END
+
+IDR_TOOLBAR_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Адресная строка",             IDM_TOOLBARS_ADDRESSBAR
+        MENUITEM "Главная панель",              IDM_TOOLBARS_MAINTOOLBAR
+        MENUITEM "Закладки",                    IDM_TOOLBARS_BOOKMARKSTOOLBAR
+        MENUITEM "Диски",                       IDM_TOOLBARS_DRIVES
+        MENUITEM "Панель приложений",           IDM_TOOLBARS_APPLICATIONTOOLBAR
+        MENUITEM SEPARATOR
+        MENUITEM "Закрепить панели",            IDM_TOOLBARS_LOCKTOOLBARS
+        MENUITEM "Настроить...",                IDM_TOOLBARS_CUSTOMIZE
+    END
+END
+
+IDR_BOOKMARKSTOOLBAR_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Открыть",                     IDM_BT_OPEN
+        MENUITEM "Открыть в новой вкладке",     IDM_BT_OPENINNEWTAB
+        MENUITEM SEPARATOR
+        MENUITEM "Новая закладка...",           IDM_BT_NEWBOOKMARK
+        MENUITEM "Новая папка...",              IDM_BT_NEWFOLDER
+        MENUITEM SEPARATOR
+        MENUITEM "Удалить",                     IDM_BT_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Свойства",                    IDM_BT_PROPERTIES
+    END
+END
+
+IDR_BOOKMARK_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Открыть",                     IDM_BOOKMARK_OPEN
+        MENUITEM "Открыть в новой вкладке",     IDM_BOOKMARK_OPENINNEWTAB
+        MENUITEM SEPARATOR
+        MENUITEM "Показывать на панели закладок", IDM_BOOKMARK_SHOWONTOOLBAR
+        MENUITEM SEPARATOR
+        MENUITEM "Удалить",                     IDM_BOOKMARK_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Новая закладка...",           IDM_BOOKMARK_NEWBOOKMARK
+        MENUITEM "Новая папка...",              IDM_BOOKMARK_NEWFOLDER
+        MENUITEM SEPARATOR
+        MENUITEM "Свойства",                    IDM_BOOKMARK_PROPERTIES
+    END
+END
+
+IDR_APPLICATIONTOOLBAR_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Открыть",                     IDM_APP_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "Добавить кнопку...",          IDM_APP_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "Удалить",                     IDM_APP_DELETE
+        MENUITEM "Свойства",                    IDM_APP_PROPERTIES
+    END
+END
+
+IDR_HEADER_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM SEPARATOR
+        MENUITEM "More...",                     IDM_HEADER_MORE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,9,5,4
+ PRODUCTVERSION 0,9,5,4
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x3L
+#else
+ FILEFLAGS 0x2L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041904b0"
+        BEGIN
+            VALUE "FileDescription", "Explorer++ Translation DLL"
+            VALUE "FileVersion", "0, 9, 5, 4"
+            VALUE "InternalName", "Explorer++ Russian Translation DLL"
+            VALUE "LegalCopyright", "(C) 2005-2009 David Erceg"
+            VALUE "OriginalFilename", "Explorer++RU.dll"
+            VALUE "ProductName", "Explorer++"
+            VALUE "ProductVersion", "0, 9, 5, 4"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x419, 1200
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_SAVEDIRECTORYLISTING 
+                            "Сохраняет структуру папок начиная с текущего каталога"
+    IDS_MERGE_COLUMN_TEXT   "Файлы для склеивания"
+    IDS_OK                  "OK"
+    IDS_MERGE_NOINPUT       "Входящие файлы не указаны"
+    IDS_MERGE_OUTPUTINVALID "Неверно указан файл назначения"
+    IDS_CANCEL              "Отмена"
+    IDS_MERGE_SELECTDESTINATION "Выберите папку назначения"
+    IDS_SORTBY_NAME         "Имя"
+    IDS_SORTBY_SIZE         "Размер"
+    IDS_SORTBY_TYPE         "Тип"
+    IDS_SORTBY_DATEMODIFIED "Дата модификации"
+    IDS_SORTBY_TOTALSIZE    "Общий размер"
+    IDS_SORTBY_FREESPACE    "Свободное пространство"
+    IDS_SORTBY_DATEDELETED  "Дата удаления"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_NEWTAB         "Создает новую вкладку"
+    IDM_FILE_CLOSETAB       "Закрывает текущую вкладку"
+    IDM_FILE_SHOWCOMMANDPROMPT "Открывает командную строку для текущей папки"
+    IDM_FILE_COPYFOLDERPATH "Копирует полный путь текущей вкладки"
+    IDM_FILE_COPYITEMPATH   "Копирует полный путь выделенного объекта"
+    IDM_FILE_DELETE         "Перемещает выделенные объекты в корзину"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_RENAME         "Переименовывает выделенные объекты"
+    IDM_FILE_PROPERTIES     "Отображает свойства выделенных объектов"
+    IDM_EDIT_CUT            "Вырезает выделенные объекты о помещает их в буфер обмена"
+    IDM_EDIT_COPY           "Копирует выделенные объекты о помещает их в буфер обмена"
+    IDM_EDIT_PASTE          "Вставляет объекты находящиеся в буфере обмена"
+    IDM_EDIT_PASTESHORTCUT  "Создает ярлык на выделенный файл"
+    IDM_EDIT_COPYTOFOLDER   "Копирует выбранные объекты в другую папку"
+    IDM_EDIT_MOVETOFOLDER   "Перемещает выбранные объекты в другую папку"
+    IDM_EDIT_SELECTALL      "Выделяет все объекты в текущей вкладке"
+    IDM_EDIT_INVERTSELECTION 
+                            "Выделяет не выделенные объекты, отменяет выделения для выделенных объектов"
+    IDM_EDIT_SELECTNONE     "Отменяет выделение объектов в текущей вкладке"
+    IDM_VIEW_STATUSBAR      "Отображает/Скрывает строку состояния"
+    IDM_VIEW_FOLDERS        "Отображает/Скрывает древо папок"
+    IDM_VEW_ADDRESSBAR      "Отображает/Скрывает адресную строку"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_EDIT_WILDCARDSELECTION "Выделяет объекты на основе шаблона"
+    IDM_BOOKMARKS_ORGANIZEBOOKMARKS 
+                            "Позволяет переименовывать, удалять, а также изменять описания закладок"
+    IDM_VIEW_DISPLAYWINDOW  "Отображает/Скрывает окно быстрого просмотра"
+    IDM_VIEW_CHANGEDISPLAYCOLOURS 
+                            "Настраивает свойства отображения окна быстрого просмотра"
+    IDM_EDIT_WILDCARDDESELECT "Отменяет выделение объектов на основе шаблона"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TOOLS_OPTIONS       "Открывает диалог настройки программы"
+    IDM_HELP_HELP           "Отображает справку"
+    IDM_HELP_ABOUT          "Покузывает информацию о программе, номер версии и и нформацию о авторском праве"
+    IDM_VIEW_SHOWHIDDENFILES "Отображает/Скрывает скрытые файлы"
+    IDM_VIEW_REFRESH        "Обновляет содержание текущей вкладки"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_DELETEPERMANENTLY 
+                            "Удаляет выделенные объекты не помещая их в корзину"
+    IDM_TAB_CLOSEOTHERTABS  "Закрывает все вкладки кроме текущей"
+    IDM_TAB_REFRESHALL      "Обновляет содержание всех вкладок"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_EXIT           "Выход из программы"
+    IDM_EDIT_SELECTALLOFSAMETYPE 
+                            "Выделяет все объекты того же типа что и текущее выделение"
+    IDM_FILE_SETFILEATTRIBUTES "Изменяет атрибуты выделенных объектов"
+    IDM_EDIT_SHOWFILESLACK  "Отображает данные находящиеся в пустотах выделенных объектов"
+    IDM_EDIT_RESOLVELINK    "Находит родителя любой выделенной ссылки"
+    IDM_RCLICK_PROPERTIES   "Отображает свойства текущей папки"
+    IDM_BOOKMARKS_BOOKMARKTHISTAB "Закладывает закладку на текущую папку"
+    IDM_BOOKMARKS_BOOKMARKALLTABS "Закладывает закладки на все открытые папки"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_VIEW_THUMBNAILS     "Отображает эскизы объектов"
+    IDM_VIEW_TILES          "Отображает объекты используя стиль - Плитка"
+    IDM_VIEW_ICONS          "Отображает большие значки объектов"
+    IDM_VIEW_SMALLICONS     "Отображает маленькие значки объектов"
+    IDM_VIEW_LIST           "Отображает список объектов"
+    IDM_VIEW_DETAILS        "Отображает объекты используя стиль - Таблица"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_ARRANGEICONSBY_NAME "Выстраивает объекты в алфавитном порядке по имени"
+    IDM_ARRANGEICONSBY_SIZE "Выстраивает объекты по увеличению размера"
+    IDM_ARRANGEICONSBY_TYPE "Выстраивает объекты по их типу"
+    IDM_ARRANGEICONSBY_DATEMODIFIED 
+                            "Выстраивает объекты по дате модификации; от самого старого к новейшему"
+    IDM_ARRANGEICONSBY_ASCENDING "Выстраивает объекты в порядке возрастания"
+    IDM_ARRANGEICONSBY_DESCENDING "Выстраивает объекты в порядке убывания"
+    IDM_ARRANGEICONSBY_SHOWINGROUPS 
+                            "Группирует объекты текущей вкладки по указанному свойству"
+    IDM_ARRANGEICONSBY_AUTOARRANGE "Выстраивает объекты автоматически"
+    IDM_GO_BACK             "Возврат в предыдущую папку"
+    IDM_GO_FORWARD          "Переход к следующей папке"
+    IDM_GO_UPONELEVEL       "Возврат на уровень вверх"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_EDIT_PASTEHARDLINK  "Создает жесткую ссылку к любому файлу и копирует ее в буфер обмена"
+    IDM_VIEW_SELECTCOLUMNS  "Настраивает колонки, отображаемые в табличном режиме для текущей вкладки"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_SORTBY_NAME         "Сортирует объекты в алфавитном порядке по имени"
+    IDM_SORTBY_SIZE         "Сортирует объекты по размеру"
+    IDM_SORTBY_TYPE         "Сортирует объекты по типу"
+    IDM_SORTBY_DATEMODIFIED "Сортирует объекты по дате их модификации"
+    IDM_SORTBY_TOTALSIZE    "Сортирует объекты по их общему размеру"
+    IDM_SORTBY_FREESPACE    "Сортирует объекты по находящемуся в них количеству свободного пространства"
+    IDM_SORTBY_DATEDELETED  "Сортирует объекты по дате их удаления"
+    IDM_SORTBY_ORIGINALLOCATION 
+                            "Сортирует объекты по их оригинальному местонахождению"
+    IDM_SORTBY_ATTRIBUTES   "Сортирует объекты по их атрибутам"
+    IDM_SORTBY_REALSIZE     "Сортирует объекты по их размеру на диске"
+    IDM_SORTBY_SHORTNAME    "Сортирует объекты по их короткому (8.3) имени"
+    IDM_SORTBY_OWNER        "Сортирует объекты в алфавитном порядке по их владельцу"
+    IDM_SORTBY_PRODUCTNAME  "Сортирует объекты по имени продукта"
+    IDM_SORTBY_COMPANY      "Сортирует объекты по названию компании производителя"
+    IDM_SORTBY_DESCRIPTION  "Сортирует объекты по их описанию"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_SORTBY_FILEVERSION  "Сортирует объекты по версии файла"
+    IDM_SORTBY_PRODUCTVERSION "Сортирует объекты по версии продукта"
+    IDM_SORTBY_SHORTCUTTO   "Сортирует объекты по ссылке"
+    IDM_SORTBY_HARDLINKS    "Сортирует объекты по количеству жестких ссылок"
+    IDM_SORTBY_EXTENSION    "Сортирует объекты по расширению"
+    IDM_SORTBY_CREATED      "Сортирует объекты по дате их создания"
+    IDM_SORTBY_ACCESSED     "Сортирует объекты по дате последнего доступа"
+    IDM_SORTBY_TITLE        "Сортирует объекты по заголовку"
+    IDM_SORTBY_SUBJECT      "Сортирует объекты по теме"
+    IDM_SORTBY_AUTHOR       "Сортирует объекты по автору"
+    IDM_SORTBY_KEYWORDS     "Сортирует объекты по ключевым словам"
+    IDM_SORTBY_COMMENTS     "Сортирует объекты по комментариям"
+    IDM_SORTBY_CAMERAMODEL  "Сортирует объекты по модели камеры"
+    IDM_SORTBY_DATETAKEN    "Сортирует объекты дате их создания"
+    IDM_SORTBY_WIDTH        "Сортирует объекты по ширине"
+    IDM_SORTBY_HEIGHT       "Сортирует объекты по высоте"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_SORTBY_VIRTUALCOMMENTS "Сортирует объекты по комментариям"
+    IDM_SORTBY_FILESYSTEM   "Сортирует объекты по файловой системе"
+    IDM_SORTBY_VIRTUALTYPE  "Сортирует объекты по типу"
+    IDM_SORTBY_NUMPRINTERDOCUMENTS 
+                            "Сортирует объекты по количеству связанных с ними документами"
+    IDM_SORTBY_PRINTERSTATUS "Сортирует объекты по их статусу"
+    IDM_SORTBY_PRINTERCOMMENTS "Сортирует объекты по комментариям"
+    IDM_SORTBY_PRINTERLOCATION "Сортирует объекты по их месту нахождения"
+    IDM_SORTBY_NETWORKADAPTER_STATUS "Сортирует объекты по их статусу"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_COPYCOLUMNTEXT "Копирует текст из выделенной колонки объекта"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TAB_DUPLICATETAB    "Дублирует текущую вкладку"
+    IDM_TAB_LOCKTAB         "Предохраняет вкладку от закрытия"
+    IDM_TAB_REFRESH         "Обновляет содержимое указанной вкладки"
+    IDM_TAB_CLOSETAB        "Закрывает указанную вкладку"
+    IDM_TAB_LOCKTABANDADDRESS 
+                            "Предохраняет вкладку от закрытия и изменения папки"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_ACTIONS_SPLITFILE   "Разделяет указанный файл на файлы меньшего размера"
+    IDM_ACTIONS_MERGEFILES  "В стадии разработки..."
+    IDM_ACTIONS_DESTROYFILES 
+                            "Навсегда удалить выделенные файлы, так чтобы их нельзя было восстановить"
+    IDM_ACTIONS_NEWFOLDER   "Создает новую папку"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TOOLBARS_ADDRESSBAR "Отображает/Скрывает адресную строку"
+    IDM_TOOLBARS_CUSTOMIZE  "Позволяет настроить главную панель"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TOOLBARS_MAINTOOLBAR "Отображает/Скрывает главную панель"
+    IDM_TOOLBARS_BOOKMARKSTOOLBAR "Отображает/Скрывает панель закладок"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SORTBY_ORIGINALLOCATION "Исходное местонахождение"
+    IDS_SORTBY_ATTRIBUTES   "Атрибуты"
+    IDS_SORTBY_REALSIZE     "Настоящий размер"
+    IDS_SORTBY_SHORTNAME    "Короткое имя"
+    IDS_SORTBY_OWNER        "Владелец"
+    IDS_SORTBY_PRODUCTNAME  "Название продукта"
+    IDS_SORTBY_COMPANY      "Компания"
+    IDS_SORTBY_DESCRIPTION  "Описание"
+    IDS_SORTBY_FILEVERSION  "Версия файла"
+    IDS_SORTBY_PRODUCTVERSION "Версия продукта"
+    IDS_SORTBY_SHORTCUTTO   "Ссылка на"
+    IDS_SORTBY_HARDLINKS    "Жесткие ссылки"
+    IDS_SORTBY_EXTENSION    "Расширение"
+    IDS_SORTBY_CREATED      "Дата создания"
+    IDS_SORTBY_ACCESSED     "Дата последнего доступа"
+    IDS_SORTBY_TITLE        "Заголовок"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SORTBY_SUBJECT      "Тема"
+    IDS_SORTBY_AUTHOR       "Автор"
+    IDS_SORTBY_KEYWORDS     "Ключевые слова"
+    IDS_SORTBY_COMMENT      "Комментарий"
+    IDS_SORTBY_CAMERAMODEL  "Модель камеры"
+    IDS_SORTBY_DATETAKEN    "Дата создания снимка"
+    IDS_SORTBY_WIDTH        "Ширина"
+    IDS_SORTBY_HEIGHT       "Высота"
+    IDS_SORTBY_FILESYSTEM   "Файловая система"
+    IDS_SORTBY_NUMPRINTERDOCUMENTS "Количество документов"
+    IDS_SORTBY_PRINTERSTATUS "Статус"
+    IDS_SORTBY_PRINTERLOCATION "Местонахождение"
+    IDS_SORTBY_NETWORKADAPTERSTATUS "Статус"
+    IDS_VERSION             "Версия"
+    IDS_ADDRESSBAR          "Адрес"
+    IDS_GO                  "Переход"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_HIDEFOLDERSPANE     "Спрятать древо папок"
+    IDS_FILERENAMEERROR     "Указанный файл не может быть переименован. Пожалуйста удостоверьтесь что этот файл не находится в использовании."
+    IDS_TOOLBAR_BACK        "Назад"
+    IDS_TOOLBAR_FORWARD     "Вперед"
+    IDS_TOOLBAR_UP          "Вверх"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TOOLBAR_FOLDERS     "Древо папок"
+    IDS_TOOLBAR_COPYTO      "Копировать в"
+    IDS_TOOLBAR_MOVETO      "Переместить в"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TOOLBAR_NEWFOLDER   "Новая папка"
+    IDS_TOOLBAR_COPY        "Копировать"
+    IDS_TOOLBAR_CUT         "Вырезать"
+    IDS_TOOLBAR_PASTE       "Вставить"
+    IDS_TOOLBAR_DELETE      "Удалить"
+    IDS_TOOLBAR_VIEWS       "Вид"
+    IDS_TOOLBAR_SEARCH      "Поиск"
+    IDS_TOOLBAR_PROPERTIES  "Свойства"
+    IDS_TOOLBAR_REFRESH     "Обновить"
+    IDS_GENERAL_SELECTED_ONEITEM "объект выбран"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_GENERAL_SELECTED_MOREITEMS "объектов выбрано"
+    IDS_GENERAL_ONEITEM     "объект"
+    IDS_GENERAL_MOREITEMS   "объектов"
+    IDS_GENERAL_VIRTUALFOLDER "Виртуальная папка"
+    IDS_GENERAL_FREE        "свободно"
+    IDS_GENERAL_FREESPACE   "Свободно пространства "
+    IDS_GENERAL_TOTALSIZE   "Общий размер"
+    IDS_TOOLBAR_ADDBOOKMARK "Заложить закладку на текущую вкладку"
+    IDS_TOOLBAR_NEWTAB      "Создать новую вкладку"
+    IDS_TOOLBAR_SHOWCOMMANDPROMPT "Открыть командную строку"
+    IDS_TOOLBAR_ORGANIZEBOOKMARKS "Управление закладками"
+    IDS_SEPARATOR           "Разделитель"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TAB_RENAMETAB       "Переименовывает указанную вкладку"
+    IDM_VIEW_SETDEFAULTCOLUMNS 
+                            "Устанавливает стандартные колонки в режиме таблицы для каждой вкладки"
+    IDM_EDIT_UNDO           "Отменить предыдущую операцию с файлом"
+    IDM_TOOLBARS_DRIVES     "Отобразить/Скрыть панель дисков"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_NEWFOLDERERROR      "Папка не может быть создана. Пожалуйста удостоверьтесь что вы имеете достаточно прав для создания папок в текущем каталоге."
+    IDS_BOOKMARKDLG_NAME    "Имя"
+    IDS_BOOKMARKDLG_LOCATION "Местонахождение"
+    IDS_BOOKMARKDLG_DESCRIPTION "Описание"
+    IDS_ERR_FILENAMEINVALID "Имя файла не может содержать следующие знаки:\n\t \\ / : * ? "" < > |"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_BT_OPEN             "Открывает выбранную закладку в текущей вкладке"
+    IDM_BT_NEWBOOKMARK      "Создает новую закладку"
+    IDM_BT_NEWFOLDER        "Создает новую папку закладок"
+    IDM_BT_DELETE           "Удаляет выбранную закладку"
+    IDM_BT_PROPERTIES       "Показывает свойства выбранных закладок"
+    IDM_BT_OPENINNEWTAB     "Открывает выбранную закладку в новой вкладке"
+    IDM_TOOLBARS_LOCKTOOLBARS "Предотвращает перемещение панелей"
+    IDM_TOOLBARS_APPLICATIONTOOLBAR "Shows/Hides the application toolbar"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_DESCRIPTION_NAME "Имя файла"
+    IDS_COLUMN_DESCRIPTION_TYPE "Тип файла"
+    IDS_COLUMN_DESCRIPTION_SIZE "Логический размер файла"
+    IDS_COLUMN_DESCRIPTION_MODIFIED "Дата модификации"
+    IDS_COLUMN_DESCRIPTION_ATTRIBUTES "Атрибуты"
+    IDS_COLUMN_DESCRIPTION_REALSIZE "Физический размер файла"
+    IDS_COLUMN_DESCRIPTION_SHORTNAME "Имя в формате DOS 8.3"
+    IDS_COLUMN_DESCRIPTION_OWNER "Владелец файла"
+    IDS_COLUMN_DESCRIPTION_PRODUCTNAME 
+                            "Имя продукта ассоциированного с исполнительным файлом"
+    IDS_COLUMN_DESCRIPTION_COMPANY 
+                            "Компания ассоциированная с исполнительным файлом"
+    IDS_COLUMN_DESCRIPTION_DESCRIPTION "Описание файла"
+    IDS_COLUMN_DESCRIPTION_FILEVERSION 
+                            "Версия ассоциированная с исполнительным файлом и динамической библиотекой"
+    IDS_COLUMN_DESCRIPTION_PRODUCTVERSION "Версия продукта"
+    IDS_COLUMN_DESCRIPTION_SHORTCUTTO "Цель ассоциированная с ссылкой"
+    IDS_COLUMN_DESCRIPTION_HARDLINKS 
+                            "Показывает количество жестких ссылок ассоциированных с файлом"
+    IDS_COLUMN_DESCRIPTION_EXTENSION "Расширение файла"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_DESCRIPTION_CREATED "Дата создания"
+    IDS_COLUMN_DESCRIPTION_ACCESSED "Дата последнего доступа"
+    IDS_COLUMN_DESCRIPTION_TITLE "Заголовок файла"
+    IDS_COLUMN_DESCRIPTION_SUBJECT "Тема файла"
+    IDS_COLUMN_DESCRIPTION_AUTHOR "Автор ассоциированный с файлом"
+    IDS_COLUMN_DESCRIPTION_KEYWORDS "Ключевые слова ассоциированные с файлом"
+    IDS_COLUMN_DESCRIPTION_COMMENT "Коментарии ассоциированные с файлом"
+    IDS_COLUMN_DESCRIPTION_CAMERAMODEL 
+                            "Модель камеры ассоциированная с изображением"
+    IDS_COLUMN_DESCRIPTION_DATETAKEN "Дата создания фотографии"
+    IDS_COLUMN_DESCRIPTION_WIDTH "Ширина изображения"
+    IDS_COLUMN_DESCRIPTION_HEIGHT "Высота изображения"
+    IDS_COLUMN_DESCRIPTION_TOTALSIZE "Общий размер диска"
+    IDS_COLUMN_DESCRIPTION_FREESPACE 
+                            "Размер свободного места доступного на диске"
+    IDS_COLUMN_DESCRIPTION_FILESYSTEM "Файловая система диска"
+    IDS_COLUMN_DESCRIPTION_NUMPRINTERDOCUMENTS 
+                            "Количество документов ассоциированных с принтером"
+    IDS_COLUMN_DESCRIPTION_PRINTERCOMMENTS 
+                            "Комментарии ассоциированные с принтером"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_DESCRIPTION_PRINTERLOCATION "Местонахождения принтера"
+    IDS_COLUMN_DESCRIPTION_NETWORKADAPTER_STATUS "Статус сетевого адаптера"
+    IDS_NETWORKADAPTER_CONNECTED "Подключен"
+    IDS_NETWORKADAPTER_DISCONNECTED "Отключен"
+    IDS_NETWORKADAPTER_TESTING "Проверяю..."
+    IDS_NETWORKADAPTER_UNKNOWN "Неизвестно"
+    IDS_NETWORKADAPTER_DORMANT "Спящий"
+    IDS_NETWORKADAPTER_NOTPRESENT "Не существует"
+    IDS_NETWORKADAPTER_LOWLAYER "Низший слой не операбельный"
+    IDS_ERR_FILEMANAGERSETTING 
+                            "Error encountered while changing default file manager status. Please ensure you have administrator privileges."
+    IDS_BOOKMARK_DELETE     "Are you sure you want to delete this bookmark?"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_NAME_NAME    "Имя"
+    IDS_COLUMN_NAME_TYPE    "Тип"
+    IDS_COLUMN_NAME_SIZE    "Размер"
+    IDS_COLUMN_NAME_DATEMODIFIED "Дата модификации"
+    IDS_COLUMN_NAME_ATTRIBUTES "Атрибуты"
+    IDS_COLUMN_NAME_REALSIZE "Размер на диске"
+    IDS_COLUMN_NAME_SHORTNAME "Имя формата 8.3"
+    IDS_COLUMN_NAME_OWNER   "Владелец"
+    IDS_COLUMN_NAME_PRODUCTNAME "Название продукта"
+    IDS_COLUMN_NAME_COMPANY "Компания"
+    IDS_COLUMN_NAME_DESCRIPTION "Описание"
+    IDS_COLUMN_NAME_FILEVERSION "Версия файла"
+    IDS_COLUMN_NAME_PRODUCTVERSION "Версия продукта"
+    IDS_COLUMN_NAME_SHORTCUTTO "Ссылка на"
+    IDS_COLUMN_NAME_HARDLINKS "Жесткие ссылки"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_NAME_EXTENSION "Расширение"
+    IDS_COLUMN_NAME_CREATED "Создан"
+    IDS_COLUMN_NAME_ACCESSED "Открыт"
+    IDS_COLUMN_NAME_TITLE   "Заголовок"
+    IDS_COLUMN_NAME_SUBJECT "Тема"
+    IDS_COLUMN_NAME_AUTHOR  "Автор"
+    IDS_COLUMN_NAME_KEYWORDS "Ключевые слова"
+    IDS_COLUMN_NAME_COMMENT "Комментарий"
+    IDS_COLUMN_NAME_CAMERAMODEL "Модель камеры"
+    IDS_COLUMN_NAME_DATETAKEN "Дата создания"
+    IDS_COLUMN_NAME_WIDTH   "Ширина"
+    IDS_COLUMN_NAME_HEIGHT  "Высота"
+    IDS_COLUMN_NAME_VIRTUALCOMMENTS "Комментарии"
+    IDS_COLUMN_NAME_TOTALSIZE "Общий размер"
+    IDS_COLUMN_NAME_FREESPACE "Свободное пространство"
+    IDS_COLUMN_NAME_FILESYSTEM "Файловая система"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_NAME_VIRTUALTYPE "Тип"
+    IDS_COLUMN_NAME_ORIGINALLOCATION "Исходное местонахождение"
+    IDS_COLUMN_NAME_DATEDELETED "Дата удаления"
+    IDS_COLUMN_NAME_NUMPRINTERDOCUMENTS "Документы"
+    IDS_COLUMN_NAME_PRINTERSTATUS "Статус"
+    IDS_COLUMN_NAME_PRINTERCOMMENTS "Комментарии"
+    IDS_COLUMN_NAME_PRINTERLOCATION "Местонахождение"
+    IDS_COLUMN_NAME_NETWORKADAPTER_STATUS "Статус"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERR_FILENAMEINVALID_MSGTITLE "Неверное имя файла"
+    IDS_OPTIONSDIALOG_TITLE "Свойства"
+    IDS_DEFAULTSETTINGS_NEWTAB "Стандартная папка для новой вкладки"
+    IDS_FOLDERPANE_HEADER   "Папки"
+    IDS_DEFAULTCOLUMNS_GENERAL "Общие"
+    IDS_GENERAL_DATEMODIFIED "Дата модификации"
+    IDS_GENERAL_NEW         "Создать"
+    IDS_GENERAL_TOTALFILESIZE "Общий размер"
+    IDS_GENERAL_CALCULATING "Считаю..."
+    IDS_TAB_CLOSE_TIP       "Закрыть текущую вкладку"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_HEADER_MORE         "Select additional columns to show."
+    IDM_FILE_CLONEWINDOW    "Clones the current window"
+END
+
+#endif    // Russian resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

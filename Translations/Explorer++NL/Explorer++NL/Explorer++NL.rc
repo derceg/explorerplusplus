@@ -1,0 +1,1331 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Dutch (Belgium) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NLB)
+#ifdef _WIN32
+LANGUAGE LANG_DUTCH, SUBLANG_DUTCH_BELGIAN
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUT DIALOGEX 0, 0, 243, 118
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Over Explorer++"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,189,96,50,14
+    CONTROL         207,IDC_ABOUT_STATIC_IMAGE,"Static",SS_BITMAP,4,4,235,87,WS_EX_STATICEDGE
+    CONTROL         "",-1,"Static",SS_ETCHEDHORZ,4,91,235,1
+END
+
+IDD_OPTIONS_FILESFOLDERS DIALOGEX 0, 0, 204, 134
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Bestanden en Mappen"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Verberg bestandsextensies",IDC_SETTINGS_CHECK_EXTENSIONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,6,103,10
+    CONTROL         "Toon Mapgrootte",IDC_SETTINGS_CHECK_FOLDERSIZES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,17,71,10
+    CONTROL         "Toon het volledige pad in de Titelbalk",IDC_SETTINGS_CHECK_TITLEPATH,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,28,134,10
+    CONTROL         "Open elke map in zijn eigen tabblad",IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,39,129,10
+    CONTROL         "Toon alle bestandsgroottes in bytes",IDC_SETTINGS_CHECK_SIZEBYTES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,50,131,10
+    CONTROL         "Gebruikersvriendelijke datumweergave",IDC_SETTINGS_CHECK_FRIENDLYDATES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,61,77,10
+    CONTROL         "Show system infotips",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON,15,83,83,10
+    CONTROL         "Show custom infotips",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON,15,94,83,10
+    CONTROL         "Show infotips for files:",IDC_OPTIONS_CHECK_SHOWINFOTIPS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,87,10
+END
+
+IDD_OPTIONS_GENERAL DIALOGEX 0, 0, 228, 159
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_CONTEXTHELP
+CAPTION "Algemeen"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Tijdens Opstarten",IDC_STATIC,9,9,171,38
+    CONTROL         "Laadt de standaard map",IDC_STARTUP_DEFAULTFOLDER,
+                    "Button",BS_AUTORADIOBUTTON,13,32,94,10
+    CONTROL         "Laadt de vorige tabbladen",IDC_STARTUP_PREVIOUSTABS,
+                    "Button",BS_AUTORADIOBUTTON,13,19,100,10
+    CONTROL         "Show gridlines in details view",IDC_OPTION_GRIDLINES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,91,108,10
+    CONTROL         "Disable treeview delay",IDC_OPTION_TREEVIEWDELAY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,115,88,10
+    CONTROL         "Save preferences to XML file",IDC_OPTION_XML,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,67,107,10
+    CONTROL         "Extend tab control across entire window",IDC_OPTION_EXTENDTABCONTROL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,127,145,10
+    CONTROL         "Turn on full-row selection in details view",IDC_OPTION_FULLROWSELECT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,139,143,10
+    CONTROL         "Replace Explorer for filesystem folders",IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,55,139,10
+    CONTROL         "Show file previews in display window",IDC_OPTION_FILEPREVIEWS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,79,133,10
+    CONTROL         "Show username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,103,101,10
+END
+
+IDD_OPTIONS_TABS DIALOGEX 0, 0, 242, 135
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Tabbladen"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Forceer dezelfde breedte voor alle tabbladen",IDC_TABS_SAMEWIDTH,
+                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,10,12,161,10
+    CONTROL         "Beperk de maximum tabblad titellengte tot:",IDC_TABS_MAXIMUMWIDTH,
+                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,10,29,153,10
+    EDITTEXT        IDC_EDIT1,172,27,23,15,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "Vraag bevestiging vóór het sluiten van alle tabbladen",IDC_TABS_CLOSECONFIRMATION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,46,186,10
+    CONTROL         "Open nieuwe tabbladen naast de huidige",IDC_TABS_OPENNEXTTOCURRENT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,63,147,10
+END
+
+IDD_CHANGEFILEATTRIBUTES DIALOGEX 0, 0, 265, 150
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Verander de bestandskenmerken"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,209,95,50,14
+    PUSHBUTTON      "Annuleren",IDCANCEL,209,116,50,14
+    CONTROL         "",IDC_MODIFICATIONDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,28,62,13
+    LTEXT           "Gewijzigd Op:",IDC_STATIC,7,29,45,8
+    LTEXT           "To change this files dates, just select a time from the control below.",IDC_STATIC,7,4,179,16
+    CONTROL         "",IDC_MODIFICATIONTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,28,62,13
+    LTEXT           "Gemaakt Op:",IDC_STATIC,7,49,43,8
+    CONTROL         "",IDC_CREATIONDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,48,62,13
+    CONTROL         "",IDC_CREATIONTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,48,62,13
+    LTEXT           "Laatst Geopend Op:",IDC_STATIC,7,71,66,8
+    CONTROL         "",IDC_ACCESSDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,68,62,13
+    CONTROL         "",IDC_ACCESSTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,68,62,13
+    PUSHBUTTON      "Herstel",IDC_MODIFICATION_RESET,209,28,50,13
+    PUSHBUTTON      "Herstel",IDC_CREATION_RESET,209,48,50,13
+    PUSHBUTTON      "Herstel",IDC_ACCESS_RESET,209,68,50,13
+    GROUPBOX        "Kenmerken",IDC_STATIC,7,91,194,51
+    CONTROL         "Archief",IDC_CHECK_ARCHIVE,"Button",BS_AUTO3STATE | WS_TABSTOP,19,107,39,10
+    CONTROL         "Alleen-lezen",IDC_CHECK_READONLY,"Button",BS_AUTO3STATE | WS_TABSTOP,19,125,55,10
+    CONTROL         "Verborgen",IDC_CHECK_HIDDEN,"Button",BS_AUTO3STATE | WS_TABSTOP,80,107,49,10
+    CONTROL         "Systeem",IDC_CHECK_SYSTEM,"Button",BS_AUTO3STATE | WS_TABSTOP,80,125,43,10
+    CONTROL         "Geïndexeerd",IDC_CHECK_INDEXED,"Button",BS_AUTO3STATE | WS_TABSTOP,135,107,57,10
+END
+
+IDD_DESTROYFILES DIALOGEX 0, 0, 305, 228
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Vernietig Bestanden"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,195,210,50,14
+    PUSHBUTTON      "Annuleren",IDCANCEL,250,210,50,14
+    GROUPBOX        "Wegvaag methode",IDC_STATIC,5,134,238,52
+    CONTROL         "1-keer overschrijven (sneller)",IDC_DESTROYFILES_RADIO_ONEPASS,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,11,150,110,10
+    CONTROL         "3-keer overschrijven",IDC_DESTROYFILES_RADIO_THREEPASS,
+                    "Button",BS_AUTORADIOBUTTON,11,168,82,10
+    CONTROL         "Willekeurig geven van bestandsnamen -kenmerken",IDC_DESTROYFILES_CHECK_RANDOMIZE,
+                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,11,195,178,10
+    CONTROL         "",IDC_DESTROYFILES_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,5,5,237,118
+    PUSHBUTTON      "Verwijderen",IDC_DESTROYFILES_BUTTON_REMOVE,250,5,50,14
+END
+
+IDD_PHYSICALDRIVE DIALOGEX 0, 0, 263, 255
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Schijf Informatie"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Sluiten",IDCLOSE,204,232,50,14
+    CONTROL         "",IDC_RICHEDIT_DRIVEINFO,"RichEdit20W",WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP | 0x884,9,9,245,216
+    PUSHBUTTON      "opslaan...",IDSAVE,151,232,50,14
+END
+
+IDD_MASSRENAME DIALOGEX 0, 0, 308, 156
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Massaal Hernoemen"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,197,137,50,14
+    PUSHBUTTON      "Annuleren",IDCANCEL,250,137,50,14
+    LTEXT           "Naampatroon van doel:",IDC_STATIC,6,6,76,8
+    EDITTEXT        IDC_MASSRENAME_EDIT,86,4,214,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_MASSRENAME_FILELISTVIEW,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,8,21,292,109
+END
+
+IDD_SELECTGROUP DIALOGEX 0, 0, 246, 41
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Selecteer bestanden"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,140,22,50,14
+    PUSHBUTTON      "Annuleren",IDCANCEL,193,22,50,14
+    COMBOBOX        IDC_SELECTGROUP_COMBOBOX,4,4,239,13,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+END
+
+IDD_DISPLAYCOLOURS DIALOGEX 0, 0, 435, 226
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Kies kleuren Voorbeeldvenster"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,321,202,50,14
+    PUSHBUTTON      "Annuleren",IDCANCEL,377,202,50,14
+    CONTROL         "",IDC_SLIDER_SURROUND_RED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,249,14,148,23
+    LTEXT           "Rood:",IDC_STATIC,223,19,20,8
+    LTEXT           "Groen:",IDC_STATIC,223,50,23,8
+    LTEXT           "Blaauw:",IDC_STATIC,223,81,26,8
+    CONTROL         "",IDC_SLIDER_SURROUND_GREEN,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,249,46,148,23
+    CONTROL         "",IDC_SLIDER_SURROUND_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,249,78,148,23
+    EDITTEXT        IDC_EDIT_SURROUND_RED,397,15,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_SURROUND_GREEN,397,46,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_SURROUND_BLUE,397,77,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "Omgevende kleur",IDC_STATIC,219,2,208,104
+    CONTROL         "",IDC_SLIDER_CENTRE_RED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,34,12,148,23
+    LTEXT           "Rood:",IDC_STATIC,8,17,20,8
+    LTEXT           "Groen:",IDC_STATIC,8,47,23,8
+    LTEXT           "Blaauw:",IDC_STATIC,8,79,26,8
+    CONTROL         "",IDC_SLIDER_CENTRE_GREEN,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,34,44,148,23
+    CONTROL         "",IDC_SLIDER_CENTRE_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,34,76,148,23
+    EDITTEXT        IDC_EDIT_CENTRE_RED,182,13,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_CENTRE_GREEN,182,44,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_CENTRE_BLUE,182,74,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "Kleur centrum",IDC_STATIC,4,2,208,102
+    LTEXT           "",IDC_STATIC_PREVIEWDISPLAY,4,131,424,56,SS_SUNKEN
+    PUSHBUTTON      "Kies lettertype...",IDC_BUTTON_DISPLAY_FONT,8,109,60,17
+END
+
+IDD_FILTER DIALOGEX 0, 0, 237, 46
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Filterresultaten"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,128,26,50,14
+    PUSHBUTTON      "Annuleren",IDCANCEL,181,26,50,14
+    COMBOBOX        IDC_FILTER_COMBOBOX,29,5,202,20,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Filter:",IDC_STATIC,6,7,20,8
+END
+
+IDD_ADD_BOOKMARK DIALOGEX 0, 0, 232, 166
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Toevoegen aan Favorieten"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,124,61,50,14
+    PUSHBUTTON      "Annuleren",IDCANCEL,178,61,50,14
+    LTEXT           "Naam",IDC_STATIC,4,5,22,8
+    LTEXT           "Beschrijving",IDC_STATIC,4,102,42,8
+    EDITTEXT        IDC_BOOKMARK_DESCRIPTION,45,100,182,44,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
+    LTEXT           "Create In",IDC_STATIC,4,24,32,8
+    LTEXT           "Location",IDC_STATIC_LOCATION,4,84,30,8
+    PUSHBUTTON      "New Folder...",IDC_BOOKMARK_NEWFOLDER,45,38,89,14
+    PUSHBUTTON      "Details >>",IDC_BOOKMARK_DETAILS,139,38,89,14
+    EDITTEXT        IDC_BOOKMARK_NAME,46,4,182,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_BOOKMARK_LOCATION,45,83,182,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_BOOKMARK_CREATEIN,"ComboBoxEx32",CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,46,22,182,166
+    CONTROL         "",IDC_BOOKMARK_SEPARATOR,"Static",SS_ETCHEDHORZ,3,56,225,1
+    CONTROL         "Show on Bookmarks Toolbar",IDC_BOOKMARK_TOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,45,150,105,10
+END
+
+IDD_ORGANIZE_BOOKMARKS DIALOGEX 0, 0, 474, 207
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Favorieten indelen"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,419,189,50,14
+    CONTROL         "",IDC_ORGANIZE_BOOKMARKS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_EDITLABELS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,125,5,288,198
+    PUSHBUTTON      "Omhoog",IDC_ORGANIZE_MOVEUP,419,5,50,14
+    PUSHBUTTON      "Omlaag",IDC_ORGANIZE_MOVEDOWN,419,21,50,14
+    PUSHBUTTON      "Verwijder",IDC_ORGANIZE_DELETE,419,37,50,14
+    PUSHBUTTON      "Eigenschappen",IDC_ORGANIZE_PROPERTIES,419,53,50,14
+    CONTROL         "",IDC_ORGANIZE_FOLDERS,"SysTreeView32",TVS_HASBUTTONS | TVS_SHOWSELALWAYS | WS_BORDER | WS_HSCROLL | WS_TABSTOP,3,5,118,198
+END
+
+IDD_OPTIONS_DEFAULT DIALOGEX 0, 0, 239, 170
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Standaard Instellingen"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Toon Verborgen bestanden",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,96,103,10
+    LTEXT           "De volgende opties worden gebruikt om het standaard gedrag programma-wijd te controleren. Elk nieuw tabblad neemt die instellingen over. Ze kunnen daarna per tabblad worden veranderd.",IDC_STATIC,15,7,212,38
+    GROUPBOX        "Standaard Beeld",IDC_STATIC,14,44,214,44
+    CONTROL         "Pictogrammen",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON,143,56,61,10
+    CONTROL         "Tegels",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON,103,56,37,10
+    CONTROL         "Kleine Pictogrammen",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON,143,74,81,10
+    CONTROL         "Lijst",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON,20,73,29,10
+    CONTROL         "Details",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON,103,74,37,10
+    CONTROL         "Automatisch Rangschikken",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,96,101,10
+    CONTROL         "In groepen weergeven",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,114,89,10
+    CONTROL         "Oplopend Rangschikken",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,125,114,92,10
+    CONTROL         "Miniatuurweergaven",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON,20,56,81,10
+    LTEXT           "Default new tab directory:",IDC_STATIC,9,134,86,8
+    EDITTEXT        IDC_DEFAULT_NEWTABDIR_EDIT,15,148,143,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_DEFAULT_NEWTABDIR_BUTTON,161,148,21,14,BS_ICON
+END
+
+IDD_BOOKMARK_PROPERTIES DIALOGEX 0, 0, 210, 134
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Eigenschappen Favorieten"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,102,114,50,14
+    PUSHBUTTON      "Annuleren",IDCANCEL,157,114,50,14
+    LTEXT           "Naam:",IDC_STATIC,4,6,22,8
+    EDITTEXT        IDC_BP_EDIT_NAME,47,3,160,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_BP_EDIT_LOCATION,47,22,160,14,ES_AUTOHSCROLL
+    LTEXT           "Locatie:",IDC_STATIC,4,24,26,8
+    LTEXT           "Beschrijving:",IDC_STATIC,4,43,42,8
+    EDITTEXT        IDC_BP_EDIT_DESCRIPTION,47,41,160,52,ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+    CONTROL         "Show on Bookmarks Toolbar",IDC_BP_SHOWONTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,47,100,105,10
+END
+
+IDD_SPLITFILE DIALOGEX 0, 0, 247, 86
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Splits Bestand"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,138,65,50,14
+    PUSHBUTTON      "Sluiten",IDCANCEL,192,65,50,14
+    LTEXT           "Output Map:",IDC_STATIC,3,24,42,8
+    EDITTEXT        IDC_SPLIT_EDIT_OUTPUT,67,23,153,12,ES_AUTOHSCROLL
+    LTEXT           "Splits grootte:",IDC_STATIC,20,6,46,8
+    EDITTEXT        IDC_SPLIT_EDIT_SIZE,68,3,40,12,ES_AUTOHSCROLL | ES_NUMBER
+    COMBOBOX        IDC_SPLIT_COMBOBOX_SIZES,114,3,48,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",IDC_SPLIT_BUTTON_OUTPUT,225,23,17,12
+    CONTROL         "",IDC_SPLIT_PROGRESS,"msctls_progress32",WS_BORDER,5,49,237,9
+END
+
+IDD_MERGEFILES DIALOGEX 0, 0, 395, 177
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Samenvoegen Bestanden"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,286,156,50,14
+    PUSHBUTTON      "Sluiten",IDCANCEL,342,156,50,14
+    CONTROL         "",IDC_MERGE_PROGRESS,"msctls_progress32",WS_BORDER,4,133,293,10
+    CONTROL         "",IDC_MERGE_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,4,5,329,96
+    PUSHBUTTON      "Omhoog",IDC_MERGE_BUTTON_MOVEUP,342,5,50,14
+    PUSHBUTTON      "Omlaag",IDC_MERGE_BUTTON_MOVEDOWN,342,24,50,14
+    PUSHBUTTON      "Verwijder",IDC_MERGE_BUTTON_REMOVE,342,43,50,14
+    LTEXT           "Output Bestand:",IDC_STATIC,4,112,54,8
+    EDITTEXT        IDC_MERGE_EDIT_FILENAME,59,111,253,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,150,387,1
+    PUSHBUTTON      "...",IDC_MERGE_BUTTON_OUTPUT,320,111,13,12
+END
+
+IDD_OPTIONS_LANGUAGE DIALOGEX 0, 0, 228, 155
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Language"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Language:",IDC_STATIC,9,43,35,8
+    COMBOBOX        IDC_OPTIONS_LANGUAGE,45,41,101,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "To change the language Explorer++ uses, simply select one from the list below. Any language change will not take effect until Explorer++ is restarted.",IDC_STATIC,9,7,204,30
+END
+
+IDD_NEWBOOKMARKFOLDER DIALOGEX 0, 0, 183, 65
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Folder"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,73,45,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,127,45,50,14
+    LTEXT           "Name",IDC_STATIC,4,7,19,8
+    LTEXT           "Create In",IDC_STATIC,4,26,32,8
+    EDITTEXT        IDC_NEWFOLDER_NAME,43,4,134,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_NEWFOLDER_CREATEIN,"ComboBoxEx32",CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,43,24,134,135
+END
+
+IDD_BOOKMARKFOLDER_PROPERTIES DIALOGEX 0, 0, 212, 113
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Folder Properties"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,102,95,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,157,95,50,14
+    LTEXT           "Name",-1,4,6,19,8
+    EDITTEXT        IDC_BFP_NAME,47,3,160,14,ES_AUTOHSCROLL
+    LTEXT           "Description",-1,4,25,36,8
+    EDITTEXT        IDC_BFP_DESCRIPTION,47,23,160,52,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
+    CONTROL         "Show on Bookmarks Toolbar",IDC_BFP_SHOWONTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,47,81,105,10
+END
+
+IDD_RENAMETAB DIALOGEX 0, 0, 288, 75
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Rename tab"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,180,57,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,233,57,50,14
+    EDITTEXT        IDC_RENAMETAB_NEWTABNAME,84,32,193,13,ES_AUTOHSCROLL
+    GROUPBOX        "Tab Name",IDC_STATIC,3,4,280,45
+    CONTROL         "Use current folders name",IDC_RENAMETAB_USEFOLDERNAME,
+                    "Button",BS_AUTORADIOBUTTON,8,18,97,10
+    CONTROL         "Use custom name:",IDC_RENAMETAB_USECUSTOMNAME,"Button",BS_AUTORADIOBUTTON,8,33,75,10
+END
+
+IDD_SETDEFAULTCOLUMNS DIALOGEX 0, 0, 200, 258
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Set Default Columns"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,92,238,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,145,238,50,14
+    CONTROL         "",IDC_DEFAULTCOLUMNS_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,3,22,137,174
+    PUSHBUTTON      "Move Up",IDC_DEFAULTCOLUMNS_MOVEUP,145,22,50,14
+    PUSHBUTTON      "Move Down",IDC_DEFAULTCOLUMNS_MOVEDOWN,145,38,50,14
+    PUSHBUTTON      "Enable",IDC_DEFAULTCOLUMNS_ENABLE,145,54,50,14
+    PUSHBUTTON      "Disable",IDC_DEFAULTCOLUMNS_DISABLE,145,70,50,14
+    LTEXT           "Description:",IDC_STATIC,3,202,39,8
+    LTEXT           "",IDC_DEFAULTCOLUMNS_DESCRIPTION,45,202,149,23
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,233,191,1
+    COMBOBOX        IDC_DEFAULTCOLUMNS_COMBOBOX,46,5,95,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Folder type:",IDC_STATIC,3,6,40,8
+END
+
+IDD_SELECTCOLUMNS DIALOGEX 0, 0, 208, 255
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Selecteer Kolommen"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,101,239,50,14
+    PUSHBUTTON      "Annuleren",IDCANCEL,154,239,50,14
+    CONTROL         "",IDC_COLUMNS_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,5,11,144,174
+    PUSHBUTTON      "Omhoog",IDC_COLUMNS_MOVEUP,154,11,50,14
+    PUSHBUTTON      "Omlaag",IDC_COLUMNS_MOVEDOWN,154,27,50,14
+    PUSHBUTTON      "Inschakelen",IDC_COLUMNS_ENABLE,154,43,50,14
+    PUSHBUTTON      "Uitschakelen",IDC_COLUMNS_DISABLE,154,59,50,14
+    LTEXT           "Beschrijving:",IDC_STATIC,5,194,42,8
+    LTEXT           "",IDC_COLUMNS_DESCRIPTION,55,194,149,23
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,229,200,1
+END
+
+IDD_EDITAPPLICATIONBUTTON DIALOGEX 0, 0, 249, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Edit Application Button"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,142,45,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,196,45,50,14
+    LTEXT           "Name",IDC_STATIC,4,6,19,8
+    LTEXT           "Command",IDC_STATIC,4,25,32,8
+    PUSHBUTTON      "...",IDC_APP_BUTTON_COMMAND,229,24,17,14
+    EDITTEXT        IDC_APP_EDIT_NAME,41,4,183,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_APP_EDIT_COMMAND,41,24,183,14,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 240
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 111
+    END
+
+    IDD_OPTIONS_TABS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 235
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 128
+    END
+
+    IDD_DESTROYFILES, DIALOG
+    BEGIN
+        RIGHTMARGIN, 303
+    END
+
+    IDD_PHYSICALDRIVE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 258
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 248
+    END
+
+    IDD_DISPLAYCOLOURS, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 431
+        TOPMARGIN, 1
+        BOTTOMMARGIN, 221
+    END
+
+    IDD_ADD_BOOKMARK, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 94
+    END
+
+    IDD_OPTIONS_LANGUAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 221
+        TOPMARGIN, 1
+        BOTTOMMARGIN, 148
+    END
+
+    IDD_SELECTCOLUMNS, DIALOG
+    BEGIN
+        RIGHTMARGIN, 201
+        BOTTOMMARGIN, 241
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINMENU MENU 
+BEGIN
+    POPUP "&Bestand"
+    BEGIN
+        MENUITEM "Nieuw Tabblad\tCtrl+T",       IDM_FILE_NEWTAB
+        MENUITEM "Sluit Tabblad\tCtrl+W",       IDM_FILE_CLOSETAB
+        MENUITEM "Clone Window",                IDM_FILE_CLONEWINDOW
+        MENUITEM SEPARATOR
+        MENUITEM "opslaan Mappenlijst",         IDM_FILE_SAVEDIRECTORYLISTING
+        MENUITEM "Toon Commando-Prompt",        IDM_FILE_SHOWCOMMANDPROMPT
+        MENUITEM "Kopieer Map-pad",             IDM_FILE_COPYFOLDERPATH
+        MENUITEM "Kopieer Bestandspaden",       IDM_FILE_COPYITEMPATH
+        MENUITEM "Kopieer Kolomtekst",          IDM_FILE_COPYCOLUMNTEXT
+        MENUITEM SEPARATOR
+        MENUITEM "Instellen Bestandskenmerken...", IDM_FILE_SETFILEATTRIBUTES
+        MENUITEM "Verwijderen\tDelete",         IDM_FILE_DELETE
+        MENUITEM "Permanent Verwijderen\tShift+Delete", IDM_FILE_DELETEPERMANENTLY
+        MENUITEM "Naam Wijzigen\tF2",           IDM_FILE_RENAME
+        MENUITEM "Eigenschappen\tAlt+Enter",    IDM_FILE_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "Sluiten",                     IDM_FILE_EXIT
+    END
+    POPUP "Be&werken"
+    BEGIN
+        MENUITEM "Undo\tCtrl+Z",                IDM_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Knippen\tCtrl+X",             IDM_EDIT_CUT
+        MENUITEM "Kopiëren\tCtrl+C",            IDM_EDIT_COPY
+        MENUITEM "Plakken\tCtrl+V",             IDM_EDIT_PASTE
+        MENUITEM "Snelkoppeling Plakken\tCtrl+Shift+V", IDM_EDIT_PASTESHORTCUT
+        MENUITEM "Vaste Koppeling  Plakken",    IDM_EDIT_PASTEHARDLINK
+        MENUITEM SEPARATOR
+        MENUITEM "naar Map Kopiëren\tCtrl+Shift+C", IDM_EDIT_COPYTOFOLDER
+        MENUITEM "naar Map Verplaatsen\tCtrl+Shift+M", IDM_EDIT_MOVETOFOLDER
+        MENUITEM SEPARATOR
+        MENUITEM "Opslaan File Slack...",       IDM_EDIT_SHOWFILESLACK
+        MENUITEM "Weergeven Snelkoppelingsbron", IDM_EDIT_RESOLVELINK
+    END
+    POPUP "Selectie"
+    BEGIN
+        MENUITEM "Alles Selecteren\tCtrl+A",    IDM_EDIT_SELECTALL
+        MENUITEM "Selectie omkeren\tCtrl+I",    IDM_EDIT_INVERTSELECTION
+        MENUITEM "Alles Selecteren van hetzelfde Type", IDM_EDIT_SELECTALLFOLDERS
+        MENUITEM "Niets Selecteren\tCtrl+Shift+N", IDM_EDIT_SELECTNONE
+        MENUITEM "Selecteren met Jokerteken...", IDM_EDIT_WILDCARDSELECTION
+        MENUITEM "Deselecteren met Jokerteken...", IDM_EDIT_WILDCARDDESELECT
+    END
+    POPUP "Bee&ld"
+    BEGIN
+        MENUITEM "Status Balk",                 IDM_VIEW_STATUSBAR
+        MENUITEM "Mappen",                      IDM_VIEW_FOLDERS
+        MENUITEM "Voorbeeldvenster",            IDM_VIEW_DISPLAYWINDOW
+        POPUP "Werkbalken"
+        BEGIN
+            MENUITEM "Adresbalk",                   IDM_TOOLBARS_ADDRESSBAR
+            MENUITEM "Werkbalk",                    IDM_TOOLBARS_MAINTOOLBAR
+            MENUITEM "Bookmarks",                   IDM_TOOLBARS_BOOKMARKSTOOLBAR
+            MENUITEM "Drives",                      IDM_TOOLBARS_DRIVES
+            MENUITEM "Application Toolbar",         IDM_TOOLBARS_APPLICATIONTOOLBAR
+            MENUITEM SEPARATOR
+            MENUITEM "Lock Toolbars",               IDM_TOOLBARS_LOCKTOOLBARS
+            MENUITEM "Aanpassen...",                IDM_TOOLBARS_CUSTOMIZE
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Miniatuurweergaven",          IDM_VIEW_THUMBNAILS
+        MENUITEM "Tegels",                      IDM_VIEW_TILES
+        MENUITEM "Pictogrammen",                IDM_VIEW_ICONS
+        MENUITEM "Kleine Pictogrammen",         IDM_VIEW_SMALLICONS
+        MENUITEM "Lijst",                       IDM_VIEW_LIST
+        MENUITEM "Details",                     IDM_VIEW_DETAILS
+        MENUITEM SEPARATOR
+        MENUITEM "Pictogrammen schikken op",    IDM_VIEW_SORTBY
+        MENUITEM "Toon verborgen bestanden\tCtrl+H", IDM_VIEW_SHOWHIDDENFILES
+        MENUITEM "Vernieuwen\tF5",              IDM_VIEW_REFRESH
+        MENUITEM "Set Default Columns...",      IDM_VIEW_SETDEFAULTCOLUMNS
+        MENUITEM "Selecteer Kolommen...",       IDM_VIEW_SELECTCOLUMNS
+        MENUITEM "Kolombreedte auto-aanpassen", IDM_VIEW_AUTOSIZECOLUMNS
+        MENUITEM "Opmaakkleuren veranderen...", IDM_VIEW_CHANGEDISPLAYCOLOURS
+        MENUITEM SEPARATOR
+        POPUP "Filter"
+        BEGIN
+            MENUITEM "Filterresultaten...",         IDM_FILTER_FILTERRESULTS
+            MENUITEM "Filter toepassen",            IDM_FILTER_APPLYFILTER
+        END
+    END
+    POPUP "Acties"
+    BEGIN
+        MENUITEM "Nieuwe Map",                  IDM_ACTIONS_NEWFOLDER
+        MENUITEM SEPARATOR
+        MENUITEM "Splitsen Bestand...",         IDM_ACTIONS_SPLITFILE
+        MENUITEM "Samenvoegen Bestanden...",    IDM_ACTIONS_MERGEFILES
+        MENUITEM "Vernietigen Bestanden...",    IDM_ACTIONS_DESTROYFILES
+    END
+    POPUP "&Ga naar"
+    BEGIN
+        MENUITEM "Vorige\tAlt+Left",            IDM_GO_BACK
+        MENUITEM "Volgende\tAlt+Right",         IDM_GO_FORWARD
+        MENUITEM "Bovenliggende map\tBackspace", IDM_GO_UPONELEVEL
+        MENUITEM SEPARATOR
+        MENUITEM "Placeholder",                 IDM_GO_MYCOMPUTER
+        MENUITEM "Placeholder",                 IDM_GO_MYDOCUMENTS
+        MENUITEM "Placeholder",                 IDM_GO_MYMUSIC
+        MENUITEM "Placeholder",                 IDM_GO_MYPICTURES
+        MENUITEM "Placeholder",                 IDM_GO_DESKTOP
+        MENUITEM SEPARATOR
+        MENUITEM "Placeholder",                 IDM_GO_RECYCLEBIN
+        MENUITEM "Placeholder",                 IDM_GO_CONTROLPANEL
+        MENUITEM "Placeholder",                 IDM_GO_PRINTERS
+        MENUITEM "Placeholder",                 IDM_GO_CDBURNING
+        MENUITEM "Placeholder",                 IDM_GO_MYNETWORKPLACES
+        MENUITEM "Placeholder",                 IDM_GO_NETWORKCONNECTIONS
+    END
+    POPUP "Favorieten"
+    BEGIN
+        MENUITEM "Dit Tabblad toevoegen aan favorieten...\tCtrl+D", IDM_BOOKMARKS_BOOKMARKTHISTAB
+        MENUITEM "Favorieten indelen...",       IDM_BOOKMARKS_ORGANIZEBOOKMARKS
+        MENUITEM SEPARATOR
+    END
+    POPUP "E&xtra"
+    BEGIN
+        MENUITEM "Toon Schijfinformatie...",    IDM_TOOLS_SHOWDRIVEINFORMATION
+        MENUITEM SEPARATOR
+        MENUITEM "Opties...",                   IDM_TOOLS_OPTIONS
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "Help\tF1",                    IDM_HELP_HELP
+        MENUITEM SEPARATOR
+        MENUITEM "Over Explorer++...",          IDM_HELP_ABOUT
+    END
+END
+
+IDR_MAINMENU_RCLICK MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        POPUP "Beeld"
+        BEGIN
+            MENUITEM "Miniatuurweergaven",          IDM_VIEW_THUMBNAILS
+            MENUITEM "Tegels",                      IDM_VIEW_TILES
+            MENUITEM "Pictogrammen",                IDM_VIEW_ICONS
+            MENUITEM "Kleine pictogrammen",         IDM_VIEW_SMALLICONS
+            MENUITEM "Lijst",                       IDM_VIEW_LIST
+            MENUITEM "Details",                     IDM_VIEW_DETAILS
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Rangschikken op",             ID_POPUP_SORTBY
+        MENUITEM "Vernieuwen",                  IDM_VIEW_REFRESH
+        MENUITEM SEPARATOR
+        MENUITEM "Plakken",                     IDM_EDIT_PASTE
+        MENUITEM "Plakken Snelkoppeling",       IDM_EDIT_PASTESHORTCUT
+        MENUITEM SEPARATOR
+        MENUITEM "Map aan Favorieten toevoegen...", IDM_BOOKMARKS_BOOKMARKTHISTAB
+        MENUITEM "Kopiëren map-pad",            IDM_FILE_COPYFOLDERPATH
+        MENUITEM SEPARATOR
+        MENUITEM "Eigenschappen",               IDM_RCLICK_PROPERTIES
+    END
+END
+
+IDR_ARRANGEMENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM SEPARATOR
+        MENUITEM "Oplopend (A-Z)",              IDM_ARRANGEICONSBY_ASCENDING
+        MENUITEM "Aflopend (Z-A)",              IDM_ARRANGEICONSBY_DESCENDING
+        MENUITEM SEPARATOR
+        MENUITEM "In groepen weergeven",        IDM_ARRANGEICONSBY_SHOWINGROUPS
+        MENUITEM "Automatisch rangschikken",    IDM_ARRANGEICONSBY_AUTOARRANGE
+    END
+END
+
+IDR_TAB_RCLICK MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "&Nieuwe Tabblad\tCtrl+T",     IDM_FILE_NEWTAB
+        MENUITEM "Dupliceer Tabblad",           IDM_TAB_DUPLICATETAB
+        MENUITEM "Open Parent in New Tab",      IDM_TAB_OPENPARENTINNEWTAB
+        MENUITEM SEPARATOR
+        MENUITEM "&Vernieuwen",                 IDM_TAB_REFRESH
+        MENUITEM "&Alles Vernieuwen",           IDM_TAB_REFRESHALL
+        MENUITEM SEPARATOR
+        MENUITEM "Rename Tab...",               IDM_TAB_RENAMETAB
+        MENUITEM "Vergrendel Tabblad",          IDM_TAB_LOCKTAB
+        MENUITEM "Vergrendel Tabblad en Adres", IDM_TAB_LOCKTABANDADDRESS
+        MENUITEM SEPARATOR
+        MENUITEM "Sluit &Overige Tabbladen",    IDM_TAB_CLOSEOTHERTABS
+        MENUITEM "&Sluit Tabblad\tCtrl+W",      IDM_TAB_CLOSETAB
+    END
+END
+
+IDR_VIEWS_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Miniatuurweergaven",          IDM_VIEW_THUMBNAILS
+        MENUITEM "Tegels",                      IDM_VIEW_TILES
+        MENUITEM "Pictogrammen",                IDM_VIEW_ICONS
+        MENUITEM "Small Icons",                 IDM_VIEW_SMALLICONS
+        MENUITEM "Lijst",                       IDM_VIEW_LIST
+        MENUITEM "Details",                     IDM_VIEW_DETAILS
+    END
+END
+
+IDR_TOOLBAR_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Adresbalk",                   IDM_TOOLBARS_ADDRESSBAR
+        MENUITEM "Werkbalk",                    IDM_TOOLBARS_MAINTOOLBAR
+        MENUITEM "Bookmarks",                   IDM_TOOLBARS_BOOKMARKSTOOLBAR
+        MENUITEM "Drives",                      IDM_TOOLBARS_DRIVES
+        MENUITEM "Application Toolbar",         IDM_TOOLBARS_APPLICATIONTOOLBAR
+        MENUITEM SEPARATOR
+        MENUITEM "Lock Toolbars",               IDM_TOOLBARS_LOCKTOOLBARS
+        MENUITEM "Aanpassen...",                IDM_TOOLBARS_CUSTOMIZE
+    END
+END
+
+IDR_BOOKMARKSTOOLBAR_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Open",                        IDM_BT_OPEN
+        MENUITEM "Open in New Tab",             IDM_BT_OPENINNEWTAB
+        MENUITEM SEPARATOR
+        MENUITEM "New Bookmark...",             IDM_BT_NEWBOOKMARK
+        MENUITEM "New Folder...",               IDM_BT_NEWFOLDER
+        MENUITEM SEPARATOR
+        MENUITEM "Delete",                      IDM_BT_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Properties",                  IDM_BT_PROPERTIES
+    END
+END
+
+IDR_BOOKMARK_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Open",                        IDM_BOOKMARK_OPEN
+        MENUITEM "Open in New Tab",             IDM_BOOKMARK_OPENINNEWTAB
+        MENUITEM SEPARATOR
+        MENUITEM "Show on Bookmarks Toolbar",   IDM_BOOKMARK_SHOWONTOOLBAR
+        MENUITEM SEPARATOR
+        MENUITEM "Delete",                      IDM_BOOKMARK_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "New Bookmark...",             IDM_BOOKMARK_NEWBOOKMARK
+        MENUITEM "New Folder...",               IDM_BOOKMARK_NEWFOLDER
+        MENUITEM SEPARATOR
+        MENUITEM "Properties",                  IDM_BOOKMARK_PROPERTIES
+    END
+END
+
+IDR_APPLICATIONTOOLBAR_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Open",                        IDM_APP_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "New Application Button...",   IDM_APP_NEW
+        MENUITEM SEPARATOR
+        MENUITEM "Delete",                      IDM_APP_DELETE
+        MENUITEM "Properties",                  IDM_APP_PROPERTIES
+    END
+END
+
+IDR_HEADER_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM SEPARATOR
+        MENUITEM "More...",                     IDM_HEADER_MORE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,9,5,4
+ PRODUCTVERSION 0,9,5,4
+ FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+ FILEFLAGS 0x3L
+#else
+ FILEFLAGS 0x2L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "081304b0"
+        BEGIN
+            VALUE "FileDescription", "Explorer++ Translation DLL"
+            VALUE "FileVersion", "0, 9, 5, 4"
+            VALUE "InternalName", "Explorer++ Dutch Translation DLL"
+            VALUE "LegalCopyright", "(C) 2005-2009 David Erceg"
+            VALUE "OriginalFilename", "Explorer++NL.dll"
+            VALUE "ProductName", "Explorer++"
+            VALUE "ProductVersion", "0, 9, 5, 4"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x813, 1200
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_SAVEDIRECTORYLISTING 
+                            "Bewaart een mappenlijst voor de geselecteerde map."
+    IDS_MERGE_COLUMN_TEXT   "Samen te voegen bestanden"
+    IDS_OK                  "OK"
+    IDS_MERGE_NOINPUT       "Geen input-bestanden gespecifieerd"
+    IDS_MERGE_OUTPUTINVALID "Het gespecifieerde output-bestand is ongeldig"
+    IDS_CANCEL              "Annuleren"
+    IDS_MERGE_SELECTDESTINATION "Selecteer een doelmap"
+    IDS_SORTBY_NAME         "Naam"
+    IDS_SORTBY_SIZE         "Grootte"
+    IDS_SORTBY_TYPE         "Type"
+    IDS_SORTBY_DATEMODIFIED "Gewijzigd op"
+    IDS_SORTBY_TOTALSIZE    "Totale Grootte"
+    IDS_SORTBY_FREESPACE    "Vrije Ruimte"
+    IDS_SORTBY_DATEDELETED  "Verwijderd Op"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_NEWTAB         "Maakt een nieuw tabblad."
+    IDM_FILE_CLOSETAB       "Sluit het huidige tabblad."
+    IDM_FILE_SHOWCOMMANDPROMPT 
+                            "Toont een commando-prompt voor de huidige map."
+    IDM_FILE_COPYFOLDERPATH "Kopieert het map-pad in dit tabblad als tekst."
+    IDM_FILE_COPYITEMPATH   "Kopieert het volledige pad van de geselecteerde items."
+    IDM_FILE_DELETE         "Verplaatst de geselecteerde items naar de Prullenbak."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_RENAME         "Hernoemt de geselecteerde items."
+    IDM_FILE_PROPERTIES     "Toont de eigenschappen van de geselecteerde items."
+    IDM_EDIT_CUT            "Knipt de geselecteerde items en plaatst ze op het klembord."
+    IDM_EDIT_COPY           "Kopieert de geselecteerde items en plaatst ze op het klembord."
+    IDM_EDIT_PASTE          "Plak elk bestand vanuit het klembord."
+    IDM_EDIT_PASTESHORTCUT  "Maakt een snelkoppeling naar elk bestand in het klembord."
+    IDM_EDIT_COPYTOFOLDER   "Kopieert de geselecteerde items naar een andere map."
+    IDM_EDIT_MOVETOFOLDER   "Verplaatst de geselecteerde items naar een andere map."
+    IDM_EDIT_SELECTALL      "Selecteert alle items in dit tabblad."
+    IDM_EDIT_INVERTSELECTION 
+                            "Selecteert de items die niet geselecteerd zijn; deselecteert de items die dat wel zijn."
+    IDM_EDIT_SELECTNONE     "Deselecteert alle items in dit tabblad."
+    IDM_VIEW_STATUSBAR      "Toont/Verbergt de Statusbalk."
+    IDM_VIEW_FOLDERS        "Toont/Verbergt het mappen paneel."
+    IDM_VEW_ADDRESSBAR      "Toont/Verbergt de Adresbalk."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_EDIT_WILDCARDSELECTION 
+                            "Selecteert items gebaseerd op een jokerteken bevattend filter."
+    IDM_BOOKMARKS_ORGANIZEBOOKMARKS 
+                            "Staat toe favorieten te hernoemen, te verwijderen en hun beschrijving te veranderen."
+    IDM_VIEW_DISPLAYWINDOW  "Toont/Verbergt het Voorbeeldvenster."
+    IDM_VIEW_CHANGEDISPLAYCOLOURS 
+                            "Configureert de kleuren van het voorbeeldvenster."
+    IDM_EDIT_WILDCARDDESELECT 
+                            "Deselecteert items gebaseerd op een jokerteken bevattend filter."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TOOLS_OPTIONS       "Configureren van programma-instellingen."
+    IDM_HELP_HELP           "Deze functie is nog niet geïmplementeerd."
+    IDM_HELP_ABOUT          "Toont programma-informatie, versienummer en auteursrechten."
+    IDM_VIEW_SHOWHIDDENFILES "Toont/Verbergt verborgen bestanden."
+    IDM_VIEW_REFRESH        "Vernieuwt de inhoud van dit tabblad."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_DELETEPERMANENTLY "Verwijdert de geselecteerde items permanent."
+    IDM_TAB_CLOSEOTHERTABS  "Sluit alle tabbladen behalve deze."
+    IDM_TAB_REFRESHALL      "Vernieuwt de inhoud van alle tabbladen."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_EXIT           "Sluit dit programma."
+    IDM_EDIT_SELECTALLOFSAMETYPE 
+                            "Selecteert alle items van hetzelfe bestandstype als de huidige selectie."
+    IDM_FILE_SETFILEATTRIBUTES 
+                            "Verandert bestandskenmerken en datums voor de geselecteerde items."
+    IDM_EDIT_SHOWFILESLACK  "Toont alle mogelijk aanwezige data in de slack ruimte van de geselecteerde items."
+    IDM_EDIT_RESOLVELINK    "Localiseert het doel van elke geselecteerde snelkoppeling."
+    IDM_RCLICK_PROPERTIES   "Toont de eigenschappen van deze map."
+    IDM_BOOKMARKS_BOOKMARKTHISTAB "Voegt deze map toe aan de favorieten."
+    IDM_BOOKMARKS_BOOKMARKALLTABS 
+                            "Voegt alle open mappen toe aan de favorieten."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_VIEW_THUMBNAILS     "Items als Miniaturenweergaven weergeven."
+    IDM_VIEW_TILES          "Informatie over elk item in dit tabblad in een tegel weergeven."
+    IDM_VIEW_ICONS          "Items weergeven als grote pictogrammen."
+    IDM_VIEW_SMALLICONS     "Items weergeven als kleine pictogrammen."
+    IDM_VIEW_LIST           "Items in een lijst weergeven."
+    IDM_VIEW_DETAILS        "Informatie over elk item in dit tabblad weergeven."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_ARRANGEICONSBY_NAME "Items in het venster rangschikken op naam."
+    IDM_ARRANGEICONSBY_SIZE "Items in het venster rangschikken op Grootte."
+    IDM_ARRANGEICONSBY_TYPE "Items in het venster rangschikken op type."
+    IDM_ARRANGEICONSBY_DATEMODIFIED 
+                            "Items in het venster rangschikken op gewijzigd op; van oud naar nieuw."
+    IDM_ARRANGEICONSBY_ASCENDING "rangschikt in oplopende volgorde."
+    IDM_ARRANGEICONSBY_DESCENDING "rangschikt in aflopende volgorde."
+    IDM_ARRANGEICONSBY_SHOWINGROUPS 
+                            "Items in dit venster groeperen op de sorteereigenschap."
+    IDM_ARRANGEICONSBY_AUTOARRANGE "Items automatisch rangschikken."
+    IDM_GO_BACK             "Teruggaan naar de vorige map."
+    IDM_GO_FORWARD          "Ga naar de volgende map."
+    IDM_GO_UPONELEVEL       "Blader door de bovenliggende map."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_EDIT_PASTEHARDLINK  "Maak een vaste koppeling naar een bestand op het klembord."
+    IDM_VIEW_SELECTCOLUMNS  "Configureert de kolommen in het gedetailleerde beeld."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_SORTBY_NAME         "Items rangschikken op Naam"
+    IDM_SORTBY_SIZE         "Items rangschikken op Grootte"
+    IDM_SORTBY_TYPE         "Items rangschikken op Type"
+    IDM_SORTBY_DATEMODIFIED "Items rangschikken op Gewijzigd Op"
+    IDM_SORTBY_TOTALSIZE    "Items rangschikken op totale Grootte"
+    IDM_SORTBY_FREESPACE    "Items rangschikken op hoeveelheid beschikbare vrije ruimte"
+    IDM_SORTBY_DATEDELETED  "Items rangschikken op Verwijderd Op"
+    IDM_SORTBY_ORIGINALLOCATION 
+                            "Items rangschikken op oorspronkelijke locatie"
+    IDM_SORTBY_ATTRIBUTES   "Items rangschikken op Kenmerken"
+    IDM_SORTBY_REALSIZE     "Items rangschikken op Grootte op Schijf"
+    IDM_SORTBY_SHORTNAME    "Items rangschikken op hun korte (8.3) naam"
+    IDM_SORTBY_OWNER        "Items rangschikken op Eigenaar"
+    IDM_SORTBY_PRODUCTNAME  "Items rangschikken op Productnaam"
+    IDM_SORTBY_COMPANY      "Items rangschikken op Bedrijf"
+    IDM_SORTBY_DESCRIPTION  "Items rangschikken op Beschrijving"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_SORTBY_FILEVERSION  "Items rangschikken op bestandsversie"
+    IDM_SORTBY_PRODUCTVERSION "Items rangschikken op productversie"
+    IDM_SORTBY_SHORTCUTTO   "Items rangschikken op snelkoppeling"
+    IDM_SORTBY_HARDLINKS    "Items rangschikken op aantal vaste koppelingen"
+    IDM_SORTBY_EXTENSION    "Items rangschikken op extensie"
+    IDM_SORTBY_CREATED      "Items rangschikken op Gemaakt Op"
+    IDM_SORTBY_ACCESSED     "Items rangschikken op Laatst Geopend Op"
+    IDM_SORTBY_TITLE        "Items rangschikken op Titel"
+    IDM_SORTBY_SUBJECT      "Items rangschikken op Onderwerp"
+    IDM_SORTBY_AUTHOR       "Items rangschikken op Auteur"
+    IDM_SORTBY_KEYWORDS     "Items rangschikken op Trefwoorden"
+    IDM_SORTBY_COMMENTS     "Items rangschikken op Opmerkingen"
+    IDM_SORTBY_CAMERAMODEL  "Items rangschikken op Cameramodel"
+    IDM_SORTBY_DATETAKEN    "Items rangschikken op Afbeelding Gemaakt Op"
+    IDM_SORTBY_WIDTH        "Items rangschikken op Breedte"
+    IDM_SORTBY_HEIGHT       "Items rangschikken op Hoogte"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_SORTBY_VIRTUALCOMMENTS "Items rangschikken op Opmerkingen"
+    IDM_SORTBY_FILESYSTEM   "Items rangschikken op bestandssysteem"
+    IDM_SORTBY_VIRTUALTYPE  "Items rangschikken op type"
+    IDM_SORTBY_NUMPRINTERDOCUMENTS 
+                            "Items rangschikken op hun aantal geassocieerde documenten"
+    IDM_SORTBY_PRINTERSTATUS "Items rangschikken op hun Status"
+    IDM_SORTBY_PRINTERCOMMENTS "Items rangschikken op Opmerkingen"
+    IDM_SORTBY_PRINTERLOCATION "Items rangschikken op locatie"
+    IDM_SORTBY_NETWORKADAPTER_STATUS "Items rangschikken op status"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_COPYCOLUMNTEXT "Kopieert de geselecteerde items' kolom tekst."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TAB_DUPLICATETAB    "Dupliceert het gespecifieerde tabblad."
+    IDM_TAB_LOCKTAB         "Voorkomt dat het gespecifieerde tabblad wordt gesloten."
+    IDM_TAB_REFRESH         "Vernieuwt de inhoud van het gespecifieerde tabblad."
+    IDM_TAB_CLOSETAB        "Sluit het gespecifieerde tabblad."
+    IDM_TAB_LOCKTABANDADDRESS 
+                            "Voorkomt dat het gespecifieerde tabblad wordt gesloten."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_ACTIONS_SPLITFILE   "Splitst het geselecteerde bestand in een aantal kleinere bestanden."
+    IDM_ACTIONS_MERGEFILES  "Nog niet geïmplementeerd"
+    IDM_ACTIONS_DESTROYFILES 
+                            "Verwijdert permanent de geselecteerde bestanden, zodanig dat ze niet herstelt kunnen worden."
+    IDM_ACTIONS_NEWFOLDER   "Maakt een nieuwe map."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TOOLBARS_ADDRESSBAR "Toont/Verbergt de adresbalk."
+    IDM_TOOLBARS_CUSTOMIZE  "aanpassen van de hoofdwerkbalk."
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TOOLBARS_MAINTOOLBAR "Toont/Verbergt de hoofdwerkbalk."
+    IDM_TOOLBARS_BOOKMARKSTOOLBAR "Shows/Hides the bookmarks toolbar"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SORTBY_ORIGINALLOCATION "Originele Locatie"
+    IDS_SORTBY_ATTRIBUTES   "Kenmerken"
+    IDS_SORTBY_REALSIZE     "Werkelijk Grootte"
+    IDS_SORTBY_SHORTNAME    "Korte Naam"
+    IDS_SORTBY_OWNER        "Eigenaar"
+    IDS_SORTBY_PRODUCTNAME  "Productnaam"
+    IDS_SORTBY_COMPANY      "Bedrijf"
+    IDS_SORTBY_DESCRIPTION  "Beschrijving"
+    IDS_SORTBY_FILEVERSION  "Bestandversie"
+    IDS_SORTBY_PRODUCTVERSION "Productversie"
+    IDS_SORTBY_SHORTCUTTO   "Snelkoppeling naar"
+    IDS_SORTBY_HARDLINKS    "Vaste Koppelingen"
+    IDS_SORTBY_EXTENSION    "Extensies"
+    IDS_SORTBY_CREATED      "Gemaakt Op"
+    IDS_SORTBY_ACCESSED     "Laatst Geopend Op"
+    IDS_SORTBY_TITLE        "Titel"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_SORTBY_SUBJECT      "Onderwerp"
+    IDS_SORTBY_AUTHOR       "Auteur"
+    IDS_SORTBY_KEYWORDS     "Trefwoorden"
+    IDS_SORTBY_COMMENT      "Opmerkingen"
+    IDS_SORTBY_CAMERAMODEL  "Cameramodel"
+    IDS_SORTBY_DATETAKEN    "Afbeelding gemaakt Op"
+    IDS_SORTBY_WIDTH        "Breedte"
+    IDS_SORTBY_HEIGHT       "Hoogte"
+    IDS_SORTBY_FILESYSTEM   "Bestandssysteem"
+    IDS_SORTBY_NUMPRINTERDOCUMENTS "Aantal Documenten"
+    IDS_SORTBY_PRINTERSTATUS "Status"
+    IDS_SORTBY_PRINTERLOCATION "Locatie"
+    IDS_SORTBY_NETWORKADAPTERSTATUS "Status"
+    IDS_VERSION             "Versie"
+    IDS_ADDRESSBAR          "Adres"
+    IDS_GO                  "Ga naar"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_HIDEFOLDERSPANE     "Verberg het mappenpaneel"
+    IDS_FILERENAMEERROR     "The specified file could not be renamed. Please ensure that it is not in use."
+    IDS_TOOLBAR_BACK        "Vorige"
+    IDS_TOOLBAR_FORWARD     "Volgende"
+    IDS_TOOLBAR_UP          "Up"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TOOLBAR_FOLDERS     "Mappen"
+    IDS_TOOLBAR_COPYTO      "Copy To"
+    IDS_TOOLBAR_MOVETO      "Move To"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TOOLBAR_NEWFOLDER   "Nieuwe Map"
+    IDS_TOOLBAR_COPY        "Kopiëren"
+    IDS_TOOLBAR_CUT         "Knippen"
+    IDS_TOOLBAR_PASTE       "Plakken"
+    IDS_TOOLBAR_DELETE      "Verwijderen"
+    IDS_TOOLBAR_VIEWS       "Views"
+    IDS_TOOLBAR_SEARCH      "Search"
+    IDS_TOOLBAR_PROPERTIES  "Eigenschappen"
+    IDS_TOOLBAR_REFRESH     "Vernieuwen"
+    IDS_GENERAL_SELECTED_ONEITEM "item geselecteerd"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_GENERAL_SELECTED_MOREITEMS "geselecteerde items"
+    IDS_GENERAL_ONEITEM     "item"
+    IDS_GENERAL_MOREITEMS   "items"
+    IDS_GENERAL_VIRTUALFOLDER "Virtueel Folder"
+    IDS_GENERAL_FREE        "free"
+    IDS_GENERAL_FREESPACE   "Free Space"
+    IDS_GENERAL_TOTALSIZE   "Totaal Grootte"
+    IDS_TOOLBAR_ADDBOOKMARK "Bookmark the current tab"
+    IDS_TOOLBAR_NEWTAB      "Create a new tab"
+    IDS_TOOLBAR_SHOWCOMMANDPROMPT "Show Command Prompt"
+    IDS_TOOLBAR_ORGANIZEBOOKMARKS "Organize Bookmarks"
+    IDS_SEPARATOR           "Separator"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TAB_RENAMETAB       "Allows the specfiied tab to be renamed"
+    IDM_VIEW_SETDEFAULTCOLUMNS "Sets the default columns used for each tab"
+    IDM_EDIT_UNDO           "Undo any previous file operation"
+    IDM_TOOLBARS_DRIVES     "Shows/Hides the drives toolbar"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_NEWFOLDERERROR      "The folder could not be created. Please ensure you have sufficient priveleges to create a new folder in this directory."
+    IDS_BOOKMARKDLG_NAME    "Name"
+    IDS_BOOKMARKDLG_LOCATION "Location"
+    IDS_BOOKMARKDLG_DESCRIPTION "Description"
+    IDS_ERR_FILENAMEINVALID "A file name cannot contain any of the following characters:\n\t \\ / : * ? "" < > |"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_BT_OPEN             "Opens the selected bookmark within the current tab"
+    IDM_BT_NEWBOOKMARK      "Creates a new bookmark"
+    IDM_BT_NEWFOLDER        "Creates a new bookmark folder"
+    IDM_BT_DELETE           "Deletes the selected bookmark"
+    IDM_BT_PROPERTIES       "Shows the properties of the selected bookmark"
+    IDM_BT_OPENINNEWTAB     "Opens the selected bookmark in a new tab"
+    IDM_TOOLBARS_LOCKTOOLBARS "Prevents the toolbars from been moved"
+    IDM_TOOLBARS_APPLICATIONTOOLBAR "Shows/Hides the application toolbar"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_DESCRIPTION_NAME "Bestandsnaam"
+    IDS_COLUMN_DESCRIPTION_TYPE "Bestandstype"
+    IDS_COLUMN_DESCRIPTION_SIZE "Logische bestandsgrootte"
+    IDS_COLUMN_DESCRIPTION_MODIFIED "Wijzigingsdatum Bestand"
+    IDS_COLUMN_DESCRIPTION_ATTRIBUTES "Bestandskenmerken"
+    IDS_COLUMN_DESCRIPTION_REALSIZE "Fysieke bestandsgrootte"
+    IDS_COLUMN_DESCRIPTION_SHORTNAME "DOS 8.3 naam"
+    IDS_COLUMN_DESCRIPTION_OWNER "Eigenaar Bestand"
+    IDS_COLUMN_DESCRIPTION_PRODUCTNAME 
+                            "Productnaam geassocieerd met uitvoerbaar bestand"
+    IDS_COLUMN_DESCRIPTION_COMPANY 
+                            "Bedrijf geassocieerd met uitvoerbaar bestand"
+    IDS_COLUMN_DESCRIPTION_DESCRIPTION "Beschrijving Bestand"
+    IDS_COLUMN_DESCRIPTION_FILEVERSION 
+                            "Versie geassocieerd met uitvoerbaar bestand of DLL"
+    IDS_COLUMN_DESCRIPTION_PRODUCTVERSION "Product versie"
+    IDS_COLUMN_DESCRIPTION_SHORTCUTTO "Doel geassoceerd met een snelkoppeling"
+    IDS_COLUMN_DESCRIPTION_HARDLINKS 
+                            "Geeft aantal vaste koppelingen aan, geassocieerd met een bestand"
+    IDS_COLUMN_DESCRIPTION_EXTENSION "Bestandsnaam extensie"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_DESCRIPTION_CREATED "Datum Aangemaakt"
+    IDS_COLUMN_DESCRIPTION_ACCESSED "Datum laatst geopend"
+    IDS_COLUMN_DESCRIPTION_TITLE "Bestandstitel"
+    IDS_COLUMN_DESCRIPTION_SUBJECT "Bestandsonderwerp"
+    IDS_COLUMN_DESCRIPTION_AUTHOR "Auteur geassoceerd met een bestand"
+    IDS_COLUMN_DESCRIPTION_KEYWORDS "Trefwoorden geassocieerd met een bestand"
+    IDS_COLUMN_DESCRIPTION_COMMENT "Opmerkingen geassocieerd met een bestand"
+    IDS_COLUMN_DESCRIPTION_CAMERAMODEL 
+                            "Cameramodel geassocieerd met een afbeeldingsbestand"
+    IDS_COLUMN_DESCRIPTION_DATETAKEN "opname gemaakt op"
+    IDS_COLUMN_DESCRIPTION_WIDTH "Afbeeldingsbreedte"
+    IDS_COLUMN_DESCRIPTION_HEIGHT "Afbeeldingshoogte"
+    IDS_COLUMN_DESCRIPTION_TOTALSIZE "Totale grootte van een schijf"
+    IDS_COLUMN_DESCRIPTION_FREESPACE "Beschikbare vrije ruimte op een schijf"
+    IDS_COLUMN_DESCRIPTION_FILESYSTEM 
+                            "Geïnstalleerd Bestandssysteem op een schijf"
+    IDS_COLUMN_DESCRIPTION_NUMPRINTERDOCUMENTS 
+                            "Number of documents associated with a printer"
+    IDS_COLUMN_DESCRIPTION_PRINTERCOMMENTS 
+                            "opmerkingen geassocieerd met een printer"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_DESCRIPTION_PRINTERLOCATION "Locatie van een printer"
+    IDS_COLUMN_DESCRIPTION_NETWORKADAPTER_STATUS 
+                            "Status van een netwerkadapter"
+    IDS_NETWORKADAPTER_CONNECTED "Verbonden"
+    IDS_NETWORKADAPTER_DISCONNECTED "Uitgeschakeld"
+    IDS_NETWORKADAPTER_TESTING "Testen"
+    IDS_NETWORKADAPTER_UNKNOWN "Onbekend"
+    IDS_NETWORKADAPTER_DORMANT "Slapend"
+    IDS_NETWORKADAPTER_NOTPRESENT "Niet aanwezig"
+    IDS_NETWORKADAPTER_LOWLAYER "diepere laag niet operationeel"
+    IDS_ERR_FILEMANAGERSETTING 
+                            "Error encountered while changing default file manager status. Please ensure you have administrator privileges."
+    IDS_BOOKMARK_DELETE     "Are you sure you want to delete this bookmark?"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_NAME_NAME    "Naam"
+    IDS_COLUMN_NAME_TYPE    "Type"
+    IDS_COLUMN_NAME_SIZE    "Grootte"
+    IDS_COLUMN_NAME_DATEMODIFIED "Gewijzigd op"
+    IDS_COLUMN_NAME_ATTRIBUTES "Kenmerken"
+    IDS_COLUMN_NAME_REALSIZE "Size On Disk"
+    IDS_COLUMN_NAME_SHORTNAME "8.3 Name"
+    IDS_COLUMN_NAME_OWNER   "Eigenaar"
+    IDS_COLUMN_NAME_PRODUCTNAME "Productnaam"
+    IDS_COLUMN_NAME_COMPANY "Bedrijf"
+    IDS_COLUMN_NAME_DESCRIPTION "Beschrijving"
+    IDS_COLUMN_NAME_FILEVERSION "Bestandversie"
+    IDS_COLUMN_NAME_PRODUCTVERSION "Productversie"
+    IDS_COLUMN_NAME_SHORTCUTTO "Snelkoppeling naar"
+    IDS_COLUMN_NAME_HARDLINKS "Vaste Koppelingen"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_NAME_EXTENSION "Extensies"
+    IDS_COLUMN_NAME_CREATED "Gemaakt Op"
+    IDS_COLUMN_NAME_ACCESSED "Laatst Geopend Op"
+    IDS_COLUMN_NAME_TITLE   "Titel"
+    IDS_COLUMN_NAME_SUBJECT "Onderwerp"
+    IDS_COLUMN_NAME_AUTHOR  "Auteur"
+    IDS_COLUMN_NAME_KEYWORDS "Trefwoorden"
+    IDS_COLUMN_NAME_COMMENT "Opmerkingen"
+    IDS_COLUMN_NAME_CAMERAMODEL "Cameramodel"
+    IDS_COLUMN_NAME_DATETAKEN "Afbeelding gemaakt Op"
+    IDS_COLUMN_NAME_WIDTH   "Breedte"
+    IDS_COLUMN_NAME_HEIGHT  "Hoogte"
+    IDS_COLUMN_NAME_VIRTUALCOMMENTS "Opmerkingen"
+    IDS_COLUMN_NAME_TOTALSIZE "Total Size"
+    IDS_COLUMN_NAME_FREESPACE "Free Space"
+    IDS_COLUMN_NAME_FILESYSTEM "Bestandssysteem"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_NAME_VIRTUALTYPE "Type"
+    IDS_COLUMN_NAME_ORIGINALLOCATION "Original Location"
+    IDS_COLUMN_NAME_DATEDELETED "Date Deleted"
+    IDS_COLUMN_NAME_NUMPRINTERDOCUMENTS "Documents"
+    IDS_COLUMN_NAME_PRINTERSTATUS "Status"
+    IDS_COLUMN_NAME_PRINTERCOMMENTS "Opmerkingen"
+    IDS_COLUMN_NAME_PRINTERLOCATION "Locatie"
+    IDS_COLUMN_NAME_NETWORKADAPTER_STATUS "Status"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_ERR_FILENAMEINVALID_MSGTITLE "File name invalid"
+    IDS_OPTIONSDIALOG_TITLE "Options"
+    IDS_DEFAULTSETTINGS_NEWTAB "Select a default directory for new tabs"
+    IDS_FOLDERPANE_HEADER   "Folders"
+    IDS_DEFAULTCOLUMNS_GENERAL "General"
+    IDS_GENERAL_DATEMODIFIED "Date Modified"
+    IDS_GENERAL_NEW         "New"
+    IDS_GENERAL_TOTALFILESIZE "Total File Size"
+    IDS_GENERAL_CALCULATING "Calculating..."
+    IDS_TAB_CLOSE_TIP       "Close the current tab"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_HEADER_MORE         "Select additional columns to show."
+    IDM_FILE_CLONEWINDOW    "Clones the current window"
+END
+
+#endif    // Dutch (Belgium) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

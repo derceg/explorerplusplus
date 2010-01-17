@@ -1,0 +1,128 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (Australia) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENA)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_TODAY               "Today"
+    IDS_YESTERDAY           "Yesterday"
+    IDS_NEWFOLDER           "New Folder"
+    IDS_LISTINGHEADER       "Directory Listing for"
+    IDS_LISTINGSUBHEADER    "Listing Generated on"
+    IDS_LISTINGENTRYTEXT    "Folder Contents"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_FOLDEREMPTY         "Empty"
+    IDS_FOLDER              "Folder"
+    IDS_COPYTOTITLE         "Select a folder to copy the selected files to, then press OK"
+    IDS_DRIVEINFO_HARDDISK  "Hard Disk"
+    IDS_DRIVEINFO_DRIVECAPACITY "Drive Capacity"
+    IDS_DRIVEINFO_NUMCYLINDERS "Number of cylinders"
+    IDS_DRIVEINFO_TRACKSPERCYLINDER "Tracks per cylinder"
+    IDS_DRIVEINFO_SECTORSPERTRACK "Sectors per track"
+    IDS_DRIVEINFO_BYTESPERSECTOR "Bytes per sector"
+    IDS_DRIVEINFO_NUMPARTITIONS "Number of partitions"
+    IDS_DRIVEINFO_PARTITION "Partition"
+    IDS_DRIVEINFO_VOLUMESERIALNUMBER "Volume serial number"
+    IDS_DRIVEINFO_UNKNOWNFILESYSTEM "Unknown"
+    IDS_DRIVEINFO_OFFSET    "Offset"
+    IDS_DRIVEINFO_PARTITIONCAPACITY "Partition capacity"
+    IDS_DRIVEINFO_FILESYSTEM "File system"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_DRIVEINFO_RESERVEDCLUSTERS "Reserved Clusters"
+    IDS_DRIVEINFO_MFTSTARTINGCLUSTER "MFT Starting Cluster"
+    IDS_DRIVEINFO_MFTSIZE   "Size Of MFT"
+    IDS_DRIVEINFO_BYTESPERCLUSTER "Bytes per cluster"
+    IDS_CONTROLPANEL        "Control Panel"
+    IDS_RECYCLEBIN          "Recycle Bin"
+    IDS_MYCOMPUTER          "My Computer"
+    IDS_MYNETWORKPLACES     "My Network Places"
+    IDS_NETWORKCONNECTIONS  "Network Connections"
+    IDS_PRINTERS            "Printers and Faxes"
+    IDS_BOOKMARK_NAME       "Name"
+    IDS_BOOKMARK_LOCATION   "Location"
+    IDS_BOOKMARK_DESCRIPTION "Description"
+END
+
+#endif    // English (Australia) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

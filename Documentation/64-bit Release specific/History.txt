@@ -1,0 +1,905 @@
+Explorer++ Version History
+--------------------------
+
+Current version: 1.0.0.0 64-bit
+
+Known limitations:
+ - Not all extended sort modes have been implemented
+   yet (such as sorting by printer status in the
+   Printers folder).
+
+Version 1.0.0.0 (23/11/09)
+--------------------------
+New features:
+ - It is now possible to search for files using
+   Tools->Search.
+ - Custom coloring rules can now be applied to
+   the listview (i.e. an items text color can be
+   set based on its filename and/or attributes).
+ - Items can now be dragged using the right mouse button
+   (listview only).
+ - Tiles view now shows basic file information.
+ - New tabs can now be created by double clicking
+   in the blank space to the right of the last tab.
+ - Explorer++ can now be restricted to only running
+   one instance by deselecting 'Allow multiple instances'
+   in the options dialog.
+ - 'Large Icons' and 'Extra Large Icons' view modes
+   added (vista and later).
+ - It is now possible to browse through tabs by moving
+   the mouse over the tab window, and scrolling with the
+   mouse wheel.
+ - Various media metadata columns added (Album,
+   Duration, Composer, etc).
+ - Columns can now be rearranged by dragging and
+   dropping them in place.
+ - Folder sizes are now included when sorting by size.
+ - Universal file paths can now be copied by selecting
+   File->Copy Universal File Paths.
+ - New items can now be inserted in their sorted position
+   by selecting 'Insert new items in their sorted position'
+   in the options dialog.
+ - System files can now be hidden by selecting 'Hide protected
+   operating system files' within the options dialog.
+ - The link (.lnk) file extension can now be hidden by
+   selecting 'Always hide the link (.lnk) extension'.
+ - Single click activation mode can now be used by selecting
+   'Single-click to open an item (point to select)' in
+   the options dialog.
+ - Zip files may be opened externally by deselecting
+   'Handle zip files' within the options dialog.
+ - All tabs can now be forced to have the same width by selecting
+   'Force all tabs to have the same width' in the options dialog.
+ - Double clicking a tab will now close it (provided 'Double click
+   to close a tab' is selected in the options dialog).
+ - Ctrl+double clicking a folder will now cause it to open in
+   a new tab.
+ - Alt+Home will now browse to the default tab folder.
+ - In rename mode, F2 will now cycle between selecting an
+   items filename, extension and filename and extension.
+ - Ctrl+1...8 will now select the specified tab (between the
+   first and eigth tab).
+ - Ctrl+9 will now select the last tab.
+ - In rename mode, tab will now select the next item
+   and place it into rename mode.
+ - Application toolbar buttons can now have their names
+   hidden (so that only the icon is visible on the toolbar).
+ - Right-clicking on the folder icon in the display window will
+   now show the context menu for the selected files (or the
+   normal right-click menu if no items are selected).
+ - Ctrl+Scroll will now cycle through each of the view modes
+   within the listview.
+ - Ctrl+Pg Up and Ctrl+Pg Down as well as Ctrl+] and Ctrl+[
+   can now be used to select the previous and next tabs,
+   respectively.
+ - Alt+double click will now show an items properties.
+
+Bug fixes:
+ - When creating a file/folder in details mode, the item
+   would be selected, but immediately taken out of rename
+   mode. Fixed.
+ - Improved listview grouping.
+ - Fixed several drag and drop bugs.
+ - Improved drag and drop item repositioning.
+ - Fixed cut/copy bug.
+ - Fixed 'Open In New Tab' treeview bug.
+ - File->Set file attributes now works for the treeview as well.
+ - Folders with a total size greater than 4GB would have
+   their size shown incorrectly when the 'Show folder
+   sizes' option was enabled.
+ - The icon modifier shown when dragging and dropping now
+   matches the action that will take place when the
+   item is dropped.
+ - Previously, if file was been pasted into a tab,
+   and the directory of that tab was changed,
+   the files would continue to be added. Fixed.
+ - When creating a new tab, its directory would not
+   always be monitored. Fixed.
+ - Items would not always be correctly ghosted when they
+   were cut. Fixed.
+ - When creating a new folder using the 'New Folder' button
+   on the main toolbar, the item would not be put into rename
+   mode if the current directory was a directory root. Fixed.
+ - The 'Open new tabs next to the current one' option
+   was not been correctly read back from the registry,
+   causing it to lose its value between sessions. Fixed.
+ - The bookmarks toolbar would not be updated when a bookmark
+   was renamed. Fixed.
+ - Fixed double click bug.
+ - When switching folders, the column header in details
+   view was not been updated.
+ - When entering a folder with an ampersand (&) in its name,
+   the ampersand would be incorrectly translated into an
+   underscore. Fixed.
+ - Fixed new menu bug.
+ - Improved mass rename dialog.
+
+Misc:
+ - Explorer++ will now save a minidump file in the
+   event of a crash. This file is saved to %TEMP%.
+ - Explorer++ can now be set as the default file manager
+   by using the command:
+   explorer++.exe -set_as_default
+ - Explorer++ can now be removed as the default file manager
+   by using the command:
+   explorer++.exe -remove_as_default
+ - Most dialogs are now centered initially, and will save
+   various state information when closed.
+ - Options dialog partially redesigned.
+ - Items can now be copied, cut and pasted to/from the treeview
+   using Ctrl+C, Ctrl+X and Ctrl+V, respectively.
+ - Chevrons are now shown when toolbar buttons do not
+   have enough room to be shown.
+ - Columns (in details view) are no longer resized
+   automatically when changing folders or refreshing.
+ - Seperate 'Group By' menu added, as appears in Vista
+   onwards.
+ - If a files name is only partially shown within the listview,
+   it will be added to the files infotip.
+ - There is now a confirmation dialog shown when
+   deleting an application button.
+ - Various new details shown on display window.
+ - Previews on the display window will not be shown if
+   the display window is inactive.
+ - Ctrl+R can now be used to refresh a folder.
+ - Ctrl+L can now be used to select the address bar.
+ - Ctrl+E can now be used to duplicate a tab.
+ - Left click drag and drop is now cancelled when the
+   user clicks the right mouse button.
+ - Tools > Show drive information removed.
+
+Version 0.9.5.4 (31/5/09)
+-------------------------
+New features:
+ - Explorer++ can now be used in place of Explorer
+   for filesystem folders by selecting 'Replace
+   Explorer for filesystem folders' in the 'Options'
+   dialog (requires Administrator privileges).
+ - The positions of the main toolbars are now saved
+   and restored between sessions.
+ - Folders can now be dragged onto the bookmarks
+   toolbar directly.
+ - Files can now be dragged onto the
+   applications toolbar directly.
+ - Icons are automatically updated when a file
+   association changes.
+ - Any file that can be previewed in Explorer can
+   now be previewed in Explorer++.
+ - Pasted files are now selected upon creation
+   (provided no other files are selected).
+ - The apps key can now be used to show the main
+   context menu.
+ - Enabled drag and drop modifier keys for the
+   tree view.
+ - Right clicking the listview header in details
+   mode will now bring up a context menu, which
+   allows columns to be easily turned on and off.
+ - The user's name can now be shown in the main title
+   bar.
+ - The 'Move Up' and 'Move Down' buttons in the
+   'Organize Bookmarks' dialog now work.
+ - File previews in the display window can now be
+   turned on or off using the 'Show file previews
+   in display window' setting in the 'Options'
+   dialog.
+ - F6 and Shift+F6 can now be used to cycle
+   through each window.
+ - Ctrl+Enter will now open the selected folder
+   in a new tab.
+ - Ctrl+F4 can now be used to close the current
+   tab.
+ - Ctrl+Shift+P will now copy the current folders
+   path to the clipboard.
+
+Bug fixes:
+ - When a new file was created, it would not always
+   be put into rename mode automatically [Windows XP only].
+ - Previously, the right click context menu would
+   not be shown for some items. Fixed.
+ - Fixed listview positioning bug.
+ - If file extensions were hidden, and a filename started
+   with a dot, no text would be shown for that item.
+ - If file extensions were hidden in Explorer, they
+   would be hidden in Explorer++ as well, regardless
+   of settings. Fixed.
+ - Drives are now added/removed correctly from the
+   listview, treeview and drives toolbar.
+ - If a cd/dvd was inserted/removed, the entire drive
+   would be added/removed, even though the physical
+   device had not changed. Fixed.
+ - Files are now sorted using natural sort order
+   (e.g. file2.txt comes before file19.txt).
+ - If the folders pane had focus, and an item was selected,
+   the file associated menus (such as properties)
+   would be disabled incorrectly. Fixed.
+ - Fixed several memory leaks.
+ - Improved synchronization in details mode.
+ - Improvements made to thumbnails mode.
+ - Fixed window size issue.
+ - Fixed address bar path issue.
+ - Fixed thumbnail image positioning error.
+ - Fixed back/forward menu bug.
+ - Fied directory monitoring bug.
+ - In details mode, if the first column was removed and
+   then added again, the other columns would not be
+   shifted correctly.
+ - Items on the "Send to" context submenu may not have
+   worked correctly. Fixed.
+ - Fixed drag and drop bug.
+
+Misc:
+ - The format of the time and date fields now
+   follows the system time and date format.
+ - Clicking the views button on the main toolbar
+   now cycles between the various views, rather
+   than showing the drop-down menu.
+ - A small delay has been added to the time
+   between when a file is dragged over a tab,
+   and focus is switched to that tab.
+ - There is now a confirmation dialog shown when
+   deleting a bookmark.
+ - In empty folders viewed in details mode, each
+   column now has its width set to a default value.
+
+Version 0.9.3.2 (24/3/09)
+-------------------------
+New features:
+ - An application toolbar has been added, which
+   allows quick access to any program.
+ - Drag and drop modifier keys (Ctrl+Shift,
+   Ctrl, Shift, Alt) now work.
+ - Explorer++ is now compatible with paths
+   containing embedded environment variables,
+   such as %systemroot%.
+ - The tab control can now be extended across
+   the entire window.
+ - Full row selection in details mode can now be
+   turned on or off.
+
+Bug fixes:
+ - Removable drives can now be ejected and
+   removed safely while Explorer++ is running.
+ - Drives are now inserted and removed from
+   the drives toolbar dynamically, as they are
+   connected and disconnected from the system.
+ - If file extensions were hidden, and a file
+   was renamed, the extension would be dropped.
+ - When renaming a file within the listview, if
+   the proposed filename ended with a trailing
+   space or period, the rename operation would
+   appear to succeed, even though it had not
+   (as filenames cannot end with a trailing
+   space or period).
+ - When a folder was put into rename mode, if
+   its name contained a period, everything
+   before the period would be selected (as for
+   files).
+ - Corrected folder system infotip bug.
+ - Previously, if files were dragged into
+   Explorer++, and the auto arrange listview
+   style was on, the files would not be
+   repositioned.
+ - Fixed drag and drop selection bug.
+ - Fixed drag and drop position bug.
+ - Fixed several drag and drop memory leaks.
+ - When loading from a configuration file, the
+   correct language selection would show up in
+   the 'Options' dialog, but the default
+   language would be used for the UI (regardless
+   of the language that was loaded).
+ - The "Show In Groups" option was not been saved
+   to the XML file. Fixed.
+ - The 'Move Up', 'Move Down', 'Enable' and
+   'Disable' buttons now work within the
+   'Set Default Columns' dialog.
+ - Fixed listview focus issue.
+ - The background of the listview was previously
+   been set to white, regardless of the system
+   background color.
+
+Misc:
+ - The languages shown in the 'Options' dialog are
+   now generated dynamically, based on any
+   translation DLL's within the same directory
+   as Explorer++.
+ - The normal rename/replace dialog is now shown
+   when a collision is encountered during a
+   copy/move operation.
+ - The main windows can now be cycled through in
+   reverse using Shift+Tab.
+ - The size column in details view is now
+   right-aligned.
+ - Removed the 'Back' text from the toolbar back
+   button.
+ - The 'Filter Results...' menu item under
+   View|Filter has been changed to 'Set Filter...'.
+
+Version 0.9.2.1 (15/2/09)
+------------------------
+New features:
+ - Each tab now has an icon attached to it (the
+   folder icon from the tabs' current directory).
+ - The default directory for new tabs can now
+   be set from within the 'Default Settings' pane
+   of the 'Options' dialog.
+ - Explorer++ is now compatible with application
+   command buttons and keys, such as the back and
+   forward buttons found on some mice and keyboards.
+ - Infotips can now be turned off, set to the system
+   ones (i.e. the ones used by Windows Explorer), or
+   be set to custom (for now, this simply sets the
+   infotip to be the files modification date).
+ - Tab lock state and custom name are now saved
+   between sessions.
+
+Bug fixes:
+ - Fixed several directory monitoring bugs.
+ - Shortcuts that pointed to a website
+   (via a URL) would previously not be opened
+   within the default browser. Fixed.
+ - When two files were selected, whose individual
+   sizes were less than 4GB, but whose combined
+   size was greater than 4GB, the combined size
+   would not be shown correctly. Fixed.
+ - When a file size was between 1000 and 1024 of the
+   specified unit (bytes, KB, MB, etc), the fourth
+   character would not be shown, causing the size to
+   appear to be incorrect. Fixed.
+ - Fixed a paste file bug.
+ - If a file that could not be cut (such as a virtual
+   item) was cut anyway using Ctrl+X, the item would
+   be ghosted whether or not it was actually placed
+   on the clipboard. Fixed.
+ - The address bar would not scroll horizontally.
+   Fixed.
+ - Fixed tab highlight bug.
+ - Because of a timing problem, it was possible that
+   when Explorer++ was opened, the first icon(s)
+   shown may not have been correct. Fixed.
+
+Misc:
+ - Ctrl+N can now be used to create a new folder.
+ - On a rename operation, if a files new name
+   contains an invalid character [\/:*?"<>|],
+   an error dialog will be shown.
+ - When an item is put into rename mode by clicking
+   on it twice, only the files name (and not the
+   files extension, if any), will be selected.
+ - An error message is now shown when attempting
+   to open a shortcut that points to a non-existent
+   item.
+ - Items on the 'Go' menu now have their names
+   taken directly from the operating system. This
+   means, for example, that the 'My Computer' item
+   will be shown as 'My Computer' on XP, but
+   'Computer' on Vista.
+ - Added an error message for the situation when a
+   new folder could not be created.
+ - A slight change to the bookmarks key means that
+   bookmarks saved in previous versions will not
+   have their paths loaded in this version
+   (this only affects bookmarks saved to the
+   registry).
+
+
+Version 0.9.0.8 (3/2/09)
+------------------------
+New features:
+ - Sort by File System now works.
+ - Folders created using the 'New Folder' toolbar
+   button or menu item are now automatically
+   selected for rename when they are created.
+
+Bug fixes:
+ - Fixed rebar positioning error that occurred
+   when using the "Windows Classic" theme.
+
+Version 0.9.0.6 (31/1/09)
+-------------------------
+Bug fixes:
+ - Fixed overflow bug.
+
+Misc:
+ - Any previous registry settings can now be cleared
+   using the command:
+   explorer++.exe -clear_settings
+   This command should be used if either version
+   Alpha 1 or Alpha 2 have previously been run.
+
+Version 0.9.0.0 (30/1/09)
+-------------------------
+New features:
+ - Explorer++ is now built as a Unicode
+   executable.
+ - Explorer++ can now save its settings
+   to an XML preference file (config.xml).
+   Explorer++ will attempt to load its
+   settings in the following order:
+    1. config.xml (this file must be in the
+      same directory as Explorer++)
+    2. the registry
+   If neither of these options are available,
+   Explorer++ will switch to using its
+   internal defaults.
+   To save to the config file intially, check the
+   'Save preferences to XML file' in the 'Options'
+   dialog.
+ - Significantly upgraded bookmarks system.
+ - Icon overlays (such as those used by
+   TortoiseSVN) are now supported.
+ - Items that are created using the shell 'New' menu
+   are now automatically selected and put into
+   rename mode on creation.
+ - A file rename operation can now be undone by
+   selection 'Edit|Undo'.
+ - Folder sizes are now shown in details view.
+ - A drives toolbar is now available, which
+   allows for quick access to any drive.
+ - Bands on the rebar can now be repositioned.
+ - Tabs can now be renamed, by right clicking
+   on them and selecting 'Rename Tab...'.
+ - 'Lock Tab and Address' now works. This option,
+   when selected, will block any directory
+   changes from occurring within the current
+   tab.
+ - Folder shortcuts are now opened within Explorer++.
+ - When in thumbnails view, image thumbnails
+   are now gathered indepently of the main
+   thread.
+ - Added 'Open Parent in New Tab' menu item to tab
+   context menu.
+ - Added 'Bookmark Tab' toolbar button.
+ - Added 'New Tab' toolbar button.
+ - Added 'Show Command Prompt' toolbar button.
+ - Added 'Organize Bookmarks' toolbar button.
+ - Added option to disable treeview delay.
+ - 'Show In Groups' now works when sorting by camera model.
+ - 'Show In Groups' now works when sorting by date taken.
+ - 'Show In Groups' now works when sorting by image width.
+ - 'Show In Groups' now works when sorting by image height.
+ - 'Show In Groups' now works when sorting by file extension.
+ - 'Show In Groups' now works when sorting by file system.
+ - 'Show In Groups' now works when sorting by network
+   adapter status.
+
+Bug fixes:
+ - All columns could previously be deslected,
+   causing the program to crash. Fixed.
+ - Fixed several small memory leaks that
+   occurred in thumbnails view.
+ - When at the root of the namespace (i.e.
+   the desktop), refreshing the tab would
+   change the path to the real desktop. Fixed.
+ - When at the root of the namespace (i.e.
+   the desktop), the 'New' menu item would not
+   appear on the right click context menu. Fixed.
+ - Fixed a problem that occurred when cutting
+   items.
+ - Fixed a drag and drop issue that caused an
+   item dragged between tabs not to be moved.
+ - When dragging and dropping an item between
+   tabs, the item count in the destination tab
+   and item selection count in the source tab
+   would become corrupted. Fixed.
+ - When creating a new tab without the 'auto
+   arrange' style, auto arrange would be set
+   anyway. Fixed.
+ - Fixed selection bug.
+ - When items (such as executable files) are
+   opened from within Explorer++, their
+   start directory is now set to the directory
+   they reside within.
+ - Fixed several small memory leaks that
+   occurred when closing a tab.
+ - Improved synchronization between threads.
+
+Misc:
+ - The menu selection color is now alpha blended.
+ - Drives in the treeview are now sorted
+   by drive letter, rather than drive name.
+ - Pressing the space bar will now cause
+   whichever item in the listview has focus
+   to be selected. If not item has focus, the
+   first item is selected.
+ - Paths specified on the command line no longer
+   need a trailing backslash. For example, the
+   commands:
+   explorer++.exe C:\
+   and
+   explorer++.exe C:
+   will both open the C:\ directory in its own tab.
+ - A command line usage message can now be shown
+   by typing:
+   explorer++.exe /?
+ - Slight changes have been made to the structure
+   of the registry keys used to save program settings.
+   These changes mean that tabs saved in previous
+   versions of Explorer++ will not load in this version.
+
+Version Alpha 2
+---------------
+26/9/08:
+New features:
+ - The language to use can now be selected in the
+   'Options' dialog, in the 'Language' tab. The
+   language Explorer++ uses is based on the following
+   (in order of importance):
+   1. Any language specified on the command line.
+   2. Any language saved from a previous session
+      (using the above method).
+   3. The system default language.
+ - Files can now be dragged and dropped onto the
+   treeview control.
+ - 'Copy File Paths' can now be used on items in the
+   treeview.
+ - 'Cut' and 'Copy' can now be used to copy and move
+   items from the treeview.
+ - The 'Back' and 'Forward' buttons on the main toolbar
+   now show what folder is back/forward in their infotip.
+ - 'Show In Groups' now works when sorting by title.
+ - 'Show In Groups' now works when sorting by subject.
+ - 'Show In Groups' now works when sorting by author.
+ - 'Show In Groups' now works when sorting by keywords.
+
+Bug fixes:
+ - Fixed bug that would cause directory monitoring to
+   stop working under certain circumstances.
+ - Fixed listview drag and drop bug.
+ - Fixed bug that arose when sorting items by comment.
+ - Fixed 'Merge Files' cancel bug.
+ - Fixed 'Split File' cancel bug.
+ - Fixed small 'Show In Groups' bug.
+ - Fixed toolbar show/hide bug.
+
+Misc:
+ - A small delay has now been added to the treeview,
+   meaning that when a different folder is selected, it
+   is not browsed to immediately.
+
+2/9/08:
+New features:
+ - 'Show In Groups' now works when sorting by attributes.
+ - 'Show In Groups' now works when sorting by file owner.
+ - 'Show In Groups' now works when sorting by file
+   creation date.
+ - 'Show In Groups' now works when sorting by date of
+   last access.
+ - 'Show In Groups' now works when sorting by short name.
+ - 'Show In Groups' now works when sorting by product name.
+ - 'Show In Groups' now works when sorting by company name.
+ - 'Show In Groups' now works when sorting by file
+   description.
+ - 'Show In Groups' now works when sorting by file version.
+ - 'Show In Groups' now works when sorting by product
+   version.
+
+Bug fixes:
+ - When closing a tab, directory monitoring would sometimes
+   be stopped for a different tab. Fixed.
+ - Fixed toolbar bug that would sometimes cause the program
+   to crash on exit.
+ - When the column representing the current sort mode
+   is deselected, the sort mode is automatically changed
+   to the first available one.
+
+Misc:
+ - Drives in 'My Computer' are now sorted according to
+   drive letter when sorting by name.
+
+21/8/08:
+New features:
+ - Confirmation when closing multiple tabs can now
+   be requested when the 'Ask for confirmation before
+   closing all tabs' option is selected.
+ - The main toolbar can now be customized by
+   selecting 'Customize...' on the toolbar context
+   menu or on the 'View|Toolbar' menu.
+ - Added an error message for the situation when a
+   file cannot be renamed.
+ - Alt+D will now shift focus to the address bar.
+ - F4 will now show the drop down for the address bar.
+ - Ctrl+B can now be used to access the 'Organize
+   Bookmarks' dialog.
+ - The tab button can now be used to switch
+   between the main item pane, the folders pane and
+   the address bar.
+ - Gridlines in details view can now be toggled on or
+   off via the 'Show gridlines in details view' option
+   within the 'Options' dialog.
+
+Bug fixes:
+ - Fixed 'Remove' button within the 'Destroy Files'
+   dialog.
+ - Fixed 'Remove' button within the 'Merge Files'
+   dialog.
+ - Fixed bug when moving columns up/down in column
+   selection dialog.
+ - Fixed several other small bugs within column
+   selection dialog.
+ - The 'Auto Arrange', 'Show In Groups' and
+   'Sort Ascending' default options are now saved
+   and loaded.
+
+Misc:
+ - Default output file when merging is now 'output.txt'.
+ - Menu mnemonic characters are now underlined on the
+   main menu after the alt key is used to select the menu.
+ - Description of column items are now shown in the
+   'Select Columns' dialog.
+
+10/8/08:
+New features:
+ - The right click context menu is now owner drawn.
+
+Bug fixes:
+ - Fixed bug that would cause the 'Sort By' submenu to
+   be drawn incorrectly.
+ - Fixed position of the 'hide folders pane' button.
+ - Fixed bug relating to the 'Address Bar' item on the
+   toolbars menu.
+
+20/7/08
+New features:
+ - Files can now be merged using 'Actions|Merge Files...'.
+
+Bug fixes:
+ - Fixed 'Go' button bug.
+ - The paste button on the main toolbar is now
+   enabled automatically when there are files
+   on the clipboard, and disabled automatically
+   when there are none.
+
+13/7/08
+New features:
+ - Added 'Autosize Columns' to the 'View' menu, which
+   will resize listview columns to fit in the text
+   of all items.
+ - Files can now be dragged and dropped between tabs.
+ - Added a main toolbar context menu.
+ - The main menus as well as the main toolbar context
+   menu are now owner drawn. Various items on the main
+   menus now have pictures shown along side the menu
+   text.
+ - More main toolbar buttons added.
+
+Bug fixes:
+ - Improvements made to drag and drop handling.
+
+Misc:
+ - Aesthetic changes made to the About dialog.
+ - Build date/time is now shown in the About dialog.
+
+7/7/08
+New features:
+ - Menu help strings are now shown for items on the
+   shell context menus.
+ - Added 'Bookmark Folder...' and 'Copy Folder Path'
+   to right click context menu.
+ - When browsing into a folder, the path of the
+   folder been loaded is now shown in the status
+   bar (i.e. if browsing into the 'C:\' folder, the
+   text in the status bar will read 'Loading C:\...').
+ - Added 'Duplicate Tab' to right click menu for tabs,
+   which will open a duplicate of the specified tab
+   in a new tab.
+ - Added 'Lock Tab' to right click menu for tabs to
+   prevent a tab been closed.
+ - Tabs can now be bookmarked using the keyboard
+   shortcut 'Ctrl + D'.
+ - Files can now be split using 'Actions|Split File...'.
+ - Files can now be permanently deleted using
+   'Actions|Destroy Files...'.
+ - If 'Show Folder Sizes' is activated in the
+   'Tools|Options' dialog, folder sizes will now be
+   shown in the display window when a folder is
+   selected.
+
+Bug fixes:
+ - Fixed 'Refresh Tab' on tab right click menu so that
+   it refreshes the specified tab instead of the one
+   that currently has focus.
+ - Thumbnail images are now shown in the correct position
+   when items are sorted in groups.
+ - Small bug fixed relating to showing items in groups
+   when sorting by name.
+ - Menu help now shows for items on the context menu for
+   individual tabs.
+
+3/7/08
+New features:
+ - Thumbnails view can now be set as the default view
+   in the 'Default Settings' page of the 'Tools|Options'
+   dialog.
+
+Bug fixes:
+ - Bookmarks can now be rearranged and have their
+   properties (name, location, description) changed.
+ - Tabs now update when relevant settings in the
+   'Tools|Options' dialog have been applied.
+ - Fixed treeview sorting bug.
+ - Folders created are now inserted into their
+   correct position in the treeview automatically.
+ - Some improvements made to 'Tools|Show Drive Information'.
+
+Misc:
+ - New tabs can be opened with middle click even
+   if the listview window does not have focus.
+
+1/7/08
+New features:
+ - Thumbnails view has been added to the 'View' menu.
+   As this is the first implementation of thumbnails
+   view, it may still contain some bugs.
+ - Added 'File|Copy Column Text', which will copy
+   the currently selected items' column text to the
+   clipboard.
+ - 'File|Copy Paths' can now copy the full paths
+   of multiple items.
+
+Bug fixes:
+ - Fixed tab swapping bug.
+ - Fixed column sorting bug.
+ - Fixed file size bug that arose when files in a
+   directory were deleted then created.
+
+29/6/08
+New features:
+ - Virtual folders can now be opened from the command
+   line simply by suppyling their name:
+   e.g. explorer++.exe "control panel"
+   will open the Control Panel.
+
+Bug fixes:
+ - Improvements made to sorting by column.
+ - Fixed bug relating to directories opened
+   via the command line.
+ - Fixed bug relating to columns not showing
+   up for the printers folder.
+ - Folder specific columns added for the
+   'My Network Places' folder.
+ - Additional virtual folders (Recycle Bin, Printers,
+   Network Connections and My Network Places) now have
+   their active columns saved and loaded.
+ - Fixed bug where program would sometimes stop
+   responding after the columns for a folder
+   had been changed.
+
+Misc:
+ - 'My Network Places' on the 'Go' menu has been
+   changed to read 'Network' on Windows Vista.
+ - The items shown on the 'Sort By' menu for a
+   particular tab now depend on the columns that
+   are active for that tab.
+ - Menu help messages added for items on the 'Sort By'
+   menu.
+
+Version Alpha 1
+---------------
+26/6/08
+New features:
+ - The display window font can now be changed (via
+   'View|Change Display Colours').
+ - 'Open in New Tab' added to right click menu
+   for treeview items.
+
+Bug fixes:
+ - Fixed combobox keyboard input bug.
+ - Image previews in the display window now
+   adjust their width (to maintain the correct
+   aspect ratio) as the display window is
+   vertically resized.
+
+25/6/08
+New features:
+ - Additional settings added to default options
+   dialog (auto arrange, show in groups and
+   sort ascending).
+ - The program can now be launched from the command
+   line with a set of directory arguments:
+   explorer++.exe dir1 dir2 ... dirN
+   where dir1 to dirN are the directories to open.
+   Each directory will be opened in its own tab.
+
+Bug fixes:
+ - Newline characters which are embedded in comments
+   for an item in details view have been replaced
+   with a space.
+ - Virtual folders now have their friendly name
+   shown in the title bar when the program is
+   configured to show full directory paths.
+ - Fixed drag selection bug.
+
+Misc:
+ - The display window can no longer be resized
+   to zero height.
+
+16/6/08
+Bug fixes:
+ - Minor internal bugs fixed.
+
+10/6/08
+Bug fixes:
+ - Greater amount of internal error checking added.
+
+Misc:
+ - New tabs opened with the middle mouse button are
+   no longer switched to automatically.
+
+8/6/08
+New features:
+ - Tabs can now be closed with the middle mouse click
+   button.
+ - Folders can now be opened in a new tab by clicking
+   on them with the middle mouse button.
+
+Bug fixes:
+ - Fixed slight bug with tab selection when a tab is
+   closed.
+ - Sometimes when a folder was created, it would be
+   inserted into the treeview twice. Fixed.
+ - Fixed slight problem involved with swapping tabs.
+
+Misc:
+ - Changed main window title from 'Explorer++ - Current
+   directory' to 'Current directory - Explorer++'.
+ - Display window can now be vertically resized.
+
+6/6/08
+Bug fixes:
+ - Greater amount of error checking added to treeview
+   control.
+ - Minor treeview collapse selection bug fixed.
+ - Bug associated with setting column data in details
+   view fixed.
+ - In options dialog, in the default settings tab,
+   setting the details radio button had no effect
+   on the state of the apply button. Fixed.
+ - Fixed small bug where program could crash as a tab
+   is closed (would only happen under very specific
+   circumstances).
+
+5/6/08
+Bug fixes:
+ - Display window now redraws its gradient background
+   as the main window is resized.
+ - For items in the my computer folder which have no
+   comment, no comment text is shown in details view
+   (previously a random series of characters was
+   shown for an item with no comment).
+
+4/6/08
+Bug fixes:
+ - Fixed treeview updating bug relating to folder
+   renaming.
+ - Minor sorting bug fixed.
+ - Fixed bug relating to the collapse state of
+   treeview items when a folder is deleted.
+ - Slight alteration made so that the copying files
+   dialog is now shown during a paste files operation.
+ - Changed copy and cut on context menu so that they
+   are handled internally, rather than by the shell.
+
+3/6/08
+New features:
+ - Added 'Open in New Tab' to right click menu
+   for folders.
+
+Bug fixes:
+ - Fixed bug where delete file permanently on File
+   menu was only sending files to recycle bin.
+ - Preview images were only been shown for images with
+   a lower case extension. Fixed to be case insensitive.
+ - Fixed thread synchronization bug, which would sometimes
+   cause the program to hang.
+
+2/6/08
+Bug fixes:
+ - Fixed small bug relating to directory monitoring/updating.
+ - Fixed problem with options not been
+   applied in 'Tools' > 'Options' general tab.
+ - Slight modification made to 'Tools' > 'Show drive information'
+   meaning it may no longer crash. Information shown may be
+   incorrect though.
+
+1/6/2008
+* INITIAL RELEASE *

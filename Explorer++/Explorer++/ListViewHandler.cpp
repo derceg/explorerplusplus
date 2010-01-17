@@ -1,0 +1,1772 @@
+/******************************************************************
+ *
+ * Project: Explorer++
+ * File: ListViewHandler.cpp
+ * License: GPL - See COPYING in the top level directory
+ *
+ * Handles messages asscoiated with the main
+ * listview controls.
+ *
+ * Written by David Erceg
+ * www.explorerplusplus.com
+ *
+ *****************************************************************/
+
+#include "stdafx.h"
+#include <uxtheme.h>
+#include "Explorer++.h"
+
+
+LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
+LRESULT CALLBACK	ListViewEditProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+
+LRESULT	(CALLBACK *DefaultListViewProc)(HWND,UINT,WPARAM,LPARAM);
+
+/*
+ * Creates and then subclasses a new listview control.
+ */
+HWND CContainer::CreateAndSubclassListView(HWND hParent,DWORD Style)
+{
+	HWND	hListView;
+	DWORD	ExtendedStyle;
+
+	hListView = CreateListView(hParent,Style);
+
+	IImageList *pImageList = NULL;
+
+	SHGetImageList(SHIL_SMALL,IID_IImageList,(void **)&pImageList);
+	ListView_SetImageList(hListView,(HIMAGELIST)pImageList,LVSIL_SMALL);
+	pImageList->Release();
+
+	ExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
+
+	/* If the user has selected to turn on full row
+	select, add the style to the listview. */
+	if(m_bUseFullRowSelect)
+	{
+		ListView_SetExtendedListViewStyle(hListView,
+			ExtendedStyle|LVS_EX_FULLROWSELECT);
+	}
+
+	/* Set the listview to the Windows Explorer theme
+	used in Windows Vista. */
+	SetWindowTheme(hListView,L"Explorer",NULL);
+
+	return hListView;
+}
+
+LRESULT CALLBACK ListViewSubclassProcStub(HWND ListView,
+UINT msg,WPARAM wParam,LPARAM lParam)
+{
+	ListViewInfo_t	*plvi = NULL;
+	CContainer		*pContainer = NULL;
+
+	plvi = (ListViewInfo_t *)GetWindowLongPtr(ListView,GWLP_USERDATA);
+
+	pContainer = (CContainer *)plvi->pContainer;
+
+	/* Jump across to the member window function (will handle all requests). */
+	return pContainer->ListViewSubclassProc(ListView,msg,wParam,lParam);
+}
+
+LRESULT CALLBACK CContainer::ListViewSubclassProc(HWND ListView,
+UINT msg,WPARAM wParam,LPARAM lParam)
+{
+	switch(msg)
+	{
+		case WM_MENUSELECT:
+			SendMessage(m_hContainer,WM_MENUSELECT,wParam,lParam);
+			break;
+
+		case WM_SETFOCUS:
+			m_hLastActiveWindow = ListView;
+			break;
+
+		case WM_LBUTTONDOWN:
+			return OnListViewLButtonDown(wParam,lParam);
+			break;
+
+		case WM_RBUTTONDOWN:
+			if((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON)
+				&& !(wParam & MK_MBUTTON))
+			{
+				LV_HITTESTINFO lvhti;
+
+				lvhti.pt.x	= LOWORD(lParam);
+				lvhti.pt.y	= HIWORD(lParam);
+
+				/* Test to see if the mouse click was
+				on an item or not. */
+				ListView_HitTest(m_hActiveListView,&lvhti);
+
+				if(!(lvhti.flags & LVHT_NOWHERE))
+				{
+					m_bDragAllowed = TRUE;
+				}
+			}
+			break;
+
+		case WM_RBUTTONUP:
+			m_bDragCancelled = FALSE;
+			m_bDragAllowed = FALSE;
+			break;
+
+		case WM_MBUTTONDOWN:
+			OnListViewMButtonDown(wParam,lParam);
+			break;
+
+		case WM_MBUTTONUP:
+			OnListViewMButtonUp(wParam,lParam);
+			break;
+
+		/* If no item is currently been dragged, and the last drag
+		has not just finished (i.e. item was dragged, but was cancelled
+		with escape, but mouse button is still down), and when the right
+		mouse button was clicked, it was over an item, start dragging. */
+		case WM_MOUSEMOVE:
+			{
+				if(!m_bDragging && !m_bDragCancelled && m_bDragAllowed)
+				{
+					if((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON)
+						&& !(wParam & MK_MBUTTON))
+					{
+						NMLISTVIEW nmlv;
+						POINT pt;
+						DWORD dwPos;
+						HRESULT hr;
+
+						dwPos = GetMessagePos();
+						pt.x = GET_X_LPARAM(dwPos);
+						pt.y = GET_Y_LPARAM(dwPos);
+						MapWindowPoints(HWND_DESKTOP,m_hActiveListView,&pt,1);
+
+						LV_HITTESTINFO lvhti;
+
+						lvhti.pt = pt;
+
+						/* Test to see if the mouse click was
+						on an item or not. */
+						ListView_HitTest(m_hActiveListView,&lvhti);
+
+						if(!(lvhti.flags & LVHT_NOWHERE) && ListView_GetSelectedCount(m_hActiveListView) > 0)
+						{
+							nmlv.iItem = 0;
+							nmlv.ptAction = pt;
+
+							hr = OnListViewBeginDrag((LPARAM)&nmlv,DRAG_TYPE_RIGHTCLICK);
+
+							if(hr == DRAGDROP_S_CANCEL)
+							{
+								m_bDragCancelled = TRUE;
+							}
+						}
+					}
+				}
+			}
+			break;
+
+		case WM_MOUSEWHEEL:
+			if(OnMouseWheel(wParam,lParam))
+				return 0;
+			break;
+
+		case WM_NOTIFY:
+			switch(((LPNMHDR)lParam)->code)
+			{
+			case HDN_BEGINDRAG:
+				return FALSE;
+				break;
+
+			case HDN_ENDDRAG:
+				{
+					/* When the drag ends, the dragged item
+					is shifted into position, and all later
+					items are shifted down one. Therefore,
+					take the item out of its position in the
+					list, and move it into its new position. */
+					NMHEADER *pnmHeader = NULL;
+					list<Column_t> ActiveColumnList;
+					list<Column_t>::iterator itr;
+					Column_t Column;
+					int i = 0;
+
+					pnmHeader = (NMHEADER *)lParam;
+
+					m_pActiveShellBrowser->ExportCurrentColumns(&ActiveColumnList);
+
+					i = 0;
+					itr = ActiveColumnList.begin();
+					while(i < (pnmHeader->iItem + 1) && itr != ActiveColumnList.end())
+					{
+						if(itr->bChecked)
+						{
+							i++;
+						}
+
+						itr++;
+					}
+
+					if(itr != ActiveColumnList.begin())
+						itr--;
+
+					Column = *itr;
+					ActiveColumnList.erase(itr);
+
+					i = 0;
+					itr = ActiveColumnList.begin();
+					while(i < (pnmHeader->pitem->iOrder + 1) && itr != ActiveColumnList.end())
+					{
+						if(itr->bChecked)
+						{
+							i++;
+						}
+
+						itr++;
+					}
+
+					if(itr != ActiveColumnList.begin())
+						itr--;
+
+					ActiveColumnList.insert(itr,Column);
+
+					m_pActiveShellBrowser->ImportColumns(&ActiveColumnList,TRUE);
+
+					RefreshTab(m_iObjectIndex);
+
+					return TRUE;
+				}
+				break;
+			}
+			break;
+	}
+
+	return CallWindowProc(DefaultListViewProc,ListView,msg,wParam,lParam);
+}
+
+LRESULT CContainer::OnListViewLButtonDown(WPARAM wParam,LPARAM lParam)
+{
+	LV_HITTESTINFO HitTestInfo;
+
+	HitTestInfo.pt.x	= LOWORD(lParam);
+	HitTestInfo.pt.y	= HIWORD(lParam);
+
+	/* Test to see if the mouse click was
+	on an item or not. */
+	ListView_HitTest(m_hActiveListView,&HitTestInfo);
+
+	/* If the mouse click was not on an item,
+	then assume we are counting down the number
+	of items selected. */
+	if(HitTestInfo.flags == LVHT_NOWHERE)
+	{
+		if(!(wParam & MK_CONTROL) && m_nSelected > 1)
+			m_bCountingDown = TRUE;
+	}
+
+	return CallWindowProc(DefaultListViewProc,m_hActiveListView,WM_LBUTTONDOWN,wParam,lParam);
+}
+
+void CContainer::OnListViewMButtonDown(WPARAM wParam,LPARAM lParam)
+{
+	LV_HITTESTINFO ht;
+
+	ht.pt.x = LOWORD(lParam);
+	ht.pt.y = HIWORD(lParam);
+
+	ListView_HitTest(m_hActiveListView,&ht);
+
+	if(ht.flags != LVHT_NOWHERE && ht.iItem != -1)
+	{
+		m_ListViewMButtonItem = ht.iItem;
+
+		ListView_SetItemState(m_hActiveListView,ht.iItem,LVIS_FOCUSED,LVIS_FOCUSED);
+	}
+	else
+	{
+		m_ListViewMButtonItem = -1;
+	}
+}
+
+void CContainer::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
+{
+	LV_HITTESTINFO	ht;
+
+	ht.pt.x = LOWORD(lParam);
+	ht.pt.y = HIWORD(lParam);
+
+	ListView_HitTest(m_hActiveListView,&ht);
+
+	if(ht.flags != LVHT_NOWHERE)
+	{
+		/* Only open an item if it was the one
+		on which the middle mouse button was
+		initially clicked on. */
+		if(ht.iItem == m_ListViewMButtonItem)
+		{
+			IShellFolder *pDesktopFolder	= NULL;
+			IShellFolder *pShellFolder		= NULL;
+			LPITEMIDLIST pidl				= NULL;
+			LPITEMIDLIST ridl				= NULL;
+			SFGAOF uAttributes				= SFGAO_FOLDER | SFGAO_STREAM;
+			TCHAR szParsingPath[MAX_PATH];
+			STRRET str;
+			HRESULT hr;
+
+			hr = SHGetDesktopFolder(&pDesktopFolder);
+
+			if(SUCCEEDED(hr))
+			{
+				pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+				hr = pDesktopFolder->BindToObject(pidl,NULL,IID_IShellFolder,(LPVOID *)&pShellFolder);
+
+				if(!SUCCEEDED(hr))
+				{
+					hr = SHGetDesktopFolder(&pShellFolder);
+				}
+
+				if(SUCCEEDED(hr))
+				{
+					ridl = m_pActiveShellBrowser->QueryItemRelativeIdl(ht.iItem);
+
+					hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&ridl,&uAttributes);
+
+					if(SUCCEEDED(hr))
+					{
+						if((uAttributes & SFGAO_FOLDER) &&
+							!(uAttributes & SFGAO_STREAM))
+						{
+							/* Folder item. */
+							pShellFolder->GetDisplayNameOf(ridl,SHGDN_FORPARSING,&str);
+							StrRetToBuf(&str,ridl,szParsingPath,MAX_PATH);
+
+							BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,FALSE);
+						}
+					}
+
+					CoTaskMemFree(ridl);
+					pShellFolder->Release();
+				}
+				CoTaskMemFree(pidl);
+				pDesktopFolder->Release();
+			}
+		}
+	}
+}
+
+void CContainer::OnListViewKeyDown(LPARAM lParam)
+{
+	LV_KEYDOWN	*lv_key = NULL;
+
+	lv_key = (LV_KEYDOWN *)lParam;
+
+	switch(lv_key->wVKey)
+	{
+		case VK_RETURN:
+			if((GetKeyState(VK_CONTROL) & 0x80) &&
+			!(GetKeyState(VK_SHIFT) & 0x80) &&
+			!(GetKeyState(VK_MENU) & 0x80))
+			{
+				/* Key press: Ctrl+Enter
+				Action: Open item in background tab. */
+				OpenAllSelectedItems(TRUE);
+			}
+			else
+			{
+				OpenAllSelectedItems(FALSE);
+			}
+			break;
+
+		case VK_DELETE:
+			if(GetKeyState(VK_SHIFT) & 0x80)
+				OnListViewFileDelete(TRUE);
+			else
+				OnListViewFileDelete(FALSE);
+			break;
+
+		case VK_BACK:
+			BrowseFolder(EMPTY_STRING,
+			SBSP_PARENT|SBSP_SAMEBROWSER);
+			break;
+
+		case 'A':
+			if((GetKeyState(VK_CONTROL) & 0x80) &&
+			!(GetKeyState(VK_SHIFT) & 0x80) &&
+			!(GetKeyState(VK_MENU) & 0x80))
+			{
+				m_bCountingUp = TRUE;
+				ListView_SelectAllItems(m_hActiveListView);
+				SetFocus(m_hActiveListView);
+			}
+			break;
+
+		case 'C':
+			if((GetKeyState(VK_CONTROL) & 0x80) &&
+			!(GetKeyState(VK_SHIFT) & 0x80) &&
+			!(GetKeyState(VK_MENU) & 0x80))
+				OnListViewCopy(TRUE);
+			break;
+
+		case 'I':
+			if((GetKeyState(VK_CONTROL) & 0x80) &&
+			!(GetKeyState(VK_SHIFT) & 0x80) &&
+			!(GetKeyState(VK_MENU) & 0x80))
+			{
+				m_bInverted = TRUE;
+				m_nSelectedOnInvert = m_nSelected;
+				ListView_InvertSelection(m_hActiveListView);
+				SetFocus(m_hActiveListView);
+			}
+			break;
+
+		case 'V':
+			if((GetKeyState(VK_CONTROL) & 0x80) &&
+			!(GetKeyState(VK_SHIFT) & 0x80) &&
+			!(GetKeyState(VK_MENU) & 0x80))
+				OnListViewPaste();
+			break;
+
+		case 'X':
+			if((GetKeyState(VK_CONTROL) & 0x80) &&
+			!(GetKeyState(VK_SHIFT) & 0x80) &&
+			!(GetKeyState(VK_MENU) & 0x80))
+				OnListViewCopy(FALSE);
+			break;
+	}
+}
+
+void CContainer::OnListViewItemChanged(LPARAM lParam)
+{
+	NMLISTVIEW	*ItemChanged = NULL;
+	int			iObjectIndex;
+	BOOL		Selected;
+
+	ItemChanged = (NM_LISTVIEW FAR *)lParam;
+
+	iObjectIndex = DetermineListViewObjectIndex(ItemChanged->hdr.hwndFrom);
+
+	if(iObjectIndex == -1)
+		return;
+
+	if(m_pShellBrowser[iObjectIndex]->QueryDragging())
+		return;
+
+	if((ItemChanged->uNewState & LVIS_SELECTED) &&
+	(ItemChanged->uOldState & LVIS_SELECTED))
+		return;
+
+	/* Only proceed if an item was selected or deselected. */
+	if(ItemChanged->uNewState & LVIS_SELECTED)
+		Selected = TRUE;
+	else if(ItemChanged->uOldState & LVIS_SELECTED)
+		Selected  = FALSE;
+	else
+		return;
+
+	/* Only update internal selection info
+	if the listview that sent the change
+	notification is active. */
+	if(iObjectIndex == m_iObjectIndex)
+	{
+		if(Selected)
+		{
+			m_nSelected++;
+
+			if(m_nSelected == ListView_GetItemCount(m_hActiveListView))
+				m_bCountingUp = FALSE;
+		}
+		else
+		{
+			m_nSelected--;
+
+			if(m_nSelected <= 1)
+				m_bCountingDown = FALSE;
+		}
+	}
+
+	m_pShellBrowser[iObjectIndex]->UpdateFileSelectionInfo(
+	(int)ItemChanged->lParam,Selected);
+
+	if((ListView_GetItemCount(m_hActiveListView) - m_nSelected) == m_nSelectedOnInvert)
+		m_bInverted = FALSE;
+
+	if(m_bCountingUp || m_bCountingDown || m_bInverted)
+		return;
+
+	HandleFileSelectionDisplay();
+	HandleStatusText();
+	HandleToolbarItemStates();
+}
+
+int CContainer::DetermineListViewObjectIndex(HWND hListView)
+{
+	ListViewInfo_t	*plvi = NULL;
+
+	plvi = (ListViewInfo_t *)GetWindowLongPtr(hListView,GWLP_USERDATA);
+
+	if(plvi->iObjectIndex < MAX_TABS &&
+		m_uTabMap[plvi->iObjectIndex] == 1)
+		return plvi->iObjectIndex;
+
+	return -1;
+}
+
+LRESULT CALLBACK ListViewEditProcStub(HWND hwnd,UINT uMsg,
+WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+{
+	CContainer *pContainer = (CContainer *)dwRefData;
+
+	return pContainer->ListViewEditProc(hwnd,uMsg,wParam,lParam);
+}
+
+LRESULT CALLBACK CContainer::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+{
+	switch(Msg)
+	{
+	/* Can't pick up tab and return keys properly
+	(blocked by edit control using WM_GETDLGMESSAGE).
+	So, send custom message instead. */
+	case WM_USER_KEYDOWN:
+		m_bListViewBeginRename = FALSE;
+		switch(wParam)
+		{
+		case VK_F2:
+			{
+				/* Cycle between:
+				- Selecting filename (no extension)
+				- Selecting whole name
+				- Selecting only extension */
+
+				TCHAR szFileName[MAX_PATH];
+				DWORD dwAttributes;
+				BOOL bExtensionFound = FALSE;
+				BOOL bSelectionSet = FALSE;
+				int i;
+
+				SendMessage(hwnd,WM_GETTEXT,
+					(WPARAM)SIZEOF_ARRAY(szFileName),
+					(LPARAM)szFileName);
+
+				dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(m_iItemEditing);
+
+				if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
+					FILE_ATTRIBUTE_DIRECTORY)
+				{
+					for(i = lstrlen(szFileName) - 1;i >= 0;i--)
+					{
+						if(szFileName[i] == '.')
+						{
+							bExtensionFound = TRUE;
+							break;
+						}
+					}
+
+					if(bExtensionFound)
+					{
+						if(m_ListViewEditingStage == LISTVIEW_RENAME_FILENAME)
+						{
+							SendMessage(hwnd,EM_SETSEL,i + 1,lstrlen(szFileName));
+							m_ListViewEditingStage = LISTVIEW_RENAME_EXTENSION;
+						}
+						else if(m_ListViewEditingStage == LISTVIEW_RENAME_EXTENSION)
+						{
+							m_ListViewEditingStage = LISTVIEW_RENAME_ENTIRE;
+							SendMessage(hwnd,EM_SETSEL,0,-1);
+						}
+						else if(m_ListViewEditingStage == LISTVIEW_RENAME_ENTIRE)
+						{
+							m_ListViewEditingStage = LISTVIEW_RENAME_FILENAME;
+
+							SendMessage(hwnd,EM_SETSEL,0,i);
+						}
+					}
+
+
+					if(m_ListViewEditingStage == LISTVIEW_RENAME_ENTIRE || !bSelectionSet)
+					{
+
+					}
+				}
+			}
+			break;
+
+		case VK_TAB:
+			{
+				int iSel;
+				int iNewSel;
+				int nItems;
+
+				iSel = ListView_GetNextItem(GetParent(hwnd),-1,LVNI_ALL|LVNI_SELECTED);
+				ListView_SelectItem(GetParent(hwnd),iSel,FALSE);
+
+				nItems = ListView_GetItemCount(GetParent(hwnd));
+
+				if(iSel == (nItems - 1))
+					iNewSel = 0;
+				else
+					iNewSel = iSel + 1;
+
+				ListView_EditLabel(GetParent(hwnd),iNewSel);
+
+				return 0;
+			}
+			break;
+		}
+		break;
+
+	case EM_SETSEL:
+		{
+			if(m_bListViewBeginRename)
+			{
+				TCHAR	szFileName[MAX_PATH];
+				DWORD	dwAttributes;
+				BOOL	bExtensionFound = FALSE;
+				int		i;
+
+				SendMessage(hwnd,WM_GETTEXT,
+					(WPARAM)SIZEOF_ARRAY(szFileName),
+					(LPARAM)szFileName);
+
+				dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(m_iItemEditing);
+
+				if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
+					FILE_ATTRIBUTE_DIRECTORY)
+				{
+					for(i = lstrlen(szFileName) - 1;i >= 0;i--)
+					{
+						if(szFileName[i] == '.')
+						{
+							bExtensionFound = TRUE;
+							break;
+						}
+					}
+
+					/* Select all text up to the '.' character
+					before the extension. */
+					/* wParam represents the lower bound; lParam
+					the upper bound. Modify them so that all the
+					items text is selected, except for any extension. */
+
+					if(bExtensionFound)
+					{
+						wParam = 0;
+						lParam = i;
+					}
+				}
+
+				//m_bListViewBeginRename = FALSE;
+			}
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd,Msg,wParam,lParam);
+}
+
+BOOL CContainer::OnListViewBeginLabelEdit(LPARAM lParam)
+{
+	HWND			hEdit;
+	NMLVDISPINFO	*pnmdi = NULL;
+
+	if(!IsRenamePossible())
+		return TRUE;
+
+	pnmdi = (NMLVDISPINFO *)lParam;
+
+	hEdit = ListView_GetEditControl(m_hActiveListView);
+
+	/* Subclass the edit window. The only reason this is
+	done is so that when the listview item is put into
+	edit mode, any extension the file has will not be
+	selected along with the rest of the text. Although
+	selection works directly from here in Windows Vista,
+	it does not work in Windows XP. */
+	SetWindowSubclass(hEdit,ListViewEditProcStub,0,(DWORD_PTR)this);
+
+	m_ListViewEditingStage = LISTVIEW_RENAME_FILENAME;
+	m_iItemEditing = pnmdi->item.iItem;
+
+	m_bListViewRenaming = TRUE;
+	m_bListViewBeginRename = TRUE;
+
+	return FALSE;
+}
+
+BOOL CContainer::OnListViewEndLabelEdit(LPARAM lParam)
+{
+	NMLVDISPINFO	*pdi = NULL;
+	LVITEM			*pItem = NULL;
+	TCHAR			NewFileName[MAX_PATH + 1];
+	TCHAR			OldFileName[MAX_PATH + 1];
+	TCHAR			CurrentDirectory[MAX_PATH];
+	TCHAR			OldName[MAX_PATH];
+	TCHAR			szTemp[128];
+	TCHAR			szError[256];
+	TCHAR			szTitle[256];
+	int				ret;
+
+	pdi = (NMLVDISPINFO *) lParam;
+	pItem = &pdi->item;
+
+	m_bListViewRenaming = FALSE;
+
+	/* Is the new filename empty? */
+	if(pItem->pszText == NULL)
+		return FALSE;
+
+	/*
+	Deny file names ending with a dot, as they are just
+	synonyms for the same file without any dot(s).
+	For example:
+	C:\Hello.txt
+	C:\Hello.txt....
+	refer to exactly the same file.
+
+	Also, do not allow filenames to end with a space.
+	
+	Taken from the web site referenced below:
+	"Do not end a file or directory name with a trailing
+	space or a period. Although the underlying file system
+	may support such names, the operating system does not.
+	However, it is acceptable to start a name with a period."	
+	*/
+	if(pItem->pszText[lstrlen(pItem->pszText) - 1] == '.' ||
+		pItem->pszText[lstrlen(pItem->pszText) - 1] == ' ')
+		return FALSE;
+
+	/*
+	The following characters are NOT allowed
+	within a file name:
+	\/:*?"<>|
+
+	See: http://msdn.microsoft.com/en-us/library/aa365247.aspx
+	*/
+	if(StrChr(pItem->pszText,'\\') != NULL ||
+		StrChr(pItem->pszText,'/') != NULL ||
+		StrChr(pItem->pszText,':') != NULL ||
+		StrChr(pItem->pszText,'*') != NULL ||
+		StrChr(pItem->pszText,'?') != NULL ||
+		StrChr(pItem->pszText,'"') != NULL ||
+		StrChr(pItem->pszText,'<') != NULL ||
+		StrChr(pItem->pszText,'>') != NULL ||
+		StrChr(pItem->pszText,'|') != NULL)
+	{
+		LoadString(g_hLanguageModule,IDS_ERR_FILENAMEINVALID,
+			szError,SIZEOF_ARRAY(szError));
+		LoadString(g_hLanguageModule,IDS_ERR_FILENAMEINVALID_MSGTITLE,
+			szTitle,SIZEOF_ARRAY(szTitle));
+
+		MessageBox(m_hContainer,szError,szTitle,MB_ICONERROR);
+
+		return 0;
+	}
+
+	m_pActiveShellBrowser->QueryCurrentDirectory(MAX_PATH,CurrentDirectory);
+	StringCchCopy(NewFileName,SIZEOF_ARRAY(NewFileName),CurrentDirectory);
+	StringCchCopy(OldFileName,SIZEOF_ARRAY(OldFileName),CurrentDirectory);
+
+	m_pActiveShellBrowser->QueryName(pItem->iItem,
+	OldName);
+	PathAppend(OldFileName,OldName);
+
+	PathAppend(NewFileName,pItem->pszText);
+
+	/* If file extensions are turned off, the new filename
+	will be incorrect (i.e. it will be missing the extension).
+	Therefore, append the extension manually if it is turned
+	off. */
+	if(!m_bShowExtensionsGlobal)
+	{
+		TCHAR	*szExt = NULL;
+
+		szExt = PathFindExtension(OldName);
+
+		if(*szExt == '.')
+			PathAddExtension(NewFileName,szExt);
+	}
+
+	/* File names must be double NULL terminated. */
+	*(OldFileName + lstrlen(OldFileName) + 1) = '\0';
+	*(NewFileName + lstrlen(NewFileName) + 1) = '\0';
+
+	ret = RenameFileWithUndo(NewFileName,OldFileName);
+
+	/* If the file was not renamed, show an error message. */
+	if(!ret)
+	{
+		LoadString(g_hLanguageModule,IDS_FILERENAMEERROR,szTemp,
+		SIZEOF_ARRAY(szTemp));
+
+		MessageBox(m_hContainer,szTemp,WINDOW_NAME,MB_ICONWARNING|MB_OK);
+	}
+
+	return ret;
+}
+
+/*
+ * Called when information (icon number, text) is required
+ * for an item in one of the listview controls.
+ */
+void CContainer::OnListViewGetDisplayInfo(LPARAM lParam)
+{
+	NMLVDISPINFO	*pnmv = NULL;
+	LVITEM			*plvItem = NULL;
+	NMHDR			*nmhdr = NULL;
+	int				iIndex = 0;
+	TCITEM			tcItem;
+	int				nTabsProcessed = 0;
+	int				nTabs;
+
+	pnmv = (NMLVDISPINFO *)lParam;
+
+	plvItem = &pnmv->item;
+	nmhdr = &pnmv->hdr;
+
+	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+
+	/* Find the tab asscoiated with this call. */
+	while((nmhdr->hwndFrom != m_hListView[iIndex])  && nTabsProcessed < nTabs)
+	{
+		tcItem.mask = TCIF_PARAM;
+		TabCtrl_GetItem(m_hTabCtrl,nTabsProcessed,&tcItem);
+
+		iIndex = (int)tcItem.lParam;
+
+		nTabsProcessed++;
+	}
+
+	m_pShellBrowser[iIndex]->OnListViewGetDisplayInfo(lParam);
+
+	return;
+}
+
+/*
+ * Called when a column is clicked in the main listview.
+ */
+void CContainer::OnListViewColumnClick(LPARAM lParam)
+{
+	NMLISTVIEW *pnmlv = NULL;
+
+	pnmlv = (NMLISTVIEW *)lParam;
+
+	m_pActiveShellBrowser->ColumnClicked(pnmlv->iSubItem);
+
+	return;
+}
+
+/*
+ * Called when info tip text is required for an item
+ * in the main listview control.
+ */
+void CContainer::OnListViewGetInfoTip(LPARAM lParam)
+{
+	LPNMLVGETINFOTIP	pGetInfoTip	= NULL;
+	TCHAR				szInfoTip[512];
+
+	pGetInfoTip = (LPNMLVGETINFOTIP)lParam;
+	
+	/* The pszText member of pGetInfoTip will contain the text of the
+	item if its name is truncated in the listview. Always concatenate
+	the rest of the info tip onto the name if it is there. */
+	if(m_bShowInfoTips)
+	{
+		CreateFileInfoTip(pGetInfoTip->iItem,szInfoTip,SIZEOF_ARRAY(szInfoTip));
+
+		if(lstrlen(pGetInfoTip->pszText) > 0)
+			StringCchCat(pGetInfoTip->pszText,pGetInfoTip->cchTextMax,_T("\n"));
+
+		StringCchCat(pGetInfoTip->pszText,pGetInfoTip->cchTextMax,
+			szInfoTip);
+	}
+	else
+	{
+		StringCchCopy(pGetInfoTip->pszText,pGetInfoTip->cchTextMax,
+			EMPTY_STRING);
+	}
+}
+
+void CContainer::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
+{
+	HRESULT	hr;
+
+	/* Use Explorer infotips if the option is selected, or this is a
+	virtual folder. Otherwise, show the modified date. */
+	/* TODO: Upgrade. */
+	if((m_InfoTipType == INFOTIP_SYSTEM) || m_pActiveShellBrowser->InVirtualFolder())
+	{
+		LPITEMIDLIST	pidlDirectory = NULL;
+		LPITEMIDLIST	pridlItem = NULL;
+
+		pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+		pridlItem = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+
+		hr = GetFileInfoTip(m_hContainer,pidlDirectory,pridlItem,szInfoTip,cchMax);
+
+		if(!SUCCEEDED(hr))
+			StringCchCopy(szInfoTip,cchMax,EMPTY_STRING);
+
+		CoTaskMemFree(pidlDirectory);
+		CoTaskMemFree(pridlItem);
+	}
+	else
+	{
+		WIN32_FIND_DATA	*pwfd = NULL;
+		TCHAR			szDate[256];
+		TCHAR			szDateModified[256];
+
+		pwfd = m_pActiveShellBrowser->QueryFileFindData(iItem);
+
+		CreateFileTimeString(&pwfd->ftLastWriteTime,
+			szDateModified,SIZEOF_ARRAY(szDateModified),m_bShowFriendlyDatesGlobal);
+
+		LoadString(g_hLanguageModule,IDS_GENERAL_DATEMODIFIED,szDate,
+				SIZEOF_ARRAY(szDate));
+
+		StringCchPrintf(szInfoTip,cchMax,_T("%s: %s"),
+			szDate,szDateModified);
+	}
+}
+
+void CContainer::OnListViewRClick(HWND hParent,POINT *pCursorPos)
+{
+	POINT			MousePos;
+	HMENU			hMenu;
+	UINT			Cmd;
+	BOOL			bInsertedNewMenu = FALSE;
+	BOOL			bCanCreate = FALSE;
+	BOOL			bWindowSubclassed = FALSE;
+
+	/* It may be possible for the active tab/folder
+	to change while the menu is been shown (e.g. if
+	not handled correctly, the back/forward buttons
+	on a mouse will change the directory without
+	destrroying the popup menu).
+	If this happens, the shell browser used will not
+	stay constant throughout this function, and will
+	cause various problems (e.g. changing from a
+	computer where new items can be created to one
+	where they cannot while the popup menu is still
+	active will cause the 'new' entry to stay on the
+	menu inccorectly).
+	Due to the possibility of unforseen problems,
+	this function should NOT access the current
+	shell browser once the menu has been destroyed. */
+
+	SetCursor(LoadCursor(NULL,IDC_WAIT));
+
+	MousePos.x = pCursorPos->x;
+	MousePos.y = pCursorPos->y;
+
+	if((GetKeyState(VK_SHIFT) & 0x80) &&
+		!(GetKeyState(VK_CONTROL) & 0x80) &&
+		!(GetKeyState(VK_MENU) & 0x80))
+	{
+		LVHITTESTINFO lvhti;
+
+		lvhti.pt = *pCursorPos;
+		ScreenToClient(m_hActiveListView,&lvhti.pt);
+		ListView_HitTest(m_hActiveListView,&lvhti);
+
+		if(!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
+		{
+			if(ListView_GetItemState(m_hActiveListView,lvhti.iItem,LVIS_SELECTED) !=
+				LVIS_SELECTED)
+			{
+				ListView_DeselectAllItems(m_hActiveListView);
+				ListView_SelectItem(m_hActiveListView,lvhti.iItem,TRUE);
+			}
+		}
+	}
+
+	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
+	{
+		IShellExtInit	*pShell = NULL;
+		IContextMenu	*pContextMenu = NULL;
+		LPITEMIDLIST	pidl = NULL;
+		MENUITEMINFO	mi;
+		HMENU			hNewMenuParent = NULL;
+		HRESULT			hr;
+
+		m_pShellContext3 = NULL;
+
+		hMenu = m_hRightClickMenu;
+
+		mi.cbSize	= sizeof(mi);
+		mi.fMask	= MIIM_SUBMENU;
+		mi.hSubMenu	= m_hArrangeSubMenu;
+		SetMenuItemInfo(hMenu,IDM_POPUP_SORTBY,FALSE,&mi);
+
+		mi.cbSize	= sizeof(mi);
+		mi.fMask	= MIIM_SUBMENU;
+		mi.hSubMenu	= m_hGroupBySubMenu;
+		SetMenuItemInfo(hMenu,IDM_POPUP_GROUPBY,FALSE,&mi);
+
+		bCanCreate = m_pActiveShellBrowser->CanCreate();
+
+		if(bCanCreate)
+		{
+			hr = CoCreateInstance(CLSID_NewMenu,NULL,CLSCTX_INPROC_SERVER,
+				IID_IShellExtInit,(void **)&pShell);
+
+			if(SUCCEEDED(hr))
+			{
+				GetIdlFromParsingName(m_CurrentDirectory,&pidl);
+
+				hr = pShell->Initialize(pidl,NULL,NULL);
+
+				if(SUCCEEDED(hr))
+				{
+					hr = pShell->QueryInterface(IID_IContextMenu,(void **)&pContextMenu);
+
+					IObjectWithSite *pObjectSite = NULL;
+					hr = pShell->QueryInterface(IID_IObjectWithSite,(void **)&pObjectSite);
+
+					pObjectSite->SetSite(reinterpret_cast<IUnknown *>(this));
+
+					if(SUCCEEDED(hr))
+					{
+						TCHAR	szNew[32];
+
+						m_hMenu			= hMenu;
+						m_bMixedMenu	= TRUE;
+						m_MenuPos		= GetMenuItemCount(hMenu) - 1;
+
+						hNewMenuParent = CreateMenu();
+
+						hr = pContextMenu->QueryContextMenu(hNewMenuParent,0,
+							MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,CMF_EXPLORE);
+
+						LoadString(g_hLanguageModule,IDS_GENERAL_NEW,szNew,SIZEOF_ARRAY(szNew));
+						InsertMenu(hMenu,m_MenuPos,MF_BYPOSITION|MF_POPUP,1010,szNew);
+
+						mi.cbSize	= sizeof(mi);
+						mi.fMask	= MIIM_SUBMENU;
+						mi.hSubMenu	= GetSubMenu(hNewMenuParent,0);
+						SetMenuItemInfo(hMenu,m_MenuPos,TRUE,&mi);
+
+						SetMenuItemOwnerDrawn(hMenu,m_MenuPos);
+
+						bInsertedNewMenu = TRUE;
+
+						if(SUCCEEDED(hr))
+						{
+							hr = pContextMenu->QueryInterface(IID_IContextMenu3,(LPVOID *)&m_pShellContext3);
+
+							if(SUCCEEDED(hr))
+							{
+								InsertMenu(hMenu,m_MenuPos + 1,MF_BYPOSITION|MF_SEPARATOR,0,NULL);
+								SetMenuItemOwnerDrawn(hMenu,m_MenuPos + 1);
+
+								/* Subclass the owner window, so that the shell can handle menu messages. */
+								DefaultMainWndProc = (WNDPROC)SetWindowLongPtr(m_hContainer,GWLP_WNDPROC,
+									(LONG_PTR)ShellMenuHookProcStubMainWindow);
+
+								bWindowSubclassed = (DefaultMainWndProc != 0);
+							}
+						}
+
+						pContextMenu->Release();
+						pContextMenu = NULL;
+					}
+
+					CoTaskMemFree(pidl);
+				}
+			}
+		}
+
+		SetCursor(LoadCursor(NULL,IDC_ARROW));
+
+		SetForegroundWindow(m_hContainer);
+
+		Cmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RIGHTBUTTON|TPM_VERTICAL|TPM_RETURNCMD,
+			MousePos.x,MousePos.y,0,m_hContainer,NULL);
+
+		if(bWindowSubclassed)
+		{
+			/* Restore previous window procedure. */
+			SetWindowLongPtr(m_hContainer,GWLP_WNDPROC,(LONG_PTR)DefaultMainWndProc);
+		}
+
+		if(Cmd >= MIN_SHELL_MENU_ID && Cmd <= MAX_SHELL_MENU_ID)
+		{
+			ProcessShellMenuCommand(m_pShellContext3,Cmd);
+		}
+		else
+		{
+			SendMessage(m_hContainer,WM_COMMAND,MAKEWPARAM(Cmd,0),NULL);
+		}
+
+		/* CANNOT release the menu until AFTER the command
+		has been processed. */
+		if(bInsertedNewMenu)
+			DestroyMenu(hNewMenuParent);
+
+		if(m_pShellContext3 != NULL)
+		{
+			m_pShellContext3->Release();
+			m_pShellContext3 = NULL;
+		}
+
+		if(pShell != NULL)
+			pShell->Release();
+
+		if(bCanCreate)
+		{
+			/* Remove the separator that is placed after the new
+			menu item. */
+			mi.cbSize	= sizeof(mi);
+			mi.fMask	= MIIM_DATA;
+			GetMenuItemInfo(hMenu,m_MenuPos + 1,TRUE,&mi);
+
+			free((void *)mi.dwItemData);
+
+			RemoveMenu(hMenu,m_MenuPos + 1,MF_BYPOSITION);
+
+			mi.cbSize	= sizeof(mi);
+			mi.fMask	= MIIM_DATA;
+			GetMenuItemInfo(hMenu,m_MenuPos,TRUE,&mi);
+
+			free((void *)mi.dwItemData);
+
+			/* Remove the new menu popup item. */
+			RemoveMenu(hMenu,m_MenuPos,MF_BYPOSITION);
+		}
+	}
+	else
+	{
+		LPITEMIDLIST *ppidl			= NULL;
+		LPITEMIDLIST pidlDirectory	= NULL;
+		int iItem;
+		int nSelected;
+		int i = 0;
+
+		nSelected = ListView_GetSelectedCount(m_hActiveListView);
+
+		ppidl = (LPITEMIDLIST *)malloc(nSelected * sizeof(LPCITEMIDLIST));
+
+		iItem = -1;
+
+		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+		{
+			ppidl[i] = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+
+			i++;
+		}
+
+		SetCursor(LoadCursor(NULL,IDC_ARROW));
+
+		pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+
+		CreateFileContextMenu(hParent,pidlDirectory,
+			MousePos,FROM_LISTVIEW,(LPCITEMIDLIST *)ppidl,nSelected,TRUE,
+			GetKeyState(VK_SHIFT) & 0x80);
+
+		CoTaskMemFree(pidlDirectory);
+
+		for(i = 0;i < nSelected;i++)
+		{
+			CoTaskMemFree(ppidl[i]);
+		}
+
+		free(ppidl);
+	}
+}
+
+void CContainer::OnListViewHeaderRClick(POINT *pCursorPos)
+{
+	HMENU						hHeaderPopupMenu;
+	HMENU						hMenu;
+	MENUITEMINFO				mii;
+	list<Column_t>				m_pActiveColumnList;
+	list<Column_t>::iterator	itr;
+	TCHAR						szColumnText[256];
+	unsigned int				*pHeaderList = NULL;
+	int							nItems = 0;
+	int							iItem = 0;
+	int							i = 0;
+
+	hHeaderPopupMenu = LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_HEADER_MENU));
+
+	hMenu = GetSubMenu(hHeaderPopupMenu,0);
+
+	m_pActiveShellBrowser->ExportCurrentColumns(&m_pActiveColumnList);
+
+	nItems = GetColumnHeaderMenuList(&pHeaderList);
+
+	for(i = 0;i < nItems;i++)
+	{
+		for(itr = m_pActiveColumnList.begin();itr != m_pActiveColumnList.end();itr++)
+		{
+			if(itr->id == pHeaderList[i])
+			{
+				LoadString(g_hLanguageModule,LookupColumnNameStringIndex(itr->id),
+					szColumnText,SIZEOF_ARRAY(szColumnText));
+
+				if(itr->bChecked)
+					mii.fState	= MFS_CHECKED;
+				else
+					mii.fState	= MFS_ENABLED;
+
+				/* Build a list of the current columns, and add them
+				to the menu. */
+				mii.cbSize			= sizeof(mii);
+				mii.fMask			= MIIM_STRING|MIIM_STATE|MIIM_ID;
+				mii.dwTypeData		= szColumnText;
+				mii.wID				= MENU_HEADER_STARTID + iItem;
+				InsertMenuItem(hMenu,iItem,TRUE,&mii);
+
+				iItem++;
+				break;
+			}
+		}
+	}
+
+	SetMenuOwnerDraw(hMenu);
+
+	TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RIGHTBUTTON|TPM_VERTICAL,
+		pCursorPos->x,pCursorPos->y,0,m_hContainer,NULL);
+
+	mii.cbSize	= sizeof(mii);
+	mii.fMask	= MIIM_DATA;
+	GetMenuItemInfo(hHeaderPopupMenu,0,TRUE,&mii);
+
+	free((CustomMenuInfo_t *)mii.dwItemData);
+
+	DestroyMenu(hHeaderPopupMenu);
+}
+
+int CContainer::GetColumnHeaderMenuList(unsigned int **pHeaderList)
+{
+	int nItems;
+
+	if(CompareVirtualFolders(CSIDL_DRIVES))
+	{
+		*pHeaderList = g_MyComputerHeaderList;
+		nItems = sizeof(g_MyComputerHeaderList) / sizeof(g_MyComputerHeaderList[0]);
+	}
+	else if(CompareVirtualFolders(CSIDL_CONTROLS))
+	{
+		*pHeaderList = g_ControlPanelHeaderList;
+		nItems = sizeof(g_ControlPanelHeaderList) / sizeof(g_ControlPanelHeaderList[0]);
+	}
+	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
+	{
+		*pHeaderList = g_RecycleBinHeaderList;
+		nItems = sizeof(g_RecycleBinHeaderList) / sizeof(g_RecycleBinHeaderList[0]);
+	}
+	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
+	{
+		*pHeaderList = g_NetworkConnectionsHeaderList;
+		nItems = sizeof(g_NetworkConnectionsHeaderList) / sizeof(g_NetworkConnectionsHeaderList[0]);
+	}
+	else if(CompareVirtualFolders(CSIDL_NETWORK))
+	{
+		*pHeaderList = g_NetworkHeaderList;
+		nItems = sizeof(g_NetworkHeaderList) / sizeof(g_NetworkHeaderList[0]);
+	}
+	else if(CompareVirtualFolders(CSIDL_PRINTERS))
+	{
+		*pHeaderList = g_PrintersHeaderList;
+		nItems = sizeof(g_PrintersHeaderList) / sizeof(g_PrintersHeaderList[0]);
+	}
+	else
+	{
+		*pHeaderList = g_RealFolderHeaderList;
+		nItems = sizeof(g_RealFolderHeaderList) / sizeof(g_RealFolderHeaderList[0]);
+	}
+
+	return nItems;
+}
+
+HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
+{
+	IDataObject			*pDataObject = NULL;
+	IDropSource			*pDropSource = NULL;
+	IDragSourceHelper	*pDragSourceHelper = NULL;
+	IShellFolder		*pDesktopFolder = NULL;
+	IShellFolder		*pShellFolder = NULL;
+	LPITEMIDLIST		*ppidl = NULL;
+	LPITEMIDLIST		pidlDirectory = NULL;
+	LPITEMIDLIST		pidlDesktop = NULL;
+	NMLISTVIEW			*pnmlv = NULL;
+	DWORD				Effect;
+	POINT				pt = {0,0};
+	HRESULT				hr;
+	int					iItem = -1;
+	int					nSelected;
+	int					iDragStartObjectIndex;
+	int					i = 0;
+
+	pnmlv = (NMLISTVIEW *)lParam;
+
+	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_ALL,
+		IID_IDragSourceHelper,(LPVOID *)&pDragSourceHelper);
+
+	if(SUCCEEDED(hr))
+	{
+		hr = CreateDropSource(&pDropSource,DragType);
+
+		if(SUCCEEDED(hr))
+		{
+			nSelected = ListView_GetSelectedCount(m_hActiveListView);
+
+			ppidl = (LPITEMIDLIST *)malloc(nSelected * sizeof(LPCITEMIDLIST));
+
+			if(ppidl != NULL)
+			{
+				pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+
+				while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+				{
+					ppidl[i] = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+
+					i++;
+				}
+
+				SHGetDesktopFolder(&pDesktopFolder);
+				SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,&pidlDesktop);
+
+				if(ILIsEqual(pidlDesktop,pidlDirectory))
+				{
+					SHGetDesktopFolder(&pShellFolder);
+				}
+				else
+				{
+					hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
+						IID_IShellFolder,(LPVOID *)&pShellFolder);
+				}
+
+				CoTaskMemFree(pidlDesktop);
+				CoTaskMemFree(pidlDirectory);
+
+				if(SUCCEEDED(hr))
+				{
+					/* Needs to be done from the parent folder for the drag/dop to work correctly.
+					If done from the desktop folder, only links to files are created. They are
+					not copied/moved. */
+					pShellFolder->GetUIObjectOf(m_hActiveListView,nSelected,(LPCITEMIDLIST *)ppidl,
+						IID_IDataObject,NULL,(LPVOID *)&pDataObject);
+
+					hr = pDragSourceHelper->InitializeFromWindow(m_hActiveListView,&pt,pDataObject);
+
+					m_pActiveShellBrowser->DragStarted(pnmlv->iItem,&pnmlv->ptAction);
+					m_bDragging = TRUE;
+
+					/* Need to remember which tab started the drag (as
+					it may be different from the tab in which the drag
+					finishes). */
+					iDragStartObjectIndex = m_iObjectIndex;
+
+					hr = DoDragDrop(pDataObject,pDropSource,DROPEFFECT_COPY|DROPEFFECT_MOVE|
+						DROPEFFECT_LINK,&Effect);
+
+					m_bDragging = FALSE;
+
+					/* The object that starts any drag may NOT be the
+					object that stops it (i.e. when a file is dragged
+					between tabs). Therefore, need to tell the object
+					that STARTED dragging that dragging has stopped. */
+					m_pShellBrowser[iDragStartObjectIndex]->DragStopped();
+
+					pDataObject->Release();
+					pShellFolder->Release();
+				}
+
+				for(i = 0;i < nSelected;i++)
+					CoTaskMemFree(ppidl[i]);
+
+				free(ppidl);
+				pDesktopFolder->Release();
+			}
+
+			pDropSource->Release();
+		}
+
+		pDragSourceHelper->Release();
+	}
+
+	return hr;
+}
+
+HRESULT CContainer::OnListViewFileDelete(BOOL bPermanent)
+{
+	LPITEMIDLIST	*ppidl = NULL;
+	LPITEMIDLIST	pidlDirectory = NULL;
+	DWORD			fMask = 0;
+	HRESULT			hr;
+	int				iItem;
+	int				nSelected;
+	int				i = 0;
+
+	nSelected = ListView_GetSelectedCount(m_hActiveListView);
+
+	if(nSelected == 0)
+	{
+		ppidl = NULL;
+		return S_FALSE;
+	}
+	else
+	{
+		ppidl = (LPITEMIDLIST *)malloc(nSelected * sizeof(LPCITEMIDLIST));
+
+		iItem = -1;
+
+		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+		{
+			ppidl[i] = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+
+			i++;
+		}
+	}
+
+	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+
+	if(bPermanent)
+	{
+		fMask = CMIC_MASK_SHIFT_DOWN;
+	}
+
+	hr = ExecuteActionFromContextMenu(pidlDirectory,(LPCITEMIDLIST *)ppidl,nSelected,
+		_T("delete"),fMask);
+
+	CoTaskMemFree(pidlDirectory);
+
+	for(i = 0;i < nSelected;i++)
+	{
+		CoTaskMemFree(ppidl[i]);
+	}
+
+	free(ppidl);
+
+	return hr;
+}
+
+void CContainer::OnListViewDoubleClick(NMHDR *nmhdr)
+{
+	if(nmhdr->hwndFrom == m_hActiveListView)
+	{
+		LV_HITTESTINFO	ht;
+		DWORD			dwPos;
+		POINT			MousePos;
+
+		dwPos = GetMessagePos();
+		MousePos.x = GET_X_LPARAM(dwPos);
+		MousePos.y = GET_Y_LPARAM(dwPos);
+		ScreenToClient(m_hActiveListView,&MousePos);
+
+		ht.pt = MousePos;
+		ListView_HitTest(m_hActiveListView,&ht);
+
+		if(ht.flags != LVHT_NOWHERE && ht.iItem != -1)
+		{
+			short AltKey = GetKeyState(VK_MENU);
+			short ControlKey = GetKeyState(VK_CONTROL);
+
+			if(AltKey & 0x8000)
+			{
+				LPITEMIDLIST pidlDirectory = NULL;
+				LPITEMIDLIST pidl = NULL;
+
+				pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+				pidl = m_pActiveShellBrowser->QueryItemRelativeIdl(ht.iItem);
+
+				ShowMultipleFileProperties(pidlDirectory,(LPCITEMIDLIST *)&pidl,1);
+
+				CoTaskMemFree(pidl);
+				CoTaskMemFree(pidlDirectory);
+			}
+			else if(ControlKey & 0x8000)
+			{
+				OpenListViewItem(ht.iItem,TRUE);
+			}
+			else
+			{
+				OpenListViewItem(ht.iItem,FALSE);
+			}
+		}
+	}
+}
+
+void CContainer::OnListViewFileRename(void)
+{
+	HWND	hEdit;
+	int		nSelected;
+	int		iSelected;
+
+	nSelected = ListView_GetSelectedCount(m_hActiveListView);
+
+	if(nSelected == 1)
+	{
+		iSelected = ListView_GetNextItem(m_hActiveListView,
+			-1,LVNI_SELECTED|LVNI_FOCUSED);
+
+		if(iSelected != -1)
+		{
+			/* Start editing the label for this item. */
+			hEdit = ListView_EditLabel(m_hActiveListView,iSelected);
+		}
+	}
+	else if(nSelected > 1)
+	{
+		if(!m_pActiveShellBrowser->InVirtualFolder())
+		{
+			DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_MASSRENAME),
+				m_hContainer,MassRenameProcStub,(LPARAM)this);
+		}
+	}
+}
+
+void CContainer::OnListViewShowFileProperties(void)
+{
+	LPITEMIDLIST	*ppidl = NULL;
+	LPITEMIDLIST	pidlDirectory = NULL;
+	int				iItem;
+	int				nSelected;
+	int				i = 0;
+
+	nSelected = ListView_GetSelectedCount(m_hActiveListView);
+
+	if(nSelected == 0)
+	{
+		ppidl = NULL;
+	}
+	else
+	{
+		ppidl = (LPITEMIDLIST *)malloc(nSelected * sizeof(LPCITEMIDLIST));
+
+		iItem = -1;
+
+		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+		{
+			ppidl[i] = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+
+			i++;
+		}
+	}
+
+	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+	ShowMultipleFileProperties(pidlDirectory,(LPCITEMIDLIST *)ppidl,nSelected);
+	CoTaskMemFree(pidlDirectory);
+
+	for(i = 0;i < nSelected;i++)
+	{
+		CoTaskMemFree(ppidl[i]);
+	}
+
+	free(ppidl);
+}
+
+void CContainer::OnListViewCopyItemPath(void)
+{
+	IBufferManager	*pBufferManager = NULL;
+	TCHAR			FullFileName[MAX_PATH];
+	TCHAR			*szFullFileNameText = NULL;
+	DWORD			dwBufferSize;
+	int				iSelected = -1;
+
+	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
+		return;
+
+	iSelected = ListView_GetNextItem(m_hActiveListView,-1,LVNI_SELECTED);
+
+	pBufferManager = new CBufferManager();
+
+	while(iSelected != -1)
+	{
+		m_pActiveShellBrowser->QueryFullItemName(iSelected,FullFileName);
+
+		pBufferManager->WriteLine(FullFileName);
+
+		iSelected = ListView_GetNextItem(m_hActiveListView,iSelected,LVNI_SELECTED);
+	}
+
+	pBufferManager->QueryBufferSize(&dwBufferSize);
+
+	szFullFileNameText = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
+
+	if(szFullFileNameText != NULL)
+	{
+		pBufferManager->QueryBuffer(szFullFileNameText,dwBufferSize);
+
+		CopyTextToClipboard(szFullFileNameText);
+	}
+
+	pBufferManager->Release();
+}
+
+void CContainer::OnListViewCopyUniversalPaths(void)
+{
+	IBufferManager	*pBufferManager = NULL;
+	UNIVERSAL_NAME_INFO	uni;
+	TCHAR			FullFileName[MAX_PATH];
+	TCHAR			*szFullFileNameText = NULL;
+	DWORD			dwBufferSize;
+	DWORD			dwRet;
+	int				iSelected = -1;
+
+	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
+		return;
+
+	iSelected = ListView_GetNextItem(m_hActiveListView,-1,LVNI_SELECTED);
+
+	pBufferManager = new CBufferManager();
+
+	while(iSelected != -1)
+	{
+		m_pActiveShellBrowser->QueryFullItemName(iSelected,FullFileName);
+
+		dwBufferSize = sizeof(uni);
+		dwRet = WNetGetUniversalName(FullFileName,UNIVERSAL_NAME_INFO_LEVEL,
+			(void **)&uni,&dwBufferSize);
+
+		if(dwRet == NO_ERROR)
+			pBufferManager->WriteLine(uni.lpUniversalName);
+		else
+			pBufferManager->WriteLine(FullFileName);
+
+		iSelected = ListView_GetNextItem(m_hActiveListView,iSelected,LVNI_SELECTED);
+	}
+
+	pBufferManager->QueryBufferSize(&dwBufferSize);
+
+	szFullFileNameText = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
+
+	if(szFullFileNameText != NULL)
+	{
+		pBufferManager->QueryBuffer(szFullFileNameText,dwBufferSize);
+
+		CopyTextToClipboard(szFullFileNameText);
+	}
+
+	pBufferManager->Release();
+}
+
+HRESULT CContainer::OnListViewCopy(BOOL bCopy)
+{
+	IDataObject		*pClipboardDataObject = NULL;
+	IBufferManager	*pBufferManager = NULL;
+	TCHAR			*szFileNameList = NULL;
+	DWORD			dwBufSize;
+	int				iItem = -1;
+	HRESULT			hr;
+
+	if(!CanCutOrCopySelection())
+		return E_FAIL;
+
+	SetCursor(LoadCursor(NULL,IDC_WAIT));
+
+	pBufferManager = new CBufferManager();
+
+	hr = BuildSelectionFileList(pBufferManager);
+
+	if(SUCCEEDED(hr))
+	{
+		/* The size returned here is the number of
+		characters in the buffer, NOT the total
+		size of the buffer. */
+		pBufferManager->QueryBufferSize(&dwBufSize);
+
+		if(dwBufSize != 0)
+		{
+			szFileNameList = (TCHAR *)malloc(dwBufSize * sizeof(TCHAR));
+
+			if(szFileNameList == NULL)
+			{
+				pBufferManager->Release();
+
+				SetCursor(LoadCursor(NULL,IDC_ARROW));
+
+				return E_OUTOFMEMORY;
+			}
+
+			pBufferManager->QueryBuffer(szFileNameList,dwBufSize);
+
+			if(bCopy)
+			{
+				hr = CopyFiles(szFileNameList,dwBufSize * sizeof(TCHAR),&pClipboardDataObject);
+
+				if(SUCCEEDED(hr))
+				{
+					m_pClipboardDataObject = pClipboardDataObject;
+				}
+			}
+			else
+			{
+				hr = CutFiles(szFileNameList,dwBufSize * sizeof(TCHAR),&pClipboardDataObject);
+
+				if(SUCCEEDED(hr))
+				{
+					CutFile_t CutFile;
+
+					m_pClipboardDataObject = pClipboardDataObject;
+					m_iCutTabInternal = m_iObjectIndex;
+
+					/* 'Ghost' each of the cut items. */
+					while((iItem = ListView_GetNextItem(m_hActiveListView,
+						iItem,LVNI_SELECTED)) != -1)
+					{
+						m_pActiveShellBrowser->QueryDisplayName(iItem,MAX_PATH,CutFile.szFileName);
+						m_CutFileNameList.push_back(CutFile);
+
+						m_pActiveShellBrowser->GhostItem(iItem);
+					}
+				}
+			}
+
+			free(szFileNameList);
+		}
+	}
+
+	SetCursor(LoadCursor(NULL,IDC_ARROW));
+
+	return hr;
+}
+
+void CContainer::OnListViewSetFileAttributes(void)
+{
+	SetFileAttributesInfo_t sfai;
+	WIN32_FIND_DATA *pwfd = NULL;
+	int nSelected;
+	int iSel;
+
+	nSelected = ListView_GetSelectedCount(m_hActiveListView);
+
+	if(nSelected != 0)
+	{
+		iSel = -1;
+
+		m_sfaiList.clear();
+
+		while((iSel = ListView_GetNextItem(m_hActiveListView,
+			iSel,LVNI_SELECTED)) != -1)
+		{
+			m_pActiveShellBrowser->QueryFullItemName(iSel,sfai.szFullFileName);
+
+			pwfd = m_pActiveShellBrowser->QueryFileFindData(iSel);
+			sfai.wfd = *pwfd;
+
+			m_sfaiList.push_back(sfai);
+		}
+
+		DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_SETFILEATTRIBUTES),
+			m_hContainer,SetFileAttributesProcStub,(LPARAM)this);
+	}
+}
+
+void CContainer::OnListViewPaste(void)
+{
+	TCHAR szDestination[MAX_PATH + 1];
+	list<PastedFile_t> PastedFileList;
+
+	/* DO NOT use the internal current directory string.
+	Files are copied asynchronously, so a change of directory
+	will cause the destination directory to change in the
+	middle of the copy operation. */
+	StringCchCopy(szDestination,SIZEOF_ARRAY(szDestination),
+		m_CurrentDirectory);
+
+	/* Also, the string must be double NULL terminated. */
+	szDestination[lstrlen(szDestination) + 1] = '\0';
+
+	PasteFilesFromClipboard(m_hContainer,
+		szDestination,FALSE,PasteFilesCallback,(void *)this);
+}

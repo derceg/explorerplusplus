@@ -1,0 +1,155 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "NoTranslationResource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (Australia) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENA)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+1                       RT_MANIFEST             "Explorer++.exe.manifest"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAIN                ICON                    "res\\Explorer++.ico"
+IDI_DISPLAYWINDOW       ICON                    "res\\Display Window.ico"
+IDI_MAIN_SMALL          ICON                    "res\\Explorer++ Small.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_TABTOOLBAR_CLOSE    BITMAP                  "res\\Tab Close.bmp"
+IDB_SHELL_GO            BITMAP                  "res\\Shell Go.bmp"
+IDB_SHELLIMAGES         BITMAP                  "res\\Shell Images.bmp"
+IDB_ABOUT               BITMAP                  "res\\About Image Final.bmp"
+IDB_FILTERINGAPPLIED    BITMAP                  "res\\Filtering Applied.bmp"
+IDB_FOLDEREMPTY         BITMAP                  "res\\Folder Empty.bmp"
+IDB_FOLDERLOCKED        BITMAP                  "res\\Folder Locked.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINACCELERATORS ACCELERATORS 
+BEGIN
+    "D",            IDA_ADDRESSBAR,         VIRTKEY, ALT, NOINVERT
+    "L",            IDA_ADDRESSBAR,         VIRTKEY, CONTROL, NOINVERT
+    VK_F4,          IDA_COMBODROPDOWN,      VIRTKEY, NOINVERT
+    VK_F2,          IDA_FILE_RENAME,        VIRTKEY, NOINVERT
+    VK_HOME,        IDA_HOME,               VIRTKEY, ALT, NOINVERT
+    VK_NEXT,        IDA_NEXTTAB,            VIRTKEY, CONTROL, NOINVERT
+    VK_OEM_6,       IDA_NEXTTAB,            VIRTKEY, CONTROL, NOINVERT
+    VK_TAB,         IDA_NEXTTAB,            VIRTKEY, CONTROL, NOINVERT
+    VK_F6,          IDA_NEXTWINDOW,         VIRTKEY, NOINVERT
+    VK_TAB,         IDA_NEXTWINDOW,         VIRTKEY, NOINVERT
+    VK_OEM_4,       IDA_PREVIOUSTAB,        VIRTKEY, CONTROL, NOINVERT
+    VK_PRIOR,       IDA_PREVIOUSTAB,        VIRTKEY, CONTROL, NOINVERT
+    VK_TAB,         IDA_PREVIOUSTAB,        VIRTKEY, SHIFT, CONTROL, NOINVERT
+    VK_F6,          IDA_PREVIOUSWINDOW,     VIRTKEY, SHIFT, NOINVERT
+    VK_TAB,         IDA_PREVIOUSWINDOW,     VIRTKEY, SHIFT, NOINVERT
+    VK_APPS,        IDA_RCLICK,             VIRTKEY, NOINVERT
+    VK_F10,         IDA_RCLICK,             VIRTKEY, SHIFT, NOINVERT
+    "E",            IDA_TAB_DUPLICATETAB,   VIRTKEY, CONTROL, NOINVERT
+    "N",            IDM_ACTIONS_NEWFOLDER,  VIRTKEY, CONTROL, NOINVERT
+    "D",            IDM_BOOKMARKS_BOOKMARKTHISTAB, VIRTKEY, CONTROL, NOINVERT
+    "B",            IDM_BOOKMARKS_ORGANIZEBOOKMARKS, VIRTKEY, CONTROL, NOINVERT
+    "C",            IDM_EDIT_COPYTOFOLDER,  VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "M",            IDM_EDIT_MOVETOFOLDER,  VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "V",            IDM_EDIT_PASTESHORTCUT, VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "N",            IDM_EDIT_SELECTNONE,    VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "Z",            IDM_EDIT_UNDO,          VIRTKEY, CONTROL, NOINVERT
+    "D",            IDM_EDIT_WILDCARDDESELECT, VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "S",            IDM_EDIT_WILDCARDSELECTION, VIRTKEY, SHIFT, CONTROL, NOINVERT
+    VK_F4,          IDM_FILE_CLOSETAB,      VIRTKEY, CONTROL, NOINVERT
+    "W",            IDM_FILE_CLOSETAB,      VIRTKEY, CONTROL, NOINVERT
+    "P",            IDM_FILE_COPYFOLDERPATH, VIRTKEY, SHIFT, CONTROL, NOINVERT
+    VK_DELETE,      IDM_FILE_DELETEPERMANENTLY, VIRTKEY, SHIFT, NOINVERT
+    "T",            IDM_FILE_NEWTAB,        VIRTKEY, CONTROL, NOINVERT
+    VK_RETURN,      IDM_FILE_PROPERTIES,    VIRTKEY, ALT, NOINVERT
+    VK_LEFT,        IDM_GO_BACK,            VIRTKEY, ALT, NOINVERT
+    VK_RIGHT,       IDM_GO_FORWARD,         VIRTKEY, ALT, NOINVERT
+    VK_UP,          IDM_GO_UPONELEVEL,      VIRTKEY, ALT, NOINVERT
+    "F",            IDM_TOOLS_SEARCH,       VIRTKEY, CONTROL, NOINVERT
+    VK_F3,          IDM_TOOLS_SEARCH,       VIRTKEY, NOINVERT
+    "R",            IDM_VIEW_REFRESH,       VIRTKEY, CONTROL, NOINVERT
+    VK_F5,          IDM_VIEW_REFRESH,       VIRTKEY, NOINVERT
+    "H",            IDM_VIEW_SHOWHIDDENFILES, VIRTKEY, CONTROL, NOINVERT
+    "1",            IDA_TAB1,               VIRTKEY, CONTROL, NOINVERT
+    "2",            IDA_TAB2,               VIRTKEY, CONTROL, NOINVERT
+    "3",            IDA_TAB3,               VIRTKEY, CONTROL, NOINVERT
+    "4",            IDA_TAB4,               VIRTKEY, CONTROL, NOINVERT
+    "5",            IDA_TAB5,               VIRTKEY, CONTROL, NOINVERT
+    "6",            IDA_TAB6,               VIRTKEY, CONTROL, NOINVERT
+    "7",            IDA_TAB7,               VIRTKEY, CONTROL, NOINVERT
+    "8",            IDA_TAB8,               VIRTKEY, CONTROL, NOINVERT
+    "9",            IDA_LASTTAB,            VIRTKEY, CONTROL, NOINVERT
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "NoTranslationResource.\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (Australia) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
