@@ -32,7 +32,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="&quot;$(SolutionDir)\..\Tools\Versioner\Release\Versioner.exe&quot; &quot;$(SolutionDir)\Explorer++\Version.h&quot;"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -126,7 +126,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="&quot;$(SolutionDir)\..\Tools\Versioner\Release\Versioner.exe&quot; &quot;$(SolutionDir)\Explorer++\Version.h&quot;"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
