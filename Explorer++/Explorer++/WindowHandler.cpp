@@ -363,6 +363,10 @@ LRESULT CALLBACK CContainer::EditSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARA
 			}
 			break;
 
+		case WM_SETFOCUS:
+			HandleToolbarItemStates();
+			break;
+
 		case WM_MOUSEWHEEL:
 			if(OnMouseWheel(wParam,lParam))
 				return 0;

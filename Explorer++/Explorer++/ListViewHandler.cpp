@@ -80,6 +80,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 		case WM_SETFOCUS:
 			m_hLastActiveWindow = ListView;
+			HandleToolbarItemStates();
 			break;
 
 		case WM_LBUTTONDOWN:
@@ -770,11 +771,16 @@ BOOL CContainer::OnListViewEndLabelEdit(LPARAM lParam)
 
 	PathAppend(NewFileName,pItem->pszText);
 
+	BOOL bExtensionHidden = FALSE;
+
+	bExtensionHidden = (!m_bShowExtensionsGlobal) ||
+		(m_bHideLinkExtensionGlobal && lstrcmp(PathFindExtension(OldName),_T(".lnk")) == 0);
+
 	/* If file extensions are turned off, the new filename
 	will be incorrect (i.e. it will be missing the extension).
 	Therefore, append the extension manually if it is turned
 	off. */
-	if(!m_bShowExtensionsGlobal)
+	if(bExtensionHidden)
 	{
 		TCHAR	*szExt = NULL;
 

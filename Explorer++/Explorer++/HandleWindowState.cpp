@@ -81,6 +81,8 @@ void CContainer::SetProgramMenuItemStates(HMENU hProgramMenu)
 	/* The following menu items are only enabled when one
 	or more files are selected (they represent file
 	actions, cut/copy, etc). */
+	/* TODO: Split CanCutOrCopySelection() into two, as some
+	items may only be copied/cut (not both). */
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPY,CanCutOrCopySelection());
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_CUT,CanCutOrCopySelection());
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPYTOFOLDER,CanCutOrCopySelection() && GetFocus() != m_hTreeView);

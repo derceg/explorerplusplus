@@ -560,7 +560,9 @@ void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 					StringCchCopy(szDisplayName,SIZEOF_ARRAY(szDisplayName),
 						szNewFileName);
 
-					if(!m_bShowExtensions)
+					if(!m_bShowExtensions || (m_bHideLinkExtension &&
+						lstrcmp(PathFindExtension(szDisplayName),_T(".lnk")) == 0)
+						&& szDisplayName[0] != '.')
 					{
 						/* Strip the extension. */
 						PathRemoveExtension(szDisplayName);
