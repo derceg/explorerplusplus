@@ -1483,6 +1483,13 @@ void CContainer::OnListViewDoubleClick(NMHDR *nmhdr)
 				OpenListViewItem(ht.iItem,FALSE);
 			}
 		}
+		else
+		{
+			/* The user has clicked in the whitepsace
+			area for this tab, so go up one folder... */
+			BrowseFolder(EMPTY_STRING,
+				SBSP_PARENT|SBSP_SAMEBROWSER);
+		}
 	}
 }
 

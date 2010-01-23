@@ -20,6 +20,8 @@ Version 1.x.x.x ()
 New features:
  - The extended right click menu is now shown when
    shift is held down and an item is right-clicked.
+ - Double clicking in a tabs whitespace will now
+   navigate to the parent folder.
 
 Bug fixes:
  - Fixed toolbar bug.
