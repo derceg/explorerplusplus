@@ -993,7 +993,7 @@ LRESULT CALLBACK CContainer::CommandHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPA
 
 	if(LOWORD(wParam) >= TOOLBAR_APPLICATIONS_ID_START)
 	{
-		int					iIndex;
+		int iIndex;
 
 		iIndex = (int)SendMessage(m_hApplicationToolbar,
 			TB_COMMANDTOINDEX,LOWORD(wParam),0);

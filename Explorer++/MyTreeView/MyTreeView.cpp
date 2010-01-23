@@ -119,14 +119,6 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			DirectoryAltered();
 			break;
 
-		case WM_MBUTTONDOWN:
-			OnMButtonDown(wParam,lParam);
-			break;
-
-		case WM_MBUTTONUP:
-			OnMButtonUp(wParam,lParam);
-			break;
-
 		case WM_DEVICECHANGE:
 			return OnDeviceChange(wParam,lParam);
 			break;
@@ -174,47 +166,6 @@ LRESULT CMyTreeView::OnSetCursor(void)
 	/* Set the cursor back to the default. */
 	SetCursor(LoadCursor(NULL,IDC_ARROW));
 	return FALSE;
-}
-
-void CMyTreeView::OnMButtonDown(WPARAM wParam,LPARAM lParam)
-{
-	TVHITTESTINFO tvhi;
-
-	tvhi.pt.x = LOWORD(lParam);
-	tvhi.pt.y = HIWORD(lParam);
-
-	TreeView_HitTest(m_hTreeView,&tvhi);
-
-	if(tvhi.flags != LVHT_NOWHERE && tvhi.hItem != NULL)
-	{
-		m_hMButtonItem = tvhi.hItem;
-
-		//ListView_SetItemState(m_hActiveListView,tvhi.iItem,LVIS_FOCUSED,LVIS_FOCUSED);
-	}
-	else
-	{
-		m_hMButtonItem = NULL;
-	}
-}
-
-void CMyTreeView::OnMButtonUp(WPARAM wParam,LPARAM lParam)
-{
-	TVHITTESTINFO tvhi;
-
-	tvhi.pt.x = LOWORD(lParam);
-	tvhi.pt.y = HIWORD(lParam);
-
-	TreeView_HitTest(m_hTreeView,&tvhi);
-
-	if(tvhi.flags != LVHT_NOWHERE && tvhi.hItem != NULL)
-	{
-		/* Only open an item if it was the one
-		on which the middle mouse button was
-		initially clicked on. */
-		if(tvhi.hItem == m_hMButtonItem)
-		{
-		}
-	}
 }
 
 HTREEITEM CMyTreeView::AddRoot(void)

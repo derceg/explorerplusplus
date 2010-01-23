@@ -22,6 +22,12 @@ New features:
    shift is held down and an item is right-clicked.
  - Double clicking in a tabs whitespace will now
    navigate to the parent folder.
+ - Middle click can now be used to open items on
+   the bookmarks toolbar in a new tab.
+ - Middle click can now be used to open items on
+   the drives toolbar in a new tab.
+ - Middle click can now be used to open items in
+   the treeview in a new tab.
 
 Bug fixes:
  - Fixed toolbar bug.

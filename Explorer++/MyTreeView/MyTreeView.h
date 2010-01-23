@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define WM_USER_TREEVIEW				WM_USER + 70
+#define WM_USER_TREEVIEW				WM_APP + 70
 #define WM_USER_TREEVIEW_GAINEDFOCUS	(WM_USER_TREEVIEW + 2)
 
 class CMyTreeView : public IDropTarget, public IDropSource
@@ -62,8 +62,6 @@ private:
 
 	/* Message handlers. */
 	LRESULT CALLBACK	OnNotify(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
-	void		OnMButtonDown(WPARAM wParam,LPARAM lParam);
-	void		OnMButtonUp(WPARAM wParam,LPARAM lParam);
 	LRESULT		OnSetCursor(void);
 
 	void		DirectoryModified(DWORD Action,TCHAR *szFullFileName);
@@ -168,9 +166,6 @@ private:
 	list<DriveEvent_t>	m_pDriveList;
 	BOOL				m_bQueryRemoveCompleted;
 	TCHAR				m_szQueryRemove[MAX_PATH];
-
-	/* Middle click. */
-	HTREEITEM			m_hMButtonItem;
 };
 
 typedef struct

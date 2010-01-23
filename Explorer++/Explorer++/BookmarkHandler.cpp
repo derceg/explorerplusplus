@@ -25,6 +25,52 @@ DWORD BookmarksTreeViewStyles	= WS_CHILD|WS_VISIBLE|TVS_SHOWSELALWAYS|TVS_HASBUT
 int g_iStartId = MENU_BOOKMARK_STARTID;
 extern int g_iFolderSelected;
 
+LRESULT CALLBACK BookmarksToolbarSubclassStub(HWND hwnd,UINT uMsg,
+WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+{
+	CContainer *pContainer = (CContainer *)dwRefData;
+
+	return pContainer->BookmarksToolbarSubclass(hwnd,uMsg,wParam,lParam);
+}
+
+LRESULT CALLBACK CContainer::BookmarksToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+{
+	switch(uMsg)
+	{
+	case WM_MBUTTONUP:
+		{
+			Bookmark_t Bookmark;
+			TBBUTTON tbButton;
+			POINT ptCursor;
+			DWORD dwPos;
+			int iIndex;
+
+			dwPos = GetMessagePos();
+			ptCursor.x = GET_X_LPARAM(dwPos);
+			ptCursor.y = GET_Y_LPARAM(dwPos);
+			MapWindowPoints(HWND_DESKTOP,m_hBookmarksToolbar,&ptCursor,1);
+
+			iIndex = (int)SendMessage(m_hBookmarksToolbar,TB_HITTEST,0,(LPARAM)&ptCursor);
+
+			if(iIndex >= 0)
+			{
+				SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iIndex,(LPARAM)&tbButton);
+
+				m_Bookmark.RetrieveBookmark((void *)tbButton.dwData,&Bookmark);
+
+				/* If this is a bookmark, open it in a new tab. */
+				if(Bookmark.Type == BOOKMARK_TYPE_BOOKMARK)
+				{
+					ExpandAndBrowsePath(Bookmark.szLocation,TRUE,TRUE);
+				}
+			}
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
 void CContainer::InsertBookmarksIntoMenu(void)
 {
 	Bookmark_t		RootBookmark;
@@ -690,17 +736,22 @@ void CContainer::RemoveItemFromBookmarksToolbar(void *pBookmarkHandle)
 	}
 }
 
+HRESULT CContainer::ExpandAndBrowsePath(TCHAR *szPath)
+{
+	return ExpandAndBrowsePath(szPath,FALSE,FALSE);
+}
+
 /* Browses to the specified path. The path may
 have any environment variables expanded (if
 necessary). */
-HRESULT CContainer::ExpandAndBrowsePath(TCHAR *szPath)
+HRESULT CContainer::ExpandAndBrowsePath(TCHAR *szPath,BOOL bOpenInNewTab,BOOL bSwitchToNewTab)
 {
 	TCHAR szExpandedPath[MAX_PATH];
 
 	MyExpandEnvironmentStrings(szPath,
 		szExpandedPath,SIZEOF_ARRAY(szExpandedPath));
 
-	return BrowseFolder(szExpandedPath,SBSP_ABSOLUTE);
+	return BrowseFolder(szExpandedPath,SBSP_ABSOLUTE,bOpenInNewTab,bSwitchToNewTab);
 }
 
 BOOL CContainer::DeleteBookmarkSafe(HWND hwnd,void *pBookmarkHandle)

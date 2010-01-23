@@ -39,6 +39,55 @@ WPARAM wParam,LPARAM lParam)
 		if(OnMouseWheel(wParam,lParam))
 			return 0;
 		break;
+
+	case WM_MBUTTONDOWN:
+		{
+			TVHITTESTINFO tvhi;
+
+			tvhi.pt.x = LOWORD(lParam);
+			tvhi.pt.y = HIWORD(lParam);
+
+			TreeView_HitTest(m_hTreeView,&tvhi);
+
+			/* TODO: Temporarily select item which
+			was middle clicked. */
+
+			if(tvhi.flags != LVHT_NOWHERE && tvhi.hItem != NULL)
+			{
+				m_hTVMButtonItem = tvhi.hItem;
+			}
+			else
+			{
+				m_hTVMButtonItem = NULL;
+			}
+		}
+		break;
+
+	case WM_MBUTTONUP:
+		{
+			TVHITTESTINFO tvhi;
+			LPITEMIDLIST pidl = NULL;
+
+			tvhi.pt.x = LOWORD(lParam);
+			tvhi.pt.y = HIWORD(lParam);
+
+			TreeView_HitTest(m_hTreeView,&tvhi);
+
+			if(tvhi.flags != LVHT_NOWHERE && tvhi.hItem != NULL)
+			{
+				/* Only open an item if it was the one
+				on which the middle mouse button was
+				initially clicked on. */
+				if(tvhi.hItem == m_hTVMButtonItem)
+				{
+					pidl = m_pMyTreeView->BuildPath(tvhi.hItem);
+					BrowseFolder(pidl,SBSP_ABSOLUTE,TRUE,FALSE);
+
+					CoTaskMemFree(pidl);
+				}
+			}
+		}
+		break;
 	}
 
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);

@@ -196,6 +196,8 @@ public:
 	LRESULT CALLBACK	ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	EditSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	RebarSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK	BookmarksToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK	DrivesToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabBackingProc(HWND hTabCtrl,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	ShellMenuHookProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -950,6 +952,7 @@ private:
 
 	/* Bookmark handling. */
 	HRESULT					ExpandAndBrowsePath(TCHAR *szPath);
+	HRESULT					ExpandAndBrowsePath(TCHAR *szPath,BOOL bOpenInNewTab,BOOL bSwitchToNewTab);
 	void					InsertBookmarksIntoMenu(void);
 	void					InsertBookmarksIntoMenuInternal(HMENU hMenu,Bookmark_t *pBookmark,int iStartPos,int iStartId);
 	void					InsertBookmarksIntoMenuInternal(HMENU hMenu,Bookmark_t *pBookmark,int iStartPos);
@@ -1433,6 +1436,9 @@ private:
 
 	/* Filtering related data. */
 	list<Filter_t>			m_FilterList;
+
+	/* TreeView middle click. */
+	HTREEITEM				m_hTVMButtonItem;
 };
 
 #endif

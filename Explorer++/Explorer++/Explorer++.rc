@@ -1396,7 +1396,7 @@ BEGIN
     IDS_FOLDERPANE_HEADER   "Folders"
     IDS_DEFAULTCOLUMNS_GENERAL "General"
     IDS_GENERAL_DATEMODIFIED "Date Modified"
-    IDS_GENERAL_NEW         "New"
+    IDS_GENERAL_NEW         "Ne&w"
     IDS_GENERAL_TOTALFILESIZE "Total File Size"
     IDS_GENERAL_CALCULATING "Calculating..."
     IDS_TAB_CLOSE_TIP       "Close the current tab"
