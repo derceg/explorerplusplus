@@ -1740,6 +1740,7 @@ void CContainer::SetDefaultRealFolderColumns(list<Column_t> *pColumns)
 	{
 		Column.id		= g_RealFolderColumns[i].id;
 		Column.bChecked	= g_RealFolderColumns[i].bChecked;
+		Column.iWidth	= g_RealFolderColumns[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1755,6 +1756,7 @@ void CContainer::SetDefaultControlPanelColumns(list<Column_t> *pColumns)
 	{
 		Column.id		= g_ControlPanelColumns[i].id;
 		Column.bChecked	= g_ControlPanelColumns[i].bChecked;
+		Column.iWidth	= g_RealFolderColumns[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1770,6 +1772,7 @@ void CContainer::SetDefaultMyComputerColumns(list<Column_t> *pColumns)
 	{
 		Column.id		= g_MyComputerColumns[i].id;
 		Column.bChecked	= g_MyComputerColumns[i].bChecked;
+		Column.iWidth	= g_RealFolderColumns[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1785,6 +1788,7 @@ void CContainer::SetDefaultRecycleBinColumns(list<Column_t> *pColumns)
 	{
 		Column.id		= g_RecycleBinColumns[i].id;
 		Column.bChecked	= g_RecycleBinColumns[i].bChecked;
+		Column.iWidth	= g_RealFolderColumns[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1800,6 +1804,7 @@ void CContainer::SetDefaultPrintersColumns(list<Column_t> *pColumns)
 	{
 		Column.id		= g_PrintersColumns[i].id;
 		Column.bChecked	= g_PrintersColumns[i].bChecked;
+		Column.iWidth	= g_RealFolderColumns[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1815,6 +1820,7 @@ void CContainer::SetDefaultNetworkConnectionsColumns(list<Column_t> *pColumns)
 	{
 		Column.id		= g_NetworkConnectionsColumns[i].id;
 		Column.bChecked	= g_NetworkConnectionsColumns[i].bChecked;
+		Column.iWidth	= g_RealFolderColumns[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1830,6 +1836,7 @@ void CContainer::SetDefaultMyNetworkPlacesColumns(list<Column_t> *pColumns)
 	{
 		Column.id		= g_MyNetworkPlacesColumns[i].id;
 		Column.bChecked	= g_MyNetworkPlacesColumns[i].bChecked;
+		Column.iWidth	= g_RealFolderColumns[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }

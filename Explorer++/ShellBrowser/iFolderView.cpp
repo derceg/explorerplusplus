@@ -529,6 +529,7 @@ void CFolderView::CopyColumnsInternal(list<Column_t> *pInternalColumns,list<Colu
 	{
 		ci.id		= itr->id;
 		ci.bChecked	= itr->bChecked;
+		ci.iWidth	= itr->iWidth;
 
 		pInternalColumns->push_back(ci);
 	}

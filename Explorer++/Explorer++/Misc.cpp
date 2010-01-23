@@ -340,6 +340,7 @@ void CContainer::ValidateSingleColumnSet(int iColumnSet,list<Column_t> *pColumnL
 		{
 			Column.id		= pColumns[i].id;
 			Column.bChecked	= pColumns[i].bChecked;
+			Column.iWidth	= DEFAULT_COLUMN_WIDTH;
 			pColumnList->push_back(Column);
 		}
 	}

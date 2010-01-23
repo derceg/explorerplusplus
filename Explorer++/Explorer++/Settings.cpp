@@ -817,6 +817,7 @@ void CContainer::SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Col
 	{
 		pColumnList[iColumn].id			= itr->id;
 		pColumnList[iColumn].bChecked	= itr->bChecked;
+		pColumnList[iColumn].iWidth		= itr->iWidth;
 
 		iColumn++;
 	}
@@ -833,12 +834,6 @@ void CContainer::LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<C
 	DWORD			dwSize;
 	DWORD			dwType;
 	unsigned int	i = 0;
-
-	/* TODO: Fix. */
-	for(i = 0;i < SIZEOF_ARRAY(ColumnList);i++)
-	{
-		ColumnList[i].iWidth = DEFAULT_COLUMN_WIDTH;
-	}
 
 	dwType = REG_BINARY;
 	dwSize = sizeof(ColumnList);
@@ -881,19 +876,19 @@ void CContainer::LoadDefaultColumnsFromRegistry(void)
 	HKEY	hColumnsKey;
 	LONG	res;
 
-	m_ControlPanelColumnList.clear();
-	m_MyComputerColumnList.clear();
-	m_RealFolderColumnList.clear();
-	m_RecycleBinColumnList.clear();
-	m_PrintersColumnList.clear();
-	m_NetworkConnectionsColumnList.clear();
-	m_MyNetworkPlacesColumnList.clear();
-
 	/* Open/Create the main key that is used to store data. */
 	res = RegOpenKeyEx(HKEY_CURRENT_USER,REG_COLUMNS_KEY,0,KEY_READ,&hColumnsKey);
 
 	if(res == ERROR_SUCCESS)
 	{
+		m_ControlPanelColumnList.clear();
+		m_MyComputerColumnList.clear();
+		m_RealFolderColumnList.clear();
+		m_RecycleBinColumnList.clear();
+		m_PrintersColumnList.clear();
+		m_NetworkConnectionsColumnList.clear();
+		m_MyNetworkPlacesColumnList.clear();
+
 		LoadColumnFromRegistry(hColumnsKey,_T("ControlPanelColumns"),&m_ControlPanelColumnList);
 		LoadColumnFromRegistry(hColumnsKey,_T("MyComputerColumns"),&m_MyComputerColumnList);
 		LoadColumnFromRegistry(hColumnsKey,_T("RealFolderColumns"),&m_RealFolderColumnList);

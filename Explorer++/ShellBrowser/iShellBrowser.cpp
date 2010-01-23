@@ -1757,6 +1757,7 @@ void CFolderView::ExportCurrentColumns(list<Column_t> *pColumns)
 	{
 		Column.id		= itr->id;
 		Column.bChecked	= itr->bChecked;
+		Column.iWidth	= itr->iWidth;
 
 		pColumns->push_back(Column);
 	}
