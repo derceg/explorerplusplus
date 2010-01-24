@@ -60,6 +60,12 @@ public:
 
 private:
 
+	typedef enum
+	{
+		DRAG_TYPE_LEFTCLICK,
+		DRAG_TYPE_RIGHTCLICK
+	} DragTypes_t;
+
 	/* Message handlers. */
 	LRESULT CALLBACK	OnNotify(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 	LRESULT		OnSetCursor(void);
@@ -87,7 +93,7 @@ private:
 	void		CopyDroppedFilesInternal(IBufferManager *pbm,TCHAR *szDestDirectory,BOOL bCopy,BOOL bRenameOnCollision);
 	void		CreateShortcutsToDroppedFiles(DROPFILES *pdf,TCHAR *szDestDirectory,int nDroppedFiles);
 	void		CreateShortcutToDroppedFile(TCHAR *szDestDirectory,TCHAR *szFullFileName);
-	void		OnBeginDrag(LPARAM lParam);
+	HRESULT		OnBeginDrag(int iItemId,DragTypes_t DragType);
 
 	/* Icon refresh. */
 	void		RefreshAllIconsInternal(HTREEITEM hFirstSibling);
@@ -129,12 +135,6 @@ private:
 		int		iMonitorId;
 	} DriveEvent_t;
 
-	typedef enum
-	{
-		DRAG_TYPE_LEFTCLICK,
-		DRAG_TYPE_RIGHTCLICK
-	} DragTypes_t;
-
 	HWND				m_hTreeView;
 	HWND				m_hParent;
 	int					m_iRefCount;
@@ -153,6 +153,8 @@ private:
 	IDropTargetHelper	*m_pDropTargetHelper;
 	IDataObject			*m_pDataObject;
 	BOOL				m_bDragging;
+	BOOL				m_bDragCancelled;
+	BOOL				m_bDragAllowed;
 	BOOL				m_bDataAccept;
 	DragTypes_t			m_DragType;
 

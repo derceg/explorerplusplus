@@ -63,6 +63,11 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 	SetTimer(m_hTreeView,DRAGSCROLL_TIMER_ID,DRAGSCROLL_TIMER_ELAPSE,
 		DragScrollTimerProc);
 
+	if(grfKeyState & MK_LBUTTON)
+		m_DragType = DRAG_TYPE_LEFTCLICK;
+	else if(grfKeyState & MK_RBUTTON)
+		m_DragType = DRAG_TYPE_RIGHTCLICK;
+
 	/* Notify the drop target helper that an object has been dragged into
 	the window. */
 	m_pDropTargetHelper->DragEnter(m_hTreeView,pDataObject,(POINT *)&pt,*pdwEffect);
@@ -249,11 +254,10 @@ POINTL pt,DWORD *pdwEffect)
 
 	KillTimer(m_hTreeView,DRAGEXPAND_TIMER_ID);
 
-	ScreenToClient(m_hTreeView,(LPPOINT)&pt);
-
 	tvht.pt.x	= pt.x;
 	tvht.pt.y	= pt.y;
 
+	ScreenToClient(m_hTreeView,(LPPOINT)&tvht.pt);
 	TreeView_HitTest(m_hTreeView,&tvht);
 
 	/* Is the mouse actually over an item? */
@@ -327,6 +331,8 @@ POINTL pt,DWORD *pdwEffect)
 					CoTaskMemFree(pidlDirectory);
 
 					szDestDirectory[lstrlen(szDestDirectory) + 1] = '\0';
+
+					ScreenToClient(m_hTreeView,(LPPOINT)&pt);
 
 					CopyDroppedFiles(pdf,(LPPOINT)&pt,
 						szDestDirectory,grfKeyState,pdwEffect);

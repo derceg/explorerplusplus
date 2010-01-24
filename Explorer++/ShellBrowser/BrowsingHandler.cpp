@@ -88,7 +88,10 @@ HRESULT CFolderView::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 		m_pPathManager->StoreIdl(pidl);
 
 	if(m_bFolderVisited)
+	{
+		SaveColumnWidths();
 		ResetFolderMemoryAllocations();
+	}
 
 	m_nTotalItems = 0;
 

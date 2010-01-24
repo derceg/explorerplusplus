@@ -6,6 +6,12 @@
  *
  * Handles the columns in details view.
  *
+ * Notes:
+ *  - Column widths need to save when:
+ *     - Switching to a different folder type
+ *     - Swapping columns (i.e. checking/unchecking columns)
+ *     - Exiting the program
+ *
  * Written by David Erceg
  * www.explorerplusplus.com
  *
@@ -2134,6 +2140,8 @@ size_t CFolderView::QueryNumActiveColumns(void)
 
 void CFolderView::ExportAllColumns(ColumnExport_t *pce)
 {
+	SaveColumnWidths();
+
 	pce->ControlPanelColumnList			= m_ControlPanelColumnList;
 	pce->MyComputerColumnList			= m_MyComputerColumnList;
 	pce->MyNetworkPlacesColumnList		= m_MyNetworkPlacesColumnList;
@@ -2141,4 +2149,57 @@ void CFolderView::ExportAllColumns(ColumnExport_t *pce)
 	pce->PrintersColumnList				= m_PrintersColumnList;
 	pce->RealFolderColumnList			= m_RealFolderColumnList;
 	pce->RecycleBinColumnList			= m_RecycleBinColumnList;
+}
+
+void CFolderView::SaveColumnWidths(void)
+{
+	list<Column_t> *pActiveColumnList = NULL;
+	list<Column_t>::iterator itr;
+	int iColumn = 0;
+
+	if(CompareVirtualFolders(CSIDL_CONTROLS))
+	{
+		/* Control panel. */
+		pActiveColumnList = &m_ControlPanelColumnList;
+	}
+	else if(CompareVirtualFolders(CSIDL_DRIVES))
+	{
+		/* My Computer. */
+		pActiveColumnList = &m_MyComputerColumnList;
+	}
+	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
+	{
+		/* Recycle Bin. */
+		pActiveColumnList = &m_RecycleBinColumnList;
+	}
+	else if(CompareVirtualFolders(CSIDL_PRINTERS))
+	{
+		/* Printers virtual folder. */
+		pActiveColumnList = &m_PrintersColumnList;
+	}
+	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
+	{
+		/* Network connections virtual folder. */
+		pActiveColumnList = &m_NetworkConnectionsColumnList;
+	}
+	else if(CompareVirtualFolders(CSIDL_NETWORK))
+	{
+		/* My Network Places (Network on Vista) virtual folder. */
+		pActiveColumnList = &m_MyNetworkPlacesColumnList;
+	}
+	else
+	{
+		/* Real folder. */
+		pActiveColumnList = &m_RealFolderColumnList;
+	}
+
+	for(itr = pActiveColumnList->begin();itr != pActiveColumnList->end();itr++)
+	{
+		if(itr->bChecked)
+		{
+			itr->iWidth = ListView_GetColumnWidth(m_hListView,iColumn);
+
+			iColumn++;
+		}
+	}
 }

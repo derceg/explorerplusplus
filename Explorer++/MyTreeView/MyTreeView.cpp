@@ -78,7 +78,9 @@ CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon)
 
 	AddRoot();
 
-	m_bDragging = FALSE;
+	m_bDragging			= FALSE;
+	m_bDragCancelled	= FALSE;
+	m_bDragAllowed		= FALSE;
 
 	m_bShowHidden = TRUE;
 
@@ -127,6 +129,77 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			return OnSetCursor();
 			break;
 
+		case WM_RBUTTONDOWN:
+			if((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON)
+				&& !(wParam & MK_MBUTTON))
+			{
+				TVHITTESTINFO tvhti;
+
+				tvhti.pt.x	= LOWORD(lParam);
+				tvhti.pt.y	= HIWORD(lParam);
+
+				/* Test to see if the mouse click was
+				on an item or not. */
+				TreeView_HitTest(m_hTreeView,&tvhti);
+
+				if(!(tvhti.flags & LVHT_NOWHERE))
+				{
+					m_bDragAllowed = TRUE;
+				}
+			}
+			break;
+
+		case WM_RBUTTONUP:
+			m_bDragCancelled = FALSE;
+			m_bDragAllowed = FALSE;
+			break;
+
+		case WM_MOUSEMOVE:
+			{
+				if(!m_bDragging && !m_bDragCancelled && m_bDragAllowed)
+				{
+					if((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON)
+						&& !(wParam & MK_MBUTTON))
+					{
+						TVHITTESTINFO tvhti;
+						TVITEM tvItem;
+						POINT pt;
+						DWORD dwPos;
+						HRESULT hr;
+						BOOL bRet;
+
+						dwPos = GetMessagePos();
+						pt.x = GET_X_LPARAM(dwPos);
+						pt.y = GET_Y_LPARAM(dwPos);
+						MapWindowPoints(HWND_DESKTOP,m_hTreeView,&pt,1);
+
+						tvhti.pt = pt;
+
+						/* Test to see if the mouse click was
+						on an item or not. */
+						TreeView_HitTest(m_hTreeView,&tvhti);
+
+						if(!(tvhti.flags & LVHT_NOWHERE))
+						{
+							tvItem.mask		= TVIF_PARAM|TVIF_HANDLE;
+							tvItem.hItem	= tvhti.hItem;
+							bRet = TreeView_GetItem(m_hTreeView,&tvItem);
+
+							if(bRet)
+							{
+								hr = OnBeginDrag((int)tvItem.lParam,DRAG_TYPE_RIGHTCLICK);
+
+								if(hr == DRAGDROP_S_CANCEL)
+								{
+									m_bDragCancelled = TRUE;
+								}
+							}
+						}
+					}
+				}
+			}
+			break;
+
 		case WM_NOTIFY:
 			return OnNotify(hwnd,msg,wParam,lParam);
 			break;
@@ -143,7 +216,7 @@ LRESULT CALLBACK CMyTreeView::OnNotify(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM l
 	switch(nmhdr->code)
 	{
 	case TVN_BEGINDRAG:
-		OnBeginDrag(lParam);
+		OnBeginDrag((int)((NMTREEVIEW *)lParam)->itemNew.lParam,DRAG_TYPE_LEFTCLICK);
 		break;
 	}
 
@@ -1836,26 +1909,23 @@ void CMyTreeView::RefreshAllIconsInternal(HTREEITEM hFirstSibling)
 	}
 }
 
-void CMyTreeView::OnBeginDrag(LPARAM lParam)
+HRESULT CMyTreeView::OnBeginDrag(int iItemId,DragTypes_t DragType)
 {
 	IDataObject			*pDataObject = NULL;
 	IDragSourceHelper	*pDragSourceHelper = NULL;
 	IShellFolder		*pShellFolder = NULL;
 	LPITEMIDLIST		ridl = NULL;
 	ItemInfo_t			*pItemInfo = NULL;
-	NMTREEVIEW			*pnmtv = NULL;
 	DWORD				Effect;
 	POINT				pt = {0,0};
-	HRESULT				hr;
-
-	pnmtv = (NMTREEVIEW *)lParam;
+	HRESULT				hr;	
 
 	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_ALL,
 		IID_IDragSourceHelper,(LPVOID *)&pDragSourceHelper);
 
 	if(SUCCEEDED(hr))
 	{
-		pItemInfo = &m_pItemInfo[(int)pnmtv->itemNew.lParam];
+		pItemInfo = &m_pItemInfo[iItemId];
 
 		hr = SHBindToParent(pItemInfo->pidl,IID_IShellFolder,
 			(LPVOID *)&pShellFolder,(LPCITEMIDLIST *)&ridl);
@@ -1870,11 +1940,12 @@ void CMyTreeView::OnBeginDrag(LPARAM lParam)
 
 			hr = pDragSourceHelper->InitializeFromWindow(m_hTreeView,&pt,pDataObject);
 
-			/* TODO: Fix. */
-			m_DragType = DRAG_TYPE_LEFTCLICK;
+			m_DragType = DragType;
 
-			DoDragDrop(pDataObject,this,DROPEFFECT_COPY|DROPEFFECT_MOVE|
+			hr = DoDragDrop(pDataObject,this,DROPEFFECT_COPY|DROPEFFECT_MOVE|
 				DROPEFFECT_LINK,&Effect);
+
+			m_bDragging = FALSE;
 
 			pDataObject->Release();
 			pShellFolder->Release();
@@ -1882,4 +1953,6 @@ void CMyTreeView::OnBeginDrag(LPARAM lParam)
 
 		pDragSourceHelper->Release();
 	}
+
+	return hr;
 }
