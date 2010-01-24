@@ -41,6 +41,10 @@ Bug fixes:
  - Fixed search bug.
  - Fixed drives toolbar issue.
 
+Misc:
+ - Explorer++ will now only load translation DLL's
+   that match the version of the main executable.
+
 Version 1.0.0.0 (23/11/09)
 --------------------------
 New features:

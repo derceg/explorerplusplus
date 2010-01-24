@@ -1030,6 +1030,7 @@ TCHAR *szImageDirectory,TCHAR *szFileName)
 	LANGANDCODEPAGE	*plcp = NULL;
 	DWORD			dwLen;
 	DWORD			dwHandle;
+	WORD			wRet = 0;
 	UINT			uLen;
 	void			*pTranslateInfo = NULL;
 	int				iIndex;
@@ -1043,36 +1044,41 @@ TCHAR *szImageDirectory,TCHAR *szFileName)
 	{
 		pTranslateInfo = malloc(dwLen);
 
-		GetFileVersionInfo(szFullFileName,NULL,dwLen,pTranslateInfo);
-		VerQueryValue(pTranslateInfo,_T("\\VarFileInfo\\Translation"),
-			(LPVOID *)&plcp,&uLen);
-
-		if(uLen >= sizeof(LANGANDCODEPAGE))
+		if(pTranslateInfo != NULL)
 		{
-			if(plcp[0].wLanguage == LANG_SINHALA)
+			GetFileVersionInfo(szFullFileName,NULL,dwLen,pTranslateInfo);
+			VerQueryValue(pTranslateInfo,_T("\\VarFileInfo\\Translation"),
+				(LPVOID *)&plcp,&uLen);
+
+			if(uLen >= sizeof(LANGANDCODEPAGE))
 			{
-				StringCchCopy(szLanguageName,SIZEOF_ARRAY(szLanguageName),
-					_T("Sinhala"));
-			}
-			else
-			{
-				GetLocaleInfo(plcp[0].wLanguage,LOCALE_SNATIVELANGNAME,
-					szLanguageName,SIZEOF_ARRAY(szLanguageName));
+				if(plcp[0].wLanguage == LANG_SINHALA)
+				{
+					StringCchCopy(szLanguageName,SIZEOF_ARRAY(szLanguageName),
+						_T("Sinhala"));
+				}
+				else
+				{
+					GetLocaleInfo(plcp[0].wLanguage,LOCALE_SNATIVELANGNAME,
+						szLanguageName,SIZEOF_ARRAY(szLanguageName));
+				}
+
+				iIndex = (int)SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szLanguageName);
+
+				if(iIndex != CB_ERR)
+				{
+					/* Associate the language identifier with the item. */
+					SendMessage(hComboBox,CB_SETITEMDATA,iIndex,PRIMARYLANGID(plcp[0].wLanguage));
+				}
+
+				wRet = PRIMARYLANGID(plcp[0].wLanguage);
 			}
 
-			iIndex = (int)SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szLanguageName);
-
-			if(iIndex != CB_ERR)
-			{
-				/* Associate the language identifier with the item. */
-				SendMessage(hComboBox,CB_SETITEMDATA,iIndex,PRIMARYLANGID(plcp[0].wLanguage));
-			}
-
-			return PRIMARYLANGID(plcp[0].wLanguage);
+			free(pTranslateInfo);
 		}
 	}
 
-	return 0;
+	return wRet;
 }
 
 int CContainer::GetLanguageIDFromIndex(HWND hDlg,int iIndex)

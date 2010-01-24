@@ -821,6 +821,7 @@ int CContainer::LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,list<Column_t> *pCo
 	Column_t					Column;
 	BSTR						bstrName;
 	BSTR						bstrValue;
+	TCHAR						szWidth[32];
 	HRESULT						hr;
 	long						nAttributeNodes;
 	int							iColumnType = -1;
@@ -868,17 +869,29 @@ int CContainer::LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,list<Column_t> *pCo
 		{
 			int j = 0;
 
-			Column.iWidth = DEFAULT_COLUMN_WIDTH;
-
 			for(j = 0;j < sizeof(ColumnData) / sizeof(ColumnData[0]);j++)
 			{
+				StringCchPrintf(szWidth,SIZEOF_ARRAY(szWidth),_T("%s_Width"),ColumnData[j].szName);
+
 				if(lstrcmp(bstrName,ColumnData[j].szName) == 0)
+				{
 					Column.id = ColumnData[j].id;
+
+					Column.bChecked	= DecodeBoolValue(bstrValue);
+
+					pColumns->push_back(Column);
+					break;
+				}
+				else if(lstrcmp(bstrName,szWidth) == 0)
+				{
+					if(pColumns->size() > 0)
+					{
+						pColumns->back().iWidth = DecodeIntValue(bstrValue);
+					}
+
+					break;
+				}
 			}
-
-			Column.bChecked	= DecodeBoolValue(bstrValue);
-
-			pColumns->push_back(Column);
 		}
 	}
 
@@ -1390,6 +1403,7 @@ TCHAR *szColumnSet,int iIndent)
 	list<Column_t>::iterator	itr;
 	TCHAR						*pszColumnSaveName = NULL;
 	WCHAR						wszIndent[128];
+	TCHAR						szWidth[32];
 	BSTR						bstr_indent = SysAllocString(L"\n\t\t\t\t");
 	int							i = 0;
 
@@ -1415,6 +1429,9 @@ TCHAR *szColumnSet,int iIndent)
 		}
 
 		AddAttributeToNode(pXMLDom,pColumnNode,pszColumnSaveName,EncodeBoolValue(itr->bChecked));
+
+		StringCchPrintf(szWidth,SIZEOF_ARRAY(szWidth),_T("%s_Width"),pszColumnSaveName);
+		AddAttributeToNode(pXMLDom,pColumnNode,szWidth,EncodeIntValue(itr->iWidth));
 	}
 
 	SysFreeString(bstr_indent);
@@ -2506,7 +2523,7 @@ unsigned long hash(unsigned char *str)
 	int c;
 
 	while((c = *str++) != '\0')
-		hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+		hash = ((hash << 5) + hash) + c;
 
 	return hash;
 }

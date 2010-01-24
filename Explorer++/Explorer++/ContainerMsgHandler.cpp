@@ -337,7 +337,21 @@ void CContainer::SetLanguageModule(void)
 
 			if(wLanguage == m_Language)
 			{
-				g_hLanguageModule = LoadLibrary(szFullFileName);
+				/* Using translation DLL's will most likely
+				crash the program due to incorrect/missing resources.
+				Therefore, only load the specified translation DLL
+				if it matches the current internal version. */
+				if(VerifyLanguageVersion(szFullFileName))
+				{
+					g_hLanguageModule = LoadLibrary(szFullFileName);
+				}
+				else
+				{
+					/* Main window hasn't been constructed yet, so this
+					message box doesn't have any owner window. */
+					MessageBox(NULL,_T("The version of the specified translation DLL does not match the version of the executable."),
+						WINDOW_NAME,MB_ICONWARNING);
+				}
 			}
 			else
 			{

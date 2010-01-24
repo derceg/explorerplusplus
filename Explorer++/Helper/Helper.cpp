@@ -2707,6 +2707,52 @@ WORD GetFileLanguage(TCHAR *szFullFileName)
 	return wLanguage;
 }
 
+BOOL GetFileProductVersion(TCHAR *szFullFileName,
+DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS)
+{
+	VS_FIXEDFILEINFO	*pvsffi = NULL;
+	DWORD			dwLen;
+	DWORD			dwHandle;
+	UINT			uLen;
+	BOOL			bSuccess = FALSE;
+	void			*pData = NULL;
+
+	*pdwProductVersionLS = 0;
+	*pdwProductVersionMS = 0;
+
+	dwLen = GetFileVersionInfoSize(szFullFileName,&dwHandle);
+
+	if(dwLen > 0)
+	{
+		pData = malloc(dwLen);
+
+		if(pData != NULL)
+		{
+			GetFileVersionInfo(szFullFileName,NULL,dwLen,pData);
+			VerQueryValue(pData,_T("\\"),
+				(LPVOID *)&pvsffi,&uLen);
+
+			/* To retrieve the product version numbers:
+			HIWORD(pvsffi->dwProductVersionMS);
+			LOWORD(pvsffi->dwProductVersionMS);
+			HIWORD(pvsffi->dwProductVersionLS);
+			LOWORD(pvsffi->dwProductVersionLS); */
+
+			if(uLen > 0)
+			{
+				*pdwProductVersionLS = pvsffi->dwProductVersionMS;
+				*pdwProductVersionMS = pvsffi->dwProductVersionLS;
+
+				bSuccess = TRUE;
+			}
+
+			free(pData);
+		}
+	}
+
+	return bSuccess;
+}
+
 void GetCPUBrandString(char *pszCPUBrand,UINT cchBuf)
 {
 	int CPUInfo[4] = {-1};

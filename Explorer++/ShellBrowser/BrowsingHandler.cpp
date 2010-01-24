@@ -145,7 +145,6 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 	nPrevItems = ListView_GetItemCount(m_hListView);
 
-	/* C4267 warning. POSSIBLE PROBLEM. */
 	m_nAwaitingAdd = (int)m_AwaitingAddList.size();
 
 	if((nPrevItems + m_nAwaitingAdd) == 0)
@@ -373,34 +372,6 @@ void CFolderView::RemoveItem(int iItemInternal)
 	
 	if(iItem != -1)
 	{
-		/* If the item to be deleted currently has the focus,
-		set focus to the previous item if this isn't
-		the last item in the listview. */
-		if(m_ViewMode == VM_DETAILS)
-		{
-			/* TODO: Complete. */
-		}
-		else
-		{
-			if((ListView_GetItemState(m_hListView,iItem,LVIS_FOCUSED) == LVIS_FOCUSED) &&
-				ListView_GetItemCount(m_hListView) != 1)
-			{
-				int iNext = 0;
-
-				iNext = ListView_GetNextItem(m_hListView,iItem,LVNI_TOLEFT);
-
-				if(iNext == -1)
-				{
-					iNext = ListView_GetNextItem(m_hListView,iItem,LVNI_TORIGHT);
-
-					if(iNext == -1)
-						iNext = 0;
-				}
-
-				ListView_FocusItem(m_hListView,iNext,TRUE);
-			}
-		}
-
 		/* Remove the item from the listview. */
 		ListView_DeleteItem(m_hListView,iItem);
 	}

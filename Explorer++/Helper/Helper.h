@@ -119,6 +119,7 @@ BOOL			GetVersionInfoString(TCHAR *szFileName,TCHAR *szVersionInfo,TCHAR *szBuff
 BOOL			ReadImageProperty(TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen);
 BOOL			IsImage(TCHAR *FileName);
 WORD			GetFileLanguage(TCHAR *szFullFileName);
+BOOL			GetFileProductVersion(TCHAR *szFullFileName,DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS);
 
 /* Menu helpers. */
 BOOL			lCheckMenuItem(HMENU hMenu,UINT ItemID,BOOL bCheck);

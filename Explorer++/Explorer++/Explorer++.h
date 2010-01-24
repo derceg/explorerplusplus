@@ -1110,6 +1110,7 @@ private:
 	void					CycleViewState(BOOL bCycleForward);
 	int						GetViewModeMenuId(UINT uViewMode);
 	int						GetViewModeMenuStringId(UINT uViewMode);
+	BOOL					VerifyLanguageVersion(TCHAR *szLanguageModule);
 
 
 

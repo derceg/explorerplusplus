@@ -1902,3 +1902,36 @@ BOOL CContainer::CheckItemSelection(void)
 
 	return FALSE;
 }
+
+/* Checks the version of the specified
+language DLL against the version of the
+main executable and returns TRUE if they
+match. */
+BOOL CContainer::VerifyLanguageVersion(TCHAR *szLanguageModule)
+{
+	TCHAR szImageName[MAX_PATH];
+	DWORD dwpvProcessLS;
+	DWORD dwpvProcessMS;
+	DWORD dwpvLanguageLS;
+	DWORD dwpvLanguageMS;
+	DWORD dwRet;
+	BOOL bSuccess1;
+	BOOL bSuccess2;
+
+	dwRet = GetCurrentProcessImageName(szImageName,SIZEOF_ARRAY(szImageName));
+
+	if(dwRet != 0)
+	{
+		bSuccess1 = GetFileProductVersion(szImageName,&dwpvProcessLS,&dwpvProcessMS);
+		bSuccess2 = GetFileProductVersion(szLanguageModule,&dwpvLanguageLS,&dwpvLanguageMS);
+
+		if(bSuccess1 && bSuccess2)
+		{
+			if((dwpvProcessLS == dwpvLanguageLS) &&
+				(dwpvProcessMS == dwpvLanguageMS))
+				return TRUE;
+		}
+	}
+
+	return FALSE;
+}
