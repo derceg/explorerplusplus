@@ -29,9 +29,7 @@
 HRESULT _stdcall CFolderView::DragEnter(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 {
-	FORMATETC	ftc = {CF_HDROP,0,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	HRESULT		hr;
-	HRESULT		hReturn;
+	HRESULT hReturn;
 	POINT pt;
 
 	m_bPerformingDrag = TRUE;
@@ -47,13 +45,14 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	}
 	else
 	{
-		/* Check whether the drop source has the type of data (CF_HDROP)
-		that is needed for this drag operation. */
-		hr = pDataObject->QueryGetData(&ftc);
+		/* The two drop formats we support. */
+		FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+		FORMATETC ftcFileDescriptor = {RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 
-		/* DON'T use SUCCEEDED (QueryGetData() will return S_FALSE on
-		failure). */
-		if(hr == S_OK)
+		/* Check whether the drop source has the type of data
+		that is needed for this drag operation. */
+		if(pDataObject->QueryGetData(&ftcHDrop) == S_OK ||
+			pDataObject->QueryGetData(&ftcFileDescriptor) == S_OK)
 		{
 			m_bDataAccept = TRUE;
 
@@ -352,6 +351,8 @@ If no modifiers are held down and the source and destination are on different dr
 HRESULT _stdcall CFolderView::Drop(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 {
+	FORMATETC		ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC		ftcFileDescriptor = {RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	FORMATETC		ftc;
 	STGMEDIUM		stg;
 	DROPFILES		*pdf = NULL;
@@ -383,131 +384,284 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 
 	szDestDirectory[lstrlen(szDestDirectory) + 1] = '\0';
 
-	ftc.cfFormat	= CF_HDROP;
-	ftc.ptd			= NULL;
-	ftc.dwAspect	= DVASPECT_CONTENT;
-	ftc.lindex		= -1;
-	ftc.tymed		= TYMED_HGLOBAL;
-
-	/* Does the dropped object contain the type of
-	data we need? */
-	hr = pDataObject->GetData(&ftc,&stg);
-
-	if(hr == S_OK)
+	if(pDataObject->QueryGetData(&ftcHDrop) == S_OK)
 	{
-		/* Need to remove the drag image before any files are copied/moved.
-		This is because a copy/replace dialog may need to shown (if there
-		is a collision), and the drag image no longer needs to be there.
-		The insertion mark may stay until the end. */
-		m_pDropTargetHelper->Drop(pDataObject,(POINT *)&pt,*pdwEffect);
+		hr = pDataObject->GetData(&ftcHDrop,&stg);
 
-		if(m_DragType == DRAG_TYPE_RIGHTCLICK)
+		if(hr == S_OK)
 		{
-			IShellFolder *pDesktop = NULL;
-			IShellFolder *pShellFolder = NULL;
-			IDropTarget *pDrop = NULL;
-			LPITEMIDLIST pidlDirectory = NULL;
-			DWORD dwe;
+			/* Need to remove the drag image before any files are copied/moved.
+			This is because a copy/replace dialog may need to shown (if there
+			is a collision), and the drag image no longer needs to be there.
+			The insertion mark may stay until the end. */
+			m_pDropTargetHelper->Drop(pDataObject,(POINT *)&pt,*pdwEffect);
 
-			hr = GetIdlFromParsingName(szDestDirectory,&pidlDirectory);
-
-			if(SUCCEEDED(hr))
+			if(m_DragType == DRAG_TYPE_RIGHTCLICK)
 			{
-				hr = SHGetDesktopFolder(&pDesktop);
+				IShellFolder *pDesktop = NULL;
+				IShellFolder *pShellFolder = NULL;
+				IDropTarget *pDrop = NULL;
+				LPITEMIDLIST pidlDirectory = NULL;
+				DWORD dwe;
+
+				hr = GetIdlFromParsingName(szDestDirectory,&pidlDirectory);
 
 				if(SUCCEEDED(hr))
 				{
-					hr = pDesktop->BindToObject(pidlDirectory,0,IID_IShellFolder,(void **)&pShellFolder);
+					hr = SHGetDesktopFolder(&pDesktop);
 
 					if(SUCCEEDED(hr))
 					{
-						dwe = *pdwEffect;
-
-						hr = pShellFolder->CreateViewObject(m_hListView,IID_IDropTarget,(void **)&pDrop);
+						hr = pDesktop->BindToObject(pidlDirectory,0,IID_IShellFolder,(void **)&pShellFolder);
 
 						if(SUCCEEDED(hr))
 						{
-							pDrop->DragEnter(pDataObject,MK_RBUTTON,ptl,&dwe);
-
 							dwe = *pdwEffect;
-							pDrop->Drop(pDataObject,grfKeyState,ptl,&dwe);
 
-							pDrop->DragLeave();
+							hr = pShellFolder->CreateViewObject(m_hListView,IID_IDropTarget,(void **)&pDrop);
 
-							pDrop->Release();
+							if(SUCCEEDED(hr))
+							{
+								pDrop->DragEnter(pDataObject,MK_RBUTTON,ptl,&dwe);
+
+								dwe = *pdwEffect;
+								pDrop->Drop(pDataObject,grfKeyState,ptl,&dwe);
+
+								pDrop->DragLeave();
+
+								pDrop->Release();
+							}
+
+							pShellFolder->Release();
 						}
 
-						pShellFolder->Release();
+						pDesktop->Release();
 					}
 
-					pDesktop->Release();
+					CoTaskMemFree(pidlDirectory);
 				}
+			}
+			else
+			{
+				pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
 
-				CoTaskMemFree(pidlDirectory);
+				if(pdf != NULL)
+				{
+					/* Request a count of the number of files that have been dropped. */
+					nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
+
+					/* If a folder was dragged locally, and it is not over a folder,
+					reposition it. */
+					if(m_bDragging && !m_bOverFolder)
+					{
+						/* The drop effect will be the same for all files
+						that are been dragged locally. */
+						dwEffect = DetermineCurrentDragEffect(grfKeyState,*pdwEffect,
+							m_bDataAccept,m_bOnSameDrive);
+
+						if(dwEffect == DROPEFFECT_MOVE)
+						{
+							POINT point;
+
+							point.x = pt.x;
+							point.y = pt.y;
+							RepositionLocalFiles(&point);
+						}
+						else if(dwEffect == DROPEFFECT_COPY)
+						{
+							IBufferManager	*pbmCopy = NULL;
+							TCHAR			szFullFileName[MAX_PATH];
+							int				i = 0;
+
+							pbmCopy = new CBufferManager();
+
+							for(i = 0;i < nDroppedFiles;i++)
+							{
+								/* Determine the name of the dropped file. */
+								DragQueryFile((HDROP)pdf,i,szFullFileName,
+									SIZEOF_ARRAY(szFullFileName));
+
+								pbmCopy->WriteListEntry(szFullFileName);
+							}
+
+							CopyDroppedFilesInternal(pbmCopy,szDestDirectory,TRUE,TRUE);
+
+							pbmCopy->Release();
+						}
+						else if(dwEffect == DROPEFFECT_LINK)
+						{
+							CreateShortcutsToDroppedFiles(pdf,szDestDirectory,nDroppedFiles);
+						}
+					}
+					else
+					{
+						CopyDroppedFiles(pDataObject,pdf,(LPPOINT)&pt,
+							szDestDirectory,grfKeyState,pdwEffect);
+					}
+
+					GlobalUnlock(stg.hGlobal);
+				}
 			}
 		}
-		else
+	}
+	else if(pDataObject->QueryGetData(&ftcFileDescriptor) == S_OK)
+	{
+		FORMATETC ftcfchg;
+		FORMATETC ftcfcis;
+		STGMEDIUM stgFileContents;
+		HANDLE hFile;
+		FILETIME *pftCreationTime = NULL;
+		FILETIME *pftLastAccessTime = NULL;
+		FILETIME *pftLastWriteTime = NULL;
+		FILEGROUPDESCRIPTOR *pfgd = NULL;
+		TCHAR szFullFileName[MAX_PATH];
+		DWORD dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+		DWORD nBytesToWrite = 0;
+		DWORD nBytesWritten;
+		LPBYTE pBuffer = NULL;
+		BOOL bDataRetrieved = FALSE;
+		unsigned int i = 0;
+
+		hr = pDataObject->GetData(&ftcFileDescriptor,&stg);
+
+		if(hr == S_OK)
 		{
-			pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
+			pfgd = (FILEGROUPDESCRIPTOR *)GlobalLock(stg.hGlobal);
 
-			if(pdf != NULL)
+			if(pfgd != NULL)
 			{
-				/* Request a count of the number of files that have been dropped. */
-				nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
-
-				/* If a folder was dragged locally, and it is not over a folder,
-				reposition it. */
-				if(m_bDragging && !m_bOverFolder)
+				for(i = 0;i < pfgd->cItems;i++)
 				{
-					/* The drop effect will be the same for all files
-					that are been dragged locally. */
-					dwEffect = DetermineCurrentDragEffect(grfKeyState,*pdwEffect,
-						m_bDataAccept,m_bOnSameDrive);
-
-					if(dwEffect == DROPEFFECT_MOVE)
+					if(pfgd->fgd[i].dwFlags & FD_ATTRIBUTES)
 					{
-						POINT point;
-
-						point.x = pt.x;
-						point.y = pt.y;
-						RepositionLocalFiles(&point);
+						dwFileAttributes = pfgd->fgd[i].dwFileAttributes;
 					}
-					else if(dwEffect == DROPEFFECT_COPY)
+
+					if(pfgd->fgd[i].dwFlags & FD_FILESIZE)
 					{
-						IBufferManager	*pbmCopy = NULL;
-						TCHAR			szFullFileName[MAX_PATH];
-						int				i = 0;
+						nBytesToWrite = pfgd->fgd[i].nFileSizeLow;
+					}
 
-						pbmCopy = new CBufferManager();
+					if(pfgd->fgd[i].dwFlags & FD_LINKUI)
+					{
+						/* TODO: Treat as shortcut... */
+					}
 
-						for(i = 0;i < nDroppedFiles;i++)
+					if(pfgd->fgd[i].dwFlags & FD_CREATETIME)
+					{
+						pftCreationTime = &pfgd->fgd[i].ftCreationTime;
+					}
+
+					if(pfgd->fgd[i].dwFlags & FD_ACCESSTIME)
+					{
+						pftLastAccessTime = &pfgd->fgd[i].ftLastAccessTime;
+					}
+
+					if(pfgd->fgd[i].dwFlags & FD_WRITESTIME)
+					{
+						pftLastWriteTime = &pfgd->fgd[i].ftLastWriteTime;
+					}
+
+					/*if(pfgd->fgd[i].dwFlags & FD_UNICODE)
+					{
+					}*/
+
+					ftcfchg.cfFormat	= RegisterClipboardFormat(CFSTR_FILECONTENTS);
+					ftcfchg.ptd			= NULL;
+					ftcfchg.dwAspect	= DVASPECT_CONTENT;
+					ftcfchg.lindex		= i;
+					ftcfchg.tymed		= TYMED_HGLOBAL;
+
+					ftcfcis.cfFormat	= RegisterClipboardFormat(CFSTR_FILECONTENTS);
+					ftcfcis.ptd			= NULL;
+					ftcfcis.dwAspect	= DVASPECT_CONTENT;
+					ftcfcis.lindex		= i;
+					ftcfcis.tymed		= TYMED_ISTREAM;
+
+					if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
+					{
+						hr = pDataObject->GetData(&ftcfchg,&stgFileContents);
+
+						if(hr == S_OK)
 						{
-							/* Determine the name of the dropped file. */
-							DragQueryFile((HDROP)pdf,i,szFullFileName,
-								SIZEOF_ARRAY(szFullFileName));
+							pBuffer = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
 
-							pbmCopy->WriteListEntry(szFullFileName);
+							if(pBuffer != NULL)
+								bDataRetrieved = TRUE;
+						}
+					}
+					else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
+					{
+						IStream *pStream = NULL;
+						STATSTG sstg;
+						ULONG cbRead;
+
+						hr = pDataObject->GetData(&ftcfcis,&stgFileContents);
+
+						if(hr == S_OK)
+						{
+							hr = stgFileContents.pstm->Stat(&sstg,STATFLAG_NONAME);
+
+							if(hr == S_OK)
+							{
+								pBuffer = (LPBYTE)malloc(sstg.cbSize.LowPart * sizeof(BYTE));
+
+								if(pBuffer != NULL)
+								{
+									/* If the file size isn't explicitly given,
+									use the size of the stream. */
+									if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+										nBytesToWrite = sstg.cbSize.LowPart;
+
+									stgFileContents.pstm->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
+
+									bDataRetrieved = TRUE;
+								}
+							}
+						}
+					}
+
+					if(bDataRetrieved)
+					{
+						StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),szDestDirectory);
+						PathAppend(szFullFileName,pfgd->fgd[i].cFileName);
+
+						hFile = CreateFile(szFullFileName,GENERIC_WRITE,0,NULL,
+							CREATE_ALWAYS,dwFileAttributes,NULL);
+
+						if(hFile != INVALID_HANDLE_VALUE)
+						{
+							SetFileTime(hFile,pftCreationTime,pftLastAccessTime,pftLastWriteTime);
+
+							WriteFile(hFile,pBuffer,nBytesToWrite,&nBytesWritten,NULL);
+
+							CloseHandle(hFile);
 						}
 
-						CopyDroppedFilesInternal(pbmCopy,szDestDirectory,TRUE,TRUE);
-
-						pbmCopy->Release();
+						if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
+						{
+							if(pBuffer != NULL)
+							{
+								GlobalUnlock(stgFileContents.hGlobal);
+							}
+						}
+						else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
+						{
+							free(pBuffer);
+						}
 					}
-					else if(dwEffect == DROPEFFECT_LINK)
-					{
-						CreateShortcutsToDroppedFiles(pdf,szDestDirectory,nDroppedFiles);
-					}
-				}
-				else
-				{
-					CopyDroppedFiles(pDataObject,pdf,(LPPOINT)&pt,
-						szDestDirectory,grfKeyState,pdwEffect);
 				}
 
 				GlobalUnlock(stg.hGlobal);
 			}
 		}
 	}
+
+	ftc.cfFormat	= CF_HDROP;
+	ftc.ptd			= NULL;
+	ftc.dwAspect	= DVASPECT_CONTENT;
+	ftc.lindex		= -1;
+	ftc.tymed		= TYMED_HGLOBAL;
 
 	if(m_bDeselectDropFolder)
 	{

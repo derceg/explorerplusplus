@@ -18,6 +18,9 @@ Known limitations:
 Version 1.x.x.x ()
 ------------------
 New features:
+ - New drag and drop type supported.
+ - Items in the treeview can now be dragged and dropped
+   using right click.
  - The extended right click menu is now shown when
    shift is held down and an item is right-clicked.
  - Double clicking in a tabs whitespace will now
