@@ -100,6 +100,32 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 				on an item or not. */
 				ListView_HitTest(m_hActiveListView,&lvhti);
 
+				HDC hdc;
+				TCHAR szText[MAX_PATH];
+				RECT rc;
+				SIZE sz;
+				UINT uViewMode;
+				m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+				if(uViewMode == VM_LIST)
+				{
+					if(!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
+					{
+						ListView_GetItemRect(m_hActiveListView,lvhti.iItem,&rc,LVIR_LABEL);
+						ListView_GetItemText(m_hActiveListView,lvhti.iItem,0,szText,MAX_PATH);
+
+						hdc = GetDC(m_hActiveListView);
+						GetTextExtentPoint32(hdc,szText,lstrlen(szText),&sz);
+						ReleaseDC(m_hActiveListView,hdc);
+
+						rc.right = rc.left + sz.cx;
+
+						if(!PtInRect(&rc,lvhti.pt))
+						{
+							m_bBlockNext = TRUE;
+						}
+					}
+				}
+
 				if(!(lvhti.flags & LVHT_NOWHERE))
 				{
 					m_bDragAllowed = TRUE;
@@ -110,6 +136,8 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 		case WM_RBUTTONUP:
 			m_bDragCancelled = FALSE;
 			m_bDragAllowed = FALSE;
+
+			m_bBlockNext = FALSE;
 			break;
 
 		case WM_MBUTTONDOWN:
@@ -126,6 +154,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 		mouse button was clicked, it was over an item, start dragging. */
 		case WM_MOUSEMOVE:
 			{
+				m_bBlockNext = FALSE;
 				if(!m_bDragging && !m_bDragCancelled && m_bDragAllowed)
 				{
 					if((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON)
@@ -945,7 +974,7 @@ void CContainer::OnListViewRClick(HWND hParent,POINT *pCursorPos)
 	to change while the menu is been shown (e.g. if
 	not handled correctly, the back/forward buttons
 	on a mouse will change the directory without
-	destrroying the popup menu).
+	destroying the popup menu).
 	If this happens, the shell browser used will not
 	stay constant throughout this function, and will
 	cause various problems (e.g. changing from a

@@ -202,7 +202,6 @@
 #define IDC_EDIT_DESCRIPTION            1215
 #define IDC_STATIC_ATTRIBUTES           1216
 #define IDC_BUTTON_RESTOREDEFAULTS      1217
-#define IDC_CHECK1                      1218
 #define IDC_TABS_DOUBLECLICKCLOSE       1218
 #define IDC_SETTINGS_CHECK_ZIPFILES     1218
 #define IDC_MASSRENAME_MORE             1219

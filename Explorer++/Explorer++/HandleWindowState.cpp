@@ -265,7 +265,6 @@ void CContainer::HandleMainWindowText(void)
 	TCHAR	szTitle[512];
 	TCHAR	szFolderDisplayName[MAX_PATH];
 	TCHAR	szOwner[512];
-	TCHAR	szOwnerAddition[512];
 
 	/* Don't show full paths for virtual folders (as only the folders
 	GUID will be shown). */
@@ -281,14 +280,50 @@ void CContainer::HandleMainWindowText(void)
 	StringCchPrintf(szTitle,SIZEOF_ARRAY(szTitle),
 	_T("%s - Explorer++"),szFolderDisplayName);
 
+	if(m_bShowUserNameInTitleBar || m_bShowPrivilegeLevelInTitleBar)
+		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),_T(" ["));
+
 	if(m_bShowUserNameInTitleBar)
 	{
 		GetProcessOwner(szOwner,SIZEOF_ARRAY(szOwner));
 
-		StringCchPrintf(szOwnerAddition,SIZEOF_ARRAY(szOwnerAddition),
-			_T(" [%s]"),szOwner);
-		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),szOwnerAddition);
+		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),szOwner);
 	}
+
+	if(m_bShowPrivilegeLevelInTitleBar)
+	{
+		TCHAR szPrivilegeAddition[32];
+		TCHAR szPrivilege[32];
+
+		if(CheckGroupMembership(GROUP_ADMINISTRATORS))
+		{
+			StringCchPrintf(szPrivilege,SIZEOF_ARRAY(szPrivilege),_T("Administrators"));
+		}
+		else if(CheckGroupMembership(GROUP_POWERUSERS))
+		{
+			StringCchPrintf(szPrivilege,SIZEOF_ARRAY(szPrivilege),_T("Power Users"));
+		}
+		else if(CheckGroupMembership(GROUP_USERS))
+		{
+			StringCchPrintf(szPrivilege,SIZEOF_ARRAY(szPrivilege),_T("Users"));
+		}
+		else if(CheckGroupMembership(GROUP_USERSRESTRICTED))
+		{
+			StringCchPrintf(szPrivilege,SIZEOF_ARRAY(szPrivilege),_T("Users/Restricted"));
+		}
+
+		if(m_bShowUserNameInTitleBar)
+			StringCchPrintf(szPrivilegeAddition,SIZEOF_ARRAY(szPrivilegeAddition),
+			_T(" - %s"),szPrivilege);
+		else
+			StringCchPrintf(szPrivilegeAddition,SIZEOF_ARRAY(szPrivilegeAddition),
+			_T("%s"),szPrivilege);
+
+		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),szPrivilegeAddition);
+	}
+
+	if(m_bShowUserNameInTitleBar || m_bShowPrivilegeLevelInTitleBar)
+		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),_T("]"));
 
 	SetWindowText(m_hContainer,szTitle);
 }

@@ -476,13 +476,15 @@ BEGIN
     CONTROL         "Show &username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,101,10
     CONTROL         "&Disable treeview delay",IDC_OPTION_TREEVIEWDELAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,88,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,88,10
     CONTROL         "Extend tab &control across entire window",IDC_OPTION_EXTENDTABCONTROL,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,145,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,85,145,10
     CONTROL         "Show &gridlines in details view",IDC_OPTION_GRIDLINES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,85,108,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,108,10
     CONTROL         "Full row selection in details &view",IDC_OPTION_FULLROWSELECT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,117,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,117,10
+    CONTROL         "Show privilege level in title bar",IDC_OPTION_PRIVILEGELEVELINTITLEBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,113,10
 END
 
 IDD_CUSTOMIZECOLORS DIALOGEX 0, 0, 363, 152

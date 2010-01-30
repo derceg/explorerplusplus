@@ -526,6 +526,8 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 				CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_TITLEPATH,BST_CHECKED);
 			if(m_bShowUserNameInTitleBar)
 				CheckDlgButton(hDlg,IDC_OPTION_USERNAMEINTITLEBAR,BST_CHECKED);
+			if(m_bShowPrivilegeLevelInTitleBar)
+				CheckDlgButton(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR,BST_CHECKED);
 			if(!m_bTreeViewDelayEnabled)
 				CheckDlgButton(hDlg,IDC_OPTION_TREEVIEWDELAY,BST_CHECKED);
 			if(m_bExtendTabControl)
@@ -544,6 +546,7 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 		case IDC_OPTION_FILEPREVIEWS:
 		case IDC_SETTINGS_CHECK_TITLEPATH:
 		case IDC_OPTION_USERNAMEINTITLEBAR:
+		case IDC_OPTION_PRIVILEGELEVELINTITLEBAR:
 		case IDC_OPTION_TREEVIEWDELAY:
 		case IDC_OPTION_EXTENDTABCONTROL:
 		case IDC_OPTION_GRIDLINES:
@@ -574,6 +577,9 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 					m_bShowUserNameInTitleBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_USERNAMEINTITLEBAR)
 						== BST_CHECKED);
 
+					m_bShowPrivilegeLevelInTitleBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR)
+						== BST_CHECKED);
+
 					m_bTreeViewDelayEnabled = !(IsDlgButtonChecked(hDlg,IDC_OPTION_TREEVIEWDELAY)
 						== BST_CHECKED);
 
@@ -586,7 +592,7 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 					m_bUseFullRowSelect = (IsDlgButtonChecked(hDlg,IDC_OPTION_FULLROWSELECT)
 						== BST_CHECKED);
 
-					/* Required if show full title path or show username
+					/* Required if show full title path or show username/privilege level
 					in title bar options change. */
 					HandleMainWindowText();
 

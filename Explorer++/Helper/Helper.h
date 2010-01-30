@@ -41,6 +41,14 @@ typedef struct
 	TCHAR szFileName[MAX_PATH];
 } PastedFile_t;
 
+typedef enum
+{
+	GROUP_ADMINISTRATORS,
+	GROUP_POWERUSERS,
+	GROUP_USERS,
+	GROUP_USERSRESTRICTED
+} GroupType_t;
+
 /* Listview helper functions. */
 int				ListView_SelectAllItems(HWND hListView);
 int				ListView_InvertSelection(HWND hListView);
@@ -106,7 +114,6 @@ void			DeleteFileSecurely(TCHAR *szFileName);
 DWORD			BuildFileAttributeString(TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize);
 int				PasteHardLinks(TCHAR *szDestination);
 size_t			GetFileOwner(TCHAR *szFile,TCHAR *szOwner,DWORD BufSize);
-BOOL			GetProcessOwner(TCHAR *szOwner,DWORD BufSize);
 DWORD			GetNumFileHardLinks(TCHAR *lpszFileName);
 int				ReadFileProperty(TCHAR *lpszFileName,DWORD dwPropertyId,TCHAR *lpszPropertyBuf,DWORD dwBufLen);
 int				SetFileProperty(TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *szNewValue);
@@ -120,6 +127,10 @@ BOOL			ReadImageProperty(TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWOR
 BOOL			IsImage(TCHAR *FileName);
 WORD			GetFileLanguage(TCHAR *szFullFileName);
 BOOL			GetFileProductVersion(TCHAR *szFullFileName,DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS);
+
+/* Ownership and access. */
+BOOL			GetProcessOwner(TCHAR *szOwner,DWORD BufSize);
+BOOL			CheckGroupMembership(GroupType_t GroupType);
 
 /* Menu helpers. */
 BOOL			lCheckMenuItem(HMENU hMenu,UINT ItemID,BOOL bCheck);

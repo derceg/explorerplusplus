@@ -147,6 +147,8 @@ CContainer::CContainer(HWND hwnd)
 	m_rgbCompressed					= RGB(0,0,255);
 	m_rgbEncrypted					= RGB(0,128,0);
 
+	m_bBlockNext = FALSE;
+
 	InitializeColorRules();
 
 	int i = 0;
@@ -312,6 +314,7 @@ void CContainer::SetDefaultValues(void)
 	m_StartupMode					= STARTUP_PREVIOUSTABS;
 	m_bExtendTabControl				= FALSE;
 	m_bShowUserNameInTitleBar		= FALSE;
+	m_bShowPrivilegeLevelInTitleBar	= FALSE;
 	m_bShowFilePreviews				= TRUE;
 	m_bReplaceExplorerFileSystem	= FALSE;
 	m_bOneClickActivate				= FALSE;
@@ -1944,6 +1947,21 @@ LRESULT CALLBACK CContainer::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPAR
 
 		case LVN_KEYDOWN:
 			OnListViewKeyDown(lParam);
+			break;
+
+		case LVN_ITEMCHANGING:
+			{
+				UINT uViewMode;
+				m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+				if(uViewMode == VM_LIST)
+				{
+					if(m_bBlockNext)
+					{
+						m_bBlockNext = FALSE;
+						return TRUE;
+					}
+				}
+			}
 			break;
 
 		case LVN_ITEMCHANGED:

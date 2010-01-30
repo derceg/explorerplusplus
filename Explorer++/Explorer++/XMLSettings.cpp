@@ -88,6 +88,7 @@ will need to be changed correspondingly. */
 #define HASH_DOUBLECLICKTABCLOSE	1866215987
 #define HASH_HANDLEZIPFILES			1074212343
 #define HASH_INSERTSORTED			1109371947
+#define HASH_SHOWPRIVILEGETITLEBAR	4071561587
 
 typedef struct
 {
@@ -415,6 +416,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowHiddenGlobal"),EncodeBoolValue(m_bShowHiddenGlobal));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInGroupsGlobal"),EncodeBoolValue(m_bShowInGroupsGlobal));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowPrivilegeLevelInTitleBar"),EncodeBoolValue(m_bShowPrivilegeLevelInTitleBar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowStatusBar"),EncodeBoolValue(m_bShowStatusBar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -2695,6 +2698,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_SHOWINGROUPSGLOBAL:
 		m_bShowInGroupsGlobal = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_SHOWPRIVILEGETITLEBAR:
+		m_bShowPrivilegeLevelInTitleBar = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWSTATUSBAR:

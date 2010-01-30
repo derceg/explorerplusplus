@@ -1219,6 +1219,7 @@ private:
 	BOOL					m_bExtendTabControl;
 	BOOL					m_bUseFullRowSelect;
 	BOOL					m_bShowUserNameInTitleBar;
+	BOOL					m_bShowPrivilegeLevelInTitleBar;
 	BOOL					m_bShowFilePreviews;
 	BOOL					m_bReplaceExplorerFileSystem;
 	BOOL					m_bOneClickActivate;
@@ -1440,6 +1441,8 @@ private:
 
 	/* TreeView middle click. */
 	HTREEITEM				m_hTVMButtonItem;
+
+	BOOL					m_bBlockNext;
 };
 
 #endif

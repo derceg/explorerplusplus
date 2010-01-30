@@ -1178,6 +1178,46 @@ BOOL GetProcessOwner(TCHAR *szOwner,DWORD BufSize)
 	return bReturn;
 }
 
+BOOL CheckGroupMembership(GroupType_t GroupType)
+{
+	SID_IDENTIFIER_AUTHORITY sia = SECURITY_NT_AUTHORITY;
+	PSID psid;
+	DWORD dwGroup;
+	BOOL bMember = FALSE;
+	BOOL bRet;
+
+	switch(GroupType)
+	{
+	case GROUP_ADMINISTRATORS:
+		dwGroup = DOMAIN_ALIAS_RID_ADMINS;
+		break;
+
+	case GROUP_POWERUSERS:
+		dwGroup = DOMAIN_ALIAS_RID_POWER_USERS;
+		break;
+
+	case GROUP_USERS:
+		dwGroup = DOMAIN_ALIAS_RID_USERS;
+		break;
+
+	case GROUP_USERSRESTRICTED:
+		dwGroup = DOMAIN_ALIAS_RID_GUESTS;
+		break;
+	}
+
+	bRet = AllocateAndInitializeSid(&sia,2,SECURITY_BUILTIN_DOMAIN_RID,
+		dwGroup,0,0,0,0,0,0,&psid);
+
+	if(bRet)
+	{
+		CheckTokenMembership(NULL,psid,&bMember);
+
+		FreeSid(psid);
+	}
+
+	return bMember;
+}
+
 struct LANGCODEPAGE
 {
     WORD wLanguage;
