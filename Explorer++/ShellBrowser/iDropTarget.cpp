@@ -18,6 +18,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Buffer.h"
 #include "../Helper/FileOperations.h"
+#include "../Helper/DropHandler.h"
 
 
 /* Scroll definitions. */
@@ -332,6 +333,38 @@ HRESULT _stdcall CFolderView::DragLeave(void)
 	return S_OK;
 }
 
+void CFolderView::OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt)
+{
+	list<PastedFile_t>::iterator itr;
+	DroppedFile_t DroppedFile;
+	POINT ptOrigin;
+	POINT LocalDropPoint;
+
+	/* Don't reposition the file if it was dropped
+	in a subfolder. */
+	if(!m_bOverFolder)
+	{
+		ListView_GetOrigin(m_hListView,&ptOrigin);
+
+		LocalDropPoint = *ppt;
+
+		ScreenToClient(m_hListView,(LPPOINT)&LocalDropPoint);
+
+		/* The location of each of the dropped items will be the same. */
+		DroppedFile.DropPoint.x = ptOrigin.x + LocalDropPoint.x;
+		DroppedFile.DropPoint.y = ptOrigin.y + LocalDropPoint.y;
+
+		for(itr = ppfl->begin();itr != ppfl->end();itr++)
+		{
+			StringCchCopy(DroppedFile.szFileName,
+				SIZEOF_ARRAY(DroppedFile.szFileName),itr->szFileName);
+			PathStripPath(DroppedFile.szFileName);
+
+			m_DroppedFileNameList.push_back(DroppedFile);
+		}
+	}
+}
+
 /*
 Causes any dragged files to be dropped in the current
 directory.
@@ -353,7 +386,6 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 {
 	FORMATETC		ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	FORMATETC		ftcFileDescriptor = {RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	FORMATETC		ftc;
 	STGMEDIUM		stg;
 	DROPFILES		*pdf = NULL;
 	POINT			pt;
@@ -361,6 +393,12 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	HRESULT			hr;
 	DWORD			dwEffect;
 	int				nDroppedFiles;
+
+	/* Need to remove the drag image before any files are copied/moved.
+	This is because a copy/replace dialog may need to shown (if there
+	is a collision), and the drag image no longer needs to be there.
+	The insertion mark may stay until the end. */
+	m_pDropTargetHelper->Drop(pDataObject,(POINT *)&pt,*pdwEffect);
 
 	pt.x = ptl.x;
 	pt.y = ptl.y;
@@ -384,64 +422,13 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 
 	szDestDirectory[lstrlen(szDestDirectory) + 1] = '\0';
 
-	if(pDataObject->QueryGetData(&ftcHDrop) == S_OK)
+	if(m_bDataAccept)
 	{
-		hr = pDataObject->GetData(&ftcHDrop,&stg);
-
-		if(hr == S_OK)
+		if(m_DragType == DRAG_TYPE_LEFTCLICK && m_bDragging && !m_bOverFolder)
 		{
-			/* Need to remove the drag image before any files are copied/moved.
-			This is because a copy/replace dialog may need to shown (if there
-			is a collision), and the drag image no longer needs to be there.
-			The insertion mark may stay until the end. */
-			m_pDropTargetHelper->Drop(pDataObject,(POINT *)&pt,*pdwEffect);
+			hr = pDataObject->GetData(&ftcHDrop,&stg);
 
-			if(m_DragType == DRAG_TYPE_RIGHTCLICK)
-			{
-				IShellFolder *pDesktop = NULL;
-				IShellFolder *pShellFolder = NULL;
-				IDropTarget *pDrop = NULL;
-				LPITEMIDLIST pidlDirectory = NULL;
-				DWORD dwe;
-
-				hr = GetIdlFromParsingName(szDestDirectory,&pidlDirectory);
-
-				if(SUCCEEDED(hr))
-				{
-					hr = SHGetDesktopFolder(&pDesktop);
-
-					if(SUCCEEDED(hr))
-					{
-						hr = pDesktop->BindToObject(pidlDirectory,0,IID_IShellFolder,(void **)&pShellFolder);
-
-						if(SUCCEEDED(hr))
-						{
-							dwe = *pdwEffect;
-
-							hr = pShellFolder->CreateViewObject(m_hListView,IID_IDropTarget,(void **)&pDrop);
-
-							if(SUCCEEDED(hr))
-							{
-								pDrop->DragEnter(pDataObject,MK_RBUTTON,ptl,&dwe);
-
-								dwe = *pdwEffect;
-								pDrop->Drop(pDataObject,grfKeyState,ptl,&dwe);
-
-								pDrop->DragLeave();
-
-								pDrop->Release();
-							}
-
-							pShellFolder->Release();
-						}
-
-						pDesktop->Release();
-					}
-
-					CoTaskMemFree(pidlDirectory);
-				}
-			}
-			else
+			if(hr == S_OK)
 			{
 				pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
 
@@ -450,218 +437,69 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 					/* Request a count of the number of files that have been dropped. */
 					nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
 
-					/* If a folder was dragged locally, and it is not over a folder,
-					reposition it. */
-					if(m_bDragging && !m_bOverFolder)
+					/* The drop effect will be the same for all files
+					that are been dragged locally. */
+					dwEffect = DetermineCurrentDragEffect(grfKeyState,*pdwEffect,
+						m_bDataAccept,m_bOnSameDrive);
+
+					if(dwEffect == DROPEFFECT_MOVE)
 					{
-						/* The drop effect will be the same for all files
-						that are been dragged locally. */
-						dwEffect = DetermineCurrentDragEffect(grfKeyState,*pdwEffect,
-							m_bDataAccept,m_bOnSameDrive);
+						POINT point;
 
-						if(dwEffect == DROPEFFECT_MOVE)
-						{
-							POINT point;
-
-							point.x = pt.x;
-							point.y = pt.y;
-							RepositionLocalFiles(&point);
-						}
-						else if(dwEffect == DROPEFFECT_COPY)
-						{
-							IBufferManager	*pbmCopy = NULL;
-							TCHAR			szFullFileName[MAX_PATH];
-							int				i = 0;
-
-							pbmCopy = new CBufferManager();
-
-							for(i = 0;i < nDroppedFiles;i++)
-							{
-								/* Determine the name of the dropped file. */
-								DragQueryFile((HDROP)pdf,i,szFullFileName,
-									SIZEOF_ARRAY(szFullFileName));
-
-								pbmCopy->WriteListEntry(szFullFileName);
-							}
-
-							CopyDroppedFilesInternal(pbmCopy,szDestDirectory,TRUE,TRUE);
-
-							pbmCopy->Release();
-						}
-						else if(dwEffect == DROPEFFECT_LINK)
-						{
-							CreateShortcutsToDroppedFiles(pdf,szDestDirectory,nDroppedFiles);
-						}
+						point.x = pt.x;
+						point.y = pt.y;
+						RepositionLocalFiles(&point);
 					}
-					else
+					else if(dwEffect == DROPEFFECT_COPY)
 					{
-						CopyDroppedFiles(pDataObject,pdf,(LPPOINT)&pt,
-							szDestDirectory,grfKeyState,pdwEffect);
-					}
+						IBufferManager	*pbmCopy = NULL;
+						TCHAR			szFullFileName[MAX_PATH];
+						int				i = 0;
 
-					GlobalUnlock(stg.hGlobal);
+						pbmCopy = new CBufferManager();
+
+						for(i = 0;i < nDroppedFiles;i++)
+						{
+							/* Determine the name of the dropped file. */
+							DragQueryFile((HDROP)pdf,i,szFullFileName,
+								SIZEOF_ARRAY(szFullFileName));
+
+							pbmCopy->WriteListEntry(szFullFileName);
+						}
+
+						CopyDroppedFilesInternal(pbmCopy,szDestDirectory,TRUE,TRUE);
+
+						pbmCopy->Release();
+					}
+					else if(dwEffect == DROPEFFECT_LINK)
+					{
+						CreateShortcutsToDroppedFiles(pdf,szDestDirectory,nDroppedFiles);
+					}
 				}
 			}
 		}
-	}
-	else if(pDataObject->QueryGetData(&ftcFileDescriptor) == S_OK)
-	{
-		FORMATETC ftcfchg;
-		FORMATETC ftcfcis;
-		STGMEDIUM stgFileContents;
-		HANDLE hFile;
-		FILETIME *pftCreationTime = NULL;
-		FILETIME *pftLastAccessTime = NULL;
-		FILETIME *pftLastWriteTime = NULL;
-		FILEGROUPDESCRIPTOR *pfgd = NULL;
-		TCHAR szFullFileName[MAX_PATH];
-		DWORD dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
-		DWORD nBytesToWrite = 0;
-		DWORD nBytesWritten;
-		LPBYTE pBuffer = NULL;
-		BOOL bDataRetrieved = FALSE;
-		unsigned int i = 0;
-
-		hr = pDataObject->GetData(&ftcFileDescriptor,&stg);
-
-		if(hr == S_OK)
+		else
 		{
-			pfgd = (FILEGROUPDESCRIPTOR *)GlobalLock(stg.hGlobal);
+			CDropHandler *pDropHandler = NULL;
 
-			if(pfgd != NULL)
-			{
-				for(i = 0;i < pfgd->cItems;i++)
-				{
-					if(pfgd->fgd[i].dwFlags & FD_ATTRIBUTES)
-					{
-						dwFileAttributes = pfgd->fgd[i].dwFileAttributes;
-					}
+			pDropHandler = new CDropHandler(pDataObject,
+				grfKeyState,ptl,pdwEffect,m_hListView,
+				m_DragType,szDestDirectory,this);
 
-					if(pfgd->fgd[i].dwFlags & FD_FILESIZE)
-					{
-						nBytesToWrite = pfgd->fgd[i].nFileSizeLow;
-					}
+			pDropHandler->Drop();
 
-					if(pfgd->fgd[i].dwFlags & FD_LINKUI)
-					{
-						/* TODO: Treat as shortcut... */
-					}
+			/* When dragging and dropping, any dropped items
+			will be selected, while any previously selected
+			items will be deselected. */
+			/* TODO: May need to modify this in case there
+			was an error with the drop (i.e. don't deselect current
+			files if nothing was actually copied/moved). */
+			if(!m_bOverFolder)
+				ListView_DeselectAllItems(m_hListView);
 
-					if(pfgd->fgd[i].dwFlags & FD_CREATETIME)
-					{
-						pftCreationTime = &pfgd->fgd[i].ftCreationTime;
-					}
-
-					if(pfgd->fgd[i].dwFlags & FD_ACCESSTIME)
-					{
-						pftLastAccessTime = &pfgd->fgd[i].ftLastAccessTime;
-					}
-
-					if(pfgd->fgd[i].dwFlags & FD_WRITESTIME)
-					{
-						pftLastWriteTime = &pfgd->fgd[i].ftLastWriteTime;
-					}
-
-					/*if(pfgd->fgd[i].dwFlags & FD_UNICODE)
-					{
-					}*/
-
-					ftcfchg.cfFormat	= RegisterClipboardFormat(CFSTR_FILECONTENTS);
-					ftcfchg.ptd			= NULL;
-					ftcfchg.dwAspect	= DVASPECT_CONTENT;
-					ftcfchg.lindex		= i;
-					ftcfchg.tymed		= TYMED_HGLOBAL;
-
-					ftcfcis.cfFormat	= RegisterClipboardFormat(CFSTR_FILECONTENTS);
-					ftcfcis.ptd			= NULL;
-					ftcfcis.dwAspect	= DVASPECT_CONTENT;
-					ftcfcis.lindex		= i;
-					ftcfcis.tymed		= TYMED_ISTREAM;
-
-					if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
-					{
-						hr = pDataObject->GetData(&ftcfchg,&stgFileContents);
-
-						if(hr == S_OK)
-						{
-							pBuffer = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
-
-							if(pBuffer != NULL)
-								bDataRetrieved = TRUE;
-						}
-					}
-					else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
-					{
-						IStream *pStream = NULL;
-						STATSTG sstg;
-						ULONG cbRead;
-
-						hr = pDataObject->GetData(&ftcfcis,&stgFileContents);
-
-						if(hr == S_OK)
-						{
-							hr = stgFileContents.pstm->Stat(&sstg,STATFLAG_NONAME);
-
-							if(hr == S_OK)
-							{
-								pBuffer = (LPBYTE)malloc(sstg.cbSize.LowPart * sizeof(BYTE));
-
-								if(pBuffer != NULL)
-								{
-									/* If the file size isn't explicitly given,
-									use the size of the stream. */
-									if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
-										nBytesToWrite = sstg.cbSize.LowPart;
-
-									stgFileContents.pstm->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
-
-									bDataRetrieved = TRUE;
-								}
-							}
-						}
-					}
-
-					if(bDataRetrieved)
-					{
-						StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),szDestDirectory);
-						PathAppend(szFullFileName,pfgd->fgd[i].cFileName);
-
-						hFile = CreateFile(szFullFileName,GENERIC_WRITE,0,NULL,
-							CREATE_ALWAYS,dwFileAttributes,NULL);
-
-						if(hFile != INVALID_HANDLE_VALUE)
-						{
-							SetFileTime(hFile,pftCreationTime,pftLastAccessTime,pftLastWriteTime);
-
-							WriteFile(hFile,pBuffer,nBytesToWrite,&nBytesWritten,NULL);
-
-							CloseHandle(hFile);
-						}
-
-						if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
-						{
-							if(pBuffer != NULL)
-							{
-								GlobalUnlock(stgFileContents.hGlobal);
-							}
-						}
-						else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
-						{
-							free(pBuffer);
-						}
-					}
-				}
-
-				GlobalUnlock(stg.hGlobal);
-			}
+			delete pDropHandler;
 		}
 	}
-
-	ftc.cfFormat	= CF_HDROP;
-	ftc.ptd			= NULL;
-	ftc.dwAspect	= DVASPECT_CONTENT;
-	ftc.lindex		= -1;
-	ftc.tymed		= TYMED_HGLOBAL;
 
 	if(m_bDeselectDropFolder)
 	{
@@ -892,84 +730,6 @@ void CFolderView::RepositionLocalFiles(POINT *ppt)
 	m_bPerformingDrag = FALSE;
 }
 
-void CFolderView::CopyDroppedFiles(IDataObject *pDataObject,
-DROPFILES *pdf,POINT *ppt,TCHAR *szDestDirectory,DWORD grfKeyState,
-DWORD *pdwEffect)
-{
-	IBufferManager	*pbmCopy = NULL;
-	IBufferManager	*pbmMove = NULL;
-	DroppedFile_t	DroppedFile;
-	POINT			ptOrigin;
-	POINT			LocalDropPoint;
-	TCHAR			szFullFileName[MAX_PATH];
-	DWORD			dwEffect;
-	BOOL			bOnSameDrive;
-	int				nDroppedFiles;
-	int				i = 0;
-
-	pbmCopy = new CBufferManager();
-	pbmMove = new CBufferManager();
-
-	nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
-
-	for(i = 0;i < nDroppedFiles;i++)
-	{
-		/* Determine the name of the dropped file. */
-		DragQueryFile((HDROP)pdf,i,szFullFileName,
-			SIZEOF_ARRAY(szFullFileName));
-
-		bOnSameDrive = CheckItemLocations(pDataObject,i);
-
-		dwEffect = DetermineCurrentDragEffect(grfKeyState,
-			*pdwEffect,m_bDataAccept,bOnSameDrive);
-
-		if(dwEffect == DROPEFFECT_MOVE)
-			pbmMove->WriteListEntry(szFullFileName);
-		else if(dwEffect == DROPEFFECT_COPY)
-			pbmCopy->WriteListEntry(szFullFileName);
-		else if(dwEffect == DROPEFFECT_LINK)
-			CreateShortcutToDroppedFile(szDestDirectory,szFullFileName);
-
-		/* Don't add the item to the list of files
-		to be selected if it was dragged over another
-		folder (i.e. it is not going into this folder
-		directly). */
-		if(!m_bOverFolder)
-		{
-			StringCchCopy(DroppedFile.szFileName,
-				SIZEOF_ARRAY(DroppedFile.szFileName),szFullFileName);
-			PathStripPath(DroppedFile.szFileName);
-
-			ListView_GetOrigin(m_hListView,&ptOrigin);
-
-			LocalDropPoint = *ppt;
-
-			ScreenToClient(m_hListView,(LPPOINT)&LocalDropPoint);
-
-			/* Store the coordinates of the dropped item. */
-			DroppedFile.DropPoint.x = ptOrigin.x + LocalDropPoint.x;
-			DroppedFile.DropPoint.y = ptOrigin.y + LocalDropPoint.y;
-
-			m_DroppedFileNameList.push_back(DroppedFile);
-		}
-	}
-
-	/* When dragging and dropping, any dropped items
-	will be selected, while any previously selected
-	items will be deselected. */
-	/* TODO: May need to modify this in case there
-	was an error with the drop (i.e. don't deselect current
-	files if nothing was actually copied/moved). */
-	if(!m_bOverFolder)
-		ListView_DeselectAllItems(m_hListView);
-
-	CopyDroppedFilesInternal(pbmCopy,szDestDirectory,TRUE,FALSE);
-	CopyDroppedFilesInternal(pbmMove,szDestDirectory,FALSE,FALSE);
-
-	pbmCopy->Release();
-	pbmMove->Release();
-}
-
 void CFolderView::CopyDroppedFilesInternal(IBufferManager *pbm,
 TCHAR *szDestDirectory,BOOL bCopy,BOOL bRenameOnCollision)
 {
@@ -986,8 +746,6 @@ TCHAR *szDestDirectory,BOOL bCopy,BOOL bRenameOnCollision)
 		if(szFileNameList != NULL)
 		{
 			pbm->QueryBuffer(szFileNameList,dwBufferSize);
-
-			m_bPositionDropItems = TRUE;
 
 			shfo.hwnd	= m_hOwner;
 			shfo.wFunc	= bCopy == TRUE ? FO_COPY : FO_MOVE;
@@ -1023,21 +781,6 @@ TCHAR *szDestDirectory,int nDroppedFiles)
 
 		CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
 	}
-}
-
-void CFolderView::CreateShortcutToDroppedFile(TCHAR *szDestDirectory,
-TCHAR *szFullFileName)
-{
-	TCHAR	szLink[MAX_PATH];
-	TCHAR	szFileName[MAX_PATH];
-
-	StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
-	PathStripPath(szFileName);
-	PathRenameExtension(szFileName,_T(".lnk"));
-	StringCchCopy(szLink,SIZEOF_ARRAY(szLink),szDestDirectory);
-	PathAppend(szLink,szFileName);
-
-	CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
 }
 
 void CFolderView::ScrollListViewFromCursor(HWND hListView,POINT *CursorPos)

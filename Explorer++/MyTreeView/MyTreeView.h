@@ -6,6 +6,7 @@
 #include <list>
 #include "../Helper/Buffer.h"
 #include "../Helper/iDirectoryMonitor.h"
+#include "../Helper/DropHandler.h"
 
 using namespace std;
 
@@ -60,12 +61,6 @@ public:
 
 private:
 
-	typedef enum
-	{
-		DRAG_TYPE_LEFTCLICK,
-		DRAG_TYPE_RIGHTCLICK
-	} DragTypes_t;
-
 	/* Message handlers. */
 	LRESULT CALLBACK	OnNotify(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 	LRESULT		OnSetCursor(void);
@@ -89,10 +84,6 @@ private:
 	void		RestoreState(void);
 	DWORD		GetCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,POINTL *ptl);
 	BOOL		CheckItemLocations(IDataObject *pDataObject,HTREEITEM hItem,int iDroppedItem);
-	void		CopyDroppedFiles(DROPFILES *pdf,POINT *ppt,TCHAR *szDestDirectory,DWORD grfKeyState,DWORD *pdwEffect);
-	void		CopyDroppedFilesInternal(IBufferManager *pbm,TCHAR *szDestDirectory,BOOL bCopy,BOOL bRenameOnCollision);
-	void		CreateShortcutsToDroppedFiles(DROPFILES *pdf,TCHAR *szDestDirectory,int nDroppedFiles);
-	void		CreateShortcutToDroppedFile(TCHAR *szDestDirectory,TCHAR *szFullFileName);
 	HRESULT		OnBeginDrag(int iItemId,DragTypes_t DragType);
 
 	/* Icon refresh. */

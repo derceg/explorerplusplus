@@ -953,7 +953,7 @@ BOOL CContainer::CanPaste(void)
 
 	hFocus = GetFocus();
 
-	bFilesOnClipboard = IsClipboardFormatAvailable(CF_HDROP);
+	bFilesOnClipboard = IsClipboardFormatAvailable(CF_HDROP) || IsClipboardFormatAvailable(RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR));
 	bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
 	if(hFocus == m_hActiveListView)

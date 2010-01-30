@@ -15,7 +15,6 @@
 #include "Helper.h"
 #include "FileOperations.h"
 #include "Buffer.h"
-#include "resource.h"
 
 
 using namespace Gdiplus;

@@ -12,9 +12,10 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "../Helper/Helper.h"
 #include "MyTreeView.h"
 #include "MyTreeViewInternal.h"
+#include "../Helper/Helper.h"
+#include "../Helper/DropHandler.h"
 
 
 #define MIN_X_POS	10
@@ -31,23 +32,20 @@ BOOL		g_bAllowScroll = FALSE;
 HRESULT _stdcall CMyTreeView::DragEnter(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
-	FORMATETC	ftc = {CF_HDROP,0,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	HRESULT		hr;
+	/* The two drop formats we support. */
+	FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC ftcFileDescriptor = {RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 
 	m_pDataObject = pDataObject;
 
 	m_bDragging = TRUE;
 
-	/* Check whether the drop source has the type of data (CF_HDROP)
+	/* Check whether the drop source has the type of data
 	that is needed for this drag operation. */
-	hr = pDataObject->QueryGetData(&ftc);
-
-	/* DON'T use SUCCEEDED (QueryGetData() will return S_FALSE on
-	failure). */
-	if(hr == S_OK)
+	if(pDataObject->QueryGetData(&ftcHDrop) == S_OK ||
+		pDataObject->QueryGetData(&ftcFileDescriptor) == S_OK)
 	{
-		/* The clipboard contains data that we can copy/move. */
-		m_bDataAccept	= TRUE;
+		m_bDataAccept = TRUE;
 
 		GetCurrentDragEffect(grfKeyState,*pdwEffect,&pt);
 	}
@@ -244,13 +242,10 @@ HRESULT _stdcall CMyTreeView::DragLeave(void)
 HRESULT _stdcall CMyTreeView::Drop(IDataObject *pDataObject,DWORD grfKeyState,
 POINTL pt,DWORD *pdwEffect)
 {
-	FORMATETC		ftc;
-	STGMEDIUM		stg;
 	TVHITTESTINFO	tvht;
 	LPITEMIDLIST	pidlDirectory = NULL;
 	DROPFILES		*pdf = NULL;
 	TCHAR			szDestDirectory[MAX_PATH + 1];
-	HRESULT			hr;
 
 	KillTimer(m_hTreeView,DRAGEXPAND_TIMER_ID);
 
@@ -261,86 +256,22 @@ POINTL pt,DWORD *pdwEffect)
 	TreeView_HitTest(m_hTreeView,&tvht);
 
 	/* Is the mouse actually over an item? */
-	if(!(tvht.flags & LVHT_NOWHERE) && (tvht.hItem != NULL))
+	if(!(tvht.flags & LVHT_NOWHERE) && (tvht.hItem != NULL) && m_bDataAccept)
 	{
-		/* The mouse is over an item, so drop the file
-		into the selected folder (if possible). */
-		ftc.cfFormat	= CF_HDROP;
-		ftc.ptd			= NULL;
-		ftc.dwAspect	= DVASPECT_CONTENT;
-		ftc.lindex		= -1;
-		ftc.tymed		= TYMED_HGLOBAL;
+		CDropHandler *pDropHandler = NULL;
 
-		/* Does the dropped object contain the type of
-		data we need? */
-		hr = pDataObject->GetData(&ftc,&stg);
+		pidlDirectory = BuildPath(tvht.hItem);
 
-		if(hr == S_OK)
-		{
-			if(m_DragType == DRAG_TYPE_RIGHTCLICK)
-			{
-				IShellFolder *pDesktop = NULL;
-				IShellFolder *pShellFolder = NULL;
-				IDropTarget *pDrop = NULL;
-				DWORD dwe;
+		GetDisplayName(pidlDirectory,szDestDirectory,SHGDN_FORPARSING);
 
-				pidlDirectory = BuildPath(tvht.hItem);
+		pDropHandler = new CDropHandler(pDataObject,
+			grfKeyState,pt,pdwEffect,m_hTreeView,
+			m_DragType,szDestDirectory,NULL);
 
-				hr = SHGetDesktopFolder(&pDesktop);
+		pDropHandler->Drop();
 
-				if(SUCCEEDED(hr))
-				{
-					hr = pDesktop->BindToObject(pidlDirectory,0,IID_IShellFolder,(void **)&pShellFolder);
-
-					if(SUCCEEDED(hr))
-					{
-						dwe = *pdwEffect;
-
-						hr = pShellFolder->CreateViewObject(m_hTreeView,IID_IDropTarget,(void **)&pDrop);
-
-						if(SUCCEEDED(hr))
-						{
-							pDrop->DragEnter(pDataObject,MK_RBUTTON,pt,&dwe);
-
-							dwe = *pdwEffect;
-							pDrop->Drop(pDataObject,grfKeyState,pt,&dwe);
-
-							pDrop->DragLeave();
-
-							pDrop->Release();
-						}
-
-						pShellFolder->Release();
-					}
-
-					pDesktop->Release();
-
-					CoTaskMemFree(pidlDirectory);
-				}
-			}
-			else
-			{
-				pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
-
-				if(pdf != NULL)
-				{
-					pidlDirectory = BuildPath(tvht.hItem);
-
-					GetDisplayName(pidlDirectory,szDestDirectory,SHGDN_FORPARSING);
-
-					CoTaskMemFree(pidlDirectory);
-
-					szDestDirectory[lstrlen(szDestDirectory) + 1] = '\0';
-
-					ScreenToClient(m_hTreeView,(LPPOINT)&pt);
-
-					CopyDroppedFiles(pdf,(LPPOINT)&pt,
-						szDestDirectory,grfKeyState,pdwEffect);
-
-					GlobalUnlock(stg.hGlobal);
-				}
-			}
-		}
+		delete pDropHandler;
+		CoTaskMemFree(pidlDirectory);
 	}
 
 	RestoreState();
@@ -348,117 +279,6 @@ POINTL pt,DWORD *pdwEffect)
 	m_pDropTargetHelper->Drop(pDataObject,(POINT *)&pt,*pdwEffect);
 
 	return S_OK;
-}
-
-void CMyTreeView::CopyDroppedFiles(DROPFILES *pdf,POINT *ppt,
-TCHAR *szDestDirectory,DWORD grfKeyState,DWORD *pdwEffect)
-{
-	IBufferManager	*pbmCopy = NULL;
-	IBufferManager	*pbmMove = NULL;
-	TCHAR			szFullFileName[MAX_PATH];
-	DWORD			dwEffect;
-	int				nDroppedFiles;
-	int				i = 0;
-
-	pbmCopy = new CBufferManager();
-	pbmMove = new CBufferManager();
-
-	nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
-
-	for(i = 0;i < nDroppedFiles;i++)
-	{
-		/* Determine the name of the dropped file. */
-		DragQueryFile((HDROP)pdf,i,szFullFileName,
-			SIZEOF_ARRAY(szFullFileName));
-
-		POINTL ptl;
-
-		ptl.x = ppt->x;
-		ptl.y = ppt->y;
-
-		dwEffect = GetCurrentDragEffect(grfKeyState,*pdwEffect,&ptl);
-
-		if(dwEffect == DROPEFFECT_MOVE)
-			pbmMove->WriteListEntry(szFullFileName);
-		else if(dwEffect == DROPEFFECT_COPY)
-			pbmCopy->WriteListEntry(szFullFileName);
-		else if(dwEffect == DROPEFFECT_LINK)
-			CreateShortcutToDroppedFile(szDestDirectory,szFullFileName);
-	}
-
-	CopyDroppedFilesInternal(pbmCopy,szDestDirectory,TRUE,FALSE);
-	CopyDroppedFilesInternal(pbmMove,szDestDirectory,FALSE,FALSE);
-
-	pbmCopy->Release();
-	pbmMove->Release();
-}
-
-void CMyTreeView::CopyDroppedFilesInternal(IBufferManager *pbm,
-TCHAR *szDestDirectory,BOOL bCopy,BOOL bRenameOnCollision)
-{
-	SHFILEOPSTRUCT	shfo;
-	TCHAR			*szFileNameList = NULL;
-	DWORD			dwBufferSize;
-
-	pbm->QueryBufferSize(&dwBufferSize);
-
-	if(dwBufferSize > 1)
-	{
-		szFileNameList = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
-
-		if(szFileNameList != NULL)
-		{
-			pbm->QueryBuffer(szFileNameList,dwBufferSize);
-
-			shfo.hwnd	= m_hParent;
-			shfo.wFunc	= bCopy == TRUE ? FO_COPY : FO_MOVE;
-			shfo.pFrom	= szFileNameList;
-			shfo.pTo	= szDestDirectory;
-			shfo.fFlags	= bRenameOnCollision == TRUE ? FOF_RENAMEONCOLLISION : 0;
-			SHFileOperation(&shfo);
-
-			free(szFileNameList);
-		}
-	}
-}
-
-void CMyTreeView::CreateShortcutsToDroppedFiles(DROPFILES *pdf,
-TCHAR *szDestDirectory,int nDroppedFiles)
-{
-	TCHAR	szFullFileName[MAX_PATH];
-	TCHAR	szLink[MAX_PATH];
-	TCHAR	szFileName[MAX_PATH];
-	int		i = 0;
-
-	for(i = 0;i < nDroppedFiles;i++)
-	{
-		/* Determine the name of the dropped file. */
-		DragQueryFile((HDROP)pdf,i,szFullFileName,
-			SIZEOF_ARRAY(szFullFileName));
-
-		StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
-		PathStripPath(szFileName);
-		PathRenameExtension(szFileName,_T(".lnk"));
-		StringCchCopy(szLink,SIZEOF_ARRAY(szLink),szDestDirectory);
-		PathAppend(szLink,szFileName);
-
-		CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
-	}
-}
-
-void CMyTreeView::CreateShortcutToDroppedFile(TCHAR *szDestDirectory,
-TCHAR *szFullFileName)
-{
-	TCHAR	szLink[MAX_PATH];
-	TCHAR	szFileName[MAX_PATH];
-
-	StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
-	PathStripPath(szFileName);
-	PathRenameExtension(szFileName,_T(".lnk"));
-	StringCchCopy(szLink,SIZEOF_ARRAY(szLink),szDestDirectory);
-	PathAppend(szLink,szFileName);
-
-	CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
 }
 
 void CMyTreeView::RestoreState(void)

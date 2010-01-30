@@ -7,6 +7,7 @@
 #include "../Helper/Buffer.h"
 #include "../Helper/Helper.h"
 #include "../Helper/FileOperations.h"
+#include "../Helper/DropHandler.h"
 
 using namespace Gdiplus;
 
@@ -230,7 +231,7 @@ int CALLBACK SortByPrinterLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lPar
 int CALLBACK SortByNetworkAdapterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 
 class CFolderView :  public MyIFolderView2, public MyIShellView3, public IShellBrowser2,
-public IShellFolder3, public IDropTarget
+public IShellFolder3, public IDropTarget, public IDropFilesCallback
 {
 public:
 
@@ -560,13 +561,12 @@ private:
 	DWORD				CheckItemLocations(IDataObject *pDataObject,int iDroppedItem);
 	void				HandleDragSelection(POINT *ppt);
 	void				CreateShortcutsToDroppedFiles(DROPFILES *pdf,TCHAR *szDestDirectory,int nDroppedFiles);
-	void				CreateShortcutToDroppedFile(TCHAR *szDestDirectory,TCHAR *szFullFileName);
-	void				CopyDroppedFiles(IDataObject *pDataObject,DROPFILES *pdf,POINT *ppt,TCHAR *szDestDirectory,DWORD grfKeyState,DWORD *pdwEffect);
 	void				CopyDroppedFilesInternal(IBufferManager *pbm,TCHAR *szDestDirectory,BOOL bCopy,BOOL bRenameOnCollision);
 	void				RepositionLocalFiles(POINT *ppt);
 	void				ScrollListViewFromCursor(HWND hListView,POINT *CursorPos);
 	void				PositionDroppedItems(void);
 	BOOL				QueryDragging(void);
+	void				OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt);
 
 	/* Miscellaneous. */
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL);
@@ -633,7 +633,6 @@ private:
 	UINT				m_ViewMode;
 	BOOL				m_bVirtualFolder;
 	BOOL				m_bFolderVisited;
-	BOOL				m_bPositionDropItems;
 	BOOL				m_bCurrentFolderRenamed;
 	BOOL				m_bShowGridlines;
 	BOOL				m_bFolderChanging;

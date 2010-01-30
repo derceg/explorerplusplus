@@ -393,9 +393,11 @@ void *pData)
 	PastedFile_t	PastedFile;
 	list<PastedFile_t>	*pPastedFileList = NULL;
 	FORMATETC		ftc;
+	FORMATETC		ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC		ftcFileDescriptor = {RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	STGMEDIUM		stg0;
 	STGMEDIUM		stg1;
-	HRESULT			hResult;
+	HRESULT			hr;
 	DROPFILES		*pdf = NULL;
 	DWORD			*pdwEffect = NULL;
 	TCHAR			*FileNameList = NULL;
@@ -410,103 +412,110 @@ void *pData)
 
 	SetCursor(LoadCursor(NULL,IDC_WAIT));
 
-	hResult = OleGetClipboard(&ClipboardObject);
+	hr = OleGetClipboard(&ClipboardObject);
 
-	if(hResult != S_OK)
+	if(hr != S_OK)
 		return;
 
-	ftc.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
-	ftc.ptd			= NULL;
-	ftc.dwAspect	= DVASPECT_CONTENT;
-	ftc.lindex		= -1;
-	ftc.tymed		= TYMED_HGLOBAL;
-
-	hResult = ClipboardObject->GetData(&ftc,&stg0);
-	
-	if(hResult == S_OK)
+	if(ClipboardObject->QueryGetData(&ftcHDrop) == S_OK)
 	{
-		pdwEffect = (DWORD *)GlobalLock(stg0.hGlobal);
+		ftc.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
+		ftc.ptd			= NULL;
+		ftc.dwAspect	= DVASPECT_CONTENT;
+		ftc.lindex		= -1;
+		ftc.tymed		= TYMED_HGLOBAL;
 
-		if(pdwEffect != NULL)
+		hr = ClipboardObject->GetData(&ftc,&stg0);
+
+		if(hr == S_OK)
 		{
-			ftc.cfFormat	= CF_HDROP;
-			ClipboardObject->GetData(&ftc,&stg1);
+			pdwEffect = (DWORD *)GlobalLock(stg0.hGlobal);
 
-			pdf = (DROPFILES *)GlobalLock(stg1.hGlobal);
-
-			if(pdf != NULL)
+			if(pdwEffect != NULL)
 			{
-				NumberOfFilesDropped = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,0);
+				ftc.cfFormat	= CF_HDROP;
+				ClipboardObject->GetData(&ftc,&stg1);
 
-				bCopy = (*pdwEffect & DROPEFFECT_COPY) == DROPEFFECT_COPY;
-				bMove = (*pdwEffect & DROPEFFECT_MOVE) == DROPEFFECT_MOVE;
+				pdf = (DROPFILES *)GlobalLock(stg1.hGlobal);
 
-				pBufferManager = new CBufferManager();
-
-				pPastedFileList = new list<PastedFile_t>;
-
-				for(i = 0;i < NumberOfFilesDropped;i++)
+				if(pdf != NULL)
 				{
-					DragQueryFile((HDROP)pdf,i,OldFileName,SIZEOF_ARRAY(OldFileName));
+					NumberOfFilesDropped = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,0);
 
-					if(i == 0)
+					bCopy = (*pdwEffect & DROPEFFECT_COPY) == DROPEFFECT_COPY;
+					bMove = (*pdwEffect & DROPEFFECT_MOVE) == DROPEFFECT_MOVE;
+
+					pBufferManager = new CBufferManager();
+
+					pPastedFileList = new list<PastedFile_t>;
+
+					for(i = 0;i < NumberOfFilesDropped;i++)
 					{
-						StringCchCopy(szSource,SIZEOF_ARRAY(szSource),OldFileName);
-						PathRemoveFileSpec(szSource);
+						DragQueryFile((HDROP)pdf,i,OldFileName,SIZEOF_ARRAY(OldFileName));
+
+						if(i == 0)
+						{
+							StringCchCopy(szSource,SIZEOF_ARRAY(szSource),OldFileName);
+							PathRemoveFileSpec(szSource);
+						}
+
+						pBufferManager->WriteListEntry(OldFileName);
+
+						StringCchCopy(PastedFile.szFileName,SIZEOF_ARRAY(PastedFile.szFileName),
+							OldFileName);
+						PathStripPath(PastedFile.szFileName);
+						pPastedFileList->push_back(PastedFile);
 					}
 
-					pBufferManager->WriteListEntry(OldFileName);
+					pBufferManager->QueryBufferSize(&dwBufferSize);
+					FileNameList = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
+					szDestDirectory = (TCHAR *)malloc((MAX_PATH + 1) * sizeof(TCHAR));
 
-					StringCchCopy(PastedFile.szFileName,SIZEOF_ARRAY(PastedFile.szFileName),
-						OldFileName);
-					PathStripPath(PastedFile.szFileName);
-					pPastedFileList->push_back(PastedFile);
-				}
-
-				pBufferManager->QueryBufferSize(&dwBufferSize);
-				FileNameList = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
-				szDestDirectory = (TCHAR *)malloc((MAX_PATH + 1) * sizeof(TCHAR));
-
-				if(FileNameList != NULL && szDestDirectory != NULL)
-				{
-					pBufferManager->QueryBuffer(FileNameList,dwBufferSize);
-					StringCchCopy(szDestDirectory,MAX_PATH,Directory);
-					szDestDirectory[lstrlen(szDestDirectory) + 1] = '\0';
-
-					ppfi = (PastedFilesInfo_t *)malloc(sizeof(PastedFilesInfo_t));
-
-					if(ppfi != NULL)
+					if(FileNameList != NULL && szDestDirectory != NULL)
 					{
-						if(bCopy)
-							ppfi->shfo.wFunc	= FO_COPY;
-						else if(bMove)
-							ppfi->shfo.wFunc	= FO_MOVE;
+						pBufferManager->QueryBuffer(FileNameList,dwBufferSize);
+						StringCchCopy(szDestDirectory,MAX_PATH,Directory);
+						szDestDirectory[lstrlen(szDestDirectory) + 1] = '\0';
 
-						ppfi->shfo.hwnd		= hwnd;
-						ppfi->shfo.pFrom	= FileNameList;
-						ppfi->shfo.pTo		= szDestDirectory;
-						ppfi->shfo.fFlags	= FOF_WANTMAPPINGHANDLE;
+						ppfi = (PastedFilesInfo_t *)malloc(sizeof(PastedFilesInfo_t));
 
-						if(lstrcmpi(szSource,Directory) == 0)
-							ppfi->shfo.fFlags |= FOF_RENAMEONCOLLISION;
+						if(ppfi != NULL)
+						{
+							if(bCopy)
+								ppfi->shfo.wFunc	= FO_COPY;
+							else if(bMove)
+								ppfi->shfo.wFunc	= FO_MOVE;
 
-						ppfi->PasteFilesCallback	= PasteFilesCallback;
-						ppfi->pData					= pData;
-						ppfi->pPastedFileList		= pPastedFileList;
+							ppfi->shfo.hwnd		= hwnd;
+							ppfi->shfo.pFrom	= FileNameList;
+							ppfi->shfo.pTo		= szDestDirectory;
+							ppfi->shfo.fFlags	= FOF_WANTMAPPINGHANDLE;
 
-						/* The actual files will be pasted in a background thread. */
-						HANDLE hThread;
-						hThread = CreateThread(NULL,0,PasteFilesThread,ppfi,0,NULL);
-						CloseHandle(hThread);
+							if(lstrcmpi(szSource,Directory) == 0)
+								ppfi->shfo.fFlags |= FOF_RENAMEONCOLLISION;
+
+							ppfi->PasteFilesCallback	= PasteFilesCallback;
+							ppfi->pData					= pData;
+							ppfi->pPastedFileList		= pPastedFileList;
+
+							/* The actual files will be pasted in a background thread. */
+							HANDLE hThread;
+							hThread = CreateThread(NULL,0,PasteFilesThread,ppfi,0,NULL);
+							CloseHandle(hThread);
+						}
 					}
+
+					pBufferManager->Release();
+
+					GlobalUnlock(stg1.hGlobal);
 				}
-
-				pBufferManager->Release();
-
-				GlobalUnlock(stg1.hGlobal);
+				GlobalUnlock(stg0.hGlobal);
 			}
-			GlobalUnlock(stg0.hGlobal);
 		}
+	}
+	else if(ClipboardObject->QueryGetData(&ftcFileDescriptor) == S_OK)
+	{
+
 	}
 
 	SetCursor(LoadCursor(NULL,IDC_ARROW));

@@ -489,6 +489,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DropHandler.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FileOperations.c"
 				>
 				<FileConfiguration
@@ -692,6 +696,10 @@
 			</File>
 			<File
 				RelativePath=".\CustomMenu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DropHandler.h"
 				>
 			</File>
 			<File

@@ -7,12 +7,6 @@ typedef enum
 	OVERWRITE_THREEPASS	= 2
 } OVERWRITE_METHODS;
 
-typedef enum
-{
-	DRAG_TYPE_LEFTCLICK,
-	DRAG_TYPE_RIGHTCLICK
-} DragTypes_t;
-
 /* Renaming. */
 int		RenameFile(TCHAR *NewFileName,TCHAR *OldFileName);
 
