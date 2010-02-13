@@ -429,8 +429,8 @@ HTREEITEM hParent)
 
 						pidlComplete = ILCombine(pidlDirectory,rgelt);
 
-						SHGetFileInfo((LPTSTR)pidlComplete,NULL,
-							&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
+						SHGetFileInfo((LPTSTR)pidlComplete, NULL, &shfi, sizeof(shfi), SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
+						int iOverlay = (shfi.iIcon >> 24);
 
 						hr = GetDisplayName(pidlComplete,szDirectory,SHGDN_FORPARSING);
 
@@ -438,6 +438,13 @@ HTREEITEM hParent)
 						m_pItemInfo[iItemId].pidl = ILClone(pidlComplete);
 
 						ItemMask = TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_CHILDREN;
+
+						if(iOverlay)
+						{
+							ItemMask |= TVIF_STATE;
+							tvItem.state			= INDEXTOOVERLAYMASK(iOverlay);
+							tvItem.stateMask		= TVIS_OVERLAYMASK;
+						}
 
 						tvItem.mask				= ItemMask;
 						tvItem.pszText			= ItemName;
