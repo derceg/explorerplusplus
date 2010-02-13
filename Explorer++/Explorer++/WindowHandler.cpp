@@ -58,6 +58,7 @@ void CContainer::CreateFolderControls(void)
 	SetWindowSubclass(m_hHolder,TreeViewHolderProcStub,0,(DWORD_PTR)this);
 
 	m_hTreeView = CreateTreeView(m_hHolder,TreeViewStyles);
+	TreeView_SetItemHeight(m_hTreeView, TreeView_GetItemHeight(m_hTreeView) + 3);
 
 	SetWindowTheme(m_hTreeView,L"Explorer",NULL);
 
