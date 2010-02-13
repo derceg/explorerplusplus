@@ -762,7 +762,7 @@ HTREEITEM CMyTreeView::DetermineItemSortedPosition(HTREEITEM hParent,TCHAR *szIt
 			file or folder. */
 			if(!PathIsRoot(szFullItemPath) && ((Attributes & SFGAO_FILESYSTEM) != SFGAO_FILESYSTEM))
 			{
-				if(lstrcmp(szItem,szFullItemPath) < 0)
+				if(lstrcmpi(szItem,szFullItemPath) < 0)
 				{
 					htInsertAfter = hPreviousItem;
 				}
@@ -771,7 +771,7 @@ HTREEITEM CMyTreeView::DetermineItemSortedPosition(HTREEITEM hParent,TCHAR *szIt
 			hPreviousItem = htItem;
 			htItem = TreeView_GetNextSibling(m_hTreeView,htItem);
 
-			if(htItem == NULL)
+			if((htItem == NULL) && !htInsertAfter)
 			{
 				htInsertAfter = TVI_LAST;
 			}
