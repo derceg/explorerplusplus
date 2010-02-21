@@ -316,7 +316,7 @@ void CContainer::SetDefaultValues(void)
 	m_bShowUserNameInTitleBar		= FALSE;
 	m_bShowPrivilegeLevelInTitleBar	= FALSE;
 	m_bShowFilePreviews				= TRUE;
-	m_bReplaceExplorerFileSystem	= FALSE;
+	m_ReplaceExplorerMode			= REPLACEEXPLORER_NONE;
 	m_bOneClickActivate				= FALSE;
 	m_bAllowMultipleInstances		= TRUE;
 	m_bForceSameTabWidth			= FALSE;
@@ -2278,9 +2278,7 @@ BOOL ProcessCommandLine(TCHAR *pCommandLine)
 	list<TabDirectory_t>::iterator	itr;
 	TabDirectory_t					TabDirectory;
 	TCHAR							szPath[MAX_PATH];
-	TCHAR							szVirtualParsingPath[MAX_PATH];
 	TCHAR							*pszCommandLine = NULL;
-	HRESULT							hr;
 	BOOL							bSeenHelpRequest = FALSE;
 
 	g_TabDirs.clear();
@@ -2316,7 +2314,7 @@ BOOL ProcessCommandLine(TCHAR *pCommandLine)
 		{
 			BOOL bSuccess;
 
-			bSuccess = RemoveAsDefaultFileManager();
+			bSuccess = RemoveAsDefaultFileManagerFileSystem();
 
 			/* Language hasn't been fully specified at this point, so
 			can't load success/error message from language dll. Simply show
@@ -2336,7 +2334,7 @@ ensure you have administrator privileges."),WINDOW_NAME,MB_ICONWARNING|MB_OK);
 		{
 			BOOL bSuccess;
 
-			bSuccess = SetAsDefaultFileManager();
+			bSuccess = SetAsDefaultFileManagerFileSystem();
 
 			if(bSuccess)
 			{
@@ -2351,25 +2349,16 @@ ensure you have administrator privileges."),WINDOW_NAME,MB_ICONWARNING|MB_OK);
 		}
 		else
 		{
-			/* Check if the path is virtual or real. */
-			hr = DecodeFriendlyPath(szPath,szVirtualParsingPath);
+			TCHAR szParsingPath[MAX_PATH];
+			TCHAR szCurrentDirectory[MAX_PATH];
 
-			if(SUCCEEDED(hr))
-			{
-				/* Virtual Path - e.g. My Computer,
-				Control Panel, etc. */
-				StringCchCopy(TabDirectory.Dir,MAX_PATH,szVirtualParsingPath);
-			}
-			else
-			{
-				/* Real Path. */
-				StringCchCopy(TabDirectory.Dir,MAX_PATH,szPath);
+			GetCurrentProcessImageName(szCurrentDirectory,
+				SIZEOF_ARRAY(szCurrentDirectory));
+			PathRemoveFileSpec(szCurrentDirectory);
 
-				if(lstrcmp(TabDirectory.Dir,_T(".")) != 0 &&
-					lstrcmp(TabDirectory.Dir,_T("..")) != 0)
-					PathAddBackslash(TabDirectory.Dir);
-			}
+			DecodePath(szPath,szCurrentDirectory,szParsingPath,SIZEOF_ARRAY(szParsingPath));
 
+			StringCchCopy(TabDirectory.Dir,SIZEOF_ARRAY(TabDirectory.Dir),szParsingPath);
 			g_TabDirs.push_back(TabDirectory);
 		}
 	}

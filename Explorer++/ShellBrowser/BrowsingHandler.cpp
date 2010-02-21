@@ -51,6 +51,11 @@ HRESULT CFolderView::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	pidl = ILClone(pidlDirectory);
 
+	if(m_bFolderVisited)
+	{
+		SaveColumnWidths();
+	}
+
 	/* The path may not be absolute, in which case it will
 	need to be completed. */
 	hr = ParsePath(&pidl,wFlags,&StoreHistory);
@@ -89,7 +94,6 @@ HRESULT CFolderView::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	if(m_bFolderVisited)
 	{
-		SaveColumnWidths();
 		ResetFolderMemoryAllocations();
 	}
 

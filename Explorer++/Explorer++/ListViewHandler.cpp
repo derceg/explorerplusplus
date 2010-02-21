@@ -13,8 +13,9 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <uxtheme.h>
+//#include <uxtheme.h>
 #include "Explorer++.h"
+#include "../Helper/DropHandler.h"
 
 
 LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -1809,6 +1810,20 @@ void CContainer::OnListViewPaste(void)
 	/* Also, the string must be double NULL terminated. */
 	szDestination[lstrlen(szDestination) + 1] = '\0';
 
-	PasteFilesFromClipboard(m_hContainer,
-		szDestination,FALSE,PasteFilesCallback,(void *)this);
+	/*PasteFilesFromClipboard(m_hContainer,
+		szDestination,FALSE,PasteFilesCallback,(void *)this);*/
+
+	IDataObject *pClipboardObject = NULL;
+	IClipboardHandler *pClipboardHandler = NULL;
+	HRESULT hr;
+
+	hr = OleGetClipboard(&pClipboardObject);
+
+	if(hr != S_OK)
+		return;
+
+	pClipboardHandler = new CDropHandler();
+
+	pClipboardHandler->CopyClipboardData(pClipboardObject,
+		m_hContainer,szDestination,NULL);
 }

@@ -31,52 +31,16 @@ Basic procedure:
 */
 void CContainer::OnAddressBarGo(void)
 {
-	TCHAR			szPath[MAX_PATH];
-	TCHAR			szFullFilePath[MAX_PATH];
-	TCHAR			szExpandedPath[MAX_PATH];
-	TCHAR			szCanonicalPath[MAX_PATH];
-	BOOL			bRelative;
-	BOOL			bRet;
+	TCHAR szPath[MAX_PATH];
+	TCHAR szFullFilePath[MAX_PATH];
+	TCHAR szCurrentDirectory[MAX_PATH];
 
 	/* Retrieve the combobox text, and determine if it is a
 	valid path. */
 	SendMessage(m_hAddressBar,WM_GETTEXT,SIZEOF_ARRAY(szPath),(LPARAM)szPath);
 
-	/* Attempt to expand the path (in the event that
-	it contains embedded environment variables). */
-	bRet = MyExpandEnvironmentStrings(szPath,
-		szExpandedPath,SIZEOF_ARRAY(szExpandedPath));
-
-	if(!bRet)
-	{
-		StringCchCopy(szExpandedPath,
-			SIZEOF_ARRAY(szExpandedPath),szPath);
-	}
-
-	/* Canonicalizing the path will remove any "." and
-	".." components. */
-	PathCanonicalize(szCanonicalPath,szExpandedPath);
-
-	if(PathIsURL(szCanonicalPath))
-	{
-		StringCchCopy(szFullFilePath,SIZEOF_ARRAY(szFullFilePath),szCanonicalPath);
-	}
-	else
-	{
-		bRelative = PathIsRelative(szCanonicalPath);
-
-		/* If the path is relative, prepend it
-		with the current directory. */
-		if(bRelative)
-		{
-			m_pActiveShellBrowser->QueryCurrentDirectory(MAX_PATH,szFullFilePath);
-			PathAppend(szFullFilePath,szCanonicalPath);
-		}
-		else
-		{
-			StringCchCopy(szFullFilePath,SIZEOF_ARRAY(szFullFilePath),szCanonicalPath);
-		}
-	}
+	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),szCurrentDirectory);
+	DecodePath(szPath,szCurrentDirectory,szFullFilePath,SIZEOF_ARRAY(szFullFilePath));
 
 	OpenItem(szFullFilePath,FALSE);
 }

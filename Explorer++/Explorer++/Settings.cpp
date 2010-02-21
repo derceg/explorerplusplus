@@ -62,7 +62,7 @@ LONG CContainer::SaveSettings(void)
 		SaveDwordToRegistry(hSettingsKey,_T("ExtendTabControl"),m_bExtendTabControl);
 		SaveDwordToRegistry(hSettingsKey,_T("UseFullRowSelect"),m_bUseFullRowSelect);
 		SaveDwordToRegistry(hSettingsKey,_T("ShowFilePreviews"),m_bShowFilePreviews);
-		SaveDwordToRegistry(hSettingsKey,_T("ReplaceExplorerFileSystem"),m_bReplaceExplorerFileSystem);
+		SaveDwordToRegistry(hSettingsKey,_T("ReplaceExplorerMode"),m_ReplaceExplorerMode);
 		SaveDwordToRegistry(hSettingsKey,_T("ShowUserNameTitleBar"),m_bShowUserNameInTitleBar);
 		SaveDwordToRegistry(hSettingsKey,_T("AllowMultipleInstances"),m_bAllowMultipleInstances);
 		SaveDwordToRegistry(hSettingsKey,_T("OneClickActivate"),m_bOneClickActivate);
@@ -168,7 +168,7 @@ LONG CContainer::LoadSettings(LPCTSTR KeyPath)
 		ReadDwordFromRegistry(hSettingsKey,_T("ExtendTabControl"),(LPDWORD)&m_bExtendTabControl);
 		ReadDwordFromRegistry(hSettingsKey,_T("UseFullRowSelect"),(LPDWORD)&m_bUseFullRowSelect);
 		ReadDwordFromRegistry(hSettingsKey,_T("ShowFilePreviews"),(LPDWORD)&m_bShowFilePreviews);
-		ReadDwordFromRegistry(hSettingsKey,_T("ReplaceExplorerFileSystem"),(LPDWORD)&m_bReplaceExplorerFileSystem);
+		ReadDwordFromRegistry(hSettingsKey,_T("ReplaceExplorerMode"),(LPDWORD)&m_ReplaceExplorerMode);
 		ReadDwordFromRegistry(hSettingsKey,_T("ShowUserNameTitleBar"),(LPDWORD)&m_bShowUserNameInTitleBar);
 		ReadDwordFromRegistry(hSettingsKey,_T("AllowMultipleInstances"),(LPDWORD)&m_bAllowMultipleInstances);
 		ReadDwordFromRegistry(hSettingsKey,_T("OneClickActivate"),(LPDWORD)&m_bOneClickActivate);

@@ -1221,12 +1221,12 @@ private:
 	BOOL					m_bShowUserNameInTitleBar;
 	BOOL					m_bShowPrivilegeLevelInTitleBar;
 	BOOL					m_bShowFilePreviews;
-	BOOL					m_bReplaceExplorerFileSystem;
 	BOOL					m_bOneClickActivate;
 	BOOL					m_bAllowMultipleInstances;
 	BOOL					m_bForceSameTabWidth;
 	BOOL					m_bDoubleClickTabClose;
 	UINT					m_StartupMode;
+	UINT					m_ReplaceExplorerMode;
 	BOOL					m_bHandleZipFiles;
 	BOOL					m_bInsertSorted;
 

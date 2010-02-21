@@ -78,7 +78,7 @@ will need to be changed correspondingly. */
 #define HASH_SHOWINGROUPSGLOBAL		4239388334
 #define HASH_EXTENDTABCONTROL		4097866437
 #define HASH_SHOWFILEPREVIEWS		1834921243
-#define HASH_REPLACEEXPLORERFILESYSTEM	2624796919
+#define HASH_REPLACEEXPLORERMODE	2422294263
 #define HASH_SHOWUSERNAMETITLEBAR	2618183549
 #define HASH_HIDESYSTEMFILESGLOBAL	1667356744
 #define HASH_HIDELINKEXTENSIONGLOBAL	1073100667
@@ -386,8 +386,11 @@ MSXML2::IXMLDOMElement *pRoot)
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("NewTabDirectory"),m_DefaultTabDirectory);
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivate"),EncodeBoolValue(m_bOneClickActivate));
+
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ReplaceExplorerFileSystem"),EncodeBoolValue(m_bReplaceExplorerFileSystem));
+	_itow_s(m_ReplaceExplorerMode,szValue,SIZEOF_ARRAY(szValue),10);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ReplaceExplorerMode"),szValue);
+
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowAddressBar"),EncodeBoolValue(m_bShowAddressBar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -2636,8 +2639,8 @@ WCHAR *wszName,WCHAR *wszValue)
 		m_bOneClickActivate = DecodeBoolValue(wszValue);
 		break;
 
-	case HASH_REPLACEEXPLORERFILESYSTEM:
-		m_bReplaceExplorerFileSystem = DecodeBoolValue(wszValue);
+	case HASH_REPLACEEXPLORERMODE:
+		m_ReplaceExplorerMode = DecodeIntValue(wszValue);
 		break;
 
 	case HASH_SHOWADDRESSBAR:

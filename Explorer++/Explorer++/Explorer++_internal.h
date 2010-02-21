@@ -346,6 +346,13 @@ typedef struct
 
 typedef enum
 {
+	REPLACEEXPLORER_NONE		= 1,
+	REPLACEEXPLORER_FILESYSTEM	= 2,
+	REPLACEEXPLORER_ALL			= 3
+} ReplaceExplorerModes_t;
+
+typedef enum
+{
 	DW_NAME,
 	DW_TYPE,
 	DW_SIZE,
@@ -646,8 +653,12 @@ void				FolderSizeCallbackStub(int nFolders,int nFiles,PLARGE_INTEGER lTotalFold
 LRESULT CALLBACK	TreeViewSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 /* Default file manager. */
-BOOL				SetAsDefaultFileManager(void);
-BOOL				RemoveAsDefaultFileManager(void);
+BOOL				SetAsDefaultFileManagerFileSystem(void);
+BOOL				SetAsDefaultFileManagerAll(void);
+BOOL				SetAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType);
+BOOL				RemoveAsDefaultFileManagerFileSystem(void);
+BOOL				RemoveAsDefaultFileManagerAll(void);
+BOOL				RemoveAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType);
 
 typedef struct
 {

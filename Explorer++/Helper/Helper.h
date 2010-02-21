@@ -84,6 +84,7 @@ LONG			GetFileSectorSize(TCHAR *FileName);
 TCHAR			GetDriveNameFromMask(ULONG unitmask);
 
 /* Idl helpers. */
+void			DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest);
 HRESULT			GetIdlFromParsingName(TCHAR *szParsingName,LPITEMIDLIST *pidl);
 HRESULT			GetDisplayName(TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags);
 HRESULT			GetDisplayName(LPITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uFlags);

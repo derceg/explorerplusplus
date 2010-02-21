@@ -19,30 +19,38 @@ __interface IDropFilesCallback
 	void OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt);
 };
 
+__interface IDropHandler
+{
+	void Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragTypes_t DragType,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback);
+};
+
+__interface IClipboardHandler
+{
+	void CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback);
+};
+
 /* Generic drop handler. Handles the following
 drop formats:
  - CF_HDROP
  - CF_STR_FILEDESCRIPTOR
 */
-class CDropHandler
+class CDropHandler : public IDropHandler, public IClipboardHandler
 {
 public:
 
-	CDropHandler(IDataObject *pDataObject,DWORD grfKeyState,
-	POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragTypes_t DragType,
-	TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback);
+	CDropHandler();
 	~CDropHandler();
-
-	void	Drop(void);
-	void	Paste(IDataObject *pDataObject,DWORD *pdwEffect,HWND hwndDrop,TCHAR *szDestDirectory);
 
 	DWORD WINAPI	CopyDroppedFilesInternalAsync(LPVOID lpParameter);
 
 private:
 
-	void	HandleLeftClickDrop(void);
+	void	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragTypes_t DragType,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback);
+	void	CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback);
+
+	void	HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDirectory,POINTL *pptl);
 	void	HandleRightClickDrop(void);
-	void	CopyDroppedFiles(DROPFILES *pdf);
+	void	CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD dwPreferredEffect);
 	void	CopyDroppedFilesInternal(IBufferManager *pbm,list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision);
 	void	CreateShortcutToDroppedFile(TCHAR *szFullFileName);
 	BOOL	CheckItemLocations(int iDroppedItem);

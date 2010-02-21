@@ -188,8 +188,25 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 				}
 				CheckDlgButton(hDlg,nIDButton,BST_CHECKED);
 
-				if(m_bReplaceExplorerFileSystem)
-					CheckDlgButton(hDlg,IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,BST_CHECKED);
+				switch(m_ReplaceExplorerMode)
+				{
+				case REPLACEEXPLORER_NONE:
+					nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
+					break;
+
+				case REPLACEEXPLORER_FILESYSTEM:
+					nIDButton = IDC_OPTION_REPLACEEXPLORER_FILESYSTEM;
+					break;
+
+				case REPLACEEXPLORER_ALL:
+					nIDButton = IDC_OPTION_REPLACEEXPLORER_ALL;
+					break;
+
+				default:
+					nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
+					break;
+				}
+				CheckDlgButton(hDlg,nIDButton,BST_CHECKED);
 
 				if(m_bSavePreferencesToXMLFile)
 					CheckDlgButton(hDlg,IDC_OPTION_XML,BST_CHECKED);
@@ -248,7 +265,7 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 						TCHAR szNewTabDir[MAX_PATH];
 						TCHAR szVirtualParsingPath[MAX_PATH];
 						TCHAR szErrorMsg[256];
-						BOOL bReplaceExplorerFileSystem;
+						UINT ReplaceExplorerMode = REPLACEEXPLORER_NONE;
 						BOOL bSuccess;
 						HRESULT hr;
 						int iSel;
@@ -258,21 +275,35 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 						else if(IsDlgButtonChecked(hDlg,IDC_STARTUP_DEFAULTFOLDER) == BST_CHECKED)
 							m_StartupMode = STARTUP_DEFAULTFOLDER;
 
-						bReplaceExplorerFileSystem = (IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_FILESYSTEM)
-							== BST_CHECKED);
+						if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_NONE) == BST_CHECKED)
+							ReplaceExplorerMode = REPLACEEXPLORER_NONE;
+						else if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_FILESYSTEM) == BST_CHECKED)
+							ReplaceExplorerMode = REPLACEEXPLORER_FILESYSTEM;
+						else if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_ALL) == BST_CHECKED)
+							ReplaceExplorerMode = REPLACEEXPLORER_ALL;
 
-						if(m_bReplaceExplorerFileSystem != bReplaceExplorerFileSystem)
+						if(m_ReplaceExplorerMode != ReplaceExplorerMode)
 						{
 							bSuccess = TRUE;
 
-							if(!bReplaceExplorerFileSystem)
+							switch(ReplaceExplorerMode)
 							{
-								bSuccess = RemoveAsDefaultFileManager();
+							case REPLACEEXPLORER_NONE:
+								RemoveAsDefaultFileManagerFileSystem();
+								RemoveAsDefaultFileManagerAll();
+								break;
 
-							}
-							else
-							{
-								bSuccess = SetAsDefaultFileManager();
+							case IDC_OPTION_REPLACEEXPLORER_FILESYSTEM:
+								RemoveAsDefaultFileManagerFileSystem();
+								RemoveAsDefaultFileManagerAll();
+								bSuccess = SetAsDefaultFileManagerFileSystem();
+								break;
+
+							case IDC_OPTION_REPLACEEXPLORER_ALL:
+								RemoveAsDefaultFileManagerFileSystem();
+								RemoveAsDefaultFileManagerAll();
+								bSuccess = SetAsDefaultFileManagerAll();
+								break;
 							}
 
 							LoadString(g_hLanguageModule,IDS_ERR_FILEMANAGERSETTING,
@@ -284,7 +315,7 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 							}
 						}
 
-						m_bReplaceExplorerFileSystem = bReplaceExplorerFileSystem;
+						m_ReplaceExplorerMode = ReplaceExplorerMode;
 
 						m_bSavePreferencesToXMLFile = (IsDlgButtonChecked(hDlg,IDC_OPTION_XML)
 							== BST_CHECKED);

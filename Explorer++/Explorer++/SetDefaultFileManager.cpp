@@ -33,11 +33,23 @@ The value of the "command" sub-key will be of the form:
 
 #define KEY_DIRECTORY_SHELL		_T("Directory\\shell")
 #define KEY_DIRECTORY_APP		_T("Directory\\shell\\openinexplorer++")
+#define KEY_FOLDER_SHELL		_T("Folder\\shell")
+#define KEY_FOLDER_APP			_T("Folder\\shell\\openinexplorer++")
 #define SHELL_DEFAULT_VALUE		_T("none")
 #define INTERNAL_COMMAND_NAME	_T("openinexplorer++")
 #define EXTERNAL_MENU_TEXT		_T("Open In Explorer++")
 
-BOOL SetAsDefaultFileManager(void)
+BOOL SetAsDefaultFileManagerFileSystem(void)
+{
+	return SetAsDefaultFileManagerInternal(REPLACEEXPLORER_FILESYSTEM);
+}
+
+BOOL SetAsDefaultFileManagerAll(void)
+{
+	return SetAsDefaultFileManagerInternal(REPLACEEXPLORER_ALL);
+}
+
+BOOL SetAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType)
 {
 	HKEY						hKeyShell;
 	HKEY						hKeyApp;
@@ -45,12 +57,28 @@ BOOL SetAsDefaultFileManager(void)
 	list<Filter_t>::iterator	itr;
 	TCHAR						szCommand[512];
 	TCHAR						szExecutable[MAX_PATH];
+	TCHAR						*pszSubKey = NULL;
 	DWORD						Disposition;
 	LONG						ReturnValue;
 	BOOL						bSuccess = FALSE;
 
+	switch(ReplacementType)
+	{
+	case REPLACEEXPLORER_FILESYSTEM:
+		pszSubKey = KEY_DIRECTORY_SHELL;
+		break;
+
+	case REPLACEEXPLORER_ALL:
+		pszSubKey = KEY_FOLDER_SHELL;
+		break;
+
+	default:
+		pszSubKey = KEY_DIRECTORY_SHELL;
+		break;
+	}
+
 	ReturnValue = RegOpenKeyEx(HKEY_CLASSES_ROOT,
-		KEY_DIRECTORY_SHELL,0,KEY_WRITE,&hKeyShell);
+		pszSubKey,0,KEY_WRITE,&hKeyShell);
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
@@ -110,16 +138,46 @@ BOOL SetAsDefaultFileManager(void)
 	return bSuccess;
 }
 
-BOOL RemoveAsDefaultFileManager(void)
+BOOL RemoveAsDefaultFileManagerFileSystem(void)
+{
+	return RemoveAsDefaultFileManagerInternal(REPLACEEXPLORER_FILESYSTEM);
+}
+
+BOOL RemoveAsDefaultFileManagerAll(void)
+{
+	return RemoveAsDefaultFileManagerInternal(REPLACEEXPLORER_ALL);
+}
+
+BOOL RemoveAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType)
 {
 	HKEY						hKeyShell;
 	list<Filter_t>::iterator	itr;
+	TCHAR						*pszSubKey = NULL;
+	TCHAR						*pszDeleteSubKey = NULL;
 	LONG						ReturnValue1 = 1;
 	LSTATUS						ReturnValue2 = 1;
 
+	switch(ReplacementType)
+	{
+	case REPLACEEXPLORER_FILESYSTEM:
+		pszSubKey = KEY_DIRECTORY_SHELL;
+		pszDeleteSubKey = KEY_DIRECTORY_APP;
+		break;
+
+	case REPLACEEXPLORER_ALL:
+		pszSubKey = KEY_FOLDER_SHELL;
+		pszDeleteSubKey = KEY_FOLDER_APP;
+		break;
+
+	default:
+		pszSubKey = KEY_DIRECTORY_SHELL;
+		pszDeleteSubKey = KEY_DIRECTORY_APP;
+		break;
+	}
+
 	/* Remove the shell default value. */
 	ReturnValue1 = RegOpenKeyEx(HKEY_CLASSES_ROOT,
-		KEY_DIRECTORY_SHELL,0,KEY_WRITE,&hKeyShell);
+		pszSubKey,0,KEY_WRITE,&hKeyShell);
 
 	if(ReturnValue1 == ERROR_SUCCESS)
 	{
@@ -130,7 +188,7 @@ BOOL RemoveAsDefaultFileManager(void)
 		if(ReturnValue1 == ERROR_SUCCESS)
 		{
 			/* Remove the main command key. */
-			ReturnValue2 = SHDeleteKey(HKEY_CLASSES_ROOT,KEY_DIRECTORY_APP);
+			ReturnValue2 = SHDeleteKey(HKEY_CLASSES_ROOT,pszDeleteSubKey);
 		}
 
 		RegCloseKey(hKeyShell);

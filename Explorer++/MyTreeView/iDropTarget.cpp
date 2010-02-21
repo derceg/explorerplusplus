@@ -258,17 +258,17 @@ POINTL pt,DWORD *pdwEffect)
 	/* Is the mouse actually over an item? */
 	if(!(tvht.flags & LVHT_NOWHERE) && (tvht.hItem != NULL) && m_bDataAccept)
 	{
-		CDropHandler *pDropHandler = NULL;
+		IDropHandler *pDropHandler = NULL;
 
 		pidlDirectory = BuildPath(tvht.hItem);
 
 		GetDisplayName(pidlDirectory,szDestDirectory,SHGDN_FORPARSING);
 
-		pDropHandler = new CDropHandler(pDataObject,
+		pDropHandler = new CDropHandler();
+
+		pDropHandler->Drop(pDataObject,
 			grfKeyState,pt,pdwEffect,m_hTreeView,
 			m_DragType,szDestDirectory,NULL);
-
-		pDropHandler->Drop();
 
 		delete pDropHandler;
 		CoTaskMemFree(pidlDirectory);

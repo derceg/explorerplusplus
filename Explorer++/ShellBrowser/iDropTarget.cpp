@@ -480,13 +480,13 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 		}
 		else
 		{
-			CDropHandler *pDropHandler = NULL;
+			IDropHandler *pDropHandler = NULL;
 
-			pDropHandler = new CDropHandler(pDataObject,
+			pDropHandler = new CDropHandler();
+
+			pDropHandler->Drop(pDataObject,
 				grfKeyState,ptl,pdwEffect,m_hListView,
 				m_DragType,szDestDirectory,this);
-
-			pDropHandler->Drop();
 
 			/* When dragging and dropping, any dropped items
 			will be selected, while any previously selected

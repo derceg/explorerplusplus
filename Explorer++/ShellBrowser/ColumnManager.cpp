@@ -2193,13 +2193,19 @@ void CFolderView::SaveColumnWidths(void)
 		pActiveColumnList = &m_RealFolderColumnList;
 	}
 
-	for(itr = pActiveColumnList->begin();itr != pActiveColumnList->end();itr++)
+	/* Only save column widths if the listview is currently in
+	details view. If it's not currently in details view, then
+	column widths have already been saved when the view changed. */
+	if(m_ViewMode == VM_DETAILS)
 	{
-		if(itr->bChecked)
+		for(itr = pActiveColumnList->begin();itr != pActiveColumnList->end();itr++)
 		{
-			itr->iWidth = ListView_GetColumnWidth(m_hListView,iColumn);
+			if(itr->bChecked)
+			{
+				itr->iWidth = ListView_GetColumnWidth(m_hListView,iColumn);
 
-			iColumn++;
+				iColumn++;
+			}
 		}
 	}
 }

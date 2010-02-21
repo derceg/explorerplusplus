@@ -387,7 +387,7 @@ void PasteFilesFromClipboard(HWND hwnd,TCHAR *Directory,BOOL bPasteLinks,
 void (*PasteFilesCallback)(void *,list<PastedFile_t> *),
 void *pData)
 {
-	IDataObject		*ClipboardObject = NULL;
+	IDataObject		*pClipboardObject = NULL;
 	IBufferManager	*pBufferManager = NULL;
 	PastedFilesInfo_t	*ppfi = NULL;
 	PastedFile_t	PastedFile;
@@ -412,12 +412,12 @@ void *pData)
 
 	SetCursor(LoadCursor(NULL,IDC_WAIT));
 
-	hr = OleGetClipboard(&ClipboardObject);
+	hr = OleGetClipboard(&pClipboardObject);
 
 	if(hr != S_OK)
 		return;
 
-	if(ClipboardObject->QueryGetData(&ftcHDrop) == S_OK)
+	if(pClipboardObject->QueryGetData(&ftcHDrop) == S_OK)
 	{
 		ftc.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
 		ftc.ptd			= NULL;
@@ -425,7 +425,7 @@ void *pData)
 		ftc.lindex		= -1;
 		ftc.tymed		= TYMED_HGLOBAL;
 
-		hr = ClipboardObject->GetData(&ftc,&stg0);
+		hr = pClipboardObject->GetData(&ftc,&stg0);
 
 		if(hr == S_OK)
 		{
@@ -434,7 +434,7 @@ void *pData)
 			if(pdwEffect != NULL)
 			{
 				ftc.cfFormat	= CF_HDROP;
-				ClipboardObject->GetData(&ftc,&stg1);
+				pClipboardObject->GetData(&ftc,&stg1);
 
 				pdf = (DROPFILES *)GlobalLock(stg1.hGlobal);
 
@@ -513,14 +513,14 @@ void *pData)
 			}
 		}
 	}
-	else if(ClipboardObject->QueryGetData(&ftcFileDescriptor) == S_OK)
+	else if(pClipboardObject->QueryGetData(&ftcFileDescriptor) == S_OK)
 	{
 
 	}
 
 	SetCursor(LoadCursor(NULL,IDC_ARROW));
 
-	ClipboardObject->Release();
+	pClipboardObject->Release();
 }
 
 DWORD WINAPI PasteFilesThread(LPVOID lpParameter)

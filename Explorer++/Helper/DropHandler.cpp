@@ -35,7 +35,17 @@ typedef struct
 
 DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter);
 
-CDropHandler::CDropHandler(IDataObject *pDataObject,DWORD grfKeyState,
+CDropHandler::CDropHandler()
+{
+	
+}
+
+CDropHandler::~CDropHandler()
+{
+
+}
+
+void CDropHandler::Drop(IDataObject *pDataObject,DWORD grfKeyState,
 POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragTypes_t DragType,
 TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback)
 {
@@ -47,19 +57,11 @@ TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback)
 	m_DragType			= DragType;
 	m_szDestDirectory	= szDestDirectory;
 	m_pDropFilesCallback	= pDropFilesCallback;
-}
 
-CDropHandler::~CDropHandler()
-{
-
-}
-
-void CDropHandler::Drop(void)
-{
 	switch(m_DragType)
 	{
 	case DRAG_TYPE_LEFTCLICK:
-		HandleLeftClickDrop();
+		HandleLeftClickDrop(m_pDataObject,m_szDestDirectory,&m_ptl);
 		break;
 
 	case DRAG_TYPE_RIGHTCLICK:
@@ -68,46 +70,61 @@ void CDropHandler::Drop(void)
 	}
 }
 
-void CDropHandler::Paste(IDataObject *pDataObject,DWORD *pdwEffect,
-HWND hwndDrop,TCHAR *szDestDirectory)
+void CDropHandler::CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback)
 {
-	FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	FORMATETC ftcFileDescriptor = {RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	IDataObject *pClipboard = NULL;
-	HRESULT hr;
+	m_pDataObject		= pDataObject;
+	m_hwndDrop			= hwndDrop;
+	m_szDestDirectory	= szDestDirectory;
+	m_pDropFilesCallback	= pDropFilesCallback;
 
-	SetCursor(LoadCursor(NULL,IDC_WAIT));
+	POINTL ptl = {0,0};
 
-	hr = OleGetClipboard(&pClipboard);
-
-	if(hr != S_OK)
-		return;
-
-	if(pClipboard->QueryGetData(&ftcHDrop) == S_OK)
-	{
-
-	}
-	else if(pClipboard->QueryGetData(&ftcFileDescriptor) == S_OK)
-	{
-
-	}
+	HandleLeftClickDrop(m_pDataObject,m_szDestDirectory,&ptl);
 }
 
-void CDropHandler::HandleLeftClickDrop(void)
+void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDirectory,POINTL *pptl)
 {
 	FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	FORMATETC ftcFileDescriptor = {RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	STGMEDIUM stg;
 	DROPFILES *pdf = NULL;
+	DWORD *pdwEffect = NULL;
+	DWORD dwEffect;
+	BOOL bPrefferedEffect = FALSE;
 	POINT pt;
 	HRESULT hr;
 
-	pt.x = m_ptl.x;
-	pt.y = m_ptl.y;
+	pt.x = pptl->x;
+	pt.y = pptl->y;
 
-	if(m_pDataObject->QueryGetData(&ftcHDrop) == S_OK)
+	FORMATETC ftc;
+
+	/* Check if the data has a preffered drop effect
+	(i.e. copy or move). */
+	ftc.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
+	ftc.ptd			= NULL;
+	ftc.dwAspect	= DVASPECT_CONTENT;
+	ftc.lindex		= -1;
+	ftc.tymed		= TYMED_HGLOBAL;
+
+	hr = pDataObject->GetData(&ftc,&stg);
+
+	if(hr == S_OK)
 	{
-		hr = m_pDataObject->GetData(&ftcHDrop,&stg);
+		pdwEffect = (DWORD *)GlobalLock(stg.hGlobal);
+
+		if(pdwEffect != NULL)
+		{
+			dwEffect = *pdwEffect;
+			bPrefferedEffect = TRUE;
+
+			GlobalUnlock(stg.hGlobal);
+		}
+	}
+
+	if(pDataObject->QueryGetData(&ftcHDrop) == S_OK)
+	{
+		hr = pDataObject->GetData(&ftcHDrop,&stg);
 
 		if(hr == S_OK)
 		{
@@ -115,13 +132,13 @@ void CDropHandler::HandleLeftClickDrop(void)
 
 			if(pdf != NULL)
 			{
-				CopyDroppedFiles(pdf);
+				CopyDroppedFiles(pdf,bPrefferedEffect,dwEffect);
 
 				GlobalUnlock(stg.hGlobal);
 			}
 		}
 	}
-	else if(m_pDataObject->QueryGetData(&ftcFileDescriptor) == S_OK)
+	else if(pDataObject->QueryGetData(&ftcFileDescriptor) == S_OK)
 	{
 		FORMATETC ftcfchg;
 		FORMATETC ftcfcis;
@@ -140,7 +157,7 @@ void CDropHandler::HandleLeftClickDrop(void)
 		BOOL bDataRetrieved = FALSE;
 		unsigned int i = 0;
 
-		hr = m_pDataObject->GetData(&ftcFileDescriptor,&stg);
+		hr = pDataObject->GetData(&ftcFileDescriptor,&stg);
 
 		if(hr == S_OK)
 		{
@@ -187,39 +204,50 @@ void CDropHandler::HandleLeftClickDrop(void)
 					ftcfchg.cfFormat	= RegisterClipboardFormat(CFSTR_FILECONTENTS);
 					ftcfchg.ptd			= NULL;
 					ftcfchg.dwAspect	= DVASPECT_CONTENT;
-					ftcfchg.lindex		= i;
+					ftcfchg.lindex		= -1;
 					ftcfchg.tymed		= TYMED_HGLOBAL;
 
 					ftcfcis.cfFormat	= RegisterClipboardFormat(CFSTR_FILECONTENTS);
 					ftcfcis.ptd			= NULL;
 					ftcfcis.dwAspect	= DVASPECT_CONTENT;
-					ftcfcis.lindex		= i;
+					ftcfcis.lindex		= -1;
 					ftcfcis.tymed		= TYMED_ISTREAM;
 
 					ftcfcstg.cfFormat	= RegisterClipboardFormat(CFSTR_FILECONTENTS);
-					ftcfcstg.ptd			= NULL;
+					ftcfcstg.ptd		= NULL;
 					ftcfcstg.dwAspect	= DVASPECT_CONTENT;
-					ftcfcstg.lindex		= i;
+					ftcfcstg.lindex		= -1;
 					ftcfcstg.tymed		= TYMED_ISTORAGE;
 
-					if(m_pDataObject->QueryGetData(&ftcfchg) == S_OK)
+					hr = pDataObject->QueryGetData(&ftcfchg);
+					hr = pDataObject->QueryGetData(&ftcfcis);
+					hr = pDataObject->QueryGetData(&ftcfcstg);
+
+					if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
 					{
-						hr = m_pDataObject->GetData(&ftcfchg,&stgFileContents);
+						ftcfchg.lindex = i - 1;
+
+						hr = pDataObject->GetData(&ftcfchg,&stgFileContents);
 
 						if(hr == S_OK)
 						{
+							if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+								nBytesToWrite = GlobalSize(stgFileContents.hGlobal);
+
 							pBuffer = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
 
 							if(pBuffer != NULL)
 								bDataRetrieved = TRUE;
 						}
 					}
-					else if(m_pDataObject->QueryGetData(&ftcfcis) == S_OK)
+					else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
 					{
 						STATSTG sstg;
 						ULONG cbRead;
 
-						hr = m_pDataObject->GetData(&ftcfcis,&stgFileContents);
+						//ftcfcis.lindex = i;
+
+						hr = pDataObject->GetData(&ftcfcis,&stgFileContents);
 
 						if(hr == S_OK)
 						{
@@ -243,13 +271,15 @@ void CDropHandler::HandleLeftClickDrop(void)
 							}
 						}
 					}
-					else if(m_pDataObject->QueryGetData(&ftcfcstg) == S_OK)
+					else if(pDataObject->QueryGetData(&ftcfcstg) == S_OK)
 					{
 						IStream *pStream;
 						STATSTG sstg;
 						ULONG cbRead;
 
-						hr = m_pDataObject->GetData(&ftcfcstg,&stgFileContents);
+						ftcfcstg.lindex = i;
+
+						hr = pDataObject->GetData(&ftcfcstg,&stgFileContents);
 
 						if(hr == S_OK)
 						{
@@ -289,12 +319,12 @@ void CDropHandler::HandleLeftClickDrop(void)
 
 					if(bDataRetrieved)
 					{
-						StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_szDestDirectory);
+						StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),pszDestDirectory);
 						PathAppend(szFullFileName,pfgd->fgd[i].cFileName);
 
 						POINT pt;
-						pt.x = m_ptl.x;
-						pt.y = m_ptl.y;
+						pt.x = pptl->x;
+						pt.y = pptl->y;
 
 						/* TODO: Fix. */
 						/*if(m_pDropFilesCallback != NULL)
@@ -312,17 +342,41 @@ void CDropHandler::HandleLeftClickDrop(void)
 							CloseHandle(hFile);
 						}
 
-						if(m_pDataObject->QueryGetData(&ftcfchg) == S_OK)
+						if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
 						{
 							if(pBuffer != NULL)
 							{
 								GlobalUnlock(stgFileContents.hGlobal);
 							}
 						}
-						else if(m_pDataObject->QueryGetData(&ftcfcis) == S_OK)
+						else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
 						{
 							free(pBuffer);
 						}
+
+						HGLOBAL hglb = NULL;
+						DWORD *pdwCopyEffect = NULL;
+						STGMEDIUM stg1;
+
+						ftc.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PERFORMEDDROPEFFECT);
+						ftc.ptd			= NULL;
+						ftc.dwAspect	= DVASPECT_CONTENT;
+						ftc.lindex		= -1;
+						ftc.tymed		= TYMED_HGLOBAL;
+
+						hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
+
+						pdwCopyEffect = (DWORD *)GlobalLock(hglb);
+
+						*pdwCopyEffect = DROPEFFECT_COPY;
+
+						GlobalUnlock(hglb);
+
+						stg1.tymed			= TYMED_HGLOBAL;
+						stg1.pUnkForRelease	= 0;
+						stg1.hGlobal		= hglb;
+
+						pDataObject->SetData(&ftc,&stg1,FALSE);
 					}
 				}
 
@@ -390,7 +444,7 @@ Differences between drag and drop/paste:
  - Effect may already be specified on paste.
  - No drop point used when pasting files.
 */
-void CDropHandler::CopyDroppedFiles(DROPFILES *pdf)
+void CDropHandler::CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD dwPreferredEffect)
 {
 	IBufferManager *pbmCopy = NULL;
 	IBufferManager *pbmMove = NULL;
@@ -399,7 +453,6 @@ void CDropHandler::CopyDroppedFiles(DROPFILES *pdf)
 	PastedFile_t PastedFile;
 	TCHAR szFullFileName[MAX_PATH];
 	DWORD dwEffect;
-	BOOL bOnSameDrive;
 	int nDroppedFiles;
 	int i = 0;
 
@@ -414,10 +467,19 @@ void CDropHandler::CopyDroppedFiles(DROPFILES *pdf)
 		DragQueryFile((HDROP)pdf,i,szFullFileName,
 			SIZEOF_ARRAY(szFullFileName));
 
-		bOnSameDrive = CheckItemLocations(i);
+		if(bPreferredEffect)
+		{
+			dwEffect = dwPreferredEffect;
+		}
+		else
+		{
+			/*bOnSameDrive = CheckItemLocations(i);
 
-		dwEffect = DetermineCurrentDragEffect(m_grfKeyState,
-			*m_pdwEffect,TRUE,bOnSameDrive);
+			dwEffect = DetermineCurrentDragEffect(m_grfKeyState,
+			*m_pdwEffect,TRUE,bOnSameDrive);*/
+		}
+
+		dwEffect = DROPEFFECT_COPY;
 
 		StringCchCopy(PastedFile.szFileName,SIZEOF_ARRAY(PastedFile.szFileName),
 			szFullFileName);
