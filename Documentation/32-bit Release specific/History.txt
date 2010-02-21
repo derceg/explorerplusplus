@@ -42,6 +42,8 @@ Bug fixes:
    buttons on the main toolbar (cut, copy, past,
    delete, etc) would be incorrectly disabled.
    Fixed.
+ - When a tab was locked (lock tab and address), it
+   would not be possible to open a new tab. Fixed.
  - Fixed toolbar bug.
  - Fixed search bug.
  - Fixed drives toolbar issue.

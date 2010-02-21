@@ -1660,27 +1660,13 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab)
 	HRESULT			hr = S_FALSE;
 	BOOL			bRet;
 
-	if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
+	hr = GetIdlFromParsingName(szPath,&pidl);
+
+	if(SUCCEEDED(hr))
 	{
-		/* Attempt to expand the path (in the event that
-		it contains embedded environment variables). */
-		bRet = MyExpandEnvironmentStrings(szPath,
-			szExpandedPath,SIZEOF_ARRAY(szExpandedPath));
+		BrowseFolder(pidl,wFlags,bOpenInNewTab,bSwitchToNewTab);
 
-		if(!bRet)
-		{
-			StringCchCopy(szExpandedPath,
-				SIZEOF_ARRAY(szExpandedPath),szPath);
-		}
-
-		hr = GetIdlFromParsingName(szExpandedPath,&pidl);
-
-		if(SUCCEEDED(hr))
-		{
-			BrowseFolder(pidl,wFlags,bOpenInNewTab,bSwitchToNewTab);
-
-			CoTaskMemFree(pidl);
-		}
+		CoTaskMemFree(pidl);
 	}
 
 	return hr;
