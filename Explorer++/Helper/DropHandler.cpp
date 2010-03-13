@@ -47,7 +47,8 @@ CDropHandler::~CDropHandler()
 
 void CDropHandler::Drop(IDataObject *pDataObject,DWORD grfKeyState,
 POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragTypes_t DragType,
-TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback)
+TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,
+BOOL bRenameOnCollision)
 {
 	m_pDataObject		= pDataObject;
 	m_grfKeyState		= grfKeyState;
@@ -57,6 +58,7 @@ TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback)
 	m_DragType			= DragType;
 	m_szDestDirectory	= szDestDirectory;
 	m_pDropFilesCallback	= pDropFilesCallback;
+	m_bRenameOnCollision	= bRenameOnCollision;
 
 	switch(m_DragType)
 	{
@@ -70,12 +72,15 @@ TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback)
 	}
 }
 
-void CDropHandler::CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback)
+void CDropHandler::CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,
+TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,
+BOOL bRenameOnCollision)
 {
 	m_pDataObject		= pDataObject;
 	m_hwndDrop			= hwndDrop;
 	m_szDestDirectory	= szDestDirectory;
 	m_pDropFilesCallback	= pDropFilesCallback;
+	m_bRenameOnCollision	= bRenameOnCollision;
 
 	POINTL ptl = {0,0};
 
@@ -89,7 +94,7 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 	STGMEDIUM stg;
 	DROPFILES *pdf = NULL;
 	DWORD *pdwEffect = NULL;
-	DWORD dwEffect;
+	DWORD dwEffect = DROPEFFECT_NONE;
 	BOOL bPrefferedEffect = FALSE;
 	POINT pt;
 	HRESULT hr;
@@ -115,10 +120,13 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 
 		if(pdwEffect != NULL)
 		{
-			dwEffect = *pdwEffect;
-			bPrefferedEffect = TRUE;
+			if(*pdwEffect != DROPEFFECT_NONE)
+			{
+				dwEffect = *pdwEffect;
+				bPrefferedEffect = TRUE;
 
-			GlobalUnlock(stg.hGlobal);
+				GlobalUnlock(stg.hGlobal);
+			}
 		}
 	}
 
@@ -473,13 +481,16 @@ void CDropHandler::CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD d
 		}
 		else
 		{
-			/*bOnSameDrive = CheckItemLocations(i);
+			BOOL bOnSameDrive;
+
+			/* If no preferred drop effect is specified,
+			decide whether to copy/move files based on their
+			locations. */
+			bOnSameDrive = CheckItemLocations(i);
 
 			dwEffect = DetermineCurrentDragEffect(m_grfKeyState,
-			*m_pdwEffect,TRUE,bOnSameDrive);*/
+			*m_pdwEffect,TRUE,bOnSameDrive);
 		}
-
-		dwEffect = DROPEFFECT_COPY;
 
 		StringCchCopy(PastedFile.szFileName,SIZEOF_ARRAY(PastedFile.szFileName),
 			szFullFileName);
@@ -501,15 +512,15 @@ void CDropHandler::CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD d
 		}
 	}
 
-	CopyDroppedFilesInternal(pbmCopy,&PastedFileListCopy,TRUE,FALSE);
-	CopyDroppedFilesInternal(pbmMove,&PastedFileListMove,FALSE,FALSE);
+	CopyDroppedFilesInternal(pbmCopy,&PastedFileListCopy,TRUE);
+	CopyDroppedFilesInternal(pbmMove,&PastedFileListMove,FALSE);
 
 	pbmCopy->Release();
 	pbmMove->Release();
 }
 
 void CDropHandler::CopyDroppedFilesInternal(IBufferManager *pbm,
-list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
+list<PastedFile_t> *pPastedFileList,BOOL bCopy)
 {
 	HANDLE hThread;
 	TCHAR *szFileNameList = NULL;
@@ -546,7 +557,7 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
 					ppfi->shfo.wFunc	= bCopy == TRUE ? FO_COPY : FO_MOVE;
 					ppfi->shfo.pFrom	= szFileNameList;
 					ppfi->shfo.pTo		= pszDestDirectory;
-					ppfi->shfo.fFlags	= (bRenameOnCollision == TRUE ? FOF_RENAMEONCOLLISION : 0)|FOF_WANTMAPPINGHANDLE;
+					ppfi->shfo.fFlags	= (m_bRenameOnCollision == TRUE ? FOF_RENAMEONCOLLISION : 0)|FOF_WANTMAPPINGHANDLE;
 
 					ppfi->pDropFilesCallback	= m_pDropFilesCallback;
 					ppfi->pPastedFileList		= new list<PastedFile_t>(*pPastedFileList);

@@ -268,7 +268,7 @@ POINTL pt,DWORD *pdwEffect)
 
 		pDropHandler->Drop(pDataObject,
 			grfKeyState,pt,pdwEffect,m_hTreeView,
-			m_DragType,szDestDirectory,NULL);
+			m_DragType,szDestDirectory,NULL,FALSE);
 
 		delete pDropHandler;
 		CoTaskMemFree(pidlDirectory);

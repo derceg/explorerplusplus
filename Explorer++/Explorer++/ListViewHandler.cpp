@@ -1825,5 +1825,13 @@ void CContainer::OnListViewPaste(void)
 	pClipboardHandler = new CDropHandler();
 
 	pClipboardHandler->CopyClipboardData(pClipboardObject,
-		m_hContainer,szDestination,NULL);
+		m_hContainer,szDestination,this,TRUE);
+}
+
+void CContainer::OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt)
+{
+	if(m_pActiveShellBrowser->QueryNumSelected() == 0)
+	{
+		m_pActiveShellBrowser->SelectItems(ppfl);
+	}
 }

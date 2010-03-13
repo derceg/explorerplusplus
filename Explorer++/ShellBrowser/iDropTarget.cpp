@@ -486,7 +486,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 
 			pDropHandler->Drop(pDataObject,
 				grfKeyState,ptl,pdwEffect,m_hListView,
-				m_DragType,szDestDirectory,this);
+				m_DragType,szDestDirectory,this,FALSE);
 
 			/* When dragging and dropping, any dropped items
 			will be selected, while any previously selected

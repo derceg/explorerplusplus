@@ -181,7 +181,7 @@ TOOLBAR_NEWFOLDER,TOOLBAR_COPY,TOOLBAR_CUT,
 TOOLBAR_PASTE,TOOLBAR_DELETE,TOOLBAR_VIEWS,
 TOOLBAR_SEARCH,TOOLBAR_PROPERTIES,TOOLBAR_REFRESH};
 
-class CContainer : public IDropTarget, public IServiceProvider, public IShellView2, public INewMenuClient
+class CContainer : public IDropTarget, public IServiceProvider, public IShellView2, public INewMenuClient, public IDropFilesCallback
 {
 public:
 
@@ -276,6 +276,8 @@ public:
 	/* INewMenuClient - Windows Vista only. */
 	HRESULT _stdcall	SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem,NMCSAEI_FLAGS flags);
 	HRESULT _stdcall	IncludeItems(NMCII_FLAGS *pFlags);
+
+	void				OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt);
 
 	void				PasteFilesCallbackInternal(list<PastedFile_t> *pPastedFileList);
 
