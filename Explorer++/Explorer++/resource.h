@@ -334,6 +334,7 @@
 #define IDS_EDITCOLORRULE               2120
 #define IDS_STOP                        2121
 #define IDS_SEARCHING                   2122
+#define IDS_GENERAL_NEWAPPLICATIONBUTTON 2123
 #define IDM_FILE_SAVEDIRECTORYLISTING   8002
 #define IDS_MERGE_COLUMN_TEXT           8003
 #define IDS_OK                          8004

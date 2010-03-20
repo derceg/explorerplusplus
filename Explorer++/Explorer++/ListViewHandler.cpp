@@ -949,25 +949,14 @@ void CContainer::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 		TCHAR			szDate[256];
 		TCHAR			szDateModified[256];
 
-		TCHAR szTip[256];
-		TCHAR *psz = NULL;
-
-		StringCchCopy(szTip,256,_T("File Name: $F"));
-
-		pwfd = m_pActiveShellBrowser->QueryFileFindData(iItem);
-
-		psz = ReplaceSubString(szTip,_T("$F"),pwfd->cFileName);
-
-		StringCchCopy(szInfoTip,cchMax,psz);
-
-		/*CreateFileTimeString(&pwfd->ftLastWriteTime,
+		CreateFileTimeString(&pwfd->ftLastWriteTime,
 			szDateModified,SIZEOF_ARRAY(szDateModified),m_bShowFriendlyDatesGlobal);
 
 		LoadString(g_hLanguageModule,IDS_GENERAL_DATEMODIFIED,szDate,
 				SIZEOF_ARRAY(szDate));
 
 		StringCchPrintf(szInfoTip,cchMax,_T("%s: %s"),
-			szDate,szDateModified);*/
+			szDate,szDateModified);
 	}
 }
 

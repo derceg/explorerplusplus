@@ -1343,7 +1343,6 @@ void CContainer::SaveStateToRegistry(void)
 		SaveMassRenameStateToRegistry(hKey);
 		SaveMergeFilesStateToRegistry(hKey);
 		SaveOrganizeBookmarksStateToRegistry(hKey);
-		SaveDrivePropertiesStateToRegistry(hKey);
 		SaveSearchStateToRegistry(hKey);
 		SaveSelectColumnsStateToRegistry(hKey);
 		SaveSelectDefaultColumnsStateToRegistry(hKey);
@@ -1565,30 +1564,6 @@ void CContainer::SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey)
 	}
 }
 
-/* TODO: Not used. */
-void CContainer::SaveDrivePropertiesStateToRegistry(HKEY hParentKey)
-{
-	/*HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_DRIVEPROPERTIES_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bDrivePropertiesDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptDriveProperties,
-				sizeof(m_ptDriveProperties));
-		}
-
-		RegCloseKey(hKey);
-	}*/
-}
-
 void CContainer::SaveSearchStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
@@ -1785,7 +1760,6 @@ void CContainer::LoadStateFromRegistry(void)
 		LoadMassRenameStateFromRegistry(hKey);
 		LoadMergeFilesStateFromRegistry(hKey);
 		LoadOrganizeBookmarksStateFromRegistry(hKey);
-		LoadDrivePropertiesStateFromRegistry(hKey);
 		LoadSearchStateFromRegistry(hKey);
 		LoadSelectColumnsStateFromRegistry(hKey);
 		LoadSelectDefaultColumnsStateFromRegistry(hKey);
@@ -2010,31 +1984,6 @@ void CContainer::LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey)
 
 		RegCloseKey(hKey);
 	}
-}
-
-/* TODO: Not used. */
-void CContainer::LoadDrivePropertiesStateFromRegistry(HKEY hParentKey)
-{
-	/*HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_DRIVEPROPERTIES_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptDriveProperties,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bDrivePropertiesDlgStateSaved = TRUE;
-		}
-
-		RegCloseKey(hKey);
-	}*/
 }
 
 void CContainer::LoadSearchStateFromRegistry(HKEY hParentKey)

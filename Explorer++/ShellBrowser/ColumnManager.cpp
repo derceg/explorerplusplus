@@ -527,7 +527,10 @@ int CFolderView::SetAllFolderSizeColumnData(void)
 					}
 				}
 
-				iColumnIndex++;
+				if(itr->bChecked)
+				{
+					iColumnIndex++;
+				}
 			}
 		}
 

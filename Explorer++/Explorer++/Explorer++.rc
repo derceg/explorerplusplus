@@ -1465,6 +1465,7 @@ BEGIN
     IDS_EDITCOLORRULE       "Edit Color Rule"
     IDS_STOP                "Stop"
     IDS_SEARCHING           "Searching %s..."
+    IDS_GENERAL_NEWAPPLICATIONBUTTON "New Application Button"
 END
 
 STRINGTABLE 

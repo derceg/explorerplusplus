@@ -743,8 +743,6 @@ private:
 	void					LoadMergeFilesStateFromRegistry(HKEY hParentKey);
 	void					SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey);
 	void					LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey);
-	void					SaveDrivePropertiesStateToRegistry(HKEY hParentKey);
-	void					LoadDrivePropertiesStateFromRegistry(HKEY hParentKey);
 	void					SaveSearchStateToRegistry(HKEY hParentKey);
 	void					LoadSearchStateFromRegistry(HKEY hParentKey);
 	void					SaveSelectColumnsStateToRegistry(HKEY hParentKey);

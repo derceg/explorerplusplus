@@ -509,13 +509,16 @@ INT_PTR CALLBACK CContainer::ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,
 void CContainer::OnApplicationToolbarNewButtonInit(HWND hDlg)
 {
 	HWND hEditName;
+	TCHAR szTemp[64];
 
 	hEditName = GetDlgItem(hDlg,IDC_APP_EDIT_NAME);
 
 	CheckDlgButton(hDlg,IDC_CHECK_SHOWAPPNAME,BST_CHECKED);
 
-	/* TODO: Move into string table. */
-	SetWindowText(hDlg,_T("New Application Button"));
+	LoadString(g_hLanguageModule,IDS_GENERAL_NEWAPPLICATIONBUTTON,
+		szTemp,SIZEOF_ARRAY(szTemp));
+
+	SetWindowText(hDlg,szTemp);
 
 	/* Set the focus to the 'Name' edit field. */
 	SetFocus(hEditName);
