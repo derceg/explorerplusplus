@@ -637,6 +637,7 @@ private:
 	BOOL				m_bShowGridlines;
 	BOOL				m_bFolderChanging;
 	BOOL				m_bShowFolderSizes;
+	BOOL				m_bDisableFolderSizesNetworkRemovable;
 	BOOL				m_bViewSet;
 	BOOL				m_bShowSizeInBytes;
 	int					m_nTotalItems;

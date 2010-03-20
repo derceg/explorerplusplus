@@ -72,6 +72,7 @@ typedef struct
 	BOOL bGridlinesActive;
 	BOOL bApplyFilter;
 	BOOL bShowFolderSizes;
+	BOOL bDisableFolderSizesNetworkRemovable;
 	BOOL bShowSizeInBytes;
 	BOOL bHideSystemFiles;
 	BOOL bHideLinkExtension;

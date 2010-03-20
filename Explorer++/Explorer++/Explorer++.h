@@ -970,6 +970,7 @@ private:
 
 	/* Files and folders dialog. */
 	void					SetInfoTipWindowStates(HWND hDlg);
+	void					SetFolderSizeWindowState(HWND hDlg);
 
 	/* Drive properties dialog. */
 	void					OnDrivePropertiesInit(HWND hDlg);
@@ -1212,6 +1213,7 @@ private:
 	BOOL					m_bShowFullTitlePath;
 	BOOL					m_bAlwaysOpenNewTab;
 	BOOL					m_bShowFolderSizes;
+	BOOL					m_bDisableFolderSizesNetworkRemovable;
 	BOOL					m_bUnlockFolders;
 	BOOL					m_bOpenNewTabNextToCurrent;
 	BOOL					m_bConfirmCloseTabs;

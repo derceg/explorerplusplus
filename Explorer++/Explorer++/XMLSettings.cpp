@@ -89,6 +89,7 @@ will need to be changed correspondingly. */
 #define HASH_HANDLEZIPFILES			1074212343
 #define HASH_INSERTSORTED			1109371947
 #define HASH_SHOWPRIVILEGETITLEBAR	4071561587
+#define HASH_DISABLEFOLDERSIZENETWORKREMOVABLE	2610679594
 
 typedef struct
 {
@@ -293,6 +294,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AutoArrangeGlobal"),EncodeBoolValue(m_bAutoArrangeGlobal));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ConfirmCloseTabs"),EncodeBoolValue(m_bConfirmCloseTabs));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisableFolderSizesNetworkRemovable"),EncodeBoolValue(m_bDisableFolderSizesNetworkRemovable));
 
 	COLORREF CentreColor;
 
@@ -587,6 +590,7 @@ int CContainer::LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 					}
 
 					pSettings[i].bShowFolderSizes = m_bShowFolderSizes;
+					pSettings[i].bDisableFolderSizesNetworkRemovable = m_bDisableFolderSizesNetworkRemovable;
 
 					hr = pNode->get_firstChild(&pColumnsNode);
 
@@ -2567,6 +2571,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_CONFIRMCLOSETABS:
 		m_bConfirmCloseTabs = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_DISABLEFOLDERSIZENETWORKREMOVABLE:
+		m_bDisableFolderSizesNetworkRemovable = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_DISPLAYCENTRECOLOR:

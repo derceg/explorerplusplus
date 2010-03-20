@@ -303,7 +303,6 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 				CoTaskMemFree(pidlComplete);
 			}
 
-
 			/* If the file is marked as hidden, ghost it out. */
 			if(m_pwfdFiles[itr->iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
 			{
@@ -333,9 +332,24 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 	if(m_ViewMode == VM_DETAILS)
 	{
+		TCHAR szDrive[MAX_PATH];
+		BOOL bNetworkRemovable = FALSE;
+
 		QueueUserAPC(SetAllColumnDataAPC,m_hThread,(ULONG_PTR)this);
 
-		if(m_bShowFolderSizes)
+		StringCchCopy(szDrive,SIZEOF_ARRAY(szDrive),m_CurDir);
+		PathStripToRoot(szDrive);
+
+		if(GetDriveType(szDrive) == DRIVE_REMOVABLE ||
+			GetDriveType(szDrive) == DRIVE_REMOTE)
+		{
+			bNetworkRemovable = TRUE;
+		}
+
+		/* If the user has selected to disable folder sizes
+		on removable drives or networks, and we are currently
+		on such a drive, do not calculate folder sizes. */
+		if(m_bShowFolderSizes && !(m_bDisableFolderSizesNetworkRemovable && bNetworkRemovable))
 			QueueUserAPC(SetAllFolderSizeColumnDataAPC,m_hFolderSizeThread,(ULONG_PTR)this);
 	}
 

@@ -310,6 +310,7 @@ void CContainer::SetDefaultValues(void)
 	m_bShowFullTitlePath			= FALSE;
 	m_bAlwaysOpenNewTab				= FALSE;
 	m_bShowFolderSizes				= FALSE;
+	m_bDisableFolderSizesNetworkRemovable	 = FALSE;
 	m_bUnlockFolders				= TRUE;
 	m_StartupMode					= STARTUP_PREVIOUSTABS;
 	m_bExtendTabControl				= FALSE;

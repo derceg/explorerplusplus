@@ -394,6 +394,8 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK,BST_CHECKED);
 				if(m_bShowFolderSizes)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES,BST_CHECKED);
+				if(m_bDisableFolderSizesNetworkRemovable)
+					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,BST_CHECKED);
 				if(m_bShowSizesInBytesGlobal)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SIZEBYTES,BST_CHECKED);
 				if(m_bHandleZipFiles)
@@ -409,6 +411,7 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					CheckDlgButton(hDlg,IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,BST_CHECKED);
 
 				SetInfoTipWindowStates(hDlg);
+				SetFolderSizeWindowState(hDlg);
 			}
 			break;
 
@@ -420,7 +423,7 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 			case IDC_SETTINGS_CHECK_LINK:
 			case IDC_SETTINGS_CHECK_INSERTSORTED:
 			case IDC_SETTINGS_CHECK_SINGLECLICK:
-			case IDC_SETTINGS_CHECK_FOLDERSIZES:
+			case IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE:
 			case IDC_SETTINGS_CHECK_SIZEBYTES:
 			case IDC_SETTINGS_CHECK_ZIPFILES:
 			case IDC_SETTINGS_CHECK_FRIENDLYDATES:
@@ -435,6 +438,11 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 			case IDC_OPTIONS_CHECK_SHOWINFOTIPS:
 				SetInfoTipWindowStates(hDlg);
+				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+				break;
+
+			case IDC_SETTINGS_CHECK_FOLDERSIZES:
+				SetFolderSizeWindowState(hDlg);
 				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
 				break;
 			}
@@ -469,6 +477,9 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							== BST_CHECKED);
 
 						m_bShowFolderSizes = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES)
+							== BST_CHECKED);
+
+						m_bDisableFolderSizesNetworkRemovable = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE)
 							== BST_CHECKED);
 
 						m_bShowSizesInBytesGlobal = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SIZEBYTES)
@@ -1144,4 +1155,17 @@ void CContainer::SetInfoTipWindowStates(HWND hDlg)
 
 	EnableWindow(hCheckSystemInfoTips,bEnable);
 	EnableWindow(hCheckCustomInfoTips,bEnable);
+}
+
+void CContainer::SetFolderSizeWindowState(HWND hDlg)
+{
+	HWND hFolderSizesNeworkRemovable;
+	BOOL bEnable;
+
+	hFolderSizesNeworkRemovable = GetDlgItem(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE);
+
+	bEnable = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES)
+		== BST_CHECKED);
+
+	EnableWindow(hFolderSizesNeworkRemovable,bEnable);
 }

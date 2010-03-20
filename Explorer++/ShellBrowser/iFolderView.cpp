@@ -501,6 +501,7 @@ void CFolderView::SetUserOptions(InitialSettings_t *is)
 	m_ViewMode				= is->ViewMode;
 	m_bApplyFilter			= is->bApplyFilter;
 	m_bShowFolderSizes		= is->bShowFolderSizes;
+	m_bDisableFolderSizesNetworkRemovable = is->bDisableFolderSizesNetworkRemovable;
 	m_bShowSizeInBytes		= is->bShowSizeInBytes;
 	m_bHideSystemFiles		= is->bHideSystemFiles;
 	m_bHideLinkExtension	= is->bHideLinkExtension;

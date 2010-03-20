@@ -166,6 +166,7 @@ int *pTabObjectIndex)
 		is.ViewMode				= m_ViewModeGlobal;
 		is.bApplyFilter			= FALSE;
 		is.bShowFolderSizes		= m_bShowFolderSizes;
+		is.bDisableFolderSizesNetworkRemovable = m_bDisableFolderSizesNetworkRemovable;
 		is.bShowSizeInBytes		= m_bShowSizesInBytesGlobal;
 		is.bHideSystemFiles		= m_bHideSystemFilesGlobal;
 		is.bHideLinkExtension	= m_bHideLinkExtensionGlobal;
