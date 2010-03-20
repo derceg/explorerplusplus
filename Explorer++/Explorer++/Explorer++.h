@@ -702,6 +702,8 @@ private:
 	int						LoadTabSettingsFromRegistry(void);
 	void					LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns);
 	void					SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns);
+	void					LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns);
+	void					SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns);
 	void					LoadDefaultColumnsFromRegistry(void);
 	void					SaveDefaultColumnsToRegistry(void);
 	void					InitializeBookmarks(void);

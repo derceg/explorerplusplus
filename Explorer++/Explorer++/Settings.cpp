@@ -637,26 +637,15 @@ void CContainer::SaveTabSettingsToRegistry(void)
 					SaveColumnToRegistry(hColumnsKey,_T("NetworkColumns"),&cie.NetworkConnectionsColumnList);
 					SaveColumnToRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&cie.MyNetworkPlacesColumnList);
 
-					RegCloseKey(hColumnsKey);
-				}
-
-				/* TODO: Fix. */
-				int *piColumnWidths = NULL;
-				int j = 0;
-
-				piColumnWidths = (int *)malloc(4 * sizeof(int));
-
-				if(piColumnWidths != NULL)
-				{
-					for(j = 0;j < 4;j++)
-					{
-						piColumnWidths[j] = ListView_GetColumnWidth(m_hListView[(int)tcItem.lParam],j);
-					}
-
-					RegSetValueEx(hTabKey,_T("ColumnWidths"),0,REG_BINARY,
-						(LPBYTE)piColumnWidths,4 * sizeof(int));
-
-					free(piColumnWidths);
+					/* Now save column widths. In the future, these keys may be merged with
+					the column keys above. */
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&cie.ControlPanelColumnList);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&cie.MyComputerColumnList);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("RealFolderColumnWidths"),&cie.RealFolderColumnList);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("RecycleBinColumnWidths"),&cie.RecycleBinColumnList);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("PrinterColumnWidths"),&cie.PrintersColumnList);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkColumnWidths"),&cie.NetworkConnectionsColumnList);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"),&cie.MyNetworkPlacesColumnList);
 				}
 
 				/* High-level settings. */
@@ -674,6 +663,24 @@ void CContainer::SaveTabSettingsToRegistry(void)
 		}
 
 		RegCloseKey(hKey);
+	}
+}
+
+void UpdateColumnWidths(list<Column_t> *pColumnList,list<Column_t> *pColumnWidthList)
+{
+	list<Column_t>::iterator itr1;
+	list<Column_t>::iterator itr2;
+
+	for(itr1 = pColumnWidthList->begin();itr1 != pColumnWidthList->end();itr1++)
+	{
+		for(itr2 = pColumnList->begin();itr2 != pColumnList->end();itr2++)
+		{
+			if(itr2->id == itr1->id)
+			{
+				itr2->iWidth = itr1->iWidth;
+				break;
+			}
+		}
 	}
 }
 
@@ -746,6 +753,30 @@ int CContainer::LoadTabSettingsFromRegistry(void)
 				LoadColumnFromRegistry(hColumnsKey,_T("NetworkColumns"),&NetworkConnectionsColumnList);
 				LoadColumnFromRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&MyNetworkPlacesColumnList);
 
+				list<Column_t>	RealFolderColumnListTemp;
+				list<Column_t>	MyComputerColumnListTemp;
+				list<Column_t>	ControlPanelColumnListTemp;
+				list<Column_t>	RecycleBinColumnListTemp;
+				list<Column_t>	PrintersColumnListTemp;
+				list<Column_t>	NetworkConnectionsColumnListTemp;
+				list<Column_t>	MyNetworkPlacesColumnListTemp;
+
+				LoadColumnWidthsFromRegistry(hColumnsKey,_T("ControlPanelColumWidths"),&ControlPanelColumnListTemp);
+				LoadColumnWidthsFromRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&MyComputerColumnListTemp);
+				LoadColumnWidthsFromRegistry(hColumnsKey,_T("RealFolderColumnWidths"),&RealFolderColumnListTemp);
+				LoadColumnWidthsFromRegistry(hColumnsKey,_T("RecycleBinColumnWidths"),&RecycleBinColumnListTemp);
+				LoadColumnWidthsFromRegistry(hColumnsKey,_T("PrinterColumnWidths"),&PrintersColumnListTemp);
+				LoadColumnWidthsFromRegistry(hColumnsKey,_T("NetworkColumnWidths"),&NetworkConnectionsColumnListTemp);
+				LoadColumnWidthsFromRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"),&MyNetworkPlacesColumnListTemp);
+
+				UpdateColumnWidths(&ControlPanelColumnList,&ControlPanelColumnListTemp);
+				UpdateColumnWidths(&MyComputerColumnList,&MyComputerColumnListTemp);
+				UpdateColumnWidths(&RealFolderColumnList,&RealFolderColumnListTemp);
+				UpdateColumnWidths(&RecycleBinColumnList,&RecycleBinColumnListTemp);
+				UpdateColumnWidths(&PrintersColumnList,&PrintersColumnListTemp);
+				UpdateColumnWidths(&NetworkConnectionsColumnList,&NetworkConnectionsColumnListTemp);
+				UpdateColumnWidths(&MyNetworkPlacesColumnList,&MyNetworkPlacesColumnListTemp);
+
 				RegCloseKey(hColumnsKey);
 			}
 
@@ -756,19 +787,6 @@ int CContainer::LoadTabSettingsFromRegistry(void)
 			ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS,&PrintersColumnList);
 			ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,&NetworkConnectionsColumnList);
 			ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,&MyNetworkPlacesColumnList);
-
-			/* TODO: Fix. */
-			int *piColumnWidths = NULL;
-
-			if(RegQueryValueEx(hTabKey,_T("ColumnWidths"),0,NULL,NULL,&cbData)
-				== ERROR_SUCCESS)
-			{
-				piColumnWidths = (int *)malloc(cbData);
-
-				RegQueryValueEx(hTabKey,_T("ColumnWidths"),0,&Type,(LPBYTE)piColumnWidths,&cbData);
-
-				free(piColumnWidths);
-			}
 
 			Settings.pControlPanelColumnList		= &ControlPanelColumnList;
 			Settings.pMyComputerColumnList			= &MyComputerColumnList;
@@ -807,32 +825,93 @@ int CContainer::LoadTabSettingsFromRegistry(void)
 	return nTabsCreated;
 }
 
-void CContainer::SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
+void CContainer::SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
 {
+	typedef struct
+	{
+		unsigned int id;
+		int iWidth;
+	} ColumnWidth_t;
+
 	list<Column_t>::iterator	itr;
-	Column_t					*pColumnList = NULL;
+	ColumnWidth_t				*pColumnList = NULL;
 	int							iColumn = 0;
 
-	pColumnList = (Column_t *)malloc(pColumns->size() * sizeof(Column_t));
+	pColumnList = (ColumnWidth_t *)malloc(pColumns->size() * sizeof(ColumnWidth_t));
 
 	for(itr = pColumns->begin();itr != pColumns->end();itr++)
 	{
 		pColumnList[iColumn].id			= itr->id;
-		pColumnList[iColumn].bChecked	= itr->bChecked;
 		pColumnList[iColumn].iWidth		= itr->iWidth;
 
 		iColumn++;
 	}
 
 	RegSetValueEx(hColumnsKey,szKeyName,0,REG_BINARY,
-		(LPBYTE)pColumnList,(DWORD)(pColumns->size() * sizeof(Column_t)));
+		(LPBYTE)pColumnList,(DWORD)(pColumns->size() * sizeof(ColumnWidth_t)));
+
+	free(pColumnList);
+}
+
+void CContainer::LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
+{
+	typedef struct
+	{
+		unsigned int id;
+		int iWidth;
+	} ColumnWidth_t;
+
+	ColumnWidth_t	ColumnList[64];
+	Column_t		Column;
+	DWORD			dwSize;
+	DWORD			dwType;
+	LONG			ret;
+	unsigned int	i = 0;
+
+	dwType = REG_BINARY;
+	dwSize = sizeof(ColumnList);
+
+	ret = RegQueryValueEx(hColumnsKey,szKeyName,0,&dwType,(LPBYTE)ColumnList,
+		&dwSize);
+
+	if(ret == ERROR_SUCCESS)
+	{
+		for(i = 0;i < dwSize / sizeof(ColumnWidth_t);i++)
+		{
+			Column.id = ColumnList[i].id;
+			Column.iWidth = ColumnList[i].iWidth;
+
+			pColumns->push_back(Column);
+		}
+	}
+}
+
+void CContainer::SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
+{
+	list<Column_t>::iterator	itr;
+	ColumnOld_t					*pColumnList = NULL;
+	int							iColumn = 0;
+
+	pColumnList = (ColumnOld_t *)malloc(pColumns->size() * sizeof(ColumnOld_t));
+
+	for(itr = pColumns->begin();itr != pColumns->end();itr++)
+	{
+		pColumnList[iColumn].id			= itr->id;
+		pColumnList[iColumn].bChecked	= itr->bChecked;
+
+		iColumn++;
+	}
+
+	RegSetValueEx(hColumnsKey,szKeyName,0,REG_BINARY,
+		(LPBYTE)pColumnList,(DWORD)(pColumns->size() * sizeof(ColumnOld_t)));
 
 	free(pColumnList);
 }
 
 void CContainer::LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
 {
-	Column_t		ColumnList[64];
+	ColumnOld_t		ColumnList[64];
+	Column_t		Column;
 	DWORD			dwSize;
 	DWORD			dwType;
 	unsigned int	i = 0;
@@ -845,7 +924,11 @@ void CContainer::LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<C
 
 	for(i = 0;i < dwSize / sizeof(Column_t);i++)
 	{
-		pColumns->push_back(ColumnList[i]);
+		Column.id = ColumnList[i].id;
+		Column.bChecked = ColumnList[i].bChecked;
+		Column.iWidth = DEFAULT_COLUMN_WIDTH;
+
+		pColumns->push_back(Column);
 	}
 }
 

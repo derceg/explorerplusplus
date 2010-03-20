@@ -46,6 +46,12 @@ typedef struct
 
 typedef struct
 {
+	unsigned int id;
+	BOOL bChecked;
+} ColumnOld_t;
+
+typedef struct
+{
 	list<Column_t>	RealFolderColumnList;
 	list<Column_t>	MyComputerColumnList;
 	list<Column_t>	ControlPanelColumnList;

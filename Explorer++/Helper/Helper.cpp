@@ -3112,3 +3112,25 @@ void DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingP
 		}
 	}
 }
+
+/*
+{name} - Filename
+{date_modified} - Date Modified
+{size} - Size
+{type} - Type
+
+Read through the incoming string one
+character at a time. Compare it to
+the set of available identifiers.
+When a match is found, replace the
+sub string.
+
+Filename: {name}, Date Modified: {date_modified}
+*/
+/* TODO: */
+void BuildFileString()
+{
+	TCHAR szString[] = _T("Filename: {name}, Date Modified: {date_modified}");
+
+	//psz = ReplaceSubString(szTip,_T("{name}"),pwfd->cFileName);
+}
