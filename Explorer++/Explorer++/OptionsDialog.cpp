@@ -240,7 +240,9 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
 				break;
 
+			case IDC_OPTION_REPLACEEXPLORER_NONE:
 			case IDC_OPTION_REPLACEEXPLORER_FILESYSTEM:
+			case IDC_OPTION_REPLACEEXPLORER_ALL:
 			case IDC_OPTION_XML:
 				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
 				break;
@@ -293,13 +295,13 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 								RemoveAsDefaultFileManagerAll();
 								break;
 
-							case IDC_OPTION_REPLACEEXPLORER_FILESYSTEM:
+							case REPLACEEXPLORER_FILESYSTEM:
 								RemoveAsDefaultFileManagerFileSystem();
 								RemoveAsDefaultFileManagerAll();
 								bSuccess = SetAsDefaultFileManagerFileSystem();
 								break;
 
-							case IDC_OPTION_REPLACEEXPLORER_ALL:
+							case REPLACEEXPLORER_ALL:
 								RemoveAsDefaultFileManagerFileSystem();
 								RemoveAsDefaultFileManagerAll();
 								bSuccess = SetAsDefaultFileManagerAll();

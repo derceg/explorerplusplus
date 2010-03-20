@@ -157,6 +157,8 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 		FILETIME *pftLastAccessTime = NULL;
 		FILETIME *pftLastWriteTime = NULL;
 		FILEGROUPDESCRIPTOR *pfgd = NULL;
+		list<PastedFile_t> pfl;
+		PastedFile_t pf;
 		TCHAR szFullFileName[MAX_PATH];
 		DWORD dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
 		DWORD nBytesToWrite = 0;
@@ -334,10 +336,6 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 						pt.x = pptl->x;
 						pt.y = pptl->y;
 
-						/* TODO: Fix. */
-						/*if(m_pDropFilesCallback != NULL)
-							m_pDropFilesCallback->OnDropFile(szFullFileName,&pt);*/
-
 						hFile = CreateFile(szFullFileName,GENERIC_WRITE,0,NULL,
 							CREATE_ALWAYS,dwFileAttributes,NULL);
 
@@ -348,6 +346,10 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 							WriteFile(hFile,pBuffer,nBytesToWrite,&nBytesWritten,NULL);
 
 							CloseHandle(hFile);
+
+							StringCchCopy(pf.szFileName,SIZEOF_ARRAY(pf.szFileName),szFullFileName);
+							PathStripPath(pf.szFileName);
+							pfl.push_back(pf);
 						}
 
 						if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
@@ -390,6 +392,9 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 
 				GlobalUnlock(stg.hGlobal);
 			}
+
+			if(m_pDropFilesCallback != NULL)
+				m_pDropFilesCallback->OnDropFile(&pfl,&pt);
 		}
 	}
 }
@@ -496,17 +501,17 @@ void CDropHandler::CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD d
 			szFullFileName);
 		PathStripPath(PastedFile.szFileName);
 
-		if(dwEffect == DROPEFFECT_MOVE)
+		if(dwEffect & DROPEFFECT_MOVE)
 		{
 			pbmMove->WriteListEntry(szFullFileName);
 			PastedFileListMove.push_back(PastedFile);
 		}
-		else if(dwEffect == DROPEFFECT_COPY)
+		else if(dwEffect & DROPEFFECT_COPY)
 		{
 			pbmCopy->WriteListEntry(szFullFileName);
 			PastedFileListCopy.push_back(PastedFile);
 		}
-		else if(dwEffect == DROPEFFECT_LINK)
+		else if(dwEffect & DROPEFFECT_LINK)
 		{
 			CreateShortcutToDroppedFile(szFullFileName);
 		}

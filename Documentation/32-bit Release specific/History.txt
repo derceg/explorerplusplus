@@ -19,7 +19,7 @@ Version 1.x.x.x ()
 ------------------
 New features:
  - Explorer++ can now replace Windows Explorer for all
-   folders (Vista an later only).
+   folders (Vista and later only).
  - New drag and drop type supported.
  - Items in the treeview can now be dragged and dropped
    using right click.
