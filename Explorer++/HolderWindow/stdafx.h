@@ -11,9 +11,6 @@
 
 #define SIZEOF_ARRAY(array)	sizeof(array) / sizeof(array[0])
 
-
-
-// TODO: reference additional headers your program requires here
 #include <windows.h>
 #include <tchar.h>
 #include <commctrl.h>

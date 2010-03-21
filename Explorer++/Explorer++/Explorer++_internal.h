@@ -28,7 +28,7 @@ to Explorer++.cpp. Should not be included in external modules.
 
 extern HINSTANCE g_hLanguageModule;
 
-#define VERSION_NUMBER		_T("1.0.0.0")
+#define VERSION_NUMBER		_T("1.0.4")
 
 #define WINDOW_NAME			_T("Explorer++")
 #define CLASS_NAME			_T("Explorer++")

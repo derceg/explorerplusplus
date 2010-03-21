@@ -47,10 +47,10 @@ IDI_MAIN_SMALL          ICON                    "res\\Explorer++ Small.ico"
 IDB_TABTOOLBAR_CLOSE    BITMAP                  "res\\Tab Close.bmp"
 IDB_SHELL_GO            BITMAP                  "res\\Shell Go.bmp"
 IDB_SHELLIMAGES         BITMAP                  "res\\Shell Images.bmp"
-IDB_ABOUT               BITMAP                  "res\\About Image Final.bmp"
 IDB_FILTERINGAPPLIED    BITMAP                  "res\\Filtering Applied.bmp"
 IDB_FOLDEREMPTY         BITMAP                  "res\\Folder Empty.bmp"
 IDB_FOLDERLOCKED        BITMAP                  "res\\Folder Locked.bmp"
+IDB_ABOUT               BITMAP                  "res\\About Image.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

@@ -41,7 +41,6 @@
 #define IDR_TOOLBAR_MENU                196
 #define IDB_SHELLIMAGES                 205
 #define IDI_MAIN_SMALL                  206
-#define IDB_ABOUT                       207
 #define IDR_BOOKMARKSTOOLBAR_MENU       210
 #define IDD_NEWBOOKMARKFOLDER           211
 #define IDD_BOOKMARKFOLDER_PROPERTIES   212
@@ -58,6 +57,8 @@
 #define IDR_GROUPBY_MENU                225
 #define IDD_OPTIONS_WINDOW              227
 #define IDD_CUSTOMIZECOLORS             228
+#define IDB_BITMAP1                     231
+#define IDB_ABOUT                       231
 #define IDC_DEFAULTCOLUMNS_DESCRIPTION  1001
 #define IDC_COLUMNS_DESCRIPTION         1001
 #define IDC_SETTINGS_CHECK_EXTENSIONS   1002
@@ -715,7 +716,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        230
+#define _APS_NEXT_RESOURCE_VALUE        232
 #define _APS_NEXT_COMMAND_VALUE         40432
 #define _APS_NEXT_CONTROL_VALUE         1255
 #define _APS_NEXT_SYMED_VALUE           101

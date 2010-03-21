@@ -890,7 +890,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\About Image.bmp"
+				>
+			</File>
+			<File
 				RelativePath=".\res\Display Window.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\Explorer++ About Image 2.bmp"
 				>
 			</File>
 			<File
