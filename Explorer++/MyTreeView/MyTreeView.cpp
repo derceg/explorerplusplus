@@ -393,8 +393,7 @@ void CMyTreeView::OnGetDisplayInfo(LPARAM lParam)
 		ptvItem->iImage	= m_iFolderIcon;
 		ptvItem->iSelectedImage	= m_iFolderIcon;
 
-		//if(!m_bNotifiedOfTermination)
-			AddToIconFinderQueue(ptvItem);
+		AddToIconFinderQueue(ptvItem);
 	}
 
 	ptvItem->mask |= TVIF_DI_SETITEM;
@@ -552,7 +551,6 @@ HTREEITEM hParent)
 	TCHAR			szDirectory[MAX_PATH];
 	TCHAR			szDirectory2[MAX_PATH];
 	ULONG			uFetched;
-	HTREEITEM		hItem;
 	TVINSERTSTRUCT	tvis;
 	TVITEMEX		tvItem;
 	HRESULT			hr;
@@ -580,6 +578,12 @@ HTREEITEM hParent)
 
 	hr = pShellFolder->EnumObjects(NULL,EnumFlags,&pEnumIDList);
 
+	int iItems = 0;
+
+	vector<ItemStore_t> vItems;
+	vector<ItemStore_t>::iterator itr;
+	ItemStore_t ItemStore;
+
 	if(SUCCEEDED(hr) && pEnumIDList != NULL)
 	{
 		/* Iterate over the subfolders items, and place them in the tree. */
@@ -600,7 +604,6 @@ HTREEITEM hParent)
 					LPITEMIDLIST	pidlComplete = NULL;
 					STRRET			str;
 					TCHAR			ItemName[MAX_PATH];
-					UINT			ItemMask;
 					int				iItemId;
 
 					hr = pShellFolder->GetDisplayNameOf(rgelt,SHGDN_NORMAL,&str);
@@ -611,29 +614,29 @@ HTREEITEM hParent)
 
 						pidlComplete = ILCombine(pidlDirectory,rgelt);
 
-						hr = GetDisplayName(pidlComplete,szDirectory,SHGDN_FORPARSING);
-
 						iItemId = GenerateUniqueItemId();
 						m_pItemInfo[iItemId].pidl = ILClone(pidlComplete);
 
-						ItemMask = TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_CHILDREN;
+						ItemStore.iItemId = iItemId;
+						StringCchCopy(ItemStore.ItemName,SIZEOF_ARRAY(ItemStore.ItemName),ItemName);
 
-						tvItem.mask				= ItemMask;
-						tvItem.pszText			= ItemName;
-						tvItem.iImage			= I_IMAGECALLBACK;
-						tvItem.iSelectedImage	= I_IMAGECALLBACK;
-						tvItem.lParam			= (LPARAM)iItemId;
-						tvItem.cChildren		= 1;
+						itr = vItems.end();
 
-						if(bMyComputer)
-							tvis.hInsertAfter		= DetermineItemSortedPosition(hParent,szDirectory);
-						else
-							tvis.hInsertAfter		= TVI_LAST;
+						/* Compare to the last item in the array and work
+						backwards. */
+						if(vItems.size() > 0)
+						{
+							itr--;
 
-						tvis.hParent			= hParent;
-						tvis.itemex				= tvItem;
+							while(StrCmpLogicalW(ItemName,itr->ItemName) < 0 && itr != vItems.begin())
+							{
+								itr--;
+							}
 
-						hItem = TreeView_InsertItem(m_hTreeView,&tvis);
+							itr++;
+						}
+
+						vItems.insert(itr,ItemStore);
 
 						CoTaskMemFree(pidlComplete);
 					}
@@ -644,6 +647,26 @@ HTREEITEM hParent)
 		}
 
 		pEnumIDList->Release();
+
+
+
+		for(itr = vItems.begin();itr != vItems.end();itr++)
+		{
+			UINT ItemMask = TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_CHILDREN;
+
+			tvItem.mask				= ItemMask;
+			tvItem.pszText			= itr->ItemName;
+			tvItem.iImage			= I_IMAGECALLBACK;
+			tvItem.iSelectedImage	= I_IMAGECALLBACK;
+			tvItem.lParam			= (LPARAM)itr->iItemId;
+			tvItem.cChildren		= 1;
+
+			tvis.hInsertAfter		= TVI_LAST;
+			tvis.hParent			= hParent;
+			tvis.itemex				= tvItem;
+
+			TreeView_InsertItem(m_hTreeView,&tvis);
+		}
 	}
 
 	SendMessage(m_hTreeView,WM_SETREDRAW,(WPARAM)TRUE,(LPARAM)NULL);

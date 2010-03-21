@@ -4,6 +4,7 @@
 #include <commctrl.h>
 #include <shlwapi.h>
 #include <list>
+#include <vector>
 #include "../Helper/Buffer.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/DropHandler.h"
@@ -106,6 +107,13 @@ private:
 
 
 	/* ------ Internal state. ------ */
+
+	/* Used to store the tree items as you enumerate them ready for sorting. */
+	typedef struct
+	{
+		TCHAR		ItemName[MAX_PATH];
+		int			iItemId;
+	} ItemStore_t;
 
 	typedef struct
 	{
