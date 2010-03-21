@@ -75,6 +75,11 @@ private:
 	void		RenameItem(HTREEITEM hItem,TCHAR *szFullFileName);
 	void		RemoveItem(TCHAR *szFullFileName);
 	LRESULT CALLBACK	OnDeviceChange(WPARAM wParam,LPARAM lParam);
+	void		OnGetDisplayInfo(LPARAM lParam);
+
+	/* Icons. */
+	void		AddToIconFinderQueue(TVITEM *plvItem);
+	void		EmptyIconFinderQueue(void);
 
 	/* Item id's. */
 	int			GenerateUniqueItemId(void);
@@ -134,10 +139,14 @@ private:
 	BOOL				m_bRightClick;
 	BOOL				m_bShowHidden;
 
+	/* Icon thread. */
+	HANDLE				m_hThread;
+
 	/* Item id's and info. */
 	int					*m_uItemMap;
 	ItemInfo_t			*m_pItemInfo;
 	int					m_iCurrentItemAllocation;
+	int					m_iFolderIcon;
 
 	/* Drag and drop. */
 	IDragSourceHelper	*m_pDragSourceHelper;

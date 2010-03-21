@@ -40,11 +40,28 @@ void CALLBACK		Timer_DirectoryModified(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWOR
 DWORD WINAPI		Thread_SubFoldersStub(LPVOID pVoid);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 
+DWORD WINAPI		Thread_TreeViewIconFinder(LPVOID pParam);
+
 DWORD	g_ThreadId;
 WNDPROC	OldTreeViewProc;
 UINT	DirWatchFlags = FILE_NOTIFY_CHANGE_DIR_NAME;
 
 list<QueuedItem_t> g_ItemList;
+
+CRITICAL_SECTION g_tv_icon_cs;
+int g_ntvAPCsRan = 0;
+int g_ntvAPCsQueued = 0;
+BOOL g_btvIconThreadSleeping = TRUE;
+
+typedef struct
+{
+	HWND			hTreeView;
+	LPITEMIDLIST	pidlFull;
+	HTREEITEM		hItem;
+	HANDLE			hEvent;
+} TreeViewInfo_t;
+
+list<TreeViewInfo_t> g_pTreeViewInfoList;
 
 CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon)
 {
@@ -54,6 +71,7 @@ CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon)
 	SetWindowSubclass(m_hTreeView,TreeViewProcStub,0,(DWORD_PTR)this);
 
 	InitializeCriticalSection(&m_cs);
+	InitializeCriticalSection(&g_tv_icon_cs);
 
 	m_iAlteredAllocation = DEFAULT_ALTERED_ALLOCATION;
 	m_nAltered = 0;
@@ -68,13 +86,9 @@ CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon)
 
 	m_iCurrentItemAllocation = DEFAULT_ITEM_ALLOCATION;
 
-	int i = 0;
+	memset(m_uItemMap, 0, (DEFAULT_ITEM_ALLOCATION * sizeof(int)));
 
-	for(i = 0;i < m_iCurrentItemAllocation;i++)
-	{
-		m_uItemMap[i] = 0;
-	}
-
+	m_iFolderIcon = GetDefaultFolderIconIndex();
 
 	AddRoot();
 
@@ -88,6 +102,8 @@ CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon)
 
 	m_bQueryRemoveCompleted = FALSE;
 	CreateThread(NULL,0,Thread_MonitorAllDrives,this,0,NULL);
+
+	m_hThread = CreateThread(NULL,0,Thread_TreeViewIconFinder,NULL,0,NULL);
 
 	m_iProcessing = 0;
 }
@@ -217,6 +233,10 @@ LRESULT CALLBACK CMyTreeView::OnNotify(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM l
 	{
 	case TVN_BEGINDRAG:
 		OnBeginDrag((int)((NMTREEVIEW *)lParam)->itemNew.lParam,DRAG_TYPE_LEFTCLICK);
+		break;
+
+	case TVN_GETDISPINFO:
+		OnGetDisplayInfo(lParam);
 		break;
 	}
 
@@ -358,6 +378,169 @@ HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent,LPITEMIDLIST pidlDirectory)
 	return hr;
 }
 
+void CMyTreeView::OnGetDisplayInfo(LPARAM lParam)
+{
+	NMTVDISPINFO	*pnmv = NULL;
+	TVITEM			*ptvItem = NULL;
+	NMHDR			*nmhdr = NULL;
+
+	pnmv	= (NMTVDISPINFO *)lParam;
+	ptvItem	= &pnmv->item;
+	nmhdr	= &pnmv->hdr;
+
+	if((ptvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
+	{
+		ptvItem->iImage	= m_iFolderIcon;
+		ptvItem->iSelectedImage	= m_iFolderIcon;
+
+		//if(!m_bNotifiedOfTermination)
+			AddToIconFinderQueue(ptvItem);
+	}
+
+	ptvItem->mask |= TVIF_DI_SETITEM;
+}
+
+void CALLBACK TVFindIconAPC(ULONG_PTR dwParam);
+BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pListViewInfo,HANDLE hStopEvent);
+
+DWORD WINAPI Thread_TreeViewIconFinder(LPVOID pParam)
+{
+	#pragma warning( disable : 4127 )
+	while(TRUE)
+	{
+		SleepEx(INFINITE,TRUE);
+	}
+
+	return 0;
+}
+
+void CMyTreeView::AddToIconFinderQueue(TVITEM *plvItem)
+{
+	EnterCriticalSection(&g_tv_icon_cs);
+
+	TreeViewInfo_t tvi;
+
+	tvi.hTreeView	= m_hTreeView;
+	tvi.hItem		= plvItem->hItem;
+	tvi.pidlFull	= BuildPath(plvItem->hItem);
+	tvi.hEvent		= NULL;
+
+	g_pTreeViewInfoList.push_back(tvi);
+
+	if(g_ntvAPCsRan == g_ntvAPCsQueued)
+	{
+		g_ntvAPCsQueued++;
+
+		QueueUserAPC(TVFindIconAPC,m_hThread,(ULONG_PTR)this);
+	}
+
+	LeaveCriticalSection(&g_tv_icon_cs);
+}
+
+void CMyTreeView::EmptyIconFinderQueue(void)
+{
+	EnterCriticalSection(&g_tv_icon_cs);
+
+	list<TreeViewInfo_t>::iterator last;
+	list<TreeViewInfo_t>::iterator first;
+
+	last = g_pTreeViewInfoList.end();
+
+	for(first = g_pTreeViewInfoList.begin();first != g_pTreeViewInfoList.end();)
+	{
+		CoTaskMemFree(first->pidlFull);
+		first = g_pTreeViewInfoList.erase(first);
+	}
+
+	LeaveCriticalSection(&g_tv_icon_cs);
+}
+
+BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pTreeViewInfo,HANDLE hStopEvent)
+{
+	BOOL bQueueNotEmpty;
+
+	EnterCriticalSection(&g_tv_icon_cs);
+
+	if(hStopEvent != NULL)
+	{
+		/* Set the event into the signaled
+		state. */
+		SetEvent(hStopEvent);
+	}
+
+	if(g_pTreeViewInfoList.empty() == TRUE)
+	{
+		g_btvIconThreadSleeping = TRUE;
+		bQueueNotEmpty = FALSE;
+
+		g_ntvAPCsRan++;
+	}
+	else
+	{
+		list<TreeViewInfo_t>::iterator itr;
+
+		itr = g_pTreeViewInfoList.end();
+
+		itr--;
+
+		*pTreeViewInfo = *itr;
+
+		/* Set the event to the non-signaled
+		state. */
+		ResetEvent(pTreeViewInfo->hEvent);
+
+		g_pTreeViewInfoList.erase(itr);
+
+		bQueueNotEmpty = TRUE;
+	}
+
+	LeaveCriticalSection(&g_tv_icon_cs);
+
+	return bQueueNotEmpty;
+}
+
+void CALLBACK TVFindIconAPC(ULONG_PTR dwParam)
+{
+	TreeViewInfo_t	pTreeViewInfo;
+	TVITEM			tvItem;
+	SHFILEINFO		shfi;
+	DWORD_PTR		res = FALSE;
+	BOOL			bQueueNotEmpty = TRUE;
+	int				iOverlay;
+
+	bQueueNotEmpty = RemoveFromIconFinderQueue(&pTreeViewInfo,NULL);
+
+	while(bQueueNotEmpty)
+	{
+		res = SHGetFileInfo((LPTSTR)pTreeViewInfo.pidlFull,0,&shfi,
+			sizeof(SHFILEINFO),SHGFI_PIDL|SHGFI_ICON|SHGFI_OVERLAYINDEX);
+
+		if(res != 0)
+		{
+			tvItem.mask				= TVIF_HANDLE|TVIF_IMAGE|TVIF_SELECTEDIMAGE;
+			tvItem.hItem			= pTreeViewInfo.hItem;
+			tvItem.iImage			= shfi.iIcon;
+			tvItem.iSelectedImage	= shfi.iIcon;
+
+			iOverlay = (shfi.iIcon >> 24);
+
+			if(iOverlay)
+			{
+				tvItem.mask			|= TVIF_STATE;
+				tvItem.state		= INDEXTOOVERLAYMASK(iOverlay);
+				tvItem.stateMask	= TVIS_OVERLAYMASK;
+			}
+
+			TreeView_SetItem(pTreeViewInfo.hTreeView,&tvItem);
+
+			DestroyIcon(shfi.hIcon);
+			CoTaskMemFree(pTreeViewInfo.pidlFull);
+		}
+
+		bQueueNotEmpty = RemoveFromIconFinderQueue(&pTreeViewInfo,pTreeViewInfo.hEvent);
+	}
+}
+
 void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder,LPITEMIDLIST pidlDirectory,
 HTREEITEM hParent)
 {
@@ -403,7 +586,6 @@ HTREEITEM hParent)
 		uFetched = 1;
 		while(pEnumIDList->Next(1,&rgelt,&uFetched) == S_OK && (uFetched == 1))
 		{
-			SHFILEINFO shfi;
 			ULONG Attributes = SFGAO_FOLDER|SFGAO_FILESYSTEM;
 
 			/* Only retrieve the attributes for this item. */
@@ -429,9 +611,6 @@ HTREEITEM hParent)
 
 						pidlComplete = ILCombine(pidlDirectory,rgelt);
 
-						SHGetFileInfo((LPTSTR)pidlComplete, NULL, &shfi, sizeof(shfi), SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
-						int iOverlay = (shfi.iIcon >> 24);
-
 						hr = GetDisplayName(pidlComplete,szDirectory,SHGDN_FORPARSING);
 
 						iItemId = GenerateUniqueItemId();
@@ -439,17 +618,10 @@ HTREEITEM hParent)
 
 						ItemMask = TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_CHILDREN;
 
-						if(iOverlay)
-						{
-							ItemMask |= TVIF_STATE;
-							tvItem.state			= INDEXTOOVERLAYMASK(iOverlay);
-							tvItem.stateMask		= TVIS_OVERLAYMASK;
-						}
-
 						tvItem.mask				= ItemMask;
 						tvItem.pszText			= ItemName;
-						tvItem.iImage			= shfi.iIcon;
-						tvItem.iSelectedImage	= shfi.iIcon;
+						tvItem.iImage			= I_IMAGECALLBACK;
+						tvItem.iSelectedImage	= I_IMAGECALLBACK;
 						tvItem.lParam			= (LPARAM)iItemId;
 						tvItem.cChildren		= 1;
 

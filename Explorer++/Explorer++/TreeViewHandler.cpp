@@ -580,6 +580,10 @@ LRESULT CALLBACK CContainer::TreeViewHolderWindowNotifyHandler(LPARAM lParam)
 		SendMessage(m_hTreeView,WM_NOTIFY,0,lParam);
 		break;
 
+	case TVN_GETDISPINFO:
+		SendMessage(m_hTreeView,WM_NOTIFY,0,lParam);
+		break;
+
 	case NM_RCLICK:
 		{
 			NMHDR *nmhdr = NULL;

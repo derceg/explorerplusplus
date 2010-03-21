@@ -376,7 +376,7 @@ int GetDefaultIcon(int iIconType)
 	switch(iIconType)
 	{
 		case DEFAULT_ICON_FOLDER:
-			dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+			dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY|FILE_ATTRIBUTE_NORMAL;
 			break;
 
 		case DEFAULT_ICON_FILE:
@@ -390,7 +390,7 @@ int GetDefaultIcon(int iIconType)
 
 	/* Under unicode, the filename argument cannot be NULL,
 	as it is not a valid unicode character. */
-	SHGetFileInfo(EMPTY_STRING,dwFileAttributes,&shfi,
+	SHGetFileInfo(_T("dummy"),dwFileAttributes,&shfi,
 	sizeof(SHFILEINFO),SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
 
 	return shfi.iIcon;
