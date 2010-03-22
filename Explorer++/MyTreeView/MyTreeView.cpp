@@ -40,8 +40,6 @@ void CALLBACK		Timer_DirectoryModified(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWOR
 DWORD WINAPI		Thread_SubFoldersStub(LPVOID pVoid);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 
-DWORD WINAPI		Thread_TreeViewIconFinder(LPVOID pParam);
-
 DWORD	g_ThreadId;
 WNDPROC	OldTreeViewProc;
 UINT	DirWatchFlags = FILE_NOTIFY_CHANGE_DIR_NAME;
@@ -63,7 +61,8 @@ typedef struct
 
 list<TreeViewInfo_t> g_pTreeViewInfoList;
 
-CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon)
+CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon,
+HANDLE hIconsThread)
 {
 	m_hTreeView = hTreeView;
 	m_hParent = hParent;
@@ -103,7 +102,7 @@ CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon)
 	m_bQueryRemoveCompleted = FALSE;
 	CreateThread(NULL,0,Thread_MonitorAllDrives,this,0,NULL);
 
-	m_hThread = CreateThread(NULL,0,Thread_TreeViewIconFinder,NULL,0,NULL);
+	m_hThread = hIconsThread;
 
 	m_iProcessing = 0;
 }
@@ -298,7 +297,7 @@ HTREEITEM CMyTreeView::AddRoot(void)
 		tvItem.lParam			= (LPARAM)iItemId;
 
 		tvis.hParent			= NULL;
-		tvis.hInsertAfter		= TVI_SORT;
+		tvis.hInsertAfter		= TVI_LAST;
 		tvis.itemex				= tvItem;
 
 		hDesktop = TreeView_InsertItem(m_hTreeView,&tvis);
@@ -401,17 +400,6 @@ void CMyTreeView::OnGetDisplayInfo(LPARAM lParam)
 
 void CALLBACK TVFindIconAPC(ULONG_PTR dwParam);
 BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pListViewInfo,HANDLE hStopEvent);
-
-DWORD WINAPI Thread_TreeViewIconFinder(LPVOID pParam)
-{
-	#pragma warning( disable : 4127 )
-	while(TRUE)
-	{
-		SleepEx(INFINITE,TRUE);
-	}
-
-	return 0;
-}
 
 void CMyTreeView::AddToIconFinderQueue(TVITEM *plvItem)
 {
@@ -540,6 +528,68 @@ void CALLBACK TVFindIconAPC(ULONG_PTR dwParam)
 	}
 }
 
+/* Sorts items in the following order:
+ - Drives
+ - Virtual Items
+ - Real Items
+
+Each set is ordered alphabetically. */
+int CALLBACK CompareFunc(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
+{
+	CMyTreeView *pMyTreeView = NULL;
+
+	pMyTreeView = (CMyTreeView *)lParamSort;
+
+	return pMyTreeView->CompareItems(lParam1,lParam2);
+}
+
+int CALLBACK CMyTreeView::CompareItems(LPARAM lParam1,LPARAM lParam2)
+{
+	TCHAR szDisplayName1[MAX_PATH];
+	TCHAR szDisplayName2[MAX_PATH];
+	TCHAR szTemp[MAX_PATH];
+	int iItemId1 = (int)lParam1;
+	int iItemId2 = (int)lParam2;
+
+	GetDisplayName(m_pItemInfo[iItemId1].pidl,szDisplayName1,SHGDN_FORPARSING);
+	GetDisplayName(m_pItemInfo[iItemId2].pidl,szDisplayName2,SHGDN_FORPARSING);
+
+	if(PathIsRoot(szDisplayName1) && !PathIsRoot(szDisplayName2))
+	{
+		return -1;
+	}
+	else if(!PathIsRoot(szDisplayName1) && PathIsRoot(szDisplayName2))
+	{
+		return 1;
+	}
+	else if(PathIsRoot(szDisplayName1) && PathIsRoot(szDisplayName2))
+	{
+		return lstrcmpi(szDisplayName1,szDisplayName2);
+	}
+	else
+	{
+		if(!SHGetPathFromIDList(m_pItemInfo[iItemId1].pidl,szTemp) &&
+			SHGetPathFromIDList(m_pItemInfo[iItemId2].pidl,szTemp))
+		{
+			return -1;
+		}
+		else if(SHGetPathFromIDList(m_pItemInfo[iItemId1].pidl,szTemp) &&
+			!SHGetPathFromIDList(m_pItemInfo[iItemId2].pidl,szTemp))
+		{
+			return 1;
+		}
+		else
+		{
+			GetDisplayName(m_pItemInfo[iItemId1].pidl,szDisplayName1,SHGDN_INFOLDER);
+			GetDisplayName(m_pItemInfo[iItemId2].pidl,szDisplayName2,SHGDN_INFOLDER);
+
+			return lstrcmpi(szDisplayName1,szDisplayName2);
+		}
+	}
+
+	return 1;
+}
+
 void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder,LPITEMIDLIST pidlDirectory,
 HTREEITEM hParent)
 {
@@ -554,7 +604,15 @@ HTREEITEM hParent)
 	TVINSERTSTRUCT	tvis;
 	TVITEMEX		tvItem;
 	HRESULT			hr;
+	BOOL			bVirtualFolder;
 	BOOL			bMyComputer = FALSE;
+
+	bVirtualFolder = !SHGetPathFromIDList(pidlDirectory,szDirectory);
+
+	if(IsNamespaceRoot(pidlDirectory))
+	{
+		bVirtualFolder = TRUE;
+	}
 
 	hr = GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
 	hr = GetDisplayName(pidlDirectory,szDirectory2,SHGDN_FORPARSING);
@@ -620,23 +678,32 @@ HTREEITEM hParent)
 						ItemStore.iItemId = iItemId;
 						StringCchCopy(ItemStore.ItemName,SIZEOF_ARRAY(ItemStore.ItemName),ItemName);
 
-						itr = vItems.end();
-
-						/* Compare to the last item in the array and work
-						backwards. */
-						if(vItems.size() > 0)
+						/* If this is a virtual directory, we'll post sort the items,
+						otherwise we'll pre-sort. */
+						if(bVirtualFolder)
 						{
-							itr--;
+							vItems.push_back(ItemStore);
+						}
+						else
+						{
+							itr = vItems.end();
 
-							while(StrCmpLogicalW(ItemName,itr->ItemName) < 0 && itr != vItems.begin())
+							/* Compare to the last item in the array and work
+							backwards. */
+							if(vItems.size() > 0)
 							{
 								itr--;
+
+								while(StrCmpLogicalW(ItemName,itr->ItemName) < 0 && itr != vItems.begin())
+								{
+									itr--;
+								}
+
+								itr++;
 							}
 
-							itr++;
+							vItems.insert(itr,ItemStore);
 						}
-
-						vItems.insert(itr,ItemStore);
 
 						CoTaskMemFree(pidlComplete);
 					}
@@ -666,6 +733,17 @@ HTREEITEM hParent)
 			tvis.itemex				= tvItem;
 
 			TreeView_InsertItem(m_hTreeView,&tvis);
+		}
+
+		if(bVirtualFolder)
+		{
+			TVSORTCB tvscb;
+
+			tvscb.hParent		= hParent;
+			tvscb.lpfnCompare	= CompareFunc;
+			tvscb.lParam		= (LPARAM)this;
+
+			TreeView_SortChildrenCB(m_hTreeView,&tvscb,0);
 		}
 	}
 

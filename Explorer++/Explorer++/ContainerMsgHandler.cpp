@@ -91,6 +91,14 @@ void CContainer::OnWindowCreate(void)
 
 	SetLanguageModule();
 
+	m_hIconThread = CreateThread(NULL,0,Thread_IconFinder,NULL,0,NULL);
+	SetThreadPriority(m_hIconThread,THREAD_PRIORITY_BELOW_NORMAL);
+	QueueUserAPC(IconThreadInitialization,m_hIconThread,NULL);
+
+	m_hFolderSizeThread = CreateThread(NULL,0,Thread_IconFinder,NULL,0,NULL);
+	SetThreadPriority(m_hFolderSizeThread,THREAD_PRIORITY_BELOW_NORMAL);
+	QueueUserAPC(IconThreadInitialization,m_hFolderSizeThread,NULL);
+
 	/* These need to occur after the language module
 	has been initialized, but before the tabs are
 	restored. */
@@ -124,14 +132,6 @@ void CContainer::OnWindowCreate(void)
 	Therefore, the listview MUST be set to the correct
 	size initially. */
 	ResizeWindows();
-
-	m_hIconThread = CreateThread(NULL,0,Thread_IconFinder,NULL,0,NULL);
-	SetThreadPriority(m_hIconThread,THREAD_PRIORITY_BELOW_NORMAL);
-	QueueUserAPC(IconThreadInitialization,m_hIconThread,NULL);
-
-	m_hFolderSizeThread = CreateThread(NULL,0,Thread_IconFinder,NULL,0,NULL);
-	SetThreadPriority(m_hFolderSizeThread,THREAD_PRIORITY_BELOW_NORMAL);
-	QueueUserAPC(IconThreadInitialization,m_hFolderSizeThread,NULL);
 
 	/* Settings cannot be applied until
 	all child windows have been created. */

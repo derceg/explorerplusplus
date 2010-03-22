@@ -24,7 +24,7 @@ public:
 	ULONG __stdcall		Release(void);
 
 	/* Contructor/Deconstructor. */
-	CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon);
+	CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon,HANDLE hIconsThread);
 	~CMyTreeView();
 
 	/* Drop source functions. */
@@ -48,6 +48,9 @@ public:
 	void				SetShowHidden(BOOL bShowHidden);
 	void				RefreshAllIcons(void);
 
+	/* Sorting. */
+	int CALLBACK		CompareItems(LPARAM lParam1,LPARAM lParam2);
+
 	static void DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,void *pData);
 
 	/* Drag and Drop. */
@@ -56,7 +59,7 @@ public:
 	HRESULT _stdcall	DragLeave(void);
 	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
 
-	void		MonitorDrivePublic(TCHAR *szDrive);
+	void				MonitorDrivePublic(TCHAR *szDrive);
 
 	int					m_iProcessing;
 

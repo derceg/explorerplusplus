@@ -670,7 +670,7 @@ HRESULT CFolderView::EnumFolderContents(TCHAR *szFolderPath)
 HRESULT inline CFolderView::AddItemInternal(LPITEMIDLIST pidlDirectory,
 LPITEMIDLIST pidlRelative,TCHAR *szFileName,int iItemIndex,BOOL bPosition)
 {
-	int				uItemId;
+	int uItemId;
 
 	uItemId = SetItemInformation(pidlDirectory,pidlRelative,szFileName);
 

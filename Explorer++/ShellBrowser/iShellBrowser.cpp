@@ -1338,7 +1338,6 @@ void CFolderView::DetermineFolderVirtual(LPITEMIDLIST pidlDirectory)
 {
 	TCHAR szParsingPath[MAX_PATH];
 
-	GetDisplayName(pidlDirectory,szParsingPath,SHGDN_FORPARSING);
 	m_bVirtualFolder = !SHGetPathFromIDList(pidlDirectory,szParsingPath);
 
 	if(m_bVirtualFolder)
