@@ -303,6 +303,7 @@ __interface IShellBrowser2 : IUnknown
 	virtual int				QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer);
 	virtual BOOL			IsBackHistory(void);
 	virtual BOOL			IsForwardHistory(void);
+	virtual void			GetBackHistory(list<LPITEMIDLIST> *lHistory);
 	virtual LPITEMIDLIST	RetrieveHistoryItem(int iItem);
 	virtual BOOL			CanBrowseUp();
 	virtual LPWIN32_FIND_DATA	QueryItemInfo(int iItem);

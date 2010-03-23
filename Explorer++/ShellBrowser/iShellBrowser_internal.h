@@ -280,6 +280,7 @@ public:
 	BOOL				ToggleShowHidden(void);
 	BOOL				IsBackHistory(void);
 	BOOL				IsForwardHistory(void);
+	void				GetBackHistory(list<LPITEMIDLIST> *lHistory);
 	LPITEMIDLIST		RetrieveHistoryItem(int iItem);
 	BOOL				CanBrowseUp(void);
 	int					QueryNumItems(void);

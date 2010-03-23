@@ -270,6 +270,11 @@ BOOL CFolderView::IsForwardHistory(void)
 	return TRUE;
 }
 
+void CFolderView::GetBackHistory(list<LPITEMIDLIST> *lHistory)
+{
+	return m_pPathManager->GetBackHistory(lHistory);
+}
+
 LPITEMIDLIST CFolderView::RetrieveHistoryItem(int iItem)
 {
 	return m_pPathManager->RetrievePathWithoutUpdate(iItem);

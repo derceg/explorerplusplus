@@ -15,9 +15,12 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <list>
 #include "iPathManager.h"
 #include "../Helper/Helper.h"
 
+
+using namespace std;
 
 CPathManager::CPathManager()
 {
@@ -165,6 +168,25 @@ int CPathManager::GetNumForwardPathsStored(void)
 	Difference between it and the iCurrentPath index
 	gives the number of 'forward' paths stored. */
 	return m_nTotal - m_iCurrent;
+}
+
+void CPathManager::GetBackHistory(list<LPITEMIDLIST> *lHistory)
+{
+	int nPaths;
+	int iStartIndex;
+	int iEndIndex;
+	int i = 0;
+
+	nPaths = GetNumBackPathsStored();
+
+	iEndIndex = m_iCurrent - 1;
+
+	iStartIndex = m_iCurrent > 10 ? m_iCurrent - 10 : 0;
+
+	for(i = iEndIndex - 1;i >= iStartIndex;i--)
+	{
+		lHistory->push_back(ppidlList[i]);
+	}
 }
 
 UINT CPathManager::CreateHistoryPopupMenu(HWND Parent,POINT *Origin,BOOL bBack)

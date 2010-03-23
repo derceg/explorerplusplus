@@ -2134,11 +2134,47 @@ LRESULT CALLBACK CContainer::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPAR
 										/* TODO: Fix. */
 										switch(tbButton.idCommand)
 										{
-											/*case TOOLBAR_BACK:
+										case TOOLBAR_BACK:
+											{
+												list<LPITEMIDLIST> lHistory;
+												list<LPITEMIDLIST>::iterator itr;
+												TCHAR szDisplayName[MAX_PATH];
+												int i = 0;
+
+												m_pActiveShellBrowser->GetBackHistory(&lHistory);
+
+												if(lHistory.size() > 0)
+												{
+													hSubMenu = CreateMenu();
+
+													for(itr = lHistory.begin();itr != lHistory.end();itr++)
+													{
+														GetDisplayName(*itr,szDisplayName,SHGDN_INFOLDER);
+
+														mii.cbSize		= sizeof(mii);
+														mii.fMask		= MIIM_ID|MIIM_STRING;
+														mii.dwTypeData	= szDisplayName;
+														InsertMenuItem(hSubMenu,i,TRUE,&mii);
+
+														i++;
+
+														CoTaskMemFree(*itr);
+													}
+
+													lHistory.clear();
+
+													SetMenuOwnerDraw(hSubMenu);
+
+													fMask |= MIIM_SUBMENU;
+												}
+											}
 											break;
 
-											case TOOLBAR_FORWARD:
-											break;*/
+										case TOOLBAR_FORWARD:
+											{
+
+											}
+											break;
 
 										case TOOLBAR_VIEWS:
 											{

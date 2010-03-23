@@ -1,11 +1,16 @@
 #ifndef PATHMANAGER_INCLUDED
 #define PATHMANAGER_INCLUDED
 
+#include <list>
+
+using namespace std;
+
 __interface IPathManager : IUnknown
 {
-	virtual int GetNumBackPathsStored(void);
-	virtual int GetNumForwardPathsStored(void);
-	virtual UINT CreateHistoryPopupMenu(HWND,POINT *,BOOL);
+	virtual int		GetNumBackPathsStored(void);
+	virtual int		GetNumForwardPathsStored(void);
+	virtual UINT	CreateHistoryPopupMenu(HWND,POINT *,BOOL);
+	virtual void	GetBackHistory(list<LPITEMIDLIST> *lHistory);
 
 	virtual void			StoreIdl(LPITEMIDLIST pidl);
 	virtual LPITEMIDLIST	RetrievePath(int iIndex);
@@ -20,13 +25,14 @@ public:
 	~CPathManager();
 
 	/* IUnknown methods. */
-	HRESULT __stdcall QueryInterface(REFIID iid,void **ppvObject);
+	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
 	ULONG __stdcall	AddRef(void);
 	ULONG __stdcall	Release(void);
 
-	int GetNumBackPathsStored(void);
-	int GetNumForwardPathsStored(void);
-	UINT CreateHistoryPopupMenu(HWND,POINT *,BOOL);
+	int				GetNumBackPathsStored(void);
+	int				GetNumForwardPathsStored(void);
+	UINT			CreateHistoryPopupMenu(HWND,POINT *,BOOL);
+	void			GetBackHistory(list<LPITEMIDLIST> *lHistory);
 
 	void			StoreIdl(LPITEMIDLIST pidl);
 	LPITEMIDLIST	RetrievePath(int iIndex);
