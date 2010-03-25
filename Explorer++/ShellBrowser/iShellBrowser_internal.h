@@ -281,6 +281,8 @@ public:
 	BOOL				IsBackHistory(void);
 	BOOL				IsForwardHistory(void);
 	void				GetBackHistory(list<LPITEMIDLIST> *lHistory);
+	void				GetForwardHistory(list<LPITEMIDLIST> *lHistory);
+	LPITEMIDLIST		RetrieveHistoryItemWithoutUpdate(int iItem);
 	LPITEMIDLIST		RetrieveHistoryItem(int iItem);
 	BOOL				CanBrowseUp(void);
 	int					QueryNumItems(void);

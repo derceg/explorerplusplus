@@ -1114,6 +1114,7 @@ private:
 	int						GetViewModeMenuId(UINT uViewMode);
 	int						GetViewModeMenuStringId(UINT uViewMode);
 	BOOL					VerifyLanguageVersion(TCHAR *szLanguageModule);
+	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 
 
 

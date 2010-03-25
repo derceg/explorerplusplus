@@ -122,6 +122,12 @@ main rebar. */
 #define	ID_DRIVESTOOLBAR		3
 #define	ID_APPLICATIONSTOOLBAR	4
 
+/* Rebar menu id's. */
+#define ID_REBAR_MENU_BACK_START	2000
+#define ID_REBAR_MENU_BACK_END		2999
+#define ID_REBAR_MENU_FORWARD_START	3000
+#define ID_REBAR_MENU_FORWARD_END	3999
+
 /* Tab drag and drop timer information. */
 #define TABDRAG_TIMER_ID		0
 #define TABDRAG_TIMER_ELAPSED	500

@@ -275,9 +275,19 @@ void CFolderView::GetBackHistory(list<LPITEMIDLIST> *lHistory)
 	return m_pPathManager->GetBackHistory(lHistory);
 }
 
-LPITEMIDLIST CFolderView::RetrieveHistoryItem(int iItem)
+void CFolderView::GetForwardHistory(list<LPITEMIDLIST> *lHistory)
+{
+	return m_pPathManager->GetForwardHistory(lHistory);
+}
+
+LPITEMIDLIST CFolderView::RetrieveHistoryItemWithoutUpdate(int iItem)
 {
 	return m_pPathManager->RetrievePathWithoutUpdate(iItem);
+}
+
+LPITEMIDLIST CFolderView::RetrieveHistoryItem(int iItem)
+{
+	return m_pPathManager->RetrievePath(iItem);
 }
 
 BOOL CFolderView::CanBrowseUp(void)

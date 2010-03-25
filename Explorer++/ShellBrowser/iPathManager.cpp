@@ -185,7 +185,26 @@ void CPathManager::GetBackHistory(list<LPITEMIDLIST> *lHistory)
 
 	for(i = iEndIndex - 1;i >= iStartIndex;i--)
 	{
-		lHistory->push_back(ppidlList[i]);
+		lHistory->push_back(ILClone(ppidlList[i]));
+	}
+}
+
+void CPathManager::GetForwardHistory(list<LPITEMIDLIST> *lHistory)
+{
+	int nPaths;
+	int iStartIndex;
+	int iEndIndex;
+	int i = 0;
+
+	nPaths = GetNumForwardPathsStored();
+
+	iStartIndex = m_iCurrent;
+
+	iEndIndex = (m_nTotal - m_iCurrent) > 10 ? m_iCurrent + 10 : m_nTotal;
+
+	for(i = iStartIndex;i < iEndIndex;i++)
+	{
+		lHistory->push_back(ILClone(ppidlList[i]));
 	}
 }
 

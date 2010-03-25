@@ -767,7 +767,7 @@ void CContainer::OnTBGetInfoTip(LPARAM lParam)
 	{
 		if(m_pActiveShellBrowser->IsBackHistory())
 		{
-			pidl = m_pActiveShellBrowser->RetrieveHistoryItem(-1);
+			pidl = m_pActiveShellBrowser->RetrieveHistoryItemWithoutUpdate(-1);
 
 			GetDisplayName(pidl,szPath,SHGDN_INFOLDER);
 			StringCchPrintf(szInfoTip,SIZEOF_ARRAY(szInfoTip),
@@ -780,7 +780,7 @@ void CContainer::OnTBGetInfoTip(LPARAM lParam)
 	{
 		if(m_pActiveShellBrowser->IsForwardHistory())
 		{
-			pidl = m_pActiveShellBrowser->RetrieveHistoryItem(1);
+			pidl = m_pActiveShellBrowser->RetrieveHistoryItemWithoutUpdate(1);
 
 			GetDisplayName(pidl,szPath,SHGDN_INFOLDER);
 			StringCchPrintf(szInfoTip,SIZEOF_ARRAY(szInfoTip),

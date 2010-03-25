@@ -2131,49 +2131,16 @@ LRESULT CALLBACK CContainer::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPAR
 								{
 								case ID_MAINTOOLBAR:
 									{
-										/* TODO: Fix. */
 										switch(tbButton.idCommand)
 										{
 										case TOOLBAR_BACK:
-											{
-												list<LPITEMIDLIST> lHistory;
-												list<LPITEMIDLIST>::iterator itr;
-												TCHAR szDisplayName[MAX_PATH];
-												int i = 0;
-
-												m_pActiveShellBrowser->GetBackHistory(&lHistory);
-
-												if(lHistory.size() > 0)
-												{
-													hSubMenu = CreateMenu();
-
-													for(itr = lHistory.begin();itr != lHistory.end();itr++)
-													{
-														GetDisplayName(*itr,szDisplayName,SHGDN_INFOLDER);
-
-														mii.cbSize		= sizeof(mii);
-														mii.fMask		= MIIM_ID|MIIM_STRING;
-														mii.dwTypeData	= szDisplayName;
-														InsertMenuItem(hSubMenu,i,TRUE,&mii);
-
-														i++;
-
-														CoTaskMemFree(*itr);
-													}
-
-													lHistory.clear();
-
-													SetMenuOwnerDraw(hSubMenu);
-
-													fMask |= MIIM_SUBMENU;
-												}
-											}
+											hSubMenu = CreateRebarHistoryMenu(TRUE);
+											fMask |= MIIM_SUBMENU;
 											break;
 
 										case TOOLBAR_FORWARD:
-											{
-
-											}
+											hSubMenu = CreateRebarHistoryMenu(FALSE);
+											fMask |= MIIM_SUBMENU;
 											break;
 
 										case TOOLBAR_VIEWS:
@@ -2284,8 +2251,45 @@ LRESULT CALLBACK CContainer::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPAR
 
 				ClientToScreen(m_hMainRebar,&ptMenu);
 
-				TrackPopupMenu(hMenu,TPM_LEFTALIGN,
+				UINT uFlags = TPM_LEFTALIGN|TPM_RETURNCMD;
+				int iCmd;
+
+				iCmd = TrackPopupMenu(hMenu,uFlags,
 					ptMenu.x,ptMenu.y,0,m_hMainRebar,NULL);
+
+				if(iCmd != 0)
+				{
+					/* We'll handle the back and forward buttons
+					in place, and send the rest of the messages
+					back to the main window. */
+					if((iCmd >= ID_REBAR_MENU_BACK_START &&
+						iCmd <= ID_REBAR_MENU_BACK_END) ||
+						(iCmd >= ID_REBAR_MENU_FORWARD_START &&
+						iCmd <= ID_REBAR_MENU_FORWARD_END))
+					{
+						LPITEMIDLIST pidl = NULL;
+
+						if(iCmd >= ID_REBAR_MENU_BACK_START &&
+							iCmd <= ID_REBAR_MENU_BACK_END)
+						{
+							iCmd = -(iCmd - ID_REBAR_MENU_BACK_START);
+						}
+						else
+						{
+							iCmd = iCmd - ID_REBAR_MENU_FORWARD_START;
+						}
+
+						pidl = m_pActiveShellBrowser->RetrieveHistoryItem(iCmd);
+
+						BrowseFolder(pidl,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
+
+						CoTaskMemFree(pidl);
+					}
+					else
+					{
+						SendMessage(m_hContainer,WM_COMMAND,MAKEWPARAM(iCmd,0),0);
+					}
+				}
 
 				DestroyMenu(hMenu);
 
@@ -2295,6 +2299,56 @@ LRESULT CALLBACK CContainer::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPAR
 	}
 
 	return 0;
+}
+
+HMENU CContainer::CreateRebarHistoryMenu(BOOL bBack)
+{
+	HMENU hSubMenu = NULL;
+	list<LPITEMIDLIST> lHistory;
+	list<LPITEMIDLIST>::iterator itr;
+	MENUITEMINFO mii;
+	TCHAR szDisplayName[MAX_PATH];
+	int iBase;
+	int i = 0;
+
+	if(bBack)
+	{
+		m_pActiveShellBrowser->GetBackHistory(&lHistory);
+
+		iBase = ID_REBAR_MENU_BACK_START;
+	}
+	else
+	{
+		m_pActiveShellBrowser->GetForwardHistory(&lHistory);
+
+		iBase = ID_REBAR_MENU_FORWARD_START;
+	}
+
+	if(lHistory.size() > 0)
+	{
+		hSubMenu = CreateMenu();
+
+		for(itr = lHistory.begin();itr != lHistory.end();itr++)
+		{
+			GetDisplayName(*itr,szDisplayName,SHGDN_INFOLDER);
+
+			mii.cbSize		= sizeof(mii);
+			mii.fMask		= MIIM_ID|MIIM_STRING;
+			mii.wID			= iBase + i + 1;
+			mii.dwTypeData	= szDisplayName;
+			InsertMenuItem(hSubMenu,i,TRUE,&mii);
+
+			i++;
+
+			CoTaskMemFree(*itr);
+		}
+
+		lHistory.clear();
+
+		SetMenuOwnerDraw(hSubMenu);
+	}
+
+	return hSubMenu;
 }
 
 /*
