@@ -150,6 +150,9 @@ private:
 	BOOL				m_bRightClick;
 	BOOL				m_bShowHidden;
 
+	/* Subfolder thread. */
+	CRITICAL_SECTION	m_csSubFolders;
+
 	/* Icon thread. */
 	HANDLE				m_hThread;
 

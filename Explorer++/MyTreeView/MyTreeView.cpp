@@ -70,6 +70,7 @@ HANDLE hIconsThread)
 	SetWindowSubclass(m_hTreeView,TreeViewProcStub,0,(DWORD_PTR)this);
 
 	InitializeCriticalSection(&m_cs);
+	InitializeCriticalSection(&m_csSubFolders);
 	InitializeCriticalSection(&g_tv_icon_cs);
 
 	m_iAlteredAllocation = DEFAULT_ALTERED_ALLOCATION;
@@ -716,7 +717,6 @@ HTREEITEM hParent)
 		pEnumIDList->Release();
 
 
-
 		for(itr = vItems.begin();itr != vItems.end();itr++)
 		{
 			UINT ItemMask = TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_CHILDREN;
@@ -938,6 +938,7 @@ LPITEMIDLIST pidlDirectory,HTREEITEM hParent)
 DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
 {
 	IShellFolder	*pShellFolder = NULL;
+	LPITEMIDLIST	pidl = NULL;
 	LPITEMIDLIST	pidlRelative = NULL;
 	HTREEITEM		hItem;
 	TVITEM			tvItem;
@@ -962,27 +963,51 @@ DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
 		if(res != FALSE)
 		{
 			ItemInfo_t *pItemInfo = NULL;
+			int iItemID;
+			BOOL bValid = FALSE;
 
-			pItemInfo = &m_pItemInfo[(int)tvItem.lParam];
+			iItemID = (int)tvItem.lParam;
 
-			hr = SHBindToParent(pItemInfo->pidl,IID_IShellFolder,(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
+			EnterCriticalSection(&m_csSubFolders);
 
-			if(SUCCEEDED(hr))
+			/* If the item is valid at this point, we'll
+			clone it's pidl, and use it to check whether
+			the item has any subfolders. */
+			if(iItemID < m_iCurrentItemAllocation)
 			{
-				/* Only retrieve the attributes for this item. */
-				hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&pidlRelative,&Attributes);
+				if(m_uItemMap[iItemID] == 1)
+				{
+					pidl = ILClone(m_pItemInfo[(int)tvItem.lParam].pidl);
+
+					bValid = TRUE;
+				}
+			}
+
+			LeaveCriticalSection(&m_csSubFolders);
+
+			if(bValid)
+			{
+				hr = SHBindToParent(pidl,IID_IShellFolder,(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
 
 				if(SUCCEEDED(hr))
 				{
-					if((Attributes & SFGAO_HASSUBFOLDER) != SFGAO_HASSUBFOLDER)
-					{
-						tvItem.mask			= TVIF_CHILDREN;
-						tvItem.cChildren	= 0;
-						TreeView_SetItem(pThreadInfo->hTreeView,&tvItem);
-					}
+					/* Only retrieve the attributes for this item. */
+					hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&pidlRelative,&Attributes);
 
-					pShellFolder->Release();
+					if(SUCCEEDED(hr))
+					{
+						if((Attributes & SFGAO_HASSUBFOLDER) != SFGAO_HASSUBFOLDER)
+						{
+							tvItem.mask			= TVIF_CHILDREN;
+							tvItem.cChildren	= 0;
+							TreeView_SetItem(pThreadInfo->hTreeView,&tvItem);
+						}
+
+						pShellFolder->Release();
+					}
 				}
+
+				CoTaskMemFree((LPVOID)pidl);
 			}
 		}
 
@@ -1393,12 +1418,16 @@ void CMyTreeView::EraseItems(HTREEITEM hParent)
 		if(Item.cChildren != 0)
 			EraseItems(hItem);
 
+		EnterCriticalSection(&m_csSubFolders);
+
 		pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
 		CoTaskMemFree((LPVOID)pItemInfo->pidl);
 
 		/* Free up this items id. */
 		m_uItemMap[(int)Item.lParam] = 0;
+
+		LeaveCriticalSection(&m_csSubFolders);
 
 		hItem = TreeView_GetNextSibling(m_hTreeView,hItem);
 	}
