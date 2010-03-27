@@ -1627,6 +1627,71 @@ LRESULT CALLBACK CContainer::CommandHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPA
 			OnAutoSizeColumns();
 			break;
 
+		case IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT:
+			{
+				/* Dump the columns from the current tab, and save
+				them as the default columns for the appropriate folder
+				type.. */
+				IShellFolder *pShellFolder = NULL;
+				list<Column_t> pActiveColumnList;
+				LPITEMIDLIST pidl = NULL;
+				LPITEMIDLIST pidlDrives = NULL;
+				LPITEMIDLIST pidlControls = NULL;
+				LPITEMIDLIST pidlBitBucket = NULL;
+				LPITEMIDLIST pidlPrinters = NULL;
+				LPITEMIDLIST pidlConnections = NULL;
+				LPITEMIDLIST pidlNetwork = NULL;
+
+				m_pActiveShellBrowser->ExportCurrentColumns(&pActiveColumnList);
+
+				pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+
+				SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidlDrives);
+				SHGetFolderLocation(NULL,CSIDL_CONTROLS,NULL,0,&pidlControls);
+				SHGetFolderLocation(NULL,CSIDL_BITBUCKET,NULL,0,&pidlBitBucket);
+				SHGetFolderLocation(NULL,CSIDL_PRINTERS,NULL,0,&pidlPrinters);
+				SHGetFolderLocation(NULL,CSIDL_CONNECTIONS,NULL,0,&pidlConnections);
+				SHGetFolderLocation(NULL,CSIDL_NETWORK,NULL,0,&pidlNetwork);
+
+				SHGetDesktopFolder(&pShellFolder);
+
+				if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlDrives) == 0)
+				{
+					m_MyComputerColumnList = pActiveColumnList;
+				}
+				else if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlControls) == 0)
+				{
+					m_ControlPanelColumnList = pActiveColumnList;
+				}
+				else if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlBitBucket) == 0)
+				{
+					m_RecycleBinColumnList = pActiveColumnList;
+				}
+				else if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlPrinters) == 0)
+				{
+					m_PrintersColumnList = pActiveColumnList;
+				}
+				else if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlConnections) == 0)
+				{
+					m_NetworkConnectionsColumnList = pActiveColumnList;
+				}
+				else if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlNetwork) == 0)
+				{
+					m_MyNetworkPlacesColumnList = pActiveColumnList;
+				}
+				else
+				{
+					m_RealFolderColumnList = pActiveColumnList;
+				}
+
+				pActiveColumnList.clear();
+
+				pShellFolder->Release();
+
+				CoTaskMemFree(pidl);
+			}
+			break;
+
 		case TOOLBAR_NEWFOLDER:
 		case IDM_ACTIONS_NEWFOLDER:
 			OnCreateNewFolder();

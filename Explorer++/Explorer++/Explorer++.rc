@@ -644,6 +644,7 @@ BEGIN
         MENUITEM "&Refresh\tF5",                IDM_VIEW_REFRESH
         MENUITEM "Select &Columns...",          IDM_VIEW_SELECTCOLUMNS
         MENUITEM "&Autosize Columns",           IDM_VIEW_AUTOSIZECOLUMNS
+        MENUITEM "Save Column Layout as Default", IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT
         MENUITEM "Change Dis&play Window Colours...", IDM_VIEW_CHANGEDISPLAYCOLOURS
         MENUITEM SEPARATOR
         POPUP "&Filter"
@@ -1471,6 +1472,8 @@ END
 STRINGTABLE 
 BEGIN
     IDM_TOOLS_SEARCH        "Search for files"
+    IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT 
+                            "Set the layout of the current columns as the default layout"
 END
 
 STRINGTABLE 

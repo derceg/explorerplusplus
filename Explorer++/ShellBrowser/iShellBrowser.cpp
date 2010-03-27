@@ -1764,11 +1764,19 @@ HICON CFolderView::GetItemIconInternal(int iItemInternal)
 
 void CFolderView::ExportCurrentColumns(list<Column_t> *pColumns)
 {
-	list<Column_t>::iterator	itr;
-	Column_t							Column;
+	list<Column_t>::iterator itr;
+	Column_t Column;
+	int iColumn = 0;
 
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
 	{
+		if(m_ViewMode == VM_DETAILS && itr->bChecked)
+		{
+			itr->iWidth = ListView_GetColumnWidth(m_hListView,iColumn);
+
+			iColumn++;
+		}
+
 		Column.id		= itr->id;
 		Column.bChecked	= itr->bChecked;
 		Column.iWidth	= itr->iWidth;

@@ -764,7 +764,7 @@ int CContainer::LoadTabSettingsFromRegistry(void)
 				list<Column_t>	NetworkConnectionsColumnListTemp;
 				list<Column_t>	MyNetworkPlacesColumnListTemp;
 
-				LoadColumnWidthsFromRegistry(hColumnsKey,_T("ControlPanelColumWidths"),&ControlPanelColumnListTemp);
+				LoadColumnWidthsFromRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&ControlPanelColumnListTemp);
 				LoadColumnWidthsFromRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&MyComputerColumnListTemp);
 				LoadColumnWidthsFromRegistry(hColumnsKey,_T("RealFolderColumnWidths"),&RealFolderColumnListTemp);
 				LoadColumnWidthsFromRegistry(hColumnsKey,_T("RecycleBinColumnWidths"),&RecycleBinColumnListTemp);
@@ -925,7 +925,7 @@ void CContainer::LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<C
 	RegQueryValueEx(hColumnsKey,szKeyName,0,&dwType,(LPBYTE)ColumnList,
 		&dwSize);
 
-	for(i = 0;i < dwSize / sizeof(Column_t);i++)
+	for(i = 0;i < dwSize / sizeof(ColumnOld_t);i++)
 	{
 		Column.id = ColumnList[i].id;
 		Column.bChecked = ColumnList[i].bChecked;
@@ -948,12 +948,25 @@ void CContainer::SaveDefaultColumnsToRegistry(void)
 	if(ReturnValue == ERROR_SUCCESS)
 	{
 		SaveColumnToRegistry(hColumnsKey,_T("ControlPanelColumns"),&m_ControlPanelColumnList);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&m_ControlPanelColumnList);
+
 		SaveColumnToRegistry(hColumnsKey,_T("MyComputerColumns"),&m_MyComputerColumnList);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&m_MyComputerColumnList);
+
 		SaveColumnToRegistry(hColumnsKey,_T("RealFolderColumns"),&m_RealFolderColumnList);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("RealFolderColumnWidths"),&m_RealFolderColumnList);
+
 		SaveColumnToRegistry(hColumnsKey,_T("RecycleBinColumns"),&m_RecycleBinColumnList);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("RecycleBinColumnWidths"),&m_RecycleBinColumnList);
+
 		SaveColumnToRegistry(hColumnsKey,_T("PrinterColumns"),&m_PrintersColumnList);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("PrinterColumnWidths"),&m_PrintersColumnList);
+
 		SaveColumnToRegistry(hColumnsKey,_T("NetworkColumns"),&m_NetworkConnectionsColumnList);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkColumnWidths"),&m_NetworkConnectionsColumnList);
+
 		SaveColumnToRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&m_MyNetworkPlacesColumnList);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"),&m_MyNetworkPlacesColumnList);
 
 		RegCloseKey(hColumnsKey);
 	}
@@ -984,6 +997,30 @@ void CContainer::LoadDefaultColumnsFromRegistry(void)
 		LoadColumnFromRegistry(hColumnsKey,_T("PrinterColumns"),&m_PrintersColumnList);
 		LoadColumnFromRegistry(hColumnsKey,_T("NetworkColumns"),&m_NetworkConnectionsColumnList);
 		LoadColumnFromRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&m_MyNetworkPlacesColumnList);
+
+		list<Column_t>	RealFolderColumnListTemp;
+		list<Column_t>	MyComputerColumnListTemp;
+		list<Column_t>	ControlPanelColumnListTemp;
+		list<Column_t>	RecycleBinColumnListTemp;
+		list<Column_t>	PrintersColumnListTemp;
+		list<Column_t>	NetworkConnectionsColumnListTemp;
+		list<Column_t>	MyNetworkPlacesColumnListTemp;
+
+		LoadColumnWidthsFromRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&ControlPanelColumnListTemp);
+		LoadColumnWidthsFromRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&MyComputerColumnListTemp);
+		LoadColumnWidthsFromRegistry(hColumnsKey,_T("RealFolderColumnWidths"),&RealFolderColumnListTemp);
+		LoadColumnWidthsFromRegistry(hColumnsKey,_T("RecycleBinColumnWidths"),&RecycleBinColumnListTemp);
+		LoadColumnWidthsFromRegistry(hColumnsKey,_T("PrinterColumnWidths"),&PrintersColumnListTemp);
+		LoadColumnWidthsFromRegistry(hColumnsKey,_T("NetworkColumnWidths"),&NetworkConnectionsColumnListTemp);
+		LoadColumnWidthsFromRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"),&MyNetworkPlacesColumnListTemp);
+
+		UpdateColumnWidths(&m_ControlPanelColumnList,&ControlPanelColumnListTemp);
+		UpdateColumnWidths(&m_MyComputerColumnList,&MyComputerColumnListTemp);
+		UpdateColumnWidths(&m_RealFolderColumnList,&RealFolderColumnListTemp);
+		UpdateColumnWidths(&m_RecycleBinColumnList,&RecycleBinColumnListTemp);
+		UpdateColumnWidths(&m_PrintersColumnList,&PrintersColumnListTemp);
+		UpdateColumnWidths(&m_NetworkConnectionsColumnList,&NetworkConnectionsColumnListTemp);
+		UpdateColumnWidths(&m_MyNetworkPlacesColumnList,&MyNetworkPlacesColumnListTemp);
 
 		ValidateColumns();
 
