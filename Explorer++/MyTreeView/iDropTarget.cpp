@@ -34,7 +34,7 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	/* The two drop formats we support. */
 	FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	FORMATETC ftcFileDescriptor = {RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC ftcFileDescriptor = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 
 	m_pDataObject = pDataObject;
 
@@ -244,7 +244,6 @@ POINTL pt,DWORD *pdwEffect)
 {
 	TVHITTESTINFO	tvht;
 	LPITEMIDLIST	pidlDirectory = NULL;
-	DROPFILES		*pdf = NULL;
 	TCHAR			szDestDirectory[MAX_PATH + 1];
 
 	KillTimer(m_hTreeView,DRAGEXPAND_TIMER_ID);

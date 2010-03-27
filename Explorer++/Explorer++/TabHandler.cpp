@@ -829,6 +829,7 @@ void CContainer::InitializeTabs(void)
 	m_hTabCtrl = CreateTabControl(m_hTabBacking,TabCtrlStyles);
 
 	himlSmall = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,100);
+	AddDefaultTabIcons(himlSmall);
 	TabCtrl_SetImageList(m_hTabCtrl,himlSmall);
 
 	/* Initialize the drag source helper, and use it to initialize the drop target helper. */
@@ -856,6 +857,26 @@ void CContainer::InitializeTabs(void)
 	m_hTabWindowToolbar	= CreateTabToolbar(m_hTabBacking,TABTOOLBAR_CLOSE,szTabCloseTip);
 }
 
+void CContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
+{
+	HIMAGELIST himlTemp;
+	HBITMAP hBitmap;
+	ICONINFO IconInfo;
+
+	himlTemp = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
+
+	hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
+
+	ImageList_Add(himlTemp,hBitmap,NULL);
+	GetIconInfo(ImageList_GetIcon(himlTemp,SHELLIMAGES_LOCK,
+		ILD_TRANSPARENT),&IconInfo);
+	ImageList_Add(himlTab,IconInfo.hbmColor,IconInfo.hbmMask);
+
+	DeleteObject(IconInfo.hbmColor);
+	DeleteObject(IconInfo.hbmMask);
+	ImageList_Destroy(himlTemp);
+}
+
 void CContainer::InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId)
 {
 	TCITEM		tcItem;
@@ -874,29 +895,18 @@ void CContainer::InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,int iT
 			SIZEOF_ARRAY(m_TabInfo[iTabId].szName),szTabText);
 	}
 
-	SHGetFileInfo((LPCTSTR)pidlDirectory,0,&shfi,sizeof(shfi),
-		SHGFI_PIDL|SHGFI_ICON|SHGFI_SMALLICON);
-
-	GetIconInfo(shfi.hIcon,&IconInfo);
-	iImage = ImageList_Add(TabCtrl_GetImageList(m_hTabCtrl),
-		IconInfo.hbmColor,IconInfo.hbmMask);
-
 	ReplaceCharacterWithString(m_TabInfo[iTabId].szName,szExpandedTabText,
 		SIZEOF_ARRAY(szExpandedTabText),'&',_T("&&"));
 
 	/* Tab control insertion information. The folders name will be used
 	as the tab text. */
-	tcItem.mask			= TCIF_TEXT|TCIF_IMAGE|TCIF_PARAM;
+	tcItem.mask			= TCIF_TEXT|TCIF_PARAM;
 	tcItem.pszText		= szExpandedTabText;
-	tcItem.iImage		= iImage;
 	tcItem.lParam		= iTabId;
 
 	SendMessage(m_hTabCtrl,TCM_INSERTITEM,(WPARAM)iNewTabIndex,(LPARAM)&tcItem);
 
-	/* Clean up. */
-	DeleteObject(IconInfo.hbmColor);
-	DeleteObject(IconInfo.hbmMask);
-	DestroyIcon(shfi.hIcon);
+	SetTabIcon(iNewTabIndex,iTabId,pidlDirectory);
 }
 
 void CContainer::OnDuplicateTab(int iTab)
@@ -916,12 +926,14 @@ void CContainer::OnLockTab(int iTab)
 	tcItem.mask = TCIF_PARAM;
 	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
 
-	OnLockTabInternal((int)tcItem.lParam);
+	OnLockTabInternal(iTab,(int)tcItem.lParam);
 }
 
-void CContainer::OnLockTabInternal(int iTabId)
+void CContainer::OnLockTabInternal(int iTab,int iTabId)
 {
 	m_TabInfo[iTabId].bLocked = !m_TabInfo[iTabId].bLocked;
+
+	SetTabIcon(iTab,iTabId);
 
 	/* If the tab that was locked/unlocked is the
 	currently selected tab, then the tab close
@@ -938,6 +950,8 @@ void CContainer::OnLockTabAndAddress(int iTab)
 	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
 
 	m_TabInfo[(int)tcItem.lParam].bAddressLocked = !m_TabInfo[(int)tcItem.lParam].bAddressLocked;
+
+	SetTabIcon(iTab,(int)tcItem.lParam);
 
 	/* If the tab that was locked/unlocked is the
 	currently selected tab, then the tab close

@@ -48,7 +48,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	{
 		/* The two drop formats we support. */
 		FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-		FORMATETC ftcFileDescriptor = {RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+		FORMATETC ftcFileDescriptor = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 
 		/* Check whether the drop source has the type of data
 		that is needed for this drag operation. */
@@ -385,7 +385,6 @@ HRESULT _stdcall CFolderView::Drop(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 {
 	FORMATETC		ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	FORMATETC		ftcFileDescriptor = {RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	STGMEDIUM		stg;
 	DROPFILES		*pdf = NULL;
 	POINT			pt;

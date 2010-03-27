@@ -256,6 +256,10 @@ bitmap). */
 #define SHELLIMAGES_FILTER			26
 #define SHELLIMAGES_UNDO			27
 #define SHELLIMAGES_REDO			28
+#define SHELLIMAGES_LOCK			29
+
+/* Tab icons. */
+#define TAB_ICON_LOCK_INDEX			0
 
 /* Used with the rename tab dialog. */
 typedef struct

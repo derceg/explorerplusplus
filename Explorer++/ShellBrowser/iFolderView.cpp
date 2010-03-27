@@ -148,6 +148,8 @@ HANDLE hFolderSizeThread)
 
 	m_iUniqueFolderIndex	= 0;
 
+	m_pidlDirectory			= NULL;
+
 	SetUserOptions(pSettings);
 
 	ListView_SetAutoArrange(m_hListView,m_bAutoArrange);

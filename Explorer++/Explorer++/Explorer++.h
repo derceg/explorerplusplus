@@ -501,7 +501,7 @@ private:
 	void					OnStartedBrowsing(int iTabId,TCHAR *szPath);
 	void					OnDuplicateTab(int iTab);
 	void					OnLockTab(int iTab);
-	void					OnLockTabInternal(int iTabId);
+	void					OnLockTabInternal(int iTab,int iTabId);
 	void					OnLockTabAndAddress(int iTab);
 	void					HandleTabToolbarItemStates(void);
 	void					OnAutoSizeColumns(void);
@@ -760,6 +760,8 @@ private:
 	void					HandleComboBoxText(void);
 	void					HandleTabText(void);
 	void					SetTabIcon(void);
+	void					SetTabIcon(int iIndex,int iTabId);
+	void					SetTabIcon(int iIndex,int iTabId,LPITEMIDLIST pidlDirectory);
 	void					HandleTreeViewSelection(void);
 	void					SetStatusBarParts(int width);
 	void					ResizeWindows(void);
@@ -1101,6 +1103,7 @@ private:
 	void					CreateStatusBar(void);
 	void					InitializeDisplayWindow(void);
 	void					InitializeTabs(void);
+	void					AddDefaultTabIcons(HIMAGELIST himlTab);
 	void					InitializeMenus(void);
 	void					SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl);
 	int						CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,int nBuffer);

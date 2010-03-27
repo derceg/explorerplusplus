@@ -1030,6 +1030,7 @@ void CContainer::OnDirChanged(int iTabId)
 	ListView_SetItemState(m_hActiveListView,0,LVIS_FOCUSED,LVIS_FOCUSED);
 
 	UpdateWindowStates();
+
 	SetTabIcon();
 }
 
@@ -1656,9 +1657,7 @@ HRESULT CContainer::BrowseFolder(TCHAR *szPath,UINT wFlags,
 BOOL bOpenInNewTab,BOOL bSwitchToNewTab)
 {
 	LPITEMIDLIST	pidl = NULL;
-	TCHAR			szExpandedPath[MAX_PATH];
 	HRESULT			hr = S_FALSE;
-	BOOL			bRet;
 
 	hr = GetIdlFromParsingName(szPath,&pidl);
 

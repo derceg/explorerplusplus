@@ -90,7 +90,7 @@ BOOL bRenameOnCollision)
 void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDirectory,POINTL *pptl)
 {
 	FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	FORMATETC ftcFileDescriptor = {RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC ftcFileDescriptor = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	STGMEDIUM stg;
 	DROPFILES *pdf = NULL;
 	DWORD *pdwEffect = NULL;
@@ -211,19 +211,19 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 					{
 					}*/
 
-					ftcfchg.cfFormat	= RegisterClipboardFormat(CFSTR_FILECONTENTS);
+					ftcfchg.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS);
 					ftcfchg.ptd			= NULL;
 					ftcfchg.dwAspect	= DVASPECT_CONTENT;
 					ftcfchg.lindex		= -1;
 					ftcfchg.tymed		= TYMED_HGLOBAL;
 
-					ftcfcis.cfFormat	= RegisterClipboardFormat(CFSTR_FILECONTENTS);
+					ftcfcis.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS);
 					ftcfcis.ptd			= NULL;
 					ftcfcis.dwAspect	= DVASPECT_CONTENT;
 					ftcfcis.lindex		= -1;
 					ftcfcis.tymed		= TYMED_ISTREAM;
 
-					ftcfcstg.cfFormat	= RegisterClipboardFormat(CFSTR_FILECONTENTS);
+					ftcfcstg.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS);
 					ftcfcstg.ptd		= NULL;
 					ftcfcstg.dwAspect	= DVASPECT_CONTENT;
 					ftcfcstg.lindex		= -1;
@@ -235,14 +235,14 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 
 					if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
 					{
-						ftcfchg.lindex = i - 1;
+						ftcfchg.lindex = i;
 
 						hr = pDataObject->GetData(&ftcfchg,&stgFileContents);
 
 						if(hr == S_OK)
 						{
 							if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
-								nBytesToWrite = GlobalSize(stgFileContents.hGlobal);
+								nBytesToWrite = (DWORD)GlobalSize(stgFileContents.hGlobal);
 
 							pBuffer = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
 
@@ -255,7 +255,7 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 						STATSTG sstg;
 						ULONG cbRead;
 
-						//ftcfcis.lindex = i;
+						ftcfcis.lindex = i;
 
 						hr = pDataObject->GetData(&ftcfcis,&stgFileContents);
 

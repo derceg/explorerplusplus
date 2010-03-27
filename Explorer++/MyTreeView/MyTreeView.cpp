@@ -587,8 +587,6 @@ int CALLBACK CMyTreeView::CompareItems(LPARAM lParam1,LPARAM lParam2)
 			return lstrcmpi(szDisplayName1,szDisplayName2);
 		}
 	}
-
-	return 1;
 }
 
 void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder,LPITEMIDLIST pidlDirectory,
@@ -636,8 +634,6 @@ HTREEITEM hParent)
 		EnumFlags |= SHCONTF_INCLUDEHIDDEN;
 
 	hr = pShellFolder->EnumObjects(NULL,EnumFlags,&pEnumIDList);
-
-	int iItems = 0;
 
 	vector<ItemStore_t> vItems;
 	vector<ItemStore_t>::iterator itr;
@@ -962,7 +958,6 @@ DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
 
 		if(res != FALSE)
 		{
-			ItemInfo_t *pItemInfo = NULL;
 			int iItemID;
 			BOOL bValid = FALSE;
 

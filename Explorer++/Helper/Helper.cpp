@@ -1182,7 +1182,7 @@ BOOL CheckGroupMembership(GroupType_t GroupType)
 {
 	SID_IDENTIFIER_AUTHORITY sia = SECURITY_NT_AUTHORITY;
 	PSID psid;
-	DWORD dwGroup;
+	DWORD dwGroup = 0;
 	BOOL bMember = FALSE;
 	BOOL bRet;
 
@@ -3130,7 +3130,7 @@ Filename: {name}, Date Modified: {date_modified}
 /* TODO: */
 void BuildFileString()
 {
-	TCHAR szString[] = _T("Filename: {name}, Date Modified: {date_modified}");
+	//TCHAR szString[] = _T("Filename: {name}, Date Modified: {date_modified}");
 
 	//psz = ReplaceSubString(szTip,_T("{name}"),pwfd->cFileName);
 }

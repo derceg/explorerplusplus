@@ -188,6 +188,19 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 				}
 				CheckDlgButton(hDlg,nIDButton,BST_CHECKED);
 
+				/* If we're running on Windows XP, stop the user
+				from selecting the 'Replace Explorer for all
+				folders' option. */
+				if(m_dwMajorVersion == WINDOWS_XP_MAJORVERSION)
+				{
+					EnableWindow(GetDlgItem(hDlg,IDC_OPTION_REPLACEEXPLORER_ALL),FALSE);
+
+					if(m_ReplaceExplorerMode == REPLACEEXPLORER_ALL)
+					{
+						m_ReplaceExplorerMode = IDC_OPTION_REPLACEEXPLORER_NONE;
+					}
+				}
+
 				switch(m_ReplaceExplorerMode)
 				{
 				case REPLACEEXPLORER_NONE:
