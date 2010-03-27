@@ -1042,6 +1042,22 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="My Inspector Results"
+			>
+			<File
+				RelativePath=".\My Inspector Results\r000mi1\r000mi1.insp"
+				>
+			</File>
+			<File
+				RelativePath=".\My Inspector Results\r001ti1\r001ti1.insp"
+				>
+			</File>
+			<File
+				RelativePath=".\My Inspector Results\r002ti3\r002ti3.insp"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\Explorer++.exe.manifest"
 			>

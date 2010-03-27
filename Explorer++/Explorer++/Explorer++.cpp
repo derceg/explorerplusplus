@@ -219,7 +219,7 @@ CContainer::CContainer(HWND hwnd)
 			ViewMode.uViewMode = VM_TILES;
 			m_ViewModes.push_back(ViewMode);
 		}
-		else if(VersionInfo.dwMajorVersion == WINDOWS_XP_MAJORVERSION)
+		else
 		{
 			ViewMode.uViewMode = VM_THUMBNAILS;
 			m_ViewModes.push_back(ViewMode);

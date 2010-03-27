@@ -385,7 +385,7 @@ void CContainer::SetLanguageModule(void)
 
 void CContainer::SetMenuOwnerDraw(HMENU hMenu)
 {
-	int					nTopLevelMenus;
+	int nTopLevelMenus;
 
 	nTopLevelMenus = GetMenuItemCount(hMenu);
 

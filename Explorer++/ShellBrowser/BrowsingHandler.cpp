@@ -282,12 +282,10 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 				ListView_SetItemPosition32(m_hListView,iItemIndex,ptItem.x,ptItem.y);
 			}
 
-			/* TODO: Fix. */
 			if(m_ViewMode == VM_TILES)
 			{
 				SetTileViewItemInfo(iItemIndex,itr->iItemInternal);
 			}
-
 
 			if(m_bNewItemCreated)
 			{

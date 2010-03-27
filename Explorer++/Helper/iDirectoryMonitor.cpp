@@ -230,7 +230,12 @@ BOOL bWatchSubTree,void *pData)
 
 	EnterCriticalSection(&m_cs);
 
+	/* TODO: This operation alters the list, including the
+	previously inserted item (e.g by updating list pointers).
+	Therefore, need to lock access between this function and
+	other reads of the inserted item. */
 	m_DirWatchInfoList.push_back(pDirInfo);
+
 	m_DirWatchInfoList.back().m_Async.hEvent = &m_DirWatchInfoList.back();
 	QueueUserAPC(WatchDirectoryInternal,m_hThread,(ULONG_PTR)&m_DirWatchInfoList.back());
 

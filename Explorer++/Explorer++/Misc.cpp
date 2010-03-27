@@ -1843,7 +1843,7 @@ void CContainer::CreateViewsMenu(POINT *ptOrigin)
 		ItemToCheck,MF_BYCOMMAND);
 
 	TrackPopupMenu(m_hViewsMenu,TPM_LEFTALIGN,ptOrigin->x,ptOrigin->y,
-		0,m_hMainToolbar,NULL);
+		0,m_hContainer,NULL);
 }
 
 int CContainer::CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,int nBuffer)

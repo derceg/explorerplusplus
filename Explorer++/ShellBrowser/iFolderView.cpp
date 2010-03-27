@@ -738,6 +738,7 @@ void CFolderView::SetTileViewInfo(void)
 	}
 }
 
+/* TODO: Make this function configurable. */
 void CFolderView::SetTileViewItemInfo(int iItem,int iItemInternal)
 {
 	SHFILEINFO shfi;
