@@ -101,9 +101,9 @@ SelectAndEdit() method of INewClient. */
 dialog. */
 #define DEFAULT_INITIAL_COLOR	RGB(0,94,138)
 
-#define WM_USER_TABMCLICK		(WM_USER + 53)
-#define WM_USER_ASSOCCHANGED	(WM_USER + 54)
-#define WM_USER_KEYDOWN			(WM_USER + 55)
+#define WM_USER_TABMCLICK		(WM_APP + 53)
+#define WM_USER_ASSOCCHANGED	(WM_APP + 54)
+#define WM_USER_KEYDOWN			(WM_APP + 55)
 
 /* Window constant abstractions. Used
 for window cycling. */

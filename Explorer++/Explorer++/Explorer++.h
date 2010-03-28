@@ -23,7 +23,7 @@ void InsertFolderItemsIntoComboBoxInternal(HWND hCreateIn,Bookmark_t *pBookmark)
 
 /* wParam contains virtual code of key that was pressed,
 lParam not currently used. */
-#define CBN_KEYDOWN					WM_USER + 2
+#define CBN_KEYDOWN					WM_APP + 2
 
 /* Private definitions. */
 #define FROM_LISTVIEW				0

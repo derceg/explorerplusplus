@@ -9,7 +9,7 @@
 using namespace Gdiplus;
 using namespace std;
 
-#define DWM_BASE				(WM_USER + 100)
+#define DWM_BASE				(WM_APP + 100)
 
 #define DWM_SETTHUMBNAILFILE	(DWM_BASE + 2)
 #define DWM_GETSURROUNDCOLOR	(DWM_BASE + 3)
@@ -60,10 +60,10 @@ SendMessage(hDisplay,DWM_BUFFERTEXT,(WPARAM)0,(LPARAM)szText)
 #define DisplayWindow_ClearTextBuffer(hDisplay) \
 SendMessage(hDisplay,DWM_CLEARTEXTBUFFER,(WPARAM)0,(LPARAM)0)
 
-#define WM_USER_DISPLAYWINDOWRESIZED	(WM_USER + 100)
+#define WM_USER_DISPLAYWINDOWRESIZED	(WM_APP + 100)
 
-#define WM_NDW_ICONRCLICK	(WM_USER + 101)
-#define WM_NDW_RCLICK		(WM_USER + 102)
+#define WM_NDW_ICONRCLICK	(WM_APP + 101)
+#define WM_NDW_RCLICK		(WM_APP + 102)
 
 typedef struct
 {
