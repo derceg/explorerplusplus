@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by Explorer++.rc
+// Used by Explorer++KO.rc
 //
 #define VS_VERSION_INFO                 1
 #define IDD_OPTIONS_FILESFOLDERS        9

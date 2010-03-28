@@ -741,7 +741,7 @@ BOOL CContainer::OnListViewEndLabelEdit(LPARAM lParam)
 	m_bListViewRenaming = FALSE;
 
 	/* Is the new filename empty? */
-	if(pItem->pszText == NULL)
+	if(lstrcmp(pItem->pszText,EMPTY_STRING) == 0)
 		return FALSE;
 
 	/*

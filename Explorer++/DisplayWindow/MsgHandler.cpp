@@ -217,50 +217,53 @@ void CDisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 					size.cx = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
 					size.cy = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
 
-					/* TODO: Check the return value from this. */
-					pExtractImage->GetLocation(szImage,MAX_PATH,
+					hr = pExtractImage->GetLocation(szImage,MAX_PATH,
 						&dwPriority,&size,32,&dwFlags);
-					hr = pExtractImage->Extract(&hBitmap);
 
 					if(SUCCEEDED(hr))
 					{
-						/* Get bitmap information (including height and width). */
-						GetObject(hBitmap,sizeof(BITMAP),&bm);
-
-						/* Delete the original bitmap. */
-						DeleteObject(hBitmap);
-
-						/* ...now query the thumbnail again, this time adjusting
-						the width of the suggested area based on the actual aspect
-						ratio. */
-						dwFlags = IEIFLAG_OFFLINE|IEIFLAG_QUALITY|IEIFLAG_ASPECT|IEIFLAG_ORIGSIZE;
-						size.cy = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
-						size.cx = (LONG)((double)size.cy * ((double)bm.bmWidth / (double)bm.bmHeight));
-						m_iImageWidth = size.cx;
-						m_iImageHeight = size.cy;
-						pExtractImage->GetLocation(szImage,MAX_PATH,
-							&dwPriority,&size,32,&dwFlags);
-						hr = pExtractImage->Extract(&m_hbmThumbnail);
+						hr = pExtractImage->Extract(&hBitmap);
 
 						if(SUCCEEDED(hr))
 						{
-							/* Check first if we've been cancelled. This might happen,
-							for example, if another file is selected while the current
-							thumbnail is been found. */
-							EnterCriticalSection(&m_csDWThumbnails);
+							/* Get bitmap information (including height and width). */
+							GetObject(hBitmap,sizeof(BITMAP),&bm);
 
-							if(!pte->bCancelled)
+							/* Delete the original bitmap. */
+							DeleteObject(hBitmap);
+
+							/* ...now query the thumbnail again, this time adjusting
+							the width of the suggested area based on the actual aspect
+							ratio. */
+							dwFlags = IEIFLAG_OFFLINE|IEIFLAG_QUALITY|IEIFLAG_ASPECT|IEIFLAG_ORIGSIZE;
+							size.cy = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
+							size.cx = (LONG)((double)size.cy * ((double)bm.bmWidth / (double)bm.bmHeight));
+							m_iImageWidth = size.cx;
+							m_iImageHeight = size.cy;
+							pExtractImage->GetLocation(szImage,MAX_PATH,
+								&dwPriority,&size,32,&dwFlags);
+							hr = pExtractImage->Extract(&m_hbmThumbnail);
+
+							if(SUCCEEDED(hr))
 							{
-								m_bThumbnailExtractionFailed = FALSE;
-								InvalidateRect(m_hDisplayWindow,NULL,FALSE);
-							}
+								/* Check first if we've been cancelled. This might happen,
+								for example, if another file is selected while the current
+								thumbnail is been found. */
+								EnterCriticalSection(&m_csDWThumbnails);
 
-							LeaveCriticalSection(&m_csDWThumbnails);
-						}
-						else
-						{
-							m_bThumbnailExtractionFailed = TRUE;
-							m_hbmThumbnail = NULL;
+								if(!pte->bCancelled)
+								{
+									m_bThumbnailExtractionFailed = FALSE;
+									InvalidateRect(m_hDisplayWindow,NULL,FALSE);
+								}
+
+								LeaveCriticalSection(&m_csDWThumbnails);
+							}
+							else
+							{
+								m_bThumbnailExtractionFailed = TRUE;
+								m_hbmThumbnail = NULL;
+							}
 						}
 					}
 

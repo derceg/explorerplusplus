@@ -257,6 +257,7 @@ bitmap). */
 #define SHELLIMAGES_UNDO			27
 #define SHELLIMAGES_REDO			28
 #define SHELLIMAGES_LOCK			29
+#define SHELLIMAGES_PASTESHORTCUT	30
 
 /* Tab icons. */
 #define TAB_ICON_LOCK_INDEX			0

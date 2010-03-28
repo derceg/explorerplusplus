@@ -7,6 +7,7 @@ Explorer++DE - German
 Explorer++ES - Spanish
 Explorer++FR - French
 Explorer++IT - Italian
+Explorer++KO - Korean
 Explorer++NL - Dutch
 Explorer++PT - Portuguese
 Explorer++RU - Russian

@@ -74,12 +74,10 @@ HRESULT CFolderView::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 	EmptyFolderQueue();
 	m_bBrowsing = FALSE;
 
-	/* TODO: These should be wrapped in a
-	critical section. Erase been called at
-	the same time as clear will crash the
-	program. */
+	EnterCriticalSection(&m_csDirectoryAltered);
 	m_FilesAdded.clear();
 	m_pFileSelectionList.clear();
+	LeaveCriticalSection(&m_csDirectoryAltered);
 
 	GetDisplayName(pidl,szParsingPath,SHGDN_FORPARSING);
 

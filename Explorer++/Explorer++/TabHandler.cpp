@@ -880,11 +880,8 @@ void CContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 void CContainer::InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId)
 {
 	TCITEM		tcItem;
-	SHFILEINFO	shfi;
-	ICONINFO	IconInfo;
 	TCHAR		szTabText[MAX_PATH];
 	TCHAR		szExpandedTabText[MAX_PATH];
-	int			iImage;
 
 	/* If no custom name is set, use the folders name. */
 	if(!m_TabInfo[iTabId].bUseCustomName)
