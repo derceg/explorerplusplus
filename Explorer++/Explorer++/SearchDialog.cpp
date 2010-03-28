@@ -17,9 +17,9 @@
 #include "MainResource.h"
 
 
-#define WM_USER_SEARCHITEMFOUND			(WM_USER + 1)
-#define WM_USER_SEARCHFINISHED			(WM_USER + 2)
-#define WM_USER_SEARCHCHANGEDDIRECTORY	(WM_USER + 3)
+#define WM_USER_SEARCHITEMFOUND			(WM_APP + 1)
+#define WM_USER_SEARCHFINISHED			(WM_APP + 2)
+#define WM_USER_SEARCHCHANGEDDIRECTORY	(WM_APP + 3)
 
 #define DEFAULT_SEARCH_ALLOCATION	200
 
@@ -297,24 +297,27 @@ INT_PTR CALLBACK CContainer::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM 
 		case WM_USER_SEARCHITEMFOUND:
 			{
 				HWND hListView;
+				LPITEMIDLIST pidl = NULL;
 				TCHAR szFullFileName[MAX_PATH];
-				TCHAR *pszFileName = NULL;
-				TCHAR *pszDirectory = NULL;
+				TCHAR szDirectory[MAX_PATH];
+				TCHAR szFileName[MAX_PATH];
 				LVITEM lvItem;
 				SHFILEINFO shfi;
 				int iIndex;
 				static int iItem = 0;
 				int iInternalIndex = 0;
 
-				pszDirectory = (TCHAR *)wParam;
-				pszFileName = (TCHAR *)lParam;
+				pidl = (LPITEMIDLIST)wParam;
 
 				hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
 
-				PathCombine(szFullFileName,pszDirectory,
-					pszFileName);
+				GetDisplayName(pidl,szDirectory,SHGDN_FORPARSING);
+				PathRemoveFileSpec(szDirectory);
 
-				SHGetFileInfo(szFullFileName,0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
+				GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
+				GetDisplayName(pidl,szFileName,SHGDN_INFOLDER);
+
+				SHGetFileInfo((LPCWSTR)pidl,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
 
 				while(g_pMap[iInternalIndex] != 0 && iInternalIndex < g_nSearchItemsAllocated)
 				{
@@ -338,14 +341,16 @@ INT_PTR CALLBACK CContainer::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM 
 				g_pMap[iInternalIndex] = 1;
 
 				lvItem.mask		= LVIF_IMAGE|LVIF_TEXT|LVIF_PARAM;
-				lvItem.pszText	= pszFileName;
+				lvItem.pszText	= szFileName;
 				lvItem.iItem	= iItem++;
 				lvItem.iSubItem	= 0;
 				lvItem.iImage	= shfi.iIcon;
 				lvItem.lParam	= iInternalIndex;
 				iIndex = ListView_InsertItem(hListView,&lvItem);
 
-				ListView_SetItemText(hListView,iIndex,1,pszDirectory);
+				ListView_SetItemText(hListView,iIndex,1,szDirectory);
+
+				CoTaskMemFree(pidl);
 			}
 			break;
 
@@ -532,7 +537,6 @@ INT_PTR CALLBACK CContainer::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM 
 			switch(((LPNMHDR)lParam)->code)
 			{
 			case NM_DBLCLK:
-				/* TODO: Fix. */
 				if(((LPNMHDR)lParam)->hwndFrom == GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS))
 				{
 					HWND hListView;
@@ -564,7 +568,6 @@ INT_PTR CALLBACK CContainer::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM 
 							CoTaskMemFree(pidlFull);
 						}
 					}
-				}
 				}
 				break;
 
@@ -621,6 +624,8 @@ INT_PTR CALLBACK CContainer::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM 
 					}
 				}
 				break;
+			}
+			break;
 
 		case WM_CLOSE:
 			if(g_bSearching)
@@ -767,9 +772,15 @@ TCHAR *szSearchPattern,DWORD dwAttributes,list<DirectoryInfo_t> *pSubfolderList)
 					else
 						g_iFilesFound++;
 
-					/* TODO: Convert to PostMessage(). */
-					SendMessage(hDlg,WM_USER_SEARCHITEMFOUND,(WPARAM)szSearchDirectory,
-						(LPARAM)wfd.cFileName);
+					LPITEMIDLIST pidl = NULL;
+					TCHAR szFullFileName[MAX_PATH];
+
+					PathCombine(szFullFileName,szSearchDirectory,wfd.cFileName);
+					GetIdlFromParsingName(szFullFileName,&pidl);
+
+					PostMessage(hDlg,WM_USER_SEARCHITEMFOUND,(WPARAM)ILClone(pidl),0);
+
+					CoTaskMemFree(pidl);
 				}
 
 				/* If this item is a folder, follow it. */

@@ -774,12 +774,12 @@ BOOL CContainer::DeleteBookmarkSafe(HWND hwnd,void *pBookmarkHandle)
 	return FALSE;
 }
 
+/* TODO: Fix. */
 void CContainer::CreateBookmarkSidebar(void)
 {
 	TCHAR szTemp[32];
 	UINT uStyle = WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
 
-	/* TODO: Fix. */
 	//if(m_bShowFolders)
 		uStyle |= WS_VISIBLE;
 
