@@ -107,22 +107,13 @@ int CALLBACK CFolderView::SortByName(LPARAM lParam1,LPARAM lParam2)
 	if(!CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
 		if(((m_pwfdFiles[lParam1].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)&&
-			((m_pwfdFiles[lParam2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
-		{
-			ReturnValue = lstrcmp(m_pExtraItemInfo[lParam1].szDisplayName,m_pExtraItemInfo[lParam2].szDisplayName);
-
-			if(!IsSortAscending())
-				ReturnValue = -ReturnValue;
-
-			return ReturnValue;
-		}
-
-		if((m_pwfdFiles[lParam1].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+			((m_pwfdFiles[lParam2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 		{
 			return -1;
 		}
 
-		if((m_pwfdFiles[lParam2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+		if(((m_pwfdFiles[lParam1].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)&&
+			((m_pwfdFiles[lParam2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
 		{
 			return 1;
 		}
