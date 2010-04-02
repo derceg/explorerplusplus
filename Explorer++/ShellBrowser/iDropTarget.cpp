@@ -399,6 +399,14 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	The insertion mark may stay until the end. */
 	m_pDropTargetHelper->Drop(pDataObject,(POINT *)&pt,*pdwEffect);
 
+	if(m_bDeselectDropFolder)
+	{
+		ListView_SetItemState(m_hListView,
+			m_iDropFolder,0,LVIS_SELECTED);
+	}
+
+	m_bPerformingDrag = FALSE;
+
 	pt.x = ptl.x;
 	pt.y = ptl.y;
 
@@ -500,16 +508,16 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 		}
 	}
 
-	if(m_bDeselectDropFolder)
+	/*if(m_bDeselectDropFolder)
 	{
 		ListView_SetItemState(m_hListView,
 			m_iDropFolder,0,LVIS_SELECTED);
-	}
+	}*/
 
 	/* Remove the insertion mark from the listview. */
 	ListView_HandleInsertionMark(m_hListView,0,NULL);
 
-	m_bPerformingDrag = FALSE;
+	//m_bPerformingDrag = FALSE;
 
 	return S_OK;
 }

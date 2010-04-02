@@ -140,6 +140,8 @@ operations that can be undone. */
 #define FILE_UNDOACTION_MOVED		2
 #define FILE_UNDOACTION_DELETE		3
 
+#define FOLDER_SIZE_LINE_INDEX	1
+
 /* The treeview is offset by a small
 amount on the left. */
 #define TREEVIEW_X_CLEARANCE		1

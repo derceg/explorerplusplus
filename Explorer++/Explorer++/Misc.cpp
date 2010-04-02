@@ -1796,7 +1796,8 @@ int nFolders,int nFiles,PLARGE_INTEGER lTotalFolderSize)
 	StringCchPrintf(szSizeString,SIZEOF_ARRAY(szSizeString),
 	_T("%s: %s"),szTotalSize,szFolderSize);
 
-	DisplayWindow_BufferText(m_hDisplayWindow,szSizeString);
+	/* TODO: The line index should be stored in some other (variable) way. */
+	DisplayWindow_SetLine(m_hDisplayWindow,FOLDER_SIZE_LINE_INDEX,szSizeString);
 }
 
 void CContainer::PushGlobalSettingsToTab(int iTabId)

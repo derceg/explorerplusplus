@@ -1659,12 +1659,15 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab)
 	LPITEMIDLIST	pidl = NULL;
 	HRESULT			hr = S_FALSE;
 
+	/* Doesn't matter if we can't get the pidl here,
+	as some paths will be relative, or will be filled
+	by the shellbrowser (e.g. when browsing back/forward). */
 	hr = GetIdlFromParsingName(szPath,&pidl);
+
+	BrowseFolder(pidl,wFlags,bOpenInNewTab,bSwitchToNewTab);
 
 	if(SUCCEEDED(hr))
 	{
-		BrowseFolder(pidl,wFlags,bOpenInNewTab,bSwitchToNewTab);
-
 		CoTaskMemFree(pidl);
 	}
 

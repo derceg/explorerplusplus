@@ -151,7 +151,7 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 		FORMATETC ftcfchg;
 		FORMATETC ftcfcis;
 		FORMATETC ftcfcstg;
-		STGMEDIUM stgFileContents;
+		STGMEDIUM stgFileContents = {0};
 		HANDLE hFile;
 		FILETIME *pftCreationTime = NULL;
 		FILETIME *pftLastAccessTime = NULL;

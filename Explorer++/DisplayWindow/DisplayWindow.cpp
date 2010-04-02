@@ -262,6 +262,35 @@ WPARAM wParam,LPARAM lParam)
 			}
 			break;
 
+		case DWM_SETLINE:
+			{
+				TCHAR *pszText = NULL;
+				vector<LineData_t>::iterator itr;
+				unsigned int iLine;
+				unsigned int i = 0;
+
+				iLine = (int)wParam;
+				pszText = (TCHAR *)lParam;
+
+				if(pszText != NULL && iLine < m_LineList.size())
+				{
+					for(itr = m_LineList.begin();itr != m_LineList.end();itr++)
+					{
+						if(i == iLine)
+						{
+							StringCchCopy(itr->szText,SIZEOF_ARRAY(itr->szText),pszText);
+							break;
+						}
+
+						i++;
+					}
+				}
+
+				/* TODO: Optimize? */
+				RedrawWindow(DisplayWindow,NULL,NULL,RDW_INVALIDATE);
+			}
+			break;
+
 		case DWM_SETTHUMBNAILFILE:
 			OnSetThumbnailFile(wParam,lParam);
 			RedrawWindow(DisplayWindow,NULL,NULL,RDW_INVALIDATE);

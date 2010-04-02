@@ -23,6 +23,7 @@ using namespace std;
 #define DWM_SETTEXTCOLOR		(DWM_BASE + 14)
 #define DWM_BUFFERTEXT			(DWM_BASE + 15)
 #define DWM_CLEARTEXTBUFFER		(DWM_BASE + 16)
+#define DWM_SETLINE				(DWM_BASE + 17)
 
 #define DisplayWindow_SetThumbnailFile(hDisplay,FileName,bShowImage) \
 SendMessage(hDisplay,DWM_SETTHUMBNAILFILE,(WPARAM)FileName,(LPARAM)bShowImage)
@@ -59,6 +60,9 @@ SendMessage(hDisplay,DWM_BUFFERTEXT,(WPARAM)0,(LPARAM)szText)
 
 #define DisplayWindow_ClearTextBuffer(hDisplay) \
 SendMessage(hDisplay,DWM_CLEARTEXTBUFFER,(WPARAM)0,(LPARAM)0)
+
+#define DisplayWindow_SetLine(hDisplay,iLine,szText) \
+SendMessage(hDisplay,DWM_SETLINE,(WPARAM)iLine,(LPARAM)szText)
 
 #define WM_USER_DISPLAYWINDOWRESIZED	(WM_APP + 100)
 
