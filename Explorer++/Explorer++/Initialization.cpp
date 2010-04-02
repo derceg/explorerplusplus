@@ -149,6 +149,7 @@ void CContainer::InitializeMenus(void)
 	/* <---- Listview right click menu ----> */
 	SetMenuItemBitmap(m_hRightClickMenu,IDM_VIEW_REFRESH,SHELLIMAGES_REFRESH);
 	SetMenuItemBitmap(m_hRightClickMenu,IDM_EDIT_PASTE,SHELLIMAGES_PASTE);
+	SetMenuItemBitmap(m_hRightClickMenu,IDM_EDIT_PASTESHORTCUT,SHELLIMAGES_PASTESHORTCUT);
 	SetMenuItemBitmap(m_hRightClickMenu,IDM_BOOKMARKS_BOOKMARKTHISTAB,SHELLIMAGES_ADDFAV);
 	SetMenuItemBitmap(m_hRightClickMenu,IDM_RCLICK_PROPERTIES,SHELLIMAGES_PROPERTIES);
 
