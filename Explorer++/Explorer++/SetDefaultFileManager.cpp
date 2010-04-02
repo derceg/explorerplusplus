@@ -17,9 +17,11 @@ Notes:
 - To replace Explorer for filesystem folders only,
   add a key at:
   HKEY_CLASSES_ROOT\Directory
+  (Default value is 'none')
 
 - To replace Explorer for all folders, add a key at:
-  HKEY_CLASSES_ROOT\Shell
+  HKEY_CLASSES_ROOT\Folder
+  (Default value is empty)
 
 The value of the "command" sub-key will be of the form:
   "C:\Explorer++.exe" "%1"
@@ -154,6 +156,7 @@ BOOL RemoveAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType)
 	list<Filter_t>::iterator	itr;
 	TCHAR						*pszSubKey = NULL;
 	TCHAR						*pszDeleteSubKey = NULL;
+	TCHAR						*pszDefaultValue = NULL;
 	LONG						ReturnValue1 = 1;
 	LSTATUS						ReturnValue2 = 1;
 
@@ -162,16 +165,19 @@ BOOL RemoveAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType)
 	case REPLACEEXPLORER_FILESYSTEM:
 		pszSubKey = KEY_DIRECTORY_SHELL;
 		pszDeleteSubKey = KEY_DIRECTORY_APP;
+		pszDefaultValue = SHELL_DEFAULT_VALUE;
 		break;
 
 	case REPLACEEXPLORER_ALL:
 		pszSubKey = KEY_FOLDER_SHELL;
 		pszDeleteSubKey = KEY_FOLDER_APP;
+		pszDefaultValue = EMPTY_STRING;
 		break;
 
 	default:
 		pszSubKey = KEY_DIRECTORY_SHELL;
 		pszDeleteSubKey = KEY_DIRECTORY_APP;
+		pszDefaultValue = SHELL_DEFAULT_VALUE;
 		break;
 	}
 
@@ -182,8 +188,8 @@ BOOL RemoveAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType)
 	if(ReturnValue1 == ERROR_SUCCESS)
 	{
 		ReturnValue1 = RegSetValueEx(hKeyShell,NULL,0,REG_SZ,
-			(LPBYTE)SHELL_DEFAULT_VALUE,
-			(lstrlen(SHELL_DEFAULT_VALUE) + 1) * sizeof(TCHAR));
+			(LPBYTE)pszDefaultValue,(lstrlen(pszDefaultValue) + 1) *
+			sizeof(TCHAR));
 
 		if(ReturnValue1 == ERROR_SUCCESS)
 		{

@@ -167,8 +167,8 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 	{
 		case WM_INITDIALOG:
 			{
-				HWND		hButton;
-				HWND		hEdit;
+				HWND hButton;
+				HWND hEdit;
 				int nIDButton;
 
 				switch(m_StartupMode)
@@ -324,13 +324,59 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 							LoadString(g_hLanguageModule,IDS_ERR_FILEMANAGERSETTING,
 								szErrorMsg,SIZEOF_ARRAY(szErrorMsg));
 
-							if(!bSuccess)
+							if(bSuccess)
+							{
+								m_ReplaceExplorerMode = ReplaceExplorerMode;
+							}
+							else
 							{
 								MessageBox(hDlg,szErrorMsg,WINDOW_NAME,MB_ICONWARNING);
+
+								int nIDButton;
+
+								switch(ReplaceExplorerMode)
+								{
+								case REPLACEEXPLORER_NONE:
+									nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
+									break;
+
+								case REPLACEEXPLORER_FILESYSTEM:
+									nIDButton = IDC_OPTION_REPLACEEXPLORER_FILESYSTEM;
+									break;
+
+								case REPLACEEXPLORER_ALL:
+									nIDButton = IDC_OPTION_REPLACEEXPLORER_ALL;
+									break;
+
+								default:
+									nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
+									break;
+								}
+								CheckDlgButton(hDlg,nIDButton,BST_UNCHECKED);
+
+								/* The defaultfile manager setting was not changed, so
+								reset the state of the file manager radio buttons. */
+								switch(m_ReplaceExplorerMode)
+								{
+								case REPLACEEXPLORER_NONE:
+									nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
+									break;
+
+								case REPLACEEXPLORER_FILESYSTEM:
+									nIDButton = IDC_OPTION_REPLACEEXPLORER_FILESYSTEM;
+									break;
+
+								case REPLACEEXPLORER_ALL:
+									nIDButton = IDC_OPTION_REPLACEEXPLORER_ALL;
+									break;
+
+								default:
+									nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
+									break;
+								}
+								CheckDlgButton(hDlg,nIDButton,BST_CHECKED);
 							}
 						}
-
-						m_ReplaceExplorerMode = ReplaceExplorerMode;
 
 						m_bSavePreferencesToXMLFile = (IsDlgButtonChecked(hDlg,IDC_OPTION_XML)
 							== BST_CHECKED);
