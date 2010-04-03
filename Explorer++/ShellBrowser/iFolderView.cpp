@@ -663,6 +663,11 @@ BOOL CFolderView::GetShowFolderSizes(void)
 	return m_bShowFolderSizes;
 }
 
+void CFolderView::SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable)
+{
+	m_bDisableFolderSizesNetworkRemovable = bDisableFolderSizesNetworkRemovable;
+}
+
 void CFolderView::SetShowFriendlyDates(BOOL bShowFriendlyDates)
 {
 	m_bShowFriendlyDates = bShowFriendlyDates;

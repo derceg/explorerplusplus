@@ -493,6 +493,20 @@ void CContainer::OnListViewItemChanged(LPARAM lParam)
 	else
 		return;
 
+	/* The selection for this tab has changed, so invalidate any
+	folder size calculations that are occurring for this tab
+	(applies only to folder sizes that will be shown in the display
+	window). */
+	list<DWFolderSize_t>::iterator itr;
+
+	for(itr = m_DWFolderSizes.begin();itr != m_DWFolderSizes.end();itr++)
+	{
+		if(itr->iTabId == iObjectIndex)
+		{
+			itr->bValid = FALSE;
+		}
+	}
+
 	/* Only update internal selection info
 	if the listview that sent the change
 	notification is active. */

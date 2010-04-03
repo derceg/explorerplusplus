@@ -25,6 +25,9 @@ void InsertFolderItemsIntoComboBoxInternal(HWND hCreateIn,Bookmark_t *pBookmark)
 lParam not currently used. */
 #define CBN_KEYDOWN					WM_APP + 2
 
+/* Sent when a folder size calculation has finished. */
+#define WM_APP_FOLDERSIZECOMPLETED	WM_APP + 3
+
 /* Private definitions. */
 #define FROM_LISTVIEW				0
 #define FROM_TREEVIEW				1
@@ -613,7 +616,7 @@ private:
 	HRESULT					CloseTab(int TabIndex);
 	HRESULT					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
-	void					RefreshTab(int iTab);
+	void					RefreshTab(int iTabId);
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
 
@@ -1282,6 +1285,10 @@ private:
 	list<DWRule_t>			m_DWRules;
 	list<DWLine_t>			m_DWLines;
 	list<DWCommand_t>		m_DWCommands;
+
+	/* Display window folder sizes. */
+	list<DWFolderSize_t>	m_DWFolderSizes;
+	int						m_iDWFolderSizeUniqueId;
 
 	/* Default columns. */
 	list<Column_t>			m_RealFolderColumnList;

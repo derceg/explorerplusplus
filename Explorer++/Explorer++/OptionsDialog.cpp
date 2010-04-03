@@ -574,6 +574,7 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							m_pShellBrowser[(int)tcItem.lParam]->SetShowExtensions(m_bShowExtensionsGlobal);
 							m_pShellBrowser[(int)tcItem.lParam]->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
 							m_pShellBrowser[(int)tcItem.lParam]->SetShowFolderSizes(m_bShowFolderSizes);
+							m_pShellBrowser[(int)tcItem.lParam]->SetDisableFolderSizesNetworkRemovable(m_bDisableFolderSizesNetworkRemovable);
 							m_pShellBrowser[(int)tcItem.lParam]->SetShowInBytes(m_bShowSizesInBytesGlobal);
 							m_pShellBrowser[(int)tcItem.lParam]->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
 							m_pShellBrowser[(int)tcItem.lParam]->SetInsertSorted(m_bInsertSorted);

@@ -179,6 +179,8 @@ CContainer::CContainer(HWND hwnd)
 
 	InitializeCriticalSection(&g_csDirMonCallback);
 
+	m_iDWFolderSizeUniqueId = 0;
+
 	m_pClipboardDataObject	= NULL;
 	m_iCutTabInternal		= 0;
 	m_hCutTreeViewItem		= NULL;
@@ -788,6 +790,56 @@ LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LP
 				GetClientRect(m_hContainer,&rc);
 
 				SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,(LPARAM)MAKELPARAM(rc.right,rc.bottom));
+			}
+			break;
+
+		case WM_APP_FOLDERSIZECOMPLETED:
+			{
+				DWFolderSizeCompletion_t *pDWFolderSizeCompletion = NULL;
+				TCHAR szFolderSize[32];
+				TCHAR szSizeString[64];
+				TCHAR szTotalSize[64];
+				BOOL bValid = FALSE;
+
+				pDWFolderSizeCompletion = (DWFolderSizeCompletion_t *)wParam;
+
+				list<DWFolderSize_t>::iterator itr;
+
+				/* First, make sure we should still display the
+				results (we won't if the listview selection has
+				changed, or this folder size was calculated for
+				a tab other than the current one). */
+				for(itr = m_DWFolderSizes.begin();itr != m_DWFolderSizes.end();itr++)
+				{
+					if(itr->uId == pDWFolderSizeCompletion->uId)
+					{
+						if(itr->iTabId == m_iObjectIndex)
+						{
+							bValid = itr->bValid;
+						}
+
+						m_DWFolderSizes.erase(itr);
+
+						break;
+					}
+				}
+
+				if(bValid)
+				{
+					FormatSizeString(pDWFolderSizeCompletion->liFolderSize.LowPart,pDWFolderSizeCompletion->liFolderSize.HighPart,
+						szFolderSize,SIZEOF_ARRAY(szFolderSize),m_bShowSizesInBytesGlobal);
+
+					LoadString(g_hLanguageModule,IDS_GENERAL_TOTALSIZE,
+						szTotalSize,SIZEOF_ARRAY(szTotalSize));
+
+					StringCchPrintf(szSizeString,SIZEOF_ARRAY(szSizeString),
+						_T("%s: %s"),szTotalSize,szFolderSize);
+
+					/* TODO: The line index should be stored in some other (variable) way. */
+					DisplayWindow_SetLine(m_hDisplayWindow,FOLDER_SIZE_LINE_INDEX,szSizeString);
+				}
+
+				free(pDWFolderSizeCompletion);
 			}
 			break;
 

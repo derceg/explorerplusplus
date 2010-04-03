@@ -56,6 +56,7 @@ BOOL SetAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType)
 	HKEY						hKeyShell;
 	HKEY						hKeyApp;
 	HKEY						hKeyCommand;
+	OSVERSIONINFO				VersionInfo;
 	list<Filter_t>::iterator	itr;
 	TCHAR						szCommand[512];
 	TCHAR						szExecutable[MAX_PATH];
@@ -63,6 +64,16 @@ BOOL SetAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType)
 	DWORD						Disposition;
 	LONG						ReturnValue;
 	BOOL						bSuccess = FALSE;
+
+	VersionInfo.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
+
+	GetVersionEx(&VersionInfo);
+
+	if(VersionInfo.dwMajorVersion == WINDOWS_XP_MAJORVERSION &&
+		ReplacementType == REPLACEEXPLORER_ALL)
+	{
+		return FALSE;
+	}
 
 	switch(ReplacementType)
 	{
@@ -153,12 +164,23 @@ BOOL RemoveAsDefaultFileManagerAll(void)
 BOOL RemoveAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType)
 {
 	HKEY						hKeyShell;
+	OSVERSIONINFO				VersionInfo;
 	list<Filter_t>::iterator	itr;
 	TCHAR						*pszSubKey = NULL;
 	TCHAR						*pszDeleteSubKey = NULL;
 	TCHAR						*pszDefaultValue = NULL;
 	LONG						ReturnValue1 = 1;
 	LSTATUS						ReturnValue2 = 1;
+
+	VersionInfo.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
+
+	GetVersionEx(&VersionInfo);
+
+	if(VersionInfo.dwMajorVersion == WINDOWS_XP_MAJORVERSION &&
+		ReplacementType == REPLACEEXPLORER_ALL)
+	{
+		return FALSE;
+	}
 
 	switch(ReplacementType)
 	{

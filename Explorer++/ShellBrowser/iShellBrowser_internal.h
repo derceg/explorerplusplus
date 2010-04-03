@@ -588,6 +588,7 @@ private:
 	BOOL				GetHideLinkExtension(void);
 	void				SetShowFolderSizes(BOOL bShowFolderSizes);
 	BOOL				GetShowFolderSizes(void);
+	void				SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable);
 	void				SetShowFriendlyDates(BOOL bShowFriendlyDates);
 	BOOL				GetShowFriendlyDates(void);
 	void				SetInsertSorted(BOOL bInsertSorted);

@@ -376,6 +376,7 @@ __interface IShellBrowser2 : IUnknown
 	virtual BOOL			GetHideLinkExtension(void);
 	virtual void			SetShowFolderSizes(BOOL bShowFolderSizes);
 	virtual BOOL			GetShowFolderSizes(void);
+	virtual void			SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable);
 	virtual void			SetShowFriendlyDates(BOOL bShowFriendlyDates);
 	virtual BOOL			GetShowFriendlyDates(void);
 	virtual void			SetInsertSorted(BOOL bInsertSorted);

@@ -488,16 +488,19 @@ HRESULT CContainer::CloseTab(int TabIndex)
 	return S_OK;
 }
 
-void CContainer::RefreshTab(int iTab)
+void CContainer::RefreshTab(int iTabId)
 {
 	LPITEMIDLIST pidlDirectory = NULL;
+	HRESULT hr;
 
-	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+	pidlDirectory = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
 
-	/* Refresh the browser window (also updates all
-	other associated child windows). */
-	BrowseFolder(pidlDirectory,SBSP_SAMEBROWSER|SBSP_ABSOLUTE|
-		SBSP_WRITENOHISTORY);
+	/* TODO: Link this back to BrowseFolder(). */
+	hr = m_pShellBrowser[iTabId]->BrowseFolder(pidlDirectory,
+		SBSP_SAMEBROWSER|SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
+
+	if(SUCCEEDED(hr))
+		OnDirChanged(iTabId);
 
 	CoTaskMemFree(pidlDirectory);
 }

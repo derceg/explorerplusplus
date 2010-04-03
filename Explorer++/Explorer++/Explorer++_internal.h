@@ -337,9 +337,8 @@ struct ApplicationButton_t
 
 typedef struct
 {
-	void *pContainer;
-	int iFolderId;
-	int iItemId;
+	void	*pContainer;
+	int		uId;
 } FolderSizeExtraInfo_t;
 
 typedef struct
@@ -356,6 +355,20 @@ typedef struct
 {
 	TCHAR szPattern[MAX_PATH];
 } SearchPatternInfo_t;
+
+typedef struct
+{
+	int	uId;
+	int	iTabId;
+	BOOL bValid;
+} DWFolderSize_t;
+
+typedef struct
+{
+	LARGE_INTEGER	liFolderSize;
+	int				uId;
+	int				iTabId;
+} DWFolderSizeCompletion_t;
 
 typedef enum
 {

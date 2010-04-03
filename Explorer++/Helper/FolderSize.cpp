@@ -102,8 +102,8 @@ int *nFiles,PLARGE_INTEGER lTotalFolderSize)
 DWORD WINAPI Thread_CalculateFolderSize(LPVOID lpParameter)
 {
 	FolderSize_t	*pFolderSize = NULL;
-	static int				nFiles;
-	static int				nFolders;
+	static int		nFiles;
+	static int		nFolders;
 	LARGE_INTEGER	lTotalDirSize;
 	HRESULT			hr;
 

@@ -1187,8 +1187,8 @@ void CContainer::HandleFileSelectionDisplayZero(void)
 	LPITEMIDLIST	pidlDirectory = NULL;
 	LPITEMIDLIST	pidlComputer = NULL;
 
-	/* Clear out any previous image shown in the
-	display window. */
+	/* Clear out any previous data shown in the display window. */
+	DisplayWindow_ClearTextBuffer(m_hDisplayWindow);
 	DisplayWindow_SetThumbnailFile(m_hDisplayWindow,EMPTY_STRING,FALSE);
 
 	m_pActiveShellBrowser->QueryCurrentDirectory(MAX_PATH,szCurrentDirectory);
@@ -1278,18 +1278,20 @@ void CContainer::HandleFileSelectionDisplayOne(void)
 
 		if(!m_pActiveShellBrowser->InVirtualFolder())
 		{
+			DWORD dwAttributes;
+
 			m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName);
 
 			pwfd = m_pActiveShellBrowser->QueryFileFindData(iSelected);
 
-			/* Get the files' typename. */
-			SHGetFileInfo(szFullItemName,pwfd->dwFileAttributes,
-				&shfi,sizeof(shfi),SHGFI_TYPENAME|SHGFI_USEFILEATTRIBUTES);
+			dwAttributes = GetFileAttributes(szFullItemName);
 
-			if(lstrcmpi(shfi.szTypeName,_T("File Folder")) == 0 && m_bShowFolderSizes)
+			if(((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+				FILE_ATTRIBUTE_DIRECTORY) && m_bShowFolderSizes)
 			{
 				FolderSize_t	*pfs = NULL;
 				FolderSizeExtraInfo_t	*pfsei = NULL;
+				DWFolderSize_t	DWFolderSize;
 				TCHAR			szDisplayText[256];
 				TCHAR			szTotalSize[64];
 				TCHAR			szCalculating[64];
@@ -1297,30 +1299,49 @@ void CContainer::HandleFileSelectionDisplayOne(void)
 
 				pfs = (FolderSize_t *)malloc(sizeof(FolderSize_t));
 
-				pfsei = (FolderSizeExtraInfo_t *)malloc(sizeof(FolderSizeExtraInfo_t));
+				if(pfs != NULL)
+				{
+					pfsei = (FolderSizeExtraInfo_t *)malloc(sizeof(FolderSizeExtraInfo_t));
 
-				pfsei->pContainer	= (void *)this;
-				pfsei->iFolderId	= 0;
-				pfsei->iItemId		= 0;
-				pfs->pData			= (LPVOID)pfsei;
+					if(pfsei != NULL)
+					{
+						pfsei->pContainer	= (void *)this;
+						pfsei->uId			= m_iDWFolderSizeUniqueId;
+						pfs->pData			= (LPVOID)pfsei;
 
-				pfs->pfnCallback	= FolderSizeCallbackStub;
+						pfs->pfnCallback	= FolderSizeCallbackStub;
 
-				StringCchCopy(pfs->szPath,MAX_PATH,szFullItemName);
+						StringCchCopy(pfs->szPath,MAX_PATH,szFullItemName);
 
-				CreateThread(NULL,0,Thread_CalculateFolderSize,(LPVOID)pfs,0,&ThreadId);
+						LoadString(g_hLanguageModule,IDS_GENERAL_TOTALSIZE,
+							szTotalSize,SIZEOF_ARRAY(szTotalSize));
+						LoadString(g_hLanguageModule,IDS_GENERAL_CALCULATING,
+							szCalculating,SIZEOF_ARRAY(szCalculating));
+						StringCchPrintf(szDisplayText,SIZEOF_ARRAY(szDisplayText),
+							_T("%s: %s"),szTotalSize,szCalculating);
+						DisplayWindow_BufferText(m_hDisplayWindow,szDisplayText);
 
-				LoadString(g_hLanguageModule,IDS_GENERAL_TOTALSIZE,
-					szTotalSize,SIZEOF_ARRAY(szTotalSize));
-				LoadString(g_hLanguageModule,IDS_GENERAL_CALCULATING,
-					szCalculating,SIZEOF_ARRAY(szCalculating));
-				StringCchPrintf(szDisplayText,SIZEOF_ARRAY(szDisplayText),
-					_T("%s: %s"),szTotalSize,szCalculating);
-				DisplayWindow_BufferText(m_hDisplayWindow,szDisplayText);
+						/* Maintain a global list of folder size operations. */
+						DWFolderSize.uId	= m_iDWFolderSizeUniqueId;
+						DWFolderSize.iTabId	= m_iObjectIndex;
+						DWFolderSize.bValid	= TRUE;
+						m_DWFolderSizes.push_back(DWFolderSize);
+
+						CreateThread(NULL,0,Thread_CalculateFolderSize,(LPVOID)pfs,0,&ThreadId);
+
+						m_iDWFolderSizeUniqueId++;
+					}
+					else
+					{
+						free(pfs);
+					}
+				}
 			}
 			else
 			{
-				/* File type. */
+				SHGetFileInfo(szFullItemName,pwfd->dwFileAttributes,
+					&shfi,sizeof(shfi),SHGFI_TYPENAME|SHGFI_USEFILEATTRIBUTES);
+
 				DisplayWindow_BufferText(m_hDisplayWindow,shfi.szTypeName);
 			}
 
@@ -1433,7 +1454,8 @@ void CContainer::HandleFileSelectionDisplayOne(void)
 
 			/* Only attempt to show file previews for files (not folders). Also, only
 			attempt to show a preview if the display window is actually active. */
-			if(lstrcmpi(shfi.szTypeName,_T("File Folder")) != 0 && m_bShowFilePreviews
+			if(((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
+				FILE_ATTRIBUTE_DIRECTORY) && m_bShowFilePreviews
 				&& m_bShowDisplayWindow)
 			{
 				DisplayWindow_SetThumbnailFile(m_hDisplayWindow,szFullItemName,TRUE);
@@ -1779,25 +1801,19 @@ void FolderSizeCallbackStub(int nFolders,int nFiles,PLARGE_INTEGER lTotalFolderS
 void CContainer::FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,
 int nFolders,int nFiles,PLARGE_INTEGER lTotalFolderSize)
 {
-	TCHAR	szFolderSize[32];
-	TCHAR	szSizeString[64];
-	TCHAR	szTotalSize[64];
+	DWFolderSizeCompletion_t *pDWFolderSizeCompletion = NULL;
 
-	/* TODO: Check if the current folder is still the same
-	as when the item was queued, that the item still
-	exists, and that it is the only item selected... */
+	pDWFolderSizeCompletion = (DWFolderSizeCompletion_t *)malloc(sizeof(DWFolderSizeCompletion_t));
 
-	FormatSizeString(lTotalFolderSize->LowPart,lTotalFolderSize->HighPart,
-	szFolderSize,SIZEOF_ARRAY(szFolderSize),m_bShowSizesInBytesGlobal);
+	pDWFolderSizeCompletion->liFolderSize = *lTotalFolderSize;
+	pDWFolderSizeCompletion->uId = pfsei->uId;
 
-	LoadString(g_hLanguageModule,IDS_GENERAL_TOTALSIZE,
-		szTotalSize,SIZEOF_ARRAY(szTotalSize));
-
-	StringCchPrintf(szSizeString,SIZEOF_ARRAY(szSizeString),
-	_T("%s: %s"),szTotalSize,szFolderSize);
-
-	/* TODO: The line index should be stored in some other (variable) way. */
-	DisplayWindow_SetLine(m_hDisplayWindow,FOLDER_SIZE_LINE_INDEX,szSizeString);
+	/* Queue the result back to the main thread, so that
+	the folder size can be displayed. It is up to the main
+	thread to determine whether the folder size should actually
+	be shown. */
+	PostMessage(m_hContainer,WM_APP_FOLDERSIZECOMPLETED,
+		(WPARAM)pDWFolderSizeCompletion,0);
 }
 
 void CContainer::PushGlobalSettingsToTab(int iTabId)
