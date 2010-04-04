@@ -894,7 +894,7 @@ BEGIN
         BLOCK "0c0904b0"
         BEGIN
             VALUE "FileDescription", "Explorer Application"
-            VALUE "FileVersion", "1, 1, 0"
+            VALUE "FileVersion", "1.1"
             VALUE "InternalName", "Explorer++"
             VALUE "LegalCopyright", "(C) 2005-2009 David Erceg"
             VALUE "OriginalFilename", "Explorer++.exe"
