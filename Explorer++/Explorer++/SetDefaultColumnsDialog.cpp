@@ -339,7 +339,10 @@ void CContainer::GetCurrentDefaultColumnState(HWND hDlg)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(hListView,&lvItem);
 
+		/* TODO: May need to pull the current column width (instead
+		pf using the default width). */
 		Column.id		= (int)lvItem.lParam;
+		Column.iWidth	= DEFAULT_COLUMN_WIDTH;
 		Column.bChecked	= ListView_GetCheckState(hListView,i);
 		pColumnList->push_back(Column);
 	}

@@ -287,8 +287,9 @@ void CContainer::OnColumnDlgOk(HWND hDlg)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(hListView,&lvItem);
 
-		Column.id					= (int)lvItem.lParam;
-		Column.bChecked				= ListView_GetCheckState(hListView,i);
+		Column.id		= (int)lvItem.lParam;
+		Column.bChecked	= ListView_GetCheckState(hListView,i);
+		Column.iWidth	= DEFAULT_COLUMN_WIDTH;
 		ColumnTempList.push_back(Column);
 	}
 
