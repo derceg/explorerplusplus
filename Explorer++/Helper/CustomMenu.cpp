@@ -17,14 +17,19 @@
 
 using namespace Gdiplus;
 
-/* The height of all items in the custom menu
-(except separators). A clearance of at least 2
-should be provided on either side of a menu icon. */
-#define MENU_ITEM_HEIGHT	20
+/* The minimum height of any item in the custom menu
+(except separators). This is defined purely for menu
+icons (i.e. the icons will need at least a vertical
+spacing of MINIMUM_MENU_ITEM_HEIGHT to display properly).
+A clearance of at least 2 should be provided on either
+side of a menu icon.*/
+#define MINIMUM_MENU_ITEM_HEIGHT	20
 
 /* How far to indent menu text from the left egde
 of the menu. */
 #define MENU_TEXT_INDENT_LEFT	22
+
+#define MENU_TEXT_VERTICAL_SPACING	4
 
 /* How far back from the right edge of the
 menu the text is allowed to extend. */
@@ -88,16 +93,30 @@ BOOL CCustomMenu::OnMeasureItem(WPARAM wParam,LPARAM lParam)
 		{
 			HDC		hdc;
 			HDC		hdcTemp;
+			NONCLIENTMETRICS	ncm;
 			HFONT	hFont;
 			TCHAR	szMenuString[64];
 			DWORD	dwStringDimensions;
+			BOOL	bRet;
 			int		iTabPos = 0;
 			int		nTabs = 0;
 
 			hdc = GetDC(m_hwnd);
 			hdcTemp = CreateCompatibleDC(hdc);
 
-			hFont = (HFONT)GetStockObject(SYSTEM_FONT);
+			ncm.cbSize	= sizeof(ncm);
+
+			bRet = SystemParametersInfo(SPI_GETNONCLIENTMETRICS,sizeof(ncm),(PVOID)&ncm,0);
+
+			if(bRet)
+			{
+				hFont = CreateFontIndirect(&ncm.lfMenuFont);
+			}
+			else
+			{
+				hFont = (HFONT)GetStockObject(SYSTEM_FONT);
+			}
+			
 			SelectObject(hdcTemp,hFont);
 
 			GetMenuString(m_hMenu,pMeasureItem->itemID,szMenuString,
@@ -116,10 +135,8 @@ BOOL CCustomMenu::OnMeasureItem(WPARAM wParam,LPARAM lParam)
 			szMenuString,lstrlen(szMenuString),nTabs,&iTabPos);
 
 			pMeasureItem->itemWidth		= LOWORD(dwStringDimensions) + MENU_TEXT_INDENT_LEFT;
-			pMeasureItem->itemHeight	= MENU_ITEM_HEIGHT;
+			pMeasureItem->itemHeight	= max(HIWORD(dwStringDimensions) + MENU_TEXT_VERTICAL_SPACING,MINIMUM_MENU_ITEM_HEIGHT);
 
-			/* Not neccessary to delete stock objects (but
-			not harmful). */
 			DeleteObject(hFont);
 			DeleteDC(hdcTemp);
 			ReleaseDC(m_hwnd,hdc);
