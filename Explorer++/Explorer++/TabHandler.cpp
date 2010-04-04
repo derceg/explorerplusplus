@@ -933,6 +933,13 @@ void CContainer::OnLockTabInternal(int iTab,int iTabId)
 {
 	m_TabInfo[iTabId].bLocked = !m_TabInfo[iTabId].bLocked;
 
+	/* The "Lock Tab" and "Lock Tab and Address" options
+	are mutually exclusive. */
+	if(m_TabInfo[iTabId].bLocked)
+	{
+		m_TabInfo[iTabId].bAddressLocked = FALSE;
+	}
+
 	SetTabIcon(iTab,iTabId);
 
 	/* If the tab that was locked/unlocked is the
@@ -950,6 +957,11 @@ void CContainer::OnLockTabAndAddress(int iTab)
 	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
 
 	m_TabInfo[(int)tcItem.lParam].bAddressLocked = !m_TabInfo[(int)tcItem.lParam].bAddressLocked;
+
+	if(m_TabInfo[(int)tcItem.lParam].bAddressLocked)
+	{
+		m_TabInfo[(int)tcItem.lParam].bLocked = FALSE;
+	}
 
 	SetTabIcon(iTab,(int)tcItem.lParam);
 

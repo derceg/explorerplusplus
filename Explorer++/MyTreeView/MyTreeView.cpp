@@ -36,6 +36,7 @@ typedef struct
 } QueuedItem_t;
 
 LRESULT CALLBACK	TreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 void CALLBACK		Timer_DirectoryModified(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime);
 DWORD WINAPI		Thread_SubFoldersStub(LPVOID pVoid);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
@@ -535,7 +536,7 @@ void CALLBACK TVFindIconAPC(ULONG_PTR dwParam)
  - Real Items
 
 Each set is ordered alphabetically. */
-int CALLBACK CompareFunc(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
+int CALLBACK CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
 	CMyTreeView *pMyTreeView = NULL;
 
@@ -584,7 +585,7 @@ int CALLBACK CMyTreeView::CompareItems(LPARAM lParam1,LPARAM lParam2)
 			GetDisplayName(m_pItemInfo[iItemId1].pidl,szDisplayName1,SHGDN_INFOLDER);
 			GetDisplayName(m_pItemInfo[iItemId2].pidl,szDisplayName2,SHGDN_INFOLDER);
 
-			return lstrcmpi(szDisplayName1,szDisplayName2);
+			return StrCmpLogicalW(szDisplayName1,szDisplayName2);
 		}
 	}
 }
@@ -736,7 +737,7 @@ HTREEITEM hParent)
 			TVSORTCB tvscb;
 
 			tvscb.hParent		= hParent;
-			tvscb.lpfnCompare	= CompareFunc;
+			tvscb.lpfnCompare	= CompareItemsStub;
 			tvscb.lParam		= (LPARAM)this;
 
 			TreeView_SortChildrenCB(m_hTreeView,&tvscb,0);
