@@ -305,6 +305,8 @@ BOOL CFolderView::IsSortAscending(void)
 	return m_bSortAscending;
 }
 
+/* TODO: Convert to using pidl's here, rather than
+file names. */
 int CFolderView::SelectFiles(TCHAR *FileNamePattern)
 {
 	int iItem;

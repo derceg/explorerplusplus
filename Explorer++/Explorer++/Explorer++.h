@@ -1429,6 +1429,7 @@ private:
 	/* Search dialog. */
 	BOOL					m_bSearchDlgStateSaved;
 	BOOL					m_bSearchSubFolders;
+	BOOL					m_bSetSearchTimer;
 	POINT					m_ptSearch;
 	int						m_iSearchWidth;
 	int						m_iSearchHeight;
@@ -1437,6 +1438,7 @@ private:
 	TCHAR					m_SearchPatternText[MAX_PATH];
 	list<SearchDirectoryInfo_t>	m_SearchDirectories;
 	list<SearchPatternInfo_t>	m_SearchPatterns;
+	list<LPITEMIDLIST>		m_SearchItems;
 	
 	/* Cut items data. */
 	list<CutFile_t>			m_CutFileNameList;

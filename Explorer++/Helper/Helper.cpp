@@ -2292,9 +2292,12 @@ BOOL CheckWildcardMatch(TCHAR *szWildcard,TCHAR *szString,BOOL bCaseSensitive)
 		If there is a match, then return true, else consume
 		the next character, and check again. */
 		case '*':
-			szWildcard++;
+			bMatched = FALSE;
 
-			bMatched = CheckWildcardMatch(szWildcard,szString,bCaseSensitive);
+			if(*(szWildcard + 1) != '\0')
+			{
+				bMatched = CheckWildcardMatch(++szWildcard,szString,bCaseSensitive);
+			}
 
 			while(*szWildcard != '\0' && *szString != '\0' && !bMatched)
 			{

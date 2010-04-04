@@ -21,6 +21,10 @@
 #define WM_USER_SEARCHFINISHED			(WM_APP + 2)
 #define WM_USER_SEARCHCHANGEDDIRECTORY	(WM_APP + 3)
 
+#define SEARCH_PROCESSITEMS_TIMER_ID		0
+#define SEARCH_PROCESSITEMS_TIMER_ELAPSED	50
+#define SEARCH_MAX_ITEMS_BATCH_PROCESS		100
+
 #define DEFAULT_SEARCH_ALLOCATION	200
 
 typedef struct
@@ -219,6 +223,7 @@ INT_PTR CALLBACK CContainer::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM 
 				g_iFoldersFound = 0;
 				g_iFilesFound = 0;
 				g_bExit = FALSE;
+				m_bSetSearchTimer = TRUE;
 
 				if(m_bSearchSubFolders)
 					CheckDlgButton(hDlg,IDC_CHECK_SEARCHSUBFOLDERS,BST_CHECKED);
@@ -294,63 +299,99 @@ INT_PTR CALLBACK CContainer::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM 
 			}
 			break;
 
+		case WM_TIMER:
+			{
+				if((int)wParam == SEARCH_PROCESSITEMS_TIMER_ID)
+				{
+					list<LPITEMIDLIST>::iterator itr;
+					int nItems = min(m_SearchItems.size(),SEARCH_MAX_ITEMS_BATCH_PROCESS);
+					int i = 0;
+
+					itr = m_SearchItems.begin();
+
+					while(i < nItems)
+					{
+						HWND hListView;
+						LPITEMIDLIST pidl = NULL;
+						TCHAR szFullFileName[MAX_PATH];
+						TCHAR szDirectory[MAX_PATH];
+						TCHAR szFileName[MAX_PATH];
+						LVITEM lvItem;
+						SHFILEINFO shfi;
+						int iIndex;
+						static int iItem = 0;
+						int iInternalIndex = 0;
+
+						pidl = *itr;
+
+						hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
+
+						GetDisplayName(pidl,szDirectory,SHGDN_FORPARSING);
+						PathRemoveFileSpec(szDirectory);
+
+						GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
+						GetDisplayName(pidl,szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
+
+						SHGetFileInfo((LPCWSTR)pidl,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
+
+						while(g_pMap[iInternalIndex] != 0 && iInternalIndex < g_nSearchItemsAllocated)
+						{
+							iInternalIndex++;
+						}
+
+						if(iInternalIndex == g_nSearchItemsAllocated)
+						{
+							g_pSearchItems = (SearchItem_t *)realloc(g_pSearchItems,
+								(g_nSearchItemsAllocated + DEFAULT_SEARCH_ALLOCATION) * sizeof(SearchItem_t));
+							g_pMap = (int *)realloc(g_pMap,
+								(g_nSearchItemsAllocated + DEFAULT_SEARCH_ALLOCATION) * sizeof(int));
+							g_nSearchItemsAllocated += DEFAULT_SEARCH_ALLOCATION;
+
+							iInternalIndex++;
+						}
+
+						StringCchCopy(g_pSearchItems[iInternalIndex].szFullFileName,
+							SIZEOF_ARRAY(g_pSearchItems[iInternalIndex].szFullFileName),
+							szFullFileName);
+						g_pMap[iInternalIndex] = 1;
+
+						lvItem.mask		= LVIF_IMAGE|LVIF_TEXT|LVIF_PARAM;
+						lvItem.pszText	= szFileName;
+						lvItem.iItem	= iItem++;
+						lvItem.iSubItem	= 0;
+						lvItem.iImage	= shfi.iIcon;
+						lvItem.lParam	= iInternalIndex;
+						iIndex = ListView_InsertItem(hListView,&lvItem);
+
+						ListView_SetItemText(hListView,iIndex,1,szDirectory);
+
+						CoTaskMemFree(pidl);
+
+						itr = m_SearchItems.erase(itr);
+
+						i++;
+					}
+
+					m_bSetSearchTimer = TRUE;
+				}
+			}
+			break;
+
+		/* We won't actually process the item here. Instead, we'll
+		add it onto the list of current items, which will be processed
+		in batch. This is done to stop this message from blocking the
+		main GUI (also see http://www.flounder.com/iocompletion.htm). */
 		case WM_USER_SEARCHITEMFOUND:
 			{
-				HWND hListView;
-				LPITEMIDLIST pidl = NULL;
-				TCHAR szFullFileName[MAX_PATH];
-				TCHAR szDirectory[MAX_PATH];
-				TCHAR szFileName[MAX_PATH];
-				LVITEM lvItem;
-				SHFILEINFO shfi;
-				int iIndex;
-				static int iItem = 0;
-				int iInternalIndex = 0;
+				m_SearchItems.push_back((LPITEMIDLIST)wParam);
 
-				pidl = (LPITEMIDLIST)wParam;
-
-				hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
-
-				GetDisplayName(pidl,szDirectory,SHGDN_FORPARSING);
-				PathRemoveFileSpec(szDirectory);
-
-				GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
-				GetDisplayName(pidl,szFileName,SHGDN_INFOLDER);
-
-				SHGetFileInfo((LPCWSTR)pidl,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
-
-				while(g_pMap[iInternalIndex] != 0 && iInternalIndex < g_nSearchItemsAllocated)
+				if(m_bSetSearchTimer)
 				{
-					iInternalIndex++;
+					SetTimer(hDlg,SEARCH_PROCESSITEMS_TIMER_ID,
+						SEARCH_PROCESSITEMS_TIMER_ELAPSED,NULL);
+
+					m_bSetSearchTimer = FALSE;
 				}
-
-				if(iInternalIndex == g_nSearchItemsAllocated)
-				{
-					g_pSearchItems = (SearchItem_t *)realloc(g_pSearchItems,
-						(g_nSearchItemsAllocated + DEFAULT_SEARCH_ALLOCATION) * sizeof(SearchItem_t));
-					g_pMap = (int *)realloc(g_pMap,
-						(g_nSearchItemsAllocated + DEFAULT_SEARCH_ALLOCATION) * sizeof(int));
-					g_nSearchItemsAllocated += DEFAULT_SEARCH_ALLOCATION;
-
-					iInternalIndex++;
-				}
-
-				StringCchCopy(g_pSearchItems[iInternalIndex].szFullFileName,
-					SIZEOF_ARRAY(g_pSearchItems[iInternalIndex].szFullFileName),
-					szFullFileName);
-				g_pMap[iInternalIndex] = 1;
-
-				lvItem.mask		= LVIF_IMAGE|LVIF_TEXT|LVIF_PARAM;
-				lvItem.pszText	= szFileName;
-				lvItem.iItem	= iItem++;
-				lvItem.iSubItem	= 0;
-				lvItem.iImage	= shfi.iIcon;
-				lvItem.lParam	= iInternalIndex;
-				iIndex = ListView_InsertItem(hListView,&lvItem);
-
-				ListView_SetItemText(hListView,iIndex,1,szDirectory);
-
-				CoTaskMemFree(pidl);
 			}
 			break;
 
@@ -803,6 +844,8 @@ void CContainer::OnSearch(HWND hDlg)
 	SearchInfo_t *psi = NULL;
 	SearchDirectoryInfo_t sdi;
 	SearchPatternInfo_t spi;
+
+	m_SearchItems.clear();
 
 	if(!g_bSearching)
 	{

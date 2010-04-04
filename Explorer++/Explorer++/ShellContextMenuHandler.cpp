@@ -299,7 +299,7 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 
 							BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE);
 
-							GetDisplayName((LPITEMIDLIST)ppidl[0],szFileName,SHGDN_INFOLDER);
+							GetDisplayName((LPITEMIDLIST)ppidl[0],szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
 
 							m_pActiveShellBrowser->SelectFiles(szFileName);
 						}
