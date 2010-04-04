@@ -505,6 +505,10 @@ void CFolderView::OnFileActionRenamedNewName(TCHAR *szFileName)
 
 /* Renames an item currently in the listview.
  */
+/* TODO: This code should be coalesced with the code that
+adds items as well as the code that finds their icons.
+ALL changes to an items name/internal properties/icon/overlay icon
+should go through a central function. */
 void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
@@ -515,6 +519,7 @@ void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 	TCHAR			szDisplayName[MAX_PATH];
 	LVITEM			lvItem;
 	TCHAR			szFullFileName[MAX_PATH];
+	DWORD_PTR		res;
 	HRESULT			hr;
 	int				iItem;
 
@@ -532,7 +537,7 @@ void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 
 		if(SUCCEEDED(hr))
 		{
-			hr = GetDisplayName(szFullFileName,szDisplayName,SHGDN_INFOLDER);
+			hr = GetDisplayName(szFullFileName,szDisplayName,SHGDN_INFOLDER|SHGDN_FORPARSING);
 
 			if(SUCCEEDED(hr))
 			{
@@ -547,35 +552,47 @@ void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 
 				/* The files' type may have changed, so retrieve the files'
 				icon again. */
-				SHGetFileInfo((LPTSTR)pidlFull,0,&shfi,
-					sizeof(SHFILEINFO),SHGFI_PIDL|SHGFI_SYSICONINDEX);
+				res = SHGetFileInfo((LPTSTR)pidlFull,0,&shfi,
+					sizeof(SHFILEINFO),SHGFI_PIDL|SHGFI_ICON|
+					SHGFI_OVERLAYINDEX);
 
-				/* Locate the item within the listview. */
-				lvfi.flags	= LVFI_PARAM;
-				lvfi.lParam	= iItemInternal;
-				iItem = ListView_FindItem(m_hListView,-1,&lvfi);
-
-				if(iItem != -1)
+				if(res != 0)
 				{
-					StringCchCopy(szDisplayName,SIZEOF_ARRAY(szDisplayName),
-						szNewFileName);
+					/* Locate the item within the listview. */
+					lvfi.flags	= LVFI_PARAM;
+					lvfi.lParam	= iItemInternal;
+					iItem = ListView_FindItem(m_hListView,-1,&lvfi);
 
-					if(!m_bShowExtensions || (m_bHideLinkExtension &&
-						lstrcmp(PathFindExtension(szDisplayName),_T(".lnk")) == 0)
-						&& szDisplayName[0] != '.')
+					if(iItem != -1)
 					{
-						/* Strip the extension. */
-						PathRemoveExtension(szDisplayName);
+						StringCchCopy(szDisplayName,SIZEOF_ARRAY(szDisplayName),
+							szNewFileName);
+
+						if(!m_bShowExtensions || (m_bHideLinkExtension &&
+							lstrcmp(PathFindExtension(szDisplayName),_T(".lnk")) == 0)
+							&& szDisplayName[0] != '.')
+						{
+							/* Strip the extension. */
+							PathRemoveExtension(szDisplayName);
+						}
+
+						lvItem.mask		= LVIF_TEXT|LVIF_IMAGE|LVIF_STATE;
+						lvItem.iItem	= iItem;
+						lvItem.iSubItem	= 0;
+						lvItem.pszText	= szDisplayName;
+						lvItem.iImage	= shfi.iIcon;
+						lvItem.stateMask	= LVIS_OVERLAYMASK;
+
+						/* As well as resetting the items icon, we'll also set
+						it's overlay again (the overlay could change, for example,
+						if the file is changed to a shortcut). */
+						lvItem.state		= INDEXTOOVERLAYMASK(shfi.iIcon >> 24);
+
+						/* Update the item in the listview. */
+						ListView_SetItem(m_hListView,&lvItem);
 					}
 
-					lvItem.mask		= LVIF_TEXT|LVIF_IMAGE;
-					lvItem.iItem	= iItem;
-					lvItem.iSubItem	= 0;
-					lvItem.pszText	= szDisplayName;
-					lvItem.iImage	= shfi.iIcon;
-
-					/* Update the item in the listview. */
-					ListView_SetItem(m_hListView,&lvItem);
+					DestroyIcon(shfi.hIcon);
 				}
 			}
 

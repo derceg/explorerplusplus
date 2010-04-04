@@ -305,9 +305,6 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 							{
 							case REPLACEEXPLORER_NONE:
 								{
-									BOOL bSuccess1;
-									BOOL bSuccess2;
-
 									switch(m_ReplaceExplorerMode)
 									{
 									case REPLACEEXPLORER_FILESYSTEM:

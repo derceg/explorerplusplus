@@ -754,6 +754,10 @@ BOOL CContainer::OnListViewEndLabelEdit(LPARAM lParam)
 
 	m_bListViewRenaming = FALSE;
 
+	/* Did the user cancel the editing? */
+	if(pItem->pszText == NULL)
+		return FALSE;
+
 	/* Is the new filename empty? */
 	if(lstrcmp(pItem->pszText,EMPTY_STRING) == 0)
 		return FALSE;
