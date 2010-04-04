@@ -15,7 +15,7 @@ Known limitations:
    yet (such as sorting by printer status in the
    Printers folder).
 
-Version 1.1 (4/4/10)
+Version 1.1 (5/4/10)
 --------------------
 New features:
  - Explorer++ can now replace Windows Explorer for all

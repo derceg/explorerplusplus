@@ -1,28 +1,31 @@
-Explorer++ 1.0.0.0 64-bit for Windows XP, Vista, 7
+Explorer++ 1.1 64-bit
+---------------------
 
-Copyright (c) 2005-2009, David Erceg
-All rights reserved.
+Copyright (c) 2005-2010 David Erceg
+
+Explorer++ is free software released under
+the GNU General Public License.
+
 www.explorerplusplus.com
-
-Using Explorer++
-----------------
-
-Explorer++ can simply be extracted and run.
-There is no need to install it.
 
 
 About Explorer++
 ----------------
+Explorer++ is a free multi-tab file manager for Windows.
+Available on Windows XP and above, it features the
+same familiar interface as Windows Explorer, while
+introducing several enhancements and improvements for a
+much richer file browsing experience.
 
-Explorer++ is a file browser/manager for Windows XP and
-above. Fast, and light in terms of resources, it includes
-most of the features present in Windows Explorer,
-as well as many new ones.
+
+Using Explorer++
+----------------
+Explorer++ can simply be extracted and run.
+There is no need to install it.
 
 
 Reporting Problems
 ------------------
-
 Please send any bugs or problems to:
 
 david@explorerplusplus.com
