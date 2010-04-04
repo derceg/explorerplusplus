@@ -1,7 +1,7 @@
 Explorer++ Version History
 --------------------------
 
-Current version: 1.0.0.0 32-bit
+Current version: 1.1
 
 Note:
  - On the 64-bit version of Windows, the control
@@ -15,8 +15,8 @@ Known limitations:
    yet (such as sorting by printer status in the
    Printers folder).
 
-Version 1.x.x.x ()
-------------------
+Version 1.1 (4/4/10)
+--------------------
 New features:
  - Explorer++ can now replace Windows Explorer for all
    folders (Vista and later only).
@@ -55,6 +55,8 @@ Bug fixes:
  - When .lnk extensions were hidden, and a file
    with the .lnk extension was renamed, it would
    lose its extension. Fixed.
+ - When the system font size for menus was changed,
+   the custom menus would be sized incorrectly. Fixed.
  - When the treeview had focus, the file action
    buttons on the main toolbar (cut, copy, past,
    delete, etc) would be incorrectly disabled.

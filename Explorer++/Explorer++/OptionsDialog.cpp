@@ -304,8 +304,25 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 							switch(ReplaceExplorerMode)
 							{
 							case REPLACEEXPLORER_NONE:
-								RemoveAsDefaultFileManagerFileSystem();
-								RemoveAsDefaultFileManagerAll();
+								{
+									BOOL bSuccess1;
+									BOOL bSuccess2;
+
+									switch(m_ReplaceExplorerMode)
+									{
+									case REPLACEEXPLORER_FILESYSTEM:
+										bSuccess = RemoveAsDefaultFileManagerFileSystem();
+										break;
+
+									case REPLACEEXPLORER_ALL:
+										bSuccess = RemoveAsDefaultFileManagerAll();
+										break;
+
+									default:
+										bSuccess = TRUE;
+										break;
+									}
+								}
 								break;
 
 							case REPLACEEXPLORER_FILESYSTEM:
