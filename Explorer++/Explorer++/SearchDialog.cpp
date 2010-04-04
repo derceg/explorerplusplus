@@ -304,7 +304,7 @@ INT_PTR CALLBACK CContainer::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM 
 				if((int)wParam == SEARCH_PROCESSITEMS_TIMER_ID)
 				{
 					list<LPITEMIDLIST>::iterator itr;
-					int nItems = min(m_SearchItems.size(),SEARCH_MAX_ITEMS_BATCH_PROCESS);
+					int nItems = min((int)m_SearchItems.size(),SEARCH_MAX_ITEMS_BATCH_PROCESS);
 					int i = 0;
 
 					itr = m_SearchItems.begin();
