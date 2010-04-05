@@ -71,7 +71,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib"
+				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib dwmapi.lib"
 				OutputFile="$(OutDir)/Explorer++.exe"
 				LinkIncremental="2"
 				IgnoreAllDefaultLibraries="false"
@@ -166,7 +166,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib"
+				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib dwmapi.lib"
 				OutputFile="$(OutDir)/Explorer++.exe"
 				LinkIncremental="2"
 				IgnoreAllDefaultLibraries="false"
@@ -255,7 +255,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib"
+				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib dwmapi.lib"
 				OutputFile="$(OutDir)/Explorer++.exe"
 				LinkIncremental="1"
 				TypeLibraryFile=""
@@ -341,7 +341,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib"
+				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib dwmapi.lib"
 				OutputFile="$(OutDir)/Explorer++.exe"
 				LinkIncremental="1"
 				TypeLibraryFile="shobjidl.idl"
@@ -426,7 +426,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib"
+				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib dwmapi.lib"
 				OutputFile="$(OutDir)/Explorer++.exe"
 				LinkIncremental="1"
 				TypeLibraryFile=""
@@ -512,7 +512,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib"
+				AdditionalDependencies="comctl32.lib shell32.lib gdiplus.lib msimg32.lib shlwapi.lib psapi.lib mpr.lib uxtheme.lib vfw32.lib dwmapi.lib"
 				OutputFile="$(OutDir)/Explorer++.exe"
 				LinkIncremental="1"
 				TypeLibraryFile="shobjidl.idl"

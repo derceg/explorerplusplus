@@ -165,6 +165,12 @@ typedef struct
 	list<DWLine_t> Lines;
 } DWRule_t;
 
+typedef struct
+{
+	HWND	hProxy;
+	int		iTabId;
+} TabProxyInfo_t;
+
 typedef enum
 {
 	STARTUP_PREVIOUSTABS	= 1,
@@ -207,6 +213,7 @@ public:
 	LRESULT CALLBACK	TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK	TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,int iTabId);
 	INT_PTR CALLBACK	GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -775,6 +782,10 @@ private:
 	HRESULT					HandleStatusText(void);
 	void					ToggleFolders(void);
 
+	/* Windows 7 taskbar thumbnail previews. */
+	ATOM					RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirectory);
+	void					CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwitchToNewTab);
+
 	/* Search. */
 	void					OnSearch(HWND hDlg);
 	void					SearchSaveState(HWND hDlg);
@@ -1257,6 +1268,12 @@ private:
 	BOOL					m_bShowGridlinesGlobal;
 	BOOL					m_bHideSystemFilesGlobal;
 	BOOL					m_bHideLinkExtensionGlobal;
+
+	/* Windows 7 taskbar thumbnail previews. */
+	ITaskbarList4			*m_pTaskbarList3;
+	list<TabProxyInfo_t>	m_TabProxyList;
+	UINT					m_uTaskbarButtonCreatedMessage;
+	BOOL					m_bInit;
 
 	/* Undo state. */
 	BOOL					m_bCanUndo;

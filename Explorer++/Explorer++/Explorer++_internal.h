@@ -53,7 +53,9 @@ add a definition here. */
 /* This is only defined for Windows Vista and later.
 If building for XP as well, this definition will
 need to be included here. */
-#define SHIL_JUMBO	0x4
+#ifndef SHIL_JUMBO
+	#define SHIL_JUMBO	0x4
+#endif
 
 /* These are used with the IncludeItems()
 method of INewMenuClient. INewMenuClient

@@ -86,6 +86,12 @@ void CContainer::OnWindowCreate(void)
 {
 	ILoadSave *pLoadSave = NULL;
 
+	m_bInit = FALSE;
+	m_uTaskbarButtonCreatedMessage = RegisterWindowMessage(_T("TaskbarButtonCreated"));
+
+	CoCreateInstance(CLSID_TaskbarList,NULL,CLSCTX_INPROC_SERVER,
+		IID_ITaskbarList4,(LPVOID *)&m_pTaskbarList3);
+
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 

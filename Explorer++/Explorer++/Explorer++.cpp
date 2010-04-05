@@ -676,8 +676,21 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
  */
 LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
-	switch(Msg)
+	if(Msg == m_uTaskbarButtonCreatedMessage)
 	{
+		m_bInit = TRUE;
+
+		ChangeWindowMessageFilter(WM_DWMSENDICONICTHUMBNAIL,MSGFLT_ADD);
+		ChangeWindowMessageFilter(WM_DWMSENDICONICLIVEPREVIEWBITMAP,MSGFLT_ADD);
+
+		m_pTaskbarList3->HrInit();
+
+		return 0;
+	}
+	else
+	{
+		switch(Msg)
+		{
 		case WM_CREATE:
 			OnWindowCreate();
 			break;
@@ -907,6 +920,7 @@ LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LP
 		case WM_DESTROY:
 			return OnDestroy();
 			break;
+		}
 	}
 
 	return DefWindowProc(hwnd,Msg,wParam,lParam);

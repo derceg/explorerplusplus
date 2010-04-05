@@ -107,6 +107,9 @@ int *pTabObjectIndex)
 	return hr;
 }
 
+/* TODO: */
+LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+
 /* Creates a new tab. If the settings argument is NULL,
 the global settings will be used. */
 HRESULT CContainer::CreateNewTab(LPITEMIDLIST pidlDirectory,
@@ -266,7 +269,391 @@ int *pTabObjectIndex)
 	if(pTabObjectIndex != NULL)
 		*pTabObjectIndex = iTabId;
 
+	/* If we're running on Windows 7, we'll create
+	a proxy window for each tab. This proxy window
+	will create the taskbar thumbnail for that tab. */
+	CreateTabProxy(pidlDirectory,iTabId,bSwitchToNewTab);
+
 	return S_OK;
+}
+
+typedef struct
+{
+	CContainer	*pContainer;
+	int			iTabId;
+} TabProxy_t;
+
+ATOM CContainer::RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirectory)
+{
+	WNDCLASSEX wcex;
+	SHFILEINFO shfi;
+
+	/* TODO: Assign lock icon if tab is locked. */
+	SHGetFileInfo((LPCTSTR)pidlDirectory,0,&shfi,sizeof(shfi),
+		SHGFI_PIDL|SHGFI_ICON|SHGFI_SMALLICON);
+
+	wcex.cbSize			= sizeof(wcex);
+	wcex.style			= 0;
+	wcex.lpfnWndProc	= TabProxyWndProcStub;
+	wcex.cbClsExtra		= 0;
+	wcex.cbWndExtra		= sizeof(TabProxy_t *);
+	wcex.hInstance		= GetModuleHandle(0);
+	wcex.hIcon			= NULL;
+	wcex.hIconSm		= shfi.hIcon;
+	wcex.hCursor		= LoadCursor(NULL,IDC_ARROW);
+	wcex.hbrBackground	= (HBRUSH)NULL;
+	wcex.lpszMenuName	= NULL;
+	wcex.lpszClassName	= szClassName;
+
+	return RegisterClassEx(&wcex);
+
+	//DestroyIcon(shfi.hIcon);
+}
+
+/* The Display Window Manager (DWM) will only interact with top-level
+windows. Therefore, we'll need to create a top-level proxy window for
+every tab. This top-level window will be hidden, and will handle the
+thumbnail preview for the tab.
+References:
+http://dotnet.dzone.com/news/windows-7-taskbar-tabbed
+http://channel9.msdn.com/learn/courses/Windows7/Taskbar/Win7TaskbarNative/Exercise-Experiment-with-the-New-Windows-7-Taskbar-Features/
+*/
+void CContainer::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwitchToNewTab)
+{
+	//if(m_bInit)
+	{
+		HWND hTabProxy;
+		TCHAR szDisplayName[MAX_PATH];
+		TCHAR szClassName[512];
+		HRESULT hr;
+		ATOM aRet;
+		BOOL bValue = TRUE;
+		
+		static int iCount = 0;
+
+		StringCchPrintf(szClassName,SIZEOF_ARRAY(szClassName),_T("Explorer++TabProxy%d"),iCount++);
+
+		aRet = RegisterTabProxyClass(szClassName,pidlDirectory);
+
+		if(aRet != 0)
+		{
+			/* Generate the text that would be shown for this tab, and
+			use it as the window text for the proxy window. */
+			GetDisplayName(pidlDirectory,szDisplayName,SHGDN_INFOLDER);
+
+			TabProxy_t *ptp = NULL;
+
+			ptp = (TabProxy_t *)malloc(sizeof(TabProxy_t));
+
+			ptp->pContainer = this;
+			ptp->iTabId = iTabId;
+
+			hTabProxy = CreateWindow(szClassName,szDisplayName,WS_OVERLAPPEDWINDOW,
+				0,0,0,0,NULL,NULL,GetModuleHandle(0),(LPVOID)ptp);
+
+			if(hTabProxy != NULL)
+			{
+				hr = DwmSetWindowAttribute(hTabProxy,DWMWA_FORCE_ICONIC_REPRESENTATION,
+					&bValue,sizeof(BOOL));
+
+				hr = DwmSetWindowAttribute(hTabProxy,DWMWA_HAS_ICONIC_BITMAP,
+					&bValue,sizeof(BOOL));
+
+				/* Register and insert the tab into the current list of
+				taskbar thumbnails. */
+				m_pTaskbarList3->RegisterTab(hTabProxy,m_hContainer);
+				m_pTaskbarList3->SetTabOrder(hTabProxy,NULL);
+
+				m_pTaskbarList3->SetThumbnailTooltip(hTabProxy,szDisplayName);
+
+				TabProxyInfo_t tpi;
+
+				tpi.hProxy	= hTabProxy;
+				tpi.iTabId	= iTabId;
+
+				m_TabProxyList.push_back(tpi);
+
+				if(bSwitchToNewTab)
+				{
+					m_pTaskbarList3->SetTabActive(hTabProxy,m_hContainer,0);
+				}
+			}
+		}
+	}
+}
+
+LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+{
+	TabProxy_t *ptp = (TabProxy_t *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+
+	switch(Msg)
+	{
+	case WM_CREATE:
+		{
+			ptp = (TabProxy_t *)((CREATESTRUCT *)lParam)->lpCreateParams;
+
+			SetWindowLongPtr(hwnd,GWLP_USERDATA,(LONG_PTR)ptp);
+		}
+		break;
+	}
+
+	if(ptp != NULL)
+		return ptp->pContainer->TabProxyWndProc(hwnd,Msg,wParam,lParam,ptp->iTabId);
+	else
+		return DefWindowProc(hwnd,Msg,wParam,lParam);
+}
+
+LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,int iTabId)
+{
+	switch(Msg)
+	{
+	case WM_ACTIVATE:
+		/* Switch to the specified tab... */
+		OnSelectTab(iTabId);
+		SendMessage(m_hListView[iTabId],WM_ACTIVATE,wParam,lParam);
+		break;
+
+	case WM_SYSCOMMAND:
+		switch(wParam)
+		{
+		case SC_CLOSE:
+			break;
+
+		default:
+			SendMessage(m_hListView[iTabId],WM_SYSCOMMAND,wParam,lParam);
+			break;
+		}
+		break;
+
+	/* Generate a thumbnail of the current tab. Basic procedure:
+	1. Generate a full-scale bitmap of the main window.
+	2. Overlay a bitmap of the specified tab onto the main
+	window bitmap.
+	3. Shrink the resulting bitmap down to the correct thumbnail size. */
+	case WM_DWMSENDICONICTHUMBNAIL:
+		{
+			HDC hdc;
+			HDC hdcSrc;
+			HBITMAP hBitmap;
+			HBITMAP hPrevBitmap;
+			Color color(0,0,0);
+			HRESULT hr;
+			RECT rcMain;
+			RECT rcTab;
+			int iWidth;
+			int iHeight;
+
+			HWND hTab = m_hListView[iTabId];
+
+			GetClientRect(m_hContainer,&rcMain);
+			GetClientRect(hTab,&rcTab);
+
+			int width = HIWORD(lParam);
+			int height = LOWORD(lParam);
+
+
+			/* Main window BitBlt. */
+			hdc = GetDC(m_hContainer);
+			hdcSrc = CreateCompatibleDC(hdc);
+
+			/* Any bitmap sent back to the operating system will need to be in 32-bit
+			ARGB format. */
+			Bitmap bi(GetRectWidth(&rcMain),GetRectHeight(&rcMain),PixelFormat32bppARGB);
+			bi.GetHBITMAP(color,&hBitmap);
+
+			/* BitBlt the main window into the bitmap. */
+			hPrevBitmap = (HBITMAP)SelectObject(hdcSrc,hBitmap);
+			BitBlt(hdcSrc,0,0,GetRectWidth(&rcMain),GetRectHeight(&rcMain),hdc,0,0,SRCCOPY);
+
+
+			/* Now BitBlt the tab onto the main window. */
+			HDC hdcTab;
+			HDC hdcTabSrc;
+			HBITMAP hbmTab;
+			HBITMAP hbmTabPrev;
+			BOOL bVisible;
+
+			hdcTab = GetDC(hTab);
+			hdcTabSrc = CreateCompatibleDC(hdcTab);
+			hbmTab = CreateCompatibleBitmap(hdcTab,GetRectWidth(&rcTab),GetRectHeight(&rcTab));
+
+			hbmTabPrev = (HBITMAP)SelectObject(hdcTabSrc,hbmTab);
+
+			bVisible = IsWindowVisible(hTab);
+
+			if(!bVisible)
+			{
+				ShowWindow(hTab,SW_SHOW);
+			}
+
+			PrintWindow(hTab,hdcTabSrc,PW_CLIENTONLY);
+
+			if(!bVisible)
+			{
+				ShowWindow(hTab,SW_HIDE);
+			}
+
+			MapWindowPoints(hTab,m_hContainer,(LPPOINT)&rcTab,2);
+			BitBlt(hdcSrc,rcTab.left,rcTab.top,GetRectWidth(&rcTab),GetRectHeight(&rcTab),hdcTabSrc,0,0,SRCCOPY);
+
+			SelectObject(hdcTabSrc,hbmTabPrev);
+			DeleteObject(hbmTab);
+			DeleteDC(hdcTabSrc);
+			ReleaseDC(hTab,hdcTab);
+
+
+			/* Shrink the bitmap. */
+			HDC hdcThumbnailSrc;
+			HBITMAP hbmThumbnail;
+			POINT pt;
+
+			hdcThumbnailSrc = CreateCompatibleDC(hdc);
+
+			/* If the current height of the main window
+			is less than the width, we'll create a thumbnail
+			of maximum width; else maximum height. */
+			if(GetRectWidth(&rcMain) > GetRectHeight(&rcMain))
+			{
+				iWidth = width;
+				iHeight = width * GetRectHeight(&rcMain) / GetRectWidth(&rcMain);
+			}
+			else
+			{
+				iHeight = height;
+				iWidth = height * GetRectWidth(&rcMain) / GetRectHeight(&rcMain);
+			}
+
+			/* Thumbnail bitmap. */
+			Bitmap bmpThumbnail(iWidth,iHeight,PixelFormat32bppARGB);
+
+			bmpThumbnail.GetHBITMAP(color,&hbmThumbnail);
+
+			hPrevBitmap = (HBITMAP)SelectObject(hdcThumbnailSrc,hbmThumbnail);
+
+			/* Finally, shrink the full-scale bitmap down into a thumbnail. */
+			SetStretchBltMode(hdcThumbnailSrc,HALFTONE);
+			SetBrushOrgEx(hdcThumbnailSrc,0,0,&pt);
+			StretchBlt(hdcThumbnailSrc,0,0,iWidth,iHeight,hdcSrc,0,0,GetRectWidth(&rcMain),GetRectHeight(&rcMain),SRCCOPY);
+
+			SelectObject(hdcThumbnailSrc,hPrevBitmap);
+			DeleteDC(hdcThumbnailSrc);
+
+			hr = DwmSetIconicThumbnail(hwnd,hbmThumbnail,0);
+
+			DeleteObject(hBitmap);
+			DeleteObject(hbmThumbnail);
+
+			SelectObject(hdcSrc,hPrevBitmap);
+
+			DeleteDC(hdcSrc);
+			ReleaseDC(m_hContainer,hdc);
+
+			return 0;
+		}
+		break;
+
+	case WM_DWMSENDICONICLIVEPREVIEWBITMAP:
+		{
+			/* Now BitBlt the tab onto the main window. */
+			HDC hdcTab;
+			HDC hdcTabSrc;
+			HBITMAP hbmTab;
+			HBITMAP hbmTabPrev;
+			Color color(0,0,0);
+			MENUBARINFO mbi;
+			POINT pt;
+			BOOL bVisible;
+			RECT rcTab;
+
+			HWND hTab = m_hListView[iTabId];
+
+			hdcTab = GetDC(hTab);
+			hdcTabSrc = CreateCompatibleDC(hdcTab);
+
+			GetClientRect(hTab,&rcTab);
+
+			Bitmap bi(GetRectWidth(&rcTab),GetRectHeight(&rcTab),PixelFormat32bppARGB);
+			bi.GetHBITMAP(color,&hbmTab);
+
+			hbmTabPrev = (HBITMAP)SelectObject(hdcTabSrc,hbmTab);
+
+			bVisible = IsWindowVisible(hTab);
+
+			if(!bVisible)
+			{
+				ShowWindow(hTab,SW_SHOW);
+			}
+
+			PrintWindow(hTab,hdcTabSrc,PW_CLIENTONLY);
+
+			if(!bVisible)
+			{
+				ShowWindow(hTab,SW_HIDE);
+			}
+
+			SetStretchBltMode(hdcTabSrc,HALFTONE);
+			SetBrushOrgEx(hdcTabSrc,0,0,&pt);
+			StretchBlt(hdcTabSrc,0,0,GetRectWidth(&rcTab),GetRectHeight(&rcTab),hdcTabSrc,
+				0,0,GetRectWidth(&rcTab),GetRectHeight(&rcTab),SRCCOPY);
+
+			MapWindowPoints(hTab,m_hContainer,(LPPOINT)&rcTab,2);
+
+			mbi.cbSize	 = sizeof(mbi);
+			GetMenuBarInfo(m_hContainer,OBJID_MENU,0,&mbi);
+
+			/* The operating system will automatically
+			draw the main window. Therefore, we'll just shift
+			the tab into it's proper position. */
+			pt.x = rcTab.left;
+
+			/* Need to include the menu bar in the offset. */
+			pt.y = rcTab.top + mbi.rcBar.bottom - mbi.rcBar.top;
+
+			DwmSetIconicLivePreviewBitmap(hwnd,hbmTab,&pt,0);
+
+			SelectObject(hdcTabSrc,hbmTabPrev);
+			DeleteObject(hbmTab);
+			DeleteDC(hdcTabSrc);
+			ReleaseDC(hTab,hdcTab);
+
+			return 0;
+		}
+		break;
+
+	case WM_CLOSE:
+		{
+			TCITEM tcItem;
+			int nTabs;
+			int i = 0;
+
+			nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+
+			if(nTabs == 1)
+			{
+				/* If this is the last tab, we'll close
+				the whole application. */
+				SendMessage(m_hContainer,WM_CLOSE,0,0);
+			}
+			else
+			{
+				for(i = 0;i < nTabs;i++)
+				{
+					tcItem.mask = TCIF_PARAM;
+					TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
+
+					if((int)tcItem.lParam == iTabId)
+					{
+						/* Close the tab... */
+						CloseTab(i);
+						break;
+					}
+				}
+			}
+		}
+		break;
+	}
+
+	return DefWindowProc(hwnd,Msg,wParam,lParam);
 }
 
 void CContainer::OnTabChangeInternal(void)
@@ -294,7 +681,21 @@ void CContainer::OnTabChangeInternal(void)
 	/* Show the new listview. */
 	ShowWindow(m_hActiveListView,SW_SHOW);
 
-	SetFocus(m_hActiveListView);
+	/* Inform the taskbar that this tab has become active. */
+	/* TODO: Fix. */
+	list<TabProxyInfo_t>::iterator itr;
+
+	for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+	{
+		if(itr->iTabId == m_iObjectIndex)
+		{
+			m_pTaskbarList3->SetTabActive(itr->hProxy,m_hContainer,0);
+			break;
+		}
+	}
+
+	/* TODO: Fix. */
+	//SetFocus(m_hActiveListView);
 }
 
 void CContainer::RefreshAllTabs(void)
@@ -472,6 +873,19 @@ HRESULT CContainer::CloseTab(int TabIndex)
 
 	/* Remove the tabs image from the image list. */
 	TabCtrl_RemoveImage(m_hTabCtrl,iRemoveImage);
+
+	list<TabProxyInfo_t>::iterator itr;
+
+	/* TODO: Need to release class icon when a tab preview is closed. */
+	for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+	{
+		if(itr->iTabId == TabIndex)
+		{
+			m_pTaskbarList3->UnregisterTab(itr->hProxy);
+			m_TabProxyList.erase(itr);
+			break;
+		}
+	}
 
 	m_pDirMon->StopDirectoryMonitor(m_pShellBrowser[ListViewIndex]->GetDirMonitorId());
 
