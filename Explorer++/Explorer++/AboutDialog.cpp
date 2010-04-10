@@ -23,7 +23,10 @@
 #include "../Helper/Controls.h"
 #include "../Helper/Bookmark.h"
 #include "MainResource.h"
-#include "Version.h"
+
+#ifndef _DEBUG
+	#include "Version.h"
+#endif
 
 
 LRESULT	CALLBACK AboutStaticProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -78,8 +81,13 @@ INT_PTR CALLBACK AboutDialogProcedure(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM l
 
 				SetDlgItemText(hDlg,IDC_STATIC_VERSIONNUMBER,szVersion);
 
-				GetDlgItemText(hDlg,IDC_STATIC_BUILDDATE,szTemp,SIZEOF_ARRAY(szTemp));
-				StringCchPrintf(szBuildDate,SIZEOF_ARRAY(szBuildDate),szTemp,VERSION_BUILD_DATE);
+				/* We'll only show a build date in non-debug mode. */
+				#ifndef _DEBUG
+					GetDlgItemText(hDlg,IDC_STATIC_BUILDDATE,szTemp,SIZEOF_ARRAY(szTemp));
+					StringCchPrintf(szBuildDate,SIZEOF_ARRAY(szBuildDate),szTemp,VERSION_BUILD_DATE);
+				#else
+					StringCchCopy(szBuildDate,SIZEOF_ARRAY(szBuildDate),_T("[Debug Build]"));
+				#endif
 
 				SetDlgItemText(hDlg,IDC_STATIC_BUILDDATE,szBuildDate);
 
