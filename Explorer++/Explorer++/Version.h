@@ -1,1 +1,0 @@
-#define VERSION_BUILD_DATE	_T("05/04/2010 03:11:05")
