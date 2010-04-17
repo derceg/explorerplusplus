@@ -1101,17 +1101,13 @@ void CContainer::LoadApplicationToolbarFromRegistryInternal(HKEY hKey)
 {
 	HKEY	hKeyChild;
 	TCHAR	szItemKey[256];
-	TCHAR	szKeyName[256];
 	TCHAR	szName[512];
 	TCHAR	szCommand[512];
-	DWORD	dwKeyLength;
 	LONG	lNameStatus;
 	LONG	lCommandStatus;
 	LONG	ReturnValue;
 	BOOL	bShowNameOnToolbar = TRUE;
 	int		i = 0;
-
-	dwKeyLength = SIZEOF_ARRAY(szKeyName);
 
 	StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
 		_T("%d"),i);

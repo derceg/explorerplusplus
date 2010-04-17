@@ -879,7 +879,7 @@ TCHAR *PrintComma(unsigned long nPrint)
 TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint)
 {
 	static TCHAR szBuffer[14];
-	TCHAR *p = &szBuffer[sizeof(szBuffer) - 1];
+	TCHAR *p = &szBuffer[SIZEOF_ARRAY(szBuffer) - 1];
 	static TCHAR chComma = ',';
 	unsigned long long nTemp = (unsigned long long)(lPrint.LowPart + (lPrint.HighPart * pow(2.0,32.0)));
 	int i = 0;
@@ -890,7 +890,7 @@ TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint)
 		return szBuffer;
 	}
 
-	*p = '\0';
+	*p = (TCHAR)'\0';
 
 	while(nTemp != 0)
 	{

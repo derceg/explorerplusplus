@@ -23,10 +23,6 @@
 #define _WIN32_IE 0x0601	// Change this to the appropriate value to target other versions of IE.
 #endif
 
-//#ifndef NTDDI_VERSION
-//#define NTDDI_VERSION NTDDI_VISTA
-//#endif
-
 #ifdef UNICODE
 #define _ctoi _wtoi
 #else
@@ -48,6 +44,9 @@
 
 /* Disable 'unreferenced formal parameter' warning. */
 #pragma warning( disable : 4100 )
+
+/* Disable the '#pragma deprecated' warning. */
+#pragma warning( disable : 4995 )
 
 // Windows Header Files:
 #include <winsock2.h>

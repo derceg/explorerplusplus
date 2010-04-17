@@ -141,6 +141,8 @@ BOOL DecodeBoolValue(WCHAR *wszValue);
 WCHAR *EncodeIntValue(int iValue);
 int DecodeIntValue(WCHAR *wszValue);
 
+unsigned long hash_setting(unsigned char *str);
+
 /* Helper function to create a DOM instance. */
 MSXML2::IXMLDOMDocument *DomFromCOM()
 {
@@ -2530,7 +2532,7 @@ WCHAR *wszAttributeValue)
 	VariantClear(&var);
 }
 
-unsigned long hash(unsigned char *str)
+unsigned long hash_setting(unsigned char *str)
 {
 	unsigned long hash = 5381;
 	int c;
@@ -2552,7 +2554,7 @@ WCHAR *wszName,WCHAR *wszValue)
 	WideCharToMultiByte(CP_ACP,0,wszName,-1,(LPSTR)szName,
 		SIZEOF_ARRAY(szName),NULL,NULL);
 
-	uNameHash = hash(szName);
+	uNameHash = hash_setting(szName);
 
 	switch(uNameHash)
 	{
