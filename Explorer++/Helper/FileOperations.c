@@ -35,7 +35,7 @@ int RenameFile(TCHAR *NewFileName,TCHAR *OldFileName)
 	shfo.wFunc	= FO_RENAME;
 	shfo.pFrom	= OldFileName;
 	shfo.pTo	= NewFileName;
-	shfo.fFlags	= FOF_ALLOWUNDO|FOF_SILENT;
+	shfo.fFlags	= FOF_ALLOWUNDO;
 
 	return !SHFileOperation(&shfo);
 }

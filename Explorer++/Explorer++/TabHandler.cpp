@@ -899,6 +899,21 @@ HRESULT CContainer::CloseTab(int TabIndex)
 
 	HandleTabToolbarItemStates();
 
+	if(!m_bAlwaysShowTabBar)
+	{
+		if(TabCtrl_GetItemCount(m_hTabCtrl) == 1)
+		{
+			RECT rc;
+
+			m_bShowTabBar = FALSE;
+
+			GetClientRect(m_hContainer,&rc);
+
+			SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,
+				(LPARAM)MAKELPARAM(rc.right,rc.bottom));
+		}
+	}
+
 	return S_OK;
 }
 
@@ -1321,6 +1336,21 @@ void CContainer::InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,int iT
 	SendMessage(m_hTabCtrl,TCM_INSERTITEM,(WPARAM)iNewTabIndex,(LPARAM)&tcItem);
 
 	SetTabIcon(iNewTabIndex,iTabId,pidlDirectory);
+
+	if(!m_bAlwaysShowTabBar)
+	{
+		if(TabCtrl_GetItemCount(m_hTabCtrl) > 1)
+		{
+			RECT rc;
+
+			m_bShowTabBar = TRUE;
+
+			GetClientRect(m_hContainer,&rc);
+
+			SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,
+				(LPARAM)MAKELPARAM(rc.right,rc.bottom));
+		}
+	}
 }
 
 void CContainer::OnDuplicateTab(int iTab)
@@ -1464,17 +1494,44 @@ BOOL CContainer::OnMouseWheel(WPARAM wParam,LPARAM lParam)
 	}
 	else
 	{
-		/* User is scrolling within the listview. */
-		if(wParam & MK_CONTROL)
+		GetClientRect(m_hTreeView,&rc);
+
+		pt.x = pts.x;
+		pt.y = pts.y;
+
+		ScreenToClient(m_hTreeView,&pt);
+
+		bInRect = PtInRect(&rc,pt);
+
+		if(bInRect)
 		{
+			WORD wScrollType;
 			int  i = 0;
 
-			/* Switch listview views. For each wheel delta
-			(notch) the wheel is scrolled through, switch
-			the view once. */
-			for(i = 0;i < abs(zDelta / WHEEL_DELTA);i++)
+			if(zDelta > 0)
+				wScrollType = SB_LINEUP;
+			else
+				wScrollType = SB_LINEDOWN;
+
+			for(i = 0;i < TREEVIEW_WHEEL_MULTIPLIER * abs(zDelta / WHEEL_DELTA);i++)
 			{
-				CycleViewState((zDelta > 0));
+				SendMessage(m_hTreeView,WM_VSCROLL,MAKEWORD(wScrollType,0),NULL);
+			}
+		}
+		else
+		{
+			/* User is scrolling within the listview. */
+			if(wParam & MK_CONTROL)
+			{
+				int  i = 0;
+
+				/* Switch listview views. For each wheel delta
+				(notch) the wheel is scrolled through, switch
+				the view once. */
+				for(i = 0;i < abs(zDelta / WHEEL_DELTA);i++)
+				{
+					CycleViewState((zDelta > 0));
+				}
 			}
 		}
 	}

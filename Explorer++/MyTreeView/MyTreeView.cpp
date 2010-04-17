@@ -57,7 +57,6 @@ typedef struct
 	HWND			hTreeView;
 	LPITEMIDLIST	pidlFull;
 	HTREEITEM		hItem;
-	HANDLE			hEvent;
 } TreeViewInfo_t;
 
 list<TreeViewInfo_t> g_pTreeViewInfoList;
@@ -400,8 +399,9 @@ void CMyTreeView::OnGetDisplayInfo(LPARAM lParam)
 	ptvItem->mask |= TVIF_DI_SETITEM;
 }
 
+/* TODO: Define somewhere. */
 void CALLBACK TVFindIconAPC(ULONG_PTR dwParam);
-BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pListViewInfo,HANDLE hStopEvent);
+BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pListViewInfo);
 
 void CMyTreeView::AddToIconFinderQueue(TVITEM *plvItem)
 {
@@ -412,7 +412,6 @@ void CMyTreeView::AddToIconFinderQueue(TVITEM *plvItem)
 	tvi.hTreeView	= m_hTreeView;
 	tvi.hItem		= plvItem->hItem;
 	tvi.pidlFull	= BuildPath(plvItem->hItem);
-	tvi.hEvent		= NULL;
 
 	g_pTreeViewInfoList.push_back(tvi);
 
@@ -444,18 +443,11 @@ void CMyTreeView::EmptyIconFinderQueue(void)
 	LeaveCriticalSection(&g_tv_icon_cs);
 }
 
-BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pTreeViewInfo,HANDLE hStopEvent)
+BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pTreeViewInfo)
 {
 	BOOL bQueueNotEmpty;
 
 	EnterCriticalSection(&g_tv_icon_cs);
-
-	if(hStopEvent != NULL)
-	{
-		/* Set the event into the signaled
-		state. */
-		SetEvent(hStopEvent);
-	}
 
 	if(g_pTreeViewInfoList.empty() == TRUE)
 	{
@@ -473,10 +465,6 @@ BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pTreeViewInfo,HANDLE hStopEvent)
 		itr--;
 
 		*pTreeViewInfo = *itr;
-
-		/* Set the event to the non-signaled
-		state. */
-		ResetEvent(pTreeViewInfo->hEvent);
 
 		g_pTreeViewInfoList.erase(itr);
 
@@ -497,7 +485,7 @@ void CALLBACK TVFindIconAPC(ULONG_PTR dwParam)
 	BOOL			bQueueNotEmpty = TRUE;
 	int				iOverlay;
 
-	bQueueNotEmpty = RemoveFromIconFinderQueue(&pTreeViewInfo,NULL);
+	bQueueNotEmpty = RemoveFromIconFinderQueue(&pTreeViewInfo);
 
 	while(bQueueNotEmpty)
 	{
@@ -526,7 +514,7 @@ void CALLBACK TVFindIconAPC(ULONG_PTR dwParam)
 			CoTaskMemFree(pTreeViewInfo.pidlFull);
 		}
 
-		bQueueNotEmpty = RemoveFromIconFinderQueue(&pTreeViewInfo,pTreeViewInfo.hEvent);
+		bQueueNotEmpty = RemoveFromIconFinderQueue(&pTreeViewInfo);
 	}
 }
 
@@ -697,7 +685,14 @@ HTREEITEM hParent)
 									itr--;
 								}
 
-								itr++;
+								/* itr in this case is the item AFTER
+								which the current item should be inserted.
+								The only exception to this is when we are
+								inserting an item at the start of the list,
+								in which case we need to insert BEFORE the
+								first item. */
+								if(itr != vItems.begin() || StrCmpLogicalW(ItemName,itr->ItemName) > 0)
+									itr++;
 							}
 
 							vItems.insert(itr,ItemStore);

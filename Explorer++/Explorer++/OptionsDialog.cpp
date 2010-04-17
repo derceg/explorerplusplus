@@ -53,9 +53,6 @@ void CContainer::OnShowOptions(void)
 
 	g_hNewTabDirIcon = ImageList_GetIcon(himl,SHELLIMAGES_NEWTAB,ILD_NORMAL);
 
-	DeleteObject(hBitmap);
-	ImageList_Destroy(himl);
-
 	/* General options page. */
 	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
 	psp[nSheet].dwFlags		= PSP_DEFAULT;
@@ -116,26 +113,37 @@ void CContainer::OnShowOptions(void)
 		szTitle,SIZEOF_ARRAY(szTitle));
 
 	psh.dwSize		= sizeof(PROPSHEETHEADER);
-	psh.dwFlags		= PSH_DEFAULT|PSH_USECALLBACK|PSH_NOCONTEXTHELP;
+	psh.dwFlags		= PSH_DEFAULT|PSH_USECALLBACK|PSH_NOCONTEXTHELP|PSH_USEHICON|PSH_MODELESS;
 	psh.hwndParent	= m_hContainer;
 	psh.pszCaption	= szTitle;
 	psh.nPages		= nSheet;
 	psh.nStartPage	= 0;
+
+	psh.hIcon		= ImageList_GetIcon(himl,SHELLIMAGES_OPTIONS,ILD_TRANSPARENT);
+
 	psh.ppsp		= psp;
 	psh.phpage		= hpsp;
 	psh.pfnCallback	= PropSheetProcStub;
 
+	DeleteObject(hBitmap);
+	ImageList_Destroy(himl);
+
 	/* Create the property dialog itself, which
 	will hold each of the above property pages. */
-	PropertySheet(&psh);
+	g_hwndOptions = (HWND)PropertySheet(&psh);
 }
 
 int CALLBACK PropSheetProcStub(HWND hDlg,UINT msg,LPARAM lParam)
 {
 	switch(msg)
 	{
-		case WM_CREATE:
+		case PSCB_INITIALIZED:
 			g_hOptionsPropertyDialog = hDlg;
+			break;
+
+		case PSCB_BUTTONPRESSED:
+			DestroyWindow(hDlg);
+			g_hwndOptions = NULL;
 			break;
 	}
 
@@ -638,6 +646,8 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 		{
 			if(m_bAllowMultipleInstances)
 				CheckDlgButton(hDlg,IDC_OPTION_MULTIPLEINSTANCES,BST_CHECKED);
+			if(m_bAlwaysShowTabBar)
+				CheckDlgButton(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR,BST_CHECKED);
 			if(m_bShowFilePreviews)
 				CheckDlgButton(hDlg,IDC_OPTION_FILEPREVIEWS,BST_CHECKED);
 			if(m_bShowFullTitlePath)
@@ -661,6 +671,7 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 		switch(LOWORD(wParam))
 		{
 		case IDC_OPTION_MULTIPLEINSTANCES:
+		case IDC_OPTION_ALWAYSSHOWTABBAR:
 		case IDC_OPTION_FILEPREVIEWS:
 		case IDC_SETTINGS_CHECK_TITLEPATH:
 		case IDC_OPTION_USERNAMEINTITLEBAR:
@@ -684,6 +695,9 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 			case PSN_APPLY:
 				{
 					m_bAllowMultipleInstances = (IsDlgButtonChecked(hDlg,IDC_OPTION_MULTIPLEINSTANCES)
+						== BST_CHECKED);
+
+					m_bAlwaysShowTabBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR)
 						== BST_CHECKED);
 
 					m_bShowFilePreviews = (IsDlgButtonChecked(hDlg,IDC_OPTION_FILEPREVIEWS)
@@ -713,6 +727,15 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 					/* Required if show full title path or show username/privilege level
 					in title bar options change. */
 					HandleMainWindowText();
+
+					/* TODO: */
+					if(!m_bAlwaysShowTabBar)
+					{
+						if(TabCtrl_GetItemCount(m_hTabCtrl) > 1)
+							m_bShowTabBar = TRUE;
+						else
+							m_bShowTabBar = FALSE;
+					}
 
 					RECT	rc;
 					TCITEM tcItem;

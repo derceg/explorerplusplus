@@ -90,6 +90,7 @@ will need to be changed correspondingly. */
 #define HASH_INSERTSORTED			1109371947
 #define HASH_SHOWPRIVILEGETITLEBAR	4071561587
 #define HASH_DISABLEFOLDERSIZENETWORKREMOVABLE	2610679594
+#define HASH_ALWAYSSHOWTABBAR		148004675
 
 typedef struct
 {
@@ -290,6 +291,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysOpenInNewTab"),EncodeBoolValue(m_bAlwaysOpenNewTab));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowSizesInBytes"),EncodeBoolValue(m_bShowSizesInBytesGlobal));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowTabBar"),EncodeBoolValue(m_bAlwaysShowTabBar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AutoArrangeGlobal"),EncodeBoolValue(m_bAutoArrangeGlobal));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -2563,6 +2566,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_ALWAYSSHOWSIZESINBYTES:
 		m_bShowSizesInBytesGlobal = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_ALWAYSSHOWTABBAR:
+		m_bAlwaysShowTabBar = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_AUTOARRANGEGLOBAL:

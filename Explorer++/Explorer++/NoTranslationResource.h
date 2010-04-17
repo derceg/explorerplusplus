@@ -57,7 +57,6 @@
 #define IDR_GROUPBY_MENU                225
 #define IDD_OPTIONS_WINDOW              227
 #define IDD_CUSTOMIZECOLORS             228
-#define IDB_BITMAP1                     231
 #define IDB_ABOUT                       231
 #define IDC_DEFAULTCOLUMNS_DESCRIPTION  1001
 #define IDC_COLUMNS_DESCRIPTION         1001
@@ -206,7 +205,6 @@
 #define IDC_TABS_DOUBLECLICKCLOSE       1218
 #define IDC_SETTINGS_CHECK_ZIPFILES     1218
 #define IDC_MASSRENAME_MORE             1219
-#define IDC_CHECK2                      1221
 #define IDC_CHECK_SEARCHADS             1221
 #define IDC_OPTION_MULTIPLEINSTANCES    1221
 #define IDC_SETTINGS_CHECK_INSERTSORTED 1221
@@ -222,9 +220,7 @@
 #define IDC_BUTTON_MOVEDOWN             1234
 #define IDC_BUTTON5_NEW                 1235
 #define IDC_BUTTON_EDIT                 1237
-#define IDC_CHECK3                      1240
 #define IDC_SETTINGS_CHECK_LINK         1240
-#define IDC_CHECK4                      1241
 #define IDC_SETTINGS_CHECK_SYSTEMFILES  1241
 #define IDC_CHECK5                      1242
 #define IDC_SETTINGS_CHECK_SINGLECLICK  1242

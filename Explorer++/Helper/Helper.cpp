@@ -924,7 +924,7 @@ int WriteTextToRichEdit(HWND hRichEdit,TCHAR *fmt,...)
 	TextEx.flags	= ST_SELECTION;
 
 	/* Unicode page set. */
-	TextEx.codepage	= 1200;
+	TextEx.codepage	= CP_UNICODE;
 
 	iResult = (int)SendMessage(hRichEdit,EM_SETTEXTEX,(WPARAM)&TextEx,(LPARAM)pszBuf);
 
@@ -1259,8 +1259,10 @@ BOOL GetVersionInfoString(TCHAR *szFileName,TCHAR *szVersionInfo,TCHAR *szBuffer
                 {
                     /* If the bottom eight bits of the language id's match, use this
                     version information (since this means that the version information
-                    and the users default language are the same). */
-                    if((UserLangId & lpTranslate[i].wLanguage) == UserLangId)
+                    and the users default language are the same). Also use this version
+					information if the language is not specified (i.e. wLanguage is 0). */
+                    if((UserLangId & lpTranslate[i].wLanguage) == UserLangId ||
+						lpTranslate[i].wLanguage == 0)
                     {
                         StringCchPrintf(szSubBlock,SIZEOF_ARRAY(szSubBlock),
                             _T("\\StringFileInfo\\%04X%04X\\%s"),lpTranslate[i].wLanguage,

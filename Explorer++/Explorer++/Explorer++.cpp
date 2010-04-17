@@ -25,6 +25,8 @@ void				SetLanguageModule(void);
 void				ShowUsage(void);
 void				ClearRegistrySettings(void);
 
+int	g_nCmdShow = SW_SHOW;
+
 HINSTANCE				g_hInstance;
 HINSTANCE				g_hLanguageModule;
 TCHAR					g_szLang[32];
@@ -32,7 +34,10 @@ BOOL					g_bForceLanguageLoad = FALSE;
 list<TabDirectory_t>	g_TabDirs;
 
 /* Search. */
-HWND					g_hwndSearch;
+HWND	g_hwndSearch;
+
+/* Options dialog. */
+HWND	g_hwndOptions;
 
 CRITICAL_SECTION	g_csDirMonCallback;
 
@@ -121,6 +126,7 @@ CContainer::CContainer(HWND hwnd)
 	m_bDragAllowed					= FALSE;
 	m_pActiveShellBrowser			= NULL;
 	g_hwndSearch					= NULL;
+	g_hwndOptions					= NULL;
 	m_ListViewMButtonItem			= -1;
 	m_nDrivesInToolbar				= 0;
 
@@ -340,6 +346,8 @@ void CContainer::SetDefaultValues(void)
 	m_bShowDisplayWindow			= TRUE;
 	m_bShowDrivesToolbar			= TRUE;
 	m_bShowApplicationToolbar		= FALSE;
+	m_bAlwaysShowTabBar				= TRUE;
+	m_bShowTabBar					= TRUE;
 	m_bLockToolbars					= TRUE;
 	m_DisplayWindowHeight			= DEFAULT_DISPLAYWINDOW_HEIGHT;
 	m_TreeViewWidth					= DEFAULT_TREEVIEW_WIDTH;
@@ -587,6 +595,10 @@ LPSTR lpCmdLine,int nCmdShow)
 		return 0;
 	}
 
+	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
+
+	g_nCmdShow = nCmdShow;
+
 	/* Create the main window. This window will act as a
 	container for all child windows created. */
 	hwnd = CreateWindow(
@@ -611,8 +623,6 @@ LPSTR lpCmdLine,int nCmdShow)
 
 		return 0;
 	}
-
-	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
 
 	hAccl = LoadAccelerators(hInstance,MAKEINTRESOURCE(IDR_MAINACCELERATORS));
 
@@ -668,7 +678,10 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 	}
 
 	/* Jump across to the member window function (will handle all requests). */
-	return pContainer->WindowProcedure(hwnd,Msg,wParam,lParam);
+	if(pContainer != NULL)
+		return pContainer->WindowProcedure(hwnd,Msg,wParam,lParam);
+	else
+		return DefWindowProc(hwnd,Msg,wParam,lParam);
 }
 
 /*
@@ -1887,7 +1900,14 @@ LRESULT CALLBACK CContainer::CommandHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPA
 			break;
 
 		case IDM_TOOLS_OPTIONS:
-			OnShowOptions();
+			if(g_hwndOptions == NULL)
+			{
+				OnShowOptions();
+			}
+			else
+			{
+				SetFocus(g_hwndOptions);
+			}
 			break;
 
 		case IDM_HELP_ABOUT:
@@ -2568,6 +2588,43 @@ ensure you have administrator privileges."),WINDOW_NAME,MB_ICONWARNING|MB_OK);
 				MessageBox(NULL,_T("Could not set Explorer++ as default file manager. Please \
 ensure you have administrator privileges."),WINDOW_NAME,MB_ICONWARNING|MB_OK);
 			}
+		}
+		else if(lstrcmp(szPath,_T("-open_new_tab")) == 0)
+		{
+			/* This will be called when the user clicks the
+			'New Tab' item on the tasks menu in Windows 7.
+			Find the already opened version of Explorer++,
+			and tell it to open a new tab. */
+			HANDLE hMutex;
+
+			hMutex = CreateMutex(NULL,TRUE,_T("Explorer++"));
+
+			if(GetLastError() == ERROR_ALREADY_EXISTS)
+			{
+				HWND hPrev;
+
+				hPrev = FindWindow(CLASS_NAME,NULL);
+
+				if(hPrev != NULL)
+				{
+					COPYDATASTRUCT cds;
+
+					cds.cbData	= 0;
+					cds.lpData	= NULL;
+					SendMessage(hPrev,WM_COPYDATA,NULL,(LPARAM)&cds);
+
+					SetForegroundWindow(hPrev);
+					ShowWindow(hPrev,SW_SHOW);
+				}
+			}
+
+			if(hMutex != NULL)
+				CloseHandle(hMutex);
+
+			/* TODO: Now exit. */
+			//bExit = TRUE;
+
+			bSeenHelpRequest = TRUE;
 		}
 		else
 		{

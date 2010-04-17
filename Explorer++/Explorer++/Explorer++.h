@@ -1228,6 +1228,8 @@ private:
 	BOOL					m_bShowBookmarksToolbar;
 	BOOL					m_bShowDrivesToolbar;
 	BOOL					m_bShowApplicationToolbar;
+	BOOL					m_bAlwaysShowTabBar;
+	BOOL					m_bShowTabBar;
 	BOOL					m_bShowFullTitlePath;
 	BOOL					m_bAlwaysOpenNewTab;
 	BOOL					m_bShowFolderSizes;

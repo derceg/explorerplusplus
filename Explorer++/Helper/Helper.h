@@ -25,6 +25,11 @@ using namespace std;
 #define DEFAULT_ICON_FOLDER		0
 #define DEFAULT_ICON_FILE		1
 
+/* CP_ACP is defined for ANSI, but there is no
+corresponding definition for Unicode. Therefore,
+add a definition here. */
+#define CP_UNICODE	1200
+
 typedef struct
 {
 	TCHAR szFullFileName[MAX_PATH];

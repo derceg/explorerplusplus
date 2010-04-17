@@ -13,7 +13,6 @@
  *****************************************************************/
 
 #include "stdafx.h"
-//#include <uxtheme.h>
 #include "Explorer++.h"
 #include "../Helper/DropHandler.h"
 
@@ -48,6 +47,10 @@ HWND CContainer::CreateAndSubclassListView(HWND hParent,DWORD Style)
 		ListView_SetExtendedListViewStyle(hListView,
 			ExtendedStyle|LVS_EX_FULLROWSELECT);
 	}
+
+	/* TODO: */
+	/*ListView_SetExtendedListViewStyle(hListView,
+			ExtendedStyle|LVS_EX_CHECKBOXES);*/
 
 	/* Set the listview to the Windows Explorer theme
 	used in Windows Vista. */
@@ -481,6 +484,22 @@ void CContainer::OnListViewItemChanged(LPARAM lParam)
 	if(m_pShellBrowser[iObjectIndex]->QueryDragging())
 		return;
 
+	if(ItemChanged->uChanged == LVIF_STATE &&
+		((LVIS_STATEIMAGEMASK & ItemChanged->uNewState) >> 12) != 0 &&
+		((LVIS_STATEIMAGEMASK & ItemChanged->uOldState) >> 12) != 0)
+	{
+		if(ListView_GetCheckState(m_hListView[iObjectIndex],ItemChanged->iItem))
+		{
+			ListView_SelectItem(m_hListView[iObjectIndex],ItemChanged->iItem,TRUE);
+		}
+		else
+		{
+			ListView_SelectItem(m_hListView[iObjectIndex],ItemChanged->iItem,FALSE);
+		}
+
+		return;
+	}
+
 	if((ItemChanged->uNewState & LVIS_SELECTED) &&
 	(ItemChanged->uOldState & LVIS_SELECTED))
 		return;
@@ -492,6 +511,17 @@ void CContainer::OnListViewItemChanged(LPARAM lParam)
 		Selected  = FALSE;
 	else
 		return;
+
+	if(Selected)
+	{
+		if(ListView_GetCheckState(m_hListView[iObjectIndex],ItemChanged->iItem) == 0)
+			ListView_SetCheckState(m_hListView[iObjectIndex],ItemChanged->iItem,TRUE);
+	}
+	else
+	{
+		if(ListView_GetCheckState(m_hListView[iObjectIndex],ItemChanged->iItem) != 0)
+			ListView_SetCheckState(m_hListView[iObjectIndex],ItemChanged->iItem,FALSE);
+	}
 
 	/* The selection for this tab has changed, so invalidate any
 	folder size calculations that are occurring for this tab
@@ -966,6 +996,8 @@ void CContainer::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 		WIN32_FIND_DATA	*pwfd = NULL;
 		TCHAR			szDate[256];
 		TCHAR			szDateModified[256];
+
+		pwfd = m_pActiveShellBrowser->QueryFileFindData(iItem);
 
 		CreateFileTimeString(&pwfd->ftLastWriteTime,
 			szDateModified,SIZEOF_ARRAY(szDateModified),m_bShowFriendlyDatesGlobal);

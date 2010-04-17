@@ -34,6 +34,8 @@ DWORD WINAPI Thread_IconFinder(LPVOID pParam);
 void CALLBACK IconThreadInitialization(ULONG_PTR dwParam);
 void CALLBACK QuitIconAPC(ULONG_PTR dwParam);
 
+extern int g_nCmdShow;
+
 DWORD WINAPI Thread_IconFinder(LPVOID pParam)
 {
 	/* OLE initialization is no longer done from within
@@ -176,7 +178,7 @@ void CContainer::OnWindowCreate(void)
 	m_hNextClipboardViewer = SetClipboardViewer(m_hContainer);
 
 	UpdateWindow(m_hContainer);
-	ShowWindow(m_hContainer,SW_SHOW);
+	ShowWindow(m_hContainer,g_nCmdShow);
 
 	SetFocus(m_hActiveListView);
 }
@@ -839,7 +841,15 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 		IndentLeft = GetRectWidth(&rc);
 	}
 
-	IndentTop = iIndentRebar + TAB_WINDOW_HEIGHT;
+	IndentTop = iIndentRebar;
+
+	if(m_bShowTabBar)
+	{
+		if(1)
+		{
+			IndentTop += TAB_WINDOW_HEIGHT;
+		}
+	}
 
 	/* <---- Tab control + backing ----> */
 
@@ -854,9 +864,26 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 		iTabBackingWidth = MainWindowWidth - IndentLeft;
 	}
 
+	uFlags = m_bShowTabBar?SWP_SHOWWINDOW:SWP_HIDEWINDOW;
+
+	int iTabTop;
+
+	/* Are we showing the tab bar at the top or
+	bottom of the window? */
+	if(1)
+	{
+		iTabTop = iIndentRebar;
+	}
+	else
+	{
+		iTabTop = IndentTop + MainWindowHeight - IndentBottom - IndentTop - TAB_WINDOW_HEIGHT;
+	}
+
+	/* If we're showing the tab bar at the bottom of the listview,
+	the only thing that will change is the top coordinate. */
 	SetWindowPos(m_hTabBacking,m_hDisplayWindow,iTabBackingLeft,
-		iIndentRebar,iTabBackingWidth,
-		TAB_WINDOW_HEIGHT,SWP_SHOWWINDOW);
+		iTabTop,iTabBackingWidth,
+		TAB_WINDOW_HEIGHT,uFlags);
 
 	SetWindowPos(m_hTabCtrl,NULL,0,0,iTabBackingWidth - 25,
 		TAB_WINDOW_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
@@ -928,7 +955,7 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 			uFlags |= SWP_SHOWWINDOW;
 
 		SetWindowPos(m_hListView[(int)tcItem.lParam],NULL,IndentLeft,IndentTop,
-			MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
+			MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - TAB_WINDOW_HEIGHT,
 			uFlags);
 	}
 

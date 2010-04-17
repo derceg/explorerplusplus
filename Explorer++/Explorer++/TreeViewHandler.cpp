@@ -35,11 +35,6 @@ WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
-	case WM_MOUSEWHEEL:
-		if(OnMouseWheel(wParam,lParam))
-			return 0;
-		break;
-
 	case WM_SETFOCUS:
 		HandleToolbarItemStates();
 		break;

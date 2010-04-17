@@ -45,11 +45,6 @@ saved to/loaded from. */
 
 #define LANG_SINHALA	1115
 
-/* CP_ACP is defined for ANSI, but there is no
-corresponding definition for Unicode. Therefore,
-add a definition here. */
-#define CP_UNICODE	1200
-
 /* This is only defined for Windows Vista and later.
 If building for XP as well, this definition will
 need to be included here. */
@@ -178,6 +173,8 @@ appears on the tab control. */
 #define TAB_TOOLBAR_HEIGHT			20
 
 #define DEFAULT_COLUMN_WIDTH	150
+
+#define TREEVIEW_WHEEL_MULTIPLIER	3
 
 #define VALIDATE_REALFOLDER_COLUMNS			0
 #define VALIDATE_CONTROLPANEL_COLUMNS		1
@@ -587,6 +584,7 @@ extern BOOL g_bForceLanguageLoad;
 extern TCHAR g_szLang[32];
 
 extern HWND g_hwndSearch;
+extern HWND g_hwndOptions;
 
 /* Save/load interface. This allows multiple
 methods of saving/loading data, as long as it

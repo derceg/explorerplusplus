@@ -213,9 +213,13 @@
 #define IDC_OPTION_REPLACEEXPLORER_ALL  1267
 #define IDC_CHECK1                      1268
 #define IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE 1268
+#define IDC_OPTION_ALWAYSSHOWTABBAR     1268
 #define IDC_SITELINK                    1269
 #define IDC_STATIC_VERSIONNUMBER        1270
 #define IDC_STATIC_BUILDDATE            1271
+#define IDC_CHECK2                      1272
+#define IDC_CHECK3                      1273
+#define IDC_CHECK4                      1274
 #define IDS_COLUMN_DESCRIPTION_NAME     2000
 #define IDS_COLUMN_DESCRIPTION_TYPE     2001
 #define IDS_COLUMN_DESCRIPTION_SIZE     2002
@@ -659,7 +663,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        230
 #define _APS_NEXT_COMMAND_VALUE         40420
-#define _APS_NEXT_CONTROL_VALUE         1272
+#define _APS_NEXT_CONTROL_VALUE         1275
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

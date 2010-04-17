@@ -475,29 +475,39 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,99,10
 END
 
-IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 213
+IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 268
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Window"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Allow &multiple instances",IDC_OPTION_MULTIPLEINSTANCES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,7,91,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,15,91,10
     CONTROL         "&Show file previews in display window",IDC_OPTION_FILEPREVIEWS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,20,133,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,133,10
     CONTROL         "Show full &path in title bar",IDC_SETTINGS_CHECK_TITLEPATH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,33,95,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,67,95,10
     CONTROL         "Show &username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,101,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,80,101,10
     CONTROL         "&Disable treeview delay",IDC_OPTION_TREEVIEWDELAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,88,10
-    CONTROL         "Extend tab &control across entire window",IDC_OPTION_EXTENDTABCONTROL,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,85,145,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,202,88,10
+    CONTROL         "Extend tab &bar across entire window",IDC_OPTION_EXTENDTABCONTROL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,54,133,10
     CONTROL         "Show &gridlines in details view",IDC_OPTION_GRIDLINES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,108,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,128,108,10
     CONTROL         "Full row selection in details &view",IDC_OPTION_FULLROWSELECT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,117,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,154,117,10
     CONTROL         "Show privilege level in title bar",IDC_OPTION_PRIVILEGELEVELINTITLEBAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,113,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,93,113,10
+    CONTROL         "Always show the tab bar",IDC_OPTION_ALWAYSSHOWTABBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,28,95,10
+    GROUPBOX        "Treeview",IDC_STATIC,3,176,198,44
+    CONTROL         "Automatically expand nodes while browsing",IDC_CHECK2,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,189,155,10
+    GROUPBOX        "General",IDC_STATIC,3,4,198,106
+    GROUPBOX        "Listview",IDC_STATIC,3,116,198,54
+    GROUPBOX        "Display Window",IDC_STATIC,3,226,198,35
+    CONTROL         "Use check boxes to select items",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,141,117,10
+    CONTROL         "Show the tab bar at the bottom",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,41,117,10
 END
 
 IDD_CUSTOMIZECOLORS DIALOGEX 0, 0, 363, 152

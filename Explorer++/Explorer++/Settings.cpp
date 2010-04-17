@@ -72,6 +72,7 @@ LONG CContainer::SaveSettings(void)
 		SaveDwordToRegistry(hSettingsKey,_T("HandleZipFiles"),m_bHandleZipFiles);
 		SaveDwordToRegistry(hSettingsKey,_T("InsertSorted"),m_bInsertSorted);
 		SaveDwordToRegistry(hSettingsKey,_T("ShowPrivilegeLevelInTitleBar"),m_bShowPrivilegeLevelInTitleBar);
+		SaveDwordToRegistry(hSettingsKey,_T("AlwaysShowTabBar"),m_bAlwaysShowTabBar);
 
 		SaveStringToRegistry(hSettingsKey,_T("NewTabDirectory"),m_DefaultTabDirectory);
 
@@ -179,6 +180,7 @@ LONG CContainer::LoadSettings(LPCTSTR KeyPath)
 		ReadDwordFromRegistry(hSettingsKey,_T("HandleZipFiles"),(LPDWORD)&m_bHandleZipFiles);
 		ReadDwordFromRegistry(hSettingsKey,_T("InsertSorted"),(LPDWORD)&m_bInsertSorted);
 		ReadDwordFromRegistry(hSettingsKey,_T("ShowPrivilegeLevelInTitleBar"),(LPDWORD)&m_bShowPrivilegeLevelInTitleBar);
+		ReadDwordFromRegistry(hSettingsKey,_T("AlwaysShowTabBar"),(LPDWORD)&m_bAlwaysShowTabBar);
 
 		ReadStringFromRegistry(hSettingsKey,_T("NewTabDirectory"),m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory));
 
