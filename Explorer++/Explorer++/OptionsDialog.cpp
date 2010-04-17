@@ -140,11 +140,6 @@ int CALLBACK PropSheetProcStub(HWND hDlg,UINT msg,LPARAM lParam)
 		case PSCB_INITIALIZED:
 			g_hOptionsPropertyDialog = hDlg;
 			break;
-
-		case PSCB_BUTTONPRESSED:
-			DestroyWindow(hDlg);
-			g_hwndOptions = NULL;
-			break;
 	}
 
 	return 0;

@@ -632,13 +632,20 @@ LPSTR lpCmdLine,int nCmdShow)
 		/* TranslateMessage() must be in the inner loop,
 		otherwise various accelerator keys (such as tab)
 		would be taken even when the dialog has focus. */
-		if(!IsDialogMessage(g_hwndSearch,&msg))
+		if(!IsDialogMessage(g_hwndSearch,&msg) &&
+			!PropSheet_IsDialogMessage(g_hwndOptions,&msg))
 		{
 			if(!TranslateAccelerator(hwnd,hAccl,&msg))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
+		}
+
+		if(PropSheet_GetCurrentPageHwnd(g_hwndOptions) == NULL)
+		{
+			DestroyWindow(g_hwndOptions);
+			g_hwndOptions = NULL;
 		}
 	}
 

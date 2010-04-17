@@ -15,10 +15,8 @@
 // English (Australia) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENA)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -80,7 +78,7 @@ CAPTION "General"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "On Startup",IDC_STATIC,6,7,217,38
-    CONTROL         "Load previous &tabs",IDC_STARTUP_PREVIOUSTABS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,17,77,10
+    CONTROL         "Load previous &tabs",IDC_STARTUP_PREVIOUSTABS,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,13,17,77,10
     CONTROL         "Load default &folder",IDC_STARTUP_DEFAULTFOLDER,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,30,77,10
     GROUPBOX        "General settings",IDC_STATIC,6,115,217,66
     CONTROL         "Run in &portable mode (save preferences to XML file)",IDC_OPTION_XML,
@@ -531,7 +529,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_OPTIONS_GENERAL, DIALOG
     BEGIN
@@ -580,7 +578,7 @@ END
 // Menu
 //
 
-IDR_MAINMENU MENU 
+IDR_MAINMENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -712,7 +710,7 @@ BEGIN
     END
 END
 
-IDR_MAINMENU_RCLICK MENU 
+IDR_MAINMENU_RCLICK MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -736,7 +734,7 @@ BEGIN
     END
 END
 
-IDR_ARRANGEMENU MENU 
+IDR_ARRANGEMENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -748,7 +746,7 @@ BEGIN
     END
 END
 
-IDR_TAB_RCLICK MENU 
+IDR_TAB_RCLICK MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -768,7 +766,7 @@ BEGIN
     END
 END
 
-IDR_VIEWS_MENU MENU 
+IDR_VIEWS_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -776,7 +774,7 @@ BEGIN
     END
 END
 
-IDR_TOOLBAR_MENU MENU 
+IDR_TOOLBAR_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -791,7 +789,7 @@ BEGIN
     END
 END
 
-IDR_BOOKMARKSTOOLBAR_MENU MENU 
+IDR_BOOKMARKSTOOLBAR_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -807,7 +805,7 @@ BEGIN
     END
 END
 
-IDR_BOOKMARK_MENU MENU 
+IDR_BOOKMARK_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -825,7 +823,7 @@ BEGIN
     END
 END
 
-IDR_APPLICATIONTOOLBAR_MENU MENU 
+IDR_APPLICATIONTOOLBAR_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -838,7 +836,7 @@ BEGIN
     END
 END
 
-IDR_HEADER_MENU MENU 
+IDR_HEADER_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -847,7 +845,7 @@ BEGIN
     END
 END
 
-IDR_DISPLAYWINDOW_RCLICK MENU 
+IDR_DISPLAYWINDOW_RCLICK MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -857,7 +855,7 @@ BEGIN
     END
 END
 
-IDR_MASSRENAME_MENU MENU 
+IDR_MASSRENAME_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -868,7 +866,7 @@ BEGIN
     END
 END
 
-IDR_GROUPBY_MENU MENU 
+IDR_GROUPBY_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -949,7 +947,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_SAVEDIRECTORYLISTING 
                             "Saves a directory listing for the current directory."
@@ -968,7 +966,7 @@ BEGIN
     IDS_SORTBY_DATEDELETED  "Date Deleted"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_NEWTAB         "Creates a new tab"
     IDM_FILE_CLOSETAB       "Closes the current tab"
@@ -979,7 +977,7 @@ BEGIN
     IDM_FILE_DELETE         "Moves the selected items to the Recycle Bin"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_RENAME         "Renames the selected items"
     IDM_FILE_PROPERTIES     "Shows the properties of the selected items"
@@ -998,7 +996,7 @@ BEGIN
     IDM_VEW_ADDRESSBAR      "Shows/Hides the Address Bar"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_EDIT_WILDCARDSELECTION "Selects items based on a wildcard filter"
     IDM_BOOKMARKS_ORGANIZEBOOKMARKS 
@@ -1009,7 +1007,7 @@ BEGIN
     IDM_EDIT_WILDCARDDESELECT "Deselects items based on a wildcard filter"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLS_OPTIONS       "Configure program settings"
     IDM_HELP_HELP           "Opens the help file"
@@ -1018,14 +1016,14 @@ BEGIN
     IDM_VIEW_REFRESH        "Refreshes the contents of the current tab"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_DELETEPERMANENTLY "Deletes the selected items permanently"
     IDM_TAB_CLOSEOTHERTABS  "Closes all tabs except the current one"
     IDM_TAB_REFRESHALL      "Refreshes the contents of all tabs"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_EXIT           "Exits the program"
     IDM_EDIT_SELECTALLOFSAMETYPE 
@@ -1039,7 +1037,7 @@ BEGIN
     IDM_BOOKMARKS_BOOKMARKALLTABS "Bookmarks all open folders"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_VIEW_THUMBNAILS     "Displays items using thumbnails"
     IDM_VIEW_TILES          "Displays information about each item in the current tab using a tile"
@@ -1051,7 +1049,7 @@ BEGIN
     IDM_VIEW_EXTRALARGEICONS "Displays items using extra large icons"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_ARRANGEICONSBY_NAME "Arranges items alphabetically by name"
     IDM_ARRANGEICONSBY_SIZE "Arranges items in order of increasing size"
@@ -1068,13 +1066,13 @@ BEGIN
     IDM_GO_UPONELEVEL       "Browses the folder above the current one"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_EDIT_PASTEHARDLINK  "Create a hard link to any files on the clipboard"
     IDM_VIEW_SELECTCOLUMNS  "Configures the columns displayed for this tab"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_SORTBY_NAME         "Sorts items alphabetically by name"
     IDM_SORTBY_SIZE         "Sorts items by their size"
@@ -1093,7 +1091,7 @@ BEGIN
     IDM_SORTBY_DESCRIPTION  "Sorts items by description"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_SORTBY_FILEVERSION  "Sorts items by file version"
     IDM_SORTBY_PRODUCTVERSION "Sorts items by product version"
@@ -1113,7 +1111,7 @@ BEGIN
     IDM_SORTBY_HEIGHT       "Sorts items by height"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_SORTBY_VIRTUALCOMMENTS "Sorts items by comment"
     IDM_SORTBY_FILESYSTEM   "Sorts items by filesystem"
@@ -1126,14 +1124,14 @@ BEGIN
     IDM_SORTBY_NETWORKADAPTER_STATUS "Sorts items by status"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILTER_APPLYFILTER  "Activates/deactivates the filter"
     IDM_FILTER_FILTERRESULTS "Allows a wildcard filter to be specified"
     IDM_FILE_COPYCOLUMNTEXT "Copies the currently selected items' column text"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TAB_DUPLICATETAB    "Duplicates the specified tab"
     IDM_TAB_LOCKTAB         "Prevents the specified tab from been closed"
@@ -1143,7 +1141,7 @@ BEGIN
                             "Prevents the specified tab from been closed and the directory from been changed"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_ACTIONS_SPLITFILE   "Split the selected file into a set of smaller files"
     IDM_ACTIONS_MERGEFILES  "Merges the selected files together"
@@ -1152,19 +1150,19 @@ BEGIN
     IDM_ACTIONS_NEWFOLDER   "Creates a new folder"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLBARS_ADDRESSBAR "Shows/Hides the address bar"
     IDM_TOOLBARS_CUSTOMIZE  "Customizes the main toolbar"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLBARS_MAINTOOLBAR "Shows/Hides the main toolbar"
     IDM_TOOLBARS_BOOKMARKSTOOLBAR "Shows/Hides the bookmarks toolbar"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_SORTBY_ORIGINALLOCATION "Original Location"
     IDS_SORTBY_ATTRIBUTES   "Attributes"
@@ -1184,7 +1182,7 @@ BEGIN
     IDS_SORTBY_TITLE        "Title"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_SORTBY_SUBJECT      "Subject"
     IDS_SORTBY_AUTHOR       "Author"
@@ -1204,7 +1202,7 @@ BEGIN
     IDS_GO                  "Go"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_HIDEFOLDERSPANE     "Hide the folders pane"
     IDS_FILERENAMEERROR     "The specified file could not be renamed. Please ensure that it is not in use."
@@ -1213,14 +1211,14 @@ BEGIN
     IDS_TOOLBAR_UP          "Up"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TOOLBAR_FOLDERS     "Folders"
     IDS_TOOLBAR_COPYTO      "Copy To"
     IDS_TOOLBAR_MOVETO      "Move To"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TOOLBAR_NEWFOLDER   "New Folder"
     IDS_TOOLBAR_COPY        "Copy"
@@ -1234,7 +1232,7 @@ BEGIN
     IDS_GENERAL_SELECTED_ONEITEM "item selected"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_GENERAL_SELECTED_MOREITEMS "items selected"
     IDS_GENERAL_ONEITEM     "item"
@@ -1250,7 +1248,7 @@ BEGIN
     IDS_SEPARATOR           "Separator"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TAB_RENAMETAB       "Allows the specfiied tab to be renamed"
     IDM_VIEW_SETDEFAULTCOLUMNS "Sets the default columns used for each tab"
@@ -1258,7 +1256,7 @@ BEGIN
     IDM_TOOLBARS_DRIVES     "Shows/Hides the drives toolbar"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_NEWFOLDERERROR      "The folder could not be created. Please ensure you have sufficient priveleges to create a new folder in this directory."
     IDS_BOOKMARKDLG_NAME    "Name"
@@ -1267,7 +1265,7 @@ BEGIN
     IDS_ERR_FILENAMEINVALID "A file name cannot contain any of the following characters:\n\t \\ / : * ? "" < > |"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_BT_OPEN             "Opens the selected bookmark within the current tab"
     IDM_BT_NEWBOOKMARK      "Creates a new bookmark"
@@ -1279,7 +1277,7 @@ BEGIN
     IDM_TOOLBARS_APPLICATIONTOOLBAR "Shows/Hides the application toolbar"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_DESCRIPTION_NAME "File name"
     IDS_COLUMN_DESCRIPTION_TYPE "File type"
@@ -1302,7 +1300,7 @@ BEGIN
     IDS_COLUMN_DESCRIPTION_EXTENSION "Filename extension"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_DESCRIPTION_CREATED "Creation date"
     IDS_COLUMN_DESCRIPTION_ACCESSED "Last access date"
@@ -1325,7 +1323,7 @@ BEGIN
                             "Comments associated with a printer"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_DESCRIPTION_PRINTERLOCATION "Location of a printer"
     IDS_COLUMN_DESCRIPTION_NETWORKADAPTER_STATUS "Status of a network adapter"
@@ -1347,7 +1345,7 @@ BEGIN
     IDS_VIEW_ICONS          "Icons"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_VIEW_SMALLICONS     "Small Icons"
     IDS_COLUMN_NAME_NAME    "Name"
@@ -1367,7 +1365,7 @@ BEGIN
     IDS_COLUMN_NAME_HARDLINKS "Hard links"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_EXTENSION "Extension"
     IDS_COLUMN_NAME_CREATED "Date Created"
@@ -1387,7 +1385,7 @@ BEGIN
     IDS_COLUMN_NAME_FILESYSTEM "File System"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_VIRTUALTYPE "Type"
     IDS_COLUMN_NAME_ORIGINALLOCATION "Original Location"
@@ -1407,7 +1405,7 @@ BEGIN
     IDS_COLUMN_NAME_DURATION "Duration"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ERR_FILENAMEINVALID_MSGTITLE "File name invalid"
     IDS_OPTIONSDIALOG_TITLE "Options"
@@ -1421,7 +1419,7 @@ BEGIN
     IDS_TAB_CLOSE_TIP       "Close the current tab"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_HEADER_MORE         "Select additional columns to show."
     IDM_FILE_CLONEWINDOW    "Clones the current window"
@@ -1431,7 +1429,7 @@ BEGIN
     IDM_GROUPBY_DESCENDING  "Sorts groups in decreasing order"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_COPYUNIVERSALFILEPATHS 
                             "Copies the universal paths of all selected items"
@@ -1439,12 +1437,12 @@ BEGIN
     IDM_TOOLS_CUSTOMIZECOLORS "Customizes the colors used within the listview"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLS_ADJUSTCOLORFILTERING "Configures color filtering"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_PROTECTED "Protected"
     IDS_COLUMN_NAME_RATING  "Rating"
@@ -1464,7 +1462,7 @@ BEGIN
     IDS_COLUMN_NAME_PARENTALRATINGREASON "Parental rating reason"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_PERIOD  "Period"
     IDS_COLUMN_NAME_PRODUCER "Producer"
@@ -1480,14 +1478,14 @@ BEGIN
     IDS_GENERAL_NEWAPPLICATIONBUTTON "New Application Button"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLS_SEARCH        "Search for files"
     IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT 
                             "Set the layout of the current columns as the default layout"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_APP_OPEN            "Opens the selected application."
     IDM_APP_NEW             "Creates a new application button"
