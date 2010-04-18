@@ -418,8 +418,29 @@ void CContainer::OnListViewKeyDown(LPARAM lParam)
 			break;
 
 		case VK_BACK:
-			BrowseFolder(EMPTY_STRING,
-			SBSP_PARENT|SBSP_SAMEBROWSER);
+			if((GetKeyState(VK_CONTROL) & 0x80) &&
+			!(GetKeyState(VK_SHIFT) & 0x80) &&
+			!(GetKeyState(VK_MENU) & 0x80))
+			{
+				LPITEMIDLIST pidl = NULL;
+				TCHAR szRoot[MAX_PATH];
+
+				pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+
+				GetDisplayName(pidl,szRoot,SHGDN_FORPARSING);
+				PathStripToRoot(szRoot);
+
+				/* Go to the root of this directory. */
+				BrowseFolder(szRoot,
+					SBSP_ABSOLUTE|SBSP_SAMEBROWSER);
+
+				CoTaskMemFree(pidl);
+			}
+			else
+			{
+				BrowseFolder(EMPTY_STRING,
+					SBSP_PARENT|SBSP_SAMEBROWSER);
+			}
 			break;
 
 		case 'A':
@@ -1544,6 +1565,7 @@ void CContainer::OnListViewDoubleClick(NMHDR *nmhdr)
 		{
 			short AltKey = GetKeyState(VK_MENU);
 			short ControlKey = GetKeyState(VK_CONTROL);
+			short ShiftKey = GetKeyState(VK_SHIFT);
 
 			if(AltKey & 0x8000)
 			{
@@ -1561,6 +1583,10 @@ void CContainer::OnListViewDoubleClick(NMHDR *nmhdr)
 			else if(ControlKey & 0x8000)
 			{
 				OpenListViewItem(ht.iItem,TRUE);
+			}
+			else if(ShiftKey & 0x8000)
+			{
+				/* TODO: */
 			}
 			else
 			{

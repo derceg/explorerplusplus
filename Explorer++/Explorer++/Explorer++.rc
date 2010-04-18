@@ -471,6 +471,8 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,116,10
     CONTROL         "&Double-click to close a tab",IDC_TABS_DOUBLECLICKCLOSE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,99,10
+    CONTROL         "Close the main window when closing the last tab",IDC_CHECK1,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,170,10
 END
 
 IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 268
@@ -568,6 +570,10 @@ BEGIN
     BEGIN
         RIGHTMARGIN, 341
         BOTTOMMARGIN, 309
+    END
+
+    IDD_OPTIONS_TABS, DIALOG
+    BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED

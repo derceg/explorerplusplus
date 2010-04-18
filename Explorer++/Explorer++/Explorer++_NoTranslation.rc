@@ -16,10 +16,8 @@
 // English (Australia) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENA)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -57,13 +55,14 @@ IDB_ABOUT               BITMAP                  "res\\About Image.bmp"
 // Accelerator
 //
 
-IDR_MAINACCELERATORS ACCELERATORS 
+IDR_MAINACCELERATORS ACCELERATORS
 BEGIN
     "D",            IDA_ADDRESSBAR,         VIRTKEY, ALT, NOINVERT
     "L",            IDA_ADDRESSBAR,         VIRTKEY, CONTROL, NOINVERT
     VK_F4,          IDA_COMBODROPDOWN,      VIRTKEY, NOINVERT
     VK_F2,          IDA_FILE_RENAME,        VIRTKEY, NOINVERT
     VK_HOME,        IDA_HOME,               VIRTKEY, ALT, NOINVERT
+    "9",            IDA_LASTTAB,            VIRTKEY, CONTROL, NOINVERT
     VK_NEXT,        IDA_NEXTTAB,            VIRTKEY, CONTROL, NOINVERT
     VK_OEM_6,       IDA_NEXTTAB,            VIRTKEY, CONTROL, NOINVERT
     VK_TAB,         IDA_NEXTTAB,            VIRTKEY, CONTROL, NOINVERT
@@ -76,6 +75,14 @@ BEGIN
     VK_TAB,         IDA_PREVIOUSWINDOW,     VIRTKEY, SHIFT, NOINVERT
     VK_APPS,        IDA_RCLICK,             VIRTKEY, NOINVERT
     VK_F10,         IDA_RCLICK,             VIRTKEY, SHIFT, NOINVERT
+    "1",            IDA_TAB1,               VIRTKEY, CONTROL, NOINVERT
+    "2",            IDA_TAB2,               VIRTKEY, CONTROL, NOINVERT
+    "3",            IDA_TAB3,               VIRTKEY, CONTROL, NOINVERT
+    "4",            IDA_TAB4,               VIRTKEY, CONTROL, NOINVERT
+    "5",            IDA_TAB5,               VIRTKEY, CONTROL, NOINVERT
+    "6",            IDA_TAB6,               VIRTKEY, CONTROL, NOINVERT
+    "7",            IDA_TAB7,               VIRTKEY, CONTROL, NOINVERT
+    "8",            IDA_TAB8,               VIRTKEY, CONTROL, NOINVERT
     "E",            IDA_TAB_DUPLICATETAB,   VIRTKEY, CONTROL, NOINVERT
     "N",            IDM_ACTIONS_NEWFOLDER,  VIRTKEY, CONTROL, NOINVERT
     "D",            IDM_BOOKMARKS_BOOKMARKTHISTAB, VIRTKEY, CONTROL, NOINVERT
@@ -101,15 +108,6 @@ BEGIN
     "R",            IDM_VIEW_REFRESH,       VIRTKEY, CONTROL, NOINVERT
     VK_F5,          IDM_VIEW_REFRESH,       VIRTKEY, NOINVERT
     "H",            IDM_VIEW_SHOWHIDDENFILES, VIRTKEY, CONTROL, NOINVERT
-    "1",            IDA_TAB1,               VIRTKEY, CONTROL, NOINVERT
-    "2",            IDA_TAB2,               VIRTKEY, CONTROL, NOINVERT
-    "3",            IDA_TAB3,               VIRTKEY, CONTROL, NOINVERT
-    "4",            IDA_TAB4,               VIRTKEY, CONTROL, NOINVERT
-    "5",            IDA_TAB5,               VIRTKEY, CONTROL, NOINVERT
-    "6",            IDA_TAB6,               VIRTKEY, CONTROL, NOINVERT
-    "7",            IDA_TAB7,               VIRTKEY, CONTROL, NOINVERT
-    "8",            IDA_TAB8,               VIRTKEY, CONTROL, NOINVERT
-    "9",            IDA_LASTTAB,            VIRTKEY, CONTROL, NOINVERT
 END
 
 

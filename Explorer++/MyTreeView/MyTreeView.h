@@ -80,6 +80,8 @@ private:
 	void		RemoveItem(TCHAR *szFullFileName);
 	LRESULT CALLBACK	OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	void		OnGetDisplayInfo(LPARAM lParam);
+	void		UpdateChildren(HTREEITEM hParent,LPITEMIDLIST pidlParent);
+	LPITEMIDLIST	UpdateItemInfo(LPITEMIDLIST pidlParent,int iItemId);
 
 	/* Icons. */
 	void		AddToIconFinderQueue(TVITEM *plvItem);
@@ -127,6 +129,7 @@ private:
 	typedef struct
 	{
 		LPITEMIDLIST	pidl;
+		LPITEMIDLIST	pridl;
 	} ItemInfo_t;
 
 	typedef struct
