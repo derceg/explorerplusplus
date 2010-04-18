@@ -27,30 +27,32 @@ LRESULT	(CALLBACK *DefaultListViewProc)(HWND,UINT,WPARAM,LPARAM);
  */
 HWND CContainer::CreateAndSubclassListView(HWND hParent,DWORD Style)
 {
-	HWND	hListView;
-	DWORD	ExtendedStyle;
+	HWND hListView;
+	DWORD dwExtendedStyle;
+	IImageList *pImageList = NULL;
 
 	hListView = CreateListView(hParent,Style);
-
-	IImageList *pImageList = NULL;
 
 	SHGetImageList(SHIL_SMALL,IID_IImageList,(void **)&pImageList);
 	ListView_SetImageList(hListView,(HIMAGELIST)pImageList,LVSIL_SMALL);
 	pImageList->Release();
 
-	ExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
+	dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
 	/* If the user has selected to turn on full row
 	select, add the style to the listview. */
 	if(m_bUseFullRowSelect)
 	{
-		ListView_SetExtendedListViewStyle(hListView,
-			ExtendedStyle|LVS_EX_FULLROWSELECT);
+		dwExtendedStyle |= LVS_EX_FULLROWSELECT;
 	}
 
-	/* TODO: */
-	/*ListView_SetExtendedListViewStyle(hListView,
-			ExtendedStyle|LVS_EX_CHECKBOXES);*/
+	if(m_bCheckBoxSelection)
+	{
+		dwExtendedStyle |= LVS_EX_CHECKBOXES;
+	}
+
+	ListView_SetExtendedListViewStyle(hListView,
+		dwExtendedStyle);
 
 	/* Set the listview to the Windows Explorer theme
 	used in Windows Vista. */
@@ -1582,11 +1584,12 @@ void CContainer::OnListViewDoubleClick(NMHDR *nmhdr)
 			}
 			else if(ControlKey & 0x8000)
 			{
+				/* Open the item in a new tab. */
 				OpenListViewItem(ht.iItem,TRUE,FALSE);
 			}
 			else if(ShiftKey & 0x8000)
 			{
-				/* TODO: */
+				/* Open the item in a new window. */
 				OpenListViewItem(ht.iItem,FALSE,TRUE);
 			}
 			else

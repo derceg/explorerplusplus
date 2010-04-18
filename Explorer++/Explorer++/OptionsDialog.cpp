@@ -657,6 +657,8 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 				CheckDlgButton(hDlg,IDC_OPTION_EXTENDTABCONTROL,BST_CHECKED);
 			if(m_bShowGridlinesGlobal)
 				CheckDlgButton(hDlg,IDC_OPTION_GRIDLINES,BST_CHECKED);
+			if(m_bCheckBoxSelection)
+				CheckDlgButton(hDlg,IDC_OPTION_CHECKBOXSELECTION,BST_CHECKED);
 			if(m_bUseFullRowSelect)
 				CheckDlgButton(hDlg,IDC_OPTION_FULLROWSELECT,BST_CHECKED);
 		}
@@ -674,6 +676,7 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 		case IDC_OPTION_TREEVIEWDELAY:
 		case IDC_OPTION_EXTENDTABCONTROL:
 		case IDC_OPTION_GRIDLINES:
+		case IDC_OPTION_CHECKBOXSELECTION:
 		case IDC_OPTION_FULLROWSELECT:
 			PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
 			break;
@@ -689,6 +692,8 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 			{
 			case PSN_APPLY:
 				{
+					BOOL bCheckBoxSelection;
+
 					m_bAllowMultipleInstances = (IsDlgButtonChecked(hDlg,IDC_OPTION_MULTIPLEINSTANCES)
 						== BST_CHECKED);
 
@@ -715,6 +720,42 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 
 					m_bShowGridlinesGlobal = (IsDlgButtonChecked(hDlg,IDC_OPTION_GRIDLINES)
 						== BST_CHECKED);
+
+					bCheckBoxSelection = (IsDlgButtonChecked(hDlg,IDC_OPTION_CHECKBOXSELECTION)
+						== BST_CHECKED);
+
+					if(m_bCheckBoxSelection != bCheckBoxSelection)
+					{
+						TCITEM tcItem;
+						DWORD dwExtendedStyle;
+						int nTabs;
+						int i = 0;
+
+						nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+
+						for(i = 0;i < nTabs;i++)
+						{
+							tcItem.mask	= TCIF_PARAM;
+							TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
+
+							dwExtendedStyle = ListView_GetExtendedListViewStyle(m_hListView[(int)tcItem.lParam]);
+
+							if(bCheckBoxSelection)
+							{
+								dwExtendedStyle |= LVS_EX_CHECKBOXES;
+							}
+							else
+							{
+								dwExtendedStyle &= ~dwExtendedStyle;
+							}
+
+							ListView_SetExtendedListViewStyle(m_hListView[(int)tcItem.lParam],
+								dwExtendedStyle);
+						}
+
+						m_bCheckBoxSelection = (IsDlgButtonChecked(hDlg,IDC_OPTION_CHECKBOXSELECTION)
+							== BST_CHECKED);
+					}
 
 					m_bUseFullRowSelect = (IsDlgButtonChecked(hDlg,IDC_OPTION_FULLROWSELECT)
 						== BST_CHECKED);

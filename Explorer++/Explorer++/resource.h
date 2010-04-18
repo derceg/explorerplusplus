@@ -219,6 +219,7 @@
 #define IDC_STATIC_BUILDDATE            1271
 #define IDC_CHECK2                      1272
 #define IDC_CHECK3                      1273
+#define IDC_OPTION_CHECKBOXSELECTION    1273
 #define IDC_CHECK4                      1274
 #define IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION 1275
 #define IDS_COLUMN_DESCRIPTION_NAME     2000

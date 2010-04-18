@@ -91,6 +91,7 @@ will need to be changed correspondingly. */
 #define HASH_SHOWPRIVILEGETITLEBAR	4071561587
 #define HASH_DISABLEFOLDERSIZENETWORKREMOVABLE	2610679594
 #define HASH_ALWAYSSHOWTABBAR		148004675
+#define HASH_CHECKBOXSELECTION		456677010
 
 typedef struct
 {
@@ -297,6 +298,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowTabBar"),EncodeBoolValue(m_bAlwaysShowTabBar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AutoArrangeGlobal"),EncodeBoolValue(m_bAutoArrangeGlobal));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("CheckBoxSelection"),EncodeBoolValue(m_bCheckBoxSelection));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ConfirmCloseTabs"),EncodeBoolValue(m_bConfirmCloseTabs));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -2576,6 +2579,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_AUTOARRANGEGLOBAL:
 		m_bAutoArrangeGlobal = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_CHECKBOXSELECTION:
+		m_bCheckBoxSelection = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_CONFIRMCLOSETABS:

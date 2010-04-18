@@ -333,6 +333,7 @@ void CContainer::SetDefaultValues(void)
 	m_bHandleZipFiles				= TRUE;
 	m_bInsertSorted					= TRUE;
 	m_bOverwriteExistingFilesConfirmation	= TRUE;
+	m_bCheckBoxSelection			= FALSE;
 
 	/* Infotips (user options). */
 	m_bShowInfoTips					= TRUE;

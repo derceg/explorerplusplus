@@ -508,7 +508,8 @@ BEGIN
     GROUPBOX        "General",IDC_STATIC,3,4,198,106
     GROUPBOX        "Listview",IDC_STATIC,3,116,198,54
     GROUPBOX        "Display Window",IDC_STATIC,3,226,198,35
-    CONTROL         "Use check boxes to select items",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,141,117,10
+    CONTROL         "Use check boxes to select items",IDC_OPTION_CHECKBOXSELECTION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,141,117,10
     CONTROL         "Show the tab bar at the bottom",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,41,117,10
 END
 
@@ -579,6 +580,10 @@ BEGIN
     END
 
     IDD_OPTIONS_TABS, DIALOG
+    BEGIN
+    END
+
+    IDD_OPTIONS_WINDOW, DIALOG
     BEGIN
     END
 END

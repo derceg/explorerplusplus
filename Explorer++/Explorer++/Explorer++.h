@@ -1252,6 +1252,7 @@ private:
 	BOOL					m_bHandleZipFiles;
 	BOOL					m_bInsertSorted;
 	BOOL					m_bOverwriteExistingFilesConfirmation;
+	BOOL					m_bCheckBoxSelection;
 	UINT					m_StartupMode;
 	UINT					m_ReplaceExplorerMode;
 
