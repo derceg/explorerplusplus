@@ -811,8 +811,10 @@ HRESULT CContainer::CloseTab(int TabIndex)
 
 	if(NumTabs == 1)
 	{
-		/* Should never end up here. */
-		return E_UNEXPECTED;
+		/* If this is the last tab, close the main
+		window. */
+		SendMessage(m_hContainer,WM_CLOSE,0,0);
+		return S_OK;
 	}
 
 	tcItem.mask = TCIF_IMAGE|TCIF_PARAM;
