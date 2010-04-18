@@ -99,7 +99,7 @@ HRESULT _stdcall CContainer::CApplicationToolbarDrop::DragLeave(void)
 }
 
 HRESULT _stdcall CContainer::CApplicationToolbarDrop::Drop(IDataObject *pDataObject,
-DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 {
 	FORMATETC		ftc;
 	STGMEDIUM		stg;
@@ -125,19 +125,33 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 		This is because a copy/replace dialog may need to shown (if there
 		is a collision), and the drag image no longer needs to be there.
 		The insertion mark may stay until the end. */
-		m_pDropTargetHelper->Drop(pDataObject,(POINT *)&pt,*pdwEffect);
+		m_pDropTargetHelper->Drop(pDataObject,(POINT *)&ptl,*pdwEffect);
 
 		pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
 
 		if(pdf != NULL)
 		{
+			TCHAR	szFullFileName[MAX_PATH];
+			POINT	pt;
+			int		iButton;
+			int		i = 0;
+
 			/* Request a count of the number of files that have been dropped. */
 			nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
 
-			TCHAR			szFullFileName[MAX_PATH];
-			int				i = 0;
+			pt.x = ptl.x;
+			pt.y = ptl.y;
 
-			/* For each folder item, create a new bookmark. */
+			/* Check whether the files were dropped over another toolbar button. If
+			they were, open the dropped file in the application represented by the
+			button. */
+			iButton = SendMessage(m_pContainer->m_hApplicationToolbar,TB_HITTEST,0,(LPARAM)&pt);
+
+			if(iButton > 0)
+			{
+				/* TODO: Pass the dropped files to the application... */
+			}
+
 			for(i = 0;i < nDroppedFiles;i++)
 			{
 				/* Determine the name of the dropped file. */

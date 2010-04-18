@@ -1195,7 +1195,7 @@ void CContainer::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 				if(SUCCEEDED(hr))
 				{
-					BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE);
+					BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 
 					CoTaskMemFree(pidlParent);
 				}
@@ -1546,5 +1546,5 @@ void CContainer::DuplicateTab(int iTabInternal)
 	m_pShellBrowser[iTabInternal]->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
-	BrowseFolder(szTabDirectory,SBSP_ABSOLUTE,TRUE,FALSE);
+	BrowseFolder(szTabDirectory,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
 }

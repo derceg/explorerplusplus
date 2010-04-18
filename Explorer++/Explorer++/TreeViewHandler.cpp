@@ -80,7 +80,7 @@ WPARAM wParam,LPARAM lParam)
 				if(tvhi.hItem == m_hTVMButtonItem)
 				{
 					pidl = m_pMyTreeView->BuildPath(tvhi.hItem);
-					BrowseFolder(pidl,SBSP_ABSOLUTE,TRUE,FALSE);
+					BrowseFolder(pidl,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
 
 					CoTaskMemFree(pidl);
 				}

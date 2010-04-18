@@ -444,7 +444,7 @@ private:
 		HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect);
 		HRESULT _stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
 		HRESULT _stdcall	DragLeave(void);
-		HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
+		HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect);
 
 	private:
 		int m_iRefCount;
@@ -527,9 +527,9 @@ private:
 	void					OnPreviousWindow(void);
 	void					OnNextWindow(void);
 	HRESULT					BrowseFolder(TCHAR *szPath,UINT wFlags);
-	HRESULT					BrowseFolder(TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab);
+	HRESULT					BrowseFolder(TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 	HRESULT					BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags);
-	HRESULT					BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab);
+	HRESULT					BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 	int						DetermineListViewObjectIndex(HWND hListView);
 	void					OnUndo(void);
 	void					OnLockToolbars(void);
@@ -828,10 +828,10 @@ private:
 	void					CopyToFolder(BOOL bMove);
 	void					GotoFolder(int FolderCSIDL);
 	void					OpenAllSelectedItems(BOOL bOpenInNewTab);
-	void					OpenListViewItem(int iItem,BOOL bOpenInNewTab);
-	void					OpenItem(TCHAR *szItem,BOOL bOpenInNewTab);
-	void					OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab);
-	void					OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab);
+	void					OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
+	void					OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
+	void					OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
+	void					OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenFileItem(LPITEMIDLIST pidlItem);
 	HRESULT					OnListViewCopy(BOOL bCopy);
 	HRESULT					ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset);
@@ -1249,10 +1249,11 @@ private:
 	BOOL					m_bAllowMultipleInstances;
 	BOOL					m_bForceSameTabWidth;
 	BOOL					m_bDoubleClickTabClose;
-	UINT					m_StartupMode;
-	UINT					m_ReplaceExplorerMode;
 	BOOL					m_bHandleZipFiles;
 	BOOL					m_bInsertSorted;
+	BOOL					m_bOverwriteExistingFilesConfirmation;
+	UINT					m_StartupMode;
+	UINT					m_ReplaceExplorerMode;
 
 	/* Infotips (user options). */
 	BOOL					m_bShowInfoTips;

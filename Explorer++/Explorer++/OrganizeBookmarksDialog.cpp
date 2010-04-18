@@ -683,7 +683,7 @@ void CContainer::OnOrganizeBookmarksOpen(HWND hDlg,BOOL bOpenInNewTab)
 		else if(Bookmark.Type == BOOKMARK_TYPE_BOOKMARK)
 		{
 			if(bOpenInNewTab)
-				BrowseFolder(Bookmark.szLocation,SBSP_SAMEBROWSER,TRUE,TRUE);
+				BrowseFolder(Bookmark.szLocation,SBSP_SAMEBROWSER,TRUE,TRUE,FALSE);
 			else
 				BrowseFolder(Bookmark.szLocation,SBSP_SAMEBROWSER);
 

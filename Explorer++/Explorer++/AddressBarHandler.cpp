@@ -42,5 +42,5 @@ void CContainer::OnAddressBarGo(void)
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),szCurrentDirectory);
 	DecodePath(szPath,szCurrentDirectory,szFullFilePath,SIZEOF_ARRAY(szFullFilePath));
 
-	OpenItem(szFullFilePath,FALSE);
+	OpenItem(szFullFilePath,FALSE,FALSE);
 }

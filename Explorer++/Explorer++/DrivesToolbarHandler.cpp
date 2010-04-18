@@ -51,7 +51,7 @@ LRESULT CALLBACK CContainer::DrivesToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wP
 				{
 					pszDrivePath = (TCHAR *)tbButton.dwData;
 
-					BrowseFolder(pszDrivePath,SBSP_ABSOLUTE,TRUE,TRUE);
+					BrowseFolder(pszDrivePath,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 				}
 			}
 		}

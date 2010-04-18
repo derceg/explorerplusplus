@@ -332,6 +332,7 @@ void CContainer::SetDefaultValues(void)
 	m_bDoubleClickTabClose			= TRUE;
 	m_bHandleZipFiles				= TRUE;
 	m_bInsertSorted					= TRUE;
+	m_bOverwriteExistingFilesConfirmation	= TRUE;
 
 	/* Infotips (user options). */
 	m_bShowInfoTips					= TRUE;
@@ -885,14 +886,14 @@ LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LP
 
 				if(pcds->lpData != NULL)
 				{
-					BrowseFolder((TCHAR *)pcds->lpData,SBSP_ABSOLUTE,TRUE,TRUE);
+					BrowseFolder((TCHAR *)pcds->lpData,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 				}
 				else
 				{
-					hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE,TRUE,TRUE);
+					hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 
 					if(FAILED(hr))
-						BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE,TRUE,TRUE);
+						BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 				}
 			}
 			break;

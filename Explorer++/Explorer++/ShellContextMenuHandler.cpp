@@ -192,7 +192,7 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 					of the items specified in ppidl. */
 					if(ppidl == NULL)
 					{
-						OpenItem(pidlParent,FALSE);
+						OpenItem(pidlParent,FALSE,FALSE);
 					}
 					else
 					{
@@ -203,7 +203,7 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 						{
 							pidlComplete = ILCombine(pidlParent,ppidl[i]);
 
-							OpenItem(pidlComplete,FALSE);
+							OpenItem(pidlComplete,FALSE,FALSE);
 
 							CoTaskMemFree(pidlComplete);
 						}
@@ -285,7 +285,7 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 							}
 
 							GetDisplayName(pidlComplete,szParsingPath,SHGDN_FORPARSING);
-							BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,TRUE);
+							BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 
 							m_bTreeViewOpenInNewTab = TRUE;
 
@@ -297,7 +297,7 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 						{
 							TCHAR szFileName[MAX_PATH];
 
-							BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE);
+							BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 
 							GetDisplayName((LPITEMIDLIST)ppidl[0],szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
 

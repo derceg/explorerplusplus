@@ -60,10 +60,10 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			{
 				HRESULT hr;
 
-				hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE,TRUE,TRUE);
+				hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 
 				if(FAILED(hr))
-					BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE,TRUE,TRUE);
+					BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 			}
 			break;
 

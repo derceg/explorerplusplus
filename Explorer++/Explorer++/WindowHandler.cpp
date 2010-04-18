@@ -105,7 +105,10 @@ void CContainer::CreateMainControls(void)
 			m_ToolbarInformation[i].cyMaxChild = HIWORD(ToolbarSize);
 			m_ToolbarInformation[i].cyChild = HIWORD(ToolbarSize);
 			SendMessage(m_hMainToolbar,TB_GETMAXSIZE,0,(LPARAM)&sz);
-			m_ToolbarInformation[i].cx = sz.cx;
+
+			if(m_ToolbarInformation[i].cx == 0)
+				m_ToolbarInformation[i].cx = sz.cx;
+
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_hMainToolbar;
 			break;
@@ -127,7 +130,10 @@ void CContainer::CreateMainControls(void)
 			m_ToolbarInformation[i].cyMaxChild = HIWORD(ToolbarSize);
 			m_ToolbarInformation[i].cyChild = HIWORD(ToolbarSize);
 			SendMessage(m_hBookmarksToolbar,TB_GETMAXSIZE,0,(LPARAM)&sz);
-			m_ToolbarInformation[i].cx = sz.cx;
+
+			if(m_ToolbarInformation[i].cx == 0)
+				m_ToolbarInformation[i].cx = sz.cx;
+
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_hBookmarksToolbar;
 			break;
@@ -139,7 +145,10 @@ void CContainer::CreateMainControls(void)
 			m_ToolbarInformation[i].cyMaxChild = HIWORD(ToolbarSize);
 			m_ToolbarInformation[i].cyChild = HIWORD(ToolbarSize);
 			SendMessage(m_hDrivesToolbar,TB_GETMAXSIZE,0,(LPARAM)&sz);
-			m_ToolbarInformation[i].cx = sz.cx;
+
+			if(m_ToolbarInformation[i].cx == 0)
+				m_ToolbarInformation[i].cx = sz.cx;
+
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_hDrivesToolbar;
 			break;
@@ -151,7 +160,10 @@ void CContainer::CreateMainControls(void)
 			m_ToolbarInformation[i].cyMaxChild = HIWORD(ToolbarSize);
 			m_ToolbarInformation[i].cyChild = HIWORD(ToolbarSize);
 			SendMessage(m_hApplicationToolbar,TB_GETMAXSIZE,0,(LPARAM)&sz);
-			m_ToolbarInformation[i].cx = sz.cx;
+
+			if(m_ToolbarInformation[i].cx == 0)
+				m_ToolbarInformation[i].cx = sz.cx;
+
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
 			m_ToolbarInformation[i].hwndChild = m_hApplicationToolbar;
 			break;

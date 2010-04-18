@@ -599,7 +599,7 @@ void CContainer::BookmarkToolbarOpenItem(int iItem,BOOL bOpenInNewTab)
 		if(Bookmark.Type == BOOKMARK_TYPE_BOOKMARK)
 		{
 			if(bOpenInNewTab)
-				BrowseFolder(Bookmark.szLocation,SBSP_ABSOLUTE,TRUE,TRUE);
+				BrowseFolder(Bookmark.szLocation,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 			else
 				BrowseFolder(Bookmark.szLocation,SBSP_ABSOLUTE);
 		}
@@ -751,7 +751,7 @@ HRESULT CContainer::ExpandAndBrowsePath(TCHAR *szPath,BOOL bOpenInNewTab,BOOL bS
 	MyExpandEnvironmentStrings(szPath,
 		szExpandedPath,SIZEOF_ARRAY(szExpandedPath));
 
-	return BrowseFolder(szExpandedPath,SBSP_ABSOLUTE,bOpenInNewTab,bSwitchToNewTab);
+	return BrowseFolder(szExpandedPath,SBSP_ABSOLUTE,bOpenInNewTab,bSwitchToNewTab,FALSE);
 }
 
 BOOL CContainer::DeleteBookmarkSafe(HWND hwnd,void *pBookmarkHandle)

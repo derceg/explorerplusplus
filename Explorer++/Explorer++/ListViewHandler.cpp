@@ -373,7 +373,7 @@ void CContainer::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
 							pShellFolder->GetDisplayNameOf(ridl,SHGDN_FORPARSING,&str);
 							StrRetToBuf(&str,ridl,szParsingPath,MAX_PATH);
 
-							BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,FALSE);
+							BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
 						}
 					}
 
@@ -1582,15 +1582,16 @@ void CContainer::OnListViewDoubleClick(NMHDR *nmhdr)
 			}
 			else if(ControlKey & 0x8000)
 			{
-				OpenListViewItem(ht.iItem,TRUE);
+				OpenListViewItem(ht.iItem,TRUE,FALSE);
 			}
 			else if(ShiftKey & 0x8000)
 			{
 				/* TODO: */
+				OpenListViewItem(ht.iItem,FALSE,TRUE);
 			}
 			else
 			{
-				OpenListViewItem(ht.iItem,FALSE);
+				OpenListViewItem(ht.iItem,FALSE,FALSE);
 			}
 		}
 		else
@@ -1871,35 +1872,30 @@ void CContainer::OnListViewSetFileAttributes(void)
 
 void CContainer::OnListViewPaste(void)
 {
-	TCHAR szDestination[MAX_PATH + 1];
-	list<PastedFile_t> PastedFileList;
-
-	/* DO NOT use the internal current directory string.
-	Files are copied asynchronously, so a change of directory
-	will cause the destination directory to change in the
-	middle of the copy operation. */
-	StringCchCopy(szDestination,SIZEOF_ARRAY(szDestination),
-		m_CurrentDirectory);
-
-	/* Also, the string must be double NULL terminated. */
-	szDestination[lstrlen(szDestination) + 1] = '\0';
-
-	/*PasteFilesFromClipboard(m_hContainer,
-		szDestination,FALSE,PasteFilesCallback,(void *)this);*/
-
 	IDataObject *pClipboardObject = NULL;
 	IClipboardHandler *pClipboardHandler = NULL;
+	TCHAR szDestination[MAX_PATH + 1];
 	HRESULT hr;
 
 	hr = OleGetClipboard(&pClipboardObject);
 
-	if(hr != S_OK)
-		return;
+	if(hr == S_OK)
+	{
+		pClipboardHandler = new CDropHandler();
 
-	pClipboardHandler = new CDropHandler();
+		/* DO NOT use the internal current directory string.
+		Files are copied asynchronously, so a change of directory
+		will cause the destination directory to change in the
+		middle of the copy operation. */
+		StringCchCopy(szDestination,SIZEOF_ARRAY(szDestination),
+			m_CurrentDirectory);
 
-	pClipboardHandler->CopyClipboardData(pClipboardObject,
-		m_hContainer,szDestination,this,TRUE);
+		/* Also, the string must be double NULL terminated. */
+		szDestination[lstrlen(szDestination) + 1] = '\0';
+
+		pClipboardHandler->CopyClipboardData(pClipboardObject,
+			m_hContainer,szDestination,this,!m_bOverwriteExistingFilesConfirmation);
+	}
 }
 
 void CContainer::OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt)

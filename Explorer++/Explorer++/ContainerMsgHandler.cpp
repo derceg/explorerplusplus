@@ -500,7 +500,7 @@ void CContainer::OnNewTab(void)
 		if(PathIsDirectory(FullItemPath))
 		{
 			bFolderSelected = TRUE;
-			BrowseFolder(FullItemPath,SBSP_ABSOLUTE,TRUE,TRUE);
+			BrowseFolder(FullItemPath,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 		}
 	}
 
@@ -508,10 +508,10 @@ void CContainer::OnNewTab(void)
 	item was not a folder; open the default tab directory. */
 	if(!bFolderSelected)
 	{
-		hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE,TRUE,TRUE);
+		hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 
 		if(FAILED(hr))
-			BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE,TRUE,TRUE);
+			BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 	}
 }
 
@@ -549,7 +549,7 @@ void CContainer::GotoFolder(int FolderCSIDL)
 	}
 }
 
-void CContainer::OpenListViewItem(int iItem,BOOL bOpenInNewTab)
+void CContainer::OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	LPITEMIDLIST	pidlComplete = NULL;
 	LPITEMIDLIST	pidl = NULL;
@@ -562,7 +562,7 @@ void CContainer::OpenListViewItem(int iItem,BOOL bOpenInNewTab)
 	{
 		pidlComplete = ILCombine(pidl,ridl);
 
-		OpenItem(pidlComplete,bOpenInNewTab);
+		OpenItem(pidlComplete,bOpenInNewTab,bOpenInNewWindow);
 
 		CoTaskMemFree(pidlComplete);
 		CoTaskMemFree(ridl);
@@ -571,7 +571,7 @@ void CContainer::OpenListViewItem(int iItem,BOOL bOpenInNewTab)
 	CoTaskMemFree(pidl);
 }
 
-void CContainer::OpenItem(TCHAR *szItem,BOOL bOpenInNewTab)
+void CContainer::OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	LPITEMIDLIST	pidlItem = NULL;
 	HRESULT			hr;
@@ -580,13 +580,13 @@ void CContainer::OpenItem(TCHAR *szItem,BOOL bOpenInNewTab)
 
 	if(SUCCEEDED(hr))
 	{
-		OpenItem(pidlItem,bOpenInNewTab);
+		OpenItem(pidlItem,bOpenInNewTab,bOpenInNewWindow);
 
 		CoTaskMemFree(pidlItem);
 	}
 }
 
-void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab)
+void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	SFGAOF	uAttributes = SFGAO_FOLDER|SFGAO_STREAM|SFGAO_LINK;
 	LPITEMIDLIST pidlControlPanel = NULL;
@@ -621,7 +621,7 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab)
 		else if(((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM)
 			&& m_bHandleZipFiles) || ((uAttributes & SFGAO_FOLDER) && !bControlPanelParent))
 		{
-			OpenFolderItem(pidlItem,bOpenInNewTab);
+			OpenFolderItem(pidlItem,bOpenInNewTab,bOpenInNewWindow);
 		}
 		else if(uAttributes & SFGAO_LINK && !bControlPanelParent)
 		{
@@ -657,7 +657,7 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab)
 
 						if(SUCCEEDED(hr))
 						{
-							OpenFolderItem(pidlTarget,bOpenInNewTab);
+							OpenFolderItem(pidlTarget,bOpenInNewTab,bOpenInNewWindow);
 
 							CoTaskMemFree(pidlTarget);
 						}
@@ -688,10 +688,12 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab)
 	}
 }
 
-void CContainer::OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab)
+void CContainer::OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
-	if(m_bAlwaysOpenNewTab || bOpenInNewTab)
-		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,TRUE,TRUE);
+	if(bOpenInNewWindow)
+		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,FALSE,FALSE,TRUE);
+	else if(m_bAlwaysOpenNewTab || bOpenInNewTab)
+		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,TRUE,TRUE,FALSE);
 	else
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER);
 }
@@ -1089,7 +1091,7 @@ void CContainer::OnResolveLink(void)
 			StringCchCopy(szPath,SIZEOF_ARRAY(szPath),szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			hr = BrowseFolder(szPath,SBSP_ABSOLUTE,TRUE,TRUE);
+			hr = BrowseFolder(szPath,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 
 			if(SUCCEEDED(hr))
 			{
@@ -1683,11 +1685,11 @@ The ONLY times an idl should be sent are:
 */
 HRESULT CContainer::BrowseFolder(TCHAR *szPath,UINT wFlags)
 {
-	return BrowseFolder(szPath,wFlags,FALSE,FALSE);
+	return BrowseFolder(szPath,wFlags,FALSE,FALSE,FALSE);
 }
 
 HRESULT CContainer::BrowseFolder(TCHAR *szPath,UINT wFlags,
-BOOL bOpenInNewTab,BOOL bSwitchToNewTab)
+BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 {
 	LPITEMIDLIST	pidl = NULL;
 	HRESULT			hr = S_FALSE;
@@ -1697,7 +1699,7 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab)
 	by the shellbrowser (e.g. when browsing back/forward). */
 	hr = GetIdlFromParsingName(szPath,&pidl);
 
-	BrowseFolder(pidl,wFlags,bOpenInNewTab,bSwitchToNewTab);
+	BrowseFolder(pidl,wFlags,bOpenInNewTab,bSwitchToNewTab,bOpenInNewWindow);
 
 	if(SUCCEEDED(hr))
 	{
@@ -1726,27 +1728,53 @@ HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 }
 
 HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,
-BOOL bOpenInNewTab,BOOL bSwitchToNewTab)
+BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 {
 	HRESULT hr = E_FAIL;
 	int iTabObjectIndex = -1;
 
-	if(!bOpenInNewTab)
+	if(bOpenInNewWindow)
 	{
-		if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
-		{
-			hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
-		}
+		/* Create a new instance of this program, with the
+		specified path as an argument. */
+		SHELLEXECUTEINFO sei;
+		TCHAR szCurrentProcess[MAX_PATH];
+		TCHAR szPath[MAX_PATH];
+		TCHAR szParameters[512];
 
-		iTabObjectIndex = m_iObjectIndex;
+		GetCurrentProcessImageName(szCurrentProcess,SIZEOF_ARRAY(szCurrentProcess));
+
+		GetDisplayName(pidlDirectory,szPath,SHGDN_FORPARSING);
+		StringCchPrintf(szParameters,SIZEOF_ARRAY(szParameters),_T("\"%s\""),szPath);
+
+		sei.cbSize			= sizeof(sei);
+		sei.fMask			= SEE_MASK_DEFAULT;
+		sei.lpVerb			= _T("open");
+		sei.lpFile			= szCurrentProcess;
+		sei.lpParameters	= szParameters;
+		sei.lpDirectory		= NULL;
+		sei.nShow			= SW_SHOW;
+		ShellExecuteEx(&sei);
 	}
 	else
 	{
-		hr = CreateNewTab(pidlDirectory,NULL,NULL,bSwitchToNewTab,&iTabObjectIndex);
-	}
+		if(!bOpenInNewTab)
+		{
+			if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
+			{
+				hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
+			}
 
-	if(SUCCEEDED(hr))
-		OnDirChanged(iTabObjectIndex);
+			iTabObjectIndex = m_iObjectIndex;
+		}
+		else
+		{
+			hr = CreateNewTab(pidlDirectory,NULL,NULL,bSwitchToNewTab,&iTabObjectIndex);
+		}
+
+		if(SUCCEEDED(hr))
+			OnDirChanged(iTabObjectIndex);
+	}
 
 	return hr;
 }

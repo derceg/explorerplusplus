@@ -770,12 +770,12 @@ void CContainer::OpenAllSelectedItems(BOOL bOpenInNewTab)
 		}
 		else
 		{
-			OpenListViewItem(iItem,FALSE);
+			OpenListViewItem(iItem,FALSE,FALSE);
 		}
 	}
 
 	if(m_bSeenDirectory)
-		OpenListViewItem(iFolderItem,bOpenInNewTab);
+		OpenListViewItem(iFolderItem,bOpenInNewTab,FALSE);
 }
 
 void CContainer::SetComboBoxExTitleString(HWND CbEx,LPITEMIDLIST pidl,TCHAR *szDisplayText)

@@ -604,7 +604,7 @@ INT_PTR CALLBACK CContainer::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM 
 								g_pSearchItems[(int)lvItem.lParam].szFullFileName);
 							GetIdlFromParsingName(szDirectory,&pidlFull);
 
-							OpenItem(pidlFull,TRUE);
+							OpenItem(pidlFull,TRUE,FALSE);
 
 							CoTaskMemFree(pidlFull);
 						}
