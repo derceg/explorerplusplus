@@ -303,12 +303,29 @@ void CFolderView::OnFileActionAdded(TCHAR *szFileName)
 
 void CFolderView::RemoveItemInternal(TCHAR *szFileName)
 {
+	list<Added_t>::iterator itr;
 	int iItemInternal;
+	BOOL bFound = FALSE;
 
-	iItemInternal = LocateFileItemInternalIndex(szFileName);
+	/* First chack if this item is in the queue of awaiting
+	items. If it is, remove it. */
+	for(itr = m_FilesAdded.begin();itr != m_FilesAdded.end();itr++)
+	{
+		if(lstrcmp(szFileName,itr->szFileName) == 0)
+		{
+			m_FilesAdded.erase(itr);
+			bFound = TRUE;
+			break;
+		}
+	}
 
-	if(iItemInternal != -1)
-		RemoveItem(iItemInternal);
+	if(!bFound)
+	{
+		iItemInternal = LocateFileItemInternalIndex(szFileName);
+
+		if(iItemInternal != -1)
+			RemoveItem(iItemInternal);
+	}
 }
 
 /*
@@ -547,8 +564,8 @@ void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 				/* Need to update internal storage for the item, since
 				it's name has now changed. */
 				StringCchCopy(m_pwfdFiles[iItemInternal].cFileName,
-					sizeof(m_pwfdFiles[iItemInternal].cFileName)/
-					sizeof(m_pwfdFiles[iItemInternal].cFileName[0]),szNewFileName);
+					SIZEOF_ARRAY(m_pwfdFiles[iItemInternal].cFileName),
+					szNewFileName);
 
 				/* The files' type may have changed, so retrieve the files'
 				icon again. */
@@ -576,11 +593,11 @@ void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 							PathRemoveExtension(szDisplayName);
 						}
 
-						lvItem.mask		= LVIF_TEXT|LVIF_IMAGE|LVIF_STATE;
-						lvItem.iItem	= iItem;
-						lvItem.iSubItem	= 0;
-						lvItem.pszText	= szDisplayName;
-						lvItem.iImage	= shfi.iIcon;
+						lvItem.mask			= LVIF_TEXT|LVIF_IMAGE|LVIF_STATE;
+						lvItem.iItem		= iItem;
+						lvItem.iSubItem		= 0;
+						lvItem.pszText		= szDisplayName;
+						lvItem.iImage		= shfi.iIcon;
 						lvItem.stateMask	= LVIS_OVERLAYMASK;
 
 						/* As well as resetting the items icon, we'll also set
@@ -600,5 +617,14 @@ void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 		}
 
 		CoTaskMemFree(pidlFull);
+	}
+	else
+	{
+		StringCchCopy(m_pExtraItemInfo[iItemInternal].szDisplayName,
+			MAX_PATH,szNewFileName);
+
+		StringCchCopy(m_pwfdFiles[iItemInternal].cFileName,
+			SIZEOF_ARRAY(m_pwfdFiles[iItemInternal].cFileName),
+			szNewFileName);
 	}
 }
