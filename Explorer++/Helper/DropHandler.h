@@ -29,6 +29,18 @@ __interface IClipboardHandler
 	void CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
 };
 
+typedef struct
+{
+	void				*pDropHandler;
+
+	SHFILEOPSTRUCT		shfo;
+	IDropFilesCallback	*pDropFilesCallback;
+	list<PastedFile_t>	*pPastedFileList;
+	POINT				pt;
+
+	IAsyncOperation		*pao;
+}PastedFilesInfo_t;
+
 /* Generic drop handler. Handles the following
 drop formats:
  - CF_HDROP
@@ -41,7 +53,7 @@ public:
 	CDropHandler();
 	~CDropHandler();
 
-	DWORD WINAPI	CopyDroppedFilesInternalAsync(LPVOID lpParameter);
+	DWORD	CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi);
 
 private:
 

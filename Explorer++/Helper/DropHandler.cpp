@@ -23,16 +23,6 @@ struct HANDLETOMAPPINGS
 	LPSHNAMEMAPPING	lpSHNameMapping;
 };
 
-typedef struct
-{
-	CDropHandler		*pDropHandler;
-
-	SHFILEOPSTRUCT		shfo;
-	IDropFilesCallback	*pDropFilesCallback;
-	list<PastedFile_t>	*pPastedFileList;
-	POINT				pt;
-}PastedFilesInfo_t;
-
 DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter);
 
 CDropHandler::CDropHandler()
@@ -556,7 +546,7 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy)
 					StringCchCopy(pszDestDirectory,MAX_PATH,m_szDestDirectory);
 					pszDestDirectory[lstrlen(pszDestDirectory) + 1] = '\0';
 
-					ppfi->pDropHandler = this;
+					ppfi->pDropHandler = (void *)this;
 
 					ppfi->shfo.hwnd		= m_hwndDrop;
 					ppfi->shfo.wFunc	= bCopy == TRUE ? FO_COPY : FO_MOVE;
@@ -569,10 +559,44 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy)
 					ppfi->pt.x					= m_ptl.x;
 					ppfi->pt.y					= m_ptl.y;
 
-					/* The actual files will be copied in a background thread. */
-					hThread = CreateThread(NULL,0,CopyDroppedFilesInternalAsyncStub,ppfi,0,NULL);
+					IAsyncOperation *pao = NULL;
+					BOOL bAsyncSupported = FALSE;
+					HRESULT hr;
 
-					CloseHandle(hThread);
+					/* Does the drop source support asynchronous copy? */
+					hr = m_pDataObject->QueryInterface(IID_IAsyncOperation,(void **)&pao);
+
+					if(hr == S_OK)
+					{
+						BOOL bSupported;
+
+						pao->GetAsyncMode(&bSupported);
+
+						if(bSupported)
+						{
+							bAsyncSupported = TRUE;
+						}
+					}
+
+					if(bAsyncSupported)
+					{
+						pao->StartOperation(NULL);
+
+						ppfi->pao	= pao;
+
+						/* Create a new thread, which we'll use to copy
+						the dropped files. */
+						hThread = CreateThread(NULL,0,CopyDroppedFilesInternalAsyncStub,ppfi,0,NULL);
+
+						CloseHandle(hThread);
+					}
+					else
+					{
+						/* Copy the files within this thread. */
+						CopyDroppedFilesInternalAsync(ppfi);
+
+						free((void *)ppfi);
+					}
 				}
 				else
 				{
@@ -586,20 +610,30 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy)
 DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter)
 {
 	PastedFilesInfo_t *ppfi = NULL;
+	CDropHandler *pdh = NULL;
+	DWORD dwRet;
 
 	ppfi = (PastedFilesInfo_t *)lpParameter;
 
-	return ppfi->pDropHandler->CopyDroppedFilesInternalAsync(lpParameter);
-}
-
-DWORD WINAPI CDropHandler::CopyDroppedFilesInternalAsync(LPVOID lpParameter)
-{
-	PastedFilesInfo_t *ppfi = NULL;
-	int iReturn;
-
-	ppfi = (PastedFilesInfo_t *)lpParameter;
+	pdh = (CDropHandler *)ppfi->pDropHandler;
 
 	CoInitializeEx(0,COINIT_APARTMENTTHREADED);
+	dwRet = pdh->CopyDroppedFilesInternalAsync(ppfi);
+	CoUninitialize();
+
+	ppfi->pao->EndOperation(S_OK,NULL,DROPEFFECT_MOVE);
+
+	ppfi->pao->Release();
+
+	free((void *)ppfi);
+
+	return dwRet;
+}
+
+DWORD CDropHandler::CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
+{
+	int iReturn;
+	
 	iReturn = SHFileOperation(&ppfi->shfo);
 
 	if(iReturn == 0)
@@ -646,9 +680,6 @@ DWORD WINAPI CDropHandler::CopyDroppedFilesInternalAsync(LPVOID lpParameter)
 	delete ppfi->pPastedFileList;
 	free((void *)ppfi->shfo.pFrom);
 	free((void *)ppfi->shfo.pTo);
-	free((void *)ppfi);
-
-	CoUninitialize();
 
 	return 0;
 }
