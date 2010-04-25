@@ -806,11 +806,11 @@ BEGIN
     BEGIN
         BLOCK "040504b0"
         BEGIN
-            VALUE "FileDescription", "Explorer Application"
+            VALUE "FileDescription", "Explorer++ Translation DLL"
             VALUE "FileVersion", "0, 9, 5, 4"
-            VALUE "InternalName", "Explorer++"
-            VALUE "LegalCopyright", "(C) 2005-2009 David Erceg"
-            VALUE "OriginalFilename", "Explorer++.exe"
+            VALUE "InternalName", "Explorer++ Czech Translation DLL"
+            VALUE "LegalCopyright", "(C) 2005-2010 David Erceg"
+            VALUE "OriginalFilename", "Explorer++CS.dll"
             VALUE "ProductName", "Explorer++"
             VALUE "ProductVersion", "0, 9, 5, 4"
         END
