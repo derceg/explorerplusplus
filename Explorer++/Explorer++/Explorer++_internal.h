@@ -176,6 +176,19 @@ appears on the tab control. */
 
 #define TREEVIEW_WHEEL_MULTIPLIER	3
 
+/* These definitions are needed to target
+Windows 7 specific features, while remaining
+compliant with XP and Vista. They are copied
+directly from the appropriate header file. */
+#define WM_DWMSENDICONICTHUMBNAIL           0x0323
+#define WM_DWMSENDICONICLIVEPREVIEWBITMAP   0x0326
+#define MSGFLT_ADD 1
+
+typedef BOOL (WINAPI *ChangeWindowMessageFilterProc)(UINT message,DWORD dwFlag);
+typedef HRESULT (STDAPICALLTYPE *DwmSetWindowAttributeProc)(HWND hwnd,DWORD dwAttribute,LPCVOID pvAttribute,DWORD cbAttribute);
+typedef HRESULT (STDAPICALLTYPE *DwmSetIconicThumbnailProc)(HWND hwnd,HBITMAP hbmp,DWORD dwSITFlags);
+typedef HRESULT (STDAPICALLTYPE *DwmSetIconicLivePreviewBitmapProc)(HWND hwnd,HBITMAP hbmp,POINT *pptClient,DWORD dwSITFlags);
+
 #define VALIDATE_REALFOLDER_COLUMNS			0
 #define VALIDATE_CONTROLPANEL_COLUMNS		1
 #define VALIDATE_MYCOMPUTER_COLUMNS			2

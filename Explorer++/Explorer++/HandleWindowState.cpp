@@ -29,7 +29,7 @@
  */
 void CContainer::UpdateWindowStates(void)
 {
-	m_pActiveShellBrowser->QueryCurrentDirectory(MAX_PATH,m_CurrentDirectory);
+	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),m_CurrentDirectory);
 
 	HandleMainWindowText();
 	HandleComboBoxText();

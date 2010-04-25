@@ -1279,6 +1279,9 @@ private:
 	UINT					m_uTaskbarButtonCreatedMessage;
 	BOOL					m_bInit;
 
+	/* Win+E keyboard hook DLL. */
+	HHOOK					m_hKeyboardHook;
+
 	/* Undo state. */
 	BOOL					m_bCanUndo;
 	UndoItem_t				m_UndoItem;

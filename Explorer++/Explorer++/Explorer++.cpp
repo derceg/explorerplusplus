@@ -698,12 +698,30 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
  */
 LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
+	/* TODO: */
 	if(Msg == m_uTaskbarButtonCreatedMessage)
 	{
+		HMODULE hUser32;
+		ChangeWindowMessageFilterProc ChangeWindowMessageFilter;
+
 		m_bInit = TRUE;
 
-		ChangeWindowMessageFilter(WM_DWMSENDICONICTHUMBNAIL,MSGFLT_ADD);
-		ChangeWindowMessageFilter(WM_DWMSENDICONICLIVEPREVIEWBITMAP,MSGFLT_ADD);
+		hUser32 = LoadLibrary(_T("user32.dll"));
+
+		if(hUser32 != NULL)
+		{
+			/* If directly targeting Windows 7, this can be switched
+			to static, rather than dynamic linking. */
+			ChangeWindowMessageFilter = (ChangeWindowMessageFilterProc)GetProcAddress(hUser32,"ChangeWindowsMessageFilter");
+
+			if(ChangeWindowMessageFilter != NULL)
+			{
+				ChangeWindowMessageFilter(WM_DWMSENDICONICTHUMBNAIL,MSGFLT_ADD);
+				ChangeWindowMessageFilter(WM_DWMSENDICONICLIVEPREVIEWBITMAP,MSGFLT_ADD);
+			}
+
+			FreeLibrary(hUser32);
+		}
 
 		m_pTaskbarList3->HrInit();
 

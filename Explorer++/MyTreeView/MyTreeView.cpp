@@ -70,6 +70,8 @@ HANDLE hIconsThread)
 	InitializeCriticalSection(&m_csSubFolders);
 	InitializeCriticalSection(&g_tv_icon_cs);
 
+	m_hThread = hIconsThread;
+
 	m_iAlteredAllocation = DEFAULT_ALTERED_ALLOCATION;
 	m_nAltered = 0;
 
@@ -99,8 +101,6 @@ HANDLE hIconsThread)
 
 	m_bQueryRemoveCompleted = FALSE;
 	CreateThread(NULL,0,Thread_MonitorAllDrives,this,0,NULL);
-
-	m_hThread = hIconsThread;
 
 	m_iProcessing = 0;
 }

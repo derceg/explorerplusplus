@@ -353,29 +353,44 @@ void CContainer::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwit
 
 			if(hTabProxy != NULL)
 			{
-				hr = DwmSetWindowAttribute(hTabProxy,DWMWA_FORCE_ICONIC_REPRESENTATION,
-					&bValue,sizeof(BOOL));
+				HMODULE hDwmapi;
+				DwmSetWindowAttributeProc DwmSetWindowAttribute;
 
-				hr = DwmSetWindowAttribute(hTabProxy,DWMWA_HAS_ICONIC_BITMAP,
-					&bValue,sizeof(BOOL));
+				hDwmapi = LoadLibrary(_T("dwmapi.dll"));
 
-				/* Register and insert the tab into the current list of
-				taskbar thumbnails. */
-				m_pTaskbarList3->RegisterTab(hTabProxy,m_hContainer);
-				m_pTaskbarList3->SetTabOrder(hTabProxy,NULL);
-
-				m_pTaskbarList3->SetThumbnailTooltip(hTabProxy,szDisplayName);
-
-				TabProxyInfo_t tpi;
-
-				tpi.hProxy	= hTabProxy;
-				tpi.iTabId	= iTabId;
-
-				m_TabProxyList.push_back(tpi);
-
-				if(bSwitchToNewTab)
+				if(hDwmapi != NULL)
 				{
-					m_pTaskbarList3->SetTabActive(hTabProxy,m_hContainer,0);
+					DwmSetWindowAttribute = (DwmSetWindowAttributeProc)GetProcAddress(hDwmapi,"DwmSetWindowAttribute");
+
+					if(DwmSetWindowAttribute != NULL)
+					{
+						hr = DwmSetWindowAttribute(hTabProxy,DWMWA_FORCE_ICONIC_REPRESENTATION,
+							&bValue,sizeof(BOOL));
+
+						hr = DwmSetWindowAttribute(hTabProxy,DWMWA_HAS_ICONIC_BITMAP,
+							&bValue,sizeof(BOOL));
+
+						/* Register and insert the tab into the current list of
+						taskbar thumbnails. */
+						m_pTaskbarList3->RegisterTab(hTabProxy,m_hContainer);
+						m_pTaskbarList3->SetTabOrder(hTabProxy,NULL);
+
+						m_pTaskbarList3->SetThumbnailTooltip(hTabProxy,szDisplayName);
+
+						TabProxyInfo_t tpi;
+
+						tpi.hProxy	= hTabProxy;
+						tpi.iTabId	= iTabId;
+
+						m_TabProxyList.push_back(tpi);
+
+						if(bSwitchToNewTab)
+						{
+							m_pTaskbarList3->SetTabActive(hTabProxy,m_hContainer,0);
+						}
+					}
+
+					FreeLibrary(hDwmapi);
 				}
 			}
 		}
@@ -538,7 +553,22 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 			SelectObject(hdcThumbnailSrc,hPrevBitmap);
 			DeleteDC(hdcThumbnailSrc);
 
-			hr = DwmSetIconicThumbnail(hwnd,hbmThumbnail,0);
+			HMODULE hDwmapi;
+			DwmSetIconicThumbnailProc DwmSetIconicThumbnail;
+
+			hDwmapi = LoadLibrary(_T("dwmapi.dll"));
+
+			if(hDwmapi != NULL)
+			{
+				DwmSetIconicThumbnail = (DwmSetIconicThumbnailProc)GetProcAddress(hDwmapi,"DwmSetIconicThumbnail");
+
+				if(DwmSetIconicThumbnail != NULL)
+				{
+					hr = DwmSetIconicThumbnail(hwnd,hbmThumbnail,0);
+				}
+			}
+
+			FreeLibrary(hDwmapi);
 
 			DeleteObject(hBitmap);
 			DeleteObject(hbmThumbnail);
@@ -609,7 +639,22 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 			/* Need to include the menu bar in the offset. */
 			pt.y = rcTab.top + mbi.rcBar.bottom - mbi.rcBar.top;
 
-			DwmSetIconicLivePreviewBitmap(hwnd,hbmTab,&pt,0);
+			HMODULE hDwmapi;
+			DwmSetIconicLivePreviewBitmapProc DwmSetIconicLivePreviewBitmap;
+
+			hDwmapi = LoadLibrary(_T("dwmapi.dll"));
+
+			if(hDwmapi != NULL)
+			{
+				DwmSetIconicLivePreviewBitmap = (DwmSetIconicLivePreviewBitmapProc)GetProcAddress(hDwmapi,"DwmSetIconicLivePreviewBitmap");
+
+				if(DwmSetIconicLivePreviewBitmap != NULL)
+				{
+					DwmSetIconicLivePreviewBitmap(hwnd,hbmTab,&pt,0);
+				}
+			}
+
+			FreeLibrary(hDwmapi);
 
 			SelectObject(hdcTabSrc,hbmTabPrev);
 			DeleteObject(hbmTab);

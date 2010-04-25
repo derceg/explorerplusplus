@@ -466,7 +466,7 @@ int CContainer::OnTreeViewEndLabelEdit(LPARAM lParam)
 	/* Build the new filename from the text entered
 	and the parent directory component of the old
 	filename. */
-	StringCchCopy(NewFileName,MAX_PATH,m_OldTreeViewFileName);
+	StringCchCopy(NewFileName,SIZEOF_ARRAY(NewFileName),m_OldTreeViewFileName);
 	PathRemoveFileSpec(NewFileName);
 	PathAppend(NewFileName,pdi->item.pszText);
 
