@@ -25,7 +25,6 @@ HRESULT	CutFiles(TCHAR *szFileNameList,int iListSize,IDataObject **pClipboardDat
 int		CreateQualifiedPathName(TCHAR *,TCHAR *,unsigned int);
 HRESULT	CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax);
 HRESULT	SaveDirectoryListing(TCHAR *,TCHAR *);
-void	GetDeletedFileDate(TCHAR *szFileName,FILETIME *pFileTime,TCHAR *szOriginalLocation);
 BOOL	PerformFileOperation(HWND,TCHAR *,TCHAR *,TCHAR *,TCHAR *);
 void	CountFilesAndFolders(TCHAR *,int *,int *,double *);
 BOOL	ShowFileProperties(TCHAR *);

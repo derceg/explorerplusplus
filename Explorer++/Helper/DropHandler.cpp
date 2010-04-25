@@ -179,7 +179,7 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 
 					if(pfgd->fgd[i].dwFlags & FD_LINKUI)
 					{
-						/* TODO: Treat as shortcut... */
+
 					}
 
 					if(pfgd->fgd[i].dwFlags & FD_CREATETIME)

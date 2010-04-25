@@ -563,13 +563,37 @@ void CFolderView::RepositionLocalFiles(POINT *ppt)
 		{
 			if(m_ViewMode == VM_DETAILS)
 			{
-				/* TODO: Disable or fix before release. */
-				/*LVITEM lvItem;
+				LVITEM lvItem;
+				POINT ptItem;
+				BOOL bBelowPreviousItem = TRUE;
 				BOOL bRes;
+				int iInsert = 0;
+				int iSort = 0;
 				int nItems;
 				int i = 0;
 
 				nItems = ListView_GetItemCount(m_hListView);
+
+				/* Find the closest item to the dropped item. */
+				for(i = 0;i < nItems;i++)
+				{
+					ListView_GetItemPosition(m_hListView,i,&ptItem);
+
+					if(bBelowPreviousItem && (pt.y - ptItem.y) < 0)
+					{
+						iInsert = i - 1;
+						break;
+					}
+
+					/* If the dropped item is below the last item,
+					it will be moved to the last position. */
+					if(i == (nItems - 1))
+					{
+						iInsert = nItems;
+					}
+
+					bBelowPreviousItem = (pt.y - ptItem.y) > 0;
+				}
 
 				for(i = 0;i < nItems;i++)
 				{
@@ -580,21 +604,23 @@ void CFolderView::RepositionLocalFiles(POINT *ppt)
 
 					if(bRes)
 					{
-						m_pExtraItemInfo[(int)lvItem.lParam].iRelativeSort = 0;
+						if(i == iItem)
+						{
+							m_pExtraItemInfo[(int)lvItem.lParam].iRelativeSort = iInsert;
+						}
+						else
+						{
+							if(iSort == iInsert)
+								iSort++;
+
+							m_pExtraItemInfo[(int)lvItem.lParam].iRelativeSort = iSort;
+						}
 					}
+
+					iSort++;
 				}
 
-				lvItem.mask		= LVIF_PARAM;
-				lvItem.iItem	= iItem;
-				lvItem.iSubItem	= 0;
-				bRes = ListView_GetItem(m_hListView,&lvItem);
-
-				if(bRes)
-				{
-					m_pExtraItemInfo[(int)lvItem.lParam].iRelativeSort = 1;
-				}
-
-				ListView_SortItems(m_hListView,SortTemporaryStub,(LPARAM)this);*/
+				ListView_SortItems(m_hListView,SortTemporaryStub,(LPARAM)this);
 			}
 			else
 			{

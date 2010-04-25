@@ -37,6 +37,8 @@ int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 void CALLBACK		Timer_DirectoryModified(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime);
 DWORD WINAPI		Thread_SubFoldersStub(LPVOID pVoid);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
+void CALLBACK		TVFindIconAPC(ULONG_PTR dwParam);
+BOOL				RemoveFromIconFinderQueue(TreeViewInfo_t *pListViewInfo);
 
 DWORD	g_ThreadId;
 WNDPROC	OldTreeViewProc;
@@ -48,13 +50,6 @@ CRITICAL_SECTION g_tv_icon_cs;
 int g_ntvAPCsRan = 0;
 int g_ntvAPCsQueued = 0;
 BOOL g_btvIconThreadSleeping = TRUE;
-
-typedef struct
-{
-	HWND			hTreeView;
-	LPITEMIDLIST	pidlFull;
-	HTREEITEM		hItem;
-} TreeViewInfo_t;
 
 list<TreeViewInfo_t> g_pTreeViewInfoList;
 
@@ -395,10 +390,6 @@ void CMyTreeView::OnGetDisplayInfo(LPARAM lParam)
 
 	ptvItem->mask |= TVIF_DI_SETITEM;
 }
-
-/* TODO: Define somewhere. */
-void CALLBACK TVFindIconAPC(ULONG_PTR dwParam);
-BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pListViewInfo);
 
 void CMyTreeView::AddToIconFinderQueue(TVITEM *plvItem)
 {

@@ -364,16 +364,12 @@ int CALLBACK SortByDateDeletedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSo
 	return pFolderView->SortByDateDeleted(lParam1,lParam2);
 }
 
+/* TODO: Implement. */
 int CFolderView::SortByDateDeleted(LPARAM lParam1,LPARAM lParam2)
 {
-	FILETIME	ftDeleted1;
-	FILETIME	ftDeleted2;
 	int			ReturnValue;
 
-	GetDeletedFileDate(m_pwfdFiles[lParam1].cFileName,&ftDeleted1,NULL);
-	GetDeletedFileDate(m_pwfdFiles[lParam2].cFileName,&ftDeleted2,NULL);
-
-	ReturnValue = CompareFileTime(&ftDeleted1,&ftDeleted2);
+	ReturnValue = 0;
 
 	if(!IsSortAscending())
 		ReturnValue = -ReturnValue;
@@ -551,21 +547,12 @@ int CALLBACK SortByOriginalLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lPa
 	return pFolderView->SortByOriginalLocation(lParam1,lParam2);
 }
 
+/* TODO: Implement. */
 int CALLBACK CFolderView::SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2)
 {
-	TCHAR		szOriginalLocation1[MAX_PATH];
-	TCHAR		szOriginalLocation2[MAX_PATH];
-	FILETIME	ftDeleted1;
-	FILETIME	ftDeleted2;
 	int			ReturnValue;
 
-	GetDeletedFileDate(m_pwfdFiles[lParam1].cFileName,&ftDeleted1,szOriginalLocation1);
-	GetDeletedFileDate(m_pwfdFiles[lParam2].cFileName,&ftDeleted2,szOriginalLocation2);
-
-	PathRemoveFileSpec(szOriginalLocation1);
-	PathRemoveFileSpec(szOriginalLocation2);
-
-	ReturnValue = lstrcmp(szOriginalLocation1,szOriginalLocation2);
+	ReturnValue = 0;
 
 	if(!IsSortAscending())
 			ReturnValue = -ReturnValue;

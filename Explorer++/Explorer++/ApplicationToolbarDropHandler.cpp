@@ -145,7 +145,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 			/* Check whether the files were dropped over another toolbar button. If
 			they were, open the dropped file in the application represented by the
 			button. */
-			iButton = SendMessage(m_pContainer->m_hApplicationToolbar,TB_HITTEST,0,(LPARAM)&pt);
+			iButton = (int)SendMessage(m_pContainer->m_hApplicationToolbar,TB_HITTEST,0,(LPARAM)&pt);
 
 			if(iButton > 0)
 			{
