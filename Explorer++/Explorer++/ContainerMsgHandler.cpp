@@ -51,11 +51,13 @@ DWORD WINAPI Thread_IconFinder(LPVOID pParam)
 
 	/* WARNING: Warning C4127 (conditional expression is
 	constant) temporarily disabled for this funtion. */
-	#pragma warning( disable : 4127 )
+	#pragma warning(push)
+	#pragma warning(disable:4127)
 	while(TRUE)
 	{
 		SleepEx(INFINITE,TRUE);
 	}
+	#pragma warning(pop)
 
 	return 0;
 }
@@ -600,6 +602,15 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInN
 
 	if(SUCCEEDED(hr))
 	{
+		/* On Windows Vista and later, the CSIDL_CONTROLS folder
+		is contained within a top-layer 'Control Panel' folder. This
+		folder simply provides grouping of several control panel
+		items. */
+		if(m_dwMajorVersion >= WINDOWS_VISTA_MAJORVERSION)
+		{
+			ILRemoveLastID(pidlControlPanel);
+		}
+
 		if(ILIsParent(pidlControlPanel,pidlItem,FALSE) && !ILIsEqual(pidlControlPanel,pidlItem))
 		{
 			bControlPanelParent = TRUE;
@@ -845,6 +856,7 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	IndentTop = iIndentRebar;
 
+	/* TODO: */
 	if(m_bShowTabBar)
 	{
 		if(1)
@@ -872,6 +884,7 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* Are we showing the tab bar at the top or
 	bottom of the window? */
+	/* TODO: */
 	if(1)
 	{
 		iTabTop = iIndentRebar;
@@ -1053,7 +1066,8 @@ close all the current tabs?"),
 
 void CContainer::OnDirChanged(int iTabId)
 {
-	m_pActiveShellBrowser->QueryCurrentDirectory(MAX_PATH,m_CurrentDirectory);
+	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
+		m_CurrentDirectory);
 
 	HandleDirectoryMonitoring(iTabId);
 
@@ -1136,7 +1150,8 @@ void CContainer::OnTabCtrlGetDispInfo(LPARAM lParam)
 		tcItem.mask = TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl,nmhdr->idFrom,&tcItem);
 
-		m_pShellBrowser[(int)tcItem.lParam]->QueryCurrentDirectory(MAX_PATH,szTabToolTip);
+		m_pShellBrowser[(int)tcItem.lParam]->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
+			szTabToolTip);
 		lpnmtdi->lpszText = szTabToolTip;
 	}
 }
@@ -1231,7 +1246,8 @@ void CContainer::HandleDirectoryMonitoring(int iTabId)
 	/* Stop monitoring the directory that was browsed from. */
 	m_pDirMon->StopDirectoryMonitor(iDirMonitorId);
 
-	m_pShellBrowser[iTabId]->QueryCurrentDirectory(MAX_PATH,szDirectoryToWatch);
+	m_pShellBrowser[iTabId]->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectoryToWatch),
+		szDirectoryToWatch);
 
 	GetVirtualFolderParsingPath(CSIDL_BITBUCKET,szRecycleBin);
 
