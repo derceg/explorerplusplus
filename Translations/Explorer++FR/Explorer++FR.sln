@@ -1,7 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++FR", "Explorer++FR\Explorer++FR.vcproj", "{1610CD3C-0F28-46D8-8BB3-8DF637614AA0}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++FR", "Explorer++FR\Explorer++FR.vcxproj", "{1610CD3C-0F28-46D8-8BB3-8DF637614AA0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
