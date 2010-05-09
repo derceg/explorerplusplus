@@ -46,7 +46,7 @@ SYSTEMTIME g_LocalAccess;
 
 INT_PTR CALLBACK SetFileAttributesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer;
+	static CContainer *pContainer = NULL;
 
 	switch(uMsg)
 	{
@@ -57,7 +57,14 @@ INT_PTR CALLBACK SetFileAttributesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 		break;
 	}
 
-	return pContainer->SetFileAttributesProc(hDlg,uMsg,wParam,lParam);
+	if(pContainer != NULL)
+	{
+		return pContainer->SetFileAttributesProc(hDlg,uMsg,wParam,lParam);
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 INT_PTR CALLBACK CContainer::SetFileAttributesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
@@ -156,6 +163,10 @@ void CContainer::OnInitializeFileAttributesDlg(HWND hDlg,LPARAM lParam)
 	SetAttributeCheckState(GetDlgItem(hDlg,IDC_CHECK_READONLY),nReadOnly,nItems);
 	SetAttributeCheckState(GetDlgItem(hDlg,IDC_CHECK_INDEXED),nIndexed,nItems);
 
+	m_bModificationDateEnabled = FALSE;
+	m_bCreationDateEnabled = FALSE;
+	m_bAccessDateEnabled = FALSE;
+
 	if(m_bSetFileAttributesDlgStateSaved)
 	{
 		SetWindowPos(hDlg,NULL,m_ptWildcardSelect.x,
@@ -208,24 +219,42 @@ void CContainer::OnFileAttributesDlgOk(HWND hDlg)
 
 	if(m_bModificationDateEnabled)
 	{
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_MODIFICATIONDATE),&LocalWrite);
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_MODIFICATIONTIME),&LocalWrite);
+		SYSTEMTIME LocalWriteDate;
+		SYSTEMTIME LocalWriteTime;
+
+		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_MODIFICATIONDATE),&LocalWriteDate);
+		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_MODIFICATIONTIME),&LocalWriteTime);
+
+		MergeDateTime(&LocalWrite,&LocalWriteDate,&LocalWriteTime);
+
 		LocalSystemTimeToFileTime(&LocalWrite,&LastWriteTime);
 		plw = &LastWriteTime;
 	}
 
 	if(m_bCreationDateEnabled)
 	{
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_CREATIONTIME),&LocalCreation);
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_CREATIONDATE),&LocalCreation);
+		SYSTEMTIME LocalCreationDate;
+		SYSTEMTIME LocalCreationTime;
+
+		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_CREATIONDATE),&LocalCreationDate);
+		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_CREATIONTIME),&LocalCreationTime);
+
+		MergeDateTime(&LocalCreation,&LocalCreationDate,&LocalCreationTime);
+
 		LocalSystemTimeToFileTime(&LocalCreation,&CreationTime);
 		plc = &CreationTime;
 	}
 
 	if(m_bAccessDateEnabled)
 	{
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_ACCESSDATE),&LocalAccess);
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_ACCESSTIME),&LocalAccess);
+		SYSTEMTIME LocalAccessDate;
+		SYSTEMTIME LocalAccessTime;
+
+		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_ACCESSDATE),&LocalAccessDate);
+		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_ACCESSTIME),&LocalAccessTime);
+
+		MergeDateTime(&LocalAccess,&LocalAccessDate,&LocalAccessTime);
+
 		LocalSystemTimeToFileTime(&LocalAccess,&AccessTime);
 		pla = &AccessTime;
 	}
@@ -276,9 +305,12 @@ void CContainer::OnFileAttributesDlgOk(HWND hDlg)
 		hFile = CreateFile(itr->szFullFileName,FILE_WRITE_ATTRIBUTES,0,NULL,OPEN_EXISTING,
 			NULL,NULL);
 
-		SetFileTime(hFile,plc,pla,plw);
+		if(hFile != INVALID_HANDLE_VALUE)
+		{
+			SetFileTime(hFile,plc,pla,plw);
 
-		CloseHandle(hFile);
+			CloseHandle(hFile);
+		}
 	}
 
 	SetFileAttributesSaveState(hDlg);

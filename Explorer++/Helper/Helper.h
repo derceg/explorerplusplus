@@ -215,5 +215,6 @@ void			ReplaceCharacterWithString(TCHAR *szBaseString,TCHAR *szOutput,UINT cchMa
 void			CenterWindow(HWND hParent,HWND hChild);
 TCHAR			*ReplaceSubString(TCHAR *szString,TCHAR *szSubString,TCHAR *szReplacement);
 void			UpdateToolbarBandSizing(HWND hRebar,HWND hToolbar);
+void			MergeDateTime(SYSTEMTIME *pstOutput,SYSTEMTIME *pstDate,SYSTEMTIME *pstTime);
 
 #endif

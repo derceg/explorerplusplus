@@ -3139,3 +3139,18 @@ void BuildFileString()
 
 	//psz = ReplaceSubString(szTip,_T("{name}"),pwfd->cFileName);
 }
+
+void MergeDateTime(SYSTEMTIME *pstOutput,SYSTEMTIME *pstDate,SYSTEMTIME *pstTime)
+{
+	/* Date fields. */
+	pstOutput->wYear		= pstDate->wYear;
+	pstOutput->wMonth		= pstDate->wMonth;
+	pstOutput->wDayOfWeek	= pstDate->wDayOfWeek;
+	pstOutput->wDay			= pstDate->wDay;
+
+	/* Time fields. */
+	pstOutput->wHour			= pstTime->wHour;
+	pstOutput->wMinute			= pstTime->wMinute;
+	pstOutput->wSecond			= pstTime->wSecond;
+	pstOutput->wMilliseconds	= pstTime->wMilliseconds;
+}
