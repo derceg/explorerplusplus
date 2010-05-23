@@ -859,7 +859,7 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 	/* TODO: */
 	if(m_bShowTabBar)
 	{
-		if(1)
+		//if(1)
 		{
 			IndentTop += TAB_WINDOW_HEIGHT;
 		}
@@ -885,14 +885,14 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 	/* Are we showing the tab bar at the top or
 	bottom of the window? */
 	/* TODO: */
-	if(1)
+	//if(1)
 	{
 		iTabTop = iIndentRebar;
 	}
-	else
+	/*else
 	{
 		iTabTop = IndentTop + MainWindowHeight - IndentBottom - IndentTop - TAB_WINDOW_HEIGHT;
-	}
+	}*/
 
 	/* If we're showing the tab bar at the bottom of the listview,
 	the only thing that will change is the top coordinate. */
@@ -906,7 +906,6 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 	/* Tab close button. */
 	SetWindowPos(m_hTabWindowToolbar,NULL,iTabBackingWidth + TAB_TOOLBAR_X_OFFSET,
 	TAB_TOOLBAR_Y_OFFSET,TAB_TOOLBAR_WIDTH,TAB_TOOLBAR_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
-
 
 	if(m_bExtendTabControl)
 		iHolderTop = IndentTop;
@@ -2737,4 +2736,23 @@ void CContainer::OnHome(void)
 	{
 		BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE);
 	}
+}
+
+void CContainer::OnNavigateUp(void)
+{
+	list<PastedFile_t> FileList;
+	PastedFile_t pf;
+	TCHAR szDirectory[MAX_PATH];
+
+	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory),
+		szDirectory);
+	PathStripPath(szDirectory);
+
+	BrowseFolder(EMPTY_STRING,SBSP_PARENT|SBSP_SAMEBROWSER);
+
+	StringCchCopy(pf.szFileName,SIZEOF_ARRAY(pf.szFileName),szDirectory);
+
+	FileList.push_back(pf);
+
+	m_pActiveShellBrowser->SelectItems(&FileList);
 }

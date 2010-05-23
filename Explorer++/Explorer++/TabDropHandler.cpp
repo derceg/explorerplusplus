@@ -76,6 +76,11 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 		*pdwEffect		= DROPEFFECT_NONE;
 	}
 
+	if(grfKeyState & MK_LBUTTON)
+		m_DragType = DRAG_TYPE_LEFTCLICK;
+	else if(grfKeyState & MK_RBUTTON)
+		m_DragType = DRAG_TYPE_RIGHTCLICK;
+
 	m_pDropTargetHelper->DragEnter(m_hTabCtrl,pDataObject,(POINT *)&pt,*pdwEffect);
 
 	return S_OK;
@@ -235,16 +240,9 @@ HRESULT _stdcall CContainer::DragLeave(void)
 HRESULT _stdcall CContainer::Drop(IDataObject *pDataObject,DWORD grfKeyState,
 POINTL pt,DWORD *pdwEffect)
 {
-	DROPFILES *pdf = NULL;
-	FORMATETC ftc;
-	STGMEDIUM stg;
 	TCHITTESTINFO tchi;
 	TCITEM tcItem;
 	TCHAR szDestDirectory[MAX_PATH];
-	DWORD dwEffect;
-	HRESULT hr;
-	BOOL bOnSameDrive;
-	int nDroppedFiles;
 	int iTab;
 
 	m_pDropTargetHelper->Drop(pDataObject,(POINT *)&pt,*pdwEffect);
@@ -269,105 +267,16 @@ POINTL pt,DWORD *pdwEffect)
 	
 	if(m_bDataAccept)
 	{
-		ftc.cfFormat	= CF_HDROP;
-		ftc.ptd			= NULL;
-		ftc.dwAspect	= DVASPECT_CONTENT;
-		ftc.lindex		= -1;
-		ftc.tymed		= TYMED_HGLOBAL;
+		IDropHandler *pDropHandler = NULL;
 
-		/* Does the dropped object contain the type of
-		data we need? */
-		hr = pDataObject->GetData(&ftc,&stg);
+		pDropHandler = new CDropHandler();
 
-		if(hr == S_OK)
-		{
-			pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
+		pDropHandler->Drop(pDataObject,
+			grfKeyState,pt,pdwEffect,m_hTabCtrl,
+			m_DragType,szDestDirectory,
+			NULL,FALSE);
 
-			if(pdf != NULL)
-			{
-				/* Request a count of the number of files that have been dropped. */
-				nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
-
-				bOnSameDrive = CheckItemLocations((int)tcItem.lParam);
-
-				dwEffect = DetermineCurrentDragEffect(grfKeyState,
-					*pdwEffect,m_bDataAccept,bOnSameDrive);
-
-				switch(dwEffect)
-				{
-				case DROPEFFECT_COPY:
-				case DROPEFFECT_MOVE:
-					{
-						IBufferManager	*pbm = NULL;
-						TCHAR			szFullFileName[MAX_PATH];
-						int				i = 0;
-
-						pbm = new CBufferManager();
-
-						for(i = 0;i < nDroppedFiles;i++)
-						{
-							/* Determine the name of the dropped file. */
-							DragQueryFile((HDROP)pdf,i,szFullFileName,
-								SIZEOF_ARRAY(szFullFileName));
-
-							pbm->WriteListEntry(szFullFileName);
-						}
-
-						SHFILEOPSTRUCT	shfo;
-						TCHAR			*szFileNameList = NULL;
-						DWORD			dwBufferSize;
-
-						pbm->QueryBufferSize(&dwBufferSize);
-
-						if(dwBufferSize > 1)
-						{
-							szFileNameList = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
-
-							if(szFileNameList != NULL)
-							{
-								pbm->QueryBuffer(szFileNameList,dwBufferSize);
-
-								shfo.hwnd	= m_hContainer;
-								shfo.wFunc	= dwEffect == DROPEFFECT_COPY ? FO_COPY : FO_MOVE;
-								shfo.pFrom	= szFileNameList;
-								shfo.pTo	= szDestDirectory;
-								shfo.fFlags	= FOF_RENAMEONCOLLISION;
-								SHFileOperation(&shfo);
-
-								free(szFileNameList);
-							}
-						}
-
-						pbm->Release();
-					}
-					break;
-
-				case DROPEFFECT_LINK:
-					{
-						TCHAR szFullFileName[MAX_PATH];
-						TCHAR	szLink[MAX_PATH];
-						TCHAR	szFileName[MAX_PATH];
-						int i = 0;
-
-						for(i = 0;i < nDroppedFiles;i++)
-						{
-							/* Determine the name of the dropped file. */
-							DragQueryFile((HDROP)pdf,i,szFullFileName,
-								SIZEOF_ARRAY(szFullFileName));
-
-							StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
-							PathStripPath(szFileName);
-							PathRenameExtension(szFileName,_T(".lnk"));
-							StringCchCopy(szLink,SIZEOF_ARRAY(szLink),szDestDirectory);
-							PathAppend(szLink,szFileName);
-
-							CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
-						}
-					}
-					break;
-				}
-			}
-		}
+		delete pDropHandler;
 	}
 
 	return S_OK;

@@ -1374,6 +1374,7 @@ private:
 	IDragSourceHelper *		m_pDragSourceHelper;
 	IDropTargetHelper *		m_pDropTargetHelper;
 	TCHAR					m_pszSource[MAX_PATH];
+	DragTypes_t				m_DragType;
 	BOOL					m_bDataAccept;
 	int						m_iTabDragTab;
 
