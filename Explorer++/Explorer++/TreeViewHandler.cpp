@@ -479,7 +479,7 @@ int CContainer::OnTreeViewEndLabelEdit(LPARAM lParam)
 	return TRUE;
 }
 
-void CContainer::OnTreeViewKeyDown(LPARAM lParam)
+LRESULT CContainer::OnTreeViewKeyDown(LPARAM lParam)
 {
 	NMTVKEYDOWN	*nmtvkd = NULL;
 
@@ -515,6 +515,14 @@ void CContainer::OnTreeViewKeyDown(LPARAM lParam)
 			OnTreeViewCopy(FALSE);
 		break;
 	}
+
+	/* If the ctrl key is down, this key sequence
+	is likely a modifier. Stop any other pressed
+	key from been used in an incremental search. */
+	if(GetKeyState(VK_CONTROL) & 0x80)
+		return 1;
+
+	return 0;
 }
 
 LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd,UINT uMsg,
@@ -567,7 +575,7 @@ LRESULT CALLBACK CContainer::TreeViewHolderWindowNotifyHandler(LPARAM lParam)
 		break;
 
 	case TVN_KEYDOWN:
-		OnTreeViewKeyDown(lParam);
+		return OnTreeViewKeyDown(lParam);
 		break;
 
 	case TVN_BEGINDRAG:

@@ -587,7 +587,7 @@ private:
 	void					OnTreeViewSelChanged(LPARAM lParam);
 	int						OnTreeViewBeginLabelEdit(LPARAM lParam);
 	int						OnTreeViewEndLabelEdit(LPARAM lParam);
-	void					OnTreeViewKeyDown(LPARAM lParam);
+	LRESULT					OnTreeViewKeyDown(LPARAM lParam);
 	void					OnTreeViewCopyItemPath(void);
 	void					OnTreeViewCopy(BOOL bCopy);
 	void					OnTreeViewSetFileAttributes(void);
