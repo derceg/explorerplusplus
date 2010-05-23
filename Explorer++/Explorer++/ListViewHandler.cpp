@@ -440,8 +440,7 @@ void CContainer::OnListViewKeyDown(LPARAM lParam)
 			}
 			else
 			{
-				BrowseFolder(EMPTY_STRING,
-					SBSP_PARENT|SBSP_SAMEBROWSER);
+				OnNavigateUp();
 			}
 			break;
 
@@ -1601,8 +1600,7 @@ void CContainer::OnListViewDoubleClick(NMHDR *nmhdr)
 		{
 			/* The user has clicked in the whitepsace
 			area for this tab, so go up one folder... */
-			BrowseFolder(EMPTY_STRING,
-				SBSP_PARENT|SBSP_SAMEBROWSER);
+			OnNavigateUp();
 		}
 	}
 }

@@ -1830,8 +1830,7 @@ LRESULT CALLBACK CContainer::CommandHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPA
 
 		case IDM_GO_UPONELEVEL:
 		case TOOLBAR_UP:
-			BrowseFolder(EMPTY_STRING,
-			SBSP_PARENT|SBSP_SAMEBROWSER);
+			OnNavigateUp();
 			break;
 
 		case IDM_GO_MYCOMPUTER:

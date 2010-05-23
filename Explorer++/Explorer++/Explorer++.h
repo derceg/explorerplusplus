@@ -550,6 +550,7 @@ private:
 	void					OnSortBy(UINT uSortMode);
 	void					OnGroupBy(UINT uSortMode);
 	void					OnHome(void);
+	void					OnNavigateUp(void);
 	void					OnSelectTab(int iTab);
 
 	/* ListView private message handlers. */
