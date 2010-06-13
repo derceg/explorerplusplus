@@ -93,6 +93,34 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			return OnListViewLButtonDown(wParam,lParam);
 			break;
 
+		case WM_LBUTTONDBLCLK:
+			{
+				LV_HITTESTINFO	ht;
+				DWORD			dwPos;
+				POINT			MousePos;
+
+				dwPos = GetMessagePos();
+				MousePos.x = GET_X_LPARAM(dwPos);
+				MousePos.y = GET_Y_LPARAM(dwPos);
+				ScreenToClient(m_hActiveListView,&MousePos);
+
+				ht.pt = MousePos;
+				ListView_HitTest(ListView,&ht);
+
+				/* NM_DBLCLK for the listview is sent both on double clicks
+				(by default), as well as in the situation when LVS_EX_ONECLICKACTIVATE
+				is active (in which case it is sent on a single mouse click).
+				Therefore, because we only want to navigate up one folder on
+				a DOUBLE click, we'll handle the event here. */
+				if(ht.flags == LVHT_NOWHERE)
+				{
+					/* The user has double clicked in the whitepsace
+					area for this tab, so go up one folder... */
+					OnNavigateUp();
+				}
+			}
+			break;
+
 		case WM_RBUTTONDOWN:
 			if((wParam & MK_RBUTTON) && !(wParam & MK_LBUTTON)
 				&& !(wParam & MK_MBUTTON))
@@ -1595,12 +1623,6 @@ void CContainer::OnListViewDoubleClick(NMHDR *nmhdr)
 			{
 				OpenListViewItem(ht.iItem,FALSE,FALSE);
 			}
-		}
-		else
-		{
-			/* The user has clicked in the whitepsace
-			area for this tab, so go up one folder... */
-			OnNavigateUp();
 		}
 	}
 }
