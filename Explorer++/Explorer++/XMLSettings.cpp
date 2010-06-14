@@ -92,6 +92,8 @@ will need to be changed correspondingly. */
 #define HASH_DISABLEFOLDERSIZENETWORKREMOVABLE	2610679594
 #define HASH_ALWAYSSHOWTABBAR		148004675
 #define HASH_CHECKBOXSELECTION		456677010
+#define HASH_FORCESIZE				1918861263
+#define HASH_SIZEDISPLAYFOMRAT		3548127263
 
 typedef struct
 {
@@ -293,8 +295,6 @@ MSXML2::IXMLDOMElement *pRoot)
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysOpenInNewTab"),EncodeBoolValue(m_bAlwaysOpenNewTab));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowSizesInBytes"),EncodeBoolValue(m_bShowSizesInBytesGlobal));
-	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowTabBar"),EncodeBoolValue(m_bAlwaysShowTabBar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AutoArrangeGlobal"),EncodeBoolValue(m_bAutoArrangeGlobal));
@@ -359,25 +359,20 @@ MSXML2::IXMLDOMElement *pRoot)
 
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DoubleClickTabClose"),EncodeBoolValue(m_bDoubleClickTabClose));
-
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ExtendTabControl"),EncodeBoolValue(m_bExtendTabControl));
-
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ForceSameTabWidth"),EncodeBoolValue(m_bForceSameTabWidth));
-
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ForceSize"),EncodeBoolValue(m_bForceSize));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HandleZipFiles"),EncodeBoolValue(m_bHandleZipFiles));
-
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideLinkExtensionGlobal"),EncodeBoolValue(m_bHideLinkExtensionGlobal));
-
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideSystemFilesGlobal"),EncodeBoolValue(m_bHideSystemFilesGlobal));
-
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InfoTipType"),EncodeIntValue(m_InfoTipType));
-
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InsertSorted"),EncodeBoolValue(m_bInsertSorted));
 
@@ -440,6 +435,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowToolbar"),EncodeBoolValue(m_bShowMainToolbar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowUserNameTitleBar"),EncodeBoolValue(m_bShowUserNameInTitleBar));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SizeDisplayFormat"),EncodeIntValue(m_SizeDisplayFormat));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SortAscendingGlobal"),EncodeBoolValue(m_bSortAscendingGlobal));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -2569,10 +2566,6 @@ WCHAR *wszName,WCHAR *wszValue)
 		m_bAlwaysOpenNewTab = DecodeBoolValue(wszValue);
 		break;
 
-	case HASH_ALWAYSSHOWSIZESINBYTES:
-		m_bShowSizesInBytesGlobal = DecodeBoolValue(wszValue);
-		break;
-
 	case HASH_ALWAYSSHOWTABBAR:
 		m_bAlwaysShowTabBar = DecodeBoolValue(wszValue);
 		break;
@@ -2624,6 +2617,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_FORCESAMETABWIDTH:
 		m_bForceSameTabWidth = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_FORCESIZE:
+		m_bForceSize = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_HANDLEZIPFILES:
@@ -2741,6 +2738,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_SHOWUSERNAMETITLEBAR:
 		m_bShowUserNameInTitleBar = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_SIZEDISPLAYFOMRAT:
+		m_SizeDisplayFormat = (SizeDisplayFormat_t)DecodeIntValue(wszValue);
 		break;
 
 	case HASH_SORTASCENDINGGLOBAL:

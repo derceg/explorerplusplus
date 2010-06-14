@@ -170,7 +170,6 @@ int *pTabObjectIndex)
 		is.bApplyFilter			= FALSE;
 		is.bShowFolderSizes		= m_bShowFolderSizes;
 		is.bDisableFolderSizesNetworkRemovable = m_bDisableFolderSizesNetworkRemovable;
-		is.bShowSizeInBytes		= m_bShowSizesInBytesGlobal;
 		is.bHideSystemFiles		= m_bHideSystemFilesGlobal;
 		is.bHideLinkExtension	= m_bHideLinkExtensionGlobal;
 
@@ -187,7 +186,8 @@ int *pTabObjectIndex)
 		pSettings = &is;
 	}
 
-	pSettings->bShowSizeInBytes = m_bShowSizesInBytesGlobal;
+	pSettings->bForceSize	= m_bForceSize;
+	pSettings->sdf			= m_SizeDisplayFormat;
 
 	InitializeFolderView(m_hContainer,m_hListView[iTabId],
 	&m_pFolderView[iTabId],pSettings,m_hIconThread,m_hFolderSizeThread);
@@ -217,7 +217,6 @@ int *pTabObjectIndex)
 	m_pShellBrowser[iTabId]->SetShowExtensions(m_bShowExtensionsGlobal);
 	m_pShellBrowser[iTabId]->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
 	m_pShellBrowser[iTabId]->SetShowFolderSizes(m_bShowFolderSizes);
-	m_pShellBrowser[iTabId]->SetShowInBytes(m_bShowSizesInBytesGlobal);
 	m_pShellBrowser[iTabId]->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
 	m_pShellBrowser[iTabId]->SetInsertSorted(m_bInsertSorted);
 

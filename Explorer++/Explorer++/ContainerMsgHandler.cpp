@@ -1733,6 +1733,8 @@ HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
 	{
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE);
+
 		hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
 
 		if(SUCCEEDED(hr))
@@ -1777,6 +1779,8 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 		{
 			if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
 			{
+				PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE);
+
 				hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
 			}
 

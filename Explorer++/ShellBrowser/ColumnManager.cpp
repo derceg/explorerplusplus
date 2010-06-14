@@ -25,7 +25,6 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Buffer.h"
 #include "../Helper/FolderSize.h"
-#include "resource.h"
 
 
 using namespace std;
@@ -143,7 +142,7 @@ void CFolderView::SetColumnData(unsigned int ColumnId,int iItem,int iColumnIndex
 			SetImageColumnData(m_hListView,iItem,iColumnIndex,PropertyTagEquipModel);
 			break;
 		case CM_DATETAKEN:
-			SetImageColumnData(m_hListView,iItem,iColumnIndex,PropertyTagDateTime);
+			SetImageColumnData(m_hListView,iItem,iColumnIndex,PropertyTagExifDTOrig);
 			break;
 		case CM_WIDTH:
 			SetImageColumnData(m_hListView,iItem,iColumnIndex,PropertyTagImageWidth);
@@ -488,7 +487,7 @@ int CFolderView::SetAllFolderSizeColumnData(void)
 				{
 					TCHAR			FullItemPath[MAX_PATH];
 					TCHAR			lpszFileSize[32];
-					LARGE_INTEGER	lTotalFolderSize;
+					ULARGE_INTEGER	lTotalFolderSize;
 					int				nFolders;
 					int				nFiles;
 
@@ -518,9 +517,8 @@ int CFolderView::SetAllFolderSizeColumnData(void)
 							m_pwfdFiles[(int)lvItem.lParam].nFileSizeHigh = lTotalFolderSize.HighPart;
 							m_pExtraItemInfo[(int)lvItem.lParam].bFolderSizeRetrieved = TRUE;
 
-							FormatSizeString(lTotalFolderSize.LowPart,lTotalFolderSize.HighPart,
-								lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
-								m_bShowSizeInBytes);
+							FormatSizeString(lTotalFolderSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
+								m_bForceSize,m_SizeDisplayFormat);
 
 							ListView_SetItemText(m_hListView,iItem,iColumnIndex,lpszFileSize);
 						}
@@ -585,7 +583,7 @@ int CFolderView::SetSizeColumnData(HWND hListView,int iItem,int iColumn)
 			lFileSize.HighPart = m_pwfdFiles[(int)lvItem.lParam].nFileSizeHigh;
 
 			FormatSizeString(lFileSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
-				m_bShowSizeInBytes);
+				m_bForceSize,m_SizeDisplayFormat);
 
 			ListView_SetItemText(hListView,iItem,iColumn,lpszFileSize);
 		}
@@ -597,6 +595,7 @@ int CFolderView::SetSizeColumnData(HWND hListView,int iItem,int iColumn)
 int CFolderView::SetRealSizeColumnData(HWND hListView,int iItem,int iColumn)
 {
 	LVITEM File;
+	ULARGE_INTEGER lRealFileSize;
 	DWORD ClusterSize;
 	DWORD RealFileSize;
 	TCHAR Root[MAX_PATH];
@@ -627,10 +626,11 @@ int CFolderView::SetRealSizeColumnData(HWND hListView,int iItem,int iColumn)
 			if(RealFileSize != 0 && (RealFileSize % ClusterSize) != 0)
 				RealFileSize += ClusterSize - (RealFileSize % ClusterSize);
 
-			FormatSizeString(RealFileSize,
-				m_pwfdFiles[(int)File.lParam].nFileSizeHigh,
-				lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
-				m_bShowSizeInBytes);
+			lRealFileSize.LowPart = RealFileSize;
+			lRealFileSize.HighPart = m_pwfdFiles[(int)File.lParam].nFileSizeHigh;
+
+			FormatSizeString(lRealFileSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
+				m_bForceSize,m_SizeDisplayFormat);
 		}
 
 		ListView_SetItemText(hListView,iItem,iColumn,lpszFileSize);
@@ -720,12 +720,12 @@ void CFolderView::SetTotalSizeColumnData(int iItem,int iColumn,BOOL bTotalSize)
 				if(bTotalSize)
 				{
 					FormatSizeString(nTotalBytes,szSizeBuf,
-						SIZEOF_ARRAY(szSizeBuf),m_bShowSizeInBytes);
+						SIZEOF_ARRAY(szSizeBuf),m_bForceSize,m_SizeDisplayFormat);
 				}
 				else
 				{
 					FormatSizeString(nFreeBytes,szSizeBuf,
-						SIZEOF_ARRAY(szSizeBuf),m_bShowSizeInBytes);
+						SIZEOF_ARRAY(szSizeBuf),m_bForceSize,m_SizeDisplayFormat);
 				}
 			}
 			else
@@ -1347,7 +1347,8 @@ void CFolderView::SetNetworkAdapterStatusColumnData(int iItem,int iColumn)
 
 	GetAdaptersAddresses(AF_UNSPEC,0,NULL,pAdapterAddresses,&ulOutBufLen);
 
-	switch(pAdapterAddresses->OperStatus)
+	/* TODO: These strings need to be setup correctly. */
+	/*switch(pAdapterAddresses->OperStatus)
 	{
 		case IfOperStatusUp:
 			uStatusID = IDS_NETWORKADAPTER_CONNECTED;
@@ -1376,7 +1377,7 @@ void CFolderView::SetNetworkAdapterStatusColumnData(int iItem,int iColumn)
 		case IfOperStatusLowerLayerDown:
 			uStatusID = IDS_NETWORKADAPTER_LOWLAYER;
 			break;
-	}
+	}*/
 
 	free(pAdapterAddresses);
 

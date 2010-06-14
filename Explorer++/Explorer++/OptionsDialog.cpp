@@ -460,6 +460,9 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 	{
 		case WM_INITDIALOG:
 			{
+				HWND hCBSize;
+				int i = 0;
+
 				if(m_bHideSystemFilesGlobal)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SYSTEMFILES,BST_CHECKED);
 				if(!m_bShowExtensionsGlobal)
@@ -474,8 +477,8 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES,BST_CHECKED);
 				if(m_bDisableFolderSizesNetworkRemovable)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,BST_CHECKED);
-				if(m_bShowSizesInBytesGlobal)
-					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SIZEBYTES,BST_CHECKED);
+				if(m_bForceSize)
+					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FORCESIZE,BST_CHECKED);
 				if(m_bHandleZipFiles)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_ZIPFILES,BST_CHECKED);
 				if(m_bShowFriendlyDatesGlobal)
@@ -487,6 +490,19 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					CheckDlgButton(hDlg,IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,BST_CHECKED);
 				else
 					CheckDlgButton(hDlg,IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,BST_CHECKED);
+
+				hCBSize = GetDlgItem(hDlg,IDC_COMBO_FILESIZES);
+
+				for(i = 0;i < SIZEOF_ARRAY(g_FileSizes);i++)
+				{
+					SendMessage(hCBSize,CB_ADDSTRING,0,(LPARAM)g_FileSizes[i].szDisplayName);
+					SendMessage(hCBSize,CB_SETITEMDATA,i,g_FileSizes[i].sdf);
+
+					if(g_FileSizes[i].sdf == m_SizeDisplayFormat)
+						SendMessage(hCBSize,CB_SETCURSEL,i,0);
+				}
+
+				EnableWindow(hCBSize,m_bForceSize);
 
 				SetInfoTipWindowStates(hDlg);
 				SetFolderSizeWindowState(hDlg);
@@ -502,9 +518,13 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 			case IDC_SETTINGS_CHECK_INSERTSORTED:
 			case IDC_SETTINGS_CHECK_SINGLECLICK:
 			case IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE:
-			case IDC_SETTINGS_CHECK_SIZEBYTES:
 			case IDC_SETTINGS_CHECK_ZIPFILES:
 			case IDC_SETTINGS_CHECK_FRIENDLYDATES:
+				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+				break;
+
+			case IDC_SETTINGS_CHECK_FORCESIZE:
+				EnableWindow(GetDlgItem(hDlg,IDC_COMBO_FILESIZES),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
 				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
 				break;
 
@@ -535,7 +555,9 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 				{
 				case PSN_APPLY:
 					{
+						HWND hCBSize;
 						TCITEM tcItem;
+						int iSel;
 						int nTabs;
 						int i = 0;
 
@@ -560,7 +582,7 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 						m_bDisableFolderSizesNetworkRemovable = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE)
 							== BST_CHECKED);
 
-						m_bShowSizesInBytesGlobal = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SIZEBYTES)
+						m_bForceSize = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FORCESIZE)
 							== BST_CHECKED);
 
 						m_bHandleZipFiles = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_ZIPFILES)
@@ -577,6 +599,11 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 						else
 							m_InfoTipType = INFOTIP_CUSTOM;
 
+						hCBSize = GetDlgItem(hDlg,IDC_COMBO_FILESIZES);
+
+						iSel = SendMessage(hCBSize,CB_GETCURSEL,0,0);
+						m_SizeDisplayFormat = (SizeDisplayFormat_t)SendMessage(hCBSize,CB_GETITEMDATA,iSel,0);
+
 						nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
 						/* Now, push each of the required settings to the
@@ -592,9 +619,10 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							m_pShellBrowser[(int)tcItem.lParam]->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
 							m_pShellBrowser[(int)tcItem.lParam]->SetShowFolderSizes(m_bShowFolderSizes);
 							m_pShellBrowser[(int)tcItem.lParam]->SetDisableFolderSizesNetworkRemovable(m_bDisableFolderSizesNetworkRemovable);
-							m_pShellBrowser[(int)tcItem.lParam]->SetShowInBytes(m_bShowSizesInBytesGlobal);
 							m_pShellBrowser[(int)tcItem.lParam]->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
 							m_pShellBrowser[(int)tcItem.lParam]->SetInsertSorted(m_bInsertSorted);
+							m_pShellBrowser[(int)tcItem.lParam]->SetForceSize(m_bForceSize);
+							m_pShellBrowser[(int)tcItem.lParam]->SetSizeDisplayFormat(m_SizeDisplayFormat);
 
 							RefreshTab((int)tcItem.lParam);
 

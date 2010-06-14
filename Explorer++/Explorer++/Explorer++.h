@@ -230,7 +230,6 @@ public:
 	INT_PTR CALLBACK	SetFileAttributesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	WildcardSelectProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	PhysicalDrivePropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SplitFileProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	MergeFilesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DestroyFilesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -244,7 +243,7 @@ public:
 	INT_PTR CALLBACK	DWChangeDetailsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DWLinePropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 
-	void				FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PLARGE_INTEGER lTotalFolderSize);
+	void				FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
 
 	/* Directory modification. */
 	static void			DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,void *pData);
@@ -989,12 +988,6 @@ private:
 	void					SetInfoTipWindowStates(HWND hDlg);
 	void					SetFolderSizeWindowState(HWND hDlg);
 
-	/* Drive properties dialog. */
-	void					OnDrivePropertiesInit(HWND hDlg);
-	void					OnDrivePropertiesSave(HWND hDlg);
-	void					FlushDriveInfoToRichEdit(HWND hRichEdit,TCHAR *lpszDrive);
-	void					DrivePropertiesSaveState(HWND hDlg);
-
 	/* Split file dialog. */
 	void					OnSplitFileInit(HWND hDlg);
 	void					OnSplitFileOk(HWND hDlg);
@@ -1254,6 +1247,8 @@ private:
 	BOOL					m_bInsertSorted;
 	BOOL					m_bOverwriteExistingFilesConfirmation;
 	BOOL					m_bCheckBoxSelection;
+	BOOL					m_bForceSize;
+	SizeDisplayFormat_t		m_SizeDisplayFormat;
 	UINT					m_StartupMode;
 	UINT					m_ReplaceExplorerMode;
 
@@ -1268,7 +1263,6 @@ private:
 	BOOL					m_bShowInGroupsGlobal;
 	BOOL					m_bAutoArrangeGlobal;
 	BOOL					m_bSortAscendingGlobal;
-	BOOL					m_bShowSizesInBytesGlobal;
 	BOOL					m_bShowFriendlyDatesGlobal;
 	BOOL					m_bShowGridlinesGlobal;
 	BOOL					m_bHideSystemFilesGlobal;

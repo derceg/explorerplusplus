@@ -18,15 +18,15 @@
 using namespace std;
 
 HRESULT CalculateFolderSize(TCHAR *szPath,int *nFolders,
-int *nFiles,PLARGE_INTEGER lTotalFolderSize)
+int *nFiles,PULARGE_INTEGER lTotalFolderSize)
 {
 	HANDLE			hFirstFile;
 	WIN32_FIND_DATA	wfd;
 	TCHAR			InitialPath[MAX_PATH + 2];
 	TCHAR			TempPath[MAX_PATH + 2];
-	LARGE_INTEGER	l_TotalFolderSize;
-	LARGE_INTEGER	r_TotalFolderSize;
-	LARGE_INTEGER	lFileSize;
+	ULARGE_INTEGER	l_TotalFolderSize;
+	ULARGE_INTEGER	r_TotalFolderSize;
+	ULARGE_INTEGER	lFileSize;
 	BOOL			bTerminated = FALSE;
 	int				l_NumFiles = 0;
 	int				l_NumFolders = 0;
@@ -104,7 +104,7 @@ DWORD WINAPI Thread_CalculateFolderSize(LPVOID lpParameter)
 	FolderSize_t	*pFolderSize = NULL;
 	static int		nFiles;
 	static int		nFolders;
-	LARGE_INTEGER	lTotalDirSize;
+	ULARGE_INTEGER	lTotalDirSize;
 	HRESULT			hr;
 
 	if(lpParameter == NULL)

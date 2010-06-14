@@ -21,7 +21,6 @@
 #include "../Helper/Helper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
-#include "resource.h"
 
 
 BOOL RemoveFromThumbnailsFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent);

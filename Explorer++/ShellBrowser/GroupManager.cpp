@@ -17,7 +17,6 @@
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
-#include "resource.h"
 
 
 #define GROUP_BY_DATECREATED	0
@@ -862,7 +861,8 @@ void CFolderView::DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHea
 
 	GetAdaptersAddresses(AF_UNSPEC,0,NULL,pAdapterAddresses,&ulOutBufLen);
 
-	switch(pAdapterAddresses->OperStatus)
+	/* TODO: These strings need to be setup correctly. */
+	/*switch(pAdapterAddresses->OperStatus)
 	{
 		case IfOperStatusUp:
 			uStatusID = IDS_NETWORKADAPTER_CONNECTED;
@@ -891,7 +891,7 @@ void CFolderView::DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHea
 		case IfOperStatusLowerLayerDown:
 			uStatusID = IDS_NETWORKADAPTER_LOWLAYER;
 			break;
-	}
+	}*/
 
 	LoadString(m_hResourceModule,uStatusID,
 		szStatus,SIZEOF_ARRAY(szStatus));

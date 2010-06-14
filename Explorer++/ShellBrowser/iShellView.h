@@ -63,20 +63,21 @@ typedef struct
 
 typedef struct
 {
-	UINT SortMode;
-	UINT ViewMode;
-	BOOL bSortAscending;
-	BOOL bShowInGroups;
-	BOOL bShowHidden;
-	BOOL bAutoArrange;
-	BOOL bGridlinesActive;
-	BOOL bApplyFilter;
-	BOOL bShowFolderSizes;
-	BOOL bDisableFolderSizesNetworkRemovable;
-	BOOL bShowSizeInBytes;
-	BOOL bHideSystemFiles;
-	BOOL bHideLinkExtension;
-	TCHAR szFilter[512];
+	UINT	SortMode;
+	UINT	ViewMode;
+	BOOL	bSortAscending;
+	BOOL	bShowInGroups;
+	BOOL	bShowHidden;
+	BOOL	bAutoArrange;
+	BOOL	bGridlinesActive;
+	BOOL	bApplyFilter;
+	BOOL	bShowFolderSizes;
+	BOOL	bDisableFolderSizesNetworkRemovable;
+	BOOL	bHideSystemFiles;
+	BOOL	bHideLinkExtension;
+	BOOL	bForceSize;
+	SizeDisplayFormat_t	sdf;
+	TCHAR	szFilter[512];
 
 	/* Initial columns. */
 	list<Column_t>	*pRealFolderColumnList;
@@ -366,8 +367,6 @@ __interface IShellBrowser2 : IUnknown
 	virtual void			QueueRename(LPITEMIDLIST pidlItem);
 	virtual void			RefreshAllIcons(void);
 	virtual void			OnDeviceChange(WPARAM wParam,LPARAM lParam);
-	virtual void			SetShowInBytes(BOOL bShowSizeInBytes);
-	virtual BOOL			GetShowInBytes(void);
 	virtual void			SetHideSystemFiles(BOOL bHideSystemFiles);
 	virtual BOOL			GetHideSystemFiles(void);
 	virtual void			SetShowExtensions(BOOL bShowExtensions);
@@ -381,6 +380,8 @@ __interface IShellBrowser2 : IUnknown
 	virtual BOOL			GetShowFriendlyDates(void);
 	virtual void			SetInsertSorted(BOOL bInsertSorted);
 	virtual BOOL			GetInsertSorted(void);
+	virtual void			SetForceSize(BOOL bForceSize);
+	virtual void			SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
 };
 
 __interface IShellFolder3 : IUnknown

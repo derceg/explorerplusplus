@@ -377,10 +377,16 @@ typedef struct
 
 typedef struct
 {
-	LARGE_INTEGER	liFolderSize;
+	ULARGE_INTEGER	liFolderSize;
 	int				uId;
 	int				iTabId;
 } DWFolderSizeCompletion_t;
+
+typedef struct
+{
+	SizeDisplayFormat_t	sdf;
+	TCHAR				szDisplayName[64];
+} FileSize_t;
 
 typedef enum
 {
@@ -591,6 +597,14 @@ static unsigned int g_RecycleBinHeaderList[] =
 {CM_NAME,CM_ORIGINALLOCATION,CM_DATEDELETED,
 CM_SIZE,CM_TYPE,CM_DATEMODIFIED};
 
+const FileSize_t g_FileSizes[] =
+{{FORMAT_BYTES,_T("Bytes")},
+{FORMAT_KBYTES,_T("KB")},
+{FORMAT_MBYTES,_T("MB")},
+{FORMAT_GBYTES,_T("GB")},
+{FORMAT_TBYTES,_T("TB")},
+{FORMAT_PBYTES,_T("PB")}};
+
 extern CRITICAL_SECTION g_csDirMonCallback;
 extern BOOL g_bConfigFileFound;
 extern BOOL g_bForceLanguageLoad;
@@ -642,7 +656,6 @@ LRESULT CALLBACK DrivesToolbarSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPA
 LRESULT CALLBACK EditSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 LRESULT CALLBACK TabBackingProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 INT_PTR CALLBACK FilterProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK PhysicalDrivePropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK DestroyFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK ApplicationButtonPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK ApplicationToolbarNewButtonProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -686,7 +699,7 @@ LRESULT CALLBACK	TabSubclassProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lP
 
 /* Paste file callback (will select pasted files). */
 void				PasteFilesCallback(void *pData,list<PastedFile_t> *pPastedFileList);
-void				FolderSizeCallbackStub(int nFolders,int nFiles,PLARGE_INTEGER lTotalFolderSize,LPVOID pData);
+void				FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
 
 /* Treeview window procedure stub. */
 LRESULT CALLBACK	TreeViewSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);

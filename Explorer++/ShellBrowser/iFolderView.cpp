@@ -20,7 +20,6 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Registry.h"
-#include "resource.h"
 
 
 BOOL g_bInitialized = FALSE;
@@ -504,9 +503,10 @@ void CFolderView::SetUserOptions(InitialSettings_t *is)
 	m_bApplyFilter			= is->bApplyFilter;
 	m_bShowFolderSizes		= is->bShowFolderSizes;
 	m_bDisableFolderSizesNetworkRemovable = is->bDisableFolderSizesNetworkRemovable;
-	m_bShowSizeInBytes		= is->bShowSizeInBytes;
 	m_bHideSystemFiles		= is->bHideSystemFiles;
 	m_bHideLinkExtension	= is->bHideLinkExtension;
+	m_bForceSize			= is->bForceSize;
+	m_SizeDisplayFormat		= is->sdf;
 
 	StringCchCopy(m_szFilter,SIZEOF_ARRAY(m_szFilter),is->szFilter);
 
@@ -613,16 +613,6 @@ HRESULT CFolderView::Refresh()
 	return S_OK;
 }
 
-void CFolderView::SetShowInBytes(BOOL bShowSizeInBytes)
-{
-	m_bShowSizeInBytes = bShowSizeInBytes;
-}
-
-BOOL CFolderView::GetShowInBytes(void)
-{
-	return m_bShowSizeInBytes;
-}
-
 void CFolderView::SetHideSystemFiles(BOOL bHideSystemFiles)
 {
 	m_bHideSystemFiles = bHideSystemFiles;
@@ -686,6 +676,16 @@ void CFolderView::SetInsertSorted(BOOL bInsertSorted)
 BOOL CFolderView::GetInsertSorted(void)
 {
 	return m_bInsertSorted;
+}
+
+void CFolderView::SetForceSize(BOOL bForceSize)
+{
+	m_bForceSize = bForceSize;
+}
+
+void CFolderView::SetSizeDisplayFormat(SizeDisplayFormat_t sdf)
+{
+	m_SizeDisplayFormat = sdf;
 }
 
 void CFolderView::InsertTileViewColumns(void)
@@ -776,7 +776,7 @@ void CFolderView::SetTileViewItemInfo(int iItem,int iItemInternal)
 		lFileSize.HighPart = m_pwfdFiles[iItemInternal].nFileSizeHigh;
 
 		FormatSizeString(lFileSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
-			m_bShowSizeInBytes);
+			m_bForceSize,m_SizeDisplayFormat);
 
 		ListView_SetItemText(m_hListView,iItem,2,lpszFileSize);
 	}

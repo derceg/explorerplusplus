@@ -578,8 +578,6 @@ private:
 	void				ApplyHeaderSortArrow(void);
 	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName);
 	void				CopyColumnsInternal(list<Column_t> *pInternalColumns,list<Column_t> *pColumns);
-	void				SetShowInBytes(BOOL bShowSizeInBytes);
-	BOOL				GetShowInBytes(void);
 	void				SetHideSystemFiles(BOOL bHideSystemFiles);
 	BOOL				GetHideSystemFiles(void);
 	void				SetShowExtensions(BOOL bShowExtensions);
@@ -593,6 +591,8 @@ private:
 	BOOL				GetShowFriendlyDates(void);
 	void				SetInsertSorted(BOOL bInsertSorted);
 	BOOL				GetInsertSorted(void);
+	void				SetForceSize(BOOL bForceSize);
+	void				SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
 
 
 
@@ -643,7 +643,8 @@ private:
 	BOOL				m_bShowFolderSizes;
 	BOOL				m_bDisableFolderSizesNetworkRemovable;
 	BOOL				m_bViewSet;
-	BOOL				m_bShowSizeInBytes;
+	BOOL				m_bForceSize;
+	SizeDisplayFormat_t	m_SizeDisplayFormat;
 	int					m_nTotalItems;
 	int					m_PreviousNumSelected;
 	int					m_NumFilesSelected;

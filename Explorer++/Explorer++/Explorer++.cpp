@@ -334,6 +334,8 @@ void CContainer::SetDefaultValues(void)
 	m_bInsertSorted					= TRUE;
 	m_bOverwriteExistingFilesConfirmation	= TRUE;
 	m_bCheckBoxSelection			= FALSE;
+	m_bForceSize					= FALSE;
+	m_SizeDisplayFormat				= FORMAT_BYTES;
 
 	/* Infotips (user options). */
 	m_bShowInfoTips					= TRUE;
@@ -363,7 +365,6 @@ void CContainer::SetDefaultValues(void)
 	m_bAutoArrangeGlobal			= TRUE;
 	m_bSortAscendingGlobal			= TRUE;
 	m_bShowGridlinesGlobal			= TRUE;
-	m_bShowSizesInBytesGlobal	= FALSE;
 	m_bShowFriendlyDatesGlobal		= TRUE;
 	m_bHideSystemFilesGlobal		= FALSE;
 	m_bHideLinkExtensionGlobal		= FALSE;
@@ -879,8 +880,8 @@ LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LP
 
 				if(bValid)
 				{
-					FormatSizeString(pDWFolderSizeCompletion->liFolderSize.LowPart,pDWFolderSizeCompletion->liFolderSize.HighPart,
-						szFolderSize,SIZEOF_ARRAY(szFolderSize),m_bShowSizesInBytesGlobal);
+					FormatSizeString(pDWFolderSizeCompletion->liFolderSize,szFolderSize,
+						SIZEOF_ARRAY(szFolderSize),m_bForceSize,m_SizeDisplayFormat);
 
 					LoadString(g_hLanguageModule,IDS_GENERAL_TOTALSIZE,
 						szTotalSize,SIZEOF_ARRAY(szTotalSize));

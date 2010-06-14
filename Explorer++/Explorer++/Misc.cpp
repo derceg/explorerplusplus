@@ -1084,7 +1084,7 @@ HRESULT CContainer::HandleStatusText(void)
 		{
 			/* No items(files or folders) selected. */
 			FormatSizeString(FolderInfo.TotalFolderSize,lpszSizeBuffer,
-				SIZEOF_ARRAY(lpszSizeBuffer),m_bShowSizesInBytesGlobal);
+				SIZEOF_ARRAY(lpszSizeBuffer),m_bForceSize,m_SizeDisplayFormat);
 		}
 		else
 		{
@@ -1098,7 +1098,7 @@ HRESULT CContainer::HandleStatusText(void)
 				/* Mixture of files and folders selected. Show size of currently
 				selected files. */
 				FormatSizeString(FolderInfo.TotalSelectionSize,lpszSizeBuffer,
-					SIZEOF_ARRAY(lpszSizeBuffer),m_bShowSizesInBytesGlobal);
+					SIZEOF_ARRAY(lpszSizeBuffer),m_bForceSize,m_SizeDisplayFormat);
 			}
 		}
 	}
@@ -1230,7 +1230,7 @@ void CContainer::HandleFileSelectionDisplayZero(void)
 
 		lTotalPhysicalMem.QuadPart = msex.ullTotalPhys;
 		FormatSizeString(lTotalPhysicalMem,szTemp,
-			SIZEOF_ARRAY(szTemp),FALSE,TRUE);
+			SIZEOF_ARRAY(szTemp),TRUE);
 		StringCchPrintf(szDisplay,SIZEOF_ARRAY(szDisplay),
 			_T("Memory: %s"),szTemp);
 		DisplayWindow_BufferText(m_hDisplayWindow,szDisplay);
@@ -1775,7 +1775,7 @@ void CContainer::HandleFileSelectionDisplayMore(void)
 		m_pActiveShellBrowser->QueryFolderInfo(&FolderInfo);
 
 		FormatSizeString(FolderInfo.TotalSelectionSize,szTotalSizeFragment,
-			SIZEOF_ARRAY(szTotalSizeFragment),m_bShowSizesInBytesGlobal);
+			SIZEOF_ARRAY(szTotalSizeFragment),m_bForceSize,m_SizeDisplayFormat);
 
 		LoadString(g_hLanguageModule,IDS_GENERAL_TOTALFILESIZE,
 		szTotalSizeString,SIZEOF_ARRAY(szTotalSizeString));
@@ -1787,7 +1787,7 @@ void CContainer::HandleFileSelectionDisplayMore(void)
 	DisplayWindow_BufferText(m_hDisplayWindow,szTotalSize);
 }
 
-void FolderSizeCallbackStub(int nFolders,int nFiles,PLARGE_INTEGER lTotalFolderSize,LPVOID pData)
+void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData)
 {
 	FolderSizeExtraInfo_t *pfsei = NULL;
 
@@ -1799,7 +1799,7 @@ void FolderSizeCallbackStub(int nFolders,int nFiles,PLARGE_INTEGER lTotalFolderS
 }
 
 void CContainer::FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,
-int nFolders,int nFiles,PLARGE_INTEGER lTotalFolderSize)
+int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 {
 	DWFolderSizeCompletion_t *pDWFolderSizeCompletion = NULL;
 
@@ -1823,7 +1823,6 @@ void CContainer::PushGlobalSettingsToTab(int iTabId)
 	/* These settings are global to the whole program. */
 	gs.bShowExtensions		= m_bShowExtensionsGlobal;
 	gs.bShowFriendlyDates	= m_bShowFriendlyDatesGlobal;
-	gs.bShowSizesInBytes	= m_bShowSizesInBytesGlobal;
 	gs.bShowFolderSizes		= m_bShowFolderSizes;
 
 	m_pShellBrowser[iTabId]->SetGlobalSettings(&gs);

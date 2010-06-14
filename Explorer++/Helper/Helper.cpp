@@ -45,123 +45,87 @@ int TraverseSelectedItems(HWND hListView,int (*TraverseFunction)(TCHAR *))
 	return NumberOfItemsSelected;
 }
 
-size_t FormatSizeString(DWORD FileSizeLow,DWORD FileSizeHigh,
-TCHAR *FileSizeBuffer,int BufferSize,BOOL bShowSizeInBytes)
+size_t FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
+size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf)
 {
-	TCHAR FileSizes[32];
-	TCHAR szSizeBuf[32];
-	TCHAR *SizeTypes[]		= {_T("bytes"),_T("KB"),_T("MB"),_T("GB"),_T("TB")};
-	double Byte				= 1.0;
-	double KB				= 1024.0 * Byte;
-	int POINT_CUTOFF		= 100;
-	int i					= 0;
-	double TotalFileSize;
+	if(bForceSize)
+		return FormatSizeString(lFileSize,pszFileSize,cchBuf,sdf);
 
-	/* Low stores up to 4GB, high stores from 4GB to 16*(6*1024) bytes. */
+	return FormatSizeString(lFileSize,pszFileSize,cchBuf);
+}
 
-	TotalFileSize = (float)FileSizeLow + ((float)FileSizeHigh * pow(2.0,32.0));
+size_t FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
+size_t cchBuf,SizeDisplayFormat_t sdf)
+{
+	TCHAR *pszSizeTypes[] = {_T("bytes"),_T("KB"),_T("MB"),_T("GB"),_T("TB"),_T("PB")};
+	double fFileSize;
+	int iSizeIndex = 0;
+	int i = 0;
 
-	if(TotalFileSize == -1)
+	switch(sdf)
 	{
-		/* File size is invalid. Return a blank string. */
-		StringCchPrintf(FileSizes,SIZEOF_ARRAY(FileSizes),EMPTY_STRING);
+	case FORMAT_BYTES:
+		StringCchPrintf(pszFileSize,cchBuf,
+			_T("%I64d %s"),lFileSize.QuadPart,pszSizeTypes[0]);
 
-		if(BufferSize >= 1)
-		{
-			StringCchCopy(FileSizeBuffer,BufferSize,FileSizes);
-		}
-		else
-		{
-			FileSizeBuffer = NULL;
-		}
-
-		/* Return the number of characters copied. */
-		return lstrlen(FileSizes);
-	}
-
-	if(bShowSizeInBytes)
-	{
-		StringCchPrintf(FileSizes,SIZEOF_ARRAY(FileSizes),
-		_T("%.0f %s"),TotalFileSize,SizeTypes[0]);
-
-		StringCchCopy(FileSizeBuffer,BufferSize,FileSizes);
-
-		/* Return the number of characters copied. */
-		return lstrlen(FileSizes);
-	}
-
-	/* Used to determine the units that will be used with this file size.
-	The result is used as an index into the SizeTypes array. */
-	while((TotalFileSize / KB) > 1.0)
-	{
-		TotalFileSize /= KB;
-		i++;
-	}
-
-	if(i > 4)
-	{
-		FileSizeBuffer = NULL;
 		return 0;
+		break;
+
+	case FORMAT_KBYTES:
+		iSizeIndex = 1;
+		break;
+
+	case FORMAT_MBYTES:
+		iSizeIndex = 2;
+		break;
+
+	case FORMAT_GBYTES:
+		iSizeIndex = 3;
+		break;
+
+	case FORMAT_TBYTES:
+		iSizeIndex = 4;
+		break;
+
+	case FORMAT_PBYTES:
+		iSizeIndex = 5;
+		break;
 	}
 
-	/* If the size is greater than 100 of the specified units, then
-	don't display any decimal points. Otherwise, display to two decimal
-	places. */
-	if(TotalFileSize < POINT_CUTOFF && TotalFileSize != 0.0)
+	fFileSize = (double)lFileSize.QuadPart;
+
+	for(i = 0;i < iSizeIndex;i++)
 	{
-		StringCchPrintf(szSizeBuf,SIZEOF_ARRAY(szSizeBuf),_T("%.03f"),TotalFileSize);
-		szSizeBuf[lstrlen(szSizeBuf) - 1] = '\0';
-		StringCchPrintf(FileSizes,SIZEOF_ARRAY(FileSizes),_T("%.5s %s"),szSizeBuf,SizeTypes[i]);
-	}
-	else
-	{
-		/* Can use .0f here (so that no decimal places will be shown). However, the
-		result may be rounded up. */
-		StringCchPrintf(szSizeBuf,SIZEOF_ARRAY(szSizeBuf),_T("%.1f"),TotalFileSize);
-		szSizeBuf[lstrlen(szSizeBuf) - 2] = '\0';
-		StringCchPrintf(FileSizes,SIZEOF_ARRAY(FileSizes),_T("%s %s"),szSizeBuf,SizeTypes[i]);
+		fFileSize /= 1024;
 	}
 
-	if(BufferSize < lstrlen(FileSizes))
-	{
-		/* Supplied buffer isn't big enough. Set the supplied buffer to NULL
-		and return the number of bytes needed to hold the string, including
-		the terminating NULL byte. */
-		FileSizeBuffer = NULL;
+	StringCchPrintf(pszFileSize,cchBuf,
+		_T("%.3f"),fFileSize);
 
-		return lstrlen(FileSizes) + 1;
-	}
+	pszFileSize[lstrlen(pszFileSize) - 1] = '\0';
 
-	StringCchCopy(FileSizeBuffer,BufferSize,FileSizes);
+	StringCchCat(pszFileSize,cchBuf,_T(" "));
+	StringCchCat(pszFileSize,cchBuf,pszSizeTypes[i]);
 
-	/* Return the number of characters copied. */
-	return lstrlen(FileSizes);
+	return 0;
 }
 
 size_t FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
-size_t cchBuf,BOOL bShowSizeInBytes)
+size_t cchBuf)
 {
-	return FormatSizeString(lFileSize,pszFileSize,cchBuf,bShowSizeInBytes,FALSE);
+	return FormatSizeString(lFileSize,pszFileSize,cchBuf,FALSE);
 }
 
 size_t FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
-size_t cchBuf,BOOL bShowSizeInBytes,BOOL bRound)
+size_t cchBuf,BOOL bRound)
 {
 	LARGE_INTEGER lFileSizeTemp;
 	LARGE_INTEGER KB;
-	TCHAR *pszSizeTypes[] = {_T("bytes"),_T("KB"),_T("MB"),_T("GB"),_T("TB")};
+	TCHAR *pszSizeTypes[] = {_T("bytes"),_T("KB"),_T("MB"),_T("GB"),_T("TB"),_T("PB")};
 	double fFileSize;
 	int i = 0;
 
 	KB.QuadPart = 1024;
-
-	if(bShowSizeInBytes)
-	{
-		StringCchPrintf(pszFileSize,cchBuf,
-			_T("%I64d %s"),lFileSize.QuadPart,pszSizeTypes[0]);
-
-		return lstrlen(pszFileSize);
-	}
 
 	i = 0;
 	lFileSizeTemp.QuadPart = lFileSize.QuadPart;
@@ -1591,6 +1555,20 @@ BOOL ReadImageProperty(TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD 
 			for(i = 0;i < NumProperties;i++)
 			{
 				if(pPropItems[i].id == PropertyId)
+				{
+					bFound = TRUE;
+					break;
+				}
+			}
+		}
+
+		if(!bFound && (PropertyId == PropertyTagExifDTOrig))
+		{
+			/* If the specified tag is PropertyTagExifDTOrig, we'll
+			transparently fall back on PropertyTagDateTime. */
+			for(i = 0;i < NumProperties;i++)
+			{
+				if(pPropItems[i].id == PropertyTagDateTime)
 				{
 					bFound = TRUE;
 					break;

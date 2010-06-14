@@ -19,7 +19,6 @@
 #include "../Helper/Helper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
-#include "resource.h"
 
 
 using namespace std;
