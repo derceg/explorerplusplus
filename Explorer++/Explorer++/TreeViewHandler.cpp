@@ -391,7 +391,14 @@ void CContainer::OnTreeViewHolderWindowTimer(void)
 
 	if(!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick &&
 		!ILIsEqual(pidlDirectory,pidlCurrentDirectory))
+	{
 		BrowseFolder(pidlDirectory,SBSP_SAMEBROWSER);
+
+		if(m_bTVAutoExpandSelected)
+		{
+			TreeView_Expand(m_hTreeView,g_NewSelectionItem,TVE_EXPAND);
+		}
+	}
 
 	CoTaskMemFree(pidlDirectory);
 

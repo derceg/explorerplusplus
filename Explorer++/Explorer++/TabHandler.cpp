@@ -422,9 +422,19 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 	switch(Msg)
 	{
 	case WM_ACTIVATE:
-		/* Switch to the specified tab... */
-		OnSelectTab(iTabId);
-		SendMessage(m_hListView[iTabId],WM_ACTIVATE,wParam,lParam);
+		/* Restore the main window if necessary, and switch
+		to the actual tab. */
+		if(IsIconic(m_hContainer))
+		{
+			ShowWindow(m_hContainer,SW_RESTORE);
+		}
+
+		OnSelectTab(iTabId,FALSE);
+		return 0;
+		break;
+
+	case WM_SETFOCUS:
+		SetFocus(m_hListView[iTabId]);
 		break;
 
 	case WM_SYSCOMMAND:
@@ -443,77 +453,50 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 	1. Generate a full-scale bitmap of the main window.
 	2. Overlay a bitmap of the specified tab onto the main
 	window bitmap.
-	3. Shrink the resulting bitmap down to the correct thumbnail size. */
+	3. Shrink the resulting bitmap down to the correct thumbnail size.
+	
+	A thumbnail will be dynamically generated, provided the main window
+	is not currently minimized (as we won't be able to grap a screenshot
+	of it). If the main window is minimized, we'll use a cached screenshot
+	of the tab (taken before the main window was minimized). */
 	case WM_DWMSENDICONICTHUMBNAIL:
 		{
 			HDC hdc;
 			HDC hdcSrc;
-			HBITMAP hBitmap;
+			HBITMAP hbmTab = NULL;
 			HBITMAP hPrevBitmap;
 			Color color(0,0,0);
 			HRESULT hr;
-			RECT rcMain;
-			RECT rcTab;
+			int iBitmapWidth;
+			int iBitmapHeight;
 			int iWidth;
 			int iHeight;
+			int iMaxWidth;
+			int iMaxHeight;
 
-			HWND hTab = m_hListView[iTabId];
+			iMaxWidth = HIWORD(lParam);
+			iMaxHeight = LOWORD(lParam);
 
-			GetClientRect(m_hContainer,&rcMain);
-			GetClientRect(hTab,&rcTab);
-
-			int width = HIWORD(lParam);
-			int height = LOWORD(lParam);
-
-
-			/* Main window BitBlt. */
-			hdc = GetDC(m_hContainer);
-			hdcSrc = CreateCompatibleDC(hdc);
-
-			/* Any bitmap sent back to the operating system will need to be in 32-bit
-			ARGB format. */
-			Bitmap bi(GetRectWidth(&rcMain),GetRectHeight(&rcMain),PixelFormat32bppARGB);
-			bi.GetHBITMAP(color,&hBitmap);
-
-			/* BitBlt the main window into the bitmap. */
-			hPrevBitmap = (HBITMAP)SelectObject(hdcSrc,hBitmap);
-			BitBlt(hdcSrc,0,0,GetRectWidth(&rcMain),GetRectHeight(&rcMain),hdc,0,0,SRCCOPY);
-
-
-			/* Now BitBlt the tab onto the main window. */
-			HDC hdcTab;
-			HDC hdcTabSrc;
-			HBITMAP hbmTab;
-			HBITMAP hbmTabPrev;
-			BOOL bVisible;
-
-			hdcTab = GetDC(hTab);
-			hdcTabSrc = CreateCompatibleDC(hdcTab);
-			hbmTab = CreateCompatibleBitmap(hdcTab,GetRectWidth(&rcTab),GetRectHeight(&rcTab));
-
-			hbmTabPrev = (HBITMAP)SelectObject(hdcTabSrc,hbmTab);
-
-			bVisible = IsWindowVisible(hTab);
-
-			if(!bVisible)
+			/* If the main window is minimized, it won't be possible
+			to generate a thumbnail for any of the tabs. In that
+			case, use a static 'No Preview Available' bitmap. */
+			if(IsIconic(m_hContainer))
 			{
-				ShowWindow(hTab,SW_SHOW);
+				hbmTab = (HBITMAP)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDB_NOPREVIEWAVAILABLE),IMAGE_BITMAP,0,0,0);
+
+				SetBitmapDimensionEx(hbmTab,223,130,NULL);
+			}
+			else
+			{
+				hbmTab = CaptureTabScreenshot(iTabId);
 			}
 
-			PrintWindow(hTab,hdcTabSrc,PW_CLIENTONLY);
+			SIZE sz;
 
-			if(!bVisible)
-			{
-				ShowWindow(hTab,SW_HIDE);
-			}
+			GetBitmapDimensionEx(hbmTab,&sz);
 
-			MapWindowPoints(hTab,m_hContainer,(LPPOINT)&rcTab,2);
-			BitBlt(hdcSrc,rcTab.left,rcTab.top,GetRectWidth(&rcTab),GetRectHeight(&rcTab),hdcTabSrc,0,0,SRCCOPY);
-
-			SelectObject(hdcTabSrc,hbmTabPrev);
-			DeleteObject(hbmTab);
-			DeleteDC(hdcTabSrc);
-			ReleaseDC(hTab,hdcTab);
+			iBitmapWidth = sz.cx;
+			iBitmapHeight = sz.cy;
 
 
 			/* Shrink the bitmap. */
@@ -521,20 +504,25 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 			HBITMAP hbmThumbnail;
 			POINT pt;
 
+			hdc = GetDC(m_hContainer);
+			hdcSrc = CreateCompatibleDC(hdc);
+
+			SelectObject(hdcSrc,hbmTab);
+
 			hdcThumbnailSrc = CreateCompatibleDC(hdc);
 
 			/* If the current height of the main window
 			is less than the width, we'll create a thumbnail
 			of maximum width; else maximum height. */
-			if(GetRectWidth(&rcMain) > GetRectHeight(&rcMain))
+			if((iBitmapWidth / iMaxWidth) > (iBitmapHeight / iMaxHeight))
 			{
-				iWidth = width;
-				iHeight = width * GetRectHeight(&rcMain) / GetRectWidth(&rcMain);
+				iWidth = iMaxWidth;
+				iHeight = iMaxWidth * iBitmapHeight / iBitmapWidth;
 			}
 			else
 			{
-				iHeight = height;
-				iWidth = height * GetRectWidth(&rcMain) / GetRectHeight(&rcMain);
+				iHeight = iMaxHeight;
+				iWidth = iMaxHeight * iBitmapWidth / iBitmapHeight;
 			}
 
 			/* Thumbnail bitmap. */
@@ -547,7 +535,7 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 			/* Finally, shrink the full-scale bitmap down into a thumbnail. */
 			SetStretchBltMode(hdcThumbnailSrc,HALFTONE);
 			SetBrushOrgEx(hdcThumbnailSrc,0,0,&pt);
-			StretchBlt(hdcThumbnailSrc,0,0,iWidth,iHeight,hdcSrc,0,0,GetRectWidth(&rcMain),GetRectHeight(&rcMain),SRCCOPY);
+			StretchBlt(hdcThumbnailSrc,0,0,iWidth,iHeight,hdcSrc,0,0,iBitmapWidth,iBitmapHeight,SRCCOPY);
 
 			SelectObject(hdcThumbnailSrc,hPrevBitmap);
 			DeleteDC(hdcThumbnailSrc);
@@ -569,8 +557,8 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 
 			FreeLibrary(hDwmapi);
 
-			DeleteObject(hBitmap);
-			DeleteObject(hbmThumbnail);
+			/* Delete the thumbnail bitmap. */
+			DeleteObject(hbmTab);
 
 			SelectObject(hdcSrc,hPrevBitmap);
 
@@ -583,63 +571,19 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 
 	case WM_DWMSENDICONICLIVEPREVIEWBITMAP:
 		{
-			/* Now BitBlt the tab onto the main window. */
-			HDC hdcTab;
-			HDC hdcTabSrc;
-			HBITMAP hbmTab;
-			HBITMAP hbmTabPrev;
-			Color color(0,0,0);
-			MENUBARINFO mbi;
-			POINT pt;
-			BOOL bVisible;
-			RECT rcTab;
-
-			HWND hTab = m_hListView[iTabId];
-
-			hdcTab = GetDC(hTab);
-			hdcTabSrc = CreateCompatibleDC(hdcTab);
-
-			GetClientRect(hTab,&rcTab);
-
-			Bitmap bi(GetRectWidth(&rcTab),GetRectHeight(&rcTab),PixelFormat32bppARGB);
-			bi.GetHBITMAP(color,&hbmTab);
-
-			hbmTabPrev = (HBITMAP)SelectObject(hdcTabSrc,hbmTab);
-
-			bVisible = IsWindowVisible(hTab);
-
-			if(!bVisible)
-			{
-				ShowWindow(hTab,SW_SHOW);
-			}
-
-			PrintWindow(hTab,hdcTabSrc,PW_CLIENTONLY);
-
-			if(!bVisible)
-			{
-				ShowWindow(hTab,SW_HIDE);
-			}
-
-			SetStretchBltMode(hdcTabSrc,HALFTONE);
-			SetBrushOrgEx(hdcTabSrc,0,0,&pt);
-			StretchBlt(hdcTabSrc,0,0,GetRectWidth(&rcTab),GetRectHeight(&rcTab),hdcTabSrc,
-				0,0,GetRectWidth(&rcTab),GetRectHeight(&rcTab),SRCCOPY);
-
-			MapWindowPoints(hTab,m_hContainer,(LPPOINT)&rcTab,2);
-
-			mbi.cbSize	 = sizeof(mbi);
-			GetMenuBarInfo(m_hContainer,OBJID_MENU,0,&mbi);
-
-			/* The operating system will automatically
-			draw the main window. Therefore, we'll just shift
-			the tab into it's proper position. */
-			pt.x = rcTab.left;
-
-			/* Need to include the menu bar in the offset. */
-			pt.y = rcTab.top + mbi.rcBar.bottom - mbi.rcBar.top;
-
 			HMODULE hDwmapi;
+			TabPreviewInfo_t tpi;
+
 			DwmSetIconicLivePreviewBitmapProc DwmSetIconicLivePreviewBitmap;
+
+			if(IsIconic(m_hContainer))
+			{
+				/* TODO: Show an image here... */
+			}
+			else
+			{
+				GetTabLivePreviewBitmap(iTabId,&tpi);
+			}
 
 			hDwmapi = LoadLibrary(_T("dwmapi.dll"));
 
@@ -649,16 +593,11 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 
 				if(DwmSetIconicLivePreviewBitmap != NULL)
 				{
-					DwmSetIconicLivePreviewBitmap(hwnd,hbmTab,&pt,0);
+					DwmSetIconicLivePreviewBitmap(hwnd,tpi.hbm,&tpi.ptOrigin,0);
 				}
 			}
 
 			FreeLibrary(hDwmapi);
-
-			SelectObject(hdcTabSrc,hbmTabPrev);
-			DeleteObject(hbmTab);
-			DeleteDC(hdcTabSrc);
-			ReleaseDC(hTab,hdcTab);
 
 			return 0;
 		}
@@ -700,7 +639,171 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 	return DefWindowProc(hwnd,Msg,wParam,lParam);
 }
 
-void CContainer::OnTabChangeInternal(void)
+HBITMAP CContainer::CaptureTabScreenshot(int iTabId)
+{
+	HDC hdc;
+	HDC hdcSrc;
+	HBITMAP hBitmap;
+	HBITMAP hPrevBitmap;
+	Color color(0,0,0);
+	RECT rcMain;
+	RECT rcTab;
+
+	HWND hTab = m_hListView[iTabId];
+
+	GetClientRect(m_hContainer,&rcMain);
+	GetClientRect(hTab,&rcTab);
+
+
+	/* Main window BitBlt. */
+	hdc = GetDC(m_hContainer);
+	hdcSrc = CreateCompatibleDC(hdc);
+
+	/* Any bitmap sent back to the operating system will need to be in 32-bit
+	ARGB format. */
+	Bitmap bi(GetRectWidth(&rcMain),GetRectHeight(&rcMain),PixelFormat32bppARGB);
+	bi.GetHBITMAP(color,&hBitmap);
+
+	/* BitBlt the main window into the bitmap. */
+	hPrevBitmap = (HBITMAP)SelectObject(hdcSrc,hBitmap);
+	BitBlt(hdcSrc,0,0,GetRectWidth(&rcMain),GetRectHeight(&rcMain),hdc,0,0,SRCCOPY);
+
+
+	/* Now BitBlt the tab onto the main window. */
+	HDC hdcTab;
+	HDC hdcTabSrc;
+	HBITMAP hbmTab;
+	HBITMAP hbmTabPrev;
+	BOOL bVisible;
+
+	hdcTab = GetDC(hTab);
+	hdcTabSrc = CreateCompatibleDC(hdcTab);
+	hbmTab = CreateCompatibleBitmap(hdcTab,GetRectWidth(&rcTab),GetRectHeight(&rcTab));
+
+	hbmTabPrev = (HBITMAP)SelectObject(hdcTabSrc,hbmTab);
+
+	bVisible = IsWindowVisible(hTab);
+
+	if(!bVisible)
+	{
+		ShowWindow(hTab,SW_SHOW);
+	}
+
+	PrintWindow(hTab,hdcTabSrc,PW_CLIENTONLY);
+
+	if(!bVisible)
+	{
+		ShowWindow(hTab,SW_HIDE);
+	}
+
+	MapWindowPoints(hTab,m_hContainer,(LPPOINT)&rcTab,2);
+	BitBlt(hdcSrc,rcTab.left,rcTab.top,GetRectWidth(&rcTab),GetRectHeight(&rcTab),hdcTabSrc,0,0,SRCCOPY);
+
+	SelectObject(hdcTabSrc,hbmTabPrev);
+	DeleteObject(hbmTab);
+	DeleteDC(hdcTabSrc);
+	ReleaseDC(hTab,hdcTab);
+
+
+	/* Shrink the bitmap. */
+	HDC hdcThumbnailSrc;
+	HBITMAP hbmThumbnail;
+	POINT pt;
+
+	hdcThumbnailSrc = CreateCompatibleDC(hdc);
+
+	/* Thumbnail bitmap. */
+	Bitmap bmpThumbnail(GetRectWidth(&rcMain),GetRectHeight(&rcMain),PixelFormat32bppARGB);
+
+	bmpThumbnail.GetHBITMAP(color,&hbmThumbnail);
+
+	hPrevBitmap = (HBITMAP)SelectObject(hdcThumbnailSrc,hbmThumbnail);
+
+	/* Finally, shrink the full-scale bitmap down into a thumbnail. */
+	SetStretchBltMode(hdcThumbnailSrc,HALFTONE);
+	SetBrushOrgEx(hdcThumbnailSrc,0,0,&pt);
+	BitBlt(hdcThumbnailSrc,0,0,GetRectWidth(&rcMain),GetRectHeight(&rcMain),hdcSrc,0,0,SRCCOPY);
+
+	SetBitmapDimensionEx(hbmThumbnail,GetRectWidth(&rcMain),GetRectHeight(&rcMain),NULL);
+
+	SelectObject(hdcThumbnailSrc,hPrevBitmap);
+	DeleteDC(hdcThumbnailSrc);
+
+	DeleteObject(hBitmap);
+
+	SelectObject(hdcSrc,hPrevBitmap);
+
+	DeleteDC(hdcSrc);
+	ReleaseDC(m_hContainer,hdc);
+
+	return hbmThumbnail;
+}
+
+void CContainer::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi)
+{
+	HDC hdcTab;
+	HDC hdcTabSrc;
+	HBITMAP hbmTab;
+	HBITMAP hbmTabPrev;
+	Color color(0,0,0);
+	MENUBARINFO mbi;
+	POINT pt;
+	BOOL bVisible;
+	RECT rcTab;
+
+	HWND hTab = m_hListView[iTabId];
+
+	hdcTab = GetDC(hTab);
+	hdcTabSrc = CreateCompatibleDC(hdcTab);
+
+	GetClientRect(hTab,&rcTab);
+
+	Bitmap bi(GetRectWidth(&rcTab),GetRectHeight(&rcTab),PixelFormat32bppARGB);
+	bi.GetHBITMAP(color,&hbmTab);
+
+	hbmTabPrev = (HBITMAP)SelectObject(hdcTabSrc,hbmTab);
+
+	bVisible = IsWindowVisible(hTab);
+
+	if(!bVisible)
+	{
+		ShowWindow(hTab,SW_SHOW);
+	}
+
+	PrintWindow(hTab,hdcTabSrc,PW_CLIENTONLY);
+
+	if(!bVisible)
+	{
+		ShowWindow(hTab,SW_HIDE);
+	}
+
+	SetStretchBltMode(hdcTabSrc,HALFTONE);
+	SetBrushOrgEx(hdcTabSrc,0,0,&pt);
+	StretchBlt(hdcTabSrc,0,0,GetRectWidth(&rcTab),GetRectHeight(&rcTab),hdcTabSrc,
+		0,0,GetRectWidth(&rcTab),GetRectHeight(&rcTab),SRCCOPY);
+
+	MapWindowPoints(hTab,m_hContainer,(LPPOINT)&rcTab,2);
+
+	mbi.cbSize	 = sizeof(mbi);
+	GetMenuBarInfo(m_hContainer,OBJID_MENU,0,&mbi);
+
+	/* The operating system will automatically
+	draw the main window. Therefore, we'll just shift
+	the tab into it's proper position. */
+	ptpi->ptOrigin.x = rcTab.left;
+
+	/* Need to include the menu bar in the offset. */
+	ptpi->ptOrigin.y = rcTab.top + mbi.rcBar.bottom - mbi.rcBar.top;
+
+	ptpi->hbm = hbmTab;
+	ptpi->iTabId = iTabId;
+
+	SelectObject(hdcTabSrc,hbmTabPrev);
+	DeleteDC(hdcTabSrc);
+	ReleaseDC(hTab,hdcTab);
+}
+
+void CContainer::OnTabChangeInternal(BOOL bSetFocus)
 {
 	TCITEM tcItem;
 
@@ -738,8 +841,10 @@ void CContainer::OnTabChangeInternal(void)
 		}
 	}
 
-	/* TODO: Fix. */
-	//SetFocus(m_hActiveListView);
+	if(bSetFocus)
+	{
+		SetFocus(m_hActiveListView);
+	}
 }
 
 void CContainer::RefreshAllTabs(void)
@@ -806,10 +911,15 @@ void CContainer::SelectAdjacentTab(BOOL bNextTab)
 
 	TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
 
-	OnTabChangeInternal();
+	OnTabChangeInternal(TRUE);
 }
 
 void CContainer::OnSelectTab(int iTab)
+{
+	return OnSelectTab(iTab,TRUE);
+}
+
+void CContainer::OnSelectTab(int iTab,BOOL bSetFocus)
 {
 	int nTabs;
 
@@ -829,7 +939,7 @@ void CContainer::OnSelectTab(int iTab)
 
 	TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
 
-	OnTabChangeInternal();
+	OnTabChangeInternal(bSetFocus);
 }
 
 HRESULT CContainer::OnCloseTab(void)
@@ -882,13 +992,13 @@ HRESULT CContainer::CloseTab(int TabIndex)
 	If the tab been closed is the active tab:
 	 - If the first tab is been closed, then the selected
 	   tab will still be the first tab.
-     - If the last tab is closed, then the selected tab
+	 - If the last tab is closed, then the selected tab
 	   will be one less then the index of the previously
 	   selected tab.
-     - Otherwise, the index of the selected tab will remain
+	 - Otherwise, the index of the selected tab will remain
 	   unchanged (as a tab will be pushed down).
    If the tab been closed is not the active tab:
-     - If the index of the closed tab is less than the index
+	 - If the index of the closed tab is less than the index
 	   of the active tab, the index of the active tab will
 	   decrease by one (as all higher tabs are pushed down
 	   one space).
@@ -907,7 +1017,7 @@ HRESULT CContainer::CloseTab(int TabIndex)
 			TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
 		}
 
-		OnTabChangeInternal();
+		OnTabChangeInternal(TRUE);
 	}
 	else
 	{
@@ -984,7 +1094,7 @@ void CContainer::OnTabSelectionChange(void)
 {
 	m_iTabSelectedItem = TabCtrl_GetCurSel(m_hTabCtrl);
 
-	OnTabChangeInternal();
+	OnTabChangeInternal(TRUE);
 }
 
 LRESULT CALLBACK TabSubclassProcStub(HWND hwnd,UINT uMsg,
@@ -1578,6 +1688,13 @@ BOOL CContainer::OnMouseWheel(WPARAM wParam,LPARAM lParam)
 				{
 					CycleViewState((zDelta > 0));
 				}
+			}
+			else if(wParam & MK_SHIFT)
+			{
+				if(zDelta < 0)
+					OnBrowseBack();
+				else
+					OnBrowseForward();
 			}
 		}
 	}

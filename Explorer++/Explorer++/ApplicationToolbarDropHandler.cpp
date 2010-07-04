@@ -14,6 +14,9 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 
+
+#define GENERAL_ALLOCATION_UNIT	1024
+
 CContainer::CApplicationToolbarDrop::CApplicationToolbarDrop(CContainer *pContainer)
 {
 	m_pContainer = pContainer;
@@ -142,36 +145,70 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 			pt.x = ptl.x;
 			pt.y = ptl.y;
 
+			ScreenToClient(m_pContainer->m_hApplicationToolbar,&pt);
+
 			/* Check whether the files were dropped over another toolbar button. If
 			they were, open the dropped file in the application represented by the
 			button. */
 			iButton = (int)SendMessage(m_pContainer->m_hApplicationToolbar,TB_HITTEST,0,(LPARAM)&pt);
 
-			if(iButton > 0)
+			/* Pass the dropped files to the application... */
+			if(iButton >= 0)
 			{
-				/* TODO: Pass the dropped files to the application... */
+				TCHAR *pszParameters = NULL;
+				TCHAR szParameter[512];
+				int iAllocated = 0;
+
+				iAllocated = GENERAL_ALLOCATION_UNIT;
+				pszParameters = (TCHAR *)malloc(iAllocated * sizeof(TCHAR));
+				memset(pszParameters,0,iAllocated * sizeof(TCHAR));
+
+				if(pszParameters != NULL)
+				{
+					/* Build the command line... */
+					for(i = 0;i < nDroppedFiles;i++)
+					{
+						DragQueryFile((HDROP)pdf,i,szFullFileName,
+							SIZEOF_ARRAY(szFullFileName));
+
+						if((lstrlen(szFullFileName) + lstrlen(pszParameters)) > iAllocated)
+						{
+							iAllocated += GENERAL_ALLOCATION_UNIT;
+							pszParameters = (TCHAR *)realloc(pszParameters,iAllocated * sizeof(TCHAR));
+						}
+
+						StringCchPrintf(szParameter,SIZEOF_ARRAY(szParameter),_T(" \"%s\""),szFullFileName);
+						StrCat(pszParameters,szParameter);
+					}
+
+					m_pContainer->ApplicationToolbarOpenItem(iButton,pszParameters);
+
+					free(pszParameters);
+				}
 			}
-
-			for(i = 0;i < nDroppedFiles;i++)
+			else
 			{
-				/* Determine the name of the dropped file. */
-				DragQueryFile((HDROP)pdf,i,szFullFileName,
-					SIZEOF_ARRAY(szFullFileName));
+				for(i = 0;i < nDroppedFiles;i++)
+				{
+					/* Determine the name of the dropped file. */
+					DragQueryFile((HDROP)pdf,i,szFullFileName,
+						SIZEOF_ARRAY(szFullFileName));
 
-				/* Make sure this item is a file (and not
-				a folder). */
+					/* Make sure this item is a file (and not
+					a folder). */
 
-				/* Remove the path and any extension. */
-				StringCchCopy(szName,SIZEOF_ARRAY(szName),szFullFileName);
-				PathStripPath(szName);
+					/* Remove the path and any extension. */
+					StringCchCopy(szName,SIZEOF_ARRAY(szName),szFullFileName);
+					PathStripPath(szName);
 
-				if(szName[0] != '.')
-					PathRemoveExtension(szName);
+					if(szName[0] != '.')
+						PathRemoveExtension(szName);
 
-				pab = m_pContainer->ApplicationToolbarAddItem(szName,szFullFileName,TRUE);
+					pab = m_pContainer->ApplicationToolbarAddItem(szName,szFullFileName,TRUE);
 
-				/* Add the application button to the toolbar. */
-				m_pContainer->ApplicationToolbarAddButtonToToolbar(pab);
+					/* Add the application button to the toolbar. */
+					m_pContainer->ApplicationToolbarAddButtonToToolbar(pab);
+				}
 			}
 
 			GlobalUnlock(stg.hGlobal);

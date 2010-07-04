@@ -1918,6 +1918,8 @@ void CContainer::OnListViewPaste(void)
 
 		pClipboardHandler->CopyClipboardData(pClipboardObject,
 			m_hContainer,szDestination,this,!m_bOverwriteExistingFilesConfirmation);
+
+		pClipboardObject->Release();
 	}
 }
 

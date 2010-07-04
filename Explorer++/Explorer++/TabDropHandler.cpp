@@ -132,7 +132,7 @@ HRESULT _stdcall CContainer::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffe
 
 				TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
 
-				OnTabChangeInternal();
+				OnTabChangeInternal(TRUE);
 
 				g_bTabDragTimerElapsed = FALSE;
 			}

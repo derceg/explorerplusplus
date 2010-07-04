@@ -1184,8 +1184,8 @@ BOOL CheckGroupMembership(GroupType_t GroupType)
 
 struct LANGCODEPAGE
 {
-    WORD wLanguage;
-    WORD wCodePage;
+	WORD wLanguage;
+	WORD wCodePage;
 } *lpTranslate;
 
 BOOL GetVersionInfoString(TCHAR *szFileName,TCHAR *szVersionInfo,TCHAR *szBuffer,UINT cbBufLen)
@@ -1198,58 +1198,58 @@ BOOL GetVersionInfoString(TCHAR *szFileName,TCHAR *szVersionInfo,TCHAR *szBuffer
 	DWORD dwHandle = NULL;
 	UINT cbTranslate;
 	UINT cbLen;
-    BOOL bRet = FALSE;
+	BOOL bRet = FALSE;
 	unsigned int i = 0;
 
 	dwLen = GetFileVersionInfoSize(szFileName,&dwHandle);
 
 	if(dwLen > 0)
-    {
-        lpData = malloc(dwLen);
+	{
+		lpData = malloc(dwLen);
 
-        if(lpData != NULL)
-        {
-            if(GetFileVersionInfo(szFileName,0,dwLen,lpData) != 0)
-            {
-                UserLangId = GetUserDefaultLangID();
+		if(lpData != NULL)
+		{
+			if(GetFileVersionInfo(szFileName,0,dwLen,lpData) != 0)
+			{
+				UserLangId = GetUserDefaultLangID();
 
-                /* Every language id for a certain language will have
-                the same lower eight bits if the languages are the same. */
-                UserLangId &= 0x00FF;
+				/* Every language id for a certain language will have
+				the same lower eight bits if the languages are the same. */
+				UserLangId &= 0x00FF;
 
-                VerQueryValue(lpData,_T("\\VarFileInfo\\Translation"),(LPVOID *)&lpTranslate,&cbTranslate);
+				VerQueryValue(lpData,_T("\\VarFileInfo\\Translation"),(LPVOID *)&lpTranslate,&cbTranslate);
 
-                for(i = 0;i < (cbTranslate / sizeof(LANGCODEPAGE));i++)
-                {
-                    /* If the bottom eight bits of the language id's match, use this
-                    version information (since this means that the version information
-                    and the users default language are the same). Also use this version
+				for(i = 0;i < (cbTranslate / sizeof(LANGCODEPAGE));i++)
+				{
+					/* If the bottom eight bits of the language id's match, use this
+					version information (since this means that the version information
+					and the users default language are the same). Also use this version
 					information if the language is not specified (i.e. wLanguage is 0). */
-                    if((UserLangId & lpTranslate[i].wLanguage) == UserLangId ||
+					if((UserLangId & lpTranslate[i].wLanguage) == UserLangId ||
 						lpTranslate[i].wLanguage == 0)
-                    {
-                        StringCchPrintf(szSubBlock,SIZEOF_ARRAY(szSubBlock),
-                            _T("\\StringFileInfo\\%04X%04X\\%s"),lpTranslate[i].wLanguage,
-                            lpTranslate[i].wCodePage,szVersionInfo);
+					{
+						StringCchPrintf(szSubBlock,SIZEOF_ARRAY(szSubBlock),
+							_T("\\StringFileInfo\\%04X%04X\\%s"),lpTranslate[i].wLanguage,
+							lpTranslate[i].wCodePage,szVersionInfo);
 
-                        if(VerQueryValue(lpData,szSubBlock,(LPVOID *)&lpszLocalBuf,&cbLen) != 0)
-                        {
-                            /* The buffer may be NULL if the specified data was not found
-                            within the file. */
-                            if(lpszLocalBuf != NULL)
-                            {
-                                StringCchCopy(szBuffer,cbBufLen,lpszLocalBuf);
+						if(VerQueryValue(lpData,szSubBlock,(LPVOID *)&lpszLocalBuf,&cbLen) != 0)
+						{
+							/* The buffer may be NULL if the specified data was not found
+							within the file. */
+							if(lpszLocalBuf != NULL)
+							{
+								StringCchCopy(szBuffer,cbBufLen,lpszLocalBuf);
 
-                                bRet = TRUE;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            free(lpData);
-        }
-    }
+								bRet = TRUE;
+								break;
+							}
+						}
+					}
+				}
+			}
+			free(lpData);
+		}
+	}
 
 	return bRet;
 }

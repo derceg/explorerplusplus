@@ -120,7 +120,7 @@ HRESULT GetItemAttributes(LPITEMIDLIST pidl,SFGAOF *pItemAttributes)
 	return hr;
 }
 
-BOOL ExecuteFileAction(HWND hwnd,TCHAR *szVerb,TCHAR *szStartDirectory,LPCITEMIDLIST pidl)
+BOOL ExecuteFileAction(HWND hwnd,TCHAR *szVerb,TCHAR *szParameters,TCHAR *szStartDirectory,LPCITEMIDLIST pidl)
 {
 	SHELLEXECUTEINFO ExecInfo;
 
@@ -130,7 +130,7 @@ BOOL ExecuteFileAction(HWND hwnd,TCHAR *szVerb,TCHAR *szStartDirectory,LPCITEMID
 	ExecInfo.lpIDList		= (LPVOID)pidl;
 	ExecInfo.hwnd			= hwnd;
 	ExecInfo.nShow			= SW_SHOW;
-	ExecInfo.lpParameters	= EMPTY_STRING;
+	ExecInfo.lpParameters	= szParameters;
 	ExecInfo.lpDirectory	= szStartDirectory;
 	ExecInfo.lpFile			= NULL;
 	ExecInfo.hInstApp		= NULL;

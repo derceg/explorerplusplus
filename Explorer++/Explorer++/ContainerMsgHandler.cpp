@@ -627,7 +627,7 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInN
 			!m_bHandleZipFiles)
 		{
 			/* Don't open zip file as folder. */
-			OpenFileItem(pidlItem);
+			OpenFileItem(pidlItem,EMPTY_STRING);
 		}
 		else if(((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM)
 			&& m_bHandleZipFiles) || ((uAttributes & SFGAO_FOLDER) && !bControlPanelParent))
@@ -688,13 +688,13 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInN
 				Also, even if the shortcut points to a dead
 				folder, it should still attempted to be
 				opened. */
-				OpenFileItem(pidlItem);
+				OpenFileItem(pidlItem,EMPTY_STRING);
 			}
 		}
 		else
 		{
 			/* File item. */
-			OpenFileItem(pidlItem);
+			OpenFileItem(pidlItem,EMPTY_STRING);
 		}
 	}
 }
@@ -709,7 +709,7 @@ void CContainer::OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER);
 }
 
-void CContainer::OpenFileItem(LPITEMIDLIST pidlItem)
+void CContainer::OpenFileItem(LPITEMIDLIST pidlItem,TCHAR *szParameters)
 {
 	TCHAR			szItemDirectory[MAX_PATH];
 	LPITEMIDLIST	pidlParent = NULL;
@@ -720,7 +720,7 @@ void CContainer::OpenFileItem(LPITEMIDLIST pidlItem)
 
 	GetDisplayName(pidlParent,szItemDirectory,SHGDN_FORPARSING);
 
-	ExecuteFileAction(m_hContainer,EMPTY_STRING,szItemDirectory,(LPCITEMIDLIST)pidlItem);
+	ExecuteFileAction(m_hContainer,EMPTY_STRING,szParameters,szItemDirectory,(LPCITEMIDLIST)pidlItem);
 
 	CoTaskMemFree(pidlParent);
 }
@@ -1740,6 +1740,10 @@ HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 		if(SUCCEEDED(hr))
 			OnDirChanged(m_iObjectIndex);
 	}
+	else
+	{
+		hr = CreateNewTab(pidlDirectory,NULL,NULL,TRUE,NULL);
+	}
 
 	return hr;
 }
@@ -1775,20 +1779,20 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 	}
 	else
 	{
-		if(!bOpenInNewTab)
+		if(!bOpenInNewTab && !m_TabInfo[m_iObjectIndex].bAddressLocked)
 		{
-			if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
-			{
-				PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE);
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE);
 
-				hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
-			}
+			hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
 
 			iTabObjectIndex = m_iObjectIndex;
 		}
 		else
 		{
-			hr = CreateNewTab(pidlDirectory,NULL,NULL,bSwitchToNewTab,&iTabObjectIndex);
+			if(m_TabInfo[m_iObjectIndex].bAddressLocked)
+				hr = CreateNewTab(pidlDirectory,NULL,NULL,TRUE,&iTabObjectIndex);
+			else
+				hr = CreateNewTab(pidlDirectory,NULL,NULL,bSwitchToNewTab,&iTabObjectIndex);
 		}
 
 		if(SUCCEEDED(hr))
@@ -2388,8 +2392,7 @@ void CContainer::OnAssocChanged(void)
 		_T("Control Panel\\Desktop\\WindowMetrics"),
 		0,KEY_READ|KEY_WRITE,&hKey);
 
-	if(res == ERROR_SUCCESS)
-	{
+	if(res == ERROR_SUCCESS){
 		ReadStringFromRegistry(hKey,_T("Shell Icon Size"),
 			szShellIconSize,SIZEOF_ARRAY(szShellIconSize));
 

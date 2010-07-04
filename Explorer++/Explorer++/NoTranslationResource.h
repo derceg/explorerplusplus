@@ -60,6 +60,8 @@
 #define IDB_ABOUT                       231
 #define IDR_WAVE1                       235
 #define IDR_WAVE_NAVIGATIONSTART        235
+#define IDB_BITMAP1                     236
+#define IDB_NOPREVIEWAVAILABLE          236
 #define IDC_DEFAULTCOLUMNS_DESCRIPTION  1001
 #define IDC_COLUMNS_DESCRIPTION         1001
 #define IDC_SETTINGS_CHECK_EXTENSIONS   1002
@@ -714,7 +716,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        236
+#define _APS_NEXT_RESOURCE_VALUE        237
 #define _APS_NEXT_COMMAND_VALUE         40433
 #define _APS_NEXT_CONTROL_VALUE         1255
 #define _APS_NEXT_SYMED_VALUE           101

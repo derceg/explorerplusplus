@@ -114,7 +114,7 @@ CContainer::CContainer(HWND hwnd)
 	m_bTreeViewRightClick			= FALSE;
 	m_bTabBeenDragged				= FALSE;
 	m_bAlteredStatusBarParts		= FALSE;
-	m_bTreeViewDelayEnabled			= TRUE;
+	m_bTreeViewDelayEnabled			= FALSE;
 	m_bSavePreferencesToXMLFile		= FALSE;
 	m_bAttemptToolbarRestore		= FALSE;
 	m_bCanUndo						= FALSE;
@@ -336,6 +336,7 @@ void CContainer::SetDefaultValues(void)
 	m_bCheckBoxSelection			= FALSE;
 	m_bForceSize					= FALSE;
 	m_SizeDisplayFormat				= FORMAT_BYTES;
+	m_bTVAutoExpandSelected			= FALSE;
 
 	/* Infotips (user options). */
 	m_bShowInfoTips					= TRUE;
@@ -1109,7 +1110,7 @@ LRESULT CALLBACK CContainer::CommandHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPA
 		iIndex = (int)SendMessage(m_hApplicationToolbar,
 			TB_COMMANDTOINDEX,LOWORD(wParam),0);
 
-		ApplicationToolbarOpenItem(iIndex);
+		ApplicationToolbarOpenItem(iIndex,EMPTY_STRING);
 	}
 	else if(LOWORD(wParam) >= TOOLBAR_DRIVES_ID_START)
 	{
@@ -1700,7 +1701,7 @@ LRESULT CALLBACK CContainer::CommandHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPA
 
 		case IDM_ARRANGEICONSBY_ASCENDING:
 			OnSortByAscending(TRUE);
-            break;
+			break;
 
 		case IDM_ARRANGEICONSBY_DESCENDING:
 			OnSortByAscending(FALSE);
@@ -2053,7 +2054,7 @@ LRESULT CALLBACK CContainer::CommandHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPA
 			break;
 
 		case IDM_APP_OPEN:
-			ApplicationToolbarOpenItem(m_iSelectedRClick);
+			ApplicationToolbarOpenItem(m_iSelectedRClick,EMPTY_STRING);
 			break;
 
 		case IDM_APP_NEW:

@@ -30,7 +30,7 @@
 typedef struct
 {
 	TCHAR szDirectory[MAX_PATH];
-	TCHAR szName[MAX_PATH];
+	TCHAR szName[MAX_PATH + 2];
 	DWORD dwAttributes;
 
 	CContainer *pContainer;
@@ -844,6 +844,7 @@ void CContainer::OnSearch(HWND hDlg)
 	SearchInfo_t *psi = NULL;
 	SearchDirectoryInfo_t sdi;
 	SearchPatternInfo_t spi;
+	TCHAR szPattern[MAX_PATH];
 
 	m_SearchItems.clear();
 
@@ -970,6 +971,26 @@ void CContainer::OnSearch(HWND hDlg)
 				SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
 
 				ComboBox_SetCurSel(hComboBox,0);
+			}
+
+			/* Turn search patterns of the form '???' into '*???*', and
+			use this modified string to search. */
+			if(lstrlen(psi->szName) > 0)
+			{
+				StringCchCopy(szPattern,SIZEOF_ARRAY(szPattern),psi->szName);
+				memset(psi->szName,0,SIZEOF_ARRAY(psi->szName));
+
+				if(szPattern[0] != '*')
+				{
+					StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
+				}
+
+				StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),szPattern);
+
+				if(szPattern[lstrlen(szPattern) - 1] != '*')
+				{
+					StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
+				}
 			}
 
 			GetDlgItemText(hDlg,IDSEARCH,g_szSearchButton,SIZEOF_ARRAY(g_szSearchButton));

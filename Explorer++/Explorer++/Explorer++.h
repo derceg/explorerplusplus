@@ -171,6 +171,13 @@ typedef struct
 	int		iTabId;
 } TabProxyInfo_t;
 
+typedef struct
+{
+	int		iTabId;
+	HBITMAP	hbm;
+	POINT	ptOrigin;
+} TabPreviewInfo_t;
+
 typedef enum
 {
 	STARTUP_PREVIOUSTABS	= 1,
@@ -462,7 +469,7 @@ private:
 	int						m_iRefCount;
 
 	/* Internal private functions. */
-	void					OnTabChangeInternal(void);
+	void					OnTabChangeInternal(BOOL bSetFocus);
 	void					UpdateArrangeMenuItems(void);
 	void					VerifyAndSetWindowPosition(InitialWindowPos_t *piwp);
 	void					SetDefaultWindowPosition(void);
@@ -551,6 +558,7 @@ private:
 	void					OnHome(void);
 	void					OnNavigateUp(void);
 	void					OnSelectTab(int iTab);
+	void					OnSelectTab(int iTab,BOOL bSetFocus);
 
 	/* ListView private message handlers. */
 	void					OnListViewMButtonDown(WPARAM wParam,LPARAM lParam);
@@ -655,7 +663,7 @@ private:
 	void					ApplicationToolbarAddButtonsToToolbar(void);
 	void					ApplicationToolbarAddButtonToToolbar(ApplicationButton_t *pab);
 	void					ApplicationToolbarRefreshButton(int iItem);
-	void					ApplicationToolbarOpenItem(int iItem);
+	void					ApplicationToolbarOpenItem(int iItem,TCHAR *szParameters);
 	void					ApplicationToolbarDeleteItem(int iItem);
 	void					ApplicationToolbarShowItemProperties(int iItem);
 
@@ -785,6 +793,8 @@ private:
 	/* Windows 7 taskbar thumbnail previews. */
 	ATOM					RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirectory);
 	void					CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwitchToNewTab);
+	HBITMAP					CaptureTabScreenshot(int iTabId);
+	void					GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi);
 
 	/* Search. */
 	void					OnSearch(HWND hDlg);
@@ -832,7 +842,7 @@ private:
 	void					OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
-	void					OpenFileItem(LPITEMIDLIST pidlItem);
+	void					OpenFileItem(LPITEMIDLIST pidlItem,TCHAR *szParameters);
 	HRESULT					OnListViewCopy(BOOL bCopy);
 	HRESULT					ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset);
 	HRESULT					CreateFileContextMenu(HWND hwnd,LPITEMIDLIST pidlParent,POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExtended);
@@ -1249,6 +1259,7 @@ private:
 	BOOL					m_bCheckBoxSelection;
 	BOOL					m_bForceSize;
 	SizeDisplayFormat_t		m_SizeDisplayFormat;
+	BOOL					m_bTVAutoExpandSelected;
 	UINT					m_StartupMode;
 	UINT					m_ReplaceExplorerMode;
 

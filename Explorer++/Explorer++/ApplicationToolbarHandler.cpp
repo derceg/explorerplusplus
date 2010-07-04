@@ -111,7 +111,7 @@ BOOL bShowNameOnToolbar)
 	return pAppButton;
 }
 
-void CContainer::ApplicationToolbarOpenItem(int iItem)
+void CContainer::ApplicationToolbarOpenItem(int iItem,TCHAR *szParameters)
 {
 	ApplicationButton_t	*pab = NULL;
 	LPITEMIDLIST		pidl = NULL;
@@ -136,7 +136,7 @@ void CContainer::ApplicationToolbarOpenItem(int iItem)
 
 			if(SUCCEEDED(hr))
 			{
-				OpenFileItem(pidl);
+				OpenFileItem(pidl,szParameters);
 
 				CoTaskMemFree(pidl);
 			}

@@ -98,8 +98,8 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON,13,78,139,10
     CONTROL         "&Don't replace Explorer",IDC_OPTION_REPLACEEXPLORER_NONE,
                     "Button",BS_AUTORADIOBUTTON,13,65,87,10
-    CONTROL         "Replace Explorer for &all folders",IDC_OPTION_REPLACEEXPLORER_ALL,
-                    "Button",BS_AUTORADIOBUTTON,13,91,114,10
+    CONTROL         "Replace Explorer for &all folders (Vista and later)",IDC_OPTION_REPLACEEXPLORER_ALL,
+                    "Button",BS_AUTORADIOBUTTON,13,91,167,10
 END
 
 IDD_SETFILEATTRIBUTES DIALOGEX 0, 0, 265, 127
@@ -478,7 +478,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,170,10
 END
 
-IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 268
+IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 277
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Window"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -486,13 +486,13 @@ BEGIN
     CONTROL         "Allow &multiple instances",IDC_OPTION_MULTIPLEINSTANCES,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,15,91,10
     CONTROL         "&Show file previews in display window",IDC_OPTION_FILEPREVIEWS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,133,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,251,133,10
     CONTROL         "Show full &path in title bar",IDC_SETTINGS_CHECK_TITLEPATH,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,67,95,10
     CONTROL         "Show &username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,80,101,10
     CONTROL         "&Disable treeview delay",IDC_OPTION_TREEVIEWDELAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,202,88,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,215,88,10
     CONTROL         "Extend tab &bar across entire window",IDC_OPTION_EXTENDTABCONTROL,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,54,133,10
     CONTROL         "Show &gridlines in details view",IDC_OPTION_GRIDLINES,
@@ -503,15 +503,17 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,93,113,10
     CONTROL         "Always show the tab bar",IDC_OPTION_ALWAYSSHOWTABBAR,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,28,95,10
-    GROUPBOX        "Treeview",IDC_STATIC,3,176,198,44
+    GROUPBOX        "Treeview",IDC_STATIC,3,176,198,55
     CONTROL         "Automatically expand nodes while browsing",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,189,155,10
     GROUPBOX        "General",IDC_STATIC,3,4,198,106
     GROUPBOX        "Listview",IDC_STATIC,3,116,198,54
-    GROUPBOX        "Display Window",IDC_STATIC,3,226,198,35
+    GROUPBOX        "Display Window",IDC_STATIC,3,237,198,35
     CONTROL         "Use check boxes to select items",IDC_OPTION_CHECKBOXSELECTION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,141,117,10
     CONTROL         "Show the tab bar at the bottom",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,41,117,10
+    CONTROL         "Automatically expand nodes on selection",IDC_OPTION_TREEVIEWSELECTIONEXPAND,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,202,146,10
 END
 
 IDD_CUSTOMIZECOLORS DIALOGEX 0, 0, 363, 152
@@ -676,7 +678,7 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "&Filter"
         BEGIN
-            MENUITEM "&Set Filter...",              IDM_FILTER_FILTERRESULTS
+            MENUITEM "&Set Filter...\tCtrl+Shift+F", IDM_FILTER_FILTERRESULTS
             MENUITEM "&Apply Filter",               IDM_FILTER_APPLYFILTER
         END
     END

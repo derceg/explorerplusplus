@@ -15,6 +15,40 @@ Known limitations:
    yet (such as sorting by printer status in the
    Printers folder).
 
+Version 1.2 (xx/xx/xx)
+----------------------
+New features:
+- Taskbar thumbnails are now shown for each tab in Windows
+  7.
+- The tab bar can now be hidden when there is only one
+  tab.
+- A navigation sound is now played when entering a folder.
+- The current folder is now selected when navigating up.
+- Listview checkboxes.
+- Closing the last tab will now close the main window
+  (when the correct option is selected).
+- Items can now be rearranged in details view.
+- It is now possible to show file sizes in one of:
+  Bytes/KB/MB/GB/TB/PB.
+- Ctrl+Backspace can now be used to browse to the root of
+  a tab.
+- Shift+Double Click will now open the selected folder in
+  a new window.
+
+Bug fixes:
+- Main window now obeys startup window position information
+  (e.g. minimized/maximized).
+- Fixed directory modification bug.
+- Fixed set file attributes dialog bug.
+- Fixed treeview rename bug (child items not updated).
+- Fixed treeview sorting bug.
+- Fixed toolbar positioning bug.
+- Fixed custom infotips bug.
+
+Misc:
+- Can now scroll treeview, even when it does not have focus.
+- The options dialog is now modeless.
+
 Version 1.1 (5/4/10)
 --------------------
 New features:

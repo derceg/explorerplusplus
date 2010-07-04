@@ -137,7 +137,7 @@ HRESULT			GetItemAttributes(TCHAR *szItemParsingPath,SFGAOF *pItemAttributes);
 HRESULT			GetItemAttributes(LPITEMIDLIST pidl,SFGAOF *pItemAttributes);
 void			SplitFile(HWND hProgressBar,TCHAR *szFullFileName,TCHAR *szOutputDirectory,UINT uSplitSize);
 void			MergeFiles(list<MergedFile_t> *MergedFileNameList,TCHAR *szOutputFileName);
-BOOL			ExecuteFileAction(HWND hwnd,TCHAR *szVerb,TCHAR *szStartDirectory,LPCITEMIDLIST pidl);
+BOOL			ExecuteFileAction(HWND hwnd,TCHAR *szVerb,TCHAR *szParameters,TCHAR *szStartDirectory,LPCITEMIDLIST pidl);
 BOOL			GetVersionInfoString(TCHAR *szFileName,TCHAR *szVersionInfo,TCHAR *szBuffer,UINT cbBufLen);
 BOOL			ReadImageProperty(TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen);
 BOOL			IsImage(TCHAR *FileName);

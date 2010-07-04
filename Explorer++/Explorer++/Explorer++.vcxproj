@@ -188,7 +188,7 @@
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
       <SetChecksum>false</SetChecksum>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
@@ -234,7 +234,7 @@
       <LinkTimeCodeGeneration>
       </LinkTimeCodeGeneration>
       <SetChecksum>false</SetChecksum>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
@@ -268,7 +268,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
@@ -304,7 +304,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
@@ -459,22 +459,18 @@
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\About Image Final.bmp" />
     <None Include="res\About Image.bmp" />
     <None Include="res\Display Window.ico" />
-    <None Include="res\Explorer++ About Image 2.bmp" />
     <None Include="res\Explorer++ Small.ico" />
     <None Include="res\Explorer++.ico" />
     <None Include="res\Filtering Applied.bmp" />
     <None Include="res\Folder Empty.bmp" />
     <None Include="res\Folder Locked.bmp" />
     <None Include="res\Navigation Start.wav" />
+    <None Include="res\No Preview Available.bmp" />
     <None Include="res\Shell Go.bmp" />
     <None Include="res\Shell Images.bmp" />
     <None Include="res\Tab Close.bmp" />
-    <None Include="My Inspector Results\r000mi1\r000mi1.insp" />
-    <None Include="My Inspector Results\r001ti1\r001ti1.insp" />
-    <None Include="My Inspector Results\r002ti3\r002ti3.insp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

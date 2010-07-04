@@ -455,7 +455,9 @@ void CDropHandler::CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD d
 	list<PastedFile_t> PastedFileListMove;
 	PastedFile_t PastedFile;
 	TCHAR szFullFileName[MAX_PATH];
+	TCHAR szSourceDirectory[MAX_PATH];
 	DWORD dwEffect;
+	BOOL bRenameOnCollision;
 	int nDroppedFiles;
 	int i = 0;
 
@@ -469,6 +471,20 @@ void CDropHandler::CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD d
 		/* Determine the name of the dropped file. */
 		DragQueryFile((HDROP)pdf,i,szFullFileName,
 			SIZEOF_ARRAY(szFullFileName));
+
+		StringCchCopy(szSourceDirectory,SIZEOF_ARRAY(szSourceDirectory),szFullFileName);
+		PathRemoveFileSpec(szSourceDirectory);
+
+		/* Force files to be renamed when they are copied and pasted
+		in the same directory. */
+		if(lstrcmpi(m_szDestDirectory,szSourceDirectory) == 0)
+		{
+			bRenameOnCollision = TRUE;
+		}
+		else
+		{
+			bRenameOnCollision = m_bRenameOnCollision;
+		}
 
 		if(bPreferredEffect)
 		{
@@ -507,15 +523,15 @@ void CDropHandler::CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD d
 		}
 	}
 
-	CopyDroppedFilesInternal(pbmCopy,&PastedFileListCopy,TRUE);
-	CopyDroppedFilesInternal(pbmMove,&PastedFileListMove,FALSE);
+	CopyDroppedFilesInternal(pbmCopy,&PastedFileListCopy,TRUE,bRenameOnCollision);
+	CopyDroppedFilesInternal(pbmMove,&PastedFileListMove,FALSE,bRenameOnCollision);
 
 	pbmCopy->Release();
 	pbmMove->Release();
 }
 
 void CDropHandler::CopyDroppedFilesInternal(IBufferManager *pbm,
-list<PastedFile_t> *pPastedFileList,BOOL bCopy)
+list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
 {
 	HANDLE hThread;
 	TCHAR *szFileNameList = NULL;
@@ -552,7 +568,7 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy)
 					ppfi->shfo.wFunc	= bCopy == TRUE ? FO_COPY : FO_MOVE;
 					ppfi->shfo.pFrom	= szFileNameList;
 					ppfi->shfo.pTo		= pszDestDirectory;
-					ppfi->shfo.fFlags	= (m_bRenameOnCollision == TRUE ? FOF_RENAMEONCOLLISION : 0)|FOF_WANTMAPPINGHANDLE;
+					ppfi->shfo.fFlags	= (bRenameOnCollision == TRUE ? FOF_RENAMEONCOLLISION : 0)|FOF_WANTMAPPINGHANDLE;
 
 					ppfi->pDropFilesCallback	= m_pDropFilesCallback;
 					ppfi->pPastedFileList		= new list<PastedFile_t>(*pPastedFileList);

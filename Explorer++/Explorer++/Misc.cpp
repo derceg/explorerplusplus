@@ -30,22 +30,44 @@ void CContainer::HandleTreeViewSelection(void)
 {
 	HTREEITEM		hItem;
 	LPITEMIDLIST	pidlDirectory = NULL;
+	TCHAR			szDirectory[MAX_PATH];
+	TCHAR			szRoot[MAX_PATH];
+	UINT			uDriveType;
+	BOOL			bNetworkPath = FALSE;
 
 	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
-	hItem = m_pMyTreeView->LocateItem(pidlDirectory);
+	GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
 
-	if(hItem != NULL)
+	/* First we'll check whether the path is a UNC path. */
+	if(PathIsUNC(szDirectory))
 	{
-		/* TVN_SELCHANGED is NOT sent when the new selected
-		item is the same as the old selected item. It is only
-		sent when the two are different.
-		Therefore, the only case to handle is when the treeview
-		selection is changed by browsing using the listview. */
-		if(TreeView_GetSelection(m_hTreeView) != hItem)
-			m_bSelectingTreeViewDirectory = TRUE;
+		bNetworkPath = TRUE;
+	}
+	else
+	{
+		PathStripToRoot(szRoot);
+		uDriveType = GetDriveType(szRoot);
 
-		SendMessage(m_hTreeView,TVM_SELECTITEM,(WPARAM)TVGN_CARET,(LPARAM)hItem);
+		bNetworkPath = (uDriveType == DRIVE_REMOTE);
+	}
+
+	if(!bNetworkPath)
+	{
+		hItem = m_pMyTreeView->LocateItem(pidlDirectory);
+
+		if(hItem != NULL)
+		{
+			/* TVN_SELCHANGED is NOT sent when the new selected
+			item is the same as the old selected item. It is only
+			sent when the two are different.
+			Therefore, the only case to handle is when the treeview
+			selection is changed by browsing using the listview. */
+			if(TreeView_GetSelection(m_hTreeView) != hItem)
+				m_bSelectingTreeViewDirectory = TRUE;
+
+			SendMessage(m_hTreeView,TVM_SELECTITEM,(WPARAM)TVGN_CARET,(LPARAM)hItem);
+		}
 	}
 
 	CoTaskMemFree(pidlDirectory);
@@ -136,7 +158,7 @@ HRESULT CContainer::RestoreTabs(ILoadSave *pLoadSave)
 
 	m_iTabSelectedItem = m_iLastSelectedTab;
 
-	OnTabChangeInternal();
+	OnTabChangeInternal(TRUE);
 
 	return S_OK;
 }
@@ -613,7 +635,7 @@ void CContainer::ShowHiddenFiles(void)
 {
 	m_pActiveShellBrowser->ToggleShowHidden();
 
-    RefreshTab(m_iObjectIndex);
+	RefreshTab(m_iObjectIndex);
 }
 
 void CContainer::CopyToFolder(BOOL bMove)

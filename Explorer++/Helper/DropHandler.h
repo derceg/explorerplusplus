@@ -63,7 +63,7 @@ private:
 	void	HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDirectory,POINTL *pptl);
 	void	HandleRightClickDrop(void);
 	void	CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD dwPreferredEffect);
-	void	CopyDroppedFilesInternal(IBufferManager *pbm,list<PastedFile_t> *pPastedFileList,BOOL bCopy);
+	void	CopyDroppedFilesInternal(IBufferManager *pbm,list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision);
 	void	CreateShortcutToDroppedFile(TCHAR *szFullFileName);
 	BOOL	CheckItemLocations(int iDroppedItem);
 
