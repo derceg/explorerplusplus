@@ -94,6 +94,8 @@ will need to be changed correspondingly. */
 #define HASH_CHECKBOXSELECTION		456677010
 #define HASH_FORCESIZE				1918861263
 #define HASH_SIZEDISPLAYFOMRAT		3548127263
+#define HASH_CLOSEMAINWINDOWONTABCLOSE	1151827266
+#define HASH_SHOWTABBARATBOTTOM		4099029340
 
 typedef struct
 {
@@ -301,6 +303,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("CheckBoxSelection"),EncodeBoolValue(m_bCheckBoxSelection));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("CloseMainWindowOnTabClose"),EncodeBoolValue(m_bCloseMainWindowOnTabClose));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ConfirmCloseTabs"),EncodeBoolValue(m_bConfirmCloseTabs));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisableFolderSizesNetworkRemovable"),EncodeBoolValue(m_bDisableFolderSizesNetworkRemovable));
@@ -424,13 +428,15 @@ MSXML2::IXMLDOMElement *pRoot)
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowHiddenGlobal"),EncodeBoolValue(m_bShowHiddenGlobal));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInfoTips"),EncodeBoolValue(m_bShowInfoTips));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInGroupsGlobal"),EncodeBoolValue(m_bShowInGroupsGlobal));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowPrivilegeLevelInTitleBar"),EncodeBoolValue(m_bShowPrivilegeLevelInTitleBar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowStatusBar"),EncodeBoolValue(m_bShowStatusBar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInfoTips"),EncodeBoolValue(m_bShowInfoTips));
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowTabBarAtBottom"),EncodeBoolValue(m_bShowTabBarAtBottom));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowToolbar"),EncodeBoolValue(m_bShowMainToolbar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -2578,6 +2584,10 @@ WCHAR *wszName,WCHAR *wszValue)
 		m_bCheckBoxSelection = DecodeBoolValue(wszValue);
 		break;
 
+	case HASH_CLOSEMAINWINDOWONTABCLOSE:
+		m_bCloseMainWindowOnTabClose = DecodeBoolValue(wszValue);
+		break;
+
 	case HASH_CONFIRMCLOSETABS:
 		m_bConfirmCloseTabs = DecodeBoolValue(wszValue);
 		break;
@@ -2730,6 +2740,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_SHOWSTATUSBAR:
 		m_bShowStatusBar = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_SHOWTABBARATBOTTOM:
+		m_bShowTabBarAtBottom = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWTOOLBAR:

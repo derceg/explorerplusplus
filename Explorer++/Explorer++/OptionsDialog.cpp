@@ -601,7 +601,7 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 						hCBSize = GetDlgItem(hDlg,IDC_COMBO_FILESIZES);
 
-						iSel = SendMessage(hCBSize,CB_GETCURSEL,0,0);
+						iSel = (int)SendMessage(hCBSize,CB_GETCURSEL,0,0);
 						m_SizeDisplayFormat = (SizeDisplayFormat_t)SendMessage(hCBSize,CB_GETITEMDATA,iSel,0);
 
 						nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
@@ -671,6 +671,8 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 				CheckDlgButton(hDlg,IDC_OPTION_MULTIPLEINSTANCES,BST_CHECKED);
 			if(m_bAlwaysShowTabBar)
 				CheckDlgButton(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR,BST_CHECKED);
+			if(m_bShowTabBarAtBottom)
+				CheckDlgButton(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM,BST_CHECKED);
 			if(m_bShowFilePreviews)
 				CheckDlgButton(hDlg,IDC_OPTION_FILEPREVIEWS,BST_CHECKED);
 			if(m_bShowFullTitlePath)
@@ -697,6 +699,7 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 		{
 		case IDC_OPTION_MULTIPLEINSTANCES:
 		case IDC_OPTION_ALWAYSSHOWTABBAR:
+		case IDC_OPTION_SHOWTABBARATBOTTOM:
 		case IDC_OPTION_FILEPREVIEWS:
 		case IDC_SETTINGS_CHECK_TITLEPATH:
 		case IDC_OPTION_USERNAMEINTITLEBAR:
@@ -726,6 +729,9 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 						== BST_CHECKED);
 
 					m_bAlwaysShowTabBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR)
+						== BST_CHECKED);
+
+					m_bShowTabBarAtBottom = (IsDlgButtonChecked(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM)
 						== BST_CHECKED);
 
 					m_bShowFilePreviews = (IsDlgButtonChecked(hDlg,IDC_OPTION_FILEPREVIEWS)
@@ -799,6 +805,10 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 							m_bShowTabBar = TRUE;
 						else
 							m_bShowTabBar = FALSE;
+					}
+					else
+					{
+						m_bShowTabBar = TRUE;
 					}
 
 					RECT	rc;
@@ -1026,6 +1036,8 @@ INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,L
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_ALWAYSNEWTAB,BST_CHECKED);
 				if(m_bDoubleClickTabClose)
 					CheckDlgButton(hDlg,IDC_TABS_DOUBLECLICKCLOSE,BST_CHECKED);
+				if(m_bCloseMainWindowOnTabClose)
+					CheckDlgButton(hDlg,IDC_TABS_CLOSEMAINWINDOW,BST_CHECKED);
 			}
 			break;
 
@@ -1037,6 +1049,7 @@ INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,L
 			case IDC_TABS_OPENNEXTTOCURRENT:
 			case IDC_SETTINGS_CHECK_ALWAYSNEWTAB:
 			case IDC_TABS_DOUBLECLICKCLOSE:
+			case IDC_TABS_CLOSEMAINWINDOW:
 				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
 				break;
 			}
@@ -1064,6 +1077,9 @@ INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,L
 							== BST_CHECKED);
 
 						m_bDoubleClickTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_DOUBLECLICKCLOSE)
+							== BST_CHECKED);
+
+						m_bCloseMainWindowOnTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSEMAINWINDOW)
 							== BST_CHECKED);
 
 						AddWindowStyle(m_hTabCtrl,TCS_FIXEDWIDTH,m_bForceSameTabWidth);

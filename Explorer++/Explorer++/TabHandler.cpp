@@ -285,11 +285,6 @@ typedef struct
 ATOM CContainer::RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirectory)
 {
 	WNDCLASSEX wcex;
-	SHFILEINFO shfi;
-
-	/* TODO: Assign lock icon if tab is locked. */
-	SHGetFileInfo((LPCTSTR)pidlDirectory,0,&shfi,sizeof(shfi),
-		SHGFI_PIDL|SHGFI_ICON|SHGFI_SMALLICON);
 
 	wcex.cbSize			= sizeof(wcex);
 	wcex.style			= 0;
@@ -298,15 +293,13 @@ ATOM CContainer::RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirec
 	wcex.cbWndExtra		= sizeof(TabProxy_t *);
 	wcex.hInstance		= GetModuleHandle(0);
 	wcex.hIcon			= NULL;
-	wcex.hIconSm		= shfi.hIcon;
+	wcex.hIconSm		= NULL;
 	wcex.hCursor		= LoadCursor(NULL,IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)NULL;
 	wcex.lpszMenuName	= NULL;
 	wcex.lpszClassName	= szClassName;
 
 	return RegisterClassEx(&wcex);
-
-	//DestroyIcon(shfi.hIcon);
 }
 
 /* The Display Window Manager (DWM) will only interact with top-level
@@ -319,80 +312,89 @@ http://channel9.msdn.com/learn/courses/Windows7/Taskbar/Win7TaskbarNative/Exerci
 */
 void CContainer::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwitchToNewTab)
 {
-	//if(m_bInit)
+	HWND hTabProxy;
+	TabProxyInfo_t tpi;
+	TCHAR szClassName[512];
+	HRESULT hr;
+	ATOM aRet;
+	BOOL bValue = TRUE;
+
+	/* If we're not running on Windows 7 or later, return without
+	doing anything. */
+	if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
+		m_dwMinorVersion == 0) ||
+		m_dwMajorVersion < WINDOWS_VISTA_SEVEN_MAJORVERSION)
 	{
-		HWND hTabProxy;
-		TCHAR szDisplayName[MAX_PATH];
-		TCHAR szClassName[512];
-		HRESULT hr;
-		ATOM aRet;
-		BOOL bValue = TRUE;
-		
-		static int iCount = 0;
+		return;
+	}
 
-		StringCchPrintf(szClassName,SIZEOF_ARRAY(szClassName),_T("Explorer++TabProxy%d"),iCount++);
+	static int iCount = 0;
 
-		aRet = RegisterTabProxyClass(szClassName,pidlDirectory);
+	StringCchPrintf(szClassName,SIZEOF_ARRAY(szClassName),_T("Explorer++TabProxy%d"),iCount++);
 
-		if(aRet != 0)
+	aRet = RegisterTabProxyClass(szClassName,pidlDirectory);
+
+	if(aRet != 0)
+	{
+		TabProxy_t *ptp = NULL;
+
+		ptp = (TabProxy_t *)malloc(sizeof(TabProxy_t));
+
+		ptp->pContainer = this;
+		ptp->iTabId = iTabId;
+
+		hTabProxy = CreateWindow(szClassName,EMPTY_STRING,WS_OVERLAPPEDWINDOW,
+			0,0,0,0,NULL,NULL,GetModuleHandle(0),(LPVOID)ptp);
+
+		if(hTabProxy != NULL)
 		{
-			/* Generate the text that would be shown for this tab, and
-			use it as the window text for the proxy window. */
-			GetDisplayName(pidlDirectory,szDisplayName,SHGDN_INFOLDER);
+			HMODULE hDwmapi;
+			DwmSetWindowAttributeProc DwmSetWindowAttribute;
 
-			TabProxy_t *ptp = NULL;
+			hDwmapi = LoadLibrary(_T("dwmapi.dll"));
 
-			ptp = (TabProxy_t *)malloc(sizeof(TabProxy_t));
-
-			ptp->pContainer = this;
-			ptp->iTabId = iTabId;
-
-			hTabProxy = CreateWindow(szClassName,szDisplayName,WS_OVERLAPPEDWINDOW,
-				0,0,0,0,NULL,NULL,GetModuleHandle(0),(LPVOID)ptp);
-
-			if(hTabProxy != NULL)
+			if(hDwmapi != NULL)
 			{
-				HMODULE hDwmapi;
-				DwmSetWindowAttributeProc DwmSetWindowAttribute;
+				DwmSetWindowAttribute = (DwmSetWindowAttributeProc)GetProcAddress(hDwmapi,"DwmSetWindowAttribute");
 
-				hDwmapi = LoadLibrary(_T("dwmapi.dll"));
-
-				if(hDwmapi != NULL)
+				if(DwmSetWindowAttribute != NULL)
 				{
-					DwmSetWindowAttribute = (DwmSetWindowAttributeProc)GetProcAddress(hDwmapi,"DwmSetWindowAttribute");
+					hr = DwmSetWindowAttribute(hTabProxy,DWMWA_FORCE_ICONIC_REPRESENTATION,
+						&bValue,sizeof(BOOL));
 
-					if(DwmSetWindowAttribute != NULL)
+					hr = DwmSetWindowAttribute(hTabProxy,DWMWA_HAS_ICONIC_BITMAP,
+						&bValue,sizeof(BOOL));
+
+					if(m_bTaskbarInitialised)
 					{
-						hr = DwmSetWindowAttribute(hTabProxy,DWMWA_FORCE_ICONIC_REPRESENTATION,
-							&bValue,sizeof(BOOL));
-
-						hr = DwmSetWindowAttribute(hTabProxy,DWMWA_HAS_ICONIC_BITMAP,
-							&bValue,sizeof(BOOL));
-
-						/* Register and insert the tab into the current list of
-						taskbar thumbnails. */
-						m_pTaskbarList3->RegisterTab(hTabProxy,m_hContainer);
-						m_pTaskbarList3->SetTabOrder(hTabProxy,NULL);
-
-						m_pTaskbarList3->SetThumbnailTooltip(hTabProxy,szDisplayName);
-
-						TabProxyInfo_t tpi;
-
-						tpi.hProxy	= hTabProxy;
-						tpi.iTabId	= iTabId;
-
-						m_TabProxyList.push_back(tpi);
-
-						if(bSwitchToNewTab)
-						{
-							m_pTaskbarList3->SetTabActive(hTabProxy,m_hContainer,0);
-						}
+						RegisterTab(hTabProxy,EMPTY_STRING,bSwitchToNewTab);
 					}
 
-					FreeLibrary(hDwmapi);
+					tpi.hProxy		= hTabProxy;
+					tpi.iTabId		= iTabId;
+					tpi.atomClass	= aRet;
+
+					m_TabProxyList.push_back(tpi);
 				}
+
+				FreeLibrary(hDwmapi);
 			}
 		}
+	}
+}
+
+void CContainer::RegisterTab(HWND hTabProxy,TCHAR *szDisplayName,BOOL bTabActive)
+{
+	/* Register and insert the tab into the current list of
+	taskbar thumbnails. */
+	m_pTaskbarList3->RegisterTab(hTabProxy,m_hContainer);
+	m_pTaskbarList3->SetTabOrder(hTabProxy,NULL);
+
+	m_pTaskbarList3->SetThumbnailTooltip(hTabProxy,szDisplayName);
+
+	if(bTabActive)
+	{
+		m_pTaskbarList3->SetTabActive(hTabProxy,m_hContainer,0);
 	}
 }
 
@@ -829,15 +831,22 @@ void CContainer::OnTabChangeInternal(BOOL bSetFocus)
 	ShowWindow(m_hActiveListView,SW_SHOW);
 
 	/* Inform the taskbar that this tab has become active. */
-	/* TODO: Fix. */
-	list<TabProxyInfo_t>::iterator itr;
-
-	for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+	if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
+			m_dwMinorVersion >= 1) ||
+			m_dwMajorVersion > WINDOWS_VISTA_SEVEN_MAJORVERSION)
 	{
-		if(itr->iTabId == m_iObjectIndex)
+		if(m_bTaskbarInitialised)
 		{
-			m_pTaskbarList3->SetTabActive(itr->hProxy,m_hContainer,0);
-			break;
+			list<TabProxyInfo_t>::iterator itr;
+
+			for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+			{
+				if(itr->iTabId == m_iObjectIndex)
+				{
+					m_pTaskbarList3->SetTabActive(itr->hProxy,m_hContainer,0);
+					break;
+				}
+			}
 		}
 	}
 
@@ -963,11 +972,13 @@ HRESULT CContainer::CloseTab(int TabIndex)
 
 	NumTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	if(NumTabs == 1)
+	if((NumTabs == 1))
 	{
-		/* If this is the last tab, close the main
-		window. */
-		SendMessage(m_hContainer,WM_CLOSE,0,0);
+		if(m_bCloseMainWindowOnTabClose)
+		{
+			SendMessage(m_hContainer,WM_CLOSE,0,0);
+		}
+
 		return S_OK;
 	}
 
@@ -1032,14 +1043,33 @@ HRESULT CContainer::CloseTab(int TabIndex)
 
 	list<TabProxyInfo_t>::iterator itr;
 
-	/* TODO: Need to release class icon when a tab preview is closed. */
-	for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+	/* TODO: Need to release class icon and destroy proxy window
+	when a tab is closed. */
+	if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
+			m_dwMinorVersion >= 1) ||
+			m_dwMajorVersion > WINDOWS_VISTA_SEVEN_MAJORVERSION)
 	{
-		if(itr->iTabId == TabIndex)
+		if(m_bTaskbarInitialised)
 		{
-			m_pTaskbarList3->UnregisterTab(itr->hProxy);
-			m_TabProxyList.erase(itr);
-			break;
+			for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+			{
+				if(itr->iTabId == TabIndex)
+				{
+					HICON hIcon;
+
+					m_pTaskbarList3->UnregisterTab(itr->hProxy);
+
+					DestroyWindow(itr->hProxy);
+
+					hIcon = (HICON)GetClassLongPtr(itr->hProxy,GCLP_HICONSM);
+					DestroyIcon(hIcon);
+
+					UnregisterClass((LPCWSTR)MAKEWORD(itr->atomClass,0),GetModuleHandle(0));
+
+					m_TabProxyList.erase(itr);
+					break;
+				}
+			}
 		}
 	}
 
@@ -1710,4 +1740,25 @@ void CContainer::DuplicateTab(int iTabInternal)
 		szTabDirectory);
 
 	BrowseFolder(szTabDirectory,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
+}
+
+void CContainer::SetTabProxyIcon(int iTabId,HICON hIcon)
+{
+	list<TabProxyInfo_t>::iterator itr;
+
+	for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+	{
+		if(itr->iTabId == iTabId)
+		{
+			HICON hIconTemp;
+
+			hIconTemp = (HICON)GetClassLongPtr(itr->hProxy,GCLP_HICONSM);
+			DestroyIcon(hIconTemp);
+
+			hIconTemp = CopyIcon(hIcon);
+
+			SetClassLongPtr(itr->hProxy,GCLP_HICONSM,(LONG_PTR)hIconTemp);
+			break;
+		}
+	}
 }

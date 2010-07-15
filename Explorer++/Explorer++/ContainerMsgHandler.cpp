@@ -90,11 +90,16 @@ void CContainer::OnWindowCreate(void)
 {
 	ILoadSave *pLoadSave = NULL;
 
-	m_bInit = FALSE;
+	m_bTaskbarInitialised = FALSE;
 	m_uTaskbarButtonCreatedMessage = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 
-	CoCreateInstance(CLSID_TaskbarList,NULL,CLSCTX_INPROC_SERVER,
-		IID_ITaskbarList4,(LPVOID *)&m_pTaskbarList3);
+	if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
+			m_dwMinorVersion >= 1) ||
+			m_dwMajorVersion > WINDOWS_VISTA_SEVEN_MAJORVERSION)
+	{
+		CoCreateInstance(CLSID_TaskbarList,NULL,CLSCTX_INPROC_SERVER,
+			IID_ITaskbarList4,(LPVOID *)&m_pTaskbarList3);
+	}
 
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
@@ -606,7 +611,7 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInN
 		is contained within a top-layer 'Control Panel' folder. This
 		folder simply provides grouping of several control panel
 		items. */
-		if(m_dwMajorVersion >= WINDOWS_VISTA_MAJORVERSION)
+		if(m_dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
 		{
 			ILRemoveLastID(pidlControlPanel);
 		}
@@ -856,10 +861,9 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	IndentTop = iIndentRebar;
 
-	/* TODO: */
 	if(m_bShowTabBar)
 	{
-		//if(1)
+		if(!m_bShowTabBarAtBottom)
 		{
 			IndentTop += TAB_WINDOW_HEIGHT;
 		}
@@ -882,17 +886,14 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	int iTabTop;
 
-	/* Are we showing the tab bar at the top or
-	bottom of the window? */
-	/* TODO: */
-	//if(1)
+	if(!m_bShowTabBarAtBottom)
 	{
 		iTabTop = iIndentRebar;
 	}
-	/*else
+	else
 	{
-		iTabTop = IndentTop + MainWindowHeight - IndentBottom - IndentTop - TAB_WINDOW_HEIGHT;
-	}*/
+		iTabTop = MainWindowHeight - IndentBottom - TAB_WINDOW_HEIGHT;
+	}
 
 	/* If we're showing the tab bar at the bottom of the listview,
 	the only thing that will change is the top coordinate. */
@@ -931,23 +932,6 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 		FOLDERS_TOOLBAR_WIDTH,FOLDERS_TOOLBAR_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
 
 
-	//iHolderTop += iHolderHeight;//250;
-	//iHolderWidth = m_TreeViewWidth;
-	//iHolderHeight = 250;//MainWindowHeight - IndentBottom - iHolderTop;
-
-	/* <---- Bookmarks sidebar ----> */
-	/*SetWindowPos(m_hBookmarksHolder,NULL,0,iHolderTop,
-		iHolderWidth,250,SWP_NOREPOSITION|SWP_NOZORDER);
-
-	SetWindowPos(m_hBookmarksTreeView,NULL,TREEVIEW_X_CLEARANCE,TREEVIEW_Y_CLEARANCE,
-		iHolderWidth - TREEVIEW_HOLDER_CLEARANCE - TREEVIEW_X_CLEARANCE,
-		iHolderHeight - TREEVIEW_Y_CLEARANCE,SWP_NOZORDER);
-
-	SetWindowPos(m_hBookmarksSidebarToolbar,NULL,
-		iHolderWidth + FOLDERS_TOOLBAR_X_OFFSET,FOLDERS_TOOLBAR_Y_OFFSET,
-		FOLDERS_TOOLBAR_WIDTH,FOLDERS_TOOLBAR_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);*/
-
-
 	/* <---- Display window ----> */
 
 	SetWindowPos(m_hDisplayWindow,NULL,0,MainWindowHeight - IndentBottom,
@@ -968,9 +952,18 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 		if((int)tcItem.lParam == m_iObjectIndex)
 			uFlags |= SWP_SHOWWINDOW;
 
-		SetWindowPos(m_hListView[(int)tcItem.lParam],NULL,IndentLeft,IndentTop,
-			MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - TAB_WINDOW_HEIGHT,
-			uFlags);
+		if(!m_bShowTabBarAtBottom)
+		{
+			SetWindowPos(m_hListView[(int)tcItem.lParam],NULL,IndentLeft,IndentTop,
+				MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
+				uFlags);
+		}
+		else
+		{
+			SetWindowPos(m_hListView[(int)tcItem.lParam],NULL,IndentLeft,IndentTop,
+				MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - TAB_WINDOW_HEIGHT,
+				uFlags);
+		}
 	}
 
 
@@ -1078,6 +1071,32 @@ void CContainer::OnDirChanged(int iTabId)
 	ListView_SetItemState(m_hActiveListView,0,LVIS_FOCUSED,LVIS_FOCUSED);
 
 	UpdateWindowStates();
+
+	/* TODO: Load this funtion ONCE only on startup. */
+	HMODULE hDwmapi;
+	DwmInvalidateIconicBitmapsProc DwmInvalidateIconicBitmaps;
+
+	hDwmapi = LoadLibrary(_T("dwmapi.dll"));
+
+	if(hDwmapi != NULL)
+	{
+		DwmInvalidateIconicBitmaps = (DwmInvalidateIconicBitmapsProc)GetProcAddress(hDwmapi,"DwmInvalidateIconicBitmaps");
+
+		if(DwmInvalidateIconicBitmaps != NULL)
+		{
+			list<TabProxyInfo_t>::iterator itr;
+
+			for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+			{
+				if(itr->iTabId == iTabId)
+				{
+					DwmInvalidateIconicBitmaps(itr->hProxy);
+				}
+			}
+		}
+
+		FreeLibrary(hDwmapi);
+	}
 
 	SetTabIcon();
 }
@@ -1733,12 +1752,13 @@ HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
 	{
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE);
-
 		hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
 
 		if(SUCCEEDED(hr))
+		{
+			PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE|SND_ASYNC);
 			OnDirChanged(m_iObjectIndex);
+		}
 	}
 	else
 	{
@@ -1781,9 +1801,12 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 	{
 		if(!bOpenInNewTab && !m_TabInfo[m_iObjectIndex].bAddressLocked)
 		{
-			PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE);
-
 			hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
+
+			if(SUCCEEDED(hr))
+			{
+				PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE|SND_ASYNC);
+			}
 
 			iTabObjectIndex = m_iObjectIndex;
 		}
@@ -2670,7 +2693,7 @@ int CContainer::GetViewModeMenuStringId(UINT uViewMode)
 			break;
 
 		case VM_ICONS:
-			if(m_dwMajorVersion >= WINDOWS_VISTA_MAJORVERSION)
+			if(m_dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
 				return IDS_VIEW_MEDIUMICONS;
 			else if(m_dwMajorVersion >= WINDOWS_XP_MAJORVERSION)
 				return IDS_VIEW_ICONS;

@@ -189,8 +189,7 @@
       </LinkTimeCodeGeneration>
       <SetChecksum>false</SetChecksum>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
@@ -235,8 +234,7 @@
       </LinkTimeCodeGeneration>
       <SetChecksum>false</SetChecksum>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -269,8 +267,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
@@ -305,8 +302,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>

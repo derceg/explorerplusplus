@@ -146,6 +146,14 @@ HRESULT CContainer::RestoreTabs(ILoadSave *pLoadSave)
 		HandleDirectoryMonitoring((int)tcItem.lParam);
 	}
 
+	if(!m_bAlwaysShowTabBar)
+	{
+		if(nTabsCreated == 1)
+		{
+			m_bShowTabBar = FALSE;
+		}
+	}
+
 	/* m_iLastSelectedTab is the tab that was selected when the
 	program was last closed. */
 	if(m_iLastSelectedTab >= TabCtrl_GetItemCount(m_hTabCtrl) ||

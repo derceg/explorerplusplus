@@ -40,7 +40,7 @@ saved to/loaded from. */
 #define XML_FILENAME	_T("config.xml")
 
 /* Used for testing what version of Windows we're running on. */
-#define WINDOWS_VISTA_MAJORVERSION	6
+#define WINDOWS_VISTA_SEVEN_MAJORVERSION	6
 #define WINDOWS_XP_MAJORVERSION		5
 
 #define LANG_SINHALA	1115
@@ -188,6 +188,7 @@ typedef BOOL (WINAPI *ChangeWindowMessageFilterProc)(UINT message,DWORD dwFlag);
 typedef HRESULT (STDAPICALLTYPE *DwmSetWindowAttributeProc)(HWND hwnd,DWORD dwAttribute,LPCVOID pvAttribute,DWORD cbAttribute);
 typedef HRESULT (STDAPICALLTYPE *DwmSetIconicThumbnailProc)(HWND hwnd,HBITMAP hbmp,DWORD dwSITFlags);
 typedef HRESULT (STDAPICALLTYPE *DwmSetIconicLivePreviewBitmapProc)(HWND hwnd,HBITMAP hbmp,POINT *pptClient,DWORD dwSITFlags);
+typedef HRESULT (STDAPICALLTYPE *DwmInvalidateIconicBitmapsProc)(HWND hwnd);
 
 #define VALIDATE_REALFOLDER_COLUMNS			0
 #define VALIDATE_CONTROLPANEL_COLUMNS		1

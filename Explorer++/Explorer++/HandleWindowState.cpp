@@ -383,6 +383,18 @@ void CContainer::HandleTabText(void)
 
 		TabCtrl_SetItemText(m_hTabCtrl,m_iTabSelectedItem,szExpandedTabText);
 
+		/* TODO: Change the proxy windows text... */
+		list<TabProxyInfo_t>::iterator itr;
+
+		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+		{
+			if(itr->iTabId == m_iObjectIndex)
+			{
+				SetWindowText(itr->hProxy,szExpandedTabText);
+				break;
+			}
+		}
+
 		CoTaskMemFree(pidlDirectory);
 	}
 }
@@ -429,6 +441,9 @@ void CContainer::SetTabIcon(int iIndex,int iTabId,LPITEMIDLIST pidlDirectory)
 	{
 		SHGetFileInfo((LPCTSTR)pidlDirectory,0,&shfi,sizeof(shfi),
 			SHGFI_PIDL|SHGFI_ICON|SHGFI_SMALLICON);
+
+		/* TODO: Update the tab proxy window with the new icon and text. */
+		SetTabProxyIcon(iTabId,shfi.hIcon);
 
 		GetIconInfo(shfi.hIcon,&IconInfo);
 		iImage = ImageList_Add(TabCtrl_GetImageList(m_hTabCtrl),

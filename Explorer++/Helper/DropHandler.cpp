@@ -457,7 +457,7 @@ void CDropHandler::CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD d
 	TCHAR szFullFileName[MAX_PATH];
 	TCHAR szSourceDirectory[MAX_PATH];
 	DWORD dwEffect;
-	BOOL bRenameOnCollision;
+	BOOL bRenameOnCollision = m_bRenameOnCollision;
 	int nDroppedFiles;
 	int i = 0;
 
@@ -480,10 +480,6 @@ void CDropHandler::CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD d
 		if(lstrcmpi(m_szDestDirectory,szSourceDirectory) == 0)
 		{
 			bRenameOnCollision = TRUE;
-		}
-		else
-		{
-			bRenameOnCollision = m_bRenameOnCollision;
 		}
 
 		if(bPreferredEffect)

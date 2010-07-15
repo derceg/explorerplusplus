@@ -200,8 +200,9 @@ CContainer::CContainer(HWND hwnd)
 	if(GetVersionEx(&VersionInfo) != 0)
 	{
 		m_dwMajorVersion = VersionInfo.dwMajorVersion;
+		m_dwMinorVersion = VersionInfo.dwMinorVersion;
 
-		if(VersionInfo.dwMajorVersion >= WINDOWS_VISTA_MAJORVERSION)
+		if(VersionInfo.dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
 		{
 			ViewMode.uViewMode = VM_EXTRALARGEICONS;
 			m_ViewModes.push_back(ViewMode);
@@ -337,6 +338,7 @@ void CContainer::SetDefaultValues(void)
 	m_bForceSize					= FALSE;
 	m_SizeDisplayFormat				= FORMAT_BYTES;
 	m_bTVAutoExpandSelected			= FALSE;
+	m_bCloseMainWindowOnTabClose	= TRUE;
 
 	/* Infotips (user options). */
 	m_bShowInfoTips					= TRUE;
@@ -357,6 +359,7 @@ void CContainer::SetDefaultValues(void)
 	m_DisplayWindowHeight			= DEFAULT_DISPLAYWINDOW_HEIGHT;
 	m_TreeViewWidth					= DEFAULT_TREEVIEW_WIDTH;
 	m_bUseFullRowSelect				= FALSE;
+	m_bShowTabBarAtBottom			= FALSE;
 
 	/* Global options. */
 	m_ViewModeGlobal				= VM_ICONS;
@@ -700,13 +703,18 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
  */
 LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
-	/* TODO: */
+	/* TODO: Release previous interface. */
 	if(Msg == m_uTaskbarButtonCreatedMessage)
 	{
 		HMODULE hUser32;
 		ChangeWindowMessageFilterProc ChangeWindowMessageFilter;
 
-		m_bInit = TRUE;
+		if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
+			m_dwMinorVersion == 0) ||
+			m_dwMajorVersion < WINDOWS_VISTA_SEVEN_MAJORVERSION)
+		{
+			return 0;
+		}
 
 		hUser32 = LoadLibrary(_T("user32.dll"));
 
@@ -726,6 +734,39 @@ LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LP
 		}
 
 		m_pTaskbarList3->HrInit();
+
+		m_bTaskbarInitialised = TRUE;
+
+		list<TabProxyInfo_t>::iterator itr;
+		LPITEMIDLIST pidlDirectory = NULL;
+		TCHAR szDisplayName[MAX_PATH];
+		BOOL bActive;
+
+		/* TODO: Check. */
+		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+		{
+			pidlDirectory = m_pShellBrowser[itr->iTabId]->QueryCurrentDirectoryIdl();
+
+			GetDisplayName(pidlDirectory,szDisplayName,SHGDN_INFOLDER);
+
+			bActive = (itr->iTabId == m_iObjectIndex);
+
+			RegisterTab(itr->hProxy,szDisplayName,bActive);
+
+			/* TODO: This text is WRONG. */
+			SetWindowText(itr->hProxy,szDisplayName);
+
+			SHFILEINFO shfi;
+
+			SHGetFileInfo((LPCTSTR)pidlDirectory,0,&shfi,sizeof(shfi),
+			SHGFI_PIDL|SHGFI_ICON|SHGFI_SMALLICON);
+
+			/* TODO: This is also wrong (a lock icon may be required).
+			Merge with function that sets tab icons. */
+			SetTabProxyIcon(itr->iTabId,shfi.hIcon);
+
+			CoTaskMemFree(pidlDirectory);
+		}
 
 		return 0;
 	}

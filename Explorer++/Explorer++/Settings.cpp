@@ -75,6 +75,8 @@ LONG CContainer::SaveSettings(void)
 		SaveDwordToRegistry(hSettingsKey,_T("CheckBoxSelection"),m_bCheckBoxSelection);
 		SaveDwordToRegistry(hSettingsKey,_T("ForceSize"),m_bForceSize);
 		SaveDwordToRegistry(hSettingsKey,_T("SizeDisplayFormat"),m_SizeDisplayFormat);
+		SaveDwordToRegistry(hSettingsKey,_T("CloseMainWindowOnTabClose"),m_bCloseMainWindowOnTabClose);
+		SaveDwordToRegistry(hSettingsKey,_T("ShowTabBarAtBottom"),m_bShowTabBarAtBottom);
 
 		SaveStringToRegistry(hSettingsKey,_T("NewTabDirectory"),m_DefaultTabDirectory);
 
@@ -185,6 +187,8 @@ LONG CContainer::LoadSettings(LPCTSTR KeyPath)
 		ReadDwordFromRegistry(hSettingsKey,_T("CheckBoxSelection"),(LPDWORD)&m_bCheckBoxSelection);
 		ReadDwordFromRegistry(hSettingsKey,_T("ForceSize"),(LPDWORD)&m_bForceSize);
 		ReadDwordFromRegistry(hSettingsKey,_T("SizeDisplayFormat"),(LPDWORD)&m_SizeDisplayFormat);
+		ReadDwordFromRegistry(hSettingsKey,_T("CloseMainWindowOnTabClose"),(LPDWORD)&m_bCloseMainWindowOnTabClose);
+		ReadDwordFromRegistry(hSettingsKey,_T("ShowTabBarAtBottom"),(LPDWORD)&m_bShowTabBarAtBottom);
 
 		ReadStringFromRegistry(hSettingsKey,_T("NewTabDirectory"),m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory));
 

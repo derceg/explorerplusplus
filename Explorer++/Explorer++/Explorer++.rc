@@ -474,7 +474,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,116,10
     CONTROL         "&Double-click to close a tab",IDC_TABS_DOUBLECLICKCLOSE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,99,10
-    CONTROL         "Close the main window when closing the last tab",IDC_CHECK1,
+    CONTROL         "Close the main window when closing the last tab",IDC_TABS_CLOSEMAINWINDOW,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,170,10
 END
 
@@ -511,7 +511,8 @@ BEGIN
     GROUPBOX        "Display Window",IDC_STATIC,3,237,198,35
     CONTROL         "Use check boxes to select items",IDC_OPTION_CHECKBOXSELECTION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,141,117,10
-    CONTROL         "Show the tab bar at the bottom",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,41,117,10
+    CONTROL         "Show the tab bar at the bottom",IDC_OPTION_SHOWTABBARATBOTTOM,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,41,117,10
     CONTROL         "Automatically expand nodes on selection",IDC_OPTION_TREEVIEWSELECTIONEXPAND,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,202,146,10
 END
@@ -921,7 +922,7 @@ BEGIN
     BEGIN
         BLOCK "0c0904b0"
         BEGIN
-            VALUE "FileDescription", "Explorer Application"
+            VALUE "FileDescription", "Explorer++"
             VALUE "FileVersion", "1.1"
             VALUE "InternalName", "Explorer++"
             VALUE "LegalCopyright", "(C) 2005-2009 David Erceg"

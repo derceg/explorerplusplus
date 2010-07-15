@@ -167,6 +167,7 @@ typedef struct
 
 typedef struct
 {
+	ATOM	atomClass;
 	HWND	hProxy;
 	int		iTabId;
 } TabProxyInfo_t;
@@ -793,6 +794,7 @@ private:
 	/* Windows 7 taskbar thumbnail previews. */
 	ATOM					RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirectory);
 	void					CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwitchToNewTab);
+	void					RegisterTab(HWND hTabProxy,TCHAR *szDisplayName,BOOL bTabActive);
 	HBITMAP					CaptureTabScreenshot(int iTabId);
 	void					GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi);
 
@@ -863,6 +865,9 @@ private:
 
 	/* Tabs. */
 	void					DuplicateTab(int iTabInternal);
+
+	/* Tab proxys. */
+	void					SetTabProxyIcon(int iTabId,HICON hIcon);
 
 	/* Tab drag and drop. */
 	void					GetSourceFileName(IDataObject *pDataObject);
@@ -1195,6 +1200,7 @@ private:
 	TCHAR					m_OldTreeViewFileName[MAX_PATH];
 	DWORD					m_Language;
 	DWORD					m_dwMajorVersion;
+	DWORD					m_dwMinorVersion;
 	LONG					m_DisplayWindowHeight;
 	BOOL					m_bTreeViewRightClick;
 	BOOL					m_bSelectingTreeViewDirectory;
@@ -1258,6 +1264,8 @@ private:
 	BOOL					m_bOverwriteExistingFilesConfirmation;
 	BOOL					m_bCheckBoxSelection;
 	BOOL					m_bForceSize;
+	BOOL					m_bCloseMainWindowOnTabClose;
+	BOOL					m_bShowTabBarAtBottom;
 	SizeDisplayFormat_t		m_SizeDisplayFormat;
 	BOOL					m_bTVAutoExpandSelected;
 	UINT					m_StartupMode;
@@ -1283,7 +1291,7 @@ private:
 	ITaskbarList4			*m_pTaskbarList3;
 	list<TabProxyInfo_t>	m_TabProxyList;
 	UINT					m_uTaskbarButtonCreatedMessage;
-	BOOL					m_bInit;
+	BOOL					m_bTaskbarInitialised;
 
 	/* Win+E keyboard hook DLL. */
 	HHOOK					m_hKeyboardHook;

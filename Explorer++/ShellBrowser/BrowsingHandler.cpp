@@ -217,7 +217,8 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			BOOL bHideExtension = FALSE;
 			TCHAR *pExt = NULL;
 
-			if(m_bHideLinkExtension)
+			if(m_bHideLinkExtension &&
+				((m_pwfdFiles[itr->iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 			{
 				pExt = PathFindExtension(m_pExtraItemInfo[(int)itr->iItemInternal].szDisplayName);
 
@@ -231,7 +232,8 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			/* Strip the extension if necessary. Don't remove the extension
 			if the filename starts with a dot. */
 			if((m_bShowExtensions ||
-				m_pExtraItemInfo[(int)itr->iItemInternal].szDisplayName[0] == '.') &&
+				m_pExtraItemInfo[(int)itr->iItemInternal].szDisplayName[0] == '.') ||
+				(m_pwfdFiles[itr->iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY &&
 				!bHideExtension)
 			{
 				lv.pszText	= m_pExtraItemInfo[(int)itr->iItemInternal].szDisplayName;
