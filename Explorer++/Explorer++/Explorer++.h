@@ -778,7 +778,10 @@ private:
 	void					HandleMainWindowText(void);
 	void					HandleComboBoxText(void);
 	void					HandleTabText(void);
+	void					HandleTabText(int iTabId);
+	void					HandleTabText(int iTab,int iTabId);
 	void					SetTabIcon(void);
+	void					SetTabIcon(int iTabId);
 	void					SetTabIcon(int iIndex,int iTabId);
 	void					SetTabIcon(int iIndex,int iTabId,LPITEMIDLIST pidlDirectory);
 	void					HandleTreeViewSelection(void);

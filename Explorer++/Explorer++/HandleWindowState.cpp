@@ -354,44 +354,66 @@ void CContainer::HandleComboBoxText(void)
 	CoTaskMemFree(pidl);
 }
 
-/*
- * Sets the text for the current tab.
- */
 void CContainer::HandleTabText(void)
 {
+	HandleTabText(m_iTabSelectedItem,m_iObjectIndex);
+}
+
+void CContainer::HandleTabText(int iTabId)
+{
 	TCITEM tcItem;
+	int nTabs;
+	int i = 0;
 
-	tcItem.mask	= TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,m_iTabSelectedItem,&tcItem);
+	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
+	for(i = 0;i < nTabs;i++)
+	{
+		tcItem.mask = TCIF_PARAM;
+		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
+
+		if((int)tcItem.lParam == iTabId)
+		{
+			HandleTabText(i,iTabId);
+			break;
+		}
+	}
+}
+
+void CContainer::HandleTabText(int iTab,int iTabId)
+{
 	/* Can optimize - store folder name, only change when
 	folder changes. */
-	if(!m_TabInfo[(int)tcItem.lParam].bUseCustomName)
+	if(!m_TabInfo[iTabId].bUseCustomName)
 	{
 		LPITEMIDLIST pidlDirectory = NULL;
 		TCHAR szTabText[MAX_PATH];
 		TCHAR szExpandedTabText[MAX_PATH];
 
-		pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+		pidlDirectory = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
 		GetDisplayName(pidlDirectory,szTabText,SHGDN_INFOLDER);
 
-		StringCchCopy(m_TabInfo[(int)tcItem.lParam].szName,
-			SIZEOF_ARRAY(m_TabInfo[(int)tcItem.lParam].szName),szTabText);
+		StringCchCopy(m_TabInfo[iTabId].szName,
+			SIZEOF_ARRAY(m_TabInfo[iTabId].szName),szTabText);
 
 		ReplaceCharacterWithString(szTabText,szExpandedTabText,
 			SIZEOF_ARRAY(szExpandedTabText),'&',_T("&&"));
 
-		TabCtrl_SetItemText(m_hTabCtrl,m_iTabSelectedItem,szExpandedTabText);
+		TabCtrl_SetItemText(m_hTabCtrl,iTab,szExpandedTabText);
 
 		/* TODO: Change the proxy windows text... */
 		list<TabProxyInfo_t>::iterator itr;
 
-		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+		if(m_bTaskbarInitialised)
 		{
-			if(itr->iTabId == m_iObjectIndex)
+			for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 			{
-				SetWindowText(itr->hProxy,szExpandedTabText);
-				break;
+				if(itr->iTabId == iTabId)
+				{
+					SetWindowText(itr->hProxy,szExpandedTabText);
+					m_pTaskbarList3->SetThumbnailTooltip(itr->hProxy,szExpandedTabText);
+					break;
+				}
 			}
 		}
 
@@ -406,6 +428,32 @@ void CContainer::SetTabIcon(void)
 	pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
 	SetTabIcon(m_iTabSelectedItem,m_iObjectIndex,pidl);
+
+	CoTaskMemFree(pidl);
+}
+
+void CContainer::SetTabIcon(int iTabId)
+{
+	LPITEMIDLIST pidl = NULL;
+	TCITEM tcItem;
+	int nTabs;
+	int i = 0;
+
+	pidl = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
+
+	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+
+	for(i = 0;i < nTabs;i++)
+	{
+		tcItem.mask = TCIF_PARAM;
+		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
+
+		if((int)tcItem.lParam == iTabId)
+		{
+			SetTabIcon(i,iTabId,pidl);
+			break;
+		}
+	}
 
 	CoTaskMemFree(pidl);
 }
@@ -442,7 +490,8 @@ void CContainer::SetTabIcon(int iIndex,int iTabId,LPITEMIDLIST pidlDirectory)
 		SHGetFileInfo((LPCTSTR)pidlDirectory,0,&shfi,sizeof(shfi),
 			SHGFI_PIDL|SHGFI_ICON|SHGFI_SMALLICON);
 
-		/* TODO: Update the tab proxy window with the new icon and text. */
+		/* TODO: The proxy icon may also be the lock icon, if
+		the tab is locked. */
 		SetTabProxyIcon(iTabId,shfi.hIcon);
 
 		GetIconInfo(shfi.hIcon,&IconInfo);

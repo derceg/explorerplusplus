@@ -41,7 +41,7 @@ saved to/loaded from. */
 
 /* Used for testing what version of Windows we're running on. */
 #define WINDOWS_VISTA_SEVEN_MAJORVERSION	6
-#define WINDOWS_XP_MAJORVERSION		5
+#define WINDOWS_XP_MAJORVERSION				5
 
 #define LANG_SINHALA	1115
 

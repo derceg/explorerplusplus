@@ -831,21 +831,44 @@ void CContainer::OnTabChangeInternal(BOOL bSetFocus)
 	ShowWindow(m_hActiveListView,SW_SHOW);
 
 	/* Inform the taskbar that this tab has become active. */
-	if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
-			m_dwMinorVersion >= 1) ||
-			m_dwMajorVersion > WINDOWS_VISTA_SEVEN_MAJORVERSION)
+	if(m_bTaskbarInitialised)
 	{
-		if(m_bTaskbarInitialised)
-		{
-			list<TabProxyInfo_t>::iterator itr;
+		list<TabProxyInfo_t>::iterator itr;
 
-			for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+		{
+			if(itr->iTabId == m_iObjectIndex)
 			{
-				if(itr->iTabId == m_iObjectIndex)
+				TCITEM tcItem;
+				int nTabs;
+				int i = 0;
+
+				nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+
+				/* POtentially the tab may have swapped position, so
+				tell the taskbar to reposition it. */
+				if(m_iTabSelectedItem == (nTabs - 1))
 				{
-					m_pTaskbarList3->SetTabActive(itr->hProxy,m_hContainer,0);
-					break;
+					m_pTaskbarList3->SetTabOrder(itr->hProxy,NULL);
 				}
+				else
+				{
+					list<TabProxyInfo_t>::iterator itrNext;
+
+					tcItem.mask = TCIF_PARAM;
+					TabCtrl_GetItem(m_hTabCtrl,m_iTabSelectedItem + 1,&tcItem);
+
+					for(itrNext = m_TabProxyList.begin();itrNext != m_TabProxyList.end();itrNext++)
+					{
+						if(itrNext->iTabId == (int)tcItem.lParam)
+						{
+							m_pTaskbarList3->SetTabOrder(itr->hProxy,itrNext->hProxy);
+						}
+					}
+				}
+
+				m_pTaskbarList3->SetTabActive(itr->hProxy,m_hContainer,0);
+				break;
 			}
 		}
 	}
@@ -1045,30 +1068,25 @@ HRESULT CContainer::CloseTab(int TabIndex)
 
 	/* TODO: Need to release class icon and destroy proxy window
 	when a tab is closed. */
-	if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
-			m_dwMinorVersion >= 1) ||
-			m_dwMajorVersion > WINDOWS_VISTA_SEVEN_MAJORVERSION)
+	if(m_bTaskbarInitialised)
 	{
-		if(m_bTaskbarInitialised)
+		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 		{
-			for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+			if(itr->iTabId == TabIndex)
 			{
-				if(itr->iTabId == TabIndex)
-				{
-					HICON hIcon;
+				HICON hIcon;
 
-					m_pTaskbarList3->UnregisterTab(itr->hProxy);
+				m_pTaskbarList3->UnregisterTab(itr->hProxy);
 
-					DestroyWindow(itr->hProxy);
+				DestroyWindow(itr->hProxy);
 
-					hIcon = (HICON)GetClassLongPtr(itr->hProxy,GCLP_HICONSM);
-					DestroyIcon(hIcon);
+				hIcon = (HICON)GetClassLongPtr(itr->hProxy,GCLP_HICONSM);
+				DestroyIcon(hIcon);
 
-					UnregisterClass((LPCWSTR)MAKEWORD(itr->atomClass,0),GetModuleHandle(0));
+				UnregisterClass((LPCWSTR)MAKEWORD(itr->atomClass,0),GetModuleHandle(0));
 
-					m_TabProxyList.erase(itr);
-					break;
-				}
+				m_TabProxyList.erase(itr);
+				break;
 			}
 		}
 	}

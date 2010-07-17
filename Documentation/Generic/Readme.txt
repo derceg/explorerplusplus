@@ -1,5 +1,5 @@
-Explorer++ 32-bit
------------------
+Explorer++
+----------
 
 Copyright (c) 2005-2010 David Erceg
 

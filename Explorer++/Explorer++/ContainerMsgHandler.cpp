@@ -93,14 +93,6 @@ void CContainer::OnWindowCreate(void)
 	m_bTaskbarInitialised = FALSE;
 	m_uTaskbarButtonCreatedMessage = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 
-	if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
-			m_dwMinorVersion >= 1) ||
-			m_dwMajorVersion > WINDOWS_VISTA_SEVEN_MAJORVERSION)
-	{
-		CoCreateInstance(CLSID_TaskbarList,NULL,CLSCTX_INPROC_SERVER,
-			IID_ITaskbarList4,(LPVOID *)&m_pTaskbarList3);
-	}
-
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 

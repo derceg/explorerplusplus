@@ -153,6 +153,8 @@ CContainer::CContainer(HWND hwnd)
 	m_rgbCompressed					= RGB(0,0,255);
 	m_rgbEncrypted					= RGB(0,128,0);
 
+	m_pTaskbarList3					= NULL;
+
 	m_bBlockNext = FALSE;
 
 	InitializeColorRules();
@@ -703,7 +705,6 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
  */
 LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
-	/* TODO: Release previous interface. */
 	if(Msg == m_uTaskbarButtonCreatedMessage)
 	{
 		HMODULE hUser32;
@@ -733,37 +734,30 @@ LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LP
 			FreeLibrary(hUser32);
 		}
 
+		if(m_pTaskbarList3 != NULL)
+		{
+			m_pTaskbarList3->Release();
+		}
+
+		CoCreateInstance(CLSID_TaskbarList,NULL,CLSCTX_INPROC_SERVER,
+			IID_ITaskbarList4,(LPVOID *)&m_pTaskbarList3);
+
 		m_pTaskbarList3->HrInit();
 
 		m_bTaskbarInitialised = TRUE;
 
 		list<TabProxyInfo_t>::iterator itr;
 		LPITEMIDLIST pidlDirectory = NULL;
-		TCHAR szDisplayName[MAX_PATH];
 		BOOL bActive;
 
-		/* TODO: Check. */
+		/* Register each of the tabs. */
 		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 		{
-			pidlDirectory = m_pShellBrowser[itr->iTabId]->QueryCurrentDirectoryIdl();
-
-			GetDisplayName(pidlDirectory,szDisplayName,SHGDN_INFOLDER);
-
 			bActive = (itr->iTabId == m_iObjectIndex);
 
-			RegisterTab(itr->hProxy,szDisplayName,bActive);
-
-			/* TODO: This text is WRONG. */
-			SetWindowText(itr->hProxy,szDisplayName);
-
-			SHFILEINFO shfi;
-
-			SHGetFileInfo((LPCTSTR)pidlDirectory,0,&shfi,sizeof(shfi),
-			SHGFI_PIDL|SHGFI_ICON|SHGFI_SMALLICON);
-
-			/* TODO: This is also wrong (a lock icon may be required).
-			Merge with function that sets tab icons. */
-			SetTabProxyIcon(itr->iTabId,shfi.hIcon);
+			RegisterTab(itr->hProxy,EMPTY_STRING,bActive);
+			HandleTabText(itr->iTabId);
+			SetTabIcon(itr->iTabId);
 
 			CoTaskMemFree(pidlDirectory);
 		}
