@@ -1358,13 +1358,13 @@ void CFolderView::DetermineFolderVirtual(LPITEMIDLIST pidlDirectory)
 
 	if(m_bVirtualFolder)
 	{
-        /* Mark the recycle bin and desktop as
-        real folders. Shouldn't be able to create
-        folders in Recycle Bin. */
+		/* Mark the recycle bin and desktop as
+		real folders. Shouldn't be able to create
+		folders in Recycle Bin. */
 		if(CompareVirtualFolders(CSIDL_BITBUCKET))
 			m_bVirtualFolder = TRUE;
-        else if(CompareVirtualFolders(CSIDL_DESKTOP))
-            m_bVirtualFolder = FALSE;
+		else if(CompareVirtualFolders(CSIDL_DESKTOP))
+			m_bVirtualFolder = FALSE;
 	}
 }
 
@@ -1953,6 +1953,11 @@ void CFolderView::SelectItems(list<PastedFile_t> *pFileList)
 		if(iIndex != -1)
 		{
 			ListView_SelectItem(m_hListView,iIndex,TRUE);
+
+			if(itr == pFileList->begin())
+			{
+				ListView_FocusItem(m_hListView,iIndex,TRUE);
+			}
 
 			itr = pFileList->erase(itr);
 		}

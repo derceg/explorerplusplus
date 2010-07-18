@@ -827,6 +827,7 @@ BOOL CContainer::OnListViewEndLabelEdit(LPARAM lParam)
 	TCHAR			szTemp[128];
 	TCHAR			szError[256];
 	TCHAR			szTitle[256];
+	DWORD			dwAttributes;
 	int				ret;
 
 	pdi = (NMLVDISPINFO *) lParam;
@@ -899,23 +900,28 @@ BOOL CContainer::OnListViewEndLabelEdit(LPARAM lParam)
 
 	PathAppend(NewFileName,pItem->pszText);
 
-	BOOL bExtensionHidden = FALSE;
+	dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(pItem->iItem);
 
-	bExtensionHidden = (!m_bShowExtensionsGlobal) ||
-		(m_bHideLinkExtensionGlobal && lstrcmp(PathFindExtension(OldName),_T(".lnk")) == 0);
-
-	/* If file extensions are turned off, the new filename
-	will be incorrect (i.e. it will be missing the extension).
-	Therefore, append the extension manually if it is turned
-	off. */
-	if(bExtensionHidden)
+	if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
-		TCHAR	*szExt = NULL;
+		BOOL bExtensionHidden = FALSE;
 
-		szExt = PathFindExtension(OldName);
+		bExtensionHidden = (!m_bShowExtensionsGlobal) ||
+			(m_bHideLinkExtensionGlobal && lstrcmp(PathFindExtension(OldName),_T(".lnk")) == 0);
 
-		if(*szExt == '.')
-			PathAddExtension(NewFileName,szExt);
+		/* If file extensions are turned off, the new filename
+		will be incorrect (i.e. it will be missing the extension).
+		Therefore, append the extension manually if it is turned
+		off. */
+		if(bExtensionHidden)
+		{
+			TCHAR	*szExt = NULL;
+
+			szExt = PathFindExtension(OldName);
+
+			if(*szExt == '.')
+				StringCchCat(NewFileName,SIZEOF_ARRAY(NewFileName),szExt);
+		}
 	}
 
 	/* File names must be double NULL terminated. */

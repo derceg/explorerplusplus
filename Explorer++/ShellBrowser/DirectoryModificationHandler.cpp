@@ -558,7 +558,9 @@ void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 			if(SUCCEEDED(hr))
 			{
 				m_pExtraItemInfo[iItemInternal].pridl = ILClone(pidlRelative);
-				StringCchCopy(m_pExtraItemInfo[iItemInternal].szDisplayName,MAX_PATH,szDisplayName);
+				StringCchCopy(m_pExtraItemInfo[iItemInternal].szDisplayName,
+					SIZEOF_ARRAY(m_pExtraItemInfo[iItemInternal].szDisplayName),
+					szDisplayName);
 
 				/* Need to update internal storage for the item, since
 				it's name has now changed. */
@@ -581,22 +583,11 @@ void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 
 					if(iItem != -1)
 					{
-						StringCchCopy(szDisplayName,SIZEOF_ARRAY(szDisplayName),
-							szNewFileName);
-
-						if(!m_bShowExtensions || (m_bHideLinkExtension &&
-							lstrcmp(PathFindExtension(szDisplayName),_T(".lnk")) == 0)
-							&& szDisplayName[0] != '.')
-						{
-							/* Strip the extension. */
-							PathRemoveExtension(szDisplayName);
-						}
-
 						lvItem.mask			= LVIF_TEXT|LVIF_IMAGE|LVIF_STATE;
 						lvItem.iItem		= iItem;
 						lvItem.iSubItem		= 0;
-						lvItem.pszText		= szDisplayName;
 						lvItem.iImage		= shfi.iIcon;
+						lvItem.pszText		= ProcessItemFileName(iItemInternal);
 						lvItem.stateMask	= LVIS_OVERLAYMASK;
 
 						/* As well as resetting the items icon, we'll also set

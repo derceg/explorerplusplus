@@ -901,13 +901,32 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 	TAB_TOOLBAR_Y_OFFSET,TAB_TOOLBAR_WIDTH,TAB_TOOLBAR_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
 
 	if(m_bExtendTabControl)
-		iHolderTop = IndentTop;
+	{
+		if(!m_bShowTabBarAtBottom)
+		{
+			iHolderTop = IndentTop;
+		}
+		else
+		{
+			iHolderTop = iIndentRebar;
+		}
+	}
 	else
+	{
 		iHolderTop = iIndentRebar;
+	}
 
 	/* <---- Holder window + child windows ----> */
 
-	iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop;
+	if(!m_bShowTabBarAtBottom)
+	{
+		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop;
+	}
+	else
+	{
+		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop - TAB_WINDOW_HEIGHT;
+	}
+
 	iHolderWidth = m_TreeViewWidth;
 
 	SetWindowPos(m_hHolder,NULL,0,iHolderTop,

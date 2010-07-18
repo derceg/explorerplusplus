@@ -213,45 +213,7 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 		if(!bHideFile)
 		{
 			lv.iItem	= itr->iItem;
-
-			BOOL bHideExtension = FALSE;
-			TCHAR *pExt = NULL;
-
-			if(m_bHideLinkExtension &&
-				((m_pwfdFiles[itr->iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
-			{
-				pExt = PathFindExtension(m_pExtraItemInfo[(int)itr->iItemInternal].szDisplayName);
-
-				if(*pExt != '\0')
-				{
-					if(lstrcmpi(pExt,_T(".lnk")) == 0)
-						bHideExtension = TRUE;
-				}
-			}
-
-			/* Strip the extension if necessary. Don't remove the extension
-			if the filename starts with a dot. */
-			if((m_bShowExtensions ||
-				m_pExtraItemInfo[(int)itr->iItemInternal].szDisplayName[0] == '.') ||
-				(m_pwfdFiles[itr->iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY &&
-				!bHideExtension)
-			{
-				lv.pszText	= m_pExtraItemInfo[(int)itr->iItemInternal].szDisplayName;
-			}
-			else
-			{
-				TCHAR szDisplayName[MAX_PATH];
-
-				StringCchCopy(szDisplayName,SIZEOF_ARRAY(szDisplayName),
-				m_pExtraItemInfo[(int)itr->iItemInternal].szDisplayName);
-
-				/* Strip the extension. */
-				PathRemoveExtension(szDisplayName);
-
-				/* The item will now be shown without its extension. */
-				lv.pszText	= szDisplayName;
-			}
-
+			lv.pszText	= ProcessItemFileName(itr->iItemInternal);
 			lv.iImage	= I_IMAGECALLBACK;
 			lv.lParam	= itr->iItemInternal;
 
@@ -354,6 +316,53 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 	m_AwaitingAddList.clear();
 	m_nAwaitingAdd = 0;
+}
+
+/* Processes an items filename. Essentially checks
+if the extension (if any) needs to be removed, and
+removes it if it does. */
+TCHAR *CFolderView::ProcessItemFileName(int iItemInternal)
+{
+	BOOL bHideExtension = FALSE;
+	TCHAR *pExt = NULL;
+	TCHAR *pszDisplay = NULL;
+
+	if(m_bHideLinkExtension &&
+		((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+	{
+		pExt = PathFindExtension(m_pExtraItemInfo[iItemInternal].szDisplayName);
+
+		if(*pExt != '\0')
+		{
+			if(lstrcmpi(pExt,_T(".lnk")) == 0)
+				bHideExtension = TRUE;
+		}
+	}
+
+	/* Strip the extension if necessary. Don't remove the extension
+	if the filename starts with a dot. */
+	if((m_bShowExtensions ||
+		m_pExtraItemInfo[iItemInternal].szDisplayName[0] == '.') ||
+		(m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY &&
+		!bHideExtension)
+	{
+		pszDisplay = m_pExtraItemInfo[iItemInternal].szDisplayName;
+	}
+	else
+	{
+		static TCHAR szDisplayName[MAX_PATH];
+
+		StringCchCopy(szDisplayName,SIZEOF_ARRAY(szDisplayName),
+			m_pExtraItemInfo[iItemInternal].szDisplayName);
+
+		/* Strip the extension. */
+		PathRemoveExtension(szDisplayName);
+
+		/* The item will now be shown without its extension. */
+		pszDisplay = szDisplayName;
+	}
+
+	return pszDisplay;
 }
 
 void CFolderView::RemoveItem(int iItemInternal)

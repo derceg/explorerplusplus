@@ -18,15 +18,19 @@ Known limitations:
 Version 1.2 (xx/xx/xx)
 ----------------------
 New features:
-- Taskbar thumbnails are now shown for each tab in Windows
-  7.
+- Taskbar thumbnails are now shown for each
+  tab in Windows 7 (provided 'Show Taskbar Thumbnails'
+  is checked in the Options dialog).
 - The tab bar can now be hidden when there is only one
   tab.
+- Files can now be dropped onto existing application
+  toolbar buttons. This will open the dropped files in
+  that application.
 - A navigation sound is now played when entering a folder.
 - The current folder is now selected when navigating up.
-- Listview checkboxes.
-- Closing the last tab will now close the main window
-  (when the correct option is selected).
+- Listview checkboxes can now be turned on by selecting
+  'Use check boxes to select items' in the Options dialog.
+- Closing the last tab will now close the main window.
 - Items can now be rearranged in details view.
 - It is now possible to show file sizes in one of:
   Bytes/KB/MB/GB/TB/PB.
@@ -36,7 +40,7 @@ New features:
   a new window.
 
 Bug fixes:
-- Main window now obeys startup window position information
+- Main window now obeys startup position information
   (e.g. minimized/maximized).
 - Fixed directory modification bug.
 - Fixed set file attributes dialog bug.
@@ -46,7 +50,8 @@ Bug fixes:
 - Fixed custom infotips bug.
 
 Misc:
-- Can now scroll treeview, even when it does not have focus.
+- The treeview no longer syncs with network/UNC paths.
+- Can now scroll listview/treeview, even when it does not have focus.
 - The options dialog is now modeless.
 
 Version 1.1 (5/4/10)
