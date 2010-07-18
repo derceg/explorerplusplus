@@ -341,6 +341,7 @@ void CContainer::SetDefaultValues(void)
 	m_SizeDisplayFormat				= FORMAT_BYTES;
 	m_bTVAutoExpandSelected			= FALSE;
 	m_bCloseMainWindowOnTabClose	= TRUE;
+	m_bShowTaskbarThumbnails		= TRUE;
 
 	/* Infotips (user options). */
 	m_bShowInfoTips					= TRUE;
@@ -713,6 +714,11 @@ LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LP
 		if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
 			m_dwMinorVersion == 0) ||
 			m_dwMajorVersion < WINDOWS_VISTA_SEVEN_MAJORVERSION)
+		{
+			return 0;
+		}
+
+		if(!m_bShowTaskbarThumbnails)
 		{
 			return 0;
 		}

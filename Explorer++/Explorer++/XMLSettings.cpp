@@ -96,6 +96,7 @@ will need to be changed correspondingly. */
 #define HASH_SIZEDISPLAYFOMRAT		3548127263
 #define HASH_CLOSEMAINWINDOWONTABCLOSE	1151827266
 #define HASH_SHOWTABBARATBOTTOM		4099029340
+#define HASH_SHOWTASKBARTHUMBNAILS	2202555045
 
 typedef struct
 {
@@ -437,6 +438,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowStatusBar"),EncodeBoolValue(m_bShowStatusBar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowTabBarAtBottom"),EncodeBoolValue(m_bShowTabBarAtBottom));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowTaskbarThumbnails"),EncodeBoolValue(m_bShowTaskbarThumbnails));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowToolbar"),EncodeBoolValue(m_bShowMainToolbar));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -2744,6 +2747,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_SHOWTABBARATBOTTOM:
 		m_bShowTabBarAtBottom = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_SHOWTASKBARTHUMBNAILS:
+		m_bShowTaskbarThumbnails = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWTOOLBAR:

@@ -1026,6 +1026,8 @@ INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,L
 	{
 		case WM_INITDIALOG:
 			{
+				if(m_bShowTaskbarThumbnails)
+					CheckDlgButton(hDlg,IDC_TABS_TASKBARTHUMBNAILS,BST_CHECKED);
 				if(m_bForceSameTabWidth)
 					CheckDlgButton(hDlg,IDC_TABS_SAMEWIDTH,BST_CHECKED);
 				if(m_bConfirmCloseTabs)
@@ -1044,6 +1046,7 @@ INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,L
 		case WM_COMMAND:
 			switch(LOWORD(wParam))
 			{
+			case IDC_TABS_TASKBARTHUMBNAILS:
 			case IDC_TABS_SAMEWIDTH:
 			case IDC_TABS_CLOSECONFIRMATION:
 			case IDC_TABS_OPENNEXTTOCURRENT:
@@ -1064,6 +1067,9 @@ INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,L
 				{
 				case PSN_APPLY:
 					{
+						m_bShowTaskbarThumbnails = (IsDlgButtonChecked(hDlg,IDC_TABS_TASKBARTHUMBNAILS)
+							== BST_CHECKED);
+
 						m_bForceSameTabWidth = (IsDlgButtonChecked(hDlg,IDC_TABS_SAMEWIDTH)
 							== BST_CHECKED);
 

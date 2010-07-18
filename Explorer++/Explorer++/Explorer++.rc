@@ -465,17 +465,19 @@ CAPTION "Tabs"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "&Force all tabs to have the same width",IDC_TABS_SAMEWIDTH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,7,136,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,20,136,10
     CONTROL         "&Ask for confirmation before closing all tabs",IDC_TABS_CLOSECONFIRMATION,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,20,151,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,33,151,10
     CONTROL         "&Open new tabs next to the current one",IDC_TABS_OPENNEXTTOCURRENT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,33,142,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,142,10
     CONTROL         "Open each folder in its own &tab",IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,116,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,116,10
     CONTROL         "&Double-click to close a tab",IDC_TABS_DOUBLECLICKCLOSE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,99,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,99,10
     CONTROL         "Close the main window when closing the last tab",IDC_TABS_CLOSEMAINWINDOW,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,170,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,85,170,10
+    CONTROL         "Show taskbar thumbnails (Windows 7 and later)",IDC_TABS_TASKBARTHUMBNAILS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,7,168,10
 END
 
 IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 277

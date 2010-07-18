@@ -319,6 +319,11 @@ void CContainer::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwit
 		return;
 	}
 
+	if(!m_bShowTaskbarThumbnails)
+	{
+		return;
+	}
+
 	static int iCount = 0;
 
 	StringCchPrintf(szClassName,SIZEOF_ARRAY(szClassName),_T("Explorer++TabProxy%d"),iCount++);

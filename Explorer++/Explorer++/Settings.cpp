@@ -91,6 +91,7 @@ LONG CContainer::SaveSettings(void)
 		SaveDwordToRegistry(hSettingsKey,_T("SortAscendingGlobal"),m_bSortAscendingGlobal);
 		SaveDwordToRegistry(hSettingsKey,_T("HideSystemFilesGlobal"),m_bHideSystemFilesGlobal);
 		SaveDwordToRegistry(hSettingsKey,_T("HideLinkExtensionGlobal"),m_bHideLinkExtensionGlobal);
+		SaveDwordToRegistry(hSettingsKey,_T("ShowTaskbarThumbnails"),m_bShowTaskbarThumbnails);
 
 		/* Display window settings. */
 		SaveDwordToRegistry(hSettingsKey,_T("DisplayWindowHeight"),m_DisplayWindowHeight);
@@ -189,6 +190,7 @@ LONG CContainer::LoadSettings(LPCTSTR KeyPath)
 		ReadDwordFromRegistry(hSettingsKey,_T("SizeDisplayFormat"),(LPDWORD)&m_SizeDisplayFormat);
 		ReadDwordFromRegistry(hSettingsKey,_T("CloseMainWindowOnTabClose"),(LPDWORD)&m_bCloseMainWindowOnTabClose);
 		ReadDwordFromRegistry(hSettingsKey,_T("ShowTabBarAtBottom"),(LPDWORD)&m_bShowTabBarAtBottom);
+		ReadDwordFromRegistry(hSettingsKey,_T("ShowTaskbarThumbnails"),(LPDWORD)&m_bShowTaskbarThumbnails);
 
 		ReadStringFromRegistry(hSettingsKey,_T("NewTabDirectory"),m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory));
 
