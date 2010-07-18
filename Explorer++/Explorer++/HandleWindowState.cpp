@@ -401,7 +401,6 @@ void CContainer::HandleTabText(int iTab,int iTabId)
 
 		TabCtrl_SetItemText(m_hTabCtrl,iTab,szExpandedTabText);
 
-		/* TODO: Change the proxy windows text... */
 		list<TabProxyInfo_t>::iterator itr;
 
 		if(m_bTaskbarInitialised)

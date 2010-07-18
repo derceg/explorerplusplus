@@ -1504,4 +1504,10 @@ private:
 	BOOL					m_bBlockNext;
 };
 
+typedef struct
+{
+	CContainer	*pContainer;
+	int			iTabId;
+} TabProxy_t;
+
 #endif

@@ -107,9 +107,6 @@ int *pTabObjectIndex)
 	return hr;
 }
 
-/* TODO: */
-LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
-
 /* Creates a new tab. If the settings argument is NULL,
 the global settings will be used. */
 HRESULT CContainer::CreateNewTab(LPITEMIDLIST pidlDirectory,
@@ -275,12 +272,6 @@ int *pTabObjectIndex)
 
 	return S_OK;
 }
-
-typedef struct
-{
-	CContainer	*pContainer;
-	int			iTabId;
-} TabProxy_t;
 
 ATOM CContainer::RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirectory)
 {
@@ -841,7 +832,6 @@ void CContainer::OnTabChangeInternal(BOOL bSetFocus)
 			{
 				TCITEM tcItem;
 				int nTabs;
-				int i = 0;
 
 				nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
@@ -1066,8 +1056,6 @@ HRESULT CContainer::CloseTab(int TabIndex)
 
 	list<TabProxyInfo_t>::iterator itr;
 
-	/* TODO: Need to release class icon and destroy proxy window
-	when a tab is closed. */
 	if(m_bTaskbarInitialised)
 	{
 		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
@@ -1077,6 +1065,10 @@ HRESULT CContainer::CloseTab(int TabIndex)
 				HICON hIcon;
 
 				m_pTaskbarList3->UnregisterTab(itr->hProxy);
+
+				TabProxy_t *ptp = (TabProxy_t *)GetWindowLongPtr(itr->hProxy,GWLP_USERDATA);
+
+				free(ptp);
 
 				DestroyWindow(itr->hProxy);
 
@@ -1128,7 +1120,6 @@ void CContainer::RefreshTab(int iTabId)
 
 	pidlDirectory = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
 
-	/* TODO: Link this back to BrowseFolder(). */
 	hr = m_pShellBrowser[iTabId]->BrowseFolder(pidlDirectory,
 		SBSP_SAMEBROWSER|SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 
@@ -1743,6 +1734,23 @@ BOOL CContainer::OnMouseWheel(WPARAM wParam,LPARAM lParam)
 					OnBrowseBack();
 				else
 					OnBrowseForward();
+			}
+			else
+			{
+				WORD wScrollType;
+				int i = 0;
+
+				if(zDelta > 0)
+					wScrollType = SB_LINEUP;
+				else
+					wScrollType = SB_LINEDOWN;
+
+				for(i = 0;i < LISTVIEW_WHEEL_MULTIPLIER * abs(zDelta / WHEEL_DELTA);i++)
+				{
+					SendMessage(m_hActiveListView,WM_VSCROLL,MAKEWORD(wScrollType,0),NULL);
+				}
+
+				bInRect = TRUE;
 			}
 		}
 	}

@@ -87,6 +87,11 @@ WPARAM wParam,LPARAM lParam)
 			}
 		}
 		break;
+
+	case WM_MOUSEWHEEL:
+		if(OnMouseWheel(wParam,lParam))
+			return 0;
+		break;
 	}
 
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
