@@ -97,6 +97,8 @@ will need to be changed correspondingly. */
 #define HASH_CLOSEMAINWINDOWONTABCLOSE	1151827266
 #define HASH_SHOWTABBARATBOTTOM		4099029340
 #define HASH_SHOWTASKBARTHUMBNAILS	2202555045
+#define HASH_SYNCHRONIZETREEVIEW	1687787660
+#define HASH_TVAUTOEXPAND			1228854897
 
 typedef struct
 {
@@ -448,12 +450,17 @@ MSXML2::IXMLDOMElement *pRoot)
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SizeDisplayFormat"),EncodeIntValue(m_SizeDisplayFormat));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SortAscendingGlobal"),EncodeBoolValue(m_bSortAscendingGlobal));
-	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("UseFullRowSelect"),EncodeBoolValue(m_bUseFullRowSelect));
 
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	_itow_s(m_StartupMode,szValue,SIZEOF_ARRAY(szValue),10);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("StartupMode"),szValue);
+
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SynchronizeTreeview"),EncodeBoolValue(m_bSynchronizeTreeview));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("TVAutoExpandSelected"),EncodeBoolValue(m_bTVAutoExpandSelected));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("UseFullRowSelect"),EncodeBoolValue(m_bUseFullRowSelect));
 
 	TBBUTTON tbButton;
 	TCHAR szButtonAttributeName[32];
@@ -2769,12 +2776,20 @@ WCHAR *wszName,WCHAR *wszValue)
 		m_bSortAscendingGlobal = DecodeBoolValue(wszValue);
 		break;
 
-	case HASH_USEFULLROWSELECT:
-		m_bUseFullRowSelect = DecodeBoolValue(wszValue);
-		break;
-
 	case HASH_STARTUPMODE:
 		m_StartupMode = DecodeIntValue(wszValue);
+		break;
+
+	case HASH_SYNCHRONIZETREEVIEW:
+		m_bSynchronizeTreeview = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_TVAUTOEXPAND:
+		m_bTVAutoExpandSelected = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_USEFULLROWSELECT:
+		m_bUseFullRowSelect = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_TOOLBARSTATE:

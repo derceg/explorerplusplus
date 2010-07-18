@@ -35,11 +35,15 @@ void CContainer::HandleTreeViewSelection(void)
 	UINT			uDriveType;
 	BOOL			bNetworkPath = FALSE;
 
+	if(!m_bSynchronizeTreeview)
+	{
+		return;
+	}
+
 	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
 	GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
 
-	/* First we'll check whether the path is a UNC path. */
 	if(PathIsUNC(szDirectory))
 	{
 		bNetworkPath = TRUE;
@@ -52,6 +56,8 @@ void CContainer::HandleTreeViewSelection(void)
 		bNetworkPath = (uDriveType == DRIVE_REMOTE);
 	}
 
+	/* To improve performance, do not automatically sync the
+	treeview with network or UNC paths. */
 	if(!bNetworkPath)
 	{
 		hItem = m_pMyTreeView->LocateItem(pidlDirectory);

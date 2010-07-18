@@ -1270,8 +1270,9 @@ private:
 	BOOL					m_bCloseMainWindowOnTabClose;
 	BOOL					m_bShowTabBarAtBottom;
 	BOOL					m_bShowTaskbarThumbnails;
-	SizeDisplayFormat_t		m_SizeDisplayFormat;
+	BOOL					m_bSynchronizeTreeview;
 	BOOL					m_bTVAutoExpandSelected;
+	SizeDisplayFormat_t		m_SizeDisplayFormat;
 	UINT					m_StartupMode;
 	UINT					m_ReplaceExplorerMode;
 

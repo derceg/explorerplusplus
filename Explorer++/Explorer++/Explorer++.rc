@@ -506,8 +506,8 @@ BEGIN
     CONTROL         "Always show the tab bar",IDC_OPTION_ALWAYSSHOWTABBAR,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,28,95,10
     GROUPBOX        "Treeview",IDC_STATIC,3,176,198,55
-    CONTROL         "Automatically expand nodes while browsing",IDC_CHECK2,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,189,155,10
+    CONTROL         "Automatically synchronize treeview with main pane",IDC_OPTION_SYNCTREEVIEW,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,189,179,10
     GROUPBOX        "General",IDC_STATIC,3,4,198,106
     GROUPBOX        "Listview",IDC_STATIC,3,116,198,54
     GROUPBOX        "Display Window",IDC_STATIC,3,237,198,35

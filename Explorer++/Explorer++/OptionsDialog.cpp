@@ -681,6 +681,10 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 				CheckDlgButton(hDlg,IDC_OPTION_USERNAMEINTITLEBAR,BST_CHECKED);
 			if(m_bShowPrivilegeLevelInTitleBar)
 				CheckDlgButton(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR,BST_CHECKED);
+			if(m_bSynchronizeTreeview)
+				CheckDlgButton(hDlg,IDC_OPTION_SYNCTREEVIEW,BST_CHECKED);
+			if(m_bTVAutoExpandSelected)
+				CheckDlgButton(hDlg,IDC_OPTION_TREEVIEWSELECTIONEXPAND,BST_CHECKED);
 			if(!m_bTreeViewDelayEnabled)
 				CheckDlgButton(hDlg,IDC_OPTION_TREEVIEWDELAY,BST_CHECKED);
 			if(m_bExtendTabControl)
@@ -704,6 +708,8 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 		case IDC_SETTINGS_CHECK_TITLEPATH:
 		case IDC_OPTION_USERNAMEINTITLEBAR:
 		case IDC_OPTION_PRIVILEGELEVELINTITLEBAR:
+		case IDC_OPTION_SYNCTREEVIEW:
+		case IDC_OPTION_TREEVIEWSELECTIONEXPAND:
 		case IDC_OPTION_TREEVIEWDELAY:
 		case IDC_OPTION_EXTENDTABCONTROL:
 		case IDC_OPTION_GRIDLINES:
@@ -744,6 +750,12 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 						== BST_CHECKED);
 
 					m_bShowPrivilegeLevelInTitleBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR)
+						== BST_CHECKED);
+
+					m_bSynchronizeTreeview = (IsDlgButtonChecked(hDlg,IDC_OPTION_SYNCTREEVIEW)
+						== BST_CHECKED);
+
+					m_bTVAutoExpandSelected = (IsDlgButtonChecked(hDlg,IDC_OPTION_TREEVIEWSELECTIONEXPAND)
 						== BST_CHECKED);
 
 					m_bTreeViewDelayEnabled = !(IsDlgButtonChecked(hDlg,IDC_OPTION_TREEVIEWDELAY)

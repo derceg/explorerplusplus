@@ -220,6 +220,8 @@
 #define IDC_STATIC_VERSIONNUMBER        1270
 #define IDC_STATIC_BUILDDATE            1271
 #define IDC_CHECK2                      1272
+#define IDC_                            1272
+#define IDC_OPTION_SYNCTREEVIEW         1272
 #define IDC_CHECK3                      1273
 #define IDC_OPTION_CHECKBOXSELECTION    1273
 #define IDC_CHECK4                      1274

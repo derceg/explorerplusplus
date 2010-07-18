@@ -339,6 +339,7 @@ void CContainer::SetDefaultValues(void)
 	m_bCheckBoxSelection			= FALSE;
 	m_bForceSize					= FALSE;
 	m_SizeDisplayFormat				= FORMAT_BYTES;
+	m_bSynchronizeTreeview			= TRUE;
 	m_bTVAutoExpandSelected			= FALSE;
 	m_bCloseMainWindowOnTabClose	= TRUE;
 	m_bShowTaskbarThumbnails		= TRUE;
