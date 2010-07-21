@@ -65,7 +65,7 @@ void CContainer::CreateFolderControls(void)
 	SetWindowTheme(m_hTreeView,L"Explorer",NULL);
 
 	SetWindowLongPtr(m_hTreeView,GWL_EXSTYLE,WS_EX_CLIENTEDGE);
-	m_pMyTreeView = new CMyTreeView(m_hTreeView,m_hContainer,m_pDirMon,m_hIconThread);
+	m_pMyTreeView = new CMyTreeView(m_hTreeView,m_hContainer,m_pDirMon,m_hTreeViewIconThread);
 
 	/* Now, subclass the treeview again. This is needed for messages
 	such as WM_MOUSEWHEEL, which need to be intercepted before they
@@ -539,6 +539,7 @@ void CContainer::ResizeWindows(void)
 	SIZE_RESTORED,(LPARAM)MAKELPARAM(rc.right,rc.bottom));
 }
 
+/* TODO: This should be linked to OnSize(). */
 void CContainer::SetListViewInitialPosition(HWND hListView)
 {
 	RECT			rc;
@@ -547,6 +548,7 @@ void CContainer::SetListViewInitialPosition(HWND hListView)
 	int				IndentBottom = 0;
 	int				IndentTop = 0;
 	int				IndentLeft = 0;
+	int				iIndentRebar = 0;
 
 	GetClientRect(m_hContainer,&rc);
 
@@ -556,7 +558,7 @@ void CContainer::SetListViewInitialPosition(HWND hListView)
 	if(m_hMainRebar)
 	{
 		GetWindowRect(m_hMainRebar,&rc);
-		IndentTop += GetRectHeight(&rc);
+		iIndentRebar += GetRectHeight(&rc);
 	}
 
 	if(m_bShowStatusBar)
@@ -576,9 +578,30 @@ void CContainer::SetListViewInitialPosition(HWND hListView)
 		IndentLeft = GetRectWidth(&rc);
 	}
 
-	SetWindowPos(hListView,NULL,IndentLeft,IndentTop + TAB_WINDOW_HEIGHT,
-		MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom -
-		IndentTop - TAB_WINDOW_HEIGHT,SWP_HIDEWINDOW|SWP_NOZORDER);
+	IndentTop = iIndentRebar;
+
+	if(m_bShowTabBar)
+	{
+		if(!m_bShowTabBarAtBottom)
+		{
+			IndentTop += TAB_WINDOW_HEIGHT;
+		}
+	}
+
+	if(!m_bShowTabBarAtBottom)
+	{
+		SetWindowPos(hListView,NULL,IndentLeft,IndentTop,
+			MainWindowWidth - IndentLeft,MainWindowHeight -
+			IndentBottom - IndentTop,
+			SWP_HIDEWINDOW|SWP_NOZORDER);
+	}
+	else
+	{
+		SetWindowPos(hListView,NULL,IndentLeft,IndentTop,
+			MainWindowWidth - IndentLeft,MainWindowHeight -
+			IndentBottom - IndentTop - TAB_WINDOW_HEIGHT,
+			SWP_HIDEWINDOW|SWP_NOZORDER);
+	}
 }
 
 void CContainer::ToggleFolders(void)

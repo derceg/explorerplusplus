@@ -102,6 +102,10 @@ void CContainer::OnWindowCreate(void)
 	SetThreadPriority(m_hIconThread,THREAD_PRIORITY_BELOW_NORMAL);
 	QueueUserAPC(IconThreadInitialization,m_hIconThread,NULL);
 
+	m_hTreeViewIconThread = CreateThread(NULL,0,Thread_IconFinder,NULL,0,NULL);
+	SetThreadPriority(m_hTreeViewIconThread,THREAD_PRIORITY_BELOW_NORMAL);
+	QueueUserAPC(IconThreadInitialization,m_hTreeViewIconThread,NULL);
+
 	m_hFolderSizeThread = CreateThread(NULL,0,Thread_IconFinder,NULL,0,NULL);
 	SetThreadPriority(m_hFolderSizeThread,THREAD_PRIORITY_BELOW_NORMAL);
 	QueueUserAPC(IconThreadInitialization,m_hFolderSizeThread,NULL);
@@ -900,16 +904,10 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 	SetWindowPos(m_hTabWindowToolbar,NULL,iTabBackingWidth + TAB_TOOLBAR_X_OFFSET,
 	TAB_TOOLBAR_Y_OFFSET,TAB_TOOLBAR_WIDTH,TAB_TOOLBAR_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
 
-	if(m_bExtendTabControl)
+	if(m_bExtendTabControl &&
+		!m_bShowTabBarAtBottom)
 	{
-		if(!m_bShowTabBarAtBottom)
-		{
-			iHolderTop = IndentTop;
-		}
-		else
-		{
-			iHolderTop = iIndentRebar;
-		}
+		iHolderTop = IndentTop;
 	}
 	else
 	{
@@ -918,13 +916,14 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* <---- Holder window + child windows ----> */
 
-	if(!m_bShowTabBarAtBottom)
+	if(m_bExtendTabControl &&
+		m_bShowTabBarAtBottom)
 	{
-		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop;
+		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop - TAB_WINDOW_HEIGHT;
 	}
 	else
 	{
-		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop - TAB_WINDOW_HEIGHT;
+		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop;
 	}
 
 	iHolderWidth = m_TreeViewWidth;
