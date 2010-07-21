@@ -1180,6 +1180,7 @@ private:
 	CBookmark				m_Bookmark;
 	CCustomMenu *			m_pCustomMenu;
 	HANDLE					m_hIconThread;
+	HANDLE					m_hTreeViewIconThread;
 	HANDLE					m_hFolderSizeThread;
 
 	/** Internal state. **/
