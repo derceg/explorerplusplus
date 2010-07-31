@@ -117,6 +117,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 					/* The user has double clicked in the whitepsace
 					area for this tab, so go up one folder... */
 					OnNavigateUp();
+					return 0;
 				}
 			}
 			break;

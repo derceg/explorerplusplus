@@ -284,7 +284,7 @@ __interface MyIShellView3 : IUnknown
 };
 
 [
-      uuid(62F890DA-C361-11d1-A54D-0000F8751BA8)
+	  uuid(62F890DA-C361-11d1-A54D-0000F8751BA8)
 ]
 __interface IShellBrowser2 : IUnknown
 {
