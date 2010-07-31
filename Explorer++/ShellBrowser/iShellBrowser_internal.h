@@ -271,7 +271,7 @@ public:
 	BOOL				IsGroupViewEnabled(void);
 	BOOL				ToggleSortAscending(void);
 	BOOL				GetSortAscending(void);
-    BOOL				SetSortAscending(BOOL bAscending);
+	BOOL				SetSortAscending(BOOL bAscending);
 	BOOL				ToggleAutoArrange(void);
 	BOOL				QuerySortAscending(void);
 	BOOL				QueryAutoArrange(void);
@@ -451,6 +451,7 @@ private:
 	HRESULT				EnumFolderContents(TCHAR *szFolderPath);
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void inline			InsertAwaitingItems(BOOL bInsertIntoGroup);
+	BOOL				IsFileFiltered(int iItemInternal);
 	TCHAR				*ProcessItemFileName(int iItemInternal);
 	HRESULT inline		AddItemInternal(LPITEMIDLIST pidlDirectory,LPITEMIDLIST pidlRelative,TCHAR *szFileName,int iItemIndex,BOOL bPosition);
 	HRESULT inline		AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
@@ -512,8 +513,9 @@ private:
 	int					DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2);
 
 	/* Filtering support. */
-	BOOL				IsFileFiltered(TCHAR *FileName);
+	BOOL				IsFilenameFiltered(TCHAR *FileName);
 	void				RemoveFilteredItems(void);
+	void				RemoveFilteredItem(int iItem,int iItemInternal);
 	void				UpdateFiltering(void);
 	void				UnfilterAllItems(void);
 

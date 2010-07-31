@@ -142,7 +142,6 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	LVITEM							lv;
 	ULARGE_INTEGER					ulFileSize;
 	list<AwaitingAdd_t>::iterator	itr;
-	BOOL							bFileFiltered;
 	unsigned int					nPrevItems;
 	int								nAdded = 0;
 	int								iItemIndex;
@@ -185,32 +184,7 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 	for(itr = m_AwaitingAddList.begin();itr != m_AwaitingAddList.end();itr++)
 	{
-		BOOL bHideFile;
-		BOOL bHideSystemFile;
-
-		if(m_bApplyFilter)
-		{
-			bFileFiltered = IsFileFiltered(m_pExtraItemInfo[itr->iItemInternal].szDisplayName)
-				&& ((m_pwfdFiles[itr->iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY);
-		}
-		else
-		{
-			bFileFiltered = FALSE;
-		}
-
-		if(m_bHideSystemFiles)
-		{
-			bHideSystemFile = (m_pwfdFiles[itr->iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
-				== FILE_ATTRIBUTE_SYSTEM;
-		}
-		else
-		{
-			bHideSystemFile = FALSE;
-		}
-
-		bHideFile = bFileFiltered || bHideSystemFile;
-
-		if(!bHideFile)
+		if(!IsFileFiltered(itr->iItemInternal))
 		{
 			lv.iItem	= itr->iItem;
 			lv.pszText	= ProcessItemFileName(itr->iItemInternal);
@@ -318,6 +292,26 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	m_nAwaitingAdd = 0;
 }
 
+BOOL CFolderView::IsFileFiltered(int iItemInternal)
+{
+	BOOL bHideSystemFile = FALSE;
+	BOOL bFilenameFiltered = FALSE;
+
+	if(m_bApplyFilter &&
+		((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+	{
+		bFilenameFiltered = IsFilenameFiltered(m_pExtraItemInfo[iItemInternal].szDisplayName);
+	}
+
+	if(m_bHideSystemFiles)
+	{
+		bHideSystemFile = (m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
+			== FILE_ATTRIBUTE_SYSTEM;
+	}
+
+	return bFilenameFiltered || bHideSystemFile;
+}
+
 /* Processes an items filename. Essentially checks
 if the extension (if any) needs to be removed, and
 removes it if it does. */
@@ -339,16 +333,12 @@ TCHAR *CFolderView::ProcessItemFileName(int iItemInternal)
 		}
 	}
 
-	/* Strip the extension if necessary. Don't remove the extension
-	if the filename starts with a dot. */
-	if((m_bShowExtensions ||
-		m_pExtraItemInfo[iItemInternal].szDisplayName[0] == '.') ||
-		(m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY &&
-		!bHideExtension)
-	{
-		pszDisplay = m_pExtraItemInfo[iItemInternal].szDisplayName;
-	}
-	else
+	/* We'll hide the extension, provided it is meant
+	to be hidden, and the filename does not begin with
+	a period, and the item is not a directory. */
+	if((!m_bShowExtensions || bHideExtension) &&
+		m_pExtraItemInfo[iItemInternal].szDisplayName[0] != '.' &&
+		(m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
 		static TCHAR szDisplayName[MAX_PATH];
 
@@ -360,6 +350,10 @@ TCHAR *CFolderView::ProcessItemFileName(int iItemInternal)
 
 		/* The item will now be shown without its extension. */
 		pszDisplay = szDisplayName;
+	}
+	else
+	{
+		pszDisplay = m_pExtraItemInfo[iItemInternal].szDisplayName;
 	}
 
 	return pszDisplay;

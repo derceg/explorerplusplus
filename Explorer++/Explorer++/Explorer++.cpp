@@ -635,6 +635,9 @@ LPSTR lpCmdLine,int nCmdShow)
 		return 0;
 	}
 
+	ShowWindow(hwnd,g_nCmdShow);
+	UpdateWindow(hwnd);
+
 	hAccl = LoadAccelerators(hInstance,MAKEINTRESOURCE(IDR_MAINACCELERATORS));
 
 	/* Enter the message loop... */
@@ -2730,13 +2733,9 @@ void ClearRegistrySettings(void)
 void CContainer::VerifyAndSetWindowPosition(InitialWindowPos_t *piwp)
 {
 	WINDOWPLACEMENT	wndpl;
-	int				iScreenWidth;
-	int				iScreenHeight;
-
-	iScreenWidth	= GetSystemMetrics(SM_CXVIRTUALSCREEN);
-	iScreenHeight	= GetSystemMetrics(SM_CYVIRTUALSCREEN);
 
 	wndpl.length	= sizeof(WINDOWPLACEMENT);
+	wndpl.flags		= 0;
 	wndpl.showCmd	= SW_HIDE;
 
 	wndpl.rcNormalPosition = piwp->rcNormalPosition;

@@ -112,7 +112,7 @@ void CFolderView::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 	}
 }
 
-BOOL CFolderView::IsFileFiltered(TCHAR *FileName)
+BOOL CFolderView::IsFilenameFiltered(TCHAR *FileName)
 {
 	if(CheckWildcardMatch(m_szFilter,FileName,TRUE))
 		return FALSE;
@@ -1274,7 +1274,6 @@ BOOL CFolderView::GhostItemInternal(int iItem,BOOL bGhost)
 void CFolderView::RemoveFilteredItems(void)
 {
 	LVITEM			lvItem;
-	ULARGE_INTEGER	ulFileSize;
 	int				nItems;
 	int				i = 0;
 
@@ -1292,36 +1291,42 @@ void CFolderView::RemoveFilteredItems(void)
 
 		if(!((m_pwfdFiles[(int)lvItem.lParam].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
 		{
-			if(IsFileFiltered(m_pExtraItemInfo[(int)lvItem.lParam].szDisplayName))
+			if(IsFilenameFiltered(m_pExtraItemInfo[(int)lvItem.lParam].szDisplayName))
 			{
-				/* Need to check if item is selected. */
-				if(ListView_GetItemState(m_hListView,i,LVIS_SELECTED)
-				== LVIS_SELECTED)
-				{
-					ulFileSize.LowPart = m_pwfdFiles[lvItem.lParam].nFileSizeLow;
-					ulFileSize.HighPart = m_pwfdFiles[lvItem.lParam].nFileSizeHigh;
-
-					m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
-				}
-
-				/* Take the file size of the removed file away from the total
-				directory size. */
-				ulFileSize.LowPart = m_pwfdFiles[lvItem.lParam].nFileSizeLow;
-				ulFileSize.HighPart = m_pwfdFiles[lvItem.lParam].nFileSizeHigh;
-
-				m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
-
-				/* Remove the item from the m_hListView. */
-				ListView_DeleteItem(m_hListView,i);
-
-				m_nTotalItems--;
-
-				m_FilteredItemsList.push_back((int)lvItem.lParam);
+				RemoveFilteredItem(i,lvItem.lParam);
 			}
 		}
 	}
 
 	SendMessage(m_hOwner,WM_USER_UPDATEWINDOWS,0,0);
+}
+
+void CFolderView::RemoveFilteredItem(int iItem,int iItemInternal)
+{
+	ULARGE_INTEGER	ulFileSize;
+
+	if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
+		== LVIS_SELECTED)
+	{
+		ulFileSize.LowPart = m_pwfdFiles[iItemInternal].nFileSizeLow;
+		ulFileSize.HighPart = m_pwfdFiles[iItemInternal].nFileSizeHigh;
+
+		m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
+	}
+
+	/* Take the file size of the removed file away from the total
+	directory size. */
+	ulFileSize.LowPart = m_pwfdFiles[iItemInternal].nFileSizeLow;
+	ulFileSize.HighPart = m_pwfdFiles[iItemInternal].nFileSizeHigh;
+
+	m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
+
+	/* Remove the item from the m_hListView. */
+	ListView_DeleteItem(m_hListView,iItem);
+
+	m_nTotalItems--;
+
+	m_FilteredItemsList.push_back(iItemInternal);
 }
 
 int CFolderView::QueryNumItems(void)
@@ -1431,6 +1436,8 @@ void CFolderView::UnfilterAllItems(void)
 	m_FilteredItemsList.clear();
 
 	InsertAwaitingItems(m_bShowInGroups);
+
+	SendMessage(m_hOwner,WM_USER_UPDATEWINDOWS,0,0);
 }
 
 void CFolderView::VerifySortMode(void)

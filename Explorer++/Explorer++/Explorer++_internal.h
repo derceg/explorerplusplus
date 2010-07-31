@@ -33,7 +33,7 @@ extern HINSTANCE g_hLanguageModule;
 #define WINDOW_NAME			_T("Explorer++")
 #define CLASS_NAME			_T("Explorer++")
 #define WEBSITE_URL			_T("http://www.explorerplusplus.com")
-#define WEBSITE_URL_TEXT	_T("www.explorerplusplus.com")
+#define WEBSITE_URL_TEXT	_T("www.explorerplusplus.com"
 
 /* The name of the XML file that preferences are
 saved to/loaded from. */
@@ -42,6 +42,8 @@ saved to/loaded from. */
 /* Used for testing what version of Windows we're running on. */
 #define WINDOWS_VISTA_SEVEN_MAJORVERSION	6
 #define WINDOWS_XP_MAJORVERSION				5
+
+#define CONTROL_PANEL_CATEGORY_VIEW	_T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")
 
 #define LANG_SINHALA	1115
 

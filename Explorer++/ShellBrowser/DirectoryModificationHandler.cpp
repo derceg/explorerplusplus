@@ -597,6 +597,12 @@ void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 
 						/* Update the item in the listview. */
 						ListView_SetItem(m_hListView,&lvItem);
+
+						/* TODO: Does the file need to be filtered out? */
+						if(IsFileFiltered(iItemInternal))
+						{
+							RemoveFilteredItem(iItem,iItemInternal);
+						}
 					}
 
 					DestroyIcon(shfi.hIcon);

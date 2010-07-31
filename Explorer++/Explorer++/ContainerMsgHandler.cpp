@@ -180,9 +180,6 @@ void CContainer::OnWindowCreate(void)
 	dynamically. */
 	m_hNextClipboardViewer = SetClipboardViewer(m_hContainer);
 
-	UpdateWindow(m_hContainer);
-	ShowWindow(m_hContainer,g_nCmdShow);
-
 	SetFocus(m_hActiveListView);
 }
 
@@ -596,28 +593,62 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInN
 	HRESULT	hr;
 	BOOL bControlPanelParent = FALSE;
 
-	/* Check if the parent of the item is the control panel.
-	If it is, pass it to the shell to open, rather than
-	opening it in-place. */
 	hr = SHGetFolderLocation(NULL,CSIDL_CONTROLS,NULL,0,&pidlControlPanel);
 
 	if(SUCCEEDED(hr))
 	{
-		/* On Windows Vista and later, the CSIDL_CONTROLS folder
-		is contained within a top-layer 'Control Panel' folder. This
-		folder simply provides grouping of several control panel
-		items. */
-		if(m_dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
-		{
-			ILRemoveLastID(pidlControlPanel);
-		}
-
-		if(ILIsParent(pidlControlPanel,pidlItem,FALSE) && !ILIsEqual(pidlControlPanel,pidlItem))
+		/* Check if the parent of the item is the control panel.
+		If it is, pass it to the shell to open, rather than
+		opening it in-place. */
+		/* TODO: Replace ILIsEqual. */
+		if(ILIsParent(pidlControlPanel,pidlItem,FALSE) &&
+			!ILIsEqual(pidlControlPanel,pidlItem))
 		{
 			bControlPanelParent = TRUE;
 		}
 
 		CoTaskMemFree(pidlControlPanel);
+	}
+
+	/* On Vista and later, the Control Panel was split into
+	two completely separate views:
+	 - Icon View
+	 - Category View
+	Icon view is essentially the same view provided in
+	Windows XP and earlier (i.e. a simple, flat listing of
+	all the items in the control panel).
+	Category view, on the other hand, groups similar
+	Control Panel items under several broad categories.
+	It is important to note that both these 'views' are
+	represented by different GUID's, and are NOT the
+	same folder.
+	 - Icon View:
+	   ::{21EC2020-3AEA-1069-A2DD-08002B30309D} (Vista and Win 7)
+	   ::{26EE0668-A00A-44D7-9371-BEB064C98683}\0 (Win 7)
+	 - Category View:
+	   ::{26EE0668-A00A-44D7-9371-BEB064C98683} (Vista and Win 7)
+	*/
+	if(m_dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
+	{
+		if(!bControlPanelParent)
+		{
+			hr = GetIdlFromParsingName(CONTROL_PANEL_CATEGORY_VIEW,&pidlControlPanel);
+
+			if(SUCCEEDED(hr))
+			{
+				/* Check if the parent of the item is the control panel.
+				If it is, pass it to the shell to open, rather than
+				opening it in-place. */
+				/* TODO: Replace ILIsEqual. */
+				if(ILIsParent(pidlControlPanel,pidlItem,FALSE) &&
+					!ILIsEqual(pidlControlPanel,pidlItem))
+				{
+					bControlPanelParent = TRUE;
+				}
+
+				CoTaskMemFree(pidlControlPanel);
+			}
+		}
 	}
 
 	hr = GetItemAttributes(pidlItem,&uAttributes);

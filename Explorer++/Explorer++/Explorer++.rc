@@ -505,12 +505,12 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,93,113,10
     CONTROL         "Always show the tab bar",IDC_OPTION_ALWAYSSHOWTABBAR,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,28,95,10
-    GROUPBOX        "Treeview",IDC_STATIC,3,176,198,55
+    GROUPBOX        "Treeview",IDC_STATIC,3,176,219,55
     CONTROL         "Automatically synchronize treeview with main pane",IDC_OPTION_SYNCTREEVIEW,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,189,179,10
-    GROUPBOX        "General",IDC_STATIC,3,4,198,106
-    GROUPBOX        "Listview",IDC_STATIC,3,116,198,54
-    GROUPBOX        "Display Window",IDC_STATIC,3,237,198,35
+    GROUPBOX        "General",IDC_STATIC,3,4,219,106
+    GROUPBOX        "Listview",IDC_STATIC,3,116,219,54
+    GROUPBOX        "Display Window",IDC_STATIC,3,237,219,35
     CONTROL         "Use check boxes to select items",IDC_OPTION_CHECKBOXSELECTION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,141,117,10
     CONTROL         "Show the tab bar at the bottom",IDC_OPTION_SHOWTABBARATBOTTOM,

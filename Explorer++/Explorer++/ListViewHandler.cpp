@@ -907,7 +907,7 @@ BOOL CContainer::OnListViewEndLabelEdit(LPARAM lParam)
 		BOOL bExtensionHidden = FALSE;
 
 		bExtensionHidden = (!m_bShowExtensionsGlobal) ||
-			(m_bHideLinkExtensionGlobal && lstrcmp(PathFindExtension(OldName),_T(".lnk")) == 0);
+			(m_bHideLinkExtensionGlobal && lstrcmpi(PathFindExtension(OldName),_T(".lnk")) == 0);
 
 		/* If file extensions are turned off, the new filename
 		will be incorrect (i.e. it will be missing the extension).
