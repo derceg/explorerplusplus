@@ -23,6 +23,7 @@ to Explorer++.cpp. Should not be included in external modules.
 #include "../Helper/CustomMenu.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../HolderWindow/HolderWindow.h"
+#include "TabManager.h"
 #include "MainResource.h"
 
 

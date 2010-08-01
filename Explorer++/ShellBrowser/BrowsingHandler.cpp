@@ -21,6 +21,17 @@
 #include "../Helper/FolderSize.h"
 
 
+/*
+Browser:
+ - Browse a folder: Enumerates items in background thread,
+   passes them back to main container class.
+ - Cache item information.
+ - Remember path history.
+*/
+
+
+
+
 HRESULT CFolderView::BrowseFolder(TCHAR *szPath,UINT wFlags)
 {
 	LPITEMIDLIST pidlDirectory	= NULL;
@@ -97,7 +108,6 @@ HRESULT CFolderView::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 	m_nTotalItems = 0;
 
 	nItems = BrowseVirtualFolder(pidl);
-	//EnumFolderContents(szParsingPath);
 
 	CoTaskMemFree(pidl);
 

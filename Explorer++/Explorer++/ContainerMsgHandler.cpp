@@ -80,23 +80,65 @@ void CALLBACK QuitIconAPC(ULONG_PTR dwParam)
 }
 
 /*
- * Main window creation.
- *
- * Settings are loaded very early on. Any
- * initial settings must be in place before
- * this.
- */
+1. Load settings and language module.
+2. Load UI elements that depend on language module.
+3. Create child windows.
+4. Restore previous tabs.
+*/
 void CContainer::OnWindowCreate(void)
 {
-	ILoadSave *pLoadSave = NULL;
+	m_pBrowserAsync = new BrowserAsync();
 
 	m_bTaskbarInitialised = FALSE;
 	m_uTaskbarButtonCreatedMessage = RegisterWindowMessage(_T("TaskbarButtonCreated"));
+
+
+	ILoadSave *pLoadSave = NULL;
 
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 
 	SetLanguageModule();
+
+	/* These need to occur after the language module
+	has been initialized, but before the tabs are
+	restored. */
+	/* TODO: Load the language module and call these functions
+	within a helper method. */
+	SetMenu(m_hContainer,LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_MAINMENU)));
+	m_hRightClickMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)),0);
+	m_hArrangeSubMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_ARRANGEMENU)),0);
+	m_hGroupBySubMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_GROUPBY_MENU)),0);
+	m_hBookmarksMenu				= GetSubMenu(GetMenu(m_hContainer),6);
+	m_hTabRightClickMenu			= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_TAB_RCLICK)),0);
+	m_hToolbarRightClickMenu		= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_TOOLBAR_MENU)),0);
+	m_hBookmarksRightClickMenu		= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_BOOKMARKSTOOLBAR_MENU)),0);
+	m_hApplicationRightClickMenu	= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)),0);
+	m_hDisplayWindowRightClickMenu	= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)),0);
+	m_hViewsMenu					= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_VIEWS_MENU)),0);
+
+	/* Mark the main menus as owner drawn. */
+	InitializeMenus();
+
+	SHChangeNotifyEntry shcne;
+
+	/* Don't need to specify any file for this notification. */
+	shcne.fRecursive	= TRUE;
+	shcne.pidl			= NULL;
+
+	/* Register for any shell changes. This should
+	be done after the tabs have been created. */
+	SHChangeNotifyRegister(m_hContainer,SHCNRF_ShellLevel,SHCNE_ASSOCCHANGED,
+		WM_USER_ASSOCCHANGED,1,&shcne);
+
+	InitializeBookmarks();
+	InitializeArrangeMenuItems();
+
+	/* Place the main window in the clipboard chain. This
+	will allow the 'Paste' button to be enabled/disabled
+	dynamically. */
+	m_hNextClipboardViewer = SetClipboardViewer(m_hContainer);
+
 
 	m_hIconThread = CreateThread(NULL,0,Thread_IconFinder,NULL,0,NULL);
 	SetThreadPriority(m_hIconThread,THREAD_PRIORITY_BELOW_NORMAL);
@@ -110,21 +152,9 @@ void CContainer::OnWindowCreate(void)
 	SetThreadPriority(m_hFolderSizeThread,THREAD_PRIORITY_BELOW_NORMAL);
 	QueueUserAPC(IconThreadInitialization,m_hFolderSizeThread,NULL);
 
-	/* These need to occur after the language module
-	has been initialized, but before the tabs are
-	restored. */
-	SetMenu(m_hContainer,LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_MAINMENU)));
-	m_hRightClickMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)),0);
-	m_hArrangeSubMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_ARRANGEMENU)),0);
-	m_hGroupBySubMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_GROUPBY_MENU)),0);
-	m_hBookmarksMenu				= GetSubMenu(GetMenu(m_hContainer),6);
-	m_hTabRightClickMenu			= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_TAB_RCLICK)),0);
-	m_hToolbarRightClickMenu		= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_TOOLBAR_MENU)),0);
-	m_hBookmarksRightClickMenu		= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_BOOKMARKSTOOLBAR_MENU)),0);
-	m_hApplicationRightClickMenu	= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)),0);
-	m_hDisplayWindowRightClickMenu	= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)),0);
-	m_hViewsMenu					= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_VIEWS_MENU)),0);
 
+	/* This object is needed for the treeview, so
+	that it can monitor all drives. */
 	CreateDirectoryMonitor(&m_pDirMon);
 
 	CreateStatusBar();
@@ -132,7 +162,6 @@ void CContainer::OnWindowCreate(void)
 	InitializeDisplayWindow();
 	InitializeTabs();
 	CreateFolderControls();
-	//CreateBookmarkSidebar();
 
 	/* All child windows MUST be resized before
 	any listview changes take place. If auto arrange
@@ -148,6 +177,7 @@ void CContainer::OnWindowCreate(void)
 	all child windows have been created. */
 	ApplyLoadedSettings();
 
+
 	RestoreTabs(pLoadSave);
 	pLoadSave->Release();
 	pLoadSave = NULL;
@@ -155,30 +185,6 @@ void CContainer::OnWindowCreate(void)
 
 
 
-	SHChangeNotifyEntry shcne;
-
-	/* Don't need to specify any file for this notification. */
-	shcne.fRecursive	= TRUE;
-	shcne.pidl			= NULL;
-
-	/* Register for any shell changes. This should
-	be done after the tabs have been created. */
-	SHChangeNotifyRegister(m_hContainer,SHCNRF_ShellLevel,SHCNE_ASSOCCHANGED,
-		WM_USER_ASSOCCHANGED,1,&shcne);
-
-
-
-
-	/* Mark the main menus as owner drawn. */
-	InitializeMenus();
-
-	InitializeBookmarks();
-	InitializeArrangeMenuItems();
-
-	/* Place the main window in the clipboard chain. This
-	will allow the 'Paste' button to be enabled/disabled
-	dynamically. */
-	m_hNextClipboardViewer = SetClipboardViewer(m_hContainer);
 
 	SetFocus(m_hActiveListView);
 }
@@ -1793,13 +1799,26 @@ HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
 	{
-		hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
+		//hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
 
-		if(SUCCEEDED(hr))
+		/* Tab needs to clear listview items. */
+		//m_pBrowserAsync->BrowseFolder(pidlDirectory);
+
+		//m_pTabManager->GetCurrentTab()->BrowseFolder();
+
+		TabManager *pTabManager = new TabManager(m_hTabCtrl);
+
+		pTabManager->AddTab();
+
+		Tab *pTab = pTabManager->GetCurrentTab();
+
+		//pTab->;
+
+		/*if(SUCCEEDED(hr))
 		{
 			PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE|SND_ASYNC);
 			OnDirChanged(m_iObjectIndex);
-		}
+		}*/
 	}
 	else
 	{

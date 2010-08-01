@@ -409,6 +409,7 @@
     <ClCompile Include="MassRenameDialog.cpp" />
     <ClCompile Include="MergeFiles.cpp" />
     <ClCompile Include="Misc.cpp" />
+    <ClCompile Include="NavigationManager.cpp" />
     <ClCompile Include="NewBookmarkFolderDialog.cpp" />
     <ClCompile Include="OptionsDialog.cpp" />
     <ClCompile Include="OrganizeBookmarksDialog.cpp" />
@@ -432,6 +433,7 @@
     <ClCompile Include="TabBackingHandler.cpp" />
     <ClCompile Include="TabDropHandler.cpp" />
     <ClCompile Include="TabHandler.cpp" />
+    <ClCompile Include="TabManager.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
     <ClCompile Include="WildcardSelectDialog.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
@@ -452,6 +454,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TabManager.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>

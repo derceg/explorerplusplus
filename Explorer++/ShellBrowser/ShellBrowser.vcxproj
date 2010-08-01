@@ -218,6 +218,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BackgroundEnumerator.cpp" />
+    <ClCompile Include="BrowserAsync.cpp" />
     <ClCompile Include="BrowsingHandler.cpp" />
     <ClCompile Include="ColumnManager.cpp" />
     <ClCompile Include="DirectoryModificationHandler.cpp" />
@@ -238,6 +240,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BackgroundEnumerator.h" />
+    <ClInclude Include="BrowserAsync.h" />
     <ClInclude Include="iPathManager.h" />
     <ClInclude Include="iShellBrowser_internal.h" />
     <ClInclude Include="iShellView.h" />

@@ -3,6 +3,7 @@
 
 #include <windows.h>
 #include <commctrl.h>
+#include "../ShellBrowser/BrowserAsync.h"
 #include "../ShellBrowser/iShellView.h"
 #include "Explorer++_internal.h"
 #import <msxml3.dll> raw_interfaces_only
@@ -1171,6 +1172,7 @@ private:
 	HWND					m_hBookmarksSidebarToolbar;
 	HWND					m_hBookmarksTreeView;
 
+	BrowserAsync *			m_pBrowserAsync;
 	MyIFolderView2 *		m_pFolderView[MAX_TABS];
 	IShellBrowser2 *		m_pShellBrowser[MAX_TABS];
 	IDisplayWindowMain *	m_pDisplayMain;
