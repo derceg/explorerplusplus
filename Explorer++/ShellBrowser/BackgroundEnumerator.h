@@ -6,7 +6,7 @@
 
 __interface IEnumerateCallback
 {
-	virtual	void BackgroundEnumerationFinished(void);
+	virtual	void BackgroundEnumerationFinished(std::list<LPITEMIDLIST> ItemList);
 };
 
 class BackgroundEnumerator
@@ -16,21 +16,20 @@ public:
 	BackgroundEnumerator(IEnumerateCallback *pEnumerateCallback);
 	~BackgroundEnumerator();
 
-	HRESULT	EnumerateDirectory(LPITEMIDLIST pidlDirectory);
-	void	EnumerateDirectoryInternal(void);
-	void	EnumerateDirectoryFinished(void);
+	HRESULT					EnumerateDirectory(LPITEMIDLIST pidlDirectory);
+	std::list<LPITEMIDLIST>	*EnumerateDirectoryInternal(LPITEMIDLIST pidlDirectory);
 
-	void	StopEnumeration(void);
+	void					EnumerateDirectoryFinished(std::list<LPITEMIDLIST> *pItemList);
+
+	void					StopEnumeration(void);
 
 private:
 
+	std::list<HANDLE>	m_ThreadList;
 	CRITICAL_SECTION	m_csStop;
-	std::list<LPITEMIDLIST>	m_ItemList;
-	HANDLE				m_hThread;
 	BOOL				m_bStopEnumeration;
 
 	IEnumerateCallback	*m_pEnumerateCallback;
-	LPITEMIDLIST		m_pidlDirectory;
 };
 
 #endif

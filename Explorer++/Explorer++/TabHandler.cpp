@@ -270,6 +270,8 @@ int *pTabObjectIndex)
 	will create the taskbar thumbnail for that tab. */
 	CreateTabProxy(pidlDirectory,iTabId,bSwitchToNewTab);
 
+	m_pTabManager->AddTab(m_hListView[m_iObjectIndex]);
+
 	return S_OK;
 }
 
@@ -803,6 +805,8 @@ void CContainer::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi)
 
 void CContainer::OnTabChangeInternal(BOOL bSetFocus)
 {
+	return;
+
 	TCITEM tcItem;
 
 	tcItem.mask = TCIF_PARAM;

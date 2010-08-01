@@ -1172,7 +1172,8 @@ private:
 	HWND					m_hBookmarksSidebarToolbar;
 	HWND					m_hBookmarksTreeView;
 
-	BrowserAsync *			m_pBrowserAsync;
+	TabManager				*m_pTabManager;
+
 	MyIFolderView2 *		m_pFolderView[MAX_TABS];
 	IShellBrowser2 *		m_pShellBrowser[MAX_TABS];
 	IDisplayWindowMain *	m_pDisplayMain;

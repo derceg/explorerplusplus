@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <list>
 #include "TabManager.h"
+#include "../Helper/Helper.h"
 
 /* Each tab has:
  - A navigation object (this contains the asynchronous browser object).
@@ -27,17 +28,17 @@ TabManager::~TabManager()
 
 /* Adds a new tab, and creates the internal
 structures needed to manage it. */
-void TabManager::AddTab(void)
+void TabManager::AddTab(HWND hListview)
 {
-	TCITEM tcItem;
+	/*TCITEM tcItem;
 
 	tcItem.mask			= TCIF_TEXT|TCIF_PARAM;
 	tcItem.pszText		= _T("Test");
 	tcItem.lParam		= 0;
 
-	SendMessage(m_hTabCtrl,TCM_INSERTITEM,(WPARAM)0,(LPARAM)&tcItem);
+	SendMessage(m_hTabCtrl,TCM_INSERTITEM,(WPARAM)0,(LPARAM)&tcItem);*/
 
-	Tab *pTab = new Tab();
+	Tab *pTab = new Tab(hListview);
 
 	m_TabList.push_back(pTab);
 }
@@ -50,4 +51,66 @@ Tab *TabManager::GetCurrentTab(void)
 	}
 
 	return NULL;
+}
+
+Tab::Tab(HWND hListview)
+{
+	/* Create the display manager. */
+	m_pTabDisplayManager = new TabDisplayManager(hListview);
+
+	/* Create the navigation manager. */
+	m_pNavigationManager = new NavigationManager(m_pTabDisplayManager);
+}
+
+Tab::~Tab()
+{
+	delete m_pNavigationManager;
+}
+
+NavigationManager *Tab::GetNavigationManager(void)
+{
+	return m_pNavigationManager;
+}
+
+TabDisplayManager::TabDisplayManager(HWND hListview)
+{
+	m_hListview = hListview;
+}
+
+void TabDisplayManager::ClearDisplay(void)
+{
+	ListView_DeleteAllItems(m_hListview);
+}
+
+/* TODO: This will have to be moved onto the main UI thread. */
+void TabDisplayManager::DisplayResults(std::list<LPITEMIDLIST> ItemList)
+{
+	LVITEM lvItem;
+	LPITEMIDLIST pidlDirectory;
+
+	GetIdlFromParsingName(_T("K:\\"),&pidlDirectory);
+
+	LPITEMIDLIST pidlComplete;
+	TCHAR szDisplayName[MAX_PATH];
+	int iItem = 0;
+
+	SendMessage(m_hListview,WM_SETREDRAW,(WPARAM)FALSE,(LPARAM)NULL);
+
+	for each(LPITEMIDLIST pidl in ItemList)
+	{
+		pidlComplete = ILCombine(pidlDirectory,pidl);
+
+		GetDisplayName(pidlComplete,szDisplayName,SHGDN_INFOLDER);
+
+		lvItem.mask		= LVIF_TEXT|LVIF_PARAM;
+		lvItem.iItem	= iItem++;
+		lvItem.iSubItem	= 0;
+		lvItem.pszText	= szDisplayName;
+		lvItem.lParam	= 0;
+		ListView_InsertItem(m_hListview,&lvItem);
+
+		CoTaskMemFree(pidlComplete);
+	}
+
+	SendMessage(m_hListview,WM_SETREDRAW,(WPARAM)TRUE,(LPARAM)NULL);
 }

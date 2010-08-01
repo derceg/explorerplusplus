@@ -3,19 +3,38 @@
 #pragma once
 
 #include <list>
+#include "NavigationManager.h"
 
 using namespace std;
+
+class TabDisplayManager : public ITabDisplayManager
+{
+public:
+
+	TabDisplayManager(HWND hListview);
+	~TabDisplayManager();
+
+private:
+
+	void	ClearDisplay(void);
+	void	DisplayResults(std::list<LPITEMIDLIST> ItemList);
+
+	HWND	m_hListview;
+};
 
 class Tab
 {
 public:
 
-	void	GetNavigation();
+	Tab(HWND hListview);
+	~Tab();
+
+	NavigationManager	*GetNavigationManager(void);
 
 private:
 
-	HWND				hListview;
-	//NavigationManager	m_NavigationManager;
+	NavigationManager	*m_pNavigationManager;
+	TabDisplayManager	*m_pTabDisplayManager;
 };
 
 /* Manages all tabs. */
@@ -26,7 +45,7 @@ public:
 	TabManager(HWND hTabCtrl);
 	~TabManager();
 
-	void	AddTab(void);
+	void	AddTab(HWND hListview);
 
 	void	GetTab(void);
 	Tab		*GetCurrentTab(void);

@@ -450,6 +450,7 @@
     <ClInclude Include="iDropSource.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="NavigationManager.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Settings.h" />

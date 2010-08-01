@@ -20,6 +20,7 @@ using namespace std;
 
 /* Visibility states should NOT be included here. The visibility of
 an item will be set dynamically based on any loaded settings. */
+/* TODO: Move these somehere else. */
 UINT StatusBarStyles		=	WS_CHILD|WS_CLIPSIBLINGS|SBARS_SIZEGRIP|
 								WS_CLIPCHILDREN;
 
@@ -34,51 +35,6 @@ DWORD WINAPI Thread_IconFinder(LPVOID pParam);
 void CALLBACK IconThreadInitialization(ULONG_PTR dwParam);
 void CALLBACK QuitIconAPC(ULONG_PTR dwParam);
 
-extern int g_nCmdShow;
-
-DWORD WINAPI Thread_IconFinder(LPVOID pParam)
-{
-	/* OLE initialization is no longer done from within
-	this function. This is because of the fact that the
-	first APC may run BEFORE this thread initialization
-	function. If this occurs, OLE will not be initialized,
-	and possible errors may occur.
-	OLE is now initialized using an APC that is queued
-	immediately after this thread is created. As APC's
-	are run sequentially, it is quaranteed that the
-	initialization APC will run before any other APC,
-	thus acting like this initialization function. */
-
-	/* WARNING: Warning C4127 (conditional expression is
-	constant) temporarily disabled for this funtion. */
-	#pragma warning(push)
-	#pragma warning(disable:4127)
-	while(TRUE)
-	{
-		SleepEx(INFINITE,TRUE);
-	}
-	#pragma warning(pop)
-
-	return 0;
-}
-
-void CALLBACK IconThreadInitialization(ULONG_PTR dwParam)
-{
-	/* This will be balanced out by a corresponding
-	CoUninitialize() when the thread is ended.
-	It must be apartment threaded, or some icons (such
-	as those used for XML files) may not load properly.
-	It *may* be due to the fact that one or more of
-	the other threads in use do not initialize COM/
-	use the same threading model. */
-	CoInitializeEx(NULL,COINIT_APARTMENTTHREADED);
-}
-
-void CALLBACK QuitIconAPC(ULONG_PTR dwParam)
-{
-	CoUninitialize();
-}
-
 /*
 1. Load settings and language module.
 2. Load UI elements that depend on language module.
@@ -87,8 +43,6 @@ void CALLBACK QuitIconAPC(ULONG_PTR dwParam)
 */
 void CContainer::OnWindowCreate(void)
 {
-	m_pBrowserAsync = new BrowserAsync();
-
 	m_bTaskbarInitialised = FALSE;
 	m_uTaskbarButtonCreatedMessage = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 
@@ -163,6 +117,8 @@ void CContainer::OnWindowCreate(void)
 	InitializeTabs();
 	CreateFolderControls();
 
+	m_pTabManager = new TabManager(m_hTabCtrl);
+
 	/* All child windows MUST be resized before
 	any listview changes take place. If auto arrange
 	is turned off in the listview, when it is
@@ -187,6 +143,49 @@ void CContainer::OnWindowCreate(void)
 
 
 	SetFocus(m_hActiveListView);
+}
+
+DWORD WINAPI Thread_IconFinder(LPVOID pParam)
+{
+	/* OLE initialization is no longer done from within
+	this function. This is because of the fact that the
+	first APC may run BEFORE this thread initialization
+	function. If this occurs, OLE will not be initialized,
+	and possible errors may occur.
+	OLE is now initialized using an APC that is queued
+	immediately after this thread is created. As APC's
+	are run sequentially, it is quaranteed that the
+	initialization APC will run before any other APC,
+	thus acting like this initialization function. */
+
+	/* WARNING: Warning C4127 (conditional expression is
+	constant) temporarily disabled for this funtion. */
+	#pragma warning(push)
+	#pragma warning(disable:4127)
+	while(TRUE)
+	{
+		SleepEx(INFINITE,TRUE);
+	}
+	#pragma warning(pop)
+
+	return 0;
+}
+
+void CALLBACK IconThreadInitialization(ULONG_PTR dwParam)
+{
+	/* This will be balanced out by a corresponding
+	CoUninitialize() when the thread is ended.
+	It must be apartment threaded, or some icons (such
+	as those used for XML files) may not load properly.
+	It *may* be due to the fact that one or more of
+	the other threads in use do not initialize COM/
+	use the same threading model. */
+	CoInitializeEx(NULL,COINIT_APARTMENTTHREADED);
+}
+
+void CALLBACK QuitIconAPC(ULONG_PTR dwParam)
+{
+	CoUninitialize();
 }
 
 void CContainer::TestConfigFile(void)
@@ -1799,26 +1798,21 @@ HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
 	{
-		//hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
+		hr = m_pTabManager->GetCurrentTab()->
+			GetNavigationManager()->
+			BrowseFolder(pidlDirectory);
 
-		/* Tab needs to clear listview items. */
-		//m_pBrowserAsync->BrowseFolder(pidlDirectory);
-
-		//m_pTabManager->GetCurrentTab()->BrowseFolder();
-
-		TabManager *pTabManager = new TabManager(m_hTabCtrl);
-
-		pTabManager->AddTab();
-
-		Tab *pTab = pTabManager->GetCurrentTab();
-
-		//pTab->;
-
-		/*if(SUCCEEDED(hr))
+		if(SUCCEEDED(hr))
 		{
-			PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE|SND_ASYNC);
-			OnDirChanged(m_iObjectIndex);
-		}*/
+			/* Navigation has successfully started, so
+			update the UI to reflect this. */
+			//UpdateUI();
+			SendMessage(m_hStatusBar,SB_SETTEXT,(WPARAM)0|0,(LPARAM)_T("Loading K:\\... (Press ESC to cancel)"));
+		}
+		else
+		{
+			/* Display an error. */
+		}
 	}
 	else
 	{

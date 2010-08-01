@@ -4,20 +4,26 @@
 
 #include "BackgroundEnumerator.h"
 
+__interface IBrowserCallback
+{
+	virtual	void BrowserFinished(std::list<LPITEMIDLIST> ItemList);
+};
+
 class BrowserAsync : public IEnumerateCallback
 {
 public:
 
-	BrowserAsync();
+	BrowserAsync(IBrowserCallback *pBrowserCallback);
 	~BrowserAsync();
 
 	HRESULT	BrowseFolder(LPITEMIDLIST pidlDirectory);
 
 private:
 
-	void	BackgroundEnumerationFinished(void);
+	void	BackgroundEnumerationFinished(std::list<LPITEMIDLIST> ItemList);
 
 	BackgroundEnumerator	*m_pbe;
+	IBrowserCallback		*m_pBrowserCallback;
 };
 
 #endif

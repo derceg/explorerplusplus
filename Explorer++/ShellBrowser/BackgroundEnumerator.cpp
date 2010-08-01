@@ -8,6 +8,12 @@ using namespace std;
 
 DWORD WINAPI Thread_Enumerator(LPVOID pParam);
 
+struct THREAD_INFO
+{
+	BackgroundEnumerator	*pbe;
+	LPITEMIDLIST			pidlDirectory;
+};
+
 BackgroundEnumerator::BackgroundEnumerator(IEnumerateCallback *pEnumerateCallback)
 {
 	m_pEnumerateCallback = pEnumerateCallback;
@@ -25,30 +31,52 @@ BackgroundEnumerator::~BackgroundEnumerator()
 /* Enumerate the specified directory in a background thread. */
 HRESULT BackgroundEnumerator::EnumerateDirectory(LPITEMIDLIST pidlDirectory)
 {
-	m_pidlDirectory = ILClone(pidlDirectory);
+	THREAD_INFO *pti = new THREAD_INFO;
 
-	m_hThread = CreateThread(NULL,0,Thread_Enumerator,(LPVOID)this,
+	pti->pbe = this;
+	pti->pidlDirectory = ILClone(pidlDirectory);
+
+	/* Each time we're asked to enumerate a directory, we'll
+	spawn a new thread. */
+	HANDLE hThread = CreateThread(NULL,0,Thread_Enumerator,(LPVOID)pti,
 		CREATE_SUSPENDED,NULL);
 
-	if(m_hThread == NULL)
+	if(hThread == NULL)
 	{
 		return E_FAIL;
 	}
 
 	/* Drop the thread priority. */
-	SetThreadPriority(m_hThread,THREAD_PRIORITY_BELOW_NORMAL);
+	SetThreadPriority(hThread,THREAD_PRIORITY_BELOW_NORMAL);
 
-	ResumeThread(m_hThread);
+	m_ThreadList.push_back(hThread);
+
+	ResumeThread(hThread);
 
 	return S_OK;
 }
 
-void BackgroundEnumerator::EnumerateDirectoryInternal(void)
+/* Enumerates a directory. */
+DWORD WINAPI Thread_Enumerator(LPVOID pParam)
 {
-	IShellFolder	*pDesktopFolder	= NULL;
-	IShellFolder	*pShellFolder		= NULL;
-	IEnumIDList		*pEnumIDList		= NULL;
-	LPITEMIDLIST	rgelt				= NULL;
+	THREAD_INFO *pti = static_cast<THREAD_INFO *>(pParam);
+
+	std::list<LPITEMIDLIST>	*pItemList = pti->pbe->EnumerateDirectoryInternal(pti->pidlDirectory);
+	pti->pbe->EnumerateDirectoryFinished(pItemList);
+
+	CoTaskMemFree(pti->pidlDirectory);
+	delete pti;
+
+	return 0;
+}
+
+std::list<LPITEMIDLIST> *BackgroundEnumerator::EnumerateDirectoryInternal(LPITEMIDLIST pidlDirectory)
+{
+	std::list<LPITEMIDLIST>	*pItemList = new std::list<LPITEMIDLIST>;
+	IShellFolder	*pDesktopFolder = NULL;
+	IShellFolder	*pShellFolder = NULL;
+	IEnumIDList		*pEnumIDList = NULL;
+	LPITEMIDLIST	rgelt = NULL;
 	SHCONTF			EnumFlags;
 	ULONG			uFetched;
 	HRESULT			hr;
@@ -58,13 +86,13 @@ void BackgroundEnumerator::EnumerateDirectoryInternal(void)
 
 	if(SUCCEEDED(hr))
 	{
-		if(IsNamespaceRoot(m_pidlDirectory))
+		if(IsNamespaceRoot(pidlDirectory))
 		{
 			hr = SHGetDesktopFolder(&pShellFolder);
 		}
 		else
 		{
-			hr = pDesktopFolder->BindToObject(m_pidlDirectory,NULL,
+			hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
 			IID_IShellFolder,(LPVOID *)&pShellFolder);
 		}
 
@@ -80,7 +108,7 @@ void BackgroundEnumerator::EnumerateDirectoryInternal(void)
 				while(pEnumIDList->Next(1,&rgelt,&uFetched) == S_OK && (uFetched == 1))
 				{
 					/* Add this item to the list. */
-					m_ItemList.push_back(ILClone(rgelt));
+					pItemList->push_back(ILClone(rgelt));
 
 					CoTaskMemFree((LPVOID)rgelt);
 
@@ -98,28 +126,31 @@ void BackgroundEnumerator::EnumerateDirectoryInternal(void)
 
 		pDesktopFolder->Release();
 	}
+
+	return pItemList;
 }
 
-void BackgroundEnumerator::EnumerateDirectoryFinished(void)
+void BackgroundEnumerator::EnumerateDirectoryFinished(std::list<LPITEMIDLIST> *pItemList)
 {
-	m_pEnumerateCallback->BackgroundEnumerationFinished();
+	std::list<LPITEMIDLIST>	*pItemListCopy = new std::list<LPITEMIDLIST>(*pItemList);
+
+	m_pEnumerateCallback->BackgroundEnumerationFinished(*pItemList);
+
+	/* Destroy the current list. Note that this is a
+	non-standard Visual C++ construct. */
+	for each(LPITEMIDLIST pidl in *pItemList)
+	{
+		CoTaskMemFree(pidl);
+	}
+
+	pItemList->clear();
+	delete pItemList;
 }
 
-/* Stop the enumeration. */
+/* Stop any current enumerations. */
 void BackgroundEnumerator::StopEnumeration(void)
 {
 	EnterCriticalSection(&m_csStop);
 	m_bStopEnumeration = TRUE;
 	LeaveCriticalSection(&m_csStop);
-}
-
-/* Enumerates a directory. */
-DWORD WINAPI Thread_Enumerator(LPVOID pParam)
-{
-	BackgroundEnumerator *pbe = static_cast<BackgroundEnumerator *>(pParam);
-
-	pbe->EnumerateDirectoryInternal();
-	pbe->EnumerateDirectoryFinished();
-
-	return 0;
 }
