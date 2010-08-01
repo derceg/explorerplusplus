@@ -138,7 +138,7 @@ void BackgroundEnumerator::EnumerateDirectoryFinished(std::list<LPITEMIDLIST> *p
 
 	/* Destroy the current list. Note that this is a
 	non-standard Visual C++ construct. */
-	for each(LPITEMIDLIST pidl in *pItemList)
+	for each(auto pidl in *pItemList)
 	{
 		CoTaskMemFree(pidl);
 	}

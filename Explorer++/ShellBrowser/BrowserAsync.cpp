@@ -29,7 +29,7 @@ HRESULT BrowserAsync::BrowseFolder(LPITEMIDLIST pidlDirectory)
 
 void BrowserAsync::BackgroundEnumerationFinished(std::list<LPITEMIDLIST> ItemList)
 {
-	for each(LPITEMIDLIST pidl in ItemList)
+	for each(auto pidl in ItemList)
 	{
 		/* Cache item information. When we browse
 		to another folder, this cached information will

@@ -47,7 +47,7 @@ Tab *TabManager::GetCurrentTab(void)
 {
 	if(m_TabList.size() > 0)
 	{
-		return *m_TabList.begin();
+		return static_cast<Tab *>(*m_TabList.begin());
 	}
 
 	return NULL;
@@ -55,11 +55,16 @@ Tab *TabManager::GetCurrentTab(void)
 
 Tab::Tab(HWND hListview)
 {
+	/* Create the navigation manager. */
+	m_pNavigationManager = new NavigationManager();
+
 	/* Create the display manager. */
 	m_pTabDisplayManager = new TabDisplayManager(hListview);
 
-	/* Create the navigation manager. */
-	m_pNavigationManager = new NavigationManager(m_pTabDisplayManager);
+	m_pNavigationManager->AddCallback(m_pTabDisplayManager);
+
+	/* TODO: Add item cache callback. Both the Tab class and
+	display class should be able to access this cache. */
 }
 
 Tab::~Tab()
@@ -77,13 +82,13 @@ TabDisplayManager::TabDisplayManager(HWND hListview)
 	m_hListview = hListview;
 }
 
-void TabDisplayManager::ClearDisplay(void)
+void TabDisplayManager::BrowsingStartedCallback(void)
 {
 	ListView_DeleteAllItems(m_hListview);
 }
 
 /* TODO: This will have to be moved onto the main UI thread. */
-void TabDisplayManager::DisplayResults(std::list<LPITEMIDLIST> ItemList)
+void TabDisplayManager::BrowsingFinishedCallback(std::list<LPITEMIDLIST> *pItemList)
 {
 	LVITEM lvItem;
 	LPITEMIDLIST pidlDirectory;
@@ -96,7 +101,7 @@ void TabDisplayManager::DisplayResults(std::list<LPITEMIDLIST> ItemList)
 
 	SendMessage(m_hListview,WM_SETREDRAW,(WPARAM)FALSE,(LPARAM)NULL);
 
-	for each(LPITEMIDLIST pidl in ItemList)
+	for each(auto pidl in *pItemList)
 	{
 		pidlComplete = ILCombine(pidlDirectory,pidl);
 

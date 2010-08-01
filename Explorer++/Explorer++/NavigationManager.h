@@ -2,7 +2,14 @@
 #define NAVIGATION_MANAGER_INCLUDED
 #pragma once
 
+#include "NavigationHistory.h"
 #include "../ShellBrowser/BrowserAsync.h"
+
+enum NotificationEvent
+{
+	NOTIFICATION_EVENT_BROWSING_STARTED,
+	NOTIFICATION_EVENT_BROWSING_FINISHED
+};
 
 enum NavigationStatus
 {
@@ -18,37 +25,46 @@ enum NavigationStatus
 	NAVIGATION_STATUS_COMPLETE
 };
 
-__interface ITabDisplayManager
+__interface IDisplayManager
 {
-	void	ClearDisplay(void);
-	void	DisplayResults(std::list<LPITEMIDLIST> ItemList);
+	void	BrowsingStartedCallback(void);
+	void	BrowsingFinishedCallback(std::list<LPITEMIDLIST> *pItemList);
 };
 
-/* Handles navigation. */
+/* Handles navigation.
+The NavigationManager object sends out callback
+notifications on the following events:
+ - When browsing has started.
+ - When browsing has finished.
+*/
 class NavigationManager : public IBrowserCallback
 {
 public:
 
-	NavigationManager(ITabDisplayManager *pTabDisplayManager);
+	NavigationManager();
 	~NavigationManager();
 
-	/* Loads the specified folder within the
-	current tab. */
+	/* Navigation. */
 	HRESULT	BrowseFolder(LPITEMIDLIST pidlDirectory);
 	void	Back(void);
 	void	Forward(void);
 
+	/* Callbacks. */
+	void	AddCallback(IDisplayManager *pDisplayManager);
+
 private:
 
-	void	NavigationManager::BrowserFinished(std::list<LPITEMIDLIST> ItemList);
+	void	BrowserFinished(std::list<LPITEMIDLIST> ItemList);
+	void	NotifyListeners(NotificationEvent Type,LPVOID pData);
 
 	/* TODO: This should be an interface, so that
 	various types of browsers can be used (e.g.
 	synchronous, asynchronous, etc). */
 	BrowserAsync		*m_pBrowserAsync;
 
-	ITabDisplayManager	*m_pTabDisplayManager;
+	std::list<IDisplayManager *>	m_DisplayManagerList;
 
+	NavigationHistory	*m_pNavigationHistory;
 	NavigationStatus	m_NavigationStatus;
 };
 

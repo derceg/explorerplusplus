@@ -7,7 +7,7 @@
 
 using namespace std;
 
-class TabDisplayManager : public ITabDisplayManager
+class TabDisplayManager : public IDisplayManager
 {
 public:
 
@@ -16,8 +16,8 @@ public:
 
 private:
 
-	void	ClearDisplay(void);
-	void	DisplayResults(std::list<LPITEMIDLIST> ItemList);
+	void	BrowsingStartedCallback(void);
+	void	BrowsingFinishedCallback(std::list<LPITEMIDLIST> *pItemList);
 
 	HWND	m_hListview;
 };

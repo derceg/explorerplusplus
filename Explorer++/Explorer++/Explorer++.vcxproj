@@ -409,6 +409,7 @@
     <ClCompile Include="MassRenameDialog.cpp" />
     <ClCompile Include="MergeFiles.cpp" />
     <ClCompile Include="Misc.cpp" />
+    <ClCompile Include="NavigationHistory.cpp" />
     <ClCompile Include="NavigationManager.cpp" />
     <ClCompile Include="NewBookmarkFolderDialog.cpp" />
     <ClCompile Include="OptionsDialog.cpp" />
@@ -450,6 +451,7 @@
     <ClInclude Include="iDropSource.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="NavigationHistory.h" />
     <ClInclude Include="NavigationManager.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="resource.h" />

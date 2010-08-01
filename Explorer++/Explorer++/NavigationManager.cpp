@@ -2,12 +2,12 @@
 #include "NavigationManager.h"
 #include "../ShellBrowser/BrowserAsync.h"
 
-NavigationManager::NavigationManager(ITabDisplayManager *pTabDisplayManager)
+NavigationManager::NavigationManager()
 {
 	m_NavigationStatus = NAVIGATION_STATUS_INITIALIZING;
 
 	m_pBrowserAsync = new BrowserAsync(this);
-	m_pTabDisplayManager = pTabDisplayManager;
+	m_pNavigationHistory = new NavigationHistory();
 
 	m_NavigationStatus = NAVIGATION_STATUS_PENDING;
 }
@@ -15,6 +15,7 @@ NavigationManager::NavigationManager(ITabDisplayManager *pTabDisplayManager)
 NavigationManager::~NavigationManager()
 {
 	delete m_pBrowserAsync;
+	delete m_pNavigationHistory;
 }
 
 HRESULT NavigationManager::BrowseFolder(LPITEMIDLIST pidlDirectory)
@@ -28,16 +29,43 @@ HRESULT NavigationManager::BrowseFolder(LPITEMIDLIST pidlDirectory)
 	should clear out any current display information
 	in preparation (i.e. delete the current listview
 	items). */
-	m_pTabDisplayManager->ClearDisplay();
+	NotifyListeners(NOTIFICATION_EVENT_BROWSING_STARTED,NULL);
 
 	return m_pBrowserAsync->BrowseFolder(pidlDirectory);
 }
 
 void NavigationManager::BrowserFinished(std::list<LPITEMIDLIST> ItemList)
 {
-	/* Tell the display manager to display the results of
-	the enumeration. */
-	m_pTabDisplayManager->DisplayResults(ItemList);
+	/* Notify each of the registered listeners (via the
+	specified callback handlers) that browsing has
+	finished. */
+	NotifyListeners(NOTIFICATION_EVENT_BROWSING_FINISHED,(LPVOID)&ItemList);
 
+	/* Store this path in history. */
+
+	/* Change navigation status. */
 	m_NavigationStatus = NAVIGATION_STATUS_COMPLETE;
+}
+
+void NavigationManager::NotifyListeners(NotificationEvent Type,LPVOID pData)
+{
+	for each(auto pDisplayManager in m_DisplayManagerList)
+	{
+		switch(Type)
+		{
+		case NOTIFICATION_EVENT_BROWSING_STARTED:
+			pDisplayManager->BrowsingStartedCallback();
+			break;
+
+		case NOTIFICATION_EVENT_BROWSING_FINISHED:
+			pDisplayManager->BrowsingFinishedCallback(static_cast<std::list<LPITEMIDLIST> *>(pData));
+			break;
+		}
+	}
+}
+
+/* Adds a new callback handler. */
+void NavigationManager::AddCallback(IDisplayManager *pDisplayManager)
+{
+	m_DisplayManagerList.push_back(pDisplayManager);
 }
