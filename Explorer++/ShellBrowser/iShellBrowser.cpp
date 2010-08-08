@@ -1293,7 +1293,7 @@ void CFolderView::RemoveFilteredItems(void)
 		{
 			if(IsFilenameFiltered(m_pExtraItemInfo[(int)lvItem.lParam].szDisplayName))
 			{
-				RemoveFilteredItem(i,lvItem.lParam);
+				RemoveFilteredItem(i,(int)lvItem.lParam);
 			}
 		}
 	}

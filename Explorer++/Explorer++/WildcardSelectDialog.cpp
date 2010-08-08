@@ -130,7 +130,7 @@ void CContainer::OnWildcardSelectOk(HWND hDlg)
 	{
 		m_pActiveShellBrowser->QueryName(i,FullFileName);
 
-		if(CheckWildcardMatch(szPattern,FullFileName,TRUE) == 1)
+		if(CheckWildcardMatch(szPattern,FullFileName,FALSE) == 1)
 		{
 			ListView_SelectItem(m_hActiveListView,i,m_bWildcardSelect);
 		}
