@@ -140,14 +140,6 @@ INT_PTR CALLBACK CContainer::ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wPa
 			}
 			break;
 
-		case WM_NOTIFY:
-			switch(((LPNMHDR)lParam)->code)
-			{
-			case EN_CHANGE:
-				break;
-			}
-			break;
-
 		case WM_CLOSE:
 			DisplayColorsSaveState(hDlg);
 			EndDialog(hDlg,0);
@@ -357,22 +349,39 @@ void CContainer::OnDisplayColorsHScroll(HWND hDlg)
 	g = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_GREEN,TBM_GETPOS,0,0);
 	b = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_BLUE,TBM_GETPOS,0,0);
 
-	SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_RED,r,FALSE);
-	SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_GREEN,g,FALSE);
-	SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_BLUE,b,FALSE);
+	if(GetDlgItemInt(hDlg,IDC_EDIT_SURROUND_RED,NULL,FALSE) != r)
+	{
+		SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_RED,r,FALSE);
+	}
 
-	COLORREF rgb;
-	rgb = RGB(r,g,b);
+	if(GetDlgItemInt(hDlg,IDC_EDIT_SURROUND_GREEN,NULL,FALSE) != g)
+	{
+		SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_GREEN,g,FALSE);
+	}
+
+	if(GetDlgItemInt(hDlg,IDC_EDIT_SURROUND_BLUE,NULL,FALSE) != b)
+	{
+		SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_BLUE,b,FALSE);
+	}
 
 	r = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_RED,TBM_GETPOS,0,0);
 	g = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_GREEN,TBM_GETPOS,0,0);
 	b = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_BLUE,TBM_GETPOS,0,0);
 
-	SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_RED,r,FALSE);
-	SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_GREEN,g,FALSE);
-	SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_BLUE,b,FALSE);
+	if(GetDlgItemInt(hDlg,IDC_EDIT_CENTRE_RED,NULL,FALSE) != r)
+	{
+		SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_RED,r,FALSE);
+	}
 
-	rgb = RGB(r,g,b);
+	if(GetDlgItemInt(hDlg,IDC_EDIT_CENTRE_GREEN,NULL,FALSE) != g)
+	{
+		SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_GREEN,g,FALSE);
+	}
+
+	if(GetDlgItemInt(hDlg,IDC_EDIT_CENTRE_BLUE,NULL,FALSE) != b)
+	{
+		SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_BLUE,b,FALSE);
+	}
 }
 
 void CContainer::OnDisplayColorsEnChange(HWND hDlg,LPARAM lParam)
