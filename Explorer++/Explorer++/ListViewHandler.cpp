@@ -1744,7 +1744,6 @@ void CContainer::OnListViewCopyItemPath(void)
 void CContainer::OnListViewCopyUniversalPaths(void)
 {
 	IBufferManager	*pBufferManager = NULL;
-	UNIVERSAL_NAME_INFO	uni;
 	TCHAR			FullFileName[MAX_PATH];
 	TCHAR			*szFullFileNameText = NULL;
 	DWORD			dwBufferSize;
@@ -1762,12 +1761,16 @@ void CContainer::OnListViewCopyUniversalPaths(void)
 	{
 		m_pActiveShellBrowser->QueryFullItemName(iSelected,FullFileName);
 
-		dwBufferSize = sizeof(uni);
+		UNIVERSAL_NAME_INFO	*puni;
+		TCHAR szBuffer[1024];
+
+		dwBufferSize = SIZEOF_ARRAY(szBuffer);
+		puni = (UNIVERSAL_NAME_INFO *)&szBuffer;
 		dwRet = WNetGetUniversalName(FullFileName,UNIVERSAL_NAME_INFO_LEVEL,
-			(void **)&uni,&dwBufferSize);
+			(LPVOID)puni,&dwBufferSize);
 
 		if(dwRet == NO_ERROR)
-			pBufferManager->WriteLine(uni.lpUniversalName);
+			pBufferManager->WriteLine(puni->lpUniversalName);
 		else
 			pBufferManager->WriteLine(FullFileName);
 
