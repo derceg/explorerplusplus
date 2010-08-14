@@ -1423,21 +1423,39 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 	IDataObject			*pDataObject = NULL;
 	IDropSource			*pDropSource = NULL;
 	IDragSourceHelper	*pDragSourceHelper = NULL;
-	IShellFolder		*pDesktopFolder = NULL;
-	IShellFolder		*pShellFolder = NULL;
-	LPITEMIDLIST		*ppidl = NULL;
-	LPITEMIDLIST		pidlDirectory = NULL;
-	LPITEMIDLIST		pidlDesktop = NULL;
 	NMLISTVIEW			*pnmlv = NULL;
-	DWORD				Effect;
 	POINT				pt = {0,0};
 	HRESULT				hr;
-	int					iItem = -1;
-	int					nSelected;
 	int					iDragStartObjectIndex;
-	int					i = 0;
 
 	pnmlv = (NMLISTVIEW *)lParam;
+
+	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
+	{
+		return E_FAIL;
+	}
+
+	LPITEMIDLIST pidlDirectory = NULL;
+	list<LPITEMIDLIST> ItemList;
+	list<std::wstring> FilenameList;
+	int iItem = -1;
+
+	/* Store the pidl of the current folder, as well as the relative
+	pidl's of the dragged items. */
+	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+
+	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+	{
+		ItemList.push_back(m_pActiveShellBrowser->QueryItemRelativeIdl(iItem));
+
+		TCHAR szFullFilename[MAX_PATH];
+
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+
+		std::wstring stringFilename(szFullFilename);
+
+		FilenameList.push_back(stringFilename);
+	}
 
 	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_ALL,
 		IID_IDragSourceHelper,(LPVOID *)&pDragSourceHelper);
@@ -1448,44 +1466,48 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 
 		if(SUCCEEDED(hr))
 		{
-			nSelected = ListView_GetSelectedCount(m_hActiveListView);
+			FORMATETC ftc[1];
+			STGMEDIUM stg[1];
 
-			ppidl = (LPITEMIDLIST *)malloc(nSelected * sizeof(LPCITEMIDLIST));
+			ftc[0].cfFormat			= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST);
+			ftc[0].ptd				= NULL;
+			ftc[0].dwAspect			= DVASPECT_CONTENT;
+			ftc[0].lindex			= -1;
+			ftc[0].tymed			= TYMED_HGLOBAL;
 
-			if(ppidl != NULL)
+			CIDA *pcida = NULL;
+			//DROPFILES *pcida = NULL;
+			UINT uSize;
+
+			/* TODO: */
+			hr = BuildShellIDList(&pcida,&uSize,pidlDirectory,ItemList);
+			//hr = BuildHDropList(&pcida,&uSize,FilenameList);
+
+			if(SUCCEEDED(hr))
 			{
-				pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+				HGLOBAL hglb = NULL;
 
-				while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+				hglb = GlobalAlloc(GMEM_MOVEABLE,uSize);
+
+				if(hglb != NULL)
 				{
-					ppidl[i] = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+					LPBYTE pData = (LPBYTE)GlobalLock(hglb);
 
-					i++;
-				}
+					memcpy(pData,pcida,uSize);
 
-				SHGetDesktopFolder(&pDesktopFolder);
-				SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,&pidlDesktop);
+					GlobalUnlock(hglb);
 
-				if(ILIsEqual(pidlDesktop,pidlDirectory))
-				{
-					SHGetDesktopFolder(&pShellFolder);
-				}
-				else
-				{
-					hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
-						IID_IShellFolder,(LPVOID *)&pShellFolder);
-				}
+					stg[0].pUnkForRelease	= 0;
+					stg[0].hGlobal			= hglb;
+					stg[0].tymed			= TYMED_HGLOBAL;
 
-				CoTaskMemFree(pidlDesktop);
-				CoTaskMemFree(pidlDirectory);
+					hr = CreateDataObject(ftc,stg,&pDataObject,1);
 
-				if(SUCCEEDED(hr))
-				{
-					/* Needs to be done from the parent folder for the drag/dop to work correctly.
-					If done from the desktop folder, only links to files are created. They are
-					not copied/moved. */
-					pShellFolder->GetUIObjectOf(m_hActiveListView,nSelected,(LPCITEMIDLIST *)ppidl,
-						IID_IDataObject,NULL,(LPVOID *)&pDataObject);
+					IAsyncOperation *pAsyncOperation = NULL;
+
+					pDataObject->QueryInterface(IID_IAsyncOperation,(void **)&pAsyncOperation);
+
+					pAsyncOperation->SetAsyncMode(TRUE);
 
 					hr = pDragSourceHelper->InitializeFromWindow(m_hActiveListView,&pt,pDataObject);
 
@@ -1497,8 +1519,10 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 					finishes). */
 					iDragStartObjectIndex = m_iObjectIndex;
 
+					DWORD dwEffect;
+
 					hr = DoDragDrop(pDataObject,pDropSource,DROPEFFECT_COPY|DROPEFFECT_MOVE|
-						DROPEFFECT_LINK,&Effect);
+						DROPEFFECT_LINK,&dwEffect);
 
 					m_bDragging = FALSE;
 
@@ -1509,14 +1533,9 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 					m_pShellBrowser[iDragStartObjectIndex]->DragStopped();
 
 					pDataObject->Release();
-					pShellFolder->Release();
+
+					delete[] pcida;
 				}
-
-				for(i = 0;i < nSelected;i++)
-					CoTaskMemFree(ppidl[i]);
-
-				free(ppidl);
-				pDesktopFolder->Release();
 			}
 
 			pDropSource->Release();
@@ -1524,6 +1543,13 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 
 		pDragSourceHelper->Release();
 	}
+
+	for each(auto pidl in ItemList)
+	{
+		CoTaskMemFree(pidl);
+	}
+
+	CoTaskMemFree(pidlDirectory);
 
 	return hr;
 }

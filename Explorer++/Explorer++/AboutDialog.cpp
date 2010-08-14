@@ -101,6 +101,10 @@ INT_PTR CALLBACK AboutDialogProcedure(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM l
 				case IDOK:
 					EndDialog(hDlg,1);
 					break;
+
+				case IDCANCEL:
+					EndDialog(hDlg,0);
+					break;
 			}
 			break;
 

@@ -12,12 +12,15 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <string>
+#include <list>
+
+using namespace std;
 
 class CEnumFormatEtc : public IEnumFORMATETC
 {
 public:
-	CEnumFormatEtc(FORMATETC *,int);
+
+	CEnumFormatEtc(list<FORMATETC> feList);
 	~CEnumFormatEtc();
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
@@ -25,54 +28,54 @@ public:
 	ULONG		__stdcall	Release(void);
 
 private:
+
 	HRESULT __stdcall Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFetched);
 	HRESULT __stdcall Skip(ULONG celt);
 	HRESULT __stdcall Reset(void);
 	HRESULT __stdcall Clone(IEnumFORMATETC **ppEnum);
 
-	FORMATETC *m_pFormatEtc;
-	int m_iRefCount;
-	int m_iIndex;
-	int m_iNumFormats;
+	int				m_iRefCount;
+
+	list<FORMATETC>	m_feList;
+	int				m_iIndex;
+	int				m_iNumFormats;
 };
 
-HRESULT CreateEnumFormatEtc(FORMATETC *pFormatEtc,IEnumFORMATETC **ppEnumFormatEtc,int count)
+HRESULT CreateEnumFormatEtc(list<FORMATETC> feList,IEnumFORMATETC **ppEnumFormatEtc)
 {
-	*ppEnumFormatEtc = new CEnumFormatEtc(pFormatEtc,count);
+	*ppEnumFormatEtc = new CEnumFormatEtc(feList);
 
 	return S_OK;
 }
 
-CEnumFormatEtc::CEnumFormatEtc(FORMATETC *pFormatEtc,int count)
+CEnumFormatEtc::CEnumFormatEtc(list<FORMATETC> feList)
 {
 	m_iRefCount		= 1;
 
 	m_iIndex		= 0;
-	m_iNumFormats	= 0;
-	m_pFormatEtc	= new FORMATETC[count];
 
-	int i =0;
-
-	for(i =0;i <= (count - 1);i++)
+	for each(auto fe in feList)
 	{
-		memcpy(&m_pFormatEtc[i],&pFormatEtc[i],sizeof(FORMATETC));
+		FORMATETC ftc = fe;
 
-		if(pFormatEtc[i].ptd)
+		if(fe.ptd)
 		{
-			m_pFormatEtc[i].ptd=(DVTARGETDEVICE *)CoTaskMemAlloc(sizeof(DVTARGETDEVICE));
+			ftc.ptd = (DVTARGETDEVICE *)CoTaskMemAlloc(sizeof(DVTARGETDEVICE));
 
-			if(m_pFormatEtc[i].ptd != NULL)
+			if(ftc.ptd != NULL)
 			{
-				*m_pFormatEtc[i].ptd = *pFormatEtc[i].ptd;
+				*ftc.ptd = *fe.ptd;
 			}
 		}
 		else
 		{
-			m_pFormatEtc[i].ptd = NULL;
+			ftc.ptd = NULL;
 		}
 
-		m_iNumFormats++;
+		m_feList.push_back(ftc);
 	}
+
+	m_iNumFormats = static_cast<int>(feList.size());
 }
 
 CEnumFormatEtc::~CEnumFormatEtc()
@@ -80,7 +83,7 @@ CEnumFormatEtc::~CEnumFormatEtc()
 
 }
 
-/*IUnknown interface members.*/
+/* IUnknown interface members. */
 HRESULT __stdcall CEnumFormatEtc::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = NULL;
@@ -125,20 +128,33 @@ HRESULT __stdcall CEnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltF
 		return S_FALSE;
 	}
 
-	memcpy(&rgelt[0],&m_pFormatEtc[m_iIndex],sizeof(FORMATETC));
+	int i = 0;
 
-	if(m_pFormatEtc[m_iIndex].ptd)
+	for(auto itr = m_feList.begin();itr != m_feList.end();itr++)
 	{
-		rgelt->ptd = (DVTARGETDEVICE *)CoTaskMemAlloc(sizeof(DVTARGETDEVICE));
+		if(i == m_iIndex)
+		{
+			memcpy(&rgelt[0],&(*itr),sizeof(FORMATETC));
 
-		if(rgelt->ptd == NULL)
-			return S_FALSE;
+			if(itr->ptd)
+			{
+				rgelt->ptd = (DVTARGETDEVICE *)CoTaskMemAlloc(sizeof(DVTARGETDEVICE));
 
-		if(m_pFormatEtc[m_iIndex].ptd != NULL)
-			*rgelt->ptd = *m_pFormatEtc[m_iIndex].ptd;
-		else
-			rgelt->ptd=NULL;
+				if(rgelt->ptd == NULL)
+					return S_FALSE;
+
+				if(itr->ptd != NULL)
+					*rgelt->ptd = *itr->ptd;
+				else
+					rgelt->ptd=NULL;
+			}
+
+			break;
+		}
+
+		i++;
 	}
+
 	m_iIndex++;
 
 	if(pceltFetched != NULL)

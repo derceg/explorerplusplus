@@ -12,13 +12,23 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <string>
+#include <list>
 
-extern HRESULT CreateEnumFormatEtc(FORMATETC *pFormatEtc,IEnumFORMATETC **ppEnumFormatEtc,int count);
+using namespace std;
 
-class CDataObject : public IDataObject
+/* TODO: */
+extern HRESULT CreateEnumFormatEtc(list<FORMATETC> feList,IEnumFORMATETC **ppEnumFormatEtc);
+
+struct DataObjectInternal
+{
+	FORMATETC	fe;
+	STGMEDIUM	stg;
+};
+
+class CDataObject : public IDataObject, public IAsyncOperation
 {
 public:
+
 	CDataObject(FORMATETC *,STGMEDIUM *,int);
 	~CDataObject();
 
@@ -36,12 +46,21 @@ public:
 	HRESULT		__stdcall	DUnadvise(DWORD dwConnection);
 	HRESULT		__stdcall	EnumDAdvise(IEnumSTATDATA **ppenumAdvise);
 
-private:
-	int m_iRefCount;
+	/* IAsyncOperation. */
+	HRESULT __stdcall	EndOperation(HRESULT hResult,IBindCtx *pbcReserved,DWORD dwEffects);
+	HRESULT __stdcall	GetAsyncMode(BOOL *pfIsOpAsync);
+	HRESULT __stdcall	InOperation(BOOL *pfInAsyncOp);
+	HRESULT __stdcall	SetAsyncMode(BOOL fDoOpAsync);
+	HRESULT __stdcall	StartOperation(IBindCtx *pbcReserved);
 
-	FORMATETC *m_pFormatEtc;
-	STGMEDIUM *m_pMedium;
-	int m_NumFormatsStored;
+private:
+
+	int							m_iRefCount;
+
+	list<DataObjectInternal>	m_daoList;
+
+	BOOL						m_bStartedOperation;
+	BOOL						m_bDoOpAsync;
 };
 
 HRESULT CreateDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,IDataObject **pDataObject,int count)
@@ -53,20 +72,17 @@ HRESULT CreateDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,IDataObject **
 
 CDataObject::CDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,int count)
 {
-	int i = 0;
+	m_iRefCount = 1;
 
-	m_iRefCount		= 1;
-
-	m_pFormatEtc	= new FORMATETC[count];
-	m_pMedium		= new STGMEDIUM[count];
-
-	for(i = 0;i  < count;i++)
+	for(int i = 0;i < count;i++)
 	{
-		m_pFormatEtc[i] = pFormatEtc[i];
-		m_pMedium[i] = pMedium[i];
+		DataObjectInternal dao = {pFormatEtc[i],pMedium[i]};
+		m_daoList.push_back(dao);
 	}
 
-	m_NumFormatsStored = count;
+	SetAsyncMode(FALSE);
+
+	m_bStartedOperation = FALSE;
 }
 
 CDataObject::~CDataObject()
@@ -77,11 +93,21 @@ CDataObject::~CDataObject()
 /* IUnknown interface members. */
 HRESULT __stdcall CDataObject::QueryInterface(REFIID iid, void **ppvObject)
 {
+	if(ppvObject == NULL)
+	{
+		return E_POINTER;
+	}
+
 	*ppvObject = NULL;
 
-	if(iid == IID_IDataObject || iid == IID_IUnknown)
+	if(IsEqualIID(iid,IID_IDataObject) ||
+		IsEqualIID(iid,IID_IUnknown))
 	{
 		*ppvObject = this;
+	}
+	else if(IsEqualIID(iid,IID_IAsyncOperation))
+	{
+		*ppvObject = static_cast<IAsyncOperation *>(this);
 	}
 
 	if(*ppvObject)
@@ -114,7 +140,6 @@ ULONG __stdcall CDataObject::Release(void)
 
 HRESULT __stdcall CDataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 {
-	int i = 0;
 	SIZE_T AllocationSize;
 	PVOID pGlobal;
 	PVOID l_pGlobal;
@@ -124,42 +149,42 @@ HRESULT __stdcall CDataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 		return DV_E_FORMATETC;
 	}
 
-	for(i = 0;i < m_NumFormatsStored;i++)
+	for each(auto dao in m_daoList)
 	{
-		if((m_pFormatEtc[i].cfFormat == pFormatEtc->cfFormat) &&
-		   (m_pFormatEtc[i].tymed & pFormatEtc->tymed) &&
-		   (m_pFormatEtc[i].dwAspect == pFormatEtc->dwAspect))
+		if(dao.fe.cfFormat == pFormatEtc->cfFormat &&
+		   dao.fe.tymed & pFormatEtc->tymed &&
+		   dao.fe.dwAspect == pFormatEtc->dwAspect)
 		{
-			break;
+			pMedium->tymed			= dao.stg.tymed;
+			pMedium->pUnkForRelease	= 0;
+
+			switch(dao.fe.tymed)
+			{
+			case TYMED_HGLOBAL:
+				AllocationSize = GlobalSize(dao.stg.hGlobal);
+				l_pGlobal = GlobalLock(dao.stg.hGlobal);
+
+				pGlobal = GlobalAlloc(GMEM_FIXED,AllocationSize);
+
+				if(pGlobal == NULL)
+					return STG_E_MEDIUMFULL;
+
+				memcpy(pGlobal,l_pGlobal,AllocationSize);
+
+				GlobalUnlock(l_pGlobal);
+				pMedium->hGlobal = pGlobal;
+				break;
+
+			default:
+				return DV_E_FORMATETC;
+				break;
+			}
+
+			return S_OK;
 		}
 	}
 
-	pMedium->tymed			= m_pMedium[i].tymed;
-	pMedium->pUnkForRelease	= 0;
-
-	switch(m_pFormatEtc[i].tymed)
-	{
-		case TYMED_HGLOBAL:
-			AllocationSize = GlobalSize(m_pMedium[i].hGlobal);
-			l_pGlobal = GlobalLock(m_pMedium[i].hGlobal);
-
-			pGlobal = GlobalAlloc(GMEM_FIXED,AllocationSize);
-
-			if(pGlobal == NULL)
-				return STG_E_MEDIUMFULL;
-
-			memcpy(pGlobal,l_pGlobal,AllocationSize);
-
-			GlobalUnlock(l_pGlobal);
-			pMedium->hGlobal = pGlobal;
-			break;
-
-		default:
-			return DV_E_FORMATETC;
-			break;
-	}
-
-	return S_OK;
+	return DV_E_FORMATETC;
 }
 
 HRESULT __stdcall CDataObject::GetDataHere(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
@@ -169,13 +194,11 @@ HRESULT __stdcall CDataObject::GetDataHere(FORMATETC *pFormatEtc,STGMEDIUM *pMed
 
 HRESULT	__stdcall CDataObject::QueryGetData(FORMATETC *pFormatEtc)
 {
-	int i = 0;
-
-	for(i = 0;i < m_NumFormatsStored;i++)
+	for each(auto dao in m_daoList)
 	{
-		if((m_pFormatEtc[i].cfFormat == pFormatEtc->cfFormat) &&
-		   (m_pFormatEtc[i].tymed & pFormatEtc->tymed) &&
-		   (m_pFormatEtc[i].dwAspect == pFormatEtc->dwAspect))
+		if(dao.fe.cfFormat == pFormatEtc->cfFormat &&
+		   dao.fe.tymed & pFormatEtc->tymed &&
+		   dao.fe.dwAspect == pFormatEtc->dwAspect)
 		{
 			return S_OK;
 		}
@@ -193,16 +216,8 @@ HRESULT __stdcall CDataObject::GetCanonicalFormatEtc(FORMATETC *pFormatEtcIn,FOR
 
 HRESULT __stdcall CDataObject::SetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,BOOL fRelease)
 {
-	m_pFormatEtc = (FORMATETC *)realloc(m_pFormatEtc,(m_NumFormatsStored + 1) * sizeof(FORMATETC));
-	m_pMedium = (STGMEDIUM *)realloc(m_pMedium,(m_NumFormatsStored + 1) * sizeof(STGMEDIUM));
-
-	if(m_pFormatEtc == NULL || m_pMedium == NULL)
-		return S_FALSE;
-
-	m_pFormatEtc[m_NumFormatsStored]	= *pFormatEtc;
-	m_pMedium[m_NumFormatsStored]		= *pMedium;
-
-	m_NumFormatsStored++;
+	DataObjectInternal dao = {*pFormatEtc,*pMedium};
+	m_daoList.push_back(dao);
 
 	return S_OK;
 }
@@ -211,12 +226,17 @@ HRESULT __stdcall CDataObject::EnumFormatEtc(DWORD dwDirection,IEnumFORMATETC **
 {
 	if(dwDirection == DATADIR_GET)
 	{
-		return CreateEnumFormatEtc(m_pFormatEtc,ppEnumFormatEtc,m_NumFormatsStored);
+		list<FORMATETC> feList;
+
+		for each(auto dao in m_daoList)
+		{
+			feList.push_back(dao.fe);
+		}
+
+		return CreateEnumFormatEtc(feList,ppEnumFormatEtc);
 	}
-	else
-	{
-		return E_NOTIMPL;
-	}
+
+	return E_NOTIMPL;
 }
 
 HRESULT __stdcall CDataObject::DAdvise(FORMATETC *pFormatEtc,DWORD advf,IAdviseSink *pAdvSink,DWORD *pdwConnection)
@@ -232,4 +252,48 @@ HRESULT __stdcall CDataObject::DUnadvise(DWORD dwConnection)
 HRESULT __stdcall CDataObject::EnumDAdvise(IEnumSTATDATA **ppenumAdvise)
 {
 	return OLE_E_ADVISENOTSUPPORTED;
+}
+
+HRESULT __stdcall CDataObject::EndOperation(HRESULT hResult,IBindCtx *pbcReserved,DWORD dwEffects)
+{
+	return S_OK;
+}
+
+HRESULT __stdcall CDataObject::GetAsyncMode(BOOL *pfIsOpAsync)
+{
+	*pfIsOpAsync = m_bDoOpAsync;
+
+	return S_OK;
+}
+
+HRESULT __stdcall CDataObject::InOperation(BOOL *pfInAsyncOp)
+{
+	if(m_bStartedOperation)
+	{
+		*pfInAsyncOp = VARIANT_TRUE;
+	}
+
+	*pfInAsyncOp = VARIANT_FALSE;
+
+	return S_OK;
+}
+
+HRESULT __stdcall CDataObject::SetAsyncMode(BOOL fDoOpAsync)
+{
+	m_bDoOpAsync = fDoOpAsync;
+
+	/* TODO: */
+	if(fDoOpAsync)
+	{
+		AddRef();
+	}
+
+	return S_OK;
+}
+
+HRESULT __stdcall CDataObject::StartOperation(IBindCtx *pbcReserved)
+{
+	m_bStartedOperation = TRUE;
+
+	return S_OK;
 }

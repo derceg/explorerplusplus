@@ -1070,25 +1070,7 @@ close all the current tabs?"),
 
 	m_iLastSelectedTab = m_iTabSelectedItem;
 
-	ILoadSave *pLoadSave = NULL;
-
-	if(m_bSavePreferencesToXMLFile)
-		pLoadSave = new CLoadSaveXML(this,FALSE);
-	else
-		pLoadSave = new CLoadSaveRegistry(this);
-
-	pLoadSave->SaveGenericSettings();
-	pLoadSave->SaveTabs();
-	pLoadSave->SaveFilters();
-	pLoadSave->SaveDefaultColumns();
-	pLoadSave->SaveBookmarks();
-	pLoadSave->SaveWindowPosition();
-	pLoadSave->SaveApplicationToolbar();
-	pLoadSave->SaveToolbarInformation();
-	pLoadSave->SaveColorRules();
-	pLoadSave->SaveState();
-
-	pLoadSave->Release();
+	SaveAllSettings();
 
 	RevokeDragDrop(m_hTabCtrl);
 
@@ -2826,4 +2808,27 @@ void CContainer::OnNavigateUp(void)
 	FileList.push_back(pf);
 
 	m_pActiveShellBrowser->SelectItems(&FileList);
+}
+
+void CContainer::SaveAllSettings(void)
+{
+	ILoadSave *pLoadSave = NULL;
+
+	if(m_bSavePreferencesToXMLFile)
+		pLoadSave = new CLoadSaveXML(this,FALSE);
+	else
+		pLoadSave = new CLoadSaveRegistry(this);
+
+	pLoadSave->SaveGenericSettings();
+	pLoadSave->SaveTabs();
+	pLoadSave->SaveFilters();
+	pLoadSave->SaveDefaultColumns();
+	pLoadSave->SaveBookmarks();
+	pLoadSave->SaveWindowPosition();
+	pLoadSave->SaveApplicationToolbar();
+	pLoadSave->SaveToolbarInformation();
+	pLoadSave->SaveColorRules();
+	pLoadSave->SaveState();
+
+	pLoadSave->Release();
 }

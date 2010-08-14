@@ -49,11 +49,13 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 		/* The two drop formats we support. */
 		FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 		FORMATETC ftcFileDescriptor = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+		FORMATETC ftcShellIDList = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 
 		/* Check whether the drop source has the type of data
 		that is needed for this drag operation. */
 		if(pDataObject->QueryGetData(&ftcHDrop) == S_OK ||
-			pDataObject->QueryGetData(&ftcFileDescriptor) == S_OK)
+			pDataObject->QueryGetData(&ftcFileDescriptor) == S_OK ||
+			pDataObject->QueryGetData(&ftcShellIDList) == S_OK)
 		{
 			m_bDataAccept = TRUE;
 

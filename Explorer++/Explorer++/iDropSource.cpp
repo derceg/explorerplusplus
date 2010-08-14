@@ -31,8 +31,8 @@ public:
 
 private:
 
-	int m_iRefCount;
-	DragTypes_t m_DragType;
+	int			m_iRefCount;
+	DragTypes_t	m_DragType;
 };
 
 HRESULT CreateDropSource(IDropSource **ppDropSource,DragTypes_t DragType)
@@ -58,7 +58,8 @@ HRESULT __stdcall CDropSource::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = NULL;
 
-	if(iid == IID_IDropSource||iid == IID_IUnknown)
+	if(iid == IID_IDropSource ||
+		iid == IID_IUnknown)
 	{
 		*ppvObject=this;
 	}

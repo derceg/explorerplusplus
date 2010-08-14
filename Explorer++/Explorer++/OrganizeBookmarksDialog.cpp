@@ -100,8 +100,11 @@ INT_PTR CALLBACK CContainer::OrganizeBookmarks(HWND hDlg,UINT uMsg,WPARAM wParam
 				case IDOK:
 					OnOrganizeBookmarksOk(hDlg);
 					break;
+
+				case IDCANCEL:
+					EndDialog(hDlg,0);
+					break;
 			}
-			return 1;
 			break;
 
 		case WM_NOTIFY:

@@ -192,7 +192,7 @@ HRESULT SaveDirectoryListing(TCHAR *Directory,TCHAR *FileName)
 	HANDLE				hFirstFile;
 	TCHAR				SearchPath[MAX_PATH];
 	TCHAR				FileHeader[] = _T("Directory Listing for:");
-	TCHAR				FileSubHeader[] = _T("Lisitng Generated on:");
+	TCHAR				FileSubHeader[] = _T("Listing Generated on:");
 	TCHAR				Buffer[MAX_PATH];
 	TCHAR				Temp[MAX_PATH];
 	IBufferManager		*pBufferManager = NULL;
@@ -277,6 +277,7 @@ HRESULT CutFiles(TCHAR *szFileNameList,int iListSize,IDataObject **pClipboardDat
 	return CopyFilesToClipboard(szFileNameList,iListSize,TRUE,pClipboardDataObject);
 }
 
+/* TODO: */
 HRESULT CopyFilesToClipboard(TCHAR *FileNameList,size_t iListSize,
 BOOL bMove,IDataObject **pClipboardDataObject)
 {
@@ -355,6 +356,8 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 
 	GlobalUnlock(hglb);
 
+	/* TODO: Free the momory? */
+
 	stg[0].pUnkForRelease	= 0;
 	stg[0].hGlobal			= hglb;
 	stg[0].tymed			= TYMED_HGLOBAL;
@@ -364,6 +367,9 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 	if(SUCCEEDED(hr))
 	{
 		hr = OleSetClipboard(*pClipboardDataObject);
+		OleFlushClipboard();
+
+		(*pClipboardDataObject)->Release();
 	}
 
 	return hr;

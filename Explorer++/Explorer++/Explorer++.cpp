@@ -333,7 +333,7 @@ void CContainer::SetDefaultValues(void)
 	m_bAllowMultipleInstances		= TRUE;
 	m_bForceSameTabWidth			= FALSE;
 	m_bDoubleClickTabClose			= TRUE;
-	m_bHandleZipFiles				= TRUE;
+	m_bHandleZipFiles				= FALSE;
 	m_bInsertSorted					= TRUE;
 	m_bOverwriteExistingFilesConfirmation	= TRUE;
 	m_bCheckBoxSelection			= FALSE;

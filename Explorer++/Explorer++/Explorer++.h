@@ -706,6 +706,7 @@ private:
 	void					InitializeMainToolbars(void);
 
 	/* Settings. */
+	void					SaveAllSettings(void);
 	LONG					SaveSettings();
 	LONG					LoadSettings(LPCTSTR);
 	void					ValidateLoadedSettings(void);

@@ -30,6 +30,16 @@ corresponding definition for Unicode. Therefore,
 add a definition here. */
 #define CP_UNICODE	1200
 
+#define FRIENDLY_NAME_DESKTOP	_T("Desktop")
+#define FRIENDLY_NAME_PICTURES	_T("Pictures")
+#define FRIENDLY_NAME_MUSIC		_T("Music")
+#define FRIENDLY_NAME_VIDEOS	_T("Videos")
+#define FRIENDLY_NAME_DOCUMENTS	_T("Documents")
+
+/* See: http://msdn.microsoft.com/en-us/library/bb776902(v=VS.85).aspx#CFSTR_SHELLIDLIST */
+#define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
+#define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
+
 typedef struct
 {
 	TCHAR szFullFileName[MAX_PATH];
@@ -112,6 +122,8 @@ HRESULT			GetItemInfoTip(TCHAR *szItemPath,TCHAR *szInfoTip,int cchMax);
 HRESULT			GetItemInfoTip(LPITEMIDLIST pidlComplete,TCHAR *szInfoTip,int cchMax);
 HRESULT			GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,DWORD uParsingFlags);
 BOOL			MyExpandEnvironmentStrings(TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize);
+HRESULT			BuildHDropList(OUT DROPFILES **ppdf,OUT UINT *puSize,IN list<std::wstring> FilenameList);
+HRESULT			BuildShellIDList(OUT CIDA **ppcida,OUT UINT *puSize,IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> apidl);
 
 /* Drag and drop helpers. */
 DWORD			DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,BOOL bDataAccept,BOOL bOnSameDrive);

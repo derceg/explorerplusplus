@@ -417,6 +417,8 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 						iSel = (int)SendMessage(GetDlgItem(hDlg,IDC_OPTIONS_LANGUAGE),CB_GETCURSEL,0,0);
 
 						m_Language = GetLanguageIDFromIndex(hDlg,iSel);
+
+						SaveAllSettings();
 					}
 					break;
 			}
@@ -628,6 +630,8 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 							ListView_ActivateOneClickSelect(m_hListView[(int)tcItem.lParam],m_bOneClickActivate);
 						}
+
+						SaveAllSettings();
 					}
 					break;
 				}
@@ -848,6 +852,8 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 						ListView_AddRemoveExtendedStyle(m_hListView[(int)tcItem.lParam],
 							LVS_EX_FULLROWSELECT,m_bUseFullRowSelect);
 					}
+
+					SaveAllSettings();
 				}
 				break;
 			}
@@ -999,6 +1005,8 @@ INT_PTR CALLBACK CContainer::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 							m_ViewModeGlobal = VM_LIST;
 						else if(IsDlgButtonChecked(hDlg,IDC_DEFAULT_DETAILS) == BST_CHECKED)
 							m_ViewModeGlobal = VM_DETAILS;
+
+						SaveAllSettings();
 					}
 					break;
 				}
@@ -1101,6 +1109,8 @@ INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,L
 							== BST_CHECKED);
 
 						AddWindowStyle(m_hTabCtrl,TCS_FIXEDWIDTH,m_bForceSameTabWidth);
+
+						SaveAllSettings();
 					}
 					break;
 				}

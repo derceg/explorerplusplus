@@ -571,6 +571,10 @@ INT_PTR CALLBACK CContainer::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM 
 					DestroyWindow(hDlg);
 				}
 				break;
+
+			case IDCANCEL:
+				DestroyWindow(hDlg);
+				break;
 			}
 			break;
 

@@ -81,6 +81,7 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 {
 	FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	FORMATETC ftcFileDescriptor = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC ftcShellIDList = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	STGMEDIUM stg;
 	DROPFILES *pdf = NULL;
 	DWORD *pdwEffect = NULL;
@@ -131,6 +132,24 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 			if(pdf != NULL)
 			{
 				CopyDroppedFiles(pdf,bPrefferedEffect,dwEffect);
+
+				GlobalUnlock(stg.hGlobal);
+			}
+		}
+	}
+	else if(pDataObject->QueryGetData(&ftcShellIDList) == S_OK)
+	{
+		hr = pDataObject->GetData(&ftcShellIDList,&stg);
+
+		if(hr == S_OK)
+		{
+			CIDA *pcida = NULL;
+
+			pcida = (CIDA *)GlobalLock(stg.hGlobal);
+
+			if(pcida != NULL)
+			{
+				/* TODO: Copy the files. */
 
 				GlobalUnlock(stg.hGlobal);
 			}
@@ -580,14 +599,7 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
 
 					if(hr == S_OK)
 					{
-						BOOL bSupported;
-
-						pao->GetAsyncMode(&bSupported);
-
-						if(bSupported)
-						{
-							bAsyncSupported = TRUE;
-						}
+						pao->GetAsyncMode(&bAsyncSupported);
 					}
 
 					if(bAsyncSupported)

@@ -242,66 +242,136 @@ BOOL IsIdlDirectory(LPITEMIDLIST pidl)
 
 HRESULT DecodeFriendlyPath(TCHAR *szFriendlyPath,TCHAR *szParsingPath)
 {
-	LPITEMIDLIST	pidl = NULL;
-	TCHAR			szControlPanel[MAX_PATH];
-	TCHAR			szRecycleBin[MAX_PATH];
-	TCHAR			szComputer[MAX_PATH];
-	TCHAR			szNetworkPlaces[MAX_PATH];
-	TCHAR			szNetworkConnections[MAX_PATH];
-	TCHAR			szPrinters[MAX_PATH];
+	LPITEMIDLIST pidl = NULL;
+	TCHAR szName[MAX_PATH];
 
 	SHGetFolderLocation(NULL,CSIDL_CONTROLS,NULL,0,&pidl);
-	GetDisplayName(pidl,szControlPanel,SHGDN_INFOLDER);
+	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
 	CoTaskMemFree(pidl);
 
-	SHGetFolderLocation(NULL,CSIDL_BITBUCKET,NULL,0,&pidl);
-	GetDisplayName(pidl,szRecycleBin,SHGDN_INFOLDER);
-	CoTaskMemFree(pidl);
-
-	SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidl);
-	GetDisplayName(pidl,szComputer,SHGDN_INFOLDER);
-	CoTaskMemFree(pidl);
-
-	SHGetFolderLocation(NULL,CSIDL_NETWORK,NULL,0,&pidl);
-	GetDisplayName(pidl,szNetworkPlaces,SHGDN_INFOLDER);
-	CoTaskMemFree(pidl);
-
-	SHGetFolderLocation(NULL,CSIDL_CONNECTIONS,NULL,0,&pidl);
-	GetDisplayName(pidl,szNetworkConnections,SHGDN_INFOLDER);
-	CoTaskMemFree(pidl);
-
-	SHGetFolderLocation(NULL,CSIDL_PRINTERS,NULL,0,&pidl);
-	GetDisplayName(pidl,szPrinters,SHGDN_INFOLDER);
-	CoTaskMemFree(pidl);
-
-	if(lstrcmpi(szControlPanel,szFriendlyPath) == 0)
+	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
 		GetVirtualFolderParsingPath(CSIDL_CONTROLS,szParsingPath);
 		return S_OK;
 	}
-	else if(lstrcmpi(szRecycleBin,szFriendlyPath) == 0)
+
+	SHGetFolderLocation(NULL,CSIDL_BITBUCKET,NULL,0,&pidl);
+	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	CoTaskMemFree(pidl);
+
+	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
 		GetVirtualFolderParsingPath(CSIDL_BITBUCKET,szParsingPath);
 		return S_OK;
 	}
-	else if(lstrcmpi(szComputer,szFriendlyPath) == 0)
+
+	SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidl);
+	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	CoTaskMemFree(pidl);
+
+	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
 		GetVirtualFolderParsingPath(CSIDL_DRIVES,szParsingPath);
 		return S_OK;
 	}
-	else if(lstrcmpi(szNetworkPlaces,szFriendlyPath) == 0)
+
+	SHGetFolderLocation(NULL,CSIDL_NETWORK,NULL,0,&pidl);
+	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	CoTaskMemFree(pidl);
+
+	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
 		GetVirtualFolderParsingPath(CSIDL_NETWORK,szParsingPath);
 		return S_OK;
 	}
-	else if(lstrcmpi(szNetworkConnections,szFriendlyPath) == 0)
+
+	SHGetFolderLocation(NULL,CSIDL_CONNECTIONS,NULL,0,&pidl);
+	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	CoTaskMemFree(pidl);
+
+	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
 		GetVirtualFolderParsingPath(CSIDL_CONNECTIONS,szParsingPath);
 		return S_OK;
 	}
-	else if(lstrcmpi(szPrinters,szFriendlyPath) == 0)
+
+	SHGetFolderLocation(NULL,CSIDL_PRINTERS,NULL,0,&pidl);
+	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	CoTaskMemFree(pidl);
+
+	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
 		GetVirtualFolderParsingPath(CSIDL_PRINTERS,szParsingPath);
+		return S_OK;
+	}
+
+	SHGetFolderLocation(NULL,CSIDL_FAVORITES,NULL,0,&pidl);
+	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	CoTaskMemFree(pidl);
+
+	if(lstrcmpi(szName,szFriendlyPath) == 0)
+	{
+		GetVirtualFolderParsingPath(CSIDL_FAVORITES,szParsingPath);
+		return S_OK;
+	}
+
+	SHGetFolderLocation(NULL,CSIDL_MYPICTURES,NULL,0,&pidl);
+	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	CoTaskMemFree(pidl);
+
+	if(lstrcmpi(szName,szFriendlyPath) == 0)
+	{
+		GetVirtualFolderParsingPath(CSIDL_MYPICTURES,szParsingPath);
+		return S_OK;
+	}
+
+	SHGetFolderLocation(NULL,CSIDL_MYMUSIC,NULL,0,&pidl);
+	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	CoTaskMemFree(pidl);
+
+	if(lstrcmpi(szName,szFriendlyPath) == 0)
+	{
+		GetVirtualFolderParsingPath(CSIDL_MYMUSIC,szParsingPath);
+		return S_OK;
+	}
+
+	SHGetFolderLocation(NULL,CSIDL_MYVIDEO,NULL,0,&pidl);
+	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	CoTaskMemFree(pidl);
+
+	if(lstrcmpi(szName,szFriendlyPath) == 0)
+	{
+		GetVirtualFolderParsingPath(CSIDL_MYVIDEO,szParsingPath);
+		return S_OK;
+	}
+
+	if(lstrcmpi(FRIENDLY_NAME_DESKTOP,szFriendlyPath) == 0)
+	{
+		GetVirtualFolderParsingPath(CSIDL_DESKTOP,szParsingPath);
+		return S_OK;
+	}
+
+	if(lstrcmpi(FRIENDLY_NAME_PICTURES,szFriendlyPath) == 0)
+	{
+		GetVirtualFolderParsingPath(CSIDL_MYPICTURES,szParsingPath);
+		return S_OK;
+	}
+
+	if(lstrcmpi(FRIENDLY_NAME_MUSIC,szFriendlyPath) == 0)
+	{
+		GetVirtualFolderParsingPath(CSIDL_MYMUSIC,szParsingPath);
+		return S_OK;
+	}
+
+	if(lstrcmpi(FRIENDLY_NAME_VIDEOS,szFriendlyPath) == 0)
+	{
+		GetVirtualFolderParsingPath(CSIDL_MYVIDEO,szParsingPath);
+		return S_OK;
+	}
+
+	if(lstrcmpi(FRIENDLY_NAME_DOCUMENTS,szFriendlyPath) == 0)
+	{
+		GetVirtualFolderParsingPath(CSIDL_MYDOCUMENTS,szParsingPath);
 		return S_OK;
 	}
 
@@ -563,4 +633,144 @@ BOOL bDataAccept,BOOL bOnSameDrive)
 	}
 
 	return dwEffect;
+}
+
+HRESULT BuildHDropList(OUT DROPFILES **ppdf,OUT UINT *puSize,
+IN list<std::wstring> FilenameList)
+{
+	*ppdf = NULL;
+	*puSize = 0;
+
+	if(FilenameList.size() == 0)
+	{
+		return E_FAIL;
+	}
+
+	UINT uSize = 0;
+
+	uSize = sizeof(DROPFILES);
+
+	for each(auto Filename in FilenameList)
+	{
+		uSize += (Filename.length() + 1) * sizeof(TCHAR);
+	}
+
+	/* The last string is double-null terminated. */
+	uSize += (1 * sizeof(TCHAR));
+
+	LPVOID pcidaData = new BYTE[uSize];
+
+	DROPFILES *pdf = static_cast<DROPFILES *>(pcidaData);
+
+	pdf->pFiles = sizeof(DROPFILES);
+	pdf->fNC = FALSE;
+	pdf->pt.x = 0;
+	pdf->pt.y = 0;
+	pdf->fWide = TRUE;
+
+	LPBYTE pData;
+	UINT uOffset = 0;
+
+	TCHAR chNull = '\0';
+
+	for each(auto Filename in FilenameList)
+	{
+		pData = static_cast<LPBYTE>(pcidaData) + sizeof(DROPFILES) + uOffset;
+
+		memcpy(pData,Filename.c_str(),(Filename.length() + 1) * sizeof(TCHAR));
+		uOffset += (Filename.length() + 1) * sizeof(TCHAR);
+	}
+
+	/* Copy the last null byte. */
+	pData = static_cast<LPBYTE>(pcidaData) + sizeof(DROPFILES) + uOffset;
+	memcpy(pData,&chNull,(1 * sizeof(TCHAR)));
+
+	*puSize = uSize;
+	*ppdf = pdf;
+
+	return S_OK;
+}
+
+/* Builds a CIDA structure. Returns the structure and its size
+via arguments.
+Returns S_OK on success; E_FAIL on fail. */
+HRESULT BuildShellIDList(OUT CIDA **ppcida,OUT UINT *puSize,
+IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> pidlList)
+{
+	*ppcida = NULL;
+	*puSize = 0;
+
+	if(ppcida == NULL ||
+		pidlList.size() == 0 ||
+		pidlDirectory == NULL)
+	{
+		return E_FAIL;
+	}
+
+	/* First, we need to decide how much memory to
+	allocate to the structure. This is based on
+	the number of items that will be stored in
+	this structure. */
+	UINT uSize = 0;
+
+	UINT nItems = static_cast<UINT>(pidlList.size());
+
+	/* Size of the base structure + offset array. */
+	UINT uBaseSize = sizeof(CIDA) + (sizeof(UINT) * nItems);
+
+	uSize += uBaseSize;
+
+	/* Size of the parent pidl. */
+	uSize += ILGetSize(pidlDirectory);
+
+	/* Add the total size of the child pidl's. */
+	for each(auto pidl in pidlList)
+	{
+		uSize += ILGetSize(pidl);
+	}
+
+	/* Now allocate memory for the structure, and
+	fill it with the required data. */
+	LPVOID pcidaData = new BYTE[uSize];
+
+	*ppcida = static_cast<CIDA *>(pcidaData);
+
+	CIDA *pcida = *ppcida;
+
+	pcida->cidl = nItems;
+
+	UINT *pOffsets = pcida->aoffset;
+
+	pOffsets[0] = uBaseSize;
+
+	LPBYTE pData;
+
+	pData = (LPBYTE)(((LPBYTE)pcida) + pcida->aoffset[0]);
+
+	memcpy(pData,(LPVOID)pidlDirectory,
+		ILGetSize(pidlDirectory));
+
+	UINT uPreviousSize;
+	int i = 0;
+
+	uPreviousSize = ILGetSize(pidlDirectory);
+
+	/* Store each of the pidl's. */
+	for each(auto pidl in pidlList)
+	{
+		pOffsets[i + 1] = pOffsets[i] + uPreviousSize;
+
+		pData = (LPBYTE)(((LPBYTE)pcida) + pcida->aoffset[i + 1]);
+
+		memcpy(pData,(LPVOID)pidl,
+			ILGetSize(pidl));
+
+		uPreviousSize = ILGetSize(pidl);
+
+		i++;
+	}
+
+	*puSize = uSize;
+
+	return S_OK;
 }
