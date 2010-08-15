@@ -1505,7 +1505,7 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 				return E_FAIL;
 			}
 
-			pData = (LPBYTE)GlobalLock(hglbHDrop);
+			pData = static_cast<LPBYTE>(GlobalLock(hglbHDrop));
 
 			memcpy(pData,pdf,uSize);
 
@@ -1549,6 +1549,7 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 			
 			hr = CreateDataObject(ftc,stg,&pDataObject,2);
 
+			/* TODO: */
 			/*IAsyncOperation *pAsyncOperation = NULL;
 
 			pDataObject->QueryInterface(IID_IAsyncOperation,(void **)&pAsyncOperation);
@@ -1864,9 +1865,6 @@ void CContainer::OnListViewCopyUniversalPaths(void)
 HRESULT CContainer::OnListViewCopy(BOOL bCopy)
 {
 	IDataObject		*pClipboardDataObject = NULL;
-	IBufferManager	*pBufferManager = NULL;
-	TCHAR			*szFileNameList = NULL;
-	DWORD			dwBufSize;
 	int				iItem = -1;
 	HRESULT			hr;
 
@@ -1875,65 +1873,39 @@ HRESULT CContainer::OnListViewCopy(BOOL bCopy)
 
 	SetCursor(LoadCursor(NULL,IDC_WAIT));
 
-	pBufferManager = new CBufferManager();
+	std::list<std::wstring> FileNameList;
 
-	hr = BuildSelectionFileList(pBufferManager);
+	BuildListViewFileSelectionList(m_hActiveListView,&FileNameList);
 
-	if(SUCCEEDED(hr))
+	if(bCopy)
 	{
-		/* The size returned here is the number of
-		characters in the buffer, NOT the total
-		size of the buffer. */
-		pBufferManager->QueryBufferSize(&dwBufSize);
+		hr = CopyFiles(FileNameList,&pClipboardDataObject);
 
-		if(dwBufSize != 0)
+		if(SUCCEEDED(hr))
 		{
-			szFileNameList = (TCHAR *)malloc(dwBufSize * sizeof(TCHAR));
+			m_pClipboardDataObject = pClipboardDataObject;
+		}
+	}
+	else
+	{
+		hr = CutFiles(FileNameList,&pClipboardDataObject);
 
-			if(szFileNameList == NULL)
+		if(SUCCEEDED(hr))
+		{
+			CutFile_t CutFile;
+
+			m_pClipboardDataObject = pClipboardDataObject;
+			m_iCutTabInternal = m_iObjectIndex;
+
+			/* 'Ghost' each of the cut items. */
+			while((iItem = ListView_GetNextItem(m_hActiveListView,
+				iItem,LVNI_SELECTED)) != -1)
 			{
-				pBufferManager->Release();
+				m_pActiveShellBrowser->QueryDisplayName(iItem,MAX_PATH,CutFile.szFileName);
+				m_CutFileNameList.push_back(CutFile);
 
-				SetCursor(LoadCursor(NULL,IDC_ARROW));
-
-				return E_OUTOFMEMORY;
+				m_pActiveShellBrowser->GhostItem(iItem);
 			}
-
-			pBufferManager->QueryBuffer(szFileNameList,dwBufSize);
-
-			if(bCopy)
-			{
-				hr = CopyFiles(szFileNameList,dwBufSize * sizeof(TCHAR),&pClipboardDataObject);
-
-				if(SUCCEEDED(hr))
-				{
-					m_pClipboardDataObject = pClipboardDataObject;
-				}
-			}
-			else
-			{
-				hr = CutFiles(szFileNameList,dwBufSize * sizeof(TCHAR),&pClipboardDataObject);
-
-				if(SUCCEEDED(hr))
-				{
-					CutFile_t CutFile;
-
-					m_pClipboardDataObject = pClipboardDataObject;
-					m_iCutTabInternal = m_iObjectIndex;
-
-					/* 'Ghost' each of the cut items. */
-					while((iItem = ListView_GetNextItem(m_hActiveListView,
-						iItem,LVNI_SELECTED)) != -1)
-					{
-						m_pActiveShellBrowser->QueryDisplayName(iItem,MAX_PATH,CutFile.szFileName);
-						m_CutFileNameList.push_back(CutFile);
-
-						m_pActiveShellBrowser->GhostItem(iItem);
-					}
-				}
-			}
-
-			free(szFileNameList);
 		}
 	}
 
@@ -2009,4 +1981,31 @@ void CContainer::OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt)
 	{
 		m_pActiveShellBrowser->SelectItems(ppfl);
 	}
+}
+
+void CContainer::BuildListViewFileSelectionList(HWND hListView,
+	std::list<std::wstring> *pFileSelectionList)
+{
+	if(pFileSelectionList == NULL)
+	{
+		return;
+	}
+
+	std::list<std::wstring> FileSelectionList;
+	int iItem = -1;
+
+	while((iItem = ListView_GetNextItem(hListView,
+		iItem,LVNI_SELECTED)) != -1)
+	{
+		TCHAR szFullFileName[MAX_PATH];
+
+		m_pActiveShellBrowser->QueryFullItemName(iItem,
+			szFullFileName);
+
+		std::wstring stringFileName(szFullFileName);
+		FileSelectionList.push_back(stringFileName);
+	}
+
+	pFileSelectionList->assign(FileSelectionList.begin(),
+		FileSelectionList.end());
 }

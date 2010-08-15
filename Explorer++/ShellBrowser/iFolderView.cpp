@@ -155,11 +155,6 @@ HANDLE hFolderSizeThread)
 
 	ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 
-	m_iAlteredAllocation = DEFAULT_ALTERED_ALLOCATION;
-	m_nAltered = 0;
-
-	m_pAlteredFiles = (AlteredFiles_t *)malloc(m_iAlteredAllocation * sizeof(AlteredFiles_t));
-
 	m_nAwaitingAdd = 0;
 
 	m_pItemMap = (int *)malloc(m_iCurrentAllocation * sizeof(int));
@@ -246,8 +241,6 @@ CFolderView::~CFolderView()
 
 	m_nItemsInInfoList = 0;
 	m_nInfoListAllocation = 0;
-
-	free(m_pAlteredFiles);
 
 	m_pPathManager->Release();
 	free(m_pItemMap);

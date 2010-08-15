@@ -406,10 +406,10 @@ PFNLVGROUPCOMPARE pfnGroupCompare)
 
 		/* The group is not in the listview, so insert it in. */
 		lvigs.lvGroup.cbSize	= sizeof(LVGROUP);
-		lvigs.lvGroup.mask		= LVGF_HEADER|LVGF_GROUPID;
+		lvigs.lvGroup.mask		= LVGF_HEADER|LVGF_GROUPID|LVGF_STATE;
 		lvigs.lvGroup.pszHeader	= wszHeader;
 		lvigs.lvGroup.iGroupId	= iGroupId;
-		lvigs.lvGroup.state		= LVGS_NORMAL;
+		lvigs.lvGroup.state		= LVGS_COLLAPSIBLE;
 		lvigs.lvGroup.stateMask	= 0;
 
 		lvigs.pfnGroupCompare = (PFNLVGROUPCOMPARE)pfnGroupCompare;

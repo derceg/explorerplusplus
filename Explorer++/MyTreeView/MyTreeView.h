@@ -83,6 +83,11 @@ private:
 	void		UpdateChildren(HTREEITEM hParent,LPITEMIDLIST pidlParent);
 	LPITEMIDLIST	UpdateItemInfo(LPITEMIDLIST pidlParent,int iItemId);
 
+	/* Directory modification. */
+	void		DirectoryAlteredAddFile(TCHAR *szFullFileName);
+	void		DirectoryAlteredRemoveFile(TCHAR *szFullFileName);
+	void		DirectoryAlteredRenameFile(TCHAR *szFullFileName);
+
 	/* Icons. */
 	void		AddToIconFinderQueue(TVITEM *plvItem);
 	void		EmptyIconFinderQueue(void);
@@ -107,10 +112,6 @@ private:
 	void		MonitorDrive(TCHAR *szDrive);
 	HTREEITEM	DetermineDriveSortedPosition(HTREEITEM hParent,TCHAR *szItemName);
 	HTREEITEM	DetermineItemSortedPosition(HTREEITEM hParent,TCHAR *szItem);
-
-	void		DirectoryAlteredAddFile(TCHAR *szFullFileName);
-	void		DirectoryAlteredRemoveFile(TCHAR *szFullFileName);
-	void		DirectoryAlteredRenameFile(TCHAR *szFullFileName);
 
 
 

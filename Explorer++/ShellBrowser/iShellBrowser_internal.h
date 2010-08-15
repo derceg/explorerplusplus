@@ -37,8 +37,6 @@ need to be included here. */
 #define VALIDATE_NETWORKCONNECTIONS_COLUMNS	5
 #define VALIDATE_MYNETWORKPLACES_COLUMNS	6
 
-#define DEFAULT_ALTERED_ALLOCATION			250
-
 #define DEFAULT_UNKNOWN_ICON				3
 
 #define THUMBNAIL_ITEM_WIDTH				120
@@ -65,7 +63,7 @@ typedef struct
 	TCHAR	szFileName[MAX_PATH];
 	DWORD	dwAction;
 	int		iFolderIndex;
-} AlteredFiles_t;
+} AlteredFile_t;
 
 typedef struct
 {
@@ -448,7 +446,6 @@ private:
 	/* Browsing support. */
 	int					BrowseVirtualFolder(TCHAR *szParsingName);
 	int					BrowseVirtualFolder(LPITEMIDLIST pidlDirectory);
-	HRESULT				EnumFolderContents(TCHAR *szFolderPath);
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void inline			InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(int iItemInternal);
@@ -687,10 +684,8 @@ private:
 	have been modified (i.e. created, deleted,
 	renamed, etc). */
 	CRITICAL_SECTION	m_csDirectoryAltered;
-	AlteredFiles_t *	m_pAlteredFiles;
+	std::list<AlteredFile_t>	m_AlteredList;
 	list<Added_t>		m_FilesAdded;
-	int					m_iAlteredAllocation;
-	int					m_nAltered;
 
 	/* Stores information on files that have
 	been created and are awaiting insetion

@@ -24,7 +24,7 @@ void CMyTreeView::DirectoryAltered(void)
 
 	KillTimer(m_hTreeView,0);
 
-	/* Two basic situations to watch out for:
+	/* Three basic situations to watch out for:
 	 - File is created, then renamed. Both notifications
 	 come in at the same time.
 	 - File is renamed twice in a row. Both notifications

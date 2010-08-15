@@ -619,6 +619,9 @@ private:
 	void					OnTabCtrlRButtonUp(WPARAM wParam,LPARAM lParam);
 	void					ProcessTabCommand(UINT uMenuID,int iTabHit);
 
+	/* Address bar private message handlers. */
+	void					OnAddressBarBeginDrag(void);
+
 	/* Holder window private message handlers. */
 	LRESULT CALLBACK		TreeViewHolderWindowCommandHandler(WPARAM wParam);
 	LRESULT CALLBACK		TreeViewHolderWindowNotifyHandler(LPARAM lParam);
@@ -856,6 +859,7 @@ private:
 	HRESULT					ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask);
 
 	/* Listview selection file tests. */
+	void					BuildListViewFileSelectionList(HWND hListView,std::list<std::wstring> *pFileSelectionList);
 	HRESULT					BuildSelectionFileList(IBufferManager *pBufferManager);
 	HRESULT					TestListViewSelectionAttributes(SFGAOF *pItemAttributes);
 	HRESULT					TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes);	

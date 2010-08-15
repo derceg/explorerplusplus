@@ -28,9 +28,7 @@ static int iRenamedItem;
 
 void CFolderView::DirectoryAltered(void)
 {
-	list<AwaitingAdd_t>::iterator	itr;
-	BOOL							bNewItemCreated;
-	int								i = 0;
+	BOOL bNewItemCreated;
 
 	EnterCriticalSection(&m_csDirectoryAltered);
 
@@ -55,34 +53,34 @@ void CFolderView::DirectoryAltered(void)
 	other actions for the file wil take place before the addition,
 	which will again result in an incorrect state.
 	*/
-	for(i = 0;i < m_nAltered;i++)
+	for each(auto af in m_AlteredList)
 	{
 		/* Only undertake the modification if the unique folder
 		index on the modified item and current folder match up
 		(i.e. ensure the directory has not changed since these
 		files were modified). */
-		if(m_pAlteredFiles[i].iFolderIndex == m_iUniqueFolderIndex)
+		if(af.iFolderIndex == m_iUniqueFolderIndex)
 		{
-			switch(m_pAlteredFiles[i].dwAction)
+			switch(af.dwAction)
 			{
 			case FILE_ACTION_ADDED:
-				OnFileActionAdded(m_pAlteredFiles[i].szFileName);
+				OnFileActionAdded(af.szFileName);
 				break;
 
 			case FILE_ACTION_MODIFIED:
-				ModifyItemInternal(m_pAlteredFiles[i].szFileName);
+				ModifyItemInternal(af.szFileName);
 				break;
 
 			case FILE_ACTION_REMOVED:
-				RemoveItemInternal(m_pAlteredFiles[i].szFileName);
+				RemoveItemInternal(af.szFileName);
 				break;
 
 			case FILE_ACTION_RENAMED_OLD_NAME:
-				OnFileActionRenamedOldName(m_pAlteredFiles[i].szFileName);
+				OnFileActionRenamedOldName(af.szFileName);
 				break;
 
 			case FILE_ACTION_RENAMED_NEW_NAME:
-				OnFileActionRenamedNewName(m_pAlteredFiles[i].szFileName);
+				OnFileActionRenamedNewName(af.szFileName);
 				break;
 			}
 		}
@@ -104,7 +102,7 @@ void CFolderView::DirectoryAltered(void)
 	if(bNewItemCreated && !m_bNewItemCreated)
 		SendMessage(m_hOwner,WM_USER_NEWITEMINSERTED,0,m_iIndexNewItem);
 
-	m_nAltered = 0;
+	m_AlteredList.clear();
 
 	list<PastedFile_t>::iterator itr2;
 	BOOL bFocusSet = FALSE;
@@ -155,19 +153,13 @@ int EventId,int iFolderIndex)
 
 	SetTimer(m_hOwner,EventId,200,TimerProc);
 
-	if(m_nAltered > (m_iAlteredAllocation - 1))
-	{
-		m_iAlteredAllocation += DEFAULT_ALTERED_ALLOCATION;
+	AlteredFile_t af;
 
-		m_pAlteredFiles = (AlteredFiles_t *)realloc(m_pAlteredFiles,
-		m_iAlteredAllocation * sizeof(AlteredFiles_t));
-	}
+	StringCchCopy(af.szFileName,SIZEOF_ARRAY(af.szFileName),FileName);
+	af.dwAction = Action;
+	af.iFolderIndex = iFolderIndex;
 
-	StringCchCopy(m_pAlteredFiles[m_nAltered].szFileName,
-		MAX_PATH,FileName);
-	m_pAlteredFiles[m_nAltered].dwAction = Action;
-	m_pAlteredFiles[m_nAltered].iFolderIndex = iFolderIndex;
-	m_nAltered++;
+	m_AlteredList.push_back(af);
 
 	LeaveCriticalSection(&m_csDirectoryAltered);
 }

@@ -340,28 +340,29 @@ void CContainer::OnTreeViewCopy(BOOL bCopy)
 	IDataObject		*pClipboardDataObject = NULL;
 	HTREEITEM		hItem;
 	TVITEM			tvItem;
-	LPITEMIDLIST	pidl = NULL;
-	TCHAR			szFullFileName[MAX_PATH + 1];
 	HRESULT			hr;
 
 	hItem = TreeView_GetSelection(m_hTreeView);
 
 	if(hItem != NULL)
 	{
-		pidl = m_pMyTreeView->BuildPath(hItem);
+		LPITEMIDLIST pidl = m_pMyTreeView->BuildPath(hItem);
+
+		std::list<std::wstring> FileNameList;
+		TCHAR szFullFileName[MAX_PATH];
 
 		GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
 
-		/* Name must be double NULL terminated. */
-		szFullFileName[lstrlen(szFullFileName) + 1] = '\0';
+		std::wstring stringFileName(szFullFileName);
+		FileNameList.push_back(stringFileName);
 
 		if(bCopy)
 		{
-			hr = CopyFiles(szFullFileName,-1,&pClipboardDataObject);
+			hr = CopyFiles(FileNameList,&pClipboardDataObject);
 		}
 		else
 		{
-			hr = CutFiles(szFullFileName,-1,&pClipboardDataObject);
+			hr = CutFiles(FileNameList,&pClipboardDataObject);
 
 			if(SUCCEEDED(hr))
 			{

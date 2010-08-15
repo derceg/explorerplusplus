@@ -1674,7 +1674,7 @@ void CFolderView::ResetFolderMemoryAllocations(void)
 	}
 
 	EnterCriticalSection(&m_csDirectoryAltered);
-	m_nAltered = 0;
+	m_AlteredList.clear();
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
 	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;

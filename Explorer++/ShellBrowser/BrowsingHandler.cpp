@@ -138,12 +138,11 @@ HRESULT CFolderView::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 {
-	LVITEM							lv;
-	ULARGE_INTEGER					ulFileSize;
-	list<AwaitingAdd_t>::iterator	itr;
-	unsigned int					nPrevItems;
-	int								nAdded = 0;
-	int								iItemIndex;
+	LVITEM lv;
+	ULARGE_INTEGER ulFileSize;
+	unsigned int nPrevItems;
+	int nAdded = 0;
+	int iItemIndex;
 
 	nPrevItems = ListView_GetItemCount(m_hListView);
 
@@ -181,7 +180,7 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	if(m_bAutoArrange)
 		ListView_SetAutoArrange(m_hListView,FALSE);
 
-	for(itr = m_AwaitingAddList.begin();itr != m_AwaitingAddList.end();itr++)
+	for(auto itr = m_AwaitingAddList.begin();itr != m_AwaitingAddList.end();itr++)
 	{
 		if(!IsFileFiltered(itr->iItemInternal))
 		{
@@ -581,89 +580,6 @@ int CFolderView::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 	}
 
 	return nItems;
-}
-
-HRESULT CFolderView::EnumFolderContents(TCHAR *szFolderPath)
-{
-	HANDLE hFirstFile			= NULL;
-	IShellFolder *pShellFolder	= NULL;
-	LPITEMIDLIST pidlComplete	= NULL;
-	LPITEMIDLIST pidlRelative	= NULL;
-	AwaitingAdd_t AwaitingAdd;
-	TCHAR szFindPath[MAX_PATH + 3];
-	TCHAR szFullFileName[MAX_PATH];
-	int uItemId;
-
-	if(szFolderPath)
-		return E_INVALIDARG;
-
-	GetIdlFromParsingName(szFolderPath,&m_pidlDirectory);
-
-	StringCchCopy(szFindPath,MAX_PATH,szFolderPath);
-	
-	/* These extra characters are needed for the file search to work properly. */
-	PathAppend(szFindPath,_T("*"));
-
-	hFirstFile = FindFirstFile(szFindPath,&m_pwfdFiles[0]);
-
-	/* No files in the directory. Return without doing anything further. */
-	if(hFirstFile == INVALID_HANDLE_VALUE)
-		return S_OK;
-
-	uItemId = GenerateUniqueItemId();
-
-	while(FindNextFile(hFirstFile,&m_pwfdFiles[uItemId]) != 0)
-	{
-		if(lstrcmp(m_pwfdFiles[uItemId].cFileName,_T("..")) != 0)
-		{
-			if((m_nTotalItems + m_nAwaitingAdd) > (m_iCurrentAllocation - 1))
-			{
-				int PrevSize = m_iCurrentAllocation;
-
-				if(m_iCurrentAllocation > MEM_ALLOCATION_LEVEL_MEDIUM)
-					m_iCurrentAllocation += MEM_ALLOCATION_LEVEL_MEDIUM;
-				else if(m_iCurrentAllocation > MEM_ALLOCATION_LEVEL_LOW)
-					m_iCurrentAllocation += MEM_ALLOCATION_LEVEL_LOW;
-				else
-					m_iCurrentAllocation += DEFAULT_MEM_ALLOC;
-
-				m_pwfdFiles = (WIN32_FIND_DATA *)realloc(m_pwfdFiles,
-					m_iCurrentAllocation * (sizeof(WIN32_FIND_DATA)));
-
-				m_pExtraItemInfo = (CItemObject *)realloc(m_pExtraItemInfo,
-					m_iCurrentAllocation * sizeof(CItemObject));
-
-				m_pItemMap = (int *)realloc(m_pItemMap,m_iCurrentAllocation * sizeof(int));
-
-				InitializeItemMap(PrevSize,m_iCurrentAllocation);
-
-				if(m_pwfdFiles == NULL || m_pExtraItemInfo == NULL)
-				{
-					return E_OUTOFMEMORY;
-				}
-			}
-
-			StringCchCopy(szFullFileName,MAX_PATH,szFolderPath);
-			PathAppend(szFullFileName,m_pwfdFiles[uItemId].cFileName);
-			GetIdlFromParsingName(szFullFileName,&pidlComplete);
-			SHBindToParent(pidlComplete,IID_IShellFolder,(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
-			CoTaskMemFree(pidlComplete);
-
-			m_pExtraItemInfo[uItemId].pridl						= ILClone(pidlRelative);
-			m_pExtraItemInfo[uItemId].bReal						= TRUE;
-			StringCchCopy(m_pExtraItemInfo[uItemId].szDisplayName,MAX_PATH,m_pwfdFiles[uItemId].cFileName);
-
-			AwaitingAdd.iItem			= m_nTotalItems + m_nAwaitingAdd;
-			AwaitingAdd.iItemInternal	= uItemId;
-
-			m_AwaitingAddList.push_back(AwaitingAdd);
-			m_nAwaitingAdd++;
-		}
-	}
-
-	FindClose(hFirstFile);
-
-	return S_OK;
 }
 
 HRESULT inline CFolderView::AddItemInternal(LPITEMIDLIST pidlDirectory,

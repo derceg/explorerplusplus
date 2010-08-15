@@ -17,9 +17,9 @@ int		DeleteFilesPermanently(HWND hwnd,TCHAR *FileNameList);
 void	DeleteFileSecurely(TCHAR *szFileName,UINT uOverwriteMethod);
 
 /* Copy and cut. */
-HRESULT CopyFilesToClipboard(TCHAR *FileNameList,size_t iListSize,BOOL bMove,IDataObject **pClipboardDataObject);
-HRESULT	CopyFiles(TCHAR *szFileNameList,int iListSize,IDataObject **pClipboardDataObject);
-HRESULT	CutFiles(TCHAR *szFileNameList,int iListSize,IDataObject **pClipboardDataObject);
+HRESULT	CopyFilesToClipboard(std::list<std::wstring> FileNameList,BOOL bMove,IDataObject **pClipboardDataObject);
+HRESULT	CopyFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject);
+HRESULT	CutFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject);
 
 /* General. */
 int		CreateQualifiedPathName(TCHAR *,TCHAR *,unsigned int);

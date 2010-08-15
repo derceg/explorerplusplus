@@ -2213,6 +2213,10 @@ LRESULT CALLBACK CContainer::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPAR
 			OnListViewColumnClick(lParam);
 			break;
 
+		case CBEN_DRAGBEGIN:
+			OnAddressBarBeginDrag();
+			break;
+
 		case TBN_DROPDOWN:
 			OnTbnDropDown(lParam);
 			break;

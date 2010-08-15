@@ -267,53 +267,53 @@ HRESULT SaveDirectoryListing(TCHAR *Directory,TCHAR *FileName)
 	return S_OK;
 }
 
-HRESULT CopyFiles(TCHAR *szFileNameList,int iListSize,IDataObject **pClipboardDataObject)
+HRESULT CopyFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject)
 {
-	return CopyFilesToClipboard(szFileNameList,iListSize,FALSE,pClipboardDataObject);
+	return CopyFilesToClipboard(FileNameList,FALSE,pClipboardDataObject);
 }
 
-HRESULT CutFiles(TCHAR *szFileNameList,int iListSize,IDataObject **pClipboardDataObject)
+HRESULT CutFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject)
 {
-	return CopyFilesToClipboard(szFileNameList,iListSize,TRUE,pClipboardDataObject);
+	return CopyFilesToClipboard(FileNameList,TRUE,pClipboardDataObject);
 }
 
 /* TODO: */
-HRESULT CopyFilesToClipboard(TCHAR *FileNameList,size_t iListSize,
+HRESULT CopyFilesToClipboard(std::list<std::wstring> FileNameList,
 BOOL bMove,IDataObject **pClipboardDataObject)
 {
-	DROPFILES	*df = NULL;
-	FORMATETC	ftc[2];
-	STGMEDIUM	stg[2];
-	HGLOBAL		hglb = NULL;
-	TCHAR		*ptr = NULL;
-	DWORD		*pdwCopyEffect = NULL;
-	size_t		iTempListSize = 0;
-	HRESULT		hr;
-
-	/* Manually calculate the list size if it is
-	not supplied. */
-	if(iListSize == -1)
-	{
-		ptr = FileNameList;
-
-		while(*ptr != '\0')
-		{
-			iTempListSize += lstrlen(ptr) + 1;
-
-			ptr += lstrlen(ptr) + 1;
-		}
-
-		iListSize = iTempListSize;
-
-		iListSize++;
-		iListSize *= sizeof(TCHAR);
-	}
+	FORMATETC ftc[2];
+	STGMEDIUM stg[2];
 
 	ftc[0].cfFormat			= CF_HDROP;
 	ftc[0].ptd				= NULL;
 	ftc[0].dwAspect			= DVASPECT_CONTENT;
 	ftc[0].lindex			= -1;
 	ftc[0].tymed			= TYMED_HGLOBAL;
+
+	DROPFILES *pdf = NULL;
+	LPBYTE pData = NULL;
+	HGLOBAL hglb = NULL;
+	UINT uSize;
+	HRESULT hr;
+
+	hr = BuildHDropList(&pdf,&uSize,FileNameList);
+
+	hglb = GlobalAlloc(GMEM_MOVEABLE,uSize);
+
+	if(hglb == NULL)
+	{
+		return E_FAIL;
+	}
+
+	pData = static_cast<LPBYTE>(GlobalLock(hglb));
+
+	memcpy(pData,pdf,uSize);
+
+	GlobalUnlock(hglb);
+
+	stg[0].pUnkForRelease	= 0;
+	stg[0].hGlobal			= hglb;
+	stg[0].tymed			= TYMED_HGLOBAL;
 
 	ftc[1].cfFormat			= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
 	ftc[1].ptd				= NULL;
@@ -323,7 +323,7 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 	
 	hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
 
-	pdwCopyEffect = (DWORD *)GlobalLock(hglb);
+	DWORD *pdwCopyEffect = static_cast<DWORD *>(GlobalLock(hglb));
 
 	if(bMove)
 		*pdwCopyEffect = DROPEFFECT_MOVE;
@@ -337,37 +337,12 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 	stg[1].hGlobal			= hglb;
 	stg[1].tymed			= TYMED_HGLOBAL;
 
-	hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DROPFILES) + iListSize);
-
-	df = (DROPFILES *)GlobalLock(hglb);
-	df->pFiles	= sizeof(DROPFILES);
-
-	#ifdef UNICODE
-	df->fWide = 1;
-	#else
-	df->fWide = 0;
-	#endif
-
-	LPBYTE pData = NULL;
-
-	pData = (LPBYTE)df + sizeof(DROPFILES);
-
-	memcpy(pData,FileNameList,iListSize);
-
-	GlobalUnlock(hglb);
-
-	stg[0].pUnkForRelease	= 0;
-	stg[0].hGlobal			= hglb;
-	stg[0].tymed			= TYMED_HGLOBAL;
-
 	hr = CreateDataObject(ftc,stg,pClipboardDataObject,2);
 
 	if(SUCCEEDED(hr))
 	{
 		hr = OleSetClipboard(*pClipboardDataObject);
 		OleFlushClipboard();
-
-		(*pClipboardDataObject)->Release();
 	}
 
 	return hr;
