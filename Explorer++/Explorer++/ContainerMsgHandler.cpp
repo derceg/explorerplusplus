@@ -1775,6 +1775,9 @@ HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
 	{
+		/* TODO: */
+		SetDirectorySpecificSettings(m_iTabSelectedItem,pidlDirectory);
+
 		hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
 
 		if(SUCCEEDED(hr))
@@ -1824,6 +1827,8 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 	{
 		if(!bOpenInNewTab && !m_TabInfo[m_iObjectIndex].bAddressLocked)
 		{
+			/* TODO: */
+			SetDirectorySpecificSettings(m_iTabSelectedItem,pidlDirectory);
 			hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
 
 			if(SUCCEEDED(hr))
@@ -2831,4 +2836,85 @@ void CContainer::SaveAllSettings(void)
 	pLoadSave->SaveState();
 
 	pLoadSave->Release();
+}
+
+/* Saves directory settings for a particular
+tab. */
+void CContainer::SaveDirectorySpecificSettings(int iTab)
+{
+	TCITEM tcItem;
+	BOOL bRet;
+
+	tcItem.mask = TCIF_PARAM;
+	bRet = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+
+	if(bRet)
+	{
+		int iIndexInternal = (int)tcItem.lParam;
+
+		DirectorySettings_t ds;
+
+		/* TODO: First check if there are already settings held for this
+		tab. If there are, delete them first. */
+
+		ds.pidlDirectory = m_pShellBrowser[iIndexInternal]->QueryCurrentDirectoryIdl();
+
+		m_pFolderView[iIndexInternal]->GetSortMode(&ds.dsi.SortMode);
+		m_pFolderView[iIndexInternal]->GetCurrentViewMode(&ds.dsi.ViewMode);
+
+		ColumnExport_t ce;
+
+		m_pShellBrowser[iIndexInternal]->ExportAllColumns(&ce);
+
+		ds.dsi.ControlPanelColumnList		= ce.ControlPanelColumnList;
+		ds.dsi.MyComputerColumnList			= ce.MyComputerColumnList;
+		ds.dsi.MyNetworkPlacesColumnList	= ce.MyNetworkPlacesColumnList;
+		ds.dsi.NetworkConnectionsColumnList	= ce.NetworkConnectionsColumnList;
+		ds.dsi.PrintersColumnList			= ce.PrintersColumnList;
+		ds.dsi.RealFolderColumnList			= ce.RealFolderColumnList;
+		ds.dsi.RecycleBinColumnList			= ce.RecycleBinColumnList;
+
+		m_DirectorySettingsList.push_back(ds);
+	}
+}
+
+/* TODO: This needs to be moved into the actual shell browser. Can't change
+settings until it's known that the folder has sucessfully changed. */
+void CContainer::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDirectory)
+{
+	if(m_DirectorySettingsList.size() > 0)
+	{
+		for each(auto ds in m_DirectorySettingsList)
+		{
+			/* TODO: Replace ILIsEqual. */
+			if(ILIsEqual(pidlDirectory,ds.pidlDirectory))
+			{
+				TCITEM tcItem;
+				BOOL bRet;
+
+				tcItem.mask = TCIF_PARAM;
+				bRet = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+
+				if(bRet)
+				{
+					int iIndexInternal = (int)tcItem.lParam;
+
+					m_pFolderView[iIndexInternal]->SetSortMode(ds.dsi.SortMode);
+					m_pFolderView[iIndexInternal]->SetCurrentViewMode(ds.dsi.ViewMode);
+
+					ColumnExport_t ce;
+
+					ce.ControlPanelColumnList = ds.dsi.ControlPanelColumnList;
+					ce.MyComputerColumnList = ds.dsi.MyComputerColumnList;
+					ce.MyNetworkPlacesColumnList = ds.dsi.MyNetworkPlacesColumnList;
+					ce.NetworkConnectionsColumnList = ds.dsi.NetworkConnectionsColumnList;
+					ce.PrintersColumnList = ds.dsi.PrintersColumnList;
+					ce.RealFolderColumnList = ds.dsi.RealFolderColumnList;
+					ce.RecycleBinColumnList = ds.dsi.RecycleBinColumnList;
+
+					m_pShellBrowser[iIndexInternal]->ImportAllColumns(&ce);
+				}
+			}
+		}
+	}
 }

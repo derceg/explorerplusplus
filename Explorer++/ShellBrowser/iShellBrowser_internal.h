@@ -426,6 +426,7 @@ public:
 	void				ToggleGridlines(void);
 	BOOL				QueryGridlinesActive(void);
 	void				SetResourceModule(HINSTANCE hResourceModule);
+	void				ImportAllColumns(ColumnExport_t *pce);
 	void				ExportAllColumns(ColumnExport_t *pce);
 	void				QueueRename(LPITEMIDLIST pidlItem);
 	void				SelectItems(list<PastedFile_t> *pFileList);

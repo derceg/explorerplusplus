@@ -2144,6 +2144,17 @@ size_t CFolderView::QueryNumActiveColumns(void)
 	return m_pActiveColumnList->size();
 }
 
+void CFolderView::ImportAllColumns(ColumnExport_t *pce)
+{
+	CopyColumnsInternal(&m_ControlPanelColumnList,&pce->ControlPanelColumnList);
+	CopyColumnsInternal(&m_MyComputerColumnList,&pce->MyComputerColumnList);
+	CopyColumnsInternal(&m_MyNetworkPlacesColumnList,&pce->MyNetworkPlacesColumnList);
+	CopyColumnsInternal(&m_NetworkConnectionsColumnList,&pce->NetworkConnectionsColumnList);
+	CopyColumnsInternal(&m_PrintersColumnList,&pce->PrintersColumnList);
+	CopyColumnsInternal(&m_RealFolderColumnList,&pce->RealFolderColumnList);
+	CopyColumnsInternal(&m_RecycleBinColumnList,&pce->RecycleBinColumnList);
+}
+
 void CFolderView::ExportAllColumns(ColumnExport_t *pce)
 {
 	SaveColumnWidths();

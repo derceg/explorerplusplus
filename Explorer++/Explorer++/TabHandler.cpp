@@ -157,28 +157,64 @@ int *pTabObjectIndex)
 	global ones. */
 	if(pSettings == NULL)
 	{
-		is.bAutoArrange			= m_bAutoArrangeGlobal;
+		BOOL bFound = FALSE;
+
+		/* These settings are program-wide. */
 		is.bGridlinesActive		= m_bShowGridlinesGlobal;
 		is.bShowHidden			= m_bShowHiddenGlobal;
 		is.bShowInGroups		= m_bShowInGroupsGlobal;
 		is.bSortAscending		= m_bSortAscendingGlobal;
-		is.SortMode				= DEFAULT_SORT_MODE;
-		is.ViewMode				= m_ViewModeGlobal;
-		is.bApplyFilter			= FALSE;
+		is.bAutoArrange			= m_bAutoArrangeGlobal;
 		is.bShowFolderSizes		= m_bShowFolderSizes;
 		is.bDisableFolderSizesNetworkRemovable = m_bDisableFolderSizesNetworkRemovable;
 		is.bHideSystemFiles		= m_bHideSystemFilesGlobal;
 		is.bHideLinkExtension	= m_bHideLinkExtensionGlobal;
 
-		StringCchCopy(is.szFilter,SIZEOF_ARRAY(is.szFilter),EMPTY_STRING);
+		/* Check if there are any specific settings saved
+		for the specified directory. */
+		for each(auto ds in m_DirectorySettingsList)
+		{
+			/* TODO: Replace ILIsEqual. */
+			if(ILIsEqual(pidlDirectory,ds.pidlDirectory))
+			{
+				/* TODO: */
+				//bFound = TRUE;
 
-		is.pControlPanelColumnList			= &m_ControlPanelColumnList;
-		is.pMyComputerColumnList			= &m_MyComputerColumnList;
-		is.pMyNetworkPlacesColumnList		= &m_MyNetworkPlacesColumnList;
-		is.pNetworkConnectionsColumnList	= &m_NetworkConnectionsColumnList;
-		is.pPrintersColumnList				= &m_PrintersColumnList;
-		is.pRealFolderColumnList			= &m_RealFolderColumnList;
-		is.pRecycleBinColumnList			= &m_RecycleBinColumnList;
+				is.SortMode				= ds.dsi.SortMode;
+				is.ViewMode				= ds.dsi.ViewMode;
+				is.bApplyFilter			= FALSE;
+
+				is.pControlPanelColumnList			= &ds.dsi.ControlPanelColumnList;
+				is.pMyComputerColumnList			= &ds.dsi.MyComputerColumnList;
+				is.pMyNetworkPlacesColumnList		= &ds.dsi.MyNetworkPlacesColumnList;
+				is.pNetworkConnectionsColumnList	= &ds.dsi.NetworkConnectionsColumnList;
+				is.pPrintersColumnList				= &ds.dsi.PrintersColumnList;
+				is.pRealFolderColumnList			= &ds.dsi.RealFolderColumnList;
+				is.pRecycleBinColumnList			= &ds.dsi.RecycleBinColumnList;
+			}
+		}
+
+		if(bFound)
+		{
+			/* There are existing settings for this directory,
+			so use those, rather than the defaults. */
+		}
+		else
+		{
+			is.SortMode				= DEFAULT_SORT_MODE;
+			is.ViewMode				= m_ViewModeGlobal;
+			is.bApplyFilter			= FALSE;
+
+			StringCchCopy(is.szFilter,SIZEOF_ARRAY(is.szFilter),EMPTY_STRING);
+
+			is.pControlPanelColumnList			= &m_ControlPanelColumnList;
+			is.pMyComputerColumnList			= &m_MyComputerColumnList;
+			is.pMyNetworkPlacesColumnList		= &m_MyNetworkPlacesColumnList;
+			is.pNetworkConnectionsColumnList	= &m_NetworkConnectionsColumnList;
+			is.pPrintersColumnList				= &m_PrintersColumnList;
+			is.pRealFolderColumnList			= &m_RealFolderColumnList;
+			is.pRecycleBinColumnList			= &m_RecycleBinColumnList;
+		}
 
 		pSettings = &is;
 	}
@@ -1007,6 +1043,8 @@ HRESULT CContainer::CloseTab(int TabIndex)
 	/* The tab is locked. Don't close it. */
 	if(m_TabInfo[(int)tcItem.lParam].bLocked || m_TabInfo[(int)tcItem.lParam].bAddressLocked)
 		return S_FALSE;
+
+	SaveDirectorySpecificSettings(TabIndex);
 
 	ListViewIndex = (int)tcItem.lParam;
 

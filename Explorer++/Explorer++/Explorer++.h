@@ -708,6 +708,10 @@ private:
 	/* Main toolbars. */
 	void					InitializeMainToolbars(void);
 
+	/* Directory specific settings. */
+	void					SaveDirectorySpecificSettings(int iTab);
+	void					SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDirectory);
+
 	/* Settings. */
 	void					SaveAllSettings(void);
 	LONG					SaveSettings();
@@ -1237,6 +1241,9 @@ private:
 	/* Internal tab state. */
 	TabInfo_t				m_TabInfo[MAX_TABS];
 	UINT					m_uTabMap[MAX_TABS];
+
+	/* Directory-speecific settings. */
+	std::list<DirectorySettings_t>	m_DirectorySettingsList;
 
 	/* User options variables. */
 	BOOL					m_bShowStatusBar;

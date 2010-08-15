@@ -392,6 +392,27 @@ typedef struct
 	TCHAR				szDisplayName[64];
 } FileSize_t;
 
+/* Used to store settings for individual directories. */
+struct DirectorySettingsInternal_t
+{
+	UINT	SortMode;
+	UINT	ViewMode;
+
+	list<Column_t>	RealFolderColumnList;
+	list<Column_t>	MyComputerColumnList;
+	list<Column_t>	ControlPanelColumnList;
+	list<Column_t>	RecycleBinColumnList;
+	list<Column_t>	PrintersColumnList;
+	list<Column_t>	NetworkConnectionsColumnList;
+	list<Column_t>	MyNetworkPlacesColumnList;
+};
+
+struct DirectorySettings_t
+{
+	LPITEMIDLIST				pidlDirectory;
+	DirectorySettingsInternal_t	dsi;
+};
+
 typedef enum
 {
 	REPLACEEXPLORER_NONE		= 1,

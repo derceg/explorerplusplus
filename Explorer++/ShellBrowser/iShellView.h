@@ -363,6 +363,7 @@ __interface IShellBrowser2 : IUnknown
 	virtual HICON			GetItemIcon(int iItem);
 	virtual void			ExportCurrentColumns(list<Column_t> *pColumns);
 	virtual void			ImportColumns(list<Column_t> *pColumns,BOOL bColumnsSwapped);
+	virtual void			ImportAllColumns(ColumnExport_t *pce);
 	virtual void			ExportAllColumns(ColumnExport_t *pcie);
 	virtual void			QueueRename(LPITEMIDLIST pidlItem);
 	virtual void			RefreshAllIcons(void);
