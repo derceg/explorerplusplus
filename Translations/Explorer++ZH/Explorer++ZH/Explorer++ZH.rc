@@ -32,6 +32,12 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "È·¶¨",IDOK,189,96,50,14
     CONTROL         207,IDC_ABOUT_STATIC_IMAGE,"Static",SS_BITMAP,4,4,235,87,WS_EX_STATICEDGE
+    LTEXT           "Explorer++ Version %s (%s)",IDC_STATIC_VERSIONNUMBER,5,63,246,8
+    LTEXT           "Copyright © 2005-2010 David Erceg",IDC_STATIC,5,91,118,8
+    LTEXT           "This program is freeware and released under the GNU General Public License",IDC_STATIC,9,130,245,8
+    CONTROL         "<a href=""http://www.explorerplusplus.com"">www.explorerplusplus.com</a>",IDC_SITELINK,
+                    "SysLink",WS_TABSTOP,5,105,91,12
+    LTEXT           "Build Date: %s",IDC_STATIC_BUILDDATE,5,77,246,8
     CONTROL         "",-1,"Static",SS_ETCHEDHORZ,4,91,235,1
 END
 
@@ -73,18 +79,6 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,79,133,10
     CONTROL         "Show username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,103,101,10
-END
-
-IDD_OPTIONS_TABS DIALOGEX 0, 0, 242, 135
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "±êÇ©Ò³"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    CONTROL         "Ç¿ÖÆËùÓÐ±êÇ©Ò³¿í¶ÈÏàÍ¬",IDC_TABS_SAMEWIDTH,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,10,12,104,10
-    CONTROL         "ÉèÖÃ±êÇ©Ò³±êÌâ×î´ó³¤¶È:",IDC_TABS_MAXIMUMWIDTH,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,10,29,107,10
-    CONTROL         "¹Ø±ÕËùÓÐ±êÇ©Ò³µÄÊ±ºòÌáÊ¾È·ÈÏ",IDC_TABS_CLOSECONFIRMATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,46,128,10
-    CONTROL         "½ô°¤×Åµ±Ç°±êÇ©Ò³´ò¿ªÐÂ±êÇ©Ò³",IDC_TABS_OPENNEXTTOCURRENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,63,128,10
-    EDITTEXT        IDC_EDIT1,143,27,23,15,ES_AUTOHSCROLL | NOT WS_VISIBLE
 END
 
 IDD_CHANGEFILEATTRIBUTES DIALOGEX 0, 0, 245, 150
@@ -411,6 +405,110 @@ BEGIN
     EDITTEXT        IDC_APP_EDIT_COMMAND,41,24,183,14,ES_AUTOHSCROLL
 END
 
+IDD_NEWCOLORRULE DIALOGEX 0, 0, 245, 152
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Color Rule"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Description:",IDC_STATIC,7,10,39,8
+    EDITTEXT        IDC_EDIT_DESCRIPTION,68,7,170,14,ES_AUTOHSCROLL
+    LTEXT           "&Color:",IDC_STATIC,7,30,20,8
+    CONTROL         "",IDC_STATIC_COLOR,"Static",SS_SIMPLE | SS_NOTIFY | SS_SUNKEN | WS_GROUP,68,27,32,14,WS_EX_STATICEDGE
+    PUSHBUTTON      "Chan&ge color...",IDC_BUTTON_CHANGECOLOR,108,26,62,14
+    LTEXT           "Filename &pattern:",IDC_STATIC_FILENAMEFILTER,7,50,58,8
+    EDITTEXT        IDC_EDIT_FILENAMEPATTERN,68,48,170,14,ES_AUTOHSCROLL
+    GROUPBOX        "Attributes",IDC_STATIC_ATTRIBUTES,8,75,230,53
+    CONTROL         "Co&mpressed",IDC_CHECK_COMPRESSED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,89,55,10
+    CONTROL         "&Encrypted",IDC_CHECK_ENCRYPTED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,89,49,10
+    CONTROL         "&Archive",IDC_CHECK_ARCHIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,141,89,40,10
+    CONTROL         "&Hidden",IDC_CHECK_HIDDEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,191,89,38,10
+    CONTROL         "I&ndexed",IDC_CHECK_INDEXED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,110,43,10
+    CONTROL         "&Read-only",IDC_CHECK_READONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,83,110,49,10
+    CONTROL         "S&ystem",IDC_CHECK_SYSTEM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,141,110,39,10
+    DEFPUSHBUTTON   "OK",IDOK,134,134,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,188,134,50,14
+END
+
+IDD_SEARCH DIALOGEX 0, 0, 343, 310
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Search"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Search &Directory:",IDC_STATIC,7,9,57,8
+    PUSHBUTTON      "",IDC_BUTTON_DIRECTORY,315,7,19,14,BS_ICON
+    LTEXT           "&Named:",IDC_STATIC,7,29,26,8
+    GROUPBOX        "Attributes",IDC_STATIC,7,50,301,39,0,WS_EX_TRANSPARENT
+    CONTROL         "&Archive",IDC_CHECK_ARCHIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,67,40,10
+    CONTROL         "&Hidden",IDC_CHECK_HIDDEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,70,67,38,10
+    CONTROL         "&Read-only",IDC_CHECK_READONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,122,67,49,10
+    CONTROL         "S&ystem",IDC_CHECK_SYSTEM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,185,67,39,10
+    CONTROL         "Search Su&bfolders",IDC_CHECK_SEARCHSUBFOLDERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,98,74,10
+    CONTROL         "",IDC_LISTVIEW_SEARCHRESULTS,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,6,119,328,129
+    LTEXT           "Status:",IDC_STATIC_STATUSLABEL,7,257,24,8
+    LTEXT           "",IDC_STATIC_STATUS,35,257,299,18
+    CONTROL         "",IDC_STATIC_ETCHEDHORZ,"Static",SS_ETCHEDHORZ,7,283,328,1
+    DEFPUSHBUTTON   "Search",IDSEARCH,229,291,50,14
+    PUSHBUTTON      "Close",IDEXIT,284,291,50,14
+    CONTROL         "",IDC_COMBO_DIRECTORY,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,67,7,241,200
+    CONTROL         "",IDC_COMBO_NAME,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,67,26,241,198
+END
+
+IDD_OPTIONS_TABS DIALOGEX 0, 0, 242, 135
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "±êÇ©Ò³"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Ç¿ÖÆËùÓÐ±êÇ©Ò³¿í¶ÈÏàÍ¬",IDC_TABS_SAMEWIDTH,
+                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,10,12,104,10
+    CONTROL         "¹Ø±ÕËùÓÐ±êÇ©Ò³µÄÊ±ºòÌáÊ¾È·ÈÏ",IDC_TABS_CLOSECONFIRMATION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,46,128,10
+    CONTROL         "½ô°¤×Åµ±Ç°±êÇ©Ò³´ò¿ªÐÂ±êÇ©Ò³",IDC_TABS_OPENNEXTTOCURRENT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,63,128,10
+    CONTROL         "Open each folder in its own &tab",IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,116,10
+    CONTROL         "&Double-click to close a tab",IDC_TABS_DOUBLECLICKCLOSE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,99,10
+END
+
+IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 213
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Window"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Allow &multiple instances",IDC_OPTION_MULTIPLEINSTANCES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,7,91,10
+    CONTROL         "&Show file previews in display window",IDC_OPTION_FILEPREVIEWS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,20,133,10
+    CONTROL         "Show full &path in title bar",IDC_SETTINGS_CHECK_TITLEPATH,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,33,95,10
+    CONTROL         "Show &username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,101,10
+    CONTROL         "&Disable treeview delay",IDC_OPTION_TREEVIEWDELAY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,88,10
+    CONTROL         "Extend tab &control across entire window",IDC_OPTION_EXTENDTABCONTROL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,85,145,10
+    CONTROL         "Show &gridlines in details view",IDC_OPTION_GRIDLINES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,108,10
+    CONTROL         "Full row selection in details &view",IDC_OPTION_FULLROWSELECT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,117,10
+    CONTROL         "Show privilege level in title bar",IDC_OPTION_PRIVILEGELEVELINTITLEBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,113,10
+END
+
+IDD_CUSTOMIZECOLORS DIALOGEX 0, 0, 363, 152
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Customize Colors"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_LISTVIEW_COLORRULES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_EDITLABELS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,6,7,297,140
+    PUSHBUTTON      "&New...",IDC_BUTTON_NEW,308,7,50,14
+    PUSHBUTTON      "&Edit...",IDC_BUTTON_EDIT,308,26,50,14
+    PUSHBUTTON      "Move &Up",IDC_BUTTON_MOVEUP,308,45,50,14
+    PUSHBUTTON      "Move &Down",IDC_BUTTON_MOVEDOWN,308,64,50,14
+    PUSHBUTTON      "Dele&te",IDC_BUTTON_DELETE,308,83,50,14
+    DEFPUSHBUTTON   "OK",IDOK,308,133,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -420,20 +518,10 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO 
 BEGIN
-    IDD_ABOUT, DIALOG
+    IDD_OPTIONS_GENERAL, DIALOG
     BEGIN
-        LEFTMARGIN, 2
-        RIGHTMARGIN, 240
-        TOPMARGIN, 4
-        BOTTOMMARGIN, 111
-    END
-
-    IDD_OPTIONS_TABS, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 235
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 128
+        RIGHTMARGIN, 228
+        BOTTOMMARGIN, 262
     END
 
     IDD_DESTROYFILES, DIALOG
@@ -441,20 +529,15 @@ BEGIN
         RIGHTMARGIN, 303
     END
 
-    IDD_PHYSICALDRIVE, DIALOG
+    IDD_WILDCARDSELECT, DIALOG
     BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 258
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 248
+        RIGHTMARGIN, 276
     END
 
     IDD_DISPLAYCOLOURS, DIALOG
     BEGIN
         LEFTMARGIN, 2
-        RIGHTMARGIN, 431
         TOPMARGIN, 1
-        BOTTOMMARGIN, 221
     END
 
     IDD_ADD_BOOKMARK, DIALOG
@@ -462,18 +545,16 @@ BEGIN
         BOTTOMMARGIN, 166
     END
 
-    IDD_OPTIONS_LANGUAGE, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 221
-        TOPMARGIN, 1
-        BOTTOMMARGIN, 148
-    END
-
     IDD_SELECTCOLUMNS, DIALOG
     BEGIN
         RIGHTMARGIN, 198
         BOTTOMMARGIN, 236
+    END
+
+    IDD_SEARCH, DIALOG
+    BEGIN
+        RIGHTMARGIN, 341
+        BOTTOMMARGIN, 309
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -496,6 +577,7 @@ BEGIN
         MENUITEM "´ò¿ªÃüÁîÐÐµ½µ±Ç°Ä¿Â¼(&C)",              IDM_FILE_SHOWCOMMANDPROMPT
         MENUITEM "¸´ÖÆµ±Ç°Â·¾¶µ½¼ôÌù°å(&F)",              IDM_FILE_COPYFOLDERPATH
         MENUITEM "¸´ÖÆÑ¡ÖÐµÄÎÄ¼þÂ·¾¶µ½¼ôÌù°å(&t)",           IDM_FILE_COPYITEMPATH
+        MENUITEM "Copy &Universal File Paths",  IDM_FILE_COPYUNIVERSALFILEPATHS
         MENUITEM "¸´ÖÆµ±Ç°ÁÐÎÄ±¾µ½¼ôÌù°å(&T)",             IDM_FILE_COPYCOLUMNTEXT
         MENUITEM SEPARATOR
         MENUITEM "ÉèÖÃÎÄ¼þÊôÐÔ(&A)",                  IDM_FILE_SETFILEATTRIBUTES
@@ -548,19 +630,17 @@ BEGIN
             MENUITEM "×Ô¶¨Òå...",                      IDM_TOOLBARS_CUSTOMIZE
         END
         MENUITEM SEPARATOR
-        MENUITEM "ËõÂÔÍ¼(&H)",                     IDM_VIEW_THUMBNAILS
-        MENUITEM "Æ½ÆÌ(&S)",                      IDM_VIEW_TILES
-        MENUITEM "Í¼±ê(&N)",                      IDM_VIEW_ICONS
-        MENUITEM "Ð¡Í¼±ê(&M)",                     IDM_VIEW_SMALLICONS
-        MENUITEM "ÁÐ±í(&L)",                      IDM_VIEW_LIST
-        MENUITEM "ÏêÏ¸ÐÅÏ¢(&D)",                    IDM_VIEW_DETAILS
+        MENUITEM "Placeholder",                 IDM_VIEW_PLACEHOLDER
+        MENUITEM SEPARATOR
+        MENUITEM "&Auto Arrange",               IDM_ARRANGEICONSBY_AUTOARRANGE
         MENUITEM SEPARATOR
         MENUITEM "ÅÅÁÐÍ¼±ê(&O)",                    IDM_VIEW_SORTBY
+        MENUITEM "&Group By",                   IDM_VIEW_GROUPBY
         MENUITEM "ÏÔÊ¾Òþ²ØÎÄ¼þ(&I)\tCtrl+H",          IDM_VIEW_SHOWHIDDENFILES
         MENUITEM "Ë¢ÐÂ(&R)\tF5",                  IDM_VIEW_REFRESH
-        MENUITEM "ÉèÖÃÄ¬ÈÏÁÐ...",                    IDM_VIEW_SETDEFAULTCOLUMNS
         MENUITEM "Ñ¡ÔñÁÐ(&C)...",                  IDM_VIEW_SELECTCOLUMNS
         MENUITEM "×Ô¶¯µ÷ÕûÁÐ(&A)",                   IDM_VIEW_AUTOSIZECOLUMNS
+        MENUITEM "Save Column Layout as Default", IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT
         MENUITEM "ÉèÖÃÏêÏ¸ÐÅÏ¢À¸ÑÕÉ«(&P)...",            IDM_VIEW_CHANGEDISPLAYCOLOURS
         MENUITEM SEPARATOR
         POPUP "¹ýÂË(&F)"
@@ -604,7 +684,8 @@ BEGIN
     END
     POPUP "¹¤¾ß(&T)"
     BEGIN
-        MENUITEM "ÏÔÊ¾Çý¶¯Æ÷ÐÅÏ¢(&S)...",              IDM_TOOLS_SHOWDRIVEINFORMATION
+        MENUITEM "&Search...\tCtrl+F",          IDM_TOOLS_SEARCH
+        MENUITEM "&Customize Colors...",        IDM_TOOLS_CUSTOMIZECOLORS
         MENUITEM SEPARATOR
         MENUITEM "Ñ¡Ïî(&O)...",                   IDM_TOOLS_OPTIONS
     END
@@ -622,15 +703,12 @@ BEGIN
     BEGIN
         POPUP "²é¿´"
         BEGIN
-            MENUITEM "ËõÂÔÍ¼",                         IDM_VIEW_THUMBNAILS
-            MENUITEM "Æ½ÆÌ",                          IDM_VIEW_TILES
-            MENUITEM "Í¼±ê",                          IDM_VIEW_ICONS
-            MENUITEM "Ð¡Í¼±ê",                         IDM_VIEW_SMALLICONS
-            MENUITEM "ÁÐ±í",                          IDM_VIEW_LIST
-            MENUITEM "ÏêÏ¸ÐÅÏ¢",                        IDM_VIEW_DETAILS
+            MENUITEM "PlaceHolder",                 IDM_VIEW_PLACEHOLDER
+            MENUITEM SEPARATOR
+            MENUITEM "Auto Arrange",                IDM_ARRANGEICONSBY_AUTOARRANGE
         END
-        MENUITEM SEPARATOR
-        MENUITEM "ÅÅÁÐÍ¼Æ¬",                        ID_POPUP_SORTBY
+        MENUITEM "ÅÅÁÐÍ¼Æ¬",                        IDM_POPUP_SORTBY
+        MENUITEM "Group &By",                   IDM_POPUP_GROUPBY
         MENUITEM "Ë¢ÐÂ",                          IDM_VIEW_REFRESH
         MENUITEM SEPARATOR
         MENUITEM "Õ³Ìù",                          IDM_EDIT_PASTE
@@ -651,8 +729,7 @@ BEGIN
         MENUITEM "ÉýÐò",                          IDM_ARRANGEICONSBY_ASCENDING
         MENUITEM "½µÐò",                          IDM_ARRANGEICONSBY_DESCENDING
         MENUITEM SEPARATOR
-        MENUITEM "°´×éÅÅÁÐ",                        IDM_ARRANGEICONSBY_SHOWINGROUPS
-        MENUITEM "×Ô¶¯ÅÅÁÐ",                        IDM_ARRANGEICONSBY_AUTOARRANGE
+        MENUITEM "&More...",                    IDM_SORTBY_MORE
     END
 END
 
@@ -680,12 +757,7 @@ IDR_VIEWS_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
-        MENUITEM "ËõÂÔÍ¼",                         IDM_VIEW_THUMBNAILS
-        MENUITEM "Æ½ÆÌ",                          IDM_VIEW_TILES
-        MENUITEM "Í¼±ê",                          IDM_VIEW_ICONS
-        MENUITEM "Small Icons",                 IDM_VIEW_SMALLICONS
-        MENUITEM "ÁÐ±í",                          IDM_VIEW_LIST
-        MENUITEM "ÏêÏ¸ÐÅÏ¢",                        IDM_VIEW_DETAILS
+        MENUITEM "Placeholder",                 IDM_VIEW_PLACEHOLDER
     END
 END
 
@@ -760,6 +832,39 @@ BEGIN
     END
 END
 
+IDR_DISPLAYWINDOW_RCLICK MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "&Change Colors...",           IDM_VIEW_CHANGEDISPLAYCOLOURS
+        MENUITEM SEPARATOR
+        MENUITEM "Hide &Display Window",        IDM_DW_HIDEDISPLAYWINDOW
+    END
+END
+
+IDR_MASSRENAME_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "$F &Filename",                IDM_MASSRENAME_FILENAME
+        MENUITEM "$B &Basename",                IDM_MASSRENAME_BASENAME
+        MENUITEM "$E &Extension",               IDM_MASSRENAME_EXTENSION
+        MENUITEM "$N &Counter",                 IDM_MASSRENAME_COUNTER
+    END
+END
+
+IDR_GROUPBY_MENU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM SEPARATOR
+        MENUITEM "&Ascending",                  IDM_ARRANGEICONSBY_ASCENDING
+        MENUITEM "&Descending",                 IDM_ARRANGEICONSBY_DESCENDING
+        MENUITEM SEPARATOR
+        MENUITEM "&More...",                    IDM_SORTBY_MORE
+    END
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -767,8 +872,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,9,5,4
- PRODUCTVERSION 0,9,5,4
+ FILEVERSION 1,1,0,0
+ PRODUCTVERSION 1,1,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x3L
@@ -784,12 +889,12 @@ BEGIN
         BLOCK "000404b0"
         BEGIN
             VALUE "FileDescription", "Explorer++ Translation DLL"
-            VALUE "FileVersion", "0, 9, 5, 4"
+            VALUE "FileVersion", "1.1"
             VALUE "InternalName", "Explorer++ Chinese Translation DLL"
             VALUE "LegalCopyright", "(C) 2005-2009 David Erceg"
             VALUE "OriginalFilename", "Explorer++ZH.dll"
             VALUE "ProductName", "Explorer++"
-            VALUE "ProductVersion", "0, 9, 5, 4"
+            VALUE "ProductVersion", "1.1"
         END
     END
     BLOCK "VarFileInfo"
@@ -831,7 +936,8 @@ END
 
 STRINGTABLE 
 BEGIN
-    IDM_FILE_SAVEDIRECTORYLISTING "±£´æµ±Ç°Ä¿Â¼ÄÚÈÝÁÐ±í."
+    IDM_FILE_SAVEDIRECTORYLISTING 
+                            "±£´æµ±Ç°Ä¿Â¼ÄÚÈÝÁÐ±í."
     IDS_MERGE_COLUMN_TEXT   "ÐèÒªºÏ²¢µÄÎÄ¼þ"
     IDS_OK                  "È·¶¨"
     IDS_MERGE_NOINPUT       "Ã»ÓÐÑ¡ÔñÊäÈëÎÄ¼þ"
@@ -851,7 +957,8 @@ STRINGTABLE
 BEGIN
     IDM_FILE_NEWTAB         "ÐÂ½¨±êÇ©Ò³"
     IDM_FILE_CLOSETAB       "¹Ø±Õµ±Ç°±êÇ©Ò³"
-    IDM_FILE_SHOWCOMMANDPROMPT "´ò¿ªÃüÁîÌáÊ¾·ûµ½µ±Ç°Ä¿Â¼"
+    IDM_FILE_SHOWCOMMANDPROMPT 
+                            "´ò¿ªÃüÁîÌáÊ¾·ûµ½µ±Ç°Ä¿Â¼"
     IDM_FILE_COPYFOLDERPATH "ÒÔÎÄ±¾·½Ê½¸´ÖÆµ±Ç°Ä¿Â¼µÄÂ·¾¶"
     IDM_FILE_COPYITEMPATH   "¸´ÖÆµ±Ç°Ñ¡ÖÐÏîÄ¿µÄÈ«Â·¾¶"
     IDM_FILE_DELETE         "ÒÆ¶¯Ñ¡ÖÐÏîÄ¿µ½»ØÊÕÕ¾"
@@ -868,7 +975,8 @@ BEGIN
     IDM_EDIT_COPYTOFOLDER   "¸´ÖÆÑ¡ÖÐµÄÎÄ¼þµ½ÆäËûÎÄ¼þ¼Ð"
     IDM_EDIT_MOVETOFOLDER   "ÒÆ¶¯Ñ¡ÖÐµÄÎÄ¼þµ½ÆäËûÎÄ¼þ¼Ð"
     IDM_EDIT_SELECTALL      "Ñ¡ÖÐµ±Ç°±êÇ©Ò³ÉÏµÄËùÓÐÏîÄ¿"
-    IDM_EDIT_INVERTSELECTION "Ñ¡ÖÐËùÓÐÎ´±»Ñ¡ÖÐµÄÎÄ¼þ,È¡ÏûÑ¡ÔñÒÑ¾­Ñ¡ÖÐµÄÎÄ¼þ"
+    IDM_EDIT_INVERTSELECTION 
+                            "Ñ¡ÖÐËùÓÐÎ´±»Ñ¡ÖÐµÄÎÄ¼þ,È¡ÏûÑ¡ÔñÒÑ¾­Ñ¡ÖÐµÄÎÄ¼þ"
     IDM_EDIT_SELECTNONE     "È¡ÏûÑ¡ÖÐ±êÇ©Ò³ÖÐµÄËùÓÐÎÄ¼þ"
     IDM_VIEW_STATUSBAR      "ÏÔÊ¾/Òþ²Ø×´Ì¬À¸"
     IDM_VIEW_FOLDERS        "ÏÔÊ¾/Òþ²ØÎÄ¼þ¼Ð²à±ßÀ¸"
@@ -878,9 +986,11 @@ END
 STRINGTABLE 
 BEGIN
     IDM_EDIT_WILDCARDSELECTION "»ùÓÚÍ¨Åä·û¹ýÂËÆ÷Ñ¡ÔñÏîÄ¿"
-    IDM_BOOKMARKS_ORGANIZEBOOKMARKS "ÖØÃüÃû¡¢É¾³ý»òÐÞ¸Ä±êÇ©"
+    IDM_BOOKMARKS_ORGANIZEBOOKMARKS 
+                            "ÖØÃüÃû¡¢É¾³ý»òÐÞ¸Ä±êÇ©"
     IDM_VIEW_DISPLAYWINDOW  "ÏÔÊ¾/Òþ²ØÏêÏ¸ÐÅÏ¢À¸"
-    IDM_VIEW_CHANGEDISPLAYCOLOURS "ÉèÖÃÐÅÏ¢À¸µÄÑÕÉ«"
+    IDM_VIEW_CHANGEDISPLAYCOLOURS 
+                            "ÉèÖÃÐÅÏ¢À¸µÄÑÕÉ«"
     IDM_EDIT_WILDCARDDESELECT "»ùÓÚÍ¨Åä·û¹ýÂËÆ÷È¡ÏûÑ¡Ôñ"
 END
 
@@ -903,8 +1013,10 @@ END
 STRINGTABLE 
 BEGIN
     IDM_FILE_EXIT           "ÍË³ö³ÌÐò"
-    IDM_EDIT_SELECTALLOFSAMETYPE "Ñ¡ÖÐËùÓÐºÍµ±Ç°Ñ¡ÖÐÎÄ¼þÀàÐÍÏàÍ¬µÄÎÄ¼þ"
-    IDM_FILE_SETFILEATTRIBUTES "¸ü¸ÄÑ¡ÖÐµÄÏîÄ¿µÄÊôÐÔºÍÈÕÆÚ"
+    IDM_EDIT_SELECTALLOFSAMETYPE 
+                            "Ñ¡ÖÐËùÓÐºÍµ±Ç°Ñ¡ÖÐÎÄ¼þÀàÐÍÏàÍ¬µÄÎÄ¼þ"
+    IDM_FILE_SETFILEATTRIBUTES 
+                            "¸ü¸ÄÑ¡ÖÐµÄÏîÄ¿µÄÊôÐÔºÍÈÕÆÚ"
     IDM_EDIT_SHOWFILESLACK  "Shows any data contained in the selected items slack space"
     IDM_EDIT_RESOLVELINK    "¶¨Î»µ½µ±Ç°Ñ¡ÖÐµÄÁ´½ÓÏîÄ¿µÄÄ¿±ê"
     IDM_RCLICK_PROPERTIES   "ÏÔÊ¾µ±Ç°ÎÄ¼þ¼ÐµÄÊôÐÔ"
@@ -920,6 +1032,8 @@ BEGIN
     IDM_VIEW_SMALLICONS     "ÒÔÐ¡Í¼±ê·½Ê½ÏÔÊ¾ÏîÄ¿"
     IDM_VIEW_LIST           "ÒÔÁÐ±í·½Ê½ÏÔÊ¾ÏîÄ¿"
     IDM_VIEW_DETAILS        "ÏÔÊ¾µ±Ç°±êÇ©Ò³ÖÐÏîÄ¿µÄÏêÏ¸ÐÅÏ¢"
+    IDM_VIEW_LARGEICONS     "Displays items using large icons"
+    IDM_VIEW_EXTRALARGEICONS "Displays items using extra large icons"
 END
 
 STRINGTABLE 
@@ -927,10 +1041,12 @@ BEGIN
     IDM_ARRANGEICONSBY_NAME "°´ÕÕÃû³ÆµÄ×ÖÄ¸±íË³ÐòÅÅÁÐÍ¼±ê"
     IDM_ARRANGEICONSBY_SIZE "°´ÕÕÎÄ¼þ´óÐ¡µÝÔö·½Ê½ÅÅÁÐÍ¼±ê"
     IDM_ARRANGEICONSBY_TYPE "°´ÕÕÀàÐÍÅÅÁÐÍ¼±ê"
-    IDM_ARRANGEICONSBY_DATEMODIFIED "°´ÕÕÐÞ¸ÄÊ±¼ä´Ó¾Éµ½ÐÂË³ÐòÅÅÁÐÍ¼±ê"
+    IDM_ARRANGEICONSBY_DATEMODIFIED 
+                            "°´ÕÕÐÞ¸ÄÊ±¼ä´Ó¾Éµ½ÐÂË³ÐòÅÅÁÐÍ¼±ê"
     IDM_ARRANGEICONSBY_ASCENDING "°´ÕÕµÝÔöË³ÐòÅÅÁÐÏîÄ¿"
     IDM_ARRANGEICONSBY_DESCENDING "°´ÕÕµÝ¼õË³ÐòÅÅÁÐÏîÄ¿"
-    IDM_ARRANGEICONSBY_SHOWINGROUPS "°´ÕÕÅÅÐòµÄÊôÐÔ×éÖ¯ÏîÄ¿"
+    IDM_ARRANGEICONSBY_SHOWINGROUPS 
+                            "°´ÕÕÅÅÐòµÄÊôÐÔ×éÖ¯ÏîÄ¿"
     IDM_ARRANGEICONSBY_AUTOARRANGE "×Ô¶¯ÅÅÁÐÏîÄ¿"
     IDM_GO_BACK             "·µ»Øµ½ÉÏÒ»¸öÄ¿Â¼"
     IDM_GO_FORWARD          "Ç°½øµ½ÏÂÒ»¸öÄ¿Â¼"
@@ -987,7 +1103,8 @@ BEGIN
     IDM_SORTBY_VIRTUALCOMMENTS "°´ÕÕ±¸×¢ÅÅÁÐÏîÄ¿"
     IDM_SORTBY_FILESYSTEM   "°´ÕÕÎÄ¼þÏµÍ³ÅÅÁÐÏîÄ¿"
     IDM_SORTBY_VIRTUALTYPE  "°´ÕÕÀàÐÍÅÅÁÐÏîÄ¿"
-    IDM_SORTBY_NUMPRINTERDOCUMENTS "°´ÕÕ´òÓ¡»ú´ý´òÓ¡ÎÄµµÊýÅÅÁÐÏîÄ¿"
+    IDM_SORTBY_NUMPRINTERDOCUMENTS 
+                            "°´ÕÕ´òÓ¡»ú´ý´òÓ¡ÎÄµµÊýÅÅÁÐÏîÄ¿"
     IDM_SORTBY_PRINTERSTATUS "°´ÕÕ´òÓ¡»ú×´Ì¬ÅÅÁÐÏîÄ¿"
     IDM_SORTBY_PRINTERCOMMENTS "°´ÕÕ´òÓ¡»úÃèÊöÅÅÁÐÏîÄ¿"
     IDM_SORTBY_PRINTERLOCATION "°´ÕÕÎ»ÖÃÅÅÁÐÏîÄ¿"
@@ -996,6 +1113,8 @@ END
 
 STRINGTABLE 
 BEGIN
+    IDM_FILTER_APPLYFILTER  "Activates/deactivates the filter"
+    IDM_FILTER_FILTERRESULTS "Allows a wildcard filter to be specified"
     IDM_FILE_COPYCOLUMNTEXT "¸´ÖÆµ±Ç°Ñ¡ÖÐµÄÏîÄ¿µÄÎÄ±¾"
 END
 
@@ -1005,14 +1124,16 @@ BEGIN
     IDM_TAB_LOCKTAB         "±£³ÖÑ¡ÖÐµÄ±êÇ©Ò³²»ÄÜ±»¹Ø±Õ"
     IDM_TAB_REFRESH         "Ë¢ÐÂÑ¡ÖÐµÄ±êÇ©Ò³µÄÄÚÈÝ"
     IDM_TAB_CLOSETAB        "¹Ø±ÕÑ¡ÖÐµÄ±êÇ©Ò³"
-    IDM_TAB_LOCKTABANDADDRESS "±£³ÖÑ¡ÖÐµÄ±êÇ©Ò³²»ÄÜ±»¹Ø±Õ,Í¬Ê±±£³Ö±êÇ©Ò³µÄµØÖ·²»ÄÜ±»¸Ä±ä"
+    IDM_TAB_LOCKTABANDADDRESS 
+                            "±£³ÖÑ¡ÖÐµÄ±êÇ©Ò³²»ÄÜ±»¹Ø±Õ,Í¬Ê±±£³Ö±êÇ©Ò³µÄµØÖ·²»ÄÜ±»¸Ä±ä"
 END
 
 STRINGTABLE 
 BEGIN
     IDM_ACTIONS_SPLITFILE   "°ÑÑ¡ÖÐµÄÎÄ¼þ·Ö¸îÎª¶à¸öÐ¡ÎÄ¼þ"
     IDM_ACTIONS_MERGEFILES  "»¹Î´ÊµÏÖ"
-    IDM_ACTIONS_DESTROYFILES "³¹µ×É¾³ýÑ¡ÖÐµÄÎÄ¼þ,Ê¹µÃËûÃÇ²»ÄÜ±»»Ö¸´."
+    IDM_ACTIONS_DESTROYFILES 
+                            "³¹µ×É¾³ýÑ¡ÖÐµÄÎÄ¼þ,Ê¹µÃËûÃÇ²»ÄÜ±»»Ö¸´."
     IDM_ACTIONS_NEWFOLDER   "´´½¨ÐÂÎÄ¼þ¼Ð"
 END
 
@@ -1153,13 +1274,16 @@ BEGIN
     IDS_COLUMN_DESCRIPTION_REALSIZE "ÎÄ¼þÎïÀí´óÐ¡"
     IDS_COLUMN_DESCRIPTION_SHORTNAME "DOS 8.3 ¶ÌÎÄ¼þÃû"
     IDS_COLUMN_DESCRIPTION_OWNER "ÎÄ¼þËùÓÐÕß"
-    IDS_COLUMN_DESCRIPTION_PRODUCTNAME "¿ÉÖ´ÐÐ³ÌÐòµÄ²úÆ·Ãû"
+    IDS_COLUMN_DESCRIPTION_PRODUCTNAME 
+                            "¿ÉÖ´ÐÐ³ÌÐòµÄ²úÆ·Ãû"
     IDS_COLUMN_DESCRIPTION_COMPANY "¿ÉÖ´ÐÐ³ÌÐòµÄ¹«Ë¾Ãû"
     IDS_COLUMN_DESCRIPTION_DESCRIPTION "ÎÄ¼þÃèÊö"
-    IDS_COLUMN_DESCRIPTION_FILEVERSION "¿ÉÖ´ÐÐÎÄ¼þ»òÕß¶¯Ì¬Á´½Ó¿âµÄ°æ±¾ÐÅÏ¢"
+    IDS_COLUMN_DESCRIPTION_FILEVERSION 
+                            "¿ÉÖ´ÐÐÎÄ¼þ»òÕß¶¯Ì¬Á´½Ó¿âµÄ°æ±¾ÐÅÏ¢"
     IDS_COLUMN_DESCRIPTION_PRODUCTVERSION "²úÆ·°æ±¾ºÅ"
     IDS_COLUMN_DESCRIPTION_SHORTCUTTO "Target associated with a shortcut"
-    IDS_COLUMN_DESCRIPTION_HARDLINKS "ÎÄ¼þ°ó¶¨µÄÓ²Á´½ÓÊý"
+    IDS_COLUMN_DESCRIPTION_HARDLINKS 
+                            "ÎÄ¼þ°ó¶¨µÄÓ²Á´½ÓÊý"
     IDS_COLUMN_DESCRIPTION_EXTENSION "ÎÄ¼þÀ©Õ¹Ãû"
 END
 
@@ -1172,15 +1296,18 @@ BEGIN
     IDS_COLUMN_DESCRIPTION_AUTHOR "ÎÄ¼þµÄ×÷Õß"
     IDS_COLUMN_DESCRIPTION_KEYWORDS "ÎÄ¼þµÄ¹Ø¼ü×Ö"
     IDS_COLUMN_DESCRIPTION_COMMENT "ÎÄ¼þµÄ×¢ÊÍ"
-    IDS_COLUMN_DESCRIPTION_CAMERAMODEL "Í¼ÏñÎÄ¼þÏà¹ØµÄÏà»úÐÍºÅ"
+    IDS_COLUMN_DESCRIPTION_CAMERAMODEL 
+                            "Í¼ÏñÎÄ¼þÏà¹ØµÄÏà»úÐÍºÅ"
     IDS_COLUMN_DESCRIPTION_DATETAKEN "ÕÕÆ¬ÅÄÉãÊ±¼ä"
     IDS_COLUMN_DESCRIPTION_WIDTH "Í¼Ïñ¿í¶È"
     IDS_COLUMN_DESCRIPTION_HEIGHT "Í¼Ïñ¸ß¶È"
     IDS_COLUMN_DESCRIPTION_TOTALSIZE "Çý¶¯Æ÷µÄ×ÜÈÝÁ¿"
     IDS_COLUMN_DESCRIPTION_FREESPACE "Çý¶¯Æ÷ÉÏµÄ¿ÉÓÃ¿Õ¼ä"
     IDS_COLUMN_DESCRIPTION_FILESYSTEM "Çý¶¯Æ÷ÉÏµÄÎÄ¼þÏµÍ³"
-    IDS_COLUMN_DESCRIPTION_NUMPRINTERDOCUMENTS "´òÓ¡»úÖÐµÄ´ý´òÓ¡ÎÄµµÊý"
-    IDS_COLUMN_DESCRIPTION_PRINTERCOMMENTS "´òÓ¡»úµÄ×¢ÊÍ"
+    IDS_COLUMN_DESCRIPTION_NUMPRINTERDOCUMENTS 
+                            "´òÓ¡»úÖÐµÄ´ý´òÓ¡ÎÄµµÊý"
+    IDS_COLUMN_DESCRIPTION_PRINTERCOMMENTS 
+                            "´òÓ¡»úµÄ×¢ÊÍ"
 END
 
 STRINGTABLE 
@@ -1197,10 +1324,17 @@ BEGIN
     IDS_ERR_FILEMANAGERSETTING 
                             "Error encountered while changing default file manager status. Please ensure you have administrator privileges."
     IDS_BOOKMARK_DELETE     "Are you sure you want to delete this bookmark?"
+    IDS_APPLICATIONBUTTON_DELETE 
+                            "Are you sure you want to delete this application button?"
+    IDS_VIEW_EXTRALARGEICONS "Extra Large Icons"
+    IDS_VIEW_LARGEICONS     "Large Icons"
+    IDS_VIEW_MEDIUMICONS    "Medium Icons"
+    IDS_VIEW_ICONS          "Icons"
 END
 
 STRINGTABLE 
 BEGIN
+    IDS_VIEW_SMALLICONS     "Small Icons"
     IDS_COLUMN_NAME_NAME    "Ãû³Æ"
     IDS_COLUMN_NAME_TYPE    "ÀàÐÍ"
     IDS_COLUMN_NAME_SIZE    "´óÐ¡"
@@ -1248,6 +1382,14 @@ BEGIN
     IDS_COLUMN_NAME_PRINTERCOMMENTS "±¸×¢"
     IDS_COLUMN_NAME_PRINTERLOCATION "Î»ÖÃ"
     IDS_COLUMN_NAME_NETWORKADAPTER_STATUS "×´Ì¬"
+    IDS_VIEW_LIST           "List"
+    IDS_VIEW_DETAILS        "Details"
+    IDS_VIEW_THUMBNAILS     "Thumbnails"
+    IDS_VIEW_TILES          "Tiles"
+    IDS_COLUMN_DESCRIPTION_BITRATE "Bit rate"
+    IDS_COLUMN_NAME_BITRATE "Bit rate"
+    IDS_COLUMN_NAME_COPYRIGHT "Copyright"
+    IDS_COLUMN_NAME_DURATION "Duration"
 END
 
 STRINGTABLE 
@@ -1268,6 +1410,74 @@ STRINGTABLE
 BEGIN
     IDM_HEADER_MORE         "Select additional columns to show."
     IDM_FILE_CLONEWINDOW    "Clones the current window"
+    IDM_DW_CHANGEDETAILS    "Changes the details shown within the display window"
+    IDM_DW_HIDEDISPLAYWINDOW "Hides the Display Window"
+    IDM_GROUPBY_ASCENDING   "Sorts groups in increasing order"
+    IDM_GROUPBY_DESCENDING  "Sorts groups in decreasing order"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_FILE_COPYUNIVERSALFILEPATHS 
+                            "Copies the universal paths of all selected items"
+    IDM_TOOLS_SEARCHFORFILES "Search for files"
+    IDM_TOOLS_CUSTOMIZECOLORS "Customizes the colors used within the listview"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TOOLS_ADJUSTCOLORFILTERING "Configures color filtering"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_NAME_PROTECTED "Protected"
+    IDS_COLUMN_NAME_RATING  "Rating"
+    IDS_COLUMN_NAME_ALBUMARTIST "Album artist"
+    IDS_COLUMN_NAME_ALBUM   "Album"
+    IDS_COLUMN_NAME_BEATSPERMINUTE "Beats-per-minute"
+    IDS_COLUMN_NAME_COMPOSER "Composer"
+    IDS_COLUMN_NAME_CONDUCTOR "Conductor"
+    IDS_COLUMN_NAME_DIRECTOR "Director"
+    IDS_COLUMN_NAME_GENRE   "Genre"
+    IDS_COLUMN_NAME_LANGUAGE "Language"
+    IDS_COLUMN_NAME_BROADCASTDATE "Broadcast date"
+    IDS_COLUMN_NAME_CHANNEL "Channel"
+    IDS_COLUMN_NAME_STATIONNAME "Station name"
+    IDS_COLUMN_NAME_MOOD    "Mood"
+    IDS_COLUMN_NAME_PARENTALRATING "Parental rating"
+    IDS_COLUMN_NAME_PARENTALRATINGREASON "Parental rating reason"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_COLUMN_NAME_PERIOD  "Period"
+    IDS_COLUMN_NAME_PRODUCER "Producer"
+    IDS_COLUMN_NAME_PUBLISHER "Publisher"
+    IDS_COLUMN_NAME_WRITER  "Writer"
+    IDS_COLUMN_NAME_YEAR    "Year"
+    IDS_COLUMN_NAME_PRINTERMODEL "Model"
+    IDS_COLORRULE_DELETE    "Are you sure you want to delete this color rule?"
+    IDS_WILDCARDDESELECTION "Wildcard Deselection"
+    IDS_EDITCOLORRULE       "Edit Color Rule"
+    IDS_STOP                "Stop"
+    IDS_SEARCHING           "Searching %s..."
+    IDS_GENERAL_NEWAPPLICATIONBUTTON "New Application Button"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_TOOLS_SEARCH        "Search for files"
+    IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT 
+                            "Set the layout of the current columns as the default layout"
+END
+
+STRINGTABLE 
+BEGIN
+    IDM_APP_OPEN            "Opens the selected application."
+    IDM_APP_NEW             "Creates a new application button"
+    IDM_APP_DELETE          "Deletes the selected application button"
+    IDM_APP_PROPERTIES      "Shows the properties of the selected application button"
 END
 
 #endif    // Chinese (P.R.C.) resources
