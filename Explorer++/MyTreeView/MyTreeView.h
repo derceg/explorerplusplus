@@ -69,7 +69,7 @@ private:
 	LRESULT CALLBACK	OnNotify(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 	LRESULT		OnSetCursor(void);
 
-	void		DirectoryModified(DWORD Action,TCHAR *szFullFileName);
+	void		DirectoryModified(DWORD dwAction,TCHAR *szFullFileName);
 
 	void		DirectoryAltered(void);
 	HTREEITEM	AddRoot(void);
@@ -108,6 +108,10 @@ private:
 	HTREEITEM	DetermineDriveSortedPosition(HTREEITEM hParent,TCHAR *szItemName);
 	HTREEITEM	DetermineItemSortedPosition(HTREEITEM hParent,TCHAR *szItem);
 
+	void		DirectoryAlteredAddFile(TCHAR *szFullFileName);
+	void		DirectoryAlteredRemoveFile(TCHAR *szFullFileName);
+	void		DirectoryAlteredRenameFile(TCHAR *szFullFileName);
+
 
 
 
@@ -124,7 +128,7 @@ private:
 	{
 		TCHAR szFileName[MAX_PATH];
 		DWORD dwAction;
-	} AlteredFiles_t;
+	} AlteredFile_t;
 
 	typedef struct
 	{
@@ -176,10 +180,10 @@ private:
 	DragTypes_t			m_DragType;
 
 	/* Directory modification. */
-	AlteredFiles_t		*m_pAlteredFiles;
-	int					m_iAlteredAllocation;
-	int					m_nAltered;
+	std::list<AlteredFile_t>	m_AlteredList;
+	std::list<AlteredFile_t>	m_AlteredTrackingList;
 	CRITICAL_SECTION	m_cs;
+	TCHAR				m_szAlteredOldFileName[MAX_PATH];
 
 	/* Hardware events. */
 	list<DriveEvent_t>	m_pDriveList;

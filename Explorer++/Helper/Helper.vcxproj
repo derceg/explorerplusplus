@@ -287,6 +287,7 @@
     <ClInclude Include="Helper.h" />
     <ClInclude Include="iDataObject.h" />
     <ClInclude Include="iDirectoryMonitor.h" />
+    <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="Registry.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

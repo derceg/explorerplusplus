@@ -97,7 +97,6 @@ HRESULT CFolderView::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 	m_nTotalItems = 0;
 
 	nItems = BrowseVirtualFolder(pidl);
-	//EnumFolderContents(szParsingPath);
 
 	CoTaskMemFree(pidl);
 
@@ -500,10 +499,10 @@ int CFolderView::BrowseVirtualFolder(TCHAR *szParsingName)
 
 int CFolderView::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 {
-	IShellFolder	*pDesktopFolder	= NULL;
-	IShellFolder	*pShellFolder		= NULL;
-	IEnumIDList		*pEnumIDList		= NULL;
-	LPITEMIDLIST	rgelt				= NULL;
+	IShellFolder	*pDesktopFolder = NULL;
+	IShellFolder	*pShellFolder = NULL;
+	IEnumIDList		*pEnumIDList = NULL;
+	LPITEMIDLIST	rgelt = NULL;
 	STRRET			str;
 	SHCONTF			EnumFlags;
 	TCHAR			szFileName[MAX_PATH];

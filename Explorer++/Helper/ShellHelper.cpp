@@ -652,7 +652,7 @@ IN list<std::wstring> FilenameList)
 
 	for each(auto Filename in FilenameList)
 	{
-		uSize += (Filename.length() + 1) * sizeof(TCHAR);
+		uSize += static_cast<UINT>((Filename.length() + 1) * sizeof(TCHAR));
 	}
 
 	/* The last string is double-null terminated. */
@@ -678,7 +678,7 @@ IN list<std::wstring> FilenameList)
 		pData = static_cast<LPBYTE>(pcidaData) + sizeof(DROPFILES) + uOffset;
 
 		memcpy(pData,Filename.c_str(),(Filename.length() + 1) * sizeof(TCHAR));
-		uOffset += (Filename.length() + 1) * sizeof(TCHAR);
+		uOffset += static_cast<UINT>((Filename.length() + 1) * sizeof(TCHAR));
 	}
 
 	/* Copy the last null byte. */
@@ -773,4 +773,54 @@ IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> pidlList)
 	*puSize = uSize;
 
 	return S_OK;
+}
+
+HRESULT BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder)
+{
+	IShellFolder *pDesktopFolder = NULL;
+	HRESULT hr;
+
+	*pShellFolder = NULL;
+
+	hr = SHGetDesktopFolder(&pDesktopFolder);
+
+	if(SUCCEEDED(hr))
+	{
+		if(IsNamespaceRoot(pidlDirectory))
+		{
+			hr = SHGetDesktopFolder(pShellFolder);
+		}
+		else
+		{
+			hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
+				IID_IShellFolder,(LPVOID *)pShellFolder);
+		}
+	}
+
+	return hr;
+}
+
+/* Returns TRUE if a path is a GUID;
+i.e. of the form:
+
+::{20D04FE0-3AEA-1069-A2D8-08002B30309D}
+(My Computer GUID, Windows 7)
+*/
+BOOL IsPathGUID(TCHAR *szPath)
+{
+	if(szPath == NULL)
+	{
+		return FALSE;
+	}
+
+	if(lstrlen(szPath) > 2)
+	{
+		if(szPath[0] == ':' &&
+			szPath[1] == ':')
+		{
+			return TRUE;
+		}
+	}
+
+	return FALSE;
 }

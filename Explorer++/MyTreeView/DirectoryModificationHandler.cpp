@@ -20,38 +20,191 @@
 
 void CMyTreeView::DirectoryAltered(void)
 {
-	static HTREEITEM	hRenamedItem;
-	int					i = 0;
-
 	EnterCriticalSection(&m_cs);
 
 	KillTimer(m_hTreeView,0);
 
-	for(i = 0;i < m_nAltered;i++)
+	/* Two basic situations to watch out for:
+	 - File is created, then renamed. Both notifications
+	 come in at the same time.
+	 - File is renamed twice in a row. Both notifications
+	 come in at the same time.
+	 - File created or renamed, and then deleted. Both
+	 notifications come in at the same time.
+	These situations may also happen multiple times
+	in one run. e.g. 5 files are created and renamed
+	before the first notification somes in. Therefore,
+	need to keep track of ALL events.
+	Notifications:
+	Created
+	Created
+	Renamed
+	Renamed
+	In this case, need to remember that the first two
+	notifications referred to files that didn't exist. */
+	for each(auto af in m_AlteredList)
 	{
-		switch(m_pAlteredFiles[i].dwAction)
+		switch(af.dwAction)
 		{
 			case FILE_ACTION_ADDED:
-				AddItem(m_pAlteredFiles[i].szFileName);
+				DirectoryAlteredAddFile(af.szFileName);
+				break;
+
+			/* The modified notification does not need
+			to be handled in any way. File size/date/attribute
+			changes have no effect within the treeview. */
+			case FILE_ACTION_MODIFIED:
 				break;
 
 			case FILE_ACTION_REMOVED:
-				RemoveItem(m_pAlteredFiles[i].szFileName);
+				DirectoryAlteredRemoveFile(af.szFileName);
 				break;
 
 			case FILE_ACTION_RENAMED_OLD_NAME:
-				hRenamedItem = LocateItemByPath(m_pAlteredFiles[i].szFileName,FALSE);
+				/* Store the old name. Since
+				FILE_ACTION_RENAMED_OLD_NAME/FILE_ACTION_RENAMED_NEW_NAME
+				always come in in paris, we only need to be able to store
+				one old filename. */
+				StringCchCopy(m_szAlteredOldFileName,
+					SIZEOF_ARRAY(m_szAlteredOldFileName),
+					af.szFileName);
 				break;
 
 			case FILE_ACTION_RENAMED_NEW_NAME:
-				RenameItem(hRenamedItem,m_pAlteredFiles[i].szFileName);
+				DirectoryAlteredRenameFile(af.szFileName);
 				break;
 		}
 	}
 
-	m_nAltered = 0;
+	m_AlteredList.clear();
 
 	LeaveCriticalSection(&m_cs);
+}
+
+/* TODO: Will have to change this. If AddItem() fails for some
+reason, then add the item to the tracking list. */
+void CMyTreeView::DirectoryAlteredAddFile(TCHAR *szFullFileName)
+{
+	LPITEMIDLIST pidlComplete = NULL;
+	HRESULT hr;
+
+	/* We'll use this as a litmus test to check whether or not
+	the file actually exists. */
+	hr = GetIdlFromParsingName(szFullFileName,&pidlComplete);
+
+	if(SUCCEEDED(hr))
+	{
+		AddItem(szFullFileName);
+		CoTaskMemFree(pidlComplete);
+	}
+	else
+	{
+		/* The file doesn't exist, so keep a record of it. */
+		AlteredFile_t af;
+
+		StringCchCopy(af.szFileName,SIZEOF_ARRAY(af.szFileName),szFullFileName);
+		af.dwAction = FILE_ACTION_ADDED;
+
+		m_AlteredTrackingList.push_back(af);
+	}
+}
+
+void CMyTreeView::DirectoryAlteredRemoveFile(TCHAR *szFullFileName)
+{
+	HTREEITEM hItem;
+
+	hItem = LocateItemByPath(szFullFileName,FALSE);
+
+	if(hItem != NULL)
+	{
+		RemoveItem(szFullFileName);
+	}
+	else
+	{
+		/* The file does not currently exist within
+		the treeview. It should appear in the tracking
+		list however. */
+		for(auto itr = m_AlteredTrackingList.begin();itr != m_AlteredTrackingList.end();itr++)
+		{
+			if(lstrcmp(szFullFileName,itr->szFileName) == 0)
+			{
+				/* Found the deleted item. Remove it from the tracking list. */
+				/* TODO: May need to do this multiple times.
+				e.g.
+				Created
+				Renamed
+				Removed
+
+				Both the created and renamed notifications need to
+				be removed from the queue. */
+				m_AlteredTrackingList.erase(itr);
+				break;
+			}
+		}
+	}
+}
+
+void CMyTreeView::DirectoryAlteredRenameFile(TCHAR *szFullFileName)
+{
+	HTREEITEM hItem;
+
+	/* Check if the file currently exists in the treeview. */
+	hItem = LocateItemByPath(m_szAlteredOldFileName,FALSE);
+
+	if(hItem != NULL)
+	{
+		RenameItem(hItem,szFullFileName);
+	}
+	else
+	{
+		BOOL bFound = FALSE;
+
+		/* Search through the queue of file addtions
+		and modifications for this file. */
+		for(auto itr = m_AlteredTrackingList.begin();itr != m_AlteredTrackingList.end();itr++)
+		{
+			if(lstrcmp(m_szAlteredOldFileName,itr->szFileName) == 0)
+			{
+				/* Item has been found. Change the name on the
+				notification and push it back into the list.
+				Note: The item must be pushed directly after the current item. */
+				StringCchCopy(itr->szFileName,SIZEOF_ARRAY(itr->szFileName),
+					szFullFileName);
+
+				for(auto itrAltered = m_AlteredList.begin();itrAltered != m_AlteredList.end();itrAltered++)
+				{
+					if(itrAltered->dwAction == FILE_ACTION_RENAMED_NEW_NAME &&
+						lstrcmp(itrAltered->szFileName,szFullFileName) == 0)
+					{
+						m_AlteredList.insert(++itrAltered,*itr);
+						break;
+					}
+				}
+
+				m_AlteredTrackingList.erase(itr);
+
+				bFound = TRUE;
+				break;
+			}
+		}
+
+		/* This may happen if a file has been
+		renamed twice in a row, or renamed then deleted.
+		e.g.
+		1.txt (Existing file) -> 2.txt
+		2.txt -> 3.txt
+		
+		Notifications:
+		old name/new name - 1.txt/2.txt
+		old name/new name - 2.txt/3.txt
+		Need to remember the original filename.
+		e.g. Need to be able to go from 1.txt to 3.txt. */
+		if(!bFound)
+		{
+			/* TODO: Change the filename on the renamed action and push it
+			back into the queue. */
+		}
+	}
 }
 
 void CMyTreeView::DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,
@@ -71,24 +224,19 @@ void *pData)
 	pMyTreeView->DirectoryModified(dwAction,szFullFileName);
 }
 
-void CMyTreeView::DirectoryModified(DWORD Action,TCHAR *szFullFileName)
+void CMyTreeView::DirectoryModified(DWORD dwAction,TCHAR *szFullFileName)
 {
 	EnterCriticalSection(&m_cs);
 
 	SetTimer(m_hTreeView,DIRECTORYMODIFIED_TIMER_ID,
 		DIRECTORYMODIFIED_TIMER_ELAPSE,NULL);
 
-	if(m_nAltered > (m_iAlteredAllocation - 1))
-	{
-		m_iAlteredAllocation += DEFAULT_ALTERED_ALLOCATION;
+	AlteredFile_t af;
 
-		m_pAlteredFiles = (AlteredFiles_t *)realloc(m_pAlteredFiles,
-		m_iAlteredAllocation * sizeof(AlteredFiles_t));
-	}
+	StringCchCopy(af.szFileName,SIZEOF_ARRAY(af.szFileName),szFullFileName);
+	af.dwAction = dwAction;
 
-	StringCchCopy(m_pAlteredFiles[m_nAltered].szFileName,MAX_PATH,szFullFileName);
-	m_pAlteredFiles[m_nAltered].dwAction = Action;
-	m_nAltered++;
+	m_AlteredList.push_back(af);
 
 	LeaveCriticalSection(&m_cs);
 }

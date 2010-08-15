@@ -67,11 +67,6 @@ HANDLE hIconsThread)
 
 	m_hThread = hIconsThread;
 
-	m_iAlteredAllocation = DEFAULT_ALTERED_ALLOCATION;
-	m_nAltered = 0;
-
-	m_pAlteredFiles = (AlteredFiles_t *)malloc(m_iAlteredAllocation * sizeof(AlteredFiles_t));
-
 	m_pDirMon = pDirMon;
 
 

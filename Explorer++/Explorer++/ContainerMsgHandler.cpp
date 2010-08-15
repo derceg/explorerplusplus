@@ -588,7 +588,7 @@ void CContainer::OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow
 
 void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
-	SFGAOF	uAttributes = SFGAO_FOLDER|SFGAO_STREAM|SFGAO_LINK;
+	SFGAOF uAttributes = SFGAO_FOLDER|SFGAO_STREAM|SFGAO_LINK;
 	LPITEMIDLIST pidlControlPanel = NULL;
 	HRESULT	hr;
 	BOOL bControlPanelParent = FALSE;

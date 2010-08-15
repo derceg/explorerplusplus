@@ -13,11 +13,8 @@
 
 #include "stdafx.h"
 #include <list>
-
-using namespace std;
-
-/* TODO: */
-extern HRESULT CreateEnumFormatEtc(list<FORMATETC> feList,IEnumFORMATETC **ppEnumFormatEtc);
+#include "iDataObject.h"
+#include "iEnumFormatEtc.h"
 
 struct DataObjectInternal
 {
@@ -55,12 +52,12 @@ public:
 
 private:
 
-	int							m_iRefCount;
+	LONG							m_lRefCount;
 
-	list<DataObjectInternal>	m_daoList;
+	std::list<DataObjectInternal>	m_daoList;
 
-	BOOL						m_bStartedOperation;
-	BOOL						m_bDoOpAsync;
+	BOOL							m_bStartedOperation;
+	BOOL							m_bDoOpAsync;
 };
 
 HRESULT CreateDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,IDataObject **pDataObject,int count)
@@ -72,7 +69,7 @@ HRESULT CreateDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,IDataObject **
 
 CDataObject::CDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,int count)
 {
-	m_iRefCount = 1;
+	m_lRefCount = 1;
 
 	for(int i = 0;i < count;i++)
 	{
@@ -121,20 +118,20 @@ HRESULT __stdcall CDataObject::QueryInterface(REFIID iid, void **ppvObject)
 
 ULONG __stdcall CDataObject::AddRef(void)
 {
-	return ++m_iRefCount;
+	return InterlockedIncrement(&m_lRefCount);
 }
 
 ULONG __stdcall CDataObject::Release(void)
 {
-	m_iRefCount--;
+	LONG lCount = InterlockedDecrement(&m_lRefCount);
 
-	if(m_iRefCount == 0)
+	if(lCount == 0)
 	{
 		delete this;
 		return 0;
 	}
 
-	return m_iRefCount;
+	return lCount;
 }
 
 
@@ -226,7 +223,7 @@ HRESULT __stdcall CDataObject::EnumFormatEtc(DWORD dwDirection,IEnumFORMATETC **
 {
 	if(dwDirection == DATADIR_GET)
 	{
-		list<FORMATETC> feList;
+		std::list<FORMATETC> feList;
 
 		for each(auto dao in m_daoList)
 		{

@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include <list>
+#include "iEnumFormatEtc.h"
 
 using namespace std;
 
@@ -41,7 +42,7 @@ private:
 	int				m_iNumFormats;
 };
 
-HRESULT CreateEnumFormatEtc(list<FORMATETC> feList,IEnumFORMATETC **ppEnumFormatEtc)
+HRESULT CreateEnumFormatEtc(std::list<FORMATETC> feList,IEnumFORMATETC **ppEnumFormatEtc)
 {
 	*ppEnumFormatEtc = new CEnumFormatEtc(feList);
 

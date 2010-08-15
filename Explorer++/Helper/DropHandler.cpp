@@ -150,6 +150,28 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 			if(pcida != NULL)
 			{
 				/* TODO: Copy the files. */
+				IShellFolder *pShellFolder = NULL;
+				HRESULT hr;
+
+				LPCITEMIDLIST pidlDirectory = HIDA_GetPIDLFolder(pcida);
+
+				hr = BindToShellFolder(pidlDirectory,&pShellFolder);
+
+				if(SUCCEEDED(hr))
+				{
+					LPCITEMIDLIST pidlItem = HIDA_GetPIDLItem(pcida,0);
+
+					IStorage *pStorage = NULL;
+
+					hr = pShellFolder->BindToStorage(pidlItem,NULL,IID_IStorage,(LPVOID *)&pStorage);
+
+					if(SUCCEEDED(hr))
+					{
+						pStorage->Release();
+					}
+
+					pShellFolder->Release();
+				}
 
 				GlobalUnlock(stg.hGlobal);
 			}

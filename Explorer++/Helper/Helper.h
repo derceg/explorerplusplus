@@ -124,6 +124,8 @@ HRESULT			GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,DWORD uParsingFlags)
 BOOL			MyExpandEnvironmentStrings(TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize);
 HRESULT			BuildHDropList(OUT DROPFILES **ppdf,OUT UINT *puSize,IN list<std::wstring> FilenameList);
 HRESULT			BuildShellIDList(OUT CIDA **ppcida,OUT UINT *puSize,IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> apidl);
+HRESULT			BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder);
+BOOL			IsPathGUID(TCHAR *szPath);
 
 /* Drag and drop helpers. */
 DWORD			DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,BOOL bDataAccept,BOOL bOnSameDrive);

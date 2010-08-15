@@ -356,8 +356,6 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 
 	GlobalUnlock(hglb);
 
-	/* TODO: Free the momory? */
-
 	stg[0].pUnkForRelease	= 0;
 	stg[0].hGlobal			= hglb;
 	stg[0].tymed			= TYMED_HGLOBAL;

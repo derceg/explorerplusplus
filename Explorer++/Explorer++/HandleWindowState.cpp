@@ -330,24 +330,30 @@ void CContainer::HandleMainWindowText(void)
 
 void CContainer::HandleComboBoxText(void)
 {
-	LPITEMIDLIST	pidl = NULL;
-	TCHAR			szAddressBarTitle[MAX_PATH];
-	SFGAOF			Attributes;
-	DWORD			uNameFlags;
+	LPITEMIDLIST pidl = NULL;
+	TCHAR szAddressBarTitle[MAX_PATH];
 
 	pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
-	Attributes = SFGAO_FILESYSTEM;
+	TCHAR szParsingPath[MAX_PATH];
 
-	/* Check if the specified folder is real or virtual. */
-	GetItemAttributes(pidl,&Attributes);
+	GetDisplayName(pidl,szParsingPath,SHGDN_FORPARSING);
 
-	if(Attributes & SFGAO_FILESYSTEM)
-		uNameFlags = SHGDN_FORPARSING;
+	/* If the path is a GUID (i.e. of the form
+	::{20D04FE0-3AEA-1069-A2D8-08002B30309D}), we'll
+	switch to showing the in folder name.
+	Otherwise, we'll show the full path.
+	Driven by the principle that GUID's should NOT
+	be shown directly to users. */
+	if(IsPathGUID(szParsingPath))
+	{
+		GetDisplayName(pidl,szAddressBarTitle,SHGDN_INFOLDER);
+	}
 	else
-		uNameFlags = SHGDN_INFOLDER;
-
-	GetDisplayName(pidl,szAddressBarTitle,uNameFlags);
+	{
+		StringCchCopy(szAddressBarTitle,SIZEOF_ARRAY(szAddressBarTitle),
+			szParsingPath);
+	}
 
 	SetComboBoxExTitleString(m_hAddressBar,pidl,szAddressBarTitle);
 

@@ -1466,78 +1466,122 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 
 		if(SUCCEEDED(hr))
 		{
-			FORMATETC ftc[1];
-			STGMEDIUM stg[1];
+			FORMATETC ftc[2];
+			STGMEDIUM stg[2];
 
-			ftc[0].cfFormat			= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST);
+			/* We'll export two formats:
+			CF_HDROP
+			CFSTR_SHELLIDLIST */
+			ftc[0].cfFormat			= CF_HDROP;
 			ftc[0].ptd				= NULL;
 			ftc[0].dwAspect			= DVASPECT_CONTENT;
 			ftc[0].lindex			= -1;
 			ftc[0].tymed			= TYMED_HGLOBAL;
 
-			CIDA *pcida = NULL;
-			//DROPFILES *pcida = NULL;
+			ftc[1].cfFormat			= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST);
+			ftc[1].ptd				= NULL;
+			ftc[1].dwAspect			= DVASPECT_CONTENT;
+			ftc[1].lindex			= -1;
+			ftc[1].tymed			= TYMED_HGLOBAL;
+
+			LPBYTE pData = NULL;
 			UINT uSize;
 
-			/* TODO: */
-			hr = BuildShellIDList(&pcida,&uSize,pidlDirectory,ItemList);
-			//hr = BuildHDropList(&pcida,&uSize,FilenameList);
+			HGLOBAL hglbHDrop = NULL;
+			DROPFILES *pdf = NULL;
 
-			if(SUCCEEDED(hr))
+			hr = BuildHDropList(&pdf,&uSize,FilenameList);
+
+			if(!SUCCEEDED(hr))
 			{
-				HGLOBAL hglb = NULL;
-
-				hglb = GlobalAlloc(GMEM_MOVEABLE,uSize);
-
-				if(hglb != NULL)
-				{
-					LPBYTE pData = (LPBYTE)GlobalLock(hglb);
-
-					memcpy(pData,pcida,uSize);
-
-					GlobalUnlock(hglb);
-
-					stg[0].pUnkForRelease	= 0;
-					stg[0].hGlobal			= hglb;
-					stg[0].tymed			= TYMED_HGLOBAL;
-
-					hr = CreateDataObject(ftc,stg,&pDataObject,1);
-
-					IAsyncOperation *pAsyncOperation = NULL;
-
-					pDataObject->QueryInterface(IID_IAsyncOperation,(void **)&pAsyncOperation);
-
-					pAsyncOperation->SetAsyncMode(TRUE);
-
-					hr = pDragSourceHelper->InitializeFromWindow(m_hActiveListView,&pt,pDataObject);
-
-					m_pActiveShellBrowser->DragStarted(pnmlv->iItem,&pnmlv->ptAction);
-					m_bDragging = TRUE;
-
-					/* Need to remember which tab started the drag (as
-					it may be different from the tab in which the drag
-					finishes). */
-					iDragStartObjectIndex = m_iObjectIndex;
-
-					DWORD dwEffect;
-
-					hr = DoDragDrop(pDataObject,pDropSource,DROPEFFECT_COPY|DROPEFFECT_MOVE|
-						DROPEFFECT_LINK,&dwEffect);
-
-					m_bDragging = FALSE;
-
-					/* The object that starts any drag may NOT be the
-					object that stops it (i.e. when a file is dragged
-					between tabs). Therefore, need to tell the object
-					that STARTED dragging that dragging has stopped. */
-					m_pShellBrowser[iDragStartObjectIndex]->DragStopped();
-
-					pDataObject->Release();
-
-					delete[] pcida;
-				}
+				/* TODO: Need to free everything before returning. */
+				return E_FAIL;
 			}
 
+			hglbHDrop = GlobalAlloc(GMEM_MOVEABLE,uSize);
+
+			if(hglbHDrop == NULL)
+			{
+				return E_FAIL;
+			}
+
+			pData = (LPBYTE)GlobalLock(hglbHDrop);
+
+			memcpy(pData,pdf,uSize);
+
+			GlobalUnlock(hglbHDrop);
+
+			stg[0].pUnkForRelease	= 0;
+			stg[0].hGlobal			= hglbHDrop;
+			stg[0].tymed			= TYMED_HGLOBAL;
+
+			delete[] pdf;
+
+			HGLOBAL hglbIDList = NULL;
+			CIDA *pcida = NULL;
+
+			hr = BuildShellIDList(&pcida,&uSize,pidlDirectory,ItemList);
+
+			if(!SUCCEEDED(hr))
+			{
+				/* TODO: Need to free everything before returning. */
+				return E_FAIL;
+			}
+
+			hglbIDList = GlobalAlloc(GMEM_MOVEABLE,uSize);
+
+			if(hglbIDList == NULL)
+			{
+				return E_FAIL;
+			}
+
+			pData = (LPBYTE)GlobalLock(hglbIDList);
+
+			memcpy(pData,pcida,uSize);
+
+			GlobalUnlock(hglbIDList);
+
+			stg[1].pUnkForRelease	= 0;
+			stg[1].hGlobal			= hglbIDList;
+			stg[1].tymed			= TYMED_HGLOBAL;
+
+			delete[] pcida;
+			
+			hr = CreateDataObject(ftc,stg,&pDataObject,2);
+
+			/*IAsyncOperation *pAsyncOperation = NULL;
+
+			pDataObject->QueryInterface(IID_IAsyncOperation,(void **)&pAsyncOperation);
+
+			pAsyncOperation->SetAsyncMode(TRUE);*/
+
+			hr = pDragSourceHelper->InitializeFromWindow(m_hActiveListView,&pt,pDataObject);
+
+			m_pActiveShellBrowser->DragStarted(pnmlv->iItem,&pnmlv->ptAction);
+			m_bDragging = TRUE;
+
+			/* Need to remember which tab started the drag (as
+			it may be different from the tab in which the drag
+			finishes). */
+			iDragStartObjectIndex = m_iObjectIndex;
+
+			DWORD dwEffect;
+
+			hr = DoDragDrop(pDataObject,pDropSource,DROPEFFECT_COPY|DROPEFFECT_MOVE|
+				DROPEFFECT_LINK,&dwEffect);
+
+			m_bDragging = FALSE;
+
+			/* The object that starts any drag may NOT be the
+			object that stops it (i.e. when a file is dragged
+			between tabs). Therefore, need to tell the object
+			that STARTED dragging that dragging has stopped. */
+			m_pShellBrowser[iDragStartObjectIndex]->DragStopped();
+
+			GlobalFree(hglbHDrop);
+			GlobalFree(hglbIDList);
+
+			pDataObject->Release();
 			pDropSource->Release();
 		}
 
