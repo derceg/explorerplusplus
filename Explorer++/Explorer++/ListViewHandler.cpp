@@ -1549,12 +1549,13 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 			
 			hr = CreateDataObject(ftc,stg,&pDataObject,2);
 
-			/* TODO: */
-			/*IAsyncOperation *pAsyncOperation = NULL;
+			IAsyncOperation *pAsyncOperation = NULL;
 
 			pDataObject->QueryInterface(IID_IAsyncOperation,(void **)&pAsyncOperation);
 
-			pAsyncOperation->SetAsyncMode(TRUE);*/
+			/* Docs mention setting the argument to VARIANT_TRUE/VARIANT_FALSE.
+			But the argument is a BOOL, so we'll go with regular TRUE/FALSE. */
+			pAsyncOperation->SetAsyncMode(TRUE);
 
 			hr = pDragSourceHelper->InitializeFromWindow(m_hActiveListView,&pt,pDataObject);
 
@@ -1579,8 +1580,26 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 			that STARTED dragging that dragging has stopped. */
 			m_pShellBrowser[iDragStartObjectIndex]->DragStopped();
 
-			GlobalFree(hglbHDrop);
-			GlobalFree(hglbIDList);
+			BOOL bInAsyncOp;
+
+			hr = pAsyncOperation->InOperation(&bInAsyncOp);
+
+			/* TODO: */
+			if(!SUCCEEDED(hr) ||
+				bInAsyncOp == FALSE)
+			{
+				/* Data extraction has finished synchronously. */
+			}
+			else
+			{
+				/* Data extraction is continuing asynchronously. */
+			}
+
+			pAsyncOperation->Release();
+
+			/* TODO: */
+			//GlobalFree(hglbHDrop);
+			//GlobalFree(hglbIDList);
 
 			pDataObject->Release();
 			pDropSource->Release();

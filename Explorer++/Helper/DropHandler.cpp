@@ -609,6 +609,7 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
 
 					ppfi->pDropFilesCallback	= m_pDropFilesCallback;
 					ppfi->pPastedFileList		= new list<PastedFile_t>(*pPastedFileList);
+					ppfi->dwEffect				= bCopy == TRUE ? DROPEFFECT_COPY : DROPEFFECT_MOVE;
 					ppfi->pt.x					= m_ptl.x;
 					ppfi->pt.y					= m_ptl.y;
 
@@ -657,27 +658,28 @@ DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter)
 {
 	PastedFilesInfo_t *ppfi = NULL;
 	CDropHandler *pdh = NULL;
-	DWORD dwRet;
+	HRESULT hr;
 
 	ppfi = (PastedFilesInfo_t *)lpParameter;
 
 	pdh = (CDropHandler *)ppfi->pDropHandler;
 
 	CoInitializeEx(0,COINIT_APARTMENTTHREADED);
-	dwRet = pdh->CopyDroppedFilesInternalAsync(ppfi);
+	hr = pdh->CopyDroppedFilesInternalAsync(ppfi);
 	CoUninitialize();
 
-	ppfi->pao->EndOperation(S_OK,NULL,DROPEFFECT_MOVE);
+	ppfi->pao->EndOperation(hr,NULL,ppfi->dwEffect);
 
 	ppfi->pao->Release();
 
 	free((void *)ppfi);
 
-	return dwRet;
+	return 0;
 }
 
-DWORD CDropHandler::CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
+HRESULT CDropHandler::CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
 {
+	HRESULT hr = E_FAIL;
 	int iReturn;
 	
 	iReturn = SHFileOperation(&ppfi->shfo);
@@ -721,13 +723,15 @@ DWORD CDropHandler::CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
 
 		if(ppfi->pDropFilesCallback != NULL)
 			ppfi->pDropFilesCallback->OnDropFile(ppfi->pPastedFileList,&ppfi->pt);
+
+		hr = S_OK;
 	}
 
 	delete ppfi->pPastedFileList;
 	free((void *)ppfi->shfo.pFrom);
 	free((void *)ppfi->shfo.pTo);
 
-	return 0;
+	return hr;
 }
 
 void CDropHandler::CreateShortcutToDroppedFile(TCHAR *szFullFileName)

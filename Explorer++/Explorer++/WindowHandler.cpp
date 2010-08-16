@@ -59,9 +59,6 @@ void CContainer::CreateFolderControls(void)
 
 	m_hTreeView = CreateTreeView(m_hHolder,TreeViewStyles);
 
-	/* TODO: Held off until next version due to time constraints. */
-	//TreeView_SetItemHeight(m_hTreeView, TreeView_GetItemHeight(m_hTreeView) + 3);
-
 	SetWindowTheme(m_hTreeView,L"Explorer",NULL);
 
 	SetWindowLongPtr(m_hTreeView,GWL_EXSTYLE,WS_EX_CLIENTEDGE);
@@ -184,12 +181,12 @@ void CContainer::CreateMainToolbar(void)
 		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
 	/* The icons to be used are all 16 x 16. */
-	SendMessage(m_hMainToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
+	SendMessage(m_hMainToolbar,TB_SETBITMAPSIZE,0,MAKELONG(24,24));//MAKELONG(16,16));
 	
 	SendMessage(m_hMainToolbar,TB_BUTTONSTRUCTSIZE,(WPARAM)sizeof(TBBUTTON),0);
 
-	himl = ImageList_Create(16,16,ILC_COLOR32 | ILC_MASK,0,47);
-	hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
+	himl = ImageList_Create(24,24,ILC_COLOR32 | ILC_MASK,0,47);
+	hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES_LARGE));
 
 	ImageList_Add(himl,hb,NULL);
 

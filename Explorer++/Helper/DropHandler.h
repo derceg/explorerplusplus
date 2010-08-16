@@ -36,6 +36,7 @@ typedef struct
 	SHFILEOPSTRUCT		shfo;
 	IDropFilesCallback	*pDropFilesCallback;
 	list<PastedFile_t>	*pPastedFileList;
+	DWORD				dwEffect;
 	POINT				pt;
 
 	IAsyncOperation		*pao;
@@ -53,7 +54,7 @@ public:
 	CDropHandler();
 	~CDropHandler();
 
-	DWORD	CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi);
+	HRESULT	CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi);
 
 private:
 

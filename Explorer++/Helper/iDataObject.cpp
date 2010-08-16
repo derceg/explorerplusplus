@@ -84,7 +84,16 @@ CDataObject::CDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,int count)
 
 CDataObject::~CDataObject()
 {
-
+	/* TODO: */
+	for each(auto dao in m_daoList)
+	{
+		switch(dao.stg.tymed)
+		{
+		case TYMED_HGLOBAL:
+			GlobalFree(dao.stg.hGlobal);
+			break;
+		}
+	}
 }
 
 /* IUnknown interface members. */
@@ -137,10 +146,6 @@ ULONG __stdcall CDataObject::Release(void)
 
 HRESULT __stdcall CDataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 {
-	SIZE_T AllocationSize;
-	PVOID pGlobal;
-	PVOID l_pGlobal;
-
 	if(QueryGetData(pFormatEtc) == DV_E_FORMATETC)
 	{
 		return DV_E_FORMATETC;
@@ -153,23 +158,51 @@ HRESULT __stdcall CDataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 		   dao.fe.dwAspect == pFormatEtc->dwAspect)
 		{
 			pMedium->tymed			= dao.stg.tymed;
-			pMedium->pUnkForRelease	= 0;
+			pMedium->pUnkForRelease	= NULL;
 
 			switch(dao.fe.tymed)
 			{
 			case TYMED_HGLOBAL:
-				AllocationSize = GlobalSize(dao.stg.hGlobal);
-				l_pGlobal = GlobalLock(dao.stg.hGlobal);
+				{
+					SIZE_T AllocationSize;
+					PVOID pGlobal = NULL;
+					PVOID l_pGlobal = NULL;
 
-				pGlobal = GlobalAlloc(GMEM_FIXED,AllocationSize);
+					AllocationSize = GlobalSize(dao.stg.hGlobal);
+					l_pGlobal = GlobalLock(dao.stg.hGlobal);
 
-				if(pGlobal == NULL)
-					return STG_E_MEDIUMFULL;
+					pGlobal = GlobalAlloc(GMEM_FIXED,AllocationSize);
 
-				memcpy(pGlobal,l_pGlobal,AllocationSize);
+					if(pGlobal == NULL)
+						return STG_E_MEDIUMFULL;
 
-				GlobalUnlock(l_pGlobal);
-				pMedium->hGlobal = pGlobal;
+					memcpy(pGlobal,l_pGlobal,AllocationSize);
+
+					GlobalUnlock(l_pGlobal);
+					pMedium->hGlobal = pGlobal;
+				}
+				break;
+
+			/* Needed for IDragSourceHelper::InitializeFromWindow(). */
+			case TYMED_ISTREAM:
+				{
+					IStream *pStream;
+					STATSTG statstg;
+					PVOID pGlobal = NULL;
+
+					dao.stg.pstm->Stat(&statstg,STATFLAG_DEFAULT);
+
+					pGlobal = GlobalAlloc(GMEM_MOVEABLE,statstg.cbSize.LowPart);
+
+					if(pGlobal == NULL)
+						return STG_E_MEDIUMFULL;
+
+					CreateStreamOnHGlobal(pGlobal,TRUE,&pStream);
+
+					dao.stg.pstm->Clone(&pStream);
+
+					pMedium->pstm = pStream;
+				}
 				break;
 
 			default:
@@ -253,6 +286,7 @@ HRESULT __stdcall CDataObject::EnumDAdvise(IEnumSTATDATA **ppenumAdvise)
 
 HRESULT __stdcall CDataObject::EndOperation(HRESULT hResult,IBindCtx *pbcReserved,DWORD dwEffects)
 {
+	Release();
 	return S_OK;
 }
 
