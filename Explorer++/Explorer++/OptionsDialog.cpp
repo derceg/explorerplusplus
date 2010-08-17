@@ -475,6 +475,8 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED,BST_CHECKED);
 				if(m_bOneClickActivate)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK,BST_CHECKED);
+				if(m_bOverwriteExistingFilesConfirmation)
+					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,BST_CHECKED);
 				if(m_bShowFolderSizes)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES,BST_CHECKED);
 				if(m_bDisableFolderSizesNetworkRemovable)
@@ -519,6 +521,7 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 			case IDC_SETTINGS_CHECK_LINK:
 			case IDC_SETTINGS_CHECK_INSERTSORTED:
 			case IDC_SETTINGS_CHECK_SINGLECLICK:
+			case IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION:
 			case IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE:
 			case IDC_SETTINGS_CHECK_ZIPFILES:
 			case IDC_SETTINGS_CHECK_FRIENDLYDATES:
@@ -576,6 +579,9 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							== BST_CHECKED);
 
 						m_bOneClickActivate = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK)
+							== BST_CHECKED);
+
+						m_bOverwriteExistingFilesConfirmation = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION)
 							== BST_CHECKED);
 
 						m_bShowFolderSizes = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES)

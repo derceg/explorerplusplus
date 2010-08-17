@@ -99,6 +99,7 @@ will need to be changed correspondingly. */
 #define HASH_SHOWTASKBARTHUMBNAILS	2202555045
 #define HASH_SYNCHRONIZETREEVIEW	1687787660
 #define HASH_TVAUTOEXPAND			1228854897
+#define HASH_OVERWRITEEXISTINGFILESCONFIRMATION	1625342835
 
 typedef struct
 {
@@ -399,6 +400,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("NewTabDirectory"),m_DefaultTabDirectory);
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivate"),EncodeBoolValue(m_bOneClickActivate));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OverwriteExistingFilesConfirmation"),EncodeBoolValue(m_bOverwriteExistingFilesConfirmation));
 
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	_itow_s(m_ReplaceExplorerMode,szValue,SIZEOF_ARRAY(szValue),10);
@@ -2678,6 +2681,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_ONECLICKACTIVATE:
 		m_bOneClickActivate = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_OVERWRITEEXISTINGFILESCONFIRMATION:
+		m_bOverwriteExistingFilesConfirmation = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_REPLACEEXPLORERMODE:
