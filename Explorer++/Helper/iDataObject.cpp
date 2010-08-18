@@ -52,6 +52,8 @@ public:
 
 private:
 
+	void	DuplicateStorageMedium(STGMEDIUM *pstgDest,STGMEDIUM *pstgSrc,FORMATETC *pftc);
+
 	LONG							m_lRefCount;
 
 	std::list<DataObjectInternal>	m_daoList;
@@ -84,15 +86,9 @@ CDataObject::CDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,int count)
 
 CDataObject::~CDataObject()
 {
-	/* TODO: */
 	for each(auto dao in m_daoList)
 	{
-		switch(dao.stg.tymed)
-		{
-		case TYMED_HGLOBAL:
-			GlobalFree(dao.stg.hGlobal);
-			break;
-		}
+		ReleaseStgMedium(&dao.stg);
 	}
 }
 
@@ -146,6 +142,11 @@ ULONG __stdcall CDataObject::Release(void)
 
 HRESULT __stdcall CDataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 {
+	if(pFormatEtc == NULL || pMedium == NULL)
+	{
+		return E_INVALIDARG;
+	}
+
 	if(QueryGetData(pFormatEtc) == DV_E_FORMATETC)
 	{
 		return DV_E_FORMATETC;
@@ -157,64 +158,60 @@ HRESULT __stdcall CDataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 		   dao.fe.tymed & pFormatEtc->tymed &&
 		   dao.fe.dwAspect == pFormatEtc->dwAspect)
 		{
-			pMedium->tymed			= dao.stg.tymed;
-			pMedium->pUnkForRelease	= NULL;
-
-			switch(dao.fe.tymed)
-			{
-			case TYMED_HGLOBAL:
-				{
-					SIZE_T AllocationSize;
-					PVOID pGlobal = NULL;
-					PVOID l_pGlobal = NULL;
-
-					AllocationSize = GlobalSize(dao.stg.hGlobal);
-					l_pGlobal = GlobalLock(dao.stg.hGlobal);
-
-					pGlobal = GlobalAlloc(GMEM_FIXED,AllocationSize);
-
-					if(pGlobal == NULL)
-						return STG_E_MEDIUMFULL;
-
-					memcpy(pGlobal,l_pGlobal,AllocationSize);
-
-					GlobalUnlock(l_pGlobal);
-					pMedium->hGlobal = pGlobal;
-				}
-				break;
-
-			/* Needed for IDragSourceHelper::InitializeFromWindow(). */
-			case TYMED_ISTREAM:
-				{
-					IStream *pStream;
-					STATSTG statstg;
-					PVOID pGlobal = NULL;
-
-					dao.stg.pstm->Stat(&statstg,STATFLAG_DEFAULT);
-
-					pGlobal = GlobalAlloc(GMEM_MOVEABLE,statstg.cbSize.LowPart);
-
-					if(pGlobal == NULL)
-						return STG_E_MEDIUMFULL;
-
-					CreateStreamOnHGlobal(pGlobal,TRUE,&pStream);
-
-					dao.stg.pstm->Clone(&pStream);
-
-					pMedium->pstm = pStream;
-				}
-				break;
-
-			default:
-				return DV_E_FORMATETC;
-				break;
-			}
-
+			DuplicateStorageMedium(pMedium,&dao.stg,&dao.fe);
 			return S_OK;
 		}
 	}
 
 	return DV_E_FORMATETC;
+}
+
+void CDataObject::DuplicateStorageMedium(STGMEDIUM *pstgDest,STGMEDIUM *pstgSrc,FORMATETC *pftc)
+{
+	pstgDest->tymed = pstgSrc->tymed;
+	pstgDest->pUnkForRelease = NULL;
+
+	if(pstgSrc->pUnkForRelease != NULL)
+	{
+		pstgDest->pUnkForRelease = pstgSrc->pUnkForRelease;
+		pstgSrc->pUnkForRelease->AddRef();
+	}
+
+	switch(pftc->tymed)
+	{
+	case TYMED_HGLOBAL:
+		pstgDest->hGlobal = (HGLOBAL)OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,NULL);
+		break;
+
+	case TYMED_FILE:
+		pstgDest->lpszFileName = (LPOLESTR)OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,NULL);
+		break;
+
+	case TYMED_ISTREAM:
+		pstgDest->pstm = pstgSrc->pstm;
+		pstgSrc->pstm->AddRef();
+		break;
+
+	case TYMED_ISTORAGE:
+		pstgDest->pstg = pstgSrc->pstg;
+		pstgSrc->pstg->AddRef();
+		break;
+
+	case TYMED_GDI:
+		pstgDest->hBitmap = (HBITMAP)OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,NULL);
+		break;
+
+	case TYMED_MFPICT:
+		pstgDest->hMetaFilePict = (HMETAFILEPICT)OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,NULL);
+		break;
+
+	case TYMED_ENHMF:
+		pstgDest->hEnhMetaFile = (HENHMETAFILE)OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,NULL);
+		break;
+
+	case TYMED_NULL:
+		break;
+	}
 }
 
 HRESULT __stdcall CDataObject::GetDataHere(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
@@ -224,6 +221,11 @@ HRESULT __stdcall CDataObject::GetDataHere(FORMATETC *pFormatEtc,STGMEDIUM *pMed
 
 HRESULT	__stdcall CDataObject::QueryGetData(FORMATETC *pFormatEtc)
 {
+	if(pFormatEtc == NULL)
+	{
+		return E_INVALIDARG;
+	}
+
 	for each(auto dao in m_daoList)
 	{
 		if(dao.fe.cfFormat == pFormatEtc->cfFormat &&
@@ -239,6 +241,11 @@ HRESULT	__stdcall CDataObject::QueryGetData(FORMATETC *pFormatEtc)
 
 HRESULT __stdcall CDataObject::GetCanonicalFormatEtc(FORMATETC *pFormatEtcIn,FORMATETC *pFormatEtcOut)
 {
+	if(pFormatEtcOut == NULL)
+	{
+		return E_INVALIDARG;
+	}
+
 	pFormatEtcOut->ptd = NULL;
 
 	return E_NOTIMPL;
@@ -246,7 +253,24 @@ HRESULT __stdcall CDataObject::GetCanonicalFormatEtc(FORMATETC *pFormatEtcIn,FOR
 
 HRESULT __stdcall CDataObject::SetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,BOOL fRelease)
 {
-	DataObjectInternal dao = {*pFormatEtc,*pMedium};
+	if(pFormatEtc == NULL || pMedium == NULL)
+	{
+		return E_INVALIDARG;
+	}
+
+	DataObjectInternal dao;
+
+	dao.fe = *pFormatEtc;
+
+	if(fRelease)
+	{
+		dao.stg = *pMedium;
+	}
+	else
+	{
+		DuplicateStorageMedium(&dao.stg,pMedium,pFormatEtc);
+	}
+
 	m_daoList.push_back(dao);
 
 	return S_OK;
@@ -254,6 +278,11 @@ HRESULT __stdcall CDataObject::SetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,
 
 HRESULT __stdcall CDataObject::EnumFormatEtc(DWORD dwDirection,IEnumFORMATETC **ppEnumFormatEtc)
 {
+	if(ppEnumFormatEtc == NULL)
+	{
+		return E_INVALIDARG;
+	}
+
 	if(dwDirection == DATADIR_GET)
 	{
 		std::list<FORMATETC> feList;
