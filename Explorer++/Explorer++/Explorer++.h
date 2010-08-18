@@ -864,7 +864,6 @@ private:
 
 	/* Listview selection file tests. */
 	void					BuildListViewFileSelectionList(HWND hListView,std::list<std::wstring> *pFileSelectionList);
-	HRESULT					BuildSelectionFileList(IBufferManager *pBufferManager);
 	HRESULT					TestListViewSelectionAttributes(SFGAOF *pItemAttributes);
 	HRESULT					TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes);	
 	HRESULT					GetSelectionAttributes(SFGAOF *pItemAttributes);

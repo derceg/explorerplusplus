@@ -31,7 +31,7 @@ public:
 
 private:
 
-	int			m_iRefCount;
+	LONG		m_lRefCount;
 	DragTypes_t	m_DragType;
 };
 
@@ -44,7 +44,7 @@ HRESULT CreateDropSource(IDropSource **ppDropSource,DragTypes_t DragType)
 
 CDropSource::CDropSource(DragTypes_t DragType)
 {
-	m_iRefCount	= 1;
+	m_lRefCount = 1;
 	m_DragType = DragType;
 }
 
@@ -61,7 +61,7 @@ HRESULT __stdcall CDropSource::QueryInterface(REFIID iid, void **ppvObject)
 	if(iid == IID_IDropSource ||
 		iid == IID_IUnknown)
 	{
-		*ppvObject=this;
+		*ppvObject = this;
 	}
 
 	if(*ppvObject)
@@ -75,20 +75,20 @@ HRESULT __stdcall CDropSource::QueryInterface(REFIID iid, void **ppvObject)
 
 ULONG __stdcall CDropSource::AddRef(void)
 {
-	return ++m_iRefCount;
+	return InterlockedIncrement(&m_lRefCount);
 }
 
 ULONG __stdcall CDropSource::Release(void)
 {
-	m_iRefCount--;
+	LONG lCount = InterlockedDecrement(&m_lRefCount);
 
-	if(m_iRefCount == 0)
+	if(lCount == 0)
 	{
 		delete this;
 		return 0;
 	}
 
-	return m_iRefCount;
+	return lCount;
 }
 
 

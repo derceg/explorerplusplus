@@ -30,40 +30,47 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Su Explorer++"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,189,96,50,14
-    CONTROL         207,IDC_ABOUT_STATIC_IMAGE,"Static",SS_BITMAP,4,4,235,87,WS_EX_STATICEDGE
+    DEFPUSHBUTTON   "OK",IDOK,212,146,50,14
+    CONTROL         231,IDC_ABOUT_STATIC_IMAGE,"Static",SS_BITMAP,0,0,16,14,WS_EX_STATICEDGE
     LTEXT           "Explorer++ Version %s (%s)",IDC_STATIC_VERSIONNUMBER,5,63,246,8
     LTEXT           "Copyright © 2005-2010 David Erceg",IDC_STATIC,5,91,118,8
     LTEXT           "This program is freeware and released under the GNU General Public License",IDC_STATIC,9,130,245,8
     CONTROL         "<a href=""http://www.explorerplusplus.com"">www.explorerplusplus.com</a>",IDC_SITELINK,
                     "SysLink",WS_TABSTOP,5,105,91,12
     LTEXT           "Build Date: %s",IDC_STATIC_BUILDDATE,5,77,246,8
-    CONTROL         "",-1,"Static",SS_ETCHEDHORZ,4,91,235,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,121,259,20
 END
 
 IDD_OPTIONS_FILESFOLDERS DIALOGEX 0, 0, 230, 213
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "File e Cartelle"
+CAPTION "Files and Folders"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    CONTROL         "Hide &protected operating system files",IDC_SETTINGS_CHECK_SYSTEMFILES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,7,135,10
     CONTROL         "Nascondi Estensioni file Conosciuti",IDC_SETTINGS_CHECK_EXTENSIONS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,9,125,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,20,78,10
+    CONTROL         "&Always hide the link (.lnk) extension",IDC_SETTINGS_CHECK_LINK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,33,131,10
+    CONTROL         "Insert ne&w items in their sorted positions",IDC_SETTINGS_CHECK_INSERTSORTED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,146,10
+    CONTROL         "&Single-click to open an item (point to select)",IDC_SETTINGS_CHECK_SINGLECLICK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,155,10
     CONTROL         "Mostra Dimensione Cartella",IDC_SETTINGS_CHECK_FOLDERSIZES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,20,103,10
-    CONTROL         "Mostra l'indirizzo nella Barra dei Titoli",IDC_SETTINGS_CHECK_TITLEPATH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,31,132,10
-    CONTROL         "Apri Cartella nella sua Linguetta",IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,42,117,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,71,10
     CONTROL         "Mostra tutte le dimensioni in Byte",IDC_SETTINGS_CHECK_SIZEBYTES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,53,122,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,98,10
+    CONTROL         "Handle &zip files",IDC_SETTINGS_CHECK_ZIPFILES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,63,10
     CONTROL         "Usa date facilitate",IDC_SETTINGS_CHECK_FRIENDLYDATES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,64,74,10
-    CONTROL         "Mostra info di sistema",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON,20,87,85,10
-    CONTROL         "Mostra informazioni personalizzate",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON,20,98,126,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,124,95,10
     CONTROL         "Mostra informazioni dei file:",IDC_OPTIONS_CHECK_SHOWINFOTIPS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,75,103,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,137,87,10
+    CONTROL         "Mostra info di sistema",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,150,83,10
+    CONTROL         "Mostra informazioni personalizzate",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON,19,161,83,10
+    CONTROL         "Disable folder sizes on removable and network drives",IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,85,185,10
 END
 
 IDD_OPTIONS_GENERAL DIALOGEX 0, 0, 230, 263
@@ -99,27 +106,26 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Cambia Attributi File"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,209,95,50,14
-    PUSHBUTTON      "Cancella",IDCANCEL,209,116,50,14
-    CONTROL         "",IDC_MODIFICATIONDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,28,62,13
     LTEXT           "Modifica data:",IDC_STATIC,7,29,46,8
-    LTEXT           "Per cambiare queste date, basta selezionarle una volta dalle seguenti impostazioni.",IDC_STATIC,7,4,179,16
+    CONTROL         "",IDC_MODIFICATIONDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,28,62,13
     CONTROL         "",IDC_MODIFICATIONTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,28,62,13
+    PUSHBUTTON      "Ripristina",IDC_MODIFICATION_RESET,209,28,50,13
     LTEXT           "Data Creazione:",IDC_STATIC,7,49,53,8
     CONTROL         "",IDC_CREATIONDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,48,62,13
     CONTROL         "",IDC_CREATIONTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,48,62,13
+    PUSHBUTTON      "Ripristina",IDC_CREATION_RESET,209,48,50,13
     LTEXT           "Data Accesso:",IDC_STATIC,7,71,47,8
     CONTROL         "",IDC_ACCESSDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,68,62,13
     CONTROL         "",IDC_ACCESSTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,68,62,13
-    PUSHBUTTON      "Ripristina",IDC_MODIFICATION_RESET,209,28,50,13
-    PUSHBUTTON      "Ripristina",IDC_CREATION_RESET,209,48,50,13
     PUSHBUTTON      "Ripristina",IDC_ACCESS_RESET,209,68,50,13
-    GROUPBOX        "Attributi",IDC_STATIC,7,91,193,51
     CONTROL         "Archiviato",IDC_CHECK_ARCHIVE,"Button",BS_AUTO3STATE | WS_TABSTOP,19,107,48,10
-    CONTROL         "Solo Lettura",IDC_CHECK_READONLY,"Button",BS_AUTO3STATE | WS_TABSTOP,19,125,55,10
     CONTROL         "Nascosto",IDC_CHECK_HIDDEN,"Button",BS_AUTO3STATE | WS_TABSTOP,82,107,45,10
-    CONTROL         "Sistema",IDC_CHECK_SYSTEM,"Button",BS_AUTO3STATE | WS_TABSTOP,82,125,41,10
     CONTROL         "Indice",IDC_CHECK_INDEXED,"Button",BS_AUTO3STATE | WS_TABSTOP,137,107,35,10
+    CONTROL         "Solo Lettura",IDC_CHECK_READONLY,"Button",BS_AUTO3STATE | WS_TABSTOP,19,125,55,10
+    CONTROL         "Sistema",IDC_CHECK_SYSTEM,"Button",BS_AUTO3STATE | WS_TABSTOP,82,125,41,10
+    DEFPUSHBUTTON   "OK",IDOK,209,95,50,14
+    PUSHBUTTON      "Cancella",IDCANCEL,209,116,50,14
+    GROUPBOX        "Attributi",IDC_STATIC,7,91,193,51
 END
 
 IDD_DESTROYFILES DIALOGEX 0, 0, 305, 228

@@ -35,7 +35,7 @@ private:
 	HRESULT __stdcall Reset(void);
 	HRESULT __stdcall Clone(IEnumFORMATETC **ppEnum);
 
-	int				m_iRefCount;
+	LONG			m_lRefCount;
 
 	list<FORMATETC>	m_feList;
 	int				m_iIndex;
@@ -51,9 +51,8 @@ HRESULT CreateEnumFormatEtc(std::list<FORMATETC> feList,IEnumFORMATETC **ppEnumF
 
 CEnumFormatEtc::CEnumFormatEtc(list<FORMATETC> feList)
 {
-	m_iRefCount		= 1;
-
-	m_iIndex		= 0;
+	m_lRefCount = 1;
+	m_iIndex = 0;
 
 	for each(auto fe in feList)
 	{
@@ -105,20 +104,20 @@ HRESULT __stdcall CEnumFormatEtc::QueryInterface(REFIID iid, void **ppvObject)
 
 ULONG __stdcall CEnumFormatEtc::AddRef(void)
 {
-	return ++m_iRefCount;
+	return InterlockedIncrement(&m_lRefCount);
 }
 
 ULONG __stdcall CEnumFormatEtc::Release(void)
 {
-	m_iRefCount--;
+	LONG lCount = InterlockedDecrement(&m_lRefCount);
 
-	if(m_iRefCount == 0)
+	if(lCount == 0)
 	{
 		delete this;
 		return 0;
 	}
 
-	return m_iRefCount;
+	return lCount;
 }
 
 
@@ -178,5 +177,5 @@ HRESULT __stdcall CEnumFormatEtc::Reset(void)
 
 HRESULT __stdcall CEnumFormatEtc::Clone(IEnumFORMATETC **ppEnum)
 {
-	return S_OK;
+	return E_NOTIMPL;
 }

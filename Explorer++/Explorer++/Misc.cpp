@@ -202,27 +202,6 @@ int CContainer::CreateListViewFileList(TCHAR *FileNameList,unsigned int BufferSi
 	return 0;
 }
 
-HRESULT CContainer::BuildSelectionFileList(IBufferManager *pBufferManager)
-{
-	TCHAR	FullFileName[MAX_PATH];
-	int		iItem = -1;
-	int		nProcessed = 0;
-
-	while((iItem = ListView_GetNextItem(m_hActiveListView,
-	iItem,LVNI_SELECTED)) != -1)
-	{
-		m_pActiveShellBrowser->QueryFullItemName(iItem,FullFileName);
-		pBufferManager->WriteListEntry(FullFileName);
-
-		nProcessed++;
-	}
-
-	if(nProcessed == 0)
-		return E_FAIL;
-
-	return S_OK;
-}
-
 void CContainer::ValidateLoadedSettings(void)
 {
 	if(m_TreeViewWidth <= 0)

@@ -1001,9 +1001,18 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 		}
 		else
 		{
-			SetWindowPos(m_hListView[(int)tcItem.lParam],NULL,IndentLeft,IndentTop,
-				MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - TAB_WINDOW_HEIGHT,
-				uFlags);
+			if(m_bShowTabBar)
+			{
+				SetWindowPos(m_hListView[(int)tcItem.lParam],NULL,IndentLeft,IndentTop,
+					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - TAB_WINDOW_HEIGHT,
+					uFlags);
+			}
+			else
+			{
+				SetWindowPos(m_hListView[(int)tcItem.lParam],NULL,IndentLeft,IndentTop,
+					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
+					uFlags);
+			}
 		}
 	}
 

@@ -30,15 +30,15 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "¹ØÓÚ Explorer++"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "È·¶¨",IDOK,189,96,50,14
-    CONTROL         207,IDC_ABOUT_STATIC_IMAGE,"Static",SS_BITMAP,4,4,235,87,WS_EX_STATICEDGE
+    DEFPUSHBUTTON   "È·¶¨",IDOK,212,146,50,14
+    CONTROL         231,IDC_ABOUT_STATIC_IMAGE,"Static",SS_BITMAP,0,0,16,14,WS_EX_STATICEDGE
     LTEXT           "Explorer++ Version %s (%s)",IDC_STATIC_VERSIONNUMBER,5,63,246,8
     LTEXT           "Copyright © 2005-2010 David Erceg",IDC_STATIC,5,91,118,8
     LTEXT           "This program is freeware and released under the GNU General Public License",IDC_STATIC,9,130,245,8
     CONTROL         "<a href=""http://www.explorerplusplus.com"">www.explorerplusplus.com</a>",IDC_SITELINK,
                     "SysLink",WS_TABSTOP,5,105,91,12
     LTEXT           "Build Date: %s",IDC_STATIC_BUILDDATE,5,77,246,8
-    CONTROL         "",-1,"Static",SS_ETCHEDHORZ,4,91,235,1
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,121,259,20
 END
 
 IDD_OPTIONS_FILESFOLDERS DIALOGEX 0, 0, 204, 134
