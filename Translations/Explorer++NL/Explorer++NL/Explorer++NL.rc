@@ -43,26 +43,34 @@ END
 
 IDD_OPTIONS_FILESFOLDERS DIALOGEX 0, 0, 230, 213
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Bestanden en Mappen"
+CAPTION "Files and Folders"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    CONTROL         "Hide &protected operating system files",IDC_SETTINGS_CHECK_SYSTEMFILES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,7,135,10
     CONTROL         "Verberg bestandsextensies",IDC_SETTINGS_CHECK_EXTENSIONS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,6,103,10
-    CONTROL         "Toon Mapgrootte",IDC_SETTINGS_CHECK_FOLDERSIZES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,17,71,10
-    CONTROL         "Toon het volledige pad in de Titelbalk",IDC_SETTINGS_CHECK_TITLEPATH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,28,134,10
-    CONTROL         "Open elke map in zijn eigen tabblad",IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,39,129,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,20,78,10
+    CONTROL         "&Always hide the link (.lnk) extension",IDC_SETTINGS_CHECK_LINK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,33,131,10
+    CONTROL         "Insert ne&w items in their sorted positions",IDC_SETTINGS_CHECK_INSERTSORTED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,146,10
+    CONTROL         "&Single-click to open an item (point to select)",IDC_SETTINGS_CHECK_SINGLECLICK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,155,10
+    CONTROL         "Toon Mapgrootte",IDC_SETTINGS_CHECK_FOLDERSIZES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,71,10
     CONTROL         "Toon alle bestandsgroottes in bytes",IDC_SETTINGS_CHECK_SIZEBYTES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,50,131,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,98,10
+    CONTROL         "Handle &zip files",IDC_SETTINGS_CHECK_ZIPFILES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,63,10
     CONTROL         "Gebruikersvriendelijke datumweergave",IDC_SETTINGS_CHECK_FRIENDLYDATES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,61,77,10
-    CONTROL         "Show system infotips",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON,15,83,83,10
-    CONTROL         "Show custom infotips",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON,15,94,83,10
-    CONTROL         "Show infotips for files:",IDC_OPTIONS_CHECK_SHOWINFOTIPS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,87,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,124,95,10
+    CONTROL         "S&how infotips for files:",IDC_OPTIONS_CHECK_SHOWINFOTIPS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,137,87,10
+    CONTROL         "Show s&ystem infotips",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,150,83,10
+    CONTROL         "Show &custom infotips",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON,19,161,83,10
+    CONTROL         "Disable folder sizes on removable and network drives",IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,85,185,10
 END
 
 IDD_OPTIONS_GENERAL DIALOGEX 0, 0, 230, 263

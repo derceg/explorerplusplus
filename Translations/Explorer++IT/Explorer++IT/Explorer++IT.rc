@@ -79,26 +79,26 @@ EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Generale"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "All'Avvio",IDC_STATIC,9,9,171,38
-    CONTROL         "Carica Cartelle predefinite",IDC_STARTUP_DEFAULTFOLDER,
-                    "Button",BS_AUTORADIOBUTTON,14,32,99,10
-    CONTROL         "Carica linguette precedenti",IDC_STARTUP_PREVIOUSTABS,
-                    "Button",BS_AUTORADIOBUTTON,13,19,102,10
-    CONTROL         "Mostra griglia nei dettagli",IDC_OPTION_GRIDLINES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,88,96,10
-    CONTROL         "Disabilita ritardo dell'albero",IDC_OPTION_TREEVIEWDELAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,110,101,10
-    CONTROL         "Salva preferenze in XML file",IDC_OPTION_XML,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,66,104,10
-    CONTROL         "Estendi controllo tab a tutta la finestra",IDC_OPTION_EXTENDTABCONTROL,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,139,10
-    CONTROL         "Attiva la selezione di colonna intera nella vista dettagliata",IDC_OPTION_FULLROWSELECT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,132,199,10
-    CONTROL         "Replace Explorer for filesystem folders",IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,55,139,10
-    CONTROL         "Show file previews in display window",IDC_OPTION_FILEPREVIEWS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,77,133,10
-    CONTROL         "Show username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,99,101,10
+    GROUPBOX        "On Startup",IDC_STATIC,6,7,217,38
+    CONTROL         "Carica linguette precedenti",IDC_STARTUP_PREVIOUSTABS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,17,77,10
+    CONTROL         "Carica Cartelle predefinite",IDC_STARTUP_DEFAULTFOLDER,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,30,77,10
+    GROUPBOX        "General settings",IDC_STATIC,6,115,217,66
+    CONTROL         "Salva preferenze in XML file",IDC_OPTION_XML,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,129,182,10
+    LTEXT           "Default &new tab folder:",IDC_STATIC,13,144,76,8
+    EDITTEXT        IDC_DEFAULT_NEWTABDIR_EDIT,19,158,173,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_DEFAULT_NEWTABDIR_BUTTON,197,158,21,14,BS_ICON
+    GROUPBOX        "Language",IDC_STATIC,6,187,217,67
+    LTEXT           "To change the language Explorer++ uses, simply select one from the list below. Any language change will not take effect until Explorer++ is restarted.",IDC_STATIC,13,200,204,30
+    LTEXT           "&Language:",IDC_STATIC,13,236,35,8
+    COMBOBOX        IDC_OPTIONS_LANGUAGE,53,234,101,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Default File Manager",IDC_STATIC,6,51,217,58
+    CONTROL         "Replace &Explorer for filesystem folders",IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
+                    "Button",BS_AUTORADIOBUTTON,13,78,139,10
+    CONTROL         "&Don't replace Explorer",IDC_OPTION_REPLACEEXPLORER_NONE,
+                    "Button",BS_AUTORADIOBUTTON,13,65,87,10
+    CONTROL         "Replace Explorer for &all folders",IDC_OPTION_REPLACEEXPLORER_ALL,
+                    "Button",BS_AUTORADIOBUTTON,13,91,114,10
 END
 
 IDD_SETFILEATTRIBUTES DIALOGEX 0, 0, 265, 127
@@ -250,21 +250,19 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Impostazioni di Default"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Mostra File Nascosti",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,91,79,10
-    LTEXT           "Le seguenti opzioni sono usate per controllare i programmi di default. Sono interessate le nuove Tab.",IDC_STATIC,11,4,175,20
-    GROUPBOX        "Vista predefinita",IDC_STATIC,9,33,172,44
-    CONTROL         "Icone",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON,119,44,34,10
-    CONTROL         "Titoli",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON,71,44,31,10
-    CONTROL         "Icone Piccole",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON,119,63,57,10
-    CONTROL         "Lista",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON,15,62,31,10
-    CONTROL         "Dettagli",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON,71,63,41,10
-    CONTROL         "Auto Ridimensiona",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,91,75,10
-    CONTROL         "Mostra in Gruppi",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,109,68,10
-    CONTROL         "Disponi Ascendenti",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,109,76,10
-    CONTROL         "Anteprima",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON,15,44,49,10
-    LTEXT           "Cartella linguetta predefinita:",IDC_STATIC,9,133,95,8
-    EDITTEXT        IDC_DEFAULT_NEWTABDIR_EDIT,15,147,143,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_DEFAULT_NEWTABDIR_BUTTON,161,147,21,14,BS_ICON
+    LTEXT           "Le seguenti opzioni sono usate per controllare i programmi di default. Sono interessate le nuove Tab.",IDC_STATIC,6,7,214,32
+    GROUPBOX        "Default view",IDC_STATIC,6,40,215,46
+    CONTROL         "Anteprima",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,52,51,10
+    CONTROL         "Titoli",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,51,30,10
+    CONTROL         "Icone",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,50,33,10
+    CONTROL         "Lista",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,68,27,10
+    CONTROL         "Dettagli",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,68,37,10
+    CONTROL         "Icone Piccole",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,68,51,10
+    CONTROL         "Mostra File Nascosti",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,96,73,10
+    CONTROL         "Auto Ridimensiona",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,96,59,10
+    CONTROL         "Mostra in Gruppi",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,65,10
+    CONTROL         "Disponi Ascendenti",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,111,63,10
+    PUSHBUTTON      "Defa&ult Columns....",IDC_BUTTON_DEFAULTCOLUMNS,6,131,76,14
 END
 
 IDD_BOOKMARK_PROPERTIES DIALOGEX 0, 0, 212, 134

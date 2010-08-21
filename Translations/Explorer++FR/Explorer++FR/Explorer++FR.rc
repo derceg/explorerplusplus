@@ -247,25 +247,22 @@ END
 
 IDD_OPTIONS_DEFAULT DIALOGEX 0, 0, 230, 213
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Paramètres par défaut"
+CAPTION "Default Settings"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Montrer les fichiers cachés",IDC_SHOWHIDDENGLOBAL,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,95,101,10
-    LTEXT           "The following options are used to control program-wide default behaviour. Each new tab inherets these settings, after which they may be changed on a per-tab basis.",IDC_STATIC,9,6,198,32
-    GROUPBOX        "Affichage par défaut",IDC_STATIC,9,39,196,46
-    CONTROL         "Icônes",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON,140,49,37,10
-    CONTROL         "Mosaïques",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON,83,50,49,10
-    CONTROL         "Petites icônes",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON,140,67,60,10
-    CONTROL         "Liste",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON,17,67,31,10
-    CONTROL         "Détails",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON,83,67,37,10
-    CONTROL         "Arrangement Automatique",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,112,95,101,10
-    CONTROL         "Afficher par groupe",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,110,79,10
-    CONTROL         "Croissant",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,112,110,46,10
-    CONTROL         "Thumbnails",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON,17,51,51,10
-    LTEXT           "Default new tab directory:",IDC_STATIC,9,134,86,8
-    EDITTEXT        IDC_DEFAULT_NEWTABDIR_EDIT,15,148,143,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_DEFAULT_NEWTABDIR_BUTTON,161,148,21,14,BS_ICON
+    LTEXT           "The following options are used to control program-wide default behaviour. Each new tab inherets these settings, after which they may be changed on a per-tab basis.",IDC_STATIC,6,7,214,32
+    GROUPBOX        "Affichage par défaut",IDC_STATIC,6,40,215,46
+    CONTROL         "&Thumbnails",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,52,51,10
+    CONTROL         "Mosaïques",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,51,30,10
+    CONTROL         "Icônes",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,50,33,10
+    CONTROL         "Liste",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,68,27,10
+    CONTROL         "Détails",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,68,37,10
+    CONTROL         "Petites icônes",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,68,51,10
+    CONTROL         "Montrer les fichiers cachés",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,96,73,10
+    CONTROL         "Arrangement Automatique",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,96,59,10
+    CONTROL         "Afficher par groupe",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,65,10
+    CONTROL         "Croissant",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,111,63,10
+    PUSHBUTTON      "Defa&ult Columns....",IDC_BUTTON_DEFAULTCOLUMNS,6,131,76,14
 END
 
 IDD_BOOKMARK_PROPERTIES DIALOGEX 0, 0, 212, 134

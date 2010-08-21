@@ -243,23 +243,19 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Стандартные настройки"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Показывать скрытые файлы",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,101,114,10
-    LTEXT           "Следующие настройки контролируют глобальное стандартное поведение программы. Каждая новая вкладка унаследует эти настройки, затем их можно будет изменить для каждой вкладки отдельно.",IDC_STATIC,9,6,227,32
-    GROUPBOX        "Вид",IDC_STATIC,9,45,199,46
-    CONTROL         "Значки",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON,127,57,40,10
-    CONTROL         "Плитка",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON,72,57,41,10
-    CONTROL         "Маленькие значки",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON,127,73,79,10
-    CONTROL         "Список",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON,17,73,40,10
-    CONTROL         "Таблица",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON,72,73,44,10
-    CONTROL         "Автоматическое упорядочение",IDC_AUTOARRANGEGLOBAL,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,124,101,123,10
-    CONTROL         "Показывать по группам",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,116,97,10
-    CONTROL         "Сортировать по возрастанию",IDC_SORTASCENDINGGLOBAL,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,124,116,117,10
-    CONTROL         "Эскизы",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON,17,57,41,10
-    LTEXT           "Стандартная папка для новой вкладки:",IDC_STATIC,9,140,138,8
-    EDITTEXT        IDC_DEFAULT_NEWTABDIR_EDIT,15,154,143,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_DEFAULT_NEWTABDIR_BUTTON,161,154,21,14,BS_ICON
+    LTEXT           "The following options are used to control program-wide default behaviour. Each new tab inherets these settings, after which they may be changed on a per-tab basis.",IDC_STATIC,6,7,214,32
+    GROUPBOX        "Default view",IDC_STATIC,6,40,215,46
+    CONTROL         "Эскизы",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,52,51,10
+    CONTROL         "Плитка",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,51,30,10
+    CONTROL         "Значки",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,50,33,10
+    CONTROL         "Список",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,68,27,10
+    CONTROL         "Таблица",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,68,37,10
+    CONTROL         "Маленькие значки",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,68,51,10
+    CONTROL         "Показывать скрытые файлы",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,96,73,10
+    CONTROL         "Автоматическое упорядочение",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,96,59,10
+    CONTROL         "Показывать по группам",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,65,10
+    CONTROL         "Сортировать по возрастанию",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,111,63,10
+    PUSHBUTTON      "Defa&ult Columns....",IDC_BUTTON_DEFAULTCOLUMNS,6,131,76,14
 END
 
 IDD_BOOKMARK_PROPERTIES DIALOGEX 0, 0, 212, 134
@@ -378,13 +374,13 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Столбцы в режиме таблицы:"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "OK",IDOK,114,219,57,14
-    PUSHBUTTON      "Отмена",IDCANCEL,175,219,57,14
     CONTROL         "",IDC_COLUMNS_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,3,3,166,174
     PUSHBUTTON      "Вверх",IDC_COLUMNS_MOVEUP,175,3,57,14
     PUSHBUTTON      "Вниз",IDC_COLUMNS_MOVEDOWN,175,19,57,14
     PUSHBUTTON      "Задействовать",IDC_COLUMNS_ENABLE,175,35,57,14
     PUSHBUTTON      "Отключить",IDC_COLUMNS_DISABLE,175,51,57,14
+    DEFPUSHBUTTON   "OK",IDOK,114,219,57,14
+    PUSHBUTTON      "Отмена",IDCANCEL,175,219,57,14
     LTEXT           "Описание:",IDC_STATIC,3,183,36,8
     LTEXT           "",IDC_COLUMNS_DESCRIPTION,45,183,149,23
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,214,228,1
