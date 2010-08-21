@@ -126,6 +126,7 @@ HRESULT			BuildHDropList(OUT DROPFILES **ppdf,OUT UINT *puSize,IN list<std::wstr
 HRESULT			BuildShellIDList(OUT CIDA **ppcida,OUT UINT *puSize,IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> apidl);
 HRESULT			BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder);
 BOOL			IsPathGUID(TCHAR *szPath);
+BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
 
 /* Drag and drop helpers. */
 DWORD			DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,BOOL bDataAccept,BOOL bOnSameDrive);
@@ -191,7 +192,7 @@ int				GetDefaultFolderIconIndex(void);
 int				GetDefaultFileIconIndex(void);
 
 /* Infotips. */
-HRESULT			GetFileInfoTip(HWND hwnd,LPCITEMIDLIST pidlDirectory,LPCITEMIDLIST pridl,TCHAR *szInfoTip,UINT cchMax);
+HRESULT			GetFileInfoTip(HWND hwnd,LPCITEMIDLIST pidlDirectory,LPCITEMIDLIST *pridl,TCHAR *szInfoTip,UINT cchMax);
 
 /* User interaction. */
 BOOL			CreateBrowseDialog(HWND hOwner,TCHAR *Title,TCHAR *PathBuffer,int BufferSize);

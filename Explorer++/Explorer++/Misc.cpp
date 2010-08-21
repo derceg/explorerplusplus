@@ -1211,7 +1211,7 @@ void CContainer::HandleFileSelectionDisplayZero(void)
 
 	SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidlComputer);
 
-	if(ILIsEqual(pidlDirectory,pidlComputer))
+	if(CompareIdls(pidlDirectory,pidlComputer))
 	{
 		char szCPUBrand[64];
 		WCHAR wszCPUBrand[64];

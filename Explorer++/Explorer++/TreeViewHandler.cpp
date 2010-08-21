@@ -396,7 +396,7 @@ void CContainer::OnTreeViewHolderWindowTimer(void)
 	pidlCurrentDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
 	if(!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick &&
-		!ILIsEqual(pidlDirectory,pidlCurrentDirectory))
+		!CompareIdls(pidlDirectory,pidlCurrentDirectory))
 	{
 		BrowseFolder(pidlDirectory,SBSP_SAMEBROWSER);
 

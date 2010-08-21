@@ -18,9 +18,15 @@
 
 HRESULT GetIdlFromParsingName(TCHAR *szParsingName,LPITEMIDLIST *pidl)
 {
-	IShellFolder	*pDesktopFolder = NULL;
-	WCHAR			szParsingNameW[MAX_PATH];
-	HRESULT			hr;
+	if(szParsingName == NULL ||
+		pidl == NULL)
+	{
+		return E_FAIL;
+	}
+
+	IShellFolder *pDesktopFolder = NULL;
+	WCHAR szParsingNameW[MAX_PATH];
+	HRESULT hr;
 
 	hr = SHGetDesktopFolder(&pDesktopFolder);
 
@@ -44,7 +50,13 @@ HRESULT GetIdlFromParsingName(TCHAR *szParsingName,LPITEMIDLIST *pidl)
 
 HRESULT GetDisplayName(TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags)
 {
-	LPITEMIDLIST pidl				= NULL;
+	if(szParsingPath == NULL ||
+		szDisplayName == NULL)
+	{
+		return E_FAIL;
+	}
+
+	LPITEMIDLIST pidl = NULL;
 	HRESULT hr;
 
 	hr = GetIdlFromParsingName(szParsingPath,&pidl);
@@ -61,10 +73,16 @@ HRESULT GetDisplayName(TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags)
 
 HRESULT GetDisplayName(LPITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uFlags)
 {
-	IShellFolder	*pShellFolder = NULL;
-	LPITEMIDLIST	pidlRelative = NULL;
-	STRRET			str;
-	HRESULT			hr;
+	if(pidlDirectory == NULL ||
+		szDisplayName == NULL)
+	{
+		return E_FAIL;
+	}
+
+	IShellFolder *pShellFolder = NULL;
+	LPITEMIDLIST pidlRelative = NULL;
+	STRRET str;
+	HRESULT hr;
 
 	hr = SHBindToParent(pidlDirectory,IID_IShellFolder,(void **)&pShellFolder,
 	(LPCITEMIDLIST *)&pidlRelative);
@@ -86,14 +104,20 @@ HRESULT GetDisplayName(LPITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uFl
 
 HRESULT GetItemAttributes(TCHAR *szItemParsingPath,SFGAOF *pItemAttributes)
 {
-	LPITEMIDLIST pidl				= NULL;
+	if(szItemParsingPath == NULL ||
+		pItemAttributes == NULL)
+	{
+		return E_FAIL;
+	}
+
+	LPITEMIDLIST pidl = NULL;
 	HRESULT hr;
 
 	hr = GetIdlFromParsingName(szItemParsingPath,&pidl);
 
 	if(SUCCEEDED(hr))
 	{
-		GetItemAttributes(pidl,pItemAttributes);
+		hr = GetItemAttributes(pidl,pItemAttributes);
 
 		CoTaskMemFree(pidl);
 	}
@@ -103,6 +127,12 @@ HRESULT GetItemAttributes(TCHAR *szItemParsingPath,SFGAOF *pItemAttributes)
 
 HRESULT GetItemAttributes(LPITEMIDLIST pidl,SFGAOF *pItemAttributes)
 {
+	if(pidl == NULL ||
+		pItemAttributes == NULL)
+	{
+		return E_FAIL;
+	}
+
 	IShellFolder	*pShellFolder = NULL;
 	LPITEMIDLIST	pidlRelative = NULL;
 	HRESULT			hr;
@@ -202,7 +232,7 @@ BOOL IsNamespaceRoot(LPCITEMIDLIST pidl)
 
 	if(SUCCEEDED(hr))
 	{
-		bNamespaceRoot = ILIsEqual(pidl,pidlDesktop);
+		bNamespaceRoot = CompareIdls(pidl,pidlDesktop);
 
 		CoTaskMemFree(pidlDesktop);
 	}
@@ -466,14 +496,22 @@ int GetDefaultIcon(int iIconType)
 	return shfi.iIcon;
 }
 
-HRESULT GetFileInfoTip(HWND hwnd,LPCITEMIDLIST pidlDirectory,LPCITEMIDLIST pridl,
+HRESULT GetFileInfoTip(HWND hwnd,LPCITEMIDLIST pidlDirectory,LPCITEMIDLIST *pridl,
 TCHAR *szInfoTip,UINT cchMax)
 {
-	IShellFolder	*pDesktopFolder = NULL;
-	IShellFolder	*pShellFolder = NULL;
-	IQueryInfo		*pQueryInfo = NULL;
-	LPWSTR			ppwszTip = NULL;
-	HRESULT			hr;
+	if(pidlDirectory == NULL ||
+		pridl == NULL ||
+		szInfoTip == NULL ||
+		cchMax == 0)
+	{
+		return E_FAIL;
+	}
+
+	IShellFolder *pDesktopFolder = NULL;
+	IShellFolder *pShellFolder = NULL;
+	IQueryInfo *pQueryInfo = NULL;
+	LPWSTR ppwszTip = NULL;
+	HRESULT hr;
 
 	hr = SHGetDesktopFolder(&pDesktopFolder);
 
@@ -491,7 +529,7 @@ TCHAR *szInfoTip,UINT cchMax)
 
 		if(SUCCEEDED(hr))
 		{
-			hr = pShellFolder->GetUIObjectOf(hwnd,1,&pridl,
+			hr = pShellFolder->GetUIObjectOf(hwnd,1,pridl,
 			IID_IQueryInfo,0,(void **)&pQueryInfo);
 
 			if(SUCCEEDED(hr))
@@ -532,8 +570,13 @@ TCHAR *szInfoTip,UINT cchMax)
 
 HRESULT GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,DWORD uParsingFlags)
 {
-	LPITEMIDLIST	pidl = NULL;
-	HRESULT			hr;
+	if(szFolderName == NULL)
+	{
+		return E_FAIL;
+	}
+
+	LPITEMIDLIST pidl = NULL;
+	HRESULT hr;
 
 	hr = SHGetFolderLocation(NULL,csidl,NULL,0,&pidl);
 
@@ -550,9 +593,9 @@ HRESULT GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,DWORD uParsingFlags)
 
 BOOL MyExpandEnvironmentStrings(TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize)
 {
-	HANDLE	hProcess;
-	HANDLE	hToken;
-	BOOL	bRet = FALSE;
+	HANDLE hProcess;
+	HANDLE hToken;
+	BOOL bRet = FALSE;
 
 	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,GetCurrentProcessId());
 
@@ -638,13 +681,15 @@ BOOL bDataAccept,BOOL bOnSameDrive)
 HRESULT BuildHDropList(OUT DROPFILES **ppdf,OUT UINT *puSize,
 IN list<std::wstring> FilenameList)
 {
-	*ppdf = NULL;
-	*puSize = 0;
-
-	if(FilenameList.size() == 0)
+	if(ppdf == NULL ||
+		puSize == NULL ||
+		FilenameList.size() == 0)
 	{
 		return E_FAIL;
 	}
+
+	*ppdf = NULL;
+	*puSize = 0;
 
 	UINT uSize = 0;
 
@@ -697,15 +742,16 @@ Returns S_OK on success; E_FAIL on fail. */
 HRESULT BuildShellIDList(OUT CIDA **ppcida,OUT UINT *puSize,
 IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> pidlList)
 {
-	*ppcida = NULL;
-	*puSize = 0;
-
 	if(ppcida == NULL ||
-		pidlList.size() == 0 ||
-		pidlDirectory == NULL)
+		puSize == NULL ||
+		pidlDirectory == NULL ||
+		pidlList.size() == 0)
 	{
 		return E_FAIL;
 	}
+
+	*ppcida = NULL;
+	*puSize = 0;
 
 	/* First, we need to decide how much memory to
 	allocate to the structure. This is based on
@@ -777,6 +823,12 @@ IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> pidlList)
 
 HRESULT BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder)
 {
+	if(pidlDirectory == NULL ||
+		pShellFolder == NULL)
+	{
+		return E_FAIL;
+	}
+
 	IShellFolder *pDesktopFolder = NULL;
 	HRESULT hr;
 
@@ -915,4 +967,32 @@ void DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingP
 			}
 		}
 	}
+}
+
+BOOL CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2)
+{
+	if(pidl1 == NULL || pidl2 == NULL)
+	{
+		return FALSE;
+	}
+
+	IShellFolder *pDesktopFolder = NULL;
+	HRESULT hr;
+	BOOL ret = FALSE;
+
+	hr = SHGetDesktopFolder(&pDesktopFolder);
+
+	if(SUCCEEDED(hr))
+	{
+		hr = pDesktopFolder->CompareIDs(0,pidl1,pidl2);
+
+		if(short(HRESULT_CODE(hr) == 0))
+		{
+			ret = TRUE;
+		}
+
+		pDesktopFolder->Release();
+	}
+
+	return ret;
 }

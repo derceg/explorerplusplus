@@ -174,8 +174,7 @@ int *pTabObjectIndex)
 		for the specified directory. */
 		for each(auto ds in m_DirectorySettingsList)
 		{
-			/* TODO: Replace ILIsEqual. */
-			if(ILIsEqual(pidlDirectory,ds.pidlDirectory))
+			if(CompareIdls(pidlDirectory,ds.pidlDirectory))
 			{
 				/* TODO: */
 				//bFound = TRUE;

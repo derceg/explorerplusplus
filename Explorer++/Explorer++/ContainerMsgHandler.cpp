@@ -600,9 +600,8 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInN
 		/* Check if the parent of the item is the control panel.
 		If it is, pass it to the shell to open, rather than
 		opening it in-place. */
-		/* TODO: Replace ILIsEqual. */
 		if(ILIsParent(pidlControlPanel,pidlItem,FALSE) &&
-			!ILIsEqual(pidlControlPanel,pidlItem))
+			!CompareIdls(pidlControlPanel,pidlItem))
 		{
 			bControlPanelParent = TRUE;
 		}
@@ -639,9 +638,8 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInN
 				/* Check if the parent of the item is the control panel.
 				If it is, pass it to the shell to open, rather than
 				opening it in-place. */
-				/* TODO: Replace ILIsEqual. */
 				if(ILIsParent(pidlControlPanel,pidlItem,FALSE) &&
-					!ILIsEqual(pidlControlPanel,pidlItem))
+					!CompareIdls(pidlControlPanel,pidlItem))
 				{
 					bControlPanelParent = TRUE;
 				}
@@ -2895,8 +2893,7 @@ void CContainer::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDirector
 	{
 		for each(auto ds in m_DirectorySettingsList)
 		{
-			/* TODO: Replace ILIsEqual. */
-			if(ILIsEqual(pidlDirectory,ds.pidlDirectory))
+			if(CompareIdls(pidlDirectory,ds.pidlDirectory))
 			{
 				TCITEM tcItem;
 				BOOL bRet;

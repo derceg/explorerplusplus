@@ -15,6 +15,7 @@
 #include <list>
 #include "DropHandler.h"
 #include "Helper.h"
+#include "Registry.h"
 
 
 struct HANDLETOMAPPINGS
@@ -24,6 +25,9 @@ struct HANDLETOMAPPINGS
 };
 
 DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter);
+
+/* TODO: */
+void CreateDropOptionsMenu(LPCITEMIDLIST pidlDirectory,IDataObject *pDataObject,HWND hDrop);
 
 CDropHandler::CDropHandler()
 {
@@ -792,4 +796,125 @@ BOOL CDropHandler::CheckItemLocations(int iDroppedItem)
 	}
 
 	return bOnSameDrive;
+}
+
+void CreateDropOptionsMenu(LPCITEMIDLIST pidlDirectory,IDataObject *pDataObject,HWND hDrop)
+{
+	IShellExtInit *p = NULL;
+	HRESULT hr;
+
+	/* Load any registered drag and drop handlers. They will
+	be listed under:
+
+	HKEY_CLASSES_ROOT\Directory\shellex\DragDropHandlers
+
+	Pick out the CLSID_GUID from the (Default) key, and look
+	it up in:
+
+	HKEY_LOCAL_MACHINE\Software\Classes\CLSID
+	
+	Load the DLL it refers to, and use CoCreateInstance to
+	create the class.
+	*/
+
+	HKEY hKey;
+	LONG lRes;
+	HMENU hMenu;
+	
+	hMenu = CreatePopupMenu();
+
+	lRes = RegOpenKeyEx(HKEY_CLASSES_ROOT,_T("Directory\\shellex\\DragDropHandlers"),0,KEY_READ,&hKey);
+
+	if(lRes == ERROR_SUCCESS)
+	{
+		HKEY hSubKey;
+		TCHAR szKeyName[512];
+		TCHAR szCLSID[256];
+		DWORD dwLen;
+		LONG lSubKeyRes;
+		int iIndex = 0;
+
+		/* TODO: RegCloseKey(). */
+		
+		dwLen = SIZEOF_ARRAY(szKeyName);
+
+		/* Enumerate each of the sub-keys. */
+		while((lRes = RegEnumKeyEx(hKey,iIndex,szKeyName,&dwLen,NULL,NULL,NULL,NULL)) == ERROR_SUCCESS)
+		{
+			TCHAR szSubKey[512];
+
+			StringCchPrintf(szSubKey,SIZEOF_ARRAY(szSubKey),_T("%s\\%s"),_T("Directory\\shellex\\DragDropHandlers"),szKeyName);
+
+			lSubKeyRes = RegOpenKeyEx(HKEY_CLASSES_ROOT,szSubKey,0,KEY_READ,&hSubKey);
+
+			if(lSubKeyRes == ERROR_SUCCESS)
+			{
+				lSubKeyRes = ReadStringFromRegistry(hSubKey,NULL,szCLSID,SIZEOF_ARRAY(szCLSID));
+
+				if(lSubKeyRes == ERROR_SUCCESS)
+				{
+					HKEY hCLSIDKey;
+					TCHAR szCLSIDKey[512];
+
+					StringCchPrintf(szCLSIDKey,SIZEOF_ARRAY(szCLSIDKey),_T("%s\\%s"),_T("Software\\Classes\\CLSID"),szCLSID);
+
+					/* Open the CLSID key. */
+					lSubKeyRes = RegOpenKeyEx(HKEY_LOCAL_MACHINE,szCLSIDKey,0,KEY_READ,&hCLSIDKey);
+
+					if(lSubKeyRes == ERROR_SUCCESS)
+					{
+						HKEY hDllKey;
+
+						/* Open InProcServer32. */
+						lSubKeyRes = RegOpenKeyEx(hCLSIDKey,_T("InProcServer32"),0,KEY_READ,&hDllKey);
+
+						if(lSubKeyRes == ERROR_SUCCESS)
+						{
+							TCHAR szDLL[MAX_PATH];
+
+							lSubKeyRes = ReadStringFromRegistry(hDllKey,NULL,szDLL,SIZEOF_ARRAY(szDLL));
+
+							if(lSubKeyRes == ERROR_SUCCESS)
+							{
+								HMODULE hDLL;
+
+								/* Now, load the DLL it refers to. */
+								hDLL = LoadLibrary(szDLL);
+
+								if(hDLL != NULL)
+								{
+									CLSID clsid;
+
+									hr = CLSIDFromString(szCLSID,&clsid);
+
+									if(hr == NO_ERROR)
+									{
+										/* Finally, call CoCreateInstance. */
+										hr = CoCreateInstance(clsid,NULL,CLSCTX_INPROC_SERVER,IID_IUnknown,(LPVOID *)&p);
+
+										if(hr == S_OK)
+										{
+											IShellExtInit *pShellExtInit = NULL;
+
+											hr = p->QueryInterface(IID_IShellExtInit,(void **)&pShellExtInit);
+
+											if(SUCCEEDED(hr))
+											{
+												hr = pShellExtInit->Initialize(pidlDirectory,pDataObject,NULL);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
+			dwLen = SIZEOF_ARRAY(szKeyName);
+			iIndex++;
+		}
+	}
+
+	TrackPopupMenu(hMenu,TPM_LEFTALIGN,0,0,0,hDrop,NULL);
 }

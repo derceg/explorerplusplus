@@ -715,7 +715,7 @@ BOOL CFolderView::CanCreate(void)
 
 	if(SUCCEEDED(hr))
 	{
-		bCanCreate = !InVirtualFolder() || ILIsEqual(m_pidlDirectory,pidl);
+		bCanCreate = !InVirtualFolder() || CompareIdls(m_pidlDirectory,pidl);
 
 		CoTaskMemFree(pidl);
 	}
@@ -756,7 +756,7 @@ HRESULT CFolderView::RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMa
 	if(bItem)
 	{
 		return GetFileInfoTip(m_hOwner,m_pidlDirectory,
-			m_pExtraItemInfo[(int)lvItem.lParam].pridl,
+			const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[(int)lvItem.lParam].pridl),
 			szInfoTip,(UINT)cchMax);
 	}
 	else
@@ -1926,7 +1926,7 @@ void CFolderView::QueueRename(LPITEMIDLIST pidlItem)
 
 		pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lvItem.lParam].pridl);
 
-		if(ILIsEqual(pidlItem,pidlComplete))
+		if(CompareIdls(pidlItem,pidlComplete))
 		{
 			CoTaskMemFree(pidlComplete);
 
@@ -2120,7 +2120,7 @@ void CFolderView::UpdateDriveIcon(TCHAR *szDrive)
 
 			pidlItem = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lvItem.lParam].pridl);
 
-			if(ILIsEqual(pidlDrive,pidlItem))
+			if(CompareIdls(pidlDrive,pidlItem))
 			{
 				iItem = i;
 				iItemInternal = (int)lvItem.lParam;

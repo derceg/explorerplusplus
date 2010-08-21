@@ -1040,7 +1040,8 @@ void CContainer::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 		pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 		pridlItem = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
 
-		hr = GetFileInfoTip(m_hContainer,pidlDirectory,pridlItem,szInfoTip,cchMax);
+		hr = GetFileInfoTip(m_hContainer,pidlDirectory,const_cast<LPCITEMIDLIST *>(&pridlItem),
+			szInfoTip,cchMax);
 
 		if(!SUCCEEDED(hr))
 			StringCchCopy(szInfoTip,cchMax,EMPTY_STRING);

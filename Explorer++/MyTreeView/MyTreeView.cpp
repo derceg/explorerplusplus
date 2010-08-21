@@ -592,7 +592,7 @@ HTREEITEM hParent)
 
 	if(SUCCEEDED(hr))
 	{
-		if(ILIsEqual(pidlDirectory,pidl))
+		if(CompareIdls(pidlDirectory,pidl))
 			bMyComputer = TRUE;
 
 		CoTaskMemFree(pidl);
@@ -1197,7 +1197,7 @@ HTREEITEM CMyTreeView::LocateItemInternal(LPITEMIDLIST pidlDirectory,BOOL bOnlyL
 
 		pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
-		if(ILIsEqual((LPCITEMIDLIST)pItemInfo->pidl,pidlDirectory))
+		if(CompareIdls((LPCITEMIDLIST)pItemInfo->pidl,pidlDirectory))
 		{
 			bFound = TRUE;
 

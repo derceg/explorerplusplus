@@ -25,6 +25,9 @@ CContainer	*g_pContainer = NULL;
 HRESULT CContainer::CreateFileContextMenu(HWND hwnd,LPITEMIDLIST pidlParent,
 POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExtended)
 {
+	assert(pidlParent != NULL);
+	assert(nFiles > 0);
+
 	IShellFolder		*pDesktopFolder = NULL;
 	IShellFolder		*pShellParentFolder = NULL;
 	IShellFolder		*pShellFolder = NULL;
@@ -346,6 +349,9 @@ LPCITEMIDLIST *ppidl,int nFiles)
 HRESULT CContainer::ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,
 LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask)
 {
+	assert(pidlDirectory != NULL);
+	assert(szAction != NULL);
+
 	IShellFolder		*pDesktopFolder = NULL;
 	IShellFolder		*pShellParentFolder = NULL;
 	IShellFolder		*pShellFolder = NULL;
@@ -599,6 +605,8 @@ LRESULT CALLBACK CContainer::ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam
 
 HRESULT CContainer::ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset)
 {
+	assert(pContextMenu != NULL);
+
 	CMINVOKECOMMANDINFO	cmici;
 
 	cmici.cbSize		= sizeof(CMINVOKECOMMANDINFO);

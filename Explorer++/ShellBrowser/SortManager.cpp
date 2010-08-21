@@ -1484,9 +1484,9 @@ int CALLBACK CFolderView::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2)
 		return ReturnValue;
 	}
 
-	hr = GetFileInfoTip(m_hOwner,m_pidlDirectory,m_pExtraItemInfo[(int)lParam1].pridl,
+	hr = GetFileInfoTip(m_hOwner,m_pidlDirectory,const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[(int)lParam1].pridl),
 		szInfoTip1,SIZEOF_ARRAY(szInfoTip1));
-	hr = GetFileInfoTip(m_hOwner,m_pidlDirectory,m_pExtraItemInfo[(int)lParam2].pridl,
+	hr = GetFileInfoTip(m_hOwner,m_pidlDirectory,const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[(int)lParam2].pridl),
 		szInfoTip2,SIZEOF_ARRAY(szInfoTip2));
 
 	ReturnValue = lstrcmp(szInfoTip1,szInfoTip2);

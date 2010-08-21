@@ -37,6 +37,11 @@ private:
 
 HRESULT CreateDropSource(IDropSource **ppDropSource,DragTypes_t DragType)
 {
+	if(ppDropSource == NULL)
+	{
+		return E_FAIL;
+	}
+
 	*ppDropSource = new CDropSource(DragType);
 
 	return S_OK;

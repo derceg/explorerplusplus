@@ -226,7 +226,7 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 				pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)itr->iItemInternal].pridl);
 
-				if(ILIsEqual(pidlComplete,m_pidlNewItem))
+				if(CompareIdls(pidlComplete,m_pidlNewItem))
 					m_bNewItemCreated = FALSE;
 
 				m_iIndexNewItem = iItemIndex;

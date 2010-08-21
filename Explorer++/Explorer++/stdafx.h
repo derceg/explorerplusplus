@@ -72,3 +72,4 @@
 #include <vfw.h>
 #include <dwmapi.h>
 #include <propvarutil.h>
+#include <assert.h>
