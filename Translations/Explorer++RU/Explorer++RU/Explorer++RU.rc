@@ -46,24 +46,31 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Файлы и Папки"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    CONTROL         "Hide &protected operating system files",IDC_SETTINGS_CHECK_SYSTEMFILES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,7,135,10
     CONTROL         "Скрывать расширения файлов",IDC_SETTINGS_CHECK_EXTENSIONS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,6,120,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,20,78,10
+    CONTROL         "&Always hide the link (.lnk) extension",IDC_SETTINGS_CHECK_LINK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,33,131,10
+    CONTROL         "Insert ne&w items in their sorted positions",IDC_SETTINGS_CHECK_INSERTSORTED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,146,10
+    CONTROL         "&Single-click to open an item (point to select)",IDC_SETTINGS_CHECK_SINGLECLICK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,155,10
     CONTROL         "Показывать размер папок",IDC_SETTINGS_CHECK_FOLDERSIZES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,17,105,10
-    CONTROL         "Выводить полный путь в строке заголовка",IDC_SETTINGS_CHECK_TITLEPATH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,28,163,10
-    CONTROL         "Открывать каждую папку в отдельной вкладке",IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,39,182,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,71,10
     CONTROL         "Показывать размеры файлов в байтах",IDC_SETTINGS_CHECK_SIZEBYTES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,50,147,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,98,10
+    CONTROL         "Handle &zip files",IDC_SETTINGS_CHECK_ZIPFILES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,63,10
     CONTROL         "Упрощенный режим отображения даты",IDC_SETTINGS_CHECK_FRIENDLYDATES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,61,151,10
-    CONTROL         "Использовать системный стиль",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON,19,84,151,10
-    CONTROL         "Использовать новый стиль",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON,19,95,151,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,124,95,10
     CONTROL         "Показывать подсказки для файлов и папок:",IDC_OPTIONS_CHECK_SHOWINFOTIPS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,182,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,137,87,10
+    CONTROL         "Использовать системный стиль",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,150,83,10
+    CONTROL         "Использовать новый стиль",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON,19,161,83,10
+    CONTROL         "Disable folder sizes on removable and network drives",IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,85,185,10
 END
 
 IDD_OPTIONS_GENERAL DIALOGEX 0, 0, 230, 263
@@ -72,26 +79,26 @@ EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Общие"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "При загрузке",IDC_STATIC,9,9,171,38
-    CONTROL         "Открывать стандартную папку",IDC_STARTUP_DEFAULTFOLDER,
-                    "Button",BS_AUTORADIOBUTTON,13,32,125,10
-    CONTROL         "Открывать вкладки предыдущего сеанса",IDC_STARTUP_PREVIOUSTABS,
-                    "Button",BS_AUTORADIOBUTTON,13,19,160,10
-    CONTROL         "Показывать сетку в режиме таблица",IDC_OPTION_GRIDLINES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,91,142,10
-    CONTROL         "Отключить задержку при формировании древа папок",IDC_OPTION_TREEVIEWDELAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,115,201,10
-    CONTROL         "Сохранять настройки в XML файл",IDC_OPTION_XML,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,67,130,10
-    CONTROL         "Extend tab control across entire window",IDC_OPTION_EXTENDTABCONTROL,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,127,145,10
-    CONTROL         "Turn on full-row selection in details view",IDC_OPTION_FULLROWSELECT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,139,143,10
-    CONTROL         "Replace Explorer for filesystem folders",IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,55,139,10
-    CONTROL         "Show file previews in display window",IDC_OPTION_FILEPREVIEWS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,79,133,10
-    CONTROL         "Show username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,103,101,10
+    GROUPBOX        "On Startup",IDC_STATIC,6,7,217,38
+    CONTROL         "Открывать вкладки предыдущего сеанса",IDC_STARTUP_PREVIOUSTABS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,17,77,10
+    CONTROL         "Открывать стандартную папку",IDC_STARTUP_DEFAULTFOLDER,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,30,77,10
+    GROUPBOX        "General settings",IDC_STATIC,6,115,217,66
+    CONTROL         "Сохранять настройки в XML файл",IDC_OPTION_XML,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,129,182,10
+    LTEXT           "Default &new tab folder:",IDC_STATIC,13,144,76,8
+    EDITTEXT        IDC_DEFAULT_NEWTABDIR_EDIT,19,158,173,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_DEFAULT_NEWTABDIR_BUTTON,197,158,21,14,BS_ICON
+    GROUPBOX        "Language",IDC_STATIC,6,187,217,67
+    LTEXT           "To change the language Explorer++ uses, simply select one from the list below. Any language change will not take effect until Explorer++ is restarted.",IDC_STATIC,13,200,204,30
+    LTEXT           "&Language:",IDC_STATIC,13,236,35,8
+    COMBOBOX        IDC_OPTIONS_LANGUAGE,53,234,101,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Default File Manager",IDC_STATIC,6,51,217,58
+    CONTROL         "Replace &Explorer for filesystem folders",IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
+                    "Button",BS_AUTORADIOBUTTON,13,78,139,10
+    CONTROL         "&Don't replace Explorer",IDC_OPTION_REPLACEEXPLORER_NONE,
+                    "Button",BS_AUTORADIOBUTTON,13,65,87,10
+    CONTROL         "Replace Explorer for &all folders",IDC_OPTION_REPLACEEXPLORER_ALL,
+                    "Button",BS_AUTORADIOBUTTON,13,91,114,10
 END
 
 IDD_SETFILEATTRIBUTES DIALOGEX 0, 0, 265, 127

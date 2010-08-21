@@ -46,24 +46,31 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Arquivos e Pastas"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    CONTROL         "Hide &protected operating system files",IDC_SETTINGS_CHECK_SYSTEMFILES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,7,135,10
     CONTROL         "Ocultar extensões de arquivos",IDC_SETTINGS_CHECK_EXTENSIONS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,114,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,20,78,10
+    CONTROL         "&Always hide the link (.lnk) extension",IDC_SETTINGS_CHECK_LINK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,33,131,10
+    CONTROL         "Insert ne&w items in their sorted positions",IDC_SETTINGS_CHECK_INSERTSORTED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,146,10
+    CONTROL         "&Single-click to open an item (point to select)",IDC_SETTINGS_CHECK_SINGLECLICK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,155,10
     CONTROL         "Exibir tamanhos de pastas",IDC_SETTINGS_CHECK_FOLDERSIZES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,18,100,10
-    CONTROL         "Exibir caminho completo na barra de título",IDC_SETTINGS_CHECK_TITLEPATH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,29,149,10
-    CONTROL         "Abrir pastas em nova aba",IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,40,98,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,71,10
     CONTROL         "Mostrar tamanhos de arquivos em bytes",IDC_SETTINGS_CHECK_SIZEBYTES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,51,145,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,98,10
+    CONTROL         "Handle &zip files",IDC_SETTINGS_CHECK_ZIPFILES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,63,10
     CONTROL         "Datas amigáveis",IDC_SETTINGS_CHECK_FRIENDLYDATES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,62,68,10
-    CONTROL         "Exibir infotips do sistema",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON,20,85,95,10
-    CONTROL         "Exibir infotips personalizadas",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON,20,96,108,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,124,95,10
     CONTROL         "Exibir infotips para os arquivos:",IDC_OPTIONS_CHECK_SHOWINFOTIPS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,117,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,137,87,10
+    CONTROL         "Exibir infotips do sistema",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,150,83,10
+    CONTROL         "Exibir infotips personalizadas",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
+                    "Button",BS_AUTORADIOBUTTON,19,161,83,10
+    CONTROL         "Disable folder sizes on removable and network drives",IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,85,185,10
 END
 
 IDD_OPTIONS_GENERAL DIALOGEX 0, 0, 230, 263
@@ -72,25 +79,26 @@ EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "Geral"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Ao iniciar",IDC_STATIC,9,9,171,38
-    CONTROL         "Abrir pasta padrão",IDC_STARTUP_DEFAULTFOLDER,"Button",BS_AUTORADIOBUTTON,13,32,76,10
-    CONTROL         "Abrir abas anteriores",IDC_STARTUP_PREVIOUSTABS,"Button",BS_AUTORADIOBUTTON,13,19,83,10
-    CONTROL         "Exibir linhas-guia no modo Detalhes",IDC_OPTION_GRIDLINES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,91,129,10
-    CONTROL         "Desativar atraso na árvore de arquivos",IDC_OPTION_TREEVIEWDELAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,115,142,10
+    GROUPBOX        "On Startup",IDC_STATIC,6,7,217,38
+    CONTROL         "Abrir abas anteriores",IDC_STARTUP_PREVIOUSTABS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,17,77,10
+    CONTROL         "Abrir pasta padrão",IDC_STARTUP_DEFAULTFOLDER,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,30,77,10
+    GROUPBOX        "General settings",IDC_STATIC,6,115,217,66
     CONTROL         "Salvar preferências em arquivo XML",IDC_OPTION_XML,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,67,130,10
-    CONTROL         "Expandir controle de aba por toda a janela",IDC_OPTION_EXTENDTABCONTROL,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,127,153,10
-    CONTROL         "Ativar seleção da coluna inteira no modo Detalhes",IDC_OPTION_FULLROWSELECT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,139,175,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,129,182,10
+    LTEXT           "Default &new tab folder:",IDC_STATIC,13,144,76,8
+    EDITTEXT        IDC_DEFAULT_NEWTABDIR_EDIT,19,158,173,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_DEFAULT_NEWTABDIR_BUTTON,197,158,21,14,BS_ICON
+    GROUPBOX        "Language",IDC_STATIC,6,187,217,67
+    LTEXT           "To change the language Explorer++ uses, simply select one from the list below. Any language change will not take effect until Explorer++ is restarted.",IDC_STATIC,13,200,204,30
+    LTEXT           "&Language:",IDC_STATIC,13,236,35,8
+    COMBOBOX        IDC_OPTIONS_LANGUAGE,53,234,101,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Default File Manager",IDC_STATIC,6,51,217,58
     CONTROL         "Substituir Explorer para pastas de sistema",IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,55,151,10
-    CONTROL         "Mostrar preview de arquivos no Painel de Visualização",IDC_OPTION_FILEPREVIEWS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,79,188,10
-    CONTROL         "Exibir nome do usuário na barra de título",IDC_OPTION_USERNAMEINTITLEBAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,103,145,10
+                    "Button",BS_AUTORADIOBUTTON,13,78,139,10
+    CONTROL         "&Don't replace Explorer",IDC_OPTION_REPLACEEXPLORER_NONE,
+                    "Button",BS_AUTORADIOBUTTON,13,65,87,10
+    CONTROL         "Replace Explorer for &all folders",IDC_OPTION_REPLACEEXPLORER_ALL,
+                    "Button",BS_AUTORADIOBUTTON,13,91,114,10
 END
 
 IDD_SETFILEATTRIBUTES DIALOGEX 0, 0, 265, 127
@@ -237,26 +245,24 @@ BEGIN
     PUSHBUTTON      "&Propriedades",IDC_ORGANIZE_PROPERTIES,417,53,54,14
 END
 
-IDD_OPTIONS_DEFAULT DIALOGEX 0, 0, 218, 167
+IDD_OPTIONS_DEFAULT DIALOGEX 0, 0, 230, 213
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Configuração padrão"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Exibir arquivos ocultos",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,95,87,10
-    LTEXT           "As opções a seguir são usadas para controlar o comportamento padrão do programa. Cada aba recebe estas configurações, que podem depois, ser alteradas para cada aba.",IDC_STATIC,9,6,203,35
-    GROUPBOX        "Visualização padrão",IDC_STATIC,9,39,203,46
-    CONTROL         "Icones",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON,130,49,37,10
-    CONTROL         "Lado a lado",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON,73,50,53,10
-    CONTROL         "Icones pequenos",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON,130,67,71,10
-    CONTROL         "Lista",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON,17,67,31,10
-    CONTROL         "Detalhes",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON,73,67,44,10
-    CONTROL         "Auto Organizar",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,95,65,10
-    CONTROL         "Exibir em grupos",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,110,69,10
-    CONTROL         "Classificar ascendente",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,100,110,87,10
-    CONTROL         "Miniaturas",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON,17,51,49,10
-    LTEXT           "Pasta padrão de nova aba:",IDC_STATIC,9,134,86,8
-    EDITTEXT        IDC_DEFAULT_NEWTABDIR_EDIT,15,148,143,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_DEFAULT_NEWTABDIR_BUTTON,161,148,21,14,BS_ICON
+    LTEXT           "The following options are used to control program-wide default behaviour. Each new tab inherets these settings, after which they may be changed on a per-tab basis.",IDC_STATIC,6,7,214,32
+    GROUPBOX        "Default view",IDC_STATIC,6,40,215,46
+    CONTROL         "Miniaturas",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,52,51,10
+    CONTROL         "Lado a lado",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,51,30,10
+    CONTROL         "Icones",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,50,33,10
+    CONTROL         "Lista",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,68,27,10
+    CONTROL         "Detalhes",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,68,37,10
+    CONTROL         "Icones pequenos",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,68,51,10
+    CONTROL         "Exibir arquivos ocultos",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,96,73,10
+    CONTROL         "Auto Organizar",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,96,59,10
+    CONTROL         "Exibir em grupos",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,65,10
+    CONTROL         "Classificar ascendente",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,111,63,10
+    PUSHBUTTON      "Defa&ult Columns....",IDC_BUTTON_DEFAULTCOLUMNS,6,131,76,14
 END
 
 IDD_BOOKMARK_PROPERTIES DIALOGEX 0, 0, 212, 134
@@ -634,9 +640,9 @@ BEGIN
         MENUITEM "&Auto Arrange",               IDM_ARRANGEICONSBY_AUTOARRANGE
         MENUITEM SEPARATOR
         MENUITEM "&Ordenar por",                IDM_VIEW_SORTBY
+        MENUITEM "&Group By",                   IDM_VIEW_GROUPBY
         MENUITEM "&Exibir arquivos ocultos\tCtrl+H", IDM_VIEW_SHOWHIDDENFILES
         MENUITEM "&Atualizar\tF5",              IDM_VIEW_REFRESH
-        MENUITEM "Colunas &padrão...",          IDM_VIEW_SETDEFAULTCOLUMNS
         MENUITEM "Selecionar &Colunas...",      IDM_VIEW_SELECTCOLUMNS
         MENUITEM "&Largura Automática",         IDM_VIEW_AUTOSIZECOLUMNS
         MENUITEM "Save Column Layout as Default", IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT
@@ -1112,6 +1118,8 @@ END
 
 STRINGTABLE 
 BEGIN
+    IDM_FILTER_APPLYFILTER  "Activates/deactivates the filter"
+    IDM_FILTER_FILTERRESULTS "Allows a wildcard filter to be specified"
     IDM_FILE_COPYCOLUMNTEXT "Copia o texto da coluna dos itens selecionados"
 END
 
