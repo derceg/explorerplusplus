@@ -7,7 +7,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "afxres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -194,8 +195,8 @@ BEGIN
     LTEXT           "Azul:",IDC_STATIC,223,81,17,8
     CONTROL         "",IDC_SLIDER_SURROUND_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,249,78,148,23
     EDITTEXT        IDC_EDIT_SURROUND_BLUE,397,77,25,16,ES_AUTOHSCROLL | ES_NUMBER
+	PUSHBUTTON      "Restore &Defaults",IDC_BUTTON_RESTOREDEFAULTS,8,109,63,17
     PUSHBUTTON      "Escoger fuente...",IDC_BUTTON_DISPLAY_FONT,8,109,66,17
-    PUSHBUTTON      "&Choose font...",IDC_BUTTON_DISPLAY_FONT,77,109,60,17
     LTEXT           "",IDC_STATIC_PREVIEWDISPLAY,4,131,424,56,SS_SUNKEN
     DEFPUSHBUTTON   "OK",IDOK,321,202,50,14
     PUSHBUTTON      "Cancel",IDCANCEL,377,202,50,14
@@ -469,7 +470,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,46,174,10
     CONTROL         "Abrir nueva pestaña siguiente de la actual",IDC_TABS_OPENNEXTTOCURRENT,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,63,151,10
-    EDITTEXT        IDC_EDIT1,146,27,23,15,ES_AUTOHSCROLL | NOT WS_VISIBLE
+    CONTROL         "Open each folder in its own &tab",IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,116,10
     CONTROL         "&Double-click to close a tab",IDC_TABS_DOUBLECLICKCLOSE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,99,10
@@ -712,7 +713,7 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "Auto Arrange",                IDM_ARRANGEICONSBY_AUTOARRANGE
         END
-        MENUITEM "Ordenar por",                 ID_POPUP_SORTBY
+        MENUITEM "Ordenar por",                 IDM_POPUP_SORTBY
         MENUITEM "Group &By",                   IDM_POPUP_GROUPBY
         MENUITEM "Refrescar",                   IDM_VIEW_REFRESH
         MENUITEM SEPARATOR

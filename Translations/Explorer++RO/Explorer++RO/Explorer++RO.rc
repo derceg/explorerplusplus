@@ -7,19 +7,16 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Romanian (Romania) resources
+// Romanian resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ROM)
-#ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
-#pragma code_page(1252)
-#endif //_WIN32
+LANGUAGE LANG_ROMANIAN, SUBLANG_NEUTRAL
+#pragma code_page(1250)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -41,6 +38,11 @@ BEGIN
     LTEXT           "Build Date: %s",IDC_STATIC_BUILDDATE,5,77,246,8
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,121,259,20
 END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
 
 IDD_OPTIONS_FILESFOLDERS DIALOGEX 0, 0, 230, 213
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
@@ -81,8 +83,10 @@ CAPTION "General"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "On Startup",IDC_STATIC,6,7,217,38
-    CONTROL         "Încarcã filele anterioare",IDC_STARTUP_PREVIOUSTABS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,17,77,10
-    CONTROL         "Încarcã dosarul prestabilit",IDC_STARTUP_DEFAULTFOLDER,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,30,77,10
+    CONTROL         "Încarcã filele anterioare",IDC_STARTUP_PREVIOUSTABS,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,17,77,10
+    CONTROL         "Încarcã dosarul prestabilit",IDC_STARTUP_DEFAULTFOLDER,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,30,77,10
     GROUPBOX        "General settings",IDC_STATIC,6,115,217,66
     CONTROL         "Salveazã preferinþe în fiºier XML",IDC_OPTION_XML,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,129,182,10
@@ -229,7 +233,8 @@ BEGIN
     EDITTEXT        IDC_BOOKMARK_LOCATION,45,83,182,14,ES_AUTOHSCROLL
     LTEXT           "Descriere",IDC_STATIC_DESCRIPTION,4,101,36,8
     EDITTEXT        IDC_BOOKMARK_DESCRIPTION,45,100,182,44,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
-    CONTROL         "&Aratã pe bara semnelor de carte",IDC_BOOKMARK_TOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,45,150,105,10
+    CONTROL         "&Aratã pe bara semnelor de carte",IDC_BOOKMARK_TOOLBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,45,150,105,10
     CONTROL         "",IDC_BOOKMARK_SEPARATOR,"Static",SS_ETCHEDHORZ,3,56,225,1
 END
 
@@ -260,7 +265,7 @@ BEGIN
     CONTROL         "Detalii",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,68,37,10
     CONTROL         "Iconiþe",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,68,51,10
     CONTROL         "Aratã fiºiere ascunse",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,96,73,10
-    CONTROL         ""Aranjare automatã",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,96,59,10
+    CONTROL         "Aranjare automatã",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,96,59,10
     CONTROL         "Aratã în grupuri",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,65,10
     CONTROL         "Dispune ascendent",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,111,63,10
     PUSHBUTTON      "Defa&ult Columns....",IDC_BUTTON_DEFAULTCOLUMNS,6,131,76,14
@@ -277,7 +282,8 @@ BEGIN
     EDITTEXT        IDC_BP_EDIT_LOCATION,47,22,160,14,ES_AUTOHSCROLL
     LTEXT           "Descriere",IDC_STATIC,4,43,36,8
     EDITTEXT        IDC_BP_EDIT_DESCRIPTION,47,41,160,52,ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL
-    CONTROL         "&Aratã pe bara semnelor de carte",IDC_BP_SHOWONTOOLBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,47,100,105,10
+    CONTROL         "&Aratã pe bara semnelor de carte",IDC_BP_SHOWONTOOLBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,47,100,105,10
     DEFPUSHBUTTON   "Confirmã",IDOK,102,115,50,14
     PUSHBUTTON      "Anuleazã",IDCANCEL,157,115,50,14
 END
@@ -351,7 +357,8 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Foloseºte numele dosarelor curente",IDC_RENAMETAB_USEFOLDERNAME,
                     "Button",BS_AUTORADIOBUTTON,8,18,97,10
-    CONTROL         "Foloseºte nume personalizat:",IDC_RENAMETAB_USECUSTOMNAME,"Button",BS_AUTORADIOBUTTON,8,33,75,10
+    CONTROL         "Foloseºte nume personalizat:",IDC_RENAMETAB_USECUSTOMNAME,
+                    "Button",BS_AUTORADIOBUTTON,8,33,75,10
     EDITTEXT        IDC_RENAMETAB_NEWTABNAME,84,32,193,13,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Confirmã",IDOK,180,57,50,14
     PUSHBUTTON      "Anuleazã",IDCANCEL,233,57,50,14
@@ -522,7 +529,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_OPTIONS_GENERAL, DIALOG
     BEGIN
@@ -571,116 +578,116 @@ END
 // Menu
 //
 
-IDR_MAINMENU MENU 
+IDR_MAINMENU MENU
 BEGIN
     POPUP "&Fiºier"
     BEGIN
-        MENUITEM "&Filã nouã\tCtrl+T",            IDM_FILE_NEWTAB
-        MENUITEM "&Închide filã\tCtrl+W",          IDM_FILE_CLOSETAB
-        MENUITEM "Cloneazã fereastrã",                IDM_FILE_CLONEWINDOW
+        MENUITEM "&Filã nouã\tCtrl+T",          IDM_FILE_NEWTAB
+        MENUITEM "&Închide filã\tCtrl+W",       IDM_FILE_CLOSETAB
+        MENUITEM "Cloneazã fereastrã",          IDM_FILE_CLONEWINDOW
         MENUITEM SEPARATOR
-        MENUITEM "Salveazã &listare director",     IDM_FILE_SAVEDIRECTORYLISTING
-        MENUITEM "Aratã &Linia de comandã",        IDM_FILE_SHOWCOMMANDPROMPT
+        MENUITEM "Salveazã &listare director",  IDM_FILE_SAVEDIRECTORYLISTING
+        MENUITEM "Aratã &Linia de comandã",     IDM_FILE_SHOWCOMMANDPROMPT
         MENUITEM "Copiazã &Calea dosarului\tCtrl+Shift+P", IDM_FILE_COPYFOLDERPATH
-        MENUITEM "Copiazã calea &fiºierului",            IDM_FILE_COPYITEMPATH
+        MENUITEM "Copiazã calea &fiºierului",   IDM_FILE_COPYITEMPATH
         MENUITEM "Copy &Universal File Paths",  IDM_FILE_COPYUNIVERSALFILEPATHS
-        MENUITEM "Copiazã &textul coloanei",           IDM_FILE_COPYCOLUMNTEXT
+        MENUITEM "Copiazã &textul coloanei",    IDM_FILE_COPYCOLUMNTEXT
         MENUITEM SEPARATOR
-        MENUITEM "Seteazã &atributele fiºierului...",     IDM_FILE_SETFILEATTRIBUTES
+        MENUITEM "Seteazã &atributele fiºierului...", IDM_FILE_SETFILEATTRIBUTES
         MENUITEM "&ªterge\tªterge",             IDM_FILE_DELETE
         MENUITEM "ªterge &permanent\tShift+Delete", IDM_FILE_DELETEPERMANENTLY
-        MENUITEM "Renu&meºte\tF2",                 IDM_FILE_RENAME
-        MENUITEM "P&roprietãþi\tAlt+Enter",      IDM_FILE_PROPERTIES
+        MENUITEM "Renu&meºte\tF2",              IDM_FILE_RENAME
+        MENUITEM "P&roprietãþi\tAlt+Enter",     IDM_FILE_PROPERTIES
         MENUITEM SEPARATOR
-        MENUITEM "&Ieºire",                       IDM_FILE_EXIT
+        MENUITEM "&Ieºire",                     IDM_FILE_EXIT
     END
     POPUP "&Editeazã"
     BEGIN
-        MENUITEM "Dezexecutã\tCtrl+Z",                IDM_EDIT_UNDO
+        MENUITEM "Dezexecutã\tCtrl+Z",          IDM_EDIT_UNDO
         MENUITEM SEPARATOR
-        MENUITEM "Ta&ie\tCtrl+X",                IDM_EDIT_CUT
-        MENUITEM "&Copiazã\tCtrl+C",               IDM_EDIT_COPY
-        MENUITEM "&Lipeºte\tCtrl+V",              IDM_EDIT_PASTE
+        MENUITEM "Ta&ie\tCtrl+X",               IDM_EDIT_CUT
+        MENUITEM "&Copiazã\tCtrl+C",            IDM_EDIT_COPY
+        MENUITEM "&Lipeºte\tCtrl+V",            IDM_EDIT_PASTE
         MENUITEM "Lipeºte &scurtãturã\tCtrl+Shift+V", IDM_EDIT_PASTESHORTCUT
-        MENUITEM "Lipeºte &legãturã fizicã",            IDM_EDIT_PASTEHARDLINK
+        MENUITEM "Lipeºte &legãturã fizicã",    IDM_EDIT_PASTEHARDLINK
         MENUITEM SEPARATOR
         MENUITEM "Copiazã în &dosar\tCtrl+Shift+C", IDM_EDIT_COPYTOFOLDER
         MENUITEM "Mu&tã în dosar\tCtrl+Shift+M", IDM_EDIT_MOVETOFOLDER
         MENUITEM SEPARATOR
-        MENUITEM "Salveazã e&xcesul de spaþiu dintre fiºiere...",         IDM_EDIT_SHOWFILESLACK
-        MENUITEM "&Rezolvã legãturã",               IDM_EDIT_RESOLVELINK
+        MENUITEM "Salveazã e&xcesul de spaþiu dintre fiºiere...", IDM_EDIT_SHOWFILESLACK
+        MENUITEM "&Rezolvã legãturã",           IDM_EDIT_RESOLVELINK
     END
     POPUP "Selecþie"
     BEGIN
-        MENUITEM "Selecteazã &tot\tCtrl+A",         IDM_EDIT_SELECTALL
-        MENUITEM "&Inverseazã selecþia\tCtrl+I",   IDM_EDIT_INVERTSELECTION
-        MENUITEM "Selecteazã totul de acelaºi &tip",    IDM_EDIT_SELECTALLFOLDERS
-        MENUITEM "Nu selecta &niciunul\tCtrl+Shift+N",  IDM_EDIT_SELECTNONE
+        MENUITEM "Selecteazã &tot\tCtrl+A",     IDM_EDIT_SELECTALL
+        MENUITEM "&Inverseazã selecþia\tCtrl+I", IDM_EDIT_INVERTSELECTION
+        MENUITEM "Selecteazã totul de acelaºi &tip", IDM_EDIT_SELECTALLFOLDERS
+        MENUITEM "Nu selecta &niciunul\tCtrl+Shift+N", IDM_EDIT_SELECTNONE
         MENUITEM "&Selecteazã metacaracter...\tCtrl+Shift+S", IDM_EDIT_WILDCARDSELECTION
         MENUITEM "&Deselecteazã metacaracter...\tCtrl+Shift+D", IDM_EDIT_WILDCARDDESELECT
     END
     POPUP "&Vizualizare"
     BEGIN
-        MENUITEM "&Barã de status",                 IDM_VIEW_STATUSBAR
-        MENUITEM "&Dosare",                    IDM_VIEW_FOLDERS
-        MENUITEM "&Fereastra de afiºare",             IDM_VIEW_DISPLAYWINDOW
+        MENUITEM "&Barã de status",             IDM_VIEW_STATUSBAR
+        MENUITEM "&Dosare",                     IDM_VIEW_FOLDERS
+        MENUITEM "&Fereastra de afiºare",       IDM_VIEW_DISPLAYWINDOW
         POPUP "&Bare de unelte"
         BEGIN
-            MENUITEM "Barã de adresã",                 IDM_TOOLBARS_ADDRESSBAR
-            MENUITEM "Bara de unelte principalã",                IDM_TOOLBARS_MAINTOOLBAR
-            MENUITEM "Semne de carte",                   IDM_TOOLBARS_BOOKMARKSTOOLBAR
-            MENUITEM "Unitãþi de stocare",                      IDM_TOOLBARS_DRIVES
-            MENUITEM "Bara de unelte a aplicaþiei",         IDM_TOOLBARS_APPLICATIONTOOLBAR
+            MENUITEM "Barã de adresã",              IDM_TOOLBARS_ADDRESSBAR
+            MENUITEM "Bara de unelte principalã",   IDM_TOOLBARS_MAINTOOLBAR
+            MENUITEM "Semne de carte",              IDM_TOOLBARS_BOOKMARKSTOOLBAR
+            MENUITEM "Unitãþi de stocare",          IDM_TOOLBARS_DRIVES
+            MENUITEM "Bara de unelte a aplicaþiei", IDM_TOOLBARS_APPLICATIONTOOLBAR
             MENUITEM SEPARATOR
-            MENUITEM "Fixare bare de unelte",               IDM_TOOLBARS_LOCKTOOLBARS
-            MENUITEM "Personalizeazã...",                IDM_TOOLBARS_CUSTOMIZE
+            MENUITEM "Fixare bare de unelte",       IDM_TOOLBARS_LOCKTOOLBARS
+            MENUITEM "Personalizeazã...",           IDM_TOOLBARS_CUSTOMIZE
         END
         MENUITEM SEPARATOR
         MENUITEM "Placeholder",                 IDM_VIEW_PLACEHOLDER
         MENUITEM SEPARATOR
         MENUITEM "&Auto Arrange",               IDM_ARRANGEICONSBY_AUTOARRANGE
         MENUITEM SEPARATOR
-        MENUITEM "A&ranjeazã dupã",                    IDM_VIEW_SORTBY
+        MENUITEM "A&ranjeazã dupã",             IDM_VIEW_SORTBY
         MENUITEM "&Group By",                   IDM_VIEW_GROUPBY
-        MENUITEM "Aratã fiºiere a&scunse\tCtrl+H",  IDM_VIEW_SHOWHIDDENFILES
-        MENUITEM "&Reîmprospãteazã\tF5",                IDM_VIEW_REFRESH
-        MENUITEM "Selecteazã &coloane...",          IDM_VIEW_SELECTCOLUMNS
-        MENUITEM "&Autodimensionezã coloane",           IDM_VIEW_AUTOSIZECOLUMNS
+        MENUITEM "Aratã fiºiere a&scunse\tCtrl+H", IDM_VIEW_SHOWHIDDENFILES
+        MENUITEM "&Reîmprospãteazã\tF5",        IDM_VIEW_REFRESH
+        MENUITEM "Selecteazã &coloane...",      IDM_VIEW_SELECTCOLUMNS
+        MENUITEM "&Autodimensionezã coloane",   IDM_VIEW_AUTOSIZECOLUMNS
         MENUITEM "Save Column Layout as Default", IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT
-        MENUITEM "Schimbã culorile afi&ºate...",  IDM_VIEW_CHANGEDISPLAYCOLOURS
+        MENUITEM "Schimbã culorile afi&ºate...", IDM_VIEW_CHANGEDISPLAYCOLOURS
         MENUITEM SEPARATOR
         POPUP "&Filtru"
         BEGIN
-            MENUITEM "Seteazã filtru...",               IDM_FILTER_FILTERRESULTS
-            MENUITEM "Aplicã filtru",                IDM_FILTER_APPLYFILTER
+            MENUITEM "Seteazã filtru...",           IDM_FILTER_FILTERRESULTS
+            MENUITEM "Aplicã filtru",               IDM_FILTER_APPLYFILTER
         END
     END
     POPUP "Acþiuni"
     BEGIN
-        MENUITEM "&Dosar nou\tCtrl+N",         IDM_ACTIONS_NEWFOLDER
+        MENUITEM "&Dosar nou\tCtrl+N",          IDM_ACTIONS_NEWFOLDER
         MENUITEM SEPARATOR
-        MENUITEM "&Divide fiºier...",              IDM_ACTIONS_SPLITFILE
-        MENUITEM "&Unificã fiºiere...",             IDM_ACTIONS_MERGEFILES
-        MENUITEM "&Distruge fiºiere...",           IDM_ACTIONS_DESTROYFILES
+        MENUITEM "&Divide fiºier...",           IDM_ACTIONS_SPLITFILE
+        MENUITEM "&Unificã fiºiere...",         IDM_ACTIONS_MERGEFILES
+        MENUITEM "&Distruge fiºiere...",        IDM_ACTIONS_DESTROYFILES
     END
     POPUP "&Hai"
     BEGIN
-        MENUITEM "&Înapoi\tAlt+Left",             IDM_GO_BACK
+        MENUITEM "&Înapoi\tAlt+Left",           IDM_GO_BACK
         MENUITEM "&Înainte\tAlt+Right",         IDM_GO_FORWARD
-        MENUITEM "&Un nivel mai sus\tBackspace",    IDM_GO_UPONELEVEL
+        MENUITEM "&Un nivel mai sus\tBackspace", IDM_GO_UPONELEVEL
         MENUITEM SEPARATOR
-        MENUITEM "Calculatorul meu",                 IDM_GO_MYCOMPUTER
-        MENUITEM "Documentele mele",                 IDM_GO_MYDOCUMENTS
-        MENUITEM "Muzica mea",                 IDM_GO_MYMUSIC
-        MENUITEM "Imaginile mele",                 IDM_GO_MYPICTURES
-        MENUITEM "Spaþiu de lucru",                 IDM_GO_DESKTOP
+        MENUITEM "Calculatorul meu",            IDM_GO_MYCOMPUTER
+        MENUITEM "Documentele mele",            IDM_GO_MYDOCUMENTS
+        MENUITEM "Muzica mea",                  IDM_GO_MYMUSIC
+        MENUITEM "Imaginile mele",              IDM_GO_MYPICTURES
+        MENUITEM "Spaþiu de lucru",             IDM_GO_DESKTOP
         MENUITEM SEPARATOR
-        MENUITEM "Coºul de reciclare",                 IDM_GO_RECYCLEBIN
-        MENUITEM "Panelul de control",                 IDM_GO_CONTROLPANEL
-        MENUITEM "Imprimante",                 IDM_GO_PRINTERS
-        MENUITEM "Inscripþionare CD",                 IDM_GO_CDBURNING
-        MENUITEM "Locurile mele de reþea",                 IDM_GO_MYNETWORKPLACES
-        MENUITEM "Conexiuni de reþea",                 IDM_GO_NETWORKCONNECTIONS
+        MENUITEM "Coºul de reciclare",          IDM_GO_RECYCLEBIN
+        MENUITEM "Panelul de control",          IDM_GO_CONTROLPANEL
+        MENUITEM "Imprimante",                  IDM_GO_PRINTERS
+        MENUITEM "Inscripþionare CD",           IDM_GO_CDBURNING
+        MENUITEM "Locurile mele de reþea",      IDM_GO_MYNETWORKPLACES
+        MENUITEM "Conexiuni de reþea",          IDM_GO_NETWORKCONNECTIONS
     END
     POPUP "Semne de carte"
     BEGIN
@@ -697,13 +704,13 @@ BEGIN
     END
     POPUP "&Ajutor"
     BEGIN
-        MENUITEM "&Ajutor\tF1",                   IDM_HELP_HELP
+        MENUITEM "&Ajutor\tF1",                 IDM_HELP_HELP
         MENUITEM SEPARATOR
-        MENUITEM "&Despre Explorator++...",        IDM_HELP_ABOUT
+        MENUITEM "&Despre Explorator++...",     IDM_HELP_ABOUT
     END
 END
 
-IDR_MAINMENU_RCLICK MENU 
+IDR_MAINMENU_RCLICK MENU
 BEGIN
     POPUP "Meniu contextual"
     BEGIN
@@ -713,21 +720,21 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "Auto Arrange",                IDM_ARRANGEICONSBY_AUTOARRANGE
         END
-        MENUITEM "Aranjeazã dupã",                     ID_POPUP_SORTBY
+        MENUITEM "Aranjeazã dupã",              IDM_POPUP_SORTBY
         MENUITEM "Group &By",                   IDM_POPUP_GROUPBY
-        MENUITEM "Reîmprospãteazã",                     IDM_VIEW_REFRESH
+        MENUITEM "Reîmprospãteazã",             IDM_VIEW_REFRESH
         MENUITEM SEPARATOR
-        MENUITEM "Lipeºte",                       IDM_EDIT_PASTE
-        MENUITEM "Lipeºte scurtãturã",              IDM_EDIT_PASTESHORTCUT
+        MENUITEM "Lipeºte",                     IDM_EDIT_PASTE
+        MENUITEM "Lipeºte scurtãturã",          IDM_EDIT_PASTESHORTCUT
         MENUITEM SEPARATOR
-        MENUITEM "Însemneazã dosarul...",          IDM_BOOKMARKS_BOOKMARKTHISTAB
-        MENUITEM "Copiazã calea dosarului",            IDM_FILE_COPYFOLDERPATH
+        MENUITEM "Însemneazã dosarul...",       IDM_BOOKMARKS_BOOKMARKTHISTAB
+        MENUITEM "Copiazã calea dosarului",     IDM_FILE_COPYFOLDERPATH
         MENUITEM SEPARATOR
-        MENUITEM "Proprietãþi",                  IDM_RCLICK_PROPERTIES
+        MENUITEM "Proprietãþi",                 IDM_RCLICK_PROPERTIES
     END
 END
 
-IDR_ARRANGEMENU MENU 
+IDR_ARRANGEMENU MENU
 BEGIN
     POPUP "Meniu contextual"
     BEGIN
@@ -739,27 +746,27 @@ BEGIN
     END
 END
 
-IDR_TAB_RCLICK MENU 
+IDR_TAB_RCLICK MENU
 BEGIN
     POPUP "Meniu contextual"
     BEGIN
-        MENUITEM "&Filã nouã\tCtrl+T",            IDM_FILE_NEWTAB
-        MENUITEM "Duplicã fila",               IDM_TAB_DUPLICATETAB
-        MENUITEM "Deschide director pãrinte în filã nouã",      IDM_TAB_OPENPARENTINNEWTAB
+        MENUITEM "&Filã nouã\tCtrl+T",          IDM_FILE_NEWTAB
+        MENUITEM "Duplicã fila",                IDM_TAB_DUPLICATETAB
+        MENUITEM "Deschide director pãrinte în filã nouã", IDM_TAB_OPENPARENTINNEWTAB
         MENUITEM SEPARATOR
-        MENUITEM "&Reîmprospãteazã\tF5",                IDM_TAB_REFRESH
-        MENUITEM "Reîmprospãteazã &tot",                IDM_TAB_REFRESHALL
+        MENUITEM "&Reîmprospãteazã\tF5",        IDM_TAB_REFRESH
+        MENUITEM "Reîmprospãteazã &tot",        IDM_TAB_REFRESHALL
         MENUITEM SEPARATOR
-        MENUITEM "Redenumeºte filã...",               IDM_TAB_RENAMETAB
-        MENUITEM "Fixeazã fila",                    IDM_TAB_LOCKTAB
-        MENUITEM "Fixeazã fila ºi adresa",        IDM_TAB_LOCKTABANDADDRESS
+        MENUITEM "Redenumeºte filã...",         IDM_TAB_RENAMETAB
+        MENUITEM "Fixeazã fila",                IDM_TAB_LOCKTAB
+        MENUITEM "Fixeazã fila ºi adresa",      IDM_TAB_LOCKTABANDADDRESS
         MENUITEM SEPARATOR
-        MENUITEM "Închide &celelalte file",           IDM_TAB_CLOSEOTHERTABS
-        MENUITEM "&Închide filã\tCtrl+W",          IDM_TAB_CLOSETAB
+        MENUITEM "Închide &celelalte file",     IDM_TAB_CLOSEOTHERTABS
+        MENUITEM "&Închide filã\tCtrl+W",       IDM_TAB_CLOSETAB
     END
 END
 
-IDR_VIEWS_MENU MENU 
+IDR_VIEWS_MENU MENU
 BEGIN
     POPUP "Meniu contextual"
     BEGIN
@@ -767,78 +774,78 @@ BEGIN
     END
 END
 
-IDR_TOOLBAR_MENU MENU 
+IDR_TOOLBAR_MENU MENU
 BEGIN
     POPUP "Meniu contextual"
     BEGIN
-        MENUITEM "Barã de adrese",                 IDM_TOOLBARS_ADDRESSBAR
-        MENUITEM "Barã de unelte principalã",                IDM_TOOLBARS_MAINTOOLBAR
-        MENUITEM "Semne de carte",                   IDM_TOOLBARS_BOOKMARKSTOOLBAR
-        MENUITEM "Unitãþi de stocare",                      IDM_TOOLBARS_DRIVES
-        MENUITEM "Barã de unelte a aplicaþiilor",         IDM_TOOLBARS_APPLICATIONTOOLBAR
+        MENUITEM "Barã de adrese",              IDM_TOOLBARS_ADDRESSBAR
+        MENUITEM "Barã de unelte principalã",   IDM_TOOLBARS_MAINTOOLBAR
+        MENUITEM "Semne de carte",              IDM_TOOLBARS_BOOKMARKSTOOLBAR
+        MENUITEM "Unitãþi de stocare",          IDM_TOOLBARS_DRIVES
+        MENUITEM "Barã de unelte a aplicaþiilor", IDM_TOOLBARS_APPLICATIONTOOLBAR
         MENUITEM SEPARATOR
-        MENUITEM "Fixeazã barele de unelte",               IDM_TOOLBARS_LOCKTOOLBARS
-        MENUITEM "Personalizeazã...",                IDM_TOOLBARS_CUSTOMIZE
+        MENUITEM "Fixeazã barele de unelte",    IDM_TOOLBARS_LOCKTOOLBARS
+        MENUITEM "Personalizeazã...",           IDM_TOOLBARS_CUSTOMIZE
     END
 END
 
-IDR_BOOKMARKSTOOLBAR_MENU MENU 
+IDR_BOOKMARKSTOOLBAR_MENU MENU
 BEGIN
     POPUP "Meniu contextual"
     BEGIN
-        MENUITEM "Deschide",                        IDM_BT_OPEN
-        MENUITEM "Deschide în filã nouã",             IDM_BT_OPENINNEWTAB
+        MENUITEM "Deschide",                    IDM_BT_OPEN
+        MENUITEM "Deschide în filã nouã",       IDM_BT_OPENINNEWTAB
         MENUITEM SEPARATOR
-        MENUITEM "Semn de carte nou...",             IDM_BT_NEWBOOKMARK
-        MENUITEM "Dosar nou...",               IDM_BT_NEWFOLDER
+        MENUITEM "Semn de carte nou...",        IDM_BT_NEWBOOKMARK
+        MENUITEM "Dosar nou...",                IDM_BT_NEWFOLDER
         MENUITEM SEPARATOR
         MENUITEM "ªterge",                      IDM_BT_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "Proprietãþi",                  IDM_BT_PROPERTIES
+        MENUITEM "Proprietãþi",                 IDM_BT_PROPERTIES
     END
 END
 
-IDR_BOOKMARK_MENU MENU 
+IDR_BOOKMARK_MENU MENU
 BEGIN
     POPUP "Meniu contextual"
     BEGIN
-        MENUITEM "Deschide",                        IDM_BOOKMARK_OPEN
-        MENUITEM "Deschide în filã nouã",             IDM_BOOKMARK_OPENINNEWTAB
+        MENUITEM "Deschide",                    IDM_BOOKMARK_OPEN
+        MENUITEM "Deschide în filã nouã",       IDM_BOOKMARK_OPENINNEWTAB
         MENUITEM SEPARATOR
-        MENUITEM "Aratã pe bara semnelor de carte",   IDM_BOOKMARK_SHOWONTOOLBAR
+        MENUITEM "Aratã pe bara semnelor de carte", IDM_BOOKMARK_SHOWONTOOLBAR
         MENUITEM SEPARATOR
         MENUITEM "ªterge",                      IDM_BOOKMARK_DELETE
         MENUITEM SEPARATOR
-        MENUITEM "Semn de carte nou...",             IDM_BOOKMARK_NEWBOOKMARK
-        MENUITEM "Dosar nou...",               IDM_BOOKMARK_NEWFOLDER
+        MENUITEM "Semn de carte nou...",        IDM_BOOKMARK_NEWBOOKMARK
+        MENUITEM "Dosar nou...",                IDM_BOOKMARK_NEWFOLDER
         MENUITEM SEPARATOR
-        MENUITEM "Proprietãþi",                  IDM_BOOKMARK_PROPERTIES
+        MENUITEM "Proprietãþi",                 IDM_BOOKMARK_PROPERTIES
     END
 END
 
-IDR_APPLICATIONTOOLBAR_MENU MENU 
+IDR_APPLICATIONTOOLBAR_MENU MENU
 BEGIN
     POPUP "Meniu contextual"
     BEGIN
-        MENUITEM "Deschide",                        IDM_APP_OPEN
+        MENUITEM "Deschide",                    IDM_APP_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "Buton pentru aplicaþie nou...",   IDM_APP_NEW
+        MENUITEM "Buton pentru aplicaþie nou...", IDM_APP_NEW
         MENUITEM SEPARATOR
         MENUITEM "ªterge",                      IDM_APP_DELETE
-        MENUITEM "Proprietãþi",                  IDM_APP_PROPERTIES
+        MENUITEM "Proprietãþi",                 IDM_APP_PROPERTIES
     END
 END
 
-IDR_HEADER_MENU MENU 
+IDR_HEADER_MENU MENU
 BEGIN
     POPUP "Meniu contextual"
     BEGIN
         MENUITEM SEPARATOR
-        MENUITEM "Mai mult...",                     IDM_HEADER_MORE
+        MENUITEM "Mai mult...",                 IDM_HEADER_MORE
     END
 END
 
-IDR_DISPLAYWINDOW_RCLICK MENU 
+IDR_DISPLAYWINDOW_RCLICK MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -848,7 +855,7 @@ BEGIN
     END
 END
 
-IDR_MASSRENAME_MENU MENU 
+IDR_MASSRENAME_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -859,7 +866,7 @@ BEGIN
     END
 END
 
-IDR_GROUPBY_MENU MENU 
+IDR_GROUPBY_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -940,7 +947,7 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_SAVEDIRECTORYLISTING 
                             "Salveazã o listare de director pentru directorul curent."
@@ -959,7 +966,7 @@ BEGIN
     IDS_SORTBY_DATEDELETED  "Data ºtergerii"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_NEWTAB         "Creeazã o filã nouã"
     IDM_FILE_CLOSETAB       "Închide fila curentã"
@@ -970,7 +977,7 @@ BEGIN
     IDM_FILE_DELETE         "Mutã elementele selectate la Coºul de reciclare"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_RENAME         "Redenumeºte elementele selectate"
     IDM_FILE_PROPERTIES     "Aratã proprietãþile elementelor selectate"
@@ -989,18 +996,19 @@ BEGIN
     IDM_VEW_ADDRESSBAR      "Aratã/Ascunde bara de adrese"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
-    IDM_EDIT_WILDCARDSELECTION "Selecteazã elemente pe baza unui filtru cu metacaractere"
+    IDM_EDIT_WILDCARDSELECTION 
+                            "Selecteazã elemente pe baza unui filtru cu metacaractere"
     IDM_BOOKMARKS_ORGANIZEBOOKMARKS 
                             "Permite redenumirea, ºtergerea ºi schimbarea descrierii semnelor de carte"
     IDM_VIEW_DISPLAYWINDOW  "Aratã/Ascunde fereastra de afiºare"
-    IDM_VIEW_CHANGEDISPLAYCOLOURS 
-                            "Configureazã culorile ferestrei de afiºare"
-    IDM_EDIT_WILDCARDDESELECT "Deselecteazã elemente pe baza unui filtru cu metacaractere"
+    IDM_VIEW_CHANGEDISPLAYCOLOURS "Configureazã culorile ferestrei de afiºare"
+    IDM_EDIT_WILDCARDDESELECT 
+                            "Deselecteazã elemente pe baza unui filtru cu metacaractere"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLS_OPTIONS       "Configureazã setãrile programului"
     IDM_HELP_HELP           "Deschide fiºierul ajutor"
@@ -1009,14 +1017,14 @@ BEGIN
     IDM_VIEW_REFRESH        "Reîmprospãteazã conþinutul filei curente"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_DELETEPERMANENTLY "ªterge permanent elementele selectate"
     IDM_TAB_CLOSEOTHERTABS  "Închide toate filele cu excepþia celei actuale"
     IDM_TAB_REFRESHALL      "Reîmprospãteazã conþinutul tuturor filelor"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_EXIT           "Iese din program"
     IDM_EDIT_SELECTALLOFSAMETYPE 
@@ -1030,7 +1038,7 @@ BEGIN
     IDM_BOOKMARKS_BOOKMARKALLTABS "Însemneazã toate dosarele deschise"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_VIEW_THUMBNAILS     "Afiºeazã elementele folosind miniaturi"
     IDM_VIEW_TILES          "Afiºeazã informaþii despre fiecare element din fila curentã folosind o dalã"
@@ -1042,7 +1050,7 @@ BEGIN
     IDM_VIEW_EXTRALARGEICONS "Displays items using extra large icons"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_ARRANGEICONSBY_NAME "Aranjeazã elementele alfabetic dupã nume"
     IDM_ARRANGEICONSBY_SIZE "Aranjeazã elementele în ordinea creºterii în mãrime"
@@ -1050,7 +1058,8 @@ BEGIN
     IDM_ARRANGEICONSBY_DATEMODIFIED 
                             "Aranjeazã elementele dupã data modificãrii; de la cel mai vechi la cel mai nou"
     IDM_ARRANGEICONSBY_ASCENDING "Sorteazã elementele în ordine crescãtoare"
-    IDM_ARRANGEICONSBY_DESCENDING "Sorteazã elementele în ordine descrescãtoare"
+    IDM_ARRANGEICONSBY_DESCENDING 
+                            "Sorteazã elementele în ordine descrescãtoare"
     IDM_ARRANGEICONSBY_SHOWINGROUPS 
                             "Grupeazã elementele din fila curentã dupã proprietatea sortatã"
     IDM_ARRANGEICONSBY_AUTOARRANGE "Aranjeazã elementele automat"
@@ -1059,13 +1068,13 @@ BEGIN
     IDM_GO_UPONELEVEL       "Navigheazã dosarul de deasupra acestuia"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_EDIT_PASTEHARDLINK  "Creeazã un o legãturã fizicã la oricare fiºier de pe cliplanºetã"
     IDM_VIEW_SELECTCOLUMNS  "Configureazã coloanele afiºate pentru aceastã filã"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_SORTBY_NAME         "Sorteazã elementele alfabetic dupã nume"
     IDM_SORTBY_SIZE         "Sorteazã elementele dupã mãrimea lor"
@@ -1074,7 +1083,8 @@ BEGIN
     IDM_SORTBY_TOTALSIZE    "Sorteazã elementele dupã mãrimea lor totalã"
     IDM_SORTBY_FREESPACE    "Sorteazã elementele dupã cantitatea de spaþiu liber pe care o au"
     IDM_SORTBY_DATEDELETED  "Sorteazã elementele dupã data când au fost ºterse"
-    IDM_SORTBY_ORIGINALLOCATION "Sorteazã elementele dupã locaþia lor originalã"
+    IDM_SORTBY_ORIGINALLOCATION 
+                            "Sorteazã elementele dupã locaþia lor originalã"
     IDM_SORTBY_ATTRIBUTES   "Sorteazã elementele dupã atribut"
     IDM_SORTBY_REALSIZE     "Sorteazã elementele dupã mãrimea lor pe disc"
     IDM_SORTBY_SHORTNAME    "Sorteazã elementele dupã numele lor scurt (8.3)"
@@ -1084,7 +1094,7 @@ BEGIN
     IDM_SORTBY_DESCRIPTION  "Sorteazã elementele dupã descriere"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_SORTBY_FILEVERSION  "Sorteazã elementele dupã versiunea fiºierului"
     IDM_SORTBY_PRODUCTVERSION "Sorteazã elementele dupã versiunea produsului"
@@ -1104,7 +1114,7 @@ BEGIN
     IDM_SORTBY_HEIGHT       "Sorteazã elementele dupã înãlþime"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_SORTBY_VIRTUALCOMMENTS "Sorteazã elementele dupã comentariu"
     IDM_SORTBY_FILESYSTEM   "Sorteazã elementele dupã sistemul de fiºiere"
@@ -1117,14 +1127,14 @@ BEGIN
     IDM_SORTBY_NETWORKADAPTER_STATUS "Sorteazã elementele dupã stare"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILTER_APPLYFILTER  "Activates/deactivates the filter"
     IDM_FILTER_FILTERRESULTS "Allows a wildcard filter to be specified"
     IDM_FILE_COPYCOLUMNTEXT "Copiazã textul coloanei elementului selectat"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TAB_DUPLICATETAB    "Duplicã fila specificatã"
     IDM_TAB_LOCKTAB         "Previne închiderea filei specificate"
@@ -1134,7 +1144,7 @@ BEGIN
                             "Previne închiderea filei specificate ºi schimbarea directorului"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_ACTIONS_SPLITFILE   "Divide fiºierul specificat într-un set de fiºiere mai mici"
     IDM_ACTIONS_MERGEFILES  "Nu este încã implementat"
@@ -1143,19 +1153,19 @@ BEGIN
     IDM_ACTIONS_NEWFOLDER   "Creeazã un dosar nou"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLBARS_ADDRESSBAR "Aratã/Ascunde bara de adrese"
     IDM_TOOLBARS_CUSTOMIZE  "Personalizeazã bara de unelte principalã"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLBARS_MAINTOOLBAR "Aratã/Ascunde bara de unelte principalã"
     IDM_TOOLBARS_BOOKMARKSTOOLBAR "Aratã/Ascunde bara semnelor de carte"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_SORTBY_ORIGINALLOCATION "Locaþie originalã"
     IDS_SORTBY_ATTRIBUTES   "Atribute"
@@ -1175,7 +1185,7 @@ BEGIN
     IDS_SORTBY_TITLE        "Titlu"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_SORTBY_SUBJECT      "Subiect"
     IDS_SORTBY_AUTHOR       "Autor"
@@ -1195,7 +1205,7 @@ BEGIN
     IDS_GO                  "Hai"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_HIDEFOLDERSPANE     "Ascunde panoul dosarelor"
     IDS_FILERENAMEERROR     "Fiºierul specificat nu a putut fi îndepãrtat. Te rog asigurã-te cã nu este folosit momentan."
@@ -1204,14 +1214,14 @@ BEGIN
     IDS_TOOLBAR_UP          "Sus"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TOOLBAR_FOLDERS     "Dosare"
     IDS_TOOLBAR_COPYTO      "Copiazã în"
     IDS_TOOLBAR_MOVETO      "Mutã în"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TOOLBAR_NEWFOLDER   "Dosar nou"
     IDS_TOOLBAR_COPY        "Copiazã"
@@ -1225,7 +1235,7 @@ BEGIN
     IDS_GENERAL_SELECTED_ONEITEM "element selectat"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_GENERAL_SELECTED_MOREITEMS "elemente selectate"
     IDS_GENERAL_ONEITEM     "element"
@@ -1241,15 +1251,16 @@ BEGIN
     IDS_SEPARATOR           "Separator"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TAB_RENAMETAB       "Permite filei specificate sã fie redenumitã"
-    IDM_VIEW_SETDEFAULTCOLUMNS "Seteazã coloanele prestabilite folosite pentru fiecare filã"
+    IDM_VIEW_SETDEFAULTCOLUMNS 
+                            "Seteazã coloanele prestabilite folosite pentru fiecare filã"
     IDM_EDIT_UNDO           "Dezexecutã orice operaþie anterioarã asupra fiºierelor"
     IDM_TOOLBARS_DRIVES     "Aratã/Ascunde bara de unelte a unitãþilor de stocare"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_NEWFOLDERERROR      "Dosarul nu a putut fi creat. Te rog asigurã-te cã ai suficiente privilegii pentru a crea un dosar nou în acest director."
     IDS_BOOKMARKDLG_NAME    "Nume semn carte"
@@ -1258,7 +1269,7 @@ BEGIN
     IDS_ERR_FILENAMEINVALID "Un nume de fiºier nu poate conþine niciunul dintre urmãtoarele caractere:\n\t \\ / : * ? "" < > |"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_BT_OPEN             "Deschide semnul de carte selectat în cadrul filei curente"
     IDM_BT_NEWBOOKMARK      "Creeazã un nou semn de carte"
@@ -1267,10 +1278,11 @@ BEGIN
     IDM_BT_PROPERTIES       "Aratã proprietãþile semnului de carte selectat"
     IDM_BT_OPENINNEWTAB     "Deschide semnul de carte selectat într-o filã nouã"
     IDM_TOOLBARS_LOCKTOOLBARS "Previne mutarea barelor de unelte"
-    IDM_TOOLBARS_APPLICATIONTOOLBAR "Aratã/Ascunde bara de unelte a aplicaþiei"
+    IDM_TOOLBARS_APPLICATIONTOOLBAR 
+                            "Aratã/Ascunde bara de unelte a aplicaþiei"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_DESCRIPTION_NAME "Nume fiºier"
     IDS_COLUMN_DESCRIPTION_TYPE "Tip fiºier"
@@ -1280,8 +1292,7 @@ BEGIN
     IDS_COLUMN_DESCRIPTION_REALSIZE "Mãrime fizicã fiºier"
     IDS_COLUMN_DESCRIPTION_SHORTNAME "Nume DOS 8.3"
     IDS_COLUMN_DESCRIPTION_OWNER "Deþinãtor fiºier"
-    IDS_COLUMN_DESCRIPTION_PRODUCTNAME 
-                            "Nume produs asociat cu executabil"
+    IDS_COLUMN_DESCRIPTION_PRODUCTNAME "Nume produs asociat cu executabil"
     IDS_COLUMN_DESCRIPTION_COMPANY "Companie asociatã cu executabil"
     IDS_COLUMN_DESCRIPTION_DESCRIPTION "Descriere fiºier"
     IDS_COLUMN_DESCRIPTION_FILEVERSION 
@@ -1293,7 +1304,7 @@ BEGIN
     IDS_COLUMN_DESCRIPTION_EXTENSION "Extensie nume fiºier"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_DESCRIPTION_CREATED "Data creãrii"
     IDS_COLUMN_DESCRIPTION_ACCESSED "Data ultimei accesãri"
@@ -1309,17 +1320,19 @@ BEGIN
     IDS_COLUMN_DESCRIPTION_HEIGHT "Înãlþimea imaginii"
     IDS_COLUMN_DESCRIPTION_TOTALSIZE "Mãrimea totalã a unei unitãþi"
     IDS_COLUMN_DESCRIPTION_FREESPACE "Spaþiu liber disponibil pe o unitate"
-    IDS_COLUMN_DESCRIPTION_FILESYSTEM "Sistem de fiºiere instalat pe o unitate"
+    IDS_COLUMN_DESCRIPTION_FILESYSTEM 
+                            "Sistem de fiºiere instalat pe o unitate"
     IDS_COLUMN_DESCRIPTION_NUMPRINTERDOCUMENTS 
                             "Numãr de documente asociate cu o imprimantã"
     IDS_COLUMN_DESCRIPTION_PRINTERCOMMENTS 
                             "Comentarii asociate cu o imprimantã"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_DESCRIPTION_PRINTERLOCATION "Locaþia unei imprimante"
-    IDS_COLUMN_DESCRIPTION_NETWORKADAPTER_STATUS "Stare a unui adaptor de reþea"
+    IDS_COLUMN_DESCRIPTION_NETWORKADAPTER_STATUS 
+                            "Stare a unui adaptor de reþea"
     IDS_NETWORKADAPTER_CONNECTED "Conectat"
     IDS_NETWORKADAPTER_DISCONNECTED "Deconectat"
     IDS_NETWORKADAPTER_TESTING "Se testeazã"
@@ -1338,7 +1351,7 @@ BEGIN
     IDS_VIEW_ICONS          "Icons"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_VIEW_SMALLICONS     "Small Icons"
     IDS_COLUMN_NAME_NAME    "Nume"
@@ -1358,7 +1371,7 @@ BEGIN
     IDS_COLUMN_NAME_HARDLINKS "Legãturi fizice"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_EXTENSION "Extensie"
     IDS_COLUMN_NAME_CREATED "Data creãrii"
@@ -1378,7 +1391,7 @@ BEGIN
     IDS_COLUMN_NAME_FILESYSTEM "Sistem de fiºiere"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_VIRTUALTYPE "Tip"
     IDS_COLUMN_NAME_ORIGINALLOCATION "Locaþie originalã"
@@ -1398,11 +1411,12 @@ BEGIN
     IDS_COLUMN_NAME_DURATION "Duration"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ERR_FILENAMEINVALID_MSGTITLE "Nume fiºier invalid"
     IDS_OPTIONSDIALOG_TITLE "Opþiuni"
-    IDS_DEFAULTSETTINGS_NEWTAB "Selecteazã un director prestabilit pentru file noi"
+    IDS_DEFAULTSETTINGS_NEWTAB 
+                            "Selecteazã un director prestabilit pentru file noi"
     IDS_FOLDERPANE_HEADER   "Dosare"
     IDS_DEFAULTCOLUMNS_GENERAL "General"
     IDS_GENERAL_DATEMODIFIED "Data Modificãrii"
@@ -1412,7 +1426,7 @@ BEGIN
     IDS_TAB_CLOSE_TIP       "Închide fila curentã"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_HEADER_MORE         "Selecteazã coloane adiþionale pentru a fi arãtate."
     IDM_FILE_CLONEWINDOW    "Cloneazã fereastra curentã"
@@ -1422,7 +1436,7 @@ BEGIN
     IDM_GROUPBY_DESCENDING  "Sorts groups in decreasing order"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_COPYUNIVERSALFILEPATHS 
                             "Copies the universal paths of all selected items"
@@ -1430,12 +1444,12 @@ BEGIN
     IDM_TOOLS_CUSTOMIZECOLORS "Customizes the colors used within the listview"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLS_ADJUSTCOLORFILTERING "Configures color filtering"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_PROTECTED "Protected"
     IDS_COLUMN_NAME_RATING  "Rating"
@@ -1455,7 +1469,7 @@ BEGIN
     IDS_COLUMN_NAME_PARENTALRATINGREASON "Parental rating reason"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_PERIOD  "Period"
     IDS_COLUMN_NAME_PRODUCER "Producer"
@@ -1471,14 +1485,14 @@ BEGIN
     IDS_GENERAL_NEWAPPLICATIONBUTTON "New Application Button"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLS_SEARCH        "Search for files"
     IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT 
                             "Set the layout of the current columns as the default layout"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_APP_OPEN            "Opens the selected application."
     IDM_APP_NEW             "Creates a new application button"
@@ -1486,7 +1500,7 @@ BEGIN
     IDM_APP_PROPERTIES      "Shows the properties of the selected application button"
 END
 
-#endif    // English (Australia) resources
+#endif    // Romanian resources
 /////////////////////////////////////////////////////////////////////////////
 
 

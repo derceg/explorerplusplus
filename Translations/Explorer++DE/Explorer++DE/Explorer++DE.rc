@@ -7,8 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-
+#include "afxres.h"
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -16,10 +15,8 @@
 // German (Germany) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_DEU)
-#ifdef _WIN32
 LANGUAGE LANG_GERMAN, SUBLANG_GERMAN
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -259,7 +256,8 @@ BEGIN
     CONTROL         "Liste",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,68,27,10
     CONTROL         "&Details",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,68,37,10
     CONTROL         "Kleine Symbole",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,68,51,10
-    CONTROL         "Versteckte Dateien anzeigen",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,96,73,10
+    CONTROL         "Versteckte Dateien anzeigen",IDC_SHOWHIDDENGLOBAL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,96,73,10
     CONTROL         "Automatisch anordnen",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,96,59,10
     CONTROL         "In Gruppen ordnen",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,65,10
     CONTROL         "Aufsteigend sortieren",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,95,111,63,10
@@ -273,7 +271,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Name:",IDC_STATIC,4,6,22,8
     EDITTEXT        IDC_BP_EDIT_NAME,51,3,160,14,ES_AUTOHSCROLL
-    LTEXT           "Ort:",IDC_STATIC,4,24,30,8
+    LTEXT           "Ort:",IDC_STATIC,4,24,14,8
     EDITTEXT        IDC_BP_EDIT_LOCATION,51,22,160,14,ES_AUTOHSCROLL
     LTEXT           "Beschreibung:",IDC_STATIC,4,43,46,8
     EDITTEXT        IDC_BP_EDIT_DESCRIPTION,51,41,160,52,ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
@@ -522,8 +520,12 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
+    IDD_ABOUT, DIALOG
+    BEGIN
+    END
+
     IDD_OPTIONS_GENERAL, DIALOG
     BEGIN
         RIGHTMARGIN, 228
@@ -551,6 +553,10 @@ BEGIN
         BOTTOMMARGIN, 166
     END
 
+    IDD_BOOKMARK_PROPERTIES, DIALOG
+    BEGIN
+    END
+
     IDD_SELECTCOLUMNS, DIALOG
     BEGIN
         RIGHTMARGIN, 198
@@ -571,7 +577,7 @@ END
 // Menu
 //
 
-IDR_MAINMENU MENU 
+IDR_MAINMENU MENU
 BEGIN
     POPUP "&File"
     BEGIN
@@ -703,7 +709,7 @@ BEGIN
     END
 END
 
-IDR_MAINMENU_RCLICK MENU 
+IDR_MAINMENU_RCLICK MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -713,7 +719,7 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "Auto Arrange",                IDM_ARRANGEICONSBY_AUTOARRANGE
         END
-        MENUITEM "Sortieren nach",              ID_POPUP_SORTBY
+        MENUITEM "Sortieren nach",              IDM_POPUP_SORTBY
         MENUITEM "Group &By",                   IDM_POPUP_GROUPBY
         MENUITEM "Aktualisieren",               IDM_VIEW_REFRESH
         MENUITEM SEPARATOR
@@ -727,7 +733,7 @@ BEGIN
     END
 END
 
-IDR_ARRANGEMENU MENU 
+IDR_ARRANGEMENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -739,7 +745,7 @@ BEGIN
     END
 END
 
-IDR_TAB_RCLICK MENU 
+IDR_TAB_RCLICK MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -759,7 +765,7 @@ BEGIN
     END
 END
 
-IDR_VIEWS_MENU MENU 
+IDR_VIEWS_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -767,7 +773,7 @@ BEGIN
     END
 END
 
-IDR_TOOLBAR_MENU MENU 
+IDR_TOOLBAR_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -782,7 +788,7 @@ BEGIN
     END
 END
 
-IDR_BOOKMARKSTOOLBAR_MENU MENU 
+IDR_BOOKMARKSTOOLBAR_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -798,7 +804,7 @@ BEGIN
     END
 END
 
-IDR_BOOKMARK_MENU MENU 
+IDR_BOOKMARK_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -816,7 +822,7 @@ BEGIN
     END
 END
 
-IDR_APPLICATIONTOOLBAR_MENU MENU 
+IDR_APPLICATIONTOOLBAR_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -829,7 +835,7 @@ BEGIN
     END
 END
 
-IDR_HEADER_MENU MENU 
+IDR_HEADER_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -838,7 +844,7 @@ BEGIN
     END
 END
 
-IDR_DISPLAYWINDOW_RCLICK MENU 
+IDR_DISPLAYWINDOW_RCLICK MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -848,7 +854,7 @@ BEGIN
     END
 END
 
-IDR_MASSRENAME_MENU MENU 
+IDR_MASSRENAME_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -859,7 +865,7 @@ BEGIN
     END
 END
 
-IDR_GROUPBY_MENU MENU 
+IDR_GROUPBY_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
@@ -940,10 +946,9 @@ END
 // String Table
 //
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
-    IDM_FILE_SAVEDIRECTORYLISTING 
-                            "Erstelle Liste aus den aktuellen Ordner."
+    IDM_FILE_SAVEDIRECTORYLISTING "Erstelle Liste aus den aktuellen Ordner."
     IDS_MERGE_COLUMN_TEXT   "Dateien die zusammengefügt werden sollen"
     IDS_OK                  "Ok"
     IDS_MERGE_NOINPUT       "Keine Quelldateien definiert"
@@ -959,7 +964,7 @@ BEGIN
     IDS_SORTBY_DATEDELETED  "Löschdatum"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_NEWTAB         "Erstellt neuen Tab."
     IDM_FILE_CLOSETAB       "Schließt den aktuellen Tab."
@@ -970,7 +975,7 @@ BEGIN
     IDM_FILE_DELETE         "Markierte Elemente in den Papierkorb verschieben."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_RENAME         "Benennt ausgewählte Objekte um."
     IDM_FILE_PROPERTIES     "Zeigt Eigenschaften ausgewählter Objekte."
@@ -989,9 +994,10 @@ BEGIN
     IDM_VEW_ADDRESSBAR      "Addressleiste ein-/ausblenden."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
-    IDM_EDIT_WILDCARDSELECTION "Elemente anhand eines Wildcard-Filter auswählen."
+    IDM_EDIT_WILDCARDSELECTION 
+                            "Elemente anhand eines Wildcard-Filter auswählen."
     IDM_BOOKMARKS_ORGANIZEBOOKMARKS 
                             "Erlaubt es Lesezeichen umzubenennen, zu löschen oder die Beschreibung zu ändern."
     IDM_VIEW_DISPLAYWINDOW  "Anzeige Fenster ein-/ausblenden."
@@ -1000,7 +1006,7 @@ BEGIN
                             "Elemente anhand eines Wildcard-Filter abwählen."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLS_OPTIONS       "Programm-Einstellungen konfigurieren."
     IDM_HELP_HELP           "Dieses Feature ist noch nicht implementiert."
@@ -1009,14 +1015,15 @@ BEGIN
     IDM_VIEW_REFRESH        "Aktualisiert alle Inhalte des ausgewählten Tabs."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
-    IDM_FILE_DELETEPERMANENTLY "Löscht die ausgewählten Elemente unwiederbringlich."
+    IDM_FILE_DELETEPERMANENTLY 
+                            "Löscht die ausgewählten Elemente unwiederbringlich."
     IDM_TAB_CLOSEOTHERTABS  "Schließt alle Tabs, außer des aktuellen Tab."
     IDM_TAB_REFRESHALL      "Aktualisiert die Inhalte aller Tabs."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_EXIT           "Beendet das Programm."
     IDM_EDIT_SELECTALLOFSAMETYPE 
@@ -1026,11 +1033,13 @@ BEGIN
     IDM_EDIT_SHOWFILESLACK  "Zeigt Daten des Slack-Speicherplatzes der ausgewählten Elemente an."
     IDM_EDIT_RESOLVELINK    "Zeigt Ziele von ausgewählten Verknüpfungen."
     IDM_RCLICK_PROPERTIES   "Zeigt Eigenschaften für ausgewählten Ordner an."
-    IDM_BOOKMARKS_BOOKMARKTHISTAB "Fügt ausgewählten Ordner zu Lesezeichen hinzu."
-    IDM_BOOKMARKS_BOOKMARKALLTABS "Fügt alle geöffneten Ordner zu Lesezeichen hinzu."
+    IDM_BOOKMARKS_BOOKMARKTHISTAB 
+                            "Fügt ausgewählten Ordner zu Lesezeichen hinzu."
+    IDM_BOOKMARKS_BOOKMARKALLTABS 
+                            "Fügt alle geöffneten Ordner zu Lesezeichen hinzu."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_VIEW_THUMBNAILS     "Zeigt Objekte in der Miniaturansicht an."
     IDM_VIEW_TILES          "Displays information about each item in the current tab using a tile."
@@ -1042,7 +1051,7 @@ BEGIN
     IDM_VIEW_EXTRALARGEICONS "Displays items using extra large icons"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_ARRANGEICONSBY_NAME "Elemente alphabetisch nach Namen anordnen."
     IDM_ARRANGEICONSBY_SIZE "Elemente aufsteigend nach Größe anordnen."
@@ -1059,13 +1068,13 @@ BEGIN
     IDM_GO_UPONELEVEL       "In übergeordneten Ordner wechseln."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_EDIT_PASTEHARDLINK  "Hard-Link zu allen Dateien in der Zwischenablage erzeugen."
     IDM_VIEW_SELECTCOLUMNS  "Spalten der Dateilanzeige konfigurieren."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_SORTBY_NAME         "Elemente alphabetisch nach Namen sortieren"
     IDM_SORTBY_SIZE         "Elemente nach Größe sortieren"
@@ -1084,7 +1093,7 @@ BEGIN
     IDM_SORTBY_DESCRIPTION  "Elemente nach Beschreibung sortieren"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_SORTBY_FILEVERSION  "Elemente nach Dateiversion sortieren"
     IDM_SORTBY_PRODUCTVERSION "Elemente nach Produktversion sortieren"
@@ -1104,7 +1113,7 @@ BEGIN
     IDM_SORTBY_HEIGHT       "Elemente nach Höhe sortieren"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_SORTBY_VIRTUALCOMMENTS "Elemente nach Kommentar sortieren"
     IDM_SORTBY_FILESYSTEM   "Elemente nach Dateisystem sortieren"
@@ -1117,14 +1126,14 @@ BEGIN
     IDM_SORTBY_NETWORKADAPTER_STATUS "Elemente nach Status sortieren"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILTER_APPLYFILTER  "Activates/deactivates the filter"
     IDM_FILTER_FILTERRESULTS "Allows a wildcard filter to be specified"
     IDM_FILE_COPYCOLUMNTEXT "Kopiert den Spalten-Text derzeitig ausgewählter Elemente."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TAB_DUPLICATETAB    "Dupliziert ausgewählten Tab."
     IDM_TAB_LOCKTAB         "Verhindert das Schließen des ausgewählten Tabs."
@@ -1134,7 +1143,7 @@ BEGIN
                             "Schützt den ausgewählten Tab vor dem Schließen."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_ACTIONS_SPLITFILE   "Split the selected file into a set of smaller files."
     IDM_ACTIONS_MERGEFILES  "Noch nicht implementiert"
@@ -1143,19 +1152,19 @@ BEGIN
     IDM_ACTIONS_NEWFOLDER   "Erstellt einen neuen Ordner."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLBARS_ADDRESSBAR "Addressleiste ein-/ausblenden."
     IDM_TOOLBARS_CUSTOMIZE  "Werkzeugleiste anpassen."
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLBARS_MAINTOOLBAR "Werkzeugleiste ein-/ausblenden."
     IDM_TOOLBARS_BOOKMARKSTOOLBAR "Shows/Hides the bookmarks toolbar"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_SORTBY_ORIGINALLOCATION "Herkunft"
     IDS_SORTBY_ATTRIBUTES   "Attribute"
@@ -1175,7 +1184,7 @@ BEGIN
     IDS_SORTBY_TITLE        "Titel"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_SORTBY_SUBJECT      "Thema"
     IDS_SORTBY_AUTHOR       "Autor"
@@ -1195,7 +1204,7 @@ BEGIN
     IDS_GO                  "Start"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_HIDEFOLDERSPANE     "Ordnerstruktur ausblenden"
     IDS_FILERENAMEERROR     "The specified file could not be renamed. Please ensure that it is not in use."
@@ -1204,14 +1213,14 @@ BEGIN
     IDS_TOOLBAR_UP          "Aufwärts"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TOOLBAR_FOLDERS     "Ordner"
     IDS_TOOLBAR_COPYTO      "Kopiere nach"
     IDS_TOOLBAR_MOVETO      "Verschiebe nach"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_TOOLBAR_NEWFOLDER   "Neuer Ordner"
     IDS_TOOLBAR_COPY        "Kopieren"
@@ -1225,7 +1234,7 @@ BEGIN
     IDS_GENERAL_SELECTED_ONEITEM "Element ausgewählt"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_GENERAL_SELECTED_MOREITEMS "Elemente ausgewählt"
     IDS_GENERAL_ONEITEM     "Element"
@@ -1241,7 +1250,7 @@ BEGIN
     IDS_SEPARATOR           "Separator"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TAB_RENAMETAB       "Allows the specfiied tab to be renamed"
     IDM_VIEW_SETDEFAULTCOLUMNS "Sets the default columns used for each tab"
@@ -1249,7 +1258,7 @@ BEGIN
     IDM_TOOLBARS_DRIVES     "Shows/Hides the drives toolbar"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_NEWFOLDERERROR      "The folder could not be created. Please ensure you have sufficient priveleges to create a new folder in this directory."
     IDS_BOOKMARKDLG_NAME    "Name"
@@ -1258,7 +1267,7 @@ BEGIN
     IDS_ERR_FILENAMEINVALID "A file name cannot contain any of the following characters:\n\t \\ / : * ? "" < > |"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_BT_OPEN             "Opens the selected bookmark within the current tab"
     IDM_BT_NEWBOOKMARK      "Creates a new bookmark"
@@ -1270,7 +1279,7 @@ BEGIN
     IDM_TOOLBARS_APPLICATIONTOOLBAR "Shows/Hides the application toolbar"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_DESCRIPTION_NAME "Dateiname"
     IDS_COLUMN_DESCRIPTION_TYPE "Dateityp"
@@ -1282,18 +1291,20 @@ BEGIN
     IDS_COLUMN_DESCRIPTION_OWNER "Besitzer"
     IDS_COLUMN_DESCRIPTION_PRODUCTNAME 
                             "Produktname der mit der ausführbaren Datei in Zusammenhang steht"
-    IDS_COLUMN_DESCRIPTION_COMPANY "Firma die mit der ausführbaren Datei in Zusammenhang steht"
+    IDS_COLUMN_DESCRIPTION_COMPANY 
+                            "Firma die mit der ausführbaren Datei in Zusammenhang steht"
     IDS_COLUMN_DESCRIPTION_DESCRIPTION "Datei Beschreibung"
     IDS_COLUMN_DESCRIPTION_FILEVERSION 
                             "Version die mit der ausführbaren Datei oder DLL in Zusammenhang steht"
     IDS_COLUMN_DESCRIPTION_PRODUCTVERSION "Produkt Version"
-    IDS_COLUMN_DESCRIPTION_SHORTCUTTO "Ziel das mit der Verknüpfung in Zusammenhang steht"
+    IDS_COLUMN_DESCRIPTION_SHORTCUTTO 
+                            "Ziel das mit der Verknüpfung in Zusammenhang steht"
     IDS_COLUMN_DESCRIPTION_HARDLINKS 
                             "Anzahl der Hard-Links die mit der Datei in Zusammenhang steht"
     IDS_COLUMN_DESCRIPTION_EXTENSION "Dateinamen-Erweiterung"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_DESCRIPTION_CREATED "Erstelldatum"
     IDS_COLUMN_DESCRIPTION_ACCESSED "Zuletzt zugegriffen am"
@@ -1302,8 +1313,7 @@ BEGIN
     IDS_COLUMN_DESCRIPTION_AUTHOR "Autor der Datei"
     IDS_COLUMN_DESCRIPTION_KEYWORDS "Schlüsselwörter der Datei"
     IDS_COLUMN_DESCRIPTION_COMMENT "Kommentare der Datei"
-    IDS_COLUMN_DESCRIPTION_CAMERAMODEL 
-                            "Kameratyp"
+    IDS_COLUMN_DESCRIPTION_CAMERAMODEL "Kameratyp"
     IDS_COLUMN_DESCRIPTION_DATETAKEN "Erstell-Datum des Bildes"
     IDS_COLUMN_DESCRIPTION_WIDTH "Bildbreite"
     IDS_COLUMN_DESCRIPTION_HEIGHT "Bildhöhe"
@@ -1316,10 +1326,11 @@ BEGIN
                             "Mit einem Drucker verknüpften Kommentar"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_DESCRIPTION_PRINTERLOCATION "Ort eines Druckers"
-    IDS_COLUMN_DESCRIPTION_NETWORKADAPTER_STATUS "Status des Netzwerk-Adapters"
+    IDS_COLUMN_DESCRIPTION_NETWORKADAPTER_STATUS 
+                            "Status des Netzwerk-Adapters"
     IDS_NETWORKADAPTER_CONNECTED "Verbunden"
     IDS_NETWORKADAPTER_DISCONNECTED "Getrennt"
     IDS_NETWORKADAPTER_TESTING "Prüfe"
@@ -1338,7 +1349,7 @@ BEGIN
     IDS_VIEW_ICONS          "Icons"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_VIEW_SMALLICONS     "Small Icons"
     IDS_COLUMN_NAME_NAME    "Name"
@@ -1358,7 +1369,7 @@ BEGIN
     IDS_COLUMN_NAME_HARDLINKS "Hard-Links"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_EXTENSION "Erweiterung"
     IDS_COLUMN_NAME_CREATED "Date Created"
@@ -1378,7 +1389,7 @@ BEGIN
     IDS_COLUMN_NAME_FILESYSTEM "Dateisystem"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_VIRTUALTYPE "Typ"
     IDS_COLUMN_NAME_ORIGINALLOCATION "Herkunft"
@@ -1398,7 +1409,7 @@ BEGIN
     IDS_COLUMN_NAME_DURATION "Duration"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_ERR_FILENAMEINVALID_MSGTITLE "File name invalid"
     IDS_OPTIONSDIALOG_TITLE "Options"
@@ -1412,7 +1423,7 @@ BEGIN
     IDS_TAB_CLOSE_TIP       "Close the current tab"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_HEADER_MORE         "Select additional columns to show."
     IDM_FILE_CLONEWINDOW    "Clones the current window"
@@ -1422,7 +1433,7 @@ BEGIN
     IDM_GROUPBY_DESCENDING  "Sorts groups in decreasing order"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_FILE_COPYUNIVERSALFILEPATHS 
                             "Copies the universal paths of all selected items"
@@ -1430,12 +1441,12 @@ BEGIN
     IDM_TOOLS_CUSTOMIZECOLORS "Customizes the colors used within the listview"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLS_ADJUSTCOLORFILTERING "Configures color filtering"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_PROTECTED "Protected"
     IDS_COLUMN_NAME_RATING  "Rating"
@@ -1455,7 +1466,7 @@ BEGIN
     IDS_COLUMN_NAME_PARENTALRATINGREASON "Parental rating reason"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDS_COLUMN_NAME_PERIOD  "Period"
     IDS_COLUMN_NAME_PRODUCER "Producer"
@@ -1471,14 +1482,14 @@ BEGIN
     IDS_GENERAL_NEWAPPLICATIONBUTTON "New Application Button"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_TOOLS_SEARCH        "Search for files"
     IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT 
                             "Set the layout of the current columns as the default layout"
 END
 
-STRINGTABLE 
+STRINGTABLE
 BEGIN
     IDM_APP_OPEN            "Opens the selected application."
     IDM_APP_NEW             "Creates a new application button"

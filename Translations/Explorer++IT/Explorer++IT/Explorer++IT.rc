@@ -7,7 +7,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "afxres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -194,8 +195,8 @@ BEGIN
     LTEXT           "Blu:",IDC_STATIC,223,81,13,8
     CONTROL         "",IDC_SLIDER_SURROUND_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,249,78,148,23
     EDITTEXT        IDC_EDIT_SURROUND_BLUE,397,77,25,16,ES_AUTOHSCROLL | ES_NUMBER
+	PUSHBUTTON      "Restore &Defaults",IDC_BUTTON_RESTOREDEFAULTS,8,109,63,17
     PUSHBUTTON      "Scegli carattere...",IDC_BUTTON_DISPLAY_FONT,8,109,64,17
-    PUSHBUTTON      "&Choose font...",IDC_BUTTON_DISPLAY_FONT,77,109,60,17
     LTEXT           "",IDC_STATIC_PREVIEWDISPLAY,4,131,424,56,SS_SUNKEN
     DEFPUSHBUTTON   "OK",IDOK,321,202,50,14
     PUSHBUTTON      "Cancella",IDCANCEL,377,202,50,14
@@ -712,7 +713,7 @@ BEGIN
             MENUITEM SEPARATOR
             MENUITEM "Auto Arrange",                IDM_ARRANGEICONSBY_AUTOARRANGE
         END
-        MENUITEM "Ordina per",                  ID_POPUP_SORTBY
+        MENUITEM "Ordina per",                  IDM_POPUP_SORTBY
         MENUITEM "Group &By",                   IDM_POPUP_GROUPBY
         MENUITEM "Aggiorna",                    IDM_VIEW_REFRESH
         MENUITEM SEPARATOR

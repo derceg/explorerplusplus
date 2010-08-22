@@ -7,7 +7,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
+#include "afxres.h"
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
@@ -322,7 +323,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Имя",IDC_STATIC,4,7,14,8,8
     EDITTEXT        IDC_NEWFOLDER_NAME,49,4,134,14,ES_AUTOHSCROLL
-    LTEXT           "Создать в",IDC_STATIC,4,26,36
+    LTEXT           "Создать в",IDC_STATIC,4,26,36,8
     CONTROL         "",IDC_NEWFOLDER_CREATEIN,"ComboBoxEx32",CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP,49,24,134,135
     DEFPUSHBUTTON   "OK",IDOK,79,45,50,14
     PUSHBUTTON      "Отмена",IDCANCEL,133,45,50,14
