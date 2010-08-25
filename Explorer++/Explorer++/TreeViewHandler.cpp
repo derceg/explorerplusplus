@@ -48,9 +48,6 @@ WPARAM wParam,LPARAM lParam)
 
 			TreeView_HitTest(m_hTreeView,&tvhi);
 
-			/* TODO: Temporarily select item which
-			was middle clicked. */
-
 			if(tvhi.flags != LVHT_NOWHERE && tvhi.hItem != NULL)
 			{
 				m_hTVMButtonItem = tvhi.hItem;
@@ -149,15 +146,14 @@ void CContainer::OnTreeViewFileDeletePermanent(void)
 	CoTaskMemFree(pidl);
 }
 
-/* TODO: Change the arguments to this function. */
 void CContainer::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 {
-	LPITEMIDLIST pidl	= NULL;
-	POINT *ppt			= NULL;
+	LPITEMIDLIST pidl = NULL;
+	POINT *ppt = NULL;
 	HTREEITEM hItem;
 	HTREEITEM hPrevItem;
-	IShellFolder *pShellParentFolder	= NULL;
-	LPITEMIDLIST pidlRelative	= NULL;
+	IShellFolder *pShellParentFolder = NULL;
+	LPITEMIDLIST pidlRelative = NULL;
 	HRESULT hr;
 
 	hItem	= (HTREEITEM)wParam;

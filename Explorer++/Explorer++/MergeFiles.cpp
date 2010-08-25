@@ -428,13 +428,10 @@ DWORD WINAPI MergeFilesThreadProc(LPVOID lpParameter)
 
 			if(lMergeFileSize.QuadPart != 0)
 			{
-				/* TODO: This won't be fulfilled on a 32-bit system if the
-				size is too large. */
 				pszMergeBuffer = (TCHAR *)realloc(pszMergeBuffer,(size_t)(lMergeFileSize.QuadPart * sizeof(TCHAR)));
 
 				if(pszMergeBuffer != NULL)
 				{
-					/* TODO: Not portable across 32, 64-bit. */
 					ReadFile(hMergeFile,(LPVOID)pszMergeBuffer,(DWORD)(lMergeFileSize.QuadPart),
 						&dwNumberOfBytesRead,NULL);
 

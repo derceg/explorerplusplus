@@ -1031,7 +1031,6 @@ void CContainer::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 
 	/* Use Explorer infotips if the option is selected, or this is a
 	virtual folder. Otherwise, show the modified date. */
-	/* TODO: Upgrade. */
 	if((m_InfoTipType == INFOTIP_SYSTEM) || m_pActiveShellBrowser->InVirtualFolder())
 	{
 		LPITEMIDLIST	pidlDirectory = NULL;
@@ -1466,82 +1465,14 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 
 		if(SUCCEEDED(hr))
 		{
-
-
 			FORMATETC ftc[2];
 			STGMEDIUM stg[2];
 
 			/* We'll export two formats:
 			CF_HDROP
 			CFSTR_SHELLIDLIST */
-			SetFORMATETC(&ftc[0],CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
-			SetFORMATETC(&ftc[1],(CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST),
-				NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
-
-			LPBYTE pData = NULL;
-			UINT uSize;
-
-			HGLOBAL hglbHDrop = NULL;
-			DROPFILES *pdf = NULL;
-
-			hr = BuildHDropList(&pdf,&uSize,FilenameList);
-
-			if(!SUCCEEDED(hr))
-			{
-				/* TODO: Need to free everything before returning. */
-				return E_FAIL;
-			}
-
-			hglbHDrop = GlobalAlloc(GMEM_MOVEABLE,uSize);
-
-			if(hglbHDrop == NULL)
-			{
-				return E_FAIL;
-			}
-
-			pData = static_cast<LPBYTE>(GlobalLock(hglbHDrop));
-
-			memcpy(pData,pdf,uSize);
-
-			GlobalUnlock(hglbHDrop);
-
-			stg[0].pUnkForRelease	= 0;
-			stg[0].hGlobal			= hglbHDrop;
-			stg[0].tymed			= TYMED_HGLOBAL;
-
-			delete[] pdf;
-
-			HGLOBAL hglbIDList = NULL;
-			CIDA *pcida = NULL;
-
-			hr = BuildShellIDList(&pcida,&uSize,pidlDirectory,ItemList);
-
-			if(!SUCCEEDED(hr))
-			{
-				/* TODO: Need to free everything before returning. */
-				return E_FAIL;
-			}
-
-			hglbIDList = GlobalAlloc(GMEM_MOVEABLE,uSize);
-
-			if(hglbIDList == NULL)
-			{
-				return E_FAIL;
-			}
-
-			pData = (LPBYTE)GlobalLock(hglbIDList);
-
-			memcpy(pData,pcida,uSize);
-
-			GlobalUnlock(hglbIDList);
-
-			stg[1].pUnkForRelease	= 0;
-			stg[1].hGlobal			= hglbIDList;
-			stg[1].tymed			= TYMED_HGLOBAL;
-
-			delete[] pcida;
-
-
+			BuildHDropList(&ftc[0],&stg[0],FilenameList);
+			BuildShellIDList(&ftc[1],&stg[1],pidlDirectory,ItemList);
 
 			IDataObject *pDataObject = NULL;
 			IAsyncOperation *pAsyncOperation = NULL;

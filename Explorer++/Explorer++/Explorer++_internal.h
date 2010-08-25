@@ -1,4 +1,4 @@
-/*************************************************************
+﻿/*************************************************************
 Explorer++_internal.h
 Contains declarations and defintions that are private
 to Explorer++.cpp. Should not be included in external modules.
@@ -28,7 +28,7 @@ to Explorer++.cpp. Should not be included in external modules.
 
 extern HINSTANCE g_hLanguageModule;
 
-#define VERSION_NUMBER		_T("1.1")
+#define VERSION_NUMBER		_T("1.2β")
 
 #define WINDOW_NAME			_T("Explorer++")
 #define CLASS_NAME			_T("Explorer++")

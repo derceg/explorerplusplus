@@ -813,9 +813,6 @@ private:
 	void					OnSearch(HWND hDlg);
 	void					SearchSaveState(HWND hDlg);
 
-	/* Bookmark sidebar. */
-	void					CreateBookmarkSidebar(void);
-
 	/* Tab ID's. */
 	void					InitializeTabMap(void);
 	void					ReleaseTabId(int iTabId);
@@ -1175,9 +1172,6 @@ private:
 	HWND					m_hBookmarksToolbar;
 	HWND					m_hDrivesToolbar;
 	HWND					m_hApplicationToolbar;
-	HWND					m_hBookmarksHolder;
-	HWND					m_hBookmarksSidebarToolbar;
-	HWND					m_hBookmarksTreeView;
 
 	MyIFolderView2 *		m_pFolderView[MAX_TABS];
 	IShellBrowser2 *		m_pShellBrowser[MAX_TABS];

@@ -678,18 +678,17 @@ BOOL bDataAccept,BOOL bOnSameDrive)
 	return dwEffect;
 }
 
-HRESULT BuildHDropList(OUT DROPFILES **ppdf,OUT UINT *puSize,
-IN list<std::wstring> FilenameList)
+HRESULT BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
+	IN list<std::wstring> FilenameList)
 {
-	if(ppdf == NULL ||
-		puSize == NULL ||
+	if(pftc == NULL ||
+		pstg == NULL ||
 		FilenameList.size() == 0)
 	{
 		return E_FAIL;
 	}
 
-	*ppdf = NULL;
-	*puSize = 0;
+	SetFORMATETC(pftc,CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
 
 	UINT uSize = 0;
 
@@ -703,7 +702,14 @@ IN list<std::wstring> FilenameList)
 	/* The last string is double-null terminated. */
 	uSize += (1 * sizeof(TCHAR));
 
-	LPVOID pcidaData = new BYTE[uSize];
+	HGLOBAL hglbHDrop = GlobalAlloc(GMEM_MOVEABLE,uSize);
+
+	if(hglbHDrop == NULL)
+	{
+		return E_FAIL;
+	}
+
+	LPVOID pcidaData = static_cast<LPVOID>(GlobalLock(hglbHDrop));
 
 	DROPFILES *pdf = static_cast<DROPFILES *>(pcidaData);
 
@@ -730,8 +736,11 @@ IN list<std::wstring> FilenameList)
 	pData = static_cast<LPBYTE>(pcidaData) + sizeof(DROPFILES) + uOffset;
 	memcpy(pData,&chNull,(1 * sizeof(TCHAR)));
 
-	*puSize = uSize;
-	*ppdf = pdf;
+	GlobalUnlock(hglbHDrop);
+
+	pstg->pUnkForRelease	= 0;
+	pstg->hGlobal			= hglbHDrop;
+	pstg->tymed				= TYMED_HGLOBAL;
 
 	return S_OK;
 }
@@ -739,19 +748,20 @@ IN list<std::wstring> FilenameList)
 /* Builds a CIDA structure. Returns the structure and its size
 via arguments.
 Returns S_OK on success; E_FAIL on fail. */
-HRESULT BuildShellIDList(OUT CIDA **ppcida,OUT UINT *puSize,
-IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> pidlList)
+HRESULT BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
+	IN LPCITEMIDLIST pidlDirectory,
+	IN list<LPITEMIDLIST> pidlList)
 {
-	if(ppcida == NULL ||
-		puSize == NULL ||
+	if(pftc == NULL ||
+		pstg == NULL ||
 		pidlDirectory == NULL ||
 		pidlList.size() == 0)
 	{
 		return E_FAIL;
 	}
 
-	*ppcida = NULL;
-	*puSize = 0;
+	SetFORMATETC(pftc,(CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST),
+		NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
 
 	/* First, we need to decide how much memory to
 	allocate to the structure. This is based on
@@ -775,13 +785,16 @@ IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> pidlList)
 		uSize += ILGetSize(pidl);
 	}
 
-	/* Now allocate memory for the structure, and
-	fill it with the required data. */
-	LPVOID pcidaData = new BYTE[uSize];
+	HGLOBAL hglbIDList = GlobalAlloc(GMEM_MOVEABLE,uSize);
 
-	*ppcida = static_cast<CIDA *>(pcidaData);
+	if(hglbIDList == NULL)
+	{
+		return E_FAIL;
+	}
 
-	CIDA *pcida = *ppcida;
+	LPVOID pcidaData = static_cast<LPVOID>(GlobalLock(hglbIDList));
+
+	CIDA *pcida = static_cast<CIDA *>(pcidaData);
 
 	pcida->cidl = nItems;
 
@@ -816,7 +829,11 @@ IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> pidlList)
 		i++;
 	}
 
-	*puSize = uSize;
+	GlobalUnlock(hglbIDList);
+
+	pstg->pUnkForRelease	= 0;
+	pstg->hGlobal			= hglbIDList;
+	pstg->tymed				= TYMED_HGLOBAL;
 
 	return S_OK;
 }

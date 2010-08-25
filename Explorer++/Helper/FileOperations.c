@@ -276,43 +276,14 @@ HRESULT CutFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDa
 	return CopyFilesToClipboard(FileNameList,TRUE,pClipboardDataObject);
 }
 
-/* TODO: */
 HRESULT CopyFilesToClipboard(std::list<std::wstring> FileNameList,
 BOOL bMove,IDataObject **pClipboardDataObject)
 {
 	FORMATETC ftc[2];
 	STGMEDIUM stg[2];
-
-	ftc[0].cfFormat			= CF_HDROP;
-	ftc[0].ptd				= NULL;
-	ftc[0].dwAspect			= DVASPECT_CONTENT;
-	ftc[0].lindex			= -1;
-	ftc[0].tymed			= TYMED_HGLOBAL;
-
-	DROPFILES *pdf = NULL;
-	LPBYTE pData = NULL;
-	HGLOBAL hglb = NULL;
-	UINT uSize;
 	HRESULT hr;
 
-	hr = BuildHDropList(&pdf,&uSize,FileNameList);
-
-	hglb = GlobalAlloc(GMEM_MOVEABLE,uSize);
-
-	if(hglb == NULL)
-	{
-		return E_FAIL;
-	}
-
-	pData = static_cast<LPBYTE>(GlobalLock(hglb));
-
-	memcpy(pData,pdf,uSize);
-
-	GlobalUnlock(hglb);
-
-	stg[0].pUnkForRelease	= 0;
-	stg[0].hGlobal			= hglb;
-	stg[0].tymed			= TYMED_HGLOBAL;
+	BuildHDropList(&ftc[0],&stg[0],FileNameList);
 
 	ftc[1].cfFormat			= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
 	ftc[1].ptd				= NULL;
@@ -320,7 +291,7 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 	ftc[1].lindex			= -1;
 	ftc[1].tymed			= TYMED_HGLOBAL;
 	
-	hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
+	HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
 
 	DWORD *pdwCopyEffect = static_cast<DWORD *>(GlobalLock(hglb));
 

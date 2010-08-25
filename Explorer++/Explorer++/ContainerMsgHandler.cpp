@@ -1782,9 +1782,6 @@ HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
 	{
-		/* TODO: */
-		SetDirectorySpecificSettings(m_iTabSelectedItem,pidlDirectory);
-
 		hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
 
 		if(SUCCEEDED(hr))
@@ -1834,8 +1831,6 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 	{
 		if(!bOpenInNewTab && !m_TabInfo[m_iObjectIndex].bAddressLocked)
 		{
-			/* TODO: */
-			SetDirectorySpecificSettings(m_iTabSelectedItem,pidlDirectory);
 			hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory,wFlags);
 
 			if(SUCCEEDED(hr))

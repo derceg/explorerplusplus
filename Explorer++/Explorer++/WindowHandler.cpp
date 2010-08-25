@@ -32,7 +32,7 @@ DWORD BookmarkToolbarStyles	=	WS_CHILD |WS_VISIBLE |WS_CLIPSIBLINGS |WS_CLIPCHIL
 								TBSTYLE_FLAT | CCS_NODIVIDER| CCS_NORESIZE;
 
 DWORD TreeViewStyles		=	WS_CHILD | WS_VISIBLE | TVS_SHOWSELALWAYS | TVS_HASBUTTONS |
-								TVS_EDITLABELS | TVS_HASLINES;
+								TVS_EDITLABELS | TVS_HASLINES | TVS_TRACKSELECT;
 
 DWORD ComboBoxStyles		=	WS_CHILD|WS_VISIBLE|WS_TABSTOP|
 								CBS_DROPDOWN|CBS_AUTOHSCROLL|WS_CLIPSIBLINGS|
@@ -725,30 +725,14 @@ BOOL CContainer::OnTBGetButtonInfo(LPARAM lParam)
 	{
 		id = ToolbarButtonSet[pnmtb->iItem];
 
-		/* TODO: Safe to remove? TOOLBAR_SEPARATOR NOT part of
-		ToolbarButtonSet. */
-		if(id == TOOLBAR_SEPARATOR)
-		{
-			pnmtb->tbButton.iBitmap		= 0;
-			pnmtb->tbButton.idCommand	= 0;
-			pnmtb->tbButton.fsState		= TBSTATE_ENABLED;
-			pnmtb->tbButton.fsStyle		= BTNS_SEP;
-			pnmtb->tbButton.dwData		= 0;
-			pnmtb->tbButton.iString		= 0;
+		pnmtb->tbButton.fsState		= TBSTATE_ENABLED;
+		pnmtb->tbButton.fsStyle		= BTNS_BUTTON | BTNS_AUTOSIZE | LookupToolbarButtonExtraStyles(id);
+		pnmtb->tbButton.idCommand	= id;
+		pnmtb->tbButton.iBitmap		= LookupToolbarButtonImage(id);
+		pnmtb->tbButton.iString		= (INT_PTR)id - TOOLBAR_BACK;
+		pnmtb->tbButton.dwData		= 0;
 
-			StringCchCopy(pnmtb->pszText,pnmtb->cchText,EMPTY_STRING);
-		}
-		else
-		{
-			pnmtb->tbButton.fsState		= TBSTATE_ENABLED;
-			pnmtb->tbButton.fsStyle		= BTNS_BUTTON | BTNS_AUTOSIZE | LookupToolbarButtonExtraStyles(id);
-			pnmtb->tbButton.idCommand	= id;
-			pnmtb->tbButton.iBitmap		= LookupToolbarButtonImage(id);
-			pnmtb->tbButton.iString		= (INT_PTR)id - TOOLBAR_BACK;
-			pnmtb->tbButton.dwData		= 0;
-
-			StringCchCopy(pnmtb->pszText,pnmtb->cchText,szText);
-		}
+		StringCchCopy(pnmtb->pszText,pnmtb->cchText,szText);
 
 		return TRUE;
 	}

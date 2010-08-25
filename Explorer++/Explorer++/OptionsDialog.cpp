@@ -820,7 +820,6 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 					in title bar options change. */
 					HandleMainWindowText();
 
-					/* TODO: */
 					if(!m_bAlwaysShowTabBar)
 					{
 						if(TabCtrl_GetItemCount(m_hTabCtrl) > 1)
