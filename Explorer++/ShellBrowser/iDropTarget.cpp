@@ -506,7 +506,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 			if(!m_bOverFolder)
 				ListView_DeselectAllItems(m_hListView);
 
-			delete pDropHandler;
+			pDropHandler->Release();
 		}
 	}
 

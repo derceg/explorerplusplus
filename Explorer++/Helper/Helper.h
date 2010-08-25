@@ -108,7 +108,7 @@ int				GetNumberOfUsedPartitions(DRIVE_LAYOUT_INFORMATION_EX *pDriveLayout);
 LONG			GetFileSectorSize(TCHAR *FileName);
 TCHAR			GetDriveNameFromMask(ULONG unitmask);
 
-/* Idl helpers. */
+/* Shell helpers. */
 void			DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest);
 HRESULT			GetIdlFromParsingName(TCHAR *szParsingName,LPITEMIDLIST *pidl);
 HRESULT			GetDisplayName(TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags);
@@ -127,13 +127,13 @@ HRESULT			BuildShellIDList(OUT CIDA **ppcida,OUT UINT *puSize,IN LPCITEMIDLIST p
 HRESULT			BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder);
 BOOL			IsPathGUID(TCHAR *szPath);
 BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
+void			SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,DVTARGETDEVICE *ptd,DWORD dwAspect,LONG lindex,DWORD tymed);
 
 /* Drag and drop helpers. */
 DWORD			DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,BOOL bDataAccept,BOOL bOnSameDrive);
 
 /* File helpers. */
 int				CreateFileTimeString(FILETIME *FileTime,TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate);
-void			PasteFilesFromClipboard(HWND hwnd,TCHAR *Directory,BOOL bPasteLinks,void (*PasteFilesCallback)(void *,list<PastedFile_t> *),void *pData);
 int				PasteLinksToClipboardFiles(TCHAR *szDestination);
 HRESULT			CreateLinkToFile(TCHAR *PathToFile,TCHAR *PathToLink,TCHAR *LinkDescription);
 int				CopyFilesToFolder(HWND hOwner,TCHAR *FileNameList,BOOL bMove);

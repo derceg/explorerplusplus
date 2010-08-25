@@ -1421,7 +1421,6 @@ int CContainer::GetColumnHeaderMenuList(unsigned int **pHeaderList)
 
 HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 {
-	IDataObject			*pDataObject = NULL;
 	IDropSource			*pDropSource = NULL;
 	IDragSourceHelper	*pDragSourceHelper = NULL;
 	NMLISTVIEW			*pnmlv = NULL;
@@ -1467,23 +1466,17 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 
 		if(SUCCEEDED(hr))
 		{
+
+
 			FORMATETC ftc[2];
 			STGMEDIUM stg[2];
 
 			/* We'll export two formats:
 			CF_HDROP
 			CFSTR_SHELLIDLIST */
-			ftc[0].cfFormat			= CF_HDROP;
-			ftc[0].ptd				= NULL;
-			ftc[0].dwAspect			= DVASPECT_CONTENT;
-			ftc[0].lindex			= -1;
-			ftc[0].tymed			= TYMED_HGLOBAL;
-
-			ftc[1].cfFormat			= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST);
-			ftc[1].ptd				= NULL;
-			ftc[1].dwAspect			= DVASPECT_CONTENT;
-			ftc[1].lindex			= -1;
-			ftc[1].tymed			= TYMED_HGLOBAL;
+			SetFORMATETC(&ftc[0],CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
+			SetFORMATETC(&ftc[1],(CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST),
+				NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
 
 			LPBYTE pData = NULL;
 			UINT uSize;
@@ -1547,12 +1540,16 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 			stg[1].tymed			= TYMED_HGLOBAL;
 
 			delete[] pcida;
+
+
+
+			IDataObject *pDataObject = NULL;
+			IAsyncOperation *pAsyncOperation = NULL;
 			
 			hr = CreateDataObject(ftc,stg,&pDataObject,2);
-
-			IAsyncOperation *pAsyncOperation = NULL;
-
 			pDataObject->QueryInterface(IID_IAsyncOperation,(void **)&pAsyncOperation);
+
+			assert(pAsyncOperation != NULL);
 
 			/* Docs mention setting the argument to VARIANT_TRUE/VARIANT_FALSE.
 			But the argument is a BOOL, so we'll go with regular TRUE/FALSE. */
@@ -1585,23 +1582,16 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 
 			hr = pAsyncOperation->InOperation(&bInAsyncOp);
 
-			/* TODO: */
 			if(!SUCCEEDED(hr) ||
 				bInAsyncOp == FALSE)
 			{
-				/* Data extraction has finished synchronously. */
-			}
-			else
-			{
-				/* Data extraction is continuing asynchronously. */
+				/* Data extraction has finished synchronously.
+				SetAsyncMode() calls AddRef(), so we'll need to
+				balance that out here. */
+				pAsyncOperation->Release();
 			}
 
 			pAsyncOperation->Release();
-
-			/* TODO: */
-			//GlobalFree(hglbHDrop);
-			//GlobalFree(hglbIDList);
-
 			pDataObject->Release();
 			pDropSource->Release();
 		}
@@ -1968,15 +1958,15 @@ void CContainer::OnListViewSetFileAttributes(void)
 void CContainer::OnListViewPaste(void)
 {
 	IDataObject *pClipboardObject = NULL;
-	IClipboardHandler *pClipboardHandler = NULL;
-	TCHAR szDestination[MAX_PATH + 1];
 	HRESULT hr;
 
 	hr = OleGetClipboard(&pClipboardObject);
 
 	if(hr == S_OK)
 	{
-		pClipboardHandler = new CDropHandler();
+		IClipboardHandler *pClipboardHandler = new CDropHandler();
+
+		TCHAR szDestination[MAX_PATH + 1];
 
 		/* DO NOT use the internal current directory string.
 		Files are copied asynchronously, so a change of directory
@@ -1990,6 +1980,8 @@ void CContainer::OnListViewPaste(void)
 
 		pClipboardHandler->CopyClipboardData(pClipboardObject,
 			m_hContainer,szDestination,this,!m_bOverwriteExistingFilesConfirmation);
+
+		pClipboardHandler->Release();
 
 		pClipboardObject->Release();
 	}

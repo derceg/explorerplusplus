@@ -996,3 +996,19 @@ BOOL CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2)
 
 	return ret;
 }
+
+void SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,
+	DVTARGETDEVICE *ptd,DWORD dwAspect,LONG lindex,
+	DWORD tymed)
+{
+	if(pftc == NULL)
+	{
+		return;
+	}
+
+	pftc->cfFormat	= cfFormat;
+	pftc->tymed		= tymed;
+	pftc->lindex	= lindex;
+	pftc->dwAspect	= dwAspect;
+	pftc->ptd		= ptd;
+}

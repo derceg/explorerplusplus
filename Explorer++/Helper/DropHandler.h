@@ -21,26 +21,21 @@ __interface IDropFilesCallback
 
 __interface IDropHandler
 {
+	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
+	ULONG		__stdcall	AddRef(void);
+	ULONG		__stdcall	Release(void);
+
 	void Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragTypes_t DragType,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
 };
 
 __interface IClipboardHandler
 {
+	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
+	ULONG		__stdcall	AddRef(void);
+	ULONG		__stdcall	Release(void);
+
 	void CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
 };
-
-typedef struct
-{
-	void				*pDropHandler;
-
-	SHFILEOPSTRUCT		shfo;
-	IDropFilesCallback	*pDropFilesCallback;
-	list<PastedFile_t>	*pPastedFileList;
-	DWORD				dwEffect;
-	POINT				pt;
-
-	IAsyncOperation		*pao;
-}PastedFilesInfo_t;
 
 /* Generic drop handler. Handles the following
 drop formats:
@@ -54,7 +49,9 @@ public:
 	CDropHandler();
 	~CDropHandler();
 
-	HRESULT	CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi);
+	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
+	ULONG		__stdcall	AddRef(void);
+	ULONG		__stdcall	Release(void);
 
 private:
 
@@ -68,6 +65,8 @@ private:
 	void	CreateShortcutToDroppedFile(TCHAR *szFullFileName);
 	BOOL	CheckItemLocations(int iDroppedItem);
 
+	LONG		m_lRefCount;
+
 	IDropFilesCallback	*m_pDropFilesCallback;
 
 	IDataObject	*m_pDataObject;
@@ -79,5 +78,23 @@ private:
 	TCHAR		*m_szDestDirectory;
 	BOOL		m_bRenameOnCollision;
 };
+
+typedef struct
+{
+	SHFILEOPSTRUCT		shfo;
+	IDropFilesCallback	*pDropFilesCallback;
+	list<PastedFile_t>	*pPastedFileList;
+	DWORD				dwEffect;
+	POINT				pt;
+
+	IAsyncOperation		*pao;
+	HWND				m_hDrop;
+	HRESULT				hrCopy;
+
+	TCHAR				*pFrom;
+	TCHAR				*pTo;
+
+	CDropHandler		*pDropHandler;
+}PastedFilesInfo_t;
 
 #endif

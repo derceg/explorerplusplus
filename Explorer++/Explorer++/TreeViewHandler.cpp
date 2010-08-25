@@ -676,24 +676,42 @@ void CContainer::OnTreeViewSetFileAttributes(void)
 
 void CContainer::OnTreeViewPaste(void)
 {
-	HTREEITEM		hItem;
-	LPITEMIDLIST	pidl = NULL;
-	TCHAR			szFullFileName[MAX_PATH + 1];
+	HTREEITEM hItem;
+	LPITEMIDLIST pidl = NULL;
+	TCHAR szFullFileName[MAX_PATH + 1];
 
 	hItem = TreeView_GetSelection(m_hTreeView);
 
 	if(hItem != NULL)
 	{
-		pidl = m_pMyTreeView->BuildPath(hItem);
+		IDataObject *pClipboardObject = NULL;
 
-		GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
+		HRESULT hr = OleGetClipboard(&pClipboardObject);
 
-		/* Name must be double NULL terminated. */
-		szFullFileName[lstrlen(szFullFileName) + 1] = '\0';
+		if(hr == S_OK)
+		{
+			IClipboardHandler *pClipboardHandler = NULL;
 
-		PasteFilesFromClipboard(m_hContainer,
-			szFullFileName,FALSE,NULL,NULL);
+			pClipboardHandler = new CDropHandler();
 
-		CoTaskMemFree(pidl);
+			pidl = m_pMyTreeView->BuildPath(hItem);
+
+			assert(pidl != NULL);
+
+			GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
+
+			/* Name must be double NULL terminated. */
+			szFullFileName[lstrlen(szFullFileName) + 1] = '\0';
+
+			pClipboardHandler->CopyClipboardData(pClipboardObject,
+				m_hTreeView,szFullFileName,NULL,
+				!m_bOverwriteExistingFilesConfirmation);
+
+			CoTaskMemFree(pidl);
+
+			pClipboardHandler->Release();
+
+			pClipboardObject->Release();
+		}
 	}
 }

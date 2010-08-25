@@ -25,7 +25,6 @@ using namespace std;
 #define PASTE_CLIPBOARD_HARDLINK	1
 
 int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType);
-DWORD WINAPI PasteFilesThread(LPVOID lpParameter);
 
 int RenameFile(TCHAR *NewFileName,TCHAR *OldFileName)
 {
@@ -339,10 +338,19 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 
 	hr = CreateDataObject(ftc,stg,pClipboardDataObject,2);
 
+	IAsyncOperation *pAsyncOperation = NULL;
+
+	(*pClipboardDataObject)->QueryInterface(IID_IAsyncOperation,(void **)&pAsyncOperation);
+
+	pAsyncOperation->SetAsyncMode(TRUE);
+	pAsyncOperation->Release();
+
 	if(SUCCEEDED(hr))
 	{
 		hr = OleSetClipboard(*pClipboardDataObject);
-		OleFlushClipboard();
+
+		/* TODO: Only do this on exit. */
+		//OleFlushClipboard();
 	}
 
 	return hr;
@@ -362,207 +370,6 @@ typedef struct
 	void				*pData;
 } PastedFilesInfo_t;
 
-void PasteFilesFromClipboard(HWND hwnd,TCHAR *Directory,BOOL bPasteLinks,
-void (*PasteFilesCallback)(void *,list<PastedFile_t> *),
-void *pData)
-{
-	IDataObject		*pClipboardObject = NULL;
-	IBufferManager	*pBufferManager = NULL;
-	PastedFilesInfo_t	*ppfi = NULL;
-	PastedFile_t	PastedFile;
-	list<PastedFile_t>	*pPastedFileList = NULL;
-	FORMATETC		ftc;
-	FORMATETC		ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	FORMATETC		ftcFileDescriptor = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	STGMEDIUM		stg0;
-	STGMEDIUM		stg1;
-	HRESULT			hr;
-	DROPFILES		*pdf = NULL;
-	DWORD			*pdwEffect = NULL;
-	TCHAR			*FileNameList = NULL;
-	TCHAR			*szDestDirectory = NULL;
-	TCHAR			OldFileName[MAX_PATH];
-	TCHAR			szSource[MAX_PATH];
-	DWORD			dwBufferSize;
-	BOOL			bCopy;
-	BOOL			bMove;
-	int				NumberOfFilesDropped;
-	int				i = 0;
-
-	SetCursor(LoadCursor(NULL,IDC_WAIT));
-
-	hr = OleGetClipboard(&pClipboardObject);
-
-	if(hr != S_OK)
-		return;
-
-	if(pClipboardObject->QueryGetData(&ftcHDrop) == S_OK)
-	{
-		ftc.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
-		ftc.ptd			= NULL;
-		ftc.dwAspect	= DVASPECT_CONTENT;
-		ftc.lindex		= -1;
-		ftc.tymed		= TYMED_HGLOBAL;
-
-		hr = pClipboardObject->GetData(&ftc,&stg0);
-
-		if(hr == S_OK)
-		{
-			pdwEffect = (DWORD *)GlobalLock(stg0.hGlobal);
-
-			if(pdwEffect != NULL)
-			{
-				ftc.cfFormat	= CF_HDROP;
-				pClipboardObject->GetData(&ftc,&stg1);
-
-				pdf = (DROPFILES *)GlobalLock(stg1.hGlobal);
-
-				if(pdf != NULL)
-				{
-					NumberOfFilesDropped = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,0);
-
-					bCopy = (*pdwEffect & DROPEFFECT_COPY) == DROPEFFECT_COPY;
-					bMove = (*pdwEffect & DROPEFFECT_MOVE) == DROPEFFECT_MOVE;
-
-					pBufferManager = new CBufferManager();
-
-					pPastedFileList = new list<PastedFile_t>;
-
-					for(i = 0;i < NumberOfFilesDropped;i++)
-					{
-						DragQueryFile((HDROP)pdf,i,OldFileName,SIZEOF_ARRAY(OldFileName));
-
-						if(i == 0)
-						{
-							StringCchCopy(szSource,SIZEOF_ARRAY(szSource),OldFileName);
-							PathRemoveFileSpec(szSource);
-						}
-
-						pBufferManager->WriteListEntry(OldFileName);
-
-						StringCchCopy(PastedFile.szFileName,SIZEOF_ARRAY(PastedFile.szFileName),
-							OldFileName);
-						PathStripPath(PastedFile.szFileName);
-						pPastedFileList->push_back(PastedFile);
-					}
-
-					pBufferManager->QueryBufferSize(&dwBufferSize);
-					FileNameList = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
-					szDestDirectory = (TCHAR *)malloc((MAX_PATH + 1) * sizeof(TCHAR));
-
-					if(FileNameList != NULL && szDestDirectory != NULL)
-					{
-						pBufferManager->QueryBuffer(FileNameList,dwBufferSize);
-						StringCchCopy(szDestDirectory,MAX_PATH,Directory);
-						szDestDirectory[lstrlen(szDestDirectory) + 1] = '\0';
-
-						ppfi = (PastedFilesInfo_t *)malloc(sizeof(PastedFilesInfo_t));
-
-						if(ppfi != NULL)
-						{
-							if(bCopy)
-								ppfi->shfo.wFunc	= FO_COPY;
-							else if(bMove)
-								ppfi->shfo.wFunc	= FO_MOVE;
-
-							ppfi->shfo.hwnd		= hwnd;
-							ppfi->shfo.pFrom	= FileNameList;
-							ppfi->shfo.pTo		= szDestDirectory;
-							ppfi->shfo.fFlags	= FOF_WANTMAPPINGHANDLE;
-
-							if(lstrcmpi(szSource,Directory) == 0)
-								ppfi->shfo.fFlags |= FOF_RENAMEONCOLLISION;
-
-							ppfi->PasteFilesCallback	= PasteFilesCallback;
-							ppfi->pData					= pData;
-							ppfi->pPastedFileList		= pPastedFileList;
-
-							/* The actual files will be pasted in a background thread. */
-							HANDLE hThread;
-							hThread = CreateThread(NULL,0,PasteFilesThread,ppfi,0,NULL);
-							CloseHandle(hThread);
-						}
-					}
-
-					pBufferManager->Release();
-
-					GlobalUnlock(stg1.hGlobal);
-				}
-				GlobalUnlock(stg0.hGlobal);
-			}
-		}
-	}
-	else if(pClipboardObject->QueryGetData(&ftcFileDescriptor) == S_OK)
-	{
-
-	}
-
-	SetCursor(LoadCursor(NULL,IDC_ARROW));
-
-	pClipboardObject->Release();
-}
-
-DWORD WINAPI PasteFilesThread(LPVOID lpParameter)
-{
-	PastedFilesInfo_t	*ppfi = NULL;
-	int					iReturn;
-
-	ppfi = (PastedFilesInfo_t *)lpParameter;
-
-	CoInitializeEx(0,COINIT_APARTMENTTHREADED);
-	iReturn = SHFileOperation(&ppfi->shfo);
-
-	if(iReturn == 0)
-	{
-		HANDLETOMAPPINGS *phtm = NULL;
-		TCHAR szOldFileName[MAX_PATH];
-		TCHAR szNewFileName[MAX_PATH];
-
-		if(ppfi->shfo.hNameMappings != NULL)
-		{
-			phtm = (HANDLETOMAPPINGS *)ppfi->shfo.hNameMappings;
-
-			list<PastedFile_t>::iterator itr;
-			int j = 0;
-
-			for(j = 0;j < (int)phtm->uNumberOfMappings;j++)
-			{
-				for(itr = ppfi->pPastedFileList->begin();itr != ppfi->pPastedFileList->end();itr++)
-				{
-					StringCchCopy(szOldFileName,SIZEOF_ARRAY(szOldFileName),
-						phtm->lpSHNameMapping[j].pszOldPath);
-					PathStripPath(szOldFileName);
-
-					if(lstrcmp(szOldFileName,itr->szFileName) == 0)
-					{
-						StringCchCopy(szNewFileName,SIZEOF_ARRAY(szNewFileName),
-							phtm->lpSHNameMapping[j].pszNewPath);
-						PathStripPath(szNewFileName);
-
-						StringCchCopy(itr->szFileName,SIZEOF_ARRAY(itr->szFileName),
-							szNewFileName);
-						break;
-					}
-				}
-			}
-
-			SHFreeNameMappings(ppfi->shfo.hNameMappings);
-		}
-
-		if(ppfi->PasteFilesCallback != NULL)
-			ppfi->PasteFilesCallback(ppfi->pData,ppfi->pPastedFileList);
-	}
-
-	delete ppfi->pPastedFileList;
-	free((void *)ppfi->shfo.pFrom);
-	free((void *)ppfi->shfo.pTo);
-	free((void *)ppfi);
-
-	CoUninitialize();
-
-	return 0;
-}
-
 int PasteLinksToClipboardFiles(TCHAR *szDestination)
 {
 	return PasteFilesFromClipboardSpecial(szDestination,PASTE_CLIPBOARD_LINK);
@@ -573,6 +380,7 @@ int PasteHardLinks(TCHAR *szDestination)
 	return PasteFilesFromClipboardSpecial(szDestination,PASTE_CLIPBOARD_HARDLINK);
 }
 
+/* TODO: Use CDropHandler. */
 int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType)
 {
 	IDataObject	*ClipboardObject = NULL;

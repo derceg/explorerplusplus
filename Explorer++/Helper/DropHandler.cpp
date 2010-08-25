@@ -18,6 +18,9 @@
 #include "Registry.h"
 
 
+#define WM_APP_COPYOPERATIONFINISHED	(WM_APP + 1)
+#define SUBCLASS_ID	10000
+
 struct HANDLETOMAPPINGS
 {
 	UINT			uNumberOfMappings;
@@ -25,18 +28,62 @@ struct HANDLETOMAPPINGS
 };
 
 DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter);
+HRESULT	CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi);
+LRESULT CALLBACK DropWindowSubclass(HWND hwnd,UINT uMsg,
+WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 /* TODO: */
 void CreateDropOptionsMenu(LPCITEMIDLIST pidlDirectory,IDataObject *pDataObject,HWND hDrop);
 
 CDropHandler::CDropHandler()
 {
-	
+	m_lRefCount = 1;	
 }
 
 CDropHandler::~CDropHandler()
 {
 
+}
+
+HRESULT __stdcall CDropHandler::QueryInterface(REFIID iid, void **ppvObject)
+{
+	if(ppvObject == NULL)
+	{
+		return E_POINTER;
+	}
+
+	*ppvObject = NULL;
+
+	if(IsEqualIID(iid,IID_IUnknown))
+	{
+		*ppvObject = this;
+	}
+
+	if(*ppvObject)
+	{
+		AddRef();
+		return S_OK;
+	}
+
+	return E_NOINTERFACE;
+}
+
+ULONG __stdcall CDropHandler::AddRef(void)
+{
+	return InterlockedIncrement(&m_lRefCount);
+}
+
+ULONG __stdcall CDropHandler::Release(void)
+{
+	LONG lCount = InterlockedDecrement(&m_lRefCount);
+
+	if(lCount == 0)
+	{
+		delete this;
+		return 0;
+	}
+
+	return lCount;
 }
 
 void CDropHandler::Drop(IDataObject *pDataObject,DWORD grfKeyState,
@@ -580,6 +627,7 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
 
 	pbm->QueryBufferSize(&dwBufferSize);
 
+	/* TODO: Need to free everything. */
 	if(dwBufferSize > 1)
 	{
 		szFileNameList = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
@@ -603,8 +651,6 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
 					StringCchCopy(pszDestDirectory,MAX_PATH,m_szDestDirectory);
 					pszDestDirectory[lstrlen(pszDestDirectory) + 1] = '\0';
 
-					ppfi->pDropHandler = (void *)this;
-
 					ppfi->shfo.hwnd		= m_hwndDrop;
 					ppfi->shfo.wFunc	= bCopy == TRUE ? FO_COPY : FO_MOVE;
 					ppfi->shfo.pFrom	= szFileNameList;
@@ -616,6 +662,11 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
 					ppfi->dwEffect				= bCopy == TRUE ? DROPEFFECT_COPY : DROPEFFECT_MOVE;
 					ppfi->pt.x					= m_ptl.x;
 					ppfi->pt.y					= m_ptl.y;
+					ppfi->pFrom					= szFileNameList;
+					ppfi->pTo					= pszDestDirectory;
+
+					ppfi->pDropHandler	= this;
+					ppfi->m_hDrop		= m_hwndDrop;
 
 					IAsyncOperation *pao = NULL;
 					BOOL bAsyncSupported = FALSE;
@@ -627,6 +678,11 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
 					if(hr == S_OK)
 					{
 						pao->GetAsyncMode(&bAsyncSupported);
+
+						if(!bAsyncSupported)
+						{
+							pao->Release();
+						}
 					}
 
 					if(bAsyncSupported)
@@ -634,6 +690,19 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
 						pao->StartOperation(NULL);
 
 						ppfi->pao	= pao;
+
+						/* The copy operation is going to occur on a background thread,
+						which means that we can't release this object until the background
+						thread has completed. Use reference counting to ensure this
+						condition is met. */
+						AddRef();
+
+						/* The drop source needs to be notified of the status of the copy
+						once it has finished. This notification however, needs to occur on
+						the thread that the object was created in. Therefore, we'll subclass
+						the drop window, so that we can send it a private user message
+						once the drop has finished. */
+						SetWindowSubclass(m_hwndDrop,DropWindowSubclass,SUBCLASS_ID,NULL);
 
 						/* Create a new thread, which we'll use to copy
 						the dropped files. */
@@ -658,30 +727,57 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
 	}
 }
 
+LRESULT CALLBACK DropWindowSubclass(HWND hwnd,UINT uMsg,
+WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+{
+	switch(uMsg)
+	{
+	case WM_APP_COPYOPERATIONFINISHED:
+		{
+			PastedFilesInfo_t *ppfi = reinterpret_cast<PastedFilesInfo_t *>(wParam);
+
+			ppfi->pao->EndOperation(ppfi->hrCopy,NULL,ppfi->dwEffect);
+			ppfi->pao->Release();
+
+			ppfi->pDropHandler->Release();
+
+			free((void *)ppfi);
+
+			RemoveWindowSubclass(hwnd,DropWindowSubclass,SUBCLASS_ID);
+			return 0;
+		}
+		break;
+
+	/* TODO: The window we're subclassing may be destroyed
+	while the subclass is active. This should be handled in
+	some way. */
+	/*case WM_NCDESTROY:
+		RemoveWindowSubclass(hwnd,DropWindowSubclass,SUBCLASS_ID);
+		break;*/
+	}
+
+	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
 DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter)
 {
-	PastedFilesInfo_t *ppfi = NULL;
-	CDropHandler *pdh = NULL;
-	HRESULT hr;
-
-	ppfi = (PastedFilesInfo_t *)lpParameter;
-
-	pdh = (CDropHandler *)ppfi->pDropHandler;
-
 	CoInitializeEx(0,COINIT_APARTMENTTHREADED);
-	hr = pdh->CopyDroppedFilesInternalAsync(ppfi);
+
+	PastedFilesInfo_t *ppfi = (PastedFilesInfo_t *)lpParameter;
+
+	ppfi->hrCopy = CopyDroppedFilesInternalAsync(ppfi);
+
 	CoUninitialize();
 
-	ppfi->pao->EndOperation(hr,NULL,ppfi->dwEffect);
-
-	ppfi->pao->Release();
-
-	free((void *)ppfi);
+	/* Signal back to the main thread. We can't call EndOperation()
+	from here, as it needs to be called on the original thread. */
+	PostMessage(ppfi->m_hDrop,WM_APP_COPYOPERATIONFINISHED,
+		reinterpret_cast<WPARAM>(ppfi),NULL);
 
 	return 0;
 }
 
-HRESULT CDropHandler::CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
+HRESULT CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
 {
 	HRESULT hr = E_FAIL;
 	int iReturn;

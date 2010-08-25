@@ -139,7 +139,6 @@ ULONG __stdcall CDataObject::Release(void)
 	return lCount;
 }
 
-
 HRESULT __stdcall CDataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 {
 	if(pFormatEtc == NULL || pMedium == NULL)
@@ -328,12 +327,7 @@ HRESULT __stdcall CDataObject::GetAsyncMode(BOOL *pfIsOpAsync)
 
 HRESULT __stdcall CDataObject::InOperation(BOOL *pfInAsyncOp)
 {
-	if(m_bStartedOperation)
-	{
-		*pfInAsyncOp = VARIANT_TRUE;
-	}
-
-	*pfInAsyncOp = VARIANT_FALSE;
+	*pfInAsyncOp = m_bStartedOperation;
 
 	return S_OK;
 }
@@ -342,7 +336,6 @@ HRESULT __stdcall CDataObject::SetAsyncMode(BOOL fDoOpAsync)
 {
 	m_bDoOpAsync = fDoOpAsync;
 
-	/* TODO: */
 	if(fDoOpAsync)
 	{
 		AddRef();
