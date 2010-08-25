@@ -1982,7 +1982,6 @@ void CContainer::OnListViewPaste(void)
 			m_hContainer,szDestination,this,!m_bOverwriteExistingFilesConfirmation);
 
 		pClipboardHandler->Release();
-
 		pClipboardObject->Release();
 	}
 }

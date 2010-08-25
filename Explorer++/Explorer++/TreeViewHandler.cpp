@@ -710,7 +710,6 @@ void CContainer::OnTreeViewPaste(void)
 			CoTaskMemFree(pidl);
 
 			pClipboardHandler->Release();
-
 			pClipboardObject->Release();
 		}
 	}

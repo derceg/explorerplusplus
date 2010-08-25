@@ -269,7 +269,7 @@ POINTL pt,DWORD *pdwEffect)
 			grfKeyState,pt,pdwEffect,m_hTreeView,
 			m_DragType,szDestDirectory,NULL,FALSE);
 
-		delete pDropHandler;
+		pDropHandler->Release();
 		CoTaskMemFree(pidlDirectory);
 	}
 
