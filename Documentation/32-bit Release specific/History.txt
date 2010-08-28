@@ -22,6 +22,14 @@ New features:
   tab in Windows 7 (this can be turned on/off by toggling
   'Show Taskbar Thumbnails' in the Options dialog).
 - Numerous improvements to drag and drop/copy and paste.
+- Text on the clipboard can now be pasted as a file.
+  The file will be given a name of the form:
+  Clipboard Text ([datetime]).txt.
+  This also applies to drag and drop.
+- Images on the clipboard can now be pasted as a file.
+  The file will be given a name of the form:
+  Clipboard Image ([datetime]).bmp.
+  This also applies to drag and drop.
 - Large toolbar icons added.
 - Files can now be dropped onto existing application
   toolbar buttons. This will open the dropped files in

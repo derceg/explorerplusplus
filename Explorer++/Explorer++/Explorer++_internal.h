@@ -166,6 +166,12 @@ the folders pane. */
 #define FOLDERS_TOOLBAR_WIDTH		16
 #define FOLDERS_TOOLBAR_HEIGHT		16
 
+/* Small/large toolbar image sizes. */
+#define TOOLBAR_IMAGE_SIZE_SMALL_X	16
+#define TOOLBAR_IMAGE_SIZE_SMALL_Y	16
+#define TOOLBAR_IMAGE_SIZE_LARGE_X	24
+#define TOOLBAR_IMAGE_SIZE_LARGE_Y	24
+
 #define TAB_TOOLBAR_X_OFFSET		(-20)
 #define TAB_TOOLBAR_Y_OFFSET		5
 

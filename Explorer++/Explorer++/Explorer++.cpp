@@ -343,6 +343,7 @@ void CContainer::SetDefaultValues(void)
 	m_bTVAutoExpandSelected			= FALSE;
 	m_bCloseMainWindowOnTabClose	= TRUE;
 	m_bShowTaskbarThumbnails		= TRUE;
+	m_bLargeToolbarIcons			= FALSE;
 
 	/* Infotips (user options). */
 	m_bShowInfoTips					= TRUE;
@@ -2171,7 +2172,7 @@ LRESULT CALLBACK CContainer::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPAR
 			break;
 
 		case LVN_KEYDOWN:
-			OnListViewKeyDown(lParam);
+			return OnListViewKeyDown(lParam);
 			break;
 
 		case LVN_ITEMCHANGING:

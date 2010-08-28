@@ -227,7 +227,6 @@
 #define IDC_BUTTON_EDIT                 1237
 #define IDC_SETTINGS_CHECK_LINK         1240
 #define IDC_SETTINGS_CHECK_SYSTEMFILES  1241
-#define IDC_CHECK5                      1242
 #define IDC_SETTINGS_CHECK_SINGLECLICK  1242
 #define IDC_BUTTON_NEW                  1243
 #define IDC_LISTVIEW_COLORRULES         1245

@@ -63,6 +63,7 @@ private:
 	void	CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD dwPreferredEffect);
 	void	CopyDroppedFilesInternal(IBufferManager *pbm,list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision);
 	void	CreateShortcutToDroppedFile(TCHAR *szFullFileName);
+	void	CopyTextToFile(TCHAR *pszDestDirectory,WCHAR *pszText);
 	BOOL	CheckItemLocations(int iDroppedItem);
 
 	LONG		m_lRefCount;

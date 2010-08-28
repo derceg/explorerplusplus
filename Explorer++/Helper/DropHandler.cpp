@@ -133,6 +133,9 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 	FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	FORMATETC ftcFileDescriptor = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	FORMATETC ftcShellIDList = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC ftcText = {CF_TEXT,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC ftcUnicodeText = {CF_UNICODETEXT,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC ftcDIBV5 = {CF_DIBV5,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	STGMEDIUM stg;
 	DROPFILES *pdf = NULL;
 	DWORD *pdwEffect = NULL;
@@ -477,6 +480,130 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 
 			if(m_pDropFilesCallback != NULL)
 				m_pDropFilesCallback->OnDropFile(&pfl,&pt);
+		}
+	}
+	else if(pDataObject->QueryGetData(&ftcUnicodeText) == S_OK)
+	{
+		hr = pDataObject->GetData(&ftcText,&stg);
+
+		if(hr == S_OK)
+		{
+			WCHAR *pText = static_cast<WCHAR *>(GlobalLock(stg.hGlobal));
+
+			if(pText != NULL)
+			{
+				CopyTextToFile(pszDestDirectory,pText);
+
+				GlobalUnlock(stg.hGlobal);
+			}
+		}
+	}
+	else if(pDataObject->QueryGetData(&ftcText) == S_OK)
+	{
+		hr = pDataObject->GetData(&ftcText,&stg);
+
+		if(hr == S_OK)
+		{
+			char *pText = static_cast<char *>(GlobalLock(stg.hGlobal));
+
+			if(pText != NULL)
+			{
+				WCHAR *pszUnicodeText = new WCHAR[strlen(pText) + 1];
+
+				MultiByteToWideChar(CP_ACP,0,pText,-1,pszUnicodeText,
+					strlen(pText) + 1);
+
+				CopyTextToFile(pszDestDirectory,pszUnicodeText);
+
+				delete[] pszUnicodeText;
+
+				GlobalUnlock(stg.hGlobal);
+			}
+		}
+	}
+	else if(pDataObject->QueryGetData(&ftcDIBV5) == S_OK)
+	{
+		hr = pDataObject->GetData(&ftcDIBV5,&stg);
+
+		if(hr == S_OK)
+		{
+			BITMAPINFO *pbmp = static_cast<BITMAPINFO *>(GlobalLock(stg.hGlobal));
+
+			if(pbmp != NULL)
+			{
+				SYSTEMTIME st;
+				FILETIME ft;
+				FILETIME lft;
+				TCHAR szTime[512];
+
+				GetLocalTime(&st);
+				SystemTimeToFileTime(&st,&ft);
+				LocalFileTimeToFileTime(&ft,&lft);
+				CreateFileTimeString(&lft,szTime,SIZEOF_ARRAY(szTime),FALSE);
+
+				for(int i = 0;i < lstrlen(szTime);i++)
+				{
+					if(szTime[i] == '/')
+					{
+						szTime[i] = '-';
+					}
+					else if(szTime[i] == ':')
+					{
+						szTime[i] = '.';
+					}
+				}
+
+				TCHAR szFullFileName[MAX_PATH];
+				TCHAR szFileName[MAX_PATH];
+
+				/* TODO: Move text into string table. */
+				StringCchPrintf(szFileName,SIZEOF_ARRAY(szFileName),
+					_T("Clipboard Image (%s).bmp"),szTime);
+
+				PathCombine(szFullFileName,pszDestDirectory,
+					szFileName);
+
+				HANDLE hFile = CreateFile(szFullFileName,
+					GENERIC_WRITE,0,NULL,CREATE_NEW,
+					FILE_ATTRIBUTE_NORMAL,NULL);
+
+				if(hFile != INVALID_HANDLE_VALUE)
+				{
+					DWORD dwSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER));
+
+					LPBYTE pData = new BYTE[dwSize];
+
+					BITMAPFILEHEADER *pbfh = (BITMAPFILEHEADER *)pData;
+
+					/* 'BM'. */
+					pbfh->bfType		= 0x4D42;
+
+					pbfh->bfSize		= pbmp->bmiHeader.biSize;
+					pbfh->bfReserved1	= 0;
+					pbfh->bfReserved2	= 0;
+					pbfh->bfOffBits		= sizeof(BITMAPFILEHEADER);
+
+					BITMAPINFOHEADER *pb5h = (BITMAPINFOHEADER *)(pData + sizeof(BITMAPFILEHEADER));
+
+					memcpy(pb5h,&pbmp->bmiHeader,sizeof(BITMAPINFOHEADER));
+
+					RGBQUAD *prgb = (RGBQUAD *)(pData + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
+
+					memcpy(prgb,pbmp->bmiColors,GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER));
+
+					DWORD nBytesWritten;
+
+					WriteFile(hFile,(LPCVOID)pData,
+						dwSize,
+						&nBytesWritten,NULL);
+
+					CloseHandle(hFile);
+
+					delete[] pData;
+				}
+
+				GlobalUnlock(stg.hGlobal);
+			}
 		}
 	}
 }
@@ -846,6 +973,56 @@ void CDropHandler::CreateShortcutToDroppedFile(TCHAR *szFullFileName)
 	PathAppend(szLink,szFileName);
 
 	CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
+}
+
+void CDropHandler::CopyTextToFile(TCHAR *pszDestDirectory,WCHAR *pszText)
+{
+	SYSTEMTIME st;
+	FILETIME ft;
+	FILETIME lft;
+	TCHAR szTime[512];
+
+	GetLocalTime(&st);
+	SystemTimeToFileTime(&st,&ft);
+	LocalFileTimeToFileTime(&ft,&lft);
+	CreateFileTimeString(&lft,szTime,SIZEOF_ARRAY(szTime),FALSE);
+
+	for(int i = 0;i < lstrlen(szTime);i++)
+	{
+		if(szTime[i] == '/')
+		{
+			szTime[i] = '-';
+		}
+		else if(szTime[i] == ':')
+		{
+			szTime[i] = '.';
+		}
+	}
+
+	TCHAR szFullFileName[MAX_PATH];
+	TCHAR szFileName[MAX_PATH];
+
+	/* TODO: Move text into string table. */
+	StringCchPrintf(szFileName,SIZEOF_ARRAY(szFileName),
+		_T("Clipboard Text (%s).txt"),szTime);
+
+	PathCombine(szFullFileName,pszDestDirectory,
+		szFileName);
+
+	HANDLE hFile = CreateFile(szFullFileName,
+		GENERIC_WRITE,0,NULL,CREATE_NEW,
+		FILE_ATTRIBUTE_NORMAL,NULL);
+
+	if(hFile != INVALID_HANDLE_VALUE)
+	{
+		DWORD nBytesWritten;
+
+		WriteFile(hFile,(LPCVOID)pszText,
+			lstrlen(pszText) * sizeof(WCHAR),
+			&nBytesWritten,NULL);
+
+		CloseHandle(hFile);
+	}
 }
 
 BOOL CDropHandler::CheckItemLocations(int iDroppedItem)

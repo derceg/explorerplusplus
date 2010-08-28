@@ -480,7 +480,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,7,168,10
 END
 
-IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 277
+IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 283
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Window"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -488,35 +488,37 @@ BEGIN
     CONTROL         "Allow &multiple instances",IDC_OPTION_MULTIPLEINSTANCES,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,15,91,10
     CONTROL         "&Show file previews in display window",IDC_OPTION_FILEPREVIEWS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,251,133,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,261,133,10
     CONTROL         "Show full &path in title bar",IDC_SETTINGS_CHECK_TITLEPATH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,67,95,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,80,95,10
     CONTROL         "Show &username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,80,101,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,93,101,10
     CONTROL         "&Disable treeview delay",IDC_OPTION_TREEVIEWDELAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,215,88,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,225,88,10
     CONTROL         "Extend tab &bar across entire window",IDC_OPTION_EXTENDTABCONTROL,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,54,133,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,67,133,10
     CONTROL         "Show &gridlines in details view",IDC_OPTION_GRIDLINES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,128,108,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,138,108,10
     CONTROL         "Full row selection in details &view",IDC_OPTION_FULLROWSELECT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,154,117,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,164,117,10
     CONTROL         "Show privilege level in title bar",IDC_OPTION_PRIVILEGELEVELINTITLEBAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,93,113,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,106,113,10
     CONTROL         "Always show the tab bar",IDC_OPTION_ALWAYSSHOWTABBAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,28,95,10
-    GROUPBOX        "Treeview",IDC_STATIC,3,176,219,55
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,41,95,10
+    GROUPBOX        "Treeview",IDC_STATIC,3,186,219,55
     CONTROL         "Automatically synchronize treeview with main pane",IDC_OPTION_SYNCTREEVIEW,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,189,179,10
-    GROUPBOX        "General",IDC_STATIC,3,4,219,106
-    GROUPBOX        "Listview",IDC_STATIC,3,116,219,54
-    GROUPBOX        "Display Window",IDC_STATIC,3,237,219,35
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,199,179,10
+    GROUPBOX        "General",IDC_STATIC,3,4,219,118
+    GROUPBOX        "Listview",IDC_STATIC,3,126,219,54
+    GROUPBOX        "Display Window",IDC_STATIC,3,246,219,30
     CONTROL         "Use check boxes to select items",IDC_OPTION_CHECKBOXSELECTION,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,141,117,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,151,117,10
     CONTROL         "Show the tab bar at the bottom",IDC_OPTION_SHOWTABBARATBOTTOM,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,41,117,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,54,117,10
     CONTROL         "Automatically expand nodes on selection",IDC_OPTION_TREEVIEWSELECTIONEXPAND,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,202,146,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,212,146,10
+    CONTROL         "Use large toolbar icons",IDC_OPTION_LARGETOOLBARICONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,28,89,10
 END
 
 IDD_CUSTOMIZECOLORS DIALOGEX 0, 0, 363, 152

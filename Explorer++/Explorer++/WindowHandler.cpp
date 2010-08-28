@@ -173,27 +173,32 @@ void CContainer::CreateMainControls(void)
 
 void CContainer::CreateMainToolbar(void)
 {
-	HIMAGELIST	himl;
-	HBITMAP		hb;
-
 	m_hMainToolbar = CreateToolbar(m_hMainRebar,MainToolbarStyles,
 		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DRAWDDARROWS|
 		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
-	/* The icons to be used are all 16 x 16. */
-	SendMessage(m_hMainToolbar,TB_SETBITMAPSIZE,0,MAKELONG(24,24));//MAKELONG(16,16));
-	
+	HIMAGELIST *phiml = NULL;
+	int cx;
+	int cy;
+
+	if(m_bLargeToolbarIcons)
+	{
+		cx = TOOLBAR_IMAGE_SIZE_LARGE_X;
+		cy = TOOLBAR_IMAGE_SIZE_LARGE_Y;
+		phiml = &m_himlToolbarLarge;
+	}
+	else
+	{
+		cx = TOOLBAR_IMAGE_SIZE_SMALL_X;
+		cy = TOOLBAR_IMAGE_SIZE_SMALL_Y;
+		phiml = &m_himlToolbarSmall;
+	}
+
+	SendMessage(m_hMainToolbar,TB_SETBITMAPSIZE,0,MAKELONG(cx,cy));	
 	SendMessage(m_hMainToolbar,TB_BUTTONSTRUCTSIZE,(WPARAM)sizeof(TBBUTTON),0);
 
-	himl = ImageList_Create(24,24,ILC_COLOR32 | ILC_MASK,0,47);
-	hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES_LARGE));
-
-	ImageList_Add(himl,hb,NULL);
-
-	DeleteObject(hb);
-
 	/* Add the custom buttons to the toolbars image list. */
-	SendMessage(m_hMainToolbar,TB_SETIMAGELIST,0,(LPARAM)himl);
+	SendMessage(m_hMainToolbar,TB_SETIMAGELIST,0,(LPARAM)*phiml);
 
 	AddStringsToMainToolbar();
 	InsertToolbarButtons();
@@ -1009,4 +1014,43 @@ void CContainer::OnAddressBarBeginDrag(void)
 
 		pDragSourceHelper->Release();
 	}
+}
+
+void CContainer::AdjustMainToolbarSize(void)
+{
+	HIMAGELIST *phiml = NULL;
+	int cx;
+	int cy;
+
+	if(m_bLargeToolbarIcons)
+	{
+		cx = TOOLBAR_IMAGE_SIZE_LARGE_X;
+		cy = TOOLBAR_IMAGE_SIZE_LARGE_Y;
+		phiml = &m_himlToolbarLarge;
+	}
+	else
+	{
+		cx = TOOLBAR_IMAGE_SIZE_SMALL_X;
+		cy = TOOLBAR_IMAGE_SIZE_SMALL_Y;
+		phiml = &m_himlToolbarSmall;
+	}
+
+	/* Switch the image list. */
+	SendMessage(m_hMainToolbar,TB_SETIMAGELIST,0,(LPARAM)*phiml);
+	SendMessage(m_hMainToolbar,TB_SETBUTTONSIZE,0,MAKELPARAM(cx,cy));
+	SendMessage(m_hMainToolbar,TB_AUTOSIZE,0,0);
+
+	REBARBANDINFO rbi;
+	DWORD dwSize;
+
+	dwSize = (DWORD)SendMessage(m_hMainToolbar,TB_GETBUTTONSIZE,0,0);
+
+	rbi.cbSize		= sizeof(rbi);
+	rbi.fMask		= RBBIM_CHILDSIZE;
+	rbi.cxMinChild	= 0;
+	rbi.cyMinChild	= HIWORD(dwSize);
+	rbi.cyChild		= HIWORD(dwSize);
+	rbi.cyMaxChild	= HIWORD(dwSize);
+
+	SendMessage(m_hMainRebar,RB_SETBANDINFO,0,(LPARAM)&rbi);
 }

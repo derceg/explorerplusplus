@@ -125,6 +125,19 @@ void CContainer::OnWindowCreate(void)
 	m_hDisplayWindowRightClickMenu	= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)),0);
 	m_hViewsMenu					= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_VIEWS_MENU)),0);
 
+	HBITMAP hb;
+
+	/* Large and small image lists for the main toolbar. */
+	m_himlToolbarSmall = ImageList_Create(TOOLBAR_IMAGE_SIZE_SMALL_X,TOOLBAR_IMAGE_SIZE_SMALL_Y,ILC_COLOR32|ILC_MASK,0,47);
+	hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
+	ImageList_Add(m_himlToolbarSmall,hb,NULL);
+	DeleteObject(hb);
+
+	m_himlToolbarLarge = ImageList_Create(TOOLBAR_IMAGE_SIZE_LARGE_X,TOOLBAR_IMAGE_SIZE_LARGE_Y,ILC_COLOR32|ILC_MASK,0,47);
+	hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES_LARGE));
+	ImageList_Add(m_himlToolbarLarge,hb,NULL);
+	DeleteObject(hb);
+
 	CreateDirectoryMonitor(&m_pDirMon);
 
 	CreateStatusBar();
@@ -1049,6 +1062,9 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 int CContainer::OnDestroy(void)
 {
 	QueueUserAPC(QuitIconAPC,m_hIconThread,NULL);
+
+	ImageList_Destroy(m_himlToolbarSmall);
+	ImageList_Destroy(m_himlToolbarLarge);
 
 	DestroyMenu(m_hRightClickMenu);
 	ChangeClipboardChain(m_hContainer,m_hNextClipboardViewer);

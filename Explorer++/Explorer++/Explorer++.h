@@ -569,7 +569,7 @@ private:
 	void					OnListViewFileRename(void);
 	void					OnListViewColumnClick(LPARAM lParam);
 	void					OnListViewGetInfoTip(LPARAM lParam);
-	void					OnListViewKeyDown(LPARAM lParam);
+	LRESULT					OnListViewKeyDown(LPARAM lParam);
 	void					OnListViewItemChanged(LPARAM lParam);
 	HRESULT					OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType);
 	BOOL					OnListViewBeginLabelEdit(LPARAM lParam);
@@ -707,6 +707,7 @@ private:
 
 	/* Main toolbars. */
 	void					InitializeMainToolbars(void);
+	void					AdjustMainToolbarSize(void);
 
 	/* Directory specific settings. */
 	void					SaveDirectorySpecificSettings(int iTab);
@@ -1278,6 +1279,7 @@ private:
 	BOOL					m_bShowTaskbarThumbnails;
 	BOOL					m_bSynchronizeTreeview;
 	BOOL					m_bTVAutoExpandSelected;
+	BOOL					m_bLargeToolbarIcons;
 	SizeDisplayFormat_t		m_SizeDisplayFormat;
 	UINT					m_StartupMode;
 	UINT					m_ReplaceExplorerMode;
@@ -1313,6 +1315,10 @@ private:
 
 	/* Main toolbars. */
 	REBARBANDINFO			m_ToolbarInformation[NUM_MAIN_TOOLBARS];
+
+	/* Main toolbar. */
+	HIMAGELIST				m_himlToolbarSmall;
+	HIMAGELIST				m_himlToolbarLarge;
 
 	/* Bookmark toolbar. */
 	UINT					m_uBookmarkToolbarMap[MAX_BOOKMARKTOOLBAR_ITEMS];

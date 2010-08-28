@@ -679,6 +679,8 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 		{
 			if(m_bAllowMultipleInstances)
 				CheckDlgButton(hDlg,IDC_OPTION_MULTIPLEINSTANCES,BST_CHECKED);
+			if(m_bLargeToolbarIcons)
+				CheckDlgButton(hDlg,IDC_OPTION_LARGETOOLBARICONS,BST_CHECKED);
 			if(m_bAlwaysShowTabBar)
 				CheckDlgButton(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR,BST_CHECKED);
 			if(m_bShowTabBarAtBottom)
@@ -712,6 +714,7 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 		switch(LOWORD(wParam))
 		{
 		case IDC_OPTION_MULTIPLEINSTANCES:
+		case IDC_OPTION_LARGETOOLBARICONS:
 		case IDC_OPTION_ALWAYSSHOWTABBAR:
 		case IDC_OPTION_SHOWTABBARATBOTTOM:
 		case IDC_OPTION_FILEPREVIEWS:
@@ -815,6 +818,17 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 
 					m_bUseFullRowSelect = (IsDlgButtonChecked(hDlg,IDC_OPTION_FULLROWSELECT)
 						== BST_CHECKED);
+
+					BOOL bLargeToolbarIcons = (IsDlgButtonChecked(hDlg,IDC_OPTION_LARGETOOLBARICONS)
+						== BST_CHECKED);
+
+					if(m_bLargeToolbarIcons != bLargeToolbarIcons)
+					{
+						m_bLargeToolbarIcons = (IsDlgButtonChecked(hDlg,IDC_OPTION_LARGETOOLBARICONS)
+							== BST_CHECKED);
+
+						AdjustMainToolbarSize();
+					}
 
 					/* Required if show full title path or show username/privilege level
 					in title bar options change. */

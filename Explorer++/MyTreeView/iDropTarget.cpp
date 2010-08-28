@@ -35,6 +35,10 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 	/* The two drop formats we support. */
 	FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	FORMATETC ftcFileDescriptor = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC ftcShellIDList = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC ftcText = {CF_UNICODETEXT,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC ftcUnicodeText = {CF_UNICODETEXT,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	FORMATETC ftcDIBV5 = {CF_DIBV5,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 
 	m_pDataObject = pDataObject;
 
@@ -43,7 +47,11 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 	/* Check whether the drop source has the type of data
 	that is needed for this drag operation. */
 	if(pDataObject->QueryGetData(&ftcHDrop) == S_OK ||
-		pDataObject->QueryGetData(&ftcFileDescriptor) == S_OK)
+		pDataObject->QueryGetData(&ftcFileDescriptor) == S_OK ||
+		pDataObject->QueryGetData(&ftcShellIDList) == S_OK ||
+		pDataObject->QueryGetData(&ftcText) == S_OK ||
+		pDataObject->QueryGetData(&ftcUnicodeText) == S_OK ||
+		pDataObject->QueryGetData(&ftcDIBV5) == S_OK)
 	{
 		m_bDataAccept = TRUE;
 

@@ -1043,8 +1043,6 @@ HRESULT CContainer::CloseTab(int TabIndex)
 	if(m_TabInfo[(int)tcItem.lParam].bLocked || m_TabInfo[(int)tcItem.lParam].bAddressLocked)
 		return S_FALSE;
 
-	SaveDirectorySpecificSettings(TabIndex);
-
 	ListViewIndex = (int)tcItem.lParam;
 
 	EnterCriticalSection(&g_csDirMonCallback);

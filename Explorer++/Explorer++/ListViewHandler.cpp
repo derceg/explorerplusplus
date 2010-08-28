@@ -418,7 +418,7 @@ void CContainer::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CContainer::OnListViewKeyDown(LPARAM lParam)
+LRESULT CContainer::OnListViewKeyDown(LPARAM lParam)
 {
 	LV_KEYDOWN	*lv_key = NULL;
 
@@ -517,6 +517,11 @@ void CContainer::OnListViewKeyDown(LPARAM lParam)
 				OnListViewCopy(FALSE);
 			break;
 	}
+
+	if(GetKeyState(VK_CONTROL) & 0x80)
+		return 1;
+
+	return 0;
 }
 
 void CContainer::OnListViewItemChanged(LPARAM lParam)

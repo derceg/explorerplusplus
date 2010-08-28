@@ -100,6 +100,7 @@ will need to be changed correspondingly. */
 #define HASH_SYNCHRONIZETREEVIEW	1687787660
 #define HASH_TVAUTOEXPAND			1228854897
 #define HASH_OVERWRITEEXISTINGFILESCONFIRMATION	1625342835
+#define HASH_LARGETOOLBARICONS		10895007
 
 typedef struct
 {
@@ -387,6 +388,9 @@ MSXML2::IXMLDOMElement *pRoot)
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	_itow_s(m_Language,szValue,SIZEOF_ARRAY(szValue),10);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("Language"),szValue);
+
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("LargeToolbarIcons"),EncodeBoolValue(m_bLargeToolbarIcons));
 
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	_itow_s(m_iLastSelectedTab,szValue,SIZEOF_ARRAY(szValue),10);
@@ -2665,6 +2669,10 @@ WCHAR *wszName,WCHAR *wszValue)
 	case HASH_LANGUAGE:
 		m_Language = DecodeIntValue(wszValue);
 		m_bLanguageLoaded = TRUE;
+		break;
+
+	case HASH_LARGETOOLBARICONS:
+		m_bLargeToolbarIcons = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_LASTSELECTEDTAB:
