@@ -959,7 +959,8 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 	/* <---- Holder window + child windows ----> */
 
 	if(m_bExtendTabControl &&
-		m_bShowTabBarAtBottom)
+		m_bShowTabBarAtBottom &&
+		m_bShowTabBar)
 	{
 		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop - TAB_WINDOW_HEIGHT;
 	}

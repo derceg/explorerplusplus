@@ -86,17 +86,6 @@ void CContainer::OnShowOptions(void)
 	hpsp[nSheet] = CreatePropertySheetPage(&psp[nSheet]);
 	nSheet++;
 
-	/* Default settings options page. */
-	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
-	psp[nSheet].dwFlags		= PSP_DEFAULT;
-	psp[nSheet].hInstance	= g_hLanguageModule;
-	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_DEFAULT);
-	psp[nSheet].lParam		= (LPARAM)this;
-	psp[nSheet].pfnDlgProc	= DefaultSettingsProcStub;
-
-	hpsp[nSheet] = CreatePropertySheetPage(&psp[nSheet]);
-	nSheet++;
-
 	/* Tab settings options page. */
 	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
 	psp[nSheet].dwFlags		= PSP_DEFAULT;
@@ -104,6 +93,17 @@ void CContainer::OnShowOptions(void)
 	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_TABS);
 	psp[nSheet].lParam		= (LPARAM)this;
 	psp[nSheet].pfnDlgProc	= TabSettingsProcStub;
+
+	hpsp[nSheet] = CreatePropertySheetPage(&psp[nSheet]);
+	nSheet++;
+
+	/* Default settings options page. */
+	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
+	psp[nSheet].dwFlags		= PSP_DEFAULT;
+	psp[nSheet].hInstance	= g_hLanguageModule;
+	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_DEFAULT);
+	psp[nSheet].lParam		= (LPARAM)this;
+	psp[nSheet].pfnDlgProc	= DefaultSettingsProcStub;
 
 	hpsp[nSheet] = CreatePropertySheetPage(&psp[nSheet]);
 	nSheet++;
@@ -887,6 +887,121 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 	return 0;
 }
 
+INT_PTR CALLBACK TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+{
+	static CContainer *pContainer;
+
+	switch(uMsg)
+	{
+		case WM_INITDIALOG:
+			{
+				PROPSHEETPAGE *ppsp;
+
+				ppsp = (PROPSHEETPAGE *)lParam;
+				pContainer = (CContainer *)ppsp->lParam;
+			}
+			break;
+	}
+
+	return pContainer->TabSettingsProc(hDlg,uMsg,wParam,lParam);
+}
+
+INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+{
+	switch(uMsg)
+	{
+		case WM_INITDIALOG:
+			{
+				if(!(m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
+					m_dwMinorVersion >= 1))
+				{
+					EnableWindow(GetDlgItem(hDlg,IDC_TABS_TASKBARTHUMBNAILS),FALSE);
+
+					if(m_bShowTaskbarThumbnails)
+					{
+						m_bShowTaskbarThumbnails = FALSE;
+					}
+				}
+
+				if(m_bShowTaskbarThumbnails)
+					CheckDlgButton(hDlg,IDC_TABS_TASKBARTHUMBNAILS,BST_CHECKED);
+				if(m_bForceSameTabWidth)
+					CheckDlgButton(hDlg,IDC_TABS_SAMEWIDTH,BST_CHECKED);
+				if(m_bConfirmCloseTabs)
+					CheckDlgButton(hDlg,IDC_TABS_CLOSECONFIRMATION,BST_CHECKED);
+				if(m_bOpenNewTabNextToCurrent)
+					CheckDlgButton(hDlg,IDC_TABS_OPENNEXTTOCURRENT,BST_CHECKED);
+				if(m_bAlwaysOpenNewTab)
+					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_ALWAYSNEWTAB,BST_CHECKED);
+				if(m_bDoubleClickTabClose)
+					CheckDlgButton(hDlg,IDC_TABS_DOUBLECLICKCLOSE,BST_CHECKED);
+				if(m_bCloseMainWindowOnTabClose)
+					CheckDlgButton(hDlg,IDC_TABS_CLOSEMAINWINDOW,BST_CHECKED);
+			}
+			break;
+
+		case WM_COMMAND:
+			switch(LOWORD(wParam))
+			{
+			case IDC_TABS_TASKBARTHUMBNAILS:
+			case IDC_TABS_SAMEWIDTH:
+			case IDC_TABS_CLOSECONFIRMATION:
+			case IDC_TABS_OPENNEXTTOCURRENT:
+			case IDC_SETTINGS_CHECK_ALWAYSNEWTAB:
+			case IDC_TABS_DOUBLECLICKCLOSE:
+			case IDC_TABS_CLOSEMAINWINDOW:
+				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+				break;
+			}
+			break;
+
+		case WM_NOTIFY:
+			{
+				NMHDR	*nmhdr = NULL;
+				nmhdr = (NMHDR *)lParam;
+
+				switch(nmhdr->code)
+				{
+				case PSN_APPLY:
+					{
+						m_bShowTaskbarThumbnails = (IsDlgButtonChecked(hDlg,IDC_TABS_TASKBARTHUMBNAILS)
+							== BST_CHECKED);
+
+						m_bForceSameTabWidth = (IsDlgButtonChecked(hDlg,IDC_TABS_SAMEWIDTH)
+							== BST_CHECKED);
+
+						m_bConfirmCloseTabs = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSECONFIRMATION)
+							== BST_CHECKED);
+
+						m_bOpenNewTabNextToCurrent = (IsDlgButtonChecked(hDlg,IDC_TABS_OPENNEXTTOCURRENT)
+							== BST_CHECKED);
+
+						m_bAlwaysOpenNewTab = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_ALWAYSNEWTAB)
+							== BST_CHECKED);
+
+						m_bDoubleClickTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_DOUBLECLICKCLOSE)
+							== BST_CHECKED);
+
+						m_bCloseMainWindowOnTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSEMAINWINDOW)
+							== BST_CHECKED);
+
+						AddWindowStyle(m_hTabCtrl,TCS_FIXEDWIDTH,m_bForceSameTabWidth);
+
+						SaveAllSettings();
+					}
+					break;
+				}
+			}
+			break;
+
+		case WM_CLOSE:
+			EndDialog(hDlg,0);
+			break;
+	}
+
+	return 0;
+}
+
 INT_PTR CALLBACK DefaultSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	static CContainer *pContainer;
@@ -1024,110 +1139,6 @@ INT_PTR CALLBACK CContainer::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 							m_ViewModeGlobal = VM_LIST;
 						else if(IsDlgButtonChecked(hDlg,IDC_DEFAULT_DETAILS) == BST_CHECKED)
 							m_ViewModeGlobal = VM_DETAILS;
-
-						SaveAllSettings();
-					}
-					break;
-				}
-			}
-			break;
-
-		case WM_CLOSE:
-			EndDialog(hDlg,0);
-			break;
-	}
-
-	return 0;
-}
-
-INT_PTR CALLBACK TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
-{
-	static CContainer *pContainer;
-
-	switch(uMsg)
-	{
-		case WM_INITDIALOG:
-			{
-				PROPSHEETPAGE *ppsp;
-
-				ppsp = (PROPSHEETPAGE *)lParam;
-				pContainer = (CContainer *)ppsp->lParam;
-			}
-			break;
-	}
-
-	return pContainer->TabSettingsProc(hDlg,uMsg,wParam,lParam);
-}
-
-INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
-{
-	switch(uMsg)
-	{
-		case WM_INITDIALOG:
-			{
-				if(m_bShowTaskbarThumbnails)
-					CheckDlgButton(hDlg,IDC_TABS_TASKBARTHUMBNAILS,BST_CHECKED);
-				if(m_bForceSameTabWidth)
-					CheckDlgButton(hDlg,IDC_TABS_SAMEWIDTH,BST_CHECKED);
-				if(m_bConfirmCloseTabs)
-					CheckDlgButton(hDlg,IDC_TABS_CLOSECONFIRMATION,BST_CHECKED);
-				if(m_bOpenNewTabNextToCurrent)
-					CheckDlgButton(hDlg,IDC_TABS_OPENNEXTTOCURRENT,BST_CHECKED);
-				if(m_bAlwaysOpenNewTab)
-					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_ALWAYSNEWTAB,BST_CHECKED);
-				if(m_bDoubleClickTabClose)
-					CheckDlgButton(hDlg,IDC_TABS_DOUBLECLICKCLOSE,BST_CHECKED);
-				if(m_bCloseMainWindowOnTabClose)
-					CheckDlgButton(hDlg,IDC_TABS_CLOSEMAINWINDOW,BST_CHECKED);
-			}
-			break;
-
-		case WM_COMMAND:
-			switch(LOWORD(wParam))
-			{
-			case IDC_TABS_TASKBARTHUMBNAILS:
-			case IDC_TABS_SAMEWIDTH:
-			case IDC_TABS_CLOSECONFIRMATION:
-			case IDC_TABS_OPENNEXTTOCURRENT:
-			case IDC_SETTINGS_CHECK_ALWAYSNEWTAB:
-			case IDC_TABS_DOUBLECLICKCLOSE:
-			case IDC_TABS_CLOSEMAINWINDOW:
-				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
-			}
-			break;
-
-		case WM_NOTIFY:
-			{
-				NMHDR	*nmhdr = NULL;
-				nmhdr = (NMHDR *)lParam;
-
-				switch(nmhdr->code)
-				{
-				case PSN_APPLY:
-					{
-						m_bShowTaskbarThumbnails = (IsDlgButtonChecked(hDlg,IDC_TABS_TASKBARTHUMBNAILS)
-							== BST_CHECKED);
-
-						m_bForceSameTabWidth = (IsDlgButtonChecked(hDlg,IDC_TABS_SAMEWIDTH)
-							== BST_CHECKED);
-
-						m_bConfirmCloseTabs = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSECONFIRMATION)
-							== BST_CHECKED);
-
-						m_bOpenNewTabNextToCurrent = (IsDlgButtonChecked(hDlg,IDC_TABS_OPENNEXTTOCURRENT)
-							== BST_CHECKED);
-
-						m_bAlwaysOpenNewTab = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_ALWAYSNEWTAB)
-							== BST_CHECKED);
-
-						m_bDoubleClickTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_DOUBLECLICKCLOSE)
-							== BST_CHECKED);
-
-						m_bCloseMainWindowOnTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSEMAINWINDOW)
-							== BST_CHECKED);
-
-						AddWindowStyle(m_hTabCtrl,TCS_FIXEDWIDTH,m_bForceSameTabWidth);
 
 						SaveAllSettings();
 					}

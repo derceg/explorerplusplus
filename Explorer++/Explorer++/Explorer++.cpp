@@ -342,8 +342,21 @@ void CContainer::SetDefaultValues(void)
 	m_bSynchronizeTreeview			= TRUE;
 	m_bTVAutoExpandSelected			= FALSE;
 	m_bCloseMainWindowOnTabClose	= TRUE;
-	m_bShowTaskbarThumbnails		= TRUE;
 	m_bLargeToolbarIcons			= FALSE;
+
+	/* Taskbar thumbnails can only be shown in
+	Windows 7, so we'll set the internal setting to
+	false if we're running on an earlier version
+	of Windows. */
+	if(m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
+		m_dwMinorVersion >= 1)
+	{
+		m_bShowTaskbarThumbnails = TRUE;
+	}
+	else
+	{
+		m_bShowTaskbarThumbnails = FALSE;
+	}
 
 	/* Infotips (user options). */
 	m_bShowInfoTips					= TRUE;

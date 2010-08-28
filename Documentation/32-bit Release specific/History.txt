@@ -15,7 +15,7 @@ Known limitations:
    yet (such as sorting by printer status in the
    Printers folder).
 
-Version 1.2 (xx/xx/xx)
+Version 1.2 (xx/09/10)
 ----------------------
 New features:
 - Taskbar thumbnails are now shown for each
@@ -36,7 +36,8 @@ New features:
   that application.
 - 'Automatically synchronize treeview with main pane' option
   added; this setting controls whether or not the treeview
-  will automatically stay in synch with the listview.
+  will automatically stay in synch with the listview while
+  browsing.
 - 'Automatically expand nodes on selection' option added;
   if this setting is enabled treeview nodes will automatically
   expand when they are selected.
@@ -59,13 +60,13 @@ New features:
   a tab.
 - Shift+Double Click will now open the selected folder in
   a new window.
-- Several dialogs weren't closing when Escape was pressed. Fixed.
 - "Desktop", "Pictures", "Music", "Videos" and "Documents"
   are all now valid address bar shortcuts.
 
 Bug fixes:
 - Main window now obeys startup position information
   (e.g. minimized/maximized, etc).
+- Several dialogs weren't closing when Escape was pressed. Fixed.
 - Fixed hide extensions bug.
 - Fixed double click navigation bug.
 - Fixed directory modification bug.
@@ -81,8 +82,7 @@ Misc:
 - The treeview no longer syncs with network/UNC paths.
 - Search dialog now turns patterns of the form '???' into
   '*???*' before searching.
-- Wilcard select is now case insensitive.
-- Closing the last tab will now close the main window.
+- Wilcard select/deselect is now case insensitive.
 - Can now scroll listview/treeview, even when it does not
   have focus.
 - Fixed 'Copy Universal File Paths' bug.
