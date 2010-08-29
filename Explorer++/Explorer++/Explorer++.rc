@@ -1279,7 +1279,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDM_TAB_RENAMETAB       "Allows the specfiied tab to be renamed"
+    IDM_TAB_RENAMETAB       "Allows the specified tab to be renamed"
     IDM_VIEW_SETDEFAULTCOLUMNS "Sets the default columns used for each tab"
     IDM_EDIT_UNDO           "Undo any previous file operation"
     IDM_TOOLBARS_DRIVES     "Shows/Hides the drives toolbar"
@@ -1505,6 +1505,7 @@ BEGIN
     IDS_STOP                "Stop"
     IDS_SEARCHING           "Searching %s..."
     IDS_GENERAL_NEWAPPLICATIONBUTTON "New Application Button"
+    IDS_TASKS_NEWTAB        "New Tab"
 END
 
 STRINGTABLE

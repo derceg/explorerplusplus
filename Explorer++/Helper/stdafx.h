@@ -87,3 +87,4 @@
 #include <userenv.h>
 #include <intrin.h>
 #include <wmsdk.h>
+#include <propvarutil.h>

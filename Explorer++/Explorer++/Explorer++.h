@@ -810,6 +810,9 @@ private:
 	HBITMAP					CaptureTabScreenshot(int iTabId);
 	void					GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi);
 
+	/* Windows 7 jumplist tasks. */
+	void					SetupJumplistTasks();
+
 	/* Search. */
 	void					OnSearch(HWND hDlg);
 	void					SearchSaveState(HWND hDlg);

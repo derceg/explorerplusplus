@@ -160,6 +160,16 @@ void CContainer::OnWindowCreate(void)
 	all child windows have been created. */
 	ApplyLoadedSettings();
 
+	/* Taskbar thumbnails can only be shown in
+	Windows 7, so we'll set the internal setting to
+	false if we're running on an earlier version
+	of Windows. */
+	if(!(m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
+		m_dwMinorVersion >= 1))
+	{
+		m_bShowTaskbarThumbnails = FALSE;
+	}
+
 	/* The internal variable that controls whether or not
 	taskbar thumbnails are shown in Windows 7 should only
 	be set once during execution (i.e. when Explorer++
@@ -2955,4 +2965,32 @@ void CContainer::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDirector
 			}
 		}
 	}
+}
+
+void CContainer::SetupJumplistTasks()
+{
+	std::list<JumpListTaskInformation> TaskList;
+
+	JumpListTaskInformation jlti;
+
+	TCHAR szCurrentProcess[MAX_PATH];
+
+	GetCurrentProcessImageName(szCurrentProcess,
+		SIZEOF_ARRAY(szCurrentProcess));
+
+	TCHAR szName[256];
+
+	LoadString(g_hLanguageModule,
+		IDS_TASKS_NEWTAB,szName,SIZEOF_ARRAY(szName));
+
+	/* New tab task. */
+	jlti.pszName		= szName;
+	jlti.pszPath		= szCurrentProcess;
+	jlti.pszArguments	= JUMPLIST_TASK_NEWTAB_ARGUMENT;
+	jlti.pszIconPath	= szCurrentProcess;
+	jlti.iIcon			= 1;
+
+	TaskList.push_back(jlti);
+
+	AddJumpListTasks(TaskList);
 }

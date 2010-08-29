@@ -367,20 +367,7 @@ void CContainer::SetDefaultValues(void)
 	m_bTVAutoExpandSelected			= FALSE;
 	m_bCloseMainWindowOnTabClose	= TRUE;
 	m_bLargeToolbarIcons			= FALSE;
-
-	/* Taskbar thumbnails can only be shown in
-	Windows 7, so we'll set the internal setting to
-	false if we're running on an earlier version
-	of Windows. */
-	if(m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
-		m_dwMinorVersion >= 1)
-	{
-		m_bShowTaskbarThumbnails = TRUE;
-	}
-	else
-	{
-		m_bShowTaskbarThumbnails = FALSE;
-	}
+	m_bShowTaskbarThumbnails		= TRUE;
 
 	/* Infotips (user options). */
 	m_bShowInfoTips					= TRUE;
@@ -783,6 +770,9 @@ LRESULT CALLBACK CContainer::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LP
 		m_pTaskbarList3->HrInit();
 
 		m_bTaskbarInitialised = TRUE;
+
+		/* Add each of the jump list tasks. */
+		SetupJumplistTasks();
 
 		list<TabProxyInfo_t>::iterator itr;
 		LPITEMIDLIST pidlDirectory = NULL;
@@ -2697,7 +2687,7 @@ ensure you have administrator privileges."),WINDOW_NAME,MB_ICONWARNING|MB_OK);
 ensure you have administrator privileges."),WINDOW_NAME,MB_ICONWARNING|MB_OK);
 			}
 		}
-		else if(lstrcmp(szPath,_T("-open_new_tab")) == 0)
+		else if(lstrcmp(szPath,JUMPLIST_TASK_NEWTAB_ARGUMENT) == 0)
 		{
 			/* This will be called when the user clicks the
 			'New Tab' item on the tasks menu in Windows 7.

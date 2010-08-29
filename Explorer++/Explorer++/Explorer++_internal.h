@@ -41,6 +41,10 @@ saved to/loaded from. */
 
 #define CONTROL_PANEL_CATEGORY_VIEW	_T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")
 
+/* Command line arguments supplied to the program
+for each jump list task. */
+#define JUMPLIST_TASK_NEWTAB_ARGUMENT	_T("-open_new_tab")
+
 #define LANG_SINHALA	1115
 
 /* This is only defined for Windows Vista and later.

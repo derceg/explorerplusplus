@@ -8,6 +8,85 @@ Known limitations:
    yet (such as sorting by printer status in the
    Printers folder).
 
+Version 1.2 Beta (30/08/10)
+---------------------------
+New features:
+- Taskbar thumbnails are now shown for each
+  tab in Windows 7 (this can be turned on/off by toggling
+  'Show taskbar thumbnails' in the Options dialog).
+- 'New Tab' added to Tasks jump list in Windows 7.
+- Numerous improvements to drag and drop/copy and paste.
+- Text on the clipboard can now be pasted as a file.
+  The file will be given a name of the form:
+  Clipboard Text ([datetime]).txt.
+  This also applies to drag and drop.
+- Images on the clipboard can now be pasted as a file.
+  The file will be given a name of the form:
+  Clipboard Image ([datetime]).bmp.
+  This also applies to drag and drop.
+- Large toolbar icons added.
+- Files can now be dropped onto existing application
+  toolbar buttons. This will open the dropped files in
+  that application.
+- 'Automatically synchronize treeview with main pane' option
+  added; this setting controls whether or not the treeview
+  will automatically stay in sync with the listview while
+  browsing.
+- 'Automatically expand nodes on selection' option added;
+  if this setting is enabled treeview nodes will automatically
+  expand when they are selected.
+- Listview groups can now be collapsed (Vista and later).
+- The contents of the address bar can now be dragged and dropped.
+- Shift+Mousewheel down and shift+mousewheel up can now
+  be used to browse backwards and forwards, respectively.
+- The tab bar can now be hidden when there is only one
+  tab.
+- The tab bar can now be shown at the bottom of the listview.
+- A navigation sound is now played when entering a folder.
+- The current folder is now selected when navigating up.
+- Listview checkboxes can now be turned on by selecting
+  'Use check boxes to select items' in the Options dialog.
+- Closing the last tab will now close the main window
+  (provided the corresponding option is selected in the
+  Options dialog).
+- Items can now be rearranged in details view.
+- It is now possible to show file sizes in one of:
+  Bytes/KB/MB/GB/TB/PB.
+- Ctrl+Backspace can now be used to browse to the root of
+  a tab.
+- Shift+Double Click will now open the selected folder in
+  a new window.
+- "Desktop", "Pictures", "Music", "Videos" and "Documents"
+  are all now valid address bar shortcuts.
+
+Bug fixes:
+- Main window now obeys startup position information
+  (e.g. minimized/maximized, etc).
+- Several dialogs weren't closing when Escape was pressed. Fixed.
+- Fixed hide extensions bug.
+- Fixed double click navigation bug.
+- Fixed directory modification bug.
+- Fixed set file attributes dialog bug.
+- Fixed treeview rename bug (child items not updated).
+- Fixed treeview sort bug.
+- Fixed toolbar positioning bug.
+- Fixed custom infotips bug.
+
+Misc:
+- All settings are now saved to the registry (or XML file)
+  when 'Ok' or 'Apply' is clicked in the Options dialog.
+- The treeview no longer syncs with network/UNC paths.
+- Copied data now remains on the clipboard after Explorer++
+  exits.
+- Search dialog now turns patterns of the form '???' into
+  '*???*' before searching.
+- Wildcard select/deselect is now case insensitive.
+- Can now scroll listview/treeview, even when it does not
+  have focus.
+- Fixed 'Copy Universal File Paths' bug.
+- The options dialog is now modeless.
+- Handle zip files set to false by default.
+
 Version 1.1 (5/4/10)
 --------------------
 New features:

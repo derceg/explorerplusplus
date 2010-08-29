@@ -12,6 +12,65 @@ Windows. */
 #define WINDOWS_VISTA_SEVEN_MAJORVERSION	6
 #define WINDOWS_XP_MAJORVERSION				5
 
+/* The following declarations, relating to
+ICustomDestinationList, are only valid for
+Windows 7. If building for an earlier
+version of Windows, these declarations
+will be required.
+All three declarations are from
+ShObjIdl.h. */
+typedef /* [v1_enum] */ 
+enum KNOWNDESTCATEGORY
+    {	KDC_FREQUENT	= 1,
+	KDC_RECENT	= ( KDC_FREQUENT + 1 ) 
+    } 	KNOWNDESTCATEGORY;
+
+EXTERN_C const IID IID_ICustomDestinationList;
+
+MIDL_INTERFACE("6332debf-87b5-4670-90c0-5e57b408a49e")
+ICustomDestinationList : public IUnknown
+{
+public:
+	virtual HRESULT STDMETHODCALLTYPE SetAppID( 
+		/* [string][in] */ __RPC__in_string LPCWSTR pszAppID) = 0;
+
+	virtual HRESULT STDMETHODCALLTYPE BeginList( 
+		/* [out] */ __RPC__out UINT *pcMinSlots,
+		/* [in] */ __RPC__in REFIID riid,
+		/* [iid_is][out] */ __RPC__deref_out_opt void **ppv) = 0;
+
+	virtual HRESULT STDMETHODCALLTYPE AppendCategory( 
+		/* [string][in] */ __RPC__in_string LPCWSTR pszCategory,
+		/* [in] */ __RPC__in_opt IObjectArray *poa) = 0;
+
+	virtual HRESULT STDMETHODCALLTYPE AppendKnownCategory( 
+		/* [in] */ KNOWNDESTCATEGORY category) = 0;
+
+	virtual HRESULT STDMETHODCALLTYPE AddUserTasks( 
+		/* [in] */ __RPC__in_opt IObjectArray *poa) = 0;
+
+	virtual HRESULT STDMETHODCALLTYPE CommitList( void) = 0;
+
+	virtual HRESULT STDMETHODCALLTYPE GetRemovedDestinations( 
+		/* [in] */ __RPC__in REFIID riid,
+		/* [iid_is][out] */ __RPC__deref_out_opt void **ppv) = 0;
+
+	virtual HRESULT STDMETHODCALLTYPE DeleteList( 
+		/* [string][unique][in] */ __RPC__in_opt_string LPCWSTR pszAppID) = 0;
+
+	virtual HRESULT STDMETHODCALLTYPE AbortList( void) = 0;
+
+};
+
+struct JumpListTaskInformation
+{
+	TCHAR	*pszName;
+	TCHAR	*pszPath;
+	TCHAR	*pszArguments;
+	TCHAR	*pszIconPath;
+	int		iIcon;
+};
+
 #define MAX_STRING_LENGTH	512
 
 /* SummaryInformation stream constants. */
@@ -133,6 +192,7 @@ HRESULT			BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFol
 BOOL			IsPathGUID(TCHAR *szPath);
 BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
 void			SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,DVTARGETDEVICE *ptd,DWORD dwAspect,LONG lindex,DWORD tymed);
+HRESULT			AddJumpListTasks(std::list<JumpListTaskInformation> TaskList);
 
 /* Drag and drop helpers. */
 DWORD			DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,BOOL bDataAccept,BOOL bOnSameDrive);

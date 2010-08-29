@@ -15,13 +15,13 @@ Known limitations:
    yet (such as sorting by printer status in the
    Printers folder).
 
-Version 1.2 Beta (xx/08/10)
+Version 1.2 Beta (30/08/10)
 ---------------------------
 New features:
 - Taskbar thumbnails are now shown for each
   tab in Windows 7 (this can be turned on/off by toggling
-  'Show Taskbar Thumbnails' in the Options dialog).
-- 'New Tab' added to Tasks jumplist in Windows 7.
+  'Show taskbar thumbnails' in the Options dialog).
+- 'New Tab' added to Tasks jump list in Windows 7.
 - Numerous improvements to drag and drop/copy and paste.
 - Text on the clipboard can now be pasted as a file.
   The file will be given a name of the form:
@@ -37,7 +37,7 @@ New features:
   that application.
 - 'Automatically synchronize treeview with main pane' option
   added; this setting controls whether or not the treeview
-  will automatically stay in synch with the listview while
+  will automatically stay in sync with the listview while
   browsing.
 - 'Automatically expand nodes on selection' option added;
   if this setting is enabled treeview nodes will automatically
@@ -81,13 +81,13 @@ Bug fixes:
 
 Misc:
 - All settings are now saved to the registry (or XML file)
-  when 'Ok' or 'Apply' ic clicked in the Options dialog.
+  when 'Ok' or 'Apply' is clicked in the Options dialog.
 - The treeview no longer syncs with network/UNC paths.
 - Copied data now remains on the clipboard after Explorer++
   exits.
 - Search dialog now turns patterns of the form '???' into
   '*???*' before searching.
-- Wilcard select/deselect is now case insensitive.
+- Wildcard select/deselect is now case insensitive.
 - Can now scroll listview/treeview, even when it does not
   have focus.
 - Fixed 'Copy Universal File Paths' bug.

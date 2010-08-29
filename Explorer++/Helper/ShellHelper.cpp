@@ -16,6 +16,12 @@
 #include "FileOperations.h"
 #include "Buffer.h"
 
+
+HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
+	std::list<JumpListTaskInformation> TaskList);
+HRESULT AddJumpListTaskInternal(IObjectCollection *poc,TCHAR *pszName,
+	TCHAR *pszPath,TCHAR *pszArguments,TCHAR *pszIconPath,int iIcon);
+
 HRESULT GetIdlFromParsingName(TCHAR *szParsingName,LPITEMIDLIST *pidl)
 {
 	if(szParsingName == NULL ||
@@ -1028,4 +1034,122 @@ void SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,
 	pftc->lindex	= lindex;
 	pftc->dwAspect	= dwAspect;
 	pftc->ptd		= ptd;
+}
+
+HRESULT AddJumpListTasks(std::list<JumpListTaskInformation> TaskList)
+{
+	if(TaskList.size() == 0)
+	{
+		return E_FAIL;
+	}
+
+	ICustomDestinationList *pCustomDestinationList = NULL;
+	HRESULT hr;
+
+	hr = CoCreateInstance(CLSID_DestinationList,NULL,CLSCTX_INPROC_SERVER,
+		IID_ICustomDestinationList,(LPVOID *)&pCustomDestinationList);
+
+	if(SUCCEEDED(hr))
+	{
+		IObjectArray *poa = NULL;
+		UINT uMinSlots;
+
+		hr = pCustomDestinationList->BeginList(&uMinSlots,IID_IObjectArray,(void **)&poa);
+
+		if(SUCCEEDED(hr))
+		{
+			poa->Release();
+
+			IObjectCollection *poc = NULL;
+
+			hr = CoCreateInstance(CLSID_EnumerableObjectCollection,NULL,CLSCTX_INPROC_SERVER,
+				IID_IObjectCollection,(LPVOID *)&poc);
+
+			if(SUCCEEDED(hr))
+			{
+				AddJumpListTasksInternal(poc,TaskList);
+
+				hr = poc->QueryInterface(IID_IObjectArray,(void **)&poa);
+
+				if(SUCCEEDED(hr))
+				{
+					pCustomDestinationList->AddUserTasks(poa);
+					pCustomDestinationList->CommitList();
+
+					poa->Release();
+				}
+
+				poc->Release();
+			}
+		}
+
+		pCustomDestinationList->Release();
+	}
+
+	return hr;
+}
+
+HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
+	std::list<JumpListTaskInformation> TaskList)
+{
+	for each(auto jtli in TaskList)
+	{
+		AddJumpListTaskInternal(poc,jtli.pszName,
+			jtli.pszPath,jtli.pszArguments,
+			jtli.pszIconPath,jtli.iIcon);
+	}
+
+	return S_OK;
+}
+
+HRESULT AddJumpListTaskInternal(IObjectCollection *poc,TCHAR *pszName,
+	TCHAR *pszPath,TCHAR *pszArguments,TCHAR *pszIconPath,int iIcon)
+{
+	if(poc == NULL ||
+		pszName == NULL ||
+		pszPath == NULL ||
+		pszArguments == NULL ||
+		pszIconPath == NULL)
+	{
+		return E_FAIL;
+	}
+
+	IShellLink *pShellLink = NULL;
+	HRESULT hr;
+
+	hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
+		IID_IShellLink,(LPVOID *)&pShellLink);
+
+	if(SUCCEEDED(hr))
+	{
+		pShellLink->SetPath(pszPath);
+		pShellLink->SetArguments(pszArguments);
+		pShellLink->SetIconLocation(pszIconPath,iIcon);
+
+		IPropertyStore *pps = NULL;
+		PROPVARIANT pv;
+
+		hr = pShellLink->QueryInterface(IID_IPropertyStore,(void **)&pps);
+
+		if(SUCCEEDED(hr))
+		{
+			InitPropVariantFromString(pszName,&pv);
+
+			/* See: http://msdn.microsoft.com/en-us/library/bb787584(VS.85).aspx */
+			PROPERTYKEY PKEY_Title;
+			CLSIDFromString(L"{F29F85E0-4FF9-1068-AB91-08002B27B3D9}",&PKEY_Title.fmtid);
+			PKEY_Title.pid = 2;
+
+			pps->SetValue(PKEY_Title,pv);
+			pps->Commit();
+
+			poc->AddObject(pShellLink);
+
+			pps->Release();
+		}
+
+		pShellLink->Release();
+	}
+
+	return hr;
 }
