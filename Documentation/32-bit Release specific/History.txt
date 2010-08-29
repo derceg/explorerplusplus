@@ -15,12 +15,13 @@ Known limitations:
    yet (such as sorting by printer status in the
    Printers folder).
 
-Version 1.2 (xx/09/10)
-----------------------
+Version 1.2 Beta (xx/08/10)
+---------------------------
 New features:
 - Taskbar thumbnails are now shown for each
   tab in Windows 7 (this can be turned on/off by toggling
   'Show Taskbar Thumbnails' in the Options dialog).
+- 'New Tab' added to Tasks jumplist in Windows 7.
 - Numerous improvements to drag and drop/copy and paste.
 - Text on the clipboard can now be pasted as a file.
   The file will be given a name of the form:
@@ -52,7 +53,9 @@ New features:
 - The current folder is now selected when navigating up.
 - Listview checkboxes can now be turned on by selecting
   'Use check boxes to select items' in the Options dialog.
-- Closing the last tab will now close the main window.
+- Closing the last tab will now close the main window
+  (provided the corresponding option is selected in the
+  Options dialog).
 - Items can now be rearranged in details view.
 - It is now possible to show file sizes in one of:
   Bytes/KB/MB/GB/TB/PB.

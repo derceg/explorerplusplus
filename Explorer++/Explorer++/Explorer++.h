@@ -1302,6 +1302,8 @@ private:
 	BOOL					m_bHideLinkExtensionGlobal;
 
 	/* Windows 7 taskbar thumbnail previews. */
+	DwmInvalidateIconicBitmapsProc	DwmInvalidateIconicBitmaps;
+	HMODULE					m_hDwmapi;
 	ITaskbarList4			*m_pTaskbarList3;
 	list<TabProxyInfo_t>	m_TabProxyList;
 	UINT					m_uTaskbarButtonCreatedMessage;

@@ -406,11 +406,25 @@ PFNLVGROUPCOMPARE pfnGroupCompare)
 
 		/* The group is not in the listview, so insert it in. */
 		lvigs.lvGroup.cbSize	= sizeof(LVGROUP);
-		lvigs.lvGroup.mask		= LVGF_HEADER|LVGF_GROUPID|LVGF_STATE;
+		lvigs.lvGroup.mask		= LVGF_HEADER|LVGF_GROUPID;
 		lvigs.lvGroup.pszHeader	= wszHeader;
 		lvigs.lvGroup.iGroupId	= iGroupId;
-		lvigs.lvGroup.state		= LVGS_COLLAPSIBLE;
 		lvigs.lvGroup.stateMask	= 0;
+
+		OSVERSIONINFO vi;
+
+		vi.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
+
+		if(GetVersionEx(&vi) != 0)
+		{
+			/* LVGS_COLLAPSIBLE is only valid on Windows Vista
+			and later. */
+			if(vi.dwMajorVersion > WINDOWS_XP_MAJORVERSION)
+			{
+				lvigs.lvGroup.mask	|= LVGF_STATE;
+				lvigs.lvGroup.state	= LVGS_COLLAPSIBLE;
+			}
+		}
 
 		lvigs.pfnGroupCompare = (PFNLVGROUPCOMPARE)pfnGroupCompare;
 		lvigs.pvData = (void *)m_hListView;

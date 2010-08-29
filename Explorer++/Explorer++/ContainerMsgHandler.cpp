@@ -145,7 +145,6 @@ void CContainer::OnWindowCreate(void)
 	InitializeDisplayWindow();
 	InitializeTabs();
 	CreateFolderControls();
-	//CreateBookmarkSidebar();
 
 	/* All child windows MUST be resized before
 	any listview changes take place. If auto arrange
@@ -1153,30 +1152,17 @@ void CContainer::OnDirChanged(int iTabId)
 
 	UpdateWindowStates();
 
-	/* TODO: Load this funtion ONCE only on startup. */
-	HMODULE hDwmapi;
-	DwmInvalidateIconicBitmapsProc DwmInvalidateIconicBitmaps;
-
-	hDwmapi = LoadLibrary(_T("dwmapi.dll"));
-
-	if(hDwmapi != NULL)
+	if(DwmInvalidateIconicBitmaps != NULL)
 	{
-		DwmInvalidateIconicBitmaps = (DwmInvalidateIconicBitmapsProc)GetProcAddress(hDwmapi,"DwmInvalidateIconicBitmaps");
+		list<TabProxyInfo_t>::iterator itr;
 
-		if(DwmInvalidateIconicBitmaps != NULL)
+		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 		{
-			list<TabProxyInfo_t>::iterator itr;
-
-			for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+			if(itr->iTabId == iTabId)
 			{
-				if(itr->iTabId == iTabId)
-				{
-					DwmInvalidateIconicBitmaps(itr->hProxy);
-				}
+				DwmInvalidateIconicBitmaps(itr->hProxy);
 			}
 		}
-
-		FreeLibrary(hDwmapi);
 	}
 
 	SetTabIcon();

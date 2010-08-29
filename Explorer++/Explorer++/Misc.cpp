@@ -239,16 +239,11 @@ void CContainer::ValidateToolbarSettings(void)
 	allowed. */
 	for(itr = m_tbInitial.begin();itr != m_tbInitial.end();itr++)
 	{
-		/* TODO: Apply upper range? */
 		if(itr->iItemID < TOOLBAR_ID_START)
 		{
 			bCorrupted = TRUE;
 			break;
 		}
-
-		/* Don't count separators. */
-		/*if(itr->iItemID != TOOLBAR_SEPARATOR)
-			ButtonMap[itr->iItemID - TOOLBAR_ID_START - 2]++;*/
 	}
 
 	if(!bCorrupted)

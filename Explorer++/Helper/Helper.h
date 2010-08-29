@@ -7,6 +7,11 @@
 
 using namespace std;
 
+/* Major version numbers for various versions of
+Windows. */
+#define WINDOWS_VISTA_SEVEN_MAJORVERSION	6
+#define WINDOWS_XP_MAJORVERSION				5
+
 #define MAX_STRING_LENGTH	512
 
 /* SummaryInformation stream constants. */

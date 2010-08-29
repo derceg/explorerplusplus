@@ -251,6 +251,30 @@ CContainer::CContainer(HWND hwnd)
 			m_ViewModes.push_back(ViewMode);
 		}
 	}
+
+	m_hDwmapi = LoadLibrary(_T("dwmapi.dll"));
+
+	if(m_hDwmapi != NULL)
+	{
+		DwmInvalidateIconicBitmaps = (DwmInvalidateIconicBitmapsProc)GetProcAddress(m_hDwmapi,"DwmInvalidateIconicBitmaps");
+	}
+	else
+	{
+		DwmInvalidateIconicBitmaps = NULL;
+	}
+}
+
+/*
+ * Deconstructor for the main CContainer class.
+ */
+CContainer::~CContainer()
+{
+	m_pDirMon->Release();
+
+	if(m_hDwmapi != NULL)
+	{
+		FreeLibrary(m_hDwmapi);
+	}
 }
 
 void CContainer::InitializeMainToolbars(void)
@@ -393,14 +417,6 @@ void CContainer::SetDefaultValues(void)
 }
 
 /*
- * Deconstructor for the main CContainer class.
- */
-CContainer::~CContainer()
-{
-	m_pDirMon->Release();
-}
-
-/*
  * Registers the main window class.
  */
 ATOM RegisterMainWindowClass(void)
@@ -496,7 +512,7 @@ LPSTR lpCmdLine,int nCmdShow)
 	TCHAR			*pCommandLine	= NULL;
 	MSG				msg;
 	LONG			res;
-	BOOL			bSeenHelpRequest = FALSE;
+	BOOL			bExit = FALSE;
 
 	g_hInstance = hInstance;
 
@@ -524,12 +540,10 @@ LPSTR lpCmdLine,int nCmdShow)
 	/* Process command line arguments. */
 	pCommandLine = GetCommandLine();
 
-	bSeenHelpRequest = ProcessCommandLine(pCommandLine);
+	bExit = ProcessCommandLine(pCommandLine);
 
-	if(bSeenHelpRequest)
+	if(bExit)
 	{
-		/* Show program usage information and then exit. */
-		ShowUsage();
 		return 0;
 	}
 
@@ -2608,11 +2622,11 @@ HMENU CContainer::CreateRebarHistoryMenu(BOOL bBack)
  */
 BOOL ProcessCommandLine(TCHAR *pCommandLine)
 {
-	list<TabDirectory_t>::iterator	itr;
-	TabDirectory_t					TabDirectory;
-	TCHAR							szPath[MAX_PATH];
-	TCHAR							*pszCommandLine = NULL;
-	BOOL							bSeenHelpRequest = FALSE;
+	list<TabDirectory_t>::iterator itr;
+	TabDirectory_t TabDirectory;
+	TCHAR szPath[MAX_PATH];
+	TCHAR *pszCommandLine = NULL;
+	BOOL bExit = FALSE;
 
 	g_TabDirs.clear();
 
@@ -2625,7 +2639,10 @@ BOOL ProcessCommandLine(TCHAR *pCommandLine)
 		/* Check to see if the user has requested the help page. */
 		if(StrCmp(szPath,_T("/?")) == 0)
 		{
-			bSeenHelpRequest = TRUE;
+			/* Show program usage information and then exit. */
+			ShowUsage();
+
+			bExit = TRUE;
 		}
 
 		if(lstrcmp(szPath,_T("-l")) == 0)
@@ -2712,10 +2729,7 @@ ensure you have administrator privileges."),WINDOW_NAME,MB_ICONWARNING|MB_OK);
 			if(hMutex != NULL)
 				CloseHandle(hMutex);
 
-			/* TODO: Now exit. */
-			//bExit = TRUE;
-
-			bSeenHelpRequest = TRUE;
+			bExit = TRUE;
 		}
 		else
 		{
@@ -2733,7 +2747,7 @@ ensure you have administrator privileges."),WINDOW_NAME,MB_ICONWARNING|MB_OK);
 		}
 	}
 
-	return bSeenHelpRequest;
+	return bExit;
 }
 
 void ClearRegistrySettings(void)
