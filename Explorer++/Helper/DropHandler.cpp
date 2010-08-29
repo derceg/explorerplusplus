@@ -35,9 +35,17 @@ WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 /* TODO: */
 void CreateDropOptionsMenu(LPCITEMIDLIST pidlDirectory,IDataObject *pDataObject,HWND hDrop);
 
+/* Drop formats supported. */
+FORMATETC	CDropHandler::m_ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+FORMATETC	CDropHandler::m_ftcFileDescriptor = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+FORMATETC	CDropHandler::m_ftcShellIDList = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+FORMATETC	CDropHandler::m_ftcText = {CF_TEXT,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+FORMATETC	CDropHandler::m_ftcUnicodeText = {CF_UNICODETEXT,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+FORMATETC	CDropHandler::m_ftcDIBV5 = {CF_DIBV5,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+
 CDropHandler::CDropHandler()
 {
-	m_lRefCount = 1;	
+	m_lRefCount = 1;
 }
 
 CDropHandler::~CDropHandler()
@@ -86,6 +94,23 @@ ULONG __stdcall CDropHandler::Release(void)
 	return lCount;
 }
 
+HRESULT CDropHandler::GetDropFormats(list<FORMATETC> *pftcList)
+{
+	if(pftcList == NULL)
+	{
+		return E_FAIL;
+	}
+
+	pftcList->push_back(m_ftcHDrop);
+	pftcList->push_back(m_ftcFileDescriptor);
+	pftcList->push_back(m_ftcShellIDList);
+	pftcList->push_back(m_ftcText);
+	pftcList->push_back(m_ftcUnicodeText);
+	pftcList->push_back(m_ftcDIBV5);
+
+	return S_OK;
+}
+
 void CDropHandler::Drop(IDataObject *pDataObject,DWORD grfKeyState,
 POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragTypes_t DragType,
 TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,
@@ -130,12 +155,6 @@ BOOL bRenameOnCollision)
 
 void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDirectory,POINTL *pptl)
 {
-	FORMATETC ftcHDrop = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	FORMATETC ftcFileDescriptor = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	FORMATETC ftcShellIDList = {(CLIPFORMAT)RegisterClipboardFormat(CFSTR_SHELLIDLIST),NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	FORMATETC ftcText = {CF_TEXT,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	FORMATETC ftcUnicodeText = {CF_UNICODETEXT,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	FORMATETC ftcDIBV5 = {CF_DIBV5,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	STGMEDIUM stg;
 	DROPFILES *pdf = NULL;
 	DWORD *pdwEffect = NULL;
@@ -175,9 +194,9 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 		}
 	}
 
-	if(pDataObject->QueryGetData(&ftcHDrop) == S_OK)
+	if(pDataObject->QueryGetData(&m_ftcHDrop) == S_OK)
 	{
-		hr = pDataObject->GetData(&ftcHDrop,&stg);
+		hr = pDataObject->GetData(&m_ftcHDrop,&stg);
 
 		if(hr == S_OK)
 		{
@@ -191,9 +210,9 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 			}
 		}
 	}
-	else if(pDataObject->QueryGetData(&ftcShellIDList) == S_OK)
+	else if(pDataObject->QueryGetData(&m_ftcShellIDList) == S_OK)
 	{
-		hr = pDataObject->GetData(&ftcShellIDList,&stg);
+		hr = pDataObject->GetData(&m_ftcShellIDList,&stg);
 
 		if(hr == S_OK)
 		{
@@ -231,7 +250,7 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 			}
 		}
 	}
-	else if(pDataObject->QueryGetData(&ftcFileDescriptor) == S_OK)
+	else if(pDataObject->QueryGetData(&m_ftcFileDescriptor) == S_OK)
 	{
 		FORMATETC ftcfchg;
 		FORMATETC ftcfcis;
@@ -252,7 +271,7 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 		BOOL bDataRetrieved = FALSE;
 		unsigned int i = 0;
 
-		hr = pDataObject->GetData(&ftcFileDescriptor,&stg);
+		hr = pDataObject->GetData(&m_ftcFileDescriptor,&stg);
 
 		if(hr == S_OK)
 		{
@@ -482,9 +501,9 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 				m_pDropFilesCallback->OnDropFile(&pfl,&pt);
 		}
 	}
-	else if(pDataObject->QueryGetData(&ftcUnicodeText) == S_OK)
+	else if(pDataObject->QueryGetData(&m_ftcUnicodeText) == S_OK)
 	{
-		hr = pDataObject->GetData(&ftcText,&stg);
+		hr = pDataObject->GetData(&m_ftcUnicodeText,&stg);
 
 		if(hr == S_OK)
 		{
@@ -498,9 +517,9 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 			}
 		}
 	}
-	else if(pDataObject->QueryGetData(&ftcText) == S_OK)
+	else if(pDataObject->QueryGetData(&m_ftcText) == S_OK)
 	{
-		hr = pDataObject->GetData(&ftcText,&stg);
+		hr = pDataObject->GetData(&m_ftcText,&stg);
 
 		if(hr == S_OK)
 		{
@@ -511,7 +530,7 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 				WCHAR *pszUnicodeText = new WCHAR[strlen(pText) + 1];
 
 				MultiByteToWideChar(CP_ACP,0,pText,-1,pszUnicodeText,
-					strlen(pText) + 1);
+					static_cast<int>(strlen(pText) + 1));
 
 				CopyTextToFile(pszDestDirectory,pszUnicodeText);
 
@@ -521,9 +540,9 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 			}
 		}
 	}
-	else if(pDataObject->QueryGetData(&ftcDIBV5) == S_OK)
+	else if(pDataObject->QueryGetData(&m_ftcDIBV5) == S_OK)
 	{
-		hr = pDataObject->GetData(&ftcDIBV5,&stg);
+		hr = pDataObject->GetData(&m_ftcDIBV5,&stg);
 
 		if(hr == S_OK)
 		{
@@ -569,7 +588,7 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 
 				if(hFile != INVALID_HANDLE_VALUE)
 				{
-					DWORD dwSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER));
+					DWORD dwSize = static_cast<DWORD>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER)));
 
 					LPBYTE pData = new BYTE[dwSize];
 

@@ -80,6 +80,8 @@ Misc:
 - All settings are now saved to the registry (or XML file)
   when 'Ok' or 'Apply' ic clicked in the Options dialog.
 - The treeview no longer syncs with network/UNC paths.
+- Copied data now remains on the clipboard after Explorer++
+  exits.
 - Search dialog now turns patterns of the form '???' into
   '*???*' before searching.
 - Wilcard select/deselect is now case insensitive.

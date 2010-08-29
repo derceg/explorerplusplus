@@ -319,9 +319,6 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 	if(SUCCEEDED(hr))
 	{
 		hr = OleSetClipboard(*pClipboardDataObject);
-
-		/* TODO: Only do this on exit. */
-		//OleFlushClipboard();
 	}
 
 	return hr;

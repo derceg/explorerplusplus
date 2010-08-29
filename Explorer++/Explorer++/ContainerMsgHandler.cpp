@@ -161,6 +161,14 @@ void CContainer::OnWindowCreate(void)
 	all child windows have been created. */
 	ApplyLoadedSettings();
 
+	/* The internal variable that controls whether or not
+	taskbar thumbnails are shown in Windows 7 should only
+	be set once during execution (i.e. when Explorer++
+	starts up).
+	Therefore, we'll only ever show the user a provisional
+	setting, to stop them from changing the actual value. */
+	m_bShowTaskbarThumbnailsProvisional	= m_bShowTaskbarThumbnails;
+
 	RestoreTabs(pLoadSave);
 	pLoadSave->Release();
 	pLoadSave = NULL;
@@ -734,6 +742,20 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInN
 				OpenFileItem(pidlItem,EMPTY_STRING);
 			}
 		}
+		else if(bControlPanelParent)
+		{
+			TCHAR szParsingPath[MAX_PATH];
+			TCHAR szExplorerPath[MAX_PATH];
+
+			GetDisplayName(pidlItem,szParsingPath,SHGDN_FORPARSING);
+
+			MyExpandEnvironmentStrings(_T("%windir%\\explorer.exe"),
+				szExplorerPath,SIZEOF_ARRAY(szExplorerPath));
+
+			/* Invoke Windows Explorer directly. */
+			ShellExecute(m_hContainer,_T("open"),szExplorerPath,
+				szParsingPath,NULL,SW_SHOWNORMAL);
+		}
 		else
 		{
 			/* File item. */
@@ -1062,6 +1084,16 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 int CContainer::OnDestroy(void)
 {
+	if(m_pClipboardDataObject != NULL)
+	{
+		if(OleIsCurrentClipboard(m_pClipboardDataObject) == S_OK)
+		{
+			/* Ensure that any data that was copied to the clipboard
+			remains there after we exit. */
+			OleFlushClipboard();
+		}
+	}
+
 	QueueUserAPC(QuitIconAPC,m_hIconThread,NULL);
 
 	ImageList_Destroy(m_himlToolbarSmall);
@@ -1093,6 +1125,8 @@ close all the current tabs?"),
 	}
 
 	m_iLastSelectedTab = m_iTabSelectedItem;
+
+	m_bShowTaskbarThumbnails = m_bShowTaskbarThumbnailsProvisional;
 
 	SaveAllSettings();
 

@@ -40,7 +40,11 @@ __interface IClipboardHandler
 /* Generic drop handler. Handles the following
 drop formats:
  - CF_HDROP
- - CF_STR_FILEDESCRIPTOR
+ - CFSTR_FILEDESCRIPTOR
+ - CFSTR_SHELLIDLIST
+ - CF_TEXT
+ - CF_UNICODETEXT
+ - CF_DIBV5
 */
 class CDropHandler : public IDropHandler, public IClipboardHandler
 {
@@ -52,6 +56,8 @@ public:
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
 	ULONG		__stdcall	AddRef(void);
 	ULONG		__stdcall	Release(void);
+
+	static HRESULT	GetDropFormats(list<FORMATETC> *pftcList);
 
 private:
 
@@ -69,6 +75,13 @@ private:
 	LONG		m_lRefCount;
 
 	IDropFilesCallback	*m_pDropFilesCallback;
+
+	static FORMATETC	m_ftcHDrop;
+	static FORMATETC	m_ftcFileDescriptor;
+	static FORMATETC	m_ftcShellIDList;
+	static FORMATETC	m_ftcText;
+	static FORMATETC	m_ftcUnicodeText;
+	static FORMATETC	m_ftcDIBV5;
 
 	IDataObject	*m_pDataObject;
 	DWORD		m_grfKeyState;

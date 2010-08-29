@@ -917,13 +917,13 @@ INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,L
 				{
 					EnableWindow(GetDlgItem(hDlg,IDC_TABS_TASKBARTHUMBNAILS),FALSE);
 
-					if(m_bShowTaskbarThumbnails)
+					if(m_bShowTaskbarThumbnailsProvisional)
 					{
-						m_bShowTaskbarThumbnails = FALSE;
+						m_bShowTaskbarThumbnailsProvisional = FALSE;
 					}
 				}
 
-				if(m_bShowTaskbarThumbnails)
+				if(m_bShowTaskbarThumbnailsProvisional)
 					CheckDlgButton(hDlg,IDC_TABS_TASKBARTHUMBNAILS,BST_CHECKED);
 				if(m_bForceSameTabWidth)
 					CheckDlgButton(hDlg,IDC_TABS_SAMEWIDTH,BST_CHECKED);
@@ -964,7 +964,7 @@ INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,L
 				{
 				case PSN_APPLY:
 					{
-						m_bShowTaskbarThumbnails = (IsDlgButtonChecked(hDlg,IDC_TABS_TASKBARTHUMBNAILS)
+						m_bShowTaskbarThumbnailsProvisional = (IsDlgButtonChecked(hDlg,IDC_TABS_TASKBARTHUMBNAILS)
 							== BST_CHECKED);
 
 						m_bForceSameTabWidth = (IsDlgButtonChecked(hDlg,IDC_TABS_SAMEWIDTH)

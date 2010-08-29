@@ -1277,6 +1277,7 @@ private:
 	BOOL					m_bCloseMainWindowOnTabClose;
 	BOOL					m_bShowTabBarAtBottom;
 	BOOL					m_bShowTaskbarThumbnails;
+	BOOL					m_bShowTaskbarThumbnailsProvisional;
 	BOOL					m_bSynchronizeTreeview;
 	BOOL					m_bTVAutoExpandSelected;
 	BOOL					m_bLargeToolbarIcons;

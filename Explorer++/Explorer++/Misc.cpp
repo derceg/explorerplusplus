@@ -962,19 +962,27 @@ BOOL CContainer::CanCutOrCopySelection(void)
 
 BOOL CContainer::CanPaste(void)
 {
-	HWND	hFocus;
-	BOOL	bFilesOnClipboard;
+	HWND hFocus = GetFocus();
 
-	hFocus = GetFocus();
+	std::list<FORMATETC> ftcList;
+	CDropHandler::GetDropFormats(&ftcList);
 
-	bFilesOnClipboard = IsClipboardFormatAvailable(CF_HDROP) ||
-		IsClipboardFormatAvailable(RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR)) ||
-		IsClipboardFormatAvailable(CF_UNICODETEXT) ||
-		IsClipboardFormatAvailable(CF_DIBV5);
+	BOOL bDataAvailable = FALSE;
+
+	/* Check whether the drop source has the type of data
+	that is needed for this drag operation. */
+	for each(auto ftc in ftcList)
+	{
+		if(IsClipboardFormatAvailable(ftc.cfFormat))
+		{
+			bDataAvailable = TRUE;
+			break;
+		}
+	}
 
 	if(hFocus == m_hActiveListView)
 	{
-		return bFilesOnClipboard && m_pActiveShellBrowser->CanCreate();
+		return bDataAvailable && m_pActiveShellBrowser->CanCreate();
 	}
 	else if(hFocus == m_hTreeView)
 	{
@@ -996,7 +1004,7 @@ BOOL CContainer::CanPaste(void)
 			CoTaskMemFree(pidl);
 
 			if(hr == S_OK)
-				return bFilesOnClipboard;
+				return bDataAvailable;
 		}
 	}
 
