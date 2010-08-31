@@ -529,6 +529,106 @@ LPSTR lpCmdLine,int nCmdShow)
 
 	bExit = ProcessCommandLine(pCommandLine);
 
+	/* Can't open folders that are children of the
+	control panel. If the comand line only refers
+	to folders that are children of the control panel,
+	pass those folders to Windows Explorer, then exit. */
+	if(g_TabDirs.size() > 0)
+	{
+		LPITEMIDLIST pidlControlPanel = NULL;
+		LPITEMIDLIST pidl = NULL;
+
+		HRESULT hr = SHGetFolderLocation(NULL,
+			CSIDL_CONTROLS,NULL,0,&pidlControlPanel);
+
+		if(SUCCEEDED(hr))
+		{
+			auto itr = g_TabDirs.begin();
+
+			BOOL bControlPanelChild = FALSE;
+
+			while(itr != g_TabDirs.end())
+			{
+				/* This could fail on a 64-bit version of
+				Vista or Windows 7 if the executable is 32-bit,
+				and the folder is 64-bit specific (as is the
+				case with some of the folders under the control
+				panel). */
+				hr = GetIdlFromParsingName(itr->Dir,&pidl);
+
+				bControlPanelChild = FALSE;
+
+				if(SUCCEEDED(hr))
+				{
+					if(ILIsParent(pidlControlPanel,pidl,FALSE) &&
+						!CompareIdls(pidlControlPanel,pidl))
+					{
+						bControlPanelChild = TRUE;
+					}
+					else
+					{
+						OSVERSIONINFO VersionInfo;
+
+						VersionInfo.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
+
+						if(GetVersionEx(&VersionInfo) != 0)
+						{
+							if(VersionInfo.dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
+							{
+								LPITEMIDLIST pidlControlPanelCategory = NULL;
+
+								hr = GetIdlFromParsingName(CONTROL_PANEL_CATEGORY_VIEW,
+									&pidlControlPanelCategory);
+
+								if(SUCCEEDED(hr))
+								{
+									if(ILIsParent(pidlControlPanelCategory,pidl,FALSE) &&
+										!CompareIdls(pidlControlPanelCategory,pidl))
+									{
+										bControlPanelChild = TRUE;
+									}
+
+									CoTaskMemFree(pidlControlPanelCategory);
+								}
+							}
+						}
+					}
+
+					if(bControlPanelChild)
+					{
+						TCHAR szExplorerPath[MAX_PATH];
+
+						MyExpandEnvironmentStrings(_T("%windir%\\explorer.exe"),
+							szExplorerPath,SIZEOF_ARRAY(szExplorerPath));
+
+						/* This is a child of the control panel,
+						so send it to Windows Explorer to open
+						directly. */
+						ShellExecute(NULL,_T("open"),szExplorerPath,
+							itr->Dir,NULL,SW_SHOWNORMAL);
+
+						itr = g_TabDirs.erase(itr);
+					}
+
+					CoTaskMemFree(pidl);
+				}
+
+
+				if(!bControlPanelChild)
+				{
+					itr++;
+				}
+			}
+
+			if(g_TabDirs.size() == 0)
+			{
+				bExit = TRUE;
+			}
+
+			CoTaskMemFree(pidlControlPanel);
+		}
+	}
+
 	if(bExit)
 	{
 		return 0;
