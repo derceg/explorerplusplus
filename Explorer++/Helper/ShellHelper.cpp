@@ -753,7 +753,7 @@ HRESULT BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
 
 /* Builds a CIDA structure. Returns the structure and its size
 via arguments.
-Returns S_OK on success; E_FAIL on fail. */
+Returns S_OK on success; E_FAIL on failure. */
 HRESULT BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
 	IN LPCITEMIDLIST pidlDirectory,
 	IN list<LPITEMIDLIST> pidlList)
@@ -978,8 +978,6 @@ void DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingP
 				with the current directory. */
 				if(bRelative)
 				{
-					/*m_pActiveShellBrowser->QueryCurrentDirectory(MAX_PATH,szFullFilePath);
-					PathAppend(szFullFilePath,szCanonicalPath);*/
 					StringCchCopy(szParsingPath,cchDest,szCurrentDirectory);
 					PathAppend(szParsingPath,szCanonicalPath);
 				}

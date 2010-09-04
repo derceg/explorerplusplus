@@ -1963,7 +1963,9 @@ void CFolderView::SelectItems(list<PastedFile_t> *pFileList)
 
 			if(itr == pFileList->begin())
 			{
+				/* Focus on the first item, and ensure it is visible. */
 				ListView_FocusItem(m_hListView,iIndex,TRUE);
+				ListView_EnsureVisible(m_hListView,iIndex,FALSE);
 			}
 
 			itr = pFileList->erase(itr);

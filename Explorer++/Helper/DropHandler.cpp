@@ -129,7 +129,7 @@ BOOL bRenameOnCollision)
 	switch(m_DragType)
 	{
 	case DRAG_TYPE_LEFTCLICK:
-		HandleLeftClickDrop(m_pDataObject,m_szDestDirectory,&m_ptl);
+		HandleLeftClickDrop(m_pDataObject,&m_ptl);
 		break;
 
 	case DRAG_TYPE_RIGHTCLICK:
@@ -150,33 +150,27 @@ BOOL bRenameOnCollision)
 
 	POINTL ptl = {0,0};
 
-	HandleLeftClickDrop(m_pDataObject,m_szDestDirectory,&ptl);
+	HandleLeftClickDrop(m_pDataObject,&ptl);
 }
 
-void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDirectory,POINTL *pptl)
+void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 {
+	FORMATETC ftc;
 	STGMEDIUM stg;
-	DROPFILES *pdf = NULL;
 	DWORD *pdwEffect = NULL;
 	DWORD dwEffect = DROPEFFECT_NONE;
 	BOOL bPrefferedEffect = FALSE;
 	POINT pt;
-	HRESULT hr;
 
 	pt.x = pptl->x;
 	pt.y = pptl->y;
 
-	FORMATETC ftc;
+	SetFORMATETC(&ftc,(CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT),
+		NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
 
 	/* Check if the data has a preffered drop effect
 	(i.e. copy or move). */
-	ftc.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
-	ftc.ptd			= NULL;
-	ftc.dwAspect	= DVASPECT_CONTENT;
-	ftc.lindex		= -1;
-	ftc.tymed		= TYMED_HGLOBAL;
-
-	hr = pDataObject->GetData(&ftc,&stg);
+	HRESULT hr = pDataObject->GetData(&ftc,&stg);
 
 	if(hr == S_OK)
 	{
@@ -194,437 +188,528 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDi
 		}
 	}
 
+	HRESULT hrCopy = E_FAIL;
+	list<PastedFile_t> PastedFileList;
+
 	if(pDataObject->QueryGetData(&m_ftcHDrop) == S_OK)
 	{
-		hr = pDataObject->GetData(&m_ftcHDrop,&stg);
-
-		if(hr == S_OK)
-		{
-			pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
-
-			if(pdf != NULL)
-			{
-				CopyDroppedFiles(pdf,bPrefferedEffect,dwEffect);
-
-				GlobalUnlock(stg.hGlobal);
-			}
-		}
+		hrCopy = CopyHDropData(pDataObject,bPrefferedEffect,dwEffect,
+			&PastedFileList);
 	}
 	else if(pDataObject->QueryGetData(&m_ftcShellIDList) == S_OK)
 	{
-		hr = pDataObject->GetData(&m_ftcShellIDList,&stg);
+		hrCopy = CopyShellIDListData(pDataObject,&PastedFileList);
+	}
+	else if(pDataObject->QueryGetData(&m_ftcFileDescriptor) == S_OK)
+	{
+		hrCopy = CopyFileDescriptorData(pDataObject,&PastedFileList);
+	}
+	else if(pDataObject->QueryGetData(&m_ftcUnicodeText) == S_OK)
+	{
+		hrCopy = CopyUnicodeTextData(pDataObject,&PastedFileList);
+	}
+	else if(pDataObject->QueryGetData(&m_ftcText) == S_OK)
+	{
+		hrCopy = CopyAnsiTextData(pDataObject,&PastedFileList);
+	}
+	else if(pDataObject->QueryGetData(&m_ftcDIBV5) == S_OK)
+	{
+		hrCopy = CopyDIBV5Data(pDataObject,&PastedFileList);
+	}
 
-		if(hr == S_OK)
+	if(hrCopy == S_OK &&
+		PastedFileList.size() > 0)
+	{
+		/* The data was copied successfully, so notify
+		the caller via the specified callback interface. */
+		if(m_pDropFilesCallback != NULL)
+			m_pDropFilesCallback->OnDropFile(&PastedFileList,&pt);
+	}
+}
+
+HRESULT CDropHandler::CopyHDropData(IDataObject *pDataObject,
+	BOOL bPrefferedEffect,DWORD dwEffect,list<PastedFile_t> *pPastedFileList)
+{
+	STGMEDIUM stg;
+	HRESULT hr;
+
+	hr = pDataObject->GetData(&m_ftcHDrop,&stg);
+
+	if(hr == S_OK)
+	{
+		DROPFILES *pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
+
+		if(pdf != NULL)
 		{
-			CIDA *pcida = NULL;
+			CopyDroppedFiles(pdf,bPrefferedEffect,dwEffect);
 
-			pcida = (CIDA *)GlobalLock(stg.hGlobal);
+			GlobalUnlock(stg.hGlobal);
+		}
+	}
 
-			if(pcida != NULL)
+	return hr;
+}
+
+HRESULT CDropHandler::CopyShellIDListData(IDataObject *pDataObject,
+	list<PastedFile_t> *pPastedFileList)
+{
+	STGMEDIUM stg;
+	HRESULT hr;
+
+	hr = pDataObject->GetData(&m_ftcShellIDList,&stg);
+
+	if(hr == S_OK)
+	{
+		CIDA *pcida = (CIDA *)GlobalLock(stg.hGlobal);
+
+		if(pcida != NULL)
+		{
+			IShellFolder *pShellFolder = NULL;
+			HRESULT hr;
+
+			LPCITEMIDLIST pidlDirectory = HIDA_GetPIDLFolder(pcida);
+
+			hr = BindToShellFolder(pidlDirectory,&pShellFolder);
+
+			if(SUCCEEDED(hr))
 			{
-				/* TODO: Copy the files. */
-				IShellFolder *pShellFolder = NULL;
-				HRESULT hr;
+				LPCITEMIDLIST pidlItem = NULL;
+				IStorage *pStorage = NULL;
 
-				LPCITEMIDLIST pidlDirectory = HIDA_GetPIDLFolder(pcida);
-
-				hr = BindToShellFolder(pidlDirectory,&pShellFolder);
-
-				if(SUCCEEDED(hr))
+				for(unsigned int i = 0;i < pcida->cidl;i++)
 				{
-					LPCITEMIDLIST pidlItem = HIDA_GetPIDLItem(pcida,0);
-
-					IStorage *pStorage = NULL;
+					pidlItem = HIDA_GetPIDLItem(pcida,i);
 
 					hr = pShellFolder->BindToStorage(pidlItem,NULL,IID_IStorage,(LPVOID *)&pStorage);
 
 					if(SUCCEEDED(hr))
 					{
+						/* TODO: Copy the files. */
 						pStorage->Release();
 					}
-
-					pShellFolder->Release();
 				}
 
-				GlobalUnlock(stg.hGlobal);
+				pShellFolder->Release();
 			}
+
+			GlobalUnlock(stg.hGlobal);
 		}
 	}
-	else if(pDataObject->QueryGetData(&m_ftcFileDescriptor) == S_OK)
+
+	return hr;
+}
+
+HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
+	list<PastedFile_t> *pPastedFileList)
+{
+	STGMEDIUM stg;
+	HRESULT hr;
+
+	hr = pDataObject->GetData(&m_ftcFileDescriptor,&stg);
+
+	if(hr == S_OK)
 	{
-		FORMATETC ftcfchg;
-		FORMATETC ftcfcis;
-		FORMATETC ftcfcstg;
-		STGMEDIUM stgFileContents = {0};
-		HANDLE hFile;
-		FILETIME *pftCreationTime = NULL;
-		FILETIME *pftLastAccessTime = NULL;
-		FILETIME *pftLastWriteTime = NULL;
-		FILEGROUPDESCRIPTOR *pfgd = NULL;
-		list<PastedFile_t> pfl;
-		PastedFile_t pf;
-		TCHAR szFullFileName[MAX_PATH];
-		DWORD dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
-		DWORD nBytesToWrite = 0;
-		DWORD nBytesWritten;
-		LPBYTE pBuffer = NULL;
-		BOOL bDataRetrieved = FALSE;
-		unsigned int i = 0;
+		FILEGROUPDESCRIPTOR *pfgd = (FILEGROUPDESCRIPTOR *)GlobalLock(stg.hGlobal);
 
-		hr = pDataObject->GetData(&m_ftcFileDescriptor,&stg);
-
-		if(hr == S_OK)
+		if(pfgd != NULL)
 		{
-			pfgd = (FILEGROUPDESCRIPTOR *)GlobalLock(stg.hGlobal);
+			FILETIME *pftCreationTime = NULL;
+			FILETIME *pftLastAccessTime = NULL;
+			FILETIME *pftLastWriteTime = NULL;
+			DWORD dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+			DWORD nBytesToWrite = 0;
 
-			if(pfgd != NULL)
+			for(unsigned int i = 0;i < pfgd->cItems;i++)
 			{
-				for(i = 0;i < pfgd->cItems;i++)
+				if(pfgd->fgd[i].dwFlags & FD_ATTRIBUTES)
 				{
-					if(pfgd->fgd[i].dwFlags & FD_ATTRIBUTES)
+					dwFileAttributes = pfgd->fgd[i].dwFileAttributes;
+				}
+
+				if(pfgd->fgd[i].dwFlags & FD_FILESIZE)
+				{
+					nBytesToWrite = pfgd->fgd[i].nFileSizeLow;
+				}
+
+				if(pfgd->fgd[i].dwFlags & FD_LINKUI)
+				{
+					/* TODO: Complete. */
+				}
+
+				if(pfgd->fgd[i].dwFlags & FD_CREATETIME)
+				{
+					pftCreationTime = &pfgd->fgd[i].ftCreationTime;
+				}
+
+				if(pfgd->fgd[i].dwFlags & FD_ACCESSTIME)
+				{
+					pftLastAccessTime = &pfgd->fgd[i].ftLastAccessTime;
+				}
+
+				if(pfgd->fgd[i].dwFlags & FD_WRITESTIME)
+				{
+					pftLastWriteTime = &pfgd->fgd[i].ftLastWriteTime;
+				}
+
+				/*if(pfgd->fgd[i].dwFlags & FD_UNICODE)
+				{
+				}*/
+
+				FORMATETC ftcfchg;
+				FORMATETC ftcfcis;
+				FORMATETC ftcfcstg;
+				STGMEDIUM stgFileContents = {0};
+				BOOL bDataRetrieved = FALSE;
+				LPBYTE pBuffer = NULL;
+
+				SetFORMATETC(&ftcfchg,(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS),
+					NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
+				SetFORMATETC(&ftcfcis,(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS),
+					NULL,DVASPECT_CONTENT,-1,TYMED_ISTREAM);
+				SetFORMATETC(&ftcfcstg,(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS),
+					NULL,DVASPECT_CONTENT,-1,TYMED_ISTORAGE);
+
+				if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
+				{
+					ftcfchg.lindex = i;
+
+					hr = pDataObject->GetData(&ftcfchg,&stgFileContents);
+
+					if(hr == S_OK)
 					{
-						dwFileAttributes = pfgd->fgd[i].dwFileAttributes;
+						if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+							nBytesToWrite = (DWORD)GlobalSize(stgFileContents.hGlobal);
+
+						pBuffer = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
+
+						if(pBuffer != NULL)
+							bDataRetrieved = TRUE;
 					}
+				}
+				else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
+				{
+					STATSTG sstg;
+					ULONG cbRead;
 
-					if(pfgd->fgd[i].dwFlags & FD_FILESIZE)
+					ftcfcis.lindex = i;
+
+					hr = pDataObject->GetData(&ftcfcis,&stgFileContents);
+
+					if(hr == S_OK)
 					{
-						nBytesToWrite = pfgd->fgd[i].nFileSizeLow;
-					}
-
-					if(pfgd->fgd[i].dwFlags & FD_LINKUI)
-					{
-
-					}
-
-					if(pfgd->fgd[i].dwFlags & FD_CREATETIME)
-					{
-						pftCreationTime = &pfgd->fgd[i].ftCreationTime;
-					}
-
-					if(pfgd->fgd[i].dwFlags & FD_ACCESSTIME)
-					{
-						pftLastAccessTime = &pfgd->fgd[i].ftLastAccessTime;
-					}
-
-					if(pfgd->fgd[i].dwFlags & FD_WRITESTIME)
-					{
-						pftLastWriteTime = &pfgd->fgd[i].ftLastWriteTime;
-					}
-
-					/*if(pfgd->fgd[i].dwFlags & FD_UNICODE)
-					{
-					}*/
-
-					ftcfchg.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS);
-					ftcfchg.ptd			= NULL;
-					ftcfchg.dwAspect	= DVASPECT_CONTENT;
-					ftcfchg.lindex		= -1;
-					ftcfchg.tymed		= TYMED_HGLOBAL;
-
-					ftcfcis.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS);
-					ftcfcis.ptd			= NULL;
-					ftcfcis.dwAspect	= DVASPECT_CONTENT;
-					ftcfcis.lindex		= -1;
-					ftcfcis.tymed		= TYMED_ISTREAM;
-
-					ftcfcstg.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS);
-					ftcfcstg.ptd		= NULL;
-					ftcfcstg.dwAspect	= DVASPECT_CONTENT;
-					ftcfcstg.lindex		= -1;
-					ftcfcstg.tymed		= TYMED_ISTORAGE;
-
-					hr = pDataObject->QueryGetData(&ftcfchg);
-					hr = pDataObject->QueryGetData(&ftcfcis);
-					hr = pDataObject->QueryGetData(&ftcfcstg);
-
-					if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
-					{
-						ftcfchg.lindex = i;
-
-						hr = pDataObject->GetData(&ftcfchg,&stgFileContents);
+						hr = stgFileContents.pstm->Stat(&sstg,STATFLAG_NONAME);
 
 						if(hr == S_OK)
 						{
-							if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
-								nBytesToWrite = (DWORD)GlobalSize(stgFileContents.hGlobal);
-
-							pBuffer = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
+							pBuffer = (LPBYTE)malloc(sstg.cbSize.LowPart * sizeof(BYTE));
 
 							if(pBuffer != NULL)
-								bDataRetrieved = TRUE;
-						}
-					}
-					else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
-					{
-						STATSTG sstg;
-						ULONG cbRead;
-
-						ftcfcis.lindex = i;
-
-						hr = pDataObject->GetData(&ftcfcis,&stgFileContents);
-
-						if(hr == S_OK)
-						{
-							hr = stgFileContents.pstm->Stat(&sstg,STATFLAG_NONAME);
-
-							if(hr == S_OK)
 							{
-								pBuffer = (LPBYTE)malloc(sstg.cbSize.LowPart * sizeof(BYTE));
+								/* If the file size isn't explicitly given,
+								use the size of the stream. */
+								if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+									nBytesToWrite = sstg.cbSize.LowPart;
 
-								if(pBuffer != NULL)
-								{
-									/* If the file size isn't explicitly given,
-									use the size of the stream. */
-									if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
-										nBytesToWrite = sstg.cbSize.LowPart;
+								stgFileContents.pstm->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
 
-									stgFileContents.pstm->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
-
-									bDataRetrieved = TRUE;
-								}
+								bDataRetrieved = TRUE;
 							}
 						}
 					}
-					else if(pDataObject->QueryGetData(&ftcfcstg) == S_OK)
+				}
+				else if(pDataObject->QueryGetData(&ftcfcstg) == S_OK)
+				{
+					IStream *pStream;
+					STATSTG sstg;
+					ULONG cbRead;
+
+					ftcfcstg.lindex = i;
+
+					hr = pDataObject->GetData(&ftcfcstg,&stgFileContents);
+
+					if(hr == S_OK)
 					{
-						IStream *pStream;
-						STATSTG sstg;
-						ULONG cbRead;
-
-						ftcfcstg.lindex = i;
-
-						hr = pDataObject->GetData(&ftcfcstg,&stgFileContents);
+						hr = stgFileContents.pstg->Stat(&sstg,STATFLAG_DEFAULT);
 
 						if(hr == S_OK)
 						{
-							hr = stgFileContents.pstg->Stat(&sstg,STATFLAG_DEFAULT);
+							hr = stgFileContents.pstg->OpenStream(sstg.pwcsName,NULL,
+								STGM_READ|STGM_SHARE_EXCLUSIVE,0,&pStream);
 
 							if(hr == S_OK)
 							{
-								hr = stgFileContents.pstg->OpenStream(sstg.pwcsName,NULL,
-									STGM_READ|STGM_SHARE_EXCLUSIVE,0,&pStream);
+								CoTaskMemFree(sstg.pwcsName);
+
+								hr = pStream->Stat(&sstg,STATFLAG_NONAME);
 
 								if(hr == S_OK)
 								{
-									CoTaskMemFree(sstg.pwcsName);
+									pBuffer = (LPBYTE)malloc(sstg.cbSize.LowPart * sizeof(BYTE));
 
-									hr = pStream->Stat(&sstg,STATFLAG_NONAME);
-
-									if(hr == S_OK)
+									if(pBuffer != NULL)
 									{
-										pBuffer = (LPBYTE)malloc(sstg.cbSize.LowPart * sizeof(BYTE));
+										/* If the file size isn't explicitly given,
+										use the size of the stream. */
+										if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+											nBytesToWrite = sstg.cbSize.LowPart;
 
-										if(pBuffer != NULL)
-										{
-											/* If the file size isn't explicitly given,
-											use the size of the stream. */
-											if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
-												nBytesToWrite = sstg.cbSize.LowPart;
+										pStream->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
 
-											pStream->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
-
-											bDataRetrieved = TRUE;
-										}
+										bDataRetrieved = TRUE;
 									}
 								}
 							}
 						}
 					}
-
-					if(bDataRetrieved)
-					{
-						StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),pszDestDirectory);
-						PathAppend(szFullFileName,pfgd->fgd[i].cFileName);
-
-						POINT pt;
-						pt.x = pptl->x;
-						pt.y = pptl->y;
-
-						hFile = CreateFile(szFullFileName,GENERIC_WRITE,0,NULL,
-							CREATE_ALWAYS,dwFileAttributes,NULL);
-
-						if(hFile != INVALID_HANDLE_VALUE)
-						{
-							SetFileTime(hFile,pftCreationTime,pftLastAccessTime,pftLastWriteTime);
-
-							WriteFile(hFile,pBuffer,nBytesToWrite,&nBytesWritten,NULL);
-
-							CloseHandle(hFile);
-
-							StringCchCopy(pf.szFileName,SIZEOF_ARRAY(pf.szFileName),szFullFileName);
-							PathStripPath(pf.szFileName);
-							pfl.push_back(pf);
-						}
-
-						if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
-						{
-							if(pBuffer != NULL)
-							{
-								GlobalUnlock(stgFileContents.hGlobal);
-							}
-						}
-						else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
-						{
-							free(pBuffer);
-						}
-
-						HGLOBAL hglb = NULL;
-						DWORD *pdwCopyEffect = NULL;
-						STGMEDIUM stg1;
-
-						ftc.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PERFORMEDDROPEFFECT);
-						ftc.ptd			= NULL;
-						ftc.dwAspect	= DVASPECT_CONTENT;
-						ftc.lindex		= -1;
-						ftc.tymed		= TYMED_HGLOBAL;
-
-						hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
-
-						pdwCopyEffect = (DWORD *)GlobalLock(hglb);
-
-						*pdwCopyEffect = DROPEFFECT_COPY;
-
-						GlobalUnlock(hglb);
-
-						stg1.tymed			= TYMED_HGLOBAL;
-						stg1.pUnkForRelease	= 0;
-						stg1.hGlobal		= hglb;
-
-						pDataObject->SetData(&ftc,&stg1,FALSE);
-					}
 				}
 
-				GlobalUnlock(stg.hGlobal);
-			}
-
-			if(m_pDropFilesCallback != NULL)
-				m_pDropFilesCallback->OnDropFile(&pfl,&pt);
-		}
-	}
-	else if(pDataObject->QueryGetData(&m_ftcUnicodeText) == S_OK)
-	{
-		hr = pDataObject->GetData(&m_ftcUnicodeText,&stg);
-
-		if(hr == S_OK)
-		{
-			WCHAR *pText = static_cast<WCHAR *>(GlobalLock(stg.hGlobal));
-
-			if(pText != NULL)
-			{
-				CopyTextToFile(pszDestDirectory,pText);
-
-				GlobalUnlock(stg.hGlobal);
-			}
-		}
-	}
-	else if(pDataObject->QueryGetData(&m_ftcText) == S_OK)
-	{
-		hr = pDataObject->GetData(&m_ftcText,&stg);
-
-		if(hr == S_OK)
-		{
-			char *pText = static_cast<char *>(GlobalLock(stg.hGlobal));
-
-			if(pText != NULL)
-			{
-				WCHAR *pszUnicodeText = new WCHAR[strlen(pText) + 1];
-
-				MultiByteToWideChar(CP_ACP,0,pText,-1,pszUnicodeText,
-					static_cast<int>(strlen(pText) + 1));
-
-				CopyTextToFile(pszDestDirectory,pszUnicodeText);
-
-				delete[] pszUnicodeText;
-
-				GlobalUnlock(stg.hGlobal);
-			}
-		}
-	}
-	else if(pDataObject->QueryGetData(&m_ftcDIBV5) == S_OK)
-	{
-		hr = pDataObject->GetData(&m_ftcDIBV5,&stg);
-
-		if(hr == S_OK)
-		{
-			BITMAPINFO *pbmp = static_cast<BITMAPINFO *>(GlobalLock(stg.hGlobal));
-
-			if(pbmp != NULL)
-			{
-				SYSTEMTIME st;
-				FILETIME ft;
-				FILETIME lft;
-				TCHAR szTime[512];
-
-				GetLocalTime(&st);
-				SystemTimeToFileTime(&st,&ft);
-				LocalFileTimeToFileTime(&ft,&lft);
-				CreateFileTimeString(&lft,szTime,SIZEOF_ARRAY(szTime),FALSE);
-
-				for(int i = 0;i < lstrlen(szTime);i++)
+				if(bDataRetrieved)
 				{
-					if(szTime[i] == '/')
+					TCHAR szFullFileName[MAX_PATH];
+
+					StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_szDestDirectory);
+					PathAppend(szFullFileName,pfgd->fgd[i].cFileName);
+
+					HANDLE hFile = CreateFile(szFullFileName,GENERIC_WRITE,0,NULL,
+						CREATE_ALWAYS,dwFileAttributes,NULL);
+
+					if(hFile != INVALID_HANDLE_VALUE)
 					{
-						szTime[i] = '-';
+						PastedFile_t pf;
+						DWORD nBytesWritten;
+
+						SetFileTime(hFile,pftCreationTime,pftLastAccessTime,pftLastWriteTime);
+
+						WriteFile(hFile,pBuffer,nBytesToWrite,&nBytesWritten,NULL);
+
+						CloseHandle(hFile);
+
+						StringCchCopy(pf.szFileName,SIZEOF_ARRAY(pf.szFileName),szFullFileName);
+						PathStripPath(pf.szFileName);
+
+						pPastedFileList->push_back(pf);
 					}
-					else if(szTime[i] == ':')
+
+					if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
 					{
-						szTime[i] = '.';
+						if(pBuffer != NULL)
+						{
+							GlobalUnlock(stgFileContents.hGlobal);
+						}
 					}
+					else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
+					{
+						free(pBuffer);
+					}
+
+					HGLOBAL hglb = NULL;
+					DWORD *pdwCopyEffect = NULL;
+					FORMATETC ftc;
+					STGMEDIUM stg1;
+
+					ftc.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PERFORMEDDROPEFFECT);
+					ftc.ptd			= NULL;
+					ftc.dwAspect	= DVASPECT_CONTENT;
+					ftc.lindex		= -1;
+					ftc.tymed		= TYMED_HGLOBAL;
+
+					hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
+
+					pdwCopyEffect = (DWORD *)GlobalLock(hglb);
+
+					*pdwCopyEffect = DROPEFFECT_COPY;
+
+					GlobalUnlock(hglb);
+
+					stg1.tymed			= TYMED_HGLOBAL;
+					stg1.pUnkForRelease	= 0;
+					stg1.hGlobal		= hglb;
+
+					pDataObject->SetData(&ftc,&stg1,FALSE);
 				}
-
-				TCHAR szFullFileName[MAX_PATH];
-				TCHAR szFileName[MAX_PATH];
-
-				/* TODO: Move text into string table. */
-				StringCchPrintf(szFileName,SIZEOF_ARRAY(szFileName),
-					_T("Clipboard Image (%s).bmp"),szTime);
-
-				PathCombine(szFullFileName,pszDestDirectory,
-					szFileName);
-
-				HANDLE hFile = CreateFile(szFullFileName,
-					GENERIC_WRITE,0,NULL,CREATE_NEW,
-					FILE_ATTRIBUTE_NORMAL,NULL);
-
-				if(hFile != INVALID_HANDLE_VALUE)
-				{
-					DWORD dwSize = static_cast<DWORD>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER)));
-
-					LPBYTE pData = new BYTE[dwSize];
-
-					BITMAPFILEHEADER *pbfh = (BITMAPFILEHEADER *)pData;
-
-					/* 'BM'. */
-					pbfh->bfType		= 0x4D42;
-
-					pbfh->bfSize		= pbmp->bmiHeader.biSize;
-					pbfh->bfReserved1	= 0;
-					pbfh->bfReserved2	= 0;
-					pbfh->bfOffBits		= sizeof(BITMAPFILEHEADER);
-
-					BITMAPINFOHEADER *pb5h = (BITMAPINFOHEADER *)(pData + sizeof(BITMAPFILEHEADER));
-
-					memcpy(pb5h,&pbmp->bmiHeader,sizeof(BITMAPINFOHEADER));
-
-					RGBQUAD *prgb = (RGBQUAD *)(pData + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
-
-					memcpy(prgb,pbmp->bmiColors,GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER));
-
-					DWORD nBytesWritten;
-
-					WriteFile(hFile,(LPCVOID)pData,
-						dwSize,
-						&nBytesWritten,NULL);
-
-					CloseHandle(hFile);
-
-					delete[] pData;
-				}
-
-				GlobalUnlock(stg.hGlobal);
 			}
+
+			GlobalUnlock(stg.hGlobal);
 		}
 	}
+
+	return hr;
+}
+
+HRESULT CDropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
+	list<PastedFile_t> *pPastedFileList)
+{
+	STGMEDIUM stg;
+	HRESULT hr;
+
+	hr = pDataObject->GetData(&m_ftcUnicodeText,&stg);
+
+	if(hr == S_OK)
+	{
+		WCHAR *pText = static_cast<WCHAR *>(GlobalLock(stg.hGlobal));
+
+		if(pText != NULL)
+		{
+			TCHAR szFullFileName[MAX_PATH];
+
+			hr = CopyTextToFile(m_szDestDirectory,pText,szFullFileName);
+
+			if(hr == S_OK)
+			{
+				PastedFile_t pf;
+
+				StringCchCopy(pf.szFileName,SIZEOF_ARRAY(pf.szFileName),szFullFileName);
+				PathStripPath(pf.szFileName);
+
+				pPastedFileList->push_back(pf);
+			}
+
+			GlobalUnlock(stg.hGlobal);
+		}
+	}
+
+	return hr;
+}
+
+HRESULT CDropHandler::CopyAnsiTextData(IDataObject *pDataObject,
+	list<PastedFile_t> *pPastedFileList)
+{
+	STGMEDIUM stg;
+	HRESULT hr;
+
+	hr = pDataObject->GetData(&m_ftcText,&stg);
+
+	if(hr == S_OK)
+	{
+		char *pText = static_cast<char *>(GlobalLock(stg.hGlobal));
+
+		if(pText != NULL)
+		{
+			WCHAR *pszUnicodeText = new WCHAR[strlen(pText) + 1];
+
+			MultiByteToWideChar(CP_ACP,0,pText,-1,pszUnicodeText,
+				static_cast<int>(strlen(pText) + 1));
+
+			TCHAR szFullFileName[MAX_PATH];
+
+			hr = CopyTextToFile(m_szDestDirectory,pszUnicodeText,szFullFileName);
+
+			if(hr == S_OK)
+			{
+				PastedFile_t pf;
+
+				StringCchCopy(pf.szFileName,SIZEOF_ARRAY(pf.szFileName),szFullFileName);
+				PathStripPath(pf.szFileName);
+
+				pPastedFileList->push_back(pf);
+			}
+
+			delete[] pszUnicodeText;
+
+			GlobalUnlock(stg.hGlobal);
+		}
+	}
+
+	return hr;
+}
+
+HRESULT CDropHandler::CopyDIBV5Data(IDataObject *pDataObject,
+	list<PastedFile_t> *pPastedFileList)
+{
+	STGMEDIUM stg;
+	HRESULT hr;
+
+	hr = pDataObject->GetData(&m_ftcDIBV5,&stg);
+
+	if(hr == S_OK)
+	{
+		BITMAPINFO *pbmp = static_cast<BITMAPINFO *>(GlobalLock(stg.hGlobal));
+
+		if(pbmp != NULL)
+		{
+			SYSTEMTIME st;
+			FILETIME ft;
+			FILETIME lft;
+			TCHAR szTime[512];
+
+			GetLocalTime(&st);
+			SystemTimeToFileTime(&st,&ft);
+			LocalFileTimeToFileTime(&ft,&lft);
+			CreateFileTimeString(&lft,szTime,SIZEOF_ARRAY(szTime),FALSE);
+
+			for(int i = 0;i < lstrlen(szTime);i++)
+			{
+				if(szTime[i] == '/')
+				{
+					szTime[i] = '-';
+				}
+				else if(szTime[i] == ':')
+				{
+					szTime[i] = '.';
+				}
+			}
+
+			TCHAR szFullFileName[MAX_PATH];
+			TCHAR szFileName[MAX_PATH];
+
+			/* TODO: Move text into string table. */
+			StringCchPrintf(szFileName,SIZEOF_ARRAY(szFileName),
+				_T("Clipboard Image (%s).bmp"),szTime);
+
+			PathCombine(szFullFileName,m_szDestDirectory,
+				szFileName);
+
+			HANDLE hFile = CreateFile(szFullFileName,
+				GENERIC_WRITE,0,NULL,CREATE_NEW,
+				FILE_ATTRIBUTE_NORMAL,NULL);
+
+			if(hFile != INVALID_HANDLE_VALUE)
+			{
+				DWORD dwSize = static_cast<DWORD>(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + (GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER)));
+
+				LPBYTE pData = new BYTE[dwSize];
+
+				BITMAPFILEHEADER *pbfh = (BITMAPFILEHEADER *)pData;
+
+				/* 'BM'. */
+				pbfh->bfType		= 0x4D42;
+
+				pbfh->bfSize		= pbmp->bmiHeader.biSize;
+				pbfh->bfReserved1	= 0;
+				pbfh->bfReserved2	= 0;
+				pbfh->bfOffBits		= sizeof(BITMAPFILEHEADER);
+
+				BITMAPINFOHEADER *pb5h = (BITMAPINFOHEADER *)(pData + sizeof(BITMAPFILEHEADER));
+
+				memcpy(pb5h,&pbmp->bmiHeader,sizeof(BITMAPINFOHEADER));
+
+				RGBQUAD *prgb = (RGBQUAD *)(pData + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
+
+				memcpy(prgb,pbmp->bmiColors,GlobalSize(stg.hGlobal) - sizeof(BITMAPINFOHEADER));
+
+				DWORD nBytesWritten;
+
+				WriteFile(hFile,(LPCVOID)pData,
+					dwSize,
+					&nBytesWritten,NULL);
+
+				CloseHandle(hFile);
+
+				delete[] pData;
+
+				PastedFile_t pf;
+
+				StringCchCopy(pf.szFileName,SIZEOF_ARRAY(pf.szFileName),szFullFileName);
+				PathStripPath(pf.szFileName);
+
+				pPastedFileList->push_back(pf);
+			}
+
+			GlobalUnlock(stg.hGlobal);
+		}
+	}
+
+	return hr;
 }
 
 void CDropHandler::HandleRightClickDrop(void)
@@ -994,11 +1079,13 @@ void CDropHandler::CreateShortcutToDroppedFile(TCHAR *szFullFileName)
 	CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
 }
 
-void CDropHandler::CopyTextToFile(TCHAR *pszDestDirectory,WCHAR *pszText)
+HRESULT CDropHandler::CopyTextToFile(IN TCHAR *pszDestDirectory,
+	IN WCHAR *pszText,OUT TCHAR *pszFullFileNameOut)
 {
 	SYSTEMTIME st;
 	FILETIME ft;
 	FILETIME lft;
+	HRESULT hr = E_FAIL;
 	TCHAR szTime[512];
 
 	GetLocalTime(&st);
@@ -1041,7 +1128,14 @@ void CDropHandler::CopyTextToFile(TCHAR *pszDestDirectory,WCHAR *pszText)
 			&nBytesWritten,NULL);
 
 		CloseHandle(hFile);
+
+		StringCchCopy(pszFullFileNameOut,MAX_PATH,
+			szFullFileName);
+
+		hr = S_OK;
 	}
+
+	return hr;
 }
 
 BOOL CDropHandler::CheckItemLocations(int iDroppedItem)

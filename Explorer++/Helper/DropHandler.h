@@ -64,12 +64,19 @@ private:
 	void	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect,HWND hwndDrop,DragTypes_t DragType,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
 	void	CopyClipboardData(IDataObject *pDataObject,HWND hwndDrop,TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,BOOL bRenameOnCollision);
 
-	void	HandleLeftClickDrop(IDataObject *pDataObject,TCHAR *pszDestDirectory,POINTL *pptl);
+	void	HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl);
+	HRESULT	CopyHDropData(IDataObject *pDataObject,BOOL bPrefferedEffect,DWORD dwEffect,list<PastedFile_t> *pPastedFileList);
+	HRESULT	CopyShellIDListData(IDataObject *pDataObject,list<PastedFile_t> *pPastedFileList);
+	HRESULT	CopyFileDescriptorData(IDataObject *pDataObject,list<PastedFile_t> *pPastedFileList);
+	HRESULT	CopyUnicodeTextData(IDataObject *pDataObject,list<PastedFile_t> *pPastedFileList);
+	HRESULT	CopyAnsiTextData(IDataObject *pDataObject,list<PastedFile_t> *pPastedFileList);
+	HRESULT	CopyDIBV5Data(IDataObject *pDataObject,list<PastedFile_t> *pPastedFileList);
+
 	void	HandleRightClickDrop(void);
 	void	CopyDroppedFiles(DROPFILES *pdf,BOOL bPreferredEffect,DWORD dwPreferredEffect);
 	void	CopyDroppedFilesInternal(IBufferManager *pbm,list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision);
 	void	CreateShortcutToDroppedFile(TCHAR *szFullFileName);
-	void	CopyTextToFile(TCHAR *pszDestDirectory,WCHAR *pszText);
+	HRESULT	CopyTextToFile(IN TCHAR *pszDestDirectory,IN WCHAR *pszText,OUT TCHAR *pszFullFileNameOut);
 	BOOL	CheckItemLocations(int iDroppedItem);
 
 	LONG		m_lRefCount;
