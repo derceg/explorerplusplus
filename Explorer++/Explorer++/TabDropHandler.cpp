@@ -25,21 +25,27 @@ BOOL	g_bTabDragTimerElapsed;
 HRESULT _stdcall CContainer::DragEnter(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
-	FORMATETC	ftc = {CF_HDROP,0,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	HRESULT		hr;
-
 	m_iTabDragTab = m_iTabSelectedItem;
 	g_bTabDragTimerElapsed = FALSE;
 
-	/* Check whether the drop source has the type of data (CF_HDROP)
-	that is needed for this drag operation. */
-	hr = pDataObject->QueryGetData(&ftc);
+	std::list<FORMATETC> ftcList;
+	CDropHandler::GetDropFormats(&ftcList);
 
-	/* DON'T use SUCCEEDED (QueryGetData() will return S_FALSE on
-	failure). */
-	if(hr == S_OK)
+	BOOL bDataAccept = FALSE;
+
+	/* Check whether the drop source has the type of data
+	that is needed for this drag operation. */
+	for each(auto ftc in ftcList)
 	{
-		/* The clipboard contains data that we can copy/move. */
+		if(pDataObject->QueryGetData(&ftc) == S_OK)
+		{
+			bDataAccept = TRUE;
+			break;
+		}
+	}
+
+	if(bDataAccept)
+	{
 		m_bDataAccept	= TRUE;
 
 		GetSourceFileName(pDataObject);
@@ -71,7 +77,6 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 	}
 	else
 	{
-		/* The clipboard contains data that we cannot copy/move. */
 		m_bDataAccept	= FALSE;
 		*pdwEffect		= DROPEFFECT_NONE;
 	}
