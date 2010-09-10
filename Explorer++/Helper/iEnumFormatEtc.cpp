@@ -125,6 +125,9 @@ HRESULT __stdcall CEnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltF
 {
 	if(m_iIndex >= m_iNumFormats)
 	{
+		if(pceltFetched != NULL)
+			*pceltFetched = 0;
+
 		return S_FALSE;
 	}
 

@@ -312,7 +312,12 @@ HRESULT __stdcall CDataObject::EnumDAdvise(IEnumSTATDATA **ppenumAdvise)
 	return OLE_E_ADVISENOTSUPPORTED;
 }
 
-HRESULT __stdcall CDataObject::EndOperation(HRESULT hResult,IBindCtx *pbcReserved,DWORD dwEffects)
+/* End operation does not seem to be called
+when dropping the CF_HDROP format into
+Windows Explorer.
+See: http://us.generation-nt.com/iasyncoperation-idataobject-help-45020022.html */
+HRESULT __stdcall CDataObject::EndOperation(HRESULT hResult,
+IBindCtx *pbcReserved,DWORD dwEffects)
 {
 	Release();
 	return S_OK;

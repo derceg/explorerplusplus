@@ -968,7 +968,6 @@ WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 			PastedFilesInfo_t *ppfi = reinterpret_cast<PastedFilesInfo_t *>(wParam);
 
 			ppfi->pao->EndOperation(ppfi->hrCopy,NULL,ppfi->dwEffect);
-			ppfi->pao->Release();
 
 			ppfi->pDropHandler->Release();
 

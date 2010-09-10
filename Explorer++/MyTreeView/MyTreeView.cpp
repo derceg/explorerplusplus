@@ -1145,6 +1145,80 @@ HTREEITEM CMyTreeView::LocateItem(LPITEMIDLIST pidlDirectory)
 	return LocateItemInternal(pidlDirectory,FALSE);
 }
 
+/* Finds items that have been deleted or renamed
+(meaning that their pidl's are no longer valid).
+
+Use two basic strategies to find the item:
+1. Find the parent item through its pidl, the child
+through it's name.
+2. Find the item simply by its name.
+The first method would not normally be needed, but
+real folders can have a display name that differs
+from their parsing name.
+For example, the C:\Users\Username\Documents
+folder in Windows 7 has a display name of
+"My Documents". This is an issue, since a
+direct path lookup will fail. */
+/* TODO: Store parsing name with each item, and
+match against that. */
+HTREEITEM CMyTreeView::LocateDeletedItem(IN TCHAR *szFullFileName)
+{
+	HTREEITEM hItem = NULL;
+	LPITEMIDLIST pidl = NULL;
+	TCHAR szParent[MAX_PATH];
+	BOOL bFound = FALSE;
+	HRESULT hr;
+
+	StringCchCopy(szParent,SIZEOF_ARRAY(szParent),szFullFileName);
+	PathRemoveFileSpec(szParent);
+	hr = GetIdlFromParsingName(szParent,&pidl);
+
+	if(SUCCEEDED(hr))
+	{
+		hItem = LocateExistingItem(pidl);
+
+		if(hItem != NULL)
+		{
+			HTREEITEM hChild;
+			TVITEM tvItem;
+			TCHAR szFileName[MAX_PATH];
+
+			hChild = TreeView_GetChild(m_hTreeView,hItem);
+
+			StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
+			PathStripPath(szFileName);
+
+			/* Now try to find the child folder. */
+			while(hChild != NULL)
+			{
+				TCHAR szItem[MAX_PATH];
+
+				tvItem.mask			= TVIF_TEXT|TVIF_HANDLE;
+				tvItem.hItem		= hChild;
+				tvItem.pszText		= szItem;
+				tvItem.cchTextMax	= SIZEOF_ARRAY(szItem);
+				TreeView_GetItem(m_hTreeView,&tvItem);
+
+				if(lstrcmp(szFileName,szItem) == 0)
+				{
+					hItem = hChild;
+					bFound = TRUE;
+					break;
+				}
+
+				hChild = TreeView_GetNextSibling(m_hTreeView,hChild);
+			}
+		}
+	}
+
+	if(!bFound)
+	{
+		hItem = LocateItemByPath(szFullFileName,FALSE);
+	}
+
+	return hItem;
+}
+
 HTREEITEM CMyTreeView::LocateExistingItem(TCHAR *szParsingPath)
 {
 	LPITEMIDLIST	pidl = NULL;

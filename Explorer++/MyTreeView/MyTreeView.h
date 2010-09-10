@@ -39,6 +39,7 @@ public:
 	LPITEMIDLIST		BuildPath(HTREEITEM hTreeItem);
 	HTREEITEM			LocateItem(TCHAR *szParsingPath);
 	HTREEITEM			LocateItem(LPITEMIDLIST pidlDirectory);
+	HTREEITEM			LocateDeletedItem(IN TCHAR *szFullFileName);
 	HTREEITEM			LocateItemByPath(TCHAR *szItemPath,BOOL bExpand);
 	void				EraseItems(HTREEITEM hParent);
 	HTREEITEM			CheckAgainstDesktop(TCHAR *szFullFileName);
@@ -78,6 +79,7 @@ private:
 	void		AddDrive(TCHAR *szDrive);
 	void		RenameItem(HTREEITEM hItem,TCHAR *szFullFileName);
 	void		RemoveItem(TCHAR *szFullFileName);
+	void		RemoveItem(HTREEITEM hItem);
 	LRESULT CALLBACK	OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	void		OnGetDisplayInfo(LPARAM lParam);
 	void		UpdateChildren(HTREEITEM hParent,LPITEMIDLIST pidlParent);

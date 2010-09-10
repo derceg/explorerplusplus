@@ -113,7 +113,7 @@ void CMyTreeView::DirectoryAlteredRemoveFile(TCHAR *szFullFileName)
 {
 	HTREEITEM hItem;
 
-	hItem = LocateItemByPath(szFullFileName,FALSE);
+	hItem = LocateDeletedItem(szFullFileName);
 
 	if(hItem != NULL)
 	{
@@ -501,84 +501,72 @@ LPITEMIDLIST CMyTreeView::UpdateItemInfo(LPITEMIDLIST pidlParent,int iItemId)
 
 void CMyTreeView::RemoveItem(TCHAR *szFullFileName)
 {
-	HTREEITEM		hItem;
-	TVITEM			tvItem;
-	SFGAOF			Attributes;
-	LPITEMIDLIST	pidl = NULL;
-	WCHAR			szParentW[MAX_PATH];
-	TCHAR			szParent[MAX_PATH];
-	TCHAR			szDesktop[MAX_PATH];
-	TCHAR			szFileName[MAX_PATH];
-	HRESULT			hr;
-	BOOL			bDesktop = FALSE;
+	HTREEITEM hItem;
 
-	StringCchCopy(szParent,MAX_PATH,szFullFileName);
-	PathRemoveFileSpec(szParent);
-
-	StringCchCopy(szFileName,MAX_PATH,szFullFileName);
-	PathStripPath(szFileName);
-
-	SHGetFolderPath(NULL,CSIDL_DESKTOP,NULL,SHGFP_TYPE_CURRENT,szDesktop);
-
-	bDesktop = !lstrcmp(szParent,szDesktop);
-
-	hItem = LocateExistingItem(szParent);
+	hItem = LocateDeletedItem(szFullFileName);
 
 	if(hItem != NULL)
 	{
-		#ifndef UNICODE
-		MultiByteToWideChar(CP_ACP,0,szParent,-1,szParentW,SIZEOF_ARRAY(szParentW));
-		#else
-		StringCchCopy(szParentW,SIZEOF_ARRAY(szParentW),szParent);
-		#endif
+		RemoveItem(hItem);
+	}
+}
 
-		hr = SHParseDisplayName(szParentW,NULL,&pidl,SFGAO_HASSUBFOLDER,&Attributes);
+void CMyTreeView::RemoveItem(HTREEITEM hItem)
+{
+	HTREEITEM hParent;
 
-		if(SUCCEEDED(hr))
+	hParent = TreeView_GetParent(m_hTreeView,hItem);
+
+	if(hParent != NULL)
+	{
+		TVITEM tvItem;
+		SFGAOF Attributes;
+		BOOL bRes;
+		HRESULT hr;
+
+		tvItem.mask		= TVIF_PARAM|TVIF_HANDLE;
+		tvItem.hItem	= hParent;
+		bRes = TreeView_GetItem(m_hTreeView,&tvItem);
+
+		if(bRes)
 		{
-			tvItem.mask		= TVIF_CHILDREN;
+			hr = GetItemAttributes(m_pItemInfo[static_cast<int>(tvItem.lParam)].pidl,
+				&Attributes);
 
-			/* If the parent folder no longer has any sub-folders,
-			set its number of children to 0. */
-			if((Attributes & SFGAO_HASSUBFOLDER) != SFGAO_HASSUBFOLDER)
+			if(SUCCEEDED(hr))
 			{
-				tvItem.cChildren	= 0;
-				TreeView_Expand(m_hTreeView,hItem,TVE_COLLAPSE);
-			}
-			else
-			{
-				tvItem.cChildren	= 1;
-			}
+				/* If the parent folder no longer has any sub-folders,
+				set its number of children to 0. */
+				if((Attributes & SFGAO_HASSUBFOLDER) != SFGAO_HASSUBFOLDER)
+				{
+					tvItem.cChildren = 0;
+					TreeView_Expand(m_hTreeView,hParent,TVE_COLLAPSE);
+				}
+				else
+				{
+					tvItem.cChildren = 1;
+				}
 
-			tvItem.mask		= TVIF_CHILDREN;
-			tvItem.hItem	= hItem;
-			TreeView_SetItem(m_hTreeView,&tvItem);
-
-			CoTaskMemFree(pidl);
+				tvItem.mask		= TVIF_CHILDREN;
+				tvItem.hItem	= hParent;
+				TreeView_SetItem(m_hTreeView,&tvItem);
+			}
 		}
 	}
 
-    /* File has been deleted. Can't use its PIDL to locate it
-    in the treeview. Parse the items path to find it. */
-	hItem = LocateItemByPath(szFullFileName,FALSE);
+	EraseItems(hItem);
+	TreeView_DeleteItem(m_hTreeView,hItem);
 
-	if(hItem != NULL)
-	{
-		EraseItems(hItem);
-
-		TreeView_DeleteItem(m_hTreeView,hItem);
-	}
-
-	/* If the item is on the desktop, it will need to
+	/* If the item is on the desktop, it may need to
 	be deleted twice. */
-	hItem = CheckAgainstDesktop(szFullFileName);
+	/*hItem = CheckAgainstDesktop(szFullFileName);
 
 	if(hItem != NULL)
 	{
 		EraseItems(hItem);
 
 		TreeView_DeleteItem(m_hTreeView,hItem);
-	}
+	}*/
 }
 
 void CALLBACK Timer_DirectoryModified(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
