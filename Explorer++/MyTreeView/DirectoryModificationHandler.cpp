@@ -111,6 +111,17 @@ void CMyTreeView::DirectoryAlteredAddFile(TCHAR *szFullFileName)
 
 void CMyTreeView::DirectoryAlteredRemoveFile(TCHAR *szFullFileName)
 {
+	TCHAR szParent[MAX_PATH];
+
+	StringCchCopy(szParent,SIZEOF_ARRAY(szParent),szFullFileName);
+	PathRemoveFileSpec(szParent);
+
+	/* The parent item should be updated (if it
+	is in the tree), regardless of whether the
+	actual item was found. For example, the number
+	of children may need to be set to 0. */
+	UpdateParent(szParent);
+
 	HTREEITEM hItem;
 
 	hItem = LocateDeletedItem(szFullFileName);
@@ -142,17 +153,6 @@ void CMyTreeView::DirectoryAlteredRemoveFile(TCHAR *szFullFileName)
 			}
 		}
 	}
-
-	TCHAR szParent[MAX_PATH];
-
-	StringCchCopy(szParent,SIZEOF_ARRAY(szParent),szFullFileName);
-	PathRemoveFileSpec(szParent);
-
-	/* The parent item should be updated (if it
-	is in the tree), regardless of whether the
-	actual item was found. For example, the number
-	of children may need to be set to 0. */
-	UpdateParent(szParent);
 }
 
 void CMyTreeView::DirectoryAlteredRenameFile(TCHAR *szFullFileName)
@@ -548,7 +548,7 @@ void CMyTreeView::UpdateParent(TCHAR *szParent)
 	if(hParent != NULL)
 	{
 		TVITEM tvItem;
-		SFGAOF Attributes;
+		SFGAOF Attributes = SFGAO_HASSUBFOLDER;
 		BOOL bRes;
 		HRESULT hr;
 
