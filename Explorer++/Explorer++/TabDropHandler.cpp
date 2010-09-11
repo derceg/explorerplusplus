@@ -281,7 +281,7 @@ POINTL pt,DWORD *pdwEffect)
 			m_DragType,szDestDirectory,
 			NULL,FALSE);
 
-		delete pDropHandler;
+		pDropHandler->Release();
 	}
 
 	return S_OK;

@@ -592,9 +592,8 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 
 			/* Delete the thumbnail bitmap. */
 			DeleteObject(hbmTab);
-
 			SelectObject(hdcSrc,hPrevBitmap);
-
+			DeleteObject(hbmThumbnail);
 			DeleteDC(hdcSrc);
 			ReleaseDC(m_hContainer,hdc);
 
@@ -608,6 +607,8 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 			TabPreviewInfo_t tpi;
 
 			DwmSetIconicLivePreviewBitmapProc DwmSetIconicLivePreviewBitmap;
+
+			tpi.hbm = NULL;
 
 			if(IsIconic(m_hContainer))
 			{
@@ -631,6 +632,11 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 			}
 
 			FreeLibrary(hDwmapi);
+
+			if(tpi.hbm != NULL)
+			{
+				DeleteObject(tpi.hbm);
+			}
 
 			return 0;
 		}
@@ -772,6 +778,7 @@ HBITMAP CContainer::CaptureTabScreenshot(int iTabId)
 	return hbmThumbnail;
 }
 
+/* It is up to the caller to delete the bitmap returned by this method. */
 void CContainer::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi)
 {
 	HDC hdcTab;

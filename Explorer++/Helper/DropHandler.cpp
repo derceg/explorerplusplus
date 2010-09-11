@@ -858,7 +858,6 @@ list<PastedFile_t> *pPastedFileList,BOOL bCopy,BOOL bRenameOnCollision)
 
 	pbm->QueryBufferSize(&dwBufferSize);
 
-	/* TODO: Need to free everything. */
 	if(dwBufferSize > 1)
 	{
 		szFileNameList = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
