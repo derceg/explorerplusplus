@@ -142,6 +142,17 @@ void CMyTreeView::DirectoryAlteredRemoveFile(TCHAR *szFullFileName)
 			}
 		}
 	}
+
+	TCHAR szParent[MAX_PATH];
+
+	StringCchCopy(szParent,SIZEOF_ARRAY(szParent),szFullFileName);
+	PathRemoveFileSpec(szParent);
+
+	/* The parent item should be updated (if it
+	is in the tree), regardless of whether the
+	actual item was found. For example, the number
+	of children may need to be set to 0. */
+	UpdateParent(szParent);
 }
 
 void CMyTreeView::DirectoryAlteredRenameFile(TCHAR *szFullFileName)
@@ -513,9 +524,26 @@ void CMyTreeView::RemoveItem(TCHAR *szFullFileName)
 
 void CMyTreeView::RemoveItem(HTREEITEM hItem)
 {
+	EraseItems(hItem);
+	TreeView_DeleteItem(m_hTreeView,hItem);
+
+	/* TODO: If the item is on the desktop, it may need to
+	be deleted twice. */
+	/*hItem = CheckAgainstDesktop(szFullFileName);
+
+	if(hItem != NULL)
+	{
+		EraseItems(hItem);
+
+		TreeView_DeleteItem(m_hTreeView,hItem);
+	}*/
+}
+
+void CMyTreeView::UpdateParent(TCHAR *szParent)
+{
 	HTREEITEM hParent;
 
-	hParent = TreeView_GetParent(m_hTreeView,hItem);
+	hParent = LocateExistingItem(szParent);
 
 	if(hParent != NULL)
 	{
@@ -553,20 +581,6 @@ void CMyTreeView::RemoveItem(HTREEITEM hItem)
 			}
 		}
 	}
-
-	EraseItems(hItem);
-	TreeView_DeleteItem(m_hTreeView,hItem);
-
-	/* If the item is on the desktop, it may need to
-	be deleted twice. */
-	/*hItem = CheckAgainstDesktop(szFullFileName);
-
-	if(hItem != NULL)
-	{
-		EraseItems(hItem);
-
-		TreeView_DeleteItem(m_hTreeView,hItem);
-	}*/
 }
 
 void CALLBACK Timer_DirectoryModified(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)

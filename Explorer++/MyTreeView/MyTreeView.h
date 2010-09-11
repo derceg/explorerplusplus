@@ -80,6 +80,7 @@ private:
 	void		RenameItem(HTREEITEM hItem,TCHAR *szFullFileName);
 	void		RemoveItem(TCHAR *szFullFileName);
 	void		RemoveItem(HTREEITEM hItem);
+	void		UpdateParent(TCHAR *szParent);
 	LRESULT CALLBACK	OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	void		OnGetDisplayInfo(LPARAM lParam);
 	void		UpdateChildren(HTREEITEM hParent,LPITEMIDLIST pidlParent);
