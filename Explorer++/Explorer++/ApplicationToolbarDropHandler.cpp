@@ -213,6 +213,8 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 
 			GlobalUnlock(stg.hGlobal);
 		}
+
+		ReleaseStgMedium(&stg);
 	}
 
 	return S_OK;

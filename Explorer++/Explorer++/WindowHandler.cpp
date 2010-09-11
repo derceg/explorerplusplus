@@ -913,18 +913,10 @@ void CContainer::OnAddressBarBeginDrag(void)
 			FORMATETC ftc[2];
 			STGMEDIUM stg[2];
 
-			/* File information (name, size, date created, etc). */
-			ftc[0].cfFormat			= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR);
-			ftc[0].ptd				= NULL;
-			ftc[0].dwAspect			= DVASPECT_CONTENT;
-			ftc[0].lindex			= -1;
-			ftc[0].tymed			= TYMED_HGLOBAL;
+			SetFORMATETC(&ftc[0],(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),
+				NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
 
-			/* Build the file descriptor storage object. */
-
-			HGLOBAL hglb = NULL;
-
-			hglb = GlobalAlloc(GMEM_MOVEABLE,1000);
+			HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE,1000);
 
 			FILEGROUPDESCRIPTOR *pfgd = static_cast<FILEGROUPDESCRIPTOR *>(GlobalLock(hglb));
 
@@ -932,6 +924,7 @@ void CContainer::OnAddressBarBeginDrag(void)
 
 			FILEDESCRIPTOR *pfd = (FILEDESCRIPTOR *)((LPBYTE)pfgd + sizeof(UINT));
 
+			/* File information (name, size, date created, etc). */
 			pfd[0].dwFlags			= FD_ATTRIBUTES|FD_FILESIZE;
 			pfd[0].dwFileAttributes	= FILE_ATTRIBUTE_NORMAL;
 			pfd[0].nFileSizeLow		= 16384;
@@ -950,11 +943,8 @@ void CContainer::OnAddressBarBeginDrag(void)
 			stg[0].tymed			= TYMED_HGLOBAL;
 
 			/* File contents. */
-			ftc[1].cfFormat			= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS);
-			ftc[1].ptd				= NULL;
-			ftc[1].dwAspect			= DVASPECT_CONTENT;
-			ftc[1].lindex			= -1;
-			ftc[1].tymed			= TYMED_HGLOBAL;
+			SetFORMATETC(&ftc[1],(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS),
+				NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
 
 			hglb = GlobalAlloc(GMEM_MOVEABLE,16384);
 

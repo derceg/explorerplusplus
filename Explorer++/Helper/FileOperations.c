@@ -409,6 +409,8 @@ int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType)
 
 				GlobalUnlock(stg.hGlobal);
 			}
+
+			ReleaseStgMedium(&stg);
 		}
 		ClipboardObject->Release();
 	}

@@ -186,6 +186,8 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 				GlobalUnlock(stg.hGlobal);
 			}
 		}
+
+		ReleaseStgMedium(&stg);
 	}
 
 	HRESULT hrCopy = E_FAIL;
@@ -245,6 +247,8 @@ HRESULT CDropHandler::CopyHDropData(IDataObject *pDataObject,
 
 			GlobalUnlock(stg.hGlobal);
 		}
+
+		ReleaseStgMedium(&stg);
 	}
 
 	return hr;
@@ -294,6 +298,8 @@ HRESULT CDropHandler::CopyShellIDListData(IDataObject *pDataObject,
 
 			GlobalUnlock(stg.hGlobal);
 		}
+
+		ReleaseStgMedium(&stg);
 	}
 
 	return hr;
@@ -377,13 +383,26 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 
 					if(hr == S_OK)
 					{
-						if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
-							nBytesToWrite = (DWORD)GlobalSize(stgFileContents.hGlobal);
-
-						pBuffer = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
+						pBuffer = (LPBYTE)malloc(GlobalSize(stgFileContents.hGlobal) * sizeof(BYTE));
 
 						if(pBuffer != NULL)
-							bDataRetrieved = TRUE;
+						{
+							if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+								nBytesToWrite = (DWORD)GlobalSize(stgFileContents.hGlobal);
+
+							LPBYTE pTemp = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
+
+							if(pTemp != NULL)
+							{
+								memcpy(pBuffer,pTemp,GlobalSize(stgFileContents.hGlobal));
+
+								GlobalUnlock(stgFileContents.hGlobal);
+
+								bDataRetrieved = TRUE;
+							}
+
+							ReleaseStgMedium(&stgFileContents);
+						}
 					}
 				}
 				else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
@@ -415,6 +434,8 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 								bDataRetrieved = TRUE;
 							}
 						}
+
+						ReleaseStgMedium(&stgFileContents);
 					}
 				}
 				else if(pDataObject->QueryGetData(&ftcfcstg) == S_OK)
@@ -460,6 +481,8 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 								}
 							}
 						}
+
+						ReleaseStgMedium(&stgFileContents);
 					}
 				}
 
@@ -490,18 +513,6 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 						pPastedFileList->push_back(pf);
 					}
 
-					if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
-					{
-						if(pBuffer != NULL)
-						{
-							GlobalUnlock(stgFileContents.hGlobal);
-						}
-					}
-					else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
-					{
-						free(pBuffer);
-					}
-
 					HGLOBAL hglb = NULL;
 					DWORD *pdwCopyEffect = NULL;
 					FORMATETC ftc;
@@ -527,10 +538,17 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 
 					pDataObject->SetData(&ftc,&stg1,FALSE);
 				}
+
+				if(pBuffer != NULL)
+				{
+					free(pBuffer);
+				}
 			}
 
 			GlobalUnlock(stg.hGlobal);
 		}
+
+		ReleaseStgMedium(&stg);
 	}
 
 	return hr;
@@ -566,6 +584,8 @@ HRESULT CDropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
 
 			GlobalUnlock(stg.hGlobal);
 		}
+
+		ReleaseStgMedium(&stg);
 	}
 
 	return hr;
@@ -608,6 +628,8 @@ HRESULT CDropHandler::CopyAnsiTextData(IDataObject *pDataObject,
 
 			GlobalUnlock(stg.hGlobal);
 		}
+
+		ReleaseStgMedium(&stg);
 	}
 
 	return hr;
@@ -707,6 +729,9 @@ HRESULT CDropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 
 			GlobalUnlock(stg.hGlobal);
 		}
+
+		/* Must release the storage medium. */
+		ReleaseStgMedium(&stg);
 	}
 
 	return hr;
@@ -1177,6 +1202,8 @@ BOOL CDropHandler::CheckItemLocations(int iDroppedItem)
 
 			GlobalUnlock(stg.hGlobal);
 		}
+
+		ReleaseStgMedium(&stg);
 	}
 
 	return bOnSameDrive;

@@ -204,6 +204,8 @@ void CContainer::GetSourceFileName(IDataObject *pDataObject)
 
 			GlobalUnlock(stg.hGlobal);
 		}
+
+		ReleaseStgMedium(&stg);
 	}
 }
 

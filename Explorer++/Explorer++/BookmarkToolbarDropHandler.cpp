@@ -67,8 +67,6 @@ DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect)
 	that is needed for this drag operation. */
 	hr = pDataObject->GetData(&ftc,&stg);
 
-	/* DON'T use SUCCEEDED (QueryGetData() will return S_FALSE on
-	failure). */
 	if(hr == S_OK)
 	{
 		bAllFolders = TRUE;
@@ -96,6 +94,8 @@ DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect)
 
 			GlobalUnlock(stg.hGlobal);
 		}
+
+		ReleaseStgMedium(&stg);
 	}
 
 	if(bAllFolders)
@@ -259,6 +259,8 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 
 			GlobalUnlock(stg.hGlobal);
 		}
+
+		ReleaseStgMedium(&stg);
 	}
 
 	/* Rebuild the bookmarks menu. */

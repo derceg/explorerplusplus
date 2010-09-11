@@ -805,7 +805,7 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 							}
 							else
 							{
-								dwExtendedStyle &= ~dwExtendedStyle;
+								dwExtendedStyle &= ~LVS_EX_CHECKBOXES;
 							}
 
 							ListView_SetExtendedListViewStyle(m_hListView[(int)tcItem.lParam],
