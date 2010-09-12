@@ -38,7 +38,6 @@ typedef struct
 	HWND hListView;
 
 	BOOL bSearchSubFolders;
-	BOOL bSearchADS;
 } SearchInfo_t;
 
 typedef struct
@@ -899,8 +898,6 @@ void CContainer::OnSearch(HWND hDlg)
 			psi->hDlg = hDlg;
 			psi->hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
 			psi->bSearchSubFolders = IsDlgButtonChecked(hDlg,IDC_CHECK_SEARCHSUBFOLDERS) ==
-				BST_CHECKED;
-			psi->bSearchADS = IsDlgButtonChecked(hDlg,IDC_CHECK_SEARCHADS) ==
 				BST_CHECKED;
 
 			psi->dwAttributes = 0;
