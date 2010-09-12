@@ -1,5 +1,5 @@
-Explorer++ 1.2 Beta 64-bit
---------------------------
+Explorer++ 1.2 64-bit
+---------------------
 
 Copyright (c) 2005-2010 David Erceg
 
