@@ -1,7 +1,7 @@
 Explorer++ Version History
 --------------------------
 
-Current version: 1.2 Beta
+Current version: 1.2
 
 Note:
  - On the 64-bit version of Windows, the control
@@ -10,13 +10,8 @@ Note:
    a 64-bit version of Windows, it is recommended
    that you use the 64-bit version of Explorer++.
 
-Known limitations:
- - Not all extended sort modes have been implemented
-   yet (such as sorting by printer status in the
-   Printers folder).
-
-Version 1.2 Beta (30/08/10)
----------------------------
+Version 1.2 (13/09/10)
+----------------------
 New features:
 - Taskbar thumbnails are now shown for each
   tab in Windows 7 (this can be turned on/off by toggling
@@ -31,19 +26,18 @@ New features:
   The file will be given a name of the form:
   Clipboard Image ([datetime]).bmp.
   This also applies to drag and drop.
+- The contents of the address bar can now be dragged and dropped.
 - Large toolbar icons added.
 - Files can now be dropped onto existing application
   toolbar buttons. This will open the dropped files in
   that application.
 - 'Automatically synchronize treeview with main pane' option
   added; this setting controls whether or not the treeview
-  will automatically stay in sync with the listview while
+  will automatically stay in sync with the listview whilst
   browsing.
 - 'Automatically expand nodes on selection' option added;
   if this setting is enabled treeview nodes will automatically
   expand when they are selected.
-- Listview groups can now be collapsed (Vista and later).
-- The contents of the address bar can now be dragged and dropped.
 - Shift+Mousewheel down and shift+mousewheel up can now
   be used to browse backwards and forwards, respectively.
 - The tab bar can now be hidden when there is only one
@@ -51,6 +45,7 @@ New features:
 - The tab bar can now be shown at the bottom of the listview.
 - A navigation sound is now played when entering a folder.
 - The current folder is now selected when navigating up.
+- Listview groups can now be collapsed (Vista and later).
 - Listview checkboxes can now be turned on by selecting
   'Use check boxes to select items' in the Options dialog.
 - Closing the last tab will now close the main window
@@ -67,13 +62,16 @@ New features:
   are all now valid address bar shortcuts.
 
 Bug fixes:
-- Main window now obeys startup position information
-  (e.g. minimized/maximized, etc).
 - Several dialogs weren't closing when Escape was pressed. Fixed.
-- Fixed hide extensions bug.
-- Fixed double click navigation bug.
+- Fixed 'Copy Universal File Paths' bug.
+- Previously, if 'Hide file extensions' was checked, the display
+  names of both files and folders would be altered. Fixed so that
+  only files names are altered.
+- When 'Single-click to open an item' was selected, navigation up
+  would occur on a single click, instead of a double click. Fixed.
 - Fixed directory modification bug.
-- Fixed set file attributes dialog bug.
+- Fixed set file attributes dialog bug (file dates weren't been
+  saved correctly).
 - Fixed treeview rename bug (child items not updated).
 - Fixed treeview sort bug.
 - Fixed toolbar positioning bug.
@@ -87,10 +85,11 @@ Misc:
   exits.
 - Search dialog now turns patterns of the form '???' into
   '*???*' before searching.
+- Main window now obeys startup position information
+  (e.g. minimized/maximized, etc).
 - Wildcard select/deselect is now case insensitive.
 - Can now scroll listview/treeview, even when it does not
   have focus.
-- Fixed 'Copy Universal File Paths' bug.
 - The options dialog is now modeless.
 - Handle zip files set to false by default.
 
@@ -127,7 +126,7 @@ New features:
    the drives toolbar in a new tab.
 
 Bug fixes:
- - All items in the treeview are now sorted corerctly.
+ - All items in the treeview are now sorted correctly.
  - Icons for the treeview are now gathered in a
    background thread.
  - Icon overlays are now shown in the treeview.
@@ -209,7 +208,7 @@ New features:
  - In rename mode, F2 will now cycle between selecting an
    items filename, extension and filename and extension.
  - Ctrl+1...8 will now select the specified tab (between the
-   first and eigth tab).
+   first and eighth tab).
  - Ctrl+9 will now select the last tab.
  - In rename mode, tab will now select the next item
    and place it into rename mode.
@@ -283,7 +282,7 @@ Misc:
    have enough room to be shown.
  - Columns (in details view) are no longer resized
    automatically when changing folders or refreshing.
- - Seperate 'Group By' menu added, as appears in Vista
+ - Separate 'Group By' menu added, as appears in Vista
    onwards.
  - If a files name is only partially shown within the listview,
    it will be added to the files infotip.
@@ -370,7 +369,7 @@ Bug fixes:
  - Fixed address bar path issue.
  - Fixed thumbnail image positioning error.
  - Fixed back/forward menu bug.
- - Fied directory monitoring bug.
+ - Fixed directory monitoring bug.
  - In details mode, if the first column was removed and
    then added again, the other columns would not be
    shifted correctly.
@@ -572,7 +571,7 @@ New features:
    If neither of these options are available,
    Explorer++ will switch to using its
    internal defaults.
-   To save to the config file intially, check the
+   To save to the config file initially, check the
    'Save preferences to XML file' in the 'Options'
    dialog.
  - Significantly upgraded bookmarks system.
@@ -595,7 +594,7 @@ New features:
    tab.
  - Folder shortcuts are now opened within Explorer++.
  - When in thumbnails view, image thumbnails
-   are now gathered indepently of the main
+   are now gathered independently of the main
    thread.
  - Added 'Open Parent in New Tab' menu item to tab
    context menu.
@@ -614,7 +613,7 @@ New features:
    adapter status.
 
 Bug fixes:
- - All columns could previously be deslected,
+ - All columns could previously be deselected,
    causing the program to crash. Fixed.
  - Fixed several small memory leaks that
    occurred in thumbnails view.
@@ -809,7 +808,7 @@ New features:
  - Added a main toolbar context menu.
  - The main menus as well as the main toolbar context
    menu are now owner drawn. Various items on the main
-   menus now have pictures shown along side the menu
+   menus now have pictures shown alongside the menu
    text.
  - More main toolbar buttons added.
 
@@ -896,7 +895,7 @@ Bug fixes:
 29/6/08
 New features:
  - Virtual folders can now be opened from the command
-   line simply by suppyling their name:
+   line simply by supplying their name:
    e.g. explorer++.exe "control panel"
    will open the Control Panel.
 
