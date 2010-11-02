@@ -18,7 +18,7 @@
 
 
 
-void CContainer::CreateTabBacking(void)
+void Explorerplusplus::CreateTabBacking(void)
 {
 	m_hTabBacking = CreateWindow(WC_STATIC,EMPTY_STRING,
 	WS_VISIBLE|WS_CHILD|WS_CLIPSIBLINGS|SS_NOTIFY,
@@ -30,12 +30,12 @@ void CContainer::CreateTabBacking(void)
 LRESULT CALLBACK TabBackingProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	CContainer *pContainer = (CContainer *)dwRefData;
+	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->TabBackingProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::TabBackingProc(HWND hTabCtrl,
+LRESULT CALLBACK Explorerplusplus::TabBackingProc(HWND hTabCtrl,
 UINT msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(msg)

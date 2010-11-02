@@ -25,12 +25,12 @@ HTREEITEM	g_NewSelectionItem;
 LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	CContainer *pContainer = (CContainer *)dwRefData;
+	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->TreeViewSubclass(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::TreeViewSubclass(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK Explorerplusplus::TreeViewSubclass(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
@@ -94,7 +94,7 @@ WPARAM wParam,LPARAM lParam)
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
-void CContainer::OnTreeViewFileRename(void)
+void Explorerplusplus::OnTreeViewFileRename(void)
 {
 	HTREEITEM hItem;
 
@@ -103,7 +103,7 @@ void CContainer::OnTreeViewFileRename(void)
 	TreeView_EditLabel(m_hTreeView,hItem);
 }
 
-void CContainer::OnTreeViewFileDelete(BOOL bPermanent)
+void Explorerplusplus::OnTreeViewFileDelete(BOOL bPermanent)
 {
 	HTREEITEM		hItem;
 	LPITEMIDLIST	pidl = NULL;
@@ -127,7 +127,7 @@ void CContainer::OnTreeViewFileDelete(BOOL bPermanent)
 	}
 }
 
-void CContainer::OnTreeViewFileDeletePermanent(void)
+void Explorerplusplus::OnTreeViewFileDeletePermanent(void)
 {
 	HTREEITEM hItem;
 	LPITEMIDLIST pidl	= NULL;
@@ -146,7 +146,7 @@ void CContainer::OnTreeViewFileDeletePermanent(void)
 	CoTaskMemFree(pidl);
 }
 
-void CContainer::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 {
 	LPITEMIDLIST pidl = NULL;
 	POINT *ppt = NULL;
@@ -208,7 +208,7 @@ void CContainer::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
  * Shows the properties dialog for the currently
  * selected treeview item.
  */
-void CContainer::OnTreeViewShowFileProperties(void)
+void Explorerplusplus::OnTreeViewShowFileProperties(void)
 {
 	LPITEMIDLIST	pidlDirectory = NULL;
 	HTREEITEM		hItem;
@@ -223,7 +223,7 @@ void CContainer::OnTreeViewShowFileProperties(void)
 	CoTaskMemFree(pidlDirectory);
 }
 
-BOOL CContainer::OnTreeViewItemExpanding(LPARAM lParam)
+BOOL Explorerplusplus::OnTreeViewItemExpanding(LPARAM lParam)
 {
 	NMTREEVIEW *pnmtv;
 	TVITEM *tvItem;
@@ -281,7 +281,7 @@ BOOL CContainer::OnTreeViewItemExpanding(LPARAM lParam)
 	return FALSE;
 }
 
-void CContainer::OnTreeViewCopyItemPath(void)
+void Explorerplusplus::OnTreeViewCopyItemPath(void)
 {
 	HTREEITEM		hItem;
 	LPITEMIDLIST	pidl;
@@ -301,7 +301,7 @@ void CContainer::OnTreeViewCopyItemPath(void)
 	}
 }
 
-void CContainer::OnTreeViewCopyUniversalPaths(void)
+void Explorerplusplus::OnTreeViewCopyUniversalPaths(void)
 {
 	HTREEITEM		hItem;
 	LPITEMIDLIST	pidl;
@@ -331,7 +331,7 @@ void CContainer::OnTreeViewCopyUniversalPaths(void)
 	}
 }
 
-void CContainer::OnTreeViewCopy(BOOL bCopy)
+void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 {
 	IDataObject		*pClipboardDataObject = NULL;
 	HTREEITEM		hItem;
@@ -382,7 +382,7 @@ void CContainer::OnTreeViewCopy(BOOL bCopy)
 	}
 }
 
-void CContainer::OnTreeViewHolderWindowTimer(void)
+void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 {
 	LPITEMIDLIST	pidlDirectory = NULL;
 	LPITEMIDLIST	pidlCurrentDirectory = NULL;
@@ -407,7 +407,7 @@ void CContainer::OnTreeViewHolderWindowTimer(void)
 	KillTimer(m_hHolder,0);
 }
 
-void CContainer::OnTreeViewSelChanged(LPARAM lParam)
+void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 {
 	NMTREEVIEW	*pnmtv = NULL;
 	TVITEM		*tvItem = NULL;
@@ -444,7 +444,7 @@ void CContainer::OnTreeViewSelChanged(LPARAM lParam)
 	}
 }
 
-int CContainer::OnTreeViewBeginLabelEdit(LPARAM lParam)
+int Explorerplusplus::OnTreeViewBeginLabelEdit(LPARAM lParam)
 {
 	NMTVDISPINFO *pdi	= NULL;
 	LPITEMIDLIST pidl	= NULL;
@@ -460,7 +460,7 @@ int CContainer::OnTreeViewBeginLabelEdit(LPARAM lParam)
 	return FALSE;
 }
 
-int CContainer::OnTreeViewEndLabelEdit(LPARAM lParam)
+int Explorerplusplus::OnTreeViewEndLabelEdit(LPARAM lParam)
 {
 	NMTVDISPINFO	*pdi = NULL;
 	TCHAR			NewFileName[MAX_PATH];
@@ -488,7 +488,7 @@ int CContainer::OnTreeViewEndLabelEdit(LPARAM lParam)
 	return TRUE;
 }
 
-LRESULT CContainer::OnTreeViewKeyDown(LPARAM lParam)
+LRESULT Explorerplusplus::OnTreeViewKeyDown(LPARAM lParam)
 {
 	NMTVKEYDOWN	*nmtvkd = NULL;
 
@@ -537,12 +537,12 @@ LRESULT CContainer::OnTreeViewKeyDown(LPARAM lParam)
 LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	CContainer *pContainer = (CContainer *)dwRefData;
+	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->TreeViewHolderProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::TreeViewHolderProc(HWND hwnd,
+LRESULT CALLBACK Explorerplusplus::TreeViewHolderProc(HWND hwnd,
 UINT msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(msg)
@@ -563,7 +563,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 	return DefSubclassProc(hwnd,msg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::TreeViewHolderWindowNotifyHandler(LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(LPARAM lParam)
 {
 	switch(((LPNMHDR)lParam)->code)
 	{
@@ -629,7 +629,7 @@ LRESULT CALLBACK CContainer::TreeViewHolderWindowNotifyHandler(LPARAM lParam)
 	return 0;
 }
 
-LRESULT CALLBACK CContainer::TreeViewHolderWindowCommandHandler(WPARAM wParam)
+LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowCommandHandler(WPARAM wParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -641,7 +641,7 @@ LRESULT CALLBACK CContainer::TreeViewHolderWindowCommandHandler(WPARAM wParam)
 	return 1;
 }
 
-void CContainer::OnTreeViewSetFileAttributes(void)
+void Explorerplusplus::OnTreeViewSetFileAttributes(void)
 {
 	SetFileAttributesInfo_t sfai;
 	HTREEITEM hItem;
@@ -670,7 +670,7 @@ void CContainer::OnTreeViewSetFileAttributes(void)
 	}
 }
 
-void CContainer::OnTreeViewPaste(void)
+void Explorerplusplus::OnTreeViewPaste(void)
 {
 	HTREEITEM hItem;
 	LPITEMIDLIST pidl = NULL;

@@ -25,7 +25,7 @@ LRESULT	(CALLBACK *DefaultListViewProc)(HWND,UINT,WPARAM,LPARAM);
 /*
  * Creates and then subclasses a new listview control.
  */
-HWND CContainer::CreateAndSubclassListView(HWND hParent,DWORD Style)
+HWND Explorerplusplus::CreateAndSubclassListView(HWND hParent,DWORD Style)
 {
 	HWND hListView;
 	DWORD dwExtendedStyle;
@@ -65,17 +65,17 @@ LRESULT CALLBACK ListViewSubclassProcStub(HWND ListView,
 UINT msg,WPARAM wParam,LPARAM lParam)
 {
 	ListViewInfo_t	*plvi = NULL;
-	CContainer		*pContainer = NULL;
+	Explorerplusplus		*pContainer = NULL;
 
 	plvi = (ListViewInfo_t *)GetWindowLongPtr(ListView,GWLP_USERDATA);
 
-	pContainer = (CContainer *)plvi->pContainer;
+	pContainer = (Explorerplusplus *)plvi->pContainer;
 
 	/* Jump across to the member window function (will handle all requests). */
 	return pContainer->ListViewSubclassProc(ListView,msg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::ListViewSubclassProc(HWND ListView,
+LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView,
 UINT msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(msg)
@@ -308,7 +308,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 	return CallWindowProc(DefaultListViewProc,ListView,msg,wParam,lParam);
 }
 
-LRESULT CContainer::OnListViewLButtonDown(WPARAM wParam,LPARAM lParam)
+LRESULT Explorerplusplus::OnListViewLButtonDown(WPARAM wParam,LPARAM lParam)
 {
 	LV_HITTESTINFO HitTestInfo;
 
@@ -331,7 +331,7 @@ LRESULT CContainer::OnListViewLButtonDown(WPARAM wParam,LPARAM lParam)
 	return CallWindowProc(DefaultListViewProc,m_hActiveListView,WM_LBUTTONDOWN,wParam,lParam);
 }
 
-void CContainer::OnListViewMButtonDown(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnListViewMButtonDown(WPARAM wParam,LPARAM lParam)
 {
 	LV_HITTESTINFO ht;
 
@@ -352,7 +352,7 @@ void CContainer::OnListViewMButtonDown(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CContainer::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
 {
 	LV_HITTESTINFO	ht;
 
@@ -418,7 +418,7 @@ void CContainer::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-LRESULT CContainer::OnListViewKeyDown(LPARAM lParam)
+LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 {
 	LV_KEYDOWN	*lv_key = NULL;
 
@@ -524,7 +524,7 @@ LRESULT CContainer::OnListViewKeyDown(LPARAM lParam)
 	return 0;
 }
 
-void CContainer::OnListViewItemChanged(LPARAM lParam)
+void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 {
 	NMLISTVIEW	*ItemChanged = NULL;
 	int			iObjectIndex;
@@ -628,7 +628,7 @@ void CContainer::OnListViewItemChanged(LPARAM lParam)
 	HandleToolbarItemStates();
 }
 
-int CContainer::DetermineListViewObjectIndex(HWND hListView)
+int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
 	ListViewInfo_t	*plvi = NULL;
 
@@ -644,12 +644,12 @@ int CContainer::DetermineListViewObjectIndex(HWND hListView)
 LRESULT CALLBACK ListViewEditProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	CContainer *pContainer = (CContainer *)dwRefData;
+	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->ListViewEditProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -793,7 +793,7 @@ LRESULT CALLBACK CContainer::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,L
 	return DefSubclassProc(hwnd,Msg,wParam,lParam);
 }
 
-BOOL CContainer::OnListViewBeginLabelEdit(LPARAM lParam)
+BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 {
 	HWND			hEdit;
 	NMLVDISPINFO	*pnmdi = NULL;
@@ -822,7 +822,7 @@ BOOL CContainer::OnListViewBeginLabelEdit(LPARAM lParam)
 	return FALSE;
 }
 
-BOOL CContainer::OnListViewEndLabelEdit(LPARAM lParam)
+BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 {
 	NMLVDISPINFO	*pdi = NULL;
 	LVITEM			*pItem = NULL;
@@ -952,7 +952,7 @@ BOOL CContainer::OnListViewEndLabelEdit(LPARAM lParam)
  * Called when information (icon number, text) is required
  * for an item in one of the listview controls.
  */
-void CContainer::OnListViewGetDisplayInfo(LPARAM lParam)
+void Explorerplusplus::OnListViewGetDisplayInfo(LPARAM lParam)
 {
 	NMLVDISPINFO	*pnmv = NULL;
 	LVITEM			*plvItem = NULL;
@@ -988,7 +988,7 @@ void CContainer::OnListViewGetDisplayInfo(LPARAM lParam)
 /*
  * Called when a column is clicked in the main listview.
  */
-void CContainer::OnListViewColumnClick(LPARAM lParam)
+void Explorerplusplus::OnListViewColumnClick(LPARAM lParam)
 {
 	NMLISTVIEW *pnmlv = NULL;
 
@@ -1003,7 +1003,7 @@ void CContainer::OnListViewColumnClick(LPARAM lParam)
  * Called when info tip text is required for an item
  * in the main listview control.
  */
-void CContainer::OnListViewGetInfoTip(LPARAM lParam)
+void Explorerplusplus::OnListViewGetInfoTip(LPARAM lParam)
 {
 	LPNMLVGETINFOTIP	pGetInfoTip	= NULL;
 	TCHAR				szInfoTip[512];
@@ -1030,7 +1030,7 @@ void CContainer::OnListViewGetInfoTip(LPARAM lParam)
 	}
 }
 
-void CContainer::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
+void Explorerplusplus::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 {
 	HRESULT	hr;
 
@@ -1072,7 +1072,7 @@ void CContainer::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 	}
 }
 
-void CContainer::OnListViewRClick(HWND hParent,POINT *pCursorPos)
+void Explorerplusplus::OnListViewRClick(HWND hParent,POINT *pCursorPos)
 {
 	POINT			MousePos;
 	HMENU			hMenu;
@@ -1317,7 +1317,7 @@ void CContainer::OnListViewRClick(HWND hParent,POINT *pCursorPos)
 	}
 }
 
-void CContainer::OnListViewHeaderRClick(POINT *pCursorPos)
+void Explorerplusplus::OnListViewHeaderRClick(POINT *pCursorPos)
 {
 	HMENU						hHeaderPopupMenu;
 	HMENU						hMenu;
@@ -1380,7 +1380,7 @@ void CContainer::OnListViewHeaderRClick(POINT *pCursorPos)
 	DestroyMenu(hHeaderPopupMenu);
 }
 
-int CContainer::GetColumnHeaderMenuList(unsigned int **pHeaderList)
+int Explorerplusplus::GetColumnHeaderMenuList(unsigned int **pHeaderList)
 {
 	int nItems;
 
@@ -1423,7 +1423,7 @@ int CContainer::GetColumnHeaderMenuList(unsigned int **pHeaderList)
 	return nItems;
 }
 
-HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
+HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 {
 	IDropSource			*pDropSource = NULL;
 	IDragSourceHelper	*pDragSourceHelper = NULL;
@@ -1545,7 +1545,7 @@ HRESULT CContainer::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
 	return hr;
 }
 
-HRESULT CContainer::OnListViewFileDelete(BOOL bPermanent)
+HRESULT Explorerplusplus::OnListViewFileDelete(BOOL bPermanent)
 {
 	LPITEMIDLIST	*ppidl = NULL;
 	LPITEMIDLIST	pidlDirectory = NULL;
@@ -1598,7 +1598,7 @@ HRESULT CContainer::OnListViewFileDelete(BOOL bPermanent)
 	return hr;
 }
 
-void CContainer::OnListViewDoubleClick(NMHDR *nmhdr)
+void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 {
 	if(nmhdr->hwndFrom == m_hActiveListView)
 	{
@@ -1651,7 +1651,7 @@ void CContainer::OnListViewDoubleClick(NMHDR *nmhdr)
 	}
 }
 
-void CContainer::OnListViewFileRename(void)
+void Explorerplusplus::OnListViewFileRename(void)
 {
 	HWND	hEdit;
 	int		nSelected;
@@ -1680,7 +1680,7 @@ void CContainer::OnListViewFileRename(void)
 	}
 }
 
-void CContainer::OnListViewShowFileProperties(void)
+void Explorerplusplus::OnListViewShowFileProperties(void)
 {
 	LPITEMIDLIST	*ppidl = NULL;
 	LPITEMIDLIST	pidlDirectory = NULL;
@@ -1720,7 +1720,7 @@ void CContainer::OnListViewShowFileProperties(void)
 	free(ppidl);
 }
 
-void CContainer::OnListViewCopyItemPath(void)
+void Explorerplusplus::OnListViewCopyItemPath(void)
 {
 	IBufferManager	*pBufferManager = NULL;
 	TCHAR			FullFileName[MAX_PATH];
@@ -1758,7 +1758,7 @@ void CContainer::OnListViewCopyItemPath(void)
 	pBufferManager->Release();
 }
 
-void CContainer::OnListViewCopyUniversalPaths(void)
+void Explorerplusplus::OnListViewCopyUniversalPaths(void)
 {
 	IBufferManager	*pBufferManager = NULL;
 	TCHAR			FullFileName[MAX_PATH];
@@ -1808,7 +1808,7 @@ void CContainer::OnListViewCopyUniversalPaths(void)
 	pBufferManager->Release();
 }
 
-HRESULT CContainer::OnListViewCopy(BOOL bCopy)
+HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 {
 	IDataObject		*pClipboardDataObject = NULL;
 	int				iItem = -1;
@@ -1860,7 +1860,7 @@ HRESULT CContainer::OnListViewCopy(BOOL bCopy)
 	return hr;
 }
 
-void CContainer::OnListViewSetFileAttributes(void)
+void Explorerplusplus::OnListViewSetFileAttributes(void)
 {
 	SetFileAttributesInfo_t sfai;
 	WIN32_FIND_DATA *pwfd = NULL;
@@ -1891,7 +1891,7 @@ void CContainer::OnListViewSetFileAttributes(void)
 	}
 }
 
-void CContainer::OnListViewPaste(void)
+void Explorerplusplus::OnListViewPaste(void)
 {
 	IDataObject *pClipboardObject = NULL;
 	HRESULT hr;
@@ -1922,7 +1922,7 @@ void CContainer::OnListViewPaste(void)
 	}
 }
 
-void CContainer::OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt)
+void Explorerplusplus::OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt)
 {
 	if(m_pActiveShellBrowser->QueryNumSelected() == 0)
 	{
@@ -1930,7 +1930,7 @@ void CContainer::OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt)
 	}
 }
 
-void CContainer::BuildListViewFileSelectionList(HWND hListView,
+void Explorerplusplus::BuildListViewFileSelectionList(HWND hListView,
 	std::list<std::wstring> *pFileSelectionList)
 {
 	if(pFileSelectionList == NULL)

@@ -3,6 +3,7 @@
 
 #include <windows.h>
 
+BOOL LoadWindowPosition(WINDOWPLACEMENT *pwndpl);
 LONG SaveSettings(LPCTSTR);
 LONG LoadSettings(LPCTSTR);
 LONG SaveMRUDirs(LPCTSTR,TCHAR *);

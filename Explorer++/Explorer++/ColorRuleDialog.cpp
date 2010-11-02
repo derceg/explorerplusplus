@@ -24,13 +24,13 @@ BOOL g_bEditing;
 
 INT_PTR CALLBACK ColorRuleProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -38,7 +38,7 @@ INT_PTR CALLBACK ColorRuleProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lPar
 	return pContainer->ColorRuleProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::ColorRuleProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::ColorRuleProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -153,7 +153,7 @@ INT_PTR CALLBACK CContainer::ColorRuleProc(HWND hDlg,UINT Msg,WPARAM wParam,LPAR
 	return 0;
 }
 
-void CContainer::ColorRuleChooseNewColor(HWND hDlg)
+void Explorerplusplus::ColorRuleChooseNewColor(HWND hDlg)
 {
 	CHOOSECOLOR cc;
 	BOOL bRet;
@@ -183,12 +183,12 @@ void CContainer::ColorRuleChooseNewColor(HWND hDlg)
 LRESULT CALLBACK StaticColorProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	CContainer *pContainer = (CContainer *)dwRefData;
+	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->StaticColorProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{

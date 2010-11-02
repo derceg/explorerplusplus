@@ -33,7 +33,7 @@ UINT TabCtrlStyles			=	WS_VISIBLE|WS_CHILD|TCS_FOCUSNEVER|TCS_SINGLELINE|
 extern LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
 extern LRESULT	(CALLBACK *DefaultListViewProc)(HWND,UINT,WPARAM,LPARAM);
 
-void CContainer::InitializeTabMap(void)
+void Explorerplusplus::InitializeTabMap(void)
 {
 	int i = 0;
 
@@ -43,12 +43,12 @@ void CContainer::InitializeTabMap(void)
 	}
 }
 
-void CContainer::ReleaseTabId(int iTabId)
+void Explorerplusplus::ReleaseTabId(int iTabId)
 {
 	m_uTabMap[iTabId] = 0;
 }
 
-BOOL CContainer::CheckTabIdStatus(int iTabId)
+BOOL Explorerplusplus::CheckTabIdStatus(int iTabId)
 {
 	if(m_uTabMap[iTabId] == 0)
 		return FALSE;
@@ -56,7 +56,7 @@ BOOL CContainer::CheckTabIdStatus(int iTabId)
 	return TRUE;
 }
 
-int CContainer::GenerateUniqueTabId(void)
+int Explorerplusplus::GenerateUniqueTabId(void)
 {
 	BOOL	bFound = FALSE;
 	int		i = 0;
@@ -77,7 +77,7 @@ int CContainer::GenerateUniqueTabId(void)
 		return -1;
 }
 
-HRESULT CContainer::CreateNewTab(TCHAR *TabDirectory,
+HRESULT Explorerplusplus::CreateNewTab(TCHAR *TabDirectory,
 InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
@@ -109,7 +109,7 @@ int *pTabObjectIndex)
 
 /* Creates a new tab. If the settings argument is NULL,
 the global settings will be used. */
-HRESULT CContainer::CreateNewTab(LPITEMIDLIST pidlDirectory,
+HRESULT Explorerplusplus::CreateNewTab(LPITEMIDLIST pidlDirectory,
 InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
@@ -308,7 +308,7 @@ int *pTabObjectIndex)
 	return S_OK;
 }
 
-ATOM CContainer::RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirectory)
+ATOM Explorerplusplus::RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirectory)
 {
 	WNDCLASSEX wcex;
 
@@ -336,7 +336,7 @@ References:
 http://dotnet.dzone.com/news/windows-7-taskbar-tabbed
 http://channel9.msdn.com/learn/courses/Windows7/Taskbar/Win7TaskbarNative/Exercise-Experiment-with-the-New-Windows-7-Taskbar-Features/
 */
-void CContainer::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwitchToNewTab)
+void Explorerplusplus::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwitchToNewTab)
 {
 	HWND hTabProxy;
 	TabProxyInfo_t tpi;
@@ -414,7 +414,7 @@ void CContainer::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwit
 	}
 }
 
-void CContainer::RegisterTab(HWND hTabProxy,TCHAR *szDisplayName,BOOL bTabActive)
+void Explorerplusplus::RegisterTab(HWND hTabProxy,TCHAR *szDisplayName,BOOL bTabActive)
 {
 	/* Register and insert the tab into the current list of
 	taskbar thumbnails. */
@@ -450,7 +450,7 @@ LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lPa
 		return DefWindowProc(hwnd,Msg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,int iTabId)
+LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,int iTabId)
 {
 	switch(Msg)
 	{
@@ -678,7 +678,7 @@ LRESULT CALLBACK CContainer::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 	return DefWindowProc(hwnd,Msg,wParam,lParam);
 }
 
-HBITMAP CContainer::CaptureTabScreenshot(int iTabId)
+HBITMAP Explorerplusplus::CaptureTabScreenshot(int iTabId)
 {
 	HDC hdc;
 	HDC hdcSrc;
@@ -779,7 +779,7 @@ HBITMAP CContainer::CaptureTabScreenshot(int iTabId)
 }
 
 /* It is up to the caller to delete the bitmap returned by this method. */
-void CContainer::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi)
+void Explorerplusplus::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi)
 {
 	HDC hdcTab;
 	HDC hdcTabSrc;
@@ -843,7 +843,7 @@ void CContainer::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi)
 	ReleaseDC(hTab,hdcTab);
 }
 
-void CContainer::OnTabChangeInternal(BOOL bSetFocus)
+void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 {
 	TCITEM tcItem;
 
@@ -916,7 +916,7 @@ void CContainer::OnTabChangeInternal(BOOL bSetFocus)
 	}
 }
 
-void CContainer::RefreshAllTabs(void)
+void Explorerplusplus::RefreshAllTabs(void)
 {
 	int i = 0;
 	int NumTabs;
@@ -935,7 +935,7 @@ void CContainer::RefreshAllTabs(void)
 	}
 }
 
-void CContainer::CloseOtherTabs(int iTab)
+void Explorerplusplus::CloseOtherTabs(int iTab)
 {
 	int nTabs;
 	int i = 0;
@@ -953,7 +953,7 @@ void CContainer::CloseOtherTabs(int iTab)
 	}
 }
 
-void CContainer::SelectAdjacentTab(BOOL bNextTab)
+void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 {
 	int nTabs;
 
@@ -983,12 +983,12 @@ void CContainer::SelectAdjacentTab(BOOL bNextTab)
 	OnTabChangeInternal(TRUE);
 }
 
-void CContainer::OnSelectTab(int iTab)
+void Explorerplusplus::OnSelectTab(int iTab)
 {
 	return OnSelectTab(iTab,TRUE);
 }
 
-void CContainer::OnSelectTab(int iTab,BOOL bSetFocus)
+void Explorerplusplus::OnSelectTab(int iTab,BOOL bSetFocus)
 {
 	int nTabs;
 
@@ -1011,7 +1011,7 @@ void CContainer::OnSelectTab(int iTab,BOOL bSetFocus)
 	OnTabChangeInternal(bSetFocus);
 }
 
-HRESULT CContainer::OnCloseTab(void)
+HRESULT Explorerplusplus::OnCloseTab(void)
 {
 	int iCurrentTab;
 
@@ -1020,7 +1020,7 @@ HRESULT CContainer::OnCloseTab(void)
 	return CloseTab(iCurrentTab);
 }
 
-HRESULT CContainer::CloseTab(int TabIndex)
+HRESULT Explorerplusplus::CloseTab(int TabIndex)
 {
 	TCITEM	tcItem;
 	int		NumTabs;
@@ -1160,7 +1160,7 @@ HRESULT CContainer::CloseTab(int TabIndex)
 	return S_OK;
 }
 
-void CContainer::RefreshTab(int iTabId)
+void Explorerplusplus::RefreshTab(int iTabId)
 {
 	LPITEMIDLIST pidlDirectory = NULL;
 	HRESULT hr;
@@ -1176,7 +1176,7 @@ void CContainer::RefreshTab(int iTabId)
 	CoTaskMemFree(pidlDirectory);
 }
 
-void CContainer::OnTabSelectionChange(void)
+void Explorerplusplus::OnTabSelectionChange(void)
 {
 	m_iTabSelectedItem = TabCtrl_GetCurSel(m_hTabCtrl);
 
@@ -1186,12 +1186,12 @@ void CContainer::OnTabSelectionChange(void)
 LRESULT CALLBACK TabSubclassProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	CContainer *pContainer = (CContainer *)dwRefData;
+	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->TabSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(msg)
 	{
@@ -1273,7 +1273,7 @@ LRESULT CALLBACK CContainer::TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LP
 	return DefSubclassProc(hTab,msg,wParam,lParam);
 }
 
-void CContainer::OnInitTabMenu(WPARAM wParam)
+void Explorerplusplus::OnInitTabMenu(WPARAM wParam)
 {
 	HMENU hTabMenu;
 	TCITEM tcItem;
@@ -1289,7 +1289,7 @@ void CContainer::OnInitTabMenu(WPARAM wParam)
 		!(m_TabInfo[(int)tcItem.lParam].bLocked || m_TabInfo[(int)tcItem.lParam].bAddressLocked));
 }
 
-void CContainer::OnTabCtrlLButtonDown(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnTabCtrlLButtonDown(WPARAM wParam,LPARAM lParam)
 {
 	TCHITTESTINFO info;
 	int ItemNum;
@@ -1314,7 +1314,7 @@ void CContainer::OnTabCtrlLButtonDown(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CContainer::OnTabCtrlLButtonUp(void)
+void Explorerplusplus::OnTabCtrlLButtonUp(void)
 {
 	if(GetCapture() == m_hTabCtrl)
 		ReleaseCapture();
@@ -1322,7 +1322,7 @@ void CContainer::OnTabCtrlLButtonUp(void)
 	m_bTabBeenDragged = FALSE;
 }
 
-void CContainer::OnTabCtrlMouseMove(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnTabCtrlMouseMove(WPARAM wParam,LPARAM lParam)
 {
 	/* Is a tab currently been dragged? */
 	if(m_bTabBeenDragged)
@@ -1388,7 +1388,7 @@ void CContainer::OnTabCtrlMouseMove(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CContainer::OnTabCtrlRButtonUp(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnTabCtrlRButtonUp(WPARAM wParam,LPARAM lParam)
 {
 	TCHITTESTINFO tcHitTest;
 	POINT ptCursor;
@@ -1417,7 +1417,7 @@ void CContainer::OnTabCtrlRButtonUp(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CContainer::ProcessTabCommand(UINT uMenuID,int iTabHit)
+void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 {
 	switch(uMenuID)
 	{
@@ -1488,7 +1488,7 @@ void CContainer::ProcessTabCommand(UINT uMenuID,int iTabHit)
 	}
 }
 
-void CContainer::InitializeTabs(void)
+void Explorerplusplus::InitializeTabs(void)
 {
 	HIMAGELIST	himlSmall;
 	TCHAR		szTabCloseTip[64];
@@ -1531,7 +1531,7 @@ void CContainer::InitializeTabs(void)
 	m_hTabWindowToolbar	= CreateTabToolbar(m_hTabBacking,TABTOOLBAR_CLOSE,szTabCloseTip);
 }
 
-void CContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
+void Explorerplusplus::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
 	HIMAGELIST himlTemp;
 	HBITMAP hBitmap;
@@ -1551,7 +1551,7 @@ void CContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 	ImageList_Destroy(himlTemp);
 }
 
-void CContainer::InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId)
+void Explorerplusplus::InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId)
 {
 	TCITEM		tcItem;
 	TCHAR		szTabText[MAX_PATH];
@@ -1595,7 +1595,7 @@ void CContainer::InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,int iT
 	}
 }
 
-void CContainer::OnDuplicateTab(int iTab)
+void Explorerplusplus::OnDuplicateTab(int iTab)
 {
 	TCITEM tcItem;
 
@@ -1605,7 +1605,7 @@ void CContainer::OnDuplicateTab(int iTab)
 	DuplicateTab((int)tcItem.lParam);
 }
 
-void CContainer::OnLockTab(int iTab)
+void Explorerplusplus::OnLockTab(int iTab)
 {
 	TCITEM tcItem;
 
@@ -1615,7 +1615,7 @@ void CContainer::OnLockTab(int iTab)
 	OnLockTabInternal(iTab,(int)tcItem.lParam);
 }
 
-void CContainer::OnLockTabInternal(int iTab,int iTabId)
+void Explorerplusplus::OnLockTabInternal(int iTab,int iTabId)
 {
 	m_TabInfo[iTabId].bLocked = !m_TabInfo[iTabId].bLocked;
 
@@ -1635,7 +1635,7 @@ void CContainer::OnLockTabInternal(int iTab,int iTabId)
 		HandleTabToolbarItemStates();
 }
 
-void CContainer::OnLockTabAndAddress(int iTab)
+void Explorerplusplus::OnLockTabAndAddress(int iTab)
 {
 	TCITEM tcItem;
 
@@ -1658,7 +1658,7 @@ void CContainer::OnLockTabAndAddress(int iTab)
 		HandleTabToolbarItemStates();
 }
 
-void CContainer::HandleTabToolbarItemStates(void)
+void Explorerplusplus::HandleTabToolbarItemStates(void)
 {
 	int nTabs;
 
@@ -1678,7 +1678,7 @@ void CContainer::HandleTabToolbarItemStates(void)
 	}
 }
 
-BOOL CContainer::OnMouseWheel(WPARAM wParam,LPARAM lParam)
+BOOL Explorerplusplus::OnMouseWheel(WPARAM wParam,LPARAM lParam)
 {
 	HWND hUpDown;
 	RECT rc;
@@ -1805,7 +1805,7 @@ BOOL CContainer::OnMouseWheel(WPARAM wParam,LPARAM lParam)
 	return bInRect;
 }
 
-void CContainer::DuplicateTab(int iTabInternal)
+void Explorerplusplus::DuplicateTab(int iTabInternal)
 {
 	TCHAR szTabDirectory[MAX_PATH];
 
@@ -1815,7 +1815,7 @@ void CContainer::DuplicateTab(int iTabInternal)
 	BrowseFolder(szTabDirectory,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
 }
 
-void CContainer::SetTabProxyIcon(int iTabId,HICON hIcon)
+void Explorerplusplus::SetTabProxyIcon(int iTabId,HICON hIcon)
 {
 	list<TabProxyInfo_t>::iterator itr;
 

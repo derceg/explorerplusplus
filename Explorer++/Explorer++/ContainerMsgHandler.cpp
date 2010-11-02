@@ -34,8 +34,6 @@ DWORD WINAPI Thread_IconFinder(LPVOID pParam);
 void CALLBACK IconThreadInitialization(ULONG_PTR dwParam);
 void CALLBACK QuitIconAPC(ULONG_PTR dwParam);
 
-extern int g_nCmdShow;
-
 DWORD WINAPI Thread_IconFinder(LPVOID pParam)
 {
 	/* OLE initialization is no longer done from within
@@ -86,7 +84,7 @@ void CALLBACK QuitIconAPC(ULONG_PTR dwParam)
  * initial settings must be in place before
  * this.
  */
-void CContainer::OnWindowCreate(void)
+void Explorerplusplus::OnWindowCreate(void)
 {
 	ILoadSave *pLoadSave = NULL;
 
@@ -213,7 +211,7 @@ void CContainer::OnWindowCreate(void)
 	SetFocus(m_hActiveListView);
 }
 
-void CContainer::TestConfigFile(void)
+void Explorerplusplus::TestConfigFile(void)
 {
 	m_bLoadSettingsFromXML = FALSE;
 
@@ -247,11 +245,8 @@ BOOL TestConfigFileInternal(void)
 	return bLoadSettingsFromXML;
 }
 
-void CContainer::LoadAllSettings(ILoadSave **pLoadSave)
+void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 {
-	LONG				res;
-	InitialWindowPos_t	iwp;
-
 	/* Tests for the existence of the configuration
 	file. If the file is present, a flag is set
 	indicating that the config file should be used
@@ -275,27 +270,6 @@ void CContainer::LoadAllSettings(ILoadSave **pLoadSave)
 		*pLoadSave = new CLoadSaveRegistry(this);
 	}
 
-	int	iScreenWidth;
-	int	iScreenHeight;
-	int	iWidth;
-	int	iHeight;
-
-	iScreenWidth	= GetSystemMetrics(SM_CXSCREEN);
-	iScreenHeight	= GetSystemMetrics(SM_CYSCREEN);
-
-	iwp.rcNormalPosition.left	= (LONG)(DEFAULT_WINDOWPOS_LEFT_PERCENTAGE * iScreenWidth);
-	iwp.rcNormalPosition.top	= (LONG)(DEFAULT_WINDOWPOS_TOP_PERCENTAGE * iScreenHeight);
-	iWidth						= (LONG)(DEFAULT_WINDOWPOS_WIDTH_PERCENTAGE * iScreenWidth);
-	iHeight						= (LONG)(DEFAULT_WINDOWPOS_HEIGHT_PERCENTAGE * iScreenHeight);
-
-	iwp.rcNormalPosition.right = iwp.rcNormalPosition.left + iWidth;
-	iwp.rcNormalPosition.bottom = iwp.rcNormalPosition.top + iHeight;
-
-	iwp.bMaximized = FALSE;
-
-	res = (*pLoadSave)->LoadWindowPosition(&iwp);
-	VerifyAndSetWindowPosition(&iwp);
-
 	(*pLoadSave)->LoadBookmarks();
 	(*pLoadSave)->LoadFilters();
 	(*pLoadSave)->LoadGenericSettings();
@@ -313,7 +287,7 @@ void CContainer::LoadAllSettings(ILoadSave **pLoadSave)
  * on user preferences and system language.
  * The default language is English.
  */
-void CContainer::SetLanguageModule(void)
+void Explorerplusplus::SetLanguageModule(void)
 {
 	HANDLE			hFindFile;
 	WIN32_FIND_DATA	wfd;
@@ -421,7 +395,7 @@ void CContainer::SetLanguageModule(void)
 	}
 }
 
-void CContainer::SetMenuOwnerDraw(HMENU hMenu)
+void Explorerplusplus::SetMenuOwnerDraw(HMENU hMenu)
 {
 	int nTopLevelMenus;
 
@@ -433,7 +407,7 @@ void CContainer::SetMenuOwnerDraw(HMENU hMenu)
 /*
  * Marks the specified menu as owner drawn.
  */
-void CContainer::SetMenuOwnerDrawInternal(HMENU hMenu,
+void Explorerplusplus::SetMenuOwnerDrawInternal(HMENU hMenu,
 int nMenus)
 {
 	MENUITEMINFO		mi;
@@ -452,7 +426,7 @@ int nMenus)
 	}
 }
 
-void CContainer::SetMenuItemOwnerDrawn(HMENU hMenu,int iItem)
+void Explorerplusplus::SetMenuItemOwnerDrawn(HMENU hMenu,int iItem)
 {
 	MENUITEMINFO		mi;
 	CustomMenuInfo_t	*pcmi = NULL;
@@ -484,7 +458,7 @@ void CContainer::SetMenuItemOwnerDrawn(HMENU hMenu,int iItem)
  * owner drawn (so that the owner drawn menu
  * structure is in place).
  */
-void CContainer::SetMenuItemBitmap(HMENU hMenu,UINT ItemID,int iBitmap)
+void Explorerplusplus::SetMenuItemBitmap(HMENU hMenu,UINT ItemID,int iBitmap)
 {
 	MENUITEMINFO		mi;
 	CustomMenuInfo_t	*pcmi = NULL;
@@ -509,7 +483,7 @@ void CContainer::SetMenuItemBitmap(HMENU hMenu,UINT ItemID,int iBitmap)
  * that folder is opened in a new tab, else
  * the default directory is opened.
  */
-void CContainer::OnNewTab(void)
+void Explorerplusplus::OnNewTab(void)
 {
 	int		iSelected;
 	HRESULT	hr;
@@ -549,7 +523,7 @@ void CContainer::OnNewTab(void)
  * Called when a key is pressed in the main combobox
  * (i.e. the address bar).
  */
-void CContainer::OnComboBoxKeyDown(WPARAM wParam)
+void Explorerplusplus::OnComboBoxKeyDown(WPARAM wParam)
 {
 	switch(wParam)
 	{
@@ -563,7 +537,7 @@ void CContainer::OnComboBoxKeyDown(WPARAM wParam)
  * Navigates to the folder specified by the incoming
  * csidl.
  */
-void CContainer::GotoFolder(int FolderCSIDL)
+void Explorerplusplus::GotoFolder(int FolderCSIDL)
 {
 	LPITEMIDLIST	pidl = NULL;
 	HRESULT			hr;
@@ -579,7 +553,7 @@ void CContainer::GotoFolder(int FolderCSIDL)
 	}
 }
 
-void CContainer::OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	LPITEMIDLIST	pidlComplete = NULL;
 	LPITEMIDLIST	pidl = NULL;
@@ -601,7 +575,7 @@ void CContainer::OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenInNewWi
 	CoTaskMemFree(pidl);
 }
 
-void CContainer::OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	LPITEMIDLIST	pidlItem = NULL;
 	HRESULT			hr;
@@ -616,7 +590,7 @@ void CContainer::OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow
 	}
 }
 
-void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	SFGAOF uAttributes = SFGAO_FOLDER|SFGAO_STREAM|SFGAO_LINK;
 	LPITEMIDLIST pidlControlPanel = NULL;
@@ -773,7 +747,7 @@ void CContainer::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInN
 	}
 }
 
-void CContainer::OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	if(bOpenInNewWindow)
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,FALSE,FALSE,TRUE);
@@ -783,7 +757,7 @@ void CContainer::OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER);
 }
 
-void CContainer::OpenFileItem(LPITEMIDLIST pidlItem,TCHAR *szParameters)
+void Explorerplusplus::OpenFileItem(LPITEMIDLIST pidlItem,TCHAR *szParameters)
 {
 	TCHAR			szItemDirectory[MAX_PATH];
 	LPITEMIDLIST	pidlParent = NULL;
@@ -799,7 +773,7 @@ void CContainer::OpenFileItem(LPITEMIDLIST pidlItem,TCHAR *szParameters)
 	CoTaskMemFree(pidlParent);
 }
 
-void CContainer::OnMainToolbarRClick(void)
+void Explorerplusplus::OnMainToolbarRClick(void)
 {
 	POINT ptCursor;
 	DWORD dwPos;
@@ -820,7 +794,7 @@ void CContainer::OnMainToolbarRClick(void)
 		ptCursor.x,ptCursor.y,0,m_hMainRebar,NULL);
 }
 
-void CContainer::OnBookmarksToolbarRClick(int iItem)
+void Explorerplusplus::OnBookmarksToolbarRClick(int iItem)
 {
 	POINT ptCursor;
 	DWORD dwPos;
@@ -836,7 +810,7 @@ void CContainer::OnBookmarksToolbarRClick(int iItem)
 		ptCursor.x,ptCursor.y,0,m_hMainRebar,NULL);
 }
 
-void CContainer::OnSaveFileSlack(void)
+void Explorerplusplus::OnSaveFileSlack(void)
 {
 	HANDLE	hFile;
 	TCHAR	pszSlack[4096];
@@ -876,7 +850,7 @@ void CContainer::OnSaveFileSlack(void)
 	}
 }
 
-void CContainer::OnWildcardSelect(BOOL bSelect)
+void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
 {
 	m_bWildcardSelect = bSelect;
 
@@ -884,7 +858,7 @@ void CContainer::OnWildcardSelect(BOOL bSelect)
 	WildcardSelectProcStub,(LPARAM)this);
 }
 
-BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
+BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 {
 	RECT			rc;
 	TCITEM			tcItem;
@@ -1091,7 +1065,7 @@ BOOL CContainer::OnSize(int MainWindowWidth,int MainWindowHeight)
 	return TRUE;
 }
 
-int CContainer::OnDestroy(void)
+int Explorerplusplus::OnDestroy(void)
 {
 	if(m_pClipboardDataObject != NULL)
 	{
@@ -1115,7 +1089,7 @@ int CContainer::OnDestroy(void)
 	return 0;
 }
 
-int CContainer::OnClose(void)
+int Explorerplusplus::OnClose(void)
 {
 	if(m_bConfirmCloseTabs && (TabCtrl_GetItemCount(m_hTabCtrl) > 1))
 	{
@@ -1146,7 +1120,7 @@ close all the current tabs?"),
 	return 0;
 }
 
-void CContainer::OnDirChanged(int iTabId)
+void Explorerplusplus::OnDirChanged(int iTabId)
 {
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
 		m_CurrentDirectory);
@@ -1178,7 +1152,7 @@ void CContainer::OnDirChanged(int iTabId)
 	SetTabIcon();
 }
 
-void CContainer::OnResolveLink(void)
+void Explorerplusplus::OnResolveLink(void)
 {
 	TCHAR	ShortcutFileName[MAX_PATH];
 	TCHAR	szFullFileName[MAX_PATH];
@@ -1215,7 +1189,7 @@ void CContainer::OnResolveLink(void)
 	}
 }
 
-void CContainer::OnSaveDirectoryListing(void)
+void Explorerplusplus::OnSaveDirectoryListing(void)
 {
 	TCHAR	FullFileName[MAX_PATH] = _T("Directory Listing.txt");
 	BOOL	bSaveNameRetrieved;
@@ -1227,7 +1201,7 @@ void CContainer::OnSaveDirectoryListing(void)
 		SaveDirectoryListing(m_CurrentDirectory,FullFileName);
 }
 
-void CContainer::OnTabCtrlGetDispInfo(LPARAM lParam)
+void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)
 {
 	HWND			ToolTipControl;
 	LPNMTTDISPINFO	lpnmtdi;
@@ -1251,7 +1225,7 @@ void CContainer::OnTabCtrlGetDispInfo(LPARAM lParam)
 	}
 }
 
-void CContainer::OnSetFocus(void)
+void Explorerplusplus::OnSetFocus(void)
 {
 	SetFocus(m_hLastActiveWindow);
 }
@@ -1261,7 +1235,7 @@ void CContainer::OnSetFocus(void)
  * All cut items are deghosted, and the 'Paste' button
  * is enabled/disabled.
  */
-void CContainer::OnDrawClipboard(void)
+void Explorerplusplus::OnDrawClipboard(void)
 {
 	list<CutFile_t>::iterator	itr;
 	int							iItem;
@@ -1321,7 +1295,7 @@ void CContainer::OnDrawClipboard(void)
  * Called when the clipboard chain is changed (i.e. a window
  * is added/removed).
  */
-void CContainer::OnChangeCBChain(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnChangeCBChain(WPARAM wParam,LPARAM lParam)
 {
 	if((HWND)wParam == m_hNextClipboardViewer)
 		m_hNextClipboardViewer = (HWND)lParam;
@@ -1329,7 +1303,7 @@ void CContainer::OnChangeCBChain(WPARAM wParam,LPARAM lParam)
 		SendMessage(m_hNextClipboardViewer,WM_CHANGECBCHAIN,wParam,lParam);
 }
 
-void CContainer::HandleDirectoryMonitoring(int iTabId)
+void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 {
 	DirectoryAltered_t	*pDirectoryAltered = NULL;
 	TCHAR				szDirectoryToWatch[MAX_PATH];
@@ -1368,7 +1342,7 @@ void CContainer::HandleDirectoryMonitoring(int iTabId)
 	m_pShellBrowser[iTabId]->SetDirMonitorId(iDirMonitorId);
 }
 
-void CContainer::OnTbnDropDown(LPARAM lParam)
+void Explorerplusplus::OnTbnDropDown(LPARAM lParam)
 {
 	NMTOOLBAR		*nmTB = NULL;
 	LPITEMIDLIST	pidl = NULL;
@@ -1415,7 +1389,7 @@ void CContainer::OnTbnDropDown(LPARAM lParam)
 	}
 }
 
-void CContainer::OnTabMClick(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnTabMClick(WPARAM wParam,LPARAM lParam)
 {
 	TCHITTESTINFO	htInfo;
 	int				iTabHit;
@@ -1445,7 +1419,7 @@ void CContainer::OnTabMClick(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CContainer::OnDisplayWindowResized(WPARAM wParam)
+void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
 	RECT	rc;
 
@@ -1457,7 +1431,7 @@ void CContainer::OnDisplayWindowResized(WPARAM wParam)
 	SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,(LPARAM)MAKELPARAM(rc.right,rc.bottom));
 }
 
-void CContainer::OnStartedBrowsing(int iTabId,TCHAR *szFolderPath)
+void Explorerplusplus::OnStartedBrowsing(int iTabId,TCHAR *szFolderPath)
 {
 	TCHAR	szLoadingText[512];
 
@@ -1480,7 +1454,7 @@ void CContainer::OnStartedBrowsing(int iTabId,TCHAR *szFolderPath)
  * Sizes all columns in the active listview
  * based on their text.
  */
-void CContainer::OnAutoSizeColumns(void)
+void Explorerplusplus::OnAutoSizeColumns(void)
 {
 	size_t	nColumns;
 	UINT	iCol = 0;
@@ -1493,7 +1467,7 @@ void CContainer::OnAutoSizeColumns(void)
 	}
 }
 
-BOOL CContainer::OnMeasureItem(WPARAM wParam,LPARAM lParam)
+BOOL Explorerplusplus::OnMeasureItem(WPARAM wParam,LPARAM lParam)
 {
 	MEASUREITEMSTRUCT	*pMeasureItem = NULL;
 
@@ -1507,7 +1481,7 @@ BOOL CContainer::OnMeasureItem(WPARAM wParam,LPARAM lParam)
 	return TRUE;
 }
 
-BOOL CContainer::OnDrawItem(WPARAM wParam,LPARAM lParam)
+BOOL Explorerplusplus::OnDrawItem(WPARAM wParam,LPARAM lParam)
 {
 	DRAWITEMSTRUCT	*pDrawItem = NULL;
 
@@ -1522,12 +1496,12 @@ BOOL CContainer::OnDrawItem(WPARAM wParam,LPARAM lParam)
 }
 
 /* Cycle through the current views. */
-void CContainer::OnToolbarViews(void)
+void Explorerplusplus::OnToolbarViews(void)
 {
 	CycleViewState(TRUE);
 }
 
-void CContainer::CycleViewState(BOOL bCycleForward)
+void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 {
 	UINT	uViewMode;
 	UINT	uNewViewMode;
@@ -1572,7 +1546,7 @@ void CContainer::CycleViewState(BOOL bCycleForward)
 	m_pFolderView[m_iObjectIndex]->SetCurrentViewMode(uNewViewMode);
 }
 
-void CContainer::ShowToolbarViewsDropdown(void)
+void Explorerplusplus::ShowToolbarViewsDropdown(void)
 {
 	POINT	ptOrigin;
 	RECT	rcButton;
@@ -1587,7 +1561,7 @@ void CContainer::ShowToolbarViewsDropdown(void)
 	CreateViewsMenu(&ptOrigin);
 }
 
-void CContainer::OnSortByAscending(BOOL bSortAscending)
+void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)
 {
 	UINT	SortMode;
 
@@ -1602,7 +1576,7 @@ void CContainer::OnSortByAscending(BOOL bSortAscending)
 	}
 }
 
-void CContainer::OnPreviousWindow(void)
+void Explorerplusplus::OnPreviousWindow(void)
 {
 	HWND	hFocus;
 
@@ -1645,7 +1619,7 @@ void CContainer::OnPreviousWindow(void)
  * Shifts focus to the next internal
  * window in the chain.
  */
-void CContainer::OnNextWindow(void)
+void Explorerplusplus::OnNextWindow(void)
 {
 	HWND	hFocus;
 
@@ -1694,7 +1668,7 @@ void CContainer::OnNextWindow(void)
 	}
 }
 
-BOOL CContainer::IsNextWindowVisible(HWND hNext)
+BOOL Explorerplusplus::IsNextWindowVisible(HWND hNext)
 {
 	if(hNext == m_hActiveListView)
 		return TRUE;
@@ -1706,7 +1680,7 @@ BOOL CContainer::IsNextWindowVisible(HWND hNext)
 	return TRUE;
 }
 
-HWND CContainer::MyGetNextWindow(HWND hwndCurrent)
+HWND Explorerplusplus::MyGetNextWindow(HWND hwndCurrent)
 {
 	if(hwndCurrent == m_hActiveListView)
 		return m_hAddressBar;
@@ -1718,7 +1692,7 @@ HWND CContainer::MyGetNextWindow(HWND hwndCurrent)
 	return NULL;
 }
 
-HWND CContainer::DecodeWindowConstant(UINT uWindow)
+HWND Explorerplusplus::DecodeWindowConstant(UINT uWindow)
 {
 	switch(uWindow)
 	{
@@ -1737,7 +1711,7 @@ HWND CContainer::DecodeWindowConstant(UINT uWindow)
 	return NULL;
 }
 
-void CContainer::CreateStatusBar(void)
+void Explorerplusplus::CreateStatusBar(void)
 {
 	if(m_bShowStatusBar)
 		StatusBarStyles |= WS_VISIBLE;
@@ -1745,7 +1719,7 @@ void CContainer::CreateStatusBar(void)
 	m_hStatusBar = ::CreateStatusBar(m_hContainer,StatusBarStyles);
 }
 
-void CContainer::SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl)
+void Explorerplusplus::SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl)
 {
 	MENUITEMINFO	mii;
 	LPITEMIDLIST	pidl = NULL;
@@ -1794,12 +1768,12 @@ The ONLY times an idl should be sent are:
  - When loading directories on startup
  - When navigating to a folder on the 'Go' menu
 */
-HRESULT CContainer::BrowseFolder(TCHAR *szPath,UINT wFlags)
+HRESULT Explorerplusplus::BrowseFolder(TCHAR *szPath,UINT wFlags)
 {
 	return BrowseFolder(szPath,wFlags,FALSE,FALSE,FALSE);
 }
 
-HRESULT CContainer::BrowseFolder(TCHAR *szPath,UINT wFlags,
+HRESULT Explorerplusplus::BrowseFolder(TCHAR *szPath,UINT wFlags,
 BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 {
 	LPITEMIDLIST	pidl = NULL;
@@ -1823,7 +1797,7 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 /* ALL calls to browse a folder in the current tab MUST
 pass through this function. This ensures that tabs that
 have their addresses locked will not change directory. */
-HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
+HRESULT Explorerplusplus::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 {
 	HRESULT hr = E_FAIL;
 
@@ -1833,7 +1807,7 @@ HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 		if(SUCCEEDED(hr))
 		{
-			PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE|SND_ASYNC);
+			PlayNavigationSound();
 			OnDirChanged(m_iObjectIndex);
 		}
 	}
@@ -1845,7 +1819,7 @@ HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 	return hr;
 }
 
-HRESULT CContainer::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,
+HRESULT Explorerplusplus::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,
 BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 {
 	HRESULT hr = E_FAIL;
@@ -1882,7 +1856,7 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 
 			if(SUCCEEDED(hr))
 			{
-				PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,SND_RESOURCE|SND_ASYNC);
+				PlayNavigationSound();
 			}
 
 			iTabObjectIndex = m_iObjectIndex;
@@ -1902,7 +1876,7 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 	return hr;
 }
 
-void CContainer::SetAllDefaultColumns(void)
+void Explorerplusplus::SetAllDefaultColumns(void)
 {
 	/* Set the default columns as the initial set. When the
 	settings are loaded, these columns may be overwritten. */
@@ -1915,7 +1889,7 @@ void CContainer::SetAllDefaultColumns(void)
 	SetDefaultMyNetworkPlacesColumns(&m_MyNetworkPlacesColumnList);
 }
 
-void CContainer::SetDefaultRealFolderColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultRealFolderColumns(list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -1931,7 +1905,7 @@ void CContainer::SetDefaultRealFolderColumns(list<Column_t> *pColumns)
 	}
 }
 
-void CContainer::SetDefaultControlPanelColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultControlPanelColumns(list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -1947,7 +1921,7 @@ void CContainer::SetDefaultControlPanelColumns(list<Column_t> *pColumns)
 	}
 }
 
-void CContainer::SetDefaultMyComputerColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultMyComputerColumns(list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -1963,7 +1937,7 @@ void CContainer::SetDefaultMyComputerColumns(list<Column_t> *pColumns)
 	}
 }
 
-void CContainer::SetDefaultRecycleBinColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultRecycleBinColumns(list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -1979,7 +1953,7 @@ void CContainer::SetDefaultRecycleBinColumns(list<Column_t> *pColumns)
 	}
 }
 
-void CContainer::SetDefaultPrintersColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultPrintersColumns(list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -1995,7 +1969,7 @@ void CContainer::SetDefaultPrintersColumns(list<Column_t> *pColumns)
 	}
 }
 
-void CContainer::SetDefaultNetworkConnectionsColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultNetworkConnectionsColumns(list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -2011,7 +1985,7 @@ void CContainer::SetDefaultNetworkConnectionsColumns(list<Column_t> *pColumns)
 	}
 }
 
-void CContainer::SetDefaultMyNetworkPlacesColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultMyNetworkPlacesColumns(list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -2027,7 +2001,7 @@ void CContainer::SetDefaultMyNetworkPlacesColumns(list<Column_t> *pColumns)
 	}
 }
 
-void CContainer::OnUndo(void)
+void Explorerplusplus::OnUndo(void)
 {
 	if(m_bCanUndo)
 	{
@@ -2055,7 +2029,7 @@ void CContainer::OnUndo(void)
 	}
 }
 
-int CContainer::RenameFileWithUndo(TCHAR *szNewFileName,
+int Explorerplusplus::RenameFileWithUndo(TCHAR *szNewFileName,
 TCHAR *szOldFileName)
 {
 	int res;
@@ -2086,7 +2060,7 @@ TCHAR *szOldFileName)
 	return res;
 }
 
-void CContainer::OnLockToolbars(void)
+void Explorerplusplus::OnLockToolbars(void)
 {
 	REBARBANDINFO	rbbi;
 	UINT			nBands;
@@ -2115,7 +2089,7 @@ void CContainer::OnLockToolbars(void)
 	AddWindowStyle(m_hMainRebar,RBS_FIXEDORDER,m_bLockToolbars);
 }
 
-void CContainer::OnShellNewItemCreated(LPARAM lParam)
+void Explorerplusplus::OnShellNewItemCreated(LPARAM lParam)
 {
 	HWND	hEdit;
 	int		iRenamedItem;
@@ -2129,7 +2103,7 @@ void CContainer::OnShellNewItemCreated(LPARAM lParam)
 	}
 }
 
-void CContainer::OnCreateNewFolder(void)
+void Explorerplusplus::OnCreateNewFolder(void)
 {
 	TCHAR			szNewFolderName[32768];
 	LPITEMIDLIST	pidlItem = NULL;
@@ -2159,7 +2133,7 @@ void CContainer::OnCreateNewFolder(void)
 	}
 }
 
-void CContainer::OnAppCommand(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnAppCommand(WPARAM wParam,LPARAM lParam)
 {
 	UINT	cmd;
 
@@ -2223,25 +2197,25 @@ void CContainer::OnAppCommand(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CContainer::OnBrowseBack(void)
+void Explorerplusplus::OnBrowseBack(void)
 {
 	BrowseFolder(EMPTY_STRING,
 		SBSP_NAVIGATEBACK|SBSP_SAMEBROWSER);
 }
 
-void CContainer::OnBrowseForward(void)
+void Explorerplusplus::OnBrowseForward(void)
 {
 	BrowseFolder(EMPTY_STRING,
 		SBSP_NAVIGATEFORWARD|SBSP_SAMEBROWSER);
 }
 
-void CContainer::OnRefresh(void)
+void Explorerplusplus::OnRefresh(void)
 {
 	/* Refresh the current tab. */
 	RefreshTab(m_iObjectIndex);
 }
 
-void CContainer::CopyColumnInfoToClipboard(void)
+void Explorerplusplus::CopyColumnInfoToClipboard(void)
 {
 	list<Column_t>				Columns;
 	list<Column_t>::iterator	itr;
@@ -2316,12 +2290,12 @@ void CContainer::CopyColumnInfoToClipboard(void)
 	pBufferManager->Release();
 }
 
-void CContainer::SetFilterStatus(void)
+void Explorerplusplus::SetFilterStatus(void)
 {
 	m_pActiveShellBrowser->SetFilterStatus(!m_pActiveShellBrowser->GetFilterStatus());
 }
 
-void CContainer::OnDirectoryModified(int iTabId)
+void Explorerplusplus::OnDirectoryModified(int iTabId)
 {
 	/* This message is sent when one of the
 	tab directories is modified.
@@ -2353,7 +2327,7 @@ void CContainer::OnDirectoryModified(int iTabId)
 	}
 }
 
-void CContainer::OnIdaRClick(void)
+void Explorerplusplus::OnIdaRClick(void)
 {
 	/* Show the context menu (if any)
 	for the window that currently has
@@ -2469,7 +2443,7 @@ References:
 http://tech.groups.yahoo.com/group/wtl/message/13911
 http://www.eggheadcafe.com/forumarchives/platformsdkshell/Nov2005/post24294253.asp
 */
-void CContainer::OnAssocChanged(void)
+void Explorerplusplus::OnAssocChanged(void)
 {
 	typedef BOOL (WINAPI *FII_PROC)(BOOL);
 	FII_PROC FileIconInit;
@@ -2544,7 +2518,7 @@ void CContainer::OnAssocChanged(void)
 	HandleComboBoxText();
 }
 
-void CContainer::OnCloneWindow(void)
+void Explorerplusplus::OnCloneWindow(void)
 {
 	TCHAR szExecutable[MAX_PATH];
 	TCHAR szCurrentDirectory[MAX_PATH];
@@ -2572,7 +2546,7 @@ void CContainer::OnCloneWindow(void)
 	ShellExecuteEx(&sei);
 }
 
-void CContainer::ShowMainRebarBand(HWND hwnd,BOOL bShow)
+void Explorerplusplus::ShowMainRebarBand(HWND hwnd,BOOL bShow)
 {
 	REBARBANDINFO rbi;
 	LRESULT lResult;
@@ -2598,7 +2572,7 @@ void CContainer::ShowMainRebarBand(HWND hwnd,BOOL bShow)
 	}
 }
 
-void CContainer::OnNdwIconRClick(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnNdwIconRClick(WPARAM wParam,LPARAM lParam)
 {
 	LPITEMIDLIST pidlDirectory	= NULL;
 	POINT pt;
@@ -2612,7 +2586,7 @@ void CContainer::OnNdwIconRClick(WPARAM wParam,LPARAM lParam)
 	OnListViewRClick(m_hDisplayWindow,&pt);
 }
 
-void CContainer::OnNdwRClick(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnNdwRClick(WPARAM wParam,LPARAM lParam)
 {
 	POINT pt;
 
@@ -2626,7 +2600,7 @@ void CContainer::OnNdwRClick(WPARAM wParam,LPARAM lParam)
 		pt.x,pt.y,0,m_hContainer,NULL);
 }
 
-LRESULT CContainer::OnCustomDraw(LPARAM lParam)
+LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 {
 	NMLVCUSTOMDRAW *pnmlvcd = NULL;
 	NMCUSTOMDRAW *pnmcd = NULL;
@@ -2709,7 +2683,7 @@ LRESULT CContainer::OnCustomDraw(LPARAM lParam)
 	return 0;
 }
 
-int CContainer::GetViewModeMenuId(UINT uViewMode)
+int Explorerplusplus::GetViewModeMenuId(UINT uViewMode)
 {
 	switch(uViewMode)
 	{
@@ -2749,7 +2723,7 @@ int CContainer::GetViewModeMenuId(UINT uViewMode)
 	return -1;
 }
 
-int CContainer::GetViewModeMenuStringId(UINT uViewMode)
+int Explorerplusplus::GetViewModeMenuStringId(UINT uViewMode)
 {
 	switch(uViewMode)
 	{
@@ -2792,7 +2766,7 @@ int CContainer::GetViewModeMenuStringId(UINT uViewMode)
 	return -1;
 }
 
-void CContainer::OnSortBy(UINT uSortMode)
+void Explorerplusplus::OnSortBy(UINT uSortMode)
 {
 	UINT uCurrentSortMode;
 
@@ -2811,7 +2785,7 @@ void CContainer::OnSortBy(UINT uSortMode)
 	m_pFolderView[m_iObjectIndex]->SortFolder(uSortMode);
 }
 
-void CContainer::OnGroupBy(UINT uSortMode)
+void Explorerplusplus::OnGroupBy(UINT uSortMode)
 {
 	UINT uCurrentSortMode;
 
@@ -2833,7 +2807,7 @@ void CContainer::OnGroupBy(UINT uSortMode)
 	m_pFolderView[m_iObjectIndex]->SortFolder(uSortMode);
 }
 
-void CContainer::OnHome(void)
+void Explorerplusplus::OnHome(void)
 {
 	HRESULT hr;
 
@@ -2845,7 +2819,7 @@ void CContainer::OnHome(void)
 	}
 }
 
-void CContainer::OnNavigateUp(void)
+void Explorerplusplus::OnNavigateUp(void)
 {
 	list<PastedFile_t> FileList;
 	PastedFile_t pf;
@@ -2864,7 +2838,7 @@ void CContainer::OnNavigateUp(void)
 	m_pActiveShellBrowser->SelectItems(&FileList);
 }
 
-void CContainer::SaveAllSettings(void)
+void Explorerplusplus::SaveAllSettings(void)
 {
 	ILoadSave *pLoadSave = NULL;
 
@@ -2878,7 +2852,6 @@ void CContainer::SaveAllSettings(void)
 	pLoadSave->SaveFilters();
 	pLoadSave->SaveDefaultColumns();
 	pLoadSave->SaveBookmarks();
-	pLoadSave->SaveWindowPosition();
 	pLoadSave->SaveApplicationToolbar();
 	pLoadSave->SaveToolbarInformation();
 	pLoadSave->SaveColorRules();
@@ -2889,7 +2862,7 @@ void CContainer::SaveAllSettings(void)
 
 /* Saves directory settings for a particular
 tab. */
-void CContainer::SaveDirectorySpecificSettings(int iTab)
+void Explorerplusplus::SaveDirectorySpecificSettings(int iTab)
 {
 	TCITEM tcItem;
 	BOOL bRet;
@@ -2929,7 +2902,7 @@ void CContainer::SaveDirectorySpecificSettings(int iTab)
 
 /* TODO: This needs to be moved into the actual shell browser. Can't change
 settings until it's known that the folder has sucessfully changed. */
-void CContainer::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDirectory)
+void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDirectory)
 {
 	if(m_DirectorySettingsList.size() > 0)
 	{
@@ -2967,7 +2940,7 @@ void CContainer::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDirector
 	}
 }
 
-void CContainer::SetupJumplistTasks()
+void Explorerplusplus::SetupJumplistTasks()
 {
 	std::list<JumpListTaskInformation> TaskList;
 
@@ -2993,4 +2966,13 @@ void CContainer::SetupJumplistTasks()
 	TaskList.push_back(jlti);
 
 	AddJumpListTasks(TaskList);
+}
+
+void Explorerplusplus::PlayNavigationSound(void)
+{
+	if(m_bPlayNavigationSound)
+	{
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,
+			SND_RESOURCE|SND_ASYNC);
+	}
 }

@@ -560,11 +560,11 @@ HINSTANCE StartCommandPrompt(TCHAR *Directory)
 	TCHAR FullPath[MAX_PATH];
 	TCHAR Prompt[]			= _T("cmd.exe");
 	HINSTANCE hNewInstance	= NULL;
-	HRESULT hr;
+	BOOL bRes;
 
-	hr = SHGetSpecialFolderPath(NULL,SystemPath,CSIDL_SYSTEM,0);
+	bRes = SHGetSpecialFolderPath(NULL,SystemPath,CSIDL_SYSTEM,0);
 
-	if(SUCCEEDED(hr))
+	if(bRes)
 	{
 		PathCombine(FullPath,SystemPath,Prompt);
 
@@ -2712,14 +2712,17 @@ WORD GetFileLanguage(TCHAR *szFullFileName)
 	{
 		pTranslateInfo = malloc(dwLen);
 
-		GetFileVersionInfo(szFullFileName,NULL,dwLen,pTranslateInfo);
-		VerQueryValue(pTranslateInfo,_T("\\VarFileInfo\\Translation"),
-			(LPVOID *)&plcp,&uLen);
+		if(pTranslateInfo != NULL)
+		{
+			GetFileVersionInfo(szFullFileName,NULL,dwLen,pTranslateInfo);
+			VerQueryValue(pTranslateInfo,_T("\\VarFileInfo\\Translation"),
+				(LPVOID *)&plcp,&uLen);
 
-		if(uLen >= sizeof(LANGANDCODEPAGE))
-			wLanguage = PRIMARYLANGID(plcp[0].wLanguage);
+			if(uLen >= sizeof(LANGANDCODEPAGE))
+				wLanguage = PRIMARYLANGID(plcp[0].wLanguage);
 
-		free(pTranslateInfo);
+			free(pTranslateInfo);
+		}
 	}
 
 	return wLanguage;

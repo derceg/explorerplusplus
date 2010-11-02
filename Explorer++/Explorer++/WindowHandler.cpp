@@ -46,7 +46,7 @@ DWORD RebarStyles			=	WS_CHILD|WS_VISIBLE|WS_CLIPCHILDREN|WS_CLIPSIBLINGS|
 								WS_BORDER|CCS_NODIVIDER|CCS_TOP|CCS_NOPARENTALIGN|
 								RBS_BANDBORDERS|RBS_VARHEIGHT;
 
-void CContainer::CreateFolderControls(void)
+void Explorerplusplus::CreateFolderControls(void)
 {
 	TCHAR szTemp[32];
 	UINT uStyle = WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
@@ -74,7 +74,7 @@ void CContainer::CreateFolderControls(void)
 	m_hFoldersToolbar = CreateTabToolbar(m_hHolder,FOLDERS_TOOLBAR_CLOSE,szTemp);
 }
 
-void CContainer::CreateMainControls(void)
+void Explorerplusplus::CreateMainControls(void)
 {
 	SIZE	sz;
 	DWORD	ToolbarSize;
@@ -171,7 +171,7 @@ void CContainer::CreateMainControls(void)
 	}
 }
 
-void CContainer::CreateMainToolbar(void)
+void Explorerplusplus::CreateMainToolbar(void)
 {
 	m_hMainToolbar = CreateToolbar(m_hMainRebar,MainToolbarStyles,
 		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DRAWDDARROWS|
@@ -218,7 +218,7 @@ void CContainer::CreateMainToolbar(void)
 	}
 }
 
-void CContainer::CreateAddressToolbar(void)
+void Explorerplusplus::CreateAddressToolbar(void)
 {
 	HIMAGELIST	himl;
 	HBITMAP		hb;
@@ -263,7 +263,7 @@ void CContainer::CreateAddressToolbar(void)
 	SendMessage(m_hAddressToolbar,TB_ADDBUTTONS,(WPARAM)iCurrent,(LPARAM)tbButton);
 }
 
-void CContainer::CreateAddressBar(void)
+void Explorerplusplus::CreateAddressBar(void)
 {
 	HWND		hEdit;
 	HIMAGELIST	SmallIcons;
@@ -283,7 +283,7 @@ void CContainer::CreateAddressBar(void)
 	SHAutoComplete(hEdit,SHACF_FILESYSTEM|SHACF_AUTOSUGGEST_FORCE_ON);
 }
 
-void CContainer::CreateBookmarksToolbar(void)
+void Explorerplusplus::CreateBookmarksToolbar(void)
 {
 	m_hBookmarksToolbar = CreateToolbar(m_hMainRebar,BookmarkToolbarStyles,
 		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DRAWDDARROWS|
@@ -301,7 +301,7 @@ void CContainer::CreateBookmarksToolbar(void)
 	RegisterDragDrop(m_hBookmarksToolbar,pbtd);
 }
 
-void CContainer::CreateDrivesToolbar(void)
+void Explorerplusplus::CreateDrivesToolbar(void)
 {
 	m_hDrivesToolbar = CreateToolbar(m_hMainRebar,BookmarkToolbarStyles,
 		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
@@ -314,7 +314,7 @@ void CContainer::CreateDrivesToolbar(void)
 	InsertDrivesIntoDrivesToolbar();
 }
 
-HWND CContainer::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
+HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 {
 	HWND TabToolbar;
 	TBBUTTON tbButton[1];
@@ -361,12 +361,12 @@ HWND CContainer::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 LRESULT CALLBACK EditSubclassStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	CContainer *pContainer = (CContainer *)dwRefData;
+	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->EditSubclass(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::EditSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::EditSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(msg)
 	{
@@ -396,12 +396,12 @@ LRESULT CALLBACK CContainer::EditSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARA
 LRESULT CALLBACK RebarSubclassStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	CContainer *pContainer = (CContainer *)dwRefData;
+	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->RebarSubclass(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::RebarSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(msg)
 	{
@@ -521,7 +521,7 @@ LRESULT CALLBACK CContainer::RebarSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPAR
 	return DefSubclassProc(hwnd,msg,wParam,lParam);
 }
 
-void CContainer::SetStatusBarParts(int width)
+void Explorerplusplus::SetStatusBarParts(int width)
 {
 	int Parts[3];
 
@@ -532,7 +532,7 @@ void CContainer::SetStatusBarParts(int width)
 	SendMessage(m_hStatusBar,SB_SETPARTS,3,(LPARAM)Parts);
 }
 
-void CContainer::ResizeWindows(void)
+void Explorerplusplus::ResizeWindows(void)
 {
 	RECT rc;
 
@@ -542,7 +542,7 @@ void CContainer::ResizeWindows(void)
 }
 
 /* TODO: This should be linked to OnSize(). */
-void CContainer::SetListViewInitialPosition(HWND hListView)
+void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 {
 	RECT			rc;
 	int				MainWindowWidth;
@@ -606,7 +606,7 @@ void CContainer::SetListViewInitialPosition(HWND hListView)
 	}
 }
 
-void CContainer::ToggleFolders(void)
+void Explorerplusplus::ToggleFolders(void)
 {
 	m_bShowFolders = !m_bShowFolders;
 	lShowWindow(m_hHolder,m_bShowFolders);
@@ -616,7 +616,7 @@ void CContainer::ToggleFolders(void)
 	ResizeWindows();
 }
 
-void CContainer::InsertToolbarButtons(void)
+void Explorerplusplus::InsertToolbarButtons(void)
 {
 	list<ToolbarButton_t>::iterator	itr;
 	TBBUTTON						*ptbButton = NULL;
@@ -662,7 +662,7 @@ void CContainer::InsertToolbarButtons(void)
 	free(ptbButton);
 }
 
-void CContainer::InsertToolbarButton(ToolbarButton_t *ptb,int iPos)
+void Explorerplusplus::InsertToolbarButton(ToolbarButton_t *ptb,int iPos)
 {
 	TBBUTTON	tbButton;
 	BYTE		StandardStyle;
@@ -700,23 +700,23 @@ void CContainer::InsertToolbarButton(ToolbarButton_t *ptb,int iPos)
 	HandleToolbarItemStates();
 }
 
-void CContainer::DeleteToolbarButton(int iButton)
+void Explorerplusplus::DeleteToolbarButton(int iButton)
 {
 	SendMessage(m_hMainToolbar,TB_DELETEBUTTON,iButton,0);
 }
 
-BOOL CContainer::OnTBQueryInsert(LPARAM lParam)
+BOOL Explorerplusplus::OnTBQueryInsert(LPARAM lParam)
 {
 	return TRUE;
 }
 
-BOOL CContainer::OnTBQueryDelete(LPARAM lParam)
+BOOL Explorerplusplus::OnTBQueryDelete(LPARAM lParam)
 {
 	/* All buttons can be deleted. */
 	return TRUE;
 }
 
-BOOL CContainer::OnTBGetButtonInfo(LPARAM lParam)
+BOOL Explorerplusplus::OnTBGetButtonInfo(LPARAM lParam)
 {
 	NMTOOLBAR		*pnmtb = NULL;
 	static TCHAR	szText[64];
@@ -747,7 +747,7 @@ BOOL CContainer::OnTBGetButtonInfo(LPARAM lParam)
 	}
 }
 
-void CContainer::OnTBSave(LPARAM lParam)
+void Explorerplusplus::OnTBSave(LPARAM lParam)
 {
 	NMTBSAVE *pnmtbs;
 
@@ -756,12 +756,12 @@ void CContainer::OnTBSave(LPARAM lParam)
 	/* Can add custom information here. */
 }
 
-BOOL CContainer::OnTBRestore(LPARAM lParam)
+BOOL Explorerplusplus::OnTBRestore(LPARAM lParam)
 {
 	return 0;
 }
 
-void CContainer::OnTBReset(void)
+void Explorerplusplus::OnTBReset(void)
 {
 	int nButtons;
 	int i = 0;
@@ -775,7 +775,7 @@ void CContainer::OnTBReset(void)
 	HandleToolbarItemStates();
 }
 
-void CContainer::OnTBGetInfoTip(LPARAM lParam)
+void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 {
 	NMTBGETINFOTIP	*ptbgit = NULL;
 	LPITEMIDLIST	pidl = NULL;
@@ -893,7 +893,7 @@ void CContainer::OnTBGetInfoTip(LPARAM lParam)
 	}
 }
 
-void CContainer::OnAddressBarBeginDrag(void)
+void Explorerplusplus::OnAddressBarBeginDrag(void)
 {
 	IDragSourceHelper *pDragSourceHelper = NULL;
 	IDropSource *pDropSource = NULL;
@@ -1006,7 +1006,7 @@ void CContainer::OnAddressBarBeginDrag(void)
 	}
 }
 
-void CContainer::AdjustMainToolbarSize(void)
+void Explorerplusplus::AdjustMainToolbarSize(void)
 {
 	HIMAGELIST *phiml = NULL;
 	int cx;

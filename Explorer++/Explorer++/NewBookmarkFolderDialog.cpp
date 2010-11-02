@@ -28,13 +28,13 @@ extern int g_iFolderSelected;
 
 INT_PTR CALLBACK NewBookmarkFolderProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 			{
-				pContainer = (CContainer *)lParam;
+				pContainer = (Explorerplusplus *)lParam;
 			}
 			break;
 	}
@@ -42,7 +42,7 @@ INT_PTR CALLBACK NewBookmarkFolderProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 	return pContainer->NewBookmarkFolderProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::NewBookmarkFolderProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::NewBookmarkFolderProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -71,7 +71,7 @@ INT_PTR CALLBACK CContainer::NewBookmarkFolderProc(HWND hDlg,UINT uMsg,WPARAM wP
 	return FALSE;
 }
 
-void CContainer::OnNewBookmarkFolderInit(HWND hDlg)
+void Explorerplusplus::OnNewBookmarkFolderInit(HWND hDlg)
 {
 	HWND	hName;
 	HWND	hCreateIn;
@@ -111,7 +111,7 @@ void CContainer::OnNewBookmarkFolderInit(HWND hDlg)
 is selected. Use the selection to decide where to
 create the new bookmark folder, by passing selection
 information back to the bookmarks module. */
-void CContainer::OnNewBookmarkFolderOk(HWND hDlg)
+void Explorerplusplus::OnNewBookmarkFolderOk(HWND hDlg)
 {
 	HWND			hName;
 	HWND			hCreateIn;

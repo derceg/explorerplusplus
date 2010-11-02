@@ -22,7 +22,32 @@ TCHAR pszCustomDirsKey[]	= _T("Custom Directories");
 
 extern DWORD g_Language;
 
-LONG CContainer::SaveSettings(void)
+BOOL LoadWindowPosition(WINDOWPLACEMENT *pwndpl)
+{
+	HKEY hSettingsKey;
+	BOOL bRes = FALSE;
+
+	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER,REG_SETTINGS_KEY,0,
+		KEY_READ,&hSettingsKey);
+
+	if(lRes == ERROR_SUCCESS)
+	{
+		DWORD dwSize = sizeof(WINDOWPLACEMENT);
+
+		RegQueryValueEx(hSettingsKey,_T("Position"),NULL,NULL,
+			(LPBYTE)pwndpl,&dwSize);
+
+		if(dwSize == sizeof(WINDOWPLACEMENT) &&
+			pwndpl->length == sizeof(WINDOWPLACEMENT))
+		{
+			bRes = TRUE;
+		}
+	}
+
+	return bRes;
+}
+
+LONG Explorerplusplus::SaveSettings(void)
 {
 	HKEY			hSettingsKey;
 	DWORD			Disposition;
@@ -35,6 +60,15 @@ LONG CContainer::SaveSettings(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
+		WINDOWPLACEMENT wndpl;
+
+		wndpl.length = sizeof(WINDOWPLACEMENT);
+		GetWindowPlacement(m_hContainer,&wndpl);
+
+		/* Window position. */
+		RegSetValueEx(hSettingsKey,_T("Position"),0,REG_BINARY,
+			(LPBYTE)&wndpl,sizeof(wndpl));
+
 		/* User settings. */
 		SaveDwordToRegistry(hSettingsKey,_T("LastSelectedTab"),m_iLastSelectedTab);
 		SaveDwordToRegistry(hSettingsKey,_T("ShowExtensions"),m_bShowExtensionsGlobal);
@@ -79,6 +113,7 @@ LONG CContainer::SaveSettings(void)
 		SaveDwordToRegistry(hSettingsKey,_T("ShowTabBarAtBottom"),m_bShowTabBarAtBottom);
 		SaveDwordToRegistry(hSettingsKey,_T("OverwriteExistingFilesConfirmation"),m_bOverwriteExistingFilesConfirmation);
 		SaveDwordToRegistry(hSettingsKey,_T("LargeToolbarIcons"),m_bLargeToolbarIcons);
+		SaveDwordToRegistry(hSettingsKey,_T("PlayNavigationSound"),m_bPlayNavigationSound);
 
 		SaveStringToRegistry(hSettingsKey,_T("NewTabDirectory"),m_DefaultTabDirectory);
 
@@ -137,7 +172,7 @@ LONG CContainer::SaveSettings(void)
 	return ReturnValue;
 }
 
-LONG CContainer::LoadSettings(LPCTSTR KeyPath)
+LONG Explorerplusplus::LoadSettings(LPCTSTR KeyPath)
 {
 	HKEY			hSettingsKey;
 	LONG			ReturnValue;
@@ -199,6 +234,7 @@ LONG CContainer::LoadSettings(LPCTSTR KeyPath)
 		ReadDwordFromRegistry(hSettingsKey,_T("TVAutoExpandSelected"),(LPDWORD)&m_bTVAutoExpandSelected);
 		ReadDwordFromRegistry(hSettingsKey,_T("OverwriteExistingFilesConfirmation"),(LPDWORD)&m_bOverwriteExistingFilesConfirmation);
 		ReadDwordFromRegistry(hSettingsKey,_T("LargeToolbarIcons"),(LPDWORD)&m_bLargeToolbarIcons);
+		ReadDwordFromRegistry(hSettingsKey,_T("PlayNavigationSound"),(LPDWORD)&m_bPlayNavigationSound);
 
 		ReadStringFromRegistry(hSettingsKey,_T("NewTabDirectory"),m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory));
 
@@ -283,7 +319,7 @@ LONG CContainer::LoadSettings(LPCTSTR KeyPath)
 	return ReturnValue;
 }
 
-LONG CContainer::SaveFilters(void)
+LONG Explorerplusplus::SaveFilters(void)
 {
 	HKEY						hFiltersKey;
 	list<Filter_t>::iterator	itr;
@@ -319,7 +355,7 @@ LONG CContainer::SaveFilters(void)
 	return ReturnValue;
 }
 
-LONG CContainer::LoadFilters(void)
+LONG Explorerplusplus::LoadFilters(void)
 {
 	HKEY		hFiltersKey;
 	Filter_t	Filter;
@@ -411,7 +447,7 @@ void DeleteKey(HKEY hKey)
 	}
 }
 
-void CContainer::SaveBookmarksToRegistry(void)
+void Explorerplusplus::SaveBookmarksToRegistry(void)
 {
 	HKEY			hBookmarksKey;
 	Bookmark_t		RootBookmark;
@@ -445,7 +481,7 @@ void CContainer::SaveBookmarksToRegistry(void)
 	}
 }
 
-void CContainer::SaveBookmarksToRegistryInternal(HKEY hKey,
+void Explorerplusplus::SaveBookmarksToRegistryInternal(HKEY hKey,
 Bookmark_t *pBookmark,int count)
 {
 	HKEY		hKeyChild;
@@ -495,7 +531,7 @@ Bookmark_t *pBookmark,int count)
 	return;
 }
 
-void CContainer::LoadBookmarksFromRegistry(void)
+void Explorerplusplus::LoadBookmarksFromRegistry(void)
 {
 	HKEY		hBookmarksKey;
 	Bookmark_t	RootBookmark;
@@ -514,7 +550,7 @@ void CContainer::LoadBookmarksFromRegistry(void)
 	}
 }
 
-void CContainer::LoadBookmarksFromRegistryInternal(HKEY hBookmarks,void *ParentFolder)
+void Explorerplusplus::LoadBookmarksFromRegistryInternal(HKEY hBookmarks,void *ParentFolder)
 {
 	HKEY	hKeyChild;
 	Bookmark_t	NewBookmark;
@@ -572,7 +608,7 @@ void CContainer::LoadBookmarksFromRegistryInternal(HKEY hBookmarks,void *ParentF
 	}
 }
 
-void CContainer::SaveTabSettingsToRegistry(void)
+void Explorerplusplus::SaveTabSettingsToRegistry(void)
 {
 	HKEY	hKey;
 	HKEY	hTabKey;
@@ -706,7 +742,7 @@ void UpdateColumnWidths(list<Column_t> *pColumnList,list<Column_t> *pColumnWidth
 	}
 }
 
-int CContainer::LoadTabSettingsFromRegistry(void)
+int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 {
 	HKEY				hKey;
 	HKEY				hTabKey;
@@ -848,7 +884,7 @@ int CContainer::LoadTabSettingsFromRegistry(void)
 	return nTabsCreated;
 }
 
-void CContainer::SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
+void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
 {
 	typedef struct
 	{
@@ -876,7 +912,7 @@ void CContainer::SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,li
 	free(pColumnList);
 }
 
-void CContainer::LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
+void Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
 {
 	typedef struct
 	{
@@ -909,7 +945,7 @@ void CContainer::LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,
 	}
 }
 
-void CContainer::SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
+void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
 {
 	list<Column_t>::iterator	itr;
 	ColumnOld_t					*pColumnList = NULL;
@@ -931,7 +967,7 @@ void CContainer::SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Col
 	free(pColumnList);
 }
 
-void CContainer::LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
+void Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
 {
 	ColumnOld_t		ColumnList[64];
 	Column_t		Column;
@@ -955,7 +991,7 @@ void CContainer::LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<C
 	}
 }
 
-void CContainer::SaveDefaultColumnsToRegistry(void)
+void Explorerplusplus::SaveDefaultColumnsToRegistry(void)
 {
 	HKEY			hColumnsKey;
 	DWORD			Disposition;
@@ -992,7 +1028,7 @@ void CContainer::SaveDefaultColumnsToRegistry(void)
 	}
 }
 
-void CContainer::LoadDefaultColumnsFromRegistry(void)
+void Explorerplusplus::LoadDefaultColumnsFromRegistry(void)
 {
 	HKEY	hColumnsKey;
 	LONG	res;
@@ -1050,7 +1086,7 @@ void CContainer::LoadDefaultColumnsFromRegistry(void)
 	return;
 }
 
-void CContainer::SaveApplicationToolbarToRegistry(void)
+void Explorerplusplus::SaveApplicationToolbarToRegistry(void)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1074,7 +1110,7 @@ void CContainer::SaveApplicationToolbarToRegistry(void)
 	}
 }
 
-void CContainer::SaveApplicationToolbarToRegistryInternal(HKEY hKey,
+void Explorerplusplus::SaveApplicationToolbarToRegistryInternal(HKEY hKey,
 ApplicationButton_t	*pab,int count)
 {
 	HKEY				hKeyChild;
@@ -1099,7 +1135,7 @@ ApplicationButton_t	*pab,int count)
 		SaveApplicationToolbarToRegistryInternal(hKey,pab->pNext,count);
 }
 
-void CContainer::LoadApplicationToolbarFromRegistry(void)
+void Explorerplusplus::LoadApplicationToolbarFromRegistry(void)
 {
 	HKEY		hKey;
 	LONG		ReturnValue;
@@ -1115,7 +1151,7 @@ void CContainer::LoadApplicationToolbarFromRegistry(void)
 	}
 }
 
-void CContainer::LoadApplicationToolbarFromRegistryInternal(HKEY hKey)
+void Explorerplusplus::LoadApplicationToolbarFromRegistryInternal(HKEY hKey)
 {
 	HKEY	hKeyChild;
 	TCHAR	szItemKey[256];
@@ -1158,7 +1194,7 @@ void CContainer::LoadApplicationToolbarFromRegistryInternal(HKEY hKey)
 	}
 }
 
-void CContainer::SaveColorRulesToRegistry(void)
+void Explorerplusplus::SaveColorRulesToRegistry(void)
 {
 	HKEY	hKey;
 	list<ListViewColouring_t>::iterator	itr;
@@ -1190,7 +1226,7 @@ void CContainer::SaveColorRulesToRegistry(void)
 	}
 }
 
-void CContainer::SaveColorRulesToRegistryInternal(HKEY hKey,
+void Explorerplusplus::SaveColorRulesToRegistryInternal(HKEY hKey,
 ListViewColouring_t *plvc,int iCount)
 {
 	HKEY				hKeyChild;
@@ -1212,7 +1248,7 @@ ListViewColouring_t *plvc,int iCount)
 	RegCloseKey(hKeyChild);
 }
 
-void CContainer::LoadColorRulesFromRegistry(void)
+void Explorerplusplus::LoadColorRulesFromRegistry(void)
 {
 	HKEY		hKey;
 	LONG		ReturnValue;
@@ -1230,7 +1266,7 @@ void CContainer::LoadColorRulesFromRegistry(void)
 	}
 }
 
-void CContainer::LoadColorRulesFromRegistryInternal(HKEY hKey)
+void Explorerplusplus::LoadColorRulesFromRegistryInternal(HKEY hKey)
 {
 	HKEY	hKeyChild;
 	TCHAR	szKeyName[256];
@@ -1279,7 +1315,7 @@ void CContainer::LoadColorRulesFromRegistryInternal(HKEY hKey)
 	}
 }
 
-void CContainer::SaveToolbarInformationToRegistry(void)
+void Explorerplusplus::SaveToolbarInformationToRegistry(void)
 {
 	HKEY	hKey;
 	HKEY	hToolbarKey;
@@ -1329,7 +1365,7 @@ void CContainer::SaveToolbarInformationToRegistry(void)
 	}
 }
 
-void CContainer::LoadToolbarInformationFromRegistry(void)
+void Explorerplusplus::LoadToolbarInformationFromRegistry(void)
 {
 	HKEY				hKey;
 	HKEY				hToolbarKey;
@@ -1377,7 +1413,7 @@ void CContainer::LoadToolbarInformationFromRegistry(void)
 	}
 }
 
-void CContainer::SaveStateToRegistry(void)
+void Explorerplusplus::SaveStateToRegistry(void)
 {
 	HKEY	hKey;
 	list<WildcardSelectInfo_t>::iterator itr;
@@ -1410,7 +1446,7 @@ void CContainer::SaveStateToRegistry(void)
 	}
 }
 
-void CContainer::SaveAddBookmarkStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveAddBookmarkStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	list<WildcardSelectInfo_t>::iterator itr;
@@ -1434,7 +1470,7 @@ void CContainer::SaveAddBookmarkStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveColorRulesStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveColorRulesStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1454,7 +1490,7 @@ void CContainer::SaveColorRulesStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveCustomizeColorsStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveCustomizeColorsStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	list<WildcardSelectInfo_t>::iterator itr;
@@ -1482,7 +1518,7 @@ void CContainer::SaveCustomizeColorsStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveDestroyFilesStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveDestroyFilesStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1505,7 +1541,7 @@ void CContainer::SaveDestroyFilesStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveDisplayColorsStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveDisplayColorsStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1528,7 +1564,7 @@ void CContainer::SaveDisplayColorsStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveFilterStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveFilterStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1551,7 +1587,7 @@ void CContainer::SaveFilterStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveMassRenameStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveMassRenameStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1574,7 +1610,7 @@ void CContainer::SaveMassRenameStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveMergeFilesStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveMergeFilesStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1597,7 +1633,7 @@ void CContainer::SaveMergeFilesStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1620,7 +1656,7 @@ void CContainer::SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveSearchStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveSearchStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	list<SearchDirectoryInfo_t>::iterator itr;
@@ -1672,7 +1708,7 @@ void CContainer::SaveSearchStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveSelectColumnsStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveSelectColumnsStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1695,7 +1731,7 @@ void CContainer::SaveSelectColumnsStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveSelectDefaultColumnsStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveSelectDefaultColumnsStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1718,7 +1754,7 @@ void CContainer::SaveSelectDefaultColumnsStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveSetFileAttributesStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveSetFileAttributesStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1741,7 +1777,7 @@ void CContainer::SaveSetFileAttributesStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveSplitFileColumnsStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveSplitFileColumnsStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	DWORD	Disposition;
@@ -1764,7 +1800,7 @@ void CContainer::SaveSplitFileColumnsStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::SaveWildcardStateToRegistry(HKEY hParentKey)
+void Explorerplusplus::SaveWildcardStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
 	list<WildcardSelectInfo_t>::iterator itr;
@@ -1798,7 +1834,7 @@ void CContainer::SaveWildcardStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadStateFromRegistry(void)
+void Explorerplusplus::LoadStateFromRegistry(void)
 {
 	HKEY				hKey;
 	LONG				ReturnValue;
@@ -1827,7 +1863,7 @@ void CContainer::LoadStateFromRegistry(void)
 	}
 }
 
-void CContainer::LoadAddBookmarkStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadAddBookmarkStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -1851,7 +1887,7 @@ void CContainer::LoadAddBookmarkStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadColorRulesStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadColorRulesStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -1870,7 +1906,7 @@ void CContainer::LoadColorRulesStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadCustomizeColorsStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadCustomizeColorsStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -1898,7 +1934,7 @@ void CContainer::LoadCustomizeColorsStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadDestroyFilesStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadDestroyFilesStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -1922,7 +1958,7 @@ void CContainer::LoadDestroyFilesStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadDisplayColorsStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadDisplayColorsStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -1946,7 +1982,7 @@ void CContainer::LoadDisplayColorsStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadFilterStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadFilterStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -1970,7 +2006,7 @@ void CContainer::LoadFilterStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadMassRenameStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadMassRenameStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -1994,7 +2030,7 @@ void CContainer::LoadMassRenameStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadMergeFilesStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadMergeFilesStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -2018,7 +2054,7 @@ void CContainer::LoadMergeFilesStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -2042,7 +2078,7 @@ void CContainer::LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadSearchStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadSearchStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	SearchDirectoryInfo_t	sdi;
@@ -2123,7 +2159,7 @@ void CContainer::LoadSearchStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadSelectColumnsStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadSelectColumnsStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -2147,7 +2183,7 @@ void CContainer::LoadSelectColumnsStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadSelectDefaultColumnsStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadSelectDefaultColumnsStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -2171,7 +2207,7 @@ void CContainer::LoadSelectDefaultColumnsStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadSetFileAttributesStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadSetFileAttributesStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -2195,7 +2231,7 @@ void CContainer::LoadSetFileAttributesStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadSplitFileStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadSplitFileStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	DWORD				dwSize;
@@ -2219,7 +2255,7 @@ void CContainer::LoadSplitFileStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-void CContainer::LoadWildcardStateFromRegistry(HKEY hParentKey)
+void Explorerplusplus::LoadWildcardStateFromRegistry(HKEY hParentKey)
 {
 	HKEY				hKey;
 	WildcardSelectInfo_t	wsi;
@@ -2268,131 +2304,92 @@ void CContainer::LoadWildcardStateFromRegistry(HKEY hParentKey)
 	}
 }
 
-LONG CContainer::CLoadSaveRegistry::LoadWindowPosition(InitialWindowPos_t *piwp)
-{
-	HKEY			hKey;
-	LONG			res;
-	DWORD			Type;
-	DWORD			SizeOfData;
-
-	/* Create/Open the main registry key used to save the window position values. */
-	res = RegOpenKeyEx(HKEY_CURRENT_USER,REG_WINDOWPOS_KEY,0,KEY_READ,&hKey);
-
-	/* Only attempt to save the values if the main key was opened (or created properly). */
-	if(res == ERROR_SUCCESS)
-	{
-		/* Must indicate to the registry key function the size of the data that
-		is being retrieved. */
-		SizeOfData = sizeof(LONG);
-
-		/* Load the window position values... */
-		RegQueryValueEx(hKey,_T("Left"),0,&Type,(LPBYTE)&piwp->rcNormalPosition.left,&SizeOfData);
-		RegQueryValueEx(hKey,_T("Top"),0,&Type,(LPBYTE)&piwp->rcNormalPosition.top,&SizeOfData);
-		RegQueryValueEx(hKey,_T("Right"),0,&Type,(LPBYTE)&piwp->rcNormalPosition.right,&SizeOfData);
-		RegQueryValueEx(hKey,_T("Bottom"),0,&Type,(LPBYTE)&piwp->rcNormalPosition.bottom,&SizeOfData);
-
-		SizeOfData = sizeof(BOOL);
-		RegQueryValueEx(hKey,_T("Maximized"),0,&Type,(LPBYTE)&piwp->bMaximized,&SizeOfData);
-	}
-
-	/* Close the main key. */
-	RegCloseKey(hKey);
-
-	return res;
-}
-
-void CContainer::CLoadSaveRegistry::LoadGenericSettings(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadGenericSettings(void)
 {
 	m_pContainer->LoadSettings(REG_MAIN_KEY);
 }
 
-void CContainer::CLoadSaveRegistry::LoadFilters(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadFilters(void)
 {
 	m_pContainer->LoadFilters();
 }
 
-void CContainer::CLoadSaveRegistry::LoadBookmarks(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadBookmarks(void)
 {
 	m_pContainer->LoadBookmarksFromRegistry();
 }
 
-int CContainer::CLoadSaveRegistry::LoadPreviousTabs(void)
+int Explorerplusplus::CLoadSaveRegistry::LoadPreviousTabs(void)
 {
 	return m_pContainer->LoadTabSettingsFromRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::LoadDefaultColumns(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadDefaultColumns(void)
 {
 	m_pContainer->LoadDefaultColumnsFromRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::LoadApplicationToolbar(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadApplicationToolbar(void)
 {
 	m_pContainer->LoadApplicationToolbarFromRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::LoadToolbarInformation(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadToolbarInformation(void)
 {
 	m_pContainer->LoadToolbarInformationFromRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::LoadColorRules(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadColorRules(void)
 {
 	m_pContainer->LoadColorRulesFromRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::LoadState(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadState(void)
 {
 	m_pContainer->LoadStateFromRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::SaveGenericSettings(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveGenericSettings(void)
 {
 	m_pContainer->SaveSettings();
 }
 
-LONG CContainer::CLoadSaveRegistry::SaveWindowPosition(void)
-{
-	::SaveWindowPosition(m_pContainer->m_hContainer,REG_WINDOWPOS_KEY);
-	return 0;
-}
-
-void CContainer::CLoadSaveRegistry::SaveFilters(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveFilters(void)
 {
 	m_pContainer->SaveFilters();
 }
 
-void CContainer::CLoadSaveRegistry::SaveBookmarks(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveBookmarks(void)
 {
 	m_pContainer->SaveBookmarksToRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::SaveTabs(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveTabs(void)
 {
 	m_pContainer->SaveTabSettingsToRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::SaveDefaultColumns(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveDefaultColumns(void)
 {
 	m_pContainer->SaveDefaultColumnsToRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::SaveApplicationToolbar(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveApplicationToolbar(void)
 {
 	m_pContainer->SaveApplicationToolbarToRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::SaveToolbarInformation(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveToolbarInformation(void)
 {
 	m_pContainer->SaveToolbarInformationToRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::SaveColorRules(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveColorRules(void)
 {
 	m_pContainer->SaveColorRulesToRegistry();
 }
 
-void CContainer::CLoadSaveRegistry::SaveState(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveState(void)
 {
 	m_pContainer->SaveStateToRegistry();
 }

@@ -20,9 +20,9 @@
 #define MENU_OPEN_IN_NEW_TAB	(MAX_SHELL_MENU_ID + 1)
 #define MENU_OPEN_FILE_LOCATION	(MAX_SHELL_MENU_ID + 2)
 
-CContainer	*g_pContainer = NULL;
+Explorerplusplus	*g_pContainer = NULL;
 
-HRESULT CContainer::CreateFileContextMenu(HWND hwnd,LPITEMIDLIST pidlParent,
+HRESULT Explorerplusplus::CreateFileContextMenu(HWND hwnd,LPITEMIDLIST pidlParent,
 POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExtended)
 {
 	assert(pidlParent != NULL);
@@ -340,13 +340,13 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 	return S_OK;
 }
 
-HRESULT CContainer::ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,
+HRESULT Explorerplusplus::ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,
 LPCITEMIDLIST *ppidl,int nFiles)
 {
 	return ExecuteActionFromContextMenu(pidlDirectory,ppidl,nFiles,_T("properties"),0);
 }
 
-HRESULT CContainer::ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,
+HRESULT Explorerplusplus::ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,
 LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask)
 {
 	assert(pidlDirectory != NULL);
@@ -441,12 +441,12 @@ LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM l
 
 LRESULT CALLBACK ShellMenuHookProcStubMainWindow(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
-	CContainer *pContainer = (CContainer *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
+	Explorerplusplus *pContainer = (Explorerplusplus *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
 
 	return pContainer->ShellMenuHookProc(hwnd,Msg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -603,7 +603,7 @@ LRESULT CALLBACK CContainer::ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam
 	return CallWindowProc(DefaultMainWndProc,hwnd,uMsg,wParam,lParam);
 }
 
-HRESULT CContainer::ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset)
+HRESULT Explorerplusplus::ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset)
 {
 	assert(pContextMenu != NULL);
 

@@ -45,13 +45,13 @@ int g_nDefaultColumnsChecked = 0;
 
 INT_PTR CALLBACK SetDefaultColumnsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -59,7 +59,7 @@ INT_PTR CALLBACK SetDefaultColumnsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 	return pContainer->SetDefaultColumnsProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::SetDefaultColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::SetDefaultColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -128,7 +128,7 @@ INT_PTR CALLBACK CContainer::SetDefaultColumnsProc(HWND hDlg,UINT Msg,WPARAM wPa
 	return 0;
 }
 
-void CContainer::OnSetDefaultColumnsInit(HWND hDlg)
+void Explorerplusplus::OnSetDefaultColumnsInit(HWND hDlg)
 {
 	HWND	hComboBox;
 	TCHAR	szFolderName[MAX_PATH];
@@ -222,7 +222,7 @@ void CContainer::OnSetDefaultColumnsInit(HWND hDlg)
 	SetFocus(hListView);
 }
 
-void CContainer::OnSetDefaultColumnsInitialzeTempColumns(void)
+void Explorerplusplus::OnSetDefaultColumnsInitialzeTempColumns(void)
 {
 	g_RealFolderColumnList			= m_RealFolderColumnList;
 	g_MyComputerColumnList			= m_MyComputerColumnList;
@@ -233,7 +233,7 @@ void CContainer::OnSetDefaultColumnsInitialzeTempColumns(void)
 	g_MyNetworkPlacesColumnList		= m_MyNetworkPlacesColumnList;
 }
 
-void CContainer::OnSetDefaultColumnsExportTempColumns(void)
+void Explorerplusplus::OnSetDefaultColumnsExportTempColumns(void)
 {
 	m_RealFolderColumnList			= g_RealFolderColumnList;
 	m_MyComputerColumnList			= g_MyComputerColumnList;
@@ -244,7 +244,7 @@ void CContainer::OnSetDefaultColumnsExportTempColumns(void)
 	m_MyNetworkPlacesColumnList		= g_MyNetworkPlacesColumnList;
 }
 
-void CContainer::OnSetDefaultColumnsCBChange(HWND hDlg)
+void Explorerplusplus::OnSetDefaultColumnsCBChange(HWND hDlg)
 {
 	HWND						hComboBox;
 	HWND						hListView;
@@ -303,7 +303,7 @@ void CContainer::OnSetDefaultColumnsCBChange(HWND hDlg)
 	ListView_SelectItem(hListView,0,TRUE);
 }
 
-void CContainer::GetCurrentDefaultColumnState(HWND hDlg)
+void Explorerplusplus::GetCurrentDefaultColumnState(HWND hDlg)
 {
 	HWND			hComboBox;
 	HWND			hListView;
@@ -348,7 +348,7 @@ void CContainer::GetCurrentDefaultColumnState(HWND hDlg)
 	}
 }
 
-BOOL CContainer::OnSetDefaultColumnsLvnItemChanging(HWND hDlg,LPARAM lParam)
+BOOL Explorerplusplus::OnSetDefaultColumnsLvnItemChanging(HWND hDlg,LPARAM lParam)
 {
 	NMLISTVIEW *nmlv;
 	HWND hListView;
@@ -417,7 +417,7 @@ BOOL CContainer::OnSetDefaultColumnsLvnItemChanging(HWND hDlg,LPARAM lParam)
 	return FALSE;
 }
 
-void CContainer::OnSetDefaultColumnsOk(HWND hDlg)
+void Explorerplusplus::OnSetDefaultColumnsOk(HWND hDlg)
 {
 	/* Save the state of the current items. */
 	GetCurrentDefaultColumnState(hDlg);
@@ -428,7 +428,7 @@ void CContainer::OnSetDefaultColumnsOk(HWND hDlg)
 	EndDialog(hDlg,1);
 }
 
-void CContainer::SetDefaultColumnsSaveState(HWND hDlg)
+void Explorerplusplus::SetDefaultColumnsSaveState(HWND hDlg)
 {
 	RECT rcTemp;
 

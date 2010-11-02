@@ -338,12 +338,6 @@ typedef struct
 	BOOL			bExpandInitial;
 } AddBookmarkInfo_t;
 
-typedef struct
-{
-	RECT	rcNormalPosition;
-	BOOL	bMaximized;
-} InitialWindowPos_t;
-
 struct ApplicationButton_t
 {
 	/* External. */
@@ -653,7 +647,6 @@ public:
 
 	/* Loading functions. */
 	virtual void	LoadGenericSettings(void);
-	virtual LONG	LoadWindowPosition(InitialWindowPos_t *piwp);
 	virtual void	LoadFilters(void);
 	virtual void	LoadBookmarks();
 	virtual int		LoadPreviousTabs(void);
@@ -665,7 +658,6 @@ public:
 
 	/* Saving functions. */
 	virtual void	SaveGenericSettings(void);
-	virtual LONG	SaveWindowPosition(void);
 	virtual void	SaveFilters(void);
 	virtual void	SaveBookmarks();
 	virtual void	SaveTabs(void);
@@ -677,6 +669,7 @@ public:
 };
 
 BOOL TestConfigFileInternal(void);
+BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl);
 BOOL LoadAllowMultipleInstancesFromXML(void);
 
 extern LRESULT CALLBACK ListViewSubclassProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -696,7 +689,6 @@ INT_PTR CALLBACK ColorRuleProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lPar
 INT_PTR CALLBACK SearchProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK DWChangeDetailsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK DWLinePropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-ATOM RegisterMainWindowClass(void);
 
 /* Dialog handler stubs. */
 INT_PTR CALLBACK	AboutDialogProcedure(HWND,UINT,WPARAM,LPARAM);

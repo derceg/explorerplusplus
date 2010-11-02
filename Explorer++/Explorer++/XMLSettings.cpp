@@ -101,6 +101,7 @@ will need to be changed correspondingly. */
 #define HASH_TVAUTOEXPAND			1228854897
 #define HASH_OVERWRITEEXISTINGFILESCONFIRMATION	1625342835
 #define HASH_LARGETOOLBARICONS		10895007
+#define HASH_PLAYNAVIGATIONSOUND	1987363412
 
 typedef struct
 {
@@ -219,7 +220,7 @@ void AppendChildToParent(MSXML2::IXMLDOMNode *pChild, MSXML2::IXMLDOMNode *pPare
 	pNode = NULL;
 }
 
-void CContainer::LoadGenericSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+void Explorerplusplus::LoadGenericSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	BSTR						bstr = NULL;
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
@@ -281,7 +282,7 @@ clean:
 	return;
 }
 
-void CContainer::SaveGenericSettingsToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveGenericSettingsToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement					*pe = NULL;
@@ -406,6 +407,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivate"),EncodeBoolValue(m_bOneClickActivate));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OverwriteExistingFilesConfirmation"),EncodeBoolValue(m_bOverwriteExistingFilesConfirmation));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("PlayNavigationSound"),EncodeBoolValue(m_bPlayNavigationSound));
 
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	_itow_s(m_ReplaceExplorerMode,szValue,SIZEOF_ARRAY(szValue),10);
@@ -518,9 +521,11 @@ MSXML2::IXMLDOMElement *pRoot)
 	AppendChildToParent(pe,pRoot);
 	pe->Release();
 	pe = NULL;
+
+	SaveWindowPositionToXML(pXMLDom,pRoot);
 }
 
-int CContainer::LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+int Explorerplusplus::LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
 	MSXML2::IXMLDOMNode			*pNode = NULL;
@@ -718,7 +723,7 @@ clean:
 	return nTabsCreated;
 }
 
-void CContainer::SaveTabSettingsToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveTabSettingsToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement	*pe = NULL;
@@ -741,7 +746,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	pe = NULL;
 }
 
-void CContainer::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe)
+void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe)
 {
 	MSXML2::IXMLDOMElement	*pParentNode = NULL;
 	MSXML2::IXMLDOMElement	*pColumnsNode = NULL;
@@ -852,7 +857,7 @@ void CContainer::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MS
 	SysFreeString(bstr_wsnttt);
 }
 
-int CContainer::LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,list<Column_t> *pColumns)
+int Explorerplusplus::LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,list<Column_t> *pColumns)
 {
 	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
 	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
@@ -936,7 +941,7 @@ int CContainer::LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,list<Column_t> *pCo
 	return iColumnType;
 }
 
-void CContainer::SaveFiltersToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveFiltersToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement	*pe = NULL;
@@ -957,7 +962,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	pe = NULL;
 }
 
-void CContainer::SaveFiltersToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe)
+void Explorerplusplus::SaveFiltersToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe)
 {
 	MSXML2::IXMLDOMElement		*pParentNode = NULL;
 	list<Filter_t>::iterator	itr;
@@ -986,7 +991,7 @@ void CContainer::SaveFiltersToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML
 	SysFreeString(bstr_wsntt);
 }
 
-int CContainer::LoadBookmarksFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+int Explorerplusplus::LoadBookmarksFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
 	MSXML2::IXMLDOMNode			*pNode = NULL;
@@ -1019,7 +1024,7 @@ clean:
 and then step down into any children, before traversing
 any sibling nodes (and stepping into their child items,
 etc). */
-void CContainer::LoadBookmarksFromXMLInternal(MSXML2::IXMLDOMNode *pNode,void *pParentFolder)
+void Explorerplusplus::LoadBookmarksFromXMLInternal(MSXML2::IXMLDOMNode *pNode,void *pParentFolder)
 {
 	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
 	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
@@ -1113,7 +1118,7 @@ void CContainer::LoadBookmarksFromXMLInternal(MSXML2::IXMLDOMNode *pNode,void *p
 	}
 }
 
-void CContainer::SaveBookmarksToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveBookmarksToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement		*pe = NULL;
@@ -1149,7 +1154,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	SysFreeString(bstr_wsnt);
 }
 
-void CContainer::SaveBookmarksToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveBookmarksToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pe,Bookmark_t *pBookmark)
 {
 	MSXML2::IXMLDOMElement		*pParentNode = NULL;
@@ -1253,7 +1258,7 @@ MSXML2::IXMLDOMElement *pe,Bookmark_t *pBookmark)
 	SysFreeString(bstr_wsntt);
 }
 
-int CContainer::LoadFiltersFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+int Explorerplusplus::LoadFiltersFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
 	MSXML2::IXMLDOMNode			*pNode = NULL;
@@ -1324,7 +1329,7 @@ clean:
 	return 0;
 }
 
-int CContainer::LoadDefaultColumnsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+int Explorerplusplus::LoadDefaultColumnsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
 	MSXML2::IXMLDOMNode			*pNode = NULL;
@@ -1397,7 +1402,7 @@ clean:
 	return 0;
 }
 
-void CContainer::SaveDefaultColumnsToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveDefaultColumnsToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement	*pColumnsNode = NULL;
@@ -1419,7 +1424,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	pColumnsNode = NULL;
 }
 
-void CContainer::SaveDefaultColumnsToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveDefaultColumnsToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pColumnsNode)
 {
 	int DEFAULT_INDENT = 2;
@@ -1433,7 +1438,7 @@ MSXML2::IXMLDOMElement *pColumnsNode)
 	SaveColumnToXML(pXMLDom,pColumnsNode,&m_MyNetworkPlacesColumnList,_T("NetworkPlaces"),DEFAULT_INDENT);
 }
 
-void CContainer::SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pColumnsNode,list<Column_t> *pColumns,
 TCHAR *szColumnSet,int iIndent)
 {
@@ -1475,84 +1480,7 @@ TCHAR *szColumnSet,int iIndent)
 	SysFreeString(bstr_indent);
 }
 
-int CContainer::LoadWindowPositionFromXML(MSXML2::IXMLDOMDocument *pXMLDom,
-InitialWindowPos_t *piwp)
-{
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	BSTR						bstr = NULL;
-	HRESULT						hr;
-	long						length;
-	long						nChildNodes;
-	int							i = 0;
-
-	if(!pXMLDom)
-		goto clean;
-
-	bstr = SysAllocString(L"//WindowPosition/*");
-	pXMLDom->selectNodes(bstr,&pNodes);
-
-	if(!pNodes)
-	{
-		goto clean;
-	}
-	else
-	{
-		pNodes->get_length(&length);
-
-		/* There should only be one node
-		under 'WindowPosition'. */
-		if(length == 1)
-		{
-			pNodes->get_item(0, &pNode);
-
-			hr = pNode->get_attributes(&am);
-
-			if(SUCCEEDED(hr))
-			{
-				am->get_length(&nChildNodes);
-
-				for(i = 1;i < nChildNodes;i++)
-				{
-					am->get_item(i,&pChildNode);
-
-					/* Element name. */
-					pChildNode->get_nodeName(&bstrName);
-
-					/* Element value. */
-					pChildNode->get_text(&bstrValue);
-
-					if(lstrcmp(bstrName,_T("Left")) == 0)
-						piwp->rcNormalPosition.left = DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("Top")) == 0)
-						piwp->rcNormalPosition.top = DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("Right")) == 0)
-						piwp->rcNormalPosition.right = DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("Bottom")) == 0)
-						piwp->rcNormalPosition.bottom = DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("Maximized")) == 0)
-						piwp->bMaximized = DecodeBoolValue(bstrValue);
-				}
-			}
-
-			pNode->Release();
-			pNode = NULL;
-		}
-	}
-
-clean:
-	if (bstr) SysFreeString(bstr);
-	if (pNodes) pNodes->Release();
-	if (pNode) pNode->Release();
-
-	return 0;
-}
-
-void CContainer::SaveWindowPositionToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveWindowPositionToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement	*pWndPosNode = NULL;
@@ -1574,34 +1502,35 @@ MSXML2::IXMLDOMElement *pRoot)
 	pWndPosNode = NULL;
 }
 
-void CContainer::SaveWindowPositionToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveWindowPositionToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pWndPosNode)
 {
 	MSXML2::IXMLDOMElement	*pParentNode = NULL;
 	WINDOWPLACEMENT			wndpl;
 	BSTR					bstr_wsntt = SysAllocString(L"\n\t\t");
-	BOOL					bMaximized;
-
-	bMaximized = IsZoomed(m_hContainer);
 
 	wndpl.length = sizeof(WINDOWPLACEMENT);
-
 	GetWindowPlacement(m_hContainer,&wndpl);
 
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pWndPosNode);
 
 	CreateElementNode(pXMLDom,&pParentNode,pWndPosNode,_T("Setting"),_T("Position"));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("Left"),EncodeIntValue(wndpl.rcNormalPosition.left));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("Top"),EncodeIntValue(wndpl.rcNormalPosition.top));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("Right"),EncodeIntValue(wndpl.rcNormalPosition.right));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("Bottom"),EncodeIntValue(wndpl.rcNormalPosition.bottom));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("Maximized"),EncodeBoolValue(IsZoomed(m_hContainer)));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("Flags"),EncodeIntValue(wndpl.flags));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("ShowCmd"),EncodeIntValue(wndpl.showCmd));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("MinPositionX"),EncodeIntValue(wndpl.ptMinPosition.x));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("MinPositionY"),EncodeIntValue(wndpl.ptMinPosition.y));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("MaxPositionX"),EncodeIntValue(wndpl.ptMaxPosition.x));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("MaxPositionY"),EncodeIntValue(wndpl.ptMaxPosition.y));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("NormalPositionLeft"),EncodeIntValue(wndpl.rcNormalPosition.left));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("NormalPositionTop"),EncodeIntValue(wndpl.rcNormalPosition.top));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("NormalPositionRight"),EncodeIntValue(wndpl.rcNormalPosition.right));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("NormalPositionBottom"),EncodeIntValue(wndpl.rcNormalPosition.bottom));
 
 	pParentNode->Release();
 	pParentNode = NULL;
 }
 
-void CContainer::LoadApplicationToolbarFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+void Explorerplusplus::LoadApplicationToolbarFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
 	MSXML2::IXMLDOMNode			*pNode = NULL;
@@ -1631,7 +1560,7 @@ clean:
 and then step down into any children, before traversing
 any sibling nodes (and stepping into their child items,
 etc). */
-void CContainer::LoadApplicationToolbarFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
+void Explorerplusplus::LoadApplicationToolbarFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
 {
 	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
 	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
@@ -1700,7 +1629,7 @@ void CContainer::LoadApplicationToolbarFromXMLInternal(MSXML2::IXMLDOMNode *pNod
 	}
 }
 
-void CContainer::SaveApplicationToolbarToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveApplicationToolbarToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement		*pe = NULL;
@@ -1729,7 +1658,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	SysFreeString(bstr_wsnt);
 }
 
-void CContainer::SaveApplicationToolbarToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveApplicationToolbarToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pe,ApplicationButton_t *pab)
 {
 	MSXML2::IXMLDOMElement		*pParentNode = NULL;
@@ -1764,7 +1693,7 @@ MSXML2::IXMLDOMElement *pe,ApplicationButton_t *pab)
 	SysFreeString(bstr_wsntt);
 }
 
-void CContainer::LoadColorRulesFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+void Explorerplusplus::LoadColorRulesFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
 	MSXML2::IXMLDOMNode			*pNode = NULL;
@@ -1795,7 +1724,7 @@ clean:
 and then step down into any children, before traversing
 any sibling nodes (and stepping into their child items,
 etc). */
-void CContainer::LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
+void Explorerplusplus::LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
 {
 	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
 	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
@@ -1881,7 +1810,7 @@ void CContainer::LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
 	}
 }
 
-void CContainer::SaveColorRulesToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveColorRulesToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement		*pe = NULL;
@@ -1913,7 +1842,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	SysFreeString(bstr_wsnt);
 }
 
-void CContainer::SaveColorRulesToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveColorRulesToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pe,ListViewColouring_t *plvc)
 {
 	MSXML2::IXMLDOMElement		*pParentNode = NULL;
@@ -1948,7 +1877,7 @@ MSXML2::IXMLDOMElement *pe,ListViewColouring_t *plvc)
 	SysFreeString(bstr_wsntt);
 }
 
-void CContainer::LoadToolbarInformationFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+void Explorerplusplus::LoadToolbarInformationFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
 	MSXML2::IXMLDOMNode			*pNode = NULL;
@@ -2035,7 +1964,7 @@ clean:
 	if (pNode) pNode->Release();
 }
 
-void CContainer::SaveToolbarInformationToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveToolbarInformationToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement	*pe = NULL;
@@ -2058,7 +1987,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	pe = NULL;
 }
 
-void CContainer::SaveToolbarInformationToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveToolbarInformationToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pe)
 {
 	MSXML2::IXMLDOMElement	*pParentNode = NULL;
@@ -2097,7 +2026,7 @@ MSXML2::IXMLDOMElement *pe)
 	SysFreeString(bstr_wsnttt);
 }
 
-void CContainer::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+void Explorerplusplus::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
 	MSXML2::IXMLDOMNode			*pNode = NULL;
@@ -2174,7 +2103,7 @@ clean:
 	if (pNode) pNode->Release();
 }
 
-void CContainer::LoadColorRulesStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
+void Explorerplusplus::LoadColorRulesStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
 {
 	MSXML2::IXMLDOMNode *pNode = NULL;
 	BSTR bstrName;
@@ -2215,7 +2144,7 @@ void CContainer::LoadColorRulesStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,lon
 	}
 }
 
-void CContainer::LoadCustomizeColorsStateFromSML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
+void Explorerplusplus::LoadCustomizeColorsStateFromSML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
 {
 	MSXML2::IXMLDOMNode *pNode = NULL;
 	BSTR bstrName;
@@ -2243,7 +2172,7 @@ void CContainer::LoadCustomizeColorsStateFromSML(MSXML2::IXMLDOMNamedNodeMap *pa
 	m_crInitialColor = RGB(r,g,b);
 }
 
-void CContainer::LoadSearchStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
+void Explorerplusplus::LoadSearchStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
 {
 	MSXML2::IXMLDOMNode *pNode = NULL;
 	SearchDirectoryInfo_t sdi;
@@ -2280,7 +2209,7 @@ void CContainer::LoadSearchStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lC
 	}
 }
 
-void CContainer::LoadWildcardStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
+void Explorerplusplus::LoadWildcardStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
 {
 	MSXML2::IXMLDOMNode *pNode = NULL;
 	WildcardSelectInfo_t wsi;
@@ -2307,7 +2236,7 @@ void CContainer::LoadWildcardStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long 
 	}
 }
 
-void CContainer::SaveStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement	*pe = NULL;
@@ -2333,7 +2262,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	pe = NULL;
 }
 
-void CContainer::SaveColorRulesStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveColorRulesStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pe)
 {
 	MSXML2::IXMLDOMElement	*pParentNode = NULL;
@@ -2356,7 +2285,7 @@ MSXML2::IXMLDOMElement *pe)
 	}
 }
 
-void CContainer::SaveCustomizeColorsStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveCustomizeColorsStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pe)
 {
 	MSXML2::IXMLDOMElement	*pParentNode = NULL;
@@ -2371,7 +2300,7 @@ MSXML2::IXMLDOMElement *pe)
 	AddAttributeToNode(pXMLDom,pParentNode,_T("b"),EncodeIntValue(GetBValue(m_crInitialColor)));
 }
 
-void CContainer::SaveSearchStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveSearchStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pe)
 {
 	MSXML2::IXMLDOMElement	*pParentNode = NULL;
@@ -2405,7 +2334,7 @@ MSXML2::IXMLDOMElement *pe)
 	AddAttributeToNode(pXMLDom,pParentNode,_T("SearchSubFolders"),EncodeBoolValue(m_bSearchSubFolders));
 }
 
-void CContainer::SaveWildcardStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+void Explorerplusplus::SaveWildcardStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pe)
 {
 	MSXML2::IXMLDOMElement	*pParentNode = NULL;
@@ -2568,7 +2497,7 @@ unsigned long hash_setting(unsigned char *str)
 
 
 /* Maps attribute name to their corresponding internal variable. */
-void CContainer::MapAttributeToValue(MSXML2::IXMLDOMNode *pNode,
+void Explorerplusplus::MapAttributeToValue(MSXML2::IXMLDOMNode *pNode,
 WCHAR *wszName,WCHAR *wszValue)
 {
 	unsigned char	szName[512];
@@ -2693,6 +2622,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_OVERWRITEEXISTINGFILESCONFIRMATION:
 		m_bOverwriteExistingFilesConfirmation = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_PLAYNAVIGATIONSOUND:
+		m_bPlayNavigationSound = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_REPLACEEXPLORERMODE:
@@ -2954,7 +2887,7 @@ WCHAR *wszName,WCHAR *wszValue)
 	}
 }
 
-void CContainer::MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,
+void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,
 InitialSettings_t *pSettings,TabInfo_t *pTabInfo)
 {
 	if(lstrcmp(wszName,L"ApplyFilter") == 0)
@@ -3196,7 +3129,7 @@ HFONT ReadXMLFontData(MSXML2::IXMLDOMNode *pNode)
 	return CreateFontIndirect(&FontInfo);
 }
 
-CContainer::CLoadSaveXML::CLoadSaveXML(CContainer *pContainer,BOOL bLoad)
+Explorerplusplus::CLoadSaveXML::CLoadSaveXML(Explorerplusplus *pContainer,BOOL bLoad)
 {
 	m_iRefCount = 1;
 
@@ -3216,7 +3149,7 @@ CContainer::CLoadSaveXML::CLoadSaveXML(CContainer *pContainer,BOOL bLoad)
 	}
 }
 
-CContainer::CLoadSaveXML::~CLoadSaveXML()
+Explorerplusplus::CLoadSaveXML::~CLoadSaveXML()
 {
 	if(m_bLoad)
 		ReleaseLoadEnvironment();
@@ -3225,7 +3158,7 @@ CContainer::CLoadSaveXML::~CLoadSaveXML()
 }
 
 /* IUnknown interface members. */
-HRESULT __stdcall CContainer::CLoadSaveXML::QueryInterface(REFIID iid, void **ppvObject)
+HRESULT __stdcall Explorerplusplus::CLoadSaveXML::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = NULL;
 
@@ -3238,12 +3171,12 @@ HRESULT __stdcall CContainer::CLoadSaveXML::QueryInterface(REFIID iid, void **pp
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall CContainer::CLoadSaveXML::AddRef(void)
+ULONG __stdcall Explorerplusplus::CLoadSaveXML::AddRef(void)
 {
 	return ++m_iRefCount;
 }
 
-ULONG __stdcall CContainer::CLoadSaveXML::Release(void)
+ULONG __stdcall Explorerplusplus::CLoadSaveXML::Release(void)
 {
 	m_iRefCount--;
 	
@@ -3256,10 +3189,11 @@ ULONG __stdcall CContainer::CLoadSaveXML::Release(void)
 	return m_iRefCount;
 }
 
-void CContainer::CLoadSaveXML::InitializeLoadEnvironment(void)
+void Explorerplusplus::CLoadSaveXML::InitializeLoadEnvironment(void)
 {
-	VARIANT_BOOL	status;
-	VARIANT			var;
+	TCHAR szConfigFile[MAX_PATH];
+	VARIANT_BOOL status;
+	VARIANT var;
 
 	m_bLoadedCorrectly = FALSE;
 
@@ -3267,6 +3201,10 @@ void CContainer::CLoadSaveXML::InitializeLoadEnvironment(void)
 
 	if(!m_pXMLDom)
 		goto clean;
+
+	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
+	PathRemoveFileSpec(szConfigFile);
+	PathAppend(szConfigFile,XML_FILENAME);
 
 	var = VariantString(XML_FILENAME);
 	m_pXMLDom->load(var,&status);
@@ -3282,7 +3220,7 @@ clean:
 	return;
 }
 
-void CContainer::CLoadSaveXML::ReleaseLoadEnvironment(void)
+void Explorerplusplus::CLoadSaveXML::ReleaseLoadEnvironment(void)
 {
 	if(m_bLoadedCorrectly)
 	{
@@ -3291,7 +3229,7 @@ void CContainer::CLoadSaveXML::ReleaseLoadEnvironment(void)
 	}
 }
 
-void CContainer::CLoadSaveXML::InitializeSaveEnvironment(void)
+void Explorerplusplus::CLoadSaveXML::InitializeSaveEnvironment(void)
 {
 	MSXML2::IXMLDOMProcessingInstruction	*pi = NULL;
 	MSXML2::IXMLDOMComment					*pc = NULL;
@@ -3345,7 +3283,7 @@ clean:
 	if (pc) pc->Release();
 }
 
-void CContainer::CLoadSaveXML::ReleaseSaveEnvironment(void)
+void Explorerplusplus::CLoadSaveXML::ReleaseSaveEnvironment(void)
 {
 	HANDLE	hProcess;
 	TCHAR	szConfigFile[MAX_PATH];
@@ -3379,111 +3317,205 @@ void CContainer::CLoadSaveXML::ReleaseSaveEnvironment(void)
 	m_pXMLDom = NULL;
 }
 
-void CContainer::CLoadSaveXML::LoadGenericSettings(void)
+void Explorerplusplus::CLoadSaveXML::LoadGenericSettings(void)
 {
 	m_pContainer->LoadGenericSettingsFromXML(m_pXMLDom);
 }
 
-LONG CContainer::CLoadSaveXML::LoadWindowPosition(InitialWindowPos_t *piwp)
-{
-	m_pContainer->LoadWindowPositionFromXML(m_pXMLDom,piwp);
-	return 0;
-}
-
-void CContainer::CLoadSaveXML::LoadFilters(void)
+void Explorerplusplus::CLoadSaveXML::LoadFilters(void)
 {
 	m_pContainer->LoadFiltersFromXML(m_pXMLDom);
 }
 
-void CContainer::CLoadSaveXML::LoadBookmarks(void)
+void Explorerplusplus::CLoadSaveXML::LoadBookmarks(void)
 {
 	m_pContainer->LoadBookmarksFromXML(m_pXMLDom);
 }
 
-int CContainer::CLoadSaveXML::LoadPreviousTabs(void)
+int Explorerplusplus::CLoadSaveXML::LoadPreviousTabs(void)
 {
 	return m_pContainer->LoadTabSettingsFromXML(m_pXMLDom);
 }
 
-void CContainer::CLoadSaveXML::LoadDefaultColumns(void)
+void Explorerplusplus::CLoadSaveXML::LoadDefaultColumns(void)
 {
 	m_pContainer->LoadDefaultColumnsFromXML(m_pXMLDom);
 }
 
-void CContainer::CLoadSaveXML::LoadApplicationToolbar(void)
+void Explorerplusplus::CLoadSaveXML::LoadApplicationToolbar(void)
 {
 	m_pContainer->LoadApplicationToolbarFromXML(m_pXMLDom);
 }
 
-void CContainer::CLoadSaveXML::LoadToolbarInformation(void)
+void Explorerplusplus::CLoadSaveXML::LoadToolbarInformation(void)
 {
 	m_pContainer->LoadToolbarInformationFromXML(m_pXMLDom);
 }
 
-void CContainer::CLoadSaveXML::LoadColorRules(void)
+void Explorerplusplus::CLoadSaveXML::LoadColorRules(void)
 {
 	m_pContainer->LoadColorRulesFromXML(m_pXMLDom);
 }
 
-void CContainer::CLoadSaveXML::LoadState(void)
+void Explorerplusplus::CLoadSaveXML::LoadState(void)
 {
 	m_pContainer->LoadStateFromXML(m_pXMLDom);
 }
 
-void CContainer::CLoadSaveXML::SaveGenericSettings(void)
+void Explorerplusplus::CLoadSaveXML::SaveGenericSettings(void)
 {
 	m_pContainer->SaveGenericSettingsToXML(m_pXMLDom,m_pRoot);
 }
 
-LONG CContainer::CLoadSaveXML::SaveWindowPosition(void)
-{
-	m_pContainer->SaveWindowPositionToXML(m_pXMLDom,m_pRoot);
-	return 0;
-}
-
-void CContainer::CLoadSaveXML::SaveFilters(void)
+void Explorerplusplus::CLoadSaveXML::SaveFilters(void)
 {
 	m_pContainer->SaveFiltersToXML(m_pXMLDom,m_pRoot);
 }
 
-void CContainer::CLoadSaveXML::SaveBookmarks(void)
+void Explorerplusplus::CLoadSaveXML::SaveBookmarks(void)
 {
 	m_pContainer->SaveBookmarksToXML(m_pXMLDom,m_pRoot);
 }
 
-void CContainer::CLoadSaveXML::SaveTabs(void)
+void Explorerplusplus::CLoadSaveXML::SaveTabs(void)
 {
 	m_pContainer->SaveTabSettingsToXML(m_pXMLDom,m_pRoot);
 }
 
-void CContainer::CLoadSaveXML::SaveDefaultColumns(void)
+void Explorerplusplus::CLoadSaveXML::SaveDefaultColumns(void)
 {
 	m_pContainer->SaveDefaultColumnsToXML(m_pXMLDom,m_pRoot);
 }
 
-void CContainer::CLoadSaveXML::SaveApplicationToolbar(void)
+void Explorerplusplus::CLoadSaveXML::SaveApplicationToolbar(void)
 {
 	m_pContainer->SaveApplicationToolbarToXML(m_pXMLDom,m_pRoot);
 }
 
-void CContainer::CLoadSaveXML::SaveToolbarInformation(void)
+void Explorerplusplus::CLoadSaveXML::SaveToolbarInformation(void)
 {
 	m_pContainer->SaveToolbarInformationToXML(m_pXMLDom,m_pRoot);
 }
 
-void CContainer::CLoadSaveXML::SaveColorRules(void)
+void Explorerplusplus::CLoadSaveXML::SaveColorRules(void)
 {
 	m_pContainer->SaveColorRulesToXML(m_pXMLDom,m_pRoot);
 }
 
-void CContainer::CLoadSaveXML::SaveState(void)
+void Explorerplusplus::CLoadSaveXML::SaveState(void)
 {
 	m_pContainer->SaveStateToXML(m_pXMLDom,m_pRoot);
+}
+
+BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
+{
+	MSXML2::IXMLDOMDocument *pXMLDom;
+	TCHAR szConfigFile[MAX_PATH];
+	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
+	MSXML2::IXMLDOMNode			*pNode = NULL;
+	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
+	MSXML2::IXMLDOMNode			*pChildNode = NULL;
+	BSTR						bstrName;
+	BSTR						bstrValue;
+	BSTR						bstr = NULL;
+	VARIANT_BOOL				status;
+	VARIANT						var;
+	HRESULT						hr;
+	long						length;
+	long						nChildNodes;
+	int							i = 0;
+
+	pXMLDom = DomFromCOM();
+
+	if(!pXMLDom)
+		goto clean;
+
+	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
+	PathRemoveFileSpec(szConfigFile);
+	PathAppend(szConfigFile,XML_FILENAME);
+
+	var = VariantString(szConfigFile);
+	pXMLDom->load(var,&status);
+
+	if(status != VARIANT_TRUE)
+		goto clean;
+
+	bstr = SysAllocString(L"//WindowPosition/*");
+	pXMLDom->selectNodes(bstr,&pNodes);
+
+	pwndpl->length = sizeof(WINDOWPLACEMENT);
+
+	if(!pNodes)
+	{
+		goto clean;
+	}
+	else
+	{
+		pNodes->get_length(&length);
+
+		/* There should only be one node
+		under 'WindowPosition'. */
+		if(length == 1)
+		{
+			pNodes->get_item(0, &pNode);
+
+			hr = pNode->get_attributes(&am);
+
+			if(SUCCEEDED(hr))
+			{
+				am->get_length(&nChildNodes);
+
+				for(i = 1;i < nChildNodes;i++)
+				{
+					am->get_item(i,&pChildNode);
+
+					/* Element name. */
+					pChildNode->get_nodeName(&bstrName);
+
+					/* Element value. */
+					pChildNode->get_text(&bstrValue);
+
+					if(lstrcmp(bstrName,_T("Flags")) == 0)
+						pwndpl->flags = DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName,_T("ShowCmd")) == 0)
+						pwndpl->showCmd = DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName,_T("MinPositionX")) == 0)
+						pwndpl->ptMinPosition.x = DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName,_T("MinPositionY")) == 0)
+						pwndpl->ptMinPosition.y = DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName,_T("MaxPositionX")) == 0)
+						pwndpl->ptMaxPosition.x = DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName,_T("MaxPositionY")) == 0)
+						pwndpl->ptMaxPosition.y = DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName,_T("NormalPositionLeft")) == 0)
+						pwndpl->rcNormalPosition.left = DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName,_T("NormalPositionTop")) == 0)
+						pwndpl->rcNormalPosition.top = DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName,_T("NormalPositionRight")) == 0)
+						pwndpl->rcNormalPosition.right = DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName,_T("NormalPositionBottom")) == 0)
+						pwndpl->rcNormalPosition.bottom = DecodeIntValue(bstrValue);
+				}
+			}
+
+			pNode->Release();
+			pNode = NULL;
+		}
+	}
+
+clean:
+	if(&var) VariantClear(&var);
+	if (bstr) SysFreeString(bstr);
+	if (pNodes) pNodes->Release();
+	if (pNode) pNode->Release();
+
+	return TRUE;
 }
 
 BOOL LoadAllowMultipleInstancesFromXML(void)
 {
 	MSXML2::IXMLDOMDocument *pXMLDom;
+	TCHAR szConfigFile[MAX_PATH];
 	VARIANT_BOOL status;
 	VARIANT var;
 	BOOL bAllowMultipleInstances = TRUE;
@@ -3493,7 +3525,11 @@ BOOL LoadAllowMultipleInstancesFromXML(void)
 	if(!pXMLDom)
 		goto clean;
 
-	var = VariantString(XML_FILENAME);
+	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
+	PathRemoveFileSpec(szConfigFile);
+	PathAppend(szConfigFile,XML_FILENAME);
+
+	var = VariantString(szConfigFile);
 	pXMLDom->load(var,&status);
 
 	if(status != VARIANT_TRUE)

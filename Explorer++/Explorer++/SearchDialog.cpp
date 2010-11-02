@@ -33,7 +33,7 @@ typedef struct
 	TCHAR szName[MAX_PATH + 2];
 	DWORD dwAttributes;
 
-	CContainer *pContainer;
+	Explorerplusplus *pContainer;
 	HWND hDlg;
 	HWND hListView;
 
@@ -92,13 +92,13 @@ int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData)
 
 INT_PTR CALLBACK SearchProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -106,7 +106,7 @@ INT_PTR CALLBACK SearchProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 	return pContainer->SearchProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -842,7 +842,7 @@ TCHAR *szSearchPattern,DWORD dwAttributes,list<DirectoryInfo_t> *pSubfolderList)
 	}
 }
 
-void CContainer::OnSearch(HWND hDlg)
+void Explorerplusplus::OnSearch(HWND hDlg)
 {
 	SearchInfo_t *psi = NULL;
 	SearchDirectoryInfo_t sdi;
@@ -1014,7 +1014,7 @@ void CContainer::OnSearch(HWND hDlg)
 	}
 }
 
-void CContainer::SearchSaveState(HWND hDlg)
+void Explorerplusplus::SearchSaveState(HWND hDlg)
 {
 	HWND hListView;
 	RECT rcTemp;

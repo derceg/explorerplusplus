@@ -29,7 +29,7 @@ Basic procedure:
 3. If the path is a URL, pass it straight out, else
 4. If the path is relative, add it onto onto the current directory
 */
-void CContainer::OnAddressBarGo(void)
+void Explorerplusplus::OnAddressBarGo(void)
 {
 	TCHAR szPath[MAX_PATH];
 	TCHAR szFullFilePath[MAX_PATH];

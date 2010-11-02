@@ -17,31 +17,31 @@
 
 #define GENERAL_ALLOCATION_UNIT	1024
 
-CContainer::CApplicationToolbarDrop::CApplicationToolbarDrop(CContainer *pContainer)
+Explorerplusplus::CApplicationToolbarDrop::CApplicationToolbarDrop(Explorerplusplus *pContainer)
 {
 	m_pContainer = pContainer;
 
 	InitializeDragDropHelpers();
 }
 
-CContainer::CApplicationToolbarDrop::~CApplicationToolbarDrop()
+Explorerplusplus::CApplicationToolbarDrop::~CApplicationToolbarDrop()
 {
 
 }
 
-HRESULT __stdcall CContainer::CApplicationToolbarDrop::QueryInterface(REFIID iid, void **ppvObject)
+HRESULT __stdcall Explorerplusplus::CApplicationToolbarDrop::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = NULL;
 
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall CContainer::CApplicationToolbarDrop::AddRef(void)
+ULONG __stdcall Explorerplusplus::CApplicationToolbarDrop::AddRef(void)
 {
 	return ++m_iRefCount;
 }
 
-ULONG __stdcall CContainer::CApplicationToolbarDrop::Release(void)
+ULONG __stdcall Explorerplusplus::CApplicationToolbarDrop::Release(void)
 {
 	m_iRefCount--;
 	
@@ -54,7 +54,7 @@ ULONG __stdcall CContainer::CApplicationToolbarDrop::Release(void)
 	return m_iRefCount;
 }
 
-HRESULT _stdcall CContainer::CApplicationToolbarDrop::DragEnter(IDataObject *pDataObject,
+HRESULT _stdcall Explorerplusplus::CApplicationToolbarDrop::DragEnter(IDataObject *pDataObject,
 DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect)
 {
 	FORMATETC	ftc = {CF_HDROP,0,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
@@ -83,7 +83,7 @@ DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect)
 	return hr;
 }
 
-HRESULT _stdcall CContainer::CApplicationToolbarDrop::DragOver(DWORD grfKeyState,
+HRESULT _stdcall Explorerplusplus::CApplicationToolbarDrop::DragOver(DWORD grfKeyState,
 POINTL pt,DWORD *pdwEffect)
 {
 	*pdwEffect = DROPEFFECT_COPY;
@@ -94,14 +94,14 @@ POINTL pt,DWORD *pdwEffect)
 	return S_OK;
 }
 
-HRESULT _stdcall CContainer::CApplicationToolbarDrop::DragLeave(void)
+HRESULT _stdcall Explorerplusplus::CApplicationToolbarDrop::DragLeave(void)
 {
 	m_pDropTargetHelper->DragLeave();
 
 	return S_OK;
 }
 
-HRESULT _stdcall CContainer::CApplicationToolbarDrop::Drop(IDataObject *pDataObject,
+HRESULT _stdcall Explorerplusplus::CApplicationToolbarDrop::Drop(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 {
 	FORMATETC		ftc;
@@ -220,7 +220,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	return S_OK;
 }
 
-HRESULT CContainer::CApplicationToolbarDrop::InitializeDragDropHelpers(void)
+HRESULT Explorerplusplus::CApplicationToolbarDrop::InitializeDragDropHelpers(void)
 {
 	HRESULT hr;
 

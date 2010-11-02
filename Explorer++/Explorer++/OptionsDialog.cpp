@@ -34,7 +34,7 @@ static HWND g_hOptionsPropertyDialog	= NULL;
 HICON g_hNewTabDirIcon;
 TCHAR g_szNewTabDirectory[MAX_PATH];
 
-void CContainer::OnShowOptions(void)
+void Explorerplusplus::OnShowOptions(void)
 {
 	PROPSHEETPAGE	psp[NUM_DIALOG_OPTIONS_PAGES];
 	HPROPSHEETPAGE	hpsp[NUM_DIALOG_OPTIONS_PAGES];
@@ -147,7 +147,7 @@ int CALLBACK PropSheetProcStub(HWND hDlg,UINT msg,LPARAM lParam)
 
 INT_PTR CALLBACK GeneralSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer;
+	static Explorerplusplus *pContainer;
 
 	switch(uMsg)
 	{
@@ -156,7 +156,7 @@ INT_PTR CALLBACK GeneralSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARA
 				PROPSHEETPAGE *ppsp;
 
 				ppsp = (PROPSHEETPAGE *)lParam;
-				pContainer = (CContainer *)ppsp->lParam;
+				pContainer = (Explorerplusplus *)ppsp->lParam;
 			}
 			break;
 	}
@@ -164,7 +164,7 @@ INT_PTR CALLBACK GeneralSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARA
 	return pContainer->GeneralSettingsProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -439,7 +439,7 @@ INT_PTR CALLBACK CContainer::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 
 INT_PTR CALLBACK FilesFoldersProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer;
+	static Explorerplusplus *pContainer;
 
 	switch(uMsg)
 	{
@@ -448,7 +448,7 @@ INT_PTR CALLBACK FilesFoldersProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM l
 				PROPSHEETPAGE *ppsp;
 
 				ppsp = (PROPSHEETPAGE *)lParam;
-				pContainer = (CContainer *)ppsp->lParam;
+				pContainer = (Explorerplusplus *)ppsp->lParam;
 			}
 			break;
 	}
@@ -456,7 +456,7 @@ INT_PTR CALLBACK FilesFoldersProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM l
 	return pContainer->FilesFoldersProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -477,6 +477,8 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK,BST_CHECKED);
 				if(m_bOverwriteExistingFilesConfirmation)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,BST_CHECKED);
+				if(m_bPlayNavigationSound)
+					CheckDlgButton(hDlg,IDC_OPTIONS_PLAYNAVIGATIONSOUND,BST_CHECKED);
 				if(m_bShowFolderSizes)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES,BST_CHECKED);
 				if(m_bDisableFolderSizesNetworkRemovable)
@@ -522,6 +524,7 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 			case IDC_SETTINGS_CHECK_INSERTSORTED:
 			case IDC_SETTINGS_CHECK_SINGLECLICK:
 			case IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION:
+			case IDC_OPTIONS_PLAYNAVIGATIONSOUND:
 			case IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE:
 			case IDC_SETTINGS_CHECK_ZIPFILES:
 			case IDC_SETTINGS_CHECK_FRIENDLYDATES:
@@ -582,6 +585,9 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							== BST_CHECKED);
 
 						m_bOverwriteExistingFilesConfirmation = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION)
+							== BST_CHECKED);
+
+						m_bPlayNavigationSound = (IsDlgButtonChecked(hDlg,IDC_OPTIONS_PLAYNAVIGATIONSOUND)
 							== BST_CHECKED);
 
 						m_bShowFolderSizes = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES)
@@ -654,7 +660,7 @@ INT_PTR CALLBACK CContainer::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 INT_PTR CALLBACK WindowProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer;
+	static Explorerplusplus *pContainer;
 
 	switch(uMsg)
 	{
@@ -663,7 +669,7 @@ INT_PTR CALLBACK WindowProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 				PROPSHEETPAGE *ppsp;
 
 				ppsp = (PROPSHEETPAGE *)lParam;
-				pContainer = (CContainer *)ppsp->lParam;
+				pContainer = (Explorerplusplus *)ppsp->lParam;
 			}
 			break;
 	}
@@ -671,7 +677,7 @@ INT_PTR CALLBACK WindowProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 	return pContainer->WindowProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -889,7 +895,7 @@ INT_PTR CALLBACK CContainer::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 
 INT_PTR CALLBACK TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer;
+	static Explorerplusplus *pContainer;
 
 	switch(uMsg)
 	{
@@ -898,7 +904,7 @@ INT_PTR CALLBACK TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lP
 				PROPSHEETPAGE *ppsp;
 
 				ppsp = (PROPSHEETPAGE *)lParam;
-				pContainer = (CContainer *)ppsp->lParam;
+				pContainer = (Explorerplusplus *)ppsp->lParam;
 			}
 			break;
 	}
@@ -906,7 +912,7 @@ INT_PTR CALLBACK TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lP
 	return pContainer->TabSettingsProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -1004,7 +1010,7 @@ INT_PTR CALLBACK CContainer::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,L
 
 INT_PTR CALLBACK DefaultSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer;
+	static Explorerplusplus *pContainer;
 
 	switch(uMsg)
 	{
@@ -1013,7 +1019,7 @@ INT_PTR CALLBACK DefaultSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARA
 				PROPSHEETPAGE *ppsp;
 
 				ppsp = (PROPSHEETPAGE *)lParam;
-				pContainer = (CContainer *)ppsp->lParam;
+				pContainer = (Explorerplusplus *)ppsp->lParam;
 			}
 			break;
 	}
@@ -1021,7 +1027,7 @@ INT_PTR CALLBACK DefaultSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARA
 	return pContainer->DefaultSettingsProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -1155,7 +1161,7 @@ INT_PTR CALLBACK CContainer::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPar
 	return 0;
 }
 
-void CContainer::OnDefaultSettingsNewTabDir(HWND hDlg)
+void Explorerplusplus::OnDefaultSettingsNewTabDir(HWND hDlg)
 {
 	BROWSEINFO bi;
 	PIDLIST_ABSOLUTE pidl = NULL;
@@ -1217,7 +1223,7 @@ int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam
 	return 0;
 }
 
-void CContainer::DefaultSettingsSetNewTabDir(HWND hEdit,TCHAR *szPath)
+void Explorerplusplus::DefaultSettingsSetNewTabDir(HWND hEdit,TCHAR *szPath)
 {
 	LPITEMIDLIST	pidl = NULL;
 	HRESULT			hr;
@@ -1232,7 +1238,7 @@ void CContainer::DefaultSettingsSetNewTabDir(HWND hEdit,TCHAR *szPath)
 	}
 }
 
-void CContainer::DefaultSettingsSetNewTabDir(HWND hEdit,LPITEMIDLIST pidl)
+void Explorerplusplus::DefaultSettingsSetNewTabDir(HWND hEdit,LPITEMIDLIST pidl)
 {
 	SFGAOF			Attributes;
 	DWORD			uNameFlags;
@@ -1253,7 +1259,7 @@ void CContainer::DefaultSettingsSetNewTabDir(HWND hEdit,LPITEMIDLIST pidl)
 	SendMessage(hEdit,WM_SETTEXT,0,(LPARAM)szNewTabDir);
 }
 
-void CContainer::AddLanguages(HWND hDlg)
+void Explorerplusplus::AddLanguages(HWND hDlg)
 {
 	HWND			hLanguageComboBox;
 	WIN32_FIND_DATA	wfd;
@@ -1307,7 +1313,7 @@ void CContainer::AddLanguages(HWND hDlg)
 	SendMessage(hLanguageComboBox,CB_SETCURSEL,iSel,0);
 }
 
-WORD CContainer::AddLanguageToComboBox(HWND hComboBox,
+WORD Explorerplusplus::AddLanguageToComboBox(HWND hComboBox,
 TCHAR *szImageDirectory,TCHAR *szFileName)
 {
 	TCHAR			szFullFileName[MAX_PATH];
@@ -1366,7 +1372,7 @@ TCHAR *szImageDirectory,TCHAR *szFileName)
 	return wRet;
 }
 
-int CContainer::GetLanguageIDFromIndex(HWND hDlg,int iIndex)
+int Explorerplusplus::GetLanguageIDFromIndex(HWND hDlg,int iIndex)
 {
 	HWND	hComboBox;
 	int		iLanguage;
@@ -1378,7 +1384,7 @@ int CContainer::GetLanguageIDFromIndex(HWND hDlg,int iIndex)
 	return iLanguage;
 }
 
-void CContainer::SetInfoTipWindowStates(HWND hDlg)
+void Explorerplusplus::SetInfoTipWindowStates(HWND hDlg)
 {
 	HWND	hCheckSystemInfoTips;
 	HWND	hCheckCustomInfoTips;
@@ -1394,7 +1400,7 @@ void CContainer::SetInfoTipWindowStates(HWND hDlg)
 	EnableWindow(hCheckCustomInfoTips,bEnable);
 }
 
-void CContainer::SetFolderSizeWindowState(HWND hDlg)
+void Explorerplusplus::SetFolderSizeWindowState(HWND hDlg)
 {
 	HWND hFolderSizesNeworkRemovable;
 	BOOL bEnable;

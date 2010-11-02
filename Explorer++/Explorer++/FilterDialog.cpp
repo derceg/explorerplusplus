@@ -24,13 +24,13 @@
 
 INT_PTR CALLBACK FilterProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -38,7 +38,7 @@ INT_PTR CALLBACK FilterProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 	return pContainer->FilterProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -119,7 +119,7 @@ INT_PTR CALLBACK CContainer::FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 	return 0;
 }
 
-void CContainer::FilterSaveState(HWND hDlg)
+void Explorerplusplus::FilterSaveState(HWND hDlg)
 {
 	RECT rcTemp;
 

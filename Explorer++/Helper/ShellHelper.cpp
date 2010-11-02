@@ -381,31 +381,36 @@ HRESULT DecodeFriendlyPath(TCHAR *szFriendlyPath,TCHAR *szParsingPath)
 		return S_OK;
 	}
 
-	if(lstrcmpi(FRIENDLY_NAME_DESKTOP,szFriendlyPath) == 0)
+	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
+		FRIENDLY_NAME_DESKTOP,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
 		GetVirtualFolderParsingPath(CSIDL_DESKTOP,szParsingPath);
 		return S_OK;
 	}
 
-	if(lstrcmpi(FRIENDLY_NAME_PICTURES,szFriendlyPath) == 0)
+	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
+		FRIENDLY_NAME_PICTURES,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
 		GetVirtualFolderParsingPath(CSIDL_MYPICTURES,szParsingPath);
 		return S_OK;
 	}
 
-	if(lstrcmpi(FRIENDLY_NAME_MUSIC,szFriendlyPath) == 0)
+	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
+		FRIENDLY_NAME_MUSIC,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
 		GetVirtualFolderParsingPath(CSIDL_MYMUSIC,szParsingPath);
 		return S_OK;
 	}
 
-	if(lstrcmpi(FRIENDLY_NAME_VIDEOS,szFriendlyPath) == 0)
+	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
+		FRIENDLY_NAME_VIDEOS,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
 		GetVirtualFolderParsingPath(CSIDL_MYVIDEO,szParsingPath);
 		return S_OK;
 	}
 
-	if(lstrcmpi(FRIENDLY_NAME_DOCUMENTS,szFriendlyPath) == 0)
+	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
+		FRIENDLY_NAME_DOCUMENTS,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
 		GetVirtualFolderParsingPath(CSIDL_MYDOCUMENTS,szParsingPath);
 		return S_OK;

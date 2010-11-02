@@ -26,7 +26,7 @@
 
 extern list<TabDirectory_t> g_TabDirs;
 
-void CContainer::HandleTreeViewSelection(void)
+void Explorerplusplus::HandleTreeViewSelection(void)
 {
 	HTREEITEM		hItem;
 	LPITEMIDLIST	pidlDirectory = NULL;
@@ -79,7 +79,7 @@ void CContainer::HandleTreeViewSelection(void)
 	CoTaskMemFree(pidlDirectory);
 }
 
-HRESULT CContainer::RestoreTabs(ILoadSave *pLoadSave)
+HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 {
 	list<TabDirectory_t>::iterator	itr;
 	TCHAR							szDirectory[MAX_PATH];
@@ -177,7 +177,7 @@ HRESULT CContainer::RestoreTabs(ILoadSave *pLoadSave)
 	return S_OK;
 }
 
-int CContainer::CreateListViewFileList(TCHAR *FileNameList,unsigned int BufferSize)
+int Explorerplusplus::CreateListViewFileList(TCHAR *FileNameList,unsigned int BufferSize)
 {
 	IBufferManager	*pBufferManager = NULL;
 	TCHAR			FullFileName[MAX_PATH];
@@ -202,7 +202,7 @@ int CContainer::CreateListViewFileList(TCHAR *FileNameList,unsigned int BufferSi
 	return 0;
 }
 
-void CContainer::ValidateLoadedSettings(void)
+void Explorerplusplus::ValidateLoadedSettings(void)
 {
 	if(m_TreeViewWidth <= 0)
 		m_TreeViewWidth = DEFAULT_TREEVIEW_WIDTH;
@@ -214,7 +214,7 @@ void CContainer::ValidateLoadedSettings(void)
 	ValidateToolbarSettings();
 }
 
-void CContainer::ValidateToolbarSettings(void)
+void Explorerplusplus::ValidateToolbarSettings(void)
 {
 	list<ToolbarButton_t>::iterator	itr;
 	BOOL							bCorrupted = FALSE;
@@ -264,7 +264,7 @@ void CContainer::ValidateToolbarSettings(void)
 	free(ButtonMap);
 }
 
-void CContainer::ValidateColumns(void)
+void Explorerplusplus::ValidateColumns(void)
 {
 	ValidateSingleColumnSet(VALIDATE_REALFOLDER_COLUMNS,&m_RealFolderColumnList);
 	ValidateSingleColumnSet(VALIDATE_CONTROLPANEL_COLUMNS,&m_ControlPanelColumnList);
@@ -275,7 +275,7 @@ void CContainer::ValidateColumns(void)
 	ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,&m_MyNetworkPlacesColumnList);
 }
 
-void CContainer::ValidateSingleColumnSet(int iColumnSet,list<Column_t> *pColumnList)
+void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet,list<Column_t> *pColumnList)
 {
 	list<Column_t>::iterator	itr;
 	Column_t					Column;
@@ -358,12 +358,12 @@ void CContainer::ValidateSingleColumnSet(int iColumnSet,list<Column_t> *pColumnL
 	free(pColumnMap);
 }
 
-void CContainer::ApplyLoadedSettings(void)
+void Explorerplusplus::ApplyLoadedSettings(void)
 {
 	m_pMyTreeView->SetShowHidden(m_bShowHiddenGlobal);
 }
 
-void CContainer::ApplyToolbarSettings(void)
+void Explorerplusplus::ApplyToolbarSettings(void)
 {
 	BOOL bVisible = FALSE;
 	int i = 0;
@@ -408,13 +408,13 @@ void CContainer::ApplyToolbarSettings(void)
 	}
 }
 
-void CContainer::AddStyleToToolbar(UINT *fStyle,UINT fStyleToAdd)
+void Explorerplusplus::AddStyleToToolbar(UINT *fStyle,UINT fStyleToAdd)
 {
 	if((*fStyle & fStyleToAdd) != fStyleToAdd)
 		*fStyle |= fStyleToAdd;
 }
 
-int CContainer::SelectAllFolders(HWND ListView)
+int Explorerplusplus::SelectAllFolders(HWND ListView)
 {
 	TCHAR	FullItemPath[MAX_PATH];
 	HRESULT	hr;
@@ -445,7 +445,7 @@ int CContainer::SelectAllFolders(HWND ListView)
 	return nFolders;
 }
 
-int CContainer::HighlightSimilarFiles(HWND ListView)
+int Explorerplusplus::HighlightSimilarFiles(HWND ListView)
 {
 	TCHAR	FullFileName[MAX_PATH];
 	TCHAR	TestFile[MAX_PATH];
@@ -489,7 +489,7 @@ int CContainer::HighlightSimilarFiles(HWND ListView)
 	return nSimilar;
 }
 
-void CContainer::AdjustFolderPanePosition(void)
+void Explorerplusplus::AdjustFolderPanePosition(void)
 {
 	RECT rc;
 	int IndentTop		= 0;
@@ -536,7 +536,7 @@ void CContainer::AdjustFolderPanePosition(void)
 	}
 }
 
-LRESULT CContainer::StatusBarMenuSelect(WPARAM wParam,LPARAM lParam)
+LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam,LPARAM lParam)
 {
 	/* Is the menu been closed? .*/
 	if(HIWORD(wParam) == 0xFFFF && lParam == 0)
@@ -560,7 +560,7 @@ LRESULT CContainer::StatusBarMenuSelect(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-void CContainer::HandleStatusBarMenuOpen(void)
+void Explorerplusplus::HandleStatusBarMenuOpen(void)
 {
 	StatusBarPart_t	sbp;
 	TCHAR			szPartText[512];
@@ -595,7 +595,7 @@ void CContainer::HandleStatusBarMenuOpen(void)
 	}
 }
 
-void CContainer::HandleStatusBarMenuClose(void)
+void Explorerplusplus::HandleStatusBarMenuClose(void)
 {
 	list<StatusBarPart_t>::iterator	itr;
 	RECT							rcClient;
@@ -619,14 +619,14 @@ void CContainer::HandleStatusBarMenuClose(void)
 	m_bAlteredStatusBarParts = FALSE;
 }
 
-void CContainer::ShowHiddenFiles(void)
+void Explorerplusplus::ShowHiddenFiles(void)
 {
 	m_pActiveShellBrowser->ToggleShowHidden();
 
 	RefreshTab(m_iObjectIndex);
 }
 
-void CContainer::CopyToFolder(BOOL bMove)
+void Explorerplusplus::CopyToFolder(BOOL bMove)
 {
 	TCHAR	*FileNameList = NULL;
 	int		nSelected;
@@ -647,7 +647,7 @@ void CContainer::CopyToFolder(BOOL bMove)
 	}
 }
 
-HRESULT CContainer::OnDeviceChange(WPARAM wParam,LPARAM lParam)
+HRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 {
 	TCITEM tcItem;
 	int nTabs;
@@ -762,7 +762,7 @@ HRESULT CContainer::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 	return E_NOTIMPL;
 }
 
-void CContainer::OpenAllSelectedItems(BOOL bOpenInNewTab)
+void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
 {
 	BOOL	m_bSeenDirectory = FALSE;
 	DWORD	dwAttributes;
@@ -788,7 +788,7 @@ void CContainer::OpenAllSelectedItems(BOOL bOpenInNewTab)
 		OpenListViewItem(iFolderItem,bOpenInNewTab,FALSE);
 }
 
-void CContainer::SetComboBoxExTitleString(HWND CbEx,LPITEMIDLIST pidl,TCHAR *szDisplayText)
+void Explorerplusplus::SetComboBoxExTitleString(HWND CbEx,LPITEMIDLIST pidl,TCHAR *szDisplayText)
 {
 	COMBOBOXEXITEM	cbItem;
 	SHFILEINFO		shfi;
@@ -808,7 +808,7 @@ void CContainer::SetComboBoxExTitleString(HWND CbEx,LPITEMIDLIST pidl,TCHAR *szD
 	SendMessage(CbEx,CBEM_SETITEM,(WPARAM)0,(LPARAM)&cbItem);
 }
 
-HRESULT CContainer::TestListViewSelectionAttributes(SFGAOF *pItemAttributes)
+HRESULT Explorerplusplus::TestListViewSelectionAttributes(SFGAOF *pItemAttributes)
 {
 	LPITEMIDLIST	pidlDirectory = NULL;
 	LPITEMIDLIST	ridl = NULL;
@@ -836,7 +836,7 @@ HRESULT CContainer::TestListViewSelectionAttributes(SFGAOF *pItemAttributes)
 	return hr;
 }
 
-HRESULT CContainer::TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes)
+HRESULT Explorerplusplus::TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes)
 {
 	HTREEITEM		hItem;
 	LPITEMIDLIST	pidl = NULL;
@@ -856,7 +856,7 @@ HRESULT CContainer::TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes)
 	return hr;
 }
 
-BOOL CContainer::IsRenamePossible(void)
+BOOL Explorerplusplus::IsRenamePossible(void)
 {
 	SFGAOF	ItemAttributes;
 	HRESULT	hr;
@@ -871,7 +871,7 @@ BOOL CContainer::IsRenamePossible(void)
 	return FALSE;
 }
 
-BOOL CContainer::IsDeletionPossible(void)
+BOOL Explorerplusplus::IsDeletionPossible(void)
 {
 	SFGAOF	ItemAttributes;
 	HRESULT	hr;
@@ -886,7 +886,7 @@ BOOL CContainer::IsDeletionPossible(void)
 	return FALSE;
 }
 
-HRESULT CContainer::GetSelectionAttributes(SFGAOF *pItemAttributes)
+HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes)
 {
 	HWND	hFocus;
 	HRESULT	hr = E_FAIL;
@@ -901,7 +901,7 @@ HRESULT CContainer::GetSelectionAttributes(SFGAOF *pItemAttributes)
 	return hr;
 }
 
-BOOL CContainer::CanShowFileProperties(void)
+BOOL Explorerplusplus::CanShowFileProperties(void)
 {
 	SFGAOF	ItemAttributes;
 	HRESULT	hr;
@@ -916,7 +916,7 @@ BOOL CContainer::CanShowFileProperties(void)
 	return FALSE;
 }
 
-BOOL CContainer::CanCutOrCopySelection(void)
+BOOL Explorerplusplus::CanCutOrCopySelection(void)
 {
 	HWND hFocus;
 
@@ -955,7 +955,7 @@ BOOL CContainer::CanCutOrCopySelection(void)
 	return FALSE;
 }
 
-BOOL CContainer::CanPaste(void)
+BOOL Explorerplusplus::CanPaste(void)
 {
 	HWND hFocus = GetFocus();
 
@@ -1006,7 +1006,7 @@ BOOL CContainer::CanPaste(void)
 	return FALSE;
 }
 
-BOOL CContainer::AreAllSelectedFilesReal(void)
+BOOL Explorerplusplus::AreAllSelectedFilesReal(void)
 {
 	int iItem = -1;
 
@@ -1022,7 +1022,7 @@ BOOL CContainer::AreAllSelectedFilesReal(void)
 	return TRUE;
 }
 
-HRESULT CContainer::HandleStatusText(void)
+HRESULT Explorerplusplus::HandleStatusText(void)
 {
 	FolderInfo_t	FolderInfo;
 	int				nTotal;
@@ -1134,7 +1134,7 @@ HRESULT CContainer::HandleStatusText(void)
 	return S_OK;
 }
 
-BOOL CContainer::CompareVirtualFolders(UINT uFolderCSIDL)
+BOOL Explorerplusplus::CompareVirtualFolders(UINT uFolderCSIDL)
 {
 	TCHAR szParsingPath[MAX_PATH];
 
@@ -1161,16 +1161,16 @@ Possible bugs:
    If this runs after the tab is freed, the tab existence
    check will fail, and the shell browser function won't be called.
 */
-void CContainer::DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,
+void Explorerplusplus::DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,
 void *pData)
 {
 	DirectoryAltered_t	*pDirectoryAltered = NULL;
-	CContainer			*pContainer = NULL;
+	Explorerplusplus			*pContainer = NULL;
 
 	EnterCriticalSection(&g_csDirMonCallback);
 
 	pDirectoryAltered = (DirectoryAltered_t *)pData;
-	pContainer = (CContainer *)pDirectoryAltered->pData;
+	pContainer = (Explorerplusplus *)pDirectoryAltered->pData;
 
 	/* Does this tab still exist? */
 	if(pContainer->m_uTabMap[pDirectoryAltered->iIndex] == 1)
@@ -1182,7 +1182,7 @@ void *pData)
 	LeaveCriticalSection(&g_csDirMonCallback);
 }
 
-void CContainer::HandleFileSelectionDisplay(void)
+void Explorerplusplus::HandleFileSelectionDisplay(void)
 {
 	int nSelected;
 
@@ -1198,7 +1198,7 @@ void CContainer::HandleFileSelectionDisplay(void)
 		HandleFileSelectionDisplayMore();
 }
 
-void CContainer::HandleFileSelectionDisplayZero(void)
+void Explorerplusplus::HandleFileSelectionDisplayZero(void)
 {
 	SHFILEINFO		shfi;
 	TCHAR			szFolderName[MAX_PATH];
@@ -1269,7 +1269,7 @@ void CContainer::HandleFileSelectionDisplayZero(void)
 	CoTaskMemFree(pidlDirectory);
 }
 
-void CContainer::HandleFileSelectionDisplayOne(void)
+void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 {
 	WIN32_FIND_DATA	*pwfd = NULL;
 	SHFILEINFO		shfi;
@@ -1525,7 +1525,7 @@ void CContainer::HandleFileSelectionDisplayOne(void)
 	}
 }
 
-void CContainer::FormatDisplayString(TCHAR *szDisplayRaw,int iSelected,
+void Explorerplusplus::FormatDisplayString(TCHAR *szDisplayRaw,int iSelected,
 TCHAR *szFullFileName,TCHAR *szDisplayFinal,UINT cchMax)
 {
 	TCHAR szOutputTemp[512];
@@ -1593,7 +1593,7 @@ TCHAR *szFullFileName,TCHAR *szDisplayFinal,UINT cchMax)
 	StringCchCopy(szDisplayFinal,cchMax,szOutputTemp);
 }
 
-void CContainer::TranslateDisplayWindowBuffer(TCHAR *szSymbol,UINT cchMax,int iSelected,TCHAR *szFullFileName)
+void Explorerplusplus::TranslateDisplayWindowBuffer(TCHAR *szSymbol,UINT cchMax,int iSelected,TCHAR *szFullFileName)
 {
 	if(lstrcmp(szSymbol,_T("{name}")) == 0)
 	{
@@ -1663,7 +1663,7 @@ void CContainer::TranslateDisplayWindowBuffer(TCHAR *szSymbol,UINT cchMax,int iS
 	}
 }
 
-void CContainer::OutputInformationOnDisplayWindow(TCHAR *szFullFileName,DWInfoType_t InfoType)
+void Explorerplusplus::OutputInformationOnDisplayWindow(TCHAR *szFullFileName,DWInfoType_t InfoType)
 {
 	switch(InfoType)
 	{
@@ -1767,7 +1767,7 @@ void CContainer::OutputInformationOnDisplayWindow(TCHAR *szFullFileName,DWInfoTy
 	}
 }
 
-void CContainer::HandleFileSelectionDisplayMore(void)
+void Explorerplusplus::HandleFileSelectionDisplayMore(void)
 {
 	TCHAR			szNumSelected[64] = EMPTY_STRING;
 	TCHAR			szTotalSize[64] = EMPTY_STRING;
@@ -1812,12 +1812,12 @@ void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolder
 
 	pfsei = (FolderSizeExtraInfo_t *)pData;
 
-	((CContainer *)pfsei->pContainer)->FolderSizeCallback(pfsei,nFolders,nFiles,lTotalFolderSize);
+	((Explorerplusplus *)pfsei->pContainer)->FolderSizeCallback(pfsei,nFolders,nFiles,lTotalFolderSize);
 
 	free(pfsei);
 }
 
-void CContainer::FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,
+void Explorerplusplus::FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,
 int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 {
 	DWFolderSizeCompletion_t *pDWFolderSizeCompletion = NULL;
@@ -1835,7 +1835,7 @@ int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 		(WPARAM)pDWFolderSizeCompletion,0);
 }
 
-void CContainer::PushGlobalSettingsToTab(int iTabId)
+void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 {
 	GlobalSettings_t gs;	
 
@@ -1847,7 +1847,7 @@ void CContainer::PushGlobalSettingsToTab(int iTabId)
 	m_pShellBrowser[iTabId]->SetGlobalSettings(&gs);
 }
 
-void CContainer::PushGlobalSettingsToAllTabs(void)
+void Explorerplusplus::PushGlobalSettingsToAllTabs(void)
 {
 	TCITEM	tcItem;
 	int		nTabs;
@@ -1866,7 +1866,7 @@ void CContainer::PushGlobalSettingsToAllTabs(void)
 	RefreshAllTabs();
 }
 
-void CContainer::CreateViewsMenu(POINT *ptOrigin)
+void Explorerplusplus::CreateViewsMenu(POINT *ptOrigin)
 {
 	UINT	uViewMode;
 	int		ItemToCheck;
@@ -1881,7 +1881,7 @@ void CContainer::CreateViewsMenu(POINT *ptOrigin)
 		0,m_hContainer,NULL);
 }
 
-int CContainer::CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,int nBuffer)
+int Explorerplusplus::CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,int nBuffer)
 {
 	ULARGE_INTEGER	TotalNumberOfBytes;
 	ULARGE_INTEGER	TotalNumberOfFreeBytes;
@@ -1918,7 +1918,7 @@ int CContainer::CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,int nBu
  * in the window that currently has focus; FALSE
  * otherwise.
  */
-BOOL CContainer::CheckItemSelection(void)
+BOOL Explorerplusplus::CheckItemSelection(void)
 {
 	HWND hFocus;
 
@@ -1942,7 +1942,7 @@ BOOL CContainer::CheckItemSelection(void)
 language DLL against the version of the
 main executable and returns TRUE if they
 match. */
-BOOL CContainer::VerifyLanguageVersion(TCHAR *szLanguageModule)
+BOOL Explorerplusplus::VerifyLanguageVersion(TCHAR *szLanguageModule)
 {
 	TCHAR szImageName[MAX_PATH];
 	DWORD dwpvProcessLS;

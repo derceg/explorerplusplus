@@ -27,7 +27,7 @@
 /*
  * Updates the states of all windows.
  */
-void CContainer::UpdateWindowStates(void)
+void Explorerplusplus::UpdateWindowStates(void)
 {
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),m_CurrentDirectory);
 
@@ -49,7 +49,7 @@ void CContainer::UpdateWindowStates(void)
 * Set the state of the items in the main
 * program menu.
 */
-void CContainer::SetProgramMenuItemStates(HMENU hProgramMenu)
+void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 {
 	LONG WindowStyle;
 	UINT ItemToCheck;
@@ -160,7 +160,7 @@ void CContainer::SetProgramMenuItemStates(HMENU hProgramMenu)
 * 'arrange menu', which appears as a
 * submenu in other higher level menus.
 */
-void CContainer::SetArrangeMenuItemStates(HMENU hProgramMenu)
+void Explorerplusplus::SetArrangeMenuItemStates(HMENU hProgramMenu)
 {
 	UINT ItemToCheck;
 	UINT SortMode;
@@ -260,7 +260,7 @@ void CContainer::SetArrangeMenuItemStates(HMENU hProgramMenu)
 /*
  * Sets the title text for the main window.
  */
-void CContainer::HandleMainWindowText(void)
+void Explorerplusplus::HandleMainWindowText(void)
 {
 	TCHAR	szTitle[512];
 	TCHAR	szFolderDisplayName[MAX_PATH];
@@ -328,7 +328,7 @@ void CContainer::HandleMainWindowText(void)
 	SetWindowText(m_hContainer,szTitle);
 }
 
-void CContainer::HandleComboBoxText(void)
+void Explorerplusplus::HandleComboBoxText(void)
 {
 	LPITEMIDLIST pidl = NULL;
 	TCHAR szAddressBarTitle[MAX_PATH];
@@ -360,12 +360,12 @@ void CContainer::HandleComboBoxText(void)
 	CoTaskMemFree(pidl);
 }
 
-void CContainer::HandleTabText(void)
+void Explorerplusplus::HandleTabText(void)
 {
 	HandleTabText(m_iTabSelectedItem,m_iObjectIndex);
 }
 
-void CContainer::HandleTabText(int iTabId)
+void Explorerplusplus::HandleTabText(int iTabId)
 {
 	TCITEM tcItem;
 	int nTabs;
@@ -386,7 +386,7 @@ void CContainer::HandleTabText(int iTabId)
 	}
 }
 
-void CContainer::HandleTabText(int iTab,int iTabId)
+void Explorerplusplus::HandleTabText(int iTab,int iTabId)
 {
 	/* Can optimize - store folder name, only change when
 	folder changes. */
@@ -426,7 +426,7 @@ void CContainer::HandleTabText(int iTab,int iTabId)
 	}
 }
 
-void CContainer::SetTabIcon(void)
+void Explorerplusplus::SetTabIcon(void)
 {
 	LPITEMIDLIST pidl = NULL;
 
@@ -437,7 +437,7 @@ void CContainer::SetTabIcon(void)
 	CoTaskMemFree(pidl);
 }
 
-void CContainer::SetTabIcon(int iTabId)
+void Explorerplusplus::SetTabIcon(int iTabId)
 {
 	LPITEMIDLIST pidl = NULL;
 	TCITEM tcItem;
@@ -463,7 +463,7 @@ void CContainer::SetTabIcon(int iTabId)
 	CoTaskMemFree(pidl);
 }
 
-void CContainer::SetTabIcon(int iIndex,int iTabId)
+void Explorerplusplus::SetTabIcon(int iIndex,int iTabId)
 {
 	LPITEMIDLIST pidl = NULL;
 
@@ -477,7 +477,7 @@ void CContainer::SetTabIcon(int iIndex,int iTabId)
 /* Sets a tabs icon. Normally, this icon
 is the folders icon, however if the tab
 is locked, the icon will be a lock. */
-void CContainer::SetTabIcon(int iIndex,int iTabId,LPITEMIDLIST pidlDirectory)
+void Explorerplusplus::SetTabIcon(int iIndex,int iTabId,LPITEMIDLIST pidlDirectory)
 {
 	TCITEM			tcItem;
 	SHFILEINFO		shfi;

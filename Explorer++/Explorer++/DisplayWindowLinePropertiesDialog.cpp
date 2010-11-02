@@ -28,13 +28,13 @@ HICON	g_hCommandsArrowIcon;
 
 INT_PTR CALLBACK DWLinePropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -42,7 +42,7 @@ INT_PTR CALLBACK DWLinePropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPAR
 	return pContainer->DWLinePropertiesProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::DWLinePropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::DWLinePropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	//switch(Msg)
 	//{

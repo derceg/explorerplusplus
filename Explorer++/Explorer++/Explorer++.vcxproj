@@ -406,6 +406,7 @@
     <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="MainToolbarHandler.cpp" />
+    <ClCompile Include="MainWndSwitch.cpp" />
     <ClCompile Include="MassRenameDialog.cpp" />
     <ClCompile Include="MergeFiles.cpp" />
     <ClCompile Include="Misc.cpp" />
@@ -435,6 +436,7 @@
     <ClCompile Include="TreeViewHandler.cpp" />
     <ClCompile Include="WildcardSelectDialog.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
+    <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="XMLSettings.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>

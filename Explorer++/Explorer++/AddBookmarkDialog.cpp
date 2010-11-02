@@ -34,7 +34,7 @@ int g_iFolderSelected;
 
 INT_PTR CALLBACK BookmarkTabDlgProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
@@ -44,7 +44,7 @@ INT_PTR CALLBACK BookmarkTabDlgProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 
 				pabi = (AddBookmarkInfo_t *)lParam;
 
-				pContainer = (CContainer *)pabi->pContainer;
+				pContainer = (Explorerplusplus *)pabi->pContainer;
 			}
 			break;
 	}
@@ -52,7 +52,7 @@ INT_PTR CALLBACK BookmarkTabDlgProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 	return pContainer->BookmarkTabDlgProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::BookmarkTabDlgProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::BookmarkTabDlgProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -91,7 +91,7 @@ INT_PTR CALLBACK CContainer::BookmarkTabDlgProc(HWND hDlg,UINT uMsg,WPARAM wPara
 	return FALSE;
 }
 
-void CContainer::OnAddBookmarkInit(HWND hDlg,LPARAM lParam)
+void Explorerplusplus::OnAddBookmarkInit(HWND hDlg,LPARAM lParam)
 {
 	AddBookmarkInfo_t	*pabi = NULL;
 	Bookmark_t			ParentBookmark;
@@ -178,7 +178,7 @@ void CContainer::OnAddBookmarkInit(HWND hDlg,LPARAM lParam)
 	}
 }
 
-void CContainer::OnAddBookmarkOk(HWND hDlg)
+void Explorerplusplus::OnAddBookmarkOk(HWND hDlg)
 {
 	HWND			hEditName;
 	HWND			hEditDescription;
@@ -267,7 +267,7 @@ void CContainer::OnAddBookmarkOk(HWND hDlg)
 	EndDialog(hDlg,1);
 }
 
-void CContainer::OnAddBookmarkNewFolder(HWND hDlg)
+void Explorerplusplus::OnAddBookmarkNewFolder(HWND hDlg)
 {
 	HWND	hCreateIn;
 
@@ -295,7 +295,7 @@ void CContainer::OnAddBookmarkNewFolder(HWND hDlg)
 	}
 }
 
-void CContainer::OnBookmarkDetails(HWND hDlg)
+void Explorerplusplus::OnBookmarkDetails(HWND hDlg)
 {
 	HWND	hSeparator;
 	HWND	hOk;
@@ -455,7 +455,7 @@ void CContainer::OnBookmarkDetails(HWND hDlg)
 	g_bExpanded = !g_bExpanded;
 }
 
-void CContainer::AddBookmarkSaveState(HWND hDlg)
+void Explorerplusplus::AddBookmarkSaveState(HWND hDlg)
 {
 	RECT rcTemp;
 

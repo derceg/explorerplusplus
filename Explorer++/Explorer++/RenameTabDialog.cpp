@@ -19,7 +19,7 @@ int		g_iTab;
 
 INT_PTR CALLBACK RenameTabProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer;
+	static Explorerplusplus *pContainer;
 
 	switch(uMsg)
 	{
@@ -29,7 +29,7 @@ INT_PTR CALLBACK RenameTabProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lPar
 
 			prti = (RenameTabInfo_t *)lParam;
 
-			pContainer = (CContainer *)prti->pContainer;
+			pContainer = (Explorerplusplus *)prti->pContainer;
 			g_iTab = prti->iTab;
 		}
 		break;
@@ -38,7 +38,7 @@ INT_PTR CALLBACK RenameTabProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lPar
 	return pContainer->RenameTabProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::RenameTabProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::RenameTabProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -89,7 +89,7 @@ INT_PTR CALLBACK CContainer::RenameTabProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 	return 0;
 }
 
-void CContainer::OnRenameTabInit(HWND hDlg)
+void Explorerplusplus::OnRenameTabInit(HWND hDlg)
 {
 	HWND	hEditName;
 	TCITEM	tcItem;
@@ -117,7 +117,7 @@ void CContainer::OnRenameTabInit(HWND hDlg)
 	SetFocus(hEditName);
 }
 
-void CContainer::OnRenameTabOk(HWND hDlg)
+void Explorerplusplus::OnRenameTabOk(HWND hDlg)
 {
 	HWND	hEditName;
 	TCITEM	tcItem;

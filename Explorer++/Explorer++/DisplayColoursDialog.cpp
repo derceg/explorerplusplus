@@ -36,13 +36,13 @@ HICON		g_hDisplayWindowIcon;
 
 INT_PTR CALLBACK ChangeDisplayColoursStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -50,7 +50,7 @@ INT_PTR CALLBACK ChangeDisplayColoursStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPAR
 	return pContainer->ChangeDisplayColours(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -153,7 +153,7 @@ INT_PTR CALLBACK CContainer::ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wPa
 	return 0;
 }
 
-void CContainer::OnInitializeDisplayColorsDlg(HWND hDlg)
+void Explorerplusplus::OnInitializeDisplayColorsDlg(HWND hDlg)
 {
 	COLORREF CentreColor;
 	COLORREF SurroundColor;
@@ -281,7 +281,7 @@ void CContainer::OnInitializeDisplayColorsDlg(HWND hDlg)
 	}
 }
 
-void CContainer::OnDisplayColorsDlgOk(HWND hDlg)
+void Explorerplusplus::OnDisplayColorsDlgOk(HWND hDlg)
 {
 	UINT r;
 	UINT g;
@@ -311,7 +311,7 @@ void CContainer::OnDisplayColorsDlgOk(HWND hDlg)
 	EndDialog(hDlg,1);
 }
 
-void CContainer::OnDisplayColorsChooseFont(HWND hDlg)
+void Explorerplusplus::OnDisplayColorsChooseFont(HWND hDlg)
 {
 	CHOOSEFONT cf;
 	LOGFONT LogFont;
@@ -339,7 +339,7 @@ void CContainer::OnDisplayColorsChooseFont(HWND hDlg)
 	DisplayWindow_SetTextColor(g_hPreviewDisplay,g_TextColor);
 }
 
-void CContainer::OnDisplayColorsHScroll(HWND hDlg)
+void Explorerplusplus::OnDisplayColorsHScroll(HWND hDlg)
 {
 	UINT r;
 	UINT g;
@@ -384,7 +384,7 @@ void CContainer::OnDisplayColorsHScroll(HWND hDlg)
 	}
 }
 
-void CContainer::OnDisplayColorsEnChange(HWND hDlg,LPARAM lParam)
+void Explorerplusplus::OnDisplayColorsEnChange(HWND hDlg,LPARAM lParam)
 {
 	HWND hEdit;
 	HWND hTrackBar = NULL;
@@ -438,7 +438,7 @@ void CContainer::OnDisplayColorsEnChange(HWND hDlg,LPARAM lParam)
 	SendMessage(g_hPreviewDisplay,DWM_SETCENTRECOLOR,rgb,0);
 }
 
-void CContainer::DisplayColorsSaveState(HWND hDlg)
+void Explorerplusplus::DisplayColorsSaveState(HWND hDlg)
 {
 	RECT rcTemp;
 

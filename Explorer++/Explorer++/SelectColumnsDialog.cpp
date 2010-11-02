@@ -20,13 +20,13 @@ int		g_nChecked = 0;
 
 INT_PTR CALLBACK SelectColumnsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -34,7 +34,7 @@ INT_PTR CALLBACK SelectColumnsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM 
 	return pContainer->SelectColumnsProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::SelectColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::SelectColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -96,7 +96,7 @@ INT_PTR CALLBACK CContainer::SelectColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,
 	return 0;
 }
 
-void CContainer::OnInitColumnDlg(HWND hDlg)
+void Explorerplusplus::OnInitColumnDlg(HWND hDlg)
 {
 	HWND						hListView;
 	list<Column_t>				pActiveColumnList;
@@ -164,7 +164,7 @@ void CContainer::OnInitColumnDlg(HWND hDlg)
 	SetFocus(hListView);
 }
 
-void CContainer::MoveColumnItem2(HWND hDlg,BOOL bUp)
+void Explorerplusplus::MoveColumnItem2(HWND hDlg,BOOL bUp)
 {
 	HWND hListView;
 	int iSelected;
@@ -186,7 +186,7 @@ void CContainer::MoveColumnItem2(HWND hDlg,BOOL bUp)
 	}
 }
 
-void CContainer::EnableColumnItem(HWND hDlg,BOOL bEnable)
+void Explorerplusplus::EnableColumnItem(HWND hDlg,BOOL bEnable)
 {
 	HWND hListView;
 	int iSelected;
@@ -201,7 +201,7 @@ void CContainer::EnableColumnItem(HWND hDlg,BOOL bEnable)
 	}
 }
 
-BOOL CContainer::OnColumnDlgLvnItemChanging(HWND hDlg,LPARAM lParam)
+BOOL Explorerplusplus::OnColumnDlgLvnItemChanging(HWND hDlg,LPARAM lParam)
 {
 	NMLISTVIEW *nmlv;
 	HWND hListView;
@@ -270,7 +270,7 @@ BOOL CContainer::OnColumnDlgLvnItemChanging(HWND hDlg,LPARAM lParam)
 	return FALSE;
 }
 
-void CContainer::OnColumnDlgOk(HWND hDlg)
+void Explorerplusplus::OnColumnDlgOk(HWND hDlg)
 {
 	HWND hListView;
 	LVITEM lvItem;
@@ -302,7 +302,7 @@ void CContainer::OnColumnDlgOk(HWND hDlg)
 	EndDialog(hDlg,1);
 }
 
-void CContainer::SelectColumnsSaveState(HWND hDlg)
+void Explorerplusplus::SelectColumnsSaveState(HWND hDlg)
 {
 	RECT rcTemp;
 
@@ -313,7 +313,7 @@ void CContainer::SelectColumnsSaveState(HWND hDlg)
 	m_bSelectColumnsDlgStateSaved = TRUE;
 }
 
-int CContainer::LookupColumnNameStringIndex(int iColumnId)
+int Explorerplusplus::LookupColumnNameStringIndex(int iColumnId)
 {
 	switch(iColumnId)
 	{
@@ -577,7 +577,7 @@ int CContainer::LookupColumnNameStringIndex(int iColumnId)
 	return 0;
 }
 
-int CContainer::LookupColumnDescriptionStringIndex(int iColumnId)
+int Explorerplusplus::LookupColumnDescriptionStringIndex(int iColumnId)
 {
 	switch(iColumnId)
 	{

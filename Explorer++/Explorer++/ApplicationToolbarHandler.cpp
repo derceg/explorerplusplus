@@ -26,7 +26,7 @@ DWORD ApplicationToolbarStyles	=	WS_CHILD |WS_VISIBLE |WS_CLIPSIBLINGS |WS_CLIPC
 								TBSTYLE_TOOLTIPS | TBSTYLE_LIST | TBSTYLE_TRANSPARENT |
 								TBSTYLE_FLAT | CCS_NODIVIDER| CCS_NORESIZE;
 
-void CContainer::CreateApplicationToolbar(void)
+void Explorerplusplus::CreateApplicationToolbar(void)
 {
 	HIMAGELIST	himlSmall;
 
@@ -50,21 +50,21 @@ void CContainer::CreateApplicationToolbar(void)
 	RegisterDragDrop(m_hApplicationToolbar,patd);
 }
 
-void CContainer::InitializeApplicationToolbar(void)
+void Explorerplusplus::InitializeApplicationToolbar(void)
 {
 	m_pAppButtons = NULL;
 	m_nAppButtons = 0;
 	m_iAppIdOffset = 0;
 }
 
-void CContainer::ApplicationToolbarNewButton(void)
+void Explorerplusplus::ApplicationToolbarNewButton(void)
 {
 	DialogBoxParam(g_hLanguageModule,
 		MAKEINTRESOURCE(IDD_EDITAPPLICATIONBUTTON),
 		m_hContainer,ApplicationToolbarNewButtonProcStub,(LPARAM)this);
 }
 
-ApplicationButton_t *CContainer::ApplicationToolbarAddItem(TCHAR *szName,TCHAR *szCommand,
+ApplicationButton_t *Explorerplusplus::ApplicationToolbarAddItem(TCHAR *szName,TCHAR *szCommand,
 BOOL bShowNameOnToolbar)
 {
 	ApplicationButton_t *pAppButton = NULL;
@@ -111,7 +111,7 @@ BOOL bShowNameOnToolbar)
 	return pAppButton;
 }
 
-void CContainer::ApplicationToolbarOpenItem(int iItem,TCHAR *szParameters)
+void Explorerplusplus::ApplicationToolbarOpenItem(int iItem,TCHAR *szParameters)
 {
 	ApplicationButton_t	*pab = NULL;
 	LPITEMIDLIST		pidl = NULL;
@@ -144,7 +144,7 @@ void CContainer::ApplicationToolbarOpenItem(int iItem,TCHAR *szParameters)
 	}
 }
 
-void CContainer::ApplicationToolbarShowItemProperties(int iItem)
+void Explorerplusplus::ApplicationToolbarShowItemProperties(int iItem)
 {
 	ApplicationButton_t	*pab = NULL;
 	TBBUTTON			tbButton;
@@ -169,7 +169,7 @@ void CContainer::ApplicationToolbarShowItemProperties(int iItem)
 	}
 }
 
-void CContainer::ApplicationToolbarDeleteItem(int iItem)
+void Explorerplusplus::ApplicationToolbarDeleteItem(int iItem)
 {
 	ApplicationButton_t	*pab = NULL;
 	TBBUTTON			tbButton;
@@ -217,7 +217,7 @@ void CContainer::ApplicationToolbarDeleteItem(int iItem)
 	}
 }
 
-void CContainer::ApplicationToolbarAddButtonsToToolbar(void)
+void Explorerplusplus::ApplicationToolbarAddButtonsToToolbar(void)
 {
 	ApplicationButton_t	*pAppButtons = NULL;
 	TBBUTTON	*ptbButtons = NULL;
@@ -274,7 +274,7 @@ void CContainer::ApplicationToolbarAddButtonsToToolbar(void)
 	}
 }
 
-void CContainer::ApplicationToolbarAddButtonToToolbar(ApplicationButton_t *pab)
+void Explorerplusplus::ApplicationToolbarAddButtonToToolbar(ApplicationButton_t *pab)
 {
 	TBBUTTON	tbButton;
 	SHFILEINFO	shfi;
@@ -310,7 +310,7 @@ void CContainer::ApplicationToolbarAddButtonToToolbar(ApplicationButton_t *pab)
 	UpdateToolbarBandSizing(m_hMainRebar,m_hApplicationToolbar);
 }
 
-void CContainer::ApplicationToolbarRefreshButton(int iItem)
+void Explorerplusplus::ApplicationToolbarRefreshButton(int iItem)
 {
 	ApplicationButton_t	*pab = NULL;
 	TBBUTTON			tbButton;
@@ -356,13 +356,13 @@ void CContainer::ApplicationToolbarRefreshButton(int iItem)
 
 INT_PTR CALLBACK ApplicationButtonPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -370,7 +370,7 @@ INT_PTR CALLBACK ApplicationButtonPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM 
 	return pContainer->ApplicationButtonPropertiesProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -403,7 +403,7 @@ INT_PTR CALLBACK CContainer::ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,
 	return 0;
 }
 
-void CContainer::OnApplicationButtonPropertiesInit(HWND hDlg)
+void Explorerplusplus::OnApplicationButtonPropertiesInit(HWND hDlg)
 {
 	HWND hEditName;
 	HWND hEditCommand;
@@ -429,7 +429,7 @@ void CContainer::OnApplicationButtonPropertiesInit(HWND hDlg)
 	SetFocus(hEditName);
 }
 
-void CContainer::OnApplicationButtonPropertiesOk(HWND hDlg)
+void Explorerplusplus::OnApplicationButtonPropertiesOk(HWND hDlg)
 {
 	HWND	hEditName;
 	HWND	hEditCommand;
@@ -459,13 +459,13 @@ void CContainer::OnApplicationButtonPropertiesOk(HWND hDlg)
 
 INT_PTR CALLBACK ApplicationToolbarNewButtonProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -473,7 +473,7 @@ INT_PTR CALLBACK ApplicationToolbarNewButtonProcStub(HWND hDlg,UINT uMsg,WPARAM 
 	return pContainer->ApplicationToolbarNewButtonProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -506,7 +506,7 @@ INT_PTR CALLBACK CContainer::ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,
 	return 0;
 }
 
-void CContainer::OnApplicationToolbarNewButtonInit(HWND hDlg)
+void Explorerplusplus::OnApplicationToolbarNewButtonInit(HWND hDlg)
 {
 	HWND hEditName;
 	TCHAR szTemp[64];
@@ -524,7 +524,7 @@ void CContainer::OnApplicationToolbarNewButtonInit(HWND hDlg)
 	SetFocus(hEditName);
 }
 
-void CContainer::OnApplicationToolbarNewButtonOk(HWND hDlg)
+void Explorerplusplus::OnApplicationToolbarNewButtonOk(HWND hDlg)
 {
 	HWND				hEditName;
 	HWND				hEditCommand;
@@ -555,7 +555,7 @@ void CContainer::OnApplicationToolbarNewButtonOk(HWND hDlg)
 	EndDialog(hDlg,1);
 }
 
-void CContainer::OnApplicationToolbarCommandButton(HWND hDlg)
+void Explorerplusplus::OnApplicationToolbarCommandButton(HWND hDlg)
 {
 	TCHAR *Filter = _T("Programs (*.exe)\0*.exe\0All Files\0*.*\0\0");
 	OPENFILENAME ofn;
@@ -593,7 +593,7 @@ void CContainer::OnApplicationToolbarCommandButton(HWND hDlg)
 	}
 }
 
-void CContainer::OnApplicationToolbarRClick(void)
+void Explorerplusplus::OnApplicationToolbarRClick(void)
 {
 	MENUITEMINFO mii;
 

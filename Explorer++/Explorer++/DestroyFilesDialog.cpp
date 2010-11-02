@@ -32,13 +32,13 @@ UINT					uOverwriteMethod;
 
 INT_PTR CALLBACK DestroyFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -46,7 +46,7 @@ INT_PTR CALLBACK DestroyFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM l
 	return pContainer->DestroyFilesProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::DestroyFilesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::DestroyFilesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -89,7 +89,7 @@ INT_PTR CALLBACK CContainer::DestroyFilesProc(HWND hDlg,UINT Msg,WPARAM wParam,L
 	return 0;
 }
 
-void CContainer::OnDestroyFilesInit(HWND hDlg)
+void Explorerplusplus::OnDestroyFilesInit(HWND hDlg)
 {
 	HWND			hListView;
 	DestroyedFile_t	df;
@@ -147,7 +147,7 @@ void CContainer::OnDestroyFilesInit(HWND hDlg)
 	}
 }
 
-void CContainer::OnDestroyFilesOk(HWND hDlg)
+void Explorerplusplus::OnDestroyFilesOk(HWND hDlg)
 {
 	int	iButtonPressed;
 
@@ -187,7 +187,7 @@ Are you sure you want to continue?"),
 	}
 }
 
-void CContainer::OnDestroyFilesConfirmDelete(HWND hDlg)
+void Explorerplusplus::OnDestroyFilesConfirmDelete(HWND hDlg)
 {
 	list<DestroyedFile_t>::iterator	itr;
 
@@ -199,7 +199,7 @@ void CContainer::OnDestroyFilesConfirmDelete(HWND hDlg)
 	EndDialog(hDlg,1);
 }
 
-void CContainer::OnDestroyFilesRemove(HWND hDlg)
+void Explorerplusplus::OnDestroyFilesRemove(HWND hDlg)
 {
 	HWND							hListView;
 	list<DestroyedFile_t>::iterator	itr;
@@ -238,7 +238,7 @@ void CContainer::OnDestroyFilesRemove(HWND hDlg)
 	}
 }
 
-void CContainer::DestroyFilesSaveState(HWND hDlg)
+void Explorerplusplus::DestroyFilesSaveState(HWND hDlg)
 {
 	RECT rcTemp;
 

@@ -27,13 +27,13 @@ using namespace std;
 
 INT_PTR CALLBACK WildcardSelectProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer;
+	static Explorerplusplus *pContainer;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -41,7 +41,7 @@ INT_PTR CALLBACK WildcardSelectProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 	return pContainer->WildcardSelectProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::WildcardSelectProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::WildcardSelectProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -72,7 +72,7 @@ INT_PTR CALLBACK CContainer::WildcardSelectProc(HWND hDlg,UINT uMsg,WPARAM wPara
 	return 0;
 }
 
-void CContainer::OnWildcardSelectInit(HWND hDlg)
+void Explorerplusplus::OnWildcardSelectInit(HWND hDlg)
 {
 	HWND hComboBox;
 	list<WildcardSelectInfo_t>::iterator itr;
@@ -113,7 +113,7 @@ void CContainer::OnWildcardSelectInit(HWND hDlg)
 	SetFocus(hComboBox);
 }
 
-void CContainer::OnWildcardSelectOk(HWND hDlg)
+void Explorerplusplus::OnWildcardSelectOk(HWND hDlg)
 {
 	WildcardSelectInfo_t	wsi;
 	TCHAR	FullFileName[MAX_PATH];
@@ -144,7 +144,7 @@ void CContainer::OnWildcardSelectOk(HWND hDlg)
 	EndDialog(hDlg,1);
 }
 
-void CContainer::WildcardSelectSaveState(HWND hDlg)
+void Explorerplusplus::WildcardSelectSaveState(HWND hDlg)
 {
 	HWND hComboBox;
 	RECT rcTemp;

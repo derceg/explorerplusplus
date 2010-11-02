@@ -26,7 +26,7 @@
  * Sets the arrange menu items that will be shown
  * for each folder.
  */
-void CContainer::InitializeArrangeMenuItems(void)
+void Explorerplusplus::InitializeArrangeMenuItems(void)
 {
 	HMENU				hMainMenu;
 	HMENU				hArrangeMenu;
@@ -130,7 +130,7 @@ void CContainer::InitializeArrangeMenuItems(void)
  * Returns the index in the string table of the text
  * for the specified arrange menu item.
  */
-UINT CContainer::GetArrangeMenuItemStringIndex(UINT uItemId)
+UINT Explorerplusplus::GetArrangeMenuItemStringIndex(UINT uItemId)
 {
 	switch(uItemId)
 	{
@@ -298,7 +298,7 @@ UINT CContainer::GetArrangeMenuItemStringIndex(UINT uItemId)
  * Sets the current arrange menu used based on
  * the current folder.
  */
-void CContainer::SetActiveArrangeMenuItems(void)
+void Explorerplusplus::SetActiveArrangeMenuItems(void)
 {
 	if(CompareVirtualFolders(CSIDL_DRIVES))
 	{
@@ -322,7 +322,7 @@ void CContainer::SetActiveArrangeMenuItems(void)
  * Inserts the current arrange menu items onto the
  * specified menu.
  */
-int CContainer::InsertArrangeMenuItems(HMENU hMenu)
+int Explorerplusplus::InsertArrangeMenuItems(HMENU hMenu)
 {
 	MENUITEMINFO						mi;
 	list<ArrangeMenuItem_t>::iterator	itr;
@@ -358,7 +358,7 @@ int CContainer::InsertArrangeMenuItems(HMENU hMenu)
  * Translates the specified sort mode into its
  * associated menu id.
  */
-int CContainer::DetermineSortModeMenuId(int SortMode)
+int Explorerplusplus::DetermineSortModeMenuId(int SortMode)
 {
 	switch(SortMode)
 	{
@@ -522,7 +522,7 @@ int CContainer::DetermineSortModeMenuId(int SortMode)
 	return -1;
 }
 
-int CContainer::DetermineGroupModeMenuId(int SortMode)
+int Explorerplusplus::DetermineGroupModeMenuId(int SortMode)
 {
 	switch(SortMode)
 	{
@@ -689,7 +689,7 @@ int CContainer::DetermineGroupModeMenuId(int SortMode)
 /*
  * Removes the previous arrange menu items from the menu.
  */
-void CContainer::DeletePreviousArrangeMenuItems(void)
+void Explorerplusplus::DeletePreviousArrangeMenuItems(void)
 {
 	MENUITEMINFO	mii;
 	int				i = 0;
@@ -716,7 +716,7 @@ void CContainer::DeletePreviousArrangeMenuItems(void)
 /*
  * Updates the arrange menu with the new items.
  */
-void CContainer::UpdateArrangeMenuItems(void)
+void Explorerplusplus::UpdateArrangeMenuItems(void)
 {
 	list<int>				SortModes;
 	list<int>::iterator		itr;

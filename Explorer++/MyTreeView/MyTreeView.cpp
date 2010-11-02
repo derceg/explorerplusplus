@@ -726,12 +726,16 @@ HTREEITEM hParent)
 	SendMessage(m_hTreeView,WM_SETREDRAW,(WPARAM)TRUE,(LPARAM)NULL);
 
 	pThreadInfo = (ThreadInfo_t *)malloc(sizeof(ThreadInfo_t));
-	pThreadInfo->hTreeView		= m_hTreeView;
-	pThreadInfo->pidl			= ILClone(pidlDirectory);
-	pThreadInfo->hParent		= hParent;
-	pThreadInfo->pMyTreeView	= this;
 
-	CreateThread(NULL,0,Thread_SubFoldersStub,pThreadInfo,0,&g_ThreadId);
+	if(pThreadInfo != NULL)
+	{
+		pThreadInfo->hTreeView		= m_hTreeView;
+		pThreadInfo->pidl			= ILClone(pidlDirectory);
+		pThreadInfo->hParent		= hParent;
+		pThreadInfo->pMyTreeView	= this;
+
+		CreateThread(NULL,0,Thread_SubFoldersStub,pThreadInfo,0,&g_ThreadId);
+	}
 }
 
 int CMyTreeView::GenerateUniqueItemId(void)

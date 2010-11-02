@@ -14,31 +14,31 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 
-CContainer::CBookmarkToolbarDrop::CBookmarkToolbarDrop(CContainer *pContainer)
+Explorerplusplus::CBookmarkToolbarDrop::CBookmarkToolbarDrop(Explorerplusplus *pContainer)
 {
 	m_pContainer = pContainer;
 
 	InitializeDragDropHelpers();
 }
 
-CContainer::CBookmarkToolbarDrop::~CBookmarkToolbarDrop()
+Explorerplusplus::CBookmarkToolbarDrop::~CBookmarkToolbarDrop()
 {
 
 }
 
-HRESULT __stdcall CContainer::CBookmarkToolbarDrop::QueryInterface(REFIID iid, void **ppvObject)
+HRESULT __stdcall Explorerplusplus::CBookmarkToolbarDrop::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = NULL;
 
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall CContainer::CBookmarkToolbarDrop::AddRef(void)
+ULONG __stdcall Explorerplusplus::CBookmarkToolbarDrop::AddRef(void)
 {
 	return ++m_iRefCount;
 }
 
-ULONG __stdcall CContainer::CBookmarkToolbarDrop::Release(void)
+ULONG __stdcall Explorerplusplus::CBookmarkToolbarDrop::Release(void)
 {
 	m_iRefCount--;
 	
@@ -51,7 +51,7 @@ ULONG __stdcall CContainer::CBookmarkToolbarDrop::Release(void)
 	return m_iRefCount;
 }
 
-HRESULT _stdcall CContainer::CBookmarkToolbarDrop::DragEnter(IDataObject *pDataObject,
+HRESULT _stdcall Explorerplusplus::CBookmarkToolbarDrop::DragEnter(IDataObject *pDataObject,
 DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect)
 {
 	FORMATETC	ftc = {CF_HDROP,0,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
@@ -117,7 +117,7 @@ DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect)
 	return hr;
 }
 
-HRESULT _stdcall CContainer::CBookmarkToolbarDrop::DragOver(DWORD grfKeyState,
+HRESULT _stdcall Explorerplusplus::CBookmarkToolbarDrop::DragOver(DWORD grfKeyState,
 POINTL pt,DWORD *pdwEffect)
 {
 	TBINSERTMARK tbim;
@@ -168,7 +168,7 @@ POINTL pt,DWORD *pdwEffect)
 	return S_OK;
 }
 
-HRESULT _stdcall CContainer::CBookmarkToolbarDrop::DragLeave(void)
+HRESULT _stdcall Explorerplusplus::CBookmarkToolbarDrop::DragLeave(void)
 {
 	TBINSERTMARK tbim;
 
@@ -182,7 +182,7 @@ HRESULT _stdcall CContainer::CBookmarkToolbarDrop::DragLeave(void)
 	return S_OK;
 }
 
-HRESULT _stdcall CContainer::CBookmarkToolbarDrop::Drop(IDataObject *pDataObject,
+HRESULT _stdcall Explorerplusplus::CBookmarkToolbarDrop::Drop(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	FORMATETC		ftc;
@@ -269,7 +269,7 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 	return S_OK;
 }
 
-HRESULT CContainer::CBookmarkToolbarDrop::InitializeDragDropHelpers(void)
+HRESULT Explorerplusplus::CBookmarkToolbarDrop::InitializeDragDropHelpers(void)
 {
 	HRESULT hr;
 

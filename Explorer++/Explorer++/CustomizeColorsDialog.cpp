@@ -20,13 +20,13 @@ extern BOOL g_bEditing;
 
 INT_PTR CALLBACK ColorFilteringProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -34,7 +34,7 @@ INT_PTR CALLBACK ColorFilteringProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM
 	return pContainer->ColorFilteringProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::ColorFilteringProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::ColorFilteringProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
@@ -199,7 +199,7 @@ INT_PTR CALLBACK CContainer::ColorFilteringProc(HWND hDlg,UINT Msg,WPARAM wParam
 	return 0;
 }
 
-void CContainer::CustomizeColorsMove(HWND hDlg,BOOL bUp)
+void Explorerplusplus::CustomizeColorsMove(HWND hDlg,BOOL bUp)
 {
 	HWND		hListView;
 	list<ListViewColouring_t>::iterator	itr;
@@ -255,7 +255,7 @@ void CContainer::CustomizeColorsMove(HWND hDlg,BOOL bUp)
 	}
 }
 
-void CContainer::CustomizeColorsDelete(HWND hDlg)
+void Explorerplusplus::CustomizeColorsDelete(HWND hDlg)
 {
 	HWND		hListView;
 	list<ListViewColouring_t>::iterator	itr;
@@ -303,7 +303,7 @@ void CContainer::CustomizeColorsDelete(HWND hDlg)
 	}
 }
 
-void CContainer::CustomizeColorsSaveState(HWND hDlg)
+void Explorerplusplus::CustomizeColorsSaveState(HWND hDlg)
 {
 	RECT rcTemp;
 
@@ -314,7 +314,7 @@ void CContainer::CustomizeColorsSaveState(HWND hDlg)
 	m_bCustomizeColorsDlgStateSaved = TRUE;
 }
 
-void CContainer::OnEditColorRule(HWND hDlg,int iSelected)
+void Explorerplusplus::OnEditColorRule(HWND hDlg,int iSelected)
 {
 	HWND hListView;
 	list<ListViewColouring_t>::iterator itr;

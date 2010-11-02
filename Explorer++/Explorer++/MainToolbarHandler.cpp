@@ -15,7 +15,7 @@
 #include "Explorer++.h"
 
 
-void CContainer::SetInitialToolbarButtons(void)
+void Explorerplusplus::SetInitialToolbarButtons(void)
 {
 	ToolbarButton_t	tb;
 
@@ -91,7 +91,7 @@ void CContainer::SetInitialToolbarButtons(void)
 	m_tbInitial.push_back(tb);
 }
 
-int CContainer::LookupToolbarButtonTextID(int iButtonID)
+int Explorerplusplus::LookupToolbarButtonTextID(int iButtonID)
 {
 	switch(iButtonID)
 	{
@@ -179,7 +179,7 @@ int CContainer::LookupToolbarButtonTextID(int iButtonID)
 	return 0;
 }
 
-int CContainer::LookupToolbarButtonImage(int iButtonID)
+int Explorerplusplus::LookupToolbarButtonImage(int iButtonID)
 {
 	switch(iButtonID)
 	{
@@ -267,7 +267,7 @@ int CContainer::LookupToolbarButtonImage(int iButtonID)
 	return -1;
 }
 
-BYTE CContainer::LookupToolbarButtonExtraStyles(int iButtonID)
+BYTE Explorerplusplus::LookupToolbarButtonExtraStyles(int iButtonID)
 {
 	switch(iButtonID)
 	{
@@ -355,7 +355,7 @@ BYTE CContainer::LookupToolbarButtonExtraStyles(int iButtonID)
 	return 0;
 }
 
-void CContainer::AddStringsToMainToolbar(void)
+void Explorerplusplus::AddStringsToMainToolbar(void)
 {
 	TCHAR szText[64];
 
@@ -503,7 +503,7 @@ void CContainer::AddStringsToMainToolbar(void)
 /*
  * Sets the state of the items in the main toolbar.
  */
-void CContainer::HandleToolbarItemStates(void)
+void Explorerplusplus::HandleToolbarItemStates(void)
 {
     BOOL	bVirtualFolder;
 

@@ -15,7 +15,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 
-void CContainer::OnCopyItemPath(void)
+void Explorerplusplus::OnCopyItemPath(void)
 {
 	HWND hFocus;
 
@@ -31,7 +31,7 @@ void CContainer::OnCopyItemPath(void)
 	}
 }
 
-void CContainer::OnCopyUniversalPaths(void)
+void Explorerplusplus::OnCopyUniversalPaths(void)
 {
 	HWND hFocus;
 
@@ -47,7 +47,7 @@ void CContainer::OnCopyUniversalPaths(void)
 	}
 }
 
-void CContainer::OnCopy(BOOL bCopy)
+void Explorerplusplus::OnCopy(BOOL bCopy)
 {
 	HWND hFocus;
 
@@ -63,7 +63,7 @@ void CContainer::OnCopy(BOOL bCopy)
 	}
 }
 
-void CContainer::OnFileRename(void)
+void Explorerplusplus::OnFileRename(void)
 {
 	HWND	hFocus;
 
@@ -87,7 +87,7 @@ void CContainer::OnFileRename(void)
 	}
 }
 
-void CContainer::OnFileDelete(BOOL bPermanent)
+void Explorerplusplus::OnFileDelete(BOOL bPermanent)
 {
 	HWND hFocus;
 
@@ -103,7 +103,7 @@ void CContainer::OnFileDelete(BOOL bPermanent)
 	}
 }
 
-void CContainer::OnSetFileAttributes(void)
+void Explorerplusplus::OnSetFileAttributes(void)
 {
 	HWND hFocus;
 
@@ -119,7 +119,7 @@ void CContainer::OnSetFileAttributes(void)
 	}
 }
 
-void CContainer::OnShowFileProperties(void)
+void Explorerplusplus::OnShowFileProperties(void)
 {
 	HWND hFocus;
 
@@ -135,7 +135,7 @@ void CContainer::OnShowFileProperties(void)
 	}
 }
 
-void CContainer::OnRightClick(NMHDR *nmhdr)
+void Explorerplusplus::OnRightClick(NMHDR *nmhdr)
 {
 	if(nmhdr->hwndFrom == m_hActiveListView)
 	{
@@ -166,7 +166,7 @@ void CContainer::OnRightClick(NMHDR *nmhdr)
 	}
 }
 
-void CContainer::OnPaste(void)
+void Explorerplusplus::OnPaste(void)
 {
 	HWND hFocus;
 
@@ -186,14 +186,14 @@ void CContainer::OnPaste(void)
 thread (provided the paste actually succeeded). */
 void PasteFilesCallback(void *pData,list<PastedFile_t> *pPastedFileList)
 {
-	CContainer *pContainer = NULL;
+	Explorerplusplus *pContainer = NULL;
 
-	pContainer = (CContainer *)pData;
+	pContainer = (Explorerplusplus *)pData;
 
 	pContainer->PasteFilesCallbackInternal(pPastedFileList);
 }
 
-void CContainer::PasteFilesCallbackInternal(list<PastedFile_t> *pPastedFileList)
+void Explorerplusplus::PasteFilesCallbackInternal(list<PastedFile_t> *pPastedFileList)
 {
 	/* If the files were pasted successfully, and the tab currently
 	does not have any selected files, then select the pasted files. */

@@ -34,13 +34,13 @@ BOOL				g_bMergingFiles;
 
 INT_PTR CALLBACK MergeFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer;
+	static Explorerplusplus *pContainer;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -48,7 +48,7 @@ INT_PTR CALLBACK MergeFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lPa
 	return pContainer->MergeFilesProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::MergeFilesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::MergeFilesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -98,7 +98,7 @@ INT_PTR CALLBACK CContainer::MergeFilesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LP
 	return 0;
 }
 
-void CContainer::OnMergeFilesInit(HWND hDlg)
+void Explorerplusplus::OnMergeFilesInit(HWND hDlg)
 {
 	HWND			hListView;
 	TCHAR			szCurrentDirectory[MAX_PATH];
@@ -176,7 +176,7 @@ void CContainer::OnMergeFilesInit(HWND hDlg)
 	}
 }
 
-void CContainer::OnMergeFilesOk(HWND hDlg)
+void Explorerplusplus::OnMergeFilesOk(HWND hDlg)
 {
 	HWND							hEditOutputFileName;
 	HWND							hProgressBar;
@@ -240,7 +240,7 @@ void CContainer::OnMergeFilesOk(HWND hDlg)
 	}
 }
 
-void CContainer::OnMergeFilesCancel(HWND hDlg)
+void Explorerplusplus::OnMergeFilesCancel(HWND hDlg)
 {
 	if(g_bMergingFiles)
 	{
@@ -254,7 +254,7 @@ void CContainer::OnMergeFilesCancel(HWND hDlg)
 	EndDialog(hDlg,0);
 }
 
-void CContainer::OnMergeFilesChangeOutputDirectory(HWND hDlg)
+void Explorerplusplus::OnMergeFilesChangeOutputDirectory(HWND hDlg)
 {
 	TCHAR	szOutputDirectory[MAX_PATH];
 	TCHAR	szTitle[64];
@@ -271,7 +271,7 @@ void CContainer::OnMergeFilesChangeOutputDirectory(HWND hDlg)
 	}
 }
 
-void CContainer::OnMergingFinished(HWND hDlg)
+void Explorerplusplus::OnMergingFinished(HWND hDlg)
 {
 	TCHAR	szStringTemp[32];
 
@@ -283,7 +283,7 @@ void CContainer::OnMergingFinished(HWND hDlg)
 	g_bMergingFiles = FALSE;
 }
 
-void CContainer::OnMergeFilesRemove(HWND hDlg)
+void Explorerplusplus::OnMergeFilesRemove(HWND hDlg)
 {
 	HWND							hListView;
 	list<MergedFile_t>::iterator	itr;
@@ -322,7 +322,7 @@ void CContainer::OnMergeFilesRemove(HWND hDlg)
 	}
 }
 
-void CContainer::OnMergeFilesMove(HWND hDlg,BOOL bUp)
+void Explorerplusplus::OnMergeFilesMove(HWND hDlg,BOOL bUp)
 {
 	HWND							hListView;
 	list<MergedFile_t>::iterator	itrSelected;
@@ -457,7 +457,7 @@ DWORD WINAPI MergeFilesThreadProc(LPVOID lpParameter)
 	return 1;
 }
 
-void CContainer::MergeFilesSaveState(HWND hDlg)
+void Explorerplusplus::MergeFilesSaveState(HWND hDlg)
 {
 	RECT rcTemp;
 

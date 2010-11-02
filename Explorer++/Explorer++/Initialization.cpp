@@ -26,7 +26,7 @@
 
 extern HIMAGELIST himlMenu;
 
-void CContainer::InitializeBookmarks(void)
+void Explorerplusplus::InitializeBookmarks(void)
 {
 	HMENU	hMenu;
 	HMENU	hBookmarkMenu;
@@ -40,7 +40,7 @@ void CContainer::InitializeBookmarks(void)
 	InsertBookmarkToolbarButtons();
 }
 
-void CContainer::InitializeDisplayWindow(void)
+void Explorerplusplus::InitializeDisplayWindow(void)
 {
 	DWInitialSettings_t	InitialSettings;
 
@@ -56,7 +56,7 @@ void CContainer::InitializeDisplayWindow(void)
 		&m_pDisplayMain,&InitialSettings);
 }
 
-void CContainer::InitializeMenus(void)
+void Explorerplusplus::InitializeMenus(void)
 {
 	HMENU	hMenu;
 	HBITMAP	hBitmap;
@@ -202,7 +202,7 @@ void CContainer::InitializeMenus(void)
 	SetMenuOwnerDraw(m_hGroupBySubMenu);
 }
 
-void CContainer::SetDefaultTabSettings(TabInfo_t *pTabInfo)
+void Explorerplusplus::SetDefaultTabSettings(TabInfo_t *pTabInfo)
 {
 	pTabInfo->bLocked			= FALSE;
 	pTabInfo->bAddressLocked	= FALSE;
@@ -211,7 +211,7 @@ void CContainer::SetDefaultTabSettings(TabInfo_t *pTabInfo)
 		SIZEOF_ARRAY(pTabInfo->szName),EMPTY_STRING);
 }
 
-void CContainer::InitializeColorRules(void)
+void Explorerplusplus::InitializeColorRules(void)
 {
 	ListViewColouring_t lvc;
 

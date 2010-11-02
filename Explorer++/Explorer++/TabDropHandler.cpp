@@ -22,7 +22,7 @@ UINT_PTR idEvent,DWORD dwTime);
 
 BOOL	g_bTabDragTimerElapsed;
 
-HRESULT _stdcall CContainer::DragEnter(IDataObject *pDataObject,
+HRESULT _stdcall Explorerplusplus::DragEnter(IDataObject *pDataObject,
 DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	m_iTabDragTab = m_iTabSelectedItem;
@@ -91,7 +91,7 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 	return S_OK;
 }
 
-HRESULT _stdcall CContainer::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+HRESULT _stdcall Explorerplusplus::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	TCHITTESTINFO HitTestInfo;
 	BOOL bOnSameDrive;
@@ -170,7 +170,7 @@ HRESULT _stdcall CContainer::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffe
 
 /* Retrieves the filename of the first file been
 dropped. */
-void CContainer::GetSourceFileName(IDataObject *pDataObject)
+void Explorerplusplus::GetSourceFileName(IDataObject *pDataObject)
 {
 	FORMATETC	ftc;
 	STGMEDIUM	stg;
@@ -218,7 +218,7 @@ if the files come from different drives,
 whether this operation is classed as a copy
 or move is only based on the location of the
 first file). */
-BOOL CContainer::CheckItemLocations(int iTabId)
+BOOL Explorerplusplus::CheckItemLocations(int iTabId)
 {
 	TCHAR			szDestDirectory[MAX_PATH];
 	BOOL			bOnSameDrive = FALSE;
@@ -237,14 +237,14 @@ UINT_PTR idEvent,DWORD dwTime)
 	g_bTabDragTimerElapsed = TRUE;
 }
 
-HRESULT _stdcall CContainer::DragLeave(void)
+HRESULT _stdcall Explorerplusplus::DragLeave(void)
 {
 	m_pDropTargetHelper->DragLeave();
 
 	return S_OK;
 }
 
-HRESULT _stdcall CContainer::Drop(IDataObject *pDataObject,DWORD grfKeyState,
+HRESULT _stdcall Explorerplusplus::Drop(IDataObject *pDataObject,DWORD grfKeyState,
 POINTL pt,DWORD *pdwEffect)
 {
 	TCHITTESTINFO tchi;

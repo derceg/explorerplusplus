@@ -40,13 +40,13 @@ list<RenameFile_t>	FileNameList;
 
 INT_PTR CALLBACK MassRenameProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -54,7 +54,7 @@ INT_PTR CALLBACK MassRenameProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lPa
 	return pContainer->MassRenameProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::MassRenameProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::MassRenameProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -344,7 +344,7 @@ TCHAR *ProcessFileName(TCHAR *szTargetName,TCHAR *szFileName,int iFileIndex)
 	return szOutputText;
 }
 
-void CContainer::OnMassRenameOk(HWND hDlg)
+void Explorerplusplus::OnMassRenameOk(HWND hDlg)
 {
 	list<RenameFile_t>::iterator itr;
 	HWND hListView;
@@ -377,7 +377,7 @@ void CContainer::OnMassRenameOk(HWND hDlg)
 	EndDialog(hDlg,1);
 }
 
-void CContainer::MassRenameSaveState(HWND hDlg)
+void Explorerplusplus::MassRenameSaveState(HWND hDlg)
 {
 	RECT rcTemp;
 

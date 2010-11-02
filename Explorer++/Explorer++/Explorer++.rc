@@ -55,23 +55,25 @@ BEGIN
     CONTROL         "&Single-click to open an item (point to select)",IDC_SETTINGS_CHECK_SINGLECLICK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,155,10
     CONTROL         "Show fol&der sizes",IDC_SETTINGS_CHECK_FOLDERSIZES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,85,71,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,71,10
     CONTROL         "Show all &file sizes in:",IDC_SETTINGS_CHECK_FORCESIZE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,81,10
-    CONTROL         "Handle &zip files",IDC_SETTINGS_CHECK_ZIPFILES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,124,63,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,124,81,10
+    CONTROL         "Handle &zip files",IDC_SETTINGS_CHECK_ZIPFILES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,137,63,10
     CONTROL         "Show &user friendly dates",IDC_SETTINGS_CHECK_FRIENDLYDATES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,137,95,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,150,95,10
     CONTROL         "S&how infotips for files:",IDC_OPTIONS_CHECK_SHOWINFOTIPS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,150,87,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,163,87,10
     CONTROL         "Show s&ystem infotips",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,163,83,10
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,176,83,10
     CONTROL         "Show &custom infotips",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON,19,174,83,10
+                    "Button",BS_AUTORADIOBUTTON,19,187,83,10
     CONTROL         "Disable folder sizes on removable and network drives",IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,98,185,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,111,185,10
     CONTROL         "Ask for confirmation before overwriting existing files",IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,183,10
-    COMBOBOX        IDC_COMBO_FILESIZES,89,109,48,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_FILESIZES,89,122,48,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Play navigation sound when entering a folder",IDC_OPTIONS_PLAYNAVIGATIONSOUND,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,85,161,10
 END
 
 IDD_OPTIONS_GENERAL DIALOGEX 0, 0, 230, 283

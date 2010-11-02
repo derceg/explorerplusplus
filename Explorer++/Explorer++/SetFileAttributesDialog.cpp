@@ -46,13 +46,13 @@ SYSTEMTIME g_LocalAccess;
 
 INT_PTR CALLBACK SetFileAttributesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer = NULL;
+	static Explorerplusplus *pContainer = NULL;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -67,7 +67,7 @@ INT_PTR CALLBACK SetFileAttributesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 	}
 }
 
-INT_PTR CALLBACK CContainer::SetFileAttributesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::SetFileAttributesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	static HANDLE hFile;
 	static TCHAR FileName[MAX_PATH];
@@ -117,7 +117,7 @@ INT_PTR CALLBACK CContainer::SetFileAttributesProc(HWND hDlg,UINT uMsg,WPARAM wP
 	return 0;
 }
 
-void CContainer::OnInitializeFileAttributesDlg(HWND hDlg,LPARAM lParam)
+void Explorerplusplus::OnInitializeFileAttributesDlg(HWND hDlg,LPARAM lParam)
 {
 	list<SetFileAttributesInfo_t>::iterator itr;
 	int nItems;
@@ -200,7 +200,7 @@ void ResetButtonState(HWND hwnd,BOOL bReset)
 	SendMessage(hwnd,BM_SETSTYLE,(WPARAM)BS_AUTOCHECKBOX,MAKELPARAM(FALSE,0));
 }
 
-void CContainer::OnFileAttributesDlgOk(HWND hDlg)
+void Explorerplusplus::OnFileAttributesDlgOk(HWND hDlg)
 {
 	HANDLE hFile;
 	list<SetFileAttributesInfo_t>::iterator itr;
@@ -318,7 +318,7 @@ void CContainer::OnFileAttributesDlgOk(HWND hDlg)
 	EndDialog(hDlg,1);
 }
 
-void CContainer::OnSetFileAttributesNotify(HWND hDlg,WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnSetFileAttributesNotify(HWND hDlg,WPARAM wParam,LPARAM lParam)
 {
 	NMHDR *nmhdr;
 
@@ -357,7 +357,7 @@ void CContainer::OnSetFileAttributesNotify(HWND hDlg,WPARAM wParam,LPARAM lParam
 	}
 }
 
-void CContainer::OnDateReset(HWND hDlg,int FieldToReset)
+void Explorerplusplus::OnDateReset(HWND hDlg,int FieldToReset)
 {
 	switch(FieldToReset)
 	{
@@ -378,7 +378,7 @@ void CContainer::OnDateReset(HWND hDlg,int FieldToReset)
 	}
 }
 
-void CContainer::InitializeAttributesStructure(void)
+void Explorerplusplus::InitializeAttributesStructure(void)
 {
 	Attributes[0].Attribute		= FILE_ATTRIBUTE_ARCHIVE;
 	Attributes[0].uControlId	= IDC_CHECK_ARCHIVE;
@@ -401,7 +401,7 @@ void CContainer::InitializeAttributesStructure(void)
 	Attributes[4].bReversed		= TRUE;
 }
 
-void CContainer::InitializeDateFields(HWND hDlg)
+void Explorerplusplus::InitializeDateFields(HWND hDlg)
 {
 	/* Use the dates of the first file... */
 	FileTimeToLocalSystemTime(&(m_sfaiList.begin())->wfd.ftLastWriteTime,&g_LocalWrite);
@@ -430,7 +430,7 @@ void CContainer::InitializeDateFields(HWND hDlg)
 	EnableWindow(GetDlgItem(hDlg,IDC_ACCESS_RESET),FALSE);
 }
 
-void CContainer::SetFileAttributesSaveState(HWND hDlg)
+void Explorerplusplus::SetFileAttributesSaveState(HWND hDlg)
 {
 	RECT rcTemp;
 

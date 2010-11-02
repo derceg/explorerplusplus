@@ -35,13 +35,13 @@ BOOL	g_bContinueSplitting;
 
 INT_PTR CALLBACK SplitFileProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	static CContainer *pContainer;
+	static Explorerplusplus *pContainer;
 
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pContainer = (CContainer *)lParam;
+			pContainer = (Explorerplusplus *)lParam;
 		}
 		break;
 	}
@@ -49,7 +49,7 @@ INT_PTR CALLBACK SplitFileProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lPar
 	return pContainer->SplitFileProc(hDlg,uMsg,wParam,lParam);
 }
 
-INT_PTR CALLBACK CContainer::SplitFileProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK Explorerplusplus::SplitFileProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -87,7 +87,7 @@ INT_PTR CALLBACK CContainer::SplitFileProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 	return 0;
 }
 
-void CContainer::OnSplitFileInit(HWND hDlg)
+void Explorerplusplus::OnSplitFileInit(HWND hDlg)
 {
 	HWND	hEditSize;
 	HWND	hComboBox;
@@ -134,7 +134,7 @@ void CContainer::OnSplitFileInit(HWND hDlg)
 	}
 }
 
-void CContainer::OnSplitFileOk(HWND hDlg)
+void Explorerplusplus::OnSplitFileOk(HWND hDlg)
 {
 	HWND	hEditSize;
 	HWND	hEditOutputDirectory;
@@ -235,7 +235,7 @@ void CContainer::OnSplitFileOk(HWND hDlg)
 	}
 }
 
-void CContainer::OnSplitFileCancel(HWND hDlg)
+void Explorerplusplus::OnSplitFileCancel(HWND hDlg)
 {
 	if(m_bSplittingFile)
 	{
@@ -249,7 +249,7 @@ void CContainer::OnSplitFileCancel(HWND hDlg)
 	EndDialog(hDlg,0);
 }
 
-void CContainer::OnSplitFinished(HWND hDlg)
+void Explorerplusplus::OnSplitFinished(HWND hDlg)
 {
 	SetDlgItemText(hDlg,IDOK,g_szSplit);
 
@@ -336,7 +336,7 @@ DWORD WINAPI SplitFileThreadProc(LPVOID lpParameter)
 	return 1;
 }
 
-void CContainer::OnSplitFileChangeOutputDirectory(HWND hDlg)
+void Explorerplusplus::OnSplitFileChangeOutputDirectory(HWND hDlg)
 {
 	TCHAR	szOutputDirectory[MAX_PATH];
 	TCHAR	szTitle[] = _T("Select a destination folder");
@@ -350,7 +350,7 @@ void CContainer::OnSplitFileChangeOutputDirectory(HWND hDlg)
 	}
 }
 
-void CContainer::SplitFileSaveState(HWND hDlg)
+void Explorerplusplus::SplitFileSaveState(HWND hDlg)
 {
 	RECT rcTemp;
 

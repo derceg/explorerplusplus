@@ -18,12 +18,12 @@
 LRESULT CALLBACK DrivesToolbarSubclassStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	CContainer *pContainer = (CContainer *)dwRefData;
+	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->DrivesToolbarSubclass(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CContainer::DrivesToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::DrivesToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -61,7 +61,7 @@ LRESULT CALLBACK CContainer::DrivesToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wP
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
-void CContainer::InsertDrivesIntoDrivesToolbar(void)
+void Explorerplusplus::InsertDrivesIntoDrivesToolbar(void)
 {
 	HIMAGELIST	SmallIcons;
 	TCHAR		*pszDriveStrings = NULL;
@@ -96,7 +96,7 @@ void CContainer::InsertDrivesIntoDrivesToolbar(void)
 	free(pszDriveStrings);
 }
 
-LRESULT CContainer::InsertDriveIntoDrivesToolbar(TCHAR *szDrive)
+LRESULT Explorerplusplus::InsertDriveIntoDrivesToolbar(TCHAR *szDrive)
 {
 	TBBUTTON	tbButton;
 	SHFILEINFO	shfi;
@@ -163,7 +163,7 @@ disconnected from the system (i.e. a removable
 device may have been ejected).
 Returns TRUE if the drive was found and removed;
 FALSE otherwise. */
-LRESULT CContainer::RemoveDriveFromDrivesToolbar(TCHAR *szDrive)
+LRESULT Explorerplusplus::RemoveDriveFromDrivesToolbar(TCHAR *szDrive)
 {
 	TBBUTTON	tbButton;
 	TCHAR		*pszDrivePath = NULL;
@@ -198,7 +198,7 @@ LRESULT CContainer::RemoveDriveFromDrivesToolbar(TCHAR *szDrive)
 
 /* Updates an items icon. This may be necessary,
 for example, if a cd/dvd is inserted/removed. */
-void CContainer::UpdateDrivesToolbarIcon(TCHAR *szDrive)
+void Explorerplusplus::UpdateDrivesToolbarIcon(TCHAR *szDrive)
 {
 	TBBUTTON tbButton;
 	SHFILEINFO shfi;
@@ -235,7 +235,7 @@ void CContainer::UpdateDrivesToolbarIcon(TCHAR *szDrive)
 	}
 }
 
-void CContainer::DrivesToolbarRefreshAllIcons(void)
+void Explorerplusplus::DrivesToolbarRefreshAllIcons(void)
 {
 	TBBUTTON tbButton;
 	SHFILEINFO shfi;

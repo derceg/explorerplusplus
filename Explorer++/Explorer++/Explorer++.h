@@ -198,12 +198,12 @@ TOOLBAR_NEWFOLDER,TOOLBAR_COPY,TOOLBAR_CUT,
 TOOLBAR_PASTE,TOOLBAR_DELETE,TOOLBAR_VIEWS,
 TOOLBAR_SEARCH,TOOLBAR_PROPERTIES,TOOLBAR_REFRESH};
 
-class CContainer : public IDropTarget, public IServiceProvider, public IShellView2, public INewMenuClient, public IDropFilesCallback
+class Explorerplusplus : public IDropTarget, public IServiceProvider, public IShellView2, public INewMenuClient, public IDropFilesCallback
 {
 public:
 
-	CContainer(HWND);
-	~CContainer();
+	Explorerplusplus(HWND);
+	~Explorerplusplus();
 
 	/* Window/dialog procedures.
 	Window procedures use LRESULT
@@ -305,7 +305,7 @@ private:
 	{
 	public:
 
-		CLoadSaveRegistry(CContainer *pContainer);
+		CLoadSaveRegistry(Explorerplusplus *pContainer);
 		~CLoadSaveRegistry();
 
 		/* IUnknown methods. */
@@ -315,7 +315,6 @@ private:
 
 		/* Loading functions. */
 		void	LoadGenericSettings(void);
-		LONG	LoadWindowPosition(InitialWindowPos_t *piwp);
 		void	LoadFilters(void);
 		void	LoadBookmarks(void);
 		int		LoadPreviousTabs(void);
@@ -327,7 +326,6 @@ private:
 
 		/* Saving functions. */
 		void	SaveGenericSettings(void);
-		LONG	SaveWindowPosition(void);
 		void	SaveFilters(void);
 		void	SaveBookmarks(void);
 		void	SaveTabs(void);
@@ -341,14 +339,14 @@ private:
 
 		int	m_iRefCount;
 
-		CContainer *m_pContainer;
+		Explorerplusplus *m_pContainer;
 	};
 
 	class CLoadSaveXML : public ILoadSave
 	{
 	public:
 
-		CLoadSaveXML(CContainer *pContainer,BOOL bLoad);
+		CLoadSaveXML(Explorerplusplus *pContainer,BOOL bLoad);
 		~CLoadSaveXML();
 
 		/* IUnknown methods. */
@@ -363,7 +361,6 @@ private:
 
 		/* Loading functions. */
 		void	LoadGenericSettings(void);
-		LONG	LoadWindowPosition(InitialWindowPos_t *piwp);
 		void	LoadFilters(void);
 		void	LoadBookmarks(void);
 		int		LoadPreviousTabs(void);
@@ -375,7 +372,6 @@ private:
 
 		/* Saving functions. */
 		void	SaveGenericSettings(void);
-		LONG	SaveWindowPosition(void);
 		void	SaveFilters(void);
 		void	SaveBookmarks(void);
 		void	SaveTabs(void);
@@ -389,7 +385,7 @@ private:
 
 		int	m_iRefCount;
 
-		CContainer				*m_pContainer;
+		Explorerplusplus				*m_pContainer;
 		BOOL					m_bLoad;
 
 		/* These are used for saving + loading. */
@@ -407,7 +403,7 @@ private:
 	class CBookmarkToolbarDrop : public IDropTarget
 	{
 	public:
-		CBookmarkToolbarDrop(CContainer *pContainer);
+		CBookmarkToolbarDrop(Explorerplusplus *pContainer);
 		~CBookmarkToolbarDrop();
 
 		/* IUnknown methods. */
@@ -424,7 +420,7 @@ private:
 	private:
 		int m_iRefCount;
 
-		CContainer *m_pContainer;
+		Explorerplusplus *m_pContainer;
 
 		/* Drag and drop. */
 		IDragSourceHelper *	m_pDragSourceHelper;
@@ -439,7 +435,7 @@ private:
 	class CApplicationToolbarDrop : public IDropTarget
 	{
 	public:
-		CApplicationToolbarDrop(CContainer *pContainer);
+		CApplicationToolbarDrop(Explorerplusplus *pContainer);
 		~CApplicationToolbarDrop();
 
 		/* IUnknown methods. */
@@ -455,7 +451,7 @@ private:
 
 	private:
 		int m_iRefCount;
-		CContainer *m_pContainer;
+		Explorerplusplus *m_pContainer;
 
 		/* Drag and drop. */
 		IDragSourceHelper *	m_pDragSourceHelper;
@@ -472,8 +468,6 @@ private:
 	/* Internal private functions. */
 	void					OnTabChangeInternal(BOOL bSetFocus);
 	void					UpdateArrangeMenuItems(void);
-	void					VerifyAndSetWindowPosition(InitialWindowPos_t *piwp);
-	void					SetDefaultWindowPosition(void);
 
 	/* <----Private message handlers.----> */
 
@@ -1086,7 +1080,6 @@ private:
 	int						LoadDefaultColumnsFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					SaveDefaultColumnsToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveDefaultColumnsToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pColumnsNode);
-	int						LoadWindowPositionFromXML(MSXML2::IXMLDOMDocument *pXMLDom,InitialWindowPos_t *piwp);
 	void					SaveWindowPositionToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveWindowPositionToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pWndPosNode);
 	void					LoadApplicationToolbarFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
@@ -1153,6 +1146,7 @@ private:
 	int						GetViewModeMenuStringId(UINT uViewMode);
 	BOOL					VerifyLanguageVersion(TCHAR *szLanguageModule);
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
+	void					PlayNavigationSound(void);
 
 
 
@@ -1284,6 +1278,7 @@ private:
 	BOOL					m_bSynchronizeTreeview;
 	BOOL					m_bTVAutoExpandSelected;
 	BOOL					m_bLargeToolbarIcons;
+	BOOL					m_bPlayNavigationSound;
 	SizeDisplayFormat_t		m_SizeDisplayFormat;
 	UINT					m_StartupMode;
 	UINT					m_ReplaceExplorerMode;
@@ -1526,7 +1521,7 @@ private:
 
 typedef struct
 {
-	CContainer	*pContainer;
+	Explorerplusplus	*pContainer;
 	int			iTabId;
 } TabProxy_t;
 
