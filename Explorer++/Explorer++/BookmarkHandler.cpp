@@ -15,6 +15,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "../Helper/ShellHelper.h"
 
 
 #define BOOKMARK_SUBMENU_POSITION_START	2

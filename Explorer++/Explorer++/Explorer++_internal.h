@@ -39,8 +39,6 @@ extern HINSTANCE g_hLanguageModule;
 saved to/loaded from. */
 #define XML_FILENAME	_T("config.xml")
 
-#define CONTROL_PANEL_CATEGORY_VIEW	_T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")
-
 /* Command line arguments supplied to the program
 for each jump list task. */
 #define JUMPLIST_TASK_NEWTAB_ARGUMENT	_T("-open_new_tab")
@@ -716,10 +714,9 @@ INT_PTR CALLBACK	DefaultSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARA
 INT_PTR CALLBACK	TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 /* Window message handler stubs. */
-LRESULT CALLBACK	TabSubclassProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
-LRESULT CALLBACK	ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
-LRESULT CALLBACK	ShellMenuHookProcStubMainWindow(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 LRESULT CALLBACK	TabSubclassProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+LRESULT CALLBACK	TabSubclassProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
+LRESULT CALLBACK	ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 /* Paste file callback (will select pasted files). */
 void				PasteFilesCallback(void *pData,list<PastedFile_t> *pPastedFileList);

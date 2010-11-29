@@ -21,6 +21,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Bookmark.h"
+#include "../Helper/ShellHelper.h"
 #include "MainResource.h"
 
 
@@ -131,13 +132,11 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 		lCheckMenuItem(hProgramMenu,IDM_ARRANGEICONSBY_AUTOARRANGE,FALSE);
 
 		lEnableMenuItem(hProgramMenu,IDM_VIEW_GROUPBY,TRUE);
-		lEnableMenuItem(m_hRightClickMenu,IDM_POPUP_GROUPBY,TRUE);
 	}
 	else if(uViewMode == VM_LIST)
 	{
 		/* Disable group menu item. */
 		lEnableMenuItem(hProgramMenu,IDM_VIEW_GROUPBY,FALSE);
-		lEnableMenuItem(m_hRightClickMenu,IDM_POPUP_GROUPBY,FALSE);
 
 		/* Disable auto arrange menu item. */
 		lEnableMenuItem(hProgramMenu,IDM_ARRANGEICONSBY_AUTOARRANGE,FALSE);
@@ -146,7 +145,6 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	else
 	{
 		lEnableMenuItem(hProgramMenu,IDM_VIEW_GROUPBY,TRUE);
-		lEnableMenuItem(m_hRightClickMenu,IDM_POPUP_GROUPBY,TRUE);
 
 		lEnableMenuItem(hProgramMenu,IDM_ARRANGEICONSBY_AUTOARRANGE,TRUE);
 		lCheckMenuItem(hProgramMenu,IDM_ARRANGEICONSBY_AUTOARRANGE,m_pActiveShellBrowser->QueryAutoArrange());

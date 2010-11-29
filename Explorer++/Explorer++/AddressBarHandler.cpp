@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
+#include "../Helper/ShellHelper.h"
 
 
 /* Called when the user presses 'Enter' while

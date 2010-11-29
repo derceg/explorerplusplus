@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ShellHelper.h"
 #include "MainResource.h"
 
 
@@ -294,7 +295,7 @@ INT_PTR CALLBACK Explorerplusplus::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,L
 					CenterWindow(m_hContainer,hDlg);
 				}
 
-				SetFocus(GetDlgItem(hDlg,IDC_COMBO_DIRECTORY));
+				SetFocus(GetDlgItem(hDlg,IDC_COMBO_NAME));
 			}
 			break;
 

@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Buffer.h"
+#include "../Helper/ShellHelper.h"
 #include "MyTreeView.h"
 #include "MyTreeViewInternal.h"
 

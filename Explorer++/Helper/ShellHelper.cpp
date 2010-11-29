@@ -13,8 +13,10 @@
 
 #include "stdafx.h"
 #include "Helper.h"
+#include "ShellHelper.h"
 #include "FileOperations.h"
 #include "Buffer.h"
+#include "Registry.h"
 
 
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
@@ -1155,4 +1157,148 @@ HRESULT AddJumpListTaskInternal(IObjectCollection *poc,TCHAR *pszName,
 	}
 
 	return hr;
+}
+
+/* Returns a list of DLL's/IUnknown interfaces. Note that
+is up to the caller to free both the DLL's and objects
+returned.
+
+http://www.ureader.com/msg/16601280.aspx */
+BOOL LoadContextMenuHandlers(IN TCHAR *szRegKey,
+	OUT list<ContextMenuHandler_t> *pContextMenuHandlers)
+{
+	HKEY hKey = NULL;
+	BOOL bSuccess = FALSE;
+
+	LONG lRes = RegOpenKeyEx(HKEY_CLASSES_ROOT,szRegKey,
+		0,KEY_READ,&hKey);
+
+	if(lRes == ERROR_SUCCESS)
+	{
+		TCHAR szKeyName[512];
+		int iIndex = 0;
+
+		DWORD dwLen = SIZEOF_ARRAY(szKeyName);
+
+		while((lRes = RegEnumKeyEx(hKey,iIndex,szKeyName,
+			&dwLen,NULL,NULL,NULL,NULL)) == ERROR_SUCCESS)
+		{
+			HKEY hSubKey;
+			TCHAR szSubKey[512];
+			TCHAR szCLSID[256];
+			LONG lSubKeyRes;
+
+			StringCchPrintf(szSubKey,SIZEOF_ARRAY(szSubKey),
+				_T("%s\\%s"),szRegKey,szKeyName);
+
+			lSubKeyRes = RegOpenKeyEx(HKEY_CLASSES_ROOT,szSubKey,0,KEY_READ,&hSubKey);
+
+			if(lSubKeyRes == ERROR_SUCCESS)
+			{
+				lSubKeyRes = ReadStringFromRegistry(hSubKey,NULL,szCLSID,
+					SIZEOF_ARRAY(szCLSID));
+
+				if(lSubKeyRes == ERROR_SUCCESS)
+				{
+					ContextMenuHandler_t ContextMenuHandler;
+
+					BOOL bRes = LoadIUnknownFromCLSID(szCLSID,&ContextMenuHandler);
+
+					if(bRes)
+					{
+						pContextMenuHandlers->push_back(ContextMenuHandler);
+					}
+				}
+
+				RegCloseKey(hSubKey);
+			}
+
+			dwLen = SIZEOF_ARRAY(szKeyName);
+			iIndex++;
+		}
+
+		RegCloseKey(hKey);
+
+		bSuccess = TRUE;
+	}
+
+	return bSuccess;
+}
+
+/* Extracts an IUnknown interface from a class object,
+based on its CLSID. If the CLSID exists in
+HKLM\Software\Classes\CLSID, the DLL for this object
+will attempted to be loaded.
+Regardless of whether or not a DLL was actually
+loaded, the object will be initialized with a call
+to CoCreateInstance. */
+BOOL LoadIUnknownFromCLSID(IN TCHAR *szCLSID,
+OUT ContextMenuHandler_t *pContextMenuHandler)
+{
+	HKEY hCLSIDKey;
+	HKEY hDllKey;
+	HMODULE hDLL = NULL;
+	TCHAR szCLSIDKey[512];
+	LONG lRes;
+	BOOL bSuccess = FALSE;
+
+	StringCchPrintf(szCLSIDKey,SIZEOF_ARRAY(szCLSIDKey),
+		_T("%s\\%s"),_T("Software\\Classes\\CLSID"),szCLSID);
+
+	/* Open the CLSID key. */
+	lRes = RegOpenKeyEx(HKEY_LOCAL_MACHINE,szCLSIDKey,0,KEY_READ,&hCLSIDKey);
+
+	if(lRes == ERROR_SUCCESS)
+	{
+		lRes = RegOpenKeyEx(hCLSIDKey,_T("InProcServer32"),0,KEY_READ,&hDllKey);
+
+		if(lRes == ERROR_SUCCESS)
+		{
+			TCHAR szDLL[MAX_PATH];
+
+			lRes = ReadStringFromRegistry(hDllKey,NULL,szDLL,SIZEOF_ARRAY(szDLL));
+
+			if(lRes == ERROR_SUCCESS)
+			{
+				/* Now, load the DLL it refers to. */
+				hDLL = LoadLibrary(szDLL);
+			}
+
+			RegCloseKey(hDllKey);
+		}
+
+		RegCloseKey(hCLSIDKey);
+	}
+
+	CLSID clsid;
+
+	/* Regardless of whether or not any DLL was
+	loaded, attempt to create the object. */
+	HRESULT hr = CLSIDFromString(szCLSID,&clsid);
+
+	if(hr == NO_ERROR)
+	{
+		IUnknown *pUnknown = NULL;
+
+		hr = CoCreateInstance(clsid,NULL,CLSCTX_INPROC_SERVER,
+			IID_IUnknown,(LPVOID *)&pUnknown);
+
+		if(hr == S_OK)
+		{
+			bSuccess = TRUE;
+
+			pContextMenuHandler->hDLL = hDLL;
+			pContextMenuHandler->pUnknown = pUnknown;
+		}
+	}
+
+	if(!bSuccess)
+	{
+		if(hDLL != NULL)
+		{
+			FreeLibrary(hDLL);
+		}
+	}
+
+	return bSuccess;
 }

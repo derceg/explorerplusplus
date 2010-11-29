@@ -20,6 +20,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Misc.h"
+#include "../Helper/ShellHelper.h"
 
 
 #define NUM_DIALOG_OPTIONS_PAGES	5

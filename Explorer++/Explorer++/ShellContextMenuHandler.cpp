@@ -15,12 +15,13 @@
 #include "stdafx.h"
 #include "Misc.h"
 #include "Explorer++.h"
+#include "../Helper/ShellHelper.h"
 
 
 #define MENU_OPEN_IN_NEW_TAB	(MAX_SHELL_MENU_ID + 1)
 #define MENU_OPEN_FILE_LOCATION	(MAX_SHELL_MENU_ID + 2)
 
-Explorerplusplus	*g_pContainer = NULL;
+#define CONTEXT_MENU_SUBCLASS_ID	1
 
 HRESULT Explorerplusplus::CreateFileContextMenu(HWND hwnd,LPITEMIDLIST pidlParent,
 POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExtended)
@@ -36,7 +37,6 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 	LPITEMIDLIST		pidlRelative = NULL;
 	HMENU				hMenu;
 	MENUITEMINFO		mii;
-	CMINVOKECOMMANDINFO	cmici;
 	TCHAR				szCmd[64];
 	SFGAOF				FileAttributes = 0;
 	HRESULT				hr;
@@ -125,8 +125,6 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 		if(SUCCEEDED(hr))
 		{
 			hMenu = CreatePopupMenu();
-			m_hMenu = hMenu;
-			m_bMixedMenu = FALSE;
 
 			UINT uFlags;
 
@@ -165,13 +163,11 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 				InsertMenuItem(hMenu,1,TRUE,&mii);
 			}
 
-			g_pContainer = this;
-
 			if(m_pShellContext3 != NULL || m_pShellContext2 != NULL)
 			{
 				/* Subclass the owner window, so that the shell can handle menu messages. */
-				DefaultMainWndProc = (WNDPROC)SetWindowLongPtr(hwnd,GWLP_WNDPROC,
-					(LONG_PTR)ShellMenuHookProcStub);
+				SetWindowSubclass(hwnd,ShellMenuHookProcStub,CONTEXT_MENU_SUBCLASS_ID,
+					reinterpret_cast<DWORD_PTR>(this));
 			}
 
 			Cmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN | TPM_RETURNCMD,MousePos.x,MousePos.y,
@@ -180,7 +176,7 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 			if(m_pShellContext3 != NULL || m_pShellContext2 != NULL)
 			{
 				/* Restore previous window procedure. */
-				SetWindowLongPtr(hwnd,GWLP_WNDPROC,(LONG_PTR)DefaultMainWndProc);
+				RemoveWindowSubclass(hwnd,ShellMenuHookProcStub,CONTEXT_MENU_SUBCLASS_ID);
 			}
 
 			if(Cmd >= MIN_SHELL_MENU_ID && Cmd <= MAX_SHELL_MENU_ID)
@@ -251,15 +247,7 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 				}
 				else
 				{
-					cmici.cbSize		= sizeof(CMINVOKECOMMANDINFO);
-					cmici.fMask			= 0;
-					cmici.hwnd			= m_hContainer;
-					cmici.lpVerb		= (LPCSTR)MAKEWORD(Cmd - MIN_SHELL_MENU_ID,0);
-					cmici.lpParameters	= NULL;
-					cmici.lpDirectory	= NULL;
-					cmici.nShow			= SW_SHOW;
-
-					hr = pActualContext->InvokeCommand(&cmici);
+					ProcessShellMenuCommand(pActualContext,Cmd,MIN_SHELL_MENU_ID);
 				}
 			}
 			else
@@ -338,6 +326,108 @@ POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExt
 	}
 
 	return S_OK;
+}
+
+LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
+	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+{
+	Explorerplusplus *pExplorerpp = reinterpret_cast<Explorerplusplus *>(dwRefData);
+
+	return pExplorerpp->ShellMenuHookProc(hwnd,Msg,wParam,lParam,dwRefData);
+}
+
+LRESULT CALLBACK Explorerplusplus::ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,
+	LPARAM lParam,DWORD_PTR dwRefData)
+{
+	switch(uMsg)
+	{
+		case WM_MEASUREITEM:
+			/* wParam is 0 if this item was sent by a menu. */
+			if(wParam == 0)
+			{
+				MEASUREITEMSTRUCT *pmi;
+
+				pmi = (MEASUREITEMSTRUCT *)lParam;
+
+				if(m_pShellContext3 != NULL)
+					m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
+				else if(m_pShellContext2 != NULL)
+					m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
+
+				return TRUE;
+			}
+			break;
+
+		case WM_DRAWITEM:
+			if(wParam == 0)
+			{
+				DRAWITEMSTRUCT *pdi;
+
+				pdi = (DRAWITEMSTRUCT *)lParam;
+
+				if(m_pShellContext3 != NULL)
+					m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
+				else if(m_pShellContext2 != NULL)
+					m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
+			}
+			return TRUE;
+			break;
+
+		case WM_INITMENUPOPUP:
+			{
+				if(m_pShellContext3 != NULL)
+					m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
+				else if(m_pShellContext2 != NULL)
+					m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
+			}
+			break;
+
+		case WM_MENUSELECT:
+			{
+				UINT CmdID;
+				TCHAR HelpString[MAX_PATH];
+				HRESULT hr = E_FAIL;
+
+				if(HIWORD(wParam) == 0xFFFF && lParam == 0)
+				{
+					HandleStatusBarMenuClose();
+				}
+				else
+				{
+					HandleStatusBarMenuOpen();
+
+					CmdID = (UINT)LOWORD(wParam);
+
+					if(!((HIWORD(wParam) & MF_POPUP) == MF_POPUP) && CmdID <= MAX_SHELL_MENU_ID
+						&& CmdID >= MIN_SHELL_MENU_ID)
+					{
+						/* Ask for the help string for the currently selected menu item. */
+						if(m_pShellContext3 != NULL)
+						{
+							hr = m_pShellContext3->GetCommandString(CmdID - MIN_SHELL_MENU_ID,GCS_HELPTEXT,
+							NULL,(LPSTR)HelpString,SIZEOF_ARRAY(HelpString));
+						}
+						else if(m_pShellContext2 != NULL)
+						{
+							hr = m_pShellContext2->GetCommandString(CmdID - MIN_SHELL_MENU_ID,GCS_HELPTEXT,
+								NULL,(LPSTR)HelpString,SIZEOF_ARRAY(HelpString));
+						}
+
+						/* If the help string was found, send it to the status bar. */
+						if(hr == NOERROR)
+						{
+							SendMessage(m_hStatusBar,SB_SETTEXT,(WPARAM)0|0,(LPARAM)HelpString);
+						}
+
+						/* Prevent the message from been passed onto the main window. */
+						return 0;
+					}
+				}
+			}
+			break;
+	}
+
+	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
 HRESULT Explorerplusplus::ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,
@@ -434,176 +524,8 @@ LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask)
 	return hr;
 }
 
-LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
-{
-	return g_pContainer->ShellMenuHookProc(hwnd,Msg,wParam,lParam);
-}
-
-LRESULT CALLBACK ShellMenuHookProcStubMainWindow(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
-{
-	Explorerplusplus *pContainer = (Explorerplusplus *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
-
-	return pContainer->ShellMenuHookProc(hwnd,Msg,wParam,lParam);
-}
-
-LRESULT CALLBACK Explorerplusplus::ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
-{
-	switch(uMsg)
-	{
-		case WM_MEASUREITEM:
-			/* wParam is 0 if this item was sent by a menu. */
-			if(wParam == 0)
-			{
-				MEASUREITEMSTRUCT *pmi;
-
-				pmi = (MEASUREITEMSTRUCT *)lParam;
-
-				if(m_bMixedMenu)
-				{
-					if(pmi->itemID >= MIN_SHELL_MENU_ID && pmi->itemID <= MAX_SHELL_MENU_ID)
-					{
-						if(m_pShellContext3 != NULL)
-							m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-						else if(m_pShellContext2 != NULL)
-							m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
-
-						pmi->itemHeight	= 20;
-					}
-					else
-					{
-						m_pCustomMenu->OnMeasureItem(wParam,lParam);
-					}
-				}
-				else
-				{
-					if(m_pShellContext3 != NULL)
-						m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-					else if(m_pShellContext2 != NULL)
-						m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
-				}
-
-				return TRUE;
-			}
-			break;
-
-		case WM_DRAWITEM:
-			if(wParam == 0)
-			{
-				DRAWITEMSTRUCT *pdi;
-
-				pdi = (DRAWITEMSTRUCT *)lParam;
-
-				if(m_bMixedMenu)
-				{
-					if(pdi->itemID >= MIN_SHELL_MENU_ID && pdi->itemID <= MAX_SHELL_MENU_ID)
-					{
-						if(m_pShellContext3 != NULL)
-							m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-						else if(m_pShellContext2 != NULL)
-							m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
-
-						if(pdi->itemState & ODS_SELECTED)
-						{
-							COLORREF BorderColor = RGB(0,0,0);
-							HBRUSH hBrush;
-
-							hBrush = CreateSolidBrush(BorderColor);
-
-							/* Draw the frame around the menu. */
-							FrameRect(pdi->hDC,&pdi->rcItem,hBrush);
-
-							DeleteObject(hBrush);
-						}
-					}
-					else
-					{
-						m_pCustomMenu->OnDrawItem(wParam,lParam);
-					}
-				}
-				else
-				{
-					if(m_pShellContext3 != NULL)
-						m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-					else if(m_pShellContext2 != NULL)
-						m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
-				}
-			}
-			return TRUE;
-			break;
-
-		case WM_INITMENUPOPUP:
-			{
-				/* File context menu. */
-				if(!m_bMixedMenu)
-				{
-					if(m_pShellContext3 != NULL)
-						m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-					else if(m_pShellContext2 != NULL)
-						m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
-				}
-				else
-				{
-					/* Right click menu. */
-					if((HMENU)wParam == GetSubMenu(m_hMenu,m_MenuPos))
-					{
-						if(m_pShellContext3 != NULL)
-							m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-						else if(m_pShellContext2 != NULL)
-							m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
-					}
-				}
-			}
-			break;
-
-		case WM_MENUSELECT:
-			{
-				UINT CmdID;
-				TCHAR HelpString[MAX_PATH];
-				HRESULT hr = E_FAIL;
-
-				if(HIWORD(wParam) == 0xFFFF && lParam == 0)
-				{
-					HandleStatusBarMenuClose();
-				}
-				else
-				{
-					HandleStatusBarMenuOpen();
-
-					CmdID = (UINT)LOWORD(wParam);
-
-					if(!((HIWORD(wParam) & MF_POPUP) == MF_POPUP) && CmdID <= MAX_SHELL_MENU_ID
-						&& CmdID >= MIN_SHELL_MENU_ID)
-					{
-						/* Ask for the help string for the currently selected menu item. */
-						if(m_pShellContext3 != NULL)
-						{
-							hr = m_pShellContext3->GetCommandString(CmdID - MIN_SHELL_MENU_ID,GCS_HELPTEXT,
-							NULL,(LPSTR)HelpString,SIZEOF_ARRAY(HelpString));
-						}
-						else if(m_pShellContext2 != NULL)
-						{
-							hr = m_pShellContext2->GetCommandString(CmdID - MIN_SHELL_MENU_ID,GCS_HELPTEXT,
-								NULL,(LPSTR)HelpString,SIZEOF_ARRAY(HelpString));
-						}
-
-						/* If the help string was found, send it to the status bar. */
-						if(hr == NOERROR)
-						{
-							SendMessage(m_hStatusBar,SB_SETTEXT,(WPARAM)0|0,(LPARAM)HelpString);
-						}
-
-						/* Prevent the message from been passed onto the main window. */
-						return 0;
-					}
-				}
-			}
-			break;
-	}
-
-	return CallWindowProc(DefaultMainWndProc,hwnd,uMsg,wParam,lParam);
-}
-
-HRESULT Explorerplusplus::ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset)
+HRESULT Explorerplusplus::ProcessShellMenuCommand(IContextMenu *pContextMenu,
+	UINT CmdIDOffset,UINT iStartOffset)
 {
 	assert(pContextMenu != NULL);
 
@@ -612,7 +534,7 @@ HRESULT Explorerplusplus::ProcessShellMenuCommand(IContextMenu *pContextMenu,UIN
 	cmici.cbSize		= sizeof(CMINVOKECOMMANDINFO);
 	cmici.fMask			= 0;
 	cmici.hwnd			= m_hContainer;
-	cmici.lpVerb		= (LPCSTR)MAKEWORD(CmdIDOffset - MIN_SHELL_MENU_ID,0);
+	cmici.lpVerb		= (LPCSTR)MAKEWORD(CmdIDOffset - iStartOffset,0);
 	cmici.lpParameters	= NULL;
 	cmici.lpDirectory	= NULL;
 	cmici.nShow			= SW_SHOW;

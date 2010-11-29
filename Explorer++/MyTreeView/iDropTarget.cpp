@@ -16,6 +16,7 @@
 #include "MyTreeViewInternal.h"
 #include "../Helper/Helper.h"
 #include "../Helper/DropHandler.h"
+#include "../Helper/ShellHelper.h"
 
 
 #define MIN_X_POS	10

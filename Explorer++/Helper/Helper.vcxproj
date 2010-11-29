@@ -230,6 +230,7 @@
   <ItemGroup>
     <ClCompile Include="Bookmark.cpp" />
     <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="ContextMenuManager.cpp" />
     <ClCompile Include="Controls.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
@@ -279,6 +280,7 @@
   <ItemGroup>
     <ClInclude Include="Bookmark.h" />
     <ClInclude Include="Buffer.h" />
+    <ClInclude Include="ContextMenuManager.h" />
     <ClInclude Include="Controls.h" />
     <ClInclude Include="CustomMenu.h" />
     <ClInclude Include="DropHandler.h" />
@@ -289,6 +291,7 @@
     <ClInclude Include="iDirectoryMonitor.h" />
     <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="Registry.h" />
+    <ClInclude Include="ShellHelper.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
+#include "../Helper/ShellHelper.h"
 
 
 LRESULT CALLBACK	TabBackingProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -968,10 +969,6 @@ void Explorerplusplus::OnAddressBarBeginDrag(void)
 				if(SUCCEEDED(hr))
 				{
 					IStream *pStream = NULL;
-
-					ULARGE_INTEGER ulSize;
-
-					pPersistStream->GetSizeMax(&ulSize);
 
 					CreateStreamOnHGlobal(hglb,FALSE,&pStream);
 

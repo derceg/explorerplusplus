@@ -1,7 +1,7 @@
 /******************************************************************
  *
  * Project: Explorer++
- * File: ContainerMsgHandler.cpp
+ * File: MsgHandler.cpp
  * License: GPL - See COPYING in the top level directory
  *
  * Handles messages passed back from the main GUI components.
@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
+#include "../Helper/ShellHelper.h"
 
 
 using namespace std;
@@ -112,7 +113,6 @@ void Explorerplusplus::OnWindowCreate(void)
 	has been initialized, but before the tabs are
 	restored. */
 	SetMenu(m_hContainer,LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_MAINMENU)));
-	m_hRightClickMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)),0);
 	m_hArrangeSubMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_ARRANGEMENU)),0);
 	m_hGroupBySubMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_GROUPBY_MENU)),0);
 	m_hBookmarksMenu				= GetSubMenu(GetMenu(m_hContainer),6);
@@ -430,12 +430,9 @@ void Explorerplusplus::SetMenuItemOwnerDrawn(HMENU hMenu,int iItem)
 {
 	MENUITEMINFO		mi;
 	CustomMenuInfo_t	*pcmi = NULL;
-	TCHAR				szMenuString[64];
 
 	mi.cbSize		= sizeof(mi);
 	mi.fMask		= MIIM_FTYPE|MIIM_ID;
-	mi.dwTypeData	= szMenuString;
-	mi.cch			= SIZEOF_ARRAY(szMenuString);
 
 	GetMenuItemInfo(hMenu,iItem,TRUE,&mi);
 
@@ -1082,7 +1079,6 @@ int Explorerplusplus::OnDestroy(void)
 	ImageList_Destroy(m_himlToolbarSmall);
 	ImageList_Destroy(m_himlToolbarLarge);
 
-	DestroyMenu(m_hRightClickMenu);
 	ChangeClipboardChain(m_hContainer,m_hNextClipboardViewer);
 	PostQuitMessage(0);
 

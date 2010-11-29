@@ -22,6 +22,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "../Helper/ShellHelper.h"
 
 
 list<Column_t>	g_RealFolderColumnList;

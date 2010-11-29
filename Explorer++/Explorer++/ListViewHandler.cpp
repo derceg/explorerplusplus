@@ -15,6 +15,8 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "../Helper/DropHandler.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/ContextMenuManager.h"
 
 
 LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -517,9 +519,6 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 				OnListViewCopy(FALSE);
 			break;
 	}
-
-	if(GetKeyState(VK_CONTROL) & 0x80)
-		return 1;
 
 	return 0;
 }
@@ -1074,13 +1073,6 @@ void Explorerplusplus::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 
 void Explorerplusplus::OnListViewRClick(HWND hParent,POINT *pCursorPos)
 {
-	POINT			MousePos;
-	HMENU			hMenu;
-	UINT			Cmd;
-	BOOL			bInsertedNewMenu = FALSE;
-	BOOL			bCanCreate = FALSE;
-	BOOL			bWindowSubclassed = FALSE;
-
 	/* It may be possible for the active tab/folder
 	to change while the menu is been shown (e.g. if
 	not handled correctly, the back/forward buttons
@@ -1097,10 +1089,7 @@ void Explorerplusplus::OnListViewRClick(HWND hParent,POINT *pCursorPos)
 	this function should NOT access the current
 	shell browser once the menu has been destroyed. */
 
-	SetCursor(LoadCursor(NULL,IDC_WAIT));
-
-	MousePos.x = pCursorPos->x;
-	MousePos.y = pCursorPos->y;
+	SetForegroundWindow(m_hContainer);
 
 	if((GetKeyState(VK_SHIFT) & 0x80) &&
 		!(GetKeyState(VK_CONTROL) & 0x80) &&
@@ -1125,195 +1114,122 @@ void Explorerplusplus::OnListViewRClick(HWND hParent,POINT *pCursorPos)
 
 	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
-		IShellExtInit	*pShell = NULL;
-		IContextMenu	*pContextMenu = NULL;
-		LPITEMIDLIST	pidl = NULL;
-		MENUITEMINFO	mi;
-		HMENU			hNewMenuParent = NULL;
-		HRESULT			hr;
-
-		m_pShellContext3 = NULL;
-
-		hMenu = m_hRightClickMenu;
-
-		mi.cbSize	= sizeof(mi);
-		mi.fMask	= MIIM_SUBMENU;
-		mi.hSubMenu	= m_hArrangeSubMenu;
-		SetMenuItemInfo(hMenu,IDM_POPUP_SORTBY,FALSE,&mi);
-
-		mi.cbSize	= sizeof(mi);
-		mi.fMask	= MIIM_SUBMENU;
-		mi.hSubMenu	= m_hGroupBySubMenu;
-		SetMenuItemInfo(hMenu,IDM_POPUP_GROUPBY,FALSE,&mi);
-
-		bCanCreate = m_pActiveShellBrowser->CanCreate();
-
-		if(bCanCreate)
-		{
-			hr = CoCreateInstance(CLSID_NewMenu,NULL,CLSCTX_INPROC_SERVER,
-				IID_IShellExtInit,(void **)&pShell);
-
-			if(SUCCEEDED(hr))
-			{
-				GetIdlFromParsingName(m_CurrentDirectory,&pidl);
-
-				hr = pShell->Initialize(pidl,NULL,NULL);
-
-				if(SUCCEEDED(hr))
-				{
-					hr = pShell->QueryInterface(IID_IContextMenu,(void **)&pContextMenu);
-
-					IObjectWithSite *pObjectSite = NULL;
-					hr = pShell->QueryInterface(IID_IObjectWithSite,(void **)&pObjectSite);
-
-					pObjectSite->SetSite(reinterpret_cast<IUnknown *>(this));
-
-					if(SUCCEEDED(hr))
-					{
-						TCHAR	szNew[32];
-
-						m_hMenu			= hMenu;
-						m_bMixedMenu	= TRUE;
-						m_MenuPos		= GetMenuItemCount(hMenu) - 1;
-
-						hNewMenuParent = CreateMenu();
-
-						hr = pContextMenu->QueryContextMenu(hNewMenuParent,0,
-							MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,CMF_EXPLORE);
-
-						LoadString(g_hLanguageModule,IDS_GENERAL_NEW,szNew,SIZEOF_ARRAY(szNew));
-						InsertMenu(hMenu,m_MenuPos,MF_BYPOSITION|MF_POPUP,1010,szNew);
-
-						mi.cbSize	= sizeof(mi);
-						mi.fMask	= MIIM_SUBMENU;
-						mi.hSubMenu	= GetSubMenu(hNewMenuParent,0);
-						SetMenuItemInfo(hMenu,m_MenuPos,TRUE,&mi);
-
-						SetMenuItemOwnerDrawn(hMenu,m_MenuPos);
-
-						bInsertedNewMenu = TRUE;
-
-						if(SUCCEEDED(hr))
-						{
-							hr = pContextMenu->QueryInterface(IID_IContextMenu3,(LPVOID *)&m_pShellContext3);
-
-							if(SUCCEEDED(hr))
-							{
-								InsertMenu(hMenu,m_MenuPos + 1,MF_BYPOSITION|MF_SEPARATOR,0,NULL);
-								SetMenuItemOwnerDrawn(hMenu,m_MenuPos + 1);
-
-								/* Subclass the owner window, so that the shell can handle menu messages. */
-								DefaultMainWndProc = (WNDPROC)SetWindowLongPtr(m_hContainer,GWLP_WNDPROC,
-									(LONG_PTR)ShellMenuHookProcStubMainWindow);
-
-								bWindowSubclassed = (DefaultMainWndProc != 0);
-							}
-						}
-
-						pContextMenu->Release();
-						pContextMenu = NULL;
-					}
-
-					CoTaskMemFree(pidl);
-				}
-			}
-		}
-
-		SetCursor(LoadCursor(NULL,IDC_ARROW));
-
-		SetForegroundWindow(m_hContainer);
-
-		Cmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RIGHTBUTTON|TPM_VERTICAL|TPM_RETURNCMD,
-			MousePos.x,MousePos.y,0,m_hContainer,NULL);
-
-		if(bWindowSubclassed)
-		{
-			/* Restore previous window procedure. */
-			SetWindowLongPtr(m_hContainer,GWLP_WNDPROC,(LONG_PTR)DefaultMainWndProc);
-		}
-
-		if(Cmd >= MIN_SHELL_MENU_ID && Cmd <= MAX_SHELL_MENU_ID)
-		{
-			ProcessShellMenuCommand(m_pShellContext3,Cmd);
-		}
-		else
-		{
-			SendMessage(m_hContainer,WM_COMMAND,MAKEWPARAM(Cmd,0),NULL);
-		}
-
-		/* CANNOT release the menu until AFTER the command
-		has been processed. */
-		if(bInsertedNewMenu)
-			DestroyMenu(hNewMenuParent);
-
-		if(m_pShellContext3 != NULL)
-		{
-			m_pShellContext3->Release();
-			m_pShellContext3 = NULL;
-		}
-
-		if(pShell != NULL)
-			pShell->Release();
-
-		if(bCanCreate)
-		{
-			/* Remove the separator that is placed after the new
-			menu item. */
-			mi.cbSize	= sizeof(mi);
-			mi.fMask	= MIIM_DATA;
-			GetMenuItemInfo(hMenu,m_MenuPos + 1,TRUE,&mi);
-
-			free((void *)mi.dwItemData);
-
-			RemoveMenu(hMenu,m_MenuPos + 1,MF_BYPOSITION);
-
-			mi.cbSize	= sizeof(mi);
-			mi.fMask	= MIIM_DATA;
-			GetMenuItemInfo(hMenu,m_MenuPos,TRUE,&mi);
-
-			free((void *)mi.dwItemData);
-
-			/* Remove the new menu popup item. */
-			RemoveMenu(hMenu,m_MenuPos,MF_BYPOSITION);
-		}
+		OnListViewBackgroundRClick(pCursorPos);
 	}
 	else
 	{
-		LPITEMIDLIST *ppidl			= NULL;
-		LPITEMIDLIST pidlDirectory	= NULL;
-		int iItem;
-		int nSelected;
+		OnListViewItemRClick(pCursorPos);
+	}
+}
+
+void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
+{
+	HMENU hMenu = InitializeRightClickMenu();
+	LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+
+	CContextMenuManager ccm(CMT_DIRECTORY_BACKGROUND_HANDLERS,pidlDirectory,
+		NULL,reinterpret_cast<IUnknown *>(this));
+
+	ccm.AddMenuEntries(hMenu,11,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID);
+
+	int iCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RIGHTBUTTON|
+		TPM_VERTICAL|TPM_RETURNCMD,pCursorPos->x,pCursorPos->y,0,
+		m_hContainer,NULL);
+
+	if(iCmd >= MIN_SHELL_MENU_ID && iCmd <= MAX_SHELL_MENU_ID)
+	{
+		ccm.HandleMenuEntry(m_hContainer,iCmd);
+	}
+	else
+	{
+		SendMessage(m_hContainer,WM_COMMAND,MAKEWPARAM(iCmd,0),NULL);
+	}
+
+	CoTaskMemFree(pidlDirectory);
+	DestroyMenu(hMenu);
+}
+
+/* TODO: */
+HMENU Explorerplusplus::InitializeRightClickMenu(void)
+{
+	HMENU hMenu;
+	MENUITEMINFO mii;
+
+	hMenu = GetSubMenu(LoadMenu(g_hLanguageModule,
+		MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)),0);
+
+	mii.cbSize	= sizeof(mii);
+	mii.fMask	= MIIM_SUBMENU;
+	mii.hSubMenu	= m_hArrangeSubMenu;
+	SetMenuItemInfo(hMenu,IDM_POPUP_SORTBY,FALSE,&mii);
+
+	mii.cbSize	= sizeof(mii);
+	mii.fMask	= MIIM_SUBMENU;
+	mii.hSubMenu	= m_hGroupBySubMenu;
+	SetMenuItemInfo(hMenu,IDM_POPUP_GROUPBY,FALSE,&mii);
+
+	/*if(uViewMode == VM_DETAILS)
+	{
+		lEnableMenuItem(hMenu,IDM_POPUP_GROUPBY,TRUE);
+	}
+	else if(uViewMode == VM_LIST)
+	{
+		lEnableMenuItem(hMenu,IDM_POPUP_GROUPBY,FALSE);
+	}
+	else
+	{
+		lEnableMenuItem(hMenu,IDM_POPUP_GROUPBY,TRUE);
+	}*/
+
+	//// Initialization.cpp - InitializeMenus().
+	//InsertMenuItem(m_hRightClickMenu,IDM_VIEW_PLACEHOLDER,FALSE,&mii);
+	//DeleteMenu(m_hRightClickMenu,IDM_VIEW_PLACEHOLDER,MF_BYCOMMAND);
+
+	//SetMenuItemBitmap(m_hRightClickMenu,IDM_VIEW_REFRESH,SHELLIMAGES_REFRESH);
+	//SetMenuItemBitmap(m_hRightClickMenu,IDM_EDIT_PASTE,SHELLIMAGES_PASTE);
+	//SetMenuItemBitmap(m_hRightClickMenu,IDM_EDIT_PASTESHORTCUT,SHELLIMAGES_PASTESHORTCUT);
+	//SetMenuItemBitmap(m_hRightClickMenu,IDM_BOOKMARKS_BOOKMARKTHISTAB,SHELLIMAGES_ADDFAV);
+	//SetMenuItemBitmap(m_hRightClickMenu,IDM_RCLICK_PROPERTIES,SHELLIMAGES_PROPERTIES);
+
+	return hMenu;
+}
+
+void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
+{
+	int nSelected = ListView_GetSelectedCount(m_hActiveListView);
+
+	if(nSelected > 0)
+	{
 		int i = 0;
 
-		nSelected = ListView_GetSelectedCount(m_hActiveListView);
+		LPITEMIDLIST *ppidl = (LPITEMIDLIST *)malloc(nSelected * sizeof(LPCITEMIDLIST));
 
-		ppidl = (LPITEMIDLIST *)malloc(nSelected * sizeof(LPCITEMIDLIST));
-
-		iItem = -1;
-
-		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+		if(ppidl != NULL)
 		{
-			ppidl[i] = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+			int iItem = -1;
 
-			i++;
+			while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+			{
+				ppidl[i] = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+
+				i++;
+			}
+
+			LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+
+			CreateFileContextMenu(m_hActiveListView,pidlDirectory,
+			*pCursorPos,FROM_LISTVIEW,(LPCITEMIDLIST *)ppidl,
+			nSelected,TRUE,GetKeyState(VK_SHIFT) & 0x80);
+
+			CoTaskMemFree(pidlDirectory);
+
+			for(i = 0;i < nSelected;i++)
+			{
+				CoTaskMemFree(ppidl[i]);
+			}
+
+			free(ppidl);
 		}
-
-		SetCursor(LoadCursor(NULL,IDC_ARROW));
-
-		pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-
-		CreateFileContextMenu(hParent,pidlDirectory,
-			MousePos,FROM_LISTVIEW,(LPCITEMIDLIST *)ppidl,nSelected,TRUE,
-			GetKeyState(VK_SHIFT) & 0x80);
-
-		CoTaskMemFree(pidlDirectory);
-
-		for(i = 0;i < nSelected;i++)
-		{
-			CoTaskMemFree(ppidl[i]);
-		}
-
-		free(ppidl);
 	}
 }
 

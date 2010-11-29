@@ -17,6 +17,7 @@
 #include "Helper.h"
 #include "iDataObject.h"
 #include "Buffer.h"
+#include "../Helper/ShellHelper.h"
 
 
 using namespace std;

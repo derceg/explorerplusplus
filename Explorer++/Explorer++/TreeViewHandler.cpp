@@ -14,6 +14,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "../Helper/ShellHelper.h"
 
 
 #define TREEVIEW_FOLDER_OPEN_DELAY	500

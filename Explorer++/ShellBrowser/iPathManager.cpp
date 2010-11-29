@@ -18,6 +18,7 @@
 #include <list>
 #include "iPathManager.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ShellHelper.h"
 
 
 using namespace std;

@@ -81,13 +81,11 @@ void Explorerplusplus::InitializeMenus(void)
 		mii.dwTypeData	= szText;
 		InsertMenuItem(hMenu,IDM_VIEW_PLACEHOLDER,FALSE,&mii);
 
-		InsertMenuItem(m_hRightClickMenu,IDM_VIEW_PLACEHOLDER,FALSE,&mii);
 		InsertMenuItem(m_hViewsMenu,IDM_VIEW_PLACEHOLDER,FALSE,&mii);
 	}
 
 	/* Delete the placeholder menu. */
 	DeleteMenu(hMenu,IDM_VIEW_PLACEHOLDER,MF_BYCOMMAND);
-	DeleteMenu(m_hRightClickMenu,IDM_VIEW_PLACEHOLDER,MF_BYCOMMAND);
 	DeleteMenu(m_hViewsMenu,IDM_VIEW_PLACEHOLDER,MF_BYCOMMAND);
 
 	nTopLevelMenus = GetMenuItemCount(hMenu);
@@ -143,15 +141,6 @@ void Explorerplusplus::InitializeMenus(void)
 	SetMenuItemBitmap(hMenu,IDM_TOOLS_OPTIONS,SHELLIMAGES_OPTIONS);
 
 	SetMenuItemBitmap(hMenu,IDM_HELP_HELP,SHELLIMAGES_HELP);
-
-	SetMenuOwnerDraw(m_hRightClickMenu);
-
-	/* <---- Listview right click menu ----> */
-	SetMenuItemBitmap(m_hRightClickMenu,IDM_VIEW_REFRESH,SHELLIMAGES_REFRESH);
-	SetMenuItemBitmap(m_hRightClickMenu,IDM_EDIT_PASTE,SHELLIMAGES_PASTE);
-	SetMenuItemBitmap(m_hRightClickMenu,IDM_EDIT_PASTESHORTCUT,SHELLIMAGES_PASTESHORTCUT);
-	SetMenuItemBitmap(m_hRightClickMenu,IDM_BOOKMARKS_BOOKMARKTHISTAB,SHELLIMAGES_ADDFAV);
-	SetMenuItemBitmap(m_hRightClickMenu,IDM_RCLICK_PROPERTIES,SHELLIMAGES_PROPERTIES);
 
 	SetMenuOwnerDraw(m_hTabRightClickMenu);
 

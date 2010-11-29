@@ -217,7 +217,7 @@ public:
 	LRESULT CALLBACK	DrivesToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabBackingProc(HWND hTabCtrl,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
-	LRESULT CALLBACK	ShellMenuHookProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK	ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,DWORD_PTR dwRefData);
 	LRESULT CALLBACK	TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -571,6 +571,8 @@ private:
 	void					OnListViewGetDisplayInfo(LPARAM lParam);
 	HRESULT					OnListViewFileDelete(BOOL bPermanent);
 	void					OnListViewRClick(HWND hParent,POINT *pCursorPos);
+	void					OnListViewBackgroundRClick(POINT *pCursorPos);
+	void					OnListViewItemRClick(POINT *pCursorPos);
 	void					OnListViewHeaderRClick(POINT *pCursorPos);
 	int						GetColumnHeaderMenuList(unsigned int **pHeaderList);
 	void					OnListViewShowFileProperties(void);
@@ -637,6 +639,7 @@ private:
 	void					OnCloneWindow(void);
 
 	/* Menus. */
+	HMENU					InitializeRightClickMenu(void);
 	void					SetProgramMenuItemStates(HMENU hProgramMenu);
 	void					SetArrangeMenuItemStates(HMENU);
 
@@ -852,7 +855,7 @@ private:
 	void					OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenFileItem(LPITEMIDLIST pidlItem,TCHAR *szParameters);
 	HRESULT					OnListViewCopy(BOOL bCopy);
-	HRESULT					ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset);
+	HRESULT					ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset,UINT iStartOffset);
 	HRESULT					CreateFileContextMenu(HWND hwnd,LPITEMIDLIST pidlParent,POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExtended);
 	HRESULT					ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles);
 	HRESULT					ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask);
@@ -1190,7 +1193,6 @@ private:
 	LPITEMIDLIST			m_pidlDirectory;
 	HMENU					m_hArrangeSubMenu;
 	HMENU					m_hGroupBySubMenu;
-	HMENU					m_hRightClickMenu;
 	HMENU					m_hBookmarksMenu;
 	HMENU					m_hTabRightClickMenu;
 	HMENU					m_hToolbarRightClickMenu;
@@ -1392,10 +1394,6 @@ private:
 	IContextMenu3			*m_pShellContext3;
 	IContextMenu2			*m_pShellContext2;
 	IContextMenu			*m_pShellContext;
-	HMENU					m_hMenu;
-	BOOL					m_bMixedMenu;
-	int						m_MenuPos;
-	LRESULT					(CALLBACK *DefaultMainWndProc)(HWND,UINT,WPARAM,LPARAM);
 
 	/* Statusbar. */
 	list<StatusBarPart_t>	m_StatusBarParts;

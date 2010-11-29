@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "../Helper/ShellHelper.h"
 
 BOOL	g_EditNameEnabled;
 int		g_iTab;

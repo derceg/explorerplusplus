@@ -21,6 +21,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
+#include "../Helper/ShellHelper.h"
 
 
 BOOL g_bNewFileRenamed = FALSE;

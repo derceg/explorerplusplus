@@ -62,15 +62,6 @@ public:
 
 };
 
-struct JumpListTaskInformation
-{
-	TCHAR	*pszName;
-	TCHAR	*pszPath;
-	TCHAR	*pszArguments;
-	TCHAR	*pszIconPath;
-	int		iIcon;
-};
-
 #define MAX_STRING_LENGTH	512
 
 /* SummaryInformation stream constants. */
@@ -171,28 +162,6 @@ LONG			GetClusterSize(TCHAR *Drive);
 int				GetNumberOfUsedPartitions(DRIVE_LAYOUT_INFORMATION_EX *pDriveLayout);
 LONG			GetFileSectorSize(TCHAR *FileName);
 TCHAR			GetDriveNameFromMask(ULONG unitmask);
-
-/* Shell helpers. */
-void			DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest);
-HRESULT			GetIdlFromParsingName(TCHAR *szParsingName,LPITEMIDLIST *pidl);
-HRESULT			GetDisplayName(TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags);
-HRESULT			GetDisplayName(LPITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uFlags);
-BOOL			CheckIdl(LPITEMIDLIST pidl);
-BOOL			IsIdlDirectory(LPITEMIDLIST pidl);
-void			GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath);
-HRESULT			GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent);
-BOOL			IsNamespaceRoot(LPCITEMIDLIST pidl);
-HRESULT			GetItemInfoTip(TCHAR *szItemPath,TCHAR *szInfoTip,int cchMax);
-HRESULT			GetItemInfoTip(LPITEMIDLIST pidlComplete,TCHAR *szInfoTip,int cchMax);
-HRESULT			GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,DWORD uParsingFlags);
-BOOL			MyExpandEnvironmentStrings(TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize);
-HRESULT			BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN list<std::wstring> FilenameList);
-HRESULT			BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> pidlList);
-HRESULT			BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder);
-BOOL			IsPathGUID(TCHAR *szPath);
-BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
-void			SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,DVTARGETDEVICE *ptd,DWORD dwAspect,LONG lindex,DWORD tymed);
-HRESULT			AddJumpListTasks(std::list<JumpListTaskInformation> TaskList);
 
 /* Drag and drop helpers. */
 DWORD			DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,BOOL bDataAccept,BOOL bOnSameDrive);

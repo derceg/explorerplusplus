@@ -16,6 +16,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "../Helper/ShellHelper.h"
 
 
 typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(

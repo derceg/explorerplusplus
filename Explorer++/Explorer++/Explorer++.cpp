@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "../Helper/ShellHelper.h"
 
 
 CRITICAL_SECTION	g_csDirMonCallback;

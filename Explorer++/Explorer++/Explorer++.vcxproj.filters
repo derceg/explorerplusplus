@@ -34,9 +34,6 @@
     <ClCompile Include="ColorRuleDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ContainerMsgHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CustomizeColorsDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -149,6 +146,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WinMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MsgHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
