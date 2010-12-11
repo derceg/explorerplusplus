@@ -14,6 +14,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "AboutDialog.h"
 
 
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -1337,7 +1338,11 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case IDM_HELP_ABOUT:
-			DialogBox(g_hLanguageModule,MAKEINTRESOURCE(IDD_ABOUT),hwnd,AboutDialogProcedure);
+			{
+				CAboutDialog AboutDialog(g_hLanguageModule,IDD_ABOUT,hwnd);
+
+				AboutDialog.ShowDialog();
+			}
 			break;
 
 		case IDM_HELP_HELP:

@@ -445,6 +445,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="Explorer++.h" />
     <ClInclude Include="Explorer++_internal.h" />
     <ClInclude Include="iDropSource.h" />
