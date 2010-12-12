@@ -21,7 +21,14 @@ protected:
 	virtual BOOL	OnInitDialog();
 	virtual BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	virtual BOOL	OnNotify(NMHDR *pnmhdr);
+	virtual BOOL	OnGetMinMaxInfo(LPMINMAXINFO pmmi);
+	virtual BOOL	OnSize(int iType,int iWidth,int iHeight);
 	virtual BOOL	OnClose();
+	virtual BOOL	OnDestroy();
+
+	/* For private application messages in
+	the range WM_APP (0x8000) - 0xBFFF. */
+	virtual void	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	HWND		m_hDlg;
 

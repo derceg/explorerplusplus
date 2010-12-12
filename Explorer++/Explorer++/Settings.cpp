@@ -1656,9 +1656,10 @@ void Explorerplusplus::SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey)
 	}
 }
 
+/* TODO: */
 void Explorerplusplus::SaveSearchStateToRegistry(HKEY hParentKey)
 {
-	HKEY	hKey;
+	/*HKEY	hKey;
 	list<SearchDirectoryInfo_t>::iterator itr;
 	list<SearchPatternInfo_t>::iterator itr2;
 	TCHAR	szItemKey[128];
@@ -1705,7 +1706,7 @@ void Explorerplusplus::SaveSearchStateToRegistry(HKEY hParentKey)
 		}
 
 		RegCloseKey(hKey);
-	}
+	}*/
 }
 
 void Explorerplusplus::SaveSelectColumnsStateToRegistry(HKEY hParentKey)
@@ -2078,9 +2079,10 @@ void Explorerplusplus::LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey)
 	}
 }
 
+/* TODO: */
 void Explorerplusplus::LoadSearchStateFromRegistry(HKEY hParentKey)
 {
-	HKEY				hKey;
+	/*HKEY				hKey;
 	SearchDirectoryInfo_t	sdi;
 	SearchPatternInfo_t	spi;
 	TCHAR				szItemKey[128];
@@ -2156,7 +2158,7 @@ void Explorerplusplus::LoadSearchStateFromRegistry(HKEY hParentKey)
 		ReadDwordFromRegistry(hKey,_T("SearchSubFolders"),(LPDWORD)&m_bSearchSubFolders);
 
 		RegCloseKey(hKey);
-	}
+	}*/
 }
 
 void Explorerplusplus::LoadSelectColumnsStateFromRegistry(HKEY hParentKey)

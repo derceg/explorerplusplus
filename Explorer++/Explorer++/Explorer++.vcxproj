@@ -453,6 +453,7 @@
     <ClInclude Include="Misc.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SearchDialog.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Version.h" />

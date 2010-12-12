@@ -86,11 +86,6 @@ typedef struct
 	TCHAR *pszFilterString;
 } Filter_t;
 
-typedef struct
-{
-	TCHAR szText[512];
-} StatusBarPart_t;
-
 /* Used to hold information on all tabs. */
 typedef struct
 {
@@ -217,7 +212,6 @@ public:
 	LRESULT CALLBACK	DrivesToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabBackingProc(HWND hTabCtrl,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
-	LRESULT CALLBACK	ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,DWORD_PTR dwRefData);
 	LRESULT CALLBACK	TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -653,10 +647,6 @@ private:
 	void					SetDefaultNetworkConnectionsColumns(list<Column_t> *pColumns);
 	void					SetDefaultMyNetworkPlacesColumns(list<Column_t> *pColumns);
 
-	/* Status bar. */
-	void					HandleStatusBarMenuOpen(void);
-	void					HandleStatusBarMenuClose(void);
-
 	/* Application toolbar. */
 	void					InitializeApplicationToolbar(void);
 	void					ApplicationToolbarNewButton(void);
@@ -810,10 +800,6 @@ private:
 	/* Windows 7 jumplist tasks. */
 	void					SetupJumplistTasks();
 
-	/* Search. */
-	void					OnSearch(HWND hDlg);
-	void					SearchSaveState(HWND hDlg);
-
 	/* Tab ID's. */
 	void					InitializeTabMap(void);
 	void					ReleaseTabId(int iTabId);
@@ -856,7 +842,6 @@ private:
 	void					OpenFileItem(LPITEMIDLIST pidlItem,TCHAR *szParameters);
 	HRESULT					OnListViewCopy(BOOL bCopy);
 	HRESULT					ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset,UINT iStartOffset);
-	HRESULT					CreateFileContextMenu(HWND hwnd,LPITEMIDLIST pidlParent,POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExtended);
 	HRESULT					ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles);
 	HRESULT					ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask);
 
@@ -1395,10 +1380,6 @@ private:
 	IContextMenu2			*m_pShellContext2;
 	IContextMenu			*m_pShellContext;
 
-	/* Statusbar. */
-	list<StatusBarPart_t>	m_StatusBarParts;
-	BOOL					m_bAlteredStatusBarParts;
-
 	/* Tab drop target. */
 	IDragSourceHelper *		m_pDragSourceHelper;
 	IDropTargetHelper *		m_pDropTargetHelper;
@@ -1480,20 +1461,6 @@ private:
 	/* New color rule dialog. */
 	ListViewColouring_t		*m_pColoringItem;
 	COLORREF				m_ccCustomColors[16];
-
-	/* Search dialog. */
-	BOOL					m_bSearchDlgStateSaved;
-	BOOL					m_bSearchSubFolders;
-	BOOL					m_bSetSearchTimer;
-	POINT					m_ptSearch;
-	int						m_iSearchWidth;
-	int						m_iSearchHeight;
-	int						m_iColumnWidth1;
-	int						m_iColumnWidth2;
-	TCHAR					m_SearchPatternText[MAX_PATH];
-	list<SearchDirectoryInfo_t>	m_SearchDirectories;
-	list<SearchPatternInfo_t>	m_SearchPatterns;
-	list<LPITEMIDLIST>		m_SearchItems;
 	
 	/* Cut items data. */
 	list<CutFile_t>			m_CutFileNameList;

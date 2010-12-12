@@ -103,7 +103,7 @@ BOOL CAboutDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 		break;
 	}
 
-	return 1;
+	return 0;
 }
 
 BOOL CAboutDialog::OnNotify(NMHDR *pnmhdr)

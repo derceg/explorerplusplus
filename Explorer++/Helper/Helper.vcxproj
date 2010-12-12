@@ -243,6 +243,7 @@
     <ClCompile Include="CustomMenu.cpp" />
     <ClCompile Include="DriveInfo.cpp" />
     <ClCompile Include="DropHandler.cpp" />
+    <ClCompile Include="FileContextMenuManager.cpp" />
     <ClCompile Include="FileOperations.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
@@ -269,6 +270,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Test|x64'">CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="ShellHelper.cpp" />
+    <ClCompile Include="StatusBar.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -286,6 +288,7 @@
     <ClInclude Include="Controls.h" />
     <ClInclude Include="CustomMenu.h" />
     <ClInclude Include="DropHandler.h" />
+    <ClInclude Include="FileContextMenuManager.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="FolderSize.h" />
     <ClInclude Include="Helper.h" />
@@ -294,6 +297,7 @@
     <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="Registry.h" />
     <ClInclude Include="ShellHelper.h" />
+    <ClInclude Include="StatusBar.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

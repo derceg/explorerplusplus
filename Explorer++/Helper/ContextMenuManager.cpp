@@ -157,6 +157,7 @@ void CContextMenuManager::AddMenuEntries(HMENU hMenu,
 				itr->iEndID = iMinID + iOffset + iCurrentOffset;
 
 				int nMenuItems = GetMenuItemCount(hDummyMenu);
+				UINT uDefault = GetMenuDefaultItem(hDummyMenu,FALSE,0);
 
 				/* Take items from the dummy menu, and
 				insert them into the real menu. Note
@@ -180,6 +181,13 @@ void CContextMenuManager::AddMenuEntries(HMENU hMenu,
 					}
 
 					InsertMenuItem(hMenu,iStartPos + nTotalMenuItems,TRUE,&mii);
+
+					/* If this menu item is the default on the dummy
+					menu, make it the default on the actual menu. */
+					if(uDefault != -1 && mii.wID == uDefault)
+					{
+						SetMenuDefaultItem(hMenu,mii.wID,FALSE);
+					}
 
 					if(mii.hSubMenu != NULL)
 					{

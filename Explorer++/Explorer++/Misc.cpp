@@ -542,13 +542,15 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam,LPARAM lParam)
 	/* Is the menu been closed? .*/
 	if(HIWORD(wParam) == 0xFFFF && lParam == 0)
 	{
-		HandleStatusBarMenuClose();
+		/* TODO: */
+		//HandleStatusBarMenuClose();
 	}
 	else
 	{
 		TCHAR szBuffer[512];
 
-		HandleStatusBarMenuOpen();
+		/* TODO: */
+		//HandleStatusBarMenuOpen();
 
 		/* Load the menu help string. */
 		LoadString(g_hLanguageModule,LOWORD(wParam),
@@ -559,65 +561,6 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam,LPARAM lParam)
 	}
 
 	return 0;
-}
-
-void Explorerplusplus::HandleStatusBarMenuOpen(void)
-{
-	StatusBarPart_t	sbp;
-	TCHAR			szPartText[512];
-	int				nParts;
-	int				aWidths = -1;
-	int				i = 0;
-
-	if(!m_bAlteredStatusBarParts)
-	{
-		/* Get the number of parts in the status bar window. */
-		nParts = (int)SendMessage(m_hStatusBar,SB_GETPARTS,0,0);
-
-		/* For each status bar part, get the text and store it.
-		The text for that part will be automatically restored
-		when the menu is closed. */
-		for(i = 0;i < nParts;i++)
-		{
-			SendMessage(m_hStatusBar,SB_GETTEXT,i,(LPARAM)szPartText);
-
-			StringCchCopy(sbp.szText,SIZEOF_ARRAY(sbp.szText),
-				szPartText);
-
-			m_StatusBarParts.push_back(sbp);
-		}
-
-		/* Set the number of status bar parts to one. This single
-		part will contain the help menu string for the selected
-		menu. */
-		SendMessage(m_hStatusBar,SB_SETPARTS,1,(LPARAM)&aWidths);
-
-		m_bAlteredStatusBarParts = TRUE;
-	}
-}
-
-void Explorerplusplus::HandleStatusBarMenuClose(void)
-{
-	list<StatusBarPart_t>::iterator	itr;
-	RECT							rcClient;
-	int								i = 0;
-
-	GetClientRect(m_hContainer,&rcClient);
-
-	/* Restore the normal status bar parts. */
-	SetStatusBarParts(GetRectWidth(&rcClient));
-
-	for(itr = m_StatusBarParts.begin();itr != m_StatusBarParts.end();itr++)
-	{
-		/* Restore the text that was present before the menu was opened. */
-		SendMessage(m_hStatusBar,SB_SETTEXT,(WPARAM)i|0,(LPARAM)itr->szText);
-
-		i++;
-	}
-
-	m_StatusBarParts.clear();
-
-	m_bAlteredStatusBarParts = FALSE;
 }
 
 void Explorerplusplus::ShowHiddenFiles(void)

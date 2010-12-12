@@ -4,7 +4,6 @@
 #include <list>
 #include <ShObjIdl.h>
 #include "ShellHelper.h"
-//#include "Helper.h"
 
 enum ContextMenuTypes
 {

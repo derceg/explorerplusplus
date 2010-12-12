@@ -82,7 +82,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_bCuttingItems					= FALSE;
 	m_bTreeViewRightClick			= FALSE;
 	m_bTabBeenDragged				= FALSE;
-	m_bAlteredStatusBarParts		= FALSE;
 	m_bTreeViewDelayEnabled			= FALSE;
 	m_bSavePreferencesToXMLFile		= FALSE;
 	m_bAttemptToolbarRestore		= FALSE;
@@ -114,10 +113,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_bSetFileAttributesDlgStateSaved	= FALSE;
 	m_bSplitFileDlgStateSaved		= FALSE;
 	m_bCustomizeColorsDlgStateSaved	= FALSE;
-	m_bSearchDlgStateSaved			= FALSE;
-
-	/* Search dialog. */
-	m_bSearchSubFolders				= TRUE;
 
 	m_rgbCompressed					= RGB(0,0,255);
 	m_rgbEncrypted					= RGB(0,128,0);
@@ -137,8 +132,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 
 	m_crInitialColor = DEFAULT_INITIAL_COLOR;
 
-	StringCchCopy(m_SearchPatternText,SIZEOF_ARRAY(m_SearchPatternText),
-		EMPTY_STRING);
 	StringCchCopy(m_szwsiText,SIZEOF_ARRAY(m_szwsiText),
 		EMPTY_STRING);
 

@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/FileContextMenuManager.h"
 
 
 #define TREEVIEW_FOLDER_OPEN_DELAY	500
@@ -154,7 +155,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	HTREEITEM hItem;
 	HTREEITEM hPrevItem;
 	IShellFolder *pShellParentFolder = NULL;
-	LPITEMIDLIST pidlRelative = NULL;
+	LPCITEMIDLIST pidlRelative = NULL;
 	HRESULT hr;
 
 	hItem	= (HTREEITEM)wParam;
@@ -167,7 +168,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	pidl = m_pMyTreeView->BuildPath(hItem);
 
 	hr = SHBindToParent(pidl,IID_IShellFolder,(void **)&pShellParentFolder,
-	(LPCITEMIDLIST *)&pidlRelative);
+	&pidlRelative);
 
 	if(SUCCEEDED(hr))
 	{
@@ -183,8 +184,13 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 			if(pidlParent != NULL)
 			{
 				m_bTreeViewOpenInNewTab = FALSE;
-				CreateFileContextMenu(m_hContainer,pidlParent,*ppt,FROM_TREEVIEW,
-					(LPCITEMIDLIST *)&pidlRelative,1,TRUE,GetKeyState(VK_SHIFT) & 0x80);
+
+				CFileContextMenuManager fcmm(m_hContainer,pidlParent,
+					&pidlRelative,1);
+
+				/* TODO: IFileContextMenuExternal interface. */
+				fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,ppt,
+					TRUE,GetKeyState(VK_SHIFT) & 0x80);
 
 				CoTaskMemFree(pidlParent);
 			}

@@ -21,414 +21,136 @@
 #define MENU_OPEN_IN_NEW_TAB	(MAX_SHELL_MENU_ID + 1)
 #define MENU_OPEN_FILE_LOCATION	(MAX_SHELL_MENU_ID + 2)
 
-#define CONTEXT_MENU_SUBCLASS_ID	1
-
-HRESULT Explorerplusplus::CreateFileContextMenu(HWND hwnd,LPITEMIDLIST pidlParent,
-POINT MousePos,UINT uFrom,LPCITEMIDLIST *ppidl,int nFiles,BOOL bRename,BOOL bExtended)
+/*if(uFrom == FROM_LISTVIEW || uFrom == FROM_TREEVIEW ||
+	uFrom == FROM_DRIVEBAR)
 {
-	assert(pidlParent != NULL);
-	assert(nFiles > 0);
-
-	IShellFolder		*pDesktopFolder = NULL;
-	IShellFolder		*pShellParentFolder = NULL;
-	IShellFolder		*pShellFolder = NULL;
-	IContextMenu		*pContext = NULL;
-	IContextMenu		*pActualContext = NULL;
-	LPITEMIDLIST		pidlRelative = NULL;
-	HMENU				hMenu;
-	MENUITEMINFO		mii;
-	TCHAR				szCmd[64];
-	SFGAOF				FileAttributes = 0;
-	HRESULT				hr;
-	INT					Cmd;
-
-	if(ppidl == NULL)
+	if(nFiles == 1)
 	{
-		hr = SHBindToParent(pidlParent,IID_IShellFolder,(void **)&pShellParentFolder,
-		(LPCITEMIDLIST *)&pidlRelative);
-
-		if(SUCCEEDED(hr))
+		if(FileAttributes & SFGAO_FOLDER)
 		{
-			hr = pShellParentFolder->GetUIObjectOf(m_hContainer,1,
-			(LPCITEMIDLIST *)&pidlRelative,IID_IContextMenu,0,
-			(LPVOID *)&pContext);
-
-			if(SUCCEEDED(hr))
-			{
-				FileAttributes = SFGAO_FOLDER;
-
-				pShellParentFolder->Release();
-				pShellParentFolder = NULL;
-			}
+			mii.cbSize		= sizeof(MENUITEMINFO);
+			mii.fMask		= MIIM_STRING|MIIM_ID;
+			mii.wID			= MENU_OPEN_IN_NEW_TAB;
+			mii.dwTypeData	= _T("Open in New Tab");
+			InsertMenuItem(hMenu,1,TRUE,&mii);
 		}
 	}
-	else
-	{
-		if(IsNamespaceRoot(pidlParent))
-		{
-			hr = SHGetDesktopFolder(&pShellFolder);
-		}
-		else
-		{
-			SHGetDesktopFolder(&pDesktopFolder);
-			
-			hr = pDesktopFolder->BindToObject(pidlParent,NULL,IID_IShellFolder,(LPVOID *)&pShellFolder);
-
-			pDesktopFolder->Release();
-			pDesktopFolder = NULL;
-		}
-
-		if(SUCCEEDED(hr))
-		{
-			hr = pShellFolder->GetUIObjectOf(m_hContainer,nFiles,
-			(LPCITEMIDLIST *)ppidl,IID_IContextMenu,0,
-			(LPVOID *)&pContext);
-
-			if(SUCCEEDED(hr))
-			{
-				if(nFiles == 1)
-				{
-					FileAttributes = SFGAO_FOLDER;
-
-					pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)ppidl,&FileAttributes);
-				}
-
-				pShellFolder->Release();
-				pShellFolder = NULL;
-			}
-		}
-	}
-
-	if(SUCCEEDED(hr))
-	{
-		m_pShellContext3 = NULL;
-		m_pShellContext2 = NULL;
-		m_pShellContext = NULL;
-
-		/* First, try to get IContextMenu3, then IContextMenu2, and if neither of these
-		are available, IContextMenu. */
-		hr = pContext->QueryInterface(IID_IContextMenu3,(LPVOID *)&m_pShellContext3);
-		pActualContext = m_pShellContext3;
-
-		if(FAILED(hr))
-		{
-			hr = pContext->QueryInterface(IID_IContextMenu2,(LPVOID *)&m_pShellContext2);
-			pActualContext = m_pShellContext2;
-
-			if(FAILED(hr))
-			{
-				hr = pContext->QueryInterface(IID_IContextMenu,(LPVOID *)&m_pShellContext);
-				pActualContext = m_pShellContext;
-			}
-		}
-
-		if(SUCCEEDED(hr))
-		{
-			hMenu = CreatePopupMenu();
-
-			UINT uFlags;
-
-			uFlags = CMF_NORMAL;
-
-			if(bExtended)
-				uFlags |= CMF_EXTENDEDVERBS;
-
-			if(bRename)
-				uFlags |= CMF_CANRENAME;
-
-			pActualContext->QueryContextMenu(hMenu,0,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,
-				uFlags);
-
-			if(uFrom == FROM_LISTVIEW || uFrom == FROM_TREEVIEW ||
-				uFrom == FROM_DRIVEBAR)
-			{
-				if(nFiles == 1)
-				{
-					if(FileAttributes & SFGAO_FOLDER)
-					{
-						mii.cbSize		= sizeof(MENUITEMINFO);
-						mii.fMask		= MIIM_STRING|MIIM_ID;
-						mii.wID			= MENU_OPEN_IN_NEW_TAB;
-						mii.dwTypeData	= _T("Open in New Tab");
-						InsertMenuItem(hMenu,1,TRUE,&mii);
-					}
-				}
-			}
-			else if(uFrom == FROM_SEARCH)
-			{
-				mii.cbSize		= sizeof(MENUITEMINFO);
-				mii.fMask		= MIIM_STRING|MIIM_ID;
-				mii.wID			= MENU_OPEN_FILE_LOCATION;
-				mii.dwTypeData	= _T("Open file location");
-				InsertMenuItem(hMenu,1,TRUE,&mii);
-			}
-
-			if(m_pShellContext3 != NULL || m_pShellContext2 != NULL)
-			{
-				/* Subclass the owner window, so that the shell can handle menu messages. */
-				SetWindowSubclass(hwnd,ShellMenuHookProcStub,CONTEXT_MENU_SUBCLASS_ID,
-					reinterpret_cast<DWORD_PTR>(this));
-			}
-
-			Cmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN | TPM_RETURNCMD,MousePos.x,MousePos.y,
-			0,hwnd,NULL);
-
-			if(m_pShellContext3 != NULL || m_pShellContext2 != NULL)
-			{
-				/* Restore previous window procedure. */
-				RemoveWindowSubclass(hwnd,ShellMenuHookProcStub,CONTEXT_MENU_SUBCLASS_ID);
-			}
-
-			if(Cmd >= MIN_SHELL_MENU_ID && Cmd <= MAX_SHELL_MENU_ID)
-			{
-				hr = pActualContext->GetCommandString(Cmd - MIN_SHELL_MENU_ID,GCS_VERB,
-				NULL,(LPSTR)szCmd,SIZEOF_ARRAY(szCmd));
-
-				if(StrCmpI(szCmd,_T("open")) == 0)
-				{
-					/* If ppidl is NULL, open the item specified by pidlParent
-					in the current listview. If ppidl is not NULL, open each
-					of the items specified in ppidl. */
-					if(ppidl == NULL)
-					{
-						OpenItem(pidlParent,FALSE,FALSE);
-					}
-					else
-					{
-						LPITEMIDLIST	pidlComplete = NULL;
-						int				i = 0;
-
-						for(i = 0;i < nFiles;i++)
-						{
-							pidlComplete = ILCombine(pidlParent,ppidl[i]);
-
-							OpenItem(pidlComplete,FALSE,FALSE);
-
-							CoTaskMemFree(pidlComplete);
-						}
-					}
-
-					m_bTreeViewOpenInNewTab = TRUE;
-
-					return 0;
-				}
-				else if(StrCmpI(szCmd,_T("rename")) == 0)
-				{
-					if(uFrom == FROM_LISTVIEW)
-					{
-						OnFileRename();
-					}
-					else if(uFrom == FROM_TREEVIEW)
-					{
-						OnTreeViewFileRename();
-					}
-				}
-				else if(StrCmpI(szCmd,_T("copy")) == 0)
-				{
-					if(uFrom == FROM_LISTVIEW)
-					{
-						OnListViewCopy(TRUE);
-					}
-					else if(uFrom == FROM_TREEVIEW)
-					{
-						OnTreeViewCopy(TRUE);
-					}
-				}
-				else if(StrCmpI(szCmd,_T("cut")) == 0)
-				{
-					if(uFrom == FROM_LISTVIEW)
-					{
-						OnListViewCopy(FALSE);
-					}
-					else if(uFrom == FROM_TREEVIEW)
-					{
-						OnTreeViewCopy(FALSE);
-					}
-				}
-				else
-				{
-					ProcessShellMenuCommand(pActualContext,Cmd,MIN_SHELL_MENU_ID);
-				}
-			}
-			else
-			{
-				/* This is a custom menu item (e.g. Open
-				in New Tab). */
-				switch(Cmd)
-				{
-					case MENU_OPEN_IN_NEW_TAB:
-						{
-							LPITEMIDLIST pidlComplete;
-							TCHAR szParsingPath[MAX_PATH];
-							BOOL bOpenInNewTab;
-
-							if(ppidl != NULL)
-							{
-								pidlComplete = ILCombine(pidlParent,*ppidl);
-
-								bOpenInNewTab = FALSE;
-							}
-							else
-							{
-								pidlComplete = ILClone(pidlParent);
-
-								bOpenInNewTab = TRUE;
-							}
-
-							GetDisplayName(pidlComplete,szParsingPath,SHGDN_FORPARSING);
-							BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-
-							m_bTreeViewOpenInNewTab = TRUE;
-
-							CoTaskMemFree(pidlComplete);
-						}
-						break;
-
-					case MENU_OPEN_FILE_LOCATION:
-						{
-							TCHAR szFileName[MAX_PATH];
-
-							BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-
-							GetDisplayName((LPITEMIDLIST)ppidl[0],szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
-
-							m_pActiveShellBrowser->SelectFiles(szFileName);
-						}
-						break;
-				}
-			}
-
-			if(m_pShellContext3 != NULL)
-			{
-				m_pShellContext3->Release();
-				m_pShellContext3 = NULL;
-			}
-			else if(m_pShellContext2 != NULL)
-			{
-				m_pShellContext2->Release();
-				m_pShellContext2 = NULL;
-			}
-			else if(m_pShellContext != NULL)
-			{
-				m_pShellContext->Release();
-				m_pShellContext = NULL;
-			}
-
-			/* Do NOT destroy the menu until AFTER
-			the command has been executed. Items
-			on the "Send to" submenu may not work,
-			for example, if this item is destroyed
-			earlier. */
-			DestroyMenu(hMenu);
-		}
-		pContext->Release();
-		pContext = NULL;
-	}
-
-	return S_OK;
 }
-
-LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
-	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+else if(uFrom == FROM_SEARCH)
 {
-	Explorerplusplus *pExplorerpp = reinterpret_cast<Explorerplusplus *>(dwRefData);
+	mii.cbSize		= sizeof(MENUITEMINFO);
+	mii.fMask		= MIIM_STRING|MIIM_ID;
+	mii.wID			= MENU_OPEN_FILE_LOCATION;
+	mii.dwTypeData	= _T("Open file location");
+	InsertMenuItem(hMenu,1,TRUE,&mii);
+}*/
 
-	return pExplorerpp->ShellMenuHookProc(hwnd,Msg,wParam,lParam,dwRefData);
-}
+//if(StrCmpI(szCmd,_T("open")) == 0)
+//{
+//	/* If ppidl is NULL, open the item specified by pidlParent
+//	in the current listview. If ppidl is not NULL, open each
+//	of the items specified in ppidl. */
+//	if(ppidl == NULL)
+//	{
+//		OpenItem(pidlParent,FALSE,FALSE);
+//	}
+//	else
+//	{
+//		LPITEMIDLIST	pidlComplete = NULL;
+//		int				i = 0;
+//
+//		for(i = 0;i < nFiles;i++)
+//		{
+//			pidlComplete = ILCombine(pidlParent,ppidl[i]);
+//
+//			OpenItem(pidlComplete,FALSE,FALSE);
+//
+//			CoTaskMemFree(pidlComplete);
+//		}
+//	}
+//
+//	m_bTreeViewOpenInNewTab = TRUE;
+//
+//	return 0;
+//}
+//else if(StrCmpI(szCmd,_T("rename")) == 0)
+//{
+//	if(uFrom == FROM_LISTVIEW)
+//	{
+//		OnFileRename();
+//	}
+//	else if(uFrom == FROM_TREEVIEW)
+//	{
+//		OnTreeViewFileRename();
+//	}
+//}
+//else if(StrCmpI(szCmd,_T("copy")) == 0)
+//{
+//	if(uFrom == FROM_LISTVIEW)
+//	{
+//		OnListViewCopy(TRUE);
+//	}
+//	else if(uFrom == FROM_TREEVIEW)
+//	{
+//		OnTreeViewCopy(TRUE);
+//	}
+//}
+//else if(StrCmpI(szCmd,_T("cut")) == 0)
+//{
+//	if(uFrom == FROM_LISTVIEW)
+//	{
+//		OnListViewCopy(FALSE);
+//	}
+//	else if(uFrom == FROM_TREEVIEW)
+//	{
+//		OnTreeViewCopy(FALSE);
+//	}
+//}
 
-LRESULT CALLBACK Explorerplusplus::ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,
-	LPARAM lParam,DWORD_PTR dwRefData)
-{
-	switch(uMsg)
-	{
-		case WM_MEASUREITEM:
-			/* wParam is 0 if this item was sent by a menu. */
-			if(wParam == 0)
-			{
-				MEASUREITEMSTRUCT *pmi;
-
-				pmi = (MEASUREITEMSTRUCT *)lParam;
-
-				if(m_pShellContext3 != NULL)
-					m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-				else if(m_pShellContext2 != NULL)
-					m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
-
-				return TRUE;
-			}
-			break;
-
-		case WM_DRAWITEM:
-			if(wParam == 0)
-			{
-				DRAWITEMSTRUCT *pdi;
-
-				pdi = (DRAWITEMSTRUCT *)lParam;
-
-				if(m_pShellContext3 != NULL)
-					m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-				else if(m_pShellContext2 != NULL)
-					m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
-			}
-			return TRUE;
-			break;
-
-		case WM_INITMENUPOPUP:
-			{
-				if(m_pShellContext3 != NULL)
-					m_pShellContext3->HandleMenuMsg2(uMsg,wParam,lParam,NULL);
-				else if(m_pShellContext2 != NULL)
-					m_pShellContext2->HandleMenuMsg(uMsg,wParam,lParam);
-			}
-			break;
-
-		case WM_MENUSELECT:
-			{
-				UINT CmdID;
-				TCHAR HelpString[MAX_PATH];
-				HRESULT hr = E_FAIL;
-
-				if(HIWORD(wParam) == 0xFFFF && lParam == 0)
-				{
-					HandleStatusBarMenuClose();
-				}
-				else
-				{
-					HandleStatusBarMenuOpen();
-
-					CmdID = (UINT)LOWORD(wParam);
-
-					if(!((HIWORD(wParam) & MF_POPUP) == MF_POPUP) && CmdID <= MAX_SHELL_MENU_ID
-						&& CmdID >= MIN_SHELL_MENU_ID)
-					{
-						/* Ask for the help string for the currently selected menu item. */
-						if(m_pShellContext3 != NULL)
-						{
-							hr = m_pShellContext3->GetCommandString(CmdID - MIN_SHELL_MENU_ID,GCS_HELPTEXT,
-							NULL,(LPSTR)HelpString,SIZEOF_ARRAY(HelpString));
-						}
-						else if(m_pShellContext2 != NULL)
-						{
-							hr = m_pShellContext2->GetCommandString(CmdID - MIN_SHELL_MENU_ID,GCS_HELPTEXT,
-								NULL,(LPSTR)HelpString,SIZEOF_ARRAY(HelpString));
-						}
-
-						/* If the help string was found, send it to the status bar. */
-						if(hr == NOERROR)
-						{
-							SendMessage(m_hStatusBar,SB_SETTEXT,(WPARAM)0|0,(LPARAM)HelpString);
-						}
-
-						/* Prevent the message from been passed onto the main window. */
-						return 0;
-					}
-				}
-			}
-			break;
-	}
-
-	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
-}
+///* This is a custom menu item (e.g. Open
+//in New Tab). */
+//switch(Cmd)
+//{
+//case MENU_OPEN_IN_NEW_TAB:
+//	{
+//		LPITEMIDLIST pidlComplete;
+//		TCHAR szParsingPath[MAX_PATH];
+//		BOOL bOpenInNewTab;
+//
+//		if(ppidl != NULL)
+//		{
+//			pidlComplete = ILCombine(pidlParent,*ppidl);
+//
+//			bOpenInNewTab = FALSE;
+//		}
+//		else
+//		{
+//			pidlComplete = ILClone(pidlParent);
+//
+//			bOpenInNewTab = TRUE;
+//		}
+//
+//		GetDisplayName(pidlComplete,szParsingPath,SHGDN_FORPARSING);
+//		BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+//
+//		m_bTreeViewOpenInNewTab = TRUE;
+//
+//		CoTaskMemFree(pidlComplete);
+//	}
+//	break;
+//
+//case MENU_OPEN_FILE_LOCATION:
+//	{
+//		TCHAR szFileName[MAX_PATH];
+//
+//		BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+//
+//		GetDisplayName((LPITEMIDLIST)ppidl[0],szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
+//
+//		m_pActiveShellBrowser->SelectFiles(szFileName);
+//	}
+//	break;
+//}
 
 HRESULT Explorerplusplus::ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,
 LPCITEMIDLIST *ppidl,int nFiles)

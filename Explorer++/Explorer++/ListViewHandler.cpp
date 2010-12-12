@@ -17,6 +17,7 @@
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ContextMenuManager.h"
+#include "../Helper//FileContextMenuManager.h"
 
 
 LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -1217,9 +1218,12 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 			LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
-			CreateFileContextMenu(m_hActiveListView,pidlDirectory,
-			*pCursorPos,FROM_LISTVIEW,(LPCITEMIDLIST *)ppidl,
-			nSelected,TRUE,GetKeyState(VK_SHIFT) & 0x80);
+			CFileContextMenuManager fcmm(m_hActiveListView,pidlDirectory,
+				const_cast<LPCITEMIDLIST *>(ppidl),nSelected);
+
+			/* TODO: IFileContextMenuExternal interface. */
+			fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,pCursorPos,
+				TRUE,GetKeyState(VK_SHIFT) & 0x80);
 
 			CoTaskMemFree(pidlDirectory);
 

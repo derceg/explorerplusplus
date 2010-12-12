@@ -2172,9 +2172,10 @@ void Explorerplusplus::LoadCustomizeColorsStateFromSML(MSXML2::IXMLDOMNamedNodeM
 	m_crInitialColor = RGB(r,g,b);
 }
 
+/* TODO: */
 void Explorerplusplus::LoadSearchStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
 {
-	MSXML2::IXMLDOMNode *pNode = NULL;
+	/*MSXML2::IXMLDOMNode *pNode = NULL;
 	SearchDirectoryInfo_t sdi;
 	SearchPatternInfo_t spi;
 	BSTR bstrName;
@@ -2206,7 +2207,7 @@ void Explorerplusplus::LoadSearchStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,l
 			StringCchCopy(spi.szPattern,SIZEOF_ARRAY(spi.szPattern),bstrValue);
 			m_SearchPatterns.push_back(spi);
 		}
-	}
+	}*/
 }
 
 void Explorerplusplus::LoadWildcardStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
@@ -2300,10 +2301,11 @@ MSXML2::IXMLDOMElement *pe)
 	AddAttributeToNode(pXMLDom,pParentNode,_T("b"),EncodeIntValue(GetBValue(m_crInitialColor)));
 }
 
+/* TODO: */
 void Explorerplusplus::SaveSearchStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pe)
 {
-	MSXML2::IXMLDOMElement	*pParentNode = NULL;
+	/*MSXML2::IXMLDOMElement	*pParentNode = NULL;
 	BSTR					bstr_wsntt = SysAllocString(L"\n\t\t");
 	list<SearchDirectoryInfo_t>::iterator	itr;
 	list<SearchPatternInfo_t>::iterator		itr2;
@@ -2331,7 +2333,7 @@ MSXML2::IXMLDOMElement *pe)
 	}
 
 	AddAttributeToNode(pXMLDom,pParentNode,_T("SearchDirectoryText"),m_SearchPatternText);
-	AddAttributeToNode(pXMLDom,pParentNode,_T("SearchSubFolders"),EncodeBoolValue(m_bSearchSubFolders));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("SearchSubFolders"),EncodeBoolValue(m_bSearchSubFolders));*/
 }
 
 void Explorerplusplus::SaveWildcardStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,

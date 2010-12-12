@@ -16,6 +16,7 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/FileContextMenuManager.h"
 
 
 LRESULT CALLBACK	TabBackingProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -459,17 +460,20 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 									{
 										pszDrivePath = (TCHAR *)tbButton.dwData;
 
-										LPITEMIDLIST	pidlItem = NULL;
-										HRESULT			hr;
+										LPITEMIDLIST pidlItem = NULL;
 
-										hr = GetIdlFromParsingName(pszDrivePath,&pidlItem);
+										HRESULT hr = GetIdlFromParsingName(pszDrivePath,&pidlItem);
 
 										if(SUCCEEDED(hr))
 										{
 											ClientToScreen(m_hDrivesToolbar,&pnmm->pt);
-											CreateFileContextMenu(m_hDrivesToolbar,pidlItem,
-												pnmm->pt,FROM_DRIVEBAR,NULL,1,FALSE,
-												GetKeyState(VK_SHIFT) & 0x80);
+
+											CFileContextMenuManager fcmm(m_hDrivesToolbar,pidlItem,
+												NULL,1);
+
+											/* TODO: IFileContextMenuExternal interface. */
+											fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,
+												FALSE,GetKeyState(VK_SHIFT) & 0x80);
 
 											CoTaskMemFree(pidlItem);
 										}

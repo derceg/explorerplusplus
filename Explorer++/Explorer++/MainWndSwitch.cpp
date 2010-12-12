@@ -14,6 +14,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "SearchDialog.h"
 #include "AboutDialog.h"
 
 
@@ -1312,8 +1313,13 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		case IDM_TOOLS_SEARCH:
 			if(g_hwndSearch == NULL)
 			{
+				/* TODO: */
+				/*CSearchDialog SearchDialog(g_hLanguageModule,IDD_ABOUT,hwnd);
+
+				SearchDialog.ShowDialog();
+
 				g_hwndSearch = CreateDialogParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_SEARCH),
-					hwnd,SearchProcStub,(LPARAM)this);
+					hwnd,SearchProcStub,(LPARAM)this);*/
 			}
 			else
 			{
