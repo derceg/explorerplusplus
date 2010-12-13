@@ -468,8 +468,10 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 										{
 											ClientToScreen(m_hDrivesToolbar,&pnmm->pt);
 
+											list<LPITEMIDLIST> pidlItemList;
+
 											CFileContextMenuManager fcmm(m_hDrivesToolbar,pidlItem,
-												NULL,1);
+												pidlItemList);
 
 											/* TODO: IFileContextMenuExternal interface. */
 											fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,

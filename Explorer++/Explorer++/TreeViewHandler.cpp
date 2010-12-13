@@ -155,7 +155,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	HTREEITEM hItem;
 	HTREEITEM hPrevItem;
 	IShellFolder *pShellParentFolder = NULL;
-	LPCITEMIDLIST pidlRelative = NULL;
+	LPITEMIDLIST pidlRelative = NULL;
 	HRESULT hr;
 
 	hItem	= (HTREEITEM)wParam;
@@ -168,7 +168,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	pidl = m_pMyTreeView->BuildPath(hItem);
 
 	hr = SHBindToParent(pidl,IID_IShellFolder,(void **)&pShellParentFolder,
-	&pidlRelative);
+	(LPCITEMIDLIST *)&pidlRelative);
 
 	if(SUCCEEDED(hr))
 	{
@@ -185,8 +185,12 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 			{
 				m_bTreeViewOpenInNewTab = FALSE;
 
+				list<LPITEMIDLIST> pidlList;
+
+				pidlList.push_back(pidlRelative);
+
 				CFileContextMenuManager fcmm(m_hContainer,pidlParent,
-					&pidlRelative,1);
+					pidlList);
 
 				/* TODO: IFileContextMenuExternal interface. */
 				fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,ppt,

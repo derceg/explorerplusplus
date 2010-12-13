@@ -21,136 +21,171 @@
 #define MENU_OPEN_IN_NEW_TAB	(MAX_SHELL_MENU_ID + 1)
 #define MENU_OPEN_FILE_LOCATION	(MAX_SHELL_MENU_ID + 2)
 
-/*if(uFrom == FROM_LISTVIEW || uFrom == FROM_TREEVIEW ||
-	uFrom == FROM_DRIVEBAR)
+struct FileContextMenuInfo_t
 {
-	if(nFiles == 1)
+	UINT	uFrom;
+};
+
+void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
+	list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu)
+{
+	MENUITEMINFO mii;
+
+	assert(dwData != NULL);
+
+	FileContextMenuInfo_t *pfcmi = reinterpret_cast<FileContextMenuInfo_t *>(dwData);
+
+	if(pfcmi->uFrom == FROM_LISTVIEW || pfcmi->uFrom == FROM_TREEVIEW ||
+		pfcmi->uFrom == FROM_DRIVEBAR)
 	{
-		if(FileAttributes & SFGAO_FOLDER)
+		if(pidlItemList.size() == 1)
 		{
-			mii.cbSize		= sizeof(MENUITEMINFO);
-			mii.fMask		= MIIM_STRING|MIIM_ID;
-			mii.wID			= MENU_OPEN_IN_NEW_TAB;
-			mii.dwTypeData	= _T("Open in New Tab");
-			InsertMenuItem(hMenu,1,TRUE,&mii);
+			SFGAOF FileAttributes = SFGAO_FOLDER;
+
+			vector<LPITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
+
+			/* TODO: Convert first argument of function
+			to const. */
+			GetItemAttributes(pidlItemVector[0],&FileAttributes);
+
+			if(FileAttributes & SFGAO_FOLDER)
+			{
+				mii.cbSize		= sizeof(MENUITEMINFO);
+				mii.fMask		= MIIM_STRING|MIIM_ID;
+				mii.wID			= MENU_OPEN_IN_NEW_TAB;
+				mii.dwTypeData	= _T("Open in New Tab");
+				InsertMenuItem(hMenu,1,TRUE,&mii);
+			}
 		}
 	}
+	else if(pfcmi->uFrom == FROM_SEARCH)
+	{
+		mii.cbSize		= sizeof(MENUITEMINFO);
+		mii.fMask		= MIIM_STRING|MIIM_ID;
+		mii.wID			= MENU_OPEN_FILE_LOCATION;
+		mii.dwTypeData	= _T("Open file location");
+		InsertMenuItem(hMenu,1,TRUE,&mii);
+	}
 }
-else if(uFrom == FROM_SEARCH)
+
+/* TODO: Return value if handled. */
+BOOL Explorerplusplus::HandleShellMenuItem(LPITEMIDLIST pidlParent,
+	list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
 {
-	mii.cbSize		= sizeof(MENUITEMINFO);
-	mii.fMask		= MIIM_STRING|MIIM_ID;
-	mii.wID			= MENU_OPEN_FILE_LOCATION;
-	mii.dwTypeData	= _T("Open file location");
-	InsertMenuItem(hMenu,1,TRUE,&mii);
-}*/
+	FileContextMenuInfo_t *pfcmi = reinterpret_cast<FileContextMenuInfo_t *>(dwData);
 
-//if(StrCmpI(szCmd,_T("open")) == 0)
-//{
-//	/* If ppidl is NULL, open the item specified by pidlParent
-//	in the current listview. If ppidl is not NULL, open each
-//	of the items specified in ppidl. */
-//	if(ppidl == NULL)
-//	{
-//		OpenItem(pidlParent,FALSE,FALSE);
-//	}
-//	else
-//	{
-//		LPITEMIDLIST	pidlComplete = NULL;
-//		int				i = 0;
-//
-//		for(i = 0;i < nFiles;i++)
-//		{
-//			pidlComplete = ILCombine(pidlParent,ppidl[i]);
-//
-//			OpenItem(pidlComplete,FALSE,FALSE);
-//
-//			CoTaskMemFree(pidlComplete);
-//		}
-//	}
-//
-//	m_bTreeViewOpenInNewTab = TRUE;
-//
-//	return 0;
-//}
-//else if(StrCmpI(szCmd,_T("rename")) == 0)
-//{
-//	if(uFrom == FROM_LISTVIEW)
-//	{
-//		OnFileRename();
-//	}
-//	else if(uFrom == FROM_TREEVIEW)
-//	{
-//		OnTreeViewFileRename();
-//	}
-//}
-//else if(StrCmpI(szCmd,_T("copy")) == 0)
-//{
-//	if(uFrom == FROM_LISTVIEW)
-//	{
-//		OnListViewCopy(TRUE);
-//	}
-//	else if(uFrom == FROM_TREEVIEW)
-//	{
-//		OnTreeViewCopy(TRUE);
-//	}
-//}
-//else if(StrCmpI(szCmd,_T("cut")) == 0)
-//{
-//	if(uFrom == FROM_LISTVIEW)
-//	{
-//		OnListViewCopy(FALSE);
-//	}
-//	else if(uFrom == FROM_TREEVIEW)
-//	{
-//		OnTreeViewCopy(FALSE);
-//	}
-//}
+	if(StrCmpI(szCmd,_T("open")) == 0)
+	{
+		/* If ppidl is NULL, open the item specified by pidlParent
+		in the current listview. If ppidl is not NULL, open each
+		of the items specified in ppidl. */
+		if(pidlItemList.size() == 0)
+		{
+			OpenItem(pidlParent,FALSE,FALSE);
+		}
+		else
+		{
+			LPITEMIDLIST pidlComplete = NULL;
 
-///* This is a custom menu item (e.g. Open
-//in New Tab). */
-//switch(Cmd)
-//{
-//case MENU_OPEN_IN_NEW_TAB:
-//	{
-//		LPITEMIDLIST pidlComplete;
-//		TCHAR szParsingPath[MAX_PATH];
-//		BOOL bOpenInNewTab;
-//
-//		if(ppidl != NULL)
-//		{
-//			pidlComplete = ILCombine(pidlParent,*ppidl);
-//
-//			bOpenInNewTab = FALSE;
-//		}
-//		else
-//		{
-//			pidlComplete = ILClone(pidlParent);
-//
-//			bOpenInNewTab = TRUE;
-//		}
-//
-//		GetDisplayName(pidlComplete,szParsingPath,SHGDN_FORPARSING);
-//		BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-//
-//		m_bTreeViewOpenInNewTab = TRUE;
-//
-//		CoTaskMemFree(pidlComplete);
-//	}
-//	break;
-//
-//case MENU_OPEN_FILE_LOCATION:
-//	{
-//		TCHAR szFileName[MAX_PATH];
-//
-//		BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-//
-//		GetDisplayName((LPITEMIDLIST)ppidl[0],szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
-//
-//		m_pActiveShellBrowser->SelectFiles(szFileName);
-//	}
-//	break;
-//}
+			for each(auto pidl in pidlItemList)
+			{
+				pidlComplete = ILCombine(pidlParent,pidl);
+
+				OpenItem(pidlComplete,FALSE,FALSE);
+
+				CoTaskMemFree(pidlComplete);
+			}
+		}
+
+		m_bTreeViewOpenInNewTab = TRUE;
+
+		return 0;
+	}
+	else if(StrCmpI(szCmd,_T("rename")) == 0)
+	{
+		if(pfcmi->uFrom == FROM_LISTVIEW)
+		{
+			OnFileRename();
+		}
+		else if(pfcmi->uFrom == FROM_TREEVIEW)
+		{
+			OnTreeViewFileRename();
+		}
+	}
+	else if(StrCmpI(szCmd,_T("copy")) == 0)
+	{
+		if(pfcmi->uFrom == FROM_LISTVIEW)
+		{
+			OnListViewCopy(TRUE);
+		}
+		else if(pfcmi->uFrom == FROM_TREEVIEW)
+		{
+			OnTreeViewCopy(TRUE);
+		}
+	}
+	else if(StrCmpI(szCmd,_T("cut")) == 0)
+	{
+		if(pfcmi->uFrom == FROM_LISTVIEW)
+		{
+			OnListViewCopy(FALSE);
+		}
+		else if(pfcmi->uFrom == FROM_TREEVIEW)
+		{
+			OnTreeViewCopy(FALSE);
+		}
+	}
+
+	return FALSE;
+}
+
+void Explorerplusplus::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
+	list<LPITEMIDLIST> pidlItemList,int iCmd)
+{
+	switch(iCmd)
+	{
+		case MENU_OPEN_IN_NEW_TAB:
+			{
+				LPITEMIDLIST pidlComplete;
+				TCHAR szParsingPath[MAX_PATH];
+				BOOL bOpenInNewTab;
+
+				if(pidlItemList.size() != 0)
+				{
+					vector<LPITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
+					pidlComplete = ILCombine(pidlParent,pidlItemVector[0]);
+
+					bOpenInNewTab = FALSE;
+				}
+				else
+				{
+					pidlComplete = ILClone(pidlParent);
+
+					bOpenInNewTab = TRUE;
+				}
+
+				GetDisplayName(pidlComplete,szParsingPath,SHGDN_FORPARSING);
+				BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+
+				m_bTreeViewOpenInNewTab = TRUE;
+
+				CoTaskMemFree(pidlComplete);
+			}
+			break;
+
+		case MENU_OPEN_FILE_LOCATION:
+			{
+				TCHAR szFileName[MAX_PATH];
+
+				BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+
+				vector<LPITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
+				GetDisplayName(pidlItemVector[0],szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
+
+				m_pActiveShellBrowser->SelectFiles(szFileName);
+			}
+			break;
+	}
+}
 
 HRESULT Explorerplusplus::ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,
 LPCITEMIDLIST *ppidl,int nFiles)

@@ -480,11 +480,16 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 						ptCursor.x = ptsCursor.x;
 						ptCursor.y = ptsCursor.y;
 
+						list<LPITEMIDLIST> pidlList;
+
+						pidlList.push_back(pidl);
+
 						CFileContextMenuManager fcmm(m_hDlg,pidlDirectory,
-							const_cast<LPCITEMIDLIST *>(&pidl),1);
+							pidlList);
 
 						/* TODO: IFileContextMenuExternal interface. */
-						fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&ptCursor);
+						/* TODO: */
+						//fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&ptCursor);
 
 						CoTaskMemFree(pidlDirectory);
 						CoTaskMemFree(pidlFull);

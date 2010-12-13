@@ -1201,38 +1201,28 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 	if(nSelected > 0)
 	{
-		int i = 0;
+		list<LPITEMIDLIST> pidlList;
+		int iItem = -1;
 
-		LPITEMIDLIST *ppidl = (LPITEMIDLIST *)malloc(nSelected * sizeof(LPCITEMIDLIST));
-
-		if(ppidl != NULL)
+		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 		{
-			int iItem = -1;
+			pidlList.push_back(m_pActiveShellBrowser->QueryItemRelativeIdl(iItem));
+		}
 
-			while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
-			{
-				ppidl[i] = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+		LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
-				i++;
-			}
+		CFileContextMenuManager fcmm(m_hActiveListView,pidlDirectory,
+			pidlList);
 
-			LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+		/* TODO: IFileContextMenuExternal interface. */
+		fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,pCursorPos,
+			TRUE,GetKeyState(VK_SHIFT) & 0x80);
 
-			CFileContextMenuManager fcmm(m_hActiveListView,pidlDirectory,
-				const_cast<LPCITEMIDLIST *>(ppidl),nSelected);
+		CoTaskMemFree(pidlDirectory);
 
-			/* TODO: IFileContextMenuExternal interface. */
-			fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,pCursorPos,
-				TRUE,GetKeyState(VK_SHIFT) & 0x80);
-
-			CoTaskMemFree(pidlDirectory);
-
-			for(i = 0;i < nSelected;i++)
-			{
-				CoTaskMemFree(ppidl[i]);
-			}
-
-			free(ppidl);
+		for each(auto pidl in pidlList)
+		{
+			CoTaskMemFree(pidl);
 		}
 	}
 }

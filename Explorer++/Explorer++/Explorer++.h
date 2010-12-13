@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <commctrl.h>
 #include "../ShellBrowser/iShellView.h"
+#include "../Helper/FileContextMenuManager.h"
 #include "Explorer++_internal.h"
 #import <msxml3.dll> raw_interfaces_only
 
@@ -193,7 +194,9 @@ TOOLBAR_NEWFOLDER,TOOLBAR_COPY,TOOLBAR_CUT,
 TOOLBAR_PASTE,TOOLBAR_DELETE,TOOLBAR_VIEWS,
 TOOLBAR_SEARCH,TOOLBAR_PROPERTIES,TOOLBAR_REFRESH};
 
-class Explorerplusplus : public IDropTarget, public IServiceProvider, public IShellView2, public INewMenuClient, public IDropFilesCallback
+class Explorerplusplus : public IDropTarget, public IServiceProvider,
+	public IShellView2, public INewMenuClient, public IDropFilesCallback,
+	public IFileContextMenuExternal
 {
 public:
 
@@ -844,6 +847,11 @@ private:
 	HRESULT					ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset,UINT iStartOffset);
 	HRESULT					ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles);
 	HRESULT					ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask);
+
+	/* File context menu. */
+	void					AddMenuEntries(LPITEMIDLIST pidlParent,list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu);
+	BOOL					HandleShellMenuItem(LPITEMIDLIST pidlParent,list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd);
+	void					HandleCustomMenuItem(LPITEMIDLIST pidlParent,list<LPITEMIDLIST> pidlItemList,int iCmd);
 
 	/* Listview selection file tests. */
 	void					BuildListViewFileSelectionList(HWND hListView,std::list<std::wstring> *pFileSelectionList);
