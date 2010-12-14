@@ -411,6 +411,11 @@ struct DirectorySettings_t
 	DirectorySettingsInternal_t	dsi;
 };
 
+struct FileContextMenuInfo_t
+{
+	UINT	uFrom;
+};
+
 typedef enum
 {
 	REPLACEEXPLORER_NONE		= 1,

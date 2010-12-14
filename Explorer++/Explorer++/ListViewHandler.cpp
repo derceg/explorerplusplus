@@ -1214,9 +1214,12 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 		CFileContextMenuManager fcmm(m_hActiveListView,pidlDirectory,
 			pidlList);
 
-		/* TODO: IFileContextMenuExternal interface. */
+		FileContextMenuInfo_t fcmi;
+
+		fcmi.uFrom = FROM_LISTVIEW;
+
 		fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,pCursorPos,
-			TRUE,GetKeyState(VK_SHIFT) & 0x80);
+			reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,GetKeyState(VK_SHIFT) & 0x80);
 
 		CoTaskMemFree(pidlDirectory);
 

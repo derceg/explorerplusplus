@@ -21,11 +21,6 @@
 #define MENU_OPEN_IN_NEW_TAB	(MAX_SHELL_MENU_ID + 1)
 #define MENU_OPEN_FILE_LOCATION	(MAX_SHELL_MENU_ID + 2)
 
-struct FileContextMenuInfo_t
-{
-	UINT	uFrom;
-};
-
 void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
 	list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
@@ -68,7 +63,6 @@ void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
 	}
 }
 
-/* TODO: Return value if handled. */
 BOOL Explorerplusplus::HandleShellMenuItem(LPITEMIDLIST pidlParent,
 	list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
 {
@@ -99,7 +93,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(LPITEMIDLIST pidlParent,
 
 		m_bTreeViewOpenInNewTab = TRUE;
 
-		return 0;
+		return TRUE;
 	}
 	else if(StrCmpI(szCmd,_T("rename")) == 0)
 	{
@@ -111,6 +105,8 @@ BOOL Explorerplusplus::HandleShellMenuItem(LPITEMIDLIST pidlParent,
 		{
 			OnTreeViewFileRename();
 		}
+
+		return TRUE;
 	}
 	else if(StrCmpI(szCmd,_T("copy")) == 0)
 	{
@@ -122,6 +118,8 @@ BOOL Explorerplusplus::HandleShellMenuItem(LPITEMIDLIST pidlParent,
 		{
 			OnTreeViewCopy(TRUE);
 		}
+
+		return TRUE;
 	}
 	else if(StrCmpI(szCmd,_T("cut")) == 0)
 	{
@@ -133,6 +131,8 @@ BOOL Explorerplusplus::HandleShellMenuItem(LPITEMIDLIST pidlParent,
 		{
 			OnTreeViewCopy(FALSE);
 		}
+
+		return TRUE;
 	}
 
 	return FALSE;

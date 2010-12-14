@@ -29,8 +29,10 @@ CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
 	m_hwnd = hwnd;
 	m_pidlParent = ILClone(pidlParent);
 
-	/* TODO: Make dynamic. */
-	m_pidlItemList = pidlItemList;
+	for each(auto pidl in pidlItemList)
+	{
+		m_pidlItemList.push_back(ILClone(pidl));
+	}
 
 	m_pActualContext = NULL;
 
@@ -117,6 +119,11 @@ CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
 
 CFileContextMenuManager::~CFileContextMenuManager()
 {
+	for each(auto pidl in m_pidlItemList)
+	{
+		CoTaskMemFree(pidl);
+	}
+
 	CoTaskMemFree(m_pidlParent);
 
 	if(m_pShellContext3 != NULL)
@@ -198,7 +205,7 @@ HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 
 		BOOL bHandled = FALSE;
 
-		/* TODO: Pass the menu back to the caller to give
+		/* Pass the menu back to the caller to give
 		it the chance to handle it. */
 		if(SUCCEEDED(hr))
 		{
@@ -222,7 +229,7 @@ HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 	}
 	else
 	{
-		/* TODO: Custom menu entry, so pass back
+		/* Custom menu entry, so pass back
 		to caller. */
 		pfcme->HandleCustomMenuItem(m_pidlParent,m_pidlItemList,iCmd);
 	}

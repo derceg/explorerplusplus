@@ -473,9 +473,12 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 											CFileContextMenuManager fcmm(m_hDrivesToolbar,pidlItem,
 												pidlItemList);
 
-											/* TODO: IFileContextMenuExternal interface. */
-											fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,
-												FALSE,GetKeyState(VK_SHIFT) & 0x80);
+											FileContextMenuInfo_t fcmi;
+
+											fcmi.uFrom = FROM_DRIVEBAR;
+
+											fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,
+												reinterpret_cast<DWORD_PTR>(&fcmi),FALSE,GetKeyState(VK_SHIFT) & 0x80);
 
 											CoTaskMemFree(pidlItem);
 										}

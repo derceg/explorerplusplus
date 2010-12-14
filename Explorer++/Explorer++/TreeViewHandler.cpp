@@ -192,9 +192,12 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 				CFileContextMenuManager fcmm(m_hContainer,pidlParent,
 					pidlList);
 
-				/* TODO: IFileContextMenuExternal interface. */
-				fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,ppt,
-					TRUE,GetKeyState(VK_SHIFT) & 0x80);
+				FileContextMenuInfo_t fcmi;
+
+				fcmi.uFrom = FROM_TREEVIEW;
+
+				fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,ppt,
+					reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,GetKeyState(VK_SHIFT) & 0x80);
 
 				CoTaskMemFree(pidlParent);
 			}
