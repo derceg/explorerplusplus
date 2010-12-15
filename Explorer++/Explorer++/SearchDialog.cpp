@@ -27,21 +27,6 @@ using namespace std;
 #define SEARCH_PROCESSITEMS_TIMER_ELAPSED	50
 #define SEARCH_MAX_ITEMS_BATCH_PROCESS		100
 
-#define DEFAULT_SEARCH_ALLOCATION	200
-
-typedef struct
-{
-	TCHAR szDirectory[MAX_PATH];
-	TCHAR szName[MAX_PATH + 2];
-	DWORD dwAttributes;
-
-	Explorerplusplus *pContainer;
-	HWND hDlg;
-	HWND hListView;
-
-	BOOL bSearchSubFolders;
-} SearchInfo_t;
-
 typedef struct
 {
 	TCHAR szFullFileName[MAX_PATH];
@@ -52,43 +37,9 @@ typedef struct
 	TCHAR szFullFileName[MAX_PATH];
 } SearchItem_t;
 
-SearchItem_t *g_pSearchItems = NULL;
-int g_nSearchItemsAllocated = 0;
-int *g_pMap = NULL;
-
-DWORD WINAPI SearchThread(LPVOID pParam);
-
-HWND g_hGripper;
-
-HICON g_hIcon;
-HICON g_hDialogIcon;
-BOOL g_bSearching = FALSE;
-BOOL g_bStopSearching = FALSE;
-
-int g_iFoldersFound = 0;
-int g_iFilesFound = 0;
-
-BOOL g_bExit = FALSE;
-
-TCHAR g_szSearch[MAX_PATH];
-
-TCHAR g_szSearchButton[32];
-
-int g_iMinWidth;
-int g_iMinHeight;
-
-int g_iListViewWidthDelta;
-int g_iListViewHeightDelta;
-int g_iSearchDirectoryWidthDelta;
-int g_iNamedWidthDelta;
-int g_iButtonDirectoryLeftDelta;
-int g_iEtchedHorzWidthDelta;
-int g_iEtchedHorzVerticalDelta;
-int g_iExitLeftDelta;
-int g_iExitVerticalDelta;
-int g_iSearchExitDelta;
-int g_iStaticStatusWidthDelta;
-int g_iStatusVerticalDelta;
+//SearchItem_t *g_pSearchItems = NULL;
+//
+//DWORD WINAPI SearchThread(LPVOID pParam);
 
 int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
 
@@ -132,21 +83,38 @@ SearchDialogSettings& SearchDialogSettings::GetInstance()
 destinations (e.g. xml file, the registry). */
 interface ISaveProvidor
 {
+	/* Registry/XML file. */
+	void SetType();
 
+	/* Overloaded - e.g. one method for int,
+	one method for strings, etc. */
+	void SaveValue();
 };
 
 CSearchDialog::CSearchDialog(HINSTANCE hInstance,int iResource,
 	HWND hParent,TCHAR *szSearchDirectory) :
 CBaseDialog(hInstance,iResource,hParent)
 {
+	m_bSearching = FALSE;
+	m_iFoldersFound = 0;
+	m_iFilesFound = 0;
+	m_bExit = FALSE;
+	m_bSetSearchTimer = TRUE;
+	m_bSearchSubFolders = TRUE;
+
+	m_bSearchDlgStateSaved = FALSE;
+
 	StringCchCopy(m_szSearchDirectory,SIZEOF_ARRAY(m_szSearchDirectory),
 		szSearchDirectory);
 
-	m_bSearchDlgStateSaved = FALSE;
-	m_bSearchSubFolders = TRUE;
-
 	StringCchCopy(m_SearchPatternText,SIZEOF_ARRAY(m_SearchPatternText),
 		EMPTY_STRING);
+}
+
+CSearchDialog::~CSearchDialog()
+{
+	DestroyIcon(m_hDialogIcon);
+	DestroyIcon(m_hDirectoryIcon);
 }
 
 BOOL CSearchDialog::OnInitDialog()
@@ -154,7 +122,6 @@ BOOL CSearchDialog::OnInitDialog()
 	HWND hListView;
 	HWND hComboBoxEx;
 	HWND hComboBox;
-	HWND hButton;
 	list<SearchDirectoryInfo_t>::iterator itr;
 	list<SearchPatternInfo_t>::iterator itr2;
 	LVCOLUMN lvColumn;
@@ -170,16 +137,16 @@ BOOL CSearchDialog::OnInitDialog()
 
 	ImageList_Add(himl,hBitmap,NULL);
 
-	g_hIcon = ImageList_GetIcon(himl,SHELLIMAGES_NEWTAB,ILD_NORMAL);
-	g_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_SEARCH,ILD_NORMAL);
+	m_hDirectoryIcon = ImageList_GetIcon(himl,SHELLIMAGES_NEWTAB,ILD_NORMAL);
+	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_SEARCH,ILD_NORMAL);
 
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,(LONG)g_hDialogIcon);
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
 
 	DeleteObject(hBitmap);
 	ImageList_Destroy(himl);
 
-	hButton = GetDlgItem(m_hDlg,IDC_BUTTON_DIRECTORY);
-	SendMessage(hButton,BM_SETIMAGE,IMAGE_ICON,(LPARAM)g_hIcon);
+	SendMessage(GetDlgItem(m_hDlg,IDC_BUTTON_DIRECTORY),BM_SETIMAGE,
+		IMAGE_ICON,(LPARAM)m_hDirectoryIcon);
 
 	hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS);
 
@@ -210,54 +177,48 @@ BOOL CSearchDialog::OnInitDialog()
 	RECT rc2;
 
 	GetWindowRect(m_hDlg,&rcMain);
-	g_iMinWidth = GetRectWidth(&rcMain);
-	g_iMinHeight = GetRectHeight(&rcMain);
+	m_iMinWidth = GetRectWidth(&rcMain);
+	m_iMinHeight = GetRectHeight(&rcMain);
 
 	GetClientRect(m_hDlg,&rcMain);
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
-	g_iListViewWidthDelta = rcMain.right - rc.right;
-	g_iListViewHeightDelta = rcMain.bottom - rc.bottom;
+	m_iListViewWidthDelta = rcMain.right - rc.right;
+	m_iListViewHeightDelta = rcMain.bottom - rc.bottom;
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
-	g_iSearchDirectoryWidthDelta = rcMain.right - rc.right;
+	m_iSearchDirectoryWidthDelta = rcMain.right - rc.right;
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_COMBO_NAME),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
-	g_iNamedWidthDelta = rcMain.right - rc.right;
+	m_iNamedWidthDelta = rcMain.right - rc.right;
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_BUTTON_DIRECTORY),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
-	g_iButtonDirectoryLeftDelta = rcMain.right - rc.left;
+	m_iButtonDirectoryLeftDelta = rcMain.right - rc.left;
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_STATIC_STATUS),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
-	g_iStaticStatusWidthDelta = rcMain.right - rc.right;
-	g_iStatusVerticalDelta = rcMain.bottom - rc.top;
+	m_iStaticStatusWidthDelta = rcMain.right - rc.right;
+	m_iStatusVerticalDelta = rcMain.bottom - rc.top;
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_STATIC_ETCHEDHORZ),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
-	g_iEtchedHorzWidthDelta = rcMain.right - rc.right;
-	g_iEtchedHorzVerticalDelta = rcMain.bottom - rc.top;
+	m_iEtchedHorzWidthDelta = rcMain.right - rc.right;
+	m_iEtchedHorzVerticalDelta = rcMain.bottom - rc.top;
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDEXIT),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
-	g_iExitLeftDelta = rcMain.right - rc.left;
-	g_iExitVerticalDelta = rcMain.bottom - rc.top;
+	m_iExitLeftDelta = rcMain.right - rc.left;
+	m_iExitVerticalDelta = rcMain.bottom - rc.top;
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDSEARCH),&rc);
 	GetWindowRect(GetDlgItem(m_hDlg,IDEXIT),&rc2);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc2,sizeof(RECT) / sizeof(POINT));
-	g_iSearchExitDelta = rc2.left - rc.left;
-
-	g_bSearching = FALSE;
-	g_iFoldersFound = 0;
-	g_iFilesFound = 0;
-	g_bExit = FALSE;
-	m_bSetSearchTimer = TRUE;
+	m_iSearchExitDelta = rc2.left - rc.left;
 
 	if(m_bSearchSubFolders)
 		CheckDlgButton(m_hDlg,IDC_CHECK_SEARCHSUBFOLDERS,BST_CHECKED);
@@ -302,14 +263,17 @@ BOOL CSearchDialog::OnInitDialog()
 
 	SetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_SearchPatternText);
 
-	g_hGripper = CreateWindow(_T("SCROLLBAR"),EMPTY_STRING,WS_CHILD|WS_VISIBLE|
+	m_hGripper = CreateWindow(_T("SCROLLBAR"),EMPTY_STRING,WS_CHILD|WS_VISIBLE|
 		WS_CLIPSIBLINGS|SBS_BOTTOMALIGN|SBS_SIZEGRIP,0,0,0,0,m_hDlg,NULL,
 		GetModuleHandle(0),NULL);
 
 	GetClientRect(m_hDlg,&rcMain);
-	GetWindowRect(g_hGripper,&rc);
-	SetWindowPos(g_hGripper,NULL,GetRectWidth(&rcMain) - GetRectWidth(&rc),
+	GetWindowRect(m_hGripper,&rc);
+	SetWindowPos(m_hGripper,NULL,GetRectWidth(&rcMain) - GetRectWidth(&rc),
 		GetRectHeight(&rcMain) - GetRectHeight(&rc),0,0,SWP_NOSIZE|SWP_NOZORDER);
+
+
+
 
 	if(m_bSearchDlgStateSaved)
 	{
@@ -350,7 +314,7 @@ BOOL CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 			TCHAR szParsingPath[MAX_PATH];
 			TCHAR szTitle[] = _T("Select a folder to search, then press OK");
 
-			GetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,g_szSearch,SIZEOF_ARRAY(g_szSearch));
+			GetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,m_szSearch,SIZEOF_ARRAY(m_szSearch));
 
 			CoInitializeEx(NULL,COINIT_APARTMENTTHREADED);
 
@@ -377,10 +341,10 @@ BOOL CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 		break;
 
 	case IDEXIT:
-		if(g_bSearching)
+		if(m_bSearching)
 		{
-			g_bExit = TRUE;
-			g_bStopSearching = TRUE;
+			m_bExit = TRUE;
+			m_bStopSearching = TRUE;
 		}
 		else
 		{
@@ -404,34 +368,33 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 	case NM_DBLCLK:
 		if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS))
 		{
-			HWND hListView;
-			LVITEM lvItem;
-			LPITEMIDLIST pidlFull = NULL;
-			TCHAR szDirectory[MAX_PATH];
-			BOOL bRet;
-			int iSelected;
+			HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS);
 
-			hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS);
-
-			iSelected = ListView_GetNextItem(hListView,-1,LVNI_ALL|LVNI_SELECTED);
+			int iSelected = ListView_GetNextItem(hListView,-1,LVNI_ALL|LVNI_SELECTED);
 
 			if(iSelected != -1)
 			{
+				LVITEM lvItem;
+
 				lvItem.mask		= LVIF_PARAM;
 				lvItem.iItem	= iSelected;
 				lvItem.iSubItem	= 0;
-				bRet = ListView_GetItem(hListView,&lvItem);
+
+				BOOL bRet = ListView_GetItem(hListView,&lvItem);
 
 				if(bRet)
 				{
+					/* TODO : */
+					/*LPITEMIDLIST pidlFull = NULL;
+					TCHAR szDirectory[MAX_PATH];
+
 					StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),
 						g_pSearchItems[(int)lvItem.lParam].szFullFileName);
 					GetIdlFromParsingName(szDirectory,&pidlFull);
 
-					/* TODO: */
-					//OpenItem(pidlFull,TRUE,FALSE);
+					OpenItem(pidlFull,TRUE,FALSE);
 
-					CoTaskMemFree(pidlFull);
+					CoTaskMemFree(pidlFull);*/
 				}
 			}
 		}
@@ -466,8 +429,9 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 
 					if(bRet)
 					{
-						StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),
-							g_pSearchItems[(int)lvItem.lParam].szFullFileName);
+						/* TODO: */
+						/*StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),
+							g_pSearchItems[(int)lvItem.lParam].szFullFileName);*/
 						GetIdlFromParsingName(szDirectory,&pidlFull);
 						PathRemoveFileSpec(szDirectory);
 						GetIdlFromParsingName(szDirectory,&pidlDirectory);
@@ -488,7 +452,6 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 							pidlList);
 
 						/* TODO: IFileContextMenuExternal interface. */
-						/* TODO: */
 						//fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&ptCursor);
 
 						CoTaskMemFree(pidlDirectory);
@@ -529,28 +492,28 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 			{
 				TCHAR szStatus[512];
 
-				if(!g_bStopSearching)
+				if(!m_bStopSearching)
 				{
 					StringCchPrintf(szStatus,SIZEOF_ARRAY(szStatus),
-						_T("Finished. %d folder(s) and %d file(s) found."),g_iFoldersFound,
-						g_iFilesFound);
+						_T("Finished. %d folder(s) and %d file(s) found."),m_iFoldersFound,
+						m_iFilesFound);
 					SetDlgItemText(m_hDlg,IDC_STATIC_STATUS,szStatus);
 				}
 				else
 				{
 					SetDlgItemText(m_hDlg,IDC_STATIC_STATUS,_T("Cancelled."));
 
-					if(g_bExit)
+					if(m_bExit)
 					{
 						SearchSaveState(m_hDlg);
 						DestroyWindow(m_hDlg);
 					}
 				}
 
-				g_bSearching = FALSE;
-				g_bStopSearching = FALSE;
+				m_bSearching = FALSE;
+				m_bStopSearching = FALSE;
 
-				SetDlgItemText(m_hDlg,IDSEARCH,g_szSearchButton);
+				SetDlgItemText(m_hDlg,IDSEARCH,m_szSearchButton);
 			}
 			break;
 
@@ -576,8 +539,8 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 BOOL CSearchDialog::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
 {
 	/* Set the minimum dialog size. */
-	pmmi->ptMinTrackSize.x = g_iMinWidth;
-	pmmi->ptMinTrackSize.y = g_iMinHeight;
+	pmmi->ptMinTrackSize.x = m_iMinWidth;
+	pmmi->ptMinTrackSize.y = m_iMinHeight;
 
 	return 0;
 }
@@ -587,66 +550,66 @@ BOOL CSearchDialog::OnSize(int iType,int iWidth,int iHeight)
 	HWND hListView;
 	RECT rc;
 
-	GetWindowRect(g_hGripper,&rc);
-	SetWindowPos(g_hGripper,NULL,iWidth - GetRectWidth(&rc),iHeight - GetRectHeight(&rc),0,
+	GetWindowRect(m_hGripper,&rc);
+	SetWindowPos(m_hGripper,NULL,iWidth - GetRectWidth(&rc),iHeight - GetRectHeight(&rc),0,
 		0,SWP_NOSIZE|SWP_NOZORDER);
 
 	hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS);
 
 	GetWindowRect(hListView,&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
-	SetWindowPos(hListView,NULL,0,0,iWidth - g_iListViewWidthDelta - rc.left,
-		iHeight - g_iListViewHeightDelta - rc.top,SWP_NOMOVE|SWP_NOZORDER);
+	SetWindowPos(hListView,NULL,0,0,iWidth - m_iListViewWidthDelta - rc.left,
+		iHeight - m_iListViewHeightDelta - rc.top,SWP_NOMOVE|SWP_NOZORDER);
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
 	SetWindowPos(GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY),NULL,0,0,
-		iWidth - g_iSearchDirectoryWidthDelta - rc.left,GetRectHeight(&rc),SWP_NOMOVE|SWP_NOZORDER);
+		iWidth - m_iSearchDirectoryWidthDelta - rc.left,GetRectHeight(&rc),SWP_NOMOVE|SWP_NOZORDER);
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_COMBO_NAME),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
 	SetWindowPos(GetDlgItem(m_hDlg,IDC_COMBO_NAME),NULL,0,0,
-		iWidth - g_iNamedWidthDelta - rc.left,GetRectHeight(&rc),SWP_NOMOVE|SWP_NOZORDER);
+		iWidth - m_iNamedWidthDelta - rc.left,GetRectHeight(&rc),SWP_NOMOVE|SWP_NOZORDER);
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_BUTTON_DIRECTORY),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
 	SetWindowPos(GetDlgItem(m_hDlg,IDC_BUTTON_DIRECTORY),NULL,
-		iWidth - g_iButtonDirectoryLeftDelta,rc.top,0,0,SWP_NOSIZE|SWP_NOZORDER);
+		iWidth - m_iButtonDirectoryLeftDelta,rc.top,0,0,SWP_NOSIZE|SWP_NOZORDER);
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_STATIC_STATUSLABEL),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
-	SetWindowPos(GetDlgItem(m_hDlg,IDC_STATIC_STATUSLABEL),NULL,rc.left,iHeight - g_iStatusVerticalDelta,
+	SetWindowPos(GetDlgItem(m_hDlg,IDC_STATIC_STATUSLABEL),NULL,rc.left,iHeight - m_iStatusVerticalDelta,
 		0,0,SWP_NOSIZE|SWP_NOZORDER);
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_STATIC_STATUS),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
-	SetWindowPos(GetDlgItem(m_hDlg,IDC_STATIC_STATUS),NULL,rc.left,iHeight - g_iStatusVerticalDelta,
-		iWidth - g_iStaticStatusWidthDelta - rc.left,GetRectHeight(&rc),SWP_NOZORDER);
+	SetWindowPos(GetDlgItem(m_hDlg,IDC_STATIC_STATUS),NULL,rc.left,iHeight - m_iStatusVerticalDelta,
+		iWidth - m_iStaticStatusWidthDelta - rc.left,GetRectHeight(&rc),SWP_NOZORDER);
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_STATIC_ETCHEDHORZ),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
-	SetWindowPos(GetDlgItem(m_hDlg,IDC_STATIC_ETCHEDHORZ),NULL,rc.left,iHeight - g_iEtchedHorzVerticalDelta,
-		iWidth - g_iEtchedHorzWidthDelta - rc.left,GetRectHeight(&rc),SWP_NOZORDER);
+	SetWindowPos(GetDlgItem(m_hDlg,IDC_STATIC_ETCHEDHORZ),NULL,rc.left,iHeight - m_iEtchedHorzVerticalDelta,
+		iWidth - m_iEtchedHorzWidthDelta - rc.left,GetRectHeight(&rc),SWP_NOZORDER);
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDEXIT),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
 	SetWindowPos(GetDlgItem(m_hDlg,IDEXIT),NULL,
-		iWidth - g_iExitLeftDelta,iHeight - g_iExitVerticalDelta,0,0,SWP_NOSIZE|SWP_NOZORDER);
+		iWidth - m_iExitLeftDelta,iHeight - m_iExitVerticalDelta,0,0,SWP_NOSIZE|SWP_NOZORDER);
 
 	GetWindowRect(GetDlgItem(m_hDlg,IDSEARCH),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
 	SetWindowPos(GetDlgItem(m_hDlg,IDSEARCH),NULL,
-		iWidth - g_iExitLeftDelta - g_iSearchExitDelta,iHeight - g_iExitVerticalDelta,0,0,SWP_NOSIZE|SWP_NOZORDER);
+		iWidth - m_iExitLeftDelta - m_iSearchExitDelta,iHeight - m_iExitVerticalDelta,0,0,SWP_NOSIZE|SWP_NOZORDER);
 
 	return 0;
 }
 
 BOOL CSearchDialog::OnClose()
 {
-	if(g_bSearching)
+	if(m_bSearching)
 	{
-		g_bExit = TRUE;
-		g_bStopSearching = TRUE;
+		m_bExit = TRUE;
+		m_bStopSearching = TRUE;
 	}
 	else
 	{
@@ -657,108 +620,101 @@ BOOL CSearchDialog::OnClose()
 	return 0;
 }
 
-BOOL CSearchDialog::OnDestroy()
+BOOL CSearchDialog::OnNcDestroy()
 {
-	g_hwndSearch = NULL;
-	DestroyIcon(g_hDialogIcon);
-	DestroyIcon(g_hIcon);
+	/* TODO: */
+	//g_hwndSearch = NULL;
+
+	delete this;
 
 	return 0;
 }
 
-INT_PTR CALLBACK Explorerplusplus::SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
-{
-	switch(Msg)
-	{
-		case WM_TIMER:
-			{
-				/* TODO: */
-				/*if((int)wParam == SEARCH_PROCESSITEMS_TIMER_ID)
-				{
-					list<LPITEMIDLIST>::iterator itr;
-					int nItems = min((int)m_SearchItems.size(),SEARCH_MAX_ITEMS_BATCH_PROCESS);
-					int i = 0;
-
-					itr = m_SearchItems.begin();
-
-					while(i < nItems)
-					{
-						HWND hListView;
-						LPITEMIDLIST pidl = NULL;
-						TCHAR szFullFileName[MAX_PATH];
-						TCHAR szDirectory[MAX_PATH];
-						TCHAR szFileName[MAX_PATH];
-						LVITEM lvItem;
-						SHFILEINFO shfi;
-						int iIndex;
-						static int iItem = 0;
-						int iInternalIndex = 0;
-
-						pidl = *itr;
-
-						hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
-
-						GetDisplayName(pidl,szDirectory,SHGDN_FORPARSING);
-						PathRemoveFileSpec(szDirectory);
-
-						GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
-						GetDisplayName(pidl,szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
-
-						SHGetFileInfo((LPCWSTR)pidl,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
-
-						while(g_pMap[iInternalIndex] != 0 && iInternalIndex < g_nSearchItemsAllocated)
-						{
-							iInternalIndex++;
-						}
-
-						if(iInternalIndex == g_nSearchItemsAllocated)
-						{
-							g_pSearchItems = (SearchItem_t *)realloc(g_pSearchItems,
-								(g_nSearchItemsAllocated + DEFAULT_SEARCH_ALLOCATION) * sizeof(SearchItem_t));
-							g_pMap = (int *)realloc(g_pMap,
-								(g_nSearchItemsAllocated + DEFAULT_SEARCH_ALLOCATION) * sizeof(int));
-							g_nSearchItemsAllocated += DEFAULT_SEARCH_ALLOCATION;
-
-							iInternalIndex++;
-						}
-
-						StringCchCopy(g_pSearchItems[iInternalIndex].szFullFileName,
-							SIZEOF_ARRAY(g_pSearchItems[iInternalIndex].szFullFileName),
-							szFullFileName);
-						g_pMap[iInternalIndex] = 1;
-
-						lvItem.mask		= LVIF_IMAGE|LVIF_TEXT|LVIF_PARAM;
-						lvItem.pszText	= szFileName;
-						lvItem.iItem	= iItem++;
-						lvItem.iSubItem	= 0;
-						lvItem.iImage	= shfi.iIcon;
-						lvItem.lParam	= iInternalIndex;
-						iIndex = ListView_InsertItem(hListView,&lvItem);
-
-						ListView_SetItemText(hListView,iIndex,1,szDirectory);
-
-						CoTaskMemFree(pidl);
-
-						itr = m_SearchItems.erase(itr);
-
-						i++;
-					}
-
-					m_bSetSearchTimer = TRUE;
-				}*/
-			}
-			break;
-	}
-
-	return 0;
-}
+//case WM_TIMER:
+//	{
+//		if((int)wParam == SEARCH_PROCESSITEMS_TIMER_ID)
+//		{
+//			list<LPITEMIDLIST>::iterator itr;
+//			int nItems = min((int)m_SearchItems.size(),SEARCH_MAX_ITEMS_BATCH_PROCESS);
+//			int i = 0;
+//
+//			itr = m_SearchItems.begin();
+//
+//			while(i < nItems)
+//			{
+//				HWND hListView;
+//				LPITEMIDLIST pidl = NULL;
+//				TCHAR szFullFileName[MAX_PATH];
+//				TCHAR szDirectory[MAX_PATH];
+//				TCHAR szFileName[MAX_PATH];
+//				LVITEM lvItem;
+//				SHFILEINFO shfi;
+//				int iIndex;
+//				static int iItem = 0;
+//				int iInternalIndex = 0;
+//
+//				pidl = *itr;
+//
+//				hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
+//
+//				GetDisplayName(pidl,szDirectory,SHGDN_FORPARSING);
+//				PathRemoveFileSpec(szDirectory);
+//
+//				GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
+//				GetDisplayName(pidl,szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
+//
+//				SHGetFileInfo((LPCWSTR)pidl,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
+//
+//				while(g_pMap[iInternalIndex] != 0 && iInternalIndex < g_nSearchItemsAllocated)
+//				{
+//					iInternalIndex++;
+//				}
+//
+//				if(iInternalIndex == g_nSearchItemsAllocated)
+//				{
+//					g_pSearchItems = (SearchItem_t *)realloc(g_pSearchItems,
+//						(g_nSearchItemsAllocated + DEFAULT_SEARCH_ALLOCATION) * sizeof(SearchItem_t));
+//					g_pMap = (int *)realloc(g_pMap,
+//						(g_nSearchItemsAllocated + DEFAULT_SEARCH_ALLOCATION) * sizeof(int));
+//					g_nSearchItemsAllocated += DEFAULT_SEARCH_ALLOCATION;
+//
+//					iInternalIndex++;
+//				}
+//
+//				StringCchCopy(g_pSearchItems[iInternalIndex].szFullFileName,
+//					SIZEOF_ARRAY(g_pSearchItems[iInternalIndex].szFullFileName),
+//					szFullFileName);
+//				g_pMap[iInternalIndex] = 1;
+//
+//				lvItem.mask		= LVIF_IMAGE|LVIF_TEXT|LVIF_PARAM;
+//				lvItem.pszText	= szFileName;
+//				lvItem.iItem	= iItem++;
+//				lvItem.iSubItem	= 0;
+//				lvItem.iImage	= shfi.iIcon;
+//				lvItem.lParam	= iInternalIndex;
+//				iIndex = ListView_InsertItem(hListView,&lvItem);
+//
+//				ListView_SetItemText(hListView,iIndex,1,szDirectory);
+//
+//				CoTaskMemFree(pidl);
+//
+//				itr = m_SearchItems.erase(itr);
+//
+//				i++;
+//			}
+//
+//			m_bSetSearchTimer = TRUE;
+//		}
+//	}
+//	break;
 
 int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData)
 {
 	switch(uMsg)
 	{
 	case BFFM_INITIALIZED:
-		SendMessage(hwnd,BFFM_SETSELECTION,TRUE,(LPARAM)g_szSearch);
+		/* TODO: */
+		//SendMessage(hwnd,BFFM_SETSELECTION,TRUE,(LPARAM)m_szSearch);
 		break;
 	}
 
@@ -771,22 +727,20 @@ TCHAR *szSearchPattern,DWORD dwAttributes,list<DirectoryInfo_t> *pSubfolderList)
 
 DWORD WINAPI SearchThread(LPVOID pParam)
 {
-	SearchInfo_t *psi = NULL;
-
-	psi = (SearchInfo_t *)pParam;
+	/*SearchInfo_t *psi = reinterpret_cast<SearchInfo_t *>(pParam);
 
 	SearchDirectory(psi,psi->szDirectory);
 
 	SendMessage(psi->hDlg,WM_APP_SEARCHFINISHED,0,0);
 
-	free(psi);
+	free(psi);*/
 
 	return 0;
 }
 
 void SearchDirectory(SearchInfo_t *psi,TCHAR *szDirectory)
 {
-	list<DirectoryInfo_t> SubfolderList;
+	/*list<DirectoryInfo_t> SubfolderList;
 	list<DirectoryInfo_t>::iterator itr;
 
 	SendMessage(psi->hDlg,WM_APP_SEARCHCHANGEDDIRECTORY,
@@ -795,7 +749,7 @@ void SearchDirectory(SearchInfo_t *psi,TCHAR *szDirectory)
 	SearchDirectoryInternal(psi->hDlg,szDirectory,
 		psi->szName,psi->dwAttributes,&SubfolderList);
 
-	if(g_bStopSearching)
+	if(m_bStopSearching)
 		return;
 
 	if(psi->bSearchSubFolders)
@@ -807,270 +761,247 @@ void SearchDirectory(SearchInfo_t *psi,TCHAR *szDirectory)
 				SearchDirectory(psi,itr->szFullFileName);
 			}
 		}
-	}
+	}*/
 }
 
 /* Can't recurse, as it would overflow the stack. */
 void SearchDirectoryInternal(HWND hDlg,TCHAR *szSearchDirectory,
 TCHAR *szSearchPattern,DWORD dwAttributes,list<DirectoryInfo_t> *pSubfolderList)
 {
-	WIN32_FIND_DATA wfd;
-	HANDLE hFindFile;
-	TCHAR szSearchTerm[MAX_PATH];
-	DirectoryInfo_t di;
+	//WIN32_FIND_DATA wfd;
+	//HANDLE hFindFile;
+	//TCHAR szSearchTerm[MAX_PATH];
+	//DirectoryInfo_t di;
 
-	PathCombine(szSearchTerm,szSearchDirectory,_T("*"));
+	//PathCombine(szSearchTerm,szSearchDirectory,_T("*"));
 
-	hFindFile = FindFirstFile(szSearchTerm,&wfd);
+	//hFindFile = FindFirstFile(szSearchTerm,&wfd);
 
-	if(hFindFile != INVALID_HANDLE_VALUE)
-	{
-		while(FindNextFile(hFindFile,&wfd) != 0)
-		{
-			if(g_bStopSearching)
-				break;
+	//if(hFindFile != INVALID_HANDLE_VALUE)
+	//{
+	//	while(FindNextFile(hFindFile,&wfd) != 0)
+	//	{
+	//		if(m_bStopSearching)
+	//			break;
 
-			if(lstrcmpi(wfd.cFileName,_T(".")) != 0 &&
-				lstrcmpi(wfd.cFileName,_T("..")) != 0)
-			{
-				BOOL bFileNameActive = FALSE;
-				BOOL bAttributesActive = FALSE;
-				BOOL bMatchFileName = FALSE;
-				BOOL bMatchAttributes = FALSE;
-				BOOL bItemMatch = FALSE;
+	//		if(lstrcmpi(wfd.cFileName,_T(".")) != 0 &&
+	//			lstrcmpi(wfd.cFileName,_T("..")) != 0)
+	//		{
+	//			BOOL bFileNameActive = FALSE;
+	//			BOOL bAttributesActive = FALSE;
+	//			BOOL bMatchFileName = FALSE;
+	//			BOOL bMatchAttributes = FALSE;
+	//			BOOL bItemMatch = FALSE;
 
-				/* Only match against the filename if it's not empty. */
-				if(lstrcmp(szSearchPattern,EMPTY_STRING) != 0)
-				{
-					bFileNameActive = TRUE;
+	//			/* Only match against the filename if it's not empty. */
+	//			if(lstrcmp(szSearchPattern,EMPTY_STRING) != 0)
+	//			{
+	//				bFileNameActive = TRUE;
 
-					if(CheckWildcardMatch(szSearchPattern,wfd.cFileName,FALSE))
-					{
-						bMatchFileName = TRUE;
-					}
-				}
+	//				if(CheckWildcardMatch(szSearchPattern,wfd.cFileName,FALSE))
+	//				{
+	//					bMatchFileName = TRUE;
+	//				}
+	//			}
 
-				if(dwAttributes != 0)
-				{
-					bAttributesActive = TRUE;
+	//			if(dwAttributes != 0)
+	//			{
+	//				bAttributesActive = TRUE;
 
-					if(wfd.dwFileAttributes & dwAttributes)
-					{
-						bMatchAttributes = TRUE;
-					}
-				}
+	//				if(wfd.dwFileAttributes & dwAttributes)
+	//				{
+	//					bMatchAttributes = TRUE;
+	//				}
+	//			}
 
-				if(bFileNameActive && bAttributesActive)
-					bItemMatch = bMatchFileName && bMatchAttributes;
-				else if(bFileNameActive)
-					bItemMatch = bMatchFileName;
-				else if(bAttributesActive)
-					bItemMatch = bMatchAttributes;
+	//			if(bFileNameActive && bAttributesActive)
+	//				bItemMatch = bMatchFileName && bMatchAttributes;
+	//			else if(bFileNameActive)
+	//				bItemMatch = bMatchFileName;
+	//			else if(bAttributesActive)
+	//				bItemMatch = bMatchAttributes;
 
-				if(bItemMatch)
-				{
-					if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-						FILE_ATTRIBUTE_DIRECTORY)
-						g_iFoldersFound++;
-					else
-						g_iFilesFound++;
+	//			if(bItemMatch)
+	//			{
+	//				if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+	//					FILE_ATTRIBUTE_DIRECTORY)
+	//					m_iFoldersFound++;
+	//				else
+	//					m_iFilesFound++;
 
-					LPITEMIDLIST pidl = NULL;
-					TCHAR szFullFileName[MAX_PATH];
+	//				LPITEMIDLIST pidl = NULL;
+	//				TCHAR szFullFileName[MAX_PATH];
 
-					PathCombine(szFullFileName,szSearchDirectory,wfd.cFileName);
-					GetIdlFromParsingName(szFullFileName,&pidl);
+	//				PathCombine(szFullFileName,szSearchDirectory,wfd.cFileName);
+	//				GetIdlFromParsingName(szFullFileName,&pidl);
 
-					PostMessage(hDlg,WM_APP_SEARCHITEMFOUND,(WPARAM)ILClone(pidl),0);
+	//				PostMessage(hDlg,WM_APP_SEARCHITEMFOUND,(WPARAM)ILClone(pidl),0);
 
-					CoTaskMemFree(pidl);
-				}
+	//				CoTaskMemFree(pidl);
+	//			}
 
-				/* If this item is a folder, follow it. */
-				if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-					FILE_ATTRIBUTE_DIRECTORY)
-				{
-					PathCombine(di.szFullFileName,szSearchDirectory,
-						wfd.cFileName);
-					pSubfolderList->push_back(di);
-				}
-			}
-		}
+	//			/* If this item is a folder, follow it. */
+	//			if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+	//				FILE_ATTRIBUTE_DIRECTORY)
+	//			{
+	//				PathCombine(di.szFullFileName,szSearchDirectory,
+	//					wfd.cFileName);
+	//				pSubfolderList->push_back(di);
+	//			}
+	//		}
+	//	}
 
-		FindClose(hFindFile);
-	}
+	//	FindClose(hFindFile);
+	//}
 }
 
 void CSearchDialog::OnSearch(HWND hDlg)
 {
-	SearchInfo_t *psi = NULL;
-	SearchDirectoryInfo_t sdi;
-	SearchPatternInfo_t spi;
-	TCHAR szPattern[MAX_PATH];
+	//SearchInfo_t *psi = NULL;
+	//SearchDirectoryInfo_t sdi;
+	//SearchPatternInfo_t spi;
+	//TCHAR szPattern[MAX_PATH];
 
-	m_SearchItems.clear();
+	//m_SearchItems.clear();
 
-	if(!g_bSearching)
-	{
-		psi = (SearchInfo_t *)malloc(sizeof(SearchInfo_t));
+	//if(!m_bSearching)
+	//{
+	//	psi = (SearchInfo_t *)malloc(sizeof(SearchInfo_t));
 
-		if(psi != NULL)
-		{
-			ListView_DeleteAllItems(GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS));
+	//	if(psi != NULL)
+	//	{
+	//		ListView_DeleteAllItems(GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS));
 
-			if(g_pSearchItems != NULL)
-			{
-				free(g_pSearchItems);
-				g_pSearchItems = NULL;
-			}
+	//		m_iFoldersFound = 0;
+	//		m_iFilesFound = 0;
 
-			if(g_pMap != NULL)
-			{
-				free(g_pMap);
-				g_pMap = NULL;
-			}
+	//		/* Get the directory and name, and remove leading and
+	//		trailing whitespace. */
+	//		GetDlgItemText(hDlg,IDC_COMBO_DIRECTORY,psi->szDirectory,
+	//			SIZEOF_ARRAY(psi->szDirectory));
+	//		PathRemoveBlanks(psi->szDirectory);
+	//		GetDlgItemText(hDlg,IDC_COMBO_NAME,psi->szName,
+	//			SIZEOF_ARRAY(psi->szName));
+	//		PathRemoveBlanks(psi->szName);
 
-			g_pSearchItems = (SearchItem_t *)malloc(DEFAULT_SEARCH_ALLOCATION * sizeof(SearchItem_t));
-			g_pMap = (int *)malloc(DEFAULT_SEARCH_ALLOCATION * sizeof(int));
-			g_nSearchItemsAllocated = DEFAULT_SEARCH_ALLOCATION;
+	//		//psi->pContainer = this;
+	//		psi->hDlg = hDlg;
+	//		psi->hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
+	//		psi->bSearchSubFolders = IsDlgButtonChecked(hDlg,IDC_CHECK_SEARCHSUBFOLDERS) ==
+	//			BST_CHECKED;
 
-			int i = 0;
+	//		psi->dwAttributes = 0;
 
-			for(i = 0;i < g_nSearchItemsAllocated;i++)
-			{
-				g_pMap[i] = 0;
-			}
+	//		if(IsDlgButtonChecked(hDlg,IDC_CHECK_ARCHIVE) == BST_CHECKED)
+	//			psi->dwAttributes |= FILE_ATTRIBUTE_ARCHIVE;
 
-			g_iFoldersFound = 0;
-			g_iFilesFound = 0;
+	//		if(IsDlgButtonChecked(hDlg,IDC_CHECK_HIDDEN) == BST_CHECKED)
+	//			psi->dwAttributes |= FILE_ATTRIBUTE_HIDDEN;
 
-			/* Get the directory and name, and remove leading and
-			trailing whitespace. */
-			GetDlgItemText(hDlg,IDC_COMBO_DIRECTORY,psi->szDirectory,
-				SIZEOF_ARRAY(psi->szDirectory));
-			PathRemoveBlanks(psi->szDirectory);
-			GetDlgItemText(hDlg,IDC_COMBO_NAME,psi->szName,
-				SIZEOF_ARRAY(psi->szName));
-			PathRemoveBlanks(psi->szName);
+	//		if(IsDlgButtonChecked(hDlg,IDC_CHECK_READONLY) == BST_CHECKED)
+	//			psi->dwAttributes |= FILE_ATTRIBUTE_READONLY;
 
-			//psi->pContainer = this;
-			psi->hDlg = hDlg;
-			psi->hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
-			psi->bSearchSubFolders = IsDlgButtonChecked(hDlg,IDC_CHECK_SEARCHSUBFOLDERS) ==
-				BST_CHECKED;
+	//		if(IsDlgButtonChecked(hDlg,IDC_CHECK_SYSTEM) == BST_CHECKED)
+	//			psi->dwAttributes |= FILE_ATTRIBUTE_SYSTEM;
 
-			psi->dwAttributes = 0;
+	//		/* Save the search directory and search pattern (only if they are not
+	//		the same as the most recent entry). */
+	//		BOOL bSaveEntry;
 
-			if(IsDlgButtonChecked(hDlg,IDC_CHECK_ARCHIVE) == BST_CHECKED)
-				psi->dwAttributes |= FILE_ATTRIBUTE_ARCHIVE;
+	//		if(m_SearchDirectories.empty())
+	//			bSaveEntry = TRUE;
+	//		else if(lstrcmp(psi->szDirectory,m_SearchDirectories.begin()->szDirectory) != 0)
+	//			bSaveEntry = TRUE;
+	//		else
+	//			bSaveEntry = FALSE;
 
-			if(IsDlgButtonChecked(hDlg,IDC_CHECK_HIDDEN) == BST_CHECKED)
-				psi->dwAttributes |= FILE_ATTRIBUTE_HIDDEN;
+	//		if(bSaveEntry)
+	//		{
+	//			StringCchCopy(sdi.szDirectory,SIZEOF_ARRAY(sdi.szDirectory),psi->szDirectory);
+	//			m_SearchDirectories.push_front(sdi);
 
-			if(IsDlgButtonChecked(hDlg,IDC_CHECK_READONLY) == BST_CHECKED)
-				psi->dwAttributes |= FILE_ATTRIBUTE_READONLY;
+	//			/* Insert the entry into the combobox. */
+	//			HWND hComboBoxEx;
+	//			HWND hComboBox;
+	//			COMBOBOXEXITEM cbi;
 
-			if(IsDlgButtonChecked(hDlg,IDC_CHECK_SYSTEM) == BST_CHECKED)
-				psi->dwAttributes |= FILE_ATTRIBUTE_SYSTEM;
+	//			hComboBoxEx = GetDlgItem(hDlg,IDC_COMBO_DIRECTORY);
+	//			hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
 
-			/* Save the search directory and search pattern (only if they are not
-			the same as the most recent entry). */
-			BOOL bSaveEntry;
+	//			cbi.mask	= CBEIF_TEXT;
+	//			cbi.iItem	= 0;
+	//			cbi.pszText	= psi->szDirectory;
+	//			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
 
-			if(m_SearchDirectories.empty())
-				bSaveEntry = TRUE;
-			else if(lstrcmp(psi->szDirectory,m_SearchDirectories.begin()->szDirectory) != 0)
-				bSaveEntry = TRUE;
-			else
-				bSaveEntry = FALSE;
+	//			ComboBox_SetCurSel(hComboBox,0);
+	//		}
 
-			if(bSaveEntry)
-			{
-				StringCchCopy(sdi.szDirectory,SIZEOF_ARRAY(sdi.szDirectory),psi->szDirectory);
-				m_SearchDirectories.push_front(sdi);
+	//		if(m_SearchPatterns.empty())
+	//			bSaveEntry = TRUE;
+	//		else if(lstrcmp(psi->szName,m_SearchPatterns.begin()->szPattern) != 0)
+	//			bSaveEntry = TRUE;
+	//		else
+	//			bSaveEntry = FALSE;
 
-				/* Insert the entry into the combobox. */
-				HWND hComboBoxEx;
-				HWND hComboBox;
-				COMBOBOXEXITEM cbi;
+	//		if(bSaveEntry)
+	//		{
+	//			StringCchCopy(spi.szPattern,SIZEOF_ARRAY(spi.szPattern),psi->szName);
+	//			m_SearchPatterns.push_front(spi);
 
-				hComboBoxEx = GetDlgItem(hDlg,IDC_COMBO_DIRECTORY);
-				hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
+	//			/* Insert the entry into the combobox. */
+	//			HWND hComboBoxEx;
+	//			HWND hComboBox;
+	//			COMBOBOXEXITEM cbi;
 
-				cbi.mask	= CBEIF_TEXT;
-				cbi.iItem	= 0;
-				cbi.pszText	= psi->szDirectory;
-				SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
+	//			hComboBoxEx = GetDlgItem(hDlg,IDC_COMBO_NAME);
+	//			hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
 
-				ComboBox_SetCurSel(hComboBox,0);
-			}
+	//			cbi.mask	= CBEIF_TEXT;
+	//			cbi.iItem	= 0;
+	//			cbi.pszText	= psi->szName;
+	//			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
 
-			if(m_SearchPatterns.empty())
-				bSaveEntry = TRUE;
-			else if(lstrcmp(psi->szName,m_SearchPatterns.begin()->szPattern) != 0)
-				bSaveEntry = TRUE;
-			else
-				bSaveEntry = FALSE;
+	//			ComboBox_SetCurSel(hComboBox,0);
+	//		}
 
-			if(bSaveEntry)
-			{
-				StringCchCopy(spi.szPattern,SIZEOF_ARRAY(spi.szPattern),psi->szName);
-				m_SearchPatterns.push_front(spi);
+	//		/* Turn search patterns of the form '???' into '*???*', and
+	//		use this modified string to search. */
+	//		if(lstrlen(psi->szName) > 0)
+	//		{
+	//			StringCchCopy(szPattern,SIZEOF_ARRAY(szPattern),psi->szName);
+	//			memset(psi->szName,0,SIZEOF_ARRAY(psi->szName));
 
-				/* Insert the entry into the combobox. */
-				HWND hComboBoxEx;
-				HWND hComboBox;
-				COMBOBOXEXITEM cbi;
+	//			if(szPattern[0] != '*')
+	//			{
+	//				StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
+	//			}
 
-				hComboBoxEx = GetDlgItem(hDlg,IDC_COMBO_NAME);
-				hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
+	//			StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),szPattern);
 
-				cbi.mask	= CBEIF_TEXT;
-				cbi.iItem	= 0;
-				cbi.pszText	= psi->szName;
-				SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
+	//			if(szPattern[lstrlen(szPattern) - 1] != '*')
+	//			{
+	//				StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
+	//			}
+	//		}
 
-				ComboBox_SetCurSel(hComboBox,0);
-			}
+	//		GetDlgItemText(hDlg,IDSEARCH,m_szSearchButton,SIZEOF_ARRAY(m_szSearchButton));
 
-			/* Turn search patterns of the form '???' into '*???*', and
-			use this modified string to search. */
-			if(lstrlen(psi->szName) > 0)
-			{
-				StringCchCopy(szPattern,SIZEOF_ARRAY(szPattern),psi->szName);
-				memset(psi->szName,0,SIZEOF_ARRAY(psi->szName));
+	//		TCHAR szTemp[64];
 
-				if(szPattern[0] != '*')
-				{
-					StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
-				}
+	//		LoadString(g_hLanguageModule,IDS_STOP,
+	//			szTemp,SIZEOF_ARRAY(szTemp));
+	//		SetDlgItemText(hDlg,IDSEARCH,szTemp);
 
-				StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),szPattern);
+	//		m_bSearching = TRUE;
 
-				if(szPattern[lstrlen(szPattern) - 1] != '*')
-				{
-					StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
-				}
-			}
-
-			GetDlgItemText(hDlg,IDSEARCH,g_szSearchButton,SIZEOF_ARRAY(g_szSearchButton));
-
-			TCHAR szTemp[64];
-
-			LoadString(g_hLanguageModule,IDS_STOP,
-				szTemp,SIZEOF_ARRAY(szTemp));
-			SetDlgItemText(hDlg,IDSEARCH,szTemp);
-
-			g_bSearching = TRUE;
-
-			/* Create a background thread, and search using it... */
-			CreateThread(NULL,0,SearchThread,(LPVOID)psi,0,NULL);
-		}
-	}
-	else
-	{
-		g_bStopSearching = TRUE;
-	}
+	//		/* Create a background thread, and search using it... */
+	//		CreateThread(NULL,0,SearchThread,(LPVOID)psi,0,NULL);
+	//	}
+	//}
+	//else
+	//{
+	//	m_bStopSearching = TRUE;
+	//}
 }
 
 /* TODO: Singleton class to save dialog details? */

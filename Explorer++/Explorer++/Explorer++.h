@@ -244,7 +244,6 @@ public:
 	INT_PTR CALLBACK	ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ColorFilteringProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ColorRuleProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	SearchProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DWChangeDetailsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DWLinePropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 

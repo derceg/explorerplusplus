@@ -1313,13 +1313,15 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		case IDM_TOOLS_SEARCH:
 			if(g_hwndSearch == NULL)
 			{
-				/* TODO: */
-				/*CSearchDialog SearchDialog(g_hLanguageModule,IDD_ABOUT,hwnd);
+				TCHAR szCurrentDirectory[MAX_PATH];
 
-				SearchDialog.ShowDialog();
+				m_pActiveShellBrowser->QueryCurrentDirectory(sizeof(szCurrentDirectory),
+					szCurrentDirectory);
 
-				g_hwndSearch = CreateDialogParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_SEARCH),
-					hwnd,SearchProcStub,(LPARAM)this);*/
+				CSearchDialog *SearchDialog = new CSearchDialog(g_hLanguageModule,
+					IDD_SEARCH,hwnd,szCurrentDirectory);
+
+				g_hwndSearch = SearchDialog->ShowModelessDialog();
 			}
 			else
 			{
@@ -1347,7 +1349,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			{
 				CAboutDialog AboutDialog(g_hLanguageModule,IDD_ABOUT,hwnd);
 
-				AboutDialog.ShowDialog();
+				AboutDialog.ShowModalDialog();
 			}
 			break;
 

@@ -75,6 +75,10 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 		case WM_DESTROY:
 			return OnDestroy();
 			break;
+
+		case WM_NCDESTROY:
+			return OnNcDestroy();
+			break;
 	}
 
 	return 0;
@@ -92,11 +96,17 @@ CBaseDialog::~CBaseDialog()
 
 }
 
-/* TODO: Provide ability to show modeless dialog. */
-void CBaseDialog::ShowDialog()
+void CBaseDialog::ShowModalDialog()
 {
 	DialogBoxParam(m_hInstance,MAKEINTRESOURCE(m_iResource),
 		m_hParent,BaseDialogProcStub,(LPARAM)this);
+}
+
+HWND CBaseDialog::ShowModelessDialog()
+{
+	return CreateDialogParam(m_hInstance,
+		MAKEINTRESOURCE(m_iResource),m_hParent,
+		BaseDialogProcStub,(LPARAM)this);
 }
 
 BOOL CBaseDialog::OnInitDialog()
@@ -130,6 +140,11 @@ BOOL CBaseDialog::OnClose()
 }
 
 BOOL CBaseDialog::OnDestroy()
+{
+	return 0;
+}
+
+BOOL CBaseDialog::OnNcDestroy()
 {
 	return 0;
 }

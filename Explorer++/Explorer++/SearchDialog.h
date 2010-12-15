@@ -23,7 +23,7 @@ protected:
 	BOOL	OnGetMinMaxInfo(LPMINMAXINFO pmmi);
 	BOOL	OnSize(int iType,int iWidth,int iHeight);
 	BOOL	OnClose();
-	BOOL	OnDestroy();
+	BOOL	OnNcDestroy();
 
 	void	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
@@ -36,7 +36,40 @@ private:
 	void	OnSearch(HWND hDlg);
 	void	SearchSaveState(HWND hDlg);
 
+	HWND	m_hGripper;
+
 	TCHAR	m_szSearchDirectory[MAX_PATH];
+	TCHAR	m_szSearch[MAX_PATH];
+
+	HICON	m_hDialogIcon;
+	HICON	m_hDirectoryIcon;
+
+	BOOL	m_bSearching;
+	BOOL	m_bStopSearching;
+
+	TCHAR	m_szSearchButton[32];
+
+	int		m_iFoldersFound;
+	int		m_iFilesFound;
+
+	BOOL	m_bExit;
+
+	int		m_iMinWidth;
+	int		m_iMinHeight;
+
+	/* Used when resizing. */
+	int m_iListViewWidthDelta;
+	int m_iListViewHeightDelta;
+	int m_iSearchDirectoryWidthDelta;
+	int m_iNamedWidthDelta;
+	int m_iButtonDirectoryLeftDelta;
+	int m_iEtchedHorzWidthDelta;
+	int m_iEtchedHorzVerticalDelta;
+	int m_iExitLeftDelta;
+	int m_iExitVerticalDelta;
+	int m_iSearchExitDelta;
+	int m_iStaticStatusWidthDelta;
+	int m_iStatusVerticalDelta;
 
 	/* TODO: */
 	BOOL					m_bSearchDlgStateSaved;
@@ -52,5 +85,10 @@ private:
 	list<SearchPatternInfo_t>	m_SearchPatterns;
 	list<LPITEMIDLIST>		m_SearchItems;
 };
+
+typedef struct
+{
+	CSearchDialog	*pSearchDialog;
+} SearchInfo_t;
 
 #endif

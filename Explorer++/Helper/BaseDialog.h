@@ -14,7 +14,8 @@ public:
 
 	INT_PTR CALLBACK	BaseDialogProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	void	ShowDialog();
+	void	ShowModalDialog();
+	HWND	ShowModelessDialog();
 
 protected:
 
@@ -25,6 +26,7 @@ protected:
 	virtual BOOL	OnSize(int iType,int iWidth,int iHeight);
 	virtual BOOL	OnClose();
 	virtual BOOL	OnDestroy();
+	virtual BOOL	OnNcDestroy();
 
 	/* For private application messages in
 	the range WM_APP (0x8000) - 0xBFFF. */
