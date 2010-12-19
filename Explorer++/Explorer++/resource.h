@@ -351,6 +351,7 @@
 #define IDS_SEARCHING                   2122
 #define IDS_GENERAL_NEWAPPLICATIONBUTTON 2123
 #define IDS_TASKS_NEWTAB                2124
+#define IDS_SEARCHDIALOG_TITLE          2125
 #define IDM_FILE_SAVEDIRECTORYLISTING   8002
 #define IDS_MERGE_COLUMN_TEXT           8003
 #define IDS_OK                          8004

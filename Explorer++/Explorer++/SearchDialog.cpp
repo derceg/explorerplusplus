@@ -27,88 +27,22 @@ using namespace std;
 #define SEARCH_PROCESSITEMS_TIMER_ELAPSED	50
 #define SEARCH_MAX_ITEMS_BATCH_PROCESS		100
 
-typedef struct
-{
-	TCHAR szFullFileName[MAX_PATH];
-} DirectoryInfo_t;
-
-typedef struct
-{
-	TCHAR szFullFileName[MAX_PATH];
-} SearchItem_t;
-
-//SearchItem_t *g_pSearchItems = NULL;
-//
-//DWORD WINAPI SearchThread(LPVOID pParam);
+DWORD WINAPI SearchThread(LPVOID pParam);
 
 int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
-
-/* Singleton class that holds settings
-by the search dialog. */
-class SearchDialogSettings
-{
-public:
-
-	~SearchDialogSettings();
-
-	static SearchDialogSettings &GetInstance();
-
-private:
-
-	SearchDialogSettings();
-
-	SearchDialogSettings(const SearchDialogSettings &);
-	SearchDialogSettings & operator=(const SearchDialogSettings &);
-};
-
-SearchDialogSettings::SearchDialogSettings()
-{
-	/* Initialize the settings. Either read them
-	from somewhere, or initialize them to default
-	values. */
-}
-
-SearchDialogSettings::~SearchDialogSettings()
-{
-
-}
-
-SearchDialogSettings& SearchDialogSettings::GetInstance()
-{
-	static SearchDialogSettings sds;
-	return sds;
-}
-
-/* Provides an interface to save to various
-destinations (e.g. xml file, the registry). */
-interface ISaveProvidor
-{
-	/* Registry/XML file. */
-	void SetType();
-
-	/* Overloaded - e.g. one method for int,
-	one method for strings, etc. */
-	void SaveValue();
-};
 
 CSearchDialog::CSearchDialog(HINSTANCE hInstance,int iResource,
 	HWND hParent,TCHAR *szSearchDirectory) :
 CBaseDialog(hInstance,iResource,hParent)
 {
 	m_bSearching = FALSE;
-	m_iFoldersFound = 0;
-	m_iFilesFound = 0;
+	m_bStopSearching = FALSE;
 	m_bExit = FALSE;
 	m_bSetSearchTimer = TRUE;
-	m_bSearchSubFolders = TRUE;
-
-	m_bSearchDlgStateSaved = FALSE;
+	m_iInternalIndex = 0;
 
 	StringCchCopy(m_szSearchDirectory,SIZEOF_ARRAY(m_szSearchDirectory),
 		szSearchDirectory);
-
-	StringCchCopy(m_SearchPatternText,SIZEOF_ARRAY(m_SearchPatternText),
-		EMPTY_STRING);
 }
 
 CSearchDialog::~CSearchDialog()
@@ -120,8 +54,6 @@ CSearchDialog::~CSearchDialog()
 BOOL CSearchDialog::OnInitDialog()
 {
 	HWND hListView;
-	HWND hComboBoxEx;
-	HWND hComboBox;
 	list<SearchDirectoryInfo_t>::iterator itr;
 	list<SearchPatternInfo_t>::iterator itr2;
 	LVCOLUMN lvColumn;
@@ -220,6 +152,10 @@ BOOL CSearchDialog::OnInitDialog()
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc2,sizeof(RECT) / sizeof(POINT));
 	m_iSearchExitDelta = rc2.left - rc.left;
 
+	/* TODO: Retrieve from singleton settings class. */
+	/*HWND hComboBoxEx;
+	HWND hComboBox;
+	
 	if(m_bSearchSubFolders)
 		CheckDlgButton(m_hDlg,IDC_CHECK_SEARCHSUBFOLDERS,BST_CHECKED);
 
@@ -261,7 +197,7 @@ BOOL CSearchDialog::OnInitDialog()
 		ComboBox_SetCurSel(hComboBox,0);
 	}
 
-	SetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_SearchPatternText);
+	SetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_SearchPatternText);*/
 
 	m_hGripper = CreateWindow(_T("SCROLLBAR"),EMPTY_STRING,WS_CHILD|WS_VISIBLE|
 		WS_CLIPSIBLINGS|SBS_BOTTOMALIGN|SBS_SIZEGRIP,0,0,0,0,m_hDlg,NULL,
@@ -275,20 +211,21 @@ BOOL CSearchDialog::OnInitDialog()
 
 
 
-	if(m_bSearchDlgStateSaved)
-	{
-		/* These dummy values will be in use if these values
-		have not previously been saved. */
-		if(m_iColumnWidth1 != -1 && m_iColumnWidth2 != -1)
-		{
-			ListView_SetColumnWidth(hListView,0,m_iColumnWidth1);
-			ListView_SetColumnWidth(hListView,1,m_iColumnWidth2);
-		}
+	/* TODO: */
+	//if(m_bSearchDlgStateSaved)
+	//{
+	//	/* These dummy values will be in use if these values
+	//	have not previously been saved. */
+	//	if(m_iColumnWidth1 != -1 && m_iColumnWidth2 != -1)
+	//	{
+	//		ListView_SetColumnWidth(hListView,0,m_iColumnWidth1);
+	//		ListView_SetColumnWidth(hListView,1,m_iColumnWidth2);
+	//	}
 
-		SetWindowPos(m_hDlg,HWND_TOP,m_ptSearch.x,m_ptSearch.y,
-			m_iSearchWidth,m_iSearchHeight,SWP_SHOWWINDOW);
-	}
-	else
+	//	SetWindowPos(m_hDlg,HWND_TOP,m_ptSearch.x,m_ptSearch.y,
+	//		m_iSearchWidth,m_iSearchHeight,SWP_SHOWWINDOW);
+	//}
+	//else
 	{
 		CenterWindow(GetParent(m_hDlg),m_hDlg);
 	}
@@ -303,20 +240,20 @@ BOOL CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	switch(LOWORD(wParam))
 	{
 	case IDSEARCH:
-		OnSearch(m_hDlg);
+		OnSearch();
 		break;
 
 	case IDC_BUTTON_DIRECTORY:
 		{
 			BROWSEINFO bi;
-			PIDLIST_ABSOLUTE pidl = NULL;
+			TCHAR szDirectory[MAX_PATH];
 			TCHAR szDisplayName[MAX_PATH];
 			TCHAR szParsingPath[MAX_PATH];
-			TCHAR szTitle[] = _T("Select a folder to search, then press OK");
+			TCHAR szTitle[256];
 
-			GetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,m_szSearch,SIZEOF_ARRAY(m_szSearch));
+			LoadString(GetInstance(),IDS_SEARCHDIALOG_TITLE,szTitle,SIZEOF_ARRAY(szTitle));
 
-			CoInitializeEx(NULL,COINIT_APARTMENTTHREADED);
+			GetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,szDirectory,SIZEOF_ARRAY(szDirectory));
 
 			bi.hwndOwner		= m_hDlg;
 			bi.pidlRoot			= NULL;
@@ -324,15 +261,12 @@ BOOL CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 			bi.lpszTitle		= szTitle;
 			bi.ulFlags			= BIF_RETURNONLYFSDIRS|BIF_NEWDIALOGSTYLE;
 			bi.lpfn				= BrowseCallbackProc;
-
-			pidl = SHBrowseForFolder(&bi);
-
-			CoUninitialize();
+			bi.lParam			= reinterpret_cast<LPARAM>(szDirectory);
+			PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
 
 			if(pidl != NULL)
 			{
 				GetDisplayName(pidl,szParsingPath,SHGDN_FORPARSING);
-
 				SetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,szParsingPath);
 
 				CoTaskMemFree(pidl);
@@ -361,6 +295,165 @@ BOOL CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
+int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData)
+{
+	assert(lpData != NULL);
+
+	TCHAR *szSearchPattern = reinterpret_cast<TCHAR *>(lpData);
+
+	switch(uMsg)
+	{
+	case BFFM_INITIALIZED:
+		SendMessage(hwnd,BFFM_SETSELECTION,TRUE,reinterpret_cast<LPARAM>(szSearchPattern));
+		break;
+	}
+
+	return 0;
+}
+
+void CSearchDialog::OnSearch()
+{
+	if(!m_bSearching)
+	{
+		m_SearchItems.clear();
+		m_SearchItemsMapInternal.clear();
+
+		ListView_DeleteAllItems(GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS));
+
+		TCHAR szBaseDirectory[MAX_PATH];
+		TCHAR szSearchPattern[MAX_PATH];
+
+		/* Get the directory and name, and remove leading and
+		trailing whitespace. */
+		GetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,szBaseDirectory,
+			SIZEOF_ARRAY(szBaseDirectory));
+		PathRemoveBlanks(szBaseDirectory);
+		GetDlgItemText(m_hDlg,IDC_COMBO_NAME,szSearchPattern,
+			SIZEOF_ARRAY(szSearchPattern));
+		PathRemoveBlanks(szSearchPattern);
+
+		BOOL bSearchSubFolders = IsDlgButtonChecked(m_hDlg,IDC_CHECK_SEARCHSUBFOLDERS) ==
+			BST_CHECKED;
+
+		DWORD dwAttributes = 0;
+
+		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_ARCHIVE) == BST_CHECKED)
+			dwAttributes |= FILE_ATTRIBUTE_ARCHIVE;
+
+		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_HIDDEN) == BST_CHECKED)
+			dwAttributes |= FILE_ATTRIBUTE_HIDDEN;
+
+		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_READONLY) == BST_CHECKED)
+			dwAttributes |= FILE_ATTRIBUTE_READONLY;
+
+		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_SYSTEM) == BST_CHECKED)
+			dwAttributes |= FILE_ATTRIBUTE_SYSTEM;
+
+		CSearch *pSearch = new CSearch(m_hDlg,szBaseDirectory,szSearchPattern,dwAttributes,bSearchSubFolders);
+
+		//TCHAR szPattern[MAX_PATH];
+
+		/* Save the search directory and search pattern (only if they are not
+		the same as the most recent entry). */
+		//BOOL bSaveEntry;
+
+		//if(m_SearchDirectories.empty())
+		//	bSaveEntry = TRUE;
+		//else if(lstrcmp(psi->szDirectory,m_SearchDirectories.begin()->szDirectory) != 0)
+		//	bSaveEntry = TRUE;
+		//else
+		//	bSaveEntry = FALSE;
+
+		//if(bSaveEntry)
+		//{
+		//	StringCchCopy(sdi.szDirectory,SIZEOF_ARRAY(sdi.szDirectory),psi->szDirectory);
+		//	m_SearchDirectories.push_front(sdi);
+
+		//	/* Insert the entry into the combobox. */
+		//	HWND hComboBoxEx;
+		//	HWND hComboBox;
+		//	COMBOBOXEXITEM cbi;
+
+		//	hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
+		//	hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
+
+		//	cbi.mask	= CBEIF_TEXT;
+		//	cbi.iItem	= 0;
+		//	cbi.pszText	= psi->szDirectory;
+		//	SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
+
+		//	ComboBox_SetCurSel(hComboBox,0);
+		//}
+
+		//if(m_SearchPatterns.empty())
+		//	bSaveEntry = TRUE;
+		//else if(lstrcmp(psi->szName,m_SearchPatterns.begin()->szPattern) != 0)
+		//	bSaveEntry = TRUE;
+		//else
+		//	bSaveEntry = FALSE;
+
+		//if(bSaveEntry)
+		//{
+		//	StringCchCopy(spi.szPattern,SIZEOF_ARRAY(spi.szPattern),psi->szName);
+		//	m_SearchPatterns.push_front(spi);
+
+		//	/* Insert the entry into the combobox. */
+		//	HWND hComboBoxEx;
+		//	HWND hComboBox;
+		//	COMBOBOXEXITEM cbi;
+
+		//	hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_NAME);
+		//	hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
+
+		//	cbi.mask	= CBEIF_TEXT;
+		//	cbi.iItem	= 0;
+		//	cbi.pszText	= psi->szName;
+		//	SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
+
+		//	ComboBox_SetCurSel(hComboBox,0);
+		//}
+
+		/* Turn search patterns of the form '???' into '*???*', and
+		use this modified string to search. */
+		/*if(lstrlen(psi->szName) > 0)
+		{
+			StringCchCopy(szPattern,SIZEOF_ARRAY(szPattern),psi->szName);
+			memset(psi->szName,0,SIZEOF_ARRAY(psi->szName));
+
+			if(szPattern[0] != '*')
+			{
+				StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
+			}
+
+			StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),szPattern);
+
+			if(szPattern[lstrlen(szPattern) - 1] != '*')
+			{
+				StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
+			}
+		}*/
+
+		GetDlgItemText(m_hDlg,IDSEARCH,m_szSearchButton,SIZEOF_ARRAY(m_szSearchButton));
+
+		TCHAR szTemp[64];
+
+		LoadString(g_hLanguageModule,IDS_STOP,
+			szTemp,SIZEOF_ARRAY(szTemp));
+		SetDlgItemText(m_hDlg,IDSEARCH,szTemp);
+
+		m_bSearching = TRUE;
+
+		/* Create a background thread, and search using it... */
+		CreateThread(NULL,0,SearchThread,reinterpret_cast<LPVOID>(pSearch),0,NULL);
+	}
+	else
+	{
+		m_bStopSearching = TRUE;
+
+		/* TODO: Notify CSearch. */
+	}
+}
+
 BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
@@ -384,17 +477,23 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 
 				if(bRet)
 				{
-					/* TODO : */
-					/*LPITEMIDLIST pidlFull = NULL;
-					TCHAR szDirectory[MAX_PATH];
+					auto itr = m_SearchItemsMapInternal.find(static_cast<int>(lvItem.lParam));
 
-					StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),
-						g_pSearchItems[(int)lvItem.lParam].szFullFileName);
-					GetIdlFromParsingName(szDirectory,&pidlFull);
+					/* Item should always exist. */
+					assert(itr != m_SearchItemsMapInternal.end());
 
-					OpenItem(pidlFull,TRUE,FALSE);
+					LPITEMIDLIST pidlFull = NULL;
 
-					CoTaskMemFree(pidlFull);*/
+					/* TODO: Make first argument const? */
+					HRESULT hr = GetIdlFromParsingName((TCHAR *)itr->second.c_str(),&pidlFull);
+
+					if(hr == S_OK)
+					{
+						/* TODO: */
+						//OpenItem(pidlFull,TRUE,FALSE);
+
+						CoTaskMemFree(pidlFull);
+					}
 				}
 			}
 		}
@@ -407,9 +506,7 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 				HWND hListView;
 				LVITEM lvItem;
 				LPITEMIDLIST pidlDirectory = NULL;
-				LPITEMIDLIST pidlFull = NULL;
 				LPITEMIDLIST pidl = NULL;
-				TCHAR szDirectory[MAX_PATH];
 				POINTS ptsCursor;
 				POINT ptCursor;
 				DWORD dwCursorPos;
@@ -429,12 +526,11 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 
 					if(bRet)
 					{
-						/* TODO: */
-						/*StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),
-							g_pSearchItems[(int)lvItem.lParam].szFullFileName);*/
-						GetIdlFromParsingName(szDirectory,&pidlFull);
-						PathRemoveFileSpec(szDirectory);
-						GetIdlFromParsingName(szDirectory,&pidlDirectory);
+						LPITEMIDLIST pidlFull = NULL;
+
+						auto itr = m_SearchItemsMapInternal.find(static_cast<int>(lvItem.lParam));
+
+						assert(itr != m_SearchItemsMapInternal.end());
 
 						pidl = ILFindLastID(pidlFull);
 
@@ -476,7 +572,7 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 		main GUI (also see http://www.flounder.com/iocompletion.htm). */
 		case WM_APP_SEARCHITEMFOUND:
 			{
-				m_SearchItems.push_back((LPITEMIDLIST)wParam);
+				m_SearchItems.push_back(reinterpret_cast<LPITEMIDLIST>(wParam));
 
 				if(m_bSetSearchTimer)
 				{
@@ -494,9 +590,12 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 				if(!m_bStopSearching)
 				{
+					int iFoldersFound = LOWORD(lParam);
+					int iFilesFound = HIWORD(lParam);
+
 					StringCchPrintf(szStatus,SIZEOF_ARRAY(szStatus),
-						_T("Finished. %d folder(s) and %d file(s) found."),m_iFoldersFound,
-						m_iFilesFound);
+						_T("Finished. %d folder(s) and %d file(s) found."),
+						iFoldersFound,iFilesFound);
 					SetDlgItemText(m_hDlg,IDC_STATIC_STATUS,szStatus);
 				}
 				else
@@ -534,6 +633,67 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 			}
 			break;
 	}
+}
+
+BOOL CSearchDialog::OnTimer(int iTimerID)
+{
+	if(iTimerID != SEARCH_PROCESSITEMS_TIMER_ID)
+	{
+		return 1;
+	}
+
+	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS);
+	int nListViewItems = ListView_GetItemCount(hListView);
+
+	int nItems = min(static_cast<int>(m_SearchItems.size()),
+		SEARCH_MAX_ITEMS_BATCH_PROCESS);
+	int i = 0;
+
+	auto itr = m_SearchItems.begin();
+
+	while(i < nItems)
+	{
+		TCHAR szFullFileName[MAX_PATH];
+		TCHAR szDirectory[MAX_PATH];
+		TCHAR szFileName[MAX_PATH];
+		LVITEM lvItem;
+		SHFILEINFO shfi;
+		int iIndex;
+
+		LPITEMIDLIST pidl = *itr;
+
+		GetDisplayName(pidl,szDirectory,SHGDN_FORPARSING);
+		PathRemoveFileSpec(szDirectory);
+
+		GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
+		GetDisplayName(pidl,szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
+
+		SHGetFileInfo((LPCWSTR)pidl,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
+
+		m_SearchItemsMapInternal.insert(unordered_map<int,wstring>::value_type(m_iInternalIndex,
+			szFullFileName));
+
+		lvItem.mask		= LVIF_IMAGE|LVIF_TEXT|LVIF_PARAM;
+		lvItem.pszText	= szFileName;
+		lvItem.iItem	= nListViewItems + i;
+		lvItem.iSubItem	= 0;
+		lvItem.iImage	= shfi.iIcon;
+		lvItem.lParam	= m_iInternalIndex++;
+		iIndex = ListView_InsertItem(hListView,&lvItem);
+
+		/* TODO: Needed? */
+		ListView_SetItemText(hListView,iIndex,1,szDirectory);
+
+		CoTaskMemFree(pidl);
+
+		itr = m_SearchItems.erase(itr);
+
+		i++;
+	}
+
+	m_bSetSearchTimer = TRUE;
+
+	return 0;
 }
 
 BOOL CSearchDialog::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
@@ -630,384 +790,182 @@ BOOL CSearchDialog::OnNcDestroy()
 	return 0;
 }
 
-//case WM_TIMER:
-//	{
-//		if((int)wParam == SEARCH_PROCESSITEMS_TIMER_ID)
-//		{
-//			list<LPITEMIDLIST>::iterator itr;
-//			int nItems = min((int)m_SearchItems.size(),SEARCH_MAX_ITEMS_BATCH_PROCESS);
-//			int i = 0;
-//
-//			itr = m_SearchItems.begin();
-//
-//			while(i < nItems)
-//			{
-//				HWND hListView;
-//				LPITEMIDLIST pidl = NULL;
-//				TCHAR szFullFileName[MAX_PATH];
-//				TCHAR szDirectory[MAX_PATH];
-//				TCHAR szFileName[MAX_PATH];
-//				LVITEM lvItem;
-//				SHFILEINFO shfi;
-//				int iIndex;
-//				static int iItem = 0;
-//				int iInternalIndex = 0;
-//
-//				pidl = *itr;
-//
-//				hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
-//
-//				GetDisplayName(pidl,szDirectory,SHGDN_FORPARSING);
-//				PathRemoveFileSpec(szDirectory);
-//
-//				GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
-//				GetDisplayName(pidl,szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
-//
-//				SHGetFileInfo((LPCWSTR)pidl,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
-//
-//				while(g_pMap[iInternalIndex] != 0 && iInternalIndex < g_nSearchItemsAllocated)
-//				{
-//					iInternalIndex++;
-//				}
-//
-//				if(iInternalIndex == g_nSearchItemsAllocated)
-//				{
-//					g_pSearchItems = (SearchItem_t *)realloc(g_pSearchItems,
-//						(g_nSearchItemsAllocated + DEFAULT_SEARCH_ALLOCATION) * sizeof(SearchItem_t));
-//					g_pMap = (int *)realloc(g_pMap,
-//						(g_nSearchItemsAllocated + DEFAULT_SEARCH_ALLOCATION) * sizeof(int));
-//					g_nSearchItemsAllocated += DEFAULT_SEARCH_ALLOCATION;
-//
-//					iInternalIndex++;
-//				}
-//
-//				StringCchCopy(g_pSearchItems[iInternalIndex].szFullFileName,
-//					SIZEOF_ARRAY(g_pSearchItems[iInternalIndex].szFullFileName),
-//					szFullFileName);
-//				g_pMap[iInternalIndex] = 1;
-//
-//				lvItem.mask		= LVIF_IMAGE|LVIF_TEXT|LVIF_PARAM;
-//				lvItem.pszText	= szFileName;
-//				lvItem.iItem	= iItem++;
-//				lvItem.iSubItem	= 0;
-//				lvItem.iImage	= shfi.iIcon;
-//				lvItem.lParam	= iInternalIndex;
-//				iIndex = ListView_InsertItem(hListView,&lvItem);
-//
-//				ListView_SetItemText(hListView,iIndex,1,szDirectory);
-//
-//				CoTaskMemFree(pidl);
-//
-//				itr = m_SearchItems.erase(itr);
-//
-//				i++;
-//			}
-//
-//			m_bSetSearchTimer = TRUE;
-//		}
-//	}
-//	break;
-
-int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData)
-{
-	switch(uMsg)
-	{
-	case BFFM_INITIALIZED:
-		/* TODO: */
-		//SendMessage(hwnd,BFFM_SETSELECTION,TRUE,(LPARAM)m_szSearch);
-		break;
-	}
-
-	return 0;
-}
-
-void SearchDirectory(SearchInfo_t *psi,TCHAR *szDirectory);
-void SearchDirectoryInternal(HWND hDlg,TCHAR *szSearchDirectory,
-TCHAR *szSearchPattern,DWORD dwAttributes,list<DirectoryInfo_t> *pSubfolderList);
-
 DWORD WINAPI SearchThread(LPVOID pParam)
 {
-	/*SearchInfo_t *psi = reinterpret_cast<SearchInfo_t *>(pParam);
+	assert(pParam != NULL);
 
-	SearchDirectory(psi,psi->szDirectory);
+	CSearch *pSearch = reinterpret_cast<CSearch *>(pParam);
 
-	SendMessage(psi->hDlg,WM_APP_SEARCHFINISHED,0,0);
+	pSearch->StartSearch();
 
-	free(psi);*/
+	delete pSearch;
 
 	return 0;
 }
 
-void SearchDirectory(SearchInfo_t *psi,TCHAR *szDirectory)
+CSearch::CSearch(HWND hDlg,TCHAR *szBaseDirectory,
+	TCHAR *szPattern,DWORD dwAttributes,BOOL bSearchSubFolders)
 {
-	/*list<DirectoryInfo_t> SubfolderList;
-	list<DirectoryInfo_t>::iterator itr;
+	m_hDlg = hDlg;
+	m_dwAttributes = dwAttributes;
+	m_bSearchSubFolders = bSearchSubFolders;
 
-	SendMessage(psi->hDlg,WM_APP_SEARCHCHANGEDDIRECTORY,
-		(WPARAM)szDirectory,0);
+	StringCchCopy(m_szBaseDirectory,SIZEOF_ARRAY(m_szBaseDirectory),
+		szBaseDirectory);
+	StringCchCopy(m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern),
+		szPattern);
 
-	SearchDirectoryInternal(psi->hDlg,szDirectory,
-		psi->szName,psi->dwAttributes,&SubfolderList);
+	InitializeCriticalSection(&m_csStop);
+	m_bStopSearching = FALSE;
+}
 
+CSearch::~CSearch()
+{
+	DeleteCriticalSection(&m_csStop);
+}
+
+void CSearch::StartSearch()
+{
+	m_iFoldersFound = 0;
+	m_iFilesFound = 0;
+
+	SearchDirectory(m_szBaseDirectory);
+
+	SendMessage(m_hDlg,WM_APP_SEARCHFINISHED,0,
+		MAKELPARAM(m_iFoldersFound,m_iFilesFound));
+}
+
+void CSearch::SearchDirectory(const TCHAR *szDirectory)
+{
+	SendMessage(m_hDlg,WM_APP_SEARCHCHANGEDDIRECTORY,
+		reinterpret_cast<WPARAM>(szDirectory),0);
+
+	list<wstring> SubFolderList;
+
+	SearchDirectoryInternal(szDirectory,&SubFolderList);
+
+	EnterCriticalSection(&m_csStop);
 	if(m_bStopSearching)
 		return;
+	LeaveCriticalSection(&m_csStop);
 
-	if(psi->bSearchSubFolders)
+	if(m_bSearchSubFolders)
 	{
-		if(!SubfolderList.empty())
+		for each(auto strSubFolder in SubFolderList)
 		{
-			for(itr = SubfolderList.begin();itr != SubfolderList.end();itr++)
-			{
-				SearchDirectory(psi,itr->szFullFileName);
-			}
+			SearchDirectory(strSubFolder.c_str());
 		}
-	}*/
+	}
 }
 
 /* Can't recurse, as it would overflow the stack. */
-void SearchDirectoryInternal(HWND hDlg,TCHAR *szSearchDirectory,
-TCHAR *szSearchPattern,DWORD dwAttributes,list<DirectoryInfo_t> *pSubfolderList)
+void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
+	list<wstring> *pSubFolderList)
 {
-	//WIN32_FIND_DATA wfd;
-	//HANDLE hFindFile;
-	//TCHAR szSearchTerm[MAX_PATH];
-	//DirectoryInfo_t di;
+	assert(szSearchDirectory != NULL);
+	assert(pSubFolderList != NULL);
 
-	//PathCombine(szSearchTerm,szSearchDirectory,_T("*"));
+	WIN32_FIND_DATA wfd;
+	TCHAR szSearchTerm[MAX_PATH];
 
-	//hFindFile = FindFirstFile(szSearchTerm,&wfd);
+	PathCombine(szSearchTerm,szSearchDirectory,_T("*"));
 
-	//if(hFindFile != INVALID_HANDLE_VALUE)
-	//{
-	//	while(FindNextFile(hFindFile,&wfd) != 0)
-	//	{
-	//		if(m_bStopSearching)
-	//			break;
+	HANDLE hFindFile = FindFirstFile(szSearchTerm,&wfd);
 
-	//		if(lstrcmpi(wfd.cFileName,_T(".")) != 0 &&
-	//			lstrcmpi(wfd.cFileName,_T("..")) != 0)
-	//		{
-	//			BOOL bFileNameActive = FALSE;
-	//			BOOL bAttributesActive = FALSE;
-	//			BOOL bMatchFileName = FALSE;
-	//			BOOL bMatchAttributes = FALSE;
-	//			BOOL bItemMatch = FALSE;
+	if(hFindFile != INVALID_HANDLE_VALUE)
+	{
+		while(FindNextFile(hFindFile,&wfd) != 0)
+		{
+			EnterCriticalSection(&m_csStop);
+			if(m_bStopSearching)
+				break;
+			LeaveCriticalSection(&m_csStop);
 
-	//			/* Only match against the filename if it's not empty. */
-	//			if(lstrcmp(szSearchPattern,EMPTY_STRING) != 0)
-	//			{
-	//				bFileNameActive = TRUE;
+			if(lstrcmpi(wfd.cFileName,_T(".")) != 0 &&
+				lstrcmpi(wfd.cFileName,_T("..")) != 0)
+			{
+				BOOL bFileNameActive = FALSE;
+				BOOL bAttributesActive = FALSE;
+				BOOL bMatchFileName = FALSE;
+				BOOL bMatchAttributes = FALSE;
+				BOOL bItemMatch = FALSE;
 
-	//				if(CheckWildcardMatch(szSearchPattern,wfd.cFileName,FALSE))
-	//				{
-	//					bMatchFileName = TRUE;
-	//				}
-	//			}
+				/* Only match against the filename if it's not empty. */
+				if(lstrcmp(m_szSearchPattern,EMPTY_STRING) != 0)
+				{
+					bFileNameActive = TRUE;
 
-	//			if(dwAttributes != 0)
-	//			{
-	//				bAttributesActive = TRUE;
+					if(CheckWildcardMatch(m_szSearchPattern,wfd.cFileName,FALSE))
+					{
+						bMatchFileName = TRUE;
+					}
+				}
 
-	//				if(wfd.dwFileAttributes & dwAttributes)
-	//				{
-	//					bMatchAttributes = TRUE;
-	//				}
-	//			}
+				if(m_dwAttributes != 0)
+				{
+					bAttributesActive = TRUE;
 
-	//			if(bFileNameActive && bAttributesActive)
-	//				bItemMatch = bMatchFileName && bMatchAttributes;
-	//			else if(bFileNameActive)
-	//				bItemMatch = bMatchFileName;
-	//			else if(bAttributesActive)
-	//				bItemMatch = bMatchAttributes;
+					if(wfd.dwFileAttributes & m_dwAttributes)
+					{
+						bMatchAttributes = TRUE;
+					}
+				}
 
-	//			if(bItemMatch)
-	//			{
-	//				if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-	//					FILE_ATTRIBUTE_DIRECTORY)
-	//					m_iFoldersFound++;
-	//				else
-	//					m_iFilesFound++;
+				if(bFileNameActive && bAttributesActive)
+					bItemMatch = bMatchFileName && bMatchAttributes;
+				else if(bFileNameActive)
+					bItemMatch = bMatchFileName;
+				else if(bAttributesActive)
+					bItemMatch = bMatchAttributes;
 
-	//				LPITEMIDLIST pidl = NULL;
-	//				TCHAR szFullFileName[MAX_PATH];
+				if(bItemMatch)
+				{
+					if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+						FILE_ATTRIBUTE_DIRECTORY)
+						m_iFoldersFound++;
+					else
+						m_iFilesFound++;
 
-	//				PathCombine(szFullFileName,szSearchDirectory,wfd.cFileName);
-	//				GetIdlFromParsingName(szFullFileName,&pidl);
+					LPITEMIDLIST pidl = NULL;
+					TCHAR szFullFileName[MAX_PATH];
 
-	//				PostMessage(hDlg,WM_APP_SEARCHITEMFOUND,(WPARAM)ILClone(pidl),0);
+					PathCombine(szFullFileName,szSearchDirectory,wfd.cFileName);
+					GetIdlFromParsingName(szFullFileName,&pidl);
 
-	//				CoTaskMemFree(pidl);
-	//			}
+					PostMessage(m_hDlg,WM_APP_SEARCHITEMFOUND,reinterpret_cast<WPARAM>(ILClone(pidl)),0);
 
-	//			/* If this item is a folder, follow it. */
-	//			if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-	//				FILE_ATTRIBUTE_DIRECTORY)
-	//			{
-	//				PathCombine(di.szFullFileName,szSearchDirectory,
-	//					wfd.cFileName);
-	//				pSubfolderList->push_back(di);
-	//			}
-	//		}
-	//	}
+					CoTaskMemFree(pidl);
+				}
 
-	//	FindClose(hFindFile);
-	//}
+				if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+					FILE_ATTRIBUTE_DIRECTORY)
+				{
+					TCHAR szSubFolder[MAX_PATH];
+
+					PathCombine(szSubFolder,szSearchDirectory,
+						wfd.cFileName);
+
+					pSubFolderList->push_back(szSubFolder);
+				}
+			}
+		}
+
+		FindClose(hFindFile);
+	}
 }
 
-void CSearchDialog::OnSearch(HWND hDlg)
+void CSearch::SetStopSearching()
 {
-	//SearchInfo_t *psi = NULL;
-	//SearchDirectoryInfo_t sdi;
-	//SearchPatternInfo_t spi;
-	//TCHAR szPattern[MAX_PATH];
-
-	//m_SearchItems.clear();
-
-	//if(!m_bSearching)
-	//{
-	//	psi = (SearchInfo_t *)malloc(sizeof(SearchInfo_t));
-
-	//	if(psi != NULL)
-	//	{
-	//		ListView_DeleteAllItems(GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS));
-
-	//		m_iFoldersFound = 0;
-	//		m_iFilesFound = 0;
-
-	//		/* Get the directory and name, and remove leading and
-	//		trailing whitespace. */
-	//		GetDlgItemText(hDlg,IDC_COMBO_DIRECTORY,psi->szDirectory,
-	//			SIZEOF_ARRAY(psi->szDirectory));
-	//		PathRemoveBlanks(psi->szDirectory);
-	//		GetDlgItemText(hDlg,IDC_COMBO_NAME,psi->szName,
-	//			SIZEOF_ARRAY(psi->szName));
-	//		PathRemoveBlanks(psi->szName);
-
-	//		//psi->pContainer = this;
-	//		psi->hDlg = hDlg;
-	//		psi->hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
-	//		psi->bSearchSubFolders = IsDlgButtonChecked(hDlg,IDC_CHECK_SEARCHSUBFOLDERS) ==
-	//			BST_CHECKED;
-
-	//		psi->dwAttributes = 0;
-
-	//		if(IsDlgButtonChecked(hDlg,IDC_CHECK_ARCHIVE) == BST_CHECKED)
-	//			psi->dwAttributes |= FILE_ATTRIBUTE_ARCHIVE;
-
-	//		if(IsDlgButtonChecked(hDlg,IDC_CHECK_HIDDEN) == BST_CHECKED)
-	//			psi->dwAttributes |= FILE_ATTRIBUTE_HIDDEN;
-
-	//		if(IsDlgButtonChecked(hDlg,IDC_CHECK_READONLY) == BST_CHECKED)
-	//			psi->dwAttributes |= FILE_ATTRIBUTE_READONLY;
-
-	//		if(IsDlgButtonChecked(hDlg,IDC_CHECK_SYSTEM) == BST_CHECKED)
-	//			psi->dwAttributes |= FILE_ATTRIBUTE_SYSTEM;
-
-	//		/* Save the search directory and search pattern (only if they are not
-	//		the same as the most recent entry). */
-	//		BOOL bSaveEntry;
-
-	//		if(m_SearchDirectories.empty())
-	//			bSaveEntry = TRUE;
-	//		else if(lstrcmp(psi->szDirectory,m_SearchDirectories.begin()->szDirectory) != 0)
-	//			bSaveEntry = TRUE;
-	//		else
-	//			bSaveEntry = FALSE;
-
-	//		if(bSaveEntry)
-	//		{
-	//			StringCchCopy(sdi.szDirectory,SIZEOF_ARRAY(sdi.szDirectory),psi->szDirectory);
-	//			m_SearchDirectories.push_front(sdi);
-
-	//			/* Insert the entry into the combobox. */
-	//			HWND hComboBoxEx;
-	//			HWND hComboBox;
-	//			COMBOBOXEXITEM cbi;
-
-	//			hComboBoxEx = GetDlgItem(hDlg,IDC_COMBO_DIRECTORY);
-	//			hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
-
-	//			cbi.mask	= CBEIF_TEXT;
-	//			cbi.iItem	= 0;
-	//			cbi.pszText	= psi->szDirectory;
-	//			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
-
-	//			ComboBox_SetCurSel(hComboBox,0);
-	//		}
-
-	//		if(m_SearchPatterns.empty())
-	//			bSaveEntry = TRUE;
-	//		else if(lstrcmp(psi->szName,m_SearchPatterns.begin()->szPattern) != 0)
-	//			bSaveEntry = TRUE;
-	//		else
-	//			bSaveEntry = FALSE;
-
-	//		if(bSaveEntry)
-	//		{
-	//			StringCchCopy(spi.szPattern,SIZEOF_ARRAY(spi.szPattern),psi->szName);
-	//			m_SearchPatterns.push_front(spi);
-
-	//			/* Insert the entry into the combobox. */
-	//			HWND hComboBoxEx;
-	//			HWND hComboBox;
-	//			COMBOBOXEXITEM cbi;
-
-	//			hComboBoxEx = GetDlgItem(hDlg,IDC_COMBO_NAME);
-	//			hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
-
-	//			cbi.mask	= CBEIF_TEXT;
-	//			cbi.iItem	= 0;
-	//			cbi.pszText	= psi->szName;
-	//			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
-
-	//			ComboBox_SetCurSel(hComboBox,0);
-	//		}
-
-	//		/* Turn search patterns of the form '???' into '*???*', and
-	//		use this modified string to search. */
-	//		if(lstrlen(psi->szName) > 0)
-	//		{
-	//			StringCchCopy(szPattern,SIZEOF_ARRAY(szPattern),psi->szName);
-	//			memset(psi->szName,0,SIZEOF_ARRAY(psi->szName));
-
-	//			if(szPattern[0] != '*')
-	//			{
-	//				StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
-	//			}
-
-	//			StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),szPattern);
-
-	//			if(szPattern[lstrlen(szPattern) - 1] != '*')
-	//			{
-	//				StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
-	//			}
-	//		}
-
-	//		GetDlgItemText(hDlg,IDSEARCH,m_szSearchButton,SIZEOF_ARRAY(m_szSearchButton));
-
-	//		TCHAR szTemp[64];
-
-	//		LoadString(g_hLanguageModule,IDS_STOP,
-	//			szTemp,SIZEOF_ARRAY(szTemp));
-	//		SetDlgItemText(hDlg,IDSEARCH,szTemp);
-
-	//		m_bSearching = TRUE;
-
-	//		/* Create a background thread, and search using it... */
-	//		CreateThread(NULL,0,SearchThread,(LPVOID)psi,0,NULL);
-	//	}
-	//}
-	//else
-	//{
-	//	m_bStopSearching = TRUE;
-	//}
+	EnterCriticalSection(&m_csStop);
+	m_bStopSearching = TRUE;
+	LeaveCriticalSection(&m_csStop);
 }
 
 /* TODO: Singleton class to save dialog details? */
 void CSearchDialog::SearchSaveState(HWND hDlg)
 {
-	HWND hListView;
+	/* TODO: */
+	/*HWND hListView;
 	RECT rcTemp;
 
 	GetWindowRect(hDlg,&rcTemp);
@@ -1027,5 +985,65 @@ void CSearchDialog::SearchSaveState(HWND hDlg)
 	m_bSearchSubFolders = IsDlgButtonChecked(hDlg,
 		IDC_CHECK_SEARCHSUBFOLDERS) == BST_CHECKED;
 
-	m_bSearchDlgStateSaved = TRUE;
+	m_bSearchDlgStateSaved = TRUE;*/
 }
+
+/* Singleton class that holds settings
+by the search dialog. */
+class CSearchDialogSettings
+{
+public:
+
+	~CSearchDialogSettings();
+
+	static CSearchDialogSettings &GetInstance();
+
+private:
+
+	CSearchDialogSettings();
+
+	CSearchDialogSettings(const CSearchDialogSettings &);
+	CSearchDialogSettings & operator=(const CSearchDialogSettings &);
+
+	//BOOL					m_bSearchDlgStateSaved;
+
+	BOOL					m_bSearchSubFolders;
+	POINT					m_ptSearch;
+	int						m_iSearchWidth;
+	int						m_iSearchHeight;
+	int						m_iColumnWidth1;
+	int						m_iColumnWidth2;
+	TCHAR					m_SearchPatternText[MAX_PATH];
+	list<SearchDirectoryInfo_t>	m_SearchDirectories;
+	list<SearchPatternInfo_t>	m_SearchPatterns;
+};
+
+CSearchDialogSettings::CSearchDialogSettings()
+{
+	/* Initialize the settings. Either read them
+	from somewhere, or initialize them to default
+	values. */
+}
+
+CSearchDialogSettings::~CSearchDialogSettings()
+{
+	/* Save settings using the specified adaptor. */
+}
+
+CSearchDialogSettings& CSearchDialogSettings::GetInstance()
+{
+	static CSearchDialogSettings sds;
+	return sds;
+}
+
+/* Provides an interface to save to various
+destinations (e.g. xml file, the registry). */
+interface ISaveProvidor
+{
+	/* Registry/XML file. */
+	void SetType();
+
+	/* Overloaded - e.g. one method for int,
+	one method for strings, etc. */
+	void SaveValue();
+};

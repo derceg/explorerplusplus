@@ -1508,6 +1508,7 @@ BEGIN
     IDS_SEARCHING           "Searching %s..."
     IDS_GENERAL_NEWAPPLICATIONBUTTON "New Application Button"
     IDS_TASKS_NEWTAB        "New Tab"
+    IDS_SEARCHDIALOG_TITLE  "Select a folder to search, then press OK"
 END
 
 STRINGTABLE

@@ -51,6 +51,10 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 			return OnInitDialog();
 			break;
 
+		case WM_TIMER:
+			return OnTimer(static_cast<int>(wParam));
+			break;
+
 		case WM_COMMAND:
 			return OnCommand(wParam,lParam);
 			break;
@@ -96,6 +100,11 @@ CBaseDialog::~CBaseDialog()
 
 }
 
+HINSTANCE CBaseDialog::GetInstance()
+{
+	return m_hInstance;
+}
+
 void CBaseDialog::ShowModalDialog()
 {
 	DialogBoxParam(m_hInstance,MAKEINTRESOURCE(m_iResource),
@@ -112,6 +121,11 @@ HWND CBaseDialog::ShowModelessDialog()
 BOOL CBaseDialog::OnInitDialog()
 {
 	return TRUE;
+}
+
+BOOL CBaseDialog::OnTimer(int iTimerID)
+{
+	return 0;
 }
 
 BOOL CBaseDialog::OnCommand(WPARAM wParam,LPARAM lParam)
