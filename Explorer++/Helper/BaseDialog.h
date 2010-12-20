@@ -1,6 +1,13 @@
 #ifndef BASEDIALOG_INCLUDED
 #define BASEDIALOG_INCLUDED
 
+__interface IModelessDialogNotification
+{
+public:
+
+	virtual void	OnModelessDialogDestroy();
+};
+
 /* Provides a degree of abstraction off a standard dialog.
 For instance, provides the ability for a class to manage
 a dialog without having to handle the dialog procedure
@@ -14,7 +21,7 @@ public:
 
 	INT_PTR CALLBACK	BaseDialogProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	void	ShowModalDialog();
+	INT_PTR	ShowModalDialog();
 	HWND	ShowModelessDialog();
 
 protected:
@@ -44,6 +51,8 @@ private:
 	HINSTANCE	m_hInstance;
 	int			m_iResource;
 	HWND		m_hParent;
+
+	BOOL		m_bShowingModelessDialog;
 };
 
 #endif

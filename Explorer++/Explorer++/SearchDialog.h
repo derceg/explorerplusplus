@@ -78,7 +78,7 @@ class CSearch
 {
 public:
 	
-	CSearch(HWND hDlg,TCHAR *szBaseDirectory,TCHAR *szPattern,DWORD dwAttributes,BOOL bSearchSubFolders);
+	CSearch(HWND hDlg,TCHAR *szBaseDirectory,TCHAR *szPattern,DWORD dwAttributes,BOOL bUseRegularExpressions,BOOL bCaseInsensitive,BOOL bSearchSubFolders);
 	~CSearch();
 
 	void				StartSearch();
@@ -94,6 +94,8 @@ private:
 	TCHAR				m_szBaseDirectory[MAX_PATH];
 	TCHAR				m_szSearchPattern[MAX_PATH + 2];
 	DWORD				m_dwAttributes;
+	BOOL				m_bUseRegularExpressions;
+	BOOL				m_bCaseInsensitive;
 	BOOL				m_bSearchSubFolders;
 
 	CRITICAL_SECTION	m_csStop;

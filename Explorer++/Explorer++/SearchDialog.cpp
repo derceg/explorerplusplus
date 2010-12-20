@@ -12,6 +12,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <regex>
 #include "Explorer++.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
@@ -335,6 +336,12 @@ void CSearchDialog::OnSearch()
 		BOOL bSearchSubFolders = IsDlgButtonChecked(m_hDlg,IDC_CHECK_SEARCHSUBFOLDERS) ==
 			BST_CHECKED;
 
+		BOOL bUseRegularExpressions = IsDlgButtonChecked(m_hDlg,IDC_CHECK_USEREGULAREXPRESSIONS) ==
+			BST_CHECKED;
+
+		BOOL bCaseInsensitive = IsDlgButtonChecked(m_hDlg,IDC_CHECK_CASEINSENSITIVE) ==
+			BST_CHECKED;
+
 		DWORD dwAttributes = 0;
 
 		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_ARCHIVE) == BST_CHECKED)
@@ -349,7 +356,8 @@ void CSearchDialog::OnSearch()
 		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_SYSTEM) == BST_CHECKED)
 			dwAttributes |= FILE_ATTRIBUTE_SYSTEM;
 
-		CSearch *pSearch = new CSearch(m_hDlg,szBaseDirectory,szSearchPattern,dwAttributes,bSearchSubFolders);
+		CSearch *pSearch = new CSearch(m_hDlg,szBaseDirectory,szSearchPattern,
+			dwAttributes,bUseRegularExpressions,bCaseInsensitive,bSearchSubFolders);
 
 		//TCHAR szPattern[MAX_PATH];
 
@@ -804,10 +812,13 @@ DWORD WINAPI SearchThread(LPVOID pParam)
 }
 
 CSearch::CSearch(HWND hDlg,TCHAR *szBaseDirectory,
-	TCHAR *szPattern,DWORD dwAttributes,BOOL bSearchSubFolders)
+	TCHAR *szPattern,DWORD dwAttributes,BOOL bUseRegularExpressions,
+	BOOL bCaseInsensitive,BOOL bSearchSubFolders)
 {
 	m_hDlg = hDlg;
 	m_dwAttributes = dwAttributes;
+	m_bUseRegularExpressions = bUseRegularExpressions;
+	m_bCaseInsensitive = bCaseInsensitive;
 	m_bSearchSubFolders = bSearchSubFolders;
 
 	StringCchCopy(m_szBaseDirectory,SIZEOF_ARRAY(m_szBaseDirectory),
@@ -895,9 +906,39 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 				{
 					bFileNameActive = TRUE;
 
-					if(CheckWildcardMatch(m_szSearchPattern,wfd.cFileName,FALSE))
+					if(m_bUseRegularExpressions)
 					{
-						bMatchFileName = TRUE;
+						wregex rx;
+
+						try
+						{
+							if(m_bCaseInsensitive)
+							{
+								rx.assign(m_szSearchPattern,regex_constants::icase);
+							}
+							else
+							{
+								rx.assign(m_szSearchPattern);
+							}
+						}
+						catch(std::exception)
+						{
+							/* TODO: Show user error message. The regex needs
+							to be initialized only ONCE per search. Also, need
+							to show message box from main thread. */
+						}
+
+						if(regex_match(wfd.cFileName,rx))
+						{
+							bMatchFileName = TRUE;
+						}
+					}
+					else
+					{
+						if(CheckWildcardMatch(m_szSearchPattern,wfd.cFileName,!m_bCaseInsensitive))
+						{
+							bMatchFileName = TRUE;
+						}
 					}
 				}
 

@@ -77,7 +77,16 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 			break;
 
 		case WM_DESTROY:
-			return OnDestroy();
+			{
+				/* If this is a modeless dialog, notify the
+				caller that the dialog is been destroyed. */
+				if(m_bShowingModelessDialog)
+				{
+					/* TODO: */
+				}
+
+				return OnDestroy();
+			}
 			break;
 
 		case WM_NCDESTROY:
@@ -93,6 +102,8 @@ CBaseDialog::CBaseDialog(HINSTANCE hInstance,int iResource,HWND hParent)
 	m_hInstance = hInstance;
 	m_iResource = iResource;
 	m_hParent = hParent;
+
+	m_bShowingModelessDialog = FALSE;
 }
 
 CBaseDialog::~CBaseDialog()
@@ -105,17 +116,37 @@ HINSTANCE CBaseDialog::GetInstance()
 	return m_hInstance;
 }
 
-void CBaseDialog::ShowModalDialog()
+INT_PTR CBaseDialog::ShowModalDialog()
 {
-	DialogBoxParam(m_hInstance,MAKEINTRESOURCE(m_iResource),
+	/* Explicitly disallow the creation of another
+	dialog from this object while a modeless dialog
+	is been shown. */
+	if(m_bShowingModelessDialog)
+	{
+		return -1;
+	}
+
+	return DialogBoxParam(m_hInstance,MAKEINTRESOURCE(m_iResource),
 		m_hParent,BaseDialogProcStub,(LPARAM)this);
 }
 
 HWND CBaseDialog::ShowModelessDialog()
 {
-	return CreateDialogParam(m_hInstance,
+	if(m_bShowingModelessDialog)
+	{
+		return NULL;
+	}
+
+	HWND hDlg = CreateDialogParam(m_hInstance,
 		MAKEINTRESOURCE(m_iResource),m_hParent,
 		BaseDialogProcStub,(LPARAM)this);
+
+	if(hDlg != NULL)
+	{
+		m_bShowingModelessDialog = TRUE;
+	}
+
+	return hDlg;
 }
 
 BOOL CBaseDialog::OnInitDialog()
