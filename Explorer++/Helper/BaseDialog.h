@@ -5,7 +5,7 @@ __interface IModelessDialogNotification
 {
 public:
 
-	virtual void	OnModelessDialogDestroy();
+	virtual void	OnModelessDialogDestroy(int iResource);
 };
 
 /* Provides a degree of abstraction off a standard dialog.
@@ -22,7 +22,7 @@ public:
 	INT_PTR CALLBACK	BaseDialogProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	INT_PTR	ShowModalDialog();
-	HWND	ShowModelessDialog();
+	HWND	ShowModelessDialog(IModelessDialogNotification *pmdn = NULL);
 
 protected:
 
@@ -51,6 +51,7 @@ private:
 	HINSTANCE	m_hInstance;
 	int			m_iResource;
 	HWND		m_hParent;
+	IModelessDialogNotification	*m_pmdn;
 
 	BOOL		m_bShowingModelessDialog;
 };

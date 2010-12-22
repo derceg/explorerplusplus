@@ -4,11 +4,6 @@
 #include "../Helper/BaseDialog.h"
 #include <unordered_map>
 
-/* TODO: */
-#define WM_APP_SEARCHITEMFOUND	 (WM_APP + 1)
-#define WM_APP_SEARCHFINISHED	(WM_APP + 2)
-#define WM_APP_SEARCHCHANGEDDIRECTORY	(WM_APP + 3)
-
 class CSearchDialog : public CBaseDialog
 {
 public:
@@ -31,9 +26,9 @@ protected:
 
 private:
 
-	/*static const int WM_APP_SEARCHITEMFOUND = WM_APP + 1;
-	static const int WM_APP_SEARCHFINISHED = WM_APP + 2;
-	static const int WM_APP_SEARCHCHANGEDDIRECTORY = WM_APP + 3;*/
+	static const int SEARCH_PROCESSITEMS_TIMER_ID = 0;
+	static const int SEARCH_PROCESSITEMS_TIMER_ELAPSED = 50;
+	static const int SEARCH_MAX_ITEMS_BATCH_PROCESS = 100;
 
 	void	OnSearch();
 	void	SearchSaveState(HWND hDlg);
@@ -72,6 +67,17 @@ private:
 	int							m_iSearchExitDelta;
 	int							m_iStaticStatusWidthDelta;
 	int							m_iStatusVerticalDelta;
+
+	list<wstring>				m_SearchDirectories;
+	list<wstring>				m_SearchPatterns;
+
+	BOOL						m_bSearchSubFolders;
+	POINT						m_ptSearch;
+	int							m_iSearchWidth;
+	int							m_iSearchHeight;
+	int							m_iColumnWidth1;
+	int							m_iColumnWidth2;
+	TCHAR						m_SearchPatternText[MAX_PATH];
 };
 
 class CSearch

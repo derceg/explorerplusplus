@@ -24,9 +24,12 @@
 using namespace std;
 
 
-#define SEARCH_PROCESSITEMS_TIMER_ID		0
-#define SEARCH_PROCESSITEMS_TIMER_ELAPSED	50
-#define SEARCH_MAX_ITEMS_BATCH_PROCESS		100
+namespace SearchDialogMessages
+{
+	const int WM_APP_SEARCHITEMFOUND = WM_APP + 1;
+	const int WM_APP_SEARCHFINISHED = WM_APP + 2;
+	const int WM_APP_SEARCHCHANGEDDIRECTORY = WM_APP + 3;
+}
 
 DWORD WINAPI SearchThread(LPVOID pParam);
 
@@ -42,8 +45,12 @@ CBaseDialog(hInstance,iResource,hParent)
 	m_bSetSearchTimer = TRUE;
 	m_iInternalIndex = 0;
 
+	m_bSearchSubFolders = TRUE;
+
 	StringCchCopy(m_szSearchDirectory,SIZEOF_ARRAY(m_szSearchDirectory),
 		szSearchDirectory);
+	StringCchCopy(m_SearchPatternText,SIZEOF_ARRAY(m_SearchPatternText),
+		EMPTY_STRING);
 }
 
 CSearchDialog::~CSearchDialog()
@@ -55,8 +62,6 @@ CSearchDialog::~CSearchDialog()
 BOOL CSearchDialog::OnInitDialog()
 {
 	HWND hListView;
-	list<SearchDirectoryInfo_t>::iterator itr;
-	list<SearchPatternInfo_t>::iterator itr2;
 	LVCOLUMN lvColumn;
 	HIMAGELIST himlSmall;
 	HIMAGELIST himl;
@@ -153,52 +158,46 @@ BOOL CSearchDialog::OnInitDialog()
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc2,sizeof(RECT) / sizeof(POINT));
 	m_iSearchExitDelta = rc2.left - rc.left;
 
-	/* TODO: Retrieve from singleton settings class. */
-	/*HWND hComboBoxEx;
-	HWND hComboBox;
-	
 	if(m_bSearchSubFolders)
 		CheckDlgButton(m_hDlg,IDC_CHECK_SEARCHSUBFOLDERS,BST_CHECKED);
 
-	if(!m_SearchDirectories.empty())
+	COMBOBOXEXITEM cbi;
+	int iItem = 0;
+
+	HWND hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
+	HWND hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
+
+	for each(auto strDirectory in m_SearchDirectories)
 	{
-		COMBOBOXEXITEM cbi;
-		int iItem = 0;
+		TCHAR szDirectory[MAX_PATH];
 
-		hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
-		hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
+		StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),strDirectory.c_str());
 
-		for(itr = m_SearchDirectories.begin();itr != m_SearchDirectories.end();itr++)
-		{
-			cbi.mask	= CBEIF_TEXT;
-			cbi.iItem	= iItem++;
-			cbi.pszText	= itr->szDirectory;
-			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
-		}
-
-		ComboBox_SetCurSel(hComboBox,0);
+		cbi.mask	= CBEIF_TEXT;
+		cbi.iItem	= iItem++;
+		cbi.pszText	= szDirectory;
+		SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
 	}
 
-	if(!m_SearchPatterns.empty())
+	ComboBox_SetCurSel(hComboBox,0);
+
+	iItem = 0;
+
+	for each(auto strPattern in m_SearchPatterns)
 	{
-		COMBOBOXEXITEM cbi;
-		int iItem = 0;
+		TCHAR szPattern[MAX_PATH];
 
-		hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_NAME);
-		hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
+		StringCchCopy(szPattern,SIZEOF_ARRAY(szPattern),strPattern.c_str());
 
-		for(itr2 = m_SearchPatterns.begin();itr2 != m_SearchPatterns.end();itr2++)
-		{
-			cbi.mask	= CBEIF_TEXT;
-			cbi.iItem	= iItem++;
-			cbi.pszText	= itr2->szPattern;
-			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
-		}
-
-		ComboBox_SetCurSel(hComboBox,0);
+		cbi.mask	= CBEIF_TEXT;
+		cbi.iItem	= iItem++;
+		cbi.pszText	= szPattern;
+		SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
 	}
 
-	SetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_SearchPatternText);*/
+	ComboBox_SetCurSel(hComboBox,0);
+
+	SetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_SearchPatternText);
 
 	m_hGripper = CreateWindow(_T("SCROLLBAR"),EMPTY_STRING,WS_CHILD|WS_VISIBLE|
 		WS_CLIPSIBLINGS|SBS_BOTTOMALIGN|SBS_SIZEGRIP,0,0,0,0,m_hDlg,NULL,
@@ -208,9 +207,6 @@ BOOL CSearchDialog::OnInitDialog()
 	GetWindowRect(m_hGripper,&rc);
 	SetWindowPos(m_hGripper,NULL,GetRectWidth(&rcMain) - GetRectWidth(&rc),
 		GetRectHeight(&rcMain) - GetRectHeight(&rc),0,0,SWP_NOSIZE|SWP_NOZORDER);
-
-
-
 
 	/* TODO: */
 	//if(m_bSearchDlgStateSaved)
@@ -356,75 +352,68 @@ void CSearchDialog::OnSearch()
 		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_SYSTEM) == BST_CHECKED)
 			dwAttributes |= FILE_ATTRIBUTE_SYSTEM;
 
+		/* TODO: Save in class variable. */
 		CSearch *pSearch = new CSearch(m_hDlg,szBaseDirectory,szSearchPattern,
 			dwAttributes,bUseRegularExpressions,bCaseInsensitive,bSearchSubFolders);
 
-		//TCHAR szPattern[MAX_PATH];
-
 		/* Save the search directory and search pattern (only if they are not
 		the same as the most recent entry). */
-		//BOOL bSaveEntry;
+		BOOL bSaveEntry = FALSE;
 
-		//if(m_SearchDirectories.empty())
-		//	bSaveEntry = TRUE;
-		//else if(lstrcmp(psi->szDirectory,m_SearchDirectories.begin()->szDirectory) != 0)
-		//	bSaveEntry = TRUE;
-		//else
-		//	bSaveEntry = FALSE;
+		if(m_SearchDirectories.empty() ||
+			lstrcmp(szBaseDirectory,
+			m_SearchDirectories.begin()->c_str()) != 0)
+		{
+			bSaveEntry = TRUE;
+		}
 
-		//if(bSaveEntry)
-		//{
-		//	StringCchCopy(sdi.szDirectory,SIZEOF_ARRAY(sdi.szDirectory),psi->szDirectory);
-		//	m_SearchDirectories.push_front(sdi);
+		if(bSaveEntry)
+		{
+			m_SearchDirectories.push_front(szBaseDirectory);
 
-		//	/* Insert the entry into the combobox. */
-		//	HWND hComboBoxEx;
-		//	HWND hComboBox;
-		//	COMBOBOXEXITEM cbi;
+			HWND hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
+			HWND hComboBox = reinterpret_cast<HWND>(SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0));
 
-		//	hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
-		//	hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
+			COMBOBOXEXITEM cbi;
+			cbi.mask	= CBEIF_TEXT;
+			cbi.iItem	= 0;
+			cbi.pszText	= szBaseDirectory;
+			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,reinterpret_cast<LPARAM>(&cbi));
 
-		//	cbi.mask	= CBEIF_TEXT;
-		//	cbi.iItem	= 0;
-		//	cbi.pszText	= psi->szDirectory;
-		//	SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
+			ComboBox_SetCurSel(hComboBox,0);
+		}
 
-		//	ComboBox_SetCurSel(hComboBox,0);
-		//}
+		bSaveEntry = FALSE;
 
-		//if(m_SearchPatterns.empty())
-		//	bSaveEntry = TRUE;
-		//else if(lstrcmp(psi->szName,m_SearchPatterns.begin()->szPattern) != 0)
-		//	bSaveEntry = TRUE;
-		//else
-		//	bSaveEntry = FALSE;
+		if(m_SearchPatterns.empty() ||
+			lstrcmp(szSearchPattern,m_SearchPatterns.begin()->c_str()) != 0)
+		{
+			bSaveEntry = TRUE;
+		}
 
-		//if(bSaveEntry)
-		//{
-		//	StringCchCopy(spi.szPattern,SIZEOF_ARRAY(spi.szPattern),psi->szName);
-		//	m_SearchPatterns.push_front(spi);
+		if(bSaveEntry)
+		{
+			m_SearchPatterns.push_front(szSearchPattern);
 
-		//	/* Insert the entry into the combobox. */
-		//	HWND hComboBoxEx;
-		//	HWND hComboBox;
-		//	COMBOBOXEXITEM cbi;
+			HWND hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_NAME);
+			HWND hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
 
-		//	hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_NAME);
-		//	hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
+			COMBOBOXEXITEM cbi;
+			cbi.mask	= CBEIF_TEXT;
+			cbi.iItem	= 0;
+			cbi.pszText	= szSearchPattern;
+			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
 
-		//	cbi.mask	= CBEIF_TEXT;
-		//	cbi.iItem	= 0;
-		//	cbi.pszText	= psi->szName;
-		//	SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
+			ComboBox_SetCurSel(hComboBox,0);
+		}
 
-		//	ComboBox_SetCurSel(hComboBox,0);
-		//}
-
+		/* TODO: */
 		/* Turn search patterns of the form '???' into '*???*', and
 		use this modified string to search. */
 		/*if(lstrlen(psi->szName) > 0)
 		{
+			TCHAR szPattern[MAX_PATH];
+
 			StringCchCopy(szPattern,SIZEOF_ARRAY(szPattern),psi->szName);
 			memset(psi->szName,0,SIZEOF_ARRAY(psi->szName));
 
@@ -458,7 +447,7 @@ void CSearchDialog::OnSearch()
 	{
 		m_bStopSearching = TRUE;
 
-		/* TODO: Notify CSearch. */
+		/* TODO: Notify CSearch. CSearch needs to be reference counted. */
 	}
 }
 
@@ -578,7 +567,7 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 		add it onto the list of current items, which will be processed
 		in batch. This is done to stop this message from blocking the
 		main GUI (also see http://www.flounder.com/iocompletion.htm). */
-		case WM_APP_SEARCHITEMFOUND:
+		case SearchDialogMessages::WM_APP_SEARCHITEMFOUND:
 			{
 				m_SearchItems.push_back(reinterpret_cast<LPITEMIDLIST>(wParam));
 
@@ -592,7 +581,7 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 			}
 			break;
 
-		case WM_APP_SEARCHFINISHED:
+		case SearchDialogMessages::WM_APP_SEARCHFINISHED:
 			{
 				TCHAR szStatus[512];
 
@@ -624,7 +613,7 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 			}
 			break;
 
-		case WM_APP_SEARCHCHANGEDDIRECTORY:
+		case SearchDialogMessages::WM_APP_SEARCHCHANGEDDIRECTORY:
 			{
 				TCHAR szStatus[512];
 				TCHAR *pszDirectory = NULL;
@@ -689,7 +678,6 @@ BOOL CSearchDialog::OnTimer(int iTimerID)
 		lvItem.lParam	= m_iInternalIndex++;
 		iIndex = ListView_InsertItem(hListView,&lvItem);
 
-		/* TODO: Needed? */
 		ListView_SetItemText(hListView,iIndex,1,szDirectory);
 
 		CoTaskMemFree(pidl);
@@ -790,9 +778,6 @@ BOOL CSearchDialog::OnClose()
 
 BOOL CSearchDialog::OnNcDestroy()
 {
-	/* TODO: */
-	//g_hwndSearch = NULL;
-
 	delete this;
 
 	return 0;
@@ -842,13 +827,13 @@ void CSearch::StartSearch()
 
 	SearchDirectory(m_szBaseDirectory);
 
-	SendMessage(m_hDlg,WM_APP_SEARCHFINISHED,0,
+	SendMessage(m_hDlg,SearchDialogMessages::WM_APP_SEARCHFINISHED,0,
 		MAKELPARAM(m_iFoldersFound,m_iFilesFound));
 }
 
 void CSearch::SearchDirectory(const TCHAR *szDirectory)
 {
-	SendMessage(m_hDlg,WM_APP_SEARCHCHANGEDDIRECTORY,
+	SendMessage(m_hDlg,SearchDialogMessages::WM_APP_SEARCHCHANGEDDIRECTORY,
 		reinterpret_cast<WPARAM>(szDirectory),0);
 
 	list<wstring> SubFolderList;
@@ -973,7 +958,8 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 					PathCombine(szFullFileName,szSearchDirectory,wfd.cFileName);
 					GetIdlFromParsingName(szFullFileName,&pidl);
 
-					PostMessage(m_hDlg,WM_APP_SEARCHITEMFOUND,reinterpret_cast<WPARAM>(ILClone(pidl)),0);
+					PostMessage(m_hDlg,SearchDialogMessages::WM_APP_SEARCHITEMFOUND,
+						reinterpret_cast<WPARAM>(ILClone(pidl)),0);
 
 					CoTaskMemFree(pidl);
 				}
@@ -1002,7 +988,10 @@ void CSearch::SetStopSearching()
 	LeaveCriticalSection(&m_csStop);
 }
 
-/* TODO: Singleton class to save dialog details? */
+/* TODO: InitializeSearchDialog method that retrieves
+values from CPersistentProvider. */
+
+/* TODO: */
 void CSearchDialog::SearchSaveState(HWND hDlg)
 {
 	/* TODO: */
@@ -1029,54 +1018,6 @@ void CSearchDialog::SearchSaveState(HWND hDlg)
 	m_bSearchDlgStateSaved = TRUE;*/
 }
 
-/* Singleton class that holds settings
-by the search dialog. */
-class CSearchDialogSettings
-{
-public:
-
-	~CSearchDialogSettings();
-
-	static CSearchDialogSettings &GetInstance();
-
-private:
-
-	CSearchDialogSettings();
-
-	CSearchDialogSettings(const CSearchDialogSettings &);
-	CSearchDialogSettings & operator=(const CSearchDialogSettings &);
-
-	//BOOL					m_bSearchDlgStateSaved;
-
-	BOOL					m_bSearchSubFolders;
-	POINT					m_ptSearch;
-	int						m_iSearchWidth;
-	int						m_iSearchHeight;
-	int						m_iColumnWidth1;
-	int						m_iColumnWidth2;
-	TCHAR					m_SearchPatternText[MAX_PATH];
-	list<SearchDirectoryInfo_t>	m_SearchDirectories;
-	list<SearchPatternInfo_t>	m_SearchPatterns;
-};
-
-CSearchDialogSettings::CSearchDialogSettings()
-{
-	/* Initialize the settings. Either read them
-	from somewhere, or initialize them to default
-	values. */
-}
-
-CSearchDialogSettings::~CSearchDialogSettings()
-{
-	/* Save settings using the specified adaptor. */
-}
-
-CSearchDialogSettings& CSearchDialogSettings::GetInstance()
-{
-	static CSearchDialogSettings sds;
-	return sds;
-}
-
 /* Provides an interface to save to various
 destinations (e.g. xml file, the registry). */
 interface ISaveProvidor
@@ -1088,3 +1029,75 @@ interface ISaveProvidor
 	one method for strings, etc. */
 	void SaveValue();
 };
+
+struct PersistentSetting_t
+{
+	TCHAR	szName[512];
+	int		iType;
+
+	int		Value;
+};
+
+/* Save generic elements to an
+array (mapped to a unique key value). */
+class CPersistentProvider
+{
+public:
+
+	~CPersistentProvider();
+
+	static CPersistentProvider &GetInstance();
+
+	/* Insert the group if it doesn't already exist;
+	else update it. */
+	void	UpdateSettings(TCHAR *szGroup);
+
+	void	RetrieveSettings(TCHAR *szGroup);
+
+	/* Saves all settings. */
+	void	SaveSettings();
+
+	/* Loads all settings. */
+	void	LoadSettings();
+
+private:
+
+	CPersistentProvider();
+
+	CPersistentProvider(const CPersistentProvider &);
+	CPersistentProvider & operator=(const CPersistentProvider &);
+
+	unordered_map<TCHAR *,PersistentSetting_t>	m_Settings;
+};
+
+CPersistentProvider::CPersistentProvider()
+{
+	
+}
+
+CPersistentProvider::~CPersistentProvider()
+{
+	
+}
+
+CPersistentProvider& CPersistentProvider::GetInstance()
+{
+	static CPersistentProvider pp;
+	return pp;
+}
+
+void CPersistentProvider::UpdateSettings(TCHAR *szGroup)
+{
+	PersistentSetting_t ps;
+
+	auto itr = m_Settings.find(szGroup);
+
+	/* TODO: */
+	/*if(itr == m_Settings.end())
+	{
+
+	}*/
+
+	m_Settings.insert(unordered_map<TCHAR *,PersistentSetting_t>::value_type(szGroup,
+			ps));
+}

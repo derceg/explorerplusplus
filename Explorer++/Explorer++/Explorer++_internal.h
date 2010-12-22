@@ -362,16 +362,6 @@ typedef struct
 
 typedef struct
 {
-	TCHAR szDirectory[MAX_PATH];
-} SearchDirectoryInfo_t;
-
-typedef struct
-{
-	TCHAR szPattern[MAX_PATH];
-} SearchPatternInfo_t;
-
-typedef struct
-{
 	int	uId;
 	int	iTabId;
 	BOOL bValid;

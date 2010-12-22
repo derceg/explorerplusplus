@@ -82,7 +82,10 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 				caller that the dialog is been destroyed. */
 				if(m_bShowingModelessDialog)
 				{
-					/* TODO: */
+					if(m_pmdn != NULL)
+					{
+						m_pmdn->OnModelessDialogDestroy(m_iResource);
+					}
 				}
 
 				return OnDestroy();
@@ -97,7 +100,8 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 	return 0;
 }
 
-CBaseDialog::CBaseDialog(HINSTANCE hInstance,int iResource,HWND hParent)
+CBaseDialog::CBaseDialog(HINSTANCE hInstance,int iResource,
+	HWND hParent)
 {
 	m_hInstance = hInstance;
 	m_iResource = iResource;
@@ -130,7 +134,7 @@ INT_PTR CBaseDialog::ShowModalDialog()
 		m_hParent,BaseDialogProcStub,(LPARAM)this);
 }
 
-HWND CBaseDialog::ShowModelessDialog()
+HWND CBaseDialog::ShowModelessDialog(IModelessDialogNotification *pmdn)
 {
 	if(m_bShowingModelessDialog)
 	{
@@ -145,6 +149,8 @@ HWND CBaseDialog::ShowModelessDialog()
 	{
 		m_bShowingModelessDialog = TRUE;
 	}
+
+	m_pmdn = pmdn;
 
 	return hDlg;
 }

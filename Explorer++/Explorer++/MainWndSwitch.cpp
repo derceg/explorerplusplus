@@ -1321,7 +1321,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				CSearchDialog *SearchDialog = new CSearchDialog(g_hLanguageModule,
 					IDD_SEARCH,hwnd,szCurrentDirectory);
 
-				g_hwndSearch = SearchDialog->ShowModelessDialog();
+				g_hwndSearch = SearchDialog->ShowModelessDialog(this);
 			}
 			else
 			{

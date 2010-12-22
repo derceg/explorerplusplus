@@ -2972,3 +2972,13 @@ void Explorerplusplus::PlayNavigationSound(void)
 			SND_RESOURCE|SND_ASYNC);
 	}
 }
+
+void Explorerplusplus::OnModelessDialogDestroy(int iResource)
+{
+	switch(iResource)
+	{
+	case IDD_SEARCH:
+		g_hwndSearch = NULL;
+		break;
+	}
+}

@@ -5,6 +5,7 @@
 #include <commctrl.h>
 #include "../ShellBrowser/iShellView.h"
 #include "../Helper/FileContextMenuManager.h"
+#include "../Helper/BaseDialog.h"
 #include "Explorer++_internal.h"
 #import <msxml3.dll> raw_interfaces_only
 
@@ -196,7 +197,7 @@ TOOLBAR_SEARCH,TOOLBAR_PROPERTIES,TOOLBAR_REFRESH};
 
 class Explorerplusplus : public IDropTarget, public IServiceProvider,
 	public IShellView2, public INewMenuClient, public IDropFilesCallback,
-	public IFileContextMenuExternal
+	public IFileContextMenuExternal, public IModelessDialogNotification
 {
 public:
 
@@ -293,6 +294,8 @@ public:
 	void				OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt);
 
 	void				PasteFilesCallbackInternal(list<PastedFile_t> *pPastedFileList);
+
+	void				OnModelessDialogDestroy(int iResource);
 
 
 private:
