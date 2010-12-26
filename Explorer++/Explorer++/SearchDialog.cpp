@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include <regex>
 #include "Explorer++.h"
+#include "XMLSettings.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/BaseDialog.h"
@@ -31,6 +32,8 @@ namespace SearchDialogMessages
 	const int WM_APP_SEARCHCHANGEDDIRECTORY = WM_APP + 3;
 }
 
+const TCHAR CSearchDialogPersistentSettings::REGISTRY_SETTINGS_KEY[] = _T("Search");
+
 DWORD WINAPI SearchThread(LPVOID pParam);
 
 int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
@@ -45,18 +48,22 @@ CBaseDialog(hInstance,iResource,hParent)
 	m_bSetSearchTimer = TRUE;
 	m_iInternalIndex = 0;
 
-	m_bSearchSubFolders = TRUE;
+	m_pSearch = NULL;
 
 	StringCchCopy(m_szSearchDirectory,SIZEOF_ARRAY(m_szSearchDirectory),
 		szSearchDirectory);
-	StringCchCopy(m_SearchPatternText,SIZEOF_ARRAY(m_SearchPatternText),
-		EMPTY_STRING);
+
+	m_sdps = &CSearchDialogPersistentSettings::GetInstance();
 }
 
 CSearchDialog::~CSearchDialog()
 {
 	DestroyIcon(m_hDialogIcon);
 	DestroyIcon(m_hDirectoryIcon);
+
+	/* TODO: If a search object is
+	active, release it. */
+	//m_pSearch->Release();
 }
 
 BOOL CSearchDialog::OnInitDialog()
@@ -158,16 +165,48 @@ BOOL CSearchDialog::OnInitDialog()
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc2,sizeof(RECT) / sizeof(POINT));
 	m_iSearchExitDelta = rc2.left - rc.left;
 
-	if(m_bSearchSubFolders)
+	if(m_sdps->m_bArchive)
+	{
+		CheckDlgButton(m_hDlg,IDC_CHECK_ARCHIVE,BST_CHECKED);
+	}
+
+	if(m_sdps->m_bHidden)
+	{
+		CheckDlgButton(m_hDlg,IDC_CHECK_HIDDEN,BST_CHECKED);
+	}
+
+	if(m_sdps->m_bReadOnly)
+	{
+		CheckDlgButton(m_hDlg,IDC_CHECK_READONLY,BST_CHECKED);
+	}
+
+	if(m_sdps->m_bSystem)
+	{
+		CheckDlgButton(m_hDlg,IDC_CHECK_SYSTEM,BST_CHECKED);
+	}
+
+	if(m_sdps->m_bSearchSubFolders)
+	{
 		CheckDlgButton(m_hDlg,IDC_CHECK_SEARCHSUBFOLDERS,BST_CHECKED);
+	}
+
+	if(m_sdps->m_bCaseInsensitive)
+	{
+		CheckDlgButton(m_hDlg,IDC_CHECK_CASEINSENSITIVE,BST_CHECKED);
+	}
+
+	if(m_sdps->m_bUseRegularExpressions)
+	{
+		CheckDlgButton(m_hDlg,IDC_CHECK_USEREGULAREXPRESSIONS,BST_CHECKED);
+	}
 
 	COMBOBOXEXITEM cbi;
 	int iItem = 0;
 
 	HWND hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
-	HWND hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
+	HWND hComboBox = reinterpret_cast<HWND>(SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0));
 
-	for each(auto strDirectory in m_SearchDirectories)
+	for each(auto strDirectory in m_sdps->m_SearchDirectories)
 	{
 		TCHAR szDirectory[MAX_PATH];
 
@@ -181,9 +220,11 @@ BOOL CSearchDialog::OnInitDialog()
 
 	ComboBox_SetCurSel(hComboBox,0);
 
+	hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_NAME);
+	hComboBox = reinterpret_cast<HWND>(SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0));
 	iItem = 0;
 
-	for each(auto strPattern in m_SearchPatterns)
+	for each(auto strPattern in m_sdps->m_SearchPatterns)
 	{
 		TCHAR szPattern[MAX_PATH];
 
@@ -197,7 +238,7 @@ BOOL CSearchDialog::OnInitDialog()
 
 	ComboBox_SetCurSel(hComboBox,0);
 
-	SetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_SearchPatternText);
+	SetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_sdps->m_szSearchPattern);
 
 	m_hGripper = CreateWindow(_T("SCROLLBAR"),EMPTY_STRING,WS_CHILD|WS_VISIBLE|
 		WS_CLIPSIBLINGS|SBS_BOTTOMALIGN|SBS_SIZEGRIP,0,0,0,0,m_hDlg,NULL,
@@ -208,21 +249,21 @@ BOOL CSearchDialog::OnInitDialog()
 	SetWindowPos(m_hGripper,NULL,GetRectWidth(&rcMain) - GetRectWidth(&rc),
 		GetRectHeight(&rcMain) - GetRectHeight(&rc),0,0,SWP_NOSIZE|SWP_NOZORDER);
 
-	/* TODO: */
-	//if(m_bSearchDlgStateSaved)
-	//{
-	//	/* These dummy values will be in use if these values
-	//	have not previously been saved. */
-	//	if(m_iColumnWidth1 != -1 && m_iColumnWidth2 != -1)
-	//	{
-	//		ListView_SetColumnWidth(hListView,0,m_iColumnWidth1);
-	//		ListView_SetColumnWidth(hListView,1,m_iColumnWidth2);
-	//	}
+	if(m_sdps->m_bStateSaved)
+	{
+		/* These dummy values will be in use if these values
+		have not previously been saved. */
+		if(m_sdps->m_iColumnWidth1 != -1 && m_sdps->m_iColumnWidth2 != -1)
+		{
+			ListView_SetColumnWidth(hListView,0,m_sdps->m_iColumnWidth1);
+			ListView_SetColumnWidth(hListView,1,m_sdps->m_iColumnWidth2);
+		}
 
-	//	SetWindowPos(m_hDlg,HWND_TOP,m_ptSearch.x,m_ptSearch.y,
-	//		m_iSearchWidth,m_iSearchHeight,SWP_SHOWWINDOW);
-	//}
-	//else
+		SetWindowPos(m_hDlg,HWND_TOP,m_sdps->m_ptSearch.x,
+			m_sdps->m_ptSearch.y,m_sdps->m_iSearchWidth,
+			m_sdps->m_iSearchHeight,SWP_SHOWWINDOW);
+	}
+	else
 	{
 		CenterWindow(GetParent(m_hDlg),m_hDlg);
 	}
@@ -279,7 +320,6 @@ BOOL CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 		}
 		else
 		{
-			SearchSaveState(m_hDlg);
 			DestroyWindow(m_hDlg);
 		}
 		break;
@@ -352,24 +392,28 @@ void CSearchDialog::OnSearch()
 		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_SYSTEM) == BST_CHECKED)
 			dwAttributes |= FILE_ATTRIBUTE_SYSTEM;
 
-		/* TODO: Save in class variable. */
-		CSearch *pSearch = new CSearch(m_hDlg,szBaseDirectory,szSearchPattern,
+		m_pSearch = new CSearch(m_hDlg,szBaseDirectory,szSearchPattern,
 			dwAttributes,bUseRegularExpressions,bCaseInsensitive,bSearchSubFolders);
+
+		/* Increment the reference count to ensure that
+		the search object will not release itself until
+		we have finished using it. */
+		m_pSearch->AddRef();
 
 		/* Save the search directory and search pattern (only if they are not
 		the same as the most recent entry). */
 		BOOL bSaveEntry = FALSE;
 
-		if(m_SearchDirectories.empty() ||
+		if(m_sdps->m_SearchDirectories.empty() ||
 			lstrcmp(szBaseDirectory,
-			m_SearchDirectories.begin()->c_str()) != 0)
+			m_sdps->m_SearchDirectories.begin()->c_str()) != 0)
 		{
 			bSaveEntry = TRUE;
 		}
 
 		if(bSaveEntry)
 		{
-			m_SearchDirectories.push_front(szBaseDirectory);
+			m_sdps->m_SearchDirectories.push_front(szBaseDirectory);
 
 			HWND hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
 			HWND hComboBox = reinterpret_cast<HWND>(SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0));
@@ -385,15 +429,15 @@ void CSearchDialog::OnSearch()
 
 		bSaveEntry = FALSE;
 
-		if(m_SearchPatterns.empty() ||
-			lstrcmp(szSearchPattern,m_SearchPatterns.begin()->c_str()) != 0)
+		if(m_sdps->m_SearchPatterns.empty() ||
+			lstrcmp(szSearchPattern,m_sdps->m_SearchPatterns.begin()->c_str()) != 0)
 		{
 			bSaveEntry = TRUE;
 		}
 
 		if(bSaveEntry)
 		{
-			m_SearchPatterns.push_front(szSearchPattern);
+			m_sdps->m_SearchPatterns.push_front(szSearchPattern);
 
 			HWND hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_NAME);
 			HWND hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
@@ -410,9 +454,9 @@ void CSearchDialog::OnSearch()
 		/* TODO: */
 		/* Turn search patterns of the form '???' into '*???*', and
 		use this modified string to search. */
-		/*if(lstrlen(psi->szName) > 0)
+		if(lstrlen(szSearchPattern) > 0)
 		{
-			TCHAR szPattern[MAX_PATH];
+			/*TCHAR szPattern[MAX_PATH];
 
 			StringCchCopy(szPattern,SIZEOF_ARRAY(szPattern),psi->szName);
 			memset(psi->szName,0,SIZEOF_ARRAY(psi->szName));
@@ -427,8 +471,8 @@ void CSearchDialog::OnSearch()
 			if(szPattern[lstrlen(szPattern) - 1] != '*')
 			{
 				StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
-			}
-		}*/
+			}*/
+		}
 
 		GetDlgItemText(m_hDlg,IDSEARCH,m_szSearchButton,SIZEOF_ARRAY(m_szSearchButton));
 
@@ -441,13 +485,16 @@ void CSearchDialog::OnSearch()
 		m_bSearching = TRUE;
 
 		/* Create a background thread, and search using it... */
-		CreateThread(NULL,0,SearchThread,reinterpret_cast<LPVOID>(pSearch),0,NULL);
+		CreateThread(NULL,0,SearchThread,reinterpret_cast<LPVOID>(m_pSearch),0,NULL);
 	}
 	else
 	{
 		m_bStopSearching = TRUE;
 
-		/* TODO: Notify CSearch. CSearch needs to be reference counted. */
+		m_pSearch->StopSearching();
+
+		/* TODO: Needed? */
+		//m_pSearch = NULL;
 	}
 }
 
@@ -601,7 +648,6 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 					if(m_bExit)
 					{
-						SearchSaveState(m_hDlg);
 						DestroyWindow(m_hDlg);
 					}
 				}
@@ -769,9 +815,17 @@ BOOL CSearchDialog::OnClose()
 	}
 	else
 	{
-		SearchSaveState(m_hDlg);
 		DestroyWindow(m_hDlg);
 	}
+
+	return 0;
+}
+
+BOOL CSearchDialog::OnDestroy()
+{
+	/* Within WM_DESTROY, all child windows
+	still exist. */
+	SaveState(m_hDlg);
 
 	return 0;
 }
@@ -789,7 +843,7 @@ DWORD WINAPI SearchThread(LPVOID pParam)
 
 	CSearch *pSearch = reinterpret_cast<CSearch *>(pParam);
 
-	pSearch->StartSearch();
+	pSearch->StartSearching();
 
 	delete pSearch;
 
@@ -820,7 +874,7 @@ CSearch::~CSearch()
 	DeleteCriticalSection(&m_csStop);
 }
 
-void CSearch::StartSearch()
+void CSearch::StartSearching()
 {
 	m_iFoldersFound = 0;
 	m_iFilesFound = 0;
@@ -981,123 +1035,332 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 	}
 }
 
-void CSearch::SetStopSearching()
+void CSearch::StopSearching()
 {
 	EnterCriticalSection(&m_csStop);
 	m_bStopSearching = TRUE;
 	LeaveCriticalSection(&m_csStop);
 }
 
-/* TODO: InitializeSearchDialog method that retrieves
-values from CPersistentProvider. */
-
-/* TODO: */
-void CSearchDialog::SearchSaveState(HWND hDlg)
+void CSearchDialog::SaveState(HWND hDlg)
 {
-	/* TODO: */
-	/*HWND hListView;
+	HWND hListView;
 	RECT rcTemp;
 
 	GetWindowRect(hDlg,&rcTemp);
-	m_ptSearch.x = rcTemp.left;
-	m_ptSearch.y = rcTemp.top;
-	m_iSearchWidth = GetRectWidth(&rcTemp);
-	m_iSearchHeight = GetRectHeight(&rcTemp);
+	m_sdps->m_ptSearch.x = rcTemp.left;
+	m_sdps->m_ptSearch.y = rcTemp.top;
+	m_sdps->m_iSearchWidth = GetRectWidth(&rcTemp);
+	m_sdps->m_iSearchHeight = GetRectHeight(&rcTemp);
+
+	m_sdps->m_bCaseInsensitive = IsDlgButtonChecked(m_hDlg,
+		IDC_CHECK_CASEINSENSITIVE) == BST_CHECKED;
+
+	m_sdps->m_bUseRegularExpressions = IsDlgButtonChecked(m_hDlg,
+		IDC_CHECK_USEREGULAREXPRESSIONS) == BST_CHECKED;
+
+	m_sdps->m_bSearchSubFolders = IsDlgButtonChecked(hDlg,
+		IDC_CHECK_SEARCHSUBFOLDERS) == BST_CHECKED;
+
+	m_sdps->m_bArchive = IsDlgButtonChecked(hDlg,
+		IDC_CHECK_ARCHIVE) == BST_CHECKED;
+
+	m_sdps->m_bHidden = IsDlgButtonChecked(hDlg,
+		IDC_CHECK_HIDDEN) == BST_CHECKED;
+
+	m_sdps->m_bReadOnly = IsDlgButtonChecked(hDlg,
+		IDC_CHECK_READONLY) == BST_CHECKED;
+
+	m_sdps->m_bSystem = IsDlgButtonChecked(hDlg,
+		IDC_CHECK_SYSTEM) == BST_CHECKED;
 
 	hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
 
-	m_iColumnWidth1 = ListView_GetColumnWidth(hListView,0);
-	m_iColumnWidth2 = ListView_GetColumnWidth(hListView,1);
+	m_sdps->m_iColumnWidth1 = ListView_GetColumnWidth(hListView,0);
+	m_sdps->m_iColumnWidth2 = ListView_GetColumnWidth(hListView,1);
 
-	GetDlgItemText(hDlg,IDC_COMBO_NAME,m_SearchPatternText,
-		SIZEOF_ARRAY(m_SearchPatternText));
+	GetDlgItemText(hDlg,IDC_COMBO_NAME,m_sdps->m_szSearchPattern,
+		SIZEOF_ARRAY(m_sdps->m_szSearchPattern));
 
-	m_bSearchSubFolders = IsDlgButtonChecked(hDlg,
-		IDC_CHECK_SEARCHSUBFOLDERS) == BST_CHECKED;
-
-	m_bSearchDlgStateSaved = TRUE;*/
+	m_sdps->m_bStateSaved = TRUE;
 }
 
-/* Provides an interface to save to various
-destinations (e.g. xml file, the registry). */
-interface ISaveProvidor
+CSearchDialogPersistentSettings::CSearchDialogPersistentSettings()
 {
-	/* Registry/XML file. */
-	void SetType();
+	m_bStateSaved = FALSE;
 
-	/* Overloaded - e.g. one method for int,
-	one method for strings, etc. */
-	void SaveValue();
-};
+	/* Initialize all settings using default values. */
+	m_bSearchSubFolders = TRUE;
+	m_bUseRegularExpressions = FALSE;
+	m_bCaseInsensitive = FALSE;
+	m_bArchive = FALSE;
+	m_bHidden = FALSE;
+	m_bReadOnly = FALSE;
+	m_bSystem = FALSE;
+	m_iColumnWidth1 = -1;
+	m_iColumnWidth1 = -2;
 
-struct PersistentSetting_t
-{
-	TCHAR	szName[512];
-	int		iType;
+	StringCchCopy(m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern),
+		EMPTY_STRING);
+}
 
-	int		Value;
-};
-
-/* Save generic elements to an
-array (mapped to a unique key value). */
-class CPersistentProvider
-{
-public:
-
-	~CPersistentProvider();
-
-	static CPersistentProvider &GetInstance();
-
-	/* Insert the group if it doesn't already exist;
-	else update it. */
-	void	UpdateSettings(TCHAR *szGroup);
-
-	void	RetrieveSettings(TCHAR *szGroup);
-
-	/* Saves all settings. */
-	void	SaveSettings();
-
-	/* Loads all settings. */
-	void	LoadSettings();
-
-private:
-
-	CPersistentProvider();
-
-	CPersistentProvider(const CPersistentProvider &);
-	CPersistentProvider & operator=(const CPersistentProvider &);
-
-	unordered_map<TCHAR *,PersistentSetting_t>	m_Settings;
-};
-
-CPersistentProvider::CPersistentProvider()
+CSearchDialogPersistentSettings::~CSearchDialogPersistentSettings()
 {
 	
 }
 
-CPersistentProvider::~CPersistentProvider()
+CSearchDialogPersistentSettings& CSearchDialogPersistentSettings::GetInstance()
 {
-	
+	static CSearchDialogPersistentSettings sdps;
+	return sdps;
 }
 
-CPersistentProvider& CPersistentProvider::GetInstance()
+void CSearchDialogPersistentSettings::SaveSettings(HKEY hParentKey)
 {
-	static CPersistentProvider pp;
-	return pp;
-}
-
-void CPersistentProvider::UpdateSettings(TCHAR *szGroup)
-{
-	PersistentSetting_t ps;
-
-	auto itr = m_Settings.find(szGroup);
-
-	/* TODO: */
-	/*if(itr == m_Settings.end())
+	if(!m_bStateSaved)
 	{
+		return;
+	}
 
-	}*/
+	HKEY hKey;
+	DWORD dwDisposition;
 
-	m_Settings.insert(unordered_map<TCHAR *,PersistentSetting_t>::value_type(szGroup,
-			ps));
+	LONG lRes = RegCreateKeyEx(hParentKey,REGISTRY_SETTINGS_KEY,
+		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
+		&dwDisposition);
+
+	if(lRes == ERROR_SUCCESS)
+	{
+		RegSetValueEx(hKey,_T("Position"),0,
+			REG_BINARY,reinterpret_cast<LPBYTE>(&m_ptSearch),
+			sizeof(m_ptSearch));
+
+		SaveDwordToRegistry(hKey,_T("Width"),m_iSearchWidth);
+		SaveDwordToRegistry(hKey,_T("Height"),m_iSearchHeight);
+		SaveDwordToRegistry(hKey,_T("ColumnWidth1"),m_iColumnWidth1);
+		SaveDwordToRegistry(hKey,_T("ColumnWidth2"),m_iColumnWidth2);
+		SaveStringToRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern);
+		SaveDwordToRegistry(hKey,_T("SearchSubFolders"),m_bSearchSubFolders);
+		SaveDwordToRegistry(hKey,_T("UseRegularExpressions"),m_bUseRegularExpressions);
+		SaveDwordToRegistry(hKey,_T("CaseInsensitive"),m_bCaseInsensitive);
+		SaveDwordToRegistry(hKey,_T("Archive"),m_bArchive);
+		SaveDwordToRegistry(hKey,_T("Hidden"),m_bHidden);
+		SaveDwordToRegistry(hKey,_T("ReadOnly"),m_bReadOnly);
+		SaveDwordToRegistry(hKey,_T("System"),m_bSystem);
+
+		TCHAR szItemKey[32];
+		int i = 0;
+		
+		for each(auto strDirectory in m_SearchDirectories)
+		{
+			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("Directory%d"),i++);
+			SaveStringToRegistry(hKey,szItemKey,strDirectory.c_str());
+		}
+
+		i = 0;
+
+		for each(auto strPattern in m_SearchPatterns)
+		{
+			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("Pattern%d"),i++);
+			SaveStringToRegistry(hKey,szItemKey,strPattern.c_str());
+		}
+
+		RegCloseKey(hKey);
+	}
+}
+
+void CSearchDialogPersistentSettings::LoadSettings(HKEY hParentKey)
+{
+	HKEY hKey;
+	DWORD dwSize;
+
+	LONG lRes = RegOpenKeyEx(hParentKey,REGISTRY_SETTINGS_KEY,0,
+		KEY_READ,&hKey);
+
+	if(lRes == ERROR_SUCCESS)
+	{
+		dwSize = sizeof(POINT);
+		RegQueryValueEx(hKey,_T("Position"),
+			NULL,NULL,(LPBYTE)&m_ptSearch,&dwSize);
+
+		ReadDwordFromRegistry(hKey,_T("Width"),reinterpret_cast<LPDWORD>(&m_iSearchWidth));
+		ReadDwordFromRegistry(hKey,_T("Height"),reinterpret_cast<LPDWORD>(&m_iSearchHeight));
+		ReadDwordFromRegistry(hKey,_T("ColumnWidth1"),reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
+		ReadDwordFromRegistry(hKey,_T("ColumnWidth2"),reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
+		ReadStringFromRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern));
+		ReadDwordFromRegistry(hKey,_T("SearchSubFolders"),reinterpret_cast<LPDWORD>(&m_bSearchSubFolders));
+		ReadDwordFromRegistry(hKey,_T("UseRegularExpressions"),reinterpret_cast<LPDWORD>(&m_bUseRegularExpressions));
+		ReadDwordFromRegistry(hKey,_T("CaseInsensitive"),reinterpret_cast<LPDWORD>(&m_bCaseInsensitive));
+		ReadDwordFromRegistry(hKey,_T("Archive"),reinterpret_cast<LPDWORD>(&m_bArchive));
+		ReadDwordFromRegistry(hKey,_T("Hidden"),reinterpret_cast<LPDWORD>(&m_bHidden));
+		ReadDwordFromRegistry(hKey,_T("ReadOnly"),reinterpret_cast<LPDWORD>(&m_bReadOnly));
+		ReadDwordFromRegistry(hKey,_T("System"),reinterpret_cast<LPDWORD>(&m_bSystem));
+
+		TCHAR szItemKey[32];
+		TCHAR szTemp[512];
+		int i = 0;
+
+		lRes = ERROR_SUCCESS;
+
+		while(lRes == ERROR_SUCCESS)
+		{
+			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
+				_T("Directory%d"),i++);
+
+			lRes = ReadStringFromRegistry(hKey,szItemKey,
+				szTemp,SIZEOF_ARRAY(szTemp));
+
+			if(lRes == ERROR_SUCCESS)
+			{
+				m_SearchDirectories.push_back(szTemp);
+			}
+		}
+
+		i = 0;
+		lRes = ERROR_SUCCESS;
+
+		while(lRes == ERROR_SUCCESS)
+		{
+			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
+				_T("Pattern%d"),i++);
+
+			lRes = ReadStringFromRegistry(hKey,szItemKey,
+				szTemp,SIZEOF_ARRAY(szTemp));
+
+			if(lRes == ERROR_SUCCESS)
+			{
+				m_SearchPatterns.push_back(szTemp);
+			}
+		}
+
+		m_bStateSaved = TRUE;
+
+		RegCloseKey(hKey);
+	}
+}
+
+void CSearchDialogPersistentSettings::SaveSettings(MSXML2::IXMLDOMDocument *pXMLDom,
+	MSXML2::IXMLDOMElement *pe)
+{
+	MSXML2::IXMLDOMElement *pParentNode = NULL;
+	BSTR bstr_wsntt = SysAllocString(L"\n\t\t");
+	TCHAR szNode[64];
+
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+
+	CreateElementNode(pXMLDom,&pParentNode,pe,_T("DialogState"),_T("Search"));
+
+	int i = 0;
+
+	for each(auto strDirectory in m_SearchDirectories)
+	{
+		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("Directory%d"),i++);
+		AddAttributeToNode(pXMLDom,pParentNode,szNode,strDirectory.c_str());
+	}
+
+	i = 0;
+
+	for each(auto strPattern in m_SearchPatterns)
+	{
+		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("Pattern%d"),i++);
+		AddAttributeToNode(pXMLDom,pParentNode,szNode,strPattern.c_str());
+	}
+
+	AddAttributeToNode(pXMLDom,pParentNode,_T("PosX"),EncodeIntValue(m_ptSearch.x));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("PosY"),EncodeIntValue(m_ptSearch.y));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("Width"),EncodeIntValue(m_iSearchWidth));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("Height"),EncodeIntValue(m_iSearchHeight));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth1"),EncodeIntValue(m_iColumnWidth1));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth2"),EncodeIntValue(m_iColumnWidth2));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("SearchDirectoryText"),m_szSearchPattern);
+	AddAttributeToNode(pXMLDom,pParentNode,_T("SearchSubFolders"),EncodeBoolValue(m_bSearchSubFolders));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("UseRegularExpressions"),EncodeBoolValue(m_bUseRegularExpressions));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("CaseInsensitive"),EncodeBoolValue(m_bCaseInsensitive));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("Archive"),EncodeBoolValue(m_bArchive));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("Hidden"),EncodeBoolValue(m_bHidden));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("ReadOnly"),EncodeBoolValue(m_bReadOnly));
+	AddAttributeToNode(pXMLDom,pParentNode,_T("System"),EncodeBoolValue(m_bSystem));
+}
+
+void CSearchDialogPersistentSettings::LoadSettings(MSXML2::IXMLDOMNamedNodeMap *pam,
+	long lChildNodes)
+{
+	MSXML2::IXMLDOMNode *pNode = NULL;
+	BSTR bstrName;
+	BSTR bstrValue;
+
+	for(int i = 1;i < lChildNodes;i++)
+	{
+		pam->get_item(i,&pNode);
+
+		pNode->get_nodeName(&bstrName);
+		pNode->get_text(&bstrValue);
+
+		if(lstrcmpi(bstrName,_T("PosX")) == 0)
+		{
+			m_ptSearch.x = DecodeIntValue(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("PosY")) == 0)
+		{
+			m_ptSearch.y = DecodeIntValue(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("Width")) == 0)
+		{
+			m_iSearchWidth = DecodeIntValue(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("Height")) == 0)
+		{
+			m_iSearchHeight = DecodeIntValue(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("ColumnWidth1")) == 0)
+		{
+			m_iColumnWidth1 = DecodeIntValue(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("ColumnWidth2")) == 0)
+		{
+			m_iColumnWidth2 = DecodeIntValue(bstrValue);
+		}
+		else if(CheckWildcardMatch(_T("Directory*"),bstrName,TRUE))
+		{
+			m_SearchDirectories.push_back(bstrValue);
+		}
+		else if(CheckWildcardMatch(_T("Pattern*"),bstrName,TRUE))
+		{
+			m_SearchPatterns.push_back(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("SearchDirectoryText")) == 0)
+		{
+			StringCchCopy(m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern),bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("SearchSubFolders")) == 0)
+		{
+			m_bSearchSubFolders = DecodeBoolValue(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("UseRegularExpressions")) == 0)
+		{
+			m_bUseRegularExpressions = DecodeBoolValue(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("CaseInsensitive")) == 0)
+		{
+			m_bCaseInsensitive = DecodeBoolValue(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("Archive")) == 0)
+		{
+			m_bArchive = DecodeBoolValue(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("Hidden")) == 0)
+		{
+			m_bHidden = DecodeBoolValue(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("ReadOnly")) == 0)
+		{
+			m_bReadOnly = DecodeBoolValue(bstrValue);
+		}
+		else if(lstrcmpi(bstrName,_T("System")) == 0)
+		{
+			m_bSystem = DecodeBoolValue(bstrValue);
+		}
+	}
+
+	m_bStateSaved = TRUE;
 }

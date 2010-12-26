@@ -62,7 +62,6 @@ lParam not currently used. */
 #define REG_MERGEFILES_KEY			_T("MergeFiles")
 #define REG_ORGANIZEBOOKMARKS_KEY	_T("OrganizeBookmarks")
 #define REG_DRIVEPROPERTIES_KEY		_T("DriveProperties")
-#define REG_SEARCH_KEY				_T("Search")
 #define REG_SELECTCOLUMNS_KEY		_T("SelectColumns")
 #define REG_SELECTDEFAULTCOLUMNS_KEY	_T("SelectDefaultColumns")
 #define REG_SETFILEATTRIBUTES_KEY	_T("SetFileAttributes")
@@ -763,8 +762,6 @@ private:
 	void					LoadMergeFilesStateFromRegistry(HKEY hParentKey);
 	void					SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey);
 	void					LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey);
-	void					SaveSearchStateToRegistry(HKEY hParentKey);
-	void					LoadSearchStateFromRegistry(HKEY hParentKey);
 	void					SaveSelectColumnsStateToRegistry(HKEY hParentKey);
 	void					LoadSelectColumnsStateFromRegistry(HKEY hParentKey);
 	void					SaveSelectDefaultColumnsStateToRegistry(HKEY hParentKey);
@@ -1094,12 +1091,10 @@ private:
 	void					LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					LoadColorRulesStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
 	void					LoadCustomizeColorsStateFromSML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
-	void					LoadSearchStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
 	void					LoadWildcardStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
 	void					SaveStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveColorRulesStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	void					SaveCustomizeColorsStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
-	void					SaveSearchStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	void					SaveWildcardStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	void					MapAttributeToValue(MSXML2::IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
 	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,TabInfo_t *pTabInfo);

@@ -29,7 +29,7 @@ LONG ReadDwordFromRegistry(HKEY hKey,TCHAR *KeyName,DWORD *pReturnValue)
 	return RegQueryValueEx(hKey,KeyName,0,0,(LPBYTE)pReturnValue,&SizeOfData);
 }
 
-LONG SaveStringToRegistry(HKEY hKey,TCHAR *KeyName,TCHAR *String)
+LONG SaveStringToRegistry(HKEY hKey,TCHAR *KeyName,const TCHAR *String)
 {
 	return RegSetValueEx(hKey,KeyName,0,REG_SZ,(LPBYTE)String,lstrlen(String) * sizeof(TCHAR));
 }

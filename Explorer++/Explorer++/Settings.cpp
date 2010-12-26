@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "SearchDialog.h"
 #include "../Helper/Registry.h"
 
 #define SMALL_SIZE		5
@@ -1439,12 +1440,13 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		SaveMassRenameStateToRegistry(hKey);
 		SaveMergeFilesStateToRegistry(hKey);
 		SaveOrganizeBookmarksStateToRegistry(hKey);
-		SaveSearchStateToRegistry(hKey);
 		SaveSelectColumnsStateToRegistry(hKey);
 		SaveSelectDefaultColumnsStateToRegistry(hKey);
 		SaveSetFileAttributesStateToRegistry(hKey);
 		SaveSplitFileColumnsStateToRegistry(hKey);
 		SaveWildcardStateToRegistry(hKey);
+
+		CSearchDialogPersistentSettings::GetInstance().SaveSettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1660,59 +1662,6 @@ void Explorerplusplus::SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey)
 	}
 }
 
-/* TODO: */
-void Explorerplusplus::SaveSearchStateToRegistry(HKEY hParentKey)
-{
-	/*HKEY	hKey;
-	list<SearchDirectoryInfo_t>::iterator itr;
-	list<SearchPatternInfo_t>::iterator itr2;
-	TCHAR	szItemKey[128];
-	DWORD	Disposition;
-	LONG	ReturnValue;
-	int		i = 0;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_SEARCH_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bSearchDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptSearch,sizeof(m_ptSearch));
-
-			SaveDwordToRegistry(hKey,_T("Width"),m_iSearchWidth);
-			SaveDwordToRegistry(hKey,_T("Height"),m_iSearchHeight);
-
-			SaveDwordToRegistry(hKey,_T("ColumnWidth1"),m_iColumnWidth1);
-			SaveDwordToRegistry(hKey,_T("ColumnWidth2"),m_iColumnWidth2);
-
-			for(itr = m_SearchDirectories.begin();itr != m_SearchDirectories.end();itr++)
-			{
-				StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("Directory%d"),i++);
-
-				SaveStringToRegistry(hKey,szItemKey,itr->szDirectory);
-			}
-
-			i = 0;
-
-			for(itr2 = m_SearchPatterns.begin();itr2 != m_SearchPatterns.end();itr2++)
-			{
-				StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("Pattern%d"),i++);
-
-				SaveStringToRegistry(hKey,szItemKey,itr2->szPattern);
-			}
-
-			SaveStringToRegistry(hKey,_T("SearchDirectoryText"),m_SearchPatternText);
-
-			SaveDwordToRegistry(hKey,_T("SearchSubFolders"),m_bSearchSubFolders);
-		}
-
-		RegCloseKey(hKey);
-	}*/
-}
-
 void Explorerplusplus::SaveSelectColumnsStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
@@ -1857,12 +1806,13 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		LoadMassRenameStateFromRegistry(hKey);
 		LoadMergeFilesStateFromRegistry(hKey);
 		LoadOrganizeBookmarksStateFromRegistry(hKey);
-		LoadSearchStateFromRegistry(hKey);
 		LoadSelectColumnsStateFromRegistry(hKey);
 		LoadSelectDefaultColumnsStateFromRegistry(hKey);
 		LoadSetFileAttributesStateFromRegistry(hKey);
 		LoadSplitFileStateFromRegistry(hKey);
 		LoadWildcardStateFromRegistry(hKey);
+
+		CSearchDialogPersistentSettings::GetInstance().LoadSettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -2081,88 +2031,6 @@ void Explorerplusplus::LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey)
 
 		RegCloseKey(hKey);
 	}
-}
-
-/* TODO: */
-void Explorerplusplus::LoadSearchStateFromRegistry(HKEY hParentKey)
-{
-	/*HKEY				hKey;
-	SearchDirectoryInfo_t	sdi;
-	SearchPatternInfo_t	spi;
-	TCHAR				szItemKey[128];
-	DWORD				dwSize;
-	LONG				ReturnValue;
-	int					i = 0;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_SEARCH_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptSearch,&dwSize);
-
-		ReadDwordFromRegistry(hKey,_T("Width"),(DWORD *)&m_iSearchWidth);
-		ReadDwordFromRegistry(hKey,_T("Height"),(DWORD *)&m_iSearchHeight);
-
-		m_iColumnWidth1 = -1;
-		m_iColumnWidth2 = -1;
-		ReadDwordFromRegistry(hKey,_T("ColumnWidth1"),(DWORD *)&m_iColumnWidth1);
-		ReadDwordFromRegistry(hKey,_T("ColumnWidth2"),(DWORD *)&m_iColumnWidth2);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bSearchDlgStateSaved = TRUE;
-		}
-
-		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-			_T("Directory%d"),i);
-
-		ReturnValue = ReadStringFromRegistry(hKey,szItemKey,
-			sdi.szDirectory,SIZEOF_ARRAY(sdi.szDirectory));
-
-		while(ReturnValue == ERROR_SUCCESS)
-		{
-			m_SearchDirectories.push_back(sdi);
-
-			i++;
-
-			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-				_T("Directory%d"),i);
-
-			ReturnValue = ReadStringFromRegistry(hKey,szItemKey,
-				sdi.szDirectory,SIZEOF_ARRAY(sdi.szDirectory));
-		}
-
-		i = 0;
-
-		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-			_T("Pattern%d"),i);
-
-		ReturnValue = ReadStringFromRegistry(hKey,szItemKey,
-			spi.szPattern,SIZEOF_ARRAY(spi.szPattern));
-
-		while(ReturnValue == ERROR_SUCCESS)
-		{
-			m_SearchPatterns.push_back(spi);
-
-			i++;
-
-			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-				_T("Pattern%d"),i);
-
-			ReturnValue = ReadStringFromRegistry(hKey,szItemKey,
-				spi.szPattern,SIZEOF_ARRAY(spi.szPattern));
-		}
-
-		ReadStringFromRegistry(hKey,_T("SearchDirectoryText"),
-			m_SearchPatternText,SIZEOF_ARRAY(m_SearchPatternText));
-
-		ReadDwordFromRegistry(hKey,_T("SearchSubFolders"),(LPDWORD)&m_bSearchSubFolders);
-
-		RegCloseKey(hKey);
-	}*/
 }
 
 void Explorerplusplus::LoadSelectColumnsStateFromRegistry(HKEY hParentKey)

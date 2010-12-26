@@ -261,6 +261,7 @@
     <ClCompile Include="iDataObject.cpp" />
     <ClCompile Include="iDirectoryMonitor.cpp" />
     <ClCompile Include="iEnumFormatEtc.cpp" />
+    <ClCompile Include="ReferenceCount.cpp" />
     <ClCompile Include="Registry.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
@@ -295,6 +296,7 @@
     <ClInclude Include="iDataObject.h" />
     <ClInclude Include="iDirectoryMonitor.h" />
     <ClInclude Include="iEnumFormatEtc.h" />
+    <ClInclude Include="ReferenceCount.h" />
     <ClInclude Include="Registry.h" />
     <ClInclude Include="ShellHelper.h" />
     <ClInclude Include="StatusBar.h" />

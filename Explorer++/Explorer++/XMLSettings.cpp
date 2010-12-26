@@ -20,8 +20,10 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "SearchDialog.h"
+#include "XMLSettings.h"
+
 #import <msxml3.dll> raw_interfaces_only
-using namespace MSXML2;
 
 
 #define COLUMN_TYPE_GENERIC			0
@@ -135,24 +137,10 @@ void WriteStandardSetting(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pGrandparentNode,TCHAR *szElementName,
 TCHAR *szAttributeName,TCHAR *szAttributeValue);
 
-void CreateElementNode(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement **pParentNode,
-MSXML2::IXMLDOMElement *pGrandparentNode,WCHAR *szElementName,
-WCHAR *szAttributeName);
-
-void AddAttributeToNode(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pParentNode,const WCHAR *wszAttributeName,
-WCHAR *wszAttributeValue);
-
 COLORREF ReadXMLColorData(MSXML2::IXMLDOMNode *pNode);
 Color ReadXMLColorData2(MSXML2::IXMLDOMNode *pNode);
 HFONT ReadXMLFontData(MSXML2::IXMLDOMNode *pNode);
 void SaveFiltersToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
-
-WCHAR *EncodeBoolValue(BOOL bValue);
-BOOL DecodeBoolValue(WCHAR *wszValue);
-WCHAR *EncodeIntValue(int iValue);
-int DecodeIntValue(WCHAR *wszValue);
 
 unsigned long hash_setting(unsigned char *str);
 
@@ -162,7 +150,7 @@ MSXML2::IXMLDOMDocument *DomFromCOM()
 	HRESULT					hr;
 	MSXML2::IXMLDOMDocument	*pxmldoc = NULL;
 
-	hr = CoCreateInstance(__uuidof(DOMDocument30),NULL,CLSCTX_INPROC_SERVER,
+	hr = CoCreateInstance(__uuidof(MSXML2::DOMDocument30),NULL,CLSCTX_INPROC_SERVER,
 		__uuidof(MSXML2::IXMLDOMDocument),(void**)&pxmldoc);
 
 	if(SUCCEEDED(hr))
@@ -176,7 +164,7 @@ MSXML2::IXMLDOMDocument *DomFromCOM()
 	return pxmldoc;
 }
 
-VARIANT VariantString(BSTR str)
+VARIANT VariantString(const WCHAR *str)
 {
 	VARIANT	var;
 
@@ -2091,7 +2079,7 @@ void Explorerplusplus::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 						else if(lstrcmpi(bstrValue,_T("CustomizeColors")) == 0)
 							LoadCustomizeColorsStateFromSML(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("Search")) == 0)
-							LoadSearchStateFromXML(am,lChildNodes);
+							CSearchDialogPersistentSettings::GetInstance().LoadSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("WildcardSelect")) == 0)
 							LoadWildcardStateFromXML(am,lChildNodes);
 					}
@@ -2178,44 +2166,6 @@ void Explorerplusplus::LoadCustomizeColorsStateFromSML(MSXML2::IXMLDOMNamedNodeM
 	m_crInitialColor = RGB(r,g,b);
 }
 
-/* TODO: */
-void Explorerplusplus::LoadSearchStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
-{
-	/*MSXML2::IXMLDOMNode *pNode = NULL;
-	SearchDirectoryInfo_t sdi;
-	SearchPatternInfo_t spi;
-	BSTR bstrName;
-	BSTR bstrValue;
-	int i = 0;
-
-	for(i = 1;i < lChildNodes;i++)
-	{
-		pam->get_item(i,&pNode);
-
-		pNode->get_nodeName(&bstrName);
-		pNode->get_text(&bstrValue);
-
-		if(lstrcmpi(bstrName,_T("SearchDirectoryText")) == 0)
-		{
-			StringCchCopy(m_SearchPatternText,SIZEOF_ARRAY(m_SearchPatternText),bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("SearchSubFolders")) == 0)
-		{
-			m_bSearchSubFolders = DecodeBoolValue(bstrValue);
-		}
-		else if(CheckWildcardMatch(_T("Directory*"),bstrName,TRUE))
-		{
-			StringCchCopy(sdi.szDirectory,SIZEOF_ARRAY(sdi.szDirectory),bstrValue);
-			m_SearchDirectories.push_back(sdi);
-		}
-		else if(CheckWildcardMatch(_T("Pattern*"),bstrName,TRUE))
-		{
-			StringCchCopy(spi.szPattern,SIZEOF_ARRAY(spi.szPattern),bstrValue);
-			m_SearchPatterns.push_back(spi);
-		}
-	}*/
-}
-
 void Explorerplusplus::LoadWildcardStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
 {
 	MSXML2::IXMLDOMNode *pNode = NULL;
@@ -2259,8 +2209,9 @@ MSXML2::IXMLDOMElement *pRoot)
 
 	SaveColorRulesStateToXML(pXMLDom,pe);
 	SaveCustomizeColorsStateToXML(pXMLDom,pe);
-	SaveSearchStateToXML(pXMLDom,pe);
 	SaveWildcardStateToXML(pXMLDom,pe);
+
+	CSearchDialogPersistentSettings::GetInstance().SaveSettings(pXMLDom,pe);
 
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 
@@ -2305,41 +2256,6 @@ MSXML2::IXMLDOMElement *pe)
 	AddAttributeToNode(pXMLDom,pParentNode,_T("r"),EncodeIntValue(GetRValue(m_crInitialColor)));
 	AddAttributeToNode(pXMLDom,pParentNode,_T("g"),EncodeIntValue(GetGValue(m_crInitialColor)));
 	AddAttributeToNode(pXMLDom,pParentNode,_T("b"),EncodeIntValue(GetBValue(m_crInitialColor)));
-}
-
-/* TODO: */
-void Explorerplusplus::SaveSearchStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pe)
-{
-	/*MSXML2::IXMLDOMElement	*pParentNode = NULL;
-	BSTR					bstr_wsntt = SysAllocString(L"\n\t\t");
-	list<SearchDirectoryInfo_t>::iterator	itr;
-	list<SearchPatternInfo_t>::iterator		itr2;
-	TCHAR					szNode[64];
-	int						i = 0;
-
-	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-
-	CreateElementNode(pXMLDom,&pParentNode,pe,_T("DialogState"),_T("Search"));
-
-	for(itr = m_SearchDirectories.begin();itr != m_SearchDirectories.end();itr++)
-	{
-		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("Directory%d"),i++);
-
-		AddAttributeToNode(pXMLDom,pParentNode,szNode,itr->szDirectory);
-	}
-
-	i = 0;
-
-	for(itr2 = m_SearchPatterns.begin();itr2 != m_SearchPatterns.end();itr2++)
-	{
-		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("Pattern%d"),i++);
-
-		AddAttributeToNode(pXMLDom,pParentNode,szNode,itr2->szPattern);
-	}
-
-	AddAttributeToNode(pXMLDom,pParentNode,_T("SearchDirectoryText"),m_SearchPatternText);
-	AddAttributeToNode(pXMLDom,pParentNode,_T("SearchSubFolders"),EncodeBoolValue(m_bSearchSubFolders));*/
 }
 
 void Explorerplusplus::SaveWildcardStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
@@ -2462,7 +2378,7 @@ WCHAR *szAttributeName)
 
 void AddAttributeToNode(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pParentNode,const WCHAR *wszAttributeName,
-WCHAR *wszAttributeValue)
+const WCHAR *wszAttributeValue)
 {
 	MSXML2::IXMLDOMAttribute	*pa = NULL;
 	MSXML2::IXMLDOMAttribute	*pa1 = NULL;

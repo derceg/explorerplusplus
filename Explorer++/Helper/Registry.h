@@ -5,7 +5,7 @@
 
 LONG	SaveDwordToRegistry(HKEY hKey,TCHAR *KeyName,DWORD Value);
 LONG	ReadDwordFromRegistry(HKEY hKey,TCHAR *KeyName,DWORD *pReturnValue);
-LONG	SaveStringToRegistry(HKEY hKey,TCHAR *KeyName,TCHAR *String);
+LONG	SaveStringToRegistry(HKEY hKey,TCHAR *KeyName,const TCHAR *String);
 LONG	ReadStringFromRegistry(HKEY hKey,TCHAR *KeyName,TCHAR *String,DWORD BufferSize);
 
 #endif
