@@ -82,6 +82,8 @@ will need to be changed correspondingly. */
 #define HASH_SHOWUSERNAMETITLEBAR	2618183549
 #define HASH_HIDESYSTEMFILESGLOBAL	1667356744
 #define HASH_HIDELINKEXTENSIONGLOBAL	1073100667
+#define HASH_HIDERECYCLEBINGLOBAL	3329734032
+#define HASH_HIDESYSVOLINFOGLOBAL	3592382252
 #define HASH_ALLOWMULTIPLEINSTANCES	3463984536
 #define HASH_ONECLICKACTIVATE		1118178238
 #define HASH_FORCESAMETABWIDTH		2315576081
@@ -380,7 +382,11 @@ MSXML2::IXMLDOMElement *pRoot)
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideLinkExtensionGlobal"),EncodeBoolValue(m_bHideLinkExtensionGlobal));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideRecycleBinGlobal"),EncodeBoolValue(m_bHideRecycleBinGlobal));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideSystemFilesGlobal"),EncodeBoolValue(m_bHideSystemFilesGlobal));
+	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideSysVolInfoGlobal"),EncodeBoolValue(m_bHideSysVolInfoGlobal));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InfoTipType"),EncodeIntValue(m_InfoTipType));
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -2595,6 +2601,14 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_INSERTSORTED:
 		m_bInsertSorted = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_HIDERECYCLEBINGLOBAL:
+		m_bHideRecycleBinGlobal = DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_HIDESYSVOLINFOGLOBAL:
+		m_bHideSysVolInfoGlobal = DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_LANGUAGE:

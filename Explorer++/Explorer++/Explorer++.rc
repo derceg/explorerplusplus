@@ -53,11 +53,18 @@ BEGIN
     CONTROL         "Insert ne&w items in their sorted positions",IDC_SETTINGS_CHECK_INSERTSORTED,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,146,10
     CONTROL         "&Single-click to open an item (point to select)",IDC_SETTINGS_CHECK_SINGLECLICK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,155,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,163,10
+    CONTROL         "Ask for confirmation before overwriting existing files",IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,183,10
+    CONTROL         "Play navigation sound when entering a folder",IDC_OPTIONS_PLAYNAVIGATIONSOUND,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,85,161,10
     CONTROL         "Show fol&der sizes",IDC_SETTINGS_CHECK_FOLDERSIZES,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,71,10
+    CONTROL         "Disable folder sizes on removable and network drives",IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,111,185,10
     CONTROL         "Show all &file sizes in:",IDC_SETTINGS_CHECK_FORCESIZE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,124,81,10
+    COMBOBOX        IDC_COMBO_FILESIZES,89,122,48,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Handle &zip files",IDC_SETTINGS_CHECK_ZIPFILES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,137,63,10
     CONTROL         "Show &user friendly dates",IDC_SETTINGS_CHECK_FRIENDLYDATES,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,150,95,10
@@ -67,13 +74,10 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,176,83,10
     CONTROL         "Show &custom infotips",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
                     "Button",BS_AUTORADIOBUTTON,19,187,83,10
-    CONTROL         "Disable folder sizes on removable and network drives",IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,111,185,10
-    CONTROL         "Ask for confirmation before overwriting existing files",IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,183,10
-    COMBOBOX        IDC_COMBO_FILESIZES,89,122,48,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Play navigation sound when entering a folder",IDC_OPTIONS_PLAYNAVIGATIONSOUND,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,85,161,10
+    CONTROL         "Hide $&RECYCLE.BIN folder",IDC_SETTINGS_CHECK_RECYCLE_BIN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,200,100,10
+    CONTROL         "Hide ""System &Volume Information"" folder",IDC_SETTINGS_CHECK_SYSVOL_INFO,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,213,150,10
 END
 
 IDD_OPTIONS_GENERAL DIALOGEX 0, 0, 230, 283
@@ -85,6 +89,13 @@ BEGIN
     GROUPBOX        "On Startup",IDC_STATIC,6,7,217,38
     CONTROL         "Load previous &tabs",IDC_STARTUP_PREVIOUSTABS,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,13,17,77,10
     CONTROL         "Load default &folder",IDC_STARTUP_DEFAULTFOLDER,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,30,77,10
+    GROUPBOX        "Default File Manager",IDC_STATIC,6,51,217,58
+    CONTROL         "&Don't replace Explorer",IDC_OPTION_REPLACEEXPLORER_NONE,
+                    "Button",BS_AUTORADIOBUTTON,13,65,87,10
+    CONTROL         "Replace &Explorer for filesystem folders",IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
+                    "Button",BS_AUTORADIOBUTTON,13,78,139,10
+    CONTROL         "Replace Explorer for &all folders (Vista and later)",IDC_OPTION_REPLACEEXPLORER_ALL,
+                    "Button",BS_AUTORADIOBUTTON,13,91,167,10
     GROUPBOX        "General settings",IDC_STATIC,6,115,217,66
     CONTROL         "Run in &portable mode (save preferences to XML file)",IDC_OPTION_XML,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,129,182,10
@@ -95,13 +106,6 @@ BEGIN
     LTEXT           "To change the language Explorer++ uses, simply select one from the list below. Any language change will not take effect until Explorer++ is restarted.",IDC_STATIC,13,200,204,30
     LTEXT           "&Language:",IDC_STATIC,13,236,35,8
     COMBOBOX        IDC_OPTIONS_LANGUAGE,53,234,101,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Default File Manager",IDC_STATIC,6,51,217,58
-    CONTROL         "Replace &Explorer for filesystem folders",IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
-                    "Button",BS_AUTORADIOBUTTON,13,78,139,10
-    CONTROL         "&Don't replace Explorer",IDC_OPTION_REPLACEEXPLORER_NONE,
-                    "Button",BS_AUTORADIOBUTTON,13,65,87,10
-    CONTROL         "Replace Explorer for &all folders (Vista and later)",IDC_OPTION_REPLACEEXPLORER_ALL,
-                    "Button",BS_AUTORADIOBUTTON,13,91,167,10
 END
 
 IDD_SETFILEATTRIBUTES DIALOGEX 0, 0, 265, 127
@@ -437,31 +441,32 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,188,134,50,14
 END
 
-IDD_SEARCH DIALOGEX 0, 0, 343, 310
+IDD_SEARCH DIALOGEX 0, 0, 343, 306
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CLIPCHILDREN | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Search"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_COMBO_NAME,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,67,26,241,198
-    GROUPBOX        "Attributes",IDC_STATIC,7,50,301,39,0,WS_EX_TRANSPARENT
-    CONTROL         "&Archive",IDC_CHECK_ARCHIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,67,40,10
-    CONTROL         "&Hidden",IDC_CHECK_HIDDEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,70,67,38,10
-    CONTROL         "&Read-only",IDC_CHECK_READONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,122,67,49,10
-    CONTROL         "S&ystem",IDC_CHECK_SYSTEM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,185,67,39,10
-    CONTROL         "Search Su&bfolders",IDC_CHECK_SEARCHSUBFOLDERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,188,98,74,10
-    CONTROL         "",IDC_LISTVIEW_SEARCHRESULTS,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,6,119,328,129
-    LTEXT           "Status:",IDC_STATIC_STATUSLABEL,7,257,24,8
-    LTEXT           "",IDC_STATIC_STATUS,35,257,299,18
-    CONTROL         "",IDC_STATIC_ETCHEDHORZ,"Static",SS_ETCHEDHORZ,7,283,328,1
-    DEFPUSHBUTTON   "Search",IDSEARCH,229,291,50,14
-    PUSHBUTTON      "Close",IDEXIT,284,291,50,14
-    LTEXT           "Search &Directory:",IDC_STATIC,7,9,57,8
-    CONTROL         "",IDC_COMBO_DIRECTORY,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,67,7,241,200
-    PUSHBUTTON      "",IDC_BUTTON_DIRECTORY,315,7,19,14,BS_ICON
-    LTEXT           "&Named:",IDC_STATIC,7,29,26,8
+    LTEXT           "File&name:",IDC_STATIC,7,11,38,8
+    CONTROL         "",IDC_COMBO_NAME,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,48,8,260,198
+    LTEXT           "&Directory:",IDC_STATIC,7,28,57,8
+    CONTROL         "",IDC_COMBO_DIRECTORY,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,48,26,260,200
+    PUSHBUTTON      "",IDC_BUTTON_DIRECTORY,315,26,19,14,BS_ICON
+    GROUPBOX        "Attributes",IDC_STATIC,7,43,119,43,0,WS_EX_TRANSPARENT
+    CONTROL         "&Archive",IDC_CHECK_ARCHIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,57,40,10
+    CONTROL         "&Hidden",IDC_CHECK_HIDDEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,65,57,38,10
+    CONTROL         "&Read-only",IDC_CHECK_READONLY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,70,49,10
+    CONTROL         "S&ystem",IDC_CHECK_SYSTEM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,65,70,39,10
+    GROUPBOX        "Search type",IDC_STATIC,137,43,196,43,0,WS_EX_TRANSPARENT
+    CONTROL         "Case Insensiti&ve",IDC_CHECK_CASEINSENSITIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,57,69,10
     CONTROL         "Use Regular &Expressions",IDC_CHECK_USEREGULAREXPRESSIONS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,85,98,95,10
-    CONTROL         "Case Insensiti&ve",IDC_CHECK_CASEINSENSITIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,98,69,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,225,57,95,10
+    CONTROL         "Search Su&bfolders",IDC_CHECK_SEARCHSUBFOLDERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,70,74,10
+    CONTROL         "",IDC_LISTVIEW_SEARCHRESULTS,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,94,328,154
+    LTEXT           "Status:",IDC_STATIC_STATUSLABEL,7,255,24,8
+    LTEXT           "",IDC_STATIC_STATUS,35,254,299,19
+    CONTROL         "",IDC_STATIC_ETCHEDHORZ,"Static",SS_ETCHEDHORZ,7,278,328,1
+    DEFPUSHBUTTON   "Search",IDSEARCH,229,286,50,14
+    PUSHBUTTON      "Close",IDEXIT,284,286,50,14
 END
 
 IDD_OPTIONS_TABS DIALOGEX 0, 0, 230, 283
@@ -469,6 +474,8 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Tabs"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    CONTROL         "Show taskbar thumbnails (Windows 7 and later)\n(Requires Explorer++ to be restarted)",IDC_TABS_TASKBARTHUMBNAILS,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,6,7,185,20
     CONTROL         "&Force all tabs to have the same width",IDC_TABS_SAMEWIDTH,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,30,136,10
     CONTROL         "&Ask for confirmation before closing all tabs",IDC_TABS_CLOSECONFIRMATION,
@@ -481,8 +488,6 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,82,99,10
     CONTROL         "Close the main window when closing the last tab",IDC_TABS_CLOSEMAINWINDOW,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,95,170,10
-    CONTROL         "Show taskbar thumbnails (Windows 7 and later)\n(Requires Explorer++ to be restarted)",IDC_TABS_TASKBARTHUMBNAILS,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,6,7,185,20
 END
 
 IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 283
@@ -490,40 +495,40 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Window"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    GROUPBOX        "General",IDC_STATIC,3,4,219,118
     CONTROL         "Allow &multiple instances",IDC_OPTION_MULTIPLEINSTANCES,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,15,91,10
-    CONTROL         "&Show file previews in display window",IDC_OPTION_FILEPREVIEWS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,261,133,10
+    CONTROL         "Use large toolbar icons",IDC_OPTION_LARGETOOLBARICONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,28,89,10
+    CONTROL         "Always show the tab bar",IDC_OPTION_ALWAYSSHOWTABBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,41,95,10
+    CONTROL         "Show the tab bar at the bottom",IDC_OPTION_SHOWTABBARATBOTTOM,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,54,117,10
+    CONTROL         "Extend tab &bar across entire window",IDC_OPTION_EXTENDTABCONTROL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,67,133,10
     CONTROL         "Show full &path in title bar",IDC_SETTINGS_CHECK_TITLEPATH,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,80,95,10
     CONTROL         "Show &username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,93,101,10
-    CONTROL         "&Disable treeview delay",IDC_OPTION_TREEVIEWDELAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,225,88,10
-    CONTROL         "Extend tab &bar across entire window",IDC_OPTION_EXTENDTABCONTROL,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,67,133,10
-    CONTROL         "Show &gridlines in details view",IDC_OPTION_GRIDLINES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,138,108,10
-    CONTROL         "Full row selection in details &view",IDC_OPTION_FULLROWSELECT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,164,117,10
     CONTROL         "Show privilege level in title bar",IDC_OPTION_PRIVILEGELEVELINTITLEBAR,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,106,113,10
-    CONTROL         "Always show the tab bar",IDC_OPTION_ALWAYSSHOWTABBAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,41,95,10
+    GROUPBOX        "Listview",IDC_STATIC,3,126,219,54
+    CONTROL         "Show &gridlines in details view",IDC_OPTION_GRIDLINES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,138,108,10
+    CONTROL         "Use check boxes to select items",IDC_OPTION_CHECKBOXSELECTION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,151,117,10
+    CONTROL         "Full row selection in details &view",IDC_OPTION_FULLROWSELECT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,164,117,10
     GROUPBOX        "Treeview",IDC_STATIC,3,186,219,55
     CONTROL         "Automatically synchronize treeview with main pane",IDC_OPTION_SYNCTREEVIEW,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,199,179,10
-    GROUPBOX        "General",IDC_STATIC,3,4,219,118
-    GROUPBOX        "Listview",IDC_STATIC,3,126,219,54
-    GROUPBOX        "Display Window",IDC_STATIC,3,246,219,30
-    CONTROL         "Use check boxes to select items",IDC_OPTION_CHECKBOXSELECTION,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,151,117,10
-    CONTROL         "Show the tab bar at the bottom",IDC_OPTION_SHOWTABBARATBOTTOM,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,54,117,10
     CONTROL         "Automatically expand nodes on selection",IDC_OPTION_TREEVIEWSELECTIONEXPAND,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,212,146,10
-    CONTROL         "Use large toolbar icons",IDC_OPTION_LARGETOOLBARICONS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,28,89,10
+    CONTROL         "&Disable treeview delay",IDC_OPTION_TREEVIEWDELAY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,225,88,10
+    GROUPBOX        "Display Window",IDC_STATIC,3,246,219,30
+    CONTROL         "&Show file previews in display window",IDC_OPTION_FILEPREVIEWS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,261,133,10
 END
 
 IDD_CUSTOMIZECOLORS DIALOGEX 0, 0, 363, 152
@@ -584,6 +589,10 @@ BEGIN
         BOTTOMMARGIN, 166
     END
 
+    IDD_OPTIONS_DEFAULT, DIALOG
+    BEGIN
+    END
+
     IDD_SELECTCOLUMNS, DIALOG
     BEGIN
         RIGHTMARGIN, 198
@@ -593,7 +602,6 @@ BEGIN
     IDD_SEARCH, DIALOG
     BEGIN
         RIGHTMARGIN, 341
-        BOTTOMMARGIN, 309
     END
 
     IDD_OPTIONS_TABS, DIALOG

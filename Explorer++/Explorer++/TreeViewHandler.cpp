@@ -107,12 +107,16 @@ void Explorerplusplus::OnTreeViewFileRename(void)
 
 void Explorerplusplus::OnTreeViewFileDelete(BOOL bPermanent)
 {
-	HTREEITEM		hItem;
+	HTREEITEM		hItem, hParentItem;
 	LPITEMIDLIST	pidl = NULL;
 	DWORD			fMask = 0;
 	HRESULT			hr;
 
-	hItem = TreeView_GetSelection(m_hTreeView);
+	hItem		= TreeView_GetSelection(m_hTreeView);
+	hParentItem = TreeView_GetParent(m_hTreeView,hItem); 
+
+	// Select the parent item to release the lock and allow deletion
+	TreeView_Select(m_hTreeView,hParentItem,TVGN_CARET);
 
 	if(hItem != NULL)
 	{

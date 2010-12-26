@@ -1295,7 +1295,9 @@ private:
 	BOOL					m_bShowGridlinesGlobal;
 	BOOL					m_bHideSystemFilesGlobal;
 	BOOL					m_bHideLinkExtensionGlobal;
-
+	BOOL					m_bHideRecycleBinGlobal;
+	BOOL					m_bHideSysVolInfoGlobal;
+	
 	/* Windows 7 taskbar thumbnail previews. */
 	DwmInvalidateIconicBitmapsProc	DwmInvalidateIconicBitmaps;
 	HMODULE					m_hDwmapi;

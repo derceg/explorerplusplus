@@ -34,7 +34,7 @@ void CMyTreeView::DirectoryAltered(void)
 	 notifications come in at the same time.
 	These situations may also happen multiple times
 	in one run. e.g. 5 files are created and renamed
-	before the first notification somes in. Therefore,
+	before the first notification comes in. Therefore,
 	need to keep track of ALL events.
 	Notifications:
 	Created

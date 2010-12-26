@@ -364,6 +364,8 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_bShowFriendlyDatesGlobal		= TRUE;
 	m_bHideSystemFilesGlobal		= FALSE;
 	m_bHideLinkExtensionGlobal		= FALSE;
+	m_bHideRecycleBinGlobal			= FALSE;
+	m_bHideSysVolInfoGlobal			= FALSE;
 }
 
 

@@ -124,6 +124,8 @@ HANDLE hFolderSizeThread)
 	m_bShowExtensions		= TRUE;
 	m_bHideSystemFiles		= FALSE;
 	m_bHideLinkExtension	= FALSE;
+	m_bHideRecycleBin		= FALSE;
+	m_bHideSysVolInfo		= FALSE;
 
 	/* Internal state. */
 	m_bColumnsPlaced		= FALSE;
@@ -500,6 +502,8 @@ void CFolderView::SetUserOptions(InitialSettings_t *is)
 	m_bHideLinkExtension	= is->bHideLinkExtension;
 	m_bForceSize			= is->bForceSize;
 	m_SizeDisplayFormat		= is->sdf;
+	m_bHideRecycleBin		= is->bHideRecycleBin;
+	m_bHideSysVolInfo		= is->bHideSysVolInfo;
 
 	StringCchCopy(m_szFilter,SIZEOF_ARRAY(m_szFilter),is->szFilter);
 
@@ -669,6 +673,26 @@ void CFolderView::SetInsertSorted(BOOL bInsertSorted)
 BOOL CFolderView::GetInsertSorted(void)
 {
 	return m_bInsertSorted;
+}
+
+void CFolderView::SetHideRecycleBin(BOOL bHideRecycleBin)
+{
+	m_bHideRecycleBin = bHideRecycleBin;
+}
+
+BOOL CFolderView::GetHideRecycleBin(void)
+{
+	return m_bHideRecycleBin;
+}
+
+void CFolderView::SetHideSysVolInfo(BOOL bHideSysVolInfo)
+{
+	m_bHideSysVolInfo = bHideSysVolInfo;
+}
+
+BOOL CFolderView::GetHideSysVolInfo(void)
+{
+	return m_bHideSysVolInfo;
 }
 
 void CFolderView::SetForceSize(BOOL bForceSize)

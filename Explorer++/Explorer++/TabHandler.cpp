@@ -170,6 +170,8 @@ int *pTabObjectIndex)
 		is.bDisableFolderSizesNetworkRemovable = m_bDisableFolderSizesNetworkRemovable;
 		is.bHideSystemFiles		= m_bHideSystemFilesGlobal;
 		is.bHideLinkExtension	= m_bHideLinkExtensionGlobal;
+		is.bHideRecycleBin		= m_bHideRecycleBinGlobal;
+		is.bHideSysVolInfo		= m_bHideSysVolInfoGlobal;
 
 		/* Check if there are any specific settings saved
 		for the specified directory. */
@@ -252,6 +254,8 @@ int *pTabObjectIndex)
 	m_pShellBrowser[iTabId]->SetShowFolderSizes(m_bShowFolderSizes);
 	m_pShellBrowser[iTabId]->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
 	m_pShellBrowser[iTabId]->SetInsertSorted(m_bInsertSorted);
+	m_pShellBrowser[iTabId]->SetHideRecycleBin(m_bHideRecycleBinGlobal);
+	m_pShellBrowser[iTabId]->SetHideSysVolInfo(m_bHideSysVolInfoGlobal);
 
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing

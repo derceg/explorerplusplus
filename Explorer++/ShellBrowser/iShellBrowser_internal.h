@@ -592,6 +592,10 @@ private:
 	BOOL				GetShowFriendlyDates(void);
 	void				SetInsertSorted(BOOL bInsertSorted);
 	BOOL				GetInsertSorted(void);
+	void				SetHideRecycleBin(BOOL bHideRecycleBin);
+	BOOL				GetHideRecycleBin(void);
+	void				SetHideSysVolInfo(BOOL bHideSysVolInfo);
+	BOOL				GetHideSysVolInfo(void);
 	void				SetForceSize(BOOL bForceSize);
 	void				SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
 
@@ -677,6 +681,8 @@ private:
 	BOOL				m_bHideSystemFiles;
 	BOOL				m_bHideLinkExtension;
 	BOOL				m_bInsertSorted;
+	BOOL				m_bHideRecycleBin;
+	BOOL				m_bHideSysVolInfo;
 
 	/* ID. */
 	int					m_ID;

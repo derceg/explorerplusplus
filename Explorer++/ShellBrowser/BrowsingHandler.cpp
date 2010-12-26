@@ -293,22 +293,42 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 BOOL CFolderView::IsFileFiltered(int iItemInternal)
 {
-	BOOL bHideSystemFile = FALSE;
-	BOOL bFilenameFiltered = FALSE;
+	BOOL bHideSystemFile	= FALSE;
+	BOOL bFilenameFiltered	= FALSE;
+	BOOL bHideRecycleBin	= FALSE;
+	BOOL bHideSysVolInfo	= FALSE;
 
+	// Filters files by filename
 	if(m_bApplyFilter &&
 		((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
 		bFilenameFiltered = IsFilenameFiltered(m_pExtraItemInfo[iItemInternal].szDisplayName);
 	}
 
+	// Hides system files
 	if(m_bHideSystemFiles)
 	{
 		bHideSystemFile = (m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
 			== FILE_ATTRIBUTE_SYSTEM;
 	}
 
-	return bFilenameFiltered || bHideSystemFile;
+	// Hides $RECYCLE.BIN folder
+	if(m_bHideRecycleBin && 
+		((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
+	{
+		if (lstrcmpi(m_pExtraItemInfo[iItemInternal].szDisplayName,_T("$RECYCLE.BIN")) == 0)
+			bHideRecycleBin = TRUE;
+	}
+
+	// Hides "System Volume Information" folder
+	if(m_bHideSysVolInfo && 
+		((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
+	{
+		if (lstrcmpi(m_pExtraItemInfo[iItemInternal].szDisplayName,_T("System Volume Information")) == 0)
+			bHideSysVolInfo = TRUE;
+	}
+
+	return bFilenameFiltered || bHideSystemFile || bHideRecycleBin || bHideSysVolInfo;
 }
 
 /* Processes an items filename. Essentially checks

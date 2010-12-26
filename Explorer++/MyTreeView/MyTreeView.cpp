@@ -86,7 +86,9 @@ HANDLE hIconsThread)
 	m_bDragCancelled	= FALSE;
 	m_bDragAllowed		= FALSE;
 
-	m_bShowHidden = TRUE;
+	m_bShowHidden		= TRUE;
+	m_bHideRecycleBin	= FALSE;
+	m_bHideSysVolInfo	= FALSE;
 
 	InitializeDragDropHelpers();
 
@@ -638,49 +640,68 @@ HTREEITEM hParent)
 
 					if(SUCCEEDED(hr))
 					{
+						BOOL bSkipItem = FALSE;
+
 						StrRetToBuf(&str,rgelt,ItemName,SIZEOF_ARRAY(ItemName));
 
-						pidlComplete = ILCombine(pidlDirectory,rgelt);
-
-						iItemId = GenerateUniqueItemId();
-						m_pItemInfo[iItemId].pidl = ILClone(pidlComplete);
-						m_pItemInfo[iItemId].pridl = ILClone(rgelt);
-
-						ItemStore.iItemId = iItemId;
-						StringCchCopy(ItemStore.ItemName,SIZEOF_ARRAY(ItemStore.ItemName),ItemName);
-
-						/* If this is a virtual directory, we'll post sort the items,
-						otherwise we'll pre-sort. */
-						if(bVirtualFolder)
+						// Hides $RECYCLE.BIN folder
+						if(m_bHideRecycleBin)
 						{
-							vItems.push_back(ItemStore);
+							if (lstrcmpi(ItemName,_T("$RECYCLE.BIN")) == 0)
+								bSkipItem = TRUE;
 						}
-						else
+
+						// Hides "System Volume Information" folder
+						if(m_bHideSysVolInfo)
 						{
-							itr = vItems.end();
+							if (lstrcmpi(ItemName,_T("System Volume Information")) == 0)
+								bSkipItem = TRUE;
+						}
 
-							/* Compare to the last item in the array and work
-							backwards. */
-							if(vItems.size() > 0)
+						if (!bSkipItem)
+						{ 
+							pidlComplete = ILCombine(pidlDirectory,rgelt);
+
+							iItemId = GenerateUniqueItemId();
+							m_pItemInfo[iItemId].pidl = ILClone(pidlComplete);
+							m_pItemInfo[iItemId].pridl = ILClone(rgelt);
+
+							ItemStore.iItemId = iItemId;
+							StringCchCopy(ItemStore.ItemName,SIZEOF_ARRAY(ItemStore.ItemName),ItemName);
+
+							/* If this is a virtual directory, we'll post sort the items,
+							otherwise we'll pre-sort. */
+							if(bVirtualFolder)
 							{
-								itr--;
+								vItems.push_back(ItemStore);
+							}
+							else
+							{
+								itr = vItems.end();
 
-								while(StrCmpLogicalW(ItemName,itr->ItemName) < 0 && itr != vItems.begin())
+								/* Compare to the last item in the array and work
+								backwards. */
+								if(vItems.size() > 0)
 								{
 									itr--;
+
+									while(StrCmpLogicalW(ItemName,itr->ItemName) < 0 && itr != vItems.begin())
+									{
+										itr--;
+									}
+
+									/* itr in this case is the item AFTER
+									which the current item should be inserted.
+									The only exception to this is when we are
+									inserting an item at the start of the list,
+									in which case we need to insert BEFORE the
+									first item. */
+									if(itr != vItems.begin() || StrCmpLogicalW(ItemName,itr->ItemName) > 0)
+										itr++;
 								}
 
-								/* itr in this case is the item AFTER
-								which the current item should be inserted.
-								The only exception to this is when we are
-								inserting an item at the start of the list,
-								in which case we need to insert BEFORE the
-								first item. */
-								if(itr != vItems.begin() || StrCmpLogicalW(ItemName,itr->ItemName) > 0)
-									itr++;
+								vItems.insert(itr,ItemStore);
 							}
-
-							vItems.insert(itr,ItemStore);
 						}
 
 						CoTaskMemFree(pidlComplete);
@@ -1830,6 +1851,16 @@ BOOL CMyTreeView::QueryDragging(void)
 void CMyTreeView::SetShowHidden(BOOL bShowHidden)
 {
 	m_bShowHidden = bShowHidden;
+}
+
+void CMyTreeView::SetHideRecycleBin(BOOL bHideRecycleBin)
+{
+	m_bHideRecycleBin = bHideRecycleBin;
+}
+
+void CMyTreeView::SetHideSysVolInfo(BOOL bHideSysVolInfo)
+{
+	m_bHideSysVolInfo = bHideSysVolInfo;
 }
 
 void CMyTreeView::RefreshAllIcons(void)

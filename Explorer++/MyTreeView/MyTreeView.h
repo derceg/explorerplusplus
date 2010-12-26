@@ -47,6 +47,8 @@ public:
 	DWORD WINAPI		Thread_SubFolders(LPVOID pParam);
 	DWORD WINAPI		Thread_AddDirectoryInternal(IShellFolder *pShellFolder,LPITEMIDLIST pidlDirectory,HTREEITEM hParent);
 	void				SetShowHidden(BOOL bShowHidden);
+	void				SetHideRecycleBin(BOOL bHideRecycleBin);
+	void				SetHideSysVolInfo(BOOL bHideSysVolInfo);
 	void				RefreshAllIcons(void);
 
 	/* Sorting. */
@@ -160,6 +162,8 @@ private:
 	TCHAR				m_szOldName[MAX_PATH];
 	BOOL				m_bRightClick;
 	BOOL				m_bShowHidden;
+	BOOL				m_bHideRecycleBin;
+	BOOL				m_bHideSysVolInfo;
 
 	/* Subfolder thread. */
 	CRITICAL_SECTION	m_csSubFolders;

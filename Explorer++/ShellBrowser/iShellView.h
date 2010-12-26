@@ -75,6 +75,8 @@ typedef struct
 	BOOL	bDisableFolderSizesNetworkRemovable;
 	BOOL	bHideSystemFiles;
 	BOOL	bHideLinkExtension;
+	BOOL	bHideRecycleBin;
+	BOOL	bHideSysVolInfo;
 	BOOL	bForceSize;
 	SizeDisplayFormat_t	sdf;
 	TCHAR	szFilter[512];
@@ -381,6 +383,10 @@ __interface IShellBrowser2 : IUnknown
 	virtual BOOL			GetShowFriendlyDates(void);
 	virtual void			SetInsertSorted(BOOL bInsertSorted);
 	virtual BOOL			GetInsertSorted(void);
+	virtual void			SetHideRecycleBin(BOOL bHideRecycleBin);
+	virtual BOOL			GetHideRecycleBin(void);
+	virtual void			SetHideSysVolInfo(BOOL bHideSysVolInfo);
+	virtual BOOL			GetHideSysVolInfo(void);
 	virtual void			SetForceSize(BOOL bForceSize);
 	virtual void			SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
 };
