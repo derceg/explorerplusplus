@@ -1,29 +1,31 @@
 #ifndef FILECONTEXTMENUMANAGER_INCLUDED
 #define FILECONTEXTMENUMANAGER_INCLUDED
 
+#include <list>
+
 __interface IFileContextMenuExternal
 {
 	/* Allows the caller to add custom entries to the
 	context menu before it is shown. */
-	virtual void	AddMenuEntries(LPITEMIDLIST pidlParent,list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu);
+	virtual void	AddMenuEntries(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu);
 
 	/* Allows the caller to handle the processing
 	of a shell menu item. For example, the 'Open'
 	item may be processed internally.
 	Returns TRUE if the item was processed;
 	FALSE otherwise. */
-	virtual BOOL	HandleShellMenuItem(LPITEMIDLIST pidlParent,list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd);
+	virtual BOOL	HandleShellMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd);
 
 	/* Handles the processing for one of the menu
 	items that was added by the caller. */
-	virtual void	HandleCustomMenuItem(LPITEMIDLIST pidlParent,list<LPITEMIDLIST> pidlItemList,int iCmd);
+	virtual void	HandleCustomMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,int iCmd);
 };
 
 class CFileContextMenuManager
 {
 public:
 
-	CFileContextMenuManager(HWND hwnd,LPITEMIDLIST pidlParent,list<LPITEMIDLIST> pidlItemList);
+	CFileContextMenuManager(HWND hwnd,LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList);
 	~CFileContextMenuManager();
 
 	/* Shows the context menu. */
@@ -45,7 +47,7 @@ private:
 	int					m_iMaxID;
 
 	LPITEMIDLIST		m_pidlParent;
-	list<LPITEMIDLIST>	m_pidlItemList;
+	std::list<LPITEMIDLIST>	m_pidlItemList;
 };
 
 #endif

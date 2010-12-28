@@ -1,9 +1,14 @@
 #ifndef SEARCHDIALOG_INCLUDED
 #define SEARCHDIALOG_INCLUDED
 
+#include <list>
+#include <vector>
+#include <string>
+#include <regex>
 #include <unordered_map>
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ReferenceCount.h"
+#include "../Helper/FileContextMenuManager.h"
 
 class CSearchDialog;
 
@@ -39,8 +44,8 @@ private:
 	BOOL			m_bStateSaved;
 
 	TCHAR			m_szSearchPattern[MAX_PATH];
-	list<wstring>	m_SearchDirectories;
-	list<wstring>	m_SearchPatterns;
+	std::list<std::wstring>	m_SearchDirectories;
+	std::list<std::wstring>	m_SearchPatterns;
 	BOOL			m_bSearchSubFolders;
 	BOOL			m_bUseRegularExpressions;
 	BOOL			m_bCaseInsensitive;
@@ -70,7 +75,7 @@ public:
 private:
 
 	void				SearchDirectory(const TCHAR *szDirectory);
-	void				SearchDirectoryInternal(const TCHAR *szSearchDirectory,list<wstring> *pSubFolderList);
+	void				SearchDirectoryInternal(const TCHAR *szSearchDirectory,std::list<std::wstring> *pSubFolderList);
 
 	HWND				m_hDlg;
 
@@ -81,6 +86,8 @@ private:
 	BOOL				m_bCaseInsensitive;
 	BOOL				m_bSearchSubFolders;
 
+	std::wregex			m_rxPattern;
+
 	CRITICAL_SECTION	m_csStop;
 	BOOL				m_bStopSearching;
 
@@ -88,12 +95,22 @@ private:
 	int					m_iFilesFound;
 };
 
-class CSearchDialog : public CBaseDialog
+class CSearchDialog : public CBaseDialog, public IFileContextMenuExternal
 {
 public:
 
 	CSearchDialog(HINSTANCE hInstance,int iResource,HWND hParent,TCHAR *szSearchDirectory);
 	~CSearchDialog();
+
+	/* IFileContextMenuExternal methods. */
+	void			AddMenuEntries(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu);
+	BOOL			HandleShellMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd);
+	void			HandleCustomMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,int iCmd);
+
+	/* Sorting methods. */
+	int CALLBACK	SortResults(LPARAM lParam1,LPARAM lParam2);
+	int CALLBACK	SortResultsByName(LPARAM lParam1,LPARAM lParam2);
+	int CALLBACK	SortResultsByPath(LPARAM lParam1,LPARAM lParam2);
 
 protected:
 
@@ -115,6 +132,18 @@ private:
 	static const int SEARCH_PROCESSITEMS_TIMER_ELAPSED = 50;
 	static const int SEARCH_MAX_ITEMS_BATCH_PROCESS = 100;
 
+	/* Available search modes. */
+	enum SortMode_t
+	{
+		SORT_NAME,
+		SORT_PATH
+	};
+
+	struct ColumnInfo_t
+	{
+		SortMode_t	SearchMode;
+	};
+
 	void	OnSearch();
 	void	SaveState(HWND hDlg);
 
@@ -134,9 +163,12 @@ private:
 
 	/* Listview item information. */
 	/* TODO: These are AWAITING search items. */
-	list<LPITEMIDLIST>			m_SearchItems;
-	unordered_map<int,wstring>	m_SearchItemsMapInternal;
+	std::list<LPITEMIDLIST>		m_SearchItems;
+	std::unordered_map<int,std::wstring>	m_SearchItemsMapInternal;
 	int							m_iInternalIndex;
+	std::vector<ColumnInfo_t>	m_Columns;
+	SortMode_t					m_SortMode;
+	BOOL						m_bSortAscending;
 
 	int							m_iMinWidth;
 	int							m_iMinHeight;

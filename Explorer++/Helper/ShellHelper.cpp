@@ -24,7 +24,7 @@ HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
 HRESULT AddJumpListTaskInternal(IObjectCollection *poc,TCHAR *pszName,
 	TCHAR *pszPath,TCHAR *pszArguments,TCHAR *pszIconPath,int iIcon);
 
-HRESULT GetIdlFromParsingName(TCHAR *szParsingName,LPITEMIDLIST *pidl)
+HRESULT GetIdlFromParsingName(const TCHAR *szParsingName,LPITEMIDLIST *pidl)
 {
 	if(szParsingName == NULL ||
 		pidl == NULL)

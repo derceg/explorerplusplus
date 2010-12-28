@@ -13,30 +13,31 @@
 
 #include "stdafx.h"
 #include <regex>
-#include "Explorer++.h"
+#include "Explorer++_internal.h"
 #include "XMLSettings.h"
+#include "SearchDialog.h"
+#include "MainResource.h"
 #include "../Helper/Helper.h"
+#include "../Helper/Registry.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/FileContextMenuManager.h"
-#include "SearchDialog.h"
-#include "MainResource.h"
-
-using namespace std;
 
 
-namespace SearchDialogMessages
+namespace NSearchDialog
 {
-	const int WM_APP_SEARCHITEMFOUND = WM_APP + 1;
-	const int WM_APP_SEARCHFINISHED = WM_APP + 2;
-	const int WM_APP_SEARCHCHANGEDDIRECTORY = WM_APP + 3;
+	const int		WM_APP_SEARCHITEMFOUND = WM_APP + 1;
+	const int		WM_APP_SEARCHFINISHED = WM_APP + 2;
+	const int		WM_APP_SEARCHCHANGEDDIRECTORY = WM_APP + 3;
+	const int		WM_APP_REGULAREXPRESSIONINVALID = WM_APP + 4;
+
+	int CALLBACK	SortResultsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+
+	DWORD WINAPI	SearchThread(LPVOID pParam);
+	int CALLBACK	BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
 }
 
 const TCHAR CSearchDialogPersistentSettings::REGISTRY_SETTINGS_KEY[] = _T("Search");
-
-DWORD WINAPI SearchThread(LPVOID pParam);
-
-int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
 
 CSearchDialog::CSearchDialog(HINSTANCE hInstance,int iResource,
 	HWND hParent,TCHAR *szSearchDirectory) :
@@ -47,6 +48,14 @@ CBaseDialog(hInstance,iResource,hParent)
 	m_bExit = FALSE;
 	m_bSetSearchTimer = TRUE;
 	m_iInternalIndex = 0;
+
+	ColumnInfo_t ci;
+
+	ci.SearchMode = SORT_NAME;
+	m_Columns.push_back(ci);
+
+	ci.SearchMode = SORT_PATH;
+	m_Columns.push_back(ci);
 
 	m_pSearch = NULL;
 
@@ -63,7 +72,10 @@ CSearchDialog::~CSearchDialog()
 
 	/* TODO: If a search object is
 	active, release it. */
-	//m_pSearch->Release();
+	if(m_pSearch != NULL)
+	{
+		m_pSearch->Release();
+	}
 }
 
 BOOL CSearchDialog::OnInitDialog()
@@ -298,7 +310,7 @@ BOOL CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 			bi.pszDisplayName	= szDisplayName;
 			bi.lpszTitle		= szTitle;
 			bi.ulFlags			= BIF_RETURNONLYFSDIRS|BIF_NEWDIALOGSTYLE;
-			bi.lpfn				= BrowseCallbackProc;
+			bi.lpfn				= NSearchDialog::BrowseCallbackProc;
 			bi.lParam			= reinterpret_cast<LPARAM>(szDirectory);
 			PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
 
@@ -332,7 +344,7 @@ BOOL CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-int CALLBACK BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData)
+int CALLBACK NSearchDialog::BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData)
 {
 	assert(lpData != NULL);
 
@@ -368,6 +380,31 @@ void CSearchDialog::OnSearch()
 		GetDlgItemText(m_hDlg,IDC_COMBO_NAME,szSearchPattern,
 			SIZEOF_ARRAY(szSearchPattern));
 		PathRemoveBlanks(szSearchPattern);
+
+		/* Turn search patterns of the form '???' into '*???*', and
+		use this modified string to search. */
+		/* TODO: Will interfere with regular expression searching.
+		Only do it if not searching use regular expressions, and
+		'*' doesn't appear at the start or end of the string. */
+		/*if(lstrlen(szSearchPattern) > 0)
+		{
+			TCHAR szTemp[MAX_PATH];
+
+			if(szSearchPattern[0] != '*')
+			{
+				StringCchCat(szTemp,SIZEOF_ARRAY(szTemp),_T("*"));
+			}
+
+			StringCchCat(szTemp,SIZEOF_ARRAY(szTemp),szSearchPattern);
+
+			if(szSearchPattern[lstrlen(szSearchPattern) - 1] != '*')
+			{
+				StringCchCat(szTemp,SIZEOF_ARRAY(szTemp),_T("*"));
+			}
+
+			StringCchCopy(szSearchPattern,SIZEOF_ARRAY(szSearchPattern),
+				szTemp);
+		}*/
 
 		BOOL bSearchSubFolders = IsDlgButtonChecked(m_hDlg,IDC_CHECK_SEARCHSUBFOLDERS) ==
 			BST_CHECKED;
@@ -451,51 +488,113 @@ void CSearchDialog::OnSearch()
 			ComboBox_SetCurSel(hComboBox,0);
 		}
 
-		/* TODO: */
-		/* Turn search patterns of the form '???' into '*???*', and
-		use this modified string to search. */
-		if(lstrlen(szSearchPattern) > 0)
-		{
-			/*TCHAR szPattern[MAX_PATH];
-
-			StringCchCopy(szPattern,SIZEOF_ARRAY(szPattern),psi->szName);
-			memset(psi->szName,0,SIZEOF_ARRAY(psi->szName));
-
-			if(szPattern[0] != '*')
-			{
-				StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
-			}
-
-			StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),szPattern);
-
-			if(szPattern[lstrlen(szPattern) - 1] != '*')
-			{
-				StringCchCat(psi->szName,SIZEOF_ARRAY(psi->szName),_T("*"));
-			}*/
-		}
-
 		GetDlgItemText(m_hDlg,IDSEARCH,m_szSearchButton,SIZEOF_ARRAY(m_szSearchButton));
 
 		TCHAR szTemp[64];
 
-		LoadString(g_hLanguageModule,IDS_STOP,
-			szTemp,SIZEOF_ARRAY(szTemp));
+		LoadString(GetInstance(),IDS_STOP,szTemp,SIZEOF_ARRAY(szTemp));
 		SetDlgItemText(m_hDlg,IDSEARCH,szTemp);
 
 		m_bSearching = TRUE;
 
 		/* Create a background thread, and search using it... */
-		CreateThread(NULL,0,SearchThread,reinterpret_cast<LPVOID>(m_pSearch),0,NULL);
+		CreateThread(NULL,0,NSearchDialog::SearchThread,reinterpret_cast<LPVOID>(m_pSearch),
+			0,NULL);
 	}
 	else
 	{
 		m_bStopSearching = TRUE;
 
-		m_pSearch->StopSearching();
+		if(m_pSearch != NULL)
+		{
+			m_pSearch->StopSearching();
 
-		/* TODO: Needed? */
-		//m_pSearch = NULL;
+			m_pSearch->Release();
+			m_pSearch = NULL;
+		}
 	}
+}
+
+int CALLBACK NSearchDialog::SortResultsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
+{
+	assert(lParamSort != NULL);
+
+	CSearchDialog *psd = reinterpret_cast<CSearchDialog *>(lParamSort);
+
+	return psd->SortResults(lParam1,lParam2);
+}
+
+int CALLBACK CSearchDialog::SortResults(LPARAM lParam1,LPARAM lParam2)
+{
+	int iRes = 0;
+
+	switch(m_SortMode)
+	{
+	case SORT_NAME:
+		iRes = SortResultsByName(lParam1,lParam2);
+		break;
+
+	case SORT_PATH:
+		iRes = SortResultsByPath(lParam1,lParam2);
+		break;
+	}
+
+	if(!m_bSortAscending)
+	{
+		iRes = -iRes;
+	}
+
+	return iRes;
+}
+
+int CALLBACK CSearchDialog::SortResultsByName(LPARAM lParam1,LPARAM lParam2)
+{
+	auto itr1 = m_SearchItemsMapInternal.find(static_cast<int>(lParam1));
+	auto itr2 = m_SearchItemsMapInternal.find(static_cast<int>(lParam2));
+
+	TCHAR szFilename1[MAX_PATH];
+	TCHAR szFilename2[MAX_PATH];
+
+	StringCchCopy(szFilename1,SIZEOF_ARRAY(szFilename1),itr1->second.c_str());
+	StringCchCopy(szFilename2,SIZEOF_ARRAY(szFilename2),itr2->second.c_str());
+
+	PathStripPath(szFilename1);
+	PathStripPath(szFilename2);
+
+	return StrCmpLogicalW(szFilename1,szFilename2);
+}
+
+int CALLBACK CSearchDialog::SortResultsByPath(LPARAM lParam1,LPARAM lParam2)
+{
+	auto itr1 = m_SearchItemsMapInternal.find(static_cast<int>(lParam1));
+	auto itr2 = m_SearchItemsMapInternal.find(static_cast<int>(lParam2));
+
+	TCHAR szPath1[MAX_PATH];
+	TCHAR szPath2[MAX_PATH];
+
+	StringCchCopy(szPath1,SIZEOF_ARRAY(szPath1),itr1->second.c_str());
+	StringCchCopy(szPath2,SIZEOF_ARRAY(szPath2),itr2->second.c_str());
+
+	PathRemoveFileSpec(szPath1);
+	PathRemoveFileSpec(szPath2);
+
+	return StrCmpLogicalW(szPath1,szPath2);
+}
+
+/* TODO: */
+void CSearchDialog::AddMenuEntries(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu)
+{
+
+}
+
+BOOL CSearchDialog::HandleShellMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
+{
+	return FALSE;
+}
+
+void CSearchDialog::HandleCustomMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,int iCmd)
+{
+
 }
 
 BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
@@ -506,7 +605,6 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 		if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS))
 		{
 			HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS);
-
 			int iSelected = ListView_GetNextItem(hListView,-1,LVNI_ALL|LVNI_SELECTED);
 
 			if(iSelected != -1)
@@ -528,8 +626,7 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 
 					LPITEMIDLIST pidlFull = NULL;
 
-					/* TODO: Make first argument const? */
-					HRESULT hr = GetIdlFromParsingName((TCHAR *)itr->second.c_str(),&pidlFull);
+					HRESULT hr = GetIdlFromParsingName(itr->second.c_str(),&pidlFull);
 
 					if(hr == S_OK)
 					{
@@ -543,62 +640,90 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 		}
 		break;
 
+	case NM_CLICK:
+		{
+			if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_LINK_STATUS))
+			{
+				PNMLINK pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
+
+				ShellExecute(NULL,L"open",pnmlink->item.szUrl,
+					NULL,NULL,SW_SHOW);
+			}
+		}
+		break;
+
 	case NM_RCLICK:
 		{
 			if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS))
 			{
-				HWND hListView;
-				LVITEM lvItem;
-				LPITEMIDLIST pidlDirectory = NULL;
-				LPITEMIDLIST pidl = NULL;
-				POINTS ptsCursor;
-				POINT ptCursor;
-				DWORD dwCursorPos;
-				BOOL bRet;
-				int iSelected;
-
-				hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS);
-
-				iSelected = ListView_GetNextItem(hListView,-1,LVNI_ALL|LVNI_SELECTED);
+				HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS);
+				int iSelected = ListView_GetNextItem(hListView,-1,LVNI_ALL|LVNI_SELECTED);
 
 				if(iSelected != -1)
 				{
+					LVITEM lvItem;
 					lvItem.mask		= LVIF_PARAM;
 					lvItem.iItem	= iSelected;
 					lvItem.iSubItem	= 0;
-					bRet = ListView_GetItem(hListView,&lvItem);
+					BOOL bRet = ListView_GetItem(hListView,&lvItem);
 
 					if(bRet)
 					{
-						LPITEMIDLIST pidlFull = NULL;
-
 						auto itr = m_SearchItemsMapInternal.find(static_cast<int>(lvItem.lParam));
-
 						assert(itr != m_SearchItemsMapInternal.end());
 
-						pidl = ILFindLastID(pidlFull);
+						LPITEMIDLIST pidlFull = NULL;
 
-						dwCursorPos = GetMessagePos();
-						ptsCursor = MAKEPOINTS(dwCursorPos);
+						HRESULT hr = GetIdlFromParsingName(itr->second.c_str(),&pidlFull);
 
-						ptCursor.x = ptsCursor.x;
-						ptCursor.y = ptsCursor.y;
+						if(hr == S_OK)
+						{
+							list<LPITEMIDLIST> pidlList;
+							pidlList.push_back(ILFindLastID(pidlFull));
 
-						list<LPITEMIDLIST> pidlList;
+							LPITEMIDLIST pidlDirectory = ILClone(pidlFull);
+							ILRemoveLastID(pidlDirectory);
 
-						pidlList.push_back(pidl);
+							CFileContextMenuManager fcmm(m_hDlg,pidlDirectory,
+								pidlList);
 
-						CFileContextMenuManager fcmm(m_hDlg,pidlDirectory,
-							pidlList);
+							DWORD dwCursorPos = GetMessagePos();
 
-						/* TODO: IFileContextMenuExternal interface. */
-						//fcmm.ShowMenu(NULL,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&ptCursor);
+							POINT ptCursor;
+							ptCursor.x = GET_X_LPARAM(dwCursorPos);
+							ptCursor.y = GET_Y_LPARAM(dwCursorPos);
 
-						CoTaskMemFree(pidlDirectory);
-						CoTaskMemFree(pidlFull);
+							fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&ptCursor,NULL,
+								FALSE,GetKeyState(VK_SHIFT) & 0x80);
+
+							CoTaskMemFree(pidlDirectory);
+							CoTaskMemFree(pidlFull);
+						}
 					}
 				}
 			}
+		}
+		break;
+
+	case LVN_COLUMNCLICK:
+		{
+			/* A listview header has been clicked,
+			so sort by that column. */
+			NMLISTVIEW *pnmlv = reinterpret_cast<NMLISTVIEW *>(pnmhdr);
+
+			/* If the column clicked matches the current sort mode,
+			flip the sort direction, else switch to that sort mode. */
+			if(m_Columns[pnmlv->iSubItem].SearchMode == m_SortMode)
+			{
+				m_bSortAscending = !m_bSortAscending;
+			}
+			else
+			{
+				m_SortMode = m_Columns[pnmlv->iSubItem].SearchMode;
+			}
+
+			ListView_SortItems(GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS),
+				NSearchDialog::SortResultsStub,reinterpret_cast<LPARAM>(this));
 		}
 		break;
 	}
@@ -614,7 +739,7 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 		add it onto the list of current items, which will be processed
 		in batch. This is done to stop this message from blocking the
 		main GUI (also see http://www.flounder.com/iocompletion.htm). */
-		case SearchDialogMessages::WM_APP_SEARCHITEMFOUND:
+		case NSearchDialog::WM_APP_SEARCHITEMFOUND:
 			{
 				m_SearchItems.push_back(reinterpret_cast<LPITEMIDLIST>(wParam));
 
@@ -628,7 +753,7 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 			}
 			break;
 
-		case SearchDialogMessages::WM_APP_SEARCHFINISHED:
+		case NSearchDialog::WM_APP_SEARCHFINISHED:
 			{
 				TCHAR szStatus[512];
 
@@ -654,12 +779,11 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 				m_bSearching = FALSE;
 				m_bStopSearching = FALSE;
-
 				SetDlgItemText(m_hDlg,IDSEARCH,m_szSearchButton);
 			}
 			break;
 
-		case SearchDialogMessages::WM_APP_SEARCHCHANGEDDIRECTORY:
+		case NSearchDialog::WM_APP_SEARCHCHANGEDDIRECTORY:
 			{
 				TCHAR szStatus[512];
 				TCHAR *pszDirectory = NULL;
@@ -668,11 +792,26 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 				TCHAR szTemp[64];
 
-				LoadString(g_hLanguageModule,IDS_SEARCHING,
+				LoadString(GetInstance(),IDS_SEARCHING,
 					szTemp,SIZEOF_ARRAY(szTemp));
 				StringCchPrintf(szStatus,SIZEOF_ARRAY(szStatus),szTemp,
 					pszDirectory);
 				SetDlgItemText(m_hDlg,IDC_STATIC_STATUS,szStatus);
+			}
+			break;
+
+		case NSearchDialog::WM_APP_REGULAREXPRESSIONINVALID:
+			{
+				/* The regular expression passed to the search
+				thread was invalid. Show the user an error message. */
+				/* TODO: The link control needs to move/resize
+				when the dialog is resized. */
+				SetDlgItemText(m_hDlg,IDC_LINK_STATUS,_T("<a href=\"http://msdn.microsoft.com/en-us/library/bb982727.aspx\">\
+					The form of the regular expression is incorrect</a>"));
+
+				m_bSearching = FALSE;
+				m_bStopSearching = FALSE;
+				SetDlgItemText(m_hDlg,IDSEARCH,m_szSearchButton);
 			}
 			break;
 	}
@@ -837,15 +976,13 @@ BOOL CSearchDialog::OnNcDestroy()
 	return 0;
 }
 
-DWORD WINAPI SearchThread(LPVOID pParam)
+DWORD WINAPI NSearchDialog::SearchThread(LPVOID pParam)
 {
 	assert(pParam != NULL);
 
 	CSearch *pSearch = reinterpret_cast<CSearch *>(pParam);
-
 	pSearch->StartSearching();
-
-	delete pSearch;
+	pSearch->Release();
 
 	return 0;
 }
@@ -879,15 +1016,38 @@ void CSearch::StartSearching()
 	m_iFoldersFound = 0;
 	m_iFilesFound = 0;
 
+	if(lstrcmp(m_szSearchPattern,EMPTY_STRING) != 0 &&
+		m_bUseRegularExpressions)
+	{
+		try
+		{
+			if(m_bCaseInsensitive)
+			{
+				m_rxPattern.assign(m_szSearchPattern,regex_constants::icase);
+			}
+			else
+			{
+				m_rxPattern.assign(m_szSearchPattern);
+			}
+		}
+		catch(std::exception)
+		{
+			SendMessage(m_hDlg,NSearchDialog::WM_APP_REGULAREXPRESSIONINVALID,
+				0,0);
+
+			return;
+		}
+	}
+
 	SearchDirectory(m_szBaseDirectory);
 
-	SendMessage(m_hDlg,SearchDialogMessages::WM_APP_SEARCHFINISHED,0,
+	SendMessage(m_hDlg,NSearchDialog::WM_APP_SEARCHFINISHED,0,
 		MAKELPARAM(m_iFoldersFound,m_iFilesFound));
 }
 
 void CSearch::SearchDirectory(const TCHAR *szDirectory)
 {
-	SendMessage(m_hDlg,SearchDialogMessages::WM_APP_SEARCHCHANGEDDIRECTORY,
+	SendMessage(m_hDlg,NSearchDialog::WM_APP_SEARCHCHANGEDDIRECTORY,
 		reinterpret_cast<WPARAM>(szDirectory),0);
 
 	list<wstring> SubFolderList;
@@ -947,27 +1107,7 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 
 					if(m_bUseRegularExpressions)
 					{
-						wregex rx;
-
-						try
-						{
-							if(m_bCaseInsensitive)
-							{
-								rx.assign(m_szSearchPattern,regex_constants::icase);
-							}
-							else
-							{
-								rx.assign(m_szSearchPattern);
-							}
-						}
-						catch(std::exception)
-						{
-							/* TODO: Show user error message. The regex needs
-							to be initialized only ONCE per search. Also, need
-							to show message box from main thread. */
-						}
-
-						if(regex_match(wfd.cFileName,rx))
+						if(regex_match(wfd.cFileName,m_rxPattern))
 						{
 							bMatchFileName = TRUE;
 						}
@@ -1012,7 +1152,7 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 					PathCombine(szFullFileName,szSearchDirectory,wfd.cFileName);
 					GetIdlFromParsingName(szFullFileName,&pidl);
 
-					PostMessage(m_hDlg,SearchDialogMessages::WM_APP_SEARCHITEMFOUND,
+					PostMessage(m_hDlg,NSearchDialog::WM_APP_SEARCHITEMFOUND,
 						reinterpret_cast<WPARAM>(ILClone(pidl)),0);
 
 					CoTaskMemFree(pidl);
