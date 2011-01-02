@@ -539,7 +539,6 @@ int CFolderView::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 		if(IsNamespaceRoot(pidlDirectory))
 		{
 			hr = SHGetDesktopFolder(&pShellFolder);
-			m_bVirtualFolder = TRUE;
 		}
 		else
 		{

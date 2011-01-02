@@ -181,6 +181,14 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 
 		hParent = TreeView_GetParent(m_hTreeView,hItem);
 
+		/* If we right-click on the "Desktop" item in the treeview, there is no parent.
+		   In such case, use "Desktop" as parent item as well, to allow the context menu
+		   to be shown. */
+		if(hParent == NULL)
+		{
+			hParent = hItem;
+		}
+
 		if(hParent != NULL)
 		{
 			pidlParent = m_pMyTreeView->BuildPath(hParent);
