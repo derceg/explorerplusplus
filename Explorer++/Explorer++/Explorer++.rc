@@ -1293,6 +1293,7 @@ BEGIN
     IDS_TOOLBAR_SHOWCOMMANDPROMPT "Show Command Prompt"
     IDS_TOOLBAR_ORGANIZEBOOKMARKS "Organize Bookmarks"
     IDS_SEPARATOR           "Separator"
+    IDS_TOOLBAR_DELETEPERMANENTLY "Delete permanently"
 END
 
 STRINGTABLE

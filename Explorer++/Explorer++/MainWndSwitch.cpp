@@ -585,6 +585,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			OnFileDelete(FALSE);
 			break;
 
+		case TOOLBAR_DELETEPERMANENTLY:
 		case IDM_FILE_DELETEPERMANENTLY:
 			OnFileDelete(TRUE);
 			break;

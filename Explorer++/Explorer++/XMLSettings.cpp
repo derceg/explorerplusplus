@@ -2725,6 +2725,8 @@ WCHAR *wszName,WCHAR *wszValue)
 					tb.iItemID = TOOLBAR_PASTE;
 				else if(lstrcmpi(bstrValue,L"Delete") == 0)
 					tb.iItemID = TOOLBAR_DELETE;
+				else if(lstrcmpi(bstrValue,L"Delete Permanently") == 0)
+					tb.iItemID = TOOLBAR_DELETEPERMANENTLY;
 				else if(lstrcmpi(bstrValue,L"Views") == 0)
 					tb.iItemID = TOOLBAR_VIEWS;
 				else if(lstrcmpi(bstrValue,L"Search") == 0)
