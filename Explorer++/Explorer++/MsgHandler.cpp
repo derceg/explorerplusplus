@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
+#include "WildcardSelectDialog.h"
 #include "../Helper/ShellHelper.h"
 
 
@@ -849,10 +850,10 @@ void Explorerplusplus::OnSaveFileSlack(void)
 
 void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
 {
-	m_bWildcardSelect = bSelect;
+	CWildcardSelectDialog WilcardSelectDialog(g_hLanguageModule,
+		IDD_WILDCARDSELECT,m_hContainer,bSelect);
 
-	DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_WILDCARDSELECT),m_hContainer,
-	WildcardSelectProcStub,(LPARAM)this);
+	WilcardSelectDialog.ShowModalDialog();
 }
 
 BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)

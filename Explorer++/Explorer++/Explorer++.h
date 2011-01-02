@@ -33,7 +33,6 @@ lParam not currently used. */
 /* Private definitions. */
 #define FROM_LISTVIEW				0
 #define FROM_TREEVIEW				1
-#define FROM_SEARCH					2
 #define FROM_DRIVEBAR				3
 
 #define MAX_BOOKMARKTOOLBAR_ITEMS	100
@@ -66,7 +65,6 @@ lParam not currently used. */
 #define REG_SELECTDEFAULTCOLUMNS_KEY	_T("SelectDefaultColumns")
 #define REG_SETFILEATTRIBUTES_KEY	_T("SetFileAttributes")
 #define REG_SPLITFILE_KEY			_T("SplitFile")
-#define REG_WILDCARD_KEY			_T("WildcardSelect")
 
 #define TAB_WINDOW_HEIGHT			24
 #define DEFAULT_TREEVIEW_WIDTH		208
@@ -233,7 +231,6 @@ public:
 	INT_PTR CALLBACK	RenameTabProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SetFileAttributesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	WildcardSelectProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SplitFileProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	MergeFilesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -742,8 +739,6 @@ private:
 	void					LoadToolbarInformationFromRegistry(void);
 	void					SaveStateToRegistry(void);
 	void					LoadStateFromRegistry(void);
-	void					SaveWildcardStateToRegistry(HKEY hParentKey);
-	void					LoadWildcardStateFromRegistry(HKEY hParentKey);
 	void					SaveAddBookmarkStateToRegistry(HKEY hParentKey);
 	void					LoadAddBookmarkStateFromRegistry(HKEY hParentKey);
 	void					SaveColorRulesStateToRegistry(HKEY hParentKey);
@@ -1029,11 +1024,6 @@ private:
 	void					OnDestroyFilesConfirmDelete(HWND hDlg);
 	void					DestroyFilesSaveState(HWND hDlg);
 
-	/* Wildcard select dialog. */
-	void					OnWildcardSelectInit(HWND hDlg);
-	void					OnWildcardSelectOk(HWND hDlg);
-	void					WildcardSelectSaveState(HWND hDlg);
-
 	/* Rename tab dialog. */
 	void					OnRenameTabInit(HWND hDlg);
 	void					OnRenameTabOk(HWND hDlg);
@@ -1091,11 +1081,9 @@ private:
 	void					LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					LoadColorRulesStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
 	void					LoadCustomizeColorsStateFromSML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
-	void					LoadWildcardStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
 	void					SaveStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveColorRulesStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	void					SaveCustomizeColorsStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
-	void					SaveWildcardStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	void					MapAttributeToValue(MSXML2::IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
 	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,TabInfo_t *pTabInfo);
 
@@ -1301,7 +1289,7 @@ private:
 	UINT					m_uTaskbarButtonCreatedMessage;
 	BOOL					m_bTaskbarInitialised;
 
-	/* Win+E keyboard hook DLL. */
+	/* TODO: Win+E keyboard hook DLL. */
 	HHOOK					m_hKeyboardHook;
 
 	/* Undo state. */
@@ -1378,7 +1366,6 @@ private:
 
 	/* Tab handler data. */
 	BOOL					m_bTabBeenDragged;
-	BOOL					m_bTCMouseCaptured;
 	RECT					m_rcDraggedTab;
 	int						m_iTabMenuItem;
 
@@ -1399,13 +1386,6 @@ private:
 	BOOL					m_bModificationDateEnabled;
 	BOOL					m_bCreationDateEnabled;
 	BOOL					m_bAccessDateEnabled;
-
-	/* Wildcard selection dialog. */
-	BOOL					m_bWildcardSelect;
-	list<WildcardSelectInfo_t>	m_wsiList;
-	TCHAR					m_szwsiText[256];
-	BOOL					m_bWildcardDlgStateSaved;
-	POINT					m_ptWildcardSelect;
 
 	/* Add bookmark dialog. */
 	BOOL					m_bAddBookmarkDlgStateSaved;
@@ -1430,10 +1410,6 @@ private:
 	/* Organize bookmarks dialog. */
 	BOOL					m_bOrganizeBookmarksDlgStateSaved;
 	POINT					m_ptOrganizeBookmarks;
-
-	/* Drive properties dialog. */
-	BOOL					m_bDrivePropertiesDlgStateSaved;
-	POINT					m_ptDriveProperties;
 
 	/* Split file dialog data. */
 	TCHAR					m_SplitFileName[MAX_PATH];
@@ -1471,7 +1447,6 @@ private:
 	
 	/* Cut items data. */
 	list<CutFile_t>			m_CutFileNameList;
-	BOOL					m_bCuttingItems;
 	int						m_iCutTabInternal;
 
 	/* Arrange menu related data. */

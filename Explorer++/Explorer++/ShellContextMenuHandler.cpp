@@ -19,13 +19,10 @@
 
 
 #define MENU_OPEN_IN_NEW_TAB	(MAX_SHELL_MENU_ID + 1)
-#define MENU_OPEN_FILE_LOCATION	(MAX_SHELL_MENU_ID + 2)
 
 void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
 	list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
-	MENUITEMINFO mii;
-
 	assert(dwData != NULL);
 
 	FileContextMenuInfo_t *pfcmi = reinterpret_cast<FileContextMenuInfo_t *>(dwData);
@@ -45,6 +42,7 @@ void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
 
 			if(FileAttributes & SFGAO_FOLDER)
 			{
+				MENUITEMINFO mii;
 				mii.cbSize		= sizeof(MENUITEMINFO);
 				mii.fMask		= MIIM_STRING|MIIM_ID;
 				mii.wID			= MENU_OPEN_IN_NEW_TAB;
@@ -52,14 +50,6 @@ void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
 				InsertMenuItem(hMenu,1,TRUE,&mii);
 			}
 		}
-	}
-	else if(pfcmi->uFrom == FROM_SEARCH)
-	{
-		mii.cbSize		= sizeof(MENUITEMINFO);
-		mii.fMask		= MIIM_STRING|MIIM_ID;
-		mii.wID			= MENU_OPEN_FILE_LOCATION;
-		mii.dwTypeData	= _T("Open file location");
-		InsertMenuItem(hMenu,1,TRUE,&mii);
 	}
 }
 
@@ -169,19 +159,6 @@ void Explorerplusplus::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
 				m_bTreeViewOpenInNewTab = TRUE;
 
 				CoTaskMemFree(pidlComplete);
-			}
-			break;
-
-		case MENU_OPEN_FILE_LOCATION:
-			{
-				TCHAR szFileName[MAX_PATH];
-
-				BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-
-				vector<LPITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
-				GetDisplayName(pidlItemVector[0],szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
-
-				m_pActiveShellBrowser->SelectFiles(szFileName);
 			}
 			break;
 	}

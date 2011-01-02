@@ -88,3 +88,4 @@
 #include <intrin.h>
 #include <wmsdk.h>
 #include <propvarutil.h>
+#include <assert.h>

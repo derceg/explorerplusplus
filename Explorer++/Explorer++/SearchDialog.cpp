@@ -70,10 +70,9 @@ CSearchDialog::~CSearchDialog()
 	DestroyIcon(m_hDialogIcon);
 	DestroyIcon(m_hDirectoryIcon);
 
-	/* TODO: If a search object is
-	active, release it. */
 	if(m_pSearch != NULL)
 	{
+		m_pSearch->StopSearching();
 		m_pSearch->Release();
 	}
 }
@@ -364,6 +363,9 @@ void CSearchDialog::OnSearch()
 {
 	if(!m_bSearching)
 	{
+		ShowWindow(GetDlgItem(m_hDlg,IDC_LINK_STATUS),SW_HIDE);
+		ShowWindow(GetDlgItem(m_hDlg,IDC_STATIC_STATUS),SW_SHOW);
+
 		m_SearchItems.clear();
 		m_SearchItemsMapInternal.clear();
 
@@ -381,31 +383,6 @@ void CSearchDialog::OnSearch()
 			SIZEOF_ARRAY(szSearchPattern));
 		PathRemoveBlanks(szSearchPattern);
 
-		/* Turn search patterns of the form '???' into '*???*', and
-		use this modified string to search. */
-		/* TODO: Will interfere with regular expression searching.
-		Only do it if not searching use regular expressions, and
-		'*' doesn't appear at the start or end of the string. */
-		/*if(lstrlen(szSearchPattern) > 0)
-		{
-			TCHAR szTemp[MAX_PATH];
-
-			if(szSearchPattern[0] != '*')
-			{
-				StringCchCat(szTemp,SIZEOF_ARRAY(szTemp),_T("*"));
-			}
-
-			StringCchCat(szTemp,SIZEOF_ARRAY(szTemp),szSearchPattern);
-
-			if(szSearchPattern[lstrlen(szSearchPattern) - 1] != '*')
-			{
-				StringCchCat(szTemp,SIZEOF_ARRAY(szTemp),_T("*"));
-			}
-
-			StringCchCopy(szSearchPattern,SIZEOF_ARRAY(szSearchPattern),
-				szTemp);
-		}*/
-
 		BOOL bSearchSubFolders = IsDlgButtonChecked(m_hDlg,IDC_CHECK_SEARCHSUBFOLDERS) ==
 			BST_CHECKED;
 
@@ -414,6 +391,23 @@ void CSearchDialog::OnSearch()
 
 		BOOL bCaseInsensitive = IsDlgButtonChecked(m_hDlg,IDC_CHECK_CASEINSENSITIVE) ==
 			BST_CHECKED;
+
+		/* Turn search patterns of the form '???' into '*???*', and
+		use this modified string to search. */
+		if(!bUseRegularExpressions && lstrlen(szSearchPattern) > 0)
+		{
+			if(szSearchPattern[0] != '*' &&
+				szSearchPattern[lstrlen(szSearchPattern) - 1] != '*')
+			{
+
+				TCHAR szTemp[MAX_PATH];
+
+				StringCchPrintf(szTemp,SIZEOF_ARRAY(szTemp),_T("*%s*"),
+					szSearchPattern);
+				StringCchCopy(szSearchPattern,SIZEOF_ARRAY(szSearchPattern),
+					szTemp);
+			}
+		}
 
 		DWORD dwAttributes = 0;
 
@@ -431,11 +425,6 @@ void CSearchDialog::OnSearch()
 
 		m_pSearch = new CSearch(m_hDlg,szBaseDirectory,szSearchPattern,
 			dwAttributes,bUseRegularExpressions,bCaseInsensitive,bSearchSubFolders);
-
-		/* Increment the reference count to ensure that
-		the search object will not release itself until
-		we have finished using it. */
-		m_pSearch->AddRef();
 
 		/* Save the search directory and search pattern (only if they are not
 		the same as the most recent entry). */
@@ -508,9 +497,6 @@ void CSearchDialog::OnSearch()
 		if(m_pSearch != NULL)
 		{
 			m_pSearch->StopSearching();
-
-			m_pSearch->Release();
-			m_pSearch = NULL;
 		}
 	}
 }
@@ -581,20 +567,50 @@ int CALLBACK CSearchDialog::SortResultsByPath(LPARAM lParam1,LPARAM lParam2)
 	return StrCmpLogicalW(szPath1,szPath2);
 }
 
-/* TODO: */
-void CSearchDialog::AddMenuEntries(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu)
+void CSearchDialog::AddMenuEntries(LPITEMIDLIST pidlParent,
+	std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
-
+	/* TODO: Move string into string table. */
+	MENUITEMINFO mii;
+	mii.cbSize		= sizeof(MENUITEMINFO);
+	mii.fMask		= MIIM_STRING|MIIM_ID;
+	mii.wID			= MENU_ID_OPEN_FILE_LOCATION;
+	mii.dwTypeData	= _T("Open file location");
+	InsertMenuItem(hMenu,1,TRUE,&mii);
 }
 
-BOOL CSearchDialog::HandleShellMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
+BOOL CSearchDialog::HandleShellMenuItem(LPITEMIDLIST pidlParent,
+	std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
 {
+	if(StrCmpI(szCmd,_T("open")) == 0)
+	{
+		/* TODO: Open the item. */
+		return TRUE;
+	}
+
 	return FALSE;
 }
 
-void CSearchDialog::HandleCustomMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,int iCmd)
+void CSearchDialog::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
+	std::list<LPITEMIDLIST> pidlItemList,int iCmd)
 {
+	switch(iCmd)
+	{
+	case MENU_ID_OPEN_FILE_LOCATION:
+		{
+			/* TODO: Browse to the parent folder,
+			and select the specified item. */
+			/*TCHAR szFileName[MAX_PATH];
 
+			BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+
+			vector<LPITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
+			GetDisplayName(pidlItemVector[0],szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
+
+			m_pActiveShellBrowser->SelectFiles(szFileName);*/
+		}
+		break;
+	}
 }
 
 BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
@@ -777,6 +793,9 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 					}
 				}
 
+				m_pSearch->Release();
+				m_pSearch = NULL;
+
 				m_bSearching = FALSE;
 				m_bStopSearching = FALSE;
 				SetDlgItemText(m_hDlg,IDSEARCH,m_szSearchButton);
@@ -802,12 +821,19 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 		case NSearchDialog::WM_APP_REGULAREXPRESSIONINVALID:
 			{
+				/* The link/status controls are in the same position, and
+				have the same size. If one of the controls is showing text,
+				the other should not be visible. */
+				ShowWindow(GetDlgItem(m_hDlg,IDC_LINK_STATUS),SW_SHOW);
+				ShowWindow(GetDlgItem(m_hDlg,IDC_STATIC_STATUS),SW_HIDE);
+
 				/* The regular expression passed to the search
 				thread was invalid. Show the user an error message. */
-				/* TODO: The link control needs to move/resize
-				when the dialog is resized. */
 				SetDlgItemText(m_hDlg,IDC_LINK_STATUS,_T("<a href=\"http://msdn.microsoft.com/en-us/library/bb982727.aspx\">\
 					The form of the regular expression is incorrect</a>"));
+
+				m_pSearch->Release();
+				m_pSearch = NULL;
 
 				m_bSearching = FALSE;
 				m_bStopSearching = FALSE;
@@ -927,6 +953,11 @@ BOOL CSearchDialog::OnSize(int iType,int iWidth,int iHeight)
 	SetWindowPos(GetDlgItem(m_hDlg,IDC_STATIC_STATUS),NULL,rc.left,iHeight - m_iStatusVerticalDelta,
 		iWidth - m_iStaticStatusWidthDelta - rc.left,GetRectHeight(&rc),SWP_NOZORDER);
 
+	GetWindowRect(GetDlgItem(m_hDlg,IDC_LINK_STATUS),&rc);
+	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
+	SetWindowPos(GetDlgItem(m_hDlg,IDC_LINK_STATUS),NULL,rc.left,iHeight - m_iStatusVerticalDelta,
+		iWidth - m_iStaticStatusWidthDelta - rc.left,GetRectHeight(&rc),SWP_NOZORDER);
+
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_STATIC_ETCHEDHORZ),&rc);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,(LPPOINT)&rc,sizeof(RECT) / sizeof(POINT));
 	SetWindowPos(GetDlgItem(m_hDlg,IDC_STATIC_ETCHEDHORZ),NULL,rc.left,iHeight - m_iEtchedHorzVerticalDelta,
@@ -964,7 +995,7 @@ BOOL CSearchDialog::OnDestroy()
 {
 	/* Within WM_DESTROY, all child windows
 	still exist. */
-	SaveState(m_hDlg);
+	SaveState();
 
 	return 0;
 }
@@ -982,7 +1013,6 @@ DWORD WINAPI NSearchDialog::SearchThread(LPVOID pParam)
 
 	CSearch *pSearch = reinterpret_cast<CSearch *>(pParam);
 	pSearch->StartSearching();
-	pSearch->Release();
 
 	return 0;
 }
@@ -1094,17 +1124,12 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 			if(lstrcmpi(wfd.cFileName,_T(".")) != 0 &&
 				lstrcmpi(wfd.cFileName,_T("..")) != 0)
 			{
-				BOOL bFileNameActive = FALSE;
-				BOOL bAttributesActive = FALSE;
 				BOOL bMatchFileName = FALSE;
 				BOOL bMatchAttributes = FALSE;
-				BOOL bItemMatch = FALSE;
 
 				/* Only match against the filename if it's not empty. */
 				if(lstrcmp(m_szSearchPattern,EMPTY_STRING) != 0)
 				{
-					bFileNameActive = TRUE;
-
 					if(m_bUseRegularExpressions)
 					{
 						if(regex_match(wfd.cFileName,m_rxPattern))
@@ -1120,23 +1145,25 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 						}
 					}
 				}
+				else
+				{
+					/* No filename constraint, so all filenames match. */
+					bMatchFileName = TRUE;
+				}
 
 				if(m_dwAttributes != 0)
 				{
-					bAttributesActive = TRUE;
-
 					if(wfd.dwFileAttributes & m_dwAttributes)
 					{
 						bMatchAttributes = TRUE;
 					}
 				}
+				else
+				{
+					bMatchAttributes = TRUE;
+				}
 
-				if(bFileNameActive && bAttributesActive)
-					bItemMatch = bMatchFileName && bMatchAttributes;
-				else if(bFileNameActive)
-					bItemMatch = bMatchFileName;
-				else if(bAttributesActive)
-					bItemMatch = bMatchAttributes;
+				BOOL bItemMatch = bMatchFileName && bMatchAttributes;
 
 				if(bItemMatch)
 				{
@@ -1182,12 +1209,12 @@ void CSearch::StopSearching()
 	LeaveCriticalSection(&m_csStop);
 }
 
-void CSearchDialog::SaveState(HWND hDlg)
+void CSearchDialog::SaveState()
 {
 	HWND hListView;
 	RECT rcTemp;
 
-	GetWindowRect(hDlg,&rcTemp);
+	GetWindowRect(m_hDlg,&rcTemp);
 	m_sdps->m_ptSearch.x = rcTemp.left;
 	m_sdps->m_ptSearch.y = rcTemp.top;
 	m_sdps->m_iSearchWidth = GetRectWidth(&rcTemp);
@@ -1199,27 +1226,27 @@ void CSearchDialog::SaveState(HWND hDlg)
 	m_sdps->m_bUseRegularExpressions = IsDlgButtonChecked(m_hDlg,
 		IDC_CHECK_USEREGULAREXPRESSIONS) == BST_CHECKED;
 
-	m_sdps->m_bSearchSubFolders = IsDlgButtonChecked(hDlg,
+	m_sdps->m_bSearchSubFolders = IsDlgButtonChecked(m_hDlg,
 		IDC_CHECK_SEARCHSUBFOLDERS) == BST_CHECKED;
 
-	m_sdps->m_bArchive = IsDlgButtonChecked(hDlg,
+	m_sdps->m_bArchive = IsDlgButtonChecked(m_hDlg,
 		IDC_CHECK_ARCHIVE) == BST_CHECKED;
 
-	m_sdps->m_bHidden = IsDlgButtonChecked(hDlg,
+	m_sdps->m_bHidden = IsDlgButtonChecked(m_hDlg,
 		IDC_CHECK_HIDDEN) == BST_CHECKED;
 
-	m_sdps->m_bReadOnly = IsDlgButtonChecked(hDlg,
+	m_sdps->m_bReadOnly = IsDlgButtonChecked(m_hDlg,
 		IDC_CHECK_READONLY) == BST_CHECKED;
 
-	m_sdps->m_bSystem = IsDlgButtonChecked(hDlg,
+	m_sdps->m_bSystem = IsDlgButtonChecked(m_hDlg,
 		IDC_CHECK_SYSTEM) == BST_CHECKED;
 
-	hListView = GetDlgItem(hDlg,IDC_LISTVIEW_SEARCHRESULTS);
+	hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS);
 
 	m_sdps->m_iColumnWidth1 = ListView_GetColumnWidth(hListView,0);
 	m_sdps->m_iColumnWidth2 = ListView_GetColumnWidth(hListView,1);
 
-	GetDlgItemText(hDlg,IDC_COMBO_NAME,m_sdps->m_szSearchPattern,
+	GetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_sdps->m_szSearchPattern,
 		SIZEOF_ARRAY(m_sdps->m_szSearchPattern));
 
 	m_sdps->m_bStateSaved = TRUE;
@@ -1382,6 +1409,11 @@ void CSearchDialogPersistentSettings::LoadSettings(HKEY hParentKey)
 void CSearchDialogPersistentSettings::SaveSettings(MSXML2::IXMLDOMDocument *pXMLDom,
 	MSXML2::IXMLDOMElement *pe)
 {
+	if(!m_bStateSaved)
+	{
+		return;
+	}
+
 	MSXML2::IXMLDOMElement *pParentNode = NULL;
 	BSTR bstr_wsntt = SysAllocString(L"\n\t\t");
 	TCHAR szNode[64];

@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "SearchDialog.h"
+#include "WildcardSelectDialog.h"
 #include "XMLSettings.h"
 
 #import <msxml3.dll> raw_interfaces_only
@@ -2081,7 +2082,7 @@ void Explorerplusplus::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 						else if(lstrcmpi(bstrValue,_T("Search")) == 0)
 							CSearchDialogPersistentSettings::GetInstance().LoadSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("WildcardSelect")) == 0)
-							LoadWildcardStateFromXML(am,lChildNodes);
+							CWildcardSelectDialogPersistentSettings::GetInstance().LoadSettings(am,lChildNodes);
 					}
 				}
 			}
@@ -2166,33 +2167,6 @@ void Explorerplusplus::LoadCustomizeColorsStateFromSML(MSXML2::IXMLDOMNamedNodeM
 	m_crInitialColor = RGB(r,g,b);
 }
 
-void Explorerplusplus::LoadWildcardStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
-{
-	MSXML2::IXMLDOMNode *pNode = NULL;
-	WildcardSelectInfo_t wsi;
-	BSTR bstrName;
-	BSTR bstrValue;
-	int i = 0;
-
-	for(i = 1;i < lChildNodes;i++)
-	{
-		pam->get_item(i,&pNode);
-
-		pNode->get_nodeName(&bstrName);
-		pNode->get_text(&bstrValue);
-
-		if(lstrcmpi(bstrName,_T("CurrentText")) == 0)
-		{
-			StringCchCopy(m_szwsiText,SIZEOF_ARRAY(m_szwsiText),bstrValue);
-		}
-		else if(CheckWildcardMatch(_T("Pattern*"),bstrName,TRUE))
-		{
-			StringCchCopy(wsi.szPattern,SIZEOF_ARRAY(wsi.szPattern),bstrValue);
-			m_wsiList.push_back(wsi);
-		}
-	}
-}
-
 void Explorerplusplus::SaveStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
@@ -2209,9 +2183,9 @@ MSXML2::IXMLDOMElement *pRoot)
 
 	SaveColorRulesStateToXML(pXMLDom,pe);
 	SaveCustomizeColorsStateToXML(pXMLDom,pe);
-	SaveWildcardStateToXML(pXMLDom,pe);
 
 	CSearchDialogPersistentSettings::GetInstance().SaveSettings(pXMLDom,pe);
+	CWildcardSelectDialogPersistentSettings::GetInstance().SaveSettings(pXMLDom,pe);
 
 	AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 
@@ -2256,29 +2230,6 @@ MSXML2::IXMLDOMElement *pe)
 	AddAttributeToNode(pXMLDom,pParentNode,_T("r"),EncodeIntValue(GetRValue(m_crInitialColor)));
 	AddAttributeToNode(pXMLDom,pParentNode,_T("g"),EncodeIntValue(GetGValue(m_crInitialColor)));
 	AddAttributeToNode(pXMLDom,pParentNode,_T("b"),EncodeIntValue(GetBValue(m_crInitialColor)));
-}
-
-void Explorerplusplus::SaveWildcardStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pe)
-{
-	MSXML2::IXMLDOMElement	*pParentNode = NULL;
-	BSTR					bstr_wsntt = SysAllocString(L"\n\t\t");
-	list<WildcardSelectInfo_t>::iterator	itr;
-	TCHAR					szNode[64];
-	int						i = 0;
-
-	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-
-	CreateElementNode(pXMLDom,&pParentNode,pe,_T("DialogState"),_T("WildcardSelect"));
-
-	for(itr = m_wsiList.begin();itr != m_wsiList.end();itr++)
-	{
-		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("Pattern%d"),i++);
-
-		AddAttributeToNode(pXMLDom,pParentNode,szNode,itr->szPattern);
-	}
-
-	AddAttributeToNode(pXMLDom,pParentNode,_T("CurrentText"),m_szwsiText);
 }
 
 void WriteStandardSetting(MSXML2::IXMLDOMDocument *pXMLDom,

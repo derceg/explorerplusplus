@@ -6,6 +6,7 @@ class CReferenceCount
 public:
 
 	CReferenceCount();
+	virtual ~CReferenceCount();
 
 	ULONG	AddRef();
 	ULONG	Release();

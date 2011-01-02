@@ -79,7 +79,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_bCountingDown					= FALSE;
 	m_bInverted						= FALSE;
 	m_bSelectingTreeViewDirectory	= FALSE;
-	m_bCuttingItems					= FALSE;
 	m_bTreeViewRightClick			= FALSE;
 	m_bTabBeenDragged				= FALSE;
 	m_bTreeViewDelayEnabled			= FALSE;
@@ -87,7 +86,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_bAttemptToolbarRestore		= FALSE;
 	m_bCanUndo						= FALSE;
 	m_bLanguageLoaded				= FALSE;
-	m_bTCMouseCaptured				= FALSE;
 	m_bListViewRenaming				= FALSE;
 	m_bDragging						= FALSE;
 	m_bDragCancelled				= FALSE;
@@ -99,7 +97,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_nDrivesInToolbar				= 0;
 
 	/* Dialog states. */
-	m_bWildcardDlgStateSaved		= FALSE;
 	m_bSelectColumnsDlgStateSaved	= FALSE;
 	m_bSetDefaultColumnsDlgStateSaved	= FALSE;
 	m_bAddBookmarkDlgStateSaved		= FALSE;
@@ -109,7 +106,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_bMassRenameDlgStateSaved		= FALSE;
 	m_bMergeFilesDlgStateSaved		= FALSE;
 	m_bOrganizeBookmarksDlgStateSaved	= FALSE;
-	m_bDrivePropertiesDlgStateSaved	= FALSE;
 	m_bSetFileAttributesDlgStateSaved	= FALSE;
 	m_bSplitFileDlgStateSaved		= FALSE;
 	m_bCustomizeColorsDlgStateSaved	= FALSE;
@@ -131,9 +127,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	}
 
 	m_crInitialColor = DEFAULT_INITIAL_COLOR;
-
-	StringCchCopy(m_szwsiText,SIZEOF_ARRAY(m_szwsiText),
-		EMPTY_STRING);
 
 	SetDefaultValues();
 	SetAllDefaultColumns();

@@ -21,10 +21,12 @@ public:
 
 	INT_PTR CALLBACK	BaseDialogProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	INT_PTR	ShowModalDialog();
-	HWND	ShowModelessDialog(IModelessDialogNotification *pmdn = NULL);
+	INT_PTR			ShowModalDialog();
+	HWND			ShowModelessDialog(IModelessDialogNotification *pmdn = NULL);
 
 protected:
+
+	HINSTANCE		GetInstance();
 
 	virtual BOOL	OnInitDialog();
 	virtual BOOL	OnTimer(int iTimerID);
@@ -40,20 +42,16 @@ protected:
 	the range WM_APP (0x8000) - 0xBFFF. */
 	virtual void	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	HWND		m_hDlg;
-
-protected:
-
-	HINSTANCE	GetInstance();
+	HWND			m_hDlg;
 
 private:
 
-	HINSTANCE	m_hInstance;
-	int			m_iResource;
-	HWND		m_hParent;
+	HINSTANCE		m_hInstance;
+	int				m_iResource;
+	HWND			m_hParent;
 	IModelessDialogNotification	*m_pmdn;
 
-	BOOL		m_bShowingModelessDialog;
+	BOOL			m_bShowingModelessDialog;
 };
 
 #endif

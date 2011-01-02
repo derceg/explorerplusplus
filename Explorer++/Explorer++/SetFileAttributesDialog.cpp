@@ -169,8 +169,9 @@ void Explorerplusplus::OnInitializeFileAttributesDlg(HWND hDlg,LPARAM lParam)
 
 	if(m_bSetFileAttributesDlgStateSaved)
 	{
-		SetWindowPos(hDlg,NULL,m_ptWildcardSelect.x,
-			m_ptWildcardSelect.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
+		/* TODO: */
+		/*SetWindowPos(hDlg,NULL,m_ptWildcardSelect.x,
+			m_ptWildcardSelect.y,0,0,SWP_NOSIZE|SWP_NOZORDER);*/
 	}
 	else
 	{

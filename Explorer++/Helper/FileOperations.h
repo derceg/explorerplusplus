@@ -1,6 +1,8 @@
 #ifndef FILEOPERATIONS_INCLUDED
 #define FILEOPERATIONS_INCLUDED
 
+#include <list>
+
 typedef enum
 {
 	OVERWRITE_ONEPASS	= 1,

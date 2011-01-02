@@ -132,6 +132,9 @@ private:
 	static const int SEARCH_PROCESSITEMS_TIMER_ELAPSED = 50;
 	static const int SEARCH_MAX_ITEMS_BATCH_PROCESS = 100;
 
+	/* TODO: MAX_SHELL_MENU_ID - replace with class constant. */
+	static const int MENU_ID_OPEN_FILE_LOCATION = (MAX_SHELL_MENU_ID + 1);
+
 	/* Available search modes. */
 	enum SortMode_t
 	{
@@ -145,7 +148,7 @@ private:
 	};
 
 	void	OnSearch();
-	void	SaveState(HWND hDlg);
+	void	SaveState();
 
 	CSearchDialogPersistentSettings	*m_sdps;
 

@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "SearchDialog.h"
+#include "WildcardSelectDialog.h"
 #include "../Helper/Registry.h"
 
 #define SMALL_SIZE		5
@@ -1421,7 +1422,6 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry(void)
 void Explorerplusplus::SaveStateToRegistry(void)
 {
 	HKEY	hKey;
-	list<WildcardSelectInfo_t>::iterator itr;
 	DWORD	Disposition;
 	LONG	ReturnValue;
 
@@ -1444,9 +1444,9 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		SaveSelectDefaultColumnsStateToRegistry(hKey);
 		SaveSetFileAttributesStateToRegistry(hKey);
 		SaveSplitFileColumnsStateToRegistry(hKey);
-		SaveWildcardStateToRegistry(hKey);
 
 		CSearchDialogPersistentSettings::GetInstance().SaveSettings(hKey);
+		CWildcardSelectDialogPersistentSettings::GetInstance().SaveSettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1455,7 +1455,6 @@ void Explorerplusplus::SaveStateToRegistry(void)
 void Explorerplusplus::SaveAddBookmarkStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
-	list<WildcardSelectInfo_t>::iterator itr;
 	DWORD	Disposition;
 	LONG	ReturnValue;
 
@@ -1499,7 +1498,6 @@ void Explorerplusplus::SaveColorRulesStateToRegistry(HKEY hParentKey)
 void Explorerplusplus::SaveCustomizeColorsStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
-	list<WildcardSelectInfo_t>::iterator itr;
 	DWORD	Disposition;
 	LONG	ReturnValue;
 
@@ -1754,40 +1752,6 @@ void Explorerplusplus::SaveSplitFileColumnsStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void Explorerplusplus::SaveWildcardStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	list<WildcardSelectInfo_t>::iterator itr;
-	TCHAR	szItemKey[128];
-	DWORD	Disposition;
-	LONG	ReturnValue;
-	int		i = 0;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_WILDCARD_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bWildcardDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptWildcardSelect,sizeof(m_ptWildcardSelect));
-
-			for(itr = m_wsiList.begin();itr != m_wsiList.end();itr++)
-			{
-				StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("Pattern%d"),i++);
-
-				SaveStringToRegistry(hKey,szItemKey,itr->szPattern);
-			}
-
-			SaveStringToRegistry(hKey,_T("CurrentText"),m_szwsiText);
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
 void Explorerplusplus::LoadStateFromRegistry(void)
 {
 	HKEY				hKey;
@@ -1810,9 +1774,9 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		LoadSelectDefaultColumnsStateFromRegistry(hKey);
 		LoadSetFileAttributesStateFromRegistry(hKey);
 		LoadSplitFileStateFromRegistry(hKey);
-		LoadWildcardStateFromRegistry(hKey);
 
 		CSearchDialogPersistentSettings::GetInstance().LoadSettings(hKey);
+		CWildcardSelectDialogPersistentSettings::GetInstance().LoadSettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -2124,55 +2088,6 @@ void Explorerplusplus::LoadSplitFileStateFromRegistry(HKEY hParentKey)
 		{
 			m_bSplitFileDlgStateSaved = TRUE;
 		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadWildcardStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	WildcardSelectInfo_t	wsi;
-	TCHAR				szItemKey[128];
-	DWORD				dwSize;
-	LONG				ReturnValue;
-	int					i = 0;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_WILDCARD_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptWildcardSelect,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bWildcardDlgStateSaved = TRUE;
-		}
-
-		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-			_T("Pattern%d"),i);
-
-		ReturnValue = ReadStringFromRegistry(hKey,szItemKey,
-			wsi.szPattern,SIZEOF_ARRAY(wsi.szPattern));
-
-		while(ReturnValue == ERROR_SUCCESS)
-		{
-			m_wsiList.push_back(wsi);
-
-			i++;
-
-			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-				_T("%d"),i);
-
-			ReturnValue = ReadStringFromRegistry(hKey,szItemKey,
-				wsi.szPattern,SIZEOF_ARRAY(wsi.szPattern));
-		}
-
-		ReadStringFromRegistry(hKey,_T("CurrentText"),
-			m_szwsiText,SIZEOF_ARRAY(m_szwsiText));
 
 		RegCloseKey(hKey);
 	}

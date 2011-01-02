@@ -12,25 +12,49 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <unordered_map>
 #include "BaseDialog.h"
 
 
-INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-
-INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+namespace NBaseDialog
 {
-	static CBaseDialog *pBaseDialog = NULL;
+	INT_PTR CALLBACK	BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
+	std::tr1::unordered_map<HWND,CBaseDialog *>	g_WindowMap;
+}
+
+INT_PTR CALLBACK NBaseDialog::BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+{
 	switch(uMsg)
 	{
 		case WM_INITDIALOG:
 		{
-			pBaseDialog = (CBaseDialog *)lParam;
+			/* Store a mapping between window handles
+			and objects. This must be done, as each
+			dialog is managed by a separate object,
+			but all window calls come through this
+			function.
+			Since two or more dialogs may be
+			shown at once (as a dialog can be
+			modeless), this function needs to be able
+			to send the specified messages to the
+			correct object.
+			May also use thunks - see
+			http://www.hackcraft.net/cpp/windowsThunk/ */
+			NBaseDialog::g_WindowMap.insert(std::tr1::unordered_map<HWND,CBaseDialog *>::
+				value_type(hDlg,reinterpret_cast<CBaseDialog *>(lParam)));
 		}
 		break;
 	}
 
-	return pBaseDialog->BaseDialogProc(hDlg,uMsg,wParam,lParam);
+	auto itr = NBaseDialog::g_WindowMap.find(hDlg);
+
+	if(itr != g_WindowMap.end())
+	{
+		return itr->second->BaseDialogProc(hDlg,uMsg,wParam,lParam);
+	}
+
+	return 0;
 }
 
 INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
@@ -93,6 +117,8 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 			break;
 
 		case WM_NCDESTROY:
+			NBaseDialog::g_WindowMap.erase(
+				NBaseDialog::g_WindowMap.find(hDlg));
 			return OnNcDestroy();
 			break;
 	}
@@ -131,7 +157,7 @@ INT_PTR CBaseDialog::ShowModalDialog()
 	}
 
 	return DialogBoxParam(m_hInstance,MAKEINTRESOURCE(m_iResource),
-		m_hParent,BaseDialogProcStub,(LPARAM)this);
+		m_hParent,NBaseDialog::BaseDialogProcStub,reinterpret_cast<LPARAM>(this));
 }
 
 HWND CBaseDialog::ShowModelessDialog(IModelessDialogNotification *pmdn)
@@ -143,7 +169,8 @@ HWND CBaseDialog::ShowModelessDialog(IModelessDialogNotification *pmdn)
 
 	HWND hDlg = CreateDialogParam(m_hInstance,
 		MAKEINTRESOURCE(m_iResource),m_hParent,
-		BaseDialogProcStub,(LPARAM)this);
+		NBaseDialog::BaseDialogProcStub,
+		reinterpret_cast<LPARAM>(this));
 
 	if(hDlg != NULL)
 	{
