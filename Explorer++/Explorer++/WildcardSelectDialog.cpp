@@ -14,14 +14,14 @@
 
 #include "stdafx.h"
 #include "WildcardSelectDialog.h"
-#include "XMLSettings.h"
 #include "MainResource.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Registry.h"
+#include "../Helper/XMLSettings.h"
 
 
-const TCHAR CWildcardSelectDialogPersistentSettings::REGISTRY_SETTINGS_KEY[] = _T("WildcardSelect");
+const TCHAR CWildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("WildcardSelect");
 
 CWildcardSelectDialog::CWildcardSelectDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,BOOL bSelect) :
@@ -94,22 +94,43 @@ void CWildcardSelectDialog::OnOk()
 	GetDlgItemText(m_hDlg,IDC_SELECTGROUP_COMBOBOX,
 		szPattern,SIZEOF_ARRAY(szPattern));
 
-	/* TODO: */
-	/*int nItems = ListView_GetItemCount(m_hActiveListView);
-
-	for(int i = 0;i < nItems;i++)
+	if(lstrcmp(szPattern,EMPTY_STRING) != 0)
 	{
-		TCHAR	FullFileName[MAX_PATH];
+		/* TODO: */
+		/*int nItems = ListView_GetItemCount(m_hActiveListView);
 
-		m_pActiveShellBrowser->QueryName(i,FullFileName);
-
-		if(CheckWildcardMatch(szPattern,FullFileName,FALSE) == 1)
+		for(int i = 0;i < nItems;i++)
 		{
-			ListView_SelectItem(m_hActiveListView,i,m_bSelect);
-		}
-	}*/
+			TCHAR	FullFileName[MAX_PATH];
 
-	m_pwsdps->m_PatternList.push_front(szPattern);
+			m_pActiveShellBrowser->QueryName(i,FullFileName);
+
+			if(CheckWildcardMatch(szPattern,FullFileName,FALSE) == 1)
+			{
+				ListView_SelectItem(m_hActiveListView,i,m_bSelect);
+			}
+		}*/
+
+		bool bStorePattern = true;
+
+		/* If the current text isn't the same as the
+		most recent text (if any), add it to the history
+		list. */
+		auto itr = m_pwsdps->m_PatternList.begin();
+
+		if(itr != m_pwsdps->m_PatternList.end())
+		{
+			if(lstrcmp(itr->c_str(),szPattern) == 0)
+			{
+				bStorePattern = false;
+			}
+		}
+
+		if(bStorePattern)
+		{
+			m_pwsdps->m_PatternList.push_front(szPattern);
+		}
+	}
 
 	EndDialog(m_hDlg,1);
 }
@@ -144,10 +165,9 @@ void CWildcardSelectDialog::SaveState()
 	m_pwsdps->m_bStateSaved = TRUE;
 }
 
-CWildcardSelectDialogPersistentSettings::CWildcardSelectDialogPersistentSettings()
+CWildcardSelectDialogPersistentSettings::CWildcardSelectDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
 {
-	m_bStateSaved = FALSE;
-
 	StringCchCopy(m_szPattern,SIZEOF_ARRAY(m_szPattern),EMPTY_STRING);
 }
 
@@ -162,133 +182,42 @@ CWildcardSelectDialogPersistentSettings& CWildcardSelectDialogPersistentSettings
 	return wsdps;
 }
 
-void CWildcardSelectDialogPersistentSettings::SaveSettings(HKEY hParentKey)
+void CWildcardSelectDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	if(!m_bStateSaved)
-	{
-		return;
-	}
-
-	HKEY hKey;
-	DWORD dwDisposition;
-
-	LONG lRes = RegCreateKeyEx(hParentKey,REGISTRY_SETTINGS_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&dwDisposition);
-
-	if(lRes == ERROR_SUCCESS)
-	{
-		RegSetValueEx(hKey,_T("Position"),0,REG_BINARY,
-			reinterpret_cast<LPBYTE>(&m_ptDialog),
-			sizeof(m_ptDialog));
-
-		TCHAR szItemKey[128];
-		int i = 0;
-
-		for each(auto strPattern in m_PatternList)
-		{
-			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("Pattern%d"),i++);
-			SaveStringToRegistry(hKey,szItemKey,strPattern.c_str());
-		}
-
-		SaveStringToRegistry(hKey,_T("CurrentText"),m_szPattern);
-
-		RegCloseKey(hKey);
-	}
+	SaveStringListToRegistry(hKey,_T("Pattern"),m_PatternList);
+	SaveStringToRegistry(hKey,_T("CurrentText"),m_szPattern);
 }
 
-void CWildcardSelectDialogPersistentSettings::LoadSettings(HKEY hParentKey)
+void CWildcardSelectDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	HKEY hKey;
-	TCHAR szItemKey[128];
-	LONG lRes;
-
-	lRes = RegOpenKeyEx(hParentKey,REGISTRY_SETTINGS_KEY,0,
-		KEY_READ,&hKey);
-
-	if(lRes == ERROR_SUCCESS)
-	{
-		DWORD dwSize = sizeof(POINT);
-		RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptDialog,&dwSize);
-
-		TCHAR szTemp[512];
-		int i = 0;
-
-		lRes = ERROR_SUCCESS;
-
-		while(lRes == ERROR_SUCCESS)
-		{
-			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-				_T("Pattern%d"),i++);
-
-			lRes = ReadStringFromRegistry(hKey,szItemKey,
-				szTemp,SIZEOF_ARRAY(szTemp));
-
-			if(lRes == ERROR_SUCCESS)
-			{
-				m_PatternList.push_back(szTemp);
-			}
-		}
-
-		ReadStringFromRegistry(hKey,_T("CurrentText"),
-			m_szPattern,SIZEOF_ARRAY(m_szPattern));
-
-		m_bStateSaved = TRUE;
-
-		RegCloseKey(hKey);
-	}
+	ReadStringListFromRegistry(hKey,_T("Pattern"),m_PatternList);
+	ReadStringFromRegistry(hKey,_T("CurrentText"),m_szPattern,
+		SIZEOF_ARRAY(m_szPattern));
 }
 
-void CWildcardSelectDialogPersistentSettings::SaveSettings(MSXML2::IXMLDOMDocument *pXMLDom,
-	MSXML2::IXMLDOMElement *pe)
+void CWildcardSelectDialogPersistentSettings::SaveExtraXMLSettings(
+	MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
 {
-	if(!m_bStateSaved)
-	{
-		return;
-	}
-
-	MSXML2::IXMLDOMElement *pParentNode = NULL;
-	BSTR bstr_wsntt = SysAllocString(L"\n\t\t");
-
-	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-
-	/* TODO: Move node name into constant. */
-	CreateElementNode(pXMLDom,&pParentNode,pe,_T("DialogState"),_T("WildcardSelect"));
-
 	TCHAR szNode[64];
 	int i = 0;
 
 	for each(auto strPattern in m_PatternList)
 	{
 		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("Pattern%d"),i++);
-		AddAttributeToNode(pXMLDom,pParentNode,szNode,strPattern.c_str());
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,strPattern.c_str());
 	}
 
-	AddAttributeToNode(pXMLDom,pParentNode,_T("CurrentText"),m_szPattern);
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CurrentText"),m_szPattern);
 }
 
-void CWildcardSelectDialogPersistentSettings::LoadSettings(MSXML2::IXMLDOMNamedNodeMap *pam,
-	long lChildNodes)
+void CWildcardSelectDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
-	MSXML2::IXMLDOMNode *pNode = NULL;
-	BSTR bstrName;
-	BSTR bstrValue;
-
-	for(int i = 1;i < lChildNodes;i++)
+	if(lstrcmpi(bstrName,_T("CurrentText")) == 0)
 	{
-		pam->get_item(i,&pNode);
-
-		pNode->get_nodeName(&bstrName);
-		pNode->get_text(&bstrValue);
-
-		if(lstrcmpi(bstrName,_T("CurrentText")) == 0)
-		{
-			StringCchCopy(m_szPattern,SIZEOF_ARRAY(m_szPattern),bstrValue);
-		}
-		else if(CheckWildcardMatch(_T("Pattern*"),bstrName,TRUE))
-		{
-			m_PatternList.push_back(bstrValue);
-		}
+		StringCchCopy(m_szPattern,SIZEOF_ARRAY(m_szPattern),bstrValue);
+	}
+	else if(CheckWildcardMatch(_T("Pattern*"),bstrName,TRUE))
+	{
+		m_PatternList.push_back(bstrValue);
 	}
 }

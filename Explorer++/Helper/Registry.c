@@ -12,10 +12,12 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <list>
+#include <string>
 #include "Registry.h"
 
 
-LONG SaveDwordToRegistry(HKEY hKey,TCHAR *KeyName,DWORD Value)
+LONG SaveDwordToRegistry(HKEY hKey,const TCHAR *KeyName,DWORD Value)
 {
 	return RegSetValueEx(hKey,KeyName,0,REG_DWORD,(LPBYTE)&Value,sizeof(Value));
 }
@@ -29,7 +31,7 @@ LONG ReadDwordFromRegistry(HKEY hKey,TCHAR *KeyName,DWORD *pReturnValue)
 	return RegQueryValueEx(hKey,KeyName,0,0,(LPBYTE)pReturnValue,&SizeOfData);
 }
 
-LONG SaveStringToRegistry(HKEY hKey,TCHAR *KeyName,const TCHAR *String)
+LONG SaveStringToRegistry(HKEY hKey,const TCHAR *KeyName,const TCHAR *String)
 {
 	return RegSetValueEx(hKey,KeyName,0,REG_SZ,(LPBYTE)String,lstrlen(String) * sizeof(TCHAR));
 }
@@ -68,4 +70,59 @@ LONG ReadStringFromRegistry(HKEY hKey,TCHAR *KeyName,TCHAR *String,DWORD BufferS
 	}
 
 	return lRes;
+}
+
+/* Saves a set of strings to the registry. Returns something other
+than ERROR_SUCCESS on failure. If this function does fail, any values
+that have been written will not be deleted (i.e. this function is
+not transactional). */
+LONG SaveStringListToRegistry(HKEY hKey,const TCHAR *szBaseKeyName,
+	const std::list<std::wstring> &strList)
+{
+	TCHAR szItemKey[128];
+	LONG lRes;
+	int i = 0;
+
+	for each(auto str in strList)
+	{
+		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("%s%d"),
+			szBaseKeyName,i++);
+		lRes = SaveStringToRegistry(hKey,szItemKey,str.c_str());
+
+		if(lRes != ERROR_SUCCESS)
+		{
+			return lRes;
+		}
+	}
+
+	return ERROR_SUCCESS;
+}
+
+LONG ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBaseKeyName,
+	std::list<std::wstring> &strList)
+{
+	TCHAR szItemKey[128];
+	TCHAR szTemp[512];
+	LONG lRes;
+	int i = 0;
+
+	lRes = ERROR_SUCCESS;
+
+	while(lRes == ERROR_SUCCESS)
+	{
+		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
+			_T("%s%d"),szBaseKeyName,i++);
+
+		lRes = ReadStringFromRegistry(hKey,szItemKey,
+			szTemp,SIZEOF_ARRAY(szTemp));
+
+		if(lRes != ERROR_SUCCESS)
+		{
+			return lRes;
+		}
+
+		strList.push_back(szTemp);
+	}
+
+	return ERROR_SUCCESS;
 }

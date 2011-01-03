@@ -7,13 +7,16 @@
 #include <regex>
 #include <unordered_map>
 #include "../Helper/BaseDialog.h"
+#include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
 #include "../Helper/FileContextMenuManager.h"
+
+#import <msxml3.dll> raw_interfaces_only
 
 class CSearchDialog;
 
 /* Manages settings for the search dialog. */
-class CSearchDialogPersistentSettings
+class CSearchDialogPersistentSettings : public CDialogSettings
 {
 public:
 
@@ -21,27 +24,24 @@ public:
 
 	static CSearchDialogPersistentSettings &GetInstance();
 
-	/* Registry save/load settings. */
-	void	SaveSettings(HKEY hParentKey);
-	void	LoadSettings(HKEY hParentKey);
+protected:
 
-	/* XML save/load settings. */
-	void	SaveSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
-	void	LoadSettings(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
+	void			SaveExtraRegistrySettings(HKEY hKey);
+	void			LoadExtraRegistrySettings(HKEY hKey);
+
+	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
+	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
 
 private:
 
 	friend CSearchDialog;
 
-	static const TCHAR REGISTRY_SETTINGS_KEY[];
+	static const TCHAR SETTINGS_KEY[];
 
 	CSearchDialogPersistentSettings();
 
 	CSearchDialogPersistentSettings(const CSearchDialogPersistentSettings &);
 	CSearchDialogPersistentSettings & operator=(const CSearchDialogPersistentSettings &);
-
-	/* TODO: Move to a base class? */
-	BOOL			m_bStateSaved;
 
 	TCHAR			m_szSearchPattern[MAX_PATH];
 	std::list<std::wstring>	m_SearchDirectories;
@@ -55,7 +55,6 @@ private:
 	BOOL			m_bSystem;
 
 	/* Dialog/control size properties. */
-	POINT			m_ptSearch;
 	int				m_iSearchWidth;
 	int				m_iSearchHeight;
 	int				m_iColumnWidth1;

@@ -14,7 +14,6 @@
 #include "stdafx.h"
 #include <regex>
 #include "Explorer++_internal.h"
-#include "XMLSettings.h"
 #include "SearchDialog.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
@@ -22,6 +21,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/FileContextMenuManager.h"
+#include "../Helper/XMLSettings.h"
 
 
 namespace NSearchDialog
@@ -37,7 +37,7 @@ namespace NSearchDialog
 	int CALLBACK	BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
 }
 
-const TCHAR CSearchDialogPersistentSettings::REGISTRY_SETTINGS_KEY[] = _T("Search");
+const TCHAR CSearchDialogPersistentSettings::SETTINGS_KEY[] = _T("Search");
 
 CSearchDialog::CSearchDialog(HINSTANCE hInstance,int iResource,
 	HWND hParent,TCHAR *szSearchDirectory) :
@@ -270,8 +270,8 @@ BOOL CSearchDialog::OnInitDialog()
 			ListView_SetColumnWidth(hListView,1,m_sdps->m_iColumnWidth2);
 		}
 
-		SetWindowPos(m_hDlg,HWND_TOP,m_sdps->m_ptSearch.x,
-			m_sdps->m_ptSearch.y,m_sdps->m_iSearchWidth,
+		SetWindowPos(m_hDlg,HWND_TOP,m_sdps->m_ptDialog.x,
+			m_sdps->m_ptDialog.y,m_sdps->m_iSearchWidth,
 			m_sdps->m_iSearchHeight,SWP_SHOWWINDOW);
 	}
 	else
@@ -1215,8 +1215,8 @@ void CSearchDialog::SaveState()
 	RECT rcTemp;
 
 	GetWindowRect(m_hDlg,&rcTemp);
-	m_sdps->m_ptSearch.x = rcTemp.left;
-	m_sdps->m_ptSearch.y = rcTemp.top;
+	m_sdps->m_ptDialog.x = rcTemp.left;
+	m_sdps->m_ptDialog.y = rcTemp.top;
 	m_sdps->m_iSearchWidth = GetRectWidth(&rcTemp);
 	m_sdps->m_iSearchHeight = GetRectHeight(&rcTemp);
 
@@ -1252,10 +1252,9 @@ void CSearchDialog::SaveState()
 	m_sdps->m_bStateSaved = TRUE;
 }
 
-CSearchDialogPersistentSettings::CSearchDialogPersistentSettings()
+CSearchDialogPersistentSettings::CSearchDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
 {
-	m_bStateSaved = FALSE;
-
 	/* Initialize all settings using default values. */
 	m_bSearchSubFolders = TRUE;
 	m_bUseRegularExpressions = FALSE;
@@ -1282,152 +1281,52 @@ CSearchDialogPersistentSettings& CSearchDialogPersistentSettings::GetInstance()
 	return sdps;
 }
 
-void CSearchDialogPersistentSettings::SaveSettings(HKEY hParentKey)
+void CSearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	if(!m_bStateSaved)
-	{
-		return;
-	}
-
-	HKEY hKey;
-	DWORD dwDisposition;
-
-	LONG lRes = RegCreateKeyEx(hParentKey,REGISTRY_SETTINGS_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&dwDisposition);
-
-	if(lRes == ERROR_SUCCESS)
-	{
-		RegSetValueEx(hKey,_T("Position"),0,
-			REG_BINARY,reinterpret_cast<LPBYTE>(&m_ptSearch),
-			sizeof(m_ptSearch));
-
-		SaveDwordToRegistry(hKey,_T("Width"),m_iSearchWidth);
-		SaveDwordToRegistry(hKey,_T("Height"),m_iSearchHeight);
-		SaveDwordToRegistry(hKey,_T("ColumnWidth1"),m_iColumnWidth1);
-		SaveDwordToRegistry(hKey,_T("ColumnWidth2"),m_iColumnWidth2);
-		SaveStringToRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern);
-		SaveDwordToRegistry(hKey,_T("SearchSubFolders"),m_bSearchSubFolders);
-		SaveDwordToRegistry(hKey,_T("UseRegularExpressions"),m_bUseRegularExpressions);
-		SaveDwordToRegistry(hKey,_T("CaseInsensitive"),m_bCaseInsensitive);
-		SaveDwordToRegistry(hKey,_T("Archive"),m_bArchive);
-		SaveDwordToRegistry(hKey,_T("Hidden"),m_bHidden);
-		SaveDwordToRegistry(hKey,_T("ReadOnly"),m_bReadOnly);
-		SaveDwordToRegistry(hKey,_T("System"),m_bSystem);
-
-		TCHAR szItemKey[32];
-		int i = 0;
-		
-		for each(auto strDirectory in m_SearchDirectories)
-		{
-			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("Directory%d"),i++);
-			SaveStringToRegistry(hKey,szItemKey,strDirectory.c_str());
-		}
-
-		i = 0;
-
-		for each(auto strPattern in m_SearchPatterns)
-		{
-			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("Pattern%d"),i++);
-			SaveStringToRegistry(hKey,szItemKey,strPattern.c_str());
-		}
-
-		RegCloseKey(hKey);
-	}
+	SaveDwordToRegistry(hKey,_T("Width"),m_iSearchWidth);
+	SaveDwordToRegistry(hKey,_T("Height"),m_iSearchHeight);
+	SaveDwordToRegistry(hKey,_T("ColumnWidth1"),m_iColumnWidth1);
+	SaveDwordToRegistry(hKey,_T("ColumnWidth2"),m_iColumnWidth2);
+	SaveStringToRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern);
+	SaveDwordToRegistry(hKey,_T("SearchSubFolders"),m_bSearchSubFolders);
+	SaveDwordToRegistry(hKey,_T("UseRegularExpressions"),m_bUseRegularExpressions);
+	SaveDwordToRegistry(hKey,_T("CaseInsensitive"),m_bCaseInsensitive);
+	SaveDwordToRegistry(hKey,_T("Archive"),m_bArchive);
+	SaveDwordToRegistry(hKey,_T("Hidden"),m_bHidden);
+	SaveDwordToRegistry(hKey,_T("ReadOnly"),m_bReadOnly);
+	SaveDwordToRegistry(hKey,_T("System"),m_bSystem);
+	SaveStringListToRegistry(hKey,_T("Directory"),m_SearchDirectories);
+	SaveStringListToRegistry(hKey,_T("Pattern"),m_SearchPatterns);
 }
 
-void CSearchDialogPersistentSettings::LoadSettings(HKEY hParentKey)
+void CSearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	HKEY hKey;
-	DWORD dwSize;
-
-	LONG lRes = RegOpenKeyEx(hParentKey,REGISTRY_SETTINGS_KEY,0,
-		KEY_READ,&hKey);
-
-	if(lRes == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptSearch,&dwSize);
-
-		ReadDwordFromRegistry(hKey,_T("Width"),reinterpret_cast<LPDWORD>(&m_iSearchWidth));
-		ReadDwordFromRegistry(hKey,_T("Height"),reinterpret_cast<LPDWORD>(&m_iSearchHeight));
-		ReadDwordFromRegistry(hKey,_T("ColumnWidth1"),reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
-		ReadDwordFromRegistry(hKey,_T("ColumnWidth2"),reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
-		ReadStringFromRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern));
-		ReadDwordFromRegistry(hKey,_T("SearchSubFolders"),reinterpret_cast<LPDWORD>(&m_bSearchSubFolders));
-		ReadDwordFromRegistry(hKey,_T("UseRegularExpressions"),reinterpret_cast<LPDWORD>(&m_bUseRegularExpressions));
-		ReadDwordFromRegistry(hKey,_T("CaseInsensitive"),reinterpret_cast<LPDWORD>(&m_bCaseInsensitive));
-		ReadDwordFromRegistry(hKey,_T("Archive"),reinterpret_cast<LPDWORD>(&m_bArchive));
-		ReadDwordFromRegistry(hKey,_T("Hidden"),reinterpret_cast<LPDWORD>(&m_bHidden));
-		ReadDwordFromRegistry(hKey,_T("ReadOnly"),reinterpret_cast<LPDWORD>(&m_bReadOnly));
-		ReadDwordFromRegistry(hKey,_T("System"),reinterpret_cast<LPDWORD>(&m_bSystem));
-
-		TCHAR szItemKey[32];
-		TCHAR szTemp[512];
-		int i = 0;
-
-		lRes = ERROR_SUCCESS;
-
-		while(lRes == ERROR_SUCCESS)
-		{
-			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-				_T("Directory%d"),i++);
-
-			lRes = ReadStringFromRegistry(hKey,szItemKey,
-				szTemp,SIZEOF_ARRAY(szTemp));
-
-			if(lRes == ERROR_SUCCESS)
-			{
-				m_SearchDirectories.push_back(szTemp);
-			}
-		}
-
-		i = 0;
-		lRes = ERROR_SUCCESS;
-
-		while(lRes == ERROR_SUCCESS)
-		{
-			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-				_T("Pattern%d"),i++);
-
-			lRes = ReadStringFromRegistry(hKey,szItemKey,
-				szTemp,SIZEOF_ARRAY(szTemp));
-
-			if(lRes == ERROR_SUCCESS)
-			{
-				m_SearchPatterns.push_back(szTemp);
-			}
-		}
-
-		m_bStateSaved = TRUE;
-
-		RegCloseKey(hKey);
-	}
+	ReadDwordFromRegistry(hKey,_T("Width"),reinterpret_cast<LPDWORD>(&m_iSearchWidth));
+	ReadDwordFromRegistry(hKey,_T("Height"),reinterpret_cast<LPDWORD>(&m_iSearchHeight));
+	ReadDwordFromRegistry(hKey,_T("ColumnWidth1"),reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
+	ReadDwordFromRegistry(hKey,_T("ColumnWidth2"),reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
+	ReadStringFromRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern));
+	ReadDwordFromRegistry(hKey,_T("SearchSubFolders"),reinterpret_cast<LPDWORD>(&m_bSearchSubFolders));
+	ReadDwordFromRegistry(hKey,_T("UseRegularExpressions"),reinterpret_cast<LPDWORD>(&m_bUseRegularExpressions));
+	ReadDwordFromRegistry(hKey,_T("CaseInsensitive"),reinterpret_cast<LPDWORD>(&m_bCaseInsensitive));
+	ReadDwordFromRegistry(hKey,_T("Archive"),reinterpret_cast<LPDWORD>(&m_bArchive));
+	ReadDwordFromRegistry(hKey,_T("Hidden"),reinterpret_cast<LPDWORD>(&m_bHidden));
+	ReadDwordFromRegistry(hKey,_T("ReadOnly"),reinterpret_cast<LPDWORD>(&m_bReadOnly));
+	ReadDwordFromRegistry(hKey,_T("System"),reinterpret_cast<LPDWORD>(&m_bSystem));
+	ReadStringListFromRegistry(hKey,_T("Directory"),m_SearchDirectories);
+	ReadStringListFromRegistry(hKey,_T("Pattern"),m_SearchPatterns);
 }
 
-void CSearchDialogPersistentSettings::SaveSettings(MSXML2::IXMLDOMDocument *pXMLDom,
-	MSXML2::IXMLDOMElement *pe)
+void CSearchDialogPersistentSettings::SaveExtraXMLSettings(
+	MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
 {
-	if(!m_bStateSaved)
-	{
-		return;
-	}
-
-	MSXML2::IXMLDOMElement *pParentNode = NULL;
-	BSTR bstr_wsntt = SysAllocString(L"\n\t\t");
 	TCHAR szNode[64];
-
-	AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-
-	CreateElementNode(pXMLDom,&pParentNode,pe,_T("DialogState"),_T("Search"));
-
 	int i = 0;
 
 	for each(auto strDirectory in m_SearchDirectories)
 	{
 		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("Directory%d"),i++);
-		AddAttributeToNode(pXMLDom,pParentNode,szNode,strDirectory.c_str());
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,strDirectory.c_str());
 	}
 
 	i = 0;
@@ -1435,104 +1334,79 @@ void CSearchDialogPersistentSettings::SaveSettings(MSXML2::IXMLDOMDocument *pXML
 	for each(auto strPattern in m_SearchPatterns)
 	{
 		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("Pattern%d"),i++);
-		AddAttributeToNode(pXMLDom,pParentNode,szNode,strPattern.c_str());
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,strPattern.c_str());
 	}
 
-	AddAttributeToNode(pXMLDom,pParentNode,_T("PosX"),EncodeIntValue(m_ptSearch.x));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("PosY"),EncodeIntValue(m_ptSearch.y));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("Width"),EncodeIntValue(m_iSearchWidth));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("Height"),EncodeIntValue(m_iSearchHeight));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth1"),EncodeIntValue(m_iColumnWidth1));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth2"),EncodeIntValue(m_iColumnWidth2));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("SearchDirectoryText"),m_szSearchPattern);
-	AddAttributeToNode(pXMLDom,pParentNode,_T("SearchSubFolders"),EncodeBoolValue(m_bSearchSubFolders));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("UseRegularExpressions"),EncodeBoolValue(m_bUseRegularExpressions));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("CaseInsensitive"),EncodeBoolValue(m_bCaseInsensitive));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("Archive"),EncodeBoolValue(m_bArchive));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("Hidden"),EncodeBoolValue(m_bHidden));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("ReadOnly"),EncodeBoolValue(m_bReadOnly));
-	AddAttributeToNode(pXMLDom,pParentNode,_T("System"),EncodeBoolValue(m_bSystem));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Width"),NXMLSettings::EncodeIntValue(m_iSearchWidth));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Height"),NXMLSettings::EncodeIntValue(m_iSearchHeight));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth1"),NXMLSettings::EncodeIntValue(m_iColumnWidth1));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth2"),NXMLSettings::EncodeIntValue(m_iColumnWidth2));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SearchDirectoryText"),m_szSearchPattern);
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SearchSubFolders"),NXMLSettings::EncodeBoolValue(m_bSearchSubFolders));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("UseRegularExpressions"),NXMLSettings::EncodeBoolValue(m_bUseRegularExpressions));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CaseInsensitive"),NXMLSettings::EncodeBoolValue(m_bCaseInsensitive));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Archive"),NXMLSettings::EncodeBoolValue(m_bArchive));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Hidden"),NXMLSettings::EncodeBoolValue(m_bHidden));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ReadOnly"),NXMLSettings::EncodeBoolValue(m_bReadOnly));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("System"),NXMLSettings::EncodeBoolValue(m_bSystem));
 }
 
-void CSearchDialogPersistentSettings::LoadSettings(MSXML2::IXMLDOMNamedNodeMap *pam,
-	long lChildNodes)
+void CSearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
-	MSXML2::IXMLDOMNode *pNode = NULL;
-	BSTR bstrName;
-	BSTR bstrValue;
-
-	for(int i = 1;i < lChildNodes;i++)
+	if(lstrcmpi(bstrName,_T("Width")) == 0)
 	{
-		pam->get_item(i,&pNode);
-
-		pNode->get_nodeName(&bstrName);
-		pNode->get_text(&bstrValue);
-
-		if(lstrcmpi(bstrName,_T("PosX")) == 0)
-		{
-			m_ptSearch.x = DecodeIntValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("PosY")) == 0)
-		{
-			m_ptSearch.y = DecodeIntValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("Width")) == 0)
-		{
-			m_iSearchWidth = DecodeIntValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("Height")) == 0)
-		{
-			m_iSearchHeight = DecodeIntValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("ColumnWidth1")) == 0)
-		{
-			m_iColumnWidth1 = DecodeIntValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("ColumnWidth2")) == 0)
-		{
-			m_iColumnWidth2 = DecodeIntValue(bstrValue);
-		}
-		else if(CheckWildcardMatch(_T("Directory*"),bstrName,TRUE))
-		{
-			m_SearchDirectories.push_back(bstrValue);
-		}
-		else if(CheckWildcardMatch(_T("Pattern*"),bstrName,TRUE))
-		{
-			m_SearchPatterns.push_back(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("SearchDirectoryText")) == 0)
-		{
-			StringCchCopy(m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern),bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("SearchSubFolders")) == 0)
-		{
-			m_bSearchSubFolders = DecodeBoolValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("UseRegularExpressions")) == 0)
-		{
-			m_bUseRegularExpressions = DecodeBoolValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("CaseInsensitive")) == 0)
-		{
-			m_bCaseInsensitive = DecodeBoolValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("Archive")) == 0)
-		{
-			m_bArchive = DecodeBoolValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("Hidden")) == 0)
-		{
-			m_bHidden = DecodeBoolValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("ReadOnly")) == 0)
-		{
-			m_bReadOnly = DecodeBoolValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,_T("System")) == 0)
-		{
-			m_bSystem = DecodeBoolValue(bstrValue);
-		}
+		m_iSearchWidth = NXMLSettings::DecodeIntValue(bstrValue);
 	}
-
-	m_bStateSaved = TRUE;
+	else if(lstrcmpi(bstrName,_T("Height")) == 0)
+	{
+		m_iSearchHeight = NXMLSettings::DecodeIntValue(bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("ColumnWidth1")) == 0)
+	{
+		m_iColumnWidth1 = NXMLSettings::DecodeIntValue(bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("ColumnWidth2")) == 0)
+	{
+		m_iColumnWidth2 = NXMLSettings::DecodeIntValue(bstrValue);
+	}
+	else if(CheckWildcardMatch(_T("Directory*"),bstrName,TRUE))
+	{
+		m_SearchDirectories.push_back(bstrValue);
+	}
+	else if(CheckWildcardMatch(_T("Pattern*"),bstrName,TRUE))
+	{
+		m_SearchPatterns.push_back(bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("SearchDirectoryText")) == 0)
+	{
+		StringCchCopy(m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern),bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("SearchSubFolders")) == 0)
+	{
+		m_bSearchSubFolders = NXMLSettings::DecodeBoolValue(bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("UseRegularExpressions")) == 0)
+	{
+		m_bUseRegularExpressions = NXMLSettings::DecodeBoolValue(bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("CaseInsensitive")) == 0)
+	{
+		m_bCaseInsensitive = NXMLSettings::DecodeBoolValue(bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("Archive")) == 0)
+	{
+		m_bArchive = NXMLSettings::DecodeBoolValue(bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("Hidden")) == 0)
+	{
+		m_bHidden = NXMLSettings::DecodeBoolValue(bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("ReadOnly")) == 0)
+	{
+		m_bReadOnly = NXMLSettings::DecodeBoolValue(bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("System")) == 0)
+	{
+		m_bSystem = NXMLSettings::DecodeBoolValue(bstrValue);
+	}
 }

@@ -126,7 +126,7 @@ INT_PTR CALLBACK Explorerplusplus::ColorFilteringProc(HWND hDlg,UINT Msg,WPARAM 
 						ListView_InsertItem(hListView,&lvItem);
 					}
 
-					/* Regardless of whether the user canelled the dialog
+					/* Regardless of whether the user cancelled the dialog
 					or added the rule, save their color selection. */
 					m_crInitialColor = lvc.rgbColour;
 

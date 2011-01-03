@@ -1,7 +1,7 @@
 Explorer++
 ----------
 
-Copyright (c) 2005-2010 David Erceg
+Copyright (c) 2005-2011 David Erceg
 
 Explorer++ is free software released under
 the GNU General Public License.

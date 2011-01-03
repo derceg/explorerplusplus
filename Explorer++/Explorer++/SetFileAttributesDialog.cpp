@@ -4,8 +4,9 @@
  * File: SetFileAttributesDialog.cpp
  * License: GPL - See COPYING in the top level directory
  *
- * Provides the ability to set various attributes
- * of a file.
+ * Provides the ability to change the attributes
+ * and creation/modification/access dates of a set
+ * of files.
  *
  * Written by David Erceg
  * www.explorerplusplus.com
@@ -14,217 +15,244 @@
 
 #include "stdafx.h"
 #include <list>
-#include "Misc.h"
-#include "Explorer++.h"
-#include "Explorer++_internal.h"
+#include "SetFileAttributesDialog.h"
+#include "MainResource.h"
+#include "../Helper/Helper.h"
 
-#define NUM_ATTRIBUTES		5
 
-#define DATE_TIME_MODIFIED	0
-#define DATE_TIME_CREATED	1
-#define DATE_TIME_ACCESSED	2
+const TCHAR CSetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetFileAttributes");
 
-void SetAttributeCheckState(HWND hwnd,int nAttribute,int nSelected);
-void ResetButtonState(HWND hwnd,BOOL bReset);
-
-typedef struct
+CSetFileAttributesDialog::CSetFileAttributesDialog(HINSTANCE hInstance,
+	int iResource,HWND hParent,std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t>
+	sfaiList) :
+CBaseDialog(hInstance,iResource,hParent)
 {
-	DWORD Attribute;
-	UINT uControlId;
-	UINT uChecked;
+	assert(sfaiList.size() > 0);
 
-	/* Set if the attribute state is on
-	when the particular attribute is off. */
-	BOOL bReversed;
-} Attributes_t;
+	m_FileList = sfaiList;
 
-Attributes_t Attributes[6];
-
-SYSTEMTIME g_LocalWrite;
-SYSTEMTIME g_LocalCreation;
-SYSTEMTIME g_LocalAccess;
-
-INT_PTR CALLBACK SetFileAttributesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
-{
-	static Explorerplusplus *pContainer = NULL;
-
-	switch(uMsg)
-	{
-		case WM_INITDIALOG:
-		{
-			pContainer = (Explorerplusplus *)lParam;
-		}
-		break;
-	}
-
-	if(pContainer != NULL)
-	{
-		return pContainer->SetFileAttributesProc(hDlg,uMsg,wParam,lParam);
-	}
-	else
-	{
-		return 0;
-	}
+	m_psfadps = &CSetFileAttributesDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CALLBACK Explorerplusplus::SetFileAttributesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+CSetFileAttributesDialog::~CSetFileAttributesDialog()
 {
-	static HANDLE hFile;
-	static TCHAR FileName[MAX_PATH];
 
-	switch(uMsg)
-	{
-		case WM_INITDIALOG:
-			OnInitializeFileAttributesDlg(hDlg,lParam);
-			break;
-
-		case WM_COMMAND:
-			switch(LOWORD(wParam))
-			{
-				case IDC_MODIFICATION_RESET:
-					OnDateReset(hDlg,DATE_TIME_MODIFIED);
-					break;
-
-				case IDC_CREATION_RESET:
-					OnDateReset(hDlg,DATE_TIME_CREATED);
-					break;
-
-				case IDC_ACCESS_RESET:
-					OnDateReset(hDlg,DATE_TIME_ACCESSED);
-					break;
-
-				case IDOK:
-					OnFileAttributesDlgOk(hDlg);
-					break;
-
-				case IDCANCEL:
-					SetFileAttributesSaveState(hDlg);
-					EndDialog(hDlg,0);
-					break;
-			}
-			break;
-
-		case WM_NOTIFY:
-			OnSetFileAttributesNotify(hDlg,wParam,lParam);
-			break;
-
-		case WM_CLOSE:
-			SetFileAttributesSaveState(hDlg);
-			EndDialog(hDlg,0);
-			break;
-	}
-
-	return 0;
 }
 
-void Explorerplusplus::OnInitializeFileAttributesDlg(HWND hDlg,LPARAM lParam)
+BOOL CSetFileAttributesDialog::OnInitDialog()
 {
-	list<SetFileAttributesInfo_t>::iterator itr;
-	int nItems;
-	int nArchive = 0;
+	InitializeAttributesStructure();
+	InitializeDateFields();
+
+	int nItems = static_cast<int>(m_FileList.size());
+
+	int nArchived = 0;
 	int nHidden = 0;
 	int nSystem = 0;
 	int nReadOnly = 0;
 	int nIndexed = 0;
 
-	InitializeAttributesStructure();
-
-	InitializeDateFields(hDlg);
-
-	nItems = (int)m_sfaiList.size();
-
-	for(itr = m_sfaiList.begin();itr != m_sfaiList.end();itr++)
+	for each(auto File in m_FileList)
 	{
-		if(itr->wfd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
-			nArchive++;
+		if(File.wfd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
+			nArchived++;
 
-		if((itr->wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) == FILE_ATTRIBUTE_HIDDEN)
+		if((File.wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) == FILE_ATTRIBUTE_HIDDEN)
 			nHidden++;
 
-		if(itr->wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
+		if(File.wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
 			nSystem++;
 
-		if(itr->wfd.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+		if(File.wfd.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
 			nReadOnly++;
 
-		if(!(itr->wfd.dwFileAttributes & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED))
+		if(!(File.wfd.dwFileAttributes & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED))
 			nIndexed++;
 	}
 
-	ResetButtonState(GetDlgItem(hDlg,IDC_CHECK_ARCHIVE),nArchive == 0 || nArchive == nItems);
-	ResetButtonState(GetDlgItem(hDlg,IDC_CHECK_HIDDEN),nHidden == 0 || nHidden == nItems);
-	ResetButtonState(GetDlgItem(hDlg,IDC_CHECK_SYSTEM),nSystem == 0 || nSystem == nItems);
-	ResetButtonState(GetDlgItem(hDlg,IDC_CHECK_READONLY),nReadOnly == 0 || nReadOnly == nItems);
-	ResetButtonState(GetDlgItem(hDlg,IDC_CHECK_INDEXED),nIndexed == 0 || nIndexed == nItems);
+	ResetButtonState(GetDlgItem(m_hDlg,IDC_CHECK_ARCHIVE),nArchived == 0 || nArchived == nItems);
+	ResetButtonState(GetDlgItem(m_hDlg,IDC_CHECK_HIDDEN),nHidden == 0 || nHidden == nItems);
+	ResetButtonState(GetDlgItem(m_hDlg,IDC_CHECK_SYSTEM),nSystem == 0 || nSystem == nItems);
+	ResetButtonState(GetDlgItem(m_hDlg,IDC_CHECK_READONLY),nReadOnly == 0 || nReadOnly == nItems);
+	ResetButtonState(GetDlgItem(m_hDlg,IDC_CHECK_INDEXED),nIndexed == 0 || nIndexed == nItems);
 
-	SetAttributeCheckState(GetDlgItem(hDlg,IDC_CHECK_ARCHIVE),nArchive,nItems);
-	SetAttributeCheckState(GetDlgItem(hDlg,IDC_CHECK_HIDDEN),nHidden,nItems);
-	SetAttributeCheckState(GetDlgItem(hDlg,IDC_CHECK_SYSTEM),nSystem,nItems);
-	SetAttributeCheckState(GetDlgItem(hDlg,IDC_CHECK_READONLY),nReadOnly,nItems);
-	SetAttributeCheckState(GetDlgItem(hDlg,IDC_CHECK_INDEXED),nIndexed,nItems);
+	SetAttributeCheckState(GetDlgItem(m_hDlg,IDC_CHECK_ARCHIVE),nArchived,nItems);
+	SetAttributeCheckState(GetDlgItem(m_hDlg,IDC_CHECK_HIDDEN),nHidden,nItems);
+	SetAttributeCheckState(GetDlgItem(m_hDlg,IDC_CHECK_SYSTEM),nSystem,nItems);
+	SetAttributeCheckState(GetDlgItem(m_hDlg,IDC_CHECK_READONLY),nReadOnly,nItems);
+	SetAttributeCheckState(GetDlgItem(m_hDlg,IDC_CHECK_INDEXED),nIndexed,nItems);
 
 	m_bModificationDateEnabled = FALSE;
 	m_bCreationDateEnabled = FALSE;
 	m_bAccessDateEnabled = FALSE;
 
-	if(m_bSetFileAttributesDlgStateSaved)
+	if(m_psfadps->m_bStateSaved)
 	{
-		/* TODO: */
-		/*SetWindowPos(hDlg,NULL,m_ptWildcardSelect.x,
-			m_ptWildcardSelect.y,0,0,SWP_NOSIZE|SWP_NOZORDER);*/
+		SetWindowPos(m_hDlg,NULL,m_psfadps->m_ptDialog.x,
+			m_psfadps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
 	}
 	else
 	{
-		CenterWindow(m_hContainer,hDlg);
+		CenterWindow(GetParent(m_hDlg),m_hDlg);
 	}
+
+	return 0;
 }
 
-void SetAttributeCheckState(HWND hwnd,int nAttribute,int nSelected)
+void CSetFileAttributesDialog::InitializeDateFields()
 {
-	UINT CheckState;
+	WIN32_FIND_DATA *pwfd = &(m_FileList.begin()->wfd);
 
-	if(nAttribute == 0)
-		CheckState = BST_UNCHECKED;
-	else if(nAttribute == nSelected)
-		CheckState = BST_CHECKED;
-	else
-		CheckState = BST_INDETERMINATE;
+	/* Use the dates of the first file... */
+	FileTimeToLocalSystemTime(&pwfd->ftLastWriteTime,&m_LocalWrite);
+	FileTimeToLocalSystemTime(&pwfd->ftCreationTime,&m_LocalCreation);
+	FileTimeToLocalSystemTime(&pwfd->ftLastAccessTime,&m_LocalCreation);
 
-	SendMessage(hwnd,BM_SETCHECK,(WPARAM)CheckState,(LPARAM)0);
+	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONDATE),GDT_VALID,&m_LocalWrite);
+	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONTIME),GDT_VALID,&m_LocalWrite);
+
+	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONDATE),GDT_VALID,&m_LocalCreation);
+	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONTIME),GDT_VALID,&m_LocalCreation);
+
+	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSDATE),GDT_VALID,&m_LocalCreation);
+	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSTIME),GDT_VALID,&m_LocalCreation);
+
+	/* All date/time fields are disabled initially. */
+	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONDATE),GDT_NONE,NULL);
+	EnableWindow(GetDlgItem(m_hDlg,IDC_MODIFICATIONTIME),FALSE);
+	EnableWindow(GetDlgItem(m_hDlg,IDC_MODIFICATION_RESET),FALSE);
+
+	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONDATE),GDT_NONE,NULL);
+	EnableWindow(GetDlgItem(m_hDlg,IDC_CREATIONTIME),FALSE);
+	EnableWindow(GetDlgItem(m_hDlg,IDC_CREATION_RESET),FALSE);
+
+	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSDATE),GDT_NONE,NULL);
+	EnableWindow(GetDlgItem(m_hDlg,IDC_ACCESSTIME),FALSE);
+	EnableWindow(GetDlgItem(m_hDlg,IDC_ACCESS_RESET),FALSE);
 }
 
-void ResetButtonState(HWND hwnd,BOOL bReset)
+void CSetFileAttributesDialog::InitializeAttributesStructure(void)
 {
-	if(!bReset)
-		return;
+	Attribute_t Attribute;
 
-	SendMessage(hwnd,BM_SETSTYLE,(WPARAM)BS_AUTOCHECKBOX,MAKELPARAM(FALSE,0));
+	Attribute.Attribute		= FILE_ATTRIBUTE_ARCHIVE;
+	Attribute.uControlId	= IDC_CHECK_ARCHIVE;
+	Attribute.bReversed		= FALSE;
+	m_AttributeList.push_back(Attribute);
+
+	Attribute.Attribute		= FILE_ATTRIBUTE_HIDDEN;
+	Attribute.uControlId	= IDC_CHECK_HIDDEN;
+	Attribute.bReversed		= FALSE;
+	m_AttributeList.push_back(Attribute);
+
+	Attribute.Attribute		= FILE_ATTRIBUTE_SYSTEM;
+	Attribute.uControlId	= IDC_CHECK_SYSTEM;
+	Attribute.bReversed		= FALSE;
+	m_AttributeList.push_back(Attribute);
+
+	Attribute.Attribute		= FILE_ATTRIBUTE_READONLY;
+	Attribute.uControlId	= IDC_CHECK_READONLY;
+	Attribute.bReversed		= FALSE;
+	m_AttributeList.push_back(Attribute);
+
+	Attribute.Attribute		= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
+	Attribute.uControlId	= IDC_CHECK_INDEXED;
+	Attribute.bReversed		= TRUE;
+	m_AttributeList.push_back(Attribute);
 }
 
-void Explorerplusplus::OnFileAttributesDlgOk(HWND hDlg)
+BOOL CSetFileAttributesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
-	HANDLE hFile;
-	list<SetFileAttributesInfo_t>::iterator itr;
-	FILETIME CreationTime;
-	FILETIME AccessTime;
-	FILETIME LastWriteTime;
-	SYSTEMTIME LocalWrite;
-	SYSTEMTIME LocalCreation;
-	SYSTEMTIME LocalAccess;
+	switch(LOWORD(wParam))
+	{
+	case IDC_MODIFICATION_RESET:
+		OnDateReset(DATE_TIME_MODIFIED);
+		break;
+
+	case IDC_CREATION_RESET:
+		OnDateReset(DATE_TIME_CREATED);
+		break;
+
+	case IDC_ACCESS_RESET:
+		OnDateReset(DATE_TIME_ACCESSED);
+		break;
+
+	case IDOK:
+		OnOk();
+		break;
+
+	case IDCANCEL:
+		OnCancel();
+		break;
+	}
+
+	return 0;
+}
+
+BOOL CSetFileAttributesDialog::OnNotify(NMHDR *pnmhdr)
+{
+	switch(pnmhdr->code)
+	{
+	case DTN_DATETIMECHANGE:
+		{
+			NMDATETIMECHANGE *pdtc = reinterpret_cast<NMDATETIMECHANGE *>(pnmhdr);
+
+			switch(pnmhdr->idFrom)
+			{
+			case IDC_MODIFICATIONDATE:
+				m_bModificationDateEnabled = (pdtc->dwFlags == GDT_VALID);
+				EnableWindow(GetDlgItem(m_hDlg,IDC_MODIFICATIONTIME),pdtc->dwFlags == GDT_VALID);
+				EnableWindow(GetDlgItem(m_hDlg,IDC_MODIFICATION_RESET),pdtc->dwFlags == GDT_VALID);
+				break;
+
+			case IDC_CREATIONDATE:
+				m_bCreationDateEnabled = (pdtc->dwFlags == GDT_VALID);
+				EnableWindow(GetDlgItem(m_hDlg,IDC_CREATIONTIME),pdtc->dwFlags == GDT_VALID);
+				EnableWindow(GetDlgItem(m_hDlg,IDC_CREATION_RESET),pdtc->dwFlags == GDT_VALID);
+				break;
+
+			case IDC_ACCESSDATE:
+				m_bAccessDateEnabled = (pdtc->dwFlags == GDT_VALID);
+				EnableWindow(GetDlgItem(m_hDlg,IDC_ACCESSTIME),pdtc->dwFlags == GDT_VALID);
+				EnableWindow(GetDlgItem(m_hDlg,IDC_ACCESS_RESET),pdtc->dwFlags == GDT_VALID);
+				break;
+			}
+		}
+		break;
+	}
+
+	return 0;
+}
+
+BOOL CSetFileAttributesDialog::OnClose()
+{
+	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CSetFileAttributesDialog::OnDestroy()
+{
+	SaveState();
+	return 0;
+}
+
+void CSetFileAttributesDialog::OnOk()
+{
 	FILETIME *plw = NULL;
 	FILETIME *plc = NULL;
 	FILETIME *pla = NULL;
 	DWORD AllFileAttributes = FILE_ATTRIBUTE_NORMAL;
 	DWORD FileAttributes;
-	int i = 0;
 
 	if(m_bModificationDateEnabled)
 	{
+		FILETIME LastWriteTime;
+		SYSTEMTIME LocalWrite;
 		SYSTEMTIME LocalWriteDate;
 		SYSTEMTIME LocalWriteTime;
 
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_MODIFICATIONDATE),&LocalWriteDate);
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_MODIFICATIONTIME),&LocalWriteTime);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONDATE),&LocalWriteDate);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONTIME),&LocalWriteTime);
 
 		MergeDateTime(&LocalWrite,&LocalWriteDate,&LocalWriteTime);
 
@@ -234,11 +262,13 @@ void Explorerplusplus::OnFileAttributesDlgOk(HWND hDlg)
 
 	if(m_bCreationDateEnabled)
 	{
+		FILETIME CreationTime;
+		SYSTEMTIME LocalCreation;
 		SYSTEMTIME LocalCreationDate;
 		SYSTEMTIME LocalCreationTime;
 
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_CREATIONDATE),&LocalCreationDate);
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_CREATIONTIME),&LocalCreationTime);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONDATE),&LocalCreationDate);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONTIME),&LocalCreationTime);
 
 		MergeDateTime(&LocalCreation,&LocalCreationDate,&LocalCreationTime);
 
@@ -248,11 +278,13 @@ void Explorerplusplus::OnFileAttributesDlgOk(HWND hDlg)
 
 	if(m_bAccessDateEnabled)
 	{
+		FILETIME AccessTime;
+		SYSTEMTIME LocalAccess;
 		SYSTEMTIME LocalAccessDate;
 		SYSTEMTIME LocalAccessTime;
 
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_ACCESSDATE),&LocalAccessDate);
-		DateTime_GetSystemtime(GetDlgItem(hDlg,IDC_ACCESSTIME),&LocalAccessTime);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSDATE),&LocalAccessDate);
+		DateTime_GetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSTIME),&LocalAccessTime);
 
 		MergeDateTime(&LocalAccess,&LocalAccessDate,&LocalAccessTime);
 
@@ -260,184 +292,128 @@ void Explorerplusplus::OnFileAttributesDlgOk(HWND hDlg)
 		pla = &AccessTime;
 	}
 
-	for(i = 0;i < NUM_ATTRIBUTES;i++)
+	/* Build up list of attributes. Add all positive
+	attributes (i.e. those that are active for all files).
+	Any attributes which are inderterminate will not change
+	(note that they are per-file). */
+	for each(auto Attribute in m_AttributeList)
 	{
-		Attributes[i].uChecked = (UINT)SendMessage(GetDlgItem(hDlg,Attributes[i].uControlId),
-		BM_GETCHECK,0,0);
-	}
+		Attribute.uChecked = static_cast<UINT>(SendMessage(GetDlgItem(m_hDlg,
+			Attribute.uControlId),BM_GETCHECK,0,0));
 
-	for(i = 0;i < NUM_ATTRIBUTES;i++)
-	{
-		if(!Attributes[i].bReversed)
+		if((!Attribute.bReversed && Attribute.uChecked == BST_CHECKED) ||
+			(Attribute.bReversed && Attribute.uChecked != BST_CHECKED))
 		{
-			if(Attributes[i].uChecked == BST_CHECKED)
-			{
-				AllFileAttributes |= Attributes[i].Attribute;
-			}
-		}
-		else
-		{
-			if(Attributes[i].uChecked != BST_CHECKED)
-			{
-				AllFileAttributes |= Attributes[i].Attribute;
-			}
+			AllFileAttributes |= Attribute.Attribute;
 		}
 	}
 
-	for(itr = m_sfaiList.begin();itr != m_sfaiList.end();itr++)
+	for each(auto File in m_FileList)
 	{
 		FileAttributes = AllFileAttributes;
 
-		for(i = 0;i < NUM_ATTRIBUTES;i++)
+		for each(auto Attribute in m_AttributeList)
 		{
 			/* If the check box is indeterminate, this attribute will
-			stay the same (i.e. if a file had it applied initially, it
-			will still have it applied, and vice versa). */
-			if(Attributes[i].uChecked == BST_INDETERMINATE)
+			stay the same (i.e. if a file had the attribute applied
+			initially, it will still have it applied, and vice versa). */
+			if(Attribute.uChecked == BST_INDETERMINATE)
 			{
-				if((!Attributes[i].bReversed) &&
-					(itr->wfd.dwFileAttributes & Attributes[i].Attribute))
-					FileAttributes |= Attributes[i].Attribute;
+				if((!Attribute.bReversed) &&
+					(File.wfd.dwFileAttributes & Attribute.Attribute))
+				{
+					FileAttributes |= Attribute.Attribute;
+				}
 			}
 		}
 
-		SetFileAttributes(itr->szFullFileName,FileAttributes);
+		SetFileAttributes(File.szFullFileName,FileAttributes);
 
-		hFile = CreateFile(itr->szFullFileName,FILE_WRITE_ATTRIBUTES,0,NULL,OPEN_EXISTING,
-			NULL,NULL);
+		HANDLE hFile = CreateFile(File.szFullFileName,FILE_WRITE_ATTRIBUTES,0,
+			NULL,OPEN_EXISTING,NULL,NULL);
 
 		if(hFile != INVALID_HANDLE_VALUE)
 		{
 			SetFileTime(hFile,plc,pla,plw);
-
 			CloseHandle(hFile);
 		}
 	}
 
-	SetFileAttributesSaveState(hDlg);
-
-	EndDialog(hDlg,1);
+	EndDialog(m_hDlg,1);
 }
 
-void Explorerplusplus::OnSetFileAttributesNotify(HWND hDlg,WPARAM wParam,LPARAM lParam)
+void CSetFileAttributesDialog::OnCancel()
 {
-	NMHDR *nmhdr;
+	EndDialog(m_hDlg,0);
+}
 
-	nmhdr = (NMHDR *)lParam;
-
-	switch(nmhdr->code)
+void CSetFileAttributesDialog::OnDateReset(DateTimeType_t DateTimeType)
+{
+	switch(DateTimeType)
 	{
-		case DTN_DATETIMECHANGE:
-			{
-				NMDATETIMECHANGE *pdtc;
+	case DATE_TIME_MODIFIED:
+		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONDATE),GDT_VALID,&m_LocalWrite);
+		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONTIME),GDT_VALID,&m_LocalWrite);
+		break;
 
-				pdtc = (NMDATETIMECHANGE *)lParam;
+	case DATE_TIME_CREATED:
+		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONDATE),GDT_VALID,&m_LocalCreation);
+		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONTIME),GDT_VALID,&m_LocalCreation);
+		break;
 
-				switch(nmhdr->idFrom)
-				{
-					case IDC_MODIFICATIONDATE:
-						m_bModificationDateEnabled = (pdtc->dwFlags == GDT_VALID);
-						EnableWindow(GetDlgItem(hDlg,IDC_MODIFICATIONTIME),pdtc->dwFlags == GDT_VALID);
-						EnableWindow(GetDlgItem(hDlg,IDC_MODIFICATION_RESET),pdtc->dwFlags == GDT_VALID);
-						break;
-
-					case IDC_CREATIONDATE:
-						m_bCreationDateEnabled = (pdtc->dwFlags == GDT_VALID);
-						EnableWindow(GetDlgItem(hDlg,IDC_CREATIONTIME),pdtc->dwFlags == GDT_VALID);
-						EnableWindow(GetDlgItem(hDlg,IDC_CREATION_RESET),pdtc->dwFlags == GDT_VALID);
-						break;
-
-					case IDC_ACCESSDATE:
-						m_bAccessDateEnabled = (pdtc->dwFlags == GDT_VALID);
-						EnableWindow(GetDlgItem(hDlg,IDC_ACCESSTIME),pdtc->dwFlags == GDT_VALID);
-						EnableWindow(GetDlgItem(hDlg,IDC_ACCESS_RESET),pdtc->dwFlags == GDT_VALID);
-						break;
-				}
-			}
-			break;
+	case DATE_TIME_ACCESSED:
+		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSDATE),GDT_VALID,&m_LocalCreation);
+		DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSTIME),GDT_VALID,&m_LocalCreation);
+		break;
 	}
 }
 
-void Explorerplusplus::OnDateReset(HWND hDlg,int FieldToReset)
+void CSetFileAttributesDialog::SaveState()
 {
-	switch(FieldToReset)
-	{
-		case DATE_TIME_MODIFIED:
-			DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_MODIFICATIONDATE),GDT_VALID,&g_LocalWrite);
-			DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_MODIFICATIONTIME),GDT_VALID,&g_LocalWrite);
-			break;
+	RECT rc;
+	GetWindowRect(m_hDlg,&rc);
+	m_psfadps->m_ptDialog.x = rc.left;
+	m_psfadps->m_ptDialog.y = rc.top;
 
-		case DATE_TIME_CREATED:
-			DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_CREATIONDATE),GDT_VALID,&g_LocalCreation);
-			DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_CREATIONTIME),GDT_VALID,&g_LocalCreation);
-			break;
-
-		case DATE_TIME_ACCESSED:
-			DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_ACCESSDATE),GDT_VALID,&g_LocalAccess);
-			DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_ACCESSTIME),GDT_VALID,&g_LocalAccess);
-			break;
-	}
+	m_psfadps->m_bStateSaved = TRUE;
 }
 
-void Explorerplusplus::InitializeAttributesStructure(void)
+void CSetFileAttributesDialog::SetAttributeCheckState(HWND hwnd,
+	int nAttributes,int nSelected)
 {
-	Attributes[0].Attribute		= FILE_ATTRIBUTE_ARCHIVE;
-	Attributes[0].uControlId	= IDC_CHECK_ARCHIVE;
-	Attributes[0].bReversed		= FALSE;
+	UINT CheckState;
 
-	Attributes[1].Attribute		= FILE_ATTRIBUTE_HIDDEN;
-	Attributes[1].uControlId	= IDC_CHECK_HIDDEN;
-	Attributes[1].bReversed		= FALSE;
+	if(nAttributes == 0)
+		CheckState = BST_UNCHECKED;
+	else if(nAttributes == nSelected)
+		CheckState = BST_CHECKED;
+	else
+		CheckState = BST_INDETERMINATE;
 
-	Attributes[2].Attribute		= FILE_ATTRIBUTE_SYSTEM;
-	Attributes[2].uControlId	= IDC_CHECK_SYSTEM;
-	Attributes[2].bReversed		= FALSE;
-
-	Attributes[3].Attribute		= FILE_ATTRIBUTE_READONLY;
-	Attributes[3].uControlId	= IDC_CHECK_READONLY;
-	Attributes[3].bReversed		= FALSE;
-
-	Attributes[4].Attribute		= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;
-	Attributes[4].uControlId	= IDC_CHECK_INDEXED;
-	Attributes[4].bReversed		= TRUE;
+	SendMessage(hwnd,BM_SETCHECK,CheckState,0);
 }
 
-void Explorerplusplus::InitializeDateFields(HWND hDlg)
+void CSetFileAttributesDialog::ResetButtonState(HWND hwnd,BOOL bReset)
 {
-	/* Use the dates of the first file... */
-	FileTimeToLocalSystemTime(&(m_sfaiList.begin())->wfd.ftLastWriteTime,&g_LocalWrite);
-	FileTimeToLocalSystemTime(&(m_sfaiList.begin())->wfd.ftCreationTime,&g_LocalCreation);
-	FileTimeToLocalSystemTime(&(m_sfaiList.begin())->wfd.ftLastAccessTime,&g_LocalAccess);
+	if(!bReset)
+		return;
 
-	DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_MODIFICATIONDATE),GDT_VALID,&g_LocalWrite);
-	DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_MODIFICATIONTIME),GDT_VALID,&g_LocalWrite);
-
-	DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_CREATIONDATE),GDT_VALID,&g_LocalCreation);
-	DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_CREATIONTIME),GDT_VALID,&g_LocalCreation);
-
-	DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_ACCESSDATE),GDT_VALID,&g_LocalAccess);
-	DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_ACCESSTIME),GDT_VALID,&g_LocalAccess);
-
-	DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_MODIFICATIONDATE),GDT_NONE,NULL);
-	EnableWindow(GetDlgItem(hDlg,IDC_MODIFICATIONTIME),FALSE);
-	EnableWindow(GetDlgItem(hDlg,IDC_MODIFICATION_RESET),FALSE);
-
-	DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_CREATIONDATE),GDT_NONE,NULL);
-	EnableWindow(GetDlgItem(hDlg,IDC_CREATIONTIME),FALSE);
-	EnableWindow(GetDlgItem(hDlg,IDC_CREATION_RESET),FALSE);
-
-	DateTime_SetSystemtime(GetDlgItem(hDlg,IDC_ACCESSDATE),GDT_NONE,NULL);
-	EnableWindow(GetDlgItem(hDlg,IDC_ACCESSTIME),FALSE);
-	EnableWindow(GetDlgItem(hDlg,IDC_ACCESS_RESET),FALSE);
+	SendMessage(hwnd,BM_SETSTYLE,BS_AUTOCHECKBOX,MAKELPARAM(FALSE,0));
 }
 
-void Explorerplusplus::SetFileAttributesSaveState(HWND hDlg)
+CSetFileAttributesDialogPersistentSettings::CSetFileAttributesDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
 {
-	RECT rcTemp;
 
-	GetWindowRect(hDlg,&rcTemp);
-	m_ptSetFileAttributes.x = rcTemp.left;
-	m_ptSetFileAttributes.y = rcTemp.top;
+}
 
-	m_bSetFileAttributesDlgStateSaved = TRUE;
+CSetFileAttributesDialogPersistentSettings::~CSetFileAttributesDialogPersistentSettings()
+{
+	
+}
+
+CSetFileAttributesDialogPersistentSettings& CSetFileAttributesDialogPersistentSettings::GetInstance()
+{
+	static CSetFileAttributesDialogPersistentSettings sfadps;
+	return sfadps;
 }

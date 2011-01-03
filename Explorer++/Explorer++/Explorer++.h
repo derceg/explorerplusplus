@@ -121,12 +121,6 @@ typedef struct
 	COLORREF	rgbColour;
 } ListViewColouring_t;
 
-typedef struct
-{
-	TCHAR szFullFileName[MAX_PATH];
-	WIN32_FIND_DATA wfd;
-} SetFileAttributesInfo_t;
-
 /* Describes the view modes and their order
 (as they differ on Windows XP and Vista/7). */
 typedef struct
@@ -230,7 +224,6 @@ public:
 	INT_PTR CALLBACK	MassRenameProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	RenameTabProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	SetFileAttributesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SplitFileProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	MergeFilesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -761,8 +754,6 @@ private:
 	void					LoadSelectColumnsStateFromRegistry(HKEY hParentKey);
 	void					SaveSelectDefaultColumnsStateToRegistry(HKEY hParentKey);
 	void					LoadSelectDefaultColumnsStateFromRegistry(HKEY hParentKey);
-	void					SaveSetFileAttributesStateToRegistry(HKEY hParentKey);
-	void					LoadSetFileAttributesStateFromRegistry(HKEY hParentKey);
 	void					SaveSplitFileColumnsStateToRegistry(HKEY hParentKey);
 	void					LoadSplitFileStateFromRegistry(HKEY hParentKey);
 
@@ -877,15 +868,6 @@ private:
 	void					OutputInformationOnDisplayWindow(TCHAR *szFullFileName,DWInfoType_t InfoType);
 	void					FormatDisplayString(TCHAR *szDisplayRaw,int iSelected,TCHAR *szFullFileName,TCHAR *szDisplayFinal,UINT cchMax);
 	void					TranslateDisplayWindowBuffer(TCHAR *szSymbol,UINT cchMax,int iSelected,TCHAR *szFullFileName);
-
-	/* Set file attributes dialog. */
-	void					OnInitializeFileAttributesDlg(HWND hDlg,LPARAM lParam);
-	void					OnFileAttributesDlgOk(HWND hDlg);
-	void					OnSetFileAttributesNotify(HWND hDlg,WPARAM wParam,LPARAM lParam);
-	void					OnDateReset(HWND hDlg,int FieldToReset);
-	void					InitializeAttributesStructure(void);
-	void					InitializeDateFields(HWND hDlg);
-	void					SetFileAttributesSaveState(HWND hDlg);
 
 	/* Display window colours dialog. */
 	void					OnInitializeDisplayColorsDlg(HWND hDlg);
@@ -1382,11 +1364,6 @@ private:
 	BOOL					m_bDataAccept;
 	int						m_iTabDragTab;
 
-	/* Set file attribute dialog internal state. */
-	BOOL					m_bModificationDateEnabled;
-	BOOL					m_bCreationDateEnabled;
-	BOOL					m_bAccessDateEnabled;
-
 	/* Add bookmark dialog. */
 	BOOL					m_bAddBookmarkDlgStateSaved;
 	POINT					m_ptAddBookmark;
@@ -1426,11 +1403,6 @@ private:
 	/* Display colors dialog. */
 	BOOL					m_bDisplayColorsDlgStateSaved;
 	POINT					m_ptDisplayColors;
-
-	/* Set file attributes diaog. */
-	list<SetFileAttributesInfo_t>	m_sfaiList;
-	BOOL					m_bSetFileAttributesDlgStateSaved;
-	POINT					m_ptSetFileAttributes;
 
 	/* Split file dialog. */
 	BOOL					m_bSplitFileDlgStateSaved;

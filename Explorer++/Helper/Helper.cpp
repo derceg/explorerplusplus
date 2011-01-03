@@ -1629,20 +1629,6 @@ int DumpSummaryInformationStream(TCHAR *lpszInputFile,TCHAR *lpszOutputFile)
 	return NumBytesWritten;
 }
 
-void ScanDirectoryForADS(TCHAR *lpszDirectory)
-{
-	TCHAR szDirSearchTerm[512];
-	WIN32_FIND_DATA wfd;
-	HANDLE hFindFile;
-
-	StringCchPrintf(szDirSearchTerm,SIZEOF_ARRAY(szDirSearchTerm),_T("%s\\*"),lpszDirectory);
-
-	hFindFile = FindFirstFile(szDirSearchTerm,&wfd);
-
-	if(hFindFile == INVALID_HANDLE_VALUE)
-		return;
-}
-
 int EnumFileStreams(TCHAR *lpszFileName)
 {
 	HANDLE hFile;

@@ -454,11 +454,11 @@
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SearchDialog.h" />
+    <ClInclude Include="SetFileAttributesDialog.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
-    <ClInclude Include="XMLSettings.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\About Image.bmp" />

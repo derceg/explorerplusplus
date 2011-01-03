@@ -241,6 +241,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Test|x64'">CompileAsCpp</CompileAs>
     </ClCompile>
     <ClCompile Include="CustomMenu.cpp" />
+    <ClCompile Include="DialogSettings.cpp" />
     <ClCompile Include="DriveInfo.cpp" />
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileContextMenuManager.cpp" />
@@ -280,6 +281,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Test|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="XMLSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h" />
@@ -288,6 +290,7 @@
     <ClInclude Include="ContextMenuManager.h" />
     <ClInclude Include="Controls.h" />
     <ClInclude Include="CustomMenu.h" />
+    <ClInclude Include="DialogSettings.h" />
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileContextMenuManager.h" />
     <ClInclude Include="FileOperations.h" />
@@ -301,6 +304,7 @@
     <ClInclude Include="ShellHelper.h" />
     <ClInclude Include="StatusBar.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="XMLSettings.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -14,6 +14,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "SetFileAttributesDialog.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FileContextMenuManager.h"
 
@@ -669,30 +670,35 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowCommandHandler(WPARAM wPa
 
 void Explorerplusplus::OnTreeViewSetFileAttributes(void)
 {
-	SetFileAttributesInfo_t sfai;
-	HTREEITEM hItem;
-	LPITEMIDLIST pidlItem = NULL;
-	HANDLE hFindFile;
+	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
 
-	hItem = TreeView_GetSelection(m_hTreeView);
-
-	if(hItem != NULL)
+	if(hItem == NULL)
 	{
-		m_sfaiList.clear();
+		return;
+	}
 
-		pidlItem = m_pMyTreeView->BuildPath(hItem);
+	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList;
+	NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
 
-		GetDisplayName(pidlItem,sfai.szFullFileName,SHGDN_FORPARSING);
+	LPITEMIDLIST pidlItem = m_pMyTreeView->BuildPath(hItem);
+	HRESULT hr = GetDisplayName(pidlItem,sfai.szFullFileName,SHGDN_FORPARSING);
+	CoTaskMemFree(pidlItem);
 
-		hFindFile = FindFirstFile(sfai.szFullFileName,&sfai.wfd);
-		CloseHandle(hFindFile);
+	if(hr == S_OK)
+	{
+		HANDLE hFindFile = FindFirstFile(sfai.szFullFileName,&sfai.wfd);
 
-		m_sfaiList.push_back(sfai);
+		if(hFindFile != INVALID_HANDLE_VALUE)
+		{
+			FindClose(hFindFile);
 
-		CoTaskMemFree(pidlItem);
+			sfaiList.push_back(sfai);
 
-		DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_SETFILEATTRIBUTES),
-			m_hContainer,SetFileAttributesProcStub,(LPARAM)this);
+			CSetFileAttributesDialog SetFileAttributesDialog(g_hLanguageModule,
+				IDD_SETFILEATTRIBUTES,m_hContainer,sfaiList);
+
+			SetFileAttributesDialog.ShowModalDialog();
+		}
 	}
 }
 

@@ -106,7 +106,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_bMassRenameDlgStateSaved		= FALSE;
 	m_bMergeFilesDlgStateSaved		= FALSE;
 	m_bOrganizeBookmarksDlgStateSaved	= FALSE;
-	m_bSetFileAttributesDlgStateSaved	= FALSE;
 	m_bSplitFileDlgStateSaved		= FALSE;
 	m_bCustomizeColorsDlgStateSaved	= FALSE;
 

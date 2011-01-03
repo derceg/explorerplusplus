@@ -381,9 +381,9 @@ void Explorerplusplus::SetLanguageModule(void)
 					}
 				}
 			}
-		}
 
-		FindClose(hFindFile);
+			FindClose(hFindFile);
+		}
 	}
 
 	/* The language DLL was not found/could not be loaded.

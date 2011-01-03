@@ -189,10 +189,10 @@
     <ClInclude Include="SearchDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XMLSettings.h">
+    <ClInclude Include="WildcardSelectDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WildcardSelectDialog.h">
+    <ClInclude Include="SetFileAttributesDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

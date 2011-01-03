@@ -15,6 +15,7 @@
 #include "Explorer++.h"
 #include "SearchDialog.h"
 #include "WildcardSelectDialog.h"
+#include "SetFileAttributesDialog.h"
 #include "../Helper/Registry.h"
 
 #define SMALL_SIZE		5
@@ -1442,11 +1443,11 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		SaveOrganizeBookmarksStateToRegistry(hKey);
 		SaveSelectColumnsStateToRegistry(hKey);
 		SaveSelectDefaultColumnsStateToRegistry(hKey);
-		SaveSetFileAttributesStateToRegistry(hKey);
 		SaveSplitFileColumnsStateToRegistry(hKey);
 
-		CSearchDialogPersistentSettings::GetInstance().SaveSettings(hKey);
-		CWildcardSelectDialogPersistentSettings::GetInstance().SaveSettings(hKey);
+		CSearchDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		CWildcardSelectDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		CSetFileAttributesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1706,29 +1707,6 @@ void Explorerplusplus::SaveSelectDefaultColumnsStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void Explorerplusplus::SaveSetFileAttributesStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_SETFILEATTRIBUTES_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bSetFileAttributesDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptSetFileAttributes,
-				sizeof(m_ptSetFileAttributes));
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
 void Explorerplusplus::SaveSplitFileColumnsStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
@@ -1772,11 +1750,11 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		LoadOrganizeBookmarksStateFromRegistry(hKey);
 		LoadSelectColumnsStateFromRegistry(hKey);
 		LoadSelectDefaultColumnsStateFromRegistry(hKey);
-		LoadSetFileAttributesStateFromRegistry(hKey);
 		LoadSplitFileStateFromRegistry(hKey);
 
-		CSearchDialogPersistentSettings::GetInstance().LoadSettings(hKey);
-		CWildcardSelectDialogPersistentSettings::GetInstance().LoadSettings(hKey);
+		CSearchDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		CWildcardSelectDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		CSetFileAttributesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -2039,30 +2017,6 @@ void Explorerplusplus::LoadSelectDefaultColumnsStateFromRegistry(HKEY hParentKey
 		if(ReturnValue == ERROR_SUCCESS)
 		{
 			m_bSetDefaultColumnsDlgStateSaved = TRUE;
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadSetFileAttributesStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_SETFILEATTRIBUTES_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptSetFileAttributes,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bSetFileAttributesDlgStateSaved = TRUE;
 		}
 
 		RegCloseKey(hKey);

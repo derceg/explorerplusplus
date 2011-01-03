@@ -4,32 +4,33 @@
 #include <list>
 #include <string>
 #include "../Helper/BaseDialog.h"
+#include "../Helper/DialogSettings.h"
 
 #import <msxml3.dll> raw_interfaces_only
 
 class CWildcardSelectDialog;
 
-class CWildcardSelectDialogPersistentSettings
+class CWildcardSelectDialogPersistentSettings : public CDialogSettings
 {
 public:
 
 	~CWildcardSelectDialogPersistentSettings();
 
-	static CWildcardSelectDialogPersistentSettings &GetInstance();
+	static			CWildcardSelectDialogPersistentSettings &GetInstance();
 
-	/* Registry save/load settings. */
-	void	SaveSettings(HKEY hParentKey);
-	void	LoadSettings(HKEY hParentKey);
+protected:
 
-	/* XML save/load settings. */
-	void	SaveSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
-	void	LoadSettings(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
+	void			SaveExtraRegistrySettings(HKEY hKey);
+	void			LoadExtraRegistrySettings(HKEY hKey);
+
+	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
+	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
 
 private:
 
-	friend CWildcardSelectDialog;
+	friend			CWildcardSelectDialog;
 
-	static const TCHAR REGISTRY_SETTINGS_KEY[];
+	static const	TCHAR SETTINGS_KEY[];
 
 	CWildcardSelectDialogPersistentSettings();
 
@@ -38,9 +39,6 @@ private:
 
 	TCHAR			m_szPattern[256];
 	std::list<std::wstring>	m_PatternList;
-
-	BOOL			m_bStateSaved;
-	POINT			m_ptDialog;
 };
 
 class CWildcardSelectDialog : public CBaseDialog

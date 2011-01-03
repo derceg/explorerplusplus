@@ -14,6 +14,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "SetFileAttributesDialog.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ContextMenuManager.h"
@@ -1775,32 +1776,29 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 
 void Explorerplusplus::OnListViewSetFileAttributes(void)
 {
-	SetFileAttributesInfo_t sfai;
-	WIN32_FIND_DATA *pwfd = NULL;
-	int nSelected;
-	int iSel;
-
-	nSelected = ListView_GetSelectedCount(m_hActiveListView);
-
-	if(nSelected != 0)
+	if(ListView_GetSelectedCount(m_hActiveListView) > 0)
 	{
-		iSel = -1;
+		int iSel = -1;
 
-		m_sfaiList.clear();
+		std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList;
 
 		while((iSel = ListView_GetNextItem(m_hActiveListView,
 			iSel,LVNI_SELECTED)) != -1)
 		{
+			NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
+
 			m_pActiveShellBrowser->QueryFullItemName(iSel,sfai.szFullFileName);
 
-			pwfd = m_pActiveShellBrowser->QueryFileFindData(iSel);
+			WIN32_FIND_DATA *pwfd = m_pActiveShellBrowser->QueryFileFindData(iSel);
 			sfai.wfd = *pwfd;
 
-			m_sfaiList.push_back(sfai);
+			sfaiList.push_back(sfai);
 		}
 
-		DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_SETFILEATTRIBUTES),
-			m_hContainer,SetFileAttributesProcStub,(LPARAM)this);
+		CSetFileAttributesDialog SetFileAttributesDialog(g_hLanguageModule,
+			IDD_SETFILEATTRIBUTES,m_hContainer,sfaiList);
+
+		SetFileAttributesDialog.ShowModalDialog();
 	}
 }
 

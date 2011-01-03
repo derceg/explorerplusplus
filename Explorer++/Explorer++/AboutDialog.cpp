@@ -7,7 +7,7 @@
  * Manages the 'About' dialog box.
  *
  * Notes:
- *  - Center dialog. Don't remember previous position.
+ *  - Always center dialog. Position is not saved/loaded.
  *
  * Written by David Erceg
  * www.explorerplusplus.com
