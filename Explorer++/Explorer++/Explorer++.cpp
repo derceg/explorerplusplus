@@ -360,16 +360,6 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_bHideSysVolInfoGlobal			= FALSE;
 }
 
-
-
-
-
-
-
-
-
-
-
 HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 {
 	HMENU hSubMenu = NULL;

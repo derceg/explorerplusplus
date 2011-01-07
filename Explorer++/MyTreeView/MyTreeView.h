@@ -42,7 +42,7 @@ public:
 	HTREEITEM			LocateDeletedItem(IN TCHAR *szFullFileName);
 	HTREEITEM			LocateItemByPath(TCHAR *szItemPath,BOOL bExpand);
 	void				EraseItems(HTREEITEM hParent);
-	HTREEITEM			CheckAgainstDesktop(TCHAR *szFullFileName);
+	HTREEITEM			LocateItemOnDesktopTree(TCHAR *szFullFileName);
 	BOOL				QueryDragging(void);
 	DWORD WINAPI		Thread_SubFolders(LPVOID pParam);
 	DWORD WINAPI		Thread_AddDirectoryInternal(IShellFolder *pShellFolder,LPITEMIDLIST pidlDirectory,HTREEITEM hParent);
@@ -73,7 +73,6 @@ private:
 	LRESULT		OnSetCursor(void);
 
 	void		DirectoryModified(DWORD dwAction,TCHAR *szFullFileName);
-
 	void		DirectoryAltered(void);
 	HTREEITEM	AddRoot(void);
 	void		AddItem(TCHAR *szFullFileName);
@@ -83,6 +82,7 @@ private:
 	void		RemoveItem(TCHAR *szFullFileName);
 	void		RemoveItem(HTREEITEM hItem);
 	void		UpdateParent(TCHAR *szParent);
+	void		UpdateParent(HTREEITEM hParent);
 	LRESULT CALLBACK	OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	void		OnGetDisplayInfo(LPARAM lParam);
 	void		UpdateChildren(HTREEITEM hParent,LPITEMIDLIST pidlParent);
@@ -117,6 +117,8 @@ private:
 	void		MonitorDrive(TCHAR *szDrive);
 	HTREEITEM	DetermineDriveSortedPosition(HTREEITEM hParent,TCHAR *szItemName);
 	HTREEITEM	DetermineItemSortedPosition(HTREEITEM hParent,TCHAR *szItem);
+	BOOL		IsDesktop(TCHAR *szPath);
+	BOOL		IsDesktopSubChild(TCHAR *szFullFileName);
 
 
 

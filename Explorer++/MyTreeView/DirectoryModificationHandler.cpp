@@ -113,29 +113,39 @@ void CMyTreeView::DirectoryAlteredAddFile(TCHAR *szFullFileName)
 void CMyTreeView::DirectoryAlteredRemoveFile(TCHAR *szFullFileName)
 {
 	TCHAR szParent[MAX_PATH];
+	HTREEITEM hItem;
+	HTREEITEM hDeskItem;
+	HTREEITEM hDeskParent;
 
 	StringCchCopy(szParent,SIZEOF_ARRAY(szParent),szFullFileName);
 	PathRemoveFileSpec(szParent);
 
-	/* The parent item should be updated (if it
-	is in the tree), regardless of whether the
-	actual item was found. For example, the number
-	of children may need to be set to 0. */
-	UpdateParent(szParent);
+	/* If the item is on the desktop, we need to remove the item 
+	   from the desktop tree branch as well. */
+	hDeskParent = LocateItemOnDesktopTree(szParent);  
+	hDeskItem	= LocateItemOnDesktopTree(szFullFileName); 
 
-	HTREEITEM hItem;
+	if(hDeskItem != NULL)
+	{
+		RemoveItem(hDeskItem);
+	}
 
 	hItem = LocateDeletedItem(szFullFileName);
-
 	if(hItem != NULL)
 	{
 		RemoveItem(szFullFileName);
 	}
-	else
+
+	/* The parent item should be updated (if it is in the tree), regardless of whether the
+	   actual item was found. For example, the number of children may need to be set to 0
+	   to remove the "+" sign from the tree. The update should be done after the removal. */
+	UpdateParent(hDeskParent);
+	UpdateParent(szParent);
+
+	if(hDeskItem == NULL && hItem == NULL)
 	{
-		/* The file does not currently exist within
-		the treeview. It should appear in the tracking
-		list however. */
+		/* The file does not currently exist within the treeview.
+		   It should appear in the tracking list however. */
 		for(auto itr = m_AlteredTrackingList.begin();itr != m_AlteredTrackingList.end();itr++)
 		{
 			if(lstrcmp(szFullFileName,itr->szFileName) == 0)
@@ -159,6 +169,20 @@ void CMyTreeView::DirectoryAlteredRemoveFile(TCHAR *szFullFileName)
 void CMyTreeView::DirectoryAlteredRenameFile(TCHAR *szFullFileName)
 {
 	HTREEITEM hItem;
+	HTREEITEM hDeskItem;
+
+	/* If the item is on the desktop, it is a special case.
+	   We need to update the treeview in two places:
+	   1) the root item
+	   2) the user's desktop folder if the tree is expanded to that folder
+		  (i.e. c:\users\'username'\Desktop) */
+	hDeskItem = LocateItemOnDesktopTree(m_szAlteredOldFileName);  
+
+	if(hDeskItem != NULL)
+	{
+		// Update root item
+		RenameItem(hDeskItem,szFullFileName);
+	}
 
 	/* Check if the file currently exists in the treeview. */
 	hItem = LocateItemByPath(m_szAlteredOldFileName,FALSE);
@@ -167,11 +191,12 @@ void CMyTreeView::DirectoryAlteredRenameFile(TCHAR *szFullFileName)
 	{
 		RenameItem(hItem,szFullFileName);
 	}
-	else
+
+    if(!hDeskItem && !hItem)
 	{
 		BOOL bFound = FALSE;
 
-		/* Search through the queue of file addtions
+		/* Search through the queue of file additions
 		and modifications for this file. */
 		for(auto itr = m_AlteredTrackingList.begin();itr != m_AlteredTrackingList.end();itr++)
 		{
@@ -277,9 +302,8 @@ void CMyTreeView::AddDrive(TCHAR *szDrive)
 void CMyTreeView::AddItem(TCHAR *szFullFileName)
 {
 	TCHAR			szDirectory[MAX_PATH];
-	TCHAR			szDesktop[MAX_PATH];
 	HTREEITEM		hParent;
-	BOOL			bDesktop;
+	HTREEITEM		hDeskParent;
 
 	/* If the specified item is a drive, it
 	will need to be handled differently,
@@ -294,24 +318,26 @@ void CMyTreeView::AddItem(TCHAR *szFullFileName)
 		StringCchCopy(szDirectory,MAX_PATH,szFullFileName);
 		PathRemoveFileSpec(szDirectory);
 
-		SHGetFolderPath(NULL,CSIDL_DESKTOP,NULL,
-			SHGFP_TYPE_CURRENT,szDesktop);
-
-		bDesktop = (lstrcmp(szDirectory,szDesktop) == 0);
+		// Check if it is a desktop (sub)child
+		hDeskParent = LocateItemOnDesktopTree(szDirectory);
 
 		hParent = LocateExistingItem(szDirectory);
 
-		/* If this items' parent isn't currently
-		shown on the treeview and the item is not
-		on the desktop, exit without doing anything
-		further. */
-		if(hParent == NULL && !bDesktop)
+		/* If this items' parent isn't currently shown on the
+		treeview and the item is not on the desktop, exit without
+		doing anything further. */
+		if(hParent == NULL && hDeskParent == NULL)
 			return;
 
-		if(bDesktop)
-			hParent = TreeView_GetRoot(m_hTreeView);
-
 		AddItemInternal(hParent,szFullFileName);
+
+		if(hDeskParent != NULL)
+		{
+			/* If the item is on the desktop, it is a special
+			case. We need to update the treeview also starting
+			from the root item. */
+			AddItemInternal(hDeskParent,szFullFileName);
+		}
 	}
 }
 
@@ -537,17 +563,6 @@ void CMyTreeView::RemoveItem(HTREEITEM hItem)
 {
 	EraseItems(hItem);
 	TreeView_DeleteItem(m_hTreeView,hItem);
-
-	/* TODO: If the item is on the desktop, it may need to
-	be deleted twice. */
-	/*hItem = CheckAgainstDesktop(szFullFileName);
-
-	if(hItem != NULL)
-	{
-		EraseItems(hItem);
-
-		TreeView_DeleteItem(m_hTreeView,hItem);
-	}*/
 }
 
 void CMyTreeView::UpdateParent(TCHAR *szParent)
@@ -556,6 +571,11 @@ void CMyTreeView::UpdateParent(TCHAR *szParent)
 
 	hParent = LocateExistingItem(szParent);
 
+	UpdateParent(hParent);
+}
+
+void CMyTreeView::UpdateParent(HTREEITEM hParent)
+{
 	if(hParent != NULL)
 	{
 		TVITEM tvItem;

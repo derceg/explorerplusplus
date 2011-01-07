@@ -1287,7 +1287,7 @@ HTREEITEM CMyTreeView::LocateItemInternal(LPITEMIDLIST pidlDirectory,BOOL bOnlyL
 
 	/* Keep searching until the specified item
 	is found or it is found the item does not
-	exist in the trrview.
+	exist in the treeview.
 	Look through each item, once an ancestor is
 	found, look through it's children, expanding
 	the parent node if necessary. */
@@ -1433,47 +1433,76 @@ HTREEITEM CMyTreeView::LocateItemByPath(TCHAR *szItemPath,BOOL bExpand)
 	return hItem;
 }
 
-HTREEITEM CMyTreeView::CheckAgainstDesktop(TCHAR *szFullFileName)
+/* Locate an item which is a Desktop (sub)child, if visible.
+   Does not expand any item */
+HTREEITEM CMyTreeView::LocateItemOnDesktopTree(TCHAR *szFullFileName)
 {
 	HTREEITEM	hItem;
 	TVITEMEX	tvItem;
-	TCHAR		szPath[MAX_PATH];
 	TCHAR		szFileName[MAX_PATH];
 	TCHAR		szDesktop[MAX_PATH];
-	TCHAR		szCurrent[MAX_PATH];
+	TCHAR		szCurrentItem[MAX_PATH];
+	TCHAR		*pItemName = NULL;
+	TCHAR		*next_token = NULL;
 	BOOL		bDesktop;
+	BOOL		bFound;
 
-	StringCchCopy(szPath,MAX_PATH,szFullFileName);
-	PathRemoveFileSpec(szPath);
+	bDesktop = IsDesktopSubChild(szFullFileName);
 
+	if (!bDesktop)
+	{
+		return NULL;
+	}
+
+	StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName), szFullFileName);
+	
 	SHGetFolderPath(NULL,CSIDL_DESKTOP,NULL,SHGFP_TYPE_CURRENT,szDesktop);
 
-	bDesktop = (lstrcmp(szPath,szDesktop) == 0);
+	pItemName = &szFileName[lstrlen(szDesktop)];
 
-	/* Is this item on the desktop? */
-	if(bDesktop)
+	if(lstrlen(szFullFileName) > lstrlen(szDesktop))
 	{
-		StringCchCopy(szFileName,MAX_PATH,szFullFileName);
-		PathStripPath(szFileName);
+		pItemName++;  // Skip the "\\" after the desktop folder name
+	}
+	
+	next_token = NULL;
+	pItemName = cstrtok_s(pItemName,_T("\\"),&next_token);
 
-		hItem = TreeView_GetChild(m_hTreeView,TreeView_GetRoot(m_hTreeView));
+	hItem = TreeView_GetRoot(m_hTreeView);
 
-		while(hItem != NULL)
+	while(pItemName != NULL)
+	{
+		hItem = TreeView_GetChild(m_hTreeView,hItem);
+		bFound = FALSE;
+
+		while(hItem != NULL && !bFound)
 		{
 			tvItem.mask			= TVIF_TEXT;
 			tvItem.hItem		= hItem;
-			tvItem.pszText		= szCurrent;
+			tvItem.pszText		= szCurrentItem;
 			tvItem.cchTextMax	= MAX_PATH;
 			TreeView_GetItem(m_hTreeView,&tvItem);
 
-			if(lstrcmp(szCurrent,szFileName) == 0)
-				return hItem;
-
-			hItem = TreeView_GetNextSibling(m_hTreeView,hItem);
+			if(lstrcmp(szCurrentItem,pItemName) == 0)
+			{
+				bFound = TRUE;
+			}
+			else
+			{
+				hItem = TreeView_GetNextSibling(m_hTreeView,hItem);
+			}
 		}
+
+		if(!bFound)
+		{
+			return NULL;
+		}
+
+		// Item found, pass to sub-level
+		pItemName = cstrtok_s(next_token,_T("\\"),&next_token);
 	}
 
-	return NULL;
+	return hItem;
 }
 
 void CMyTreeView::EraseItems(HTREEITEM hParent)
@@ -1990,4 +2019,22 @@ HRESULT CMyTreeView::OnBeginDrag(int iItemId,DragTypes_t DragType)
 	}
 
 	return hr;
+}
+
+BOOL CMyTreeView::IsDesktop(TCHAR *szPath)
+{
+	TCHAR szDesktop[MAX_PATH];
+
+	SHGetFolderPath(NULL,CSIDL_DESKTOP,NULL,SHGFP_TYPE_CURRENT,szDesktop);
+
+	return (lstrcmp(szPath,szDesktop) == 0);
+}
+
+BOOL CMyTreeView::IsDesktopSubChild(TCHAR *szFullFileName)
+{
+	TCHAR szDesktop[MAX_PATH];
+
+	SHGetFolderPath(NULL,CSIDL_DESKTOP,NULL,SHGFP_TYPE_CURRENT,szDesktop);
+
+	return (wcsncmp(szFullFileName,szDesktop,lstrlen(szDesktop)) == 0);
 }
