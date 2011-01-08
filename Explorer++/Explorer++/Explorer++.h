@@ -6,6 +6,7 @@
 #include "../ShellBrowser/iShellView.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/BaseDialog.h"
+#include "../Helper/SetDefaultFileManager.h"
 #include "Explorer++_internal.h"
 #import <msxml3.dll> raw_interfaces_only
 
@@ -68,11 +69,6 @@ lParam not currently used. */
 
 #define TAB_WINDOW_HEIGHT			24
 #define DEFAULT_TREEVIEW_WIDTH		208
-
-typedef struct
-{
-	TCHAR szFileName[MAX_PATH];
-} CutFile_t;
 
 typedef struct
 {
@@ -1243,7 +1239,7 @@ private:
 	BOOL					m_bPlayNavigationSound;
 	SizeDisplayFormat_t		m_SizeDisplayFormat;
 	UINT					m_StartupMode;
-	UINT					m_ReplaceExplorerMode;
+	NDefaultFileManager::ReplaceExplorerModes_t	m_ReplaceExplorerMode;
 
 	/* Infotips (user options). */
 	BOOL					m_bShowInfoTips;
@@ -1418,7 +1414,7 @@ private:
 	COLORREF				m_ccCustomColors[16];
 	
 	/* Cut items data. */
-	list<CutFile_t>			m_CutFileNameList;
+	list<std::wstring>		m_CutFileNameList;
 	int						m_iCutTabInternal;
 
 	/* Arrange menu related data. */

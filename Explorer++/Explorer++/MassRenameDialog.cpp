@@ -25,7 +25,6 @@ $E	- Extension
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 
-using namespace std;
 
 typedef struct
 {

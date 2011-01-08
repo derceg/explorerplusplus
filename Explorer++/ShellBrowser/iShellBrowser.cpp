@@ -324,7 +324,7 @@ int CFolderView::SelectFiles(TCHAR *FileNamePattern)
 	return 0;
 }
 
-int CFolderView::LocateFileItemIndex(TCHAR *szFileName)
+int CFolderView::LocateFileItemIndex(const TCHAR *szFileName)
 {
 	LV_FINDINFO	lvFind;
 	int			iItem;
@@ -344,7 +344,7 @@ int CFolderView::LocateFileItemIndex(TCHAR *szFileName)
 	return -1;
 }
 
-int CFolderView::LocateFileItemInternalIndex(TCHAR *szFileName)
+int CFolderView::LocateFileItemInternalIndex(const TCHAR *szFileName)
 {
 	LVITEM	lvItem;
 	int		i = 0;

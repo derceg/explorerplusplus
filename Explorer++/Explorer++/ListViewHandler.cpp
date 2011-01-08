@@ -1752,17 +1752,18 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 
 		if(SUCCEEDED(hr))
 		{
-			CutFile_t CutFile;
-
 			m_pClipboardDataObject = pClipboardDataObject;
 			m_iCutTabInternal = m_iObjectIndex;
+
+			TCHAR szFilename[MAX_PATH];
 
 			/* 'Ghost' each of the cut items. */
 			while((iItem = ListView_GetNextItem(m_hActiveListView,
 				iItem,LVNI_SELECTED)) != -1)
 			{
-				m_pActiveShellBrowser->QueryDisplayName(iItem,MAX_PATH,CutFile.szFileName);
-				m_CutFileNameList.push_back(CutFile);
+				m_pActiveShellBrowser->QueryDisplayName(iItem,SIZEOF_ARRAY(szFilename),
+					szFilename);
+				m_CutFileNameList.push_back(szFilename);
 
 				m_pActiveShellBrowser->GhostItem(iItem);
 			}

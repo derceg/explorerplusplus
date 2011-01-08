@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/SetDefaultFileManager.h"
 
 
 typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(
@@ -36,7 +37,7 @@ extern LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lPar
 DWORD dwControlClasses = ICC_BAR_CLASSES|ICC_COOL_CLASSES|
 	ICC_LISTVIEW_CLASSES|ICC_USEREX_CLASSES|ICC_STANDARD_CLASSES|
 	ICC_LINK_CLASS;
-list<TabDirectory_t> g_TabDirs;
+list<std::wstring> g_TabDirs;
 
 /* Search and options dialogs. */
 HWND g_hwndSearch;
@@ -61,8 +62,6 @@ BOOL g_bForceLanguageLoad = FALSE;
  */
 BOOL ProcessCommandLine(TCHAR *pCommandLine)
 {
-	list<TabDirectory_t>::iterator itr;
-	TabDirectory_t TabDirectory;
 	TCHAR szPath[MAX_PATH];
 	TCHAR *pszCommandLine = NULL;
 	BOOL bExit = FALSE;
@@ -103,7 +102,7 @@ BOOL ProcessCommandLine(TCHAR *pCommandLine)
 		{
 			BOOL bSuccess;
 
-			bSuccess = RemoveAsDefaultFileManagerFileSystem();
+			bSuccess = NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 
 			/* Language hasn't been fully specified at this point, so
 			can't load success/error message from language dll. Simply show
@@ -123,7 +122,8 @@ ensure you have administrator privileges."),WINDOW_NAME,MB_ICONWARNING|MB_OK);
 		{
 			BOOL bSuccess;
 
-			bSuccess = SetAsDefaultFileManagerFileSystem();
+			bSuccess = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME,
+				SHELL_DEFAULT_MENU_TEXT);
 
 			if(bSuccess)
 			{
@@ -180,9 +180,7 @@ ensure you have administrator privileges."),WINDOW_NAME,MB_ICONWARNING|MB_OK);
 			PathRemoveFileSpec(szCurrentDirectory);
 
 			DecodePath(szPath,szCurrentDirectory,szParsingPath,SIZEOF_ARRAY(szParsingPath));
-
-			StringCchCopy(TabDirectory.Dir,SIZEOF_ARRAY(TabDirectory.Dir),szParsingPath);
-			g_TabDirs.push_back(TabDirectory);
+			g_TabDirs.push_back(szParsingPath);
 		}
 	}
 
@@ -365,7 +363,7 @@ LPSTR lpCmdLine,int nCmdShow)
 				and the folder is 64-bit specific (as is the
 				case with some of the folders under the control
 				panel). */
-				hr = GetIdlFromParsingName(itr->Dir,&pidl);
+				hr = GetIdlFromParsingName(itr->c_str(),&pidl);
 
 				bControlPanelChild = FALSE;
 
@@ -416,7 +414,7 @@ LPSTR lpCmdLine,int nCmdShow)
 						so send it to Windows Explorer to open
 						directly. */
 						ShellExecute(NULL,_T("open"),szExplorerPath,
-							itr->Dir,NULL,SW_SHOWNORMAL);
+							itr->c_str(),NULL,SW_SHOWNORMAL);
 
 						itr = g_TabDirs.erase(itr);
 					}
@@ -487,17 +485,18 @@ LPSTR lpCmdLine,int nCmdShow)
 
 			if(hPrev != NULL)
 			{
-				list<TabDirectory_t>::iterator	itr;
-
 				if(!g_TabDirs.empty())
 				{
-					for(itr = g_TabDirs.begin();itr != g_TabDirs.end();itr++)
+					for each(auto strDirectory in g_TabDirs)
 					{
 						COPYDATASTRUCT cds;
+						TCHAR szDirectory[MAX_PATH];
 
-						cds.cbData	= (lstrlen(itr->Dir) + 1) * sizeof(TCHAR);
-						cds.lpData	= itr->Dir;
-						SendMessage(hPrev,WM_COPYDATA,NULL,(LPARAM)&cds);
+						StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),strDirectory.c_str());
+
+						cds.cbData	= static_cast<DWORD>((strDirectory.size() + 1) * sizeof(TCHAR));
+						cds.lpData	= szDirectory;
+						SendMessage(hPrev,WM_COPYDATA,NULL,reinterpret_cast<LPARAM>(&cds));
 					}
 				}
 				else
@@ -506,7 +505,7 @@ LPSTR lpCmdLine,int nCmdShow)
 
 					cds.cbData	= 0;
 					cds.lpData	= NULL;
-					SendMessage(hPrev,WM_COPYDATA,NULL,(LPARAM)&cds);
+					SendMessage(hPrev,WM_COPYDATA,NULL,reinterpret_cast<LPARAM>(&cds));
 				}
 
 				SetForegroundWindow(hPrev);

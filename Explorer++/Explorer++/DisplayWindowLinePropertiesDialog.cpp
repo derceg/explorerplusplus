@@ -17,8 +17,6 @@
 #include "../Helper/Helper.h"
 #include "MainResource.h"
 
-using namespace std;
-
 
 DWRule_t			*g_pDWRule = NULL;
 list<DWLine_t>		g_DWLines;

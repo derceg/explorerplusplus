@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/SetDefaultFileManager.h"
 
 
 CRITICAL_SECTION	g_csDirMonCallback;
@@ -306,7 +307,7 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_bShowUserNameInTitleBar		= FALSE;
 	m_bShowPrivilegeLevelInTitleBar	= FALSE;
 	m_bShowFilePreviews				= TRUE;
-	m_ReplaceExplorerMode			= REPLACEEXPLORER_NONE;
+	m_ReplaceExplorerMode			= NDefaultFileManager::REPLACEEXPLORER_NONE;
 	m_bOneClickActivate				= FALSE;
 	m_bAllowMultipleInstances		= TRUE;
 	m_bForceSameTabWidth			= FALSE;

@@ -340,7 +340,7 @@ public:
 	HRESULT				CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,IN POINT *pt,IN BOOL bBackOrForward);
 	int					SelectFiles(TCHAR *FileNamePattern);
 	void				QueryFolderInfo(FolderInfo_t *pFolderInfo);
-	int					LocateFileItemIndex(TCHAR *szFileName);
+	int					LocateFileItemIndex(const TCHAR *szFileName);
 	BOOL				DeghostItem(int iItem);
 	BOOL				GhostItem(int iItem);
 	void				OnListViewGetDisplayInfo(LPARAM lParam);
@@ -574,7 +574,7 @@ private:
 
 	/* Miscellaneous. */
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL);
-	int					LocateFileItemInternalIndex(TCHAR *szFileName);
+	int					LocateFileItemInternalIndex(const TCHAR *szFileName);
 	HRESULT				RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMax);
 	void				ApplyHeaderSortArrow(void);
 	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName);

@@ -332,7 +332,7 @@ __interface IShellBrowser2 : IUnknown
 	virtual int				GetParentDirMointorId(void);
 	virtual void			DragStopped(void);
 	virtual BOOL			IsFileReal(int iItem);
-	virtual int				LocateFileItemIndex(TCHAR *szFileName);
+	virtual int				LocateFileItemIndex(const TCHAR *szFileName);
 	virtual BOOL			DeghostItem(int iItem);
 	virtual BOOL			GhostItem(int iItem);
 	virtual int				QueryNumItems(void);

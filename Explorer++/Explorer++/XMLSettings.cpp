@@ -2310,7 +2310,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_REPLACEEXPLORERMODE:
-		m_ReplaceExplorerMode = NXMLSettings::DecodeIntValue(wszValue);
+		m_ReplaceExplorerMode = static_cast<NDefaultFileManager::ReplaceExplorerModes_t>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SHOWADDRESSBAR:

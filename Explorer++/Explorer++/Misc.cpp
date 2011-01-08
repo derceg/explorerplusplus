@@ -25,7 +25,7 @@
 #include "MainResource.h"
 
 
-extern list<TabDirectory_t> g_TabDirs;
+extern list<std::wstring> g_TabDirs;
 
 void Explorerplusplus::HandleTreeViewSelection(void)
 {
@@ -82,7 +82,6 @@ void Explorerplusplus::HandleTreeViewSelection(void)
 
 HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 {
-	list<TabDirectory_t>::iterator	itr;
 	TCHAR							szDirectory[MAX_PATH];
 	HRESULT							hr;
 	int								nTabsCreated = 0;
@@ -90,18 +89,18 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	if(!g_TabDirs.empty())
 	{
-		for(itr = g_TabDirs.begin();itr != g_TabDirs.end();itr++)
+		for each(auto strDirectory in g_TabDirs)
 		{
-			StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),itr->Dir);
+			StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),strDirectory.c_str());
 
-			if(lstrcmp(itr->Dir,_T("..")) == 0)
+			if(lstrcmp(strDirectory.c_str(),_T("..")) == 0)
 			{
 				/* Get the parent of the current directory,
 				and browse to it. */
 				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
 				PathRemoveFileSpec(szDirectory);
 			}
-			else if(lstrcmp(itr->Dir,_T(".")) == 0)
+			else if(lstrcmp(strDirectory.c_str(),_T(".")) == 0)
 			{
 				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
 			}

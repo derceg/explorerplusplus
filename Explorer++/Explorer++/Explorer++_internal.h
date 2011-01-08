@@ -1,10 +1,4 @@
-﻿/*************************************************************
-Explorer++_internal.h
-Contains declarations and defintions that are private
-to Explorer++.cpp. Should not be included in external modules.
-*************************************************************/
-
-#ifndef EXPLORERINTERNAL_INCLUDED
+﻿#ifndef EXPLORERINTERNAL_INCLUDED
 #define EXPLORERINTERNAL_INCLUDED
 
 #include <list>
@@ -42,6 +36,11 @@ saved to/loaded from. */
 /* Command line arguments supplied to the program
 for each jump list task. */
 #define JUMPLIST_TASK_NEWTAB_ARGUMENT	_T("-open_new_tab")
+
+/* Used when setting Explorer++ as the default
+file manager. */
+#define SHELL_DEFAULT_INTERNAL_COMMAND_NAME _T("openinexplorer++")
+#define SHELL_DEFAULT_MENU_TEXT _T("Open In Explorer++")
 
 #define LANG_SINHALA	1115
 
@@ -302,11 +301,6 @@ typedef struct
 
 typedef struct
 {
-	TCHAR Dir[MAX_PATH];
-} TabDirectory_t;
-
-typedef struct
-{
 	/* The type of operation that
 	occurred. */
 	UINT	Type;
@@ -405,13 +399,6 @@ struct FileContextMenuInfo_t
 
 typedef enum
 {
-	REPLACEEXPLORER_NONE		= 1,
-	REPLACEEXPLORER_FILESYSTEM	= 2,
-	REPLACEEXPLORER_ALL			= 3
-} ReplaceExplorerModes_t;
-
-typedef enum
-{
 	DW_NAME,
 	DW_TYPE,
 	DW_SIZE,
@@ -421,7 +408,7 @@ typedef enum
 	DW_SHORTNAME,
 	DW_OWNER,
 
-	/*File version information.*/
+	/* File version information. */
 	DW_PRODUCTNAME,
 	DW_COMPANY,
 	DW_DESCRIPTION,
@@ -434,14 +421,14 @@ typedef enum
 	DW_CREATED,
 	DW_ACCESSED,
 
-	/*File summary information.*/
+	/* File summary information. */
 	DW_TITLE,
 	DW_SUBJECT,
 	DW_AUTHOR,
 	DW_KEYWORDS,
 	DW_COMMENT,
 
-	/*Photo data.*/
+	/* Photo data. */
 	DW_CAMERAMODEL,
 	DW_DATETAKEN,
 	DW_WIDTH,
@@ -489,9 +476,6 @@ typedef enum
 	DW_MEDIA_PUBLISHER,
 	DW_MEDIA_TRACKNUMBER,
 	DW_MEDIA_YEAR
-	/*DW_MEDIA_,
-	DW_MEDIA_,
-	DW_MEDIA_,*/
 } DWInfoType_t;
 
 static Column_t g_RealFolderColumns[] =
@@ -583,7 +567,7 @@ static Column_t g_NetworkConnectionsColumns[] =
 
 static Column_t g_MyNetworkPlacesColumns[] =
 {{CM_NAME,TRUE,DEFAULT_COLUMN_WIDTH},
-{CM_VIRTUALCOMMENTS,TRUE,DEFAULT_COLUMN_WIDTH}};//{CM_NETWORKCOMPUTER,TRUE},{CM_NETWORKLOCATION,TRUE}
+{CM_VIRTUALCOMMENTS,TRUE,DEFAULT_COLUMN_WIDTH}};
 
 static unsigned int g_RealFolderHeaderList[] =
 {CM_NAME,CM_TYPE,CM_SIZE,CM_DATEMODIFIED,
@@ -693,16 +677,8 @@ INT_PTR CALLBACK	ChangeDisplayColoursStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPAR
 INT_PTR CALLBACK	SelectColumnsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	SetDefaultColumnsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-/* Options dialog handler stubs. */
-INT_PTR CALLBACK	FilesFoldersProcStub(HWND,UINT,WPARAM,LPARAM);
-INT_PTR CALLBACK	WindowProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK	GeneralSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK	DefaultSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK	TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-
 /* Window message handler stubs. */
 LRESULT CALLBACK	TabSubclassProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-LRESULT CALLBACK	TabSubclassProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 
 /* Paste file callback (will select pasted files). */
 void				PasteFilesCallback(void *pData,list<PastedFile_t> *pPastedFileList);
@@ -710,14 +686,6 @@ void				FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFol
 
 /* Treeview window procedure stub. */
 LRESULT CALLBACK	TreeViewSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-
-/* Default file manager. */
-BOOL				SetAsDefaultFileManagerFileSystem(void);
-BOOL				SetAsDefaultFileManagerAll(void);
-BOOL				SetAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType);
-BOOL				RemoveAsDefaultFileManagerFileSystem(void);
-BOOL				RemoveAsDefaultFileManagerAll(void);
-BOOL				RemoveAsDefaultFileManagerInternal(ReplaceExplorerModes_t ReplacementType);
 
 typedef struct
 {

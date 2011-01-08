@@ -103,9 +103,6 @@
     <ClCompile Include="SetDefaultColumnsDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SetDefaultFileManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SetFileAttributesDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

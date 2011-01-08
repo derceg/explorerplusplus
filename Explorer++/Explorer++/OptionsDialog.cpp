@@ -21,9 +21,16 @@
 #include "Explorer++.h"
 #include "Misc.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/SetDefaultFileManager.h"
 
 
 #define NUM_DIALOG_OPTIONS_PAGES	5
+
+INT_PTR CALLBACK	FilesFoldersProcStub(HWND,UINT,WPARAM,LPARAM);
+INT_PTR CALLBACK	WindowProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
+INT_PTR CALLBACK	GeneralSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
+INT_PTR CALLBACK	DefaultSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
+INT_PTR CALLBACK	TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 int CALLBACK PropSheetProcStub(HWND hDlg,UINT msg,LPARAM lParam);
 int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
@@ -199,23 +206,23 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 				{
 					EnableWindow(GetDlgItem(hDlg,IDC_OPTION_REPLACEEXPLORER_ALL),FALSE);
 
-					if(m_ReplaceExplorerMode == REPLACEEXPLORER_ALL)
+					if(m_ReplaceExplorerMode == NDefaultFileManager::REPLACEEXPLORER_ALL)
 					{
-						m_ReplaceExplorerMode = IDC_OPTION_REPLACEEXPLORER_NONE;
+						m_ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
 					}
 				}
 
 				switch(m_ReplaceExplorerMode)
 				{
-				case REPLACEEXPLORER_NONE:
+				case NDefaultFileManager::REPLACEEXPLORER_NONE:
 					nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
 					break;
 
-				case REPLACEEXPLORER_FILESYSTEM:
+				case NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM:
 					nIDButton = IDC_OPTION_REPLACEEXPLORER_FILESYSTEM;
 					break;
 
-				case REPLACEEXPLORER_ALL:
+				case NDefaultFileManager::REPLACEEXPLORER_ALL:
 					nIDButton = IDC_OPTION_REPLACEEXPLORER_ALL;
 					break;
 
@@ -284,7 +291,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 						TCHAR szNewTabDir[MAX_PATH];
 						TCHAR szVirtualParsingPath[MAX_PATH];
 						TCHAR szErrorMsg[256];
-						UINT ReplaceExplorerMode = REPLACEEXPLORER_NONE;
+						NDefaultFileManager::ReplaceExplorerModes_t ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
 						BOOL bSuccess;
 						HRESULT hr;
 						int iSel;
@@ -295,11 +302,11 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 							m_StartupMode = STARTUP_DEFAULTFOLDER;
 
 						if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_NONE) == BST_CHECKED)
-							ReplaceExplorerMode = REPLACEEXPLORER_NONE;
+							ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
 						else if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_FILESYSTEM) == BST_CHECKED)
-							ReplaceExplorerMode = REPLACEEXPLORER_FILESYSTEM;
+							ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM;
 						else if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_ALL) == BST_CHECKED)
-							ReplaceExplorerMode = REPLACEEXPLORER_ALL;
+							ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_ALL;
 
 						if(m_ReplaceExplorerMode != ReplaceExplorerMode)
 						{
@@ -307,16 +314,16 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 							switch(ReplaceExplorerMode)
 							{
-							case REPLACEEXPLORER_NONE:
+							case NDefaultFileManager::REPLACEEXPLORER_NONE:
 								{
 									switch(m_ReplaceExplorerMode)
 									{
-									case REPLACEEXPLORER_FILESYSTEM:
-										bSuccess = RemoveAsDefaultFileManagerFileSystem();
+									case NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM:
+										bSuccess = NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 										break;
 
-									case REPLACEEXPLORER_ALL:
-										bSuccess = RemoveAsDefaultFileManagerAll();
+									case NDefaultFileManager::REPLACEEXPLORER_ALL:
+										bSuccess = NDefaultFileManager::RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 										break;
 
 									default:
@@ -326,16 +333,18 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 								}
 								break;
 
-							case REPLACEEXPLORER_FILESYSTEM:
-								RemoveAsDefaultFileManagerFileSystem();
-								RemoveAsDefaultFileManagerAll();
-								bSuccess = SetAsDefaultFileManagerFileSystem();
+							case NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM:
+								NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+								NDefaultFileManager::RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+								bSuccess = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
+									SHELL_DEFAULT_INTERNAL_COMMAND_NAME,SHELL_DEFAULT_MENU_TEXT);
 								break;
 
-							case REPLACEEXPLORER_ALL:
-								RemoveAsDefaultFileManagerFileSystem();
-								RemoveAsDefaultFileManagerAll();
-								bSuccess = SetAsDefaultFileManagerAll();
+							case NDefaultFileManager::REPLACEEXPLORER_ALL:
+								NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+								NDefaultFileManager::RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
+								bSuccess = NDefaultFileManager::SetAsDefaultFileManagerAll(
+									SHELL_DEFAULT_INTERNAL_COMMAND_NAME,SHELL_DEFAULT_MENU_TEXT);
 								break;
 							}
 
@@ -354,15 +363,15 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 								switch(ReplaceExplorerMode)
 								{
-								case REPLACEEXPLORER_NONE:
+								case NDefaultFileManager::REPLACEEXPLORER_NONE:
 									nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
 									break;
 
-								case REPLACEEXPLORER_FILESYSTEM:
+								case NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM:
 									nIDButton = IDC_OPTION_REPLACEEXPLORER_FILESYSTEM;
 									break;
 
-								case REPLACEEXPLORER_ALL:
+								case NDefaultFileManager::REPLACEEXPLORER_ALL:
 									nIDButton = IDC_OPTION_REPLACEEXPLORER_ALL;
 									break;
 
@@ -376,15 +385,15 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 								reset the state of the file manager radio buttons. */
 								switch(m_ReplaceExplorerMode)
 								{
-								case REPLACEEXPLORER_NONE:
+								case NDefaultFileManager::REPLACEEXPLORER_NONE:
 									nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
 									break;
 
-								case REPLACEEXPLORER_FILESYSTEM:
+								case NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM:
 									nIDButton = IDC_OPTION_REPLACEEXPLORER_FILESYSTEM;
 									break;
 
-								case REPLACEEXPLORER_ALL:
+								case NDefaultFileManager::REPLACEEXPLORER_ALL:
 									nIDButton = IDC_OPTION_REPLACEEXPLORER_ALL;
 									break;
 

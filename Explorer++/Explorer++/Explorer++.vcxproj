@@ -417,7 +417,6 @@
     <ClCompile Include="SearchDialog.cpp" />
     <ClCompile Include="SelectColumnsDialog.cpp" />
     <ClCompile Include="SetDefaultColumnsDialog.cpp" />
-    <ClCompile Include="SetDefaultFileManager.cpp" />
     <ClCompile Include="SetFileAttributesDialog.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="ShellContextMenuHandler.cpp" />

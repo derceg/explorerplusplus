@@ -18,8 +18,6 @@
 #include "../Helper/ShellHelper.h"
 
 
-using namespace std;
-
 /* Visibility states should NOT be included here. The visibility of
 an item will be set dynamically based on any loaded settings. */
 UINT StatusBarStyles		=	WS_CHILD|WS_CLIPSIBLINGS|SBARS_SIZEGRIP|
@@ -1234,21 +1232,18 @@ void Explorerplusplus::OnSetFocus(void)
  */
 void Explorerplusplus::OnDrawClipboard(void)
 {
-	list<CutFile_t>::iterator	itr;
-	int							iItem;
-
 	if(m_pClipboardDataObject != NULL)
 	{
 		if(OleIsCurrentClipboard(m_pClipboardDataObject) == S_FALSE)
 		{
 			/* Deghost all items that have been 'cut'. */
-			for(itr = m_CutFileNameList.begin();itr != m_CutFileNameList.end();itr++)
+			for each(auto strFile in m_CutFileNameList)
 			{
 				/* Only deghost the items if the tab they
 				are/were in still exists. */
 				if(CheckTabIdStatus(m_iCutTabInternal))
 				{
-					iItem = m_pShellBrowser[m_iCutTabInternal]->LocateFileItemIndex(itr->szFileName);
+					int iItem = m_pShellBrowser[m_iCutTabInternal]->LocateFileItemIndex(strFile.c_str());
 
 					/* It is possible that the ghosted file
 					does NOT exist within the current folder.
