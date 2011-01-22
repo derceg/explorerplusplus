@@ -555,7 +555,7 @@ int CFolderView::SetNameColumnData(HWND hListView,int iItem,int iColumn)
 	if(bItem)
 	{
 		ListView_SetItemText(hListView,iItem,iColumn,
-		m_pExtraItemInfo[(int)File.lParam].szDisplayName);
+			ProcessItemFileName((int)File.lParam));
 	}
 
 	return m_nTotalItems;
