@@ -451,6 +451,7 @@
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="NoTranslationResource.h" />
+    <ClInclude Include="RenameTabDialog.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SearchDialog.h" />
     <ClInclude Include="SetFileAttributesDialog.h" />

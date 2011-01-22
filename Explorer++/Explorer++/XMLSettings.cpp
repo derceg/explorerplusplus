@@ -22,6 +22,7 @@
 #include "Explorer++.h"
 #include "SearchDialog.h"
 #include "WildcardSelectDialog.h"
+#include "RenameTabDialog.h"
 #include "../Helper/XMLSettings.h"
 
 #import <msxml3.dll> raw_interfaces_only
@@ -2011,6 +2012,8 @@ void Explorerplusplus::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 							CSearchDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("WildcardSelect")) == 0)
 							CWildcardSelectDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
+						else if(lstrcmpi(bstrValue,_T("RenameTab")) == 0)
+							CRenameTabDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 					}
 				}
 			}
@@ -2114,6 +2117,7 @@ MSXML2::IXMLDOMElement *pRoot)
 
 	CSearchDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CWildcardSelectDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CRenameTabDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 

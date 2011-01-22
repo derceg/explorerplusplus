@@ -147,32 +147,37 @@ void AddPathsToComboBoxEx(HWND CbEx,TCHAR *Path)
 
 	hFirstFile = FindFirstFile(FindPath,&wfd);
 
-	while(FindNextFile(hFirstFile,&wfd) != NULL)
+	if(hFirstFile != INVALID_HANDLE_VALUE)
 	{
-		/* If the specified item is a folder, add it to the combo box list box. */
-		if((wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY &&
-		StrCmp(wfd.cFileName,_T("..")) != 0)
+		while(FindNextFile(hFirstFile,&wfd) != NULL)
 		{
-			/* Build the full path to the folder, then find its icon index (within the
-			system image list). */
-			PathAppend(Path,wfd.cFileName);
-			SHGetFileInfo(Path,NULL,&shfi,NULL,SHGFI_SYSICONINDEX);
+			/* If the specified item is a folder, add it to the combo box list box. */
+			if((wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY &&
+				StrCmp(wfd.cFileName,_T("..")) != 0)
+			{
+				/* Build the full path to the folder, then find its icon index (within the
+				system image list). */
+				PathAppend(Path,wfd.cFileName);
+				SHGetFileInfo(Path,NULL,&shfi,NULL,SHGFI_SYSICONINDEX);
 
-			PathRemoveFileSpec(Path);
-			iImage = shfi.iIcon;
+				PathRemoveFileSpec(Path);
+				iImage = shfi.iIcon;
 
-			cbItem.mask				= CBEIF_TEXT|CBEIF_IMAGE|CBEIF_INDENT|CBEIF_SELECTEDIMAGE;
-			cbItem.iItem			= -1;
-			cbItem.iImage			= iImage;
-			cbItem.iSelectedImage	= iImage;
-			cbItem.iIndent			= 1;
-			cbItem.iOverlay			= 1;
-			cbItem.pszText			= wfd.cFileName;
-			cbItem.cchTextMax		= lstrlen(wfd.cFileName);
+				cbItem.mask				= CBEIF_TEXT|CBEIF_IMAGE|CBEIF_INDENT|CBEIF_SELECTEDIMAGE;
+				cbItem.iItem			= -1;
+				cbItem.iImage			= iImage;
+				cbItem.iSelectedImage	= iImage;
+				cbItem.iIndent			= 1;
+				cbItem.iOverlay			= 1;
+				cbItem.pszText			= wfd.cFileName;
+				cbItem.cchTextMax		= lstrlen(wfd.cFileName);
 
-			SendMessage(CbEx,CBEM_INSERTITEM,0,(LPARAM)&cbItem);
-			i++;
+				SendMessage(CbEx,CBEM_INSERTITEM,0,(LPARAM)&cbItem);
+				i++;
+			}
 		}
+
+		FindClose(hFirstFile);
 	}
 }
 

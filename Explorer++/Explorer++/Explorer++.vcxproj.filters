@@ -192,6 +192,9 @@
     <ClInclude Include="SetFileAttributesDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RenameTabDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

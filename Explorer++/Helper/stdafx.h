@@ -89,3 +89,4 @@
 #include <wmsdk.h>
 #include <propvarutil.h>
 #include <assert.h>
+#include <list>

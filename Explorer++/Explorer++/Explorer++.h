@@ -218,7 +218,6 @@ public:
 	INT_PTR CALLBACK	BookmarkPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkFolderPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	MassRenameProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	RenameTabProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SplitFileProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -1001,10 +1000,6 @@ private:
 	void					OnDestroyFilesOk(HWND hDlg);
 	void					OnDestroyFilesConfirmDelete(HWND hDlg);
 	void					DestroyFilesSaveState(HWND hDlg);
-
-	/* Rename tab dialog. */
-	void					OnRenameTabInit(HWND hDlg);
-	void					OnRenameTabOk(HWND hDlg);
 
 	/* Set default columns dialog. */
 	void					OnSetDefaultColumnsInit(HWND hDlg);

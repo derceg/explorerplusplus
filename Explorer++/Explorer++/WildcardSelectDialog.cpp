@@ -198,15 +198,7 @@ void CWildcardSelectDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKe
 void CWildcardSelectDialogPersistentSettings::SaveExtraXMLSettings(
 	MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
 {
-	TCHAR szNode[64];
-	int i = 0;
-
-	for each(auto strPattern in m_PatternList)
-	{
-		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("Pattern%d"),i++);
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,strPattern.c_str());
-	}
-
+	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Pattern"),m_PatternList);
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CurrentText"),m_szPattern);
 }
 

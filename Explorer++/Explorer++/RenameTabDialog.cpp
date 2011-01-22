@@ -12,131 +12,121 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Explorer++.h"
+#include "RenameTabDialog.h"
+#include "MainResource.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 
-BOOL	g_EditNameEnabled;
-int		g_iTab;
 
-INT_PTR CALLBACK RenameTabProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+const TCHAR CRenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
+
+CRenameTabDialog::CRenameTabDialog(HINSTANCE hInstance,
+	int iResource,HWND hParent) :
+CBaseDialog(hInstance,iResource,hParent)
 {
-	static Explorerplusplus *pContainer;
+	m_prtdps = &CRenameTabDialogPersistentSettings::GetInstance();
 
-	switch(uMsg)
-	{
-		case WM_INITDIALOG:
-		{
-			RenameTabInfo_t *prti;
+	/* TODO: Need tab name. */
+	/*TCITEM tcItem;
+	tcItem.mask			= TCIF_PARAM;
+	TabCtrl_GetItem(m_hTabCtrl,g_iTab,&tcItem);
 
-			prti = (RenameTabInfo_t *)lParam;
-
-			pContainer = (Explorerplusplus *)prti->pContainer;
-			g_iTab = prti->iTab;
-		}
-		break;
-	}
-
-	return pContainer->RenameTabProc(hDlg,uMsg,wParam,lParam);
+	SetWindowText(hEditName,m_TabInfo[(int)tcItem.lParam].szName);*/
 }
 
-INT_PTR CALLBACK Explorerplusplus::RenameTabProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+CRenameTabDialog::~CRenameTabDialog()
 {
-	switch(uMsg)
+
+}
+
+BOOL CRenameTabDialog::OnInitDialog()
+{
+	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
+
+	/* TODO: */
+	//SetWindowText(hEditName,m_szTabName);
+
+	/* When this dialog is opened, the 'custom name' option will
+	be selected by default (whether or not that is the actual
+	option that is currently in effect). */
+	CheckDlgButton(m_hDlg,IDC_RENAMETAB_USECUSTOMNAME,BST_CHECKED);
+
+	EnableWindow(hEditName,TRUE);
+	SendMessage(hEditName,EM_SETSEL,0,-1);
+	SetFocus(hEditName);
+
+	if(m_prtdps->m_bStateSaved)
 	{
-		case WM_INITDIALOG:
-			OnRenameTabInit(hDlg);
-			break;
-
-		case WM_COMMAND:
-			switch(LOWORD(wParam))
-			{
-			case IDC_RENAMETAB_USEFOLDERNAME:
-				{
-					HWND	hEditName;
-
-					hEditName = GetDlgItem(hDlg,IDC_RENAMETAB_NEWTABNAME);
-
-					EnableWindow(hEditName,FALSE);
-				}
-				break;
-
-			case IDC_RENAMETAB_USECUSTOMNAME:
-				{
-					HWND	hEditName;
-
-					hEditName = GetDlgItem(hDlg,IDC_RENAMETAB_NEWTABNAME);
-
-					EnableWindow(hEditName,TRUE);
-
-					SetFocus(hEditName);
-				}
-				break;
-
-			case IDOK:
-				OnRenameTabOk(hDlg);
-				break;
-
-			case IDCANCEL:
-				EndDialog(hDlg,0);
-				break;
-			}
-			break;
-
-		case WM_CLOSE:
-			EndDialog(hDlg,0);
-			break;
+		SetWindowPos(m_hDlg,NULL,m_prtdps->m_ptDialog.x,
+			m_prtdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
+	}
+	else
+	{
+		CenterWindow(GetParent(m_hDlg),m_hDlg);
 	}
 
 	return 0;
 }
 
-void Explorerplusplus::OnRenameTabInit(HWND hDlg)
+BOOL CRenameTabDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
-	HWND	hEditName;
-	TCITEM	tcItem;
+	switch(LOWORD(wParam))
+	{
+	case IDC_RENAMETAB_USEFOLDERNAME:
+		OnUseFolderName();
+		break;
 
-	hEditName = GetDlgItem(hDlg,IDC_RENAMETAB_NEWTABNAME);
+	case IDC_RENAMETAB_USECUSTOMNAME:
+		OnUseCustomName();
+		break;
 
-	tcItem.mask			= TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,g_iTab,&tcItem);
+	case IDOK:
+		OnOk();
+		break;
 
-	SetWindowText(hEditName,m_TabInfo[(int)tcItem.lParam].szName);
+	case IDCANCEL:
+		OnCancel();
+		break;
+	}
 
-	g_EditNameEnabled = m_TabInfo[(int)tcItem.lParam].bUseCustomName;
+	return 0;
+}
 
-	/* When this dialog is opened, the 'custom name' option will
-	be selected by default (whether or not that is the actual
-	option that is currently in effect). */
-	CheckDlgButton(hDlg,IDC_RENAMETAB_USECUSTOMNAME,BST_CHECKED);
+BOOL CRenameTabDialog::OnClose()
+{
+	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+void CRenameTabDialog::OnUseFolderName()
+{
+	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
+
+	EnableWindow(hEditName,FALSE);
+}
+
+void CRenameTabDialog::OnUseCustomName()
+{
+	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
 
 	EnableWindow(hEditName,TRUE);
-
-	/* Select all the text in the name edit control. */
-	SendMessage(hEditName,EM_SETSEL,0,-1);
-
-	/* Focus on the name edit control. */
 	SetFocus(hEditName);
 }
 
-void Explorerplusplus::OnRenameTabOk(HWND hDlg)
+void CRenameTabDialog::OnOk()
 {
-	HWND	hEditName;
-	TCITEM	tcItem;
-	UINT	uCheckStatus;
+	/* TODO: Need to be able to change tab name. */
+	/*TCITEM	tcItem;
 	TCHAR	szTabText[MAX_PATH];
 
 	tcItem.mask			= TCIF_PARAM;
 	TabCtrl_GetItem(m_hTabCtrl,g_iTab,&tcItem);
 
-	uCheckStatus = IsDlgButtonChecked(hDlg,IDC_RENAMETAB_USEFOLDERNAME);
+	UINT uCheckStatus = IsDlgButtonChecked(m_hDlg,IDC_RENAMETAB_USEFOLDERNAME);
 
-	/* If the button is checked, use the
-	current folders name as the tab text.
-	If the button is not checked, use
-	whatever text is in the edit control. */
 	if(uCheckStatus == BST_CHECKED)
 	{
-		LPITEMIDLIST	pidlDirectory = NULL;
+		LPITEMIDLIST pidlDirectory = NULL;
 
 		pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 		GetDisplayName(pidlDirectory,szTabText,SHGDN_INFOLDER);
@@ -145,7 +135,7 @@ void Explorerplusplus::OnRenameTabOk(HWND hDlg)
 	}
 	else
 	{
-		hEditName = GetDlgItem(hDlg,IDC_RENAMETAB_NEWTABNAME);
+		HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
 
 		GetWindowText(hEditName,szTabText,SIZEOF_ARRAY(szTabText));
 	}
@@ -156,7 +146,45 @@ void Explorerplusplus::OnRenameTabOk(HWND hDlg)
 
 	tcItem.mask		= TCIF_TEXT;
 	tcItem.pszText	= szTabText;
-	TabCtrl_SetItem(m_hTabCtrl,g_iTab,&tcItem);
+	TabCtrl_SetItem(m_hTabCtrl,g_iTab,&tcItem);*/
 
-	EndDialog(hDlg,1);
+	EndDialog(m_hDlg,1);
+}
+
+void CRenameTabDialog::OnCancel()
+{
+	EndDialog(m_hDlg,0);
+}
+
+BOOL CRenameTabDialog::OnDestroy()
+{
+	SaveState();
+	return 0;
+}
+
+void CRenameTabDialog::SaveState()
+{
+	RECT rc;
+	GetWindowRect(m_hDlg,&rc);
+	m_prtdps->m_ptDialog.x = rc.left;
+	m_prtdps->m_ptDialog.y = rc.top;
+
+	m_prtdps->m_bStateSaved = TRUE;
+}
+
+CRenameTabDialogPersistentSettings::CRenameTabDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
+{
+
+}
+
+CRenameTabDialogPersistentSettings::~CRenameTabDialogPersistentSettings()
+{
+	
+}
+
+CRenameTabDialogPersistentSettings& CRenameTabDialogPersistentSettings::GetInstance()
+{
+	static CRenameTabDialogPersistentSettings sfadps;
+	return sfadps;
 }

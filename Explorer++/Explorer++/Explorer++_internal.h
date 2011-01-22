@@ -285,13 +285,6 @@ bitmap). */
 /* Tab icons. */
 #define TAB_ICON_LOCK_INDEX			0
 
-/* Used with the rename tab dialog. */
-typedef struct
-{
-	void	*pContainer;
-	int		iTab;
-} RenameTabInfo_t;
-
 /* Used with the bookmark propeties dialog. */
 typedef struct
 {
@@ -664,7 +657,6 @@ INT_PTR CALLBACK DWLinePropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPAR
 
 /* Dialog handler stubs. */
 INT_PTR CALLBACK	MassRenameProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK	RenameTabProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	SplitFileProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	MergeFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 int CALLBACK		PropSheetProcStub(HWND hDlg,UINT msg,LPARAM lParam);

@@ -1320,27 +1320,12 @@ void CSearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 void CSearchDialogPersistentSettings::SaveExtraXMLSettings(
 	MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
 {
-	TCHAR szNode[64];
-	int i = 0;
-
-	for each(auto strDirectory in m_SearchDirectories)
-	{
-		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("Directory%d"),i++);
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,strDirectory.c_str());
-	}
-
-	i = 0;
-
-	for each(auto strPattern in m_SearchPatterns)
-	{
-		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("Pattern%d"),i++);
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,strPattern.c_str());
-	}
-
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Width"),NXMLSettings::EncodeIntValue(m_iSearchWidth));
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Height"),NXMLSettings::EncodeIntValue(m_iSearchHeight));
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth1"),NXMLSettings::EncodeIntValue(m_iColumnWidth1));
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth2"),NXMLSettings::EncodeIntValue(m_iColumnWidth2));
+	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Directory"),m_SearchDirectories);
+	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Pattern"),m_SearchPatterns);
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SearchDirectoryText"),m_szSearchPattern);
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SearchSubFolders"),NXMLSettings::EncodeBoolValue(m_bSearchSubFolders));
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("UseRegularExpressions"),NXMLSettings::EncodeBoolValue(m_bUseRegularExpressions));

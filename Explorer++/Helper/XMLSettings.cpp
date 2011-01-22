@@ -168,6 +168,22 @@ const WCHAR *wszAttributeValue)
 	VariantClear(&var);
 }
 
+void NXMLSettings::AddStringListToNode(MSXML2::IXMLDOMDocument *pXMLDom,
+MSXML2::IXMLDOMElement *pParentNode,const TCHAR *szBaseKeyName,
+	const std::list<std::wstring> &strList)
+{
+	TCHAR szNode[64];
+	int i = 0;
+
+	for each(auto str in strList)
+	{
+		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("%s%d"),
+			szBaseKeyName,i++);
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,
+			szNode,str.c_str());
+	}
+}
+
 void NXMLSettings::CreateElementNode(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement **pParentNode,
 MSXML2::IXMLDOMElement *pGrandparentNode,WCHAR *szElementName,

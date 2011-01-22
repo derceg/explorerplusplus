@@ -16,6 +16,7 @@
 #include <list>
 #include "Misc.h"
 #include "Explorer++.h"
+#include "RenameTabDialog.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
@@ -1463,12 +1464,9 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_RENAMETAB:
 			{
-				RenameTabInfo_t rti;
+				CRenameTabDialog RenameTabDialog(g_hLanguageModule,IDD_RENAMETAB,m_hContainer);
 
-				rti.pContainer	= (void *)this;
-				rti.iTab		= iTabHit;
-				DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_RENAMETAB),
-					m_hContainer,RenameTabProcStub,(LPARAM)&rti);
+				RenameTabDialog.ShowModalDialog();
 			}
 			break;
 
@@ -1791,6 +1789,7 @@ BOOL Explorerplusplus::OnMouseWheel(WPARAM wParam,LPARAM lParam)
 			}
 			else
 			{
+				/* TODO: http://www.explorerplusplus.com/forum/viewtopic.php?f=5&t=567 */
 				WORD wScrollType;
 				int i = 0;
 

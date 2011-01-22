@@ -16,6 +16,7 @@
 #include "SearchDialog.h"
 #include "WildcardSelectDialog.h"
 #include "SetFileAttributesDialog.h"
+#include "RenameTabDialog.h"
 #include "../Helper/Registry.h"
 
 #define SMALL_SIZE		5
@@ -1450,6 +1451,7 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		CSearchDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CWildcardSelectDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CSetFileAttributesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		CRenameTabDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1757,6 +1759,7 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		CSearchDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CWildcardSelectDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CSetFileAttributesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		CRenameTabDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
