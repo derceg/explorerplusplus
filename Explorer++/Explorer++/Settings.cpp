@@ -674,6 +674,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				SaveDwordToRegistry(hTabKey,_T("SortAscending"),m_pFolderView[(int)tcItem.lParam]->IsSortAscending());
 				SaveDwordToRegistry(hTabKey,_T("ShowInGroups"),m_pFolderView[(int)tcItem.lParam]->IsGroupViewEnabled());
 				SaveDwordToRegistry(hTabKey,_T("ApplyFilter"),m_pShellBrowser[(int)tcItem.lParam]->GetFilterStatus());
+				SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"),m_pShellBrowser[(int)tcItem.lParam]->GetFilterCaseSensitive());
 				SaveDwordToRegistry(hTabKey,_T("ShowHidden"),m_pShellBrowser[(int)tcItem.lParam]->QueryShowHidden());
 				SaveDwordToRegistry(hTabKey,_T("AutoArrange"),m_pFolderView[(int)tcItem.lParam]->GetAutoArrange());
 				SaveDwordToRegistry(hTabKey,_T("ShowGridlines"),m_pShellBrowser[(int)tcItem.lParam]->QueryGridlinesActive());
@@ -790,6 +791,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			ReadDwordFromRegistry(hTabKey,_T("SortAscending"),(LPDWORD)&Settings.bSortAscending);
 			ReadDwordFromRegistry(hTabKey,_T("ShowInGroups"),(LPDWORD)&Settings.bShowInGroups);
 			ReadDwordFromRegistry(hTabKey,_T("ApplyFilter"),(LPDWORD)&Settings.bApplyFilter);
+			ReadDwordFromRegistry(hTabKey,_T("FilterCaseSensitive"),(LPDWORD)&Settings.bFilterCaseSensitive);
 			ReadDwordFromRegistry(hTabKey,_T("ShowHidden"),(LPDWORD)&Settings.bShowHidden);
 			ReadDwordFromRegistry(hTabKey,_T("AutoArrange"),(LPDWORD)&Settings.bAutoArrange);
 			ReadDwordFromRegistry(hTabKey,_T("ShowGridlines"),(LPDWORD)&Settings.bGridlinesActive);

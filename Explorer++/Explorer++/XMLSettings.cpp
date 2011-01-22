@@ -707,6 +707,9 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXML
 		m_pShellBrowser[(int)tcItem.lParam]->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Filter"),szFilter);
 
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("FilterCaseSensitive"),
+			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->GetFilterCaseSensitive()));
+
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowGridlines"),
 			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->QueryGridlinesActive()));
 
@@ -2585,6 +2588,10 @@ InitialSettings_t *pSettings,TabInfo_t *pTabInfo)
 	{
 		StringCchCopy(pSettings->szFilter,SIZEOF_ARRAY(pSettings->szFilter),
 			wszValue);
+	}
+	else if(lstrcmp(wszName,L"FilterCaseSensitive") == 0)
+	{
+		pSettings->bFilterCaseSensitive = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"ShowGridlines") == 0)
 	{

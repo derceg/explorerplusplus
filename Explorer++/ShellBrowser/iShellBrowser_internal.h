@@ -335,6 +335,8 @@ public:
 	void				SetFilter(TCHAR *szFilter);
 	BOOL				GetFilterStatus(void);
 	void				SetFilterStatus(BOOL bFilter);
+	BOOL				GetFilterCaseSensitive(void);
+	void				SetFilterCaseSensitive(BOOL bCaseSensitive);
 
 	void				UpdateFileSelectionInfo(int,BOOL);
 	HRESULT				CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,IN POINT *pt,IN BOOL bBackOrForward);
@@ -765,6 +767,7 @@ private:
 	list<int>			m_FilteredItemsList;
 	TCHAR				m_szFilter[512];
 	BOOL				m_bApplyFilter;
+	BOOL				m_bFilterCaseSensitive;
 
 	BOOL volatile		m_bBrowsing;
 };

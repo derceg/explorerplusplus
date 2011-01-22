@@ -115,7 +115,7 @@ void CFolderView::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 
 BOOL CFolderView::IsFilenameFiltered(TCHAR *FileName)
 {
-	if(CheckWildcardMatch(m_szFilter,FileName,TRUE))
+	if(CheckWildcardMatch(m_szFilter,FileName,m_bFilterCaseSensitive))
 		return FALSE;
 
 	return TRUE;
@@ -1402,6 +1402,16 @@ BOOL CFolderView::GetFilterStatus(void)
 	return m_bApplyFilter;
 }
 
+void CFolderView::SetFilterCaseSensitive(BOOL bFilterCaseSensitive)
+{
+	m_bFilterCaseSensitive = bFilterCaseSensitive;
+}
+
+BOOL CFolderView::GetFilterCaseSensitive(void)
+{
+	return m_bFilterCaseSensitive;
+}
+
 void CFolderView::UpdateFiltering(void)
 {
 	if(m_bApplyFilter)
@@ -1428,7 +1438,11 @@ void CFolderView::UnfilterAllItems(void)
 
 	for(itr = m_FilteredItemsList.begin();itr != m_FilteredItemsList.end();itr++)
 	{
-		AwaitingAdd.iItem			= 0;
+		int iSorted = DetermineItemSortedPosition(*itr);
+
+		AwaitingAdd.iItem			= iSorted;
+		AwaitingAdd.bPosition		= TRUE;
+		AwaitingAdd.iAfter			= iSorted - 1;
 		AwaitingAdd.iItemInternal	= *itr;
 
 		m_AwaitingAddList.push_back(AwaitingAdd);

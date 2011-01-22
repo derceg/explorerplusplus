@@ -71,6 +71,7 @@ typedef struct
 	BOOL	bAutoArrange;
 	BOOL	bGridlinesActive;
 	BOOL	bApplyFilter;
+	BOOL	bFilterCaseSensitive;
 	BOOL	bShowFolderSizes;
 	BOOL	bDisableFolderSizesNetworkRemovable;
 	BOOL	bHideSystemFiles;
@@ -339,10 +340,12 @@ __interface IShellBrowser2 : IUnknown
 	virtual int				QueryNumSelectedFiles(void);
 	virtual int				QueryNumSelectedFolders(void);
 	virtual void			QueryFolderInfo(FolderInfo_t *pFolderInfo);
-	virtual void			SetFilterStatus(BOOL bFilter);
-	virtual BOOL			GetFilterStatus(void);
 	virtual void			GetFilter(TCHAR *szFilter,int cchMax);
 	virtual void			SetFilter(TCHAR *szFilter);
+	virtual BOOL			GetFilterStatus(void);
+	virtual void			SetFilterStatus(BOOL bFilter);
+	virtual BOOL			GetFilterCaseSensitive(void);
+	virtual void			SetFilterCaseSensitive(BOOL bCaseSensitive);
 	virtual BOOL			ToggleSortAscending(void);
 	virtual BOOL			ToggleAutoArrange(void);
 	virtual BOOL			QuerySortAscending(void);

@@ -119,6 +119,7 @@ HANDLE hFolderSizeThread)
 	m_bShowFriendlyDates	= TRUE;
 	m_bFolderVisited		= FALSE;
 	m_bApplyFilter			= FALSE;
+	m_bFilterCaseSensitive	= FALSE;
 	m_bGridlinesActive		= TRUE;
 	m_bShowHidden			= FALSE;
 	m_bShowExtensions		= TRUE;
@@ -496,6 +497,7 @@ void CFolderView::SetUserOptions(InitialSettings_t *is)
 	m_SortMode				= is->SortMode;
 	m_ViewMode				= is->ViewMode;
 	m_bApplyFilter			= is->bApplyFilter;
+	m_bFilterCaseSensitive	= is->bFilterCaseSensitive;
 	m_bShowFolderSizes		= is->bShowFolderSizes;
 	m_bDisableFolderSizesNetworkRemovable = is->bDisableFolderSizesNetworkRemovable;
 	m_bHideSystemFiles		= is->bHideSystemFiles;

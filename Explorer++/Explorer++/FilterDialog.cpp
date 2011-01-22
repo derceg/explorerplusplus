@@ -59,8 +59,16 @@ INT_PTR CALLBACK Explorerplusplus::FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					SendMessage(hComboBox,CB_ADDSTRING,(WPARAM)-1,(LPARAM)itr->pszFilterString);
 				}
 
+				TCHAR szFilter[256];
+				m_pActiveShellBrowser->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
+
+				ComboBox_SelectString(hComboBox,-1,szFilter);
+
 				SendMessage(hComboBox,CB_SETEDITSEL,0,MAKELPARAM(0,-1));
 
+				if (m_pActiveShellBrowser->GetFilterCaseSensitive())
+					CheckDlgButton(hDlg,IDC_FILTERS_CASESENSITIVE,BST_CHECKED);
+				
 				if(m_bFilterDlgStateSaved)
 				{
 					SetWindowPos(hDlg,NULL,m_ptFilter.x,m_ptFilter.y,
@@ -91,6 +99,9 @@ INT_PTR CALLBACK Explorerplusplus::FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 						SendMessage(hComboBox,WM_GETTEXT,iBufSize + 1,(LPARAM)Filter.pszFilterString);
 
 						m_FilterList.push_front(Filter);
+
+						m_pActiveShellBrowser->SetFilterCaseSensitive(IsDlgButtonChecked(
+							hDlg,IDC_FILTERS_CASESENSITIVE) == BST_CHECKED);
 
 						m_pActiveShellBrowser->SetFilter(Filter.pszFilterString);
 

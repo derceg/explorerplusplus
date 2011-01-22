@@ -185,6 +185,7 @@ int *pTabObjectIndex)
 				is.SortMode				= ds.dsi.SortMode;
 				is.ViewMode				= ds.dsi.ViewMode;
 				is.bApplyFilter			= FALSE;
+				is.bFilterCaseSensitive	= FALSE;
 
 				is.pControlPanelColumnList			= &ds.dsi.ControlPanelColumnList;
 				is.pMyComputerColumnList			= &ds.dsi.MyComputerColumnList;
@@ -206,6 +207,7 @@ int *pTabObjectIndex)
 			is.SortMode				= DEFAULT_SORT_MODE;
 			is.ViewMode				= m_ViewModeGlobal;
 			is.bApplyFilter			= FALSE;
+			is.bFilterCaseSensitive	= FALSE;
 
 			StringCchCopy(is.szFilter,SIZEOF_ARRAY(is.szFilter),EMPTY_STRING);
 
