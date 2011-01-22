@@ -190,6 +190,39 @@ void CMyTreeView::DirectoryAlteredRenameFile(TCHAR *szFullFileName)
 	if(hItem != NULL)
 	{
 		RenameItem(hItem,szFullFileName);
+
+		/* Notify the parent that the selected item (or one of its ancestors)
+		has been renamed. */
+		HTREEITEM hSelection = TreeView_GetSelection(m_hTreeView);
+		HTREEITEM hAncestor = hSelection;
+
+		while(hAncestor != hItem && hAncestor != NULL) 
+		{
+			hAncestor = TreeView_GetParent(m_hTreeView,hAncestor);
+		} 
+
+		if(hAncestor == hItem)
+		{
+			TVITEM tvSelected;
+
+			tvSelected.mask		= TVIF_PARAM;
+			tvSelected.hItem	= hSelection;
+			BOOL bRes = TreeView_GetItem(m_hTreeView,&tvSelected);
+
+			HWND hParent = GetParent(m_hTreeView);
+
+			if(bRes && hParent != NULL)
+			{
+				NMTREEVIEW nmtv;
+
+				nmtv.hdr.code	= TVN_SELCHANGED;
+				nmtv.action		= TVC_UNKNOWN;
+				nmtv.itemNew	= tvSelected;
+
+				/* TODO: Switch to custom notification. */
+				SendMessage(hParent,WM_NOTIFY,0,reinterpret_cast<LPARAM>(&nmtv));
+			}
+		}
 	}
 
     if(!hDeskItem && !hItem)
