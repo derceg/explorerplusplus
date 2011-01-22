@@ -281,13 +281,20 @@ BOOL Explorerplusplus::OnTreeViewItemExpanding(LPARAM lParam)
 	}
 	else
 	{
-		HTREEITEM hSelection;
-
-		hSelection = TreeView_GetSelection(m_hTreeView);
+		HTREEITEM hSelection = TreeView_GetSelection(m_hTreeView);
 
 		if(hSelection != NULL)
 		{
-			if(TreeView_GetParent(m_hTreeView,hSelection) == tvItem->hItem)
+			/* We may collapse multiple levels (not just the parent folder), so we need 
+			to search up the tree for the parent item. */
+			HTREEITEM hItem = hSelection;
+
+			do 
+			{
+				hItem = TreeView_GetParent(m_hTreeView,hItem);
+			} while (hItem != tvItem->hItem && hItem != NULL);
+
+			if(hItem == tvItem->hItem)
 			{
 				LPITEMIDLIST pidl	= NULL;
 
