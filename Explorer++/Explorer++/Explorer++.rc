@@ -74,8 +74,8 @@ BEGIN
                     "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,176,83,10
     CONTROL         "Show &custom infotips",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
                     "Button",BS_AUTORADIOBUTTON,19,187,83,10
-    CONTROL         "Hide $&RECYCLE.BIN folder",IDC_SETTINGS_CHECK_RECYCLE_BIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,200,100,10
+    CONTROL         "Hide ""&RECYCLE BIN"" folders",IDC_SETTINGS_CHECK_RECYCLE_BIN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,200,105,10
     CONTROL         "Hide ""System &Volume Information"" folder",IDC_SETTINGS_CHECK_SYSVOL_INFO,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,213,150,10
 END

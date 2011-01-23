@@ -647,8 +647,12 @@ HTREEITEM hParent)
 						// Hides $RECYCLE.BIN folder
 						if(m_bHideRecycleBin)
 						{
-							if (lstrcmpi(ItemName,_T("$RECYCLE.BIN")) == 0)
+							if (lstrcmpi(ItemName,_T("$RECYCLE.BIN")) == 0 ||
+								lstrcmpi(ItemName,_T("RECYCLER")) == 0 ||
+								lstrcmpi(ItemName,_T("RECYCLE BIN")) == 0)
+							{
 								bSkipItem = TRUE;
+							}
 						}
 
 						// Hides "System Volume Information" folder

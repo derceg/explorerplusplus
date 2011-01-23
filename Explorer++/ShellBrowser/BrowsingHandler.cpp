@@ -316,8 +316,12 @@ BOOL CFolderView::IsFileFiltered(int iItemInternal)
 	if(m_bHideRecycleBin && 
 		((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
 	{
-		if (lstrcmpi(m_pExtraItemInfo[iItemInternal].szDisplayName,_T("$RECYCLE.BIN")) == 0)
+		if(lstrcmpi(m_pExtraItemInfo[iItemInternal].szDisplayName,_T("$RECYCLE.BIN")) == 0 ||
+			lstrcmpi(m_pExtraItemInfo[iItemInternal].szDisplayName,_T("RECYCLER")) == 0 ||
+			lstrcmpi(m_pExtraItemInfo[iItemInternal].szDisplayName,_T("RECYCLE BIN")) == 0)
+		{
 			bHideRecycleBin = TRUE;
+		}
 	}
 
 	// Hides "System Volume Information" folder
