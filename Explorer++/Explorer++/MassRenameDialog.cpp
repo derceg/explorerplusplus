@@ -5,384 +5,421 @@
  * License: GPL - See COPYING in the top level directory
  *
  * Provides support for the mass renaming of files.
+ * The following special characters are supported:
+ * $N	- Counter
+ * $F	- Filename
+ * $B	- Basename (filename without extension)
+ * $E	- Extension
  *
  * Written by David Erceg
  * www.explorerplusplus.com
  *
  *****************************************************************/
 
-/*
-Special characters:
-$N	- Counter
-$F	- Filename
-$B	- Basename (filename without extension)
-$E	- Extension
-*/
-
 #include "stdafx.h"
 #include <list>
-#include "Misc.h"
-#include "Explorer++.h"
 #include "Explorer++_internal.h"
+#include "MassRenameDialog.h"
+#include "MainResource.h"
+#include "../Helper/Helper.h"
 
 
-typedef struct
+const TCHAR CMassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename");
+
+CMassRenameDialog::CMassRenameDialog(HINSTANCE hInstance,
+	int iResource,HWND hParent,std::list<std::wstring> FullFilenameList) :
+CBaseDialog(hInstance,iResource,hParent)
 {
-	TCHAR szFullFileName[MAX_PATH];
-	TCHAR szFileName[MAX_PATH];
-} RenameFile_t;
+	m_FullFilenameList = FullFilenameList;
 
-TCHAR *ProcessFileName(TCHAR *szTargetName,TCHAR *szFileName,int iFileIndex);
-
-HICON				g_hMassRenameIcon;
-list<RenameFile_t>	FileNameList;
-
-INT_PTR CALLBACK MassRenameProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
-{
-	static Explorerplusplus *pContainer = NULL;
-
-	switch(uMsg)
-	{
-		case WM_INITDIALOG:
-		{
-			pContainer = (Explorerplusplus *)lParam;
-		}
-		break;
-	}
-
-	return pContainer->MassRenameProc(hDlg,uMsg,wParam,lParam);
+	m_pmrdps = &CMassRenameDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CALLBACK Explorerplusplus::MassRenameProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+CMassRenameDialog::~CMassRenameDialog()
 {
-	switch(uMsg)
+
+}
+
+BOOL CMassRenameDialog::OnInitDialog()
+{
+	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
+	HBITMAP hBitmap = LoadBitmap(GetInstance(),MAKEINTRESOURCE(IDB_SHELLIMAGES));
+	ImageList_Add(himl,hBitmap,NULL);
+
+	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_RENAME,ILD_NORMAL);
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+
+	m_hMoreIcon = ImageList_GetIcon(himl,SHELLIMAGES_RIGHTARROW,ILD_NORMAL);
+	SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_MORE,BM_SETIMAGE,IMAGE_ICON,
+		reinterpret_cast<LPARAM>(m_hMoreIcon));
+
+	DeleteObject(hBitmap);
+	ImageList_Destroy(himl);
+
+	HWND hListView = GetDlgItem(m_hDlg,IDC_MASSRENAME_FILELISTVIEW);
+
+	LONG Style;
+	Style = GetWindowLong(hListView,GWL_STYLE);
+	SetWindowLongPtr(hListView,GWL_STYLE,Style|LVS_SHAREIMAGELISTS);
+
+	ListView_SetExtendedListViewStyleEx(hListView,
+		LVS_EX_GRIDLINES|LVS_EX_SUBITEMIMAGES|LVS_EX_FULLROWSELECT,
+		LVS_EX_GRIDLINES|LVS_EX_SUBITEMIMAGES|LVS_EX_FULLROWSELECT);
+
+	HIMAGELIST himlSmall;
+	Shell_GetImageLists(NULL,&himlSmall);
+	ListView_SetImageList(hListView,himlSmall,LVSIL_SMALL);
+
+	LVCOLUMN lvCol;
+
+	/* TODO: Move text to string table. */
+	lvCol.mask		= LVCF_TEXT;
+	lvCol.pszText	= _T("Current Name");
+	ListView_InsertColumn(hListView,1,&lvCol);
+
+	/* TODO: Move text to string table. */
+	lvCol.mask		= LVCF_TEXT;
+	lvCol.pszText	= _T("Preview Name");
+	ListView_InsertColumn(hListView,2,&lvCol);
+
+	RECT rc;
+	GetClientRect(hListView,&rc);
+	SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,GetRectWidth(&rc) / 2);
+	SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,GetRectWidth(&rc) / 2);
+
+	LVITEM lvItem;
+	SHFILEINFO shfi;
+	TCHAR szFilename[MAX_PATH];
+	int iItem = 0;
+
+	/* Add each file to the listview, along with its icon. */
+	for each(auto strFilename in m_FullFilenameList)
 	{
-		case WM_INITDIALOG:
-			{
-				HWND hListView;
-				LVCOLUMN lvcol;
-				list<RenameFile_t>::iterator itr;
-				DWORD dwStyleEx;
-				int iItem = 0;
+		SHGetFileInfo(strFilename.c_str(),0,&shfi,
+			sizeof(SHFILEINFO),SHGFI_SYSICONINDEX);
 
-				HIMAGELIST himl;
-				HBITMAP hBitmap;
+		StringCchCopy(szFilename,SIZEOF_ARRAY(szFilename),
+			strFilename.c_str());
+		PathStripPath(szFilename);
 
-				himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
+		lvItem.mask		= LVIF_TEXT|LVIF_IMAGE;
+		lvItem.iItem	= iItem;
+		lvItem.iSubItem	= 0;
+		lvItem.iImage	= shfi.iIcon;
+		lvItem.pszText	= szFilename;
+		ListView_InsertItem(hListView,&lvItem);
 
-				/* Contains all images used on the menus. */
-				hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
+		lvItem.mask		= LVIF_TEXT;
+		lvItem.iItem	= iItem;
+		lvItem.iSubItem	= 1;
+		lvItem.pszText	= szFilename;
+		ListView_SetItem(hListView,&lvItem);
 
-				ImageList_Add(himl,hBitmap,NULL);
+		iItem++;
+	}
 
-				g_hMassRenameIcon = ImageList_GetIcon(himl,SHELLIMAGES_RIGHTARROW,ILD_NORMAL);
-				SendDlgItemMessage(hDlg,IDC_MASSRENAME_MORE,BM_SETIMAGE,IMAGE_ICON,(LPARAM)g_hMassRenameIcon);
+	InitializeControlStates();
 
-				DeleteObject(hBitmap);
-				ImageList_Destroy(himl);
+	SetDlgItemText(m_hDlg,IDC_MASSRENAME_EDIT,_T("$F"));
+	SendMessage(GetDlgItem(m_hDlg,IDC_MASSRENAME_EDIT),
+		EM_SETSEL,0,-1);
+	SetFocus(GetDlgItem(m_hDlg,IDC_MASSRENAME_EDIT));
 
-				hListView = GetDlgItem(hDlg,IDC_MASSRENAME_FILELISTVIEW);
+	RECT rcMain;
 
-				ListView_SetExtendedListViewStyleEx(hListView,
-				LVS_EX_GRIDLINES|LVS_EX_SUBITEMIMAGES,
-				LVS_EX_GRIDLINES|LVS_EX_SUBITEMIMAGES);
+	GetWindowRect(m_hDlg,&rcMain);
+	m_iMinWidth = GetRectWidth(&rcMain);
+	m_iMinHeight = GetRectHeight(&rcMain);
 
-				HIMAGELIST SmallIcons;
-				LONG Style;
+	m_hGripper = CreateWindow(_T("SCROLLBAR"),EMPTY_STRING,WS_CHILD|WS_VISIBLE|
+		WS_CLIPSIBLINGS|SBS_BOTTOMALIGN|SBS_SIZEGRIP,0,0,0,0,m_hDlg,NULL,
+		GetInstance(),NULL);
 
-				Shell_GetImageLists(NULL,&SmallIcons);
+	GetClientRect(m_hDlg,&rcMain);
+	GetWindowRect(m_hGripper,&rc);
+	SetWindowPos(m_hGripper,NULL,GetRectWidth(&rcMain) - GetRectWidth(&rc),
+		GetRectHeight(&rcMain) - GetRectHeight(&rc),0,0,SWP_NOSIZE|SWP_NOZORDER);
 
-				Style = GetWindowLong(hListView,GWL_STYLE);
-				SetWindowLongPtr(hListView,GWL_STYLE,Style|LVS_SHAREIMAGELISTS);
-				
-				ListView_SetImageList(hListView,SmallIcons,LVSIL_SMALL);
-
-				lvcol.mask		= LVCF_TEXT|LVCF_WIDTH;
-				lvcol.cx		= 100;
-				lvcol.pszText	= _T("Current Name");
-				ListView_InsertColumn(hListView,1,&lvcol);
-
-				lvcol.mask		= LVCF_TEXT|LVCF_WIDTH;
-				lvcol.cx		= 300;
-				lvcol.pszText	= _T("Preview Name");
-				ListView_InsertColumn(hListView,2,&lvcol);
-
-				LVITEM item;
-				SHFILEINFO shfi;
-				int nSelected;
-				int iIndex = -1;
-				int i = 0;
-				RenameFile_t RenameFile;
-
-				FileNameList.clear();
-
-				nSelected = ListView_GetSelectedCount(m_hActiveListView);
-
-				for(i = 0;i < nSelected;i++)
-				{
-					iIndex = ListView_GetNextItem(m_hActiveListView,
-					iIndex,LVNI_SELECTED);
-
-					if(iIndex != -1)
-					{
-						m_pActiveShellBrowser->QueryFullItemName(iIndex,RenameFile.szFullFileName);
-						m_pActiveShellBrowser->QueryName(iIndex,RenameFile.szFileName);
-
-						FileNameList.push_back(RenameFile);
-					}
-				}
-
-				for(itr = FileNameList.begin();itr != FileNameList.end();itr++)
-				{
-					SHGetFileInfo(itr->szFullFileName,0,&shfi,
-					sizeof(SHFILEINFO),SHGFI_SYSICONINDEX);
-
-					item.mask		= LVIF_TEXT|LVIF_IMAGE;
-					item.iItem		= iItem;
-					item.iSubItem	= 0;
-					item.iImage		= shfi.iIcon;
-					item.pszText	= itr->szFileName;
-					ListView_InsertItem(hListView,&item);
-
-					item.mask		= LVIF_TEXT;
-					item.iItem		= iItem;
-					item.iSubItem	= 1;
-					item.pszText	= itr->szFileName;
-					ListView_SetItem(hListView,&item);
-
-					iItem++;
-				}
-
-				RECT rc;
-
-				GetClientRect(hListView,&rc);
-
-				SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,GetRectWidth(&rc) / 2);
-				SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,GetRectWidth(&rc) / 2);
-
-				dwStyleEx = ListView_GetExtendedListViewStyle(hListView);
-				ListView_SetExtendedListViewStyle(hListView,dwStyleEx|LVS_EX_FULLROWSELECT);
-
-				SetFocus(GetDlgItem(hDlg,IDC_MASSRENAME_EDIT));
-
-				if(m_bMassRenameDlgStateSaved)
-				{
-					SetWindowPos(hDlg,NULL,m_ptMassRename.x,
-						m_ptMassRename.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-				}
-				else
-				{
-					CenterWindow(m_hContainer,hDlg);
-				}
-			}
-			break;
-
-		case WM_COMMAND:
-			if(HIWORD(wParam) != 0)
-			{
-				switch(HIWORD(wParam))
-				{
-					case EN_CHANGE:
-					{
-						HWND hListView;
-						list<RenameFile_t>::iterator itr;
-						TCHAR EditText[100];
-						TCHAR *szTargetName;
-						LVITEM item;
-						int i = 0;
-
-						GetDlgItemText(hDlg,IDC_MASSRENAME_EDIT,
-						EditText,SIZEOF_ARRAY(EditText));
-
-						hListView = GetDlgItem(hDlg,IDC_MASSRENAME_FILELISTVIEW);
-						
-						for(itr = FileNameList.begin();itr != FileNameList.end();itr++)
-						{
-							szTargetName = ProcessFileName(EditText,itr->szFileName,i);
-
-							item.mask		= LVIF_TEXT;
-							item.iItem		= i;
-							item.iSubItem	= 1;
-							item.pszText	= szTargetName;
-
-							ListView_SetItem(hListView,&item);
-
-							i++;
-						}
-					}
-					break;
-				}
-				break;
-			}
-			else
-			{
-				switch(LOWORD(wParam))
-				{
-				case IDC_MASSRENAME_MORE:
-					{
-						HMENU hMenu;
-						UINT uId;
-						RECT rc;
-
-						hMenu = GetSubMenu(LoadMenu(GetModuleHandle(0),MAKEINTRESOURCE(IDR_MASSRENAME_MENU)),0);
-
-						GetWindowRect(GetDlgItem(hDlg,IDC_MASSRENAME_MORE),&rc);
-
-						uId = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_VERTICAL|TPM_RETURNCMD,
-							rc.right,rc.top,0,hDlg,NULL);
-
-						switch(uId)
-						{
-						case IDM_MASSRENAME_FILENAME:
-							SendDlgItemMessage(hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,(LPARAM)_T("$F"));
-							break;
-
-						case IDM_MASSRENAME_BASENAME:
-							SendDlgItemMessage(hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,(LPARAM)_T("$B"));
-							break;
-
-						case IDM_MASSRENAME_EXTENSION:
-							SendDlgItemMessage(hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,(LPARAM)_T("$E"));
-							break;
-
-						case IDM_MASSRENAME_COUNTER:
-							SendDlgItemMessage(hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,(LPARAM)_T("$N"));
-							break;
-						}
-					}
-					break;
-
-				case IDOK:
-					OnMassRenameOk(hDlg);
-					break;
-
-				case IDCANCEL:
-					MassRenameSaveState(hDlg);
-					EndDialog(hDlg,0);
-					break;
-				}
-				break;
-			}
-			break;
-
-		case WM_CLOSE:
-			MassRenameSaveState(hDlg);
-			EndDialog(hDlg,0);
-			break;
-
-		case WM_DESTROY:
-			DestroyIcon(g_hMassRenameIcon);
-			break;
+	if(m_pmrdps->m_bStateSaved)
+	{
+		/* TODO: Save/restore dialog size. */
+		SetWindowPos(m_hDlg,NULL,m_pmrdps->m_ptDialog.x,
+			m_pmrdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
+	}
+	else
+	{
+		CenterWindow(GetParent(m_hDlg),m_hDlg);
 	}
 
 	return 0;
 }
 
-TCHAR *ProcessFileName(TCHAR *szTargetName,TCHAR *szFileName,int iFileIndex)
+void CMassRenameDialog::InitializeControlStates()
 {
-	static TCHAR szOutputText[MAX_PATH];
-	TCHAR szBaseName[MAX_PATH];
-	TCHAR *pExt;
-	int i = 0;
-	int j = 0;
+	std::list<CResizableDialog::Control_t> ControlList;
+	CResizableDialog::Control_t Control;
 
-	StringCchCopy(szBaseName,MAX_PATH,szFileName);
-	PathRemoveExtension(szBaseName);
+	Control.iID = IDC_MASSRENAME_EDIT;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
 
-	pExt = PathFindExtension(szFileName);
+	Control.iID = IDC_MASSRENAME_MORE;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
 
-	for(i = 0;i < lstrlen(szTargetName);i++)
+	Control.iID = IDC_MASSRENAME_FILELISTVIEW;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDOK;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDCANCEL;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	m_prd = new CResizableDialog(m_hDlg,ControlList);
+}
+
+BOOL CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+{
+	if(HIWORD(wParam) != 0)
 	{
-		if(szTargetName[i] == '$')
+		switch(HIWORD(wParam))
 		{
-			switch(szTargetName[i + 1])
+		case EN_CHANGE:
 			{
-				case 'N':
-					TCHAR szFileIndex[20];
-					szOutputText[j] = '\0';
-					_itot_s(iFileIndex,szFileIndex,20,10);
-					StringCchCatN(szOutputText,MAX_PATH,szFileIndex,lstrlen(szFileIndex));
-					j += lstrlen(szFileIndex);
-					i += 1;
-					break;
+				TCHAR szNamePattern[MAX_PATH];
+				GetDlgItemText(m_hDlg,IDC_MASSRENAME_EDIT,
+					szNamePattern,SIZEOF_ARRAY(szNamePattern));
 
-				case 'F':
-					szOutputText[j] = '\0';
-					StringCchCatN(szOutputText,MAX_PATH,szFileName,lstrlen(szFileName));
-					j += lstrlen(szFileName);
-					i += 1;
-					break;
+				HWND hListView = GetDlgItem(m_hDlg,IDC_MASSRENAME_FILELISTVIEW);
 
-				case 'B':
-					szOutputText[j] = '\0';
-					StringCchCatN(szOutputText,MAX_PATH,szBaseName,lstrlen(szBaseName));
-					j += lstrlen(szBaseName);
-					i += 1;
-					break;
+				LVITEM lvItem;
+				std::wstring strNewFilename;
+				TCHAR szFilename[MAX_PATH];
+				TCHAR szNewFilename[MAX_PATH];
+				int iItem = 0;
 
-				case 'E':
-					szOutputText[j] = '\0';
-					StringCchCatN(szOutputText,MAX_PATH,pExt,lstrlen(pExt));
-					j += lstrlen(pExt);
-					i += 1;
-					break;
+				for each(auto strFilename in m_FullFilenameList)
+				{
+					StringCchCopy(szFilename,SIZEOF_ARRAY(szFilename),
+						strFilename.c_str());
+					PathStripPath(szFilename);
 
-				default:
-					szOutputText[j++] = szTargetName[i];
-					break;
+					ProcessFileName(szNamePattern,szFilename,iItem,strNewFilename);
+
+					StringCchCopy(szNewFilename,SIZEOF_ARRAY(szNewFilename),
+						strNewFilename.c_str());
+
+					lvItem.mask		= LVIF_TEXT;
+					lvItem.iItem	= iItem;
+					lvItem.iSubItem	= 1;
+					lvItem.pszText	= szNewFilename;
+					ListView_SetItem(hListView,&lvItem);
+
+					iItem++;
+				}
 			}
+			break;
 		}
-		else
+	}
+	else
+	{
+		switch(LOWORD(wParam))
 		{
-			szOutputText[j++] = szTargetName[i];
+		case IDC_MASSRENAME_MORE:
+			{
+				HMENU hMenu = GetSubMenu(LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MASSRENAME_MENU)),0);
+
+				RECT rc;
+				GetWindowRect(GetDlgItem(m_hDlg,IDC_MASSRENAME_MORE),&rc);
+
+				UINT uCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_VERTICAL|TPM_RETURNCMD,
+					rc.right,rc.top,0,m_hDlg,NULL);
+
+				switch(uCmd)
+				{
+				case IDM_MASSRENAME_FILENAME:
+					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
+						reinterpret_cast<LPARAM>(_T("$F")));
+					break;
+
+				case IDM_MASSRENAME_BASENAME:
+					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
+						reinterpret_cast<LPARAM>(_T("$B")));
+					break;
+
+				case IDM_MASSRENAME_EXTENSION:
+					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
+						reinterpret_cast<LPARAM>(_T("$E")));
+					break;
+
+				case IDM_MASSRENAME_COUNTER:
+					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
+						reinterpret_cast<LPARAM>(_T("$N")));
+					break;
+				}
+			}
+			break;
+
+		case IDOK:
+			OnOk();
+			break;
+
+		case IDCANCEL:
+			OnCancel();
+			break;
 		}
 	}
 
-	szOutputText[j] = '\0';
-
-	return szOutputText;
+	return 0;
 }
 
-void Explorerplusplus::OnMassRenameOk(HWND hDlg)
+BOOL CMassRenameDialog::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
 {
-	list<RenameFile_t>::iterator itr;
-	HWND hListView;
-	TCHAR EditText[100];
-	TCHAR *szTargetName;
-	int i = 0;
-	TCHAR szNewFileName[MAX_PATH];
+	/* Set the minimum dialog size. */
+	pmmi->ptMinTrackSize.x = m_iMinWidth;
+	pmmi->ptMinTrackSize.y = m_iMinHeight;
 
-	GetDlgItemText(hDlg,IDC_MASSRENAME_EDIT,
-	EditText,SIZEOF_ARRAY(EditText));
+	return 0;
+}
 
-	hListView = GetDlgItem(hDlg,IDC_MASSRENAME_FILELISTVIEW);
+BOOL CMassRenameDialog::OnSize(int iType,int iWidth,int iHeight)
+{
+	RECT rc;
+	GetWindowRect(m_hGripper,&rc);
+	SetWindowPos(m_hGripper,NULL,iWidth - GetRectWidth(&rc),iHeight - GetRectHeight(&rc),0,
+		0,SWP_NOSIZE|SWP_NOZORDER);
 
-	for(itr = FileNameList.begin();itr != FileNameList.end();itr++)
+	m_prd->UpdateControls(iWidth,iHeight);
+
+	return 0;
+}
+
+BOOL CMassRenameDialog::OnClose()
+{
+	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CMassRenameDialog::OnDestroy()
+{
+	DestroyIcon(m_hMoreIcon);
+	DestroyIcon(m_hDialogIcon);
+
+	delete m_prd;
+
+	SaveState();
+	return 0;
+}
+
+void CMassRenameDialog::OnOk()
+{
+	TCHAR szNamePattern[MAX_PATH];
+
+	GetDlgItemText(m_hDlg,IDC_MASSRENAME_EDIT,
+		szNamePattern,SIZEOF_ARRAY(szNamePattern));
+
+	std::wstring strNewFilename;
+	TCHAR szFilename[MAX_PATH];
+	int iItem = 0;
+
+	for each (auto strFilename in m_FullFilenameList)
 	{
-		szTargetName = ProcessFileName(EditText,itr->szFileName,i);
+		StringCchCopy(szFilename,SIZEOF_ARRAY(szFilename),
+			strFilename.c_str());
+		PathStripPath(szFilename);
+
+		ProcessFileName(szNamePattern,szFilename,iItem,strNewFilename);
+
+		/* TODO: */
+		/*TCHAR szNewFileName[MAX_PATH];
 
 		StringCchPrintf(szNewFileName,MAX_PATH,_T("%s\\%s"),m_CurrentDirectory,szTargetName);
 
 		szNewFileName[lstrlen(szNewFileName) + 1] = '\0';
 		itr->szFullFileName[lstrlen(itr->szFullFileName) + 1] = '\0';
 
-		RenameFileWithUndo(szNewFileName,itr->szFullFileName);
+		RenameFileWithUndo(szNewFileName,itr->szFullFileName);*/
 
-		i++;
+		iItem++;
 	}
 
-	MassRenameSaveState(hDlg);
-
-	EndDialog(hDlg,1);
+	EndDialog(m_hDlg,1);
 }
 
-void Explorerplusplus::MassRenameSaveState(HWND hDlg)
+void CMassRenameDialog::OnCancel()
 {
-	RECT rcTemp;
+	EndDialog(m_hDlg,0);
+}
 
-	GetWindowRect(hDlg,&rcTemp);
-	m_ptMassRename.x = rcTemp.left;
-	m_ptMassRename.y = rcTemp.top;
+void CMassRenameDialog::SaveState()
+{
+	RECT rc;
+	GetWindowRect(m_hDlg,&rc);
+	m_pmrdps->m_ptDialog.x = rc.left;
+	m_pmrdps->m_ptDialog.y = rc.top;
 
-	m_bMassRenameDlgStateSaved = TRUE;
+	m_pmrdps->m_bStateSaved = TRUE;
+}
+
+void CMassRenameDialog::ProcessFileName(const std::wstring strTarget,
+	const std::wstring strFilename,int iFileIndex,std::wstring &strOutput)
+{
+	TCHAR szBaseName[MAX_PATH];
+	StringCchCopy(szBaseName,MAX_PATH,strFilename.c_str());
+	PathRemoveExtension(szBaseName);
+
+	TCHAR *pExt = PathFindExtension(strFilename.c_str());
+
+	size_t iPos;
+
+	strOutput = strTarget;
+
+	while((iPos = strOutput.find(_T("$N"))) != std::wstring::npos)
+	{
+		std::wstringstream ss;
+		ss << iFileIndex;
+
+		strOutput.replace(iPos,2,ss.str());
+	}
+
+	while((iPos = strOutput.find(_T("$F"))) != std::wstring::npos)
+	{
+		strOutput.replace(iPos,2,strFilename);
+	}
+
+	while((iPos = strOutput.find(_T("$B"))) != std::wstring::npos)
+	{
+		strOutput.replace(iPos,2,szBaseName);
+	}
+
+	while((iPos = strOutput.find(_T("$E"))) != std::wstring::npos)
+	{
+		strOutput.replace(iPos,2,pExt);
+	}
+}
+
+CMassRenameDialogPersistentSettings::CMassRenameDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
+{
+
+}
+
+CMassRenameDialogPersistentSettings::~CMassRenameDialogPersistentSettings()
+{
+	
+}
+
+CMassRenameDialogPersistentSettings& CMassRenameDialogPersistentSettings::GetInstance()
+{
+	static CMassRenameDialogPersistentSettings sfadps;
+	return sfadps;
 }

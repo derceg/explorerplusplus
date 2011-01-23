@@ -17,6 +17,7 @@
 #include "WildcardSelectDialog.h"
 #include "SetFileAttributesDialog.h"
 #include "RenameTabDialog.h"
+#include "MassRenameDialog.h"
 #include "../Helper/Registry.h"
 
 #define SMALL_SIZE		5
@@ -1441,7 +1442,6 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		SaveDestroyFilesStateToRegistry(hKey);
 		SaveDisplayColorsStateToRegistry(hKey);
 		SaveFilterStateToRegistry(hKey);
-		SaveMassRenameStateToRegistry(hKey);
 		SaveMergeFilesStateToRegistry(hKey);
 		SaveOrganizeBookmarksStateToRegistry(hKey);
 		SaveSelectColumnsStateToRegistry(hKey);
@@ -1452,6 +1452,7 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		CWildcardSelectDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CSetFileAttributesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CRenameTabDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		CMassRenameDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1596,29 +1597,6 @@ void Explorerplusplus::SaveFilterStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void Explorerplusplus::SaveMassRenameStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_MASSRENAME_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bMassRenameDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptMassRename,
-				sizeof(m_ptMassRename));
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
 void Explorerplusplus::SaveMergeFilesStateToRegistry(HKEY hParentKey)
 {
 	HKEY	hKey;
@@ -1749,7 +1727,6 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		LoadDestroyFilesStateFromRegistry(hKey);
 		LoadDisplayColorsStateFromRegistry(hKey);
 		LoadFilterStateFromRegistry(hKey);
-		LoadMassRenameStateFromRegistry(hKey);
 		LoadMergeFilesStateFromRegistry(hKey);
 		LoadOrganizeBookmarksStateFromRegistry(hKey);
 		LoadSelectColumnsStateFromRegistry(hKey);
@@ -1760,6 +1737,7 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		CWildcardSelectDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CSetFileAttributesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CRenameTabDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		CMassRenameDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1902,30 +1880,6 @@ void Explorerplusplus::LoadFilterStateFromRegistry(HKEY hParentKey)
 		if(ReturnValue == ERROR_SUCCESS)
 		{
 			m_bFilterDlgStateSaved = TRUE;
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadMassRenameStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_MASSRENAME_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptMassRename,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bMassRenameDlgStateSaved = TRUE;
 		}
 
 		RegCloseKey(hKey);

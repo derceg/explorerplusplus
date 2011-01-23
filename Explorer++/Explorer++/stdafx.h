@@ -72,3 +72,5 @@
 #include <vfw.h>
 #include <dwmapi.h>
 #include <assert.h>
+#include <iostream>
+#include <sstream>

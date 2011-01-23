@@ -449,6 +449,7 @@
     <ClInclude Include="Explorer++_internal.h" />
     <ClInclude Include="iDropSource.h" />
     <ClInclude Include="MainResource.h" />
+    <ClInclude Include="MassRenameDialog.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="RenameTabDialog.h" />

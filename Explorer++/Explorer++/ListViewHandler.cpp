@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "SetFileAttributesDialog.h"
+#include "MassRenameDialog.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ContextMenuManager.h"
@@ -1567,30 +1568,49 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 
 void Explorerplusplus::OnListViewFileRename(void)
 {
-	HWND	hEdit;
-	int		nSelected;
-	int		iSelected;
+	if(m_pActiveShellBrowser->InVirtualFolder())
+	{
+		return;
+	}
 
-	nSelected = ListView_GetSelectedCount(m_hActiveListView);
+	int nSelected = ListView_GetSelectedCount(m_hActiveListView);
 
+	/* If there is only item selected, start editing
+	it in-place. If multiple items are selected,
+	show the mass rename dialog. */
 	if(nSelected == 1)
 	{
-		iSelected = ListView_GetNextItem(m_hActiveListView,
+		int iSelected = ListView_GetNextItem(m_hActiveListView,
 			-1,LVNI_SELECTED|LVNI_FOCUSED);
 
 		if(iSelected != -1)
 		{
 			/* Start editing the label for this item. */
-			hEdit = ListView_EditLabel(m_hActiveListView,iSelected);
+			ListView_EditLabel(m_hActiveListView,iSelected);
 		}
 	}
 	else if(nSelected > 1)
 	{
-		if(!m_pActiveShellBrowser->InVirtualFolder())
+		std::list<std::wstring>	FullFilenameList;
+		TCHAR szFullFilename[MAX_PATH];
+		int iIndex = -1;
+
+		for(int i = 0;i < nSelected;i++)
 		{
-			DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_MASSRENAME),
-				m_hContainer,MassRenameProcStub,(LPARAM)this);
+			iIndex = ListView_GetNextItem(m_hActiveListView,
+				iIndex,LVNI_SELECTED);
+
+			if(iIndex != -1)
+			{
+				m_pActiveShellBrowser->QueryFullItemName(iIndex,szFullFilename);
+				FullFilenameList.push_back(szFullFilename);
+			}
 		}
+
+		CMassRenameDialog CMassRenameDialog(g_hLanguageModule,IDD_MASSRENAME,
+			m_hContainer,FullFilenameList);
+
+		CMassRenameDialog.ShowModalDialog();
 	}
 }
 

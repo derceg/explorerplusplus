@@ -195,6 +195,9 @@
     <ClInclude Include="RenameTabDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MassRenameDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

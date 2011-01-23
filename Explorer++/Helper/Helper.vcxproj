@@ -271,6 +271,7 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Test|x64'">CompileAsCpp</CompileAs>
     </ClCompile>
+    <ClCompile Include="ResizableDialog.cpp" />
     <ClCompile Include="SetDefaultFileManager.cpp" />
     <ClCompile Include="ShellHelper.cpp" />
     <ClCompile Include="StatusBar.cpp" />
@@ -302,6 +303,7 @@
     <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="ReferenceCount.h" />
     <ClInclude Include="Registry.h" />
+    <ClInclude Include="ResizableDialog.h" />
     <ClInclude Include="SetDefaultFileManager.h" />
     <ClInclude Include="ShellHelper.h" />
     <ClInclude Include="StatusBar.h" />

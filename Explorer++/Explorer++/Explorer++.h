@@ -217,7 +217,6 @@ public:
 	INT_PTR CALLBACK	OrganizeBookmarks(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkFolderPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	MassRenameProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SplitFileProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -739,8 +738,6 @@ private:
 	void					LoadDisplayColorsStateFromRegistry(HKEY hParentKey);
 	void					SaveFilterStateToRegistry(HKEY hParentKey);
 	void					LoadFilterStateFromRegistry(HKEY hParentKey);
-	void					SaveMassRenameStateToRegistry(HKEY hParentKey);
-	void					LoadMassRenameStateFromRegistry(HKEY hParentKey);
 	void					SaveMergeFilesStateToRegistry(HKEY hParentKey);
 	void					LoadMergeFilesStateFromRegistry(HKEY hParentKey);
 	void					SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey);
@@ -874,10 +871,6 @@ private:
 
 	/* Delete securely dialog. */
 	void					OnDeleteSecurelyOk(HWND hDlg);
-
-	/* Mass rename dialog. */
-	void					OnMassRenameOk(HWND hDlg);
-	void					MassRenameSaveState(HWND hDlg);
 
 	/* Add bookmark dialog. */
 	void					OnAddBookmarkInit(HWND hDlg,LPARAM lParam);
@@ -1366,10 +1359,6 @@ private:
 	/* Filter dialog. */
 	BOOL					m_bFilterDlgStateSaved;
 	POINT					m_ptFilter;
-
-	/* Mass rename dialog. */
-	BOOL					m_bMassRenameDlgStateSaved;
-	POINT					m_ptMassRename;
 
 	/* Merge files dialog. */
 	BOOL					m_bMergeFilesDlgStateSaved;
