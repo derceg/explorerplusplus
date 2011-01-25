@@ -1982,17 +1982,10 @@ unsigned int CFolderView::DetermineColumnSortMode(int iColumnId)
 
 void CFolderView::ColumnClicked(int iClickedColumn)
 {
-	HWND hHeader;
 	list<Column_t>::iterator itr;
-	HDITEM hdItem;
-	int UpOrDownFmt;
 	int iCurrentColumn = 0;
-	int iPreviousSortedColumn = 0;
 	UINT SortMode = 0;
-	BOOL bPreviousColumnExists = FALSE;
-	unsigned int iColumnId = 0;
-
-	hHeader = ListView_GetHeader(m_hListView);
+	UINT iColumnId = 0;
 
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
 	{
@@ -2018,55 +2011,8 @@ void CFolderView::ColumnClicked(int iClickedColumn)
 	{
 		ToggleSortAscending();
 	}
-	else
-	{
-		/* Search through the currently active columns to find the column that previously
-		had the up/down arrow. */
-		for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
-		{
-			/* Only increnment if this column is actually been shown. */
-			if(itr->bChecked)
-			{
-				if(m_iPreviousSortedColumnId == itr->id)
-				{
-					bPreviousColumnExists = TRUE;
-					break;
-				}
-
-				iPreviousSortedColumn++;
-			}
-		}
-
-		if(bPreviousColumnExists)
-		{
-			hdItem.mask			= HDI_FORMAT;
-			hdItem.fmt			= HDF_STRING;
-
-			/* Remove the up/down arrow from the column by which
-			results were previously sorted. */
-			Header_SetItem(hHeader,iPreviousSortedColumn,&hdItem);
-		}
-	}
 
 	SortFolder(SortMode);
-
-	if(!m_bSortAscending)
-	{
-		UpOrDownFmt = HDF_SORTDOWN;
-	}
-	else
-	{
-		UpOrDownFmt = HDF_SORTUP;
-	}
-
-	hdItem.mask			= HDI_FORMAT;
-	hdItem.fmt			= UpOrDownFmt | HDF_STRING;
-
-	/* Add the up/down arrow to the column by which
-	items are now sorted. */
-	Header_SetItem(hHeader,iClickedColumn,&hdItem);
-
-	m_iPreviousSortedColumnId = iColumnId;
 }
 
 void CFolderView::ApplyHeaderSortArrow(void)
@@ -2075,7 +2021,6 @@ void CFolderView::ApplyHeaderSortArrow(void)
 	HDITEM hdItem;
 	list<Column_t>::iterator itr;
 	BOOL bPreviousColumnExists = FALSE;
-	int UpOrDownFmt;
 	int iColumn = 0;
 	int iPreviousSortedColumn = 0;
 	int iColumnId = -1;
@@ -2101,21 +2046,22 @@ void CFolderView::ApplyHeaderSortArrow(void)
 
 	if(bPreviousColumnExists)
 	{
-		hdItem.mask	= HDI_FORMAT;
-		hdItem.fmt	= HDF_STRING;
+		hdItem.mask = HDI_FORMAT;
+		Header_GetItem(hHeader,iPreviousSortedColumn,&hdItem);
+
+		if(hdItem.fmt & HDF_SORTUP)
+		{
+			hdItem.fmt &= ~HDF_SORTUP;
+		}
+		else if(hdItem.fmt & HDF_SORTDOWN)
+		{
+			hdItem.fmt &= ~HDF_SORTDOWN;
+		}
 
 		/* Remove the up/down arrow from the column by which
 		results were previously sorted. */
 		Header_SetItem(hHeader,iPreviousSortedColumn,&hdItem);
 	}
-
-	if(!m_bSortAscending)
-		UpOrDownFmt = HDF_SORTDOWN;
-	else
-		UpOrDownFmt = HDF_SORTUP;
-
-	hdItem.mask	= HDI_FORMAT;
-	hdItem.fmt	= UpOrDownFmt | HDF_STRING;
 
 	/* Find the index of the column representing the current sort mode. */
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
@@ -2131,6 +2077,14 @@ void CFolderView::ApplyHeaderSortArrow(void)
 			iColumn++;
 		}
 	}
+
+	hdItem.mask = HDI_FORMAT;
+	Header_GetItem(hHeader,iColumn,&hdItem);
+
+	if(!m_bSortAscending)
+		hdItem.fmt |= HDF_SORTDOWN;
+	else
+		hdItem.fmt |= HDF_SORTUP;
 
 	/* Add the up/down arrow to the column by which
 	items are now sorted. */
