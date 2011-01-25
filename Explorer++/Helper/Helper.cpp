@@ -2244,6 +2244,54 @@ void TabCtrl_SetItemText(HWND Tab,int iTab,TCHAR *Text)
 
 BOOL CheckWildcardMatch(TCHAR *szWildcard,TCHAR *szString,BOOL bCaseSensitive)
 {
+	/* Handles multiple wildcard patterns. If the wildcard pattern contains ':', 
+	split the pattern into multiple subpatterns.
+	For example "*.h: *.cpp" would match against "*.h" and "*.cpp" */
+	BOOL bMultiplePattern = FALSE;
+
+	for(int i = 0; i < lstrlen(szWildcard); i++)
+	{
+		if(szWildcard[i] == ':')
+		{
+			bMultiplePattern = TRUE;
+			break;
+		}
+	}
+
+	if(!bMultiplePattern)
+	{
+		return CheckWildcardMatchInternal(szWildcard,szString,bCaseSensitive);
+	}
+	else
+	{
+		TCHAR szWildcardPattern[512];
+		TCHAR *szSinglePattern = NULL;
+		TCHAR *szSearchPattern = NULL;
+		TCHAR *szRemainingPattern = NULL;
+
+		StringCchCopy(szWildcardPattern,SIZEOF_ARRAY(szWildcardPattern),szWildcard);
+
+		szSinglePattern = cstrtok_s(szWildcardPattern,_T(":"),&szRemainingPattern);
+		PathRemoveBlanks(szSinglePattern);
+
+		while(szSinglePattern != NULL)
+		{
+			if(CheckWildcardMatchInternal(szSinglePattern,szString,bCaseSensitive))
+			{
+				return TRUE;
+			}
+
+			szSearchPattern = szRemainingPattern;
+			szSinglePattern = cstrtok_s(szSearchPattern,_T(":"),&szRemainingPattern);
+			PathRemoveBlanks(szSinglePattern);
+		}
+	}
+
+	return FALSE;
+}
+
+BOOL CheckWildcardMatchInternal(TCHAR *szWildcard,TCHAR *szString,BOOL bCaseSensitive)
+{
 	BOOL bMatched;
 	BOOL bCurrentMatch = TRUE;
 
@@ -2310,7 +2358,7 @@ BOOL CheckWildcardMatch(TCHAR *szWildcard,TCHAR *szString,BOOL bCaseSensitive)
 		szWildcard++;
 	}
 
-	/* Skip past any traling wildcards. */
+	/* Skip past any trailing wildcards. */
 	while(*szWildcard == '*')
 		szWildcard++;
 

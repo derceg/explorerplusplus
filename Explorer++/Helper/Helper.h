@@ -266,6 +266,7 @@ void			EnumLoggedOnUsers(void);
 TCHAR			*PrintComma(unsigned long nPrint);
 TCHAR			*PrintCommaLargeNum(LARGE_INTEGER lPrint);
 BOOL			CheckWildcardMatch(TCHAR *szWildcard,TCHAR *szString,BOOL bCaseSensitive);
+BOOL			CheckWildcardMatchInternal(TCHAR *szWildcard,TCHAR *szString,BOOL bCaseSensitive);
 void			ReplaceCharacters(TCHAR *str,char ch,char replacement);
 TCHAR			*GetToken(TCHAR *ptr,TCHAR *Buffer,TCHAR *BufferLength);
 HRESULT			DecodeFriendlyPath(TCHAR *szFriendlyPath,TCHAR *szParsingPath);
