@@ -783,7 +783,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_FILTER_FILTERRESULTS:
 			{
-				CFilterDialog FilterDialog(g_hLanguageModule,IDD_FILTER,hwnd);
+				CFilterDialog FilterDialog(g_hLanguageModule,IDD_FILTER,hwnd,this);
 
 				FilterDialog.ShowModalDialog();
 			}

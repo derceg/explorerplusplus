@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include <list>
+#include "Explorer++_internal.h"
 #include "FilterDialog.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
@@ -25,9 +26,11 @@
 const TCHAR CFilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
 CFilterDialog::CFilterDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent) :
+	int iResource,HWND hParent,IExplorerplusplus *pexpp) :
 CBaseDialog(hInstance,iResource,hParent)
 {
+	m_pexpp = pexpp;
+
 	m_pfdps = &CFilterDialogPersistentSettings::GetInstance();
 }
 
@@ -48,16 +51,15 @@ BOOL CFilterDialog::OnInitDialog()
 			reinterpret_cast<LPARAM>(strFilter.c_str()));
 	}
 
-	/* TODO: */
-	/*TCHAR szFilter[256];
-	m_pActiveShellBrowser->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
+	TCHAR szFilter[512];
+	m_pexpp->GetActiveShellBrowser()->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
 
 	ComboBox_SelectString(hComboBox,-1,szFilter);
 
 	SendMessage(hComboBox,CB_SETEDITSEL,0,MAKELPARAM(0,-1));
 
-	if (m_pActiveShellBrowser->GetFilterCaseSensitive())
-		CheckDlgButton(m_hDlg,IDC_FILTERS_CASESENSITIVE,BST_CHECKED);*/
+	if (m_pexpp->GetActiveShellBrowser()->GetFilterCaseSensitive())
+		CheckDlgButton(m_hDlg,IDC_FILTERS_CASESENSITIVE,BST_CHECKED);
 
 	if(m_pfdps->m_bStateSaved)
 	{
@@ -107,19 +109,40 @@ void CFilterDialog::OnOk()
 	int iBufSize = GetWindowTextLength(hComboBox);
 
 	TCHAR *pszFilter = new TCHAR[iBufSize + 1];
+
 	SendMessage(hComboBox,WM_GETTEXT,iBufSize + 1,
 		reinterpret_cast<LPARAM>(pszFilter));
-	m_pfdps->m_FilterList.push_front(pszFilter);
-	delete[] pszFilter;
 
-	/* TODO: */
-	/*m_pActiveShellBrowser->SetFilterCaseSensitive(IsDlgButtonChecked(
+	bool bFound = false;
+
+	/* If the entry already exists in the list,
+	simply move the existing entry to the start.
+	Otherwise, insert it at the start. */
+	for(auto itr = m_pfdps->m_FilterList.begin();itr != m_pfdps->m_FilterList.end();itr++)
+	{
+		if(lstrcmp(pszFilter,itr->c_str()) == 0)
+		{
+			std::iter_swap(itr,m_pfdps->m_FilterList.begin());
+
+			bFound = true;
+			break;
+		}
+	}
+
+	if(!bFound)
+	{
+		m_pfdps->m_FilterList.push_front(pszFilter);
+	}
+
+	m_pexpp->GetActiveShellBrowser()->SetFilterCaseSensitive(IsDlgButtonChecked(
 		m_hDlg,IDC_FILTERS_CASESENSITIVE) == BST_CHECKED);
 
-	m_pActiveShellBrowser->SetFilter(pszFilter);
+	m_pexpp->GetActiveShellBrowser()->SetFilter(pszFilter);
 
-	if(!m_pActiveShellBrowser->GetFilterStatus())
-		m_pActiveShellBrowser->SetFilterStatus(TRUE);*/
+	if(!m_pexpp->GetActiveShellBrowser()->GetFilterStatus())
+		m_pexpp->GetActiveShellBrowser()->SetFilterStatus(TRUE);
+
+	delete[] pszFilter;
 
 	EndDialog(m_hDlg,1);
 }
