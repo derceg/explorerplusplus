@@ -1482,6 +1482,17 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 			CloseOtherTabs(iTabHit);
 			break;
 
+		case IDM_TAB_CLOSETABSTORIGHT:
+			{
+				int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+
+				for(int i = nTabs - 1;i > iTabHit;i--)
+				{
+					CloseTab(i);
+				}
+			}
+			break;
+
 		case IDM_TAB_CLOSETAB:
 			CloseTab(iTabHit);
 			break;

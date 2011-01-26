@@ -447,6 +447,7 @@
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="Explorer++.h" />
     <ClInclude Include="Explorer++_internal.h" />
+    <ClInclude Include="FilterDialog.h" />
     <ClInclude Include="iDropSource.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="MassRenameDialog.h" />

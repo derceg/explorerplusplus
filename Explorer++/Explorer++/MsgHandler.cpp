@@ -270,7 +270,6 @@ void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 	}
 
 	(*pLoadSave)->LoadBookmarks();
-	(*pLoadSave)->LoadFilters();
 	(*pLoadSave)->LoadGenericSettings();
 	(*pLoadSave)->LoadDefaultColumns();
 	(*pLoadSave)->LoadApplicationToolbar();
@@ -2841,7 +2840,6 @@ void Explorerplusplus::SaveAllSettings(void)
 
 	pLoadSave->SaveGenericSettings();
 	pLoadSave->SaveTabs();
-	pLoadSave->SaveFilters();
 	pLoadSave->SaveDefaultColumns();
 	pLoadSave->SaveBookmarks();
 	pLoadSave->SaveApplicationToolbar();

@@ -16,6 +16,7 @@
 #include "Explorer++.h"
 #include "SearchDialog.h"
 #include "AboutDialog.h"
+#include "FilterDialog.h"
 
 
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -780,8 +781,11 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case IDM_FILTER_FILTERRESULTS:
-			DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_FILTER),
-				hwnd,FilterProcStub,(LPARAM)this);
+			{
+				CFilterDialog FilterDialog(g_hLanguageModule,IDD_FILTER,hwnd);
+
+				FilterDialog.ShowModalDialog();
+			}
 			break;
 
 		case IDM_FILTER_APPLYFILTER:

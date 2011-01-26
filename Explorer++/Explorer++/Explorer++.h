@@ -76,11 +76,6 @@ typedef struct
 	UINT GroupById;
 } ArrangeMenuItem_t;
 
-typedef struct
-{
-	TCHAR *pszFilterString;
-} Filter_t;
-
 /* Used to hold information on all tabs. */
 typedef struct
 {
@@ -218,7 +213,6 @@ public:
 	INT_PTR CALLBACK	BookmarkPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkFolderPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SplitFileProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	MergeFilesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DestroyFilesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -297,7 +291,6 @@ private:
 
 		/* Loading functions. */
 		void	LoadGenericSettings(void);
-		void	LoadFilters(void);
 		void	LoadBookmarks(void);
 		int		LoadPreviousTabs(void);
 		void	LoadDefaultColumns(void);
@@ -308,7 +301,6 @@ private:
 
 		/* Saving functions. */
 		void	SaveGenericSettings(void);
-		void	SaveFilters(void);
 		void	SaveBookmarks(void);
 		void	SaveTabs(void);
 		void	SaveDefaultColumns(void);
@@ -343,7 +335,6 @@ private:
 
 		/* Loading functions. */
 		void	LoadGenericSettings(void);
-		void	LoadFilters(void);
 		void	LoadBookmarks(void);
 		int		LoadPreviousTabs(void);
 		void	LoadDefaultColumns(void);
@@ -354,7 +345,6 @@ private:
 
 		/* Saving functions. */
 		void	SaveGenericSettings(void);
-		void	SaveFilters(void);
 		void	SaveBookmarks(void);
 		void	SaveTabs(void);
 		void	SaveDefaultColumns(void);
@@ -736,8 +726,6 @@ private:
 	void					LoadDestroyFilesStateFromRegistry(HKEY hParentKey);
 	void					SaveDisplayColorsStateToRegistry(HKEY hParentKey);
 	void					LoadDisplayColorsStateFromRegistry(HKEY hParentKey);
-	void					SaveFilterStateToRegistry(HKEY hParentKey);
-	void					LoadFilterStateFromRegistry(HKEY hParentKey);
 	void					SaveMergeFilesStateToRegistry(HKEY hParentKey);
 	void					LoadMergeFilesStateFromRegistry(HKEY hParentKey);
 	void					SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey);
@@ -794,10 +782,6 @@ private:
 
 	/* Default settings. */
 	void					SetDefaultTabSettings(TabInfo_t *pTabInfo);
-
-	/* Filters. */
-	LONG					LoadFilters(void);
-	LONG					SaveFilters(void);
 
 	/* Color rules. */
 	void					InitializeColorRules(void);
@@ -940,9 +924,6 @@ private:
 	int						LookupColumnDescriptionStringIndex(int iColumnId);
 	void					CopyColumnInfoToClipboard(void);
 
-	/* Filter dialog. */
-	void					FilterSaveState(HWND hDlg);
-
 	/* Bookmarks. */
 	void					InsertBookmarkToolbarButtons(void);
 	void					InsertToolbarButtonsInternal(Bookmark_t *pBookmark);
@@ -1021,9 +1002,6 @@ private:
 	void					SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	int						LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,list<Column_t> *pColumns);
 	void					SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pColumnsNode,list<Column_t> *pColumns,TCHAR *szColumnSet,int iIndent);
-	int						LoadFiltersFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					SaveFiltersToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					SaveFiltersToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	int						LoadBookmarksFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					LoadBookmarksFromXMLInternal(MSXML2::IXMLDOMNode *pNode,void *pParentFolder);
 	void					SaveBookmarksToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
@@ -1356,10 +1334,6 @@ private:
 	BOOL					m_bDestroyFilesDlgStateSaved;
 	POINT					m_ptDestroyFiles;
 
-	/* Filter dialog. */
-	BOOL					m_bFilterDlgStateSaved;
-	POINT					m_ptFilter;
-
 	/* Merge files dialog. */
 	BOOL					m_bMergeFilesDlgStateSaved;
 	POINT					m_ptMergeFiles;
@@ -1408,9 +1382,6 @@ private:
 	list<ArrangeMenuItem_t>	m_ArrangeMenuMyComputer;
 	list<ArrangeMenuItem_t>	m_ArrangeMenuControlPanel;
 	list<ArrangeMenuItem_t>	m_ArrangeMenuRecycleBin;
-
-	/* Filtering related data. */
-	list<Filter_t>			m_FilterList;
 
 	/* TreeView middle click. */
 	HTREEITEM				m_hTVMButtonItem;

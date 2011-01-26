@@ -13,130 +13,167 @@
 
 #include "stdafx.h"
 #include <list>
-#include "Misc.h"
-#include "Explorer++.h"
-#include "../Helper/FileOperations.h"
-#include "../Helper/Helper.h"
-#include "../Helper/Controls.h"
-#include "../Helper/Bookmark.h"
+#include "FilterDialog.h"
 #include "MainResource.h"
+#include "../Helper/Helper.h"
+#include "../Helper/Registry.h"
+#include "../Helper/XMLSettings.h"
 
 
-INT_PTR CALLBACK FilterProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+const TCHAR CFilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
+
+CFilterDialog::CFilterDialog(HINSTANCE hInstance,
+	int iResource,HWND hParent) :
+CBaseDialog(hInstance,iResource,hParent)
 {
-	static Explorerplusplus *pContainer = NULL;
-
-	switch(uMsg)
-	{
-		case WM_INITDIALOG:
-		{
-			pContainer = (Explorerplusplus *)lParam;
-		}
-		break;
-	}
-
-	return pContainer->FilterProc(hDlg,uMsg,wParam,lParam);
+	m_pfdps = &CFilterDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CALLBACK Explorerplusplus::FilterProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+CFilterDialog::~CFilterDialog()
 {
-	switch(uMsg)
+
+}
+
+BOOL CFilterDialog::OnInitDialog()
+{
+	HWND hComboBox = GetDlgItem(m_hDlg,IDC_FILTER_COMBOBOX);
+
+	SetFocus(hComboBox);
+
+	for each(auto strFilter in m_pfdps->m_FilterList)
 	{
-		case WM_INITDIALOG:
-			{
-				HWND						hComboBox;
-				list<Filter_t>::iterator	itr;
+		SendMessage(hComboBox,CB_ADDSTRING,static_cast<WPARAM>(-1),
+			reinterpret_cast<LPARAM>(strFilter.c_str()));
+	}
 
-				hComboBox = GetDlgItem(hDlg,IDC_FILTER_COMBOBOX);
+	/* TODO: */
+	/*TCHAR szFilter[256];
+	m_pActiveShellBrowser->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
 
-				SetFocus(hComboBox);
+	ComboBox_SelectString(hComboBox,-1,szFilter);
 
-				for(itr = m_FilterList.begin();itr != m_FilterList.end();itr++)
-				{
-					if(itr == m_FilterList.begin())
-						SendMessage(hComboBox,WM_SETTEXT,0,(LPARAM)itr->pszFilterString);
+	SendMessage(hComboBox,CB_SETEDITSEL,0,MAKELPARAM(0,-1));
 
-					SendMessage(hComboBox,CB_ADDSTRING,(WPARAM)-1,(LPARAM)itr->pszFilterString);
-				}
+	if (m_pActiveShellBrowser->GetFilterCaseSensitive())
+		CheckDlgButton(m_hDlg,IDC_FILTERS_CASESENSITIVE,BST_CHECKED);*/
 
-				TCHAR szFilter[256];
-				m_pActiveShellBrowser->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
-
-				ComboBox_SelectString(hComboBox,-1,szFilter);
-
-				SendMessage(hComboBox,CB_SETEDITSEL,0,MAKELPARAM(0,-1));
-
-				if (m_pActiveShellBrowser->GetFilterCaseSensitive())
-					CheckDlgButton(hDlg,IDC_FILTERS_CASESENSITIVE,BST_CHECKED);
-				
-				if(m_bFilterDlgStateSaved)
-				{
-					SetWindowPos(hDlg,NULL,m_ptFilter.x,m_ptFilter.y,
-						0,0,SWP_NOSIZE|SWP_NOZORDER);
-				}
-				else
-				{
-					CenterWindow(m_hContainer,hDlg);
-				}
-			}
-			break;
-
-		case WM_COMMAND:
-			switch(LOWORD(wParam))
-			{
-				case IDOK:
-					{
-						HWND		hComboBox;
-						Filter_t	Filter;
-						int			iBufSize;
-
-						hComboBox = GetDlgItem(hDlg,IDC_FILTER_COMBOBOX);
-
-						iBufSize = GetWindowTextLength(hComboBox);
-
-						Filter.pszFilterString = (TCHAR *)malloc((iBufSize + 1) * sizeof(TCHAR));
-
-						SendMessage(hComboBox,WM_GETTEXT,iBufSize + 1,(LPARAM)Filter.pszFilterString);
-
-						m_FilterList.push_front(Filter);
-
-						m_pActiveShellBrowser->SetFilterCaseSensitive(IsDlgButtonChecked(
-							hDlg,IDC_FILTERS_CASESENSITIVE) == BST_CHECKED);
-
-						m_pActiveShellBrowser->SetFilter(Filter.pszFilterString);
-
-						if(!m_pActiveShellBrowser->GetFilterStatus())
-							m_pActiveShellBrowser->SetFilterStatus(TRUE);
-
-						FilterSaveState(hDlg);
-
-						EndDialog(hDlg,0);
-					}
-					break;
-
-				case IDCANCEL:
-					FilterSaveState(hDlg);
-					EndDialog(hDlg,1);
-					break;
-			}
-			break;
-
-		case WM_CLOSE:
-			FilterSaveState(hDlg);
-			EndDialog(hDlg,0);
-			break;
+	if(m_pfdps->m_bStateSaved)
+	{
+		SetWindowPos(m_hDlg,NULL,m_pfdps->m_ptDialog.x,
+			m_pfdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
+	}
+	else
+	{
+		CenterWindow(GetParent(m_hDlg),m_hDlg);
 	}
 
 	return 0;
 }
 
-void Explorerplusplus::FilterSaveState(HWND hDlg)
+BOOL CFilterDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
-	RECT rcTemp;
+	switch(LOWORD(wParam))
+	{
+	case IDOK:
+		OnOk();
+		break;
 
-	GetWindowRect(hDlg,&rcTemp);
-	m_ptFilter.x = rcTemp.left;
-	m_ptFilter.y = rcTemp.top;
+	case IDCANCEL:
+		OnCancel();
+		break;
+	}
 
-	m_bFilterDlgStateSaved = TRUE;
+	return 0;
+}
+
+BOOL CFilterDialog::OnClose()
+{
+	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CFilterDialog::OnDestroy()
+{
+	SaveState();
+	return 0;
+}
+
+void CFilterDialog::OnOk()
+{
+	HWND hComboBox = GetDlgItem(m_hDlg,IDC_FILTER_COMBOBOX);
+
+	int iBufSize = GetWindowTextLength(hComboBox);
+
+	TCHAR *pszFilter = new TCHAR[iBufSize + 1];
+	SendMessage(hComboBox,WM_GETTEXT,iBufSize + 1,
+		reinterpret_cast<LPARAM>(pszFilter));
+	m_pfdps->m_FilterList.push_front(pszFilter);
+	delete[] pszFilter;
+
+	/* TODO: */
+	/*m_pActiveShellBrowser->SetFilterCaseSensitive(IsDlgButtonChecked(
+		m_hDlg,IDC_FILTERS_CASESENSITIVE) == BST_CHECKED);
+
+	m_pActiveShellBrowser->SetFilter(pszFilter);
+
+	if(!m_pActiveShellBrowser->GetFilterStatus())
+		m_pActiveShellBrowser->SetFilterStatus(TRUE);*/
+
+	EndDialog(m_hDlg,1);
+}
+
+void CFilterDialog::OnCancel()
+{
+	EndDialog(m_hDlg,0);
+}
+
+void CFilterDialog::SaveState()
+{
+	RECT rc;
+	GetWindowRect(m_hDlg,&rc);
+	m_pfdps->m_ptDialog.x = rc.left;
+	m_pfdps->m_ptDialog.y = rc.top;
+
+	m_pfdps->m_bStateSaved = TRUE;
+}
+
+CFilterDialogPersistentSettings::CFilterDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
+{
+
+}
+
+CFilterDialogPersistentSettings::~CFilterDialogPersistentSettings()
+{
+	
+}
+
+CFilterDialogPersistentSettings& CFilterDialogPersistentSettings::GetInstance()
+{
+	static CFilterDialogPersistentSettings sfadps;
+	return sfadps;
+}
+
+void CFilterDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
+{
+	SaveStringListToRegistry(hKey,_T("Filter"),m_FilterList);
+}
+
+void CFilterDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
+{
+	ReadStringListFromRegistry(hKey,_T("Filter"),m_FilterList);
+}
+
+void CFilterDialogPersistentSettings::SaveExtraXMLSettings(
+	MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
+{
+	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Filter"),m_FilterList);
+}
+
+void CFilterDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+{
+	if(CheckWildcardMatch(_T("Filter*"),bstrName,TRUE))
+	{
+		m_FilterList.push_back(bstrValue);
+	}
 }

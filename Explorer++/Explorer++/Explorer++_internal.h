@@ -19,7 +19,6 @@
 #include "../HolderWindow/HolderWindow.h"
 #include "MainResource.h"
 
-
 extern HINSTANCE g_hLanguageModule;
 
 #define VERSION_NUMBER		_T("1.2")
@@ -27,7 +26,7 @@ extern HINSTANCE g_hLanguageModule;
 #define WINDOW_NAME			_T("Explorer++")
 #define CLASS_NAME			_T("Explorer++")
 #define WEBSITE_URL			_T("http://www.explorerplusplus.com")
-#define WEBSITE_URL_TEXT	_T("www.explorerplusplus.com"
+#define WEBSITE_URL_TEXT	_T("www.explorerplusplus.com")
 
 /* The name of the XML file that preferences are
 saved to/loaded from. */
@@ -614,7 +613,6 @@ public:
 
 	/* Loading functions. */
 	virtual void	LoadGenericSettings(void);
-	virtual void	LoadFilters(void);
 	virtual void	LoadBookmarks();
 	virtual int		LoadPreviousTabs(void);
 	virtual void	LoadDefaultColumns(void);
@@ -625,7 +623,6 @@ public:
 
 	/* Saving functions. */
 	virtual void	SaveGenericSettings(void);
-	virtual void	SaveFilters(void);
 	virtual void	SaveBookmarks();
 	virtual void	SaveTabs(void);
 	virtual void	SaveDefaultColumns(void);
@@ -646,7 +643,6 @@ LRESULT CALLBACK DrivesToolbarSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPA
 LRESULT CALLBACK EditSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 LRESULT CALLBACK TabBackingProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK FilterProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK DestroyFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK ApplicationButtonPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK ApplicationToolbarNewButtonProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);

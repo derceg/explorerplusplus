@@ -815,8 +815,9 @@ BEGIN
         MENUITEM "&Lock Tab",                   IDM_TAB_LOCKTAB
         MENUITEM "L&ock Tab and Address",       IDM_TAB_LOCKTABANDADDRESS
         MENUITEM SEPARATOR
-        MENUITEM "Close &Other Tabs",           IDM_TAB_CLOSEOTHERTABS
         MENUITEM "&Close Tab\tCtrl+W",          IDM_TAB_CLOSETAB
+        MENUITEM "Close &Other Tabs",           IDM_TAB_CLOSEOTHERTABS
+        MENUITEM "Clo&se Tabs to the Right",    IDM_TAB_CLOSETABSTORIGHT
     END
 END
 
@@ -1540,6 +1541,7 @@ BEGIN
     IDM_TOOLS_SEARCH        "Search for files"
     IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT 
                             "Set the layout of the current columns as the default layout"
+    IDM_TAB_CLOSETABSTORIGHT "Closes all tabs to the right of this one"
 END
 
 STRINGTABLE

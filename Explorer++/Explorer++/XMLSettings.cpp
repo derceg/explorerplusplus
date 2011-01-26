@@ -24,6 +24,7 @@
 #include "WildcardSelectDialog.h"
 #include "RenameTabDialog.h"
 #include "MassRenameDialog.h"
+#include "FilterDialog.h"
 #include "../Helper/XMLSettings.h"
 
 #import <msxml3.dll> raw_interfaces_only
@@ -866,56 +867,6 @@ int Explorerplusplus::LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,list<Column_t
 	return iColumnType;
 }
 
-void Explorerplusplus::SaveFiltersToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
-{
-	MSXML2::IXMLDOMElement	*pe = NULL;
-	BSTR					bstr = NULL;
-	BSTR					bstr_wsnt= SysAllocString(L"\n\t");
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pRoot);
-
-	bstr = SysAllocString(L"Filters");
-	pXMLDom->createElement(bstr,&pe);
-	SysFreeString(bstr);
-	bstr = NULL;
-
-	SaveFiltersToXMLInternal(pXMLDom,pe);
-
-	NXMLSettings::AppendChildToParent(pe,pRoot);
-	pe->Release();
-	pe = NULL;
-}
-
-void Explorerplusplus::SaveFiltersToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe)
-{
-	MSXML2::IXMLDOMElement		*pParentNode = NULL;
-	list<Filter_t>::iterator	itr;
-	TCHAR						szAttributeName[32];
-	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
-	BSTR						bstr_wsntt = SysAllocString(L"\n\t\t");
-	int							i = 0;
-
-	for(itr = m_FilterList.begin();itr != m_FilterList.end();itr++)
-	{
-		wsprintf(szAttributeName,_T("%d"),i);
-		NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Filter"),szAttributeName);
-
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("String"),itr->pszFilterString);
-
-		pParentNode->Release();
-		pParentNode = NULL;
-
-		i++;
-	}
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
-
-	SysFreeString(bstr_wsnt);
-	SysFreeString(bstr_wsntt);
-}
-
 int Explorerplusplus::LoadBookmarksFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
@@ -1049,7 +1000,6 @@ MSXML2::IXMLDOMElement *pRoot)
 	MSXML2::IXMLDOMElement		*pe = NULL;
 	Bookmark_t					RootBookmark;
 	Bookmark_t					FirstChild;
-	list<Filter_t>::iterator	itr;
 	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
 	BSTR						bstr;
 	HRESULT						hr;
@@ -1181,77 +1131,6 @@ MSXML2::IXMLDOMElement *pe,Bookmark_t *pBookmark)
 	pParentNode = NULL;
 
 	SysFreeString(bstr_wsntt);
-}
-
-int Explorerplusplus::LoadFiltersFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
-{
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
-	BSTR						bstrValue;
-	BSTR						bstr = NULL;
-	Filter_t					Filter;
-	HRESULT						hr;
-	long						length;
-
-	m_FilterList.clear();
-
-	if(!pXMLDom)
-		goto clean;
-
-	bstr = SysAllocString(L"//Filters/*");
-	pXMLDom->selectNodes(bstr,&pNodes);
-
-	if(!pNodes)
-	{
-		goto clean;
-	}
-	else
-	{
-		pNodes->get_length(&length);
-
-		for(long i = 0; i < length; i++)
-		{
-			hr = pNodes->get_item(i, &pNode);
-
-			if(SUCCEEDED(hr))
-			{
-				hr = pNode->get_attributes(&am);
-
-				if(SUCCEEDED(hr))
-				{
-					/* Each filter item will have an attribute
-					named 'String'. This attribute will be followed
-					by the filter string. There are no other
-					attributes for this item. */
-					hr = am->get_item(1,&pChildNode);
-
-					if(SUCCEEDED(hr))
-					{
-						/* Element value. */
-						pChildNode->get_text(&bstrValue);
-
-						Filter.pszFilterString = (TCHAR *)malloc((lstrlen(bstrValue) + 1) * sizeof(TCHAR));
-
-						StringCchCopy(Filter.pszFilterString,lstrlen(bstrValue) + 1,bstrValue);
-
-						m_FilterList.push_back(Filter);
-					}
-				}
-
-				pNode->Release();
-				pNode = NULL;
-			}
-		}
-	}
-
-clean:
-	if (bstr) SysFreeString(bstr);
-	if (pNodes) pNodes->Release();
-	if (pNode) pNode->Release();
-
-	return 0;
 }
 
 int Explorerplusplus::LoadDefaultColumnsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
@@ -1558,7 +1437,6 @@ void Explorerplusplus::SaveApplicationToolbarToXML(MSXML2::IXMLDOMDocument *pXML
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement		*pe = NULL;
-	list<Filter_t>::iterator	itr;
 	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
 	BSTR						bstr;
 
@@ -2017,6 +1895,8 @@ void Explorerplusplus::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 							CRenameTabDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("MassRename")) == 0)
 							CMassRenameDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
+						else if(lstrcmpi(bstrValue,_T("Filter")) == 0)
+							CFilterDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 					}
 				}
 			}
@@ -2122,6 +2002,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	CWildcardSelectDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CRenameTabDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CMassRenameDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CFilterDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 
@@ -2837,11 +2718,6 @@ void Explorerplusplus::CLoadSaveXML::LoadGenericSettings(void)
 	m_pContainer->LoadGenericSettingsFromXML(m_pXMLDom);
 }
 
-void Explorerplusplus::CLoadSaveXML::LoadFilters(void)
-{
-	m_pContainer->LoadFiltersFromXML(m_pXMLDom);
-}
-
 void Explorerplusplus::CLoadSaveXML::LoadBookmarks(void)
 {
 	m_pContainer->LoadBookmarksFromXML(m_pXMLDom);
@@ -2880,11 +2756,6 @@ void Explorerplusplus::CLoadSaveXML::LoadState(void)
 void Explorerplusplus::CLoadSaveXML::SaveGenericSettings(void)
 {
 	m_pContainer->SaveGenericSettingsToXML(m_pXMLDom,m_pRoot);
-}
-
-void Explorerplusplus::CLoadSaveXML::SaveFilters(void)
-{
-	m_pContainer->SaveFiltersToXML(m_pXMLDom,m_pRoot);
 }
 
 void Explorerplusplus::CLoadSaveXML::SaveBookmarks(void)

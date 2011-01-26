@@ -18,6 +18,7 @@
 #include "SetFileAttributesDialog.h"
 #include "RenameTabDialog.h"
 #include "MassRenameDialog.h"
+#include "FilterDialog.h"
 #include "../Helper/Registry.h"
 
 #define SMALL_SIZE		5
@@ -325,85 +326,6 @@ LONG Explorerplusplus::LoadSettings(LPCTSTR KeyPath)
 			CLIP_DEFAULT_PRECIS,PROOF_QUALITY,FIXED_PITCH|FF_MODERN,
 			_T("Segoe UI"));
 
-	return ReturnValue;
-}
-
-LONG Explorerplusplus::SaveFilters(void)
-{
-	HKEY						hFiltersKey;
-	list<Filter_t>::iterator	itr;
-	TCHAR						szKeyName[SMALL_SIZE];
-	DWORD						Disposition;
-	LONG						ReturnValue;
-	int							i = 0;
-
-	/* First, delete the key (so that any previous values are
-	erased). */
-	SHDeleteKey(HKEY_CURRENT_USER,REG_FILTERS_KEY);
-
-	ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_FILTERS_KEY,
-	0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,
-	NULL,&hFiltersKey,&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		for(itr = m_FilterList.begin();itr != m_FilterList.end();itr++)
-		{
-			StringCchPrintf(szKeyName,SIZEOF_ARRAY(szKeyName),_T("%d"),i);
-
-			ReturnValue = RegSetValueEx(hFiltersKey,szKeyName,0,REG_SZ,
-				(LPBYTE)itr->pszFilterString,lstrlen(itr->pszFilterString) * sizeof(TCHAR));
-
-			i++;
-		}
-
-		/* Close all the keys used... */
-		RegCloseKey(hFiltersKey);
-	}
-
-	return ReturnValue;
-}
-
-LONG Explorerplusplus::LoadFilters(void)
-{
-	HKEY		hFiltersKey;
-	Filter_t	Filter;
-	TCHAR		szKeyName[SMALL_SIZE];
-	LONG		ReturnValue;
-	DWORD		Type;
-	DWORD		cbData;
-	int			i = 0;
-
-	m_FilterList.clear();
-
-	ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_FILTERS_KEY,0,KEY_READ,&hFiltersKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		StringCchPrintf(szKeyName,SIZEOF_ARRAY(szKeyName),_T("%d"),i);
-
-		while(RegQueryValueEx(hFiltersKey,szKeyName,0,NULL,NULL,&cbData)
-			== ERROR_SUCCESS)
-		{
-			Filter.pszFilterString = (TCHAR *)malloc(cbData + 1);
-
-			RegQueryValueEx(hFiltersKey,szKeyName,0,&Type,(LPBYTE)Filter.pszFilterString,&cbData);
-
-			Filter.pszFilterString[lstrlen(Filter.pszFilterString) + 1] = '\0';
-
-			m_FilterList.push_back(Filter);
-
-			//free(Filter.pszFilterString);
-
-			i++;
-			StringCchPrintf(szKeyName,SIZEOF_ARRAY(szKeyName),_T("%d"),i);
-		}
-	}
-
-	/* Close all the keys used... */
-	RegCloseKey(hFiltersKey);
-
-	/* Return the number of directory paths that were successfully read. */
 	return ReturnValue;
 }
 
@@ -1441,7 +1363,6 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		SaveCustomizeColorsStateToRegistry(hKey);
 		SaveDestroyFilesStateToRegistry(hKey);
 		SaveDisplayColorsStateToRegistry(hKey);
-		SaveFilterStateToRegistry(hKey);
 		SaveMergeFilesStateToRegistry(hKey);
 		SaveOrganizeBookmarksStateToRegistry(hKey);
 		SaveSelectColumnsStateToRegistry(hKey);
@@ -1453,6 +1374,7 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		CSetFileAttributesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CRenameTabDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CMassRenameDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		CFilterDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1568,29 +1490,6 @@ void Explorerplusplus::SaveDisplayColorsStateToRegistry(HKEY hParentKey)
 			RegSetValueEx(hKey,_T("Position"),0,
 				REG_BINARY,(LPBYTE)&m_ptDisplayColors,
 				sizeof(m_ptDisplayColors));
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::SaveFilterStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_FILTER_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bFilterDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptFilter,
-				sizeof(m_ptFilter));
 		}
 
 		RegCloseKey(hKey);
@@ -1726,7 +1625,6 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		LoadCustomizeColorsStateFromRegistry(hKey);
 		LoadDestroyFilesStateFromRegistry(hKey);
 		LoadDisplayColorsStateFromRegistry(hKey);
-		LoadFilterStateFromRegistry(hKey);
 		LoadMergeFilesStateFromRegistry(hKey);
 		LoadOrganizeBookmarksStateFromRegistry(hKey);
 		LoadSelectColumnsStateFromRegistry(hKey);
@@ -1738,6 +1636,7 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		CSetFileAttributesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CRenameTabDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CMassRenameDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		CFilterDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1856,30 +1755,6 @@ void Explorerplusplus::LoadDisplayColorsStateFromRegistry(HKEY hParentKey)
 		if(ReturnValue == ERROR_SUCCESS)
 		{
 			m_bDisplayColorsDlgStateSaved = TRUE;
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadFilterStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_FILTER_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptFilter,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bFilterDlgStateSaved = TRUE;
 		}
 
 		RegCloseKey(hKey);
@@ -2011,11 +1886,6 @@ void Explorerplusplus::CLoadSaveRegistry::LoadGenericSettings(void)
 	m_pContainer->LoadSettings(REG_MAIN_KEY);
 }
 
-void Explorerplusplus::CLoadSaveRegistry::LoadFilters(void)
-{
-	m_pContainer->LoadFilters();
-}
-
 void Explorerplusplus::CLoadSaveRegistry::LoadBookmarks(void)
 {
 	m_pContainer->LoadBookmarksFromRegistry();
@@ -2054,11 +1924,6 @@ void Explorerplusplus::CLoadSaveRegistry::LoadState(void)
 void Explorerplusplus::CLoadSaveRegistry::SaveGenericSettings(void)
 {
 	m_pContainer->SaveSettings();
-}
-
-void Explorerplusplus::CLoadSaveRegistry::SaveFilters(void)
-{
-	m_pContainer->SaveFilters();
 }
 
 void Explorerplusplus::CLoadSaveRegistry::SaveBookmarks(void)
