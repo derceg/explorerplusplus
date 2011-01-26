@@ -20,6 +20,7 @@ CStatusBar::CStatusBar(HWND hwnd)
 {
 	m_hwnd = hwnd;
 
+	m_bAlteredStatusBarParts = false;
 	m_nParts = 0;
 }
 
@@ -58,6 +59,8 @@ void CStatusBar::HandleStatusBarMenuOpen(void)
 			m_TextList.push_back(szPartText);
 		}
 
+		m_nParts = nParts;
+
 		int aWidths = -1;
 
 		/* Set the number of status bar parts to one. This single
@@ -65,7 +68,7 @@ void CStatusBar::HandleStatusBarMenuOpen(void)
 		menu. */
 		SendMessage(m_hwnd,SB_SETPARTS,1,reinterpret_cast<LPARAM>(&aWidths));
 
-		m_bAlteredStatusBarParts = TRUE;
+		m_bAlteredStatusBarParts = true;
 	}
 }
 
@@ -94,5 +97,5 @@ void CStatusBar::HandleStatusBarMenuClose(void)
 
 	m_nParts = 0;
 	m_TextList.clear();
-	m_bAlteredStatusBarParts = FALSE;
+	m_bAlteredStatusBarParts = false;
 }

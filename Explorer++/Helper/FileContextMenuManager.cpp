@@ -15,6 +15,7 @@
 #include <vector>
 #include "ShellHelper.h"
 #include "FileContextMenuManager.h"
+#include "StatusBar.h"
 
 
 LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
@@ -141,7 +142,8 @@ CFileContextMenuManager::~CFileContextMenuManager()
 }
 
 HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
-	int iMinID,int iMaxID,POINT *ppt,DWORD_PTR dwData,BOOL bRename,BOOL bExtended)
+	int iMinID,int iMaxID,POINT *ppt,CStatusBar *pStatusBar,
+	DWORD_PTR dwData,BOOL bRename,BOOL bExtended)
 {
 	if(m_pActualContext == NULL)
 	{
@@ -154,6 +156,8 @@ HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 	{
 		return E_FAIL;
 	}
+
+	m_pStatusBar = pStatusBar;
 
 	m_iMinID = iMinID;
 	m_iMaxID = iMaxID;
@@ -292,33 +296,36 @@ LRESULT CALLBACK CFileContextMenuManager::ShellMenuHookProc(HWND hwnd,UINT uMsg,
 
 		case WM_MENUSELECT:
 			{
-				if(HIWORD(wParam) == 0xFFFF && lParam == 0)
+				if(m_pStatusBar != NULL)
 				{
-					//HandleStatusBarMenuClose();
-				}
-				else
-				{
-					//HandleStatusBarMenuOpen();
-
-					int iCmd = static_cast<int>(LOWORD(wParam));
-
-					if(!((HIWORD(wParam) & MF_POPUP) == MF_POPUP) &&
-						(iCmd >= m_iMinID && iCmd <= m_iMaxID))
+					if(HIWORD(wParam) == 0xFFFF && lParam == 0)
 					{
-						TCHAR szHelpString[512];
+						m_pStatusBar->HandleStatusBarMenuClose();
+					}
+					else
+					{
+						m_pStatusBar->HandleStatusBarMenuOpen();
 
-						/* Ask for the help string for the currently selected menu item. */
-						HRESULT hr = m_pActualContext->GetCommandString(iCmd - m_iMinID,GCS_HELPTEXT,
+						int iCmd = static_cast<int>(LOWORD(wParam));
+
+						if(!((HIWORD(wParam) & MF_POPUP) == MF_POPUP) &&
+							(iCmd >= m_iMinID && iCmd <= m_iMaxID))
+						{
+							TCHAR szHelpString[512];
+
+							/* Ask for the help string for the currently selected menu item. */
+							HRESULT hr = m_pActualContext->GetCommandString(iCmd - m_iMinID,GCS_HELPTEXT,
 								NULL,reinterpret_cast<LPSTR>(szHelpString),SIZEOF_ARRAY(szHelpString));
 
-						/* If the help string was found, send it to the status bar. */
-						if(hr == NOERROR)
-						{
-							//SendMessage(m_hStatusBar,SB_SETTEXT,(WPARAM)0|0,(LPARAM)szHelpString);
-						}
+							/* If the help string was found, send it to the status bar. */
+							if(hr == NOERROR)
+							{
+								m_pStatusBar->SetPartText(0,szHelpString);
+							}
 
-						/* Prevent the message from been passed onto the main window. */
-						return 0;
+							/* Prevent the message from been passed onto the original window. */
+							return 0;
+						}
 					}
 				}
 			}

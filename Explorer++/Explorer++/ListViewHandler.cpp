@@ -1217,10 +1217,11 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 			pidlList);
 
 		FileContextMenuInfo_t fcmi;
-
 		fcmi.uFrom = FROM_LISTVIEW;
 
-		fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,pCursorPos,
+		CStatusBar StatusBar(m_hStatusBar);
+
+		fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,pCursorPos,&StatusBar,
 			reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,GetKeyState(VK_SHIFT) & 0x80);
 
 		CoTaskMemFree(pidlDirectory);

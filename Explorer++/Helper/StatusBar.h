@@ -26,8 +26,7 @@ private:
 	int				*m_pPartWidths;
 	list<wstring>	m_TextList;
 
-	/* TODO: Needed? */
-	BOOL			m_bAlteredStatusBarParts;
+	bool			m_bAlteredStatusBarParts;
 };
 
 #endif

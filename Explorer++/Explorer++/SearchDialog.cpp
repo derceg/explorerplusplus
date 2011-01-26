@@ -711,8 +711,9 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 							ptCursor.x = GET_X_LPARAM(dwCursorPos);
 							ptCursor.y = GET_Y_LPARAM(dwCursorPos);
 
+							/* TODO: Pass CStatusBar. */
 							fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&ptCursor,NULL,
-								FALSE,GetKeyState(VK_SHIFT) & 0x80);
+								NULL,FALSE,GetKeyState(VK_SHIFT) & 0x80);
 
 							CoTaskMemFree(pidlDirectory);
 							CoTaskMemFree(pidlFull);

@@ -2,6 +2,7 @@
 #define FILECONTEXTMENUMANAGER_INCLUDED
 
 #include <list>
+#include "StatusBar.h"
 
 __interface IFileContextMenuExternal
 {
@@ -29,7 +30,7 @@ public:
 	~CFileContextMenuManager();
 
 	/* Shows the context menu. */
-	HRESULT				ShowMenu(IFileContextMenuExternal *pfcme,int iMinID,int iMaxID,POINT *ppt,DWORD_PTR dwData,BOOL bRename = FALSE,BOOL bExtended = FALSE);
+	HRESULT				ShowMenu(IFileContextMenuExternal *pfcme,int iMinID,int iMaxID,POINT *ppt,CStatusBar *pStatusBar,DWORD_PTR dwData,BOOL bRename = FALSE,BOOL bExtended = FALSE);
 
 	LRESULT CALLBACK	ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,DWORD_PTR dwRefData);
 
@@ -45,6 +46,8 @@ private:
 	HWND				m_hwnd;
 	int					m_iMinID;
 	int					m_iMaxID;
+
+	CStatusBar			*m_pStatusBar;
 
 	LPITEMIDLIST		m_pidlParent;
 	std::list<LPITEMIDLIST>	m_pidlItemList;

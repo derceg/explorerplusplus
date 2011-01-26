@@ -474,10 +474,11 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 												pidlItemList);
 
 											FileContextMenuInfo_t fcmi;
-
 											fcmi.uFrom = FROM_DRIVEBAR;
 
-											fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,
+											CStatusBar StatusBar(m_hStatusBar);
+
+											fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,&StatusBar,
 												reinterpret_cast<DWORD_PTR>(&fcmi),FALSE,GetKeyState(VK_SHIFT) & 0x80);
 
 											CoTaskMemFree(pidlItem);
