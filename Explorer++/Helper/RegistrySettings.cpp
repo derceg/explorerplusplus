@@ -1,7 +1,7 @@
 /******************************************************************
  *
  * Project: Helper
- * File: Registry.cpp
+ * File: RegistrySettings.cpp
  * License: GPL - See COPYING in the top level directory
  *
  * Provides various registry functionality.
@@ -14,29 +14,28 @@
 #include "stdafx.h"
 #include <list>
 #include <string>
-#include "Registry.h"
+#include "RegistrySettings.h"
 
 
-LONG SaveDwordToRegistry(HKEY hKey,const TCHAR *KeyName,DWORD Value)
+LONG NRegistrySettings::SaveDwordToRegistry(HKEY hKey,const TCHAR *szKey,DWORD dwValue)
 {
-	return RegSetValueEx(hKey,KeyName,0,REG_DWORD,(LPBYTE)&Value,sizeof(Value));
+	return RegSetValueEx(hKey,szKey,0,REG_DWORD,reinterpret_cast<const BYTE *>(&dwValue),sizeof(dwValue));
 }
 
-LONG ReadDwordFromRegistry(HKEY hKey,TCHAR *KeyName,DWORD *pReturnValue)
+LONG NRegistrySettings::ReadDwordFromRegistry(HKEY hKey,const TCHAR *szKey,DWORD *pReturnValue)
 {
-	DWORD SizeOfData;
+	DWORD dwSize = sizeof(DWORD);
 
-	SizeOfData = sizeof(DWORD);
-
-	return RegQueryValueEx(hKey,KeyName,0,0,(LPBYTE)pReturnValue,&SizeOfData);
+	return RegQueryValueEx(hKey,szKey,0,0,reinterpret_cast<LPBYTE>(pReturnValue),&dwSize);
 }
 
-LONG SaveStringToRegistry(HKEY hKey,const TCHAR *KeyName,const TCHAR *String)
+LONG NRegistrySettings::SaveStringToRegistry(HKEY hKey,const TCHAR *szKey,const TCHAR *szValue)
 {
-	return RegSetValueEx(hKey,KeyName,0,REG_SZ,(LPBYTE)String,lstrlen(String) * sizeof(TCHAR));
+	return RegSetValueEx(hKey,szKey,0,REG_SZ,reinterpret_cast<const BYTE *>(szValue),
+		lstrlen(szValue) * sizeof(TCHAR));
 }
 
-LONG ReadStringFromRegistry(HKEY hKey,TCHAR *KeyName,TCHAR *String,DWORD BufferSize)
+LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const TCHAR *szKey,TCHAR *szOutput,DWORD BufferSize)
 {
 	LONG	lRes;
 	DWORD	dwType;
@@ -44,7 +43,7 @@ LONG ReadStringFromRegistry(HKEY hKey,TCHAR *KeyName,TCHAR *String,DWORD BufferS
 
 	dwBufSize = BufferSize;
 
-	lRes = RegQueryValueEx(hKey,KeyName,0,&dwType,(LPBYTE)String,&dwBufSize);
+	lRes = RegQueryValueEx(hKey,szKey,0,&dwType,reinterpret_cast<LPBYTE>(szOutput),&dwBufSize);
 
 	/* The returned buffer size includes any terminating
 	NULL bytes (if the string was stored with a NULL byte).
@@ -57,16 +56,28 @@ LONG ReadStringFromRegistry(HKEY hKey,TCHAR *KeyName,TCHAR *String,DWORD BufferS
 	of the incoming buffer. */
 	if(dwBufSize == 0 || dwType != REG_SZ)
 	{
-		String[0] = '\0';
+		szOutput[0] = '\0';
 	}
 	else
 	{
-		if(String[dwBufSize - 1] != '\0')
+		if(szOutput[dwBufSize - 1] != '\0')
 		{
 			dwBufSize = min(dwBufSize,BufferSize);
-
-			String[dwBufSize] = '\0';
+			szOutput[dwBufSize] = '\0';
 		}
+	}
+
+	return lRes;
+}
+
+LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,std::wstring strKey,std::wstring &strOutput)
+{
+	TCHAR szTemp[512];
+	LONG lRes = NRegistrySettings::ReadStringFromRegistry(hKey,strKey.c_str(),szTemp,SIZEOF_ARRAY(szTemp));
+
+	if(lRes == ERROR_SUCCESS)
+	{
+		strOutput = szTemp;
 	}
 
 	return lRes;
@@ -76,7 +87,7 @@ LONG ReadStringFromRegistry(HKEY hKey,TCHAR *KeyName,TCHAR *String,DWORD BufferS
 than ERROR_SUCCESS on failure. If this function does fail, any values
 that have been written will not be deleted (i.e. this function is
 not transactional). */
-LONG SaveStringListToRegistry(HKEY hKey,const TCHAR *szBaseKeyName,
+LONG NRegistrySettings::SaveStringListToRegistry(HKEY hKey,const TCHAR *szBaseKeyName,
 	const std::list<std::wstring> &strList)
 {
 	TCHAR szItemKey[128];
@@ -98,7 +109,7 @@ LONG SaveStringListToRegistry(HKEY hKey,const TCHAR *szBaseKeyName,
 	return ERROR_SUCCESS;
 }
 
-LONG ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBaseKeyName,
+LONG NRegistrySettings::ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBaseKeyName,
 	std::list<std::wstring> &strList)
 {
 	TCHAR szItemKey[128];

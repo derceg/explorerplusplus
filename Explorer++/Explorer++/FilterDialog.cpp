@@ -16,9 +16,11 @@
 #include "FilterDialog.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Registry.h"
+#include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 
+
+/* TODO: Resizable. */
 
 const TCHAR CFilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
@@ -156,12 +158,12 @@ CFilterDialogPersistentSettings& CFilterDialogPersistentSettings::GetInstance()
 
 void CFilterDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	SaveStringListToRegistry(hKey,_T("Filter"),m_FilterList);
+	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Filter"),m_FilterList);
 }
 
 void CFilterDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	ReadStringListFromRegistry(hKey,_T("Filter"),m_FilterList);
+	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Filter"),m_FilterList);
 }
 
 void CFilterDialogPersistentSettings::SaveExtraXMLSettings(

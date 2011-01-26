@@ -962,8 +962,6 @@ DWORD BuildFileAttributeString(TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize)
 {
 	HANDLE hFindFile;
 	WIN32_FIND_DATA wfd;
-	TCHAR lpszAttributes[6];
-	int i = 0;
 
 	/* FindFirstFile is used instead of GetFileAttributes() or
 	GetFileAttributesEx() because of its behaviour
@@ -979,20 +977,30 @@ DWORD BuildFileAttributeString(TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize)
 		return 0;
 	}
 
-	EnterAttributeIntoString(wfd.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE,lpszAttributes,i++,'A');
-	EnterAttributeIntoString(wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN,lpszAttributes,i++,'H');
-	EnterAttributeIntoString(wfd.dwFileAttributes & FILE_ATTRIBUTE_READONLY,lpszAttributes,i++,'R');
-	EnterAttributeIntoString(wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM,lpszAttributes,i++,'S');
-	EnterAttributeIntoString((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY,
-	lpszAttributes,i++,'D');
-
-	lpszAttributes[i] = '\0';
-
-	StringCchCopy(Buffer,BufSize,lpszAttributes);
+	BuildFileAttributeStringInternal(wfd.dwFileAttributes,Buffer,BufSize);
 
 	FindClose(hFindFile);
 
 	return wfd.dwFileAttributes;
+}
+
+void BuildFileAttributeStringInternal(DWORD dwFileAttributes,TCHAR *szOutput,DWORD cchMax)
+{
+	TCHAR szAttributes[8];
+	int i = 0;
+
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE,szAttributes,i++,'A');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_HIDDEN,szAttributes,i++,'H');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_READONLY,szAttributes,i++,'R');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_SYSTEM,szAttributes,i++,'S');
+	EnterAttributeIntoString((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY,
+		szAttributes,i++,'D');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED,szAttributes,i++,'C');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED,szAttributes,i++,'E');
+
+	szAttributes[i] = '\0';
+
+	StringCchCopy(szOutput,cchMax,szAttributes);
 }
 
 void EnterAttributeIntoString(BOOL bEnter,TCHAR *String,int Pos,TCHAR chAttribute)
@@ -2242,7 +2250,7 @@ void TabCtrl_SetItemText(HWND Tab,int iTab,TCHAR *Text)
 	SendMessage(Tab,TCM_SETITEM,(WPARAM)(int)iTab,(LPARAM)&tcItem);
 }
 
-BOOL CheckWildcardMatch(TCHAR *szWildcard,TCHAR *szString,BOOL bCaseSensitive)
+BOOL CheckWildcardMatch(const TCHAR *szWildcard,const TCHAR *szString,BOOL bCaseSensitive)
 {
 	/* Handles multiple wildcard patterns. If the wildcard pattern contains ':', 
 	split the pattern into multiple subpatterns.
@@ -2290,7 +2298,7 @@ BOOL CheckWildcardMatch(TCHAR *szWildcard,TCHAR *szString,BOOL bCaseSensitive)
 	return FALSE;
 }
 
-BOOL CheckWildcardMatchInternal(TCHAR *szWildcard,TCHAR *szString,BOOL bCaseSensitive)
+BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard,const TCHAR *szString,BOOL bCaseSensitive)
 {
 	BOOL bMatched;
 	BOOL bCurrentMatch = TRUE;
@@ -3051,4 +3059,16 @@ void MergeDateTime(SYSTEMTIME *pstOutput,SYSTEMTIME *pstDate,SYSTEMTIME *pstTime
 	pstOutput->wMinute			= pstTime->wMinute;
 	pstOutput->wSecond			= pstTime->wSecond;
 	pstOutput->wMilliseconds	= pstTime->wMilliseconds;
+}
+
+void GetWindowString(HWND hwnd,std::wstring &str)
+{
+	int iLen = GetWindowTextLength(hwnd);
+
+	TCHAR *szTemp = new TCHAR[iLen + 1];
+	GetWindowText(hwnd,szTemp,iLen + 1);
+
+	str = szTemp;
+
+	delete[] szTemp;
 }

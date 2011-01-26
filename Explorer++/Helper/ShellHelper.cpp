@@ -16,7 +16,7 @@
 #include "ShellHelper.h"
 #include "FileOperations.h"
 #include "Buffer.h"
-#include "Registry.h"
+#include "RegistrySettings.h"
 
 
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
@@ -1195,7 +1195,7 @@ BOOL LoadContextMenuHandlers(IN TCHAR *szRegKey,
 
 			if(lSubKeyRes == ERROR_SUCCESS)
 			{
-				lSubKeyRes = ReadStringFromRegistry(hSubKey,NULL,szCLSID,
+				lSubKeyRes = NRegistrySettings::ReadStringFromRegistry(hSubKey,NULL,szCLSID,
 					SIZEOF_ARRAY(szCLSID));
 
 				if(lSubKeyRes == ERROR_SUCCESS)
@@ -1256,7 +1256,7 @@ OUT ContextMenuHandler_t *pContextMenuHandler)
 		{
 			TCHAR szDLL[MAX_PATH];
 
-			lRes = ReadStringFromRegistry(hDllKey,NULL,szDLL,SIZEOF_ARRAY(szDLL));
+			lRes = NRegistrySettings::ReadStringFromRegistry(hDllKey,NULL,szDLL,SIZEOF_ARRAY(szDLL));
 
 			if(lRes == ERROR_SUCCESS)
 			{

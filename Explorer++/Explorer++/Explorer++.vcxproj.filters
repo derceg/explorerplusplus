@@ -201,6 +201,12 @@
     <ClInclude Include="FilterDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ColorRuleDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomizeColorsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

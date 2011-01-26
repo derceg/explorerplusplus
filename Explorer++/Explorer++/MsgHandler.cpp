@@ -2457,21 +2457,22 @@ void Explorerplusplus::OnAssocChanged(void)
 		_T("Control Panel\\Desktop\\WindowMetrics"),
 		0,KEY_READ|KEY_WRITE,&hKey);
 
-	if(res == ERROR_SUCCESS){
-		ReadStringFromRegistry(hKey,_T("Shell Icon Size"),
+	if(res == ERROR_SUCCESS)
+	{
+		NRegistrySettings::ReadStringFromRegistry(hKey,_T("Shell Icon Size"),
 			szShellIconSize,SIZEOF_ARRAY(szShellIconSize));
 
 		dwShellIconSize = _wtoi(szShellIconSize);
 
 		/* Increment the value by one, and save it back to the registry. */
 		StringCchPrintf(szTemp,SIZEOF_ARRAY(szTemp),_T("%d"),dwShellIconSize + 1);
-		SaveStringToRegistry(hKey,_T("Shell Icon Size"),szTemp);
+		NRegistrySettings::SaveStringToRegistry(hKey,_T("Shell Icon Size"),szTemp);
 
 		if(FileIconInit != NULL)
 			FileIconInit(TRUE);
 
 		/* Now, set it back to the original value. */
-		SaveStringToRegistry(hKey,_T("Shell Icon Size"),szShellIconSize);
+		NRegistrySettings::SaveStringToRegistry(hKey,_T("Shell Icon Size"),szShellIconSize);
 
 		if(FileIconInit != NULL)
 			FileIconInit(FALSE);
@@ -2610,57 +2611,47 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 
 		case CDDS_ITEMPREPAINT:
 			{
-				list<ListViewColouring_t>::iterator itr;
+				DWORD dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(static_cast<int>(pnmcd->dwItemSpec));
+
 				TCHAR szFileName[MAX_PATH];
-				DWORD dwAttributes;
-
-				dwAttributes = m_pActiveShellBrowser->QueryFileAttributes((int)pnmcd->dwItemSpec);
-
-				m_pActiveShellBrowser->QueryFullItemName((int)pnmcd->dwItemSpec,szFileName);
+				m_pActiveShellBrowser->QueryFullItemName(static_cast<int>(pnmcd->dwItemSpec),szFileName);
 				PathStripPath(szFileName);
 
 				/* Loop through each filter. Decide whether to change the font of the
 				current item based on its filename and/or attributes. */
-				for(itr = m_ColourFilter.begin();itr != m_ColourFilter.end();itr++)
+				for each(auto ColorRule in m_ColorRuleList)
 				{
-					BOOL bFileNameActive = FALSE;
-					BOOL bAttributesActive = FALSE;
 					BOOL bMatchFileName = FALSE;
 					BOOL bMatchAttributes = FALSE;
-					BOOL bColorItem = FALSE;
 
 					/* Only match against the filename if it's not empty. */
-					if(lstrcmp(itr->szFilterPattern,EMPTY_STRING) != 0)
+					if(ColorRule.strFilterPattern.size() > 0)
 					{
-						bFileNameActive = TRUE;
-
-						if(CheckWildcardMatch(itr->szFilterPattern,szFileName,TRUE) == 1)
+						if(CheckWildcardMatch(ColorRule.strFilterPattern.c_str(),szFileName,TRUE) == 1)
 						{
 							bMatchFileName = TRUE;
 						}
 					}
-
-					if(itr->dwFilterAttributes != 0)
+					else
 					{
-						bAttributesActive = TRUE;
+						bMatchFileName = TRUE;
+					}
 
-						if(itr->dwFilterAttributes & dwAttributes)
+					if(ColorRule.dwFilterAttributes != 0)
+					{
+						if(ColorRule.dwFilterAttributes & dwAttributes)
 						{
 							bMatchAttributes = TRUE;
 						}
 					}
-
-					if(bFileNameActive && bAttributesActive)
-						bColorItem = bMatchFileName && bMatchAttributes;
-					else if(bFileNameActive)
-						bColorItem = bMatchFileName;
-					else if(bAttributesActive)
-						bColorItem = bMatchAttributes;
-
-					if(bColorItem)
+					else
 					{
-						pnmlvcd->clrText = itr->rgbColour;
+						bMatchAttributes = TRUE;
+					}
 
+					if(bMatchFileName && bMatchAttributes)
+					{
+						pnmlvcd->clrText = ColorRule.rgbColour;
 						return CDRF_NEWFONT;
 					}
 				}

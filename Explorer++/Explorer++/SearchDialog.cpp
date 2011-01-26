@@ -17,7 +17,7 @@
 #include "SearchDialog.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Registry.h"
+#include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -571,6 +571,8 @@ void CSearchDialog::AddMenuEntries(LPITEMIDLIST pidlParent,
 	std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
 	/* TODO: Move string into string table. */
+	/* TODO: If the item is a folder, show 'Open folder location'
+	instead. */
 	MENUITEMINFO mii;
 	mii.cbSize		= sizeof(MENUITEMINFO);
 	mii.fMask		= MIIM_STRING|MIIM_ID;
@@ -1283,38 +1285,38 @@ CSearchDialogPersistentSettings& CSearchDialogPersistentSettings::GetInstance()
 
 void CSearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	SaveDwordToRegistry(hKey,_T("Width"),m_iSearchWidth);
-	SaveDwordToRegistry(hKey,_T("Height"),m_iSearchHeight);
-	SaveDwordToRegistry(hKey,_T("ColumnWidth1"),m_iColumnWidth1);
-	SaveDwordToRegistry(hKey,_T("ColumnWidth2"),m_iColumnWidth2);
-	SaveStringToRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern);
-	SaveDwordToRegistry(hKey,_T("SearchSubFolders"),m_bSearchSubFolders);
-	SaveDwordToRegistry(hKey,_T("UseRegularExpressions"),m_bUseRegularExpressions);
-	SaveDwordToRegistry(hKey,_T("CaseInsensitive"),m_bCaseInsensitive);
-	SaveDwordToRegistry(hKey,_T("Archive"),m_bArchive);
-	SaveDwordToRegistry(hKey,_T("Hidden"),m_bHidden);
-	SaveDwordToRegistry(hKey,_T("ReadOnly"),m_bReadOnly);
-	SaveDwordToRegistry(hKey,_T("System"),m_bSystem);
-	SaveStringListToRegistry(hKey,_T("Directory"),m_SearchDirectories);
-	SaveStringListToRegistry(hKey,_T("Pattern"),m_SearchPatterns);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("Width"),m_iSearchWidth);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("Height"),m_iSearchHeight);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ColumnWidth1"),m_iColumnWidth1);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ColumnWidth2"),m_iColumnWidth2);
+	NRegistrySettings::SaveStringToRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("SearchSubFolders"),m_bSearchSubFolders);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("UseRegularExpressions"),m_bUseRegularExpressions);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("CaseInsensitive"),m_bCaseInsensitive);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("Archive"),m_bArchive);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("Hidden"),m_bHidden);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ReadOnly"),m_bReadOnly);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("System"),m_bSystem);
+	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Directory"),m_SearchDirectories);
+	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Pattern"),m_SearchPatterns);
 }
 
 void CSearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	ReadDwordFromRegistry(hKey,_T("Width"),reinterpret_cast<LPDWORD>(&m_iSearchWidth));
-	ReadDwordFromRegistry(hKey,_T("Height"),reinterpret_cast<LPDWORD>(&m_iSearchHeight));
-	ReadDwordFromRegistry(hKey,_T("ColumnWidth1"),reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
-	ReadDwordFromRegistry(hKey,_T("ColumnWidth2"),reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
-	ReadStringFromRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern));
-	ReadDwordFromRegistry(hKey,_T("SearchSubFolders"),reinterpret_cast<LPDWORD>(&m_bSearchSubFolders));
-	ReadDwordFromRegistry(hKey,_T("UseRegularExpressions"),reinterpret_cast<LPDWORD>(&m_bUseRegularExpressions));
-	ReadDwordFromRegistry(hKey,_T("CaseInsensitive"),reinterpret_cast<LPDWORD>(&m_bCaseInsensitive));
-	ReadDwordFromRegistry(hKey,_T("Archive"),reinterpret_cast<LPDWORD>(&m_bArchive));
-	ReadDwordFromRegistry(hKey,_T("Hidden"),reinterpret_cast<LPDWORD>(&m_bHidden));
-	ReadDwordFromRegistry(hKey,_T("ReadOnly"),reinterpret_cast<LPDWORD>(&m_bReadOnly));
-	ReadDwordFromRegistry(hKey,_T("System"),reinterpret_cast<LPDWORD>(&m_bSystem));
-	ReadStringListFromRegistry(hKey,_T("Directory"),m_SearchDirectories);
-	ReadStringListFromRegistry(hKey,_T("Pattern"),m_SearchPatterns);
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Width"),reinterpret_cast<LPDWORD>(&m_iSearchWidth));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Height"),reinterpret_cast<LPDWORD>(&m_iSearchHeight));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ColumnWidth1"),reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ColumnWidth2"),reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
+	NRegistrySettings::ReadStringFromRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("SearchSubFolders"),reinterpret_cast<LPDWORD>(&m_bSearchSubFolders));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("UseRegularExpressions"),reinterpret_cast<LPDWORD>(&m_bUseRegularExpressions));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("CaseInsensitive"),reinterpret_cast<LPDWORD>(&m_bCaseInsensitive));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Archive"),reinterpret_cast<LPDWORD>(&m_bArchive));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Hidden"),reinterpret_cast<LPDWORD>(&m_bHidden));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ReadOnly"),reinterpret_cast<LPDWORD>(&m_bReadOnly));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("System"),reinterpret_cast<LPDWORD>(&m_bSystem));
+	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Directory"),m_SearchDirectories);
+	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Pattern"),m_SearchPatterns);
 }
 
 void CSearchDialogPersistentSettings::SaveExtraXMLSettings(

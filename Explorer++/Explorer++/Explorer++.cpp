@@ -106,25 +106,12 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_bMergeFilesDlgStateSaved		= FALSE;
 	m_bOrganizeBookmarksDlgStateSaved	= FALSE;
 	m_bSplitFileDlgStateSaved		= FALSE;
-	m_bCustomizeColorsDlgStateSaved	= FALSE;
-
-	m_rgbCompressed					= RGB(0,0,255);
-	m_rgbEncrypted					= RGB(0,128,0);
 
 	m_pTaskbarList3					= NULL;
 
 	m_bBlockNext = FALSE;
 
 	InitializeColorRules();
-
-	int i = 0;
-
-	for(i = 0;i < SIZEOF_ARRAY(m_ccCustomColors);i++)
-	{
-		m_ccCustomColors[i] = RGB(255,255,255);
-	}
-
-	m_crInitialColor = DEFAULT_INITIAL_COLOR;
 
 	SetDefaultValues();
 	SetAllDefaultColumns();

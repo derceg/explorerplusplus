@@ -263,14 +263,7 @@
     <ClCompile Include="iDirectoryMonitor.cpp" />
     <ClCompile Include="iEnumFormatEtc.cpp" />
     <ClCompile Include="ReferenceCount.cpp" />
-    <ClCompile Include="Registry.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Test|x64'">CompileAsCpp</CompileAs>
-    </ClCompile>
+    <ClCompile Include="RegistrySettings.cpp" />
     <ClCompile Include="ResizableDialog.cpp" />
     <ClCompile Include="SetDefaultFileManager.cpp" />
     <ClCompile Include="ShellHelper.cpp" />
@@ -302,7 +295,7 @@
     <ClInclude Include="iDirectoryMonitor.h" />
     <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="ReferenceCount.h" />
-    <ClInclude Include="Registry.h" />
+    <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="ResizableDialog.h" />
     <ClInclude Include="SetDefaultFileManager.h" />
     <ClInclude Include="ShellHelper.h" />

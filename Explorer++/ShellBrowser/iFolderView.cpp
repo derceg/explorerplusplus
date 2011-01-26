@@ -19,7 +19,7 @@
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
-#include "../Helper/Registry.h"
+#include "../Helper/RegistrySettings.h"
 
 
 BOOL g_bInitialized = FALSE;

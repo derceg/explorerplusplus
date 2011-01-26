@@ -15,7 +15,7 @@
 #include <list>
 #include "DropHandler.h"
 #include "Helper.h"
-#include "Registry.h"
+#include "RegistrySettings.h"
 #include "ShellHelper.h"
 #include "ContextMenuManager.h"
 

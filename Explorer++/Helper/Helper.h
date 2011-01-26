@@ -177,6 +177,7 @@ BOOL			CompareFileTypes(TCHAR *pszFile1,TCHAR *pszFile2);
 BOOL			SetFileSparse(TCHAR *szFileName);
 void			DeleteFileSecurely(TCHAR *szFileName);
 DWORD			BuildFileAttributeString(TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize);
+void			BuildFileAttributeStringInternal(DWORD dwFileAttributes,TCHAR *szOutput,DWORD cchMax);
 int				PasteHardLinks(TCHAR *szDestination);
 size_t			GetFileOwner(TCHAR *szFile,TCHAR *szOwner,DWORD BufSize);
 DWORD			GetNumFileHardLinks(TCHAR *lpszFileName);
@@ -265,8 +266,8 @@ BOOL			lShowWindow(HWND hwnd,BOOL bShowWindow);
 void			EnumLoggedOnUsers(void);
 TCHAR			*PrintComma(unsigned long nPrint);
 TCHAR			*PrintCommaLargeNum(LARGE_INTEGER lPrint);
-BOOL			CheckWildcardMatch(TCHAR *szWildcard,TCHAR *szString,BOOL bCaseSensitive);
-BOOL			CheckWildcardMatchInternal(TCHAR *szWildcard,TCHAR *szString,BOOL bCaseSensitive);
+BOOL			CheckWildcardMatch(const TCHAR *szWildcard,const TCHAR *szString,BOOL bCaseSensitive);
+BOOL			CheckWildcardMatchInternal(const TCHAR *szWildcard,const TCHAR *szString,BOOL bCaseSensitive);
 void			ReplaceCharacters(TCHAR *str,char ch,char replacement);
 TCHAR			*GetToken(TCHAR *ptr,TCHAR *Buffer,TCHAR *BufferLength);
 HRESULT			DecodeFriendlyPath(TCHAR *szFriendlyPath,TCHAR *szParsingPath);
@@ -277,5 +278,6 @@ void			CenterWindow(HWND hParent,HWND hChild);
 TCHAR			*ReplaceSubString(TCHAR *szString,TCHAR *szSubString,TCHAR *szReplacement);
 void			UpdateToolbarBandSizing(HWND hRebar,HWND hToolbar);
 void			MergeDateTime(SYSTEMTIME *pstOutput,SYSTEMTIME *pstDate,SYSTEMTIME *pstTime);
+void			GetWindowString(HWND hwnd,std::wstring &str);
 
 #endif

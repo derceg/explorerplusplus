@@ -6,7 +6,7 @@
 #include "Settings.h"
 #include "iDropSource.h"
 #include "../Helper/Controls.h"
-#include "../Helper/Registry.h"
+#include "../Helper/RegistrySettings.h"
 #include "../Helper/Helper.h"
 #include "../Helper/FolderSize.h"
 #include "../MyTreeView/MyTreeView.h"
@@ -91,10 +91,6 @@ SelectAndEdit() method of INewClient. */
 
 #define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Color(255,255,255)
 #define DEFAULT_DISPLAYWINDOW_SURROUND_COLOR	Color(0,94,138)
-
-/* The default color used by the new/edit color rule
-dialog. */
-#define DEFAULT_INITIAL_COLOR	RGB(0,94,138)
 
 #define WM_USER_TABMCLICK		(WM_APP + 53)
 #define WM_USER_ASSOCCHANGED	(WM_APP + 54)
@@ -283,6 +279,17 @@ bitmap). */
 
 /* Tab icons. */
 #define TAB_ICON_LOCK_INDEX			0
+
+struct ColorRule_t
+{
+	std::wstring	strDescription;
+
+	/* Filename and attribute filtering. */
+	std::wstring	strFilterPattern;
+	DWORD			dwFilterAttributes;
+
+	COLORREF		rgbColour;
+};
 
 /* Used with the bookmark propeties dialog. */
 typedef struct
@@ -646,8 +653,6 @@ LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lPa
 INT_PTR CALLBACK DestroyFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK ApplicationButtonPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK ApplicationToolbarNewButtonProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK ColorFilteringProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK ColorRuleProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK DWChangeDetailsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK DWLinePropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 

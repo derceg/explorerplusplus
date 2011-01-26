@@ -186,8 +186,8 @@ MSXML2::IXMLDOMElement *pParentNode,const TCHAR *szBaseKeyName,
 
 void NXMLSettings::CreateElementNode(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement **pParentNode,
-MSXML2::IXMLDOMElement *pGrandparentNode,WCHAR *szElementName,
-WCHAR *szAttributeName)
+MSXML2::IXMLDOMElement *pGrandparentNode,const WCHAR *szElementName,
+const WCHAR *szAttributeName)
 {
 	MSXML2::IXMLDOMAttribute	*pa = NULL;
 	MSXML2::IXMLDOMAttribute	*pa1 = NULL;

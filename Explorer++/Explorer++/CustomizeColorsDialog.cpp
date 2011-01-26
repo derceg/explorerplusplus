@@ -12,208 +12,262 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Explorer++.h"
+#include "Explorer++_internal.h"
+#include "CustomizeColorsDialog.h"
+#include "ColorRuleDialog.h"
 #include "MainResource.h"
+#include "../Helper/Helper.h"
 
 
-extern BOOL g_bEditing;
+const TCHAR CCustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("CustomizeColors");
 
-INT_PTR CALLBACK ColorFilteringProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+CCustomizeColorsDialog::CCustomizeColorsDialog(HINSTANCE hInstance,
+	int iResource,HWND hParent,std::vector<ColorRule_t> *pColorRuleList) :
+CBaseDialog(hInstance,iResource,hParent)
 {
-	static Explorerplusplus *pContainer = NULL;
+	m_pColorRuleList = pColorRuleList;
 
-	switch(uMsg)
-	{
-		case WM_INITDIALOG:
-		{
-			pContainer = (Explorerplusplus *)lParam;
-		}
-		break;
-	}
-
-	return pContainer->ColorFilteringProc(hDlg,uMsg,wParam,lParam);
+	m_pccdps = &CCustomizeColorsDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CALLBACK Explorerplusplus::ColorFilteringProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
+CCustomizeColorsDialog::~CCustomizeColorsDialog()
 {
-	switch(Msg)
+
+}
+
+BOOL CCustomizeColorsDialog::OnInitDialog()
+{
+	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
+	HBITMAP hBitmap = LoadBitmap(GetInstance(),MAKEINTRESOURCE(IDB_SHELLIMAGES));
+	ImageList_Add(himl,hBitmap,NULL);
+
+	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_CUSTOMIZECOLORS,ILD_NORMAL);
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+
+	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
+
+	SetWindowTheme(hListView,L"Explorer",NULL);
+
+	ListView_SetExtendedListViewStyleEx(hListView,
+		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES,
+		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
+
+	/* TODO: Move text into string table. */
+	LVCOLUMN lvColumn;
+	lvColumn.mask		= LVCF_TEXT;
+	lvColumn.pszText	= _T("Description");
+	ListView_InsertColumn(hListView,0,&lvColumn);
+
+	lvColumn.mask		= LVCF_TEXT;
+	lvColumn.pszText	= _T("Filename Pattern");
+	ListView_InsertColumn(hListView,1,&lvColumn);
+
+	lvColumn.mask		= LVCF_TEXT;
+	lvColumn.pszText	= _T("Attributes");
+	ListView_InsertColumn(hListView,2,&lvColumn);
+
+	RECT rc;
+	GetClientRect(hListView,&rc);
+	SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,GetRectWidth(&rc) / 3);
+	SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,GetRectWidth(&rc) / 3);
+	SendMessage(hListView,LVM_SETCOLUMNWIDTH,2,GetRectWidth(&rc) / 3);
+
+	int iItem = 0;
+
+	for each(auto ColorRule in *m_pColorRuleList)
 	{
-		case WM_INITDIALOG:
-			{
-				HWND hListView;
-				LVCOLUMN lvColumn;
-				LVITEM lvItem;
-				list<ListViewColouring_t>::iterator itr;
-				int iItem = 0;
+		InsertColorRuleIntoListView(hListView,ColorRule,iItem++);
+	}
 
-				hListView = GetDlgItem(hDlg,IDC_LISTVIEW_COLORRULES);
+	SetFocus(hListView);
 
-				lvColumn.mask		= LVCF_TEXT;
-				lvColumn.pszText	= _T("Description");
-				ListView_InsertColumn(hListView,0,&lvColumn);
-
-				ListView_SetColumnWidth(hListView,0,LVSCW_AUTOSIZE_USEHEADER);
-
-				if(!m_ColourFilter.empty())
-				{
-					for(itr = m_ColourFilter.begin();itr != m_ColourFilter.end();itr++)
-					{
-						lvItem.mask		= LVIF_TEXT;
-						lvItem.pszText	= itr->szDescription;
-						lvItem.iItem	= iItem++;
-						lvItem.iSubItem	= 0;
-						ListView_InsertItem(hListView,&lvItem);
-					}
-				}
-
-				ListView_SetExtendedListViewStyleEx(hListView,
-					LVS_EX_FULLROWSELECT,LVS_EX_FULLROWSELECT);
-
-				SetFocus(hListView);
-
-				if(m_bCustomizeColorsDlgStateSaved)
-				{
-					SetWindowPos(hDlg,NULL,m_ptCustomizeColors.x,
-						m_ptCustomizeColors.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-				}
-				else
-				{
-					CenterWindow(m_hContainer,hDlg);
-				}
-			}
-			break;
-
-		case WM_COMMAND:
-			switch(LOWORD(wParam))
-			{
-			case IDC_BUTTON_NEW:
-				{
-					HWND hListView;
-					LVITEM lvItem;
-					ListViewColouring_t lvc;
-					INT_PTR iRet;
-
-					hListView = GetDlgItem(hDlg,IDC_LISTVIEW_COLORRULES);
-
-					StringCchCopy(lvc.szDescription,
-						SIZEOF_ARRAY(lvc.szDescription),EMPTY_STRING);
-					StringCchCopy(lvc.szFilterPattern,
-						SIZEOF_ARRAY(lvc.szDescription),EMPTY_STRING);
-
-					lvc.rgbColour			= m_crInitialColor;
-					lvc.dwFilterAttributes	= 0;
-
-					m_pColoringItem = &lvc;
-
-					g_bEditing = FALSE;
-
-					iRet = DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_NEWCOLORRULE),
-						hDlg,ColorRuleProcStub,(LPARAM)this);
-
-					if(iRet == 1)
-					{
-						m_ColourFilter.push_back(lvc);
-
-						int nItems;
-
-						nItems = ListView_GetItemCount(hListView);
-
-						/* Insert the item into the listview. */
-						lvItem.mask		= LVIF_TEXT;
-						lvItem.pszText	= lvc.szDescription;
-						lvItem.iItem	= nItems;
-						lvItem.iSubItem	= 0;
-						ListView_InsertItem(hListView,&lvItem);
-					}
-
-					/* Regardless of whether the user cancelled the dialog
-					or added the rule, save their color selection. */
-					m_crInitialColor = lvc.rgbColour;
-
-					SetFocus(hDlg);
-				}
-				break;
-
-			case IDC_BUTTON_EDIT:
-				{
-					HWND hListView;
-					int iSelected;
-
-					hListView = GetDlgItem(hDlg,IDC_LISTVIEW_COLORRULES);
-
-					iSelected = ListView_GetNextItem(hListView,-1,LVNI_ALL|LVNI_SELECTED);
-
-					OnEditColorRule(hDlg,iSelected);
-				}
-				break;
-
-			case IDC_BUTTON_MOVEUP:
-				CustomizeColorsMove(hDlg,TRUE);
-				break;
-
-			case IDC_BUTTON_MOVEDOWN:
-				CustomizeColorsMove(hDlg,FALSE);
-				break;
-
-			case IDC_BUTTON_DELETE:
-				CustomizeColorsDelete(hDlg);
-				break;
-
-			case IDOK:
-				{
-					/* Causes the active listview to redraw (therefore
-					applying the updated color schemes). */
-					InvalidateRect(m_hActiveListView,NULL,FALSE);
-					CustomizeColorsSaveState(hDlg);
-					EndDialog(hDlg,1);
-				}
-				break;
-			}
-			break;
-
-		case WM_NOTIFY:
-			switch(((LPNMHDR)lParam)->code)
-			{
-			case NM_DBLCLK:
-				{
-					NMITEMACTIVATE	*pnmItem = NULL;
-
-					pnmItem = (NMITEMACTIVATE *)lParam;
-
-					if(pnmItem->iItem != -1)
-					{
-						OnEditColorRule(hDlg,pnmItem->iItem);
-					}
-				}
-				break;
-			}
-			break;
-
-		case WM_CLOSE:
-			InvalidateRect(m_hActiveListView,NULL,FALSE);
-			CustomizeColorsSaveState(hDlg);
-			EndDialog(hDlg,0);
-			break;
+	if(m_pccdps->m_bStateSaved)
+	{
+		SetWindowPos(m_hDlg,NULL,m_pccdps->m_ptDialog.x,
+			m_pccdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
+	}
+	else
+	{
+		CenterWindow(GetParent(m_hDlg),m_hDlg);
 	}
 
 	return 0;
 }
 
-void Explorerplusplus::CustomizeColorsMove(HWND hDlg,BOOL bUp)
+void CCustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const ColorRule_t &ColorRule,
+	int iIndex)
 {
-	HWND		hListView;
-	list<ListViewColouring_t>::iterator	itr;
-	ListViewColouring_t	lvc;
-	int			iSelected;
-	int			iSwap;
-	int			i = 0;
+	TCHAR szTemp[512];
 
-	hListView = GetDlgItem(hDlg,IDC_LISTVIEW_COLORRULES);
+	StringCchCopy(szTemp,SIZEOF_ARRAY(szTemp),
+		ColorRule.strDescription.c_str());
 
-	iSelected = ListView_GetNextItem(hListView,-1,LVNI_SELECTED);
+	LVITEM lvItem;
+	lvItem.mask		= LVIF_TEXT;
+	lvItem.pszText	= szTemp;
+	lvItem.iItem	= iIndex;
+	lvItem.iSubItem	= 0;
+	int iActualIndex = ListView_InsertItem(hListView,&lvItem);
+
+	if(iActualIndex != -1)
+	{
+		StringCchCopy(szTemp,SIZEOF_ARRAY(szTemp),ColorRule.strFilterPattern.c_str());
+		ListView_SetItemText(hListView,iActualIndex,1,szTemp);
+
+		BuildFileAttributeStringInternal(ColorRule.dwFilterAttributes,szTemp,SIZEOF_ARRAY(szTemp));
+		ListView_SetItemText(hListView,iActualIndex,2,szTemp);
+	}
+}
+
+BOOL CCustomizeColorsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+{
+	switch(LOWORD(wParam))
+	{
+	case IDC_BUTTON_NEW:
+		OnNew();
+		break;
+
+	case IDC_BUTTON_EDIT:
+		OnEdit();
+		break;
+
+	case IDC_BUTTON_MOVEUP:
+		OnMove(TRUE);
+		break;
+
+	case IDC_BUTTON_MOVEDOWN:
+		OnMove(FALSE);
+		break;
+
+	case IDC_BUTTON_DELETE:
+		OnDelete();
+		break;
+
+	case IDOK:
+		OnOk();
+		break;
+
+	case IDCANCEL:
+		OnCancel();
+		break;
+	}
+
+	return 0;
+}
+
+BOOL CCustomizeColorsDialog::OnNotify(NMHDR *pnmhdr)
+{
+	switch(pnmhdr->code)
+	{
+	case NM_DBLCLK:
+		{
+			NMITEMACTIVATE *pnmItem = reinterpret_cast<NMITEMACTIVATE *>(pnmhdr);
+
+			if(pnmItem->iItem != -1)
+			{
+				EditColorRule(pnmItem->iItem);
+			}
+		}
+		break;
+	}
+
+	return 0;
+}
+
+BOOL CCustomizeColorsDialog::OnClose()
+{
+	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CCustomizeColorsDialog::OnDestroy()
+{
+	DestroyIcon(m_hDialogIcon);
+
+	SaveState();
+	return 0;
+}
+
+void CCustomizeColorsDialog::SaveState()
+{
+	RECT rc;
+	GetWindowRect(m_hDlg,&rc);
+	m_pccdps->m_ptDialog.x = rc.left;
+	m_pccdps->m_ptDialog.y = rc.top;
+
+	m_pccdps->m_bStateSaved = TRUE;
+}
+
+void CCustomizeColorsDialog::OnNew()
+{
+	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
+
+	ColorRule_t ColorRule;
+
+	CColorRuleDialog ColorRuleDialog(GetInstance(),IDD_NEWCOLORRULE,m_hDlg,&ColorRule,FALSE);
+
+	INT_PTR iRet = ColorRuleDialog.ShowModalDialog();
+
+	if(iRet == 1)
+	{
+		m_pColorRuleList->push_back(ColorRule);
+
+		int nItems = ListView_GetItemCount(hListView);
+		InsertColorRuleIntoListView(hListView,ColorRule,nItems);
+	}
+
+	SetFocus(m_hDlg);
+}
+
+void CCustomizeColorsDialog::OnEdit()
+{
+	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
+	int iSelected = ListView_GetNextItem(hListView,-1,LVNI_ALL|LVNI_SELECTED);
 
 	if(iSelected != -1)
 	{
+		EditColorRule(iSelected);
+	}
+
+	SetFocus(m_hDlg);
+}
+
+void CCustomizeColorsDialog::EditColorRule(int iSelected)
+{
+	CColorRuleDialog ColorRuleDialog(GetInstance(),IDD_NEWCOLORRULE,m_hDlg,
+		&(*m_pColorRuleList)[iSelected],TRUE);
+
+	INT_PTR iRet = ColorRuleDialog.ShowModalDialog();
+
+	if(iRet == 1)
+	{
+		HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
+
+		TCHAR szTemp[512];
+
+		StringCchCopy(szTemp,SIZEOF_ARRAY(szTemp),
+			(*m_pColorRuleList)[iSelected].strDescription.c_str());
+		ListView_SetItemText(hListView,iSelected,0,szTemp);
+
+		StringCchCopy(szTemp,SIZEOF_ARRAY(szTemp),
+			(*m_pColorRuleList)[iSelected].strFilterPattern.c_str());
+		ListView_SetItemText(hListView,iSelected,1,szTemp);
+
+		BuildFileAttributeStringInternal((*m_pColorRuleList)[iSelected].dwFilterAttributes,
+			szTemp,SIZEOF_ARRAY(szTemp));
+		ListView_SetItemText(hListView,iSelected,2,szTemp);
+	}
+}
+
+void CCustomizeColorsDialog::OnMove(BOOL bUp)
+{
+	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
+	int iSelected = ListView_GetNextItem(hListView,-1,LVNI_SELECTED);
+
+	if(iSelected != -1)
+	{
+		int iSwap;
+
 		if(bUp)
 		{
 			if(iSelected == 0)
@@ -223,73 +277,45 @@ void Explorerplusplus::CustomizeColorsMove(HWND hDlg,BOOL bUp)
 		}
 		else
 		{
-			if(iSelected == (ListView_GetItemCount(hListView) - 1))
+			if(iSelected == (m_pColorRuleList->size() - 1))
 				return;
 
 			iSwap = iSelected + 1;
 		}
 
-		itr = m_ColourFilter.begin();
+		std::vector<ColorRule_t>::iterator itrSelected = m_pColorRuleList->begin();
+		std::advance(itrSelected,iSelected);
 
-		while(i < iSelected && itr != m_ColourFilter.end())
-		{
-			i++;
-			itr++;
-		}
+		std::vector<ColorRule_t>::iterator itrSwap = m_pColorRuleList->begin();
+		std::advance(itrSelected,iSwap);
 
-		lvc = *itr;
-
-		m_ColourFilter.erase(itr);
-
-		itr = m_ColourFilter.begin();
-
-		while(i < iSwap && itr != m_ColourFilter.end())
-		{
-			i++;
-			itr++;
-		}
-
-		m_ColourFilter.insert(itr,lvc);
+		std::iter_swap(itrSelected,itrSwap);
 
 		ListView_SwapItemsNolParam(hListView,iSelected,iSwap);
 	}
 }
 
-void Explorerplusplus::CustomizeColorsDelete(HWND hDlg)
+void CCustomizeColorsDialog::OnDelete()
 {
-	HWND		hListView;
-	list<ListViewColouring_t>::iterator	itr;
-	int			nItems;
-	int			iSelected;
-	int			i = 0;
-
-	hListView = GetDlgItem(hDlg,IDC_LISTVIEW_COLORRULES);
-
-	nItems = ListView_GetItemCount(hListView);
-	iSelected = ListView_GetNextItem(hListView,-1,LVNI_SELECTED);
+	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
+	int iSelected = ListView_GetNextItem(hListView,-1,LVNI_SELECTED);
 
 	if(iSelected != -1)
 	{
-		itr = m_ColourFilter.begin();
-
-		while(i < iSelected && itr != m_ColourFilter.end())
-		{
-			i++;
-			itr++;
-		}
-
 		TCHAR szInfoMsg[128];
-		int	iMessageBoxReturn;
-
-		LoadString(g_hLanguageModule,IDS_COLORRULE_DELETE,
+		LoadString(GetInstance(),IDS_COLORRULE_DELETE,
 			szInfoMsg,SIZEOF_ARRAY(szInfoMsg));
 
-		iMessageBoxReturn = MessageBox(hDlg,szInfoMsg,
+		int iRes = MessageBox(m_hDlg,szInfoMsg,
 			WINDOW_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
 
-		if(iMessageBoxReturn == IDYES)
+		if(iRes == IDYES)
 		{
-			m_ColourFilter.erase(itr);
+			int nItems = static_cast<int>(m_pColorRuleList->size());
+
+			std::vector<ColorRule_t>::iterator itr = m_pColorRuleList->begin();
+			std::advance(itr,iSelected);
+			m_pColorRuleList->erase(itr);
 
 			ListView_DeleteItem(hListView,iSelected);
 
@@ -303,48 +329,29 @@ void Explorerplusplus::CustomizeColorsDelete(HWND hDlg)
 	}
 }
 
-void Explorerplusplus::CustomizeColorsSaveState(HWND hDlg)
+void CCustomizeColorsDialog::OnOk()
 {
-	RECT rcTemp;
-
-	GetWindowRect(hDlg,&rcTemp);
-	m_ptCustomizeColors.x = rcTemp.left;
-	m_ptCustomizeColors.y = rcTemp.top;
-
-	m_bCustomizeColorsDlgStateSaved = TRUE;
+	EndDialog(m_hDlg,1);
 }
 
-void Explorerplusplus::OnEditColorRule(HWND hDlg,int iSelected)
+void CCustomizeColorsDialog::OnCancel()
 {
-	HWND hListView;
-	list<ListViewColouring_t>::iterator itr;
-	INT_PTR iRet;
-	int i = 0;
+	EndDialog(m_hDlg,0);
+}
 
-	hListView = GetDlgItem(hDlg,IDC_LISTVIEW_COLORRULES);
+CCustomizeColorsDialogPersistentSettings::CCustomizeColorsDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
+{
 
-	if(iSelected != -1)
-	{
-		itr = m_ColourFilter.begin();
+}
 
-		while(i < iSelected && itr != m_ColourFilter.end())
-		{
-			i++;
-			itr++;
-		}
+CCustomizeColorsDialogPersistentSettings::~CCustomizeColorsDialogPersistentSettings()
+{
+	
+}
 
-		m_pColoringItem = &(*itr);
-
-		g_bEditing = TRUE;
-
-		iRet = DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_NEWCOLORRULE),
-			hDlg,ColorRuleProcStub,(LPARAM)this);
-
-		if(iRet == 1)
-		{
-			ListView_SetItemText(hListView,iSelected,0,itr->szDescription);
-		}
-	}
-
-	SetFocus(hDlg);
+CCustomizeColorsDialogPersistentSettings& CCustomizeColorsDialogPersistentSettings::GetInstance()
+{
+	static CCustomizeColorsDialogPersistentSettings sfadps;
+	return sfadps;
 }

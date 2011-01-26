@@ -1,6 +1,8 @@
 #ifndef RESIZABLEDIALOG_INCLUDED
 #define RESIZABLEDIALOG_INCLUDED
 
+#include <list>
+
 /* Within a resizable dialog, controls
 either: move, resize, or hold the same
 size and position.

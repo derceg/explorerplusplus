@@ -14,7 +14,7 @@
 #include "stdafx.h"
 #include <list>
 #include "Bookmark.h"
-#include "Registry.h"
+#include "RegistrySettings.h"
 
 
 using namespace std;

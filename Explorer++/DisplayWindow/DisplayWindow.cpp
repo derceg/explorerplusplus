@@ -27,7 +27,7 @@
 #include "DisplayWindow.h"
 #include "DisplayWindowInternal.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Registry.h"
+#include "../Helper/RegistrySettings.h"
 
 
 using namespace Gdiplus;

@@ -25,6 +25,8 @@
 #include "RenameTabDialog.h"
 #include "MassRenameDialog.h"
 #include "FilterDialog.h"
+#include "ColorRuleDialog.h"
+#include "CustomizeColorsDialog.h"
 #include "../Helper/XMLSettings.h"
 
 #import <msxml3.dll> raw_interfaces_only
@@ -1511,7 +1513,7 @@ void Explorerplusplus::LoadColorRulesFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 
 	if(hr == S_OK)
 	{
-		m_ColourFilter.clear();
+		m_ColorRuleList.clear();
 		LoadColorRulesFromXMLInternal(pNode);
 	}
 
@@ -1532,7 +1534,7 @@ void Explorerplusplus::LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
 	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
 	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
 	MSXML2::IXMLDOMNode			*pNextSibling = NULL;
-	ListViewColouring_t			lvc;
+	ColorRule_t					ColorRule;
 	BOOL						bDescriptionFound = FALSE;
 	BOOL						bFilenamePatternFound = FALSE;
 	BSTR						bstrName;
@@ -1565,19 +1567,19 @@ void Explorerplusplus::LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
 
 		if(lstrcmpi(bstrName,L"Name") == 0)
 		{
-			StringCchCopy(lvc.szDescription,SIZEOF_ARRAY(lvc.szDescription),bstrValue);
+			ColorRule.strDescription = _bstr_t(bstrValue);
 
 			bDescriptionFound = TRUE;
 		}
 		else if(lstrcmpi(bstrName,L"FilenamePattern") == 0)
 		{
-			StringCchCopy(lvc.szFilterPattern,SIZEOF_ARRAY(lvc.szFilterPattern),bstrValue);
+			ColorRule.strFilterPattern = _bstr_t(bstrValue);
 
 			bFilenamePatternFound = TRUE;
 		}
 		else if(lstrcmpi(bstrName,L"Attributes") == 0)
 		{
-			lvc.dwFilterAttributes = NXMLSettings::DecodeIntValue(bstrValue);
+			ColorRule.dwFilterAttributes = NXMLSettings::DecodeIntValue(bstrValue);
 		}
 		else if(lstrcmpi(bstrName,L"r") == 0)
 		{
@@ -1595,9 +1597,9 @@ void Explorerplusplus::LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
 
 	if(bDescriptionFound && bFilenamePatternFound)
 	{
-		lvc.rgbColour = RGB(r,g,b);
+		ColorRule.rgbColour = RGB(r,g,b);
 
-		m_ColourFilter.push_back(lvc);
+		m_ColorRuleList.push_back(ColorRule);
 	}
 
 	hr = pNode->get_nextSibling(&pNextSibling);
@@ -1617,7 +1619,6 @@ void Explorerplusplus::SaveColorRulesToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement		*pe = NULL;
-	list<ListViewColouring_t>::iterator	itr;
 	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
 	BSTR						bstr;
 
@@ -1628,12 +1629,9 @@ MSXML2::IXMLDOMElement *pRoot)
 	SysFreeString(bstr);
 	bstr = NULL;
 
-	if(!m_ColourFilter.empty())
+	for each(auto ColorRule in m_ColorRuleList)
 	{
-		for(itr = m_ColourFilter.begin();itr != m_ColourFilter.end();itr++)
-		{
-			SaveColorRulesToXMLInternal(pXMLDom,pe,&(*itr));
-		}
+		SaveColorRulesToXMLInternal(pXMLDom,pe,ColorRule);
 	}
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
@@ -1646,7 +1644,7 @@ MSXML2::IXMLDOMElement *pRoot)
 }
 
 void Explorerplusplus::SaveColorRulesToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pe,ListViewColouring_t *plvc)
+	MSXML2::IXMLDOMElement *pe,const ColorRule_t &ColorRule)
 {
 	MSXML2::IXMLDOMElement		*pParentNode = NULL;
 	BSTR						bstr_wsntt = SysAllocString(L"\n\t\t");
@@ -1667,12 +1665,12 @@ MSXML2::IXMLDOMElement *pe,ListViewColouring_t *plvc)
 	SysFreeString(bstr_indent);
 	bstr_indent = NULL;
 
-	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("ColorRule"),plvc->szDescription);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("FilenamePattern"),plvc->szFilterPattern);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Attributes"),NXMLSettings::EncodeIntValue(plvc->dwFilterAttributes));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(plvc->rgbColour)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(plvc->rgbColour)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(plvc->rgbColour)));
+	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("ColorRule"),ColorRule.strDescription.c_str());
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("FilenamePattern"),ColorRule.strFilterPattern.c_str());
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Attributes"),NXMLSettings::EncodeIntValue(ColorRule.dwFilterAttributes));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(ColorRule.rgbColour)));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(ColorRule.rgbColour)));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(ColorRule.rgbColour)));
 
 	pParentNode->Release();
 	pParentNode = NULL;
@@ -1884,9 +1882,9 @@ void Explorerplusplus::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 						pChildNode->get_text(&bstrValue);
 
 						if(lstrcmpi(bstrValue,_T("ColorRules")) == 0)
-							LoadColorRulesStateFromXML(am,lChildNodes);
+							CColorRuleDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("CustomizeColors")) == 0)
-							LoadCustomizeColorsStateFromSML(am,lChildNodes);
+							CCustomizeColorsDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("Search")) == 0)
 							CSearchDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("WildcardSelect")) == 0)
@@ -1912,75 +1910,6 @@ clean:
 	if (pNode) pNode->Release();
 }
 
-void Explorerplusplus::LoadColorRulesStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
-{
-	MSXML2::IXMLDOMNode *pNode = NULL;
-	BSTR bstrName;
-	BSTR bstrValue;
-	BYTE r = 0;
-	BYTE g = 0;
-	BYTE b = 0;
-	int nColors = 0;
-	int iIndex = 0;
-	int i = 0;
-
-	/* If the layout of this information ever
-	changes, need to change this. For now,
-	just read the information based on predefined
-	knowledge of its layout... */
-	for(i = 1;i < lChildNodes;i++)
-	{
-		pam->get_item(i,&pNode);
-
-		pNode->get_nodeName(&bstrName);
-		pNode->get_text(&bstrValue);
-
-		nColors++;
-
-		if(nColors == 1)
-			r = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-		else if(nColors == 2)
-			g = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-		else if(nColors == 3)
-			b = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-
-		if(nColors == 3)
-		{
-			m_ccCustomColors[iIndex++] = RGB(r,g,b);
-
-			nColors = 0;
-		}
-	}
-}
-
-void Explorerplusplus::LoadCustomizeColorsStateFromSML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes)
-{
-	MSXML2::IXMLDOMNode *pNode = NULL;
-	BSTR bstrName;
-	BSTR bstrValue;
-	BYTE r = 0;
-	BYTE g = 0;
-	BYTE b = 0;
-	int i = 0;
-
-	for(i = 1;i < lChildNodes;i++)
-	{
-		pam->get_item(i,&pNode);
-
-		pNode->get_nodeName(&bstrName);
-		pNode->get_text(&bstrValue);
-
-		if(lstrcmpi(bstrName,_T("r")) == 0)
-			r = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-		else if(lstrcmpi(bstrName,_T("g")) == 0)
-			g = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-		else if(lstrcmpi(bstrName,_T("b")) == 0)
-			b = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-	}
-
-	m_crInitialColor = RGB(r,g,b);
-}
-
 void Explorerplusplus::SaveStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
@@ -1995,58 +1924,19 @@ MSXML2::IXMLDOMElement *pRoot)
 	SysFreeString(bstr);
 	bstr = NULL;
 
-	SaveColorRulesStateToXML(pXMLDom,pe);
-	SaveCustomizeColorsStateToXML(pXMLDom,pe);
-
 	CSearchDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CWildcardSelectDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CRenameTabDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CMassRenameDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CFilterDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CColorRuleDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CCustomizeColorsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 
 	NXMLSettings::AppendChildToParent(pe,pRoot);
 	pe->Release();
 	pe = NULL;
-}
-
-void Explorerplusplus::SaveColorRulesStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pe)
-{
-	MSXML2::IXMLDOMElement	*pParentNode = NULL;
-	BSTR					bstr_wsntt = SysAllocString(L"\n\t\t");
-	TCHAR					szNode[32];
-	int						i = 0;
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-
-	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("DialogState"),_T("ColorRules"));
-
-	for(i = 0;i < SIZEOF_ARRAY(m_ccCustomColors);i++)
-	{
-		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("r%d"),i + 1);
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,NXMLSettings::EncodeIntValue(GetRValue(m_ccCustomColors[i])));
-		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("g%d"),i + 1);
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,NXMLSettings::EncodeIntValue(GetGValue(m_ccCustomColors[i])));
-		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("b%d"),i + 1);
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,NXMLSettings::EncodeIntValue(GetBValue(m_ccCustomColors[i])));
-	}
-}
-
-void Explorerplusplus::SaveCustomizeColorsStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pe)
-{
-	MSXML2::IXMLDOMElement	*pParentNode = NULL;
-	BSTR					bstr_wsntt = SysAllocString(L"\n\t\t");
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-
-	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("DialogState"),_T("CustomizeColors"));
-
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(m_crInitialColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(m_crInitialColor)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(m_crInitialColor)));
 }
 
 unsigned long hash_setting(unsigned char *str)

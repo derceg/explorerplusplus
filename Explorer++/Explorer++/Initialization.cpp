@@ -17,6 +17,7 @@
 #include <shobjidl.h>
 #include "Misc.h"
 #include "Explorer++.h"
+#include "CustomizeColorsDialog.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
@@ -203,17 +204,17 @@ void Explorerplusplus::SetDefaultTabSettings(TabInfo_t *pTabInfo)
 
 void Explorerplusplus::InitializeColorRules(void)
 {
-	ListViewColouring_t lvc;
+	ColorRule_t ColorRule;
 
-	StringCchCopy(lvc.szDescription,SIZEOF_ARRAY(lvc.szFilterPattern),_T("Compressed files"));
-	StringCchCopy(lvc.szFilterPattern,SIZEOF_ARRAY(lvc.szFilterPattern),EMPTY_STRING);
-	lvc.rgbColour = m_rgbCompressed;
-	lvc.dwFilterAttributes = FILE_ATTRIBUTE_COMPRESSED;
-	m_ColourFilter.push_back(lvc);
+	/* TODO: Move text into string table. */
+	ColorRule.strDescription		= _T("Compressed files");
+	ColorRule.rgbColour				= CF_COMPRESSED;
+	ColorRule.dwFilterAttributes	= FILE_ATTRIBUTE_COMPRESSED;
+	m_ColorRuleList.push_back(ColorRule);
 
-	StringCchCopy(lvc.szDescription,SIZEOF_ARRAY(lvc.szFilterPattern),_T("Encrypted files"));
-	StringCchCopy(lvc.szFilterPattern,SIZEOF_ARRAY(lvc.szFilterPattern),EMPTY_STRING);
-	lvc.rgbColour = m_rgbEncrypted;
-	lvc.dwFilterAttributes = FILE_ATTRIBUTE_ENCRYPTED;
-	m_ColourFilter.push_back(lvc);
+	/* TODO: Move text into string table. */
+	ColorRule.strDescription		= _T("Encrypted files");
+	ColorRule.rgbColour				= CF_ENCRYPTED;
+	ColorRule.dwFilterAttributes	= FILE_ATTRIBUTE_ENCRYPTED;
+	m_ColorRuleList.push_back(ColorRule);
 }

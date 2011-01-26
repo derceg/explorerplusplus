@@ -462,7 +462,7 @@ LPSTR lpCmdLine,int nCmdShow)
 
 		if(ReturnValue == ERROR_SUCCESS)
 		{
-			ReadDwordFromRegistry(hSettingsKey,_T("AllowMultipleInstances"),
+			NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("AllowMultipleInstances"),
 				(LPDWORD)&bAllowMultipleInstances);
 
 			RegCloseKey(hSettingsKey);

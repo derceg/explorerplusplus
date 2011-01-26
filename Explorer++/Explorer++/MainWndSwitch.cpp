@@ -17,6 +17,7 @@
 #include "SearchDialog.h"
 #include "AboutDialog.h"
 #include "FilterDialog.h"
+#include "CustomizeColorsDialog.h"
 
 
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -1335,8 +1336,15 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case IDM_TOOLS_CUSTOMIZECOLORS:
-			DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_CUSTOMIZECOLORS),
-				hwnd,ColorFilteringProcStub,(LPARAM)this);
+			{
+				CCustomizeColorsDialog CustomizeColorsDialog(g_hLanguageModule,IDD_CUSTOMIZECOLORS,hwnd,&m_ColorRuleList);
+
+				CustomizeColorsDialog.ShowModalDialog();
+
+				/* Causes the active listview to redraw (therefore
+				applying any updated color schemes). */
+				InvalidateRect(m_hActiveListView,NULL,FALSE);
+			}
 			break;
 
 		case IDM_TOOLS_OPTIONS:

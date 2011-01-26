@@ -17,7 +17,7 @@
 #include "MainResource.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Registry.h"
+#include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 
 
@@ -184,14 +184,14 @@ CWildcardSelectDialogPersistentSettings& CWildcardSelectDialogPersistentSettings
 
 void CWildcardSelectDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	SaveStringListToRegistry(hKey,_T("Pattern"),m_PatternList);
-	SaveStringToRegistry(hKey,_T("CurrentText"),m_szPattern);
+	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Pattern"),m_PatternList);
+	NRegistrySettings::SaveStringToRegistry(hKey,_T("CurrentText"),m_szPattern);
 }
 
 void CWildcardSelectDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	ReadStringListFromRegistry(hKey,_T("Pattern"),m_PatternList);
-	ReadStringFromRegistry(hKey,_T("CurrentText"),m_szPattern,
+	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Pattern"),m_PatternList);
+	NRegistrySettings::ReadStringFromRegistry(hKey,_T("CurrentText"),m_szPattern,
 		SIZEOF_ARRAY(m_szPattern));
 }
 

@@ -12,7 +12,7 @@ namespace NXMLSettings
 	void	AppendChildToParent(MSXML2::IXMLDOMNode *pChild, MSXML2::IXMLDOMNode *pParent);
 	void	AddAttributeToNode(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode,const WCHAR *wszAttributeName,const WCHAR *wszAttributeValue);
 	void	AddStringListToNode(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode,const TCHAR *szBaseKeyName,const std::list<std::wstring> &strList);
-	void	CreateElementNode(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement **pParentNode,MSXML2::IXMLDOMElement *pGrandparentNode,WCHAR *szElementName,WCHAR *szAttributeName);
+	void	CreateElementNode(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement **pParentNode,MSXML2::IXMLDOMElement *pGrandparentNode,const WCHAR *szElementName,const WCHAR *szAttributeName);
 	WCHAR	*EncodeBoolValue(BOOL bValue);
 	BOOL	DecodeBoolValue(WCHAR *wszValue);
 	WCHAR	*EncodeIntValue(int iValue);

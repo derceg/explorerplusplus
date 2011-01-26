@@ -48,23 +48,17 @@ lParam not currently used. */
 #define REG_TOOLBARS_KEY			_T("Software\\Explorer++\\Toolbars")
 #define REG_COLUMNS_KEY				_T("Software\\Explorer++\\DefaultColumns")
 #define REG_APPLICATIONS_KEY		_T("Software\\Explorer++\\ApplicationToolbar")
-#define REG_STATE_KEY				_T("Software\\Explorer++\\State")
+#define REG_DIALOGS_KEY				_T("Software\\Explorer++\\Dialogs")
 #define REG_COLORS_KEY				_T("Software\\Explorer++\\ColorRules")
 
-/* State keys (relative to REG_STATE_KEY). */
+/* Dialog keys (relative to REG_DIALOGS_KEY). */
 #define REG_ADDBOOKMARK_KEY			_T("AddBookmark")
-#define REG_COLORRULES_KEY			_T("ColorRules")
-#define REG_CUSTOMIZECOLORS_KEY		_T("CustomizeColors")
 #define REG_DESTROYFILES_KEY		_T("DestroyFiles")
 #define REG_DISPLAYCOLORS_KEY		_T("DisplayColors")
-#define REG_FILTER_KEY				_T("Filter")
-#define REG_MASSRENAME_KEY			_T("MassRename")
 #define REG_MERGEFILES_KEY			_T("MergeFiles")
 #define REG_ORGANIZEBOOKMARKS_KEY	_T("OrganizeBookmarks")
-#define REG_DRIVEPROPERTIES_KEY		_T("DriveProperties")
 #define REG_SELECTCOLUMNS_KEY		_T("SelectColumns")
 #define REG_SELECTDEFAULTCOLUMNS_KEY	_T("SelectDefaultColumns")
-#define REG_SETFILEATTRIBUTES_KEY	_T("SetFileAttributes")
 #define REG_SPLITFILE_KEY			_T("SplitFile")
 
 #define TAB_WINDOW_HEIGHT			24
@@ -96,21 +90,6 @@ typedef struct
 {
 	int iItemID;
 } ToolbarButton_t;
-
-typedef struct
-{
-	/* Description of this rule. */
-	TCHAR		szDescription[512];
-
-	/* Filename filtering. */
-	TCHAR		szFilterPattern[512];
-
-	/* Attribute filtering. */
-	DWORD		dwFilterAttributes;
-
-	/* Text color. */
-	COLORREF	rgbColour;
-} ListViewColouring_t;
 
 /* Describes the view modes and their order
 (as they differ on Windows XP and Vista/7). */
@@ -200,7 +179,6 @@ public:
 	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	LRESULT CALLBACK	StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,int iTabId);
 	INT_PTR CALLBACK	GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -220,8 +198,6 @@ public:
 	INT_PTR CALLBACK	SetDefaultColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	ColorFilteringProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	ColorRuleProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DWChangeDetailsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DWLinePropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 
@@ -276,6 +252,9 @@ public:
 
 
 private:
+
+	static const COLORREF	CF_COMPRESSED = RGB(0,0,255);
+	static const COLORREF	CF_ENCRYPTED = RGB(0,128,0);
 
 	class CLoadSaveRegistry : public ILoadSave
 	{
@@ -636,6 +615,9 @@ private:
 	void					ApplicationToolbarDeleteItem(int iItem);
 	void					ApplicationToolbarShowItemProperties(int iItem);
 
+	/* Customize colors. */
+	std::vector<ColorRule_t>	m_ColorRuleList;
+
 	/* Application button properties dialog. */
 	void					OnApplicationButtonPropertiesInit(HWND hDlg);
 	void					OnApplicationButtonPropertiesOk(HWND hDlg);
@@ -710,7 +692,7 @@ private:
 	void					LoadColorRulesFromRegistry(void);
 	void					LoadColorRulesFromRegistryInternal(HKEY hKey);
 	void					SaveColorRulesToRegistry(void);
-	void					SaveColorRulesToRegistryInternal(HKEY hKey,ListViewColouring_t *plvc,int iCount);
+	void					SaveColorRulesToRegistryInternal(HKEY hKey,ColorRule_t *pColorRule,int iCount);
 	void					SaveApplicationToolbarToRegistryInternal(HKEY hKey,ApplicationButton_t	*pab,int count);
 	void					SaveToolbarInformationToRegistry(void);
 	void					LoadToolbarInformationFromRegistry(void);
@@ -718,10 +700,6 @@ private:
 	void					LoadStateFromRegistry(void);
 	void					SaveAddBookmarkStateToRegistry(HKEY hParentKey);
 	void					LoadAddBookmarkStateFromRegistry(HKEY hParentKey);
-	void					SaveColorRulesStateToRegistry(HKEY hParentKey);
-	void					LoadColorRulesStateFromRegistry(HKEY hParentKey);
-	void					SaveCustomizeColorsStateToRegistry(HKEY hParentKey);
-	void					LoadCustomizeColorsStateFromRegistry(HKEY hParentKey);
 	void					SaveDestroyFilesStateToRegistry(HKEY hParentKey);
 	void					LoadDestroyFilesStateFromRegistry(HKEY hParentKey);
 	void					SaveDisplayColorsStateToRegistry(HKEY hParentKey);
@@ -985,15 +963,6 @@ private:
 	void					GetCurrentDefaultColumnState(HWND hDlg);
 	void					SetDefaultColumnsSaveState(HWND hDlg);
 
-	/* Customize colors dialog. */
-	void					CustomizeColorsMove(HWND hDlg,BOOL bUp);
-	void					CustomizeColorsDelete(HWND hDlg);
-	void					CustomizeColorsSaveState(HWND hDlg);
-	void					OnEditColorRule(HWND hDlg,int iSelected);
-
-	/* New color rule dialog. */
-	void					ColorRuleChooseNewColor(HWND hDlg);
-
 	/* XML Settings. */
 	void					LoadGenericSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					SaveGenericSettingsToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
@@ -1018,16 +987,12 @@ private:
 	void					LoadColorRulesFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode);
 	void					SaveColorRulesToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					SaveColorRulesToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe,ListViewColouring_t *plvc);
+	void					SaveColorRulesToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe,const ColorRule_t &ColorRule);
 	void					LoadToolbarInformationFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					SaveToolbarInformationToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveToolbarInformationToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	void					LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					LoadColorRulesStateFromXML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
-	void					LoadCustomizeColorsStateFromSML(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
 	void					SaveStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					SaveColorRulesStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
-	void					SaveCustomizeColorsStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	void					MapAttributeToValue(MSXML2::IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
 	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,TabInfo_t *pTabInfo);
 
@@ -1289,11 +1254,6 @@ private:
 	int						m_nSelectedOnInvert;
 	int						m_ListViewMButtonItem;
 
-	/* Listview item colouring. */
-	list<ListViewColouring_t>	m_ColourFilter;
-	COLORREF				m_rgbCompressed;
-	COLORREF				m_rgbEncrypted;
-
 	/* Copy/cut. */
 	IDataObject				*m_pClipboardDataObject;
 	HTREEITEM				m_hCutTreeViewItem;
@@ -1361,15 +1321,6 @@ private:
 	/* Split file dialog. */
 	BOOL					m_bSplitFileDlgStateSaved;
 	POINT					m_ptSplitFile;
-
-	/* Customize colors dialog. */
-	BOOL					m_bCustomizeColorsDlgStateSaved;
-	POINT					m_ptCustomizeColors;
-	COLORREF				m_crInitialColor;
-
-	/* New color rule dialog. */
-	ListViewColouring_t		*m_pColoringItem;
-	COLORREF				m_ccCustomColors[16];
 	
 	/* Cut items data. */
 	list<std::wstring>		m_CutFileNameList;

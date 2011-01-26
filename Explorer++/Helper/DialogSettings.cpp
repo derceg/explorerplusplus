@@ -15,7 +15,7 @@
 
 #include "stdafx.h"
 #include "DialogSettings.h"
-#include "Registry.h"
+#include "RegistrySettings.h"
 #include "XMLSettings.h"
 
 

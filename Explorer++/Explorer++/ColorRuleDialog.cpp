@@ -12,200 +12,229 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Explorer++.h"
+#include "ColorRuleDialog.h"
 #include "MainResource.h"
+#include "../Helper/Helper.h"
+#include "../Helper/XMLSettings.h"
 
 
-LRESULT CALLBACK StaticColorProcStub(HWND hwnd,UINT uMsg,
-WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-
-COLORREF g_rgbColor;
-BOOL g_bEditing;
-
-INT_PTR CALLBACK ColorRuleProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+namespace NColorRuleDialog
 {
-	static Explorerplusplus *pContainer = NULL;
-
-	switch(uMsg)
-	{
-		case WM_INITDIALOG:
-		{
-			pContainer = (Explorerplusplus *)lParam;
-		}
-		break;
-	}
-
-	return pContainer->ColorRuleProc(hDlg,uMsg,wParam,lParam);
+	LRESULT CALLBACK StaticColorProcStub(HWND hwnd,UINT uMsg,
+		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 }
 
-INT_PTR CALLBACK Explorerplusplus::ColorRuleProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
+const TCHAR CColorRuleDialogPersistentSettings::SETTINGS_KEY[] = _T("ColorRules");
+const COLORREF CColorRuleDialogPersistentSettings::DEFAULT_INITIAL_COLOR = RGB(0,94,138);
+
+CColorRuleDialog::CColorRuleDialog(HINSTANCE hInstance,
+	int iResource,HWND hParent,ColorRule_t *pColorRule,BOOL bEdit) :
+CBaseDialog(hInstance,iResource,hParent)
 {
-	switch(Msg)
+	m_pColorRule = pColorRule;
+	m_bEdit = bEdit;
+
+	m_pcrdps = &CColorRuleDialogPersistentSettings::GetInstance();
+}
+
+CColorRuleDialog::~CColorRuleDialog()
+{
+
+}
+
+BOOL CColorRuleDialog::OnInitDialog()
+{
+	if(m_bEdit)
 	{
-		case WM_INITDIALOG:
-			{
-				HWND hStaticColor;
+		SetDlgItemText(m_hDlg,IDC_EDIT_DESCRIPTION,m_pColorRule->strDescription.c_str());
+		SetDlgItemText(m_hDlg,IDC_EDIT_FILENAMEPATTERN,m_pColorRule->strFilterPattern.c_str());
 
-				SetDlgItemText(hDlg,IDC_EDIT_DESCRIPTION,m_pColoringItem->szDescription);
-				SetDlgItemText(hDlg,IDC_EDIT_FILENAMEPATTERN,m_pColoringItem->szFilterPattern);
+		m_cfCurrentColor = m_pColorRule->rgbColour;
 
-				g_rgbColor = m_pColoringItem->rgbColour;
+		if(m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_COMPRESSED)
+			CheckDlgButton(m_hDlg,IDC_CHECK_COMPRESSED,BST_CHECKED);
 
-				if(m_pColoringItem->dwFilterAttributes & FILE_ATTRIBUTE_COMPRESSED)
-					CheckDlgButton(hDlg,IDC_CHECK_COMPRESSED,BST_CHECKED);
+		if(m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_ENCRYPTED)
+			CheckDlgButton(m_hDlg,IDC_CHECK_ENCRYPTED,BST_CHECKED);
 
-				if(m_pColoringItem->dwFilterAttributes & FILE_ATTRIBUTE_ENCRYPTED)
-					CheckDlgButton(hDlg,IDC_CHECK_ENCRYPTED,BST_CHECKED);
+		if(m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_ARCHIVE)
+			CheckDlgButton(m_hDlg,IDC_CHECK_ARCHIVE,BST_CHECKED);
 
-				if(m_pColoringItem->dwFilterAttributes & FILE_ATTRIBUTE_ARCHIVE)
-					CheckDlgButton(hDlg,IDC_CHECK_ARCHIVE,BST_CHECKED);
+		if(m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_HIDDEN)
+			CheckDlgButton(m_hDlg,IDC_CHECK_HIDDEN,BST_CHECKED);
 
-				if(m_pColoringItem->dwFilterAttributes & FILE_ATTRIBUTE_HIDDEN)
-					CheckDlgButton(hDlg,IDC_CHECK_HIDDEN,BST_CHECKED);
+		if(m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED)
+			CheckDlgButton(m_hDlg,IDC_CHECK_INDEXED,BST_CHECKED);
 
-				if(m_pColoringItem->dwFilterAttributes & FILE_ATTRIBUTE_NOT_CONTENT_INDEXED)
-					CheckDlgButton(hDlg,IDC_CHECK_INDEXED,BST_CHECKED);
+		if(m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_READONLY)
+			CheckDlgButton(m_hDlg,IDC_CHECK_READONLY,BST_CHECKED);
 
-				if(m_pColoringItem->dwFilterAttributes & FILE_ATTRIBUTE_READONLY)
-					CheckDlgButton(hDlg,IDC_CHECK_READONLY,BST_CHECKED);
+		if(m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_SYSTEM)
+			CheckDlgButton(m_hDlg,IDC_CHECK_SYSTEM,BST_CHECKED);
 
-				if(m_pColoringItem->dwFilterAttributes & FILE_ATTRIBUTE_SYSTEM)
-					CheckDlgButton(hDlg,IDC_CHECK_SYSTEM,BST_CHECKED);
+		TCHAR szTemp[64];
+		LoadString(GetInstance(),IDS_EDITCOLORRULE,
+			szTemp,SIZEOF_ARRAY(szTemp));
+		SetWindowText(m_hDlg,szTemp);
+	}
+	else
+	{
+		m_cfCurrentColor = m_pcrdps->m_cfInitialColor;
+	}
 
-				hStaticColor = GetDlgItem(hDlg,IDC_STATIC_COLOR);
+	HWND hStaticColor = GetDlgItem(m_hDlg,IDC_STATIC_COLOR);
+	SetWindowSubclass(hStaticColor,NColorRuleDialog::StaticColorProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
-				SetWindowSubclass(hStaticColor,StaticColorProcStub,0,(DWORD_PTR)this);
+	SendMessage(GetDlgItem(m_hDlg,IDC_EDIT_DESCRIPTION),EM_SETSEL,0,-1);
+	SetFocus(GetDlgItem(m_hDlg,IDC_EDIT_DESCRIPTION));
 
-				if(g_bEditing)
-				{
-					TCHAR szTemp[64];
-
-					LoadString(g_hLanguageModule,IDS_EDITCOLORRULE,
-						szTemp,SIZEOF_ARRAY(szTemp));
-					SetWindowText(hDlg,szTemp);
-				}
-
-				SetFocus(GetDlgItem(hDlg,IDC_EDIT_DESCRIPTION));
-
-				CenterWindow(m_hContainer,hDlg);
-			}
-			break;
-
-		case WM_COMMAND:
-			switch(HIWORD(wParam))
-			{
-				case STN_DBLCLK:
-					ColorRuleChooseNewColor(hDlg);
-					break;
-			}
-
-			switch(LOWORD(wParam))
-			{
-			case IDC_BUTTON_CHANGECOLOR:
-				ColorRuleChooseNewColor(hDlg);
-				break;
-
-			case IDOK:
-				{
-					GetWindowText(GetDlgItem(hDlg,IDC_EDIT_DESCRIPTION),
-						m_pColoringItem->szDescription,
-						SIZEOF_ARRAY(m_pColoringItem->szDescription));
-
-					GetWindowText(GetDlgItem(hDlg,IDC_EDIT_FILENAMEFILTER),
-						m_pColoringItem->szFilterPattern,
-						SIZEOF_ARRAY(m_pColoringItem->szFilterPattern));
-
-					m_pColoringItem->rgbColour = g_rgbColor;
-
-					if(IsDlgButtonChecked(hDlg,IDC_CHECK_COMPRESSED) == BST_CHECKED)
-						m_pColoringItem->dwFilterAttributes |= FILE_ATTRIBUTE_COMPRESSED;
-
-					if(IsDlgButtonChecked(hDlg,IDC_CHECK_ENCRYPTED) == BST_CHECKED)
-						m_pColoringItem->dwFilterAttributes |= FILE_ATTRIBUTE_ENCRYPTED;
-
-					if(IsDlgButtonChecked(hDlg,IDC_CHECK_ARCHIVE) == BST_CHECKED)
-						m_pColoringItem->dwFilterAttributes |= FILE_ATTRIBUTE_ARCHIVE;
-
-					if(IsDlgButtonChecked(hDlg,IDC_CHECK_HIDDEN) == BST_CHECKED)
-						m_pColoringItem->dwFilterAttributes |= FILE_ATTRIBUTE_HIDDEN;
-
-					if(IsDlgButtonChecked(hDlg,IDC_CHECK_READONLY) == BST_CHECKED)
-						m_pColoringItem->dwFilterAttributes |= FILE_ATTRIBUTE_READONLY;
-
-					if(IsDlgButtonChecked(hDlg,IDC_CHECK_SYSTEM) == BST_CHECKED)
-						m_pColoringItem->dwFilterAttributes |= FILE_ATTRIBUTE_SYSTEM;
-
-					EndDialog(hDlg,1);
-				}
-				break;
-
-			case IDCANCEL:
-					EndDialog(hDlg,0);
-					break;
-			}
-			break;
-
-		case WM_CLOSE:
-			EndDialog(hDlg,0);
-			break;
+	if(m_pcrdps->m_bStateSaved)
+	{
+		SetWindowPos(m_hDlg,NULL,m_pcrdps->m_ptDialog.x,
+			m_pcrdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
+	}
+	else
+	{
+		CenterWindow(GetParent(m_hDlg),m_hDlg);
 	}
 
 	return 0;
 }
 
-void Explorerplusplus::ColorRuleChooseNewColor(HWND hDlg)
+BOOL CColorRuleDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+{
+	if(HIWORD(wParam) != 0)
+	{
+		switch(HIWORD(wParam))
+		{
+		case STN_DBLCLK:
+			OnChangeColor();
+			break;
+		}
+	}
+	else
+	{
+		switch(LOWORD(wParam))
+		{
+		case IDC_BUTTON_CHANGECOLOR:
+			OnChangeColor();
+			break;
+
+		case IDOK:
+			OnOk();
+			break;
+
+		case IDCANCEL:
+			OnCancel();
+			break;
+		}
+	}
+
+	return 0;
+}
+
+void CColorRuleDialog::OnOk()
+{
+	GetWindowString(GetDlgItem(m_hDlg,IDC_EDIT_DESCRIPTION),m_pColorRule->strDescription);
+	GetWindowString(GetDlgItem(m_hDlg,IDC_EDIT_FILENAMEPATTERN),m_pColorRule->strFilterPattern);
+
+	m_pColorRule->rgbColour = m_cfCurrentColor;
+
+	m_pColorRule->dwFilterAttributes = 0;
+
+	if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_COMPRESSED) == BST_CHECKED)
+		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_COMPRESSED;
+
+	if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_ENCRYPTED) == BST_CHECKED)
+		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_ENCRYPTED;
+
+	if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_ARCHIVE) == BST_CHECKED)
+		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_ARCHIVE;
+
+	if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_HIDDEN) == BST_CHECKED)
+		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_HIDDEN;
+
+	if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_READONLY) == BST_CHECKED)
+		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_READONLY;
+
+	if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_SYSTEM) == BST_CHECKED)
+		m_pColorRule->dwFilterAttributes |= FILE_ATTRIBUTE_SYSTEM;
+
+	EndDialog(m_hDlg,1);
+}
+
+void CColorRuleDialog::OnCancel()
+{
+	EndDialog(m_hDlg,0);
+}
+
+BOOL CColorRuleDialog::OnClose()
+{
+	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CColorRuleDialog::OnDestroy()
+{
+	SaveState();
+	return 0;
+}
+
+void CColorRuleDialog::SaveState()
+{
+	RECT rc;
+	GetWindowRect(m_hDlg,&rc);
+	m_pcrdps->m_ptDialog.x = rc.left;
+	m_pcrdps->m_ptDialog.y = rc.top;
+
+	m_pcrdps->m_bStateSaved = TRUE;
+}
+
+void CColorRuleDialog::OnChangeColor()
 {
 	CHOOSECOLOR cc;
-	BOOL bRet;
-
 	cc.lStructSize	= sizeof(cc);
-	cc.hwndOwner	= hDlg;
-	cc.rgbResult	= g_rgbColor;
-	cc.lpCustColors	= m_ccCustomColors;
+	cc.hwndOwner	= m_hDlg;
+	cc.rgbResult	= m_cfCurrentColor;
+	cc.lpCustColors	= m_pcrdps->m_cfCustomColors;
 	cc.Flags		= CC_RGBINIT;
-
-	bRet = ChooseColor(&cc);
+	BOOL bRet = ChooseColor(&cc);
 
 	if(bRet)
 	{
-		g_rgbColor = cc.rgbResult;
+		m_cfCurrentColor = cc.rgbResult;
 
 		/* If this is a new item been created, store the color
 		regardless of whether the item is actually created or
 		not. */
-		if(!g_bEditing)
-			m_pColoringItem->rgbColour = cc.rgbResult;
+		if(!m_bEdit)
+			m_pcrdps->m_cfInitialColor = cc.rgbResult;
 
-		InvalidateRect(GetDlgItem(hDlg,IDC_STATIC_COLOR),NULL,TRUE);
+		InvalidateRect(GetDlgItem(m_hDlg,IDC_STATIC_COLOR),NULL,TRUE);
 	}
 }
 
-LRESULT CALLBACK StaticColorProcStub(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK NColorRuleDialog::StaticColorProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
+	CColorRuleDialog *pcrd = reinterpret_cast<CColorRuleDialog *>(dwRefData);
 
-	return pContainer->StaticColorProc(hwnd,uMsg,wParam,lParam);
+	return pcrd->StaticColorProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK CColorRuleDialog::StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(Msg)
 	{
 	case WM_ERASEBKGND:
 		{
-			HDC hdc;
+			HDC hdc = reinterpret_cast<HDC>(wParam);
+
 			RECT rc;
-			HBRUSH hBrush;
-
-			hdc = (HDC)wParam;
-
 			GetClientRect(hwnd,&rc);
 
-			hBrush = CreateSolidBrush(g_rgbColor);
-
+			HBRUSH hBrush = CreateSolidBrush(m_cfCurrentColor);
 			FillRect(hdc,&rc,hBrush);
-
 			DeleteObject(hBrush);
 
 			return 1;
@@ -214,4 +243,116 @@ LRESULT CALLBACK Explorerplusplus::StaticColorProc(HWND hwnd,UINT Msg,WPARAM wPa
 	}
 
 	return DefSubclassProc(hwnd,Msg,wParam,lParam);
+}
+
+CColorRuleDialogPersistentSettings::CColorRuleDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
+{
+	m_cfInitialColor = DEFAULT_INITIAL_COLOR;
+
+	for(int i = 0;i < SIZEOF_ARRAY(m_cfCustomColors);i++)
+	{
+		m_cfCustomColors[i] = RGB(255,255,255);
+	}
+}
+
+CColorRuleDialogPersistentSettings::~CColorRuleDialogPersistentSettings()
+{
+	
+}
+
+CColorRuleDialogPersistentSettings& CColorRuleDialogPersistentSettings::GetInstance()
+{
+	static CColorRuleDialogPersistentSettings sfadps;
+	return sfadps;
+}
+
+void CColorRuleDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
+{
+	RegSetValueEx(hKey,_T("InitialColor"),0,REG_BINARY,
+		reinterpret_cast<LPBYTE>(&m_cfInitialColor),
+		sizeof(m_cfInitialColor));
+
+	RegSetValueEx(hKey,_T("CustomColors"),0,REG_BINARY,
+		reinterpret_cast<LPBYTE>(&m_cfCustomColors),
+		sizeof(m_cfCustomColors));
+}
+
+void CColorRuleDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
+{
+	DWORD dwSize = sizeof(m_cfInitialColor);
+	RegQueryValueEx(hKey,_T("InitialColor"),NULL,NULL,
+		reinterpret_cast<LPBYTE>(&m_cfInitialColor),&dwSize);
+
+	dwSize = sizeof(m_cfCustomColors);
+	RegQueryValueEx(hKey,_T("CustomColors"),NULL,NULL,
+		reinterpret_cast<LPBYTE>(&m_cfCustomColors),&dwSize);
+}
+
+void CColorRuleDialogPersistentSettings::SaveExtraXMLSettings(
+	MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
+{
+	TCHAR szNode[32];
+
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("InitialColor_r"),NXMLSettings::EncodeIntValue(GetRValue(m_cfInitialColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("InitialColor_g"),NXMLSettings::EncodeIntValue(GetGValue(m_cfInitialColor)));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("InitialColor_b"),NXMLSettings::EncodeIntValue(GetBValue(m_cfInitialColor)));
+
+	for(int i = 0;i < SIZEOF_ARRAY(m_cfCustomColors);i++)
+	{
+		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("r%d"),i);
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,NXMLSettings::EncodeIntValue(GetRValue(m_cfCustomColors[i])));
+		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("g%d"),i);
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,NXMLSettings::EncodeIntValue(GetGValue(m_cfCustomColors[i])));
+		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("b%d"),i);
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szNode,NXMLSettings::EncodeIntValue(GetBValue(m_cfCustomColors[i])));
+	}
+}
+
+void CColorRuleDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+{
+	if(CheckWildcardMatch(_T("r*"),bstrName,TRUE) ||
+		CheckWildcardMatch(_T("g*"),bstrName,TRUE) ||
+		CheckWildcardMatch(_T("b*"),bstrName,TRUE))
+	{
+		/* At the very least, the attribute name
+		should reference a color component and index. */
+		if(lstrlen(bstrName) < 2)
+		{
+			return ;
+		}
+
+		int iIndex = 0;
+
+		/* Extract the index. */
+		std::wstring strIndex = bstrName;
+		std::wistringstream iss(strIndex.substr(1));
+		iss >> iIndex;
+
+		if(iIndex < 0 || iIndex > (sizeof(m_cfCustomColors) - 1))
+		{
+			return;
+		}
+
+		COLORREF clr = m_cfCustomColors[iIndex];
+		BYTE c = static_cast<BYTE>(NXMLSettings::DecodeIntValue(bstrValue));
+
+		if(CheckWildcardMatch(_T("r*"),bstrName,TRUE))
+			m_cfCustomColors[iIndex] = RGB(c,GetGValue(clr),GetBValue(clr));
+		else if(CheckWildcardMatch(_T("g*"),bstrName,TRUE))
+			m_cfCustomColors[iIndex] = RGB(GetRValue(clr),c,GetBValue(clr));
+		else if(CheckWildcardMatch(_T("b*"),bstrName,TRUE))
+			m_cfCustomColors[iIndex] = RGB(GetRValue(clr),GetGValue(clr),c);
+	}
+	else
+	{
+		BYTE c = static_cast<BYTE>(NXMLSettings::DecodeIntValue(bstrValue));
+
+		if(lstrcmpi(_T("InitialColor_r"),bstrName) == 0)
+			m_cfInitialColor = RGB(c,GetGValue(m_cfInitialColor),GetBValue(m_cfInitialColor));
+		else if(lstrcmpi(_T("InitialColor_g"),bstrName) == 0)
+			m_cfInitialColor = RGB(c,GetGValue(m_cfInitialColor),GetBValue(m_cfInitialColor));
+		else if(lstrcmpi(_T("InitialColor_b"),bstrName) == 0)
+			m_cfInitialColor = RGB(c,GetGValue(m_cfInitialColor),GetBValue(m_cfInitialColor));
+	}
 }
