@@ -158,7 +158,8 @@ TOOLBAR_SEARCH,TOOLBAR_PROPERTIES,TOOLBAR_REFRESH};
 
 class Explorerplusplus : public IDropTarget, public IServiceProvider,
 	public IShellView2, public INewMenuClient, public IDropFilesCallback,
-	public IFileContextMenuExternal, public IModelessDialogNotification
+	public IFileContextMenuExternal, public IModelessDialogNotification,
+	public IExplorerplusplus
 {
 public:
 
@@ -202,6 +203,10 @@ public:
 	INT_PTR CALLBACK	DWLinePropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	void				FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
+
+	/* IExplorerplusplus methods. */
+	HWND				GetActiveListView();
+	IShellBrowser2		*GetActiveShellBrowser();
 
 	/* Directory modification. */
 	static void			DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,void *pData);

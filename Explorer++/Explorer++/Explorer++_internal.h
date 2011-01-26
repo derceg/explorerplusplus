@@ -277,6 +277,14 @@ bitmap). */
 #define SHELLIMAGES_PASTESHORTCUT		30
 #define SHELLIMAGES_DELETEPERMANENTLY	31
 
+/* Basic interface between Explorerplusplus
+and the dialogs. */
+__interface IExplorerplusplus
+{
+	virtual HWND			GetActiveListView();
+	virtual IShellBrowser2	*GetActiveShellBrowser();
+};
+
 /* Tab icons. */
 #define TAB_ICON_LOCK_INDEX			0
 

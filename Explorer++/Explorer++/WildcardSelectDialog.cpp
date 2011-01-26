@@ -13,6 +13,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include "Explorer++_internal.h"
 #include "WildcardSelectDialog.h"
 #include "MainResource.h"
 #include "../Helper/BaseDialog.h"
@@ -24,10 +25,11 @@
 const TCHAR CWildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("WildcardSelect");
 
 CWildcardSelectDialog::CWildcardSelectDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,BOOL bSelect) :
+	int iResource,HWND hParent,BOOL bSelect,IExplorerplusplus *pexpp) :
 CBaseDialog(hInstance,iResource,hParent)
 {
 	m_bSelect = bSelect;
+	m_pexpp = pexpp;
 
 	m_pwsdps = &CWildcardSelectDialogPersistentSettings::GetInstance();
 }
@@ -96,20 +98,7 @@ void CWildcardSelectDialog::OnOk()
 
 	if(lstrcmp(szPattern,EMPTY_STRING) != 0)
 	{
-		/* TODO: */
-		/*int nItems = ListView_GetItemCount(m_hActiveListView);
-
-		for(int i = 0;i < nItems;i++)
-		{
-			TCHAR	FullFileName[MAX_PATH];
-
-			m_pActiveShellBrowser->QueryName(i,FullFileName);
-
-			if(CheckWildcardMatch(szPattern,FullFileName,FALSE) == 1)
-			{
-				ListView_SelectItem(m_hActiveListView,i,m_bSelect);
-			}
-		}*/
+		SelectItems(szPattern);
 
 		bool bStorePattern = true;
 
@@ -133,6 +122,25 @@ void CWildcardSelectDialog::OnOk()
 	}
 
 	EndDialog(m_hDlg,1);
+}
+
+void CWildcardSelectDialog::SelectItems(TCHAR *szPattern)
+{
+	HWND hListView = m_pexpp->GetActiveListView();
+
+	int nItems = ListView_GetItemCount(hListView);
+
+	for(int i = 0;i < nItems;i++)
+	{
+		TCHAR szFilename[MAX_PATH];
+
+		m_pexpp->GetActiveShellBrowser()->QueryName(i,szFilename);
+
+		if(CheckWildcardMatch(szPattern,szFilename,FALSE) == 1)
+		{
+			ListView_SelectItem(hListView,i,m_bSelect);
+		}
+	}
 }
 
 void CWildcardSelectDialog::OnCancel()

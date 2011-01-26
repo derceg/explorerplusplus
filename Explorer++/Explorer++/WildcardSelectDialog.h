@@ -45,7 +45,7 @@ class CWildcardSelectDialog : public CBaseDialog
 {
 public:
 
-	CWildcardSelectDialog(HINSTANCE hInstance,int iResource,HWND hParent,BOOL bSelect);
+	CWildcardSelectDialog(HINSTANCE hInstance,int iResource,HWND hParent,BOOL bSelect,IExplorerplusplus *pexpp);
 	~CWildcardSelectDialog();
 
 protected:
@@ -59,11 +59,13 @@ private:
 
 	void	OnOk();
 	void	OnCancel();
+	void	SelectItems(TCHAR *szPattern);
 
 	void	SaveState();
 
 	CWildcardSelectDialogPersistentSettings	*m_pwsdps;
 
+	IExplorerplusplus	*m_pexpp;
 	BOOL	m_bSelect;
 };
 

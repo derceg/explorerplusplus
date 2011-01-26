@@ -848,7 +848,7 @@ void Explorerplusplus::OnSaveFileSlack(void)
 void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
 {
 	CWildcardSelectDialog WilcardSelectDialog(g_hLanguageModule,
-		IDD_WILDCARDSELECT,m_hContainer,bSelect);
+		IDD_WILDCARDSELECT,m_hContainer,bSelect,this);
 
 	WilcardSelectDialog.ShowModalDialog();
 }
@@ -2966,4 +2966,14 @@ void Explorerplusplus::OnModelessDialogDestroy(int iResource)
 		g_hwndSearch = NULL;
 		break;
 	}
+}
+
+HWND Explorerplusplus::GetActiveListView()
+{
+	return m_hActiveListView;
+}
+
+IShellBrowser2 *Explorerplusplus::GetActiveShellBrowser()
+{
+	return m_pActiveShellBrowser;
 }
