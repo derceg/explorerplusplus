@@ -93,11 +93,11 @@ BEGIN
     CONTROL         "Load default &folder",IDC_STARTUP_DEFAULTFOLDER,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,30,77,10
     GROUPBOX        "Default File Manager",IDC_STATIC,6,51,217,58
     CONTROL         "&Don't replace Explorer",IDC_OPTION_REPLACEEXPLORER_NONE,
-                    "Button",BS_AUTORADIOBUTTON,13,65,87,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,13,65,87,10
     CONTROL         "Replace &Explorer for filesystem folders",IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
-                    "Button",BS_AUTORADIOBUTTON,13,78,139,10
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,78,139,10
     CONTROL         "Replace Explorer for &all folders (Vista and later)",IDC_OPTION_REPLACEEXPLORER_ALL,
-                    "Button",BS_AUTORADIOBUTTON,13,91,167,10
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,91,167,10
     GROUPBOX        "General settings",IDC_STATIC,6,115,217,66
     CONTROL         "Run in &portable mode (save preferences to XML file)",IDC_OPTION_XML,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,129,182,10
@@ -737,7 +737,7 @@ BEGIN
         POPUP "&Filter"
         BEGIN
             MENUITEM "&Set Filter...\tCtrl+Shift+F", IDM_FILTER_FILTERRESULTS
-            MENUITEM "&Apply Filter\tShift+F",      IDM_FILTER_APPLYFILTER
+            MENUITEM "&Apply Filter\tCtrl+G",       IDM_FILTER_APPLYFILTER
         END
     END
     POPUP "&Actions"
