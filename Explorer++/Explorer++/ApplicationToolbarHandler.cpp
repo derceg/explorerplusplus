@@ -190,7 +190,7 @@ void Explorerplusplus::ApplicationToolbarDeleteItem(int iItem)
 				szInfoMsg,SIZEOF_ARRAY(szInfoMsg));
 
 			iMessageBoxReturn = MessageBox(m_hContainer,szInfoMsg,
-				WINDOW_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
+				NExplorerplusplus::WINDOW_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
 
 			if(iMessageBoxReturn == IDYES)
 			{

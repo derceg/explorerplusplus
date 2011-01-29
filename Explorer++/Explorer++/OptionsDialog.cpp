@@ -357,7 +357,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 							}
 							else
 							{
-								MessageBox(hDlg,szErrorMsg,WINDOW_NAME,MB_ICONWARNING);
+								MessageBox(hDlg,szErrorMsg,NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING);
 
 								int nIDButton;
 

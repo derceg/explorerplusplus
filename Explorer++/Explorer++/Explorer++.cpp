@@ -105,7 +105,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_bDisplayColorsDlgStateSaved	= FALSE;
 	m_bMergeFilesDlgStateSaved		= FALSE;
 	m_bOrganizeBookmarksDlgStateSaved	= FALSE;
-	m_bSplitFileDlgStateSaved		= FALSE;
 
 	m_pTaskbarList3					= NULL;
 

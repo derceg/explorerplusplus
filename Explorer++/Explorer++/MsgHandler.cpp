@@ -360,7 +360,7 @@ void Explorerplusplus::SetLanguageModule(void)
 					/* Main window hasn't been constructed yet, so this
 					message box doesn't have any owner window. */
 					MessageBox(NULL,_T("The version of the specified translation DLL does not match the version of the executable."),
-						WINDOW_NAME,MB_ICONWARNING);
+						NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING);
 				}
 			}
 			else
@@ -1092,7 +1092,7 @@ int Explorerplusplus::OnClose(void)
 		response = MessageBox(m_hContainer,
 		_T("Are you sure you want to \
 close all the current tabs?"),
-		WINDOW_NAME,
+		NExplorerplusplus::WINDOW_NAME,
 		MB_ICONINFORMATION|MB_YESNO);
 
 		/* If the user clicked no, return without
@@ -2120,7 +2120,8 @@ void Explorerplusplus::OnCreateNewFolder(void)
 		LoadString(g_hLanguageModule,IDS_NEWFOLDERERROR,szTemp,
 		SIZEOF_ARRAY(szTemp));
 
-		MessageBox(m_hContainer,szTemp,WINDOW_NAME,MB_ICONERROR|MB_OK);
+		MessageBox(m_hContainer,szTemp,NExplorerplusplus::WINDOW_NAME,
+			MB_ICONERROR|MB_OK);
 	}
 }
 

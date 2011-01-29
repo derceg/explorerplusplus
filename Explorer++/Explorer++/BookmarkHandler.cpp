@@ -764,7 +764,7 @@ BOOL Explorerplusplus::DeleteBookmarkSafe(HWND hwnd,void *pBookmarkHandle)
 		szInfoMsg,SIZEOF_ARRAY(szInfoMsg));
 
 	iMessageBoxReturn = MessageBox(hwnd,szInfoMsg,
-		WINDOW_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
+		NExplorerplusplus::WINDOW_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
 
 	if(iMessageBoxReturn == IDYES)
 	{

@@ -944,7 +944,8 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		LoadString(g_hLanguageModule,IDS_FILERENAMEERROR,szTemp,
 		SIZEOF_ARRAY(szTemp));
 
-		MessageBox(m_hContainer,szTemp,WINDOW_NAME,MB_ICONWARNING|MB_OK);
+		MessageBox(m_hContainer,szTemp,NExplorerplusplus::WINDOW_NAME,
+			MB_ICONWARNING|MB_OK);
 	}
 
 	return ret;

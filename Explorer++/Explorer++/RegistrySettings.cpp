@@ -21,6 +21,7 @@
 #include "FilterDialog.h"
 #include "ColorRuleDialog.h"
 #include "CustomizeColorsDialog.h"
+#include "SplitFileDialog.h"
 #include "../Helper/RegistrySettings.h"
 
 #define SMALL_SIZE		5
@@ -1350,7 +1351,6 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		SaveOrganizeBookmarksStateToRegistry(hKey);
 		SaveSelectColumnsStateToRegistry(hKey);
 		SaveSelectDefaultColumnsStateToRegistry(hKey);
-		SaveSplitFileColumnsStateToRegistry(hKey);
 
 		CSearchDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CWildcardSelectDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
@@ -1360,6 +1360,7 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		CFilterDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CColorRuleDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CCustomizeColorsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		CSplitFileDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1526,29 +1527,6 @@ void Explorerplusplus::SaveSelectDefaultColumnsStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void Explorerplusplus::SaveSplitFileColumnsStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_SPLITFILE_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bSplitFileDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptSplitFile,
-				sizeof(m_ptSplitFile));
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
 void Explorerplusplus::LoadStateFromRegistry(void)
 {
 	HKEY				hKey;
@@ -1565,7 +1543,6 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		LoadOrganizeBookmarksStateFromRegistry(hKey);
 		LoadSelectColumnsStateFromRegistry(hKey);
 		LoadSelectDefaultColumnsStateFromRegistry(hKey);
-		LoadSplitFileStateFromRegistry(hKey);
 
 		CSearchDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CWildcardSelectDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
@@ -1575,6 +1552,7 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		CFilterDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CColorRuleDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CCustomizeColorsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		CSplitFileDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1742,30 +1720,6 @@ void Explorerplusplus::LoadSelectDefaultColumnsStateFromRegistry(HKEY hParentKey
 		if(ReturnValue == ERROR_SUCCESS)
 		{
 			m_bSetDefaultColumnsDlgStateSaved = TRUE;
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadSplitFileStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_SPLITFILE_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptSplitFile,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bSplitFileDlgStateSaved = TRUE;
 		}
 
 		RegCloseKey(hKey);

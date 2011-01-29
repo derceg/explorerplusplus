@@ -59,7 +59,6 @@ lParam not currently used. */
 #define REG_ORGANIZEBOOKMARKS_KEY	_T("OrganizeBookmarks")
 #define REG_SELECTCOLUMNS_KEY		_T("SelectColumns")
 #define REG_SELECTDEFAULTCOLUMNS_KEY	_T("SelectDefaultColumns")
-#define REG_SPLITFILE_KEY			_T("SplitFile")
 
 #define TAB_WINDOW_HEIGHT			24
 #define DEFAULT_TREEVIEW_WIDTH		208
@@ -192,7 +191,6 @@ public:
 	INT_PTR CALLBACK	BookmarkPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkFolderPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	SplitFileProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	MergeFilesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DestroyFilesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SelectColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -717,8 +715,6 @@ private:
 	void					LoadSelectColumnsStateFromRegistry(HKEY hParentKey);
 	void					SaveSelectDefaultColumnsStateToRegistry(HKEY hParentKey);
 	void					LoadSelectDefaultColumnsStateFromRegistry(HKEY hParentKey);
-	void					SaveSplitFileColumnsStateToRegistry(HKEY hParentKey);
-	void					LoadSplitFileStateFromRegistry(HKEY hParentKey);
 
 	/* Window state update. */
 	void					UpdateWindowStates(void);
@@ -932,14 +928,6 @@ private:
 	/* Files and folders dialog. */
 	void					SetInfoTipWindowStates(HWND hDlg);
 	void					SetFolderSizeWindowState(HWND hDlg);
-
-	/* Split file dialog. */
-	void					OnSplitFileInit(HWND hDlg);
-	void					OnSplitFileOk(HWND hDlg);
-	void					OnSplitFileCancel(HWND hDlg);
-	void					OnSplitFileChangeOutputDirectory(HWND hDlg);
-	void					OnSplitFinished(HWND hDlg);
-	void					SplitFileSaveState(HWND hDlg);
 
 	/* Merge files dialog. */
 	void					OnMergeFilesInit(HWND hDlg);
@@ -1307,10 +1295,6 @@ private:
 	BOOL					m_bOrganizeBookmarksDlgStateSaved;
 	POINT					m_ptOrganizeBookmarks;
 
-	/* Split file dialog data. */
-	TCHAR					m_SplitFileName[MAX_PATH];
-	BOOL					m_bSplittingFile;
-
 	/* Select columns dialog. */
 	BOOL					m_bSelectColumnsDlgStateSaved;
 	POINT					m_ptSelectColumns;
@@ -1322,10 +1306,6 @@ private:
 	/* Display colors dialog. */
 	BOOL					m_bDisplayColorsDlgStateSaved;
 	POINT					m_ptDisplayColors;
-
-	/* Split file dialog. */
-	BOOL					m_bSplitFileDlgStateSaved;
-	POINT					m_ptSplitFile;
 	
 	/* Cut items data. */
 	list<std::wstring>		m_CutFileNameList;

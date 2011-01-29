@@ -71,7 +71,7 @@ BOOL CAboutDialog::OnInitDialog()
 #endif
 
 	GetDlgItemText(m_hDlg,IDC_STATIC_VERSIONNUMBER,szTemp,SIZEOF_ARRAY(szTemp));
-	StringCchPrintf(szVersion,SIZEOF_ARRAY(szVersion),szTemp,VERSION_NUMBER,szBuild);
+	StringCchPrintf(szVersion,SIZEOF_ARRAY(szVersion),szTemp,NExplorerplusplus::VERSION_NUMBER,szBuild);
 
 	SetDlgItemText(m_hDlg,IDC_STATIC_VERSIONNUMBER,szVersion);
 

@@ -3,7 +3,6 @@
 
 #include <list>
 #include "Misc.h"
-#include "Settings.h"
 #include "iDropSource.h"
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
@@ -19,14 +18,16 @@
 #include "../HolderWindow/HolderWindow.h"
 #include "MainResource.h"
 
+/* Used to share global data across the
+classes within the Explorer++ project. */
+namespace NExplorerplusplus
+{
+	const TCHAR VERSION_NUMBER[]	= _T("1.2");
+	const TCHAR WINDOW_NAME[]		= _T("Explorer++");
+	const TCHAR CLASS_NAME[]		= _T("Explorer++");
+}
+
 extern HINSTANCE g_hLanguageModule;
-
-#define VERSION_NUMBER		_T("1.2")
-
-#define WINDOW_NAME			_T("Explorer++")
-#define CLASS_NAME			_T("Explorer++")
-#define WEBSITE_URL			_T("http://www.explorerplusplus.com")
-#define WEBSITE_URL_TEXT	_T("www.explorerplusplus.com")
 
 /* The name of the XML file that preferences are
 saved to/loaded from. */
@@ -648,6 +649,7 @@ public:
 };
 
 BOOL TestConfigFileInternal(void);
+BOOL LoadWindowPosition(WINDOWPLACEMENT *pwndpl);
 BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl);
 BOOL LoadAllowMultipleInstancesFromXML(void);
 
@@ -665,7 +667,6 @@ INT_PTR CALLBACK DWChangeDetailsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARA
 INT_PTR CALLBACK DWLinePropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 /* Dialog handler stubs. */
-INT_PTR CALLBACK	SplitFileProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	MergeFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 int CALLBACK		PropSheetProcStub(HWND hDlg,UINT msg,LPARAM lParam);
 INT_PTR CALLBACK	BookmarkTabDlgProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);

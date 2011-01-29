@@ -203,7 +203,7 @@ void Explorerplusplus::OnMergeFilesOk(HWND hDlg)
 			szStringTemp,SIZEOF_ARRAY(szStringTemp));
 
 			MessageBox(hDlg,szStringTemp,
-			WINDOW_NAME,MB_ICONWARNING | MB_OK);
+			NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_OK);
 			return;
 		}
 
@@ -215,7 +215,7 @@ void Explorerplusplus::OnMergeFilesOk(HWND hDlg)
 			szStringTemp,SIZEOF_ARRAY(szStringTemp));
 
 			MessageBox(hDlg,szStringTemp,
-			WINDOW_NAME,MB_ICONWARNING | MB_OK);
+			NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_OK);
 			return;
 		}
 

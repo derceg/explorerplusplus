@@ -75,6 +75,11 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 			return OnInitDialog();
 			break;
 
+		case WM_CTLCOLORSTATIC:
+			return OnCtlColorStatic(reinterpret_cast<HWND>(lParam),
+				reinterpret_cast<HDC>(wParam));
+			break;
+
 		case WM_TIMER:
 			return OnTimer(static_cast<int>(wParam));
 			break;
@@ -188,6 +193,11 @@ BOOL CBaseDialog::OnInitDialog()
 }
 
 BOOL CBaseDialog::OnTimer(int iTimerID)
+{
+	return 0;
+}
+
+INT_PTR CBaseDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 {
 	return 0;
 }

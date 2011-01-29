@@ -413,14 +413,14 @@
     <ClCompile Include="NewBookmarkFolderDialog.cpp" />
     <ClCompile Include="OptionsDialog.cpp" />
     <ClCompile Include="OrganizeBookmarksDialog.cpp" />
+    <ClCompile Include="RegistrySettings.cpp" />
     <ClCompile Include="RenameTabDialog.cpp" />
     <ClCompile Include="SearchDialog.cpp" />
     <ClCompile Include="SelectColumnsDialog.cpp" />
     <ClCompile Include="SetDefaultColumnsDialog.cpp" />
     <ClCompile Include="SetFileAttributesDialog.cpp" />
-    <ClCompile Include="Settings.cpp" />
     <ClCompile Include="ShellContextMenuHandler.cpp" />
-    <ClCompile Include="SplitFile.cpp" />
+    <ClCompile Include="SplitFileDialog.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -459,7 +459,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="SearchDialog.h" />
     <ClInclude Include="SetFileAttributesDialog.h" />
-    <ClInclude Include="Settings.h" />
+    <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Version.h" />
     <ClInclude Include="WildcardSelectDialog.h" />

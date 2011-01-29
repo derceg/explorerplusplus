@@ -18,6 +18,7 @@
 #include "AboutDialog.h"
 #include "FilterDialog.h"
 #include "CustomizeColorsDialog.h"
+#include "SplitFileDialog.h"
 
 
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -1217,8 +1218,19 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case IDM_ACTIONS_SPLITFILE:
-			DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_SPLITFILE),
-			hwnd,SplitFileProcStub,(LPARAM)this);
+			{
+				int iSelected = ListView_GetNextItem(m_hActiveListView,-1,LVNI_SELECTED);
+
+				if(iSelected != -1)
+				{
+					TCHAR szFullFilename[MAX_PATH];
+					m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullFilename);
+
+					CSplitFileDialog SplitFileDialog(g_hLanguageModule,IDD_SPLITFILE,hwnd,szFullFilename);
+
+					SplitFileDialog.ShowModalDialog();
+				}
+			}
 			break;
 
 		case IDM_ACTIONS_DESTROYFILES:

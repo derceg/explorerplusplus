@@ -164,8 +164,8 @@ void Explorerplusplus::OnDestroyFilesOk(HWND hDlg)
 	_T("Files that are destroyed will be \
 permanently deleted, and will NOT be recoverable.\n\n\
 Are you sure you want to continue?"),
-	WINDOW_NAME,
-	MB_ICONWARNING | MB_SETFOREGROUND | MB_YESNO | MB_DEFBUTTON2);
+	NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_SETFOREGROUND|
+	MB_YESNO|MB_DEFBUTTON2);
 
 	DestroyFilesSaveState(hDlg);
 
