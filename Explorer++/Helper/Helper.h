@@ -141,7 +141,7 @@ void			ListView_SetAutoArrange(HWND hListView,BOOL bAutoArrange);
 HRESULT			ListView_SetBackgroundImage(HWND hListView,UINT Image);
 void			ListView_SwapItems(HWND hListView,int iItem1,int iItem2);
 void			ListView_SwapItemsNolParam(HWND hListView,int iItem1,int iItem2);
-void			ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate);
+void			ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate,UINT HoverTime);
 int				InsertItemIntoListView(HWND hListView,TCHAR *Text,int IconNumber,void *StoredData);
 
 /* Tab control helper functions. */

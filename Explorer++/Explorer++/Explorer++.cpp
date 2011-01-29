@@ -293,6 +293,7 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_bShowFilePreviews				= TRUE;
 	m_ReplaceExplorerMode			= NDefaultFileManager::REPLACEEXPLORER_NONE;
 	m_bOneClickActivate				= FALSE;
+	m_OneClickActivateHoverTime		= DEFAULT_LISTVIEW_HOVER_TIME;
 	m_bAllowMultipleInstances		= TRUE;
 	m_bForceSameTabWidth			= FALSE;
 	m_bDoubleClickTabClose			= TRUE;

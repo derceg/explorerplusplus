@@ -2970,7 +2970,7 @@ HRESULT GetMediaMetadata(TCHAR *szFileName,LPCWSTR szAttribute,BYTE **pszOutput)
 	return hr;
 }
 
-void ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate)
+void ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate,UINT HoverTime)
 {
 	DWORD dwExtendedStyle;
 	UINT dwStyle;
@@ -2994,6 +2994,8 @@ void ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate)
 
 		ListView_SetExtendedListViewStyle(hListView,
 			dwExtendedStyle|dwStyle);
+
+		ListView_SetHoverTime(hListView,HoverTime);
 	}
 	else
 	{

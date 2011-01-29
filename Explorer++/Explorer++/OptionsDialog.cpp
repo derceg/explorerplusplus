@@ -485,6 +485,11 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED,BST_CHECKED);
 				if(m_bOneClickActivate)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK,BST_CHECKED);
+				
+				SetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,m_OneClickActivateHoverTime,FALSE);
+				EnableWindow(GetDlgItem(hDlg,IDC_OPTIONS_HOVER_TIME),m_bOneClickActivate);
+				EnableWindow(GetDlgItem(hDlg,IDC_LABEL_HOVER_TIME),m_bOneClickActivate);
+
 				if(m_bOverwriteExistingFilesConfirmation)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,BST_CHECKED);
 				if(m_bPlayNavigationSound)
@@ -537,7 +542,6 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 			case IDC_SETTINGS_CHECK_EXTENSIONS:
 			case IDC_SETTINGS_CHECK_LINK:
 			case IDC_SETTINGS_CHECK_INSERTSORTED:
-			case IDC_SETTINGS_CHECK_SINGLECLICK:
 			case IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION:
 			case IDC_OPTIONS_PLAYNAVIGATIONSOUND:
 			case IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE:
@@ -545,6 +549,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 			case IDC_SETTINGS_CHECK_FRIENDLYDATES:
 			case IDC_SETTINGS_CHECK_RECYCLE_BIN:
 			case IDC_SETTINGS_CHECK_SYSVOL_INFO:
+			case IDC_OPTIONS_HOVER_TIME:
 				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
 				break;
 
@@ -566,6 +571,12 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 			case IDC_SETTINGS_CHECK_FOLDERSIZES:
 				SetFolderSizeWindowState(hDlg);
+				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+				break;
+
+			case IDC_SETTINGS_CHECK_SINGLECLICK:
+				EnableWindow(GetDlgItem(hDlg,IDC_OPTIONS_HOVER_TIME),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
+				EnableWindow(GetDlgItem(hDlg,IDC_LABEL_HOVER_TIME),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
 				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
 				break;
 			}
@@ -600,6 +611,8 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 						m_bOneClickActivate = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK)
 							== BST_CHECKED);
+
+						m_OneClickActivateHoverTime = GetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,NULL,FALSE);
 
 						m_bOverwriteExistingFilesConfirmation = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION)
 							== BST_CHECKED);
@@ -665,7 +678,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 							RefreshTab((int)tcItem.lParam);
 
-							ListView_ActivateOneClickSelect(m_hListView[(int)tcItem.lParam],m_bOneClickActivate);
+							ListView_ActivateOneClickSelect(m_hListView[(int)tcItem.lParam],m_bOneClickActivate,m_OneClickActivateHoverTime);
 						}
 
 						// Now, push each of the required settings to the treeview

@@ -259,6 +259,8 @@ private:
 	static const COLORREF	CF_COMPRESSED = RGB(0,0,255);
 	static const COLORREF	CF_ENCRYPTED = RGB(0,128,0);
 
+	static const int		DEFAULT_LISTVIEW_HOVER_TIME = 500;
+
 	class CLoadSaveRegistry : public ILoadSave
 	{
 	public:
@@ -1145,6 +1147,7 @@ private:
 	BOOL					m_bShowPrivilegeLevelInTitleBar;
 	BOOL					m_bShowFilePreviews;
 	BOOL					m_bOneClickActivate;
+	UINT					m_OneClickActivateHoverTime;
 	BOOL					m_bAllowMultipleInstances;
 	BOOL					m_bForceSameTabWidth;
 	BOOL					m_bDoubleClickTabClose;

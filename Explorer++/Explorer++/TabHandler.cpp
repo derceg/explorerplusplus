@@ -150,7 +150,7 @@ int *pTabObjectIndex)
 	if(m_hListView[iTabId] == NULL)
 		return E_FAIL;
 
-	ListView_ActivateOneClickSelect(m_hListView[iTabId],m_bOneClickActivate);
+	ListView_ActivateOneClickSelect(m_hListView[iTabId],m_bOneClickActivate,m_OneClickActivateHoverTime);
 
 	/* Set the listview to its initial size. */
 	SetListViewInitialPosition(m_hListView[iTabId]);

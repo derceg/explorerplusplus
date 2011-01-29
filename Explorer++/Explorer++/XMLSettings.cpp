@@ -95,6 +95,7 @@ will need to be changed correspondingly. */
 #define HASH_HIDESYSVOLINFOGLOBAL	3592382252
 #define HASH_ALLOWMULTIPLEINSTANCES	3463984536
 #define HASH_ONECLICKACTIVATE		1118178238
+#define HASH_ONECLICKACTIVATEHOVERTIME	3023373873
 #define HASH_FORCESAMETABWIDTH		2315576081
 #define HASH_DOUBLECLICKTABCLOSE	1866215987
 #define HASH_HANDLEZIPFILES			1074212343
@@ -331,6 +332,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("NewTabDirectory"),m_DefaultTabDirectory);
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivate"),NXMLSettings::EncodeBoolValue(m_bOneClickActivate));
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivateHoverTime"),NXMLSettings::EncodeIntValue(m_OneClickActivateHoverTime));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OverwriteExistingFilesConfirmation"),NXMLSettings::EncodeBoolValue(m_bOverwriteExistingFilesConfirmation));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -2085,6 +2088,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_ONECLICKACTIVATE:
 		m_bOneClickActivate = NXMLSettings::DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_ONECLICKACTIVATEHOVERTIME:
+		m_OneClickActivateHoverTime = NXMLSettings::DecodeIntValue(wszValue);
 		break;
 
 	case HASH_OVERWRITEEXISTINGFILESCONFIRMATION:
