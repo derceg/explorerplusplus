@@ -301,13 +301,13 @@ struct ColorRule_t
 };
 
 /* Used with the bookmark propeties dialog. */
-typedef struct
+struct BookmarkPropertiesInfo_t
 {
 	void	*pContainer;
 	void	*pBookmarkHandle;
-} BookmarkPropertiesInfo_t;
+};
 
-typedef struct
+struct UndoItem_t
 {
 	/* The type of operation that
 	occurred. */
@@ -320,25 +320,25 @@ typedef struct
 	element contains the previous name
 	of the file. */
 	TCHAR	szOldFileName[MAX_PATH + 1];
-} UndoItem_t;
+};
 
 /* This structure is stored with
 every listview. */
-typedef struct
+struct ListViewInfo_t
 {
 	void	*pContainer;
 	int		iObjectIndex;
-} ListViewInfo_t;
+};
 
 /* This information is used by
 the 'Add Bookmark' dialog. */
-typedef struct
+struct AddBookmarkInfo_t
 {
 	void			*pContainer;
 	void			*pParentBookmark;
 	LPITEMIDLIST	pidlDirectory;
 	BOOL			bExpandInitial;
-} AddBookmarkInfo_t;
+};
 
 struct ApplicationButton_t
 {
@@ -353,31 +353,31 @@ struct ApplicationButton_t
 	int		iImage;
 };
 
-typedef struct
+struct FolderSizeExtraInfo_t
 {
 	void	*pContainer;
 	int		uId;
-} FolderSizeExtraInfo_t;
+};
 
-typedef struct
+struct DWFolderSize_t
 {
 	int	uId;
 	int	iTabId;
 	BOOL bValid;
-} DWFolderSize_t;
+};
 
-typedef struct
+struct DWFolderSizeCompletion_t
 {
 	ULARGE_INTEGER	liFolderSize;
 	int				uId;
 	int				iTabId;
-} DWFolderSizeCompletion_t;
+};
 
-typedef struct
+struct FileSize_t
 {
 	SizeDisplayFormat_t	sdf;
 	TCHAR				szDisplayName[64];
-} FileSize_t;
+};
 
 /* Used to store settings for individual directories. */
 struct DirectorySettingsInternal_t
@@ -613,7 +613,6 @@ const FileSize_t g_FileSizes[] =
 {FORMAT_PBYTES,_T("PB")}};
 
 extern CRITICAL_SECTION g_csDirMonCallback;
-extern BOOL g_bConfigFileFound;
 extern BOOL g_bForceLanguageLoad;
 extern TCHAR g_szLang[32];
 
@@ -668,7 +667,6 @@ INT_PTR CALLBACK DWLinePropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPAR
 
 /* Dialog handler stubs. */
 INT_PTR CALLBACK	MergeFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-int CALLBACK		PropSheetProcStub(HWND hDlg,UINT msg,LPARAM lParam);
 INT_PTR CALLBACK	BookmarkTabDlgProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	NewBookmarkFolderProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	OrganizeBookmarksStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);

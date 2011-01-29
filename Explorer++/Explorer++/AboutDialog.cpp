@@ -16,15 +16,11 @@
 
 #include "stdafx.h"
 #include <list>
-#include "Misc.h"
-#include "Explorer++.h"
-#include "../Helper/FileOperations.h"
-#include "../Helper/Helper.h"
-#include "../Helper/Controls.h"
-#include "../Helper/Bookmark.h"
-#include "../Helper/BaseDialog.h"
+#include "Explorer++_internal.h"
 #include "AboutDialog.h"
 #include "MainResource.h"
+#include "../Helper/Helper.h"
+#include "../Helper/BaseDialog.h"
 
 #ifndef _DEBUG
 	#include "Version.h"

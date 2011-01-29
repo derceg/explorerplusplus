@@ -48,19 +48,30 @@ public:
 
 protected:
 
-	BOOL	OnInitDialog();
-	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
-	BOOL	OnClose();
-	BOOL	OnDestroy();
+	BOOL				OnInitDialog();
+	BOOL				OnCommand(WPARAM wParam,LPARAM lParam);
+	BOOL				OnGetMinMaxInfo(LPMINMAXINFO pmmi);
+	BOOL				OnSize(int iType,int iWidth,int iHeight);
+	BOOL				OnClose();
+	BOOL				OnDestroy();
 
 private:
 
-	void	OnOk();
-	void	OnCancel();
+	void				OnOk();
+	void				OnCancel();
 
-	void	SaveState();
+	void				SaveState();
+
+	void				InitializeControlStates();
 
 	IExplorerplusplus	*m_pexpp;
+
+	HWND				m_hGripper;
+	HICON				m_hDialogIcon;
+
+	int					m_iMinWidth;
+	int					m_iMinHeight;
+	CResizableDialog	*m_prd;
 
 	CFilterDialogPersistentSettings	*m_pfdps;
 };
