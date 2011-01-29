@@ -1246,6 +1246,7 @@ private:
 	BOOL					m_bCountingUp;
 	BOOL					m_bCountingDown;
 	BOOL					m_bInverted;
+	BOOL					m_bSelectionFromNowhere;
 	int						m_nSelected;
 	int						m_nSelectedOnInvert;
 	int						m_ListViewMButtonItem;

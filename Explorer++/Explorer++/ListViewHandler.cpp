@@ -329,8 +329,14 @@ LRESULT Explorerplusplus::OnListViewLButtonDown(WPARAM wParam,LPARAM lParam)
 	of items selected. */
 	if(HitTestInfo.flags == LVHT_NOWHERE)
 	{
+		m_bSelectionFromNowhere = TRUE;
+
 		if(!(wParam & MK_CONTROL) && m_nSelected > 1)
 			m_bCountingDown = TRUE;
+	}
+	else
+	{
+		m_bSelectionFromNowhere = FALSE;
 	}
 
 	return CallWindowProc(DefaultListViewProc,m_hActiveListView,WM_LBUTTONDOWN,wParam,lParam);

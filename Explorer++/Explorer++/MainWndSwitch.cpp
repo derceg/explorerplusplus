@@ -1541,8 +1541,10 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wPara
 	switch(nmhdr->code)
 	{
 		case NM_CLICK:
-			if(m_bOneClickActivate)
+			if(m_bOneClickActivate && !m_bSelectionFromNowhere)
+			{
 				OnListViewDoubleClick(&((NMITEMACTIVATE *)lParam)->hdr);
+			}
 			break;
 
 		case NM_DBLCLK:

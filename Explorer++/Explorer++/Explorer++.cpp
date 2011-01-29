@@ -79,6 +79,7 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_bCountingUp					= FALSE;
 	m_bCountingDown					= FALSE;
 	m_bInverted						= FALSE;
+	m_bSelectionFromNowhere			= FALSE;
 	m_bSelectingTreeViewDirectory	= FALSE;
 	m_bTreeViewRightClick			= FALSE;
 	m_bTabBeenDragged				= FALSE;
