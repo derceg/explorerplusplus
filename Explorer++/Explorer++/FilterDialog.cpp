@@ -140,6 +140,8 @@ BOOL CFilterDialog::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
 	pmmi->ptMinTrackSize.x = m_iMinWidth;
 	pmmi->ptMinTrackSize.y = m_iMinHeight;
 
+	pmmi->ptMaxTrackSize.y = m_iMinHeight;
+
 	return 0;
 }
 

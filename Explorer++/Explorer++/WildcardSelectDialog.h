@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include "../Helper/BaseDialog.h"
+#include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
 
 #import <msxml3.dll> raw_interfaces_only
@@ -52,21 +53,31 @@ protected:
 
 	BOOL	OnInitDialog();
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
+	BOOL	OnGetMinMaxInfo(LPMINMAXINFO pmmi);
+	BOOL	OnSize(int iType,int iWidth,int iHeight);
 	BOOL	OnClose();
 	BOOL	OnDestroy();
 
 private:
 
-	void	OnOk();
-	void	OnCancel();
-	void	SelectItems(TCHAR *szPattern);
+	void				OnOk();
+	void				OnCancel();
+	void				SelectItems(TCHAR *szPattern);
 
-	void	SaveState();
+	void				SaveState();
 
-	CWildcardSelectDialogPersistentSettings	*m_pwsdps;
+	void				InitializeControlStates();
 
 	IExplorerplusplus	*m_pexpp;
-	BOOL	m_bSelect;
+	BOOL				m_bSelect;
+
+	HWND				m_hGripper;
+
+	int					m_iMinWidth;
+	int					m_iMinHeight;
+	CResizableDialog	*m_prd;
+
+	CWildcardSelectDialogPersistentSettings	*m_pwsdps;
 };
 
 #endif

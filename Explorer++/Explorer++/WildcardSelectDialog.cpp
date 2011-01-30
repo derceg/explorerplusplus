@@ -50,15 +50,22 @@ BOOL CWildcardSelectDialog::OnInitDialog()
 
 	ComboBox_SetText(hComboBox,m_pwsdps->m_szPattern);
 
-	if(m_pwsdps->m_bStateSaved)
-	{
-		SetWindowPos(m_hDlg,NULL,m_pwsdps->m_ptDialog.x,
-			m_pwsdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	RECT rcMain;
+	GetWindowRect(m_hDlg,&rcMain);
+	m_iMinWidth = GetRectWidth(&rcMain);
+	m_iMinHeight = GetRectHeight(&rcMain);
+
+	m_hGripper = CreateWindow(_T("SCROLLBAR"),EMPTY_STRING,WS_CHILD|WS_VISIBLE|
+		WS_CLIPSIBLINGS|SBS_BOTTOMALIGN|SBS_SIZEGRIP,0,0,0,0,m_hDlg,NULL,
+		GetInstance(),NULL);
+
+	RECT rc;
+	GetClientRect(m_hDlg,&rcMain);
+	GetWindowRect(m_hGripper,&rc);
+	SetWindowPos(m_hGripper,NULL,GetRectWidth(&rcMain) - GetRectWidth(&rc),
+		GetRectHeight(&rcMain) - GetRectHeight(&rc),0,0,SWP_NOSIZE|SWP_NOZORDER);
+
+	InitializeControlStates();
 
 	if(!m_bSelect)
 	{
@@ -70,7 +77,40 @@ BOOL CWildcardSelectDialog::OnInitDialog()
 
 	SetFocus(hComboBox);
 
+	if(m_pwsdps->m_bStateSaved)
+	{
+		SetWindowPos(m_hDlg,NULL,m_pwsdps->m_ptDialog.x,
+			m_pwsdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
+	}
+	else
+	{
+		CenterWindow(GetParent(m_hDlg),m_hDlg);
+	}
+
 	return 0;
+}
+
+void CWildcardSelectDialog::InitializeControlStates()
+{
+	std::list<CResizableDialog::Control_t> ControlList;
+	CResizableDialog::Control_t Control;
+
+	Control.iID = IDC_SELECTGROUP_COMBOBOX;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDOK;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDCANCEL;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	m_prd = new CResizableDialog(m_hDlg,ControlList);
 }
 
 BOOL CWildcardSelectDialog::OnCommand(WPARAM wParam,LPARAM lParam)
@@ -141,6 +181,30 @@ void CWildcardSelectDialog::SelectItems(TCHAR *szPattern)
 			ListView_SelectItem(hListView,i,m_bSelect);
 		}
 	}
+}
+
+BOOL CWildcardSelectDialog::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
+{
+	pmmi->ptMinTrackSize.x = m_iMinWidth;
+	pmmi->ptMinTrackSize.y = m_iMinHeight;
+
+	/* Only allow the dialog to be resized in the
+	x-direction. */
+	pmmi->ptMaxTrackSize.y = m_iMinHeight;
+
+	return 0;
+}
+
+BOOL CWildcardSelectDialog::OnSize(int iType,int iWidth,int iHeight)
+{
+	RECT rc;
+	GetWindowRect(m_hGripper,&rc);
+	SetWindowPos(m_hGripper,NULL,iWidth - GetRectWidth(&rc),iHeight - GetRectHeight(&rc),0,
+		0,SWP_NOSIZE|SWP_NOZORDER);
+
+	m_prd->UpdateControls(iWidth,iHeight);
+
+	return 0;
 }
 
 void CWildcardSelectDialog::OnCancel()

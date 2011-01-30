@@ -41,15 +41,6 @@ lParam not currently used. */
 /* Registry keys used to store prgram settings. */
 #define REG_MAIN_KEY				_T("Software\\Explorer++")
 #define REG_SETTINGS_KEY			_T("Software\\Explorer++\\Settings")
-#define REG_WINDOWPOS_KEY			_T("Software\\Explorer++\\Position")
-#define REG_BOOKMARKS_KEY			_T("Software\\Explorer++\\Bookmarks")
-#define REG_FILTERS_KEY				_T("Software\\Explorer++\\Filters")
-#define REG_TABS_KEY				_T("Software\\Explorer++\\Tabs")
-#define REG_TOOLBARS_KEY			_T("Software\\Explorer++\\Toolbars")
-#define REG_COLUMNS_KEY				_T("Software\\Explorer++\\DefaultColumns")
-#define REG_APPLICATIONS_KEY		_T("Software\\Explorer++\\ApplicationToolbar")
-#define REG_DIALOGS_KEY				_T("Software\\Explorer++\\Dialogs")
-#define REG_COLORS_KEY				_T("Software\\Explorer++\\ColorRules")
 
 /* Dialog keys (relative to REG_DIALOGS_KEY). */
 #define REG_ADDBOOKMARK_KEY			_T("AddBookmark")

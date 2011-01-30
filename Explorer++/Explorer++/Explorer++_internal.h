@@ -650,6 +650,7 @@ public:
 BOOL TestConfigFileInternal(void);
 BOOL LoadWindowPosition(WINDOWPLACEMENT *pwndpl);
 BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl);
+BOOL LoadAllowMultipleInstancesFromRegistry(void);
 BOOL LoadAllowMultipleInstancesFromXML(void);
 
 LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);

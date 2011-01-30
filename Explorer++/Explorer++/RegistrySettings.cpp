@@ -24,7 +24,14 @@
 #include "SplitFileDialog.h"
 #include "../Helper/RegistrySettings.h"
 
-#define SMALL_SIZE		5
+
+#define REG_BOOKMARKS_KEY			_T("Software\\Explorer++\\Bookmarks")
+#define REG_TABS_KEY				_T("Software\\Explorer++\\Tabs")
+#define REG_TOOLBARS_KEY			_T("Software\\Explorer++\\Toolbars")
+#define REG_COLUMNS_KEY				_T("Software\\Explorer++\\DefaultColumns")
+#define REG_APPLICATIONS_KEY		_T("Software\\Explorer++\\ApplicationToolbar")
+#define REG_DIALOGS_KEY				_T("Software\\Explorer++\\Dialogs")
+#define REG_COLORS_KEY				_T("Software\\Explorer++\\ColorRules")
 
 TCHAR pszDirectoriesKey[]	= _T("Directories");
 TCHAR pszCustomDirsKey[]	= _T("Custom Directories");
@@ -54,6 +61,24 @@ BOOL LoadWindowPosition(WINDOWPLACEMENT *pwndpl)
 	}
 
 	return bRes;
+}
+
+BOOL LoadAllowMultipleInstancesFromRegistry(void)
+{
+	BOOL bAllowMultipleInstances = TRUE;
+
+	HKEY hSettingsKey;
+	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER,REG_SETTINGS_KEY,0,KEY_READ,&hSettingsKey);
+
+	if(lRes == ERROR_SUCCESS)
+	{
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("AllowMultipleInstances"),
+			(LPDWORD)&bAllowMultipleInstances);
+
+		RegCloseKey(hSettingsKey);
+	}
+
+	return bAllowMultipleInstances;
 }
 
 LONG Explorerplusplus::SaveSettings(void)

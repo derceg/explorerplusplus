@@ -454,19 +454,7 @@ LPSTR lpCmdLine,int nCmdShow)
 	}
 	else
 	{
-		HKEY hSettingsKey;
-		LONG ReturnValue;
-
-		/* Open/Create the main key that is used to store data. */
-		ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_SETTINGS_KEY,0,KEY_READ,&hSettingsKey);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("AllowMultipleInstances"),
-				(LPDWORD)&bAllowMultipleInstances);
-
-			RegCloseKey(hSettingsKey);
-		}
+		bAllowMultipleInstances = LoadAllowMultipleInstancesFromRegistry();
 	}
 
 	/* Create the mutex regardless of the actual setting. For example,
