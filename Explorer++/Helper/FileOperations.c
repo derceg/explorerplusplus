@@ -37,7 +37,7 @@ int RenameFile(TCHAR *NewFileName,TCHAR *OldFileName)
 	shfo.pTo	= NewFileName;
 	shfo.fFlags	= FOF_ALLOWUNDO;
 
-	return !SHFileOperation(&shfo);
+	return (!SHFileOperation(&shfo) && !shfo.fAnyOperationsAborted);
 }
 
 BOOL PerformFileOperation(HWND Parent,TCHAR *Path,TCHAR *FileName,
