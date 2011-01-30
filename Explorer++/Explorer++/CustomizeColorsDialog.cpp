@@ -277,7 +277,7 @@ void CCustomizeColorsDialog::OnMove(BOOL bUp)
 		}
 		else
 		{
-			if(iSelected == (m_pColorRuleList->size() - 1))
+			if(iSelected == static_cast<int>((m_pColorRuleList->size() - 1)))
 				return;
 
 			iSwap = iSelected + 1;
