@@ -1761,7 +1761,7 @@ BOOL Explorerplusplus::OnMouseWheel(WPARAM wParam,LPARAM lParam)
 
 		bInRect = PtInRect(&rc,pt);
 
-		if(bInRect)
+		if(bInRect && m_bShowFolders)
 		{
 			WORD wScrollType;
 			int  i = 0;
