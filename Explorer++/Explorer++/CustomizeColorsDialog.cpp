@@ -79,6 +79,22 @@ BOOL CCustomizeColorsDialog::OnInitDialog()
 		InsertColorRuleIntoListView(hListView,ColorRule,iItem++);
 	}
 
+	RECT rcMain;
+	GetWindowRect(m_hDlg,&rcMain);
+	m_iMinWidth = GetRectWidth(&rcMain);
+	m_iMinHeight = GetRectHeight(&rcMain);
+
+	m_hGripper = CreateWindow(_T("SCROLLBAR"),EMPTY_STRING,WS_CHILD|WS_VISIBLE|
+		WS_CLIPSIBLINGS|SBS_BOTTOMALIGN|SBS_SIZEGRIP,0,0,0,0,m_hDlg,NULL,
+		GetInstance(),NULL);
+
+	GetClientRect(m_hDlg,&rcMain);
+	GetWindowRect(m_hGripper,&rc);
+	SetWindowPos(m_hGripper,NULL,GetRectWidth(&rcMain) - GetRectWidth(&rc),
+		GetRectHeight(&rcMain) - GetRectHeight(&rc),0,0,SWP_NOSIZE|SWP_NOZORDER);
+
+	InitializeControlStates();
+
 	SetFocus(hListView);
 
 	if(m_pccdps->m_bStateSaved)
@@ -92,6 +108,54 @@ BOOL CCustomizeColorsDialog::OnInitDialog()
 	}
 
 	return 0;
+}
+
+void CCustomizeColorsDialog::InitializeControlStates()
+{
+	std::list<CResizableDialog::Control_t> ControlList;
+	CResizableDialog::Control_t Control;
+
+	Control.iID = IDC_LISTVIEW_COLORRULES;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_BUTTON_DELETE;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_BUTTON_MOVEDOWN;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_BUTTON_MOVEUP;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_BUTTON_EDIT;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_BUTTON_NEW;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDOK;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDCANCEL;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	m_prd = new CResizableDialog(m_hDlg,ControlList);
 }
 
 void CCustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const ColorRule_t &ColorRule,
@@ -174,6 +238,26 @@ BOOL CCustomizeColorsDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
+BOOL CCustomizeColorsDialog::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
+{
+	pmmi->ptMinTrackSize.x = m_iMinWidth;
+	pmmi->ptMinTrackSize.y = m_iMinHeight;
+
+	return 0;
+}
+
+BOOL CCustomizeColorsDialog::OnSize(int iType,int iWidth,int iHeight)
+{
+	RECT rc;
+	GetWindowRect(m_hGripper,&rc);
+	SetWindowPos(m_hGripper,NULL,iWidth - GetRectWidth(&rc),iHeight - GetRectHeight(&rc),0,
+		0,SWP_NOSIZE|SWP_NOZORDER);
+
+	m_prd->UpdateControls(iWidth,iHeight);
+
+	return 0;
+}
+
 BOOL CCustomizeColorsDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
@@ -182,6 +266,8 @@ BOOL CCustomizeColorsDialog::OnClose()
 
 BOOL CCustomizeColorsDialog::OnDestroy()
 {
+	delete m_prd;
+
 	DestroyIcon(m_hDialogIcon);
 
 	SaveState();

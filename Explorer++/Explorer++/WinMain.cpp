@@ -497,7 +497,7 @@ LPSTR lpCmdLine,int nCmdShow)
 				}
 
 				SetForegroundWindow(hPrev);
-				ShowWindow(hPrev,SW_SHOW);
+				ShowWindow(hPrev,SW_RESTORE);
 				CloseHandle(hMutex);
 				return 0;
 			}
