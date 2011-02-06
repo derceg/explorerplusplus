@@ -29,7 +29,7 @@ const COLORREF CColorRuleDialogPersistentSettings::DEFAULT_INITIAL_COLOR = RGB(0
 
 CColorRuleDialog::CColorRuleDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,ColorRule_t *pColorRule,BOOL bEdit) :
-CBaseDialog(hInstance,iResource,hParent)
+CBaseDialog(hInstance,iResource,hParent,false)
 {
 	m_pColorRule = pColorRule;
 	m_bEdit = bEdit;

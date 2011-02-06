@@ -28,7 +28,7 @@ const TCHAR CMassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename
 
 CMassRenameDialog::CMassRenameDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,std::list<std::wstring> FullFilenameList) :
-CBaseDialog(hInstance,iResource,hParent)
+CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_FullFilenameList = FullFilenameList;
 
@@ -118,27 +118,10 @@ BOOL CMassRenameDialog::OnInitDialog()
 		iItem++;
 	}
 
-	InitializeControlStates();
-
 	SetDlgItemText(m_hDlg,IDC_MASSRENAME_EDIT,_T("$F"));
 	SendMessage(GetDlgItem(m_hDlg,IDC_MASSRENAME_EDIT),
 		EM_SETSEL,0,-1);
 	SetFocus(GetDlgItem(m_hDlg,IDC_MASSRENAME_EDIT));
-
-	RECT rcMain;
-
-	GetWindowRect(m_hDlg,&rcMain);
-	m_iMinWidth = GetRectWidth(&rcMain);
-	m_iMinHeight = GetRectHeight(&rcMain);
-
-	m_hGripper = CreateWindow(_T("SCROLLBAR"),EMPTY_STRING,WS_CHILD|WS_VISIBLE|
-		WS_CLIPSIBLINGS|SBS_BOTTOMALIGN|SBS_SIZEGRIP,0,0,0,0,m_hDlg,NULL,
-		GetInstance(),NULL);
-
-	GetClientRect(m_hDlg,&rcMain);
-	GetWindowRect(m_hGripper,&rc);
-	SetWindowPos(m_hGripper,NULL,GetRectWidth(&rcMain) - GetRectWidth(&rc),
-		GetRectHeight(&rcMain) - GetRectHeight(&rc),0,0,SWP_NOSIZE|SWP_NOZORDER);
 
 	if(m_pmrdps->m_bStateSaved)
 	{
@@ -154,9 +137,11 @@ BOOL CMassRenameDialog::OnInitDialog()
 	return 0;
 }
 
-void CMassRenameDialog::InitializeControlStates()
+void CMassRenameDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
+	std::list<CResizableDialog::Control_t> &ControlList)
 {
-	std::list<CResizableDialog::Control_t> ControlList;
+	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
+
 	CResizableDialog::Control_t Control;
 
 	Control.iID = IDC_MASSRENAME_EDIT;
@@ -184,7 +169,10 @@ void CMassRenameDialog::InitializeControlStates()
 	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
-	m_prd = new CResizableDialog(m_hDlg,ControlList);
+	Control.iID = IDC_GRIPPER;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
 }
 
 BOOL CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
@@ -282,27 +270,6 @@ BOOL CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CMassRenameDialog::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
-{
-	/* Set the minimum dialog size. */
-	pmmi->ptMinTrackSize.x = m_iMinWidth;
-	pmmi->ptMinTrackSize.y = m_iMinHeight;
-
-	return 0;
-}
-
-BOOL CMassRenameDialog::OnSize(int iType,int iWidth,int iHeight)
-{
-	RECT rc;
-	GetWindowRect(m_hGripper,&rc);
-	SetWindowPos(m_hGripper,NULL,iWidth - GetRectWidth(&rc),iHeight - GetRectHeight(&rc),0,
-		0,SWP_NOSIZE|SWP_NOZORDER);
-
-	m_prd->UpdateControls(iWidth,iHeight);
-
-	return 0;
-}
-
 BOOL CMassRenameDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
@@ -313,8 +280,6 @@ BOOL CMassRenameDialog::OnDestroy()
 {
 	DestroyIcon(m_hMoreIcon);
 	DestroyIcon(m_hDialogIcon);
-
-	delete m_prd;
 
 	SaveState();
 	return 0;

@@ -41,7 +41,7 @@ const TCHAR CSearchDialogPersistentSettings::SETTINGS_KEY[] = _T("Search");
 
 CSearchDialog::CSearchDialog(HINSTANCE hInstance,int iResource,
 	HWND hParent,TCHAR *szSearchDirectory) :
-CBaseDialog(hInstance,iResource,hParent)
+CBaseDialog(hInstance,iResource,hParent,false)
 {
 	m_bSearching = FALSE;
 	m_bStopSearching = FALSE;
@@ -1087,6 +1087,7 @@ void CSearch::SearchDirectory(const TCHAR *szDirectory)
 
 	SearchDirectoryInternal(szDirectory,&SubFolderList);
 
+	/* TODO: Critical section not released. */
 	EnterCriticalSection(&m_csStop);
 	if(m_bStopSearching)
 		return;
@@ -1119,6 +1120,7 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 	{
 		while(FindNextFile(hFindFile,&wfd) != 0)
 		{
+			/* TODO: Critical section not released. */
 			EnterCriticalSection(&m_csStop);
 			if(m_bStopSearching)
 				break;

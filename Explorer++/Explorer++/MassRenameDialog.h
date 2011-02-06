@@ -38,10 +38,10 @@ protected:
 
 	BOOL	OnInitDialog();
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
-	BOOL	OnGetMinMaxInfo(LPMINMAXINFO pmmi);
-	BOOL	OnSize(int iType,int iWidth,int iHeight);
 	BOOL	OnClose();
 	BOOL	OnDestroy();
+
+	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
 private:
 
@@ -50,21 +50,11 @@ private:
 
 	void	SaveState();
 
-	void	InitializeControlStates();
 	void	ProcessFileName(const std::wstring strTarget,const std::wstring strFilename,int iFileIndex,std::wstring &strOutput);
 
 	std::list<std::wstring>	m_FullFilenameList;
-	HWND	m_hGripper;
 	HICON	m_hDialogIcon;
 	HICON	m_hMoreIcon;
-
-	CResizableDialog	*m_prd;
-
-	int		m_iMinWidth;
-	int		m_iMinHeight;
-
-	int		m_iListViewWidthDelta;
-	int		m_iListViewHeightDelta;
 
 	CMassRenameDialogPersistentSettings	*m_pmrdps;
 };

@@ -12,6 +12,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include "Explorer++_internal.h"
 #include "RenameTabDialog.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
@@ -21,12 +22,14 @@
 const TCHAR CRenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
 CRenameTabDialog::CRenameTabDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent) :
-CBaseDialog(hInstance,iResource,hParent)
+	int iResource,HWND hParent,IExplorerplusplus *pexpp) :
+CBaseDialog(hInstance,iResource,hParent,false)
 {
+	m_pexpp = pexpp;
+
 	m_prtdps = &CRenameTabDialogPersistentSettings::GetInstance();
 
-	/* TODO: Need tab name. */
+	/* TODO: Need tab name. Query from tab directly. */
 	/*TCITEM tcItem;
 	tcItem.mask			= TCIF_PARAM;
 	TabCtrl_GetItem(m_hTabCtrl,g_iTab,&tcItem);
@@ -115,12 +118,7 @@ void CRenameTabDialog::OnUseCustomName()
 
 void CRenameTabDialog::OnOk()
 {
-	/* TODO: Need to be able to change tab name. */
-	/*TCITEM	tcItem;
-	TCHAR	szTabText[MAX_PATH];
-
-	tcItem.mask			= TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,g_iTab,&tcItem);
+	TCHAR szTabText[MAX_PATH];
 
 	UINT uCheckStatus = IsDlgButtonChecked(m_hDlg,IDC_RENAMETAB_USEFOLDERNAME);
 
@@ -128,7 +126,7 @@ void CRenameTabDialog::OnOk()
 	{
 		LPITEMIDLIST pidlDirectory = NULL;
 
-		pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+		pidlDirectory = m_pexpp->GetActiveShellBrowser()->QueryCurrentDirectoryIdl();
 		GetDisplayName(pidlDirectory,szTabText,SHGDN_INFOLDER);
 
 		CoTaskMemFree(pidlDirectory);
@@ -140,13 +138,7 @@ void CRenameTabDialog::OnOk()
 		GetWindowText(hEditName,szTabText,SIZEOF_ARRAY(szTabText));
 	}
 
-	StringCchCopy(m_TabInfo[(int)tcItem.lParam].szName,
-		SIZEOF_ARRAY(m_TabInfo[(int)tcItem.lParam].szName),szTabText);
-	m_TabInfo[(int)tcItem.lParam].bUseCustomName = (uCheckStatus != BST_CHECKED);
-
-	tcItem.mask		= TCIF_TEXT;
-	tcItem.pszText	= szTabText;
-	TabCtrl_SetItem(m_hTabCtrl,g_iTab,&tcItem);*/
+	/* TODO: Need to be able to change tab name. */
 
 	EndDialog(m_hDlg,1);
 }

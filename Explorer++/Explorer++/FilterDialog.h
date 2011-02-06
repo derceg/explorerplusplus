@@ -50,28 +50,19 @@ protected:
 
 	BOOL				OnInitDialog();
 	BOOL				OnCommand(WPARAM wParam,LPARAM lParam);
-	BOOL				OnGetMinMaxInfo(LPMINMAXINFO pmmi);
-	BOOL				OnSize(int iType,int iWidth,int iHeight);
 	BOOL				OnClose();
 	BOOL				OnDestroy();
+
+	void				GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
 private:
 
 	void				OnOk();
 	void				OnCancel();
-
 	void				SaveState();
 
-	void				InitializeControlStates();
-
 	IExplorerplusplus	*m_pexpp;
-
-	HWND				m_hGripper;
 	HICON				m_hDialogIcon;
-
-	int					m_iMinWidth;
-	int					m_iMinHeight;
-	CResizableDialog	*m_prd;
 
 	CFilterDialogPersistentSettings	*m_pfdps;
 };

@@ -41,10 +41,10 @@ protected:
 	BOOL	OnInitDialog();
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnNotify(NMHDR *pnmhdr);
-	BOOL	OnGetMinMaxInfo(LPMINMAXINFO pmmi);
-	BOOL	OnSize(int iType,int iWidth,int iHeight);
 	BOOL	OnClose();
 	BOOL	OnDestroy();
+
+	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
 private:
 
@@ -58,17 +58,10 @@ private:
 	void	OnOk();
 	void	OnCancel();
 
-	void	InitializeControlStates();
-
 	void	SaveState();
 
-	HWND	m_hGripper;
 	HICON	m_hDialogIcon;
 	std::vector<ColorRule_t>	*m_pColorRuleList;
-
-	int		m_iMinWidth;
-	int		m_iMinHeight;
-	CResizableDialog	*m_prd;
 
 	CCustomizeColorsDialogPersistentSettings	*m_pccdps;
 };

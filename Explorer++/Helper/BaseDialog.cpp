@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include <unordered_map>
 #include "BaseDialog.h"
+#include "Helper.h"
 
 
 namespace NBaseDialog
@@ -72,6 +73,26 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 		case WM_INITDIALOG:
 			m_hDlg = hDlg;
 
+			if(m_bResizable)
+			{
+				RECT rcMain;
+				GetWindowRect(m_hDlg,&rcMain);
+
+				/* Assume that the current width and height of
+				the dialog are the minimum width and height.
+				Note that at this point, the dialog has NOT
+				been initialized in any way, so it will not
+				have had a chance to be resized yet. */
+				m_iMinWidth = GetRectWidth(&rcMain);
+				m_iMinHeight = GetRectHeight(&rcMain);
+
+				std::list<CResizableDialog::Control_t> ControlList;
+				m_dsc = DIALOG_SIZE_CONSTRAINT_NONE;
+				GetResizableControlInformation(m_dsc,ControlList);
+
+				m_prd = new CResizableDialog(m_hDlg,ControlList);
+			}
+
 			return OnInitDialog();
 			break;
 
@@ -93,10 +114,36 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 			break;
 
 		case WM_GETMINMAXINFO:
+			if(m_bResizable)
+			{
+				LPMINMAXINFO pmmi = reinterpret_cast<LPMINMAXINFO>(lParam);
+
+				pmmi->ptMinTrackSize.x = m_iMinWidth;
+				pmmi->ptMinTrackSize.y = m_iMinHeight;
+
+				if(m_dsc == DIALOG_SIZE_CONSTRAINT_X)
+				{
+					pmmi->ptMaxTrackSize.y = m_iMinHeight;
+				}
+
+				if(m_dsc == DIALOG_SIZE_CONSTRAINT_Y)
+				{
+					pmmi->ptMaxTrackSize.x = m_iMinWidth;
+				}
+
+				return 0;
+			}
+
 			return OnGetMinMaxInfo(reinterpret_cast<LPMINMAXINFO>(lParam));
 			break;
 
 		case WM_SIZE:
+			if(m_bResizable)
+			{
+				m_prd->UpdateControls(LOWORD(lParam),HIWORD(lParam));
+				return 0;
+			}
+
 			return OnSize(static_cast<int>(wParam),
 				LOWORD(lParam),HIWORD(lParam));
 			break;
@@ -132,18 +179,21 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 }
 
 CBaseDialog::CBaseDialog(HINSTANCE hInstance,int iResource,
-	HWND hParent)
+	HWND hParent,bool bResizable)
 {
 	m_hInstance = hInstance;
 	m_iResource = iResource;
 	m_hParent = hParent;
+	m_bResizable = bResizable;
+
+	m_prd = NULL;
 
 	m_bShowingModelessDialog = FALSE;
 }
 
 CBaseDialog::~CBaseDialog()
 {
-
+	delete m_prd;
 }
 
 HINSTANCE CBaseDialog::GetInstance()
@@ -238,6 +288,12 @@ BOOL CBaseDialog::OnNcDestroy()
 }
 
 void CBaseDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
+{
+
+}
+
+void CBaseDialog::GetResizableControlInformation(DialogSizeConstraint &dsc,
+	std::list<CResizableDialog::Control_t> &ControlList)
 {
 
 }

@@ -25,7 +25,7 @@ const TCHAR CFilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
 CFilterDialog::CFilterDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,IExplorerplusplus *pexpp) :
-CBaseDialog(hInstance,iResource,hParent)
+CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_pexpp = pexpp;
 
@@ -66,23 +66,6 @@ BOOL CFilterDialog::OnInitDialog()
 	if (m_pexpp->GetActiveShellBrowser()->GetFilterCaseSensitive())
 		CheckDlgButton(m_hDlg,IDC_FILTERS_CASESENSITIVE,BST_CHECKED);
 
-	RECT rcMain;
-	GetWindowRect(m_hDlg,&rcMain);
-	m_iMinWidth = GetRectWidth(&rcMain);
-	m_iMinHeight = GetRectHeight(&rcMain);
-
-	m_hGripper = CreateWindow(_T("SCROLLBAR"),EMPTY_STRING,WS_CHILD|WS_VISIBLE|
-		WS_CLIPSIBLINGS|SBS_BOTTOMALIGN|SBS_SIZEGRIP,0,0,0,0,m_hDlg,NULL,
-		GetInstance(),NULL);
-
-	RECT rc;
-	GetClientRect(m_hDlg,&rcMain);
-	GetWindowRect(m_hGripper,&rc);
-	SetWindowPos(m_hGripper,NULL,GetRectWidth(&rcMain) - GetRectWidth(&rc),
-		GetRectHeight(&rcMain) - GetRectHeight(&rc),0,0,SWP_NOSIZE|SWP_NOZORDER);
-
-	InitializeControlStates();
-
 	if(m_pfdps->m_bStateSaved)
 	{
 		SetWindowPos(m_hDlg,NULL,m_pfdps->m_ptDialog.x,
@@ -96,9 +79,11 @@ BOOL CFilterDialog::OnInitDialog()
 	return 0;
 }
 
-void CFilterDialog::InitializeControlStates()
+void CFilterDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
+	std::list<CResizableDialog::Control_t> &ControlList)
 {
-	std::list<CResizableDialog::Control_t> ControlList;
+	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_X;
+
 	CResizableDialog::Control_t Control;
 
 	Control.iID = IDC_FILTER_COMBOBOX;
@@ -116,7 +101,10 @@ void CFilterDialog::InitializeControlStates()
 	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
-	m_prd = new CResizableDialog(m_hDlg,ControlList);
+	Control.iID = IDC_GRIPPER;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
 }
 
 BOOL CFilterDialog::OnCommand(WPARAM wParam,LPARAM lParam)
@@ -131,28 +119,6 @@ BOOL CFilterDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 		OnCancel();
 		break;
 	}
-
-	return 0;
-}
-
-BOOL CFilterDialog::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
-{
-	pmmi->ptMinTrackSize.x = m_iMinWidth;
-	pmmi->ptMinTrackSize.y = m_iMinHeight;
-
-	pmmi->ptMaxTrackSize.y = m_iMinHeight;
-
-	return 0;
-}
-
-BOOL CFilterDialog::OnSize(int iType,int iWidth,int iHeight)
-{
-	RECT rc;
-	GetWindowRect(m_hGripper,&rc);
-	SetWindowPos(m_hGripper,NULL,iWidth - GetRectWidth(&rc),iHeight - GetRectHeight(&rc),0,
-		0,SWP_NOSIZE|SWP_NOZORDER);
-
-	m_prd->UpdateControls(iWidth,iHeight);
 
 	return 0;
 }

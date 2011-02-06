@@ -36,7 +36,7 @@ const TCHAR CSplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile")
 
 CSplitFileDialog::CSplitFileDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,std::wstring strFullFilename) :
-CBaseDialog(hInstance,iResource,hParent)
+CBaseDialog(hInstance,iResource,hParent,false)
 {
 	m_strFullFilename	= strFullFilename;
 	m_bSplittingFile	= false;
@@ -152,6 +152,7 @@ BOOL CSplitFileDialog::OnTimer(int iTimerID)
 	{
 		m_uElapsedTime++;
 
+		/* Update the elapsed time display (form is hh:mm:ss). */
 		TCHAR szElapsedTime[9];
 		StringCchPrintf(szElapsedTime,SIZEOF_ARRAY(szElapsedTime),
 			_T("%02d:%02d:%02d"),m_uElapsedTime / 3600,(m_uElapsedTime / 60) % 60,
@@ -166,6 +167,7 @@ INT_PTR CSplitFileDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 {
 	if(hwnd == GetDlgItem(m_hDlg,IDC_SPLIT_STATIC_FILENAMEHELPER))
 	{
+		/* Set a custom text color for the helper text. */
 		SetTextColor(hdc,HELPER_TEXT_COLOR);
 		SetBkMode(hdc,TRANSPARENT);
 		return reinterpret_cast<INT_PTR>(GetStockObject(NULL_BRUSH));
@@ -377,8 +379,10 @@ void CSplitFileDialog::OnChangeOutputDirectory()
 {
 	TCHAR szOutputDirectory[MAX_PATH];
 
-	/* TODO: Move text into string table. */
-	TCHAR szTitle[] = _T("Select a destination folder");
+	TCHAR szTitle[128];
+
+	LoadString(GetInstance(),IDS_SPLITFILEDIALOG_DIRECTORYTITLE,
+		szTitle,SIZEOF_ARRAY(szTitle));
 
 	BOOL bSucceeded = CreateBrowseDialog(m_hDlg,szTitle,szOutputDirectory,
 		SIZEOF_ARRAY(szOutputDirectory));

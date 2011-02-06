@@ -23,7 +23,7 @@ const TCHAR CCustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("Custo
 
 CCustomizeColorsDialog::CCustomizeColorsDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,std::vector<ColorRule_t> *pColorRuleList) :
-CBaseDialog(hInstance,iResource,hParent)
+CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_pColorRuleList = pColorRuleList;
 
@@ -79,22 +79,6 @@ BOOL CCustomizeColorsDialog::OnInitDialog()
 		InsertColorRuleIntoListView(hListView,ColorRule,iItem++);
 	}
 
-	RECT rcMain;
-	GetWindowRect(m_hDlg,&rcMain);
-	m_iMinWidth = GetRectWidth(&rcMain);
-	m_iMinHeight = GetRectHeight(&rcMain);
-
-	m_hGripper = CreateWindow(_T("SCROLLBAR"),EMPTY_STRING,WS_CHILD|WS_VISIBLE|
-		WS_CLIPSIBLINGS|SBS_BOTTOMALIGN|SBS_SIZEGRIP,0,0,0,0,m_hDlg,NULL,
-		GetInstance(),NULL);
-
-	GetClientRect(m_hDlg,&rcMain);
-	GetWindowRect(m_hGripper,&rc);
-	SetWindowPos(m_hGripper,NULL,GetRectWidth(&rcMain) - GetRectWidth(&rc),
-		GetRectHeight(&rcMain) - GetRectHeight(&rc),0,0,SWP_NOSIZE|SWP_NOZORDER);
-
-	InitializeControlStates();
-
 	SetFocus(hListView);
 
 	if(m_pccdps->m_bStateSaved)
@@ -110,9 +94,11 @@ BOOL CCustomizeColorsDialog::OnInitDialog()
 	return 0;
 }
 
-void CCustomizeColorsDialog::InitializeControlStates()
+void CCustomizeColorsDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
+	std::list<CResizableDialog::Control_t> &ControlList)
 {
-	std::list<CResizableDialog::Control_t> ControlList;
+	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
+
 	CResizableDialog::Control_t Control;
 
 	Control.iID = IDC_LISTVIEW_COLORRULES;
@@ -155,7 +141,10 @@ void CCustomizeColorsDialog::InitializeControlStates()
 	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
 	ControlList.push_back(Control);
 
-	m_prd = new CResizableDialog(m_hDlg,ControlList);
+	Control.iID = IDC_GRIPPER;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
 }
 
 void CCustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const ColorRule_t &ColorRule,
@@ -238,26 +227,6 @@ BOOL CCustomizeColorsDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-BOOL CCustomizeColorsDialog::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
-{
-	pmmi->ptMinTrackSize.x = m_iMinWidth;
-	pmmi->ptMinTrackSize.y = m_iMinHeight;
-
-	return 0;
-}
-
-BOOL CCustomizeColorsDialog::OnSize(int iType,int iWidth,int iHeight)
-{
-	RECT rc;
-	GetWindowRect(m_hGripper,&rc);
-	SetWindowPos(m_hGripper,NULL,iWidth - GetRectWidth(&rc),iHeight - GetRectHeight(&rc),0,
-		0,SWP_NOSIZE|SWP_NOZORDER);
-
-	m_prd->UpdateControls(iWidth,iHeight);
-
-	return 0;
-}
-
 BOOL CCustomizeColorsDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
@@ -266,8 +235,6 @@ BOOL CCustomizeColorsDialog::OnClose()
 
 BOOL CCustomizeColorsDialog::OnDestroy()
 {
-	delete m_prd;
-
 	DestroyIcon(m_hDialogIcon);
 
 	SaveState();

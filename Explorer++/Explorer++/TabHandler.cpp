@@ -1435,18 +1435,18 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_OPENPARENTINNEWTAB:
 			{
-				HRESULT			hr;
-				LPITEMIDLIST	pidlCurrent = NULL;
-				LPITEMIDLIST	pidlParent = NULL;
+				TCITEM tcItem;
+				tcItem.mask = TCIF_PARAM;
+				TabCtrl_GetItem(m_hTabCtrl,iTabHit,&tcItem);
 
-				pidlCurrent = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+				LPITEMIDLIST pidlCurrent = m_pShellBrowser[static_cast<int>(tcItem.lParam)]->QueryCurrentDirectoryIdl();
 
-				hr = GetVirtualParentPath(pidlCurrent,&pidlParent);
+				LPITEMIDLIST pidlParent = NULL;
+				HRESULT hr = GetVirtualParentPath(pidlCurrent,&pidlParent);
 
 				if(SUCCEEDED(hr))
 				{
 					BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-
 					CoTaskMemFree(pidlParent);
 				}
 
@@ -1464,7 +1464,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_RENAMETAB:
 			{
-				CRenameTabDialog RenameTabDialog(g_hLanguageModule,IDD_RENAMETAB,m_hContainer);
+				CRenameTabDialog RenameTabDialog(g_hLanguageModule,IDD_RENAMETAB,m_hContainer,this);
 
 				RenameTabDialog.ShowModalDialog();
 			}

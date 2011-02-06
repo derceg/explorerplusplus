@@ -28,7 +28,7 @@
 
 
 CAboutDialog::CAboutDialog(HINSTANCE hInstance,int iResource,HWND hParent) :
-CBaseDialog(hInstance,iResource,hParent)
+CBaseDialog(hInstance,iResource,hParent,false)
 {
 	
 }
