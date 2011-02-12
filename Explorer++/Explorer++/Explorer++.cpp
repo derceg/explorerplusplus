@@ -102,7 +102,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_bSelectColumnsDlgStateSaved	= FALSE;
 	m_bSetDefaultColumnsDlgStateSaved	= FALSE;
 	m_bAddBookmarkDlgStateSaved		= FALSE;
-	m_bDestroyFilesDlgStateSaved	= FALSE;
 	m_bDisplayColorsDlgStateSaved	= FALSE;
 	m_bMergeFilesDlgStateSaved		= FALSE;
 	m_bOrganizeBookmarksDlgStateSaved	= FALSE;

@@ -22,6 +22,7 @@
 #include "ColorRuleDialog.h"
 #include "CustomizeColorsDialog.h"
 #include "SplitFileDialog.h"
+#include "DestroyFilesDialog.h"
 #include "../Helper/RegistrySettings.h"
 
 
@@ -1372,7 +1373,6 @@ void Explorerplusplus::SaveStateToRegistry(void)
 	if(ReturnValue == ERROR_SUCCESS)
 	{
 		SaveAddBookmarkStateToRegistry(hKey);
-		SaveDestroyFilesStateToRegistry(hKey);
 		SaveDisplayColorsStateToRegistry(hKey);
 		SaveMergeFilesStateToRegistry(hKey);
 		SaveOrganizeBookmarksStateToRegistry(hKey);
@@ -1388,6 +1388,7 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		CColorRuleDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CCustomizeColorsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CSplitFileDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		CDestroyFilesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1410,29 +1411,6 @@ void Explorerplusplus::SaveAddBookmarkStateToRegistry(HKEY hParentKey)
 			RegSetValueEx(hKey,_T("Position"),0,
 				REG_BINARY,(LPBYTE)&m_ptAddBookmark,
 				sizeof(m_ptAddBookmark));
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::SaveDestroyFilesStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_DESTROYFILES_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bDestroyFilesDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptDestroyFiles,
-				sizeof(m_ptDestroyFiles));
 		}
 
 		RegCloseKey(hKey);
@@ -1564,7 +1542,6 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 	if(ReturnValue == ERROR_SUCCESS)
 	{
 		LoadAddBookmarkStateFromRegistry(hKey);
-		LoadDestroyFilesStateFromRegistry(hKey);
 		LoadDisplayColorsStateFromRegistry(hKey);
 		LoadMergeFilesStateFromRegistry(hKey);
 		LoadOrganizeBookmarksStateFromRegistry(hKey);
@@ -1580,6 +1557,7 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		CColorRuleDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CCustomizeColorsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CSplitFileDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		CDestroyFilesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1603,30 +1581,6 @@ void Explorerplusplus::LoadAddBookmarkStateFromRegistry(HKEY hParentKey)
 		if(ReturnValue == ERROR_SUCCESS)
 		{
 			m_bAddBookmarkDlgStateSaved = TRUE;
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadDestroyFilesStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_DESTROYFILES_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptDestroyFiles,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bDestroyFilesDlgStateSaved = TRUE;
 		}
 
 		RegCloseKey(hKey);

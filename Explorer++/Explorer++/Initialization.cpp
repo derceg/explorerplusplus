@@ -15,7 +15,6 @@
 #include "stdafx.h"
 #include <list>
 #include <shobjidl.h>
-#include "Misc.h"
 #include "Explorer++.h"
 #include "CustomizeColorsDialog.h"
 #include "../Helper/FileOperations.h"

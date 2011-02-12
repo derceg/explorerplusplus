@@ -119,5 +119,11 @@ void CResizableDialog::UpdateControls(int iWidth,int iHeight)
 			}
 			break;
 		}
+
+		/* Force group boxes to redraw. */
+		if(GetWindowStyle(hCtrl) & BS_GROUPBOX)
+		{
+			InvalidateRect(hCtrl,NULL,TRUE);
+		}
 	}
 }

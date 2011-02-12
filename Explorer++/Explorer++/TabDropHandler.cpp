@@ -13,7 +13,6 @@
 
 #include "stdafx.h"
 #include <list>
-#include "Misc.h"
 #include "Explorer++.h"
 
 

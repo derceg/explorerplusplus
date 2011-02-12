@@ -159,9 +159,6 @@
     <ClInclude Include="iDropSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Misc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NoTranslationResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -205,6 +202,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SplitFileDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DestroyFilesDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

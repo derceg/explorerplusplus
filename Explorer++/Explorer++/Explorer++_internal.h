@@ -2,7 +2,6 @@
 #define EXPLORERINTERNAL_INCLUDED
 
 #include <list>
-#include "Misc.h"
 #include "iDropSource.h"
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
@@ -71,6 +70,9 @@ SelectAndEdit() method of INewClient. */
 #define LISTVIEW_RENAME_FILENAME	0
 #define LISTVIEW_RENAME_EXTENSION	1
 #define LISTVIEW_RENAME_ENTIRE		2
+
+#define MIN_SHELL_MENU_ID	1
+#define MAX_SHELL_MENU_ID	1000
 
 #define SORTBY_BASE	50000
 #define SORTBY_END	50099
@@ -660,7 +662,6 @@ LRESULT CALLBACK DrivesToolbarSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPA
 LRESULT CALLBACK EditSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 LRESULT CALLBACK TabBackingProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK DestroyFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK ApplicationButtonPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK ApplicationToolbarNewButtonProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK DWChangeDetailsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);

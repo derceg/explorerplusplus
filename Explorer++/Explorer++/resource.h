@@ -241,6 +241,8 @@
 #define IDC_OPTIONS_HOVER_TIME          1302
 #define IDC_LABEL_HOVER_TIME            1303
 #define IDC_GRIPPER                     1304
+#define IDC_DESTROYFILES_STATIC_WARNING_MESSAGE 1305
+#define IDC_GROUP                       1306
 #define IDS_COLUMN_DESCRIPTION_NAME     2000
 #define IDS_COLUMN_DESCRIPTION_TYPE     2001
 #define IDS_COLUMN_DESCRIPTION_SIZE     2002
@@ -686,7 +688,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        232
 #define _APS_NEXT_COMMAND_VALUE         40430
-#define _APS_NEXT_CONTROL_VALUE         1305
+#define _APS_NEXT_CONTROL_VALUE         1307
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -19,7 +19,6 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "Misc.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 

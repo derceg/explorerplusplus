@@ -12,239 +12,313 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
-#include "Misc.h"
-#include "Explorer++.h"
-#include "../Helper/FileOperations.h"
-#include "../Helper/Helper.h"
-#include "../Helper/Controls.h"
-#include "../Helper/Bookmark.h"
+#include "Explorer++_internal.h"
+#include "DestroyFilesDialog.h"
 #include "MainResource.h"
+#include "../Helper/RegistrySettings.h"
+#include "../Helper/XMLSettings.h"
 
 
-typedef struct
+const TCHAR CDestroyFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("DestroyFiles");
+
+CDestroyFilesDialog::CDestroyFilesDialog(HINSTANCE hInstance,
+	int iResource,HWND hParent,std::list<std::wstring> FullFilenameList) :
+CBaseDialog(hInstance,iResource,hParent,true)
 {
-	TCHAR szFullFileName[MAX_PATH];
-} DestroyedFile_t;
+	m_FullFilenameList = FullFilenameList;
 
-list<DestroyedFile_t>	g_DestroyedFileList;
-UINT					uOverwriteMethod;
+	m_pdfdps = &CDestroyFilesDialogPersistentSettings::GetInstance();
+}
 
-INT_PTR CALLBACK DestroyFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+CDestroyFilesDialog::~CDestroyFilesDialog()
 {
-	static Explorerplusplus *pContainer = NULL;
 
-	switch(uMsg)
+}
+
+BOOL CDestroyFilesDialog::OnInitDialog()
+{
+	HWND hListView = GetDlgItem(m_hDlg,IDC_DESTROYFILES_LISTVIEW);
+
+	ListView_SetGridlines(hListView,TRUE);
+
+	SetWindowTheme(hListView,L"Explorer",NULL);
+
+	ListView_SetExtendedListViewStyleEx(hListView,
+		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES,
+		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
+
+	LVCOLUMN lvColumn;
+	lvColumn.mask		= LVCF_TEXT;
+	lvColumn.pszText	= _T("File");
+	ListView_InsertColumn(hListView,0,&lvColumn);
+
+	lvColumn.mask		= LVCF_TEXT;
+	lvColumn.pszText	= _T("Type");
+	ListView_InsertColumn(hListView,1,&lvColumn);
+
+	lvColumn.mask		= LVCF_TEXT;
+	lvColumn.pszText	= _T("Size");
+	ListView_InsertColumn(hListView,2,&lvColumn);
+
+	lvColumn.mask		= LVCF_TEXT;
+	lvColumn.pszText	= _T("Date Modified");
+	ListView_InsertColumn(hListView,3,&lvColumn);
+
+	int iItem = 0;
+
+	for each(auto strFullFilename in m_FullFilenameList)
 	{
-		case WM_INITDIALOG:
-		{
-			pContainer = (Explorerplusplus *)lParam;
-		}
+		TCHAR szFullFilename[MAX_PATH];
+
+		StringCchCopy(szFullFilename,SIZEOF_ARRAY(szFullFilename),
+			strFullFilename.c_str());
+
+		LVITEM lvItem;
+		lvItem.mask		= LVIF_TEXT;
+		lvItem.iItem	= iItem;
+		lvItem.iSubItem	= 0;
+		lvItem.pszText	= szFullFilename;
+		ListView_InsertItem(hListView,&lvItem);
+
+		SHFILEINFO shfi;
+		SHGetFileInfo(szFullFilename,0,&shfi,sizeof(shfi),SHGFI_TYPENAME);
+		ListView_SetItemText(hListView,iItem,1,shfi.szTypeName);
+
+		WIN32_FILE_ATTRIBUTE_DATA wfad;
+		GetFileAttributesEx(szFullFilename,GetFileExInfoStandard,&wfad);
+
+		TCHAR szFileSize[32];
+		ULARGE_INTEGER lFileSize = {wfad.nFileSizeLow,wfad.nFileSizeHigh};
+		FormatSizeString(lFileSize,szFileSize,SIZEOF_ARRAY(szFileSize));
+		ListView_SetItemText(hListView,iItem,2,szFileSize);
+
+		/* TODO: Friendly dates global. */
+		TCHAR szDateModified[32];
+		CreateFileTimeString(&wfad.ftLastWriteTime,szDateModified,
+			SIZEOF_ARRAY(szDateModified),TRUE);
+		ListView_SetItemText(hListView,iItem,3,szDateModified);
+
+		iItem++;
+	}
+
+	ListView_SetColumnWidth(hListView,0,LVSCW_AUTOSIZE_USEHEADER);
+	ListView_SetColumnWidth(hListView,1,LVSCW_AUTOSIZE_USEHEADER);
+	ListView_SetColumnWidth(hListView,2,LVSCW_AUTOSIZE_USEHEADER);
+	ListView_SetColumnWidth(hListView,3,LVSCW_AUTOSIZE_USEHEADER);
+
+	switch(m_pdfdps->m_uOverwriteMethod)
+	{
+	case OVERWRITE_ONEPASS:
+		CheckDlgButton(m_hDlg,IDC_DESTROYFILES_RADIO_ONEPASS,BST_CHECKED);
+		break;
+
+	case OVERWRITE_THREEPASS:
+		CheckDlgButton(m_hDlg,IDC_DESTROYFILES_RADIO_THREEPASS,BST_CHECKED);
 		break;
 	}
 
-	return pContainer->DestroyFilesProc(hDlg,uMsg,wParam,lParam);
-}
-
-INT_PTR CALLBACK Explorerplusplus::DestroyFilesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
-{
-	switch(Msg)
+	if(m_pdfdps->m_bStateSaved)
 	{
-		case WM_INITDIALOG:
-			OnDestroyFilesInit(hDlg);
-			break;
-
-		case WM_COMMAND:
-			switch(LOWORD(wParam))
-			{
-				case IDC_DESTROYFILES_RADIO_ONEPASS:
-					uOverwriteMethod = OVERWRITE_ONEPASS;
-					break;
-
-				case IDC_DESTROYFILES_RADIO_THREEPASS:
-					uOverwriteMethod = OVERWRITE_THREEPASS;
-					break;
-
-				case IDC_DESTROYFILES_BUTTON_REMOVE:
-					OnDestroyFilesRemove(hDlg);
-					break;
-
-				case IDOK:
-					OnDestroyFilesOk(hDlg);
-					break;
-
-				case IDCANCEL:
-					DestroyFilesSaveState(hDlg);
-					EndDialog(hDlg,0);
-					break;
-			}
-			break;
-
-		case WM_CLOSE:
-			DestroyFilesSaveState(hDlg);
-			EndDialog(hDlg,0);
-			break;
+		SetWindowPos(m_hDlg,NULL,m_pdfdps->m_ptDialog.x,
+			m_pdfdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
+	}
+	else
+	{
+		CenterWindow(GetParent(m_hDlg),m_hDlg);
 	}
 
 	return 0;
 }
 
-void Explorerplusplus::OnDestroyFilesInit(HWND hDlg)
+void CDestroyFilesDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
+	std::list<CResizableDialog::Control_t> &ControlList)
 {
-	HWND			hListView;
-	DestroyedFile_t	df;
-	LVCOLUMN		lvColumn;
-	LVITEM			lvItem;
-	DWORD			ExtendedStyle;
-	int				iItem = -1;
-	int				i = 0;
+	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
 
-	g_DestroyedFileList.clear();
+	CResizableDialog::Control_t Control;
 
-	hListView = GetDlgItem(hDlg,IDC_DESTROYFILES_LISTVIEW);
+	Control.iID = IDC_DESTROYFILES_LISTVIEW;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
 
-	ListView_SetGridlines(hListView,TRUE);
+	Control.iID = IDC_GROUP;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
 
-	ExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
+	Control.iID = IDC_GROUP;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(Control);
 
-	/* Turn on full row select for report (details) mode. */
-	ListView_SetExtendedListViewStyle(hListView,ExtendedStyle | LVS_EX_FULLROWSELECT);
+	Control.iID = IDC_DESTROYFILES_RADIO_ONEPASS;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(Control);
 
-	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Files");
+	Control.iID = IDC_DESTROYFILES_RADIO_THREEPASS;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(Control);
 
-	ListView_InsertColumn(hListView,0,&lvColumn);
+	Control.iID = IDC_DESTROYFILES_STATIC_WARNING_MESSAGE;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(Control);
 
-	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+	Control.iID = IDOK;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDCANCEL;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_GRIPPER;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+}
+
+INT_PTR CDestroyFilesDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
+{
+	if(hwnd == GetDlgItem(m_hDlg,IDC_DESTROYFILES_STATIC_WARNING_MESSAGE))
 	{
-		m_pActiveShellBrowser->QueryFullItemName(iItem,df.szFullFileName);
-
-		g_DestroyedFileList.push_back(df);
-
-		lvItem.mask		= LVIF_TEXT;
-		lvItem.iItem	= i;
-		lvItem.iSubItem	= 0;
-		lvItem.pszText	= df.szFullFileName;
-		ListView_InsertItem(hListView,&lvItem);
-
-		i++;
+		SetTextColor(hdc,RGB(255,0,0));
+		SetBkMode(hdc,TRANSPARENT);
+		return reinterpret_cast<INT_PTR>(GetStockObject(NULL_BRUSH));
 	}
 
-	ListView_SetColumnWidth(hListView,0,LVSCW_AUTOSIZE);
+	return 0;
+}
 
-	uOverwriteMethod = OVERWRITE_ONEPASS;
-
-	CheckDlgButton(hDlg,IDC_DESTROYFILES_RADIO_ONEPASS,BST_CHECKED);
-
-	if(m_bDestroyFilesDlgStateSaved)
+BOOL CDestroyFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+{
+	switch(LOWORD(wParam))
 	{
-		SetWindowPos(hDlg,NULL,m_ptDestroyFiles.x,
-			m_ptDestroyFiles.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
+	case IDOK:
+		OnOk();
+		break;
+
+	case IDCANCEL:
+		OnCancel();
+		break;
+	}
+
+	return 0;
+}
+
+BOOL CDestroyFilesDialog::OnClose()
+{
+	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CDestroyFilesDialog::OnDestroy()
+{
+	SaveState();
+	return 0;
+}
+
+void CDestroyFilesDialog::SaveState()
+{
+	RECT rc;
+	GetWindowRect(m_hDlg,&rc);
+	m_pdfdps->m_ptDialog.x = rc.left;
+	m_pdfdps->m_ptDialog.y = rc.top;
+
+	if(IsDlgButtonChecked(m_hDlg,IDC_DESTROYFILES_RADIO_ONEPASS) == BST_CHECKED)
+	{
+		m_pdfdps->m_uOverwriteMethod = OVERWRITE_ONEPASS;
 	}
 	else
 	{
-		CenterWindow(m_hContainer,hDlg);
+		m_pdfdps->m_uOverwriteMethod = OVERWRITE_THREEPASS;
 	}
+
+	m_pdfdps->m_bStateSaved = TRUE;
 }
 
-void Explorerplusplus::OnDestroyFilesOk(HWND hDlg)
+void CDestroyFilesDialog::OnOk()
 {
-	int	iButtonPressed;
-
-	if(g_DestroyedFileList.empty() == TRUE)
-	{
-		/* No files to delete. */
-		EndDialog(hDlg,0);
-		return;
-	}
-
 	/* The default button in this message box will be the second
 	button (i.e. the no button). */
-	iButtonPressed = MessageBox(hDlg,
+	/* TODO: Move string into string table. */
+	int iRes = MessageBox(m_hDlg,
 	_T("Files that are destroyed will be \
 permanently deleted, and will NOT be recoverable.\n\n\
 Are you sure you want to continue?"),
 	NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_SETFOREGROUND|
 	MB_YESNO|MB_DEFBUTTON2);
 
-	DestroyFilesSaveState(hDlg);
-
-	switch(iButtonPressed)
+	switch(iRes)
 	{
-		case IDNO:
-			/* Do nothing. */
-			EndDialog(hDlg,0);
-			break;
-
 		case IDYES:
-			OnDestroyFilesConfirmDelete(hDlg);
+			OnConfirmDestroy();
 			break;
 
 		default:
-			/* Do nothing. */
-			EndDialog(hDlg,0);
+			EndDialog(m_hDlg,0);
 			break;
 	}
 }
 
-void Explorerplusplus::OnDestroyFilesConfirmDelete(HWND hDlg)
+void CDestroyFilesDialog::OnCancel()
 {
-	list<DestroyedFile_t>::iterator	itr;
-
-	for(itr = g_DestroyedFileList.begin();itr != g_DestroyedFileList.end();itr++)
-	{
-		DeleteFileSecurely(itr->szFullFileName,uOverwriteMethod);
-	}
-
-	EndDialog(hDlg,1);
+	EndDialog(m_hDlg,0);
 }
 
-void Explorerplusplus::OnDestroyFilesRemove(HWND hDlg)
+void CDestroyFilesDialog::OnConfirmDestroy()
 {
-	HWND							hListView;
-	list<DestroyedFile_t>::iterator	itr;
-	int								iSelected;
-	int								i = 0;
+	/* TODO: Perform in background thread. */
+	//for each(auto strFullFilename in m_FullFilenameList)
+	//{
+	//	//DeleteFileSecurely(strFullFilename.c_str(),uOverwriteMethod);
+	//}
 
-	hListView = GetDlgItem(hDlg,IDC_DESTROYFILES_LISTVIEW);
-
-	/* Find which item is selected. */
-	iSelected = ListView_GetNextItem(hListView,-1,LVNI_SELECTED);
-
-	itr = g_DestroyedFileList.begin();
-
-	if(iSelected != -1)
-	{
-		while(i < iSelected && itr != g_DestroyedFileList.end())
-		{
-			i++;
-
-			itr++;
-		}
-
-		if(itr != g_DestroyedFileList.end())
-		{
-			g_DestroyedFileList.erase(itr);
-
-			ListView_DeleteItem(hListView,iSelected);
-
-			SetFocus(hListView);
-
-			if(iSelected > ListView_GetItemCount(hListView))
-				ListView_SelectItem(hListView,iSelected - 1,TRUE);
-			else
-				ListView_SelectItem(hListView,iSelected,TRUE);
-		}
-	}
+	EndDialog(m_hDlg,1);
 }
 
-void Explorerplusplus::DestroyFilesSaveState(HWND hDlg)
+CDestroyFilesDialogPersistentSettings::CDestroyFilesDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
 {
-	RECT rcTemp;
+	m_uOverwriteMethod = OVERWRITE_ONEPASS;
+}
 
-	GetWindowRect(hDlg,&rcTemp);
-	m_ptDestroyFiles.x = rcTemp.left;
-	m_ptDestroyFiles.y = rcTemp.top;
+CDestroyFilesDialogPersistentSettings::~CDestroyFilesDialogPersistentSettings()
+{
+	
+}
 
-	m_bDestroyFilesDlgStateSaved = TRUE;
+CDestroyFilesDialogPersistentSettings& CDestroyFilesDialogPersistentSettings::GetInstance()
+{
+	static CDestroyFilesDialogPersistentSettings sfadps;
+	return sfadps;
+}
+
+void CDestroyFilesDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
+{
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("OverwriteMethod"),m_uOverwriteMethod);
+}
+
+void CDestroyFilesDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
+{
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("OverwriteMethod"),reinterpret_cast<LPDWORD>(&m_uOverwriteMethod));
+}
+
+void CDestroyFilesDialogPersistentSettings::SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,
+	MSXML2::IXMLDOMElement *pParentNode)
+{
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("OverwriteMethod"),NXMLSettings::EncodeIntValue(m_uOverwriteMethod));
+}
+
+void CDestroyFilesDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+{
+	if(lstrcmpi(bstrName,_T("OverwriteMethod")) == 0)
+	{
+		m_uOverwriteMethod = NXMLSettings::DecodeIntValue(bstrValue);
+	}
 }

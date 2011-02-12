@@ -13,7 +13,6 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "Misc.h"
 
 #define WM_USER_MERGINGFINISHED	WM_USER
 

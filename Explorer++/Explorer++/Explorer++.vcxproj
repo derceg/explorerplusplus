@@ -447,13 +447,13 @@
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />
+    <ClInclude Include="DestroyFilesDialog.h" />
     <ClInclude Include="Explorer++.h" />
     <ClInclude Include="Explorer++_internal.h" />
     <ClInclude Include="FilterDialog.h" />
     <ClInclude Include="iDropSource.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="MassRenameDialog.h" />
-    <ClInclude Include="Misc.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="RenameTabDialog.h" />
     <ClInclude Include="resource.h" />

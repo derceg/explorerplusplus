@@ -19,6 +19,7 @@
 #include "FilterDialog.h"
 #include "CustomizeColorsDialog.h"
 #include "SplitFileDialog.h"
+#include "DestroyFilesDialog.h"
 
 
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -1234,8 +1235,22 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case IDM_ACTIONS_DESTROYFILES:
-			DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_DESTROYFILES),
-			hwnd,DestroyFilesProcStub,(LPARAM)this);
+			{
+				std::list<std::wstring>	FullFilenameList;
+				int iItem = -1;
+
+				while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+				{
+					TCHAR szFullFilename[MAX_PATH];
+					m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+					FullFilenameList.push_back(szFullFilename);
+				}
+
+				CDestroyFilesDialog CDestroyFilesDialog(g_hLanguageModule,IDD_DESTROYFILES,
+					m_hContainer,FullFilenameList);
+
+				CDestroyFilesDialog.ShowModalDialog();
+			}
 			break;
 
 		case IDM_GO_BACK:

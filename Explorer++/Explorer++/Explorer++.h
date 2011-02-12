@@ -44,7 +44,6 @@ lParam not currently used. */
 
 /* Dialog keys (relative to REG_DIALOGS_KEY). */
 #define REG_ADDBOOKMARK_KEY			_T("AddBookmark")
-#define REG_DESTROYFILES_KEY		_T("DestroyFiles")
 #define REG_DISPLAYCOLORS_KEY		_T("DisplayColors")
 #define REG_MERGEFILES_KEY			_T("MergeFiles")
 #define REG_ORGANIZEBOOKMARKS_KEY	_T("OrganizeBookmarks")
@@ -183,7 +182,6 @@ public:
 	INT_PTR CALLBACK	BookmarkFolderPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	MergeFilesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	DestroyFilesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SelectColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SetDefaultColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -696,8 +694,6 @@ private:
 	void					LoadStateFromRegistry(void);
 	void					SaveAddBookmarkStateToRegistry(HKEY hParentKey);
 	void					LoadAddBookmarkStateFromRegistry(HKEY hParentKey);
-	void					SaveDestroyFilesStateToRegistry(HKEY hParentKey);
-	void					LoadDestroyFilesStateFromRegistry(HKEY hParentKey);
 	void					SaveDisplayColorsStateToRegistry(HKEY hParentKey);
 	void					LoadDisplayColorsStateFromRegistry(HKEY hParentKey);
 	void					SaveMergeFilesStateToRegistry(HKEY hParentKey);
@@ -931,13 +927,6 @@ private:
 	void					OnMergeFilesChangeOutputDirectory(HWND hDlg);
 	void					OnMergingFinished(HWND hDlg);
 	void					MergeFilesSaveState(HWND hDlg);
-
-	/* Destroy files dialog. */
-	void					OnDestroyFilesInit(HWND hDlg);
-	void					OnDestroyFilesRemove(HWND hDlg);
-	void					OnDestroyFilesOk(HWND hDlg);
-	void					OnDestroyFilesConfirmDelete(HWND hDlg);
-	void					DestroyFilesSaveState(HWND hDlg);
 
 	/* Set default columns dialog. */
 	void					OnSetDefaultColumnsInit(HWND hDlg);
@@ -1277,10 +1266,6 @@ private:
 	/* Add bookmark dialog. */
 	BOOL					m_bAddBookmarkDlgStateSaved;
 	POINT					m_ptAddBookmark;
-
-	/* Destroy files dialog. */
-	BOOL					m_bDestroyFilesDlgStateSaved;
-	POINT					m_ptDestroyFiles;
 
 	/* Merge files dialog. */
 	BOOL					m_bMergeFilesDlgStateSaved;

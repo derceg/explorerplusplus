@@ -13,7 +13,6 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Misc.h"
 #include "Explorer++.h"
 #include "../Helper/ShellHelper.h"
 

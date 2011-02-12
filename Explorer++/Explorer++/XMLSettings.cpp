@@ -28,6 +28,7 @@
 #include "ColorRuleDialog.h"
 #include "CustomizeColorsDialog.h"
 #include "SplitFileDialog.h"
+#include "DestroyFilesDialog.h"
 #include "../Helper/XMLSettings.h"
 
 #import <msxml3.dll> raw_interfaces_only
@@ -1901,6 +1902,8 @@ void Explorerplusplus::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 							CFilterDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("SplitFile")) == 0)
 							CSplitFileDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
+						else if(lstrcmpi(bstrValue,_T("DestroyFiles")) == 0)
+							CDestroyFilesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 					}
 				}
 			}
@@ -1938,6 +1941,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	CColorRuleDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CCustomizeColorsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CSplitFileDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CDestroyFilesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 
