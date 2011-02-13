@@ -358,10 +358,11 @@ void CMassRenameDialog::ProcessFileName(const std::wstring strTarget,
 		if(std::tr1::regex_search(itrStart,itrEnd,mr,rxPattern))
 		{
 			std::wstringstream ss;
-			ss << iFileIndex;
-			std::wstring strCounter = wstring(mr.length() - 2,_T('0')) + ss.str();
 
-			strOutput.replace(mr.position(),mr.length(),strCounter);
+			/* The minimum length is the number of zeros present plus one. */
+			ss << std::setfill(_T('0')) << setw((mr.length() - 2) + 1) << iFileIndex;
+
+			strOutput.replace(mr.position(),mr.length(),ss.str());
 		}
 		else
 		{
