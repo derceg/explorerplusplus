@@ -943,10 +943,10 @@ IDR_MASSRENAME_MENU MENU
 BEGIN
     POPUP "Popup"
     BEGIN
-        MENUITEM "$F &Filename",                IDM_MASSRENAME_FILENAME
-        MENUITEM "$B &Basename",                IDM_MASSRENAME_BASENAME
-        MENUITEM "$E &Extension",               IDM_MASSRENAME_EXTENSION
-        MENUITEM "$N &Counter",                 IDM_MASSRENAME_COUNTER
+        MENUITEM "/F &Filename",                IDM_MASSRENAME_FILENAME
+        MENUITEM "/B &Basename",                IDM_MASSRENAME_BASENAME
+        MENUITEM "/E &Extension",               IDM_MASSRENAME_EXTENSION
+        MENUITEM "/N &Counter",                 IDM_MASSRENAME_COUNTER
     END
 END
 

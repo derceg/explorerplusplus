@@ -6,10 +6,10 @@
  *
  * Provides support for the mass renaming of files.
  * The following special characters are supported:
- * $N	- Counter
- * $F	- Filename
- * $B	- Basename (filename without extension)
- * $E	- Extension
+ * /N	- Counter
+ * /F	- Filename
+ * /B	- Basename (filename without extension)
+ * /E	- Extension
  *
  * Written by David Erceg
  * www.explorerplusplus.com
@@ -18,6 +18,8 @@
 
 #include "stdafx.h"
 #include <list>
+#include <regex>
+#include <iomanip>
 #include "Explorer++_internal.h"
 #include "MassRenameDialog.h"
 #include "MainResource.h"
@@ -120,7 +122,7 @@ BOOL CMassRenameDialog::OnInitDialog()
 		iItem++;
 	}
 
-	SetDlgItemText(m_hDlg,IDC_MASSRENAME_EDIT,_T("$F"));
+	SetDlgItemText(m_hDlg,IDC_MASSRENAME_EDIT,_T("/F"));
 	SendMessage(GetDlgItem(m_hDlg,IDC_MASSRENAME_EDIT),
 		EM_SETSEL,0,-1);
 	SetFocus(GetDlgItem(m_hDlg,IDC_MASSRENAME_EDIT));
@@ -229,22 +231,22 @@ BOOL CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 				{
 				case IDM_MASSRENAME_FILENAME:
 					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
-						reinterpret_cast<LPARAM>(_T("$F")));
+						reinterpret_cast<LPARAM>(_T("/F")));
 					break;
 
 				case IDM_MASSRENAME_BASENAME:
 					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
-						reinterpret_cast<LPARAM>(_T("$B")));
+						reinterpret_cast<LPARAM>(_T("/B")));
 					break;
 
 				case IDM_MASSRENAME_EXTENSION:
 					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
-						reinterpret_cast<LPARAM>(_T("$E")));
+						reinterpret_cast<LPARAM>(_T("/E")));
 					break;
 
 				case IDM_MASSRENAME_COUNTER:
 					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
-						reinterpret_cast<LPARAM>(_T("$N")));
+						reinterpret_cast<LPARAM>(_T("/N")));
 					break;
 				}
 			}
@@ -342,25 +344,42 @@ void CMassRenameDialog::ProcessFileName(const std::wstring strTarget,
 
 	strOutput = strTarget;
 
-	while((iPos = strOutput.find(_T("$N"))) != std::wstring::npos)
-	{
-		std::wstringstream ss;
-		ss << iFileIndex;
+	std::wregex rxPattern;
+	rxPattern.assign(_T("/[0]*N"));
 
-		strOutput.replace(iPos,2,ss.str());
+	bool bStop = false;
+
+	while(!bStop)
+	{
+		std::match_results<std::wstring::const_iterator> mr;
+		std::wstring::const_iterator itrStart = strOutput.begin();
+		std::wstring::const_iterator itrEnd = strOutput.end();
+
+		if(std::tr1::regex_search(itrStart,itrEnd,mr,rxPattern))
+		{
+			std::wstringstream ss;
+			ss << iFileIndex;
+			std::wstring strCounter = wstring(mr.length() - 2,_T('0')) + ss.str();
+
+			strOutput.replace(mr.position(),mr.length(),strCounter);
+		}
+		else
+		{
+			bStop = true;
+		}
 	}
 
-	while((iPos = strOutput.find(_T("$F"))) != std::wstring::npos)
+	while((iPos = strOutput.find(_T("/F"))) != std::wstring::npos)
 	{
 		strOutput.replace(iPos,2,strFilename);
 	}
 
-	while((iPos = strOutput.find(_T("$B"))) != std::wstring::npos)
+	while((iPos = strOutput.find(_T("/B"))) != std::wstring::npos)
 	{
 		strOutput.replace(iPos,2,szBaseName);
 	}
 
-	while((iPos = strOutput.find(_T("$E"))) != std::wstring::npos)
+	while((iPos = strOutput.find(_T("/E"))) != std::wstring::npos)
 	{
 		strOutput.replace(iPos,2,pExt);
 	}
