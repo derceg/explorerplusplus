@@ -61,7 +61,8 @@ protected:
 	BOOL	OnInitDialog();
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnClose();
-	BOOL	OnDestroy();
+
+	void	SaveState();
 
 	void	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
@@ -74,7 +75,6 @@ private:
 	void	OnChangeOutputDirectory();
 	void	OnMove(bool bUp);
 	void	OnFinished();
-	void	SaveState();
 
 	std::wstring			m_strOutputDirectory;
 	std::list<std::wstring>	m_FullFilenameList;

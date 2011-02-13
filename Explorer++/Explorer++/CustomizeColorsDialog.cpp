@@ -81,15 +81,7 @@ BOOL CCustomizeColorsDialog::OnInitDialog()
 
 	SetFocus(hListView);
 
-	if(m_pccdps->m_bStateSaved)
-	{
-		SetWindowPos(m_hDlg,NULL,m_pccdps->m_ptDialog.x,
-			m_pccdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	m_pccdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
 }
@@ -237,16 +229,12 @@ BOOL CCustomizeColorsDialog::OnDestroy()
 {
 	DestroyIcon(m_hDialogIcon);
 
-	SaveState();
 	return 0;
 }
 
 void CCustomizeColorsDialog::SaveState()
 {
-	RECT rc;
-	GetWindowRect(m_hDlg,&rc);
-	m_pccdps->m_ptDialog.x = rc.left;
-	m_pccdps->m_ptDialog.y = rc.top;
+	m_pccdps->SaveDialogPosition(m_hDlg);
 
 	m_pccdps->m_bStateSaved = TRUE;
 }

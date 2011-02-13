@@ -52,6 +52,7 @@ protected:
 	BOOL				OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL				OnClose();
 	BOOL				OnDestroy();
+	void				SaveState();
 
 	void				GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
@@ -59,7 +60,6 @@ private:
 
 	void				OnOk();
 	void				OnCancel();
-	void				SaveState();
 
 	IExplorerplusplus	*m_pexpp;
 	HICON				m_hDialogIcon;

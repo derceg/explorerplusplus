@@ -27,8 +27,13 @@ protected:
 	virtual void	SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
 	virtual void	LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
 
+	void			SaveDialogPosition(HWND hDlg);
+	void			RestoreDialogPosition(HWND hDlg,bool bRestoreSize);
+
 	BOOL			m_bStateSaved;
 	POINT			m_ptDialog;
+	int				m_iWidth;
+	int				m_iHeight;
 
 private:
 

@@ -50,7 +50,8 @@ protected:
 	INT_PTR	OnCtlColorStatic(HWND hwnd,HDC hdc);
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnClose();
-	BOOL	OnDestroy();
+
+	void	SaveState();
 
 	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
@@ -59,7 +60,6 @@ private:
 	void	OnOk();
 	void	OnCancel();
 	void	OnConfirmDestroy();
-	void	SaveState();
 
 	std::list<std::wstring>	m_FullFilenameList;
 

@@ -86,15 +86,7 @@ BOOL CSetFileAttributesDialog::OnInitDialog()
 	m_bCreationDateEnabled = FALSE;
 	m_bAccessDateEnabled = FALSE;
 
-	if(m_psfadps->m_bStateSaved)
-	{
-		SetWindowPos(m_hDlg,NULL,m_psfadps->m_ptDialog.x,
-			m_psfadps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	m_psfadps->RestoreDialogPosition(m_hDlg,false);
 
 	return 0;
 }
@@ -227,12 +219,6 @@ BOOL CSetFileAttributesDialog::OnNotify(NMHDR *pnmhdr)
 BOOL CSetFileAttributesDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
-	return 0;
-}
-
-BOOL CSetFileAttributesDialog::OnDestroy()
-{
-	SaveState();
 	return 0;
 }
 
@@ -370,10 +356,7 @@ void CSetFileAttributesDialog::OnDateReset(DateTimeType_t DateTimeType)
 
 void CSetFileAttributesDialog::SaveState()
 {
-	RECT rc;
-	GetWindowRect(m_hDlg,&rc);
-	m_psfadps->m_ptDialog.x = rc.left;
-	m_psfadps->m_ptDialog.y = rc.top;
+	m_psfadps->SaveDialogPosition(m_hDlg);
 
 	m_psfadps->m_bStateSaved = TRUE;
 }

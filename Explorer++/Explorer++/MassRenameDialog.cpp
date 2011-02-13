@@ -125,16 +125,7 @@ BOOL CMassRenameDialog::OnInitDialog()
 		EM_SETSEL,0,-1);
 	SetFocus(GetDlgItem(m_hDlg,IDC_MASSRENAME_EDIT));
 
-	if(m_pmrdps->m_bStateSaved)
-	{
-		/* TODO: Save/restore dialog size. */
-		SetWindowPos(m_hDlg,NULL,m_pmrdps->m_ptDialog.x,
-			m_pmrdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	m_pmrdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
 }
@@ -283,7 +274,6 @@ BOOL CMassRenameDialog::OnDestroy()
 	DestroyIcon(m_hMoreIcon);
 	DestroyIcon(m_hDialogIcon);
 
-	SaveState();
 	return 0;
 }
 
@@ -334,10 +324,7 @@ void CMassRenameDialog::OnCancel()
 
 void CMassRenameDialog::SaveState()
 {
-	RECT rc;
-	GetWindowRect(m_hDlg,&rc);
-	m_pmrdps->m_ptDialog.x = rc.left;
-	m_pmrdps->m_ptDialog.y = rc.top;
+	m_pmrdps->SaveDialogPosition(m_hDlg);
 
 	m_pmrdps->m_bStateSaved = TRUE;
 }

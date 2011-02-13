@@ -88,15 +88,7 @@ BOOL CColorRuleDialog::OnInitDialog()
 	SendMessage(GetDlgItem(m_hDlg,IDC_EDIT_DESCRIPTION),EM_SETSEL,0,-1);
 	SetFocus(GetDlgItem(m_hDlg,IDC_EDIT_DESCRIPTION));
 
-	if(m_pcrdps->m_bStateSaved)
-	{
-		SetWindowPos(m_hDlg,NULL,m_pcrdps->m_ptDialog.x,
-			m_pcrdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	m_pcrdps->RestoreDialogPosition(m_hDlg,false);
 
 	return 0;
 }
@@ -174,18 +166,9 @@ BOOL CColorRuleDialog::OnClose()
 	return 0;
 }
 
-BOOL CColorRuleDialog::OnDestroy()
-{
-	SaveState();
-	return 0;
-}
-
 void CColorRuleDialog::SaveState()
 {
-	RECT rc;
-	GetWindowRect(m_hDlg,&rc);
-	m_pcrdps->m_ptDialog.x = rc.left;
-	m_pcrdps->m_ptDialog.y = rc.top;
+	m_pcrdps->SaveDialogPosition(m_hDlg);
 
 	m_pcrdps->m_bStateSaved = TRUE;
 }

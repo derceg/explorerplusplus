@@ -164,7 +164,13 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 					}
 				}
 
-				return OnDestroy();
+				BOOL bRes = OnDestroy();
+
+				/* Within WM_DESTROY, all child windows
+				still exist. */
+				SaveState();
+
+				return bRes;
 			}
 			break;
 
@@ -285,6 +291,11 @@ BOOL CBaseDialog::OnDestroy()
 BOOL CBaseDialog::OnNcDestroy()
 {
 	return 0;
+}
+
+void CBaseDialog::SaveState()
+{
+
 }
 
 void CBaseDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)

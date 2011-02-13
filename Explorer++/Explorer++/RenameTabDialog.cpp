@@ -58,15 +58,7 @@ BOOL CRenameTabDialog::OnInitDialog()
 	SendMessage(hEditName,EM_SETSEL,0,-1);
 	SetFocus(hEditName);
 
-	if(m_prtdps->m_bStateSaved)
-	{
-		SetWindowPos(m_hDlg,NULL,m_prtdps->m_ptDialog.x,
-			m_prtdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	m_prtdps->RestoreDialogPosition(m_hDlg,false);
 
 	return 0;
 }
@@ -148,18 +140,9 @@ void CRenameTabDialog::OnCancel()
 	EndDialog(m_hDlg,0);
 }
 
-BOOL CRenameTabDialog::OnDestroy()
-{
-	SaveState();
-	return 0;
-}
-
 void CRenameTabDialog::SaveState()
 {
-	RECT rc;
-	GetWindowRect(m_hDlg,&rc);
-	m_prtdps->m_ptDialog.x = rc.left;
-	m_prtdps->m_ptDialog.y = rc.top;
+	m_prtdps->SaveDialogPosition(m_hDlg);
 
 	m_prtdps->m_bStateSaved = TRUE;
 }

@@ -123,15 +123,7 @@ BOOL CDestroyFilesDialog::OnInitDialog()
 		break;
 	}
 
-	if(m_pdfdps->m_bStateSaved)
-	{
-		SetWindowPos(m_hDlg,NULL,m_pdfdps->m_ptDialog.x,
-			m_pdfdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	m_pdfdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
 }
@@ -223,18 +215,9 @@ BOOL CDestroyFilesDialog::OnClose()
 	return 0;
 }
 
-BOOL CDestroyFilesDialog::OnDestroy()
-{
-	SaveState();
-	return 0;
-}
-
 void CDestroyFilesDialog::SaveState()
 {
-	RECT rc;
-	GetWindowRect(m_hDlg,&rc);
-	m_pdfdps->m_ptDialog.x = rc.left;
-	m_pdfdps->m_ptDialog.y = rc.top;
+	m_pdfdps->SaveDialogPosition(m_hDlg);
 
 	if(IsDlgButtonChecked(m_hDlg,IDC_DESTROYFILES_RADIO_ONEPASS) == BST_CHECKED)
 	{

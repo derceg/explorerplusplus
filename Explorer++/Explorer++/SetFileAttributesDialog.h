@@ -49,7 +49,8 @@ protected:
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnNotify(NMHDR *pnmhdr);
 	BOOL	OnClose();
-	BOOL	OnDestroy();
+
+	void	SaveState();
 
 private:
 
@@ -73,8 +74,6 @@ private:
 	};
 
 	void	InitializeAttributesStructure(void);
-
-	void	SaveState();
 
 	void	ResetButtonState(HWND hwnd,BOOL bReset);
 	void	SetAttributeCheckState(HWND hwnd,int nAttributes,int nSelected);

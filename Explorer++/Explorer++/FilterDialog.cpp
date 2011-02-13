@@ -66,15 +66,7 @@ BOOL CFilterDialog::OnInitDialog()
 	if (m_pexpp->GetActiveShellBrowser()->GetFilterCaseSensitive())
 		CheckDlgButton(m_hDlg,IDC_FILTERS_CASESENSITIVE,BST_CHECKED);
 
-	if(m_pfdps->m_bStateSaved)
-	{
-		SetWindowPos(m_hDlg,NULL,m_pfdps->m_ptDialog.x,
-			m_pfdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	m_pfdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
 }
@@ -133,7 +125,6 @@ BOOL CFilterDialog::OnDestroy()
 {
 	DestroyIcon(m_hDialogIcon);
 
-	SaveState();
 	return 0;
 }
 
@@ -189,10 +180,7 @@ void CFilterDialog::OnCancel()
 
 void CFilterDialog::SaveState()
 {
-	RECT rc;
-	GetWindowRect(m_hDlg,&rc);
-	m_pfdps->m_ptDialog.x = rc.left;
-	m_pfdps->m_ptDialog.y = rc.top;
+	m_pfdps->SaveDialogPosition(m_hDlg);
 
 	m_pfdps->m_bStateSaved = TRUE;
 }

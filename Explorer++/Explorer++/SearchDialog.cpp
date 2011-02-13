@@ -269,15 +269,9 @@ BOOL CSearchDialog::OnInitDialog()
 			ListView_SetColumnWidth(hListView,0,m_sdps->m_iColumnWidth1);
 			ListView_SetColumnWidth(hListView,1,m_sdps->m_iColumnWidth2);
 		}
+	}
 
-		SetWindowPos(m_hDlg,HWND_TOP,m_sdps->m_ptDialog.x,
-			m_sdps->m_ptDialog.y,m_sdps->m_iSearchWidth,
-			m_sdps->m_iSearchHeight,SWP_SHOWWINDOW);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	m_sdps->RestoreDialogPosition(m_hDlg,true);
 
 	SetFocus(GetDlgItem(m_hDlg,IDC_COMBO_NAME));
 
@@ -994,15 +988,6 @@ BOOL CSearchDialog::OnClose()
 	return 0;
 }
 
-BOOL CSearchDialog::OnDestroy()
-{
-	/* Within WM_DESTROY, all child windows
-	still exist. */
-	SaveState();
-
-	return 0;
-}
-
 BOOL CSearchDialog::OnNcDestroy()
 {
 	delete this;
@@ -1217,13 +1202,8 @@ void CSearch::StopSearching()
 void CSearchDialog::SaveState()
 {
 	HWND hListView;
-	RECT rcTemp;
 
-	GetWindowRect(m_hDlg,&rcTemp);
-	m_sdps->m_ptDialog.x = rcTemp.left;
-	m_sdps->m_ptDialog.y = rcTemp.top;
-	m_sdps->m_iSearchWidth = GetRectWidth(&rcTemp);
-	m_sdps->m_iSearchHeight = GetRectHeight(&rcTemp);
+	m_sdps->SaveDialogPosition(m_hDlg);
 
 	m_sdps->m_bCaseInsensitive = IsDlgButtonChecked(m_hDlg,
 		IDC_CHECK_CASEINSENSITIVE) == BST_CHECKED;
@@ -1288,8 +1268,6 @@ CSearchDialogPersistentSettings& CSearchDialogPersistentSettings::GetInstance()
 
 void CSearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("Width"),m_iSearchWidth);
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("Height"),m_iSearchHeight);
 	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ColumnWidth1"),m_iColumnWidth1);
 	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ColumnWidth2"),m_iColumnWidth2);
 	NRegistrySettings::SaveStringToRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern);
@@ -1306,8 +1284,6 @@ void CSearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 
 void CSearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Width"),reinterpret_cast<LPDWORD>(&m_iSearchWidth));
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Height"),reinterpret_cast<LPDWORD>(&m_iSearchHeight));
 	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ColumnWidth1"),reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
 	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ColumnWidth2"),reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
 	NRegistrySettings::ReadStringFromRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern));
@@ -1325,8 +1301,6 @@ void CSearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 void CSearchDialogPersistentSettings::SaveExtraXMLSettings(
 	MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Width"),NXMLSettings::EncodeIntValue(m_iSearchWidth));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Height"),NXMLSettings::EncodeIntValue(m_iSearchHeight));
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth1"),NXMLSettings::EncodeIntValue(m_iColumnWidth1));
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth2"),NXMLSettings::EncodeIntValue(m_iColumnWidth2));
 	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Directory"),m_SearchDirectories);
@@ -1343,15 +1317,7 @@ void CSearchDialogPersistentSettings::SaveExtraXMLSettings(
 
 void CSearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
-	if(lstrcmpi(bstrName,_T("Width")) == 0)
-	{
-		m_iSearchWidth = NXMLSettings::DecodeIntValue(bstrValue);
-	}
-	else if(lstrcmpi(bstrName,_T("Height")) == 0)
-	{
-		m_iSearchHeight = NXMLSettings::DecodeIntValue(bstrValue);
-	}
-	else if(lstrcmpi(bstrName,_T("ColumnWidth1")) == 0)
+	if(lstrcmpi(bstrName,_T("ColumnWidth1")) == 0)
 	{
 		m_iColumnWidth1 = NXMLSettings::DecodeIntValue(bstrValue);
 	}

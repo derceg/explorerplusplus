@@ -54,9 +54,7 @@ private:
 	BOOL			m_bReadOnly;
 	BOOL			m_bSystem;
 
-	/* Dialog/control size properties. */
-	int				m_iSearchWidth;
-	int				m_iSearchHeight;
+	/* Control size properties. */
 	int				m_iColumnWidth1;
 	int				m_iColumnWidth2;
 };
@@ -120,8 +118,9 @@ protected:
 	BOOL	OnGetMinMaxInfo(LPMINMAXINFO pmmi);
 	BOOL	OnSize(int iType,int iWidth,int iHeight);
 	BOOL	OnClose();
-	BOOL	OnDestroy();
 	BOOL	OnNcDestroy();
+
+	void	SaveState();
 
 	void	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
@@ -147,7 +146,6 @@ private:
 	};
 
 	void	OnSearch();
-	void	SaveState();
 
 	CSearchDialogPersistentSettings	*m_sdps;
 

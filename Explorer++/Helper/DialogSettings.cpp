@@ -17,6 +17,7 @@
 #include "DialogSettings.h"
 #include "RegistrySettings.h"
 #include "XMLSettings.h"
+#include "Helper.h"
 
 
 CDialogSettings::CDialogSettings(const TCHAR *szSettingsKey,bool bSavePosition)
@@ -54,6 +55,9 @@ void CDialogSettings::SaveRegistrySettings(HKEY hParentKey)
 			RegSetValueEx(hKey,_T("Position"),0,REG_BINARY,
 				reinterpret_cast<LPBYTE>(&m_ptDialog),
 				sizeof(m_ptDialog));
+
+			NRegistrySettings::SaveDwordToRegistry(hKey,_T("Width"),m_iWidth);
+			NRegistrySettings::SaveDwordToRegistry(hKey,_T("Height"),m_iHeight);
 		}
 
 		SaveExtraRegistrySettings(hKey);
@@ -77,6 +81,11 @@ void CDialogSettings::LoadRegistrySettings(HKEY hParentKey)
 			DWORD dwSize = sizeof(POINT);
 			RegQueryValueEx(hKey,_T("Position"),
 				NULL,NULL,(LPBYTE)&m_ptDialog,&dwSize);
+
+			NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Width"),
+				reinterpret_cast<DWORD *>(&m_iWidth));
+			NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Height"),
+				reinterpret_cast<DWORD *>(&m_iHeight));
 		}
 
 		LoadExtraRegistrySettings(hKey);
@@ -108,6 +117,10 @@ void CDialogSettings::SaveXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,
 			NXMLSettings::EncodeIntValue(m_ptDialog.x));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("PosY"),
 			NXMLSettings::EncodeIntValue(m_ptDialog.y));
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Width"),
+			NXMLSettings::EncodeIntValue(m_iWidth));
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Height"),
+			NXMLSettings::EncodeIntValue(m_iHeight));
 	}
 
 	SaveExtraXMLSettings(pXMLDom,pParentNode);
@@ -138,6 +151,16 @@ void CDialogSettings::LoadXMLSettings(MSXML2::IXMLDOMNamedNodeMap *pam,long lChi
 			else if(lstrcmpi(bstrName,_T("PosY")) == 0)
 			{
 				m_ptDialog.y = NXMLSettings::DecodeIntValue(bstrValue);
+				bHandled = true;
+			}
+			else if(lstrcmpi(bstrName,_T("Width")) == 0)
+			{
+				m_iWidth = NXMLSettings::DecodeIntValue(bstrValue);
+				bHandled = true;
+			}
+			else if(lstrcmpi(bstrName,_T("Height")) == 0)
+			{
+				m_iHeight = NXMLSettings::DecodeIntValue(bstrValue);
 				bHandled = true;
 			}
 		}
@@ -174,4 +197,35 @@ void CDialogSettings::SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXM
 void CDialogSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
 
+}
+
+void CDialogSettings::SaveDialogPosition(HWND hDlg)
+{
+	RECT rc;
+	GetWindowRect(hDlg,&rc);
+	m_ptDialog.x = rc.left;
+	m_ptDialog.y = rc.top;
+	m_iWidth = GetRectWidth(&rc);
+	m_iHeight = GetRectHeight(&rc);
+}
+
+void CDialogSettings::RestoreDialogPosition(HWND hDlg,bool bRestoreSize)
+{
+	if(m_bStateSaved)
+	{
+		if(bRestoreSize)
+		{
+			SetWindowPos(hDlg,NULL,m_ptDialog.x,m_ptDialog.y,
+				m_iWidth,m_iHeight,SWP_NOZORDER);
+		}
+		else
+		{
+			SetWindowPos(hDlg,NULL,m_ptDialog.x,m_ptDialog.y,
+				0,0,SWP_NOSIZE|SWP_NOZORDER);
+		}
+	}
+	else
+	{
+		CenterWindow(GetParent(hDlg),hDlg);
+	}
 }

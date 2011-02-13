@@ -48,6 +48,8 @@ protected:
 	virtual BOOL	OnDestroy();
 	virtual BOOL	OnNcDestroy();
 
+	virtual void	SaveState();
+
 	/* For private application messages in
 	the range WM_APP (0x8000) - 0xBFFF. */
 	virtual void	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);

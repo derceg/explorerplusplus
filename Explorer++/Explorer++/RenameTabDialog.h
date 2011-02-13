@@ -38,7 +38,8 @@ protected:
 	BOOL	OnInitDialog();
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnClose();
-	BOOL	OnDestroy();
+
+	void	SaveState();
 
 private:
 
@@ -46,8 +47,6 @@ private:
 	void	OnUseCustomName();
 	void	OnOk();
 	void	OnCancel();
-
-	void	SaveState();
 
 	CRenameTabDialogPersistentSettings	*m_prtdps;
 

@@ -175,15 +175,7 @@ BOOL CMergeFilesDialog::OnInitDialog()
 	SendMessage(GetDlgItem(m_hDlg,IDC_MERGE_EDIT_FILENAME),EM_SETSEL,0,-1);
 	SetFocus(GetDlgItem(m_hDlg,IDC_MERGE_EDIT_FILENAME));
 
-	if(m_pmfdps->m_bStateSaved)
-	{
-		SetWindowPos(m_hDlg,NULL,m_pmfdps->m_ptDialog.x,
-			m_pmfdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	m_pmfdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
 }
@@ -300,12 +292,6 @@ BOOL CMergeFilesDialog::OnClose()
 	return 0;
 }
 
-BOOL CMergeFilesDialog::OnDestroy()
-{
-	SaveState();
-	return 0;
-}
-
 void CMergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
@@ -326,11 +312,7 @@ void CMergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 void CMergeFilesDialog::SaveState()
 {
-	RECT rc;
-	GetWindowRect(m_hDlg,&rc);
-	m_pmfdps->m_ptDialog.x = rc.left;
-	m_pmfdps->m_ptDialog.y = rc.top;
-
+	m_pmfdps->SaveDialogPosition(m_hDlg);
 	m_pmfdps->m_bStateSaved = TRUE;
 }
 

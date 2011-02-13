@@ -82,6 +82,8 @@ protected:
 	BOOL	OnClose();
 	BOOL	OnDestroy();
 
+	void	SaveState();
+
 	void	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 private:
@@ -116,8 +118,6 @@ private:
 	void	OnCancel();
 	void	OnChangeOutputDirectory();
 	void	OnSplitFinished();
-
-	void	SaveState();
 
 	std::wstring	m_strFullFilename;
 	bool			m_bSplittingFile;

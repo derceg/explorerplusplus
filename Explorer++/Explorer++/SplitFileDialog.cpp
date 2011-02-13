@@ -135,15 +135,7 @@ BOOL CSplitFileDialog::OnInitDialog()
 
 	SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_ELAPSEDTIME,_T("00:00:00"));
 
-	if(m_psfdps->m_bStateSaved)
-	{
-		SetWindowPos(m_hDlg,NULL,m_psfdps->m_ptDialog.x,
-			m_psfdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	m_psfdps->RestoreDialogPosition(m_hDlg,false);
 
 	return 0;
 }
@@ -246,16 +238,12 @@ BOOL CSplitFileDialog::OnDestroy()
 {
 	DeleteObject(m_hHelperTextFont);
 
-	SaveState();
 	return 0;
 }
 
 void CSplitFileDialog::SaveState()
 {
-	RECT rc;
-	GetWindowRect(m_hDlg,&rc);
-	m_psfdps->m_ptDialog.x = rc.left;
-	m_psfdps->m_ptDialog.y = rc.top;
+	m_psfdps->SaveDialogPosition(m_hDlg);
 
 	GetWindowString(GetDlgItem(m_hDlg,IDC_SPLIT_EDIT_SIZE),m_psfdps->m_strSplitSize);
 	GetWindowString(GetDlgItem(m_hDlg,IDC_SPLIT_COMBOBOX_SIZES),m_psfdps->m_strSplitGroup);

@@ -53,7 +53,8 @@ protected:
 	BOOL	OnInitDialog();
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnClose();
-	BOOL	OnDestroy();
+
+	void	SaveState();
 
 private:
 
@@ -61,8 +62,6 @@ private:
 
 	void	OnOk();
 	void	OnCancel();
-
-	void	SaveState();
 
 	BOOL		m_bEdit;
 	ColorRule_t	*m_pColorRule;

@@ -44,6 +44,8 @@ protected:
 	BOOL	OnClose();
 	BOOL	OnDestroy();
 
+	void	SaveState();
+
 	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
 private:
@@ -57,8 +59,6 @@ private:
 
 	void	OnOk();
 	void	OnCancel();
-
-	void	SaveState();
 
 	HICON	m_hDialogIcon;
 	std::vector<ColorRule_t>	*m_pColorRuleList;

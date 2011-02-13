@@ -60,15 +60,7 @@ BOOL CWildcardSelectDialog::OnInitDialog()
 
 	SetFocus(hComboBox);
 
-	if(m_pwsdps->m_bStateSaved)
-	{
-		SetWindowPos(m_hDlg,NULL,m_pwsdps->m_ptDialog.x,
-			m_pwsdps->m_ptDialog.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(GetParent(m_hDlg),m_hDlg);
-	}
+	m_pwsdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
 }
@@ -182,18 +174,9 @@ BOOL CWildcardSelectDialog::OnClose()
 	return 0;
 }
 
-BOOL CWildcardSelectDialog::OnDestroy()
-{
-	SaveState();
-	return 0;
-}
-
 void CWildcardSelectDialog::SaveState()
 {
-	RECT rc;
-	GetWindowRect(m_hDlg,&rc);
-	m_pwsdps->m_ptDialog.x = rc.left;
-	m_pwsdps->m_ptDialog.y = rc.top;
+	m_pwsdps->SaveDialogPosition(m_hDlg);
 
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_SELECTGROUP_COMBOBOX);
 	ComboBox_GetText(hComboBox,m_pwsdps->m_szPattern,SIZEOF_ARRAY(m_pwsdps->m_szPattern));

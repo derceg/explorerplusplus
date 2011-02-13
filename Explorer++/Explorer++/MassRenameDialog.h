@@ -41,14 +41,14 @@ protected:
 	BOOL	OnClose();
 	BOOL	OnDestroy();
 
+	void	SaveState();
+
 	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
 private:
 
 	void	OnOk();
 	void	OnCancel();
-
-	void	SaveState();
 
 	void	ProcessFileName(const std::wstring strTarget,const std::wstring strFilename,int iFileIndex,std::wstring &strOutput);
 
