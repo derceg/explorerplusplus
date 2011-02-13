@@ -23,6 +23,7 @@
 #include "CustomizeColorsDialog.h"
 #include "SplitFileDialog.h"
 #include "DestroyFilesDialog.h"
+#include "MergeFilesDialog.h"
 #include "../Helper/RegistrySettings.h"
 
 
@@ -1374,7 +1375,6 @@ void Explorerplusplus::SaveStateToRegistry(void)
 	{
 		SaveAddBookmarkStateToRegistry(hKey);
 		SaveDisplayColorsStateToRegistry(hKey);
-		SaveMergeFilesStateToRegistry(hKey);
 		SaveOrganizeBookmarksStateToRegistry(hKey);
 		SaveSelectColumnsStateToRegistry(hKey);
 		SaveSelectDefaultColumnsStateToRegistry(hKey);
@@ -1389,6 +1389,7 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		CCustomizeColorsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CSplitFileDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CDestroyFilesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		CMergeFilesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1434,29 +1435,6 @@ void Explorerplusplus::SaveDisplayColorsStateToRegistry(HKEY hParentKey)
 			RegSetValueEx(hKey,_T("Position"),0,
 				REG_BINARY,(LPBYTE)&m_ptDisplayColors,
 				sizeof(m_ptDisplayColors));
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::SaveMergeFilesStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_MERGEFILES_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bMergeFilesDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptMergeFiles,
-				sizeof(m_ptMergeFiles));
 		}
 
 		RegCloseKey(hKey);
@@ -1543,7 +1521,6 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 	{
 		LoadAddBookmarkStateFromRegistry(hKey);
 		LoadDisplayColorsStateFromRegistry(hKey);
-		LoadMergeFilesStateFromRegistry(hKey);
 		LoadOrganizeBookmarksStateFromRegistry(hKey);
 		LoadSelectColumnsStateFromRegistry(hKey);
 		LoadSelectDefaultColumnsStateFromRegistry(hKey);
@@ -1558,6 +1535,7 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		CCustomizeColorsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CSplitFileDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CDestroyFilesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		CMergeFilesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1605,30 +1583,6 @@ void Explorerplusplus::LoadDisplayColorsStateFromRegistry(HKEY hParentKey)
 		if(ReturnValue == ERROR_SUCCESS)
 		{
 			m_bDisplayColorsDlgStateSaved = TRUE;
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadMergeFilesStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_MERGEFILES_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptMergeFiles,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bMergeFilesDlgStateSaved = TRUE;
 		}
 
 		RegCloseKey(hKey);

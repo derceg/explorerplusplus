@@ -29,6 +29,7 @@
 #include "CustomizeColorsDialog.h"
 #include "SplitFileDialog.h"
 #include "DestroyFilesDialog.h"
+#include "MergeFilesDialog.h"
 #include "../Helper/XMLSettings.h"
 
 #import <msxml3.dll> raw_interfaces_only
@@ -1904,6 +1905,8 @@ void Explorerplusplus::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 							CSplitFileDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("DestroyFiles")) == 0)
 							CDestroyFilesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
+						else if(lstrcmpi(bstrValue,_T("MergeFiles")) == 0)
+							CMergeFilesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 					}
 				}
 			}
@@ -1942,6 +1945,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	CCustomizeColorsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CSplitFileDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CDestroyFilesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CMergeFilesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 
@@ -2505,9 +2509,9 @@ void Explorerplusplus::CLoadSaveXML::InitializeLoadEnvironment(void)
 
 	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile,XML_FILENAME);
+	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
 
-	var = NXMLSettings::VariantString(XML_FILENAME);
+	var = NXMLSettings::VariantString(NExplorerplusplus::XML_FILENAME);
 	m_pXMLDom->load(var,&status);
 
 	if(status != VARIANT_TRUE)
@@ -2606,7 +2610,7 @@ void Explorerplusplus::CLoadSaveXML::ReleaseSaveEnvironment(void)
 	CloseHandle(hProcess);
 
 	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile,XML_FILENAME);
+	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
 
 	var = NXMLSettings::VariantString(szConfigFile);
 	m_pXMLDom->save(var);
@@ -2723,7 +2727,7 @@ BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 
 	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile,XML_FILENAME);
+	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
 
 	var = NXMLSettings::VariantString(szConfigFile);
 	pXMLDom->load(var,&status);
@@ -2818,7 +2822,7 @@ BOOL LoadAllowMultipleInstancesFromXML(void)
 
 	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile,XML_FILENAME);
+	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
 
 	var = NXMLSettings::VariantString(szConfigFile);
 	pXMLDom->load(var,&status);

@@ -1,6 +1,8 @@
 #ifndef SPLITFILEDIALOG_INCLUDED
 #define SPLITFILEDIALOG_INCLUDED
 
+#include <list>
+#include <string>
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
@@ -92,6 +94,15 @@ private:
 		SIZE_TYPE_GB,
 	};
 
+	enum ErrorType_t
+	{
+		ERROR_NONE,
+		ERROR_OUTPUT_FILENAME_EMPTY,
+		ERROR_OUTPUT_FILENAME_CONSTANT,
+		ERROR_OUTPUT_DIRECTORY_EMPTY,
+		ERROR_SPLIT_SIZE
+	};
+
 	static const COLORREF HELPER_TEXT_COLOR = RGB(120,120,120);
 
 	static const int KB = (1024);
@@ -119,6 +130,8 @@ private:
 
 	TCHAR			m_szOk[32];
 	UINT			m_uElapsedTime;
+
+	ErrorType_t		m_CurrentError;
 
 	CSplitFileDialogPersistentSettings	*m_psfdps;
 };

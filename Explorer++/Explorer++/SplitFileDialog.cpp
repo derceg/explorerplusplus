@@ -29,6 +29,8 @@ namespace NSplitFileDialog
 	const int		WM_APP_SPLITFINISHED		= WM_APP + 3;
 	const int		WM_APP_INPUTFILEINVALID		= WM_APP + 4;
 
+	const TCHAR		COUNTER_PATTERN[] = _T("/N");
+
 	DWORD WINAPI	SplitFileThreadProcStub(LPVOID pParam);
 }
 
@@ -41,6 +43,7 @@ CBaseDialog(hInstance,iResource,hParent,false)
 	m_strFullFilename	= strFullFilename;
 	m_bSplittingFile	= false;
 	m_bStopSplitting	= false;
+	m_CurrentError		= ERROR_NONE;
 
 	m_psfdps = &CSplitFileDialogPersistentSettings::GetInstance();
 }
@@ -111,12 +114,11 @@ BOOL CSplitFileDialog::OnInitDialog()
 	SendMessage(hEditSize,EM_SETSEL,0,-1);
 	SetFocus(hEditSize);
 
-	/* The output filename is the incoming filename
-	with ".part$N" appended. */
 	TCHAR szOutputFilename[MAX_PATH];
 	StringCchCopy(szOutputFilename,SIZEOF_ARRAY(szOutputFilename),m_strFullFilename.c_str());
 	PathStripPath(szOutputFilename);
-	StringCchCat(szOutputFilename,SIZEOF_ARRAY(szOutputFilename),_T(".part$N"));
+	StringCchPrintf(szOutputFilename,SIZEOF_ARRAY(szOutputFilename),_T("%s.part%s"),
+		szOutputFilename,NSplitFileDialog::COUNTER_PATTERN);
 	SetDlgItemText(m_hDlg,IDC_SPLIT_EDIT_OUTPUTFILENAME,szOutputFilename);
 
 	HFONT hCurentFont = reinterpret_cast<HFONT>(SendDlgItemMessage(m_hDlg,
@@ -178,6 +180,44 @@ INT_PTR CSplitFileDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 
 BOOL CSplitFileDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	switch(HIWORD(wParam))
+	{
+	case EN_CHANGE:
+		{
+			bool bHideError = false;
+
+			switch(m_CurrentError)
+			{
+			case ERROR_OUTPUT_FILENAME_EMPTY:
+				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUTFILENAME);
+				break;
+
+			case ERROR_OUTPUT_FILENAME_CONSTANT:
+				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUTFILENAME);
+				break;
+
+			case ERROR_OUTPUT_DIRECTORY_EMPTY:
+				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUT);
+				break;
+
+			case ERROR_SPLIT_SIZE:
+				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_SIZE);
+				break;
+			}
+
+			if(bHideError)
+			{
+				/* If an error is currently been shown, and it is
+				for the control this notification is been sent for,
+				hide the error message. */
+				SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,EMPTY_STRING);
+
+				m_CurrentError = ERROR_NONE;
+			}
+		}
+		break;
+	}
+
 	switch(LOWORD(wParam))
 	{
 	case IDC_SPLIT_BUTTON_OUTPUT:
@@ -254,30 +294,34 @@ void CSplitFileDialog::OnOk()
 			LoadString(GetInstance(),IDS_SPLITFILEDIALOG_OUTPUTFILENAMEERROR,
 				szTemp,SIZEOF_ARRAY(szTemp));
 
-			MessageBox(m_hDlg,szTemp,NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_OK);
+			SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,szTemp);
+
+			m_CurrentError = ERROR_OUTPUT_FILENAME_EMPTY;
 
 			SetFocus(hOutputFilename);
 			return;
 		}
 
-		TCHAR szOutputFilename[MAX_PATH];
-		GetWindowText(hOutputFilename,szOutputFilename,SIZEOF_ARRAY(szOutputFilename));
+		std::wstring strOutputFilename;
+		GetWindowString(hOutputFilename,strOutputFilename);
 
-		/* TODO: Now, check that the filename has a variable component
-		(i.e. $N). Without the variable component, the filenames
-		of all the split files would be exactly the same. */
-		/*if()
+		/* Now, check that the filename has a variable component. Without the
+		variable component, the filenames of all the split files would be exactly
+		the same. */
+		if(strOutputFilename.find(NSplitFileDialog::COUNTER_PATTERN) == std::wstring::npos)
 		{
 			TCHAR szTemp[128];
 
 			LoadString(GetInstance(),IDS_SPLITFILEDIALOG_OUTPUTFILENAMECONSTANTERROR,
 				szTemp,SIZEOF_ARRAY(szTemp));
 
-			MessageBox(m_hDlg,szTemp,WINDOW_NAME,MB_ICONWARNING|MB_OK);
+			SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,szTemp);
+
+			m_CurrentError = ERROR_OUTPUT_FILENAME_CONSTANT;
 
 			SetFocus(hOutputFilename);
 			return;
-		}*/
+		}
 
 		HWND hEditOutputDirectory = GetDlgItem(m_hDlg,IDC_SPLIT_EDIT_OUTPUT);
 
@@ -288,14 +332,16 @@ void CSplitFileDialog::OnOk()
 			LoadString(GetInstance(),IDS_SPLITFILEDIALOG_OUTPUTDIRECTORYERROR,
 				szTemp,SIZEOF_ARRAY(szTemp));
 
-			MessageBox(m_hDlg,szTemp,NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_OK);
+			SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,szTemp);
+
+			m_CurrentError = ERROR_OUTPUT_DIRECTORY_EMPTY;
 
 			SetFocus(hEditOutputDirectory);
 			return;
 		}
 
-		TCHAR szOutputDirectory[MAX_PATH];
-		GetWindowText(hEditOutputDirectory,szOutputDirectory,SIZEOF_ARRAY(szOutputDirectory));
+		std::wstring strOutputDirectory;
+		GetWindowString(hEditOutputDirectory,strOutputDirectory);
 
 		BOOL bTranslated;
 		UINT uSplitSize = GetDlgItemInt(m_hDlg,IDC_SPLIT_EDIT_SIZE,&bTranslated,FALSE);
@@ -307,7 +353,11 @@ void CSplitFileDialog::OnOk()
 			LoadString(GetInstance(),IDS_SPLITFILEDIALOG_SIZEERROR,
 				szTemp,SIZEOF_ARRAY(szTemp));
 
-			MessageBox(m_hDlg,szTemp,NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_OK);
+			SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,szTemp);
+
+			m_CurrentError = ERROR_SPLIT_SIZE;
+
+			SetFocus(GetDlgItem(m_hDlg,IDC_SPLIT_EDIT_SIZE));
 			return;
 		}
 
@@ -339,8 +389,8 @@ void CSplitFileDialog::OnOk()
 			}
 		}
 
-		m_pSplitFile = new CSplitFile(m_hDlg,m_strFullFilename,szOutputFilename,
-			szOutputDirectory,uSplitSize);
+		m_pSplitFile = new CSplitFile(m_hDlg,m_strFullFilename,strOutputFilename,
+			strOutputDirectory,uSplitSize);
 
 		GetDlgItemText(m_hDlg,IDOK,m_szOk,SIZEOF_ARRAY(m_szOk));
 
@@ -510,7 +560,7 @@ void CSplitFile::ProcessFilename(int nSplitsMade,std::wstring &strOutputFullFile
 
 	std::wstringstream ss;
 	ss << nSplitsMade;
-	strOutputFilename.replace(strOutputFilename.find(_T("$N")),2,ss.str());
+	strOutputFilename.replace(strOutputFilename.find(NSplitFileDialog::COUNTER_PATTERN),2,ss.str());
 
 	strOutputFullFilename = m_strOutputDirectory + _T("\\") + strOutputFilename;
 }

@@ -97,11 +97,6 @@ add a definition here. */
 
 typedef struct
 {
-	TCHAR szFullFileName[MAX_PATH];
-} MergedFile_t;
-
-typedef struct
-{
 	WORD wLanguage;
 	WORD wCodePage;
 } LANGANDCODEPAGE;
@@ -185,8 +180,6 @@ int				ReadFileProperty(TCHAR *lpszFileName,DWORD dwPropertyId,TCHAR *lpszProper
 int				SetFileProperty(TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *szNewValue);
 HRESULT			GetItemAttributes(TCHAR *szItemParsingPath,SFGAOF *pItemAttributes);
 HRESULT			GetItemAttributes(LPITEMIDLIST pidl,SFGAOF *pItemAttributes);
-void			SplitFile(HWND hProgressBar,TCHAR *szFullFileName,TCHAR *szOutputDirectory,UINT uSplitSize);
-void			MergeFiles(list<MergedFile_t> *MergedFileNameList,TCHAR *szOutputFileName);
 BOOL			ExecuteFileAction(HWND hwnd,TCHAR *szVerb,TCHAR *szParameters,TCHAR *szStartDirectory,LPCITEMIDLIST pidl);
 BOOL			GetVersionInfoString(TCHAR *szFileName,TCHAR *szVersionInfo,TCHAR *szBuffer,UINT cbBufLen);
 BOOL			ReadImageProperty(TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen);

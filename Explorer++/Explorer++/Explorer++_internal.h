@@ -24,17 +24,17 @@ namespace NExplorerplusplus
 	const TCHAR VERSION_NUMBER[]	= _T("1.2");
 	const TCHAR WINDOW_NAME[]		= _T("Explorer++");
 	const TCHAR CLASS_NAME[]		= _T("Explorer++");
+
+	/* The name of the XML file that preferences are
+	saved to/loaded from. */
+	const TCHAR XML_FILENAME[]		= _T("config.xml");
+
+	/* Command line arguments supplied to the program
+	for each jump list task. */
+	const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[]	= _T("-open_new_tab");
 }
 
 extern HINSTANCE g_hLanguageModule;
-
-/* The name of the XML file that preferences are
-saved to/loaded from. */
-#define XML_FILENAME	_T("config.xml")
-
-/* Command line arguments supplied to the program
-for each jump list task. */
-#define JUMPLIST_TASK_NEWTAB_ARGUMENT	_T("-open_new_tab")
 
 /* Used when setting Explorer++ as the default
 file manager. */
@@ -99,12 +99,6 @@ SelectAndEdit() method of INewClient. */
 #define WM_USER_ASSOCCHANGED	(WM_APP + 54)
 #define WM_USER_KEYDOWN			(WM_APP + 55)
 
-/* Window constant abstractions. Used
-for window cycling. */
-#define WINDOW_LISTVIEW		0
-#define WINDOW_TREEVIEW		1
-#define WINDOW_ADDRESSBAR	2
-
 /* The number of toolbars that appear in the
 main rebar. */
 #define NUM_MAIN_TOOLBARS	5
@@ -125,14 +119,6 @@ main rebar. */
 /* Tab drag and drop timer information. */
 #define TABDRAG_TIMER_ID		0
 #define TABDRAG_TIMER_ELAPSED	500
-
-/* These are used to support the undo
-functionality. They define the various
-operations that can be undone. */
-#define FILE_UNDOACTION_RENAMED		0
-#define FILE_UNDOACTION_COPIED		1
-#define FILE_UNDOACTION_MOVED		2
-#define FILE_UNDOACTION_DELETE		3
 
 #define FOLDER_SIZE_LINE_INDEX	1
 
@@ -307,21 +293,6 @@ struct BookmarkPropertiesInfo_t
 {
 	void	*pContainer;
 	void	*pBookmarkHandle;
-};
-
-struct UndoItem_t
-{
-	/* The type of operation that
-	occurred. */
-	UINT	Type;
-
-	/* Name of the file. */
-	TCHAR	szFileName[MAX_PATH + 1];
-
-	/* If the file was renamed, this
-	element contains the previous name
-	of the file. */
-	TCHAR	szOldFileName[MAX_PATH + 1];
 };
 
 /* This structure is stored with
@@ -668,7 +639,6 @@ INT_PTR CALLBACK DWChangeDetailsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARA
 INT_PTR CALLBACK DWLinePropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 /* Dialog handler stubs. */
-INT_PTR CALLBACK	MergeFilesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	BookmarkTabDlgProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	NewBookmarkFolderProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	OrganizeBookmarksStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);

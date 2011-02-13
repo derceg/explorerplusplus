@@ -19,11 +19,11 @@ and dropping (right-click). */
 
 struct JumpListTaskInformation
 {
-	TCHAR	*pszName;
-	TCHAR	*pszPath;
-	TCHAR	*pszArguments;
-	TCHAR	*pszIconPath;
-	int		iIcon;
+	const TCHAR	*pszName;
+	const TCHAR	*pszPath;
+	const TCHAR	*pszArguments;
+	const TCHAR	*pszIconPath;
+	int			iIcon;
 };
 
 struct ContextMenuHandler_t

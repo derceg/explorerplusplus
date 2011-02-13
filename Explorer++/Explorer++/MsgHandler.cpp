@@ -229,7 +229,7 @@ BOOL TestConfigFileInternal(void)
 	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
 
 	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile,XML_FILENAME);
+	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
 
 	hConfigFile = CreateFile(szConfigFile,GENERIC_READ,FILE_SHARE_READ,NULL,
 		OPEN_EXISTING,0,NULL);
@@ -1683,25 +1683,6 @@ HWND Explorerplusplus::MyGetNextWindow(HWND hwndCurrent)
 	return NULL;
 }
 
-HWND Explorerplusplus::DecodeWindowConstant(UINT uWindow)
-{
-	switch(uWindow)
-	{
-	case WINDOW_LISTVIEW:
-		return m_hActiveListView;
-
-	case WINDOW_TREEVIEW:
-		return m_hTreeView;
-		break;
-
-	case WINDOW_ADDRESSBAR:
-		return (HWND)SendMessage(m_hAddressBar,CBEM_GETEDITCONTROL,0,0);
-		break;
-	}
-
-	return NULL;
-}
-
 void Explorerplusplus::CreateStatusBar(void)
 {
 	if(m_bShowStatusBar)
@@ -2941,7 +2922,7 @@ void Explorerplusplus::SetupJumplistTasks()
 	/* New tab task. */
 	jlti.pszName		= szName;
 	jlti.pszPath		= szCurrentProcess;
-	jlti.pszArguments	= JUMPLIST_TASK_NEWTAB_ARGUMENT;
+	jlti.pszArguments	= NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT;
 	jlti.pszIconPath	= szCurrentProcess;
 	jlti.iIcon			= 1;
 

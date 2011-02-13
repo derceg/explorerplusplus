@@ -62,9 +62,11 @@ BOOL CMassRenameDialog::OnInitDialog()
 	Style = GetWindowLong(hListView,GWL_STYLE);
 	SetWindowLongPtr(hListView,GWL_STYLE,Style|LVS_SHAREIMAGELISTS);
 
+	SetWindowTheme(hListView,L"Explorer",NULL);
+
 	ListView_SetExtendedListViewStyleEx(hListView,
-		LVS_EX_GRIDLINES|LVS_EX_SUBITEMIMAGES|LVS_EX_FULLROWSELECT,
-		LVS_EX_GRIDLINES|LVS_EX_SUBITEMIMAGES|LVS_EX_FULLROWSELECT);
+		LVS_EX_DOUBLEBUFFER|LVS_EX_SUBITEMIMAGES|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES,
+		LVS_EX_DOUBLEBUFFER|LVS_EX_SUBITEMIMAGES|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
 
 	HIMAGELIST himlSmall;
 	Shell_GetImageLists(NULL,&himlSmall);
@@ -291,6 +293,11 @@ void CMassRenameDialog::OnOk()
 
 	GetDlgItemText(m_hDlg,IDC_MASSRENAME_EDIT,
 		szNamePattern,SIZEOF_ARRAY(szNamePattern));
+
+	if(lstrlen(szNamePattern) == 0)
+	{
+		/* TODO: Show error. */
+	}
 
 	std::wstring strNewFilename;
 	TCHAR szFilename[MAX_PATH];

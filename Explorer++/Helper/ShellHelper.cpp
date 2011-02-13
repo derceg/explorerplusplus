@@ -21,8 +21,8 @@
 
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
 	std::list<JumpListTaskInformation> TaskList);
-HRESULT AddJumpListTaskInternal(IObjectCollection *poc,TCHAR *pszName,
-	TCHAR *pszPath,TCHAR *pszArguments,TCHAR *pszIconPath,int iIcon);
+HRESULT AddJumpListTaskInternal(IObjectCollection *poc,const TCHAR *pszName,
+	const TCHAR *pszPath,const TCHAR *pszArguments,const TCHAR *pszIconPath,int iIcon);
 
 HRESULT GetIdlFromParsingName(const TCHAR *szParsingName,LPITEMIDLIST *pidl)
 {
@@ -1107,8 +1107,8 @@ HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
 	return S_OK;
 }
 
-HRESULT AddJumpListTaskInternal(IObjectCollection *poc,TCHAR *pszName,
-	TCHAR *pszPath,TCHAR *pszArguments,TCHAR *pszIconPath,int iIcon)
+HRESULT AddJumpListTaskInternal(IObjectCollection *poc,const TCHAR *pszName,
+	const TCHAR *pszPath,const TCHAR *pszArguments,const TCHAR *pszIconPath,int iIcon)
 {
 	if(poc == NULL ||
 		pszName == NULL ||

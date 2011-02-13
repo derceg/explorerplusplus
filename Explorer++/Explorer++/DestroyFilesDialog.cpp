@@ -39,7 +39,9 @@ BOOL CDestroyFilesDialog::OnInitDialog()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DESTROYFILES_LISTVIEW);
 
-	ListView_SetGridlines(hListView,TRUE);
+	HIMAGELIST himlSmall;
+	Shell_GetImageLists(NULL,&himlSmall);
+	ListView_SetImageList(hListView,himlSmall,LVSIL_SMALL);
 
 	SetWindowTheme(hListView,L"Explorer",NULL);
 
@@ -73,15 +75,19 @@ BOOL CDestroyFilesDialog::OnInitDialog()
 		StringCchCopy(szFullFilename,SIZEOF_ARRAY(szFullFilename),
 			strFullFilename.c_str());
 
+		/* TODO: Perform in background thread. */
+		SHFILEINFO shfi;
+		SHGetFileInfo(szFullFilename,0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX|
+			SHGFI_TYPENAME);
+
 		LVITEM lvItem;
-		lvItem.mask		= LVIF_TEXT;
+		lvItem.mask		= LVIF_TEXT|LVIF_IMAGE;
 		lvItem.iItem	= iItem;
 		lvItem.iSubItem	= 0;
 		lvItem.pszText	= szFullFilename;
+		lvItem.iImage	 = shfi.iIcon;
 		ListView_InsertItem(hListView,&lvItem);
 
-		SHFILEINFO shfi;
-		SHGetFileInfo(szFullFilename,0,&shfi,sizeof(shfi),SHGFI_TYPENAME);
 		ListView_SetItemText(hListView,iItem,1,shfi.szTypeName);
 
 		WIN32_FILE_ATTRIBUTE_DATA wfad;
@@ -295,8 +301,8 @@ CDestroyFilesDialogPersistentSettings::~CDestroyFilesDialogPersistentSettings()
 
 CDestroyFilesDialogPersistentSettings& CDestroyFilesDialogPersistentSettings::GetInstance()
 {
-	static CDestroyFilesDialogPersistentSettings sfadps;
-	return sfadps;
+	static CDestroyFilesDialogPersistentSettings dfdps;
+	return dfdps;
 }
 
 void CDestroyFilesDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)

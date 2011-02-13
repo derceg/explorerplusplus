@@ -136,7 +136,7 @@ ensure you have administrator privileges."),NExplorerplusplus::WINDOW_NAME,MB_IC
 ensure you have administrator privileges."),NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_OK);
 			}
 		}
-		else if(lstrcmp(szPath,JUMPLIST_TASK_NEWTAB_ARGUMENT) == 0)
+		else if(lstrcmp(szPath,NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT) == 0)
 		{
 			/* This will be called when the user clicks the
 			'New Tab' item on the tasks menu in Windows 7.

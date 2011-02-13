@@ -336,10 +336,10 @@ void CCustomizeColorsDialog::OnMove(BOOL bUp)
 			iSwap = iSelected + 1;
 		}
 
-		std::vector<ColorRule_t>::iterator itrSelected = m_pColorRuleList->begin();
+		auto itrSelected = m_pColorRuleList->begin();
 		std::advance(itrSelected,iSelected);
 
-		std::vector<ColorRule_t>::iterator itrSwap = m_pColorRuleList->begin();
+		auto itrSwap = m_pColorRuleList->begin();
 		std::advance(itrSelected,iSwap);
 
 		std::iter_swap(itrSelected,itrSwap);

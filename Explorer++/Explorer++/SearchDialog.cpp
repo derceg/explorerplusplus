@@ -1137,7 +1137,7 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 				{
 					if(m_bUseRegularExpressions)
 					{
-						if(regex_match(wfd.cFileName,m_rxPattern))
+						if(std::tr1::regex_match(wfd.cFileName,m_rxPattern))
 						{
 							bMatchFileName = TRUE;
 						}

@@ -20,6 +20,7 @@
 #include "CustomizeColorsDialog.h"
 #include "SplitFileDialog.h"
 #include "DestroyFilesDialog.h"
+#include "MergeFilesDialog.h"
 
 
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -1214,8 +1215,25 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case IDM_ACTIONS_MERGEFILES:
-			DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_MERGEFILES),
-			hwnd,MergeFilesProcStub,(LPARAM)this);
+			{
+				TCHAR szCurrentDirectory[MAX_PATH];
+				m_pActiveShellBrowser->QueryCurrentDirectory(MAX_PATH,szCurrentDirectory);
+
+				std::list<std::wstring>	FullFilenameList;
+				int iItem = -1;
+
+				while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+				{
+					TCHAR szFullFilename[MAX_PATH];
+					m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+					FullFilenameList.push_back(szFullFilename);
+				}
+
+				CMergeFilesDialog CMergeFilesDialog(g_hLanguageModule,IDD_MERGEFILES,
+					m_hContainer,szCurrentDirectory,FullFilenameList);
+
+				CMergeFilesDialog.ShowModalDialog();
+			}
 			break;
 
 		case IDM_ACTIONS_SPLITFILE:

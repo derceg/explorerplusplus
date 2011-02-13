@@ -181,7 +181,6 @@ public:
 	INT_PTR CALLBACK	BookmarkPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkFolderPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	MergeFilesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SelectColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	SetDefaultColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -244,6 +243,32 @@ public:
 
 
 private:
+
+	/* These are used to support the undo
+	functionality. They define the various
+	operations that can be undone. */
+	enum UndoType_t
+	{
+		FILE_UNDOACTION_RENAMED,
+		FILE_UNDOACTION_COPIED,
+		FILE_UNDOACTION_MOVED,
+		FILE_UNDOACTION_DELETE
+	};
+
+	struct UndoItem_t
+	{
+		/* The type of operation that
+		occurred. */
+		UndoType_t	Type;
+
+		/* Name of the file. */
+		TCHAR		szFileName[MAX_PATH + 1];
+
+		/* If the file was renamed, this
+		element contains the previous name
+		of the file. */
+		TCHAR		szOldFileName[MAX_PATH + 1];
+	};
 
 	static const COLORREF	CF_COMPRESSED = RGB(0,0,255);
 	static const COLORREF	CF_ENCRYPTED = RGB(0,128,0);
@@ -696,8 +721,6 @@ private:
 	void					LoadAddBookmarkStateFromRegistry(HKEY hParentKey);
 	void					SaveDisplayColorsStateToRegistry(HKEY hParentKey);
 	void					LoadDisplayColorsStateFromRegistry(HKEY hParentKey);
-	void					SaveMergeFilesStateToRegistry(HKEY hParentKey);
-	void					LoadMergeFilesStateFromRegistry(HKEY hParentKey);
 	void					SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey);
 	void					LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey);
 	void					SaveSelectColumnsStateToRegistry(HKEY hParentKey);
@@ -918,16 +941,6 @@ private:
 	void					SetInfoTipWindowStates(HWND hDlg);
 	void					SetFolderSizeWindowState(HWND hDlg);
 
-	/* Merge files dialog. */
-	void					OnMergeFilesInit(HWND hDlg);
-	void					OnMergeFilesRemove(HWND hDlg);
-	void					OnMergeFilesMove(HWND hDlg,BOOL bUp);
-	void					OnMergeFilesOk(HWND hDlg);
-	void					OnMergeFilesCancel(HWND hDlg);
-	void					OnMergeFilesChangeOutputDirectory(HWND hDlg);
-	void					OnMergingFinished(HWND hDlg);
-	void					MergeFilesSaveState(HWND hDlg);
-
 	/* Set default columns dialog. */
 	void					OnSetDefaultColumnsInit(HWND hDlg);
 	void					OnSetDefaultColumnsCBChange(HWND hDlg);
@@ -1001,7 +1014,6 @@ private:
 	void					SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl);
 	int						CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,int nBuffer);
 	BOOL					CheckItemSelection(void);
-	HWND					DecodeWindowConstant(UINT uWindow);
 	HWND					MyGetNextWindow(HWND hwndCurrent);
 	BOOL					IsNextWindowVisible(HWND hNext);
 	void					ShowMainRebarBand(HWND hwnd,BOOL bShow);
@@ -1266,10 +1278,6 @@ private:
 	/* Add bookmark dialog. */
 	BOOL					m_bAddBookmarkDlgStateSaved;
 	POINT					m_ptAddBookmark;
-
-	/* Merge files dialog. */
-	BOOL					m_bMergeFilesDlgStateSaved;
-	POINT					m_ptMergeFiles;
 
 	/* Organize bookmarks dialog. */
 	BOOL					m_bOrganizeBookmarksDlgStateSaved;
