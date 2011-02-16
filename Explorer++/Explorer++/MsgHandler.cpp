@@ -720,7 +720,7 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 				OpenFileItem(pidlItem,EMPTY_STRING);
 			}
 		}
-		else if(bControlPanelParent)
+		else if(bControlPanelParent && (uAttributes & SFGAO_FOLDER))
 		{
 			TCHAR szParsingPath[MAX_PATH];
 			TCHAR szExplorerPath[MAX_PATH];
@@ -730,7 +730,12 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 			MyExpandEnvironmentStrings(_T("%windir%\\explorer.exe"),
 				szExplorerPath,SIZEOF_ARRAY(szExplorerPath));
 
-			/* Invoke Windows Explorer directly. */
+			/* Invoke Windows Explorer directly. Note that only folder
+			items need to be passed directly to Explorer. Two central
+			reasons:
+			1. Explorer can only open folder items.
+			2. Non-folder items can be opened directly (regardless of
+			whether or not they're children of the control panel). */
 			ShellExecute(m_hContainer,_T("open"),szExplorerPath,
 				szParsingPath,NULL,SW_SHOWNORMAL);
 		}
