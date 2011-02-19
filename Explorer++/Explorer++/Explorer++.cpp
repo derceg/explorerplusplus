@@ -301,7 +301,7 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_bOverwriteExistingFilesConfirmation	= TRUE;
 	m_bCheckBoxSelection			= FALSE;
 	m_bForceSize					= FALSE;
-	m_SizeDisplayFormat				= FORMAT_BYTES;
+	m_SizeDisplayFormat				= SIZE_FORMAT_BYTES;
 	m_bSynchronizeTreeview			= TRUE;
 	m_bTVAutoExpandSelected			= FALSE;
 	m_bCloseMainWindowOnTabClose	= TRUE;

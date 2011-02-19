@@ -34,6 +34,21 @@ INT_PTR CALLBACK	TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lP
 int CALLBACK PropSheetProcStub(HWND hDlg,UINT msg,LPARAM lParam);
 int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
 
+/* TODO: Define in class. */
+struct FileSize_t
+{
+	SizeDisplayFormat_t	sdf;
+	TCHAR				szDisplayName[64];
+};
+
+static const FileSize_t g_FileSizes[] =
+{{SIZE_FORMAT_BYTES,_T("Bytes")},
+{SIZE_FORMAT_KBYTES,_T("KB")},
+{SIZE_FORMAT_MBYTES,_T("MB")},
+{SIZE_FORMAT_GBYTES,_T("GB")},
+{SIZE_FORMAT_TBYTES,_T("TB")},
+{SIZE_FORMAT_PBYTES,_T("PB")}};
+
 BOOL bRefreshAllTabs;
 
 static HWND g_hOptionsPropertyDialog	= NULL;

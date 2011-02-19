@@ -12,6 +12,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <sstream>
 #include "Helper.h"
 #include "FileOperations.h"
 #include "Buffer.h"
@@ -27,180 +28,111 @@ BOOL	GetFileAllocationInfo(TCHAR *lpszFileName,STARTING_VCN_INPUT_BUFFER *pStart
 BOOL	GetNtfsVolumeInfo(TCHAR *lpszDrive,NTFS_VOLUME_DATA_BUFFER *pNtfsVolumeInfo,DWORD BufSize);
 TCHAR	*GetPartitionName(LARGE_INTEGER StartingOffset);
 
-int TraverseSelectedItems(HWND hListView,int (*TraverseFunction)(TCHAR *))
-{
-	int NumberOfItemsSelected;
-	int LastItemFound;
-	TCHAR FileName[MAX_PATH];
-
-	NumberOfItemsSelected = ListView_GetSelectedCount(hListView);
-
-	LastItemFound = -1;
-	while((LastItemFound = ListView_GetNextItem(hListView,LastItemFound,LVNI_SELECTED)) != -1)
-	{
-		ListView_GetItemText(hListView,LastItemFound,0,FileName,MAX_PATH);
-
-		TraverseFunction(FileName);
-	}
-
-	return NumberOfItemsSelected;
-}
-
-size_t FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
-size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf)
-{
-	if(bForceSize)
-		return FormatSizeString(lFileSize,pszFileSize,cchBuf,sdf);
-
-	return FormatSizeString(lFileSize,pszFileSize,cchBuf);
-}
-
-size_t FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
-size_t cchBuf,SizeDisplayFormat_t sdf)
-{
-	TCHAR *pszSizeTypes[] = {_T("bytes"),_T("KB"),_T("MB"),_T("GB"),_T("TB"),_T("PB")};
-	double fFileSize;
-	int iSizeIndex = 0;
-	int i = 0;
-
-	switch(sdf)
-	{
-	case FORMAT_BYTES:
-		StringCchPrintf(pszFileSize,cchBuf,
-			_T("%I64d %s"),lFileSize.QuadPart,pszSizeTypes[0]);
-
-		return 0;
-		break;
-
-	case FORMAT_KBYTES:
-		iSizeIndex = 1;
-		break;
-
-	case FORMAT_MBYTES:
-		iSizeIndex = 2;
-		break;
-
-	case FORMAT_GBYTES:
-		iSizeIndex = 3;
-		break;
-
-	case FORMAT_TBYTES:
-		iSizeIndex = 4;
-		break;
-
-	case FORMAT_PBYTES:
-		iSizeIndex = 5;
-		break;
-	}
-
-	fFileSize = (double)lFileSize.QuadPart;
-
-	for(i = 0;i < iSizeIndex;i++)
-	{
-		fFileSize /= 1024;
-	}
-
-	StringCchPrintf(pszFileSize,cchBuf,
-		_T("%.3f"),fFileSize);
-
-	pszFileSize[lstrlen(pszFileSize) - 1] = '\0';
-
-	StringCchCat(pszFileSize,cchBuf,_T(" "));
-	StringCchCat(pszFileSize,cchBuf,pszSizeTypes[i]);
-
-	return 0;
-}
-
-size_t FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
+void FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
 size_t cchBuf)
 {
-	return FormatSizeString(lFileSize,pszFileSize,cchBuf,FALSE);
+	FormatSizeString(lFileSize,pszFileSize,cchBuf,FALSE,SIZE_FORMAT_NONE);
 }
 
-size_t FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
-size_t cchBuf,BOOL bRound)
+void FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
+size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf)
 {
-	LARGE_INTEGER lFileSizeTemp;
-	LARGE_INTEGER KB;
 	TCHAR *pszSizeTypes[] = {_T("bytes"),_T("KB"),_T("MB"),_T("GB"),_T("TB"),_T("PB")};
-	double fFileSize;
-	int i = 0;
 
-	KB.QuadPart = 1024;
+	double fFileSize = static_cast<double>(lFileSize.QuadPart);
+	int iSizeIndex = 0;
 
-	i = 0;
-	lFileSizeTemp.QuadPart = lFileSize.QuadPart;
-	fFileSize = (double)lFileSize.QuadPart;
-	while((fFileSize / (double)KB.QuadPart) > 1.0)
+	if(bForceSize)
 	{
-		lFileSizeTemp.QuadPart /= KB.QuadPart;
-		fFileSize /= (double)KB.QuadPart;
-		i++;
-	}
+		switch(sdf)
+		{
+		case SIZE_FORMAT_BYTES:
+			iSizeIndex = 0;
+			break;
 
-	if(i > SIZEOF_ARRAY(pszSizeTypes))
-	{
-		pszFileSize = NULL;
-		return 0;
-	}
+		case SIZE_FORMAT_KBYTES:
+			iSizeIndex = 1;
+			break;
 
-	/* If the size to be shown is a byte unit, don't display
-	any decimal places. */
-	if(i == 0)
-	{
-		StringCchPrintf(pszFileSize,cchBuf,
-			_T("%I64d %s"),lFileSize.QuadPart,pszSizeTypes[0]);
+		case SIZE_FORMAT_MBYTES:
+			iSizeIndex = 2;
+			break;
+
+		case SIZE_FORMAT_GBYTES:
+			iSizeIndex = 3;
+			break;
+
+		case SIZE_FORMAT_TBYTES:
+			iSizeIndex = 4;
+			break;
+
+		case SIZE_FORMAT_PBYTES:
+			iSizeIndex = 5;
+			break;
+		}
+
+		for(int i = 0;i < iSizeIndex;i++)
+		{
+			fFileSize /= 1024;
+		}
 	}
 	else
 	{
-		if(bRound)
+		while((fFileSize / 1024) > 1)
 		{
-			if(lFileSizeTemp.QuadPart < 10)
-			{
-				StringCchPrintf(pszFileSize,cchBuf,
-					_T("%.2f"),fFileSize);
-			}
-			else if(lFileSizeTemp.QuadPart < 100)
-			{
-				StringCchPrintf(pszFileSize,cchBuf,
-					_T("%.1f"),fFileSize);
-			}
-			else
-			{
-				StringCchPrintf(pszFileSize,cchBuf,
-					_T("%.0f"),fFileSize);
-			}
+			fFileSize /= 1024;
+
+			iSizeIndex++;
+		}
+
+		if(iSizeIndex > SIZEOF_ARRAY(pszSizeTypes))
+		{
+			StringCchCopy(pszFileSize,cchBuf,EMPTY_STRING);
+			return;
+		}
+	}
+
+	int iPrecision;
+
+	if(iSizeIndex == 0 ||
+		lFileSize.QuadPart % (1024 * iSizeIndex) == 0)
+	{
+		iPrecision = 0;
+	}
+	else
+	{
+		if(fFileSize < 10)
+		{
+			iPrecision = 2;
+		}
+		else if(fFileSize < 100)
+		{
+			iPrecision = 1;
 		}
 		else
 		{
-			if(lFileSizeTemp.QuadPart < 10)
-			{
-				StringCchPrintf(pszFileSize,cchBuf,
-					_T("%.3f"),fFileSize);
-
-				pszFileSize[lstrlen(pszFileSize) - 1] = '\0';
-			}
-			else if(lFileSizeTemp.QuadPart < 100)
-			{
-				StringCchPrintf(pszFileSize,cchBuf,
-					_T("%.2f"),fFileSize);
-
-				pszFileSize[lstrlen(pszFileSize) - 1] = '\0';
-			}
-			else
-			{
-				StringCchPrintf(pszFileSize,cchBuf,
-					_T("%.1f"),fFileSize);
-
-				pszFileSize[lstrlen(pszFileSize) - 2] = '\0';
-			}
+			iPrecision = 0;
 		}
-
-		StringCchCat(pszFileSize,cchBuf,_T(" "));
-		StringCchCat(pszFileSize,cchBuf,pszSizeTypes[i]);
 	}
 
-	return 0;
+	int iLeast = static_cast<int>((fFileSize - static_cast<int>(fFileSize)) *
+		pow(10.0,iPrecision + 1));
+
+	/* Setting the precision will cause automatic rounding. Therefore,
+	if the least significant digit to be dropped is greater than 0.5,
+	reduce it to below 0.5. */
+	if(iLeast >= 5)
+	{
+		fFileSize -= 5.0 * pow(10.0,-(iPrecision + 1));
+	}
+
+	std::wstringstream ss;
+	ss.imbue(std::locale(""));
+	ss.precision(iPrecision);
+
+	ss << std::fixed << fFileSize << _T(" ") << pszSizeTypes[iSizeIndex];
+	wstring str = ss.str();
+	StringCchCopy(pszFileSize,cchBuf,str.c_str());
 }
 
 int CreateFileTimeString(FILETIME *FileTime,

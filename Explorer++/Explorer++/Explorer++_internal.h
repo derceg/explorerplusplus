@@ -346,12 +346,6 @@ struct DWFolderSizeCompletion_t
 	int				iTabId;
 };
 
-struct FileSize_t
-{
-	SizeDisplayFormat_t	sdf;
-	TCHAR				szDisplayName[64];
-};
-
 /* Used to store settings for individual directories. */
 struct DirectorySettingsInternal_t
 {
@@ -576,14 +570,6 @@ CM_PRINTERCOMMENTS,CM_PRINTERLOCATION};
 static unsigned int g_RecycleBinHeaderList[] =
 {CM_NAME,CM_ORIGINALLOCATION,CM_DATEDELETED,
 CM_SIZE,CM_TYPE,CM_DATEMODIFIED};
-
-const FileSize_t g_FileSizes[] =
-{{FORMAT_BYTES,_T("Bytes")},
-{FORMAT_KBYTES,_T("KB")},
-{FORMAT_MBYTES,_T("MB")},
-{FORMAT_GBYTES,_T("GB")},
-{FORMAT_TBYTES,_T("TB")},
-{FORMAT_PBYTES,_T("PB")}};
 
 extern CRITICAL_SECTION g_csDirMonCallback;
 extern BOOL g_bForceLanguageLoad;

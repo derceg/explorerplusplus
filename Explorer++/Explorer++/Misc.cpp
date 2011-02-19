@@ -1193,7 +1193,7 @@ void Explorerplusplus::HandleFileSelectionDisplayZero(void)
 
 		lTotalPhysicalMem.QuadPart = msex.ullTotalPhys;
 		FormatSizeString(lTotalPhysicalMem,szTemp,
-			SIZEOF_ARRAY(szTemp),TRUE);
+			SIZEOF_ARRAY(szTemp));
 		StringCchPrintf(szDisplay,SIZEOF_ARRAY(szDisplay),
 			_T("Memory: %s"),szTemp);
 		DisplayWindow_BufferText(m_hDisplayWindow,szDisplay);
@@ -1447,11 +1447,11 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 				if(bRet)
 				{
 					FormatSizeString(ulTotalNumberOfFreeBytes,szSize,
-						SIZEOF_ARRAY(szSize),FALSE);
+						SIZEOF_ARRAY(szSize));
 					StringCchPrintf(szMsg,SIZEOF_ARRAY(szMsg),_T("Free Space: %s"),szSize);
 					DisplayWindow_BufferText(m_hDisplayWindow,szMsg);
 
-					FormatSizeString(ulTotalNumberOfBytes,szSize,SIZEOF_ARRAY(szSize),FALSE);
+					FormatSizeString(ulTotalNumberOfBytes,szSize,SIZEOF_ARRAY(szSize));
 					StringCchPrintf(szMsg,SIZEOF_ARRAY(szMsg),_T("Total Size: %s"),szSize);
 					DisplayWindow_BufferText(m_hDisplayWindow,szMsg);
 				}
@@ -1842,7 +1842,7 @@ int Explorerplusplus::CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,i
 	}
 
 	FormatSizeString(TotalNumberOfFreeBytes,szFreeSpace,
-		SIZEOF_ARRAY(szFreeSpace),FALSE);
+		SIZEOF_ARRAY(szFreeSpace));
 
 	LoadString(g_hLanguageModule,IDS_GENERAL_FREE,szFree,SIZEOF_ARRAY(szFree));
 

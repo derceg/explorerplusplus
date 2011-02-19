@@ -114,15 +114,16 @@ typedef enum
 	GROUP_USERSRESTRICTED
 } GroupType_t;
 
-typedef enum
+enum SizeDisplayFormat_t
 {
-	FORMAT_BYTES,
-	FORMAT_KBYTES,
-	FORMAT_MBYTES,
-	FORMAT_GBYTES,
-	FORMAT_TBYTES,
-	FORMAT_PBYTES
-} SizeDisplayFormat_t;
+	SIZE_FORMAT_NONE,
+	SIZE_FORMAT_BYTES,
+	SIZE_FORMAT_KBYTES,
+	SIZE_FORMAT_MBYTES,
+	SIZE_FORMAT_GBYTES,
+	SIZE_FORMAT_TBYTES,
+	SIZE_FORMAT_PBYTES
+};
 
 /* Listview helper functions. */
 int				ListView_SelectAllItems(HWND hListView);
@@ -242,10 +243,8 @@ void			GetCPUBrandString(char *pszCPUBrand,UINT cchBuf);
 HRESULT			GetMediaMetadata(TCHAR *szFileName,LPCWSTR szAttribute,BYTE **pszOutput);
 
 /* General helper functions. */
-size_t			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf);
-size_t			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf);
-size_t			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf,BOOL bRound);
-size_t			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf,SizeDisplayFormat_t sdf);
+void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf);
+void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf);
 HINSTANCE		StartCommandPrompt(TCHAR *Directory);
 BOOL			SetProcessTokenPrivilege(DWORD ProcessId,TCHAR *PrivilegeName,BOOL bEnablePrivilege);
 void			ShowLastError(void);
