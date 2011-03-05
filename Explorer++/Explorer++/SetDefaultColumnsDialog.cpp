@@ -6,436 +6,417 @@
  *
  * Handles the 'Select Columns' dialog.
  *
- * Methodology:
- * Each column set will be copied to a
- * temporary on initialization. If the
- * 'OK' button is used to exit the dialog,
- * the temporary column copies will be
- * set as the new defaults; if 'Cancel' is
- * used to ecit the dialog, nothing
- * permanent will happen.
- *
  * Written by David Erceg
  * www.explorerplusplus.com
  *
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Explorer++.h"
+#include "Explorer++_internal.h"
+#include "SetDefaultColumnsDialog.h"
+#include "MainResource.h"
+#include "../ShellBrowser/iShellView.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 
 
-list<Column_t>	g_RealFolderColumnList;
-list<Column_t>	g_MyComputerColumnList;
-list<Column_t>	g_ControlPanelColumnList;
-list<Column_t>	g_RecycleBinColumnList;
-list<Column_t>	g_PrintersColumnList;
-list<Column_t>	g_NetworkConnectionsColumnList;
-list<Column_t>	g_MyNetworkPlacesColumnList;
+const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetDefaultColumns");
 
-DWORD g_iControlPanel;
-DWORD g_iGeneral;
-DWORD g_iMyComputer;
-DWORD g_iNetwork;
-DWORD g_iNetworkPlaces;
-DWORD g_iPrinters;
-DWORD g_iRecycleBin;
-DWORD g_iPreviousTypeSel;
-
-int g_nDefaultColumnsChecked = 0;
-
-INT_PTR CALLBACK SetDefaultColumnsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+CSetDefaultColumnsDialog::CSetDefaultColumnsDialog(HINSTANCE hInstance,
+	int iResource,HWND hParent) :
+CBaseDialog(hInstance,iResource,hParent,true)
 {
-	static Explorerplusplus *pContainer = NULL;
+	m_psdcdps = &CSetDefaultColumnsDialogPersistentSettings::GetInstance();
+}
 
-	switch(uMsg)
+CSetDefaultColumnsDialog::~CSetDefaultColumnsDialog()
+{
+
+}
+
+BOOL CSetDefaultColumnsDialog::OnInitDialog()
+{
+	HWND hComboBox = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
+
+	TCHAR szFolderName[MAX_PATH];
+	GetCsidlFolderName(CSIDL_CONTROLS,szFolderName,SHGDN_INFOLDER);
+	m_iControlPanel = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+
+	LoadString(GetInstance(),IDS_DEFAULTCOLUMNS_GENERAL,szFolderName,SIZEOF_ARRAY(szFolderName));
+	m_iGeneral = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+
+	GetCsidlFolderName(CSIDL_DRIVES,szFolderName,SHGDN_INFOLDER);
+	m_iMyComputer = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+
+	GetCsidlFolderName(CSIDL_CONNECTIONS,szFolderName,SHGDN_INFOLDER);
+	m_iNetwork = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+
+	GetCsidlFolderName(CSIDL_NETWORK,szFolderName,SHGDN_INFOLDER);
+	m_iNetworkPlaces = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+
+	GetCsidlFolderName(CSIDL_PRINTERS,szFolderName,SHGDN_INFOLDER);
+	m_iPrinters = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+
+	GetCsidlFolderName(CSIDL_BITBUCKET,szFolderName,SHGDN_INFOLDER);
+	m_iRecycleBin = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+
+	SendMessage(hComboBox,CB_SETCURSEL,1,0);
+	m_iPreviousTypeSel = 1;
+
+	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
+
+	ListView_SetExtendedListViewStyleEx(hListView,
+	LVS_EX_CHECKBOXES,LVS_EX_CHECKBOXES);
+
+	LVCOLUMN lvColumn;
+	lvColumn.mask	= LVCF_WIDTH;
+	lvColumn.cx		= 180;
+	ListView_InsertColumn(hListView,0,&lvColumn);
+
+	/* TODO: Show columns for selected folder type. */
+	/*int iItem = 0;
+
+	for each(auto Column in m_RealFolderColumnList)
 	{
-		case WM_INITDIALOG:
-		{
-			pContainer = (Explorerplusplus *)lParam;
-		}
+		TCHAR szText[64];
+		LoadString(GetInstance(),LookupColumnNameStringIndex(itr->id),szText,SIZEOF_ARRAY(szText));
+
+		LVITEM lvItem;
+		lvItem.mask		= LVIF_TEXT|LVIF_PARAM;
+		lvItem.iItem	= iItem;
+		lvItem.iSubItem	= 0;
+		lvItem.pszText	= szText;
+		lvItem.lParam	= itr->id;
+		ListView_InsertItem(hListView,&lvItem);
+
+		ListView_SetCheckState(hListView,iItem,itr->bChecked);
+
+		iItem++;
+	}*/
+
+	ListView_SelectItem(hListView,0,TRUE);
+	SetFocus(hListView);
+
+	m_psdcdps->RestoreDialogPosition(m_hDlg,true);
+
+	return 0;
+}
+
+void CSetDefaultColumnsDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
+	std::list<CResizableDialog::Control_t> &ControlList)
+{
+	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
+
+	CResizableDialog::Control_t Control;
+
+	Control.iID = IDC_COLUMNS_LISTVIEW;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_COLUMNS_MOVEUP;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_COLUMNS_MOVEDOWN;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_STATIC_DESCRIPTION;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_DEFAULTCOLUMNS_DESCRIPTION;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_DEFAULTCOLUMNS_DESCRIPTION;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_STATIC_ETCHEDHORZ;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_STATIC_ETCHEDHORZ;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDOK;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDCANCEL;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_GRIPPER;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+}
+
+BOOL CSetDefaultColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+{
+	switch(HIWORD(wParam))
+	{
+	case CBN_SELCHANGE:
+		OnCbnSelChange();
 		break;
 	}
 
-	return pContainer->SetDefaultColumnsProc(hDlg,uMsg,wParam,lParam);
-}
-
-INT_PTR CALLBACK Explorerplusplus::SetDefaultColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam)
-{
-	switch(Msg)
+	switch(LOWORD(wParam))
 	{
-		case WM_INITDIALOG:
-			OnSetDefaultColumnsInit(hDlg);
-			break;
+	case IDC_DEFAULTCOLUMNS_MOVEUP:
+		OnMoveColumn(TRUE);
+		break;
 
-		case WM_COMMAND:
-			switch(HIWORD(wParam))
-			{
-				case CBN_SELCHANGE:
-					OnSetDefaultColumnsCBChange(hDlg);
-					break;
-			}
+	case IDC_DEFAULTCOLUMNS_MOVEDOWN:
+		OnMoveColumn(FALSE);
+		break;
 
-			switch(LOWORD(wParam))
-			{
-				case IDC_DEFAULTCOLUMNS_MOVEUP:
-					MoveColumnItem2(hDlg,TRUE);
-					break;
+	case IDOK:
+		OnOk();
+		break;
 
-				case IDC_DEFAULTCOLUMNS_MOVEDOWN:
-					MoveColumnItem2(hDlg,FALSE);
-					break;
-
-				case IDC_DEFAULTCOLUMNS_ENABLE:
-					EnableColumnItem(hDlg,TRUE);
-					break;
-
-				case IDC_DEFAULTCOLUMNS_DISABLE:
-					EnableColumnItem(hDlg,FALSE);
-					break;
-
-				case IDOK:
-					OnSetDefaultColumnsOk(hDlg);
-					break;
-
-				case IDCANCEL:
-					SetDefaultColumnsSaveState(hDlg);
-					EndDialog(hDlg,0);
-					break;
-			}
-			break;
-
-		case WM_NOTIFY:
-			{
-				NMHDR *nmhdr;
-
-				nmhdr = (NMHDR *)lParam;
-
-				switch(nmhdr->code)
-				{
-					case LVN_ITEMCHANGING:
-						OnSetDefaultColumnsLvnItemChanging(hDlg,lParam);
-						break;
-				}
-			}
-			break;
-
-		case WM_CLOSE:
-			SetDefaultColumnsSaveState(hDlg);
-			EndDialog(hDlg,0);
-			break;
+	case IDCANCEL:
+		OnCancel();
+		break;
 	}
 
 	return 0;
 }
 
-void Explorerplusplus::OnSetDefaultColumnsInit(HWND hDlg)
+BOOL CSetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
 {
-	HWND	hComboBox;
-	TCHAR	szFolderName[MAX_PATH];
-
-	if(m_bSetDefaultColumnsDlgStateSaved)
+	switch(pnmhdr->code)
 	{
-		SetWindowPos(hDlg,NULL,m_ptSetDefaultColumns.x,
-			m_ptSetDefaultColumns.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(m_hContainer,hDlg);
+	case LVN_ITEMCHANGING:
+		OnLvnItemChanging(reinterpret_cast<NMLISTVIEW *>(pnmhdr));
+		break;
 	}
 
-	hComboBox = GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
+	return 0;
+}
 
-	/* Need to be careful here. If the combobox decides to insert
-	items in the first position, then the indexes will be wrong.
-	Similarly, if the CBS_SORT window style is applied, items
-	will be inserted in sorted order, causing the indexes to
-	overlap.
-	Should use CB_INSERTSTRING. */
-	GetCsidlFolderName(CSIDL_CONTROLS,szFolderName,SHGDN_INFOLDER);
-	g_iControlPanel		= (DWORD)SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName);
+BOOL CSetDefaultColumnsDialog::OnClose()
+{
+	EndDialog(m_hDlg,0);
+	return 0;
+}
 
-	LoadString(g_hLanguageModule,IDS_DEFAULTCOLUMNS_GENERAL,szFolderName,SIZEOF_ARRAY(szFolderName));
-	g_iGeneral			= (DWORD)SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName);
+void CSetDefaultColumnsDialog::SaveState()
+{
+	m_psdcdps->SaveDialogPosition(m_hDlg);
+	m_psdcdps->m_bStateSaved = TRUE;
+}
 
-	GetCsidlFolderName(CSIDL_DRIVES,szFolderName,SHGDN_INFOLDER);
-	g_iMyComputer		= (DWORD)SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName);
+void CSetDefaultColumnsDialog::OnOk()
+{
+	/* TODO: Save column state for each of the folder types. */
 
-	GetCsidlFolderName(CSIDL_CONNECTIONS,szFolderName,SHGDN_INFOLDER);
-	g_iNetwork			= (DWORD)SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName);
+	EndDialog(m_hDlg,1);
+}
 
-	GetCsidlFolderName(CSIDL_NETWORK,szFolderName,SHGDN_INFOLDER);
-	g_iNetworkPlaces	= (DWORD)SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName);
+void CSetDefaultColumnsDialog::OnCancel()
+{
+	EndDialog(m_hDlg,0);
+}
 
-	GetCsidlFolderName(CSIDL_PRINTERS,szFolderName,SHGDN_INFOLDER);
-	g_iPrinters			= (DWORD)SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName);
+void CSetDefaultColumnsDialog::OnCbnSelChange()
+{
+	/* TODO: */
+	//GetCurrentDefaultColumnState(m_hDlg);
 
-	GetCsidlFolderName(CSIDL_BITBUCKET,szFolderName,SHGDN_INFOLDER);
-	g_iRecycleBin		= (DWORD)SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName);
+	HWND hComboBox = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
+	int iSelected = static_cast<int>(SendMessage(hComboBox,CB_GETCURSEL,0,0));
 
-	SendMessage(hComboBox,CB_SETCURSEL,1,0);
-	g_iPreviousTypeSel = 1;
+	std::list<Column_t> *pColumnList = NULL;
 
-	HWND						hListView;
-	list<Column_t>				*pColumnList = NULL;
-	list<Column_t>::iterator	itr;
-	LVITEM						lvItem;
-	LVCOLUMN					lvColumn;
-	TCHAR						szText[64];
-	int							iItem = 0;
-
-	OnSetDefaultColumnsInitialzeTempColumns();
-
-	hListView = GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
-
-	ListView_SetExtendedListViewStyleEx(hListView,
-	LVS_EX_CHECKBOXES,LVS_EX_CHECKBOXES);
-
-	lvColumn.mask	= LVCF_WIDTH;
-	lvColumn.cx		= 180;
-	ListView_InsertColumn(hListView,0,&lvColumn);
-
-	pColumnList = &m_RealFolderColumnList;
-
-	/* MUST set this beforehand. If it is 1 while items are
-	been inserted, their checkbox may not appear and the
-	dialog may appear corrupted. */
-	//g_nDefaultColumnsChecked = 0;
-
-	for(itr = pColumnList->begin();itr != pColumnList->end();itr++)
+	if(iSelected == m_iControlPanel)
 	{
-		LoadString(g_hLanguageModule,LookupColumnNameStringIndex(itr->id),szText,SIZEOF_ARRAY(szText));
-
-		lvItem.mask		= LVIF_TEXT | LVIF_PARAM;
-		lvItem.iItem	= iItem;
-		lvItem.iSubItem	= 0;
-		lvItem.pszText	= szText;
-		lvItem.lParam	= itr->id;
-
-		ListView_InsertItem(hListView,&lvItem);
-
-		ListView_SetCheckState(hListView,iItem,itr->bChecked);
-
-		iItem++;
+		pColumnList = &m_ControlPanelColumnList;
+	}
+	else if(iSelected == m_iGeneral)
+	{
+		pColumnList = &m_RealFolderColumnList;
+	}
+	else if(iSelected == m_iMyComputer)
+	{
+		pColumnList = &m_MyComputerColumnList;
+	}
+	else if(iSelected == m_iNetwork)
+	{
+		pColumnList = &m_NetworkConnectionsColumnList;
+	}
+	else if(iSelected == m_iNetworkPlaces)
+	{
+		pColumnList = &m_MyNetworkPlacesColumnList;
+	}
+	else if(iSelected == m_iPrinters)
+	{
+		pColumnList = &m_PrintersColumnList;
+	}
+	else if(iSelected == m_iRecycleBin)
+	{
+		pColumnList = &m_RecycleBinColumnList;
 	}
 
-	ListView_SelectItem(hListView,0,TRUE);
-	SetFocus(hListView);
-}
+	m_iPreviousTypeSel = iSelected;
 
-void Explorerplusplus::OnSetDefaultColumnsInitialzeTempColumns(void)
-{
-	g_RealFolderColumnList			= m_RealFolderColumnList;
-	g_MyComputerColumnList			= m_MyComputerColumnList;
-	g_ControlPanelColumnList		= m_ControlPanelColumnList;
-	g_RecycleBinColumnList			= m_RecycleBinColumnList;
-	g_PrintersColumnList			= m_PrintersColumnList;
-	g_NetworkConnectionsColumnList	= m_NetworkConnectionsColumnList;
-	g_MyNetworkPlacesColumnList		= m_MyNetworkPlacesColumnList;
-}
-
-void Explorerplusplus::OnSetDefaultColumnsExportTempColumns(void)
-{
-	m_RealFolderColumnList			= g_RealFolderColumnList;
-	m_MyComputerColumnList			= g_MyComputerColumnList;
-	m_ControlPanelColumnList		= g_ControlPanelColumnList;
-	m_RecycleBinColumnList			= g_RecycleBinColumnList;
-	m_PrintersColumnList			= g_PrintersColumnList;
-	m_NetworkConnectionsColumnList	= g_NetworkConnectionsColumnList;
-	m_MyNetworkPlacesColumnList		= g_MyNetworkPlacesColumnList;
-}
-
-void Explorerplusplus::OnSetDefaultColumnsCBChange(HWND hDlg)
-{
-	HWND						hComboBox;
-	HWND						hListView;
-	list<Column_t>::iterator	itr;
-	LVITEM						lvItem;
-	TCHAR						szText[64];
-	int							iItem = 0;
-	list<Column_t>				*pColumnList = NULL;
-	DWORD						iSelected;
-
-	hComboBox = GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
-
-	/* Save the state of the current items. */
-	GetCurrentDefaultColumnState(hDlg);
-
-	iSelected = (int)SendMessage(hComboBox,CB_GETCURSEL,0,0);
-
-	if(iSelected == g_iControlPanel)
-		pColumnList = &g_ControlPanelColumnList;
-	else if(iSelected == g_iGeneral)
-		pColumnList = &g_RealFolderColumnList;
-	else if(iSelected == g_iMyComputer)
-		pColumnList = &g_MyComputerColumnList;
-	else if(iSelected == g_iNetwork)
-		pColumnList = &g_NetworkConnectionsColumnList;
-	else if(iSelected == g_iNetworkPlaces)
-		pColumnList = &g_MyNetworkPlacesColumnList;
-	else if(iSelected == g_iPrinters)
-		pColumnList = &g_PrintersColumnList;
-	else if(iSelected == g_iRecycleBin)
-		pColumnList = &g_RecycleBinColumnList;
-
-	g_iPreviousTypeSel = iSelected;
-
-	hListView = GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
-
+	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
 	ListView_DeleteAllItems(hListView);
 
-	for(itr = pColumnList->begin();itr != pColumnList->end();itr++)
-	{
-		LoadString(g_hLanguageModule,LookupColumnNameStringIndex(itr->id),szText,SIZEOF_ARRAY(szText));
+	/* TODO: */
+	/*int iItem = 0;
 
+	for each(auto Column in *pColumnList)
+	{
+		TCHAR szText[64];
+		LoadString(GetInstance(),LookupColumnNameStringIndex(Column.id),szText,SIZEOF_ARRAY(szText));
+
+		LVITEM lvItem;
 		lvItem.mask		= LVIF_TEXT | LVIF_PARAM;
 		lvItem.iItem	= iItem;
 		lvItem.iSubItem	= 0;
 		lvItem.pszText	= szText;
-		lvItem.lParam	= itr->id;
+		lvItem.lParam	= Column.id;
 
 		ListView_InsertItem(hListView,&lvItem);
 
-		ListView_SetCheckState(hListView,iItem,itr->bChecked);
+		ListView_SetCheckState(hListView,iItem,Column.bChecked);
 
 		iItem++;
-	}
+	}*/
 
 	ListView_SelectItem(hListView,0,TRUE);
 }
 
-void Explorerplusplus::GetCurrentDefaultColumnState(HWND hDlg)
+void CSetDefaultColumnsDialog::OnLvnItemChanging(NMLISTVIEW *pnmlv)
 {
-	HWND			hComboBox;
-	HWND			hListView;
-	LVITEM			lvItem;
-	list<Column_t>	*pColumnList = NULL;
-	Column_t		Column;
-	int				i = 0;
-
-	hComboBox = GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
-	hListView = GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
-
-	if(g_iPreviousTypeSel == g_iControlPanel)
-		pColumnList = &g_ControlPanelColumnList;
-	else if(g_iPreviousTypeSel == g_iGeneral)
-		pColumnList = &g_RealFolderColumnList;
-	else if(g_iPreviousTypeSel == g_iMyComputer)
-		pColumnList = &g_MyComputerColumnList;
-	else if(g_iPreviousTypeSel == g_iNetwork)
-		pColumnList = &g_NetworkConnectionsColumnList;
-	else if(g_iPreviousTypeSel == g_iNetworkPlaces)
-		pColumnList = &g_MyNetworkPlacesColumnList;
-	else if(g_iPreviousTypeSel == g_iPrinters)
-		pColumnList = &g_PrintersColumnList;
-	else if(g_iPreviousTypeSel == g_iRecycleBin)
-		pColumnList = &g_RecycleBinColumnList;
-
-	pColumnList->clear();
-
-	for(i = 0;i < ListView_GetItemCount(hListView);i++)
+	if(pnmlv->uNewState & LVIS_SELECTED)
 	{
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= i;
-		lvItem.iSubItem	= 0;
-		ListView_GetItem(hListView,&lvItem);
+		HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
 
-		/* TODO: May need to pull the current column width (instead
-		pf using the default width). */
-		Column.id		= (int)lvItem.lParam;
-		Column.iWidth	= DEFAULT_COLUMN_WIDTH;
-		Column.bChecked	= ListView_GetCheckState(hListView,i);
-		pColumnList->push_back(Column);
-	}
-}
-
-BOOL Explorerplusplus::OnSetDefaultColumnsLvnItemChanging(HWND hDlg,LPARAM lParam)
-{
-	NMLISTVIEW *nmlv;
-	HWND hListView;
-
-	nmlv = (NMLISTVIEW *)lParam;
-
-	hListView = GetDlgItem(hDlg,IDC_COLUMNS_LISTVIEW);
-
-	if((nmlv->uNewState & LVIS_STATEIMAGEMASK) == INDEXTOSTATEIMAGEMASK(2))
-	{
-		/* The item was checked. */
-		EnableWindow(GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_ENABLE),FALSE);
-		EnableWindow(GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_DISABLE),TRUE);
-
-		g_nDefaultColumnsChecked++;
-	}
-	else if((nmlv->uNewState & LVIS_STATEIMAGEMASK) == INDEXTOSTATEIMAGEMASK(1))
-	{
-		/* The item was unchecked. */
-
-		if(g_nDefaultColumnsChecked != 1)
-		{
-			EnableWindow(GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_DISABLE),FALSE);
-			EnableWindow(GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_ENABLE),TRUE);
-
-			g_nDefaultColumnsChecked--;
-		}
-		else
-		{
-			/* Can't just return. Need to set the DWL_MSGRESULT
-			value to the return value first. */
-			SetWindowLongPtr(hDlg,DWLP_MSGRESULT,TRUE);
-			return TRUE;
-		}
-	}
-	else if(nmlv->uNewState & LVIS_SELECTED)
-	{
 		LVITEM lvItem;
-		TCHAR szColumnDescription[128];
-		int iDescriptionStringIndex;
-
 		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= nmlv->iItem;
+		lvItem.iItem	= pnmlv->iItem;
 		lvItem.iSubItem	= 0;
-
 		ListView_GetItem(hListView,&lvItem);
 
-		iDescriptionStringIndex = LookupColumnDescriptionStringIndex((int)lvItem.lParam);
+		/* TODO */
+		/*int iDescriptionStringIndex = LookupColumnDescriptionStringIndex((int)lvItem.lParam);
 
-		LoadString(g_hLanguageModule,iDescriptionStringIndex,szColumnDescription,
-		SIZEOF_ARRAY(szColumnDescription));
-		SetDlgItemText(hDlg,IDC_COLUMNS_DESCRIPTION,szColumnDescription);
+		TCHAR szColumnDescription[128];
+		LoadString(GetInstance(),iDescriptionStringIndex,szColumnDescription,
+			SIZEOF_ARRAY(szColumnDescription));
+		SetDlgItemText(m_hDlg,IDC_COLUMNS_DESCRIPTION,szColumnDescription);*/
+	}
+}
 
-		if(ListView_GetCheckState(hListView,nmlv->iItem))
+void CSetDefaultColumnsDialog::OnMoveColumn(bool bUp)
+{
+	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
+
+	int iSelected = ListView_GetNextItem(hListView,-1,LVNI_SELECTED);
+
+	if(iSelected != -1)
+	{
+		if(bUp)
 		{
-			EnableWindow(GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_ENABLE),FALSE);
-			EnableWindow(GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_DISABLE),TRUE);
+			ListView_SwapItems(hListView,iSelected,iSelected - 1);
 		}
 		else
 		{
-			EnableWindow(GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_ENABLE),FALSE);
-			EnableWindow(GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_DISABLE),TRUE);
+			ListView_SwapItems(hListView,iSelected,iSelected + 1);
 		}
+
+		SetFocus(hListView);
 	}
-
-	return FALSE;
 }
 
-void Explorerplusplus::OnSetDefaultColumnsOk(HWND hDlg)
+/* TODO: */
+//void Explorerplusplus::GetCurrentDefaultColumnState(HWND hDlg)
+//{
+//	HWND			hComboBox;
+//	HWND			hListView;
+//	LVITEM			lvItem;
+//	list<Column_t>	*pColumnList = NULL;
+//	Column_t		Column;
+//	int				i = 0;
+//
+//	hComboBox = GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
+//	hListView = GetDlgItem(hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
+//
+//	if(g_iPreviousTypeSel == g_iControlPanel)
+//	{
+//		pColumnList = &m_ControlPanelColumnList;
+//	}
+//	else if(g_iPreviousTypeSel == g_iGeneral)
+//	{
+//		pColumnList = &m_RealFolderColumnList;
+//	}
+//	else if(g_iPreviousTypeSel == g_iMyComputer)
+//	{
+//		pColumnList = &m_MyComputerColumnList;
+//	}
+//	else if(g_iPreviousTypeSel == g_iNetwork)
+//	{
+//		pColumnList = &m_NetworkConnectionsColumnList;
+//	}
+//	else if(g_iPreviousTypeSel == g_iNetworkPlaces)
+//	{
+//		pColumnList = &m_MyNetworkPlacesColumnList;
+//	}
+//	else if(g_iPreviousTypeSel == g_iPrinters)
+//	{
+//		pColumnList = &m_PrintersColumnList;
+//	}
+//	else if(g_iPreviousTypeSel == g_iRecycleBin)
+//	{
+//		pColumnList = &m_RecycleBinColumnList;
+//	}
+//
+//	pColumnList->clear();
+//
+//	for(i = 0;i < ListView_GetItemCount(hListView);i++)
+//	{
+//		lvItem.mask		= LVIF_PARAM;
+//		lvItem.iItem	= i;
+//		lvItem.iSubItem	= 0;
+//		ListView_GetItem(hListView,&lvItem);
+//
+//		/* TODO: May need to pull the current column width (instead
+//		pf using the default width). */
+//		Column.id		= (int)lvItem.lParam;
+//		Column.iWidth	= DEFAULT_COLUMN_WIDTH;
+//		Column.bChecked	= ListView_GetCheckState(hListView,i);
+//		pColumnList->push_back(Column);
+//	}
+//}
+
+CSetDefaultColumnsDialogPersistentSettings::CSetDefaultColumnsDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
 {
-	/* Save the state of the current items. */
-	GetCurrentDefaultColumnState(hDlg);
-
-	OnSetDefaultColumnsExportTempColumns();
-
-	SetDefaultColumnsSaveState(hDlg);
-	EndDialog(hDlg,1);
+	/* TODO: Save combo box selection when exiting dialog. */
 }
 
-void Explorerplusplus::SetDefaultColumnsSaveState(HWND hDlg)
+CSetDefaultColumnsDialogPersistentSettings::~CSetDefaultColumnsDialogPersistentSettings()
 {
-	RECT rcTemp;
+	
+}
 
-	GetWindowRect(hDlg,&rcTemp);
-	m_ptSetDefaultColumns.x = rcTemp.left;
-	m_ptSetDefaultColumns.y = rcTemp.top;
-
-	m_bSetDefaultColumnsDlgStateSaved = TRUE;
+CSetDefaultColumnsDialogPersistentSettings& CSetDefaultColumnsDialogPersistentSettings::GetInstance()
+{
+	static CSetDefaultColumnsDialogPersistentSettings mfdps;
+	return mfdps;
 }

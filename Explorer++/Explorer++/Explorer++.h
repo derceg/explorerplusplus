@@ -181,8 +181,6 @@ public:
 	INT_PTR CALLBACK	BookmarkPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkFolderPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	SelectColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	SetDefaultColumnsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DWChangeDetailsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -723,10 +721,6 @@ private:
 	void					LoadDisplayColorsStateFromRegistry(HKEY hParentKey);
 	void					SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey);
 	void					LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey);
-	void					SaveSelectColumnsStateToRegistry(HKEY hParentKey);
-	void					LoadSelectColumnsStateFromRegistry(HKEY hParentKey);
-	void					SaveSelectDefaultColumnsStateToRegistry(HKEY hParentKey);
-	void					LoadSelectDefaultColumnsStateFromRegistry(HKEY hParentKey);
 
 	/* Window state update. */
 	void					UpdateWindowStates(void);
@@ -844,9 +838,6 @@ private:
 	void					OnDisplayColorsHScroll(HWND hDlg);
 	void					OnDisplayColorsEnChange(HWND hDlg,LPARAM lParam);
 
-	/* Delete securely dialog. */
-	void					OnDeleteSecurelyOk(HWND hDlg);
-
 	/* Add bookmark dialog. */
 	void					OnAddBookmarkInit(HWND hDlg,LPARAM lParam);
 	void					OnAddBookmarkOk(HWND hDlg);
@@ -902,15 +893,8 @@ private:
 	void					BookmarkToolbarNewFolder(int iItem);
 	void					RemoveItemFromBookmarksToolbar(void *pBookmarkHandle);
 
-	/* Select column dialog. */
-	void					OnInitColumnDlg(HWND hDlg);
-	void					MoveColumnItem2(HWND hDlg,BOOL bUp);
-	void					EnableColumnItem(HWND hDlg,BOOL bEnable);
-	BOOL					OnColumnDlgLvnItemChanging(HWND hDlg,LPARAM lParam);
-	void					OnColumnDlgOk(HWND hDlg);
-	void					SelectColumnsSaveState(HWND hDlg);
-
 	/* Columns. */
+	void					OnSelectColumns();
 	int						LookupColumnNameStringIndex(int iColumnId);
 	int						LookupColumnDescriptionStringIndex(int iColumnId);
 	void					CopyColumnInfoToClipboard(void);
@@ -940,16 +924,6 @@ private:
 	/* Files and folders dialog. */
 	void					SetInfoTipWindowStates(HWND hDlg);
 	void					SetFolderSizeWindowState(HWND hDlg);
-
-	/* Set default columns dialog. */
-	void					OnSetDefaultColumnsInit(HWND hDlg);
-	void					OnSetDefaultColumnsCBChange(HWND hDlg);
-	BOOL					OnSetDefaultColumnsLvnItemChanging(HWND hDlg,LPARAM lParam);
-	void					OnSetDefaultColumnsOk(HWND hDlg);
-	void					OnSetDefaultColumnsInitialzeTempColumns(void);
-	void					OnSetDefaultColumnsExportTempColumns(void);
-	void					GetCurrentDefaultColumnState(HWND hDlg);
-	void					SetDefaultColumnsSaveState(HWND hDlg);
 
 	/* XML Settings. */
 	void					LoadGenericSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
@@ -1282,14 +1256,6 @@ private:
 	/* Organize bookmarks dialog. */
 	BOOL					m_bOrganizeBookmarksDlgStateSaved;
 	POINT					m_ptOrganizeBookmarks;
-
-	/* Select columns dialog. */
-	BOOL					m_bSelectColumnsDlgStateSaved;
-	POINT					m_ptSelectColumns;
-
-	/* Set default columns dialog. */
-	BOOL					m_bSetDefaultColumnsDlgStateSaved;
-	POINT					m_ptSetDefaultColumns;
 
 	/* Display colors dialog. */
 	BOOL					m_bDisplayColorsDlgStateSaved;

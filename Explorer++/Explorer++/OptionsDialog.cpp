@@ -19,6 +19,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "SetDefaultColumnsDialog.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 
@@ -1162,8 +1163,10 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 				break;
 
 			case IDC_BUTTON_DEFAULTCOLUMNS:
-				DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_SETDEFAULTCOLUMNS),
-					hDlg,SetDefaultColumnsProcStub,(LPARAM)this);
+				{
+					CSetDefaultColumnsDialog SetDefaultColumnsDialog(g_hLanguageModule,IDD_SETDEFAULTCOLUMNS,hDlg);
+					SetDefaultColumnsDialog.ShowModalDialog();
+				}
 				break;
 			}
 			break;

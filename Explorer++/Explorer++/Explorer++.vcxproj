@@ -459,6 +459,8 @@
     <ClInclude Include="RenameTabDialog.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SearchDialog.h" />
+    <ClInclude Include="SelectColumnsDialog.h" />
+    <ClInclude Include="SetDefaultColumnsDialog.h" />
     <ClInclude Include="SetFileAttributesDialog.h" />
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />

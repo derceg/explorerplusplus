@@ -210,6 +210,12 @@
     <ClInclude Include="MergeFilesDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SelectColumnsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SetDefaultColumnsDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

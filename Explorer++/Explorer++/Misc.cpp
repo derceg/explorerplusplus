@@ -16,6 +16,7 @@
 #include <list>
 #include <shobjidl.h>
 #include "Explorer++.h"
+#include "SelectColumnsDialog.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
@@ -1913,4 +1914,432 @@ BOOL Explorerplusplus::VerifyLanguageVersion(TCHAR *szLanguageModule)
 	}
 
 	return FALSE;
+}
+
+int Explorerplusplus::LookupColumnNameStringIndex(int iColumnId)
+{
+	switch(iColumnId)
+	{
+	case CM_NAME:
+		return IDS_COLUMN_NAME_NAME;
+		break;
+
+	case CM_TYPE:
+		return IDS_COLUMN_NAME_TYPE;
+		break;
+
+	case CM_SIZE:
+		return IDS_COLUMN_NAME_SIZE;
+		break;
+
+	case CM_DATEMODIFIED:
+		return IDS_COLUMN_NAME_DATEMODIFIED;
+		break;
+
+	case CM_ATTRIBUTES:
+		return IDS_COLUMN_NAME_ATTRIBUTES;
+		break;
+
+	case CM_REALSIZE:
+		return IDS_COLUMN_NAME_REALSIZE;
+		break;
+
+	case CM_SHORTNAME:
+		return IDS_COLUMN_NAME_SHORTNAME;
+		break;
+
+	case CM_OWNER:
+		return IDS_COLUMN_NAME_OWNER;
+		break;
+
+	case CM_PRODUCTNAME:
+		return IDS_COLUMN_NAME_PRODUCTNAME;
+		break;
+
+	case CM_COMPANY:
+		return IDS_COLUMN_NAME_COMPANY;
+		break;
+
+	case CM_DESCRIPTION:
+		return IDS_COLUMN_NAME_DESCRIPTION;
+		break;
+
+	case CM_FILEVERSION:
+		return IDS_COLUMN_NAME_FILEVERSION;
+		break;
+
+	case CM_PRODUCTVERSION:
+		return IDS_COLUMN_NAME_PRODUCTVERSION;
+		break;
+
+	case CM_SHORTCUTTO:
+		return IDS_COLUMN_NAME_SHORTCUTTO;
+		break;
+
+	case CM_HARDLINKS:
+		return IDS_COLUMN_NAME_HARDLINKS;
+		break;
+
+	case CM_EXTENSION:
+		return IDS_COLUMN_NAME_EXTENSION;
+		break;
+
+	case CM_CREATED:
+		return IDS_COLUMN_NAME_CREATED;
+		break;
+
+	case CM_ACCESSED:
+		return IDS_COLUMN_NAME_ACCESSED;
+		break;
+
+	case CM_TITLE:
+		return IDS_COLUMN_NAME_TITLE;
+		break;
+
+	case CM_SUBJECT:
+		return IDS_COLUMN_NAME_SUBJECT;
+		break;
+
+	case CM_AUTHOR:
+		return IDS_COLUMN_NAME_AUTHOR;
+		break;
+
+	case CM_KEYWORDS:
+		return IDS_COLUMN_NAME_KEYWORDS;
+		break;
+
+	case CM_COMMENT:
+		return IDS_COLUMN_NAME_COMMENT;
+		break;
+
+	case CM_CAMERAMODEL:
+		return IDS_COLUMN_NAME_CAMERAMODEL;
+		break;
+
+	case CM_DATETAKEN:
+		return IDS_COLUMN_NAME_DATETAKEN;
+		break;
+
+	case CM_WIDTH:
+		return IDS_COLUMN_NAME_WIDTH;
+		break;
+
+	case CM_HEIGHT:
+		return IDS_COLUMN_NAME_HEIGHT;
+		break;
+
+	case CM_VIRTUALCOMMENTS:
+		return IDS_COLUMN_NAME_VIRTUALCOMMENTS;
+		break;
+
+	case CM_TOTALSIZE:
+		return IDS_COLUMN_NAME_TOTALSIZE;
+		break;
+
+	case CM_FREESPACE:
+		return IDS_COLUMN_NAME_FREESPACE;
+		break;
+
+	case CM_FILESYSTEM:
+		return IDS_COLUMN_NAME_FILESYSTEM;
+		break;
+
+	case CM_VIRTUALTYPE:
+		return IDS_COLUMN_NAME_VIRTUALTYPE;
+		break;
+
+	case CM_ORIGINALLOCATION:
+		return IDS_COLUMN_NAME_ORIGINALLOCATION;
+		break;
+
+	case CM_DATEDELETED:
+		return IDS_COLUMN_NAME_DATEDELETED;
+		break;
+
+	case CM_NUMPRINTERDOCUMENTS:
+		return IDS_COLUMN_NAME_NUMPRINTERDOCUMENTS;
+		break;
+
+	case CM_PRINTERSTATUS:
+		return IDS_COLUMN_NAME_PRINTERSTATUS;
+		break;
+
+	case CM_PRINTERCOMMENTS:
+		return IDS_COLUMN_NAME_PRINTERCOMMENTS;
+		break;
+
+	case CM_PRINTERLOCATION:
+		return IDS_COLUMN_NAME_PRINTERLOCATION;
+		break;
+
+	case CM_PRINTERMODEL:
+		return IDS_COLUMN_NAME_PRINTERMODEL;
+		break;
+
+	case CM_NETWORKADAPTER_STATUS:
+		return IDS_COLUMN_NAME_NETWORKADAPTER_STATUS;
+		break;
+
+	case CM_MEDIA_BITRATE:
+		return IDS_COLUMN_NAME_BITRATE;
+		break;
+
+	case CM_MEDIA_COPYRIGHT:
+		return IDS_COLUMN_NAME_COPYRIGHT;
+		break;
+
+	case CM_MEDIA_DURATION:
+		return IDS_COLUMN_NAME_DURATION;
+		break;
+
+	case CM_MEDIA_PROTECTED:
+		return IDS_COLUMN_NAME_PROTECTED;
+		break;
+
+	case CM_MEDIA_RATING:
+		return IDS_COLUMN_NAME_RATING;
+		break;
+
+	case CM_MEDIA_ALBUMARTIST:
+		return IDS_COLUMN_NAME_ALBUMARTIST;
+		break;
+
+	case CM_MEDIA_ALBUM:
+		return IDS_COLUMN_NAME_ALBUM;
+		break;
+
+	case CM_MEDIA_BEATSPERMINUTE:
+		return IDS_COLUMN_NAME_BEATSPERMINUTE;
+		break;
+
+	case CM_MEDIA_COMPOSER:
+		return IDS_COLUMN_NAME_COMPOSER;
+		break;
+
+	case CM_MEDIA_CONDUCTOR:
+		return IDS_COLUMN_NAME_CONDUCTOR;
+		break;
+
+	case CM_MEDIA_DIRECTOR:
+		return IDS_COLUMN_NAME_DIRECTOR;
+		break;
+
+	case CM_MEDIA_GENRE:
+		return IDS_COLUMN_NAME_GENRE;
+		break;
+
+	case CM_MEDIA_LANGUAGE:
+		return IDS_COLUMN_NAME_LANGUAGE;
+		break;
+
+	case CM_MEDIA_BROADCASTDATE:
+		return IDS_COLUMN_NAME_BROADCASTDATE;
+		break;
+
+	case CM_MEDIA_CHANNEL:
+		return IDS_COLUMN_NAME_CHANNEL;
+		break;
+
+	case CM_MEDIA_STATIONNAME:
+		return IDS_COLUMN_NAME_STATIONNAME;
+		break;
+
+	case CM_MEDIA_MOOD:
+		return IDS_COLUMN_NAME_MOOD;
+		break;
+
+	case CM_MEDIA_PARENTALRATING:
+		return IDS_COLUMN_NAME_PARENTALRATING;
+		break;
+
+	case CM_MEDIA_PARENTALRATINGREASON:
+		return IDS_COLUMN_NAME_PARENTALRATINGREASON;
+		break;
+
+	case CM_MEDIA_PERIOD:
+		return IDS_COLUMN_NAME_PERIOD;
+		break;
+
+	case CM_MEDIA_PRODUCER:
+		return IDS_COLUMN_NAME_PRODUCER;
+		break;
+
+	case CM_MEDIA_PUBLISHER:
+		return IDS_COLUMN_NAME_PUBLISHER;
+		break;
+
+	case CM_MEDIA_WRITER:
+		return IDS_COLUMN_NAME_WRITER;
+		break;
+
+	case CM_MEDIA_YEAR:
+		return IDS_COLUMN_NAME_YEAR;
+		break;
+	}
+
+	return 0;
+}
+
+int Explorerplusplus::LookupColumnDescriptionStringIndex(int iColumnId)
+{
+	switch(iColumnId)
+	{
+		case CM_NAME:
+			return IDS_COLUMN_DESCRIPTION_NAME;
+			break;
+
+		case CM_TYPE:
+			return IDS_COLUMN_DESCRIPTION_TYPE;
+			break;
+
+		case CM_SIZE:
+			return IDS_COLUMN_DESCRIPTION_SIZE;
+			break;
+
+		case CM_DATEMODIFIED:
+			return IDS_COLUMN_DESCRIPTION_MODIFIED;
+			break;
+
+		case CM_ATTRIBUTES:
+			return IDS_COLUMN_DESCRIPTION_ATTRIBUTES;
+			break;
+
+		case CM_REALSIZE:
+			return IDS_COLUMN_DESCRIPTION_REALSIZE;
+			break;
+
+		case CM_SHORTNAME:
+			return IDS_COLUMN_DESCRIPTION_SHORTNAME;
+			break;
+
+		case CM_OWNER:
+			return IDS_COLUMN_DESCRIPTION_OWNER;
+			break;
+
+		case CM_PRODUCTNAME:
+			return IDS_COLUMN_DESCRIPTION_PRODUCTNAME;
+			break;
+
+		case CM_COMPANY:
+			return IDS_COLUMN_DESCRIPTION_COMPANY;
+			break;
+
+		case CM_DESCRIPTION:
+			return IDS_COLUMN_DESCRIPTION_DESCRIPTION;
+			break;
+
+		case CM_FILEVERSION:
+			return IDS_COLUMN_DESCRIPTION_FILEVERSION;
+			break;
+
+		case CM_PRODUCTVERSION:
+			return IDS_COLUMN_DESCRIPTION_PRODUCTVERSION;
+			break;
+
+		case CM_SHORTCUTTO:
+			return IDS_COLUMN_DESCRIPTION_SHORTCUTTO;
+			break;
+
+		case CM_HARDLINKS:
+			return IDS_COLUMN_DESCRIPTION_HARDLINKS;
+			break;
+
+		case CM_EXTENSION:
+			return IDS_COLUMN_DESCRIPTION_EXTENSION;
+			break;
+			
+		case CM_CREATED:
+			return IDS_COLUMN_DESCRIPTION_CREATED;
+			break;
+			
+		case CM_ACCESSED:
+			return IDS_COLUMN_DESCRIPTION_ACCESSED;
+			break;
+
+		case CM_TITLE:
+			return IDS_COLUMN_DESCRIPTION_TITLE;
+			break;
+
+		case CM_SUBJECT:
+			return IDS_COLUMN_DESCRIPTION_SUBJECT;
+			break;
+
+		case CM_AUTHOR:
+			return IDS_COLUMN_DESCRIPTION_AUTHOR;
+			break;
+
+		case CM_KEYWORDS:
+			return IDS_COLUMN_DESCRIPTION_KEYWORDS;
+			break;
+
+		case CM_COMMENT:
+			return IDS_COLUMN_DESCRIPTION_COMMENT;
+			break;
+
+		case CM_CAMERAMODEL:
+			return IDS_COLUMN_DESCRIPTION_CAMERAMODEL;
+			break;
+
+		case CM_DATETAKEN:
+			return IDS_COLUMN_DESCRIPTION_DATETAKEN;
+			break;
+
+		case CM_WIDTH:
+			return IDS_COLUMN_DESCRIPTION_WIDTH;
+			break;
+
+		case CM_HEIGHT:
+			return IDS_COLUMN_DESCRIPTION_HEIGHT;
+			break;
+
+		case CM_VIRTUALCOMMENTS:
+			return IDS_COLUMN_DESCRIPTION_COMMENT;
+			break;
+
+		case CM_TOTALSIZE:
+			return IDS_COLUMN_DESCRIPTION_TOTALSIZE;
+			break;
+
+		case CM_FREESPACE:
+			return IDS_COLUMN_DESCRIPTION_FREESPACE;
+			break;
+
+		case CM_FILESYSTEM:
+			return IDS_COLUMN_DESCRIPTION_FILESYSTEM;
+			break;
+
+		case CM_VIRTUALTYPE:
+			return IDS_COLUMN_DESCRIPTION_TYPE;
+			break;
+
+		case CM_NUMPRINTERDOCUMENTS:
+			return IDS_COLUMN_DESCRIPTION_NUMPRINTERDOCUMENTS;
+			break;
+
+		case CM_PRINTERCOMMENTS:
+			return IDS_COLUMN_DESCRIPTION_PRINTERCOMMENTS;
+			break;
+
+		case CM_PRINTERLOCATION:
+			return IDS_COLUMN_DESCRIPTION_PRINTERLOCATION;
+			break;
+
+		case CM_NETWORKADAPTER_STATUS:
+			return IDS_COLUMN_DESCRIPTION_NETWORKADAPTER_STATUS;
+			break;
+
+		case CM_MEDIA_BITRATE:
+			return IDS_COLUMN_DESCRIPTION_BITRATE;
+			break;
+	}
+
+	return 0;
+}
+
+void Explorerplusplus::OnSelectColumns()
+{
+	CSelectColumnsDialog SelectColumnsDialog(g_hLanguageModule,IDD_SELECTCOLUMNS,m_hContainer);
+	SelectColumnsDialog.ShowModalDialog();
+
+	UpdateArrangeMenuItems();
 }

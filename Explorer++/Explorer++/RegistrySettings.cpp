@@ -24,6 +24,8 @@
 #include "SplitFileDialog.h"
 #include "DestroyFilesDialog.h"
 #include "MergeFilesDialog.h"
+#include "SelectColumnsDialog.h"
+#include "SetDefaultColumnsDialog.h"
 #include "../Helper/RegistrySettings.h"
 
 
@@ -1376,8 +1378,6 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		SaveAddBookmarkStateToRegistry(hKey);
 		SaveDisplayColorsStateToRegistry(hKey);
 		SaveOrganizeBookmarksStateToRegistry(hKey);
-		SaveSelectColumnsStateToRegistry(hKey);
-		SaveSelectDefaultColumnsStateToRegistry(hKey);
 
 		CSearchDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CWildcardSelectDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
@@ -1390,6 +1390,8 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		CSplitFileDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CDestroyFilesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CMergeFilesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		CSelectColumnsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		CSetDefaultColumnsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1464,52 +1466,6 @@ void Explorerplusplus::SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void Explorerplusplus::SaveSelectColumnsStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_SELECTCOLUMNS_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bSelectColumnsDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptSelectColumns,
-				sizeof(m_ptSelectColumns));
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::SaveSelectDefaultColumnsStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_SELECTDEFAULTCOLUMNS_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bSetDefaultColumnsDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptSetDefaultColumns,
-				sizeof(m_ptSetDefaultColumns));
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
 void Explorerplusplus::LoadStateFromRegistry(void)
 {
 	HKEY				hKey;
@@ -1522,8 +1478,6 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		LoadAddBookmarkStateFromRegistry(hKey);
 		LoadDisplayColorsStateFromRegistry(hKey);
 		LoadOrganizeBookmarksStateFromRegistry(hKey);
-		LoadSelectColumnsStateFromRegistry(hKey);
-		LoadSelectDefaultColumnsStateFromRegistry(hKey);
 
 		CSearchDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CWildcardSelectDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
@@ -1536,6 +1490,8 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		CSplitFileDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CDestroyFilesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CMergeFilesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		CSelectColumnsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		CSetDefaultColumnsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1607,54 +1563,6 @@ void Explorerplusplus::LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey)
 		if(ReturnValue == ERROR_SUCCESS)
 		{
 			m_bOrganizeBookmarksDlgStateSaved = TRUE;
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadSelectColumnsStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_SELECTCOLUMNS_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptSelectColumns,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bSelectColumnsDlgStateSaved = TRUE;
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadSelectDefaultColumnsStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_SELECTDEFAULTCOLUMNS_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptSetDefaultColumns,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bSetDefaultColumnsDlgStateSaved = TRUE;
 		}
 
 		RegCloseKey(hKey);

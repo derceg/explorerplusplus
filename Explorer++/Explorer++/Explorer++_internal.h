@@ -631,8 +631,6 @@ INT_PTR CALLBACK	OrganizeBookmarksStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM 
 INT_PTR CALLBACK	BookmarkPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	BookmarkFolderPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	ChangeDisplayColoursStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK	SelectColumnsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK	SetDefaultColumnsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 /* Window message handler stubs. */
 LRESULT CALLBACK	TabSubclassProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);

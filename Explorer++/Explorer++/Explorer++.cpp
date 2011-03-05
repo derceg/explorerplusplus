@@ -99,8 +99,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_nDrivesInToolbar				= 0;
 
 	/* Dialog states. */
-	m_bSelectColumnsDlgStateSaved	= FALSE;
-	m_bSetDefaultColumnsDlgStateSaved	= FALSE;
 	m_bAddBookmarkDlgStateSaved		= FALSE;
 	m_bDisplayColorsDlgStateSaved	= FALSE;
 	m_bOrganizeBookmarksDlgStateSaved	= FALSE;

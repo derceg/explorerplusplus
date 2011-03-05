@@ -1135,9 +1135,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_SORTBY_MORE:
 		case IDM_VIEW_SELECTCOLUMNS:
-			DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_SELECTCOLUMNS),
-				hwnd,SelectColumnsProcStub,(LPARAM)this);
-			UpdateArrangeMenuItems();
+			OnSelectColumns();
 			break;
 
 		case IDM_VIEW_AUTOSIZECOLUMNS:
@@ -1540,9 +1538,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		/* Listview column header context menu. */
 		case IDM_HEADER_MORE:
-			DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_SELECTCOLUMNS),
-				hwnd,SelectColumnsProcStub,(LPARAM)this);
-			UpdateArrangeMenuItems();
+			OnSelectColumns();
 			break;
 
 		/* Display window menus. */
