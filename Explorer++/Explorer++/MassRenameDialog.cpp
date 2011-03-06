@@ -29,10 +29,12 @@
 const TCHAR CMassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename");
 
 CMassRenameDialog::CMassRenameDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,std::list<std::wstring> FullFilenameList) :
+	int iResource,HWND hParent,std::list<std::wstring> FullFilenameList,
+	CFileActionHandler *pFileActionHandler) :
 CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_FullFilenameList = FullFilenameList;
+	m_pFileActionHandler = pFileActionHandler;
 
 	m_pmrdps = &CMassRenameDialogPersistentSettings::GetInstance();
 }
@@ -86,6 +88,7 @@ BOOL CMassRenameDialog::OnInitDialog()
 	lvCol.pszText	= _T("Preview Name");
 	ListView_InsertColumn(hListView,2,&lvCol);
 
+	/* TODO: Remember column widths. */
 	RECT rc;
 	GetClientRect(hListView,&rc);
 	SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,GetRectWidth(&rc) / 2);
@@ -291,30 +294,33 @@ void CMassRenameDialog::OnOk()
 		/* TODO: Show error. */
 	}
 
-	std::wstring strNewFilename;
-	TCHAR szFilename[MAX_PATH];
+	std::list<CFileActionHandler::RenamedItem_t> RenamedItemList;
 	int iItem = 0;
 
-	for each (auto strFilename in m_FullFilenameList)
+	for each (auto strOldFilename in m_FullFilenameList)
 	{
+		TCHAR szFilename[MAX_PATH];
 		StringCchCopy(szFilename,SIZEOF_ARRAY(szFilename),
-			strFilename.c_str());
+			strOldFilename.c_str());
 		PathStripPath(szFilename);
 
+		std::wstring strNewFilename;
 		ProcessFileName(szNamePattern,szFilename,iItem,strNewFilename);
 
-		/* TODO: */
-		/*TCHAR szNewFileName[MAX_PATH];
+		StringCchCopy(szFilename,SIZEOF_ARRAY(szFilename),
+			strOldFilename.c_str());
+		PathRemoveFileSpec(szFilename);
+		strNewFilename = szFilename + std::wstring(_T("\\")) + strNewFilename;
 
-		StringCchPrintf(szNewFileName,MAX_PATH,_T("%s\\%s"),m_CurrentDirectory,szTargetName);
-
-		szNewFileName[lstrlen(szNewFileName) + 1] = '\0';
-		itr->szFullFileName[lstrlen(itr->szFullFileName) + 1] = '\0';
-
-		RenameFileWithUndo(szNewFileName,itr->szFullFileName);*/
+		CFileActionHandler::RenamedItem_t RenamedItem;
+		RenamedItem.strOldFilename = strOldFilename;
+		RenamedItem.strNewFilename = strNewFilename;
+		RenamedItemList.push_back(RenamedItem);
 
 		iItem++;
 	}
+
+	m_pFileActionHandler->RenameFiles(RenamedItemList);
 
 	EndDialog(m_hDlg,1);
 }

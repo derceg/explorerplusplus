@@ -148,7 +148,8 @@ void Explorerplusplus::OnTreeViewFileDeletePermanent(void)
 
 	szPath[lstrlen(szPath) + 1] = '\0';
 
-	DeleteFilesPermanently(m_hTreeView,szPath);
+	/* TODO: */
+	//DeleteFilesPermanently(m_hTreeView,szPath);
 
 	CoTaskMemFree(pidl);
 }
@@ -514,11 +515,13 @@ int Explorerplusplus::OnTreeViewEndLabelEdit(LPARAM lParam)
 	PathRemoveFileSpec(NewFileName);
 	PathAppend(NewFileName,pdi->item.pszText);
 
-	/* File names must be double NULL terminated. */
-	*(m_OldTreeViewFileName + lstrlen(m_OldTreeViewFileName) + 1) = '\0';
-	*(NewFileName + lstrlen(NewFileName) + 1) = '\0';
+	CFileActionHandler::RenamedItem_t RenamedItem;
+	RenamedItem.strOldFilename = m_OldTreeViewFileName;
+	RenamedItem.strNewFilename = NewFileName;
 
-	RenameFileWithUndo(NewFileName,m_OldTreeViewFileName);
+	std::list<CFileActionHandler::RenamedItem_t> RenamedItemList;
+	RenamedItemList.push_back(RenamedItem);
+	m_FileActionHandler.RenameFiles(RenamedItemList);
 
 	return TRUE;
 }

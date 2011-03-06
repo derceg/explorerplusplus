@@ -244,6 +244,7 @@
     <ClCompile Include="DialogSettings.cpp" />
     <ClCompile Include="DriveInfo.cpp" />
     <ClCompile Include="DropHandler.cpp" />
+    <ClCompile Include="FileActionHandler.cpp" />
     <ClCompile Include="FileContextMenuManager.cpp" />
     <ClCompile Include="FileOperations.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
@@ -287,6 +288,7 @@
     <ClInclude Include="CustomMenu.h" />
     <ClInclude Include="DialogSettings.h" />
     <ClInclude Include="DropHandler.h" />
+    <ClInclude Include="FileActionHandler.h" />
     <ClInclude Include="FileContextMenuManager.h" />
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="FolderSize.h" />

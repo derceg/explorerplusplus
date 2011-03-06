@@ -1978,65 +1978,6 @@ void Explorerplusplus::SetDefaultMyNetworkPlacesColumns(list<Column_t> *pColumns
 	}
 }
 
-void Explorerplusplus::OnUndo(void)
-{
-	if(m_bCanUndo)
-	{
-		switch(m_UndoItem.Type)
-		{
-		case FILE_UNDOACTION_RENAMED:
-			{
-				TCHAR	szNewFileName[MAX_PATH + 1];
-				TCHAR	szOldFileName[MAX_PATH + 1];
-
-				/* Can't use these, as they will be changed
-				by the function below, and will both end up
-				holding the same thing. */
-				StringCchCopy(szNewFileName,SIZEOF_ARRAY(szNewFileName),m_UndoItem.szFileName);
-				StringCchCopy(szOldFileName,SIZEOF_ARRAY(szOldFileName),m_UndoItem.szOldFileName);
-
-				/* File names must be double NULL terminated. */
-				szOldFileName[lstrlen(szOldFileName) + 1] = '\0';
-				szNewFileName[lstrlen(szNewFileName) + 1] = '\0';
-
-				RenameFileWithUndo(szOldFileName,szNewFileName);
-			}
-			break;
-		}
-	}
-}
-
-int Explorerplusplus::RenameFileWithUndo(TCHAR *szNewFileName,
-TCHAR *szOldFileName)
-{
-	int res;
-
-	res = RenameFile(szNewFileName,szOldFileName);
-
-	/* If the file was successfully renamed,
-	set the flag indicating that this operation
-	can be undone, and fill out any other
-	information needed to undo this operation. */
-	if(res)
-	{
-		m_bCanUndo = TRUE;
-
-		m_UndoItem.Type = FILE_UNDOACTION_RENAMED;
-		StringCchCopy(m_UndoItem.szFileName,
-			SIZEOF_ARRAY(m_UndoItem.szFileName),
-			szNewFileName);
-		StringCchCopy(m_UndoItem.szOldFileName,
-			SIZEOF_ARRAY(m_UndoItem.szOldFileName),
-			szOldFileName);
-
-		/* File names must be double NULL terminated. */
-		m_UndoItem.szFileName[lstrlen(m_UndoItem.szFileName) + 1] = '\0';
-		m_UndoItem.szOldFileName[lstrlen(m_UndoItem.szOldFileName) + 1] = '\0';
-	}
-
-	return res;
-}
-
 void Explorerplusplus::OnLockToolbars(void)
 {
 	REBARBANDINFO	rbbi;
@@ -2167,7 +2108,7 @@ void Explorerplusplus::OnAppCommand(WPARAM wParam,LPARAM lParam)
 		break;
 
 	case APPCOMMAND_UNDO:
-		OnUndo();
+		m_FileActionHandler.Undo();
 		break;
 
 	case APPCOMMAND_REDO:

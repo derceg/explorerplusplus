@@ -19,7 +19,8 @@
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ContextMenuManager.h"
-#include "../Helper//FileContextMenuManager.h"
+#include "../Helper/FileContextMenuManager.h"
+#include "../Helper/FileActionHandler.h"
 
 
 LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -938,11 +939,13 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		}
 	}
 
-	/* File names must be double NULL terminated. */
-	*(OldFileName + lstrlen(OldFileName) + 1) = '\0';
-	*(NewFileName + lstrlen(NewFileName) + 1) = '\0';
+	CFileActionHandler::RenamedItem_t RenamedItem;
+	RenamedItem.strOldFilename = OldFileName;
+	RenamedItem.strNewFilename = NewFileName;
 
-	ret = RenameFileWithUndo(NewFileName,OldFileName);
+	std::list<CFileActionHandler::RenamedItem_t> RenamedItemList;
+	RenamedItemList.push_back(RenamedItem);
+	ret = m_FileActionHandler.RenameFiles(RenamedItemList);
 
 	/* If the file was not renamed, show an error message. */
 	if(!ret)
@@ -1468,57 +1471,26 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 	return hr;
 }
 
-HRESULT Explorerplusplus::OnListViewFileDelete(BOOL bPermanent)
+void Explorerplusplus::OnListViewFileDelete(BOOL bPermanent)
 {
-	LPITEMIDLIST	*ppidl = NULL;
-	LPITEMIDLIST	pidlDirectory = NULL;
-	DWORD			fMask = 0;
-	HRESULT			hr;
-	int				iItem;
-	int				nSelected;
-	int				i = 0;
-
-	nSelected = ListView_GetSelectedCount(m_hActiveListView);
+	int nSelected = ListView_GetSelectedCount(m_hActiveListView);
 
 	if(nSelected == 0)
 	{
-		ppidl = NULL;
-		return S_FALSE;
+		return;
 	}
-	else
+
+	std::list<std::wstring> FullFilenameList;
+	int iItem = -1;
+
+	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
-		ppidl = (LPITEMIDLIST *)malloc(nSelected * sizeof(LPCITEMIDLIST));
-
-		iItem = -1;
-
-		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
-		{
-			ppidl[i] = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
-
-			i++;
-		}
+		TCHAR szFullFilename[MAX_PATH];
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+		FullFilenameList.push_back(szFullFilename);
 	}
 
-	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-
-	if(bPermanent)
-	{
-		fMask = CMIC_MASK_SHIFT_DOWN;
-	}
-
-	hr = ExecuteActionFromContextMenu(pidlDirectory,(LPCITEMIDLIST *)ppidl,nSelected,
-		_T("delete"),fMask);
-
-	CoTaskMemFree(pidlDirectory);
-
-	for(i = 0;i < nSelected;i++)
-	{
-		CoTaskMemFree(ppidl[i]);
-	}
-
-	free(ppidl);
-
-	return hr;
+	m_FileActionHandler.DeleteFiles(m_hContainer,FullFilenameList,bPermanent);
 }
 
 void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
@@ -1616,8 +1588,7 @@ void Explorerplusplus::OnListViewFileRename(void)
 		}
 
 		CMassRenameDialog CMassRenameDialog(g_hLanguageModule,IDD_MASSRENAME,
-			m_hContainer,FullFilenameList);
-
+			m_hContainer,FullFilenameList,&m_FileActionHandler);
 		CMassRenameDialog.ShowModalDialog();
 	}
 }

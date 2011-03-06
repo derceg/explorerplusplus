@@ -3,20 +3,18 @@
 
 #include <list>
 
-typedef enum
+enum OverwriteMethod_t
 {
 	OVERWRITE_ONEPASS	= 1,
 	OVERWRITE_THREEPASS	= 2
-} OVERWRITE_METHODS;
+};
 
 /* Renaming. */
-int		RenameFile(TCHAR *NewFileName,TCHAR *OldFileName);
+BOOL	RenameFile(std::wstring strOldFilename,std::wstring strNewFilename);
 
 /* Deletion. */
-int		DeleteFiles(HWND,TCHAR *,BOOL);
-int		DeleteFilesToRecycleBin(HWND hwnd,TCHAR *FileNameList);
-int		DeleteFilesPermanently(HWND hwnd,TCHAR *FileNameList);
-void	DeleteFileSecurely(TCHAR *szFileName,UINT uOverwriteMethod);
+BOOL	DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL Permanent);
+void	DeleteFileSecurely(TCHAR *szFileName,OverwriteMethod_t OverwriteMethod);
 
 /* Copy and cut. */
 HRESULT	CopyFilesToClipboard(std::list<std::wstring> FileNameList,BOOL bMove,IDataObject **pClipboardDataObject);
@@ -28,7 +26,5 @@ int		CreateQualifiedPathName(TCHAR *,TCHAR *,unsigned int);
 HRESULT	CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax);
 HRESULT	SaveDirectoryListing(TCHAR *,TCHAR *);
 BOOL	PerformFileOperation(HWND,TCHAR *,TCHAR *,TCHAR *,TCHAR *);
-void	CountFilesAndFolders(TCHAR *,int *,int *,double *);
-BOOL	ShowFileProperties(TCHAR *);
 
 #endif

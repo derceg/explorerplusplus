@@ -7,6 +7,7 @@
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/SetDefaultFileManager.h"
+#include "../Helper/FileActionHandler.h"
 #include "Explorer++_internal.h"
 #import <msxml3.dll> raw_interfaces_only
 
@@ -242,32 +243,6 @@ public:
 
 private:
 
-	/* These are used to support the undo
-	functionality. They define the various
-	operations that can be undone. */
-	enum UndoType_t
-	{
-		FILE_UNDOACTION_RENAMED,
-		FILE_UNDOACTION_COPIED,
-		FILE_UNDOACTION_MOVED,
-		FILE_UNDOACTION_DELETE
-	};
-
-	struct UndoItem_t
-	{
-		/* The type of operation that
-		occurred. */
-		UndoType_t	Type;
-
-		/* Name of the file. */
-		TCHAR		szFileName[MAX_PATH + 1];
-
-		/* If the file was renamed, this
-		element contains the previous name
-		of the file. */
-		TCHAR		szOldFileName[MAX_PATH + 1];
-	};
-
 	static const COLORREF	CF_COMPRESSED = RGB(0,0,255);
 	static const COLORREF	CF_ENCRYPTED = RGB(0,128,0);
 
@@ -500,7 +475,6 @@ private:
 	HRESULT					BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags);
 	HRESULT					BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 	int						DetermineListViewObjectIndex(HWND hListView);
-	void					OnUndo(void);
 	void					OnLockToolbars(void);
 	void					LoadAllSettings(ILoadSave **pLoadSave);
 	void					OnShellNewItemCreated(LPARAM lParam);
@@ -537,7 +511,7 @@ private:
 	BOOL					OnListViewBeginLabelEdit(LPARAM lParam);
 	BOOL					OnListViewEndLabelEdit(LPARAM lParam);
 	void					OnListViewGetDisplayInfo(LPARAM lParam);
-	HRESULT					OnListViewFileDelete(BOOL bPermanent);
+	void					OnListViewFileDelete(BOOL bPermanent);
 	void					OnListViewRClick(HWND hParent,POINT *pCursorPos);
 	void					OnListViewBackgroundRClick(POINT *pCursorPos);
 	void					OnListViewItemRClick(POINT *pCursorPos);
@@ -761,9 +735,6 @@ private:
 
 	/* Languages. */
 	void					SetLanguageModule(void);
-
-	/* Undo. */
-	int						RenameFileWithUndo(TCHAR *szNewFileName,TCHAR *szOldFileName);
 
 	/* Default settings. */
 	void					SetDefaultTabSettings(TabInfo_t *pTabInfo);
@@ -1163,9 +1134,8 @@ private:
 	/* TODO: Win+E keyboard hook DLL. */
 	HHOOK					m_hKeyboardHook;
 
-	/* Undo state. */
-	BOOL					m_bCanUndo;
-	UndoItem_t				m_UndoItem;
+	/* Undo support. */
+	CFileActionHandler		m_FileActionHandler;
 
 	/* Main toolbars. */
 	REBARBANDINFO			m_ToolbarInformation[NUM_MAIN_TOOLBARS];

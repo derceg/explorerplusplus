@@ -611,7 +611,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case IDM_EDIT_UNDO:
-			OnUndo();
+			m_FileActionHandler.Undo();
 			break;
 
 		case TOOLBAR_COPY:

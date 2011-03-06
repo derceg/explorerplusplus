@@ -86,7 +86,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_bTreeViewDelayEnabled			= FALSE;
 	m_bSavePreferencesToXMLFile		= FALSE;
 	m_bAttemptToolbarRestore		= FALSE;
-	m_bCanUndo						= FALSE;
 	m_bLanguageLoaded				= FALSE;
 	m_bListViewRenaming				= FALSE;
 	m_bDragging						= FALSE;

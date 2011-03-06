@@ -73,7 +73,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_FILE_DELETEPERMANENTLY,IsDeletionPossible());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_PROPERTIES,CanShowFileProperties());
 
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_UNDO,m_bCanUndo);
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_UNDO,m_FileActionHandler.CanUndo());
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_PASTE,CanPaste());
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_PASTESHORTCUT,CanPaste());
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_PASTEHARDLINK,CanPaste());

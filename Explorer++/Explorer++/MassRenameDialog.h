@@ -4,6 +4,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
+#include "../Helper/FileActionHandler.h"
 
 class CMassRenameDialog;
 
@@ -31,7 +32,7 @@ class CMassRenameDialog : public CBaseDialog
 {
 public:
 
-	CMassRenameDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::list<std::wstring> FullFilenameList);
+	CMassRenameDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::list<std::wstring> FullFilenameList,CFileActionHandler *pFileActionHandler);
 	~CMassRenameDialog();
 
 protected:
@@ -53,8 +54,9 @@ private:
 	void	ProcessFileName(const std::wstring strTarget,const std::wstring strFilename,int iFileIndex,std::wstring &strOutput);
 
 	std::list<std::wstring>	m_FullFilenameList;
-	HICON	m_hDialogIcon;
-	HICON	m_hMoreIcon;
+	HICON					m_hDialogIcon;
+	HICON					m_hMoreIcon;
+	CFileActionHandler		*m_pFileActionHandler;
 
 	CMassRenameDialogPersistentSettings	*m_pmrdps;
 };

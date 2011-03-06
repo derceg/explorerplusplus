@@ -20,24 +20,75 @@
 #include "../Helper/ShellHelper.h"
 
 
-using namespace std;
-
 #define PASTE_CLIPBOARD_LINK		0
 #define PASTE_CLIPBOARD_HARDLINK	1
 
 int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType);
 
-int RenameFile(TCHAR *NewFileName,TCHAR *OldFileName)
+BOOL RenameFile(std::wstring strOldFilename,
+	std::wstring strNewFilename)
 {
-	SHFILEOPSTRUCT	shfo;
+	TCHAR *pszOldFilename = new TCHAR[strOldFilename.size() + 2];
+	TCHAR *pszNewFilename = new TCHAR[strNewFilename.size() + 2];
 
+	StringCchCopy(pszOldFilename,strOldFilename.size() + 2,strOldFilename.c_str());
+	pszOldFilename[lstrlen(pszOldFilename) + 1] = '\0';
+	StringCchCopy(pszNewFilename,strNewFilename.size() + 2,strNewFilename.c_str());
+	pszNewFilename[lstrlen(pszNewFilename) + 1] = '\0';
+
+	SHFILEOPSTRUCT shfo;
 	shfo.hwnd	= NULL;
 	shfo.wFunc	= FO_RENAME;
-	shfo.pFrom	= OldFileName;
-	shfo.pTo	= NewFileName;
+	shfo.pFrom	= pszOldFilename;
+	shfo.pTo	= pszNewFilename;
 	shfo.fFlags	= FOF_ALLOWUNDO;
+	BOOL bRes = (!SHFileOperation(&shfo) && !shfo.fAnyOperationsAborted);
 
-	return (!SHFileOperation(&shfo) && !shfo.fAnyOperationsAborted);
+	delete[] pszOldFilename;
+	delete[] pszNewFilename;
+
+	return bRes;
+}
+
+BOOL DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL Permanent)
+{
+	TCHAR *pszFullFilenames = NULL;
+	int iTotalSize = 0;
+
+	for each(auto FullFilename in FullFilenameList)
+	{
+		pszFullFilenames = reinterpret_cast<TCHAR *>(realloc(pszFullFilenames,
+			(iTotalSize + FullFilename.size() + 1) * sizeof(TCHAR)));
+		memcpy(pszFullFilenames + iTotalSize,FullFilename.c_str(),(FullFilename.size() + 1) * sizeof(TCHAR));
+		iTotalSize += static_cast<int>(FullFilename.size() + 1);
+	}
+
+	/* The list of strings must end with a second
+	terminating NULL character, so add it now. */
+	pszFullFilenames = reinterpret_cast<TCHAR *>(realloc(pszFullFilenames,(iTotalSize + 1) * sizeof(TCHAR)));
+	pszFullFilenames[iTotalSize] = '\0';
+
+	FILEOP_FLAGS fFlags = 0;
+
+	if(!Permanent)
+	{
+		fFlags = FOF_ALLOWUNDO;
+	}
+
+	SHFILEOPSTRUCT shfo;
+	shfo.hwnd					= hwnd;
+	shfo.wFunc					= FO_DELETE;
+	shfo.pFrom					= pszFullFilenames;
+	shfo.pTo					= NULL;
+	shfo.fFlags					= fFlags;
+	shfo.fAnyOperationsAborted	= NULL;
+	shfo.hNameMappings			= NULL;
+	shfo.lpszProgressTitle		= NULL;
+	BOOL bRes = (!SHFileOperation(&shfo) && !shfo.fAnyOperationsAborted);
+
+	free(pszFullFilenames);
+
+	return bRes;
 }
 
 BOOL PerformFileOperation(HWND Parent,TCHAR *Path,TCHAR *FileName,
@@ -73,48 +124,6 @@ TCHAR *Operation,TCHAR *Parameters)
 	}
 
 	return bReturnValue;
-}
-
-BOOL ShowFileProperties(TCHAR *FileName)
-{
-	BOOL ReturnValue;
-
-	ReturnValue = PerformFileOperation(NULL,NULL,FileName,_T("properties"),NULL);
-
-	return ReturnValue;
-}
-
-int DeleteFiles(HWND hwnd,TCHAR *FileNames,BOOL Permanent)
-{
-	SHFILEOPSTRUCT	shfo;
-	FILEOP_FLAGS	Flags = NULL;
-
-	if(FileNames == NULL)
-		return -1;
-
-	if(!Permanent)
-		Flags = FOF_ALLOWUNDO;
-
-	shfo.hwnd					= hwnd;
-	shfo.wFunc					= FO_DELETE;
-	shfo.pFrom					= FileNames;
-	shfo.pTo					= NULL;
-	shfo.fFlags					= Flags;
-	shfo.fAnyOperationsAborted	= NULL;
-	shfo.hNameMappings			= NULL;
-	shfo.lpszProgressTitle		= NULL;
-
-	return SHFileOperation(&shfo);
-}
-
-int DeleteFilesToRecycleBin(HWND hwnd,TCHAR *FileNameList)
-{
-	return DeleteFiles(hwnd,FileNameList,FALSE);
-}
-
-int DeleteFilesPermanently(HWND hwnd,TCHAR *FileNameList)
-{
-	return DeleteFiles(hwnd,FileNameList,TRUE);
 }
 
 HRESULT CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax)
