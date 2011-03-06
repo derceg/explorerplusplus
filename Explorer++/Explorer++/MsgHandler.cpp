@@ -671,7 +671,7 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 
 			GetDisplayName(pidlItem,szItemPath,SHGDN_FORPARSING);
 
-			hr = ResolveLink(m_hContainer,0,szItemPath,szTargetPath,SIZEOF_ARRAY(szTargetPath));
+			hr = NFileOperations::ResolveLink(m_hContainer,0,szItemPath,szTargetPath,SIZEOF_ARRAY(szTargetPath));
 
 			if(hr == S_OK)
 			{
@@ -1165,7 +1165,7 @@ void Explorerplusplus::OnResolveLink(void)
 	{
 		m_pActiveShellBrowser->QueryFullItemName(iItem,ShortcutFileName);
 
-		hr = ResolveLink(m_hContainer,0,ShortcutFileName,szFullFileName,SIZEOF_ARRAY(szFullFileName));
+		hr = NFileOperations::ResolveLink(m_hContainer,0,ShortcutFileName,szFullFileName,SIZEOF_ARRAY(szFullFileName));
 
 		if(hr == S_OK)
 		{
@@ -1197,7 +1197,9 @@ void Explorerplusplus::OnSaveDirectoryListing(void)
 	FullFileName,m_CurrentDirectory);
 
 	if(bSaveNameRetrieved)
-		SaveDirectoryListing(m_CurrentDirectory,FullFileName);
+	{
+		NFileOperations::SaveDirectoryListing(m_CurrentDirectory,FullFileName);
+	}
 }
 
 void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)

@@ -25,7 +25,13 @@ CFileActionHandler::CFileActionHandler()
 
 CFileActionHandler::~CFileActionHandler()
 {
+	while(stackFileActions.size() > 0)
+	{
+		UndoItem_t UndoItem = stackFileActions.top();
+		stackFileActions.pop();
 
+		delete UndoItem.pInfo;
+	}
 }
 
 BOOL CFileActionHandler::RenameFiles(const std::list<RenamedItem_t> &ItemList)
@@ -34,7 +40,7 @@ BOOL CFileActionHandler::RenameFiles(const std::list<RenamedItem_t> &ItemList)
 
 	for each(auto Item in ItemList)
 	{
-		BOOL bRes = ::RenameFile(Item.strOldFilename,Item.strNewFilename);
+		BOOL bRes = NFileOperations::RenameFile(Item.strOldFilename,Item.strNewFilename);
 
 		if(bRes)
 		{
@@ -65,7 +71,7 @@ BOOL CFileActionHandler::RenameFiles(const std::list<RenamedItem_t> &ItemList)
 BOOL CFileActionHandler::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,
 	BOOL bPermanent)
 {
-	BOOL bRes = ::DeleteFiles(hwnd,FullFilenameList,bPermanent);
+	BOOL bRes = NFileOperations::DeleteFiles(hwnd,FullFilenameList,bPermanent);
 
 	if(bRes)
 	{
@@ -132,7 +138,7 @@ void CFileActionHandler::UndoDeleteOperation(const std::list<std::wstring> &Dele
 	/* Move the file back out of the recycle bin,
 	and push a delete action back onto the stack.
 	Steps:
-	 - Find the item in the recycle bin.
+	 - Find the item in the recycle bin (probably need to read INFO2 file).
 	 - Restore it (context menu command).
 	 - Push delete action onto stack. */
 }

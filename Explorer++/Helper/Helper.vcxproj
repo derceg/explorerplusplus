@@ -246,18 +246,7 @@
     <ClCompile Include="DropHandler.cpp" />
     <ClCompile Include="FileActionHandler.cpp" />
     <ClCompile Include="FileContextMenuManager.cpp" />
-    <ClCompile Include="FileOperations.c">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Full</Optimization>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Full</Optimization>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">Full</Optimization>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">CompileAsCpp</CompileAs>
-      <Optimization Condition="'$(Configuration)|$(Platform)'=='Test|x64'">Full</Optimization>
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Test|x64'">CompileAsCpp</CompileAs>
-    </ClCompile>
+    <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="FolderSize.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="iDataObject.cpp" />

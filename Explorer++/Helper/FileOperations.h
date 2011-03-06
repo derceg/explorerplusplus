@@ -9,22 +9,33 @@ enum OverwriteMethod_t
 	OVERWRITE_THREEPASS	= 2
 };
 
-/* Renaming. */
-BOOL	RenameFile(std::wstring strOldFilename,std::wstring strNewFilename);
+namespace NFileOperations
+{
+	BOOL	RenameFile(std::wstring strOldFilename,std::wstring strNewFilename);
+	BOOL	DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL Permanent);
 
-/* Deletion. */
-BOOL	DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL Permanent);
+	BOOL	SaveDirectoryListing(std::wstring strDirectory,std::wstring strFilename);
+
+	HRESULT	CreateLinkToFile(std::wstring strTargetFilename,std::wstring strLinkFilename,std::wstring strLinkDescription);
+	HRESULT	ResolveLink(HWND hwnd,DWORD fFlags,TCHAR *szLinkFilename,TCHAR *szResolvedPath,int nBufferSize);
+};
+
 void	DeleteFileSecurely(TCHAR *szFileName,OverwriteMethod_t OverwriteMethod);
 
-/* Copy and cut. */
-HRESULT	CopyFilesToClipboard(std::list<std::wstring> FileNameList,BOOL bMove,IDataObject **pClipboardDataObject);
+HRESULT	CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax);
+
 HRESULT	CopyFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject);
 HRESULT	CutFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject);
+HRESULT	CopyFilesToClipboard(std::list<std::wstring> FileNameList,BOOL bMove,IDataObject **pClipboardDataObject);
 
-/* General. */
-int		CreateQualifiedPathName(TCHAR *,TCHAR *,unsigned int);
-HRESULT	CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax);
-HRESULT	SaveDirectoryListing(TCHAR *,TCHAR *);
-BOOL	PerformFileOperation(HWND,TCHAR *,TCHAR *,TCHAR *,TCHAR *);
+int		PasteLinksToClipboardFiles(TCHAR *szDestination);
+int		PasteHardLinks(TCHAR *szDestination);
+
+BOOL	CreateBrowseDialog(HWND hOwner,TCHAR *Title,TCHAR *PathBuffer,int BufferSize);
+BOOL	CreateBrowseDialog(HWND hOwner,TCHAR *Title,LPITEMIDLIST *ppidl);
+
+int		CopyFilesToFolder(HWND hOwner,TCHAR *FileNameList,BOOL bMove);
+
+void	DeleteFileSecurely(TCHAR *szFileName);
 
 #endif

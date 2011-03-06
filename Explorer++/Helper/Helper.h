@@ -138,7 +138,6 @@ HRESULT			ListView_SetBackgroundImage(HWND hListView,UINT Image);
 void			ListView_SwapItems(HWND hListView,int iItem1,int iItem2);
 void			ListView_SwapItemsNolParam(HWND hListView,int iItem1,int iItem2);
 void			ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate,UINT HoverTime);
-int				InsertItemIntoListView(HWND hListView,TCHAR *Text,int IconNumber,void *StoredData);
 
 /* Tab control helper functions. */
 void			TabCtrl_SwapItems(HWND hTabCtrl,int iItem1,int iItem2);
@@ -164,17 +163,11 @@ DWORD			DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,BOOL 
 
 /* File helpers. */
 int				CreateFileTimeString(FILETIME *FileTime,TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate);
-int				PasteLinksToClipboardFiles(TCHAR *szDestination);
-HRESULT			CreateLinkToFile(TCHAR *PathToFile,TCHAR *PathToLink,TCHAR *LinkDescription);
-int				CopyFilesToFolder(HWND hOwner,TCHAR *FileNameList,BOOL bMove);
 BOOL			GetRealFileSize(TCHAR *FileName,PLARGE_INTEGER lpRealFileSize);
-HRESULT			ResolveLink(HWND hwnd,DWORD fFlags,TCHAR *LinkFile,TCHAR *LinkPath,int nBufferSize);
 BOOL			CompareFileTypes(TCHAR *pszFile1,TCHAR *pszFile2);
 BOOL			SetFileSparse(TCHAR *szFileName);
-void			DeleteFileSecurely(TCHAR *szFileName);
 DWORD			BuildFileAttributeString(TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize);
 void			BuildFileAttributeStringInternal(DWORD dwFileAttributes,TCHAR *szOutput,DWORD cchMax);
-int				PasteHardLinks(TCHAR *szDestination);
 size_t			GetFileOwner(TCHAR *szFile,TCHAR *szOwner,DWORD BufSize);
 DWORD			GetNumFileHardLinks(TCHAR *lpszFileName);
 int				ReadFileProperty(TCHAR *lpszFileName,DWORD dwPropertyId,TCHAR *lpszPropertyBuf,DWORD dwBufLen);
@@ -208,9 +201,6 @@ void			ReadFileStreams(TCHAR *lpszFile);
 /* Bitmap helper functions. */
 HRESULT			GetBitmapDimensions(TCHAR *FileName,SIZE *BitmapSize);
 
-/* String helpers. */
-void			StringReplace(TCHAR *szString,TCHAR szCharToReplace,TCHAR szReplacement);
-
 /* File slack. */
 void			WriteFileSlack(TCHAR *szFileName,void *pData,int iDataSize);
 int				ReadFileSlack(TCHAR *FileName,TCHAR *pszSlack,int iBufferLen);
@@ -224,8 +214,6 @@ int				GetDefaultFileIconIndex(void);
 HRESULT			GetFileInfoTip(HWND hwnd,LPCITEMIDLIST pidlDirectory,LPCITEMIDLIST *pridl,TCHAR *szInfoTip,UINT cchMax);
 
 /* User interaction. */
-BOOL			CreateBrowseDialog(HWND hOwner,TCHAR *Title,TCHAR *PathBuffer,int BufferSize);
-BOOL			CreateBrowseDialog(HWND hOwner,TCHAR *Title,LPITEMIDLIST *ppidl);
 BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,TCHAR *InitialDirectory);
 
 /* Device related. */

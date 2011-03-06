@@ -301,21 +301,6 @@ BOOL ListView_FocusItem(HWND hListView,int nItem,BOOL bFocus)
 	return (BOOL)SendMessage(hListView,LVM_SETITEMSTATE,(WPARAM)nItem,(LPARAM)&lvItem);
 }
 
-int InsertItemIntoListView(HWND hListView,TCHAR *Text,int IconNumber,void *StoredData)
-{
-	LVITEM lv;
-
-	lv.mask		= LVIF_TEXT|LVIF_IMAGE|LVIF_PARAM|LVIF_COLUMNS;
-	lv.iItem	= 0;
-	lv.iSubItem	= 0;
-	lv.pszText	= Text;
-	lv.iImage	= IconNumber;
-	lv.lParam	= (LPARAM)StoredData;
-
-	/* Insert the item into the hListView control. */
-	return ListView_InsertItem(hListView,&lv);
-}
-
 void ListView_HandleInsertionMark(HWND hListView,int iItemFocus,POINT *ppt)
 {
 	LVFINDINFO lvfi;
@@ -2439,17 +2424,6 @@ TCHAR *GetToken(TCHAR *ptr,TCHAR *Buffer,TCHAR *BufferLength)
 		p++;
 
 	return p;
-}
-
-void StringReplace(TCHAR *szString,TCHAR szCharToReplace,TCHAR szReplacement)
-{
-	int i = 0;
-
-	for(i = 0;i < lstrlen(szString);i++)
-	{
-		if(szString[i] == szCharToReplace)
-			szString[i] = szReplacement;
-	}
 }
 
 HRESULT GetItemInfoTip(TCHAR *szItemPath,TCHAR *szInfoTip,int cchMax)

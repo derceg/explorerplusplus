@@ -13,11 +13,12 @@
 
 #include "stdafx.h"
 #include <list>
+#include <sstream>
 #include "FileOperations.h"
 #include "Helper.h"
 #include "iDataObject.h"
 #include "Buffer.h"
-#include "../Helper/ShellHelper.h"
+#include "ShellHelper.h"
 
 
 #define PASTE_CLIPBOARD_LINK		0
@@ -25,7 +26,7 @@
 
 int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType);
 
-BOOL RenameFile(std::wstring strOldFilename,
+BOOL NFileOperations::RenameFile(std::wstring strOldFilename,
 	std::wstring strNewFilename)
 {
 	TCHAR *pszOldFilename = new TCHAR[strOldFilename.size() + 2];
@@ -50,7 +51,8 @@ BOOL RenameFile(std::wstring strOldFilename,
 	return bRes;
 }
 
-BOOL DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL Permanent)
+BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,
+	BOOL Permanent)
 {
 	TCHAR *pszFullFilenames = NULL;
 	int iTotalSize = 0;
@@ -89,41 +91,6 @@ BOOL DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL 
 	free(pszFullFilenames);
 
 	return bRes;
-}
-
-BOOL PerformFileOperation(HWND Parent,TCHAR *Path,TCHAR *FileName,
-TCHAR *Operation,TCHAR *Parameters)
-{
-	SHELLEXECUTEINFO	sei;
-	HANDLE				hProcess = NULL;
-	BOOL				bReturnValue;
-
-	ZeroMemory(&sei,sizeof(SHELLEXECUTEINFO));
-	sei.cbSize			= sizeof(SHELLEXECUTEINFO);
-	sei.fMask			= SEE_MASK_FLAG_NO_UI|SEE_MASK_INVOKEIDLIST|SEE_MASK_NOCLOSEPROCESS;
-	sei.hwnd			= Parent;
-	sei.lpVerb			= Operation;
-	sei.lpFile			= FileName;
-	sei.lpParameters	= Parameters;
-	sei.nShow			= SW_SHOW;
-	sei.hProcess		= hProcess;
-
-	bReturnValue = ShellExecuteEx(&sei);
-
-	if(!bReturnValue)
-	{
-		TCHAR ExePath[MAX_PATH];
-
-		/* File has failed to be opened/executed. If the file has no program
-		associated with it, invoke the "Open With" system dialog box. */
-		if((int)FindExecutable(FileName,NULL,ExePath) == SE_ERR_NOASSOC)
-		{
-			sei.lpVerb		= _T("openas");
-			bReturnValue	= ShellExecuteEx(&sei);
-		}
-	}
-
-	return bReturnValue;
 }
 
 HRESULT CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax)
@@ -186,7 +153,6 @@ HRESULT CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax)
 
 	if(!res)
 	{
-		/* Directory was not created. */
 		return E_FAIL;
 	}
 
@@ -195,85 +161,137 @@ HRESULT CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax)
 	return S_OK;
 }
 
-HRESULT SaveDirectoryListing(TCHAR *Directory,TCHAR *FileName)
+BOOL NFileOperations::SaveDirectoryListing(std::wstring strDirectory,std::wstring strFilename)
 {
-	WIN32_FIND_DATA		wfd;
-	HANDLE				hFirstFile;
-	TCHAR				SearchPath[MAX_PATH];
-	TCHAR				FileHeader[] = _T("Directory Listing for:");
-	TCHAR				FileSubHeader[] = _T("Listing Generated on:");
-	TCHAR				Buffer[MAX_PATH];
-	TCHAR				Temp[MAX_PATH];
-	IBufferManager		*pBufferManager = NULL;
-	SYSTEMTIME			SystemTime;
-	FILETIME			FileTime;
-	FILETIME			LocalFileTime;
+	std::wstring strContents = _T("Directory\r\n---------\r\n") + strDirectory + _T("\r\n\r\n");
 
-	if((Directory == NULL) || (FileName == NULL))
-		return E_INVALIDARG;
+	SYSTEMTIME st;
+	FILETIME ft;
+	FILETIME lft;
+	GetLocalTime(&st);
+	SystemTimeToFileTime(&st,&ft);
+	LocalFileTimeToFileTime(&ft,&lft);
 
-	StringCchCopy(SearchPath,SIZEOF_ARRAY(SearchPath),Directory);
-	StringCchCat(SearchPath,SIZEOF_ARRAY(SearchPath),_T("\\*"));
+	TCHAR szTime[128];
+	CreateFileTimeString(&lft,szTime,SIZEOF_ARRAY(szTime),FALSE);
+	strContents += _T("Date\r\n----\r\n") + std::wstring(szTime) + _T("\r\n\r\n");
 
-	pBufferManager = new CBufferManager();
+	std::wstring strSearch = strDirectory + _T("\\*");
 
-	StringCchPrintf(Buffer,SIZEOF_ARRAY(Buffer),_T("%s %s"),FileHeader,Directory);
-	pBufferManager->WriteLine(Buffer);
+	WIN32_FIND_DATA wfd;
+	HANDLE hFirstFile = FindFirstFile(strSearch.c_str(),&wfd);
 
-	GetLocalTime(&SystemTime);
-	SystemTimeToFileTime(&SystemTime,&FileTime);
-	LocalFileTimeToFileTime(&FileTime,&LocalFileTime);
+	std::list<std::wstring> FolderList;
+	std::list<std::wstring> FileList;
+	ULARGE_INTEGER ulTotalSize;
 
-	CreateFileTimeString(&LocalFileTime,Temp,SIZEOF_ARRAY(Temp),FALSE);
+	ulTotalSize.QuadPart = 0;
 
-	StringCchPrintf(Buffer,SIZEOF_ARRAY(Buffer),_T("%s %s"),FileSubHeader,Temp);
-	pBufferManager->WriteLine(Buffer);
-
-	/* Write a blank line. */
-	pBufferManager->WriteLine(EMPTY_STRING);
-	pBufferManager->WriteLine(_T("Folder Contents:"));
-
-	hFirstFile = FindFirstFile(SearchPath,&wfd);
-
-	if(hFirstFile == INVALID_HANDLE_VALUE)
+	if(hFirstFile != INVALID_HANDLE_VALUE)
 	{
-		pBufferManager->WriteLine(_T("Empty"));
-	}
-	else
-	{
-		if(StrCmp(wfd.cFileName,_T(".")) != 0)
+		ULARGE_INTEGER ulFileSize;
+
+		if(lstrcmpi(wfd.cFileName,_T(".")) != 0 &&
+			lstrcmpi(wfd.cFileName,_T("..")) != 0)
 		{
-			StringCchCopy(Buffer,SIZEOF_ARRAY(Buffer),wfd.cFileName);
 			if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
 			FILE_ATTRIBUTE_DIRECTORY)
 			{
-				StringCchCat(Buffer,SIZEOF_ARRAY(Buffer),_T(" (Folder)"));
+				FolderList.push_back(wfd.cFileName);
 			}
-			pBufferManager->WriteLine(Buffer);
-		}
-	}
-
-	while(FindNextFile(hFirstFile,&wfd) != 0)
-	{
-		if(StrCmp(wfd.cFileName,_T("..")) != 0)
-		{
-			StringCchCopy(Buffer,SIZEOF_ARRAY(Buffer),wfd.cFileName);
-			if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-			FILE_ATTRIBUTE_DIRECTORY)
+			else
 			{
-				StringCchCat(Buffer,SIZEOF_ARRAY(Buffer),_T(" (Folder)"));
+				FileList.push_back(wfd.cFileName);
+
+				ulFileSize.LowPart = wfd.nFileSizeLow;
+				ulFileSize.HighPart = wfd.nFileSizeHigh;
+
+				ulTotalSize.QuadPart += ulFileSize.QuadPart;
 			}
-			pBufferManager->WriteLine(Buffer);
 		}
+
+		while(FindNextFile(hFirstFile,&wfd) != 0)
+		{
+			if(lstrcmpi(wfd.cFileName,_T(".")) != 0 &&
+				lstrcmpi(wfd.cFileName,_T("..")) != 0)
+			{
+				if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+					FILE_ATTRIBUTE_DIRECTORY)
+				{
+					FolderList.push_back(wfd.cFileName);
+				}
+				else
+				{
+					FileList.push_back(wfd.cFileName);
+
+					ulFileSize.LowPart = wfd.nFileSizeLow;
+					ulFileSize.HighPart = wfd.nFileSizeHigh;
+
+					ulTotalSize.QuadPart += ulFileSize.QuadPart;
+				}
+			}
+		}
+
+		FindClose(hFirstFile);
 	}
 
-	pBufferManager->WriteToFile(FileName);
+	std::wstringstream ss;
+	ss.imbue(std::locale(""));
+	ss.precision(0);
 
-	pBufferManager->Release();
+	strContents += _T("Statistics\r\n----------\r\n");
 
-	FindClose(hFirstFile);
+	ss << std::fixed << FolderList.size();
+	strContents += _T("Number of folders: ") + ss.str() + std::wstring(_T("\r\n"));
 
-	return S_OK;
+	ss.str(_T(""));
+	ss << std::fixed << FileList.size();
+	strContents += _T("Number of files: ") + ss.str() + std::wstring(_T("\r\n"));
+
+	TCHAR szTotalSize[32];
+	FormatSizeString(ulTotalSize,szTotalSize,SIZEOF_ARRAY(szTotalSize));
+	strContents += _T("Total size (not including subfolders): ") + std::wstring(szTotalSize) + std::wstring(_T("\r\n"));
+
+	strContents += _T("\r\nFolders\r\n-------\r\n");
+
+	for each(auto Folder in FolderList)
+	{
+		strContents += Folder + _T("\r\n");
+	}
+
+	strContents += _T("\r\nFiles\r\n-----\r\n");
+
+	for each(auto File in FileList)
+	{
+		strContents += File + _T("\r\n");
+	}
+
+	/* Remove the trailing newline. */
+	strContents = strContents.substr(0,strContents.size() - 2);
+
+	HANDLE hFile = CreateFile(strFilename.c_str(),FILE_WRITE_DATA,0,NULL,
+		CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL,NULL);
+
+	if(hFile != INVALID_HANDLE_VALUE)
+	{
+		DWORD nBytesWritten;
+
+		/* Write out the BOM for UTF-16 LE data.
+		See http://en.wikipedia.org/wiki/Byte-order_mark */
+		WriteFile(hFile,reinterpret_cast<LPCVOID>("\xFF\xFE"),2,&nBytesWritten,NULL);
+
+		WriteFile(hFile,reinterpret_cast<LPCVOID>(strContents.c_str()),static_cast<DWORD>(strContents.size() * sizeof(WCHAR)),
+			&nBytesWritten,NULL);
+
+		if(nBytesWritten == strContents.size())
+		{
+			return TRUE;
+		}
+
+		CloseHandle(hFile);
+	}
+
+	return FALSE;
 }
 
 HRESULT CopyFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject)
@@ -408,7 +426,7 @@ int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType)
 					{
 					case PASTE_CLIPBOARD_LINK:
 						PathRenameExtension(szLinkFileName,_T(".lnk"));
-						CreateLinkToFile(szOldFileName,szLinkFileName,EMPTY_STRING);
+						NFileOperations::CreateLinkToFile(szOldFileName,szLinkFileName,EMPTY_STRING);
 						break;
 
 					case PASTE_CLIPBOARD_HARDLINK:
@@ -428,33 +446,24 @@ int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType)
 	return nFilesCopied;
 }
 
-HRESULT CreateLinkToFile(TCHAR *PathToFile,TCHAR *PathToLink,TCHAR *LinkDescription)
+HRESULT NFileOperations::CreateLinkToFile(std::wstring strTargetFilename,
+	std::wstring strLinkFilename,std::wstring strLinkDescription)
 {
-	IShellLink		*pShellLink = NULL;
-	IPersistFile	*pPersistFile = NULL;
-	WCHAR			PathToLinkW[MAX_PATH];
-	HRESULT			hr;
-
-	hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
-	IID_IShellLink,(LPVOID*)&pShellLink);
+	IShellLink *pShellLink = NULL;
+	HRESULT hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
+		IID_IShellLink,reinterpret_cast<LPVOID *>(&pShellLink));
 
 	if(SUCCEEDED(hr))
 	{
-		pShellLink->SetPath(PathToFile);
-		pShellLink->SetDescription(LinkDescription);
+		pShellLink->SetPath(strTargetFilename.c_str());
+		pShellLink->SetDescription(strLinkDescription.c_str());
 
-		hr = pShellLink->QueryInterface(IID_IPersistFile,(LPVOID*)&pPersistFile);
+		IPersistFile *pPersistFile = NULL;
+		hr = pShellLink->QueryInterface(IID_IPersistFile,reinterpret_cast<LPVOID *>(&pPersistFile));
 
 		if(SUCCEEDED(hr))
 		{
-			#ifndef UNICODE
-			MultiByteToWideChar(CP_ACP,0,PathToLink,-1,PathToLinkW,MAX_PATH);
-			#else
-			StringCchCopy(PathToLinkW,SIZEOF_ARRAY(PathToLinkW),PathToLink);
-			#endif
-
-			pPersistFile->Save(PathToLinkW,TRUE);
-
+			pPersistFile->Save(strLinkFilename.c_str(),TRUE);
 			pPersistFile->Release();
 		}
 
@@ -464,46 +473,38 @@ HRESULT CreateLinkToFile(TCHAR *PathToFile,TCHAR *PathToLink,TCHAR *LinkDescript
 	return hr;
 }
 
-HRESULT ResolveLink(HWND hwnd,DWORD fFlags,TCHAR *LinkFile,TCHAR *LinkPath,int nBufferSize)
+HRESULT NFileOperations::ResolveLink(HWND hwnd,DWORD fFlags,TCHAR *szLinkFilename,TCHAR *szResolvedPath,int nBufferSize)
 {
-	IShellLink		*pShellLink = NULL;
-	IPersistFile	*pPersistFile = NULL;
-	SHFILEINFO		shfi;
-	WCHAR			LinkFileW[MAX_PATH];
-	TCHAR			ResolvedFilePath[MAX_PATH];
-	HRESULT			hr;
+	SHFILEINFO shfi;
+	DWORD_PTR dwRet = SHGetFileInfo(szLinkFilename,NULL,&shfi,sizeof(shfi),SHGFI_ATTRIBUTES);
 
-	SHGetFileInfo(LinkFile,NULL,&shfi,sizeof(shfi),SHGFI_ATTRIBUTES);
-
-	if(!(shfi.dwAttributes & SFGAO_LINK))
+	if(dwRet == 0 ||
+		!(shfi.dwAttributes & SFGAO_LINK))
 	{
-		StringCchCopy(LinkPath,nBufferSize,LinkFile);
-		return E_UNEXPECTED;
+		return E_FAIL;
 	}
 
-	hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
-	IID_IShellLink,(LPVOID*)&pShellLink);
+	IShellLink *pShellLink = NULL;
+	HRESULT hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
+		IID_IShellLink,reinterpret_cast<LPVOID *>(&pShellLink));
 
 	if(hr == S_OK)
 	{
-		hr = pShellLink->QueryInterface(IID_IPersistFile,(LPVOID *)&pPersistFile);
+		IPersistFile *pPersistFile = NULL;
+		hr = pShellLink->QueryInterface(IID_IPersistFile,reinterpret_cast<LPVOID *>(&pPersistFile));
 
 		if(hr == S_OK)
 		{
-			#ifndef UNICODE
-			MultiByteToWideChar(CP_ACP,0,LinkFile,-1,LinkFileW,MAX_PATH);
-			#else
-			StringCchCopy(LinkFileW,SIZEOF_ARRAY(LinkFileW),LinkFile);
-			#endif
-
-			hr = pPersistFile->Load(LinkFileW,STGM_READ);
+			hr = pPersistFile->Load(szLinkFilename,STGM_READ);
 
 			if(hr == S_OK)
 			{
 				pShellLink->Resolve(hwnd,fFlags);
-				pShellLink->GetPath(ResolvedFilePath,MAX_PATH,NULL,SLGP_UNCPRIORITY);
 
-				StringCchCopy(LinkPath,nBufferSize,ResolvedFilePath);
+				TCHAR szResolvedPathInternal[MAX_PATH];
+				pShellLink->GetPath(szResolvedPathInternal,SIZEOF_ARRAY(szResolvedPathInternal),NULL,SLGP_UNCPRIORITY);
+
+				StringCchCopy(szResolvedPath,nBufferSize,szResolvedPathInternal);
 			}
 
 			pPersistFile->Release();

@@ -821,7 +821,7 @@ TCHAR *szDestDirectory,int nDroppedFiles)
 		StringCchCopy(szLink,SIZEOF_ARRAY(szLink),szDestDirectory);
 		PathAppend(szLink,szFileName);
 
-		CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
+		NFileOperations::CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
 	}
 }
 

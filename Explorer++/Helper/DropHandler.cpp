@@ -1100,7 +1100,7 @@ void CDropHandler::CreateShortcutToDroppedFile(TCHAR *szFullFileName)
 	StringCchCopy(szLink,SIZEOF_ARRAY(szLink),m_szDestDirectory);
 	PathAppend(szLink,szFileName);
 
-	CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
+	NFileOperations::CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
 }
 
 HRESULT CDropHandler::CopyTextToFile(IN TCHAR *pszDestDirectory,

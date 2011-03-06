@@ -1015,10 +1015,10 @@ int CALLBACK CFolderView::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2)
 	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
 	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
 
-	hr = ResolveLink(NULL,SLR_NO_UI,FullFileName1,szResolvedLinkPath1,
+	hr = NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName1,szResolvedLinkPath1,
 	SIZEOF_ARRAY(szResolvedLinkPath1));
 
-	hr = ResolveLink(NULL,SLR_NO_UI,FullFileName2,szResolvedLinkPath2,
+	hr = NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName2,szResolvedLinkPath2,
 	SIZEOF_ARRAY(szResolvedLinkPath2));
 
 	ReturnValue = lstrcmp(szResolvedLinkPath1,szResolvedLinkPath2);

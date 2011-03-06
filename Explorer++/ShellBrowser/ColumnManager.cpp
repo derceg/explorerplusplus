@@ -956,7 +956,7 @@ int CFolderView::SetShortcutColumnData(HWND hListView,int iItem,int iColumn)
 	{
 		StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
 		PathAppend(FullFileName,m_pwfdFiles[(int)File.lParam].cFileName);
-		hr = ResolveLink(NULL,SLR_NO_UI,FullFileName,szResolvedLinkPath,SIZEOF_ARRAY(szResolvedLinkPath));
+		hr = NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName,szResolvedLinkPath,SIZEOF_ARRAY(szResolvedLinkPath));
 
 		if(SUCCEEDED(hr))
 		{
