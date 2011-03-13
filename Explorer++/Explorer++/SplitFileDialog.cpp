@@ -415,19 +415,16 @@ void CSplitFileDialog::OnCancel()
 
 void CSplitFileDialog::OnChangeOutputDirectory()
 {
-	TCHAR szOutputDirectory[MAX_PATH];
-
 	TCHAR szTitle[128];
-
 	LoadString(GetInstance(),IDS_SPLITFILEDIALOG_DIRECTORYTITLE,
 		szTitle,SIZEOF_ARRAY(szTitle));
 
-	BOOL bSucceeded = CreateBrowseDialog(m_hDlg,szTitle,szOutputDirectory,
-		SIZEOF_ARRAY(szOutputDirectory));
+	std::wstring strOutputFilename;
+	BOOL bSucceeded = NFileOperations::CreateBrowseDialog(m_hDlg,szTitle,strOutputFilename);
 
 	if(bSucceeded)
 	{
-		SetDlgItemText(m_hDlg,IDC_SPLIT_EDIT_OUTPUT,szOutputDirectory);
+		SetDlgItemText(m_hDlg,IDC_SPLIT_EDIT_OUTPUT,strOutputFilename.c_str());
 	}
 }
 

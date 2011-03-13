@@ -930,7 +930,6 @@ private:
 	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,TabInfo_t *pTabInfo);
 
 	/* Miscellaneous. */
-	int						CreateListViewFileList(TCHAR *FileNameList,unsigned int BufferSize);
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
 	void					OnShowOptions(void);
 	void					AddLanguages(HWND hDlg);

@@ -26,8 +26,8 @@
 
 int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType);
 
-BOOL NFileOperations::RenameFile(std::wstring strOldFilename,
-	std::wstring strNewFilename)
+BOOL NFileOperations::RenameFile(const std::wstring &strOldFilename,
+	const std::wstring &strNewFilename)
 {
 	TCHAR *pszOldFilename = new TCHAR[strOldFilename.size() + 2];
 	TCHAR *pszNewFilename = new TCHAR[strNewFilename.size() + 2];
@@ -73,6 +73,42 @@ BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullF
 	shfo.hNameMappings			= NULL;
 	shfo.lpszProgressTitle		= NULL;
 	BOOL bRes = (!SHFileOperation(&shfo) && !shfo.fAnyOperationsAborted);
+
+	free(pszFullFilenames);
+
+	return bRes;
+}
+
+BOOL NFileOperations::CopyFilesToFolder(HWND hOwner,const std::wstring strTitle,
+	const std::list<std::wstring> &FullFilenameList,BOOL bMove)
+{
+	std::wstring strOutputFilename;
+	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner,strTitle.c_str(),strOutputFilename);
+
+	if(!bRes)
+	{
+		return FALSE;
+	}
+
+	TCHAR *pszFullFilenames = NFileOperations::BuildFilenameList(FullFilenameList);
+
+	/* TODO: Pass off to copy function. */
+	SHFILEOPSTRUCT shfo;
+
+	if(bMove)
+	{
+		shfo.wFunc = FO_MOVE;
+	}
+	else
+	{
+		shfo.wFunc = FO_COPY;
+	}
+
+	shfo.hwnd	= hOwner;
+	shfo.pFrom	= pszFullFilenames;
+	shfo.pTo	= strOutputFilename.c_str();
+	shfo.fFlags	= FOF_ALLOWUNDO;
+	bRes = (!SHFileOperation(&shfo) && !shfo.fAnyOperationsAborted);
 
 	free(pszFullFilenames);
 
@@ -169,7 +205,7 @@ HRESULT CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax)
 	return S_OK;
 }
 
-BOOL NFileOperations::SaveDirectoryListing(std::wstring strDirectory,std::wstring strFilename)
+BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,const std::wstring &strFilename)
 {
 	std::wstring strContents = _T("Directory\r\n---------\r\n") + strDirectory + _T("\r\n\r\n");
 
@@ -454,8 +490,8 @@ int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType)
 	return nFilesCopied;
 }
 
-HRESULT NFileOperations::CreateLinkToFile(std::wstring strTargetFilename,
-	std::wstring strLinkFilename,std::wstring strLinkDescription)
+HRESULT NFileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
+	const std::wstring &strLinkFilename,const std::wstring &strLinkDescription)
 {
 	IShellLink *pShellLink = NULL;
 	HRESULT hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
@@ -524,84 +560,42 @@ HRESULT NFileOperations::ResolveLink(HWND hwnd,DWORD fFlags,TCHAR *szLinkFilenam
 	return hr;
 }
 
-BOOL CreateBrowseDialog(HWND hOwner,TCHAR *Title,TCHAR *PathBuffer,int BufferSize)
+BOOL NFileOperations::CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,std::wstring &strOutputFilename)
 {
-	LPITEMIDLIST	pidl = NULL;
-	TCHAR			FullFolderPath[MAX_PATH];
-	BOOL			bSuccessful = FALSE;
+	LPITEMIDLIST pidl = NULL;
+	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner,strTitle,&pidl);
 
-	bSuccessful = CreateBrowseDialog(hOwner,Title,&pidl);
-
-	if(bSuccessful)
+	if(bRes)
 	{
-		SHGetPathFromIDList(pidl,FullFolderPath);
-
-		if(BufferSize > lstrlen(FullFolderPath))
-		{
-			StringCchCopy(PathBuffer,BufferSize,FullFolderPath);
-			bSuccessful = TRUE;
-		}
-
+		TCHAR szOutputFilename[MAX_PATH];
+		SHGetPathFromIDList(pidl,szOutputFilename);
+		strOutputFilename = szOutputFilename;
 		CoTaskMemFree(pidl);
 	}
 
-	return bSuccessful;
+	return bRes;
 }
 
-BOOL CreateBrowseDialog(HWND hOwner,TCHAR *Title,LPITEMIDLIST *ppidl)
+BOOL NFileOperations::CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,LPITEMIDLIST *ppidl)
 {
-	BROWSEINFO		BrowseInfo;
-	TCHAR			FolderName[MAX_PATH];
-	BOOL			bSuccessful = FALSE;
-
 	CoInitializeEx(NULL,COINIT_APARTMENTTHREADED);
 
-	BrowseInfo.hwndOwner		= hOwner;
-	BrowseInfo.pidlRoot			= NULL;
-	BrowseInfo.pszDisplayName	= FolderName;
-	BrowseInfo.lpszTitle		= Title;
-	BrowseInfo.ulFlags			= BIF_NEWDIALOGSTYLE;
-	BrowseInfo.lpfn				= NULL;
+	TCHAR szDisplayName[MAX_PATH];
 
-	*ppidl = SHBrowseForFolder(&BrowseInfo);
+	BROWSEINFO bi;
+	bi.hwndOwner		= hOwner;
+	bi.pidlRoot			= NULL;
+	bi.pszDisplayName	= szDisplayName;
+	bi.lpszTitle		= strTitle.c_str();
+	bi.ulFlags			= BIF_NEWDIALOGSTYLE;
+	bi.lpfn				= NULL;
+	*ppidl = SHBrowseForFolder(&bi);
 
-	bSuccessful = (*ppidl != NULL);
+	BOOL bSuccessful = (*ppidl != NULL);
 
 	CoUninitialize();
 
 	return bSuccessful;
-}
-
-int CopyFilesToFolder(HWND hOwner,TCHAR *FileNameList,BOOL bMove)
-{
-	TCHAR	FolderPath[MAX_PATH];
-	TCHAR	Title[] = _T("Select a folder to copy the selected files to, then press OK");
-	BOOL	Succeeded;
-	int		iResult = -1;
-
-	Succeeded = CreateBrowseDialog(hOwner,Title,FolderPath,SIZEOF_ARRAY(FolderPath));
-
-	if(!Succeeded)
-		return 0;
-
-	if(FolderPath != NULL)
-	{
-		SHFILEOPSTRUCT FileOp;
-
-		if(bMove)
-			FileOp.wFunc	= FO_MOVE;
-		else
-			FileOp.wFunc	= FO_COPY;
-
-		FileOp.hwnd		= hOwner;
-		FileOp.pFrom	= FileNameList;
-		FileOp.pTo		= FolderPath;
-		FileOp.fFlags	= FOF_ALLOWUNDO;
-
-		iResult = SHFileOperation(&FileOp);
-	}
-
-	return iResult;
 }
 
 void DeleteFileSecurely(TCHAR *szFileName,UINT uOverwriteMethod)

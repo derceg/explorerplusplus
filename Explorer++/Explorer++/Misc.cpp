@@ -177,31 +177,6 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	return S_OK;
 }
 
-int Explorerplusplus::CreateListViewFileList(TCHAR *FileNameList,unsigned int BufferSize)
-{
-	IBufferManager	*pBufferManager = NULL;
-	TCHAR			FullFileName[MAX_PATH];
-	int				LastItemFound;
-
-	pBufferManager = new CBufferManager();
-
-	/* Find each selected file and call the selected function for the file. */
-	LastItemFound = -1;
-	while((LastItemFound = ListView_GetNextItem(m_hActiveListView,
-	LastItemFound,LVNI_SELECTED)) != -1)
-	{
-		m_pActiveShellBrowser->QueryFullItemName(LastItemFound,FullFileName);
-		pBufferManager->WriteListEntry(FullFileName);
-	}
-
-	if(FileNameList != NULL)
-	{
-		pBufferManager->QueryBuffer(FileNameList,BufferSize);
-	}
-
-	return 0;
-}
-
 void Explorerplusplus::ValidateLoadedSettings(void)
 {
 	if(m_TreeViewWidth <= 0)
@@ -573,23 +548,25 @@ void Explorerplusplus::ShowHiddenFiles(void)
 
 void Explorerplusplus::CopyToFolder(BOOL bMove)
 {
-	TCHAR	*FileNameList = NULL;
-	int		nSelected;
-
-	nSelected = ListView_GetSelectedCount(m_hActiveListView);
-
-	if(nSelected == 0)
-		return;
-
-	FileNameList = (TCHAR *)malloc(nSelected * MAX_PATH * sizeof(TCHAR));
-
-	if(FileNameList != NULL)
+	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
-		CreateListViewFileList(FileNameList,nSelected * MAX_PATH);
-		CopyFilesToFolder(m_hContainer,FileNameList,bMove);
-
-		free(FileNameList);
+		return;
 	}
+
+	std::list<std::wstring> FullFilenameList;
+	int iItem = -1;
+
+	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+	{
+		TCHAR szFullFilename[MAX_PATH];
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+
+		FullFilenameList.push_back(szFullFilename);
+	}
+
+	/* TODO: Move string into string table. */
+	std::wstring strTitle = _T("Select a folder to copy the selected files to, then press OK");
+	NFileOperations::CopyFilesToFolder(m_hContainer,strTitle,FullFilenameList,bMove);
 }
 
 HRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)

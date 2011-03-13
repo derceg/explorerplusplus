@@ -370,16 +370,16 @@ void CMergeFilesDialog::OnCancel()
 
 void CMergeFilesDialog::OnChangeOutputDirectory()
 {
-	TCHAR szTitle[64];
-	LoadString(g_hLanguageModule,IDS_MERGE_SELECTDESTINATION,
+	TCHAR szTitle[128];
+	LoadString(GetInstance(),IDS_MERGE_SELECTDESTINATION,
 		szTitle,SIZEOF_ARRAY(szTitle));
 
-	TCHAR szOutputDirectory[MAX_PATH];
-	BOOL bRes = CreateBrowseDialog(m_hDlg,szTitle,szOutputDirectory,MAX_PATH);
+	std::wstring strOutputFilename;
+	BOOL bSucceeded = NFileOperations::CreateBrowseDialog(m_hDlg,szTitle,strOutputFilename);
 
-	if(bRes)
+	if(bSucceeded)
 	{
-		SetDlgItemText(m_hDlg,IDC_MERGE_EDIT_FILENAME,szOutputDirectory);
+		SetDlgItemText(m_hDlg,IDC_MERGE_EDIT_FILENAME,strOutputFilename.c_str());
 	}
 }
 
