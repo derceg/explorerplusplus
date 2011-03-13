@@ -1635,90 +1635,62 @@ void Explorerplusplus::OnListViewShowFileProperties(void)
 
 void Explorerplusplus::OnListViewCopyItemPath(void)
 {
-	IBufferManager	*pBufferManager = NULL;
-	TCHAR			FullFileName[MAX_PATH];
-	TCHAR			*szFullFileNameText = NULL;
-	DWORD			dwBufferSize;
-	int				iSelected = -1;
-
 	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
+	{
 		return;
-
-	iSelected = ListView_GetNextItem(m_hActiveListView,-1,LVNI_SELECTED);
-
-	pBufferManager = new CBufferManager();
-
-	while(iSelected != -1)
-	{
-		m_pActiveShellBrowser->QueryFullItemName(iSelected,FullFileName);
-
-		pBufferManager->WriteLine(FullFileName);
-
-		iSelected = ListView_GetNextItem(m_hActiveListView,iSelected,LVNI_SELECTED);
 	}
 
-	pBufferManager->QueryBufferSize(&dwBufferSize);
+	std::wstring strItemPaths;
+	int iItem = -1;
 
-	szFullFileNameText = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
-
-	if(szFullFileNameText != NULL)
+	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
-		pBufferManager->QueryBuffer(szFullFileNameText,dwBufferSize);
+		TCHAR szFullFilename[MAX_PATH];
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
 
-		CopyTextToClipboard(szFullFileNameText);
+		strItemPaths += szFullFilename + std::wstring(_T("\r\n"));
 	}
 
-	pBufferManager->Release();
+	strItemPaths = strItemPaths.substr(0,strItemPaths.size() - 2);
+
+	CopyTextToClipboard(strItemPaths);
 }
 
 void Explorerplusplus::OnListViewCopyUniversalPaths(void)
 {
-	IBufferManager	*pBufferManager = NULL;
-	TCHAR			FullFileName[MAX_PATH];
-	TCHAR			*szFullFileNameText = NULL;
-	DWORD			dwBufferSize;
-	DWORD			dwRet;
-	int				iSelected = -1;
-
 	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
-		return;
-
-	iSelected = ListView_GetNextItem(m_hActiveListView,-1,LVNI_SELECTED);
-
-	pBufferManager = new CBufferManager();
-
-	while(iSelected != -1)
 	{
-		m_pActiveShellBrowser->QueryFullItemName(iSelected,FullFileName);
+		return;
+	}
 
-		UNIVERSAL_NAME_INFO	*puni;
+	std::wstring strUniversalPaths;
+	int iItem = -1;
+
+	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+	{
+		TCHAR szFullFilename[MAX_PATH];
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+
 		TCHAR szBuffer[1024];
 
-		dwBufferSize = SIZEOF_ARRAY(szBuffer);
-		puni = (UNIVERSAL_NAME_INFO *)&szBuffer;
-		dwRet = WNetGetUniversalName(FullFileName,UNIVERSAL_NAME_INFO_LEVEL,
-			(LPVOID)puni,&dwBufferSize);
+		DWORD dwBufferSize = SIZEOF_ARRAY(szBuffer);
+		UNIVERSAL_NAME_INFO *puni = reinterpret_cast<UNIVERSAL_NAME_INFO *>(&szBuffer);
+		DWORD dwRet = WNetGetUniversalName(szFullFilename,UNIVERSAL_NAME_INFO_LEVEL,
+			reinterpret_cast<LPVOID>(puni),&dwBufferSize);
 
 		if(dwRet == NO_ERROR)
-			pBufferManager->WriteLine(puni->lpUniversalName);
+		{
+			strUniversalPaths += puni->lpUniversalName + std::wstring(_T("\r\n"));
+		}
 		else
-			pBufferManager->WriteLine(FullFileName);
-
-		iSelected = ListView_GetNextItem(m_hActiveListView,iSelected,LVNI_SELECTED);
+		{
+			strUniversalPaths += szFullFilename + std::wstring(_T("\r\n"));
+		}
 	}
 
-	pBufferManager->QueryBufferSize(&dwBufferSize);
+	strUniversalPaths = strUniversalPaths.substr(0,strUniversalPaths.size() - 2);
 
-	szFullFileNameText = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
-
-	if(szFullFileNameText != NULL)
-	{
-		pBufferManager->QueryBuffer(szFullFileNameText,dwBufferSize);
-
-		CopyTextToClipboard(szFullFileNameText);
-	}
-
-	pBufferManager->Release();
+	CopyTextToClipboard(strUniversalPaths);
 }
 
 HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)

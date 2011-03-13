@@ -54,6 +54,6 @@ void			SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,DVTARGETDEVICE *ptd,DWOR
 HRESULT			AddJumpListTasks(std::list<JumpListTaskInformation> TaskList);
 BOOL			LoadContextMenuHandlers(IN TCHAR *szRegKey,OUT list<ContextMenuHandler_t> *pContextMenuHandlers);
 BOOL			LoadIUnknownFromCLSID(IN TCHAR *szCLSID,OUT ContextMenuHandler_t *pContextMenuHandler);
-BOOL			CopyTextToClipboard(std::wstring str);
+BOOL			CopyTextToClipboard(const std::wstring &str);
 
 #endif

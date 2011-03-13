@@ -630,7 +630,7 @@ BOOL MyExpandEnvironmentStrings(TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize)
 	return bRet;
 }
 
-BOOL CopyTextToClipboard(std::wstring str)
+BOOL CopyTextToClipboard(const std::wstring &str)
 {
 	if(!OpenClipboard(NULL))
 	{
