@@ -630,6 +630,37 @@ BOOL MyExpandEnvironmentStrings(TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize)
 	return bRet;
 }
 
+BOOL CopyTextToClipboard(std::wstring str)
+{
+	if(!OpenClipboard(NULL))
+	{
+		return FALSE;
+	}
+
+	EmptyClipboard();
+
+	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE,(str.size() + 1) * sizeof(TCHAR));
+	BOOL bRes = FALSE;
+
+	if(hGlobal != NULL)
+	{
+		LPVOID pMem = GlobalLock(hGlobal);
+		memcpy(pMem,str.c_str(),(str.size() + 1) * sizeof(TCHAR));
+		GlobalUnlock(hGlobal);
+
+		HANDLE hData = SetClipboardData(CF_UNICODETEXT,hGlobal);
+
+		if(hData != NULL)
+		{
+			bRes = TRUE;
+		}
+	}
+
+	CloseClipboard();
+
+	return bRes;
+}
+
 DWORD DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,
 BOOL bDataAccept,BOOL bOnSameDrive)
 {

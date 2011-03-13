@@ -493,46 +493,6 @@ HINSTANCE StartCommandPrompt(TCHAR *Directory)
 	return hNewInstance;
 }
 
-HANDLE CopyTextToClipboard(TCHAR *szTextData)
-{
-	HGLOBAL hGlobal		= NULL;
-	LPVOID pMem			= NULL;
-	HANDLE DataHandle	= NULL;
-	UINT uFormat;
-	BOOL bOpened;
-
-	if(szTextData == NULL)
-		return NULL;
-
-	bOpened = OpenClipboard(NULL);
-
-	if(!bOpened)
-		return NULL;
-
-	EmptyClipboard();
-
-	hGlobal = GlobalAlloc(GMEM_MOVEABLE,(lstrlen(szTextData) + 1) * sizeof(TCHAR));
-
-	if(hGlobal != NULL)
-	{
-		pMem = GlobalLock(hGlobal);
-		memcpy(pMem,szTextData,(lstrlen(szTextData) + 1) * sizeof(TCHAR));
-		GlobalUnlock(hGlobal);
-
-		#ifndef UNICODE
-			uFormat = CF_TEXT;
-		#else
-			uFormat = CF_UNICODETEXT;
-		#endif
-
-		DataHandle = SetClipboardData(uFormat,hGlobal);
-	}
-
-	CloseClipboard();
-
-	return DataHandle;
-}
-
 BOOL lCheckMenuItem(HMENU hMenu,UINT ItemID,BOOL bCheck)
 {
 	if(bCheck)

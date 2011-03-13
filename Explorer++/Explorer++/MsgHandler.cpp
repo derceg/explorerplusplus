@@ -2132,83 +2132,57 @@ void Explorerplusplus::OnBrowseForward(void)
 
 void Explorerplusplus::OnRefresh(void)
 {
-	/* Refresh the current tab. */
 	RefreshTab(m_iObjectIndex);
 }
 
 void Explorerplusplus::CopyColumnInfoToClipboard(void)
 {
-	list<Column_t>				Columns;
-	list<Column_t>::iterator	itr;
-	TCHAR						*szCompleteColumnText = NULL;
-	TCHAR						szText[512];
-	DWORD						dwBufferSize;
-	int							iSelected;
-	int							nActiveColumns = 0;
-	int							i = 0;
+	std::list<Column_t> Columns;
+	m_pActiveShellBrowser->ExportCurrentColumns(&Columns);
 
-	if(ListView_GetSelectedCount(m_hActiveListView) < 1)
-		return;
+	std::wstring strColumnInfo;
+	int nActiveColumns = 0;
 
-	iSelected = ListView_GetNextItem(m_hActiveListView,-1,LVNI_SELECTED);
-
-	IBufferManager *pBufferManager;
-
-	pBufferManager = new CBufferManager();
-
-	iSelected = ListView_GetNextItem(m_hActiveListView,-1,LVNI_SELECTED);
-
-	if(iSelected != -1)
+	for each(auto Column in Columns)
 	{
-		m_pActiveShellBrowser->ExportCurrentColumns(&Columns);
-
-		/* Only place column names in once. */
-		for(itr = Columns.begin();itr != Columns.end();itr++)
+		if(Column.bChecked)
 		{
-			if(itr->bChecked)
-			{
-				TCHAR szText[64];
+			TCHAR szText[64];
+			LoadString(g_hLanguageModule,LookupColumnNameStringIndex(Column.id),szText,SIZEOF_ARRAY(szText));
 
-				LoadString(g_hLanguageModule,LookupColumnNameStringIndex(itr->id),szText,SIZEOF_ARRAY(szText));
+			strColumnInfo += std::wstring(szText) + _T("\t");
 
-				pBufferManager->Write(szText);
-				pBufferManager->Write(_T("\t"));
-
-				nActiveColumns++;
-			}
+			nActiveColumns++;
 		}
 	}
 
-	while(iSelected != -1)
+	/* Remove the trailing tab. */
+	strColumnInfo = strColumnInfo.substr(0,strColumnInfo.size() - 1);
+
+	strColumnInfo += _T("\r\n");
+
+	int iItem = -1;
+
+	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
-		for(i = 0;i  < nActiveColumns;i++)
+		for(int i = 0;i < nActiveColumns;i++)
 		{
-			ListView_GetItemText(m_hActiveListView,iSelected,i,szText,
-			SIZEOF_ARRAY(szText));
+			TCHAR szText[64];
+			ListView_GetItemText(m_hActiveListView,iItem,i,szText,
+				SIZEOF_ARRAY(szText));
 
-			if(i == 0)
-				pBufferManager->WriteLine(szText);
-			else
-				pBufferManager->Write(szText);
-
-			pBufferManager->Write(_T("\t"));
+			strColumnInfo += std::wstring(szText) + _T("\t");
 		}
 
-		iSelected = ListView_GetNextItem(m_hActiveListView,iSelected,LVNI_SELECTED);
+		strColumnInfo = strColumnInfo.substr(0,strColumnInfo.size() - 1);
+
+		strColumnInfo += _T("\r\n");
 	}
 
-	pBufferManager->QueryBufferSize(&dwBufferSize);
+	/* Remove the trailing newline. */
+	strColumnInfo = strColumnInfo.substr(0,strColumnInfo.size() - 2);
 
-	szCompleteColumnText = (TCHAR *)malloc(dwBufferSize * sizeof(TCHAR));
-
-	if(szCompleteColumnText != NULL)
-	{
-		pBufferManager->QueryBuffer(szCompleteColumnText,dwBufferSize);
-
-		CopyTextToClipboard(szCompleteColumnText);
-	}
-
-	pBufferManager->Release();
+	CopyTextToClipboard(strColumnInfo);
 }
 
 void Explorerplusplus::SetFilterStatus(void)

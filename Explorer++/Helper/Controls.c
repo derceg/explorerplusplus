@@ -12,20 +12,8 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Helper.h"
 #include "Controls.h"
 
-
-BOOL InitControlClasses(DWORD Classes)
-{
-	INITCOMMONCONTROLSEX	ccEx;
-
-	ccEx.dwSize	= sizeof(INITCOMMONCONTROLSEX);
-	ccEx.dwICC	= Classes;
-
-	return InitCommonControlsEx(&ccEx);
-
-}
 
 HWND CreateListView(HWND Parent,DWORD Style)
 {
@@ -179,17 +167,6 @@ void AddPathsToComboBoxEx(HWND CbEx,TCHAR *Path)
 
 		FindClose(hFirstFile);
 	}
-}
-
-HWND CreateButton(HWND hParent,DWORD Styles)
-{
-	HWND hButton;
-	Styles = WS_VISIBLE|WS_CHILD;
-
-	hButton = CreateWindow(WC_BUTTON,EMPTY_STRING,Styles,0,0,20,20,
-	hParent,NULL,GetModuleHandle(0),NULL);
-
-	return hButton;
 }
 
 void ListView_AddRemoveExtendedStyle(HWND hListView,DWORD dwStyle,BOOL bAdd)

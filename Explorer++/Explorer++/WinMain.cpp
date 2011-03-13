@@ -330,7 +330,11 @@ LPSTR lpCmdLine,int nCmdShow)
 
 	/* Initialize OLE, as well as the various window classes that
 	will be needed (listview, TreeView, comboboxex, etc.). */
-	InitControlClasses(dwControlClasses);
+	INITCOMMONCONTROLSEX	ccEx;
+	ccEx.dwSize	= sizeof(INITCOMMONCONTROLSEX);
+	ccEx.dwICC	= dwControlClasses;
+	InitCommonControlsEx(&ccEx);
+
 	OleInitialize(NULL);
 
 	/* Process command line arguments. */

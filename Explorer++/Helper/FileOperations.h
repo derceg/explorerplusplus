@@ -11,6 +11,8 @@ enum OverwriteMethod_t
 
 namespace NFileOperations
 {
+	TCHAR	*BuildFilenameList(const std::list<std::wstring> &FilenameList);
+
 	BOOL	RenameFile(std::wstring strOldFilename,std::wstring strNewFilename);
 	BOOL	DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL Permanent);
 

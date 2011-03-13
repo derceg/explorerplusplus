@@ -54,21 +54,7 @@ BOOL NFileOperations::RenameFile(std::wstring strOldFilename,
 BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,
 	BOOL Permanent)
 {
-	TCHAR *pszFullFilenames = NULL;
-	int iTotalSize = 0;
-
-	for each(auto FullFilename in FullFilenameList)
-	{
-		pszFullFilenames = reinterpret_cast<TCHAR *>(realloc(pszFullFilenames,
-			(iTotalSize + FullFilename.size() + 1) * sizeof(TCHAR)));
-		memcpy(pszFullFilenames + iTotalSize,FullFilename.c_str(),(FullFilename.size() + 1) * sizeof(TCHAR));
-		iTotalSize += static_cast<int>(FullFilename.size() + 1);
-	}
-
-	/* The list of strings must end with a second
-	terminating NULL character, so add it now. */
-	pszFullFilenames = reinterpret_cast<TCHAR *>(realloc(pszFullFilenames,(iTotalSize + 1) * sizeof(TCHAR)));
-	pszFullFilenames[iTotalSize] = '\0';
+	TCHAR *pszFullFilenames = NFileOperations::BuildFilenameList(FullFilenameList);
 
 	FILEOP_FLAGS fFlags = 0;
 
@@ -91,6 +77,28 @@ BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullF
 	free(pszFullFilenames);
 
 	return bRes;
+}
+
+TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &FilenameList)
+{
+	TCHAR *pszFilenames = NULL;
+	int iTotalSize = 0;
+
+	for each(auto Filename in FilenameList)
+	{
+		pszFilenames = reinterpret_cast<TCHAR *>(realloc(pszFilenames,
+			(iTotalSize + Filename.size() + 1) * sizeof(TCHAR)));
+		memcpy(pszFilenames + iTotalSize,Filename.c_str(),(Filename.size() + 1) * sizeof(TCHAR));
+		iTotalSize += static_cast<int>(Filename.size() + 1);
+	}
+
+	/* The list of strings must end with a second
+	terminating NULL character, so add it now. */
+	pszFilenames = reinterpret_cast<TCHAR *>(realloc(pszFilenames,(iTotalSize + 1) * sizeof(TCHAR)));
+	pszFilenames[iTotalSize] = '\0';
+
+	/* Note that it is up to the caller to free this. */
+	return pszFilenames;
 }
 
 HRESULT CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax)

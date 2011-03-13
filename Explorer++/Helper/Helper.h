@@ -239,7 +239,6 @@ void			ShowLastError(void);
 int				WriteTextToRichEdit(HWND hRichEdit,TCHAR *fmt,...);
 int				GetRectHeight(RECT *rc);
 int				GetRectWidth(RECT *rc);
-HANDLE			CopyTextToClipboard(TCHAR *szTextData);
 void			CheckItem(HWND hwnd,BOOL bCheck);
 BOOL			IsItemChecked(HWND hwnd);
 BOOL			lShowWindow(HWND hwnd,BOOL bShowWindow);
