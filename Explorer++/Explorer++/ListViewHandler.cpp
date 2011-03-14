@@ -1783,7 +1783,7 @@ void Explorerplusplus::OnListViewPaste(void)
 
 	if(hr == S_OK)
 	{
-		IClipboardHandler *pClipboardHandler = new CDropHandler();
+		CDropHandler *pDropHandler = CDropHandler::CreateNew();
 
 		TCHAR szDestination[MAX_PATH + 1];
 
@@ -1797,19 +1797,19 @@ void Explorerplusplus::OnListViewPaste(void)
 		/* Also, the string must be double NULL terminated. */
 		szDestination[lstrlen(szDestination) + 1] = '\0';
 
-		pClipboardHandler->CopyClipboardData(pClipboardObject,
+		pDropHandler->CopyClipboardData(pClipboardObject,
 			m_hContainer,szDestination,this,!m_bOverwriteExistingFilesConfirmation);
 
-		pClipboardHandler->Release();
+		pDropHandler->Release();
 		pClipboardObject->Release();
 	}
 }
 
-void Explorerplusplus::OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt)
+void Explorerplusplus::OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt)
 {
 	if(m_pActiveShellBrowser->QueryNumSelected() == 0)
 	{
-		m_pActiveShellBrowser->SelectItems(ppfl);
+		m_pActiveShellBrowser->SelectItems(PastedFileList);
 	}
 }
 

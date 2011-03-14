@@ -729,9 +729,7 @@ void Explorerplusplus::OnTreeViewPaste(void)
 
 		if(hr == S_OK)
 		{
-			IClipboardHandler *pClipboardHandler = NULL;
-
-			pClipboardHandler = new CDropHandler();
+			CDropHandler *pDropHandler = CDropHandler::CreateNew();
 
 			pidl = m_pMyTreeView->BuildPath(hItem);
 
@@ -742,13 +740,13 @@ void Explorerplusplus::OnTreeViewPaste(void)
 			/* Name must be double NULL terminated. */
 			szFullFileName[lstrlen(szFullFileName) + 1] = '\0';
 
-			pClipboardHandler->CopyClipboardData(pClipboardObject,
+			pDropHandler->CopyClipboardData(pClipboardObject,
 				m_hTreeView,szFullFileName,NULL,
 				!m_bOverwriteExistingFilesConfirmation);
 
 			CoTaskMemFree(pidl);
 
-			pClipboardHandler->Release();
+			pDropHandler->Release();
 			pClipboardObject->Release();
 		}
 	}

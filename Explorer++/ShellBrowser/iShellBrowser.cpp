@@ -1961,37 +1961,34 @@ void CFolderView::QueueRename(LPITEMIDLIST pidlItem)
 	}
 }
 
-void CFolderView::SelectItems(list<PastedFile_t> *pFileList)
+void CFolderView::SelectItems(const std::list<std::wstring> &PastedFileList)
 {
-	list<PastedFile_t>::iterator itr;
-	int iIndex;
+	int i = 0;
 
-	m_pFileSelectionList.clear();
+	m_FileSelectionList.clear();
 
-	for(itr = pFileList->begin();itr != pFileList->end();)
+	for each(auto PastedFile in PastedFileList)
 	{
-		iIndex = LocateFileItemIndex(itr->szFileName);
+		int iIndex = LocateFileItemIndex(PastedFile.c_str());
 
 		if(iIndex != -1)
 		{
 			ListView_SelectItem(m_hListView,iIndex,TRUE);
 
-			if(itr == pFileList->begin())
+			if(i == 0)
 			{
 				/* Focus on the first item, and ensure it is visible. */
 				ListView_FocusItem(m_hListView,iIndex,TRUE);
 				ListView_EnsureVisible(m_hListView,iIndex,FALSE);
-			}
 
-			itr = pFileList->erase(itr);
+				i++;
+			}
 		}
 		else
 		{
-			++itr;
+			m_FileSelectionList.push_back(PastedFile);
 		}
 	}
-
-	m_pFileSelectionList = *pFileList;
 }
 
 /* Refreshes all icons in the current

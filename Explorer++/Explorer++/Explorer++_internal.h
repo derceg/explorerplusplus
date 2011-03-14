@@ -9,7 +9,6 @@
 #include "../Helper/FolderSize.h"
 #include "../MyTreeView/MyTreeView.h"
 #include "../Helper/iDataObject.h"
-#include "../Helper/Buffer.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/CustomMenu.h"
@@ -635,8 +634,6 @@ INT_PTR CALLBACK	ChangeDisplayColoursStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPAR
 /* Window message handler stubs. */
 LRESULT CALLBACK	TabSubclassProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
-/* Paste file callback (will select pasted files). */
-void				PasteFilesCallback(void *pData,list<PastedFile_t> *pPastedFileList);
 void				FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
 
 /* Treeview window procedure stub. */

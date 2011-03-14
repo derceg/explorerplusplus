@@ -12,7 +12,7 @@ enum OverwriteMethod_t
 namespace NFileOperations
 {
 	BOOL	RenameFile(const std::wstring &strOldFilename,const std::wstring &strNewFilename);
-	BOOL	DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL Permanent);
+	BOOL	DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL bPermanent);
 	BOOL	CopyFilesToFolder(HWND hOwner,const std::wstring strTitle,const std::list<std::wstring> &FullFilenameList,BOOL bMove);
 
 	TCHAR	*BuildFilenameList(const std::list<std::wstring> &FilenameList);

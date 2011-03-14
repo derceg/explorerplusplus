@@ -234,10 +234,6 @@ public:
 	HRESULT _stdcall	SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem,NMCSAEI_FLAGS flags);
 	HRESULT _stdcall	IncludeItems(NMCII_FLAGS *pFlags);
 
-	void				OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt);
-
-	void				PasteFilesCallbackInternal(list<PastedFile_t> *pPastedFileList);
-
 	void				OnModelessDialogDestroy(int iResource);
 
 
@@ -577,6 +573,9 @@ private:
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
 
+	/* Drag and drop. */
+	void					OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt);
+
 	/* Clone Window. */
 	void					OnCloneWindow(void);
 
@@ -785,7 +784,7 @@ private:
 	/* Tabs. */
 	void					DuplicateTab(int iTabInternal);
 
-	/* Tab proxys. */
+	/* Tab proxy's. */
 	void					SetTabProxyIcon(int iTabId,HICON hIcon);
 
 	/* Tab drag and drop. */

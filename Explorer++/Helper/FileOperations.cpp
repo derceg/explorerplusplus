@@ -17,7 +17,6 @@
 #include "FileOperations.h"
 #include "Helper.h"
 #include "iDataObject.h"
-#include "Buffer.h"
 #include "ShellHelper.h"
 
 
@@ -52,13 +51,13 @@ BOOL NFileOperations::RenameFile(const std::wstring &strOldFilename,
 }
 
 BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,
-	BOOL Permanent)
+	BOOL bPermanent)
 {
 	TCHAR *pszFullFilenames = NFileOperations::BuildFilenameList(FullFilenameList);
 
 	FILEOP_FLAGS fFlags = 0;
 
-	if(!Permanent)
+	if(!bPermanent)
 	{
 		fFlags = FOF_ALLOWUNDO;
 	}
@@ -401,14 +400,6 @@ struct HANDLETOMAPPINGS
 	UINT			uNumberOfMappings;
 	LPSHNAMEMAPPING	lpSHNameMapping;
 };
-
-typedef struct
-{
-	SHFILEOPSTRUCT		shfo;
-	void				(*PasteFilesCallback)(void *,list<PastedFile_t> *);
-	list<PastedFile_t>	*pPastedFileList;
-	void				*pData;
-} PastedFilesInfo_t;
 
 int PasteLinksToClipboardFiles(TCHAR *szDestination)
 {

@@ -14,7 +14,6 @@
 #include "stdafx.h"
 #include "Helper.h"
 #include "FileOperations.h"
-#include "Buffer.h"
 
 BOOL GetDriveGeometryEx(TCHAR *lpszDrive,DISK_GEOMETRY_EX *pDiskGeometry,DWORD dwSize)
 {

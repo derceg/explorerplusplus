@@ -4,7 +4,6 @@
 #include <windows.h>
 #include <commctrl.h>
 #include <gdiplus.h>
-#include "../Helper/Buffer.h"
 #include "../Helper/Helper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/DropHandler.h"
@@ -431,7 +430,7 @@ public:
 	void				ImportAllColumns(ColumnExport_t *pce);
 	void				ExportAllColumns(ColumnExport_t *pce);
 	void				QueueRename(LPITEMIDLIST pidlItem);
-	void				SelectItems(list<PastedFile_t> *pFileList);
+	void				SelectItems(const std::list<std::wstring> &PastedFileList);
 	void				RefreshAllIcons(void);
 	void				OnDeviceChange(WPARAM wParam,LPARAM lParam);
 
@@ -566,13 +565,11 @@ private:
 	HRESULT				InitializeDragDropHelpers(void);
 	DWORD				CheckItemLocations(IDataObject *pDataObject,int iDroppedItem);
 	void				HandleDragSelection(POINT *ppt);
-	void				CreateShortcutsToDroppedFiles(DROPFILES *pdf,TCHAR *szDestDirectory,int nDroppedFiles);
-	void				CopyDroppedFilesInternal(IBufferManager *pbm,TCHAR *szDestDirectory,BOOL bCopy,BOOL bRenameOnCollision);
 	void				RepositionLocalFiles(POINT *ppt);
 	void				ScrollListViewFromCursor(HWND hListView,POINT *CursorPos);
 	void				PositionDroppedItems(void);
 	BOOL				QueryDragging(void);
-	void				OnDropFile(list<PastedFile_t> *ppfl,POINT *ppt);
+	void				OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt);
 
 	/* Miscellaneous. */
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL);
@@ -697,7 +694,7 @@ private:
 	list<Added_t>		m_FilesAdded;
 
 	/* Stores information on files that have
-	been created and are awaiting insetion
+	been created and are awaiting insertion
 	into the listview. */
 	list<AwaitingAdd_t>	m_AwaitingAddList;
 	int					m_nAwaitingAdd;
@@ -708,7 +705,7 @@ private:
 	int					m_iIndexNewItem;
 
 	/* File selection. */
-	list<PastedFile_t>	m_pFileSelectionList;
+	std::list<std::wstring>	m_FileSelectionList;
 
 	/* Icon gathering information. */
 	int					m_nItemsInInfoList;

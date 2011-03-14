@@ -23,7 +23,6 @@
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Buffer.h"
 #include "../Helper/FolderSize.h"
 
 

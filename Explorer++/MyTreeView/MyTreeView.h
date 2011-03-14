@@ -5,7 +5,6 @@
 #include <shlwapi.h>
 #include <list>
 #include <vector>
-#include "../Helper/Buffer.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/DropHandler.h"
 

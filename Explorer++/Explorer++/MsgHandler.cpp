@@ -2707,21 +2707,14 @@ void Explorerplusplus::OnHome(void)
 
 void Explorerplusplus::OnNavigateUp(void)
 {
-	list<PastedFile_t> FileList;
-	PastedFile_t pf;
 	TCHAR szDirectory[MAX_PATH];
-
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory),
 		szDirectory);
 	PathStripPath(szDirectory);
 
 	BrowseFolder(EMPTY_STRING,SBSP_PARENT|SBSP_SAMEBROWSER);
 
-	StringCchCopy(pf.szFileName,SIZEOF_ARRAY(pf.szFileName),szDirectory);
-
-	FileList.push_back(pf);
-
-	m_pActiveShellBrowser->SelectItems(&FileList);
+	m_pActiveShellBrowser->SelectFiles(szDirectory);
 }
 
 void Explorerplusplus::SaveAllSettings(void)

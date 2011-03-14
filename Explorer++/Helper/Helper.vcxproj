@@ -230,7 +230,6 @@
   <ItemGroup>
     <ClCompile Include="BaseDialog.cpp" />
     <ClCompile Include="Bookmark.cpp" />
-    <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="ContextMenuManager.cpp" />
     <ClCompile Include="Controls.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
@@ -271,7 +270,6 @@
   <ItemGroup>
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="Bookmark.h" />
-    <ClInclude Include="Buffer.h" />
     <ClInclude Include="ContextMenuManager.h" />
     <ClInclude Include="Controls.h" />
     <ClInclude Include="CustomMenu.h" />

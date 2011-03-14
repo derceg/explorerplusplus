@@ -15,7 +15,6 @@
 #include <sstream>
 #include "Helper.h"
 #include "FileOperations.h"
-#include "Buffer.h"
 #include "ShellHelper.h"
 
 

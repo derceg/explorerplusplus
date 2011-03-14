@@ -15,7 +15,6 @@
 #include "Helper.h"
 #include "ShellHelper.h"
 #include "FileOperations.h"
-#include "Buffer.h"
 #include "RegistrySettings.h"
 
 

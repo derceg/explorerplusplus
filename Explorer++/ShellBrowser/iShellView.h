@@ -318,7 +318,7 @@ __interface IShellBrowser2 : IUnknown
 	virtual void			SetGroupingFlag(BOOL bShowInGroups);
 	virtual HRESULT			SetEnumFlags(DWORD);
 	virtual int				SelectFiles(TCHAR *FileNamePattern);
-	virtual void			SelectItems(list<PastedFile_t> *pFileList);
+	virtual void			SelectItems(const std::list<std::wstring> &PastedFileList);
 	virtual DWORD			QueryFileAttributes(int iItem);
 	virtual void			DragStarted(int iFirstItem,POINT *ptCursor);
 	virtual LPWIN32_FIND_DATA	QueryFileFindData(int iItem);

@@ -51,7 +51,7 @@ void CFolderView::DirectoryAltered(void)
 	file matches the name of the added file, add the file in-place
 	with its new name.
 	The operation should NOT be queued, as it is possible that
-	other actions for the file wil take place before the addition,
+	other actions for the file will take place before the addition,
 	which will again result in an incorrect state.
 	*/
 	for each(auto af in m_AlteredList)
@@ -105,15 +105,14 @@ void CFolderView::DirectoryAltered(void)
 
 	m_AlteredList.clear();
 
-	list<PastedFile_t>::iterator itr2;
 	BOOL bFocusSet = FALSE;
 	int iIndex;
 
 	/* Select the specified items, and place the
 	focus on the first item. */
-	for(itr2 = m_pFileSelectionList.begin();itr2 != m_pFileSelectionList.end();)
+	for(auto itr = m_FileSelectionList.begin();itr != m_FileSelectionList.end();itr++)
 	{
-		iIndex = LocateFileItemIndex(itr2->szFileName);
+		iIndex = LocateFileItemIndex(itr->c_str());
 
 		if(iIndex != -1)
 		{
@@ -127,11 +126,11 @@ void CFolderView::DirectoryAltered(void)
 				bFocusSet = TRUE;
 			}
 
-			itr2 = m_pFileSelectionList.erase(itr2);
+			itr = m_FileSelectionList.erase(itr);
 		}
 		else
 		{
-			++itr2;
+			++itr;
 		}
 	}
 

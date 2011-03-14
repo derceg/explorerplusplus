@@ -28,7 +28,7 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 	g_bTabDragTimerElapsed = FALSE;
 
 	std::list<FORMATETC> ftcList;
-	CDropHandler::GetDropFormats(&ftcList);
+	CDropHandler::GetDropFormats(ftcList);
 
 	BOOL bDataAccept = FALSE;
 
@@ -273,15 +273,11 @@ POINTL pt,DWORD *pdwEffect)
 	
 	if(m_bDataAccept)
 	{
-		IDropHandler *pDropHandler = NULL;
-
-		pDropHandler = new CDropHandler();
-
+		CDropHandler *pDropHandler = CDropHandler::CreateNew();
 		pDropHandler->Drop(pDataObject,
 			grfKeyState,pt,pdwEffect,m_hTabCtrl,
 			m_DragType,szDestDirectory,
 			NULL,FALSE);
-
 		pDropHandler->Release();
 	}
 

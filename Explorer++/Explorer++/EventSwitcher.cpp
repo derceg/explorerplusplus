@@ -181,24 +181,3 @@ void Explorerplusplus::OnPaste(void)
 		OnTreeViewPaste();
 	}
 }
-
-/* This will be called once files have been pasted from the background
-thread (provided the paste actually succeeded). */
-void PasteFilesCallback(void *pData,list<PastedFile_t> *pPastedFileList)
-{
-	Explorerplusplus *pContainer = NULL;
-
-	pContainer = (Explorerplusplus *)pData;
-
-	pContainer->PasteFilesCallbackInternal(pPastedFileList);
-}
-
-void Explorerplusplus::PasteFilesCallbackInternal(list<PastedFile_t> *pPastedFileList)
-{
-	/* If the files were pasted successfully, and the tab currently
-	does not have any selected files, then select the pasted files. */
-	if(m_pActiveShellBrowser->QueryNumSelected() == 0)
-	{
-		m_pActiveShellBrowser->SelectItems(pPastedFileList);
-	}
-}

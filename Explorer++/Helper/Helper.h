@@ -101,11 +101,6 @@ typedef struct
 	WORD wCodePage;
 } LANGANDCODEPAGE;
 
-typedef struct
-{
-	TCHAR szFileName[MAX_PATH];
-} PastedFile_t;
-
 typedef enum
 {
 	GROUP_ADMINISTRATORS,

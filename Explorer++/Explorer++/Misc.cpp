@@ -882,7 +882,7 @@ BOOL Explorerplusplus::CanPaste(void)
 	HWND hFocus = GetFocus();
 
 	std::list<FORMATETC> ftcList;
-	CDropHandler::GetDropFormats(&ftcList);
+	CDropHandler::GetDropFormats(ftcList);
 
 	BOOL bDataAvailable = FALSE;
 

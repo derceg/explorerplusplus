@@ -76,7 +76,7 @@ HRESULT CFolderView::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	EnterCriticalSection(&m_csDirectoryAltered);
 	m_FilesAdded.clear();
-	m_pFileSelectionList.clear();
+	m_FileSelectionList.clear();
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
 	GetDisplayName(pidl,szParsingPath,SHGDN_FORPARSING);
