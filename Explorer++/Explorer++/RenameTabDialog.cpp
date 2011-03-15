@@ -22,19 +22,13 @@
 const TCHAR CRenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
 CRenameTabDialog::CRenameTabDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,IExplorerplusplus *pexpp) :
+	int iResource,HWND hParent,int iTab,IExplorerplusplus *pexpp) :
 CBaseDialog(hInstance,iResource,hParent,false)
 {
+	m_iTab = iTab;
 	m_pexpp = pexpp;
 
 	m_prtdps = &CRenameTabDialogPersistentSettings::GetInstance();
-
-	/* TODO: Need tab name. Query from tab directly. */
-	/*TCITEM tcItem;
-	tcItem.mask			= TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,g_iTab,&tcItem);
-
-	SetWindowText(hEditName,m_TabInfo[(int)tcItem.lParam].szName);*/
 }
 
 CRenameTabDialog::~CRenameTabDialog()
@@ -46,8 +40,7 @@ BOOL CRenameTabDialog::OnInitDialog()
 {
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
 
-	/* TODO: */
-	//SetWindowText(hEditName,m_szTabName);
+	SetWindowText(hEditName,m_pexpp->GetTabName(m_iTab).c_str());
 
 	/* When this dialog is opened, the 'custom name' option will
 	be selected by default (whether or not that is the actual
@@ -127,10 +120,18 @@ void CRenameTabDialog::OnOk()
 	{
 		HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
 
+		if(GetWindowTextLength(hEditName) == 0)
+		{
+			/* TODO: Move string into string table. */
+			MessageBox(m_hDlg,_T("Please enter a custom name"),_T("Rename Tab"),MB_OK);
+			SetFocus(hEditName);
+			return;
+		}
+
 		GetWindowText(hEditName,szTabText,SIZEOF_ARRAY(szTabText));
 	}
 
-	/* TODO: Need to be able to change tab name. */
+	m_pexpp->SetTabName(m_iTab,szTabText,(uCheckStatus != BST_CHECKED));
 
 	EndDialog(m_hDlg,1);
 }

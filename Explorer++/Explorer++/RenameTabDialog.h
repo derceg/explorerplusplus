@@ -30,7 +30,7 @@ class CRenameTabDialog : public CBaseDialog
 {
 public:
 
-	CRenameTabDialog(HINSTANCE hInstance,int iResource,HWND hParent,IExplorerplusplus *pexpp);
+	CRenameTabDialog(HINSTANCE hInstance,int iResource,HWND hParent,int iTab,IExplorerplusplus *pexpp);
 	~CRenameTabDialog();
 
 protected:
@@ -51,6 +51,7 @@ private:
 	CRenameTabDialogPersistentSettings	*m_prtdps;
 
 	IExplorerplusplus	*m_pexpp;
+	int		m_iTab;
 	TCHAR	m_szTabName[256];
 };
 

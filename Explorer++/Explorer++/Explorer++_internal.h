@@ -271,6 +271,9 @@ __interface IExplorerplusplus
 {
 	virtual HWND			GetActiveListView();
 	virtual IShellBrowser2	*GetActiveShellBrowser();
+
+	virtual std::wstring	GetTabName(int iTab);
+	virtual void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
 };
 
 /* Tab icons. */

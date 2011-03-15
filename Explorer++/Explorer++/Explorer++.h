@@ -928,6 +928,10 @@ private:
 	void					MapAttributeToValue(MSXML2::IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
 	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,TabInfo_t *pTabInfo);
 
+	/* Tabs. */
+	std::wstring			GetTabName(int iTab);
+	void					SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
+
 	/* Miscellaneous. */
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
 	void					OnShowOptions(void);
@@ -1052,7 +1056,7 @@ private:
 	TabInfo_t				m_TabInfo[MAX_TABS];
 	UINT					m_uTabMap[MAX_TABS];
 
-	/* Directory-speecific settings. */
+	/* Directory-specific settings. */
 	std::list<DirectorySettings_t>	m_DirectorySettingsList;
 
 	/* User options variables. */

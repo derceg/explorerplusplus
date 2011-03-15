@@ -34,6 +34,33 @@ UINT TabCtrlStyles			=	WS_VISIBLE|WS_CHILD|TCS_FOCUSNEVER|TCS_SINGLELINE|
 extern LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
 extern LRESULT	(CALLBACK *DefaultListViewProc)(HWND,UINT,WPARAM,LPARAM);
 
+std::wstring Explorerplusplus::GetTabName(int iTab)
+{
+	TCITEM tcItem;
+	tcItem.mask = TCIF_PARAM;
+	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+
+	return std::wstring(m_TabInfo[static_cast<int>(tcItem.lParam)].szName);
+}
+
+void Explorerplusplus::SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName)
+{
+	TCITEM tcItem;
+	tcItem.mask = TCIF_PARAM;
+	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+
+	StringCchCopy(m_TabInfo[static_cast<int>(tcItem.lParam)].szName,
+		SIZEOF_ARRAY(m_TabInfo[static_cast<int>(tcItem.lParam)].szName),strName.c_str());
+	m_TabInfo[static_cast<int>(tcItem.lParam)].bUseCustomName = bUseCustomName;
+
+	TCHAR szName[256];
+	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());
+
+	tcItem.mask = TCIF_TEXT;
+	tcItem.pszText = szName;
+	TabCtrl_SetItem(m_hTabCtrl,iTab,&tcItem);
+}
+
 void Explorerplusplus::InitializeTabMap(void)
 {
 	int i = 0;
@@ -1463,7 +1490,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_RENAMETAB:
 			{
-				CRenameTabDialog RenameTabDialog(g_hLanguageModule,IDD_RENAMETAB,m_hContainer,this);
+				CRenameTabDialog RenameTabDialog(g_hLanguageModule,IDD_RENAMETAB,m_hContainer,iTabHit,this);
 
 				RenameTabDialog.ShowModalDialog();
 			}
