@@ -1878,3 +1878,8 @@ void Explorerplusplus::SetTabProxyIcon(int iTabId,HICON hIcon)
 		}
 	}
 }
+
+int Explorerplusplus::GetCurrentTabId()
+{
+	return m_iObjectIndex;
+}

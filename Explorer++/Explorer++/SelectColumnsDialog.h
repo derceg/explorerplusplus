@@ -31,7 +31,7 @@ class CSelectColumnsDialog : public CBaseDialog
 {
 public:
 
-	CSelectColumnsDialog(HINSTANCE hInstance,int iResource,HWND hParent);
+	CSelectColumnsDialog(HINSTANCE hInstance,int iResource,HWND hParent,IExplorerplusplus *pexpp);
 	~CSelectColumnsDialog();
 
 protected:
@@ -52,6 +52,7 @@ private:
 	void	OnLvnItemChanging(NMLISTVIEW *pnmlv);
 	void	OnMoveColumn(bool bUp);
 
+	IExplorerplusplus	*m_pexpp;
 	BOOL	m_bColumnsSwapped;
 
 	CSelectColumnsDialogPersistentSettings	*m_pscdps;

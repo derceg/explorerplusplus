@@ -572,6 +572,7 @@ private:
 	void					RefreshTab(int iTabId);
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
+	int						GetCurrentTabId();
 
 	/* Drag and drop. */
 	void					OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt);

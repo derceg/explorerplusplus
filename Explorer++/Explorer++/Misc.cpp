@@ -2315,7 +2315,7 @@ int Explorerplusplus::LookupColumnDescriptionStringIndex(int iColumnId)
 
 void Explorerplusplus::OnSelectColumns()
 {
-	CSelectColumnsDialog SelectColumnsDialog(g_hLanguageModule,IDD_SELECTCOLUMNS,m_hContainer);
+	CSelectColumnsDialog SelectColumnsDialog(g_hLanguageModule,IDD_SELECTCOLUMNS,m_hContainer,this);
 	SelectColumnsDialog.ShowModalDialog();
 
 	UpdateArrangeMenuItems();

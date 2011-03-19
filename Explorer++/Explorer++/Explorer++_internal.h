@@ -274,6 +274,11 @@ __interface IExplorerplusplus
 
 	virtual std::wstring	GetTabName(int iTab);
 	virtual void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
+	virtual void			RefreshTab(int iTabId);
+	virtual int				GetCurrentTabId();
+
+	virtual int				LookupColumnNameStringIndex(int iColumnId);
+	virtual int				LookupColumnDescriptionStringIndex(int iColumnId);
 };
 
 /* Tab icons. */

@@ -22,9 +22,10 @@
 const TCHAR CSelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectColumns");
 
 CSelectColumnsDialog::CSelectColumnsDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent) :
+	int iResource,HWND hParent,IExplorerplusplus *pexpp) :
 CBaseDialog(hInstance,iResource,hParent,true)
 {
+	m_pexpp = pexpp;
 	m_bColumnsSwapped = FALSE;
 
 	m_pscdps = &CSelectColumnsDialogPersistentSettings::GetInstance();
@@ -44,35 +45,34 @@ BOOL CSelectColumnsDialog::OnInitDialog()
 		LVS_EX_CHECKBOXES,LVS_EX_CHECKBOXES);
 
 	LVCOLUMN lvColumn;
-	lvColumn.mask	= LVCF_WIDTH;
-	lvColumn.cx		= 180;
+	lvColumn.mask = 0;
 	ListView_InsertColumn(hListView,0,&lvColumn);
 
-	/* TODO: */
-	//std::list<Column_t> ActiveColumnList;
-	//m_pActiveShellBrowser->ExportCurrentColumns(&pActiveColumnList);
+	std::list<Column_t> ActiveColumnList;
+	m_pexpp->GetActiveShellBrowser()->ExportCurrentColumns(&ActiveColumnList);
 
-	//int iItem = 0;
+	int iItem = 0;
 
-	//for each(auto Column in ActiveColumnList)
-	//{
-	//	/* TODO: */
-	//	TCHAR szText[64];
-	//	/*LoadString(g_hLanguageModule,LookupColumnNameStringIndex(itr->id),
-	//		szText,SIZEOF_ARRAY(szText));*/
+	for each(auto Column in ActiveColumnList)
+	{
+		TCHAR szText[64];
+		LoadString(GetInstance(),m_pexpp->LookupColumnNameStringIndex(Column.id),
+			szText,SIZEOF_ARRAY(szText));
 
-	//	LVITEM lvItem;
-	//	lvItem.mask		= LVIF_TEXT | LVIF_PARAM;
-	//	lvItem.iItem	= iItem;
-	//	lvItem.iSubItem	= 0;
-	//	lvItem.pszText	= szText;
-	//	lvItem.lParam	= Column.id;
-	//	ListView_InsertItem(hListView,&lvItem);
+		LVITEM lvItem;
+		lvItem.mask		= LVIF_TEXT|LVIF_PARAM;
+		lvItem.iItem	= iItem;
+		lvItem.iSubItem	= 0;
+		lvItem.pszText	= szText;
+		lvItem.lParam	= Column.id;
+		ListView_InsertItem(hListView,&lvItem);
 
-	//	ListView_SetCheckState(hListView,iItem,Column.bChecked);
+		ListView_SetCheckState(hListView,iItem,Column.bChecked);
 
-	//	iItem++;
-	//}
+		iItem++;
+	}
+
+	ListView_SetColumnWidth(hListView,0,LVSCW_AUTOSIZE);
 
 	ListView_SelectItem(hListView,0,TRUE);
 	SetFocus(hListView);
@@ -195,9 +195,8 @@ void CSelectColumnsDialog::SaveState()
 
 void CSelectColumnsDialog::OnOk()
 {
-	std::list<Column_t> ColumnTempList;
-
 	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
+	std::list<Column_t> ColumnTempList;
 
 	for(int i = 0;i < ListView_GetItemCount(hListView);i++)
 	{
@@ -214,13 +213,12 @@ void CSelectColumnsDialog::OnOk()
 		ColumnTempList.push_back(Column);
 	}
 
-	/* TODO: */
-	/*m_pActiveShellBrowser->ImportColumns(&ColumnTempList,m_bColumnsSwapped);
+	m_pexpp->GetActiveShellBrowser()->ImportColumns(&ColumnTempList,m_bColumnsSwapped);
 
 	if(m_bColumnsSwapped)
 	{
-		RefreshTab(m_iObjectIndex);
-	}*/
+		m_pexpp->RefreshTab(m_pexpp->GetCurrentTabId());
+	}
 
 	EndDialog(m_hDlg,1);
 }
@@ -242,13 +240,12 @@ void CSelectColumnsDialog::OnLvnItemChanging(NMLISTVIEW *pnmlv)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(hListView,&lvItem);
 
-		/* TODO */
-		/*int iDescriptionStringIndex = LookupColumnDescriptionStringIndex((int)lvItem.lParam);
+		int iDescriptionStringIndex = m_pexpp->LookupColumnDescriptionStringIndex(static_cast<int>(lvItem.lParam));
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetInstance(),iDescriptionStringIndex,szColumnDescription,
 			SIZEOF_ARRAY(szColumnDescription));
-		SetDlgItemText(m_hDlg,IDC_COLUMNS_DESCRIPTION,szColumnDescription);*/
+		SetDlgItemText(m_hDlg,IDC_COLUMNS_DESCRIPTION,szColumnDescription);
 	}
 }
 
