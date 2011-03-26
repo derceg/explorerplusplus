@@ -12,10 +12,10 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Czech (Czech Republic) resources
+// Czech resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CSY)
-LANGUAGE LANG_CZECH, SUBLANG_DEFAULT
+LANGUAGE LANG_CZECH, SUBLANG_NEUTRAL
 #pragma code_page(1250)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,212,146,50,14
     CONTROL         231,IDC_ABOUT_STATIC_IMAGE,"Static",SS_BITMAP,0,0,16,14,WS_EX_STATICEDGE
     LTEXT           "Explorer++ Version %s (%s)",IDC_STATIC_VERSIONNUMBER,5,63,246,8
-    LTEXT           "Copyright © 2005-2010 David Erceg",IDC_STATIC,5,91,118,8
+    LTEXT           "Copyright © 2005-2011 David Erceg",IDC_STATIC,5,91,118,8
     LTEXT           "This program is freeware and released under the GNU General Public License",IDC_STATIC,9,130,245,8
     CONTROL         "<a href=""http://www.explorerplusplus.com"">www.explorerplusplus.com</a>",IDC_SITELINK,
                     "SysLink",WS_TABSTOP,5,105,91,12
@@ -39,7 +39,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,121,259,20
 END
 
-IDD_OPTIONS_FILESFOLDERS DIALOGEX 0, 0, 230, 213
+IDD_OPTIONS_FILESFOLDERS DIALOGEX 0, 0, 230, 283
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Soubory a složky"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -55,23 +55,26 @@ BEGIN
     CONTROL         "&Single-click to open an item (point to select)",IDC_SETTINGS_CHECK_SINGLECLICK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,155,10
     CONTROL         "Zobrazit velikosti složek",IDC_SETTINGS_CHECK_FOLDERSIZES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,91,10
-    CONTROL         "Zobrazit velikost všech souboru v bajtech",IDC_SETTINGS_CHECK_SIZEBYTES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,149,10
-    CONTROL         "Handle &zip files",IDC_SETTINGS_CHECK_ZIPFILES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,63,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,85,91,10
+    CONTROL         "Show all &file sizes in:",IDC_SETTINGS_CHECK_FORCESIZE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,81,10
+    CONTROL         "Handle &zip files",IDC_SETTINGS_CHECK_ZIPFILES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,124,63,10
     CONTROL         "Uživatelsky poívitivá data",IDC_SETTINGS_CHECK_FRIENDLYDATES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,124,97,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,137,97,10
     CONTROL         "Zobrazit tipy pro soubory:",IDC_OPTIONS_CHECK_SHOWINFOTIPS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,137,99,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,150,99,10
     CONTROL         "Zobrazit systémové tipy",IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,150,93,10
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,19,163,93,10
     CONTROL         "Zobrazit uživatelské tipy",IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,
-                    "Button",BS_AUTORADIOBUTTON,19,161,93,10
+                    "Button",BS_AUTORADIOBUTTON,19,174,93,10
     CONTROL         "Disable folder sizes on removable and network drives",IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,85,185,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,98,185,10
+    CONTROL         "Ask for confirmation before overwriting existing files",IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,183,10
+    COMBOBOX        IDC_COMBO_FILESIZES,89,109,48,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
 
-IDD_OPTIONS_GENERAL DIALOGEX 0, 0, 230, 263
+IDD_OPTIONS_GENERAL DIALOGEX 0, 0, 230, 283
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_CONTEXTHELP
 CAPTION "General"
@@ -79,10 +82,10 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Poi startu programu",IDC_STATIC,6,7,217,38
     CONTROL         "Naeíst poedchozí panely",IDC_STARTUP_PREVIOUSTABS,
-                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,17,77,10
-    CONTROL         "Naeíst výchozí složku",IDC_STARTUP_DEFAULTFOLDER,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,30,77,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,13,17,93,10
+    CONTROL         "Naeíst výchozí složku",IDC_STARTUP_DEFAULTFOLDER,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,13,30,83,10
     GROUPBOX        "General settings",IDC_STATIC,6,115,217,66
-    CONTROL         "Uložit nastavení do XML souboru",IDC_OPTION_XML,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,129,182,10
+    CONTROL         "Uložit nastavení do XML souboru",IDC_OPTION_XML,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,129,119,10
     LTEXT           "Default &new tab folder:",IDC_STATIC,13,144,76,8
     EDITTEXT        IDC_DEFAULT_NEWTABDIR_EDIT,19,158,173,14,ES_AUTOHSCROLL
     PUSHBUTTON      "",IDC_DEFAULT_NEWTABDIR_BUTTON,197,158,21,14,BS_ICON
@@ -92,7 +95,7 @@ BEGIN
     COMBOBOX        IDC_OPTIONS_LANGUAGE,53,234,101,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Default File Manager",IDC_STATIC,6,51,217,58
     CONTROL         "Nahradit Explorer pro systémové složky",IDC_OPTION_REPLACEEXPLORER_FILESYSTEM,
-                    "Button",BS_AUTORADIOBUTTON,13,78,139,10
+                    "Button",BS_AUTORADIOBUTTON,13,78,143,10
     CONTROL         "&Don't replace Explorer",IDC_OPTION_REPLACEEXPLORER_NONE,
                     "Button",BS_AUTORADIOBUTTON,13,65,87,10
     CONTROL         "Replace Explorer for &all folders",IDC_OPTION_REPLACEEXPLORER_ALL,
@@ -104,26 +107,26 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Zminit atributy souboru"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Pro zminu dat tohoto souboru, nastavte datum na ovládání dole.",IDC_STATIC,7,4,179,16
-    CONTROL         "",IDC_MODIFICATIONDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,28,62,13
-    CONTROL         "",IDC_MODIFICATIONTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,28,62,13
-    PUSHBUTTON      "Reset",IDC_MODIFICATION_RESET,209,28,50,13
-    LTEXT           "Zminin dne:",IDC_STATIC,7,29,58,8
-    CONTROL         "",IDC_CREATIONDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,48,62,13
-    CONTROL         "",IDC_CREATIONTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,48,62,13
-    PUSHBUTTON      "Reset",IDC_CREATION_RESET,209,48,50,13
-    LTEXT           "Vytvooen dne:",IDC_STATIC,7,49,48,8
-    CONTROL         "",IDC_ACCESSDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,68,62,13
-    CONTROL         "",IDC_ACCESSTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,68,62,13
-    PUSHBUTTON      "Reset",IDC_ACCESS_RESET,209,68,50,13
-    CONTROL         "Archiv",IDC_CHECK_ARCHIVE,"Button",BS_AUTO3STATE | WS_TABSTOP,19,107,40,10
-    CONTROL         "Skrytý",IDC_CHECK_HIDDEN,"Button",BS_AUTO3STATE | WS_TABSTOP,78,107,38,10
-    CONTROL         "Indexovaný",IDC_CHECK_INDEXED,"Button",BS_AUTO3STATE | WS_TABSTOP,133,107,43,10
-    CONTROL         "Pouze ke etení",IDC_CHECK_READONLY,"Button",BS_AUTO3STATE | WS_TABSTOP,19,125,48,10
-    CONTROL         "Systémový",IDC_CHECK_SYSTEM,"Button",BS_AUTO3STATE | WS_TABSTOP,78,125,39,10
-    DEFPUSHBUTTON   "OK",IDOK,209,95,50,14
-    PUSHBUTTON      "Storno",IDCANCEL,209,116,50,14
-    GROUPBOX        "Atributy",IDC_STATIC,7,91,175,51
+    CONTROL         "",IDC_MODIFICATIONDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,6,62,13
+    CONTROL         "",IDC_MODIFICATIONTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,6,62,13
+    PUSHBUTTON      "Reset",IDC_MODIFICATION_RESET,209,6,50,13
+    LTEXT           "Zminin dne:",IDC_STATIC,7,7,38,8
+    CONTROL         "",IDC_CREATIONDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,26,62,13
+    CONTROL         "",IDC_CREATIONTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,26,62,13
+    PUSHBUTTON      "Reset",IDC_CREATION_RESET,209,26,50,13
+    LTEXT           "Vytvooen dne:",IDC_STATIC,7,28,48,8
+    CONTROL         "",IDC_ACCESSDATE,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_SHOWNONE | WS_TABSTOP,75,46,62,13
+    CONTROL         "",IDC_ACCESSTIME,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,140,46,62,13
+    PUSHBUTTON      "Reset",IDC_ACCESS_RESET,209,46,50,13
+    CONTROL         "Archiv",IDC_CHECK_ARCHIVE,"Button",BS_AUTO3STATE | WS_TABSTOP,19,85,36,10
+    CONTROL         "Skrytý",IDC_CHECK_HIDDEN,"Button",BS_AUTO3STATE | WS_TABSTOP,84,85,37,10
+    CONTROL         "Indexovaný",IDC_CHECK_INDEXED,"Button",BS_AUTO3STATE | WS_TABSTOP,137,85,55,10
+    CONTROL         "Pouze ke etení",IDC_CHECK_READONLY,"Button",BS_AUTO3STATE | WS_TABSTOP,19,103,63,10
+    CONTROL         "Systémový",IDC_CHECK_SYSTEM,"Button",BS_AUTO3STATE | WS_TABSTOP,84,103,51,10
+    DEFPUSHBUTTON   "OK",IDOK,209,73,50,14
+    PUSHBUTTON      "Storno",IDCANCEL,209,94,50,14
+    GROUPBOX        "Atributy",IDC_STATIC,7,69,193,51
+    LTEXT           "Pøístupné a datum:",IDC_STATIC,7,49,62,8
 END
 
 IDD_DESTROYFILES DIALOGEX 0, 0, 305, 228
@@ -144,17 +147,17 @@ BEGIN
     PUSHBUTTON      "Storno",IDCANCEL,250,210,50,14
 END
 
-IDD_MASSRENAME DIALOGEX 0, 0, 332, 157
+IDD_MASSRENAME DIALOGEX 0, 0, 352, 157
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Hromadné poejmenování"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Šablona cílového jména:",IDC_STATIC,6,5,78,8
-    EDITTEXT        IDC_MASSRENAME_EDIT,86,4,223,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "",IDC_MASSRENAME_MORE,311,3,18,14,BS_ICON
-    CONTROL         "",IDC_MASSRENAME_FILELISTVIEW,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,6,21,323,109
-    DEFPUSHBUTTON   "OK",IDOK,225,137,50,14
-    PUSHBUTTON      "Storno",IDCANCEL,279,137,50,14
+    LTEXT           "Šablona cílového jména:",IDC_STATIC,6,6,78,8
+    EDITTEXT        IDC_MASSRENAME_EDIT,86,4,237,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_MASSRENAME_MORE,327,3,18,14,BS_ICON
+    CONTROL         "",IDC_MASSRENAME_FILELISTVIEW,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,5,21,340,109
+    DEFPUSHBUTTON   "OK",IDOK,241,137,50,14
+    PUSHBUTTON      "Storno",IDCANCEL,295,137,50,14
 END
 
 IDD_WILDCARDSELECT DIALOGEX 0, 0, 277, 41
@@ -167,36 +170,36 @@ BEGIN
     PUSHBUTTON      "Storno",IDCANCEL,222,22,50,14
 END
 
-IDD_DISPLAYCOLOURS DIALOGEX 0, 0, 449, 223
+IDD_DISPLAYCOLOURS DIALOGEX 0, 0, 435, 223
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Zminit barvy zobrazení"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Barva stoedu",IDC_STATIC,4,2,214,102
+    GROUPBOX        "Barva stoedu",IDC_STATIC,4,2,208,102
     LTEXT           "Eervená:",IDC_STATIC,8,17,30,8
-    CONTROL         "",IDC_SLIDER_CENTRE_RED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,38,12,148,23
-    EDITTEXT        IDC_EDIT_CENTRE_RED,186,13,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SLIDER_CENTRE_RED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,34,12,148,23
+    EDITTEXT        IDC_EDIT_CENTRE_RED,182,13,25,16,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "Zelená:",IDC_STATIC,8,47,25,8
-    CONTROL         "",IDC_SLIDER_CENTRE_GREEN,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,38,44,148,23
-    EDITTEXT        IDC_EDIT_CENTRE_GREEN,186,44,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_SLIDER_CENTRE_GREEN,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,34,44,148,23
+    EDITTEXT        IDC_EDIT_CENTRE_GREEN,182,44,25,16,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "Modrá:",IDC_STATIC,8,79,24,8
-    CONTROL         "",IDC_SLIDER_CENTRE_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,38,76,148,23
-    EDITTEXT        IDC_EDIT_CENTRE_BLUE,186,74,25,16,ES_AUTOHSCROLL | ES_NUMBER
-    GROUPBOX        "Barva okolí",IDC_STATIC,228,2,214,104
-    LTEXT           "Eervená:",IDC_STATIC,232,19,30,8
-    CONTROL         "",IDC_SLIDER_SURROUND_RED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,260,14,148,23
-    EDITTEXT        IDC_EDIT_SURROUND_RED,410,15,25,16,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Zelená:",IDC_STATIC,232,50,25,8
-    CONTROL         "",IDC_SLIDER_SURROUND_GREEN,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,260,46,148,23
-    EDITTEXT        IDC_EDIT_SURROUND_GREEN,410,46,25,16,ES_AUTOHSCROLL | ES_NUMBER
-    LTEXT           "Modrá:",IDC_STATIC,232,81,24,8
-    CONTROL         "",IDC_SLIDER_SURROUND_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,260,78,148,23
-    EDITTEXT        IDC_EDIT_SURROUND_BLUE,410,77,25,16,ES_AUTOHSCROLL | ES_NUMBER
-    PUSHBUTTON      "Restore &Defaults",IDC_BUTTON_RESTOREDEFAULTS,8,108,63,17
-    PUSHBUTTON      "Vybrat font...",IDC_BUTTON_DISPLAY_FONT,77,108,60,17
-    LTEXT           "",IDC_STATIC_PREVIEWDISPLAY,4,131,438,56,SS_SUNKEN
-    DEFPUSHBUTTON   "OK",IDOK,336,202,50,14
-    PUSHBUTTON      "Storno",IDCANCEL,392,202,50,14
+    CONTROL         "",IDC_SLIDER_CENTRE_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,34,76,148,23
+    EDITTEXT        IDC_EDIT_CENTRE_BLUE,182,74,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "Barva okolí",IDC_STATIC,219,2,208,104
+    LTEXT           "Eervená:",IDC_STATIC,223,19,30,8
+    CONTROL         "",IDC_SLIDER_SURROUND_RED,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,249,14,148,23
+    EDITTEXT        IDC_EDIT_SURROUND_RED,397,15,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Zelená:",IDC_STATIC,223,50,25,8
+    CONTROL         "",IDC_SLIDER_SURROUND_GREEN,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,249,46,148,23
+    EDITTEXT        IDC_EDIT_SURROUND_GREEN,397,46,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Modrá:",IDC_STATIC,223,81,24,8
+    CONTROL         "",IDC_SLIDER_SURROUND_BLUE,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,249,78,148,23
+    EDITTEXT        IDC_EDIT_SURROUND_BLUE,397,77,25,16,ES_AUTOHSCROLL | ES_NUMBER
+    PUSHBUTTON      "Restore &Defaults",IDC_BUTTON_RESTOREDEFAULTS,8,109,63,17
+    PUSHBUTTON      "Vybrat font...",IDC_BUTTON_DISPLAY_FONT,77,109,60,17
+    LTEXT           "",IDC_STATIC_PREVIEWDISPLAY,4,131,424,56,SS_SUNKEN
+    DEFPUSHBUTTON   "OK",IDOK,321,202,50,14
+    PUSHBUTTON      "Storno",IDCANCEL,377,202,50,14
 END
 
 IDD_FILTER DIALOGEX 0, 0, 277, 41
@@ -204,9 +207,9 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Výsledky filtru"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
+    COMBOBOX        IDC_FILTER_COMBOBOX,4,4,268,13,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,168,26,50,14
     PUSHBUTTON      "Storno",IDCANCEL,222,26,50,14
-    DEFPUSHBUTTON   "OK",IDOK,167,26,50,14
-    COMBOBOX        IDC_FILTER_COMBOBOX,5,5,267,20,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_ADD_BOOKMARK DIALOGEX 0, 0, 232, 167
@@ -243,23 +246,23 @@ BEGIN
     PUSHBUTTON      "&Vlastnosti",IDC_ORGANIZE_PROPERTIES,417,53,50,14
 END
 
-IDD_OPTIONS_DEFAULT DIALOGEX 0, 0, 230, 213
+IDD_OPTIONS_DEFAULT DIALOGEX 0, 0, 230, 283
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Výchozí nastavení"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Následující možnosti slouží k širokému nastavení výchozího chování programu. Každý nový panel tato nastavení poevezme, poté mohou být zminina pro daný panel.",IDC_STATIC,9,6,187,32
-    GROUPBOX        "Výchozí zobrazení",IDC_STATIC,9,39,175,46
-    CONTROL         "Náhledy",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON,17,51,42,10
-    CONTROL         "Dlaždice",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON,83,50,42,10
-    CONTROL         "Ikony",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON,128,49,34,10
-    CONTROL         "Seznam",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON,17,67,41,10
-    CONTROL         "Detaily",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON,83,67,38,10
-    CONTROL         "Malé ikony",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON,128,67,49,10
-    CONTROL         "Zobrazit skryté soubory",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,95,92,10
-    CONTROL         "Automaticky uspooádat",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,98,95,91,10
-    CONTROL         "Zobrazit ve skupinách",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,110,85,10
-    CONTROL         "Oadit vzestupni",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,98,110,66,10
+    LTEXT           "Následující možnosti slouží k širokému nastavení výchozího chování programu. Každý nový panel tato nastavení poevezme, poté mohou být zminina pro daný panel.",IDC_STATIC,6,7,214,32
+    GROUPBOX        "Výchozí zobrazení",IDC_STATIC,6,40,215,46
+    CONTROL         "Náhledy",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,52,42,10
+    CONTROL         "Dlaždice",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,52,42,10
+    CONTROL         "Ikony",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,52,34,10
+    CONTROL         "Seznam",IDC_DEFAULT_LIST,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,68,41,10
+    CONTROL         "Detaily",IDC_DEFAULT_DETAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,80,68,38,10
+    CONTROL         "Malé ikony",IDC_DEFAULT_SMALLICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,125,68,49,10
+    CONTROL         "Zobrazit skryté soubory",IDC_SHOWHIDDENGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,96,92,10
+    CONTROL         "Automaticky uspooádat",IDC_AUTOARRANGEGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,96,91,10
+    CONTROL         "Zobrazit ve skupinách",IDC_SHOWINGROUPSGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,85,10
+    CONTROL         "Oadit vzestupni",IDC_SORTASCENDINGGLOBAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,111,66,10
     PUSHBUTTON      "Defa&ult Columns....",IDC_BUTTON_DEFAULTCOLUMNS,6,131,76,14
 END
 
@@ -279,38 +282,38 @@ BEGIN
     PUSHBUTTON      "Storno",IDCANCEL,157,115,50,14
 END
 
-IDD_SPLITFILE DIALOGEX 0, 0, 235, 86
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_SPLITFILE DIALOGEX 0, 0, 251, 86
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Rozdilit soubor"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Rozdilit na velikost:",IDC_STATIC,20,6,31,8
-    EDITTEXT        IDC_SPLIT_EDIT_SIZE,55,3,40,12,ES_AUTOHSCROLL | ES_NUMBER
-    COMBOBOX        IDC_SPLIT_COMBOBOX_SIZES,101,3,48,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Výstupní složka:",IDC_STATIC,3,24,48,8
-    EDITTEXT        IDC_SPLIT_EDIT_OUTPUT,55,23,153,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_SPLIT_BUTTON_OUTPUT,213,23,17,12
-    CONTROL         "",IDC_SPLIT_PROGRESS,"msctls_progress32",WS_BORDER,3,49,226,9
-    DEFPUSHBUTTON   "OK",IDOK,127,65,50,14
-    PUSHBUTTON      "Zavoít",IDCANCEL,180,65,50,14
+    LTEXT           "Rozdilit na velikost:",IDC_STATIC,7,6,62,8
+    EDITTEXT        IDC_SPLIT_EDIT_SIZE,71,3,40,12,ES_AUTOHSCROLL | ES_NUMBER
+    COMBOBOX        IDC_SPLIT_COMBOBOX_SIZES,117,3,48,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Výstupní složka:",IDC_STATIC,17,24,52,8
+    EDITTEXT        IDC_SPLIT_EDIT_OUTPUT,71,23,153,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_SPLIT_BUTTON_OUTPUT,229,23,17,12
+    CONTROL         "",IDC_SPLIT_PROGRESS,"msctls_progress32",WS_BORDER,19,49,226,9
+    DEFPUSHBUTTON   "Split",IDOK,143,65,50,14
+    PUSHBUTTON      "Zavoít",IDCANCEL,196,65,50,14
 END
 
-IDD_MERGEFILES DIALOGEX 0, 0, 354, 177
+IDD_MERGEFILES DIALOGEX 0, 0, 375, 177
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Sloueit soubory"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "",IDC_MERGE_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,4,5,293,96
-    PUSHBUTTON      "Posunout výš",IDC_MERGE_BUTTON_MOVEUP,301,5,50,14
-    PUSHBUTTON      "Posunout níž",IDC_MERGE_BUTTON_MOVEDOWN,301,24,50,14
-    PUSHBUTTON      "Odstranit",IDC_MERGE_BUTTON_REMOVE,301,43,50,14
+    CONTROL         "",IDC_MERGE_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SHAREIMAGELISTS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,4,5,310,96
+    PUSHBUTTON      "Posunout výš",IDC_MERGE_BUTTON_MOVEUP,320,5,50,14
+    PUSHBUTTON      "Posunout níž",IDC_MERGE_BUTTON_MOVEDOWN,320,24,50,14
+    PUSHBUTTON      "Odstranit",IDC_MERGE_BUTTON_REMOVE,320,43,50,14
     LTEXT           "Výstupní soubor:",IDC_STATIC,4,112,55,8
-    EDITTEXT        IDC_MERGE_EDIT_FILENAME,62,111,272,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_MERGE_BUTTON_OUTPUT,338,111,13,12
-    CONTROL         "",IDC_MERGE_PROGRESS,"msctls_progress32",WS_BORDER,4,133,293,10
-    DEFPUSHBUTTON   "OK",IDOK,245,156,50,14
-    PUSHBUTTON      "Zavoít",IDCANCEL,301,156,50,14
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,150,346,1
+    EDITTEXT        IDC_MERGE_EDIT_FILENAME,61,111,253,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_MERGE_BUTTON_OUTPUT,320,111,19,12
+    CONTROL         "",IDC_MERGE_PROGRESS,"msctls_progress32",WS_BORDER,21,133,293,10
+    DEFPUSHBUTTON   "OK",IDOK,262,156,50,14
+    PUSHBUTTON      "Zavoít",IDCANCEL,318,156,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,150,364,1
 END
 
 IDD_NEWBOOKMARKFOLDER DIALOGEX 0, 0, 183, 65
@@ -341,18 +344,18 @@ BEGIN
     PUSHBUTTON      "Storno",IDCANCEL,157,95,50,14
 END
 
-IDD_RENAMETAB DIALOGEX 0, 0, 280, 57
+IDD_RENAMETAB DIALOGEX 0, 0, 284, 57
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Poejmenovat panel"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Použít název aktuální složky",IDC_RENAMETAB_USEFOLDERNAME,
-                    "Button",BS_AUTORADIOBUTTON,8,18,97,10
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,5,5,105,10
     CONTROL         "Použít vlastní název:",IDC_RENAMETAB_USECUSTOMNAME,
-                    "Button",BS_AUTORADIOBUTTON,8,33,75,10
-    EDITTEXT        IDC_RENAMETAB_NEWTABNAME,84,32,193,13,ES_AUTOHSCROLL
-    DEFPUSHBUTTON   "OK",IDOK,180,57,50,14
-    PUSHBUTTON      "Storno",IDCANCEL,233,57,50,14
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,5,20,82,10
+    EDITTEXT        IDC_RENAMETAB_NEWTABNAME,86,19,193,13,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,175,39,50,14
+    PUSHBUTTON      "Storno",IDCANCEL,229,39,50,14
 END
 
 IDD_SETDEFAULTCOLUMNS DIALOGEX 0, 0, 200, 290
@@ -360,18 +363,18 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Nastavit výchozí sloupce"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Typ složky:",IDC_STATIC,3,6,40,8
-    COMBOBOX        IDC_DEFAULTCOLUMNS_COMBOBOX,46,5,95,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "",IDC_DEFAULTCOLUMNS_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,3,22,137,174
-    PUSHBUTTON      "Posunout výš",IDC_DEFAULTCOLUMNS_MOVEUP,145,22,50,14
-    PUSHBUTTON      "Posunout níž",IDC_DEFAULTCOLUMNS_MOVEDOWN,145,38,50,14
-    PUSHBUTTON      "Zapnout",IDC_DEFAULTCOLUMNS_ENABLE,145,54,50,14
-    PUSHBUTTON      "Vypnout",IDC_DEFAULTCOLUMNS_DISABLE,145,70,50,14
-    DEFPUSHBUTTON   "OK",IDOK,92,238,50,14
-    PUSHBUTTON      "Storno",IDCANCEL,145,238,50,14
-    LTEXT           "Popis:",IDC_STATIC,3,202,39,8
-    LTEXT           "",IDC_DEFAULTCOLUMNS_DESCRIPTION,45,202,149,23
-    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,233,191,1
+    LTEXT           "Typ složky:",IDC_STATIC,3,40,40,8
+    COMBOBOX        IDC_DEFAULTCOLUMNS_COMBOBOX,46,39,95,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_DEFAULTCOLUMNS_LISTVIEW,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,3,56,137,174
+    PUSHBUTTON      "Posunout výš",IDC_DEFAULTCOLUMNS_MOVEUP,145,56,50,14
+    PUSHBUTTON      "Posunout níž",IDC_DEFAULTCOLUMNS_MOVEDOWN,145,72,50,14
+    PUSHBUTTON      "Zapnout",IDC_DEFAULTCOLUMNS_ENABLE,145,88,50,14
+    PUSHBUTTON      "Vypnout",IDC_DEFAULTCOLUMNS_DISABLE,145,104,50,14
+    DEFPUSHBUTTON   "OK",IDOK,92,272,50,14
+    PUSHBUTTON      "Storno",IDCANCEL,145,272,50,14
+    LTEXT           "Popis:",IDC_STATIC,3,236,39,8
+    LTEXT           "",IDC_DEFAULTCOLUMNS_DESCRIPTION,45,236,149,23
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,267,191,1
     LTEXT           "The default columns for each folder type can be set below. These columns will be used for each new tab, at which point they can be changed on a per-tab basis.",IDC_STATIC,3,7,191,29
 END
 
@@ -387,7 +390,7 @@ BEGIN
     PUSHBUTTON      "V&ypnout",IDC_COLUMNS_DISABLE,145,51,50,14
     DEFPUSHBUTTON   "OK",IDOK,92,219,50,14
     PUSHBUTTON      "Storno",IDCANCEL,145,219,50,14
-    LTEXT           "Popis:",IDC_STATIC,3,183,20,8
+    LTEXT           "Popis:",IDC_STATIC,3,183,39,8
     LTEXT           "",IDC_COLUMNS_DESCRIPTION,45,183,149,23
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,214,191,1
 END
@@ -404,7 +407,7 @@ BEGIN
     PUSHBUTTON      "...",IDC_APP_BUTTON_COMMAND,229,24,17,14
     CONTROL         "&Show name on application toolbar",IDC_CHECK_SHOWAPPNAME,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,41,45,123,10
-    DEFPUSHBUTTON   "OK",IDOK,142,68,50,14
+    DEFPUSHBUTTON   "OK",IDOK,143,68,50,14
     PUSHBUTTON      "Storno",IDCANCEL,196,68,50,14
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,4,62,242,20
 END
@@ -457,46 +460,66 @@ BEGIN
     CONTROL         "",IDC_COMBO_NAME,"ComboBoxEx32",CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP,67,26,241,198
 END
 
-IDD_OPTIONS_TABS DIALOGEX 0, 0, 230, 213
+IDD_OPTIONS_TABS DIALOGEX 0, 0, 230, 283
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Tabs"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Vynutit stejnou šíoku pro všechny panely",IDC_TABS_SAMEWIDTH,
-                    "Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,10,12,136,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,30,147,10
     CONTROL         "Žádat potvrzení poed zavoením všech panelu",IDC_TABS_CLOSECONFIRMATION,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,46,151,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,43,161,10
     CONTROL         "Otevoít nové panely vedle aktuálního",IDC_TABS_OPENNEXTTOCURRENT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,63,142,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,56,135,10
     CONTROL         "Open each folder in its own &tab",IDC_SETTINGS_CHECK_ALWAYSNEWTAB,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,116,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,69,116,10
     CONTROL         "&Double-click to close a tab",IDC_TABS_DOUBLECLICKCLOSE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,99,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,82,99,10
+    CONTROL         "Close the main window when closing the last tab",IDC_TABS_CLOSEMAINWINDOW,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,95,170,10
+    CONTROL         "Show taskbar thumbnails (Windows 7 and later)\n(Requires Explorer++ to be restarted)",IDC_TABS_TASKBARTHUMBNAILS,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,6,7,185,20
 END
 
-IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 213
+IDD_OPTIONS_WINDOW DIALOGEX 0, 0, 230, 283
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Window"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Allow &multiple instances",IDC_OPTION_MULTIPLEINSTANCES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,7,91,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,15,91,10
     CONTROL         "&Show file previews in display window",IDC_OPTION_FILEPREVIEWS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,20,133,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,261,133,10
     CONTROL         "Show full &path in title bar",IDC_SETTINGS_CHECK_TITLEPATH,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,33,95,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,80,95,10
     CONTROL         "Show &username in title bar",IDC_OPTION_USERNAMEINTITLEBAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,46,101,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,93,101,10
     CONTROL         "&Disable treeview delay",IDC_OPTION_TREEVIEWDELAY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,72,88,10
-    CONTROL         "Extend tab &control across entire window",IDC_OPTION_EXTENDTABCONTROL,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,85,145,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,225,88,10
+    CONTROL         "Extend tab &bar across entire window",IDC_OPTION_EXTENDTABCONTROL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,67,133,10
     CONTROL         "Show &gridlines in details view",IDC_OPTION_GRIDLINES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,98,108,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,138,108,10
     CONTROL         "Full row selection in details &view",IDC_OPTION_FULLROWSELECT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,111,117,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,164,117,10
     CONTROL         "Show privilege level in title bar",IDC_OPTION_PRIVILEGELEVELINTITLEBAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,59,113,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,106,113,10
+    CONTROL         "Always show the tab bar",IDC_OPTION_ALWAYSSHOWTABBAR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,41,95,10
+    GROUPBOX        "Treeview",IDC_STATIC,3,186,219,55
+    CONTROL         "Automatically synchronize treeview with main pane",IDC_OPTION_SYNCTREEVIEW,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,199,179,10
+    GROUPBOX        "General",IDC_STATIC,3,4,219,118
+    GROUPBOX        "Listview",IDC_STATIC,3,126,219,54
+    GROUPBOX        "Display Window",IDC_STATIC,3,246,219,30
+    CONTROL         "Use check boxes to select items",IDC_OPTION_CHECKBOXSELECTION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,151,117,10
+    CONTROL         "Show the tab bar at the bottom",IDC_OPTION_SHOWTABBARATBOTTOM,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,54,117,10
+    CONTROL         "Automatically expand nodes on selection",IDC_OPTION_TREEVIEWSELECTIONEXPAND,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,212,146,10
+    CONTROL         "Use large toolbar icons",IDC_OPTION_LARGETOOLBARICONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,28,89,10
 END
 
 IDD_CUSTOMIZECOLORS DIALOGEX 0, 0, 363, 152
@@ -506,9 +529,9 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_LISTVIEW_COLORRULES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_EDITLABELS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,6,7,297,140
     PUSHBUTTON      "&New...",IDC_BUTTON_NEW,308,7,50,14
-    PUSHBUTTON      "&Edit...",IDC_BUTTON_EDIT,308,26,50,14
-    PUSHBUTTON      "Move &Up",IDC_BUTTON_MOVEUP,308,45,50,14
-    PUSHBUTTON      "Move &Down",IDC_BUTTON_MOVEDOWN,308,64,50,14
+    PUSHBUTTON      "&Upravit...",IDC_BUTTON_EDIT,308,26,50,14
+    PUSHBUTTON      "Pos&unout výš",IDC_BUTTON_MOVEUP,308,45,50,14
+    PUSHBUTTON      "&Posunout níž",IDC_BUTTON_MOVEDOWN,308,64,50,14
     PUSHBUTTON      "Dele&te",IDC_BUTTON_DELETE,308,83,50,14
     DEFPUSHBUTTON   "OK",IDOK,308,133,50,14
 END
@@ -536,6 +559,10 @@ BEGIN
         BOTTOMMARGIN, 262
     END
 
+    IDD_SETFILEATTRIBUTES, DIALOG
+    BEGIN
+    END
+
     IDD_DESTROYFILES, DIALOG
     BEGIN
         RIGHTMARGIN, 303
@@ -555,7 +582,6 @@ BEGIN
     IDD_DISPLAYCOLOURS, DIALOG
     BEGIN
         LEFTMARGIN, 2
-        RIGHTMARGIN, 435
         TOPMARGIN, 1
     END
 
@@ -580,6 +606,11 @@ BEGIN
     BEGIN
     END
 
+    IDD_SPLITFILE, DIALOG
+    BEGIN
+        RIGHTMARGIN, 235
+    END
+
     IDD_MERGEFILES, DIALOG
     BEGIN
     END
@@ -593,6 +624,11 @@ BEGIN
     END
 
     IDD_RENAMETAB, DIALOG
+    BEGIN
+        RIGHTMARGIN, 280
+    END
+
+    IDD_SETDEFAULTCOLUMNS, DIALOG
     BEGIN
     END
 
@@ -734,18 +770,18 @@ BEGIN
         MENUITEM "&Vpoed\tAlt+Right",           IDM_GO_FORWARD
         MENUITEM "&O úroveo výš\tBackspace",    IDM_GO_UPONELEVEL
         MENUITEM SEPARATOR
-        MENUITEM "rezervované místo",           IDM_GO_MYCOMPUTER
-        MENUITEM "rezervované místo",           IDM_GO_MYDOCUMENTS
-        MENUITEM "rezervované místo",           IDM_GO_MYMUSIC
-        MENUITEM "rezervované místo",           IDM_GO_MYPICTURES
-        MENUITEM "rezervované místo",           IDM_GO_DESKTOP
+        MENUITEM "Placeholder",                 IDM_GO_MYCOMPUTER
+        MENUITEM "Placeholder",                 IDM_GO_MYDOCUMENTS
+        MENUITEM "Placeholder",                 IDM_GO_MYMUSIC
+        MENUITEM "Placeholder",                 IDM_GO_MYPICTURES
+        MENUITEM "Placeholder",                 IDM_GO_DESKTOP
         MENUITEM SEPARATOR
-        MENUITEM "rezervované místo",           IDM_GO_RECYCLEBIN
-        MENUITEM "rezervované místo",           IDM_GO_CONTROLPANEL
-        MENUITEM "rezervované místo",           IDM_GO_PRINTERS
-        MENUITEM "rezervované místo",           IDM_GO_CDBURNING
-        MENUITEM "rezervované místo",           IDM_GO_MYNETWORKPLACES
-        MENUITEM "rezervované místo",           IDM_GO_NETWORKCONNECTIONS
+        MENUITEM "Placeholder",                 IDM_GO_RECYCLEBIN
+        MENUITEM "Placeholder",                 IDM_GO_CONTROLPANEL
+        MENUITEM "Placeholder",                 IDM_GO_PRINTERS
+        MENUITEM "Placeholder",                 IDM_GO_CDBURNING
+        MENUITEM "Placeholder",                 IDM_GO_MYNETWORKPLACES
+        MENUITEM "Placeholder",                 IDM_GO_NETWORKCONNECTIONS
     END
     POPUP "Záložky"
     BEGIN
@@ -770,7 +806,7 @@ END
 
 IDR_MAINMENU_RCLICK MENU
 BEGIN
-    POPUP "Kontext menu"
+    POPUP "Popup"
     BEGIN
         POPUP "Zobrazit"
         BEGIN
@@ -794,7 +830,7 @@ END
 
 IDR_ARRANGEMENU MENU
 BEGIN
-    POPUP "Kontext menu"
+    POPUP "Popup"
     BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Vzestupni",                   IDM_ARRANGEICONSBY_ASCENDING
@@ -806,7 +842,7 @@ END
 
 IDR_TAB_RCLICK MENU
 BEGIN
-    POPUP "Kontext menu"
+    POPUP "Popup"
     BEGIN
         MENUITEM "&Nový panel\tCtrl+T",         IDM_FILE_NEWTAB
         MENUITEM "Duplikovat panel",            IDM_TAB_DUPLICATETAB
@@ -826,7 +862,7 @@ END
 
 IDR_VIEWS_MENU MENU
 BEGIN
-    POPUP "Kontext menu"
+    POPUP "Popup"
     BEGIN
         MENUITEM "Placeholder",                 IDM_VIEW_PLACEHOLDER
     END
@@ -834,7 +870,7 @@ END
 
 IDR_TOOLBAR_MENU MENU
 BEGIN
-    POPUP "Kontext menu"
+    POPUP "Popup"
     BEGIN
         MENUITEM "Lišta adresy",                IDM_TOOLBARS_ADDRESSBAR
         MENUITEM "Hlavní lišta nástroju",       IDM_TOOLBARS_MAINTOOLBAR
@@ -849,7 +885,7 @@ END
 
 IDR_BOOKMARKSTOOLBAR_MENU MENU
 BEGIN
-    POPUP "Kontext menu"
+    POPUP "Popup"
     BEGIN
         MENUITEM "Otevoít",                     IDM_BT_OPEN
         MENUITEM "Otevoít v novém panelu",      IDM_BT_OPENINNEWTAB
@@ -865,7 +901,7 @@ END
 
 IDR_BOOKMARK_MENU MENU
 BEGIN
-    POPUP "Kontext menu"
+    POPUP "Popup"
     BEGIN
         MENUITEM "Otevoít",                     IDM_BOOKMARK_OPEN
         MENUITEM "Otevoít v novém panelu",      IDM_BOOKMARK_OPENINNEWTAB
@@ -883,7 +919,7 @@ END
 
 IDR_APPLICATIONTOOLBAR_MENU MENU
 BEGIN
-    POPUP "Kontext menu"
+    POPUP "Popup"
     BEGIN
         MENUITEM "Otevoít",                     IDM_APP_OPEN
         MENUITEM SEPARATOR
@@ -896,7 +932,7 @@ END
 
 IDR_HEADER_MENU MENU
 BEGIN
-    POPUP "Kontext menu"
+    POPUP "Popup"
     BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Více...",                     IDM_HEADER_MORE
@@ -943,8 +979,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,1,0,0
- PRODUCTVERSION 1,1,0,0
+ FILEVERSION 1,2,0,0
+ PRODUCTVERSION 1,2,0,0
  FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
  FILEFLAGS 0x3L
@@ -957,20 +993,20 @@ VS_VERSION_INFO VERSIONINFO
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040504b0"
+        BLOCK "000504b0"
         BEGIN
             VALUE "FileDescription", "Explorer++ Translation DLL"
-            VALUE "FileVersion", "1.1"
+            VALUE "FileVersion", "1.2"
             VALUE "InternalName", "Explorer++ Czech Translation DLL"
-            VALUE "LegalCopyright", "(C) 2005-2010 David Erceg"
+            VALUE "LegalCopyright", "(C) 2005-2011 David Erceg"
             VALUE "OriginalFilename", "Explorer++CS.dll"
             VALUE "ProductName", "Explorer++"
-            VALUE "ProductVersion", "1.1"
+            VALUE "ProductVersion", "1.2"
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x405, 1200
+        VALUE "Translation", 0x5, 1200
     END
 END
 
@@ -1529,6 +1565,7 @@ BEGIN
     IDS_STOP                "Stop"
     IDS_SEARCHING           "Searching %s..."
     IDS_GENERAL_NEWAPPLICATIONBUTTON "New Application Button"
+    IDS_TASKS_NEWTAB        "New Tab"
 END
 
 STRINGTABLE
@@ -1546,7 +1583,7 @@ BEGIN
     IDM_APP_PROPERTIES      "Shows the properties of the selected application button"
 END
 
-#endif    // Czech (Czech Republic) resources
+#endif    // Czech resources
 /////////////////////////////////////////////////////////////////////////////
 
 
