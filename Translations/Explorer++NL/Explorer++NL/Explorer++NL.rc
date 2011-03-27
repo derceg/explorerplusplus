@@ -29,7 +29,7 @@ CAPTION "Over Explorer++"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,212,146,50,14
-    CONTROL         231,IDC_ABOUT_STATIC_IMAGE,"Static",SS_BITMAP,0,0,16,14,WS_EX_STATICEDGE
+    CONTROL         231,IDC_ABOUT_STATIC_IMAGE,"Static",SS_BITMAP,0,0,267,166,WS_EX_STATICEDGE
     LTEXT           "Explorer++ Version %s (%s)",IDC_STATIC_VERSIONNUMBER,5,63,246,8
     LTEXT           "Copyright © 2005-2011 David Erceg",IDC_STATIC,5,91,118,8
     LTEXT           "This program is freeware and released under the GNU General Public License",IDC_STATIC,9,130,245,8
@@ -253,7 +253,7 @@ CAPTION "Standaard Instellingen"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "The following options are used to control program-wide default behaviour. Each new tab inherets these settings, after which they may be changed on a per-tab basis.",IDC_STATIC,6,7,214,32
-    GROUPBOX        "Default view",IDC_STATIC,6,40,215,46
+    GROUPBOX        "Default view",IDC_STATIC,6,40,220,46
     CONTROL         "Miniatuurweergaven",IDC_DEFAULT_THUMBNAILS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,14,52,81,10
     CONTROL         "Tegels",IDC_DEFAULT_TILES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,96,51,37,10
     CONTROL         "Pictogrammen",IDC_DEFAULT_ICONS,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,141,50,61,10
