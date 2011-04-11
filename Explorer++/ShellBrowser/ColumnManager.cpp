@@ -1746,7 +1746,8 @@ void CFolderView::InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWidth
 	lvColumn.pszText	= szText;
 	lvColumn.cx			= iWidth;
 
-	if(ColumnId == CM_SIZE)
+	if(ColumnId == CM_SIZE || ColumnId == CM_REALSIZE || 
+		ColumnId == CM_TOTALSIZE || ColumnId == CM_FREESPACE)
 	{
 		lvColumn.mask	|= LVCF_FMT;
 		lvColumn.fmt	= LVCFMT_RIGHT;
