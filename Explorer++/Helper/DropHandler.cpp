@@ -943,6 +943,8 @@ DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter)
 
 	AsyncOperationInfo_t aoi;
 
+	aoi.pao = ppfi->pao;
+
 	if(bRes)
 	{
 		aoi.hr = S_OK;

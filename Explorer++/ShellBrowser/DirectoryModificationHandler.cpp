@@ -110,7 +110,8 @@ void CFolderView::DirectoryAltered(void)
 
 	/* Select the specified items, and place the
 	focus on the first item. */
-	for(auto itr = m_FileSelectionList.begin();itr != m_FileSelectionList.end();itr++)
+	auto itr = m_FileSelectionList.begin();
+	while(itr != m_FileSelectionList.end())
 	{
 		iIndex = LocateFileItemIndex(itr->c_str());
 
