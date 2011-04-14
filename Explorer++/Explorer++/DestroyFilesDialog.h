@@ -34,7 +34,7 @@ private:
 	CDestroyFilesDialogPersistentSettings(const CDestroyFilesDialogPersistentSettings &);
 	CDestroyFilesDialogPersistentSettings & operator=(const CDestroyFilesDialogPersistentSettings &);
 
-	UINT	m_uOverwriteMethod;
+	NFileOperations::OverwriteMethod_t	m_uOverwriteMethod;
 };
 
 class CDestroyFilesDialog : public CBaseDialog

@@ -158,7 +158,7 @@ DWORD			DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,BOOL 
 
 /* File helpers. */
 int				CreateFileTimeString(FILETIME *FileTime,TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate);
-BOOL			GetRealFileSize(TCHAR *FileName,PLARGE_INTEGER lpRealFileSize);
+BOOL			GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize);
 BOOL			CompareFileTypes(TCHAR *pszFile1,TCHAR *pszFile2);
 BOOL			SetFileSparse(TCHAR *szFileName);
 DWORD			BuildFileAttributeString(TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize);

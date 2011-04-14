@@ -520,18 +520,15 @@ BOOL lEnableMenuItem(HMENU hMenu,UINT ItemID,BOOL bEnable)
 	}
 }
 
-BOOL GetRealFileSize(TCHAR *FileName,PLARGE_INTEGER lpRealFileSize)
+BOOL GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize)
 {
 	LARGE_INTEGER lFileSize;
 	LONG ClusterSize;
 	HANDLE hFile;
 	TCHAR szRoot[MAX_PATH];
 
-	if(FileName == NULL)
-		return FALSE;
-
 	/* Get a handle to the file. */
-	hFile = CreateFile(FileName,GENERIC_READ,
+	hFile = CreateFile(strFilename.c_str(),GENERIC_READ,
 	FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,NULL,NULL);
 
 	if(hFile == INVALID_HANDLE_VALUE)
@@ -545,7 +542,7 @@ BOOL GetRealFileSize(TCHAR *FileName,PLARGE_INTEGER lpRealFileSize)
 
 	if(lFileSize.QuadPart != 0)
 	{
-		StringCchCopy(szRoot,SIZEOF_ARRAY(szRoot),FileName);
+		StringCchCopy(szRoot,SIZEOF_ARRAY(szRoot),strFilename.c_str());
 		PathStripToRoot(szRoot);
 
 		/* Get the cluster size of the drive the file resides on. */

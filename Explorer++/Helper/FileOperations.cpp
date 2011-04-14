@@ -78,7 +78,7 @@ BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullF
 	return bRes;
 }
 
-BOOL NFileOperations::CopyFilesToFolder(HWND hOwner,const std::wstring strTitle,
+BOOL NFileOperations::CopyFilesToFolder(HWND hOwner,const std::wstring &strTitle,
 	const std::list<std::wstring> &FullFilenameList,BOOL bMove)
 {
 	std::wstring strOutputFilename;
@@ -589,7 +589,7 @@ BOOL NFileOperations::CreateBrowseDialog(HWND hOwner,const std::wstring &strTitl
 	return bSuccessful;
 }
 
-void DeleteFileSecurely(TCHAR *szFileName,UINT uOverwriteMethod)
+void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,OverwriteMethod_t uOverwriteMethod)
 {
 	HANDLE			hFile;
 	WIN32_FIND_DATA	wfd;
@@ -603,7 +603,7 @@ void DeleteFileSecurely(TCHAR *szFileName,UINT uOverwriteMethod)
 	BOOL			bFolder;
 	int				i = 0;
 
-	hFindFile = FindFirstFile(szFileName,&wfd);
+	hFindFile = FindFirstFile(strFilename.c_str(),&wfd);
 
 	if(hFindFile == INVALID_HANDLE_VALUE)
 		return;
@@ -614,25 +614,17 @@ void DeleteFileSecurely(TCHAR *szFileName,UINT uOverwriteMethod)
 
 	if(bFolder)
 	{
-		/*SHFILEOPSTRUCT shFileOp;
-
-		shFileOp.hwnd	= NULL;
-		shFileOp.wFunc	= FO_DELETE;
-		shFileOp.pFrom	= szFileName;
-		shFileOp.pTo	= NULL;
-
-		SHFileOperation(&shFileOp);*/
-
+		/* TODO: Recurse. */
 		return;
 	}
 
 	/* Determine the actual size of the file on disk
 	(i.e. how many clusters it is allocated). */
-	GetRealFileSize(szFileName,&lRealFileSize);
+	GetRealFileSize(strFilename,&lRealFileSize);
 
 	/* Open the file, block any sharing mode, to stop the file
 	been opened while it is overwritten. */
-	hFile = CreateFile(szFileName,FILE_WRITE_DATA,0,NULL,OPEN_EXISTING,
+	hFile = CreateFile(strFilename.c_str(),FILE_WRITE_DATA,0,NULL,OPEN_EXISTING,
 	NULL,NULL);
 
 	if(hFile == INVALID_HANDLE_VALUE)
@@ -666,10 +658,6 @@ void DeleteFileSecurely(TCHAR *szFileName,UINT uOverwriteMethod)
 			WriteFile(hFile,(LPVOID)&Pass2Data,1,&nBytesWritten,NULL);
 		}
 
-		/* Now, write in a *random* set of data, again byte by
-		byte. This random data is obtained via the os's
-		cryptography functions, and as such should be
-		exteremely difficult to duplicate. */
 		SetFilePointer(hFile,0,NULL,FILE_BEGIN);
 
 		CryptAcquireContext(&hProv,_T("SecureDelete"),NULL,PROV_RSA_AES,CRYPT_NEWKEYSET);
@@ -687,5 +675,5 @@ void DeleteFileSecurely(TCHAR *szFileName,UINT uOverwriteMethod)
 
 	CloseHandle(hFile);
 
-	DeleteFile(szFileName);
+	DeleteFile(strFilename.c_str());
 }

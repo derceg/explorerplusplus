@@ -114,11 +114,11 @@ BOOL CDestroyFilesDialog::OnInitDialog()
 
 	switch(m_pdfdps->m_uOverwriteMethod)
 	{
-	case OVERWRITE_ONEPASS:
+	case NFileOperations::OVERWRITE_ONEPASS:
 		CheckDlgButton(m_hDlg,IDC_DESTROYFILES_RADIO_ONEPASS,BST_CHECKED);
 		break;
 
-	case OVERWRITE_THREEPASS:
+	case NFileOperations::OVERWRITE_THREEPASS:
 		CheckDlgButton(m_hDlg,IDC_DESTROYFILES_RADIO_THREEPASS,BST_CHECKED);
 		break;
 	}
@@ -163,6 +163,11 @@ void CDestroyFilesDialog::GetResizableControlInformation(CBaseDialog::DialogSize
 	Control.iID = IDC_DESTROYFILES_STATIC_WARNING_MESSAGE;
 	Control.Type = CResizableDialog::TYPE_MOVE;
 	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_DESTROYFILES_STATIC_WARNING_MESSAGE;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
 	Control.iID = IDOK;
@@ -221,11 +226,11 @@ void CDestroyFilesDialog::SaveState()
 
 	if(IsDlgButtonChecked(m_hDlg,IDC_DESTROYFILES_RADIO_ONEPASS) == BST_CHECKED)
 	{
-		m_pdfdps->m_uOverwriteMethod = OVERWRITE_ONEPASS;
+		m_pdfdps->m_uOverwriteMethod = NFileOperations::OVERWRITE_ONEPASS;
 	}
 	else
 	{
-		m_pdfdps->m_uOverwriteMethod = OVERWRITE_THREEPASS;
+		m_pdfdps->m_uOverwriteMethod = NFileOperations::OVERWRITE_THREEPASS;
 	}
 
 	m_pdfdps->m_bStateSaved = TRUE;
@@ -262,11 +267,22 @@ void CDestroyFilesDialog::OnCancel()
 
 void CDestroyFilesDialog::OnConfirmDestroy()
 {
+	NFileOperations::OverwriteMethod_t OverwriteMethod;
+
+	if(IsDlgButtonChecked(m_hDlg,IDC_DESTROYFILES_RADIO_ONEPASS) == BST_CHECKED)
+	{
+		OverwriteMethod = NFileOperations::OVERWRITE_ONEPASS;
+	}
+	else
+	{
+		OverwriteMethod = NFileOperations::OVERWRITE_THREEPASS;
+	}
+
 	/* TODO: Perform in background thread. */
-	//for each(auto strFullFilename in m_FullFilenameList)
-	//{
-	//	//DeleteFileSecurely(strFullFilename.c_str(),uOverwriteMethod);
-	//}
+	for each(auto strFullFilename in m_FullFilenameList)
+	{
+		DeleteFileSecurely(strFullFilename,OverwriteMethod);
+	}
 
 	EndDialog(m_hDlg,1);
 }
@@ -274,7 +290,7 @@ void CDestroyFilesDialog::OnConfirmDestroy()
 CDestroyFilesDialogPersistentSettings::CDestroyFilesDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
 {
-	m_uOverwriteMethod = OVERWRITE_ONEPASS;
+	m_uOverwriteMethod = NFileOperations::OVERWRITE_ONEPASS;
 }
 
 CDestroyFilesDialogPersistentSettings::~CDestroyFilesDialogPersistentSettings()
@@ -308,6 +324,6 @@ void CDestroyFilesDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,B
 {
 	if(lstrcmpi(bstrName,_T("OverwriteMethod")) == 0)
 	{
-		m_uOverwriteMethod = NXMLSettings::DecodeIntValue(bstrValue);
+		m_uOverwriteMethod = static_cast<NFileOperations::OverwriteMethod_t>(NXMLSettings::DecodeIntValue(bstrValue));
 	}
 }

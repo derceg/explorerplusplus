@@ -3,17 +3,18 @@
 
 #include <list>
 
-enum OverwriteMethod_t
-{
-	OVERWRITE_ONEPASS	= 1,
-	OVERWRITE_THREEPASS	= 2
-};
-
 namespace NFileOperations
 {
+	enum OverwriteMethod_t
+	{
+		OVERWRITE_ONEPASS	= 1,
+		OVERWRITE_THREEPASS	= 2
+	};
+
 	BOOL	RenameFile(const std::wstring &strOldFilename,const std::wstring &strNewFilename);
 	BOOL	DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL bPermanent);
-	BOOL	CopyFilesToFolder(HWND hOwner,const std::wstring strTitle,const std::list<std::wstring> &FullFilenameList,BOOL bMove);
+	void	DeleteFileSecurely(const std::wstring &strFilename,OverwriteMethod_t uOverwriteMethod);
+	BOOL	CopyFilesToFolder(HWND hOwner,const std::wstring &strTitle,const std::list<std::wstring> &FullFilenameList,BOOL bMove);
 
 	TCHAR	*BuildFilenameList(const std::list<std::wstring> &FilenameList);
 
@@ -25,8 +26,6 @@ namespace NFileOperations
 	BOOL	CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,std::wstring &strOutputFilename);
 	BOOL	CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,LPITEMIDLIST *ppidl);
 };
-
-void	DeleteFileSecurely(TCHAR *szFileName,OverwriteMethod_t OverwriteMethod);
 
 HRESULT	CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax);
 
