@@ -1082,6 +1082,8 @@ int Explorerplusplus::OnDestroy(void)
 	ImageList_Destroy(m_himlToolbarSmall);
 	ImageList_Destroy(m_himlToolbarLarge);
 
+	delete m_pStatusBar;
+
 	ChangeClipboardChain(m_hContainer,m_hNextClipboardViewer);
 	PostQuitMessage(0);
 
@@ -1697,6 +1699,7 @@ void Explorerplusplus::CreateStatusBar(void)
 		StatusBarStyles |= WS_VISIBLE;
 
 	m_hStatusBar = ::CreateStatusBar(m_hContainer,StatusBarStyles);
+	m_pStatusBar = new CStatusBar(m_hStatusBar);
 }
 
 void Explorerplusplus::SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl)

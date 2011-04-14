@@ -518,21 +518,15 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam,LPARAM lParam)
 	/* Is the menu been closed? .*/
 	if(HIWORD(wParam) == 0xFFFF && lParam == 0)
 	{
-		/* TODO: */
-		//HandleStatusBarMenuClose();
+		m_pStatusBar->HandleStatusBarMenuClose();
 	}
 	else
 	{
+		m_pStatusBar->HandleStatusBarMenuOpen();
+
 		TCHAR szBuffer[512];
-
-		/* TODO: */
-		//HandleStatusBarMenuOpen();
-
-		/* Load the menu help string. */
 		LoadString(g_hLanguageModule,LOWORD(wParam),
-		szBuffer,SIZEOF_ARRAY(szBuffer));
-
-		/* Send the help string to the status bar. */
+			szBuffer,SIZEOF_ARRAY(szBuffer));
 		SetWindowText(m_hStatusBar,szBuffer);
 	}
 

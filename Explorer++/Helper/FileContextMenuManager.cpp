@@ -322,11 +322,11 @@ LRESULT CALLBACK CFileContextMenuManager::ShellMenuHookProc(HWND hwnd,UINT uMsg,
 							{
 								m_pStatusBar->SetPartText(0,szHelpString);
 							}
-
-							/* Prevent the message from been passed onto the original window. */
-							return 0;
 						}
 					}
+
+					/* Prevent the message from been passed onto the original window. */
+					return 0;
 				}
 			}
 			break;

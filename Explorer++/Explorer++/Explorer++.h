@@ -1004,6 +1004,7 @@ private:
 	CMyTreeView *			m_pMyTreeView;
 	CBookmark				m_Bookmark;
 	CCustomMenu *			m_pCustomMenu;
+	CStatusBar *			m_pStatusBar;
 	HANDLE					m_hIconThread;
 	HANDLE					m_hTreeViewIconThread;
 	HANDLE					m_hFolderSizeThread;
