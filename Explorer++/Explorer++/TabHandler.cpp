@@ -892,6 +892,14 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 	m_hActiveListView		= m_hListView[m_iObjectIndex];
 	m_pActiveShellBrowser	= m_pShellBrowser[m_iObjectIndex];
 
+	/* The selected tab has changed, so update the current
+	directory. Although this is not needed internally, context
+	menu extensions may need the current directory to be
+	set correctly. */
+	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
+		m_CurrentDirectory);
+	SetCurrentDirectory(m_CurrentDirectory);
+
 	m_nSelected = m_pActiveShellBrowser->QueryNumSelected();
 
 	SetActiveArrangeMenuItems();

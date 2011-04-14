@@ -1123,6 +1123,7 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 {
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
 		m_CurrentDirectory);
+	SetCurrentDirectory(m_CurrentDirectory);
 
 	HandleDirectoryMonitoring(iTabId);
 
