@@ -1,6 +1,7 @@
 #ifndef SETDEFAULTCOLUMNSDIALOG_INCLUDED
 #define SETDEFAULTCOLUMNSDIALOG_INCLUDED
 
+#include <unordered_map>
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -15,6 +16,14 @@ public:
 
 	static CSetDefaultColumnsDialogPersistentSettings &GetInstance();
 
+protected:
+
+	void			SaveExtraRegistrySettings(HKEY hKey);
+	void			LoadExtraRegistrySettings(HKEY hKey);
+
+	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
+	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
+
 private:
 
 	friend CSetDefaultColumnsDialog;
@@ -25,6 +34,8 @@ private:
 
 	CSetDefaultColumnsDialogPersistentSettings(const CSetDefaultColumnsDialogPersistentSettings &);
 	CSetDefaultColumnsDialogPersistentSettings & operator=(const CSetDefaultColumnsDialogPersistentSettings &);
+
+	std::wstring	m_strFolder;
 };
 
 class CSetDefaultColumnsDialog : public CBaseDialog
@@ -47,6 +58,17 @@ protected:
 
 private:
 
+	enum FolderType_t
+	{
+		FOLDER_TYPE_GENERAL,
+		FOLDER_TYPE_COMPUTER,
+		FOLDER_TYPE_CONTROL_PANEL,
+		FOLDER_TYPE_NETWORK,
+		FOLDER_TYPE_NETWORK_PLACES,
+		FOLDER_TYPE_PRINTERS,
+		FOLDER_TYPE_RECYCLE_BIN
+	};
+
 	void	OnOk();
 	void	OnCancel();
 	void	OnCbnSelChange();
@@ -61,15 +83,7 @@ private:
 	std::list<Column_t>	m_NetworkConnectionsColumnList;
 	std::list<Column_t>	m_MyNetworkPlacesColumnList;
 
-	/* Index of folder types within the combo box. */
-	int					m_iControlPanel;
-	int					m_iGeneral;
-	int					m_iMyComputer;
-	int					m_iNetwork;
-	int					m_iNetworkPlaces;
-	int					m_iPrinters;
-	int					m_iRecycleBin;
-	int					m_iPreviousTypeSel;
+	std::tr1::unordered_map<int,FolderType_t>	m_FolderMap;
 
 	CSetDefaultColumnsDialogPersistentSettings	*m_psdcdps;
 };

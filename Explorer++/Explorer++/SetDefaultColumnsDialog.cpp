@@ -18,6 +18,8 @@
 #include "../ShellBrowser/iShellView.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/RegistrySettings.h"
+#include "../Helper/XMLSettings.h"
 
 
 const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetDefaultColumns");
@@ -39,29 +41,37 @@ BOOL CSetDefaultColumnsDialog::OnInitDialog()
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
 
 	TCHAR szFolderName[MAX_PATH];
+	int iPos;
+
 	GetCsidlFolderName(CSIDL_CONTROLS,szFolderName,SHGDN_INFOLDER);
-	m_iControlPanel = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_CONTROL_PANEL));
 
 	LoadString(GetInstance(),IDS_DEFAULTCOLUMNS_GENERAL,szFolderName,SIZEOF_ARRAY(szFolderName));
-	m_iGeneral = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_GENERAL));
 
 	GetCsidlFolderName(CSIDL_DRIVES,szFolderName,SHGDN_INFOLDER);
-	m_iMyComputer = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_COMPUTER));
 
 	GetCsidlFolderName(CSIDL_CONNECTIONS,szFolderName,SHGDN_INFOLDER);
-	m_iNetwork = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_NETWORK));
 
 	GetCsidlFolderName(CSIDL_NETWORK,szFolderName,SHGDN_INFOLDER);
-	m_iNetworkPlaces = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_NETWORK_PLACES));
 
 	GetCsidlFolderName(CSIDL_PRINTERS,szFolderName,SHGDN_INFOLDER);
-	m_iPrinters = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_PRINTERS));
 
 	GetCsidlFolderName(CSIDL_BITBUCKET,szFolderName,SHGDN_INFOLDER);
-	m_iRecycleBin = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szFolderName));
+	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
+	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_RECYCLE_BIN));
 
-	SendMessage(hComboBox,CB_SETCURSEL,1,0);
-	m_iPreviousTypeSel = 1;
+	SendMessage(hComboBox,CB_SELECTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(m_psdcdps->m_strFolder.c_str()));
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
 
@@ -217,6 +227,9 @@ BOOL CSetDefaultColumnsDialog::OnClose()
 void CSetDefaultColumnsDialog::SaveState()
 {
 	m_psdcdps->SaveDialogPosition(m_hDlg);
+
+	GetWindowString(GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX),m_psdcdps->m_strFolder);
+
 	m_psdcdps->m_bStateSaved = TRUE;
 }
 
@@ -242,36 +255,41 @@ void CSetDefaultColumnsDialog::OnCbnSelChange()
 
 	std::list<Column_t> *pColumnList = NULL;
 
-	if(iSelected == m_iControlPanel)
-	{
-		pColumnList = &m_ControlPanelColumnList;
-	}
-	else if(iSelected == m_iGeneral)
-	{
-		pColumnList = &m_RealFolderColumnList;
-	}
-	else if(iSelected == m_iMyComputer)
-	{
-		pColumnList = &m_MyComputerColumnList;
-	}
-	else if(iSelected == m_iNetwork)
-	{
-		pColumnList = &m_NetworkConnectionsColumnList;
-	}
-	else if(iSelected == m_iNetworkPlaces)
-	{
-		pColumnList = &m_MyNetworkPlacesColumnList;
-	}
-	else if(iSelected == m_iPrinters)
-	{
-		pColumnList = &m_PrintersColumnList;
-	}
-	else if(iSelected == m_iRecycleBin)
-	{
-		pColumnList = &m_RecycleBinColumnList;
-	}
+	auto itr = m_FolderMap.find(iSelected);
 
-	m_iPreviousTypeSel = iSelected;
+	if(itr != m_FolderMap.end())
+	{
+		switch(itr->second)
+		{
+		case FOLDER_TYPE_GENERAL:
+			pColumnList = &m_RealFolderColumnList;
+			break;
+
+		case FOLDER_TYPE_COMPUTER:
+			pColumnList = &m_MyComputerColumnList;
+			break;
+
+		case FOLDER_TYPE_CONTROL_PANEL:
+			pColumnList = &m_ControlPanelColumnList;
+			break;
+
+		case FOLDER_TYPE_NETWORK:
+			pColumnList = &m_NetworkConnectionsColumnList;
+			break;
+
+		case FOLDER_TYPE_NETWORK_PLACES:
+			pColumnList = &m_MyNetworkPlacesColumnList;
+			break;
+
+		case FOLDER_TYPE_PRINTERS:
+			pColumnList = &m_PrintersColumnList;
+			break;
+
+		case FOLDER_TYPE_RECYCLE_BIN:
+			pColumnList = &m_RecycleBinColumnList;
+			break;
+		}
+	}
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
 	ListView_DeleteAllItems(hListView);
@@ -407,7 +425,7 @@ void CSetDefaultColumnsDialog::OnMoveColumn(bool bUp)
 CSetDefaultColumnsDialogPersistentSettings::CSetDefaultColumnsDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
 {
-	/* TODO: Save combo box selection when exiting dialog. */
+	m_strFolder = _T("General");
 }
 
 CSetDefaultColumnsDialogPersistentSettings::~CSetDefaultColumnsDialogPersistentSettings()
@@ -419,4 +437,28 @@ CSetDefaultColumnsDialogPersistentSettings& CSetDefaultColumnsDialogPersistentSe
 {
 	static CSetDefaultColumnsDialogPersistentSettings mfdps;
 	return mfdps;
+}
+
+void CSetDefaultColumnsDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
+{
+	NRegistrySettings::SaveStringToRegistry(hKey,_T("Folder"),m_strFolder.c_str());
+}
+
+void CSetDefaultColumnsDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
+{
+	NRegistrySettings::ReadStringFromRegistry(hKey,_T("Folder"),m_strFolder);
+}
+
+void CSetDefaultColumnsDialogPersistentSettings::SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,
+	MSXML2::IXMLDOMElement *pParentNode)
+{
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Folder"),m_strFolder.c_str());
+}
+
+void CSetDefaultColumnsDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+{
+	if(lstrcmpi(bstrName,_T("Folder")) == 0)
+	{
+		m_strFolder = _bstr_t(bstrValue);
+	}
 }
