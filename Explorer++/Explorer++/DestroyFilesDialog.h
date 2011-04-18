@@ -41,7 +41,7 @@ class CDestroyFilesDialog : public CBaseDialog
 {
 public:
 
-	CDestroyFilesDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::list<std::wstring> FullFilenameList);
+	CDestroyFilesDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::list<std::wstring> FullFilenameList,BOOL bShowFriendlyDates);
 	~CDestroyFilesDialog();
 
 protected:
@@ -64,6 +64,8 @@ private:
 	std::list<std::wstring>	m_FullFilenameList;
 
 	CDestroyFilesDialogPersistentSettings	*m_pdfdps;
+
+	BOOL	m_bShowFriendlyDates;
 };
 
 #endif

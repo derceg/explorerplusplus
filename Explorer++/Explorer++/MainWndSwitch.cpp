@@ -1229,7 +1229,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				}
 
 				CMergeFilesDialog CMergeFilesDialog(g_hLanguageModule,IDD_MERGEFILES,
-					m_hContainer,szCurrentDirectory,FullFilenameList);
+					m_hContainer,szCurrentDirectory,FullFilenameList,m_bShowFriendlyDatesGlobal);
 
 				CMergeFilesDialog.ShowModalDialog();
 			}
@@ -1264,7 +1264,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				}
 
 				CDestroyFilesDialog CDestroyFilesDialog(g_hLanguageModule,IDD_DESTROYFILES,
-					m_hContainer,FullFilenameList);
+					m_hContainer,FullFilenameList,m_bShowFriendlyDatesGlobal);
 
 				CDestroyFilesDialog.ShowModalDialog();
 			}

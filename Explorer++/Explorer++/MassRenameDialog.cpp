@@ -23,7 +23,8 @@
 #include "Explorer++_internal.h"
 #include "MassRenameDialog.h"
 #include "MainResource.h"
-#include "../Helper/Helper.h"
+#include "../Helper/RegistrySettings.h"
+#include "../Helper/XMLSettings.h"
 
 
 const TCHAR CMassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename");
@@ -77,22 +78,24 @@ BOOL CMassRenameDialog::OnInitDialog()
 	ListView_SetImageList(hListView,himlSmall,LVSIL_SMALL);
 
 	LVCOLUMN lvCol;
+	TCHAR szTemp[64];
 
-	/* TODO: Move text to string table. */
+	LoadString(GetInstance(),IDS_MASS_RENAME_CURRENT_NAME,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvCol.mask		= LVCF_TEXT;
-	lvCol.pszText	= _T("Current Name");
+	lvCol.pszText	= szTemp;
 	ListView_InsertColumn(hListView,1,&lvCol);
 
-	/* TODO: Move text to string table. */
+	LoadString(GetInstance(),IDS_MASS_RENAME_PREVIEW_NAME,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvCol.mask		= LVCF_TEXT;
-	lvCol.pszText	= _T("Preview Name");
+	lvCol.pszText	= szTemp;
 	ListView_InsertColumn(hListView,2,&lvCol);
 
-	/* TODO: Remember column widths. */
 	RECT rc;
 	GetClientRect(hListView,&rc);
-	SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,GetRectWidth(&rc) / 2);
-	SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,GetRectWidth(&rc) / 2);
+	SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,m_pmrdps->m_iColumnWidth1);
+	SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,m_pmrdps->m_iColumnWidth2);
 
 	LVITEM lvItem;
 	SHFILEINFO shfi;
@@ -291,7 +294,8 @@ void CMassRenameDialog::OnOk()
 
 	if(lstrlen(szNamePattern) == 0)
 	{
-		/* TODO: Show error. */
+		EndDialog(m_hDlg,1);
+		return;
 	}
 
 	std::list<CFileActionHandler::RenamedItem_t> RenamedItemList;
@@ -333,6 +337,10 @@ void CMassRenameDialog::OnCancel()
 void CMassRenameDialog::SaveState()
 {
 	m_pmrdps->SaveDialogPosition(m_hDlg);
+
+	HWND hListView = GetDlgItem(m_hDlg,IDC_MASSRENAME_FILELISTVIEW);
+	m_pmrdps->m_iColumnWidth1 = ListView_GetColumnWidth(hListView,0);
+	m_pmrdps->m_iColumnWidth2 = ListView_GetColumnWidth(hListView,1);
 
 	m_pmrdps->m_bStateSaved = TRUE;
 }
@@ -395,7 +403,8 @@ void CMassRenameDialog::ProcessFileName(const std::wstring strTarget,
 CMassRenameDialogPersistentSettings::CMassRenameDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
 {
-
+	m_iColumnWidth1 = DEFAULT_MASS_RENAME_COLUMN_WIDTH;
+	m_iColumnWidth2 = DEFAULT_MASS_RENAME_COLUMN_WIDTH;
 }
 
 CMassRenameDialogPersistentSettings::~CMassRenameDialogPersistentSettings()
@@ -407,4 +416,35 @@ CMassRenameDialogPersistentSettings& CMassRenameDialogPersistentSettings::GetIns
 {
 	static CMassRenameDialogPersistentSettings sfadps;
 	return sfadps;
+}
+
+void CMassRenameDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
+{
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ColumnWidth1"),m_iColumnWidth1);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ColumnWidth2"),m_iColumnWidth2);
+}
+
+void CMassRenameDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
+{
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ColumnWidth1"),reinterpret_cast<DWORD *>(&m_iColumnWidth1));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ColumnWidth2"),reinterpret_cast<DWORD *>(&m_iColumnWidth2));
+}
+
+void CMassRenameDialogPersistentSettings::SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,
+	MSXML2::IXMLDOMElement *pParentNode)
+{
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth1"),NXMLSettings::EncodeIntValue(m_iColumnWidth1));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth2"),NXMLSettings::EncodeIntValue(m_iColumnWidth2));
+}
+
+void CMassRenameDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
+{
+	if(lstrcmpi(bstrName,_T("ColumnWidth1")) == 0)
+	{
+		m_iColumnWidth1 = NXMLSettings::DecodeIntValue(bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("ColumnWidth2")) == 0)
+	{
+		m_iColumnWidth2 = NXMLSettings::DecodeIntValue(bstrValue);
+	}
 }

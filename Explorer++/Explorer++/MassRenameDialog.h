@@ -16,16 +16,28 @@ public:
 
 	static CMassRenameDialogPersistentSettings &GetInstance();
 
+protected:
+
+	void			SaveExtraRegistrySettings(HKEY hKey);
+	void			LoadExtraRegistrySettings(HKEY hKey);
+
+	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
+	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
+
 private:
 
 	friend CMassRenameDialog;
 
 	static const TCHAR SETTINGS_KEY[];
+	static const int DEFAULT_MASS_RENAME_COLUMN_WIDTH = 250;
 
 	CMassRenameDialogPersistentSettings();
 
 	CMassRenameDialogPersistentSettings(const CMassRenameDialogPersistentSettings &);
 	CMassRenameDialogPersistentSettings & operator=(const CMassRenameDialogPersistentSettings &);
+
+	int	m_iColumnWidth1;
+	int	m_iColumnWidth2;
 };
 
 class CMassRenameDialog : public CBaseDialog

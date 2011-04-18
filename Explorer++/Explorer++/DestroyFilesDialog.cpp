@@ -12,7 +12,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Explorer++_internal.h"
+//#include "Explorer++_internal.h"
 #include "DestroyFilesDialog.h"
 #include "MainResource.h"
 #include "../Helper/RegistrySettings.h"
@@ -22,10 +22,12 @@
 const TCHAR CDestroyFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("DestroyFiles");
 
 CDestroyFilesDialog::CDestroyFilesDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,std::list<std::wstring> FullFilenameList) :
+	int iResource,HWND hParent,std::list<std::wstring> FullFilenameList,
+	BOOL bShowFriendlyDates) :
 CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_FullFilenameList = FullFilenameList;
+	m_bShowFriendlyDates = bShowFriendlyDates;
 
 	m_pdfdps = &CDestroyFilesDialogPersistentSettings::GetInstance();
 }
@@ -50,20 +52,30 @@ BOOL CDestroyFilesDialog::OnInitDialog()
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
 
 	LVCOLUMN lvColumn;
+	TCHAR szTemp[128];
+
+	LoadString(GetInstance(),IDS_DESTROY_FILES_COLUMN_FILE,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("File");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,0,&lvColumn);
 
+	LoadString(GetInstance(),IDS_DESTROY_FILES_COLUMN_TYPE,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Type");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,1,&lvColumn);
 
+	LoadString(GetInstance(),IDS_DESTROY_FILES_COLUMN_SIZE,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Size");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,2,&lvColumn);
 
+	LoadString(GetInstance(),IDS_DESTROY_FILES_COLUMN_DATE_MODIFIED,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Date Modified");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,3,&lvColumn);
 
 	int iItem = 0;
@@ -98,10 +110,9 @@ BOOL CDestroyFilesDialog::OnInitDialog()
 		FormatSizeString(lFileSize,szFileSize,SIZEOF_ARRAY(szFileSize));
 		ListView_SetItemText(hListView,iItem,2,szFileSize);
 
-		/* TODO: Friendly dates global. */
 		TCHAR szDateModified[32];
 		CreateFileTimeString(&wfad.ftLastWriteTime,szDateModified,
-			SIZEOF_ARRAY(szDateModified),TRUE);
+			SIZEOF_ARRAY(szDateModified),m_bShowFriendlyDates);
 		ListView_SetItemText(hListView,iItem,3,szDateModified);
 
 		iItem++;
@@ -238,15 +249,14 @@ void CDestroyFilesDialog::SaveState()
 
 void CDestroyFilesDialog::OnOk()
 {
+	TCHAR szConfirmation[128];
+	LoadString(GetInstance(),IDS_DESTROY_FILES_CONFIRMATION,
+		szConfirmation,SIZEOF_ARRAY(szConfirmation));
+
 	/* The default button in this message box will be the second
 	button (i.e. the no button). */
-	/* TODO: Move string into string table. */
-	int iRes = MessageBox(m_hDlg,
-	_T("Files that are destroyed will be \
-permanently deleted, and will NOT be recoverable.\n\n\
-Are you sure you want to continue?"),
-	NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_SETFOREGROUND|
-	MB_YESNO|MB_DEFBUTTON2);
+	int iRes = MessageBox(m_hDlg,szConfirmation,NExplorerplusplus::WINDOW_NAME,
+		MB_ICONWARNING|MB_SETFOREGROUND|MB_YESNO|MB_DEFBUTTON2);
 
 	switch(iRes)
 	{

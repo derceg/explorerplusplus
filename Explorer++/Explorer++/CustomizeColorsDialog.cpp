@@ -52,18 +52,25 @@ BOOL CCustomizeColorsDialog::OnInitDialog()
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES,
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
 
-	/* TODO: Move text into string table. */
+	TCHAR szTemp[128];
+
+	LoadString(GetInstance(),IDS_CUSTOMIZE_COLORS_COLUMN_DESCRIPTION,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	LVCOLUMN lvColumn;
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Description");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,0,&lvColumn);
 
+	LoadString(GetInstance(),IDS_CUSTOMIZE_COLORS_COLUMN_FILENAME_PATTERN,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Filename Pattern");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,1,&lvColumn);
 
+	LoadString(GetInstance(),IDS_CUSTOMIZE_COLORS_COLUMN_ATTRIBUTES,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Attributes");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,2,&lvColumn);
 
 	RECT rc;

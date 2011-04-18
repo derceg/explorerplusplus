@@ -32,11 +32,12 @@ const TCHAR CMergeFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("MergeFiles
 
 CMergeFilesDialog::CMergeFilesDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,std::wstring strOutputDirectory,
-	std::list<std::wstring> FullFilenameList) :
+	std::list<std::wstring> FullFilenameList,BOOL bShowFriendlyDates) :
 CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_strOutputDirectory	= strOutputDirectory;
 	m_FullFilenameList		= FullFilenameList;
+	m_bShowFriendlyDates	= bShowFriendlyDates;
 	m_bMergingFiles			= false;
 	m_bStopMerging			= false;
 
@@ -107,7 +108,7 @@ BOOL CMergeFilesDialog::OnInitDialog()
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
 
 	TCHAR szTemp[32];
-	LoadString(g_hLanguageModule,IDS_MERGE_COLUMN_TEXT,szTemp,SIZEOF_ARRAY(szTemp));
+	LoadString(GetInstance(),IDS_MERGE_COLUMN_TEXT,szTemp,SIZEOF_ARRAY(szTemp));
 
 	LVCOLUMN lvColumn;
 	lvColumn.mask		= LVCF_TEXT;
@@ -158,10 +159,9 @@ BOOL CMergeFilesDialog::OnInitDialog()
 		FormatSizeString(lFileSize,szFileSize,SIZEOF_ARRAY(szFileSize));
 		ListView_SetItemText(hListView,iItem,2,szFileSize);
 
-		/* TODO: Friendly dates global. */
 		TCHAR szDateModified[32];
 		CreateFileTimeString(&wfad.ftLastWriteTime,szDateModified,
-			SIZEOF_ARRAY(szDateModified),TRUE);
+			SIZEOF_ARRAY(szDateModified),m_bShowFriendlyDates);
 		ListView_SetItemText(hListView,iItem,3,szDateModified);
 
 		iItem++;
@@ -325,7 +325,7 @@ void CMergeFilesDialog::OnOk()
 		if(GetWindowTextLength(hOutputFileName) == 0)
 		{
 			TCHAR szTemp[64];
-			LoadString(g_hLanguageModule,IDS_MERGE_OUTPUTINVALID,
+			LoadString(GetInstance(),IDS_MERGE_OUTPUTINVALID,
 				szTemp,SIZEOF_ARRAY(szTemp));
 
 			MessageBox(m_hDlg,szTemp,NExplorerplusplus::WINDOW_NAME,
@@ -341,7 +341,7 @@ void CMergeFilesDialog::OnOk()
 		GetDlgItemText(m_hDlg,IDOK,m_szOk,SIZEOF_ARRAY(m_szOk));
 
 		TCHAR szTemp[64];
-		LoadString(g_hLanguageModule,IDS_CANCEL,szTemp,SIZEOF_ARRAY(szTemp));
+		LoadString(GetInstance(),IDS_CANCEL,szTemp,SIZEOF_ARRAY(szTemp));
 		SetDlgItemText(m_hDlg,IDOK,szTemp);
 
 		m_bMergingFiles = true;
