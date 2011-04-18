@@ -12,7 +12,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
-//#include "Explorer++_internal.h"
+#include "Explorer++_internal.h"
 #include "DestroyFilesDialog.h"
 #include "MainResource.h"
 #include "../Helper/RegistrySettings.h"
