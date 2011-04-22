@@ -100,9 +100,9 @@ public:
 	~CSearchDialog();
 
 	/* IFileContextMenuExternal methods. */
-	void			AddMenuEntries(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu);
-	BOOL			HandleShellMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd);
-	void			HandleCustomMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,int iCmd);
+	void			AddMenuEntries(LPITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
+	BOOL			HandleShellMenuItem(LPITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,TCHAR *szCmd);
+	void			HandleCustomMenuItem(LPITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,int iCmd);
 
 	/* Sorting methods. */
 	int CALLBACK	SortResults(LPARAM lParam1,LPARAM lParam2);
@@ -130,7 +130,9 @@ private:
 	static const int SEARCH_PROCESSITEMS_TIMER_ELAPSED = 50;
 	static const int SEARCH_MAX_ITEMS_BATCH_PROCESS = 100;
 
-	/* TODO: MAX_SHELL_MENU_ID - replace with class constant. */
+	static const int MIN_SHELL_MENU_ID = 1;
+	static const int MAX_SHELL_MENU_ID = 1000;
+
 	static const int MENU_ID_OPEN_FILE_LOCATION = (MAX_SHELL_MENU_ID + 1);
 
 	/* Available search modes. */

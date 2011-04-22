@@ -71,9 +71,6 @@ SelectAndEdit() method of INewClient. */
 #define LISTVIEW_RENAME_EXTENSION	1
 #define LISTVIEW_RENAME_ENTIRE		2
 
-#define MIN_SHELL_MENU_ID	1
-#define MAX_SHELL_MENU_ID	1000
-
 #define SORTBY_BASE	50000
 #define SORTBY_END	50099
 
@@ -284,6 +281,8 @@ __interface IExplorerplusplus
 	virtual void			OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 
 	virtual	CStatusBar		*GetStatusBar();
+
+	virtual HRESULT			BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 };
 
 /* Tab icons. */

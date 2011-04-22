@@ -238,6 +238,16 @@ void CSearchDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstr
 	Control.Constraint = CResizableDialog::CONSTRAINT_X;
 	ControlList.push_back(Control);
 
+	Control.iID = IDC_LINK_STATUS;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_LINK_STATUS;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
 	Control.iID = IDC_STATIC_ETCHEDHORZ;
 	Control.Type = CResizableDialog::TYPE_MOVE;
 	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
@@ -548,26 +558,46 @@ int CALLBACK CSearchDialog::SortResultsByPath(LPARAM lParam1,LPARAM lParam2)
 }
 
 void CSearchDialog::AddMenuEntries(LPITEMIDLIST pidlParent,
-	std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu)
+	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
-	/* TODO: Move string into string table. */
-	/* TODO: If the item is a folder, show 'Open folder location'
-	instead. */
+	LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
+	SFGAOF ItemAttributes = SFGAO_FOLDER;
+	GetItemAttributes(pidlComplete,&ItemAttributes);
+	CoTaskMemFree(pidlComplete);
+
+	TCHAR szTemp[64];
+
+	if((ItemAttributes & SFGAO_FOLDER) == SFGAO_FOLDER)
+	{
+		LoadString(GetInstance(),IDS_SEARCH_OPEN_FOLDER_LOCATION,
+			szTemp,SIZEOF_ARRAY(szTemp));
+	}
+	else
+	{
+		LoadString(GetInstance(),IDS_SEARCH_OPEN_FILE_LOCATION,
+			szTemp,SIZEOF_ARRAY(szTemp));
+	}
+
 	MENUITEMINFO mii;
 	mii.cbSize		= sizeof(MENUITEMINFO);
 	mii.fMask		= MIIM_STRING|MIIM_ID;
 	mii.wID			= MENU_ID_OPEN_FILE_LOCATION;
-	mii.dwTypeData	= _T("Open file location");
+	mii.dwTypeData	= szTemp;
 	InsertMenuItem(hMenu,1,TRUE,&mii);
 }
 
 BOOL CSearchDialog::HandleShellMenuItem(LPITEMIDLIST pidlParent,
-	std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
+	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
 {
 	if(StrCmpI(szCmd,_T("open")) == 0)
 	{
-		/* TODO: Open the item. */
-		//m_pexpp->OpenItem();
+		for each(auto pidlItem in pidlItemList)
+		{
+			LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItem);
+			m_pexpp->OpenItem(pidlComplete,FALSE,FALSE);
+			CoTaskMemFree(pidlComplete);
+		}
+
 		return TRUE;
 	}
 
@@ -575,22 +605,20 @@ BOOL CSearchDialog::HandleShellMenuItem(LPITEMIDLIST pidlParent,
 }
 
 void CSearchDialog::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
-	std::list<LPITEMIDLIST> pidlItemList,int iCmd)
+	const std::list<LPITEMIDLIST> &pidlItemList,int iCmd)
 {
 	switch(iCmd)
 	{
 	case MENU_ID_OPEN_FILE_LOCATION:
 		{
-			/* TODO: Browse to the parent folder,
-			and select the specified item. */
-			/*TCHAR szFileName[MAX_PATH];
+			m_pexpp->BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 
-			BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+			TCHAR szFilename[MAX_PATH];
+			LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
+			GetDisplayName(pidlComplete,szFilename,SHGDN_INFOLDER|SHGDN_FORPARSING);
+			CoTaskMemFree(pidlComplete);
 
-			vector<LPITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
-			GetDisplayName(pidlItemVector[0],szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
-
-			m_pActiveShellBrowser->SelectFiles(szFileName);*/
+			m_pexpp->GetActiveShellBrowser()->SelectFiles(szFilename);
 		}
 		break;
 	}
@@ -629,8 +657,7 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 
 					if(hr == S_OK)
 					{
-						/* TODO: */
-						//OpenItem(pidlFull,TRUE,FALSE);
+						m_pexpp->OpenItem(pidlFull,FALSE,FALSE);
 
 						CoTaskMemFree(pidlFull);
 					}
