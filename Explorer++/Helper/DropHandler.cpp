@@ -177,28 +177,28 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 	HRESULT hrCopy = E_FAIL;
 	std::list<std::wstring> PastedFileList;
 
-	if(pDataObject->QueryGetData(&m_ftcHDrop) == S_OK)
+	if(CheckDropFormatSupported(pDataObject,&m_ftcHDrop))
 	{
 		hrCopy = CopyHDropData(pDataObject,bPrefferedEffect,dwEffect,
 			PastedFileList);
 	}
-	else if(pDataObject->QueryGetData(&m_ftcShellIDList) == S_OK)
+	else if(CheckDropFormatSupported(pDataObject,&m_ftcShellIDList))
 	{
 		hrCopy = CopyShellIDListData(pDataObject,PastedFileList);
 	}
-	else if(pDataObject->QueryGetData(&m_ftcFileDescriptor) == S_OK)
+	else if(CheckDropFormatSupported(pDataObject,&m_ftcFileDescriptor))
 	{
 		hrCopy = CopyFileDescriptorData(pDataObject,PastedFileList);
 	}
-	else if(pDataObject->QueryGetData(&m_ftcUnicodeText) == S_OK)
+	else if(CheckDropFormatSupported(pDataObject,&m_ftcUnicodeText))
 	{
 		hrCopy = CopyUnicodeTextData(pDataObject,PastedFileList);
 	}
-	else if(pDataObject->QueryGetData(&m_ftcText) == S_OK)
+	else if(CheckDropFormatSupported(pDataObject,&m_ftcText))
 	{
 		hrCopy = CopyAnsiTextData(pDataObject,PastedFileList);
 	}
-	else if(pDataObject->QueryGetData(&m_ftcDIBV5) == S_OK)
+	else if(CheckDropFormatSupported(pDataObject,&m_ftcDIBV5))
 	{
 		hrCopy = CopyDIBV5Data(pDataObject,PastedFileList);
 	}
@@ -213,6 +213,35 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 			m_pDropFilesCallback->OnDropFile(PastedFileList,&pt);
 		}
 	}
+}
+
+/* Some applications (e.g. Thunderbird) may indicate via
+QueryGetData() that they support a particular drop format,
+even though a corresponding call to GetData() fails.
+Therefore, we'll actually attempt to query the data using
+GetData(). */
+BOOL CDropHandler::CheckDropFormatSupported(IDataObject *pDataObject,FORMATETC *pftc)
+{
+	HRESULT hr;
+	
+	hr = pDataObject->QueryGetData(pftc);
+
+	if(hr != S_OK)
+	{
+		return FALSE;
+	}
+
+	STGMEDIUM stg;
+	hr = pDataObject->GetData(pftc,&stg);
+
+	if(hr != S_OK)
+	{
+		return FALSE;
+	}
+
+	ReleaseStgMedium(&stg);
+
+	return TRUE;
 }
 
 HRESULT CDropHandler::CopyHDropData(IDataObject *pDataObject,
@@ -357,7 +386,9 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 				SetFORMATETC(&ftcfcstg,(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS),
 					NULL,DVASPECT_CONTENT,-1,TYMED_ISTORAGE);
 
-				if(pDataObject->QueryGetData(&ftcfchg) == S_OK)
+				BOOL bDataExtracted = FALSE;
+
+				if(CheckDropFormatSupported(pDataObject,&ftcfchg))
 				{
 					ftcfchg.lindex = i;
 
@@ -365,107 +396,131 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 
 					if(hr == S_OK)
 					{
-						pBuffer = (LPBYTE)malloc(GlobalSize(stgFileContents.hGlobal) * sizeof(BYTE));
-
-						if(pBuffer != NULL)
-						{
-							if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
-								nBytesToWrite = (DWORD)GlobalSize(stgFileContents.hGlobal);
-
-							LPBYTE pTemp = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
-
-							if(pTemp != NULL)
-							{
-								memcpy(pBuffer,pTemp,GlobalSize(stgFileContents.hGlobal));
-
-								GlobalUnlock(stgFileContents.hGlobal);
-
-								bDataRetrieved = TRUE;
-							}
-
-							ReleaseStgMedium(&stgFileContents);
-						}
+						bDataExtracted = TRUE;
 					}
 				}
-				else if(pDataObject->QueryGetData(&ftcfcis) == S_OK)
+				else if(CheckDropFormatSupported(pDataObject,&ftcfcis))
 				{
-					STATSTG sstg;
-					ULONG cbRead;
-
 					ftcfcis.lindex = i;
 
 					hr = pDataObject->GetData(&ftcfcis,&stgFileContents);
 
 					if(hr == S_OK)
 					{
-						hr = stgFileContents.pstm->Stat(&sstg,STATFLAG_NONAME);
-
-						if(hr == S_OK)
-						{
-							pBuffer = (LPBYTE)malloc(sstg.cbSize.LowPart * sizeof(BYTE));
-
-							if(pBuffer != NULL)
-							{
-								/* If the file size isn't explicitly given,
-								use the size of the stream. */
-								if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
-									nBytesToWrite = sstg.cbSize.LowPart;
-
-								stgFileContents.pstm->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
-
-								bDataRetrieved = TRUE;
-							}
-						}
-
-						ReleaseStgMedium(&stgFileContents);
+						bDataExtracted = TRUE;
 					}
 				}
-				else if(pDataObject->QueryGetData(&ftcfcstg) == S_OK)
+				else if(CheckDropFormatSupported(pDataObject,&ftcfcstg))
 				{
-					IStream *pStream;
-					STATSTG sstg;
-					ULONG cbRead;
-
 					ftcfcstg.lindex = i;
 
 					hr = pDataObject->GetData(&ftcfcstg,&stgFileContents);
 
 					if(hr == S_OK)
 					{
-						hr = stgFileContents.pstg->Stat(&sstg,STATFLAG_DEFAULT);
+						bDataExtracted = TRUE;
+					}
+				}
 
-						if(hr == S_OK)
+				if(bDataExtracted)
+				{
+					/* Some applications (e.g. Thunderbird) may return data
+					in a different format than the one requested. So, take
+					action based on what they return, rather than what
+					was requested. */
+					switch(stgFileContents.tymed)
+					{
+					case TYMED_HGLOBAL:
 						{
-							hr = stgFileContents.pstg->OpenStream(sstg.pwcsName,NULL,
-								STGM_READ|STGM_SHARE_EXCLUSIVE,0,&pStream);
+							pBuffer = (LPBYTE)malloc(GlobalSize(stgFileContents.hGlobal) * sizeof(BYTE));
+
+							if(pBuffer != NULL)
+							{
+								if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+									nBytesToWrite = (DWORD)GlobalSize(stgFileContents.hGlobal);
+
+								LPBYTE pTemp = (LPBYTE)GlobalLock(stgFileContents.hGlobal);
+
+								if(pTemp != NULL)
+								{
+									memcpy(pBuffer,pTemp,GlobalSize(stgFileContents.hGlobal));
+
+									GlobalUnlock(stgFileContents.hGlobal);
+
+									bDataRetrieved = TRUE;
+								}
+							}
+						}
+						break;
+
+					case TYMED_ISTREAM:
+						{
+							STATSTG sstg;
+							ULONG cbRead;
+
+							hr = stgFileContents.pstm->Stat(&sstg,STATFLAG_NONAME);
 
 							if(hr == S_OK)
 							{
-								CoTaskMemFree(sstg.pwcsName);
+								pBuffer = (LPBYTE)malloc(sstg.cbSize.LowPart * sizeof(BYTE));
 
-								hr = pStream->Stat(&sstg,STATFLAG_NONAME);
+								if(pBuffer != NULL)
+								{
+									/* If the file size isn't explicitly given,
+									use the size of the stream. */
+									if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+										nBytesToWrite = sstg.cbSize.LowPart;
+
+									stgFileContents.pstm->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
+
+									bDataRetrieved = TRUE;
+								}
+							}
+						}
+						break;
+
+					case TYMED_ISTORAGE:
+						{
+							IStream *pStream;
+							STATSTG sstg;
+							ULONG cbRead;
+
+							hr = stgFileContents.pstg->Stat(&sstg,STATFLAG_DEFAULT);
+
+							if(hr == S_OK)
+							{
+								hr = stgFileContents.pstg->OpenStream(sstg.pwcsName,NULL,
+									STGM_READ|STGM_SHARE_EXCLUSIVE,0,&pStream);
 
 								if(hr == S_OK)
 								{
-									pBuffer = (LPBYTE)malloc(sstg.cbSize.LowPart * sizeof(BYTE));
+									CoTaskMemFree(sstg.pwcsName);
 
-									if(pBuffer != NULL)
+									hr = pStream->Stat(&sstg,STATFLAG_NONAME);
+
+									if(hr == S_OK)
 									{
-										/* If the file size isn't explicitly given,
-										use the size of the stream. */
-										if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
-											nBytesToWrite = sstg.cbSize.LowPart;
+										pBuffer = (LPBYTE)malloc(sstg.cbSize.LowPart * sizeof(BYTE));
 
-										pStream->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
+										if(pBuffer != NULL)
+										{
+											/* If the file size isn't explicitly given,
+											use the size of the stream. */
+											if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
+												nBytesToWrite = sstg.cbSize.LowPart;
 
-										bDataRetrieved = TRUE;
+											pStream->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
+
+											bDataRetrieved = TRUE;
+										}
 									}
 								}
 							}
 						}
-
-						ReleaseStgMedium(&stgFileContents);
+						break;
 					}
+
+					ReleaseStgMedium(&stgFileContents);
 				}
 
 				if(bDataRetrieved)

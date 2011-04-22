@@ -39,6 +39,8 @@ private:
 	void	HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl);
 	void	HandleRightClickDrop(void);
 
+	BOOL	CheckDropFormatSupported(IDataObject *pDataObject,FORMATETC *pftc);
+
 	HRESULT	CopyHDropData(IDataObject *pDataObject,BOOL bPrefferedEffect,DWORD dwEffect,std::list<std::wstring> &PastedFileList);
 	HRESULT	CopyShellIDListData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
 	HRESULT	CopyFileDescriptorData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
