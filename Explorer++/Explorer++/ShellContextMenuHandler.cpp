@@ -35,8 +35,6 @@ void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
 
 			std::vector<LPITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
 
-			/* TODO: Convert first argument of function
-			to const. */
 			GetItemAttributes(pidlItemVector[0],&FileAttributes);
 
 			if(FileAttributes & SFGAO_FOLDER)

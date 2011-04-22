@@ -132,7 +132,7 @@ HRESULT GetItemAttributes(TCHAR *szItemParsingPath,SFGAOF *pItemAttributes)
 	return hr;
 }
 
-HRESULT GetItemAttributes(LPITEMIDLIST pidl,SFGAOF *pItemAttributes)
+HRESULT GetItemAttributes(LPCITEMIDLIST pidl,SFGAOF *pItemAttributes)
 {
 	if(pidl == NULL ||
 		pItemAttributes == NULL)

@@ -1162,42 +1162,57 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	DestroyMenu(hMenu);
 }
 
-/* TODO: */
 HMENU Explorerplusplus::InitializeRightClickMenu(void)
 {
-	HMENU hMenu;
-	MENUITEMINFO mii;
-
-	hMenu = GetSubMenu(LoadMenu(g_hLanguageModule,
+	HMENU hMenu = GetSubMenu(LoadMenu(g_hLanguageModule,
 		MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)),0);
 
-	mii.cbSize	= sizeof(mii);
-	mii.fMask	= MIIM_SUBMENU;
+	MENUITEMINFO mii;
+
+	for each(auto ViewMode in m_ViewModes)
+	{
+		TCHAR szTemp[64];
+		LoadString(g_hLanguageModule,GetViewModeMenuStringId(ViewMode.uViewMode),
+			szTemp,SIZEOF_ARRAY(szTemp));
+
+		mii.cbSize		= sizeof(mii);
+		mii.fMask		= MIIM_ID|MIIM_STRING;
+		mii.wID			= GetViewModeMenuId(ViewMode.uViewMode);
+		mii.dwTypeData	= szTemp;
+		InsertMenuItem(hMenu,IDM_RCLICK_VIEW_PLACEHOLDER,FALSE,&mii);
+	}
+
+	DeleteMenu(hMenu,IDM_RCLICK_VIEW_PLACEHOLDER,MF_BYCOMMAND);
+
+	mii.cbSize		= sizeof(mii);
+	mii.fMask		= MIIM_SUBMENU;
 	mii.hSubMenu	= m_hArrangeSubMenu;
 	SetMenuItemInfo(hMenu,IDM_POPUP_SORTBY,FALSE,&mii);
 
-	mii.cbSize	= sizeof(mii);
-	mii.fMask	= MIIM_SUBMENU;
+	mii.cbSize		= sizeof(mii);
+	mii.fMask		= MIIM_SUBMENU;
+	mii.hSubMenu	= m_hArrangeSubMenu;
+	SetMenuItemInfo(hMenu,IDM_POPUP_SORTBY,FALSE,&mii);
+
+	mii.cbSize		= sizeof(mii);
+	mii.fMask		= MIIM_SUBMENU;
 	mii.hSubMenu	= m_hGroupBySubMenu;
 	SetMenuItemInfo(hMenu,IDM_POPUP_GROUPBY,FALSE,&mii);
 
-	/*if(uViewMode == VM_DETAILS)
-	{
-		lEnableMenuItem(hMenu,IDM_POPUP_GROUPBY,TRUE);
-	}
-	else if(uViewMode == VM_LIST)
+	UINT uViewMode;
+	m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+
+	if(uViewMode == VM_LIST)
 	{
 		lEnableMenuItem(hMenu,IDM_POPUP_GROUPBY,FALSE);
 	}
 	else
 	{
 		lEnableMenuItem(hMenu,IDM_POPUP_GROUPBY,TRUE);
-	}*/
+	}
 
-	//// Initialization.cpp - InitializeMenus().
-	//InsertMenuItem(m_hRightClickMenu,IDM_VIEW_PLACEHOLDER,FALSE,&mii);
-	//DeleteMenu(m_hRightClickMenu,IDM_VIEW_PLACEHOLDER,MF_BYCOMMAND);
-
+	/* TODO: */
+	// Initialization.cpp - InitializeMenus().
 	//SetMenuItemBitmap(m_hRightClickMenu,IDM_VIEW_REFRESH,SHELLIMAGES_REFRESH);
 	//SetMenuItemBitmap(m_hRightClickMenu,IDM_EDIT_PASTE,SHELLIMAGES_PASTE);
 	//SetMenuItemBitmap(m_hRightClickMenu,IDM_EDIT_PASTESHORTCUT,SHELLIMAGES_PASTESHORTCUT);
