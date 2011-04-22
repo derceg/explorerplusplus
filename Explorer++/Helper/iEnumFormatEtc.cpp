@@ -15,13 +15,12 @@
 #include <list>
 #include "iEnumFormatEtc.h"
 
-using namespace std;
 
 class CEnumFormatEtc : public IEnumFORMATETC
 {
 public:
 
-	CEnumFormatEtc(list<FORMATETC> feList);
+	CEnumFormatEtc(std::list<FORMATETC> feList);
 	~CEnumFormatEtc();
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
@@ -37,7 +36,7 @@ private:
 
 	LONG			m_lRefCount;
 
-	list<FORMATETC>	m_feList;
+	std::list<FORMATETC>	m_feList;
 	int				m_iIndex;
 	int				m_iNumFormats;
 };
@@ -49,7 +48,7 @@ HRESULT CreateEnumFormatEtc(std::list<FORMATETC> feList,IEnumFORMATETC **ppEnumF
 	return S_OK;
 }
 
-CEnumFormatEtc::CEnumFormatEtc(list<FORMATETC> feList)
+CEnumFormatEtc::CEnumFormatEtc(std::list<FORMATETC> feList)
 {
 	m_lRefCount = 1;
 	m_iIndex = 0;

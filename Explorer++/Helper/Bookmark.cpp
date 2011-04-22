@@ -17,8 +17,6 @@
 #include "RegistrySettings.h"
 
 
-using namespace std;
-
 #define ROOT_NAME	_T("Bookmarks")
 
 CBookmark::CBookmark(void)

@@ -44,14 +44,12 @@ DWORD	g_ThreadId;
 WNDPROC	OldTreeViewProc;
 UINT	DirWatchFlags = FILE_NOTIFY_CHANGE_DIR_NAME;
 
-list<QueuedItem_t> g_ItemList;
-
 CRITICAL_SECTION g_tv_icon_cs;
 int g_ntvAPCsRan = 0;
 int g_ntvAPCsQueued = 0;
 BOOL g_btvIconThreadSleeping = TRUE;
 
-list<TreeViewInfo_t> g_pTreeViewInfoList;
+std::list<TreeViewInfo_t> g_pTreeViewInfoList;
 
 CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon,
 HANDLE hIconsThread)
@@ -414,8 +412,8 @@ void CMyTreeView::EmptyIconFinderQueue(void)
 {
 	EnterCriticalSection(&g_tv_icon_cs);
 
-	list<TreeViewInfo_t>::iterator last;
-	list<TreeViewInfo_t>::iterator first;
+	std::list<TreeViewInfo_t>::iterator last;
+	std::list<TreeViewInfo_t>::iterator first;
 
 	last = g_pTreeViewInfoList.end();
 
@@ -443,7 +441,7 @@ BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pTreeViewInfo)
 	}
 	else
 	{
-		list<TreeViewInfo_t>::iterator itr;
+		std::list<TreeViewInfo_t>::iterator itr;
 
 		itr = g_pTreeViewInfoList.end();
 
@@ -609,8 +607,8 @@ HTREEITEM hParent)
 
 	hr = pShellFolder->EnumObjects(NULL,EnumFlags,&pEnumIDList);
 
-	vector<ItemStore_t> vItems;
-	vector<ItemStore_t>::iterator itr;
+	std::vector<ItemStore_t> vItems;
+	std::vector<ItemStore_t>::iterator itr;
 	ItemStore_t ItemStore;
 
 	if(SUCCEEDED(hr) && pEnumIDList != NULL)
@@ -1604,7 +1602,7 @@ LRESULT CALLBACK CMyTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 				a drive. Stop monitoring the drive. */
 				DEV_BROADCAST_HDR				*dbh = NULL;
 				DEV_BROADCAST_HANDLE			*pdbHandle = NULL;
-				list<DriveEvent_t>::iterator	itr;
+				std::list<DriveEvent_t>::iterator	itr;
 
 				dbh = (DEV_BROADCAST_HDR *)lParam;
 
@@ -1667,7 +1665,7 @@ LRESULT CALLBACK CMyTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 			{
 				DEV_BROADCAST_HDR				*dbh = NULL;
 				DEV_BROADCAST_HANDLE			*pdbHandle = NULL;
-				list<DriveEvent_t>::iterator	itr;
+				std::list<DriveEvent_t>::iterator	itr;
 
 				dbh = (DEV_BROADCAST_HDR *)lParam;
 

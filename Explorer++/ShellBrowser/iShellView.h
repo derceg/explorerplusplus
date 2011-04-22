@@ -9,7 +9,6 @@
 #include "iPathManager.h"
 #include "../Helper/Helper.h"
 
-using namespace std;
 
 #define WM_USER_UPDATEWINDOWS		(WM_APP + 17)
 #define WM_USER_FILESADDED			(WM_APP + 51)
@@ -52,13 +51,13 @@ typedef struct
 
 typedef struct
 {
-	list<Column_t>	RealFolderColumnList;
-	list<Column_t>	MyComputerColumnList;
-	list<Column_t>	ControlPanelColumnList;
-	list<Column_t>	RecycleBinColumnList;
-	list<Column_t>	PrintersColumnList;
-	list<Column_t>	NetworkConnectionsColumnList;
-	list<Column_t>	MyNetworkPlacesColumnList;
+	std::list<Column_t>	RealFolderColumnList;
+	std::list<Column_t>	MyComputerColumnList;
+	std::list<Column_t>	ControlPanelColumnList;
+	std::list<Column_t>	RecycleBinColumnList;
+	std::list<Column_t>	PrintersColumnList;
+	std::list<Column_t>	NetworkConnectionsColumnList;
+	std::list<Column_t>	MyNetworkPlacesColumnList;
 } ColumnExport_t;
 
 typedef struct
@@ -83,13 +82,13 @@ typedef struct
 	TCHAR	szFilter[512];
 
 	/* Initial columns. */
-	list<Column_t>	*pRealFolderColumnList;
-	list<Column_t>	*pMyComputerColumnList;
-	list<Column_t>	*pControlPanelColumnList;
-	list<Column_t>	*pRecycleBinColumnList;
-	list<Column_t>	*pPrintersColumnList;
-	list<Column_t>	*pNetworkConnectionsColumnList;
-	list<Column_t>	*pMyNetworkPlacesColumnList;
+	std::list<Column_t>	*pRealFolderColumnList;
+	std::list<Column_t>	*pMyComputerColumnList;
+	std::list<Column_t>	*pControlPanelColumnList;
+	std::list<Column_t>	*pRecycleBinColumnList;
+	std::list<Column_t>	*pPrintersColumnList;
+	std::list<Column_t>	*pNetworkConnectionsColumnList;
+	std::list<Column_t>	*pMyNetworkPlacesColumnList;
 } InitialSettings_t;
 
 typedef struct
@@ -307,8 +306,8 @@ __interface IShellBrowser2 : IUnknown
 	virtual int				QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer);
 	virtual BOOL			IsBackHistory(void);
 	virtual BOOL			IsForwardHistory(void);
-	virtual void			GetBackHistory(list<LPITEMIDLIST> *lHistory);
-	virtual void			GetForwardHistory(list<LPITEMIDLIST> *lHistory);
+	virtual void			GetBackHistory(std::list<LPITEMIDLIST> *lHistory);
+	virtual void			GetForwardHistory(std::list<LPITEMIDLIST> *lHistory);
 	virtual LPITEMIDLIST	RetrieveHistoryItemWithoutUpdate(int iItem);
 	virtual LPITEMIDLIST	RetrieveHistoryItem(int iItem);
 	virtual BOOL			CanBrowseUp();
@@ -359,15 +358,15 @@ __interface IShellBrowser2 : IUnknown
 	virtual InitialSettings_t	*QueryUserOptions(void);
 	virtual BOOL			QueryDragging(void);
 	virtual void			ColumnClicked(int iColumn);
-	virtual void			QueryCurrentSortModes(list<int> *pSortModes);
+	virtual void			QueryCurrentSortModes(std::list<int> *pSortModes);
 	virtual void			SetGlobalSettings(GlobalSettings_t *gs);
 	virtual int				QueryNumSelected(void);
 	virtual size_t			QueryNumActiveColumns(void);
 	virtual void			ToggleGridlines(void);
 	virtual BOOL			QueryGridlinesActive(void);
 	virtual HICON			GetItemIcon(int iItem);
-	virtual void			ExportCurrentColumns(list<Column_t> *pColumns);
-	virtual void			ImportColumns(list<Column_t> *pColumns,BOOL bColumnsSwapped);
+	virtual void			ExportCurrentColumns(std::list<Column_t> *pColumns);
+	virtual void			ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped);
 	virtual void			ImportAllColumns(ColumnExport_t *pce);
 	virtual void			ExportAllColumns(ColumnExport_t *pcie);
 	virtual void			QueueRename(LPITEMIDLIST pidlItem);

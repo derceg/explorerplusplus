@@ -4,8 +4,6 @@
 #include <list>
 #include <string>
 
-using namespace std;
-
 class CStatusBar
 {
 public:
@@ -24,7 +22,7 @@ private:
 
 	int				m_nParts;
 	int				*m_pPartWidths;
-	list<wstring>	m_TextList;
+	std::list<std::wstring>	m_TextList;
 
 	bool			m_bAlteredStatusBarParts;
 };

@@ -96,7 +96,7 @@ class CSearchDialog : public CBaseDialog, public IFileContextMenuExternal
 {
 public:
 
-	CSearchDialog(HINSTANCE hInstance,int iResource,HWND hParent,TCHAR *szSearchDirectory);
+	CSearchDialog(HINSTANCE hInstance,int iResource,HWND hParent,TCHAR *szSearchDirectory,IExplorerplusplus *pexpp);
 	~CSearchDialog();
 
 	/* IFileContextMenuExternal methods. */
@@ -115,14 +115,14 @@ protected:
 	BOOL	OnTimer(int iTimerID);
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnNotify(NMHDR *pnmhdr);
-	BOOL	OnGetMinMaxInfo(LPMINMAXINFO pmmi);
-	BOOL	OnSize(int iType,int iWidth,int iHeight);
 	BOOL	OnClose();
 	BOOL	OnNcDestroy();
 
 	void	SaveState();
 
 	void	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
+
+	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
 private:
 
@@ -147,9 +147,6 @@ private:
 
 	void	OnSearch();
 
-	CSearchDialogPersistentSettings	*m_sdps;
-
-	HWND						m_hGripper;
 	TCHAR						m_szSearchDirectory[MAX_PATH];
 	HICON						m_hDialogIcon;
 	HICON						m_hDirectoryIcon;
@@ -170,24 +167,11 @@ private:
 	SortMode_t					m_SortMode;
 	BOOL						m_bSortAscending;
 
-	int							m_iMinWidth;
-	int							m_iMinHeight;
-
 	BOOL						m_bSetSearchTimer;
 
-	/* Used when resizing. */
-	int							m_iListViewWidthDelta;
-	int							m_iListViewHeightDelta;
-	int							m_iSearchDirectoryWidthDelta;
-	int							m_iNamedWidthDelta;
-	int							m_iButtonDirectoryLeftDelta;
-	int							m_iEtchedHorzWidthDelta;
-	int							m_iEtchedHorzVerticalDelta;
-	int							m_iExitLeftDelta;
-	int							m_iExitVerticalDelta;
-	int							m_iSearchExitDelta;
-	int							m_iStaticStatusWidthDelta;
-	int							m_iStatusVerticalDelta;
+	IExplorerplusplus			*m_pexpp;
+
+	CSearchDialogPersistentSettings	*m_sdps;
 };
 
 #endif

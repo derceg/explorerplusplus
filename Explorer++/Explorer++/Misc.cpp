@@ -25,7 +25,7 @@
 #include "MainResource.h"
 
 
-extern list<std::wstring> g_TabDirs;
+extern std::list<std::wstring> g_TabDirs;
 
 void Explorerplusplus::HandleTreeViewSelection(void)
 {
@@ -191,7 +191,7 @@ void Explorerplusplus::ValidateLoadedSettings(void)
 
 void Explorerplusplus::ValidateToolbarSettings(void)
 {
-	list<ToolbarButton_t>::iterator	itr;
+	std::list<ToolbarButton_t>::iterator	itr;
 	BOOL							bCorrupted = FALSE;
 	int								*ButtonMap;
 	int								nButtons;
@@ -250,9 +250,9 @@ void Explorerplusplus::ValidateColumns(void)
 	ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,&m_MyNetworkPlacesColumnList);
 }
 
-void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet,list<Column_t> *pColumnList)
+void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet,std::list<Column_t> *pColumnList)
 {
-	list<Column_t>::iterator	itr;
+	std::list<Column_t>::iterator	itr;
 	Column_t					Column;
 	int							*pColumnMap = NULL;
 	BOOL						bFound = FALSE;
@@ -1195,9 +1195,9 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 	TCHAR			szDisplayName[MAX_PATH];
 	TCHAR			szDateModified[256];
 	int				iSelected;
-	list<DWRule_t>::iterator itr;
-	list<DWFileType_t>::iterator itrTypes;
-	list<DWLine_t>::iterator itrLines;
+	std::list<DWRule_t>::iterator	itr;
+	std::list<DWFileType_t>::iterator	itrTypes;
+	std::list<DWLine_t>::iterator	itrLines;
 
 	iSelected = ListView_GetNextItem(m_hActiveListView,-1,LVNI_SELECTED);
 
@@ -1299,11 +1299,11 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 				TCHAR szOutput[256];
 				UINT uWidth;
 				UINT uHeight;
-				Image *pimg = NULL;
+				Gdiplus::Image *pimg = NULL;
 
-				pimg = new Image(szFullItemName,FALSE);
+				pimg = new Gdiplus::Image(szFullItemName,FALSE);
 
-				if(pimg->GetLastStatus() == Ok)
+				if(pimg->GetLastStatus() == Gdiplus::Ok)
 				{
 					/* String table. */
 					uWidth = pimg->GetWidth();
@@ -1315,7 +1315,7 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("Height: %u pixels"),uHeight);
 					DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
 
-					PixelFormat format;
+					Gdiplus::PixelFormat format;
 					UINT uBitDepth;
 
 					format = pimg->GetPixelFormat();
@@ -1373,7 +1373,7 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 
 					DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
 
-					REAL res;
+					Gdiplus::REAL res;
 
 					res = pimg->GetHorizontalResolution();
 					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("Horizontal resolution: %.0f dpi"),res);
@@ -1546,13 +1546,13 @@ void Explorerplusplus::TranslateDisplayWindowBuffer(TCHAR *szSymbol,UINT cchMax,
 	}
 	else if(lstrcmp(szSymbol,_T("{width}")) == 0)
 	{
-		Image *pimg = NULL;
+		Gdiplus::Image *pimg = NULL;
 		TCHAR szOutput[256];
 		UINT uWidth;
 
-		pimg = new Image(szFullFileName,FALSE);
+		pimg = new Gdiplus::Image(szFullFileName,FALSE);
 
-		if(pimg->GetLastStatus() == Ok)
+		if(pimg->GetLastStatus() == Gdiplus::Ok)
 		{
 			uWidth = pimg->GetWidth();
 			StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("%u"),uWidth);
@@ -1563,13 +1563,13 @@ void Explorerplusplus::TranslateDisplayWindowBuffer(TCHAR *szSymbol,UINT cchMax,
 	}
 	else if(lstrcmp(szSymbol,_T("{height}")) == 0)
 	{
-		Image *pimg = NULL;
+		Gdiplus::Image *pimg = NULL;
 		TCHAR szOutput[256];
 		UINT uHeight;
 
-		pimg = new Image(szFullFileName,FALSE);
+		pimg = new Gdiplus::Image(szFullFileName,FALSE);
 
-		if(pimg->GetLastStatus() == Ok)
+		if(pimg->GetLastStatus() == Gdiplus::Ok)
 		{
 			uHeight = pimg->GetHeight();
 			StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("%u"),uHeight);
@@ -2313,4 +2313,9 @@ void Explorerplusplus::OnSelectColumns()
 	SelectColumnsDialog.ShowModalDialog();
 
 	UpdateArrangeMenuItems();
+}
+
+CStatusBar *Explorerplusplus::GetStatusBar()
+{
+	return m_pStatusBar;
 }

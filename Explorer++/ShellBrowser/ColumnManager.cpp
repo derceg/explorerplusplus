@@ -26,8 +26,6 @@
 #include "../Helper/FolderSize.h"
 
 
-using namespace std;
-
 #define COLUMN_TIME_MODIFIED	0
 #define COLUMN_TIME_CREATED		1
 #define COLUMN_TIME_ACCESSED	2
@@ -340,7 +338,7 @@ BOOL CFolderView::RemoveFromColumnQueue(int *iItem)
 	}
 	else
 	{
-		list<int>::iterator itr;
+		std::list<int>::iterator itr;
 
 		itr = m_pColumnInfoList.begin();
 
@@ -360,8 +358,8 @@ BOOL CFolderView::RemoveFromColumnQueue(int *iItem)
 
 int CFolderView::SetAllColumnData(void)
 {
-	list<Column_t>				pActiveColumnList;
-	list<Column_t>::iterator	itr;
+	std::list<Column_t>			pActiveColumnList;
+	std::list<Column_t>::iterator	itr;
 	BOOL						bQueueNotEmpty;
 	int							iItem;
 	int							iColumnIndex = 0;
@@ -431,7 +429,7 @@ BOOL CFolderView::RemoveFromFolderQueue(int *iItem)
 	}
 	else
 	{
-		list<int>::iterator itr;
+		std::list<int>::iterator itr;
 
 		itr = m_pFolderInfoList.end();
 
@@ -462,7 +460,7 @@ void CALLBACK SetAllFolderSizeColumnDataAPC(ULONG_PTR dwParam)
 
 int CFolderView::SetAllFolderSizeColumnData(void)
 {
-	list<Column_t>::iterator itr;
+	std::list<Column_t>::iterator itr;
 	LVITEM lvItem;
 	BOOL bQueueNotEmpty;
 	int iItem;
@@ -1694,7 +1692,7 @@ void CFolderView::SetMediaStatusColumnData(int iItem,int iColumn,int iType)
 
 void CFolderView::PlaceColumns(void)
 {
-	list<Column_t>::iterator	itr;
+	std::list<Column_t>::iterator	itr;
 	int							iColumnIndex = 0;
 	int							i = 0;
 
@@ -1766,7 +1764,7 @@ void CFolderView::InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWidth
 
 void CFolderView::SetActiveColumnSet(void)
 {
-	list<Column_t> *pActiveColumnList = NULL;
+	std::list<Column_t> *pActiveColumnList = NULL;
 
 	if(CompareVirtualFolders(CSIDL_CONTROLS))
 	{
@@ -1982,14 +1980,14 @@ unsigned int CFolderView::DetermineColumnSortMode(int iColumnId)
 
 void CFolderView::ColumnClicked(int iClickedColumn)
 {
-	list<Column_t>::iterator itr;
+	std::list<Column_t>::iterator itr;
 	int iCurrentColumn = 0;
 	UINT SortMode = 0;
 	UINT iColumnId = 0;
 
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
 	{
-		/* Only increnment if this column is actually been shown. */
+		/* Only increment if this column is actually been shown. */
 		if(itr->bChecked)
 		{
 			if(iCurrentColumn == iClickedColumn)
@@ -2019,7 +2017,7 @@ void CFolderView::ApplyHeaderSortArrow(void)
 {
 	HWND hHeader;
 	HDITEM hdItem;
-	list<Column_t>::iterator itr;
+	std::list<Column_t>::iterator itr;
 	BOOL bPreviousColumnExists = FALSE;
 	int iColumn = 0;
 	int iPreviousSortedColumn = 0;
@@ -2031,7 +2029,7 @@ void CFolderView::ApplyHeaderSortArrow(void)
 	had the up/down arrow. */
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
 	{
-		/* Only increnment if this column is actually been shown. */
+		/* Only increment if this column is actually been shown. */
 		if(itr->bChecked)
 		{
 			if(m_iPreviousSortedColumnId == itr->id)
@@ -2124,8 +2122,8 @@ void CFolderView::ExportAllColumns(ColumnExport_t *pce)
 
 void CFolderView::SaveColumnWidths(void)
 {
-	list<Column_t> *pActiveColumnList = NULL;
-	list<Column_t>::iterator itr;
+	std::list<Column_t> *pActiveColumnList = NULL;
+	std::list<Column_t>::iterator itr;
 	int iColumn = 0;
 
 	if(CompareVirtualFolders(CSIDL_CONTROLS))

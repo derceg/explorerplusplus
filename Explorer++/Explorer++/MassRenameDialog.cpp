@@ -374,7 +374,7 @@ void CMassRenameDialog::ProcessFileName(const std::wstring strTarget,
 			std::wstringstream ss;
 
 			/* The minimum length is the number of zeros present plus one. */
-			ss << std::setfill(_T('0')) << setw((mr.length() - 2) + 1) << iFileIndex;
+			ss << std::setfill(_T('0')) << std::setw((mr.length() - 2) + 1) << iFileIndex;
 
 			strOutput.replace(mr.position(),mr.length(),ss.str());
 		}

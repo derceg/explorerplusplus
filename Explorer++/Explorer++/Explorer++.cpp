@@ -345,8 +345,8 @@ void Explorerplusplus::SetDefaultValues(void)
 HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 {
 	HMENU hSubMenu = NULL;
-	list<LPITEMIDLIST> lHistory;
-	list<LPITEMIDLIST>::iterator itr;
+	std::list<LPITEMIDLIST> lHistory;
+	std::list<LPITEMIDLIST>::iterator itr;
 	MENUITEMINFO mii;
 	TCHAR szDisplayName[MAX_PATH];
 	int iBase;

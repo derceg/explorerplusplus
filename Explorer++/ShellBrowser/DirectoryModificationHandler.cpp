@@ -237,7 +237,7 @@ void CFolderView::OnFileActionAdded(TCHAR *szFileName)
 			{
 				StrRetToBuf(&str,pidlRelative,szDisplayName,SIZEOF_ARRAY(szDisplayName));
 
-				list<DroppedFile_t>::iterator itr;
+				std::list<DroppedFile_t>::iterator itr;
 				BOOL bDropped = FALSE;
 
 				if(!m_DroppedFileNameList.empty())
@@ -295,11 +295,11 @@ void CFolderView::OnFileActionAdded(TCHAR *szFileName)
 
 void CFolderView::RemoveItemInternal(TCHAR *szFileName)
 {
-	list<Added_t>::iterator itr;
+	std::list<Added_t>::iterator itr;
 	int iItemInternal;
 	BOOL bFound = FALSE;
 
-	/* First chack if this item is in the queue of awaiting
+	/* First check if this item is in the queue of awaiting
 	items. If it is, remove it. */
 	for(itr = m_FilesAdded.begin();itr != m_FilesAdded.end();itr++)
 	{
@@ -357,7 +357,7 @@ void CFolderView::ModifyItemInternal(TCHAR *FileName)
 		inserted, so that files the have just been created
 		can be updated without them residing within the
 		listview. */
-		list<AwaitingAdd_t>::iterator itr;
+		std::list<AwaitingAdd_t>::iterator itr;
 
 		for(itr = m_AwaitingAddList.begin();itr!= m_AwaitingAddList.end();itr++)
 		{
@@ -432,7 +432,7 @@ void CFolderView::ModifyItemInternal(TCHAR *FileName)
 
 			if(m_ViewMode == VM_DETAILS)
 			{
-				list<Column_t>::iterator itrColumn;
+				std::list<Column_t>::iterator itrColumn;
 				int iColumnIndex = 0;
 
 				if(m_pActiveColumnList != NULL)
@@ -468,7 +468,7 @@ void CFolderView::ModifyItemInternal(TCHAR *FileName)
 
 void CFolderView::OnFileActionRenamedOldName(TCHAR *szFileName)
 {
-	list<Added_t>::iterator itrAdded;
+	std::list<Added_t>::iterator itrAdded;
 	BOOL bFileHandled = FALSE;
 
 	/* Loop through each file that is awaiting add to check for the

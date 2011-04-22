@@ -690,10 +690,10 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 	}
 }
 
-void UpdateColumnWidths(list<Column_t> *pColumnList,list<Column_t> *pColumnWidthList)
+void UpdateColumnWidths(std::list<Column_t> *pColumnList,std::list<Column_t> *pColumnWidthList)
 {
-	list<Column_t>::iterator itr1;
-	list<Column_t>::iterator itr2;
+	std::list<Column_t>::iterator itr1;
+	std::list<Column_t>::iterator itr2;
 
 	for(itr1 = pColumnWidthList->begin();itr1 != pColumnWidthList->end();itr1++)
 	{
@@ -758,13 +758,13 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			Settings.bShowFolderSizes = m_bShowFolderSizes;
 			Settings.bDisableFolderSizesNetworkRemovable = m_bDisableFolderSizesNetworkRemovable;
 
-			list<Column_t>	RealFolderColumnList;
-			list<Column_t>	MyComputerColumnList;
-			list<Column_t>	ControlPanelColumnList;
-			list<Column_t>	RecycleBinColumnList;
-			list<Column_t>	PrintersColumnList;
-			list<Column_t>	NetworkConnectionsColumnList;
-			list<Column_t>	MyNetworkPlacesColumnList;
+			std::list<Column_t>	RealFolderColumnList;
+			std::list<Column_t>	MyComputerColumnList;
+			std::list<Column_t>	ControlPanelColumnList;
+			std::list<Column_t>	RecycleBinColumnList;
+			std::list<Column_t>	PrintersColumnList;
+			std::list<Column_t>	NetworkConnectionsColumnList;
+			std::list<Column_t>	MyNetworkPlacesColumnList;
 
 			/* Now load this tabs columns. */
 			ReturnValue = RegOpenKeyEx(hTabKey,_T("Columns"),0,KEY_READ,&hColumnsKey);
@@ -779,13 +779,13 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 				LoadColumnFromRegistry(hColumnsKey,_T("NetworkColumns"),&NetworkConnectionsColumnList);
 				LoadColumnFromRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&MyNetworkPlacesColumnList);
 
-				list<Column_t>	RealFolderColumnListTemp;
-				list<Column_t>	MyComputerColumnListTemp;
-				list<Column_t>	ControlPanelColumnListTemp;
-				list<Column_t>	RecycleBinColumnListTemp;
-				list<Column_t>	PrintersColumnListTemp;
-				list<Column_t>	NetworkConnectionsColumnListTemp;
-				list<Column_t>	MyNetworkPlacesColumnListTemp;
+				std::list<Column_t>	RealFolderColumnListTemp;
+				std::list<Column_t>	MyComputerColumnListTemp;
+				std::list<Column_t>	ControlPanelColumnListTemp;
+				std::list<Column_t>	RecycleBinColumnListTemp;
+				std::list<Column_t>	PrintersColumnListTemp;
+				std::list<Column_t>	NetworkConnectionsColumnListTemp;
+				std::list<Column_t>	MyNetworkPlacesColumnListTemp;
 
 				LoadColumnWidthsFromRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&ControlPanelColumnListTemp);
 				LoadColumnWidthsFromRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&MyComputerColumnListTemp);
@@ -851,7 +851,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 	return nTabsCreated;
 }
 
-void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
+void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns)
 {
 	typedef struct
 	{
@@ -859,7 +859,7 @@ void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyN
 		int iWidth;
 	} ColumnWidth_t;
 
-	list<Column_t>::iterator	itr;
+	std::list<Column_t>::iterator	itr;
 	ColumnWidth_t				*pColumnList = NULL;
 	int							iColumn = 0;
 
@@ -879,7 +879,7 @@ void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyN
 	free(pColumnList);
 }
 
-void Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
+void Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns)
 {
 	typedef struct
 	{
@@ -912,9 +912,9 @@ void Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKe
 	}
 }
 
-void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
+void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns)
 {
-	list<Column_t>::iterator	itr;
+	std::list<Column_t>::iterator	itr;
 	ColumnOld_t					*pColumnList = NULL;
 	int							iColumn = 0;
 
@@ -934,7 +934,7 @@ void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,li
 	free(pColumnList);
 }
 
-void Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns)
+void Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns)
 {
 	ColumnOld_t		ColumnList[64];
 	Column_t		Column;
@@ -1021,13 +1021,13 @@ void Explorerplusplus::LoadDefaultColumnsFromRegistry(void)
 		LoadColumnFromRegistry(hColumnsKey,_T("NetworkColumns"),&m_NetworkConnectionsColumnList);
 		LoadColumnFromRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&m_MyNetworkPlacesColumnList);
 
-		list<Column_t>	RealFolderColumnListTemp;
-		list<Column_t>	MyComputerColumnListTemp;
-		list<Column_t>	ControlPanelColumnListTemp;
-		list<Column_t>	RecycleBinColumnListTemp;
-		list<Column_t>	PrintersColumnListTemp;
-		list<Column_t>	NetworkConnectionsColumnListTemp;
-		list<Column_t>	MyNetworkPlacesColumnListTemp;
+		std::list<Column_t>	RealFolderColumnListTemp;
+		std::list<Column_t>	MyComputerColumnListTemp;
+		std::list<Column_t>	ControlPanelColumnListTemp;
+		std::list<Column_t>	RecycleBinColumnListTemp;
+		std::list<Column_t>	PrintersColumnListTemp;
+		std::list<Column_t>	NetworkConnectionsColumnListTemp;
+		std::list<Column_t>	MyNetworkPlacesColumnListTemp;
 
 		LoadColumnWidthsFromRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&ControlPanelColumnListTemp);
 		LoadColumnWidthsFromRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&MyComputerColumnListTemp);

@@ -3,8 +3,6 @@
 
 #include <list>
 
-using namespace std;
-
 #define CONTROL_PANEL_CATEGORY_VIEW	_T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")
 
 /* ---- Context menu handler registry entries ---- */
@@ -45,14 +43,14 @@ HRESULT			GetItemInfoTip(TCHAR *szItemPath,TCHAR *szInfoTip,int cchMax);
 HRESULT			GetItemInfoTip(LPITEMIDLIST pidlComplete,TCHAR *szInfoTip,int cchMax);
 HRESULT			GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,DWORD uParsingFlags);
 BOOL			MyExpandEnvironmentStrings(TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize);
-HRESULT			BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN list<std::wstring> FilenameList);
-HRESULT			BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN LPCITEMIDLIST pidlDirectory,IN list<LPITEMIDLIST> pidlList);
+HRESULT			BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN std::list<std::wstring> FilenameList);
+HRESULT			BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN LPCITEMIDLIST pidlDirectory,IN std::list<LPITEMIDLIST> pidlList);
 HRESULT			BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder);
 BOOL			IsPathGUID(TCHAR *szPath);
 BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
 void			SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,DVTARGETDEVICE *ptd,DWORD dwAspect,LONG lindex,DWORD tymed);
 HRESULT			AddJumpListTasks(std::list<JumpListTaskInformation> TaskList);
-BOOL			LoadContextMenuHandlers(IN TCHAR *szRegKey,OUT list<ContextMenuHandler_t> *pContextMenuHandlers);
+BOOL			LoadContextMenuHandlers(IN TCHAR *szRegKey,OUT std::list<ContextMenuHandler_t> *pContextMenuHandlers);
 BOOL			LoadIUnknownFromCLSID(IN TCHAR *szCLSID,OUT ContextMenuHandler_t *pContextMenuHandler);
 BOOL			CopyTextToClipboard(const std::wstring &str);
 

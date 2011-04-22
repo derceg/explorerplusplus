@@ -1140,7 +1140,7 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 
 	if(DwmInvalidateIconicBitmaps != NULL)
 	{
-		list<TabProxyInfo_t>::iterator itr;
+		std::list<TabProxyInfo_t>::iterator itr;
 
 		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 		{
@@ -1509,7 +1509,7 @@ void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 
 	m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
 
-	list<ViewMode_t>::iterator itr;
+	std::list<ViewMode_t>::iterator itr;
 
 	for(itr = m_ViewModes.begin();itr != m_ViewModes.end();itr++)
 	{
@@ -1519,7 +1519,7 @@ void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 
 	if(bCycleForward)
 	{
-		list<ViewMode_t>::iterator itrEnd;
+		std::list<ViewMode_t>::iterator itrEnd;
 
 		itrEnd = m_ViewModes.end();
 		itrEnd--;
@@ -1872,7 +1872,7 @@ void Explorerplusplus::SetAllDefaultColumns(void)
 	SetDefaultMyNetworkPlacesColumns(&m_MyNetworkPlacesColumnList);
 }
 
-void Explorerplusplus::SetDefaultRealFolderColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultRealFolderColumns(std::list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -1888,7 +1888,7 @@ void Explorerplusplus::SetDefaultRealFolderColumns(list<Column_t> *pColumns)
 	}
 }
 
-void Explorerplusplus::SetDefaultControlPanelColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultControlPanelColumns(std::list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -1904,7 +1904,7 @@ void Explorerplusplus::SetDefaultControlPanelColumns(list<Column_t> *pColumns)
 	}
 }
 
-void Explorerplusplus::SetDefaultMyComputerColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultMyComputerColumns(std::list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -1920,7 +1920,7 @@ void Explorerplusplus::SetDefaultMyComputerColumns(list<Column_t> *pColumns)
 	}
 }
 
-void Explorerplusplus::SetDefaultRecycleBinColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultRecycleBinColumns(std::list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -1936,7 +1936,7 @@ void Explorerplusplus::SetDefaultRecycleBinColumns(list<Column_t> *pColumns)
 	}
 }
 
-void Explorerplusplus::SetDefaultPrintersColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultPrintersColumns(std::list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -1952,7 +1952,7 @@ void Explorerplusplus::SetDefaultPrintersColumns(list<Column_t> *pColumns)
 	}
 }
 
-void Explorerplusplus::SetDefaultNetworkConnectionsColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultNetworkConnectionsColumns(std::list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;
@@ -1968,7 +1968,7 @@ void Explorerplusplus::SetDefaultNetworkConnectionsColumns(list<Column_t> *pColu
 	}
 }
 
-void Explorerplusplus::SetDefaultMyNetworkPlacesColumns(list<Column_t> *pColumns)
+void Explorerplusplus::SetDefaultMyNetworkPlacesColumns(std::list<Column_t> *pColumns)
 {
 	Column_t Column;
 	int i = 0;

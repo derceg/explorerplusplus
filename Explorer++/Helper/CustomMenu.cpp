@@ -15,8 +15,6 @@
 #include "CustomMenu.h"
 
 
-using namespace Gdiplus;
-
 /* The minimum height of any item in the custom menu
 (except separators). This is defined purely for menu
 icons (i.e. the icons will need at least a vertical
@@ -25,7 +23,7 @@ A clearance of at least 2 should be provided on either
 side of a menu icon.*/
 #define MINIMUM_MENU_ITEM_HEIGHT	20
 
-/* How far to indent menu text from the left egde
+/* How far to indent menu text from the left edge
 of the menu. */
 #define MENU_TEXT_INDENT_LEFT	22
 
@@ -191,10 +189,10 @@ BOOL CCustomMenu::OnDrawItem(WPARAM wParam,LPARAM lParam)
 				around the shading. */
 				InflateRect(&rcSelection,-1,-1);
 
-				SolidBrush SemiTransBrush(Color(100,GetRValue(BorderColorBase),
+				Gdiplus::SolidBrush SemiTransBrush(Gdiplus::Color(100,GetRValue(BorderColorBase),
 					GetGValue(BorderColorBase),GetBValue(BorderColorBase)));
 
-				Graphics graphics(pDrawItem->hDC);
+				Gdiplus::Graphics graphics(pDrawItem->hDC);
 				graphics.FillRectangle(&SemiTransBrush,rcSelection.left,rcSelection.top,
 					rcSelection.right - rcSelection.left,rcSelection.bottom - rcSelection.top);
 			}

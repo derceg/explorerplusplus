@@ -29,8 +29,6 @@
 
 #define GROUP_OTHER				27
 
-using namespace std;
-
 TCHAR *RetrieveGroupHeader(int iGroupId);
 
 /* Group sorting. */
@@ -39,7 +37,7 @@ INT CALLBACK	FreeSpaceComparison(INT Group1_ID, INT Group2_ID, void *pvData);
 
 BOOL g_bSortAscending;
 
-list<TypeGroup_t> *g_pGroupList = NULL;
+std::list<TypeGroup_t> *g_pGroupList = NULL;
 
 /* Simply sets the grouping flag, without actually moving
 items into groups. */
@@ -136,7 +134,7 @@ INT CALLBACK FreeSpaceComparison(INT Group1_ID, INT Group2_ID, void *pvData)
 
 TCHAR *RetrieveGroupHeader(int iGroupId)
 {
-	list<TypeGroup_t>::iterator	itr;
+	std::list<TypeGroup_t>::iterator	itr;
 
 	for(itr = g_pGroupList->begin();itr != g_pGroupList->end();itr++)
 	{
@@ -351,7 +349,7 @@ int CFolderView::CheckGroup(TCHAR *szGroupHeader,
 PFNLVGROUPCOMPARE pfnGroupCompare)
 {
 	LVINSERTGROUPSORTED			lvigs;
-	list<TypeGroup_t>::iterator	itr;
+	std::list<TypeGroup_t>::iterator	itr;
 	TypeGroup_t					TypeGroup;
 	WCHAR						wszHeader[512];
 	BOOL						bFoundGroup = FALSE;
@@ -446,7 +444,7 @@ PFNLVGROUPCOMPARE pfnGroupCompare)
 void CFolderView::DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
 {
 	TCHAR ch;
-	list<TypeGroup_t>::iterator itr;
+	std::list<TypeGroup_t>::iterator itr;
 
 	/* Take the first character of the item's name,
 	and use it to determine which group it belongs to. */
@@ -573,7 +571,7 @@ void CFolderView::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroup
 	LPITEMIDLIST				pidlComplete = NULL;
 	LPITEMIDLIST				pidlDirectory = NULL;
 	SHFILEINFO					shfi;
-	list<TypeGroup_t>::iterator	itr;
+	std::list<TypeGroup_t>::iterator	itr;
 
 	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
 
@@ -655,7 +653,7 @@ void CFolderView::DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyTy
 {
 	TCHAR						szFullFileName[MAX_PATH];
 	TCHAR						szComment[512];
-	list<TypeGroup_t>::iterator	itr;
+	std::list<TypeGroup_t>::iterator	itr;
 	int							iRes;
 
 	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
@@ -673,7 +671,7 @@ void CFolderView::DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyTy
 /* TODO: Need to sort based on percentage free. */
 void CFolderView::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
 {
-	list<TypeGroup_t>::iterator itr;
+	std::list<TypeGroup_t>::iterator itr;
 	LPITEMIDLIST pidlComplete	= NULL;
 	LPITEMIDLIST pidlDirectory	= NULL;
 	TCHAR szFreeSpace[MAX_PATH];
@@ -727,7 +725,7 @@ void CFolderView::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHe
 void CFolderView::DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
 {
 	TCHAR FullFileName[MAX_PATH];
-	list<TypeGroup_t>::iterator itr;
+	std::list<TypeGroup_t>::iterator itr;
 	TCHAR szAttributes[32];
 
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
@@ -742,7 +740,7 @@ void CFolderView::DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHe
 void CFolderView::DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
 {
 	TCHAR FullFileName[MAX_PATH];
-	list<TypeGroup_t>::iterator itr;
+	std::list<TypeGroup_t>::iterator itr;
 	TCHAR szOwner[512];
 
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
@@ -757,7 +755,7 @@ void CFolderView::DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionTy
 {
 	BOOL bGroupFound = FALSE;
 	TCHAR FullFileName[MAX_PATH];
-	list<TypeGroup_t>::iterator itr;
+	std::list<TypeGroup_t>::iterator itr;
 	TCHAR szVersion[512];
 	BOOL bVersionInfoObtained;
 
@@ -778,7 +776,7 @@ void CFolderView::DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionTy
 void CFolderView::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID PropertyId,TCHAR *szGroupHeader,int cchMax)
 {
 	TCHAR szFullFileName[MAX_PATH];
-	list<TypeGroup_t>::iterator itr;
+	std::list<TypeGroup_t>::iterator itr;
 	TCHAR szProperty[512];
 	BOOL bRes;
 
@@ -863,7 +861,7 @@ void CFolderView::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupH
 /* TODO: Fix. Need to check for each adapter. */
 void CFolderView::DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
 {
-	list<TypeGroup_t>::iterator itr;
+	std::list<TypeGroup_t>::iterator itr;
 
 	TCHAR szStatus[32] = EMPTY_STRING;
 	IP_ADAPTER_ADDRESSES *pAdapterAddresses = NULL;

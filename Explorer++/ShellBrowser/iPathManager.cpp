@@ -21,8 +21,6 @@
 #include "../Helper/ShellHelper.h"
 
 
-using namespace std;
-
 CPathManager::CPathManager()
 {
 	m_iRefCount = 1;
@@ -171,7 +169,7 @@ int CPathManager::GetNumForwardPathsStored(void)
 	return m_nTotal - m_iCurrent;
 }
 
-void CPathManager::GetBackHistory(list<LPITEMIDLIST> *lHistory)
+void CPathManager::GetBackHistory(std::list<LPITEMIDLIST> *lHistory)
 {
 	int nPaths;
 	int iStartIndex;
@@ -190,7 +188,7 @@ void CPathManager::GetBackHistory(list<LPITEMIDLIST> *lHistory)
 	}
 }
 
-void CPathManager::GetForwardHistory(list<LPITEMIDLIST> *lHistory)
+void CPathManager::GetForwardHistory(std::list<LPITEMIDLIST> *lHistory)
 {
 	int nPaths;
 	int iStartIndex;

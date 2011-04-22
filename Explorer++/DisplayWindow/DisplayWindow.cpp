@@ -30,8 +30,6 @@
 #include "../Helper/RegistrySettings.h"
 
 
-using namespace Gdiplus;
-
 #define CLASS_NAME				_T("DisplayWindow")
 #define WINDOW_NAME				_T("DisplayWindow")
 
@@ -44,7 +42,7 @@ ULONG_PTR	token;
 BOOL RegisterDisplayWindow(void)
 {
 	WNDCLASS			wc;
-	GdiplusStartupInput	startupInput;
+	Gdiplus::GdiplusStartupInput	startupInput;
 
 	wc.style			= 0;
 	wc.lpfnWndProc		= DisplayWindowProcStub;
@@ -60,7 +58,7 @@ BOOL RegisterDisplayWindow(void)
 	if(!RegisterClass(&wc))
 		return FALSE;
 
-	GdiplusStartup(&token,&startupInput,NULL);
+	Gdiplus::GdiplusStartup(&token,&startupInput,NULL);
 
 	return TRUE;
 }
@@ -158,7 +156,7 @@ CDisplayWindow::~CDisplayWindow()
 	g_ObjectCount--;
 
 	if(g_ObjectCount == 0)
-		GdiplusShutdown(token);
+		Gdiplus::GdiplusShutdown(token);
 }
 
 LRESULT CALLBACK DisplayWindowProcStub(HWND DisplayWindow,UINT msg,
@@ -265,7 +263,7 @@ WPARAM wParam,LPARAM lParam)
 		case DWM_SETLINE:
 			{
 				TCHAR *pszText = NULL;
-				vector<LineData_t>::iterator itr;
+				std::vector<LineData_t>::iterator itr;
 				unsigned int iLine;
 				unsigned int i = 0;
 

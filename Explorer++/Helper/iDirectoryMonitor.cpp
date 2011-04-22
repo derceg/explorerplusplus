@@ -18,8 +18,6 @@
 #include "iDirectoryMonitor.h"
 
 
-using namespace std;
-
 DWORD WINAPI Thread_DirModifiedInternal(LPVOID Container);
 
 class CDirectoryMonitor : public IDirectoryMonitor
@@ -83,7 +81,7 @@ private:
 	int					m_iRefCount;
 	DWORD				m_ThreadId;
 	HANDLE				m_hThread;
-	list<CDirInfo>		m_DirWatchInfoList;
+	std::list<CDirInfo>	m_DirWatchInfoList;
 	CRITICAL_SECTION	m_cs;
 	HANDLE				m_hStopThreadEvent;
 	int					m_UniqueId;
@@ -377,7 +375,7 @@ void CDirectoryMonitor::DeleteRequest(ULONG_PTR dwParam)
 {
 	CDirInfo					*pDirInfo = NULL;
 	CDirectoryMonitor			*pDirectoryMonitor = NULL;
-	list<CDirInfo>::iterator	itr;
+	std::list<CDirInfo>::iterator	itr;
 
 	pDirInfo = reinterpret_cast<CDirInfo *>(dwParam);
 
@@ -402,7 +400,7 @@ void CDirectoryMonitor::DeleteRequest(ULONG_PTR dwParam)
 
 BOOL CDirectoryMonitor::StopDirectoryMonitor(int iStopId)
 {
-	list<CDirInfo>::iterator	itr;
+	std::list<CDirInfo>::iterator	itr;
 
 	if(iStopId < 0)
 		return FALSE;

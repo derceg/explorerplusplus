@@ -256,8 +256,8 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 					take the item out of its position in the
 					list, and move it into its new position. */
 					NMHEADER *pnmHeader = NULL;
-					list<Column_t> ActiveColumnList;
-					list<Column_t>::iterator itr;
+					std::list<Column_t> ActiveColumnList;
+					std::list<Column_t>::iterator itr;
 					Column_t Column;
 					int i = 0;
 
@@ -592,7 +592,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	folder size calculations that are occurring for this tab
 	(applies only to folder sizes that will be shown in the display
 	window). */
-	list<DWFolderSize_t>::iterator itr;
+	std::list<DWFolderSize_t>::iterator itr;
 
 	for(itr = m_DWFolderSizes.begin();itr != m_DWFolderSizes.end();itr++)
 	{
@@ -1213,7 +1213,7 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 	if(nSelected > 0)
 	{
-		list<LPITEMIDLIST> pidlList;
+		std::list<LPITEMIDLIST> pidlList;
 		int iItem = -1;
 
 		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
@@ -1248,8 +1248,8 @@ void Explorerplusplus::OnListViewHeaderRClick(POINT *pCursorPos)
 	HMENU						hHeaderPopupMenu;
 	HMENU						hMenu;
 	MENUITEMINFO				mii;
-	list<Column_t>				m_pActiveColumnList;
-	list<Column_t>::iterator	itr;
+	std::list<Column_t>			m_pActiveColumnList;
+	std::list<Column_t>::iterator	itr;
 	TCHAR						szColumnText[256];
 	unsigned int				*pHeaderList = NULL;
 	int							nItems = 0;
@@ -1366,8 +1366,8 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 	}
 
 	LPITEMIDLIST pidlDirectory = NULL;
-	list<LPITEMIDLIST> ItemList;
-	list<std::wstring> FilenameList;
+	std::list<LPITEMIDLIST> ItemList;
+	std::list<std::wstring> FilenameList;
 	int iItem = -1;
 
 	/* Store the pidl of the current folder, as well as the relative

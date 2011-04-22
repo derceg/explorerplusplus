@@ -18,8 +18,6 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 
-using namespace Gdiplus;
-
 /* These give the position and size of the
 main 'folder' icon. */
 #define MAIN_ICON_LEFT			20
@@ -37,13 +35,13 @@ can float. */
 at the top and bottom of the thumbnail. */
 #define THUMB_HEIGHT_DELTA		20
 
-list<ThumbnailEntry_t>	g_ThumbnailEntries;
+std::list<ThumbnailEntry_t>	g_ThumbnailEntries;
 
 void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc,RECT *UpdateRect)
 {
-	GraphicsPath	Path;
-	Point			Center(0,0);
-	INT				count = 1;
+	Gdiplus::GraphicsPath	Path;
+	Gdiplus::Point			Center(0,0);
+	INT						count = 1;
 
 	if(m_hBitmapBackground)
 		DeleteObject(m_hBitmapBackground);
@@ -52,15 +50,15 @@ void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc,RECT *UpdateRect)
 	m_hBitmapBackground	= CreateCompatibleBitmap(hdc,rc->right - rc->left,rc->bottom - rc->top);
 	SelectObject(m_hdcBackground,m_hBitmapBackground);
 
-	Graphics graphics(m_hdcBackground);
+	Gdiplus::Graphics graphics(m_hdcBackground);
 
 	/* This rectangle encloses the entire client area of the window. */
-	Rect DisplayRect(0,0,rc->right - rc->left,rc->bottom - rc->top);
+	Gdiplus::Rect DisplayRect(0,0,rc->right - rc->left,rc->bottom - rc->top);
 
 	/* Add the client area to the path objects drawing section,
 	and set the centre colour that will be used. */
 	Path.AddRectangle(DisplayRect);
-	PathGradientBrush pgb(&Path);
+	Gdiplus::PathGradientBrush pgb(&Path);
 	pgb.SetCenterPoint(Center);
 
 	pgb.SetCenterColor(m_CentreColor);
@@ -68,9 +66,9 @@ void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc,RECT *UpdateRect)
 	pgb.SetSurroundColors(&m_SurroundColor,&count);
 	graphics.FillRectangle(&pgb,DisplayRect);
 
-	/* This draws a seperator line across the top edge of the window,
-	so that it is visually seperated from other windows. */
-	Pen NewPen(BORDER_COLOUR,1);
+	/* This draws a separator line across the top edge of the window,
+	so that it is visually separated from other windows. */
+	Gdiplus::Pen NewPen(BORDER_COLOUR,1);
 	graphics.DrawLine(&NewPen,0,0,rc->right,0);
 }
 
@@ -465,7 +463,7 @@ void CDisplayWindow::OnRButtonUp(WPARAM wParam,LPARAM lParam)
 
 void CDisplayWindow::CancelThumbnailExtraction(void)
 {
-	list<ThumbnailEntry_t>::iterator itr;
+	std::list<ThumbnailEntry_t>::iterator itr;
 
 	EnterCriticalSection(&m_csDWThumbnails);
 

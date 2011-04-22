@@ -25,7 +25,7 @@
 
 BOOL RemoveFromThumbnailsFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent);
 
-list<ListViewInfo_t>	g_ThumbnailQueue;
+std::list<ListViewInfo_t>	g_ThumbnailQueue;
 CRITICAL_SECTION		g_csThumbnails;
 BOOL					g_bcsThumbnailInitialized = FALSE;
 
@@ -158,7 +158,7 @@ BOOL RemoveFromThumbnailsFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopE
 	}
 	else
 	{
-		list<ListViewInfo_t>::iterator itr;
+		std::list<ListViewInfo_t>::iterator itr;
 
 		itr = g_ThumbnailQueue.end();
 

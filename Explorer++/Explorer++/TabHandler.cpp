@@ -532,7 +532,7 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 			HDC hdcSrc;
 			HBITMAP hbmTab = NULL;
 			HBITMAP hPrevBitmap;
-			Color color(0,0,0);
+			Gdiplus::Color color(0,0,0);
 			HRESULT hr;
 			int iBitmapWidth;
 			int iBitmapHeight;
@@ -593,7 +593,7 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 			}
 
 			/* Thumbnail bitmap. */
-			Bitmap bmpThumbnail(iWidth,iHeight,PixelFormat32bppARGB);
+			Gdiplus::Bitmap bmpThumbnail(iWidth,iHeight,PixelFormat32bppARGB);
 
 			bmpThumbnail.GetHBITMAP(color,&hbmThumbnail);
 
@@ -718,7 +718,7 @@ HBITMAP Explorerplusplus::CaptureTabScreenshot(int iTabId)
 	HDC hdcSrc;
 	HBITMAP hBitmap;
 	HBITMAP hPrevBitmap;
-	Color color(0,0,0);
+	Gdiplus::Color color(0,0,0);
 	RECT rcMain;
 	RECT rcTab;
 
@@ -727,14 +727,13 @@ HBITMAP Explorerplusplus::CaptureTabScreenshot(int iTabId)
 	GetClientRect(m_hContainer,&rcMain);
 	GetClientRect(hTab,&rcTab);
 
-
 	/* Main window BitBlt. */
 	hdc = GetDC(m_hContainer);
 	hdcSrc = CreateCompatibleDC(hdc);
 
 	/* Any bitmap sent back to the operating system will need to be in 32-bit
 	ARGB format. */
-	Bitmap bi(GetRectWidth(&rcMain),GetRectHeight(&rcMain),PixelFormat32bppARGB);
+	Gdiplus::Bitmap bi(GetRectWidth(&rcMain),GetRectHeight(&rcMain),PixelFormat32bppARGB);
 	bi.GetHBITMAP(color,&hBitmap);
 
 	/* BitBlt the main window into the bitmap. */
@@ -786,7 +785,7 @@ HBITMAP Explorerplusplus::CaptureTabScreenshot(int iTabId)
 	hdcThumbnailSrc = CreateCompatibleDC(hdc);
 
 	/* Thumbnail bitmap. */
-	Bitmap bmpThumbnail(GetRectWidth(&rcMain),GetRectHeight(&rcMain),PixelFormat32bppARGB);
+	Gdiplus::Bitmap bmpThumbnail(GetRectWidth(&rcMain),GetRectHeight(&rcMain),PixelFormat32bppARGB);
 
 	bmpThumbnail.GetHBITMAP(color,&hbmThumbnail);
 
@@ -819,7 +818,7 @@ void Explorerplusplus::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi
 	HDC hdcTabSrc;
 	HBITMAP hbmTab;
 	HBITMAP hbmTabPrev;
-	Color color(0,0,0);
+	Gdiplus::Color color(0,0,0);
 	MENUBARINFO mbi;
 	POINT pt;
 	BOOL bVisible;
@@ -832,7 +831,7 @@ void Explorerplusplus::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi
 
 	GetClientRect(hTab,&rcTab);
 
-	Bitmap bi(GetRectWidth(&rcTab),GetRectHeight(&rcTab),PixelFormat32bppARGB);
+	Gdiplus::Bitmap bi(GetRectWidth(&rcTab),GetRectHeight(&rcTab),PixelFormat32bppARGB);
 	bi.GetHBITMAP(color,&hbmTab);
 
 	hbmTabPrev = (HBITMAP)SelectObject(hdcTabSrc,hbmTab);
@@ -913,7 +912,7 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 	/* Inform the taskbar that this tab has become active. */
 	if(m_bTaskbarInitialised)
 	{
-		list<TabProxyInfo_t>::iterator itr;
+		std::list<TabProxyInfo_t>::iterator itr;
 
 		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 		{
@@ -932,7 +931,7 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 				}
 				else
 				{
-					list<TabProxyInfo_t>::iterator itrNext;
+					std::list<TabProxyInfo_t>::iterator itrNext;
 
 					tcItem.mask = TCIF_PARAM;
 					TabCtrl_GetItem(m_hTabCtrl,m_iTabSelectedItem + 1,&tcItem);
@@ -1143,7 +1142,7 @@ HRESULT Explorerplusplus::CloseTab(int TabIndex)
 	/* Remove the tabs image from the image list. */
 	TabCtrl_RemoveImage(m_hTabCtrl,iRemoveImage);
 
-	list<TabProxyInfo_t>::iterator itr;
+	std::list<TabProxyInfo_t>::iterator itr;
 
 	if(m_bTaskbarInitialised)
 	{
@@ -1868,7 +1867,7 @@ void Explorerplusplus::DuplicateTab(int iTabInternal)
 
 void Explorerplusplus::SetTabProxyIcon(int iTabId,HICON hIcon)
 {
-	list<TabProxyInfo_t>::iterator itr;
+	std::list<TabProxyInfo_t>::iterator itr;
 
 	for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 	{

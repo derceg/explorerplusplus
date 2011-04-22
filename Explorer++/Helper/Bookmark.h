@@ -3,8 +3,6 @@
 
 #include <list>
 
-using namespace std;
-
 #define BOOKMARK_TYPE_FOLDER	0
 #define BOOKMARK_TYPE_BOOKMARK	1
 

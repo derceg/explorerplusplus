@@ -22,15 +22,13 @@
 #include "../Helper/ShellHelper.h"
 
 
-using namespace std;
-
 void CALLBACK	TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime);
 void CALLBACK	FindIconAPC(ULONG_PTR dwParam);
 BOOL			RemoveFromIconFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent);
 int				GetIconThreadStatus(void);
 void			SetIconThreadStatus(void);
 
-list<ListViewInfo_t>	g_pListViewInfoList;
+std::list<ListViewInfo_t>	g_pListViewInfoList;
 int					g_nItemsInInfoList;
 int					g_nInfoListAllocation;
 CRITICAL_SECTION	g_icon_cs;
@@ -270,12 +268,12 @@ BOOL CFolderView::IsForwardHistory(void)
 	return TRUE;
 }
 
-void CFolderView::GetBackHistory(list<LPITEMIDLIST> *lHistory)
+void CFolderView::GetBackHistory(std::list<LPITEMIDLIST> *lHistory)
 {
 	return m_pPathManager->GetBackHistory(lHistory);
 }
 
-void CFolderView::GetForwardHistory(list<LPITEMIDLIST> *lHistory)
+void CFolderView::GetForwardHistory(std::list<LPITEMIDLIST> *lHistory)
 {
 	return m_pPathManager->GetForwardHistory(lHistory);
 }
@@ -515,8 +513,8 @@ void CFolderView::EmptyIconFinderQueue(void)
 {
 	EnterCriticalSection(&g_icon_cs);
 
-	list<ListViewInfo_t>::iterator last;
-	list<ListViewInfo_t>::iterator first;
+	std::list<ListViewInfo_t>::iterator last;
+	std::list<ListViewInfo_t>::iterator first;
 
 	last = g_pListViewInfoList.end();
 
@@ -558,7 +556,7 @@ BOOL RemoveFromIconFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent)
 	}
 	else
 	{
-		list<ListViewInfo_t>::iterator itr;
+		std::list<ListViewInfo_t>::iterator itr;
 
 		itr = g_pListViewInfoList.end();
 
@@ -566,7 +564,7 @@ BOOL RemoveFromIconFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent)
 
 		*pListViewInfo = *itr;
 
-		/* Set the event to the non-signaled
+		/* Set the event to the non-signalled
 		state. */
 		ResetEvent(pListViewInfo->hEvent);
 
@@ -824,7 +822,7 @@ int CFolderView::GenerateUniqueItemId(void)
 
 void CFolderView::PositionDroppedItems(void)
 {
-	list<DroppedFile_t>::iterator	itr;
+	std::list<DroppedFile_t>::iterator	itr;
 	BOOL							bDropItemSet = FALSE;
 	int								iItem;
 
@@ -1433,7 +1431,7 @@ void CFolderView::UpdateFiltering(void)
 
 void CFolderView::UnfilterAllItems(void)
 {
-	list<int>::iterator	itr;
+	std::list<int>::iterator	itr;
 	AwaitingAdd_t		AwaitingAdd;
 
 	for(itr = m_FilteredItemsList.begin();itr != m_FilteredItemsList.end();itr++)
@@ -1734,9 +1732,9 @@ void CFolderView::SetTerminationStatus(void)
 		SendMessage(m_hOwner,WM_USER_RELEASEBROWSER,(WPARAM)m_ID,NULL);*/
 }
 
-void CFolderView::QueryCurrentSortModes(list<int> *pSortModes)
+void CFolderView::QueryCurrentSortModes(std::list<int> *pSortModes)
 {
-	list<Column_t>::iterator itr;
+	std::list<Column_t>::iterator itr;
 	int ColumnSortMode;
 
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
@@ -1785,9 +1783,9 @@ HICON CFolderView::GetItemIconInternal(int iItemInternal)
 	m_pExtraItemInfo[iItemInternal].iIcon,ILD_NORMAL);
 }
 
-void CFolderView::ExportCurrentColumns(list<Column_t> *pColumns)
+void CFolderView::ExportCurrentColumns(std::list<Column_t> *pColumns)
 {
-	list<Column_t>::iterator itr;
+	std::list<Column_t>::iterator itr;
 	Column_t Column;
 	int iColumn = 0;
 
@@ -1808,11 +1806,11 @@ void CFolderView::ExportCurrentColumns(list<Column_t> *pColumns)
 	}
 }
 
-void CFolderView::ImportColumns(list<Column_t> *pColumns,BOOL bColumnsSwapped)
+void CFolderView::ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped)
 {
-	list<Column_t>::iterator itr;
-	list<Column_t>::iterator itr2;
-	list<Column_t>::iterator itr3;
+	std::list<Column_t>::iterator itr;
+	std::list<Column_t>::iterator itr2;
+	std::list<Column_t>::iterator itr3;
 	Column_t ci;
 	BOOL bResortFolder = FALSE;
 	int iColumn = 0;
@@ -1891,7 +1889,7 @@ void CFolderView::ImportColumns(list<Column_t> *pColumns,BOOL bColumnsSwapped)
 
 void CFolderView::GetColumnInternal(unsigned int id,Column_t *pci)
 {
-	list<Column_t>::iterator itr;
+	std::list<Column_t>::iterator itr;
 
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
 	{

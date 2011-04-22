@@ -117,7 +117,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		/* Add each of the jump list tasks. */
 		SetupJumplistTasks();
 
-		list<TabProxyInfo_t>::iterator itr;
+		std::list<TabProxyInfo_t>::iterator itr;
 		LPITEMIDLIST pidlDirectory = NULL;
 		BOOL bActive;
 
@@ -264,7 +264,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 				pDWFolderSizeCompletion = (DWFolderSizeCompletion_t *)wParam;
 
-				list<DWFolderSize_t>::iterator itr;
+				std::list<DWFolderSize_t>::iterator itr;
 
 				/* First, make sure we should still display the
 				results (we won't if the listview selection has
@@ -415,8 +415,8 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		iOffset = LOWORD(wParam) - MENU_HEADER_STARTID;
 
-		list<Column_t>				m_pActiveColumnList;
-		list<Column_t>::iterator	itr;
+		std::list<Column_t>			m_pActiveColumnList;
+		std::list<Column_t>::iterator	itr;
 		int							iItem = 0;
 		unsigned int				*pHeaderList = NULL;
 
@@ -1149,7 +1149,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				them as the default columns for the appropriate folder
 				type.. */
 				IShellFolder *pShellFolder = NULL;
-				list<Column_t> pActiveColumnList;
+				std::list<Column_t> pActiveColumnList;
 				LPITEMIDLIST pidl = NULL;
 				LPITEMIDLIST pidlDrives = NULL;
 				LPITEMIDLIST pidlControls = NULL;
@@ -1369,7 +1369,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 					szCurrentDirectory);
 
 				CSearchDialog *SearchDialog = new CSearchDialog(g_hLanguageModule,
-					IDD_SEARCH,hwnd,szCurrentDirectory);
+					IDD_SEARCH,hwnd,szCurrentDirectory,this);
 
 				g_hwndSearch = SearchDialog->ShowModelessDialog(this);
 			}

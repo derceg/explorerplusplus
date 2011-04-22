@@ -520,10 +520,10 @@ void CFolderView::SetUserOptions(InitialSettings_t *is)
 	ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 }
 
-void CFolderView::CopyColumnsInternal(list<Column_t> *pInternalColumns,list<Column_t> *pColumns)
+void CFolderView::CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns)
 {
-	list<Column_t>::iterator	itr;
-	Column_t			ci;
+	std::list<Column_t>::iterator	itr;
+	Column_t						ci;
 
 	pInternalColumns->clear();
 

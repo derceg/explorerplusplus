@@ -404,7 +404,7 @@ void Explorerplusplus::HandleTabText(int iTab,int iTabId)
 
 		TabCtrl_SetItemText(m_hTabCtrl,iTab,szExpandedTabText);
 
-		list<TabProxyInfo_t>::iterator itr;
+		std::list<TabProxyInfo_t>::iterator itr;
 
 		if(m_bTaskbarInitialised)
 		{

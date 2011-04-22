@@ -471,13 +471,13 @@ int Explorerplusplus::LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 	InitialSettings_t			*pSettings = NULL;
 	TabInfo_t					*pTabInfo = NULL;
 	TCHAR						**szDirectory = NULL;
-	list<Column_t>				RealFolderColumnList;
-	list<Column_t>				MyComputerColumnList;
-	list<Column_t>				ControlPanelColumnList;
-	list<Column_t>				RecycleBinColumnList;
-	list<Column_t>				PrintersColumnList;
-	list<Column_t>				NetworkConnectionsColumnList;
-	list<Column_t>				MyNetworkPlacesColumnList;
+	std::list<Column_t>			RealFolderColumnList;
+	std::list<Column_t>			MyComputerColumnList;
+	std::list<Column_t>			ControlPanelColumnList;
+	std::list<Column_t>			RecycleBinColumnList;
+	std::list<Column_t>			PrintersColumnList;
+	std::list<Column_t>			NetworkConnectionsColumnList;
+	std::list<Column_t>			MyNetworkPlacesColumnList;
 	long						length;
 	long						lChildNodes;
 	long						j = 0;
@@ -570,7 +570,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 							{
 								pColumnNode->get_nextSibling(&pColumnNode);
 
-								list<Column_t> Column;
+								std::list<Column_t> Column;
 								int iColumnType;
 
 								while(pColumnNode != NULL)
@@ -791,7 +791,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXML
 	SysFreeString(bstr_wsnttt);
 }
 
-int Explorerplusplus::LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,list<Column_t> *pColumns)
+int Explorerplusplus::LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,std::list<Column_t> *pColumns)
 {
 	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
 	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
@@ -1146,7 +1146,7 @@ int Explorerplusplus::LoadDefaultColumnsFromXML(MSXML2::IXMLDOMDocument *pXMLDom
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
 	MSXML2::IXMLDOMNode			*pNode = NULL;
 	BSTR						bstr = NULL;
-	list<Column_t>				ColumnSet;
+	std::list<Column_t>			ColumnSet;
 	long						length;
 	int							iColumnType;
 
@@ -1251,11 +1251,11 @@ MSXML2::IXMLDOMElement *pColumnsNode)
 }
 
 void Explorerplusplus::SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pColumnsNode,list<Column_t> *pColumns,
+MSXML2::IXMLDOMElement *pColumnsNode,std::list<Column_t> *pColumns,
 TCHAR *szColumnSet,int iIndent)
 {
 	MSXML2::IXMLDOMElement		*pColumnNode = NULL;
-	list<Column_t>::iterator	itr;
+	std::list<Column_t>::iterator	itr;
 	TCHAR						*pszColumnSaveName = NULL;
 	WCHAR						wszIndent[128];
 	TCHAR						szWidth[32];

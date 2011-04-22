@@ -3,15 +3,13 @@
 
 #include <list>
 
-using namespace std;
-
 __interface IPathManager : IUnknown
 {
 	virtual int		GetNumBackPathsStored(void);
 	virtual int		GetNumForwardPathsStored(void);
 	virtual UINT	CreateHistoryPopupMenu(HWND,POINT *,BOOL);
-	virtual void	GetBackHistory(list<LPITEMIDLIST> *lHistory);
-	virtual void	GetForwardHistory(list<LPITEMIDLIST> *lHistory);
+	virtual void	GetBackHistory(std::list<LPITEMIDLIST> *lHistory);
+	virtual void	GetForwardHistory(std::list<LPITEMIDLIST> *lHistory);
 
 	virtual void			StoreIdl(LPITEMIDLIST pidl);
 	virtual LPITEMIDLIST	RetrievePath(int iIndex);
@@ -33,8 +31,8 @@ public:
 	int				GetNumBackPathsStored(void);
 	int				GetNumForwardPathsStored(void);
 	UINT			CreateHistoryPopupMenu(HWND,POINT *,BOOL);
-	void			GetBackHistory(list<LPITEMIDLIST> *lHistory);
-	void			GetForwardHistory(list<LPITEMIDLIST> *lHistory);
+	void			GetBackHistory(std::list<LPITEMIDLIST> *lHistory);
+	void			GetForwardHistory(std::list<LPITEMIDLIST> *lHistory);
 
 	void			StoreIdl(LPITEMIDLIST pidl);
 	LPITEMIDLIST	RetrievePath(int iIndex);

@@ -8,8 +8,6 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/DropHandler.h"
 
-using namespace Gdiplus;
-
 #define KBYTE					1024
 #define MBYTE					1024 * 1024
 #define GBYTE					1024 * 1024 *1024
@@ -142,7 +140,7 @@ typedef struct
 	TCHAR szFileName[MAX_PATH];
 } Added_t;
 
-extern list<ListViewInfo_t>	g_pListViewInfoList;
+extern std::list<ListViewInfo_t>	g_pListViewInfoList;
 extern int					g_nItemsInInfoList;
 extern int					g_nInfoListAllocation;
 extern CRITICAL_SECTION	g_icon_cs;
@@ -277,8 +275,8 @@ public:
 	BOOL				ToggleShowHidden(void);
 	BOOL				IsBackHistory(void);
 	BOOL				IsForwardHistory(void);
-	void				GetBackHistory(list<LPITEMIDLIST> *lHistory);
-	void				GetForwardHistory(list<LPITEMIDLIST> *lHistory);
+	void				GetBackHistory(std::list<LPITEMIDLIST> *lHistory);
+	void				GetForwardHistory(std::list<LPITEMIDLIST> *lHistory);
 	LPITEMIDLIST		RetrieveHistoryItemWithoutUpdate(int iItem);
 	LPITEMIDLIST		RetrieveHistoryItem(int iItem);
 	BOOL				CanBrowseUp(void);
@@ -320,8 +318,8 @@ public:
 	
 	/* Column support. */
 	int					SetAllColumnData(void);
-	void				ExportCurrentColumns(list<Column_t> *pColumns);
-	void				ImportColumns(list<Column_t> *pColumns,BOOL bColumnsSwapped);
+	void				ExportCurrentColumns(std::list<Column_t> *pColumns);
+	void				ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped);
 
 	/* Thumbnails view. */
 	int					GetExtractedThumbnail(HBITMAP hThumbnailBitmap);
@@ -422,7 +420,7 @@ public:
 	void				IncrementNumAPCsRan(void);
 
 	void				ColumnClicked(int iClickedColumn);
-	void				QueryCurrentSortModes(list<int> *pSortModes);
+	void				QueryCurrentSortModes(std::list<int> *pSortModes);
 	size_t				QueryNumActiveColumns(void);
 	void				ToggleGridlines(void);
 	BOOL				QueryGridlinesActive(void);
@@ -577,7 +575,7 @@ private:
 	HRESULT				RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMax);
 	void				ApplyHeaderSortArrow(void);
 	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName);
-	void				CopyColumnsInternal(list<Column_t> *pInternalColumns,list<Column_t> *pColumns);
+	void				CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns);
 	void				SetHideSystemFiles(BOOL bHideSystemFiles);
 	BOOL				GetHideSystemFiles(void);
 	void				SetShowExtensions(BOOL bShowExtensions);
@@ -691,12 +689,12 @@ private:
 	renamed, etc). */
 	CRITICAL_SECTION	m_csDirectoryAltered;
 	std::list<AlteredFile_t>	m_AlteredList;
-	list<Added_t>		m_FilesAdded;
+	std::list<Added_t>	m_FilesAdded;
 
 	/* Stores information on files that have
 	been created and are awaiting insertion
 	into the listview. */
-	list<AwaitingAdd_t>	m_AwaitingAddList;
+	std::list<AwaitingAdd_t>	m_AwaitingAddList;
 	int					m_nAwaitingAdd;
 
 	/* Shell new. */
@@ -713,12 +711,12 @@ private:
 	BOOL				m_bIconThreadSleeping;
 
 	/* Column gathering information. */
-	list<int>			m_pColumnInfoList;
+	std::list<int>		m_pColumnInfoList;
 	CRITICAL_SECTION	m_column_cs;
 	HANDLE				m_hColumnQueueEvent;
 
 	/* Folder size information. */
-	list<int>			m_pFolderInfoList;
+	std::list<int>		m_pFolderInfoList;
 	CRITICAL_SECTION	m_folder_cs;
 	HANDLE				m_hFolderQueueEvent;
 
@@ -726,14 +724,14 @@ private:
 	BOOL				m_bThumbnailsSetup;
 
 	/* Column related data. */
-	list<Column_t> *	m_pActiveColumnList;
-	list<Column_t>		m_RealFolderColumnList;
-	list<Column_t>		m_MyComputerColumnList;
-	list<Column_t>		m_ControlPanelColumnList;
-	list<Column_t>		m_RecycleBinColumnList;
-	list<Column_t>		m_PrintersColumnList;
-	list<Column_t>		m_NetworkConnectionsColumnList;
-	list<Column_t>		m_MyNetworkPlacesColumnList;
+	std::list<Column_t> *m_pActiveColumnList;
+	std::list<Column_t>	m_RealFolderColumnList;
+	std::list<Column_t>	m_MyComputerColumnList;
+	std::list<Column_t>	m_ControlPanelColumnList;
+	std::list<Column_t>	m_RecycleBinColumnList;
+	std::list<Column_t>	m_PrintersColumnList;
+	std::list<Column_t>	m_NetworkConnectionsColumnList;
+	std::list<Column_t>	m_MyNetworkPlacesColumnList;
 	BOOL				m_bColumnsPlaced;
 	int					m_nCurrentColumns;
 	int					m_nActiveColumns;
@@ -742,8 +740,8 @@ private:
 	/* Drag and drop related data. */
 	IDragSourceHelper *	m_pDragSourceHelper;
 	IDropTargetHelper *	m_pDropTargetHelper;
-	list<DroppedFile_t>	m_DroppedFileNameList;
-	list<DraggedFile_t>	m_DraggedFilesList;
+	std::list<DroppedFile_t>	m_DroppedFileNameList;
+	std::list<DraggedFile_t>	m_DraggedFilesList;
 	DragTypes_t			m_DragType;
 	POINT				m_ptDraggedOffset;
 	BOOL				m_bDataAccept;
@@ -757,11 +755,11 @@ private:
 	explicitly, rather than taken from the size
 	of the group list, to avoid warnings concerning
 	size_t and int. */
-	list<TypeGroup_t>	m_GroupList;
+	std::list<TypeGroup_t>	m_GroupList;
 	int					m_iGroupId;
 
 	/* Filtering related data. */
-	list<int>			m_FilteredItemsList;
+	std::list<int>		m_FilteredItemsList;
 	TCHAR				m_szFilter[512];
 	BOOL				m_bApplyFilter;
 	BOOL				m_bFilterCaseSensitive;

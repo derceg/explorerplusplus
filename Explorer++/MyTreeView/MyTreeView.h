@@ -8,8 +8,6 @@
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/DropHandler.h"
 
-using namespace std;
-
 #define WM_USER_TREEVIEW				WM_APP + 70
 #define WM_USER_TREEVIEW_GAINEDFOCUS	(WM_USER_TREEVIEW + 2)
 
@@ -22,7 +20,6 @@ public:
 	ULONG __stdcall		AddRef(void);
 	ULONG __stdcall		Release(void);
 
-	/* Contructor/Deconstructor. */
 	CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon,HANDLE hIconsThread);
 	~CMyTreeView();
 
@@ -195,7 +192,7 @@ private:
 	TCHAR				m_szAlteredOldFileName[MAX_PATH];
 
 	/* Hardware events. */
-	list<DriveEvent_t>	m_pDriveList;
+	std::list<DriveEvent_t>	m_pDriveList;
 	BOOL				m_bQueryRemoveCompleted;
 	TCHAR				m_szQueryRemove[MAX_PATH];
 };

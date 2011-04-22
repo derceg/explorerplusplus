@@ -59,7 +59,7 @@ BOOL CMergeFilesDialog::OnInitDialog()
 	std::wregex rxPattern;
 	bool bAllMatchPattern = true;
 
-	rxPattern.assign(_T(".*[\\.]?part[0-9]+"),regex_constants::icase);
+	rxPattern.assign(_T(".*[\\.]?part[0-9]+"),std::regex_constants::icase);
 
 	/* If the files all match the pattern .*[\\.]?part[0-9]+
 	(e.g. document.txt.part1), order them alphabetically. */
@@ -81,7 +81,7 @@ BOOL CMergeFilesDialog::OnInitDialog()
 		/* Since the filenames all match the
 		pattern, construct the output filename
 		from the first files name. */
-		rxPattern.assign(_T("[\\.]?part[0-9]+"),regex_constants::icase);
+		rxPattern.assign(_T("[\\.]?part[0-9]+"),std::regex_constants::icase);
 		strOutputFilename = std::tr1::regex_replace(m_FullFilenameList.front(),
 			rxPattern,std::wstring(_T("")));
 	}

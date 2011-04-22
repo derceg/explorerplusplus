@@ -18,8 +18,6 @@
 #include "ShellHelper.h"
 
 
-using namespace Gdiplus;
-
 /* Local helpers. */
 void	EnterAttributeIntoString(BOOL bEnter,TCHAR *String,int Pos,TCHAR chAttribute);
 BOOL	GetFileAllocationInfo(TCHAR *lpszFileName,STARTING_VCN_INPUT_BUFFER *pStartingVcn,
@@ -130,7 +128,7 @@ size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf)
 	ss.precision(iPrecision);
 
 	ss << std::fixed << fFileSize << _T(" ") << pszSizeTypes[iSizeIndex];
-	wstring str = ss.str();
+	std::wstring str = ss.str();
 	StringCchCopy(pszFileSize,cchBuf,str.c_str());
 }
 
@@ -1373,14 +1371,14 @@ int SetFileProperty(TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *szNewValue)
 
 BOOL ReadImageProperty(TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen)
 {
-	GdiplusStartupInput	StartupInput;
+	Gdiplus::GdiplusStartupInput	StartupInput;
 	WCHAR				wszImage[MAX_PATH];
-	PropertyItem		*pPropItems = NULL;
+	Gdiplus::PropertyItem	*pPropItems = NULL;
 	char				pTempBuffer[512];
 	ULONG_PTR			Token;
 	UINT				Size;
 	UINT				NumProperties;
-	Status				res;
+	Gdiplus::Status		res;
 	BOOL				bFound = FALSE;
 	unsigned int		i = 0;
 
@@ -1393,9 +1391,9 @@ BOOL ReadImageProperty(TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD 
 	StringCchCopy(wszImage,SIZEOF_ARRAY(wszImage),lpszImage);
 	#endif
 
-	Image *image = new Image(wszImage,FALSE);
+	Gdiplus::Image *image = new Gdiplus::Image(wszImage,FALSE);
 
-	if(image->GetLastStatus() != Ok)
+	if(image->GetLastStatus() != Gdiplus::Ok)
 	{
 		delete image;
 		return FALSE;
@@ -1425,10 +1423,10 @@ BOOL ReadImageProperty(TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD 
 	{
 		image->GetPropertySize(&Size,&NumProperties);
 
-		pPropItems = (PropertyItem *)malloc(Size);
+		pPropItems = (Gdiplus::PropertyItem *)malloc(Size);
 		res = image->GetAllPropertyItems(Size,NumProperties,pPropItems);
 
-		if(res == Ok)
+		if(res == Gdiplus::Ok)
 		{
 			for(i = 0;i < NumProperties;i++)
 			{
@@ -1471,7 +1469,7 @@ BOOL ReadImageProperty(TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD 
 	}
 
 	delete image;
-	GdiplusShutdown(Token);
+	Gdiplus::GdiplusShutdown(Token);
 
 	return bFound;
 }
@@ -2835,4 +2833,20 @@ void GetWindowString(HWND hwnd,std::wstring &str)
 	str = szTemp;
 
 	delete[] szTemp;
+}
+
+BOOL lCheckDlgButton(HWND hDlg,int ButtonId,BOOL bCheck)
+{
+	UINT uCheck;
+
+	if(bCheck)
+	{
+		uCheck = BST_CHECKED;
+	}
+	else
+	{
+		uCheck = BST_UNCHECKED;
+	}
+
+	return CheckDlgButton(hDlg,ButtonId,uCheck);
 }

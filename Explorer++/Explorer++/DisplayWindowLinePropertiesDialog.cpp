@@ -18,9 +18,9 @@
 #include "MainResource.h"
 
 
-DWRule_t			*g_pDWRule = NULL;
-list<DWLine_t>		g_DWLines;
-list<DWCommand_t>	g_DWCommands;
+DWRule_t				*g_pDWRule = NULL;
+std::list<DWLine_t>		g_DWLines;
+std::list<DWCommand_t>	g_DWCommands;
 
 HICON	g_hCommandsArrowIcon;
 

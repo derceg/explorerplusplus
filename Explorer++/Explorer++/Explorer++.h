@@ -109,8 +109,8 @@ typedef struct
 {
 	TCHAR szDescription[256];
 	
-	list<DWFileType_t> FileTypes;
-	list<DWLine_t> Lines;
+	std::list<DWFileType_t>	FileTypes;
+	std::list<DWLine_t>		Lines;
 } DWRule_t;
 
 typedef struct
@@ -587,13 +587,13 @@ private:
 
 	/* Columns. */
 	void					SetAllDefaultColumns(void);
-	void					SetDefaultRealFolderColumns(list<Column_t> *pColumns);
-	void					SetDefaultControlPanelColumns(list<Column_t> *pColumns);
-	void					SetDefaultMyComputerColumns(list<Column_t> *pColumns);
-	void					SetDefaultRecycleBinColumns(list<Column_t> *pColumns);
-	void					SetDefaultPrintersColumns(list<Column_t> *pColumns);
-	void					SetDefaultNetworkConnectionsColumns(list<Column_t> *pColumns);
-	void					SetDefaultMyNetworkPlacesColumns(list<Column_t> *pColumns);
+	void					SetDefaultRealFolderColumns(std::list<Column_t> *pColumns);
+	void					SetDefaultControlPanelColumns(std::list<Column_t> *pColumns);
+	void					SetDefaultMyComputerColumns(std::list<Column_t> *pColumns);
+	void					SetDefaultRecycleBinColumns(std::list<Column_t> *pColumns);
+	void					SetDefaultPrintersColumns(std::list<Column_t> *pColumns);
+	void					SetDefaultNetworkConnectionsColumns(std::list<Column_t> *pColumns);
+	void					SetDefaultMyNetworkPlacesColumns(std::list<Column_t> *pColumns);
 
 	/* Application toolbar. */
 	void					InitializeApplicationToolbar(void);
@@ -658,7 +658,7 @@ private:
 	void					ValidateLoadedSettings(void);
 	void					ValidateToolbarSettings(void);
 	void					ValidateColumns(void);
-	void					ValidateSingleColumnSet(int iColumnSet,list<Column_t> *pColumnList);
+	void					ValidateSingleColumnSet(int iColumnSet,std::list<Column_t> *pColumnList);
 	void					ApplyLoadedSettings(void);
 	void					ApplyToolbarSettings(void);
 	void					AddStyleToToolbar(UINT *fStyle,UINT fStyleToAdd);
@@ -666,10 +666,10 @@ private:
 	void					TestConfigFile(void);
 	void					SaveTabSettingsToRegistry(void);
 	int						LoadTabSettingsFromRegistry(void);
-	void					LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns);
-	void					SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns);
-	void					LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns);
-	void					SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,list<Column_t> *pColumns);
+	void					LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns);
+	void					SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns);
+	void					LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns);
+	void					SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns);
 	void					LoadDefaultColumnsFromRegistry(void);
 	void					SaveDefaultColumnsToRegistry(void);
 	void					InitializeBookmarks(void);
@@ -766,9 +766,9 @@ private:
 	HRESULT					ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask);
 
 	/* File context menu. */
-	void					AddMenuEntries(LPITEMIDLIST pidlParent,list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu);
-	BOOL					HandleShellMenuItem(LPITEMIDLIST pidlParent,list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd);
-	void					HandleCustomMenuItem(LPITEMIDLIST pidlParent,list<LPITEMIDLIST> pidlItemList,int iCmd);
+	void					AddMenuEntries(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,HMENU hMenu);
+	BOOL					HandleShellMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,DWORD_PTR dwData,TCHAR *szCmd);
+	void					HandleCustomMenuItem(LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList,int iCmd);
 
 	/* Listview selection file tests. */
 	void					BuildListViewFileSelectionList(HWND hListView,std::list<std::wstring> *pFileSelectionList);
@@ -902,8 +902,8 @@ private:
 	int						LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					SaveTabSettingsToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
-	int						LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,list<Column_t> *pColumns);
-	void					SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pColumnsNode,list<Column_t> *pColumns,TCHAR *szColumnSet,int iIndent);
+	int						LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,std::list<Column_t> *pColumns);
+	void					SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pColumnsNode,std::list<Column_t> *pColumns,TCHAR *szColumnSet,int iIndent);
 	int						LoadBookmarksFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					LoadBookmarksFromXMLInternal(MSXML2::IXMLDOMNode *pNode,void *pParentFolder);
 	void					SaveBookmarksToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
@@ -972,6 +972,7 @@ private:
 	BOOL					VerifyLanguageVersion(TCHAR *szLanguageModule);
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	void					PlayNavigationSound(void);
+	CStatusBar				*GetStatusBar();
 
 
 
@@ -1045,12 +1046,12 @@ private:
 	int						m_iTabSelectedItem;
 	int						m_ListViewEditingStage;
 
-	list<ViewMode_t>		m_ViewModes;
+	std::list<ViewMode_t>	m_ViewModes;
 
 	/* Initialization. */
 	BOOL					m_bLoadSettingsFromXML;
-	Color					m_DisplayWindowCentreColor;
-	Color					m_DisplayWindowSurroundColor;
+	Gdiplus::Color			m_DisplayWindowCentreColor;
+	Gdiplus::Color			m_DisplayWindowSurroundColor;
 	COLORREF				m_DisplayWindowTextColor;
 	HFONT					m_DisplayWindowFont;
 
@@ -1131,7 +1132,7 @@ private:
 	DwmInvalidateIconicBitmapsProc	DwmInvalidateIconicBitmaps;
 	HMODULE					m_hDwmapi;
 	ITaskbarList4			*m_pTaskbarList3;
-	list<TabProxyInfo_t>	m_TabProxyList;
+	std::list<TabProxyInfo_t>	m_TabProxyList;
 	UINT					m_uTaskbarButtonCreatedMessage;
 	BOOL					m_bTaskbarInitialised;
 
@@ -1153,7 +1154,7 @@ private:
 	int						m_iSelectedRClick;
 
 	/* Toolbar buttons. */
-	list<ToolbarButton_t>	m_tbInitial;
+	std::list<ToolbarButton_t>	m_tbInitial;
 
 	/* Drives toolbar. */
 	int						m_nDrivesInToolbar;
@@ -1165,22 +1166,22 @@ private:
 	int						m_iAppIdOffset;
 
 	/* Display window details. */
-	list<DWRule_t>			m_DWRules;
-	list<DWLine_t>			m_DWLines;
-	list<DWCommand_t>		m_DWCommands;
+	std::list<DWRule_t>		m_DWRules;
+	std::list<DWLine_t>		m_DWLines;
+	std::list<DWCommand_t>	m_DWCommands;
 
 	/* Display window folder sizes. */
-	list<DWFolderSize_t>	m_DWFolderSizes;
+	std::list<DWFolderSize_t>	m_DWFolderSizes;
 	int						m_iDWFolderSizeUniqueId;
 
 	/* Default columns. */
-	list<Column_t>			m_RealFolderColumnList;
-	list<Column_t>			m_MyComputerColumnList;
-	list<Column_t>			m_ControlPanelColumnList;
-	list<Column_t>			m_RecycleBinColumnList;
-	list<Column_t>			m_PrintersColumnList;
-	list<Column_t>			m_NetworkConnectionsColumnList;
-	list<Column_t>			m_MyNetworkPlacesColumnList;
+	std::list<Column_t>		m_RealFolderColumnList;
+	std::list<Column_t>		m_MyComputerColumnList;
+	std::list<Column_t>		m_ControlPanelColumnList;
+	std::list<Column_t>		m_RecycleBinColumnList;
+	std::list<Column_t>		m_PrintersColumnList;
+	std::list<Column_t>		m_NetworkConnectionsColumnList;
+	std::list<Column_t>		m_MyNetworkPlacesColumnList;
 
 	/* ListView selection. */
 	BOOL					m_bCountingUp;
@@ -1236,16 +1237,16 @@ private:
 	POINT					m_ptDisplayColors;
 	
 	/* Cut items data. */
-	list<std::wstring>		m_CutFileNameList;
+	std::list<std::wstring>	m_CutFileNameList;
 	int						m_iCutTabInternal;
 
 	/* Arrange menu related data. */
-	list<ArrangeMenuItem_t>	m_ArrangeList;
-	list<ArrangeMenuItem_t>	*m_pActiveArrangeMenuItems;
-	list<ArrangeMenuItem_t>	m_ArrangeMenuRealFolder;
-	list<ArrangeMenuItem_t>	m_ArrangeMenuMyComputer;
-	list<ArrangeMenuItem_t>	m_ArrangeMenuControlPanel;
-	list<ArrangeMenuItem_t>	m_ArrangeMenuRecycleBin;
+	std::list<ArrangeMenuItem_t>	m_ArrangeList;
+	std::list<ArrangeMenuItem_t>	*m_pActiveArrangeMenuItems;
+	std::list<ArrangeMenuItem_t>	m_ArrangeMenuRealFolder;
+	std::list<ArrangeMenuItem_t>	m_ArrangeMenuMyComputer;
+	std::list<ArrangeMenuItem_t>	m_ArrangeMenuControlPanel;
+	std::list<ArrangeMenuItem_t>	m_ArrangeMenuRecycleBin;
 
 	/* TreeView middle click. */
 	HTREEITEM				m_hTVMButtonItem;

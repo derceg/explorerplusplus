@@ -287,7 +287,7 @@ void CFolderView::HandleDragSelection(POINT *ppt)
 			{
 				if(m_bDragging)
 				{
-					list<DraggedFile_t>::iterator itr;
+					std::list<DraggedFile_t>::iterator itr;
 
 					for(itr = m_DraggedFilesList.begin();itr != m_DraggedFilesList.end();itr++)
 					{
@@ -526,7 +526,7 @@ int CALLBACK CFolderView::SortTemporary(LPARAM lParam1,LPARAM lParam2)
 
 void CFolderView::RepositionLocalFiles(POINT *ppt)
 {
-	list<DraggedFile_t>::iterator	itr;
+	std::list<DraggedFile_t>::iterator	itr;
 	POINT							pt;
 	POINT							ptOrigin;
 	int								iItem;

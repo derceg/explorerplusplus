@@ -324,7 +324,7 @@ void Explorerplusplus::SetActiveArrangeMenuItems(void)
 int Explorerplusplus::InsertArrangeMenuItems(HMENU hMenu)
 {
 	MENUITEMINFO						mi;
-	list<ArrangeMenuItem_t>::iterator	itr;
+	std::list<ArrangeMenuItem_t>::iterator	itr;
 	TCHAR								szStringTemp[32];
 	UINT								uStringIndex;
 	int									i = 0;
@@ -717,8 +717,8 @@ void Explorerplusplus::DeletePreviousArrangeMenuItems(void)
  */
 void Explorerplusplus::UpdateArrangeMenuItems(void)
 {
-	list<int>				SortModes;
-	list<int>::iterator		itr;
+	std::list<int>			SortModes;
+	std::list<int>::iterator	itr;
 	ArrangeMenuItem_t		am;
 	int						SortById;
 	int						GroupById;

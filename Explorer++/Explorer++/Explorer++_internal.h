@@ -7,6 +7,7 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Helper.h"
 #include "../Helper/FolderSize.h"
+#include "../Helper/StatusBar.h"
 #include "../MyTreeView/MyTreeView.h"
 #include "../Helper/iDataObject.h"
 #include "../Helper/FileOperations.h"
@@ -91,8 +92,8 @@ SelectAndEdit() method of INewClient. */
 #define MINIMUM_DISPLAYWINDOW_HEIGHT	70
 #define DEFAULT_DISPLAYWINDOW_HEIGHT	90
 
-#define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Color(255,255,255)
-#define DEFAULT_DISPLAYWINDOW_SURROUND_COLOR	Color(0,94,138)
+#define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Gdiplus::Color(255,255,255)
+#define DEFAULT_DISPLAYWINDOW_SURROUND_COLOR	Gdiplus::Color(0,94,138)
 
 #define WM_USER_TABMCLICK		(WM_APP + 53)
 #define WM_USER_ASSOCCHANGED	(WM_APP + 54)
@@ -279,6 +280,10 @@ __interface IExplorerplusplus
 
 	virtual int				LookupColumnNameStringIndex(int iColumnId);
 	virtual int				LookupColumnDescriptionStringIndex(int iColumnId);
+
+	virtual void			OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
+
+	virtual	CStatusBar		*GetStatusBar();
 };
 
 /* Tab icons. */
@@ -359,13 +364,13 @@ struct DirectorySettingsInternal_t
 	UINT	SortMode;
 	UINT	ViewMode;
 
-	list<Column_t>	RealFolderColumnList;
-	list<Column_t>	MyComputerColumnList;
-	list<Column_t>	ControlPanelColumnList;
-	list<Column_t>	RecycleBinColumnList;
-	list<Column_t>	PrintersColumnList;
-	list<Column_t>	NetworkConnectionsColumnList;
-	list<Column_t>	MyNetworkPlacesColumnList;
+	std::list<Column_t>	RealFolderColumnList;
+	std::list<Column_t>	MyComputerColumnList;
+	std::list<Column_t>	ControlPanelColumnList;
+	std::list<Column_t>	RecycleBinColumnList;
+	std::list<Column_t>	PrintersColumnList;
+	std::list<Column_t>	NetworkConnectionsColumnList;
+	std::list<Column_t>	MyNetworkPlacesColumnList;
 };
 
 struct DirectorySettings_t

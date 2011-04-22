@@ -49,8 +49,8 @@ private:
 		int				iEndID;
 	};
 
-	list<ContextMenuHandler_t>	m_ContextMenuHandlers;
-	list<MenuHandler_t>			m_MenuHandlers;
+	std::list<ContextMenuHandler_t>	m_ContextMenuHandlers;
+	std::list<MenuHandler_t>		m_MenuHandlers;
 };
 
 #endif

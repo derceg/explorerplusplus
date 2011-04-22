@@ -5,8 +5,6 @@
 #include <winioctl.h>
 #include <list>
 
-using namespace std;
-
 /* Major version numbers for various versions of
 Windows. */
 #define WINDOWS_VISTA_SEVEN_MAJORVERSION	6
@@ -253,5 +251,6 @@ TCHAR			*ReplaceSubString(TCHAR *szString,TCHAR *szSubString,TCHAR *szReplacemen
 void			UpdateToolbarBandSizing(HWND hRebar,HWND hToolbar);
 void			MergeDateTime(SYSTEMTIME *pstOutput,SYSTEMTIME *pstDate,SYSTEMTIME *pstTime);
 void			GetWindowString(HWND hwnd,std::wstring &str);
+BOOL			lCheckDlgButton(HWND hDlg,int ButtonId,BOOL bCheck);
 
 #endif

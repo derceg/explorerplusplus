@@ -468,7 +468,7 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 										{
 											ClientToScreen(m_hDrivesToolbar,&pnmm->pt);
 
-											list<LPITEMIDLIST> pidlItemList;
+											std::list<LPITEMIDLIST> pidlItemList;
 
 											CFileContextMenuManager fcmm(m_hDrivesToolbar,pidlItem,
 												pidlItemList);
@@ -629,7 +629,7 @@ void Explorerplusplus::ToggleFolders(void)
 
 void Explorerplusplus::InsertToolbarButtons(void)
 {
-	list<ToolbarButton_t>::iterator	itr;
+	std::list<ToolbarButton_t>::iterator	itr;
 	TBBUTTON						*ptbButton = NULL;
 	BYTE							StandardStyle;
 	unsigned int					iCurrent = 0;

@@ -67,7 +67,7 @@ void Explorerplusplus::InitializeMenus(void)
 
 	/* Insert the view mode (icons, small icons, details, etc) menus in. */
 	MENUITEMINFO mii;
-	list<ViewMode_t>::iterator itr;
+	std::list<ViewMode_t>::iterator itr;
 	TCHAR szText[64];
 
 	for(itr = m_ViewModes.begin();itr != m_ViewModes.end();itr++)

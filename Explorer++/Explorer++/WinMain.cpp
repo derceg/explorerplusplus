@@ -37,7 +37,7 @@ extern LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lPar
 DWORD dwControlClasses = ICC_BAR_CLASSES|ICC_COOL_CLASSES|
 	ICC_LISTVIEW_CLASSES|ICC_USEREX_CLASSES|ICC_STANDARD_CLASSES|
 	ICC_LINK_CLASS;
-list<std::wstring> g_TabDirs;
+std::list<std::wstring> g_TabDirs;
 
 /* Search and options dialogs. */
 HWND g_hwndSearch;
@@ -54,7 +54,7 @@ BOOL g_bForceLanguageLoad = FALSE;
  * -l	Specifies the language for Explorer++ to use.
  * /?	Causes Explorer++ to show a small help message and exit.
  *
- * Directories can also be passed at any point (no preceeding
+ * Directories can also be passed at any point (no preceding
  * arguments needed).
  *
  * Paths on the command line are automatically expanded by

@@ -6,9 +6,6 @@
 #include <gdiplus.h>
 #include <vector>
 
-using namespace Gdiplus;
-using namespace std;
-
 #define DWM_BASE				(WM_APP + 100)
 
 #define DWM_SETTHUMBNAILFILE	(DWM_BASE + 2)
@@ -71,8 +68,8 @@ SendMessage(hDisplay,DWM_SETLINE,(WPARAM)iLine,(LPARAM)szText)
 
 typedef struct
 {
-	Color		CentreColor;
-	Color		SurroundColor;
+	Gdiplus::Color	CentreColor;
+	Gdiplus::Color	SurroundColor;
 	COLORREF	TextColor;
 	HFONT		hFont;
 	HICON		hIcon;
@@ -118,7 +115,7 @@ public:
 
 private:
 
-	#define BORDER_COLOUR		Color(128,128,128)
+	#define BORDER_COLOUR		Gdiplus::Color(128,128,128)
 	#define NUM_IMAGE_TYPES		9
 
 	typedef struct
@@ -169,11 +166,11 @@ private:
 	unsigned int	m_AveTextWidth;
 
 	/* Text buffers (for internal redrawing operations). */
-	vector<LineData_t>	m_LineList;
+	std::vector<LineData_t>	m_LineList;
 	TCHAR			m_ImageFile[MAX_PATH];
 	BOOL			m_bSizing;
-	Color			m_CentreColor;
-	Color			m_SurroundColor;
+	Gdiplus::Color	m_CentreColor;
+	Gdiplus::Color	m_SurroundColor;
 
 	int				m_iImageWidth;
 	int				m_iImageHeight;
@@ -191,10 +188,10 @@ private:
 
 	TCHAR ImageTypes[NUM_IMAGE_TYPES][4];
 	HDC m_hdcBackground;
-	Graphics *m_pFadingImage;
+	Gdiplus::Graphics *m_pFadingImage;
 	double m_dCurrentAlpha;
 	HDC m_hdcMemFading;
-	Image *m_FadingImageThumb;
+	Gdiplus::Image *m_FadingImageThumb;
 	HBITMAP m_hBitmapBackground;
 	HICON m_hMainIcon;
 	HFONT m_hDisplayFont;

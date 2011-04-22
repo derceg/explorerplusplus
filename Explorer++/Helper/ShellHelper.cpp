@@ -722,7 +722,7 @@ BOOL bDataAccept,BOOL bOnSameDrive)
 }
 
 HRESULT BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
-	IN list<std::wstring> FilenameList)
+	IN std::list<std::wstring> FilenameList)
 {
 	if(pftc == NULL ||
 		pstg == NULL ||
@@ -793,7 +793,7 @@ via arguments.
 Returns S_OK on success; E_FAIL on failure. */
 HRESULT BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
 	IN LPCITEMIDLIST pidlDirectory,
-	IN list<LPITEMIDLIST> pidlList)
+	IN std::list<LPITEMIDLIST> pidlList)
 {
 	if(pftc == NULL ||
 		pstg == NULL ||
@@ -1195,7 +1195,7 @@ returned.
 
 http://www.ureader.com/msg/16601280.aspx */
 BOOL LoadContextMenuHandlers(IN TCHAR *szRegKey,
-	OUT list<ContextMenuHandler_t> *pContextMenuHandlers)
+	OUT std::list<ContextMenuHandler_t> *pContextMenuHandlers)
 {
 	HKEY hKey = NULL;
 	BOOL bSuccess = FALSE;

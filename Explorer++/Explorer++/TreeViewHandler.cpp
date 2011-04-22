@@ -199,7 +199,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 			{
 				m_bTreeViewOpenInNewTab = FALSE;
 
-				list<LPITEMIDLIST> pidlList;
+				std::list<LPITEMIDLIST> pidlList;
 
 				pidlList.push_back(pidlRelative);
 

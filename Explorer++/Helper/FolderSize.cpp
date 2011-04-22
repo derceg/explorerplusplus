@@ -15,7 +15,6 @@
 #include "FolderSize.h"
 #include <list>
 
-using namespace std;
 
 HRESULT CalculateFolderSize(TCHAR *szPath,int *nFolders,
 int *nFiles,PULARGE_INTEGER lTotalFolderSize)
