@@ -40,35 +40,35 @@ CAboutDialog::~CAboutDialog()
 
 BOOL CAboutDialog::OnInitDialog()
 {
-	TCHAR	szVersion[64];
-	TCHAR	szTemp[64];
-	TCHAR	szBuild[64];
-	TCHAR	szBuildDate[64];
-
 	m_hIcon = (HICON)LoadImage(GetModuleHandle(0),
 		MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,
 		32,32,LR_VGACOLOR);
 
 	SendMessage(m_hDlg,WM_SETICON,ICON_SMALL,(LPARAM)m_hIcon);
 
+	TCHAR szVersion[64];
+	TCHAR szBuild[64];
+	TCHAR szBuildDate[64];
+	TCHAR szTemp[64];
+
 	/* Indicate which architecture (32-bit or
 	64-bit) we are building for in the version
 	string.*/
 #ifdef WIN64
-	StringCchCopy(szBuild,SIZEOF_ARRAY(szBuild),_T("64-bit"));
+	LoadString(GetInstance(),IDS_ABOUT_64BIT_BUILD,
+		szBuild,SIZEOF_ARRAY(szBuild));
 #else
-	StringCchCopy(szBuild,SIZEOF_ARRAY(szBuild),_T("32-bit"));
+	LoadString(GetInstance(),IDS_ABOUT_32BIT_BUILD,
+		szBuild,SIZEOF_ARRAY(szBuild));
 #endif
 
-#ifdef UNICODE
-	StringCchCat(szBuild,SIZEOF_ARRAY(szBuild),_T(" Unicode build"));
-#else
-	StringCchCat(szBuild,SIZEOF_ARRAY(szBuild),_T(" build"));
-#endif
+	LoadString(GetInstance(),IDS_ABOUT_UNICODE_BUILD,
+		szTemp,SIZEOF_ARRAY(szTemp));
+	StringCchCat(szBuild,SIZEOF_ARRAY(szBuild),_T(" "));
+	StringCchCat(szBuild,SIZEOF_ARRAY(szBuild),szTemp);
 
 	GetDlgItemText(m_hDlg,IDC_STATIC_VERSIONNUMBER,szTemp,SIZEOF_ARRAY(szTemp));
 	StringCchPrintf(szVersion,SIZEOF_ARRAY(szVersion),szTemp,NExplorerplusplus::VERSION_NUMBER,szBuild);
-
 	SetDlgItemText(m_hDlg,IDC_STATIC_VERSIONNUMBER,szVersion);
 
 	/* We'll only show a build date in non-debug mode. */

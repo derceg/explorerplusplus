@@ -107,24 +107,31 @@ BOOL CMergeFilesDialog::OnInitDialog()
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES,
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
 
-	TCHAR szTemp[32];
-	LoadString(GetInstance(),IDS_MERGE_COLUMN_TEXT,szTemp,SIZEOF_ARRAY(szTemp));
-
 	LVCOLUMN lvColumn;
+	TCHAR szTemp[32];
+
+	LoadString(GetInstance(),IDS_MERGE_FILES_COLUMN_FILE,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
 	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,0,&lvColumn);
 
+	LoadString(GetInstance(),IDS_MERGE_FILES_COLUMN_TYPE,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Type");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,1,&lvColumn);
 
+	LoadString(GetInstance(),IDS_MERGE_FILES_COLUMN_SIZE,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Size");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,2,&lvColumn);
 
+	LoadString(GetInstance(),IDS_MERGE_FILES_COLUMN_DATE_MODIFIED,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Date Modified");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,3,&lvColumn);
 
 	int iItem = 0;

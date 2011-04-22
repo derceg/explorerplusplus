@@ -80,7 +80,6 @@ CSearchDialog::~CSearchDialog()
 BOOL CSearchDialog::OnInitDialog()
 {
 	HWND hListView;
-	LVCOLUMN lvColumn;
 	HIMAGELIST himlSmall;
 	HIMAGELIST himl;
 	HBITMAP hBitmap;
@@ -112,12 +111,19 @@ BOOL CSearchDialog::OnInitDialog()
 	Shell_GetImageLists(NULL,&himlSmall);
 	ListView_SetImageList(hListView,himlSmall,LVSIL_SMALL);
 
+	LVCOLUMN lvColumn;
+	TCHAR szTemp[128];
+
+	LoadString(GetInstance(),IDS_SEARCH_COLUMN_NAME,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Name");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,0,&lvColumn);
 
+	LoadString(GetInstance(),IDS_SEARCH_COLUMN_PATH,
+		szTemp,SIZEOF_ARRAY(szTemp));
 	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= _T("Path");
+	lvColumn.pszText	= szTemp;
 	ListView_InsertColumn(hListView,1,&lvColumn);
 
 	RECT rc;
@@ -775,14 +781,19 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 					int iFoldersFound = LOWORD(lParam);
 					int iFilesFound = HIWORD(lParam);
 
-					StringCchPrintf(szStatus,SIZEOF_ARRAY(szStatus),
-						_T("Finished. %d folder(s) and %d file(s) found."),
+					TCHAR szTemp[128];
+					LoadString(GetInstance(),IDS_SEARCH_FINISHED_MESSAGE,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					StringCchPrintf(szStatus,SIZEOF_ARRAY(szStatus),szTemp,
 						iFoldersFound,iFilesFound);
 					SetDlgItemText(m_hDlg,IDC_STATIC_STATUS,szStatus);
 				}
 				else
 				{
-					SetDlgItemText(m_hDlg,IDC_STATIC_STATUS,_T("Cancelled."));
+					TCHAR szTemp[128];
+					LoadString(GetInstance(),IDS_SEARCH_CANCELLED_MESSAGE,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					SetDlgItemText(m_hDlg,IDC_STATIC_STATUS,szTemp);
 
 					if(m_bExit)
 					{
@@ -807,7 +818,6 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 				pszDirectory = (TCHAR *)wParam;
 
 				TCHAR szTemp[64];
-
 				LoadString(GetInstance(),IDS_SEARCHING,
 					szTemp,SIZEOF_ARRAY(szTemp));
 				StringCchPrintf(szStatus,SIZEOF_ARRAY(szStatus),szTemp,
@@ -826,8 +836,10 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 				/* The regular expression passed to the search
 				thread was invalid. Show the user an error message. */
-				SetDlgItemText(m_hDlg,IDC_LINK_STATUS,_T("<a href=\"http://msdn.microsoft.com/en-us/library/bb982727.aspx\">\
-					The form of the regular expression is incorrect</a>"));
+				TCHAR szTemp[128];
+				LoadString(GetInstance(),IDS_SEARCH_REGULAR_EXPRESSION_INVALID,
+					szTemp,SIZEOF_ARRAY(szTemp));
+				SetDlgItemText(m_hDlg,IDC_LINK_STATUS,szTemp);
 
 				m_pSearch->Release();
 				m_pSearch = NULL;
