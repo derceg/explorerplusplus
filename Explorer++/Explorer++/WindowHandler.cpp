@@ -387,8 +387,10 @@ LRESULT CALLBACK Explorerplusplus::EditSubclass(HWND hwnd,UINT msg,WPARAM wParam
 			break;
 
 		case WM_MOUSEWHEEL:
-			if(OnMouseWheel(wParam,lParam))
+			if(OnMouseWheel(MOUSEWHEEL_SOURCE_OTHER,wParam,lParam))
+			{
 				return 0;
+			}
 			break;
 	}
 

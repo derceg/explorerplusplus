@@ -237,8 +237,10 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			break;
 
 		case WM_MOUSEWHEEL:
-			if(OnMouseWheel(wParam,lParam))
+			if(OnMouseWheel(MOUSEWHEEL_SOURCE_LISTVIEW,wParam,lParam))
+			{
 				return 0;
+			}
 			break;
 
 		case WM_NOTIFY:

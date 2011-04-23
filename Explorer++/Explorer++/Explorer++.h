@@ -247,6 +247,13 @@ private:
 	static const int		MIN_SHELL_MENU_ID = 1;
 	static const int		MAX_SHELL_MENU_ID = 1000;
 
+	enum MousewheelSource_t
+	{
+		MOUSEWHEEL_SOURCE_LISTVIEW,
+		MOUSEWHEEL_SOURCE_TREEVIEW,
+		MOUSEWHEEL_SOURCE_OTHER
+	};
+
 	class CLoadSaveRegistry : public ILoadSave
 	{
 	public:
@@ -968,7 +975,7 @@ private:
 	HWND					MyGetNextWindow(HWND hwndCurrent);
 	BOOL					IsNextWindowVisible(HWND hNext);
 	void					ShowMainRebarBand(HWND hwnd,BOOL bShow);
-	BOOL					OnMouseWheel(WPARAM wParam,LPARAM lParam);
+	BOOL					OnMouseWheel(MousewheelSource_t MousewheelSource,WPARAM wParam,LPARAM lParam);
 	void					CycleViewState(BOOL bCycleForward);
 	int						GetViewModeMenuId(UINT uViewMode);
 	int						GetViewModeMenuStringId(UINT uViewMode);
@@ -1250,6 +1257,9 @@ private:
 	std::list<ArrangeMenuItem_t>	m_ArrangeMenuMyComputer;
 	std::list<ArrangeMenuItem_t>	m_ArrangeMenuControlPanel;
 	std::list<ArrangeMenuItem_t>	m_ArrangeMenuRecycleBin;
+
+	/* Mousewheel. */
+	int						m_zDeltaTotal;
 
 	/* TreeView middle click. */
 	HTREEITEM				m_hTVMButtonItem;

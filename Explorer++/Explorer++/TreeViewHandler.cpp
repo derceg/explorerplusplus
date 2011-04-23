@@ -89,8 +89,10 @@ WPARAM wParam,LPARAM lParam)
 		break;
 
 	case WM_MOUSEWHEEL:
-		if(OnMouseWheel(wParam,lParam))
+		if(OnMouseWheel(MOUSEWHEEL_SOURCE_TREEVIEW,wParam,lParam))
+		{
 			return 0;
+		}
 		break;
 	}
 

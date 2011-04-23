@@ -96,6 +96,7 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	g_hwndOptions					= NULL;
 	m_ListViewMButtonItem			= -1;
 	m_nDrivesInToolbar				= 0;
+	m_zDeltaTotal					= 0;
 
 	/* Dialog states. */
 	m_bAddBookmarkDlgStateSaved		= FALSE;

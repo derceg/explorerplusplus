@@ -160,9 +160,6 @@ appears on the tab control. */
 
 #define DEFAULT_COLUMN_WIDTH	150
 
-#define LISTVIEW_WHEEL_MULTIPLIER	3
-#define TREEVIEW_WHEEL_MULTIPLIER	3
-
 /* These definitions are needed to target
 Windows 7 specific features, while remaining
 compliant with XP and Vista. They are copied

@@ -1727,132 +1727,119 @@ void Explorerplusplus::HandleTabToolbarItemStates(void)
 	}
 }
 
-BOOL Explorerplusplus::OnMouseWheel(WPARAM wParam,LPARAM lParam)
+BOOL Explorerplusplus::OnMouseWheel(MousewheelSource_t MousewheelSource,WPARAM wParam,LPARAM lParam)
 {
-	HWND hUpDown;
-	RECT rc;
+	short zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+	m_zDeltaTotal += zDelta;
+
+	DWORD dwCursorPos = GetMessagePos();
+	POINTS pts = MAKEPOINTS(dwCursorPos);
+
 	POINT pt;
-	POINTS pts;
-	DWORD dwCursorPos;
-	BOOL bSuccess;
-	BOOL bInRect;
-	int iLow;
-	int iHigh;
-	int iScrollPos;
-	int iPos;
-	short zDelta;
-
-	zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
-
-	GetClientRect(m_hTabCtrl,&rc);
-	dwCursorPos = GetMessagePos();
-
-	pts = MAKEPOINTS(dwCursorPos);
 	pt.x = pts.x;
 	pt.y = pts.y;
 
-	ScreenToClient(m_hTabCtrl,&pt);
+	HWND hwnd = WindowFromPoint(pt);
 
-	bInRect = PtInRect(&rc,pt);
+	BOOL bMessageHandled = FALSE;
 
-	if(bInRect)
+	/* Normally, mouse wheel messages will be sent
+	to the window with focus. We want to be able to
+	scroll windows even if they do not have focus,
+	so we'll capture the mouse wheel message and
+	and forward it to the window currently underneath
+	the mouse. */
+	if(hwnd == m_hActiveListView)
 	{
-		hUpDown = FindWindowEx(m_hTabCtrl,NULL,UPDOWN_CLASS,NULL);
+		if(wParam & MK_CONTROL)
+		{
+			/* Switch listview views. For each wheel delta
+			(notch) the wheel is scrolled through, switch
+			the view once. */
+			for(int i = 0;i < abs(m_zDeltaTotal / WHEEL_DELTA);i++)
+			{
+				CycleViewState((m_zDeltaTotal > 0));
+			}
+		}
+		else if(wParam & MK_SHIFT)
+		{
+			if(m_zDeltaTotal < 0)
+			{
+				for(int i = 0;i < abs(m_zDeltaTotal / WHEEL_DELTA);i++)
+				{
+					OnBrowseBack();
+				}
+			}
+			else
+			{
+				for(int i = 0;i < abs(m_zDeltaTotal / WHEEL_DELTA);i++)
+				{
+					OnBrowseForward();
+				}
+			}
+		}
+		else
+		{
+			if(MousewheelSource != MOUSEWHEEL_SOURCE_LISTVIEW)
+			{
+				bMessageHandled = TRUE;
+				SendMessage(m_hActiveListView,WM_MOUSEWHEEL,wParam,lParam);
+			}
+		}
+	}
+	else if(hwnd == m_hTreeView)
+	{
+		if(MousewheelSource != MOUSEWHEEL_SOURCE_TREEVIEW)
+		{
+			bMessageHandled = TRUE;
+			SendMessage(m_hTreeView,WM_MOUSEWHEEL,wParam,lParam);
+		}
+	}
+	else if(hwnd == m_hTabCtrl)
+	{
+		bMessageHandled = TRUE;
+
+		HWND hUpDown = FindWindowEx(m_hTabCtrl,NULL,UPDOWN_CLASS,NULL);
 
 		if(hUpDown != NULL)
 		{
-			iPos = (int)SendMessage(hUpDown,UDM_GETPOS32,0,(LPARAM)&bSuccess);
+			BOOL bSuccess;
+			int iPos = static_cast<int>(SendMessage(hUpDown,UDM_GETPOS32,0,reinterpret_cast<LPARAM>(&bSuccess)));
 
 			if(bSuccess)
 			{
-				iScrollPos = iPos;
-				SendMessage(hUpDown,UDM_GETRANGE32,(WPARAM)&iLow,(LPARAM)&iHigh);
+				int iScrollPos = iPos;
 
-				if(zDelta < 0)
+				int iLow;
+				int iHigh;
+				SendMessage(hUpDown,UDM_GETRANGE32,reinterpret_cast<WPARAM>(&iLow),reinterpret_cast<LPARAM>(&iHigh));
+
+				if(m_zDeltaTotal < 0)
 				{
 					if(iScrollPos < iHigh)
+					{
 						iScrollPos++;
+					}
 				}
 				else
 				{
 					if(iScrollPos > iLow)
+					{
 						iScrollPos--;
+					}
 				}
 
 				SendMessage(m_hTabCtrl,WM_HSCROLL,MAKEWPARAM(SB_THUMBPOSITION,iScrollPos),NULL);
 			}
 		}
 	}
-	else
+
+	if(abs(m_zDeltaTotal) >= WHEEL_DELTA)
 	{
-		GetClientRect(m_hTreeView,&rc);
-
-		pt.x = pts.x;
-		pt.y = pts.y;
-
-		ScreenToClient(m_hTreeView,&pt);
-
-		bInRect = PtInRect(&rc,pt);
-
-		if(bInRect && m_bShowFolders)
-		{
-			WORD wScrollType;
-			int  i = 0;
-
-			if(zDelta > 0)
-				wScrollType = SB_LINEUP;
-			else
-				wScrollType = SB_LINEDOWN;
-
-			for(i = 0;i < TREEVIEW_WHEEL_MULTIPLIER * abs(zDelta / WHEEL_DELTA);i++)
-			{
-				SendMessage(m_hTreeView,WM_VSCROLL,MAKEWORD(wScrollType,0),NULL);
-			}
-		}
-		else
-		{
-			/* User is scrolling within the listview. */
-			if(wParam & MK_CONTROL)
-			{
-				int  i = 0;
-
-				/* Switch listview views. For each wheel delta
-				(notch) the wheel is scrolled through, switch
-				the view once. */
-				for(i = 0;i < abs(zDelta / WHEEL_DELTA);i++)
-				{
-					CycleViewState((zDelta > 0));
-				}
-			}
-			else if(wParam & MK_SHIFT)
-			{
-				if(zDelta < 0)
-					OnBrowseBack();
-				else
-					OnBrowseForward();
-			}
-			else
-			{
-				/* TODO: http://www.explorerplusplus.com/forum/viewtopic.php?f=5&t=567 */
-				WORD wScrollType;
-				int i = 0;
-
-				if(zDelta > 0)
-					wScrollType = SB_LINEUP;
-				else
-					wScrollType = SB_LINEDOWN;
-
-				for(i = 0;i < LISTVIEW_WHEEL_MULTIPLIER * abs(zDelta / WHEEL_DELTA);i++)
-				{
-					SendMessage(m_hActiveListView,WM_VSCROLL,MAKEWORD(wScrollType,0),NULL);
-				}
-
-				bInRect = TRUE;
-			}
-		}
+		m_zDeltaTotal = m_zDeltaTotal % WHEEL_DELTA;
 	}
 
-	return bInRect;
+	return bMessageHandled;
 }
 
 void Explorerplusplus::DuplicateTab(int iTabInternal)
