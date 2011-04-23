@@ -345,10 +345,13 @@ void Explorerplusplus::SetLanguageModule(void)
 			PathAppend(szFullFileName,wfd.cFileName);
 			wLanguage = GetFileLanguage(szFullFileName);
 
+			BOOL bLanguageMismatch = FALSE;
+
 			if(wLanguage == m_Language)
 			{
-				/* Using translation DLL's will most likely
-				crash the program due to incorrect/missing resources.
+				/* Using translation DLL's built for other versions of
+				the executable will most likely crash the program due
+				to incorrect/missing resources.
 				Therefore, only load the specified translation DLL
 				if it matches the current internal version. */
 				if(VerifyLanguageVersion(szFullFileName))
@@ -357,10 +360,7 @@ void Explorerplusplus::SetLanguageModule(void)
 				}
 				else
 				{
-					/* Main window hasn't been constructed yet, so this
-					message box doesn't have any owner window. */
-					MessageBox(NULL,_T("The version of the specified translation DLL does not match the version of the executable."),
-						NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING);
+					bLanguageMismatch = TRUE;
 				}
 			}
 			else
@@ -373,13 +373,110 @@ void Explorerplusplus::SetLanguageModule(void)
 
 					if(wLanguage == m_Language)
 					{
-						g_hLanguageModule = LoadLibrary(szFullFileName);
+						if(VerifyLanguageVersion(szFullFileName))
+						{
+							g_hLanguageModule = LoadLibrary(szFullFileName);
+						}
+						else
+						{
+							bLanguageMismatch = TRUE;
+						}
+
 						break;
 					}
 				}
 			}
 
 			FindClose(hFindFile);
+
+			if(bLanguageMismatch)
+			{
+				TCHAR szTemp[256];
+
+				/* Attempt to show an error message in the language
+				that was specified. */
+				switch(wLanguage)
+				{
+				case LANG_CHINESE_SIMPLIFIED:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_CHINESE_SIMPLIFIED,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_CZECH:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_CZECH,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_DANISH:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_DANISH,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_DUTCH:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_DUTCH,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_FRENCH:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_FRENCH,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_GERMAN:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_GERMAN,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_ITALIAN:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_ITALIAN,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_JAPANESE:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_JAPANESE,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_KOREAN:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_KOREAN,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_NORWEGIAN:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_NORWEGIAN,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_PORTUGUESE:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_PORTUGUESE,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_ROMANIAN:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_ROMANIAN,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_RUSSIAN:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_RUSSIAN,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				case LANG_SPANISH:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH_SPANISH,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+
+				default:
+					LoadString(GetModuleHandle(NULL),IDS_GENERAL_TRANSLATION_DLL_VERSION_MISMATCH,
+						szTemp,SIZEOF_ARRAY(szTemp));
+					break;
+				}
+
+				/* Main window hasn't been constructed yet, so this
+				message box doesn't have any owner window. */
+				MessageBox(NULL,szTemp,NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING);
+			}
 		}
 	}
 
