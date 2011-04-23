@@ -40,11 +40,11 @@ CAboutDialog::~CAboutDialog()
 
 BOOL CAboutDialog::OnInitDialog()
 {
-	m_hIcon = (HICON)LoadImage(GetModuleHandle(0),
+	m_hIcon = reinterpret_cast<HICON>(LoadImage(GetInstance(),
 		MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,
-		32,32,LR_VGACOLOR);
+		32,32,LR_VGACOLOR));
 
-	SendMessage(m_hDlg,WM_SETICON,ICON_SMALL,(LPARAM)m_hIcon);
+	SendMessage(m_hDlg,WM_SETICON,ICON_SMALL,reinterpret_cast<LPARAM>(m_hIcon));
 
 	TCHAR szVersion[64];
 	TCHAR szBuild[64];

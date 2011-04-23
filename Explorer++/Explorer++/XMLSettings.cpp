@@ -30,6 +30,9 @@
 #include "SplitFileDialog.h"
 #include "DestroyFilesDialog.h"
 #include "MergeFilesDialog.h"
+#include "SetFileAttributesDialog.h"
+#include "SelectColumnsDialog.h"
+#include "SetDefaultColumnsDialog.h"
 #include "../Helper/XMLSettings.h"
 
 #import <msxml3.dll> raw_interfaces_only
@@ -1907,6 +1910,12 @@ void Explorerplusplus::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 							CDestroyFilesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("MergeFiles")) == 0)
 							CMergeFilesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
+						else if(lstrcmpi(bstrValue,_T("SetFileAttributes")) == 0)
+							CSetFileAttributesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
+						else if(lstrcmpi(bstrValue,_T("SelectColumns")) == 0)
+							CSelectColumnsDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
+						else if(lstrcmpi(bstrValue,_T("SetDefaultColumns")) == 0)
+							CSetDefaultColumnsDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 					}
 				}
 			}
@@ -1938,6 +1947,7 @@ MSXML2::IXMLDOMElement *pRoot)
 
 	CSearchDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CWildcardSelectDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CSetFileAttributesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CRenameTabDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CMassRenameDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CFilterDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
@@ -1946,6 +1956,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	CSplitFileDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CDestroyFilesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CMergeFilesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CSelectColumnsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CSetDefaultColumnsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 

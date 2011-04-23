@@ -46,6 +46,9 @@ BOOL CFilterDialog::OnInitDialog()
 	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_FILTER,ILD_NORMAL);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
 
+	DeleteObject(hBitmap);
+	ImageList_Destroy(himl);
+
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_FILTER_COMBOBOX);
 
 	SetFocus(hComboBox);

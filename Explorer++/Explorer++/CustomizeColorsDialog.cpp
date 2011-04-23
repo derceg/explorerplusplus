@@ -44,6 +44,9 @@ BOOL CCustomizeColorsDialog::OnInitDialog()
 	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_CUSTOMIZECOLORS,ILD_NORMAL);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
 
+	DeleteObject(hBitmap);
+	ImageList_Destroy(himl);
+
 	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
 
 	SetWindowTheme(hListView,L"Explorer",NULL);
