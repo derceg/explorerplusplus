@@ -27,8 +27,6 @@ namespace NSplitFileDialog
 	const int		WM_APP_SETTOTALSPLITCOUNT	= WM_APP + 1;
 	const int		WM_APP_SETCURRENTSPLITCOUNT	= WM_APP + 2;
 	const int		WM_APP_SPLITFINISHED		= WM_APP + 3;
-
-	/* TODO: This message needs to be handled. */
 	const int		WM_APP_INPUTFILEINVALID		= WM_APP + 4;
 
 	const TCHAR		COUNTER_PATTERN[] = _T("/N");
@@ -278,6 +276,27 @@ void CSplitFileDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 	case NSplitFileDialog::WM_APP_SPLITFINISHED:
 		OnSplitFinished();
+		break;
+
+	case NSplitFileDialog::WM_APP_INPUTFILEINVALID:
+		{
+			TCHAR szTemp[128];
+			LoadString(GetInstance(),IDS_SPLITFILEDIALOG_INPUTFILEINVALID,
+				szTemp,SIZEOF_ARRAY(szTemp));
+			SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,szTemp);
+
+			assert(m_pSplitFile != NULL);
+
+			m_pSplitFile->Release();
+			m_pSplitFile = NULL;
+
+			m_bSplittingFile = false;
+			m_bStopSplitting = false;
+
+			KillTimer(m_hDlg,ELPASED_TIMER_ID);
+
+			SetDlgItemText(m_hDlg,IDOK,m_szOk);
+		}
 		break;
 	}
 }

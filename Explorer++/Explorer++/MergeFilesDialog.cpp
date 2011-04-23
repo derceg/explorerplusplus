@@ -23,8 +23,6 @@ namespace NMergeFilesDialog
 	const int WM_APP_SETTOTALMERGECOUNT		= WM_APP + 1;
 	const int WM_APP_SETCURRENTMERGECOUNT	= WM_APP + 2;
 	const int WM_APP_MERGINGFINISHED		= WM_APP + 3;
-
-	/* TODO: This message needs to be handled. */
 	const int WM_APP_OUTPUTFILEINVALID		= WM_APP + 4;
 
 	DWORD WINAPI	MergeFilesThread(LPVOID pParam);
@@ -320,6 +318,25 @@ void CMergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 	case NMergeFilesDialog::WM_APP_MERGINGFINISHED:
 		OnFinished();
+		break;
+
+	case NMergeFilesDialog::WM_APP_OUTPUTFILEINVALID:
+		{
+			TCHAR szTemp[64];
+			LoadString(GetInstance(),IDS_MERGE_FILES_OUTPUTFILEINVALID,
+				szTemp,SIZEOF_ARRAY(szTemp));
+			MessageBox(m_hDlg,szTemp,NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_OK);
+
+			assert(m_pMergeFiles != NULL);
+
+			m_pMergeFiles->Release();
+			m_pMergeFiles = NULL;
+
+			m_bMergingFiles = false;
+			m_bStopMerging = false;
+
+			SetDlgItemText(m_hDlg,IDOK,m_szOk);
+		}
 		break;
 	}
 }
