@@ -19,12 +19,9 @@
 #include "Explorer++_internal.h"
 #include "AboutDialog.h"
 #include "MainResource.h"
+#include "Version.h"
 #include "../Helper/Helper.h"
 #include "../Helper/BaseDialog.h"
-
-#ifndef _DEBUG
-	#include "Version.h"
-#endif
 
 
 CAboutDialog::CAboutDialog(HINSTANCE hInstance,int iResource,HWND hParent) :
@@ -68,16 +65,11 @@ BOOL CAboutDialog::OnInitDialog()
 	StringCchCat(szBuild,SIZEOF_ARRAY(szBuild),szTemp);
 
 	GetDlgItemText(m_hDlg,IDC_STATIC_VERSIONNUMBER,szTemp,SIZEOF_ARRAY(szTemp));
-	StringCchPrintf(szVersion,SIZEOF_ARRAY(szVersion),szTemp,NExplorerplusplus::VERSION_NUMBER,szBuild);
+	StringCchPrintf(szVersion,SIZEOF_ARRAY(szVersion),szTemp,VERSION_STRING_W,szBuild);
 	SetDlgItemText(m_hDlg,IDC_STATIC_VERSIONNUMBER,szVersion);
 
-	/* We'll only show a build date in non-debug mode. */
-#ifndef _DEBUG
 	GetDlgItemText(m_hDlg,IDC_STATIC_BUILDDATE,szTemp,SIZEOF_ARRAY(szTemp));
-	StringCchPrintf(szBuildDate,SIZEOF_ARRAY(szBuildDate),szTemp,VERSION_BUILD_DATE);
-#else
-	StringCchCopy(szBuildDate,SIZEOF_ARRAY(szBuildDate),_T("[Debug Build]"));
-#endif
+	StringCchPrintf(szBuildDate,SIZEOF_ARRAY(szBuildDate),szTemp,BUILD_DATE_STRING);
 
 	SetDlgItemText(m_hDlg,IDC_STATIC_BUILDDATE,szBuildDate);
 

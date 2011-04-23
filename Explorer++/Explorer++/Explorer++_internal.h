@@ -21,7 +21,6 @@
 classes within the Explorer++ project. */
 namespace NExplorerplusplus
 {
-	const TCHAR VERSION_NUMBER[]	= _T("1.2");
 	const TCHAR WINDOW_NAME[]		= _T("Explorer++");
 	const TCHAR CLASS_NAME[]		= _T("Explorer++");
 

@@ -156,8 +156,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>subwcrev.exe "$(SolutionDir)..\Explorer++" "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -199,8 +198,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>subwcrev.exe "$(SolutionDir)..\Explorer++" "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
     </PreBuildEvent>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -240,7 +238,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PreBuildEvent>
-      <Command>"$(SolutionDir)\..\Tools\Versioner\Release\Versioner.exe" "$(SolutionDir)\Explorer++\Version.h"</Command>
+      <Command>subwcrev.exe "$(SolutionDir)..\Explorer++" "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Full</Optimization>
@@ -273,7 +271,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>
-      <Command>"$(SolutionDir)\..\Tools\Versioner\Release\Versioner.exe" "$(SolutionDir)\Explorer++\Version.h"</Command>
+      <Command>subwcrev.exe "$(SolutionDir)..\Explorer++" "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
     </PreBuildEvent>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -308,7 +306,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|Win32'">
     <PreBuildEvent>
-      <Command>"$(SolutionDir)\..\Tools\Versioner\Release\Versioner.exe" "$(SolutionDir)\Explorer++\Version.h"</Command>
+      <Command>subwcrev.exe "$(SolutionDir)..\Explorer++" "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Full</Optimization>
@@ -342,7 +340,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
     <PreBuildEvent>
-      <Command>"$(SolutionDir)\..\Tools\Versioner\Release\Versioner.exe" "$(SolutionDir)\Explorer++\Version.h"</Command>
+      <Command>subwcrev.exe "$(SolutionDir)..\Explorer++" "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
     </PreBuildEvent>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -376,6 +374,16 @@
       </DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
     </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <PreBuildEvent>
+      <Command>subwcrev.exe "$(SolutionDir)..\Explorer++" "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|x64'">
+    <PreBuildEvent>
+      <Command>subwcrev.exe "$(SolutionDir)..\Explorer++" "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp">
@@ -464,7 +472,6 @@
     <ClInclude Include="SetFileAttributesDialog.h" />
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Version.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
   </ItemGroup>
   <ItemGroup>
