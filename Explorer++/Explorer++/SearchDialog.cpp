@@ -808,6 +808,8 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 					}
 				}
 
+				assert(m_pSearch != NULL);
+
 				m_pSearch->Release();
 				m_pSearch = NULL;
 
@@ -847,6 +849,8 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 				LoadString(GetInstance(),IDS_SEARCH_REGULAR_EXPRESSION_INVALID,
 					szTemp,SIZEOF_ARRAY(szTemp));
 				SetDlgItemText(m_hDlg,IDC_LINK_STATUS,szTemp);
+
+				assert(m_pSearch != NULL);
 
 				m_pSearch->Release();
 				m_pSearch = NULL;

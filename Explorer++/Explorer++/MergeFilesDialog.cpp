@@ -23,6 +23,8 @@ namespace NMergeFilesDialog
 	const int WM_APP_SETTOTALMERGECOUNT		= WM_APP + 1;
 	const int WM_APP_SETCURRENTMERGECOUNT	= WM_APP + 2;
 	const int WM_APP_MERGINGFINISHED		= WM_APP + 3;
+
+	/* TODO: This message needs to be handled. */
 	const int WM_APP_OUTPUTFILEINVALID		= WM_APP + 4;
 
 	DWORD WINAPI	MergeFilesThread(LPVOID pParam);
@@ -40,13 +42,18 @@ CBaseDialog(hInstance,iResource,hParent,true)
 	m_bShowFriendlyDates	= bShowFriendlyDates;
 	m_bMergingFiles			= false;
 	m_bStopMerging			= false;
+	m_pMergeFiles			= NULL;
 
 	m_pmfdps = &CMergeFilesDialogPersistentSettings::GetInstance();
 }
 
 CMergeFilesDialog::~CMergeFilesDialog()
 {
-
+	if(m_pMergeFiles != NULL)
+	{
+		m_pMergeFiles->StopMerging();
+		m_pMergeFiles->Release();
+	}
 }
 
 bool CompareFilenames(std::wstring strFirst,std::wstring strSecond)
@@ -345,6 +352,8 @@ void CMergeFilesDialog::OnOk()
 
 		m_pMergeFiles = new CMergeFiles(m_hDlg,szOutputFileName,m_FullFilenameList);
 
+		SendDlgItemMessage(m_hDlg,IDC_MERGE_PROGRESS,PBM_SETPOS,0,0);
+
 		GetDlgItemText(m_hDlg,IDOK,m_szOk,SIZEOF_ARRAY(m_szOk));
 
 		TCHAR szTemp[64];
@@ -360,6 +369,11 @@ void CMergeFilesDialog::OnOk()
 	else
 	{
 		m_bStopMerging = true;
+
+		if(m_pMergeFiles != NULL)
+		{
+			m_pMergeFiles->StopMerging();
+		}
 	}
 }
 
@@ -428,7 +442,19 @@ void CMergeFilesDialog::OnMove(bool bUp)
 
 void CMergeFilesDialog::OnFinished()
 {
+	assert(m_pMergeFiles != NULL);
+
+	m_pMergeFiles->Release();
+	m_pMergeFiles = NULL;
+
 	m_bMergingFiles = false;
+	m_bStopMerging = false;
+
+	/* Set the progress bar position to the end. */
+	int iHighLimit = static_cast<int>(SendDlgItemMessage(m_hDlg,IDC_MERGE_PROGRESS,PBM_GETRANGE,FALSE,0));
+	SendDlgItemMessage(m_hDlg,IDC_MERGE_PROGRESS,PBM_SETPOS,iHighLimit,0);
+
+	SetDlgItemText(m_hDlg,IDOK,m_szOk);
 }
 
 DWORD WINAPI NMergeFilesDialog::MergeFilesThread(LPVOID pParam)
@@ -522,6 +548,13 @@ void CMergeFiles::StartMerging()
 	CloseHandle(hOutputFile);
 
 	SendMessage(m_hDlg,NMergeFilesDialog::WM_APP_MERGINGFINISHED,0,0);
+}
+
+void CMergeFiles::StopMerging()
+{
+	EnterCriticalSection(&m_csStop);
+	m_bstopMerging = true;
+	LeaveCriticalSection(&m_csStop);
 }
 
 CMergeFilesDialogPersistentSettings::CMergeFilesDialogPersistentSettings() :

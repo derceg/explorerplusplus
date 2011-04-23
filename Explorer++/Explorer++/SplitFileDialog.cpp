@@ -27,6 +27,8 @@ namespace NSplitFileDialog
 	const int		WM_APP_SETTOTALSPLITCOUNT	= WM_APP + 1;
 	const int		WM_APP_SETCURRENTSPLITCOUNT	= WM_APP + 2;
 	const int		WM_APP_SPLITFINISHED		= WM_APP + 3;
+
+	/* TODO: This message needs to be handled. */
 	const int		WM_APP_INPUTFILEINVALID		= WM_APP + 4;
 
 	const TCHAR		COUNTER_PATTERN[] = _T("/N");
@@ -44,13 +46,18 @@ CBaseDialog(hInstance,iResource,hParent,false)
 	m_bSplittingFile	= false;
 	m_bStopSplitting	= false;
 	m_CurrentError		= ERROR_NONE;
+	m_pSplitFile		= NULL;
 
 	m_psfdps = &CSplitFileDialogPersistentSettings::GetInstance();
 }
 
 CSplitFileDialog::~CSplitFileDialog()
 {
-
+	if(m_pSplitFile != NULL)
+	{
+		m_pSplitFile->StopSplitting();
+		m_pSplitFile->Release();
+	}
 }
 
 BOOL CSplitFileDialog::OnInitDialog()
@@ -397,6 +404,10 @@ void CSplitFileDialog::OnOk()
 		m_uElapsedTime = 0;
 		SetTimer(m_hDlg,ELPASED_TIMER_ID,ELPASED_TIMER_TIMEOUT,NULL);
 
+		LoadString(GetInstance(),IDS_SPLITFILEDIALOG_SPLITTING,
+			szTemp,SIZEOF_ARRAY(szTemp));
+		SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,szTemp);
+
 		HANDLE hThread = CreateThread(NULL,0,NSplitFileDialog::SplitFileThreadProcStub,
 			reinterpret_cast<LPVOID>(m_pSplitFile),0,NULL);
 		SetThreadPriority(hThread,THREAD_PRIORITY_LOWEST);
@@ -404,6 +415,11 @@ void CSplitFileDialog::OnOk()
 	else
 	{
 		m_bStopSplitting = true;
+
+		if(m_pSplitFile != NULL)
+		{
+			m_pSplitFile->StopSplitting();
+		}
 	}
 }
 
@@ -436,7 +452,35 @@ void CSplitFileDialog::OnChangeOutputDirectory()
 
 void CSplitFileDialog::OnSplitFinished()
 {
+	TCHAR szTemp[64];
+
+	if(!m_bStopSplitting)
+	{
+		LoadString(GetInstance(),IDS_SPLITFILEDIALOG_FINISHED,
+			szTemp,SIZEOF_ARRAY(szTemp));
+	}
+	else
+	{
+		LoadString(GetInstance(),IDS_SPLITFILEDIALOG_CANCELLED,
+			szTemp,SIZEOF_ARRAY(szTemp));
+	}
+
+	SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,szTemp);
+
+	assert(m_pSplitFile != NULL);
+
+	m_pSplitFile->Release();
+	m_pSplitFile = NULL;
+
 	m_bSplittingFile = false;
+	m_bStopSplitting = false;
+
+	KillTimer(m_hDlg,ELPASED_TIMER_ID);
+
+	int iHighLimit = static_cast<int>(SendDlgItemMessage(m_hDlg,IDC_SPLIT_PROGRESS,PBM_GETRANGE,FALSE,0));
+	SendDlgItemMessage(m_hDlg,IDC_SPLIT_PROGRESS,PBM_SETPOS,iHighLimit,0);
+
+	SetDlgItemText(m_hDlg,IDOK,m_szOk);
 }
 
 DWORD WINAPI NSplitFileDialog::SplitFileThreadProcStub(LPVOID pParam)
