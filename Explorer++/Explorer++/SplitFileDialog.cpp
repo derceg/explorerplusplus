@@ -98,13 +98,19 @@ BOOL CSplitFileDialog::OnInitDialog()
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_SPLIT_COMBOBOX_SIZES);
 	int iPos;
 
-	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(_T("Bytes"))));
+	TCHAR szTemp[64];
+
+	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_BYTES,szTemp,SIZEOF_ARRAY(szTemp));
+	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::tr1::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_BYTES));
-	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(_T("KB"))));
+	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_KB,szTemp,SIZEOF_ARRAY(szTemp));
+	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::tr1::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_KB));
-	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(_T("MB"))));
+	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_MB,szTemp,SIZEOF_ARRAY(szTemp));
+	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::tr1::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_MB));
-	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(_T("GB"))));
+	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_GB,szTemp,SIZEOF_ARRAY(szTemp));
+	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
 	m_SizeMap.insert(std::tr1::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_GB));
 
 	SendMessage(hComboBox,CB_SELECTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(m_psfdps->m_strSplitGroup.c_str()));

@@ -12,6 +12,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <algorithm>
 #include "Explorer++_internal.h"
 #include "SelectColumnsDialog.h"
 #include "MainResource.h"
@@ -198,6 +199,9 @@ void CSelectColumnsDialog::OnOk()
 	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
 	std::list<Column_t> ColumnTempList;
 
+	std::list<Column_t> ActiveColumnList;
+	m_pexpp->GetActiveShellBrowser()->ExportCurrentColumns(&ActiveColumnList);
+
 	for(int i = 0;i < ListView_GetItemCount(hListView);i++)
 	{
 		LVITEM lvItem;
@@ -206,10 +210,14 @@ void CSelectColumnsDialog::OnOk()
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(hListView,&lvItem);
 
+		UINT id = static_cast<int>(lvItem.lParam);
+		auto itr = std::find_if(ActiveColumnList.begin(),ActiveColumnList.end(),
+			[id](const Column_t &Column){return Column.id == id;});
+
 		Column_t Column;
-		Column.id		= static_cast<int>(lvItem.lParam);
+		Column.id		= id;
+		Column.iWidth	= itr->iWidth;
 		Column.bChecked	= ListView_GetCheckState(hListView,i);
-		Column.iWidth	= DEFAULT_COLUMN_WIDTH;
 		ColumnTempList.push_back(Column);
 	}
 

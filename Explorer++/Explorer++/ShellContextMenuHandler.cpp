@@ -40,10 +40,13 @@ void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
 			if(FileAttributes & SFGAO_FOLDER)
 			{
 				MENUITEMINFO mii;
+				TCHAR szTemp[64];
+
+				LoadString(g_hLanguageModule,IDS_GENERAL_OPEN_IN_NEW_TAB,szTemp,SIZEOF_ARRAY(szTemp));
 				mii.cbSize		= sizeof(MENUITEMINFO);
 				mii.fMask		= MIIM_STRING|MIIM_ID;
 				mii.wID			= MENU_OPEN_IN_NEW_TAB;
-				mii.dwTypeData	= _T("Open in New Tab");
+				mii.dwTypeData	= szTemp;
 				InsertMenuItem(hMenu,1,TRUE,&mii);
 			}
 		}

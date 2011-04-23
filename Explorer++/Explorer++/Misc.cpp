@@ -558,9 +558,9 @@ void Explorerplusplus::CopyToFolder(BOOL bMove)
 		FullFilenameList.push_back(szFullFilename);
 	}
 
-	/* TODO: Move string into string table. */
-	std::wstring strTitle = _T("Select a folder to copy the selected files to, then press OK");
-	NFileOperations::CopyFilesToFolder(m_hContainer,strTitle,FullFilenameList,bMove);
+	TCHAR szTemp[128];
+	LoadString(g_hLanguageModule,IDS_GENERAL_COPY_TO_FOLDER_TITLE,szTemp,SIZEOF_ARRAY(szTemp));
+	NFileOperations::CopyFilesToFolder(m_hContainer,szTemp,FullFilenameList,bMove);
 }
 
 HRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)

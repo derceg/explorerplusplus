@@ -17,7 +17,6 @@
 #include "Explorer++_internal.h"
 
 
-
 void Explorerplusplus::CreateTabBacking(void)
 {
 	m_hTabBacking = CreateWindow(WC_STATIC,EMPTY_STRING,

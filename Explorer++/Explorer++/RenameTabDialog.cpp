@@ -120,18 +120,13 @@ void CRenameTabDialog::OnOk()
 	{
 		HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
 
-		if(GetWindowTextLength(hEditName) == 0)
-		{
-			/* TODO: Move string into string table. */
-			MessageBox(m_hDlg,_T("Please enter a custom name"),_T("Rename Tab"),MB_OK);
-			SetFocus(hEditName);
-			return;
-		}
-
 		GetWindowText(hEditName,szTabText,SIZEOF_ARRAY(szTabText));
 	}
 
-	m_pexpp->SetTabName(m_iTab,szTabText,(uCheckStatus != BST_CHECKED));
+	if(lstrlen(szTabText) > 0)
+	{
+		m_pexpp->SetTabName(m_iTab,szTabText,(uCheckStatus != BST_CHECKED));
+	}
 
 	EndDialog(m_hDlg,1);
 }

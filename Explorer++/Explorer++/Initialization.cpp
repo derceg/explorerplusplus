@@ -204,15 +204,16 @@ void Explorerplusplus::SetDefaultTabSettings(TabInfo_t *pTabInfo)
 void Explorerplusplus::InitializeColorRules(void)
 {
 	ColorRule_t ColorRule;
+	TCHAR szTemp[64];
 
-	/* TODO: Move text into string table. */
-	ColorRule.strDescription		= _T("Compressed files");
+	LoadString(g_hLanguageModule,IDS_GENERAL_COLOR_RULE_COMPRESSED,szTemp,SIZEOF_ARRAY(szTemp));
+	ColorRule.strDescription		= szTemp;
 	ColorRule.rgbColour				= CF_COMPRESSED;
 	ColorRule.dwFilterAttributes	= FILE_ATTRIBUTE_COMPRESSED;
 	m_ColorRuleList.push_back(ColorRule);
 
-	/* TODO: Move text into string table. */
-	ColorRule.strDescription		= _T("Encrypted files");
+	LoadString(g_hLanguageModule,IDS_GENERAL_COLOR_RULE_ENCRYPTED,szTemp,SIZEOF_ARRAY(szTemp));
+	ColorRule.strDescription		= szTemp;
 	ColorRule.rgbColour				= CF_ENCRYPTED;
 	ColorRule.dwFilterAttributes	= FILE_ATTRIBUTE_ENCRYPTED;
 	m_ColorRuleList.push_back(ColorRule);
