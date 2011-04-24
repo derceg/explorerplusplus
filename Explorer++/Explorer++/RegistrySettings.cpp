@@ -170,8 +170,6 @@ LONG Explorerplusplus::SaveSettings(void)
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowTaskbarThumbnails"),m_bShowTaskbarThumbnails);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("SynchronizeTreeview"),m_bSynchronizeTreeview);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("TVAutoExpandSelected"),m_bTVAutoExpandSelected);
-		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("HideRecycleBinGlobal"),m_bHideRecycleBinGlobal);
-		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("HideSysVolInfoGlobal"),m_bHideSysVolInfoGlobal);
 
 		/* Display window settings. */
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("DisplayWindowHeight"),m_DisplayWindowHeight);
@@ -294,8 +292,6 @@ LONG Explorerplusplus::LoadSettings(LPCTSTR KeyPath)
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("SortAscendingGlobal"),(LPDWORD)&m_bSortAscendingGlobal);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("HideSystemFilesGlobal"),(LPDWORD)&m_bHideSystemFilesGlobal);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("HideLinkExtensionGlobal"),(LPDWORD)&m_bHideLinkExtensionGlobal);
-		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("HideRecycleBinGlobal"),(LPDWORD)&m_bHideRecycleBinGlobal);
-		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("HideSysVolInfoGlobal"),(LPDWORD)&m_bHideSysVolInfoGlobal);
 
 		/* Display window settings. */
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("DisplayWindowHeight"),(LPDWORD)&m_DisplayWindowHeight);

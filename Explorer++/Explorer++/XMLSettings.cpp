@@ -96,8 +96,6 @@ will need to be changed correspondingly. */
 #define HASH_SHOWUSERNAMETITLEBAR	2618183549
 #define HASH_HIDESYSTEMFILESGLOBAL	1667356744
 #define HASH_HIDELINKEXTENSIONGLOBAL	1073100667
-#define HASH_HIDERECYCLEBINGLOBAL	3329734032
-#define HASH_HIDESYSVOLINFOGLOBAL	3592382252
 #define HASH_ALLOWMULTIPLEINSTANCES	3463984536
 #define HASH_ONECLICKACTIVATE		1118178238
 #define HASH_ONECLICKACTIVATEHOVERTIME	3023373873
@@ -308,11 +306,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideLinkExtensionGlobal"),NXMLSettings::EncodeBoolValue(m_bHideLinkExtensionGlobal));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideRecycleBinGlobal"),NXMLSettings::EncodeBoolValue(m_bHideRecycleBinGlobal));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideSystemFilesGlobal"),NXMLSettings::EncodeBoolValue(m_bHideSystemFilesGlobal));
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideSysVolInfoGlobal"),NXMLSettings::EncodeBoolValue(m_bHideSysVolInfoGlobal));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InfoTipType"),NXMLSettings::EncodeIntValue(m_InfoTipType));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -2075,14 +2069,6 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_INSERTSORTED:
 		m_bInsertSorted = NXMLSettings::DecodeBoolValue(wszValue);
-		break;
-
-	case HASH_HIDERECYCLEBINGLOBAL:
-		m_bHideRecycleBinGlobal = NXMLSettings::DecodeBoolValue(wszValue);
-		break;
-
-	case HASH_HIDESYSVOLINFOGLOBAL:
-		m_bHideSysVolInfoGlobal = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_LANGUAGE:

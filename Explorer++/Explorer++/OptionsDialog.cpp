@@ -527,11 +527,6 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 				else
 					CheckDlgButton(hDlg,IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,BST_CHECKED);
 
-				if(m_bHideRecycleBinGlobal)
-					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_RECYCLE_BIN,BST_CHECKED);
-				if(m_bHideSysVolInfoGlobal)
-					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SYSVOL_INFO,BST_CHECKED);
-
 				hCBSize = GetDlgItem(hDlg,IDC_COMBO_FILESIZES);
 
 				for(i = 0;i < SIZEOF_ARRAY(g_FileSizes);i++)
@@ -658,12 +653,6 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						else
 							m_InfoTipType = INFOTIP_CUSTOM;
 
-						m_bHideRecycleBinGlobal = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_RECYCLE_BIN)
-							== BST_CHECKED);
-						
-						m_bHideSysVolInfoGlobal = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SYSVOL_INFO)
-							== BST_CHECKED);
-
 						hCBSize = GetDlgItem(hDlg,IDC_COMBO_FILESIZES);
 
 						iSel = (int)SendMessage(hCBSize,CB_GETCURSEL,0,0);
@@ -688,17 +677,11 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 							m_pShellBrowser[(int)tcItem.lParam]->SetInsertSorted(m_bInsertSorted);
 							m_pShellBrowser[(int)tcItem.lParam]->SetForceSize(m_bForceSize);
 							m_pShellBrowser[(int)tcItem.lParam]->SetSizeDisplayFormat(m_SizeDisplayFormat);
-							m_pShellBrowser[(int)tcItem.lParam]->SetHideRecycleBin(m_bHideRecycleBinGlobal);
-							m_pShellBrowser[(int)tcItem.lParam]->SetHideSysVolInfo(m_bHideSysVolInfoGlobal);
 
 							RefreshTab((int)tcItem.lParam);
 
 							ListView_ActivateOneClickSelect(m_hListView[(int)tcItem.lParam],m_bOneClickActivate,m_OneClickActivateHoverTime);
 						}
-
-						// Now, push each of the required settings to the treeview
-						m_pMyTreeView->SetHideRecycleBin(m_bHideRecycleBinGlobal);
-						m_pMyTreeView->SetHideSysVolInfo(m_bHideSysVolInfoGlobal);
 
 						SaveAllSettings();
 					}

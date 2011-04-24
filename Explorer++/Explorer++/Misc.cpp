@@ -336,8 +336,6 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet,std::list<Column_t
 void Explorerplusplus::ApplyLoadedSettings(void)
 {
 	m_pMyTreeView->SetShowHidden(m_bShowHiddenGlobal);
-	m_pMyTreeView->SetHideRecycleBin(m_bHideRecycleBinGlobal);
-	m_pMyTreeView->SetHideSysVolInfo(m_bHideSysVolInfoGlobal);
 }
 
 void Explorerplusplus::ApplyToolbarSettings(void)

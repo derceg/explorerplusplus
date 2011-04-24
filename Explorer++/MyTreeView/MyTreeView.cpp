@@ -84,8 +84,6 @@ HANDLE hIconsThread)
 	m_bDragAllowed		= FALSE;
 
 	m_bShowHidden		= TRUE;
-	m_bHideRecycleBin	= FALSE;
-	m_bHideSysVolInfo	= FALSE;
 
 	InitializeDragDropHelpers();
 
@@ -640,24 +638,6 @@ HTREEITEM hParent)
 						BOOL bSkipItem = FALSE;
 
 						StrRetToBuf(&str,rgelt,ItemName,SIZEOF_ARRAY(ItemName));
-
-						// Hides $RECYCLE.BIN folder
-						if(m_bHideRecycleBin)
-						{
-							if (lstrcmpi(ItemName,_T("$RECYCLE.BIN")) == 0 ||
-								lstrcmpi(ItemName,_T("RECYCLER")) == 0 ||
-								lstrcmpi(ItemName,_T("RECYCLE BIN")) == 0)
-							{
-								bSkipItem = TRUE;
-							}
-						}
-
-						// Hides "System Volume Information" folder
-						if(m_bHideSysVolInfo)
-						{
-							if (lstrcmpi(ItemName,_T("System Volume Information")) == 0)
-								bSkipItem = TRUE;
-						}
 
 						if (!bSkipItem)
 						{ 
@@ -1881,16 +1861,6 @@ BOOL CMyTreeView::QueryDragging(void)
 void CMyTreeView::SetShowHidden(BOOL bShowHidden)
 {
 	m_bShowHidden = bShowHidden;
-}
-
-void CMyTreeView::SetHideRecycleBin(BOOL bHideRecycleBin)
-{
-	m_bHideRecycleBin = bHideRecycleBin;
-}
-
-void CMyTreeView::SetHideSysVolInfo(BOOL bHideSysVolInfo)
-{
-	m_bHideSysVolInfo = bHideSysVolInfo;
 }
 
 void CMyTreeView::RefreshAllIcons(void)
