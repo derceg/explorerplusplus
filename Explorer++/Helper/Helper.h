@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <winioctl.h>
 #include <list>
+#include <ShObjIdl.h>
 
 /* Major version numbers for various versions of
 Windows. */
