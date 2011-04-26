@@ -2850,3 +2850,21 @@ BOOL lCheckDlgButton(HWND hDlg,int ButtonId,BOOL bCheck)
 
 	return CheckDlgButton(hDlg,ButtonId,uCheck);
 }
+
+void TrimStringLeft(std::wstring &str,const std::wstring &strWhitespace)
+{
+	size_t pos = str.find_first_not_of(strWhitespace);
+	str.erase(0,pos);
+}
+
+void TrimStringRight(std::wstring &str,const std::wstring &strWhitespace)
+{
+	size_t pos = str.find_last_not_of(strWhitespace);
+	str.erase(pos + 1);
+}
+
+void TrimString(std::wstring &str,const std::wstring &strWhitespace)
+{
+	TrimStringLeft(str,strWhitespace);
+	TrimStringRight(str,strWhitespace);
+}

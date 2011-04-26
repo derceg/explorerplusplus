@@ -17,6 +17,7 @@
 #include "SetFileAttributesDialog.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FileContextMenuManager.h"
+#include "../Helper/Helper.h"
 
 
 #define TREEVIEW_FOLDER_OPEN_DELAY	500
@@ -515,11 +516,18 @@ int Explorerplusplus::OnTreeViewEndLabelEdit(LPARAM lParam)
 	filename. */
 	StringCchCopy(NewFileName,SIZEOF_ARRAY(NewFileName),m_OldTreeViewFileName);
 	PathRemoveFileSpec(NewFileName);
-	PathAppend(NewFileName,pdi->item.pszText);
+	BOOL bRes = PathAppend(NewFileName,pdi->item.pszText);
+
+	if(!bRes)
+	{
+		return FALSE;
+	}
 
 	CFileActionHandler::RenamedItem_t RenamedItem;
 	RenamedItem.strOldFilename = m_OldTreeViewFileName;
 	RenamedItem.strNewFilename = NewFileName;
+
+	TrimStringRight(RenamedItem.strNewFilename,_T(" "));
 
 	std::list<CFileActionHandler::RenamedItem_t> RenamedItemList;
 	RenamedItemList.push_back(RenamedItem);

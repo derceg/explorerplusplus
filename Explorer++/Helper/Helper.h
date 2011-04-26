@@ -253,5 +253,8 @@ void			UpdateToolbarBandSizing(HWND hRebar,HWND hToolbar);
 void			MergeDateTime(SYSTEMTIME *pstOutput,SYSTEMTIME *pstDate,SYSTEMTIME *pstTime);
 void			GetWindowString(HWND hwnd,std::wstring &str);
 BOOL			lCheckDlgButton(HWND hDlg,int ButtonId,BOOL bCheck);
+void			TrimStringLeft(std::wstring &str,const std::wstring &strWhitespace);
+void			TrimStringRight(std::wstring &str,const std::wstring &strWhitespace);
+void			TrimString(std::wstring &str,const std::wstring &strWhitespace);
 
 #endif

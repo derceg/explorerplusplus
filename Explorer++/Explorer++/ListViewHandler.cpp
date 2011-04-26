@@ -21,6 +21,7 @@
 #include "../Helper/ContextMenuManager.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/FileActionHandler.h"
+#include "../Helper/Helper.h"
 
 
 LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -867,8 +868,6 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	C:\Hello.txt
 	C:\Hello.txt....
 	refer to exactly the same file.
-
-	Also, do not allow filenames to end with a space.
 	
 	Taken from the web site referenced below:
 	"Do not end a file or directory name with a trailing
@@ -876,8 +875,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	may support such names, the operating system does not.
 	However, it is acceptable to start a name with a period."	
 	*/
-	if(pItem->pszText[lstrlen(pItem->pszText) - 1] == '.' ||
-		pItem->pszText[lstrlen(pItem->pszText) - 1] == ' ')
+	if(pItem->pszText[lstrlen(pItem->pszText) - 1] == '.')
 		return FALSE;
 
 	/*
@@ -915,7 +913,12 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	OldName);
 	PathAppend(OldFileName,OldName);
 
-	PathAppend(NewFileName,pItem->pszText);
+	BOOL bRes = PathAppend(NewFileName,pItem->pszText);
+
+	if(!bRes)
+	{
+		return 0;
+	}
 
 	dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(pItem->iItem);
 
@@ -944,6 +947,8 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	CFileActionHandler::RenamedItem_t RenamedItem;
 	RenamedItem.strOldFilename = OldFileName;
 	RenamedItem.strNewFilename = NewFileName;
+
+	TrimStringRight(RenamedItem.strNewFilename,_T(" "));
 
 	std::list<CFileActionHandler::RenamedItem_t> RenamedItemList;
 	RenamedItemList.push_back(RenamedItem);
