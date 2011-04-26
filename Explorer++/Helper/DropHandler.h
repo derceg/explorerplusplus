@@ -66,7 +66,7 @@ private:
 	IDropFilesCallback	*m_pDropFilesCallback;
 	DWORD				m_grfKeyState;
 	POINTL				m_ptl;
-	DWORD				*m_pdwEffect;
+	DWORD				m_dwEffect;
 	HWND				m_hwndDrop;
 	DragTypes_t			m_DragType;
 	TCHAR				*m_szDestDirectory;

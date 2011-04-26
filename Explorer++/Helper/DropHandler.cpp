@@ -103,7 +103,7 @@ BOOL bRenameOnCollision)
 	m_pDataObject		= pDataObject;
 	m_grfKeyState		= grfKeyState;
 	m_ptl				= ptl;
-	m_pdwEffect			= pdwEffect;
+	m_dwEffect			= *pdwEffect;
 	m_hwndDrop			= hwndDrop;
 	m_DragType			= DragType;
 	m_szDestDirectory	= szDestDirectory;
@@ -127,6 +127,7 @@ TCHAR *szDestDirectory,IDropFilesCallback *pDropFilesCallback,
 BOOL bRenameOnCollision)
 {
 	m_pDataObject		= pDataObject;
+	m_dwEffect			= DROPEFFECT_COPY;
 	m_hwndDrop			= hwndDrop;
 	m_szDestDirectory	= szDestDirectory;
 	m_pDropFilesCallback	= pDropFilesCallback;
@@ -793,7 +794,7 @@ void CDropHandler::HandleRightClickDrop(void)
 
 			if(SUCCEEDED(hr))
 			{
-				dwe = *m_pdwEffect;
+				dwe = m_dwEffect;
 
 				hr = pShellFolder->CreateViewObject(m_hwndDrop,IID_IDropTarget,(void **)&pDrop);
 
@@ -801,7 +802,7 @@ void CDropHandler::HandleRightClickDrop(void)
 				{
 					pDrop->DragEnter(m_pDataObject,MK_RBUTTON,m_ptl,&dwe);
 
-					dwe = *m_pdwEffect;
+					dwe = m_dwEffect;
 					pDrop->Drop(m_pDataObject,m_grfKeyState,m_ptl,&dwe);
 
 					pDrop->DragLeave();
@@ -871,7 +872,7 @@ void CDropHandler::CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD 
 			bOnSameDrive = CheckItemLocations(i);
 
 			dwEffect = DetermineCurrentDragEffect(m_grfKeyState,
-			*m_pdwEffect,TRUE,bOnSameDrive);
+			m_dwEffect,TRUE,bOnSameDrive);
 		}
 
 		TCHAR szFileName[MAX_PATH];
