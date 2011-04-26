@@ -162,8 +162,9 @@ void CDisplayWindow::ExtractThumbnailImage(void)
 	te.bCancelled	= FALSE;
 	g_ThumbnailEntries.push_back(te);
 
-	CreateThread(NULL,0,Thread_ExtractThumbnailImage,
+	HANDLE hThread = CreateThread(NULL,0,Thread_ExtractThumbnailImage,
 		(LPVOID)&g_ThumbnailEntries.back(),0,NULL);
+	CloseHandle(hThread);
 }
 
 void CDisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)

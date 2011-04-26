@@ -382,6 +382,7 @@ void CMergeFilesDialog::OnOk()
 		HANDLE hThread = CreateThread(NULL,0,NMergeFilesDialog::MergeFilesThread,
 			reinterpret_cast<LPVOID>(m_pMergeFiles),0,NULL);
 		SetThreadPriority(hThread,THREAD_PRIORITY_LOWEST);
+		CloseHandle(hThread);
 	}
 	else
 	{

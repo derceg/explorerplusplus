@@ -88,7 +88,8 @@ HANDLE hIconsThread)
 	InitializeDragDropHelpers();
 
 	m_bQueryRemoveCompleted = FALSE;
-	CreateThread(NULL,0,Thread_MonitorAllDrives,this,0,NULL);
+	HANDLE hThread = CreateThread(NULL,0,Thread_MonitorAllDrives,this,0,NULL);
+	CloseHandle(hThread);
 
 	m_iProcessing = 0;
 }
@@ -737,7 +738,8 @@ HTREEITEM hParent)
 		pThreadInfo->hParent		= hParent;
 		pThreadInfo->pMyTreeView	= this;
 
-		CreateThread(NULL,0,Thread_SubFoldersStub,pThreadInfo,0,&g_ThreadId);
+		HANDLE hThread = CreateThread(NULL,0,Thread_SubFoldersStub,pThreadInfo,0,&g_ThreadId);
+		CloseHandle(hThread);
 	}
 }
 

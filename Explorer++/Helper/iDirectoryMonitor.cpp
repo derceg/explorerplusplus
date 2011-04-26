@@ -110,6 +110,7 @@ CDirectoryMonitor::~CDirectoryMonitor()
 	/* Queue the APC that will stop the worker
 	thread. */
 	QueueUserAPC(ExitWorkerThread,m_hThread,(ULONG_PTR)this);
+	CloseHandle(m_hThread);
 
 	/* Wait for the worker thread to stop. Once it
 	has been stopped, delete any dependent data

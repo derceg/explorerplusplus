@@ -477,8 +477,9 @@ void CSearchDialog::OnSearch()
 		m_bSearching = TRUE;
 
 		/* Create a background thread, and search using it... */
-		CreateThread(NULL,0,NSearchDialog::SearchThread,reinterpret_cast<LPVOID>(m_pSearch),
-			0,NULL);
+		HANDLE hThread = CreateThread(NULL,0,NSearchDialog::SearchThread,
+			reinterpret_cast<LPVOID>(m_pSearch),0,NULL);
+		CloseHandle(hThread);
 	}
 	else
 	{

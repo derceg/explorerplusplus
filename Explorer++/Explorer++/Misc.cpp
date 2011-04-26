@@ -1260,7 +1260,8 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 						DWFolderSize.bValid	= TRUE;
 						m_DWFolderSizes.push_back(DWFolderSize);
 
-						CreateThread(NULL,0,Thread_CalculateFolderSize,(LPVOID)pfs,0,&ThreadId);
+						HANDLE hThread = CreateThread(NULL,0,Thread_CalculateFolderSize,(LPVOID)pfs,0,&ThreadId);
+						CloseHandle(hThread);
 
 						m_iDWFolderSizeUniqueId++;
 					}

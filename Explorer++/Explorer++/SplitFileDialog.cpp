@@ -430,6 +430,7 @@ void CSplitFileDialog::OnOk()
 		HANDLE hThread = CreateThread(NULL,0,NSplitFileDialog::SplitFileThreadProcStub,
 			reinterpret_cast<LPVOID>(m_pSplitFile),0,NULL);
 		SetThreadPriority(hThread,THREAD_PRIORITY_LOWEST);
+		CloseHandle(hThread);
 	}
 	else
 	{
