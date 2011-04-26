@@ -223,8 +223,16 @@ GetData(). */
 BOOL CDropHandler::CheckDropFormatSupported(IDataObject *pDataObject,FORMATETC *pftc)
 {
 	HRESULT hr;
+
+	/* When using QueryGetData(), the line index
+	must be -1. This may not be the case when calling
+	GetData(). */
+	LONG lindex = pftc->lindex;
+	pftc->lindex = -1;
 	
 	hr = pDataObject->QueryGetData(pftc);
+
+	pftc->lindex = lindex;
 
 	if(hr != S_OK)
 	{
@@ -380,18 +388,16 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 				LPBYTE pBuffer = NULL;
 
 				SetFORMATETC(&ftcfchg,(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS),
-					NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
+					NULL,DVASPECT_CONTENT,i,TYMED_HGLOBAL);
 				SetFORMATETC(&ftcfcis,(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS),
-					NULL,DVASPECT_CONTENT,-1,TYMED_ISTREAM);
+					NULL,DVASPECT_CONTENT,i,TYMED_ISTREAM);
 				SetFORMATETC(&ftcfcstg,(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS),
-					NULL,DVASPECT_CONTENT,-1,TYMED_ISTORAGE);
+					NULL,DVASPECT_CONTENT,i,TYMED_ISTORAGE);
 
 				BOOL bDataExtracted = FALSE;
 
 				if(CheckDropFormatSupported(pDataObject,&ftcfchg))
 				{
-					ftcfchg.lindex = i;
-
 					hr = pDataObject->GetData(&ftcfchg,&stgFileContents);
 
 					if(hr == S_OK)
@@ -401,8 +407,6 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 				}
 				else if(CheckDropFormatSupported(pDataObject,&ftcfcis))
 				{
-					ftcfcis.lindex = i;
-
 					hr = pDataObject->GetData(&ftcfcis,&stgFileContents);
 
 					if(hr == S_OK)
@@ -412,8 +416,6 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 				}
 				else if(CheckDropFormatSupported(pDataObject,&ftcfcstg))
 				{
-					ftcfcstg.lindex = i;
-
 					hr = pDataObject->GetData(&ftcfcstg,&stgFileContents);
 
 					if(hr == S_OK)
