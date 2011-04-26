@@ -341,11 +341,6 @@ HRESULT __stdcall CDataObject::SetAsyncMode(BOOL fDoOpAsync)
 {
 	m_bDoOpAsync = fDoOpAsync;
 
-	if(fDoOpAsync)
-	{
-		AddRef();
-	}
-
 	return S_OK;
 }
 
