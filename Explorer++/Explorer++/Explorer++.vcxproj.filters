@@ -265,6 +265,9 @@
     <None Include="res\Shell Images Large.bmp">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="Version.h.tmpl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

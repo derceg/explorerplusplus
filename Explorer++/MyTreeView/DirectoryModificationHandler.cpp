@@ -437,15 +437,6 @@ void CMyTreeView::AddItemInternal(HTREEITEM hParent,TCHAR *szFullFileName)
 					iItemId = GenerateUniqueItemId();
 
 					m_pItemInfo[iItemId].pidl = ILClone(pidlComplete);
-
-					/* E++ used to crash in "void CMyTreeView::EraseItems(HTREEITEM hParent)" at line
-					   CoTaskMemFree((LPVOID)pItemInfo->pridl);
-					   because the pridl was not initialized. The problem could be easily reproduce by
-					   creating and renaming folder in a way that swap folder orders in the tree 
-					   (for example creating folder B and C and then changing the name of folder C to A. 
-					   Then clicking on the "-" beside the parent folder, which collapses the tree and 
-					   invoke "CMyTreeView::EraseItems".
-					   So we need to initialize the relative pidl as well, to avoid crashing E++ */
 					m_pItemInfo[iItemId].pridl = ILClone(pidlRelative);
 
 					GetDisplayName(szFullFileName,szDisplayName,SHGDN_NORMAL);

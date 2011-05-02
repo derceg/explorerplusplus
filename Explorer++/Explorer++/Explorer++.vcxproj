@@ -347,6 +347,7 @@
     <None Include="res\Shell Images Large.bmp" />
     <None Include="res\Shell Images.bmp" />
     <None Include="res\Tab Close.bmp" />
+    <None Include="Version.h.tmpl" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
