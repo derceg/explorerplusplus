@@ -122,8 +122,6 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 
 	lEnableMenuItem(hProgramMenu,IDM_VIEW_AUTOSIZECOLUMNS,uViewMode == VM_DETAILS);
 
-	m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
-
 	if(uViewMode == VM_DETAILS)
 	{
 		/* Disable auto arrange menu item. */
@@ -166,6 +164,7 @@ void Explorerplusplus::SetArrangeMenuItemStates(HMENU hProgramMenu)
 	UINT uFirst;
 	UINT uLast;
 	HMENU hMenu;
+	HMENU hMenuRClick;
 	int nItems;
 	int i = 0;
 
@@ -183,6 +182,7 @@ void Explorerplusplus::SetArrangeMenuItemStates(HMENU hProgramMenu)
 	for(i = 0;i < nItems;i++)
 	{
 		CheckMenuItem(m_hArrangeSubMenu,i,MF_BYPOSITION|MF_UNCHECKED);
+		CheckMenuItem(m_hArrangeSubMenuRClick,i,MF_BYPOSITION|MF_UNCHECKED);
 	}
 
 	nItems = GetMenuItemCount(m_hGroupBySubMenu);
@@ -190,11 +190,13 @@ void Explorerplusplus::SetArrangeMenuItemStates(HMENU hProgramMenu)
 	for(i = 0;i < nItems;i++)
 	{
 		CheckMenuItem(m_hGroupBySubMenu,i,MF_BYPOSITION|MF_UNCHECKED);
+		CheckMenuItem(m_hGroupBySubMenuRClick,i,MF_BYPOSITION|MF_UNCHECKED);
 	}
 
 	if(bShowInGroups)
 	{
 		hMenu = m_hGroupBySubMenu;
+		hMenuRClick = m_hGroupBySubMenuRClick;
 
 		ItemToCheck = DetermineGroupModeMenuId(SortMode);
 
@@ -210,18 +212,25 @@ void Explorerplusplus::SetArrangeMenuItemStates(HMENU hProgramMenu)
 
 		lEnableMenuItem(m_hArrangeSubMenu,IDM_ARRANGEICONSBY_ASCENDING,FALSE);
 		lEnableMenuItem(m_hArrangeSubMenu,IDM_ARRANGEICONSBY_DESCENDING,FALSE);
+		lEnableMenuItem(m_hArrangeSubMenuRClick,IDM_ARRANGEICONSBY_ASCENDING,FALSE);
+		lEnableMenuItem(m_hArrangeSubMenuRClick,IDM_ARRANGEICONSBY_DESCENDING,FALSE);
 
 		lEnableMenuItem(m_hGroupBySubMenu,IDM_ARRANGEICONSBY_ASCENDING,TRUE);
 		lEnableMenuItem(m_hGroupBySubMenu,IDM_ARRANGEICONSBY_DESCENDING,TRUE);
+		lEnableMenuItem(m_hGroupBySubMenuRClick,IDM_ARRANGEICONSBY_ASCENDING,TRUE);
+		lEnableMenuItem(m_hGroupBySubMenuRClick,IDM_ARRANGEICONSBY_DESCENDING,TRUE);
 
 		/* May need to change this (i.e. uncheck each menu item
 		individually). */
 		CheckMenuRadioItem(m_hArrangeSubMenu,SORTBY_BASE,SORTBY_END,
 			0,MF_BYCOMMAND);
+		CheckMenuRadioItem(m_hArrangeSubMenuRClick,SORTBY_BASE,SORTBY_END,
+			0,MF_BYCOMMAND);
 	}
 	else
 	{
 		hMenu = m_hArrangeSubMenu;
+		hMenuRClick = m_hArrangeSubMenuRClick;
 
 		ItemToCheck = DetermineSortModeMenuId(SortMode);
 
@@ -237,12 +246,18 @@ void Explorerplusplus::SetArrangeMenuItemStates(HMENU hProgramMenu)
 
 		lEnableMenuItem(m_hGroupBySubMenu,IDM_ARRANGEICONSBY_ASCENDING,FALSE);
 		lEnableMenuItem(m_hGroupBySubMenu,IDM_ARRANGEICONSBY_DESCENDING,FALSE);
+		lEnableMenuItem(m_hGroupBySubMenuRClick,IDM_ARRANGEICONSBY_ASCENDING,FALSE);
+		lEnableMenuItem(m_hGroupBySubMenuRClick,IDM_ARRANGEICONSBY_DESCENDING,FALSE);
 
 		lEnableMenuItem(m_hArrangeSubMenu,IDM_ARRANGEICONSBY_ASCENDING,TRUE);
 		lEnableMenuItem(m_hArrangeSubMenu,IDM_ARRANGEICONSBY_DESCENDING,TRUE);
+		lEnableMenuItem(m_hArrangeSubMenuRClick,IDM_ARRANGEICONSBY_ASCENDING,TRUE);
+		lEnableMenuItem(m_hArrangeSubMenuRClick,IDM_ARRANGEICONSBY_DESCENDING,TRUE);
 	}
 
 	CheckMenuRadioItem(hMenu,uFirst,uLast,
+		ItemToCheck,MF_BYCOMMAND);
+	CheckMenuRadioItem(hMenuRClick,uFirst,uLast,
 		ItemToCheck,MF_BYCOMMAND);
 
 	if(m_pFolderView[m_iObjectIndex]->IsSortAscending())
@@ -251,6 +266,8 @@ void Explorerplusplus::SetArrangeMenuItemStates(HMENU hProgramMenu)
 		ItemToCheck = IDM_ARRANGEICONSBY_DESCENDING;
 
 	CheckMenuRadioItem(hMenu,IDM_ARRANGEICONSBY_ASCENDING,IDM_ARRANGEICONSBY_DESCENDING,
+		ItemToCheck,MF_BYCOMMAND);
+	CheckMenuRadioItem(hMenuRClick,IDM_ARRANGEICONSBY_ASCENDING,IDM_ARRANGEICONSBY_DESCENDING,
 		ItemToCheck,MF_BYCOMMAND);
 }
 

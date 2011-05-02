@@ -1027,6 +1027,8 @@ private:
 	LPITEMIDLIST			m_pidlDirectory;
 	HMENU					m_hArrangeSubMenu;
 	HMENU					m_hGroupBySubMenu;
+	HMENU					m_hArrangeSubMenuRClick;
+	HMENU					m_hGroupBySubMenuRClick;
 	HMENU					m_hBookmarksMenu;
 	HMENU					m_hTabRightClickMenu;
 	HMENU					m_hToolbarRightClickMenu;

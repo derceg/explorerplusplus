@@ -339,6 +339,7 @@ int Explorerplusplus::InsertArrangeMenuItems(HMENU hMenu)
 		mi.dwTypeData	= szStringTemp;
 		mi.wID			= itr->SortById;
 		InsertMenuItem(hMenu,i,TRUE,&mi);
+		InsertMenuItem(m_hArrangeSubMenuRClick,i,TRUE,&mi);
 
 		ZeroMemory(&mi,sizeof(mi));
 		mi.cbSize		= sizeof(mi);
@@ -346,6 +347,7 @@ int Explorerplusplus::InsertArrangeMenuItems(HMENU hMenu)
 		mi.dwTypeData	= szStringTemp;
 		mi.wID			= itr->GroupById;
 		InsertMenuItem(m_hGroupBySubMenu,i,TRUE,&mi);
+		InsertMenuItem(m_hGroupBySubMenuRClick,i,TRUE,&mi);
 
 		i++;
 	}
@@ -708,7 +710,9 @@ void Explorerplusplus::DeletePreviousArrangeMenuItems(void)
 		free((CustomMenuInfo_t *)mii.dwItemData);
 
 		DeleteMenu(m_hArrangeSubMenu,i,MF_BYPOSITION);
+		DeleteMenu(m_hArrangeSubMenuRClick,i,MF_BYPOSITION);
 		DeleteMenu(m_hGroupBySubMenu,i,MF_BYPOSITION);
+		DeleteMenu(m_hGroupBySubMenuRClick,i,MF_BYPOSITION);
 	}
 }
 

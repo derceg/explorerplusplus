@@ -1169,6 +1169,8 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	DestroyMenu(hMenu);
 }
 
+/* TODO: Helper strings needed for shell extensions shown
+on this menu. */
 HMENU Explorerplusplus::InitializeRightClickMenu(void)
 {
 	HMENU hMenu = GetSubMenu(LoadMenu(g_hLanguageModule,
@@ -1191,19 +1193,15 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 
 	DeleteMenu(hMenu,IDM_RCLICK_VIEW_PLACEHOLDER,MF_BYCOMMAND);
 
+	/* TODO: Menu system needs to at least partially restructured/rewritten. */
 	mii.cbSize		= sizeof(mii);
 	mii.fMask		= MIIM_SUBMENU;
-	mii.hSubMenu	= m_hArrangeSubMenu;
+	mii.hSubMenu	= m_hArrangeSubMenuRClick;
 	SetMenuItemInfo(hMenu,IDM_POPUP_SORTBY,FALSE,&mii);
 
 	mii.cbSize		= sizeof(mii);
 	mii.fMask		= MIIM_SUBMENU;
-	mii.hSubMenu	= m_hArrangeSubMenu;
-	SetMenuItemInfo(hMenu,IDM_POPUP_SORTBY,FALSE,&mii);
-
-	mii.cbSize		= sizeof(mii);
-	mii.fMask		= MIIM_SUBMENU;
-	mii.hSubMenu	= m_hGroupBySubMenu;
+	mii.hSubMenu	= m_hGroupBySubMenuRClick;
 	SetMenuItemInfo(hMenu,IDM_POPUP_GROUPBY,FALSE,&mii);
 
 	UINT uViewMode;
@@ -1217,14 +1215,6 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 	{
 		lEnableMenuItem(hMenu,IDM_POPUP_GROUPBY,TRUE);
 	}
-
-	/* TODO: */
-	// Initialization.cpp - InitializeMenus().
-	//SetMenuItemBitmap(m_hRightClickMenu,IDM_VIEW_REFRESH,SHELLIMAGES_REFRESH);
-	//SetMenuItemBitmap(m_hRightClickMenu,IDM_EDIT_PASTE,SHELLIMAGES_PASTE);
-	//SetMenuItemBitmap(m_hRightClickMenu,IDM_EDIT_PASTESHORTCUT,SHELLIMAGES_PASTESHORTCUT);
-	//SetMenuItemBitmap(m_hRightClickMenu,IDM_BOOKMARKS_BOOKMARKTHISTAB,SHELLIMAGES_ADDFAV);
-	//SetMenuItemBitmap(m_hRightClickMenu,IDM_RCLICK_PROPERTIES,SHELLIMAGES_PROPERTIES);
 
 	return hMenu;
 }
