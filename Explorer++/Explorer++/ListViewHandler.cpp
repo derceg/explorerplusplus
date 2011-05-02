@@ -1466,15 +1466,6 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 
 			hr = pAsyncOperation->InOperation(&bInAsyncOp);
 
-			if(!SUCCEEDED(hr) ||
-				bInAsyncOp == FALSE)
-			{
-				/* Data extraction has finished synchronously.
-				SetAsyncMode() calls AddRef(), so we'll need to
-				balance that out here. */
-				pAsyncOperation->Release();
-			}
-
 			pAsyncOperation->Release();
 			pDataObject->Release();
 			pDropSource->Release();

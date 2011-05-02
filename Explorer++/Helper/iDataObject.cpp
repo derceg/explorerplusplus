@@ -58,7 +58,7 @@ private:
 
 	std::list<DataObjectInternal>	m_daoList;
 
-	BOOL							m_bStartedOperation;
+	BOOL							m_bInOperation;
 	BOOL							m_bDoOpAsync;
 };
 
@@ -81,7 +81,7 @@ CDataObject::CDataObject(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,int count)
 
 	SetAsyncMode(FALSE);
 
-	m_bStartedOperation = FALSE;
+	m_bInOperation = FALSE;
 }
 
 CDataObject::~CDataObject()
@@ -319,7 +319,7 @@ See: http://us.generation-nt.com/iasyncoperation-idataobject-help-45020022.html 
 HRESULT __stdcall CDataObject::EndOperation(HRESULT hResult,
 IBindCtx *pbcReserved,DWORD dwEffects)
 {
-	Release();
+	m_bInOperation = FALSE;
 	return S_OK;
 }
 
@@ -332,7 +332,7 @@ HRESULT __stdcall CDataObject::GetAsyncMode(BOOL *pfIsOpAsync)
 
 HRESULT __stdcall CDataObject::InOperation(BOOL *pfInAsyncOp)
 {
-	*pfInAsyncOp = m_bStartedOperation;
+	*pfInAsyncOp = m_bInOperation;
 
 	return S_OK;
 }
@@ -346,7 +346,7 @@ HRESULT __stdcall CDataObject::SetAsyncMode(BOOL fDoOpAsync)
 
 HRESULT __stdcall CDataObject::StartOperation(IBindCtx *pbcReserved)
 {
-	m_bStartedOperation = TRUE;
+	m_bInOperation = TRUE;
 
 	return S_OK;
 }
