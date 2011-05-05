@@ -79,13 +79,13 @@ CContextMenuManager::CContextMenuManager(ContextMenuTypes ContextMenuType,
 				(void **)&pContextMenu3);
 			MenuHandler.pContextMenuActual = pContextMenu3;
 
-			if(FAILED(hr))
+			if(FAILED(hr) || pContextMenu3 == NULL)
 			{
 				hr = pUnknown->QueryInterface(IID_IContextMenu2,
 					(void **)&pContextMenu2);
 				MenuHandler.pContextMenuActual = pContextMenu2;
 
-				if(FAILED(hr))
+				if(FAILED(hr) || pContextMenu2 == NULL)
 				{
 					hr = pUnknown->QueryInterface(IID_IContextMenu,
 						(void **)&pContextMenu);
@@ -137,92 +137,94 @@ void CContextMenuManager::AddMenuEntries(HMENU hMenu,
 	interfaces and add the required menu items. */
 	for(auto itr = m_MenuHandlers.begin();itr != m_MenuHandlers.end();itr++)
 	{
-		MenuHandler_t MenuHandler = *itr;
-		HMENU hDummyMenu = CreatePopupMenu();
-
-		HRESULT hr = MenuHandler.pContextMenuActual->QueryContextMenu(
-			hDummyMenu,0,iMinID + iOffset,iMaxID,CMF_NORMAL|CMF_EXPLORE);
-
-		if(HRESULT_SEVERITY(hr) == SEVERITY_SUCCESS)
+		if(itr->pContextMenuActual != NULL)
 		{
-			int iCurrentOffset = HRESULT_CODE(hr);
+			HMENU hDummyMenu = CreatePopupMenu();
 
-			if(iCurrentOffset > 0)
+			HRESULT hr = itr->pContextMenuActual->QueryContextMenu(
+				hDummyMenu,0,iMinID + iOffset,iMaxID,CMF_NORMAL|CMF_EXPLORE);
+
+			if(HRESULT_SEVERITY(hr) == SEVERITY_SUCCESS)
 			{
-				MENUITEMINFO mii;
-				int nTotalMenuItems = 0;
+				int iCurrentOffset = HRESULT_CODE(hr);
 
-				/* Need to save ID offsets for this menu handler. */
-				itr->iStartID = iMinID + iOffset;
-				itr->iEndID = iMinID + iOffset + iCurrentOffset;
-
-				int nMenuItems = GetMenuItemCount(hDummyMenu);
-				UINT uDefault = GetMenuDefaultItem(hDummyMenu,FALSE,0);
-
-				/* Take items from the dummy menu, and
-				insert them into the real menu. Note
-				that beginning or trailing separators
-				will NOT be added. */
-				for(int i = 0;i < nMenuItems;i++)
+				if(iCurrentOffset > 0)
 				{
-					TCHAR szText[256];
+					MENUITEMINFO mii;
+					int nTotalMenuItems = 0;
 
-					mii.cbSize		= sizeof(mii);
-					mii.fMask		= MIIM_BITMAP|MIIM_CHECKMARKS|MIIM_DATA|
-						MIIM_FTYPE|MIIM_ID|MIIM_STATE|MIIM_STRING|MIIM_SUBMENU;
-					mii.dwTypeData	= szText;
-					mii.cch			= SIZEOF_ARRAY(szText);
-					GetMenuItemInfo(hDummyMenu,i,TRUE,&mii);
+					/* Need to save ID offsets for this menu handler. */
+					itr->iStartID = iMinID + iOffset;
+					itr->iEndID = iMinID + iOffset + iCurrentOffset;
 
-					if((i == 0 || i == (nMenuItems - 1)) &&
-						(mii.fType & MFT_SEPARATOR) == MFT_SEPARATOR)
+					int nMenuItems = GetMenuItemCount(hDummyMenu);
+					UINT uDefault = GetMenuDefaultItem(hDummyMenu,FALSE,0);
+
+					/* Take items from the dummy menu, and
+					insert them into the real menu. Note
+					that beginning or trailing separators
+					will NOT be added. */
+					for(int i = 0;i < nMenuItems;i++)
 					{
-						continue;
+						TCHAR szText[256];
+
+						mii.cbSize		= sizeof(mii);
+						mii.fMask		= MIIM_BITMAP|MIIM_CHECKMARKS|MIIM_DATA|
+							MIIM_FTYPE|MIIM_ID|MIIM_STATE|MIIM_STRING|MIIM_SUBMENU;
+						mii.dwTypeData	= szText;
+						mii.cch			= SIZEOF_ARRAY(szText);
+						GetMenuItemInfo(hDummyMenu,i,TRUE,&mii);
+
+						if((i == 0 || i == (nMenuItems - 1)) &&
+							(mii.fType & MFT_SEPARATOR) == MFT_SEPARATOR)
+						{
+							continue;
+						}
+
+						InsertMenuItem(hMenu,iStartPos + nTotalMenuItems,TRUE,&mii);
+
+						/* If this menu item is the default on the dummy
+						menu, make it the default on the actual menu. */
+						if(uDefault != -1 && mii.wID == uDefault)
+						{
+							SetMenuDefaultItem(hMenu,mii.wID,FALSE);
+						}
+
+						if(mii.hSubMenu != NULL)
+						{
+							IContextMenu2 *pContextMenu2 = NULL;
+
+							if(itr->pContextMenu2 != NULL)
+							{
+								pContextMenu2 = itr->pContextMenu2;
+							}
+							else if(itr->pContextMenu3 != NULL)
+							{
+								pContextMenu2 = itr->pContextMenu3;
+							}
+
+							if(pContextMenu2 != NULL)
+							{
+								pContextMenu2->HandleMenuMsg(WM_INITMENUPOPUP,
+									(WPARAM)GetSubMenu(hMenu,iStartPos + nTotalMenuItems),
+									(LPARAM)MAKEWORD(iStartPos + nTotalMenuItems,FALSE));
+							}
+						}
+
+						nTotalMenuItems++;
 					}
 
+					/* Insert a trailing separator
+					after the shell extension menus. */
+					mii.cbSize		= sizeof(mii);
+					mii.fMask		= MIIM_FTYPE;
+					mii.fType		= MFT_SEPARATOR;
 					InsertMenuItem(hMenu,iStartPos + nTotalMenuItems,TRUE,&mii);
 
-					/* If this menu item is the default on the dummy
-					menu, make it the default on the actual menu. */
-					if(uDefault != -1 && mii.wID == uDefault)
-					{
-						SetMenuDefaultItem(hMenu,mii.wID,FALSE);
-					}
-
-					if(mii.hSubMenu != NULL)
-					{
-						IContextMenu2 *pContextMenu2 = NULL;
-
-						if(MenuHandler.pContextMenu2 != NULL)
-						{
-							pContextMenu2 = MenuHandler.pContextMenu2;
-						}
-						else if(MenuHandler.pContextMenu3 != NULL)
-						{
-							pContextMenu2 = MenuHandler.pContextMenu3;
-						}
-
-						if(pContextMenu2 != NULL)
-						{
-							pContextMenu2->HandleMenuMsg(WM_INITMENUPOPUP,
-								(WPARAM)GetSubMenu(hMenu,iStartPos + nTotalMenuItems),
-								(LPARAM)MAKEWORD(iStartPos + nTotalMenuItems,FALSE));
-						}
-					}
-
 					nTotalMenuItems++;
+
+					iOffset += iCurrentOffset;
 				}
-
-				/* Insert a trailing separator
-				after the shell extension menus. */
-				mii.cbSize		= sizeof(mii);
-				mii.fMask		= MIIM_FTYPE;
-				mii.fType		= MFT_SEPARATOR;
-				InsertMenuItem(hMenu,iStartPos + nTotalMenuItems,TRUE,&mii);
-
-				nTotalMenuItems++;
-
-				iOffset += iCurrentOffset;
 			}
 		}
 	}
