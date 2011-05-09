@@ -1,5 +1,5 @@
-Explorer++ 1.2 32-bit
----------------------
+Explorer++ 1.3 Beta 32-bit
+--------------------------
 
 Copyright (c) 2005-2011 David Erceg
 

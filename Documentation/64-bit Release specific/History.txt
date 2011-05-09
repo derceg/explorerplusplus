@@ -1,7 +1,76 @@
 Explorer++ Version History
 --------------------------
 
-Current version: 1.2
+Current version: 1.3 Beta
+
+Version 1.3 Beta (10/5/11)
+--------------------------
+New features:
+- The complete state of most dialogs are now saved.
+- Most dialogs can now be resized.
+- Significant improvements to split file dialog.
+- Context menu extensions are now shown on the main
+  right-click context menu.
+- Enhanced undo functionality. Multiple rename operations
+  (such as those performed by the mass rename dialog) can now be
+  undone as a single set.
+- 'Delete permanently' button added to main toolbar.
+- Added 'Close Tabs to the Right' entry to the tab right-click menu.
+- The listview hover time can now be set by the user.
+- Right-clicking search dialog results now brings up the file
+  context menu.
+- Search dialog results can now be sorted by name/path.
+- Added 'Case sensitive' option to filter dialog.
+- The folder navigation sound can now be disabled via the
+  options dialog.
+- The search dialog can now search using regular expressions.
+  A case insensitive flag has also been added.
+- Deleting an item in the treeview will select the parent
+  folder prior to deletion (allowing the previously selected
+  folder to be deleted).
+- Right-clicking on the root desktop folder in the treeview now
+  brings up its context menu.
+- Trailing spaces are now trimmed when renaming an item in the
+  listview/treeview.
+
+Bug fixes:
+- Fixed a crash that occurred when collapsing a node in
+  the treeview.
+- When single-click activation was enabled, and an area
+  in the listview was selected, any file under the mouse
+  when it was released would be opened. Fixed.
+- Fixed 'Open Parent in New Tab' bug (parent of current
+  tab would always be opened, regardless of which tab was
+  clicked).
+- Fixed listview gridline issue (Windows XP only).
+- Under certain circumstances, translation DLL's would still
+  be loaded, even if they did not match the current version.
+  Fixed.
+- Filename extension is now hidden correctly (if required) in
+  details view.
+- Size column now remains right aligned after sorting.
+- When allow multiple instances was not set, and a new instance
+  was started, it would not restore the previous window correctly
+  if it was minimized. Fixed.
+- Fixed control panel handling bug.
+- Fixed drag and drop memory leak.
+- Fixed bugs in mouse wheel handler.
+
+Misc:
+- Version number now takes the form: Major.Minor.Micro.Revision.
+- Improved drag and drop interoperability.
+- File sizes are now formatted according to the current system
+  locale.
+- When collapsing the direct parent of the current folder
+  in the treeview, the listview selection would change to
+  the parent. Now works when collapsing multiple levels.
+- The 'Size On Disk', 'Total Size', and 'Free Space' columns
+  are now right aligned.
+- The current directory is now set when the directory or tab
+  selection changes.
+- The error message shown on a translation DLL version mismatch
+  will now be shown in the target language (when possible).
+- The (main) right click context menu is no longer owner drawn.
 
 Version 1.2 (13/09/10)
 ----------------------

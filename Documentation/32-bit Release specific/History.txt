@@ -10,8 +10,8 @@ Note:
    a 64-bit version of Windows, it is recommended
    that you use the 64-bit version of Explorer++.
 
-Version 1.3 Beta
-----------------
+Version 1.3 Beta (10/5/11)
+--------------------------
 New features:
 - The complete state of most dialogs are now saved.
 - Most dialogs can now be resized.
