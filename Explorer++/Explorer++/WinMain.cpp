@@ -344,7 +344,7 @@ LPSTR lpCmdLine,int nCmdShow)
 	bExit = ProcessCommandLine(pCommandLine);
 
 	/* Can't open folders that are children of the
-	control panel. If the comand line only refers
+	control panel. If the command line only refers
 	to folders that are children of the control panel,
 	pass those folders to Windows Explorer, then exit. */
 	if(g_TabDirs.size() > 0)
@@ -381,8 +381,6 @@ LPSTR lpCmdLine,int nCmdShow)
 					}
 					else
 					{
-						OSVERSIONINFO VersionInfo;
-
 						VersionInfo.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
 
 						if(GetVersionEx(&VersionInfo) != 0)

@@ -825,7 +825,7 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 				TCHAR szStatus[512];
 				TCHAR *pszDirectory = NULL;
 
-				pszDirectory = (TCHAR *)wParam;
+				pszDirectory = reinterpret_cast<TCHAR *>(wParam);
 
 				TCHAR szTemp[64];
 				LoadString(GetInstance(),IDS_SEARCHING,

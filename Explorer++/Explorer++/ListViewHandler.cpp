@@ -1370,7 +1370,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 	HRESULT				hr;
 	int					iDragStartObjectIndex;
 
-	pnmlv = (NMLISTVIEW *)lParam;
+	pnmlv = reinterpret_cast<NMLISTVIEW *>(lParam);
 
 	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
@@ -1400,7 +1400,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 	}
 
 	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_ALL,
-		IID_IDragSourceHelper,(LPVOID *)&pDragSourceHelper);
+		IID_IDragSourceHelper,reinterpret_cast<LPVOID *>(&pDragSourceHelper));
 
 	if(SUCCEEDED(hr))
 	{

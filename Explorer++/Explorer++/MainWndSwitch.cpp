@@ -1365,7 +1365,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			{
 				TCHAR szCurrentDirectory[MAX_PATH];
 
-				m_pActiveShellBrowser->QueryCurrentDirectory(sizeof(szCurrentDirectory),
+				m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),
 					szCurrentDirectory);
 
 				CSearchDialog *SearchDialog = new CSearchDialog(g_hLanguageModule,

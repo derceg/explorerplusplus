@@ -23,7 +23,7 @@ MSXML2::IXMLDOMDocument *NXMLSettings::DomFromCOM()
 	MSXML2::IXMLDOMDocument	*pxmldoc = NULL;
 
 	hr = CoCreateInstance(__uuidof(MSXML2::DOMDocument30),NULL,CLSCTX_INPROC_SERVER,
-		__uuidof(MSXML2::IXMLDOMDocument),(void**)&pxmldoc);
+		__uuidof(MSXML2::IXMLDOMDocument),reinterpret_cast<LPVOID *>(&pxmldoc));
 
 	if(SUCCEEDED(hr))
 	{

@@ -393,6 +393,8 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 
 Explorerplusplus::CLoadSaveRegistry::CLoadSaveRegistry(Explorerplusplus *pContainer)
 {
+	m_iRefCount = 1;
+
 	m_pContainer = pContainer;
 }
 

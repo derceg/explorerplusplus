@@ -733,7 +733,6 @@ BOOL Explorerplusplus::OnTBGetButtonInfo(LPARAM lParam)
 {
 	NMTOOLBAR		*pnmtb = NULL;
 	static TCHAR	szText[64];
-	static int		count = 0;
 	int				id;
 
 	pnmtb = (NMTOOLBAR *)lParam;
@@ -762,10 +761,6 @@ BOOL Explorerplusplus::OnTBGetButtonInfo(LPARAM lParam)
 
 void Explorerplusplus::OnTBSave(LPARAM lParam)
 {
-	NMTBSAVE *pnmtbs;
-
-	pnmtbs = (NMTBSAVE *)lParam;
-
 	/* Can add custom information here. */
 }
 
