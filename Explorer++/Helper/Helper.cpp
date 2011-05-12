@@ -1158,7 +1158,7 @@ int ReadFileProperty(TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *lpszPropert
 {
 	HANDLE hFile;
 	TCHAR szCommentStreamName[512];
-	TCHAR *lpszProperty;
+	LPCSTR lpszProperty;
 	DWORD dwNumBytesRead;
 	DWORD dwSectionLength;
 	DWORD dwPropertyCount;
@@ -1167,6 +1167,8 @@ int ReadFileProperty(TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *lpszPropert
 	DWORD dwPropertyLength;
 	DWORD dwPropertyMarker;
 	DWORD dwSectionOffset;
+	DWORD dwCodepageOffset = 0;
+	UINT uCodepage = CP_ACP;
 	BOOL bFound = FALSE;
 	unsigned int i = 0;
 
@@ -1178,38 +1180,42 @@ int ReadFileProperty(TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *lpszPropert
 	if(hFile == INVALID_HANDLE_VALUE)
 		return -1;
 
-	/*Constant offset.*/
+	/* Constant offset. */
 	SetFilePointer(hFile,0x2C,0,FILE_CURRENT);
 
-	/*Read out the section offset (the SummaryInformation stream only has one offset anyway...).*/
 	ReadFile(hFile,(LPBYTE)&dwSectionOffset,sizeof(dwSectionOffset),&dwNumBytesRead,NULL);
 
-	/*The secion offset is from the start of the stream. Go back to the start of the stream,
-	and then go to the start of the section.*/
-	SetFilePointer(hFile,0,0,FILE_BEGIN);
+	/* The section offset is from the start of the stream. */
 	SetFilePointer(hFile,dwSectionOffset,0,FILE_BEGIN);
 
-	/*Since this is the only section, the section length gives the length from the
+	/* Since this is the only section, the section length gives the length from the
 	start of the section to the end of the stream. The property count gives the
-	number of properties assocciated with this file (author, comments, etc).*/
+	number of properties associated with this file (author, comments, etc). */
 	ReadFile(hFile,(LPBYTE)&dwSectionLength,sizeof(DWORD),&dwNumBytesRead,NULL);
 	ReadFile(hFile,(LPBYTE)&dwPropertyCount,sizeof(DWORD),&dwNumBytesRead,NULL);
 
-	/*Go through each property, try to find the one that was asked for.*/
 	for(i = 0;i < dwPropertyCount;i++)
 	{
 		ReadFile(hFile,(LPBYTE)&dwPropertyId,sizeof(dwPropertyId),&dwNumBytesRead,NULL);
 
-		if(dwPropertyId == dwPropertyType)
+		if(dwPropertyId == 1)
+		{
+			/* Property id 1 is the codepage that any string properties are encoded in.
+			If present, it occurs before the strings to which it refers. */
+			ReadFile(hFile,(LPBYTE)&dwCodepageOffset,sizeof(dwCodepageOffset),&dwNumBytesRead,NULL);
+		}
+		else if(dwPropertyId == dwPropertyType)
 		{
 			bFound = TRUE;
 
-			/*The offset is from the start of this section.*/
+			/* The offset is from the start of this section. */
 			ReadFile(hFile,(LPBYTE)&dwPropertyOffset,sizeof(dwPropertyOffset),&dwNumBytesRead,NULL);
 		}
-
-		/*Skip past the offset, as this is a property that isn't needed.*/
-		SetFilePointer(hFile,0x04,0,FILE_CURRENT);
+		else
+		{
+			/* Skip past the offset. */
+			SetFilePointer(hFile,0x04,0,FILE_CURRENT);
+		}
 	}
 
 	if(!bFound)
@@ -1218,37 +1224,49 @@ int ReadFileProperty(TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *lpszPropert
 		return -1;
 	}
 
-	/*Go back to the start of the offset, then to the property that is desired (property offsets
-	are given from the start of the section).*/
-	SetFilePointer(hFile,0,0,FILE_BEGIN);
-	SetFilePointer(hFile,dwSectionOffset,0,FILE_BEGIN);
-	SetFilePointer(hFile,dwPropertyOffset,0,FILE_CURRENT);
+	if(dwCodepageOffset)
+	{
+		SetFilePointer(hFile,dwSectionOffset + dwCodepageOffset + 4,0,FILE_BEGIN);
+		ReadFile(hFile,(LPBYTE)&uCodepage,sizeof(uCodepage),&dwNumBytesRead,NULL);
+	}
 
-	/*Read the property marker. If this is not equal to 0x1E, then this is not a valid property
-	(1E indicates a NULL terminated string prepended by dword string length).*/
+	/* Property offsets are given from the start of the section. */
+	SetFilePointer(hFile,dwSectionOffset + dwPropertyOffset,0,FILE_BEGIN);
+
+	/* Read the property marker. If this is not equal to 0x1E, then this is not a valid property
+	(1E indicates a NULL terminated string prepended by dword string length). */
 	ReadFile(hFile,(LPBYTE)&dwPropertyMarker,sizeof(dwPropertyMarker),&dwNumBytesRead,NULL);
 
 	//if(dwPropertyMarker != 0x1E)
 		//return -1;
 
-	/*Read the length of the property (if the property is a string, this length includes the
-	NULL byte).*/
+	/* Read the length of the property (if the property is a string, this length includes the
+	NULL byte). */
 	ReadFile(hFile,(LPBYTE)&dwPropertyLength,sizeof(dwPropertyLength),&dwNumBytesRead,NULL);
 
-	lpszProperty = (TCHAR *)malloc(dwPropertyLength * sizeof(TCHAR));
+	lpszProperty = (LPCSTR)malloc(dwPropertyLength);
 
-	/*Now finally read out the property of interest.*/
+	/* Read out the property of interest. */
 	ReadFile(hFile,(LPBYTE)lpszProperty,dwPropertyLength,&dwNumBytesRead,NULL);
 	
 	if(dwNumBytesRead != dwPropertyLength)
 	{
-		/*This stream is not valid, and has probably been altered or damaged.*/
+		/* This stream is not valid, and has probably been altered or damaged. */
 		CloseHandle(hFile);
 		return -1;
 	}
 
+	#ifdef UNICODE
+	/* Convert the property string from its current codepage to UTF-16, as expected by our caller. */
+	MultiByteToWideChar(uCodepage,MB_PRECOMPOSED,
+		lpszProperty,dwPropertyLength,
+		lpszPropertyBuf,dwBufLen);
+	dwPropertyLength = lstrlen(lpszPropertyBuf) + 1;
+	#else
 	StringCchCopy(lpszPropertyBuf,dwBufLen,lpszProperty);
+	#endif
 
+	free((LPVOID)lpszProperty);
 	CloseHandle(hFile);
 
 	return dwPropertyLength;
