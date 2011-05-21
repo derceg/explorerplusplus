@@ -358,3 +358,98 @@ void CBookmark::SwapBookmarks(Bookmark_t *pBookmark1,Bookmark_t *pBookmark2)
 	pbi2->Parent			= biTemp.Parent;
 	pbi2->FirstChild		= biTemp.FirstChild;
 }
+
+UINT Bookmark::m_IDCounter = 0;
+UINT BookmarkFolder::m_IDCounter = 0;
+
+Bookmark::Bookmark(const std::wstring &strName,LPITEMIDLIST pidlLocation,const std::wstring &strDescription) :
+	m_ID(++m_IDCounter),
+	m_strName(strName),
+	m_pidlLocation(pidlLocation),
+	m_strDescription(strDescription)
+{
+	
+}
+
+Bookmark::~Bookmark()
+{
+
+}
+
+std::wstring Bookmark::GetName()
+{
+	return m_strName;
+}
+
+std::wstring Bookmark::GetDescription()
+{
+	return m_strDescription;
+}
+
+void Bookmark::SetName(const std::wstring &strName)
+{
+	m_strName = strName;
+}
+
+void Bookmark::SetDescription(const std::wstring &strDescription)
+{
+	m_strDescription = strDescription;
+}
+
+UINT Bookmark::GetID()
+{
+	return m_ID;
+}
+
+BookmarkFolder::BookmarkFolder(const std::wstring &strName,const std::wstring &strDescription) :
+	m_ID(++m_IDCounter),
+	m_strName(strName),
+	m_strDescription(strDescription)
+{
+	 
+}
+
+BookmarkFolder::~BookmarkFolder()
+{
+
+}
+
+std::wstring BookmarkFolder::GetName()
+{
+	return m_strName;
+}
+
+std::wstring BookmarkFolder::GetDescription()
+{
+	return m_strDescription;
+}
+
+void BookmarkFolder::SetName(const std::wstring &strName)
+{
+	m_strName = strName;
+}
+
+void BookmarkFolder::SetDescription(const std::wstring &strDescription)
+{
+	m_strDescription = strDescription;
+}
+
+UINT BookmarkFolder::GetID()
+{
+	return m_ID;
+}
+
+void BookmarkFolder::InsertBookmark(const Bookmark &bm,UINT uPosition)
+{
+	m_ChildList.push_back(bm);
+}
+
+std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator BookmarkFolder::begin()
+{
+	return m_ChildList.begin();
+}
+
+std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator BookmarkFolder::end()
+{
+	return m_ChildList.end();
+}

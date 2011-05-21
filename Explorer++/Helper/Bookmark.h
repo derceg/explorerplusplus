@@ -2,6 +2,7 @@
 #define BOOKMARK_INCLUDED
 
 #include <list>
+#include <boost/variant.hpp>
 
 #define BOOKMARK_TYPE_FOLDER	0
 #define BOOKMARK_TYPE_BOOKMARK	1
@@ -79,6 +80,80 @@ private:
 
 	void	ImportBookmarkInternal(BookmarkInternal_t *pbi,Bookmark_t *pBookmark);
 	void	ExportBookmarkInternal(BookmarkInternal_t *pbi,Bookmark_t *pBookmark);
+};
+
+class Bookmark;
+class BookmarkFolder;
+
+class BookmarkFolder
+{
+public:
+
+	BookmarkFolder(const std::wstring &strName,const std::wstring &strDescription);
+	~BookmarkFolder();
+
+	UINT			GetID();
+
+	std::wstring	GetName();
+	std::wstring	GetDescription();
+
+	void			SetName(const std::wstring &strName);
+	void			SetDescription(const std::wstring &strDescription);
+
+	std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator	begin();
+	std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator	end();
+
+	void			InsertBookmark(const Bookmark &bm,UINT uPosition);
+	void			InsertBookmarkFolder();
+
+	void			RemoveBookmark();
+	void			RemoveBookmarkFolder();
+
+	void			GetBookmark(UINT uID);
+	void			GetBookmarkFolder(UINT uID);
+
+	void			GetIterator();
+
+private:
+
+	static UINT		m_IDCounter;
+	UINT			m_ID;
+
+	std::wstring	m_strName;
+	std::wstring	m_strDescription;
+
+	/* List of child folders and bookmarks. Note that
+	the ordering within this list defines the ordering
+	between child items (i.e. there is no explicit
+	ordering). */
+	std::list<boost::variant<BookmarkFolder,Bookmark>>	m_ChildList;
+};
+
+class Bookmark
+{
+public:
+
+	Bookmark(const std::wstring &strName,LPITEMIDLIST pidlLocation,const std::wstring &strDescription);
+	~Bookmark();
+
+	UINT			GetID();
+
+	std::wstring	GetName();
+	void			GetLocation();
+	std::wstring	GetDescription();
+
+	void			SetName(const std::wstring &strName);
+	void			SetLocation();
+	void			SetDescription(const std::wstring &strDescription);
+
+private:
+
+	static UINT		m_IDCounter;
+	UINT			m_ID;
+
+	std::wstring	m_strName;
+	LPITEMIDLIST	m_pidlLocation;
+	std::wstring	m_strDescription;
 };
 
 #endif

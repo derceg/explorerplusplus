@@ -8,6 +8,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/FileActionHandler.h"
+#include "../Helper/Bookmark.h"
 #include "Explorer++_internal.h"
 #import <msxml3.dll> raw_interfaces_only
 
