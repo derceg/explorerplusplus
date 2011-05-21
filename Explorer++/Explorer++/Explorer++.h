@@ -174,7 +174,6 @@ public:
 	INT_PTR CALLBACK	DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	BookmarkFolderPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -817,10 +816,6 @@ private:
 	/* Bookmark properties dialog. */
 	void					OnBookmarkPropertiesInit(HWND hDlg,LPARAM lParam);
 	void					OnBookmarkPropertiesOk(HWND hDlg);
-
-	/* Bookmark folder properties dialog. */
-	void					OnBookmarkFolderPropertiesInit(HWND hDlg,LPARAM lParam);
-	void					OnBookmarkFolderPropertiesOk(HWND hDlg);
 
 	/* Helper functions for the bookmark toolbar. */
 	void					BookmarkToolbarOpenItem(int iItem,BOOL bOpenInNewTab);

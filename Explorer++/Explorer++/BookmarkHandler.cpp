@@ -432,10 +432,7 @@ void Explorerplusplus::BookmarkToolbarShowItemProperties(int iItem)
 		this item is a (bookmark) folder or a bookmark. */
 		if(Bookmark.Type == BOOKMARK_TYPE_FOLDER)
 		{
-			nResult = DialogBoxParam(g_hLanguageModule,
-				MAKEINTRESOURCE(IDD_BOOKMARKFOLDER_PROPERTIES),
-				m_hContainer,BookmarkFolderPropertiesProcStub,
-				(LPARAM)&bpi);
+			/* TODO: Show new bookmark folder dialog. */
 		}
 		else
 		{
