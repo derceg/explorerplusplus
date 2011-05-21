@@ -4,6 +4,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
+#include "../Helper/Bookmark.h"
 
 class CAddBookmarkDialog;
 
@@ -39,6 +40,7 @@ protected:
 	BOOL	OnInitDialog();
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnClose();
+	BOOL	OnDestroy();
 
 private:
 
@@ -46,6 +48,9 @@ private:
 
 	void	OnOk();
 	void	OnCancel();
+
+	BookmarkFolder	*m_pbfAllBookmarks;
+	HIMAGELIST		m_himlTreeView;
 
 	CAddBookmarkDialogPersistentSettings	*m_pabdps;
 };

@@ -401,10 +401,9 @@ UINT Bookmark::GetID()
 	return m_ID;
 }
 
-BookmarkFolder::BookmarkFolder(const std::wstring &strName,const std::wstring &strDescription) :
+BookmarkFolder::BookmarkFolder(const std::wstring &strName) :
 	m_ID(++m_IDCounter),
-	m_strName(strName),
-	m_strDescription(strDescription)
+	m_strName(strName)
 {
 	 
 }
@@ -419,19 +418,9 @@ std::wstring BookmarkFolder::GetName()
 	return m_strName;
 }
 
-std::wstring BookmarkFolder::GetDescription()
-{
-	return m_strDescription;
-}
-
 void BookmarkFolder::SetName(const std::wstring &strName)
 {
 	m_strName = strName;
-}
-
-void BookmarkFolder::SetDescription(const std::wstring &strDescription)
-{
-	m_strDescription = strDescription;
 }
 
 UINT BookmarkFolder::GetID()
@@ -439,9 +428,28 @@ UINT BookmarkFolder::GetID()
 	return m_ID;
 }
 
-void BookmarkFolder::InsertBookmark(const Bookmark &bm,UINT uPosition)
+void BookmarkFolder::InsertBookmark(const Bookmark &bm,std::size_t Position)
 {
-	m_ChildList.push_back(bm);
+	if(Position > (m_ChildList.size() - 1))
+	{
+		Position = m_ChildList.size() - 1;
+	}
+
+	auto itr = m_ChildList.begin();
+	std::advance(itr,Position);
+	m_ChildList.insert(itr,bm);
+}
+
+void BookmarkFolder::InsertBookmarkFolder(const BookmarkFolder &bf,std::size_t Position)
+{
+	if(Position > (m_ChildList.size() - 1))
+	{
+		Position = m_ChildList.size() - 1;
+	}
+
+	auto itr = m_ChildList.begin();
+	std::advance(itr,Position);
+	m_ChildList.insert(itr,bf);
 }
 
 std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator BookmarkFolder::begin()

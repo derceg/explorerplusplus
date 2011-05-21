@@ -89,22 +89,20 @@ class BookmarkFolder
 {
 public:
 
-	BookmarkFolder(const std::wstring &strName,const std::wstring &strDescription);
+	BookmarkFolder(const std::wstring &strName);
 	~BookmarkFolder();
 
 	UINT			GetID();
 
 	std::wstring	GetName();
-	std::wstring	GetDescription();
 
 	void			SetName(const std::wstring &strName);
-	void			SetDescription(const std::wstring &strDescription);
 
 	std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator	begin();
 	std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator	end();
 
-	void			InsertBookmark(const Bookmark &bm,UINT uPosition);
-	void			InsertBookmarkFolder();
+	void			InsertBookmark(const Bookmark &bm,std::size_t Position);
+	void			InsertBookmarkFolder(const BookmarkFolder &bf,std::size_t Position);
 
 	void			RemoveBookmark();
 	void			RemoveBookmarkFolder();
@@ -120,7 +118,6 @@ private:
 	UINT			m_ID;
 
 	std::wstring	m_strName;
-	std::wstring	m_strDescription;
 
 	/* List of child folders and bookmarks. Note that
 	the ordering within this list defines the ordering
