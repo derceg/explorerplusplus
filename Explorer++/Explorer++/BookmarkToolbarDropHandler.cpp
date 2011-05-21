@@ -1,7 +1,7 @@
 /******************************************************************
  *
  * Project: Explorer++
- * File: OrganizeBookmarksDialog.cpp
+ * File: BookmarkToolbarDropHandler.cpp
  * License: GPL - See COPYING in the top level directory
  *
  * Handles drag and drop for the bookmarks toolbar.

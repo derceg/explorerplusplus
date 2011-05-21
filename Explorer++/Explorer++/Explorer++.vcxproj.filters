@@ -85,9 +85,6 @@
     <ClCompile Include="OptionsDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OrganizeBookmarksDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RenameTabDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

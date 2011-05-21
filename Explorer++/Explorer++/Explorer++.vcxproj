@@ -285,7 +285,6 @@
     <ClCompile Include="MsgHandler.cpp" />
     <ClCompile Include="NewBookmarkFolderDialog.cpp" />
     <ClCompile Include="OptionsDialog.cpp" />
-    <ClCompile Include="OrganizeBookmarksDialog.cpp" />
     <ClCompile Include="RegistrySettings.cpp" />
     <ClCompile Include="RenameTabDialog.cpp" />
     <ClCompile Include="SearchDialog.cpp" />

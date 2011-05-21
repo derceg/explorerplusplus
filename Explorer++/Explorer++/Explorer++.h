@@ -48,7 +48,6 @@ lParam not currently used. */
 #define REG_ADDBOOKMARK_KEY			_T("AddBookmark")
 #define REG_DISPLAYCOLORS_KEY		_T("DisplayColors")
 #define REG_MERGEFILES_KEY			_T("MergeFiles")
-#define REG_ORGANIZEBOOKMARKS_KEY	_T("OrganizeBookmarks")
 #define REG_SELECTCOLUMNS_KEY		_T("SelectColumns")
 #define REG_SELECTDEFAULTCOLUMNS_KEY	_T("SelectDefaultColumns")
 
@@ -179,7 +178,6 @@ public:
 	INT_PTR CALLBACK	TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkTabDlgProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	NewBookmarkFolderProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	OrganizeBookmarks(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkFolderPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -704,8 +702,6 @@ private:
 	void					LoadAddBookmarkStateFromRegistry(HKEY hParentKey);
 	void					SaveDisplayColorsStateToRegistry(HKEY hParentKey);
 	void					LoadDisplayColorsStateFromRegistry(HKEY hParentKey);
-	void					SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey);
-	void					LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey);
 
 	/* Window state update. */
 	void					UpdateWindowStates(void);
@@ -820,6 +816,11 @@ private:
 	void					OnDisplayColorsHScroll(HWND hDlg);
 	void					OnDisplayColorsEnChange(HWND hDlg,LPARAM lParam);
 
+	/* Bookmarks. */
+	void					InitializeBookmarkToolbarMap(void);
+	int						GenerateUniqueBookmarkToolbarId(void);
+	void					GetBookmarkMenuItemDirectory(HMENU hMenu,int iBookmarkId,TCHAR *szDirectory,UINT uBufSize);
+
 	/* Add bookmark dialog. */
 	void					OnAddBookmarkInit(HWND hDlg,LPARAM lParam);
 	void					OnAddBookmarkOk(HWND hDlg);
@@ -833,31 +834,6 @@ private:
 	/* New bookmark folder dialog. */
 	void					OnNewBookmarkFolderInit(HWND hDlg);
 	void					OnNewBookmarkFolderOk(HWND hDlg);
-
-	/* Bookmarks organization dialog. */
-	void					OnOrganizeBookmarksInit(HWND hDlg);
-	void					MoveColumnItem(HWND hDlg,BOOL bUp);
-	void					OrganizeBookmarksMove(HWND hDlg,BOOL bUp);
-	void					OnOrganizeBookmarksDelete(HWND hDlg);
-	void					OnOrganizeBookmarksOk(HWND hDlg);
-	void					OnOrganizeBookmarksProperties(HWND hDlg);
-	void					OnOrganizeBookmarksDoubleClick(HWND hDlg,LPARAM lParam);
-	void					OnOrganizeBookmarksRightClick(HWND hDlg,LPARAM lParam);
-	void					OrganizeBookmarksRefreshItem(HWND hDlg,int iItem);
-	void					OnOrganizeBookmarksTvnSelChanged(HWND hDlg,LPARAM lParam);
-	void					OnOrganizeBookmarksInitMenu(HWND hDlg,WPARAM wParam);
-	void					OnOrganizeBookmarksShowOnToolbar(HWND hDlg);
-	void					OnOrganizeBookmarksOpen(HWND hDlg,BOOL bOpenInNewTab);
-	void					ShowBookmarkProperties(HWND hDlg,HWND hListView,int iItem);
-	void					InsertBookmarksIntoTreeView(HWND hTreeView,HTREEITEM hParent,Bookmark_t *pBookmark);
-	void					InsertBookmarksIntoTreeViewInternal(HWND hTreeView,HTREEITEM hParent,Bookmark_t *pBookmark);
-	void					InsertBookmarkFolderItemsIntoTreeView(HWND hFolders,HTREEITEM hParent,Bookmark_t *pBookmark);
-	void					InsertBookmarksIntoListView(HWND hBookmarks,Bookmark_t *pBookmark);
-	void					InitializeBookmarkToolbarMap(void);
-	int						GenerateUniqueBookmarkToolbarId(void);
-	void					GetBookmarkMenuItemDirectory(HMENU hMenu,int iBookmarkId,TCHAR *szDirectory,UINT uBufSize);
-	void					OrganizeBookmarksTrackInTreeView(HWND hDlg,void *pBookmarkHandle);
-	void					OrganizeBookmarksSaveState(HWND hDlg);
 
 	/* Bookmark properties dialog. */
 	void					OnBookmarkPropertiesInit(HWND hDlg,LPARAM lParam);
@@ -1238,10 +1214,6 @@ private:
 	/* Add bookmark dialog. */
 	BOOL					m_bAddBookmarkDlgStateSaved;
 	POINT					m_ptAddBookmark;
-
-	/* Organize bookmarks dialog. */
-	BOOL					m_bOrganizeBookmarksDlgStateSaved;
-	POINT					m_ptOrganizeBookmarks;
 
 	/* Display colors dialog. */
 	BOOL					m_bDisplayColorsDlgStateSaved;

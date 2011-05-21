@@ -1355,8 +1355,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case TOOLBAR_ORGANIZEBOOKMARKS:
 		case IDM_BOOKMARKS_ORGANIZEBOOKMARKS:
-			DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_ORGANIZE_BOOKMARKS),
-				m_hContainer,OrganizeBookmarksStub,(LPARAM)this);
 			break;
 
 		case TOOLBAR_SEARCH:

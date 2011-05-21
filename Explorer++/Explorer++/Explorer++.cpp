@@ -101,7 +101,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	/* Dialog states. */
 	m_bAddBookmarkDlgStateSaved		= FALSE;
 	m_bDisplayColorsDlgStateSaved	= FALSE;
-	m_bOrganizeBookmarksDlgStateSaved	= FALSE;
 
 	m_pTaskbarList3					= NULL;
 

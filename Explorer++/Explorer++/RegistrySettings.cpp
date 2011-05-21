@@ -1373,7 +1373,6 @@ void Explorerplusplus::SaveStateToRegistry(void)
 	{
 		SaveAddBookmarkStateToRegistry(hKey);
 		SaveDisplayColorsStateToRegistry(hKey);
-		SaveOrganizeBookmarksStateToRegistry(hKey);
 
 		CSearchDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CWildcardSelectDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
@@ -1439,29 +1438,6 @@ void Explorerplusplus::SaveDisplayColorsStateToRegistry(HKEY hParentKey)
 	}
 }
 
-void Explorerplusplus::SaveOrganizeBookmarksStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_ORGANIZEBOOKMARKS_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bOrganizeBookmarksDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptOrganizeBookmarks,
-				sizeof(m_ptOrganizeBookmarks));
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
 void Explorerplusplus::LoadStateFromRegistry(void)
 {
 	HKEY				hKey;
@@ -1473,7 +1449,6 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 	{
 		LoadAddBookmarkStateFromRegistry(hKey);
 		LoadDisplayColorsStateFromRegistry(hKey);
-		LoadOrganizeBookmarksStateFromRegistry(hKey);
 
 		CSearchDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CWildcardSelectDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
@@ -1535,30 +1510,6 @@ void Explorerplusplus::LoadDisplayColorsStateFromRegistry(HKEY hParentKey)
 		if(ReturnValue == ERROR_SUCCESS)
 		{
 			m_bDisplayColorsDlgStateSaved = TRUE;
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadOrganizeBookmarksStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_ORGANIZEBOOKMARKS_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptOrganizeBookmarks,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bOrganizeBookmarksDlgStateSaved = TRUE;
 		}
 
 		RegCloseKey(hKey);
