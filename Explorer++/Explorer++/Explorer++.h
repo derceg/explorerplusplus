@@ -38,7 +38,7 @@ lParam not currently used. */
 
 #define MAX_BOOKMARKTOOLBAR_ITEMS	100
 
-/* Registry keys used to store prgram settings. */
+/* Registry keys used to store program settings. */
 #define REG_MAIN_KEY				_T("Software\\Explorer++")
 #define REG_SETTINGS_KEY			_T("Software\\Explorer++\\Settings")
 
@@ -676,9 +676,7 @@ private:
 	void					SaveDefaultColumnsToRegistry(void);
 	void					InitializeBookmarks(void);
 	void					SaveBookmarksToRegistry(void);
-	void					SaveBookmarksToRegistryInternal(HKEY hKey,Bookmark_t *pBookmark,int count);
 	void					LoadBookmarksFromRegistry(void);
-	void					LoadBookmarksFromRegistryInternal(HKEY hBookmarks,void *ParentFolder);
 	void					LoadApplicationToolbarFromRegistry(void);
 	void					LoadApplicationToolbarFromRegistryInternal(HKEY hKey);
 	void					SaveApplicationToolbarToRegistry(void);
@@ -811,6 +809,10 @@ private:
 	void					InitializeBookmarkToolbarMap(void);
 	int						GenerateUniqueBookmarkToolbarId(void);
 	void					GetBookmarkMenuItemDirectory(HMENU hMenu,int iBookmarkId,TCHAR *szDirectory,UINT uBufSize);
+	void					InsertBookmarkToolbarButtons(void);
+	void					InsertToolbarButtonsInternal(Bookmark_t *pBookmark);
+	void					InsertBookmarkIntoToolbar(Bookmark_t *pBookmark,int id);
+	void					UpdateToolbarButton(Bookmark_t *pBookmark);
 
 	/* Helper functions for the bookmark toolbar. */
 	void					BookmarkToolbarOpenItem(int iItem,BOOL bOpenInNewTab);
@@ -825,12 +827,6 @@ private:
 	int						LookupColumnNameStringIndex(int iColumnId);
 	int						LookupColumnDescriptionStringIndex(int iColumnId);
 	void					CopyColumnInfoToClipboard(void);
-
-	/* Bookmarks. */
-	void					InsertBookmarkToolbarButtons(void);
-	void					InsertToolbarButtonsInternal(Bookmark_t *pBookmark);
-	void					InsertBookmarkIntoToolbar(Bookmark_t *pBookmark,int id);
-	void					UpdateToolbarButton(Bookmark_t *pBookmark);
 
 	/* Bookmark handling. */
 	HRESULT					ExpandAndBrowsePath(TCHAR *szPath);
@@ -861,9 +857,7 @@ private:
 	int						LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,std::list<Column_t> *pColumns);
 	void					SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pColumnsNode,std::list<Column_t> *pColumns,TCHAR *szColumnSet,int iIndent);
 	int						LoadBookmarksFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					LoadBookmarksFromXMLInternal(MSXML2::IXMLDOMNode *pNode,void *pParentFolder);
 	void					SaveBookmarksToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					SaveBookmarksToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe,Bookmark_t *pBookmark);
 	int						LoadDefaultColumnsFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					SaveDefaultColumnsToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveDefaultColumnsToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pColumnsNode);

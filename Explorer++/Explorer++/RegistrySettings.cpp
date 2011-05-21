@@ -412,91 +412,26 @@ void DeleteKey(HKEY hKey)
 void Explorerplusplus::SaveBookmarksToRegistry(void)
 {
 	HKEY			hBookmarksKey;
-	Bookmark_t		RootBookmark;
-	Bookmark_t		FirstChild;
 	DWORD			Disposition;
-	HRESULT			hr;
 	LONG			ReturnValue;
 
-	/* First, delete the 'Bookmarks' key, along
-	with all of its subkeys. */
 	SHDeleteKey(HKEY_CURRENT_USER,REG_BOOKMARKS_KEY);
 
-	/* Simply open the 'main' registry key, as the 'bookmarks' sub-key
-	will be created by the root bookmark (called 'Bookmarks'). */
 	ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_BOOKMARKS_KEY,
 	0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hBookmarksKey,
 	&Disposition);
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		m_Bookmark.GetRoot(&RootBookmark);
-
-		hr = m_Bookmark.GetChild(&RootBookmark,&FirstChild);
-
-		if(SUCCEEDED(hr))
-		{
-			SaveBookmarksToRegistryInternal(hBookmarksKey,&FirstChild,0);
-		}
+		/* TODO: Save bookmarks. */
 
 		RegCloseKey(hBookmarksKey);
 	}
 }
 
-void Explorerplusplus::SaveBookmarksToRegistryInternal(HKEY hKey,
-Bookmark_t *pBookmark,int count)
-{
-	HKEY		hKeyChild;
-	Bookmark_t	FirstChild;
-	Bookmark_t	SiblingBookmark;
-	TCHAR		szKeyName[32];
-	DWORD		Disposition;
-	HRESULT		hr;
-	LONG		ReturnValue;
-
-	_itow_s(count,szKeyName,SIZEOF_ARRAY(szKeyName),10);
-	ReturnValue = RegCreateKeyEx(hKey,szKeyName,0,NULL,
-		REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKeyChild,
-		&Disposition);
-
-	NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("Name"),pBookmark->szItemName);
-	NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("Description"),pBookmark->szItemDescription);
-	NRegistrySettings::SaveDwordToRegistry(hKeyChild,_T("Type"),pBookmark->Type);
-	NRegistrySettings::SaveDwordToRegistry(hKeyChild,_T("ShowOnBookmarksToolbar"),pBookmark->bShowOnToolbar);
-
-	count++;
-
-	if(pBookmark->Type == BOOKMARK_TYPE_BOOKMARK)
-	{
-		NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("Location"),pBookmark->szLocation);
-	}
-	
-	if(pBookmark->Type == BOOKMARK_TYPE_FOLDER)
-	{
-		hr = m_Bookmark.GetChild(pBookmark,&FirstChild);
-
-		if(SUCCEEDED(hr))
-		{
-			SaveBookmarksToRegistryInternal(hKeyChild,&FirstChild,0);
-		}
-	}
-
-	RegCloseKey(hKeyChild);
-
-	hr = m_Bookmark.GetNextBookmarkSibling(pBookmark,&SiblingBookmark);
-
-	if(SUCCEEDED(hr))
-	{
-		SaveBookmarksToRegistryInternal(hKey,&SiblingBookmark,count);
-	}
-
-	return;
-}
-
 void Explorerplusplus::LoadBookmarksFromRegistry(void)
 {
 	HKEY		hBookmarksKey;
-	Bookmark_t	RootBookmark;
 	LONG		ReturnValue;
 
 	ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_BOOKMARKS_KEY,
@@ -504,69 +439,9 @@ void Explorerplusplus::LoadBookmarksFromRegistry(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		m_Bookmark.GetRoot(&RootBookmark);
-
-		LoadBookmarksFromRegistryInternal(hBookmarksKey,RootBookmark.pHandle);
+		/* TODO: Load bookmarks. */
 
 		RegCloseKey(hBookmarksKey);
-	}
-}
-
-void Explorerplusplus::LoadBookmarksFromRegistryInternal(HKEY hBookmarks,void *ParentFolder)
-{
-	HKEY	hKeyChild;
-	Bookmark_t	NewBookmark;
-	TCHAR	szKeyName[256];
-	DWORD	dwKeyLength;
-	LONG	lTypeStatus;
-	LONG	lNameStatus;
-	LONG	lDescriptionStatus;
-	LONG	lToolbarStatus;
-	LONG	lLocationStatus;
-	DWORD	dwIndex = 0;
-
-	dwKeyLength = SIZEOF_ARRAY(szKeyName);
-
-	/* Enumerate each of the subkeys. */
-	while(RegEnumKeyEx(hBookmarks,dwIndex++,szKeyName,&dwKeyLength,NULL,NULL,NULL,NULL) == ERROR_SUCCESS)
-	{
-		/* Open the subkey. First, attempt to load
-		the type. If there is no type specifier, ignore
-		the key. If any other values are missing, also
-		ignore the key. */
-		RegOpenKeyEx(hBookmarks,szKeyName,0,KEY_READ,&hKeyChild);
-
-		lTypeStatus = NRegistrySettings::ReadDwordFromRegistry(hKeyChild,_T("Type"),
-			(LPDWORD)&NewBookmark.Type);
-		lNameStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,_T("Name"),
-			NewBookmark.szItemName,SIZEOF_ARRAY(NewBookmark.szItemName));
-		lToolbarStatus = NRegistrySettings::ReadDwordFromRegistry(hKeyChild,_T("ShowOnBookmarksToolbar"),
-			(LPDWORD)&NewBookmark.bShowOnToolbar);
-		lDescriptionStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,_T("Description"),
-			NewBookmark.szItemDescription,SIZEOF_ARRAY(NewBookmark.szItemDescription));
-
-		if(lTypeStatus == ERROR_SUCCESS && lNameStatus == ERROR_SUCCESS &&
-			lToolbarStatus == ERROR_SUCCESS)
-		{
-			if(NewBookmark.Type == BOOKMARK_TYPE_FOLDER)
-			{
-				/* Create the bookmark folder. */
-				m_Bookmark.CreateNewBookmark(ParentFolder,&NewBookmark);
-
-				LoadBookmarksFromRegistryInternal(hKeyChild,NewBookmark.pHandle);
-			}
-			else
-			{
-				lLocationStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,_T("Location"),
-					NewBookmark.szLocation,SIZEOF_ARRAY(NewBookmark.szLocation));
-
-				m_Bookmark.CreateNewBookmark(ParentFolder,&NewBookmark);
-			}
-		}
-
-		RegCloseKey(hKeyChild);
-
-		dwKeyLength = SIZEOF_ARRAY(szKeyName);
 	}
 }
 

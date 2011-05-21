@@ -876,7 +876,6 @@ int Explorerplusplus::LoadBookmarksFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
 	MSXML2::IXMLDOMNode			*pNode = NULL;
-	Bookmark_t					RootBookmark;
 	BSTR						bstr = NULL;
 	HRESULT						hr;
 
@@ -888,9 +887,7 @@ int Explorerplusplus::LoadBookmarksFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 
 	if(hr == S_OK)
 	{
-		m_Bookmark.GetRoot(&RootBookmark);
-
-		LoadBookmarksFromXMLInternal(pNode,RootBookmark.pHandle);
+		/* TODO: Load bookmarks. */
 	}
 
 clean:
@@ -899,104 +896,6 @@ clean:
 	if (pNode) pNode->Release();
 
 	return 0;
-}
-
-/* Start at the first node. Read all of its attributes
-and then step down into any children, before traversing
-any sibling nodes (and stepping into their child items,
-etc). */
-void Explorerplusplus::LoadBookmarksFromXMLInternal(MSXML2::IXMLDOMNode *pNode,void *pParentFolder)
-{
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
-	MSXML2::IXMLDOMNode			*pNextSibling = NULL;
-	Bookmark_t					NewBookmark = {0};
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	HRESULT						hr;
-	long						nAttributeNodes;
-	long						i = 0;
-
-	hr = pNode->get_attributes(&am);
-
-	if(FAILED(hr))
-		return;
-
-	/* Retrieve the total number of attributes
-	attached to this node. */
-	am->get_length(&nAttributeNodes);
-
-	for(i = 0;i < nAttributeNodes;i++)
-	{
-		am->get_item(i, &pAttributeNode);
-
-		/* Element name. */
-		pAttributeNode->get_nodeName(&bstrName);
-
-		/* Each bookmark item will have a name, description
-		and type. If the item is a bookmark (rather than a
-		folder), it will also have a location attribute. */
-
-		/* Element value. */
-		pAttributeNode->get_text(&bstrValue);
-
-		if(lstrcmpi(bstrName,L"Name") == 0)
-			StringCchCopy(NewBookmark.szItemName,SIZEOF_ARRAY(NewBookmark.szItemName),bstrValue);
-		else if(lstrcmpi(bstrName,L"Description") == 0)
-			StringCchCopy(NewBookmark.szItemDescription,SIZEOF_ARRAY(NewBookmark.szItemDescription),bstrValue);
-		else if(lstrcmpi(bstrName,L"Location") == 0)
-			StringCchCopy(NewBookmark.szLocation,SIZEOF_ARRAY(NewBookmark.szLocation),bstrValue);
-		else if(lstrcmpi(bstrName,L"Type") == 0)
-			NewBookmark.Type = _wtoi(bstrValue);
-		else if(lstrcmpi(bstrName,L"ShowOnBookmarksToolbar") == 0)
-			NewBookmark.bShowOnToolbar = NXMLSettings::DecodeBoolValue(bstrValue);
-	}
-
-	/* If this item is a bookmark folder, recursively retrieve
-	it's sub-items. */
-	if(NewBookmark.Type == BOOKMARK_TYPE_FOLDER)
-	{
-		m_Bookmark.CreateNewBookmark(pParentFolder,&NewBookmark);
-
-		hr = pNode->get_firstChild(&pChildNode);
-
-		if(hr == S_OK)
-		{
-			hr = pChildNode->get_nextSibling(&pChildNode);
-
-			if(hr == S_OK)
-			{
-				hr = pChildNode->get_firstChild(&pChildNode);
-
-				if(hr == S_OK)
-				{
-					hr = pChildNode->get_nextSibling(&pChildNode);
-
-					if(hr == S_OK)
-					{
-						LoadBookmarksFromXMLInternal(pChildNode,NewBookmark.pHandle);
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		m_Bookmark.CreateNewBookmark(pParentFolder,&NewBookmark);
-	}
-
-	hr = pNode->get_nextSibling(&pNextSibling);
-
-	if(hr == S_OK)
-	{
-		hr = pNextSibling->get_nextSibling(&pNextSibling);
-
-		if(hr == S_OK)
-		{
-			LoadBookmarksFromXMLInternal(pNextSibling,pParentFolder);
-		}
-	}
 }
 
 void Explorerplusplus::SaveBookmarksToXML(MSXML2::IXMLDOMDocument *pXMLDom,
@@ -1022,7 +921,7 @@ MSXML2::IXMLDOMElement *pRoot)
 
 	if(SUCCEEDED(hr))
 	{
-		SaveBookmarksToXMLInternal(pXMLDom,pe,&FirstChild);
+		/* TODO: Save bookmarks. */
 	}
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
@@ -1032,110 +931,6 @@ MSXML2::IXMLDOMElement *pRoot)
 	pe = NULL;
 
 	SysFreeString(bstr_wsnt);
-}
-
-void Explorerplusplus::SaveBookmarksToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pe,Bookmark_t *pBookmark)
-{
-	MSXML2::IXMLDOMElement		*pParentNode = NULL;
-	Bookmark_t					FirstChild;
-	Bookmark_t					SiblingBookmark;
-	BSTR						bstr_wsntt = SysAllocString(L"\n\t\t");
-	BSTR						bstr_indent;
-	WCHAR						wszIndent[128];
-	HRESULT						hr;
-	static int					iIndent = 2;
-	int							i = 0;
-
-	StringCchPrintf(wszIndent,SIZEOF_ARRAY(wszIndent),L"\n");
-
-	for(i = 0;i < iIndent;i++)
-		StringCchCat(wszIndent,SIZEOF_ARRAY(wszIndent),L"\t");
-
-	bstr_indent = SysAllocString(wszIndent);
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_indent,pe);
-
-	SysFreeString(bstr_indent);
-	bstr_indent = NULL;
-
-	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Bookmark"),pBookmark->szItemName);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Description"),pBookmark->szItemDescription);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Type"),NXMLSettings::EncodeIntValue(pBookmark->Type));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowOnBookmarksToolbar"),NXMLSettings::EncodeBoolValue(pBookmark->bShowOnToolbar));
-
-	if(pBookmark->Type == BOOKMARK_TYPE_BOOKMARK)
-	{
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Location"),pBookmark->szLocation);
-	}
-	
-	if(pBookmark->Type == BOOKMARK_TYPE_FOLDER)
-	{
-		hr = m_Bookmark.GetChild(pBookmark,&FirstChild);
-
-		if(SUCCEEDED(hr))
-		{
-			MSXML2::IXMLDOMElement *pe2 = NULL;
-			BSTR					bstr;
-
-			iIndent++;
-
-			StringCchPrintf(wszIndent,SIZEOF_ARRAY(wszIndent),L"\n");
-
-			for(i = 0;i < iIndent;i++)
-				StringCchCat(wszIndent,SIZEOF_ARRAY(wszIndent),L"\t");
-
-			bstr_indent = SysAllocString(wszIndent);
-
-			NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_indent,pParentNode);
-
-			bstr = SysAllocString(L"Bookmarks");
-			pXMLDom->createElement(bstr,&pe2);
-			SysFreeString(bstr);
-			bstr = NULL;
-
-			iIndent++;
-
-			SaveBookmarksToXMLInternal(pXMLDom,pe2,&FirstChild);
-
-			iIndent--;
-
-			NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_indent,pe2);
-
-			SysFreeString(bstr_indent);
-			bstr_indent = NULL;
-
-			NXMLSettings::AppendChildToParent(pe2,pParentNode);
-			pe2->Release();
-			pe2 = NULL;
-
-			iIndent--;
-
-			StringCchPrintf(wszIndent,SIZEOF_ARRAY(wszIndent),L"\n");
-
-			for(i = 0;i < iIndent;i++)
-				StringCchCat(wszIndent,SIZEOF_ARRAY(wszIndent),L"\t");
-
-			bstr_indent = SysAllocString(wszIndent);
-
-			NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_indent,pParentNode);
-
-			SysFreeString(bstr_indent);
-			bstr_indent = NULL;
-		}
-	}
-
-	hr = m_Bookmark.GetNextBookmarkSibling(pBookmark,&SiblingBookmark);
-
-	if(SUCCEEDED(hr))
-	{
-		SaveBookmarksToXMLInternal(pXMLDom,pe,&SiblingBookmark);
-	}
-
-	pParentNode->Release();
-	pParentNode = NULL;
-
-	SysFreeString(bstr_wsntt);
 }
 
 int Explorerplusplus::LoadDefaultColumnsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
