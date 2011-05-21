@@ -12,8 +12,6 @@
 #include "Explorer++_internal.h"
 #import <msxml3.dll> raw_interfaces_only
 
-void InsertFolderItemsIntoComboBoxInternal(HWND hCreateIn,Bookmark_t *pBookmark);
-
 #define MAX_TABS					100
 #define MENU_BOOKMARK_STARTPOS		3
 #define MENU_BOOKMARK_STARTID		10000
@@ -175,7 +173,6 @@ public:
 	INT_PTR CALLBACK	WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	NewBookmarkFolderProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkFolderPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -816,12 +813,6 @@ private:
 	void					InitializeBookmarkToolbarMap(void);
 	int						GenerateUniqueBookmarkToolbarId(void);
 	void					GetBookmarkMenuItemDirectory(HMENU hMenu,int iBookmarkId,TCHAR *szDirectory,UINT uBufSize);
-
-	/* New bookmark folder dialog. */
-	void					OnNewBookmarkFolderInit(HWND hDlg);
-	void					OnNewBookmarkFolderOk(HWND hDlg);
-	void					InsertFolderItemsIntoComboBox(HWND hCreateIn,Bookmark_t *pBookmark);
-	void					InsertFolderItemsIntoComboBoxInternal(HWND hCreateIn,Bookmark_t *pBookmark,int iIndent,int iBookmarkFolderItem);
 
 	/* Bookmark properties dialog. */
 	void					OnBookmarkPropertiesInit(HWND hDlg,LPARAM lParam);

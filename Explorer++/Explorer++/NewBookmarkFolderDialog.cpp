@@ -12,128 +12,76 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
 #include "Explorer++.h"
-#include "../Helper/FileOperations.h"
-#include "../Helper/Helper.h"
-#include "../Helper/Controls.h"
-#include "../Helper/Bookmark.h"
+#include "NewBookmarkFolderDialog.h"
 #include "MainResource.h"
+#include "../Helper/Bookmark.h"
 
 
-#define DEFAULT_NEWFOLDER_NAME	_T("New Folder")
+const TCHAR CNewBookmarkFolderDialogPersistentSettings::SETTINGS_KEY[] = _T("NewBookmarkFolder");
 
-INT_PTR CALLBACK NewBookmarkFolderProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+CNewBookmarkFolderDialog::CNewBookmarkFolderDialog(HINSTANCE hInstance,
+	int iResource,HWND hParent) :
+CBaseDialog(hInstance,iResource,hParent,true)
 {
-	static Explorerplusplus *pContainer = NULL;
+	m_pnbfdps = &CNewBookmarkFolderDialogPersistentSettings::GetInstance();
+}
 
-	switch(uMsg)
+CNewBookmarkFolderDialog::~CNewBookmarkFolderDialog()
+{
+
+}
+
+BOOL CNewBookmarkFolderDialog::OnInitDialog()
+{
+	return 0;
+}
+
+BOOL CNewBookmarkFolderDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+{
+	switch(LOWORD(wParam))
 	{
-		case WM_INITDIALOG:
-			{
-				pContainer = (Explorerplusplus *)lParam;
-			}
-			break;
+	case IDOK:
+		OnOk();
+		break;
+
+	case IDCANCEL:
+		OnCancel();
+		break;
 	}
 
-	return pContainer->NewBookmarkFolderProc(hDlg,uMsg,wParam,lParam);
+	return 0;
 }
 
-INT_PTR CALLBACK Explorerplusplus::NewBookmarkFolderProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+void CNewBookmarkFolderDialog::OnOk()
 {
-	switch(uMsg)
-	{
-		case WM_INITDIALOG:
-			OnNewBookmarkFolderInit(hDlg);
-			break;
-
-		case WM_COMMAND:
-			switch(LOWORD(wParam))
-			{
-				case IDOK:
-					OnNewBookmarkFolderOk(hDlg);
-					break;
-
-				case IDCANCEL:
-					EndDialog(hDlg,0);
-					break;
-			}
-			break;
-
-		case WM_CLOSE:
-			EndDialog(hDlg,0);
-			break;
-	}
-
-	return FALSE;
+	EndDialog(m_hDlg,1);
 }
 
-void Explorerplusplus::OnNewBookmarkFolderInit(HWND hDlg)
+void CNewBookmarkFolderDialog::OnCancel()
 {
-	HWND	hName;
-	HWND	hCreateIn;
-
-	hName = GetDlgItem(hDlg,IDC_NEWFOLDER_NAME);
-	hCreateIn = GetDlgItem(hDlg,IDC_NEWFOLDER_CREATEIN);
-
-	SetWindowText(hName,DEFAULT_NEWFOLDER_NAME);
-
-
-	/* Initialize the 'Create In' control. This is where the
-	bookmark will be created. */
-	HIMAGELIST		himl;
-	HBITMAP			hb;
-
-	himl = ImageList_Create(16,16,ILC_COLOR32 | ILC_MASK,0,1);
-	hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(himl,hb,NULL);
-	DeleteObject(hb);
-	SendMessage(hCreateIn,CBEM_SETIMAGELIST,0,(LPARAM)himl);
-
-	Bookmark_t RootBookmark;
-
-	m_Bookmark.GetRoot(&RootBookmark);
-
-	InsertFolderItemsIntoComboBox(hCreateIn,&RootBookmark);
-
-	/* Select the first item in the list. */
-	SendMessage(hCreateIn,CB_SETCURSEL,0,0);
-
-	/* Select the text in the 'Name' control. */
-	SendMessage(hName,EM_SETSEL,0,-1);
-	SetFocus(hName);
+	EndDialog(m_hDlg,0);
 }
 
-/* Determine which item in the 'Create In' combo box
-is selected. Use the selection to decide where to
-create the new bookmark folder, by passing selection
-information back to the bookmarks module. */
-void Explorerplusplus::OnNewBookmarkFolderOk(HWND hDlg)
+BOOL CNewBookmarkFolderDialog::OnClose()
 {
-	HWND			hName;
-	HWND			hCreateIn;
-	COMBOBOXEXITEM	cbexItem;
-	TCHAR			szName[256];
-	int				iSel;
+	EndDialog(m_hDlg,0);
+	return 0;
+}
 
-	hName = GetDlgItem(hDlg,IDC_NEWFOLDER_NAME);
-	hCreateIn = GetDlgItem(hDlg,IDC_NEWFOLDER_CREATEIN);
+CNewBookmarkFolderDialogPersistentSettings::CNewBookmarkFolderDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
+{
 
-	SendMessage(hName,WM_GETTEXT,256,(LPARAM)szName);
+}
 
-	iSel = (int)SendMessage(hCreateIn,CB_GETCURSEL,0,0);
+CNewBookmarkFolderDialogPersistentSettings::~CNewBookmarkFolderDialogPersistentSettings()
+{
+	
+}
 
-	cbexItem.iItem	= iSel;
-	cbexItem.mask	= CBEIF_LPARAM;
-	SendMessage(hCreateIn,CBEM_GETITEM,0,(LPARAM)&cbexItem);
-
-	Bookmark_t Bookmark;
-
-	StringCchCopy(Bookmark.szItemName,SIZEOF_ARRAY(Bookmark.szItemName),szName);
-	StringCchCopy(Bookmark.szItemDescription,SIZEOF_ARRAY(Bookmark.szItemDescription),EMPTY_STRING);
-	Bookmark.Type = BOOKMARK_TYPE_FOLDER;
-	Bookmark.bShowOnToolbar = FALSE;
-	m_Bookmark.CreateNewBookmark((void *)cbexItem.lParam,&Bookmark);
-
-	EndDialog(hDlg,1);
+CNewBookmarkFolderDialogPersistentSettings& CNewBookmarkFolderDialogPersistentSettings::GetInstance()
+{
+	static CNewBookmarkFolderDialogPersistentSettings nbfdps;
+	return nbfdps;
 }

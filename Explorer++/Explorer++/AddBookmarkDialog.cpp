@@ -162,6 +162,6 @@ CAddBookmarkDialogPersistentSettings::~CAddBookmarkDialogPersistentSettings()
 
 CAddBookmarkDialogPersistentSettings& CAddBookmarkDialogPersistentSettings::GetInstance()
 {
-	static CAddBookmarkDialogPersistentSettings sfadps;
-	return sfadps;
+	static CAddBookmarkDialogPersistentSettings abdps;
+	return abdps;
 }

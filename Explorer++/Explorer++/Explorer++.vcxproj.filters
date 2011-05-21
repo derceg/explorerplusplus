@@ -213,6 +213,9 @@
     <ClInclude Include="AddBookmarkDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NewBookmarkFolderDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

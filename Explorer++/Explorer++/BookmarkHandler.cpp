@@ -16,6 +16,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AddBookmarkDialog.h"
+#include "NewBookmarkFolderDialog.h"
 #include "../Helper/ShellHelper.h"
 
 
@@ -317,45 +318,6 @@ void Explorerplusplus::UpdateToolbarButton(Bookmark_t *pBookmark)
 	}
 }
 
-void Explorerplusplus::InsertFolderItemsIntoComboBox(HWND hCreateIn,Bookmark_t *pBookmark)
-{
-	InsertFolderItemsIntoComboBoxInternal(hCreateIn,pBookmark,0,0);
-}
-
-void Explorerplusplus::InsertFolderItemsIntoComboBoxInternal(HWND hCreateIn,Bookmark_t *pBookmark,
-int iIndent,int iBookmarkFolderItem)
-{
-	COMBOBOXEXITEM	cbexItem;
-	Bookmark_t		Child;
-	Bookmark_t		Sibling;
-	HRESULT			hr;
-
-	cbexItem.mask			= CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_LPARAM | CBEIF_INDENT;
-	cbexItem.iItem			= iBookmarkFolderItem++;
-	cbexItem.pszText		= pBookmark->szItemName;
-	cbexItem.iImage			= SHELLIMAGES_NEWTAB;
-	cbexItem.iSelectedImage	= SHELLIMAGES_NEWTAB;
-	cbexItem.iIndent		= iIndent;
-	cbexItem.lParam			= (LPARAM)pBookmark->pHandle;
-	SendMessage(hCreateIn,CBEM_INSERTITEM,0,(LPARAM)&cbexItem);
-
-	hr = m_Bookmark.GetChildFolder(pBookmark,&Child);
-
-	if(SUCCEEDED(hr))
-	{
-		iIndent++;
-		InsertFolderItemsIntoComboBoxInternal(hCreateIn,&Child,iIndent,iBookmarkFolderItem);
-		iIndent--;
-	}
-
-	hr = m_Bookmark.GetNextFolderSibling(pBookmark,&Sibling);
-	
-	if(SUCCEEDED(hr))
-	{
-		InsertFolderItemsIntoComboBoxInternal(hCreateIn,&Sibling,iIndent,iBookmarkFolderItem);
-	}
-}
-
 void Explorerplusplus::InitializeBookmarkToolbarMap(void)
 {
 	int i = 0;
@@ -506,8 +468,8 @@ void Explorerplusplus::BookmarkToolbarNewBookmark(int iItem)
 
 void Explorerplusplus::BookmarkToolbarNewFolder(int iItem)
 {
-	DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_NEWBOOKMARKFOLDER),
-		m_hContainer,NewBookmarkFolderProcStub,(LPARAM)this);
+	CNewBookmarkFolderDialog NewBookmarkFolderDialog(g_hLanguageModule,IDD_NEWBOOKMARKFOLDER,m_hContainer);
+	NewBookmarkFolderDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::RemoveItemFromBookmarksToolbar(void *pBookmarkHandle)
