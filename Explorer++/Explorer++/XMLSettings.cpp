@@ -902,11 +902,8 @@ void Explorerplusplus::SaveBookmarksToXML(MSXML2::IXMLDOMDocument *pXMLDom,
 MSXML2::IXMLDOMElement *pRoot)
 {
 	MSXML2::IXMLDOMElement		*pe = NULL;
-	Bookmark_t					RootBookmark;
-	Bookmark_t					FirstChild;
 	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
 	BSTR						bstr;
-	HRESULT						hr;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pRoot);
 
@@ -915,14 +912,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	SysFreeString(bstr);
 	bstr = NULL;
 
-	m_Bookmark.GetRoot(&RootBookmark);
-
-	hr = m_Bookmark.GetChild(&RootBookmark,&FirstChild);
-
-	if(SUCCEEDED(hr))
-	{
-		/* TODO: Save bookmarks. */
-	}
+	/* TODO: Save bookmarks. */
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 

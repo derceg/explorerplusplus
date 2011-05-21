@@ -26,6 +26,20 @@ extern HIMAGELIST himlMenu;
 
 void Explorerplusplus::InitializeBookmarks(void)
 {
+	TCHAR szTemp[64];
+
+	LoadString(g_hLanguageModule,IDS_BOOKMARKS_ALLBOOKMARKS,szTemp,SIZEOF_ARRAY(szTemp));
+	m_bfAllBookmarks = new BookmarkFolder(szTemp);
+
+	/* Set up the 'Bookmarks Toolbar' and 'Bookmarks Menu' folders. */
+	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSTOOLBAR,szTemp,SIZEOF_ARRAY(szTemp));
+	BookmarkFolder bfBookmarksToolbar(szTemp);
+	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksToolbar,0);
+
+	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSMENU,szTemp,SIZEOF_ARRAY(szTemp));
+	BookmarkFolder bfBookmarksMenu(szTemp);
+	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu,1);
+
 	HMENU	hMenu;
 	HMENU	hBookmarkMenu;
 

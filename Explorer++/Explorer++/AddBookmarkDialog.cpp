@@ -19,10 +19,11 @@
 
 const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
-CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,Bookmark *pBookmark) :
+CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,
+	BookmarkFolder *pAllBookmarks,Bookmark *pBookmark) :
 CBaseDialog(hInstance,iResource,hParent,true)
 {
+	m_pAllBookmarks = pAllBookmarks;
 	m_pBookmark = pBookmark;
 
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
@@ -47,47 +48,52 @@ BOOL CAddBookmarkDialog::OnInitDialog()
 	TreeView_SetImageList(hTreeView,m_himlTreeView,TVSIL_NORMAL);
 	DeleteObject(hBitmap);
 
-	TVITEMEX tviex;
-	TVINSERTSTRUCT tvis;
+	InsertFoldersIntoTreeView();
 
-	tviex.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_CHILDREN|TVIF_SELECTEDIMAGE;
-	tviex.pszText			= _T("All Bookmarks");
-	tviex.iImage			= SHELLIMAGES_NEWTAB;
-	tviex.iSelectedImage	= SHELLIMAGES_NEWTAB;
-	tviex.cChildren			= 1;
+	SetFocus(GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME));
 
-	tvis.hParent			= NULL;
-	tvis.hInsertAfter		= TVI_LAST;
-	tvis.itemex				= tviex;
-	HTREEITEM hRoot = TreeView_InsertItem(hTreeView,&tvis);
+	return 0;
+}
 
-	for(auto itr = m_pbfAllBookmarks->begin();itr != m_pbfAllBookmarks->end();itr++)
+void CAddBookmarkDialog::InsertFoldersIntoTreeView()
+{
+	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
+
+	HTREEITEM hRoot = InsertFolderIntoTreeView(hTreeView,NULL,m_pAllBookmarks);
+
+	for(auto itr = m_pAllBookmarks->begin();itr != m_pAllBookmarks->end();itr++)
 	{
-		if(BookmarkFolder *pbf = boost::get<BookmarkFolder>(&(*itr)))
+		if(BookmarkFolder *pBookmarkFolder = boost::get<BookmarkFolder>(&(*itr)))
 		{
-			TCHAR szText[256];
-			StringCchCopy(szText,SIZEOF_ARRAY(szText),pbf->GetName().c_str());
-
-			tviex.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_CHILDREN|TVIF_SELECTEDIMAGE|TVIF_PARAM;
-			tviex.pszText			= szText;
-			tviex.iImage			= SHELLIMAGES_NEWTAB;
-			tviex.iSelectedImage	= SHELLIMAGES_NEWTAB;
-			tviex.cChildren			= 1;
-			tviex.lParam			= pbf->GetID();
-
-			tvis.hParent			= hRoot;
-			tvis.hInsertAfter		= TVI_LAST;
-			tvis.itemex				= tviex;
-			TreeView_InsertItem(hTreeView,&tvis);
+			InsertFolderIntoTreeView(hTreeView,hRoot,pBookmarkFolder);
 		}
 	}
 
 	TreeView_Expand(hTreeView,hRoot,TVE_EXPAND);
 	TreeView_SelectItem(hTreeView,hRoot);
+}
 
-	SetFocus(GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME));
+HTREEITEM CAddBookmarkDialog::InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,
+	BookmarkFolder *pBookmarkFolder)
+{
+	TCHAR szText[256];
+	StringCchCopy(szText,SIZEOF_ARRAY(szText),pBookmarkFolder->GetName().c_str());
 
-	return 0;
+	TVITEMEX tviex;
+	tviex.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_CHILDREN|TVIF_SELECTEDIMAGE|TVIF_PARAM;
+	tviex.pszText			= szText;
+	tviex.iImage			= SHELLIMAGES_NEWTAB;
+	tviex.iSelectedImage	= SHELLIMAGES_NEWTAB;
+	tviex.cChildren			= 1;
+	tviex.lParam			= pBookmarkFolder->GetID();
+
+	TVINSERTSTRUCT tvis;
+	tvis.hParent			= hParent;
+	tvis.hInsertAfter		= TVI_LAST;
+	tvis.itemex				= tviex;
+	HTREEITEM hItem = TreeView_InsertItem(hTreeView,&tvis);
+
+	return hItem;
 }
 
 BOOL CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)

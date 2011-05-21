@@ -32,7 +32,7 @@ class CAddBookmarkDialog : public CBaseDialog
 {
 public:
 
-	CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,Bookmark *pBookmark);
+	CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,BookmarkFolder *pAllBookmarks,Bookmark *pBookmark);
 	~CAddBookmarkDialog();
 
 protected:
@@ -44,12 +44,14 @@ protected:
 
 private:
 
-	void	OnNewFolder();
+	void		InsertFoldersIntoTreeView();
+	HTREEITEM	InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,BookmarkFolder *pBookmarkFolder);
+	void		OnNewFolder();
 
-	void	OnOk();
-	void	OnCancel();
+	void		OnOk();
+	void		OnCancel();
 
-	BookmarkFolder	*m_pbfAllBookmarks;
+	BookmarkFolder	*m_pAllBookmarks;
 	Bookmark		*m_pBookmark;
 	HIMAGELIST		m_himlTreeView;
 

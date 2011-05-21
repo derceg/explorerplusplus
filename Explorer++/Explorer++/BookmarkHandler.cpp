@@ -30,7 +30,7 @@ int g_iStartId = MENU_BOOKMARK_STARTID;
 LRESULT CALLBACK BookmarksToolbarSubclassStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
+	Explorerplusplus *pContainer = reinterpret_cast<Explorerplusplus *>(dwRefData);
 
 	return pContainer->BookmarksToolbarSubclass(hwnd,uMsg,wParam,lParam);
 }
@@ -41,30 +41,22 @@ LRESULT CALLBACK Explorerplusplus::BookmarksToolbarSubclass(HWND hwnd,UINT uMsg,
 	{
 	case WM_MBUTTONUP:
 		{
-			Bookmark_t Bookmark;
-			TBBUTTON tbButton;
-			POINT ptCursor;
-			DWORD dwPos;
-			int iIndex;
+			DWORD dwPos = GetMessagePos();
 
-			dwPos = GetMessagePos();
+			POINT ptCursor;
 			ptCursor.x = GET_X_LPARAM(dwPos);
 			ptCursor.y = GET_Y_LPARAM(dwPos);
 			MapWindowPoints(HWND_DESKTOP,m_hBookmarksToolbar,&ptCursor,1);
 
-			iIndex = (int)SendMessage(m_hBookmarksToolbar,TB_HITTEST,0,(LPARAM)&ptCursor);
+			int iIndex = static_cast<int>(SendMessage(m_hBookmarksToolbar,TB_HITTEST,0,
+				reinterpret_cast<LPARAM>(&ptCursor)));
 
 			if(iIndex >= 0)
 			{
-				SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iIndex,(LPARAM)&tbButton);
+				TBBUTTON tbButton;
+				SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
 
-				m_Bookmark.RetrieveBookmark((void *)tbButton.dwData,&Bookmark);
-
-				/* If this is a bookmark, open it in a new tab. */
-				if(Bookmark.Type == BOOKMARK_TYPE_BOOKMARK)
-				{
-					ExpandAndBrowsePath(Bookmark.szLocation,TRUE,TRUE);
-				}
+				/* TODO: If this is a bookmark, open it in a new tab. */
 			}
 		}
 		break;
@@ -457,7 +449,7 @@ void Explorerplusplus::BookmarkToolbarNewBookmark(int iItem)
 
 		Bookmark bm(EMPTY_STRING,EMPTY_STRING,EMPTY_STRING);
 
-		CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,m_hContainer,&bm);
+		CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,m_hContainer,m_bfAllBookmarks,&bm);
 		AddBookmarkDialog.ShowModalDialog();
 	}
 }
