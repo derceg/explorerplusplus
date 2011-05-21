@@ -20,9 +20,11 @@
 const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
 CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent) :
+	int iResource,HWND hParent,Bookmark *pBookmark) :
 CBaseDialog(hInstance,iResource,hParent,true)
 {
+	m_pBookmark = pBookmark;
+
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
 }
 
@@ -33,6 +35,9 @@ CAddBookmarkDialog::~CAddBookmarkDialog()
 
 BOOL CAddBookmarkDialog::OnInitDialog()
 {
+	SetDlgItemText(m_hDlg,IDC_BOOKMARK_NAME,m_pBookmark->GetName().c_str());
+	SetDlgItemText(m_hDlg,IDC_BOOKMARK_LOCATION,m_pBookmark->GetLocation().c_str());
+
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 	SetWindowTheme(hTreeView,L"Explorer",NULL);
 

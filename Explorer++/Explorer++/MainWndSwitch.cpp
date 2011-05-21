@@ -1333,7 +1333,13 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		case TOOLBAR_ADDBOOKMARK:
 		case IDM_BOOKMARKS_BOOKMARKTHISTAB:
 			{
-				CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,hwnd);
+				TCHAR szCurrentDirectory[MAX_PATH];
+				TCHAR szDisplayName[MAX_PATH];
+				m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),szCurrentDirectory);
+				GetDisplayName(szCurrentDirectory,szDisplayName,SHGDN_INFOLDER);
+				Bookmark bm(szDisplayName,szCurrentDirectory,EMPTY_STRING);
+
+				CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,hwnd,&bm);
 				AddBookmarkDialog.ShowModalDialog();
 			}
 			break;

@@ -39,14 +39,10 @@ public:
 
 	void	GetRoot(Bookmark_t *pRoot);
 	HRESULT	GetChild(Bookmark_t *pParent,Bookmark_t *pChild);
-	HRESULT	GetChildFolder(Bookmark_t *pParent,Bookmark_t *pChildFolder);
 	HRESULT	GetNextBookmarkSibling(Bookmark_t *pParent,Bookmark_t *pSibling);
-	HRESULT	GetNextFolderSibling(Bookmark_t *pParent,Bookmark_t *pFolderSibling);
 	void	CreateNewBookmark(void *pParentHandle,Bookmark_t *pFolder);
 	void	DeleteBookmark(void *pBookmarkHandle);
-	void	UpdateBookmark(void *pBookmarkHandle,Bookmark_t *pUpdatedBookmark);
 	void	RetrieveBookmark(void *pBookmarkHandle,Bookmark_t *pBookmark);
-	void	SwapBookmarks(Bookmark_t *pBookmark1,Bookmark_t *pBookmark2);
 
 private:
 
@@ -130,17 +126,17 @@ class Bookmark
 {
 public:
 
-	Bookmark(const std::wstring &strName,LPITEMIDLIST pidlLocation,const std::wstring &strDescription);
+	Bookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription);
 	~Bookmark();
 
 	UINT			GetID();
 
 	std::wstring	GetName();
-	void			GetLocation();
+	std::wstring	GetLocation();
 	std::wstring	GetDescription();
 
 	void			SetName(const std::wstring &strName);
-	void			SetLocation();
+	void			SetLocation(const std::wstring &strLocation);
 	void			SetDescription(const std::wstring &strDescription);
 
 private:
@@ -149,7 +145,7 @@ private:
 	UINT			m_ID;
 
 	std::wstring	m_strName;
-	LPITEMIDLIST	m_pidlLocation;
+	std::wstring	m_strLocation;
 	std::wstring	m_strDescription;
 };
 

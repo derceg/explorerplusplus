@@ -70,37 +70,6 @@ HRESULT CBookmark::GetChild(Bookmark_t *pParent,Bookmark_t *pChild)
 	return hr;
 }
 
-HRESULT CBookmark::GetChildFolder(Bookmark_t *pParent,Bookmark_t *pChildFolder)
-{
-	BookmarkInternal_t	*pbi = NULL;
-	BookmarkInternal_t	*pChild = NULL;
-	HRESULT				hr = E_FAIL;
-
-	pbi = (BookmarkInternal_t *)pParent->pHandle;
-
-	/* First check if this item is actually
-	a folder. */
-	if(pbi->Type == BOOKMARK_TYPE_FOLDER)
-	{
-		/* Does this folder have any folder children?
-		If it does, copy the bookmark information
-		across. */
-		pChild = (BookmarkInternal_t *)pbi->FirstChild;
-
-		while(pChild != NULL && pChild->Type != BOOKMARK_TYPE_FOLDER)
-			pChild = (BookmarkInternal_t *)pChild->NextSibling;
-
-		if(pChild != NULL)
-		{
-			ExportBookmarkInternal(pChild,pChildFolder);
-
-			hr = S_OK;
-		}
-	}
-
-	return hr;
-}
-
 HRESULT CBookmark::GetNextBookmarkSibling(Bookmark_t *pParent,Bookmark_t *pSibling)
 {
 	BookmarkInternal_t	*pbi = NULL;
@@ -114,32 +83,6 @@ HRESULT CBookmark::GetNextBookmarkSibling(Bookmark_t *pParent,Bookmark_t *pSibli
 	if(pbi->NextSibling != NULL)
 	{
 		ExportBookmarkInternal((BookmarkInternal_t *)pbi->NextSibling,pSibling);
-
-		hr = S_OK;
-	}
-
-	return hr;
-}
-
-HRESULT CBookmark::GetNextFolderSibling(Bookmark_t *pParent,Bookmark_t *pFolderSibling)
-{
-	BookmarkInternal_t	*pbi = NULL;
-	BookmarkInternal_t	*pSibling = NULL;
-	HRESULT				hr = E_FAIL;
-
-	pbi = (BookmarkInternal_t *)pParent->pHandle;
-
-	/* Does this item have any folder siblings?
-	If it does, copy the bookmark information
-	across. */
-	pSibling = (BookmarkInternal_t *)pbi->NextSibling;
-
-	while(pSibling != NULL && pSibling->Type != BOOKMARK_TYPE_FOLDER)
-		pSibling = (BookmarkInternal_t *)pSibling->NextSibling;
-
-	if(pSibling != NULL)
-	{
-		ExportBookmarkInternal(pSibling,pFolderSibling);
 
 		hr = S_OK;
 	}
@@ -280,92 +223,13 @@ void CBookmark::DeleteBookmark(void *pBookmarkHandle)
 	free(pbiBookmark);
 }
 
-/* ONLY properties that can be updated are:
- - Name
- - Location (if this item is a bookmark)
- - Description
- - Show on toolbar status
-No other fields may be changed externally. */
-void CBookmark::UpdateBookmark(void *pBookmarkHandle,Bookmark_t *pUpdatedBookmark)
-{
-	BookmarkInternal_t *pbi;
-
-	pbi = (BookmarkInternal_t *)pBookmarkHandle;
-
-	StringCchCopy(pbi->szItemName,SIZEOF_ARRAY(pbi->szItemName),
-		pUpdatedBookmark->szItemName);
-	StringCchCopy(pbi->szItemDescription,
-		SIZEOF_ARRAY(pbi->szItemDescription),
-		pUpdatedBookmark->szItemDescription);
-
-	pbi->bShowOnToolbar	= pUpdatedBookmark->bShowOnToolbar;
-
-	if(pbi->Type == BOOKMARK_TYPE_BOOKMARK)
-	{
-		/* If this is a bookmark, also copy
-		across its location. */
-		StringCchCopy(pbi->szLocation,SIZEOF_ARRAY(pbi->szLocation),
-			pUpdatedBookmark->szLocation);
-	}
-
-	pUpdatedBookmark->Type		= pbi->Type;
-	pUpdatedBookmark->pHandle	= pBookmarkHandle;
-}
-
-void CBookmark::SwapBookmarks(Bookmark_t *pBookmark1,Bookmark_t *pBookmark2)
-{
-	BookmarkInternal_t	*pbi1 = NULL;
-	BookmarkInternal_t	*pbi2 = NULL;
-	BookmarkInternal_t	biTemp;
-
-	pbi1 = (BookmarkInternal_t *)pBookmark1->pHandle;
-	pbi2 = (BookmarkInternal_t *)pBookmark2->pHandle;
-
-	/* Note that the previous and next sibling members
-	DO NOT need to be altered, since the members in each
-	element are simply been swapped. */
-
-	StringCchCopy(biTemp.szItemName,SIZEOF_ARRAY(biTemp.szItemName),
-		pbi1->szItemName);
-	StringCchCopy(biTemp.szItemDescription,SIZEOF_ARRAY(biTemp.szItemDescription),
-		pbi1->szItemDescription);
-	StringCchCopy(biTemp.szLocation,SIZEOF_ARRAY(biTemp.szLocation),
-		pbi1->szLocation);
-	biTemp.bShowOnToolbar	= pbi1->bShowOnToolbar;
-	biTemp.Type				= pbi1->Type;
-	biTemp.Parent			= pbi1->Parent;
-	biTemp.FirstChild		= pbi1->FirstChild;
-
-	StringCchCopy(pbi1->szItemName,SIZEOF_ARRAY(pbi1->szItemName),
-		pbi2->szItemName);
-	StringCchCopy(pbi1->szItemDescription,SIZEOF_ARRAY(pbi1->szItemDescription),
-		pbi2->szItemDescription);
-	StringCchCopy(pbi1->szLocation,SIZEOF_ARRAY(pbi1->szLocation),
-		pbi2->szLocation);
-	pbi1->bShowOnToolbar	= pbi2->bShowOnToolbar;
-	pbi1->Type				= pbi2->Type;
-	pbi1->Parent			= pbi2->Parent;
-	pbi1->FirstChild		= pbi2->FirstChild;
-
-	StringCchCopy(pbi2->szItemName,SIZEOF_ARRAY(pbi2->szItemName),
-		biTemp.szItemName);
-	StringCchCopy(pbi2->szItemDescription,SIZEOF_ARRAY(pbi2->szItemDescription),
-		biTemp.szItemDescription);
-	StringCchCopy(pbi2->szLocation,SIZEOF_ARRAY(pbi2->szLocation),
-		biTemp.szLocation);
-	pbi2->bShowOnToolbar	= biTemp.bShowOnToolbar;
-	pbi2->Type				= biTemp.Type;
-	pbi2->Parent			= biTemp.Parent;
-	pbi2->FirstChild		= biTemp.FirstChild;
-}
-
 UINT Bookmark::m_IDCounter = 0;
 UINT BookmarkFolder::m_IDCounter = 0;
 
-Bookmark::Bookmark(const std::wstring &strName,LPITEMIDLIST pidlLocation,const std::wstring &strDescription) :
+Bookmark::Bookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription) :
 	m_ID(++m_IDCounter),
 	m_strName(strName),
-	m_pidlLocation(pidlLocation),
+	m_strLocation(strLocation),
 	m_strDescription(strDescription)
 {
 	
@@ -381,6 +245,11 @@ std::wstring Bookmark::GetName()
 	return m_strName;
 }
 
+std::wstring Bookmark::GetLocation()
+{
+	return m_strLocation;
+}
+
 std::wstring Bookmark::GetDescription()
 {
 	return m_strDescription;
@@ -389,6 +258,11 @@ std::wstring Bookmark::GetDescription()
 void Bookmark::SetName(const std::wstring &strName)
 {
 	m_strName = strName;
+}
+
+void Bookmark::SetLocation(const std::wstring &strLocation)
+{
+	m_strLocation = strLocation;
 }
 
 void Bookmark::SetDescription(const std::wstring &strDescription)

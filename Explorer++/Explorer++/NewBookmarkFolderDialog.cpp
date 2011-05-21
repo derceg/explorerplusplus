@@ -15,7 +15,6 @@
 #include "Explorer++.h"
 #include "NewBookmarkFolderDialog.h"
 #include "MainResource.h"
-#include "../Helper/Bookmark.h"
 
 
 const TCHAR CNewBookmarkFolderDialogPersistentSettings::SETTINGS_KEY[] = _T("NewBookmarkFolder");
