@@ -99,7 +99,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_zDeltaTotal					= 0;
 
 	/* Dialog states. */
-	m_bAddBookmarkDlgStateSaved		= FALSE;
 	m_bDisplayColorsDlgStateSaved	= FALSE;
 
 	m_pTaskbarList3					= NULL;

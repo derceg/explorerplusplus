@@ -315,6 +315,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AboutDialog.h" />
+    <ClInclude Include="AddBookmarkDialog.h" />
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />
     <ClInclude Include="DestroyFilesDialog.h" />

@@ -45,7 +45,6 @@ lParam not currently used. */
 #define REG_SETTINGS_KEY			_T("Software\\Explorer++\\Settings")
 
 /* Dialog keys (relative to REG_DIALOGS_KEY). */
-#define REG_ADDBOOKMARK_KEY			_T("AddBookmark")
 #define REG_DISPLAYCOLORS_KEY		_T("DisplayColors")
 #define REG_MERGEFILES_KEY			_T("MergeFiles")
 #define REG_SELECTCOLUMNS_KEY		_T("SelectColumns")
@@ -176,7 +175,6 @@ public:
 	INT_PTR CALLBACK	WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	BookmarkTabDlgProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	NewBookmarkFolderProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	BookmarkFolderPropertiesProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -698,8 +696,6 @@ private:
 	void					LoadToolbarInformationFromRegistry(void);
 	void					SaveStateToRegistry(void);
 	void					LoadStateFromRegistry(void);
-	void					SaveAddBookmarkStateToRegistry(HKEY hParentKey);
-	void					LoadAddBookmarkStateFromRegistry(HKEY hParentKey);
 	void					SaveDisplayColorsStateToRegistry(HKEY hParentKey);
 	void					LoadDisplayColorsStateFromRegistry(HKEY hParentKey);
 
@@ -821,19 +817,11 @@ private:
 	int						GenerateUniqueBookmarkToolbarId(void);
 	void					GetBookmarkMenuItemDirectory(HMENU hMenu,int iBookmarkId,TCHAR *szDirectory,UINT uBufSize);
 
-	/* Add bookmark dialog. */
-	void					OnAddBookmarkInit(HWND hDlg,LPARAM lParam);
-	void					OnAddBookmarkOk(HWND hDlg);
-	void					OnAddBookmarkNewFolder(HWND hDlg);
-	void					OnBookmarkDetails(HWND hDlg);
-	int						LocateBookmarkInComboBox(HWND hComboBox,void *pBookmarkHandle);
-	void					InsertFolderItemsIntoComboBox(HWND hCreateIn,Bookmark_t *pBookmark);
-	void					InsertFolderItemsIntoComboBoxInternal(HWND hCreateIn,Bookmark_t *pBookmark,int iIndent,int iBookmarkFolderItem);
-	void					AddBookmarkSaveState(HWND hDlg);
-
 	/* New bookmark folder dialog. */
 	void					OnNewBookmarkFolderInit(HWND hDlg);
 	void					OnNewBookmarkFolderOk(HWND hDlg);
+	void					InsertFolderItemsIntoComboBox(HWND hCreateIn,Bookmark_t *pBookmark);
+	void					InsertFolderItemsIntoComboBoxInternal(HWND hCreateIn,Bookmark_t *pBookmark,int iIndent,int iBookmarkFolderItem);
 
 	/* Bookmark properties dialog. */
 	void					OnBookmarkPropertiesInit(HWND hDlg,LPARAM lParam);
@@ -1210,10 +1198,6 @@ private:
 	DragTypes_t				m_DragType;
 	BOOL					m_bDataAccept;
 	int						m_iTabDragTab;
-
-	/* Add bookmark dialog. */
-	BOOL					m_bAddBookmarkDlgStateSaved;
-	POINT					m_ptAddBookmark;
 
 	/* Display colors dialog. */
 	BOOL					m_bDisplayColorsDlgStateSaved;

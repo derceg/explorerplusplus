@@ -309,16 +309,6 @@ struct ListViewInfo_t
 	int		iObjectIndex;
 };
 
-/* This information is used by
-the 'Add Bookmark' dialog. */
-struct AddBookmarkInfo_t
-{
-	void			*pContainer;
-	void			*pParentBookmark;
-	LPITEMIDLIST	pidlDirectory;
-	BOOL			bExpandInitial;
-};
-
 struct ApplicationButton_t
 {
 	/* External. */
@@ -631,7 +621,6 @@ INT_PTR CALLBACK DWChangeDetailsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARA
 INT_PTR CALLBACK DWLinePropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 /* Dialog handler stubs. */
-INT_PTR CALLBACK	BookmarkTabDlgProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	NewBookmarkFolderProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	BookmarkPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK	BookmarkFolderPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);

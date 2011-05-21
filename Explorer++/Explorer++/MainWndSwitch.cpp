@@ -21,6 +21,7 @@
 #include "SplitFileDialog.h"
 #include "DestroyFilesDialog.h"
 #include "MergeFilesDialog.h"
+#include "AddBookmarkDialog.h"
 #include "../Helper/ShellHelper.h"
 
 
@@ -1332,24 +1333,8 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		case TOOLBAR_ADDBOOKMARK:
 		case IDM_BOOKMARKS_BOOKMARKTHISTAB:
 			{
-				AddBookmarkInfo_t abi;
-
-				abi.pContainer		= (void *)this;
-				abi.pParentBookmark	= NULL;
-				abi.pidlDirectory	= m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-				abi.bExpandInitial	= FALSE;
-
-				DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_ADD_BOOKMARK),
-					hwnd,BookmarkTabDlgProcStub,(LPARAM)&abi);
-
-				CoTaskMemFree(abi.pidlDirectory);
-
-				/* It's possible the dialog may have been cancelled
-				or closed, but that the bookmarks menu still needs
-				to be updated. This is the case when (for example),
-				a new bookmark folder is created, and the dialog
-				is cancelled. */
-				InsertBookmarksIntoMenu();
+				CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,hwnd);
+				AddBookmarkDialog.ShowModalDialog();
 			}
 			break;
 

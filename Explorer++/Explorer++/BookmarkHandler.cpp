@@ -15,6 +15,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "AddBookmarkDialog.h"
 #include "../Helper/ShellHelper.h"
 
 
@@ -24,7 +25,6 @@ DWORD BookmarksTreeViewStyles	= WS_CHILD|WS_VISIBLE|TVS_SHOWSELALWAYS|TVS_HASBUT
 								  TVS_EDITLABELS|TVS_HASLINES;
 
 int g_iStartId = MENU_BOOKMARK_STARTID;
-extern int g_iFolderSelected;
 
 LRESULT CALLBACK BookmarksToolbarSubclassStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
@@ -356,29 +356,6 @@ int iIndent,int iBookmarkFolderItem)
 	}
 }
 
-int Explorerplusplus::LocateBookmarkInComboBox(HWND hComboBox,void *pBookmarkHandle)
-{
-	LONG_PTR	lResult;
-	int			nItems;
-	int			i = 0;
-
-	/* Should always be at least one. */
-	nItems = (int)SendMessage(hComboBox,CB_GETCOUNT,0,0);
-
-	for(i = 0;i <nItems;i++)
-	{
-		lResult = SendMessage(hComboBox,CB_GETITEMDATA,i,0);
-
-		if(lResult != CB_ERR)
-		{
-			if((void *)lResult == pBookmarkHandle)
-				return i;
-		}
-	}
-
-	return -1;
-}
-
 void Explorerplusplus::InitializeBookmarkToolbarMap(void)
 {
 	int i = 0;
@@ -516,39 +493,19 @@ void Explorerplusplus::BookmarkToolbarShowItemProperties(int iItem)
 
 void Explorerplusplus::BookmarkToolbarNewBookmark(int iItem)
 {
-	AddBookmarkInfo_t	abi;
-	TBBUTTON			tbButton;
-	Bookmark_t			Bookmark;
-	void				*pParentBookmark;
-
 	if(iItem != -1)
 	{
-		SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iItem,(LPARAM)&tbButton);
+		/* TODO: Need to retrieve bookmark details. */
+		/*TBBUTTON tbButton;
+		SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iItem,(LPARAM)&tbButton);*/
 
-		m_Bookmark.RetrieveBookmark((void *)tbButton.dwData,&Bookmark);
-
-		if(Bookmark.Type == BOOKMARK_TYPE_FOLDER)
-		{
-			pParentBookmark = (void *)tbButton.dwData;
-		}
-		else
-		{
-			pParentBookmark = NULL;
-		}
-
-		abi.pContainer		= (void *)this;
-		abi.pParentBookmark	= (void *)pParentBookmark;
-		abi.pidlDirectory	= NULL;
-		abi.bExpandInitial	= TRUE;
-
-		DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_ADD_BOOKMARK),
-			m_hContainer,BookmarkTabDlgProcStub,(LPARAM)&abi);
+		CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,m_hContainer);
+		AddBookmarkDialog.ShowModalDialog();
 	}
 }
 
 void Explorerplusplus::BookmarkToolbarNewFolder(int iItem)
 {
-	g_iFolderSelected = 0;
 	DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_NEWBOOKMARKFOLDER),
 		m_hContainer,NewBookmarkFolderProcStub,(LPARAM)this);
 }

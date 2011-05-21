@@ -23,8 +23,6 @@
 
 #define DEFAULT_NEWFOLDER_NAME	_T("New Folder")
 
-extern int g_iFolderSelected;
-
 INT_PTR CALLBACK NewBookmarkFolderProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	static Explorerplusplus *pContainer = NULL;
@@ -99,7 +97,7 @@ void Explorerplusplus::OnNewBookmarkFolderInit(HWND hDlg)
 	InsertFolderItemsIntoComboBox(hCreateIn,&RootBookmark);
 
 	/* Select the first item in the list. */
-	SendMessage(hCreateIn,CB_SETCURSEL,g_iFolderSelected,0);
+	SendMessage(hCreateIn,CB_SETCURSEL,0,0);
 
 	/* Select the text in the 'Name' control. */
 	SendMessage(hName,EM_SETSEL,0,-1);

@@ -26,6 +26,7 @@
 #include "MergeFilesDialog.h"
 #include "SelectColumnsDialog.h"
 #include "SetDefaultColumnsDialog.h"
+#include "AddBookmarkDialog.h"
 #include "../Helper/RegistrySettings.h"
 
 
@@ -1371,7 +1372,6 @@ void Explorerplusplus::SaveStateToRegistry(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		SaveAddBookmarkStateToRegistry(hKey);
 		SaveDisplayColorsStateToRegistry(hKey);
 
 		CSearchDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
@@ -1387,29 +1387,7 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		CMergeFilesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CSelectColumnsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CSetDefaultColumnsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::SaveAddBookmarkStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_ADDBOOKMARK_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bAddBookmarkDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptAddBookmark,
-				sizeof(m_ptAddBookmark));
-		}
+		CAddBookmarkDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1447,7 +1425,6 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		LoadAddBookmarkStateFromRegistry(hKey);
 		LoadDisplayColorsStateFromRegistry(hKey);
 
 		CSearchDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
@@ -1463,30 +1440,7 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		CMergeFilesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CSelectColumnsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CSetDefaultColumnsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadAddBookmarkStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_ADDBOOKMARK_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptAddBookmark,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bAddBookmarkDlgStateSaved = TRUE;
-		}
+		CAddBookmarkDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
