@@ -436,10 +436,7 @@ void Explorerplusplus::BookmarkToolbarShowItemProperties(int iItem)
 		}
 		else
 		{
-			nResult = DialogBoxParam(g_hLanguageModule,
-				MAKEINTRESOURCE(IDD_BOOKMARK_PROPERTIES),
-				m_hContainer,BookmarkPropertiesProcStub,
-				(LPARAM)&bpi);
+			/* TODO: Show add bookmark dialog. */
 		}
 
 		/* Ok was pressed. Need to update the information

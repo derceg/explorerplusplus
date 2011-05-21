@@ -22,9 +22,6 @@
     <ClCompile Include="BookmarkHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkPropertiesDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BookmarkToolbarDropHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

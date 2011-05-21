@@ -261,7 +261,6 @@
     <ClCompile Include="ApplicationToolbarHandler.cpp" />
     <ClCompile Include="ArrangeMenuHandler.cpp" />
     <ClCompile Include="BookmarkHandler.cpp" />
-    <ClCompile Include="BookmarkPropertiesDialog.cpp" />
     <ClCompile Include="BookmarkToolbarDropHandler.cpp" />
     <ClCompile Include="ChangeDisplayWindowDetailsDialog.cpp" />
     <ClCompile Include="ColorRuleDialog.cpp" />
