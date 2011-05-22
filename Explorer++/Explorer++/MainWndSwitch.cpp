@@ -457,7 +457,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 	LOWORD(wParam) <= (TOOLBAR_BOOKMARK_START +
 	(MENU_BOOKMARK_ENDID - MENU_BOOKMARK_STARTID - 1)))
 	{
-		Bookmark_t	Bookmark;
 		TBBUTTON	tbButton;
 		int			iIndex;
 
@@ -467,46 +466,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		{
 			SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iIndex,(LPARAM)&tbButton);
 
-			m_Bookmark.RetrieveBookmark((void *)tbButton.dwData,&Bookmark);
-
-			/* If the toolbar item is a bookmark, simply navigate
-			to its directory. If it's a folder, open a menu with
-			its sub-items on. */
-			if(Bookmark.Type == BOOKMARK_TYPE_BOOKMARK)
-			{
-				ExpandAndBrowsePath(Bookmark.szLocation);
-			}
-			else
-			{
-				HMENU		hMenu;
-				Bookmark_t	ChildBookmark;
-				RECT		rc;
-				HRESULT		hr;
-
-				hMenu = CreatePopupMenu();
-
-				MENUINFO mi;
-				mi.cbSize	= sizeof(MENUINFO);
-				mi.fMask	= MIM_STYLE;
-				mi.dwStyle	= MNS_NOTIFYBYPOS;
-				SetMenuInfo(hMenu,&mi);
-
-				hr = m_Bookmark.GetChild(&Bookmark,&ChildBookmark);
-
-				if(SUCCEEDED(hr))
-				{
-					InsertBookmarksIntoMenuInternal(hMenu,&ChildBookmark,0,MENU_BOOKMARK_STARTID);
-				}
-				else
-				{
-					InsertBookmarksIntoMenuInternal(hMenu,NULL,0,MENU_BOOKMARK_STARTID);
-				}
-
-				SendMessage(m_hBookmarksToolbar,TB_GETITEMRECT,iIndex,(LPARAM)&rc);
-				MapWindowPoints(m_hBookmarksToolbar,NULL,(LPPOINT)&rc,2);
-
-				TrackPopupMenu(hMenu,TPM_LEFTALIGN,rc.left,rc.bottom,0,hwnd,NULL);
-			}
+			/* TODO: [Bookmarks] Handle message. */
 		}
 	}
 
@@ -1694,7 +1654,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wPara
 
 		case RBN_HEIGHTCHANGE:
 			/* The listview and treeview may
-			need to be moved to accomodate the new
+			need to be moved to accommodate the new
 			rebar size. */
 			AdjustFolderPanePosition();
 			ResizeWindows();
@@ -1844,49 +1804,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wPara
 
 								case ID_BOOKMARKSTOOLBAR:
 									{
-										Bookmark_t	Bookmark;
-										int			iIndex;
-
-										iIndex = (int)SendMessage(m_hBookmarksToolbar,TB_COMMANDTOINDEX,tbButton.idCommand,0);
-
-										if(iIndex != -1)
-										{
-											SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iIndex,(LPARAM)&tbButton);
-
-											m_Bookmark.RetrieveBookmark((void *)tbButton.dwData,&Bookmark);
-
-											if(Bookmark.Type == BOOKMARK_TYPE_FOLDER)
-											{
-												Bookmark_t	ChildBookmark;
-												HRESULT		hr;
-
-												hSubMenu = CreateMenu();
-												m_hBookmarksMenu = CreateMenu();
-
-												MENUINFO mi;
-												mi.cbSize	= sizeof(MENUINFO);
-												mi.fMask	= MIM_STYLE;
-												mi.dwStyle	= MNS_NOTIFYBYPOS;
-												SetMenuInfo(hSubMenu,&mi);
-
-												hr = m_Bookmark.GetChild(&Bookmark,&ChildBookmark);
-
-												if(SUCCEEDED(hr))
-												{
-													InsertBookmarksIntoMenuInternal(hSubMenu,&ChildBookmark,0,MENU_BOOKMARK_STARTID);
-													InsertBookmarksIntoMenuInternal(m_hBookmarksMenu,&ChildBookmark,0,MENU_BOOKMARK_STARTID);
-												}
-												else
-												{
-													InsertBookmarksIntoMenuInternal(hSubMenu,NULL,0,MENU_BOOKMARK_STARTID);
-													InsertBookmarksIntoMenuInternal(m_hBookmarksMenu,NULL,0,MENU_BOOKMARK_STARTID);
-												}
-
-												SetMenuOwnerDraw(hSubMenu);
-
-												fMask |= MIIM_SUBMENU;
-											}
-										}
+										/* TODO: [Bookmarks] Build menu. */
 									}
 									break;
 								}

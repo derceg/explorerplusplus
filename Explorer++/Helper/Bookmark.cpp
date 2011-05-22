@@ -71,26 +71,6 @@ HRESULT CBookmark::GetChild(Bookmark_t *pParent,Bookmark_t *pChild)
 	return hr;
 }
 
-HRESULT CBookmark::GetNextBookmarkSibling(Bookmark_t *pParent,Bookmark_t *pSibling)
-{
-	BookmarkInternal_t	*pbi = NULL;
-	HRESULT				hr = E_FAIL;
-
-	pbi = (BookmarkInternal_t *)pParent->pHandle;
-
-	/* Does this item have any siblings?
-	If it does, copy the bookmark information
-	across. */
-	if(pbi->NextSibling != NULL)
-	{
-		ExportBookmarkInternal((BookmarkInternal_t *)pbi->NextSibling,pSibling);
-
-		hr = S_OK;
-	}
-
-	return hr;
-}
-
 void CBookmark::ImportBookmarkInternal(BookmarkInternal_t *pbi,Bookmark_t *pBookmark)
 {
 	StringCchCopy(pbi->szItemName,SIZEOF_ARRAY(pbi->szItemName),

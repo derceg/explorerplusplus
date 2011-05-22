@@ -56,7 +56,7 @@ LRESULT CALLBACK Explorerplusplus::BookmarksToolbarSubclass(HWND hwnd,UINT uMsg,
 				TBBUTTON tbButton;
 				SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
 
-				/* TODO: If this is a bookmark, open it in a new tab. */
+				/* TODO: [Bookmarks] If this is a bookmark, open it in a new tab. */
 			}
 		}
 		break;
@@ -67,187 +67,18 @@ LRESULT CALLBACK Explorerplusplus::BookmarksToolbarSubclass(HWND hwnd,UINT uMsg,
 
 void Explorerplusplus::InsertBookmarksIntoMenu(void)
 {
-	Bookmark_t		RootBookmark;
-	Bookmark_t		FirstChild;
-	MENUITEMINFO	mii;
-	HRESULT			hr;
-	int				nBookmarksAddedToMenu;
-	int				i = 0;
-
-	nBookmarksAddedToMenu = GetMenuItemCount(m_hBookmarksMenu) - 3;
-
-	if(nBookmarksAddedToMenu > 0)
-	{
-		/* First, delete any previous bookmarks from the
-		menu. */
-		for(i = nBookmarksAddedToMenu - 1;i >= 0;i--)
-		{
-			mii.cbSize	= sizeof(mii);
-			mii.fMask	= MIIM_DATA;
-			GetMenuItemInfo(m_hBookmarksMenu,MENU_BOOKMARK_STARTPOS + i,TRUE,&mii);
-
-			free((void *)mii.dwItemData);
-
-			DeleteMenu(m_hBookmarksMenu,MENU_BOOKMARK_STARTPOS + i,MF_BYPOSITION);
-		}
-
-		g_iStartId = MENU_BOOKMARK_STARTID;
-	}
-
-	m_Bookmark.GetRoot(&RootBookmark);
-
-	hr = m_Bookmark.GetChild(&RootBookmark,&FirstChild);
-
-	if(SUCCEEDED(hr))
-	{
-		InsertBookmarksIntoMenuInternal(m_hBookmarksMenu,&FirstChild,MENU_BOOKMARK_STARTPOS);
-	}
-}
-
-void Explorerplusplus::InsertBookmarksIntoMenuInternal(HMENU hMenu,
-Bookmark_t *pBookmark,int iStartPos,int iStartId)
-{
-	g_iStartId = iStartId;
-
-	InsertBookmarksIntoMenuInternal(hMenu,pBookmark,iStartPos);
-}
-
-void Explorerplusplus::InsertBookmarksIntoMenuInternal(HMENU hMenu,
-Bookmark_t *pBookmark,int iStartPos)
-{
-	MENUITEMINFO		mi;
-	Bookmark_t			ChildBookmark;
-	Bookmark_t			SiblingBookmark;
-	CustomMenuInfo_t	*pcmi = NULL;
-	HRESULT				hr;
-	BOOL				res;
-
-	/* pBookmark may be NULL when creating a menu
-	for a folder on the bookmarks toolbar, when that
-	folder has no children. */
-	if(pBookmark == NULL)
-	{
-		mi.cbSize		= sizeof(mi);
-		mi.fMask		= MIIM_STRING|MIIM_ID;
-		mi.wID			= IDM_BOOKMARKS_BOOKMARKTHISTAB;
-		mi.dwTypeData	= _T("Bookmark This Tab...");
-		res = InsertMenuItem(hMenu,0,TRUE,&mi);
-
-		SetMenuItemOwnerDrawn(hMenu,0);
-
-		return;
-	}
-
-	if(pBookmark->Type == BOOKMARK_TYPE_BOOKMARK)
-	{
-		mi.cbSize		= sizeof(mi);
-		mi.fMask		= MIIM_STRING|MIIM_ID;
-		mi.wID			= g_iStartId++;
-		mi.dwTypeData	= pBookmark->szItemName;
-		res = InsertMenuItem(hMenu,iStartPos,TRUE,&mi);
-
-		SetMenuItemOwnerDrawn(hMenu,iStartPos);
-
-		mi.cbSize		= sizeof(mi);
-		mi.fMask		= MIIM_DATA;
-		res = GetMenuItemInfo(hMenu,iStartPos,TRUE,&mi);
-
-		pcmi = (CustomMenuInfo_t *)mi.dwItemData;
-
-		pcmi->dwItemData = (ULONG_PTR)pBookmark->pHandle;
-	}
-	else
-	{
-		HMENU hSubMenu;
-
-		hSubMenu = CreateMenu();
-
-		InsertMenu(hMenu,iStartPos,MF_BYPOSITION|MF_POPUP,1010,pBookmark->szItemName);
-
-		mi.cbSize		= sizeof(mi);
-		mi.fMask		= MIIM_SUBMENU;
-		mi.hSubMenu		= hSubMenu;
-		SetMenuItemInfo(hMenu,iStartPos,TRUE,&mi);
-		SetMenuItemOwnerDrawn(hMenu,iStartPos);
-
-		mi.cbSize		= sizeof(mi);
-		mi.fMask		= MIIM_STRING|MIIM_ID;
-		mi.wID			= IDM_BOOKMARKS_BOOKMARKTHISTAB;
-		mi.dwTypeData	= _T("Bookmark This Tab...");
-		res = InsertMenuItem(hSubMenu,0,TRUE,&mi);
-		SetMenuItemOwnerDrawn(hSubMenu,0);
-
-		hr = m_Bookmark.GetChild(pBookmark,&ChildBookmark);
-
-		if(SUCCEEDED(hr))
-		{
-			/* Only insert a separator if this item actually
-			has children. */
-			mi.cbSize		= sizeof(mi);
-			mi.fMask		= MIIM_FTYPE;
-			mi.fType		= MFT_SEPARATOR;
-			res = InsertMenuItem(hSubMenu,1,TRUE,&mi);
-			SetMenuItemOwnerDrawn(hSubMenu,1);
-
-			InsertBookmarksIntoMenuInternal(hSubMenu,&ChildBookmark,
-				BOOKMARK_SUBMENU_POSITION_START);
-		}
-	}
-
-	hr = m_Bookmark.GetNextBookmarkSibling(pBookmark,&SiblingBookmark);
-
-	if(SUCCEEDED(hr))
-	{
-		InsertBookmarksIntoMenuInternal(hMenu,&SiblingBookmark,iStartPos + 1);
-	}
+	/* TODO: [Bookmarks] Rewrite. */
 }
 
 void Explorerplusplus::InsertBookmarkToolbarButtons(void)
 {
-	Bookmark_t		RootBookmark;
-	HIMAGELIST		himl;
-	HBITMAP			hb;
-
-	himl = ImageList_Create(16,16,ILC_COLOR32 | ILC_MASK,0,1);
-	hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
+	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32 | ILC_MASK,0,1);
+	HBITMAP hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
 	ImageList_Add(himl,hb,NULL);
+	SendMessage(m_hBookmarksToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himl));
 	DeleteObject(hb);
 
-	/* Add the custom buttons to the toolbars image list. */
-	SendMessage(m_hBookmarksToolbar,TB_SETIMAGELIST,0,(LPARAM)himl);
-
-	m_Bookmark.GetRoot(&RootBookmark);
-
-	InsertToolbarButtonsInternal(&RootBookmark);
-}
-
-void Explorerplusplus::InsertToolbarButtonsInternal(Bookmark_t *pBookmark)
-{
-	Bookmark_t	CurrentBookmark;
-	Bookmark_t	ChildBookmark;
-	HRESULT		hr;
-
-	hr = m_Bookmark.GetChild(pBookmark,&CurrentBookmark);
-
-	while(SUCCEEDED(hr))
-	{
-		if(CurrentBookmark.bShowOnToolbar)
-		{
-			InsertBookmarkIntoToolbar(&CurrentBookmark,GenerateUniqueBookmarkToolbarId());
-		}
-
-		if(CurrentBookmark.Type == BOOKMARK_TYPE_FOLDER)
-		{
-			hr = m_Bookmark.GetChild(&CurrentBookmark,&ChildBookmark);
-
-			if(SUCCEEDED(hr))
-			{
-				InsertToolbarButtonsInternal(&ChildBookmark);
-			}
-		}
-
-		hr = m_Bookmark.GetNextBookmarkSibling(&CurrentBookmark,&CurrentBookmark);
-	}
+	/* TODO: [Bookmarks] Rewrite. */
 }
 
 void Explorerplusplus::InsertBookmarkIntoToolbar(Bookmark_t *pBookmark,int id)

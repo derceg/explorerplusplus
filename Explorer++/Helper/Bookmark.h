@@ -39,7 +39,6 @@ public:
 
 	void	GetRoot(Bookmark_t *pRoot);
 	HRESULT	GetChild(Bookmark_t *pParent,Bookmark_t *pChild);
-	HRESULT	GetNextBookmarkSibling(Bookmark_t *pParent,Bookmark_t *pSibling);
 	void	CreateNewBookmark(void *pParentHandle,Bookmark_t *pFolder);
 	void	DeleteBookmark(void *pBookmarkHandle);
 	void	RetrieveBookmark(void *pBookmarkHandle,Bookmark_t *pBookmark);
