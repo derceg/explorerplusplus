@@ -35,10 +35,13 @@ public:
 	CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,BookmarkFolder *pAllBookmarks,Bookmark *pBookmark);
 	~CAddBookmarkDialog();
 
+	LRESULT CALLBACK	TreeViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+
 protected:
 
 	BOOL	OnInitDialog();
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
+	BOOL	OnNotify(NMHDR *pnmhdr);
 	BOOL	OnClose();
 	BOOL	OnDestroy();
 
@@ -47,6 +50,10 @@ private:
 	void		InsertFoldersIntoTreeView();
 	HTREEITEM	InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,BookmarkFolder *pBookmarkFolder);
 	void		OnNewFolder();
+
+	void		OnTvnBeginLabelEdit();
+	BOOL		OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi);
+	void		OnTvnKeyDown(NMTVKEYDOWN *pnmtvkd);
 
 	BookmarkFolder	*CAddBookmarkDialog::GetBookmarkFolderFromTreeView(HTREEITEM hItem);
 

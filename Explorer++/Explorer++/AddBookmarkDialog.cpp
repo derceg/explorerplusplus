@@ -18,6 +18,12 @@
 #include "MainResource.h"
 
 
+namespace NAddBookmarkDialog
+{
+	LRESULT CALLBACK TreeViewEditProcStub(HWND hwnd,UINT uMsg,
+		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+}
+
 const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
 CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,
@@ -148,6 +154,26 @@ BOOL CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
+BOOL CAddBookmarkDialog::OnNotify(NMHDR *pnmhdr)
+{
+	switch(pnmhdr->code)
+	{
+	case TVN_BEGINLABELEDIT:
+		OnTvnBeginLabelEdit();
+		break;
+
+	case TVN_ENDLABELEDIT:
+		return OnTvnEndLabelEdit(reinterpret_cast<NMTVDISPINFO *>(pnmhdr));
+		break;
+
+	case TVN_KEYDOWN:
+		OnTvnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(pnmhdr));
+		break;
+	}
+
+	return 0;
+}
+
 void CAddBookmarkDialog::OnNewFolder()
 {
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
@@ -213,6 +239,73 @@ BookmarkFolder *CAddBookmarkDialog::GetBookmarkFolderFromTreeView(HTREEITEM hIte
 	}
 
 	return pBookmarkFolder;
+}
+
+void CAddBookmarkDialog::OnTvnBeginLabelEdit()
+{
+	HWND hEdit = reinterpret_cast<HWND>(SendDlgItemMessage(m_hDlg,
+		IDC_BOOKMARK_TREEVIEW,TVM_GETEDITCONTROL,0,0));
+	SetWindowSubclass(hEdit,NAddBookmarkDialog::TreeViewEditProcStub,0,
+		reinterpret_cast<DWORD_PTR>(this));
+}
+
+BOOL CAddBookmarkDialog::OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi)
+{
+	HWND hEdit = reinterpret_cast<HWND>(SendDlgItemMessage(m_hDlg,
+		IDC_BOOKMARK_TREEVIEW,TVM_GETEDITCONTROL,0,0));
+	RemoveWindowSubclass(hEdit,NAddBookmarkDialog::TreeViewEditProcStub,0);
+
+	if(pnmtvdi->item.pszText != NULL &&
+		lstrlen(pnmtvdi->item.pszText) > 0)
+	{
+		BookmarkFolder *pBookmarkFolder = GetBookmarkFolderFromTreeView(pnmtvdi->item.hItem);
+		pBookmarkFolder->SetName(pnmtvdi->item.pszText);
+
+		SetWindowLongPtr(m_hDlg,DWLP_MSGRESULT,TRUE);
+		return TRUE;
+	}
+
+	SetWindowLongPtr(m_hDlg,DWLP_MSGRESULT,FALSE);
+	return FALSE;
+}
+
+LRESULT CALLBACK NAddBookmarkDialog::TreeViewEditProcStub(HWND hwnd,UINT uMsg,
+	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+{
+	CAddBookmarkDialog *pabd = reinterpret_cast<CAddBookmarkDialog *>(dwRefData);
+
+	return pabd->TreeViewEditProc(hwnd,uMsg,wParam,lParam);
+}
+
+LRESULT CALLBACK CAddBookmarkDialog::TreeViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+{
+	switch(Msg)
+	{
+	case WM_GETDLGCODE:
+		switch(wParam)
+		{
+		case VK_RETURN:
+			return DLGC_WANTALLKEYS;
+			break;
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd,Msg,wParam,lParam);
+}
+
+void CAddBookmarkDialog::OnTvnKeyDown(NMTVKEYDOWN *pnmtvkd)
+{
+	switch(pnmtvkd->wVKey)
+	{
+	case VK_F2:
+		{
+			HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
+			HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
+			TreeView_EditLabel(hTreeView,hSelectedItem);
+		}
+		break;
+	}
 }
 
 void CAddBookmarkDialog::OnOk()
