@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include <list>
+#include <algorithm>
 #include "Bookmark.h"
 #include "RegistrySettings.h"
 
@@ -277,7 +278,8 @@ UINT Bookmark::GetID()
 
 BookmarkFolder::BookmarkFolder(const std::wstring &strName) :
 	m_ID(++m_IDCounter),
-	m_strName(strName)
+	m_strName(strName),
+	m_nChildFolders(0)
 {
 	 
 }
@@ -302,28 +304,44 @@ UINT BookmarkFolder::GetID()
 	return m_ID;
 }
 
+void BookmarkFolder::InsertBookmark(const Bookmark &bm)
+{
+	InsertBookmark(bm,m_ChildList.size());
+}
+
 void BookmarkFolder::InsertBookmark(const Bookmark &bm,std::size_t Position)
 {
 	if(Position > (m_ChildList.size() - 1))
 	{
-		Position = m_ChildList.size() - 1;
+		m_ChildList.push_back(bm);
 	}
+	else
+	{
+		auto itr = m_ChildList.begin();
+		std::advance(itr,Position);
+		m_ChildList.insert(itr,bm);
+	}
+}
 
-	auto itr = m_ChildList.begin();
-	std::advance(itr,Position);
-	m_ChildList.insert(itr,bm);
+void BookmarkFolder::InsertBookmarkFolder(const BookmarkFolder &bf)
+{
+	InsertBookmarkFolder(bf,m_ChildList.size());
 }
 
 void BookmarkFolder::InsertBookmarkFolder(const BookmarkFolder &bf,std::size_t Position)
 {
 	if(Position > (m_ChildList.size() - 1))
 	{
-		Position = m_ChildList.size() - 1;
+		m_ChildList.push_back(bf);
+	}
+	else
+	{
+		auto itr = m_ChildList.begin();
+		std::advance(itr,Position);
+		m_ChildList.insert(itr,bf);
 	}
 
-	auto itr = m_ChildList.begin();
-	std::advance(itr,Position);
-	m_ChildList.insert(itr,bf);
+	m_nChildFolders++;
 }
 
 std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator BookmarkFolder::begin()
@@ -334,4 +352,38 @@ std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator BookmarkFolder::beg
 std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator BookmarkFolder::end()
 {
 	return m_ChildList.end();
+}
+
+bool BookmarkFolder::HasChildFolder()
+{
+	if(m_nChildFolders > 0)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+BookmarkFolder *BookmarkFolder::GetBookmarkFolder(UINT uID)
+{
+	auto itr = std::find_if(m_ChildList.begin(),m_ChildList.end(),
+		[uID](boost::variant<BookmarkFolder,Bookmark> &Variant) -> BOOL
+		{
+			BookmarkFolder *pBookmarkFolder = boost::get<BookmarkFolder>(&Variant);
+
+			if(pBookmarkFolder)
+			{
+				return pBookmarkFolder->GetID() == uID;
+			}
+
+			return FALSE;
+		}
+	);
+
+	if(itr != m_ChildList.end())
+	{
+		return boost::get<BookmarkFolder>(&(*itr));
+	}
+
+	return NULL;
 }

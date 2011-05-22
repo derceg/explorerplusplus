@@ -48,6 +48,8 @@ private:
 	HTREEITEM	InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,BookmarkFolder *pBookmarkFolder);
 	void		OnNewFolder();
 
+	BookmarkFolder	*CAddBookmarkDialog::GetBookmarkFolderFromTreeView(HTREEITEM hItem);
+
 	void		OnOk();
 	void		OnCancel();
 

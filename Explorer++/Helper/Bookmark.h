@@ -94,9 +94,15 @@ public:
 
 	void			SetName(const std::wstring &strName);
 
+	/* Returns true if this folder has *at least*
+	one child folder. */
+	bool			HasChildFolder();
+
 	std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator	begin();
 	std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator	end();
 
+	void			InsertBookmark(const Bookmark &bm);
+	void			InsertBookmarkFolder(const BookmarkFolder &bf);
 	void			InsertBookmark(const Bookmark &bm,std::size_t Position);
 	void			InsertBookmarkFolder(const BookmarkFolder &bf,std::size_t Position);
 
@@ -104,7 +110,7 @@ public:
 	void			RemoveBookmarkFolder();
 
 	void			GetBookmark(UINT uID);
-	void			GetBookmarkFolder(UINT uID);
+	BookmarkFolder	*BookmarkFolder::GetBookmarkFolder(UINT uID);
 
 	void			GetIterator();
 
@@ -114,6 +120,12 @@ private:
 	UINT			m_ID;
 
 	std::wstring	m_strName;
+
+	/* Keeps track of the number of child
+	folders that are added. Used purely as
+	an optimization for the HasChildFolder()
+	method above. */
+	int				m_nChildFolders;
 
 	/* List of child folders and bookmarks. Note that
 	the ordering within this list defines the ordering

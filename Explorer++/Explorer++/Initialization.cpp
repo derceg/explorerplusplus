@@ -34,11 +34,11 @@ void Explorerplusplus::InitializeBookmarks(void)
 	/* Set up the 'Bookmarks Toolbar' and 'Bookmarks Menu' folders. */
 	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSTOOLBAR,szTemp,SIZEOF_ARRAY(szTemp));
 	BookmarkFolder bfBookmarksToolbar(szTemp);
-	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksToolbar,0);
+	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksToolbar);
 
 	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSMENU,szTemp,SIZEOF_ARRAY(szTemp));
 	BookmarkFolder bfBookmarksMenu(szTemp);
-	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu,1);
+	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu);
 
 	HMENU	hMenu;
 	HMENU	hBookmarkMenu;
