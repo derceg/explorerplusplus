@@ -67,7 +67,52 @@ BOOL CAddBookmarkDialog::OnInitDialog()
 	SendMessage(hEditName,EM_SETSEL,0,-1);
 	SetFocus(hEditName);
 
+	m_pabdps->RestoreDialogPosition(m_hDlg,true);
+
 	return 0;
+}
+
+void CAddBookmarkDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
+	std::list<CResizableDialog::Control_t> &ControlList)
+{
+	dsc = CBaseDialog::DIALOG_SIZE_CONSTRAINT_NONE;
+
+	CResizableDialog::Control_t Control;
+
+	Control.iID = IDC_BOOKMARK_NAME;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_BOOKMARK_LOCATION;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_X;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_BOOKMARK_TREEVIEW;
+	Control.Type = CResizableDialog::TYPE_RESIZE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_BOOKMARK_NEWFOLDER;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_Y;
+	ControlList.push_back(Control);
+
+	Control.iID = IDOK;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDCANCEL;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
+
+	Control.iID = IDC_GRIPPER;
+	Control.Type = CResizableDialog::TYPE_MOVE;
+	Control.Constraint = CResizableDialog::CONSTRAINT_NONE;
+	ControlList.push_back(Control);
 }
 
 void CAddBookmarkDialog::InsertFoldersIntoTreeView()
@@ -316,6 +361,13 @@ void CAddBookmarkDialog::OnOk()
 void CAddBookmarkDialog::OnCancel()
 {
 	EndDialog(m_hDlg,0);
+}
+
+void CAddBookmarkDialog::SaveState()
+{
+	m_pabdps->SaveDialogPosition(m_hDlg);
+
+	m_pabdps->m_bStateSaved = TRUE;
 }
 
 BOOL CAddBookmarkDialog::OnClose()
