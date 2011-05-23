@@ -18,14 +18,22 @@
 #include "MainResource.h"
 
 
+namespace NManageBookmarksDialog
+{
+	LRESULT CALLBACK EditSearchProcStub(HWND hwnd,UINT uMsg,
+		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+}
+
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,
 	BookmarkFolder *pAllBookmarks) :
+m_pAllBookmarks(pAllBookmarks),
+m_bSearchFieldBlank(true),
+m_bEditingSearchField(false),
+m_hEditSearchFont(NULL),
 CBaseDialog(hInstance,iResource,hParent,true)
 {
-	m_pAllBookmarks = pAllBookmarks;
-
 	m_pmbdps = &CManageBookmarksDialogPersistentSettings::GetInstance();
 }
 
@@ -36,9 +44,21 @@ CManageBookmarksDialog::~CManageBookmarksDialog()
 
 BOOL CManageBookmarksDialog::OnInitDialog()
 {
-	/* TODO: Set text color to gray. */
-	SetDlgItemText(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH,_T("Search Bookmarks"));
+	HWND hEdit = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH);
+	SetWindowSubclass(hEdit,NManageBookmarksDialog::EditSearchProcStub,
+		0,reinterpret_cast<DWORD_PTR>(this));
+	SetSearchFieldDefaultState();
 
+	SetupTreeView();
+	SetupListView();
+
+	SetFocus(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW));
+
+	return 0;
+}
+
+void CManageBookmarksDialog::SetupTreeView()
+{
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 	SetWindowTheme(hTreeView,L"Explorer",NULL);
 
@@ -49,7 +69,10 @@ BOOL CManageBookmarksDialog::OnInitDialog()
 	DeleteObject(hBitmap);
 
 	InsertFoldersIntoTreeView();
+}
 
+void CManageBookmarksDialog::SetupListView()
+{
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
 	SetWindowTheme(hListView,L"Explorer",NULL);
@@ -76,8 +99,92 @@ BOOL CManageBookmarksDialog::OnInitDialog()
 	SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,m_pmbdps->m_iColumnWidth2);
 
 	InsertBookmarksIntoListView(m_pAllBookmarks);
+}
 
-	return 0;
+/* Changes the font within the search edit
+control, and sets the default text. */
+void CManageBookmarksDialog::SetSearchFieldDefaultState()
+{
+	HWND hEdit = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH);
+
+	LOGFONT lf;
+	HFONT hCurentFont = reinterpret_cast<HFONT>(SendMessage(hEdit,WM_GETFONT,0,0));
+	GetObject(hCurentFont,sizeof(lf),reinterpret_cast<LPVOID>(&lf));
+
+	HFONT hPrevEditSearchFont = m_hEditSearchFont;
+
+	lf.lfItalic = TRUE;
+	m_hEditSearchFont = CreateFontIndirect(&lf);
+	SendMessage(hEdit,WM_SETFONT,reinterpret_cast<WPARAM>(m_hEditSearchFont),MAKEWORD(TRUE,0));
+
+	if(hPrevEditSearchFont != NULL)
+	{
+		DeleteFont(hPrevEditSearchFont);
+	}
+
+	TCHAR szTemp[64];
+	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_DEFAULT_SEARCH_TEXT,szTemp,SIZEOF_ARRAY(szTemp));
+	SetWindowText(hEdit,szTemp);
+}
+
+/* Resets the font within the search
+field and removes any text. */
+void CManageBookmarksDialog::RemoveSearchFieldDefaultState()
+{
+	HWND hEdit = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH);
+
+	LOGFONT lf;
+	HFONT hCurentFont = reinterpret_cast<HFONT>(SendMessage(hEdit,WM_GETFONT,0,0));
+	GetObject(hCurentFont,sizeof(lf),reinterpret_cast<LPVOID>(&lf));
+
+	HFONT hPrevEditSearchFont = m_hEditSearchFont;
+
+	lf.lfItalic = FALSE;
+	m_hEditSearchFont = CreateFontIndirect(&lf);
+	SendMessage(hEdit,WM_SETFONT,reinterpret_cast<WPARAM>(m_hEditSearchFont),MAKEWORD(TRUE,0));
+
+	DeleteFont(hPrevEditSearchFont);
+
+	SetWindowText(hEdit,EMPTY_STRING);
+}
+
+LRESULT CALLBACK NManageBookmarksDialog::EditSearchProcStub(HWND hwnd,UINT uMsg,
+	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+{
+	CManageBookmarksDialog *pmbd = reinterpret_cast<CManageBookmarksDialog *>(dwRefData);
+
+	return pmbd->EditSearchProc(hwnd,uMsg,wParam,lParam);
+}
+
+LRESULT CALLBACK CManageBookmarksDialog::EditSearchProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+{
+	switch(Msg)
+	{
+	case WM_SETFOCUS:
+		if(m_bSearchFieldBlank)
+		{
+			RemoveSearchFieldDefaultState();
+		}
+
+		m_bEditingSearchField = true;
+		break;
+
+	case WM_KILLFOCUS:
+		if(GetWindowTextLength(hwnd) == 0)
+		{
+			m_bSearchFieldBlank = true;
+			SetSearchFieldDefaultState();
+		}
+		else
+		{
+			m_bSearchFieldBlank = false;
+		}
+
+		m_bEditingSearchField = false;
+		break;
+	}
+
+	return DefSubclassProc(hwnd,Msg,wParam,lParam);
 }
 
 /* TODO: The three methods below are shared with CAddBookmarkDialog.
@@ -206,13 +313,50 @@ void CManageBookmarksDialog::InsertBookmarkIntoListView(HWND hListView,Bookmark 
 
 }
 
-/* TODO: No cancel button, so won't respond to escape. */
+INT_PTR CManageBookmarksDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
+{
+	if(hwnd == GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH))
+	{
+		if(m_bSearchFieldBlank &&
+			!m_bEditingSearchField)
+		{
+			SetTextColor(hdc,SEARCH_TEXT_COLOR);
+			SetBkMode(hdc,TRANSPARENT);
+			return reinterpret_cast<INT_PTR>(GetSysColorBrush(COLOR_WINDOW));
+		}
+		else
+		{
+			SetTextColor(hdc,GetSysColor(COLOR_WINDOWTEXT));
+			SetBkMode(hdc,TRANSPARENT);
+			return reinterpret_cast<INT_PTR>(GetSysColorBrush(COLOR_WINDOW));
+		}
+	}
+
+	return 0;
+}
+
 BOOL CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
 	case IDOK:
 		OnOk();
+		break;
+
+	case IDCANCEL:
+		OnCancel();
+		break;
+	}
+
+	return 0;
+}
+
+BOOL CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
+{
+	switch(pnmhdr->code)
+	{
+	case EN_CHANGE:
+		/* TODO: Perform live search of bookmarks. */
 		break;
 	}
 
@@ -224,6 +368,11 @@ void CManageBookmarksDialog::OnOk()
 	EndDialog(m_hDlg,1);
 }
 
+void CManageBookmarksDialog::OnCancel()
+{
+	EndDialog(m_hDlg,0);
+}
+
 BOOL CManageBookmarksDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
@@ -232,6 +381,7 @@ BOOL CManageBookmarksDialog::OnClose()
 
 BOOL CManageBookmarksDialog::OnDestroy()
 {
+	DeleteFont(m_hEditSearchFont);
 	ImageList_Destroy(m_himlTreeView);
 	return 0;
 }

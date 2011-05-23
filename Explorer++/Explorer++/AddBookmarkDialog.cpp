@@ -28,11 +28,10 @@ const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookma
 
 CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,
 	BookmarkFolder *pAllBookmarks,Bookmark *pBookmark) :
+m_pAllBookmarks(pAllBookmarks),
+m_pBookmark(pBookmark),
 CBaseDialog(hInstance,iResource,hParent,true)
 {
-	m_pAllBookmarks = pAllBookmarks;
-	m_pBookmark = pBookmark;
-
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
 }
 

@@ -40,6 +40,7 @@ protected:
 	virtual BOOL	OnInitDialog();
 	virtual BOOL	OnTimer(int iTimerID);
 	virtual INT_PTR	OnCtlColorStatic(HWND hwnd,HDC hdc);
+	virtual INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc);
 	virtual BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	virtual BOOL	OnNotify(NMHDR *pnmhdr);
 	virtual BOOL	OnGetMinMaxInfo(LPMINMAXINFO pmmi);

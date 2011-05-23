@@ -39,16 +39,28 @@ public:
 	CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,BookmarkFolder *pAllBookmarks);
 	~CManageBookmarksDialog();
 
+	LRESULT CALLBACK	EditSearchProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+
 protected:
 
 	BOOL	OnInitDialog();
+	INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc);
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
+	BOOL	OnNotify(NMHDR *pnmhdr);
 	BOOL	OnClose();
 	BOOL	OnDestroy();
 
 	void	SaveState();
 
 private:
+
+	static const COLORREF SEARCH_TEXT_COLOR = RGB(120,120,120);
+
+	void		SetupTreeView();
+	void		SetupListView();
+
+	void		SetSearchFieldDefaultState();
+	void		RemoveSearchFieldDefaultState();
 
 	void		InsertFoldersIntoTreeView();
 	HTREEITEM	InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,BookmarkFolder *pBookmarkFolder);
@@ -59,9 +71,14 @@ private:
 	void		InsertBookmarkIntoListView(HWND hListView,Bookmark *pBookmark);
 
 	void		OnOk();
+	void		OnCancel();
 
 	BookmarkFolder	*m_pAllBookmarks;
 	HIMAGELIST		m_himlTreeView;
+
+	HFONT			m_hEditSearchFont;
+	bool			m_bSearchFieldBlank;
+	bool			m_bEditingSearchField;
 
 	CManageBookmarksDialogPersistentSettings	*m_pmbdps;
 };
