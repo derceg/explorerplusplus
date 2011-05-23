@@ -68,7 +68,13 @@ private:
 
 	void		InsertBookmarksIntoListView(BookmarkFolder *pBookmarkFolder);
 	void		InsertBookmarkFolderIntoListView(HWND hListView,BookmarkFolder *pBookmarkFolder,int iPosition);
-	void		InsertBookmarkIntoListView(HWND hListView,Bookmark *pBookmark);
+	void		InsertBookmarkIntoListView(HWND hListView,Bookmark *pBookmark,int iPosition);
+	void		InsertBookmarkItemIntoListView(HWND hListView,const std::wstring &strName,UINT uID,int iPosition);
+	void		GetBookmarkItemFromListView(int iItem);
+
+	void		OnEnChange(HWND hEdit);
+	void		OnTvnSelChanged(NMTREEVIEW *pnmtv);
+	void		OnDblClk(NMHDR *pnmhdr);
 
 	void		OnOk();
 	void		OnCancel();

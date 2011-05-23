@@ -274,6 +274,7 @@ BookmarkFolder *CManageBookmarksDialog::GetBookmarkFolderFromTreeView(HTREEITEM 
 void CManageBookmarksDialog::InsertBookmarksIntoListView(BookmarkFolder *pBookmarkFolder)
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+	ListView_DeleteAllItems(hListView);
 
 	int iItem = 0;
 
@@ -285,7 +286,7 @@ void CManageBookmarksDialog::InsertBookmarksIntoListView(BookmarkFolder *pBookma
 		}
 		else if(Bookmark *pBookmark = boost::get<Bookmark>(&(*itr)))
 		{
-			InsertBookmarkIntoListView(hListView,pBookmark);
+			InsertBookmarkIntoListView(hListView,pBookmark,iItem);
 		}
 
 		iItem++;
@@ -295,8 +296,22 @@ void CManageBookmarksDialog::InsertBookmarksIntoListView(BookmarkFolder *pBookma
 void CManageBookmarksDialog::InsertBookmarkFolderIntoListView(HWND hListView,
 	BookmarkFolder *pBookmarkFolder,int iPosition)
 {
+	InsertBookmarkItemIntoListView(hListView,pBookmarkFolder->GetName(),
+		pBookmarkFolder->GetID(),iPosition);
+}
+
+void CManageBookmarksDialog::InsertBookmarkIntoListView(HWND hListView,
+	Bookmark *pBookmark,int iPosition)
+{
+	InsertBookmarkItemIntoListView(hListView,pBookmark->GetName(),
+		pBookmark->GetID(),iPosition);
+}
+
+void CManageBookmarksDialog::InsertBookmarkItemIntoListView(HWND hListView,const std::wstring &strName,
+	UINT uID,int iPosition)
+{
 	TCHAR szName[256];
-	StringCchCopy(szName,SIZEOF_ARRAY(szName),pBookmarkFolder->GetName().c_str());
+	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());
 
 	LVITEM lvi;
 	lvi.mask		= LVIF_TEXT|LVIF_IMAGE|LVIF_PARAM;
@@ -304,13 +319,27 @@ void CManageBookmarksDialog::InsertBookmarkFolderIntoListView(HWND hListView,
 	lvi.iSubItem	= 0;
 	lvi.iImage		= 0;
 	lvi.pszText		= szName;
-	lvi.lParam		= pBookmarkFolder->GetID();
+	lvi.lParam		= uID;
 	ListView_InsertItem(hListView,&lvi);
 }
 
-void CManageBookmarksDialog::InsertBookmarkIntoListView(HWND hListView,Bookmark *pBookmark)
+void CManageBookmarksDialog::GetBookmarkItemFromListView(int iItem)
 {
+	/*HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
+	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
+	BookmarkFolder *pBookmarkFolder = GetBookmarkFolderFromTreeView(hSelectedItem);
 
+	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+
+	LVITEM lvi;
+	lvi.mask		= LVIF_PARAM;
+	lvi.iItem		= iItem;
+	lvi.iSubItem	= 0;
+	ListView_GetItem(hListView,&lvi);*/
+
+	/* TODO: This needs to be able to retrieve either
+	a bookmark or bookmark folder. */
+	//pBookmarkFolder->GetBookmark(lvi.lParam);
 }
 
 INT_PTR CManageBookmarksDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
@@ -339,6 +368,10 @@ BOOL CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
+	case EN_CHANGE:
+		OnEnChange(reinterpret_cast<HWND>(lParam));
+		break;
+
 	case IDOK:
 		OnOk();
 		break;
@@ -355,12 +388,50 @@ BOOL CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
-	case EN_CHANGE:
-		/* TODO: Perform live search of bookmarks. */
+	case TVN_SELCHANGED:
+		OnTvnSelChanged(reinterpret_cast<NMTREEVIEW *>(pnmhdr));
+		break;
+
+	case NM_DBLCLK:
+		OnDblClk(pnmhdr);
 		break;
 	}
 
 	return 0;
+}
+
+void CManageBookmarksDialog::OnEnChange(HWND hEdit)
+{
+	if(hEdit != GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH))
+	{
+		return;
+	}
+
+	std::wstring strSearch;
+	GetWindowString(hEdit,strSearch);
+
+	if(strSearch.size() > 0)
+	{
+
+	}
+}
+
+void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
+{
+	BookmarkFolder *pBookmarkFolder = GetBookmarkFolderFromTreeView(pnmtv->itemNew.hItem);
+	assert(pBookmarkFolder != NULL);
+
+	InsertBookmarksIntoListView(pBookmarkFolder);
+}
+
+void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
+{
+	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+
+	if(pnmhdr->hwndFrom == hListView)
+	{
+		/* TODO: Open bookmark folder/bookmark. */
+	}
 }
 
 void CManageBookmarksDialog::OnOk()
