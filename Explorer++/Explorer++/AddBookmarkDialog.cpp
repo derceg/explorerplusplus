@@ -55,7 +55,7 @@ BOOL CAddBookmarkDialog::OnInitDialog()
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 	SetWindowTheme(hTreeView,L"Explorer",NULL);
 
-	HIMAGELIST m_himlTreeView = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
+	m_himlTreeView = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
 	HBITMAP hBitmap = LoadBitmap(GetInstance(),MAKEINTRESOURCE(IDB_SHELLIMAGES));
 	ImageList_Add(m_himlTreeView,hBitmap,NULL);
 	TreeView_SetImageList(hTreeView,m_himlTreeView,TVSIL_NORMAL);

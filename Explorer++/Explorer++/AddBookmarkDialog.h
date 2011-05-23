@@ -53,13 +53,13 @@ private:
 
 	void		InsertFoldersIntoTreeView();
 	HTREEITEM	InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,BookmarkFolder *pBookmarkFolder);
+	BookmarkFolder	*GetBookmarkFolderFromTreeView(HTREEITEM hItem);
+
 	void		OnNewFolder();
 
 	void		OnTvnBeginLabelEdit();
 	BOOL		OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi);
 	void		OnTvnKeyDown(NMTVKEYDOWN *pnmtvkd);
-
-	BookmarkFolder	*CAddBookmarkDialog::GetBookmarkFolderFromTreeView(HTREEITEM hItem);
 
 	void		OnOk();
 	void		OnCancel();

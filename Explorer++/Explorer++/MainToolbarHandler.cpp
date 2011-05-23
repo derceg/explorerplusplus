@@ -171,7 +171,7 @@ int Explorerplusplus::LookupToolbarButtonTextID(int iButtonID)
 		break;
 
 	case TOOLBAR_ORGANIZEBOOKMARKS:
-		return IDS_TOOLBAR_ORGANIZEBOOKMARKS;
+		return IDS_TOOLBAR_MANAGEBOOKMARKS;
 		break;
 
 	case TOOLBAR_NEWTAB:

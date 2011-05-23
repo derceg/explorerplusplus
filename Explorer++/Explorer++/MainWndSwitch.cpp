@@ -22,6 +22,7 @@
 #include "DestroyFilesDialog.h"
 #include "MergeFilesDialog.h"
 #include "AddBookmarkDialog.h"
+#include "ManageBookmarksDialog.h"
 #include "../Helper/ShellHelper.h"
 
 
@@ -1305,7 +1306,11 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case TOOLBAR_ORGANIZEBOOKMARKS:
-		case IDM_BOOKMARKS_ORGANIZEBOOKMARKS:
+		case IDM_BOOKMARKS_MANAGEBOOKMARKS:
+			{
+				CManageBookmarksDialog ManageBookmarksDialog(g_hLanguageModule,IDD_MANAGE_BOOKMARKS,hwnd,m_bfAllBookmarks);
+				ManageBookmarksDialog.ShowModalDialog();
+			}
 			break;
 
 		case TOOLBAR_SEARCH:

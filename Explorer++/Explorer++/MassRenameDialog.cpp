@@ -63,12 +63,7 @@ BOOL CMassRenameDialog::OnInitDialog()
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MASSRENAME_FILELISTVIEW);
 
-	LONG Style;
-	Style = GetWindowLong(hListView,GWL_STYLE);
-	SetWindowLongPtr(hListView,GWL_STYLE,Style|LVS_SHAREIMAGELISTS);
-
 	SetWindowTheme(hListView,L"Explorer",NULL);
-
 	ListView_SetExtendedListViewStyleEx(hListView,
 		LVS_EX_DOUBLEBUFFER|LVS_EX_SUBITEMIMAGES|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES,
 		LVS_EX_DOUBLEBUFFER|LVS_EX_SUBITEMIMAGES|LVS_EX_FULLROWSELECT|LVS_EX_GRIDLINES);
@@ -92,8 +87,6 @@ BOOL CMassRenameDialog::OnInitDialog()
 	lvCol.pszText	= szTemp;
 	ListView_InsertColumn(hListView,2,&lvCol);
 
-	RECT rc;
-	GetClientRect(hListView,&rc);
 	SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,m_pmrdps->m_iColumnWidth1);
 	SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,m_pmrdps->m_iColumnWidth2);
 

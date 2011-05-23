@@ -278,6 +278,7 @@
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="MainToolbarHandler.cpp" />
     <ClCompile Include="MainWndSwitch.cpp" />
+    <ClCompile Include="ManageBookmarksDialog.cpp" />
     <ClCompile Include="MassRenameDialog.cpp" />
     <ClCompile Include="MergeFilesDialog.cpp" />
     <ClCompile Include="Misc.cpp" />
@@ -323,6 +324,7 @@
     <ClInclude Include="FilterDialog.h" />
     <ClInclude Include="iDropSource.h" />
     <ClInclude Include="MainResource.h" />
+    <ClInclude Include="ManageBookmarksDialog.h" />
     <ClInclude Include="MassRenameDialog.h" />
     <ClInclude Include="MergeFilesDialog.h" />
     <ClInclude Include="NewBookmarkFolderDialog.h" />
