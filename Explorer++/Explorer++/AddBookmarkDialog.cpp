@@ -276,7 +276,8 @@ BookmarkFolder *CAddBookmarkDialog::GetBookmarkFolderFromTreeView(HTREEITEM hIte
 	while(!stackIDs.empty())
 	{
 		UINT uID = stackIDs.top();
-		pBookmarkFolder = pBookmarkFolder->GetBookmarkFolder(uID);
+		std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem = pBookmarkFolder->GetBookmarkItem(uID);
+		pBookmarkFolder = reinterpret_cast<BookmarkFolder *>(BookmarkItem.first);
 		assert(pBookmarkFolder != NULL);
 
 		stackIDs.pop();

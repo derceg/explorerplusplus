@@ -99,6 +99,8 @@ void CManageBookmarksDialog::SetupListView()
 	SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,m_pmbdps->m_iColumnWidth2);
 
 	InsertBookmarksIntoListView(m_pAllBookmarks);
+
+	ListView_SelectItem(hListView,0,TRUE);
 }
 
 /* Changes the font within the search edit
@@ -262,7 +264,8 @@ BookmarkFolder *CManageBookmarksDialog::GetBookmarkFolderFromTreeView(HTREEITEM 
 	while(!stackIDs.empty())
 	{
 		UINT uID = stackIDs.top();
-		pBookmarkFolder = pBookmarkFolder->GetBookmarkFolder(uID);
+		std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem = pBookmarkFolder->GetBookmarkItem(uID);
+		pBookmarkFolder = reinterpret_cast<BookmarkFolder *>(BookmarkItem.first);
 		assert(pBookmarkFolder != NULL);
 
 		stackIDs.pop();
@@ -325,7 +328,7 @@ void CManageBookmarksDialog::InsertBookmarkItemIntoListView(HWND hListView,const
 
 void CManageBookmarksDialog::GetBookmarkItemFromListView(int iItem)
 {
-	/*HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
+	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
 	BookmarkFolder *pBookmarkFolder = GetBookmarkFolderFromTreeView(hSelectedItem);
 
@@ -335,11 +338,22 @@ void CManageBookmarksDialog::GetBookmarkItemFromListView(int iItem)
 	lvi.mask		= LVIF_PARAM;
 	lvi.iItem		= iItem;
 	lvi.iSubItem	= 0;
-	ListView_GetItem(hListView,&lvi);*/
+	ListView_GetItem(hListView,&lvi);
 
-	/* TODO: This needs to be able to retrieve either
-	a bookmark or bookmark folder. */
-	//pBookmarkFolder->GetBookmark(lvi.lParam);
+	std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem = pBookmarkFolder->GetBookmarkItem(
+		static_cast<UINT>(lvi.lParam));
+
+	switch(BookmarkItem.second)
+	{
+	case NBookmarks::TYPE_BOOKMARK:
+		/* TODO: Send the bookmark back to the main
+		window to open. */
+		break;
+
+	case NBookmarks::TYPE_FOLDER:
+		/* TODO: Browse into the folder. */
+		break;
+	}
 }
 
 INT_PTR CManageBookmarksDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)

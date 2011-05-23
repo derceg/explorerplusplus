@@ -77,6 +77,15 @@ private:
 	void	ExportBookmarkInternal(BookmarkInternal_t *pbi,Bookmark_t *pBookmark);
 };
 
+namespace NBookmarks
+{
+	enum BookmarkType_t
+	{
+		TYPE_BOOKMARK,
+		TYPE_FOLDER
+	};
+}
+
 class Bookmark;
 class BookmarkFolder;
 
@@ -108,8 +117,11 @@ public:
 	void			RemoveBookmark();
 	void			RemoveBookmarkFolder();
 
-	void			GetBookmark(UINT uID);
-	BookmarkFolder	*BookmarkFolder::GetBookmarkFolder(UINT uID);
+	/* Retrieves the bookmark item with the
+	specified id. Item in this case may
+	refer to either a bookmark or bookmark
+	folder. */
+	std::pair<void *,NBookmarks::BookmarkType_t>	GetBookmarkItem(UINT uID);
 
 	void			GetIterator();
 
@@ -125,6 +137,11 @@ private:
 	an optimization for the HasChildFolder()
 	method above. */
 	int				m_nChildFolders;
+
+	/* These need to be able to be saved and read
+	back from storage. */
+	FILETIME		m_ftCreated;
+	FILETIME		m_ftModified;
 
 	/* List of child folders and bookmarks. Note that
 	the ordering within this list defines the ordering
@@ -158,6 +175,9 @@ private:
 	std::wstring	m_strName;
 	std::wstring	m_strLocation;
 	std::wstring	m_strDescription;
+
+	FILETIME		m_ftCreated;
+	FILETIME		m_ftModified;
 };
 
 #endif

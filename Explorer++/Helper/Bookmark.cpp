@@ -213,7 +213,7 @@ Bookmark::Bookmark(const std::wstring &strName,const std::wstring &strLocation,c
 	m_strLocation(strLocation),
 	m_strDescription(strDescription)
 {
-	
+	GetSystemTimeAsFileTime(&m_ftCreated);
 }
 
 Bookmark::~Bookmark()
@@ -261,7 +261,7 @@ BookmarkFolder::BookmarkFolder(const std::wstring &strName) :
 	m_strName(strName),
 	m_nChildFolders(0)
 {
-	 
+	 GetSystemTimeAsFileTime(&m_ftCreated);
 }
 
 BookmarkFolder::~BookmarkFolder()
@@ -344,7 +344,7 @@ bool BookmarkFolder::HasChildFolder()
 	return false;
 }
 
-BookmarkFolder *BookmarkFolder::GetBookmarkFolder(UINT uID)
+std::pair<void *,NBookmarks::BookmarkType_t> BookmarkFolder::GetBookmarkItem(UINT uID)
 {
 	auto itr = std::find_if(m_ChildList.begin(),m_ChildList.end(),
 		[uID](boost::variant<BookmarkFolder,Bookmark> &Variant) -> BOOL
@@ -362,8 +362,9 @@ BookmarkFolder *BookmarkFolder::GetBookmarkFolder(UINT uID)
 
 	if(itr != m_ChildList.end())
 	{
-		return boost::get<BookmarkFolder>(&(*itr));
+		return std::make_pair(reinterpret_cast<void *>(boost::get<BookmarkFolder>(&(*itr))),
+			NBookmarks::TYPE_BOOKMARK);
 	}
 
-	return NULL;
+	return std::make_pair(reinterpret_cast<void *>(NULL),NBookmarks::TYPE_BOOKMARK);
 }
