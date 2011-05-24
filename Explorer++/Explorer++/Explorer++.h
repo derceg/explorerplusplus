@@ -819,7 +819,6 @@ private:
 	void					BookmarkToolbarShowItemProperties(int iItem);
 	void					BookmarkToolbarNewBookmark(int iItem);
 	void					BookmarkToolbarNewFolder(int iItem);
-	void					RemoveItemFromBookmarksToolbar(void *pBookmarkHandle);
 
 	/* Columns. */
 	void					OnSelectColumns();

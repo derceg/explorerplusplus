@@ -7,15 +7,13 @@
 #define BOOKMARK_TYPE_FOLDER	0
 #define BOOKMARK_TYPE_BOOKMARK	1
 
-#define GROUP_NAME_MAX_CHARS	256
-
 /* Basic structure used to export bookmark
 information. */
 typedef struct
 {
 	/* These attributes are used for both bookmark
 	folders and bookmarks themselves. */
-	TCHAR			szItemName[GROUP_NAME_MAX_CHARS];
+	TCHAR			szItemName[256];
 	TCHAR			szItemDescription[512];
 	BOOL			bShowOnToolbar;
 	int				Type;
@@ -38,7 +36,6 @@ public:
 	~CBookmark(void);
 
 	void	GetRoot(Bookmark_t *pRoot);
-	HRESULT	GetChild(Bookmark_t *pParent,Bookmark_t *pChild);
 	void	CreateNewBookmark(void *pParentHandle,Bookmark_t *pFolder);
 	void	DeleteBookmark(void *pBookmarkHandle);
 	void	RetrieveBookmark(void *pBookmarkHandle,Bookmark_t *pBookmark);
@@ -48,7 +45,7 @@ private:
 	typedef struct
 	{
 		/* The name of this item. */
-		TCHAR			szItemName[GROUP_NAME_MAX_CHARS];
+		TCHAR			szItemName[256];
 		TCHAR			szItemDescription[512];
 
 		BOOL			bShowOnToolbar;

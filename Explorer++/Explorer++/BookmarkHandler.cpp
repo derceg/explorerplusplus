@@ -20,13 +20,6 @@
 #include "../Helper/ShellHelper.h"
 
 
-#define BOOKMARK_SUBMENU_POSITION_START	2
-
-DWORD BookmarksTreeViewStyles	= WS_CHILD|WS_VISIBLE|TVS_SHOWSELALWAYS|TVS_HASBUTTONS|
-								  TVS_EDITLABELS|TVS_HASLINES;
-
-int g_iStartId = MENU_BOOKMARK_STARTID;
-
 LRESULT CALLBACK BookmarksToolbarSubclassStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
@@ -289,33 +282,6 @@ void Explorerplusplus::BookmarkToolbarNewFolder(int iItem)
 {
 	CNewBookmarkFolderDialog NewBookmarkFolderDialog(g_hLanguageModule,IDD_NEWBOOKMARKFOLDER,m_hContainer);
 	NewBookmarkFolderDialog.ShowModalDialog();
-}
-
-void Explorerplusplus::RemoveItemFromBookmarksToolbar(void *pBookmarkHandle)
-{
-	TBBUTTON	tbButton;
-	LRESULT		lResult;
-	int			nButtons;
-	int			i = 0;
-
-	nButtons = (int)SendMessage(m_hBookmarksToolbar,TB_BUTTONCOUNT,0,0);
-
-	for(i = 0;i < nButtons;i++)
-	{
-		lResult = SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,
-			i,(LPARAM)&tbButton);
-
-		if(lResult)
-		{
-			if((void *)tbButton.dwData == pBookmarkHandle)
-			{
-				SendMessage(m_hBookmarksToolbar,TB_DELETEBUTTON,i,0);
-
-				UpdateToolbarBandSizing(m_hMainRebar,m_hBookmarksToolbar);
-				break;
-			}
-		}
-	}
 }
 
 HRESULT Explorerplusplus::ExpandAndBrowsePath(TCHAR *szPath)

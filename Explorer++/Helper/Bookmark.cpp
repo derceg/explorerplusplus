@@ -46,31 +46,6 @@ void CBookmark::GetRoot(Bookmark_t *pRoot)
 	pRoot->pHandle			= (void *)&m_Root;
 }
 
-HRESULT CBookmark::GetChild(Bookmark_t *pParent,Bookmark_t *pChild)
-{
-	BookmarkInternal_t	*pbi = NULL;
-	HRESULT				hr = E_FAIL;
-
-	pbi = (BookmarkInternal_t *)pParent->pHandle;
-
-	/* First check if this item is actually
-	a folder. */
-	if(pbi->Type == BOOKMARK_TYPE_FOLDER)
-	{
-		/* Does this folder have any children?
-		If it does, copy the bookmark information
-		across. */
-		if(pbi->FirstChild != NULL)
-		{
-			ExportBookmarkInternal((BookmarkInternal_t *)pbi->FirstChild,pChild);
-
-			hr = S_OK;
-		}
-	}
-
-	return hr;
-}
-
 void CBookmark::ImportBookmarkInternal(BookmarkInternal_t *pbi,Bookmark_t *pBookmark)
 {
 	StringCchCopy(pbi->szItemName,SIZEOF_ARRAY(pbi->szItemName),
