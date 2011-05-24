@@ -1451,28 +1451,23 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		/* Messages from the context menu that
 		is used with the bookmarks toolbar. */
+		/* TODO: [Bookmarks] Handle menu messages. */
 		case IDM_BT_OPEN:
-			BookmarkToolbarOpenItem(m_iSelectedRClick,FALSE);
 			break;
 
 		case IDM_BT_OPENINNEWTAB:
-			BookmarkToolbarOpenItem(m_iSelectedRClick,TRUE);
 			break;
 
 		case IDM_BT_DELETE:
-			BookmarkToolbarDeleteItem(m_iSelectedRClick);
 			break;
 
 		case IDM_BT_PROPERTIES:
-			BookmarkToolbarShowItemProperties(m_iSelectedRClick);
 			break;
 
 		case IDM_BT_NEWBOOKMARK:
-			BookmarkToolbarNewBookmark(m_iSelectedRClick);
 			break;
 
 		case IDM_BT_NEWFOLDER:
-			BookmarkToolbarNewFolder(m_iSelectedRClick);
 			break;
 
 		case IDM_APP_OPEN:

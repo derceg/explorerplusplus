@@ -37,7 +37,6 @@ public:
 
 	void	GetRoot(Bookmark_t *pRoot);
 	void	CreateNewBookmark(void *pParentHandle,Bookmark_t *pFolder);
-	void	DeleteBookmark(void *pBookmarkHandle);
 	void	RetrieveBookmark(void *pBookmarkHandle,Bookmark_t *pBookmark);
 
 private:

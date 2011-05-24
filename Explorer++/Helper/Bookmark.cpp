@@ -132,53 +132,6 @@ void CBookmark::CreateNewBookmark(void *pParentHandle,Bookmark_t *pFolder)
 	}
 }
 
-void CBookmark::DeleteBookmark(void *pBookmarkHandle)
-{
-	BookmarkInternal_t	*pbiBookmark = NULL;
-	BookmarkInternal_t	*pChild = NULL;
-
-	pbiBookmark = (BookmarkInternal_t *)pBookmarkHandle;
-
-	/* If this is a bookmark, it can just be deleted.
-	If it is a folder, all its children will need
-	to be deleted as well. */
-	if(pbiBookmark->Type == BOOKMARK_TYPE_FOLDER)
-	{
-		pChild = (BookmarkInternal_t *)pbiBookmark->FirstChild;
-
-		while(pChild->NextSibling != NULL)
-		{
-			DeleteBookmark((void *)pChild);
-
-			pChild = (BookmarkInternal_t *)pChild->NextSibling;
-		}
-	}
-
-	/* Now, remap the pointers for the parent
-	item. The previous sibling (if any) will
-	will have it's next pointer remapped
-	to the next sibling from the current
-	item (if any). */
-	if(pbiBookmark->PreviousSibling == NULL)
-	{
-		((BookmarkInternal_t *)pbiBookmark->Parent)->FirstChild = pbiBookmark->NextSibling;
-
-		/* If there is a next sibling, set its previous pointer. */
-		if(pbiBookmark->NextSibling != NULL)
-			((BookmarkInternal_t *)pbiBookmark->NextSibling)->PreviousSibling = NULL;
-	}
-	else
-	{
-		((BookmarkInternal_t *)pbiBookmark->PreviousSibling)->NextSibling = pbiBookmark->NextSibling;
-
-		/* If there is a next sibling, set its previous pointer. */
-		if(pbiBookmark->NextSibling != NULL)
-			((BookmarkInternal_t *)pbiBookmark->NextSibling)->PreviousSibling = pbiBookmark->PreviousSibling;
-	}
-
-	free(pbiBookmark);
-}
-
 UINT Bookmark::m_IDCounter = 0;
 UINT BookmarkFolder::m_IDCounter = 0;
 

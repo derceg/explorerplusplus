@@ -811,12 +811,8 @@ private:
 	void					GetBookmarkMenuItemDirectory(HMENU hMenu,int iBookmarkId,TCHAR *szDirectory,UINT uBufSize);
 	void					InsertBookmarkToolbarButtons(void);
 	void					InsertBookmarkIntoToolbar(Bookmark_t *pBookmark,int id);
-	void					UpdateToolbarButton(Bookmark_t *pBookmark);
 
 	/* Helper functions for the bookmark toolbar. */
-	void					BookmarkToolbarOpenItem(int iItem,BOOL bOpenInNewTab);
-	void					BookmarkToolbarDeleteItem(int iItem);
-	void					BookmarkToolbarShowItemProperties(int iItem);
 	void					BookmarkToolbarNewBookmark(int iItem);
 	void					BookmarkToolbarNewFolder(int iItem);
 
@@ -830,7 +826,6 @@ private:
 	HRESULT					ExpandAndBrowsePath(TCHAR *szPath);
 	HRESULT					ExpandAndBrowsePath(TCHAR *szPath,BOOL bOpenInNewTab,BOOL bSwitchToNewTab);
 	void					InsertBookmarksIntoMenu(void);
-	BOOL					DeleteBookmarkSafe(HWND hwnd,void *pBookmarkHandle);
 
 	/* Filtering. */
 	void					SetFilterStatus(void);

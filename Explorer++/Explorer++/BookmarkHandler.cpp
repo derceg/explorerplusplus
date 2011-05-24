@@ -96,44 +96,6 @@ void Explorerplusplus::InsertBookmarkIntoToolbar(Bookmark_t *pBookmark,int id)
 	UpdateToolbarBandSizing(m_hMainRebar,m_hBookmarksToolbar);
 }
 
-void Explorerplusplus::UpdateToolbarButton(Bookmark_t *pBookmark)
-{
-	TBBUTTONINFO tbbi;
-	TBBUTTON tbButton;
-	int iImage;
-	LRESULT lResult;
-	int nButtons;
-	int i = 0;
-
-	nButtons = (int)SendMessage(m_hBookmarksToolbar,TB_BUTTONCOUNT,0,0);
-
-	for(i = 0;i < nButtons;i++)
-	{
-		lResult = SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,
-			i,(LPARAM)&tbButton);
-
-		if(lResult)
-		{
-			if((void *)tbButton.dwData == pBookmark->pHandle)
-			{
-				if(pBookmark->Type == BOOKMARK_TYPE_FOLDER)
-					iImage = SHELLIMAGES_NEWTAB;
-				else
-					iImage = SHELLIMAGES_FAV;
-
-				tbbi.cbSize		= sizeof(tbbi);
-				tbbi.dwMask		= TBIF_TEXT;
-				tbbi.iImage		= iImage;
-				tbbi.pszText	= pBookmark->szItemName;
-				tbbi.lParam		= (DWORD_PTR)pBookmark->pHandle;
-				SendMessage(m_hBookmarksToolbar,TB_SETBUTTONINFO,tbButton.idCommand,(LPARAM)&tbbi);
-
-				break;
-			}
-		}
-	}
-}
-
 void Explorerplusplus::InitializeBookmarkToolbarMap(void)
 {
 	int i = 0;
@@ -181,88 +143,6 @@ int iBookmarkId,TCHAR *szDirectory,UINT uBufSize)
 	StringCchCopy(szDirectory,uBufSize,Bookmark.szLocation);
 }
 
-void Explorerplusplus::BookmarkToolbarOpenItem(int iItem,BOOL bOpenInNewTab)
-{
-	Bookmark_t	Bookmark;
-	TBBUTTON	tbButton;
-
-	if(iItem != -1)
-	{
-		SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iItem,(LPARAM)&tbButton);
-
-		m_Bookmark.RetrieveBookmark((void *)tbButton.dwData,&Bookmark);
-
-		/* If the toolbar item is a bookmark, simply navigate
-		to its directory. If it's a folder, open a menu with
-		its sub-items on. */
-		if(Bookmark.Type == BOOKMARK_TYPE_BOOKMARK)
-		{
-			if(bOpenInNewTab)
-				BrowseFolder(Bookmark.szLocation,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-			else
-				BrowseFolder(Bookmark.szLocation,SBSP_ABSOLUTE);
-		}
-	}
-}
-
-void Explorerplusplus::BookmarkToolbarDeleteItem(int iItem)
-{
-	TBBUTTON	tbButton;
-	BOOL		bDeleted;
-
-	if(iItem != -1)
-	{
-		SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iItem,(LPARAM)&tbButton);
-
-		/* Delete the bookmark. */
-		bDeleted = DeleteBookmarkSafe(m_hContainer,(void *)tbButton.dwData);
-
-		if(bDeleted)
-		{
-			/* Now, remove it from the toolbar. */
-			SendMessage(m_hBookmarksToolbar,TB_DELETEBUTTON,iItem,0);
-
-			/* ...and re-insert any bookmarks into the bookmarks menu. */
-			InsertBookmarksIntoMenu();
-		}
-	}
-}
-
-void Explorerplusplus::BookmarkToolbarShowItemProperties(int iItem)
-{
-	Bookmark_t					Bookmark;
-	BookmarkPropertiesInfo_t	bpi;
-	TBBUTTON					tbButton;
-	INT_PTR						nResult = 0;
-
-	if(iItem != -1)
-	{
-		SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iItem,(LPARAM)&tbButton);
-
-		m_Bookmark.RetrieveBookmark((void *)tbButton.dwData,&Bookmark);
-
-		bpi.pContainer		= this;
-		bpi.pBookmarkHandle	= (void *)tbButton.dwData;
-
-		/* Which dialog is shown depends on whether
-		this item is a (bookmark) folder or a bookmark. */
-		if(Bookmark.Type == BOOKMARK_TYPE_FOLDER)
-		{
-			/* TODO: Show new bookmark folder dialog. */
-		}
-		else
-		{
-			/* TODO: Show add bookmark dialog. */
-		}
-
-		/* Ok was pressed. Need to update the information
-		for this bookmark. */
-		if(nResult == 1)
-		{
-		}
-	}
-}
-
 void Explorerplusplus::BookmarkToolbarNewBookmark(int iItem)
 {
 	if(iItem != -1)
@@ -300,24 +180,4 @@ HRESULT Explorerplusplus::ExpandAndBrowsePath(TCHAR *szPath,BOOL bOpenInNewTab,B
 		szExpandedPath,SIZEOF_ARRAY(szExpandedPath));
 
 	return BrowseFolder(szExpandedPath,SBSP_ABSOLUTE,bOpenInNewTab,bSwitchToNewTab,FALSE);
-}
-
-BOOL Explorerplusplus::DeleteBookmarkSafe(HWND hwnd,void *pBookmarkHandle)
-{
-	TCHAR szInfoMsg[128];
-	int	iMessageBoxReturn;
-
-	LoadString(g_hLanguageModule,IDS_BOOKMARK_DELETE,
-		szInfoMsg,SIZEOF_ARRAY(szInfoMsg));
-
-	iMessageBoxReturn = MessageBox(hwnd,szInfoMsg,
-		NExplorerplusplus::WINDOW_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
-
-	if(iMessageBoxReturn == IDYES)
-	{
-		m_Bookmark.DeleteBookmark(pBookmarkHandle);
-		return TRUE;
-	}
-
-	return FALSE;
 }
