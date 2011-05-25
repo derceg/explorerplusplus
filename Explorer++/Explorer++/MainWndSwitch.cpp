@@ -1267,9 +1267,9 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				TCHAR szDisplayName[MAX_PATH];
 				m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),szCurrentDirectory);
 				GetDisplayName(szCurrentDirectory,szDisplayName,SHGDN_INFOLDER);
-				Bookmark bm(szDisplayName,szCurrentDirectory,EMPTY_STRING);
+				CBookmark Bookmark(szDisplayName,szCurrentDirectory,EMPTY_STRING);
 
-				CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,hwnd,m_bfAllBookmarks,&bm);
+				CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,hwnd,m_bfAllBookmarks,&Bookmark);
 				AddBookmarkDialog.ShowModalDialog();
 			}
 			break;

@@ -18,10 +18,10 @@
 #include "Bookmark.h"
 
 
-UINT Bookmark::m_IDCounter = 0;
-UINT BookmarkFolder::m_IDCounter = 0;
+UINT CBookmark::m_IDCounter = 0;
+UINT CBookmarkFolder::m_IDCounter = 0;
 
-Bookmark::Bookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription) :
+CBookmark::CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription) :
 	m_ID(++m_IDCounter),
 	m_strName(strName),
 	m_strLocation(strLocation),
@@ -30,47 +30,47 @@ Bookmark::Bookmark(const std::wstring &strName,const std::wstring &strLocation,c
 	GetSystemTimeAsFileTime(&m_ftCreated);
 }
 
-Bookmark::~Bookmark()
+CBookmark::~CBookmark()
 {
 
 }
 
-std::wstring Bookmark::GetName()
+std::wstring CBookmark::GetName()
 {
 	return m_strName;
 }
 
-std::wstring Bookmark::GetLocation()
+std::wstring CBookmark::GetLocation()
 {
 	return m_strLocation;
 }
 
-std::wstring Bookmark::GetDescription()
+std::wstring CBookmark::GetDescription()
 {
 	return m_strDescription;
 }
 
-void Bookmark::SetName(const std::wstring &strName)
+void CBookmark::SetName(const std::wstring &strName)
 {
 	m_strName = strName;
 }
 
-void Bookmark::SetLocation(const std::wstring &strLocation)
+void CBookmark::SetLocation(const std::wstring &strLocation)
 {
 	m_strLocation = strLocation;
 }
 
-void Bookmark::SetDescription(const std::wstring &strDescription)
+void CBookmark::SetDescription(const std::wstring &strDescription)
 {
 	m_strDescription = strDescription;
 }
 
-UINT Bookmark::GetID()
+UINT CBookmark::GetID()
 {
 	return m_ID;
 }
 
-BookmarkFolder::BookmarkFolder(const std::wstring &strName) :
+CBookmarkFolder::CBookmarkFolder(const std::wstring &strName) :
 	m_ID(++m_IDCounter),
 	m_strName(strName),
 	m_nChildFolders(0)
@@ -78,77 +78,77 @@ BookmarkFolder::BookmarkFolder(const std::wstring &strName) :
 	 GetSystemTimeAsFileTime(&m_ftCreated);
 }
 
-BookmarkFolder::~BookmarkFolder()
+CBookmarkFolder::~CBookmarkFolder()
 {
 
 }
 
-std::wstring BookmarkFolder::GetName()
+std::wstring CBookmarkFolder::GetName()
 {
 	return m_strName;
 }
 
-void BookmarkFolder::SetName(const std::wstring &strName)
+void CBookmarkFolder::SetName(const std::wstring &strName)
 {
 	m_strName = strName;
 }
 
-UINT BookmarkFolder::GetID()
+UINT CBookmarkFolder::GetID()
 {
 	return m_ID;
 }
 
-void BookmarkFolder::InsertBookmark(const Bookmark &bm)
+void CBookmarkFolder::InsertBookmark(const CBookmark &Bookmark)
 {
-	InsertBookmark(bm,m_ChildList.size());
+	InsertBookmark(Bookmark,m_ChildList.size());
 }
 
-void BookmarkFolder::InsertBookmark(const Bookmark &bm,std::size_t Position)
+void CBookmarkFolder::InsertBookmark(const CBookmark &Bookmark,std::size_t Position)
 {
 	if(Position > (m_ChildList.size() - 1))
 	{
-		m_ChildList.push_back(bm);
+		m_ChildList.push_back(Bookmark);
 	}
 	else
 	{
 		auto itr = m_ChildList.begin();
 		std::advance(itr,Position);
-		m_ChildList.insert(itr,bm);
+		m_ChildList.insert(itr,Bookmark);
 	}
 }
 
-void BookmarkFolder::InsertBookmarkFolder(const BookmarkFolder &bf)
+void CBookmarkFolder::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder)
 {
-	InsertBookmarkFolder(bf,m_ChildList.size());
+	InsertBookmarkFolder(BookmarkFolder,m_ChildList.size());
 }
 
-void BookmarkFolder::InsertBookmarkFolder(const BookmarkFolder &bf,std::size_t Position)
+void CBookmarkFolder::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder,std::size_t Position)
 {
 	if(Position > (m_ChildList.size() - 1))
 	{
-		m_ChildList.push_back(bf);
+		m_ChildList.push_back(BookmarkFolder);
 	}
 	else
 	{
 		auto itr = m_ChildList.begin();
 		std::advance(itr,Position);
-		m_ChildList.insert(itr,bf);
+		m_ChildList.insert(itr,BookmarkFolder);
 	}
 
 	m_nChildFolders++;
 }
 
-std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator BookmarkFolder::begin()
+std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator CBookmarkFolder::begin()
 {
 	return m_ChildList.begin();
 }
 
-std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator BookmarkFolder::end()
+std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator CBookmarkFolder::end()
 {
 	return m_ChildList.end();
 }
 
-bool BookmarkFolder::HasChildFolder()
+bool CBookmarkFolder::HasChildFolder()
 {
 	if(m_nChildFolders > 0)
 	{
@@ -158,12 +158,12 @@ bool BookmarkFolder::HasChildFolder()
 	return false;
 }
 
-std::pair<void *,NBookmarks::BookmarkType_t> BookmarkFolder::GetBookmarkItem(UINT uID)
+std::pair<void *,NBookmarks::BookmarkType_t> CBookmarkFolder::GetBookmarkItem(UINT uID)
 {
 	auto itr = std::find_if(m_ChildList.begin(),m_ChildList.end(),
-		[uID](boost::variant<BookmarkFolder,Bookmark> &Variant) -> BOOL
+		[uID](boost::variant<CBookmarkFolder,CBookmark> &Variant) -> BOOL
 		{
-			BookmarkFolder *pBookmarkFolder = boost::get<BookmarkFolder>(&Variant);
+			CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(&Variant);
 
 			if(pBookmarkFolder)
 			{
@@ -176,7 +176,7 @@ std::pair<void *,NBookmarks::BookmarkType_t> BookmarkFolder::GetBookmarkItem(UIN
 
 	if(itr != m_ChildList.end())
 	{
-		return std::make_pair(reinterpret_cast<void *>(boost::get<BookmarkFolder>(&(*itr))),
+		return std::make_pair(reinterpret_cast<void *>(boost::get<CBookmarkFolder>(&(*itr))),
 			NBookmarks::TYPE_BOOKMARK);
 	}
 

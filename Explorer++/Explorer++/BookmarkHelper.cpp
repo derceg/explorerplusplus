@@ -17,7 +17,7 @@
 #include "BookmarkHelper.h"
 
 
-void NBookmarkHelper::InsertFoldersIntoTreeView(HWND hTreeView,BookmarkFolder *pBookmarkFolder)
+void NBookmarkHelper::InsertFoldersIntoTreeView(HWND hTreeView,CBookmarkFolder *pBookmarkFolder)
 {
 	TreeView_DeleteAllItems(hTreeView);
 
@@ -25,7 +25,7 @@ void NBookmarkHelper::InsertFoldersIntoTreeView(HWND hTreeView,BookmarkFolder *p
 
 	for(auto itr = pBookmarkFolder->begin();itr != pBookmarkFolder->end();itr++)
 	{
-		if(BookmarkFolder *pBookmarkFolder = boost::get<BookmarkFolder>(&(*itr)))
+		if(CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(&(*itr)))
 		{
 			InsertFolderIntoTreeView(hTreeView,hRoot,pBookmarkFolder);
 		}
@@ -38,7 +38,7 @@ void NBookmarkHelper::InsertFoldersIntoTreeView(HWND hTreeView,BookmarkFolder *p
 /* Note that this function assumes that the standard shell images
 have been placed in the image list for the treeview. */
 HTREEITEM NBookmarkHelper::InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,
-	BookmarkFolder *pBookmarkFolder)
+	CBookmarkFolder *pBookmarkFolder)
 {
 	TCHAR szText[256];
 	StringCchCopy(szText,SIZEOF_ARRAY(szText),pBookmarkFolder->GetName().c_str());
@@ -67,8 +67,8 @@ HTREEITEM NBookmarkHelper::InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hPa
 	return hItem;
 }
 
-BookmarkFolder *NBookmarkHelper::GetBookmarkFolderFromTreeView(HWND hTreeView,
-	HTREEITEM hItem,BookmarkFolder *pRootBookmarkFolder)
+CBookmarkFolder *NBookmarkHelper::GetBookmarkFolderFromTreeView(HWND hTreeView,
+	HTREEITEM hItem,CBookmarkFolder *pRootBookmarkFolder)
 {
 	std::stack<UINT> stackIDs;
 	HTREEITEM hParent;
@@ -86,13 +86,13 @@ BookmarkFolder *NBookmarkHelper::GetBookmarkFolderFromTreeView(HWND hTreeView,
 		hCurrentItem = hParent;
 	}
 
-	BookmarkFolder *pBookmarkFolder = pRootBookmarkFolder;
+	CBookmarkFolder *pBookmarkFolder = pRootBookmarkFolder;
 
 	while(!stackIDs.empty())
 	{
 		UINT uID = stackIDs.top();
 		std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem = pBookmarkFolder->GetBookmarkItem(uID);
-		pBookmarkFolder = reinterpret_cast<BookmarkFolder *>(BookmarkItem.first);
+		pBookmarkFolder = reinterpret_cast<CBookmarkFolder *>(BookmarkItem.first);
 		assert(pBookmarkFolder != NULL);
 
 		stackIDs.pop();
@@ -101,7 +101,7 @@ BookmarkFolder *NBookmarkHelper::GetBookmarkFolderFromTreeView(HWND hTreeView,
 	return pBookmarkFolder;
 }
 
-void NBookmarkHelper::InsertBookmarksIntoListView(HWND hListView,BookmarkFolder *pBookmarkFolder)
+void NBookmarkHelper::InsertBookmarksIntoListView(HWND hListView,CBookmarkFolder *pBookmarkFolder)
 {
 	ListView_DeleteAllItems(hListView);
 
@@ -109,11 +109,11 @@ void NBookmarkHelper::InsertBookmarksIntoListView(HWND hListView,BookmarkFolder 
 
 	for(auto itr = pBookmarkFolder->begin();itr != pBookmarkFolder->end();itr++)
 	{
-		if(BookmarkFolder *pBookmarkFolder = boost::get<BookmarkFolder>(&(*itr)))
+		if(CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(&(*itr)))
 		{
 			InsertBookmarkFolderIntoListView(hListView,pBookmarkFolder,iItem);
 		}
-		else if(Bookmark *pBookmark = boost::get<Bookmark>(&(*itr)))
+		else if(CBookmark *pBookmark = boost::get<CBookmark>(&(*itr)))
 		{
 			InsertBookmarkIntoListView(hListView,pBookmark,iItem);
 		}
@@ -123,14 +123,14 @@ void NBookmarkHelper::InsertBookmarksIntoListView(HWND hListView,BookmarkFolder 
 }
 
 void NBookmarkHelper::InsertBookmarkFolderIntoListView(HWND hListView,
-	BookmarkFolder *pBookmarkFolder,int iPosition)
+	CBookmarkFolder *pBookmarkFolder,int iPosition)
 {
 	InsertBookmarkItemIntoListView(hListView,pBookmarkFolder->GetName(),
 		pBookmarkFolder->GetID(),iPosition);
 }
 
 void NBookmarkHelper::InsertBookmarkIntoListView(HWND hListView,
-	Bookmark *pBookmark,int iPosition)
+	CBookmark *pBookmark,int iPosition)
 {
 	InsertBookmarkItemIntoListView(hListView,pBookmark->GetName(),
 		pBookmark->GetID(),iPosition);

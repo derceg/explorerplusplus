@@ -29,15 +29,15 @@ void Explorerplusplus::InitializeBookmarks(void)
 	TCHAR szTemp[64];
 
 	LoadString(g_hLanguageModule,IDS_BOOKMARKS_ALLBOOKMARKS,szTemp,SIZEOF_ARRAY(szTemp));
-	m_bfAllBookmarks = new BookmarkFolder(szTemp);
+	m_bfAllBookmarks = new CBookmarkFolder(szTemp);
 
 	/* Set up the 'Bookmarks Toolbar' and 'Bookmarks Menu' folders. */
 	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSTOOLBAR,szTemp,SIZEOF_ARRAY(szTemp));
-	BookmarkFolder bfBookmarksToolbar(szTemp);
+	CBookmarkFolder bfBookmarksToolbar(szTemp);
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksToolbar);
 
 	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSMENU,szTemp,SIZEOF_ARRAY(szTemp));
-	BookmarkFolder bfBookmarksMenu(szTemp);
+	CBookmarkFolder bfBookmarksMenu(szTemp);
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu);
 }
 

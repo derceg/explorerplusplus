@@ -28,7 +28,7 @@ namespace NManageBookmarksDialog
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,
-	BookmarkFolder *pAllBookmarks) :
+	CBookmarkFolder *pAllBookmarks) :
 m_pAllBookmarks(pAllBookmarks),
 m_bSearchFieldBlank(true),
 m_bEditingSearchField(false),
@@ -194,7 +194,7 @@ void CManageBookmarksDialog::GetBookmarkItemFromListView(int iItem)
 {
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
-	BookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
+	CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
 		hSelectedItem,m_pAllBookmarks);
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
@@ -298,7 +298,7 @@ void CManageBookmarksDialog::OnEnChange(HWND hEdit)
 void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
 {
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
-	BookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
+	CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
 		pnmtv->itemNew.hItem,m_pAllBookmarks);
 	assert(pBookmarkFolder != NULL);
 

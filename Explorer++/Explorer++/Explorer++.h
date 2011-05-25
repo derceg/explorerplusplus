@@ -907,7 +907,7 @@ private:
 	IShellBrowser2 *		m_pActiveShellBrowser;
 	IDirectoryMonitor *		m_pDirMon;
 	CMyTreeView *			m_pMyTreeView;
-	BookmarkFolder *		m_bfAllBookmarks;
+	CBookmarkFolder *		m_bfAllBookmarks;
 	CCustomMenu *			m_pCustomMenu;
 	CStatusBar *			m_pStatusBar;
 	HANDLE					m_hIconThread;

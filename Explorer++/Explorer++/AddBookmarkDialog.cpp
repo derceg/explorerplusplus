@@ -28,7 +28,7 @@ namespace NAddBookmarkDialog
 const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
 CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,
-	BookmarkFolder *pAllBookmarks,Bookmark *pBookmark) :
+	CBookmarkFolder *pAllBookmarks,CBookmark *pBookmark) :
 m_pAllBookmarks(pAllBookmarks),
 m_pBookmark(pBookmark),
 CBaseDialog(hInstance,iResource,hParent,true)
@@ -180,9 +180,9 @@ void CAddBookmarkDialog::OnNewFolder()
 
 	TCHAR szTemp[64];
 	LoadString(GetInstance(),IDS_BOOKMARKS_NEWBOOKMARKFOLDER,szTemp,SIZEOF_ARRAY(szTemp));
-	BookmarkFolder NewBookmarkFolder(szTemp);
+	CBookmarkFolder NewBookmarkFolder(szTemp);
 
-	BookmarkFolder *pParentBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
+	CBookmarkFolder *pParentBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
 		hSelectedItem,m_pAllBookmarks);
 	pParentBookmarkFolder->InsertBookmarkFolder(NewBookmarkFolder);
 	HTREEITEM hNewItem = NBookmarkHelper::InsertFolderIntoTreeView(hTreeView,hSelectedItem,&NewBookmarkFolder);
@@ -220,7 +220,7 @@ BOOL CAddBookmarkDialog::OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi)
 		lstrlen(pnmtvdi->item.pszText) > 0)
 	{
 		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
-		BookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
+		CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
 			pnmtvdi->item.hItem,m_pAllBookmarks);
 		pBookmarkFolder->SetName(pnmtvdi->item.pszText);
 

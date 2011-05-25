@@ -13,15 +13,15 @@ namespace NBookmarks
 	};
 }
 
-class Bookmark;
-class BookmarkFolder;
+class CBookmark;
+class CBookmarkFolder;
 
-class BookmarkFolder
+class CBookmarkFolder
 {
 public:
 
-	BookmarkFolder(const std::wstring &strName);
-	~BookmarkFolder();
+	CBookmarkFolder(const std::wstring &strName);
+	~CBookmarkFolder();
 
 	UINT			GetID();
 
@@ -33,13 +33,13 @@ public:
 	one child folder. */
 	bool			HasChildFolder();
 
-	std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator	begin();
-	std::list<boost::variant<BookmarkFolder,Bookmark>>::iterator	end();
+	std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator	begin();
+	std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator	end();
 
-	void			InsertBookmark(const Bookmark &bm);
-	void			InsertBookmarkFolder(const BookmarkFolder &bf);
-	void			InsertBookmark(const Bookmark &bm,std::size_t Position);
-	void			InsertBookmarkFolder(const BookmarkFolder &bf,std::size_t Position);
+	void			InsertBookmark(const CBookmark &Bookmark);
+	void			InsertBookmark(const CBookmark &Bookmark,std::size_t Position);
+	void			InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder);
+	void			InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder,std::size_t Position);
 
 	void			RemoveBookmark();
 	void			RemoveBookmarkFolder();
@@ -74,15 +74,15 @@ private:
 	the ordering within this list defines the ordering
 	between child items (i.e. there is no explicit
 	ordering). */
-	std::list<boost::variant<BookmarkFolder,Bookmark>>	m_ChildList;
+	std::list<boost::variant<CBookmarkFolder,CBookmark>>	m_ChildList;
 };
 
-class Bookmark
+class CBookmark
 {
 public:
 
-	Bookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription);
-	~Bookmark();
+	CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription);
+	~CBookmark();
 
 	UINT			GetID();
 

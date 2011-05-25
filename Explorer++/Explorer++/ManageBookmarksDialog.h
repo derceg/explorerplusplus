@@ -36,7 +36,7 @@ class CManageBookmarksDialog : public CBaseDialog
 {
 public:
 
-	CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,BookmarkFolder *pAllBookmarks);
+	CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,CBookmarkFolder *pAllBookmarks);
 	~CManageBookmarksDialog();
 
 	LRESULT CALLBACK	EditSearchProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -71,7 +71,7 @@ private:
 	void		OnOk();
 	void		OnCancel();
 
-	BookmarkFolder	*m_pAllBookmarks;
+	CBookmarkFolder	*m_pAllBookmarks;
 	HIMAGELIST		m_himlTreeView;
 
 	HFONT			m_hEditSearchFont;
