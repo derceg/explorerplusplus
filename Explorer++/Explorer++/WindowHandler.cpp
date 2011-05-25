@@ -871,7 +871,6 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 	}
 	else if(ptbgit->iItem >= TOOLBAR_BOOKMARK_START)
 	{
-		Bookmark_t	Bookmark;
 		TBBUTTON	tbButton;
 		int			iIndex;
 
@@ -881,18 +880,7 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 		{
 			SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iIndex,(LPARAM)&tbButton);
 
-			m_Bookmark.RetrieveBookmark((void *)tbButton.dwData,&Bookmark);
-
-			/* If this item is a bookmark, show its name
-			and location. If it's a folder, don't show
-			anything. */
-			if(Bookmark.Type == BOOKMARK_TYPE_BOOKMARK)
-			{
-				StringCchPrintf(szInfoTip,SIZEOF_ARRAY(szInfoTip),_T("%s\n%s"),
-					Bookmark.szItemName,Bookmark.szLocation);
-
-				StringCchCopy(ptbgit->pszText,ptbgit->cchTextMax,szInfoTip);
-			}
+			/* TODO: [Bookmarks] Show info tip. */
 		}
 	}
 }

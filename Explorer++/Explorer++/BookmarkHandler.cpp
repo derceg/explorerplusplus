@@ -74,24 +74,6 @@ void Explorerplusplus::InsertBookmarkToolbarButtons(void)
 	/* TODO: [Bookmarks] Rewrite. */
 }
 
-void Explorerplusplus::GetBookmarkMenuItemDirectory(HMENU hMenu,
-int iBookmarkId,TCHAR *szDirectory,UINT uBufSize)
-{
-	MENUITEMINFO		mii;
-	Bookmark_t			Bookmark;
-	CustomMenuInfo_t	*pcmi = NULL;
-
-	mii.cbSize	= sizeof(mii);
-	mii.fMask	= MIIM_DATA;
-	GetMenuItemInfo(hMenu,iBookmarkId,FALSE,&mii);
-
-	pcmi = (CustomMenuInfo_t *)mii.dwItemData;
-
-	m_Bookmark.RetrieveBookmark((void *)pcmi->dwItemData,&Bookmark);
-
-	StringCchCopy(szDirectory,uBufSize,Bookmark.szLocation);
-}
-
 void Explorerplusplus::BookmarkToolbarNewBookmark(int iItem)
 {
 	if(iItem != -1)

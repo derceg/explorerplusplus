@@ -347,10 +347,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 			OnAppCommand(wParam,lParam);
 			break;
 
-		case WM_MENUCOMMAND:
-			OnMenuCommand(wParam,lParam);
-			break;
-
 		case WM_COMMAND:
 			return CommandHandler(hwnd,Msg,wParam,lParam);
 			break;
@@ -376,39 +372,12 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 	return DefWindowProc(hwnd,Msg,wParam,lParam);
 }
 
-void Explorerplusplus::OnMenuCommand(WPARAM wParam,LPARAM lParam)
-{
-	UINT	uMenuID;
-
-	uMenuID = GetMenuItemID((HMENU)lParam,(int)wParam);
-
-	if(uMenuID >= MENU_BOOKMARK_STARTID &&
-	uMenuID <= MENU_BOOKMARK_ENDID)
-	{
-		TCHAR szDirectory[MAX_PATH];
-
-		GetBookmarkMenuItemDirectory((HMENU)lParam,uMenuID,
-			szDirectory,SIZEOF_ARRAY(szDirectory));
-
-		BrowseFolder(szDirectory,SBSP_ABSOLUTE);
-	}
-}
-
-/*
- * WM_COMMAND handler for main window.
- */
 LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
-	/* Has a bookmark menu item been clicked? */
 	if(!HIWORD(wParam) && LOWORD(wParam) >= MENU_BOOKMARK_STARTID &&
 	LOWORD(wParam) <= MENU_BOOKMARK_ENDID)
 	{
-		TCHAR	szDirectory[MAX_PATH];
-
-		GetBookmarkMenuItemDirectory(m_hBookmarksMenu,LOWORD(wParam),
-			szDirectory,SIZEOF_ARRAY(szDirectory));
-
-		ExpandAndBrowsePath(szDirectory);
+		/* TODO: [Bookmarks] Open bookmark. */
 	}
 	else if(!HIWORD(wParam) && LOWORD(wParam) >= MENU_HEADER_STARTID &&
 	LOWORD(wParam) <= MENU_HEADER_ENDID)

@@ -383,7 +383,6 @@ private:
 	/* Main window private message handlers. */
 	LRESULT CALLBACK		CommandHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK		NotifyHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
-	void					OnMenuCommand(WPARAM wParam,LPARAM lParam);
 	BOOL					OnSize(int MainWindowWidth,int MainWindowHeight);
 	int						OnClose(void);
 	int						OnDestroy(void);
@@ -774,7 +773,6 @@ private:
 	void					OnDisplayColorsEnChange(HWND hDlg,LPARAM lParam);
 
 	/* Bookmarks. */
-	void					GetBookmarkMenuItemDirectory(HMENU hMenu,int iBookmarkId,TCHAR *szDirectory,UINT uBufSize);
 	void					InsertBookmarkToolbarButtons(void);
 
 	/* Helper functions for the bookmark toolbar. */
@@ -909,7 +907,6 @@ private:
 	IShellBrowser2 *		m_pActiveShellBrowser;
 	IDirectoryMonitor *		m_pDirMon;
 	CMyTreeView *			m_pMyTreeView;
-	CBookmark				m_Bookmark;
 	BookmarkFolder *		m_bfAllBookmarks;
 	CCustomMenu *			m_pCustomMenu;
 	CStatusBar *			m_pStatusBar;

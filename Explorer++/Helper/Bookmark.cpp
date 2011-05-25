@@ -18,49 +18,6 @@
 #include "Bookmark.h"
 
 
-#define ROOT_NAME	_T("Bookmarks")
-
-CBookmark::CBookmark(void)
-{
-	/* Fill out information for the root. */
-	StringCchCopy(m_Root.szItemName,SIZEOF_ARRAY(m_Root.szItemName),ROOT_NAME);
-	m_Root.Type			= BOOKMARK_TYPE_FOLDER;
-	m_Root.NextSibling	= NULL;
-	m_Root.FirstChild	= NULL;
-}
-
-CBookmark::~CBookmark(void)
-{
-}
-
-void CBookmark::ExportBookmarkInternal(BookmarkInternal_t *pbi,Bookmark_t *pBookmark)
-{
-	StringCchCopy(pBookmark->szItemName,SIZEOF_ARRAY(pBookmark->szItemName),
-		pbi->szItemName);
-	StringCchCopy(pBookmark->szItemDescription,
-		SIZEOF_ARRAY(pBookmark->szItemDescription),
-		pbi->szItemDescription);
-
-	pBookmark->Type				= pbi->Type;
-	pBookmark->bShowOnToolbar	= pbi->bShowOnToolbar;
-
-	if(pbi->Type == BOOKMARK_TYPE_BOOKMARK)
-	{
-		/* If this is a bookmark, also copy
-		across its location. The calling code
-		will be responsible for freeing this. */
-		StringCchCopy(pBookmark->szLocation,
-			SIZEOF_ARRAY(pBookmark->szLocation),pbi->szLocation);
-	}
-
-	pBookmark->pHandle	= (void *)pbi;
-}
-
-void CBookmark::RetrieveBookmark(void *pBookmarkHandle,Bookmark_t *pBookmark)
-{
-	ExportBookmarkInternal((BookmarkInternal_t *)pBookmarkHandle,pBookmark);
-}
-
 UINT Bookmark::m_IDCounter = 0;
 UINT BookmarkFolder::m_IDCounter = 0;
 
