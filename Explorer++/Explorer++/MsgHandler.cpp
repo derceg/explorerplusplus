@@ -961,10 +961,6 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 {
 	RECT			rc;
 	TCITEM			tcItem;
-	WORD			wComboBoxWidth;
-	RECT			rcComboBox;
-	RECT			rcMain;
-	TBBUTTONINFO	tbi;
 	UINT			uFlags;
 	int				IndentBottom = 0;
 	int				IndentTop = 0;
@@ -1144,20 +1140,6 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	/* Ensure that the main rebar keeps its width in line with the main
 	window (its height will not change). */
 	MoveWindow(m_hMainRebar,0,0,MainWindowWidth,0,FALSE);
-
-	GetWindowRect(m_hContainer,&rcMain);
-	GetWindowRect(m_hAddressBar,&rcComboBox);
-	wComboBoxWidth = (WORD)(MainWindowWidth - (rcComboBox.left - rcMain.left) - 22);
-
-	MoveWindow(m_hAddressBar,0,0,wComboBoxWidth,0,FALSE);
-
-	tbi.cbSize	= sizeof(tbi);
-	tbi.dwMask	= TBIF_BYINDEX|TBIF_SIZE;
-	tbi.cx		= wComboBoxWidth;
-
-	/* Move the 'Go To' button to the end of the combo box (address bar). */
-	SendMessage(m_hAddressToolbar,TB_SETBUTTONINFO,0,(LPARAM)&tbi);
-
 
 	SetFocus(m_hLastActiveWindow);
 

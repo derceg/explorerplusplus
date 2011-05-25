@@ -604,7 +604,6 @@ private:
 	void					CreateMainControls(void);
 	void					CreateFolderControls(void);
 	void					CreateMainToolbar(void);
-	void					CreateAddressToolbar(void);
 	void					CreateAddressBar(void);
 	void					CreateBookmarksToolbar(void);
 	void					CreateDrivesToolbar(void);
@@ -896,7 +895,6 @@ private:
 	HWND					m_hListView[MAX_TABS];
 	HWND					m_hFoldersToolbar;
 	HWND					m_hTabBacking;
-	HWND					m_hAddressToolbar;
 	HWND					m_hBookmarksToolbar;
 	HWND					m_hDrivesToolbar;
 	HWND					m_hApplicationToolbar;

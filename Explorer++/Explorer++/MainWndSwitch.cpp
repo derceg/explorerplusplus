@@ -638,7 +638,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_TOOLBARS_ADDRESSBAR:
 			m_bShowAddressBar = !m_bShowAddressBar;
-			ShowMainRebarBand(m_hAddressToolbar,m_bShowAddressBar);
+			ShowMainRebarBand(m_hAddressBar,m_bShowAddressBar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
@@ -1412,10 +1412,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case TOOLBAR_VIEWS:
 			OnToolbarViews();
-			break;
-
-		case TOOLBAR_ADDRESSBAR_GO:
-			OnAddressBarGo();
 			break;
 
 		/* Messages from the context menu that

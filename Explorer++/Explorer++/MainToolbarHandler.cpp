@@ -458,12 +458,6 @@ void Explorerplusplus::AddStringsToMainToolbar(void)
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_ADDRESSBAR_GO),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
 	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_REFRESH),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */

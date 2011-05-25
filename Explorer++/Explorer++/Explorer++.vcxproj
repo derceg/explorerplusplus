@@ -350,7 +350,6 @@
     <None Include="res\Folder Locked.bmp" />
     <None Include="res\Navigation Start.wav" />
     <None Include="res\No Preview Available.bmp" />
-    <None Include="res\Shell Go.bmp" />
     <None Include="res\Shell Images Large.bmp" />
     <None Include="res\Shell Images.bmp" />
     <None Include="res\Tab Close.bmp" />

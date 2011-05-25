@@ -79,6 +79,7 @@ void Explorerplusplus::CreateFolderControls(void)
 void Explorerplusplus::CreateMainControls(void)
 {
 	SIZE	sz;
+	RECT	rc;
 	DWORD	ToolbarSize;
 	TCHAR	szBandText[32];
 	int		i = 0;
@@ -113,13 +114,12 @@ void Explorerplusplus::CreateMainControls(void)
 			break;
 
 		case ID_ADDRESSTOOLBAR:
-			CreateAddressToolbar();
 			CreateAddressBar();
 			LoadString(g_hLanguageModule,IDS_ADDRESSBAR,szBandText,SIZEOF_ARRAY(szBandText));
-			ToolbarSize = (DWORD)SendMessage(m_hAddressToolbar,TB_GETBUTTONSIZE,0,0);
-			m_ToolbarInformation[i].cyMinChild = HIWORD(ToolbarSize);
+			GetWindowRect(m_hAddressBar,&rc);
+			m_ToolbarInformation[i].cyMinChild = GetRectHeight(&rc);
 			m_ToolbarInformation[i].lpText = szBandText;
-			m_ToolbarInformation[i].hwndChild = m_hAddressToolbar;
+			m_ToolbarInformation[i].hwndChild = m_hAddressBar;
 			break;
 
 		case ID_BOOKMARKSTOOLBAR:
@@ -220,57 +220,12 @@ void Explorerplusplus::CreateMainToolbar(void)
 	}
 }
 
-void Explorerplusplus::CreateAddressToolbar(void)
-{
-	HIMAGELIST	himl;
-	HBITMAP		hb;
-	TBBUTTON	tbButton[2];
-	TCHAR		szGoText[32];
-	int			iCurrent = 0;
-
-	m_hAddressToolbar = CreateToolbar(m_hMainRebar,GoToolbarStyles,
-		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DOUBLEBUFFER);
-
-	SendMessage(m_hAddressToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
-	SendMessage(m_hAddressToolbar,TB_BUTTONSTRUCTSIZE,(WPARAM)sizeof(TBBUTTON),0);
-
-	himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,1);
-	hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELL_GO));
-	ImageList_Add(himl,hb,NULL);
-
-	DeleteObject(hb);
-
-	/* Add the custom buttons to the toolbars image list. */
-	SendMessage(m_hAddressToolbar,TB_SETIMAGELIST,0,(LPARAM)himl);
-
-	tbButton[iCurrent].iBitmap		= 0;
-	tbButton[iCurrent].idCommand	= 0;
-	tbButton[iCurrent].fsState		= TBSTATE_ENABLED;
-	tbButton[iCurrent].fsStyle		= BTNS_SEP;
-	tbButton[iCurrent].dwData		= 0;
-	tbButton[iCurrent].iString		= 0;
-	iCurrent++;
-
-	LoadString(g_hLanguageModule,IDS_GO,szGoText,SIZEOF_ARRAY(szGoText));
-
-	tbButton[iCurrent].iBitmap		= 0;
-	tbButton[iCurrent].idCommand	= TOOLBAR_ADDRESSBAR_GO;
-	tbButton[iCurrent].fsState		= TBSTATE_ENABLED;
-	tbButton[iCurrent].fsStyle		= BTNS_BUTTON | BTNS_AUTOSIZE;
-	tbButton[iCurrent].dwData		= 0;
-	tbButton[iCurrent].iString		= (INT_PTR)szGoText;
-	iCurrent++;
-
-	/* Add the buttons to the toolbar. */
-	SendMessage(m_hAddressToolbar,TB_ADDBUTTONS,(WPARAM)iCurrent,(LPARAM)tbButton);
-}
-
 void Explorerplusplus::CreateAddressBar(void)
 {
 	HWND		hEdit;
 	HIMAGELIST	SmallIcons;
 
-	m_hAddressBar = CreateComboBox(m_hAddressToolbar,ComboBoxStyles);
+	m_hAddressBar = CreateComboBox(m_hMainRebar,ComboBoxStyles);
 
 	/* Retrieve the small and large versions of the system image list. */
 	Shell_GetImageLists(NULL,&SmallIcons);

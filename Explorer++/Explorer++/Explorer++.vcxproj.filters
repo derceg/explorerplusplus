@@ -259,9 +259,6 @@
     <None Include="res\Navigation Start.wav">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\Shell Go.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\Shell Images.bmp">
       <Filter>Resource Files</Filter>
     </None>

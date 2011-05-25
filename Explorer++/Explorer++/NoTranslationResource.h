@@ -9,7 +9,6 @@
 #define IDI_DISPLAYWINDOW               106
 #define IDB_FOLDEREMPTY                 149
 #define IDR_MAINACCELERATORS            152
-#define IDB_SHELL_GO                    194
 #define IDB_SHELLIMAGES                 205
 #define IDI_MAIN_SMALL                  206
 #define IDB_ABOUT                       231
