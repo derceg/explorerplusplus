@@ -296,11 +296,7 @@ void Explorerplusplus::CreateBookmarksToolbar(void)
 	SendMessage(m_hBookmarksToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
 	SendMessage(m_hBookmarksToolbar,TB_BUTTONSTRUCTSIZE,(WPARAM)sizeof(TBBUTTON),0);
 
-	CBookmarkToolbarDrop *pbtd = NULL;
-
-	pbtd = new CBookmarkToolbarDrop(this);
-
-	RegisterDragDrop(m_hBookmarksToolbar,pbtd);
+	/* TODO: [Bookmarks] Register toolbar for drag and drop. */
 }
 
 void Explorerplusplus::CreateDrivesToolbar(void)

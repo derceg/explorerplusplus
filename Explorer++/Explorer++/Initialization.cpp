@@ -39,17 +39,6 @@ void Explorerplusplus::InitializeBookmarks(void)
 	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSMENU,szTemp,SIZEOF_ARRAY(szTemp));
 	BookmarkFolder bfBookmarksMenu(szTemp);
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu);
-
-	HMENU	hMenu;
-	HMENU	hBookmarkMenu;
-
-	hMenu = GetMenu(m_hContainer);
-	hBookmarkMenu = GetSubMenu(hMenu,6);
-
-	InitializeBookmarkToolbarMap();
-
-	InsertBookmarksIntoMenu();
-	InsertBookmarkToolbarButtons();
 }
 
 void Explorerplusplus::InitializeDisplayWindow(void)

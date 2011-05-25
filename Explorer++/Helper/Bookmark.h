@@ -35,8 +35,6 @@ public:
 	CBookmark(void);
 	~CBookmark(void);
 
-	void	GetRoot(Bookmark_t *pRoot);
-	void	CreateNewBookmark(void *pParentHandle,Bookmark_t *pFolder);
 	void	RetrieveBookmark(void *pBookmarkHandle,Bookmark_t *pBookmark);
 
 private:
@@ -69,7 +67,6 @@ private:
 	/* The root of the bookmark heirarchy. */
 	BookmarkInternal_t m_Root;
 
-	void	ImportBookmarkInternal(BookmarkInternal_t *pbi,Bookmark_t *pBookmark);
 	void	ExportBookmarkInternal(BookmarkInternal_t *pbi,Bookmark_t *pBookmark);
 };
 

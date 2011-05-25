@@ -4,7 +4,8 @@
  * File: Bookmark.cpp
  * License: GPL - See COPYING in the top level directory
  *
- * Implements a general bookmarking system.
+ * Implements a bookmark system, with both bookmark folders
+ * and bookmarks.
  *
  * Written by David Erceg
  * www.explorerplusplus.com
@@ -15,7 +16,6 @@
 #include <list>
 #include <algorithm>
 #include "Bookmark.h"
-#include "RegistrySettings.h"
 
 
 #define ROOT_NAME	_T("Bookmarks")
@@ -31,44 +31,6 @@ CBookmark::CBookmark(void)
 
 CBookmark::~CBookmark(void)
 {
-}
-
-void CBookmark::GetRoot(Bookmark_t *pRoot)
-{
-	StringCchCopy(pRoot->szItemName,SIZEOF_ARRAY(pRoot->szItemName),
-		m_Root.szItemName);
-	StringCchCopy(pRoot->szItemDescription,
-		SIZEOF_ARRAY(pRoot->szItemDescription),
-		m_Root.szItemDescription);
-
-	pRoot->Type				= m_Root.Type;
-	pRoot->bShowOnToolbar	= m_Root.bShowOnToolbar;
-	pRoot->pHandle			= (void *)&m_Root;
-}
-
-void CBookmark::ImportBookmarkInternal(BookmarkInternal_t *pbi,Bookmark_t *pBookmark)
-{
-	StringCchCopy(pbi->szItemName,SIZEOF_ARRAY(pbi->szItemName),
-		pBookmark->szItemName);
-	StringCchCopy(pbi->szItemDescription,
-		SIZEOF_ARRAY(pbi->szItemDescription),
-		pBookmark->szItemDescription);
-
-	pbi->Type			= pBookmark->Type;
-	pbi->bShowOnToolbar	= pBookmark->bShowOnToolbar;
-	pbi->FirstChild		= NULL;
-	pbi->NextSibling	= NULL;
-
-	if(pBookmark->Type == BOOKMARK_TYPE_BOOKMARK)
-	{
-		/* If this is a bookmark, also copy
-		across its location. The calling code
-		will be responsible for freeing this. */
-		StringCchCopy(pbi->szLocation,SIZEOF_ARRAY(pbi->szLocation),
-			pBookmark->szLocation);
-	}
-
-	pBookmark->pHandle	= (void *)pbi;
 }
 
 void CBookmark::ExportBookmarkInternal(BookmarkInternal_t *pbi,Bookmark_t *pBookmark)
@@ -97,39 +59,6 @@ void CBookmark::ExportBookmarkInternal(BookmarkInternal_t *pbi,Bookmark_t *pBook
 void CBookmark::RetrieveBookmark(void *pBookmarkHandle,Bookmark_t *pBookmark)
 {
 	ExportBookmarkInternal((BookmarkInternal_t *)pBookmarkHandle,pBookmark);
-}
-
-void CBookmark::CreateNewBookmark(void *pParentHandle,Bookmark_t *pFolder)
-{
-	BookmarkInternal_t	*pbiParent = NULL;
-	BookmarkInternal_t	*pNewBookmark = NULL;
-	BookmarkInternal_t	*pChild = NULL;
-
-	pbiParent = (BookmarkInternal_t *)pParentHandle;
-
-	pNewBookmark = (BookmarkInternal_t *)malloc(sizeof(BookmarkInternal_t));
-
-	ImportBookmarkInternal(pNewBookmark,pFolder);
-
-	pNewBookmark->Parent = (void *)pbiParent;
-
-	if(pbiParent->FirstChild == NULL)
-	{
-		pbiParent->FirstChild			= pNewBookmark;
-		pNewBookmark->PreviousSibling	= NULL;
-	}
-	else
-	{
-		pChild = (BookmarkInternal_t *)pbiParent->FirstChild;
-
-		while(pChild->NextSibling != NULL)
-		{
-			pChild = (BookmarkInternal_t *)pChild->NextSibling;
-		}
-
-		pChild->NextSibling				= pNewBookmark;
-		pNewBookmark->PreviousSibling	= pChild;
-	}
 }
 
 UINT Bookmark::m_IDCounter = 0;

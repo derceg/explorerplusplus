@@ -74,57 +74,6 @@ void Explorerplusplus::InsertBookmarkToolbarButtons(void)
 	/* TODO: [Bookmarks] Rewrite. */
 }
 
-void Explorerplusplus::InsertBookmarkIntoToolbar(Bookmark_t *pBookmark,int id)
-{
-	TBBUTTON	tbButton;
-	int			iImage;
-
-	if(pBookmark->Type == BOOKMARK_TYPE_FOLDER)
-		iImage = SHELLIMAGES_NEWTAB;
-	else
-		iImage = SHELLIMAGES_FAV;
-
-	tbButton.iBitmap	= iImage;
-	tbButton.idCommand	= id;
-	tbButton.fsState	= TBSTATE_ENABLED;
-	tbButton.fsStyle	= BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
-	tbButton.dwData		= (DWORD)pBookmark->pHandle;
-	tbButton.iString	= (INT_PTR)pBookmark->szItemName;
-
-	SendMessage(m_hBookmarksToolbar,TB_ADDBUTTONS,(WPARAM)1,(LPARAM)&tbButton);
-
-	UpdateToolbarBandSizing(m_hMainRebar,m_hBookmarksToolbar);
-}
-
-void Explorerplusplus::InitializeBookmarkToolbarMap(void)
-{
-	int i = 0;
-
-	for(i = 0;i < MAX_BOOKMARKTOOLBAR_ITEMS;i++)
-		m_uBookmarkToolbarMap[i] = 0;
-}
-
-int Explorerplusplus::GenerateUniqueBookmarkToolbarId(void)
-{
-	BOOL	bFound = FALSE;
-	int		i = 0;
-
-	for(i = 0;i < MAX_BOOKMARKTOOLBAR_ITEMS;i++)
-	{
-		if(m_uBookmarkToolbarMap[i] == 0)
-		{
-			m_uBookmarkToolbarMap[i] = 1;
-			bFound = TRUE;
-			break;
-		}
-	}
-
-	if(bFound)
-		return TOOLBAR_BOOKMARK_START + i;
-	else
-		return -1;
-}
-
 void Explorerplusplus::GetBookmarkMenuItemDirectory(HMENU hMenu,
 int iBookmarkId,TCHAR *szDirectory,UINT uBufSize)
 {

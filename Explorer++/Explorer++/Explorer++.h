@@ -341,38 +341,6 @@ private:
 
 	friend CLoadSaveXML;
 
-	class CBookmarkToolbarDrop : public IDropTarget
-	{
-	public:
-		CBookmarkToolbarDrop(Explorerplusplus *pContainer);
-		~CBookmarkToolbarDrop();
-
-		/* IUnknown methods. */
-		HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
-		ULONG __stdcall		AddRef(void);
-		ULONG __stdcall		Release(void);
-
-		/* Drag and drop. */
-		HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect);
-		HRESULT _stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-		HRESULT _stdcall	DragLeave(void);
-		HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-
-	private:
-		int m_iRefCount;
-
-		Explorerplusplus *m_pContainer;
-
-		/* Drag and drop. */
-		IDragSourceHelper *	m_pDragSourceHelper;
-		IDropTargetHelper *	m_pDropTargetHelper;
-		BOOL m_bAcceptData;
-
-		HRESULT	InitializeDragDropHelpers(void);
-	};
-
-	friend CBookmarkToolbarDrop;
-
 	class CApplicationToolbarDrop : public IDropTarget
 	{
 	public:
@@ -806,11 +774,8 @@ private:
 	void					OnDisplayColorsEnChange(HWND hDlg,LPARAM lParam);
 
 	/* Bookmarks. */
-	void					InitializeBookmarkToolbarMap(void);
-	int						GenerateUniqueBookmarkToolbarId(void);
 	void					GetBookmarkMenuItemDirectory(HMENU hMenu,int iBookmarkId,TCHAR *szDirectory,UINT uBufSize);
 	void					InsertBookmarkToolbarButtons(void);
-	void					InsertBookmarkIntoToolbar(Bookmark_t *pBookmark,int id);
 
 	/* Helper functions for the bookmark toolbar. */
 	void					BookmarkToolbarNewBookmark(int iItem);
@@ -1092,7 +1057,6 @@ private:
 	HIMAGELIST				m_himlToolbarLarge;
 
 	/* Bookmark toolbar. */
-	UINT					m_uBookmarkToolbarMap[MAX_BOOKMARKTOOLBAR_ITEMS];
 	int						m_iSelectedRClick;
 
 	/* Toolbar buttons. */
