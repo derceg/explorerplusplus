@@ -62,14 +62,6 @@ private:
 	void		SetSearchFieldDefaultState();
 	void		RemoveSearchFieldDefaultState();
 
-	void		InsertFoldersIntoTreeView();
-	HTREEITEM	InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,BookmarkFolder *pBookmarkFolder);
-	BookmarkFolder	*GetBookmarkFolderFromTreeView(HTREEITEM hItem);
-
-	void		InsertBookmarksIntoListView(BookmarkFolder *pBookmarkFolder);
-	void		InsertBookmarkFolderIntoListView(HWND hListView,BookmarkFolder *pBookmarkFolder,int iPosition);
-	void		InsertBookmarkIntoListView(HWND hListView,Bookmark *pBookmark,int iPosition);
-	void		InsertBookmarkItemIntoListView(HWND hListView,const std::wstring &strName,UINT uID,int iPosition);
 	void		GetBookmarkItemFromListView(int iItem);
 
 	void		OnEnChange(HWND hEdit);

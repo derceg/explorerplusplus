@@ -51,10 +51,6 @@ protected:
 
 private:
 
-	void		InsertFoldersIntoTreeView();
-	HTREEITEM	InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,BookmarkFolder *pBookmarkFolder);
-	BookmarkFolder	*GetBookmarkFolderFromTreeView(HTREEITEM hItem);
-
 	void		OnNewFolder();
 
 	void		OnTvnBeginLabelEdit();
