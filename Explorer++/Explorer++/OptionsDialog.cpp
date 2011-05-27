@@ -22,6 +22,7 @@
 #include "SetDefaultColumnsDialog.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
+#include "../Helper/ListViewHelper.h"
 
 
 #define NUM_DIALOG_OPTIONS_PAGES	5
@@ -678,7 +679,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 							RefreshTab((int)tcItem.lParam);
 
-							ListView_ActivateOneClickSelect(m_hListView[(int)tcItem.lParam],m_bOneClickActivate,m_OneClickActivateHoverTime);
+							NListView::ListView_ActivateOneClickSelect(m_hListView[(int)tcItem.lParam],m_bOneClickActivate,m_OneClickActivateHoverTime);
 						}
 
 						SaveAllSettings();
@@ -912,7 +913,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							m_pShellBrowser[(int)tcItem.lParam]->ToggleGridlines();
 						}
 
-						ListView_AddRemoveExtendedStyle(m_hListView[(int)tcItem.lParam],
+						NListView::ListView_AddRemoveExtendedStyle(m_hListView[(int)tcItem.lParam],
 							LVS_EX_FULLROWSELECT,m_bUseFullRowSelect);
 					}
 

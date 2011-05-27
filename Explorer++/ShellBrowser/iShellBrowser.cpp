@@ -20,6 +20,7 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ListViewHelper.h"
 
 
 void CALLBACK	TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime);
@@ -313,8 +314,8 @@ int CFolderView::SelectFiles(TCHAR *FileNamePattern)
 
 	if(iItem != -1)
 	{
-		ListView_FocusItem(m_hListView,iItem,TRUE);
-		ListView_SelectItem(m_hListView,iItem,TRUE);
+		NListView::ListView_FocusItem(m_hListView,iItem,TRUE);
+		NListView::ListView_SelectItem(m_hListView,iItem,TRUE);
 		ListView_EnsureVisible(m_hListView,iItem,FALSE);
 		return 1;
 	}
@@ -840,7 +841,7 @@ void CFolderView::PositionDroppedItems(void)
 		to be moved. Therefore, if the style is on, turn it
 		off, move the items, and the turn it back on. */
 		if(m_bAutoArrange)
-			ListView_SetAutoArrange(m_hListView,FALSE);
+			NListView::ListView_SetAutoArrange(m_hListView,FALSE);
 
 		for(itr = m_DroppedFileNameList.begin();itr != m_DroppedFileNameList.end();)
 		{
@@ -979,8 +980,8 @@ void CFolderView::PositionDroppedItems(void)
 					ListView_SetItemPosition32(m_hListView,iItem,itr->DropPoint.x,itr->DropPoint.y);
 				}
 
-				ListView_SelectItem(m_hListView,iItem,TRUE);
-				ListView_FocusItem(m_hListView,iItem,TRUE);
+				NListView::ListView_SelectItem(m_hListView,iItem,TRUE);
+				NListView::ListView_FocusItem(m_hListView,iItem,TRUE);
 
 				itr = m_DroppedFileNameList.erase(itr);
 			}
@@ -991,7 +992,7 @@ void CFolderView::PositionDroppedItems(void)
 		}
 
 		if(m_bAutoArrange)
-			ListView_SetAutoArrange(m_hListView,TRUE);
+			NListView::ListView_SetAutoArrange(m_hListView,TRUE);
 	}
 }
 
@@ -1579,7 +1580,7 @@ BOOL CFolderView::ToggleAutoArrange(void)
 {
 	m_bAutoArrange = !m_bAutoArrange;
 
-	ListView_SetAutoArrange(m_hListView,m_bAutoArrange);
+	NListView::ListView_SetAutoArrange(m_hListView,m_bAutoArrange);
 
 	return m_bAutoArrange;
 }
@@ -1971,12 +1972,12 @@ void CFolderView::SelectItems(const std::list<std::wstring> &PastedFileList)
 
 		if(iIndex != -1)
 		{
-			ListView_SelectItem(m_hListView,iIndex,TRUE);
+			NListView::ListView_SelectItem(m_hListView,iIndex,TRUE);
 
 			if(i == 0)
 			{
 				/* Focus on the first item, and ensure it is visible. */
-				ListView_FocusItem(m_hListView,iIndex,TRUE);
+				NListView::ListView_FocusItem(m_hListView,iIndex,TRUE);
 				ListView_EnsureVisible(m_hListView,iIndex,FALSE);
 
 				i++;

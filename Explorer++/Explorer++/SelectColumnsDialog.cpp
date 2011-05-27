@@ -18,6 +18,7 @@
 #include "MainResource.h"
 #include "../ShellBrowser/iShellView.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ListViewHelper.h"
 
 
 const TCHAR CSelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectColumns");
@@ -75,7 +76,7 @@ BOOL CSelectColumnsDialog::OnInitDialog()
 
 	ListView_SetColumnWidth(hListView,0,LVSCW_AUTOSIZE);
 
-	ListView_SelectItem(hListView,0,TRUE);
+	NListView::ListView_SelectItem(hListView,0,TRUE);
 	SetFocus(hListView);
 
 	m_pscdps->RestoreDialogPosition(m_hDlg,true);
@@ -267,11 +268,11 @@ void CSelectColumnsDialog::OnMoveColumn(bool bUp)
 	{
 		if(bUp)
 		{
-			ListView_SwapItems(hListView,iSelected,iSelected - 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected - 1);
 		}
 		else
 		{
-			ListView_SwapItems(hListView,iSelected,iSelected + 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected + 1);
 		}
 
 		m_bColumnsSwapped = TRUE;

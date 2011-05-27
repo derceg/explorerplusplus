@@ -16,6 +16,7 @@
 #include "Explorer++_internal.h"
 #include "MergeFilesDialog.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ListViewHelper.h"
 
 
 namespace NMergeFilesDialog
@@ -454,7 +455,7 @@ void CMergeFilesDialog::OnMove(bool bUp)
 
 		std::iter_swap(itrSelected,itrSwap);
 
-		ListView_SwapItemsNolParam(hListView,iSelected,iSwap);
+		NListView::ListView_SwapItemsNolParam(hListView,iSelected,iSwap);
 	}
 }
 

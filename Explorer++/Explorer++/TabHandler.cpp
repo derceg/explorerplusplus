@@ -20,6 +20,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ListViewHelper.h"
 #include "MainResource.h"
 
 
@@ -175,7 +176,7 @@ int *pTabObjectIndex)
 	if(m_hListView[iTabId] == NULL)
 		return E_FAIL;
 
-	ListView_ActivateOneClickSelect(m_hListView[iTabId],m_bOneClickActivate,m_OneClickActivateHoverTime);
+	NListView::ListView_ActivateOneClickSelect(m_hListView[iTabId],m_bOneClickActivate,m_OneClickActivateHoverTime);
 
 	/* Set the listview to its initial size. */
 	SetListViewInitialPosition(m_hListView[iTabId]);
@@ -254,7 +255,7 @@ int *pTabObjectIndex)
 	&m_pFolderView[iTabId],pSettings,m_hIconThread,m_hFolderSizeThread);
 
 	if(pSettings->bApplyFilter)
-		ListView_SetBackgroundImage(m_hListView[iTabId],IDB_FILTERINGAPPLIED);
+		NListView::ListView_SetBackgroundImage(m_hListView[iTabId],IDB_FILTERINGAPPLIED);
 
 	ListViewInfo_t	*plvi = NULL;
 

@@ -17,6 +17,7 @@
 #include "ColorRuleDialog.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ListViewHelper.h"
 
 
 const TCHAR CCustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("CustomizeColors");
@@ -342,7 +343,7 @@ void CCustomizeColorsDialog::OnMove(BOOL bUp)
 
 		std::iter_swap(itrSelected,itrSwap);
 
-		ListView_SwapItemsNolParam(hListView,iSelected,iSwap);
+		NListView::ListView_SwapItemsNolParam(hListView,iSelected,iSwap);
 	}
 }
 
@@ -373,7 +374,7 @@ void CCustomizeColorsDialog::OnDelete()
 			if(iSelected == (nItems - 1))
 				iSelected--;
 
-			ListView_SelectItem(hListView,iSelected,TRUE);
+			NListView::ListView_SelectItem(hListView,iSelected,TRUE);
 		}
 
 		SetFocus(hListView);

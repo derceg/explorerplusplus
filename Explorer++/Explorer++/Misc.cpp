@@ -21,6 +21,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ListViewHelper.h"
 #include "MainResource.h"
 
 
@@ -396,7 +397,7 @@ int Explorerplusplus::SelectAllFolders(HWND ListView)
 	int		nFolders = 0;
 	int		i = 0;
 
-	ListView_DeselectAllItems(ListView);
+	NListView::ListView_SelectAllItems(ListView,FALSE);
 
 	nItems = ListView_GetItemCount(ListView);
 
@@ -450,12 +451,12 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView)
 
 			if(bSimilarTypes)
 			{
-				ListView_SelectItem(ListView,i,TRUE);
+				NListView::ListView_SelectItem(ListView,i,TRUE);
 				nSimilar++;
 			}
 			else
 			{
-				ListView_SelectItem(ListView,i,FALSE);
+				NListView::ListView_SelectItem(ListView,i,FALSE);
 			}
 		}
 	}

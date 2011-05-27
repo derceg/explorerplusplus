@@ -24,6 +24,7 @@
 #include "AddBookmarkDialog.h"
 #include "ManageBookmarksDialog.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ListViewHelper.h"
 
 
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -217,18 +218,18 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		case WM_USER_FOLDEREMPTY:
 			{
 				if((BOOL)lParam == TRUE)
-					ListView_SetBackgroundImage(m_hListView[(int)wParam],IDB_FOLDEREMPTY);
+					NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],IDB_FOLDEREMPTY);
 				else
-					ListView_SetBackgroundImage(m_hListView[(int)wParam],NULL);
+					NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],NULL);
 			}
 			break;
 
 		case WM_USER_FILTERINGAPPLIED:
 			{
 				if((BOOL)lParam == TRUE)
-					ListView_SetBackgroundImage(m_hListView[(int)wParam],IDB_FILTERINGAPPLIED);
+					NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],IDB_FILTERINGAPPLIED);
 				else
-					ListView_SetBackgroundImage(m_hListView[(int)wParam],NULL);
+					NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],NULL);
 			}
 			break;
 
@@ -581,14 +582,14 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_EDIT_SELECTALL:
 			m_bCountingUp = TRUE;
-			ListView_SelectAllItems(m_hActiveListView);
+			NListView::ListView_SelectAllItems(m_hActiveListView,TRUE);
 			SetFocus(m_hActiveListView);
 			break;
 
 		case IDM_EDIT_INVERTSELECTION:
 			m_bInverted = TRUE;
 			m_nSelectedOnInvert = m_nSelected;
-			ListView_InvertSelection(m_hActiveListView);
+			NListView::ListView_InvertSelection(m_hActiveListView);
 			SetFocus(m_hActiveListView);
 			break;
 
@@ -599,7 +600,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_EDIT_SELECTNONE:
 			m_bCountingDown = TRUE;
-			ListView_DeselectAllItems(m_hActiveListView);
+			NListView::ListView_SelectAllItems(m_hActiveListView,FALSE);
 			SetFocus(m_hActiveListView);
 			break;
 

@@ -22,6 +22,7 @@
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ListViewHelper.h"
 
 
 LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -494,7 +495,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 			!(GetKeyState(VK_MENU) & 0x80))
 			{
 				m_bCountingUp = TRUE;
-				ListView_SelectAllItems(m_hActiveListView);
+				NListView::ListView_SelectAllItems(m_hActiveListView,TRUE);
 				SetFocus(m_hActiveListView);
 			}
 			break;
@@ -513,7 +514,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 			{
 				m_bInverted = TRUE;
 				m_nSelectedOnInvert = m_nSelected;
-				ListView_InvertSelection(m_hActiveListView);
+				NListView::ListView_InvertSelection(m_hActiveListView);
 				SetFocus(m_hActiveListView);
 			}
 			break;
@@ -558,11 +559,11 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	{
 		if(ListView_GetCheckState(m_hListView[iObjectIndex],ItemChanged->iItem))
 		{
-			ListView_SelectItem(m_hListView[iObjectIndex],ItemChanged->iItem,TRUE);
+			NListView::ListView_SelectItem(m_hListView[iObjectIndex],ItemChanged->iItem,TRUE);
 		}
 		else
 		{
-			ListView_SelectItem(m_hListView[iObjectIndex],ItemChanged->iItem,FALSE);
+			NListView::ListView_SelectItem(m_hListView[iObjectIndex],ItemChanged->iItem,FALSE);
 		}
 
 		return;
@@ -739,7 +740,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wP
 				int nItems;
 
 				iSel = ListView_GetNextItem(GetParent(hwnd),-1,LVNI_ALL|LVNI_SELECTED);
-				ListView_SelectItem(GetParent(hwnd),iSel,FALSE);
+				NListView::ListView_SelectItem(GetParent(hwnd),iSel,FALSE);
 
 				nItems = ListView_GetItemCount(GetParent(hwnd));
 
@@ -1126,8 +1127,8 @@ void Explorerplusplus::OnListViewRClick(HWND hParent,POINT *pCursorPos)
 			if(ListView_GetItemState(m_hActiveListView,lvhti.iItem,LVIS_SELECTED) !=
 				LVIS_SELECTED)
 			{
-				ListView_DeselectAllItems(m_hActiveListView);
-				ListView_SelectItem(m_hActiveListView,lvhti.iItem,TRUE);
+				NListView::ListView_SelectAllItems(m_hActiveListView,FALSE);
+				NListView::ListView_SelectItem(m_hActiveListView,lvhti.iItem,TRUE);
 			}
 		}
 	}

@@ -17,6 +17,7 @@
 #include "ManageBookmarksDialog.h"
 #include "BookmarkHelper.h"
 #include "MainResource.h"
+#include "../Helper/ListViewHelper.h"
 
 
 namespace NManageBookmarksDialog
@@ -101,7 +102,7 @@ void CManageBookmarksDialog::SetupListView()
 
 	NBookmarkHelper::InsertBookmarksIntoListView(hListView,m_pAllBookmarks);
 
-	ListView_SelectItem(hListView,0,TRUE);
+	NListView::ListView_SelectItem(hListView,0,TRUE);
 }
 
 /* Changes the font within the search edit
