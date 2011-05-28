@@ -120,7 +120,6 @@ void Explorerplusplus::OnWindowCreate(void)
 	m_hBookmarksMenu				= GetSubMenu(GetMenu(m_hContainer),6);
 	m_hTabRightClickMenu			= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_TAB_RCLICK)),0);
 	m_hToolbarRightClickMenu		= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_TOOLBAR_MENU)),0);
-	m_hBookmarksRightClickMenu		= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_BOOKMARKSTOOLBAR_MENU)),0);
 	m_hApplicationRightClickMenu	= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)),0);
 	m_hDisplayWindowRightClickMenu	= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)),0);
 	m_hViewsMenu					= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_VIEWS_MENU)),0);
@@ -891,22 +890,6 @@ void Explorerplusplus::OnMainToolbarRClick(void)
 	ptCursor.y = GET_Y_LPARAM(dwPos);
 
 	TrackPopupMenu(m_hToolbarRightClickMenu,TPM_LEFTALIGN,
-		ptCursor.x,ptCursor.y,0,m_hMainRebar,NULL);
-}
-
-void Explorerplusplus::OnBookmarksToolbarRClick(int iItem)
-{
-	POINT ptCursor;
-	DWORD dwPos;
-
-	SetFocus(m_hMainToolbar);
-	dwPos = GetMessagePos();
-	ptCursor.x = GET_X_LPARAM(dwPos);
-	ptCursor.y = GET_Y_LPARAM(dwPos);
-
-	m_iSelectedRClick = iItem;
-
-	TrackPopupMenu(m_hBookmarksRightClickMenu,TPM_LEFTALIGN,
 		ptCursor.x,ptCursor.y,0,m_hMainRebar,NULL);
 }
 

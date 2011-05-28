@@ -134,6 +134,11 @@ BOOL CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	{
 		switch(LOWORD(wParam))
 		{
+		case IDM_ADDBOOKMARK_RLICK_RENAME:
+			OnTreeViewRename();
+			break;
+
+		case IDM_ADDBOOKMARK_RLICK_NEWFOLDER:
 		case IDC_BOOKMARK_NEWFOLDER:
 			OnNewFolder();
 			break;
@@ -155,6 +160,10 @@ BOOL CAddBookmarkDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
+	case NM_RCLICK:
+		OnRClick(pnmhdr);
+		break;
+
 	case TVN_BEGINLABELEDIT:
 		OnTvnBeginLabelEdit();
 		break;
@@ -200,6 +209,34 @@ void CAddBookmarkDialog::OnNewFolder()
 	SetFocus(hTreeView);
 	TreeView_SelectItem(hTreeView,hNewItem);
 	TreeView_EditLabel(hTreeView,hNewItem);
+}
+
+void CAddBookmarkDialog::OnRClick(NMHDR *pnmhdr)
+{
+	if(pnmhdr->idFrom == IDC_BOOKMARK_TREEVIEW)
+	{
+		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
+
+		DWORD dwCursorPos = GetMessagePos();
+
+		POINT ptCursor;
+		ptCursor.x = GET_X_LPARAM(dwCursorPos);
+		ptCursor.y = GET_Y_LPARAM(dwCursorPos);
+
+		TVHITTESTINFO tvhti;
+		tvhti.pt = ptCursor;
+		ScreenToClient(hTreeView,&tvhti.pt);
+		HTREEITEM hItem = TreeView_HitTest(hTreeView,&tvhti);
+
+		if(hItem != NULL)
+		{
+			TreeView_SelectItem(hTreeView,hItem);
+
+			HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_ADDBOOKMARK_RCLICK_MENU));
+			TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,ptCursor.x,ptCursor.y,0,m_hDlg,NULL);
+			DestroyMenu(hMenu);
+		}
+	}
 }
 
 void CAddBookmarkDialog::OnTvnBeginLabelEdit()
@@ -262,17 +299,40 @@ void CAddBookmarkDialog::OnTvnKeyDown(NMTVKEYDOWN *pnmtvkd)
 	switch(pnmtvkd->wVKey)
 	{
 	case VK_F2:
-		{
-			HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
-			HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
-			TreeView_EditLabel(hTreeView,hSelectedItem);
-		}
+		OnTreeViewRename();
 		break;
 	}
 }
 
+void CAddBookmarkDialog::OnTreeViewRename()
+{
+	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
+	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
+	TreeView_EditLabel(hTreeView,hSelectedItem);
+}
+
 void CAddBookmarkDialog::OnOk()
 {
+	HWND hName = GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME);
+	std::wstring strName;
+	GetWindowString(hName,strName);
+
+	HWND hLocation = GetDlgItem(m_hDlg,IDC_BOOKMARK_LOCATION);
+	std::wstring strLocation;
+	GetWindowString(hLocation,strLocation);
+
+	if(strName.size() > 0 &&
+		strLocation.size() > 0)
+	{
+		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
+		HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
+		CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
+			hSelected,m_pAllBookmarks);
+
+		CBookmark Bookmark(strName,strLocation,_T(""));
+		pBookmarkFolder->InsertBookmark(Bookmark);
+	}
+
 	EndDialog(m_hDlg,1);
 }
 

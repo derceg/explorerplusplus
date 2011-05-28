@@ -430,7 +430,6 @@ private:
 	void					ShowToolbarViewsDropdown(void);
 	void					OnMainToolbarRClick(void);
 	void					OnApplicationToolbarRClick(void);
-	void					OnBookmarksToolbarRClick(int iItem);
 	void					OnAddressBarGo(void);
 	void					OnSortByAscending(BOOL bSortAscending);
 	void					OnPreviousWindow(void);
@@ -924,7 +923,6 @@ private:
 	HMENU					m_hBookmarksMenu;
 	HMENU					m_hTabRightClickMenu;
 	HMENU					m_hToolbarRightClickMenu;
-	HMENU					m_hBookmarksRightClickMenu;
 	HMENU					m_hApplicationRightClickMenu;
 	HMENU					m_hDisplayWindowRightClickMenu;
 	HMENU					m_hViewsMenu;
@@ -1051,9 +1049,6 @@ private:
 	HIMAGELIST				m_himlToolbarSmall;
 	HIMAGELIST				m_himlToolbarLarge;
 
-	/* Bookmark toolbar. */
-	int						m_iSelectedRClick;
-
 	/* Toolbar buttons. */
 	std::list<ToolbarButton_t>	m_tbInitial;
 
@@ -1065,6 +1060,7 @@ private:
 	ApplicationButton_t		*m_pAppButtonSelected;
 	int						m_nAppButtons;
 	int						m_iAppIdOffset;
+	int						m_iSelectedRClick;
 
 	/* Display window details. */
 	std::list<DWRule_t>		m_DWRules;

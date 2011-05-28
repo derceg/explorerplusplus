@@ -381,18 +381,7 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 
 						if(pnmh->hwndFrom == m_hBookmarksToolbar)
 						{
-							if(pnmm->dwItemSpec != -1)
-							{
-								int iItem;
-
-								iItem = (int)SendMessage(m_hBookmarksToolbar,TB_COMMANDTOINDEX,pnmm->dwItemSpec,0);
-
-								OnBookmarksToolbarRClick(iItem);
-							}
-							else
-							{
-								OnMainToolbarRClick();
-							}
+							/* TODO: [Bookmarks] Show bookmarks menu. */
 						}
 						else if(pnmh->hwndFrom == m_hDrivesToolbar)
 						{

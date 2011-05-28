@@ -53,6 +53,10 @@ private:
 
 	void		OnNewFolder();
 
+	void		OnRClick(NMHDR *pnmhdr);
+
+	void		OnTreeViewRename();
+
 	void		OnTvnBeginLabelEdit();
 	BOOL		OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi);
 	void		OnTvnKeyDown(NMTVKEYDOWN *pnmtvkd);

@@ -153,11 +153,6 @@ void Explorerplusplus::InitializeMenus(void)
 	/* <---- Toolbar right click menu ----> */
 	SetMenuOwnerDraw(m_hToolbarRightClickMenu);
 
-	/* <--- Bookmarks right click menu ----> */
-	SetMenuOwnerDraw(m_hBookmarksRightClickMenu);
-	SetMenuItemBitmap(m_hBookmarksRightClickMenu,IDM_BT_DELETE,SHELLIMAGES_DELETE);
-	SetMenuItemBitmap(m_hBookmarksRightClickMenu,IDM_BT_PROPERTIES,SHELLIMAGES_PROPERTIES);
-
 	/* <---- Application toolbar right click menu ----> */
 	SetMenuOwnerDraw(m_hApplicationRightClickMenu);
 	SetMenuItemBitmap(m_hApplicationRightClickMenu,IDM_APP_DELETE,SHELLIMAGES_DELETE);
