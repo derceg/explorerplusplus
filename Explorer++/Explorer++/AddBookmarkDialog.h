@@ -51,18 +51,21 @@ protected:
 
 private:
 
-	void		OnNewFolder();
+	void		SetDialogIcon();
 
 	void		OnRClick(NMHDR *pnmhdr);
-
-	void		OnTreeViewRename();
+	void		OnNewFolder();
 
 	void		OnTvnBeginLabelEdit();
 	BOOL		OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi);
 	void		OnTvnKeyDown(NMTVKEYDOWN *pnmtvkd);
 
+	void		OnTreeViewRename();
+
 	void		OnOk();
 	void		OnCancel();
+
+	HICON			m_hDialogIcon;
 
 	CBookmarkFolder	*m_pAllBookmarks;
 	CBookmark		*m_pBookmark;

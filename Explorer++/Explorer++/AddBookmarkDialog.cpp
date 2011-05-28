@@ -43,6 +43,8 @@ CAddBookmarkDialog::~CAddBookmarkDialog()
 
 BOOL CAddBookmarkDialog::OnInitDialog()
 {
+	SetDialogIcon();
+
 	SetDlgItemText(m_hDlg,IDC_BOOKMARK_NAME,m_pBookmark->GetName().c_str());
 	SetDlgItemText(m_hDlg,IDC_BOOKMARK_LOCATION,m_pBookmark->GetLocation().c_str());
 
@@ -70,6 +72,19 @@ BOOL CAddBookmarkDialog::OnInitDialog()
 	m_pabdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
+}
+
+void CAddBookmarkDialog::SetDialogIcon()
+{
+	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
+	HBITMAP hBitmap = LoadBitmap(GetInstance(),MAKEINTRESOURCE(IDB_SHELLIMAGES));
+	ImageList_Add(himl,hBitmap,NULL);
+
+	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_ADDFAV,ILD_NORMAL);
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+
+	DeleteObject(hBitmap);
+	ImageList_Destroy(himl);
 }
 
 void CAddBookmarkDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
@@ -356,6 +371,7 @@ BOOL CAddBookmarkDialog::OnClose()
 
 BOOL CAddBookmarkDialog::OnDestroy()
 {
+	DestroyIcon(m_hDialogIcon);
 	ImageList_Destroy(m_himlTreeView);
 	return 0;
 }

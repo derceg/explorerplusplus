@@ -17,22 +17,34 @@
 #include "BookmarkHelper.h"
 
 
+void InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,CBookmarkFolder *pBookmarkFolder);
+
 void NBookmarkHelper::InsertFoldersIntoTreeView(HWND hTreeView,CBookmarkFolder *pBookmarkFolder)
 {
 	TreeView_DeleteAllItems(hTreeView);
 
 	HTREEITEM hRoot = InsertFolderIntoTreeView(hTreeView,NULL,pBookmarkFolder);
 
-	for(auto itr = pBookmarkFolder->begin();itr != pBookmarkFolder->end();itr++)
-	{
-		if(CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(&(*itr)))
-		{
-			InsertFolderIntoTreeView(hTreeView,hRoot,pBookmarkFolder);
-		}
-	}
+	InsertFoldersIntoTreeViewRecursive(hTreeView,hRoot,pBookmarkFolder);
 
 	TreeView_Expand(hTreeView,hRoot,TVE_EXPAND);
 	TreeView_SelectItem(hTreeView,hRoot);
+}
+
+void InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,CBookmarkFolder *pBookmarkFolder)
+{
+	for(auto itr = pBookmarkFolder->begin();itr != pBookmarkFolder->end();++itr)
+	{
+		if(CBookmarkFolder *pBookmarkFolderChild = boost::get<CBookmarkFolder>(&(*itr)))
+		{
+			HTREEITEM hCurrentItem = NBookmarkHelper::InsertFolderIntoTreeView(hTreeView,hParent,pBookmarkFolderChild);
+
+			if(pBookmarkFolderChild->HasChildFolder())
+			{
+				InsertFoldersIntoTreeViewRecursive(hTreeView,hCurrentItem,pBookmarkFolderChild);
+			}
+		}
+	}
 }
 
 /* Note that this function assumes that the standard shell images
@@ -107,7 +119,7 @@ void NBookmarkHelper::InsertBookmarksIntoListView(HWND hListView,CBookmarkFolder
 
 	int iItem = 0;
 
-	for(auto itr = pBookmarkFolder->begin();itr != pBookmarkFolder->end();itr++)
+	for(auto itr = pBookmarkFolder->begin();itr != pBookmarkFolder->end();++itr)
 	{
 		if(CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(&(*itr)))
 		{
