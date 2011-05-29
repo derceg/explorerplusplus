@@ -411,22 +411,8 @@ void DeleteKey(HKEY hKey)
 
 void Explorerplusplus::SaveBookmarksToRegistry(void)
 {
-	HKEY			hBookmarksKey;
-	DWORD			Disposition;
-	LONG			ReturnValue;
-
 	SHDeleteKey(HKEY_CURRENT_USER,REG_BOOKMARKS_KEY);
-
-	ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_BOOKMARKS_KEY,
-	0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hBookmarksKey,
-	&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		/* TODO: Save bookmarks. */
-
-		RegCloseKey(hBookmarksKey);
-	}
+	m_bfAllBookmarks->SerializeToRegistry(REG_BOOKMARKS_KEY);
 }
 
 void Explorerplusplus::LoadBookmarksFromRegistry(void)

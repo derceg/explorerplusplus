@@ -20,13 +20,17 @@ class CBookmarkFolder
 {
 public:
 
-	CBookmarkFolder(const std::wstring &strName);
+	static CBookmarkFolder	Create(const std::wstring &strName);
+	static CBookmarkFolder	*CreateNew(const std::wstring &strName);
+	static CBookmarkFolder	UnserializeFromRegistry(const std::wstring &strKey);
+
 	~CBookmarkFolder();
+
+	void			SerializeToRegistry(const std::wstring &strKey);
 
 	UINT			GetID();
 
 	std::wstring	GetName();
-
 	void			SetName(const std::wstring &strName);
 
 	/* Returns true if this folder has *at least*
@@ -50,9 +54,18 @@ public:
 	folder. */
 	std::pair<void *,NBookmarks::BookmarkType_t>	GetBookmarkItem(UINT uID);
 
-	void			GetIterator();
-
 private:
+
+	enum InitializationType_t
+	{
+		INITIALIZATION_TYPE_NORMAL,
+		INITIALIZATION_TYPE_REGISTRY
+	};
+
+	CBookmarkFolder(const std::wstring &str,InitializationType_t InitializationType);
+
+	void			Initialize(const std::wstring &strName);
+	void			InitializeFromRegistry(const std::wstring &strKey);
 
 	static UINT		m_IDCounter;
 	UINT			m_ID;
@@ -65,8 +78,6 @@ private:
 	method above. */
 	int				m_nChildFolders;
 
-	/* These need to be able to be saved and read
-	back from storage. */
 	FILETIME		m_ftCreated;
 	FILETIME		m_ftModified;
 

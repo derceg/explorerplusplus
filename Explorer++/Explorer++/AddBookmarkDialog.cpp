@@ -204,7 +204,7 @@ void CAddBookmarkDialog::OnNewFolder()
 
 	TCHAR szTemp[64];
 	LoadString(GetInstance(),IDS_BOOKMARKS_NEWBOOKMARKFOLDER,szTemp,SIZEOF_ARRAY(szTemp));
-	CBookmarkFolder NewBookmarkFolder(szTemp);
+	CBookmarkFolder NewBookmarkFolder = CBookmarkFolder::Create(szTemp);
 
 	CBookmarkFolder *pParentBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
 		hSelectedItem,m_pAllBookmarks);
