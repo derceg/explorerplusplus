@@ -82,23 +82,24 @@ void CManageBookmarksDialog::SetupListView()
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT,
 		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT);
 
-	LVCOLUMN lvCol;
-	TCHAR szTemp[64];
+	int iColumn = 0;
 
-	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_NAME,
-		szTemp,SIZEOF_ARRAY(szTemp));
-	lvCol.mask		= LVCF_TEXT;
-	lvCol.pszText	= szTemp;
-	ListView_InsertColumn(hListView,1,&lvCol);
+	for each(auto ci in m_pmbdps->m_vectorColumnInfo)
+	{
+		if(ci.bActive)
+		{
+			LVCOLUMN lvCol;
+			TCHAR szTemp[128];
 
-	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_LOCATION,
-		szTemp,SIZEOF_ARRAY(szTemp));
-	lvCol.mask		= LVCF_TEXT;
-	lvCol.pszText	= szTemp;
-	ListView_InsertColumn(hListView,2,&lvCol);
+			GetColumnString(ci.ColumnType,szTemp,SIZEOF_ARRAY(szTemp));
+			lvCol.mask		= LVCF_TEXT|LVCF_WIDTH;
+			lvCol.pszText	= szTemp;
+			lvCol.cx		= ci.iWidth;
+			ListView_InsertColumn(hListView,iColumn,&lvCol);
 
-	SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,m_pmbdps->m_iColumnWidth1);
-	SendMessage(hListView,LVM_SETCOLUMNWIDTH,1,m_pmbdps->m_iColumnWidth2);
+			++iColumn;
+		}
+	}
 
 	NBookmarkHelper::InsertBookmarksIntoListView(hListView,m_pAllBookmarks);
 
@@ -268,12 +269,16 @@ BOOL CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
-	case TVN_SELCHANGED:
-		OnTvnSelChanged(reinterpret_cast<NMTREEVIEW *>(pnmhdr));
-		break;
-
 	case NM_DBLCLK:
 		OnDblClk(pnmhdr);
+		break;
+
+	case NM_RCLICK:
+		OnRClick(pnmhdr);
+		break;
+
+	case TVN_SELCHANGED:
+		OnTvnSelChanged(reinterpret_cast<NMTREEVIEW *>(pnmhdr));
 		break;
 	}
 
@@ -296,6 +301,126 @@ void CManageBookmarksDialog::OnEnChange(HWND hEdit)
 	}
 }
 
+void CManageBookmarksDialog::OnListViewHeaderRClick()
+{
+	DWORD dwCursorPos = GetMessagePos();
+
+	POINT ptCursor;
+	ptCursor.x = GET_X_LPARAM(dwCursorPos);
+	ptCursor.y = GET_Y_LPARAM(dwCursorPos);
+
+	HMENU hMenu = CreatePopupMenu();
+	int iItem = 0;
+
+	for each(auto ci in m_pmbdps->m_vectorColumnInfo)
+	{
+		TCHAR szColumn[128];
+		GetColumnString(ci.ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
+
+		MENUITEMINFO mii;
+		mii.cbSize		= sizeof(mii);
+		mii.fMask		= MIIM_ID|MIIM_STRING|MIIM_STATE;
+		mii.wID			= ci.ColumnType;
+		mii.dwTypeData	= szColumn;
+		mii.fState		= 0;
+
+		if(ci.bActive)
+		{
+			mii.fState |= MFS_CHECKED;
+		}
+
+		/* The name column cannot be removed. */
+		if(ci.ColumnType == CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME)
+		{
+			mii.fState |= MFS_DISABLED;
+		}
+
+		InsertMenuItem(hMenu,iItem,TRUE,&mii);
+
+		++iItem;
+	}
+
+	int iCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RETURNCMD,ptCursor.x,ptCursor.y,0,m_hDlg,NULL);
+	DestroyMenu(hMenu);
+
+	int iColumn = 0;
+
+	for(auto itr = m_pmbdps->m_vectorColumnInfo.begin();itr != m_pmbdps->m_vectorColumnInfo.end();++itr)
+	{
+		if(itr->ColumnType == iCmd)
+		{
+			HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+
+			if(itr->bActive)
+			{
+				itr->iWidth = ListView_GetColumnWidth(hListView,iColumn);
+				ListView_DeleteColumn(hListView,iColumn);
+			}
+			else
+			{
+				LVCOLUMN lvCol;
+				TCHAR szTemp[128];
+
+				GetColumnString(itr->ColumnType,szTemp,SIZEOF_ARRAY(szTemp));
+				lvCol.mask		= LVCF_TEXT|LVCF_WIDTH;
+				lvCol.pszText	= szTemp;
+				lvCol.cx		= itr->iWidth;
+				ListView_InsertColumn(hListView,iColumn,&lvCol);
+			}
+
+			itr->bActive = !itr->bActive;
+
+			break;
+		}
+		else
+		{
+			if(itr->bActive)
+			{
+				++iColumn;
+			}
+		}
+	}
+}
+
+void CManageBookmarksDialog::GetColumnString(CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,
+	TCHAR *szColumn,UINT cchBuf)
+{
+	UINT uResourceID = 0;
+
+	switch(ColumnType)
+	{
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME:
+		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_NAME;
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LOCATION:
+		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_LOCATION;
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_DATE:
+		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_VISIT_DATE;
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_COUNT:
+		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_VISIT_COUNT;
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_ADDED:
+		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_ADDED;
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LAST_MODIFIED:
+		uResourceID = IDS_MANAGE_BOOKMARKS_COLUMN_LAST_MODIFIED;
+		break;
+
+	default:
+		assert(FALSE);
+		break;
+	}
+
+	LoadString(GetInstance(),uResourceID,szColumn,cchBuf);
+}
+
 void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
 {
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
@@ -314,6 +439,25 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 	if(pnmhdr->hwndFrom == hListView)
 	{
 		/* TODO: Open bookmark folder/bookmark. */
+	}
+}
+
+void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)
+{
+	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
+
+	if(pnmhdr->hwndFrom == hListView)
+	{
+
+	}
+	else if(pnmhdr->hwndFrom == ListView_GetHeader(hListView))
+	{
+		OnListViewHeaderRClick();
+	}
+	else if(pnmhdr->hwndFrom == hTreeView)
+	{
+
 	}
 }
 
@@ -345,8 +489,16 @@ void CManageBookmarksDialog::SaveState()
 	m_pmbdps->SaveDialogPosition(m_hDlg);
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-	m_pmbdps->m_iColumnWidth1 = ListView_GetColumnWidth(hListView,0);
-	m_pmbdps->m_iColumnWidth2 = ListView_GetColumnWidth(hListView,1);
+	int iColumn = 0;
+
+	for(auto itr = m_pmbdps->m_vectorColumnInfo.begin();itr != m_pmbdps->m_vectorColumnInfo.end();++itr)
+	{
+		if(itr->bActive)
+		{
+			itr->iWidth = ListView_GetColumnWidth(hListView,iColumn);
+			++iColumn;
+		}
+	}
 
 	m_pmbdps->m_bStateSaved = TRUE;
 }
@@ -354,8 +506,7 @@ void CManageBookmarksDialog::SaveState()
 CManageBookmarksDialogPersistentSettings::CManageBookmarksDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
 {
-	m_iColumnWidth1 = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
-	m_iColumnWidth2 = DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
+	SetupDefaultColumns();
 }
 
 CManageBookmarksDialogPersistentSettings::~CManageBookmarksDialogPersistentSettings()
@@ -367,4 +518,39 @@ CManageBookmarksDialogPersistentSettings& CManageBookmarksDialogPersistentSettin
 {
 	static CManageBookmarksDialogPersistentSettings mbdps;
 	return mbdps;
+}
+
+void CManageBookmarksDialogPersistentSettings::SetupDefaultColumns()
+{
+	ColumnInfo_t ci;
+
+	ci.ColumnType	= COLUMN_TYPE_NAME;
+	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
+	ci.bActive		= TRUE;
+	m_vectorColumnInfo.push_back(ci);
+
+	ci.ColumnType	= COLUMN_TYPE_LOCATION;
+	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
+	ci.bActive		= TRUE;
+	m_vectorColumnInfo.push_back(ci);
+
+	ci.ColumnType	= COLUMN_TYPE_VISIT_DATE;
+	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
+	ci.bActive		= FALSE;
+	m_vectorColumnInfo.push_back(ci);
+
+	ci.ColumnType	= COLUMN_TYPE_VISIT_COUNT;
+	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
+	ci.bActive		= FALSE;
+	m_vectorColumnInfo.push_back(ci);
+
+	ci.ColumnType	= COLUMN_TYPE_ADDED;
+	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
+	ci.bActive		= FALSE;
+	m_vectorColumnInfo.push_back(ci);
+
+	ci.ColumnType	= COLUMN_TYPE_LAST_MODIFIED;
+	ci.iWidth		= DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH;
+	ci.bActive		= FALSE;
+	m_vectorColumnInfo.push_back(ci);
 }

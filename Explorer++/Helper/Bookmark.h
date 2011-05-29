@@ -114,6 +114,9 @@ private:
 	std::wstring	m_strLocation;
 	std::wstring	m_strDescription;
 
+	int				m_iVisitCount;
+	FILETIME		m_ftLastVisited;
+
 	FILETIME		m_ftCreated;
 	FILETIME		m_ftModified;
 };

@@ -20,6 +20,23 @@ private:
 
 	friend CManageBookmarksDialog;
 
+	enum ColumnType_t
+	{
+		COLUMN_TYPE_NAME = 1,
+		COLUMN_TYPE_LOCATION = 2,
+		COLUMN_TYPE_VISIT_DATE = 3,
+		COLUMN_TYPE_VISIT_COUNT = 4,
+		COLUMN_TYPE_ADDED = 5,
+		COLUMN_TYPE_LAST_MODIFIED = 6
+	};
+
+	struct ColumnInfo_t
+	{
+		ColumnType_t	ColumnType;
+		int				iWidth;
+		bool			bActive;
+	};
+
 	static const TCHAR SETTINGS_KEY[];
 	static const int DEFAULT_MANAGE_BOOKMARKS_COLUMN_WIDTH = 180;
 
@@ -28,8 +45,9 @@ private:
 	CManageBookmarksDialogPersistentSettings(const CManageBookmarksDialogPersistentSettings &);
 	CManageBookmarksDialogPersistentSettings & operator=(const CManageBookmarksDialogPersistentSettings &);
 
-	int	m_iColumnWidth1;
-	int	m_iColumnWidth2;
+	void SetupDefaultColumns();
+
+	std::vector<ColumnInfo_t>	m_vectorColumnInfo;
 };
 
 class CManageBookmarksDialog : public CBaseDialog
@@ -59,14 +77,18 @@ private:
 	void		SetupTreeView();
 	void		SetupListView();
 
+	void		GetColumnString(CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,UINT cchBuf);
+
 	void		SetSearchFieldDefaultState();
 	void		RemoveSearchFieldDefaultState();
 
 	void		GetBookmarkItemFromListView(int iItem);
 
 	void		OnEnChange(HWND hEdit);
-	void		OnTvnSelChanged(NMTREEVIEW *pnmtv);
 	void		OnDblClk(NMHDR *pnmhdr);
+	void		OnRClick(NMHDR *pnmhdr);
+	void		OnListViewHeaderRClick();
+	void		OnTvnSelChanged(NMTREEVIEW *pnmtv);
 
 	void		OnOk();
 	void		OnCancel();
