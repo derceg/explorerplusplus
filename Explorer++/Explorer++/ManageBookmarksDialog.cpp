@@ -144,6 +144,30 @@ void CManageBookmarksDialog::SetupListView()
 
 	NBookmarkHelper::InsertBookmarksIntoListView(hListView,m_pAllBookmarks);
 
+	int iItem = 0;
+
+	/* Update the data for each of the sub-items. */
+	for(auto itr = m_pAllBookmarks->begin();itr != m_pAllBookmarks->end();++itr)
+	{
+		int iSubItem = 1;
+
+		for each(auto ci in m_pmbdps->m_vectorColumnInfo)
+		{
+			/* The name column will always appear first in
+			the set of columns and can be skipped here. */
+			if(ci.bActive && ci.ColumnType != CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME)
+			{
+				TCHAR szColumn[256];
+				GetBookmarkItemColumnInfo(&(*itr),ci.ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
+				ListView_SetItemText(hListView,iItem,iSubItem,szColumn);
+
+				++iSubItem;
+			}
+		}
+
+		++iItem;
+	}
+
 	NListView::ListView_SelectItem(hListView,0,TRUE);
 }
 
@@ -460,6 +484,111 @@ void CManageBookmarksDialog::GetColumnString(CManageBookmarksDialogPersistentSet
 	}
 
 	LoadString(GetInstance(),uResourceID,szColumn,cchBuf);
+}
+
+void CManageBookmarksDialog::GetBookmarkItemColumnInfo(boost::variant<CBookmarkFolder,CBookmark> *pBookmarkVariant,
+	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf)
+{
+	if(CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(pBookmarkVariant))
+	{
+		GetBookmarkFolderColumnInfo(pBookmarkFolder,ColumnType,szColumn,cchBuf);
+	}
+	else if(CBookmark *pBookmark = boost::get<CBookmark>(pBookmarkVariant))
+	{
+		GetBookmarkColumnInfo(pBookmark,ColumnType,szColumn,cchBuf);
+	}
+}
+
+void CManageBookmarksDialog::GetBookmarkColumnInfo(CBookmark *pBookmark,
+	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,
+	TCHAR *szColumn,size_t cchBuf)
+{
+	switch(ColumnType)
+	{
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME:
+		StringCchCopy(szColumn,cchBuf,pBookmark->GetName().c_str());
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LOCATION:
+		StringCchCopy(szColumn,cchBuf,pBookmark->GetLocation().c_str());
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_DATE:
+		{
+			/* TODO: Friendly dates. */
+			FILETIME ftLastVisited = pBookmark->GetDateLastVisited();
+			CreateFileTimeString(&ftLastVisited,szColumn,static_cast<int>(cchBuf),FALSE);
+		}
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_COUNT:
+		StringCchPrintf(szColumn,cchBuf,_T("%d"),pBookmark->GetVisitCount());
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_ADDED:
+		{
+			/* TODO: Friendly dates. */
+			FILETIME ftCreated = pBookmark->GetDateCreated();
+			CreateFileTimeString(&ftCreated,szColumn,static_cast<int>(cchBuf),FALSE);
+		}
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LAST_MODIFIED:
+		{
+			/* TODO: Friendly dates. */
+			FILETIME ftModified = pBookmark->GetDateModified();
+			CreateFileTimeString(&ftModified,szColumn,static_cast<int>(cchBuf),FALSE);
+		}
+		break;
+
+	default:
+		assert(FALSE);
+		break;
+	}
+}
+
+void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(CBookmarkFolder *pBookmarkFolder,
+	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,
+	TCHAR *szColumn,size_t cchBuf)
+{
+	switch(ColumnType)
+	{
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME:
+		StringCchCopy(szColumn,cchBuf,pBookmarkFolder->GetName().c_str());
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LOCATION:
+		StringCchCopy(szColumn,cchBuf,EMPTY_STRING);
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_DATE:
+		StringCchCopy(szColumn,cchBuf,EMPTY_STRING);
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_COUNT:
+		StringCchCopy(szColumn,cchBuf,EMPTY_STRING);
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_ADDED:
+		{
+			/* TODO: Friendly dates. */
+			FILETIME ftCreated = pBookmarkFolder->GetDateCreated();
+			CreateFileTimeString(&ftCreated,szColumn,static_cast<int>(cchBuf),FALSE);
+		}
+		break;
+
+	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LAST_MODIFIED:
+		{
+			/* TODO: Friendly dates. */
+			FILETIME ftModified = pBookmarkFolder->GetDateModified();
+			CreateFileTimeString(&ftModified,szColumn,static_cast<int>(cchBuf),FALSE);
+		}
+		break;
+
+	default:
+		assert(FALSE);
+		break;
+	}
 }
 
 void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)

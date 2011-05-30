@@ -79,6 +79,9 @@ private:
 	void		SetupListView();
 
 	void		GetColumnString(CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,UINT cchBuf);
+	void		GetBookmarkItemColumnInfo(boost::variant<CBookmarkFolder,CBookmark> *pBookmarkVariant,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
+	void		GetBookmarkColumnInfo(CBookmark *pBookmark,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
+	void		GetBookmarkFolderColumnInfo(CBookmarkFolder *pBookmarkFolder,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
 
 	void		SetSearchFieldDefaultState();
 	void		RemoveSearchFieldDefaultState();

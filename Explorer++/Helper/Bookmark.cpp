@@ -73,6 +73,26 @@ UINT CBookmark::GetID()
 	return m_ID;
 }
 
+int CBookmark::GetVisitCount()
+{
+	return m_iVisitCount;
+}
+
+FILETIME CBookmark::GetDateLastVisited()
+{
+	return m_ftLastVisited;
+}
+
+FILETIME CBookmark::GetDateCreated()
+{
+	return m_ftCreated;
+}
+
+FILETIME CBookmark::GetDateModified()
+{
+	return m_ftModified;
+}
+
 CBookmarkFolder CBookmarkFolder::Create(const std::wstring &strName)
 {
 	return CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL);
@@ -114,6 +134,8 @@ void CBookmarkFolder::Initialize(const std::wstring &strName)
 	m_nChildFolders = 0;
 
 	GetSystemTimeAsFileTime(&m_ftCreated);
+
+	m_ftModified = m_ftCreated;
 }
 
 void CBookmarkFolder::InitializeFromRegistry(const std::wstring &strKey)
@@ -213,6 +235,16 @@ UINT CBookmarkFolder::GetID()
 	return m_ID;
 }
 
+FILETIME CBookmarkFolder::GetDateCreated()
+{
+	return m_ftCreated;
+}
+
+FILETIME CBookmarkFolder::GetDateModified()
+{
+	return m_ftModified;
+}
+
 void CBookmarkFolder::InsertBookmark(const CBookmark &Bookmark)
 {
 	InsertBookmark(Bookmark,m_ChildList.size());
@@ -230,6 +262,8 @@ void CBookmarkFolder::InsertBookmark(const CBookmark &Bookmark,std::size_t Posit
 		std::advance(itr,Position);
 		m_ChildList.insert(itr,Bookmark);
 	}
+
+	GetSystemTimeAsFileTime(&m_ftModified);
 }
 
 void CBookmarkFolder::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder)
@@ -251,6 +285,8 @@ void CBookmarkFolder::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder
 	}
 
 	m_nChildFolders++;
+
+	GetSystemTimeAsFileTime(&m_ftModified);
 }
 
 std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator CBookmarkFolder::begin()

@@ -33,6 +33,9 @@ public:
 	std::wstring	GetName();
 	void			SetName(const std::wstring &strName);
 
+	FILETIME		GetDateCreated();
+	FILETIME		GetDateModified();
+
 	/* Returns true if this folder has *at least*
 	one child folder. */
 	bool			HasChildFolder();
@@ -104,6 +107,12 @@ public:
 	void			SetName(const std::wstring &strName);
 	void			SetLocation(const std::wstring &strLocation);
 	void			SetDescription(const std::wstring &strDescription);
+
+	int				GetVisitCount();
+	FILETIME		GetDateLastVisited();
+
+	FILETIME		GetDateCreated();
+	FILETIME		GetDateModified();
 
 private:
 
