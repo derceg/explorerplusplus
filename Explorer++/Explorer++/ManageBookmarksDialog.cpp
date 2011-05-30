@@ -51,12 +51,53 @@ BOOL CManageBookmarksDialog::OnInitDialog()
 		0,reinterpret_cast<DWORD_PTR>(this));
 	SetSearchFieldDefaultState();
 
+	SetupToolbar();
 	SetupTreeView();
 	SetupListView();
 
 	SetFocus(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW));
 
 	return 0;
+}
+
+void CManageBookmarksDialog::SetupToolbar()
+{
+	m_hToolbar = CreateToolbar(m_hDlg,
+		WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|
+		TBSTYLE_TOOLTIPS|TBSTYLE_LIST|TBSTYLE_TRANSPARENT|
+		TBSTYLE_FLAT|CCS_NODIVIDER|CCS_NORESIZE,
+		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DRAWDDARROWS|
+		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
+
+	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
+	SendMessage(m_hToolbar,TB_BUTTONSTRUCTSIZE,static_cast<WPARAM>(sizeof(TBBUTTON)),0);
+
+	m_himlToolbar = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
+	HBITMAP hBitmap = LoadBitmap(GetInstance(),MAKEINTRESOURCE(IDB_SHELLIMAGES));
+	ImageList_Add(m_himlToolbar,hBitmap,NULL);
+	DeleteObject(hBitmap);
+	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_himlToolbar));
+
+	TBBUTTON tbb;
+	tbb.iBitmap		= SHELLIMAGES_VIEWS;
+	tbb.idCommand	= 1;
+	tbb.fsState		= TBSTATE_ENABLED;
+	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_DROPDOWN;
+	tbb.dwData		= 0;
+	tbb.iString		= reinterpret_cast<INT_PTR>(_T("Views"));
+	SendMessage(m_hToolbar,TB_INSERTBUTTON,0,reinterpret_cast<LPARAM>(&tbb));
+
+	RECT rcTreeView;
+	GetWindowRect(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW),&rcTreeView);
+	MapWindowPoints(HWND_DESKTOP,m_hDlg,reinterpret_cast<LPPOINT>(&rcTreeView),2);
+
+	RECT rcSearch;
+	GetWindowRect(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH),&rcSearch);
+	MapWindowPoints(HWND_DESKTOP,m_hDlg,reinterpret_cast<LPPOINT>(&rcSearch),2);
+
+	DWORD dwButtonSize = static_cast<DWORD>(SendMessage(m_hToolbar,TB_GETBUTTONSIZE,0,0));
+	SetWindowPos(m_hToolbar,NULL,rcTreeView.left,rcSearch.top - (HIWORD(dwButtonSize) - GetRectHeight(&rcSearch)) / 2,
+		rcSearch.left - rcTreeView.left - 10,HIWORD(dwButtonSize),0);
 }
 
 void CManageBookmarksDialog::SetupTreeView()
@@ -480,7 +521,9 @@ BOOL CManageBookmarksDialog::OnClose()
 BOOL CManageBookmarksDialog::OnDestroy()
 {
 	DeleteFont(m_hEditSearchFont);
+	ImageList_Destroy(m_himlToolbar);
 	ImageList_Destroy(m_himlTreeView);
+
 	return 0;
 }
 

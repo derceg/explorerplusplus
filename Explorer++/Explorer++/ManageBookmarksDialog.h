@@ -74,6 +74,7 @@ private:
 
 	static const COLORREF SEARCH_TEXT_COLOR = RGB(120,120,120);
 
+	void		SetupToolbar();
 	void		SetupTreeView();
 	void		SetupListView();
 
@@ -92,6 +93,9 @@ private:
 
 	void		OnOk();
 	void		OnCancel();
+
+	HWND			m_hToolbar;
+	HIMAGELIST		m_himlToolbar;
 
 	CBookmarkFolder	*m_pAllBookmarks;
 	HIMAGELIST		m_himlTreeView;
