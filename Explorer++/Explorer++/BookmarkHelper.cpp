@@ -17,31 +17,35 @@
 #include "BookmarkHelper.h"
 
 
-void InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,CBookmarkFolder *pBookmarkFolder);
+void InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,
+	CBookmarkFolder *pBookmarkFolder,UINT uIDSelected,const std::set<UINT> &setExpansion);
 
-void NBookmarkHelper::InsertFoldersIntoTreeView(HWND hTreeView,CBookmarkFolder *pBookmarkFolder)
+void NBookmarkHelper::InsertFoldersIntoTreeView(HWND hTreeView,CBookmarkFolder *pBookmarkFolder,
+	UINT uIDSelected,const std::set<UINT> &setExpansion)
 {
 	TreeView_DeleteAllItems(hTreeView);
 
-	HTREEITEM hRoot = InsertFolderIntoTreeView(hTreeView,NULL,pBookmarkFolder);
+	HTREEITEM hRoot = InsertFolderIntoTreeView(hTreeView,NULL,pBookmarkFolder,
+		uIDSelected,setExpansion);
 
-	InsertFoldersIntoTreeViewRecursive(hTreeView,hRoot,pBookmarkFolder);
-
-	TreeView_Expand(hTreeView,hRoot,TVE_EXPAND);
-	TreeView_SelectItem(hTreeView,hRoot);
+	InsertFoldersIntoTreeViewRecursive(hTreeView,hRoot,pBookmarkFolder,
+		uIDSelected,setExpansion);
 }
 
-void InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,CBookmarkFolder *pBookmarkFolder)
+void InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,
+	CBookmarkFolder *pBookmarkFolder,UINT uIDSelected,const std::set<UINT> &setExpansion)
 {
 	for(auto itr = pBookmarkFolder->begin();itr != pBookmarkFolder->end();++itr)
 	{
 		if(CBookmarkFolder *pBookmarkFolderChild = boost::get<CBookmarkFolder>(&(*itr)))
 		{
-			HTREEITEM hCurrentItem = NBookmarkHelper::InsertFolderIntoTreeView(hTreeView,hParent,pBookmarkFolderChild);
+			HTREEITEM hCurrentItem = NBookmarkHelper::InsertFolderIntoTreeView(hTreeView,hParent,
+				pBookmarkFolderChild,uIDSelected,setExpansion);
 
 			if(pBookmarkFolderChild->HasChildFolder())
 			{
-				InsertFoldersIntoTreeViewRecursive(hTreeView,hCurrentItem,pBookmarkFolderChild);
+				InsertFoldersIntoTreeViewRecursive(hTreeView,hCurrentItem,
+					pBookmarkFolderChild,uIDSelected,setExpansion);
 			}
 		}
 	}
@@ -50,7 +54,7 @@ void InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,CBookma
 /* Note that this function assumes that the standard shell images
 have been placed in the image list for the treeview. */
 HTREEITEM NBookmarkHelper::InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,
-	CBookmarkFolder *pBookmarkFolder)
+	CBookmarkFolder *pBookmarkFolder,UINT uIDSelected,const std::set<UINT> &setExpansion)
 {
 	TCHAR szText[256];
 	StringCchCopy(szText,SIZEOF_ARRAY(szText),pBookmarkFolder->GetName().c_str());
@@ -62,13 +66,33 @@ HTREEITEM NBookmarkHelper::InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hPa
 		nChildren = 1;
 	}
 
+	UINT uState = 0;
+	UINT uStateMask = 0;
+
+	auto itr = setExpansion.find(pBookmarkFolder->GetID());
+
+	if(itr != setExpansion.end() &&
+		pBookmarkFolder->HasChildFolder())
+	{
+		uState		|= TVIS_EXPANDED;
+		uStateMask	|= TVIS_EXPANDED;
+	}
+
+	if(pBookmarkFolder->GetID() == uIDSelected)
+	{
+		uState		|= TVIS_SELECTED;
+		uStateMask	|= TVIS_SELECTED;
+	}
+
 	TVITEMEX tviex;
-	tviex.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_CHILDREN|TVIF_SELECTEDIMAGE|TVIF_PARAM;
+	tviex.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_CHILDREN|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_STATE;
 	tviex.pszText			= szText;
 	tviex.iImage			= SHELLIMAGES_NEWTAB;
 	tviex.iSelectedImage	= SHELLIMAGES_NEWTAB;
 	tviex.cChildren			= nChildren;
 	tviex.lParam			= pBookmarkFolder->GetID();
+	tviex.state				= uState;
+	tviex.stateMask			= uStateMask;
 
 	TVINSERTSTRUCT tvis;
 	tvis.hParent			= hParent;

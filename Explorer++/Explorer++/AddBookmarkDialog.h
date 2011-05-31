@@ -1,6 +1,7 @@
 #ifndef ADDBOOKMARKDIALOG_INCLUDED
 #define ADDBOOKMARKDIALOG_INCLUDED
 
+#include <set>
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -26,6 +27,9 @@ private:
 
 	CAddBookmarkDialogPersistentSettings(const CAddBookmarkDialogPersistentSettings &);
 	CAddBookmarkDialogPersistentSettings & operator=(const CAddBookmarkDialogPersistentSettings &);
+
+	UINT			m_uIDSelected;
+	std::set<UINT>	m_setExpansion;
 };
 
 class CAddBookmarkDialog : public CBaseDialog
@@ -64,6 +68,9 @@ private:
 
 	void		OnOk();
 	void		OnCancel();
+
+	void		SaveTreeViewState();
+	void		SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hItem);
 
 	HICON			m_hDialogIcon;
 

@@ -78,6 +78,7 @@ void CManageBookmarksDialog::SetupToolbar()
 	DeleteObject(hBitmap);
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_himlToolbar));
 
+	/* TODO: String into string table. */
 	TBBUTTON tbb;
 	tbb.iBitmap		= SHELLIMAGES_VIEWS;
 	tbb.idCommand	= 1;
@@ -111,7 +112,8 @@ void CManageBookmarksDialog::SetupTreeView()
 	TreeView_SetImageList(hTreeView,m_himlTreeView,TVSIL_NORMAL);
 	DeleteObject(hBitmap);
 
-	NBookmarkHelper::InsertFoldersIntoTreeView(hTreeView,m_pAllBookmarks);
+	/* TODO: Provide selection/expansion info. */
+	//NBookmarkHelper::InsertFoldersIntoTreeView(hTreeView,m_pAllBookmarks);
 }
 
 void CManageBookmarksDialog::SetupListView()

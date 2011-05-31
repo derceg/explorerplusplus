@@ -63,7 +63,8 @@ BOOL CAddBookmarkDialog::OnInitDialog()
 	TreeView_SetImageList(hTreeView,m_himlTreeView,TVSIL_NORMAL);
 	DeleteObject(hBitmap);
 
-	NBookmarkHelper::InsertFoldersIntoTreeView(hTreeView,m_pAllBookmarks);
+	NBookmarkHelper::InsertFoldersIntoTreeView(hTreeView,m_pAllBookmarks,
+		m_pabdps->m_uIDSelected,m_pabdps->m_setExpansion);
 
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME);
 	SendMessage(hEditName,EM_SETSEL,0,-1);
@@ -209,7 +210,8 @@ void CAddBookmarkDialog::OnNewFolder()
 	CBookmarkFolder *pParentBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
 		hSelectedItem,m_pAllBookmarks);
 	pParentBookmarkFolder->InsertBookmarkFolder(NewBookmarkFolder);
-	HTREEITEM hNewItem = NBookmarkHelper::InsertFolderIntoTreeView(hTreeView,hSelectedItem,&NewBookmarkFolder);
+	HTREEITEM hNewItem = NBookmarkHelper::InsertFolderIntoTreeView(hTreeView,hSelectedItem,
+		&NewBookmarkFolder,m_pabdps->m_uIDSelected,m_pabdps->m_setExpansion);
 
 	TVITEM tvi;
 	tvi.mask		= TVIF_CHILDREN;
@@ -360,7 +362,40 @@ void CAddBookmarkDialog::SaveState()
 {
 	m_pabdps->SaveDialogPosition(m_hDlg);
 
+	SaveTreeViewState();
+
 	m_pabdps->m_bStateSaved = TRUE;
+}
+
+void CAddBookmarkDialog::SaveTreeViewState()
+{
+	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
+
+	HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
+	CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,hSelected,m_pAllBookmarks);
+	m_pabdps->m_uIDSelected = pBookmarkFolder->GetID();
+
+	m_pabdps->m_setExpansion.clear();
+	SaveTreeViewExpansionState(hTreeView,TreeView_GetRoot(hTreeView));
+}
+
+void CAddBookmarkDialog::SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hItem)
+{
+	UINT uState = TreeView_GetItemState(hTreeView,hItem,TVIS_EXPANDED);
+
+	if(uState & TVIS_EXPANDED)
+	{
+		CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,hItem,m_pAllBookmarks);
+		m_pabdps->m_setExpansion.insert(pBookmarkFolder->GetID());
+
+		HTREEITEM hChild = TreeView_GetChild(hTreeView,hItem);
+		SaveTreeViewExpansionState(hTreeView,hChild);
+
+		while((hChild = TreeView_GetNextSibling(hTreeView,hChild)) != NULL)
+		{
+			SaveTreeViewExpansionState(hTreeView,hChild);
+		}
+	}
 }
 
 BOOL CAddBookmarkDialog::OnClose()
@@ -379,7 +414,10 @@ BOOL CAddBookmarkDialog::OnDestroy()
 CAddBookmarkDialogPersistentSettings::CAddBookmarkDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
 {
-	/* TODO: Save treeview expansion and selection info. */
+	/* TODO: These should be initialized to hold the root bookmark
+	(so that it will be selected and expanded by default). */
+	//m_uIDSelected;
+	//m_setExpansion;
 }
 
 CAddBookmarkDialogPersistentSettings::~CAddBookmarkDialogPersistentSettings()
