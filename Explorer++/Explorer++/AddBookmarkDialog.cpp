@@ -34,6 +34,19 @@ m_pBookmark(pBookmark),
 CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
+
+	/* If the singleton settings class has not been initialized
+	yet, mark the root bookmark as selected and expanded. This
+	is only needed the first time this dialog is shown, as
+	selection and expansion info will be saved each time after
+	that. */
+	if(!m_pabdps->m_bInitialized)
+	{
+		m_pabdps->m_guidSelected = pAllBookmarks->GetGUID();
+		m_pabdps->m_setExpansion.insert(pAllBookmarks->GetGUID());
+
+		m_pabdps->m_bInitialized = true;
+	}
 }
 
 CAddBookmarkDialog::~CAddBookmarkDialog()
@@ -63,7 +76,8 @@ BOOL CAddBookmarkDialog::OnInitDialog()
 	TreeView_SetImageList(hTreeView,m_himlTreeView,TVSIL_NORMAL);
 	DeleteObject(hBitmap);
 
-	NBookmarkHelper::InsertFoldersIntoTreeView(hTreeView,m_pAllBookmarks,
+	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView);
+	m_pBookmarkTreeView->InsertFoldersIntoTreeView(hTreeView,m_pAllBookmarks,
 		m_pabdps->m_guidSelected,m_pabdps->m_setExpansion);
 
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME);
@@ -207,10 +221,10 @@ void CAddBookmarkDialog::OnNewFolder()
 	LoadString(GetInstance(),IDS_BOOKMARKS_NEWBOOKMARKFOLDER,szTemp,SIZEOF_ARRAY(szTemp));
 	CBookmarkFolder NewBookmarkFolder = CBookmarkFolder::Create(szTemp);
 
-	CBookmarkFolder *pParentBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
+	CBookmarkFolder *pParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hTreeView,
 		hSelectedItem,m_pAllBookmarks);
 	pParentBookmarkFolder->InsertBookmarkFolder(NewBookmarkFolder);
-	HTREEITEM hNewItem = NBookmarkHelper::InsertFolderIntoTreeView(hTreeView,hSelectedItem,
+	HTREEITEM hNewItem = m_pBookmarkTreeView->InsertFolderIntoTreeView(hTreeView,hSelectedItem,
 		&NewBookmarkFolder,m_pabdps->m_guidSelected,m_pabdps->m_setExpansion);
 
 	TVITEM tvi;
@@ -274,7 +288,7 @@ BOOL CAddBookmarkDialog::OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi)
 		lstrlen(pnmtvdi->item.pszText) > 0)
 	{
 		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
-		CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
+		CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hTreeView,
 			pnmtvdi->item.hItem,m_pAllBookmarks);
 		pBookmarkFolder->SetName(pnmtvdi->item.pszText);
 
@@ -343,7 +357,7 @@ void CAddBookmarkDialog::OnOk()
 	{
 		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 		HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-		CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
+		CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hTreeView,
 			hSelected,m_pAllBookmarks);
 
 		CBookmark Bookmark(strName,strLocation,_T(""));
@@ -372,7 +386,7 @@ void CAddBookmarkDialog::SaveTreeViewState()
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 
 	HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-	CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,hSelected,m_pAllBookmarks);
+	CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hTreeView,hSelected,m_pAllBookmarks);
 	m_pabdps->m_guidSelected = pBookmarkFolder->GetGUID();
 
 	m_pabdps->m_setExpansion.clear();
@@ -385,7 +399,7 @@ void CAddBookmarkDialog::SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hIt
 
 	if(uState & TVIS_EXPANDED)
 	{
-		CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,hItem,m_pAllBookmarks);
+		CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hTreeView,hItem,m_pAllBookmarks);
 		m_pabdps->m_setExpansion.insert(pBookmarkFolder->GetGUID());
 
 		HTREEITEM hChild = TreeView_GetChild(hTreeView,hItem);
@@ -411,13 +425,17 @@ BOOL CAddBookmarkDialog::OnDestroy()
 	return 0;
 }
 
+BOOL CAddBookmarkDialog::OnNcDestroy()
+{
+	delete m_pBookmarkTreeView;
+
+	return 0;
+}
+
 CAddBookmarkDialogPersistentSettings::CAddBookmarkDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
 {
-	/* TODO: These should be initialized to hold the root bookmark
-	(so that it will be selected and expanded by default). */
-	//m_uIDSelected;
-	//m_setExpansion;
+	m_bInitialized = false;
 }
 
 CAddBookmarkDialogPersistentSettings::~CAddBookmarkDialogPersistentSettings()

@@ -596,13 +596,14 @@ void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(CBookmarkFolder *pBookm
 
 void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
 {
-	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
+	/* TODO: */
+	/*HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 	CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
 		pnmtv->itemNew.hItem,m_pAllBookmarks);
 	assert(pBookmarkFolder != NULL);
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-	NBookmarkHelper::InsertBookmarksIntoListView(hListView,pBookmarkFolder);
+	NBookmarkHelper::InsertBookmarksIntoListView(hListView,pBookmarkFolder);*/
 }
 
 void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)

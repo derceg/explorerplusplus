@@ -29,8 +29,9 @@ private:
 	CAddBookmarkDialogPersistentSettings(const CAddBookmarkDialogPersistentSettings &);
 	CAddBookmarkDialogPersistentSettings & operator=(const CAddBookmarkDialogPersistentSettings &);
 
-	GUID										m_guidSelected;
-	std::unordered_set<GUID,GuidHash,GuidEq>	m_setExpansion;
+	bool							m_bInitialized;
+	GUID							m_guidSelected;
+	NBookmarkHelper::setExpansion_t	m_setExpansion;
 };
 
 class CAddBookmarkDialog : public CBaseDialog
@@ -49,6 +50,7 @@ protected:
 	BOOL	OnNotify(NMHDR *pnmhdr);
 	BOOL	OnClose();
 	BOOL	OnDestroy();
+	BOOL	OnNcDestroy();
 
 	void	SaveState();
 
@@ -77,7 +79,9 @@ private:
 
 	CBookmarkFolder	*m_pAllBookmarks;
 	CBookmark		*m_pBookmark;
-	HIMAGELIST		m_himlTreeView;
+
+	CBookmarkTreeView	*m_pBookmarkTreeView;
+	HIMAGELIST			m_himlTreeView;
 
 	CAddBookmarkDialogPersistentSettings	*m_pabdps;
 };

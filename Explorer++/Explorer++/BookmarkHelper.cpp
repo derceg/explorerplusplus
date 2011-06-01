@@ -17,11 +17,8 @@
 #include "BookmarkHelper.h"
 
 
-void InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,
-	CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const std::unordered_set<GUID,GuidHash,GuidEq> &setExpansion);
-
-void NBookmarkHelper::InsertFoldersIntoTreeView(HWND hTreeView,CBookmarkFolder *pBookmarkFolder,
-	const GUID &guidSelected,const std::unordered_set<GUID,GuidHash,GuidEq> &setExpansion)
+void CBookmarkTreeView::InsertFoldersIntoTreeView(HWND hTreeView,CBookmarkFolder *pBookmarkFolder,
+	const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
 {
 	TreeView_DeleteAllItems(hTreeView);
 
@@ -32,14 +29,14 @@ void NBookmarkHelper::InsertFoldersIntoTreeView(HWND hTreeView,CBookmarkFolder *
 		guidSelected,setExpansion);
 }
 
-void InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,
-	CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const std::unordered_set<GUID,GuidHash,GuidEq> &setExpansion)
+void CBookmarkTreeView::InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,
+	CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
 {
 	for(auto itr = pBookmarkFolder->begin();itr != pBookmarkFolder->end();++itr)
 	{
 		if(CBookmarkFolder *pBookmarkFolderChild = boost::get<CBookmarkFolder>(&(*itr)))
 		{
-			HTREEITEM hCurrentItem = NBookmarkHelper::InsertFolderIntoTreeView(hTreeView,hParent,
+			HTREEITEM hCurrentItem = InsertFolderIntoTreeView(hTreeView,hParent,
 				pBookmarkFolderChild,guidSelected,setExpansion);
 
 			if(pBookmarkFolderChild->HasChildFolder())
@@ -53,8 +50,8 @@ void InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,
 
 /* Note that this function assumes that the standard shell images
 have been placed in the image list for the treeview. */
-HTREEITEM NBookmarkHelper::InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,
-	CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const std::unordered_set<GUID,GuidHash,GuidEq> &setExpansion)
+HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,
+	CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
 {
 	TCHAR szText[256];
 	StringCchCopy(szText,SIZEOF_ARRAY(szText),pBookmarkFolder->GetName().c_str());
@@ -90,7 +87,7 @@ HTREEITEM NBookmarkHelper::InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hPa
 	tviex.iImage			= SHELLIMAGES_NEWTAB;
 	tviex.iSelectedImage	= SHELLIMAGES_NEWTAB;
 	tviex.cChildren			= nChildren;
-	tviex.lParam			= reinterpret_cast<LPARAM>(pBookmarkFolder);
+	tviex.lParam			= m_uIDCounter;
 	tviex.state				= uState;
 	tviex.stateMask			= uStateMask;
 
@@ -100,10 +97,13 @@ HTREEITEM NBookmarkHelper::InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hPa
 	tvis.itemex				= tviex;
 	HTREEITEM hItem = TreeView_InsertItem(hTreeView,&tvis);
 
+	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,pBookmarkFolder->GetGUID()));
+	++m_uIDCounter;
+
 	return hItem;
 }
 
-CBookmarkFolder *NBookmarkHelper::GetBookmarkFolderFromTreeView(HWND hTreeView,
+CBookmarkFolder *CBookmarkTreeView::GetBookmarkFolderFromTreeView(HWND hTreeView,
 	HTREEITEM hItem,CBookmarkFolder *pRootBookmarkFolder)
 {
 	TVITEM tvi;
@@ -111,11 +111,7 @@ CBookmarkFolder *NBookmarkHelper::GetBookmarkFolderFromTreeView(HWND hTreeView,
 	tvi.hItem	= hItem;
 	TreeView_GetItem(hTreeView,&tvi);
 
-	CBookmarkFolder *pBookmarkFolder = reinterpret_cast<CBookmarkFolder *>(tvi.lParam);
-
-	return pBookmarkFolder;
-
-	/*std::stack<UINT> stackIDs;
+	std::stack<UINT> stackIDs;
 	HTREEITEM hParent;
 	HTREEITEM hCurrentItem = hItem;
 
@@ -136,14 +132,15 @@ CBookmarkFolder *NBookmarkHelper::GetBookmarkFolderFromTreeView(HWND hTreeView,
 	while(!stackIDs.empty())
 	{
 		UINT uID = stackIDs.top();
-		std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem = pBookmarkFolder->GetBookmarkItem(uID);
+		auto itr = m_mapID.find(uID);
+		std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem = pBookmarkFolder->GetBookmarkItem(itr->second);
 		pBookmarkFolder = reinterpret_cast<CBookmarkFolder *>(BookmarkItem.first);
 		assert(pBookmarkFolder != NULL);
 
 		stackIDs.pop();
 	}
 
-	return pBookmarkFolder;*/
+	return pBookmarkFolder;
 }
 
 void NBookmarkHelper::InsertBookmarksIntoListView(HWND hListView,CBookmarkFolder *pBookmarkFolder)
