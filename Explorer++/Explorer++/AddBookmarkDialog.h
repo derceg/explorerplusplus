@@ -1,7 +1,8 @@
 #ifndef ADDBOOKMARKDIALOG_INCLUDED
 #define ADDBOOKMARKDIALOG_INCLUDED
 
-#include <set>
+#include <unordered_set>
+#include "BookmarkHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -28,8 +29,8 @@ private:
 	CAddBookmarkDialogPersistentSettings(const CAddBookmarkDialogPersistentSettings &);
 	CAddBookmarkDialogPersistentSettings & operator=(const CAddBookmarkDialogPersistentSettings &);
 
-	UINT			m_uIDSelected;
-	std::set<UINT>	m_setExpansion;
+	GUID										m_guidSelected;
+	std::unordered_set<GUID,GuidHash,GuidEq>	m_setExpansion;
 };
 
 class CAddBookmarkDialog : public CBaseDialog

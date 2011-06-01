@@ -259,35 +259,36 @@ LRESULT CALLBACK CManageBookmarksDialog::EditSearchProc(HWND hwnd,UINT Msg,WPARA
 	return DefSubclassProc(hwnd,Msg,wParam,lParam);
 }
 
+/* TODO: */
 void CManageBookmarksDialog::GetBookmarkItemFromListView(int iItem)
 {
-	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
-	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
-	CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
-		hSelectedItem,m_pAllBookmarks);
+	//HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
+	//HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
+	//CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
+	//	hSelectedItem,m_pAllBookmarks);
 
-	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+	//HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	LVITEM lvi;
-	lvi.mask		= LVIF_PARAM;
-	lvi.iItem		= iItem;
-	lvi.iSubItem	= 0;
-	ListView_GetItem(hListView,&lvi);
+	//LVITEM lvi;
+	//lvi.mask		= LVIF_PARAM;
+	//lvi.iItem		= iItem;
+	//lvi.iSubItem	= 0;
+	//ListView_GetItem(hListView,&lvi);
 
-	std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem = pBookmarkFolder->GetBookmarkItem(
-		static_cast<UINT>(lvi.lParam));
+	//std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem = pBookmarkFolder->GetBookmarkItem(
+	//	static_cast<UINT>(lvi.lParam));
 
-	switch(BookmarkItem.second)
-	{
-	case NBookmarks::TYPE_BOOKMARK:
-		/* TODO: Send the bookmark back to the main
-		window to open. */
-		break;
+	//switch(BookmarkItem.second)
+	//{
+	//case NBookmarks::TYPE_BOOKMARK:
+	//	/* TODO: Send the bookmark back to the main
+	//	window to open. */
+	//	break;
 
-	case NBookmarks::TYPE_FOLDER:
-		/* TODO: Browse into the folder. */
-		break;
-	}
+	//case NBookmarks::TYPE_FOLDER:
+	//	/* TODO: Browse into the folder. */
+	//	break;
+	//}
 }
 
 INT_PTR CManageBookmarksDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)

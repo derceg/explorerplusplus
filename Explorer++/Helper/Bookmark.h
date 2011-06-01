@@ -28,7 +28,7 @@ public:
 
 	void			SerializeToRegistry(const std::wstring &strKey);
 
-	UINT			GetID();
+	GUID			GetGUID();
 
 	std::wstring	GetName();
 	void			SetName(const std::wstring &strName);
@@ -55,7 +55,7 @@ public:
 	specified id. Item in this case may
 	refer to either a bookmark or bookmark
 	folder. */
-	std::pair<void *,NBookmarks::BookmarkType_t>	GetBookmarkItem(UINT uID);
+	std::pair<void *,NBookmarks::BookmarkType_t>	GetBookmarkItem(const GUID &guid);
 
 private:
 
@@ -70,8 +70,7 @@ private:
 	void			Initialize(const std::wstring &strName);
 	void			InitializeFromRegistry(const std::wstring &strKey);
 
-	static UINT		m_IDCounter;
-	UINT			m_ID;
+	GUID			m_guid;
 
 	std::wstring	m_strName;
 
@@ -98,7 +97,7 @@ public:
 	CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription);
 	~CBookmark();
 
-	UINT			GetID();
+	GUID			GetGUID();
 
 	std::wstring	GetName();
 	std::wstring	GetLocation();
@@ -116,8 +115,7 @@ public:
 
 private:
 
-	static UINT		m_IDCounter;
-	UINT			m_ID;
+	GUID			m_guid;
 
 	std::wstring	m_strName;
 	std::wstring	m_strLocation;

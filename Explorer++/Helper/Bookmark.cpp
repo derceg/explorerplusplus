@@ -20,16 +20,13 @@
 #include "Helper.h"
 
 
-UINT CBookmark::m_IDCounter = 0;
-UINT CBookmarkFolder::m_IDCounter = 0;
-
 CBookmark::CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription) :
-	m_ID(++m_IDCounter),
 	m_strName(strName),
 	m_strLocation(strLocation),
 	m_strDescription(strDescription),
 	m_iVisitCount(0)
 {
+	CoCreateGuid(&m_guid);
 	GetSystemTimeAsFileTime(&m_ftCreated);
 }
 
@@ -68,9 +65,9 @@ void CBookmark::SetDescription(const std::wstring &strDescription)
 	m_strDescription = strDescription;
 }
 
-UINT CBookmark::GetID()
+GUID CBookmark::GetGUID()
 {
-	return m_ID;
+	return m_guid;
 }
 
 int CBookmark::GetVisitCount()
@@ -129,7 +126,8 @@ CBookmarkFolder::~CBookmarkFolder()
 
 void CBookmarkFolder::Initialize(const std::wstring &strName)
 {
-	m_ID = ++m_IDCounter;
+	CoCreateGuid(&m_guid);
+
 	m_strName = strName;
 	m_nChildFolders = 0;
 
@@ -145,7 +143,8 @@ void CBookmarkFolder::InitializeFromRegistry(const std::wstring &strKey)
 
 	if(lRes == ERROR_SUCCESS)
 	{
-		NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ID"),reinterpret_cast<DWORD *>(&m_ID));
+		/* TODO: Write GUID. */
+		//NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ID"),reinterpret_cast<DWORD *>(&m_ID));
 		NRegistrySettings::ReadStringFromRegistry(hKey,_T("Name"),m_strName);
 		NRegistrySettings::ReadDwordFromRegistry(hKey,_T("DateCreatedLow"),&m_ftCreated.dwLowDateTime);
 		NRegistrySettings::ReadDwordFromRegistry(hKey,_T("DateCreatedHigh"),&m_ftCreated.dwHighDateTime);
@@ -188,7 +187,8 @@ void CBookmarkFolder::SerializeToRegistry(const std::wstring &strKey)
 	if(lRes == ERROR_SUCCESS)
 	{
 		/* These details don't need to be saved for the root bookmark. */
-		NRegistrySettings::SaveDwordToRegistry(hKey,_T("ID"),m_ID);
+		/* TODO: Read GUID. */
+		//NRegistrySettings::SaveDwordToRegistry(hKey,_T("ID"),m_ID);
 		NRegistrySettings::SaveStringToRegistry(hKey,_T("Name"),m_strName.c_str());
 		NRegistrySettings::SaveDwordToRegistry(hKey,_T("DateCreatedLow"),m_ftCreated.dwLowDateTime);
 		NRegistrySettings::SaveDwordToRegistry(hKey,_T("DateCreatedHigh"),m_ftCreated.dwHighDateTime);
@@ -230,9 +230,9 @@ void CBookmarkFolder::SetName(const std::wstring &strName)
 	m_strName = strName;
 }
 
-UINT CBookmarkFolder::GetID()
+GUID CBookmarkFolder::GetGUID()
 {
-	return m_ID;
+	return m_guid;
 }
 
 FILETIME CBookmarkFolder::GetDateCreated()
@@ -309,16 +309,16 @@ bool CBookmarkFolder::HasChildFolder()
 	return false;
 }
 
-std::pair<void *,NBookmarks::BookmarkType_t> CBookmarkFolder::GetBookmarkItem(UINT uID)
+std::pair<void *,NBookmarks::BookmarkType_t> CBookmarkFolder::GetBookmarkItem(const GUID &guid)
 {
 	auto itr = std::find_if(m_ChildList.begin(),m_ChildList.end(),
-		[uID](boost::variant<CBookmarkFolder,CBookmark> &Variant) -> BOOL
+		[guid](boost::variant<CBookmarkFolder,CBookmark> &Variant) -> BOOL
 		{
 			CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(&Variant);
 
 			if(pBookmarkFolder)
 			{
-				return pBookmarkFolder->GetID() == uID;
+				return IsEqualGUID(pBookmarkFolder->GetGUID(),guid);
 			}
 
 			return FALSE;
