@@ -24,38 +24,50 @@ namespace NBookmarkHelper
 	};
 
 	typedef std::unordered_set<GUID,GuidHash,GuidEq> setExpansion_t;
-
-	void			InsertBookmarksIntoListView(HWND hListView,CBookmarkFolder *pBookmarkFolder);
-	void			InsertBookmarkFolderIntoListView(HWND hListView,CBookmarkFolder *pBookmarkFolder,int iPosition);
-	void			InsertBookmarkIntoListView(HWND hListView,CBookmark *pBookmark,int iPosition);
-	void			InsertBookmarkItemIntoListView(HWND hListView,const std::wstring &strName,UINT uID,int iPosition);
 }
 
 class CBookmarkTreeView
 {
 public:
 
-	CBookmarkTreeView(HWND hTreeView) :
-		m_hTreeView(hTreeView),
-		m_uIDCounter(0)
-	{
-		
-	}
+	CBookmarkTreeView(HWND hTreeView);
+	~CBookmarkTreeView();
 
-	~CBookmarkTreeView()
-	{
-
-	}
-
-	void			InsertFoldersIntoTreeView(HWND hTreeView,CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
-	HTREEITEM		InsertFolderIntoTreeView(HWND hTreeView,HTREEITEM hParent,CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
-	CBookmarkFolder	*GetBookmarkFolderFromTreeView(HWND hTreeView,HTREEITEM hItem,CBookmarkFolder *pRootBookmarkFolder);
+	void			InsertFoldersIntoTreeView(CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
+	HTREEITEM		InsertFolderIntoTreeView(HTREEITEM hParent,CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
+	CBookmarkFolder	*GetBookmarkFolderFromTreeView(HTREEITEM hItem,CBookmarkFolder *pRootBookmarkFolder);
 
 private:
 
-	void	InsertFoldersIntoTreeViewRecursive(HWND hTreeView,HTREEITEM hParent,CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
+	void	InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
 
 	HWND							m_hTreeView;
+	HIMAGELIST						m_himl;
+
+	std::unordered_map<UINT,GUID>	m_mapID;
+	UINT							m_uIDCounter;
+};
+
+class CBookmarkListView
+{
+public:
+
+	CBookmarkListView(HWND hListView);
+	~CBookmarkListView();
+
+	void	InsertBookmarksIntoListView(CBookmarkFolder *pBookmarkFolder);
+	void	InsertBookmarkFolderIntoListView(CBookmarkFolder *pBookmarkFolder,int iPosition);
+	void	InsertBookmarkIntoListView(CBookmark *pBookmark,int iPosition);
+	std::pair<void *,NBookmarks::BookmarkType_t>	GetBookmarkItemFromListView(int iItem);
+
+private:
+
+	void	InsertBookmarkItemIntoListView(const std::wstring &strName,const GUID &guid,int iPosition);
+
+	HWND							m_hListView;
+	HIMAGELIST						m_himl;
+
+	CBookmarkFolder					*m_pParentBookmarkFolder;
 
 	std::unordered_map<UINT,GUID>	m_mapID;
 	UINT							m_uIDCounter;

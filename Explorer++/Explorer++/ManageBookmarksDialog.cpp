@@ -37,6 +37,14 @@ m_hEditSearchFont(NULL),
 CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_pmbdps = &CManageBookmarksDialogPersistentSettings::GetInstance();
+
+	if(!m_pmbdps->m_bInitialized)
+	{
+		m_pmbdps->m_guidSelected = pAllBookmarks->GetGUID();
+		m_pmbdps->m_setExpansion.insert(pAllBookmarks->GetGUID());
+
+		m_pmbdps->m_bInitialized = true;
+	}
 }
 
 CManageBookmarksDialog::~CManageBookmarksDialog()
@@ -46,11 +54,7 @@ CManageBookmarksDialog::~CManageBookmarksDialog()
 
 BOOL CManageBookmarksDialog::OnInitDialog()
 {
-	HWND hEdit = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH);
-	SetWindowSubclass(hEdit,NManageBookmarksDialog::EditSearchProcStub,
-		0,reinterpret_cast<DWORD_PTR>(this));
-	SetSearchFieldDefaultState();
-
+	SetupSearchField();
 	SetupToolbar();
 	SetupTreeView();
 	SetupListView();
@@ -58,6 +62,14 @@ BOOL CManageBookmarksDialog::OnInitDialog()
 	SetFocus(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW));
 
 	return 0;
+}
+
+void CManageBookmarksDialog::SetupSearchField()
+{
+	HWND hEdit = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH);
+	SetWindowSubclass(hEdit,NManageBookmarksDialog::EditSearchProcStub,
+		0,reinterpret_cast<DWORD_PTR>(this));
+	SetSearchFieldDefaultState();
 }
 
 void CManageBookmarksDialog::SetupToolbar()
@@ -104,26 +116,17 @@ void CManageBookmarksDialog::SetupToolbar()
 void CManageBookmarksDialog::SetupTreeView()
 {
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
-	SetWindowTheme(hTreeView,L"Explorer",NULL);
 
-	m_himlTreeView = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
-	HBITMAP hBitmap = LoadBitmap(GetInstance(),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(m_himlTreeView,hBitmap,NULL);
-	TreeView_SetImageList(hTreeView,m_himlTreeView,TVSIL_NORMAL);
-	DeleteObject(hBitmap);
-
-	/* TODO: Provide selection/expansion info. */
-	//NBookmarkHelper::InsertFoldersIntoTreeView(hTreeView,m_pAllBookmarks);
+	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView);
+	m_pBookmarkTreeView->InsertFoldersIntoTreeView(m_pAllBookmarks,
+		m_pmbdps->m_guidSelected,m_pmbdps->m_setExpansion);
 }
 
 void CManageBookmarksDialog::SetupListView()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	SetWindowTheme(hListView,L"Explorer",NULL);
-	ListView_SetExtendedListViewStyleEx(hListView,
-		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT,
-		LVS_EX_DOUBLEBUFFER|LVS_EX_FULLROWSELECT);
+	m_pBookmarkListView = new CBookmarkListView(hListView);
 
 	int iColumn = 0;
 
@@ -144,7 +147,7 @@ void CManageBookmarksDialog::SetupListView()
 		}
 	}
 
-	NBookmarkHelper::InsertBookmarksIntoListView(hListView,m_pAllBookmarks);
+	m_pBookmarkListView->InsertBookmarksIntoListView(m_pAllBookmarks);
 
 	int iItem = 0;
 
@@ -259,38 +262,6 @@ LRESULT CALLBACK CManageBookmarksDialog::EditSearchProc(HWND hwnd,UINT Msg,WPARA
 	return DefSubclassProc(hwnd,Msg,wParam,lParam);
 }
 
-/* TODO: */
-void CManageBookmarksDialog::GetBookmarkItemFromListView(int iItem)
-{
-	//HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
-	//HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
-	//CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
-	//	hSelectedItem,m_pAllBookmarks);
-
-	//HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-
-	//LVITEM lvi;
-	//lvi.mask		= LVIF_PARAM;
-	//lvi.iItem		= iItem;
-	//lvi.iSubItem	= 0;
-	//ListView_GetItem(hListView,&lvi);
-
-	//std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem = pBookmarkFolder->GetBookmarkItem(
-	//	static_cast<UINT>(lvi.lParam));
-
-	//switch(BookmarkItem.second)
-	//{
-	//case NBookmarks::TYPE_BOOKMARK:
-	//	/* TODO: Send the bookmark back to the main
-	//	window to open. */
-	//	break;
-
-	//case NBookmarks::TYPE_FOLDER:
-	//	/* TODO: Browse into the folder. */
-	//	break;
-	//}
-}
-
 INT_PTR CManageBookmarksDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
 {
 	if(hwnd == GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH))
@@ -369,6 +340,21 @@ void CManageBookmarksDialog::OnEnChange(HWND hEdit)
 	}
 }
 
+void CManageBookmarksDialog::OnListViewRClick()
+{
+	DWORD dwCursorPos = GetMessagePos();
+
+	POINT ptCursor;
+	ptCursor.x = GET_X_LPARAM(dwCursorPos);
+	ptCursor.y = GET_Y_LPARAM(dwCursorPos);
+
+	HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_BOOKMARK_RCLICK_MENU));
+	SetMenuDefaultItem(GetSubMenu(hMenu,0),IDM_MB_BOOKMARK_OPEN,FALSE);
+
+	TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,ptCursor.x,ptCursor.y,0,m_hDlg,NULL);
+	DestroyMenu(hMenu);
+}
+
 void CManageBookmarksDialog::OnListViewHeaderRClick()
 {
 	DWORD dwCursorPos = GetMessagePos();
@@ -434,6 +420,21 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 				lvCol.pszText	= szTemp;
 				lvCol.cx		= itr->iWidth;
 				ListView_InsertColumn(hListView,iColumn,&lvCol);
+
+				HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
+				HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
+				CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_pAllBookmarks);
+
+				int iItem = 0;
+
+				for(auto itrBookmarks = pBookmarkFolder->begin();itrBookmarks != pBookmarkFolder->end();++itrBookmarks)
+				{
+					TCHAR szColumn[256];
+					GetBookmarkItemColumnInfo(&(*itrBookmarks),itr->ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
+					ListView_SetItemText(hListView,iItem,iColumn,szColumn);
+
+					++iItem;
+				}
 			}
 
 			itr->bActive = !itr->bActive;
@@ -596,14 +597,10 @@ void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(CBookmarkFolder *pBookm
 
 void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
 {
-	/* TODO: */
-	/*HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
-	CBookmarkFolder *pBookmarkFolder = NBookmarkHelper::GetBookmarkFolderFromTreeView(hTreeView,
-		pnmtv->itemNew.hItem,m_pAllBookmarks);
+	CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(pnmtv->itemNew.hItem,m_pAllBookmarks);
 	assert(pBookmarkFolder != NULL);
 
-	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-	NBookmarkHelper::InsertBookmarksIntoListView(hListView,pBookmarkFolder);*/
+	m_pBookmarkListView->InsertBookmarksIntoListView(pBookmarkFolder);
 }
 
 void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
@@ -612,7 +609,22 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 
 	if(pnmhdr->hwndFrom == hListView)
 	{
-		/* TODO: Open bookmark folder/bookmark. */
+		NMITEMACTIVATE *pnmia = reinterpret_cast<NMITEMACTIVATE *>(pnmhdr);
+
+		std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem =
+			m_pBookmarkListView->GetBookmarkItemFromListView(pnmia->iItem);
+
+		switch(BookmarkItem.second)
+		{
+		case NBookmarks::TYPE_BOOKMARK:
+			/* TODO: Send the bookmark back to the main
+			window to open. */
+			break;
+
+		case NBookmarks::TYPE_FOLDER:
+			/* TODO: Browse into the folder. */
+			break;
+		}
 	}
 }
 
@@ -623,7 +635,7 @@ void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)
 
 	if(pnmhdr->hwndFrom == hListView)
 	{
-
+		OnListViewRClick();
 	}
 	else if(pnmhdr->hwndFrom == ListView_GetHeader(hListView))
 	{
@@ -655,7 +667,6 @@ BOOL CManageBookmarksDialog::OnDestroy()
 {
 	DeleteFont(m_hEditSearchFont);
 	ImageList_Destroy(m_himlToolbar);
-	ImageList_Destroy(m_himlTreeView);
 
 	return 0;
 }
@@ -682,7 +693,11 @@ void CManageBookmarksDialog::SaveState()
 CManageBookmarksDialogPersistentSettings::CManageBookmarksDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
 {
+	m_bInitialized = false;
+
 	SetupDefaultColumns();
+
+	/* TODO: Save listview selection information. */
 }
 
 CManageBookmarksDialogPersistentSettings::~CManageBookmarksDialogPersistentSettings()

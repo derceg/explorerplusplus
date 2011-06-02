@@ -81,7 +81,6 @@ private:
 	CBookmark		*m_pBookmark;
 
 	CBookmarkTreeView	*m_pBookmarkTreeView;
-	HIMAGELIST			m_himlTreeView;
 
 	CAddBookmarkDialogPersistentSettings	*m_pabdps;
 };

@@ -1,6 +1,7 @@
 #ifndef MANAGEBOOKMARKSDIALOG_INCLUDED
 #define MANAGEBOOKMARKSDIALOG_INCLUDED
 
+#include "BookmarkHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -47,7 +48,11 @@ private:
 
 	void SetupDefaultColumns();
 
-	std::vector<ColumnInfo_t>	m_vectorColumnInfo;
+	std::vector<ColumnInfo_t>		m_vectorColumnInfo;
+
+	bool							m_bInitialized;
+	GUID							m_guidSelected;
+	NBookmarkHelper::setExpansion_t	m_setExpansion;
 };
 
 class CManageBookmarksDialog : public CBaseDialog
@@ -74,6 +79,7 @@ private:
 
 	static const COLORREF SEARCH_TEXT_COLOR = RGB(120,120,120);
 
+	void		SetupSearchField();
 	void		SetupToolbar();
 	void		SetupTreeView();
 	void		SetupListView();
@@ -86,26 +92,27 @@ private:
 	void		SetSearchFieldDefaultState();
 	void		RemoveSearchFieldDefaultState();
 
-	void		GetBookmarkItemFromListView(int iItem);
-
 	void		OnEnChange(HWND hEdit);
 	void		OnDblClk(NMHDR *pnmhdr);
 	void		OnRClick(NMHDR *pnmhdr);
+	void		OnListViewRClick();
 	void		OnListViewHeaderRClick();
 	void		OnTvnSelChanged(NMTREEVIEW *pnmtv);
 
 	void		OnOk();
 	void		OnCancel();
 
-	HWND			m_hToolbar;
-	HIMAGELIST		m_himlToolbar;
+	HWND				m_hToolbar;
+	HIMAGELIST			m_himlToolbar;
 
-	CBookmarkFolder	*m_pAllBookmarks;
-	HIMAGELIST		m_himlTreeView;
+	CBookmarkFolder		*m_pAllBookmarks;
 
-	HFONT			m_hEditSearchFont;
-	bool			m_bSearchFieldBlank;
-	bool			m_bEditingSearchField;
+	CBookmarkTreeView	*m_pBookmarkTreeView;
+	CBookmarkListView	*m_pBookmarkListView;
+
+	HFONT				m_hEditSearchFont;
+	bool				m_bSearchFieldBlank;
+	bool				m_bEditingSearchField;
 
 	CManageBookmarksDialogPersistentSettings	*m_pmbdps;
 };
