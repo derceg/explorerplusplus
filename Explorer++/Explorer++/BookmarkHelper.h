@@ -24,6 +24,15 @@ namespace NBookmarkHelper
 	};
 
 	typedef std::unordered_set<GUID,GuidHash,GuidEq> setExpansion_t;
+	typedef boost::variant<CBookmarkFolder &,CBookmark &> variantBookmark_t;
+
+	enum SortMode_t
+	{
+		SM_NAME = 1
+	};
+
+	int CALLBACK		SortByName(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
+	variantBookmark_t	GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder,const GUID &guid);
 }
 
 class CBookmarkTreeView
@@ -58,7 +67,7 @@ public:
 	void	InsertBookmarksIntoListView(CBookmarkFolder *pBookmarkFolder);
 	void	InsertBookmarkFolderIntoListView(CBookmarkFolder *pBookmarkFolder,int iPosition);
 	void	InsertBookmarkIntoListView(CBookmark *pBookmark,int iPosition);
-	std::pair<void *,NBookmarks::BookmarkType_t>	GetBookmarkItemFromListView(int iItem);
+	NBookmarkHelper::variantBookmark_t	GetBookmarkItemFromListView(int iItem);
 
 private:
 

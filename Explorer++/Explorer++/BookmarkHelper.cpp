@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include <stack>
+#include <algorithm>
 #include "Explorer++_internal.h"
 #include "BookmarkHelper.h"
 
@@ -149,9 +150,9 @@ CBookmarkFolder *CBookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hIte
 	{
 		UINT uID = stackIDs.top();
 		auto itr = m_mapID.find(uID);
-		std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem = pBookmarkFolder->GetBookmarkItem(itr->second);
-		pBookmarkFolder = reinterpret_cast<CBookmarkFolder *>(BookmarkItem.first);
-		assert(pBookmarkFolder != NULL);
+
+		NBookmarkHelper::variantBookmark_t variantBookmark = NBookmarkHelper::GetBookmarkItem(*pRootBookmarkFolder,itr->second);
+		pBookmarkFolder = boost::get<CBookmarkFolder>(&variantBookmark);
 
 		stackIDs.pop();
 	}
@@ -236,7 +237,7 @@ void CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strNa
 	++m_uIDCounter;
 }
 
-std::pair<void *,NBookmarks::BookmarkType_t> CBookmarkListView::GetBookmarkItemFromListView(int iItem)
+NBookmarkHelper::variantBookmark_t CBookmarkListView::GetBookmarkItemFromListView(int iItem)
 {
 	LVITEM lvi;
 	lvi.mask		= LVIF_PARAM;
@@ -245,7 +246,73 @@ std::pair<void *,NBookmarks::BookmarkType_t> CBookmarkListView::GetBookmarkItemF
 	ListView_GetItem(m_hListView,&lvi);
 
 	auto itr = m_mapID.find(static_cast<UINT>(lvi.lParam));
-	std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem = m_pParentBookmarkFolder->GetBookmarkItem(itr->second);
+	NBookmarkHelper::variantBookmark_t variantBookmark = NBookmarkHelper::GetBookmarkItem(*m_pParentBookmarkFolder,itr->second);
 
-	return BookmarkItem;
+	return variantBookmark;
+}
+
+NBookmarkHelper::variantBookmark_t NBookmarkHelper::GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder,
+	const GUID &guid)
+{
+	auto itr = std::find_if(ParentBookmarkFolder.begin(),ParentBookmarkFolder.end(),
+		[guid](boost::variant<CBookmarkFolder,CBookmark> &variantBookmark) -> BOOL
+		{
+			if(variantBookmark.type() == typeid(CBookmarkFolder))
+			{
+				CBookmarkFolder BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
+				return IsEqualGUID(BookmarkFolder.GetGUID(),guid);
+			}
+			else
+			{
+				CBookmark Bookmark = boost::get<CBookmark>(variantBookmark);
+				return IsEqualGUID(Bookmark.GetGUID(),guid);
+			}
+		}
+	);
+
+	if(itr == ParentBookmarkFolder.end())
+	{
+		assert(false);
+	}
+
+	if(itr->type() == typeid(CBookmarkFolder))
+	{
+		CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(*itr);
+		return BookmarkFolder;
+	}
+	else
+	{
+		CBookmark &Bookmark = boost::get<CBookmark>(*itr);
+		return Bookmark;
+	}
+}
+
+int CALLBACK NBookmarkHelper::SortByName(const variantBookmark_t BookmarkItem1,
+	const variantBookmark_t BookmarkItem2)
+{
+	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		const CBookmarkFolder &BookmarkFolder1 = boost::get<CBookmarkFolder>(BookmarkItem1);
+		const CBookmarkFolder &BookmarkFolder2 = boost::get<CBookmarkFolder>(BookmarkItem2);
+
+		return BookmarkFolder1.GetName().compare(BookmarkFolder2.GetName());
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmark))
+	{
+		return -1;
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmark) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		return 1;
+	}
+	else
+	{
+		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+
+		return Bookmark1.GetName().compare(Bookmark2.GetName());
+	}
 }

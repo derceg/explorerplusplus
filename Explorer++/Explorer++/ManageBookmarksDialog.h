@@ -62,6 +62,7 @@ public:
 	CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,CBookmarkFolder *pAllBookmarks);
 	~CManageBookmarksDialog();
 
+	int CALLBACK		SortBookmarks(LPARAM lParam1,LPARAM lParam2);
 	LRESULT CALLBACK	EditSearchProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 protected:
@@ -102,17 +103,20 @@ private:
 	void		OnOk();
 	void		OnCancel();
 
-	HWND				m_hToolbar;
-	HIMAGELIST			m_himlToolbar;
+	HWND						m_hToolbar;
+	HIMAGELIST					m_himlToolbar;
 
-	CBookmarkFolder		*m_pAllBookmarks;
+	CBookmarkFolder				*m_pAllBookmarks;
 
-	CBookmarkTreeView	*m_pBookmarkTreeView;
-	CBookmarkListView	*m_pBookmarkListView;
+	CBookmarkTreeView			*m_pBookmarkTreeView;
 
-	HFONT				m_hEditSearchFont;
-	bool				m_bSearchFieldBlank;
-	bool				m_bEditingSearchField;
+	NBookmarkHelper::SortMode_t	m_SortMode;
+	bool						m_bSortAscending;
+	CBookmarkListView			*m_pBookmarkListView;
+
+	HFONT						m_hEditSearchFont;
+	bool						m_bSearchFieldBlank;
+	bool						m_bEditingSearchField;
 
 	CManageBookmarksDialogPersistentSettings	*m_pmbdps;
 };

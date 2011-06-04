@@ -14,7 +14,6 @@
 
 #include "stdafx.h"
 #include <list>
-#include <algorithm>
 #include "Bookmark.h"
 #include "RegistrySettings.h"
 #include "Helper.h"
@@ -35,17 +34,17 @@ CBookmark::~CBookmark()
 
 }
 
-std::wstring CBookmark::GetName()
+std::wstring CBookmark::GetName() const
 {
 	return m_strName;
 }
 
-std::wstring CBookmark::GetLocation()
+std::wstring CBookmark::GetLocation() const
 {
 	return m_strLocation;
 }
 
-std::wstring CBookmark::GetDescription()
+std::wstring CBookmark::GetDescription() const
 {
 	return m_strDescription;
 }
@@ -65,27 +64,27 @@ void CBookmark::SetDescription(const std::wstring &strDescription)
 	m_strDescription = strDescription;
 }
 
-GUID CBookmark::GetGUID()
+GUID CBookmark::GetGUID() const
 {
 	return m_guid;
 }
 
-int CBookmark::GetVisitCount()
+int CBookmark::GetVisitCount() const
 {
 	return m_iVisitCount;
 }
 
-FILETIME CBookmark::GetDateLastVisited()
+FILETIME CBookmark::GetDateLastVisited() const
 {
 	return m_ftLastVisited;
 }
 
-FILETIME CBookmark::GetDateCreated()
+FILETIME CBookmark::GetDateCreated() const
 {
 	return m_ftCreated;
 }
 
-FILETIME CBookmark::GetDateModified()
+FILETIME CBookmark::GetDateModified() const
 {
 	return m_ftModified;
 }
@@ -220,7 +219,7 @@ void CBookmarkFolder::SerializeToRegistry(const std::wstring &strKey)
 	}
 }
 
-std::wstring CBookmarkFolder::GetName()
+std::wstring CBookmarkFolder::GetName() const
 {
 	return m_strName;
 }
@@ -230,17 +229,17 @@ void CBookmarkFolder::SetName(const std::wstring &strName)
 	m_strName = strName;
 }
 
-GUID CBookmarkFolder::GetGUID()
+GUID CBookmarkFolder::GetGUID() const
 {
 	return m_guid;
 }
 
-FILETIME CBookmarkFolder::GetDateCreated()
+FILETIME CBookmarkFolder::GetDateCreated() const
 {
 	return m_ftCreated;
 }
 
-FILETIME CBookmarkFolder::GetDateModified()
+FILETIME CBookmarkFolder::GetDateModified() const
 {
 	return m_ftModified;
 }
@@ -299,7 +298,7 @@ std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator CBookmarkFolder::
 	return m_ChildList.end();
 }
 
-bool CBookmarkFolder::HasChildFolder()
+bool CBookmarkFolder::HasChildFolder() const
 {
 	if(m_nChildFolders > 0)
 	{
@@ -307,29 +306,4 @@ bool CBookmarkFolder::HasChildFolder()
 	}
 
 	return false;
-}
-
-std::pair<void *,NBookmarks::BookmarkType_t> CBookmarkFolder::GetBookmarkItem(const GUID &guid)
-{
-	auto itr = std::find_if(m_ChildList.begin(),m_ChildList.end(),
-		[guid](boost::variant<CBookmarkFolder,CBookmark> &Variant) -> BOOL
-		{
-			CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(&Variant);
-
-			if(pBookmarkFolder)
-			{
-				return IsEqualGUID(pBookmarkFolder->GetGUID(),guid);
-			}
-
-			return FALSE;
-		}
-	);
-
-	if(itr != m_ChildList.end())
-	{
-		return std::make_pair(reinterpret_cast<void *>(boost::get<CBookmarkFolder>(&(*itr))),
-			NBookmarks::TYPE_BOOKMARK);
-	}
-
-	return std::make_pair(reinterpret_cast<void *>(NULL),NBookmarks::TYPE_BOOKMARK);
 }

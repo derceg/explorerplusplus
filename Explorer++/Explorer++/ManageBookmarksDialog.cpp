@@ -22,8 +22,9 @@
 
 namespace NManageBookmarksDialog
 {
-	LRESULT CALLBACK EditSearchProcStub(HWND hwnd,UINT uMsg,
-		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+	int CALLBACK		SortBookmarksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+
+	LRESULT CALLBACK	EditSearchProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 }
 
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
@@ -31,6 +32,8 @@ const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("Manag
 CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,
 	CBookmarkFolder *pAllBookmarks) :
 m_pAllBookmarks(pAllBookmarks),
+m_SortMode(NBookmarkHelper::SM_NAME),
+m_bSortAscending(true),
 m_bSearchFieldBlank(true),
 m_bEditingSearchField(false),
 m_hEditSearchFont(NULL),
@@ -173,7 +176,42 @@ void CManageBookmarksDialog::SetupListView()
 		++iItem;
 	}
 
+	ListView_SortItems(hListView,NManageBookmarksDialog::SortBookmarksStub,reinterpret_cast<LPARAM>(this));
+
 	NListView::ListView_SelectItem(hListView,0,TRUE);
+}
+
+int CALLBACK NManageBookmarksDialog::SortBookmarksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
+{
+	assert(lParamSort != NULL);
+
+	CManageBookmarksDialog *pmbd = reinterpret_cast<CManageBookmarksDialog *>(lParamSort);
+
+	return pmbd->SortBookmarks(lParam1,lParam2);
+}
+
+int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2)
+{
+	/* TODO: Need to be able to retrieve items using their lParam
+	value. */
+	NBookmarkHelper::variantBookmark_t variantBookmark1 = m_pBookmarkListView->GetBookmarkItemFromListView(0);
+	NBookmarkHelper::variantBookmark_t variantBookmark2 = m_pBookmarkListView->GetBookmarkItemFromListView(1);
+
+	int iRes = 0;
+
+	switch(m_SortMode)
+	{
+	case NBookmarkHelper::SM_NAME:
+		iRes = NBookmarkHelper::SortByName(variantBookmark1,variantBookmark2);
+		break;
+	}
+
+	if(!m_bSortAscending)
+	{
+		iRes = -iRes;
+	}
+
+	return iRes;
 }
 
 /* Changes the font within the search edit
@@ -611,19 +649,16 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 	{
 		NMITEMACTIVATE *pnmia = reinterpret_cast<NMITEMACTIVATE *>(pnmhdr);
 
-		std::pair<void *,NBookmarks::BookmarkType_t> BookmarkItem =
-			m_pBookmarkListView->GetBookmarkItemFromListView(pnmia->iItem);
+		NBookmarkHelper::variantBookmark_t variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(pnmia->iItem);
 
-		switch(BookmarkItem.second)
+		if(variantBookmark.type() == typeid(CBookmarkFolder))
 		{
-		case NBookmarks::TYPE_BOOKMARK:
+			/* TODO: Browse into the folder. */
+		}
+		else if(variantBookmark.type() == typeid(CBookmark))
+		{
 			/* TODO: Send the bookmark back to the main
 			window to open. */
-			break;
-
-		case NBookmarks::TYPE_FOLDER:
-			/* TODO: Browse into the folder. */
-			break;
 		}
 	}
 }

@@ -4,15 +4,6 @@
 #include <list>
 #include <boost/variant.hpp>
 
-namespace NBookmarks
-{
-	enum BookmarkType_t
-	{
-		TYPE_BOOKMARK,
-		TYPE_FOLDER
-	};
-}
-
 class CBookmark;
 class CBookmarkFolder;
 
@@ -28,17 +19,17 @@ public:
 
 	void			SerializeToRegistry(const std::wstring &strKey);
 
-	GUID			GetGUID();
+	GUID			GetGUID() const;
 
-	std::wstring	GetName();
+	std::wstring	GetName() const;
 	void			SetName(const std::wstring &strName);
 
-	FILETIME		GetDateCreated();
-	FILETIME		GetDateModified();
+	FILETIME		GetDateCreated() const;
+	FILETIME		GetDateModified() const;
 
 	/* Returns true if this folder has *at least*
 	one child folder. */
-	bool			HasChildFolder();
+	bool			HasChildFolder() const;
 
 	std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator	begin();
 	std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator	end();
@@ -50,12 +41,6 @@ public:
 
 	void			RemoveBookmark();
 	void			RemoveBookmarkFolder();
-
-	/* Retrieves the bookmark item with the
-	specified id. Item in this case may
-	refer to either a bookmark or bookmark
-	folder. */
-	std::pair<void *,NBookmarks::BookmarkType_t>	GetBookmarkItem(const GUID &guid);
 
 private:
 
@@ -97,21 +82,21 @@ public:
 	CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription);
 	~CBookmark();
 
-	GUID			GetGUID();
+	GUID			GetGUID() const;
 
-	std::wstring	GetName();
-	std::wstring	GetLocation();
-	std::wstring	GetDescription();
+	std::wstring	GetName() const;
+	std::wstring	GetLocation() const;
+	std::wstring	GetDescription() const;
 
 	void			SetName(const std::wstring &strName);
 	void			SetLocation(const std::wstring &strLocation);
 	void			SetDescription(const std::wstring &strDescription);
 
-	int				GetVisitCount();
-	FILETIME		GetDateLastVisited();
+	int				GetVisitCount() const;
+	FILETIME		GetDateLastVisited() const;
 
-	FILETIME		GetDateCreated();
-	FILETIME		GetDateModified();
+	FILETIME		GetDateCreated() const;
+	FILETIME		GetDateModified() const;
 
 private:
 
