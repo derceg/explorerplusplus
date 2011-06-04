@@ -38,7 +38,7 @@ class CAddBookmarkDialog : public CBaseDialog
 {
 public:
 
-	CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,CBookmarkFolder *pAllBookmarks,CBookmark *pBookmark);
+	CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,CBookmarkFolder &AllBookmarks,CBookmark &Bookmark);
 	~CAddBookmarkDialog();
 
 	LRESULT CALLBACK	TreeViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -57,6 +57,8 @@ protected:
 	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
 private:
+
+	CAddBookmarkDialog & operator = (const CAddBookmarkDialog &mbd);
 
 	void		SetDialogIcon();
 
@@ -77,8 +79,8 @@ private:
 
 	HICON			m_hDialogIcon;
 
-	CBookmarkFolder	*m_pAllBookmarks;
-	CBookmark		*m_pBookmark;
+	CBookmarkFolder	&m_AllBookmarks;
+	CBookmark		&m_Bookmark;
 
 	CBookmarkTreeView	*m_pBookmarkTreeView;
 

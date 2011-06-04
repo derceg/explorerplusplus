@@ -32,6 +32,12 @@ namespace NBookmarkHelper
 	};
 
 	int CALLBACK		SortByName(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
+	int CALLBACK		SortByLocation(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
+	int CALLBACK		SortByVisitDate(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
+	int CALLBACK		SortByVisitCount(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
+	int CALLBACK		SortByAdded(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
+	int CALLBACK		SortByLastModified(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
+
 	variantBookmark_t	GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder,const GUID &guid);
 }
 
@@ -42,13 +48,13 @@ public:
 	CBookmarkTreeView(HWND hTreeView);
 	~CBookmarkTreeView();
 
-	void			InsertFoldersIntoTreeView(CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
-	HTREEITEM		InsertFolderIntoTreeView(HTREEITEM hParent,CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
-	CBookmarkFolder	*GetBookmarkFolderFromTreeView(HTREEITEM hItem,CBookmarkFolder *pRootBookmarkFolder);
+	void			InsertFoldersIntoTreeView(const CBookmarkFolder &BookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
+	HTREEITEM		InsertFolderIntoTreeView(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
+	CBookmarkFolder	&GetBookmarkFolderFromTreeView(HTREEITEM hItem,CBookmarkFolder &RootBookmarkFolder);
 
 private:
 
-	void	InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
+	void	InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
 
 	HWND							m_hTreeView;
 	HIMAGELIST						m_himl;
@@ -64,10 +70,10 @@ public:
 	CBookmarkListView(HWND hListView);
 	~CBookmarkListView();
 
-	void	InsertBookmarksIntoListView(CBookmarkFolder *pBookmarkFolder);
-	void	InsertBookmarkFolderIntoListView(CBookmarkFolder *pBookmarkFolder,int iPosition);
-	void	InsertBookmarkIntoListView(CBookmark *pBookmark,int iPosition);
-	NBookmarkHelper::variantBookmark_t	GetBookmarkItemFromListView(int iItem);
+	void	InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder);
+	void	InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder,int iPosition);
+	void	InsertBookmarkIntoListView(const CBookmark &Bookmark,int iPosition);
+	NBookmarkHelper::variantBookmark_t	GetBookmarkItemFromListView(CBookmarkFolder &ParentBookmarkFolder,int iItem);
 
 private:
 
@@ -75,8 +81,6 @@ private:
 
 	HWND							m_hListView;
 	HIMAGELIST						m_himl;
-
-	CBookmarkFolder					*m_pParentBookmarkFolder;
 
 	std::unordered_map<UINT,GUID>	m_mapID;
 	UINT							m_uIDCounter;

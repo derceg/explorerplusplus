@@ -298,6 +298,16 @@ std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator CBookmarkFolder::
 	return m_ChildList.end();
 }
 
+std::list<boost::variant<CBookmarkFolder,CBookmark>>::const_iterator CBookmarkFolder::begin() const
+{
+	return m_ChildList.begin();
+}
+
+std::list<boost::variant<CBookmarkFolder,CBookmark>>::const_iterator CBookmarkFolder::end() const
+{
+	return m_ChildList.end();
+}
+
 bool CBookmarkFolder::HasChildFolder() const
 {
 	if(m_nChildFolders > 0)

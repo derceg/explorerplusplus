@@ -59,7 +59,7 @@ class CManageBookmarksDialog : public CBaseDialog
 {
 public:
 
-	CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,CBookmarkFolder *pAllBookmarks);
+	CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,CBookmarkFolder &AllBookmarks);
 	~CManageBookmarksDialog();
 
 	int CALLBACK		SortBookmarks(LPARAM lParam1,LPARAM lParam2);
@@ -69,6 +69,7 @@ protected:
 
 	BOOL	OnInitDialog();
 	INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc);
+	BOOL	OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys);
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnNotify(NMHDR *pnmhdr);
 	BOOL	OnClose();
@@ -80,15 +81,17 @@ private:
 
 	static const COLORREF SEARCH_TEXT_COLOR = RGB(120,120,120);
 
+	CManageBookmarksDialog & operator = (const CManageBookmarksDialog &mbd);
+
 	void		SetupSearchField();
 	void		SetupToolbar();
 	void		SetupTreeView();
 	void		SetupListView();
 
 	void		GetColumnString(CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,UINT cchBuf);
-	void		GetBookmarkItemColumnInfo(boost::variant<CBookmarkFolder,CBookmark> *pBookmarkVariant,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
-	void		GetBookmarkColumnInfo(CBookmark *pBookmark,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
-	void		GetBookmarkFolderColumnInfo(CBookmarkFolder *pBookmarkFolder,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
+	void		GetBookmarkItemColumnInfo(const NBookmarkHelper::variantBookmark_t variantBookmark,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
+	void		GetBookmarkColumnInfo(const CBookmark &Bookmark,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
+	void		GetBookmarkFolderColumnInfo(const CBookmarkFolder &BookmarkFolder,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
 
 	void		SetSearchFieldDefaultState();
 	void		RemoveSearchFieldDefaultState();
@@ -106,12 +109,13 @@ private:
 	HWND						m_hToolbar;
 	HIMAGELIST					m_himlToolbar;
 
-	CBookmarkFolder				*m_pAllBookmarks;
+	CBookmarkFolder				&m_AllBookmarks;
 
 	CBookmarkTreeView			*m_pBookmarkTreeView;
 
 	NBookmarkHelper::SortMode_t	m_SortMode;
 	bool						m_bSortAscending;
+	bool						m_bListViewInitialized;
 	CBookmarkListView			*m_pBookmarkListView;
 
 	HFONT						m_hEditSearchFont;

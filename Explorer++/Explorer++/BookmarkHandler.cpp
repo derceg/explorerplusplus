@@ -84,7 +84,7 @@ void Explorerplusplus::BookmarkToolbarNewBookmark(int iItem)
 
 		CBookmark Bookmark(EMPTY_STRING,EMPTY_STRING,EMPTY_STRING);
 
-		CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,m_hContainer,m_bfAllBookmarks,&Bookmark);
+		CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,m_hContainer,*m_bfAllBookmarks,Bookmark);
 		AddBookmarkDialog.ShowModalDialog();
 	}
 }

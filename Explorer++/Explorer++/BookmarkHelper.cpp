@@ -38,44 +38,46 @@ CBookmarkTreeView::~CBookmarkTreeView()
 	ImageList_Destroy(m_himl);
 }
 
-void CBookmarkTreeView::InsertFoldersIntoTreeView(CBookmarkFolder *pBookmarkFolder,
+void CBookmarkTreeView::InsertFoldersIntoTreeView(const CBookmarkFolder &BookmarkFolder,
 	const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
 {
-	HTREEITEM hRoot = InsertFolderIntoTreeView(NULL,pBookmarkFolder,
+	HTREEITEM hRoot = InsertFolderIntoTreeView(NULL,BookmarkFolder,
 		guidSelected,setExpansion);
 
-	InsertFoldersIntoTreeViewRecursive(hRoot,pBookmarkFolder,
+	InsertFoldersIntoTreeViewRecursive(hRoot,BookmarkFolder,
 		guidSelected,setExpansion);
 }
 
-void CBookmarkTreeView::InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,
-	CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
+void CBookmarkTreeView::InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,
+	const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
 {
-	for(auto itr = pBookmarkFolder->begin();itr != pBookmarkFolder->end();++itr)
+	for(auto itr = BookmarkFolder.begin();itr != BookmarkFolder.end();++itr)
 	{
-		if(CBookmarkFolder *pBookmarkFolderChild = boost::get<CBookmarkFolder>(&(*itr)))
+		if(itr->type() == typeid(CBookmarkFolder))
 		{
-			HTREEITEM hCurrentItem = InsertFolderIntoTreeView(hParent,
-				pBookmarkFolderChild,guidSelected,setExpansion);
+			const CBookmarkFolder &BookmarkFolderChild = boost::get<CBookmarkFolder>(*itr);
 
-			if(pBookmarkFolderChild->HasChildFolder())
+			HTREEITEM hCurrentItem = InsertFolderIntoTreeView(hParent,
+				BookmarkFolderChild,guidSelected,setExpansion);
+
+			if(BookmarkFolderChild.HasChildFolder())
 			{
 				InsertFoldersIntoTreeViewRecursive(hCurrentItem,
-					pBookmarkFolderChild,guidSelected,setExpansion);
+					BookmarkFolderChild,guidSelected,setExpansion);
 			}
 		}
 	}
 }
 
-HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,
-	CBookmarkFolder *pBookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
+HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,
+	const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
 {
 	TCHAR szText[256];
-	StringCchCopy(szText,SIZEOF_ARRAY(szText),pBookmarkFolder->GetName().c_str());
+	StringCchCopy(szText,SIZEOF_ARRAY(szText),BookmarkFolder.GetName().c_str());
 
 	int nChildren = 0;
 
-	if(pBookmarkFolder->HasChildFolder())
+	if(BookmarkFolder.HasChildFolder())
 	{
 		nChildren = 1;
 	}
@@ -83,19 +85,13 @@ HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,
 	UINT uState = 0;
 	UINT uStateMask = 0;
 
-	auto itr = setExpansion.find(pBookmarkFolder->GetGUID());
+	auto itr = setExpansion.find(BookmarkFolder.GetGUID());
 
 	if(itr != setExpansion.end() &&
-		pBookmarkFolder->HasChildFolder())
+		BookmarkFolder.HasChildFolder())
 	{
 		uState		|= TVIS_EXPANDED;
 		uStateMask	|= TVIS_EXPANDED;
-	}
-
-	if(IsEqualGUID(pBookmarkFolder->GetGUID(),guidSelected))
-	{
-		uState		|= TVIS_SELECTED;
-		uStateMask	|= TVIS_SELECTED;
 	}
 
 	TVITEMEX tviex;
@@ -114,14 +110,19 @@ HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,
 	tvis.itemex				= tviex;
 	HTREEITEM hItem = TreeView_InsertItem(m_hTreeView,&tvis);
 
-	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,pBookmarkFolder->GetGUID()));
+	if(IsEqualGUID(BookmarkFolder.GetGUID(),guidSelected))
+	{
+		TreeView_SelectItem(m_hTreeView,hItem);
+	}
+
+	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,BookmarkFolder.GetGUID()));
 	++m_uIDCounter;
 
 	return hItem;
 }
 
-CBookmarkFolder *CBookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hItem,
-	CBookmarkFolder *pRootBookmarkFolder)
+CBookmarkFolder &CBookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hItem,
+	CBookmarkFolder &RootBookmarkFolder)
 {
 	TVITEM tvi;
 	tvi.mask	= TVIF_HANDLE|TVIF_PARAM;
@@ -144,20 +145,20 @@ CBookmarkFolder *CBookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hIte
 		hCurrentItem = hParent;
 	}
 
-	CBookmarkFolder *pBookmarkFolder = pRootBookmarkFolder;
+	CBookmarkFolder *pBookmarkFolder = &RootBookmarkFolder;
 
 	while(!stackIDs.empty())
 	{
 		UINT uID = stackIDs.top();
 		auto itr = m_mapID.find(uID);
 
-		NBookmarkHelper::variantBookmark_t variantBookmark = NBookmarkHelper::GetBookmarkItem(*pRootBookmarkFolder,itr->second);
+		NBookmarkHelper::variantBookmark_t variantBookmark = NBookmarkHelper::GetBookmarkItem(*pBookmarkFolder,itr->second);
 		pBookmarkFolder = boost::get<CBookmarkFolder>(&variantBookmark);
 
 		stackIDs.pop();
 	}
 
-	return pBookmarkFolder;
+	return *pBookmarkFolder;
 }
 
 CBookmarkListView::CBookmarkListView(HWND hListView) :
@@ -181,41 +182,41 @@ CBookmarkListView::~CBookmarkListView()
 	ImageList_Destroy(m_himl);
 }
 
-void CBookmarkListView::InsertBookmarksIntoListView(CBookmarkFolder *pBookmarkFolder)
+void CBookmarkListView::InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder)
 {
-	m_pParentBookmarkFolder = pBookmarkFolder;
-
 	ListView_DeleteAllItems(m_hListView);
 	m_uIDCounter = 0;
 	m_mapID.clear();
 
 	int iItem = 0;
 
-	for(auto itr = pBookmarkFolder->begin();itr != pBookmarkFolder->end();++itr)
+	for(auto itr = BookmarkFolder.begin();itr != BookmarkFolder.end();++itr)
 	{
-		if(CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(&(*itr)))
+		if(itr->type() == typeid(CBookmarkFolder))
 		{
-			InsertBookmarkFolderIntoListView(pBookmarkFolder,iItem);
+			const CBookmarkFolder &CurrentBookmarkFolder = boost::get<CBookmarkFolder>(*itr);
+			InsertBookmarkFolderIntoListView(CurrentBookmarkFolder,iItem);
 		}
-		else if(CBookmark *pBookmark = boost::get<CBookmark>(&(*itr)))
+		else
 		{
-			InsertBookmarkIntoListView(pBookmark,iItem);
+			const CBookmark &CurrentBookmark = boost::get<CBookmark>(*itr);
+			InsertBookmarkIntoListView(CurrentBookmark,iItem);
 		}
 
 		++iItem;
 	}
 }
 
-void CBookmarkListView::InsertBookmarkFolderIntoListView(CBookmarkFolder *pBookmarkFolder,int iPosition)
+void CBookmarkListView::InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder,int iPosition)
 {
-	InsertBookmarkItemIntoListView(pBookmarkFolder->GetName(),
-		pBookmarkFolder->GetGUID(),iPosition);
+	InsertBookmarkItemIntoListView(BookmarkFolder.GetName(),
+		BookmarkFolder.GetGUID(),iPosition);
 }
 
-void CBookmarkListView::InsertBookmarkIntoListView(CBookmark *pBookmark,int iPosition)
+void CBookmarkListView::InsertBookmarkIntoListView(const CBookmark &Bookmark,int iPosition)
 {
-	InsertBookmarkItemIntoListView(pBookmark->GetName(),
-		pBookmark->GetGUID(),iPosition);
+	InsertBookmarkItemIntoListView(Bookmark.GetName(),
+		Bookmark.GetGUID(),iPosition);
 }
 
 void CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strName,
@@ -237,7 +238,7 @@ void CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strNa
 	++m_uIDCounter;
 }
 
-NBookmarkHelper::variantBookmark_t CBookmarkListView::GetBookmarkItemFromListView(int iItem)
+NBookmarkHelper::variantBookmark_t CBookmarkListView::GetBookmarkItemFromListView(CBookmarkFolder &ParentBookmarkFolder,int iItem)
 {
 	LVITEM lvi;
 	lvi.mask		= LVIF_PARAM;
@@ -246,7 +247,7 @@ NBookmarkHelper::variantBookmark_t CBookmarkListView::GetBookmarkItemFromListVie
 	ListView_GetItem(m_hListView,&lvi);
 
 	auto itr = m_mapID.find(static_cast<UINT>(lvi.lParam));
-	NBookmarkHelper::variantBookmark_t variantBookmark = NBookmarkHelper::GetBookmarkItem(*m_pParentBookmarkFolder,itr->second);
+	NBookmarkHelper::variantBookmark_t variantBookmark = NBookmarkHelper::GetBookmarkItem(ParentBookmarkFolder,itr->second);
 
 	return variantBookmark;
 }
@@ -314,5 +315,161 @@ int CALLBACK NBookmarkHelper::SortByName(const variantBookmark_t BookmarkItem1,
 		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
 
 		return Bookmark1.GetName().compare(Bookmark2.GetName());
+	}
+}
+
+int CALLBACK NBookmarkHelper::SortByLocation(const variantBookmark_t BookmarkItem1,
+	const variantBookmark_t BookmarkItem2)
+{
+	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		return 0;
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmark))
+	{
+		return -1;
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmark) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		return 1;
+	}
+	else
+	{
+		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+
+		return Bookmark1.GetLocation().compare(Bookmark2.GetLocation());
+	}
+}
+
+int CALLBACK NBookmarkHelper::SortByVisitDate(const variantBookmark_t BookmarkItem1,
+	const variantBookmark_t BookmarkItem2)
+{
+	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		return 0;
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmark))
+	{
+		return -1;
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmark) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		return 1;
+	}
+	else
+	{
+		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+
+		FILETIME ft1 = Bookmark1.GetDateLastVisited();
+		FILETIME ft2 = Bookmark2.GetDateLastVisited();
+
+		return CompareFileTime(&ft1,&ft2);
+	}
+}
+
+int CALLBACK NBookmarkHelper::SortByVisitCount(const variantBookmark_t BookmarkItem1,
+	const variantBookmark_t BookmarkItem2)
+{
+	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		return 0;
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmark))
+	{
+		return -1;
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmark) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		return 1;
+	}
+	else
+	{
+		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+
+		return Bookmark1.GetVisitCount() - Bookmark2.GetVisitCount();
+	}
+}
+
+int CALLBACK NBookmarkHelper::SortByAdded(const variantBookmark_t BookmarkItem1,
+	const variantBookmark_t BookmarkItem2)
+{
+	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		const CBookmarkFolder &BookmarkFolder1 = boost::get<CBookmarkFolder>(BookmarkItem1);
+		const CBookmarkFolder &BookmarkFolder2 = boost::get<CBookmarkFolder>(BookmarkItem2);
+
+		FILETIME ft1 = BookmarkFolder1.GetDateCreated();
+		FILETIME ft2 = BookmarkFolder2.GetDateCreated();
+
+		return CompareFileTime(&ft1,&ft2);
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmark))
+	{
+		return -1;
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmark) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		return 1;
+	}
+	else
+	{
+		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+
+		FILETIME ft1 = Bookmark1.GetDateCreated();
+		FILETIME ft2 = Bookmark2.GetDateCreated();
+
+		return CompareFileTime(&ft1,&ft2);
+	}
+}
+
+int CALLBACK NBookmarkHelper::SortByLastModified(const variantBookmark_t BookmarkItem1,
+	const variantBookmark_t BookmarkItem2)
+{
+	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		const CBookmarkFolder &BookmarkFolder1 = boost::get<CBookmarkFolder>(BookmarkItem1);
+		const CBookmarkFolder &BookmarkFolder2 = boost::get<CBookmarkFolder>(BookmarkItem2);
+
+		FILETIME ft1 = BookmarkFolder1.GetDateModified();
+		FILETIME ft2 = BookmarkFolder2.GetDateModified();
+
+		return CompareFileTime(&ft1,&ft2);
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
+		BookmarkItem2.type() == typeid(CBookmark))
+	{
+		return -1;
+	}
+	else if(BookmarkItem1.type() == typeid(CBookmark) &&
+		BookmarkItem2.type() == typeid(CBookmarkFolder))
+	{
+		return 1;
+	}
+	else
+	{
+		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+
+		FILETIME ft1 = Bookmark1.GetDateModified();
+		FILETIME ft2 = Bookmark2.GetDateModified();
+
+		return CompareFileTime(&ft1,&ft2);
 	}
 }

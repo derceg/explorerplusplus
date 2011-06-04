@@ -30,10 +30,11 @@ namespace NManageBookmarksDialog
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,
-	CBookmarkFolder *pAllBookmarks) :
-m_pAllBookmarks(pAllBookmarks),
+	CBookmarkFolder &AllBookmarks) :
+m_AllBookmarks(AllBookmarks),
 m_SortMode(NBookmarkHelper::SM_NAME),
 m_bSortAscending(true),
+m_bListViewInitialized(false),
 m_bSearchFieldBlank(true),
 m_bEditingSearchField(false),
 m_hEditSearchFont(NULL),
@@ -43,8 +44,8 @@ CBaseDialog(hInstance,iResource,hParent,true)
 
 	if(!m_pmbdps->m_bInitialized)
 	{
-		m_pmbdps->m_guidSelected = pAllBookmarks->GetGUID();
-		m_pmbdps->m_setExpansion.insert(pAllBookmarks->GetGUID());
+		m_pmbdps->m_guidSelected = AllBookmarks.GetGUID();
+		m_pmbdps->m_setExpansion.insert(AllBookmarks.GetGUID());
 
 		m_pmbdps->m_bInitialized = true;
 	}
@@ -121,7 +122,7 @@ void CManageBookmarksDialog::SetupTreeView()
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 
 	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView);
-	m_pBookmarkTreeView->InsertFoldersIntoTreeView(m_pAllBookmarks,
+	m_pBookmarkTreeView->InsertFoldersIntoTreeView(m_AllBookmarks,
 		m_pmbdps->m_guidSelected,m_pmbdps->m_setExpansion);
 }
 
@@ -150,12 +151,12 @@ void CManageBookmarksDialog::SetupListView()
 		}
 	}
 
-	m_pBookmarkListView->InsertBookmarksIntoListView(m_pAllBookmarks);
+	m_pBookmarkListView->InsertBookmarksIntoListView(m_AllBookmarks);
 
 	int iItem = 0;
 
 	/* Update the data for each of the sub-items. */
-	for(auto itr = m_pAllBookmarks->begin();itr != m_pAllBookmarks->end();++itr)
+	for(auto itr = m_AllBookmarks.begin();itr != m_AllBookmarks.end();++itr)
 	{
 		int iSubItem = 1;
 
@@ -166,7 +167,7 @@ void CManageBookmarksDialog::SetupListView()
 			if(ci.bActive && ci.ColumnType != CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME)
 			{
 				TCHAR szColumn[256];
-				GetBookmarkItemColumnInfo(&(*itr),ci.ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
+				GetBookmarkItemColumnInfo(*itr,ci.ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
 				ListView_SetItemText(hListView,iItem,iSubItem,szColumn);
 
 				++iSubItem;
@@ -179,6 +180,8 @@ void CManageBookmarksDialog::SetupListView()
 	ListView_SortItems(hListView,NManageBookmarksDialog::SortBookmarksStub,reinterpret_cast<LPARAM>(this));
 
 	NListView::ListView_SelectItem(hListView,0,TRUE);
+
+	m_bListViewInitialized = true;
 }
 
 int CALLBACK NManageBookmarksDialog::SortBookmarksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
@@ -194,8 +197,12 @@ int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2
 {
 	/* TODO: Need to be able to retrieve items using their lParam
 	value. */
-	NBookmarkHelper::variantBookmark_t variantBookmark1 = m_pBookmarkListView->GetBookmarkItemFromListView(0);
-	NBookmarkHelper::variantBookmark_t variantBookmark2 = m_pBookmarkListView->GetBookmarkItemFromListView(1);
+	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
+	HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
+	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_AllBookmarks);
+
+	NBookmarkHelper::variantBookmark_t variantBookmark1 = m_pBookmarkListView->GetBookmarkItemFromListView(BookmarkFolder,0);
+	NBookmarkHelper::variantBookmark_t variantBookmark2 = m_pBookmarkListView->GetBookmarkItemFromListView(BookmarkFolder,1);
 
 	int iRes = 0;
 
@@ -317,6 +324,22 @@ INT_PTR CManageBookmarksDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
 			SetBkMode(hdc,TRANSPARENT);
 			return reinterpret_cast<INT_PTR>(GetSysColorBrush(COLOR_WINDOW));
 		}
+	}
+
+	return 0;
+}
+
+BOOL CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
+{
+	switch(uCmd)
+	{
+	case APPCOMMAND_BROWSER_BACKWARD:
+		/* TODO: Browse back. */
+		break;
+
+	case APPCOMMAND_BROWSER_FORWARD:
+		/* TODO: Browse forward. */
+		break;
 	}
 
 	return 0;
@@ -461,14 +484,14 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 
 				HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 				HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-				CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_pAllBookmarks);
+				CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_AllBookmarks);
 
 				int iItem = 0;
 
-				for(auto itrBookmarks = pBookmarkFolder->begin();itrBookmarks != pBookmarkFolder->end();++itrBookmarks)
+				for(auto itrBookmarks = BookmarkFolder.begin();itrBookmarks != BookmarkFolder.end();++itrBookmarks)
 				{
 					TCHAR szColumn[256];
-					GetBookmarkItemColumnInfo(&(*itrBookmarks),itr->ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
+					GetBookmarkItemColumnInfo(*itrBookmarks,itr->ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
 					ListView_SetItemText(hListView,iItem,iColumn,szColumn);
 
 					++iItem;
@@ -528,49 +551,51 @@ void CManageBookmarksDialog::GetColumnString(CManageBookmarksDialogPersistentSet
 	LoadString(GetInstance(),uResourceID,szColumn,cchBuf);
 }
 
-void CManageBookmarksDialog::GetBookmarkItemColumnInfo(boost::variant<CBookmarkFolder,CBookmark> *pBookmarkVariant,
+void CManageBookmarksDialog::GetBookmarkItemColumnInfo(const NBookmarkHelper::variantBookmark_t variantBookmark,
 	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf)
 {
-	if(CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(pBookmarkVariant))
+	if(variantBookmark.type() == typeid(CBookmarkFolder))
 	{
-		GetBookmarkFolderColumnInfo(pBookmarkFolder,ColumnType,szColumn,cchBuf);
+		const CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
+		GetBookmarkFolderColumnInfo(BookmarkFolder,ColumnType,szColumn,cchBuf);
 	}
-	else if(CBookmark *pBookmark = boost::get<CBookmark>(pBookmarkVariant))
+	else
 	{
-		GetBookmarkColumnInfo(pBookmark,ColumnType,szColumn,cchBuf);
+		const CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
+		GetBookmarkColumnInfo(Bookmark,ColumnType,szColumn,cchBuf);
 	}
 }
 
-void CManageBookmarksDialog::GetBookmarkColumnInfo(CBookmark *pBookmark,
+void CManageBookmarksDialog::GetBookmarkColumnInfo(const CBookmark &Bookmark,
 	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,
 	TCHAR *szColumn,size_t cchBuf)
 {
 	switch(ColumnType)
 	{
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME:
-		StringCchCopy(szColumn,cchBuf,pBookmark->GetName().c_str());
+		StringCchCopy(szColumn,cchBuf,Bookmark.GetName().c_str());
 		break;
 
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LOCATION:
-		StringCchCopy(szColumn,cchBuf,pBookmark->GetLocation().c_str());
+		StringCchCopy(szColumn,cchBuf,Bookmark.GetLocation().c_str());
 		break;
 
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_DATE:
 		{
 			/* TODO: Friendly dates. */
-			FILETIME ftLastVisited = pBookmark->GetDateLastVisited();
+			FILETIME ftLastVisited = Bookmark.GetDateLastVisited();
 			CreateFileTimeString(&ftLastVisited,szColumn,static_cast<int>(cchBuf),FALSE);
 		}
 		break;
 
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_VISIT_COUNT:
-		StringCchPrintf(szColumn,cchBuf,_T("%d"),pBookmark->GetVisitCount());
+		StringCchPrintf(szColumn,cchBuf,_T("%d"),Bookmark.GetVisitCount());
 		break;
 
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_ADDED:
 		{
 			/* TODO: Friendly dates. */
-			FILETIME ftCreated = pBookmark->GetDateCreated();
+			FILETIME ftCreated = Bookmark.GetDateCreated();
 			CreateFileTimeString(&ftCreated,szColumn,static_cast<int>(cchBuf),FALSE);
 		}
 		break;
@@ -578,7 +603,7 @@ void CManageBookmarksDialog::GetBookmarkColumnInfo(CBookmark *pBookmark,
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LAST_MODIFIED:
 		{
 			/* TODO: Friendly dates. */
-			FILETIME ftModified = pBookmark->GetDateModified();
+			FILETIME ftModified = Bookmark.GetDateModified();
 			CreateFileTimeString(&ftModified,szColumn,static_cast<int>(cchBuf),FALSE);
 		}
 		break;
@@ -589,14 +614,13 @@ void CManageBookmarksDialog::GetBookmarkColumnInfo(CBookmark *pBookmark,
 	}
 }
 
-void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(CBookmarkFolder *pBookmarkFolder,
-	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,
-	TCHAR *szColumn,size_t cchBuf)
+void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(const CBookmarkFolder &BookmarkFolder,
+	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf)
 {
 	switch(ColumnType)
 	{
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_NAME:
-		StringCchCopy(szColumn,cchBuf,pBookmarkFolder->GetName().c_str());
+		StringCchCopy(szColumn,cchBuf,BookmarkFolder.GetName().c_str());
 		break;
 
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LOCATION:
@@ -614,7 +638,7 @@ void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(CBookmarkFolder *pBookm
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_ADDED:
 		{
 			/* TODO: Friendly dates. */
-			FILETIME ftCreated = pBookmarkFolder->GetDateCreated();
+			FILETIME ftCreated = BookmarkFolder.GetDateCreated();
 			CreateFileTimeString(&ftCreated,szColumn,static_cast<int>(cchBuf),FALSE);
 		}
 		break;
@@ -622,7 +646,7 @@ void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(CBookmarkFolder *pBookm
 	case CManageBookmarksDialogPersistentSettings::COLUMN_TYPE_LAST_MODIFIED:
 		{
 			/* TODO: Friendly dates. */
-			FILETIME ftModified = pBookmarkFolder->GetDateModified();
+			FILETIME ftModified = BookmarkFolder.GetDateModified();
 			CreateFileTimeString(&ftModified,szColumn,static_cast<int>(cchBuf),FALSE);
 		}
 		break;
@@ -635,10 +659,17 @@ void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(CBookmarkFolder *pBookm
 
 void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
 {
-	CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(pnmtv->itemNew.hItem,m_pAllBookmarks);
-	assert(pBookmarkFolder != NULL);
+	/* This message will come in once before the listview has been
+	properly initialized (due to the selection been set in
+	the treeview), and can be ignored. */
+	if(!m_bListViewInitialized)
+	{
+		return;
+	}
 
-	m_pBookmarkListView->InsertBookmarksIntoListView(pBookmarkFolder);
+	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(pnmtv->itemNew.hItem,m_AllBookmarks);
+
+	m_pBookmarkListView->InsertBookmarksIntoListView(BookmarkFolder);
 }
 
 void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
@@ -649,11 +680,18 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 	{
 		NMITEMACTIVATE *pnmia = reinterpret_cast<NMITEMACTIVATE *>(pnmhdr);
 
-		NBookmarkHelper::variantBookmark_t variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(pnmia->iItem);
+		HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
+		HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
+		CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_AllBookmarks);
+		NBookmarkHelper::variantBookmark_t variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(
+			ParentBookmarkFolder,pnmia->iItem);
 
 		if(variantBookmark.type() == typeid(CBookmarkFolder))
 		{
-			/* TODO: Browse into the folder. */
+			CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
+			m_pBookmarkListView->InsertBookmarksIntoListView(BookmarkFolder);
+
+			/* TODO: Change treeview selection. */
 		}
 		else if(variantBookmark.type() == typeid(CBookmark))
 		{

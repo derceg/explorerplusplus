@@ -28,9 +28,9 @@ namespace NAddBookmarkDialog
 const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
 CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,
-	CBookmarkFolder *pAllBookmarks,CBookmark *pBookmark) :
-m_pAllBookmarks(pAllBookmarks),
-m_pBookmark(pBookmark),
+	CBookmarkFolder &AllBookmarks,CBookmark &Bookmark) :
+m_AllBookmarks(AllBookmarks),
+m_Bookmark(Bookmark),
 CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
@@ -42,8 +42,8 @@ CBaseDialog(hInstance,iResource,hParent,true)
 	that. */
 	if(!m_pabdps->m_bInitialized)
 	{
-		m_pabdps->m_guidSelected = pAllBookmarks->GetGUID();
-		m_pabdps->m_setExpansion.insert(pAllBookmarks->GetGUID());
+		m_pabdps->m_guidSelected = AllBookmarks.GetGUID();
+		m_pabdps->m_setExpansion.insert(AllBookmarks.GetGUID());
 
 		m_pabdps->m_bInitialized = true;
 	}
@@ -58,11 +58,11 @@ BOOL CAddBookmarkDialog::OnInitDialog()
 {
 	SetDialogIcon();
 
-	SetDlgItemText(m_hDlg,IDC_BOOKMARK_NAME,m_pBookmark->GetName().c_str());
-	SetDlgItemText(m_hDlg,IDC_BOOKMARK_LOCATION,m_pBookmark->GetLocation().c_str());
+	SetDlgItemText(m_hDlg,IDC_BOOKMARK_NAME,m_Bookmark.GetName().c_str());
+	SetDlgItemText(m_hDlg,IDC_BOOKMARK_LOCATION,m_Bookmark.GetLocation().c_str());
 
-	if(m_pBookmark->GetName().size() == 0 ||
-		m_pBookmark->GetLocation().size() == 0)
+	if(m_Bookmark.GetName().size() == 0 ||
+		m_Bookmark.GetLocation().size() == 0)
 	{
 		EnableWindow(GetDlgItem(m_hDlg,IDOK),FALSE);
 	}
@@ -70,7 +70,7 @@ BOOL CAddBookmarkDialog::OnInitDialog()
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 
 	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView);
-	m_pBookmarkTreeView->InsertFoldersIntoTreeView(m_pAllBookmarks,
+	m_pBookmarkTreeView->InsertFoldersIntoTreeView(m_AllBookmarks,
 		m_pabdps->m_guidSelected,m_pabdps->m_setExpansion);
 
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME);
@@ -214,11 +214,11 @@ void CAddBookmarkDialog::OnNewFolder()
 	LoadString(GetInstance(),IDS_BOOKMARKS_NEWBOOKMARKFOLDER,szTemp,SIZEOF_ARRAY(szTemp));
 	CBookmarkFolder NewBookmarkFolder = CBookmarkFolder::Create(szTemp);
 
-	CBookmarkFolder *pParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
-		hSelectedItem,m_pAllBookmarks);
-	pParentBookmarkFolder->InsertBookmarkFolder(NewBookmarkFolder);
+	CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
+		hSelectedItem,m_AllBookmarks);
+	ParentBookmarkFolder.InsertBookmarkFolder(NewBookmarkFolder);
 	HTREEITEM hNewItem = m_pBookmarkTreeView->InsertFolderIntoTreeView(hSelectedItem,
-		&NewBookmarkFolder,m_pabdps->m_guidSelected,m_pabdps->m_setExpansion);
+		NewBookmarkFolder,m_pabdps->m_guidSelected,m_pabdps->m_setExpansion);
 
 	TVITEM tvi;
 	tvi.mask		= TVIF_CHILDREN;
@@ -280,9 +280,9 @@ BOOL CAddBookmarkDialog::OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi)
 	if(pnmtvdi->item.pszText != NULL &&
 		lstrlen(pnmtvdi->item.pszText) > 0)
 	{
-		CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
-			pnmtvdi->item.hItem,m_pAllBookmarks);
-		pBookmarkFolder->SetName(pnmtvdi->item.pszText);
+		CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
+			pnmtvdi->item.hItem,m_AllBookmarks);
+		BookmarkFolder.SetName(pnmtvdi->item.pszText);
 
 		SetWindowLongPtr(m_hDlg,DWLP_MSGRESULT,TRUE);
 		return TRUE;
@@ -349,11 +349,11 @@ void CAddBookmarkDialog::OnOk()
 	{
 		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 		HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-		CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
-			hSelected,m_pAllBookmarks);
+		CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
+			hSelected,m_AllBookmarks);
 
 		CBookmark Bookmark(strName,strLocation,_T(""));
-		pBookmarkFolder->InsertBookmark(Bookmark);
+		BookmarkFolder.InsertBookmark(Bookmark);
 	}
 
 	EndDialog(m_hDlg,1);
@@ -378,8 +378,8 @@ void CAddBookmarkDialog::SaveTreeViewState()
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 
 	HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-	CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_pAllBookmarks);
-	m_pabdps->m_guidSelected = pBookmarkFolder->GetGUID();
+	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_AllBookmarks);
+	m_pabdps->m_guidSelected = BookmarkFolder.GetGUID();
 
 	m_pabdps->m_setExpansion.clear();
 	SaveTreeViewExpansionState(hTreeView,TreeView_GetRoot(hTreeView));
@@ -391,8 +391,8 @@ void CAddBookmarkDialog::SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hIt
 
 	if(uState & TVIS_EXPANDED)
 	{
-		CBookmarkFolder *pBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hItem,m_pAllBookmarks);
-		m_pabdps->m_setExpansion.insert(pBookmarkFolder->GetGUID());
+		CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hItem,m_AllBookmarks);
+		m_pabdps->m_setExpansion.insert(BookmarkFolder.GetGUID());
 
 		HTREEITEM hChild = TreeView_GetChild(hTreeView,hItem);
 		SaveTreeViewExpansionState(hTreeView,hChild);

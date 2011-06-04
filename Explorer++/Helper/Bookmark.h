@@ -34,6 +34,9 @@ public:
 	std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator	begin();
 	std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator	end();
 
+	std::list<boost::variant<CBookmarkFolder,CBookmark>>::const_iterator	begin() const;
+	std::list<boost::variant<CBookmarkFolder,CBookmark>>::const_iterator	end() const;
+
 	void			InsertBookmark(const CBookmark &Bookmark);
 	void			InsertBookmark(const CBookmark &Bookmark,std::size_t Position);
 	void			InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder);

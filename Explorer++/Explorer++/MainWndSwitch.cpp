@@ -1270,7 +1270,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				GetDisplayName(szCurrentDirectory,szDisplayName,SHGDN_INFOLDER);
 				CBookmark Bookmark(szDisplayName,szCurrentDirectory,EMPTY_STRING);
 
-				CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,hwnd,m_bfAllBookmarks,&Bookmark);
+				CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,hwnd,*m_bfAllBookmarks,Bookmark);
 				AddBookmarkDialog.ShowModalDialog();
 			}
 			break;
@@ -1278,7 +1278,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		case TOOLBAR_ORGANIZEBOOKMARKS:
 		case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 			{
-				CManageBookmarksDialog ManageBookmarksDialog(g_hLanguageModule,IDD_MANAGE_BOOKMARKS,hwnd,m_bfAllBookmarks);
+				CManageBookmarksDialog ManageBookmarksDialog(g_hLanguageModule,IDD_MANAGE_BOOKMARKS,hwnd,*m_bfAllBookmarks);
 				ManageBookmarksDialog.ShowModalDialog();
 			}
 			break;
