@@ -58,6 +58,7 @@ CManageBookmarksDialog::~CManageBookmarksDialog()
 
 BOOL CManageBookmarksDialog::OnInitDialog()
 {
+	SetDialogIcon();
 	SetupSearchField();
 	SetupToolbar();
 	SetupTreeView();
@@ -66,6 +67,19 @@ BOOL CManageBookmarksDialog::OnInitDialog()
 	SetFocus(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW));
 
 	return 0;
+}
+
+void CManageBookmarksDialog::SetDialogIcon()
+{
+	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
+	HBITMAP hBitmap = LoadBitmap(GetInstance(),MAKEINTRESOURCE(IDB_SHELLIMAGES));
+	ImageList_Add(himl,hBitmap,NULL);
+
+	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_FAV,ILD_NORMAL);
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+
+	DeleteObject(hBitmap);
+	ImageList_Destroy(himl);
 }
 
 void CManageBookmarksDialog::SetupSearchField()
@@ -94,15 +108,28 @@ void CManageBookmarksDialog::SetupToolbar()
 	DeleteObject(hBitmap);
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_himlToolbar));
 
-	/* TODO: String into string table. */
 	TBBUTTON tbb;
-	tbb.iBitmap		= SHELLIMAGES_VIEWS;
-	tbb.idCommand	= 1;
+	TCHAR szTemp[64];
+
+	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_TOOLBAR_ORGANIZE,szTemp,SIZEOF_ARRAY(szTemp));
+
+	tbb.iBitmap		= SHELLIMAGES_COPY;
+	tbb.idCommand	= TOOLBAR_ORGANIZE_ID;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_DROPDOWN;
 	tbb.dwData		= 0;
-	tbb.iString		= reinterpret_cast<INT_PTR>(_T("Views"));
+	tbb.iString		= reinterpret_cast<INT_PTR>(szTemp);
 	SendMessage(m_hToolbar,TB_INSERTBUTTON,0,reinterpret_cast<LPARAM>(&tbb));
+
+	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_TOOLBAR_VIEWS,szTemp,SIZEOF_ARRAY(szTemp));
+
+	tbb.iBitmap		= SHELLIMAGES_VIEWS;
+	tbb.idCommand	= TOOLBAR_VIEWS_ID;
+	tbb.fsState		= TBSTATE_ENABLED;
+	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_DROPDOWN;
+	tbb.dwData		= 0;
+	tbb.iString		= reinterpret_cast<INT_PTR>(szTemp);
+	SendMessage(m_hToolbar,TB_INSERTBUTTON,1,reinterpret_cast<LPARAM>(&tbb));
 
 	RECT rcTreeView;
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW),&rcTreeView);
@@ -353,6 +380,25 @@ BOOL CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 		OnEnChange(reinterpret_cast<HWND>(lParam));
 		break;
 
+	/* TODO: */
+	case IDM_MB_BOOKMARK_OPEN:
+		break;
+
+	case IDM_MB_BOOKMARK_OPENINNEWTAB:
+		break;
+
+	case IDM_MB_BOOKMARK_OPENINNEWWINDOW:
+		break;
+
+	case IDM_MB_BOOKMARK_CUT:
+		break;
+
+	case IDM_MB_BOOKMARK_COPY:
+		break;
+
+	case IDM_MB_BOOKMARK_DELETE:
+		break;
+
 	case IDOK:
 		OnOk();
 		break;
@@ -375,6 +421,10 @@ BOOL CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 
 	case NM_RCLICK:
 		OnRClick(pnmhdr);
+		break;
+
+	case TBN_DROPDOWN:
+		OnTbnDropDown(reinterpret_cast<NMTOOLBAR *>(pnmhdr));
 		break;
 
 	case TVN_SELCHANGED:
@@ -657,6 +707,29 @@ void CManageBookmarksDialog::GetBookmarkFolderColumnInfo(const CBookmarkFolder &
 	}
 }
 
+void CManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
+{
+	switch(nmtb->iItem)
+	{
+	case TOOLBAR_VIEWS_ID:
+		{
+			HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_VIEW_MENU));
+
+			RECT rcButton;
+			SendMessage(m_hToolbar,TB_GETRECT,TOOLBAR_VIEWS_ID,reinterpret_cast<LPARAM>(&rcButton));
+
+			POINT pt;
+			pt.x = rcButton.left;
+			pt.y = rcButton.bottom;
+			ClientToScreen(m_hToolbar,&pt);
+
+			TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,pt.x,pt.y,0,m_hDlg,NULL);
+			DestroyMenu(hMenu);
+		}
+		break;
+	}
+}
+
 void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
 {
 	/* This message will come in once before the listview has been
@@ -738,6 +811,7 @@ BOOL CManageBookmarksDialog::OnClose()
 
 BOOL CManageBookmarksDialog::OnDestroy()
 {
+	DestroyIcon(m_hDialogIcon);
 	DeleteFont(m_hEditSearchFont);
 	ImageList_Destroy(m_himlToolbar);
 

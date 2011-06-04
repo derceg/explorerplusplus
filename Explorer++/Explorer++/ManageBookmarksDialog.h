@@ -81,7 +81,12 @@ private:
 
 	static const COLORREF SEARCH_TEXT_COLOR = RGB(120,120,120);
 
+	static const int TOOLBAR_ORGANIZE_ID = 10000;
+	static const int TOOLBAR_VIEWS_ID = 10001;
+
 	CManageBookmarksDialog & operator = (const CManageBookmarksDialog &mbd);
+
+	void		SetDialogIcon();
 
 	void		SetupSearchField();
 	void		SetupToolbar();
@@ -96,6 +101,8 @@ private:
 	void		SetSearchFieldDefaultState();
 	void		RemoveSearchFieldDefaultState();
 
+	void		OnTbnDropDown(NMTOOLBAR *nmtb);
+
 	void		OnEnChange(HWND hEdit);
 	void		OnDblClk(NMHDR *pnmhdr);
 	void		OnRClick(NMHDR *pnmhdr);
@@ -105,6 +112,8 @@ private:
 
 	void		OnOk();
 	void		OnCancel();
+
+	HICON						m_hDialogIcon;
 
 	HWND						m_hToolbar;
 	HIMAGELIST					m_himlToolbar;
