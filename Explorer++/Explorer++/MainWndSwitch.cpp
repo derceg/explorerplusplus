@@ -1277,9 +1277,14 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case TOOLBAR_ORGANIZEBOOKMARKS:
 		case IDM_BOOKMARKS_MANAGEBOOKMARKS:
+			if(g_hwndManageBookmarks == NULL)
 			{
-				CManageBookmarksDialog ManageBookmarksDialog(g_hLanguageModule,IDD_MANAGE_BOOKMARKS,hwnd,*m_bfAllBookmarks);
-				ManageBookmarksDialog.ShowModalDialog();
+				CManageBookmarksDialog *pManageBookmarksDialog = new CManageBookmarksDialog(g_hLanguageModule,IDD_MANAGE_BOOKMARKS,hwnd,*m_bfAllBookmarks);
+				g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(this);
+			}
+			else
+			{
+				SetFocus(g_hwndManageBookmarks);
 			}
 			break;
 

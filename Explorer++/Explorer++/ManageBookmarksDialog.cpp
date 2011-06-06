@@ -111,25 +111,39 @@ void CManageBookmarksDialog::SetupToolbar()
 	TBBUTTON tbb;
 	TCHAR szTemp[64];
 
+	tbb.iBitmap		= SHELLIMAGES_BACK;
+	tbb.idCommand	= TOOLBAR_ID_BACK;
+	tbb.fsState		= TBSTATE_ENABLED;
+	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE;
+	tbb.dwData		= 0;
+	SendMessage(m_hToolbar,TB_INSERTBUTTON,0,reinterpret_cast<LPARAM>(&tbb));
+
+	tbb.iBitmap		= SHELLIMAGES_FORWARD;
+	tbb.idCommand	= TOOLBAR_ID_FORWARD;
+	tbb.fsState		= TBSTATE_ENABLED;
+	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE;
+	tbb.dwData		= 0;
+	SendMessage(m_hToolbar,TB_INSERTBUTTON,1,reinterpret_cast<LPARAM>(&tbb));
+
 	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_TOOLBAR_ORGANIZE,szTemp,SIZEOF_ARRAY(szTemp));
 
 	tbb.iBitmap		= SHELLIMAGES_COPY;
-	tbb.idCommand	= TOOLBAR_ORGANIZE_ID;
+	tbb.idCommand	= TOOLBAR_ID_ORGANIZE;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_DROPDOWN;
 	tbb.dwData		= 0;
 	tbb.iString		= reinterpret_cast<INT_PTR>(szTemp);
-	SendMessage(m_hToolbar,TB_INSERTBUTTON,0,reinterpret_cast<LPARAM>(&tbb));
+	SendMessage(m_hToolbar,TB_INSERTBUTTON,2,reinterpret_cast<LPARAM>(&tbb));
 
 	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_TOOLBAR_VIEWS,szTemp,SIZEOF_ARRAY(szTemp));
 
 	tbb.iBitmap		= SHELLIMAGES_VIEWS;
-	tbb.idCommand	= TOOLBAR_VIEWS_ID;
+	tbb.idCommand	= TOOLBAR_ID_VIEWS;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_DROPDOWN;
 	tbb.dwData		= 0;
 	tbb.iString		= reinterpret_cast<INT_PTR>(szTemp);
-	SendMessage(m_hToolbar,TB_INSERTBUTTON,1,reinterpret_cast<LPARAM>(&tbb));
+	SendMessage(m_hToolbar,TB_INSERTBUTTON,3,reinterpret_cast<LPARAM>(&tbb));
 
 	RECT rcTreeView;
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW),&rcTreeView);
@@ -430,6 +444,10 @@ BOOL CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 	case TVN_SELCHANGED:
 		OnTvnSelChanged(reinterpret_cast<NMTREEVIEW *>(pnmhdr));
 		break;
+
+	case LVN_KEYDOWN:
+		OnLvnKeyDown(reinterpret_cast<NMLVKEYDOWN *>(pnmhdr));
+		break;
 	}
 
 	return 0;
@@ -458,6 +476,18 @@ void CManageBookmarksDialog::OnListViewRClick()
 	POINT ptCursor;
 	ptCursor.x = GET_X_LPARAM(dwCursorPos);
 	ptCursor.y = GET_Y_LPARAM(dwCursorPos);
+
+	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+
+	LVHITTESTINFO lvhti;
+	lvhti.pt = ptCursor;
+	ScreenToClient(hListView,&lvhti.pt);
+	int iItem = ListView_HitTest(hListView,&lvhti);
+
+	if(iItem == -1)
+	{
+		return;
+	}
 
 	HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_BOOKMARK_RCLICK_MENU));
 	SetMenuDefaultItem(GetSubMenu(hMenu,0),IDM_MB_BOOKMARK_OPEN,FALSE);
@@ -559,6 +589,23 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 				++iColumn;
 			}
 		}
+	}
+}
+
+void CManageBookmarksDialog::OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd)
+{
+	switch(pnmlvkd->wVKey)
+	{
+	case 'A':
+		if((GetKeyState(VK_CONTROL) & 0x80) &&
+			!(GetKeyState(VK_SHIFT) & 0x80) &&
+			!(GetKeyState(VK_MENU) & 0x80))
+		{
+			HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+			NListView::ListView_SelectAllItems(hListView,TRUE);
+			SetFocus(hListView);
+		}
+		break;
 	}
 }
 
@@ -711,12 +758,12 @@ void CManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
 {
 	switch(nmtb->iItem)
 	{
-	case TOOLBAR_VIEWS_ID:
+	case TOOLBAR_ID_VIEWS:
 		{
 			HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_VIEW_MENU));
 
 			RECT rcButton;
-			SendMessage(m_hToolbar,TB_GETRECT,TOOLBAR_VIEWS_ID,reinterpret_cast<LPARAM>(&rcButton));
+			SendMessage(m_hToolbar,TB_GETRECT,TOOLBAR_ID_VIEWS,reinterpret_cast<LPARAM>(&rcButton));
 
 			POINT pt;
 			pt.x = rcButton.left;
@@ -753,6 +800,11 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 	{
 		NMITEMACTIVATE *pnmia = reinterpret_cast<NMITEMACTIVATE *>(pnmhdr);
 
+		if(pnmia->iItem == -1)
+		{
+			return;
+		}
+
 		HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 		HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
 		CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_AllBookmarks);
@@ -762,15 +814,43 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 		if(variantBookmark.type() == typeid(CBookmarkFolder))
 		{
 			CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
-			m_pBookmarkListView->InsertBookmarksIntoListView(BookmarkFolder);
-
-			/* TODO: Change treeview selection. */
+			BrowseBookmarkFolder(BookmarkFolder);
 		}
 		else if(variantBookmark.type() == typeid(CBookmark))
 		{
 			/* TODO: Send the bookmark back to the main
 			window to open. */
 		}
+	}
+}
+
+void CManageBookmarksDialog::BrowseBookmarkFolder(const CBookmarkFolder &BookmarkFolder)
+{
+	m_pBookmarkListView->InsertBookmarksIntoListView(BookmarkFolder);
+
+	/* TODO: Change treeview selection. */
+}
+
+void CManageBookmarksDialog::BrowseBack()
+{
+	if(m_stackBack.size() == 0)
+	{
+		return;
+	}
+
+	GUID guid = m_stackBack.top();
+	m_stackBack.pop();
+
+	/* TODO: Browse back. */
+
+	m_stackForward.push(guid);
+}
+
+void CManageBookmarksDialog::BrowseForward()
+{
+	if(m_stackForward.size() == 0)
+	{
+		return;
 	}
 }
 
@@ -795,17 +875,17 @@ void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)
 
 void CManageBookmarksDialog::OnOk()
 {
-	EndDialog(m_hDlg,1);
+	DestroyWindow(m_hDlg);
 }
 
 void CManageBookmarksDialog::OnCancel()
 {
-	EndDialog(m_hDlg,0);
+	DestroyWindow(m_hDlg);
 }
 
 BOOL CManageBookmarksDialog::OnClose()
 {
-	EndDialog(m_hDlg,0);
+	DestroyWindow(m_hDlg);
 	return 0;
 }
 

@@ -81,8 +81,10 @@ private:
 
 	static const COLORREF SEARCH_TEXT_COLOR = RGB(120,120,120);
 
-	static const int TOOLBAR_ORGANIZE_ID = 10000;
-	static const int TOOLBAR_VIEWS_ID = 10001;
+	static const int TOOLBAR_ID_BACK		= 10000;
+	static const int TOOLBAR_ID_FORWARD		= 10001;
+	static const int TOOLBAR_ID_ORGANIZE	= 10002;
+	static const int TOOLBAR_ID_VIEWS		= 10003;
 
 	CManageBookmarksDialog & operator = (const CManageBookmarksDialog &mbd);
 
@@ -101,14 +103,21 @@ private:
 	void		SetSearchFieldDefaultState();
 	void		RemoveSearchFieldDefaultState();
 
-	void		OnTbnDropDown(NMTOOLBAR *nmtb);
+	void		BrowseBack();
+	void		BrowseForward();
+	void		BrowseBookmarkFolder(const CBookmarkFolder &BookmarkFolder);
 
 	void		OnEnChange(HWND hEdit);
 	void		OnDblClk(NMHDR *pnmhdr);
 	void		OnRClick(NMHDR *pnmhdr);
+
+	void		OnTbnDropDown(NMTOOLBAR *nmtb);
+
+	void		OnTvnSelChanged(NMTREEVIEW *pnmtv);
+
 	void		OnListViewRClick();
 	void		OnListViewHeaderRClick();
-	void		OnTvnSelChanged(NMTREEVIEW *pnmtv);
+	void		OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd);
 
 	void		OnOk();
 	void		OnCancel();
@@ -119,6 +128,9 @@ private:
 	HIMAGELIST					m_himlToolbar;
 
 	CBookmarkFolder				&m_AllBookmarks;
+
+	std::stack<GUID>			m_stackBack;
+	std::stack<GUID>			m_stackForward;
 
 	CBookmarkTreeView			*m_pBookmarkTreeView;
 

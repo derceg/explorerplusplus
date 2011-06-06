@@ -572,6 +572,7 @@ extern TCHAR g_szLang[32];
 
 extern HWND g_hwndSearch;
 extern HWND g_hwndOptions;
+extern HWND g_hwndManageBookmarks;
 
 /* Save/load interface. This allows multiple
 methods of saving/loading data, as long as it

@@ -40,9 +40,10 @@ DWORD dwControlClasses = ICC_BAR_CLASSES|ICC_COOL_CLASSES|
 	ICC_LINK_CLASS;
 std::list<std::wstring> g_TabDirs;
 
-/* Search and options dialogs. */
+/* Modeless dialog handles. */
 HWND g_hwndSearch;
 HWND g_hwndOptions;
+HWND g_hwndManageBookmarks;
 
 HINSTANCE g_hLanguageModule;
 TCHAR g_szLang[32];

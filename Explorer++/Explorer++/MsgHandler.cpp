@@ -2931,6 +2931,10 @@ void Explorerplusplus::OnModelessDialogDestroy(int iResource)
 	case IDD_SEARCH:
 		g_hwndSearch = NULL;
 		break;
+
+	case IDD_MANAGE_BOOKMARKS:
+		g_hwndManageBookmarks = NULL;
+		break;
 	}
 }
 

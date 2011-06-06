@@ -94,6 +94,7 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_pActiveShellBrowser			= NULL;
 	g_hwndSearch					= NULL;
 	g_hwndOptions					= NULL;
+	g_hwndManageBookmarks			= NULL;
 	m_ListViewMButtonItem			= -1;
 	m_nDrivesInToolbar				= 0;
 	m_zDeltaTotal					= 0;
