@@ -18,10 +18,18 @@
 #include "BookmarkHelper.h"
 
 
+namespace
+{
+	LRESULT CALLBACK BookmarkTreeViewProcStub(HWND hwnd,UINT uMsg,
+		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+}
+
 CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView) :
 	m_hTreeView(hTreeView),
 	m_uIDCounter(0)
 {
+	SetWindowSubclass(hTreeView,BookmarkTreeViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
+
 	SetWindowTheme(hTreeView,L"Explorer",NULL);
 
 	m_himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
@@ -35,7 +43,68 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView) :
 
 CBookmarkTreeView::~CBookmarkTreeView()
 {
+	RemoveWindowSubclass(m_hTreeView,BookmarkTreeViewProcStub,0);
 	ImageList_Destroy(m_himl);
+}
+
+namespace
+{
+	LRESULT CALLBACK BookmarkTreeViewProcStub(HWND hwnd,UINT uMsg,
+		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+	{
+		CBookmarkTreeView *pbtv = reinterpret_cast<CBookmarkTreeView *>(dwRefData);
+
+		return pbtv->TreeViewProc(hwnd,uMsg,wParam,lParam);
+	}
+}
+
+LRESULT CALLBACK CBookmarkTreeView::TreeViewProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+{
+	switch(Msg)
+	{
+	case WM_NOTIFY:
+		switch(reinterpret_cast<NMHDR *>(lParam)->code)
+		{
+		case TVN_DELETEITEM:
+			OnTvnDeleteItem(reinterpret_cast<NMTREEVIEW *>(lParam));
+			break;
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd,Msg,wParam,lParam);
+}
+
+void CBookmarkTreeView::OnTvnDeleteItem(NMTREEVIEW *pnmtv)
+{
+	auto itrID = m_mapID.find(static_cast<UINT>(pnmtv->itemOld.lParam));
+
+	if(itrID == m_mapID.end())
+	{
+		assert(false);
+	}
+
+	auto itrItem = m_mapItem.find(itrID->second);
+
+	if(itrItem == m_mapItem.end())
+	{
+		assert(false);
+	}
+
+	m_mapItem.erase(itrItem);
+	m_mapID.erase(itrID);
+}
+
+void CBookmarkTreeView::SelectFolder(const GUID &guid)
+{
+	auto itr = m_mapItem.find(guid);
+
+	if(itr == m_mapItem.end())
+	{
+		assert(false);
+	}
+
+	TreeView_SelectItem(m_hTreeView,itr->second);
 }
 
 void CBookmarkTreeView::InsertFoldersIntoTreeView(const CBookmarkFolder &BookmarkFolder,
@@ -117,6 +186,8 @@ HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,const CB
 
 	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,BookmarkFolder.GetGUID()));
 	++m_uIDCounter;
+
+	m_mapItem.insert(std::make_pair<GUID,HTREEITEM>(BookmarkFolder.GetGUID(),hItem));
 
 	return hItem;
 }

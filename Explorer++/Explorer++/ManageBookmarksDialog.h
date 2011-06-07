@@ -107,6 +107,8 @@ private:
 	void		BrowseForward();
 	void		BrowseBookmarkFolder(const CBookmarkFolder &BookmarkFolder);
 
+	void		UpdateToolbarState();
+
 	void		OnEnChange(HWND hEdit);
 	void		OnDblClk(NMHDR *pnmhdr);
 	void		OnRClick(NMHDR *pnmhdr);
@@ -128,6 +130,8 @@ private:
 	HIMAGELIST					m_himlToolbar;
 
 	CBookmarkFolder				&m_AllBookmarks;
+
+	GUID						m_guidCurrentFolder;
 
 	std::stack<GUID>			m_stackBack;
 	std::stack<GUID>			m_stackForward;

@@ -32,6 +32,7 @@ const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("Manag
 CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,
 	CBookmarkFolder &AllBookmarks) :
 m_AllBookmarks(AllBookmarks),
+m_guidCurrentFolder(AllBookmarks.GetGUID()),
 m_SortMode(NBookmarkHelper::SM_NAME),
 m_bSortAscending(true),
 m_bListViewInitialized(false),
@@ -63,6 +64,8 @@ BOOL CManageBookmarksDialog::OnInitDialog()
 	SetupToolbar();
 	SetupTreeView();
 	SetupListView();
+
+	UpdateToolbarState();
 
 	SetFocus(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW));
 
@@ -375,11 +378,11 @@ BOOL CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD
 	switch(uCmd)
 	{
 	case APPCOMMAND_BROWSER_BACKWARD:
-		/* TODO: Browse back. */
+		BrowseBack();
 		break;
 
 	case APPCOMMAND_BROWSER_FORWARD:
-		/* TODO: Browse forward. */
+		BrowseForward();
 		break;
 	}
 
@@ -774,6 +777,23 @@ void CManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
 			DestroyMenu(hMenu);
 		}
 		break;
+
+	case TOOLBAR_ID_ORGANIZE:
+		{
+			HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_ORGANIZE_MENU));
+
+			RECT rcButton;
+			SendMessage(m_hToolbar,TB_GETRECT,TOOLBAR_ID_ORGANIZE,reinterpret_cast<LPARAM>(&rcButton));
+
+			POINT pt;
+			pt.x = rcButton.left;
+			pt.y = rcButton.bottom;
+			ClientToScreen(m_hToolbar,&pt);
+
+			TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,pt.x,pt.y,0,m_hDlg,NULL);
+			DestroyMenu(hMenu);
+		}
+		break;
 	}
 }
 
@@ -789,7 +809,12 @@ void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
 
 	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(pnmtv->itemNew.hItem,m_AllBookmarks);
 
-	m_pBookmarkListView->InsertBookmarksIntoListView(BookmarkFolder);
+	if(IsEqualGUID(BookmarkFolder.GetGUID(),m_guidCurrentFolder))
+	{
+		return;
+	}
+
+	BrowseBookmarkFolder(BookmarkFolder);
 }
 
 void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
@@ -826,9 +851,13 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 
 void CManageBookmarksDialog::BrowseBookmarkFolder(const CBookmarkFolder &BookmarkFolder)
 {
+	m_stackBack.push(m_guidCurrentFolder);
+
+	m_guidCurrentFolder = BookmarkFolder.GetGUID();
+	m_pBookmarkTreeView->SelectFolder(BookmarkFolder.GetGUID());
 	m_pBookmarkListView->InsertBookmarksIntoListView(BookmarkFolder);
 
-	/* TODO: Change treeview selection. */
+	UpdateToolbarState();
 }
 
 void CManageBookmarksDialog::BrowseBack()
@@ -840,10 +869,9 @@ void CManageBookmarksDialog::BrowseBack()
 
 	GUID guid = m_stackBack.top();
 	m_stackBack.pop();
+	m_stackForward.push(guid);
 
 	/* TODO: Browse back. */
-
-	m_stackForward.push(guid);
 }
 
 void CManageBookmarksDialog::BrowseForward()
@@ -852,6 +880,12 @@ void CManageBookmarksDialog::BrowseForward()
 	{
 		return;
 	}
+}
+
+void CManageBookmarksDialog::UpdateToolbarState()
+{
+	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_BACK,m_stackBack.size() != 0);
+	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_FORWARD,m_stackForward.size() != 0);
 }
 
 void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)

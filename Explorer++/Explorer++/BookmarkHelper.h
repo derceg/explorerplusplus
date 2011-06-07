@@ -48,18 +48,26 @@ public:
 	CBookmarkTreeView(HWND hTreeView);
 	~CBookmarkTreeView();
 
+	LRESULT CALLBACK	TreeViewProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+
 	void			InsertFoldersIntoTreeView(const CBookmarkFolder &BookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
 	HTREEITEM		InsertFolderIntoTreeView(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
 	CBookmarkFolder	&GetBookmarkFolderFromTreeView(HTREEITEM hItem,CBookmarkFolder &RootBookmarkFolder);
 
+	void			SelectFolder(const GUID &guid);
+
 private:
 
+	typedef std::unordered_map<GUID,HTREEITEM,NBookmarkHelper::GuidHash,NBookmarkHelper::GuidEq> ItemMap_t;
+
 	void	InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
+	void	OnTvnDeleteItem(NMTREEVIEW *pnmtv);
 
 	HWND							m_hTreeView;
 	HIMAGELIST						m_himl;
 
 	std::unordered_map<UINT,GUID>	m_mapID;
+	ItemMap_t						m_mapItem;
 	UINT							m_uIDCounter;
 };
 
