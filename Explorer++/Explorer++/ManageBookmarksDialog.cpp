@@ -148,6 +148,16 @@ void CManageBookmarksDialog::SetupToolbar()
 	tbb.iString		= reinterpret_cast<INT_PTR>(szTemp);
 	SendMessage(m_hToolbar,TB_INSERTBUTTON,3,reinterpret_cast<LPARAM>(&tbb));
 
+	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_TOOLBAR_IMPORTEXPORT,szTemp,SIZEOF_ARRAY(szTemp));
+
+	tbb.iBitmap		= SHELLIMAGES_PROPERTIES;
+	tbb.idCommand	= TOOLBAR_ID_IMPORTEXPORT;
+	tbb.fsState		= TBSTATE_ENABLED;
+	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_DROPDOWN;
+	tbb.dwData		= 0;
+	tbb.iString		= reinterpret_cast<INT_PTR>(szTemp);
+	SendMessage(m_hToolbar,TB_INSERTBUTTON,4,reinterpret_cast<LPARAM>(&tbb));
+
 	RECT rcTreeView;
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW),&rcTreeView);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,reinterpret_cast<LPPOINT>(&rcTreeView),2);
@@ -228,6 +238,14 @@ void CManageBookmarksDialog::SetupListView()
 	m_bListViewInitialized = true;
 }
 
+void CManageBookmarksDialog::SortListViewItems(NBookmarkHelper::SortMode_t SortMode)
+{
+	m_SortMode = SortMode;
+
+	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+	ListView_SortItems(hListView,NManageBookmarksDialog::SortBookmarksStub,reinterpret_cast<LPARAM>(this));
+}
+
 int CALLBACK NManageBookmarksDialog::SortBookmarksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
 	assert(lParamSort != NULL);
@@ -245,8 +263,8 @@ int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2
 	HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
 	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_AllBookmarks);
 
-	NBookmarkHelper::variantBookmark_t variantBookmark1 = m_pBookmarkListView->GetBookmarkItemFromListView(BookmarkFolder,0);
-	NBookmarkHelper::variantBookmark_t variantBookmark2 = m_pBookmarkListView->GetBookmarkItemFromListView(BookmarkFolder,1);
+	NBookmarkHelper::variantBookmark_t variantBookmark1 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam1);
+	NBookmarkHelper::variantBookmark_t variantBookmark2 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam2);
 
 	int iRes = 0;
 
@@ -254,6 +272,26 @@ int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2
 	{
 	case NBookmarkHelper::SM_NAME:
 		iRes = NBookmarkHelper::SortByName(variantBookmark1,variantBookmark2);
+		break;
+
+	case NBookmarkHelper::SM_LOCATION:
+		iRes = NBookmarkHelper::SortByLocation(variantBookmark1,variantBookmark2);
+		break;
+
+	case NBookmarkHelper::SM_VISIT_DATE:
+		iRes = NBookmarkHelper::SortByVisitDate(variantBookmark1,variantBookmark2);
+		break;
+
+	case NBookmarkHelper::SM_VISIT_COUNT:
+		iRes = NBookmarkHelper::SortByVisitCount(variantBookmark1,variantBookmark2);
+		break;
+
+	case NBookmarkHelper::SM_ADDED:
+		iRes = NBookmarkHelper::SortByAdded(variantBookmark1,variantBookmark2);
+		break;
+
+	case NBookmarkHelper::SM_LAST_MODIFIED:
+		iRes = NBookmarkHelper::SortByLastModified(variantBookmark1,variantBookmark2);
 		break;
 	}
 
@@ -395,6 +433,48 @@ BOOL CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	{
 	case EN_CHANGE:
 		OnEnChange(reinterpret_cast<HWND>(lParam));
+		break;
+
+	case TOOLBAR_ID_ORGANIZE:
+		ShowOrganizeMenu();
+		break;
+
+	case TOOLBAR_ID_VIEWS:
+		ShowViewMenu();
+		break;
+
+	case IDM_MB_VIEW_SORTBYNAME:
+		SortListViewItems(NBookmarkHelper::SM_NAME);
+		break;
+
+	case IDM_MB_VIEW_SORTBYLOCATION:
+		SortListViewItems(NBookmarkHelper::SM_LOCATION);
+		break;
+
+	case IDM_MB_VIEW_SORTBYVISITDATE:
+		SortListViewItems(NBookmarkHelper::SM_VISIT_DATE);
+		break;
+
+	case IDM_MB_VIEW_SORTBYVISITCOUNT:
+		SortListViewItems(NBookmarkHelper::SM_VISIT_COUNT);
+		break;
+
+	case IDM_MB_VIEW_SORTBYADDED:
+		SortListViewItems(NBookmarkHelper::SM_ADDED);
+		break;
+
+	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
+		SortListViewItems(NBookmarkHelper::SM_LAST_MODIFIED);
+		break;
+
+	case IDM_MB_VIEW_SORTASCENDING:
+		m_bSortAscending = true;
+		SortListViewItems(m_SortMode);
+		break;
+
+	case IDM_MB_VIEW_SORTDESCENDING:
+		m_bSortAscending = false;
+		SortListViewItems(m_SortMode);
 		break;
 
 	/* TODO: */
@@ -762,39 +842,97 @@ void CManageBookmarksDialog::OnTbnDropDown(NMTOOLBAR *nmtb)
 	switch(nmtb->iItem)
 	{
 	case TOOLBAR_ID_VIEWS:
-		{
-			HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_VIEW_MENU));
-
-			RECT rcButton;
-			SendMessage(m_hToolbar,TB_GETRECT,TOOLBAR_ID_VIEWS,reinterpret_cast<LPARAM>(&rcButton));
-
-			POINT pt;
-			pt.x = rcButton.left;
-			pt.y = rcButton.bottom;
-			ClientToScreen(m_hToolbar,&pt);
-
-			TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,pt.x,pt.y,0,m_hDlg,NULL);
-			DestroyMenu(hMenu);
-		}
+		ShowViewMenu();
 		break;
 
 	case TOOLBAR_ID_ORGANIZE:
-		{
-			HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_ORGANIZE_MENU));
-
-			RECT rcButton;
-			SendMessage(m_hToolbar,TB_GETRECT,TOOLBAR_ID_ORGANIZE,reinterpret_cast<LPARAM>(&rcButton));
-
-			POINT pt;
-			pt.x = rcButton.left;
-			pt.y = rcButton.bottom;
-			ClientToScreen(m_hToolbar,&pt);
-
-			TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,pt.x,pt.y,0,m_hDlg,NULL);
-			DestroyMenu(hMenu);
-		}
+		ShowOrganizeMenu();
 		break;
 	}
+}
+
+void CManageBookmarksDialog::ShowViewMenu()
+{
+	DWORD dwButtonState = static_cast<DWORD>(SendMessage(m_hToolbar,TB_GETSTATE,TOOLBAR_ID_VIEWS,MAKEWORD(TBSTATE_PRESSED,0)));
+	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_VIEWS,MAKEWORD(dwButtonState|TBSTATE_PRESSED,0));
+
+	HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_VIEW_MENU));
+
+	UINT uCheck;
+
+	if(m_bSortAscending)
+	{
+		uCheck = IDM_MB_VIEW_SORTASCENDING;
+	}
+	else
+	{
+		uCheck = IDM_MB_VIEW_SORTDESCENDING;
+	}
+
+	CheckMenuRadioItem(hMenu,IDM_MB_VIEW_SORTASCENDING,IDM_MB_VIEW_SORTDESCENDING,uCheck,MF_BYCOMMAND);
+
+	switch(m_SortMode)
+	{
+	case NBookmarkHelper::SM_NAME:
+		uCheck = IDM_MB_VIEW_SORTBYNAME;
+		break;
+
+	case NBookmarkHelper::SM_LOCATION:
+		uCheck = IDM_MB_VIEW_SORTBYLOCATION;
+		break;
+
+	case NBookmarkHelper::SM_VISIT_DATE:
+		uCheck = IDM_MB_VIEW_SORTBYVISITDATE;
+		break;
+
+	case NBookmarkHelper::SM_VISIT_COUNT:
+		uCheck = IDM_MB_VIEW_SORTBYVISITCOUNT;
+		break;
+
+	case NBookmarkHelper::SM_ADDED:
+		uCheck = IDM_MB_VIEW_SORTBYADDED;
+		break;
+
+	case NBookmarkHelper::SM_LAST_MODIFIED:
+		uCheck = IDM_MB_VIEW_SORTBYLASTMODIFIED;
+		break;
+	}
+
+	CheckMenuRadioItem(hMenu,IDM_MB_VIEW_SORTBYNAME,IDM_MB_VIEW_SORTBYLASTMODIFIED,uCheck,MF_BYCOMMAND);
+
+	RECT rcButton;
+	SendMessage(m_hToolbar,TB_GETRECT,TOOLBAR_ID_VIEWS,reinterpret_cast<LPARAM>(&rcButton));
+
+	POINT pt;
+	pt.x = rcButton.left;
+	pt.y = rcButton.bottom;
+	ClientToScreen(m_hToolbar,&pt);
+
+	TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,pt.x,pt.y,0,m_hDlg,NULL);
+	DestroyMenu(hMenu);
+
+	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_VIEWS,MAKEWORD(dwButtonState,0));
+}
+
+void CManageBookmarksDialog::ShowOrganizeMenu()
+{
+	DWORD dwButtonState = static_cast<DWORD>(SendMessage(m_hToolbar,TB_GETSTATE,TOOLBAR_ID_ORGANIZE,MAKEWORD(TBSTATE_PRESSED,0)));
+	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_ORGANIZE,MAKEWORD(dwButtonState|TBSTATE_PRESSED,0));
+
+	HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_MANAGEBOOKMARKS_ORGANIZE_MENU));
+
+	RECT rcButton;
+	SendMessage(m_hToolbar,TB_GETRECT,TOOLBAR_ID_ORGANIZE,reinterpret_cast<LPARAM>(&rcButton));
+
+	POINT pt;
+	pt.x = rcButton.left;
+	pt.y = rcButton.bottom;
+	ClientToScreen(m_hToolbar,&pt);
+
+	TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,pt.x,pt.y,0,m_hDlg,NULL);
+	DestroyMenu(hMenu);
+
+	SendMessage(m_hToolbar,TB_SETSTATE,TOOLBAR_ID_ORGANIZE,MAKEWORD(dwButtonState,0));
 }
 
 void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
@@ -888,6 +1026,28 @@ void CManageBookmarksDialog::UpdateToolbarState()
 	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_FORWARD,m_stackForward.size() != 0);
 }
 
+/* TODO: */
+void CManageBookmarksDialog::BookmarkItemAdded()
+{
+	/* First, if the item added is a bookmark folder,
+	add it to the treeview. */
+
+	/* If the item was added to the current folder
+	(i.e. its parent is the current folder), add the
+	item to the listview. */
+}
+
+void CManageBookmarksDialog::BookmarkItemModified()
+{
+	/* If the item is visible either in the treeview,
+	or listview, update it. */
+}
+
+void CManageBookmarksDialog::BookmarkItemDeleted()
+{
+	/* Remove the item from the treeview and/or listview. */
+}
+
 void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
@@ -928,6 +1088,13 @@ BOOL CManageBookmarksDialog::OnDestroy()
 	DestroyIcon(m_hDialogIcon);
 	DeleteFont(m_hEditSearchFont);
 	ImageList_Destroy(m_himlToolbar);
+
+	return 0;
+}
+
+BOOL CManageBookmarksDialog::OnNcDestroy()
+{
+	delete this;
 
 	return 0;
 }

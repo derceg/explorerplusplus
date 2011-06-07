@@ -281,26 +281,37 @@ void CBookmarkListView::InsertBookmarksIntoListView(const CBookmarkFolder &Bookm
 void CBookmarkListView::InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder,int iPosition)
 {
 	InsertBookmarkItemIntoListView(BookmarkFolder.GetName(),
-		BookmarkFolder.GetGUID(),iPosition);
+		BookmarkFolder.GetGUID(),true,iPosition);
 }
 
 void CBookmarkListView::InsertBookmarkIntoListView(const CBookmark &Bookmark,int iPosition)
 {
 	InsertBookmarkItemIntoListView(Bookmark.GetName(),
-		Bookmark.GetGUID(),iPosition);
+		Bookmark.GetGUID(),false,iPosition);
 }
 
 void CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strName,
-	const GUID &guid,int iPosition)
+	const GUID &guid,bool bFolder,int iPosition)
 {
 	TCHAR szName[256];
 	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());
+
+	int iImage;
+
+	if(bFolder)
+	{
+		iImage = SHELLIMAGES_NEWTAB;
+	}
+	else
+	{
+		iImage = SHELLIMAGES_FAV;
+	}
 
 	LVITEM lvi;
 	lvi.mask		= LVIF_TEXT|LVIF_IMAGE|LVIF_PARAM;
 	lvi.iItem		= iPosition;
 	lvi.iSubItem	= 0;
-	lvi.iImage		= SHELLIMAGES_NEWTAB;
+	lvi.iImage		= iImage;
 	lvi.pszText		= szName;
 	lvi.lParam		= m_uIDCounter;
 	ListView_InsertItem(m_hListView,&lvi);
@@ -317,7 +328,14 @@ NBookmarkHelper::variantBookmark_t CBookmarkListView::GetBookmarkItemFromListVie
 	lvi.iSubItem	= 0;
 	ListView_GetItem(m_hListView,&lvi);
 
-	auto itr = m_mapID.find(static_cast<UINT>(lvi.lParam));
+	NBookmarkHelper::variantBookmark_t variantBookmark = GetBookmarkItemFromListViewlParam(ParentBookmarkFolder,lvi.lParam);
+
+	return variantBookmark;
+}
+
+NBookmarkHelper::variantBookmark_t CBookmarkListView::GetBookmarkItemFromListViewlParam(CBookmarkFolder &ParentBookmarkFolder,LPARAM lParam)
+{
+	auto itr = m_mapID.find(static_cast<UINT>(lParam));
 	NBookmarkHelper::variantBookmark_t variantBookmark = NBookmarkHelper::GetBookmarkItem(ParentBookmarkFolder,itr->second);
 
 	return variantBookmark;

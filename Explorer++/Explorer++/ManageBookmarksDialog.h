@@ -65,6 +65,14 @@ public:
 	int CALLBACK		SortBookmarks(LPARAM lParam1,LPARAM lParam2);
 	LRESULT CALLBACK	EditSearchProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
+	/* These methods are called when a bookmark is
+	updated (either from outside this dialog, or in
+	another Explorer++ process). The dialog will need
+	to update its state to reflect the change. */
+	void				BookmarkItemAdded();
+	void				BookmarkItemModified();
+	void				BookmarkItemDeleted();
+
 protected:
 
 	BOOL	OnInitDialog();
@@ -74,6 +82,7 @@ protected:
 	BOOL	OnNotify(NMHDR *pnmhdr);
 	BOOL	OnClose();
 	BOOL	OnDestroy();
+	BOOL	OnNcDestroy();
 
 	void	SaveState();
 
@@ -81,10 +90,11 @@ private:
 
 	static const COLORREF SEARCH_TEXT_COLOR = RGB(120,120,120);
 
-	static const int TOOLBAR_ID_BACK		= 10000;
-	static const int TOOLBAR_ID_FORWARD		= 10001;
-	static const int TOOLBAR_ID_ORGANIZE	= 10002;
-	static const int TOOLBAR_ID_VIEWS		= 10003;
+	static const int TOOLBAR_ID_BACK			= 10000;
+	static const int TOOLBAR_ID_FORWARD			= 10001;
+	static const int TOOLBAR_ID_ORGANIZE		= 10002;
+	static const int TOOLBAR_ID_VIEWS			= 10003;
+	static const int TOOLBAR_ID_IMPORTEXPORT	= 10004;
 
 	CManageBookmarksDialog & operator = (const CManageBookmarksDialog &mbd);
 
@@ -94,6 +104,8 @@ private:
 	void		SetupToolbar();
 	void		SetupTreeView();
 	void		SetupListView();
+
+	void		SortListViewItems(NBookmarkHelper::SortMode_t SortMode);
 
 	void		GetColumnString(CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,UINT cchBuf);
 	void		GetBookmarkItemColumnInfo(const NBookmarkHelper::variantBookmark_t variantBookmark,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
@@ -114,6 +126,8 @@ private:
 	void		OnRClick(NMHDR *pnmhdr);
 
 	void		OnTbnDropDown(NMTOOLBAR *nmtb);
+	void		ShowViewMenu();
+	void		ShowOrganizeMenu();
 
 	void		OnTvnSelChanged(NMTREEVIEW *pnmtv);
 

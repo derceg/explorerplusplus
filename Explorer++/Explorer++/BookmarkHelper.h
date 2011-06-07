@@ -28,7 +28,12 @@ namespace NBookmarkHelper
 
 	enum SortMode_t
 	{
-		SM_NAME = 1
+		SM_NAME = 1,
+		SM_LOCATION = 2,
+		SM_VISIT_DATE = 3,
+		SM_VISIT_COUNT = 4,
+		SM_ADDED = 5,
+		SM_LAST_MODIFIED = 6
 	};
 
 	int CALLBACK		SortByName(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
@@ -82,10 +87,11 @@ public:
 	void	InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder,int iPosition);
 	void	InsertBookmarkIntoListView(const CBookmark &Bookmark,int iPosition);
 	NBookmarkHelper::variantBookmark_t	GetBookmarkItemFromListView(CBookmarkFolder &ParentBookmarkFolder,int iItem);
+	NBookmarkHelper::variantBookmark_t	GetBookmarkItemFromListViewlParam(CBookmarkFolder &ParentBookmarkFolder,LPARAM lParam);
 
 private:
 
-	void	InsertBookmarkItemIntoListView(const std::wstring &strName,const GUID &guid,int iPosition);
+	void	InsertBookmarkItemIntoListView(const std::wstring &strName,const GUID &guid,bool bFolder,int iPosition);
 
 	HWND							m_hListView;
 	HIMAGELIST						m_himl;
