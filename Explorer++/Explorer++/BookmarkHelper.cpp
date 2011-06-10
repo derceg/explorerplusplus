@@ -278,19 +278,33 @@ void CBookmarkListView::InsertBookmarksIntoListView(const CBookmarkFolder &Bookm
 	}
 }
 
-void CBookmarkListView::InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder,int iPosition)
+int CBookmarkListView::InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder)
 {
-	InsertBookmarkItemIntoListView(BookmarkFolder.GetName(),
+	int nItems = ListView_GetItemCount(m_hListView);
+	return InsertBookmarkItemIntoListView(BookmarkFolder.GetName(),
+		BookmarkFolder.GetGUID(),true,nItems);
+}
+
+int CBookmarkListView::InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder,int iPosition)
+{
+	return InsertBookmarkItemIntoListView(BookmarkFolder.GetName(),
 		BookmarkFolder.GetGUID(),true,iPosition);
 }
 
-void CBookmarkListView::InsertBookmarkIntoListView(const CBookmark &Bookmark,int iPosition)
+int CBookmarkListView::InsertBookmarkIntoListView(const CBookmark &Bookmark)
 {
-	InsertBookmarkItemIntoListView(Bookmark.GetName(),
+	int nItems = ListView_GetItemCount(m_hListView);
+	return InsertBookmarkItemIntoListView(Bookmark.GetName(),
+		Bookmark.GetGUID(),false,nItems);
+}
+
+int CBookmarkListView::InsertBookmarkIntoListView(const CBookmark &Bookmark,int iPosition)
+{
+	return InsertBookmarkItemIntoListView(Bookmark.GetName(),
 		Bookmark.GetGUID(),false,iPosition);
 }
 
-void CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strName,
+int CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strName,
 	const GUID &guid,bool bFolder,int iPosition)
 {
 	TCHAR szName[256];
@@ -314,10 +328,12 @@ void CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strNa
 	lvi.iImage		= iImage;
 	lvi.pszText		= szName;
 	lvi.lParam		= m_uIDCounter;
-	ListView_InsertItem(m_hListView,&lvi);
+	int iItem = ListView_InsertItem(m_hListView,&lvi);
 
 	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,guid));
 	++m_uIDCounter;
+
+	return iItem;
 }
 
 NBookmarkHelper::variantBookmark_t CBookmarkListView::GetBookmarkItemFromListView(CBookmarkFolder &ParentBookmarkFolder,int iItem)

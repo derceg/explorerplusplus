@@ -205,14 +205,14 @@ BOOL CAddBookmarkDialog::OnNotify(NMHDR *pnmhdr)
 
 void CAddBookmarkDialog::OnNewFolder()
 {
+	TCHAR szTemp[64];
+	LoadString(GetInstance(),IDS_BOOKMARKS_NEWBOOKMARKFOLDER,szTemp,SIZEOF_ARRAY(szTemp));
+	CBookmarkFolder NewBookmarkFolder = CBookmarkFolder::Create(szTemp);
+
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
 
 	assert(hSelectedItem != NULL);
-
-	TCHAR szTemp[64];
-	LoadString(GetInstance(),IDS_BOOKMARKS_NEWBOOKMARKFOLDER,szTemp,SIZEOF_ARRAY(szTemp));
-	CBookmarkFolder NewBookmarkFolder = CBookmarkFolder::Create(szTemp);
 
 	CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
 		hSelectedItem,m_AllBookmarks);

@@ -611,6 +611,7 @@ LPSTR lpCmdLine,int nCmdShow)
 		otherwise various accelerator keys (such as tab)
 		would be taken even when the dialog has focus. */
 		if(!IsDialogMessage(g_hwndSearch,&msg) &&
+			!IsDialogMessage(g_hwndManageBookmarks,&msg) &&
 			!PropSheet_IsDialogMessage(g_hwndOptions,&msg))
 		{
 			if(!TranslateAccelerator(hwnd,hAccl,&msg))

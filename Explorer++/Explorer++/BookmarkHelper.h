@@ -84,14 +84,16 @@ public:
 	~CBookmarkListView();
 
 	void	InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder);
-	void	InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder,int iPosition);
-	void	InsertBookmarkIntoListView(const CBookmark &Bookmark,int iPosition);
+	int		InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder);
+	int		InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder,int iPosition);
+	int		InsertBookmarkIntoListView(const CBookmark &Bookmark);
+	int		InsertBookmarkIntoListView(const CBookmark &Bookmark,int iPosition);
 	NBookmarkHelper::variantBookmark_t	GetBookmarkItemFromListView(CBookmarkFolder &ParentBookmarkFolder,int iItem);
 	NBookmarkHelper::variantBookmark_t	GetBookmarkItemFromListViewlParam(CBookmarkFolder &ParentBookmarkFolder,LPARAM lParam);
 
 private:
 
-	void	InsertBookmarkItemIntoListView(const std::wstring &strName,const GUID &guid,bool bFolder,int iPosition);
+	int		InsertBookmarkItemIntoListView(const std::wstring &strName,const GUID &guid,bool bFolder,int iPosition);
 
 	HWND							m_hListView;
 	HIMAGELIST						m_himl;

@@ -429,80 +429,92 @@ BOOL CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD
 
 BOOL CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
-	switch(LOWORD(wParam))
+	if(HIWORD(wParam) != 0)
 	{
-	case EN_CHANGE:
-		OnEnChange(reinterpret_cast<HWND>(lParam));
-		break;
+		switch(HIWORD(wParam))
+		{
+		case EN_CHANGE:
+			OnEnChange(reinterpret_cast<HWND>(lParam));
+			break;
+		}
+	}
+	else
+	{
+		switch(LOWORD(wParam))
+		{
+		case TOOLBAR_ID_ORGANIZE:
+			ShowOrganizeMenu();
+			break;
 
-	case TOOLBAR_ID_ORGANIZE:
-		ShowOrganizeMenu();
-		break;
+		case TOOLBAR_ID_VIEWS:
+			ShowViewMenu();
+			break;
 
-	case TOOLBAR_ID_VIEWS:
-		ShowViewMenu();
-		break;
+		case IDM_MB_ORGANIZE_NEWFOLDER:
+			OnNewFolder();
+			break;
 
-	case IDM_MB_VIEW_SORTBYNAME:
-		SortListViewItems(NBookmarkHelper::SM_NAME);
-		break;
+		case IDM_MB_VIEW_SORTBYNAME:
+			SortListViewItems(NBookmarkHelper::SM_NAME);
+			break;
 
-	case IDM_MB_VIEW_SORTBYLOCATION:
-		SortListViewItems(NBookmarkHelper::SM_LOCATION);
-		break;
+		case IDM_MB_VIEW_SORTBYLOCATION:
+			SortListViewItems(NBookmarkHelper::SM_LOCATION);
+			break;
 
-	case IDM_MB_VIEW_SORTBYVISITDATE:
-		SortListViewItems(NBookmarkHelper::SM_VISIT_DATE);
-		break;
+		case IDM_MB_VIEW_SORTBYVISITDATE:
+			SortListViewItems(NBookmarkHelper::SM_VISIT_DATE);
+			break;
 
-	case IDM_MB_VIEW_SORTBYVISITCOUNT:
-		SortListViewItems(NBookmarkHelper::SM_VISIT_COUNT);
-		break;
+		case IDM_MB_VIEW_SORTBYVISITCOUNT:
+			SortListViewItems(NBookmarkHelper::SM_VISIT_COUNT);
+			break;
 
-	case IDM_MB_VIEW_SORTBYADDED:
-		SortListViewItems(NBookmarkHelper::SM_ADDED);
-		break;
+		case IDM_MB_VIEW_SORTBYADDED:
+			SortListViewItems(NBookmarkHelper::SM_ADDED);
+			break;
 
-	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
-		SortListViewItems(NBookmarkHelper::SM_LAST_MODIFIED);
-		break;
+		case IDM_MB_VIEW_SORTBYLASTMODIFIED:
+			SortListViewItems(NBookmarkHelper::SM_LAST_MODIFIED);
+			break;
 
-	case IDM_MB_VIEW_SORTASCENDING:
-		m_bSortAscending = true;
-		SortListViewItems(m_SortMode);
-		break;
+		case IDM_MB_VIEW_SORTASCENDING:
+			m_bSortAscending = true;
+			SortListViewItems(m_SortMode);
+			break;
 
-	case IDM_MB_VIEW_SORTDESCENDING:
-		m_bSortAscending = false;
-		SortListViewItems(m_SortMode);
-		break;
+		case IDM_MB_VIEW_SORTDESCENDING:
+			m_bSortAscending = false;
+			SortListViewItems(m_SortMode);
+			break;
 
-	/* TODO: */
-	case IDM_MB_BOOKMARK_OPEN:
-		break;
+			/* TODO: */
+		case IDM_MB_BOOKMARK_OPEN:
+			break;
 
-	case IDM_MB_BOOKMARK_OPENINNEWTAB:
-		break;
+		case IDM_MB_BOOKMARK_OPENINNEWTAB:
+			break;
 
-	case IDM_MB_BOOKMARK_OPENINNEWWINDOW:
-		break;
+		case IDM_MB_BOOKMARK_OPENINNEWWINDOW:
+			break;
 
-	case IDM_MB_BOOKMARK_CUT:
-		break;
+		case IDM_MB_BOOKMARK_CUT:
+			break;
 
-	case IDM_MB_BOOKMARK_COPY:
-		break;
+		case IDM_MB_BOOKMARK_COPY:
+			break;
 
-	case IDM_MB_BOOKMARK_DELETE:
-		break;
+		case IDM_MB_BOOKMARK_DELETE:
+			break;
 
-	case IDOK:
-		OnOk();
-		break;
+		case IDOK:
+			OnOk();
+			break;
 
-	case IDCANCEL:
-		OnCancel();
-		break;
+		case IDCANCEL:
+			OnCancel();
+			break;
+		}
 	}
 
 	return 0;
@@ -528,12 +540,43 @@ BOOL CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 		OnTvnSelChanged(reinterpret_cast<NMTREEVIEW *>(pnmhdr));
 		break;
 
+	case LVN_ENDLABELEDIT:
+		return OnLvnEndLabelEdit(reinterpret_cast<NMLVDISPINFO *>(pnmhdr));
+		break;
+
 	case LVN_KEYDOWN:
 		OnLvnKeyDown(reinterpret_cast<NMLVKEYDOWN *>(pnmhdr));
 		break;
 	}
 
 	return 0;
+}
+
+void CManageBookmarksDialog::OnNewFolder()
+{
+	TCHAR szTemp[64];
+	LoadString(GetInstance(),IDS_BOOKMARKS_NEWBOOKMARKFOLDER,szTemp,SIZEOF_ARRAY(szTemp));
+	CBookmarkFolder NewBookmarkFolder = CBookmarkFolder::Create(szTemp);
+
+	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
+	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
+
+	assert(hSelectedItem != NULL);
+
+	CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
+		hSelectedItem,m_AllBookmarks);
+	ParentBookmarkFolder.InsertBookmarkFolder(NewBookmarkFolder);
+
+	/* TODO: Update treeview. */
+
+	int iItem = m_pBookmarkListView->InsertBookmarkFolderIntoListView(NewBookmarkFolder);
+
+	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+
+	SetFocus(hListView);
+	NListView::ListView_SelectAllItems(hListView,FALSE);
+	NListView::ListView_SelectItem(hListView,iItem,TRUE);
+	ListView_EditLabel(hListView,iItem);
 }
 
 void CManageBookmarksDialog::OnEnChange(HWND hEdit)
@@ -673,6 +716,40 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 			}
 		}
 	}
+}
+
+BOOL CManageBookmarksDialog::OnLvnEndLabelEdit(NMLVDISPINFO *pnmlvdi)
+{
+	if(pnmlvdi->item.pszText != NULL &&
+		lstrlen(pnmlvdi->item.pszText) > 0)
+	{
+		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
+		HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
+
+		assert(hSelectedItem != NULL);
+
+		CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
+			hSelectedItem,m_AllBookmarks);
+		NBookmarkHelper::variantBookmark_t variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(
+			ParentBookmarkFolder,pnmlvdi->item.iItem);
+
+		if(variantBookmark.type() == typeid(CBookmarkFolder))
+		{
+			CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
+			BookmarkFolder.SetName(pnmlvdi->item.pszText);
+		}
+		else if(variantBookmark.type() == typeid(CBookmark))
+		{
+			CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
+			Bookmark.SetName(pnmlvdi->item.pszText);
+		}
+
+		SetWindowLongPtr(m_hDlg,DWLP_MSGRESULT,TRUE);
+		return TRUE;
+	}
+
+	SetWindowLongPtr(m_hDlg,DWLP_MSGRESULT,FALSE);
+	return FALSE;
 }
 
 void CManageBookmarksDialog::OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd)

@@ -121,6 +121,8 @@ private:
 
 	void		UpdateToolbarState();
 
+	void		OnNewFolder();
+
 	void		OnEnChange(HWND hEdit);
 	void		OnDblClk(NMHDR *pnmhdr);
 	void		OnRClick(NMHDR *pnmhdr);
@@ -133,6 +135,7 @@ private:
 
 	void		OnListViewRClick();
 	void		OnListViewHeaderRClick();
+	BOOL		OnLvnEndLabelEdit(NMLVDISPINFO *pnmlvdi);
 	void		OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd);
 
 	void		OnOk();
