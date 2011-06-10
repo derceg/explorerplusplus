@@ -222,6 +222,9 @@
     <ClInclude Include="BookmarkHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Explorer++VersionInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -231,6 +234,9 @@
       <Filter>Resource Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="Explorer++Main.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="Explorer++VersionInfo.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
