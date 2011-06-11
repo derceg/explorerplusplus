@@ -33,8 +33,7 @@ CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance,int iResource
 	CBookmarkFolder &AllBookmarks) :
 m_AllBookmarks(AllBookmarks),
 m_guidCurrentFolder(AllBookmarks.GetGUID()),
-m_SortMode(NBookmarkHelper::SM_NAME),
-m_bSortAscending(true),
+m_bNewFolderAdded(false),
 m_bListViewInitialized(false),
 m_bSearchFieldBlank(true),
 m_bEditingSearchField(false),
@@ -64,6 +63,8 @@ BOOL CManageBookmarksDialog::OnInitDialog()
 	SetupToolbar();
 	SetupTreeView();
 	SetupListView();
+
+	CBookmarkItemNotifier::GetInstance().AddObserver(this);
 
 	UpdateToolbarState();
 
@@ -240,7 +241,7 @@ void CManageBookmarksDialog::SetupListView()
 
 void CManageBookmarksDialog::SortListViewItems(NBookmarkHelper::SortMode_t SortMode)
 {
-	m_SortMode = SortMode;
+	m_pmbdps->m_SortMode = SortMode;
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 	ListView_SortItems(hListView,NManageBookmarksDialog::SortBookmarksStub,reinterpret_cast<LPARAM>(this));
@@ -268,7 +269,7 @@ int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2
 
 	int iRes = 0;
 
-	switch(m_SortMode)
+	switch(m_pmbdps->m_SortMode)
 	{
 	case NBookmarkHelper::SM_NAME:
 		iRes = NBookmarkHelper::SortByName(variantBookmark1,variantBookmark2);
@@ -295,7 +296,7 @@ int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2
 		break;
 	}
 
-	if(!m_bSortAscending)
+	if(!m_pmbdps->m_bSortAscending)
 	{
 		iRes = -iRes;
 	}
@@ -479,13 +480,13 @@ BOOL CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 			break;
 
 		case IDM_MB_VIEW_SORTASCENDING:
-			m_bSortAscending = true;
-			SortListViewItems(m_SortMode);
+			m_pmbdps->m_bSortAscending = true;
+			SortListViewItems(m_pmbdps->m_SortMode);
 			break;
 
 		case IDM_MB_VIEW_SORTDESCENDING:
-			m_bSortAscending = false;
-			SortListViewItems(m_SortMode);
+			m_pmbdps->m_bSortAscending = false;
+			SortListViewItems(m_pmbdps->m_SortMode);
 			break;
 
 			/* TODO: */
@@ -558,6 +559,12 @@ void CManageBookmarksDialog::OnNewFolder()
 	LoadString(GetInstance(),IDS_BOOKMARKS_NEWBOOKMARKFOLDER,szTemp,SIZEOF_ARRAY(szTemp));
 	CBookmarkFolder NewBookmarkFolder = CBookmarkFolder::Create(szTemp);
 
+	/* Save the folder GUID, so that it can be selected and
+	placed into edit mode once the bookmark notification
+	comes through. */
+	m_bNewFolderAdded = true;
+	m_guidNewFolder = NewBookmarkFolder.GetGUID();
+
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
 
@@ -566,17 +573,6 @@ void CManageBookmarksDialog::OnNewFolder()
 	CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
 		hSelectedItem,m_AllBookmarks);
 	ParentBookmarkFolder.InsertBookmarkFolder(NewBookmarkFolder);
-
-	/* TODO: Update treeview. */
-
-	int iItem = m_pBookmarkListView->InsertBookmarkFolderIntoListView(NewBookmarkFolder);
-
-	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
-
-	SetFocus(hListView);
-	NListView::ListView_SelectAllItems(hListView,FALSE);
-	NListView::ListView_SelectItem(hListView,iItem,TRUE);
-	ListView_EditLabel(hListView,iItem);
 }
 
 void CManageBookmarksDialog::OnEnChange(HWND hEdit)
@@ -756,6 +752,10 @@ void CManageBookmarksDialog::OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd)
 {
 	switch(pnmlvkd->wVKey)
 	{
+	case VK_F2:
+		OnListViewRename();
+		break;
+
 	case 'A':
 		if((GetKeyState(VK_CONTROL) & 0x80) &&
 			!(GetKeyState(VK_SHIFT) & 0x80) &&
@@ -766,6 +766,17 @@ void CManageBookmarksDialog::OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd)
 			SetFocus(hListView);
 		}
 		break;
+	}
+}
+
+void CManageBookmarksDialog::OnListViewRename()
+{
+	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+	int iItem = ListView_GetNextItem(hListView,-1,LVNI_SELECTED);
+
+	if(iItem != -1)
+	{
+		ListView_EditLabel(hListView,iItem);
 	}
 }
 
@@ -937,7 +948,7 @@ void CManageBookmarksDialog::ShowViewMenu()
 
 	UINT uCheck;
 
-	if(m_bSortAscending)
+	if(m_pmbdps->m_bSortAscending)
 	{
 		uCheck = IDM_MB_VIEW_SORTASCENDING;
 	}
@@ -948,7 +959,7 @@ void CManageBookmarksDialog::ShowViewMenu()
 
 	CheckMenuRadioItem(hMenu,IDM_MB_VIEW_SORTASCENDING,IDM_MB_VIEW_SORTDESCENDING,uCheck,MF_BYCOMMAND);
 
-	switch(m_SortMode)
+	switch(m_pmbdps->m_SortMode)
 	{
 	case NBookmarkHelper::SM_NAME:
 		uCheck = IDM_MB_VIEW_SORTBYNAME;
@@ -1103,26 +1114,43 @@ void CManageBookmarksDialog::UpdateToolbarState()
 	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_FORWARD,m_stackForward.size() != 0);
 }
 
-/* TODO: */
-void CManageBookmarksDialog::BookmarkItemAdded()
+void CManageBookmarksDialog::OnBookmarkItemModified(const GUID &guid)
 {
-	/* First, if the item added is a bookmark folder,
-	add it to the treeview. */
 
-	/* If the item was added to the current folder
-	(i.e. its parent is the current folder), add the
-	item to the listview. */
 }
 
-void CManageBookmarksDialog::BookmarkItemModified()
+void CManageBookmarksDialog::OnBookmarkAdded(const CBookmark &Bookmark)
 {
-	/* If the item is visible either in the treeview,
-	or listview, update it. */
+
 }
 
-void CManageBookmarksDialog::BookmarkItemDeleted()
+void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder)
 {
-	/* Remove the item from the treeview and/or listview. */
+	/* TODO: Update treeview. */
+
+	int iItem = m_pBookmarkListView->InsertBookmarkFolderIntoListView(BookmarkFolder);
+
+	if(IsEqualGUID(BookmarkFolder.GetGUID(),m_guidNewFolder))
+	{
+		HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+
+		SetFocus(hListView);
+		NListView::ListView_SelectAllItems(hListView,FALSE);
+		NListView::ListView_SelectItem(hListView,iItem,TRUE);
+		ListView_EditLabel(hListView,iItem);
+
+		m_bNewFolderAdded = false;
+	}
+}
+
+void CManageBookmarksDialog::OnBookmarkRemoved(const GUID &guid)
+{
+
+}
+
+void CManageBookmarksDialog::OnBookmarkFolderRemoved(const GUID &guid)
+{
+	
 }
 
 void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)
@@ -1162,6 +1190,7 @@ BOOL CManageBookmarksDialog::OnClose()
 
 BOOL CManageBookmarksDialog::OnDestroy()
 {
+	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
 	DestroyIcon(m_hDialogIcon);
 	DeleteFont(m_hEditSearchFont);
 	ImageList_Destroy(m_himlToolbar);
@@ -1196,10 +1225,11 @@ void CManageBookmarksDialog::SaveState()
 }
 
 CManageBookmarksDialogPersistentSettings::CManageBookmarksDialogPersistentSettings() :
+m_bInitialized(false),
+m_SortMode(NBookmarkHelper::SM_NAME),
+m_bSortAscending(true),
 CDialogSettings(SETTINGS_KEY)
 {
-	m_bInitialized = false;
-
 	SetupDefaultColumns();
 
 	/* TODO: Save listview selection information. */

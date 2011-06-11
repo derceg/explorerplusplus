@@ -14,6 +14,7 @@
 
 #include "stdafx.h"
 #include <list>
+#include <algorithm>
 #include "Bookmark.h"
 #include "RegistrySettings.h"
 #include "Helper.h"
@@ -52,16 +53,22 @@ std::wstring CBookmark::GetDescription() const
 void CBookmark::SetName(const std::wstring &strName)
 {
 	m_strName = strName;
+
+	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkItemModified(m_guid);
 }
 
 void CBookmark::SetLocation(const std::wstring &strLocation)
 {
 	m_strLocation = strLocation;
+
+	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkItemModified(m_guid);
 }
 
 void CBookmark::SetDescription(const std::wstring &strDescription)
 {
 	m_strDescription = strDescription;
+
+	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkItemModified(m_guid);
 }
 
 GUID CBookmark::GetGUID() const
@@ -77,6 +84,14 @@ int CBookmark::GetVisitCount() const
 FILETIME CBookmark::GetDateLastVisited() const
 {
 	return m_ftLastVisited;
+}
+
+void CBookmark::UpdateVisitCount()
+{
+	++m_iVisitCount;
+	GetSystemTimeAsFileTime(&m_ftLastVisited);
+
+	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkItemModified(m_guid);
 }
 
 FILETIME CBookmark::GetDateCreated() const
@@ -227,6 +242,8 @@ std::wstring CBookmarkFolder::GetName() const
 void CBookmarkFolder::SetName(const std::wstring &strName)
 {
 	m_strName = strName;
+
+	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkItemModified(m_guid);
 }
 
 GUID CBookmarkFolder::GetGUID() const
@@ -263,6 +280,8 @@ void CBookmarkFolder::InsertBookmark(const CBookmark &Bookmark,std::size_t Posit
 	}
 
 	GetSystemTimeAsFileTime(&m_ftModified);
+
+	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkAdded(Bookmark);
 }
 
 void CBookmarkFolder::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder)
@@ -286,6 +305,8 @@ void CBookmarkFolder::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder
 	m_nChildFolders++;
 
 	GetSystemTimeAsFileTime(&m_ftModified);
+
+	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkFolderAdded(BookmarkFolder);
 }
 
 std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator CBookmarkFolder::begin()
@@ -316,4 +337,91 @@ bool CBookmarkFolder::HasChildFolder() const
 	}
 
 	return false;
+}
+
+CBookmarkItemNotifier::CBookmarkItemNotifier()
+{
+
+}
+
+CBookmarkItemNotifier::~CBookmarkItemNotifier()
+{
+
+}
+
+CBookmarkItemNotifier& CBookmarkItemNotifier::GetInstance()
+{
+	static CBookmarkItemNotifier bin;
+	return bin;
+}
+
+void CBookmarkItemNotifier::AddObserver(NBookmark::IBookmarkItemNotification *pbin)
+{
+	m_listObservers.push_back(pbin);
+}
+
+void CBookmarkItemNotifier::RemoveObserver(NBookmark::IBookmarkItemNotification *pbin)
+{
+	auto itr = std::find_if(m_listObservers.begin(),m_listObservers.end(),
+		[pbin](const NBookmark::IBookmarkItemNotification *pbinCurrent){return pbinCurrent == pbin;});
+
+	if(itr != m_listObservers.end())
+	{
+		m_listObservers.erase(itr);
+	}
+}
+
+void CBookmarkItemNotifier::NotifyObserversBookmarkItemModified(const GUID &guid)
+{
+	NotifyObservers(NOTIFY_BOOKMARK_ITEM_MODIFIED,guid);
+}
+
+void CBookmarkItemNotifier::NotifyObserversBookmarkAdded(const CBookmark &Bookmark)
+{
+	NotifyObservers(NOTIFY_BOOKMARK_ADDED,Bookmark);
+}
+
+void CBookmarkItemNotifier::NotifyObserversBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder)
+{
+	NotifyObservers(NOTIFY_BOOKMARK_FOLDER_ADDED,BookmarkFolder);
+}
+
+void CBookmarkItemNotifier::NotifyObserversBookmarkRemoved(const GUID &guid)
+{
+	NotifyObservers(NOTIFY_BOOKMARK_REMOVED,guid);
+}
+
+void CBookmarkItemNotifier::NotifyObserversBookmarkFolderRemoved(const GUID &guid)
+{
+	NotifyObservers(NOTIFY_BOOMARK_FOLDER_REMOVED,guid);
+}
+
+void CBookmarkItemNotifier::NotifyObservers(NotificationType_t NotificationType,
+	boost::variant<const GUID &,const CBookmark &,const CBookmarkFolder &> variantData)
+{
+	for each(auto pbin in m_listObservers)
+	{
+		switch(NotificationType)
+		{
+		case NOTIFY_BOOKMARK_ITEM_MODIFIED:
+			pbin->OnBookmarkItemModified(boost::get<const GUID &>(variantData));
+			break;
+
+		case NOTIFY_BOOKMARK_ADDED:
+			pbin->OnBookmarkAdded(boost::get<const CBookmark &>(variantData));
+			break;
+
+		case NOTIFY_BOOKMARK_FOLDER_ADDED:
+			pbin->OnBookmarkFolderAdded(boost::get<const CBookmarkFolder &>(variantData));
+			break;
+
+		case NOTIFY_BOOKMARK_REMOVED:
+			pbin->OnBookmarkRemoved(boost::get<const GUID &>(variantData));
+			break;
+
+		case NOTIFY_BOOMARK_FOLDER_REMOVED:
+			pbin->OnBookmarkFolderRemoved(boost::get<const GUID &>(variantData));
+			break;
+		}
+	}
 }

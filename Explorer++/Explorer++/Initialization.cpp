@@ -16,6 +16,7 @@
 #include <list>
 #include "Explorer++.h"
 #include "CustomizeColorsDialog.h"
+#include "BookmarkHelper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
@@ -39,6 +40,9 @@ void Explorerplusplus::InitializeBookmarks(void)
 	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSMENU,szTemp,SIZEOF_ARRAY(szTemp));
 	CBookmarkFolder bfBookmarksMenu = CBookmarkFolder::Create(szTemp);
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu);
+
+	m_pipbin = new CIPBookmarkItemNotifier();
+	CBookmarkItemNotifier::GetInstance().AddObserver(m_pipbin);
 }
 
 void Explorerplusplus::InitializeDisplayWindow(void)

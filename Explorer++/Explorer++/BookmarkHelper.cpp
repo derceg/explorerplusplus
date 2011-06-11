@@ -99,10 +99,7 @@ void CBookmarkTreeView::SelectFolder(const GUID &guid)
 {
 	auto itr = m_mapItem.find(guid);
 
-	if(itr == m_mapItem.end())
-	{
-		assert(false);
-	}
+	assert(itr != m_mapItem.end());
 
 	TreeView_SelectItem(m_hTreeView,itr->second);
 }
@@ -376,10 +373,7 @@ NBookmarkHelper::variantBookmark_t NBookmarkHelper::GetBookmarkItem(CBookmarkFol
 		}
 	);
 
-	if(itr == ParentBookmarkFolder.end())
-	{
-		assert(false);
-	}
+	assert(itr != ParentBookmarkFolder.end());
 
 	if(itr->type() == typeid(CBookmarkFolder))
 	{
@@ -577,4 +571,39 @@ int CALLBACK NBookmarkHelper::SortByLastModified(const variantBookmark_t Bookmar
 
 		return CompareFileTime(&ft1,&ft2);
 	}
+}
+
+CIPBookmarkItemNotifier::CIPBookmarkItemNotifier()
+{
+
+}
+
+CIPBookmarkItemNotifier::~CIPBookmarkItemNotifier()
+{
+
+}
+
+void CIPBookmarkItemNotifier::OnBookmarkItemModified(const GUID &guid)
+{
+	
+}
+
+void CIPBookmarkItemNotifier::OnBookmarkAdded(const CBookmark &Bookmark)
+{
+
+}
+
+void CIPBookmarkItemNotifier::OnBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder)
+{
+	
+}
+
+void CIPBookmarkItemNotifier::OnBookmarkRemoved(const GUID &guid)
+{
+
+}
+
+void CIPBookmarkItemNotifier::OnBookmarkFolderRemoved(const GUID &guid)
+{
+
 }

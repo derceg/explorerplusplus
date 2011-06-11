@@ -53,9 +53,12 @@ private:
 	bool							m_bInitialized;
 	GUID							m_guidSelected;
 	NBookmarkHelper::setExpansion_t	m_setExpansion;
+
+	NBookmarkHelper::SortMode_t		m_SortMode;
+	bool							m_bSortAscending;
 };
 
-class CManageBookmarksDialog : public CBaseDialog
+class CManageBookmarksDialog : public CBaseDialog, public NBookmark::IBookmarkItemNotification
 {
 public:
 
@@ -65,13 +68,11 @@ public:
 	int CALLBACK		SortBookmarks(LPARAM lParam1,LPARAM lParam2);
 	LRESULT CALLBACK	EditSearchProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
-	/* These methods are called when a bookmark is
-	updated (either from outside this dialog, or in
-	another Explorer++ process). The dialog will need
-	to update its state to reflect the change. */
-	void				BookmarkItemAdded();
-	void				BookmarkItemModified();
-	void				BookmarkItemDeleted();
+	void	OnBookmarkItemModified(const GUID &guid);
+	void	OnBookmarkAdded(const CBookmark &Bookmark);
+	void	OnBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder);
+	void	OnBookmarkRemoved(const GUID &guid);
+	void	OnBookmarkFolderRemoved(const GUID &guid);
 
 protected:
 
@@ -137,6 +138,7 @@ private:
 	void		OnListViewHeaderRClick();
 	BOOL		OnLvnEndLabelEdit(NMLVDISPINFO *pnmlvdi);
 	void		OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd);
+	void		OnListViewRename();
 
 	void		OnOk();
 	void		OnCancel();
@@ -150,13 +152,14 @@ private:
 
 	GUID						m_guidCurrentFolder;
 
+	bool						m_bNewFolderAdded;
+	GUID						m_guidNewFolder;
+
 	std::stack<GUID>			m_stackBack;
 	std::stack<GUID>			m_stackForward;
 
 	CBookmarkTreeView			*m_pBookmarkTreeView;
 
-	NBookmarkHelper::SortMode_t	m_SortMode;
-	bool						m_bSortAscending;
 	bool						m_bListViewInitialized;
 	CBookmarkListView			*m_pBookmarkListView;
 

@@ -3,13 +3,14 @@
 
 #include <windows.h>
 #include <commctrl.h>
+#include "Explorer++_internal.h"
+#include "BookmarkHelper.h"
 #include "../ShellBrowser/iShellView.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Bookmark.h"
-#include "Explorer++_internal.h"
 #import <msxml3.dll> raw_interfaces_only
 
 #define MAX_TABS					100
@@ -1088,6 +1089,9 @@ private:
 	int						m_nSelected;
 	int						m_nSelectedOnInvert;
 	int						m_ListViewMButtonItem;
+
+	/* Bookmarks. */
+	CIPBookmarkItemNotifier	*m_pipbin;
 
 	/* Copy/cut. */
 	IDataObject				*m_pClipboardDataObject;

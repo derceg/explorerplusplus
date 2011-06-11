@@ -2,10 +2,25 @@
 #define BOOKMARK_INCLUDED
 
 #include <list>
+#include <vector>
 #include <boost/variant.hpp>
 
 class CBookmark;
 class CBookmarkFolder;
+
+namespace NBookmark
+{
+	__interface IBookmarkItemNotification
+	{
+		virtual void	OnBookmarkItemModified(const GUID &guid);
+
+		virtual void	OnBookmarkAdded(const CBookmark &Bookmark);
+		virtual void	OnBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder);
+
+		virtual void	OnBookmarkRemoved(const GUID &guid);
+		virtual void	OnBookmarkFolderRemoved(const GUID &guid);
+	};
+}
 
 class CBookmarkFolder
 {
@@ -98,6 +113,8 @@ public:
 	int				GetVisitCount() const;
 	FILETIME		GetDateLastVisited() const;
 
+	void			UpdateVisitCount();
+
 	FILETIME		GetDateCreated() const;
 	FILETIME		GetDateModified() const;
 
@@ -114,6 +131,44 @@ private:
 
 	FILETIME		m_ftCreated;
 	FILETIME		m_ftModified;
+};
+
+class CBookmarkItemNotifier
+{
+public:
+
+	~CBookmarkItemNotifier();
+
+	static CBookmarkItemNotifier &GetInstance();
+
+	void	AddObserver(NBookmark::IBookmarkItemNotification *pbin);
+	void	RemoveObserver(NBookmark::IBookmarkItemNotification *pbin);
+
+	void	NotifyObserversBookmarkItemModified(const GUID &guid);
+	void	NotifyObserversBookmarkAdded(const CBookmark &Bookmark);
+	void	NotifyObserversBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder);
+	void	NotifyObserversBookmarkRemoved(const GUID &guid);
+	void	NotifyObserversBookmarkFolderRemoved(const GUID &guid);
+
+private:
+
+	enum NotificationType_t
+	{
+		NOTIFY_BOOKMARK_ITEM_MODIFIED,
+		NOTIFY_BOOKMARK_ADDED,
+		NOTIFY_BOOKMARK_FOLDER_ADDED,
+		NOTIFY_BOOKMARK_REMOVED,
+		NOTIFY_BOOMARK_FOLDER_REMOVED
+	};
+
+	CBookmarkItemNotifier();
+
+	CBookmarkItemNotifier(const CBookmarkItemNotifier &);
+	CBookmarkItemNotifier & operator=(const CBookmarkItemNotifier &);
+
+	void	NotifyObservers(NotificationType_t NotificationType,boost::variant<const GUID &,const CBookmark &,const CBookmarkFolder &> variantData);
+
+	std::list<NBookmark::IBookmarkItemNotification *>	m_listObservers;
 };
 
 #endif

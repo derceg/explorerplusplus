@@ -102,4 +102,22 @@ private:
 	UINT							m_uIDCounter;
 };
 
+/* Receives low-level bookmark notifications, and rebroadcasts them
+via IPC to other Explorer++ processes. */
+class CIPBookmarkItemNotifier : public NBookmark::IBookmarkItemNotification
+{
+public:
+
+	CIPBookmarkItemNotifier();
+	~CIPBookmarkItemNotifier();
+
+	void	OnBookmarkItemModified(const GUID &guid);
+	void	OnBookmarkAdded(const CBookmark &Bookmark);
+	void	OnBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder);
+	void	OnBookmarkRemoved(const GUID &guid);
+	void	OnBookmarkFolderRemoved(const GUID &guid);
+
+private:
+};
+
 #endif

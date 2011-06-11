@@ -56,9 +56,6 @@ ULONG __stdcall Explorerplusplus::Release(void)
 	return m_iRefCount;
 }
 
-/*
- * Constructor for the main Explorerplusplus class.
- */
 Explorerplusplus::Explorerplusplus(HWND hwnd)
 {
 	m_iRefCount = 1;
@@ -199,11 +196,11 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	}
 }
 
-/*
- * Deconstructor for the main Explorerplusplus class.
- */
 Explorerplusplus::~Explorerplusplus()
 {
+	/* Bookmarks teardown. */
+	delete m_pipbin;
+
 	m_pDirMon->Release();
 
 	if(m_hDwmapi != NULL)
