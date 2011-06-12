@@ -24,8 +24,10 @@ namespace
 		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 }
 
-CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView) :
+CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView,CBookmarkFolder *pAllBookmarks,
+	const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion) :
 	m_hTreeView(hTreeView),
+	m_pAllBookmarks(pAllBookmarks),
 	m_uIDCounter(0)
 {
 	SetWindowSubclass(hTreeView,BookmarkTreeViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
@@ -38,7 +40,7 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView) :
 	TreeView_SetImageList(hTreeView,m_himl,TVSIL_NORMAL);
 	DeleteObject(hBitmap);
 
-	TreeView_DeleteAllItems(hTreeView);
+	SetupTreeView(guidSelected,setExpansion);
 }
 
 CBookmarkTreeView::~CBookmarkTreeView()
@@ -75,6 +77,131 @@ LRESULT CALLBACK CBookmarkTreeView::TreeViewProc(HWND hwnd,UINT Msg,WPARAM wPara
 	return DefSubclassProc(hwnd,Msg,wParam,lParam);
 }
 
+void CBookmarkTreeView::SetupTreeView(const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
+{
+	TreeView_DeleteAllItems(m_hTreeView);
+
+	HTREEITEM hRoot = InsertFolderIntoTreeView(NULL,*m_pAllBookmarks);
+	InsertFoldersIntoTreeViewRecursive(hRoot,*m_pAllBookmarks);
+
+	for each(auto guidExpanded in setExpansion)
+	{
+		auto itrExpanded = m_mapItem.find(guidExpanded);
+
+		if(itrExpanded != m_mapItem.end())
+		{
+			CBookmarkFolder &BookmarkFolder = GetBookmarkFolderFromTreeView(itrExpanded->second);
+
+			if(BookmarkFolder.HasChildFolder())
+			{
+				TreeView_Expand(m_hTreeView,itrExpanded->second,TVE_EXPAND);
+			}
+		}
+	}
+
+	auto itrSelected = m_mapItem.find(guidSelected);
+	
+	if(itrSelected != m_mapItem.end())
+	{
+		TreeView_SelectItem(m_hTreeView,itrSelected->second);
+	}
+}
+
+void CBookmarkTreeView::InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder)
+{
+	for(auto itr = BookmarkFolder.begin();itr != BookmarkFolder.end();++itr)
+	{
+		if(itr->type() == typeid(CBookmarkFolder))
+		{
+			const CBookmarkFolder &BookmarkFolderChild = boost::get<CBookmarkFolder>(*itr);
+
+			HTREEITEM hCurrentItem = InsertFolderIntoTreeView(hParent,
+				BookmarkFolderChild);
+
+			if(BookmarkFolderChild.HasChildFolder())
+			{
+				InsertFoldersIntoTreeViewRecursive(hCurrentItem,
+					BookmarkFolderChild);
+			}
+		}
+	}
+}
+
+HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder)
+{
+	TCHAR szText[256];
+	StringCchCopy(szText,SIZEOF_ARRAY(szText),BookmarkFolder.GetName().c_str());
+
+	int nChildren = 0;
+
+	if(BookmarkFolder.HasChildFolder())
+	{
+		nChildren = 1;
+	}
+
+	TVITEMEX tviex;
+	tviex.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_CHILDREN|TVIF_SELECTEDIMAGE|TVIF_PARAM;
+	tviex.pszText			= szText;
+	tviex.iImage			= SHELLIMAGES_NEWTAB;
+	tviex.iSelectedImage	= SHELLIMAGES_NEWTAB;
+	tviex.cChildren			= nChildren;
+	tviex.lParam			= m_uIDCounter;
+
+	TVINSERTSTRUCT tvis;
+	tvis.hParent			= hParent;
+	tvis.hInsertAfter		= TVI_LAST;
+	tvis.itemex				= tviex;
+	HTREEITEM hItem = TreeView_InsertItem(m_hTreeView,&tvis);
+
+	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,BookmarkFolder.GetGUID()));
+	++m_uIDCounter;
+
+	m_mapItem.insert(std::make_pair<GUID,HTREEITEM>(BookmarkFolder.GetGUID(),hItem));
+
+	return hItem;
+}
+
+void CBookmarkTreeView::BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
+{
+	/* Due to the fact that *all* bookmark folders will be inserted
+	into the treeview (regardless of whether or not they are actually
+	shown), any new folders will always need to be inserted. */
+	auto itr = m_mapItem.find(ParentBookmarkFolder.GetGUID());
+	assert(itr != m_mapItem.end());
+	InsertFolderIntoTreeView(itr->second,BookmarkFolder);
+
+	UINT uParentState = TreeView_GetItemState(m_hTreeView,itr->second,TVIS_EXPANDED);
+
+	if((uParentState & TVIS_EXPANDED) != TVIS_EXPANDED)
+	{
+		TVITEM tvi;
+		tvi.mask		= TVIF_CHILDREN;
+		tvi.hItem		= itr->second;
+		tvi.cChildren	= 1;
+		TreeView_SetItem(m_hTreeView,&tvi);
+	}
+}
+
+void CBookmarkTreeView::BookmarkFolderModified(const GUID &guid)
+{
+	auto itr = m_mapItem.find(guid);
+	assert(itr != m_mapItem.end());
+
+	CBookmarkFolder &BookmarkFolder = GetBookmarkFolderFromTreeView(itr->second);
+
+	TCHAR szText[256];
+	StringCchCopy(szText,SIZEOF_ARRAY(szText),BookmarkFolder.GetName().c_str());
+
+	/* The only property of the bookmark folder shown
+	within the treeview is its name, so that is all
+	that needs to be updated here. */
+	TVITEM tvi;
+	tvi.mask		= TVIF_TEXT;
+	tvi.hItem		= itr->second;
+	tvi.pszText		= szText;
+	TreeView_SetItem(m_hTreeView,&tvi);
+}
+
 void CBookmarkTreeView::OnTvnDeleteItem(NMTREEVIEW *pnmtv)
 {
 	auto itrID = m_mapID.find(static_cast<UINT>(pnmtv->itemOld.lParam));
@@ -104,93 +231,7 @@ void CBookmarkTreeView::SelectFolder(const GUID &guid)
 	TreeView_SelectItem(m_hTreeView,itr->second);
 }
 
-void CBookmarkTreeView::InsertFoldersIntoTreeView(const CBookmarkFolder &BookmarkFolder,
-	const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
-{
-	HTREEITEM hRoot = InsertFolderIntoTreeView(NULL,BookmarkFolder,
-		guidSelected,setExpansion);
-
-	InsertFoldersIntoTreeViewRecursive(hRoot,BookmarkFolder,
-		guidSelected,setExpansion);
-}
-
-void CBookmarkTreeView::InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,
-	const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
-{
-	for(auto itr = BookmarkFolder.begin();itr != BookmarkFolder.end();++itr)
-	{
-		if(itr->type() == typeid(CBookmarkFolder))
-		{
-			const CBookmarkFolder &BookmarkFolderChild = boost::get<CBookmarkFolder>(*itr);
-
-			HTREEITEM hCurrentItem = InsertFolderIntoTreeView(hParent,
-				BookmarkFolderChild,guidSelected,setExpansion);
-
-			if(BookmarkFolderChild.HasChildFolder())
-			{
-				InsertFoldersIntoTreeViewRecursive(hCurrentItem,
-					BookmarkFolderChild,guidSelected,setExpansion);
-			}
-		}
-	}
-}
-
-HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,
-	const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion)
-{
-	TCHAR szText[256];
-	StringCchCopy(szText,SIZEOF_ARRAY(szText),BookmarkFolder.GetName().c_str());
-
-	int nChildren = 0;
-
-	if(BookmarkFolder.HasChildFolder())
-	{
-		nChildren = 1;
-	}
-
-	UINT uState = 0;
-	UINT uStateMask = 0;
-
-	auto itr = setExpansion.find(BookmarkFolder.GetGUID());
-
-	if(itr != setExpansion.end() &&
-		BookmarkFolder.HasChildFolder())
-	{
-		uState		|= TVIS_EXPANDED;
-		uStateMask	|= TVIS_EXPANDED;
-	}
-
-	TVITEMEX tviex;
-	tviex.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_CHILDREN|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_STATE;
-	tviex.pszText			= szText;
-	tviex.iImage			= SHELLIMAGES_NEWTAB;
-	tviex.iSelectedImage	= SHELLIMAGES_NEWTAB;
-	tviex.cChildren			= nChildren;
-	tviex.lParam			= m_uIDCounter;
-	tviex.state				= uState;
-	tviex.stateMask			= uStateMask;
-
-	TVINSERTSTRUCT tvis;
-	tvis.hParent			= hParent;
-	tvis.hInsertAfter		= TVI_LAST;
-	tvis.itemex				= tviex;
-	HTREEITEM hItem = TreeView_InsertItem(m_hTreeView,&tvis);
-
-	if(IsEqualGUID(BookmarkFolder.GetGUID(),guidSelected))
-	{
-		TreeView_SelectItem(m_hTreeView,hItem);
-	}
-
-	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,BookmarkFolder.GetGUID()));
-	++m_uIDCounter;
-
-	m_mapItem.insert(std::make_pair<GUID,HTREEITEM>(BookmarkFolder.GetGUID(),hItem));
-
-	return hItem;
-}
-
-CBookmarkFolder &CBookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hItem,
-	CBookmarkFolder &RootBookmarkFolder)
+CBookmarkFolder &CBookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hItem)
 {
 	TVITEM tvi;
 	tvi.mask	= TVIF_HANDLE|TVIF_PARAM;
@@ -213,7 +254,7 @@ CBookmarkFolder &CBookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hIte
 		hCurrentItem = hParent;
 	}
 
-	CBookmarkFolder *pBookmarkFolder = &RootBookmarkFolder;
+	CBookmarkFolder *pBookmarkFolder = m_pAllBookmarks;
 
 	while(!stackIDs.empty())
 	{
@@ -588,12 +629,12 @@ void CIPBookmarkItemNotifier::OnBookmarkItemModified(const GUID &guid)
 	
 }
 
-void CIPBookmarkItemNotifier::OnBookmarkAdded(const CBookmark &Bookmark)
+void CIPBookmarkItemNotifier::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)
 {
 
 }
 
-void CIPBookmarkItemNotifier::OnBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder)
+void CIPBookmarkItemNotifier::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
 {
 	
 }

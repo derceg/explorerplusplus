@@ -281,7 +281,7 @@ void CBookmarkFolder::InsertBookmark(const CBookmark &Bookmark,std::size_t Posit
 
 	GetSystemTimeAsFileTime(&m_ftModified);
 
-	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkAdded(Bookmark);
+	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkAdded(*this,Bookmark);
 }
 
 void CBookmarkFolder::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder)
@@ -306,7 +306,7 @@ void CBookmarkFolder::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder
 
 	GetSystemTimeAsFileTime(&m_ftModified);
 
-	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkFolderAdded(BookmarkFolder);
+	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkFolderAdded(*this,BookmarkFolder);
 }
 
 std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator CBookmarkFolder::begin()
@@ -373,54 +373,57 @@ void CBookmarkItemNotifier::RemoveObserver(NBookmark::IBookmarkItemNotification 
 
 void CBookmarkItemNotifier::NotifyObserversBookmarkItemModified(const GUID &guid)
 {
-	NotifyObservers(NOTIFY_BOOKMARK_ITEM_MODIFIED,guid);
+	NotifyObservers(NOTIFY_BOOKMARK_ITEM_MODIFIED,NULL,NULL,NULL,&guid);
 }
 
-void CBookmarkItemNotifier::NotifyObserversBookmarkAdded(const CBookmark &Bookmark)
+void CBookmarkItemNotifier::NotifyObserversBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
+	const CBookmark &Bookmark)
 {
-	NotifyObservers(NOTIFY_BOOKMARK_ADDED,Bookmark);
+	NotifyObservers(NOTIFY_BOOKMARK_ADDED,&ParentBookmarkFolder,NULL,&Bookmark,NULL);
 }
 
-void CBookmarkItemNotifier::NotifyObserversBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder)
+void CBookmarkItemNotifier::NotifyObserversBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
+	const CBookmarkFolder &BookmarkFolder)
 {
-	NotifyObservers(NOTIFY_BOOKMARK_FOLDER_ADDED,BookmarkFolder);
+	NotifyObservers(NOTIFY_BOOKMARK_FOLDER_ADDED,&ParentBookmarkFolder,&BookmarkFolder,NULL,NULL);
 }
 
 void CBookmarkItemNotifier::NotifyObserversBookmarkRemoved(const GUID &guid)
 {
-	NotifyObservers(NOTIFY_BOOKMARK_REMOVED,guid);
+	NotifyObservers(NOTIFY_BOOKMARK_REMOVED,NULL,NULL,NULL,&guid);
 }
 
 void CBookmarkItemNotifier::NotifyObserversBookmarkFolderRemoved(const GUID &guid)
 {
-	NotifyObservers(NOTIFY_BOOMARK_FOLDER_REMOVED,guid);
+	NotifyObservers(NOTIFY_BOOMARK_FOLDER_REMOVED,NULL,NULL,NULL,&guid);
 }
 
 void CBookmarkItemNotifier::NotifyObservers(NotificationType_t NotificationType,
-	boost::variant<const GUID &,const CBookmark &,const CBookmarkFolder &> variantData)
+	const CBookmarkFolder *pParentBookmarkFolder,const CBookmarkFolder *pBookmarkFolder,
+	const CBookmark *pBookmark,const GUID *pguid)
 {
 	for each(auto pbin in m_listObservers)
 	{
 		switch(NotificationType)
 		{
 		case NOTIFY_BOOKMARK_ITEM_MODIFIED:
-			pbin->OnBookmarkItemModified(boost::get<const GUID &>(variantData));
+			pbin->OnBookmarkItemModified(*pguid);
 			break;
 
 		case NOTIFY_BOOKMARK_ADDED:
-			pbin->OnBookmarkAdded(boost::get<const CBookmark &>(variantData));
+			pbin->OnBookmarkAdded(*pParentBookmarkFolder,*pBookmark);
 			break;
 
 		case NOTIFY_BOOKMARK_FOLDER_ADDED:
-			pbin->OnBookmarkFolderAdded(boost::get<const CBookmarkFolder &>(variantData));
+			pbin->OnBookmarkFolderAdded(*pParentBookmarkFolder,*pBookmarkFolder);
 			break;
 
 		case NOTIFY_BOOKMARK_REMOVED:
-			pbin->OnBookmarkRemoved(boost::get<const GUID &>(variantData));
+			pbin->OnBookmarkRemoved(*pguid);
 			break;
 
 		case NOTIFY_BOOMARK_FOLDER_REMOVED:
-			pbin->OnBookmarkFolderRemoved(boost::get<const GUID &>(variantData));
+			pbin->OnBookmarkFolderRemoved(*pguid);
 			break;
 		}
 	}

@@ -14,8 +14,8 @@ namespace NBookmark
 	{
 		virtual void	OnBookmarkItemModified(const GUID &guid);
 
-		virtual void	OnBookmarkAdded(const CBookmark &Bookmark);
-		virtual void	OnBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder);
+		virtual void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
+		virtual void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
 
 		virtual void	OnBookmarkRemoved(const GUID &guid);
 		virtual void	OnBookmarkFolderRemoved(const GUID &guid);
@@ -145,8 +145,8 @@ public:
 	void	RemoveObserver(NBookmark::IBookmarkItemNotification *pbin);
 
 	void	NotifyObserversBookmarkItemModified(const GUID &guid);
-	void	NotifyObserversBookmarkAdded(const CBookmark &Bookmark);
-	void	NotifyObserversBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder);
+	void	NotifyObserversBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
+	void	NotifyObserversBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
 	void	NotifyObserversBookmarkRemoved(const GUID &guid);
 	void	NotifyObserversBookmarkFolderRemoved(const GUID &guid);
 
@@ -166,7 +166,7 @@ private:
 	CBookmarkItemNotifier(const CBookmarkItemNotifier &);
 	CBookmarkItemNotifier & operator=(const CBookmarkItemNotifier &);
 
-	void	NotifyObservers(NotificationType_t NotificationType,boost::variant<const GUID &,const CBookmark &,const CBookmarkFolder &> variantData);
+	void	NotifyObservers(NotificationType_t NotificationType,const CBookmarkFolder *pParentBookmarkFolder,const CBookmarkFolder *pBookmarkFolder,const CBookmark *pBookmark,const GUID *pguid);
 
 	std::list<NBookmark::IBookmarkItemNotification *>	m_listObservers;
 };

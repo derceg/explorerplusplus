@@ -69,8 +69,8 @@ public:
 	LRESULT CALLBACK	EditSearchProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	void	OnBookmarkItemModified(const GUID &guid);
-	void	OnBookmarkAdded(const CBookmark &Bookmark);
-	void	OnBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder);
+	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
+	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
 	void	OnBookmarkRemoved(const GUID &guid);
 	void	OnBookmarkFolderRemoved(const GUID &guid);
 

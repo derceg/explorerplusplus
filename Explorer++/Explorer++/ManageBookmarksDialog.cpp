@@ -53,7 +53,8 @@ CBaseDialog(hInstance,iResource,hParent,true)
 
 CManageBookmarksDialog::~CManageBookmarksDialog()
 {
-
+	delete m_pBookmarkTreeView;
+	delete m_pBookmarkListView;
 }
 
 BOOL CManageBookmarksDialog::OnInitDialog()
@@ -176,8 +177,7 @@ void CManageBookmarksDialog::SetupTreeView()
 {
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 
-	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView);
-	m_pBookmarkTreeView->InsertFoldersIntoTreeView(m_AllBookmarks,
+	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView,&m_AllBookmarks,
 		m_pmbdps->m_guidSelected,m_pmbdps->m_setExpansion);
 }
 
@@ -262,7 +262,7 @@ int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2
 	value. */
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 	HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_AllBookmarks);
+	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
 
 	NBookmarkHelper::variantBookmark_t variantBookmark1 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam1);
 	NBookmarkHelper::variantBookmark_t variantBookmark2 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam2);
@@ -571,7 +571,7 @@ void CManageBookmarksDialog::OnNewFolder()
 	assert(hSelectedItem != NULL);
 
 	CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
-		hSelectedItem,m_AllBookmarks);
+		hSelectedItem);
 	ParentBookmarkFolder.InsertBookmarkFolder(NewBookmarkFolder);
 }
 
@@ -686,7 +686,7 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 
 				HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 				HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-				CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_AllBookmarks);
+				CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
 
 				int iItem = 0;
 
@@ -724,8 +724,7 @@ BOOL CManageBookmarksDialog::OnLvnEndLabelEdit(NMLVDISPINFO *pnmlvdi)
 
 		assert(hSelectedItem != NULL);
 
-		CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(
-			hSelectedItem,m_AllBookmarks);
+		CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelectedItem);
 		NBookmarkHelper::variantBookmark_t variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(
 			ParentBookmarkFolder,pnmlvdi->item.iItem);
 
@@ -1033,7 +1032,7 @@ void CManageBookmarksDialog::OnTvnSelChanged(NMTREEVIEW *pnmtv)
 		return;
 	}
 
-	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(pnmtv->itemNew.hItem,m_AllBookmarks);
+	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(pnmtv->itemNew.hItem);
 
 	if(IsEqualGUID(BookmarkFolder.GetGUID(),m_guidCurrentFolder))
 	{
@@ -1058,7 +1057,7 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 
 		HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 		HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
-		CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected,m_AllBookmarks);
+		CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
 		NBookmarkHelper::variantBookmark_t variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(
 			ParentBookmarkFolder,pnmia->iItem);
 
@@ -1116,30 +1115,33 @@ void CManageBookmarksDialog::UpdateToolbarState()
 
 void CManageBookmarksDialog::OnBookmarkItemModified(const GUID &guid)
 {
-
+	m_pBookmarkTreeView->BookmarkFolderModified(guid);
 }
 
-void CManageBookmarksDialog::OnBookmarkAdded(const CBookmark &Bookmark)
+void CManageBookmarksDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)
 {
 
 }
 
-void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder)
+void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
 {
-	/* TODO: Update treeview. */
+	m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder);
 
-	int iItem = m_pBookmarkListView->InsertBookmarkFolderIntoListView(BookmarkFolder);
-
-	if(IsEqualGUID(BookmarkFolder.GetGUID(),m_guidNewFolder))
+	if(IsEqualGUID(ParentBookmarkFolder.GetGUID(),m_guidCurrentFolder))
 	{
-		HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
+		int iItem = m_pBookmarkListView->InsertBookmarkFolderIntoListView(BookmarkFolder);
 
-		SetFocus(hListView);
-		NListView::ListView_SelectAllItems(hListView,FALSE);
-		NListView::ListView_SelectItem(hListView,iItem,TRUE);
-		ListView_EditLabel(hListView,iItem);
+		if(IsEqualGUID(BookmarkFolder.GetGUID(),m_guidNewFolder))
+		{
+			HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-		m_bNewFolderAdded = false;
+			SetFocus(hListView);
+			NListView::ListView_SelectAllItems(hListView,FALSE);
+			NListView::ListView_SelectItem(hListView,iItem,TRUE);
+			ListView_EditLabel(hListView,iItem);
+
+			m_bNewFolderAdded = false;
+		}
 	}
 }
 

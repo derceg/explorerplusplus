@@ -50,26 +50,33 @@ class CBookmarkTreeView
 {
 public:
 
-	CBookmarkTreeView(HWND hTreeView);
+	CBookmarkTreeView(HWND hTreeView,CBookmarkFolder *pAllBookmarks,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
 	~CBookmarkTreeView();
 
 	LRESULT CALLBACK	TreeViewProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
-	void			InsertFoldersIntoTreeView(const CBookmarkFolder &BookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
-	HTREEITEM		InsertFolderIntoTreeView(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
-	CBookmarkFolder	&GetBookmarkFolderFromTreeView(HTREEITEM hItem,CBookmarkFolder &RootBookmarkFolder);
+	CBookmarkFolder		&GetBookmarkFolderFromTreeView(HTREEITEM hItem);
 
-	void			SelectFolder(const GUID &guid);
+	void				BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
+	void				BookmarkFolderModified(const GUID &guid);
+
+	void				SelectFolder(const GUID &guid);
 
 private:
 
 	typedef std::unordered_map<GUID,HTREEITEM,NBookmarkHelper::GuidHash,NBookmarkHelper::GuidEq> ItemMap_t;
 
-	void	InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
-	void	OnTvnDeleteItem(NMTREEVIEW *pnmtv);
+	void				SetupTreeView(const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
+
+	HTREEITEM			InsertFolderIntoTreeView(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder);
+	void				InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder);
+
+	void				OnTvnDeleteItem(NMTREEVIEW *pnmtv);
 
 	HWND							m_hTreeView;
 	HIMAGELIST						m_himl;
+
+	CBookmarkFolder					*m_pAllBookmarks;
 
 	std::unordered_map<UINT,GUID>	m_mapID;
 	ItemMap_t						m_mapItem;
@@ -112,8 +119,8 @@ public:
 	~CIPBookmarkItemNotifier();
 
 	void	OnBookmarkItemModified(const GUID &guid);
-	void	OnBookmarkAdded(const CBookmark &Bookmark);
-	void	OnBookmarkFolderAdded(const CBookmarkFolder &BookmarkFolder);
+	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
+	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
 	void	OnBookmarkRemoved(const GUID &guid);
 	void	OnBookmarkFolderRemoved(const GUID &guid);
 
