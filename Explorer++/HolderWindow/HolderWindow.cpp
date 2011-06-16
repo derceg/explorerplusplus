@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include "HolderWindow.h"
 #include "HolderWindowInternal.h"
+#include "../Helper/Macros.h"
 
 
 #define FOLDERS_TEXT_X	5

@@ -9,8 +9,6 @@
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 
-#define SIZEOF_ARRAY(array)	sizeof(array) / sizeof(array[0])
-
 #include <windows.h>
 #include <tchar.h>
 #include <commctrl.h>
