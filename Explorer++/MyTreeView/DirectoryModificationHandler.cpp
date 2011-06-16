@@ -12,10 +12,11 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "../Helper/Helper.h"
-#include "../Helper/ShellHelper.h"
 #include "MyTreeView.h"
 #include "MyTreeViewInternal.h"
+#include "../Helper/Helper.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/Macros.h"
 
 
 void CMyTreeView::DirectoryAltered(void)
