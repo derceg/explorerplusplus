@@ -34,6 +34,7 @@
 #include "SelectColumnsDialog.h"
 #include "SetDefaultColumnsDialog.h"
 #include "../Helper/XMLSettings.h"
+#include "../Helper/Macros.h"
 
 #import <msxml3.dll> raw_interfaces_only
 

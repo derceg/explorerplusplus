@@ -23,6 +23,7 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);

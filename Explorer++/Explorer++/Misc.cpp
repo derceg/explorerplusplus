@@ -22,6 +22,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 #include "MainResource.h"
 
 

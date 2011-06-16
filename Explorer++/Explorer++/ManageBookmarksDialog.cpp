@@ -18,6 +18,7 @@
 #include "BookmarkHelper.h"
 #include "MainResource.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 namespace NManageBookmarksDialog

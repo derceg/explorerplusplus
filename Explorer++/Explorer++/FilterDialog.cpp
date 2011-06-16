@@ -19,6 +19,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
+#include "../Helper/Macros.h"
 
 
 const TCHAR CFilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");

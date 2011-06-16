@@ -150,6 +150,9 @@
     <ClInclude Include="ListViewHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

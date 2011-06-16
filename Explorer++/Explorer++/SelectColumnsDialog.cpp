@@ -19,6 +19,7 @@
 #include "../ShellBrowser/iShellView.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 const TCHAR CSelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectColumns");

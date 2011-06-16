@@ -21,6 +21,7 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 const TCHAR CWildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("WildcardSelect");

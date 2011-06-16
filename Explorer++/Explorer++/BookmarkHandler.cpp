@@ -18,6 +18,7 @@
 #include "AddBookmarkDialog.h"
 #include "NewBookmarkFolderDialog.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/Macros.h"
 
 
 LRESULT CALLBACK BookmarksToolbarSubclassStub(HWND hwnd,UINT uMsg,

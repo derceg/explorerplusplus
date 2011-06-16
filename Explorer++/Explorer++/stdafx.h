@@ -35,10 +35,6 @@
 
 #define OEMRESOURCE
 
-#define EMPTY_STRING _T("")
-
-#define SIZEOF_ARRAY(array)	sizeof(array) / sizeof(array[0])
-
 /* Disable 'unreferenced formal parameter' warning. */
 #pragma warning( disable : 4100 )
 

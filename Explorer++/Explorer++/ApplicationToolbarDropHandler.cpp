@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "../Helper/Macros.h"
 
 
 #define GENERAL_ALLOCATION_UNIT	1024

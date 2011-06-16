@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/Macros.h"
 
 
 #define MENU_OPEN_IN_NEW_TAB	(MAX_SHELL_MENU_ID + 1)

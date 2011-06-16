@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include <list>
 #include "Explorer++.h"
+#include "../Helper/Macros.h"
 
 #define NUM_CONTROLS	3
 

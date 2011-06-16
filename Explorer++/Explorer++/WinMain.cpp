@@ -19,6 +19,7 @@
 #include "Version.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
+#include "../Helper/Macros.h"
 
 
 typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(

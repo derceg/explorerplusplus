@@ -17,6 +17,7 @@
 #include "MainResource.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
+#include "../Helper/Macros.h"
 
 
 const TCHAR CDestroyFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("DestroyFiles");

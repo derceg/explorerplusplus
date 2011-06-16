@@ -17,6 +17,7 @@
 #include "Explorer++_internal.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FileContextMenuManager.h"
+#include "../Helper/Macros.h"
 
 
 LRESULT CALLBACK	TabBackingProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);

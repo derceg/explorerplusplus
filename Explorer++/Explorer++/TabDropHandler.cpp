@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include <list>
 #include "Explorer++.h"
+#include "../Helper/Macros.h"
 
 
 void CALLBACK TabDragTimerProc(HWND hwnd,UINT uMsg,

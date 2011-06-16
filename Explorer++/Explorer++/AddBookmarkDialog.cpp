@@ -17,6 +17,7 @@
 #include "AddBookmarkDialog.h"
 #include "BookmarkHelper.h"
 #include "MainResource.h"
+#include "../Helper/Macros.h"
 
 
 namespace NAddBookmarkDialog

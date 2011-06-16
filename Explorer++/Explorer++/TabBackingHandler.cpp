@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
+#include "../Helper/Macros.h"
 
 
 void Explorerplusplus::CreateTabBacking(void)
