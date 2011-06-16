@@ -21,6 +21,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 BOOL g_bInitialized = FALSE;

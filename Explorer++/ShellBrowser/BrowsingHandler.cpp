@@ -21,6 +21,7 @@
 #include "../Helper/FolderSize.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 HRESULT CFolderView::BrowseFolder(TCHAR *szPath,UINT wFlags)
