@@ -32,6 +32,7 @@ The value of the "command" sub-key will be of the form:
 #include "stdafx.h"
 #include "Helper.h"
 #include "SetDefaultFileManager.h"
+#include "Macros.h"
 
 
 namespace NDefaultFileManagerInternal

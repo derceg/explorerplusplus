@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include "ContextMenuManager.h"
 #include "ShellHelper.h"
+#include "Macros.h"
 
 
 /* The following steps are taken when showing shell

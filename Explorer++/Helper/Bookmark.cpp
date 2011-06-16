@@ -18,6 +18,7 @@
 #include "Bookmark.h"
 #include "RegistrySettings.h"
 #include "Helper.h"
+#include "Macros.h"
 
 
 CBookmark::CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription) :

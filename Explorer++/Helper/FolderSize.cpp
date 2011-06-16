@@ -12,8 +12,9 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "FolderSize.h"
 #include <list>
+#include "FolderSize.h"
+#include "Macros.h"
 
 
 HRESULT CalculateFolderSize(TCHAR *szPath,int *nFolders,

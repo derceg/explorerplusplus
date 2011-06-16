@@ -14,6 +14,7 @@
 
 #include "stdafx.h"
 #include "XMLSettings.h"
+#include "Macros.h"
 
 
 /* Helper function to create a DOM instance. */

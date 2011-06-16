@@ -18,6 +18,7 @@
 #include "RegistrySettings.h"
 #include "ShellHelper.h"
 #include "ContextMenuManager.h"
+#include "Macros.h"
 
 
 #define WM_APP_COPYOPERATIONFINISHED	(WM_APP + 1)

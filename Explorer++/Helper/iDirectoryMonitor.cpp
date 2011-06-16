@@ -16,6 +16,7 @@
 #include "stdafx.h"
 #include <list>
 #include "iDirectoryMonitor.h"
+#include "Macros.h"
 
 
 DWORD WINAPI Thread_DirModifiedInternal(LPVOID Container);

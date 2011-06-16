@@ -18,6 +18,7 @@
 #include "Helper.h"
 #include "iDataObject.h"
 #include "ShellHelper.h"
+#include "Macros.h"
 
 
 #define PASTE_CLIPBOARD_LINK		0

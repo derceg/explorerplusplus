@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "CustomMenu.h"
+#include "Macros.h"
 
 
 /* The minimum height of any item in the custom menu

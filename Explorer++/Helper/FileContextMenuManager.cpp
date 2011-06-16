@@ -16,6 +16,7 @@
 #include "ShellHelper.h"
 #include "FileContextMenuManager.h"
 #include "StatusBar.h"
+#include "Macros.h"
 
 
 LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,

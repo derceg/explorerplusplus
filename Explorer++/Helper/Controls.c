@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Controls.h"
+#include "Macros.h"
 
 
 HWND CreateListView(HWND Parent,DWORD Style)
