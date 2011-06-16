@@ -17,6 +17,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/Macros.h"
 
 /* These give the position and size of the
 main 'folder' icon. */

@@ -28,6 +28,7 @@
 #include "DisplayWindowInternal.h"
 #include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
+#include "../Helper/Macros.h"
 
 
 #define CLASS_NAME				_T("DisplayWindow")
