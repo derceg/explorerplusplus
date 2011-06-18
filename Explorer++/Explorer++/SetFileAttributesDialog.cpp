@@ -227,12 +227,14 @@ void CSetFileAttributesDialog::OnOk()
 	FILETIME *plw = NULL;
 	FILETIME *plc = NULL;
 	FILETIME *pla = NULL;
+	FILETIME LastWriteTime;
+	FILETIME CreationTime;
+	FILETIME AccessTime;
 	DWORD AllFileAttributes = FILE_ATTRIBUTE_NORMAL;
 	DWORD FileAttributes;
 
 	if(m_bModificationDateEnabled)
 	{
-		FILETIME LastWriteTime;
 		SYSTEMTIME LocalWrite;
 		SYSTEMTIME LocalWriteDate;
 		SYSTEMTIME LocalWriteTime;
@@ -248,7 +250,6 @@ void CSetFileAttributesDialog::OnOk()
 
 	if(m_bCreationDateEnabled)
 	{
-		FILETIME CreationTime;
 		SYSTEMTIME LocalCreation;
 		SYSTEMTIME LocalCreationDate;
 		SYSTEMTIME LocalCreationTime;
@@ -264,7 +265,6 @@ void CSetFileAttributesDialog::OnOk()
 
 	if(m_bAccessDateEnabled)
 	{
-		FILETIME AccessTime;
 		SYSTEMTIME LocalAccess;
 		SYSTEMTIME LocalAccessDate;
 		SYSTEMTIME LocalAccessTime;
@@ -280,7 +280,7 @@ void CSetFileAttributesDialog::OnOk()
 
 	/* Build up list of attributes. Add all positive
 	attributes (i.e. those that are active for all files).
-	Any attributes which are inderterminate will not change
+	Any attributes which are indeterminate will not change
 	(note that they are per-file). */
 	for each(auto Attribute in m_AttributeList)
 	{
