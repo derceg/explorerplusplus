@@ -372,7 +372,6 @@ void Explorerplusplus::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL
 	HWND hTabProxy;
 	TabProxyInfo_t tpi;
 	TCHAR szClassName[512];
-	HRESULT hr;
 	ATOM aRet;
 	BOOL bValue = TRUE;
 
@@ -421,10 +420,10 @@ void Explorerplusplus::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL
 
 				if(DwmSetWindowAttribute != NULL)
 				{
-					hr = DwmSetWindowAttribute(hTabProxy,DWMWA_FORCE_ICONIC_REPRESENTATION,
+					DwmSetWindowAttribute(hTabProxy,DWMWA_FORCE_ICONIC_REPRESENTATION,
 						&bValue,sizeof(BOOL));
 
-					hr = DwmSetWindowAttribute(hTabProxy,DWMWA_HAS_ICONIC_BITMAP,
+					DwmSetWindowAttribute(hTabProxy,DWMWA_HAS_ICONIC_BITMAP,
 						&bValue,sizeof(BOOL));
 
 					if(m_bTaskbarInitialised)

@@ -911,7 +911,6 @@ int CALLBACK CFolderView::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int Ve
 	TCHAR			szVersionBuf2[512];
 	BOOL			IsFolder1;
 	BOOL			IsFolder2;
-	BOOL			bVersionInfoObtained;
 	int				ReturnValue;
 
 	File1 = &m_pwfdFiles[(int)lParam1];
@@ -947,10 +946,10 @@ int CALLBACK CFolderView::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int Ve
 	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
 	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
 
-	bVersionInfoObtained = GetVersionInfoString(FullFileName1,
+	GetVersionInfoString(FullFileName1,
 	_T("ProductName"),szVersionBuf1,SIZEOF_ARRAY(szVersionBuf1));
 
-	bVersionInfoObtained = GetVersionInfoString(FullFileName2,
+	GetVersionInfoString(FullFileName2,
 	_T("ProductName"),szVersionBuf2,SIZEOF_ARRAY(szVersionBuf2));
 
 	ReturnValue = lstrcmp(szVersionBuf1,szVersionBuf2);
@@ -980,7 +979,6 @@ int CALLBACK CFolderView::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2)
 	TCHAR			szResolvedLinkPath2[MAX_PATH];
 	BOOL			IsFolder1;
 	BOOL			IsFolder2;
-	HRESULT			hr;
 	int				ReturnValue;
 
 	File1 = &m_pwfdFiles[(int)lParam1];
@@ -1016,10 +1014,10 @@ int CALLBACK CFolderView::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2)
 	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
 	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
 
-	hr = NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName1,szResolvedLinkPath1,
+	NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName1,szResolvedLinkPath1,
 	SIZEOF_ARRAY(szResolvedLinkPath1));
 
-	hr = NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName2,szResolvedLinkPath2,
+	NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName2,szResolvedLinkPath2,
 	SIZEOF_ARRAY(szResolvedLinkPath2));
 
 	ReturnValue = lstrcmp(szResolvedLinkPath1,szResolvedLinkPath2);
@@ -1269,7 +1267,6 @@ int CALLBACK CFolderView::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DW
 	TCHAR			szPropertyBuf2[512];
 	BOOL			IsFolder1;
 	BOOL			IsFolder2;
-	int				iRes;
 	int				ReturnValue;
 
 	File1 = &m_pwfdFiles[(int)lParam1];
@@ -1305,10 +1302,10 @@ int CALLBACK CFolderView::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DW
 	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
 	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
 
-	iRes = ReadFileProperty(FullFileName1,dwPropertyType,szPropertyBuf1,
+	ReadFileProperty(FullFileName1,dwPropertyType,szPropertyBuf1,
 	SIZEOF_ARRAY(szPropertyBuf1));
 
-	iRes = ReadFileProperty(FullFileName2,dwPropertyType,szPropertyBuf2,
+	ReadFileProperty(FullFileName2,dwPropertyType,szPropertyBuf2,
 	SIZEOF_ARRAY(szPropertyBuf2));
 
 	ReturnValue = lstrcmp(szPropertyBuf1,szPropertyBuf2);
@@ -1385,7 +1382,6 @@ int CALLBACK CFolderView::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROP
 	TCHAR			szPropertyBuf2[512];
 	BOOL			IsFolder1;
 	BOOL			IsFolder2;
-	BOOL			bRes;
 	int				ReturnValue;
 
 	File1 = &m_pwfdFiles[(int)lParam1];
@@ -1421,10 +1417,10 @@ int CALLBACK CFolderView::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROP
 	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
 	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
 
-	bRes = ReadImageProperty(FullFileName1,PropertyId,szPropertyBuf1,
+	ReadImageProperty(FullFileName1,PropertyId,szPropertyBuf1,
 	SIZEOF_ARRAY(szPropertyBuf1));
 
-	bRes = ReadImageProperty(FullFileName2,PropertyId,szPropertyBuf2,
+	ReadImageProperty(FullFileName2,PropertyId,szPropertyBuf2,
 	SIZEOF_ARRAY(szPropertyBuf2));
 
 	ReturnValue = lstrcmp(szPropertyBuf1,szPropertyBuf2);
@@ -1452,7 +1448,6 @@ int CALLBACK CFolderView::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2)
 	TCHAR			szInfoTip2[512];
 	BOOL			IsFolder1;
 	BOOL			IsFolder2;
-	HRESULT			hr;
 	int				ReturnValue;
 
 	File1 = &m_pwfdFiles[(int)lParam1];
@@ -1485,9 +1480,9 @@ int CALLBACK CFolderView::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2)
 		return ReturnValue;
 	}
 
-	hr = GetFileInfoTip(m_hOwner,m_pidlDirectory,const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[(int)lParam1].pridl),
+	GetFileInfoTip(m_hOwner,m_pidlDirectory,const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[(int)lParam1].pridl),
 		szInfoTip1,SIZEOF_ARRAY(szInfoTip1));
-	hr = GetFileInfoTip(m_hOwner,m_pidlDirectory,const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[(int)lParam2].pridl),
+	GetFileInfoTip(m_hOwner,m_pidlDirectory,const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[(int)lParam2].pridl),
 		szInfoTip2,SIZEOF_ARRAY(szInfoTip2));
 
 	ReturnValue = lstrcmp(szInfoTip1,szInfoTip2);

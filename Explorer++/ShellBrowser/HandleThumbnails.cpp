@@ -109,7 +109,7 @@ void CFolderView::RemoveThumbnailsView(void)
 void CFolderView::EmptyThumbnailsQueue(void)
 {
 	EnterCriticalSection(&g_csThumbnails);
-	g_ThumbnailQueue.empty();
+	g_ThumbnailQueue.clear();
 	LeaveCriticalSection(&g_csThumbnails);
 }
 

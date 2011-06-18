@@ -63,7 +63,7 @@ private:
 	void	OnOk();
 	void	OnCancel();
 
-	void	ProcessFileName(const std::wstring strTarget,const std::wstring strFilename,int iFileIndex,std::wstring &strOutput);
+	void	ProcessFileName(const std::wstring &strTarget,const std::wstring &strFilename,int iFileIndex,std::wstring &strOutput);
 
 	std::list<std::wstring>	m_FullFilenameList;
 	HICON					m_hDialogIcon;

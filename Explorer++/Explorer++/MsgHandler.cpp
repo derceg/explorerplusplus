@@ -215,8 +215,6 @@ void Explorerplusplus::OnWindowCreate(void)
 
 void Explorerplusplus::TestConfigFile(void)
 {
-	m_bLoadSettingsFromXML = FALSE;
-
 	m_bLoadSettingsFromXML = TestConfigFileInternal();
 }
 

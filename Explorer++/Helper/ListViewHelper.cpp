@@ -310,7 +310,7 @@ void NListView::ListView_SwapItems(HWND hListView,int iItem1,int iItem2)
 		lvItem.pszText		= szBuffer1;
 		lvItem.cchTextMax	= SIZEOF_ARRAY(szBuffer1);
 
-		res = ListView_GetItem(hListView,&lvItem);
+		ListView_GetItem(hListView,&lvItem);
 
 		lvItem.mask			= LVIF_TEXT;
 		lvItem.iItem		= iItem2;
@@ -318,7 +318,7 @@ void NListView::ListView_SwapItems(HWND hListView,int iItem1,int iItem2)
 		lvItem.pszText		= szBuffer2;
 		lvItem.cchTextMax	= SIZEOF_ARRAY(szBuffer2);
 
-		res = ListView_GetItem(hListView,&lvItem);
+		ListView_GetItem(hListView,&lvItem);
 
 		lvItem.mask		= LVIF_TEXT;
 		lvItem.iItem	= iItem1;
@@ -417,7 +417,7 @@ void NListView::ListView_SwapItemsNolParam(HWND hListView,int iItem1,int iItem2)
 		lvItem.pszText		= szBuffer1;
 		lvItem.cchTextMax	= SIZEOF_ARRAY(szBuffer1);
 
-		res = ListView_GetItem(hListView,&lvItem);
+		ListView_GetItem(hListView,&lvItem);
 
 		lvItem.mask			= LVIF_TEXT;
 		lvItem.iItem		= iItem2;
@@ -425,7 +425,7 @@ void NListView::ListView_SwapItemsNolParam(HWND hListView,int iItem1,int iItem2)
 		lvItem.pszText		= szBuffer2;
 		lvItem.cchTextMax	= SIZEOF_ARRAY(szBuffer2);
 
-		res = ListView_GetItem(hListView,&lvItem);
+		ListView_GetItem(hListView,&lvItem);
 
 		lvItem.mask		= LVIF_TEXT;
 		lvItem.iItem	= iItem1;

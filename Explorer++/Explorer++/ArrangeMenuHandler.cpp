@@ -112,7 +112,7 @@ void Explorerplusplus::InitializeArrangeMenuItems(void)
 	ArrangeMenuItem.GroupById = IDM_GROUPBY_DATEDELETED;
 	m_ArrangeMenuRecycleBin.push_back(ArrangeMenuItem);
 
-	ArrangeMenuItem.GroupById = IDM_SORTBY_SIZE;
+	ArrangeMenuItem.SortById = IDM_SORTBY_SIZE;
 	ArrangeMenuItem.GroupById = IDM_GROUPBY_SIZE;
 	m_ArrangeMenuRecycleBin.push_back(ArrangeMenuItem);
 

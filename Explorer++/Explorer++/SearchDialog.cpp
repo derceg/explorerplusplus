@@ -1200,7 +1200,7 @@ CDialogSettings(SETTINGS_KEY)
 	m_bReadOnly = FALSE;
 	m_bSystem = FALSE;
 	m_iColumnWidth1 = -1;
-	m_iColumnWidth1 = -1;
+	m_iColumnWidth2 = -1;
 
 	StringCchCopy(m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern),
 		EMPTY_STRING);

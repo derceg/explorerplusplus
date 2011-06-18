@@ -832,7 +832,7 @@ LPITEMIDLIST pidlDirectory,HTREEITEM hParent)
 	HRESULT			hr;
 	int				iMonitorId = -1;
 
-	hr = GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
+	GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
 
 	EnumFlags = SHCONTF_FOLDERS;
 
@@ -1045,7 +1045,6 @@ HTREEITEM CMyTreeView::DetermineItemSortedPosition(HTREEITEM hParent,TCHAR *szIt
 
 			GetDisplayName(pItemInfo->pidl,szFullItemPath,SHGDN_FORPARSING);
 
-			Attributes = SFGAO_FILESYSTEM;
 			Attributes = GetFileAttributes(szFullItemPath);
 
 			/* Only perform the comparison if the current item is a real
@@ -1976,7 +1975,7 @@ HRESULT CMyTreeView::OnBeginDrag(int iItemId,DragTypes_t DragType)
 			pShellFolder->GetUIObjectOf(m_hTreeView,1,(LPCITEMIDLIST *)&ridl,
 				IID_IDataObject,NULL,(LPVOID *)&pDataObject);
 
-			hr = pDragSourceHelper->InitializeFromWindow(m_hTreeView,&pt,pDataObject);
+			pDragSourceHelper->InitializeFromWindow(m_hTreeView,&pt,pDataObject);
 
 			m_DragType = DragType;
 

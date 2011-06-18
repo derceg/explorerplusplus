@@ -339,8 +339,8 @@ void CMassRenameDialog::SaveState()
 	m_pmrdps->m_bStateSaved = TRUE;
 }
 
-void CMassRenameDialog::ProcessFileName(const std::wstring strTarget,
-	const std::wstring strFilename,int iFileIndex,std::wstring &strOutput)
+void CMassRenameDialog::ProcessFileName(const std::wstring &strTarget,
+	const std::wstring &strFilename,int iFileIndex,std::wstring &strOutput)
 {
 	TCHAR szBaseName[MAX_PATH];
 	StringCchCopy(szBaseName,MAX_PATH,strFilename.c_str());
