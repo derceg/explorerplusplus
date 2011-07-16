@@ -16,6 +16,8 @@ a dialog without having to handle the dialog procedure
 directly. */
 class CBaseDialog
 {
+	friend INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
+
 public:
 
 	enum DialogSizeConstraint
@@ -27,8 +29,6 @@ public:
 
 	CBaseDialog(HINSTANCE hInstance,int iResource,HWND hParent,bool bResizable);
 	~CBaseDialog();
-
-	INT_PTR CALLBACK	BaseDialogProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	INT_PTR			ShowModalDialog();
 	HWND			ShowModelessDialog(IModelessDialogNotification *pmdn = NULL);
@@ -61,6 +61,8 @@ protected:
 	HWND			m_hDlg;
 
 private:
+
+	INT_PTR CALLBACK	BaseDialogProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	HINSTANCE		m_hInstance;
 	int				m_iResource;

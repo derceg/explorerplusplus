@@ -1297,6 +1297,7 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 			if(IsImage(szFullItemName))
 			{
 				TCHAR szOutput[256];
+				TCHAR szTemp[64];
 				UINT uWidth;
 				UINT uHeight;
 				Gdiplus::Image *pimg = NULL;
@@ -1305,14 +1306,14 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 
 				if(pimg->GetLastStatus() == Gdiplus::Ok)
 				{
-					/* String table. */
 					uWidth = pimg->GetWidth();
-					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("Width: %u pixels"),uWidth);
+					LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_IMAGEWIDTH,szTemp,SIZEOF_ARRAY(szTemp));
+					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),szTemp,uWidth);
 					DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
 
-					/* String table. */
 					uHeight = pimg->GetHeight();
-					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("Height: %u pixels"),uHeight);
+					LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_IMAGEHEIGHT,szTemp,SIZEOF_ARRAY(szTemp));
+					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),szTemp,uHeight);
 					DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
 
 					Gdiplus::PixelFormat format;
@@ -1365,22 +1366,29 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 						break;
 					}
 
-					/* String table. */
 					if(uBitDepth == -1)
-						StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("Bit depth: Unknown"));
+					{
+						LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_BITDEPTHUNKNOWN,szTemp,SIZEOF_ARRAY(szTemp));
+						StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),szTemp);
+					}
 					else
-						StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("Bit depth: %u"),uBitDepth);
+					{
+						LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_BITDEPTH,szTemp,SIZEOF_ARRAY(szTemp));
+						StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),szTemp,uBitDepth);
+					}
 
 					DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
 
 					Gdiplus::REAL res;
 
 					res = pimg->GetHorizontalResolution();
-					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("Horizontal resolution: %.0f dpi"),res);
+					LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_HORIZONTALRESOLUTION,szTemp,SIZEOF_ARRAY(szTemp));
+					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),szTemp,res);
 					DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
 
 					res = pimg->GetVerticalResolution();
-					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("Vertical resolution: %.0f dpi"),res);
+					LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_VERTICALRESOLUTION,szTemp,SIZEOF_ARRAY(szTemp));
+					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),szTemp,res);
 					DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
 				}
 

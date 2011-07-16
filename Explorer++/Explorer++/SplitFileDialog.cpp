@@ -184,57 +184,62 @@ INT_PTR CSplitFileDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 
 BOOL CSplitFileDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
-	switch(HIWORD(wParam))
+	if(HIWORD(wParam) != 0)
 	{
-	case EN_CHANGE:
+		switch(HIWORD(wParam))
 		{
-			bool bHideError = false;
-
-			switch(m_CurrentError)
+		case EN_CHANGE:
 			{
-			case ERROR_OUTPUT_FILENAME_EMPTY:
-				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUTFILENAME);
-				break;
+				bool bHideError = false;
 
-			case ERROR_OUTPUT_FILENAME_CONSTANT:
-				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUTFILENAME);
-				break;
+				switch(m_CurrentError)
+				{
+				case ERROR_OUTPUT_FILENAME_EMPTY:
+					bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUTFILENAME);
+					break;
 
-			case ERROR_OUTPUT_DIRECTORY_EMPTY:
-				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUT);
-				break;
+				case ERROR_OUTPUT_FILENAME_CONSTANT:
+					bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUTFILENAME);
+					break;
 
-			case ERROR_SPLIT_SIZE:
-				bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_SIZE);
-				break;
+				case ERROR_OUTPUT_DIRECTORY_EMPTY:
+					bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_OUTPUT);
+					break;
+
+				case ERROR_SPLIT_SIZE:
+					bHideError = (LOWORD(wParam) == IDC_SPLIT_EDIT_SIZE);
+					break;
+				}
+
+				if(bHideError)
+				{
+					/* If an error is currently been shown, and it is
+					for the control this notification is been sent for,
+					hide the error message. */
+					SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,EMPTY_STRING);
+
+					m_CurrentError = ERROR_NONE;
+				}
 			}
-
-			if(bHideError)
-			{
-				/* If an error is currently been shown, and it is
-				for the control this notification is been sent for,
-				hide the error message. */
-				SetDlgItemText(m_hDlg,IDC_SPLIT_STATIC_MESSAGE,EMPTY_STRING);
-
-				m_CurrentError = ERROR_NONE;
-			}
+			break;
 		}
-		break;
 	}
-
-	switch(LOWORD(wParam))
+	else
 	{
-	case IDC_SPLIT_BUTTON_OUTPUT:
-		OnChangeOutputDirectory();
-		break;
+		switch(LOWORD(wParam))
+		{
+		case IDC_SPLIT_BUTTON_OUTPUT:
+			OnChangeOutputDirectory();
+			break;
 
-	case IDOK:
-		OnOk();
-		break;
+		case IDOK:
+			OnOk();
+			break;
 
-	case IDCANCEL:
-		OnCancel();
-		break;
+		case IDCANCEL:
+			OnCancel();
+			break;
+		}
 	}
 
 	return 0;

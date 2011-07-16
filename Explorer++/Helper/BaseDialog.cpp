@@ -17,14 +17,12 @@
 #include "Helper.h"
 
 
-namespace NBaseDialog
+namespace
 {
-	INT_PTR CALLBACK	BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-
 	std::tr1::unordered_map<HWND,CBaseDialog *>	g_WindowMap;
 }
 
-INT_PTR CALLBACK NBaseDialog::BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -42,13 +40,13 @@ INT_PTR CALLBACK NBaseDialog::BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wPar
 			correct object.
 			May also use thunks - see
 			http://www.hackcraft.net/cpp/windowsThunk/ */
-			NBaseDialog::g_WindowMap.insert(std::tr1::unordered_map<HWND,CBaseDialog *>::
+			g_WindowMap.insert(std::tr1::unordered_map<HWND,CBaseDialog *>::
 				value_type(hDlg,reinterpret_cast<CBaseDialog *>(lParam)));
 		}
 		break;
 	}
 
-	auto itr = NBaseDialog::g_WindowMap.find(hDlg);
+	auto itr = g_WindowMap.find(hDlg);
 
 	if(itr != g_WindowMap.end())
 	{
@@ -187,8 +185,7 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 			break;
 
 		case WM_NCDESTROY:
-			NBaseDialog::g_WindowMap.erase(
-				NBaseDialog::g_WindowMap.find(hDlg));
+			g_WindowMap.erase(g_WindowMap.find(hDlg));
 			return OnNcDestroy();
 			break;
 	}
@@ -230,7 +227,7 @@ INT_PTR CBaseDialog::ShowModalDialog()
 	}
 
 	return DialogBoxParam(m_hInstance,MAKEINTRESOURCE(m_iResource),
-		m_hParent,NBaseDialog::BaseDialogProcStub,reinterpret_cast<LPARAM>(this));
+		m_hParent,BaseDialogProcStub,reinterpret_cast<LPARAM>(this));
 }
 
 HWND CBaseDialog::ShowModelessDialog(IModelessDialogNotification *pmdn)
@@ -242,7 +239,7 @@ HWND CBaseDialog::ShowModelessDialog(IModelessDialogNotification *pmdn)
 
 	HWND hDlg = CreateDialogParam(m_hInstance,
 		MAKEINTRESOURCE(m_iResource),m_hParent,
-		NBaseDialog::BaseDialogProcStub,
+		BaseDialogProcStub,
 		reinterpret_cast<LPARAM>(this));
 
 	if(hDlg != NULL)

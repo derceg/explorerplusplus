@@ -599,9 +599,13 @@ void Explorerplusplus::OnApplicationToolbarRClick(void)
 {
 	MENUITEMINFO mii;
 
+	TCHAR szTemp[64];
+	LoadString(g_hLanguageModule,IDS_APPLICATIONBUTTON_NEW,
+		szTemp,SIZEOF_ARRAY(szTemp));
+
 	mii.cbSize		= sizeof(mii);
 	mii.fMask		= MIIM_ID|MIIM_STRING;
-	mii.dwTypeData	= _T("New Application Button...");
+	mii.dwTypeData	= szTemp;
 	mii.wID			= IDM_APP_NEW;
 
 	/* Add the item to the menu. */

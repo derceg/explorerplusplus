@@ -30,6 +30,23 @@ namespace NExplorerplusplus
 	/* Command line arguments supplied to the program
 	for each jump list task. */
 	const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[]	= _T("-open_new_tab");
+
+	enum IPNotificationType_t
+	{
+		IP_NOTIFICATION_TYPE_NEW_TAB = 1,
+
+		/* Bookmark notifications. */
+		IP_NOTIFICATION_TYPE_BOOKMARK_MODIFIED = 2
+	};
+
+	struct IPBookmarkNotification_t
+	{
+		/* Use a series of different structures. This field
+		must ALWAYS appear first in each of the structures.
+		Decode by switching on the type and casting to the
+		appropriate structure. */
+		IPNotificationType_t	Type;
+	};
 }
 
 extern HINSTANCE g_hLanguageModule;

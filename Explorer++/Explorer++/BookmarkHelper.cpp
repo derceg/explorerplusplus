@@ -19,12 +19,6 @@
 #include "../Helper/Macros.h"
 
 
-namespace
-{
-	LRESULT CALLBACK BookmarkTreeViewProcStub(HWND hwnd,UINT uMsg,
-		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-}
-
 CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView,CBookmarkFolder *pAllBookmarks,
 	const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion) :
 	m_hTreeView(hTreeView),
@@ -50,15 +44,12 @@ CBookmarkTreeView::~CBookmarkTreeView()
 	ImageList_Destroy(m_himl);
 }
 
-namespace
+LRESULT CALLBACK BookmarkTreeViewProcStub(HWND hwnd,UINT uMsg,
+	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	LRESULT CALLBACK BookmarkTreeViewProcStub(HWND hwnd,UINT uMsg,
-		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
-	{
-		CBookmarkTreeView *pbtv = reinterpret_cast<CBookmarkTreeView *>(dwRefData);
+	CBookmarkTreeView *pbtv = reinterpret_cast<CBookmarkTreeView *>(dwRefData);
 
-		return pbtv->TreeViewProc(hwnd,uMsg,wParam,lParam);
-	}
+	return pbtv->TreeViewProc(hwnd,uMsg,wParam,lParam);
 }
 
 LRESULT CALLBACK CBookmarkTreeView::TreeViewProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
@@ -615,7 +606,8 @@ int CALLBACK NBookmarkHelper::SortByLastModified(const variantBookmark_t Bookmar
 	}
 }
 
-CIPBookmarkItemNotifier::CIPBookmarkItemNotifier()
+CIPBookmarkItemNotifier::CIPBookmarkItemNotifier(HWND hTopLevelWnd) :
+m_hTopLevelWnd(hTopLevelWnd)
 {
 
 }
@@ -625,9 +617,38 @@ CIPBookmarkItemNotifier::~CIPBookmarkItemNotifier()
 
 }
 
+BOOL CALLBACK BookmarkNotifierEnumWindowsStub(HWND hwnd,LPARAM lParam)
+{
+	CIPBookmarkItemNotifier *pipbn = reinterpret_cast<CIPBookmarkItemNotifier *>(lParam);
+
+	return pipbn->BookmarkNotifierEnumWindows(hwnd);
+}
+
+BOOL CALLBACK CIPBookmarkItemNotifier::BookmarkNotifierEnumWindows(HWND hwnd)
+{
+	TCHAR szClassName[256];
+	int iRes = GetClassName(hwnd,szClassName,SIZEOF_ARRAY(szClassName));
+
+	if(iRes != 0 &&
+		lstrcmp(szClassName,NExplorerplusplus::CLASS_NAME) == 0 &&
+		hwnd != m_hTopLevelWnd)
+	{
+		NExplorerplusplus::IPBookmarkNotification_t ipbn;
+		ipbn.Type = NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_MODIFIED;
+
+		COPYDATASTRUCT cds;
+		cds.lpData = reinterpret_cast<PVOID>(&ipbn);
+		cds.cbData = sizeof(ipbn);
+		cds.dwData = NULL;
+		SendMessage(hwnd,WM_COPYDATA,reinterpret_cast<WPARAM>(m_hTopLevelWnd),reinterpret_cast<LPARAM>(&cds));
+	}
+
+	return TRUE;
+}
+
 void CIPBookmarkItemNotifier::OnBookmarkItemModified(const GUID &guid)
 {
-	
+	EnumWindows(BookmarkNotifierEnumWindowsStub,reinterpret_cast<LPARAM>(this));
 }
 
 void CIPBookmarkItemNotifier::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)
@@ -648,4 +669,26 @@ void CIPBookmarkItemNotifier::OnBookmarkRemoved(const GUID &guid)
 void CIPBookmarkItemNotifier::OnBookmarkFolderRemoved(const GUID &guid)
 {
 
+}
+
+CIPBookmarkObserver::CIPBookmarkObserver()
+{
+
+}
+
+CIPBookmarkObserver::~CIPBookmarkObserver()
+{
+
+}
+
+void CIPBookmarkObserver::OnBookmarkItemModified(const GUID &guid)
+{
+	/* Find the bookmark with the specified GUID, and update its
+	properties. This will need to update *each* of the bookmarks
+	properties - i.e.. if a new public property is added, that property
+	will need to be updated here.
+	This may also need to update internal properties (i.e. visitor
+	count, last visit date).
+	Need to clone exact state of modified bookmark, and broadcast
+	a modification notification. */
 }

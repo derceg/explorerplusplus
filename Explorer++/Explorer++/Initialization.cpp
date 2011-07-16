@@ -42,7 +42,7 @@ void Explorerplusplus::InitializeBookmarks(void)
 	CBookmarkFolder bfBookmarksMenu = CBookmarkFolder::Create(szTemp);
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu);
 
-	m_pipbin = new CIPBookmarkItemNotifier();
+	m_pipbin = new CIPBookmarkItemNotifier(m_hContainer);
 	CBookmarkItemNotifier::GetInstance().AddObserver(m_pipbin);
 }
 

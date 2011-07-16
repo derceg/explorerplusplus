@@ -48,12 +48,12 @@ namespace NBookmarkHelper
 
 class CBookmarkTreeView
 {
+	friend LRESULT CALLBACK BookmarkTreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+
 public:
 
 	CBookmarkTreeView(HWND hTreeView,CBookmarkFolder *pAllBookmarks,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
 	~CBookmarkTreeView();
-
-	LRESULT CALLBACK	TreeViewProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	CBookmarkFolder		&GetBookmarkFolderFromTreeView(HTREEITEM hItem);
 
@@ -65,6 +65,8 @@ public:
 private:
 
 	typedef std::unordered_map<GUID,HTREEITEM,NBookmarkHelper::GuidHash,NBookmarkHelper::GuidEq> ItemMap_t;
+
+	LRESULT CALLBACK	TreeViewProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	void				SetupTreeView(const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
 
@@ -113,9 +115,11 @@ private:
 via IPC to other Explorer++ processes. */
 class CIPBookmarkItemNotifier : public NBookmark::IBookmarkItemNotification
 {
+	friend BOOL CALLBACK BookmarkNotifierEnumWindowsStub(HWND hwnd,LPARAM lParam);
+
 public:
 
-	CIPBookmarkItemNotifier();
+	CIPBookmarkItemNotifier(HWND hTopLevelWnd);
 	~CIPBookmarkItemNotifier();
 
 	void	OnBookmarkItemModified(const GUID &guid);
@@ -123,6 +127,30 @@ public:
 	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
 	void	OnBookmarkRemoved(const GUID &guid);
 	void	OnBookmarkFolderRemoved(const GUID &guid);
+
+private:
+
+	BOOL CALLBACK	BookmarkNotifierEnumWindows(HWND hwnd);
+
+	HWND	m_hTopLevelWnd;
+};
+
+/* Receives bookmark notifications via IPC from other Explorer++ process,
+and rebroadcasts those notifications internally.
+This class will have to emulate all bookmark notifications. That is, upon
+receiving a modification, addition, etc notification, this class will
+have to reconstruct the changes locally. This will then cause the changes
+to be rebroadcast internally.
+While reconstructing the changes, this class will have to set a flag indicating
+that the changes are not to rebroadcast. */
+class CIPBookmarkObserver
+{
+public:
+
+	CIPBookmarkObserver();
+	~CIPBookmarkObserver();
+
+	void	OnBookmarkItemModified(const GUID &guid);
 
 private:
 };
