@@ -230,7 +230,7 @@ int *pTabObjectIndex)
 		}
 		else
 		{
-			is.SortMode				= DEFAULT_SORT_MODE;
+			is.SortMode				= GetDefaultSortMode(pidlDirectory);
 			is.ViewMode				= m_ViewModeGlobal;
 			is.bApplyFilter			= FALSE;
 			is.bFilterCaseSensitive	= FALSE;
@@ -1872,4 +1872,219 @@ void Explorerplusplus::SetTabProxyIcon(int iTabId,HICON hIcon)
 int Explorerplusplus::GetCurrentTabId()
 {
 	return m_iObjectIndex;
+}
+
+UINT Explorerplusplus::GetDefaultSortMode(const LPITEMIDLIST &pidlDirectory)
+{
+	std::list<Column_t> *pColumns = NULL;
+
+	TCHAR szDirectory[MAX_PATH];
+	GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
+
+	if(CompareVirtualFolders(szDirectory,CSIDL_CONTROLS))
+	{
+		pColumns = &m_ControlPanelColumnList;
+	}
+	else if(CompareVirtualFolders(szDirectory,CSIDL_DRIVES))
+	{
+		pColumns = &m_MyComputerColumnList;
+	}
+	else if(CompareVirtualFolders(szDirectory,CSIDL_BITBUCKET))
+	{
+		pColumns = &m_RecycleBinColumnList;
+	}
+	else if(CompareVirtualFolders(szDirectory,CSIDL_PRINTERS))
+	{
+		pColumns = &m_PrintersColumnList;
+	}
+	else if(CompareVirtualFolders(szDirectory,CSIDL_CONNECTIONS))
+	{
+		pColumns = &m_NetworkConnectionsColumnList;
+	}
+	else if(CompareVirtualFolders(szDirectory,CSIDL_NETWORK))
+	{
+		pColumns = &m_MyNetworkPlacesColumnList;
+	}
+	else
+	{
+		pColumns = &m_RealFolderColumnList;
+	}
+
+	UINT uSortMode = FSM_NAME;
+
+	for each(auto Column in *pColumns)
+	{
+		if(Column.bChecked)
+		{
+			uSortMode = DetermineColumnSortMode(Column.id);
+			break;
+		}
+	}
+
+	return uSortMode;
+}
+
+/* TODO: Code shared with CFolderView. */
+unsigned int Explorerplusplus::DetermineColumnSortMode(UINT uColumnId)
+{
+	switch(uColumnId)
+	{
+		case CM_NAME:
+			return FSM_NAME;
+			break;
+
+		case CM_TYPE:
+			return FSM_TYPE;
+			break;
+
+		case CM_SIZE:
+			return FSM_SIZE;
+			break;
+
+		case CM_DATEMODIFIED:
+			return FSM_DATEMODIFIED;
+			break;
+
+		case CM_ATTRIBUTES:
+			return FSM_ATTRIBUTES;
+			break;
+
+		case CM_REALSIZE:
+			return FSM_REALSIZE;
+			break;
+
+		case CM_SHORTNAME:
+			return FSM_SHORTNAME;
+			break;
+
+		case CM_OWNER:
+			return FSM_OWNER;
+			break;
+
+		case CM_PRODUCTNAME:
+			return FSM_PRODUCTNAME;
+			break;
+
+		case CM_COMPANY:
+			return FSM_COMPANY;
+			break;
+
+		case CM_DESCRIPTION:
+			return FSM_DESCRIPTION;
+			break;
+
+		case CM_FILEVERSION:
+			return FSM_FILEVERSION;
+			break;
+
+		case CM_PRODUCTVERSION:
+			return FSM_PRODUCTVERSION;
+			break;
+
+		case CM_SHORTCUTTO:
+			return FSM_SHORTCUTTO;
+			break;
+
+		case CM_HARDLINKS:
+			return FSM_HARDLINKS;
+			break;
+
+		case CM_EXTENSION:
+			return FSM_EXTENSION;
+			break;
+
+		case CM_CREATED:
+			return FSM_CREATED;
+			break;
+
+		case CM_ACCESSED:
+			return FSM_ACCESSED;
+			break;
+
+		case CM_TITLE:
+			return FSM_TITLE;
+			break;
+
+		case CM_SUBJECT:
+			return FSM_SUBJECT;
+			break;
+
+		case CM_AUTHOR:
+			return FSM_AUTHOR;
+			break;
+
+		case CM_KEYWORDS:
+			return FSM_KEYWORDS;
+			break;
+
+		case CM_COMMENT:
+			return FSM_COMMENTS;
+			break;
+
+		case CM_CAMERAMODEL:
+			return FSM_CAMERAMODEL;
+			break;
+
+		case CM_DATETAKEN:
+			return FSM_DATETAKEN;
+			break;
+
+		case CM_WIDTH:
+			return FSM_WIDTH;
+			break;
+
+		case CM_HEIGHT:
+			return FSM_HEIGHT;
+			break;
+
+		case CM_VIRTUALCOMMENTS:
+			return FSM_VIRTUALCOMMENTS;
+			break;
+
+		case CM_TOTALSIZE:
+			return FSM_TOTALSIZE;
+			break;
+
+		case CM_FREESPACE:
+			return FSM_FREESPACE;
+			break;
+
+		case CM_FILESYSTEM:
+			return FSM_FILESYSTEM;
+			break;
+
+		case CM_VIRTUALTYPE:
+			return FSM_VIRTUALTYPE;
+			break;
+
+		case CM_ORIGINALLOCATION:
+			return FSM_ORIGINALLOCATION;
+			break;
+
+		case CM_DATEDELETED:
+			return FSM_DATEDELETED;
+			break;
+
+		case CM_NUMPRINTERDOCUMENTS:
+			return FSM_NUMPRINTERDOCUMENTS;
+			break;
+
+		case CM_PRINTERSTATUS:
+			return FSM_PRINTERSTATUS;
+			break;
+
+		case CM_PRINTERCOMMENTS:
+			return FSM_PRINTERCOMMENTS;
+			break;
+
+		case CM_PRINTERLOCATION:
+			return FSM_PRINTERLOCATION;
+			break;
+
+		case CM_NETWORKADAPTER_STATUS:
+			return FSM_NETWORKADAPTER_STATUS;
+			break;
+	}
+
+	return 0;
 }

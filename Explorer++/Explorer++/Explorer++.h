@@ -838,6 +838,7 @@ private:
 
 	/* Miscellaneous. */
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
+	BOOL					CompareVirtualFolders(TCHAR *szDirectory,UINT uFolderCSIDL);
 	void					OnShowOptions(void);
 	void					AddLanguages(HWND hDlg);
 	WORD					AddLanguageToComboBox(HWND hComboBox,TCHAR *szImageDirectory,TCHAR *szFileName);
@@ -876,6 +877,8 @@ private:
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	void					PlayNavigationSound(void);
 	CStatusBar				*GetStatusBar();
+	UINT					GetDefaultSortMode(const LPITEMIDLIST &pidlDirectory);
+	unsigned int			DetermineColumnSortMode(UINT uColumnId);
 
 
 

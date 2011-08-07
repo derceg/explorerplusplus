@@ -92,8 +92,6 @@ SelectAndEdit() method of INewClient. */
 #define GROUPBY_BASE	50100
 #define GROUPBY_END		50199
 
-#define DEFAULT_SORT_MODE			FSM_NAME
-
 #define MAX_TABS					100
 #define LISTVIEW_COLUMN_WIDTH		180
 #define TREEVIEW_HEADERSIZE			16

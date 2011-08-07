@@ -1051,11 +1051,16 @@ HRESULT Explorerplusplus::HandleStatusText(void)
 
 BOOL Explorerplusplus::CompareVirtualFolders(UINT uFolderCSIDL)
 {
+	return CompareVirtualFolders(m_CurrentDirectory,uFolderCSIDL);
+}
+
+BOOL Explorerplusplus::CompareVirtualFolders(TCHAR *szDirectory,UINT uFolderCSIDL)
+{
 	TCHAR szParsingPath[MAX_PATH];
 
 	GetVirtualFolderParsingPath(uFolderCSIDL,szParsingPath);
 
-	if(StrCmp(m_CurrentDirectory,szParsingPath) == 0)
+	if(StrCmp(szDirectory,szParsingPath) == 0)
 		return TRUE;
 
 	return FALSE;
