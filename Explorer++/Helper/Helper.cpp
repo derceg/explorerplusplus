@@ -2283,8 +2283,7 @@ void UpdateToolbarBandSizing(HWND hRebar,HWND hToolbar)
 		SendMessage(hToolbar,TB_GETMAXSIZE,0,(LPARAM)&sz);
 
 		rbbi.cbSize		= sizeof(rbbi);
-		rbbi.fMask		= RBBIM_SIZE|RBBIM_IDEALSIZE;
-		rbbi.cx			= sz.cx;
+		rbbi.fMask		= RBBIM_IDEALSIZE;
 		rbbi.cxIdeal	= sz.cx;
 		SendMessage(hRebar,RB_SETBANDINFO,iBand,(LPARAM)&rbbi);
 	}
