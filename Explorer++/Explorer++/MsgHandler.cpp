@@ -1847,6 +1847,7 @@ have their addresses locked will not change directory. */
 HRESULT Explorerplusplus::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 {
 	HRESULT hr = E_FAIL;
+	int iTabObjectIndex = -1;
 
 	if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
 	{
@@ -1855,12 +1856,18 @@ HRESULT Explorerplusplus::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 		if(SUCCEEDED(hr))
 		{
 			PlayNavigationSound();
-			OnDirChanged(m_iObjectIndex);
 		}
+
+		iTabObjectIndex = m_iObjectIndex;
 	}
 	else
 	{
-		hr = CreateNewTab(pidlDirectory,NULL,NULL,TRUE,NULL);
+		hr = CreateNewTab(pidlDirectory,NULL,NULL,TRUE,&iTabObjectIndex);
+	}
+
+	if(SUCCEEDED(hr))
+	{
+		OnDirChanged(iTabObjectIndex);
 	}
 
 	return hr;
