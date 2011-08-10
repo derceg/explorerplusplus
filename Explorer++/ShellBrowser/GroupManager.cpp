@@ -451,10 +451,10 @@ void CFolderView::DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,
 	and use it to determine which group it belongs to. */
 	ch = m_pExtraItemInfo[iItemInternal].szDisplayName[0];
 
-	if(isalpha(ch))
+	if(iswalpha(ch))
 	{
 		StringCchPrintf(szGroupHeader,cchMax,
-			_T("%c"),toupper(ch));
+			_T("%c"),towupper(ch));
 	}
 	else
 	{
