@@ -1151,15 +1151,12 @@ HRESULT Explorerplusplus::CloseTab(int TabIndex)
 				m_pTaskbarList3->UnregisterTab(itr->hProxy);
 
 				TabProxy_t *ptp = (TabProxy_t *)GetWindowLongPtr(itr->hProxy,GWLP_USERDATA);
-
+				DestroyWindow(itr->hProxy);
 				free(ptp);
 
-				DestroyWindow(itr->hProxy);
-
 				hIcon = (HICON)GetClassLongPtr(itr->hProxy,GCLP_HICONSM);
-				DestroyIcon(hIcon);
-
 				UnregisterClass((LPCWSTR)MAKEWORD(itr->atomClass,0),GetModuleHandle(0));
+				DestroyIcon(hIcon);
 
 				m_TabProxyList.erase(itr);
 				break;
