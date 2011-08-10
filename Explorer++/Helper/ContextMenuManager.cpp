@@ -4,7 +4,9 @@
  * File: ContextMenuManager.cpp
  * License: GPL - See COPYING in the top level directory
  *
- * Manages context menu extensions.
+ * This class is designed to show an existing menu, with
+ * has been modified to also show menu items inserted
+ * by shell extensions.
  *
  * Written by David Erceg
  * www.explorerplusplus.com
@@ -12,6 +14,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <vector>
 #include "ContextMenuManager.h"
 #include "ShellHelper.h"
 #include "Macros.h"
@@ -98,8 +101,8 @@ CContextMenuManager::CContextMenuManager(ContextMenuTypes ContextMenuType,
 			MenuHandler.pContextMenu2 = pContextMenu2;
 			MenuHandler.pContextMenu3 = pContextMenu3;
 
-			MenuHandler.iStartID = 0;
-			MenuHandler.iEndID = 0;
+			MenuHandler.uStartID = 0;
+			MenuHandler.uEndID = 0;
 
 			m_MenuHandlers.push_back(MenuHandler);
 		}
@@ -129,21 +132,79 @@ CContextMenuManager::~CContextMenuManager()
 	}
 }
 
-void CContextMenuManager::AddMenuEntries(HMENU hMenu,
-	int iStartPos,int iMinID,int iMaxID)
+bool CContextMenuManager::ShowMenu(HWND hwnd,HMENU hMenu,
+	UINT uIDPrevious,UINT uMinID,UINT uMaxID,const POINT &pt,
+	CStatusBar &StatusBar)
 {
+	if(hwnd == NULL ||
+		hMenu == NULL ||
+		uIDPrevious == 0 ||
+		uMaxID <= uMinID)
+	{
+		return false;
+	}
+
+	m_uMinID = uMinID;
+	m_uMaxID = uMaxID;
+	m_pStatusBar = &StatusBar;
+
+	AddMenuEntries(hMenu,uIDPrevious,uMinID,uMaxID);
+
+	SetWindowSubclass(hwnd,ContextMenuHookProc,CONTEXT_MENU_SUBCLASS_ID,
+		reinterpret_cast<DWORD_PTR>(this));
+
+	UINT uCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RIGHTBUTTON|
+		TPM_VERTICAL|TPM_RETURNCMD,pt.x,pt.y,0,hwnd,NULL);
+
+	RemoveWindowSubclass(hwnd,ContextMenuHookProc,CONTEXT_MENU_SUBCLASS_ID);
+
+	if(uCmd != 0)
+	{
+		if(uCmd >= uMinID && uCmd <= uMaxID)
+		{
+			InvokeMenuEntry(hwnd,uCmd);
+		}
+		else
+		{
+			SendMessage(hwnd,WM_COMMAND,MAKEWPARAM(uCmd,0),NULL);
+		}
+	}
+
+	return true;
+}
+
+void CContextMenuManager::AddMenuEntries(HMENU hMenu,
+	UINT uIDPrevious,int iMinID,int iMaxID)
+{
+	/* Shell extension menu items will be inserted
+	directly *after* this item. This is used rather
+	than a direct position, as some shell extensions
+	(such as the "Catalyst Context Menu") insert themselves
+	at positions other than the one specified. */
+	int iStartPos = GetMenuItemPos(hMenu,uIDPrevious) + 1;
+
+	/* First, add two separators to the menu; these
+	will "bracket" the shell extensions. */
+	MENUITEMINFO mii;
+	mii.cbSize	= sizeof(mii);
+	mii.fMask	= MIIM_FTYPE;
+	mii.fType	= MFT_SEPARATOR;
+	InsertMenuItem(hMenu,iStartPos,TRUE,&mii);
+	InsertMenuItem(hMenu,iStartPos + 1,TRUE,&mii);
+
+	iStartPos++;
+
 	int iOffset = 0;
 
-	/* Loop through each of the acquired IContextMenu
-	interfaces and add the required menu items. */
+	/* Loop through each of the acquired IContextMenu interfaces and add
+	the required menu items. */
 	for(auto itr = m_MenuHandlers.begin();itr != m_MenuHandlers.end();itr++)
 	{
 		if(itr->pContextMenuActual != NULL)
 		{
-			HMENU hDummyMenu = CreatePopupMenu();
-
 			HRESULT hr = itr->pContextMenuActual->QueryContextMenu(
-				hDummyMenu,0,iMinID + iOffset,iMaxID,CMF_NORMAL|CMF_EXPLORE);
+				hMenu,iStartPos,iMinID + iOffset,iMaxID,
+				CMF_NORMAL|CMF_EXPLORE);
 
 			if(HRESULT_SEVERITY(hr) == SEVERITY_SUCCESS)
 			{
@@ -151,99 +212,220 @@ void CContextMenuManager::AddMenuEntries(HMENU hMenu,
 
 				if(iCurrentOffset > 0)
 				{
-					MENUITEMINFO mii;
-					int nTotalMenuItems = 0;
-
 					/* Need to save ID offsets for this menu handler. */
-					itr->iStartID = iMinID + iOffset;
-					itr->iEndID = iMinID + iOffset + iCurrentOffset;
-
-					int nMenuItems = GetMenuItemCount(hDummyMenu);
-					UINT uDefault = GetMenuDefaultItem(hDummyMenu,FALSE,0);
-
-					/* Take items from the dummy menu, and
-					insert them into the real menu. Note
-					that beginning or trailing separators
-					will NOT be added. */
-					for(int i = 0;i < nMenuItems;i++)
-					{
-						TCHAR szText[256];
-
-						mii.cbSize		= sizeof(mii);
-						mii.fMask		= MIIM_BITMAP|MIIM_CHECKMARKS|MIIM_DATA|
-							MIIM_FTYPE|MIIM_ID|MIIM_STATE|MIIM_STRING|MIIM_SUBMENU;
-						mii.dwTypeData	= szText;
-						mii.cch			= SIZEOF_ARRAY(szText);
-						GetMenuItemInfo(hDummyMenu,i,TRUE,&mii);
-
-						if((i == 0 || i == (nMenuItems - 1)) &&
-							(mii.fType & MFT_SEPARATOR) == MFT_SEPARATOR)
-						{
-							continue;
-						}
-
-						InsertMenuItem(hMenu,iStartPos + nTotalMenuItems,TRUE,&mii);
-
-						/* If this menu item is the default on the dummy
-						menu, make it the default on the actual menu. */
-						if(uDefault != -1 && mii.wID == uDefault)
-						{
-							SetMenuDefaultItem(hMenu,mii.wID,FALSE);
-						}
-
-						if(mii.hSubMenu != NULL)
-						{
-							IContextMenu2 *pContextMenu2 = NULL;
-
-							if(itr->pContextMenu2 != NULL)
-							{
-								pContextMenu2 = itr->pContextMenu2;
-							}
-							else if(itr->pContextMenu3 != NULL)
-							{
-								pContextMenu2 = itr->pContextMenu3;
-							}
-
-							if(pContextMenu2 != NULL)
-							{
-								pContextMenu2->HandleMenuMsg(WM_INITMENUPOPUP,
-									(WPARAM)GetSubMenu(hMenu,iStartPos + nTotalMenuItems),
-									(LPARAM)MAKEWORD(iStartPos + nTotalMenuItems,FALSE));
-							}
-						}
-
-						nTotalMenuItems++;
-					}
-
-					/* Insert a trailing separator
-					after the shell extension menus. */
-					mii.cbSize		= sizeof(mii);
-					mii.fMask		= MIIM_FTYPE;
-					mii.fType		= MFT_SEPARATOR;
-					InsertMenuItem(hMenu,iStartPos + nTotalMenuItems,TRUE,&mii);
-
-					nTotalMenuItems++;
+					itr->uStartID = iMinID + iOffset;
+					itr->uEndID = iMinID + iOffset + iCurrentOffset;
 
 					iOffset += iCurrentOffset;
+
+					iStartPos = GetMenuItemPos(hMenu,uIDPrevious) + 2;
 				}
 			}
 		}
 	}
+
+	RemoveDuplicateSeperators(hMenu);
 }
 
-void CContextMenuManager::HandleMenuEntry(HWND hwnd,int iCmd)
+void CContextMenuManager::RemoveDuplicateSeperators(HMENU hMenu)
+{
+	std::vector<int> DeletionVector;
+
+	bool bPreviousItemSeperator = false;
+
+	for(int i = 0;i < GetMenuItemCount(hMenu);i++)
+	{
+		MENUITEMINFO mii;
+		mii.cbSize	= sizeof(mii);
+		mii.fMask	= MIIM_FTYPE;
+		GetMenuItemInfo(hMenu,i,TRUE,&mii);
+
+		bool bCurrentItemSeparator = (mii.fType & MFT_SEPARATOR) ? true : false;
+
+		if(bPreviousItemSeperator && bCurrentItemSeparator)
+		{
+			DeletionVector.push_back(i);
+		}
+
+		bPreviousItemSeperator = bCurrentItemSeparator;
+	}
+
+	for(auto itr = DeletionVector.rbegin();itr != DeletionVector.rend();itr++)
+	{
+		DeleteMenu(hMenu,*itr,MF_BYPOSITION);
+	}
+}
+
+LRESULT CALLBACK ContextMenuHookProc(HWND hwnd,UINT uMsg,
+	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+{
+	CContextMenuManager *pcmm = reinterpret_cast<CContextMenuManager *>(dwRefData);
+
+	switch(uMsg)
+	{
+	case WM_INITMENUPOPUP:
+	case WM_MEASUREITEM:
+	case WM_DRAWITEM:
+	case WM_MENUCHAR:
+		{
+			LRESULT lRes;
+			HRESULT hr = pcmm->HandleMenuMessage(uMsg,wParam,lParam,lRes);
+
+			if(SUCCEEDED(hr))
+			{
+				if(uMsg == WM_INITMENUPOPUP)
+				{
+					return 0;
+				}
+				else if(uMsg == WM_MEASUREITEM ||
+					uMsg == WM_DRAWITEM)
+				{
+					return TRUE;
+				}
+				else
+				{
+					return lRes;
+				}
+			}
+		}
+		break;
+
+	case WM_MENUSELECT:
+		{
+			if(HIWORD(wParam) == 0xFFFF && lParam == 0)
+			{
+				pcmm->m_pStatusBar->HandleStatusBarMenuClose();
+			}
+			else
+			{
+				pcmm->m_pStatusBar->HandleStatusBarMenuOpen();
+
+				UINT uCmd = LOWORD(wParam);
+
+				if(uCmd >= pcmm->m_uMinID && uCmd <= pcmm->m_uMaxID)
+				{
+					TCHAR szHelperText[512];
+
+					HRESULT hr = pcmm->GetMenuHelperText(LOWORD(wParam),szHelperText,SIZEOF_ARRAY(szHelperText));
+
+					if(hr == S_OK)
+					{
+						pcmm->m_pStatusBar->SetPartText(0,szHelperText);
+						return 0;
+					}
+				}
+			}
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+HRESULT CContextMenuManager::HandleMenuMessage(UINT uMsg,WPARAM wParam,
+	LPARAM lParam,LRESULT &lRes)
+{
+	UINT uItemID = static_cast<UINT>(-1);
+	bool bContextMenu3Required = false;
+
+	switch(uMsg)
+	{
+	case WM_INITMENUPOPUP:
+		uItemID = GetMenuItemID(reinterpret_cast<HMENU>(wParam),0);
+		break;
+
+	case WM_MEASUREITEM:
+		uItemID = reinterpret_cast<MEASUREITEMSTRUCT *>(lParam)->itemID;
+		break;
+
+	case WM_DRAWITEM:
+		uItemID = reinterpret_cast<DRAWITEMSTRUCT *>(lParam)->itemID;
+		break;
+
+	case WM_MENUCHAR:
+		uItemID = GetMenuItemID(reinterpret_cast<HMENU>(lParam),0);
+		bContextMenu3Required = true;
+		break;
+	}
+
+	HRESULT hr = E_FAIL;
+
+	if(uItemID != -1)
+	{
+		for each(auto MenuHandler in m_MenuHandlers)
+		{
+			if(uItemID >= MenuHandler.uStartID &&
+				uItemID < MenuHandler.uEndID)
+			{
+				if(MenuHandler.pContextMenu3 != NULL)
+				{
+					hr = MenuHandler.pContextMenu3->HandleMenuMsg2(uMsg,wParam,lParam,&lRes);
+				}
+				else if(MenuHandler.pContextMenu2 != NULL && !bContextMenu3Required)
+				{
+					hr = MenuHandler.pContextMenu2->HandleMenuMsg(uMsg,wParam,lParam);
+				}
+
+				break;
+			}
+		}
+	}
+
+	return hr;
+}
+
+/* See http://blogs.msdn.com/b/oldnewthing/archive/2004/09/28/235242.aspx for potential
+issues with this. */
+HRESULT CContextMenuManager::GetMenuHelperText(UINT uID,TCHAR *szText,UINT cchMax)
+{
+	HRESULT hr = E_FAIL;
+
+	for each(auto MenuHandler in m_MenuHandlers)
+	{
+		if(uID >= MenuHandler.uStartID &&
+			uID < MenuHandler.uEndID)
+		{
+			if(MenuHandler.pContextMenuActual != NULL)
+			{
+				hr = MenuHandler.pContextMenuActual->GetCommandString(uID - MenuHandler.uStartID,
+					GCS_HELPTEXT,NULL,reinterpret_cast<LPSTR>(szText),cchMax);
+			}
+
+			break;
+		}
+	}
+
+	return hr;
+}
+
+int CContextMenuManager::GetMenuItemPos(HMENU hMenu,UINT uID)
+{
+	int iPos = -1;
+
+	for(int i = 0;i < GetMenuItemCount(hMenu);i++)
+	{
+		if(GetMenuItemID(hMenu,i) == uID)
+		{
+			iPos = i;
+			break;
+		}
+	}
+
+	return iPos;
+}
+
+void CContextMenuManager::InvokeMenuEntry(HWND hwnd,UINT uCmd)
 {
 	for each(auto MenuHandler in m_MenuHandlers)
 	{
-		if(iCmd >= MenuHandler.iStartID &&
-			iCmd < MenuHandler.iEndID)
+		if(uCmd >= MenuHandler.uStartID &&
+			uCmd < MenuHandler.uEndID)
 		{
 			CMINVOKECOMMANDINFO	cmici;
-
 			cmici.cbSize		= sizeof(CMINVOKECOMMANDINFO);
 			cmici.fMask			= 0;
 			cmici.hwnd			= hwnd;
-			cmici.lpVerb		= (LPCSTR)MAKEWORD(iCmd - MenuHandler.iStartID,0);
+			cmici.lpVerb		= reinterpret_cast<LPCSTR>(MAKEWORD(uCmd - MenuHandler.uStartID,0));
 			cmici.lpParameters	= NULL;
 			cmici.lpDirectory	= NULL;
 			cmici.nShow			= SW_SHOW;

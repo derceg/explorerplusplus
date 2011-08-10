@@ -4,6 +4,7 @@
 #include <list>
 #include <ShObjIdl.h>
 #include "ShellHelper.h"
+#include "StatusBar.h"
 
 enum ContextMenuTypes
 {
@@ -13,6 +14,9 @@ enum ContextMenuTypes
 
 class CContextMenuManager
 {
+	friend LRESULT CALLBACK ContextMenuHookProc(HWND hwnd,UINT Msg,WPARAM wParam,
+	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+
 public:
 
 	/* Loads the context menu handlers bound to
@@ -23,13 +27,10 @@ public:
 	interfaces. */
 	~CContextMenuManager();
 
-	/* Adds the menu entries for each of the
-	context menu handlers that was initialized. */
-	void	AddMenuEntries(HMENU hMenu,int iStartPos,int iMinID,int iMaxID);
-
-	/* Handles a menu entry that was added by
-	one of the context menu handlers. */
-	void	HandleMenuEntry(HWND hwnd,int iCmd);
+	/* This will show the specified menu. Note that before
+	the menu is shown, this method will insert any loaded
+	shell extensions at the specified position. */
+	bool	ShowMenu(HWND hwnd,HMENU hMenu,UINT uIDPrevious,UINT uMinID,UINT uMaxID,const POINT &pt,CStatusBar &StatusBar);
 
 private:
 
@@ -45,12 +46,26 @@ private:
 		independent way. */
 		IContextMenu	*pContextMenuActual;
 
-		int				iStartID;
-		int				iEndID;
+		UINT			uStartID;
+		UINT			uEndID;
 	};
+
+	static const int	CONTEXT_MENU_SUBCLASS_ID = 1;
+
+	void	AddMenuEntries(HMENU hMenu,UINT uIDPrevious,int iMinID,int iMaxID);
+	HRESULT	HandleMenuMessage(UINT uMsg,WPARAM wParam,LPARAM lParam,LRESULT &lRes);
+	HRESULT	GetMenuHelperText(UINT uID,TCHAR *szText,UINT cchMax);
+	void	InvokeMenuEntry(HWND hwnd,UINT uCmd);
+
+	int		GetMenuItemPos(HMENU hMenu,UINT uID);
+	void	RemoveDuplicateSeperators(HMENU hMenu);
 
 	std::list<ContextMenuHandler_t>	m_ContextMenuHandlers;
 	std::list<MenuHandler_t>		m_MenuHandlers;
+
+	UINT							m_uMinID;
+	UINT							m_uMaxID;
+	CStatusBar						*m_pStatusBar;
 };
 
 #endif

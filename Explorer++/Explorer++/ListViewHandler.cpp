@@ -1106,7 +1106,7 @@ void Explorerplusplus::OnListViewRClick(HWND hParent,POINT *pCursorPos)
 	computer where new items can be created to one
 	where they cannot while the popup menu is still
 	active will cause the 'new' entry to stay on the
-	menu inccorectly).
+	menu incorrectly).
 	Due to the possibility of unforseen problems,
 	this function should NOT access the current
 	shell browser once the menu has been destroyed. */
@@ -1149,24 +1149,48 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	HMENU hMenu = InitializeRightClickMenu();
 	LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
-	CContextMenuManager ccm(CMT_DIRECTORY_BACKGROUND_HANDLERS,pidlDirectory,
-		NULL,reinterpret_cast<IUnknown *>(this));
+	LPITEMIDLIST pidlParent = ILClone(pidlDirectory);
+	ILRemoveLastID(pidlParent);
 
-	ccm.AddMenuEntries(hMenu,11,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID);
+	LPCITEMIDLIST pidlChildFolder = ILFindLastID(pidlDirectory);
 
-	int iCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RIGHTBUTTON|
-		TPM_VERTICAL|TPM_RETURNCMD,pCursorPos->x,pCursorPos->y,0,
-		m_hContainer,NULL);
+	IShellFolder *pShellFolder = NULL;
+	HRESULT hr;
 
-	if(iCmd >= MIN_SHELL_MENU_ID && iCmd <= MAX_SHELL_MENU_ID)
+	if(IsNamespaceRoot(pidlParent))
 	{
-		ccm.HandleMenuEntry(m_hContainer,iCmd);
+		hr = SHGetDesktopFolder(&pShellFolder);
 	}
 	else
 	{
-		SendMessage(m_hContainer,WM_COMMAND,MAKEWPARAM(iCmd,0),NULL);
+		IShellFolder *pDesktopFolder = NULL;
+		SHGetDesktopFolder(&pDesktopFolder);
+		hr = pDesktopFolder->BindToObject(pidlParent,NULL,
+			IID_IShellFolder,reinterpret_cast<void **>(&pShellFolder));
+		pDesktopFolder->Release();
 	}
 
+	if(SUCCEEDED(hr))
+	{
+		IDataObject *pDataObject = NULL;
+		hr = pShellFolder->GetUIObjectOf(NULL,1,&pidlChildFolder,IID_IDataObject,
+			NULL,reinterpret_cast<void **>(&pDataObject));
+
+		if(SUCCEEDED(hr))
+		{
+			CContextMenuManager cmm(CMT_DIRECTORY_BACKGROUND_HANDLERS,pidlDirectory,
+				pDataObject,reinterpret_cast<IUnknown *>(this));
+
+			cmm.ShowMenu(m_hContainer,hMenu,IDM_FILE_COPYFOLDERPATH,MIN_SHELL_MENU_ID,
+				MAX_SHELL_MENU_ID,*pCursorPos,*m_pStatusBar);
+
+			pDataObject->Release();
+		}
+
+		pShellFolder->Release();
+	}
+
+	CoTaskMemFree(pidlParent);
 	CoTaskMemFree(pidlDirectory);
 	DestroyMenu(hMenu);
 }
