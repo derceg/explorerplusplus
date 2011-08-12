@@ -750,15 +750,21 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 
 	if(SUCCEEDED(hr))
 	{
-		if((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM) &&
-			!m_bHandleZipFiles)
+		if((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM))
 		{
-			/* Don't open zip file as folder. */
-			OpenFileItem(pidlItem,EMPTY_STRING);
+			/* Zip file. */
+			if(m_bHandleZipFiles)
+			{
+				OpenFolderItem(pidlItem,bOpenInNewTab,bOpenInNewWindow);
+			}
+			else
+			{
+				OpenFileItem(pidlItem,EMPTY_STRING);
+			}
 		}
-		else if(((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM)
-			&& m_bHandleZipFiles) || ((uAttributes & SFGAO_FOLDER) && !bControlPanelParent))
+		else if(((uAttributes & SFGAO_FOLDER) && !bControlPanelParent))
 		{
+			/* Open folders. */
 			OpenFolderItem(pidlItem,bOpenInNewTab,bOpenInNewWindow);
 		}
 		else if(uAttributes & SFGAO_LINK && !bControlPanelParent)
@@ -776,7 +782,7 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 				/* The target of the shortcut was found
 				successfully. Query it to determine whether
 				it is a folder or not. */
-				uAttributes = SFGAO_FOLDER;
+				uAttributes = SFGAO_FOLDER|SFGAO_STREAM;
 				hr = GetItemAttributes(szTargetPath,&uAttributes);
 
 				/* Note this is functionally equivalent to
@@ -787,7 +793,9 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 				without some way of stopping. */
 				if(SUCCEEDED(hr))
 				{
-					if((uAttributes & SFGAO_FOLDER))
+					/* Is this a link to a folder or zip file? */
+					if(((uAttributes & SFGAO_FOLDER) && !(uAttributes & SFGAO_STREAM)) ||
+						((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM) && m_bHandleZipFiles))
 					{
 						LPITEMIDLIST	pidlTarget = NULL;
 
