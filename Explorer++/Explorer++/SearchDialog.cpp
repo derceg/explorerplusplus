@@ -1146,7 +1146,7 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 
 				if(m_dwAttributes != 0)
 				{
-					if(wfd.dwFileAttributes & m_dwAttributes)
+					if((wfd.dwFileAttributes & m_dwAttributes) == m_dwAttributes)
 					{
 						bMatchAttributes = TRUE;
 					}
