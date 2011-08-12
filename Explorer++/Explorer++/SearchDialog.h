@@ -38,25 +38,45 @@ private:
 
 	static const TCHAR SETTINGS_KEY[];
 
+	enum SortMode_t
+	{
+		SORT_NAME = 1,
+		SORT_PATH = 2
+	};
+
+	struct ColumnInfo_t
+	{
+		SortMode_t	SortMode;
+		UINT		uStringID;
+
+		/* Indicates whether the sort direction
+		for this column should be ascending by
+		default. */
+		bool		bSortAscending;
+	};
+
 	CSearchDialogPersistentSettings();
 
 	CSearchDialogPersistentSettings(const CSearchDialogPersistentSettings &);
 	CSearchDialogPersistentSettings & operator=(const CSearchDialogPersistentSettings &);
 
-	TCHAR			m_szSearchPattern[MAX_PATH];
-	std::list<std::wstring>	m_SearchDirectories;
-	std::list<std::wstring>	m_SearchPatterns;
-	BOOL			m_bSearchSubFolders;
-	BOOL			m_bUseRegularExpressions;
-	BOOL			m_bCaseInsensitive;
-	BOOL			m_bArchive;
-	BOOL			m_bHidden;
-	BOOL			m_bReadOnly;
-	BOOL			m_bSystem;
+	TCHAR						m_szSearchPattern[MAX_PATH];
+	std::list<std::wstring>		m_SearchDirectories;
+	std::list<std::wstring>		m_SearchPatterns;
+	BOOL						m_bSearchSubFolders;
+	BOOL						m_bUseRegularExpressions;
+	BOOL						m_bCaseInsensitive;
+	BOOL						m_bArchive;
+	BOOL						m_bHidden;
+	BOOL						m_bReadOnly;
+	BOOL						m_bSystem;
 
-	/* Control size properties. */
-	int				m_iColumnWidth1;
-	int				m_iColumnWidth2;
+	std::vector<ColumnInfo_t>	m_Columns;
+	SortMode_t					m_SortMode;
+	BOOL						m_bSortAscending;
+
+	int							m_iColumnWidth1;
+	int							m_iColumnWidth2;
 };
 
 class CSearch : public CReferenceCount
@@ -135,19 +155,8 @@ private:
 
 	static const int MENU_ID_OPEN_FILE_LOCATION = (MAX_SHELL_MENU_ID + 1);
 
-	/* Available search modes. */
-	enum SortMode_t
-	{
-		SORT_NAME,
-		SORT_PATH
-	};
-
-	struct ColumnInfo_t
-	{
-		SortMode_t	SearchMode;
-	};
-
-	void	OnSearch();
+	void						OnSearch();
+	void						UpdateListViewHeader();
 
 	TCHAR						m_szSearchDirectory[MAX_PATH];
 	HICON						m_hDialogIcon;
@@ -157,7 +166,6 @@ private:
 	TCHAR						m_szSearchButton[32];
 	BOOL						m_bExit;
 
-	/* Search data. */
 	CSearch						*m_pSearch;
 
 	/* Listview item information. */
@@ -165,9 +173,7 @@ private:
 	std::list<LPITEMIDLIST>		m_SearchItems;
 	std::unordered_map<int,std::wstring>	m_SearchItemsMapInternal;
 	int							m_iInternalIndex;
-	std::vector<ColumnInfo_t>	m_Columns;
-	SortMode_t					m_SortMode;
-	BOOL						m_bSortAscending;
+	int							m_iPreviousSelectedColumn;
 
 	BOOL						m_bSetSearchTimer;
 

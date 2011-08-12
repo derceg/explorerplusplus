@@ -49,21 +49,13 @@ CBaseDialog(hInstance,iResource,hParent,true)
 
 	m_pexpp = pexpp;
 
-	m_bSearching = FALSE;
-	m_bStopSearching = FALSE;
-	m_bExit = FALSE;
-	m_bSetSearchTimer = TRUE;
-	m_iInternalIndex = 0;
-
-	ColumnInfo_t ci;
-
-	ci.SearchMode = SORT_NAME;
-	m_Columns.push_back(ci);
-
-	ci.SearchMode = SORT_PATH;
-	m_Columns.push_back(ci);
-
-	m_pSearch = NULL;
+	m_bSearching		= FALSE;
+	m_bStopSearching	= FALSE;
+	m_bExit				= FALSE;
+	m_bSetSearchTimer	= TRUE;
+	m_iInternalIndex	= 0;
+	m_iPreviousSelectedColumn	= -1;
+	m_pSearch			= NULL;
 
 	m_sdps = &CSearchDialogPersistentSettings::GetInstance();
 }
@@ -111,26 +103,28 @@ BOOL CSearchDialog::OnInitDialog()
 
 	SetWindowTheme(hListView,L"Explorer",NULL);
 
-	LVCOLUMN lvColumn;
-	TCHAR szTemp[128];
+	int i = 0;
 
-	LoadString(GetInstance(),IDS_SEARCH_COLUMN_NAME,
-		szTemp,SIZEOF_ARRAY(szTemp));
-	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= szTemp;
-	ListView_InsertColumn(hListView,0,&lvColumn);
+	for each(auto ci in m_sdps->m_Columns)
+	{
+		TCHAR szTemp[128];
+		LoadString(GetInstance(),ci.uStringID,szTemp,SIZEOF_ARRAY(szTemp));
 
-	LoadString(GetInstance(),IDS_SEARCH_COLUMN_PATH,
-		szTemp,SIZEOF_ARRAY(szTemp));
-	lvColumn.mask		= LVCF_TEXT;
-	lvColumn.pszText	= szTemp;
-	ListView_InsertColumn(hListView,1,&lvColumn);
+		LVCOLUMN lvColumn;
+		lvColumn.mask		= LVCF_TEXT;
+		lvColumn.pszText	= szTemp;
+		ListView_InsertColumn(hListView,i,&lvColumn);
+
+		i++;
+	}
 
 	RECT rc;
 	GetClientRect(hListView,&rc);
 
 	ListView_SetColumnWidth(hListView,0,(1.0/3.0) * GetRectWidth(&rc));
 	ListView_SetColumnWidth(hListView,1,(1.80/3.0) * GetRectWidth(&rc));
+
+	UpdateListViewHeader();
 
 	lCheckDlgButton(m_hDlg,IDC_CHECK_ARCHIVE,m_sdps->m_bArchive);
 	lCheckDlgButton(m_hDlg,IDC_CHECK_HIDDEN,m_sdps->m_bHidden);
@@ -493,6 +487,60 @@ void CSearchDialog::OnSearch()
 	}
 }
 
+void CSearchDialog::UpdateListViewHeader()
+{
+	HWND hHeader = ListView_GetHeader(GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS));
+
+	HDITEM hdItem;
+
+	/* Remove the sort arrow from the column that was
+	previously selected. */
+	if(m_iPreviousSelectedColumn != -1)
+	{
+		hdItem.mask	= HDI_FORMAT;
+		Header_GetItem(hHeader,m_iPreviousSelectedColumn,&hdItem);
+
+		if(hdItem.fmt & HDF_SORTUP)
+		{
+			hdItem.fmt &= ~HDF_SORTUP;
+		}
+		else if(hdItem.fmt & HDF_SORTDOWN)
+		{
+			hdItem.fmt &= ~HDF_SORTDOWN;
+		}
+
+		Header_SetItem(hHeader,m_iPreviousSelectedColumn,&hdItem);
+	}
+
+	int iColumn = 0;
+
+	for each(auto ci in m_sdps->m_Columns)
+	{
+		if(ci.SortMode == m_sdps->m_SortMode)
+		{
+			break;
+		}
+
+		iColumn++;
+	}
+
+	hdItem.mask	= HDI_FORMAT;
+	Header_GetItem(hHeader,iColumn,&hdItem);
+
+	if(m_sdps->m_bSortAscending)
+	{
+		hdItem.fmt |= HDF_SORTUP;
+	}
+	else
+	{
+		hdItem.fmt |= HDF_SORTDOWN;
+	}
+
+	Header_SetItem(hHeader,iColumn,&hdItem);
+
+	m_iPreviousSelectedColumn = iColumn;
+}
+
 int CALLBACK NSearchDialog::SortResultsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
 	assert(lParamSort != NULL);
@@ -506,18 +554,18 @@ int CALLBACK CSearchDialog::SortResults(LPARAM lParam1,LPARAM lParam2)
 {
 	int iRes = 0;
 
-	switch(m_SortMode)
+	switch(m_sdps->m_SortMode)
 	{
-	case SORT_NAME:
+	case CSearchDialogPersistentSettings::SORT_NAME:
 		iRes = SortResultsByName(lParam1,lParam2);
 		break;
 
-	case SORT_PATH:
+	case CSearchDialogPersistentSettings::SORT_PATH:
 		iRes = SortResultsByPath(lParam1,lParam2);
 		break;
 	}
 
-	if(!m_bSortAscending)
+	if(!m_sdps->m_bSortAscending)
 	{
 		iRes = -iRes;
 	}
@@ -741,17 +789,20 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 
 			/* If the column clicked matches the current sort mode,
 			flip the sort direction, else switch to that sort mode. */
-			if(m_Columns[pnmlv->iSubItem].SearchMode == m_SortMode)
+			if(m_sdps->m_Columns[pnmlv->iSubItem].SortMode == m_sdps->m_SortMode)
 			{
-				m_bSortAscending = !m_bSortAscending;
+				m_sdps->m_bSortAscending = !m_sdps->m_bSortAscending;
 			}
 			else
 			{
-				m_SortMode = m_Columns[pnmlv->iSubItem].SearchMode;
+				m_sdps->m_SortMode = m_sdps->m_Columns[pnmlv->iSubItem].SortMode;
+				m_sdps->m_bSortAscending = m_sdps->m_Columns[pnmlv->iSubItem].bSortAscending;
 			}
 
 			ListView_SortItems(GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS),
 				NSearchDialog::SortResultsStub,reinterpret_cast<LPARAM>(this));
+
+			UpdateListViewHeader();
 		}
 		break;
 	}
@@ -1192,18 +1243,32 @@ void CSearchDialog::SaveState()
 CSearchDialogPersistentSettings::CSearchDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
 {
-	m_bSearchSubFolders = TRUE;
-	m_bUseRegularExpressions = FALSE;
-	m_bCaseInsensitive = FALSE;
-	m_bArchive = FALSE;
-	m_bHidden = FALSE;
-	m_bReadOnly = FALSE;
-	m_bSystem = FALSE;
-	m_iColumnWidth1 = -1;
-	m_iColumnWidth2 = -1;
+	m_bSearchSubFolders			= TRUE;
+	m_bUseRegularExpressions	= FALSE;
+	m_bCaseInsensitive			= FALSE;
+	m_bArchive					= FALSE;
+	m_bHidden					= FALSE;
+	m_bReadOnly					= FALSE;
+	m_bSystem					= FALSE;
+	m_iColumnWidth1				= -1;
+	m_iColumnWidth2				= -1;
 
 	StringCchCopy(m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern),
 		EMPTY_STRING);
+
+	ColumnInfo_t ci;
+	ci.SortMode		= SORT_NAME;
+	ci.uStringID		= IDS_SEARCH_COLUMN_NAME;
+	ci.bSortAscending	= true;
+	m_Columns.push_back(ci);
+
+	ci.SortMode		= SORT_PATH;
+	ci.uStringID		= IDS_SEARCH_COLUMN_PATH;
+	ci.bSortAscending	= true;
+	m_Columns.push_back(ci);
+
+	m_SortMode			= m_Columns.front().SortMode;
+	m_bSortAscending	= m_Columns.front().bSortAscending;
 }
 
 CSearchDialogPersistentSettings::~CSearchDialogPersistentSettings()
@@ -1231,6 +1296,8 @@ void CSearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 	NRegistrySettings::SaveDwordToRegistry(hKey,_T("System"),m_bSystem);
 	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Directory"),m_SearchDirectories);
 	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Pattern"),m_SearchPatterns);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("SortMode"),m_SortMode);
+	NRegistrySettings::SaveDwordToRegistry(hKey,_T("SortAscending"),m_bSortAscending);
 }
 
 void CSearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
@@ -1247,6 +1314,8 @@ void CSearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("System"),reinterpret_cast<LPDWORD>(&m_bSystem));
 	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Directory"),m_SearchDirectories);
 	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Pattern"),m_SearchPatterns);
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("SortMode"),reinterpret_cast<LPDWORD>(&m_SortMode));
+	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("SortAscending"),reinterpret_cast<LPDWORD>(&m_bSortAscending));
 }
 
 void CSearchDialogPersistentSettings::SaveExtraXMLSettings(
@@ -1264,6 +1333,8 @@ void CSearchDialogPersistentSettings::SaveExtraXMLSettings(
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Hidden"),NXMLSettings::EncodeBoolValue(m_bHidden));
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ReadOnly"),NXMLSettings::EncodeBoolValue(m_bReadOnly));
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("System"),NXMLSettings::EncodeBoolValue(m_bSystem));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortMode"),NXMLSettings::EncodeIntValue(m_SortMode));
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortAscending"),NXMLSettings::EncodeBoolValue(m_bSortAscending));
 }
 
 void CSearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
@@ -1315,5 +1386,24 @@ void CSearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bs
 	else if(lstrcmpi(bstrName,_T("System")) == 0)
 	{
 		m_bSystem = NXMLSettings::DecodeBoolValue(bstrValue);
+	}
+	else if(lstrcmpi(bstrName,_T("SortMode")) == 0)
+	{
+		int SortMode = NXMLSettings::DecodeIntValue(bstrValue);
+
+		switch(SortMode)
+		{
+		case SORT_NAME:
+			m_SortMode = SORT_NAME;
+			break;
+
+		case SORT_PATH:
+			m_SortMode = SORT_PATH;
+			break;
+		}
+	}
+	else if(lstrcmpi(bstrName,_T("SortAscending")) == 0)
+	{
+		m_bSortAscending = NXMLSettings::DecodeBoolValue(bstrValue);
 	}
 }
