@@ -6,12 +6,6 @@
 #include "ShellHelper.h"
 #include "StatusBar.h"
 
-enum ContextMenuTypes
-{
-	CMT_DIRECTORY_BACKGROUND_HANDLERS,
-	CMT_DRAGDROP_HANDLERS
-};
-
 class CContextMenuManager
 {
 	friend LRESULT CALLBACK ContextMenuHookProc(HWND hwnd,UINT Msg,WPARAM wParam,
@@ -19,9 +13,15 @@ class CContextMenuManager
 
 public:
 
+	enum ContextMenuType_t
+	{
+		CONTEXT_MENU_TYPE_BACKGROUND,
+		CONTEXT_MENU_TYPE_DRAG_AND_DROP
+	};
+
 	/* Loads the context menu handlers bound to
 	a specific registry key. */
-	CContextMenuManager(ContextMenuTypes ContextMenuType,LPCITEMIDLIST pidlDirectory,IDataObject *pDataObject,IUnknown *pUnkSite);
+	CContextMenuManager(ContextMenuType_t ContextMenuType,LPCITEMIDLIST pidlDirectory,IDataObject *pDataObject,IUnknown *pUnkSite);
 
 	/* Releases the DLL's as well as the IUnknown
 	interfaces. */
@@ -33,6 +33,13 @@ public:
 	bool	ShowMenu(HWND hwnd,HMENU hMenu,UINT uIDPrevious,UINT uMinID,UINT uMaxID,const POINT &pt,CStatusBar &StatusBar);
 
 private:
+
+	enum ItemType_t
+	{
+		ITEM_TYPE_FOLDER,
+		ITEM_TYPE_DIRECTORY,
+		ITEM_TYPE_FILE
+	};
 
 	struct MenuHandler_t
 	{
@@ -52,6 +59,11 @@ private:
 
 	static const int	CONTEXT_MENU_SUBCLASS_ID = 1;
 
+	/* Context menu handler registry entries. */
+	static const TCHAR CMH_DIRECTORY_BACKGROUND[];
+	static const TCHAR CMH_DIRECTORY_DRAG_AND_DROP[];
+	static const TCHAR CMH_FOLDER_DRAG_AND_DROP[];
+
 	void	AddMenuEntries(HMENU hMenu,UINT uIDPrevious,int iMinID,int iMaxID);
 	HRESULT	HandleMenuMessage(UINT uMsg,WPARAM wParam,LPARAM lParam,LRESULT &lRes);
 	HRESULT	GetMenuHelperText(UINT uID,TCHAR *szText,UINT cchMax);
@@ -59,6 +71,8 @@ private:
 
 	int		GetMenuItemPos(HMENU hMenu,UINT uID);
 	void	RemoveDuplicateSeperators(HMENU hMenu);
+
+	ItemType_t	GetItemType(LPCITEMIDLIST pidl);
 
 	std::list<ContextMenuHandler_t>	m_ContextMenuHandlers;
 	std::list<MenuHandler_t>		m_MenuHandlers;

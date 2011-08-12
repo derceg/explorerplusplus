@@ -1194,7 +1194,7 @@ is up to the caller to free both the DLL's and objects
 returned.
 
 http://www.ureader.com/msg/16601280.aspx */
-BOOL LoadContextMenuHandlers(IN TCHAR *szRegKey,
+BOOL LoadContextMenuHandlers(IN const TCHAR *szRegKey,
 	OUT std::list<ContextMenuHandler_t> *pContextMenuHandlers)
 {
 	HKEY hKey = NULL;
