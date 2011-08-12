@@ -265,33 +265,38 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 			break;
 
 		case WM_COMMAND:
-			switch(HIWORD(wParam))
+			if(HIWORD(wParam) != 0)
 			{
-			case EN_CHANGE:
-			case CBN_SELCHANGE:
-				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
-			}
-
-			switch(LOWORD(wParam))
-			{
-			case IDC_STARTUP_PREVIOUSTABS:
-			case IDC_STARTUP_DEFAULTFOLDER:
-				if(IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED)
+				switch(HIWORD(wParam))
+				{
+				case EN_CHANGE:
+				case CBN_SELCHANGE:
 					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
+					break;
+				}
+			}
+			else
+			{
+				switch(LOWORD(wParam))
+				{
+				case IDC_STARTUP_PREVIOUSTABS:
+				case IDC_STARTUP_DEFAULTFOLDER:
+					if(IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED)
+						PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					break;
 
-			case IDC_OPTION_REPLACEEXPLORER_NONE:
-			case IDC_OPTION_REPLACEEXPLORER_FILESYSTEM:
-			case IDC_OPTION_REPLACEEXPLORER_ALL:
-			case IDC_OPTION_XML:
-				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
+				case IDC_OPTION_REPLACEEXPLORER_NONE:
+				case IDC_OPTION_REPLACEEXPLORER_FILESYSTEM:
+				case IDC_OPTION_REPLACEEXPLORER_ALL:
+				case IDC_OPTION_XML:
+					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					break;
 
-			case IDC_DEFAULT_NEWTABDIR_BUTTON:
-				OnDefaultSettingsNewTabDir(hDlg);
-				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
+				case IDC_DEFAULT_NEWTABDIR_BUTTON:
+					OnDefaultSettingsNewTabDir(hDlg);
+					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					break;
+				}
 			}
 			break;
 
@@ -398,7 +403,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 								}
 								CheckDlgButton(hDlg,nIDButton,BST_UNCHECKED);
 
-								/* The defaultfile manager setting was not changed, so
+								/* The default file manager setting was not changed, so
 								reset the state of the file manager radio buttons. */
 								switch(m_ReplaceExplorerMode)
 								{
@@ -548,47 +553,59 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 			break;
 
 		case WM_COMMAND:
-			switch(LOWORD(wParam))
+			if(HIWORD(wParam) != 0)
 			{
-			case IDC_SETTINGS_CHECK_SYSTEMFILES:
-			case IDC_SETTINGS_CHECK_EXTENSIONS:
-			case IDC_SETTINGS_CHECK_LINK:
-			case IDC_SETTINGS_CHECK_INSERTSORTED:
-			case IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION:
-			case IDC_OPTIONS_PLAYNAVIGATIONSOUND:
-			case IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE:
-			case IDC_SETTINGS_CHECK_ZIPFILES:
-			case IDC_SETTINGS_CHECK_FRIENDLYDATES:
-			case IDC_OPTIONS_HOVER_TIME:
-				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
-
-			case IDC_SETTINGS_CHECK_FORCESIZE:
-				EnableWindow(GetDlgItem(hDlg,IDC_COMBO_FILESIZES),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
-				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
-
-			case IDC_OPTIONS_RADIO_SYSTEMINFOTIPS:
-			case IDC_OPTIONS_RADIO_CUSTOMINFOTIPS:
-				if(IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED)
+				switch(HIWORD(wParam))
+				{
+				case CBN_SELCHANGE:
 					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
+					break;
+				}
+			}
+			else
+			{
+				switch(LOWORD(wParam))
+				{
+				case IDC_SETTINGS_CHECK_SYSTEMFILES:
+				case IDC_SETTINGS_CHECK_EXTENSIONS:
+				case IDC_SETTINGS_CHECK_LINK:
+				case IDC_SETTINGS_CHECK_INSERTSORTED:
+				case IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION:
+				case IDC_OPTIONS_PLAYNAVIGATIONSOUND:
+				case IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE:
+				case IDC_SETTINGS_CHECK_ZIPFILES:
+				case IDC_SETTINGS_CHECK_FRIENDLYDATES:
+				case IDC_OPTIONS_HOVER_TIME:
+					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					break;
 
-			case IDC_OPTIONS_CHECK_SHOWINFOTIPS:
-				SetInfoTipWindowStates(hDlg);
-				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
+				case IDC_SETTINGS_CHECK_FORCESIZE:
+					EnableWindow(GetDlgItem(hDlg,IDC_COMBO_FILESIZES),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
+					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					break;
 
-			case IDC_SETTINGS_CHECK_FOLDERSIZES:
-				SetFolderSizeWindowState(hDlg);
-				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
+				case IDC_OPTIONS_RADIO_SYSTEMINFOTIPS:
+				case IDC_OPTIONS_RADIO_CUSTOMINFOTIPS:
+					if(IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED)
+						PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					break;
 
-			case IDC_SETTINGS_CHECK_SINGLECLICK:
-				EnableWindow(GetDlgItem(hDlg,IDC_OPTIONS_HOVER_TIME),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
-				EnableWindow(GetDlgItem(hDlg,IDC_LABEL_HOVER_TIME),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
-				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
+				case IDC_OPTIONS_CHECK_SHOWINFOTIPS:
+					SetInfoTipWindowStates(hDlg);
+					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					break;
+
+				case IDC_SETTINGS_CHECK_FOLDERSIZES:
+					SetFolderSizeWindowState(hDlg);
+					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					break;
+
+				case IDC_SETTINGS_CHECK_SINGLECLICK:
+					EnableWindow(GetDlgItem(hDlg,IDC_OPTIONS_HOVER_TIME),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
+					EnableWindow(GetDlgItem(hDlg,IDC_LABEL_HOVER_TIME),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
+					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					break;
+				}
 			}
 			break;
 
