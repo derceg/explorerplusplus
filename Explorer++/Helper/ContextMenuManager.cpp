@@ -8,6 +8,9 @@
  * has been modified to also show menu items inserted
  * by shell extensions.
  *
+ * References:
+ * http://windowsxp.mvps.org/context_folders.htm
+ *
  * Written by David Erceg
  * www.explorerplusplus.com
  *
@@ -15,10 +18,15 @@
 
 #include "stdafx.h"
 #include <vector>
+#include "Helper.h"
 #include "ContextMenuManager.h"
 #include "ShellHelper.h"
 #include "Macros.h"
 
+
+const TCHAR CContextMenuManager::CMH_FOLDER_DRAG_AND_DROP[] = _T("Folder\\ShellEx\\DragDropHandlers");
+const TCHAR CContextMenuManager::CMH_DIRECTORY_BACKGROUND[] = _T("Directory\\Background\\shellex\\ContextMenuHandlers");
+const TCHAR CContextMenuManager::CMH_DIRECTORY_DRAG_AND_DROP[] = _T("Directory\\shellex\\DragDropHandlers");
 
 /* The following steps are taken when showing shell
 extensions on an existing menu:
@@ -26,85 +34,100 @@ extensions on an existing menu:
 2. Build and show menu.
 3. Pass selection to shell extension (if necessary).
 4. Release shell extensions (also free the DLL's they reside in). */
-CContextMenuManager::CContextMenuManager(ContextMenuTypes ContextMenuType,
+CContextMenuManager::CContextMenuManager(ContextMenuType_t ContextMenuType,
 	LPCITEMIDLIST pidlDirectory,IDataObject *pDataObject,IUnknown *pUnkSite)
 {
-	TCHAR *pszRegContext = NULL;
+	ItemType_t ItemType = GetItemType(pidlDirectory);
 
-	switch(ContextMenuType)
+	const TCHAR *pszRegContext = NULL;
+
+	switch(ItemType)
 	{
-	case CMT_DIRECTORY_BACKGROUND_HANDLERS:
-		pszRegContext = CMH_DIRECTORY_BACKGROUND;
+	case ITEM_TYPE_FOLDER:
+		if(ContextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
+		{
+			pszRegContext = CMH_FOLDER_DRAG_AND_DROP;
+		}
 		break;
 
-	case CMT_DRAGDROP_HANDLERS:
-		pszRegContext = CMH_DRAGDROP_HANDLERS;
+	case ITEM_TYPE_DIRECTORY:
+		if(ContextMenuType == CONTEXT_MENU_TYPE_BACKGROUND)
+		{
+			pszRegContext = CMH_DIRECTORY_BACKGROUND;
+		}
+		else if(ContextMenuType == CONTEXT_MENU_TYPE_DRAG_AND_DROP)
+		{
+			pszRegContext = CMH_DIRECTORY_DRAG_AND_DROP;
+		}
 		break;
 	}
 
-	LoadContextMenuHandlers(pszRegContext,&m_ContextMenuHandlers);
-
-	/* Initialize the shell extensions, and extract
-	an IContextMenu interface. */
-	for each(auto ContextMenuHandler in m_ContextMenuHandlers)
+	if(pszRegContext != NULL)
 	{
-		IShellExtInit *pShellExtInit = NULL;
-		HRESULT hr;
+		LoadContextMenuHandlers(pszRegContext,&m_ContextMenuHandlers);
 
-		IUnknown *pUnknown = ContextMenuHandler.pUnknown;
-
-		hr = pUnknown->QueryInterface(IID_IShellExtInit,
-			reinterpret_cast<void **>(&pShellExtInit));
-
-		if(SUCCEEDED(hr))
+		/* Initialize the shell extensions, and extract
+		an IContextMenu interface. */
+		for each(auto ContextMenuHandler in m_ContextMenuHandlers)
 		{
-			MenuHandler_t MenuHandler;
-			IContextMenu *pContextMenu = NULL;
-			IContextMenu2 *pContextMenu2 = NULL;
-			IContextMenu3 *pContextMenu3 = NULL;
+			IShellExtInit *pShellExtInit = NULL;
+			HRESULT hr;
 
-			pShellExtInit->Initialize(pidlDirectory,pDataObject,NULL);
-			pShellExtInit->Release();
+			IUnknown *pUnknown = ContextMenuHandler.pUnknown;
 
-			if(pUnkSite != NULL)
+			hr = pUnknown->QueryInterface(IID_IShellExtInit,
+				reinterpret_cast<void **>(&pShellExtInit));
+
+			if(SUCCEEDED(hr))
 			{
-				IObjectWithSite *pObjectSite = NULL;
+				MenuHandler_t MenuHandler;
+				IContextMenu *pContextMenu = NULL;
+				IContextMenu2 *pContextMenu2 = NULL;
+				IContextMenu3 *pContextMenu3 = NULL;
 
-				hr = pUnknown->QueryInterface(IID_IObjectWithSite,reinterpret_cast<void **>(&pObjectSite));
+				pShellExtInit->Initialize(pidlDirectory,pDataObject,NULL);
+				pShellExtInit->Release();
 
-				if(SUCCEEDED(hr))
+				if(pUnkSite != NULL)
 				{
-					pObjectSite->SetSite(pUnkSite);
-					pObjectSite->Release();
+					IObjectWithSite *pObjectSite = NULL;
+
+					hr = pUnknown->QueryInterface(IID_IObjectWithSite,reinterpret_cast<void **>(&pObjectSite));
+
+					if(SUCCEEDED(hr))
+					{
+						pObjectSite->SetSite(pUnkSite);
+						pObjectSite->Release();
+					}
 				}
-			}
 
-			hr = pUnknown->QueryInterface(IID_IContextMenu3,
-				reinterpret_cast<void **>(&pContextMenu3));
-			MenuHandler.pContextMenuActual = pContextMenu3;
+				hr = pUnknown->QueryInterface(IID_IContextMenu3,
+					reinterpret_cast<void **>(&pContextMenu3));
+				MenuHandler.pContextMenuActual = pContextMenu3;
 
-			if(FAILED(hr) || pContextMenu3 == NULL)
-			{
-				hr = pUnknown->QueryInterface(IID_IContextMenu2,
-					reinterpret_cast<void **>(&pContextMenu2));
-				MenuHandler.pContextMenuActual = pContextMenu2;
-
-				if(FAILED(hr) || pContextMenu2 == NULL)
+				if(FAILED(hr) || pContextMenu3 == NULL)
 				{
-					hr = pUnknown->QueryInterface(IID_IContextMenu,
-						reinterpret_cast<void **>(&pContextMenu));
-					MenuHandler.pContextMenuActual = pContextMenu;
+					hr = pUnknown->QueryInterface(IID_IContextMenu2,
+						reinterpret_cast<void **>(&pContextMenu2));
+					MenuHandler.pContextMenuActual = pContextMenu2;
+
+					if(FAILED(hr) || pContextMenu2 == NULL)
+					{
+						hr = pUnknown->QueryInterface(IID_IContextMenu,
+							reinterpret_cast<void **>(&pContextMenu));
+						MenuHandler.pContextMenuActual = pContextMenu;
+					}
 				}
+
+				MenuHandler.pContextMenu = pContextMenu;
+				MenuHandler.pContextMenu2 = pContextMenu2;
+				MenuHandler.pContextMenu3 = pContextMenu3;
+
+				MenuHandler.uStartID = 0;
+				MenuHandler.uEndID = 0;
+
+				m_MenuHandlers.push_back(MenuHandler);
 			}
-
-			MenuHandler.pContextMenu = pContextMenu;
-			MenuHandler.pContextMenu2 = pContextMenu2;
-			MenuHandler.pContextMenu3 = pContextMenu3;
-
-			MenuHandler.uStartID = 0;
-			MenuHandler.uEndID = 0;
-
-			m_MenuHandlers.push_back(MenuHandler);
 		}
 	}
 }
@@ -433,5 +456,26 @@ void CContextMenuManager::InvokeMenuEntry(HWND hwnd,UINT uCmd)
 			MenuHandler.pContextMenuActual->InvokeCommand(&cmici);
 			break;
 		}
+	}
+}
+
+CContextMenuManager::ItemType_t CContextMenuManager::GetItemType(LPCITEMIDLIST pidl)
+{
+	SFGAOF Attributes = SFGAO_FOLDER|SFGAO_FILESYSTEM;
+	GetItemAttributes(pidl,&Attributes);
+
+	if((Attributes & SFGAO_FOLDER) &&
+		(Attributes & SFGAO_FILESYSTEM))
+	{
+		return ITEM_TYPE_DIRECTORY;
+	}
+	else if((Attributes & SFGAO_FOLDER) &&
+		!(Attributes & SFGAO_FILESYSTEM))
+	{
+		return ITEM_TYPE_FOLDER;
+	}
+	else
+	{
+		return ITEM_TYPE_FILE;
 	}
 }

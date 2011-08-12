@@ -1178,7 +1178,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 
 		if(SUCCEEDED(hr))
 		{
-			CContextMenuManager cmm(CMT_DIRECTORY_BACKGROUND_HANDLERS,pidlDirectory,
+			CContextMenuManager cmm(CContextMenuManager::CONTEXT_MENU_TYPE_BACKGROUND,pidlDirectory,
 				pDataObject,reinterpret_cast<IUnknown *>(this));
 
 			cmm.ShowMenu(m_hContainer,hMenu,IDM_FILE_COPYFOLDERPATH,MIN_SHELL_MENU_ID,
