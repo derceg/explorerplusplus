@@ -169,8 +169,7 @@ private:
 	CSearch						*m_pSearch;
 
 	/* Listview item information. */
-	/* TODO: These are AWAITING search items. */
-	std::list<LPITEMIDLIST>		m_SearchItems;
+	std::list<LPITEMIDLIST>		m_AwaitingSearchItems;
 	std::unordered_map<int,std::wstring>	m_SearchItemsMapInternal;
 	int							m_iInternalIndex;
 	int							m_iPreviousSelectedColumn;

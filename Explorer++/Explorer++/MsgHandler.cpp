@@ -2862,7 +2862,7 @@ void Explorerplusplus::SaveDirectorySpecificSettings(int iTab)
 }
 
 /* TODO: This needs to be moved into the actual shell browser. Can't change
-settings until it's known that the folder has sucessfully changed. */
+settings until it's known that the folder has successfully changed. */
 void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDirectory)
 {
 	if(m_DirectorySettingsList.size() > 0)

@@ -351,7 +351,7 @@ void CSearchDialog::OnSearch()
 		ShowWindow(GetDlgItem(m_hDlg,IDC_LINK_STATUS),SW_HIDE);
 		ShowWindow(GetDlgItem(m_hDlg,IDC_STATIC_STATUS),SW_SHOW);
 
-		m_SearchItems.clear();
+		m_AwaitingSearchItems.clear();
 		m_SearchItemsMapInternal.clear();
 
 		ListView_DeleteAllItems(GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS));
@@ -820,7 +820,7 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 		main GUI (also see http://www.flounder.com/iocompletion.htm). */
 		case NSearchDialog::WM_APP_SEARCHITEMFOUND:
 			{
-				m_SearchItems.push_back(reinterpret_cast<LPITEMIDLIST>(wParam));
+				m_AwaitingSearchItems.push_back(reinterpret_cast<LPITEMIDLIST>(wParam));
 
 				if(m_bSetSearchTimer)
 				{
@@ -926,11 +926,11 @@ BOOL CSearchDialog::OnTimer(int iTimerID)
 	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS);
 	int nListViewItems = ListView_GetItemCount(hListView);
 
-	int nItems = min(static_cast<int>(m_SearchItems.size()),
+	int nItems = min(static_cast<int>(m_AwaitingSearchItems.size()),
 		SEARCH_MAX_ITEMS_BATCH_PROCESS);
 	int i = 0;
 
-	auto itr = m_SearchItems.begin();
+	auto itr = m_AwaitingSearchItems.begin();
 
 	while(i < nItems)
 	{
@@ -966,7 +966,7 @@ BOOL CSearchDialog::OnTimer(int iTimerID)
 
 		CoTaskMemFree(pidl);
 
-		itr = m_SearchItems.erase(itr);
+		itr = m_AwaitingSearchItems.erase(itr);
 
 		i++;
 	}

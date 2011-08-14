@@ -1195,8 +1195,6 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	DestroyMenu(hMenu);
 }
 
-/* TODO: Helper strings needed for shell extensions shown
-on this menu. */
 HMENU Explorerplusplus::InitializeRightClickMenu(void)
 {
 	HMENU hMenu = GetSubMenu(LoadMenu(g_hLanguageModule,
@@ -1219,7 +1217,6 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 
 	DeleteMenu(hMenu,IDM_RCLICK_VIEW_PLACEHOLDER,MF_BYCOMMAND);
 
-	/* TODO: Menu system needs to at least partially restructured/rewritten. */
 	mii.cbSize		= sizeof(mii);
 	mii.fMask		= MIIM_SUBMENU;
 	mii.hSubMenu	= m_hArrangeSubMenuRClick;
