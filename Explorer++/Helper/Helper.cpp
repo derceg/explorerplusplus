@@ -76,7 +76,7 @@ size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf)
 	}
 	else
 	{
-		while((fFileSize / 1024) > 1)
+		while((fFileSize / 1024) >= 1)
 		{
 			fFileSize /= 1024;
 
@@ -92,8 +92,7 @@ size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf)
 
 	int iPrecision;
 
-	if(iSizeIndex == 0 ||
-		lFileSize.QuadPart % (1024 * iSizeIndex) == 0)
+	if(iSizeIndex == 0)
 	{
 		iPrecision = 0;
 	}
