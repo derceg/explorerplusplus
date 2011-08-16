@@ -40,6 +40,7 @@ protected:
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnNotify(NMHDR *pnmhdr);
 	BOOL	OnClose();
+	BOOL	OnDestroy();
 
 	void	SaveState();
 
@@ -54,6 +55,8 @@ private:
 
 	IExplorerplusplus	*m_pexpp;
 	BOOL	m_bColumnsSwapped;
+
+	HICON	m_hDialogIcon;
 
 	CSelectColumnsDialogPersistentSettings	*m_pscdps;
 };

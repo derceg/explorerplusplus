@@ -54,6 +54,7 @@ protected:
 	BOOL	OnInitDialog();
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnClose();
+	BOOL	OnDestroy();
 
 	void	SaveState();
 
@@ -67,6 +68,8 @@ private:
 
 	IExplorerplusplus	*m_pexpp;
 	BOOL				m_bSelect;
+
+	HICON				m_hDialogIcon;
 
 	CWildcardSelectDialogPersistentSettings	*m_pwsdps;
 };

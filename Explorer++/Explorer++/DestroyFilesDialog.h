@@ -50,6 +50,7 @@ protected:
 	INT_PTR	OnCtlColorStatic(HWND hwnd,HDC hdc);
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnClose();
+	BOOL	OnDestroy();
 
 	void	SaveState();
 
@@ -62,6 +63,8 @@ private:
 	void	OnConfirmDestroy();
 
 	std::list<std::wstring>	m_FullFilenameList;
+
+	HICON	m_hDialogIcon;
 
 	CDestroyFilesDialogPersistentSettings	*m_pdfdps;
 

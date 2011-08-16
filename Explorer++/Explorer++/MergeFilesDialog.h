@@ -61,6 +61,7 @@ protected:
 	BOOL	OnInitDialog();
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnClose();
+	BOOL	OnDestroy();
 
 	void	SaveState();
 
@@ -84,6 +85,8 @@ private:
 	bool					m_bMergingFiles;
 	bool					m_bStopMerging;
 	TCHAR					m_szOk[32];
+
+	HICON					m_hDialogIcon;
 
 	CMergeFilesDialogPersistentSettings	*m_pmfdps;
 };
