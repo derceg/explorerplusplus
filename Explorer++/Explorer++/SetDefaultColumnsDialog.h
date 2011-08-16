@@ -64,6 +64,7 @@ protected:
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnNotify(NMHDR *pnmhdr);
 	BOOL	OnClose();
+	BOOL	OnDestroy();
 
 	void	SaveState();
 
@@ -94,6 +95,8 @@ private:
 
 	std::tr1::unordered_map<int,FolderType_t>	m_FolderMap;
 	FolderType_t		m_PreviousFolderType;
+
+	HICON				m_hDialogIcon;
 
 	CSetDefaultColumnsDialogPersistentSettings	*m_psdcdps;
 };

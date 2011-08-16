@@ -54,6 +54,9 @@ CSetDefaultColumnsDialog::~CSetDefaultColumnsDialog()
 
 BOOL CSetDefaultColumnsDialog::OnInitDialog()
 {
+	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);
 
 	TCHAR szFolderName[MAX_PATH];
@@ -222,6 +225,13 @@ BOOL CSetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
 BOOL CSetDefaultColumnsDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CSetDefaultColumnsDialog::OnDestroy()
+{
+	DestroyIcon(m_hDialogIcon);
+
 	return 0;
 }
 

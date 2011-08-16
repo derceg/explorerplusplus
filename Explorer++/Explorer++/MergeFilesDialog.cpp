@@ -63,6 +63,9 @@ bool CompareFilenames(std::wstring strFirst,std::wstring strSecond)
 
 BOOL CMergeFilesDialog::OnInitDialog()
 {
+	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+
 	std::wregex rxPattern;
 	bool bAllMatchPattern = true;
 
@@ -303,6 +306,13 @@ BOOL CMergeFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 BOOL CMergeFilesDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CMergeFilesDialog::OnDestroy()
+{
+	DestroyIcon(m_hDialogIcon);
+
 	return 0;
 }
 

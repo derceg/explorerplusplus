@@ -38,7 +38,7 @@ CAboutDialog::~CAboutDialog()
 
 BOOL CAboutDialog::OnInitDialog()
 {
-	m_hIcon = reinterpret_cast<HICON>(LoadImage(GetInstance(),
+	m_hIcon = reinterpret_cast<HICON>(LoadImage(GetModuleHandle(0),
 		MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,
 		32,32,LR_VGACOLOR));
 

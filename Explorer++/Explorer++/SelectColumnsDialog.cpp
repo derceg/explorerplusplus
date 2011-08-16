@@ -41,6 +41,9 @@ CSelectColumnsDialog::~CSelectColumnsDialog()
 
 BOOL CSelectColumnsDialog::OnInitDialog()
 {
+	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+
 	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
 	SetWindowTheme(hListView,L"Explorer",NULL);
 
@@ -187,6 +190,13 @@ BOOL CSelectColumnsDialog::OnNotify(NMHDR *pnmhdr)
 BOOL CSelectColumnsDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CSelectColumnsDialog::OnDestroy()
+{
+	DestroyIcon(m_hDialogIcon);
+
 	return 0;
 }
 

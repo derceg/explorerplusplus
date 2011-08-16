@@ -40,6 +40,9 @@ CDestroyFilesDialog::~CDestroyFilesDialog()
 
 BOOL CDestroyFilesDialog::OnInitDialog()
 {
+	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DESTROYFILES_LISTVIEW);
 
 	HIMAGELIST himlSmall;
@@ -229,6 +232,13 @@ BOOL CDestroyFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 BOOL CDestroyFilesDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CDestroyFilesDialog::OnDestroy()
+{
+	DestroyIcon(m_hDialogIcon);
+
 	return 0;
 }
 

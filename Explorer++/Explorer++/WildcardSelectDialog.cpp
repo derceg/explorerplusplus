@@ -43,6 +43,9 @@ CWildcardSelectDialog::~CWildcardSelectDialog()
 
 BOOL CWildcardSelectDialog::OnInitDialog()
 {
+	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_SELECTGROUP_COMBOBOX);
 
 	for each(auto strPattern in m_pwsdps->m_PatternList)
@@ -173,6 +176,13 @@ void CWildcardSelectDialog::OnCancel()
 BOOL CWildcardSelectDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CWildcardSelectDialog::OnDestroy()
+{
+	DestroyIcon(m_hDialogIcon);
+
 	return 0;
 }
 
