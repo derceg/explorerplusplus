@@ -95,6 +95,7 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_ListViewMButtonItem			= -1;
 	m_nDrivesInToolbar				= 0;
 	m_zDeltaTotal					= 0;
+	m_iPreviousTabSelectionId		= -1;
 
 	/* Dialog states. */
 	m_bDisplayColorsDlgStateSaved	= FALSE;

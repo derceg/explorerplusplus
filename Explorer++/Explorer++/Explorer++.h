@@ -535,8 +535,9 @@ private:
 	HRESULT					CreateNewTab(TCHAR *TabDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
 	HRESULT					CreateNewTab(LPITEMIDLIST pidlDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
 	void					InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
-	HRESULT					CloseTab(int TabIndex);
-	HRESULT					OnCloseTab(void);
+	bool					CloseTab(int TabIndex);
+	void					RemoveTabFromControl(int iTab);
+	bool					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	void					RefreshTab(int iTabId);
 	void					RefreshAllTabs(void);
@@ -1111,6 +1112,8 @@ private:
 	int						m_iItemEditing;
 
 	/* Tab handler data. */
+	std::vector<int>		m_TabSelectionHistory;
+	int						m_iPreviousTabSelectionId;
 	BOOL					m_bTabBeenDragged;
 	RECT					m_rcDraggedTab;
 	int						m_iTabMenuItem;

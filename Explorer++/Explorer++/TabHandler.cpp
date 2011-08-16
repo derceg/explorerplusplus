@@ -14,9 +14,9 @@
 
 #include "stdafx.h"
 #include <list>
+#include <algorithm>
 #include "Explorer++.h"
 #include "RenameTabDialog.h"
-#include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ShellHelper.h"
@@ -290,6 +290,11 @@ int *pTabObjectIndex)
 
 	if(bSwitchToNewTab)
 	{
+		if(m_iPreviousTabSelectionId != -1)
+		{
+			m_TabSelectionHistory.push_back(m_iPreviousTabSelectionId);
+		}
+
 		/* Select the newly created tab. */
 		TabCtrl_SetCurSel(m_hTabCtrl,iNewTabIndex);
 
@@ -305,6 +310,8 @@ int *pTabObjectIndex)
 		m_pActiveShellBrowser	= m_pShellBrowser[m_iObjectIndex];
 
 		SetFocus(m_hListView[iTabId]);
+
+		m_iPreviousTabSelectionId = iTabId;
 	}
 
 	/* SBSP_SAMEBROWSER is used internally. Ignored
@@ -874,6 +881,11 @@ void Explorerplusplus::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi
 
 void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 {
+	if(m_iPreviousTabSelectionId != -1)
+	{
+		m_TabSelectionHistory.push_back(m_iPreviousTabSelectionId);
+	}
+
 	TCITEM tcItem;
 
 	tcItem.mask = TCIF_PARAM;
@@ -951,6 +963,8 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 	{
 		SetFocus(m_hActiveListView);
 	}
+
+	m_iPreviousTabSelectionId = m_iObjectIndex;
 }
 
 void Explorerplusplus::RefreshAllTabs(void)
@@ -1048,114 +1062,51 @@ void Explorerplusplus::OnSelectTab(int iTab,BOOL bSetFocus)
 	OnTabChangeInternal(bSetFocus);
 }
 
-HRESULT Explorerplusplus::OnCloseTab(void)
+bool Explorerplusplus::OnCloseTab(void)
 {
-	int iCurrentTab;
-
-	iCurrentTab = TabCtrl_GetCurSel(m_hTabCtrl);
-
-	return CloseTab(iCurrentTab);
+	return CloseTab(m_iTabSelectedItem);
 }
 
-HRESULT Explorerplusplus::CloseTab(int TabIndex)
+bool Explorerplusplus::CloseTab(int TabIndex)
 {
-	TCITEM	tcItem;
-	int		NumTabs;
-	int		m_iLastSelectedTab;
-	int		ListViewIndex;
-	int		iRemoveImage;
+	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	m_iLastSelectedTab = TabIndex;
-
-	NumTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-	if((NumTabs == 1))
+	if(nTabs == 1 &&
+		m_bCloseMainWindowOnTabClose)
 	{
-		if(m_bCloseMainWindowOnTabClose)
-		{
-			SendMessage(m_hContainer,WM_CLOSE,0,0);
-		}
-
-		return S_OK;
+		OnClose();
+		return true;
 	}
 
+	TCITEM tcItem;
 	tcItem.mask = TCIF_IMAGE|TCIF_PARAM;
 	TabCtrl_GetItem(m_hTabCtrl,TabIndex,&tcItem);
-	iRemoveImage = tcItem.iImage;
+
+	int iInternalIndex = static_cast<int>(tcItem.lParam);
 
 	/* The tab is locked. Don't close it. */
-	if(m_TabInfo[(int)tcItem.lParam].bLocked || m_TabInfo[(int)tcItem.lParam].bAddressLocked)
-		return S_FALSE;
-
-	ListViewIndex = (int)tcItem.lParam;
-
-	EnterCriticalSection(&g_csDirMonCallback);
-	ReleaseTabId(ListViewIndex);
-	LeaveCriticalSection(&g_csDirMonCallback);
-
-	NumTabs--;
-
-	/*
-	Cases:
-	If the tab been closed is the active tab:
-	 - If the first tab is been closed, then the selected
-	   tab will still be the first tab.
-	 - If the last tab is closed, then the selected tab
-	   will be one less then the index of the previously
-	   selected tab.
-	 - Otherwise, the index of the selected tab will remain
-	   unchanged (as a tab will be pushed down).
-   If the tab been closed is not the active tab:
-	 - If the index of the closed tab is less than the index
-	   of the active tab, the index of the active tab will
-	   decrease by one (as all higher tabs are pushed down
-	   one space).
-	*/
-	if(TabIndex == m_iTabSelectedItem)
+	if(m_TabInfo[iInternalIndex].bLocked ||
+		m_TabInfo[iInternalIndex].bAddressLocked)
 	{
-		if(TabIndex == NumTabs)
-		{
-			m_iTabSelectedItem--;
-			TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
-			TabCtrl_DeleteItem(m_hTabCtrl,TabIndex);
-		}
-		else
-		{
-			TabCtrl_DeleteItem(m_hTabCtrl,TabIndex);
-			TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
-		}
-
-		OnTabChangeInternal(TRUE);
-	}
-	else
-	{
-		TabCtrl_DeleteItem(m_hTabCtrl,TabIndex);
-
-		if(TabIndex < m_iTabSelectedItem)
-			m_iTabSelectedItem--;
+		return false;
 	}
 
-	/* Remove the tabs image from the image list. */
-	TabCtrl_RemoveImage(m_hTabCtrl,iRemoveImage);
-
-	std::list<TabProxyInfo_t>::iterator itr;
+	RemoveTabFromControl(TabIndex);
 
 	if(m_bTaskbarInitialised)
 	{
-		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+		for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 		{
-			if(itr->iTabId == ListViewIndex)
+			if(itr->iTabId == iInternalIndex)
 			{
-				HICON hIcon;
-
 				m_pTaskbarList3->UnregisterTab(itr->hProxy);
 
-				TabProxy_t *ptp = (TabProxy_t *)GetWindowLongPtr(itr->hProxy,GWLP_USERDATA);
+				TabProxy_t *ptp = reinterpret_cast<TabProxy_t *>(GetWindowLongPtr(itr->hProxy,GWLP_USERDATA));
 				DestroyWindow(itr->hProxy);
 				free(ptp);
 
-				hIcon = (HICON)GetClassLongPtr(itr->hProxy,GCLP_HICONSM);
-				UnregisterClass((LPCWSTR)MAKEWORD(itr->atomClass,0),GetModuleHandle(0));
+				HICON hIcon = reinterpret_cast<HICON>(GetClassLongPtr(itr->hProxy,GCLP_HICONSM));
+				UnregisterClass(reinterpret_cast<LPCWSTR>(MAKEWORD(itr->atomClass,0)),GetModuleHandle(0));
 				DestroyIcon(hIcon);
 
 				m_TabProxyList.erase(itr);
@@ -1164,34 +1115,92 @@ HRESULT Explorerplusplus::CloseTab(int TabIndex)
 		}
 	}
 
-	m_pDirMon->StopDirectoryMonitor(m_pShellBrowser[ListViewIndex]->GetDirMonitorId());
+	EnterCriticalSection(&g_csDirMonCallback);
+	ReleaseTabId(iInternalIndex);
+	LeaveCriticalSection(&g_csDirMonCallback);
 
-	m_pFolderView[ListViewIndex]->SetTerminationStatus();
-	DestroyWindow(m_hListView[ListViewIndex]);
+	m_pDirMon->StopDirectoryMonitor(m_pShellBrowser[iInternalIndex]->GetDirMonitorId());
 
-	m_pShellBrowser[ListViewIndex]->Release();
-	m_pShellBrowser[ListViewIndex] = NULL;
-	m_pFolderView[ListViewIndex]->Release();
-	m_pFolderView[ListViewIndex] = NULL;
+	m_pFolderView[iInternalIndex]->SetTerminationStatus();
+	DestroyWindow(m_hListView[iInternalIndex]);
 
-	HandleTabToolbarItemStates();
+	m_pShellBrowser[iInternalIndex]->Release();
+	m_pShellBrowser[iInternalIndex] = NULL;
+	m_pFolderView[iInternalIndex]->Release();
+	m_pFolderView[iInternalIndex] = NULL;
 
 	if(!m_bAlwaysShowTabBar)
 	{
 		if(TabCtrl_GetItemCount(m_hTabCtrl) == 1)
 		{
-			RECT rc;
-
 			m_bShowTabBar = FALSE;
 
+			RECT rc;
 			GetClientRect(m_hContainer,&rc);
 
 			SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,
-				(LPARAM)MAKELPARAM(rc.right,rc.bottom));
+				MAKELPARAM(rc.right,rc.bottom));
 		}
 	}
 
-	return S_OK;
+	return true;
+}
+
+void Explorerplusplus::RemoveTabFromControl(int iTab)
+{
+	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	int iNewTabSelection = m_iTabSelectedItem;
+
+	/* If there was a previously active tab, the focus
+	should be switched back to it. */
+	if(iTab == m_iTabSelectedItem &&
+		!m_TabSelectionHistory.empty())
+	{
+		for(int i = 0;i < nTabs;i++)
+		{
+			TCITEM tcItem;
+			tcItem.mask = TCIF_PARAM;
+			TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
+
+			if(static_cast<int>(tcItem.lParam) == m_TabSelectionHistory.back())
+			{
+				iNewTabSelection = i;
+				m_TabSelectionHistory.pop_back();
+				break;
+			}
+		}
+
+		/* Tabs are removed from the selection history when they
+		are closed, so any previous tab must exist. */
+		assert(iNewTabSelection != -1);
+	}
+
+	TCITEM tcItemRemoved;
+	tcItemRemoved.mask = TCIF_IMAGE|TCIF_PARAM;
+	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItemRemoved);
+
+	int iRemovedInternalIndex = static_cast<int>(tcItemRemoved.lParam);
+
+	TabCtrl_DeleteItem(m_hTabCtrl,iTab);
+	TabCtrl_RemoveImage(m_hTabCtrl,tcItemRemoved.iImage);
+
+	if(iNewTabSelection > iTab ||
+		iNewTabSelection == (nTabs - 1))
+	{
+		iNewTabSelection--;
+	}
+
+	m_iTabSelectedItem = iNewTabSelection;
+
+	TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
+	OnTabChangeInternal(TRUE);
+
+	m_TabSelectionHistory.erase(std::remove_if(m_TabSelectionHistory.begin(),m_TabSelectionHistory.end(),
+		[iRemovedInternalIndex](int iHistoryInternalIndex) -> bool
+		{
+			return iHistoryInternalIndex == iRemovedInternalIndex;
+		}),
+		m_TabSelectionHistory.end());
 }
 
 void Explorerplusplus::RefreshTab(int iTabId)
