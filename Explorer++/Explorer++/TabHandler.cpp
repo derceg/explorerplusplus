@@ -1144,7 +1144,7 @@ HRESULT Explorerplusplus::CloseTab(int TabIndex)
 	{
 		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 		{
-			if(itr->iTabId == TabIndex)
+			if(itr->iTabId == ListViewIndex)
 			{
 				HICON hIcon;
 
