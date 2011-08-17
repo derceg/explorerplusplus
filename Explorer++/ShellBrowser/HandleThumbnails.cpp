@@ -85,11 +85,6 @@ void CFolderView::RemoveThumbnailsView(void)
 	/* Reset to the default icon spacing. */
 	ListView_SetIconSpacing(m_hListView,-1,-1);
 
-	/* Destroy the thumbnails imagelist. */
-	himl = ListView_GetImageList(m_hListView,LVSIL_NORMAL);
-
-	ImageList_Destroy(himl);
-
 	nItems = ListView_GetItemCount(m_hListView);
 
 	EmptyThumbnailsQueue();
@@ -102,6 +97,11 @@ void CFolderView::RemoveThumbnailsView(void)
 		lvItem.iImage	= I_IMAGECALLBACK;
 		ListView_SetItem(m_hListView,&lvItem);
 	}
+
+	/* Destroy the thumbnails imagelist. */
+	himl = ListView_GetImageList(m_hListView,LVSIL_NORMAL);
+
+	ImageList_Destroy(himl);
 
 	m_bThumbnailsSetup = FALSE;
 }
