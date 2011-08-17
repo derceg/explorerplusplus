@@ -138,26 +138,6 @@ void Explorerplusplus::OnTreeViewFileDelete(BOOL bPermanent)
 	}
 }
 
-void Explorerplusplus::OnTreeViewFileDeletePermanent(void)
-{
-	HTREEITEM hItem;
-	LPITEMIDLIST pidl	= NULL;
-	TCHAR szPath[MAX_PATH + 1];
-
-	hItem = TreeView_GetSelection(m_hTreeView);
-
-	pidl = m_pMyTreeView->BuildPath(hItem);
-
-	GetDisplayName(pidl,szPath,SHGDN_FORPARSING);
-
-	szPath[lstrlen(szPath) + 1] = '\0';
-
-	/* TODO: */
-	//DeleteFilesPermanently(m_hTreeView,szPath);
-
-	CoTaskMemFree(pidl);
-}
-
 void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 {
 	LPITEMIDLIST pidl = NULL;

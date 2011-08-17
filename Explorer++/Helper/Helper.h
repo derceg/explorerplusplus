@@ -197,7 +197,6 @@ HRESULT			GetFileInfoTip(HWND hwnd,LPCITEMIDLIST pidlDirectory,LPCITEMIDLIST *pr
 BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,TCHAR *InitialDirectory);
 
 /* Device related. */
-BOOL			GetMonitorDeviceName(TCHAR *lpszMonitorName,DWORD BufSize);
 TCHAR			*DecodePrinterStatus(DWORD dwStatus);
 void			RetrieveAdapterInfo(void);
 
@@ -216,7 +215,6 @@ void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBu
 HINSTANCE		StartCommandPrompt(TCHAR *Directory);
 BOOL			SetProcessTokenPrivilege(DWORD ProcessId,TCHAR *PrivilegeName,BOOL bEnablePrivilege);
 void			ShowLastError(void);
-int				WriteTextToRichEdit(HWND hRichEdit,TCHAR *fmt,...);
 int				GetRectHeight(RECT *rc);
 int				GetRectWidth(RECT *rc);
 void			CheckItem(HWND hwnd,BOOL bCheck);

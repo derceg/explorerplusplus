@@ -538,32 +538,6 @@ TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint)
 	return p;
 }
 
-int WriteTextToRichEdit(HWND hRichEdit,TCHAR *fmt,...)
-{
-	va_list		varg;
-	SETTEXTEX	TextEx;
-	TCHAR		pszBuf[1024];
-	int			iResult;
-
-	va_start(varg,fmt);
-
-	/* Can't dynamically allocate pszBuf properly, because
-	the string may be expanded. */
-	StringCchVPrintf(pszBuf,SIZEOF_ARRAY(pszBuf),fmt,varg);
-
-	/* Replace current selection. */
-	TextEx.flags	= ST_SELECTION;
-
-	/* Unicode page set. */
-	TextEx.codepage	= CP_UNICODE;
-
-	iResult = (int)SendMessage(hRichEdit,EM_SETTEXTEX,(WPARAM)&TextEx,(LPARAM)pszBuf);
-
-	va_end(varg);
-
-	return iResult;
-}
-
 BOOL lShowWindow(HWND hwnd,BOOL bShowWindow)
 {
 	int WindowShowState;
@@ -584,23 +558,6 @@ int GetRectHeight(RECT *rc)
 int GetRectWidth(RECT *rc)
 {
 	return rc->right - rc->left;
-}
-
-BOOL GetMonitorDeviceName(TCHAR *lpszMonitorName,DWORD BufSize)
-{
-	HMONITOR hMonitor;
-	MONITORINFOEX mfex;
-	POINT pt = {0,0};
-	BOOL bRes;
-
-	hMonitor = MonitorFromPoint(pt,MONITOR_DEFAULTTOPRIMARY);
-
-	mfex.cbSize	= sizeof(mfex);
-	bRes = GetMonitorInfo(hMonitor,&mfex);
-
-	StringCchCopy(lpszMonitorName,BufSize,mfex.szDevice);
-
-	return bRes;
 }
 
 DWORD BuildFileAttributeString(TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize)
@@ -1510,45 +1467,6 @@ int ReadFileSlack(TCHAR *FileName,TCHAR *pszSlack,int iBufferLen)
 	CloseHandle(hFile);
 
 	return nBytesRead;
-}
-
-HRESULT SetComboBoxExPath(HWND CbEx,ITEMIDLIST *PathIdl)
-{
-	IShellFolder *pDesktop		= NULL;
-	COMBOBOXEXITEM cbItem;
-	SHFILEINFO shfi;
-	STRRET str;
-	HRESULT hr;
-	TCHAR PathDisplayName[MAX_PATH];
-
-	hr = SHGetDesktopFolder(&pDesktop);
-
-	if(SUCCEEDED(hr))
-	{
-		SHGetFileInfo((LPTSTR)PathIdl,NULL,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
-
-		hr = pDesktop->GetDisplayNameOf(PathIdl,SHGDN_NORMAL,&str);
-
-		if(SUCCEEDED(hr))
-		{
-			StrRetToBuf(&str,PathIdl,PathDisplayName,SIZEOF_ARRAY(PathDisplayName));
-
-			cbItem.mask				= CBEIF_TEXT|CBEIF_IMAGE|CBEIF_INDENT|CBEIF_SELECTEDIMAGE;
-			cbItem.iItem			= -1;
-			cbItem.iImage			= shfi.iIcon;
-			cbItem.iSelectedImage	= shfi.iIcon;
-			cbItem.iIndent			= 1;
-			cbItem.iOverlay			= 1;
-			cbItem.pszText			= PathDisplayName;
-			cbItem.cchTextMax		= lstrlen(PathDisplayName);
-
-			SendMessage(CbEx,CBEM_SETITEM,(WPARAM)-1,(LPARAM)&cbItem);
-		}
-
-		pDesktop->Release();
-	}
-
-	return hr;
 }
 
 BOOL GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,TCHAR *InitialDirectory)

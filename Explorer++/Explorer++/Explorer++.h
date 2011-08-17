@@ -491,7 +491,6 @@ private:
 	/* TreeView private message handlers. */
 	void					OnTreeViewFileRename(void);
 	void					OnTreeViewFileDelete(BOOL bPermanent);
-	void					OnTreeViewFileDeletePermanent(void);
 	void					OnTreeViewRightClick(WPARAM wParam,LPARAM lParam);
 	void					OnTreeViewShowFileProperties(void);
 	BOOL					OnTreeViewItemExpanding(LPARAM lParam);
