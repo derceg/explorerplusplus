@@ -1,7 +1,7 @@
 Explorer++ Version History
 --------------------------
 
-Current version: 1.3 Beta
+Current version: 1.3
 
 Note:
  - On the 64-bit version of Windows, the control
@@ -10,8 +10,8 @@ Note:
    a 64-bit version of Windows, it is recommended
    that you use the 64-bit version of Explorer++.
 
-Version 1.3 Beta (10/5/11)
---------------------------
+Version 1.3 (xx/08/2011)
+------------------------
 New features:
 - The complete state of most dialogs are now saved.
 - Most dialogs can now be resized.
@@ -41,6 +41,9 @@ New features:
   listview/treeview.
 
 Bug fixes:
+- In Windows 7 when closing a tab, the wrong taskbar
+  preview pane would be closed (i.e. the taskbar preview
+  pane for another tab would be closed instead).
 - Fixed a crash that occurred when collapsing a node in
   the treeview.
 - When single-click activation was enabled, and an area
@@ -49,6 +52,12 @@ Bug fixes:
 - Fixed 'Open Parent in New Tab' bug (parent of current
   tab would always be opened, regardless of which tab was
   clicked).
+- When opening a folder in a locked tab, the newly created
+  tab was not switched to correctly (which caused directory
+  modifications to fail, for example). Fixed.
+- Fixed toolbar bug (when a button was added or removed from
+  a toolbar, the length of the toolbar would be reset, causing
+  it to resize).
 - Fixed listview gridline issue (Windows XP only).
 - Under certain circumstances, translation DLL's would still
   be loaded, even if they did not match the current version.
@@ -59,9 +68,12 @@ Bug fixes:
 - When allow multiple instances was not set, and a new instance
   was started, it would not restore the previous window correctly
   if it was minimized. Fixed.
+- Summary information stream codepage wasn't been checked. Fixed.
 - Fixed control panel handling bug.
 - Fixed drag and drop memory leak.
 - Fixed bugs in mouse wheel handler.
+- Fixed bug in options dialog (apply button not enabled when
+  changing size selection in files and folders tab).
 
 Misc:
 - Version number now takes the form: Major.Minor.Micro.Revision.
@@ -75,12 +87,14 @@ Misc:
   are now right aligned.
 - The current directory is now set when the directory or tab
   selection changes.
+- Updated 'Handle zip files' option to read 'Open zip files
+  in Explorer++'.
 - The error message shown on a translation DLL version mismatch
   will now be shown in the target language (when possible).
 - The (main) right click context menu is no longer owner drawn.
 
-Version 1.2 (13/09/10)
-----------------------
+Version 1.2 (13/09/2010)
+------------------------
 New features:
 - Taskbar thumbnails are now shown for each
   tab in Windows 7 (this can be turned on/off by toggling
@@ -162,8 +176,8 @@ Misc:
 - The options dialog is now modeless.
 - Handle zip files set to false by default.
 
-Version 1.1 (5/4/10)
---------------------
+Version 1.1 (05/04/2010)
+------------------------
 New features:
  - Explorer++ can now replace Windows Explorer for all
    folders (Vista and later only).
@@ -227,8 +241,8 @@ Misc:
  - Updated About dialog and image.
  - Added menu image for Edit->Paste Shortcut.
 
-Version 1.0.0.0 (23/11/09)
---------------------------
+Version 1.0.0.0 (23/11/2009)
+----------------------------
 New features:
  - It is now possible to search for files using
    Tools->Search.
@@ -367,8 +381,8 @@ Misc:
    user clicks the right mouse button.
  - Tools > Show drive information removed.
 
-Version 0.9.5.4 (31/5/09)
--------------------------
+Version 0.9.5.4 (31/05/2009)
+----------------------------
 New features:
  - Explorer++ can now be used in place of Explorer
    for filesystem folders by selecting 'Replace
@@ -460,8 +474,8 @@ Misc:
  - In empty folders viewed in details mode, each
    column now has its width set to a default value.
 
-Version 0.9.3.2 (24/3/09)
--------------------------
+Version 0.9.3.2 (24/03/2009)
+----------------------------
 New features:
  - An application toolbar has been added, which
    allows quick access to any program.
@@ -533,8 +547,8 @@ Misc:
  - The 'Filter Results...' menu item under
    View|Filter has been changed to 'Set Filter...'.
 
-Version 0.9.2.1 (15/2/09)
-------------------------
+Version 0.9.2.1 (15/02/2009)
+----------------------------
 New features:
  - Each tab now has an icon attached to it (the
    folder icon from the tabs' current directory).
@@ -601,8 +615,8 @@ Misc:
    registry).
 
 
-Version 0.9.0.8 (3/2/09)
-------------------------
+Version 0.9.0.8 (03/02/2009)
+----------------------------
 New features:
  - Sort by File System now works.
  - Folders created using the 'New Folder' toolbar
@@ -613,8 +627,8 @@ Bug fixes:
  - Fixed rebar positioning error that occurred
    when using the "Windows Classic" theme.
 
-Version 0.9.0.6 (31/1/09)
--------------------------
+Version 0.9.0.6 (31/01/2009)
+----------------------------
 Bug fixes:
  - Fixed overflow bug.
 
@@ -625,8 +639,8 @@ Misc:
    This command should be used if either version
    Alpha 1 or Alpha 2 have previously been run.
 
-Version 0.9.0.0 (30/1/09)
--------------------------
+Version 0.9.0.0 (30/01/2009)
+----------------------------
 New features:
  - Explorer++ is now built as a Unicode
    executable.
@@ -737,7 +751,7 @@ Misc:
 
 Version Alpha 2
 ---------------
-26/9/08:
+26/09/2008:
 New features:
  - The language to use can now be selected in the
    'Options' dialog, in the 'Language' tab. The
@@ -775,7 +789,7 @@ Misc:
    meaning that when a different folder is selected, it
    is not browsed to immediately.
 
-2/9/08:
+02/09/2008:
 New features:
  - 'Show In Groups' now works when sorting by attributes.
  - 'Show In Groups' now works when sorting by file owner.
@@ -805,7 +819,7 @@ Misc:
  - Drives in 'My Computer' are now sorted according to
    drive letter when sorting by name.
 
-21/8/08:
+21/08/2008:
 New features:
  - Confirmation when closing multiple tabs can now
    be requested when the 'Ask for confirmation before
@@ -846,7 +860,7 @@ Misc:
  - Description of column items are now shown in the
    'Select Columns' dialog.
 
-10/8/08:
+10/08/2008:
 New features:
  - The right click context menu is now owner drawn.
 
@@ -857,7 +871,7 @@ Bug fixes:
  - Fixed bug relating to the 'Address Bar' item on the
    toolbars menu.
 
-20/7/08
+20/07/2008:
 New features:
  - Files can now be merged using 'Actions|Merge Files...'.
 
@@ -868,7 +882,7 @@ Bug fixes:
    on the clipboard, and disabled automatically
    when there are none.
 
-13/7/08
+13/07/2008:
 New features:
  - Added 'Autosize Columns' to the 'View' menu, which
    will resize listview columns to fit in the text
@@ -888,7 +902,7 @@ Misc:
  - Aesthetic changes made to the About dialog.
  - Build date/time is now shown in the About dialog.
 
-7/7/08
+07/07/2008:
 New features:
  - Menu help strings are now shown for items on the
    shell context menus.
@@ -924,7 +938,7 @@ Bug fixes:
  - Menu help now shows for items on the context menu for
    individual tabs.
 
-3/7/08
+03/07/2008:
 New features:
  - Thumbnails view can now be set as the default view
    in the 'Default Settings' page of the 'Tools|Options'
@@ -944,7 +958,7 @@ Misc:
  - New tabs can be opened with middle click even
    if the listview window does not have focus.
 
-1/7/08
+01/07/2008:
 New features:
  - Thumbnails view has been added to the 'View' menu.
    As this is the first implementation of thumbnails
@@ -961,7 +975,7 @@ Bug fixes:
  - Fixed file size bug that arose when files in a
    directory were deleted then created.
 
-29/6/08
+29/06/2008:
 New features:
  - Virtual folders can now be opened from the command
    line simply by supplying their name:
@@ -994,7 +1008,7 @@ Misc:
 
 Version Alpha 1
 ---------------
-26/6/08
+26/06/2008:
 New features:
  - The display window font can now be changed (via
    'View|Change Display Colours').
@@ -1008,7 +1022,7 @@ Bug fixes:
    aspect ratio) as the display window is
    vertically resized.
 
-25/6/08
+25/06/2008:
 New features:
  - Additional settings added to default options
    dialog (auto arrange, show in groups and
@@ -1032,11 +1046,11 @@ Misc:
  - The display window can no longer be resized
    to zero height.
 
-16/6/08
+16/06/2008:
 Bug fixes:
  - Minor internal bugs fixed.
 
-10/6/08
+10/06/2008:
 Bug fixes:
  - Greater amount of internal error checking added.
 
@@ -1044,7 +1058,7 @@ Misc:
  - New tabs opened with the middle mouse button are
    no longer switched to automatically.
 
-8/6/08
+08/06/2008:
 New features:
  - Tabs can now be closed with the middle mouse click
    button.
@@ -1063,7 +1077,7 @@ Misc:
    directory' to 'Current directory - Explorer++'.
  - Display window can now be vertically resized.
 
-6/6/08
+06/06/2008:
 Bug fixes:
  - Greater amount of error checking added to treeview
    control.
@@ -1077,7 +1091,7 @@ Bug fixes:
    is closed (would only happen under very specific
    circumstances).
 
-5/6/08
+05/06/2008:
 Bug fixes:
  - Display window now redraws its gradient background
    as the main window is resized.
@@ -1086,7 +1100,7 @@ Bug fixes:
    (previously a random series of characters was
    shown for an item with no comment).
 
-4/6/08
+04/06/2008:
 Bug fixes:
  - Fixed treeview updating bug relating to folder
    renaming.
@@ -1098,7 +1112,7 @@ Bug fixes:
  - Changed copy and cut on context menu so that they
    are handled internally, rather than by the shell.
 
-3/6/08
+03/06/2008:
 New features:
  - Added 'Open in New Tab' to right click menu
    for folders.
@@ -1111,7 +1125,7 @@ Bug fixes:
  - Fixed thread synchronization bug, which would sometimes
    cause the program to hang.
 
-2/6/08
+02/06/2008:
 Bug fixes:
  - Fixed small bug relating to directory monitoring/updating.
  - Fixed problem with options not been
@@ -1120,5 +1134,5 @@ Bug fixes:
    meaning it may no longer crash. Information shown may be
    incorrect though.
 
-1/6/2008
+01/06/2008:
 * INITIAL RELEASE *

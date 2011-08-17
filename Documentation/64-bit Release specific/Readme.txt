@@ -1,5 +1,5 @@
-Explorer++ 1.3 Beta 64-bit
---------------------------
+Explorer++ 1.3 64-bit
+---------------------
 
 Copyright (c) 2005-2011 David Erceg
 
