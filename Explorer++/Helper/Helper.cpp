@@ -2006,8 +2006,8 @@ DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS)
 
 			if(uLen > 0)
 			{
-				*pdwProductVersionLS = pvsffi->dwProductVersionMS;
-				*pdwProductVersionMS = pvsffi->dwProductVersionLS;
+				*pdwProductVersionLS = pvsffi->dwProductVersionLS;
+				*pdwProductVersionMS = pvsffi->dwProductVersionMS;
 
 				bSuccess = TRUE;
 			}

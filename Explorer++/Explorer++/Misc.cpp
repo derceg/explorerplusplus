@@ -1867,10 +1867,6 @@ BOOL Explorerplusplus::CheckItemSelection(void)
 	return FALSE;
 }
 
-/* Checks the version of the specified
-language DLL against the version of the
-main executable and returns TRUE if they
-match. */
 BOOL Explorerplusplus::VerifyLanguageVersion(TCHAR *szLanguageModule)
 {
 	TCHAR szImageName[MAX_PATH];
@@ -1891,9 +1887,16 @@ BOOL Explorerplusplus::VerifyLanguageVersion(TCHAR *szLanguageModule)
 
 		if(bSuccess1 && bSuccess2)
 		{
-			if((dwpvProcessLS == dwpvLanguageLS) &&
-				(dwpvProcessMS == dwpvLanguageMS))
+			/* For the version of the language DLL to match
+			the version of the executable, the major version,
+			minor version and micro version must match. The
+			build version is ignored. */
+			if(HIWORD(dwpvLanguageMS) == HIWORD(dwpvProcessMS) &&
+				LOWORD(dwpvLanguageMS) == LOWORD(dwpvProcessMS) &&
+				HIWORD(dwpvLanguageLS) == HIWORD(dwpvProcessLS))
+			{
 				return TRUE;
+			}
 		}
 	}
 
