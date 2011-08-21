@@ -212,6 +212,7 @@ void CManageBookmarksDialog::SetupListView()
 	int iItem = 0;
 
 	/* Update the data for each of the sub-items. */
+	/* TODO: This needs to be done by CBookmarkListView. */
 	for(auto itr = m_AllBookmarks.begin();itr != m_AllBookmarks.end();++itr)
 	{
 		int iSubItem = 1;
@@ -259,8 +260,6 @@ int CALLBACK NManageBookmarksDialog::SortBookmarksStub(LPARAM lParam1,LPARAM lPa
 
 int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2)
 {
-	/* TODO: Need to be able to retrieve items using their lParam
-	value. */
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 	HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
 	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
@@ -268,34 +267,7 @@ int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2
 	NBookmarkHelper::variantBookmark_t variantBookmark1 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam1);
 	NBookmarkHelper::variantBookmark_t variantBookmark2 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam2);
 
-	int iRes = 0;
-
-	switch(m_pmbdps->m_SortMode)
-	{
-	case NBookmarkHelper::SM_NAME:
-		iRes = NBookmarkHelper::SortByName(variantBookmark1,variantBookmark2);
-		break;
-
-	case NBookmarkHelper::SM_LOCATION:
-		iRes = NBookmarkHelper::SortByLocation(variantBookmark1,variantBookmark2);
-		break;
-
-	case NBookmarkHelper::SM_VISIT_DATE:
-		iRes = NBookmarkHelper::SortByVisitDate(variantBookmark1,variantBookmark2);
-		break;
-
-	case NBookmarkHelper::SM_VISIT_COUNT:
-		iRes = NBookmarkHelper::SortByVisitCount(variantBookmark1,variantBookmark2);
-		break;
-
-	case NBookmarkHelper::SM_ADDED:
-		iRes = NBookmarkHelper::SortByAdded(variantBookmark1,variantBookmark2);
-		break;
-
-	case NBookmarkHelper::SM_LAST_MODIFIED:
-		iRes = NBookmarkHelper::SortByLastModified(variantBookmark1,variantBookmark2);
-		break;
-	}
+	int iRes = NBookmarkHelper::Sort(m_pmbdps->m_SortMode,variantBookmark1,variantBookmark2);
 
 	if(!m_pmbdps->m_bSortAscending)
 	{
@@ -1121,7 +1093,10 @@ void CManageBookmarksDialog::OnBookmarkItemModified(const GUID &guid)
 
 void CManageBookmarksDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)
 {
-
+	if(IsEqualGUID(ParentBookmarkFolder.GetGUID(),m_guidCurrentFolder))
+	{
+		m_pBookmarkListView->InsertBookmarkIntoListView(Bookmark);
+	}
 }
 
 void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)

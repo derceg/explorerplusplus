@@ -36,12 +36,7 @@ namespace NBookmarkHelper
 		SM_LAST_MODIFIED = 6
 	};
 
-	int CALLBACK		SortByName(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
-	int CALLBACK		SortByLocation(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
-	int CALLBACK		SortByVisitDate(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
-	int CALLBACK		SortByVisitCount(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
-	int CALLBACK		SortByAdded(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
-	int CALLBACK		SortByLastModified(const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
+	int CALLBACK		Sort(SortMode_t SortMode,const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
 
 	variantBookmark_t	GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder,const GUID &guid);
 }
