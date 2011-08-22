@@ -21,6 +21,7 @@
 #include "SplitFileDialog.h"
 #include "DestroyFilesDialog.h"
 #include "MergeFilesDialog.h"
+#include "HelpFileMissingDialog.h"
 #include "../Helper/ShellHelper.h"
 
 
@@ -30,10 +31,6 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 have been corrected. */
 extern HIMAGELIST himlMenu;
 
-/*
-* Dummy window procedure. Simply transfers control
-* to the 'real' window procedure.
-*/
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	Explorerplusplus *pContainer = (Explorerplusplus *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
@@ -63,9 +60,6 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 		return DefWindowProc(hwnd,Msg,wParam,lParam);
 }
 
-/*
- * Main window procedure.
- */
 LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	if(Msg == m_uTaskbarButtonCreatedMessage)
@@ -1402,15 +1396,41 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			}
 			break;
 
-		case IDM_HELP_ABOUT:
+		case IDM_HELP_HELP:
 			{
-				CAboutDialog AboutDialog(g_hLanguageModule,IDD_ABOUT,hwnd);
+				TCHAR szHelpFile[MAX_PATH];
+				GetCurrentProcessImageName(szHelpFile,SIZEOF_ARRAY(szHelpFile));
+				PathRemoveFileSpec(szHelpFile);
+				PathAppend(szHelpFile,NExplorerplusplus::HELP_FILE_NAME);
 
-				AboutDialog.ShowModalDialog();
+				LPITEMIDLIST pidl = NULL;
+				HRESULT hr = GetIdlFromParsingName(szHelpFile,&pidl);
+
+				bool bOpenedHelpFile = false;
+
+				if(SUCCEEDED(hr))
+				{
+					BOOL bRes = ExecuteFileAction(m_hContainer,NULL,NULL,NULL,pidl);
+
+					if(bRes)
+					{
+						bOpenedHelpFile = true;
+					}
+				}
+
+				if(!bOpenedHelpFile)
+				{
+					CHelpFileMissingDialog HelpFileMissingDialog(g_hLanguageModule,IDD_HELPFILEMISSING,hwnd);
+					HelpFileMissingDialog.ShowModalDialog();
+				}
 			}
 			break;
 
-		case IDM_HELP_HELP:
+		case IDM_HELP_ABOUT:
+			{
+				CAboutDialog AboutDialog(g_hLanguageModule,IDD_ABOUT,hwnd);
+				AboutDialog.ShowModalDialog();
+			}
 			break;
 
 
