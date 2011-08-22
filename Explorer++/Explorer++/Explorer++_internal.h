@@ -23,6 +23,8 @@ namespace NExplorerplusplus
 	const TCHAR WINDOW_NAME[]		= _T("Explorer++");
 	const TCHAR CLASS_NAME[]		= _T("Explorer++");
 
+	const TCHAR HELP_FILE_NAME[]	= _T("Explorer++ Help.chm");
+
 	/* The name of the XML file that preferences are
 	saved to/loaded from. */
 	const TCHAR XML_FILENAME[]		= _T("config.xml");

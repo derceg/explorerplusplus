@@ -273,6 +273,7 @@
     <ClCompile Include="Explorer++.cpp" />
     <ClCompile Include="FilterDialog.cpp" />
     <ClCompile Include="HandleWindowState.cpp" />
+    <ClCompile Include="HelpFileMissingDialog.cpp" />
     <ClCompile Include="iDropSource.cpp" />
     <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
@@ -325,6 +326,7 @@
     <ClInclude Include="Explorer++VersionInfo.h" />
     <ClInclude Include="Explorer++_internal.h" />
     <ClInclude Include="FilterDialog.h" />
+    <ClInclude Include="HelpFileMissingDialog.h" />
     <ClInclude Include="iDropSource.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="ManageBookmarksDialog.h" />
