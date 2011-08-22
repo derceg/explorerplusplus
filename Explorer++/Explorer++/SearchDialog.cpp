@@ -15,6 +15,7 @@
 #include <regex>
 #include "Explorer++_internal.h"
 #include "SearchDialog.h"
+#include "DialogHelper.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
@@ -158,7 +159,7 @@ BOOL CSearchDialog::OnInitDialog()
 	hComboBox = reinterpret_cast<HWND>(SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0));
 	iItem = 0;
 
-	for each(auto strPattern in m_sdps->m_SearchPatterns)
+	for each(auto strPattern in *m_sdps->m_pSearchPatterns)
 	{
 		TCHAR szPattern[MAX_PATH];
 
@@ -424,6 +425,7 @@ void CSearchDialog::OnSearch()
 
 		if(bSaveEntry)
 		{
+			/* TODO: Switch to circular buffer. */
 			m_sdps->m_SearchDirectories.push_front(szBaseDirectory);
 
 			HWND hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
@@ -440,26 +442,49 @@ void CSearchDialog::OnSearch()
 
 		bSaveEntry = FALSE;
 
-		if(m_sdps->m_SearchPatterns.empty() ||
-			lstrcmp(szSearchPattern,m_sdps->m_SearchPatterns.begin()->c_str()) != 0)
+		if(m_sdps->m_pSearchPatterns->empty() ||
+			lstrcmp(szSearchPattern,m_sdps->m_pSearchPatterns->begin()->c_str()) != 0)
 		{
 			bSaveEntry = TRUE;
 		}
 
 		if(bSaveEntry)
 		{
-			m_sdps->m_SearchPatterns.push_front(szSearchPattern);
+			TCHAR szSearchPatternOriginal[MAX_PATH];
+			GetDlgItemText(m_hDlg,IDC_COMBO_NAME,szSearchPatternOriginal,
+				SIZEOF_ARRAY(szSearchPatternOriginal));
+
+			std::wstring strSearchPatternOriginal(szSearchPatternOriginal);
+			auto itr = std::find_if(m_sdps->m_pSearchPatterns->begin(),m_sdps->m_pSearchPatterns->end(),
+				[strSearchPatternOriginal](const std::wstring Pattern){return Pattern.compare(strSearchPatternOriginal) == 0;});
 
 			HWND hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_NAME);
-			HWND hComboBox = (HWND)SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0);
+			HWND hComboBox = reinterpret_cast<HWND>(SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0));
+
+			ComboBox_SetCurSel(hComboBox,-1);
+
+			/* Remove the current element from both the list and the
+			combo box. It will be reinserted at the front of both below. */
+			if(itr != m_sdps->m_pSearchPatterns->end())
+			{
+				auto index = std::distance(m_sdps->m_pSearchPatterns->begin(),itr);
+				SendMessage(hComboBoxEx,CBEM_DELETEITEM,index,0);
+
+				m_sdps->m_pSearchPatterns->erase(itr);
+			}
+
+			m_sdps->m_pSearchPatterns->push_front(szSearchPatternOriginal);
 
 			COMBOBOXEXITEM cbi;
 			cbi.mask	= CBEIF_TEXT;
 			cbi.iItem	= 0;
-			cbi.pszText	= szSearchPattern;
-			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,(LPARAM)&cbi);
+			cbi.pszText	= szSearchPatternOriginal;
+			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,reinterpret_cast<LPARAM>(&cbi));
 
-			ComboBox_SetCurSel(hComboBox,0);
+			if(ComboBox_GetCount(hComboBox) > m_sdps->m_pSearchPatterns->capacity())
+			{
+				SendMessage(hComboBoxEx,CBEM_DELETEITEM,ComboBox_GetCount(hComboBox) - 1,0);
+			}
 		}
 
 		GetDlgItemText(m_hDlg,IDSEARCH,m_szSearchButton,SIZEOF_ARRAY(m_szSearchButton));
@@ -1256,13 +1281,15 @@ CDialogSettings(SETTINGS_KEY)
 	StringCchCopy(m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern),
 		EMPTY_STRING);
 
+	m_pSearchPatterns	= new boost::circular_buffer<std::wstring>(NDialogHelper::DEFAULT_HISTORY_SIZE);
+
 	ColumnInfo_t ci;
-	ci.SortMode		= SORT_NAME;
+	ci.SortMode			= SORT_NAME;
 	ci.uStringID		= IDS_SEARCH_COLUMN_NAME;
 	ci.bSortAscending	= true;
 	m_Columns.push_back(ci);
 
-	ci.SortMode		= SORT_PATH;
+	ci.SortMode			= SORT_PATH;
 	ci.uStringID		= IDS_SEARCH_COLUMN_PATH;
 	ci.bSortAscending	= true;
 	m_Columns.push_back(ci);
@@ -1273,7 +1300,7 @@ CDialogSettings(SETTINGS_KEY)
 
 CSearchDialogPersistentSettings::~CSearchDialogPersistentSettings()
 {
-	
+	delete m_pSearchPatterns;
 }
 
 CSearchDialogPersistentSettings& CSearchDialogPersistentSettings::GetInstance()
@@ -1295,7 +1322,11 @@ void CSearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ReadOnly"),m_bReadOnly);
 	NRegistrySettings::SaveDwordToRegistry(hKey,_T("System"),m_bSystem);
 	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Directory"),m_SearchDirectories);
-	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Pattern"),m_SearchPatterns);
+
+	std::list<std::wstring> SearchPatternList;
+	CircularBufferToList(*m_pSearchPatterns,SearchPatternList);
+	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Pattern"),SearchPatternList);
+
 	NRegistrySettings::SaveDwordToRegistry(hKey,_T("SortMode"),m_SortMode);
 	NRegistrySettings::SaveDwordToRegistry(hKey,_T("SortAscending"),m_bSortAscending);
 }
@@ -1313,7 +1344,11 @@ void CSearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ReadOnly"),reinterpret_cast<LPDWORD>(&m_bReadOnly));
 	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("System"),reinterpret_cast<LPDWORD>(&m_bSystem));
 	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Directory"),m_SearchDirectories);
-	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Pattern"),m_SearchPatterns);
+
+	std::list<std::wstring> SearchPatternList;
+	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Pattern"),SearchPatternList);
+	ListToCircularBuffer(SearchPatternList,*m_pSearchPatterns);
+
 	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("SortMode"),reinterpret_cast<LPDWORD>(&m_SortMode));
 	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("SortAscending"),reinterpret_cast<LPDWORD>(&m_bSortAscending));
 }
@@ -1324,7 +1359,11 @@ void CSearchDialogPersistentSettings::SaveExtraXMLSettings(
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth1"),NXMLSettings::EncodeIntValue(m_iColumnWidth1));
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth2"),NXMLSettings::EncodeIntValue(m_iColumnWidth2));
 	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Directory"),m_SearchDirectories);
-	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Pattern"),m_SearchPatterns);
+
+	std::list<std::wstring> SearchPatternList;
+	CircularBufferToList(*m_pSearchPatterns,SearchPatternList);
+	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Pattern"),SearchPatternList);
+
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SearchDirectoryText"),m_szSearchPattern);
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SearchSubFolders"),NXMLSettings::EncodeBoolValue(m_bSearchSubFolders));
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("UseRegularExpressions"),NXMLSettings::EncodeBoolValue(m_bUseRegularExpressions));
@@ -1353,7 +1392,7 @@ void CSearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bs
 	}
 	else if(CheckWildcardMatch(_T("Pattern*"),bstrName,TRUE))
 	{
-		m_SearchPatterns.push_back(bstrValue);
+		m_pSearchPatterns->push_back(bstrValue);
 	}
 	else if(lstrcmpi(bstrName,_T("SearchDirectoryText")) == 0)
 	{
@@ -1405,5 +1444,25 @@ void CSearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bs
 	else if(lstrcmpi(bstrName,_T("SortAscending")) == 0)
 	{
 		m_bSortAscending = NXMLSettings::DecodeBoolValue(bstrValue);
+	}
+}
+
+template <typename T>
+void CSearchDialogPersistentSettings::CircularBufferToList(const boost::circular_buffer<T> &cb,
+	std::list<T> &list)
+{
+	for each(auto Item in cb)
+	{
+		list.push_back(Item);
+	}
+}
+
+template <typename T>
+void CSearchDialogPersistentSettings::ListToCircularBuffer(const std::list<T> &list,
+	boost::circular_buffer<T> &cb)
+{
+	for each(auto Item in list)
+	{
+		cb.push_back(Item);
 	}
 }
