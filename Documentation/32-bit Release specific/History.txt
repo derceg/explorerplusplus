@@ -20,6 +20,8 @@ Misc:
 - The help file (if present) can now be launched from the
   Help|Help menu. It must be named "Explorer++ Help.chm"
   and be in the same folder as the Explorer++ executable.
+- Updated 'Always hide the link (.lnk) extension' option
+  to read 'Hide the link (.lnk) extension'.
 
 Version 1.3 (20/08/2011)
 ------------------------
