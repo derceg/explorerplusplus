@@ -80,8 +80,8 @@
     <ResourceCompile Include="Explorer++TR.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Version.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Version.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
