@@ -68,9 +68,10 @@ public:
 	int CALLBACK		SortBookmarks(LPARAM lParam1,LPARAM lParam2);
 	LRESULT CALLBACK	EditSearchProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
-	void	OnBookmarkItemModified(const GUID &guid);
 	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
 	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
+	void	OnBookmarkModified(const GUID &guid);
+	void	OnBookmarkFolderModified(const GUID &guid);
 	void	OnBookmarkRemoved(const GUID &guid);
 	void	OnBookmarkFolderRemoved(const GUID &guid);
 
@@ -123,6 +124,7 @@ private:
 	void		UpdateToolbarState();
 
 	void		OnNewFolder();
+	void		OnDeleteBookmark(const GUID &guid);
 
 	void		OnEnChange(HWND hEdit);
 	void		OnDblClk(NMHDR *pnmhdr);
@@ -157,6 +159,7 @@ private:
 
 	std::stack<GUID>			m_stackBack;
 	std::stack<GUID>			m_stackForward;
+	bool						m_bSaveHistory;
 
 	CBookmarkTreeView			*m_pBookmarkTreeView;
 

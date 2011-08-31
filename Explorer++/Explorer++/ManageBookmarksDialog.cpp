@@ -41,6 +41,8 @@ m_bEditingSearchField(false),
 m_hEditSearchFont(NULL),
 CBaseDialog(hInstance,iResource,hParent,true)
 {
+	m_bSaveHistory = true;
+
 	m_pmbdps = &CManageBookmarksDialogPersistentSettings::GetInstance();
 
 	if(!m_pmbdps->m_bInitialized)
@@ -60,6 +62,7 @@ CManageBookmarksDialog::~CManageBookmarksDialog()
 
 BOOL CManageBookmarksDialog::OnInitDialog()
 {
+	/* TODO: Enable drag and drop for listview and treeview. */
 	SetDialogIcon();
 	SetupSearchField();
 	SetupToolbar();
@@ -475,10 +478,13 @@ BOOL CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 		case IDM_MB_BOOKMARK_CUT:
 			break;
 
+		/* TODO: Need to copy bookmark information to
+		the clipboard using a custom format. */
 		case IDM_MB_BOOKMARK_COPY:
 			break;
 
 		case IDM_MB_BOOKMARK_DELETE:
+			//OnDeleteBookmark();
 			break;
 
 		case IDOK:
@@ -548,6 +554,11 @@ void CManageBookmarksDialog::OnNewFolder()
 	ParentBookmarkFolder.InsertBookmarkFolder(NewBookmarkFolder);
 }
 
+void CManageBookmarksDialog::OnDeleteBookmark(const GUID &guid)
+{
+	/* TODO: Move the bookmark/bookmark folder to the trash folder. */
+}
+
 void CManageBookmarksDialog::OnEnChange(HWND hEdit)
 {
 	if(hEdit != GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH))
@@ -558,9 +569,24 @@ void CManageBookmarksDialog::OnEnChange(HWND hEdit)
 	std::wstring strSearch;
 	GetWindowString(hEdit,strSearch);
 
+	/* TODO: */
 	if(strSearch.size() > 0)
 	{
+		std::list<CBookmark> MatchList;
 
+		/* Loop through each bookmark, beginning from the
+		root bookmark and match the entered text against
+		each bookmarks name, location and description. */
+		for(auto itr = m_AllBookmarks.begin();itr != m_AllBookmarks.end();itr++)
+		{
+
+		}
+
+		/* Once all matches have been found, switch to a new
+		view showing all the matched items. This will need to
+		be a special case, as m_guidCurrentFolder will no longer
+		be valid. Items that are removed/added/modified will have
+		to be specifically checked. */
 	}
 }
 
@@ -737,6 +763,22 @@ void CManageBookmarksDialog::OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd)
 			NListView::ListView_SelectAllItems(hListView,TRUE);
 			SetFocus(hListView);
 		}
+		break;
+
+	/* TODO: */
+	case 'C':
+		break;
+
+	case 'V':
+		break;
+
+	case 'X':
+		break;
+
+	case VK_RETURN:
+		break;
+
+	case VK_DELETE:
 		break;
 	}
 }
@@ -1049,7 +1091,14 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 
 void CManageBookmarksDialog::BrowseBookmarkFolder(const CBookmarkFolder &BookmarkFolder)
 {
-	m_stackBack.push(m_guidCurrentFolder);
+	/* Temporary flag used to indicate whether history should
+	be saved. It will be reset each time a folder is browsed. */
+	if(m_bSaveHistory)
+	{
+		m_stackBack.push(m_guidCurrentFolder);
+	}
+
+	m_bSaveHistory = true;
 
 	m_guidCurrentFolder = BookmarkFolder.GetGUID();
 	m_pBookmarkTreeView->SelectFolder(BookmarkFolder.GetGUID());
@@ -1065,11 +1114,14 @@ void CManageBookmarksDialog::BrowseBack()
 		return;
 	}
 
+	/* TODO: Will need to remove bookmark folders from
+	list when they are deleted. */
 	GUID guid = m_stackBack.top();
 	m_stackBack.pop();
-	m_stackForward.push(guid);
+	m_stackForward.push(m_guidCurrentFolder);
 
-	/* TODO: Browse back. */
+	m_bSaveHistory = false;
+	m_pBookmarkTreeView->SelectFolder(guid);
 }
 
 void CManageBookmarksDialog::BrowseForward()
@@ -1078,17 +1130,19 @@ void CManageBookmarksDialog::BrowseForward()
 	{
 		return;
 	}
+
+	GUID guid = m_stackForward.top();
+	m_stackForward.pop();
+	m_stackBack.push(m_guidCurrentFolder);
+
+	m_bSaveHistory = false;
+	m_pBookmarkTreeView->SelectFolder(guid);
 }
 
 void CManageBookmarksDialog::UpdateToolbarState()
 {
 	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_BACK,m_stackBack.size() != 0);
 	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_FORWARD,m_stackForward.size() != 0);
-}
-
-void CManageBookmarksDialog::OnBookmarkItemModified(const GUID &guid)
-{
-	m_pBookmarkTreeView->BookmarkFolderModified(guid);
 }
 
 void CManageBookmarksDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)
@@ -1121,14 +1175,24 @@ void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &Parent
 	}
 }
 
+void CManageBookmarksDialog::OnBookmarkModified(const GUID &guid)
+{
+	/* TODO: Notify listview if necessary. */
+}
+
+void CManageBookmarksDialog::OnBookmarkFolderModified(const GUID &guid)
+{
+	m_pBookmarkTreeView->BookmarkFolderModified(guid);
+}
+
 void CManageBookmarksDialog::OnBookmarkRemoved(const GUID &guid)
 {
-
+	/* TODO: Notify listview if necessary. */
 }
 
 void CManageBookmarksDialog::OnBookmarkFolderRemoved(const GUID &guid)
 {
-	
+	m_pBookmarkTreeView->BookmarkFolderRemoved(guid);
 }
 
 void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)

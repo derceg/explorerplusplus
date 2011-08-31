@@ -52,8 +52,9 @@ public:
 
 	CBookmarkFolder		&GetBookmarkFolderFromTreeView(HTREEITEM hItem);
 
-	void				BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
+	HTREEITEM			BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
 	void				BookmarkFolderModified(const GUID &guid);
+	void				BookmarkFolderRemoved(const GUID &guid);
 
 	void				SelectFolder(const GUID &guid);
 
@@ -117,9 +118,10 @@ public:
 	CIPBookmarkItemNotifier(HWND hTopLevelWnd);
 	~CIPBookmarkItemNotifier();
 
-	void	OnBookmarkItemModified(const GUID &guid);
 	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
 	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
+	void	OnBookmarkModified(const GUID &guid);
+	void	OnBookmarkFolderModified(const GUID &guid);
 	void	OnBookmarkRemoved(const GUID &guid);
 	void	OnBookmarkFolderRemoved(const GUID &guid);
 

@@ -160,14 +160,14 @@ HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,const CB
 	return hItem;
 }
 
-void CBookmarkTreeView::BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
+HTREEITEM CBookmarkTreeView::BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
 {
 	/* Due to the fact that *all* bookmark folders will be inserted
 	into the treeview (regardless of whether or not they are actually
 	shown), any new folders will always need to be inserted. */
 	auto itr = m_mapItem.find(ParentBookmarkFolder.GetGUID());
 	assert(itr != m_mapItem.end());
-	InsertFolderIntoTreeView(itr->second,BookmarkFolder);
+	HTREEITEM hItem = InsertFolderIntoTreeView(itr->second,BookmarkFolder);
 
 	UINT uParentState = TreeView_GetItemState(m_hTreeView,itr->second,TVIS_EXPANDED);
 
@@ -179,6 +179,8 @@ void CBookmarkTreeView::BookmarkFolderAdded(const CBookmarkFolder &ParentBookmar
 		tvi.cChildren	= 1;
 		TreeView_SetItem(m_hTreeView,&tvi);
 	}
+
+	return hItem;
 }
 
 void CBookmarkTreeView::BookmarkFolderModified(const GUID &guid)
@@ -199,6 +201,17 @@ void CBookmarkTreeView::BookmarkFolderModified(const GUID &guid)
 	tvi.hItem		= itr->second;
 	tvi.pszText		= szText;
 	TreeView_SetItem(m_hTreeView,&tvi);
+}
+
+void CBookmarkTreeView::BookmarkFolderRemoved(const GUID &guid)
+{
+	auto itr = m_mapItem.find(guid);
+	assert(itr != m_mapItem.end());
+
+	/* TODO: Should collapse parent if it no longer
+	has any children. Should also change selection if
+	required (i.e. if the deleted bookmark was selected). */
+	TreeView_DeleteItem(m_hTreeView,itr->second);
 }
 
 void CBookmarkTreeView::OnTvnDeleteItem(NMTREEVIEW *pnmtv)
@@ -644,9 +657,14 @@ BOOL CALLBACK CIPBookmarkItemNotifier::BookmarkNotifierEnumWindows(HWND hwnd)
 	return TRUE;
 }
 
-void CIPBookmarkItemNotifier::OnBookmarkItemModified(const GUID &guid)
+void CIPBookmarkItemNotifier::OnBookmarkModified(const GUID &guid)
 {
 	EnumWindows(BookmarkNotifierEnumWindowsStub,reinterpret_cast<LPARAM>(this));
+}
+
+void CIPBookmarkItemNotifier::OnBookmarkFolderModified(const GUID &guid)
+{
+	
 }
 
 void CIPBookmarkItemNotifier::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)

@@ -12,10 +12,11 @@ namespace NBookmark
 {
 	__interface IBookmarkItemNotification
 	{
-		virtual void	OnBookmarkItemModified(const GUID &guid);
-
 		virtual void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
 		virtual void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
+
+		virtual void	OnBookmarkModified(const GUID &guid);
+		virtual void	OnBookmarkFolderModified(const GUID &guid);
 
 		virtual void	OnBookmarkRemoved(const GUID &guid);
 		virtual void	OnBookmarkFolderRemoved(const GUID &guid);
@@ -144,9 +145,10 @@ public:
 	void	AddObserver(NBookmark::IBookmarkItemNotification *pbin);
 	void	RemoveObserver(NBookmark::IBookmarkItemNotification *pbin);
 
-	void	NotifyObserversBookmarkItemModified(const GUID &guid);
 	void	NotifyObserversBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
 	void	NotifyObserversBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
+	void	NotifyObserversBookmarkModified(const GUID &guid);
+	void	NotifyObserversBookmarkFolderModified(const GUID &guid);
 	void	NotifyObserversBookmarkRemoved(const GUID &guid);
 	void	NotifyObserversBookmarkFolderRemoved(const GUID &guid);
 
@@ -154,9 +156,10 @@ private:
 
 	enum NotificationType_t
 	{
-		NOTIFY_BOOKMARK_ITEM_MODIFIED,
 		NOTIFY_BOOKMARK_ADDED,
 		NOTIFY_BOOKMARK_FOLDER_ADDED,
+		NOTIFY_BOOKMARK_MODIFIED,
+		NOTIFY_BOOKMARK_FOLDER_MODIFIED,
 		NOTIFY_BOOKMARK_REMOVED,
 		NOTIFY_BOOMARK_FOLDER_REMOVED
 	};

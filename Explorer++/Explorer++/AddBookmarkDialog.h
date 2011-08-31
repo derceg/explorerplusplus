@@ -34,7 +34,7 @@ private:
 	NBookmarkHelper::setExpansion_t	m_setExpansion;
 };
 
-class CAddBookmarkDialog : public CBaseDialog
+class CAddBookmarkDialog : public CBaseDialog, public NBookmark::IBookmarkItemNotification
 {
 public:
 
@@ -42,6 +42,13 @@ public:
 	~CAddBookmarkDialog();
 
 	LRESULT CALLBACK	TreeViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+
+	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
+	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
+	void	OnBookmarkModified(const GUID &guid);
+	void	OnBookmarkFolderModified(const GUID &guid);
+	void	OnBookmarkRemoved(const GUID &guid);
+	void	OnBookmarkFolderRemoved(const GUID &guid);
 
 protected:
 
@@ -83,6 +90,9 @@ private:
 	CBookmark		&m_Bookmark;
 
 	CBookmarkTreeView	*m_pBookmarkTreeView;
+
+	bool		m_bNewFolderCreated;
+	GUID		m_NewFolderGUID;
 
 	CAddBookmarkDialogPersistentSettings	*m_pabdps;
 };

@@ -34,6 +34,8 @@ m_AllBookmarks(AllBookmarks),
 m_Bookmark(Bookmark),
 CBaseDialog(hInstance,iResource,hParent,true)
 {
+	m_bNewFolderCreated = false;
+
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
 
 	/* If the singleton settings class has not been initialized
@@ -76,6 +78,8 @@ BOOL CAddBookmarkDialog::OnInitDialog()
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME);
 	SendMessage(hEditName,EM_SETSEL,0,-1);
 	SetFocus(hEditName);
+
+	CBookmarkItemNotifier::GetInstance().AddObserver(this);
 
 	m_pabdps->RestoreDialogPosition(m_hDlg,true);
 
@@ -209,6 +213,9 @@ void CAddBookmarkDialog::OnNewFolder()
 	LoadString(GetInstance(),IDS_BOOKMARKS_NEWBOOKMARKFOLDER,szTemp,SIZEOF_ARRAY(szTemp));
 	CBookmarkFolder NewBookmarkFolder = CBookmarkFolder::Create(szTemp);
 
+	m_bNewFolderCreated = true;
+	m_NewFolderGUID = NewBookmarkFolder.GetGUID();
+
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
 
@@ -216,24 +223,6 @@ void CAddBookmarkDialog::OnNewFolder()
 
 	CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelectedItem);
 	ParentBookmarkFolder.InsertBookmarkFolder(NewBookmarkFolder);
-
-	/* TODO: Rely on notification. */
-	/*HTREEITEM hNewItem = m_pBookmarkTreeView->InsertFolderIntoTreeView(hSelectedItem,
-		NewBookmarkFolder,m_pabdps->m_guidSelected,m_pabdps->m_setExpansion);*/
-
-	TVITEM tvi;
-	tvi.mask		= TVIF_CHILDREN;
-	tvi.hItem		= hSelectedItem;
-	tvi.cChildren	= 1;
-	TreeView_SetItem(hTreeView,&tvi);
-	TreeView_Expand(hTreeView,hSelectedItem,TVE_EXPAND);
-
-	/* The item will be selected, as it is assumed that if
-	the user creates a new folder, they intend to place any
-	new bookmark within that folder. */
-	SetFocus(hTreeView);
-	//TreeView_SelectItem(hTreeView,hNewItem);
-	//TreeView_EditLabel(hTreeView,hNewItem);
 }
 
 void CAddBookmarkDialog::OnRClick(NMHDR *pnmhdr)
@@ -420,6 +409,51 @@ BOOL CAddBookmarkDialog::OnNcDestroy()
 	delete m_pBookmarkTreeView;
 
 	return 0;
+}
+
+void CAddBookmarkDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)
+{
+
+}
+
+void CAddBookmarkDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
+{
+	HTREEITEM hItem = m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder);
+
+	if(m_bNewFolderCreated &&
+		IsEqualGUID(BookmarkFolder.GetGUID(),m_NewFolderGUID))
+	{
+		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
+
+		/* If a new folder has been created, it will be selected,
+		as it is assumed that the user intends to place any
+		new bookmark within that folder. */
+		SetFocus(hTreeView);
+		TreeView_SelectItem(hTreeView,hItem);
+		TreeView_EditLabel(hTreeView,hItem);
+
+		m_bNewFolderCreated = false;
+	}
+}
+
+void CAddBookmarkDialog::OnBookmarkModified(const GUID &guid)
+{
+
+}
+
+void CAddBookmarkDialog::OnBookmarkFolderModified(const GUID &guid)
+{
+	m_pBookmarkTreeView->BookmarkFolderModified(guid);
+}
+
+void CAddBookmarkDialog::OnBookmarkRemoved(const GUID &guid)
+{
+
+}
+
+void CAddBookmarkDialog::OnBookmarkFolderRemoved(const GUID &guid)
+{
+	m_pBookmarkTreeView->BookmarkFolderRemoved(guid);
 }
 
 CAddBookmarkDialogPersistentSettings::CAddBookmarkDialogPersistentSettings() :
