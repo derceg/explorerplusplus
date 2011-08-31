@@ -5,6 +5,7 @@
 #include <commctrl.h>
 #include "Explorer++_internal.h"
 #include "BookmarkHelper.h"
+#include "BookmarksToolbar.h"
 #include "../ShellBrowser/iShellView.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/BaseDialog.h"
@@ -154,15 +155,11 @@ public:
 	Explorerplusplus(HWND);
 	~Explorerplusplus();
 
-	/* Window/dialog procedures.
-	Window procedures use LRESULT
-	Dialog procedures use INT_PTR */
 	LRESULT CALLBACK	WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	ListViewSubclassProc(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	EditSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	RebarSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
-	LRESULT CALLBACK	BookmarksToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	DrivesToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabBackingProc(HWND hTabCtrl,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -771,13 +768,6 @@ private:
 	void					OnDisplayColorsHScroll(HWND hDlg);
 	void					OnDisplayColorsEnChange(HWND hDlg,LPARAM lParam);
 
-	/* Bookmarks. */
-	void					InsertBookmarkToolbarButtons(void);
-
-	/* Helper functions for the bookmark toolbar. */
-	void					BookmarkToolbarNewBookmark(int iItem);
-	void					BookmarkToolbarNewFolder(int iItem);
-
 	/* Columns. */
 	void					OnSelectColumns();
 	int						LookupColumnNameStringIndex(int iColumnId);
@@ -908,7 +898,6 @@ private:
 	IShellBrowser2 *		m_pActiveShellBrowser;
 	IDirectoryMonitor *		m_pDirMon;
 	CMyTreeView *			m_pMyTreeView;
-	CBookmarkFolder *		m_bfAllBookmarks;
 	CCustomMenu *			m_pCustomMenu;
 	CStatusBar *			m_pStatusBar;
 	HANDLE					m_hIconThread;
@@ -1039,6 +1028,12 @@ private:
 	std::list<TabProxyInfo_t>	m_TabProxyList;
 	UINT					m_uTaskbarButtonCreatedMessage;
 	BOOL					m_bTaskbarInitialised;
+
+	/* Bookmarks. */
+	CBookmarkFolder *		m_bfAllBookmarks;
+	GUID					m_guidBookmarksToolbar;
+	GUID					m_guidBookmarksMenu;
+	CBookmarksToolbar		*m_pBookmarksToolbar;
 
 	/* TODO: Win+E keyboard hook DLL. */
 	HHOOK					m_hKeyboardHook;

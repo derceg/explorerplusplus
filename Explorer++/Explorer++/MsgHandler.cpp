@@ -98,6 +98,8 @@ void Explorerplusplus::OnWindowCreate(void)
 
 	SetLanguageModule();
 
+	InitializeBookmarks();
+
 	m_hIconThread = CreateThread(NULL,0,Thread_IconFinder,NULL,0,NULL);
 	SetThreadPriority(m_hIconThread,THREAD_PRIORITY_BELOW_NORMAL);
 	QueueUserAPC(IconThreadInitialization,m_hIconThread,NULL);
@@ -202,7 +204,6 @@ void Explorerplusplus::OnWindowCreate(void)
 	/* Mark the main menus as owner drawn. */
 	InitializeMenus();
 
-	InitializeBookmarks();
 	InitializeArrangeMenuItems();
 
 	/* Place the main window in the clipboard chain. This

@@ -39,10 +39,9 @@ m_bListViewInitialized(false),
 m_bSearchFieldBlank(true),
 m_bEditingSearchField(false),
 m_hEditSearchFont(NULL),
+m_bSaveHistory(true),
 CBaseDialog(hInstance,iResource,hParent,true)
 {
-	m_bSaveHistory = true;
-
 	m_pmbdps = &CManageBookmarksDialogPersistentSettings::GetInstance();
 
 	if(!m_pmbdps->m_bInitialized)
@@ -1114,8 +1113,6 @@ void CManageBookmarksDialog::BrowseBack()
 		return;
 	}
 
-	/* TODO: Will need to remove bookmark folders from
-	list when they are deleted. */
 	GUID guid = m_stackBack.top();
 	m_stackBack.pop();
 	m_stackForward.push(m_guidCurrentFolder);
@@ -1193,6 +1190,8 @@ void CManageBookmarksDialog::OnBookmarkRemoved(const GUID &guid)
 void CManageBookmarksDialog::OnBookmarkFolderRemoved(const GUID &guid)
 {
 	m_pBookmarkTreeView->BookmarkFolderRemoved(guid);
+
+	/* TODO: Remove the deleted folder from the history list. */
 }
 
 void CManageBookmarksDialog::OnRClick(NMHDR *pnmhdr)

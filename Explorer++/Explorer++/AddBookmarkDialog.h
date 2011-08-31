@@ -65,7 +65,7 @@ protected:
 
 private:
 
-	CAddBookmarkDialog & operator = (const CAddBookmarkDialog &mbd);
+	CAddBookmarkDialog & operator = (const CAddBookmarkDialog &abd);
 
 	void		SetDialogIcon();
 

@@ -37,10 +37,12 @@ void Explorerplusplus::InitializeBookmarks(void)
 	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSTOOLBAR,szTemp,SIZEOF_ARRAY(szTemp));
 	CBookmarkFolder bfBookmarksToolbar = CBookmarkFolder::Create(szTemp);
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksToolbar);
+	m_guidBookmarksToolbar = bfBookmarksToolbar.GetGUID();
 
 	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSMENU,szTemp,SIZEOF_ARRAY(szTemp));
 	CBookmarkFolder bfBookmarksMenu = CBookmarkFolder::Create(szTemp);
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu);
+	m_guidBookmarksMenu = bfBookmarksMenu.GetGUID();
 
 	m_pipbin = new CIPBookmarkItemNotifier(m_hContainer);
 	CBookmarkItemNotifier::GetInstance().AddObserver(m_pipbin);

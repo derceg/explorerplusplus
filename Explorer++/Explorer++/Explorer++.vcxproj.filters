@@ -148,6 +148,9 @@
     <ClCompile Include="HelpFileMissingDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarksToolbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Explorer++.h">
@@ -232,6 +235,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HelpFileMissingDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarksToolbar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

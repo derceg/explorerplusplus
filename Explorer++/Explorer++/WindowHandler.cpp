@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
+#include "BookmarksToolbar.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Macros.h"
@@ -243,12 +244,8 @@ void Explorerplusplus::CreateBookmarksToolbar(void)
 		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DRAWDDARROWS|
 		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
-	SetWindowSubclass(m_hBookmarksToolbar,BookmarksToolbarSubclassStub,0,(DWORD_PTR)this);
-
-	SendMessage(m_hBookmarksToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
-	SendMessage(m_hBookmarksToolbar,TB_BUTTONSTRUCTSIZE,(WPARAM)sizeof(TBBUTTON),0);
-
-	/* TODO: [Bookmarks] Register toolbar for drag and drop. */
+	m_pBookmarksToolbar = new CBookmarksToolbar(m_hBookmarksToolbar,
+		*m_bfAllBookmarks,m_guidBookmarksToolbar);
 }
 
 void Explorerplusplus::CreateDrivesToolbar(void)

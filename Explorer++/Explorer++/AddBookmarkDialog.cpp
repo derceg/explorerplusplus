@@ -32,10 +32,9 @@ CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hP
 	CBookmarkFolder &AllBookmarks,CBookmark &Bookmark) :
 m_AllBookmarks(AllBookmarks),
 m_Bookmark(Bookmark),
+m_bNewFolderCreated(false),
 CBaseDialog(hInstance,iResource,hParent,true)
 {
-	m_bNewFolderCreated = false;
-
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
 
 	/* If the singleton settings class has not been initialized
@@ -400,7 +399,9 @@ BOOL CAddBookmarkDialog::OnClose()
 
 BOOL CAddBookmarkDialog::OnDestroy()
 {
+	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
 	DestroyIcon(m_hDialogIcon);
+
 	return 0;
 }
 
