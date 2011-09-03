@@ -33,6 +33,7 @@ CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hP
 m_AllBookmarks(AllBookmarks),
 m_Bookmark(Bookmark),
 m_bNewFolderCreated(false),
+m_ErrorBrush(CreateSolidBrush(ERROR_BACKGROUND_COLOR)),
 CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
@@ -53,7 +54,7 @@ CBaseDialog(hInstance,iResource,hParent,true)
 
 CAddBookmarkDialog::~CAddBookmarkDialog()
 {
-
+	DeleteObject(m_ErrorBrush);
 }
 
 BOOL CAddBookmarkDialog::OnInitDialog()
@@ -141,6 +142,21 @@ void CAddBookmarkDialog::GetResizableControlInformation(CBaseDialog::DialogSizeC
 	ControlList.push_back(Control);
 }
 
+INT_PTR CAddBookmarkDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
+{
+	if(hwnd == GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME) ||
+		hwnd == GetDlgItem(m_hDlg,IDC_BOOKMARK_LOCATION))
+	{
+		if(GetWindowTextLength(hwnd) == 0)
+		{
+			SetBkMode(hdc,TRANSPARENT);
+			return reinterpret_cast<INT_PTR>(m_ErrorBrush);
+		}
+	}
+
+	return FALSE;
+}
+
 BOOL CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	if(HIWORD(wParam) != 0)
@@ -153,6 +169,14 @@ BOOL CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 			BOOL bEnable = (GetWindowTextLength(GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME)) != 0 &&
 				GetWindowTextLength(GetDlgItem(m_hDlg,IDC_BOOKMARK_LOCATION)) != 0);
 			EnableWindow(GetDlgItem(m_hDlg,IDOK),bEnable);
+
+			if(LOWORD(wParam) == IDC_BOOKMARK_NAME ||
+				LOWORD(wParam) == IDC_BOOKMARK_LOCATION)
+			{
+				/* Used to ensure the edit controls are redrawn properly when
+				changing the background color. */
+				InvalidateRect(GetDlgItem(m_hDlg,LOWORD(wParam)),NULL,TRUE);
+			}
 			break;
 		}
 	}

@@ -20,10 +20,11 @@
 
 
 CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar,CBookmarkFolder &AllBookmarks,
-	const GUID &guidBookmarksToolbar) :
+	const GUID &guidBookmarksToolbar,UINT uIDStart) :
 m_hToolbar(hToolbar),
 m_AllBookmarks(AllBookmarks),
 m_guidBookmarksToolbar(guidBookmarksToolbar),
+m_uIDStart(uIDStart),
 m_uIDCounter(0)
 {
 	InitializeToolbar();
@@ -119,16 +120,18 @@ void CBookmarksToolbar::InsertBookmarkItems()
 
 void CBookmarksToolbar::InsertBookmark(const CBookmark &Bookmark)
 {
-	InsertBookmarkItem(Bookmark.GetName(),Bookmark.GetGUID(),false);
+	int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
+	InsertBookmarkItem(Bookmark.GetName(),Bookmark.GetGUID(),false,nButtons);
 }
 
 void CBookmarksToolbar::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder)
 {
-	InsertBookmarkItem(BookmarkFolder.GetName(),BookmarkFolder.GetGUID(),true);
+	int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
+	InsertBookmarkItem(BookmarkFolder.GetName(),BookmarkFolder.GetGUID(),true,nButtons);
 }
 
 void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
-	const GUID &guid,bool bFolder)
+	const GUID &guid,bool bFolder,int iPosition)
 {
 	TCHAR szName[256];
 	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());
@@ -146,12 +149,12 @@ void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
 
 	TBBUTTON tbb;
 	tbb.iBitmap		= iImage;
-	tbb.idCommand	= 1;
+	tbb.idCommand	= m_uIDStart + m_uIDCounter;
 	tbb.fsState		= TBSTATE_ENABLED;
-	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT;
+	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_NOPREFIX;
 	tbb.dwData		= m_uIDCounter;
 	tbb.iString		= reinterpret_cast<INT_PTR>(szName);
-	SendMessage(m_hToolbar,TB_INSERTBUTTON,0,reinterpret_cast<LPARAM>(&tbb));
+	SendMessage(m_hToolbar,TB_INSERTBUTTON,iPosition,reinterpret_cast<LPARAM>(&tbb));
 
 	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,guid));
 	++m_uIDCounter;
@@ -175,22 +178,94 @@ void CBookmarksToolbar::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookm
 
 void CBookmarksToolbar::OnBookmarkModified(const GUID &guid)
 {
-	
+	ModifyBookmarkItem(guid,false);
 }
 
 void CBookmarksToolbar::OnBookmarkFolderModified(const GUID &guid)
 {
-
+	ModifyBookmarkItem(guid,true);
 }
 
 void CBookmarksToolbar::OnBookmarkRemoved(const GUID &guid)
 {
-
+	RemoveBookmarkItem(guid);	
 }
 
 void CBookmarksToolbar::OnBookmarkFolderRemoved(const GUID &guid)
 {
+	RemoveBookmarkItem(guid);
+}
 
+void CBookmarksToolbar::ModifyBookmarkItem(const GUID &guid,bool bFolder)
+{
+	int iIndex = GetBookmarkItemIndex(guid);
+
+	if(iIndex != -1)
+	{
+		auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks,m_guidBookmarksToolbar);
+		CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
+
+		auto variantBookmarkItem = NBookmarkHelper::GetBookmarkItem(BookmarksToolbarFolder,guid);
+
+		TCHAR szText[128];
+
+		if(bFolder)
+		{
+			assert(variantBookmarkItem.type() == typeid(CBookmarkFolder));
+			CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmarkItem);
+
+			StringCchCopy(szText,SIZEOF_ARRAY(szText),BookmarkFolder.GetName().c_str());
+		}
+		else
+		{
+			assert(variantBookmarkItem.type() == typeid(CBookmark));
+			CBookmark &Bookmark = boost::get<CBookmark>(variantBookmarkItem);
+
+			StringCchCopy(szText,SIZEOF_ARRAY(szText),Bookmark.GetName().c_str());
+		}
+
+		TBBUTTONINFO tbbi;
+		tbbi.cbSize		= sizeof(tbbi);
+		tbbi.dwMask		= TBIF_BYINDEX|TBIF_TEXT;
+		tbbi.pszText	= szText;
+
+		SendMessage(m_hToolbar,TB_SETBUTTONINFO,iIndex,reinterpret_cast<LPARAM>(&tbbi));
+	}
+}
+
+void CBookmarksToolbar::RemoveBookmarkItem(const GUID &guid)
+{
+	int iIndex = GetBookmarkItemIndex(guid);
+
+	if(iIndex != -1)
+	{
+		SendMessage(m_hToolbar,TB_DELETEBUTTON,iIndex,0);
+
+		m_mapID.erase(iIndex);
+	}
+}
+
+int CBookmarksToolbar::GetBookmarkItemIndex(const GUID &guid)
+{
+	int iIndex = -1;
+	int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
+
+	for(int i = 0;i < nButtons;i++)
+	{
+		TBBUTTON tb;
+		SendMessage(m_hToolbar,TB_GETBUTTON,i,reinterpret_cast<LPARAM>(&tb));
+
+		auto itr = m_mapID.find(static_cast<UINT>(tb.dwData));
+
+		if(itr != m_mapID.end() &&
+			IsEqualGUID(itr->second,guid))
+		{
+			iIndex = i;
+			break;
+		}
+	}
+
+	return iIndex;
 }
 
 /* TODO: */

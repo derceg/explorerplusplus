@@ -9,7 +9,7 @@ class CBookmarksToolbar : public NBookmark::IBookmarkItemNotification
 
 public:
 
-	CBookmarksToolbar(HWND hToolbar,CBookmarkFolder &AllBookmarks,const GUID &guidBookmarksToolbar);
+	CBookmarksToolbar(HWND hToolbar,CBookmarkFolder &AllBookmarks,const GUID &guidBookmarksToolbar,UINT uIDStart);
 	~CBookmarksToolbar();
 
 	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
@@ -30,13 +30,20 @@ private:
 	void	InsertBookmarkItems();
 	void	InsertBookmark(const CBookmark &Bookmark);
 	void	InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder);
-	void	InsertBookmarkItem(const std::wstring &strName,const GUID &guid,bool bFolder);
+	void	InsertBookmarkItem(const std::wstring &strName,const GUID &guid,bool bFolder,int iPosition);
+
+	void	ModifyBookmarkItem(const GUID &guid,bool bFolder);
+
+	void	RemoveBookmarkItem(const GUID &guid);
+
+	int		GetBookmarkItemIndex(const GUID &guid);
 
 	HWND							m_hToolbar;
 	CBookmarkFolder					&m_AllBookmarks;
 	GUID							m_guidBookmarksToolbar;
 
 	std::unordered_map<UINT,GUID>	m_mapID;
+	UINT							m_uIDStart;
 	UINT							m_uIDCounter;
 };
 

@@ -53,6 +53,7 @@ public:
 protected:
 
 	BOOL	OnInitDialog();
+	INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc);
 	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	BOOL	OnNotify(NMHDR *pnmhdr);
 	BOOL	OnClose();
@@ -64,6 +65,8 @@ protected:
 	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
 private:
+
+	static const COLORREF ERROR_BACKGROUND_COLOR = RGB(255,188,188);
 
 	CAddBookmarkDialog & operator = (const CAddBookmarkDialog &abd);
 
@@ -93,6 +96,8 @@ private:
 
 	bool		m_bNewFolderCreated;
 	GUID		m_NewFolderGUID;
+
+	HBRUSH		m_ErrorBrush;
 
 	CAddBookmarkDialogPersistentSettings	*m_pabdps;
 };
