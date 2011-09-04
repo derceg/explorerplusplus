@@ -1142,21 +1142,23 @@ void CManageBookmarksDialog::UpdateToolbarState()
 	SendMessage(m_hToolbar,TB_ENABLEBUTTON,TOOLBAR_ID_FORWARD,m_stackForward.size() != 0);
 }
 
-void CManageBookmarksDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)
+void CManageBookmarksDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
+	const CBookmark &Bookmark,std::size_t Position)
 {
 	if(IsEqualGUID(ParentBookmarkFolder.GetGUID(),m_guidCurrentFolder))
 	{
-		m_pBookmarkListView->InsertBookmarkIntoListView(Bookmark);
+		m_pBookmarkListView->InsertBookmarkIntoListView(Bookmark,static_cast<int>(Position));
 	}
 }
 
-void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
+void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
+	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
 {
-	m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder);
+	m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder,Position);
 
 	if(IsEqualGUID(ParentBookmarkFolder.GetGUID(),m_guidCurrentFolder))
 	{
-		int iItem = m_pBookmarkListView->InsertBookmarkFolderIntoListView(BookmarkFolder);
+		int iItem = m_pBookmarkListView->InsertBookmarkFolderIntoListView(BookmarkFolder,static_cast<int>(Position));
 
 		if(IsEqualGUID(BookmarkFolder.GetGUID(),m_guidNewFolder))
 		{

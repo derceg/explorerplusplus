@@ -16,6 +16,7 @@
 #include <algorithm>
 #include "Explorer++.h"
 #include "BookmarksToolbar.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -34,6 +35,8 @@ m_uIDCounter(0)
 
 CBookmarksToolbar::~CBookmarksToolbar()
 {
+	m_pbtdh->Release();
+
 	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
 }
 
@@ -48,7 +51,8 @@ void CBookmarksToolbar::InitializeToolbar()
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_himl));
 	DeleteObject(hBitmap);
 
-	/* TODO: Register toolbar for drag and drop. */
+	m_pbtdh = new CBookmarksToolbarDropHandler(m_hToolbar,m_AllBookmarks,m_guidBookmarksToolbar);
+	RegisterDragDrop(m_hToolbar,m_pbtdh);
 
 	SetWindowSubclass(m_hToolbar,BookmarksToolbarProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
@@ -98,9 +102,7 @@ void CBookmarksToolbar::InsertBookmarkItems()
 	/* The bookmarks toolbar folder should always be a direct child
 	of the root. */
 	auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks,m_guidBookmarksToolbar);
-
 	assert(variantBookmarksToolbar.type() == typeid(CBookmarkFolder));
-
 	const CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
 
 	for each(auto variantBookmark in BookmarksToolbarFolder)
@@ -121,18 +123,30 @@ void CBookmarksToolbar::InsertBookmarkItems()
 void CBookmarksToolbar::InsertBookmark(const CBookmark &Bookmark)
 {
 	int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
-	InsertBookmarkItem(Bookmark.GetName(),Bookmark.GetGUID(),false,nButtons);
+	InsertBookmark(Bookmark,nButtons);
+}
+
+void CBookmarksToolbar::InsertBookmark(const CBookmark &Bookmark,std::size_t Position)
+{
+	InsertBookmarkItem(Bookmark.GetName(),Bookmark.GetGUID(),false,Position);
 }
 
 void CBookmarksToolbar::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder)
 {
 	int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
-	InsertBookmarkItem(BookmarkFolder.GetName(),BookmarkFolder.GetGUID(),true,nButtons);
+	InsertBookmarkFolder(BookmarkFolder,nButtons);
+}
+
+void CBookmarksToolbar::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder,std::size_t Position)
+{
+	InsertBookmarkItem(BookmarkFolder.GetName(),BookmarkFolder.GetGUID(),true,Position);
 }
 
 void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
-	const GUID &guid,bool bFolder,int iPosition)
+	const GUID &guid,bool bFolder,std::size_t Position)
 {
+	assert(Position <= SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
+
 	TCHAR szName[256];
 	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());
 
@@ -154,25 +168,27 @@ void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_NOPREFIX;
 	tbb.dwData		= m_uIDCounter;
 	tbb.iString		= reinterpret_cast<INT_PTR>(szName);
-	SendMessage(m_hToolbar,TB_INSERTBUTTON,iPosition,reinterpret_cast<LPARAM>(&tbb));
+	SendMessage(m_hToolbar,TB_INSERTBUTTON,Position,reinterpret_cast<LPARAM>(&tbb));
 
 	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,guid));
 	++m_uIDCounter;
 }
 
-void CBookmarksToolbar::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)
+void CBookmarksToolbar::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
+	const CBookmark &Bookmark,std::size_t Position)
 {
 	if(IsEqualGUID(ParentBookmarkFolder.GetGUID(),m_guidBookmarksToolbar))
 	{
-		InsertBookmark(Bookmark);
+		InsertBookmark(Bookmark,Position);
 	}
 }
 
-void CBookmarksToolbar::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
+void CBookmarksToolbar::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
+	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
 {
 	if(IsEqualGUID(ParentBookmarkFolder.GetGUID(),m_guidBookmarksToolbar))
 	{
-		InsertBookmarkFolder(BookmarkFolder);
+		InsertBookmarkFolder(BookmarkFolder,Position);
 	}
 }
 
@@ -241,6 +257,9 @@ void CBookmarksToolbar::RemoveBookmarkItem(const GUID &guid)
 	{
 		SendMessage(m_hToolbar,TB_DELETEBUTTON,iIndex,0);
 
+		/* TODO: */
+		//UpdateToolbarBandSizing(m_hMainRebar,m_hBookmarksToolbar);
+
 		m_mapID.erase(iIndex);
 	}
 }
@@ -266,6 +285,268 @@ int CBookmarksToolbar::GetBookmarkItemIndex(const GUID &guid)
 	}
 
 	return iIndex;
+}
+
+CBookmarksToolbarDropHandler::CBookmarksToolbarDropHandler(HWND hToolbar,
+	CBookmarkFolder &AllBookmarks,const GUID &guidBookmarksToolbar) :
+m_hToolbar(hToolbar),
+m_AllBookmarks(AllBookmarks),
+m_guidBookmarksToolbar(guidBookmarksToolbar),
+m_ulRefCount(1)
+{
+	CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
+		IID_IDragSourceHelper,reinterpret_cast<LPVOID *>(&m_pDragSourceHelper));
+
+	/* Note that the above call is assumed to always succeed. */
+	m_pDragSourceHelper->QueryInterface(IID_IDropTargetHelper,reinterpret_cast<void **>(&m_pDropTargetHelper));
+}
+
+CBookmarksToolbarDropHandler::~CBookmarksToolbarDropHandler()
+{
+	m_pDragSourceHelper->Release();
+	m_pDropTargetHelper->Release();
+}
+
+HRESULT __stdcall CBookmarksToolbarDropHandler::QueryInterface(REFIID iid,void **ppvObject)
+{
+	*ppvObject = NULL;
+
+	if(iid == IID_IDropTarget ||
+		iid == IID_IUnknown)
+	{
+		*ppvObject = this;
+	}
+
+	if(*ppvObject)
+	{
+		AddRef();
+		return S_OK;
+	}
+
+	return E_NOINTERFACE;
+}
+
+ULONG __stdcall CBookmarksToolbarDropHandler::AddRef(void)
+{
+	return ++m_ulRefCount;
+}
+
+ULONG __stdcall CBookmarksToolbarDropHandler::Release(void)
+{
+	m_ulRefCount--;
+	
+	if(m_ulRefCount == 0)
+	{
+		delete this;
+		return 0;
+	}
+
+	return m_ulRefCount;
+}
+
+HRESULT __stdcall CBookmarksToolbarDropHandler::DragEnter(IDataObject *pDataObject,
+	DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect)
+{
+	bool m_bValid = false;
+	bool m_bAllFolders = true;
+
+	FORMATETC ftc = {CF_HDROP,0,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	STGMEDIUM stg;
+
+	HRESULT hr = pDataObject->GetData(&ftc,&stg);
+
+	if(hr == S_OK)
+	{
+		DROPFILES *pdf = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
+
+		if(pdf != NULL)
+		{
+			m_bValid = true;
+
+			UINT nDroppedFiles = DragQueryFile(reinterpret_cast<HDROP>(pdf),0xFFFFFFFF,NULL,NULL);
+
+			for(UINT i = 0;i < nDroppedFiles;i++)
+			{
+				TCHAR szFullFileName[MAX_PATH];
+				DragQueryFile(reinterpret_cast<HDROP>(pdf),i,szFullFileName,
+					SIZEOF_ARRAY(szFullFileName));
+
+				if(!PathIsDirectory(szFullFileName))
+				{
+					m_bAllFolders = false;
+					break;
+				}
+			}
+
+			GlobalUnlock(stg.hGlobal);
+		}
+
+		ReleaseStgMedium(&stg);
+	}
+
+	if(m_bValid &&
+		m_bAllFolders)
+	{
+		*pdwEffect = DROPEFFECT_COPY;
+
+		m_bAcceptData = true;
+	}
+	else
+	{
+		*pdwEffect = DROPEFFECT_NONE;
+
+		m_bAcceptData = false;
+	}
+
+	m_pDropTargetHelper->DragEnter(m_hToolbar,pDataObject,reinterpret_cast<POINT *>(&pt),*pdwEffect);
+
+	return S_OK;
+}
+
+HRESULT __stdcall CBookmarksToolbarDropHandler::DragOver(DWORD grfKeyState,
+	POINTL pt,DWORD *pdwEffect)
+{
+	if(m_bAcceptData)
+	{
+		*pdwEffect = DROPEFFECT_COPY;
+	}
+	else
+	{
+		*pdwEffect = DROPEFFECT_NONE;
+	}
+
+	bool bAfter;
+	int iButton = GetToolbarPositionIndex(pt,bAfter);
+
+	if(iButton < 0)
+	{
+		int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
+
+		TBINSERTMARK tbim;
+		tbim.iButton = nButtons - 1;
+		tbim.dwFlags = TBIMHT_AFTER;
+		SendMessage(m_hToolbar,TB_SETINSERTMARK,0,reinterpret_cast<LPARAM>(&tbim));
+	}
+	else
+	{
+		TBINSERTMARK tbim;
+
+		if(bAfter)
+		{
+			tbim.dwFlags = TBIMHT_AFTER;
+		}
+		else
+		{
+			tbim.dwFlags = 0;
+		}
+
+		tbim.iButton = iButton;
+		SendMessage(m_hToolbar,TB_SETINSERTMARK,0,reinterpret_cast<LPARAM>(&tbim));
+	}
+
+	m_pDropTargetHelper->DragOver(reinterpret_cast<POINT *>(&pt),*pdwEffect);
+
+	return S_OK;
+}
+
+HRESULT __stdcall CBookmarksToolbarDropHandler::DragLeave(void)
+{
+	RemoveInsertionMark();
+
+	m_pDropTargetHelper->DragLeave();
+
+	return S_OK;
+}
+
+HRESULT __stdcall CBookmarksToolbarDropHandler::Drop(IDataObject *pDataObject,
+	DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+{
+	FORMATETC ftc = {CF_HDROP,0,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	STGMEDIUM stg;
+
+	HRESULT hr = pDataObject->GetData(&ftc,&stg);
+
+	if(hr == S_OK)
+	{
+		DROPFILES *pdf = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
+
+		if(pdf != NULL)
+		{
+			bool bAfter;
+			int iPosition = GetToolbarPositionIndex(pt,bAfter);
+
+			if(iPosition < 0)
+			{
+				iPosition = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
+			}
+			else
+			{
+				if(bAfter)
+				{
+					iPosition++;
+				}
+			}
+
+			UINT nDroppedFiles = DragQueryFile(reinterpret_cast<HDROP>(pdf),0xFFFFFFFF,NULL,NULL);
+
+			for(UINT i = 0;i < nDroppedFiles;i++)
+			{
+				TCHAR szFullFileName[MAX_PATH];
+				DragQueryFile(reinterpret_cast<HDROP>(pdf),i,szFullFileName,
+					SIZEOF_ARRAY(szFullFileName));
+
+				if(PathIsDirectory(szFullFileName))
+				{
+					TCHAR szDisplayName[MAX_PATH];
+					GetDisplayName(szFullFileName,szDisplayName,SHGDN_INFOLDER);
+
+					CBookmark Bookmark(szDisplayName,szFullFileName,EMPTY_STRING);
+
+					auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks,m_guidBookmarksToolbar);
+					assert(variantBookmarksToolbar.type() == typeid(CBookmarkFolder));
+					CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
+
+					BookmarksToolbarFolder.InsertBookmark(Bookmark,iPosition + i);
+				}
+			}
+
+			GlobalUnlock(stg.hGlobal);
+		}
+
+		ReleaseStgMedium(&stg);
+	}
+
+	RemoveInsertionMark();
+	m_pDropTargetHelper->Drop(pDataObject,reinterpret_cast<POINT *>(&pt),*pdwEffect);
+
+	return S_OK;
+}
+
+int CBookmarksToolbarDropHandler::GetToolbarPositionIndex(const POINTL &pt,bool &bAfter)
+{
+	POINT ptClient;
+	ptClient.x = pt.x;
+	ptClient.y = pt.y;
+	ScreenToClient(m_hToolbar,&ptClient);
+	int iButton = static_cast<int>(SendMessage(m_hToolbar,TB_HITTEST,
+		0,reinterpret_cast<LPARAM>(&ptClient)));
+
+	if(iButton >= 0)
+	{
+		RECT rc;
+		SendMessage(m_hToolbar,TB_GETITEMRECT,iButton,reinterpret_cast<LPARAM>(&rc));
+
+		bAfter = (ptClient.x > (rc.left + GetRectWidth(&rc) / 2)) ? true : false;
+	}
+
+	return iButton;
+}
+
+void CBookmarksToolbarDropHandler::RemoveInsertionMark()
+{
+	TBINSERTMARK tbim;
+	tbim.iButton = -1;
+	SendMessage(m_hToolbar,TB_SETINSERTMARK,0,reinterpret_cast<LPARAM>(&tbim));
 }
 
 /* TODO: */

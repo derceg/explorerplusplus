@@ -436,14 +436,16 @@ BOOL CAddBookmarkDialog::OnNcDestroy()
 	return 0;
 }
 
-void CAddBookmarkDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)
+void CAddBookmarkDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
+	const CBookmark &Bookmark,std::size_t Position)
 {
 
 }
 
-void CAddBookmarkDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
+void CAddBookmarkDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
+	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
 {
-	HTREEITEM hItem = m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder);
+	HTREEITEM hItem = m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder,Position);
 
 	if(m_bNewFolderCreated &&
 		IsEqualGUID(BookmarkFolder.GetGUID(),m_NewFolderGUID))

@@ -80,7 +80,7 @@ void CBookmarkTreeView::SetupTreeView(const GUID &guidSelected,const NBookmarkHe
 {
 	TreeView_DeleteAllItems(m_hTreeView);
 
-	HTREEITEM hRoot = InsertFolderIntoTreeView(NULL,*m_pAllBookmarks);
+	HTREEITEM hRoot = InsertFolderIntoTreeView(NULL,*m_pAllBookmarks,0);
 	InsertFoldersIntoTreeViewRecursive(hRoot,*m_pAllBookmarks);
 
 	for each(auto guidExpanded in setExpansion)
@@ -108,6 +108,8 @@ void CBookmarkTreeView::SetupTreeView(const GUID &guidSelected,const NBookmarkHe
 
 void CBookmarkTreeView::InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder)
 {
+	std::size_t Position = 0;
+
 	for(auto itr = BookmarkFolder.begin();itr != BookmarkFolder.end();++itr)
 	{
 		if(itr->type() == typeid(CBookmarkFolder))
@@ -115,7 +117,8 @@ void CBookmarkTreeView::InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,con
 			const CBookmarkFolder &BookmarkFolderChild = boost::get<CBookmarkFolder>(*itr);
 
 			HTREEITEM hCurrentItem = InsertFolderIntoTreeView(hParent,
-				BookmarkFolderChild);
+				BookmarkFolderChild,Position);
+			Position++;
 
 			if(BookmarkFolderChild.HasChildFolder())
 			{
@@ -126,7 +129,7 @@ void CBookmarkTreeView::InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,con
 	}
 }
 
-HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder)
+HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,std::size_t Position)
 {
 	TCHAR szText[256];
 	StringCchCopy(szText,SIZEOF_ARRAY(szText),BookmarkFolder.GetName().c_str());
@@ -146,9 +149,40 @@ HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,const CB
 	tviex.cChildren			= nChildren;
 	tviex.lParam			= m_uIDCounter;
 
+	HTREEITEM hInsertAfter;
+
+	if(Position == 0)
+	{
+		hInsertAfter = TVI_FIRST;
+	}
+	else
+	{
+		/* Find the item one *before* Position;
+		the new item will then be inserted one
+		place *after* this. */
+		HTREEITEM hChild = TreeView_GetChild(m_hTreeView,hParent);
+
+		for(std::size_t i = 0;i < (Position - 1);i++)
+		{
+			HTREEITEM hNextSibling = TreeView_GetNextSibling(m_hTreeView,hChild);
+			
+			/* Only bookmark folders are inserted into the
+			treeview, so it's possible that the specified position
+			will be after the last child in the treeview. */
+			if(hNextSibling == NULL)
+			{
+				break;
+			}
+
+			hChild = hNextSibling;
+		}
+
+		hInsertAfter = hChild;
+	}
+
 	TVINSERTSTRUCT tvis;
 	tvis.hParent			= hParent;
-	tvis.hInsertAfter		= TVI_LAST;
+	tvis.hInsertAfter		= hInsertAfter;
 	tvis.itemex				= tviex;
 	HTREEITEM hItem = TreeView_InsertItem(m_hTreeView,&tvis);
 
@@ -160,14 +194,15 @@ HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,const CB
 	return hItem;
 }
 
-HTREEITEM CBookmarkTreeView::BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
+HTREEITEM CBookmarkTreeView::BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
+	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
 {
 	/* Due to the fact that *all* bookmark folders will be inserted
 	into the treeview (regardless of whether or not they are actually
 	shown), any new folders will always need to be inserted. */
 	auto itr = m_mapItem.find(ParentBookmarkFolder.GetGUID());
 	assert(itr != m_mapItem.end());
-	HTREEITEM hItem = InsertFolderIntoTreeView(itr->second,BookmarkFolder);
+	HTREEITEM hItem = InsertFolderIntoTreeView(itr->second,BookmarkFolder,Position);
 
 	UINT uParentState = TreeView_GetItemState(m_hTreeView,itr->second,TVIS_EXPANDED);
 
@@ -327,24 +362,10 @@ void CBookmarkListView::InsertBookmarksIntoListView(const CBookmarkFolder &Bookm
 	}
 }
 
-int CBookmarkListView::InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder)
-{
-	int nItems = ListView_GetItemCount(m_hListView);
-	return InsertBookmarkItemIntoListView(BookmarkFolder.GetName(),
-		BookmarkFolder.GetGUID(),true,nItems);
-}
-
 int CBookmarkListView::InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder,int iPosition)
 {
 	return InsertBookmarkItemIntoListView(BookmarkFolder.GetName(),
 		BookmarkFolder.GetGUID(),true,iPosition);
-}
-
-int CBookmarkListView::InsertBookmarkIntoListView(const CBookmark &Bookmark)
-{
-	int nItems = ListView_GetItemCount(m_hListView);
-	return InsertBookmarkItemIntoListView(Bookmark.GetName(),
-		Bookmark.GetGUID(),false,nItems);
 }
 
 int CBookmarkListView::InsertBookmarkIntoListView(const CBookmark &Bookmark,int iPosition)
@@ -356,6 +377,8 @@ int CBookmarkListView::InsertBookmarkIntoListView(const CBookmark &Bookmark,int 
 int CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strName,
 	const GUID &guid,bool bFolder,int iPosition)
 {
+	assert(iPosition >= 0 && iPosition <= ListView_GetItemCount(m_hListView));
+
 	TCHAR szName[256];
 	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());
 
@@ -667,12 +690,12 @@ void CIPBookmarkItemNotifier::OnBookmarkFolderModified(const GUID &guid)
 	
 }
 
-void CIPBookmarkItemNotifier::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)
+void CIPBookmarkItemNotifier::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position)
 {
 
 }
 
-void CIPBookmarkItemNotifier::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
+void CIPBookmarkItemNotifier::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position)
 {
 	
 }

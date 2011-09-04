@@ -12,8 +12,8 @@ namespace NBookmark
 {
 	__interface IBookmarkItemNotification
 	{
-		virtual void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
-		virtual void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
+		virtual void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
+		virtual void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
 
 		virtual void	OnBookmarkModified(const GUID &guid);
 		virtual void	OnBookmarkFolderModified(const GUID &guid);
@@ -145,8 +145,8 @@ public:
 	void	AddObserver(NBookmark::IBookmarkItemNotification *pbin);
 	void	RemoveObserver(NBookmark::IBookmarkItemNotification *pbin);
 
-	void	NotifyObserversBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
-	void	NotifyObserversBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
+	void	NotifyObserversBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
+	void	NotifyObserversBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
 	void	NotifyObserversBookmarkModified(const GUID &guid);
 	void	NotifyObserversBookmarkFolderModified(const GUID &guid);
 	void	NotifyObserversBookmarkRemoved(const GUID &guid);
@@ -169,7 +169,7 @@ private:
 	CBookmarkItemNotifier(const CBookmarkItemNotifier &);
 	CBookmarkItemNotifier & operator=(const CBookmarkItemNotifier &);
 
-	void	NotifyObservers(NotificationType_t NotificationType,const CBookmarkFolder *pParentBookmarkFolder,const CBookmarkFolder *pBookmarkFolder,const CBookmark *pBookmark,const GUID *pguid);
+	void	NotifyObservers(NotificationType_t NotificationType,const CBookmarkFolder *pParentBookmarkFolder,const CBookmarkFolder *pBookmarkFolder,const CBookmark *pBookmark,const GUID *pguid,std::size_t Position);
 
 	std::list<NBookmark::IBookmarkItemNotification *>	m_listObservers;
 };

@@ -50,26 +50,26 @@ public:
 	CBookmarkTreeView(HWND hTreeView,CBookmarkFolder *pAllBookmarks,const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
 	~CBookmarkTreeView();
 
-	CBookmarkFolder		&GetBookmarkFolderFromTreeView(HTREEITEM hItem);
+	CBookmarkFolder					&GetBookmarkFolderFromTreeView(HTREEITEM hItem);
 
-	HTREEITEM			BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
-	void				BookmarkFolderModified(const GUID &guid);
-	void				BookmarkFolderRemoved(const GUID &guid);
+	HTREEITEM						BookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
+	void							BookmarkFolderModified(const GUID &guid);
+	void							BookmarkFolderRemoved(const GUID &guid);
 
-	void				SelectFolder(const GUID &guid);
+	void							SelectFolder(const GUID &guid);
 
 private:
 
 	typedef std::unordered_map<GUID,HTREEITEM,NBookmarkHelper::GuidHash,NBookmarkHelper::GuidEq> ItemMap_t;
 
-	LRESULT CALLBACK	TreeViewProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK				TreeViewProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
-	void				SetupTreeView(const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
+	void							SetupTreeView(const GUID &guidSelected,const NBookmarkHelper::setExpansion_t &setExpansion);
 
-	HTREEITEM			InsertFolderIntoTreeView(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder);
-	void				InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder);
+	HTREEITEM						InsertFolderIntoTreeView(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
+	void							InsertFoldersIntoTreeViewRecursive(HTREEITEM hParent,const CBookmarkFolder &BookmarkFolder);
 
-	void				OnTvnDeleteItem(NMTREEVIEW *pnmtv);
+	void							OnTvnDeleteItem(NMTREEVIEW *pnmtv);
 
 	HWND							m_hTreeView;
 	HIMAGELIST						m_himl;
@@ -88,17 +88,15 @@ public:
 	CBookmarkListView(HWND hListView);
 	~CBookmarkListView();
 
-	void	InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder);
-	int		InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder);
-	int		InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder,int iPosition);
-	int		InsertBookmarkIntoListView(const CBookmark &Bookmark);
-	int		InsertBookmarkIntoListView(const CBookmark &Bookmark,int iPosition);
+	void							InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder);
+	int								InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder,int iPosition);
+	int								InsertBookmarkIntoListView(const CBookmark &Bookmark,int iPosition);
 	NBookmarkHelper::variantBookmark_t	GetBookmarkItemFromListView(CBookmarkFolder &ParentBookmarkFolder,int iItem);
 	NBookmarkHelper::variantBookmark_t	GetBookmarkItemFromListViewlParam(CBookmarkFolder &ParentBookmarkFolder,LPARAM lParam);
 
 private:
 
-	int		InsertBookmarkItemIntoListView(const std::wstring &strName,const GUID &guid,bool bFolder,int iPosition);
+	int								InsertBookmarkItemIntoListView(const std::wstring &strName,const GUID &guid,bool bFolder,int iPosition);
 
 	HWND							m_hListView;
 	HIMAGELIST						m_himl;
@@ -118,8 +116,8 @@ public:
 	CIPBookmarkItemNotifier(HWND hTopLevelWnd);
 	~CIPBookmarkItemNotifier();
 
-	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
-	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
+	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
+	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
 	void	OnBookmarkModified(const GUID &guid);
 	void	OnBookmarkFolderModified(const GUID &guid);
 	void	OnBookmarkRemoved(const GUID &guid);
