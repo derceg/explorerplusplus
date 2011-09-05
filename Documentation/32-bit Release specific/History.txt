@@ -1,7 +1,7 @@
 Explorer++ Version History
 --------------------------
 
-Current version: 1.3
+Current version: 1.3.1
 
 Note:
  - On the 64-bit version of Windows, the control
@@ -10,7 +10,7 @@ Note:
    a 64-bit version of Windows, it is recommended
    that you use the 64-bit version of Explorer++.
 
-Version 1.3.1 (xx/xx/2011)
+Version 1.3.1 (05/09/2011)
 --------------------------
 New features:
 - The sort mode and direction are now saved in the search
