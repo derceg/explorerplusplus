@@ -671,7 +671,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wP
 	(blocked by edit control using WM_GETDLGMESSAGE).
 	So, send custom message instead. */
 	case WM_USER_KEYDOWN:
-		m_bListViewBeginRename = FALSE;
 		switch(wParam)
 		{
 		case VK_F2:
@@ -760,7 +759,15 @@ LRESULT CALLBACK Explorerplusplus::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wP
 
 	case EM_SETSEL:
 		{
-			if(m_bListViewBeginRename)
+			/* When editing an item, the listview control
+			will first deselect, then select all text. If
+			an item has been put into edit mode, and the
+			listview attempts to select all text, modify the
+			message so that only text up to the extension
+			(if any) is selected. */
+			if(m_bListViewBeginRename &&
+				wParam == 0 &&
+				lParam == -1)
 			{
 				TCHAR	szFileName[MAX_PATH];
 				DWORD	dwAttributes;
@@ -785,12 +792,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wP
 						}
 					}
 
-					/* Select all text up to the '.' character
-					before the extension. */
-					/* wParam represents the lower bound; lParam
-					the upper bound. Modify them so that all the
-					items text is selected, except for any extension. */
-
 					if(bExtensionFound)
 					{
 						wParam = 0;
@@ -798,7 +799,7 @@ LRESULT CALLBACK Explorerplusplus::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wP
 					}
 				}
 
-				//m_bListViewBeginRename = FALSE;
+				m_bListViewBeginRename = FALSE;
 			}
 		}
 		break;
