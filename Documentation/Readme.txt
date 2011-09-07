@@ -1,5 +1,4 @@
-Explorer++ 1.3 64-bit
----------------------
+Explorer++ [version] [build_type]
 
 Copyright (c) 2005-2011 David Erceg
 
