@@ -10,6 +10,13 @@ Note:
    a 64-bit version of Windows, it is recommended
    that you use the 64-bit version of Explorer++.
 
+Version 1.3.2 (xx/xx/2011)
+--------------------------
+Bug fixes:
+- When renaming a file in the listview with IME turned on,
+  text was been overwritten (because the text selection was
+  modified). Fixed.
+
 Version 1.3.1 (05/09/2011)
 --------------------------
 New features:
