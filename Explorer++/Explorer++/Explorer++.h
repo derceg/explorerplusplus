@@ -15,7 +15,6 @@
 #import <msxml3.dll> raw_interfaces_only
 
 #define MAX_TABS					100
-#define MENU_BOOKMARK_STARTPOS		3
 #define MENU_BOOKMARK_STARTID		10000
 #define MENU_BOOKMARK_ENDID			11000
 #define MENU_HEADER_STARTID			12000
@@ -37,8 +36,6 @@ lParam not currently used. */
 #define FROM_LISTVIEW				0
 #define FROM_TREEVIEW				1
 #define FROM_DRIVEBAR				3
-
-#define MAX_BOOKMARKTOOLBAR_ITEMS	100
 
 /* Registry keys used to store program settings. */
 #define REG_MAIN_KEY				_T("Software\\Explorer++")
@@ -1034,9 +1031,7 @@ private:
 	GUID					m_guidBookmarksToolbar;
 	GUID					m_guidBookmarksMenu;
 	CBookmarksToolbar		*m_pBookmarksToolbar;
-
-	/* TODO: Win+E keyboard hook DLL. */
-	HHOOK					m_hKeyboardHook;
+	CIPBookmarkItemNotifier	*m_pipbin;
 
 	/* Undo support. */
 	CFileActionHandler		m_FileActionHandler;
@@ -1088,9 +1083,6 @@ private:
 	int						m_nSelectedOnInvert;
 	int						m_ListViewMButtonItem;
 
-	/* Bookmarks. */
-	CIPBookmarkItemNotifier	*m_pipbin;
-
 	/* Copy/cut. */
 	IDataObject				*m_pClipboardDataObject;
 	HTREEITEM				m_hCutTreeViewItem;
@@ -1111,11 +1103,6 @@ private:
 	BOOL					m_bTabBeenDragged;
 	RECT					m_rcDraggedTab;
 	int						m_iTabMenuItem;
-
-	/* Shell context menu. */
-	IContextMenu3			*m_pShellContext3;
-	IContextMenu2			*m_pShellContext2;
-	IContextMenu			*m_pShellContext;
 
 	/* Tab drop target. */
 	IDragSourceHelper *		m_pDragSourceHelper;
