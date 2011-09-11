@@ -116,15 +116,6 @@ public:
 private:
 
 	#define BORDER_COLOUR		Gdiplus::Color(128,128,128)
-	#define NUM_IMAGE_TYPES		9
-
-	typedef struct
-	{
-		int xLeft;
-		int yTop;
-		int cxWidth;
-		int cyWidth;
-	} Icon_t;
 
 	LONG	OnMouseMove(LPARAM lParam);
 	void	OnLButtonDown(LPARAM lParam);
@@ -150,10 +141,6 @@ private:
 	void	CancelThumbnailExtraction(void);
 
 
-
-
-	/* ------ Internal state. ------ */
-
 	/* IUnknown members. */
 	int				m_iRefCount;
 
@@ -163,7 +150,6 @@ private:
 	COLORREF		m_TextColor;
 	unsigned int	m_LineSpacing;
 	unsigned int	m_LeftIndent;
-	unsigned int	m_AveTextWidth;
 
 	/* Text buffers (for internal redrawing operations). */
 	std::vector<LineData_t>	m_LineList;
@@ -184,19 +170,10 @@ private:
 
 	int				m_xColumnFinal;
 
-	Icon_t IconInfo;
-
-	TCHAR ImageTypes[NUM_IMAGE_TYPES][4];
-	HDC m_hdcBackground;
-	Gdiplus::Graphics *m_pFadingImage;
-	double m_dCurrentAlpha;
-	HDC m_hdcMemFading;
-	Gdiplus::Image *m_FadingImageThumb;
-	HBITMAP m_hBitmapBackground;
-	HICON m_hMainIcon;
-	HFONT m_hDisplayFont;
-	HANDLE m_hFirstCycleImage;
-	WIN32_FIND_DATA m_wfdCycle;
+	HDC				m_hdcBackground;
+	HBITMAP			m_hBitmapBackground;
+	HICON			m_hMainIcon;
+	HFONT			m_hDisplayFont;
 };
 
 HWND CreateDisplayWindow(HWND Parent,IDisplayWindowMain **pMain,

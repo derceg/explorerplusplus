@@ -652,8 +652,6 @@ LPITEMIDLIST pidlRelative,TCHAR *szFileName)
 			return E_OUTOFMEMORY;
 	}
 
-	m_nInfoListAllocation = m_nTotalItems + m_nAwaitingAdd;
-
 	uItemId = GenerateUniqueItemId();
 
 	m_pExtraItemInfo[uItemId].pridl					= ILClone(pidlRelative);

@@ -43,10 +43,6 @@ HRESULT __stdcall CFolderView::QueryInterface(REFIID iid, void **ppvObject)
 	{
 		*ppvObject = static_cast<IShellBrowser2 *>(this);
 	}
-	else if(iid == IID_IShellFolder)
-	{
-		*ppvObject = static_cast <IShellFolder3 *> (this);
-	}
 
 	if(*ppvObject)
 	{
@@ -83,7 +79,6 @@ HANDLE hIconThread,HANDLE hFolderSizeThread)
 		hIconThread,hFolderSizeThread);
 }
 
-/* CFolderView constructor. */
 CFolderView::CFolderView(HWND hOwner,HWND hListView,
 InitialSettings_t *pSettings,HANDLE hIconThread,
 HANDLE hFolderSizeThread)
@@ -96,8 +91,6 @@ HANDLE hFolderSizeThread)
 	m_hOwner	= hOwner;
 
 	hr = InitializeDragDropHelpers();
-
-	//if(!SUCCEEDED(hr));
 
 	AllocateInitialItemMemory();
 
@@ -137,8 +130,6 @@ HANDLE hFolderSizeThread)
 	m_nCurrentColumns		= 0;
 	m_iDirMonitorId			= -1;
 	m_iParentDirMonitorId	= -1;
-	m_nItemsInInfoList		= 0;
-	m_nInfoListAllocation	= 0;
 	m_bFolderChanging		= FALSE;
 	m_pActiveColumnList		= NULL;
 	m_bPerformingDrag		= FALSE;
@@ -174,7 +165,6 @@ HANDLE hFolderSizeThread)
 		g_bcsThumbnailInitialized = TRUE;
 	}
 
-	m_bIconThreadSleeping = TRUE;
 	m_hThread = hIconThread;
 	m_hFolderSizeThread = hFolderSizeThread;
 
@@ -190,7 +180,6 @@ HANDLE hFolderSizeThread)
 		g_nAPCsQueued = 0;
 		g_bIconThreadSleeping = TRUE;
 		InitializeCriticalSection(&g_icon_cs);
-		g_nItemsInInfoList = 0;
 
 		g_bInitialized = TRUE;
 	}
@@ -200,7 +189,6 @@ HANDLE hFolderSizeThread)
 	m_hFolderQueueEvent = CreateEvent(NULL,TRUE,TRUE,NULL);
 }
 
-/* CFolderView deconstructor. */
 CFolderView::~CFolderView()
 {
 	EmptyIconFinderQueue();
@@ -210,8 +198,6 @@ CFolderView::~CFolderView()
 
 	/* Wait for any current processing to finish. */
 	WaitForSingleObject(m_hIconEvent,INFINITE);
-	//WaitForSingleObject(m_hColumnQueueEvent,INFINITE);
-	//WaitForSingleObject(m_hFolderQueueEvent,INFINITE);
 
 	/* Release the drag and drop helpers. */
 	m_pDropTargetHelper->Release();
@@ -241,9 +227,6 @@ CFolderView::~CFolderView()
 	}
 
 	CoTaskMemFree(m_pidlDirectory);
-
-	m_nItemsInInfoList = 0;
-	m_nInfoListAllocation = 0;
 
 	m_pPathManager->Release();
 	free(m_pItemMap);
@@ -585,22 +568,6 @@ void CFolderView::SetResourceModule(HINSTANCE hResourceModule)
 void CFolderView::Terminate(void)
 {
 	SendMessage(m_hOwner,WM_USER_RELEASEBROWSER,(WPARAM)m_ID,NULL);
-}
-
-int CFolderView::GetNumAPCsRun(void)
-{
-	return g_nAPCsRan;
-}
-
-int CFolderView::GetNumAPCsQueued(void)
-{
-	return g_nAPCsQueued;
-}
-
-void CFolderView::IncrementNumAPCsRan(void)
-{
-	m_nAPCsRan++;
-	g_nAPCsRan++;
 }
 
 HRESULT CFolderView::Refresh()

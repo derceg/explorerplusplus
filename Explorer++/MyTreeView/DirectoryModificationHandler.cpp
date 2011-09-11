@@ -637,10 +637,3 @@ void CMyTreeView::UpdateParent(HTREEITEM hParent)
 		}
 	}
 }
-
-void CALLBACK Timer_DirectoryModified(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
-{
-	KillTimer(hwnd,idEvent);
-
-	return;
-}

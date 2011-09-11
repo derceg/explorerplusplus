@@ -137,13 +137,6 @@ void CFolderView::AddToThumbnailFinderQueue(LPARAM lParam)
 	LeaveCriticalSection(&g_csThumbnails);
 }
 
-void CFolderView::SetThumbnailFlag(CItemObject *m_pExtraItemInfo)
-{
-	EnterCriticalSection(&g_csThumbnails);
-	m_pExtraItemInfo->bThumbnailRetreived = TRUE;
-	LeaveCriticalSection(&g_csThumbnails);
-}
-
 BOOL RemoveFromThumbnailsFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent)
 {
 	BOOL bQueueNotEmpty;

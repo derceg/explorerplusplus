@@ -27,28 +27,18 @@
 #include "../Helper/Macros.h"
 
 
-typedef struct
-{
-	LPITEMIDLIST	pidlParentNode;
-	LPITEMIDLIST	pidlDestination;
-} QueuedItem_t;
-
 LRESULT CALLBACK	TreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-void CALLBACK		Timer_DirectoryModified(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime);
 DWORD WINAPI		Thread_SubFoldersStub(LPVOID pVoid);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 void CALLBACK		TVFindIconAPC(ULONG_PTR dwParam);
 BOOL				RemoveFromIconFinderQueue(TreeViewInfo_t *pListViewInfo);
 
 DWORD	g_ThreadId;
-WNDPROC	OldTreeViewProc;
-UINT	DirWatchFlags = FILE_NOTIFY_CHANGE_DIR_NAME;
 
 CRITICAL_SECTION g_tv_icon_cs;
 int g_ntvAPCsRan = 0;
 int g_ntvAPCsQueued = 0;
-BOOL g_btvIconThreadSleeping = TRUE;
 
 std::list<TreeViewInfo_t> g_pTreeViewInfoList;
 
@@ -97,7 +87,12 @@ HANDLE hIconsThread)
 
 CMyTreeView::~CMyTreeView()
 {
+	free(m_uItemMap);
+	free(m_pItemInfo);
 
+	DeleteCriticalSection(&m_cs);
+	DeleteCriticalSection(&m_csSubFolders);
+	DeleteCriticalSection(&g_tv_icon_cs);
 }
 
 LRESULT CALLBACK TreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,
@@ -434,7 +429,6 @@ BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pTreeViewInfo)
 
 	if(g_pTreeViewInfoList.empty() == TRUE)
 	{
-		g_btvIconThreadSleeping = TRUE;
 		bQueueNotEmpty = FALSE;
 
 		g_ntvAPCsRan++;
@@ -1779,7 +1773,7 @@ void CMyTreeView::MonitorDrive(TCHAR *szDrive)
 			StringCchCopy(pDirectoryAltered->szPath,MAX_PATH,szDrive);
 			pDirectoryAltered->pMyTreeView	= this;
 
-			iMonitorId = m_pDirMon->WatchDirectory(hDrive,szDrive,DirWatchFlags,
+			iMonitorId = m_pDirMon->WatchDirectory(hDrive,szDrive,FILE_NOTIFY_CHANGE_DIR_NAME,
 				CMyTreeView::DirectoryAlteredCallback,TRUE,(void *)pDirectoryAltered);
 
 			dbv.dbch_size		= sizeof(dbv);

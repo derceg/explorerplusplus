@@ -313,7 +313,6 @@ __interface IShellBrowser2 : IUnknown
 	virtual void			ToggleGrouping(void);
 	virtual void			SetGrouping(BOOL bShowInGroups);
 	virtual void			SetGroupingFlag(BOOL bShowInGroups);
-	virtual HRESULT			SetEnumFlags(DWORD);
 	virtual int				SelectFiles(TCHAR *FileNamePattern);
 	virtual void			SelectItems(const std::list<std::wstring> &PastedFileList);
 	virtual DWORD			QueryFileAttributes(int iItem);
@@ -385,12 +384,6 @@ __interface IShellBrowser2 : IUnknown
 	virtual BOOL			GetInsertSorted(void);
 	virtual void			SetForceSize(BOOL bForceSize);
 	virtual void			SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
-};
-
-__interface IShellFolder3 : IUnknown
-{
-	virtual HRESULT GetAttributesOf(TCHAR *,UINT *);
-	virtual HRESULT CreateViewObject(HWND hOwner,REFIID iid,void **ppv);
 };
 
 void InitializeFolderView(HWND hOwner,HWND hListView,

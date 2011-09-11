@@ -36,6 +36,46 @@
 
 int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 
+int CALLBACK SortByDateModifiedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortBySizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByTotalSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByFreeSpaceStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByDateDeletedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByOriginalLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByAttributesStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByRealSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByShortNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByOwnerStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByProductNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByCompanyStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByDescriptionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByFileVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByProductVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByShortcutToStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByHardlinksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByExtensionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByDateCreatedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByDateAccessedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByTitleStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortBySubjectStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByAuthorStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByKeywordsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByCameraModelStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByDateTakenStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByWidthStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByHeightStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByVirtualCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByFileSystemStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByVirtualTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByNumPrinterDocumentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByPrinterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByPrinterCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByPrinterLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+int CALLBACK SortByNetworkAdapterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+
 int CALLBACK SortByNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
 	CFolderView	*pFolderView = NULL;
@@ -2021,6 +2061,185 @@ int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 int CALLBACK CFolderView::Sort(LPARAM lParam1,LPARAM lParam2)
 {
 	return SortItemsRelative(lParam1,lParam2);
+}
+
+int CFolderView::SortItemsRelative(LPARAM lParam1,LPARAM lParam2)
+{
+	int iSort;
+
+	iSort = DetermineRelativeItemPositions(lParam1,lParam2);
+
+	if(iSort == 0)
+	{
+		iSort = StrCmpLogicalW(m_pExtraItemInfo[lParam1].szDisplayName,
+			m_pExtraItemInfo[lParam2].szDisplayName);
+	}
+
+	return iSort;
+}
+
+int CFolderView::DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2)
+{
+	switch(m_SortMode)
+	{
+	case FSM_NAME:
+		return SortByNameStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_TYPE:
+		return SortByTypeStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_SIZE:
+		return SortBySizeStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_DATEMODIFIED:
+		return SortByDateModifiedStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_TOTALSIZE:
+		return SortByTotalSizeStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_FREESPACE:
+		return SortByFreeSpaceStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_DATEDELETED:
+		return SortByDateDeletedStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_ORIGINALLOCATION:
+		return SortByOriginalLocationStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_ATTRIBUTES:
+		return SortByAttributesStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_REALSIZE:
+		return SortByRealSizeStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_SHORTNAME:
+		return SortByShortNameStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_OWNER:
+		return SortByOwnerStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_PRODUCTNAME:
+		return SortByProductNameStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_COMPANY:
+		return SortByCompanyStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_DESCRIPTION:
+		return SortByDescriptionStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_FILEVERSION:
+		return SortByFileVersionStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_PRODUCTVERSION:
+		return SortByProductVersionStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_SHORTCUTTO:
+		return SortByShortcutToStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_HARDLINKS:
+		return SortByHardlinksStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_EXTENSION:
+		return SortByExtensionStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_CREATED:
+		return SortByDateCreatedStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_ACCESSED:
+		return SortByDateAccessedStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_TITLE:
+		return SortByTitleStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_SUBJECT:
+		return SortBySubjectStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_AUTHOR:
+		return SortByAuthorStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_KEYWORDS:
+		return SortByKeywordsStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_COMMENTS:
+		return SortByCommentsStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_CAMERAMODEL:
+		return SortByCameraModelStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_DATETAKEN:
+		return SortByDateTakenStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_WIDTH:
+		return SortByWidthStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_HEIGHT:
+		return SortByHeightStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_VIRTUALCOMMENTS:
+		return SortByVirtualCommentsStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_FILESYSTEM:
+		return SortByFileSystemStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_VIRTUALTYPE:
+		return SortByVirtualTypeStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_NUMPRINTERDOCUMENTS:
+		return SortByNumPrinterDocumentsStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_PRINTERSTATUS:
+		return SortByPrinterStatusStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_PRINTERCOMMENTS:
+		return SortByPrinterCommentsStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_PRINTERLOCATION:
+		return SortByPrinterLocationStub(lParam1,lParam2,(LPARAM)this);
+		break;
+
+	case FSM_NETWORKADAPTER_STATUS:
+		return SortByNetworkAdapterStatusStub(lParam1,lParam2,(LPARAM)this);
+		break;
+	}
+
+	return 0;
 }
 
 HRESULT CFolderView::SortFolder(UINT SortMode)

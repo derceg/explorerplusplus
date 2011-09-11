@@ -34,8 +34,6 @@ need to be included here. */
 #define VALIDATE_NETWORKCONNECTIONS_COLUMNS	5
 #define VALIDATE_MYNETWORKPLACES_COLUMNS	6
 
-#define DEFAULT_UNKNOWN_ICON				3
-
 #define THUMBNAIL_ITEM_WIDTH				120
 #define THUMBNAIL_ITEM_HEIGHT				120
 #define THUMBNAIL_ITEM_HORIZONTAL_SPACING	20
@@ -46,14 +44,14 @@ need to be included here. */
 
 typedef struct
 {
-	TCHAR *pszFilter;
-} Filter_t;
+	TCHAR szFileName[MAX_PATH];
+	POINT DropPoint;
+} DroppedFile_t;
 
 typedef struct
 {
 	TCHAR szFileName[MAX_PATH];
-	POINT DropPoint;
-} DroppedFile_t;
+} DraggedFile_t;
 
 typedef struct
 {
@@ -80,24 +78,6 @@ typedef struct
 	BOOL	bPosition;
 	int		iAfter;
 } AwaitingAdd_t;
-
-typedef struct
-{
-	int		iItemInternal;
-	TCHAR	szNewFileName[MAX_PATH];
-} AwaitingRename_t;
-
-typedef struct
-{
-	TCHAR szFileName[MAX_PATH];
-} DraggedFile_t;
-
-typedef struct
-{
-	int iColumnId;
-	TCHAR ColumnText[256];
-	BOOL bActive;
-} Columns_t;
 
 class CItemObject
 {
@@ -141,8 +121,6 @@ typedef struct
 } Added_t;
 
 extern std::list<ListViewInfo_t>	g_pListViewInfoList;
-extern int					g_nItemsInInfoList;
-extern int					g_nInfoListAllocation;
 extern CRITICAL_SECTION	g_icon_cs;
 extern BOOL				g_bIconThreadSleeping;
 extern int					g_nAPCsRan;
@@ -185,48 +163,8 @@ void CALLBACK	FindThumbnailAPC(ULONG_PTR dwParam);
 void CALLBACK SetAllColumnDataAPC(ULONG_PTR dwParam);
 void CALLBACK SetAllFolderSizeColumnDataAPC(ULONG_PTR dwParam);
 
-int CALLBACK SortByDateModifiedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortBySizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByTotalSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByFreeSpaceStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByDateDeletedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByOriginalLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByAttributesStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByRealSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByShortNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByOwnerStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByProductNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByCompanyStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByDescriptionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByFileVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByProductVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByShortcutToStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByHardlinksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByExtensionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByDateCreatedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByDateAccessedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByTitleStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortBySubjectStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByAuthorStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByKeywordsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByCameraModelStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByDateTakenStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByWidthStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByHeightStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByVirtualCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByFileSystemStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByVirtualTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByNumPrinterDocumentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByPrinterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByPrinterCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByPrinterLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByNetworkAdapterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-
 class CFolderView :  public MyIFolderView2, public MyIShellView3, public IShellBrowser2,
-public IShellFolder3, public IDropTarget, public IDropFilesCallback
+public IDropTarget, public IDropFilesCallback
 {
 public:
 
@@ -261,7 +199,6 @@ public:
 	HRESULT				GetCurrentViewMode(UINT *pViewMode);
 	HRESULT				GetSortMode(UINT *SortMode);
 	HRESULT				SetSortMode(UINT SortMode);
-	HRESULT				SetEnumFlags(DWORD pgrfFlags);
 	BOOL				IsSortAscending(void);
 	BOOL				IsGroupViewEnabled(void);
 	BOOL				ToggleSortAscending(void);
@@ -413,11 +350,6 @@ public:
 	BOOL				GetTerminationStatus(void);
 	void				SetTerminationStatus(void);
 	void				Terminate(void);
-	void				SetThumbnailFlag(CItemObject *m_pExtraItemInfo);
-
-	int					GetNumAPCsRun(void);
-	int					GetNumAPCsQueued(void);
-	void				IncrementNumAPCsRan(void);
 
 	void				ColumnClicked(int iClickedColumn);
 	void				QueryCurrentSortModes(std::list<int> *pSortModes);
@@ -435,7 +367,6 @@ public:
 
 private:
 
-	/* Internal private functions. */
 	void				InitializeItemMap(int iStart,int iEnd);
 	int					GenerateUniqueItemId(void);
 	BOOL				GhostItemInternal(int iItem,BOOL bGhost);
@@ -593,10 +524,6 @@ private:
 	void				SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
 
 
-
-
-	/* ------ Internal state. ------ */
-
 	int					m_iRefCount;
 
 	HWND				m_hListView;
@@ -629,7 +556,6 @@ private:
 	TCHAR				m_CurDir[MAX_PATH];
 	ULARGE_INTEGER		m_ulTotalDirSize;
 	ULARGE_INTEGER		m_ulFileSelectionSize;
-	DWORD				m_EnumFlags;
 	DWORD				m_dwMajorVersion;
 	UINT				m_SortMode;
 	UINT				m_ViewMode;
@@ -698,11 +624,6 @@ private:
 
 	/* File selection. */
 	std::list<std::wstring>	m_FileSelectionList;
-
-	/* Icon gathering information. */
-	int					m_nItemsInInfoList;
-	int					m_nInfoListAllocation;
-	BOOL				m_bIconThreadSleeping;
 
 	/* Column gathering information. */
 	std::list<int>		m_pColumnInfoList;
