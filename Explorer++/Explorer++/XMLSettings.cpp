@@ -2035,6 +2035,7 @@ WCHAR *wszName,WCHAR *wszValue)
 				/* Element value. */
 				pChildNode->get_text(&bstrValue);
 
+				/* TODO: Replace hardcoded strings. */
 				if(lstrcmpi(bstrValue,L"Separator") == 0)
 					tb.iItemID = TOOLBAR_SEPARATOR;
 				else if(lstrcmpi(bstrValue,L"Back") == 0)
@@ -2075,8 +2076,8 @@ WCHAR *wszName,WCHAR *wszValue)
 					tb.iItemID = TOOLBAR_ORGANIZEBOOKMARKS;
 				else if(lstrcmpi(bstrValue,L"Create a new tab") == 0)
 					tb.iItemID = TOOLBAR_NEWTAB;
-				else if(lstrcmpi(bstrValue,L"Show Command Prompt") == 0)
-					tb.iItemID = TOOLBAR_SHOWCOMMANDPROMPT;
+				else if(lstrcmpi(bstrValue,L"Open Command Prompt") == 0)
+					tb.iItemID = TOOLBAR_OPENCOMMANDPROMPT;
 
 				m_tbInitial.push_back(tb);
 			}

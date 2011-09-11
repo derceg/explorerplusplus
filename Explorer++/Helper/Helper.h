@@ -212,7 +212,7 @@ HRESULT			GetMediaMetadata(TCHAR *szFileName,LPCWSTR szAttribute,BYTE **pszOutpu
 /* General helper functions. */
 void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf);
 void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf);
-HINSTANCE		StartCommandPrompt(TCHAR *Directory);
+HINSTANCE		StartCommandPrompt(TCHAR *Directory,bool Elevated);
 BOOL			SetProcessTokenPrivilege(DWORD ProcessId,TCHAR *PrivilegeName,BOOL bEnablePrivilege);
 void			ShowLastError(void);
 int				GetRectHeight(RECT *rc);

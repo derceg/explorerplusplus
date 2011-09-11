@@ -64,7 +64,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYITEMPATH,CheckItemSelection());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYUNIVERSALFILEPATHS,CheckItemSelection());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_SETFILEATTRIBUTES,CheckItemSelection());
-	lEnableMenuItem(hProgramMenu,IDM_FILE_SHOWCOMMANDPROMPT,!bVirtualFolder);
+	lEnableMenuItem(hProgramMenu,IDM_FILE_OPENCOMMANDPROMPT,!bVirtualFolder);
 	lEnableMenuItem(hProgramMenu,IDM_FILE_SAVEDIRECTORYLISTING,!bVirtualFolder);
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYCOLUMNTEXT,m_nSelected && (uViewMode == VM_DETAILS));
 

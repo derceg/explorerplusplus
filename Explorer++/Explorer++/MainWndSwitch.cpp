@@ -488,9 +488,13 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			OnSaveDirectoryListing();
 			break;
 
-		case TOOLBAR_SHOWCOMMANDPROMPT:
-		case IDM_FILE_SHOWCOMMANDPROMPT:
-			StartCommandPrompt(m_CurrentDirectory);
+		case TOOLBAR_OPENCOMMANDPROMPT:
+		case IDM_FILE_OPENCOMMANDPROMPT:
+			StartCommandPrompt(m_CurrentDirectory,false);
+			break;
+
+		case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
+			StartCommandPrompt(m_CurrentDirectory,true);
 			break;
 
 		case IDM_FILE_COPYFOLDERPATH:

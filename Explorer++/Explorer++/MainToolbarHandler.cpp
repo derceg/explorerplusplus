@@ -79,7 +79,7 @@ void Explorerplusplus::SetInitialToolbarButtons(void)
 	tb.iItemID		= TOOLBAR_VIEWS;
 	m_tbInitial.push_back(tb);
 
-	tb.iItemID		= TOOLBAR_SHOWCOMMANDPROMPT;
+	tb.iItemID		= TOOLBAR_OPENCOMMANDPROMPT;
 	m_tbInitial.push_back(tb);
 
 	tb.iItemID		= TOOLBAR_REFRESH;
@@ -179,8 +179,8 @@ int Explorerplusplus::LookupToolbarButtonTextID(int iButtonID)
 		return IDS_TOOLBAR_NEWTAB;
 		break;
 
-	case TOOLBAR_SHOWCOMMANDPROMPT:
-		return IDS_TOOLBAR_SHOWCOMMANDPROMPT;
+	case TOOLBAR_OPENCOMMANDPROMPT:
+		return IDS_TOOLBAR_OPENCOMMANDPROMPT;
 		break;
 	}
 
@@ -271,7 +271,7 @@ int Explorerplusplus::LookupToolbarButtonImage(int iButtonID)
 			return SHELLIMAGES_NEWTAB;
 			break;
 
-		case TOOLBAR_SHOWCOMMANDPROMPT:
+		case TOOLBAR_OPENCOMMANDPROMPT:
 			return SHELLIMAGES_CMD;
 			break;
 	}
@@ -363,7 +363,7 @@ BYTE Explorerplusplus::LookupToolbarButtonExtraStyles(int iButtonID)
 			return 0;
 			break;
 
-		case TOOLBAR_SHOWCOMMANDPROMPT:
+		case TOOLBAR_OPENCOMMANDPROMPT:
 			return 0;
 			break;
 	}
@@ -477,7 +477,7 @@ void Explorerplusplus::AddStringsToMainToolbar(void)
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_SHOWCOMMANDPROMPT),
+	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_OPENCOMMANDPROMPT),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
@@ -520,7 +520,7 @@ void Explorerplusplus::HandleToolbarItemStates(void)
 	SendMessage(m_hMainToolbar,TB_ENABLEBUTTON,(WPARAM)TOOLBAR_DELETE,IsDeletionPossible());
 	SendMessage(m_hMainToolbar,TB_ENABLEBUTTON,(WPARAM)TOOLBAR_DELETEPERMANENTLY,IsDeletionPossible());
 
-	SendMessage(m_hMainToolbar,TB_ENABLEBUTTON,(WPARAM)TOOLBAR_SHOWCOMMANDPROMPT,!bVirtualFolder);
+	SendMessage(m_hMainToolbar,TB_ENABLEBUTTON,(WPARAM)TOOLBAR_OPENCOMMANDPROMPT,!bVirtualFolder);
 
 	SendMessage(m_hMainToolbar,TB_ENABLEBUTTON,TOOLBAR_NEWFOLDER,!bVirtualFolder);
 }

@@ -264,22 +264,31 @@ HRESULT GetBitmapDimensions(TCHAR *FileName,SIZE *BitmapSize)
 	return S_OK;
 }
 
-HINSTANCE StartCommandPrompt(TCHAR *Directory)
+HINSTANCE StartCommandPrompt(TCHAR *Directory,bool Elevated)
 {
-	TCHAR SystemPath[MAX_PATH];
-	TCHAR FullPath[MAX_PATH];
-	TCHAR Prompt[]			= _T("cmd.exe");
-	HINSTANCE hNewInstance	= NULL;
-	BOOL bRes;
+	HINSTANCE hNewInstance = NULL;
 
-	bRes = SHGetSpecialFolderPath(NULL,SystemPath,CSIDL_SYSTEM,0);
+	TCHAR SystemPath[MAX_PATH];
+	BOOL bRes = SHGetSpecialFolderPath(NULL,SystemPath,CSIDL_SYSTEM,0);
 
 	if(bRes)
 	{
-		PathCombine(FullPath,SystemPath,Prompt);
+		TCHAR CommandPath[MAX_PATH];
+		PathCombine(CommandPath,SystemPath,_T("cmd.exe"));
 
-		hNewInstance = ShellExecute(NULL,_T("open"),FullPath,Directory,Directory,
-		SW_SHOW);
+		TCHAR Operation[32];
+
+		if(Elevated)
+		{
+			StringCchCopy(Operation,SIZEOF_ARRAY(Operation),_T("runas"));
+		}
+		else
+		{
+			StringCchCopy(Operation,SIZEOF_ARRAY(Operation),_T("open"));
+		}
+
+		hNewInstance = ShellExecute(NULL,Operation,CommandPath,NULL,Directory,
+		SW_SHOWNORMAL);
 	}
 
 	return hNewInstance;
