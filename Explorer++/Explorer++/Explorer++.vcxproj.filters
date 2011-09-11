@@ -22,9 +22,6 @@
     <ClCompile Include="BookmarkHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ChangeDisplayWindowDetailsDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ColorRuleDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -35,9 +32,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DisplayColoursDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DisplayWindowLinePropertiesDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DrivesToolbarHandler.cpp">

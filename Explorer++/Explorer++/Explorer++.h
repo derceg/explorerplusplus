@@ -86,31 +86,6 @@ typedef struct
 
 typedef struct
 {
-	TCHAR szType[32];
-} DWFileType_t;
-
-typedef struct
-{
-	TCHAR szCommand[256];
-	TCHAR szDescription[256];
-} DWCommand_t;
-
-typedef struct
-{
-	TCHAR szDescription[256];
-	TCHAR szText[256];
-} DWLine_t;
-
-typedef struct
-{
-	TCHAR szDescription[256];
-	
-	std::list<DWFileType_t>	FileTypes;
-	std::list<DWLine_t>		Lines;
-} DWRule_t;
-
-typedef struct
-{
 	ATOM	atomClass;
 	HWND	hProxy;
 	int		iTabId;
@@ -403,7 +378,6 @@ private:
 	void					OnChangeCBChain(WPARAM wParam,LPARAM lParam);
 	void					OnSetFocus(void);
 	void					ItemChangedHandler(TCHAR *ItemName,BOOL Selected);
-	int						SelectAllFolders(HWND ListView);
 	int						HighlightSimilarFiles(HWND ListView);
 	void					ShowHiddenFiles(void);
 	HRESULT					OnDeviceChange(WPARAM wParam,LPARAM lParam);
@@ -753,7 +727,6 @@ private:
 	void					HandleFileSelectionDisplayZero(void);
 	void					HandleFileSelectionDisplayOne(void);
 	void					HandleFileSelectionDisplayMore(void);
-	void					OutputInformationOnDisplayWindow(TCHAR *szFullFileName,DWInfoType_t InfoType);
 	void					FormatDisplayString(TCHAR *szDisplayRaw,int iSelected,TCHAR *szFullFileName,TCHAR *szDisplayFinal,UINT cchMax);
 	void					TranslateDisplayWindowBuffer(TCHAR *szSymbol,UINT cchMax,int iSelected,TCHAR *szFullFileName);
 
@@ -774,7 +747,6 @@ private:
 	/* Bookmark handling. */
 	HRESULT					ExpandAndBrowsePath(TCHAR *szPath);
 	HRESULT					ExpandAndBrowsePath(TCHAR *szPath,BOOL bOpenInNewTab,BOOL bSwitchToNewTab);
-	void					InsertBookmarksIntoMenu(void);
 
 	/* Filtering. */
 	void					SetFilterStatus(void);
@@ -1055,11 +1027,6 @@ private:
 	int						m_nAppButtons;
 	int						m_iAppIdOffset;
 	int						m_iSelectedRClick;
-
-	/* Display window details. */
-	std::list<DWRule_t>		m_DWRules;
-	std::list<DWLine_t>		m_DWLines;
-	std::list<DWCommand_t>	m_DWCommands;
 
 	/* Display window folder sizes. */
 	std::list<DWFolderSize_t>	m_DWFolderSizes;

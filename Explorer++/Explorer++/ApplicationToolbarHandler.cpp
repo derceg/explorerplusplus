@@ -28,6 +28,9 @@ DWORD ApplicationToolbarStyles	=	WS_CHILD |WS_VISIBLE |WS_CLIPSIBLINGS |WS_CLIPC
 								TBSTYLE_TOOLTIPS | TBSTYLE_LIST | TBSTYLE_TRANSPARENT |
 								TBSTYLE_FLAT | CCS_NODIVIDER| CCS_NORESIZE;
 
+INT_PTR CALLBACK ApplicationToolbarNewButtonProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
+INT_PTR CALLBACK ApplicationButtonPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
+
 void Explorerplusplus::CreateApplicationToolbar(void)
 {
 	HIMAGELIST	himlSmall;

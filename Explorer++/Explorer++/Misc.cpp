@@ -390,37 +390,6 @@ void Explorerplusplus::AddStyleToToolbar(UINT *fStyle,UINT fStyleToAdd)
 		*fStyle |= fStyleToAdd;
 }
 
-int Explorerplusplus::SelectAllFolders(HWND ListView)
-{
-	TCHAR	FullItemPath[MAX_PATH];
-	HRESULT	hr;
-	int		nItems;
-	int		nFolders = 0;
-	int		i = 0;
-
-	NListView::ListView_SelectAllItems(ListView,FALSE);
-
-	nItems = ListView_GetItemCount(ListView);
-
-	while(i < nItems)
-	{
-		hr = m_pActiveShellBrowser->QueryFullItemName(i,FullItemPath);
-
-		if(SUCCEEDED(hr))
-		{
-			if(PathIsDirectory(FullItemPath))
-			{
-				ListView_SetItemState(ListView,i,LVIS_SELECTED,LVIS_SELECTED);
-				nFolders++;
-			}
-		}
-
-		i++;
-	}
-
-	return nFolders;
-}
-
 int Explorerplusplus::HighlightSimilarFiles(HWND ListView)
 {
 	TCHAR	FullFileName[MAX_PATH];
@@ -1199,9 +1168,6 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 	TCHAR			szDisplayName[MAX_PATH];
 	TCHAR			szDateModified[256];
 	int				iSelected;
-	std::list<DWRule_t>::iterator	itr;
-	std::list<DWFileType_t>::iterator	itrTypes;
-	std::list<DWLine_t>::iterator	itrLines;
 
 	iSelected = ListView_GetNextItem(m_hActiveListView,-1,LVNI_SELECTED);
 
@@ -1589,110 +1555,6 @@ void Explorerplusplus::TranslateDisplayWindowBuffer(TCHAR *szSymbol,UINT cchMax,
 			StringCchCopy(szSymbol,cchMax,szOutput);
 			delete pimg;
 		}
-	}
-}
-
-void Explorerplusplus::OutputInformationOnDisplayWindow(TCHAR *szFullFileName,DWInfoType_t InfoType)
-{
-	switch(InfoType)
-	{
-		case DW_NAME:
-			{
-				TCHAR szOutput[MAX_PATH];
-
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),szFullFileName);
-				PathStripPath(szOutput);
-				DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
-			}
-			break;
-
-		case DW_TYPE:
-			break;
-		case DW_SIZE:
-			break;
-
-		case DW_DATEMODIFIED:
-			break;
-		case DW_CREATED:
-			break;
-		case DW_ACCESSED:
-			break;
-
-		case DW_ATTRIBUTES:
-			break;
-		case DW_REALSIZE:
-			break;
-		case DW_SHORTNAME:
-			break;
-		case DW_OWNER:
-			break;
-
-		case DW_PRODUCTNAME:
-			break;
-		case DW_COMPANY:
-			break;
-		case DW_DESCRIPTION:
-			break;
-		case DW_FILEVERSION:
-			break;
-		case DW_PRODUCTVERSION:
-			break;
-
-		case DW_SHORTCUTTO:
-			break;
-		case DW_HARDLINKS:
-			break;
-		case DW_EXTENSION:
-			break;
-
-		case DW_TITLE:
-			break;
-		case DW_SUBJECT:
-			break;
-		case DW_AUTHOR:
-			break;
-		case DW_KEYWORDS:
-			break;
-		case DW_COMMENT:
-			break;
-
-		case DW_CAMERAMODEL:
-			break;
-		case DW_DATETAKEN:
-			break;
-		case DW_WIDTH:
-			break;
-		case DW_HEIGHT:
-			break;
-
-		case DW_VIRTUALCOMMENTS:
-			break;
-
-		case DW_VIRTUALTYPE:
-			break;
-
-		case DW_TOTALSIZE:
-			break;
-		case DW_FREESPACE:
-			break;
-
-		case DW_FILESYSTEM:
-			break;
-
-		case DW_NUMPRINTERDOCUMENTS:
-			break;
-
-		case DW_PRINTERSTATUS:
-			break;
-
-		case DW_PRINTERCOMMENTS:
-			break;
-
-		case DW_PRINTERLOCATION:
-			break;
-
-		case DW_NETWORKADAPTER_STATUS:
-			break;
 	}
 }
 

@@ -78,12 +78,6 @@ SelectAndEdit() method of INewClient. */
 #define NMCSAEI_SELECT	0x0000
 #define NMCSAEI_EDIT	0x0001
 
-/* Default window size/position. */
-#define DEFAULT_WINDOWPOS_LEFT_PERCENTAGE	0.02
-#define DEFAULT_WINDOWPOS_TOP_PERCENTAGE	0.05
-#define DEFAULT_WINDOWPOS_WIDTH_PERCENTAGE	0.96
-#define DEFAULT_WINDOWPOS_HEIGHT_PERCENTAGE	0.82
-
 #define LISTVIEW_RENAME_FILENAME	0
 #define LISTVIEW_RENAME_EXTENSION	1
 #define LISTVIEW_RENAME_ENTIRE		2
@@ -93,12 +87,6 @@ SelectAndEdit() method of INewClient. */
 
 #define GROUPBY_BASE	50100
 #define GROUPBY_END		50199
-
-#define MAX_TABS					100
-#define LISTVIEW_COLUMN_WIDTH		180
-#define TREEVIEW_HEADERSIZE			16
-#define MIN_TREEVIEW_WIDTH			20
-#define MIN_TREEVIEW_HEIGHT			400
 
 /* Display window defaults. */
 #define MINIMUM_DISPLAYWINDOW_HEIGHT	70
@@ -311,13 +299,6 @@ struct ColorRule_t
 	COLORREF		rgbColour;
 };
 
-/* Used with the bookmark propeties dialog. */
-struct BookmarkPropertiesInfo_t
-{
-	void	*pContainer;
-	void	*pBookmarkHandle;
-};
-
 /* This structure is stored with
 every listview. */
 struct ListViewInfo_t
@@ -384,87 +365,6 @@ struct FileContextMenuInfo_t
 {
 	UINT	uFrom;
 };
-
-typedef enum
-{
-	DW_NAME,
-	DW_TYPE,
-	DW_SIZE,
-	DW_DATEMODIFIED,
-	DW_ATTRIBUTES,
-	DW_REALSIZE,
-	DW_SHORTNAME,
-	DW_OWNER,
-
-	/* File version information. */
-	DW_PRODUCTNAME,
-	DW_COMPANY,
-	DW_DESCRIPTION,
-	DW_FILEVERSION,
-	DW_PRODUCTVERSION,
-
-	DW_SHORTCUTTO,
-	DW_HARDLINKS,
-	DW_EXTENSION,
-	DW_CREATED,
-	DW_ACCESSED,
-
-	/* File summary information. */
-	DW_TITLE,
-	DW_SUBJECT,
-	DW_AUTHOR,
-	DW_KEYWORDS,
-	DW_COMMENT,
-
-	/* Photo data. */
-	DW_CAMERAMODEL,
-	DW_DATETAKEN,
-	DW_WIDTH,
-	DW_HEIGHT,
-
-	/* Control panel. */
-	DW_VIRTUALCOMMENTS,
-
-	/* My Computer. */
-	DW_TOTALSIZE,
-	DW_FREESPACE,
-	DW_FILESYSTEM,
-	DW_VIRTUALTYPE,
-
-	/* Recycle Bin. */
-	DW_ORIGINALLOCATION,
-	DW_DATEDELETED,
-
-	/* Printer columns. */
-	DW_NUMPRINTERDOCUMENTS,
-	DW_PRINTERSTATUS,
-	DW_PRINTERCOMMENTS,
-	DW_PRINTERLOCATION,
-
-	/* Network connections columns. */
-	DW_NETWORKADAPTER_STATUS,
-
-	/* Media metadata. */
-	DW_MEDIA_BITRATE,
-	DW_MEDIA_LENGTH,
-	DW_MEDIA_RATING,
-	DW_MEDIA_TITLE,
-	DW_MEDIA_ALBUMARTIST,
-	DW_MEDIA_ALBUMCOVERURL,
-	DW_MEDIA_ALBUMTITLE,
-	DW_MEDIA_BEATSPERMINUTE,
-	DW_MEDIA_CATEGORY,
-	DW_MEDIA_COMPOSER,
-	DW_MEDIA_CONDUCTOR,
-	DW_MEDIA_DIRECTOR,
-	DW_MEDIA_PARENTALRATING,
-	DW_MEDIA_PARENTALRATINGREASON,
-	DW_MEDIA_PARTOFSET,
-	DW_MEDIA_PRODUCER,
-	DW_MEDIA_PUBLISHER,
-	DW_MEDIA_TRACKNUMBER,
-	DW_MEDIA_YEAR
-} DWInfoType_t;
 
 static Column_t g_RealFolderColumns[] =
 {{CM_NAME,TRUE,DEFAULT_COLUMN_WIDTH},
@@ -627,26 +527,10 @@ BOOL LoadAllowMultipleInstancesFromRegistry(void);
 BOOL LoadAllowMultipleInstancesFromXML(void);
 
 LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-LRESULT CALLBACK RebarSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 LRESULT CALLBACK DrivesToolbarSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-LRESULT CALLBACK EditSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-LRESULT CALLBACK TabBackingProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK ApplicationButtonPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK ApplicationToolbarNewButtonProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK DWChangeDetailsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-INT_PTR CALLBACK DWLinePropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-
-/* Dialog handler stubs. */
-INT_PTR CALLBACK	ChangeDisplayColoursStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-
-/* Window message handler stubs. */
-LRESULT CALLBACK	TabSubclassProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-
-void				FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
-
-/* Treeview window procedure stub. */
-LRESULT CALLBACK	TreeViewSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+INT_PTR CALLBACK ChangeDisplayColoursStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
+void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
+LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 typedef struct
 {

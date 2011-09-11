@@ -21,11 +21,6 @@
 #include "../Helper/Macros.h"
 
 
-void Explorerplusplus::InsertBookmarksIntoMenu(void)
-{
-	/* TODO: [Bookmarks] Rewrite. */
-}
-
 HRESULT Explorerplusplus::ExpandAndBrowsePath(TCHAR *szPath)
 {
 	return ExpandAndBrowsePath(szPath,FALSE,FALSE);

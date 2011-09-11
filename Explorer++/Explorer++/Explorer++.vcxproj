@@ -263,12 +263,10 @@
     <ClCompile Include="BookmarkHandler.cpp" />
     <ClCompile Include="BookmarkHelper.cpp" />
     <ClCompile Include="BookmarksToolbar.cpp" />
-    <ClCompile Include="ChangeDisplayWindowDetailsDialog.cpp" />
     <ClCompile Include="ColorRuleDialog.cpp" />
     <ClCompile Include="CustomizeColorsDialog.cpp" />
     <ClCompile Include="DestroyFilesDialog.cpp" />
     <ClCompile Include="DisplayColoursDialog.cpp" />
-    <ClCompile Include="DisplayWindowLinePropertiesDialog.cpp" />
     <ClCompile Include="DrivesToolbarHandler.cpp" />
     <ClCompile Include="EventSwitcher.cpp" />
     <ClCompile Include="Explorer++.cpp" />
