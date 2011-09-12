@@ -101,11 +101,6 @@ void CDisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 	DeleteObject(hBitmap);
 }
 
-void CDisplayWindow::DrawGradientFillExternal(HDC hdc,RECT *rc,RECT *UpdateRect)
-{
-	PatchBackground(hdc,rc,UpdateRect);
-}
-
 void CDisplayWindow::DrawThumbnail(HDC hdcMem)
 {
 	HBITMAP hBitmapOld;

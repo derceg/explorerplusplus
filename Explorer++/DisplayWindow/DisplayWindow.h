@@ -86,30 +86,16 @@ typedef struct
 	BOOL bCancelled;
 } ThumbnailEntry_t;
 
-__interface IDisplayWindowMain : IUnknown
-{
-	virtual void DrawGradientFillExternal(HDC hdc,RECT *rc,RECT *UpdateRect);
-};
-
 static int g_ObjectCount = 0;
 
-class CDisplayWindow : public IDisplayWindowMain
+class CDisplayWindow
 {
 public:
 
-	CDisplayWindow(HWND hDisplayWindow,
-	DWInitialSettings_t *pInitialSettings);
+	CDisplayWindow(HWND hDisplayWindow,DWInitialSettings_t *pInitialSettings);
 	~CDisplayWindow();
 
-	/* IUnknown methods. */
-	HRESULT __stdcall QueryInterface(REFIID iid,void **ppvObject);
-	ULONG __stdcall	AddRef(void);
-	ULONG __stdcall	Release(void);
-
 	LRESULT CALLBACK DisplayWindowProc(HWND,UINT,WPARAM,LPARAM);
-
-	/* Used for previewing colour changes in the window. */
-	void	DrawGradientFillExternal(HDC hdc,RECT *rc,RECT *UpdateRect);
 
 	void	ExtractThumbnailImageInternal(ThumbnailEntry_t *pte);
 
@@ -140,9 +126,6 @@ private:
 	void	ExtractThumbnailImage(void);
 	void	CancelThumbnailExtraction(void);
 
-
-	/* IUnknown members. */
-	int				m_iRefCount;
 
 	HWND			m_hDisplayWindow;
 
@@ -176,7 +159,6 @@ private:
 	HFONT			m_hDisplayFont;
 };
 
-HWND CreateDisplayWindow(HWND Parent,IDisplayWindowMain **pMain,
-DWInitialSettings_t *pSettings);
+HWND CreateDisplayWindow(HWND Parent,DWInitialSettings_t *pSettings);
 
 #endif

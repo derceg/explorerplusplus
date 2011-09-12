@@ -64,65 +64,22 @@ BOOL RegisterDisplayWindow(void)
 	return TRUE;
 }
 
-HWND CreateDisplayWindow(HWND Parent,IDisplayWindowMain **pMain,
-DWInitialSettings_t *pSettings)
+HWND CreateDisplayWindow(HWND Parent,DWInitialSettings_t *pSettings)
 {
 	HWND hDisplayWindow;
 
-	/* Registers the class needed to create the display window. */
 	RegisterDisplayWindow();
 
 	hDisplayWindow = CreateWindow(WINDOW_NAME,EMPTY_STRING,
 	WS_VISIBLE|WS_CHILD|WS_CLIPSIBLINGS,0,0,0,0,
 	Parent,NULL,GetModuleHandle(0),(LPVOID)pSettings);
 
-	*pMain = NULL;
-
 	return hDisplayWindow;
-}
-
-/* IUnknown interface members. */
-HRESULT __stdcall CDisplayWindow::QueryInterface(REFIID iid, void **ppvObject)
-{
-	*ppvObject = NULL;
-
-	if(iid == IID_IUnknown)
-	{
-		*ppvObject = static_cast<IUnknown *>(this);
-	}
-
-	if(*ppvObject)
-	{
-		AddRef();
-		return S_OK;
-	}
-
-	return E_NOINTERFACE;
-}
-
-ULONG __stdcall CDisplayWindow::AddRef(void)
-{
-	return ++m_iRefCount;
-}
-
-ULONG __stdcall CDisplayWindow::Release(void)
-{
-	m_iRefCount--;
-	
-	if(m_iRefCount == 0)
-	{
-		delete this;
-		return 0;
-	}
-
-	return m_iRefCount;
 }
 
 CDisplayWindow::CDisplayWindow(HWND hDisplayWindow,
 DWInitialSettings_t *pInitialSettings)
 {
-	m_iRefCount = 1;
-
 	g_ObjectCount++;
 
 	m_hDisplayWindow = hDisplayWindow;
@@ -365,10 +322,6 @@ WPARAM wParam,LPARAM lParam)
 
 		case WM_SIZE:
 			OnSize(wParam,lParam);
-			break;
-
-		case WM_DESTROY:
-			//OnDestroyWindow();
 			break;
 	}
 

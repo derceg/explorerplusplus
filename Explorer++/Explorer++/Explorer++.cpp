@@ -97,9 +97,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	m_zDeltaTotal					= 0;
 	m_iPreviousTabSelectionId		= -1;
 
-	/* Dialog states. */
-	m_bDisplayColorsDlgStateSaved	= FALSE;
-
 	m_pTaskbarList3					= NULL;
 
 	m_bBlockNext = FALSE;

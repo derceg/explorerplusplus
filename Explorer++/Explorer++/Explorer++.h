@@ -41,12 +41,6 @@ lParam not currently used. */
 #define REG_MAIN_KEY				_T("Software\\Explorer++")
 #define REG_SETTINGS_KEY			_T("Software\\Explorer++\\Settings")
 
-/* Dialog keys (relative to REG_DIALOGS_KEY). */
-#define REG_DISPLAYCOLORS_KEY		_T("DisplayColors")
-#define REG_MERGEFILES_KEY			_T("MergeFiles")
-#define REG_SELECTCOLUMNS_KEY		_T("SelectColumns")
-#define REG_SELECTDEFAULTCOLUMNS_KEY	_T("SelectDefaultColumns")
-
 #define TAB_WINDOW_HEIGHT			24
 #define DEFAULT_TREEVIEW_WIDTH		208
 
@@ -143,7 +137,6 @@ public:
 	INT_PTR CALLBACK	WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DWChangeDetailsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
@@ -623,8 +616,6 @@ private:
 	void					LoadToolbarInformationFromRegistry(void);
 	void					SaveStateToRegistry(void);
 	void					LoadStateFromRegistry(void);
-	void					SaveDisplayColorsStateToRegistry(HKEY hParentKey);
-	void					LoadDisplayColorsStateFromRegistry(HKEY hParentKey);
 
 	/* Window state update. */
 	void					UpdateWindowStates(void);
@@ -729,14 +720,6 @@ private:
 	void					HandleFileSelectionDisplayMore(void);
 	void					FormatDisplayString(TCHAR *szDisplayRaw,int iSelected,TCHAR *szFullFileName,TCHAR *szDisplayFinal,UINT cchMax);
 	void					TranslateDisplayWindowBuffer(TCHAR *szSymbol,UINT cchMax,int iSelected,TCHAR *szFullFileName);
-
-	/* Display window colours dialog. */
-	void					OnInitializeDisplayColorsDlg(HWND hDlg);
-	void					OnDisplayColorsDlgOk(HWND hDlg);
-	void					OnDisplayColorsChooseFont(HWND hDlg);
-	void					DisplayColorsSaveState(HWND hDlg);
-	void					OnDisplayColorsHScroll(HWND hDlg);
-	void					OnDisplayColorsEnChange(HWND hDlg,LPARAM lParam);
 
 	/* Columns. */
 	void					OnSelectColumns();
@@ -863,7 +846,6 @@ private:
 
 	MyIFolderView2 *		m_pFolderView[MAX_TABS];
 	IShellBrowser2 *		m_pShellBrowser[MAX_TABS];
-	IDisplayWindowMain *	m_pDisplayMain;
 	IShellBrowser2 *		m_pActiveShellBrowser;
 	IDirectoryMonitor *		m_pDirMon;
 	CMyTreeView *			m_pMyTreeView;
@@ -1078,10 +1060,6 @@ private:
 	DragTypes_t				m_DragType;
 	BOOL					m_bDataAccept;
 	int						m_iTabDragTab;
-
-	/* Display colors dialog. */
-	BOOL					m_bDisplayColorsDlgStateSaved;
-	POINT					m_ptDisplayColors;
 	
 	/* Cut items data. */
 	std::list<std::wstring>	m_CutFileNameList;

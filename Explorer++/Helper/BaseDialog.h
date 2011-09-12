@@ -41,6 +41,7 @@ protected:
 	virtual BOOL	OnTimer(int iTimerID);
 	virtual INT_PTR	OnCtlColorStatic(HWND hwnd,HDC hdc);
 	virtual INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc);
+	virtual BOOL	OnHScroll(HWND hwnd);
 	virtual BOOL	OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys);
 	virtual BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
 	virtual BOOL	OnNotify(NMHDR *pnmhdr);

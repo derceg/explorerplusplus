@@ -27,6 +27,7 @@
 #include "SelectColumnsDialog.h"
 #include "SetDefaultColumnsDialog.h"
 #include "AddBookmarkDialog.h"
+#include "DisplayColoursDialog.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
 
@@ -1234,8 +1235,6 @@ void Explorerplusplus::SaveStateToRegistry(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		SaveDisplayColorsStateToRegistry(hKey);
-
 		CSearchDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CWildcardSelectDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CSetFileAttributesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
@@ -1250,29 +1249,7 @@ void Explorerplusplus::SaveStateToRegistry(void)
 		CSelectColumnsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CSetDefaultColumnsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CAddBookmarkDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::SaveDisplayColorsStateToRegistry(HKEY hParentKey)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(hParentKey,REG_DISPLAYCOLORS_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_bDisplayColorsDlgStateSaved)
-		{
-			RegSetValueEx(hKey,_T("Position"),0,
-				REG_BINARY,(LPBYTE)&m_ptDisplayColors,
-				sizeof(m_ptDisplayColors));
-		}
+		CDisplayColoursDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -1287,8 +1264,6 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		LoadDisplayColorsStateFromRegistry(hKey);
-
 		CSearchDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CWildcardSelectDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CSetFileAttributesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
@@ -1303,30 +1278,7 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 		CSelectColumnsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CSetDefaultColumnsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CAddBookmarkDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadDisplayColorsStateFromRegistry(HKEY hParentKey)
-{
-	HKEY				hKey;
-	DWORD				dwSize;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(hParentKey,REG_DISPLAYCOLORS_KEY,0,
-		KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		dwSize = sizeof(POINT);
-		ReturnValue = RegQueryValueEx(hKey,_T("Position"),
-			NULL,NULL,(LPBYTE)&m_ptDisplayColors,&dwSize);
-
-		if(ReturnValue == ERROR_SUCCESS)
-		{
-			m_bDisplayColorsDlgStateSaved = TRUE;
-		}
+		CDisplayColoursDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}

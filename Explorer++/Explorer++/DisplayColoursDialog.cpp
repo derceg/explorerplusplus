@@ -4,7 +4,7 @@
  * File: DisplayColoursDialog.cpp
  * License: GPL - See COPYING in the top level directory
  *
- * Handles the 'Change Display Colors' dialog and associated messages.
+ * Handles the 'Change Display Colours' dialog and associated messages.
  *
  * Written by David Erceg
  * www.explorerplusplus.com
@@ -13,438 +13,407 @@
 
 #include "stdafx.h"
 #include <list>
-#include "Explorer++.h"
+#include "DisplayColoursDialog.h"
+#include "MainResource.h"
+#include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/Macros.h"
 
-#define NUM_CONTROLS	3
 
-typedef struct
+const TCHAR CDisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
+
+CDisplayColoursDialog::CDisplayColoursDialog(HINSTANCE hInstance,int iResource,
+	HWND hParent,HWND hDisplayWindow,COLORREF DefaultCenterColor,COLORREF DefaultSurroundingColor) :
+m_hDisplayWindow(hDisplayWindow),
+m_DefaultCenterColor(DefaultCenterColor),
+m_DefaultSurroundingColor(DefaultSurroundingColor),
+CBaseDialog(hInstance,iResource,hParent,false)
 {
-	UINT uSliderId;
-	UINT uEditId;
-
-	BYTE (*GetColorValue)(DWORD rgb);
-} Colors_t;
-
-HWND g_hPreviewDisplay;
-
-Colors_t	CentreColors[3];
-Colors_t	SurroundColors[3];
-HFONT		g_hDisplayFont;
-COLORREF	g_TextColor;
-HICON		g_hDisplayWindowIcon;
-
-INT_PTR CALLBACK ChangeDisplayColoursStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
-{
-	static Explorerplusplus *pContainer = NULL;
-
-	switch(uMsg)
-	{
-		case WM_INITDIALOG:
-		{
-			pContainer = (Explorerplusplus *)lParam;
-		}
-		break;
-	}
-
-	return pContainer->ChangeDisplayColours(hDlg,uMsg,wParam,lParam);
+	m_pdcdps = &CDisplayColoursDialogPersistentSettings::GetInstance();
 }
 
-INT_PTR CALLBACK Explorerplusplus::ChangeDisplayColours(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
+CDisplayColoursDialog::~CDisplayColoursDialog()
 {
-	switch(uMsg)
+
+}
+
+BOOL CDisplayColoursDialog::OnInitDialog()
+{
+	InitializeColorGroups();
+	InitializePreviewWindow();
+
+	m_pdcdps->RestoreDialogPosition(m_hDlg,false);
+
+	return 0;
+}
+
+void CDisplayColoursDialog::InitializeColorGroups()
+{
+	m_CenterGroup[0].SliderId	= IDC_SLIDER_CENTRE_RED;
+	m_CenterGroup[0].EditId		= IDC_EDIT_CENTRE_RED;
+	m_CenterGroup[0].Color		= COLOR_RED;
+
+	m_CenterGroup[1].SliderId	= IDC_SLIDER_CENTRE_GREEN;
+	m_CenterGroup[1].EditId		= IDC_EDIT_CENTRE_GREEN;
+	m_CenterGroup[1].Color		= COLOR_GREEN;
+
+	m_CenterGroup[2].SliderId	= IDC_SLIDER_CENTRE_BLUE;
+	m_CenterGroup[2].EditId		= IDC_EDIT_CENTRE_BLUE;
+	m_CenterGroup[2].Color		= COLOR_BLUE;
+
+	InitializeColorGroupControls(m_CenterGroup);
+
+	m_SurroundingGroup[0].SliderId	= IDC_SLIDER_SURROUND_RED;
+	m_SurroundingGroup[0].EditId	= IDC_EDIT_SURROUND_RED;
+	m_SurroundingGroup[0].Color	= COLOR_RED;
+
+	m_SurroundingGroup[1].SliderId	= IDC_SLIDER_SURROUND_GREEN;
+	m_SurroundingGroup[1].EditId	= IDC_EDIT_SURROUND_GREEN;
+	m_SurroundingGroup[1].Color	= COLOR_GREEN;
+
+	m_SurroundingGroup[2].SliderId	= IDC_SLIDER_SURROUND_BLUE;
+	m_SurroundingGroup[2].EditId	= IDC_EDIT_SURROUND_BLUE;
+	m_SurroundingGroup[2].Color	= COLOR_BLUE;
+
+	InitializeColorGroupControls(m_SurroundingGroup);
+}
+
+void CDisplayColoursDialog::InitializeColorGroupControls(ColorGroup_t ColorGroup[NUM_COLORS])
+{
+	for(int i = 0;i < NUM_COLORS;i++)
 	{
-		case WM_INITDIALOG:
-			OnInitializeDisplayColorsDlg(hDlg);
+		SendDlgItemMessage(m_hDlg,ColorGroup[i].SliderId,TBM_SETTICFREQ,TICK_REQUENCY,0);
+		SendDlgItemMessage(m_hDlg,ColorGroup[i].SliderId,TBM_SETRANGE,TRUE,MAKELONG(0,255));
+		SendDlgItemMessage(m_hDlg,ColorGroup[i].EditId,EM_SETLIMITTEXT,3,0);
+	}
+}
+
+void CDisplayColoursDialog::SetColorGroupValues(ColorGroup_t ColorGroup[NUM_COLORS],COLORREF Color)
+{
+	for(int i = 0;i < NUM_COLORS;i++)
+	{
+		UINT ColorComponent = 0;
+
+		switch(ColorGroup[i].Color)
+		{
+		case COLOR_RED:
+			ColorComponent = GetRValue(Color);
 			break;
 
-		case WM_HSCROLL:
-			OnDisplayColorsHScroll(hDlg);
+		case COLOR_GREEN:
+			ColorComponent = GetGValue(Color);
 			break;
 
-		case WM_COMMAND:
-			switch(HIWORD(wParam))
-			{
-			case EN_CHANGE:
-				OnDisplayColorsEnChange(hDlg,lParam);
-				break;
-			}
-
-			switch(LOWORD(wParam))
-			{
-			case IDC_BUTTON_RESTOREDEFAULTS:
-				{
-					COLORREF SurroundColor;
-					COLORREF CentreColor;
-
-					m_DisplayWindowSurroundColor = DEFAULT_DISPLAYWINDOW_SURROUND_COLOR;
-					m_DisplayWindowCentreColor = DEFAULT_DISPLAYWINDOW_CENTRE_COLOR;
-
-					SurroundColor = m_DisplayWindowSurroundColor.ToCOLORREF();
-					CentreColor = m_DisplayWindowCentreColor.ToCOLORREF();
-
-					/* TODO: Need to delete old display window fonts. */
-					//DeleteFont(m_DisplayWindowFont);
-					m_DisplayWindowFont	= CreateFont(-13,0,0,0,FW_MEDIUM,FALSE,
-						FALSE,FALSE,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,
-						CLIP_DEFAULT_PRECIS,PROOF_QUALITY,FIXED_PITCH|FF_MODERN,
-						_T("Segoe UI"));
-					g_hDisplayFont = m_DisplayWindowFont;
-
-					SendMessage(g_hPreviewDisplay,DWM_SETSURROUNDCOLOR,SurroundColor,0);
-					SendMessage(g_hPreviewDisplay,DWM_SETCENTRECOLOR,CentreColor,0);
-					DisplayWindow_SetFont(g_hPreviewDisplay,(WPARAM)g_hDisplayFont);
-					DisplayWindow_SetTextColor(g_hPreviewDisplay,g_TextColor);
-
-					SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_RED,GetRValue(SurroundColor),FALSE);
-					SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_GREEN,GetGValue(SurroundColor),FALSE);
-					SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_BLUE,GetBValue(SurroundColor),FALSE);
-
-					SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_RED,TBM_SETPOS,TRUE,
-						GetRValue(SurroundColor));
-					SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_GREEN,TBM_SETPOS,TRUE,
-						GetGValue(SurroundColor));
-					SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_BLUE,TBM_SETPOS,TRUE,
-						GetBValue(SurroundColor));
-
-					SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_RED,GetRValue(CentreColor),FALSE);
-					SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_GREEN,GetGValue(CentreColor),FALSE);
-					SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_BLUE,GetBValue(CentreColor),FALSE);
-
-					SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_RED,TBM_SETPOS,TRUE,
-						GetRValue(CentreColor));
-					SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_GREEN,TBM_SETPOS,TRUE,
-						GetGValue(CentreColor));
-					SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_BLUE,TBM_SETPOS,TRUE,
-						GetBValue(CentreColor));
-
-					SendMessage(g_hPreviewDisplay,DWM_SETSURROUNDCOLOR,SurroundColor,0);
-					SendMessage(g_hPreviewDisplay,DWM_SETCENTRECOLOR,CentreColor,0);
-					DisplayWindow_SetFont(g_hPreviewDisplay,(WPARAM)g_hDisplayFont);
-					DisplayWindow_SetTextColor(g_hPreviewDisplay,g_TextColor);
-				}
-				break;
-
-			case IDC_BUTTON_DISPLAY_FONT:
-				OnDisplayColorsChooseFont(hDlg);
-				break;
-
-			case IDOK:
-				OnDisplayColorsDlgOk(hDlg);
-				break;
-
-			case IDCANCEL:
-				DisplayColorsSaveState(hDlg);
-				EndDialog(hDlg,0);
-				break;
-			}
+		case COLOR_BLUE:
+			ColorComponent = GetBValue(Color);
 			break;
 
-		case WM_CLOSE:
-			DisplayColorsSaveState(hDlg);
-			EndDialog(hDlg,0);
+		default:
+			assert(false);
+			break;
+		}
+
+		SetDlgItemInt(m_hDlg,ColorGroup[i].EditId,ColorComponent,FALSE);
+		SendDlgItemMessage(m_hDlg,ColorGroup[i].SliderId,TBM_SETPOS,TRUE,ColorComponent);
+	}
+}
+
+void CDisplayColoursDialog::InitializePreviewWindow()
+{
+	COLORREF CentreColor = static_cast<COLORREF>(SendMessage(m_hDisplayWindow,DWM_GETCENTRECOLOR,0,0));
+	COLORREF SurroundColor = static_cast<COLORREF>(SendMessage(m_hDisplayWindow,DWM_GETSURROUNDCOLOR,0,0));
+
+	DisplayWindow_GetFont(m_hDisplayWindow,reinterpret_cast<WPARAM>(&m_hDisplayFont));
+	m_TextColor = DisplayWindow_GetTextColor(m_hDisplayWindow);
+
+	m_hDisplayWindowIcon = reinterpret_cast<HICON>(LoadImage(GetModuleHandle(NULL),
+		MAKEINTRESOURCE(IDI_DISPLAYWINDOW),IMAGE_ICON,0,0,LR_CREATEDIBSECTION));
+
+	DWInitialSettings_t InitialSettings;
+	InitialSettings.CentreColor		= CentreColor;
+	InitialSettings.SurroundColor	= SurroundColor;
+	InitialSettings.TextColor		= m_TextColor;
+	InitialSettings.hFont			= m_hDisplayFont;
+	InitialSettings.hIcon			= m_hDisplayWindowIcon;
+
+	HWND hStatic = GetDlgItem(m_hDlg,IDC_STATIC_PREVIEWDISPLAY);
+	m_hPreviewDisplayWindow = CreateDisplayWindow(hStatic,&InitialSettings);
+
+	SendMessage(m_hPreviewDisplayWindow,DWM_SETSURROUNDCOLOR,SurroundColor,0);
+	SendMessage(m_hPreviewDisplayWindow,DWM_SETCENTRECOLOR,CentreColor,0);
+	DisplayWindow_SetFont(m_hPreviewDisplayWindow,reinterpret_cast<WPARAM>(m_hDisplayFont));
+	DisplayWindow_SetTextColor(m_hPreviewDisplayWindow,m_TextColor);
+
+	DisplayWindow_ClearTextBuffer(m_hPreviewDisplayWindow);
+
+	TCHAR szTemp[64];
+	LoadString(GetInstance(),IDS_DISPLAYCOLORS_FILENAME,szTemp,SIZEOF_ARRAY(szTemp));
+	DisplayWindow_BufferText(m_hPreviewDisplayWindow,szTemp);
+
+	LoadString(GetInstance(),IDS_DISPLAYCOLORS_FILE_TYPE,szTemp,SIZEOF_ARRAY(szTemp));
+	DisplayWindow_BufferText(m_hPreviewDisplayWindow,szTemp);
+
+	LoadString(GetInstance(),IDS_DISPLAYCOLORS_MODIFICATION_DATE,szTemp,SIZEOF_ARRAY(szTemp));
+	DisplayWindow_BufferText(m_hPreviewDisplayWindow,szTemp);
+
+	RECT rc;
+	GetWindowRect(hStatic,&rc);
+	SetWindowPos(m_hPreviewDisplayWindow,NULL,0,0,rc.right,rc.bottom,SWP_SHOWWINDOW|SWP_NOZORDER);
+
+	SetColorGroupValues(m_CenterGroup,CentreColor);
+	SetColorGroupValues(m_SurroundingGroup,SurroundColor);
+}
+
+BOOL CDisplayColoursDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+{
+	if(HIWORD(wParam) != 0)
+	{
+		switch(HIWORD(wParam))
+		{
+		case EN_CHANGE:
+			OnEnChange(LOWORD(wParam));
+			break;
+		}
+	}
+	else
+	{
+		switch(LOWORD(wParam))
+		{
+		case IDC_BUTTON_RESTOREDEFAULTS:
+			OnRestoreDefaults();
 			break;
 
-		case WM_DESTROY:
-			DestroyIcon(g_hDisplayWindowIcon);
+		case IDC_BUTTON_DISPLAY_FONT:
+			OnChooseFont();
 			break;
+
+		case IDOK:
+			OnOk();
+			break;
+
+		case IDCANCEL:
+			OnCancel();
+			break;
+		}
 	}
 
 	return 0;
 }
 
-void Explorerplusplus::OnInitializeDisplayColorsDlg(HWND hDlg)
+void CDisplayColoursDialog::OnRestoreDefaults()
 {
-	COLORREF CentreColor;
-	COLORREF SurroundColor;
-	WORD wFreq;
-	int i = 0;
+	/* TODO: Need to delete old display window fonts. */
+	//DeleteFont(m_DisplayWindowFont);
 
-	CentreColors[0].uSliderId	= IDC_SLIDER_CENTRE_RED;
-	CentreColors[0].uEditId		= IDC_EDIT_CENTRE_RED;
+	/* TODO: This should be defined externally. */
+	m_hDisplayFont	= CreateFont(-13,0,0,0,FW_MEDIUM,FALSE,
+		FALSE,FALSE,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,
+		CLIP_DEFAULT_PRECIS,PROOF_QUALITY,FIXED_PITCH|FF_MODERN,
+		_T("Segoe UI"));
 
-	CentreColors[1].uSliderId	= IDC_SLIDER_CENTRE_GREEN;
-	CentreColors[1].uEditId		= IDC_EDIT_CENTRE_GREEN;
+	/* TODO: Default text color. */
+	m_TextColor = RGB(0,0,0);
 
-	CentreColors[2].uSliderId	= IDC_SLIDER_CENTRE_BLUE;
-	CentreColors[2].uEditId		= IDC_EDIT_CENTRE_BLUE;
+	SendMessage(m_hPreviewDisplayWindow,DWM_SETCENTRECOLOR,m_DefaultCenterColor,0);
+	SendMessage(m_hPreviewDisplayWindow,DWM_SETSURROUNDCOLOR,m_DefaultSurroundingColor,0);
+	DisplayWindow_SetFont(m_hPreviewDisplayWindow,reinterpret_cast<WPARAM>(m_hDisplayFont));
+	DisplayWindow_SetTextColor(m_hPreviewDisplayWindow,m_TextColor);
 
-	SurroundColors[0].uSliderId	= IDC_SLIDER_SURROUND_RED;
-	SurroundColors[0].uEditId	= IDC_EDIT_SURROUND_RED;
-
-	SurroundColors[1].uSliderId	= IDC_SLIDER_SURROUND_GREEN;
-	SurroundColors[1].uEditId	= IDC_EDIT_SURROUND_GREEN;
-
-	SurroundColors[2].uSliderId	= IDC_SLIDER_SURROUND_BLUE;
-	SurroundColors[2].uEditId	= IDC_EDIT_SURROUND_BLUE;
-
-	wFreq = 10;
-
-	for(i = 0;i < NUM_CONTROLS;i++)
-	{
-		SendDlgItemMessage(hDlg,SurroundColors[i].uSliderId,
-			TBM_SETTICFREQ,wFreq,0);
-
-		SendDlgItemMessage(hDlg,SurroundColors[i].uSliderId,
-			TBM_SETRANGE,TRUE,MAKELONG(0,255));
-
-		SendDlgItemMessage(hDlg,SurroundColors[i].uEditId,
-			EM_SETLIMITTEXT,3,0);
-	}
-
-	for(i = 0;i < NUM_CONTROLS;i++)
-	{
-		SendDlgItemMessage(hDlg,CentreColors[i].uSliderId,
-		TBM_SETTICFREQ,wFreq,0);
-
-		SendDlgItemMessage(hDlg,CentreColors[i].uSliderId,
-		TBM_SETRANGE,TRUE,MAKELONG(0,255));
-
-		SendDlgItemMessage(hDlg,CentreColors[i].uEditId,
-			EM_SETLIMITTEXT,3,0);
-	}
-
-	SurroundColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETSURROUNDCOLOR,0,0);
-	CentreColor = (COLORREF)SendMessage(m_hDisplayWindow,DWM_GETCENTRECOLOR,0,0);
-
-	DisplayWindow_GetFont(m_hDisplayWindow,(WPARAM)&g_hDisplayFont);
-	g_TextColor = DisplayWindow_GetTextColor(m_hDisplayWindow);
-
-	HWND hStatic;
-	RECT rc;
-
-	hStatic = GetDlgItem(hDlg,IDC_STATIC_PREVIEWDISPLAY);
-
-	DWInitialSettings_t InitialSettings;
-
-	g_hDisplayWindowIcon = (HICON)LoadImage(GetModuleHandle(0),
-		MAKEINTRESOURCE(IDI_DISPLAYWINDOW),IMAGE_ICON,
-		0,0,LR_CREATEDIBSECTION);
-
-	InitialSettings.CentreColor		= m_DisplayWindowCentreColor;
-	InitialSettings.SurroundColor	= m_DisplayWindowSurroundColor;
-	InitialSettings.TextColor		= m_DisplayWindowTextColor;
-	InitialSettings.hFont			= m_DisplayWindowFont;
-	InitialSettings.hIcon			= g_hDisplayWindowIcon;
-
-	g_hPreviewDisplay = CreateDisplayWindow(hStatic,&m_pDisplayMain,&InitialSettings);
-
-
-
-
-	SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_RED,GetRValue(SurroundColor),FALSE);
-	SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_GREEN,GetGValue(SurroundColor),FALSE);
-	SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_BLUE,GetBValue(SurroundColor),FALSE);
-
-	SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_RED,TBM_SETPOS,TRUE,
-	GetRValue(SurroundColor));
-	SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_GREEN,TBM_SETPOS,TRUE,
-	GetGValue(SurroundColor));
-	SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_BLUE,TBM_SETPOS,TRUE,
-	GetBValue(SurroundColor));
-
-	SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_RED,GetRValue(CentreColor),FALSE);
-	SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_GREEN,GetGValue(CentreColor),FALSE);
-	SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_BLUE,GetBValue(CentreColor),FALSE);
-
-	SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_RED,TBM_SETPOS,TRUE,
-	GetRValue(CentreColor));
-	SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_GREEN,TBM_SETPOS,TRUE,
-	GetGValue(CentreColor));
-	SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_BLUE,TBM_SETPOS,TRUE,
-	GetBValue(CentreColor));
-
-	SendMessage(g_hPreviewDisplay,DWM_SETSURROUNDCOLOR,SurroundColor,0);
-	SendMessage(g_hPreviewDisplay,DWM_SETCENTRECOLOR,CentreColor,0);
-	DisplayWindow_SetFont(g_hPreviewDisplay,(WPARAM)g_hDisplayFont);
-	DisplayWindow_SetTextColor(g_hPreviewDisplay,g_TextColor);
-
-
-
-
-	DisplayWindow_ClearTextBuffer(g_hPreviewDisplay);
-	DisplayWindow_BufferText(g_hPreviewDisplay,_T("Filename"));
-	DisplayWindow_BufferText(g_hPreviewDisplay,_T("File Type"));
-	DisplayWindow_BufferText(g_hPreviewDisplay,_T("Modification Date"));
-
-	GetWindowRect(hStatic,&rc);
-
-	SetWindowPos(g_hPreviewDisplay,NULL,0,0,rc.right,rc.bottom,SWP_SHOWWINDOW|SWP_NOZORDER);
-
-	if(m_bDisplayColorsDlgStateSaved)
-	{		
-		SetWindowPos(hDlg,NULL,m_ptDisplayColors.x,m_ptDisplayColors.y,0,0,SWP_NOSIZE|SWP_NOZORDER);
-	}
-	else
-	{
-		CenterWindow(m_hContainer,hDlg);
-	}
+	SetColorGroupValues(m_CenterGroup,m_DefaultCenterColor);
+	SetColorGroupValues(m_SurroundingGroup,m_DefaultSurroundingColor);
 }
 
-void Explorerplusplus::OnDisplayColorsDlgOk(HWND hDlg)
+void CDisplayColoursDialog::OnChooseFont()
 {
-	UINT r;
-	UINT g;
-	UINT b;
-	COLORREF rgb;
-
-	r = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_RED,TBM_GETPOS,0,0);
-	g = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_GREEN,TBM_GETPOS,0,0);
-	b = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_BLUE,TBM_GETPOS,0,0);
-
-	rgb = RGB(r,g,b);
-
-	SendMessage(m_hDisplayWindow,DWM_SETSURROUNDCOLOR,rgb,0);
-
-	r = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_RED,TBM_GETPOS,0,0);
-	g = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_GREEN,TBM_GETPOS,0,0);
-	b = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_BLUE,TBM_GETPOS,0,0);
-
-	rgb = RGB(r,g,b);
-
-	SendMessage(m_hDisplayWindow,DWM_SETCENTRECOLOR,rgb,0);
-
-	DisplayWindow_SetFont(m_hDisplayWindow,(WPARAM)g_hDisplayFont);
-	DisplayWindow_SetTextColor(m_hDisplayWindow,g_TextColor);
-
-	DisplayColorsSaveState(hDlg);
-	EndDialog(hDlg,1);
-}
-
-void Explorerplusplus::OnDisplayColorsChooseFont(HWND hDlg)
-{
-	CHOOSEFONT cf;
-	LOGFONT LogFont;
 	HFONT hFont;
+	DisplayWindow_GetFont(m_hPreviewDisplayWindow,reinterpret_cast<WPARAM>(&hFont));
+
+	LOGFONT lf;
+	GetObject(hFont,sizeof(lf),reinterpret_cast<LPVOID>(&lf));
+
+	CHOOSEFONT cf;
 	TCHAR szStyle[512];
-
-	DisplayWindow_GetFont(g_hPreviewDisplay,(WPARAM)&hFont);
-
-	GetObject(hFont,sizeof(LogFont),(LPVOID)&LogFont);
-
 	cf.lStructSize	= sizeof(cf);
-	cf.hwndOwner	= hDlg;
+	cf.hwndOwner	= m_hDlg;
 	cf.Flags		= CF_FORCEFONTEXIST|CF_SCREENFONTS|CF_EFFECTS|CF_INITTOLOGFONTSTRUCT;
-	cf.lpLogFont	= &LogFont;
-	cf.rgbColors	= DisplayWindow_GetTextColor(g_hPreviewDisplay);
+	cf.lpLogFont	= &lf;
+	cf.rgbColors	= DisplayWindow_GetTextColor(m_hPreviewDisplayWindow);
 	cf.lCustData	= NULL;
 	cf.lpszStyle	= szStyle;
+	BOOL res = ChooseFont(&cf);
 
-	ChooseFont(&cf);
-
-	g_hDisplayFont = CreateFontIndirect(cf.lpLogFont);
-	g_TextColor = cf.rgbColors;
-
-	DisplayWindow_SetFont(g_hPreviewDisplay,(WPARAM)g_hDisplayFont);
-	DisplayWindow_SetTextColor(g_hPreviewDisplay,g_TextColor);
-}
-
-void Explorerplusplus::OnDisplayColorsHScroll(HWND hDlg)
-{
-	UINT r;
-	UINT g;
-	UINT b;
-
-	r = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_RED,TBM_GETPOS,0,0);
-	g = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_GREEN,TBM_GETPOS,0,0);
-	b = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_BLUE,TBM_GETPOS,0,0);
-
-	if(GetDlgItemInt(hDlg,IDC_EDIT_SURROUND_RED,NULL,FALSE) != r)
+	if(res)
 	{
-		SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_RED,r,FALSE);
-	}
+		/* TODO: This font must be freed. */
+		m_hDisplayFont = CreateFontIndirect(cf.lpLogFont);
+		m_TextColor = cf.rgbColors;
 
-	if(GetDlgItemInt(hDlg,IDC_EDIT_SURROUND_GREEN,NULL,FALSE) != g)
-	{
-		SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_GREEN,g,FALSE);
-	}
-
-	if(GetDlgItemInt(hDlg,IDC_EDIT_SURROUND_BLUE,NULL,FALSE) != b)
-	{
-		SetDlgItemInt(hDlg,IDC_EDIT_SURROUND_BLUE,b,FALSE);
-	}
-
-	r = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_RED,TBM_GETPOS,0,0);
-	g = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_GREEN,TBM_GETPOS,0,0);
-	b = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_BLUE,TBM_GETPOS,0,0);
-
-	if(GetDlgItemInt(hDlg,IDC_EDIT_CENTRE_RED,NULL,FALSE) != r)
-	{
-		SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_RED,r,FALSE);
-	}
-
-	if(GetDlgItemInt(hDlg,IDC_EDIT_CENTRE_GREEN,NULL,FALSE) != g)
-	{
-		SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_GREEN,g,FALSE);
-	}
-
-	if(GetDlgItemInt(hDlg,IDC_EDIT_CENTRE_BLUE,NULL,FALSE) != b)
-	{
-		SetDlgItemInt(hDlg,IDC_EDIT_CENTRE_BLUE,b,FALSE);
+		DisplayWindow_SetFont(m_hPreviewDisplayWindow,reinterpret_cast<WPARAM>(m_hDisplayFont));
+		DisplayWindow_SetTextColor(m_hPreviewDisplayWindow,m_TextColor);
 	}
 }
 
-void Explorerplusplus::OnDisplayColorsEnChange(HWND hDlg,LPARAM lParam)
+BOOL CDisplayColoursDialog::OnHScroll(HWND hwnd)
 {
-	HWND hEdit;
+	UpdateEditControlsFromSlider(m_CenterGroup);
+	UpdateEditControlsFromSlider(m_SurroundingGroup);
+
+	return 0;
+}
+
+void CDisplayColoursDialog::UpdateEditControlsFromSlider(ColorGroup_t ColorGroup[NUM_COLORS])
+{
+	for(int i = 0;i < NUM_COLORS;i++)
+	{
+		UINT ColorComponent = static_cast<UINT>(SendDlgItemMessage(m_hDlg,ColorGroup[i].SliderId,TBM_GETPOS,0,0));
+
+		if(GetDlgItemInt(m_hDlg,ColorGroup[i].EditId,NULL,FALSE) != ColorComponent)
+		{
+			SetDlgItemInt(m_hDlg,ColorGroup[i].EditId,ColorComponent,FALSE);
+		}
+	}
+}
+
+COLORREF CDisplayColoursDialog::GetColorFromSliderGroup(ColorGroup_t ColorGroup[NUM_COLORS])
+{
+	UINT r = 0;
+	UINT g = 0;
+	UINT b = 0;
+
+	for(int i = 0;i < NUM_COLORS;i++)
+	{
+		UINT ColorComponent = static_cast<UINT>(SendDlgItemMessage(m_hDlg,ColorGroup[i].SliderId,TBM_GETPOS,0,0));
+
+		switch(ColorGroup[i].Color)
+		{
+		case COLOR_RED:
+			r = ColorComponent;
+			break;
+
+		case COLOR_GREEN:
+			g = ColorComponent;
+			break;
+
+		case COLOR_BLUE:
+			b = ColorComponent;
+			break;
+
+		default:
+			assert(false);
+			break;
+		}
+	}
+
+	return RGB(r,g,b);
+}
+
+void CDisplayColoursDialog::OnEnChange(UINT ControlID)
+{
+	BOOL Translated;
+	UINT Value = GetDlgItemInt(m_hDlg,ControlID,&Translated,FALSE);
+
+	if(!Translated)
+	{
+		return;
+	}
+
 	HWND hTrackBar = NULL;
-	COLORREF rgb;
-	TCHAR szValue[32];
-	int iValue;
 
-	hEdit = (HWND)lParam;
+	switch(ControlID)
+	{
+	case IDC_EDIT_CENTRE_RED:
+		hTrackBar = GetDlgItem(m_hDlg,IDC_SLIDER_CENTRE_RED);
+		break;
 
-	GetWindowText(hEdit,szValue,SIZEOF_ARRAY(szValue));
+	case IDC_EDIT_CENTRE_GREEN:
+		hTrackBar = GetDlgItem(m_hDlg,IDC_SLIDER_CENTRE_GREEN);
+		break;
 
-	#ifdef UNICODE
-		iValue = _wtoi(szValue);
-	#else
-		iValue = atoi(szValue);
-	#endif
+	case IDC_EDIT_CENTRE_BLUE:
+		hTrackBar = GetDlgItem(m_hDlg,IDC_SLIDER_CENTRE_BLUE);
+		break;
 
-	if(hEdit == GetDlgItem(hDlg,IDC_EDIT_SURROUND_RED))
-		hTrackBar = GetDlgItem(hDlg,IDC_SLIDER_SURROUND_RED);
-	else if(hEdit == GetDlgItem(hDlg,IDC_EDIT_SURROUND_GREEN))
-		hTrackBar = GetDlgItem(hDlg,IDC_SLIDER_SURROUND_GREEN);
-	else if(hEdit == GetDlgItem(hDlg,IDC_EDIT_SURROUND_BLUE))
-		hTrackBar = GetDlgItem(hDlg,IDC_SLIDER_SURROUND_BLUE);
-	else if(hEdit == GetDlgItem(hDlg,IDC_EDIT_CENTRE_RED))
-		hTrackBar = GetDlgItem(hDlg,IDC_SLIDER_CENTRE_RED);
-	else if(hEdit == GetDlgItem(hDlg,IDC_EDIT_CENTRE_GREEN))
-		hTrackBar = GetDlgItem(hDlg,IDC_SLIDER_CENTRE_GREEN);
-	else if(hEdit == GetDlgItem(hDlg,IDC_EDIT_CENTRE_BLUE))
-		hTrackBar = GetDlgItem(hDlg,IDC_SLIDER_CENTRE_BLUE);
+	case IDC_EDIT_SURROUND_RED:
+		hTrackBar = GetDlgItem(m_hDlg,IDC_SLIDER_SURROUND_RED);
+		break;
 
-	SendMessage(hTrackBar,TBM_SETPOS,TRUE,iValue);
+	case IDC_EDIT_SURROUND_GREEN:
+		hTrackBar = GetDlgItem(m_hDlg,IDC_SLIDER_SURROUND_GREEN);
+		break;
 
-	UINT r;
-	UINT g;
-	UINT b;
+	case IDC_EDIT_SURROUND_BLUE:
+		hTrackBar = GetDlgItem(m_hDlg,IDC_SLIDER_SURROUND_BLUE);
+		break;
+	}
 
-	r = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_RED,TBM_GETPOS,0,0);
-	g = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_GREEN,TBM_GETPOS,0,0);
-	b = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_SURROUND_BLUE,TBM_GETPOS,0,0);
+	SendMessage(hTrackBar,TBM_SETPOS,TRUE,Value);
 
-	rgb = RGB(r,g,b);
-
-	SendMessage(g_hPreviewDisplay,DWM_SETSURROUNDCOLOR,rgb,0);
-
-	r = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_RED,TBM_GETPOS,0,0);
-	g = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_GREEN,TBM_GETPOS,0,0);
-	b = (UINT)SendDlgItemMessage(hDlg,IDC_SLIDER_CENTRE_BLUE,TBM_GETPOS,0,0);
-
-	rgb = RGB(r,g,b);
-
-	SendMessage(g_hPreviewDisplay,DWM_SETCENTRECOLOR,rgb,0);
+	if(ControlID == IDC_EDIT_CENTRE_RED ||
+		ControlID == IDC_EDIT_CENTRE_GREEN ||
+		ControlID == IDC_EDIT_CENTRE_BLUE)
+	{
+		COLORREF Color = GetColorFromSliderGroup(m_CenterGroup);
+		SendMessage(m_hPreviewDisplayWindow,DWM_SETCENTRECOLOR,Color,0);
+	}
+	else if(ControlID == IDC_EDIT_SURROUND_RED ||
+		ControlID == IDC_EDIT_SURROUND_GREEN ||
+		ControlID == IDC_EDIT_SURROUND_BLUE)
+	{
+		COLORREF Color = GetColorFromSliderGroup(m_SurroundingGroup);
+		SendMessage(m_hPreviewDisplayWindow,DWM_SETSURROUNDCOLOR,Color,0);
+	}
 }
 
-void Explorerplusplus::DisplayColorsSaveState(HWND hDlg)
+void CDisplayColoursDialog::OnOk()
 {
-	RECT rcTemp;
+	COLORREF CenterColor = GetColorFromSliderGroup(m_CenterGroup);
+	SendMessage(m_hDisplayWindow,DWM_SETCENTRECOLOR,CenterColor,0);
 
-	GetWindowRect(hDlg,&rcTemp);
-	m_ptDisplayColors.x = rcTemp.left;
-	m_ptDisplayColors.y = rcTemp.top;
+	COLORREF SurroundingColor = GetColorFromSliderGroup(m_SurroundingGroup);
+	SendMessage(m_hDisplayWindow,DWM_SETSURROUNDCOLOR,SurroundingColor,0);
 
-	m_bDisplayColorsDlgStateSaved = TRUE;
+	DisplayWindow_SetFont(m_hDisplayWindow,reinterpret_cast<WPARAM>(m_hDisplayFont));
+	DisplayWindow_SetTextColor(m_hDisplayWindow,m_TextColor);
+
+	EndDialog(m_hDlg,1);
+}
+
+void CDisplayColoursDialog::OnCancel()
+{
+	EndDialog(m_hDlg,0);
+}
+
+BOOL CDisplayColoursDialog::OnClose()
+{
+	EndDialog(m_hDlg,0);
+	return 0;
+}
+
+BOOL CDisplayColoursDialog::OnDestroy()
+{
+	DestroyIcon(m_hDisplayWindowIcon);
+	return 0;
+}
+
+void CDisplayColoursDialog::SaveState()
+{
+	m_pdcdps->SaveDialogPosition(m_hDlg);
+
+	m_pdcdps->m_bStateSaved = TRUE;
+}
+
+CDisplayColoursDialogPersistentSettings::CDisplayColoursDialogPersistentSettings() :
+CDialogSettings(SETTINGS_KEY)
+{
+	
+}
+
+CDisplayColoursDialogPersistentSettings::~CDisplayColoursDialogPersistentSettings()
+{
+	
+}
+
+CDisplayColoursDialogPersistentSettings& CDisplayColoursDialogPersistentSettings::GetInstance()
+{
+	static CDisplayColoursDialogPersistentSettings dcdps;
+	return dcdps;
 }

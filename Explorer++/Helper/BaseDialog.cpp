@@ -104,6 +104,10 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 				reinterpret_cast<HDC>(wParam));
 			break;
 
+		case WM_HSCROLL:
+			OnHScroll(reinterpret_cast<HWND>(lParam));
+			break;
+
 		case WM_APPCOMMAND:
 			return OnAppCommand(reinterpret_cast<HWND>(wParam),
 				GET_APPCOMMAND_LPARAM(lParam),
@@ -268,6 +272,11 @@ INT_PTR CBaseDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 }
 
 INT_PTR CBaseDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
+{
+	return 0;
+}
+
+BOOL CBaseDialog::OnHScroll(HWND hwnd)
 {
 	return 0;
 }

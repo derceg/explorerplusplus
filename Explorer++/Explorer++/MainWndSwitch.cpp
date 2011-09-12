@@ -24,6 +24,7 @@
 #include "AddBookmarkDialog.h"
 #include "ManageBookmarksDialog.h"
 #include "HelpFileMissingDialog.h"
+#include "DisplayColoursDialog.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
@@ -712,14 +713,16 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case IDM_VIEW_CHANGEDISPLAYCOLOURS:
-			DialogBoxParam(g_hLanguageModule,MAKEINTRESOURCE(IDD_DISPLAYCOLOURS),
-				hwnd,ChangeDisplayColoursStub,(LPARAM)this);
+			{
+				CDisplayColoursDialog DisplayColoursDialog(g_hLanguageModule,IDD_DISPLAYCOLOURS,hwnd,
+					m_hDisplayWindow,m_DisplayWindowCentreColor.ToCOLORREF(),m_DisplayWindowSurroundColor.ToCOLORREF());
+				DisplayColoursDialog.ShowModalDialog();
+			}
 			break;
 
 		case IDM_FILTER_FILTERRESULTS:
 			{
 				CFilterDialog FilterDialog(g_hLanguageModule,IDD_FILTER,hwnd,this);
-
 				FilterDialog.ShowModalDialog();
 			}
 			break;

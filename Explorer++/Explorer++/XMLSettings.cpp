@@ -33,6 +33,8 @@
 #include "SetFileAttributesDialog.h"
 #include "SelectColumnsDialog.h"
 #include "SetDefaultColumnsDialog.h"
+#include "AddBookmarkDialog.h"
+#include "DisplayColoursDialog.h"
 #include "../Helper/XMLSettings.h"
 #include "../Helper/Macros.h"
 
@@ -1696,6 +1698,10 @@ void Explorerplusplus::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 							CSelectColumnsDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("SetDefaultColumns")) == 0)
 							CSetDefaultColumnsDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
+						else if(lstrcmpi(bstrValue,_T("AddBookmark")) == 0)
+							CAddBookmarkDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
+						else if(lstrcmpi(bstrValue,_T("DisplayColors")) == 0)
+							CDisplayColoursDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 					}
 				}
 			}
@@ -1738,6 +1744,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	CMergeFilesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CSelectColumnsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CSetDefaultColumnsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CAddBookmarkDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CDisplayColoursDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 

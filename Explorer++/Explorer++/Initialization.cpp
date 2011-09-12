@@ -60,8 +60,7 @@ void Explorerplusplus::InitializeDisplayWindow(void)
 		MAKEINTRESOURCE(IDI_DISPLAYWINDOW),IMAGE_ICON,
 		0,0,LR_CREATEDIBSECTION);
 
-	m_hDisplayWindow = CreateDisplayWindow(m_hContainer,
-		&m_pDisplayMain,&InitialSettings);
+	m_hDisplayWindow = CreateDisplayWindow(m_hContainer,&InitialSettings);
 }
 
 void Explorerplusplus::InitializeMenus(void)
