@@ -13,11 +13,18 @@
 
 #include "stdafx.h"
 #include "DisplayWindow.h"
-#include "DisplayWindowInternal.h"
 #include "../Helper/Helper.h"
-#include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
+
+
+/* Defines how close the text can get to the bottom
+of the display window before it is moved into the
+next column. */
+#define TEXT_VERTICAL_THRESHOLD	10
+
+/* Defines the horizontal spacing between text columns. */
+#define TEXT_COLUMN_SPACING	50
 
 /* These give the position and size of the
 main 'folder' icon. */
@@ -40,12 +47,10 @@ std::list<ThumbnailEntry_t>	g_ThumbnailEntries;
 
 void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc,RECT *UpdateRect)
 {
-	Gdiplus::GraphicsPath	Path;
-	Gdiplus::Point			Center(0,0);
-	INT						count = 1;
-
 	if(m_hBitmapBackground)
+	{
 		DeleteObject(m_hBitmapBackground);
+	}
 
 	/* Create the (temporary) off-screen buffer used for drawing. */
 	m_hBitmapBackground	= CreateCompatibleBitmap(hdc,rc->right - rc->left,rc->bottom - rc->top);
@@ -53,17 +58,16 @@ void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc,RECT *UpdateRect)
 
 	Gdiplus::Graphics graphics(m_hdcBackground);
 
-	/* This rectangle encloses the entire client area of the window. */
 	Gdiplus::Rect DisplayRect(0,0,rc->right - rc->left,rc->bottom - rc->top);
 
-	/* Add the client area to the path objects drawing section,
-	and set the centre colour that will be used. */
+	Gdiplus::GraphicsPath Path;
 	Path.AddRectangle(DisplayRect);
 	Gdiplus::PathGradientBrush pgb(&Path);
-	pgb.SetCenterPoint(Center);
+	pgb.SetCenterPoint(Gdiplus::Point(0,0));
 
 	pgb.SetCenterColor(m_CentreColor);
-	
+
+	INT count = 1;
 	pgb.SetSurroundColors(&m_SurroundColor,&count);
 	graphics.FillRectangle(&pgb,DisplayRect);
 
@@ -75,12 +79,8 @@ void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc,RECT *UpdateRect)
 
 void CDisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 {
-	HDC		hdcMem;
-	HBITMAP	hBitmap;
-
-	/* Create the (temporary) off-screen buffer used for drawing. */
-	hdcMem	= CreateCompatibleDC(hdc);
-	hBitmap	= CreateCompatibleBitmap(hdc,rc->right-rc->left,rc->bottom-rc->top);
+	HDC hdcMem	= CreateCompatibleDC(hdc);
+	HBITMAP hBitmap	= CreateCompatibleBitmap(hdc,rc->right-rc->left,rc->bottom-rc->top);
 	SelectObject(hdcMem,hBitmap);
 
 	/* Draw the stored background on top of the patched area. */
@@ -92,7 +92,9 @@ void CDisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 		MAIN_ICON_WIDTH,MAIN_ICON_HEIGHT,NULL,NULL,DI_NORMAL);
 
 	if(m_bShowThumbnail)
+	{
 		DrawThumbnail(hdcMem);
+	}
 
 	BitBlt(hdc,UpdateRect->left,UpdateRect->top,rc->right,rc->bottom,hdcMem,
 	UpdateRect->left,UpdateRect->top,SRCCOPY);
@@ -103,10 +105,6 @@ void CDisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 
 void CDisplayWindow::DrawThumbnail(HDC hdcMem)
 {
-	HBITMAP hBitmapOld;
-	HDC hdcSrc;
-	RECT rc;
-
 	if(!m_bThumbnailExtracted)
 	{
 		ExtractThumbnailImage();
@@ -115,10 +113,11 @@ void CDisplayWindow::DrawThumbnail(HDC hdcMem)
 	{
 		if(!m_bThumbnailExtractionFailed)
 		{
+			RECT rc;
 			GetClientRect(m_hDisplayWindow,&rc);
 
-			hdcSrc = CreateCompatibleDC(hdcMem);
-			hBitmapOld = (HBITMAP)SelectObject(hdcSrc,m_hbmThumbnail);
+			HDC hdcSrc = CreateCompatibleDC(hdcMem);
+			HBITMAP hBitmapOld = (HBITMAP)SelectObject(hdcSrc,m_hbmThumbnail);
 
 			BitBlt(hdcMem,m_xColumnFinal,THUMB_IMAGE_TOP,
 				GetRectWidth(&rc) - m_xColumnFinal,GetRectHeight(&rc) - THUMB_HEIGHT_DELTA,
@@ -415,7 +414,7 @@ void CDisplayWindow::OnLButtonDown(LPARAM lParam)
 		SetCapture(m_hDisplayWindow);
 	}
 
-	/* If an image thumbnial was clicked, open
+	/* If an image thumbnail was clicked, open
 	the image and set the mouse pointer back to
 	the regular pointer. */
 	if(m_bShowThumbnail)
@@ -428,6 +427,7 @@ void CDisplayWindow::OnLButtonDown(LPARAM lParam)
 
 		if(PtInRect(&rcThumbnail,CursorPos))
 		{
+			/* TODO: Parent should be notified. */
 			SetCursor(LoadCursor(NULL,IDC_HAND));
 			ShellExecute(m_hDisplayWindow,_T("open"),
 			m_ImageFile,NULL,NULL,SW_SHOW);

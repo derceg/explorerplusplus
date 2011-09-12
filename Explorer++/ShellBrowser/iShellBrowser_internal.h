@@ -1,9 +1,6 @@
 #ifndef SHELLBROWSER_INTERNAL_INCLUDED
 #define SHELLBROWSER_INTERNAL_INCLUDED
 
-#include <windows.h>
-#include <commctrl.h>
-#include <gdiplus.h>
 #include "../Helper/Helper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/DropHandler.h"
@@ -473,7 +470,6 @@ private:
 	void				SetGrouping(BOOL bShowInGroups);
 	void				SetGroupingFlag(BOOL bShowInGroups);
 	void				MoveItemsIntoGroups(void);
-	void				HandleNameGroup(int iGroupId);
 
 	/* Thumbnails view. */
 	void				SetupThumbnailsView(void);

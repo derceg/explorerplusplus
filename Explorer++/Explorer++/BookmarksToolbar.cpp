@@ -145,7 +145,7 @@ void CBookmarksToolbar::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFold
 void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
 	const GUID &guid,bool bFolder,std::size_t Position)
 {
-	assert(Position <= SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
+	assert(Position <= static_cast<std::size_t>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0)));
 
 	TCHAR szName[256];
 	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());

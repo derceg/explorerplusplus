@@ -120,7 +120,6 @@ void Explorerplusplus::OnWindowCreate(void)
 	m_hArrangeSubMenuRClick			= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_ARRANGEMENU)),0);
 	m_hGroupBySubMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_GROUPBY_MENU)),0);
 	m_hGroupBySubMenuRClick			= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_GROUPBY_MENU)),0);
-	m_hBookmarksMenu				= GetSubMenu(GetMenu(m_hContainer),6);
 	m_hTabRightClickMenu			= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_TAB_RCLICK)),0);
 	m_hToolbarRightClickMenu		= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_TOOLBAR_MENU)),0);
 	m_hApplicationRightClickMenu	= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)),0);

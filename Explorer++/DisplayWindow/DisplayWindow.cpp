@@ -25,77 +25,72 @@
 
 #include "stdafx.h"
 #include "DisplayWindow.h"
-#include "DisplayWindowInternal.h"
 #include "../Helper/Helper.h"
-#include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
 
 
-#define CLASS_NAME				_T("DisplayWindow")
-#define WINDOW_NAME				_T("DisplayWindow")
-
-/* Private helper functions. */
-LRESULT CALLBACK	DisplayWindowProcStub(HWND,UINT,WPARAM,LPARAM);
-int					RegisterDisplayWindow(void);
-
-ULONG_PTR	token;
-
-BOOL RegisterDisplayWindow(void)
+namespace
 {
-	WNDCLASS			wc;
-	Gdiplus::GdiplusStartupInput	startupInput;
+	static const TCHAR CLASS_NAME[] = _T("DisplayWindow");
+	static const TCHAR WINDOW_NAME[] = _T("DisplayWindow");
+}
 
-	wc.style			= 0;
-	wc.lpfnWndProc		= DisplayWindowProcStub;
-	wc.cbClsExtra		= 0;
-	wc.cbWndExtra		= sizeof(CDisplayWindow *);
-	wc.hInstance		= GetModuleHandle(0);
-	wc.hIcon			= NULL;
-	wc.hCursor			= LoadCursor(NULL,IDC_ARROW);
-	wc.hbrBackground	= (HBRUSH)NULL;
-	wc.lpszMenuName		= NULL;
-	wc.lpszClassName	= CLASS_NAME;
+ULONG_PTR token;
 
-	if(!RegisterClass(&wc))
-		return FALSE;
+namespace
+{
+	BOOL RegisterDisplayWindowClass()
+	{
+		Gdiplus::GdiplusStartupInput	startupInput;
 
-	Gdiplus::GdiplusStartup(&token,&startupInput,NULL);
+		WNDCLASS wc;
+		wc.style			= 0;
+		wc.lpfnWndProc		= DisplayWindowProcStub;
+		wc.cbClsExtra		= 0;
+		wc.cbWndExtra		= sizeof(CDisplayWindow *);
+		wc.hInstance		= GetModuleHandle(NULL);
+		wc.hIcon			= NULL;
+		wc.hCursor			= LoadCursor(NULL,IDC_ARROW);
+		wc.hbrBackground	= NULL;
+		wc.lpszMenuName		= NULL;
+		wc.lpszClassName	= CLASS_NAME;
 
-	return TRUE;
+		if(!RegisterClass(&wc))
+		{
+			return FALSE;
+		}
+
+		Gdiplus::GdiplusStartup(&token,&startupInput,NULL);
+
+		return TRUE;
+	}
 }
 
 HWND CreateDisplayWindow(HWND Parent,DWInitialSettings_t *pSettings)
 {
-	HWND hDisplayWindow;
+	RegisterDisplayWindowClass();
 
-	RegisterDisplayWindow();
-
-	hDisplayWindow = CreateWindow(WINDOW_NAME,EMPTY_STRING,
-	WS_VISIBLE|WS_CHILD|WS_CLIPSIBLINGS,0,0,0,0,
-	Parent,NULL,GetModuleHandle(0),(LPVOID)pSettings);
+	HWND hDisplayWindow = CreateWindow(WINDOW_NAME,EMPTY_STRING,
+		WS_VISIBLE|WS_CHILD|WS_CLIPSIBLINGS,0,0,0,0,
+		Parent,NULL,GetModuleHandle(NULL),reinterpret_cast<LPVOID>(pSettings));
 
 	return hDisplayWindow;
 }
 
-CDisplayWindow::CDisplayWindow(HWND hDisplayWindow,
-DWInitialSettings_t *pInitialSettings)
+CDisplayWindow::CDisplayWindow(HWND hDisplayWindow,DWInitialSettings_t *pInitialSettings) :
+	m_hDisplayWindow(hDisplayWindow),
+	m_hMainIcon(pInitialSettings->hIcon),
+	m_CentreColor(pInitialSettings->CentreColor),
+	m_SurroundColor(pInitialSettings->SurroundColor),
+	m_TextColor(pInitialSettings->TextColor),
+	m_hDisplayFont(pInitialSettings->hFont)
 {
 	g_ObjectCount++;
-
-	m_hDisplayWindow = hDisplayWindow;
-
-	m_hMainIcon = pInitialSettings->hIcon;
 
 	m_LineSpacing	= 20;
 	m_LeftIndent	= 80;
 
-	m_bSizing		= FALSE;
-
-	m_CentreColor	= pInitialSettings->CentreColor;
-	m_SurroundColor	= pInitialSettings->SurroundColor;
-	m_TextColor		= pInitialSettings->TextColor;
-	m_hDisplayFont	= pInitialSettings->hFont;
-
+	m_bSizing = FALSE;
 	m_hbmThumbnail = NULL;
 	m_bShowThumbnail = FALSE;
 	m_bThumbnailExtracted = FALSE;
@@ -106,6 +101,8 @@ DWInitialSettings_t *pInitialSettings)
 
 CDisplayWindow::~CDisplayWindow()
 {
+	DeleteCriticalSection(&m_csDWThumbnails);
+
 	DeleteDC(m_hdcBackground);
 	DeleteObject(m_hBitmapBackground);
 
@@ -114,34 +111,30 @@ CDisplayWindow::~CDisplayWindow()
 	g_ObjectCount--;
 
 	if(g_ObjectCount == 0)
+	{
 		Gdiplus::GdiplusShutdown(token);
+	}
 }
 
 LRESULT CALLBACK DisplayWindowProcStub(HWND DisplayWindow,UINT msg,
 WPARAM wParam,LPARAM lParam)
 {
-	CDisplayWindow *pdw = (CDisplayWindow *)GetWindowLongPtr(DisplayWindow,GWLP_USERDATA);
+	CDisplayWindow *pdw = reinterpret_cast<CDisplayWindow *>(GetWindowLongPtr(DisplayWindow,GWLP_USERDATA));
 
 	switch(msg)
 	{
 		case WM_CREATE:
 			{
-				CREATESTRUCT		*pCreate = NULL;
-				DWInitialSettings_t	*pSettings = NULL;
-
-				pCreate = (CREATESTRUCT *)lParam;
-
-				pSettings = (DWInitialSettings_t *)pCreate->lpCreateParams;
+				DWInitialSettings_t *pSettings = reinterpret_cast<DWInitialSettings_t *>(
+					reinterpret_cast<CREATESTRUCT *>(lParam)->lpCreateParams);
 
 				pdw = new CDisplayWindow(DisplayWindow,pSettings);
-				SetWindowLongPtr(DisplayWindow,GWLP_USERDATA,(LONG_PTR)pdw);
+				SetWindowLongPtr(DisplayWindow,GWLP_USERDATA,reinterpret_cast<LONG_PTR>(pdw));
 			}
 			break;
 
-		case WM_DESTROY:
-			/* TODO: This may cause an error (critical section freed
-			while in use?). */
-			//delete pdw;
+		case WM_NCDESTROY:
+			delete pdw;
 			return 0;
 			break;
 	}

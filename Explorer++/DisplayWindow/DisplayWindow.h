@@ -1,8 +1,6 @@
 #ifndef DISPLAY_INCLUDED
 #define DISPLAY_INCLUDED
 
-#include <windows.h>
-#include <unknwn.h>
 #include <gdiplus.h>
 #include <vector>
 
@@ -43,15 +41,6 @@ SendMessage(hDisplay,DWM_GETFONT,hFont,0)
 #define DisplayWindow_SetTextColor(hDisplay,hColor) \
 SendMessage(hDisplay,DWM_SETTEXTCOLOR,hColor,0)
 
-#define DisplayWindow_SaveSettings(hDisplay,szKeyPath) \
-SendMessage(hDisplay,DWM_SAVESETTINGS,szKeyPath,0)
-
-#define DisplayWindow_LoadSettings(hDisplay,szKeyPath) \
-SendMessage(hDisplay,DWM_LOADSETTINGS,szKeyPath,0)
-
-#define DisplayWindow_DirectoryEntered(hDisplay,szDirectory) \
-SendMessage(hDisplay,DWM_DIRECTORYENTERED,0,szDirectory)
-
 #define DisplayWindow_BufferText(hDisplay,szText) \
 SendMessage(hDisplay,DWM_BUFFERTEXT,(WPARAM)0,(LPARAM)szText)
 
@@ -90,12 +79,12 @@ static int g_ObjectCount = 0;
 
 class CDisplayWindow
 {
+	friend LRESULT CALLBACK DisplayWindowProcStub(HWND DisplayWindow,UINT msg,WPARAM wParam,LPARAM lParam);
+
 public:
 
 	CDisplayWindow(HWND hDisplayWindow,DWInitialSettings_t *pInitialSettings);
 	~CDisplayWindow();
-
-	LRESULT CALLBACK DisplayWindowProc(HWND,UINT,WPARAM,LPARAM);
 
 	void	ExtractThumbnailImageInternal(ThumbnailEntry_t *pte);
 
@@ -103,12 +92,12 @@ private:
 
 	#define BORDER_COLOUR		Gdiplus::Color(128,128,128)
 
+	LRESULT CALLBACK DisplayWindowProc(HWND,UINT,WPARAM,LPARAM);
+
 	LONG	OnMouseMove(LPARAM lParam);
 	void	OnLButtonDown(LPARAM lParam);
 	void	OnRButtonUp(WPARAM wParam,LPARAM lParam);
 	void	DrawGradientFill(HDC,RECT *,RECT *);
-	void	EraseLine(unsigned int);
-	void	FlushLineToScreen(HDC,unsigned int);
 	void	PaintText(HDC hdc,unsigned int,unsigned int);
 	void	TransparentTextOut(HDC hdc,TCHAR *Text,RECT *prcText);
 	void	DrawThumbnail(HDC hdcMem);
@@ -116,7 +105,6 @@ private:
 	void	OnSetFont(HFONT hFont);
 	void	OnSetTextColor(COLORREF hColor);
 
-	void	SetWindowSize(HWND,int);
 	void	ApplyDefaultFont(HDC hdc);
 
 	void	PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect);

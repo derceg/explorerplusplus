@@ -228,7 +228,8 @@ CFolderView::~CFolderView()
 
 	CoTaskMemFree(m_pidlDirectory);
 
-	m_pPathManager->Release();
+	delete m_pPathManager;
+
 	free(m_pItemMap);
 	free(m_pExtraItemInfo);
 	free(m_pwfdFiles);

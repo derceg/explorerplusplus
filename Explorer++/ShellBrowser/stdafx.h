@@ -53,3 +53,4 @@
 #include <iphlpapi.h>
 #include <unknwn.h>
 #include <wmsdk.h>
+#include <gdiplus.h>

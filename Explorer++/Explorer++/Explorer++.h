@@ -864,7 +864,6 @@ private:
 	HMENU					m_hGroupBySubMenu;
 	HMENU					m_hArrangeSubMenuRClick;
 	HMENU					m_hGroupBySubMenuRClick;
-	HMENU					m_hBookmarksMenu;
 	HMENU					m_hTabRightClickMenu;
 	HMENU					m_hToolbarRightClickMenu;
 	HMENU					m_hApplicationRightClickMenu;
@@ -880,8 +879,6 @@ private:
 	LONG					m_DisplayWindowHeight;
 	BOOL					m_bTreeViewRightClick;
 	BOOL					m_bSelectingTreeViewDirectory;
-	BOOL					m_bInVirtualFolder;
-	BOOL					m_bStickySelection;
 	BOOL					m_bAttemptToolbarRestore;
 	BOOL					m_bLanguageLoaded;
 	BOOL					m_bTreeViewOpenInNewTab;

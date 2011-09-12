@@ -153,7 +153,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DisplayWindow.h" />
-    <ClInclude Include="DisplayWindowInternal.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

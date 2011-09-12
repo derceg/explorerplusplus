@@ -37,43 +37,6 @@ CPathManager::~CPathManager()
 {
 }
 
-/* IUnknown interface members. */
-HRESULT __stdcall CPathManager::QueryInterface(REFIID iid, void **ppvObject)
-{
-	*ppvObject = NULL;
-
-	if(iid == IID_IUnknown)
-	{
-		*ppvObject = static_cast<IUnknown *>(this);
-	}
-
-	if(*ppvObject)
-	{
-		AddRef();
-		return S_OK;
-	}
-
-	return E_NOINTERFACE;
-}
-
-ULONG __stdcall CPathManager::AddRef(void)
-{
-	return ++m_iRefCount;
-}
-
-ULONG __stdcall CPathManager::Release(void)
-{
-	m_iRefCount--;
-	
-	if(m_iRefCount==0)
-	{
-		delete this;
-		return 0;
-	}
-
-	return m_iRefCount;
-}
-
 void CPathManager::StoreIdl(LPITEMIDLIST pidl)
 {
 	/* Check if the number of idl's stored has reached the number of

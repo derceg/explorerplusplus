@@ -272,7 +272,6 @@ void Explorerplusplus::SetDefaultValues(void)
 	/* User options. */
 	m_bOpenNewTabNextToCurrent		= FALSE;
 	m_bConfirmCloseTabs				= FALSE;
-	m_bStickySelection				= TRUE;
 	m_bShowFullTitlePath			= FALSE;
 	m_bAlwaysOpenNewTab				= FALSE;
 	m_bShowFolderSizes				= FALSE;

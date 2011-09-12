@@ -3,7 +3,7 @@
 
 #include <list>
 
-__interface IPathManager : IUnknown
+__interface IPathManager
 {
 	virtual int		GetNumBackPathsStored(void);
 	virtual int		GetNumForwardPathsStored(void);
@@ -22,11 +22,6 @@ class CPathManager : public IPathManager
 public:
 	CPathManager();
 	~CPathManager();
-
-	/* IUnknown methods. */
-	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
-	ULONG __stdcall	AddRef(void);
-	ULONG __stdcall	Release(void);
 
 	int				GetNumBackPathsStored(void);
 	int				GetNumForwardPathsStored(void);
