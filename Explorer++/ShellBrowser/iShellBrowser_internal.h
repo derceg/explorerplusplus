@@ -538,7 +538,7 @@ private:
 	CItemObject *		m_pExtraItemInfo;
 
 	/* Manages browsing history. */
-	IPathManager *		m_pPathManager;
+	CPathManager *		m_pPathManager;
 
 	HANDLE				m_hThread;
 	HANDLE				m_hFolderSizeThread;

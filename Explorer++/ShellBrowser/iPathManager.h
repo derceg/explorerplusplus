@@ -3,21 +3,7 @@
 
 #include <list>
 
-__interface IPathManager
-{
-	virtual int		GetNumBackPathsStored(void);
-	virtual int		GetNumForwardPathsStored(void);
-	virtual UINT	CreateHistoryPopupMenu(HWND,POINT *,BOOL);
-	virtual void	GetBackHistory(std::list<LPITEMIDLIST> *lHistory);
-	virtual void	GetForwardHistory(std::list<LPITEMIDLIST> *lHistory);
-
-	virtual void			StoreIdl(LPITEMIDLIST pidl);
-	virtual LPITEMIDLIST	RetrievePath(int iIndex);
-	virtual LPITEMIDLIST	RetrievePathWithoutUpdate(int iIndex);
-	virtual LPITEMIDLIST	RetrieveAndValidateIdl(int iIndex);
-};
-
-class CPathManager : public IPathManager
+class CPathManager
 {
 public:
 	CPathManager();
@@ -37,7 +23,6 @@ public:
 private:
 	int m_iRefCount;
 
-	#define MAX_STORED_PATHS	10
 	#define DEFAULT_ALLOCATION	10
 
 	/* Points one past the "current" path. */
