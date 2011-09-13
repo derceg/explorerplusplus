@@ -93,7 +93,6 @@ Explorerplusplus::Explorerplusplus(HWND hwnd)
 	g_hwndOptions					= NULL;
 	g_hwndManageBookmarks			= NULL;
 	m_ListViewMButtonItem			= -1;
-	m_nDrivesInToolbar				= 0;
 	m_zDeltaTotal					= 0;
 	m_iPreviousTabSelectionId		= -1;
 

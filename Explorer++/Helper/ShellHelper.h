@@ -29,7 +29,7 @@ BOOL			IsIdlDirectory(LPITEMIDLIST pidl);
 void			GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath);
 HRESULT			GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent);
 BOOL			IsNamespaceRoot(LPCITEMIDLIST pidl);
-HRESULT			GetItemInfoTip(TCHAR *szItemPath,TCHAR *szInfoTip,int cchMax);
+HRESULT			GetItemInfoTip(const TCHAR *szItemPath,TCHAR *szInfoTip,int cchMax);
 HRESULT			GetItemInfoTip(LPITEMIDLIST pidlComplete,TCHAR *szInfoTip,int cchMax);
 HRESULT			GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,DWORD uParsingFlags);
 BOOL			MyExpandEnvironmentStrings(TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize);

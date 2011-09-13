@@ -1823,12 +1823,12 @@ The ONLY times an idl should be sent are:
  - When loading directories on startup
  - When navigating to a folder on the 'Go' menu
 */
-HRESULT Explorerplusplus::BrowseFolder(TCHAR *szPath,UINT wFlags)
+HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath,UINT wFlags)
 {
 	return BrowseFolder(szPath,wFlags,FALSE,FALSE,FALSE);
 }
 
-HRESULT Explorerplusplus::BrowseFolder(TCHAR *szPath,UINT wFlags,
+HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath,UINT wFlags,
 BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 {
 	LPITEMIDLIST	pidl = NULL;
@@ -2489,9 +2489,6 @@ void Explorerplusplus::OnAssocChanged(void)
 
 	/* Now, refresh the treeview. */
 	m_pMyTreeView->RefreshAllIcons();
-
-	/* ...and refresh the drives toolbar. */
-	DrivesToolbarRefreshAllIcons();
 
 	/* Address bar. */
 	HandleComboBoxText();

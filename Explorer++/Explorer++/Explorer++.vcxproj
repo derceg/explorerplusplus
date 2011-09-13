@@ -267,7 +267,7 @@
     <ClCompile Include="CustomizeColorsDialog.cpp" />
     <ClCompile Include="DestroyFilesDialog.cpp" />
     <ClCompile Include="DisplayColoursDialog.cpp" />
-    <ClCompile Include="DrivesToolbarHandler.cpp" />
+    <ClCompile Include="DrivesToolbar.cpp" />
     <ClCompile Include="EventSwitcher.cpp" />
     <ClCompile Include="Explorer++.cpp" />
     <ClCompile Include="FilterDialog.cpp" />
@@ -323,6 +323,7 @@
     <ClInclude Include="DestroyFilesDialog.h" />
     <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DisplayColoursDialog.h" />
+    <ClInclude Include="DrivesToolbar.h" />
     <ClInclude Include="Explorer++.h" />
     <ClInclude Include="Explorer++VersionInfo.h" />
     <ClInclude Include="Explorer++_internal.h" />

@@ -584,19 +584,20 @@ HRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 					else if this is a change in the physical
 					device, add the device in the required
 					areas. */
-					if(pdbv->dbcv_flags & DBTF_MEDIA)
-					{
-						UpdateDrivesToolbarIcon(szDrive);
-					}
-					else
-					{
-						/* Add the drive to the toolbar. The button
-						will automatically be inserted into its
-						correct, sorted position. */
-						InsertDriveIntoDrivesToolbar(szDrive);
+					/* TODO: */
+					//if(pdbv->dbcv_flags & DBTF_MEDIA)
+					//{
+					//	UpdateDrivesToolbarIcon(szDrive);
+					//}
+					//else
+					//{
+					//	/* Add the drive to the toolbar. The button
+					//	will automatically be inserted into its
+					//	correct, sorted position. */
+					//	InsertDriveIntoDrivesToolbar(szDrive);
 
-						UpdateToolbarBandSizing(m_hMainRebar,m_hDrivesToolbar);
-					}
+					//	UpdateToolbarBandSizing(m_hMainRebar,m_hDrivesToolbar);
+					//}
 				}
 			}
 			break;
@@ -622,18 +623,19 @@ HRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 							StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),_T("%c:\\"),chDrive);
 
 							/* Media changed or drive removed? */
-							if(pdbv->dbcv_flags & DBTF_MEDIA)
-							{
-								UpdateDrivesToolbarIcon(szDrive);
-							}
-							else
-							{
-								/* The device was removed from the system.
-								Remove its button from the drive toolbar. */
-								RemoveDriveFromDrivesToolbar(szDrive);
+							/* TODO: */
+							//if(pdbv->dbcv_flags & DBTF_MEDIA)
+							//{
+							//	UpdateDrivesToolbarIcon(szDrive);
+							//}
+							//else
+							//{
+							//	/* The device was removed from the system.
+							//	Remove its button from the drive toolbar. */
+							//	RemoveDriveFromDrivesToolbar(szDrive);
 
-								UpdateToolbarBandSizing(m_hMainRebar,m_hDrivesToolbar);
-							}
+							//	UpdateToolbarBandSizing(m_hMainRebar,m_hDrivesToolbar);
+							//}
 						}
 						break;
 				}

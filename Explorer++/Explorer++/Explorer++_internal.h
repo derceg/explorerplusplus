@@ -219,9 +219,12 @@ TOOLBAR_SEARCH,TOOLBAR_PROPERTIES,TOOLBAR_REFRESH,
 TOOLBAR_ADDBOOKMARK,TOOLBAR_NEWTAB,TOOLBAR_OPENCOMMANDPROMPT,
 TOOLBAR_ORGANIZEBOOKMARKS,TOOLBAR_DELETEPERMANENTLY};
 
-#define TOOLBAR_BOOKMARK_START			46000
-#define TOOLBAR_DRIVES_ID_START			47000
-#define TOOLBAR_APPLICATIONS_ID_START	49000
+#define TOOLBAR_BOOKMARK_START			(TOOLBAR_ID_START + 1000)
+#define TOOLBAR_BOOKMARK_END			(TOOLBAR_BOOKMARK_START + 1000)
+#define TOOLBAR_DRIVES_ID_START			(TOOLBAR_BOOKMARK_END + 1)
+#define TOOLBAR_DRIVES_ID_END			(TOOLBAR_DRIVES_ID_START + 1000)
+#define TOOLBAR_APPLICATIONS_ID_START	(TOOLBAR_DRIVES_ID_END + 1)
+#define TOOLBAR_APPLICATIONS_ID_END		(TOOLBAR_APPLICATIONS_ID_START + 1000)
 
 /* These define the order of the images
 within the shell bitmap resource. The
@@ -282,6 +285,7 @@ __interface IExplorerplusplus
 
 	virtual	CStatusBar		*GetStatusBar();
 
+	virtual HRESULT			BrowseFolder(const TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 	virtual HRESULT			BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 };
 
@@ -527,7 +531,6 @@ BOOL LoadAllowMultipleInstancesFromRegistry(void);
 BOOL LoadAllowMultipleInstancesFromXML(void);
 
 LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-LRESULT CALLBACK DrivesToolbarSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
 LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 

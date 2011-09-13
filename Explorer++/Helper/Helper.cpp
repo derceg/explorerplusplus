@@ -1831,7 +1831,7 @@ TCHAR *GetToken(TCHAR *ptr,TCHAR *Buffer,TCHAR *BufferLength)
 	return p;
 }
 
-HRESULT GetItemInfoTip(TCHAR *szItemPath,TCHAR *szInfoTip,int cchMax)
+HRESULT GetItemInfoTip(const TCHAR *szItemPath,TCHAR *szInfoTip,int cchMax)
 {
 	LPITEMIDLIST	pidlItem = NULL;
 	HRESULT			hr;

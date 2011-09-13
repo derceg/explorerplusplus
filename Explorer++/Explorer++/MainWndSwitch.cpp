@@ -446,28 +446,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		ApplicationToolbarOpenItem(iIndex,EMPTY_STRING);
 	}
-	else if(LOWORD(wParam) >= TOOLBAR_DRIVES_ID_START)
-	{
-		/* Was one of the buttons on the drives toolbar clicked? */
-		TBBUTTON	tbButton;
-		TCHAR		*pszDrivePath = NULL;
-		LRESULT		lResult;
-		int			iIndex;
-
-		iIndex = (int)SendMessage(m_hDrivesToolbar,TB_COMMANDTOINDEX,LOWORD(wParam),0);
-
-		if(iIndex != -1)
-		{
-			lResult = SendMessage(m_hDrivesToolbar,TB_GETBUTTON,iIndex,(LPARAM)&tbButton);
-
-			if(lResult)
-			{
-				pszDrivePath = (TCHAR *)tbButton.dwData;
-
-				BrowseFolder(pszDrivePath,SBSP_ABSOLUTE);
-			}
-		}
-	}
 
 	switch(LOWORD(wParam))
 	{

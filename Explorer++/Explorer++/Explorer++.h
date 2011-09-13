@@ -6,6 +6,7 @@
 #include "Explorer++_internal.h"
 #include "BookmarkHelper.h"
 #include "BookmarksToolbar.h"
+#include "DrivesToolbar.h"
 #include "../ShellBrowser/iShellView.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/BaseDialog.h"
@@ -126,7 +127,6 @@ public:
 	LRESULT CALLBACK	ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	EditSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	RebarSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
-	LRESULT CALLBACK	DrivesToolbarSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabBackingProc(HWND hTabCtrl,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -139,8 +139,6 @@ public:
 	INT_PTR CALLBACK	TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	DWChangeDetailsProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	DWLinePropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	void				FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
 
@@ -396,8 +394,8 @@ private:
 	void					OnSortByAscending(BOOL bSortAscending);
 	void					OnPreviousWindow(void);
 	void					OnNextWindow(void);
-	HRESULT					BrowseFolder(TCHAR *szPath,UINT wFlags);
-	HRESULT					BrowseFolder(TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
+	HRESULT					BrowseFolder(const TCHAR *szPath,UINT wFlags);
+	HRESULT					BrowseFolder(const TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 	HRESULT					BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags);
 	HRESULT					BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 	int						DetermineListViewObjectIndex(HWND hListView);
@@ -549,13 +547,6 @@ private:
 
 	/* Shared between application dialogs. */
 	void					OnApplicationToolbarCommandButton(HWND hDlg);
-
-	/* Drives toolbar. */
-	void					InsertDrivesIntoDrivesToolbar(void);
-	LRESULT					InsertDriveIntoDrivesToolbar(TCHAR *szDrive);
-	LRESULT					RemoveDriveFromDrivesToolbar(TCHAR *szDrive);
-	void					UpdateDrivesToolbarIcon(TCHAR *szDrive);
-	void					DrivesToolbarRefreshAllIcons(void);
 
 	/* File infotips. */
 	void					CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax);
@@ -998,7 +989,7 @@ private:
 	std::list<ToolbarButton_t>	m_tbInitial;
 
 	/* Drives toolbar. */
-	int						m_nDrivesInToolbar;
+	CDrivesToolbar			*m_pDrivesToolbar;
 
 	/* Application toolbar. */
 	ApplicationButton_t		*m_pAppButtons;

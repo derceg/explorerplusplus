@@ -16,6 +16,7 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "BookmarksToolbar.h"
+#include "DrivesToolbar.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Macros.h"
@@ -254,12 +255,8 @@ void Explorerplusplus::CreateDrivesToolbar(void)
 	m_hDrivesToolbar = CreateToolbar(m_hMainRebar,BookmarkToolbarStyles,
 		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
-	SetWindowSubclass(m_hDrivesToolbar,DrivesToolbarSubclassStub,0,(DWORD_PTR)this);
-
-	SendMessage(m_hDrivesToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
-	SendMessage(m_hDrivesToolbar,TB_BUTTONSTRUCTSIZE,(WPARAM)sizeof(TBBUTTON),0);
-
-	InsertDrivesIntoDrivesToolbar();
+	m_pDrivesToolbar = new CDrivesToolbar(m_hDrivesToolbar,
+		TOOLBAR_DRIVES_ID_START,TOOLBAR_DRIVES_ID_END,this);
 }
 
 HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
@@ -380,53 +377,10 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 						}
 						else if(pnmh->hwndFrom == m_hDrivesToolbar)
 						{
-							if(pnmm->dwItemSpec != -1)
-							{
-								TBBUTTON	tbButton;
-								TCHAR		*pszDrivePath;
-								LONG		lResult;
-								int			iIndex;
-
-								iIndex = (int)SendMessage(m_hDrivesToolbar,TB_COMMANDTOINDEX,pnmm->dwItemSpec,0);
-
-								if(iIndex != -1)
-								{
-									lResult = (int)SendMessage(m_hDrivesToolbar,TB_GETBUTTON,iIndex,(LPARAM)&tbButton);
-
-									if(lResult)
-									{
-										pszDrivePath = (TCHAR *)tbButton.dwData;
-
-										LPITEMIDLIST pidlItem = NULL;
-
-										HRESULT hr = GetIdlFromParsingName(pszDrivePath,&pidlItem);
-
-										if(SUCCEEDED(hr))
-										{
-											ClientToScreen(m_hDrivesToolbar,&pnmm->pt);
-
-											std::list<LPITEMIDLIST> pidlItemList;
-
-											CFileContextMenuManager fcmm(m_hDrivesToolbar,pidlItem,
-												pidlItemList);
-
-											FileContextMenuInfo_t fcmi;
-											fcmi.uFrom = FROM_DRIVEBAR;
-
-											CStatusBar StatusBar(m_hStatusBar);
-
-											fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,&StatusBar,
-												reinterpret_cast<DWORD_PTR>(&fcmi),FALSE,GetKeyState(VK_SHIFT) & 0x80);
-
-											CoTaskMemFree(pidlItem);
-										}
-									}
-								}
-							}
-							else
-							{
-								OnMainToolbarRClick();
-							}
+							/* The drives toolbar will handle right-clicking of
+							its items, so if the NM_RCLICK message is received
+							here, it means the toolbar background was clicked. */
+							OnMainToolbarRClick();
 						}
 						else if(pnmh->hwndFrom == m_hApplicationToolbar)
 						{
@@ -776,35 +730,6 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 
 				StringCchPrintf(ptbgit->pszText,ptbgit->cchTextMax,_T("%s\n%s"),
 					pab->szName,pab->szCommand);
-			}
-		}
-	}
-	else if(ptbgit->iItem >= TOOLBAR_DRIVES_ID_START)
-	{
-		TBBUTTON	tbButton;
-		TCHAR		*pszDrivePath;
-		LRESULT		lResult;
-		HRESULT		hr;
-		int			iIndex;
-
-		iIndex = (int)SendMessage(m_hDrivesToolbar,TB_COMMANDTOINDEX,ptbgit->iItem,0);
-
-		if(iIndex != -1)
-		{
-			lResult = SendMessage(m_hDrivesToolbar,TB_GETBUTTON,iIndex,(LPARAM)&tbButton);
-
-			if(lResult)
-			{
-				pszDrivePath = (TCHAR *)tbButton.dwData;
-
-				/* Get the infotip for the drive, and use it as
-				the items tooltip. */
-				hr = GetItemInfoTip(pszDrivePath,szInfoTip,SIZEOF_ARRAY(szInfoTip));
-
-				if(SUCCEEDED(hr))
-				{
-					StringCchCopy(ptbgit->pszText,ptbgit->cchTextMax,szInfoTip);
-				}
 			}
 		}
 	}
