@@ -27,12 +27,9 @@
 void CALLBACK	TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime);
 void CALLBACK	FindIconAPC(ULONG_PTR dwParam);
 BOOL			RemoveFromIconFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent);
-int				GetIconThreadStatus(void);
-void			SetIconThreadStatus(void);
 
 std::list<ListViewInfo_t>	g_pListViewInfoList;
 CRITICAL_SECTION	g_icon_cs;
-BOOL				g_bIconThreadSleeping;
 int					g_nAPCsRan;
 int					g_nAPCsQueued;
 
@@ -110,38 +107,6 @@ BOOL CFolderView::IsFilenameFiltered(TCHAR *FileName)
 		return FALSE;
 
 	return TRUE;
-}
-
-HRESULT CFolderView::GetStoredName(int index,TCHAR *Buffer,unsigned int BufferSize)
-{
-	LVITEM			Item;
-	unsigned int	iNeededBufferSize;
-	BOOL			bRes;
-
-	Item.mask		= LVIF_PARAM;
-	Item.iItem		= index;
-	Item.iSubItem	= 0;
-	bRes = ListView_GetItem(m_hListView,&Item);
-
-	if(!bRes)
-	{
-		Buffer = NULL;
-
-		return E_FAIL;
-	}
-
-	iNeededBufferSize = lstrlen(m_pwfdFiles[(int)Item.lParam].cFileName) + 1;
-
-	if(BufferSize < iNeededBufferSize)
-	{
-		Buffer = NULL;
-
-		return E_FAIL;
-	}
-
-	StringCchCopy(Buffer,BufferSize,m_pwfdFiles[(int)Item.lParam].cFileName);
-
-	return S_OK;
 }
 
 int CFolderView::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer)
@@ -286,11 +251,6 @@ BOOL CFolderView::CanBrowseUp(void)
 	return !IsNamespaceRoot(m_pidlDirectory);
 }
 
-HRESULT CFolderView::CreateViewObject(HWND hOwner,REFIID iid,void **ppv)
-{
-	return S_OK;
-}
-
 BOOL CFolderView::IsSortAscending(void)
 {
 	return m_bSortAscending;
@@ -428,7 +388,7 @@ void CFolderView::OnListViewGetDisplayInfo(LPARAM lParam)
 	nmhdr	= &pnmv->hdr;
 
 	/* Construct an image here using the items
-	acual icon. This image will be shown initially.
+	actual icon. This image will be shown initially.
 	If the item also has a thumbnail image, this
 	will be found later, and will overwrite any
 	image settings made here.
@@ -535,14 +495,13 @@ BOOL RemoveFromIconFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent)
 
 	if(hStopEvent != NULL)
 	{
-		/* Set the event into the signaled
+		/* Set the event into the signalled
 		state. */
 		SetEvent(hStopEvent);
 	}
 
 	if(g_pListViewInfoList.empty() == TRUE)
 	{
-		g_bIconThreadSleeping = TRUE;
 		bQueueNotEmpty = FALSE;
 
 		g_nAPCsRan++;
@@ -571,20 +530,6 @@ BOOL RemoveFromIconFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent)
 	return bQueueNotEmpty;
 }
 
-int GetIconThreadStatus(void)
-{
-	return g_bIconThreadSleeping;
-}
-
-void SetIconThreadStatus(void)
-{
-	EnterCriticalSection(&g_icon_cs);
-
-	g_bIconThreadSleeping = FALSE;
-
-	LeaveCriticalSection(&g_icon_cs);
-}
-
 /* What happens when a FolderView is destroyed in
 the middle of this procedure:
 As this code only relies on the iItem, pidlFull
@@ -608,8 +553,6 @@ void CALLBACK FindIconAPC(ULONG_PTR dwParam)
 	SHFILEINFO		shfi;
 	DWORD_PTR		res = FALSE;
 	BOOL			bQueueNotEmpty = TRUE;
-
-	SetIconThreadStatus();
 
 	bQueueNotEmpty = RemoveFromIconFinderQueue(&pListViewInfo,NULL);
 
@@ -666,34 +609,6 @@ BOOL CFolderView::InVirtualFolder(void)
 	return m_bVirtualFolder;
 }
 
-BOOL CFolderView::CanDeleteItem(int iItem)
-{
-	IShellFolder	*pDesktopFolder = NULL;
-	LPITEMIDLIST	pidlFull = NULL;
-	LVITEM			lvItem;
-	ULONG			uAttributes = SFGAO_CANDELETE;
-	HRESULT			hr;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	ListView_GetItem(m_hListView,&lvItem);
-
-	hr = SHGetDesktopFolder(&pDesktopFolder);
-
-	if(SUCCEEDED(hr))
-	{
-		pidlFull = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lvItem.lParam].pridl);
-
-		pDesktopFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&pidlFull,&uAttributes);
-
-		pDesktopFolder->Release();
-		CoTaskMemFree(pidlFull);
-	}
-
-	return ((uAttributes & SFGAO_CANDELETE) == SFGAO_CANDELETE);
-}
-
 /* We can create files in this folder if it is
 part of the filesystem, or if it is the root of
 the namespace (i.e. the desktop). */
@@ -720,19 +635,9 @@ void CFolderView::SetDirMonitorId(int iDirMonitorId)
 	m_iDirMonitorId = iDirMonitorId;
 }
 
-void CFolderView::SetParentDirMointorId(int iParentDirMonitorId)
-{
-	m_iParentDirMonitorId = iParentDirMonitorId;
-}
-
 int CFolderView::GetDirMonitorId(void)
 {
 	return m_iDirMonitorId;
-}
-
-int CFolderView::GetParentDirMointorId(void)
-{
-	return m_iParentDirMonitorId;
 }
 
 HRESULT CFolderView::RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMax)
@@ -1427,44 +1332,6 @@ BOOL CFolderView::ToggleShowHidden(void)
 	return m_bShowHidden;
 }
 
-void CFolderView::CheckFolderLockState(TCHAR *szParsingPath)
-{
-	HANDLE hFile;
-
-	hFile = CreateFile(szParsingPath,FILE_ALL_ACCESS,
-	FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,
-	FILE_FLAG_BACKUP_SEMANTICS,NULL);
-
-	if(hFile == INVALID_HANDLE_VALUE)
-	{
-		if(GetLastError() == ERROR_ACCESS_DENIED)
-		{
-			SECURITY_DESCRIPTOR Des;
-			ACL Acl;
-
-			InitializeSecurityDescriptor(&Des,SECURITY_DESCRIPTOR_REVISION);
-			InitializeAcl(&Acl,sizeof(Acl),ACL_REVISION);
-			SetSecurityDescriptorDacl(&Des,FALSE,&Acl,FALSE);
-
-			if(m_bUnlockFolders)
-			{
-				/*The folder is locked. Attempt to unlock it (won't
-				work on folders that have been locked by other users).*/
-				SetFileSecurity(szParsingPath,DACL_SECURITY_INFORMATION,
-				&Des);
-			}
-			else
-			{
-				//ListView_SetBackgroundImage(m_hListView,IDB_FOLDERLOCKED);
-			}
-		}
-	}
-	else
-	{
-		CloseHandle(hFile);
-	}
-}
-
 void CFolderView::ResetFolderMemoryAllocations(void)
 {
 	HIMAGELIST himl;
@@ -1558,41 +1425,6 @@ void CFolderView::QueryCurrentSortModes(std::list<int> *pSortModes)
 			pSortModes->push_back(ColumnSortMode);
 		}
 	}
-}
-
-HICON CFolderView::GetItemIcon(int iItem)
-{
-	LVITEM lvItem;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	ListView_GetItem(m_hListView,&lvItem);
-
-	if(!m_pExtraItemInfo[(int)lvItem.lParam].bIconRetrieved)
-		return GetItemIconInternal((int)lvItem.lParam);
-	else
-		return ImageList_GetIcon(m_hListViewImageList,
-		m_pExtraItemInfo[(int)lvItem.lParam].iIcon,ILD_NORMAL);
-}
-
-HICON CFolderView::GetItemIconInternal(int iItemInternal)
-{
-	SHFILEINFO	shfi;
-	TCHAR		szItemPath[MAX_PATH];
-
-	QueryFullItemNameInternal(iItemInternal,szItemPath);
-
-	if(!m_pExtraItemInfo[iItemInternal].bIconRetrieved)
-	{
-		SHGetFileInfo(szItemPath,0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
-
-		m_pExtraItemInfo[iItemInternal].bIconRetrieved	= TRUE;
-		m_pExtraItemInfo[iItemInternal].iIcon			= shfi.iIcon;
-	}
-
-	return ImageList_GetIcon(m_hListViewImageList,
-	m_pExtraItemInfo[iItemInternal].iIcon,ILD_NORMAL);
 }
 
 void CFolderView::ExportCurrentColumns(std::list<Column_t> *pColumns)

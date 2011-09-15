@@ -167,37 +167,6 @@ int EventId,int iFolderIndex)
 	LeaveCriticalSection(&m_csDirectoryAltered);
 }
 
-void CFolderView::ParentModified(DWORD Action,TCHAR *FileName)
-{
-	switch(Action)
-	{
-		case FILE_ACTION_RENAMED_OLD_NAME:
-			{
-				TCHAR szDir[MAX_PATH];
-
-				StringCchCopy(szDir,SIZEOF_ARRAY(szDir),m_CurDir);
-				PathStripPath(szDir);
-
-				if(lstrcmp(szDir,FileName) == 0)
-					m_bCurrentFolderRenamed = TRUE;
-				else
-					m_bCurrentFolderRenamed = FALSE;
-			}
-			break;
-
-		case FILE_ACTION_RENAMED_NEW_NAME:
-			{
-				if(m_bCurrentFolderRenamed)
-				{
-					PathRemoveFileSpec(m_CurDir);
-					PathAppend(m_CurDir,FileName);
-					SendMessage(m_hOwner,WM_USER_UPDATEWINDOWS,0,0);
-				}
-			}
-			break;
-	}
-}
-
 void CFolderView::OnFileActionAdded(TCHAR *szFileName)
 {
 	IShellFolder	*pShellFolder = NULL;

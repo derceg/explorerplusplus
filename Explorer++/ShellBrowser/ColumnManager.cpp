@@ -20,6 +20,7 @@
 #include "stdafx.h"
 #include <gdiplus.h>
 #include <list>
+#include <assert.h>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
@@ -287,6 +288,10 @@ void CFolderView::SetColumnData(unsigned int ColumnId,int iItem,int iColumnIndex
 
 		case CM_MEDIA_YEAR:
 			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_YEAR);
+			break;
+
+		default:
+			assert(false);
 			break;
 	}
 }

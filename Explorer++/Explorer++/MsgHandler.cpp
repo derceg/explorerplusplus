@@ -45,12 +45,12 @@ DWORD WINAPI Thread_IconFinder(LPVOID pParam)
 	and possible errors may occur.
 	OLE is now initialized using an APC that is queued
 	immediately after this thread is created. As APC's
-	are run sequentially, it is quaranteed that the
+	are run sequentially, it is guaranteed that the
 	initialization APC will run before any other APC,
 	thus acting like this initialization function. */
 
 	/* WARNING: Warning C4127 (conditional expression is
-	constant) temporarily disabled for this funtion. */
+	constant) temporarily disabled for this function. */
 	#pragma warning(push)
 	#pragma warning(disable:4127)
 	while(TRUE)

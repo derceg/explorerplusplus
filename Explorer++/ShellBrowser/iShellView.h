@@ -293,9 +293,7 @@ __interface IShellBrowser2 : IUnknown
 	virtual void			UpdateFileSelectionInfo(int,BOOL);
 	virtual int				GetFolderIndex(void);
 	virtual void			FilesModified(DWORD Action,TCHAR *FileName,int EventId,int iFolderIndex);
-	virtual void			ParentModified(DWORD Action,TCHAR *FileName);
 	virtual void			DirectoryAltered(void);
-	virtual HRESULT			GetStoredName(int,TCHAR *,unsigned int);
 	virtual void			QueryName(int iIndex,TCHAR *FileName);
 	virtual HRESULT			QueryFullItemName(int iIndex,TCHAR *FullItemPath);
 	virtual UINT			QueryCurrentDirectory(int,TCHAR *);
@@ -321,12 +319,9 @@ __interface IShellBrowser2 : IUnknown
 	virtual void			OnListViewGetDisplayInfo(LPARAM lParam);
 	virtual LPITEMIDLIST		QueryItemRelativeIdl(int iItem);
 	virtual BOOL			InVirtualFolder(void);
-	virtual BOOL			CanDeleteItem(int iItem);
 	virtual BOOL			CanCreate(void);
 	virtual void			SetDirMonitorId(int iDirMonitorId);
-	virtual void			SetParentDirMointorId(int iParentDirMonitorId);
 	virtual int				GetDirMonitorId(void);
-	virtual int				GetParentDirMointorId(void);
 	virtual void			DragStopped(void);
 	virtual BOOL			IsFileReal(int iItem);
 	virtual int				LocateFileItemIndex(const TCHAR *szFileName);
@@ -361,7 +356,6 @@ __interface IShellBrowser2 : IUnknown
 	virtual size_t			QueryNumActiveColumns(void);
 	virtual void			ToggleGridlines(void);
 	virtual BOOL			QueryGridlinesActive(void);
-	virtual HICON			GetItemIcon(int iItem);
 	virtual void			ExportCurrentColumns(std::list<Column_t> *pColumns);
 	virtual void			ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped);
 	virtual void			ImportAllColumns(ColumnExport_t *pce);

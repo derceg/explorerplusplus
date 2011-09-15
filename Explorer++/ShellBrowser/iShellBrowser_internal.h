@@ -119,7 +119,6 @@ typedef struct
 
 extern std::list<ListViewInfo_t>	g_pListViewInfoList;
 extern CRITICAL_SECTION	g_icon_cs;
-extern BOOL				g_bIconThreadSleeping;
 extern int					g_nAPCsRan;
 extern int					g_nAPCsQueued;
 
@@ -230,25 +229,20 @@ public:
 
 	/* Directory modification support. */
 	void				FilesModified(DWORD Action,TCHAR *FileName,int EventId,int iFolderIndex);
-	void				ParentModified(DWORD Action,TCHAR *FileName);
 	void				DirectoryAltered(void);
 	void				SetDirMonitorId(int iDirMonitorId);
-	void				SetParentDirMointorId(int iParentDirMonitorId);
 	int					GetDirMonitorId(void);
-	int					GetParentDirMointorId(void);
 	int					GetFolderIndex(void);
 
 	/* Item information. */
 	LPWIN32_FIND_DATA	QueryItemInfo(int iItem);
 	LPWIN32_FIND_DATA	QueryFileFindData(int iItem);
 	LPITEMIDLIST		QueryItemRelativeIdl(int iItem);
-	HRESULT				GetStoredName(int,TCHAR *,unsigned int);
 	DWORD				QueryFileAttributes(int iItem);
 	int					QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer);
 	BOOL				IsFileReal(int iItem);
 	void				QueryName(int iIndex,TCHAR *FileName);
 	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath);
-	HICON				GetItemIcon(int iItem);
 	
 	/* Column support. */
 	int					SetAllColumnData(void);
@@ -282,10 +276,8 @@ public:
 	void				AddToThumbnailFinderQueue(LPARAM lParam);
 	void				EmptyThumbnailsQueue(void);
 	BOOL				InVirtualFolder(void);
-	BOOL				CanDeleteItem(int iItem);
 	BOOL				CanCreate(void);
 	HRESULT				GetAttributesOf(TCHAR *Object,UINT *Attributes);
-	HRESULT				CreateViewObject(HWND hOwner,REFIID iid,void **ppv);
 
 	/* Column queueing. */
 	void				AddToColumnQueue(int iItem);
@@ -381,7 +373,6 @@ private:
 	HRESULT inline		AddItemInternal(LPITEMIDLIST pidlDirectory,LPITEMIDLIST pidlRelative,TCHAR *szFileName,int iItemIndex,BOOL bPosition);
 	HRESULT inline		AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
 	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory,LPITEMIDLIST pidlRelative,TCHAR *szFileName);
-	void				CheckFolderLockState(TCHAR *szParsingPath);
 	void				ResetFolderMemoryAllocations(void);
 	void				SetCurrentViewModeInternal(DWORD ViewMode);
 
@@ -474,7 +465,6 @@ private:
 	/* Thumbnails view. */
 	void				SetupThumbnailsView(void);
 	void				RemoveThumbnailsView(void);
-	HICON				GetItemIconInternal(int iItemInternal);
 	int					GetIconThumbnail(int iInternalIndex);
 	int					GetThumbnailInternal(int iType,int iInternalIndex,HBITMAP hThumbnailBitmap);
 	void				DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex);
@@ -542,8 +532,6 @@ private:
 
 	HANDLE				m_hThread;
 	HANDLE				m_hFolderSizeThread;
-	int					m_nAPCsRan;
-	int					m_nAPCsQueued;
 
 	/* Internal state. */
 	LPITEMIDLIST		m_pidlDirectory;
@@ -558,21 +546,16 @@ private:
 	BOOL				m_bVirtualFolder;
 	BOOL				m_bFolderVisited;
 	BOOL				m_bCurrentFolderRenamed;
-	BOOL				m_bShowGridlines;
-	BOOL				m_bFolderChanging;
 	BOOL				m_bShowFolderSizes;
 	BOOL				m_bDisableFolderSizesNetworkRemovable;
-	BOOL				m_bViewSet;
 	BOOL				m_bForceSize;
 	SizeDisplayFormat_t	m_SizeDisplayFormat;
 	int					m_nTotalItems;
-	int					m_PreviousNumSelected;
 	int					m_NumFilesSelected;
 	int					m_NumFoldersSelected;
 	int					m_iCurrentAllocation;
 	int					m_iCachedPosition;
 	int					m_iDirMonitorId;
-	int					m_iParentDirMonitorId;
 	int					m_iFolderIcon;
 	int					m_iFileIcon;
 	int *				m_pItemMap;

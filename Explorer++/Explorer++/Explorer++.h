@@ -368,7 +368,6 @@ private:
 	void					OnDrawClipboard(void);
 	void					OnChangeCBChain(WPARAM wParam,LPARAM lParam);
 	void					OnSetFocus(void);
-	void					ItemChangedHandler(TCHAR *ItemName,BOOL Selected);
 	int						HighlightSimilarFiles(HWND ListView);
 	void					ShowHiddenFiles(void);
 	HRESULT					OnDeviceChange(WPARAM wParam,LPARAM lParam);

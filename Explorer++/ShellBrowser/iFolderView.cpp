@@ -5,7 +5,7 @@
  * License: GPL - See COPYING in the top level directory
  *
  * Constructs/deconstructs the browser
- * object. Also contains some auxillary
+ * object. Also contains some auxiliary
  * code.
  *
  * Written by David Erceg
@@ -81,24 +81,21 @@ HANDLE hIconThread,HANDLE hFolderSizeThread)
 
 CFolderView::CFolderView(HWND hOwner,HWND hListView,
 InitialSettings_t *pSettings,HANDLE hIconThread,
-HANDLE hFolderSizeThread)
+HANDLE hFolderSizeThread) :
+m_hOwner(hOwner),
+m_hListView(hListView),
+m_hThread(hIconThread),
+m_hFolderSizeThread(hFolderSizeThread)
 {
-	HRESULT hr;
-
 	m_iRefCount = 1;
 
-	m_hListView	= hListView;
-	m_hOwner	= hOwner;
-
-	hr = InitializeDragDropHelpers();
+	InitializeDragDropHelpers();
 
 	AllocateInitialItemMemory();
 
 	OSVERSIONINFO VersionInfo;
-
 	VersionInfo.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
 
-	/* Need the OS version (for grouping). */
 	if(GetVersionEx(&VersionInfo) != 0)
 	{
 		m_dwMajorVersion = VersionInfo.dwMajorVersion;
@@ -121,7 +118,6 @@ HANDLE hFolderSizeThread)
 	m_bHideSystemFiles		= FALSE;
 	m_bHideLinkExtension	= FALSE;
 
-	/* Internal state. */
 	m_bColumnsPlaced		= FALSE;
 	m_bOverFolder			= FALSE;
 	m_bDragging				= FALSE;
@@ -129,13 +125,10 @@ HANDLE hFolderSizeThread)
 	m_bThumbnailsSetup		= FALSE;
 	m_nCurrentColumns		= 0;
 	m_iDirMonitorId			= -1;
-	m_iParentDirMonitorId	= -1;
-	m_bFolderChanging		= FALSE;
 	m_pActiveColumnList		= NULL;
 	m_bPerformingDrag		= FALSE;
 	m_bNotifiedOfTermination	= FALSE;
 	m_nActiveColumns		= 0;
-	m_bViewSet				= FALSE;
 	m_bNewItemCreated		= FALSE;
 	m_iDropped				= -1;
 
@@ -146,7 +139,6 @@ HANDLE hFolderSizeThread)
 	SetUserOptions(pSettings);
 
 	NListView::ListView_SetAutoArrange(m_hListView,m_bAutoArrange);
-
 	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 
 	m_nAwaitingAdd = 0;
@@ -165,20 +157,13 @@ HANDLE hFolderSizeThread)
 		g_bcsThumbnailInitialized = TRUE;
 	}
 
-	m_hThread = hIconThread;
-	m_hFolderSizeThread = hFolderSizeThread;
-
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 	m_iFileIcon = GetDefaultFileIconIndex();
-
-	m_nAPCsRan = 0;
-	m_nAPCsQueued = 0;
 
 	if(!g_bInitialized)
 	{
 		g_nAPCsRan = 0;
 		g_nAPCsQueued = 0;
-		g_bIconThreadSleeping = TRUE;
 		InitializeCriticalSection(&g_icon_cs);
 
 		g_bInitialized = TRUE;
@@ -207,21 +192,18 @@ CFolderView::~CFolderView()
 	DeleteCriticalSection(&m_column_cs);
 	DeleteCriticalSection(&m_csDirectoryAltered);
 
-	LVITEM lvItem;
-	int nItems;
-	int i = 0;
+	int nItems = ListView_GetItemCount(m_hListView);
 
-	nItems = ListView_GetItemCount(m_hListView);
-
-	for(i = 0;i < nItems;i++)
+	for(int i = 0;i < nItems;i++)
 	{
+		LVITEM lvItem;
 		lvItem.mask		= LVIF_PARAM;
 		lvItem.iItem	= i;
 		lvItem.iSubItem	= 0;
 
 		ListView_GetItem(m_hListView,&lvItem);
 
-		CoTaskMemFree((LPVOID)m_pExtraItemInfo[lvItem.lParam].pridl);
+		CoTaskMemFree(reinterpret_cast<LPVOID>(m_pExtraItemInfo[lvItem.lParam].pridl));
 
 		/* Also destroy the thumbnails imagelist... */
 	}
@@ -237,12 +219,7 @@ CFolderView::~CFolderView()
 
 BOOL CFolderView::GetAutoArrange(void)
 {
-	if(m_bAutoArrange)
-	{
-		return TRUE;
-	}
-
-	return FALSE;
+	return m_bAutoArrange;
 }
 
 /* This function is only called on 'hard' view changes
@@ -542,11 +519,6 @@ void CFolderView::AllocateInitialItemMemory(void)
 	m_pExtraItemInfo	= (CItemObject *)malloc(DEFAULT_MEM_ALLOC * sizeof(CItemObject));
 
 	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;
-
-	if((m_pwfdFiles == NULL) || (m_pExtraItemInfo == NULL))
-	{
-		return;
-	}
 }
 
 void CFolderView::ToggleGridlines(void)

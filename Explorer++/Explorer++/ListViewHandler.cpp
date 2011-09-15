@@ -4,7 +4,7 @@
  * File: ListViewHandler.cpp
  * License: GPL - See COPYING in the top level directory
  *
- * Handles messages asscoiated with the main
+ * Handles messages associated with the main
  * listview controls.
  *
  * Written by David Erceg
