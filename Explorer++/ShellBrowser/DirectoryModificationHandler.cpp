@@ -340,12 +340,12 @@ void CFolderView::ModifyItemInternal(TCHAR *FileName)
 
 	/* Although an item may not have been added to the listview
 	yet, it is critical that its' size still be updated if
-	neccesary.
+	necessary.
 	It is possible (and quite likely) that the file add and
 	modified messages will be sent in the same group, meaning
 	that when the modification message is processed, the item
 	is not in the listview, but it still needs to be updated.
-	Therefore, instead of searching for items soley in the
+	Therefore, instead of searching for items solely in the
 	listview, also look through the list of pending file
 	additions. */
 
@@ -381,6 +381,28 @@ void CFolderView::ModifyItemInternal(TCHAR *FileName)
 
 		if(res != FALSE)
 			iItemInternal = (int)lvItem.lParam;
+
+		TCHAR szFullFileName[MAX_PATH];
+		StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
+		PathAppend(szFullFileName,FileName);
+
+		/* When a file is modified, its icon overlay may change.
+		This is the case when modifying a file managed by
+		TortoiseSVN, for example. */
+		SHFILEINFO shfi;
+		DWORD_PTR dwRes = SHGetFileInfo(szFullFileName,0,&shfi,sizeof(SHFILEINFO),SHGFI_ICON|SHGFI_OVERLAYINDEX);
+
+		if(dwRes != 0)
+		{
+			lvItem.mask			= LVIF_STATE;
+			lvItem.iItem		= iItem;
+			lvItem.iSubItem		= 0;
+			lvItem.stateMask	= LVIS_OVERLAYMASK;
+			lvItem.state		= INDEXTOOVERLAYMASK(shfi.iIcon >> 24);
+			ListView_SetItem(m_hListView,&lvItem);
+
+			DestroyIcon(shfi.hIcon);
+		}
 	}
 
 	if(iItemInternal != -1)
