@@ -185,6 +185,7 @@
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="iDataObject.cpp" />
     <ClCompile Include="iDirectoryMonitor.cpp" />
+    <ClCompile Include="iDropSource.cpp" />
     <ClCompile Include="iEnumFormatEtc.cpp" />
     <ClCompile Include="ListViewHelper.cpp" />
     <ClCompile Include="ReferenceCount.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="Helper.h" />
     <ClInclude Include="iDataObject.h" />
     <ClInclude Include="iDirectoryMonitor.h" />
+    <ClInclude Include="iDropSource.h" />
     <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="ListViewHelper.h" />
     <ClInclude Include="Macros.h" />

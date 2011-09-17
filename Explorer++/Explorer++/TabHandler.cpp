@@ -175,7 +175,7 @@ int *pTabObjectIndex)
 		m_TabInfo[iTabId] = *pTabInfo;
 	}
 
-	m_hListView[iTabId]	= CreateAndSubclassListView(m_hContainer,ListViewStyles);
+	m_hListView[iTabId]	= CreateMainListView(m_hContainer,ListViewStyles);
 
 	if(m_hListView[iTabId] == NULL)
 		return E_FAIL;
@@ -1556,6 +1556,7 @@ void Explorerplusplus::InitializeTabs(void)
 
 	m_hTabCtrl = CreateTabControl(m_hTabBacking,TabCtrlStyles);
 
+	/* TODO: The image list is been leaked. */
 	himlSmall = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,100);
 	AddDefaultTabIcons(himlSmall);
 	TabCtrl_SetImageList(m_hTabCtrl,himlSmall);

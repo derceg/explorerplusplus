@@ -9,7 +9,6 @@
 #include "iPathManager.h"
 #include "../Helper/Helper.h"
 
-
 #define WM_USER_UPDATEWINDOWS		(WM_APP + 17)
 #define WM_USER_FILESADDED			(WM_APP + 51)
 #define WM_USER_RELEASEBROWSER		(WM_APP + 52)
@@ -307,7 +306,6 @@ __interface IShellBrowser2 : IUnknown
 	virtual LPITEMIDLIST	RetrieveHistoryItemWithoutUpdate(int iItem);
 	virtual LPITEMIDLIST	RetrieveHistoryItem(int iItem);
 	virtual BOOL			CanBrowseUp();
-	virtual LPWIN32_FIND_DATA	QueryItemInfo(int iItem);
 	virtual void			ToggleGrouping(void);
 	virtual void			SetGrouping(BOOL bShowInGroups);
 	virtual void			SetGroupingFlag(BOOL bShowInGroups);
@@ -360,7 +358,7 @@ __interface IShellBrowser2 : IUnknown
 	virtual void			ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped);
 	virtual void			ImportAllColumns(ColumnExport_t *pce);
 	virtual void			ExportAllColumns(ColumnExport_t *pcie);
-	virtual void			QueueRename(LPITEMIDLIST pidlItem);
+	virtual void			QueueRename(LPCITEMIDLIST pidlItem);
 	virtual void			RefreshAllIcons(void);
 	virtual void			OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	virtual void			SetHideSystemFiles(BOOL bHideSystemFiles);

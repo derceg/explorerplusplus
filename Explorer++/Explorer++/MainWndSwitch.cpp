@@ -25,6 +25,7 @@
 #include "ManageBookmarksDialog.h"
 #include "HelpFileMissingDialog.h"
 #include "DisplayColoursDialog.h"
+#include "IModelessDialogNotification.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
@@ -1260,7 +1261,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			if(g_hwndManageBookmarks == NULL)
 			{
 				CManageBookmarksDialog *pManageBookmarksDialog = new CManageBookmarksDialog(g_hLanguageModule,IDD_MANAGE_BOOKMARKS,hwnd,*m_bfAllBookmarks);
-				g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(this);
+				g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(new CModelessDialogNotification());
 			}
 			else
 			{
@@ -1273,14 +1274,10 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			if(g_hwndSearch == NULL)
 			{
 				TCHAR szCurrentDirectory[MAX_PATH];
+				m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),szCurrentDirectory);
 
-				m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),
-					szCurrentDirectory);
-
-				CSearchDialog *SearchDialog = new CSearchDialog(g_hLanguageModule,
-					IDD_SEARCH,hwnd,szCurrentDirectory,this);
-
-				g_hwndSearch = SearchDialog->ShowModelessDialog(this);
+				CSearchDialog *SearchDialog = new CSearchDialog(g_hLanguageModule,IDD_SEARCH,hwnd,szCurrentDirectory,this);
+				g_hwndSearch = SearchDialog->ShowModelessDialog(new CModelessDialogNotification());
 			}
 			else
 			{

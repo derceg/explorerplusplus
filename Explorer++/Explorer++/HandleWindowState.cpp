@@ -24,9 +24,9 @@
 #include "../Helper/Macros.h"
 
 
-/*
- * Updates the states of all windows.
- */
+/* Tab icons. */
+#define TAB_ICON_LOCK_INDEX			0
+
 void Explorerplusplus::UpdateWindowStates(void)
 {
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),m_CurrentDirectory);
@@ -309,6 +309,7 @@ void Explorerplusplus::HandleMainWindowText(void)
 		TCHAR szPrivilegeAddition[32];
 		TCHAR szPrivilege[32];
 
+		/* TODO: String table. */
 		if(CheckGroupMembership(GROUP_ADMINISTRATORS))
 		{
 			StringCchPrintf(szPrivilege,SIZEOF_ARRAY(szPrivilege),_T("Administrators"));

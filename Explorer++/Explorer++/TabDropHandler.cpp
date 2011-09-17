@@ -17,6 +17,10 @@
 #include "../Helper/Macros.h"
 
 
+/* Tab drag and drop timer information. */
+#define TABDRAG_TIMER_ID		0
+#define TABDRAG_TIMER_ELAPSED	500
+
 void CALLBACK TabDragTimerProc(HWND hwnd,UINT uMsg,
 UINT_PTR idEvent,DWORD dwTime);
 

@@ -23,7 +23,7 @@ struct ContextMenuHandler_t
 void			DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest);
 HRESULT			GetIdlFromParsingName(const TCHAR *szParsingName,LPITEMIDLIST *pidl);
 HRESULT			GetDisplayName(TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags);
-HRESULT			GetDisplayName(LPITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uFlags);
+HRESULT			GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uFlags);
 BOOL			CheckIdl(LPITEMIDLIST pidl);
 BOOL			IsIdlDirectory(LPITEMIDLIST pidl);
 void			GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath);

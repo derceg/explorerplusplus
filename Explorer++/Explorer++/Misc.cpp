@@ -28,6 +28,8 @@
 
 extern std::list<std::wstring> g_TabDirs;
 
+void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
+
 void Explorerplusplus::HandleTreeViewSelection(void)
 {
 	HTREEITEM		hItem;

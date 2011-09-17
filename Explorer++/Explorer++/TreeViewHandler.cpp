@@ -23,9 +23,41 @@
 
 #define TREEVIEW_FOLDER_OPEN_DELAY	500
 
+LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+
 /* Used to keep track of which item was selected in
 the treeview control. */
 HTREEITEM	g_NewSelectionItem;
+
+void Explorerplusplus::CreateFolderControls(void)
+{
+	TCHAR szTemp[32];
+	UINT uStyle = WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
+
+	if(m_bShowFolders)
+		uStyle |= WS_VISIBLE;
+
+	/* TODO: String table. */
+	m_hHolder = CreateHolderWindow(m_hContainer,_T("Folders"),uStyle);
+	SetWindowSubclass(m_hHolder,TreeViewHolderProcStub,0,(DWORD_PTR)this);
+
+	m_hTreeView = CreateTreeView(m_hHolder,WS_CHILD|WS_VISIBLE|TVS_SHOWSELALWAYS|
+		TVS_HASBUTTONS|TVS_EDITLABELS|TVS_HASLINES|TVS_TRACKSELECT);
+
+	SetWindowTheme(m_hTreeView,L"Explorer",NULL);
+
+	SetWindowLongPtr(m_hTreeView,GWL_EXSTYLE,WS_EX_CLIENTEDGE);
+	m_pMyTreeView = new CMyTreeView(m_hTreeView,m_hContainer,m_pDirMon,m_hTreeViewIconThread);
+
+	/* Now, subclass the treeview again. This is needed for messages
+	such as WM_MOUSEWHEEL, which need to be intercepted before they
+	reach the window procedure provided by CMyTreeView. */
+	SetWindowSubclass(m_hTreeView,TreeViewSubclassStub,1,(DWORD_PTR)this);
+
+	LoadString(g_hLanguageModule,IDS_HIDEFOLDERSPANE,szTemp,SIZEOF_ARRAY(szTemp));
+	m_hFoldersToolbar = CreateTabToolbar(m_hHolder,FOLDERS_TOOLBAR_CLOSE,szTemp);
+}
 
 LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)

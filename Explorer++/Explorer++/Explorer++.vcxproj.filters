@@ -46,9 +46,6 @@
     <ClCompile Include="HandleWindowState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="iDropSource.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Initialization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -145,15 +142,24 @@
     <ClCompile Include="DrivesToolbar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="iShellView2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="INewMenuClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="iServiceProvider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IModelessDialogNotification.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Explorer++.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Explorer++_internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="iDropSource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NoTranslationResource.h">
@@ -238,6 +244,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DrivesToolbar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="iShellView2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="INewMenuClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="iServiceProvider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IModelessDialogNotification.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

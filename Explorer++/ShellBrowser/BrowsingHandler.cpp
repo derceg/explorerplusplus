@@ -298,14 +298,12 @@ BOOL CFolderView::IsFileFiltered(int iItemInternal)
 	BOOL bHideSystemFile	= FALSE;
 	BOOL bFilenameFiltered	= FALSE;
 
-	// Filters files by filename
 	if(m_bApplyFilter &&
 		((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
 		bFilenameFiltered = IsFilenameFiltered(m_pExtraItemInfo[iItemInternal].szDisplayName);
 	}
 
-	// Hides system files
 	if(m_bHideSystemFiles)
 	{
 		bHideSystemFile = (m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
@@ -469,7 +467,7 @@ BOOL *bStoreHistory)
 	}
 	else
 	{
-		/* Assume that SBSP_ABSOLUTE was paseed. */
+		/* Assume that SBSP_ABSOLUTE was passed. */
 		if(pidlDirectory == NULL)
 			return E_INVALIDARG;
 	}

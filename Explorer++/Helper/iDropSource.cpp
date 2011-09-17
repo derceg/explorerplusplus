@@ -1,6 +1,6 @@
 /******************************************************************
  *
- * Project: Explorer++
+ * Project: Helper
  * File: iDropSource.cpp
  * License: GPL - See COPYING in the top level directory
  *

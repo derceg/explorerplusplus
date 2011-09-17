@@ -15,9 +15,10 @@
 #include "ReferenceCount.h"
 
 
-CReferenceCount::CReferenceCount()
+CReferenceCount::CReferenceCount() :
+m_RefCount(1)
 {
-	m_lRefCount = 1;
+	
 }
 
 CReferenceCount::~CReferenceCount()
@@ -27,14 +28,12 @@ CReferenceCount::~CReferenceCount()
 
 ULONG CReferenceCount::AddRef()
 {
-	return InterlockedIncrement(&m_lRefCount);
+	return InterlockedIncrement(&m_RefCount);
 }
 
 ULONG CReferenceCount::Release()
 {
-	LONG lCount = InterlockedDecrement(&m_lRefCount);
-
-	assert(lCount >= 0);
+	LONG lCount = InterlockedDecrement(&m_RefCount);
 
 	if(lCount == 0)
 	{

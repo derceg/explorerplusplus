@@ -235,7 +235,6 @@ public:
 	int					GetFolderIndex(void);
 
 	/* Item information. */
-	LPWIN32_FIND_DATA	QueryItemInfo(int iItem);
 	LPWIN32_FIND_DATA	QueryFileFindData(int iItem);
 	LPITEMIDLIST		QueryItemRelativeIdl(int iItem);
 	DWORD				QueryFileAttributes(int iItem);
@@ -348,7 +347,7 @@ public:
 	void				SetResourceModule(HINSTANCE hResourceModule);
 	void				ImportAllColumns(ColumnExport_t *pce);
 	void				ExportAllColumns(ColumnExport_t *pce);
-	void				QueueRename(LPITEMIDLIST pidlItem);
+	void				QueueRename(LPCITEMIDLIST pidlItem);
 	void				SelectItems(const std::list<std::wstring> &PastedFileList);
 	void				RefreshAllIcons(void);
 	void				OnDeviceChange(WPARAM wParam,LPARAM lParam);

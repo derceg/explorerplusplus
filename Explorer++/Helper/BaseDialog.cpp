@@ -175,6 +175,7 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 					if(m_pmdn != NULL)
 					{
 						m_pmdn->OnModelessDialogDestroy(m_iResource);
+						m_pmdn->Release();
 					}
 				}
 

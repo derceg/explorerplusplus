@@ -1991,7 +1991,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SIZEDISPLAYFOMRAT:
-		m_SizeDisplayFormat = (SizeDisplayFormat_t)NXMLSettings::DecodeIntValue(wszValue);
+		m_SizeDisplayFormat = static_cast<SizeDisplayFormat_t>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SORTASCENDINGGLOBAL:
@@ -1999,7 +1999,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_STARTUPMODE:
-		m_StartupMode = NXMLSettings::DecodeIntValue(wszValue);
+		m_StartupMode = static_cast<StartupMode_t>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SYNCHRONIZETREEVIEW:
@@ -2159,7 +2159,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_INFOTIPTYPE:
-		m_InfoTipType = NXMLSettings::DecodeIntValue(wszValue);
+		m_InfoTipType = static_cast<InfoTipType_t>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 	}
 }
@@ -2227,13 +2227,10 @@ InitialSettings_t *pSettings,TabInfo_t *pTabInfo)
 	}
 }
 
-Explorerplusplus::CLoadSaveXML::CLoadSaveXML(Explorerplusplus *pContainer,BOOL bLoad)
+Explorerplusplus::CLoadSaveXML::CLoadSaveXML(Explorerplusplus *pContainer,BOOL bLoad) :
+m_pContainer(pContainer),
+m_bLoad(bLoad)
 {
-	m_iRefCount = 1;
-
-	m_pContainer = pContainer;
-	m_bLoad = bLoad;
-
 	if(bLoad)
 	{
 		/* Initialize the load environment (namely,
@@ -2253,38 +2250,6 @@ Explorerplusplus::CLoadSaveXML::~CLoadSaveXML()
 		ReleaseLoadEnvironment();
 	else
 		ReleaseSaveEnvironment();
-}
-
-/* IUnknown interface members. */
-HRESULT __stdcall Explorerplusplus::CLoadSaveXML::QueryInterface(REFIID iid, void **ppvObject)
-{
-	*ppvObject = NULL;
-
-	if(*ppvObject)
-	{
-		AddRef();
-		return S_OK;
-	}
-
-	return E_NOINTERFACE;
-}
-
-ULONG __stdcall Explorerplusplus::CLoadSaveXML::AddRef(void)
-{
-	return ++m_iRefCount;
-}
-
-ULONG __stdcall Explorerplusplus::CLoadSaveXML::Release(void)
-{
-	m_iRefCount--;
-	
-	if(m_iRefCount == 0)
-	{
-		delete this;
-		return 0;
-	}
-
-	return m_iRefCount;
 }
 
 void Explorerplusplus::CLoadSaveXML::InitializeLoadEnvironment(void)

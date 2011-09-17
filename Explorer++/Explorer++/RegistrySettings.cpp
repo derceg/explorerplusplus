@@ -1097,7 +1097,7 @@ void Explorerplusplus::LoadColorRulesFromRegistryInternal(HKEY hKey)
 		HKEY hKeyChild;
 
 		/* Open the subkey. First, attempt to load
-		the type. If there is no type specifier, ignore
+		the type. If there is no type specified, ignore
 		the key. If any other values are missing, also
 		ignore the key. */
 		RegOpenKeyEx(hKey,szKeyName,0,KEY_READ,&hKeyChild);
@@ -1282,6 +1282,17 @@ void Explorerplusplus::LoadStateFromRegistry(void)
 
 		RegCloseKey(hKey);
 	}
+}
+
+Explorerplusplus::CLoadSaveRegistry::CLoadSaveRegistry(Explorerplusplus *pContainer) :
+m_pContainer(pContainer)
+{
+	 
+}
+
+Explorerplusplus::CLoadSaveRegistry::~CLoadSaveRegistry()
+{
+
 }
 
 void Explorerplusplus::CLoadSaveRegistry::LoadGenericSettings(void)

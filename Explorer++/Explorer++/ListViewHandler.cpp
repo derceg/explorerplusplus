@@ -26,30 +26,26 @@
 #include "../Helper/Macros.h"
 
 
+#define LISTVIEW_RENAME_FILENAME	0
+#define LISTVIEW_RENAME_EXTENSION	1
+#define LISTVIEW_RENAME_ENTIRE		2
+
 LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
 LRESULT CALLBACK	ListViewEditProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 LRESULT	(CALLBACK *DefaultListViewProc)(HWND,UINT,WPARAM,LPARAM);
 
-/*
- * Creates and then subclasses a new listview control.
- */
-HWND Explorerplusplus::CreateAndSubclassListView(HWND hParent,DWORD Style)
+HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)
 {
-	HWND hListView;
-	DWORD dwExtendedStyle;
+	HWND hListView = CreateListView(hParent,Style);
+
 	IImageList *pImageList = NULL;
-
-	hListView = CreateListView(hParent,Style);
-
-	SHGetImageList(SHIL_SMALL,IID_IImageList,(void **)&pImageList);
-	ListView_SetImageList(hListView,(HIMAGELIST)pImageList,LVSIL_SMALL);
+	SHGetImageList(SHIL_SMALL,IID_IImageList,reinterpret_cast<void **>(&pImageList));
+	ListView_SetImageList(hListView,reinterpret_cast<HIMAGELIST>(pImageList),LVSIL_SMALL);
 	pImageList->Release();
 
-	dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
+	DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
-	/* If the user has selected to turn on full row
-	select, add the style to the listview. */
 	if(m_bUseFullRowSelect)
 	{
 		dwExtendedStyle |= LVS_EX_FULLROWSELECT;
@@ -60,11 +56,8 @@ HWND Explorerplusplus::CreateAndSubclassListView(HWND hParent,DWORD Style)
 		dwExtendedStyle |= LVS_EX_CHECKBOXES;
 	}
 
-	ListView_SetExtendedListViewStyle(hListView,
-		dwExtendedStyle);
+	ListView_SetExtendedListViewStyle(hListView,dwExtendedStyle);
 
-	/* Set the listview to the Windows Explorer theme
-	used in Windows Vista. */
 	SetWindowTheme(hListView,L"Explorer",NULL);
 
 	return hListView;
@@ -80,7 +73,6 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 	pContainer = (Explorerplusplus *)plvi->pContainer;
 
-	/* Jump across to the member window function (will handle all requests). */
 	return pContainer->ListViewSubclassProc(ListView,msg,wParam,lParam);
 }
 
@@ -123,7 +115,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 				a DOUBLE click, we'll handle the event here. */
 				if(ht.flags == LVHT_NOWHERE)
 				{
-					/* The user has double clicked in the whitepsace
+					/* The user has double clicked in the whitespace
 					area for this tab, so go up one folder... */
 					OnNavigateUp();
 					return 0;
@@ -683,7 +675,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wP
 				TCHAR szFileName[MAX_PATH];
 				DWORD dwAttributes;
 				BOOL bExtensionFound = FALSE;
-				BOOL bSelectionSet = FALSE;
 				int i;
 
 				SendMessage(hwnd,WM_GETTEXT,
@@ -722,12 +713,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wP
 
 							SendMessage(hwnd,EM_SETSEL,0,i);
 						}
-					}
-
-
-					if(m_ListViewEditingStage == LISTVIEW_RENAME_ENTIRE || !bSelectionSet)
-					{
-
 					}
 				}
 			}
@@ -802,6 +787,10 @@ LRESULT CALLBACK Explorerplusplus::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wP
 				m_bListViewBeginRename = FALSE;
 			}
 		}
+		break;
+
+	case WM_NCDESTROY:
+		RemoveWindowSubclass(hwnd,ListViewEditProcStub,0);
 		break;
 	}
 
@@ -991,7 +980,7 @@ void Explorerplusplus::OnListViewGetDisplayInfo(LPARAM lParam)
 
 	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	/* Find the tab asscoiated with this call. */
+	/* Find the tab associated with this call. */
 	while((nmhdr->hwndFrom != m_hListView[iIndex])  && nTabsProcessed < nTabs)
 	{
 		tcItem.mask = TCIF_PARAM;

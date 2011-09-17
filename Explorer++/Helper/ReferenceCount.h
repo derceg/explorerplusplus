@@ -1,7 +1,13 @@
 #ifndef REFERENCECOUNT_INCLUDED
 #define REFERENCECOUNT_INCLUDED
 
-class CReferenceCount
+__interface IReferenceCount
+{
+	ULONG	AddRef();
+	ULONG	Release();
+};
+
+class CReferenceCount : public IReferenceCount
 {
 public:
 
@@ -13,7 +19,7 @@ public:
 
 private:
 
-	LONG	m_lRefCount;
+	LONG	m_RefCount;
 };
 
 #endif

@@ -79,7 +79,7 @@ HRESULT GetDisplayName(TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags)
 	return hr;
 }
 
-HRESULT GetDisplayName(LPITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uFlags)
+HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uFlags)
 {
 	if(pidlDirectory == NULL ||
 		szDisplayName == NULL)

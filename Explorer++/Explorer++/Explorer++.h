@@ -45,77 +45,29 @@ lParam not currently used. */
 #define TAB_WINDOW_HEIGHT			24
 #define DEFAULT_TREEVIEW_WIDTH		208
 
-typedef struct
-{
-	UINT SortById;
-	UINT GroupById;
-} ArrangeMenuItem_t;
-
-/* Used to hold information on all tabs. */
-typedef struct
-{
-	BOOL	bLocked;
-	BOOL	bAddressLocked;
-	BOOL	bUseCustomName;
-	TCHAR	szName[MAX_PATH];
-
-	/* Although each tab manages its
-	own columns, it does not know
-	about any column defaults.
-	Therefore, it makes more sense
-	for this setting to remain here. */
-	//BOOL	bUsingDefaultColumns;
-} TabInfo_t;
-
-typedef struct
-{
-	int iItemID;
-} ToolbarButton_t;
-
 /* Describes the view modes and their order
 (as they differ on Windows XP and Vista/7). */
-typedef struct
+struct ViewMode_t
 {
 	UINT uViewMode;
-} ViewMode_t;
+};
 
-typedef struct
+struct TabProxyInfo_t
 {
 	ATOM	atomClass;
 	HWND	hProxy;
 	int		iTabId;
-} TabProxyInfo_t;
+};
 
-typedef struct
+struct TabPreviewInfo_t
 {
 	int		iTabId;
 	HBITMAP	hbm;
 	POINT	ptOrigin;
-} TabPreviewInfo_t;
+};
 
-typedef enum
-{
-	STARTUP_PREVIOUSTABS	= 1,
-	STARTUP_DEFAULTFOLDER	= 2
-} STARTUP_MODES;
-
-typedef enum
-{
-	INFOTIP_SYSTEM	= 0,
-	INFOTIP_CUSTOM	= 1
-} INFOTIP_TYPE;
-
-static const int ToolbarButtons[] =
-{TOOLBAR_BACK,TOOLBAR_FORWARD,TOOLBAR_UP,
-TOOLBAR_FOLDERS,TOOLBAR_COPYTO,TOOLBAR_MOVETO,
-TOOLBAR_NEWFOLDER,TOOLBAR_CUT,TOOLBAR_COPY,
-TOOLBAR_PASTE,TOOLBAR_DELETE,TOOLBAR_DELETEPERMANENTLY,TOOLBAR_VIEWS,
-TOOLBAR_SEARCH,TOOLBAR_PROPERTIES,TOOLBAR_REFRESH};
-
-class Explorerplusplus : public IDropTarget, public IServiceProvider,
-	public IShellView2, public INewMenuClient, public IDropFilesCallback,
-	public IFileContextMenuExternal, public IModelessDialogNotification,
-	public IExplorerplusplus
+class Explorerplusplus : public IDropTarget,public IDropFilesCallback,
+	public IFileContextMenuExternal, public IExplorerplusplus
 {
 public:
 
@@ -142,10 +94,6 @@ public:
 
 	void				FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
 
-	/* IExplorerplusplus methods. */
-	HWND				GetActiveListView();
-	IShellBrowser2		*GetActiveShellBrowser();
-
 	/* Directory modification. */
 	static void			DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,void *pData);
 
@@ -159,35 +107,6 @@ public:
 	HRESULT _stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
 	HRESULT _stdcall	DragLeave(void);
 	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-
-	/* IServiceProvider methods. */
-	HRESULT	_stdcall	QueryService(REFGUID guidService,REFIID riid,void **ppv);
-
-	/* IShellView2 methods. */
-	HRESULT _stdcall	CreateViewWindow2(LPSV2CVW2_PARAMS lpParams);
-	HRESULT _stdcall	GetView(SHELLVIEWID *pvid,ULONG uView);
-	HRESULT _stdcall	HandleRename(LPCITEMIDLIST pidlNew);
-	HRESULT _stdcall	SelectAndPositionItem(LPCITEMIDLIST pidlItem,UINT uFlags,POINT *ppt);
-
-	HRESULT _stdcall	GetWindow(HWND *);
-	HRESULT _stdcall	ContextSensitiveHelp(BOOL bHelp);
-	HRESULT _stdcall	TranslateAccelerator(MSG *msg);
-	HRESULT _stdcall	EnableModeless(BOOL fEnable);
-	HRESULT _stdcall	UIActivate(UINT uActivate);
-	HRESULT _stdcall	Refresh(void);
-	HRESULT _stdcall	CreateViewWindow(IShellView *psvPrevious,LPCFOLDERSETTINGS pfs,IShellBrowser *psb,RECT *prcView,HWND *phWnd);
-	HRESULT _stdcall	DestroyViewWindow(void);
-	HRESULT _stdcall	GetCurrentInfo(LPFOLDERSETTINGS pfs);
-	HRESULT _stdcall	AddPropertySheetPages(DWORD dwReserved,LPFNSVADDPROPSHEETPAGE pfn,LPARAM lparam);
-	HRESULT _stdcall	SaveViewState(void);
-	HRESULT _stdcall	SelectItem(LPCITEMIDLIST pidlItem,SVSIF uFlags);
-	HRESULT _stdcall	GetItemObject(UINT uItem,REFIID riid,void **ppv);
-
-	/* INewMenuClient - Windows Vista only. */
-	HRESULT _stdcall	SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem,NMCSAEI_FLAGS flags);
-	HRESULT _stdcall	IncludeItems(NMCII_FLAGS *pFlags);
-
-	void				OnModelessDialogDestroy(int iResource);
 
 
 private:
@@ -207,17 +126,50 @@ private:
 		MOUSEWHEEL_SOURCE_OTHER
 	};
 
+	enum StartupMode_t
+	{
+		STARTUP_PREVIOUSTABS	= 1,
+		STARTUP_DEFAULTFOLDER	= 2
+	};
+
+	enum InfoTipType_t
+	{
+		INFOTIP_SYSTEM	= 0,
+		INFOTIP_CUSTOM	= 1
+	};
+
+	struct ArrangeMenuItem_t
+	{
+		UINT SortById;
+		UINT GroupById;
+	};
+
+	struct ToolbarButton_t
+	{
+		int iItemID;
+	};
+
+	struct TabInfo_t
+	{
+		BOOL	bLocked;
+		BOOL	bAddressLocked;
+		BOOL	bUseCustomName;
+		TCHAR	szName[MAX_PATH];
+
+		/* Although each tab manages its
+		own columns, it does not know
+		about any column defaults.
+		Therefore, it makes more sense
+		for this setting to remain here. */
+		//BOOL	bUsingDefaultColumns;
+	};
+
 	class CLoadSaveRegistry : public ILoadSave
 	{
 	public:
 
 		CLoadSaveRegistry(Explorerplusplus *pContainer);
 		~CLoadSaveRegistry();
-
-		/* IUnknown methods. */
-		HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
-		ULONG __stdcall		AddRef(void);
-		ULONG __stdcall		Release(void);
 
 		/* Loading functions. */
 		void	LoadGenericSettings(void);
@@ -241,8 +193,6 @@ private:
 
 	private:
 
-		int	m_iRefCount;
-
 		Explorerplusplus *m_pContainer;
 	};
 
@@ -252,11 +202,6 @@ private:
 
 		CLoadSaveXML(Explorerplusplus *pContainer,BOOL bLoad);
 		~CLoadSaveXML();
-
-		/* IUnknown methods. */
-		HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
-		ULONG __stdcall		AddRef(void);
-		ULONG __stdcall		Release(void);
 
 		void	InitializeLoadEnvironment(void);
 		void	ReleaseLoadEnvironment(void);
@@ -285,9 +230,7 @@ private:
 
 	private:
 
-		int	m_iRefCount;
-
-		Explorerplusplus				*m_pContainer;
+		Explorerplusplus		*m_pContainer;
 		BOOL					m_bLoad;
 
 		/* These are used for saving + loading. */
@@ -467,7 +410,6 @@ private:
 	BOOL					OnTBQueryDelete(LPARAM lParam);
 	BOOL					OnTBGetButtonInfo(LPARAM lParam);
 	BOOL					OnTBRestore(LPARAM lParam);
-	void					OnTBSave(LPARAM lParam);
 	void					OnTBReset(void);
 	void					OnTBGetInfoTip(LPARAM lParam);
 
@@ -551,7 +493,7 @@ private:
 	void					CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax);
 
 	/* Control creation. */
-	HWND					CreateAndSubclassListView(HWND hParent,DWORD Style);
+	HWND					CreateMainListView(HWND hParent,DWORD Style);
 	void					CreateMainControls(void);
 	void					CreateFolderControls(void);
 	void					CreateMainToolbar(void);
@@ -768,6 +710,10 @@ private:
 	std::wstring			GetTabName(int iTab);
 	void					SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
 
+	/* IExplorerplusplus methods. */
+	HWND					GetActiveListView();
+	IShellBrowser2			*GetActiveShellBrowser();
+
 	/* Miscellaneous. */
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
 	BOOL					CompareVirtualFolders(TCHAR *szDirectory,UINT uFolderCSIDL);
@@ -787,8 +733,6 @@ private:
 	int						LookupToolbarButtonImage(int iButtonID);
 	BYTE					LookupToolbarButtonExtraStyles(int iButtonID);
 	void					InsertToolbarButtons(void);
-	void					InsertToolbarButton(ToolbarButton_t *ptb,int iPos);
-	void					DeleteToolbarButton(int iButton);
 	void					AddStringsToMainToolbar(void);
 	void					CreateStatusBar(void);
 	void					InitializeDisplayWindow(void);
@@ -940,12 +884,12 @@ private:
 	BOOL					m_bLargeToolbarIcons;
 	BOOL					m_bPlayNavigationSound;
 	SizeDisplayFormat_t		m_SizeDisplayFormat;
-	UINT					m_StartupMode;
+	StartupMode_t			m_StartupMode;
 	NDefaultFileManager::ReplaceExplorerModes_t	m_ReplaceExplorerMode;
 
 	/* Infotips (user options). */
 	BOOL					m_bShowInfoTips;
-	UINT					m_InfoTipType;
+	InfoTipType_t			m_InfoTipType;
 
 	/* Global options. */
 	DWORD					m_ViewModeGlobal;

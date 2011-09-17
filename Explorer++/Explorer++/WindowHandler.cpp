@@ -22,59 +22,15 @@
 #include "../Helper/Macros.h"
 
 
-DWORD MainToolbarStyles		=	WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |
-								TBSTYLE_TOOLTIPS | TBSTYLE_LIST | TBSTYLE_TRANSPARENT |
-								TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NORESIZE | CCS_ADJUSTABLE;
-
 DWORD BookmarkToolbarStyles	=	WS_CHILD |WS_VISIBLE |WS_CLIPSIBLINGS |WS_CLIPCHILDREN |
 								TBSTYLE_TOOLTIPS | TBSTYLE_LIST | TBSTYLE_TRANSPARENT |
 								TBSTYLE_FLAT | CCS_NODIVIDER| CCS_NORESIZE;
-
-DWORD TreeViewStyles		=	WS_CHILD | WS_VISIBLE | TVS_SHOWSELALWAYS | TVS_HASBUTTONS |
-								TVS_EDITLABELS | TVS_HASLINES | TVS_TRACKSELECT;
-
-DWORD ComboBoxStyles		=	WS_CHILD|WS_VISIBLE|WS_TABSTOP|
-								CBS_DROPDOWN|CBS_AUTOHSCROLL|WS_CLIPSIBLINGS|
-								WS_CLIPCHILDREN;
-
-UINT TabToolbarStyles		=	WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |
-								TBSTYLE_TOOLTIPS | TBSTYLE_LIST | TBSTYLE_TRANSPARENT |
-								TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NOPARENTALIGN | CCS_NORESIZE;
 
 DWORD RebarStyles			=	WS_CHILD|WS_VISIBLE|WS_CLIPCHILDREN|WS_CLIPSIBLINGS|
 								WS_BORDER|CCS_NODIVIDER|CCS_TOP|CCS_NOPARENTALIGN|
 								RBS_BANDBORDERS|RBS_VARHEIGHT;
 
-LRESULT CALLBACK EditSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 LRESULT CALLBACK RebarSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-
-void Explorerplusplus::CreateFolderControls(void)
-{
-	TCHAR szTemp[32];
-	UINT uStyle = WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
-
-	if(m_bShowFolders)
-		uStyle |= WS_VISIBLE;
-
-	m_hHolder = CreateHolderWindow(m_hContainer,_T("Folders"),uStyle);
-	SetWindowSubclass(m_hHolder,TreeViewHolderProcStub,0,(DWORD_PTR)this);
-
-	m_hTreeView = CreateTreeView(m_hHolder,TreeViewStyles);
-
-	SetWindowTheme(m_hTreeView,L"Explorer",NULL);
-
-	SetWindowLongPtr(m_hTreeView,GWL_EXSTYLE,WS_EX_CLIENTEDGE);
-	m_pMyTreeView = new CMyTreeView(m_hTreeView,m_hContainer,m_pDirMon,m_hTreeViewIconThread);
-
-	/* Now, subclass the treeview again. This is needed for messages
-	such as WM_MOUSEWHEEL, which need to be intercepted before they
-	reach the window procedure provided by CMyTreeView. */
-	SetWindowSubclass(m_hTreeView,TreeViewSubclassStub,1,(DWORD_PTR)this);
-
-	LoadString(g_hLanguageModule,IDS_HIDEFOLDERSPANE,szTemp,SIZEOF_ARRAY(szTemp));
-
-	m_hFoldersToolbar = CreateTabToolbar(m_hHolder,FOLDERS_TOOLBAR_CLOSE,szTemp);
-}
 
 void Explorerplusplus::CreateMainControls(void)
 {
@@ -175,8 +131,9 @@ void Explorerplusplus::CreateMainControls(void)
 
 void Explorerplusplus::CreateMainToolbar(void)
 {
-	m_hMainToolbar = CreateToolbar(m_hMainRebar,MainToolbarStyles,
-		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DRAWDDARROWS|
+	m_hMainToolbar = CreateToolbar(m_hMainRebar,WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|
+		TBSTYLE_TOOLTIPS|TBSTYLE_LIST|TBSTYLE_TRANSPARENT|TBSTYLE_FLAT|CCS_NODIVIDER|
+		CCS_NORESIZE|CCS_ADJUSTABLE,TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DRAWDDARROWS|
 		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
 	HIMAGELIST *phiml = NULL;
@@ -220,26 +177,6 @@ void Explorerplusplus::CreateMainToolbar(void)
 	}
 }
 
-void Explorerplusplus::CreateAddressBar(void)
-{
-	HWND		hEdit;
-	HIMAGELIST	SmallIcons;
-
-	m_hAddressBar = CreateComboBox(m_hMainRebar,ComboBoxStyles);
-
-	/* Retrieve the small and large versions of the system image list. */
-	Shell_GetImageLists(NULL,&SmallIcons);
-	SendMessage(m_hAddressBar,CBEM_SETIMAGELIST,0,(LPARAM)SmallIcons);
-
-	hEdit = (HWND)SendMessage(m_hAddressBar,CBEM_GETEDITCONTROL,0,0);
-
-	SetWindowSubclass(hEdit,EditSubclassStub,0,(DWORD_PTR)this);
-
-	/* Turn on auto complete for the edit control within the combobox.
-	This will let the os complete paths as they are typed. */
-	SHAutoComplete(hEdit,SHACF_FILESYSTEM|SHACF_AUTOSUGGEST_FORCE_ON);
-}
-
 void Explorerplusplus::CreateBookmarksToolbar(void)
 {
 	m_hBookmarksToolbar = CreateToolbar(m_hMainRebar,BookmarkToolbarStyles,
@@ -261,83 +198,34 @@ void Explorerplusplus::CreateDrivesToolbar(void)
 
 HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 {
-	HWND TabToolbar;
-	TBBUTTON tbButton[1];
-	HBITMAP hb;
-	HIMAGELIST himl;
-	int ImageSize;
-	int iIndex;
-
-	TabToolbar = CreateToolbar(hParent,TabToolbarStyles,
-		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DOUBLEBUFFER);
-
-	ImageSize = 7;
+	HWND TabToolbar = CreateToolbar(hParent,WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|
+		TBSTYLE_TOOLTIPS|TBSTYLE_LIST|TBSTYLE_TRANSPARENT|TBSTYLE_FLAT|CCS_NODIVIDER|
+		CCS_NOPARENTALIGN|CCS_NORESIZE,TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DOUBLEBUFFER);
 	
-	SendMessage(TabToolbar,TB_SETBITMAPSIZE,0,MAKELONG(ImageSize,ImageSize));
-	
-	SendMessage(TabToolbar,TB_BUTTONSTRUCTSIZE,(WPARAM)sizeof(TBBUTTON),0);
+	SendMessage(TabToolbar,TB_SETBITMAPSIZE,0,MAKELONG(7,7));
+	SendMessage(TabToolbar,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
+	SendMessage(TabToolbar,TB_SETBUTTONSIZE,0,MAKELPARAM(16,16));
 
-	himl = ImageList_Create(ImageSize,ImageSize,ILC_COLOR32|ILC_MASK,0,2);
-
-	hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_TABTOOLBAR_CLOSE));
-
-	iIndex = ImageList_Add(himl,hb,NULL);
-
+	/* TODO: The image list is been leaked. */
+	HIMAGELIST himl = ImageList_Create(7,7,ILC_COLOR32|ILC_MASK,0,2);
+	HBITMAP hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_TABTOOLBAR_CLOSE));
+	int iIndex = ImageList_Add(himl,hb,NULL);
+	SendMessage(TabToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himl));
 	DeleteObject(hb);
 
-	SendMessage(TabToolbar,TB_SETIMAGELIST,0,(LPARAM)himl);
-
 	/* Add the close button, used to close tabs. */
-	tbButton[0].iBitmap		= iIndex;
-	tbButton[0].idCommand	= idCommand;
-	tbButton[0].fsState		= TBSTATE_ENABLED;
-	tbButton[0].fsStyle		= TBSTYLE_BUTTON | TBSTYLE_AUTOSIZE;
-	tbButton[0].dwData		= 0;
-	tbButton[0].iString		= (INT_PTR)szTip;
-	SendMessage(TabToolbar,TB_ADDBUTTONS,(WPARAM)1,(LPARAM)&tbButton);
-
-	SendMessage(TabToolbar,TB_SETBUTTONSIZE,0,MAKELPARAM(16,16));
+	TBBUTTON tbButton;
+	tbButton.iBitmap	= iIndex;
+	tbButton.idCommand	= idCommand;
+	tbButton.fsState	= TBSTATE_ENABLED;
+	tbButton.fsStyle	= TBSTYLE_BUTTON|TBSTYLE_AUTOSIZE;
+	tbButton.dwData		= 0;
+	tbButton.iString	= reinterpret_cast<INT_PTR>(szTip);
+	SendMessage(TabToolbar,TB_INSERTBUTTON,0,reinterpret_cast<LPARAM>(&tbButton));
 
 	SendMessage(TabToolbar,TB_AUTOSIZE,0,0);
 
 	return TabToolbar;
-}
-
-LRESULT CALLBACK EditSubclassStub(HWND hwnd,UINT uMsg,
-WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
-{
-	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
-
-	return pContainer->EditSubclass(hwnd,uMsg,wParam,lParam);
-}
-
-LRESULT CALLBACK Explorerplusplus::EditSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam)
-{
-	switch(msg)
-	{
-		case WM_KEYDOWN:
-			switch(wParam)
-			{
-				case VK_RETURN:
-					SendMessage(m_hContainer,CBN_KEYDOWN,VK_RETURN,0);
-					return 0;
-					break;
-			}
-			break;
-
-		case WM_SETFOCUS:
-			HandleToolbarItemStates();
-			break;
-
-		case WM_MOUSEWHEEL:
-			if(OnMouseWheel(MOUSEWHEEL_SOURCE_OTHER,wParam,lParam))
-			{
-				return 0;
-			}
-			break;
-	}
-
-	return DefSubclassProc(hwnd,msg,wParam,lParam);
 }
 
 LRESULT CALLBACK RebarSubclassStub(HWND hwnd,UINT uMsg,
@@ -564,49 +452,6 @@ void Explorerplusplus::InsertToolbarButtons(void)
 	free(ptbButton);
 }
 
-void Explorerplusplus::InsertToolbarButton(ToolbarButton_t *ptb,int iPos)
-{
-	TBBUTTON	tbButton;
-	BYTE		StandardStyle;
-	TCHAR		*szText = NULL;
-
-	StandardStyle = BTNS_BUTTON | BTNS_AUTOSIZE;
-
-	if(ptb->iItemID == TOOLBAR_SEPARATOR)
-	{
-		tbButton.iBitmap	= 0;
-		tbButton.idCommand	= 0;
-		tbButton.fsState	= TBSTATE_ENABLED;
-		tbButton.fsStyle	= BTNS_SEP;
-		tbButton.dwData		= 0;
-		tbButton.iString	= 0;
-	}
-	else
-	{
-		szText = (TCHAR *)malloc(64 * sizeof(TCHAR));
-
-		LoadString(g_hLanguageModule,LookupToolbarButtonTextID(ptb->iItemID),
-			szText,64);
-
-		tbButton.iBitmap	= LookupToolbarButtonImage(ptb->iItemID);
-		tbButton.idCommand	= ptb->iItemID;
-		tbButton.fsState	= TBSTATE_ENABLED;
-		tbButton.fsStyle	= StandardStyle | LookupToolbarButtonExtraStyles(ptb->iItemID);
-		tbButton.dwData		= 0;
-		tbButton.iString	= (INT_PTR)szText;
-	}
-
-	/* Add the button to the toolbar. */
-	SendMessage(m_hMainToolbar,TB_INSERTBUTTON,(WPARAM)iPos,(LPARAM)&tbButton);
-
-	HandleToolbarItemStates();
-}
-
-void Explorerplusplus::DeleteToolbarButton(int iButton)
-{
-	SendMessage(m_hMainToolbar,TB_DELETEBUTTON,iButton,0);
-}
-
 BOOL Explorerplusplus::OnTBQueryInsert(LPARAM lParam)
 {
 	return TRUE;
@@ -648,11 +493,6 @@ BOOL Explorerplusplus::OnTBGetButtonInfo(LPARAM lParam)
 	}
 }
 
-void Explorerplusplus::OnTBSave(LPARAM lParam)
-{
-	/* Can add custom information here. */
-}
-
 BOOL Explorerplusplus::OnTBRestore(LPARAM lParam)
 {
 	return 0;
@@ -683,6 +523,7 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 
 	StringCchCopy(ptbgit->pszText,ptbgit->cchTextMax,EMPTY_STRING);
 
+	/* TODO: String table. */
 	if(ptbgit->iItem == TOOLBAR_BACK)
 	{
 		if(m_pActiveShellBrowser->IsBackHistory())
@@ -749,115 +590,6 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 	}
 }
 
-void Explorerplusplus::OnAddressBarBeginDrag(void)
-{
-	IDragSourceHelper *pDragSourceHelper = NULL;
-	IDropSource *pDropSource = NULL;
-	HRESULT hr;
-
-	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_ALL,
-		IID_IDragSourceHelper,(LPVOID *)&pDragSourceHelper);
-
-	if(SUCCEEDED(hr))
-	{
-		hr = CreateDropSource(&pDropSource,DRAG_TYPE_LEFTCLICK);
-
-		if(SUCCEEDED(hr))
-		{
-			LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-
-			FORMATETC ftc[2];
-			STGMEDIUM stg[2];
-
-			SetFORMATETC(&ftc[0],(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR),
-				NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
-
-			HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE,1000);
-
-			FILEGROUPDESCRIPTOR *pfgd = static_cast<FILEGROUPDESCRIPTOR *>(GlobalLock(hglb));
-
-			pfgd->cItems = 1;
-
-			FILEDESCRIPTOR *pfd = (FILEDESCRIPTOR *)((LPBYTE)pfgd + sizeof(UINT));
-
-			/* File information (name, size, date created, etc). */
-			pfd[0].dwFlags			= FD_ATTRIBUTES|FD_FILESIZE;
-			pfd[0].dwFileAttributes	= FILE_ATTRIBUTE_NORMAL;
-			pfd[0].nFileSizeLow		= 16384;
-			pfd[0].nFileSizeHigh	= 0;
-
-			/* The name of the file will be the folder name, followed by .lnk. */
-			TCHAR szDisplayName[MAX_PATH];
-			GetDisplayName(pidlDirectory,szDisplayName,SHGDN_INFOLDER);
-			StringCchCat(szDisplayName,SIZEOF_ARRAY(szDisplayName),_T(".lnk"));
-			StringCchCopy(pfd[0].cFileName,SIZEOF_ARRAY(pfd[0].cFileName),szDisplayName);
-
-			GlobalUnlock(hglb);
-
-			stg[0].pUnkForRelease	= 0;
-			stg[0].hGlobal			= hglb;
-			stg[0].tymed			= TYMED_HGLOBAL;
-
-			/* File contents. */
-			SetFORMATETC(&ftc[1],(CLIPFORMAT)RegisterClipboardFormat(CFSTR_FILECONTENTS),
-				NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
-
-			hglb = GlobalAlloc(GMEM_MOVEABLE,16384);
-
-			IShellLink *pShellLink = NULL;
-			IPersistStream *pPersistStream = NULL;
-			HRESULT hr;
-
-			hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
-				IID_IShellLink,(LPVOID*)&pShellLink);
-
-			if(SUCCEEDED(hr))
-			{
-				TCHAR szPath[MAX_PATH];
-
-				GetDisplayName(pidlDirectory,szPath,SHGDN_FORPARSING);
-
-				pShellLink->SetPath(szPath);
-
-				hr = pShellLink->QueryInterface(IID_IPersistStream,(LPVOID*)&pPersistStream);
-
-				if(SUCCEEDED(hr))
-				{
-					IStream *pStream = NULL;
-
-					CreateStreamOnHGlobal(hglb,FALSE,&pStream);
-
-					hr = pPersistStream->Save(pStream,TRUE);
-				}
-			}
-
-			GlobalUnlock(hglb);
-
-			stg[1].pUnkForRelease	= 0;
-			stg[1].hGlobal			= hglb;
-			stg[1].tymed			= TYMED_HGLOBAL;
-
-			IDataObject *pDataObject = NULL;
-			POINT pt = {0,0};
-
-			hr = CreateDataObject(ftc,stg,&pDataObject,2);
-
-			pDragSourceHelper->InitializeFromWindow(m_hAddressBar,&pt,pDataObject);
-
-			DWORD dwEffect;
-
-			DoDragDrop(pDataObject,pDropSource,DROPEFFECT_LINK,&dwEffect);
-
-			CoTaskMemFree(pidlDirectory);
-
-			pDataObject->Release();
-			pDropSource->Release();
-		}
-
-		pDragSourceHelper->Release();
-	}
-}
-
 void Explorerplusplus::AdjustMainToolbarSize(void)
 {
 	HIMAGELIST *phiml = NULL;
@@ -895,4 +627,110 @@ void Explorerplusplus::AdjustMainToolbarSize(void)
 	rbi.cyMaxChild	= HIWORD(dwSize);
 
 	SendMessage(m_hMainRebar,RB_SETBANDINFO,0,(LPARAM)&rbi);
+}
+
+HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
+{
+	HMENU hSubMenu = NULL;
+	std::list<LPITEMIDLIST> lHistory;
+	std::list<LPITEMIDLIST>::iterator itr;
+	MENUITEMINFO mii;
+	TCHAR szDisplayName[MAX_PATH];
+	int iBase;
+	int i = 0;
+
+	if(bBack)
+	{
+		m_pActiveShellBrowser->GetBackHistory(&lHistory);
+
+		iBase = ID_REBAR_MENU_BACK_START;
+	}
+	else
+	{
+		m_pActiveShellBrowser->GetForwardHistory(&lHistory);
+
+		iBase = ID_REBAR_MENU_FORWARD_START;
+	}
+
+	if(lHistory.size() > 0)
+	{
+		hSubMenu = CreateMenu();
+
+		for(itr = lHistory.begin();itr != lHistory.end();itr++)
+		{
+			GetDisplayName(*itr,szDisplayName,SHGDN_INFOLDER);
+
+			mii.cbSize		= sizeof(mii);
+			mii.fMask		= MIIM_ID|MIIM_STRING;
+			mii.wID			= iBase + i + 1;
+			mii.dwTypeData	= szDisplayName;
+			InsertMenuItem(hSubMenu,i,TRUE,&mii);
+
+			i++;
+
+			CoTaskMemFree(*itr);
+		}
+
+		lHistory.clear();
+
+		SetMenuOwnerDraw(hSubMenu);
+	}
+
+	return hSubMenu;
+}
+
+void Explorerplusplus::InitializeMainToolbars(void)
+{
+	/* Initialize the main toolbar styles and settings here. The visibility and gripper
+	styles will be set after the settings have been loaded (needed to keep compatibility
+	with versions older than 0.9.5.4). */
+	m_ToolbarInformation[0].wID			= ID_MAINTOOLBAR;
+	m_ToolbarInformation[0].fMask		= RBBIM_ID|RBBIM_CHILD|RBBIM_CHILDSIZE|RBBIM_SIZE|RBBIM_IDEALSIZE|RBBIM_STYLE;
+	m_ToolbarInformation[0].fStyle		= RBBS_BREAK|RBBS_USECHEVRON;
+	m_ToolbarInformation[0].cx			= 0;
+	m_ToolbarInformation[0].cxIdeal		= 0;
+	m_ToolbarInformation[0].cxMinChild	= 0;
+	m_ToolbarInformation[0].cyIntegral	= 0;
+	m_ToolbarInformation[0].cxHeader	= 0;
+	m_ToolbarInformation[0].lpText		= NULL;
+
+	m_ToolbarInformation[1].wID			= ID_ADDRESSTOOLBAR;
+	m_ToolbarInformation[1].fMask		= RBBIM_ID|RBBIM_CHILD|RBBIM_CHILDSIZE|RBBIM_SIZE|RBBIM_STYLE|RBBIM_TEXT;
+	m_ToolbarInformation[1].fStyle		= RBBS_BREAK;
+	m_ToolbarInformation[1].cx			= 0;
+	m_ToolbarInformation[1].cxIdeal		= 0;
+	m_ToolbarInformation[1].cxMinChild	= 0;
+	m_ToolbarInformation[1].cyIntegral	= 0;
+	m_ToolbarInformation[1].cxHeader	= 0;
+	m_ToolbarInformation[1].lpText		= NULL;
+
+	m_ToolbarInformation[2].wID			= ID_BOOKMARKSTOOLBAR;
+	m_ToolbarInformation[2].fMask		= RBBIM_ID|RBBIM_CHILD|RBBIM_CHILDSIZE|RBBIM_SIZE|RBBIM_IDEALSIZE|RBBIM_STYLE;
+	m_ToolbarInformation[2].fStyle		= RBBS_BREAK|RBBS_USECHEVRON;
+	m_ToolbarInformation[2].cx			= 0;
+	m_ToolbarInformation[2].cxIdeal		= 0;
+	m_ToolbarInformation[2].cxMinChild	= 0;
+	m_ToolbarInformation[2].cyIntegral	= 0;
+	m_ToolbarInformation[2].cxHeader	= 0;
+	m_ToolbarInformation[2].lpText		= NULL;
+
+	m_ToolbarInformation[3].wID			= ID_DRIVESTOOLBAR;
+	m_ToolbarInformation[3].fMask		= RBBIM_ID|RBBIM_CHILD|RBBIM_CHILDSIZE|RBBIM_SIZE|RBBIM_IDEALSIZE|RBBIM_STYLE;
+	m_ToolbarInformation[3].fStyle		= RBBS_BREAK|RBBS_USECHEVRON;
+	m_ToolbarInformation[3].cx			= 0;
+	m_ToolbarInformation[3].cxIdeal		= 0;
+	m_ToolbarInformation[3].cxMinChild	= 0;
+	m_ToolbarInformation[3].cyIntegral	= 0;
+	m_ToolbarInformation[3].cxHeader	= 0;
+	m_ToolbarInformation[3].lpText		= NULL;
+
+	m_ToolbarInformation[4].wID			= ID_APPLICATIONSTOOLBAR;
+	m_ToolbarInformation[4].fMask		= RBBIM_ID|RBBIM_CHILD|RBBIM_CHILDSIZE|RBBIM_SIZE|RBBIM_IDEALSIZE|RBBIM_STYLE;
+	m_ToolbarInformation[4].fStyle		= RBBS_BREAK|RBBS_USECHEVRON;
+	m_ToolbarInformation[4].cx			= 0;
+	m_ToolbarInformation[4].cxIdeal		= 0;
+	m_ToolbarInformation[4].cxMinChild	= 0;
+	m_ToolbarInformation[4].cyIntegral	= 0;
+	m_ToolbarInformation[4].cxHeader	= 0;
+	m_ToolbarInformation[4].lpText		= NULL;
 }

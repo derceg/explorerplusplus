@@ -2,7 +2,8 @@
 #define EXPLORERINTERNAL_INCLUDED
 
 #include <list>
-#include "iDropSource.h"
+#include "../ShellBrowser/iShellView.h"
+#include "../Helper/iDropSource.h"
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Helper.h"
@@ -51,6 +52,29 @@ namespace NExplorerplusplus
 	};
 }
 
+/* Basic interface between Explorerplusplus
+and the dialogs. */
+__interface IExplorerplusplus
+{
+	virtual HWND			GetActiveListView();
+	virtual IShellBrowser2	*GetActiveShellBrowser();
+
+	virtual std::wstring	GetTabName(int iTab);
+	virtual void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
+	virtual void			RefreshTab(int iTabId);
+	virtual int				GetCurrentTabId();
+
+	virtual int				LookupColumnNameStringIndex(int iColumnId);
+	virtual int				LookupColumnDescriptionStringIndex(int iColumnId);
+
+	virtual void			OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
+
+	virtual	CStatusBar		*GetStatusBar();
+
+	virtual HRESULT			BrowseFolder(const TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
+	virtual HRESULT			BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
+};
+
 extern HINSTANCE g_hLanguageModule;
 
 /* Used when setting Explorer++ as the default
@@ -66,21 +90,6 @@ need to be included here. */
 #ifndef SHIL_JUMBO
 	#define SHIL_JUMBO	0x4
 #endif
-
-/* These are used with the IncludeItems()
-method of INewMenuClient. INewMenuClient
-is used to support the shell 'new' menu. */
-#define NMCII_ITEMS		0x0001
-#define NMCII_FOLDERS	0x0002
-
-/* These two flags are used with the
-SelectAndEdit() method of INewClient. */
-#define NMCSAEI_SELECT	0x0000
-#define NMCSAEI_EDIT	0x0001
-
-#define LISTVIEW_RENAME_FILENAME	0
-#define LISTVIEW_RENAME_EXTENSION	1
-#define LISTVIEW_RENAME_ENTIRE		2
 
 #define SORTBY_BASE	50000
 #define SORTBY_END	50099
@@ -115,10 +124,6 @@ main rebar. */
 #define ID_REBAR_MENU_BACK_END		2999
 #define ID_REBAR_MENU_FORWARD_START	3000
 #define ID_REBAR_MENU_FORWARD_END	3999
-
-/* Tab drag and drop timer information. */
-#define TABDRAG_TIMER_ID		0
-#define TABDRAG_TIMER_ELAPSED	500
 
 #define FOLDER_SIZE_LINE_INDEX	1
 
@@ -185,7 +190,6 @@ typedef HRESULT (STDAPICALLTYPE *DwmInvalidateIconicBitmapsProc)(HWND hwnd);
 #define VALIDATE_NETWORKCONNECTIONS_COLUMNS	5
 #define VALIDATE_MYNETWORKPLACES_COLUMNS	6
 
-/* Keep all identifiers below 70000. Above what can be handled. */
 #define TOOLBAR_ID_START			45000
 #define TOOLBAR_SEPARATOR			(TOOLBAR_ID_START + 1)
 #define TOOLBAR_BACK				(TOOLBAR_ID_START + 2)
@@ -265,32 +269,6 @@ bitmap). */
 #define SHELLIMAGES_PASTESHORTCUT		30
 #define SHELLIMAGES_DELETEPERMANENTLY	31
 #define SHELLIMAGES_CMDADMIN			32
-
-/* Basic interface between Explorerplusplus
-and the dialogs. */
-__interface IExplorerplusplus
-{
-	virtual HWND			GetActiveListView();
-	virtual IShellBrowser2	*GetActiveShellBrowser();
-
-	virtual std::wstring	GetTabName(int iTab);
-	virtual void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
-	virtual void			RefreshTab(int iTabId);
-	virtual int				GetCurrentTabId();
-
-	virtual int				LookupColumnNameStringIndex(int iColumnId);
-	virtual int				LookupColumnDescriptionStringIndex(int iColumnId);
-
-	virtual void			OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
-
-	virtual	CStatusBar		*GetStatusBar();
-
-	virtual HRESULT			BrowseFolder(const TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
-	virtual HRESULT			BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
-};
-
-/* Tab icons. */
-#define TAB_ICON_LOCK_INDEX			0
 
 struct ColorRule_t
 {
@@ -499,7 +477,7 @@ extern HWND g_hwndManageBookmarks;
 /* Save/load interface. This allows multiple
 methods of saving/loading data, as long as it
 conforms to this specification. */
-__interface ILoadSave : IUnknown
+__interface ILoadSave
 {
 public:
 
@@ -529,10 +507,6 @@ BOOL LoadWindowPosition(WINDOWPLACEMENT *pwndpl);
 BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl);
 BOOL LoadAllowMultipleInstancesFromRegistry(void);
 BOOL LoadAllowMultipleInstancesFromXML(void);
-
-LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
-LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 typedef struct
 {

@@ -33,26 +33,6 @@ CRITICAL_SECTION	g_icon_cs;
 int					g_nAPCsRan;
 int					g_nAPCsQueued;
 
-WIN32_FIND_DATA *CFolderView::QueryItemInfo(int iItem)
-{
-	LVITEM			lvItem;
-	WIN32_FIND_DATA	*pwfd = NULL;
-	BOOL			bRes;
-
-	if(iItem != -1)
-	{
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= iItem;
-		lvItem.iSubItem	= 0;
-		bRes = ListView_GetItem(m_hListView,&lvItem);
-
-		if(bRes)
-			pwfd = &m_pwfdFiles[lvItem.lParam];
-	}
-
-	return pwfd;
-}
-
 HRESULT CFolderView::GetAttributesOf(TCHAR *Object,UINT *Attributes)
 {
 	int i = 0;
@@ -1550,7 +1530,7 @@ This method is used when a file is created
 using the shell new menu, and the item
 may or may not have been inserted into
 the listview yet. */
-void CFolderView::QueueRename(LPITEMIDLIST pidlItem)
+void CFolderView::QueueRename(LPCITEMIDLIST pidlItem)
 {
 	/* Items are inserted within the context
 	of this thread. Therefore, either pending

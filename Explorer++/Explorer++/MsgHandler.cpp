@@ -180,8 +180,7 @@ void Explorerplusplus::OnWindowCreate(void)
 	m_bShowTaskbarThumbnailsProvisional	= m_bShowTaskbarThumbnails;
 
 	RestoreTabs(pLoadSave);
-	pLoadSave->Release();
-	pLoadSave = NULL;
+	delete pLoadSave;
 
 
 
@@ -1510,6 +1509,7 @@ void Explorerplusplus::OnStartedBrowsing(int iTabId,TCHAR *szFolderPath)
 
 	if(iTabId == m_iObjectIndex)
 	{
+		/* TODO: String table. */
 		StringCchPrintf(szLoadingText,SIZEOF_ARRAY(szLoadingText),
 			_T("Loading %s..."),szFolderPath);
 
@@ -2815,7 +2815,7 @@ void Explorerplusplus::SaveAllSettings(void)
 	pLoadSave->SaveColorRules();
 	pLoadSave->SaveState();
 
-	pLoadSave->Release();
+	delete pLoadSave;
 }
 
 /* Saves directory settings for a particular
@@ -2932,20 +2932,6 @@ void Explorerplusplus::PlayNavigationSound(void)
 	{
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,
 			SND_RESOURCE|SND_ASYNC);
-	}
-}
-
-void Explorerplusplus::OnModelessDialogDestroy(int iResource)
-{
-	switch(iResource)
-	{
-	case IDD_SEARCH:
-		g_hwndSearch = NULL;
-		break;
-
-	case IDD_MANAGE_BOOKMARKS:
-		g_hwndManageBookmarks = NULL;
-		break;
 	}
 }
 

@@ -198,7 +198,7 @@ ensure you have administrator privileges."),NExplorerplusplus::WINDOW_NAME,MB_IC
 
 /*
  * Shows a brief message explaining the
- * command line paramters Explorer++
+ * command line parameters Explorer++
  * uses.
  */
 void ShowUsage(void)
@@ -227,14 +227,9 @@ void ClearRegistrySettings(void)
 		MessageBox(NULL,_T("Settings could not be cleared."),NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING);
 }
 
-/*
- * Registers the main window class.
- */
 ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 {
 	WNDCLASSEX wcex;
-
-	/* Prepare the structure needed to create the main window. */
 	wcex.cbSize			= sizeof(wcex);
 	wcex.style			= 0;
 	wcex.lpfnWndProc	= WndProcStub;
@@ -247,7 +242,6 @@ ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 	wcex.hbrBackground	= (HBRUSH)NULL;
 	wcex.lpszMenuName	= NULL;
 	wcex.lpszClassName	= NExplorerplusplus::CLASS_NAME;
-
 	return RegisterClassEx(&wcex);
 }
 
@@ -305,11 +299,8 @@ A minidump has been saved to:\n%s\nPlease report this to the developer."),szFile
 	return ret;
 }
 
-/*
-* Program entry-point.
-*/
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
-LPSTR lpCmdLine,int nCmdShow)
+	LPSTR lpCmdLine,int nCmdShow)
 {
 	HMODULE			hRichEditLib;
 	HWND			hwnd;
@@ -346,7 +337,6 @@ LPSTR lpCmdLine,int nCmdShow)
 
 	OleInitialize(NULL);
 
-	/* Process command line arguments. */
 	pCommandLine = GetCommandLine();
 
 	bExit = ProcessCommandLine(pCommandLine);

@@ -2,12 +2,11 @@
 #define BASEDIALOG_INCLUDED
 
 #include "ResizableDialog.h"
+#include "ReferenceCount.h"
 
-__interface IModelessDialogNotification
+__interface IModelessDialogNotification : public IReferenceCount
 {
-public:
-
-	virtual void	OnModelessDialogDestroy(int iResource);
+	void OnModelessDialogDestroy(int iResource);
 };
 
 /* Provides a degree of abstraction off a standard dialog.
