@@ -17,12 +17,13 @@
 #include <algorithm>
 #include "Explorer++.h"
 #include "RenameTabDialog.h"
+#include "TabDropHandler.h"
+#include "MainResource.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
-#include "MainResource.h"
 
 
 DWORD ListViewStyles		=	WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|
@@ -37,6 +38,133 @@ LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lPa
 
 extern LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
 extern LRESULT	(CALLBACK *DefaultListViewProc)(HWND,UINT,WPARAM,LPARAM);
+
+void Explorerplusplus::InitializeTabs(void)
+{
+	/* The tab backing will hold the tab window. */
+	CreateTabBacking();
+
+	if(m_bForceSameTabWidth)
+	{
+		TabCtrlStyles |= TCS_FIXEDWIDTH;
+	}
+
+	m_hTabCtrl = CreateTabControl(m_hTabBacking,TabCtrlStyles);
+
+	/* TODO: The image list is been leaked. */
+	HIMAGELIST himlSmall = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,100);
+	AddDefaultTabIcons(himlSmall);
+	TabCtrl_SetImageList(m_hTabCtrl,himlSmall);
+
+	/* TODO: Needs to be freed when closing. */
+	m_pTabContainer = new CTabContainer(m_hTabCtrl,m_pShellBrowser,this);
+
+	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hTabCtrl,m_pTabContainer);
+	RegisterDragDrop(m_hTabCtrl,pTabDropHandler);
+	pTabDropHandler->Release();
+
+	SetWindowSubclass(m_hTabCtrl,TabSubclassProcStub,0,reinterpret_cast<DWORD_PTR>(this));
+
+	/* Create the toolbar that will appear on the tab control.
+	Only contains the close button used to close tabs. */
+	TCHAR szTabCloseTip[64];
+	LoadString(g_hLanguageModule,IDS_TAB_CLOSE_TIP,szTabCloseTip,SIZEOF_ARRAY(szTabCloseTip));
+	m_hTabWindowToolbar	= CreateTabToolbar(m_hTabBacking,TABTOOLBAR_CLOSE,szTabCloseTip);
+}
+
+LRESULT CALLBACK TabSubclassProcStub(HWND hwnd,UINT uMsg,
+WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+{
+	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
+
+	return pContainer->TabSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam)
+{
+	switch(msg)
+	{
+		case WM_INITMENU:
+			OnInitTabMenu(wParam);
+			SendMessage(m_hContainer,WM_INITMENU,wParam,lParam);
+			break;
+
+		case WM_MENUSELECT:
+			/* Forward the message to the main window so it can
+			handle menu help. */
+			SendMessage(m_hContainer,WM_MENUSELECT,wParam,lParam);
+			break;
+
+		case WM_MEASUREITEM:
+			SendMessage(m_hContainer,WM_MEASUREITEM,wParam,lParam);
+			break;
+
+		case WM_DRAWITEM:
+			SendMessage(m_hContainer,WM_DRAWITEM,wParam,lParam);
+			break;
+
+		case WM_LBUTTONDOWN:
+			OnTabCtrlLButtonDown(wParam,lParam);
+			break;
+
+		case WM_LBUTTONUP:
+			OnTabCtrlLButtonUp();
+			break;
+
+		case WM_MOUSEMOVE:
+			OnTabCtrlMouseMove(wParam,lParam);
+			break;
+
+		case WM_MBUTTONUP:
+			SendMessage(m_hContainer,WM_USER_TABMCLICK,wParam,lParam);
+			break;
+
+		case WM_RBUTTONUP:
+			OnTabCtrlRButtonUp(wParam,lParam);
+			break;
+
+		case WM_CAPTURECHANGED:
+			{
+				if((HWND)lParam != hTab)
+					ReleaseCapture();
+
+				m_bTabBeenDragged = FALSE;
+			}
+			break;
+
+		case WM_LBUTTONDBLCLK:
+			{
+				TCHITTESTINFO info;
+				int ItemNum;
+				DWORD dwPos;
+				POINT MousePos;
+
+				dwPos = GetMessagePos();
+				MousePos.x = GET_X_LPARAM(dwPos);
+				MousePos.y = GET_Y_LPARAM(dwPos);
+				ScreenToClient(hTab,&MousePos);
+
+				/* The cursor position will be tested to see if
+				there is a tab beneath it. */
+				info.pt.x	= LOWORD(lParam);
+				info.pt.y	= HIWORD(lParam);
+
+				ItemNum = TabCtrl_HitTest(m_hTabCtrl,&info);
+
+				if(info.flags != TCHT_NOWHERE && m_bDoubleClickTabClose)
+				{
+					CloseTab(ItemNum);
+				}
+			}
+			break;
+
+		case WM_NCDESTROY:
+			RemoveWindowSubclass(m_hTabCtrl,TabSubclassProcStub,0);
+			break;
+	}
+
+	return DefSubclassProc(hTab,msg,wParam,lParam);
+}
 
 std::wstring Explorerplusplus::GetTabName(int iTab)
 {
@@ -63,6 +191,13 @@ void Explorerplusplus::SetTabName(int iTab,std::wstring strName,BOOL bUseCustomN
 	tcItem.mask = TCIF_TEXT;
 	tcItem.pszText = szName;
 	TabCtrl_SetItem(m_hTabCtrl,iTab,&tcItem);
+}
+
+void Explorerplusplus::SetTabSelection(int Index)
+{
+	m_iTabSelectedItem = Index;
+	TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
+	OnTabChangeInternal(TRUE);
 }
 
 void Explorerplusplus::InitializeTabMap(void)
@@ -1229,96 +1364,6 @@ void Explorerplusplus::OnTabSelectionChange(void)
 	OnTabChangeInternal(TRUE);
 }
 
-LRESULT CALLBACK TabSubclassProcStub(HWND hwnd,UINT uMsg,
-WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
-{
-	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
-
-	return pContainer->TabSubclassProc(hwnd,uMsg,wParam,lParam);
-}
-
-LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam)
-{
-	switch(msg)
-	{
-		case WM_INITMENU:
-			OnInitTabMenu(wParam);
-			SendMessage(m_hContainer,WM_INITMENU,wParam,lParam);
-			break;
-
-		case WM_MENUSELECT:
-			/* Forward the message to the main window so it can
-			handle menu help. */
-			SendMessage(m_hContainer,WM_MENUSELECT,wParam,lParam);
-			break;
-
-		case WM_MEASUREITEM:
-			SendMessage(m_hContainer,WM_MEASUREITEM,wParam,lParam);
-			break;
-
-		case WM_DRAWITEM:
-			SendMessage(m_hContainer,WM_DRAWITEM,wParam,lParam);
-			break;
-
-		case WM_LBUTTONDOWN:
-			OnTabCtrlLButtonDown(wParam,lParam);
-			break;
-
-		case WM_LBUTTONUP:
-			OnTabCtrlLButtonUp();
-			break;
-
-		case WM_MOUSEMOVE:
-			OnTabCtrlMouseMove(wParam,lParam);
-			break;
-
-		case WM_MBUTTONUP:
-			SendMessage(m_hContainer,WM_USER_TABMCLICK,wParam,lParam);
-			break;
-
-		case WM_RBUTTONUP:
-			OnTabCtrlRButtonUp(wParam,lParam);
-			break;
-
-		case WM_CAPTURECHANGED:
-			{
-				if((HWND)lParam != hTab)
-					ReleaseCapture();
-
-				m_bTabBeenDragged = FALSE;
-			}
-			break;
-
-		case WM_LBUTTONDBLCLK:
-			{
-				TCHITTESTINFO info;
-				int ItemNum;
-				DWORD dwPos;
-				POINT MousePos;
-
-				dwPos = GetMessagePos();
-				MousePos.x = GET_X_LPARAM(dwPos);
-				MousePos.y = GET_Y_LPARAM(dwPos);
-				ScreenToClient(hTab,&MousePos);
-
-				/* The cursor position will be tested to see if
-				there is a tab beneath it. */
-				info.pt.x	= LOWORD(lParam);
-				info.pt.y	= HIWORD(lParam);
-
-				ItemNum = TabCtrl_HitTest(m_hTabCtrl,&info);
-
-				if(info.flags != TCHT_NOWHERE && m_bDoubleClickTabClose)
-				{
-					CloseTab(ItemNum);
-				}
-			}
-			break;
-	}
-
-	return DefSubclassProc(hTab,msg,wParam,lParam);
-}
-
 void Explorerplusplus::OnInitTabMenu(WPARAM wParam)
 {
 	HMENU hTabMenu;
@@ -1540,50 +1585,6 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 			SendMessage(m_hContainer,WM_COMMAND,MAKEWPARAM(uMenuID,iTabHit),0);
 			break;
 	}
-}
-
-void Explorerplusplus::InitializeTabs(void)
-{
-	HIMAGELIST	himlSmall;
-	TCHAR		szTabCloseTip[64];
-	HRESULT		hr;
-
-	/* The tab backing will hold the tab window. */
-	CreateTabBacking();
-
-	if(m_bForceSameTabWidth)
-		TabCtrlStyles |= TCS_FIXEDWIDTH;
-
-	m_hTabCtrl = CreateTabControl(m_hTabBacking,TabCtrlStyles);
-
-	/* TODO: The image list is been leaked. */
-	himlSmall = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,100);
-	AddDefaultTabIcons(himlSmall);
-	TabCtrl_SetImageList(m_hTabCtrl,himlSmall);
-
-	/* Initialize the drag source helper, and use it to initialize the drop target helper. */
-	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
-	IID_IDragSourceHelper,(LPVOID *)&m_pDragSourceHelper);
-
-	if(SUCCEEDED(hr))
-	{
-		hr = m_pDragSourceHelper->QueryInterface(IID_IDropTargetHelper,(LPVOID *)&m_pDropTargetHelper);
-
-		if(SUCCEEDED(hr))
-		{
-			/* Indicate that the tab control supports the dropping of items. */
-			RegisterDragDrop(m_hTabCtrl,this);
-		}
-	}
-
-	/* Subclass the tab control. */
-	SetWindowSubclass(m_hTabCtrl,TabSubclassProcStub,0,(DWORD_PTR)this);
-
-	/* Create the toolbar that will appear on the tab control.
-	Only contains the close buton used to close tabs. */
-	LoadString(g_hLanguageModule,IDS_TAB_CLOSE_TIP,
-		szTabCloseTip,SIZEOF_ARRAY(szTabCloseTip));
-	m_hTabWindowToolbar	= CreateTabToolbar(m_hTabBacking,TABTOOLBAR_CLOSE,szTabCloseTip);
 }
 
 void Explorerplusplus::AddDefaultTabIcons(HIMAGELIST himlTab)

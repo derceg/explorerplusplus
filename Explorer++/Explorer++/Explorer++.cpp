@@ -19,45 +19,8 @@
 
 CRITICAL_SECTION	g_csDirMonCallback;
 
-/* IUnknown interface members. */
-HRESULT __stdcall Explorerplusplus::QueryInterface(REFIID iid, void **ppvObject)
-{
-	*ppvObject = NULL;
-
-	if(iid == IID_IServiceProvider)
-	{
-		*ppvObject = new CServiceProvider(this);
-	}
-
-	if(*ppvObject)
-	{
-		return S_OK;
-	}
-
-	return E_NOINTERFACE;
-}
-
-ULONG __stdcall Explorerplusplus::AddRef(void)
-{
-	return ++m_iRefCount;
-}
-
-ULONG __stdcall Explorerplusplus::Release(void)
-{
-	m_iRefCount--;
-	
-	if(m_iRefCount == 0)
-	{
-		delete this;
-		return 0;
-	}
-
-	return m_iRefCount;
-}
-
 Explorerplusplus::Explorerplusplus(HWND hwnd) :
-m_hContainer(hwnd),
-m_iRefCount(1)
+m_hContainer(hwnd)
 {
 	/* When the 'open new tabs next to
 	current' option is activated, the

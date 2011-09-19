@@ -40,6 +40,9 @@
 #define REG_DIALOGS_KEY				_T("Software\\Explorer++\\Dialogs")
 #define REG_COLORS_KEY				_T("Software\\Explorer++\\ColorRules")
 
+#define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Gdiplus::Color(255,255,255)
+#define DEFAULT_DISPLAYWINDOW_SURROUND_COLOR	Gdiplus::Color(0,94,138)
+
 TCHAR pszDirectoriesKey[]	= _T("Directories");
 TCHAR pszCustomDirsKey[]	= _T("Custom Directories");
 

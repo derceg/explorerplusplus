@@ -154,6 +154,12 @@
     <ClCompile Include="IModelessDialogNotification.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="IDropFilesCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TabContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Explorer++.h">
@@ -256,6 +262,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IModelessDialogNotification.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IDropFilesCallback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TabDropHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TabContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -56,23 +56,26 @@ namespace NExplorerplusplus
 and the dialogs. */
 __interface IExplorerplusplus
 {
-	virtual HWND			GetActiveListView();
-	virtual IShellBrowser2	*GetActiveShellBrowser();
+	HWND			GetActiveListView();
+	IShellBrowser2	*GetActiveShellBrowser();
 
-	virtual std::wstring	GetTabName(int iTab);
-	virtual void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
-	virtual void			RefreshTab(int iTabId);
-	virtual int				GetCurrentTabId();
+	std::wstring	GetTabName(int iTab);
+	void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
+	void			RefreshTab(int iTabId);
+	int				GetCurrentTabId();
 
-	virtual int				LookupColumnNameStringIndex(int iColumnId);
-	virtual int				LookupColumnDescriptionStringIndex(int iColumnId);
+	/* Temporary. */
+	void			SetTabSelection(int Index);
 
-	virtual void			OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
+	int				LookupColumnNameStringIndex(int iColumnId);
+	int				LookupColumnDescriptionStringIndex(int iColumnId);
 
-	virtual	CStatusBar		*GetStatusBar();
+	void			OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 
-	virtual HRESULT			BrowseFolder(const TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
-	virtual HRESULT			BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
+	CStatusBar		*GetStatusBar();
+
+	HRESULT			BrowseFolder(const TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
+	HRESULT			BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 };
 
 extern HINSTANCE g_hLanguageModule;
@@ -81,8 +84,6 @@ extern HINSTANCE g_hLanguageModule;
 file manager. */
 #define SHELL_DEFAULT_INTERNAL_COMMAND_NAME _T("openinexplorer++")
 #define SHELL_DEFAULT_MENU_TEXT _T("Open In Explorer++")
-
-#define LANG_SINHALA	1115
 
 /* This is only defined for Windows Vista and later.
 If building for XP as well, this definition will
@@ -100,9 +101,6 @@ need to be included here. */
 /* Display window defaults. */
 #define MINIMUM_DISPLAYWINDOW_HEIGHT	70
 #define DEFAULT_DISPLAYWINDOW_HEIGHT	90
-
-#define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Gdiplus::Color(255,255,255)
-#define DEFAULT_DISPLAYWINDOW_SURROUND_COLOR	Gdiplus::Color(0,94,138)
 
 #define WM_USER_TABMCLICK		(WM_APP + 53)
 #define WM_USER_ASSOCCHANGED	(WM_APP + 54)
@@ -124,8 +122,6 @@ main rebar. */
 #define ID_REBAR_MENU_BACK_END		2999
 #define ID_REBAR_MENU_FORWARD_START	3000
 #define ID_REBAR_MENU_FORWARD_END	3999
-
-#define FOLDER_SIZE_LINE_INDEX	1
 
 /* The treeview is offset by a small
 amount on the left. */
@@ -337,17 +333,6 @@ struct DirectorySettingsInternal_t
 	std::list<Column_t>	MyNetworkPlacesColumnList;
 };
 
-struct DirectorySettings_t
-{
-	LPITEMIDLIST				pidlDirectory;
-	DirectorySettingsInternal_t	dsi;
-};
-
-struct FileContextMenuInfo_t
-{
-	UINT	uFrom;
-};
-
 static Column_t g_RealFolderColumns[] =
 {{CM_NAME,TRUE,DEFAULT_COLUMN_WIDTH},
 {CM_TYPE,TRUE,DEFAULT_COLUMN_WIDTH},
@@ -508,11 +493,11 @@ BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl);
 BOOL LoadAllowMultipleInstancesFromRegistry(void);
 BOOL LoadAllowMultipleInstancesFromXML(void);
 
-typedef struct
+struct DirectoryAltered_t
 {
 	int		iIndex;
 	int		iFolderIndex;
 	void	*pData;
-} DirectoryAltered_t;
+};
 
 #endif

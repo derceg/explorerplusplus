@@ -4,7 +4,7 @@
  * File: TabDropHandler.cpp
  * License: GPL - See COPYING in the top level directory
  *
- * Manages drag and drop for the tabs.
+ * Manages drag and drop for the main tab control.
  *
  * Written by David Erceg
  * www.explorerplusplus.com
@@ -13,197 +13,175 @@
 
 #include "stdafx.h"
 #include <list>
-#include "Explorer++.h"
+#include "TabDropHandler.h"
 #include "../Helper/Macros.h"
 
 
-/* Tab drag and drop timer information. */
-#define TABDRAG_TIMER_ID		0
-#define TABDRAG_TIMER_ELAPSED	500
-
-void CALLBACK TabDragTimerProc(HWND hwnd,UINT uMsg,
-UINT_PTR idEvent,DWORD dwTime);
-
-BOOL	g_bTabDragTimerElapsed;
-
-HRESULT _stdcall Explorerplusplus::DragEnter(IDataObject *pDataObject,
-DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+CTabDropHandler::CTabDropHandler(HWND hTabCtrl,CTabContainer *pTabContainer) :
+m_hTabCtrl(hTabCtrl),
+m_pTabContainer(pTabContainer),
+m_RefCount(1)
 {
-	m_iTabDragTab = m_iTabSelectedItem;
-	g_bTabDragTimerElapsed = FALSE;
+	SetWindowSubclass(m_hTabCtrl,TabCtrlProcStub,SUBCLASS_ID,reinterpret_cast<DWORD_PTR>(this));
+
+	CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
+		IID_IDragSourceHelper,reinterpret_cast<LPVOID *>(&m_pDragSourceHelper));
+
+	m_pDragSourceHelper->QueryInterface(IID_IDropTargetHelper,reinterpret_cast<void **>(&m_pDropTargetHelper));
+}
+
+CTabDropHandler::~CTabDropHandler()
+{
+	m_pDropTargetHelper->Release();
+	m_pDragSourceHelper->Release();
+}
+
+HRESULT __stdcall CTabDropHandler::QueryInterface(REFIID iid,void **ppvObject)
+{
+	*ppvObject = NULL;
+
+	if(iid == IID_IUnknown)
+	{
+		*ppvObject = static_cast<IUnknown *>(this);
+	}
+	else if(iid == IID_IDropTarget)
+	{
+		*ppvObject = static_cast<IDropTarget *>(this);
+	}
+
+	if(*ppvObject)
+	{
+		AddRef();
+		return S_OK;
+	}
+
+	return E_NOINTERFACE;
+}
+
+ULONG __stdcall CTabDropHandler::AddRef(void)
+{
+	return ++m_RefCount;
+}
+
+ULONG __stdcall CTabDropHandler::Release(void)
+{
+	m_RefCount--;
+	
+	if(m_RefCount == 0)
+	{
+		delete this;
+		return 0;
+	}
+
+	return m_RefCount;
+}
+
+LRESULT CALLBACK TabCtrlProcStub(HWND hwnd,UINT uMsg,
+	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+{
+	CTabDropHandler *ptdh = reinterpret_cast<CTabDropHandler *>(dwRefData);
+
+	return ptdh->TabCtrlProc(hwnd,uMsg,wParam,lParam);
+}
+
+LRESULT CALLBACK CTabDropHandler::TabCtrlProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+{
+	switch(uMsg)
+	{
+	case WM_TIMER:
+		if(wParam == TIMER_ID)
+		{
+			m_pTabContainer->SetSelection(m_TabHoverIndex);
+
+			return 0;
+		}
+		break;
+
+	case WM_NCDESTROY:
+		RemoveWindowSubclass(hwnd,TabCtrlProcStub,SUBCLASS_ID);
+		break;
+	}
+
+	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+HRESULT __stdcall CTabDropHandler::DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
+{
+	m_AcceptData = false;
+	m_TabHoverIndex = m_pTabContainer->GetSelection();
 
 	std::list<FORMATETC> ftcList;
 	CDropHandler::GetDropFormats(ftcList);
 
-	BOOL bDataAccept = FALSE;
-
-	/* Check whether the drop source has the type of data
-	that is needed for this drag operation. */
 	for each(auto ftc in ftcList)
 	{
 		if(pDataObject->QueryGetData(&ftc) == S_OK)
 		{
-			bDataAccept = TRUE;
+			m_AcceptData = true;
+			GetRepresentativeSourceDrive(pDataObject,ftc.cfFormat);
+
 			break;
 		}
 	}
 
-	if(bDataAccept)
-	{
-		m_bDataAccept	= TRUE;
-
-		GetSourceFileName(pDataObject);
-
-		TCHITTESTINFO	tchi;
-		TCITEM			tcItem;
-		BOOL			bOnSameDrive;
-		int				iTab;
-
-		tchi.pt.x = pt.x;
-		tchi.pt.y = pt.y;
-		ScreenToClient(m_hTabCtrl,&tchi.pt);
-		iTab = TabCtrl_HitTest(m_hTabCtrl,&tchi);
-
-		if(iTab != -1)
-		{
-			tcItem.mask = TCIF_PARAM;
-			TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
-
-			bOnSameDrive = CheckItemLocations((int)tcItem.lParam);
-
-			*pdwEffect = DetermineCurrentDragEffect(grfKeyState,
-				*pdwEffect,m_bDataAccept,bOnSameDrive);
-		}
-		else
-		{
-			*pdwEffect = DROPEFFECT_NONE;
-		}
-	}
-	else
-	{
-		m_bDataAccept	= FALSE;
-		*pdwEffect		= DROPEFFECT_NONE;
-	}
+	TCHITTESTINFO tchti;
+	tchti.pt.x = pt.x;
+	tchti.pt.y = pt.y;
+	ScreenToClient(m_hTabCtrl,&tchti.pt);
+	int iTab = TabCtrl_HitTest(m_hTabCtrl,&tchti);
+	*pdwEffect = DetermineCurrentDragEffect(iTab,grfKeyState,*pdwEffect);
 
 	if(grfKeyState & MK_LBUTTON)
-		m_DragType = DRAG_TYPE_LEFTCLICK;
-	else if(grfKeyState & MK_RBUTTON)
-		m_DragType = DRAG_TYPE_RIGHTCLICK;
-
-	m_pDropTargetHelper->DragEnter(m_hTabCtrl,pDataObject,(POINT *)&pt,*pdwEffect);
-
-	return S_OK;
-}
-
-HRESULT _stdcall Explorerplusplus::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
-{
-	TCHITTESTINFO HitTestInfo;
-	BOOL bOnSameDrive;
-	int iTab;
-
-	HitTestInfo.pt.x	= pt.x;
-	HitTestInfo.pt.y	= pt.y;
-
-	ScreenToClient(m_hTabCtrl,&HitTestInfo.pt);
-
-	iTab = TabCtrl_HitTest(m_hTabCtrl,&HitTestInfo);
-
-	if(iTab == -1)
 	{
-		*pdwEffect = DROPEFFECT_NONE;
+		m_DragType = DRAG_TYPE_LEFTCLICK;
 	}
 	else
 	{
-		TCITEM tcItem;
-
-		tcItem.mask	= TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
-
-		if(iTab != m_iTabSelectedItem)
-		{
-			/* Set a timer. If the mouse does not move
-			outside this tab before the timer expires,
-			and the item is still been dragged, switch
-			focus to this tab.
-			The timer will be set if the tab the item
-			is currently above does not match the
-			tab it was above initially (when the timer
-			was previously set). */
-			if(iTab != m_iTabDragTab)
-			{
-				SetTimer(m_hTabCtrl,TABDRAG_TIMER_ID,TABDRAG_TIMER_ELAPSED,TabDragTimerProc);
-
-				m_iTabDragTab = iTab;
-			}
-			else if(g_bTabDragTimerElapsed)
-			{
-				m_iTabSelectedItem = iTab;
-
-				TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
-
-				OnTabChangeInternal(TRUE);
-
-				g_bTabDragTimerElapsed = FALSE;
-			}
-		}
-		else
-		{
-			KillTimer(m_hTabCtrl,TABDRAG_TIMER_ID);
-			m_iTabDragTab = iTab;
-		}
-
-		/* If the tab contains a virtual folder,
-		then files cannot be dropped. */
-		if(m_pShellBrowser[(int)tcItem.lParam]->InVirtualFolder())
-		{
-			*pdwEffect = DROPEFFECT_NONE;
-		}
-		else
-		{
-			bOnSameDrive = CheckItemLocations((int)tcItem.lParam);
-
-			*pdwEffect = DetermineCurrentDragEffect(grfKeyState,
-				*pdwEffect,m_bDataAccept,bOnSameDrive);
-		}
+		m_DragType = DRAG_TYPE_RIGHTCLICK;
 	}
 
-	m_pDropTargetHelper->DragOver((LPPOINT)&pt,*pdwEffect);
+	m_pDropTargetHelper->DragEnter(m_hTabCtrl,pDataObject,reinterpret_cast<POINT *>(&pt),*pdwEffect);
 
 	return S_OK;
 }
 
-/* Retrieves the filename of the first file been
-dropped. */
-void Explorerplusplus::GetSourceFileName(IDataObject *pDataObject)
+void CTabDropHandler::GetRepresentativeSourceDrive(IDataObject *pDataObject,CLIPFORMAT Format)
 {
-	FORMATETC	ftc;
-	STGMEDIUM	stg;
-	DROPFILES	*pdf = NULL;
-	HRESULT		hr;
-	int			nDroppedFiles;
+	switch(Format)
+	{
+	case CF_HDROP:
+		GetRepresentativeSourceDriveHDrop(pDataObject);
+		break;
 
-	ftc.cfFormat	= CF_HDROP;
-	ftc.ptd			= NULL;
-	ftc.dwAspect	= DVASPECT_CONTENT;
-	ftc.lindex		= -1;
-	ftc.tymed		= TYMED_HGLOBAL;
+	default:
+		m_RepresentativeDrive = EMPTY_STRING;
+		break;
+	}
+}
 
-	hr = pDataObject->GetData(&ftc,&stg);
+void CTabDropHandler::GetRepresentativeSourceDriveHDrop(IDataObject *pDataObject)
+{
+	FORMATETC ftc = {CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
+	STGMEDIUM stg;
+
+	HRESULT hr = pDataObject->GetData(&ftc,&stg);
 
 	if(hr == S_OK)
 	{
-		pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
+		DROPFILES *pdf = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
 
 		if(pdf != NULL)
 		{
-			/* Request a count of the number of files that have been dropped. */
-			nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
+			int nDroppedFiles = DragQueryFile(reinterpret_cast<HDROP>(pdf),0xFFFFFFFF,NULL,NULL);
 
 			if(nDroppedFiles >= 1)
 			{
-				/* Determine the name of the first dropped file. */
-				DragQueryFile((HDROP)pdf,0,m_pszSource,
-					SIZEOF_ARRAY(m_pszSource));
+				TCHAR szFileName[MAX_PATH];
+				DragQueryFile(reinterpret_cast<HDROP>(pdf),0,szFileName,
+					SIZEOF_ARRAY(szFileName));
+
+				PathStripToRoot(szFileName);
+				m_RepresentativeDrive = szFileName;
 			}
 
 			GlobalUnlock(stg.hGlobal);
@@ -213,78 +191,90 @@ void Explorerplusplus::GetSourceFileName(IDataObject *pDataObject)
 	}
 }
 
-/* Determines the drop effect based on the
-location of the source and destination
-directories.
-Note that the first dropped file is taken
-as representative of the rest (meaning that
-if the files come from different drives,
-whether this operation is classed as a copy
-or move is only based on the location of the
-first file). */
-BOOL Explorerplusplus::CheckItemLocations(int iTabId)
+DWORD CTabDropHandler::DetermineCurrentDragEffect(int iTab,DWORD grfKeyState,DWORD CurrentDropEffect)
 {
-	TCHAR			szDestDirectory[MAX_PATH];
-	BOOL			bOnSameDrive = FALSE;
+	DWORD DropEffect = DROPEFFECT_NONE;
 
-	m_pShellBrowser[iTabId]->QueryCurrentDirectory(SIZEOF_ARRAY(szDestDirectory),
-		szDestDirectory);
+	if(iTab != -1)
+	{
+		if(m_pTabContainer->GetBrowserForTab(iTab)->CanCreate())
+		{
+			TCHAR szDestDirectory[MAX_PATH];
+			m_pTabContainer->GetBrowserForTab(iTab)->QueryCurrentDirectory(SIZEOF_ARRAY(szDestDirectory),szDestDirectory);
 
-	bOnSameDrive = PathIsSameRoot(szDestDirectory,m_pszSource);
+			BOOL bOnSameDrive = PathIsSameRoot(szDestDirectory,m_RepresentativeDrive.c_str());
+			DropEffect = ::DetermineCurrentDragEffect(grfKeyState,CurrentDropEffect,m_AcceptData,bOnSameDrive);
+		}
+	}
 
-	return bOnSameDrive;
+	return DropEffect;
 }
 
-void CALLBACK TabDragTimerProc(HWND hwnd,UINT uMsg,
-UINT_PTR idEvent,DWORD dwTime)
+HRESULT __stdcall CTabDropHandler::DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
-	g_bTabDragTimerElapsed = TRUE;
+	TCHITTESTINFO tchti;
+	tchti.pt.x = pt.x;
+	tchti.pt.y = pt.y;
+	ScreenToClient(m_hTabCtrl,&tchti.pt);
+	int iTab = TabCtrl_HitTest(m_hTabCtrl,&tchti);
+
+	/* Set a timer. If the mouse does not move
+	outside this tab before the timer expires,
+	and the item is still been dragged, switch
+	focus to this tab. */
+	if(iTab != -1 &&
+		iTab != m_pTabContainer->GetSelection() &&
+		iTab != m_TabHoverIndex)
+	{
+		SetTimer(m_hTabCtrl,TIMER_ID,TIMEOUT_VALUE,NULL);
+	}
+	else if(iTab == -1 ||
+		iTab != m_TabHoverIndex)
+	{
+		KillTimer(m_hTabCtrl,TIMER_ID);
+	}
+
+	m_TabHoverIndex = iTab;
+
+	*pdwEffect = DetermineCurrentDragEffect(iTab,grfKeyState,*pdwEffect);
+
+	m_pDropTargetHelper->DragOver(reinterpret_cast<POINT *>(&pt),*pdwEffect);
+
+	return S_OK;
 }
 
-HRESULT _stdcall Explorerplusplus::DragLeave(void)
+HRESULT __stdcall CTabDropHandler::DragLeave(void)
 {
+	KillTimer(m_hTabCtrl,TIMER_ID);
 	m_pDropTargetHelper->DragLeave();
 
 	return S_OK;
 }
 
-HRESULT _stdcall Explorerplusplus::Drop(IDataObject *pDataObject,DWORD grfKeyState,
-POINTL pt,DWORD *pdwEffect)
+HRESULT __stdcall CTabDropHandler::Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
-	TCHITTESTINFO tchi;
-	TCITEM tcItem;
-	TCHAR szDestDirectory[MAX_PATH];
-	int iTab;
+	KillTimer(m_hTabCtrl,TIMER_ID);
 
-	m_pDropTargetHelper->Drop(pDataObject,(POINT *)&pt,*pdwEffect);
+	TCHITTESTINFO tchti;
+	tchti.pt.x = pt.x;
+	tchti.pt.y = pt.y;
+	ScreenToClient(m_hTabCtrl,&tchti.pt);
+	int iTab = TabCtrl_HitTest(m_hTabCtrl,&tchti);
 
-	tchi.pt.x = pt.x;
-	tchi.pt.y = pt.y;
-	ScreenToClient(m_hTabCtrl,&tchi.pt);
-	iTab = TabCtrl_HitTest(m_hTabCtrl,&tchi);
-
-	if(iTab != -1)
+	if(iTab != -1 &&
+		m_AcceptData)
 	{
-		tcItem.mask = TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+		TCHAR szDestDirectory[MAX_PATH];
+		m_pTabContainer->GetBrowserForTab(iTab)->QueryCurrentDirectory(
+			SIZEOF_ARRAY(szDestDirectory),szDestDirectory);
 
-		m_pShellBrowser[(int)tcItem.lParam]->QueryCurrentDirectory(SIZEOF_ARRAY(szDestDirectory),
-			szDestDirectory);
-	}
-	else
-	{
-		return S_OK;
-	}
-	
-	if(m_bDataAccept)
-	{
 		CDropHandler *pDropHandler = CDropHandler::CreateNew();
-		pDropHandler->Drop(pDataObject,
-			grfKeyState,pt,pdwEffect,m_hTabCtrl,
-			m_DragType,szDestDirectory,
-			NULL,FALSE);
+		pDropHandler->Drop(pDataObject,grfKeyState,pt,pdwEffect,m_hTabCtrl,
+			m_DragType,szDestDirectory,NULL,FALSE);
 		pDropHandler->Release();
 	}
+
+	m_pDropTargetHelper->Drop(pDataObject,reinterpret_cast<POINT *>(&pt),*pdwEffect);
 
 	return S_OK;
 }

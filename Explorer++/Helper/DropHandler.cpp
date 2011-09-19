@@ -960,6 +960,11 @@ void CDropHandler::CopyDroppedFilesInternal(const std::list<std::wstring> &FullF
 		/* Copy the files within this thread. */
 		CopyDroppedFilesInternalAsync(ppfi);
 
+		if(ppfi->pDropFilesCallback != NULL)
+		{
+			ppfi->pDropFilesCallback->Release();
+		}
+		
 		delete ppfi;
 	}
 }
@@ -1029,6 +1034,11 @@ DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter)
 		reinterpret_cast<WPARAM>(&aoi),NULL);
 
 	ppfi->pReferenceCount->Release();
+
+	if(ppfi->pDropFilesCallback != NULL)
+	{
+		ppfi->pDropFilesCallback->Release();
+	}
 
 	delete ppfi;
 

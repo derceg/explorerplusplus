@@ -12,7 +12,9 @@ enum DragTypes_t
 	DRAG_TYPE_RIGHTCLICK
 };
 
-__interface IDropFilesCallback
+/* TODO: Switch to IReferenceCount in the future.
+IUnknown needed to support CFolderView. */
+__interface IDropFilesCallback : public IUnknown
 {
 	void OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt);
 };

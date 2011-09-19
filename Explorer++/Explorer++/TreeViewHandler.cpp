@@ -4,7 +4,7 @@
  * File: TreeViewHandler.cpp
  * License: GPL - See COPYING in the top level directory
  *
- * Handles messages asscoiated with the main
+ * Handles messages associated with the main
  * treeview control.
  *
  * Written by David Erceg
@@ -22,6 +22,7 @@
 
 
 #define TREEVIEW_FOLDER_OPEN_DELAY	500
+#define FOLDERS_TOOLBAR_CLOSE		6000
 
 LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);

@@ -16,6 +16,8 @@
 #include "Explorer++.h"
 #include "SetFileAttributesDialog.h"
 #include "MassRenameDialog.h"
+#include "iServiceProvider.h"
+#include "IDropFilesCallback.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ContextMenuManager.h"
@@ -1168,8 +1170,9 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 
 		if(SUCCEEDED(hr))
 		{
+			CServiceProvider ServiceProvider(this);
 			CContextMenuManager cmm(CContextMenuManager::CONTEXT_MENU_TYPE_BACKGROUND,pidlDirectory,
-				pDataObject,reinterpret_cast<IUnknown *>(this));
+				pDataObject,&ServiceProvider);
 
 			cmm.ShowMenu(m_hContainer,hMenu,IDM_FILE_COPYFOLDERPATH,MIN_SHELL_MENU_ID,
 				MAX_SHELL_MENU_ID,*pCursorPos,*m_pStatusBar);
@@ -1799,8 +1802,6 @@ void Explorerplusplus::OnListViewPaste(void)
 
 	if(hr == S_OK)
 	{
-		CDropHandler *pDropHandler = CDropHandler::CreateNew();
-
 		TCHAR szDestination[MAX_PATH + 1];
 
 		/* DO NOT use the internal current directory string.
@@ -1813,19 +1814,13 @@ void Explorerplusplus::OnListViewPaste(void)
 		/* Also, the string must be double NULL terminated. */
 		szDestination[lstrlen(szDestination) + 1] = '\0';
 
-		pDropHandler->CopyClipboardData(pClipboardObject,
-			m_hContainer,szDestination,this,!m_bOverwriteExistingFilesConfirmation);
-
+		CDropHandler *pDropHandler = CDropHandler::CreateNew();
+		CDropFilesCallback *DropFilesCallback = new CDropFilesCallback(this);
+		pDropHandler->CopyClipboardData(pClipboardObject,m_hContainer,szDestination,
+			DropFilesCallback,!m_bOverwriteExistingFilesConfirmation);
 		pDropHandler->Release();
-		pClipboardObject->Release();
-	}
-}
 
-void Explorerplusplus::OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt)
-{
-	if(m_pActiveShellBrowser->QueryNumSelected() == 0)
-	{
-		m_pActiveShellBrowser->SelectItems(PastedFileList);
+		pClipboardObject->Release();
 	}
 }
 

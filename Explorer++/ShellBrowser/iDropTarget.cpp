@@ -477,6 +477,11 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 		{
 			CDropHandler *pDropHandler = CDropHandler::CreateNew();
 
+			/* The drop handler will call Release(), so we
+			need to AddRef() here. In the future, this should
+			be switched to an independent class. */
+			AddRef();
+
 			pDropHandler->Drop(pDataObject,
 				grfKeyState,ptl,pdwEffect,m_hListView,
 				m_DragType,szDestDirectory,this,FALSE);

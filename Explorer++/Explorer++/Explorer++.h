@@ -1,12 +1,11 @@
 #ifndef EXPLORER_INCLUDED
 #define EXPLORER_INCLUDED
 
-#include <windows.h>
-#include <commctrl.h>
 #include "Explorer++_internal.h"
 #include "BookmarkHelper.h"
 #include "BookmarksToolbar.h"
 #include "DrivesToolbar.h"
+#include "TabContainer.h"
 #include "../ShellBrowser/iShellView.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/BaseDialog.h"
@@ -23,8 +22,6 @@
 
 #define TOOLBAR_START				5000
 #define TABTOOLBAR_CLOSE			(TOOLBAR_START + 33)
-
-#define FOLDERS_TOOLBAR_CLOSE		6000
 
 /* wParam contains virtual code of key that was pressed,
 lParam not currently used. */
@@ -45,29 +42,7 @@ lParam not currently used. */
 #define TAB_WINDOW_HEIGHT			24
 #define DEFAULT_TREEVIEW_WIDTH		208
 
-/* Describes the view modes and their order
-(as they differ on Windows XP and Vista/7). */
-struct ViewMode_t
-{
-	UINT uViewMode;
-};
-
-struct TabProxyInfo_t
-{
-	ATOM	atomClass;
-	HWND	hProxy;
-	int		iTabId;
-};
-
-struct TabPreviewInfo_t
-{
-	int		iTabId;
-	HBITMAP	hbm;
-	POINT	ptOrigin;
-};
-
-class Explorerplusplus : public IDropTarget,public IDropFilesCallback,
-	public IFileContextMenuExternal, public IExplorerplusplus
+class Explorerplusplus : public IExplorerplusplus, public IFileContextMenuExternal
 {
 public:
 
@@ -96,18 +71,6 @@ public:
 
 	/* Directory modification. */
 	static void			DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,void *pData);
-
-	/* IUnknown methods. */
-	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
-	ULONG __stdcall		AddRef(void);
-	ULONG __stdcall		Release(void);
-
-	/* Drop target handler. */
-	HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-	HRESULT _stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-	HRESULT _stdcall	DragLeave(void);
-	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-
 
 private:
 
@@ -138,6 +101,13 @@ private:
 		INFOTIP_CUSTOM	= 1
 	};
 
+	/* Describes the view modes and their order
+	(as they differ on Windows XP and Vista/7). */
+	struct ViewMode_t
+	{
+		UINT uViewMode;
+	};
+
 	struct ArrangeMenuItem_t
 	{
 		UINT SortById;
@@ -162,6 +132,31 @@ private:
 		Therefore, it makes more sense
 		for this setting to remain here. */
 		//BOOL	bUsingDefaultColumns;
+	};
+
+	struct TabProxyInfo_t
+	{
+		ATOM	atomClass;
+		HWND	hProxy;
+		int		iTabId;
+	};
+
+	struct TabPreviewInfo_t
+	{
+		int		iTabId;
+		HBITMAP	hbm;
+		POINT	ptOrigin;
+	};
+
+	struct FileContextMenuInfo_t
+	{
+		UINT uFrom;
+	};
+
+	struct DirectorySettings_t
+	{
+		LPITEMIDLIST				pidlDirectory;
+		DirectorySettingsInternal_t	dsi;
 	};
 
 	class CLoadSaveRegistry : public ILoadSave
@@ -275,8 +270,6 @@ private:
 	};
 
 	friend CApplicationToolbarDrop;
-
-	int						m_iRefCount;
 
 	/* Internal private functions. */
 	void					OnTabChangeInternal(BOOL bSetFocus);
@@ -442,9 +435,6 @@ private:
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
 	int						GetCurrentTabId();
-
-	/* Drag and drop. */
-	void					OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt);
 
 	/* Clone Window. */
 	void					OnCloneWindow(void);
@@ -641,10 +631,6 @@ private:
 	/* Tab proxy's. */
 	void					SetTabProxyIcon(int iTabId,HICON hIcon);
 
-	/* Tab drag and drop. */
-	void					GetSourceFileName(IDataObject *pDataObject);
-	BOOL					CheckItemLocations(int iTabId);
-
 	/* Display window file information. */
 	void					HandleFileSelectionDisplay(void);
 	void					HandleFileSelectionDisplayZero(void);
@@ -709,6 +695,7 @@ private:
 	/* Tabs. */
 	std::wstring			GetTabName(int iTab);
 	void					SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
+	void					SetTabSelection(int Index);
 
 	/* IExplorerplusplus methods. */
 	HWND					GetActiveListView();
@@ -911,6 +898,9 @@ private:
 	UINT					m_uTaskbarButtonCreatedMessage;
 	BOOL					m_bTaskbarInitialised;
 
+	/* Tabs. */
+	CTabContainer			*m_pTabContainer;
+
 	/* Bookmarks. */
 	CBookmarkFolder *		m_bfAllBookmarks;
 	GUID					m_guidBookmarksToolbar;
@@ -983,14 +973,6 @@ private:
 	BOOL					m_bTabBeenDragged;
 	RECT					m_rcDraggedTab;
 	int						m_iTabMenuItem;
-
-	/* Tab drop target. */
-	IDragSourceHelper *		m_pDragSourceHelper;
-	IDropTargetHelper *		m_pDropTargetHelper;
-	TCHAR					m_pszSource[MAX_PATH];
-	DragTypes_t				m_DragType;
-	BOOL					m_bDataAccept;
-	int						m_iTabDragTab;
 	
 	/* Cut items data. */
 	std::list<std::wstring>	m_CutFileNameList;
@@ -1013,10 +995,10 @@ private:
 	BOOL					m_bBlockNext;
 };
 
-typedef struct
+struct TabProxy_t
 {
 	Explorerplusplus	*pContainer;
 	int			iTabId;
-} TabProxy_t;
+};
 
 #endif

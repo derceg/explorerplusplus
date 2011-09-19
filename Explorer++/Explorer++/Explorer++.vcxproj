@@ -273,6 +273,7 @@
     <ClCompile Include="FilterDialog.cpp" />
     <ClCompile Include="HandleWindowState.cpp" />
     <ClCompile Include="HelpFileMissingDialog.cpp" />
+    <ClCompile Include="IDropFilesCallback.cpp" />
     <ClCompile Include="IModelessDialogNotification.cpp" />
     <ClCompile Include="INewMenuClient.cpp" />
     <ClCompile Include="Initialization.cpp" />
@@ -303,6 +304,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TabBackingHandler.cpp" />
+    <ClCompile Include="TabContainer.cpp" />
     <ClCompile Include="TabDropHandler.cpp" />
     <ClCompile Include="TabHandler.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
@@ -332,6 +334,7 @@
     <ClInclude Include="Explorer++_internal.h" />
     <ClInclude Include="FilterDialog.h" />
     <ClInclude Include="HelpFileMissingDialog.h" />
+    <ClInclude Include="IDropFilesCallback.h" />
     <ClInclude Include="IModelessDialogNotification.h" />
     <ClInclude Include="INewMenuClient.h" />
     <ClInclude Include="iServiceProvider.h" />
@@ -350,6 +353,8 @@
     <ClInclude Include="SetFileAttributesDialog.h" />
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TabContainer.h" />
+    <ClInclude Include="TabDropHandler.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
   </ItemGroup>
   <ItemGroup>

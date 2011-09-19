@@ -31,6 +31,8 @@
 #include "../Helper/Macros.h"
 
 
+#define FOLDER_SIZE_LINE_INDEX	1
+
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 /* TODO: Remove once custom menu image lists
