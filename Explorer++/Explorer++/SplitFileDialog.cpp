@@ -59,7 +59,7 @@ CSplitFileDialog::~CSplitFileDialog()
 	}
 }
 
-BOOL CSplitFileDialog::OnInitDialog()
+INT_PTR CSplitFileDialog::OnInitDialog()
 {
 	SHFILEINFO shfi;
 	DWORD_PTR dwRes = SHGetFileInfo(m_strFullFilename.c_str(),0,&shfi,sizeof(shfi),SHGFI_ICON);
@@ -152,7 +152,7 @@ BOOL CSplitFileDialog::OnInitDialog()
 	return 0;
 }
 
-BOOL CSplitFileDialog::OnTimer(int iTimerID)
+INT_PTR CSplitFileDialog::OnTimer(int iTimerID)
 {
 	if(iTimerID == ELPASED_TIMER_ID)
 	{
@@ -182,7 +182,7 @@ INT_PTR CSplitFileDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 	return 0;
 }
 
-BOOL CSplitFileDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CSplitFileDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	if(HIWORD(wParam) != 0)
 	{
@@ -245,13 +245,13 @@ BOOL CSplitFileDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CSplitFileDialog::OnClose()
+INT_PTR CSplitFileDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-BOOL CSplitFileDialog::OnDestroy()
+INT_PTR CSplitFileDialog::OnDestroy()
 {
 	DeleteObject(m_hHelperTextFont);
 
@@ -268,7 +268,7 @@ void CSplitFileDialog::SaveState()
 	m_psfdps->m_bStateSaved = TRUE;
 }
 
-void CSplitFileDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CSplitFileDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -305,6 +305,8 @@ void CSplitFileDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 		}
 		break;
 	}
+
+	return 0;
 }
 
 void CSplitFileDialog::OnOk()

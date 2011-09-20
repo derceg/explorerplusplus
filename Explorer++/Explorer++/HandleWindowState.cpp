@@ -27,12 +27,18 @@
 /* Tab icons. */
 #define TAB_ICON_LOCK_INDEX			0
 
+#define SORTBY_BASE	50000
+#define SORTBY_END	50099
+
+#define GROUPBY_BASE	50100
+#define GROUPBY_END		50199
+
 void Explorerplusplus::UpdateWindowStates(void)
 {
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),m_CurrentDirectory);
 
 	HandleMainWindowText();
-	HandleComboBoxText();
+	HandleAddressBarText();
 	HandleToolbarItemStates();
 	HandleTabText();
 	HandleTreeViewSelection();
@@ -343,7 +349,7 @@ void Explorerplusplus::HandleMainWindowText(void)
 	SetWindowText(m_hContainer,szTitle);
 }
 
-void Explorerplusplus::HandleComboBoxText(void)
+void Explorerplusplus::HandleAddressBarText(void)
 {
 	LPITEMIDLIST pidl = NULL;
 	TCHAR szAddressBarTitle[MAX_PATH];

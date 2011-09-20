@@ -12,10 +12,10 @@ public:
 
 protected:
 
-	BOOL	OnInitDialog();
-	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
-	BOOL	OnNotify(NMHDR *pnmhdr);
-	BOOL	OnClose();
+	INT_PTR	OnInitDialog();
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
+	INT_PTR	OnNotify(NMHDR *pnmhdr);
+	INT_PTR	OnClose();
 
 private:
 

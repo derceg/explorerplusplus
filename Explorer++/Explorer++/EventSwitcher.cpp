@@ -70,7 +70,7 @@ void Explorerplusplus::OnFileRename(void)
 	if(m_bListViewRenaming)
 	{
 		SendMessage(ListView_GetEditControl(m_hActiveListView),
-			WM_USER_KEYDOWN,VK_F2,0);
+			WM_APP_KEYDOWN,VK_F2,0);
 	}
 	else
 	{

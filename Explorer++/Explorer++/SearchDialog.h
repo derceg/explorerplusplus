@@ -135,16 +135,16 @@ public:
 
 protected:
 
-	BOOL	OnInitDialog();
-	BOOL	OnTimer(int iTimerID);
-	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
-	BOOL	OnNotify(NMHDR *pnmhdr);
-	BOOL	OnClose();
-	BOOL	OnNcDestroy();
+	INT_PTR	OnInitDialog();
+	INT_PTR	OnTimer(int iTimerID);
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
+	INT_PTR	OnNotify(NMHDR *pnmhdr);
+	INT_PTR	OnClose();
+	INT_PTR	OnNcDestroy();
 
 	void	SaveState();
 
-	void	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
+	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 

@@ -35,9 +35,9 @@ public:
 
 protected:
 
-	BOOL	OnInitDialog();
-	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
-	BOOL	OnClose();
+	INT_PTR	OnInitDialog();
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
+	INT_PTR	OnClose();
 
 	void	SaveState();
 

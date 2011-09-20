@@ -77,14 +77,14 @@ public:
 
 protected:
 
-	BOOL	OnInitDialog();
+	INT_PTR	OnInitDialog();
 	INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc);
-	BOOL	OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys);
-	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
-	BOOL	OnNotify(NMHDR *pnmhdr);
-	BOOL	OnClose();
-	BOOL	OnDestroy();
-	BOOL	OnNcDestroy();
+	INT_PTR	OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys);
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
+	INT_PTR	OnNotify(NMHDR *pnmhdr);
+	INT_PTR	OnClose();
+	INT_PTR	OnDestroy();
+	INT_PTR	OnNcDestroy();
 
 	void	SaveState();
 

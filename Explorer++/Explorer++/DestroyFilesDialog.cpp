@@ -38,7 +38,7 @@ CDestroyFilesDialog::~CDestroyFilesDialog()
 
 }
 
-BOOL CDestroyFilesDialog::OnInitDialog()
+INT_PTR CDestroyFilesDialog::OnInitDialog()
 {
 	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
@@ -213,7 +213,7 @@ INT_PTR CDestroyFilesDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 	return 0;
 }
 
-BOOL CDestroyFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CDestroyFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -229,13 +229,13 @@ BOOL CDestroyFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CDestroyFilesDialog::OnClose()
+INT_PTR CDestroyFilesDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-BOOL CDestroyFilesDialog::OnDestroy()
+INT_PTR CDestroyFilesDialog::OnDestroy()
 {
 	DestroyIcon(m_hDialogIcon);
 

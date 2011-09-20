@@ -37,7 +37,7 @@ CCustomizeColorsDialog::~CCustomizeColorsDialog()
 
 }
 
-BOOL CCustomizeColorsDialog::OnInitDialog()
+INT_PTR CCustomizeColorsDialog::OnInitDialog()
 {
 	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
@@ -176,7 +176,7 @@ void CCustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const Co
 	}
 }
 
-BOOL CCustomizeColorsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CCustomizeColorsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -212,7 +212,7 @@ BOOL CCustomizeColorsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CCustomizeColorsDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR CCustomizeColorsDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -231,13 +231,13 @@ BOOL CCustomizeColorsDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-BOOL CCustomizeColorsDialog::OnClose()
+INT_PTR CCustomizeColorsDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-BOOL CCustomizeColorsDialog::OnDestroy()
+INT_PTR CCustomizeColorsDialog::OnDestroy()
 {
 	DestroyIcon(m_hDialogIcon);
 

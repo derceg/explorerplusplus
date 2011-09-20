@@ -18,6 +18,7 @@
 #include "MassRenameDialog.h"
 #include "iServiceProvider.h"
 #include "IDropFilesCallback.h"
+#include "ListView.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ContextMenuManager.h"
@@ -28,14 +29,7 @@
 #include "../Helper/Macros.h"
 
 
-#define LISTVIEW_RENAME_FILENAME	0
-#define LISTVIEW_RENAME_EXTENSION	1
-#define LISTVIEW_RENAME_ENTIRE		2
-
-LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
-LRESULT CALLBACK	ListViewEditProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-
-LRESULT	(CALLBACK *DefaultListViewProc)(HWND,UINT,WPARAM,LPARAM);
+LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)
 {
@@ -65,17 +59,12 @@ HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)
 	return hListView;
 }
 
-LRESULT CALLBACK ListViewSubclassProcStub(HWND ListView,
-UINT msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,
+	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
-	ListViewInfo_t	*plvi = NULL;
-	Explorerplusplus		*pContainer = NULL;
+	Explorerplusplus *pexpp = reinterpret_cast<Explorerplusplus *>(dwRefData);
 
-	plvi = (ListViewInfo_t *)GetWindowLongPtr(ListView,GWLP_USERDATA);
-
-	pContainer = (Explorerplusplus *)plvi->pContainer;
-
-	return pContainer->ListViewSubclassProc(ListView,msg,wParam,lParam);
+	return pexpp->ListViewSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
 LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView,
@@ -93,7 +82,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			break;
 
 		case WM_LBUTTONDOWN:
-			return OnListViewLButtonDown(wParam,lParam);
+			OnListViewLButtonDown(wParam,lParam);
 			break;
 
 		case WM_LBUTTONDBLCLK:
@@ -310,10 +299,10 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			break;
 	}
 
-	return CallWindowProc(DefaultListViewProc,ListView,msg,wParam,lParam);
+	return DefSubclassProc(ListView,msg,wParam,lParam);
 }
 
-LRESULT Explorerplusplus::OnListViewLButtonDown(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnListViewLButtonDown(WPARAM wParam,LPARAM lParam)
 {
 	LV_HITTESTINFO HitTestInfo;
 
@@ -338,8 +327,6 @@ LRESULT Explorerplusplus::OnListViewLButtonDown(WPARAM wParam,LPARAM lParam)
 	{
 		m_bSelectionFromNowhere = FALSE;
 	}
-
-	return CallWindowProc(DefaultListViewProc,m_hActiveListView,WM_LBUTTONDOWN,wParam,lParam);
 }
 
 void Explorerplusplus::OnListViewMButtonDown(WPARAM wParam,LPARAM lParam)
@@ -649,167 +636,10 @@ int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 	return -1;
 }
 
-LRESULT CALLBACK ListViewEditProcStub(HWND hwnd,UINT uMsg,
-WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
-{
-	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
-
-	return pContainer->ListViewEditProc(hwnd,uMsg,wParam,lParam);
-}
-
-LRESULT CALLBACK Explorerplusplus::ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
-{
-	switch(Msg)
-	{
-	/* Can't pick up tab and return keys properly
-	(blocked by edit control using WM_GETDLGMESSAGE).
-	So, send custom message instead. */
-	case WM_USER_KEYDOWN:
-		switch(wParam)
-		{
-		case VK_F2:
-			{
-				/* Cycle between:
-				- Selecting filename (no extension)
-				- Selecting whole name
-				- Selecting only extension */
-
-				TCHAR szFileName[MAX_PATH];
-				DWORD dwAttributes;
-				BOOL bExtensionFound = FALSE;
-				int i;
-
-				SendMessage(hwnd,WM_GETTEXT,
-					(WPARAM)SIZEOF_ARRAY(szFileName),
-					(LPARAM)szFileName);
-
-				dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(m_iItemEditing);
-
-				if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
-					FILE_ATTRIBUTE_DIRECTORY)
-				{
-					for(i = lstrlen(szFileName) - 1;i >= 0;i--)
-					{
-						if(szFileName[i] == '.')
-						{
-							bExtensionFound = TRUE;
-							break;
-						}
-					}
-
-					if(bExtensionFound)
-					{
-						if(m_ListViewEditingStage == LISTVIEW_RENAME_FILENAME)
-						{
-							SendMessage(hwnd,EM_SETSEL,i + 1,lstrlen(szFileName));
-							m_ListViewEditingStage = LISTVIEW_RENAME_EXTENSION;
-						}
-						else if(m_ListViewEditingStage == LISTVIEW_RENAME_EXTENSION)
-						{
-							m_ListViewEditingStage = LISTVIEW_RENAME_ENTIRE;
-							SendMessage(hwnd,EM_SETSEL,0,-1);
-						}
-						else if(m_ListViewEditingStage == LISTVIEW_RENAME_ENTIRE)
-						{
-							m_ListViewEditingStage = LISTVIEW_RENAME_FILENAME;
-
-							SendMessage(hwnd,EM_SETSEL,0,i);
-						}
-					}
-				}
-			}
-			break;
-
-		case VK_TAB:
-			{
-				int iSel;
-				int iNewSel;
-				int nItems;
-
-				iSel = ListView_GetNextItem(GetParent(hwnd),-1,LVNI_ALL|LVNI_SELECTED);
-				NListView::ListView_SelectItem(GetParent(hwnd),iSel,FALSE);
-
-				nItems = ListView_GetItemCount(GetParent(hwnd));
-
-				if(iSel == (nItems - 1))
-					iNewSel = 0;
-				else
-					iNewSel = iSel + 1;
-
-				ListView_EditLabel(GetParent(hwnd),iNewSel);
-
-				return 0;
-			}
-			break;
-		}
-		break;
-
-	case EM_SETSEL:
-		{
-			/* When editing an item, the listview control
-			will first deselect, then select all text. If
-			an item has been put into edit mode, and the
-			listview attempts to select all text, modify the
-			message so that only text up to the extension
-			(if any) is selected. */
-			if(m_bListViewBeginRename &&
-				wParam == 0 &&
-				lParam == -1)
-			{
-				TCHAR	szFileName[MAX_PATH];
-				DWORD	dwAttributes;
-				BOOL	bExtensionFound = FALSE;
-				int		i;
-
-				SendMessage(hwnd,WM_GETTEXT,
-					(WPARAM)SIZEOF_ARRAY(szFileName),
-					(LPARAM)szFileName);
-
-				dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(m_iItemEditing);
-
-				if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
-					FILE_ATTRIBUTE_DIRECTORY)
-				{
-					for(i = lstrlen(szFileName) - 1;i >= 0;i--)
-					{
-						if(szFileName[i] == '.')
-						{
-							bExtensionFound = TRUE;
-							break;
-						}
-					}
-
-					if(bExtensionFound)
-					{
-						wParam = 0;
-						lParam = i;
-					}
-				}
-
-				m_bListViewBeginRename = FALSE;
-			}
-		}
-		break;
-
-	case WM_NCDESTROY:
-		RemoveWindowSubclass(hwnd,ListViewEditProcStub,0);
-		break;
-	}
-
-	return DefSubclassProc(hwnd,Msg,wParam,lParam);
-}
-
 BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 {
-	HWND			hEdit;
-	NMLVDISPINFO	*pnmdi = NULL;
-
 	if(!IsRenamePossible())
 		return TRUE;
-
-	pnmdi = (NMLVDISPINFO *)lParam;
-
-	hEdit = ListView_GetEditControl(m_hActiveListView);
 
 	/* Subclass the edit window. The only reason this is
 	done is so that when the listview item is put into
@@ -817,13 +647,10 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 	selected along with the rest of the text. Although
 	selection works directly from here in Windows Vista,
 	it does not work in Windows XP. */
-	SetWindowSubclass(hEdit,ListViewEditProcStub,0,(DWORD_PTR)this);
-
-	m_ListViewEditingStage = LISTVIEW_RENAME_FILENAME;
-	m_iItemEditing = pnmdi->item.iItem;
+	HWND hEdit = ListView_GetEditControl(m_hActiveListView);
+	CListViewEdit::CreateNew(hEdit,reinterpret_cast<NMLVDISPINFO *>(lParam)->item.iItem,this);
 
 	m_bListViewRenaming = TRUE;
-	m_bListViewBeginRename = TRUE;
 
 	return FALSE;
 }

@@ -36,7 +36,7 @@ CDisplayColoursDialog::~CDisplayColoursDialog()
 
 }
 
-BOOL CDisplayColoursDialog::OnInitDialog()
+INT_PTR CDisplayColoursDialog::OnInitDialog()
 {
 	InitializeColorGroups();
 	InitializePreviewWindow();
@@ -163,7 +163,7 @@ void CDisplayColoursDialog::InitializePreviewWindow()
 	SetColorGroupValues(m_SurroundingGroup,SurroundColor);
 }
 
-BOOL CDisplayColoursDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CDisplayColoursDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	if(HIWORD(wParam) != 0)
 	{
@@ -252,7 +252,7 @@ void CDisplayColoursDialog::OnChooseFont()
 	}
 }
 
-BOOL CDisplayColoursDialog::OnHScroll(HWND hwnd)
+INT_PTR CDisplayColoursDialog::OnHScroll(HWND hwnd)
 {
 	UpdateEditControlsFromSlider(m_CenterGroup);
 	UpdateEditControlsFromSlider(m_SurroundingGroup);
@@ -382,13 +382,13 @@ void CDisplayColoursDialog::OnCancel()
 	EndDialog(m_hDlg,0);
 }
 
-BOOL CDisplayColoursDialog::OnClose()
+INT_PTR CDisplayColoursDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-BOOL CDisplayColoursDialog::OnDestroy()
+INT_PTR CDisplayColoursDialog::OnDestroy()
 {
 	DestroyIcon(m_hDisplayWindowIcon);
 	return 0;

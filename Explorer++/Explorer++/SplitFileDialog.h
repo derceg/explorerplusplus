@@ -75,16 +75,16 @@ public:
 
 protected:
 
-	BOOL	OnInitDialog();
-	BOOL	OnTimer(int iTimerID);
+	INT_PTR	OnInitDialog();
+	INT_PTR	OnTimer(int iTimerID);
 	INT_PTR	OnCtlColorStatic(HWND hwnd,HDC hdc);
-	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
-	BOOL	OnClose();
-	BOOL	OnDestroy();
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
+	INT_PTR	OnClose();
+	INT_PTR	OnDestroy();
 
 	void	SaveState();
 
-	void	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
+	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 private:
 

@@ -57,7 +57,7 @@ CAddBookmarkDialog::~CAddBookmarkDialog()
 	DeleteObject(m_ErrorBrush);
 }
 
-BOOL CAddBookmarkDialog::OnInitDialog()
+INT_PTR CAddBookmarkDialog::OnInitDialog()
 {
 	SetDialogIcon();
 
@@ -157,7 +157,7 @@ INT_PTR CAddBookmarkDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
 	return FALSE;
 }
 
-BOOL CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	if(HIWORD(wParam) != 0)
 	{
@@ -206,7 +206,7 @@ BOOL CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CAddBookmarkDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR CAddBookmarkDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -415,13 +415,13 @@ void CAddBookmarkDialog::SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hIt
 	}
 }
 
-BOOL CAddBookmarkDialog::OnClose()
+INT_PTR CAddBookmarkDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-BOOL CAddBookmarkDialog::OnDestroy()
+INT_PTR CAddBookmarkDialog::OnDestroy()
 {
 	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
 	DestroyIcon(m_hDialogIcon);
@@ -429,7 +429,7 @@ BOOL CAddBookmarkDialog::OnDestroy()
 	return 0;
 }
 
-BOOL CAddBookmarkDialog::OnNcDestroy()
+INT_PTR CAddBookmarkDialog::OnNcDestroy()
 {
 	delete m_pBookmarkTreeView;
 

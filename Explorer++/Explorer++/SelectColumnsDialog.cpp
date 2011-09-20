@@ -39,7 +39,7 @@ CSelectColumnsDialog::~CSelectColumnsDialog()
 
 }
 
-BOOL CSelectColumnsDialog::OnInitDialog()
+INT_PTR CSelectColumnsDialog::OnInitDialog()
 {
 	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
@@ -151,7 +151,7 @@ void CSelectColumnsDialog::GetResizableControlInformation(CBaseDialog::DialogSiz
 	ControlList.push_back(Control);
 }
 
-BOOL CSelectColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CSelectColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -175,7 +175,7 @@ BOOL CSelectColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CSelectColumnsDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR CSelectColumnsDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -187,13 +187,13 @@ BOOL CSelectColumnsDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-BOOL CSelectColumnsDialog::OnClose()
+INT_PTR CSelectColumnsDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-BOOL CSelectColumnsDialog::OnDestroy()
+INT_PTR CSelectColumnsDialog::OnDestroy()
 {
 	DestroyIcon(m_hDialogIcon);
 

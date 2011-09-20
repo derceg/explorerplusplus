@@ -39,7 +39,7 @@ CSetFileAttributesDialog::~CSetFileAttributesDialog()
 
 }
 
-BOOL CSetFileAttributesDialog::OnInitDialog()
+INT_PTR CSetFileAttributesDialog::OnInitDialog()
 {
 	InitializeAttributesStructure();
 	InitializeDateFields();
@@ -153,7 +153,7 @@ void CSetFileAttributesDialog::InitializeAttributesStructure(void)
 	m_AttributeList.push_back(Attribute);
 }
 
-BOOL CSetFileAttributesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CSetFileAttributesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -181,7 +181,7 @@ BOOL CSetFileAttributesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CSetFileAttributesDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR CSetFileAttributesDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -216,7 +216,7 @@ BOOL CSetFileAttributesDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-BOOL CSetFileAttributesDialog::OnClose()
+INT_PTR CSetFileAttributesDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;

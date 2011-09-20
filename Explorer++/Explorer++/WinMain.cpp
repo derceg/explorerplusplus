@@ -40,8 +40,6 @@ void ClearRegistrySettings(void);
 ATOM RegisterMainWindowClass(void);
 LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInfo);
 
-extern LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
-
 DWORD dwControlClasses = ICC_BAR_CLASSES|ICC_COOL_CLASSES|
 	ICC_LISTVIEW_CLASSES|ICC_USEREX_CLASSES|ICC_STANDARD_CLASSES|
 	ICC_LINK_CLASS;

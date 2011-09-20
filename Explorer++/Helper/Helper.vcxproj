@@ -166,6 +166,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BaseDialog.cpp" />
+    <ClCompile Include="BaseWindow.cpp" />
     <ClCompile Include="Bookmark.cpp" />
     <ClCompile Include="ContextMenuManager.cpp" />
     <ClCompile Include="Controls.c">
@@ -188,6 +189,7 @@
     <ClCompile Include="iDropSource.cpp" />
     <ClCompile Include="iEnumFormatEtc.cpp" />
     <ClCompile Include="ListViewHelper.cpp" />
+    <ClCompile Include="MessageForwarder.cpp" />
     <ClCompile Include="ReferenceCount.cpp" />
     <ClCompile Include="RegistrySettings.cpp" />
     <ClCompile Include="ResizableDialog.cpp" />
@@ -204,6 +206,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h" />
+    <ClInclude Include="BaseWindow.h" />
     <ClInclude Include="Bookmark.h" />
     <ClInclude Include="ContextMenuManager.h" />
     <ClInclude Include="Controls.h" />
@@ -221,6 +224,7 @@
     <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="ListViewHelper.h" />
     <ClInclude Include="Macros.h" />
+    <ClInclude Include="MessageForwarder.h" />
     <ClInclude Include="ReferenceCount.h" />
     <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="ResizableDialog.h" />

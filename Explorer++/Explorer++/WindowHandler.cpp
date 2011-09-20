@@ -196,6 +196,19 @@ void Explorerplusplus::CreateDrivesToolbar(void)
 		TOOLBAR_DRIVES_ID_START,TOOLBAR_DRIVES_ID_END,this);
 }
 
+void Explorerplusplus::CreateStatusBar(void)
+{
+	UINT Style = WS_CHILD|WS_CLIPSIBLINGS|SBARS_SIZEGRIP|WS_CLIPCHILDREN;
+
+	if(m_bShowStatusBar)
+	{
+		Style |= WS_VISIBLE;
+	}
+
+	m_hStatusBar = ::CreateStatusBar(m_hContainer,Style);
+	m_pStatusBar = new CStatusBar(m_hStatusBar);
+}
+
 HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 {
 	HWND TabToolbar = CreateToolbar(hParent,WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|

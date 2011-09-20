@@ -35,11 +35,11 @@ public:
 
 protected:
 
-	BOOL	OnInitDialog();
-	BOOL	OnHScroll(HWND hwnd);
-	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
-	BOOL	OnClose();
-	BOOL	OnDestroy();
+	INT_PTR	OnInitDialog();
+	INT_PTR	OnHScroll(HWND hwnd);
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
+	INT_PTR	OnClose();
+	INT_PTR	OnDestroy();
 
 	void	SaveState();
 

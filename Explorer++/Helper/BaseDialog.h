@@ -2,6 +2,7 @@
 #define BASEDIALOG_INCLUDED
 
 #include "ResizableDialog.h"
+#include "MessageForwarder.h"
 #include "ReferenceCount.h"
 
 __interface IModelessDialogNotification : public IReferenceCount
@@ -13,7 +14,7 @@ __interface IModelessDialogNotification : public IReferenceCount
 For instance, provides the ability for a class to manage
 a dialog without having to handle the dialog procedure
 directly. */
-class CBaseDialog
+class CBaseDialog : public CMessageForwarder
 {
 	friend INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
@@ -36,27 +37,10 @@ protected:
 
 	HINSTANCE		GetInstance() const;
 
-	virtual BOOL	OnInitDialog();
-	virtual BOOL	OnTimer(int iTimerID);
-	virtual INT_PTR	OnCtlColorStatic(HWND hwnd,HDC hdc);
-	virtual INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc);
-	virtual BOOL	OnHScroll(HWND hwnd);
-	virtual BOOL	OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys);
-	virtual BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
-	virtual BOOL	OnNotify(NMHDR *pnmhdr);
-	virtual BOOL	OnGetMinMaxInfo(LPMINMAXINFO pmmi);
-	virtual BOOL	OnSize(int iType,int iWidth,int iHeight);
-	virtual BOOL	OnClose();
-	virtual BOOL	OnDestroy();
-	virtual BOOL	OnNcDestroy();
-
-	virtual void	SaveState();
-
-	/* For private application messages in
-	the range WM_APP (0x8000) - 0xBFFF. */
-	virtual void	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
+	INT_PTR			GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	virtual void	GetResizableControlInformation(DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
+	virtual void	SaveState();
 
 	HWND			m_hDlg;
 

@@ -27,14 +27,14 @@ CHelpFileMissingDialog::~CHelpFileMissingDialog()
 
 }
 
-BOOL CHelpFileMissingDialog::OnInitDialog()
+INT_PTR CHelpFileMissingDialog::OnInitDialog()
 {
 	CenterWindow(GetParent(m_hDlg),m_hDlg);
 
 	return TRUE;
 }
 
-BOOL CHelpFileMissingDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CHelpFileMissingDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -50,7 +50,7 @@ BOOL CHelpFileMissingDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CHelpFileMissingDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR CHelpFileMissingDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -70,7 +70,7 @@ BOOL CHelpFileMissingDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-BOOL CHelpFileMissingDialog::OnClose()
+INT_PTR CHelpFileMissingDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;

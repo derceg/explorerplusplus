@@ -38,7 +38,7 @@ CFilterDialog::~CFilterDialog()
 
 }
 
-BOOL CFilterDialog::OnInitDialog()
+INT_PTR CFilterDialog::OnInitDialog()
 {
 	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
@@ -103,7 +103,7 @@ void CFilterDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstr
 	ControlList.push_back(Control);
 }
 
-BOOL CFilterDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CFilterDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -119,13 +119,13 @@ BOOL CFilterDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CFilterDialog::OnClose()
+INT_PTR CFilterDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-BOOL CFilterDialog::OnDestroy()
+INT_PTR CFilterDialog::OnDestroy()
 {
 	DestroyIcon(m_hDialogIcon);
 

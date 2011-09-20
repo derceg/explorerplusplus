@@ -52,7 +52,7 @@ CSetDefaultColumnsDialog::~CSetDefaultColumnsDialog()
 
 }
 
-BOOL CSetDefaultColumnsDialog::OnInitDialog()
+INT_PTR CSetDefaultColumnsDialog::OnInitDialog()
 {
 	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
@@ -179,7 +179,7 @@ void CSetDefaultColumnsDialog::GetResizableControlInformation(CBaseDialog::Dialo
 	ControlList.push_back(Control);
 }
 
-BOOL CSetDefaultColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CSetDefaultColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(HIWORD(wParam))
 	{
@@ -210,7 +210,7 @@ BOOL CSetDefaultColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CSetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR CSetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -222,13 +222,13 @@ BOOL CSetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-BOOL CSetDefaultColumnsDialog::OnClose()
+INT_PTR CSetDefaultColumnsDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-BOOL CSetDefaultColumnsDialog::OnDestroy()
+INT_PTR CSetDefaultColumnsDialog::OnDestroy()
 {
 	DestroyIcon(m_hDialogIcon);
 

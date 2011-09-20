@@ -59,147 +59,101 @@ INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lPa
 INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 	WPARAM wParam,LPARAM lParam)
 {
-	/* Private message? */
-	if(uMsg > WM_APP && uMsg < 0xBFFF)
-	{
-		OnPrivateMessage(uMsg,wParam,lParam);
-		return 0;
-	}
-
 	switch(uMsg)
 	{
-		case WM_INITDIALOG:
-			m_hDlg = hDlg;
+	case WM_INITDIALOG:
+		m_hDlg = hDlg;
 
-			if(m_bResizable)
+		if(m_bResizable)
+		{
+			RECT rcMain;
+			GetWindowRect(m_hDlg,&rcMain);
+
+			/* Assume that the current width and height of
+			the dialog are the minimum width and height.
+			Note that at this point, the dialog has NOT
+			been initialized in any way, so it will not
+			have had a chance to be resized yet. */
+			m_iMinWidth = GetRectWidth(&rcMain);
+			m_iMinHeight = GetRectHeight(&rcMain);
+
+			std::list<CResizableDialog::Control_t> ControlList;
+			m_dsc = DIALOG_SIZE_CONSTRAINT_NONE;
+			GetResizableControlInformation(m_dsc,ControlList);
+
+			m_prd = new CResizableDialog(m_hDlg,ControlList);
+		}
+		break;
+
+	case WM_GETMINMAXINFO:
+		if(m_bResizable)
+		{
+			LPMINMAXINFO pmmi = reinterpret_cast<LPMINMAXINFO>(lParam);
+
+			pmmi->ptMinTrackSize.x = m_iMinWidth;
+			pmmi->ptMinTrackSize.y = m_iMinHeight;
+
+			if(m_dsc == DIALOG_SIZE_CONSTRAINT_X)
 			{
-				RECT rcMain;
-				GetWindowRect(m_hDlg,&rcMain);
-
-				/* Assume that the current width and height of
-				the dialog are the minimum width and height.
-				Note that at this point, the dialog has NOT
-				been initialized in any way, so it will not
-				have had a chance to be resized yet. */
-				m_iMinWidth = GetRectWidth(&rcMain);
-				m_iMinHeight = GetRectHeight(&rcMain);
-
-				std::list<CResizableDialog::Control_t> ControlList;
-				m_dsc = DIALOG_SIZE_CONSTRAINT_NONE;
-				GetResizableControlInformation(m_dsc,ControlList);
-
-				m_prd = new CResizableDialog(m_hDlg,ControlList);
+				pmmi->ptMaxTrackSize.y = m_iMinHeight;
 			}
 
-			return OnInitDialog();
-			break;
-
-		case WM_CTLCOLORSTATIC:
-			return OnCtlColorStatic(reinterpret_cast<HWND>(lParam),
-				reinterpret_cast<HDC>(wParam));
-			break;
-
-		case WM_CTLCOLOREDIT:
-			return OnCtlColorEdit(reinterpret_cast<HWND>(lParam),
-				reinterpret_cast<HDC>(wParam));
-			break;
-
-		case WM_HSCROLL:
-			OnHScroll(reinterpret_cast<HWND>(lParam));
-			break;
-
-		case WM_APPCOMMAND:
-			return OnAppCommand(reinterpret_cast<HWND>(wParam),
-				GET_APPCOMMAND_LPARAM(lParam),
-				GET_DEVICE_LPARAM(lParam),
-				GET_KEYSTATE_LPARAM(lParam));
-			break;
-
-		case WM_TIMER:
-			return OnTimer(static_cast<int>(wParam));
-			break;
-
-		case WM_COMMAND:
-			return OnCommand(wParam,lParam);
-			break;
-
-		case WM_NOTIFY:
-			return OnNotify(reinterpret_cast<LPNMHDR>(lParam));
-			break;
-
-		case WM_GETMINMAXINFO:
-			if(m_bResizable)
+			if(m_dsc == DIALOG_SIZE_CONSTRAINT_Y)
 			{
-				LPMINMAXINFO pmmi = reinterpret_cast<LPMINMAXINFO>(lParam);
+				pmmi->ptMaxTrackSize.x = m_iMinWidth;
+			}
 
-				pmmi->ptMinTrackSize.x = m_iMinWidth;
-				pmmi->ptMinTrackSize.y = m_iMinHeight;
+			return 0;
+		}
+		break;
 
-				if(m_dsc == DIALOG_SIZE_CONSTRAINT_X)
+	case WM_SIZE:
+		if(m_bResizable)
+		{
+			m_prd->UpdateControls(LOWORD(lParam),HIWORD(lParam));
+			return 0;
+		}
+		break;
+
+	case WM_DESTROY:
+		{
+			/* If this is a modeless dialog, notify the
+			caller that the dialog is been destroyed. */
+			if(m_bShowingModelessDialog)
+			{
+				if(m_pmdn != NULL)
 				{
-					pmmi->ptMaxTrackSize.y = m_iMinHeight;
+					m_pmdn->OnModelessDialogDestroy(m_iResource);
+					m_pmdn->Release();
 				}
-
-				if(m_dsc == DIALOG_SIZE_CONSTRAINT_Y)
-				{
-					pmmi->ptMaxTrackSize.x = m_iMinWidth;
-				}
-
-				return 0;
 			}
 
-			return OnGetMinMaxInfo(reinterpret_cast<LPMINMAXINFO>(lParam));
-			break;
+			INT_PTR Res = OnDestroy();
 
-		case WM_SIZE:
-			if(m_bResizable)
-			{
-				m_prd->UpdateControls(LOWORD(lParam),HIWORD(lParam));
-				return 0;
-			}
+			/* Within WM_DESTROY, all child windows
+			still exist. */
+			SaveState();
 
-			return OnSize(static_cast<int>(wParam),
-				LOWORD(lParam),HIWORD(lParam));
-			break;
+			return Res;
+		}
+		break;
 
-		case WM_CLOSE:
-			return OnClose();
-			break;
-
-		case WM_DESTROY:
-			{
-				/* If this is a modeless dialog, notify the
-				caller that the dialog is been destroyed. */
-				if(m_bShowingModelessDialog)
-				{
-					if(m_pmdn != NULL)
-					{
-						m_pmdn->OnModelessDialogDestroy(m_iResource);
-						m_pmdn->Release();
-					}
-				}
-
-				BOOL bRes = OnDestroy();
-
-				/* Within WM_DESTROY, all child windows
-				still exist. */
-				SaveState();
-
-				return bRes;
-			}
-			break;
-
-		case WM_NCDESTROY:
-			g_WindowMap.erase(g_WindowMap.find(hDlg));
-			return OnNcDestroy();
-			break;
+	case WM_NCDESTROY:
+		g_WindowMap.erase(g_WindowMap.find(hDlg));
+		break;
 	}
 
+	return ForwardMessage(hDlg,uMsg,wParam,lParam);
+}
+
+INT_PTR CBaseDialog::GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+{
 	return 0;
 }
 
 CBaseDialog::CBaseDialog(HINSTANCE hInstance,int iResource,
-	HWND hParent,bool bResizable)
+	HWND hParent,bool bResizable) :
+CMessageForwarder()
 {
 	m_hInstance = hInstance;
 	m_iResource = iResource;
@@ -257,83 +211,13 @@ HWND CBaseDialog::ShowModelessDialog(IModelessDialogNotification *pmdn)
 	return hDlg;
 }
 
-BOOL CBaseDialog::OnInitDialog()
+void CBaseDialog::GetResizableControlInformation(DialogSizeConstraint &dsc,
+	std::list<CResizableDialog::Control_t> &ControlList)
 {
-	return TRUE;
-}
 
-BOOL CBaseDialog::OnTimer(int iTimerID)
-{
-	return 0;
-}
-
-INT_PTR CBaseDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
-{
-	return 0;
-}
-
-INT_PTR CBaseDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
-{
-	return 0;
-}
-
-BOOL CBaseDialog::OnHScroll(HWND hwnd)
-{
-	return 0;
-}
-
-BOOL CBaseDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
-{
-	return 0;
-}
-
-BOOL CBaseDialog::OnCommand(WPARAM wParam,LPARAM lParam)
-{
-	return 1;
-}
-
-BOOL CBaseDialog::OnNotify(NMHDR *pnmhdr)
-{
-	return 0;
-}
-
-BOOL CBaseDialog::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
-{
-	return 0;
-}
-
-BOOL CBaseDialog::OnSize(int iType,int iWidth,int iHeight)
-{
-	return 0;
-}
-
-BOOL CBaseDialog::OnClose()
-{
-	return 0;
-}
-
-BOOL CBaseDialog::OnDestroy()
-{
-	return 0;
-}
-
-BOOL CBaseDialog::OnNcDestroy()
-{
-	return 0;
 }
 
 void CBaseDialog::SaveState()
-{
-
-}
-
-void CBaseDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
-{
-
-}
-
-void CBaseDialog::GetResizableControlInformation(DialogSizeConstraint &dsc,
-	std::list<CResizableDialog::Control_t> &ControlList)
 {
 
 }

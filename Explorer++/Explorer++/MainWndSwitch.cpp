@@ -33,8 +33,6 @@
 
 #define FOLDER_SIZE_LINE_INDEX	1
 
-LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
-
 /* TODO: Remove once custom menu image lists
 have been corrected. */
 extern HIMAGELIST himlMenu;
@@ -198,7 +196,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 			m_hLastActiveWindow = m_hTreeView;
 			break;
 
-		case WM_USER_TABMCLICK:
+		case WM_APP_TABMCLICK:
 			OnTabMClick(wParam,lParam);
 			break;
 
@@ -240,7 +238,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 			OnDirectoryModified((int)wParam);
 			break;
 
-		case WM_USER_ASSOCCHANGED:
+		case WM_APP_ASSOCCHANGED:
 			OnAssocChanged();
 			break;
 

@@ -100,19 +100,13 @@ need to be included here. */
 	#define SHIL_JUMBO	0x4
 #endif
 
-#define SORTBY_BASE	50000
-#define SORTBY_END	50099
-
-#define GROUPBY_BASE	50100
-#define GROUPBY_END		50199
-
 /* Display window defaults. */
 #define MINIMUM_DISPLAYWINDOW_HEIGHT	70
 #define DEFAULT_DISPLAYWINDOW_HEIGHT	90
 
-#define WM_USER_TABMCLICK		(WM_APP + 53)
-#define WM_USER_ASSOCCHANGED	(WM_APP + 54)
-#define WM_USER_KEYDOWN			(WM_APP + 55)
+#define WM_APP_TABMCLICK		(WM_APP + 53)
+#define WM_APP_ASSOCCHANGED		(WM_APP + 54)
+#define WM_APP_KEYDOWN			(WM_APP + 55)
 
 /* The number of toolbars that appear in the
 main rebar. */
@@ -289,7 +283,6 @@ struct ColorRule_t
 every listview. */
 struct ListViewInfo_t
 {
-	void	*pContainer;
 	int		iObjectIndex;
 };
 

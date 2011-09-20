@@ -73,7 +73,7 @@ CSearchDialog::~CSearchDialog()
 	}
 }
 
-BOOL CSearchDialog::OnInitDialog()
+INT_PTR CSearchDialog::OnInitDialog()
 {
 	SetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_sdps->m_szSearchPattern);
 	SetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,m_szSearchDirectory);
@@ -270,7 +270,7 @@ void CSearchDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstr
 	ControlList.push_back(Control);
 }
 
-BOOL CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -699,7 +699,7 @@ void CSearchDialog::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
 	}
 }
 
-BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR CSearchDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -835,7 +835,7 @@ BOOL CSearchDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -939,9 +939,11 @@ void CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 			}
 			break;
 	}
+
+	return 0;
 }
 
-BOOL CSearchDialog::OnTimer(int iTimerID)
+INT_PTR CSearchDialog::OnTimer(int iTimerID)
 {
 	if(iTimerID != SEARCH_PROCESSITEMS_TIMER_ID)
 	{
@@ -1001,7 +1003,7 @@ BOOL CSearchDialog::OnTimer(int iTimerID)
 	return 0;
 }
 
-BOOL CSearchDialog::OnClose()
+INT_PTR CSearchDialog::OnClose()
 {
 	if(m_bSearching)
 	{
@@ -1016,7 +1018,7 @@ BOOL CSearchDialog::OnClose()
 	return 0;
 }
 
-BOOL CSearchDialog::OnNcDestroy()
+INT_PTR CSearchDialog::OnNcDestroy()
 {
 	delete this;
 

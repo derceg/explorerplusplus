@@ -46,11 +46,11 @@ public:
 
 protected:
 
-	BOOL	OnInitDialog();
+	INT_PTR	OnInitDialog();
 	INT_PTR	OnCtlColorStatic(HWND hwnd,HDC hdc);
-	BOOL	OnCommand(WPARAM wParam,LPARAM lParam);
-	BOOL	OnClose();
-	BOOL	OnDestroy();
+	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
+	INT_PTR	OnClose();
+	INT_PTR	OnDestroy();
 
 	void	SaveState();
 

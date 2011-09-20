@@ -37,7 +37,7 @@ CRenameTabDialog::~CRenameTabDialog()
 
 }
 
-BOOL CRenameTabDialog::OnInitDialog()
+INT_PTR CRenameTabDialog::OnInitDialog()
 {
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
 
@@ -57,7 +57,7 @@ BOOL CRenameTabDialog::OnInitDialog()
 	return 0;
 }
 
-BOOL CRenameTabDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CRenameTabDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -81,7 +81,7 @@ BOOL CRenameTabDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CRenameTabDialog::OnClose()
+INT_PTR CRenameTabDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;

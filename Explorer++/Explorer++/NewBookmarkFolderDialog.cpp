@@ -31,12 +31,12 @@ CNewBookmarkFolderDialog::~CNewBookmarkFolderDialog()
 
 }
 
-BOOL CNewBookmarkFolderDialog::OnInitDialog()
+INT_PTR CNewBookmarkFolderDialog::OnInitDialog()
 {
 	return 0;
 }
 
-BOOL CNewBookmarkFolderDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CNewBookmarkFolderDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -62,7 +62,7 @@ void CNewBookmarkFolderDialog::OnCancel()
 	EndDialog(m_hDlg,0);
 }
 
-BOOL CNewBookmarkFolderDialog::OnClose()
+INT_PTR CNewBookmarkFolderDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;

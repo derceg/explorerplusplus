@@ -46,7 +46,7 @@ CMassRenameDialog::~CMassRenameDialog()
 
 }
 
-BOOL CMassRenameDialog::OnInitDialog()
+INT_PTR CMassRenameDialog::OnInitDialog()
 {
 	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
@@ -170,7 +170,7 @@ void CMassRenameDialog::GetResizableControlInformation(CBaseDialog::DialogSizeCo
 	ControlList.push_back(Control);
 }
 
-BOOL CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	if(HIWORD(wParam) != 0)
 	{
@@ -265,13 +265,13 @@ BOOL CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CMassRenameDialog::OnClose()
+INT_PTR CMassRenameDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-BOOL CMassRenameDialog::OnDestroy()
+INT_PTR CMassRenameDialog::OnDestroy()
 {
 	DestroyIcon(m_hMoreIcon);
 	DestroyIcon(m_hDialogIcon);

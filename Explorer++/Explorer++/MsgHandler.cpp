@@ -20,11 +20,6 @@
 #include "../Helper/Macros.h"
 
 
-/* Visibility states should NOT be included here. The visibility of
-an item will be set dynamically based on any loaded settings. */
-UINT StatusBarStyles		=	WS_CHILD|WS_CLIPSIBLINGS|SBARS_SIZEGRIP|
-								WS_CLIPCHILDREN;
-
 UINT DirectoryWatchFlags	=	FILE_NOTIFY_CHANGE_FILE_NAME|FILE_NOTIFY_CHANGE_SIZE|
 								FILE_NOTIFY_CHANGE_DIR_NAME|FILE_NOTIFY_CHANGE_ATTRIBUTES|
 								FILE_NOTIFY_CHANGE_LAST_WRITE|FILE_NOTIFY_CHANGE_LAST_ACCESS|
@@ -194,7 +189,7 @@ void Explorerplusplus::OnWindowCreate(void)
 	/* Register for any shell changes. This should
 	be done after the tabs have been created. */
 	SHChangeNotifyRegister(m_hContainer,SHCNRF_ShellLevel,SHCNE_ASSOCCHANGED,
-		WM_USER_ASSOCCHANGED,1,&shcne);
+		WM_APP_ASSOCCHANGED,1,&shcne);
 
 
 
@@ -1461,36 +1456,6 @@ void Explorerplusplus::OnTbnDropDown(LPARAM lParam)
 	}
 }
 
-void Explorerplusplus::OnTabMClick(WPARAM wParam,LPARAM lParam)
-{
-	TCHITTESTINFO	htInfo;
-	int				iTabHit;
-	int				x;
-	int				y;
-
-	/* Only close a tab if the tab control
-	actually has focused (i.e. if the middle mouse
-	button was clicked on the control, then the
-	tab control will have focus; if it was clicked
-	somewhere else, it won't). */
-	if(GetFocus() == m_hTabCtrl)
-	{
-		x = LOWORD(lParam);
-		y = HIWORD(lParam);
-
-		htInfo.pt.x = x;
-		htInfo.pt.y = y;
-
-		/* Find the tab that the click occurred over. */
-		iTabHit = TabCtrl_HitTest(m_hTabCtrl,&htInfo);
-
-		if(iTabHit != -1)
-		{
-			CloseTab(iTabHit);
-		}
-	}
-}
-
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
 	RECT	rc;
@@ -1699,7 +1664,7 @@ void Explorerplusplus::OnNextWindow(void)
 	if(m_bListViewRenaming)
 	{
 		SendMessage(ListView_GetEditControl(m_hActiveListView),
-			WM_USER_KEYDOWN,VK_TAB,0);
+			WM_APP_KEYDOWN,VK_TAB,0);
 	}
 	else
 	{
@@ -1739,39 +1704,6 @@ void Explorerplusplus::OnNextWindow(void)
 			}
 		}
 	}
-}
-
-BOOL Explorerplusplus::IsNextWindowVisible(HWND hNext)
-{
-	if(hNext == m_hActiveListView)
-		return TRUE;
-	else if(hNext == m_hTreeView)
-		return m_bShowFolders;
-	else if(hNext == m_hAddressBar || hNext == (HWND)SendMessage(m_hAddressBar,CBEM_GETEDITCONTROL,0,0))
-		return m_bShowAddressBar;
-
-	return TRUE;
-}
-
-HWND Explorerplusplus::MyGetNextWindow(HWND hwndCurrent)
-{
-	if(hwndCurrent == m_hActiveListView)
-		return m_hAddressBar;
-	else if(hwndCurrent == m_hTreeView)
-		return m_hActiveListView;
-	else if(hwndCurrent == (HWND)SendMessage(m_hAddressBar,CBEM_GETEDITCONTROL,0,0))
-		return m_hTreeView;
-
-	return NULL;
-}
-
-void Explorerplusplus::CreateStatusBar(void)
-{
-	if(m_bShowStatusBar)
-		StatusBarStyles |= WS_VISIBLE;
-
-	m_hStatusBar = ::CreateStatusBar(m_hContainer,StatusBarStyles);
-	m_pStatusBar = new CStatusBar(m_hStatusBar);
 }
 
 void Explorerplusplus::SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl)
@@ -2491,7 +2423,7 @@ void Explorerplusplus::OnAssocChanged(void)
 	m_pMyTreeView->RefreshAllIcons();
 
 	/* Address bar. */
-	HandleComboBoxText();
+	HandleAddressBarText();
 }
 
 void Explorerplusplus::OnCloneWindow(void)

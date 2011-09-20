@@ -59,7 +59,7 @@ CManageBookmarksDialog::~CManageBookmarksDialog()
 	delete m_pBookmarkListView;
 }
 
-BOOL CManageBookmarksDialog::OnInitDialog()
+INT_PTR CManageBookmarksDialog::OnInitDialog()
 {
 	/* TODO: Enable drag and drop for listview and treeview. */
 	SetDialogIcon();
@@ -387,7 +387,7 @@ INT_PTR CManageBookmarksDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
 	return 0;
 }
 
-BOOL CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
+INT_PTR CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
 {
 	switch(uCmd)
 	{
@@ -403,7 +403,7 @@ BOOL CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD
 	return 0;
 }
 
-BOOL CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	if(HIWORD(wParam) != 0)
 	{
@@ -499,7 +499,7 @@ BOOL CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR CManageBookmarksDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -1225,13 +1225,13 @@ void CManageBookmarksDialog::OnCancel()
 	DestroyWindow(m_hDlg);
 }
 
-BOOL CManageBookmarksDialog::OnClose()
+INT_PTR CManageBookmarksDialog::OnClose()
 {
 	DestroyWindow(m_hDlg);
 	return 0;
 }
 
-BOOL CManageBookmarksDialog::OnDestroy()
+INT_PTR CManageBookmarksDialog::OnDestroy()
 {
 	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
 	DestroyIcon(m_hDialogIcon);
@@ -1241,7 +1241,7 @@ BOOL CManageBookmarksDialog::OnDestroy()
 	return 0;
 }
 
-BOOL CManageBookmarksDialog::OnNcDestroy()
+INT_PTR CManageBookmarksDialog::OnNcDestroy()
 {
 	delete this;
 

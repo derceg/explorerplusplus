@@ -41,7 +41,7 @@ CWildcardSelectDialog::~CWildcardSelectDialog()
 
 }
 
-BOOL CWildcardSelectDialog::OnInitDialog()
+INT_PTR CWildcardSelectDialog::OnInitDialog()
 {
 	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
@@ -98,7 +98,7 @@ void CWildcardSelectDialog::GetResizableControlInformation(CBaseDialog::DialogSi
 	ControlList.push_back(Control);
 }
 
-BOOL CWildcardSelectDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CWildcardSelectDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -173,13 +173,13 @@ void CWildcardSelectDialog::OnCancel()
 	EndDialog(m_hDlg,0);
 }
 
-BOOL CWildcardSelectDialog::OnClose()
+INT_PTR CWildcardSelectDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-BOOL CWildcardSelectDialog::OnDestroy()
+INT_PTR CWildcardSelectDialog::OnDestroy()
 {
 	DestroyIcon(m_hDialogIcon);
 

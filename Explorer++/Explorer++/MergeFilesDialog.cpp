@@ -61,7 +61,7 @@ bool CompareFilenames(std::wstring strFirst,std::wstring strSecond)
 	return (StrCmpLogicalW(strFirst.c_str(),strSecond.c_str()) <= 0);
 }
 
-BOOL CMergeFilesDialog::OnInitDialog()
+INT_PTR CMergeFilesDialog::OnInitDialog()
 {
 	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
@@ -275,7 +275,7 @@ void CMergeFilesDialog::GetResizableControlInformation(CBaseDialog::DialogSizeCo
 	ControlList.push_back(Control);
 }
 
-BOOL CMergeFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CMergeFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -303,20 +303,20 @@ BOOL CMergeFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CMergeFilesDialog::OnClose()
+INT_PTR CMergeFilesDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;
 }
 
-BOOL CMergeFilesDialog::OnDestroy()
+INT_PTR CMergeFilesDialog::OnDestroy()
 {
 	DestroyIcon(m_hDialogIcon);
 
 	return 0;
 }
 
-void CMergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CMergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -351,6 +351,8 @@ void CMergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 		}
 		break;
 	}
+
+	return 0;
 }
 
 void CMergeFilesDialog::SaveState()

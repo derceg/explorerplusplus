@@ -280,6 +280,7 @@
     <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="iServiceProvider.cpp" />
     <ClCompile Include="iShellView2.cpp" />
+    <ClCompile Include="ListView.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="MainToolbarHandler.cpp" />
     <ClCompile Include="MainWndSwitch.cpp" />
@@ -341,6 +342,7 @@
     <ClInclude Include="INewMenuClient.h" />
     <ClInclude Include="iServiceProvider.h" />
     <ClInclude Include="iShellView2.h" />
+    <ClInclude Include="ListView.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="ManageBookmarksDialog.h" />
     <ClInclude Include="MassRenameDialog.h" />

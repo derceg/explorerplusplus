@@ -43,7 +43,7 @@ CColorRuleDialog::~CColorRuleDialog()
 
 }
 
-BOOL CColorRuleDialog::OnInitDialog()
+INT_PTR CColorRuleDialog::OnInitDialog()
 {
 	if(m_bEdit)
 	{
@@ -94,7 +94,7 @@ BOOL CColorRuleDialog::OnInitDialog()
 	return 0;
 }
 
-BOOL CColorRuleDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CColorRuleDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	if(HIWORD(wParam) != 0)
 	{
@@ -161,7 +161,7 @@ void CColorRuleDialog::OnCancel()
 	EndDialog(m_hDlg,0);
 }
 
-BOOL CColorRuleDialog::OnClose()
+INT_PTR CColorRuleDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
 	return 0;

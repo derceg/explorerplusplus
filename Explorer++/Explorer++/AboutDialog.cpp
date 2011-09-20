@@ -36,7 +36,7 @@ CAboutDialog::~CAboutDialog()
 
 }
 
-BOOL CAboutDialog::OnInitDialog()
+INT_PTR CAboutDialog::OnInitDialog()
 {
 	m_hIcon = reinterpret_cast<HICON>(LoadImage(GetModuleHandle(0),
 		MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,
@@ -92,7 +92,7 @@ BOOL CAboutDialog::OnInitDialog()
 	return TRUE;
 }
 
-BOOL CAboutDialog::OnCommand(WPARAM wParam,LPARAM lParam)
+INT_PTR CAboutDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
 	switch(LOWORD(wParam))
 	{
@@ -108,7 +108,7 @@ BOOL CAboutDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-BOOL CAboutDialog::OnNotify(NMHDR *pnmhdr)
+INT_PTR CAboutDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
@@ -129,7 +129,7 @@ BOOL CAboutDialog::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-BOOL CAboutDialog::OnClose()
+INT_PTR CAboutDialog::OnClose()
 {
 	DestroyIcon(m_hIcon);
 

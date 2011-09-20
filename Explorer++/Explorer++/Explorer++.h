@@ -46,26 +46,33 @@ lParam not currently used. */
 class Explorerplusplus : public IExplorerplusplus, public IFileContextMenuExternal,
 	public NBookmarkIPHelper::IPBookmarkNotificationGet, public NBookmarkIPHelper::IPBookmarkNotificationSet
 {
+	friend LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+
 public:
 
 	Explorerplusplus(HWND);
 	~Explorerplusplus();
 
-	LRESULT CALLBACK	WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	ListViewSubclassProc(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
-	LRESULT CALLBACK	ListViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+
+	/* Address bar edit control. */
 	LRESULT CALLBACK	EditSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
+
 	LRESULT CALLBACK	RebarSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabBackingProc(HWND hTabCtrl,UINT msg,WPARAM wParam,LPARAM lParam);
-	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam);
-	LRESULT CALLBACK	TreeViewSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,int iTabId);
+
+	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK	TreeViewSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
+
+	/* Options dialog. */
 	INT_PTR CALLBACK	GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
+
 	INT_PTR CALLBACK	ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 
@@ -273,6 +280,8 @@ private:
 
 	friend CApplicationToolbarDrop;
 
+	LRESULT CALLBACK		WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+
 	/* Internal private functions. */
 	void					OnTabChangeInternal(BOOL bSetFocus);
 	void					UpdateArrangeMenuItems(void);
@@ -361,7 +370,7 @@ private:
 	/* ListView private message handlers. */
 	void					OnListViewMButtonDown(WPARAM wParam,LPARAM lParam);
 	void					OnListViewMButtonUp(WPARAM wParam,LPARAM lParam);
-	LRESULT					OnListViewLButtonDown(WPARAM wParam,LPARAM lParam);
+	void					OnListViewLButtonDown(WPARAM wParam,LPARAM lParam);
 	void					OnListViewDoubleClick(NMHDR *nmhdr);
 	void					OnListViewFileRename(void);
 	void					OnListViewColumnClick(LPARAM lParam);
@@ -467,9 +476,6 @@ private:
 	void					ApplicationToolbarDeleteItem(int iItem);
 	void					ApplicationToolbarShowItemProperties(int iItem);
 
-	/* Customize colors. */
-	std::vector<ColorRule_t>	m_ColorRuleList;
-
 	/* Application button properties dialog. */
 	void					OnApplicationButtonPropertiesInit(HWND hDlg);
 	void					OnApplicationButtonPropertiesOk(HWND hDlg);
@@ -544,7 +550,7 @@ private:
 	/* Window state update. */
 	void					UpdateWindowStates(void);
 	void					HandleMainWindowText(void);
-	void					HandleComboBoxText(void);
+	void					HandleAddressBarText(void);
 	void					HandleTabText(void);
 	void					HandleTabText(int iTabId);
 	void					HandleTabText(int iTab,int iTabId);
@@ -737,8 +743,6 @@ private:
 	void					SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl);
 	int						CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,int nBuffer);
 	BOOL					CheckItemSelection(void);
-	HWND					MyGetNextWindow(HWND hwndCurrent);
-	BOOL					IsNextWindowVisible(HWND hNext);
 	void					ShowMainRebarBand(HWND hwnd,BOOL bShow);
 	BOOL					OnMouseWheel(MousewheelSource_t MousewheelSource,WPARAM wParam,LPARAM lParam);
 	void					CycleViewState(BOOL bCycleForward);
@@ -816,7 +820,6 @@ private:
 	int						m_iMaxArrangeMenuItem;
 	int						m_iLastSelectedTab;
 	int						m_iTabSelectedItem;
-	int						m_ListViewEditingStage;
 
 	std::list<ViewMode_t>	m_ViewModes;
 
@@ -918,6 +921,9 @@ private:
 	bool					m_bBroadcastIPBookmarkNotifications;
 	CBookmarksToolbar		*m_pBookmarksToolbar;
 
+	/* Customize colors. */
+	std::vector<ColorRule_t>	m_ColorRuleList;
+
 	/* Undo support. */
 	CFileActionHandler		m_FileActionHandler;
 
@@ -973,9 +979,7 @@ private:
 	BOOL					m_bDragAllowed;
 
 	/* Rename support. */
-	BOOL					m_bListViewBeginRename;
 	BOOL					m_bListViewRenaming;
-	int						m_iItemEditing;
 
 	/* Tab handler data. */
 	std::vector<int>		m_TabSelectionHistory;

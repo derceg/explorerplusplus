@@ -36,8 +36,7 @@ UINT TabCtrlStyles			=	WS_VISIBLE|WS_CHILD|TCS_FOCUSNEVER|TCS_SINGLELINE|
 LRESULT CALLBACK TabSubclassProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
-extern LRESULT CALLBACK	ListViewSubclassProcStub(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
-extern LRESULT	(CALLBACK *DefaultListViewProc)(HWND,UINT,WPARAM,LPARAM);
+extern LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 void Explorerplusplus::InitializeTabs(void)
 {
@@ -116,7 +115,7 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 			break;
 
 		case WM_MBUTTONUP:
-			SendMessage(m_hContainer,WM_USER_TABMCLICK,wParam,lParam);
+			SendMessage(m_hContainer,WM_APP_TABMCLICK,wParam,lParam);
 			break;
 
 		case WM_RBUTTONUP:
@@ -396,17 +395,13 @@ int *pTabObjectIndex)
 	if(pSettings->bApplyFilter)
 		NListView::ListView_SetBackgroundImage(m_hListView[iTabId],IDB_FILTERINGAPPLIED);
 
-	ListViewInfo_t	*plvi = NULL;
-
-	plvi = (ListViewInfo_t *)malloc(sizeof(ListViewInfo_t));
-
-	plvi->pContainer	= this;
+	ListViewInfo_t	*plvi = (ListViewInfo_t *)malloc(sizeof(ListViewInfo_t));
 	plvi->iObjectIndex	= iTabId;
 
 	SetWindowLongPtr(m_hListView[iTabId],GWLP_USERDATA,(LONG_PTR)plvi);
 
-	/* Subclass the window. */
-	DefaultListViewProc = (WNDPROC)SetWindowLongPtr(m_hListView[iTabId],GWLP_WNDPROC,(LONG_PTR)ListViewSubclassProcStub);
+	/* TODO: This needs to be removed. */
+	SetWindowSubclass(m_hListView[iTabId],ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
 	m_pFolderView[iTabId]->QueryInterface(IID_IShellBrowser,
 	(void **)&m_pShellBrowser[iTabId]);
@@ -2098,4 +2093,34 @@ unsigned int Explorerplusplus::DetermineColumnSortMode(UINT uColumnId)
 	}
 
 	return 0;
+}
+
+void Explorerplusplus::OnTabMClick(WPARAM wParam,LPARAM lParam)
+{
+	TCHITTESTINFO	htInfo;
+	int				iTabHit;
+	int				x;
+	int				y;
+
+	/* Only close a tab if the tab control
+	actually has focused (i.e. if the middle mouse
+	button was clicked on the control, then the
+	tab control will have focus; if it was clicked
+	somewhere else, it won't). */
+	if(GetFocus() == m_hTabCtrl)
+	{
+		x = LOWORD(lParam);
+		y = HIWORD(lParam);
+
+		htInfo.pt.x = x;
+		htInfo.pt.y = y;
+
+		/* Find the tab that the click occurred over. */
+		iTabHit = TabCtrl_HitTest(m_hTabCtrl,&htInfo);
+
+		if(iTabHit != -1)
+		{
+			CloseTab(iTabHit);
+		}
+	}
 }
