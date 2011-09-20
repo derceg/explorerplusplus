@@ -21,6 +21,14 @@ namespace NBookmark
 		virtual void	OnBookmarkRemoved(const GUID &guid);
 		virtual void	OnBookmarkFolderRemoved(const GUID &guid);
 	};
+
+	struct SerializedData_t
+	{
+		void	*pData;
+		UINT	uSize;
+	};
+
+	const int VERSION_NUMBER_MISMATCH = 1;
 }
 
 class CBookmarkFolder
@@ -29,6 +37,7 @@ public:
 
 	static CBookmarkFolder	Create(const std::wstring &strName);
 	static CBookmarkFolder	*CreateNew(const std::wstring &strName);
+	static CBookmarkFolder	Unserialize(void *pSerializedData);
 	static CBookmarkFolder	UnserializeFromRegistry(const std::wstring &strKey);
 
 	~CBookmarkFolder();
@@ -61,15 +70,31 @@ public:
 	void			RemoveBookmark();
 	void			RemoveBookmarkFolder();
 
+	NBookmark::SerializedData_t	Serialize() const;
+
 private:
 
 	enum InitializationType_t
 	{
 		INITIALIZATION_TYPE_NORMAL,
+		INITIALIZATION_TYPE_UNSERIALIZE,
 		INITIALIZATION_TYPE_REGISTRY
 	};
 
+	struct BookmarkFolderSerialized_t
+	{
+		UINT		uSize;
+
+		GUID		guid;
+
+		TCHAR		Name[256];
+
+		FILETIME	ftCreated;
+		FILETIME	ftModified;
+	};
+
 	CBookmarkFolder(const std::wstring &str,InitializationType_t InitializationType);
+	CBookmarkFolder(void *pSerializedData);
 
 	void			Initialize(const std::wstring &strName);
 	void			InitializeFromRegistry(const std::wstring &strKey);
@@ -99,6 +124,7 @@ class CBookmark
 public:
 
 	CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription);
+	CBookmark(void *pSerializedData);
 	~CBookmark();
 
 	GUID			GetGUID() const;
@@ -119,7 +145,38 @@ public:
 	FILETIME		GetDateCreated() const;
 	FILETIME		GetDateModified() const;
 
+	/* Note that this method will allocate data
+	using new; it is up to the caller to delete it. */
+	NBookmark::SerializedData_t	Serialize() const;
+
 private:
+
+	/* Whenever a member is added, removed
+	or changed within this class, it must
+	be added, removed or changed within this
+	structure. */
+	struct BookmarkSerialized_t
+	{
+		/* Size of the structure. Used to ensure binary
+		compatibility. When unserializing a bookmark,
+		if this size does not match the internal size
+		of this structure, the data will be rejected.
+		Note that this element MUST appear first in this
+		structure. */
+		UINT		uSize;
+
+		GUID		guid;
+
+		TCHAR		Name[256];
+		TCHAR		Location[256];
+		TCHAR		Description[256];
+
+		int			iVisitCount;
+		FILETIME	ftLastVisited;
+
+		FILETIME	ftCreated;
+		FILETIME	ftModified;
+	};
 
 	GUID			m_guid;
 

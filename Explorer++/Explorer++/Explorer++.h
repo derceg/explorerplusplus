@@ -3,6 +3,7 @@
 
 #include "Explorer++_internal.h"
 #include "BookmarkHelper.h"
+#include "BookmarkIPHelper.h"
 #include "BookmarksToolbar.h"
 #include "DrivesToolbar.h"
 #include "TabContainer.h"
@@ -42,7 +43,8 @@ lParam not currently used. */
 #define TAB_WINDOW_HEIGHT			24
 #define DEFAULT_TREEVIEW_WIDTH		208
 
-class Explorerplusplus : public IExplorerplusplus, public IFileContextMenuExternal
+class Explorerplusplus : public IExplorerplusplus, public IFileContextMenuExternal,
+	public NBookmarkIPHelper::IPBookmarkNotificationGet, public NBookmarkIPHelper::IPBookmarkNotificationSet
 {
 public:
 
@@ -576,6 +578,12 @@ private:
 	int						GenerateUniqueTabId(void);
 	BOOL					CheckTabIdStatus(int iTabId);
 
+	/* IPBookmarkNotificationGet methods. */
+	bool					GetIPBroadcast() const;
+
+	/* IPBookmarkNotificationSet methods. */
+	void					SetIPBroadcast(bool bBroadcast);
+
 	/* Languages. */
 	void					SetLanguageModule(void);
 
@@ -905,8 +913,10 @@ private:
 	CBookmarkFolder *		m_bfAllBookmarks;
 	GUID					m_guidBookmarksToolbar;
 	GUID					m_guidBookmarksMenu;
-	CBookmarksToolbar		*m_pBookmarksToolbar;
 	CIPBookmarkItemNotifier	*m_pipbin;
+	CIPBookmarkObserver		*m_pipbo;
+	bool					m_bBroadcastIPBookmarkNotifications;
+	CBookmarksToolbar		*m_pBookmarksToolbar;
 
 	/* Undo support. */
 	CFileActionHandler		m_FileActionHandler;

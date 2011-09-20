@@ -34,12 +34,20 @@ namespace NExplorerplusplus
 	for each jump list task. */
 	const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[]	= _T("-open_new_tab");
 
+	/* When sending data across Explorer++ processes via
+	WM_COPYDATA, the type (as specified by this enumeration)
+	must ALWAYS be specified first. */
 	enum IPNotificationType_t
 	{
 		IP_NOTIFICATION_TYPE_NEW_TAB = 1,
 
 		/* Bookmark notifications. */
-		IP_NOTIFICATION_TYPE_BOOKMARK_MODIFIED = 2
+		IP_NOTIFICATION_TYPE_BOOKMARK_ADDED = 2,
+		IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_ADDED = 3,
+		IP_NOTIFICATION_TYPE_BOOKMARK_MODIFIED = 4,
+		IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_MODIFIED = 5,
+		IP_NOTIFICATION_TYPE_BOOKMARK_REMOVED = 6,
+		IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_REMOVED = 7
 	};
 
 	struct IPBookmarkNotification_t
@@ -48,7 +56,7 @@ namespace NExplorerplusplus
 		must ALWAYS appear first in each of the structures.
 		Decode by switching on the type and casting to the
 		appropriate structure. */
-		IPNotificationType_t	Type;
+		IPNotificationType_t Type;
 	};
 }
 

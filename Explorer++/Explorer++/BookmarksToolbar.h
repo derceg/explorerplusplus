@@ -15,15 +15,15 @@ public:
 	ULONG __stdcall		AddRef(void);
 	ULONG __stdcall		Release(void);
 
+private:
+
+	CBookmarksToolbarDropHandler & operator = (const CBookmarksToolbarDropHandler &btdh);
+
 	/* IDropTarget methods. */
 	HRESULT __stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect);
 	HRESULT __stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
 	HRESULT __stdcall	DragLeave(void);
 	HRESULT __stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-
-private:
-
-	CBookmarksToolbarDropHandler & operator = (const CBookmarksToolbarDropHandler &btdh);
 
 	int					GetToolbarPositionIndex(const POINTL &pt,bool &bAfter);
 	void				RemoveInsertionMark();
@@ -42,10 +42,11 @@ private:
 class CBookmarksToolbar : public NBookmark::IBookmarkItemNotification
 {
 	friend LRESULT CALLBACK BookmarksToolbarProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+	friend LRESULT CALLBACK BookmarksToolbarParentProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 public:
 
-	CBookmarksToolbar(HWND hToolbar,CBookmarkFolder &AllBookmarks,const GUID &guidBookmarksToolbar,UINT uIDStart);
+	CBookmarksToolbar(HWND hToolbar,CBookmarkFolder &AllBookmarks,const GUID &guidBookmarksToolbar,UINT uIDStart,UINT uIDEnd);
 	~CBookmarksToolbar();
 
 	/* IBookmarkItemNotification methods. */
@@ -60,7 +61,11 @@ private:
 
 	CBookmarksToolbar & operator = (const CBookmarksToolbar &bt);
 
+	static const UINT_PTR SUBCLASS_ID = 0;
+	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
+
 	LRESULT CALLBACK	BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK	BookmarksToolbarParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	void	InitializeToolbar();
 
@@ -78,11 +83,14 @@ private:
 	int		GetBookmarkItemIndex(const GUID &guid);
 
 	HWND							m_hToolbar;
+	HIMAGELIST						m_himl;
+
 	CBookmarkFolder					&m_AllBookmarks;
 	GUID							m_guidBookmarksToolbar;
 
 	std::unordered_map<UINT,GUID>	m_mapID;
 	UINT							m_uIDStart;
+	UINT							m_uIDEnd;
 	UINT							m_uIDCounter;
 
 	CBookmarksToolbarDropHandler	*m_pbtdh;

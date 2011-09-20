@@ -308,22 +308,51 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 		case WM_COPYDATA:
 			{
-				COPYDATASTRUCT *pcds = NULL;
-				HRESULT hr;
+				COPYDATASTRUCT *pcds = reinterpret_cast<COPYDATASTRUCT *>(lParam);
 
-				pcds = (COPYDATASTRUCT *)lParam;
+				if(pcds->cbData < sizeof(NExplorerplusplus::IPNotificationType_t))
+				{
+					return FALSE;
+				}
 
-				if(pcds->lpData != NULL)
+				NExplorerplusplus::IPNotificationType_t *ipnt = reinterpret_cast<NExplorerplusplus::IPNotificationType_t *>(pcds->lpData);
+
+				switch(*ipnt)
+				{
+				case NExplorerplusplus::IP_NOTIFICATION_TYPE_NEW_TAB:
+					/* TODO: */
+					break;
+
+				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_ADDED:
+				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_ADDED:
+				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_MODIFIED:
+				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_MODIFIED:
+				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_REMOVED:
+				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_REMOVED:
+					{
+						m_pipbo->OnNotificationReceived(*ipnt,pcds->lpData);
+					}
+					break;
+
+				default:
+					return FALSE;
+					break;
+				}
+
+				/* TODO: */
+				/*if(pcds->lpData != NULL)
 				{
 					BrowseFolder((TCHAR *)pcds->lpData,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 				}
 				else
 				{
-					hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+					HRESULT hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 
 					if(FAILED(hr))
 						BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-				}
+				}*/
+
+				return TRUE;
 			}
 			break;
 
@@ -419,24 +448,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		else
 		{
 			m_pActiveShellBrowser->ImportColumns(&m_pActiveColumnList,FALSE);
-		}
-	}
-
-	/* Was one of the items on the bookmarks toolbar clicked? */
-	if(LOWORD(wParam) >= TOOLBAR_BOOKMARK_START &&
-	LOWORD(wParam) <= (TOOLBAR_BOOKMARK_START +
-	(MENU_BOOKMARK_ENDID - MENU_BOOKMARK_STARTID - 1)))
-	{
-		TBBUTTON	tbButton;
-		int			iIndex;
-
-		iIndex = (int)SendMessage(m_hBookmarksToolbar,TB_COMMANDTOINDEX,LOWORD(wParam),0);
-
-		if(iIndex != -1)
-		{
-			SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iIndex,(LPARAM)&tbButton);
-
-			/* TODO: [Bookmarks] Handle message. */
 		}
 	}
 

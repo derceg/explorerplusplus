@@ -44,8 +44,12 @@ void Explorerplusplus::InitializeBookmarks(void)
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu);
 	m_guidBookmarksMenu = bfBookmarksMenu.GetGUID();
 
-	m_pipbin = new CIPBookmarkItemNotifier(m_hContainer);
+	m_bBroadcastIPBookmarkNotifications = true;
+
+	m_pipbin = new CIPBookmarkItemNotifier(m_hContainer,this);
 	CBookmarkItemNotifier::GetInstance().AddObserver(m_pipbin);
+
+	m_pipbo = new CIPBookmarkObserver(m_bfAllBookmarks,this);
 }
 
 void Explorerplusplus::InitializeDisplayWindow(void)

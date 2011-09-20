@@ -21,11 +21,12 @@
 
 
 CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar,CBookmarkFolder &AllBookmarks,
-	const GUID &guidBookmarksToolbar,UINT uIDStart) :
+	const GUID &guidBookmarksToolbar,UINT uIDStart,UINT uIDEnd) :
 m_hToolbar(hToolbar),
 m_AllBookmarks(AllBookmarks),
 m_guidBookmarksToolbar(guidBookmarksToolbar),
 m_uIDStart(uIDStart),
+m_uIDEnd(uIDEnd),
 m_uIDCounter(0)
 {
 	InitializeToolbar();
@@ -35,7 +36,13 @@ m_uIDCounter(0)
 
 CBookmarksToolbar::~CBookmarksToolbar()
 {
+	ImageList_Destroy(m_himl);
+
+	RevokeDragDrop(m_hToolbar);
 	m_pbtdh->Release();
+
+	RemoveWindowSubclass(m_hToolbar,BookmarksToolbarProcStub,SUBCLASS_ID);
+	RemoveWindowSubclass(GetParent(m_hToolbar),BookmarksToolbarParentProcStub,PARENT_SUBCLASS_ID);
 
 	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
 }
@@ -45,7 +52,7 @@ void CBookmarksToolbar::InitializeToolbar()
 	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
 	SendMessage(m_hToolbar,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 
-	HIMAGELIST m_himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
+	m_himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL),MAKEINTRESOURCE(IDB_SHELLIMAGES));
 	ImageList_Add(m_himl,hBitmap,NULL);
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_himl));
@@ -54,7 +61,12 @@ void CBookmarksToolbar::InitializeToolbar()
 	m_pbtdh = new CBookmarksToolbarDropHandler(m_hToolbar,m_AllBookmarks,m_guidBookmarksToolbar);
 	RegisterDragDrop(m_hToolbar,m_pbtdh);
 
-	SetWindowSubclass(m_hToolbar,BookmarksToolbarProcStub,0,reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(m_hToolbar,BookmarksToolbarProcStub,SUBCLASS_ID,reinterpret_cast<DWORD_PTR>(this));
+
+	/* Also subclass the parent window, so that WM_COMMAND/WM_NOTIFY messages
+	can be caught. */
+	SetWindowSubclass(GetParent(m_hToolbar),BookmarksToolbarParentProcStub,PARENT_SUBCLASS_ID,
+		reinterpret_cast<DWORD_PTR>(this));
 
 	InsertBookmarkItems();
 }
@@ -89,6 +101,50 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 				SendMessage(m_hToolbar,TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
 
 				/* TODO: If this is a bookmark, open it in a new tab. */
+			}
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+LRESULT CALLBACK BookmarksToolbarParentProcStub(HWND hwnd,UINT uMsg,
+	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+{
+	CBookmarksToolbar *pbt = reinterpret_cast<CBookmarksToolbar *>(dwRefData);
+
+	return pbt->BookmarksToolbarParentProc(hwnd,uMsg,wParam,lParam);
+}
+
+LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+{
+	switch(uMsg)
+	{
+	case WM_COMMAND:
+		if(LOWORD(wParam) >= m_uIDStart &&
+			LOWORD(wParam) <= m_uIDEnd)
+		{
+			/* TODO: Map the id back to a GUID, and
+			then open the bookmark/show a dropdown
+			list. */
+			return 0;
+		}
+		break;
+
+	case WM_NOTIFY:
+		if(reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hToolbar)
+		{
+			switch(reinterpret_cast<LPNMHDR>(lParam)->code)
+			{
+			case TBN_GETINFOTIP:
+				{
+					//NMTBGETINFOTIP *pnmtbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
+
+					/* TODO: Build an infotip for the bookmark. */
+					//return 0;
+				}
+				break;
 			}
 		}
 		break;

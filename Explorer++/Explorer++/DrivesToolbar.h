@@ -26,7 +26,7 @@ private:
 	};
 
 	static const UINT_PTR SUBCLASS_ID = 0;
-	static CONST UINT_PTR PARENT_SUBCLASS_ID = 0;
+	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	LRESULT CALLBACK DrivesToolbarProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);

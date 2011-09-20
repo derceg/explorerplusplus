@@ -184,7 +184,7 @@ void Explorerplusplus::CreateBookmarksToolbar(void)
 		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
 	m_pBookmarksToolbar = new CBookmarksToolbar(m_hBookmarksToolbar,
-		*m_bfAllBookmarks,m_guidBookmarksToolbar,TOOLBAR_BOOKMARK_START);
+		*m_bfAllBookmarks,m_guidBookmarksToolbar,TOOLBAR_BOOKMARK_START,TOOLBAR_BOOKMARK_END);
 }
 
 void Explorerplusplus::CreateDrivesToolbar(void)
@@ -572,20 +572,6 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 				StringCchPrintf(ptbgit->pszText,ptbgit->cchTextMax,_T("%s\n%s"),
 					pab->szName,pab->szCommand);
 			}
-		}
-	}
-	else if(ptbgit->iItem >= TOOLBAR_BOOKMARK_START)
-	{
-		TBBUTTON	tbButton;
-		int			iIndex;
-
-		iIndex = (int)SendMessage(m_hBookmarksToolbar,TB_COMMANDTOINDEX,ptbgit->iItem,0);
-
-		if(iIndex != -1)
-		{
-			SendMessage(m_hBookmarksToolbar,TB_GETBUTTON,iIndex,(LPARAM)&tbButton);
-
-			/* TODO: [Bookmarks] Show info tip. */
 		}
 	}
 }

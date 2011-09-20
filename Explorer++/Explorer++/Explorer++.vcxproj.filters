@@ -139,6 +139,9 @@
     <ClCompile Include="BookmarksToolbar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkIPHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="DrivesToolbar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -244,6 +247,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BookmarksToolbar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkIPHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DisplayColoursDialog.h">
