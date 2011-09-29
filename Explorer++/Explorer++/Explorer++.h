@@ -76,6 +76,8 @@ public:
 	INT_PTR CALLBACK	ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 
+	LRESULT CALLBACK	MainWndTaskbarThumbnailProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
+
 	void				FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
 
 	/* Directory modification. */
@@ -569,6 +571,7 @@ private:
 	void					ToggleFolders(void);
 
 	/* Windows 7 taskbar thumbnail previews. */
+	void					InitializeTaskbarThumbnails();
 	ATOM					RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirectory);
 	void					CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwitchToNewTab);
 	void					RegisterTab(HWND hTabProxy,TCHAR *szDisplayName,BOOL bTabActive);

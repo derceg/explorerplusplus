@@ -68,332 +68,262 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 
 LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
-	if(Msg == m_uTaskbarButtonCreatedMessage)
+	switch(Msg)
 	{
-		HMODULE hUser32;
-		ChangeWindowMessageFilterProc ChangeWindowMessageFilter;
+	case WM_CREATE:
+		OnWindowCreate();
+		break;
 
-		if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
-			m_dwMinorVersion == 0) ||
-			m_dwMajorVersion < WINDOWS_VISTA_SEVEN_MAJORVERSION)
-		{
-			return 0;
-		}
-
-		if(!m_bShowTaskbarThumbnails)
-		{
-			return 0;
-		}
-
-		hUser32 = LoadLibrary(_T("user32.dll"));
-
-		if(hUser32 != NULL)
-		{
-			/* If directly targeting Windows 7, this can be switched
-			to static, rather than dynamic linking. */
-			ChangeWindowMessageFilter = (ChangeWindowMessageFilterProc)GetProcAddress(hUser32,"ChangeWindowsMessageFilter");
-
-			if(ChangeWindowMessageFilter != NULL)
-			{
-				ChangeWindowMessageFilter(WM_DWMSENDICONICTHUMBNAIL,MSGFLT_ADD);
-				ChangeWindowMessageFilter(WM_DWMSENDICONICLIVEPREVIEWBITMAP,MSGFLT_ADD);
-			}
-
-			FreeLibrary(hUser32);
-		}
-
-		if(m_pTaskbarList3 != NULL)
-		{
-			m_pTaskbarList3->Release();
-		}
-
-		CoCreateInstance(CLSID_TaskbarList,NULL,CLSCTX_INPROC_SERVER,
-			IID_ITaskbarList4,(LPVOID *)&m_pTaskbarList3);
-
-		m_pTaskbarList3->HrInit();
-
-		m_bTaskbarInitialised = TRUE;
-
-		/* Add each of the jump list tasks. */
-		SetupJumplistTasks();
-
-		std::list<TabProxyInfo_t>::iterator itr;
-		LPITEMIDLIST pidlDirectory = NULL;
-		BOOL bActive;
-
-		/* Register each of the tabs. */
-		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
-		{
-			bActive = (itr->iTabId == m_iObjectIndex);
-
-			RegisterTab(itr->hProxy,EMPTY_STRING,bActive);
-			HandleTabText(itr->iTabId);
-			SetTabIcon(itr->iTabId);
-
-			CoTaskMemFree(pidlDirectory);
-		}
-
+	case WM_SETFOCUS:
+		OnSetFocus();
 		return 0;
-	}
-	else
-	{
-		switch(Msg)
+		break;
+
+	case CBN_KEYDOWN:
+		OnComboBoxKeyDown(wParam);
+		break;
+
+	case WM_INITMENU:
+		m_pCustomMenu->OnInitMenu(wParam);
+		SetProgramMenuItemStates((HMENU)wParam);
+		break;
+
+	case WM_MENUSELECT:
+		StatusBarMenuSelect(wParam,lParam);
+		break;
+
+	case WM_MEASUREITEM:
+		return OnMeasureItem(wParam,lParam);
+		break;
+
+	case WM_DRAWITEM:
+		return OnDrawItem(wParam,lParam);
+		break;
+
+	case WM_DEVICECHANGE:
+		OnDeviceChange(wParam,lParam);
+		break;
+
+	case WM_USER_UPDATEWINDOWS:
+		UpdateWindowStates();
+		break;
+
+	case WM_USER_FILESADDED:
+		/* Runs in the context of the main thread. Either
+		occurs after the specified tab index has been
+		freed (in which case nothing happens), or before. */
+		if(CheckTabIdStatus((int)wParam))
+			m_pShellBrowser[wParam]->DirectoryAltered();
+		break;
+
+	case WM_USER_RELEASEBROWSER:
+		m_pShellBrowser[(int)wParam]->Release();
+		m_pShellBrowser[(int)wParam] = NULL;
+		m_pFolderView[(int)wParam]->Release();
+		m_pFolderView[(int)wParam] = NULL;
+		break;
+
+	case WM_USER_TREEVIEW_GAINEDFOCUS:
+		m_hLastActiveWindow = m_hTreeView;
+		break;
+
+	case WM_APP_TABMCLICK:
+		OnTabMClick(wParam,lParam);
+		break;
+
+	case WM_USER_DISPLAYWINDOWRESIZED:
+		OnDisplayWindowResized(wParam);
+		break;
+
+	case WM_USER_STARTEDBROWSING:
+		OnStartedBrowsing((int)wParam,(TCHAR *)lParam);
+		break;
+
+	case WM_USER_NEWITEMINSERTED:
+		OnShellNewItemCreated(lParam);
+		break;
+
+	case WM_USER_FOLDEREMPTY:
 		{
-		case WM_CREATE:
-			OnWindowCreate();
-			break;
-
-		case WM_SETFOCUS:
-			OnSetFocus();
-			return 0;
-			break;
-
-		case CBN_KEYDOWN:
-			OnComboBoxKeyDown(wParam);
-			break;
-
-		case WM_INITMENU:
-			m_pCustomMenu->OnInitMenu(wParam);
-			SetProgramMenuItemStates((HMENU)wParam);
-			break;
-
-		case WM_MENUSELECT:
-			StatusBarMenuSelect(wParam,lParam);
-			break;
-
-		case WM_MEASUREITEM:
-			return OnMeasureItem(wParam,lParam);
-			break;
-
-		case WM_DRAWITEM:
-			return OnDrawItem(wParam,lParam);
-			break;
-
-		case WM_DEVICECHANGE:
-			OnDeviceChange(wParam,lParam);
-			break;
-
-		case WM_USER_UPDATEWINDOWS:
-			UpdateWindowStates();
-			break;
-
-		case WM_USER_FILESADDED:
-			/* Runs in the context of the main thread. Either
-			occurs after the specified tab index has been
-			freed (in which case nothing happens), or before. */
-			if(CheckTabIdStatus((int)wParam))
-				m_pShellBrowser[wParam]->DirectoryAltered();
-			break;
-
-		case WM_USER_RELEASEBROWSER:
-			m_pShellBrowser[(int)wParam]->Release();
-			m_pShellBrowser[(int)wParam] = NULL;
-			m_pFolderView[(int)wParam]->Release();
-			m_pFolderView[(int)wParam] = NULL;
-			break;
-
-		case WM_USER_TREEVIEW_GAINEDFOCUS:
-			m_hLastActiveWindow = m_hTreeView;
-			break;
-
-		case WM_APP_TABMCLICK:
-			OnTabMClick(wParam,lParam);
-			break;
-
-		case WM_USER_DISPLAYWINDOWRESIZED:
-			OnDisplayWindowResized(wParam);
-			break;
-
-		case WM_USER_STARTEDBROWSING:
-			OnStartedBrowsing((int)wParam,(TCHAR *)lParam);
-			break;
-
-		case WM_USER_NEWITEMINSERTED:
-			OnShellNewItemCreated(lParam);
-			break;
-
-		case WM_USER_FOLDEREMPTY:
-			{
-				if((BOOL)lParam == TRUE)
-					NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],IDB_FOLDEREMPTY);
-				else
-					NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],NULL);
-			}
-			break;
-
-		case WM_USER_FILTERINGAPPLIED:
-			{
-				if((BOOL)lParam == TRUE)
-					NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],IDB_FILTERINGAPPLIED);
-				else
-					NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],NULL);
-			}
-			break;
-
-		case WM_USER_GETCOLUMNNAMEINDEX:
-			return LookupColumnNameStringIndex((int)wParam);
-			break;
-
-		case WM_USER_DIRECTORYMODIFIED:
-			OnDirectoryModified((int)wParam);
-			break;
-
-		case WM_APP_ASSOCCHANGED:
-			OnAssocChanged();
-			break;
-
-		case WM_USER_HOLDERRESIZED:
-			{
-				RECT	rc;
-
-				m_TreeViewWidth = (int)lParam + TREEVIEW_DRAG_OFFSET;
-
-				GetClientRect(m_hContainer,&rc);
-
-				SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,(LPARAM)MAKELPARAM(rc.right,rc.bottom));
-			}
-			break;
-
-		case WM_APP_FOLDERSIZECOMPLETED:
-			{
-				DWFolderSizeCompletion_t *pDWFolderSizeCompletion = NULL;
-				TCHAR szFolderSize[32];
-				TCHAR szSizeString[64];
-				TCHAR szTotalSize[64];
-				BOOL bValid = FALSE;
-
-				pDWFolderSizeCompletion = (DWFolderSizeCompletion_t *)wParam;
-
-				std::list<DWFolderSize_t>::iterator itr;
-
-				/* First, make sure we should still display the
-				results (we won't if the listview selection has
-				changed, or this folder size was calculated for
-				a tab other than the current one). */
-				for(itr = m_DWFolderSizes.begin();itr != m_DWFolderSizes.end();itr++)
-				{
-					if(itr->uId == pDWFolderSizeCompletion->uId)
-					{
-						if(itr->iTabId == m_iObjectIndex)
-						{
-							bValid = itr->bValid;
-						}
-
-						m_DWFolderSizes.erase(itr);
-
-						break;
-					}
-				}
-
-				if(bValid)
-				{
-					FormatSizeString(pDWFolderSizeCompletion->liFolderSize,szFolderSize,
-						SIZEOF_ARRAY(szFolderSize),m_bForceSize,m_SizeDisplayFormat);
-
-					LoadString(g_hLanguageModule,IDS_GENERAL_TOTALSIZE,
-						szTotalSize,SIZEOF_ARRAY(szTotalSize));
-
-					StringCchPrintf(szSizeString,SIZEOF_ARRAY(szSizeString),
-						_T("%s: %s"),szTotalSize,szFolderSize);
-
-					/* TODO: The line index should be stored in some other (variable) way. */
-					DisplayWindow_SetLine(m_hDisplayWindow,FOLDER_SIZE_LINE_INDEX,szSizeString);
-				}
-
-				free(pDWFolderSizeCompletion);
-			}
-			break;
-
-		case WM_COPYDATA:
-			{
-				COPYDATASTRUCT *pcds = reinterpret_cast<COPYDATASTRUCT *>(lParam);
-
-				if(pcds->cbData < sizeof(NExplorerplusplus::IPNotificationType_t))
-				{
-					return FALSE;
-				}
-
-				NExplorerplusplus::IPNotificationType_t *ipnt = reinterpret_cast<NExplorerplusplus::IPNotificationType_t *>(pcds->lpData);
-
-				switch(*ipnt)
-				{
-				case NExplorerplusplus::IP_NOTIFICATION_TYPE_NEW_TAB:
-					/* TODO: */
-					break;
-
-				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_ADDED:
-				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_ADDED:
-				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_MODIFIED:
-				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_MODIFIED:
-				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_REMOVED:
-				case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_REMOVED:
-					{
-						m_pipbo->OnNotificationReceived(*ipnt,pcds->lpData);
-					}
-					break;
-
-				default:
-					return FALSE;
-					break;
-				}
-
-				/* TODO: */
-				/*if(pcds->lpData != NULL)
-				{
-					BrowseFolder((TCHAR *)pcds->lpData,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-				}
-				else
-				{
-					HRESULT hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-
-					if(FAILED(hr))
-						BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-				}*/
-
-				return TRUE;
-			}
-			break;
-
-		case WM_NDW_RCLICK:
-			OnNdwRClick(wParam,lParam);
-			break;
-
-		case WM_NDW_ICONRCLICK:
-			OnNdwIconRClick(wParam,lParam);
-			break;
-
-		case WM_CHANGECBCHAIN:
-			OnChangeCBChain(wParam,lParam);
-			break;
-
-		case WM_DRAWCLIPBOARD:
-			OnDrawClipboard();
-			break;
-
-		case WM_APPCOMMAND:
-			OnAppCommand(wParam,lParam);
-			break;
-
-		case WM_COMMAND:
-			return CommandHandler(hwnd,Msg,wParam,lParam);
-			break;
-
-		case WM_NOTIFY:
-			return NotifyHandler(hwnd,Msg,wParam,lParam);
-			break;
-
-		case WM_SIZE:
-			return OnSize(LOWORD(lParam),HIWORD(lParam));
-			break;
-
-		case WM_CLOSE:
-			return OnClose();
-			break;
-
-		case WM_DESTROY:
-			return OnDestroy();
-			break;
+			if((BOOL)lParam == TRUE)
+				NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],IDB_FOLDEREMPTY);
+			else
+				NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],NULL);
 		}
+		break;
+
+	case WM_USER_FILTERINGAPPLIED:
+		{
+			if((BOOL)lParam == TRUE)
+				NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],IDB_FILTERINGAPPLIED);
+			else
+				NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],NULL);
+		}
+		break;
+
+	case WM_USER_GETCOLUMNNAMEINDEX:
+		return LookupColumnNameStringIndex((int)wParam);
+		break;
+
+	case WM_USER_DIRECTORYMODIFIED:
+		OnDirectoryModified((int)wParam);
+		break;
+
+	case WM_APP_ASSOCCHANGED:
+		OnAssocChanged();
+		break;
+
+	case WM_USER_HOLDERRESIZED:
+		{
+			RECT	rc;
+
+			m_TreeViewWidth = (int)lParam + TREEVIEW_DRAG_OFFSET;
+
+			GetClientRect(m_hContainer,&rc);
+
+			SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,(LPARAM)MAKELPARAM(rc.right,rc.bottom));
+		}
+		break;
+
+	case WM_APP_FOLDERSIZECOMPLETED:
+		{
+			DWFolderSizeCompletion_t *pDWFolderSizeCompletion = NULL;
+			TCHAR szFolderSize[32];
+			TCHAR szSizeString[64];
+			TCHAR szTotalSize[64];
+			BOOL bValid = FALSE;
+
+			pDWFolderSizeCompletion = (DWFolderSizeCompletion_t *)wParam;
+
+			std::list<DWFolderSize_t>::iterator itr;
+
+			/* First, make sure we should still display the
+			results (we won't if the listview selection has
+			changed, or this folder size was calculated for
+			a tab other than the current one). */
+			for(itr = m_DWFolderSizes.begin();itr != m_DWFolderSizes.end();itr++)
+			{
+				if(itr->uId == pDWFolderSizeCompletion->uId)
+				{
+					if(itr->iTabId == m_iObjectIndex)
+					{
+						bValid = itr->bValid;
+					}
+
+					m_DWFolderSizes.erase(itr);
+
+					break;
+				}
+			}
+
+			if(bValid)
+			{
+				FormatSizeString(pDWFolderSizeCompletion->liFolderSize,szFolderSize,
+					SIZEOF_ARRAY(szFolderSize),m_bForceSize,m_SizeDisplayFormat);
+
+				LoadString(g_hLanguageModule,IDS_GENERAL_TOTALSIZE,
+					szTotalSize,SIZEOF_ARRAY(szTotalSize));
+
+				StringCchPrintf(szSizeString,SIZEOF_ARRAY(szSizeString),
+					_T("%s: %s"),szTotalSize,szFolderSize);
+
+				/* TODO: The line index should be stored in some other (variable) way. */
+				DisplayWindow_SetLine(m_hDisplayWindow,FOLDER_SIZE_LINE_INDEX,szSizeString);
+			}
+
+			free(pDWFolderSizeCompletion);
+		}
+		break;
+
+	case WM_COPYDATA:
+		{
+			COPYDATASTRUCT *pcds = reinterpret_cast<COPYDATASTRUCT *>(lParam);
+
+			if(pcds->cbData < sizeof(NExplorerplusplus::IPNotificationType_t))
+			{
+				return FALSE;
+			}
+
+			NExplorerplusplus::IPNotificationType_t *ipnt = reinterpret_cast<NExplorerplusplus::IPNotificationType_t *>(pcds->lpData);
+
+			switch(*ipnt)
+			{
+			case NExplorerplusplus::IP_NOTIFICATION_TYPE_NEW_TAB:
+				/* TODO: */
+				break;
+
+			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_ADDED:
+			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_ADDED:
+			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_MODIFIED:
+			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_MODIFIED:
+			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_REMOVED:
+			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_REMOVED:
+				{
+					m_pipbo->OnNotificationReceived(*ipnt,pcds->lpData);
+				}
+				break;
+
+			default:
+				return FALSE;
+				break;
+			}
+
+			/* TODO: */
+			/*if(pcds->lpData != NULL)
+			{
+			BrowseFolder((TCHAR *)pcds->lpData,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+			}
+			else
+			{
+			HRESULT hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+
+			if(FAILED(hr))
+			BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+			}*/
+
+			return TRUE;
+		}
+		break;
+
+	case WM_NDW_RCLICK:
+		OnNdwRClick(wParam,lParam);
+		break;
+
+	case WM_NDW_ICONRCLICK:
+		OnNdwIconRClick(wParam,lParam);
+		break;
+
+	case WM_CHANGECBCHAIN:
+		OnChangeCBChain(wParam,lParam);
+		break;
+
+	case WM_DRAWCLIPBOARD:
+		OnDrawClipboard();
+		break;
+
+	case WM_APPCOMMAND:
+		OnAppCommand(wParam,lParam);
+		break;
+
+	case WM_COMMAND:
+		return CommandHandler(hwnd,Msg,wParam,lParam);
+		break;
+
+	case WM_NOTIFY:
+		return NotifyHandler(hwnd,Msg,wParam,lParam);
+		break;
+
+	case WM_SIZE:
+		return OnSize(LOWORD(lParam),HIWORD(lParam));
+		break;
+
+	case WM_CLOSE:
+		return OnClose();
+		break;
+
+	case WM_DESTROY:
+		return OnDestroy();
+		break;
 	}
 
 	return DefWindowProc(hwnd,Msg,wParam,lParam);

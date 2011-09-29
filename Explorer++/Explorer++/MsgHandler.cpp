@@ -85,8 +85,7 @@ void Explorerplusplus::OnWindowCreate(void)
 {
 	ILoadSave *pLoadSave = NULL;
 
-	m_bTaskbarInitialised = FALSE;
-	m_uTaskbarButtonCreatedMessage = RegisterWindowMessage(_T("TaskbarButtonCreated"));
+	InitializeTaskbarThumbnails();
 
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
@@ -2828,34 +2827,6 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 			}
 		}
 	}
-}
-
-void Explorerplusplus::SetupJumplistTasks()
-{
-	std::list<JumpListTaskInformation> TaskList;
-
-	JumpListTaskInformation jlti;
-
-	TCHAR szCurrentProcess[MAX_PATH];
-
-	GetCurrentProcessImageName(szCurrentProcess,
-		SIZEOF_ARRAY(szCurrentProcess));
-
-	TCHAR szName[256];
-
-	LoadString(g_hLanguageModule,
-		IDS_TASKS_NEWTAB,szName,SIZEOF_ARRAY(szName));
-
-	/* New tab task. */
-	jlti.pszName		= szName;
-	jlti.pszPath		= szCurrentProcess;
-	jlti.pszArguments	= NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT;
-	jlti.pszIconPath	= szCurrentProcess;
-	jlti.iIcon			= 1;
-
-	TaskList.push_back(jlti);
-
-	AddJumpListTasks(TaskList);
 }
 
 void Explorerplusplus::PlayNavigationSound(void)

@@ -309,6 +309,7 @@
     <ClCompile Include="TabContainer.cpp" />
     <ClCompile Include="TabDropHandler.cpp" />
     <ClCompile Include="TabHandler.cpp" />
+    <ClCompile Include="TaskbarThumbnails.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
     <ClCompile Include="WildcardSelectDialog.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
