@@ -386,6 +386,7 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 				FORMATETC ftcfcis;
 				FORMATETC ftcfcstg;
 				STGMEDIUM stgFileContents = {0};
+				BOOL bDataCopied = FALSE;
 				BOOL bDataRetrieved = FALSE;
 				LPBYTE pBuffer = NULL;
 
@@ -485,40 +486,31 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 
 					case TYMED_ISTORAGE:
 						{
-							IStream *pStream;
-							STATSTG sstg;
-							ULONG cbRead;
+							TCHAR szFullFileName[MAX_PATH];
+							StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_szDestDirectory);
+							PathAppend(szFullFileName,pfgd->fgd[i].cFileName);
 
-							hr = stgFileContents.pstg->Stat(&sstg,STATFLAG_DEFAULT);
+							IStorage *pStorage = NULL;
+							hr = StgCreateStorageEx(szFullFileName,STGM_READWRITE|STGM_TRANSACTED|STGM_CREATE,STGFMT_STORAGE,
+								0,NULL,NULL,IID_IStorage,reinterpret_cast<void **>(&pStorage));
 
 							if(hr == S_OK)
 							{
-								hr = stgFileContents.pstg->OpenStream(sstg.pwcsName,NULL,
-									STGM_READ|STGM_SHARE_EXCLUSIVE,0,&pStream);
+								hr = stgFileContents.pstg->CopyTo(0,NULL,NULL,pStorage);
 
 								if(hr == S_OK)
 								{
-									CoTaskMemFree(sstg.pwcsName);
-
-									hr = pStream->Stat(&sstg,STATFLAG_NONAME);
+									hr = pStorage->Commit(STGC_DEFAULT);
 
 									if(hr == S_OK)
 									{
-										pBuffer = (LPBYTE)malloc(sstg.cbSize.LowPart * sizeof(BYTE));
+										PastedFileList.push_back(pfgd->fgd[i].cFileName);
 
-										if(pBuffer != NULL)
-										{
-											/* If the file size isn't explicitly given,
-											use the size of the stream. */
-											if(!(pfgd->fgd[i].dwFlags & FD_FILESIZE))
-												nBytesToWrite = sstg.cbSize.LowPart;
-
-											pStream->Read(pBuffer,sstg.cbSize.LowPart,&cbRead);
-
-											bDataRetrieved = TRUE;
-										}
+										bDataCopied = TRUE;
 									}
 								}
+
+								pStorage->Release();
 							}
 						}
 						break;
@@ -527,7 +519,8 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 					ReleaseStgMedium(&stgFileContents);
 				}
 
-				if(bDataRetrieved)
+				if(bDataRetrieved &&
+					!bDataCopied)
 				{
 					TCHAR szFullFileName[MAX_PATH];
 
