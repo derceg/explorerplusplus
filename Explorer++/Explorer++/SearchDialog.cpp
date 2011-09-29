@@ -23,6 +23,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/XMLSettings.h"
+#include "../Helper/ComboBox.h"
 #include "../Helper/Macros.h"
 
 
@@ -75,9 +76,6 @@ CSearchDialog::~CSearchDialog()
 
 INT_PTR CSearchDialog::OnInitDialog()
 {
-	SetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_sdps->m_szSearchPattern);
-	SetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,m_szSearchDirectory);
-
 	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
 	ImageList_Add(himl,hBitmap,NULL);
@@ -135,44 +133,23 @@ INT_PTR CSearchDialog::OnInitDialog()
 	lCheckDlgButton(m_hDlg,IDC_CHECK_CASEINSENSITIVE,m_sdps->m_bCaseInsensitive);
 	lCheckDlgButton(m_hDlg,IDC_CHECK_USEREGULAREXPRESSIONS,m_sdps->m_bUseRegularExpressions);
 
-	HWND hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
-	HWND hComboBox = reinterpret_cast<HWND>(SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0));
-
-	int iItem = 0;
-
 	for each(auto strDirectory in m_sdps->m_SearchDirectories)
 	{
-		TCHAR szDirectory[MAX_PATH];
-
-		StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),strDirectory.c_str());
-
-		COMBOBOXEXITEM cbi;
-		cbi.mask	= CBEIF_TEXT;
-		cbi.iItem	= iItem++;
-		cbi.pszText	= szDirectory;
-		SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,reinterpret_cast<LPARAM>(&cbi));
+		SendDlgItemMessage(m_hDlg,IDC_COMBO_DIRECTORY,CB_INSERTSTRING,static_cast<WPARAM>(-1),
+			reinterpret_cast<LPARAM>(strDirectory.c_str()));
 	}
-
-	ComboBox_SetCurSel(hComboBox,0);
-
-	hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_NAME);
-	hComboBox = reinterpret_cast<HWND>(SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0));
-	iItem = 0;
 
 	for each(auto strPattern in *m_sdps->m_pSearchPatterns)
 	{
-		TCHAR szPattern[MAX_PATH];
-
-		StringCchCopy(szPattern,SIZEOF_ARRAY(szPattern),strPattern.c_str());
-
-		COMBOBOXEXITEM cbi;
-		cbi.mask	= CBEIF_TEXT;
-		cbi.iItem	= iItem++;
-		cbi.pszText	= szPattern;
-		SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,reinterpret_cast<LPARAM>(&cbi));
+		SendDlgItemMessage(m_hDlg,IDC_COMBO_NAME,CB_INSERTSTRING,static_cast<WPARAM>(-1),
+			reinterpret_cast<LPARAM>(strPattern.c_str()));
 	}
 
-	ComboBox_SetCurSel(hComboBox,0);
+	SetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_sdps->m_szSearchPattern);
+	SetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,m_szSearchDirectory);
+
+	CComboBox::CreateNew(GetDlgItem(m_hDlg,IDC_COMBO_NAME));
+	CComboBox::CreateNew(GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY));
 
 	if(m_sdps->m_bStateSaved)
 	{
@@ -428,14 +405,8 @@ void CSearchDialog::OnSearch()
 			/* TODO: Switch to circular buffer. */
 			m_sdps->m_SearchDirectories.push_front(szBaseDirectory);
 
-			HWND hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
-			HWND hComboBox = reinterpret_cast<HWND>(SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0));
-
-			COMBOBOXEXITEM cbi;
-			cbi.mask	= CBEIF_TEXT;
-			cbi.iItem	= 0;
-			cbi.pszText	= szBaseDirectory;
-			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,reinterpret_cast<LPARAM>(&cbi));
+			HWND hComboBox = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
+			SendMessage(hComboBox,CB_INSERTSTRING,0,reinterpret_cast<LPARAM>(szBaseDirectory));
 
 			ComboBox_SetCurSel(hComboBox,0);
 		}
@@ -458,8 +429,7 @@ void CSearchDialog::OnSearch()
 			auto itr = std::find_if(m_sdps->m_pSearchPatterns->begin(),m_sdps->m_pSearchPatterns->end(),
 				[strSearchPatternOriginal](const std::wstring Pattern){return Pattern.compare(strSearchPatternOriginal) == 0;});
 
-			HWND hComboBoxEx = GetDlgItem(m_hDlg,IDC_COMBO_NAME);
-			HWND hComboBox = reinterpret_cast<HWND>(SendMessage(hComboBoxEx,CBEM_GETCOMBOCONTROL,0,0));
+			HWND hComboBox = GetDlgItem(m_hDlg,IDC_COMBO_NAME);
 
 			ComboBox_SetCurSel(hComboBox,-1);
 
@@ -468,22 +438,20 @@ void CSearchDialog::OnSearch()
 			if(itr != m_sdps->m_pSearchPatterns->end())
 			{
 				auto index = std::distance(m_sdps->m_pSearchPatterns->begin(),itr);
-				SendMessage(hComboBoxEx,CBEM_DELETEITEM,index,0);
+				SendMessage(hComboBox,CB_DELETESTRING,index,0);
 
 				m_sdps->m_pSearchPatterns->erase(itr);
 			}
 
 			m_sdps->m_pSearchPatterns->push_front(szSearchPatternOriginal);
 
-			COMBOBOXEXITEM cbi;
-			cbi.mask	= CBEIF_TEXT;
-			cbi.iItem	= 0;
-			cbi.pszText	= szSearchPatternOriginal;
-			SendMessage(hComboBoxEx,CBEM_INSERTITEM,0,reinterpret_cast<LPARAM>(&cbi));
+			SendMessage(hComboBox,CB_INSERTSTRING,0,reinterpret_cast<LPARAM>(szSearchPatternOriginal));
+			ComboBox_SetCurSel(hComboBox,0);
+			ComboBox_SetEditSel(hComboBox,-1,-1);
 
 			if(ComboBox_GetCount(hComboBox) > m_sdps->m_pSearchPatterns->capacity())
 			{
-				SendMessage(hComboBoxEx,CBEM_DELETEITEM,ComboBox_GetCount(hComboBox) - 1,0);
+				SendMessage(hComboBox,CB_DELETESTRING,ComboBox_GetCount(hComboBox) - 1,0);
 			}
 		}
 

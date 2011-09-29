@@ -168,6 +168,8 @@
     <ClCompile Include="BaseDialog.cpp" />
     <ClCompile Include="BaseWindow.cpp" />
     <ClCompile Include="Bookmark.cpp" />
+    <ClCompile Include="ComboBox.cpp" />
+    <ClCompile Include="ComboBoxHelper.cpp" />
     <ClCompile Include="ContextMenuManager.cpp" />
     <ClCompile Include="Controls.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
@@ -208,6 +210,8 @@
     <ClInclude Include="BaseDialog.h" />
     <ClInclude Include="BaseWindow.h" />
     <ClInclude Include="Bookmark.h" />
+    <ClInclude Include="ComboBox.h" />
+    <ClInclude Include="ComboBoxHelper.h" />
     <ClInclude Include="ContextMenuManager.h" />
     <ClInclude Include="Controls.h" />
     <ClInclude Include="CustomMenu.h" />
