@@ -21,6 +21,14 @@
 #include <gdiplus.h>
 #include <list>
 #include <assert.h>
+
+/* Temporarily disable the "conditional expression is
+constant" warning. */
+#pragma warning(push)
+#pragma warning(disable:4127)
+#include <boost\date_time\posix_time\posix_time.hpp>
+#pragma warning(pop)
+
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
@@ -1453,8 +1461,18 @@ void CFolderView::SetMediaStatusColumnData(int iItem,int iColumn,int iType)
 
 			if(SUCCEEDED(hr))
 			{
-				/* TODO: Fix (display actual time). */
-				StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("%d"),*pqwTemp);
+				boost::posix_time::wtime_facet *Facet = new boost::posix_time::wtime_facet();
+				Facet->time_duration_format(L"%H:%M:%S");
+
+				std::wstringstream DateStream;
+				DateStream.imbue(std::locale(DateStream.getloc(),Facet));
+
+				/* Note that the duration itself is in 100-nanosecond units
+				(see http://msdn.microsoft.com/en-us/library/windows/desktop/dd798053(v=vs.85).aspx). */
+				boost::posix_time::time_duration Duration = boost::posix_time::microseconds(*pqwTemp / 10);
+				DateStream << Duration;
+
+				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),DateStream.str().c_str());
 
 				free(pqwTemp);
 			}
