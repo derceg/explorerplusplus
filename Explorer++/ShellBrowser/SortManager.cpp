@@ -91,7 +91,7 @@ Drives
 Folders
 Normal items
 */
-int CALLBACK CFolderView::SortByName(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByName(LPARAM lParam1,LPARAM lParam2) const
 {
 	int ReturnValue;
 
@@ -162,7 +162,7 @@ int CALLBACK CFolderView::SortByName(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = StrCmpLogicalW(m_pExtraItemInfo[lParam1].szDisplayName,m_pExtraItemInfo[lParam2].szDisplayName);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -177,7 +177,7 @@ int CALLBACK SortBySizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortBySize(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortBySize(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortBySize(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -214,7 +214,7 @@ int CALLBACK CFolderView::SortBySize(LPARAM lParam1,LPARAM lParam2)
 			else
 				ReturnValue = 0;
 
-			if(!IsSortAscending())
+			if(!m_bSortAscending)
 				ReturnValue = -ReturnValue;
 		}
 
@@ -248,7 +248,7 @@ int CALLBACK CFolderView::SortBySize(LPARAM lParam1,LPARAM lParam2)
 	else
 		ReturnValue = 0;
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -263,7 +263,7 @@ int CALLBACK SortByTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortByType(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByType(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByType(LPARAM lParam1,LPARAM lParam2) const
 {
 	IShellFolder	*pShellFolder1 = NULL;
 	IShellFolder	*pShellFolder2 = NULL;
@@ -376,7 +376,7 @@ int CALLBACK CFolderView::SortByType(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = lstrcmp(shfi1.szTypeName,shfi2.szTypeName);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -391,7 +391,7 @@ int CALLBACK SortByDateModifiedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamS
 	return pFolderView->SortByDateModified(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByDateModified(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByDateModified(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByDate(lParam1,lParam2,DATE_MODIFIED);
 }
@@ -406,13 +406,13 @@ int CALLBACK SortByDateDeletedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSo
 }
 
 /* TODO: Implement. */
-int CFolderView::SortByDateDeleted(LPARAM lParam1,LPARAM lParam2)
+int CFolderView::SortByDateDeleted(LPARAM lParam1,LPARAM lParam2) const
 {
 	int			ReturnValue;
 
 	ReturnValue = 0;
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 		ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -424,7 +424,8 @@ DateType:
 1 - Modified.
 2 - Accessed;
 */
-int CFolderView::SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType)
+/* TODO: DateType -> enum. */
+int CFolderView::SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType) const
 {
 	BOOL	IsFolder1;
 	BOOL	IsFolder2;
@@ -454,7 +455,7 @@ int CFolderView::SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType)
 				break;
 		}
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -485,7 +486,7 @@ int CFolderView::SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType)
 			break;
 	}
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 		ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -500,7 +501,7 @@ int CALLBACK SortByTotalSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort
 	return pFolderView->SortByTotalSize(lParam1,lParam2,TRUE);
 }
 
-int CALLBACK CFolderView::SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize)
+int CALLBACK CFolderView::SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize) const
 {
 	IShellFolder	*pShellFolder1 = NULL;
 	IShellFolder	*pShellFolder2 = NULL;
@@ -589,13 +590,13 @@ int CALLBACK SortByOriginalLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lPa
 }
 
 /* TODO: Implement. */
-int CALLBACK CFolderView::SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2) const
 {
 	int			ReturnValue;
 
 	ReturnValue = 0;
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -610,7 +611,7 @@ int CALLBACK SortByAttributesStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSor
 	return pFolderView->SortByAttributes(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByAttributes(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByAttributes(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -632,7 +633,7 @@ int CALLBACK CFolderView::SortByAttributes(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -665,7 +666,7 @@ int CALLBACK CFolderView::SortByAttributes(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = lstrcmp(szAttributes1,szAttributes2);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -680,7 +681,7 @@ int CALLBACK SortByRealSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortByRealSize(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByRealSize(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByRealSize(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -701,7 +702,7 @@ int CALLBACK CFolderView::SortByRealSize(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -745,7 +746,7 @@ int CALLBACK CFolderView::SortByRealSize(LPARAM lParam1,LPARAM lParam2)
 	else
 		ReturnValue = 0;
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -760,7 +761,7 @@ int CALLBACK SortByShortNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort
 	return pFolderView->SortByShortName(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByShortName(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByShortName(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -778,7 +779,7 @@ int CALLBACK CFolderView::SortByShortName(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -800,7 +801,7 @@ int CALLBACK CFolderView::SortByShortName(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = lstrcmp(m_pwfdFiles[lParam1].cAlternateFileName,m_pwfdFiles[lParam2].cAlternateFileName);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -815,7 +816,7 @@ int CALLBACK SortByOwnerStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortByOwner(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByOwner(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByOwner(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -837,7 +838,7 @@ int CALLBACK CFolderView::SortByOwner(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -865,7 +866,7 @@ int CALLBACK CFolderView::SortByOwner(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = lstrcmp(szOwner1,szOwner2);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -880,7 +881,7 @@ int CALLBACK SortByProductNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSo
 	return pFolderView->SortByProductName(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByProductName(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByProductName(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByVersionInfo(lParam1,lParam2,VERSION_PRODUCTNAME);
 }
@@ -894,7 +895,7 @@ int CALLBACK SortByCompanyStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortByCompany(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByCompany(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByCompany(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByVersionInfo(lParam1,lParam2,VERSION_COMPANY);
 }
@@ -908,7 +909,7 @@ int CALLBACK SortByDescriptionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSo
 	return pFolderView->SortByDescription(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByDescription(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByDescription(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByVersionInfo(lParam1,lParam2,VERSION_DESCRIPTION);
 }
@@ -922,7 +923,7 @@ int CALLBACK SortByFileVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSo
 	return pFolderView->SortByFileVersion(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByFileVersion(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByFileVersion(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByVersionInfo(lParam1,lParam2,VERSION_FILEVERSION);
 }
@@ -936,12 +937,12 @@ int CALLBACK SortByProductVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lPara
 	return pFolderView->SortByProductVersion(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByProductVersion(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByProductVersion(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByVersionInfo(lParam1,lParam2,VERSION_PRODUCTVERSION);
 }
 
-int CALLBACK CFolderView::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int VersionProperty)
+int CALLBACK CFolderView::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int VersionProperty) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -963,7 +964,7 @@ int CALLBACK CFolderView::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int Ve
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -994,7 +995,7 @@ int CALLBACK CFolderView::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int Ve
 
 	ReturnValue = lstrcmp(szVersionBuf1,szVersionBuf2);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1009,7 +1010,7 @@ int CALLBACK SortByShortcutToStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSor
 	return pFolderView->SortByShortcutTo(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1031,7 +1032,7 @@ int CALLBACK CFolderView::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -1062,7 +1063,7 @@ int CALLBACK CFolderView::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = lstrcmp(szResolvedLinkPath1,szResolvedLinkPath2);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1077,7 +1078,7 @@ int CALLBACK SortByHardlinksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort
 	return pFolderView->SortByHardlinks(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByHardlinks(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1099,7 +1100,7 @@ int CALLBACK CFolderView::SortByHardlinks(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -1127,7 +1128,7 @@ int CALLBACK CFolderView::SortByHardlinks(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = dwNumHardLinks1 - dwNumHardLinks2;
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1142,7 +1143,7 @@ int CALLBACK SortByExtensionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort
 	return pFolderView->SortByExtension(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByExtension(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByExtension(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1164,7 +1165,7 @@ int CALLBACK CFolderView::SortByExtension(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -1193,7 +1194,7 @@ int CALLBACK CFolderView::SortByExtension(LPARAM lParam1,LPARAM lParam2)
 	/* TODO: Need to check if pExt == NULL. */
 	ReturnValue = lstrcmp(pExt1,pExt2);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1208,7 +1209,7 @@ int CALLBACK SortByDateCreatedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSo
 	return pFolderView->SortByDateCreated(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByDateCreated(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByDateCreated(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByDate(lParam1,lParam2,DATE_CREATED);
 }
@@ -1222,7 +1223,7 @@ int CALLBACK SortByDateAccessedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamS
 	return pFolderView->SortByDateAccessed(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByDateAccessed(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByDateAccessed(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByDate(lParam1,lParam2,DATE_ACCESSED);
 }
@@ -1236,7 +1237,7 @@ int CALLBACK SortByTitleStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortByTitle(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByTitle(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByTitle(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_TITLE);
 }
@@ -1250,7 +1251,7 @@ int CALLBACK SortBySubjectStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortBySubject(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortBySubject(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortBySubject(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_SUBJECT);
 }
@@ -1264,7 +1265,7 @@ int CALLBACK SortByAuthorStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortByAuthor(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByAuthor(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByAuthor(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_AUTHOR);
 }
@@ -1278,7 +1279,7 @@ int CALLBACK SortByKeywordsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortByKeywords(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByKeywords(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByKeywords(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_KEYWORDS);
 }
@@ -1292,12 +1293,12 @@ int CALLBACK SortByCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortByComments(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByComments(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByComments(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_COMMENT);
 }
 
-int CALLBACK CFolderView::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DWORD dwPropertyType)
+int CALLBACK CFolderView::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DWORD dwPropertyType) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1319,7 +1320,7 @@ int CALLBACK CFolderView::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DW
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -1350,7 +1351,7 @@ int CALLBACK CFolderView::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DW
 
 	ReturnValue = lstrcmp(szPropertyBuf1,szPropertyBuf2);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1365,7 +1366,7 @@ int CALLBACK SortByCameraModelStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSo
 	return pFolderView->SortByCameraModel(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByCameraModel(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByCameraModel(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByImageProperty(lParam1,lParam2,PropertyTagEquipModel);
 }
@@ -1379,7 +1380,7 @@ int CALLBACK SortByDateTakenStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort
 	return pFolderView->SortByDateTaken(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByDateTaken(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByDateTaken(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByImageProperty(lParam1,lParam2,PropertyTagDateTime);
 }
@@ -1393,7 +1394,7 @@ int CALLBACK SortByWidthStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortByWidth(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByWidth(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByWidth(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByImageProperty(lParam1,lParam2,PropertyTagImageWidth);
 }
@@ -1407,12 +1408,12 @@ int CALLBACK SortByHeightStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->SortByHeight(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByHeight(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByHeight(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByImageProperty(lParam1,lParam2,PropertyTagImageHeight);
 }
 
-int CALLBACK CFolderView::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId)
+int CALLBACK CFolderView::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1434,7 +1435,7 @@ int CALLBACK CFolderView::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROP
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -1465,7 +1466,7 @@ int CALLBACK CFolderView::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROP
 
 	ReturnValue = lstrcmp(szPropertyBuf1,szPropertyBuf2);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1480,7 +1481,7 @@ int CALLBACK SortByVirtualCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lPar
 	return pFolderView->SortByVirtualComments(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1500,7 +1501,7 @@ int CALLBACK CFolderView::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -1527,7 +1528,7 @@ int CALLBACK CFolderView::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = lstrcmp(szInfoTip1,szInfoTip2);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1542,7 +1543,7 @@ int CALLBACK SortByFileSystemStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSor
 	return pFolderView->SortByFileSystem(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByFileSystem(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const
 {
 	int				ReturnValue = 0;
 	TCHAR			szFullFileName1[MAX_PATH];
@@ -1604,7 +1605,7 @@ int CALLBACK CFolderView::SortByFileSystem(LPARAM lParam1,LPARAM lParam2)
 			ReturnValue = lstrcmp(szFileSystemName1,szFileSystemName2);
 	}
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 		ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1619,7 +1620,7 @@ int CALLBACK SortByVirtualTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSo
 	return pFolderView->SortByVirtualType(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByVirtualType(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByVirtualType(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1683,7 +1684,7 @@ int CALLBACK CFolderView::SortByVirtualType(LPARAM lParam1,LPARAM lParam2)
 		CoTaskMemFree(pidlComplete2);
 	}
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1698,7 +1699,7 @@ int CALLBACK SortByNumPrinterDocumentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM 
 	return pFolderView->SortByNumPrinterDocuments(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2) const
 {
 	HANDLE hPrinter1;
 	HANDLE hPrinter2;
@@ -1744,7 +1745,7 @@ int CALLBACK CFolderView::SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam
 	}
 
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 		ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1759,7 +1760,7 @@ int CALLBACK SortByPrinterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParam
 	return pFolderView->SortByPrinterStatus(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA *File1		= NULL;
 	WIN32_FIND_DATA *File2		= NULL;
@@ -1777,7 +1778,7 @@ int CALLBACK CFolderView::SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -1835,7 +1836,7 @@ int CALLBACK CFolderView::SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2)
 
 
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1850,7 +1851,7 @@ int CALLBACK SortByPrinterCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lPar
 	return pFolderView->SortByPrinterComments(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByPrinterComments(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA *File1		= NULL;
 	WIN32_FIND_DATA *File2		= NULL;
@@ -1872,7 +1873,7 @@ int CALLBACK CFolderView::SortByPrinterComments(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -1900,7 +1901,7 @@ int CALLBACK CFolderView::SortByPrinterComments(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = lstrcmp(shfi1.szTypeName,shfi2.szTypeName);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1915,7 +1916,7 @@ int CALLBACK SortByPrinterLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lPar
 	return pFolderView->SortByPrinterLocation(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA *File1		= NULL;
 	WIN32_FIND_DATA *File2		= NULL;
@@ -1937,7 +1938,7 @@ int CALLBACK CFolderView::SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!IsSortAscending())
+		if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
@@ -1965,7 +1966,7 @@ int CALLBACK CFolderView::SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = lstrcmp(shfi1.szTypeName,shfi2.szTypeName);
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -1980,7 +1981,7 @@ int CALLBACK SortByNetworkAdapterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM
 	return pFolderView->SortByNetworkAdapterStatus(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA *File1		= NULL;
 	WIN32_FIND_DATA *File2		= NULL;
@@ -2043,7 +2044,7 @@ int CALLBACK CFolderView::SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lPara
 
 	ReturnValue = 0;
 
-	if(!IsSortAscending())
+	if(!m_bSortAscending)
 			ReturnValue = -ReturnValue;
 
 	return ReturnValue;
@@ -2058,12 +2059,12 @@ int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 	return pFolderView->Sort(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::Sort(LPARAM lParam1,LPARAM lParam2)
+int CALLBACK CFolderView::Sort(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortItemsRelative(lParam1,lParam2);
 }
 
-int CFolderView::SortItemsRelative(LPARAM lParam1,LPARAM lParam2)
+int CFolderView::SortItemsRelative(LPARAM lParam1,LPARAM lParam2) const
 {
 	int iSort;
 
@@ -2078,7 +2079,7 @@ int CFolderView::SortItemsRelative(LPARAM lParam1,LPARAM lParam2)
 	return iSort;
 }
 
-int CFolderView::DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2)
+int CFolderView::DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2) const
 {
 	switch(m_SortMode)
 	{

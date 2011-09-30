@@ -293,7 +293,7 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	m_nAwaitingAdd = 0;
 }
 
-BOOL CFolderView::IsFileFiltered(int iItemInternal)
+BOOL CFolderView::IsFileFiltered(int iItemInternal) const
 {
 	BOOL bHideSystemFile	= FALSE;
 	BOOL bFilenameFiltered	= FALSE;

@@ -731,7 +731,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXML
 			NXMLSettings::EncodeBoolValue(m_pFolderView[(int)tcItem.lParam]->IsGroupViewEnabled()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortAscending"),
-			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->QuerySortAscending()));
+			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->GetSortAscending()));
 
 		m_pFolderView[(int)tcItem.lParam]->GetSortMode(&SortMode);
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortMode"),NXMLSettings::EncodeIntValue(SortMode));

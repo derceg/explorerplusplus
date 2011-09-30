@@ -164,8 +164,7 @@ public IDropTarget, public IDropFilesCallback
 {
 public:
 
-	CFolderView(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,
-	HANDLE hIconThread,HANDLE hFolderSizeThread);
+	CFolderView(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread);
 	~CFolderView();
 
 	/* IUnknown methods. */
@@ -187,61 +186,58 @@ public:
 	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect);
 
 	/* Get/Set current state. */
-	LPITEMIDLIST		QueryCurrentDirectoryIdl(void);
-	UINT				QueryCurrentDirectory(int BufferSize,TCHAR *Buffer);
-	BOOL				GetAutoArrange(void);
+	LPITEMIDLIST		QueryCurrentDirectoryIdl(void) const;
+	UINT				QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const;
+	BOOL				GetAutoArrange(void) const;
 	HRESULT				SortFolder(UINT SortMode);
 	HRESULT				SetCurrentViewMode(DWORD ViewMode);
-	HRESULT				GetCurrentViewMode(UINT *pViewMode);
-	HRESULT				GetSortMode(UINT *SortMode);
+	HRESULT				GetCurrentViewMode(UINT *pViewMode) const;
+	HRESULT				GetSortMode(UINT *SortMode) const;
 	HRESULT				SetSortMode(UINT SortMode);
-	BOOL				IsSortAscending(void);
-	BOOL				IsGroupViewEnabled(void);
+	BOOL				IsGroupViewEnabled(void) const;
 	BOOL				ToggleSortAscending(void);
-	BOOL				GetSortAscending(void);
+	BOOL				GetSortAscending(void) const;
 	BOOL				SetSortAscending(BOOL bAscending);
 	BOOL				ToggleAutoArrange(void);
-	BOOL				QuerySortAscending(void);
-	BOOL				QueryAutoArrange(void);
-	BOOL				QueryShowHidden(void);
+	BOOL				QueryAutoArrange(void) const;
+	BOOL				QueryShowHidden(void) const;
 	BOOL				SetShowHidden(BOOL bShowHidden);
 	BOOL				ToggleShowHidden(void);
-	BOOL				IsBackHistory(void);
-	BOOL				IsForwardHistory(void);
-	void				GetBackHistory(std::list<LPITEMIDLIST> *lHistory);
-	void				GetForwardHistory(std::list<LPITEMIDLIST> *lHistory);
+	BOOL				IsBackHistory(void) const;
+	BOOL				IsForwardHistory(void) const;
+	void				GetBackHistory(std::list<LPITEMIDLIST> *lHistory) const;
+	void				GetForwardHistory(std::list<LPITEMIDLIST> *lHistory) const;
 	LPITEMIDLIST		RetrieveHistoryItemWithoutUpdate(int iItem);
 	LPITEMIDLIST		RetrieveHistoryItem(int iItem);
-	BOOL				CanBrowseUp(void);
-	int					QueryNumItems(void);
-	int					QueryNumSelectedFiles(void);
-	int					QueryNumSelectedFolders(void);
-	int					QueryNumSelected(void);
+	BOOL				CanBrowseUp(void) const;
+	int					QueryNumItems(void) const;
+	int					QueryNumSelectedFiles(void) const;
+	int					QueryNumSelectedFolders(void) const;
+	int					QueryNumSelected(void) const;
 
 	/* Settings. */
 	void				SetUserOptions(InitialSettings_t *is);
 	void				SetGlobalSettings(GlobalSettings_t *gs);
-	InitialSettings_t	*QueryUserOptions(void);
 
 	/* ID. */
-	int					GetId(void);
+	int					GetId(void) const;
 	void				SetId(int ID);
 
 	/* Directory modification support. */
 	void				FilesModified(DWORD Action,TCHAR *FileName,int EventId,int iFolderIndex);
 	void				DirectoryAltered(void);
 	void				SetDirMonitorId(int iDirMonitorId);
-	int					GetDirMonitorId(void);
-	int					GetFolderIndex(void);
+	int					GetDirMonitorId(void) const;
+	int					GetFolderIndex(void) const;
 
 	/* Item information. */
-	LPWIN32_FIND_DATA	QueryFileFindData(int iItem);
-	LPITEMIDLIST		QueryItemRelativeIdl(int iItem);
-	DWORD				QueryFileAttributes(int iItem);
-	int					QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer);
-	BOOL				IsFileReal(int iItem);
-	void				QueryName(int iIndex,TCHAR *FileName);
-	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath);
+	LPWIN32_FIND_DATA	QueryFileFindData(int iItem) const;
+	LPITEMIDLIST		QueryItemRelativeIdl(int iItem) const;
+	DWORD				QueryFileAttributes(int iItem) const;
+	int					QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
+	BOOL				IsFileReal(int iItem) const;
+	void				QueryName(int iIndex,TCHAR *FileName) const;
+	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath) const;
 	
 	/* Column support. */
 	int					SetAllColumnData(void);
@@ -255,18 +251,18 @@ public:
 	int					SetAllFolderSizeColumnData(void);
 
 	/* Filtering. */
-	void				GetFilter(TCHAR *szFilter,int cchMax);
+	void				GetFilter(TCHAR *szFilter,int cchMax) const;
 	void				SetFilter(TCHAR *szFilter);
-	BOOL				GetFilterStatus(void);
+	BOOL				GetFilterStatus(void) const;
 	void				SetFilterStatus(BOOL bFilter);
-	BOOL				GetFilterCaseSensitive(void);
+	BOOL				GetFilterCaseSensitive(void) const;
 	void				SetFilterCaseSensitive(BOOL bCaseSensitive);
 
 	void				UpdateFileSelectionInfo(int,BOOL);
 	HRESULT				CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,IN POINT *pt,IN BOOL bBackOrForward);
 	int					SelectFiles(TCHAR *FileNamePattern);
 	void				QueryFolderInfo(FolderInfo_t *pFolderInfo);
-	int					LocateFileItemIndex(const TCHAR *szFileName);
+	int					LocateFileItemIndex(const TCHAR *szFileName) const;
 	BOOL				DeghostItem(int iItem);
 	BOOL				GhostItem(int iItem);
 	void				OnListViewGetDisplayInfo(LPARAM lParam);
@@ -274,9 +270,9 @@ public:
 	void				EmptyIconFinderQueue(void);
 	void				AddToThumbnailFinderQueue(LPARAM lParam);
 	void				EmptyThumbnailsQueue(void);
-	BOOL				InVirtualFolder(void);
-	BOOL				CanCreate(void);
-	HRESULT				GetAttributesOf(TCHAR *Object,UINT *Attributes);
+	BOOL				InVirtualFolder(void) const;
+	BOOL				CanCreate(void) const;
+	HRESULT				GetAttributesOf(TCHAR *Object,UINT *Attributes) const;
 
 	/* Column queueing. */
 	void				AddToColumnQueue(int iItem);
@@ -289,61 +285,61 @@ public:
 	BOOL				RemoveFromFolderQueue(int *iItem);
 
 	/* Listview sorting. */
-	int CALLBACK		Sort(LPARAM lParam1,LPARAM lParam2);
-	int					SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType);
-	int CALLBACK		SortByName(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortBySize(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByType(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByDateModified(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize);
-	int CALLBACK		SortByComments(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByDateDeleted(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByAttributes(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByRealSize(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByShortName(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByOwner(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByProductName(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByCompany(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByDescription(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByFileVersion(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByProductVersion(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int VersionProperty);
-	int CALLBACK		SortByShortcutTo(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByHardlinks(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByExtension(LPARAM lParam1,LPARAM lParam2);
-	int	CALLBACK		SortByDateCreated(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByDateAccessed(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByTitle(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortBySubject(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByAuthor(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByKeywords(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DWORD dwPropertyType);
-	int CALLBACK		SortByCameraModel(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByDateTaken(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByWidth(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByHeight(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId);
-	int CALLBACK		SortByVirtualComments(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByFileSystem(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByVirtualType(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByPrinterComments(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2);
-	int CALLBACK		SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2);
+	int CALLBACK		Sort(LPARAM lParam1,LPARAM lParam2) const;
+	int					SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType) const;
+	int CALLBACK		SortByName(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortBySize(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByType(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateModified(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize) const;
+	int CALLBACK		SortByComments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateDeleted(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByAttributes(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByRealSize(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByShortName(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByOwner(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByProductName(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByCompany(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDescription(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByFileVersion(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByProductVersion(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int VersionProperty) const;
+	int CALLBACK		SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByExtension(LPARAM lParam1,LPARAM lParam2) const;
+	int	CALLBACK		SortByDateCreated(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateAccessed(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByTitle(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortBySubject(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByAuthor(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByKeywords(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DWORD dwPropertyType) const;
+	int CALLBACK		SortByCameraModel(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateTaken(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByWidth(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByHeight(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId) const;
+	int CALLBACK		SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByVirtualType(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2) const;
 
 	int CALLBACK		SortTemporary(LPARAM lParam1,LPARAM lParam2);
 
-	BOOL				GetTerminationStatus(void);
+	BOOL				GetTerminationStatus(void) const;
 	void				SetTerminationStatus(void);
 	void				Terminate(void);
 
 	void				ColumnClicked(int iClickedColumn);
-	void				QueryCurrentSortModes(std::list<int> *pSortModes);
-	size_t				QueryNumActiveColumns(void);
+	void				QueryCurrentSortModes(std::list<int> *pSortModes) const;
+	size_t				QueryNumActiveColumns(void) const;
 	void				ToggleGridlines(void);
-	BOOL				QueryGridlinesActive(void);
+	BOOL				QueryGridlinesActive(void) const;
 	void				SetResourceModule(HINSTANCE hResourceModule);
 	void				ImportAllColumns(ColumnExport_t *pce);
 	void				ExportAllColumns(ColumnExport_t *pce);
@@ -351,7 +347,6 @@ public:
 	void				SelectItems(const std::list<std::wstring> &PastedFileList);
 	void				RefreshAllIcons(void);
 	void				OnDeviceChange(WPARAM wParam,LPARAM lParam);
-
 
 private:
 
@@ -367,7 +362,7 @@ private:
 	int					BrowseVirtualFolder(LPITEMIDLIST pidlDirectory);
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void inline			InsertAwaitingItems(BOOL bInsertIntoGroup);
-	BOOL				IsFileFiltered(int iItemInternal);
+	BOOL				IsFileFiltered(int iItemInternal) const;
 	TCHAR				*ProcessItemFileName(int iItemInternal);
 	HRESULT inline		AddItemInternal(LPITEMIDLIST pidlDirectory,LPITEMIDLIST pidlRelative,TCHAR *szFileName,int iItemIndex,BOOL bPosition);
 	HRESULT inline		AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
@@ -380,8 +375,8 @@ private:
 	void				SetColumnData(unsigned int ColumnId,int iItem,int iColumnIndex);
 	void				InsertColumn(unsigned int ColumnId,int iColumndIndex,int iWidth);
 	void				SetActiveColumnSet(void);
-	unsigned int		DetermineColumnSortMode(int iColumnId);
-	void				GetColumnInternal(unsigned int id,Column_t *pci);
+	unsigned int		DetermineColumnSortMode(int iColumnId) const;
+	void				GetColumnInternal(unsigned int id,Column_t *pci) const;
 	void				SaveColumnWidths(void);
 
 	/* Listview columns - set column data. */
@@ -423,12 +418,12 @@ private:
 	void				OnFileActionRenamedOldName(TCHAR *szFileName);
 	void				OnFileActionRenamedNewName(TCHAR *szFileName);
 	void				RenameItem(int iItemInternal,TCHAR *szNewFileName);
-	int					DetermineItemSortedPosition(LPARAM lParam);
-	int					SortItemsRelative(LPARAM lParam1,LPARAM lParam2);
-	int					DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2);
+	int					DetermineItemSortedPosition(LPARAM lParam) const;
+	int					SortItemsRelative(LPARAM lParam1,LPARAM lParam2) const;
+	int					DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2) const;
 
 	/* Filtering support. */
-	BOOL				IsFilenameFiltered(TCHAR *FileName);
+	BOOL				IsFilenameFiltered(TCHAR *FileName) const;
 	void				RemoveFilteredItems(void);
 	void				RemoveFilteredItem(int iItem,int iItemInternal);
 	void				UpdateFiltering(void);
@@ -436,22 +431,22 @@ private:
 
 	/* Listview group support (real files). */
 	int					DetermineItemGroup(int iItemInternal);
-	void				DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionType,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemCameraPropertyGroup(int iItemInternal,PROPID PropertyId,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHeader,int cchMax);
+	void				DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionType,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemCameraPropertyGroup(int iItemInternal,PROPID PropertyId,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 
 	/* Listview group support (virtual files). */
-	void				DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax);
-	void				DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyType,TCHAR *szGroupHeader,int cchMax);
+	void				DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyType,TCHAR *szGroupHeader,int cchMax) const;
 
 	/* Other grouping support. */
 	int					CheckGroup(TCHAR *szGroupHeader,PFNLVGROUPCOMPARE pfnGroupCompare);
@@ -482,29 +477,29 @@ private:
 	void				RepositionLocalFiles(POINT *ppt);
 	void				ScrollListViewFromCursor(HWND hListView,POINT *CursorPos);
 	void				PositionDroppedItems(void);
-	BOOL				QueryDragging(void);
+	BOOL				QueryDragging(void) const;
 	void				OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt);
 
 	/* Miscellaneous. */
-	BOOL				CompareVirtualFolders(UINT uFolderCSIDL);
-	int					LocateFileItemInternalIndex(const TCHAR *szFileName);
+	BOOL				CompareVirtualFolders(UINT uFolderCSIDL) const;
+	int					LocateFileItemInternalIndex(const TCHAR *szFileName) const;
 	HRESULT				RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMax);
 	void				ApplyHeaderSortArrow(void);
-	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName);
+	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName) const;
 	void				CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns);
 	void				SetHideSystemFiles(BOOL bHideSystemFiles);
-	BOOL				GetHideSystemFiles(void);
+	BOOL				GetHideSystemFiles(void) const;
 	void				SetShowExtensions(BOOL bShowExtensions);
-	BOOL				GetShowExtensions(void);
+	BOOL				GetShowExtensions(void) const;
 	void				SetHideLinkExtension(BOOL bHideLinkExtension);
-	BOOL				GetHideLinkExtension(void);
+	BOOL				GetHideLinkExtension(void) const;
 	void				SetShowFolderSizes(BOOL bShowFolderSizes);
-	BOOL				GetShowFolderSizes(void);
+	BOOL				GetShowFolderSizes(void) const;
 	void				SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable);
 	void				SetShowFriendlyDates(BOOL bShowFriendlyDates);
-	BOOL				GetShowFriendlyDates(void);
+	BOOL				GetShowFriendlyDates(void) const;
 	void				SetInsertSorted(BOOL bInsertSorted);
-	BOOL				GetInsertSorted(void);
+	BOOL				GetInsertSorted(void) const;
 	void				SetForceSize(BOOL bForceSize);
 	void				SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
 

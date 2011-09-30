@@ -217,7 +217,7 @@ CFolderView::~CFolderView()
 	free(m_pwfdFiles);
 }
 
-BOOL CFolderView::GetAutoArrange(void)
+BOOL CFolderView::GetAutoArrange(void) const
 {
 	return m_bAutoArrange;
 }
@@ -370,7 +370,7 @@ void CFolderView::SetCurrentViewModeInternal(DWORD ViewMode)
 	SendMessage(m_hListView,LVM_SETVIEW,dwStyle,0);
 }
 
-HRESULT CFolderView::GetCurrentViewMode(UINT *pViewMode)
+HRESULT CFolderView::GetCurrentViewMode(UINT *pViewMode) const
 {
 	if(pViewMode == NULL)
 		return E_INVALIDARG;
@@ -380,7 +380,7 @@ HRESULT CFolderView::GetCurrentViewMode(UINT *pViewMode)
 	return S_OK;
 }
 
-HRESULT CFolderView::GetSortMode(UINT *SortMode)
+HRESULT CFolderView::GetSortMode(UINT *SortMode) const
 {
 	*SortMode = m_SortMode;
 
@@ -394,7 +394,7 @@ HRESULT CFolderView::SetSortMode(UINT SortMode)
 	return S_OK;
 }
 
-BOOL CFolderView::IsGroupViewEnabled(void)
+BOOL CFolderView::IsGroupViewEnabled(void) const
 {
 	return m_bShowInGroups;
 }
@@ -430,22 +430,6 @@ HRESULT CFolderView::InitializeDragDropHelpers(void)
 	}
 
 	return hr;
-}
-
-InitialSettings_t *CFolderView::QueryUserOptions(void)
-{
-	static InitialSettings_t is;
-
-	/* TODO: Fix up. */
-	is.bAutoArrange			= m_bAutoArrange;
-	is.bGridlinesActive		= m_bGridlinesActive;
-	is.bShowHidden			= m_bShowHidden;
-	is.bShowInGroups		= m_bShowInGroups;
-	is.bSortAscending		= m_bSortAscending;
-	is.SortMode				= m_SortMode;
-	is.ViewMode				= m_ViewMode;
-
-	return &is;
 }
 
 void CFolderView::SetUserOptions(InitialSettings_t *is)
@@ -503,7 +487,7 @@ void CFolderView::SetGlobalSettings(GlobalSettings_t *gs)
 	m_bShowFolderSizes		= gs->bShowFolderSizes;
 }
 
-int CFolderView::GetId(void)
+int CFolderView::GetId(void) const
 {
 	return m_ID;
 }
@@ -528,7 +512,7 @@ void CFolderView::ToggleGridlines(void)
 	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 }
 
-BOOL CFolderView::QueryGridlinesActive(void)
+BOOL CFolderView::QueryGridlinesActive(void) const
 {
 	return m_bGridlinesActive;
 }
@@ -555,7 +539,7 @@ void CFolderView::SetHideSystemFiles(BOOL bHideSystemFiles)
 	m_bHideSystemFiles = bHideSystemFiles;
 }
 
-BOOL CFolderView::GetHideSystemFiles(void)
+BOOL CFolderView::GetHideSystemFiles(void) const
 {
 	return m_bHideSystemFiles;
 }
@@ -565,7 +549,7 @@ void CFolderView::SetShowExtensions(BOOL bShowExtensions)
 	m_bShowExtensions = bShowExtensions;
 }
 
-BOOL CFolderView::GetShowExtensions(void)
+BOOL CFolderView::GetShowExtensions(void) const
 {
 	return m_bShowExtensions;
 }
@@ -575,7 +559,7 @@ void CFolderView::SetHideLinkExtension(BOOL bHideLinkExtension)
 	m_bHideLinkExtension = bHideLinkExtension;
 }
 
-BOOL CFolderView::GetHideLinkExtension(void)
+BOOL CFolderView::GetHideLinkExtension(void) const
 {
 	return m_bHideLinkExtension;
 }
@@ -585,7 +569,7 @@ void CFolderView::SetShowFolderSizes(BOOL bShowFolderSizes)
 	m_bShowFolderSizes = bShowFolderSizes;
 }
 
-BOOL CFolderView::GetShowFolderSizes(void)
+BOOL CFolderView::GetShowFolderSizes(void) const
 {
 	return m_bShowFolderSizes;
 }
@@ -600,7 +584,7 @@ void CFolderView::SetShowFriendlyDates(BOOL bShowFriendlyDates)
 	m_bShowFriendlyDates = bShowFriendlyDates;
 }
 
-BOOL CFolderView::GetShowFriendlyDates(void)
+BOOL CFolderView::GetShowFriendlyDates(void) const
 {
 	return m_bShowFriendlyDates;
 }
@@ -610,7 +594,7 @@ void CFolderView::SetInsertSorted(BOOL bInsertSorted)
 	m_bInsertSorted = bInsertSorted;
 }
 
-BOOL CFolderView::GetInsertSorted(void)
+BOOL CFolderView::GetInsertSorted(void) const
 {
 	return m_bInsertSorted;
 }

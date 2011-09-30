@@ -266,7 +266,7 @@ void Explorerplusplus::SetArrangeMenuItemStates(HMENU hProgramMenu)
 	CheckMenuRadioItem(hMenuRClick,uFirst,uLast,
 		ItemToCheck,MF_BYCOMMAND);
 
-	if(m_pFolderView[m_iObjectIndex]->IsSortAscending())
+	if(m_pActiveShellBrowser->GetSortAscending())
 		ItemToCheck = IDM_ARRANGEICONSBY_ASCENDING;
 	else
 		ItemToCheck = IDM_ARRANGEICONSBY_DESCENDING;

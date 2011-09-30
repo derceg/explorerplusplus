@@ -492,7 +492,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				m_pFolderView[(int)tcItem.lParam]->GetSortMode(&SortMode);
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortMode"),SortMode);
 
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"),m_pFolderView[(int)tcItem.lParam]->IsSortAscending());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"),m_pShellBrowser[(int)tcItem.lParam]->GetSortAscending());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"),m_pFolderView[(int)tcItem.lParam]->IsGroupViewEnabled());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ApplyFilter"),m_pShellBrowser[(int)tcItem.lParam]->GetFilterStatus());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"),m_pShellBrowser[(int)tcItem.lParam]->GetFilterCaseSensitive());

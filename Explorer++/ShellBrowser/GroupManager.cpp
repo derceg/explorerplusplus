@@ -442,7 +442,7 @@ PFNLVGROUPCOMPARE pfnGroupCompare)
  * is non-NULL.
  */
 /* TODO: These groups have changed as of Windows Visa.*/
-void CFolderView::DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR ch;
 	std::list<TypeGroup_t>::iterator itr;
@@ -469,7 +469,7 @@ void CFolderView::DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,
  * Also returns the text header for the group when szGroupHeader
  * is non-NULL.
  */
-void CFolderView::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR *SizeGroups[] = {_T("Folders"),_T("Tiny"),_T("Small"),_T("Medium"),_T("Large"),_T("Huge")};
 	int SizeGroupLimits[] = {0,0,32 * KBYTE,100 * KBYTE,MBYTE,10 * MBYTE};
@@ -508,7 +508,7 @@ void CFolderView::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeader,
  * is non-NULL.
  */
 /* TODO: These groups have changed as of Windows Vista. */
-void CFolderView::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	IShellFolder *pShellFolder	= NULL;
 	LPITEMIDLIST pidlComplete	= NULL;
@@ -567,7 +567,7 @@ void CFolderView::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHe
 	StringCchCopy(szGroupHeader,512,SizeGroups[iSize]);
 }
 
-void CFolderView::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	LPITEMIDLIST				pidlComplete = NULL;
 	LPITEMIDLIST				pidlDirectory = NULL;
@@ -586,7 +586,7 @@ void CFolderView::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroup
 	CoTaskMemFree(pidlDirectory);
 }
 
-void CFolderView::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR *szGroupHeader,int cchMax) const
 {
 	/* TODO: Move strings into string table. */
 	SYSTEMTIME	stCurrentTime;
@@ -650,7 +650,7 @@ void CFolderView::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR *
 }
 
 /* TODO: Check if works in XP. */
-void CFolderView::DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyType,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyType,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR						szFullFileName[MAX_PATH];
 	TCHAR						szComment[512];
@@ -670,7 +670,7 @@ void CFolderView::DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyTy
 }
 
 /* TODO: Need to sort based on percentage free. */
-void CFolderView::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	std::list<TypeGroup_t>::iterator itr;
 	LPITEMIDLIST pidlComplete	= NULL;
@@ -723,7 +723,7 @@ void CFolderView::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHe
 	StringCchCopy(szGroupHeader,cchMax,szFreeSpace);
 }
 
-void CFolderView::DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR FullFileName[MAX_PATH];
 	std::list<TypeGroup_t>::iterator itr;
@@ -738,7 +738,7 @@ void CFolderView::DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHe
 	StringCchCopy(szGroupHeader,cchMax,szAttributes);
 }
 
-void CFolderView::DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR FullFileName[MAX_PATH];
 	std::list<TypeGroup_t>::iterator itr;
@@ -752,7 +752,7 @@ void CFolderView::DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHeader
 	StringCchCopy(szGroupHeader,cchMax,szOwner);
 }
 
-void CFolderView::DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionType,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionType,TCHAR *szGroupHeader,int cchMax) const
 {
 	BOOL bGroupFound = FALSE;
 	TCHAR FullFileName[MAX_PATH];
@@ -774,7 +774,7 @@ void CFolderView::DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionTy
 	StringCchCopy(szGroupHeader,cchMax,szVersion);
 }
 
-void CFolderView::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID PropertyId,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID PropertyId,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR szFullFileName[MAX_PATH];
 	std::list<TypeGroup_t>::iterator itr;
@@ -793,7 +793,7 @@ void CFolderView::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID Prop
 	StringCchCopy(szGroupHeader,cchMax,szProperty);
 }
 
-void CFolderView::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR FullFileName[MAX_PATH];
 	TCHAR *pExt;
@@ -815,7 +815,7 @@ void CFolderView::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHe
 	}
 }
 
-void CFolderView::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	LPITEMIDLIST pidlComplete = NULL;
 	IShellFolder *pShellFolder	= NULL;
@@ -860,7 +860,7 @@ void CFolderView::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupH
 }
 
 /* TODO: Fix. Need to check for each adapter. */
-void CFolderView::DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHeader,int cchMax)
+void CFolderView::DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	std::list<TypeGroup_t>::iterator itr;
 
