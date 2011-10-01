@@ -390,8 +390,8 @@ int *pTabObjectIndex)
 	pSettings->bForceSize	= m_bForceSize;
 	pSettings->sdf			= m_SizeDisplayFormat;
 
-	InitializeFolderView(m_hContainer,m_hListView[iTabId],
-	&m_pFolderView[iTabId],pSettings,m_hIconThread,m_hFolderSizeThread);
+	m_pShellBrowser[iTabId] = CFolderView::CreateNew(m_hContainer,m_hListView[iTabId],pSettings,
+		m_hIconThread,m_hFolderSizeThread);
 
 	if(pSettings->bApplyFilter)
 		NListView::ListView_SetBackgroundImage(m_hListView[iTabId],IDB_FILTERINGAPPLIED);
@@ -404,12 +404,8 @@ int *pTabObjectIndex)
 	/* TODO: This needs to be removed. */
 	SetWindowSubclass(m_hListView[iTabId],ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
-	m_pFolderView[iTabId]->QueryInterface(IID_IShellBrowser,
-	(void **)&m_pShellBrowser[iTabId]);
-
-	m_pFolderView[iTabId]->SetId(iTabId);
-	m_pFolderView[iTabId]->SetResourceModule(g_hLanguageModule);
-
+	m_pShellBrowser[iTabId]->SetId(iTabId);
+	m_pShellBrowser[iTabId]->SetResourceModule(g_hLanguageModule);
 	m_pShellBrowser[iTabId]->SetHideSystemFiles(m_bHideSystemFilesGlobal);
 	m_pShellBrowser[iTabId]->SetShowExtensions(m_bShowExtensionsGlobal);
 	m_pShellBrowser[iTabId]->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
@@ -798,13 +794,11 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 
 	m_pDirMon->StopDirectoryMonitor(m_pShellBrowser[iInternalIndex]->GetDirMonitorId());
 
-	m_pFolderView[iInternalIndex]->SetTerminationStatus();
+	m_pShellBrowser[iInternalIndex]->SetTerminationStatus();
 	DestroyWindow(m_hListView[iInternalIndex]);
 
 	m_pShellBrowser[iInternalIndex]->Release();
 	m_pShellBrowser[iInternalIndex] = NULL;
-	m_pFolderView[iInternalIndex]->Release();
-	m_pFolderView[iInternalIndex] = NULL;
 
 	if(!m_bAlwaysShowTabBar)
 	{

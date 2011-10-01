@@ -53,7 +53,7 @@ and the dialogs. */
 __interface IExplorerplusplus
 {
 	HWND			GetActiveListView() const;
-	IShellBrowser2	*GetActiveShellBrowser() const;
+	CFolderView		*GetActiveShellBrowser() const;
 
 	std::wstring	GetTabName(int iTab) const;
 	void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);

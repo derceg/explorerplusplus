@@ -1347,9 +1347,6 @@ void CFolderView::SetTerminationStatus(void)
 	EmptyColumnQueue();
 	EmptyFolderQueue();
 	m_bNotifiedOfTermination = TRUE;
-
-	/*if(g_nAPCsRan == g_nAPCsQueued)
-		SendMessage(m_hOwner,WM_USER_RELEASEBROWSER,(WPARAM)m_ID,NULL);*/
 }
 
 void CFolderView::QueryCurrentSortModes(std::list<int> *pSortModes) const

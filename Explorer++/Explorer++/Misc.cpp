@@ -1244,7 +1244,7 @@ void Explorerplusplus::CreateViewsMenu(POINT *ptOrigin)
 	UINT	uViewMode;
 	int		ItemToCheck;
 
-	m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+	m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
 
 	ItemToCheck = GetViewModeMenuId(uViewMode);
 	CheckMenuRadioItem(m_hViewsMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,

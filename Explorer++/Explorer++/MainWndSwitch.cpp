@@ -120,13 +120,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 			m_pShellBrowser[wParam]->DirectoryAltered();
 		break;
 
-	case WM_USER_RELEASEBROWSER:
-		m_pShellBrowser[(int)wParam]->Release();
-		m_pShellBrowser[(int)wParam] = NULL;
-		m_pFolderView[(int)wParam]->Release();
-		m_pFolderView[(int)wParam] = NULL;
-		break;
-
 	case WM_USER_TREEVIEW_GAINEDFOCUS:
 		m_hLastActiveWindow = m_hTreeView;
 		break;
@@ -605,35 +598,35 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case IDM_VIEW_EXTRALARGEICONS:
-			m_pFolderView[m_iObjectIndex]->SetCurrentViewMode(VM_EXTRALARGEICONS);
+			m_pShellBrowser[m_iObjectIndex]->SetCurrentViewMode(VM_EXTRALARGEICONS);
 			break;
 
 		case IDM_VIEW_LARGEICONS:
-			m_pFolderView[m_iObjectIndex]->SetCurrentViewMode(VM_LARGEICONS);
+			m_pShellBrowser[m_iObjectIndex]->SetCurrentViewMode(VM_LARGEICONS);
 			break;
 
 		case IDM_VIEW_ICONS:
-			m_pFolderView[m_iObjectIndex]->SetCurrentViewMode(VM_ICONS);
+			m_pShellBrowser[m_iObjectIndex]->SetCurrentViewMode(VM_ICONS);
 			break;
 
 		case IDM_VIEW_SMALLICONS:
-			m_pFolderView[m_iObjectIndex]->SetCurrentViewMode(VM_SMALLICONS);
+			m_pShellBrowser[m_iObjectIndex]->SetCurrentViewMode(VM_SMALLICONS);
 			break;
 
 		case IDM_VIEW_LIST:
-			m_pFolderView[m_iObjectIndex]->SetCurrentViewMode(VM_LIST);
+			m_pShellBrowser[m_iObjectIndex]->SetCurrentViewMode(VM_LIST);
 			break;
 
 		case IDM_VIEW_DETAILS:
-			m_pFolderView[m_iObjectIndex]->SetCurrentViewMode(VM_DETAILS);
+			m_pShellBrowser[m_iObjectIndex]->SetCurrentViewMode(VM_DETAILS);
 			break;
 
 		case IDM_VIEW_THUMBNAILS:
-			m_pFolderView[m_iObjectIndex]->SetCurrentViewMode(VM_THUMBNAILS);
+			m_pShellBrowser[m_iObjectIndex]->SetCurrentViewMode(VM_THUMBNAILS);
 			break;
 
 		case IDM_VIEW_TILES:
-			m_pFolderView[m_iObjectIndex]->SetCurrentViewMode(VM_TILES);
+			m_pShellBrowser[m_iObjectIndex]->SetCurrentViewMode(VM_TILES);
 			break;
 
 		case IDM_VIEW_CHANGEDISPLAYCOLOURS:
@@ -1468,7 +1461,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wPara
 		case LVN_ITEMCHANGING:
 			{
 				UINT uViewMode;
-				m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+				m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
 				if(uViewMode == VM_LIST)
 				{
 					if(m_bBlockNext)
@@ -1504,7 +1497,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wPara
 				if(m_dwMajorVersion == WINDOWS_XP_MAJORVERSION)
 				{
 					UINT uViewMode;
-					m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+					m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
 
 					DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(m_hActiveListView);
 

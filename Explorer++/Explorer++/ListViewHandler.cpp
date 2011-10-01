@@ -136,7 +136,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 				RECT rc;
 				SIZE sz;
 				UINT uViewMode;
-				m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+				m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
 				if(uViewMode == VM_LIST)
 				{
 					if(!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
@@ -1051,7 +1051,7 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 	SetMenuItemInfo(hMenu,IDM_POPUP_GROUPBY,FALSE,&mii);
 
 	UINT uViewMode;
-	m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+	m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
 
 	if(uViewMode == VM_LIST)
 	{

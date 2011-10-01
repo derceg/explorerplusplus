@@ -712,7 +712,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXML
 			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->GetFilterStatus()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("AutoArrange"),
-			NXMLSettings::EncodeBoolValue(m_pFolderView[(int)tcItem.lParam]->GetAutoArrange()));
+			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->GetAutoArrange()));
 
 		TCHAR szFilter[512];
 
@@ -729,15 +729,15 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXML
 			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->QueryShowHidden()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowInGroups"),
-			NXMLSettings::EncodeBoolValue(m_pFolderView[(int)tcItem.lParam]->IsGroupViewEnabled()));
+			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->IsGroupViewEnabled()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortAscending"),
 			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->GetSortAscending()));
 
-		m_pFolderView[(int)tcItem.lParam]->GetSortMode(&SortMode);
+		m_pShellBrowser[(int)tcItem.lParam]->GetSortMode(&SortMode);
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortMode"),NXMLSettings::EncodeIntValue(SortMode));
 
-		m_pFolderView[(int)tcItem.lParam]->GetCurrentViewMode(&ViewMode);
+		m_pShellBrowser[(int)tcItem.lParam]->GetCurrentViewMode(&ViewMode);
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ViewMode"),NXMLSettings::EncodeIntValue(ViewMode));
 
 		bstr = SysAllocString(L"Columns");

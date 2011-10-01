@@ -1535,7 +1535,7 @@ void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 	UINT	uViewMode;
 	UINT	uNewViewMode;
 
-	m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+	m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
 
 	std::list<ViewMode_t>::iterator itr;
 
@@ -1572,7 +1572,7 @@ void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 
 	uNewViewMode = itr->uViewMode;
 
-	m_pFolderView[m_iObjectIndex]->SetCurrentViewMode(uNewViewMode);
+	m_pShellBrowser[m_iObjectIndex]->SetCurrentViewMode(uNewViewMode);
 }
 
 void Explorerplusplus::ShowToolbarViewsDropdown(void)
@@ -1598,10 +1598,10 @@ void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)
 	{
 		m_pActiveShellBrowser->SetSortAscending(bSortAscending);
 
-		m_pFolderView[m_iObjectIndex]->GetSortMode(&SortMode);
+		m_pShellBrowser[m_iObjectIndex]->GetSortMode(&SortMode);
 
 		/* It is quicker to re-sort the folder than refresh it. */
-		m_pFolderView[m_iObjectIndex]->SortFolder(SortMode);
+		m_pShellBrowser[m_iObjectIndex]->SortFolder(SortMode);
 	}
 }
 
@@ -2282,7 +2282,7 @@ void Explorerplusplus::OnIdaRClick(void)
 
 				ClientToScreen(m_hActiveListView,&ptItem);
 
-				m_pFolderView[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+				m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
 
 				if(uViewMode == VM_SMALLICONS || uViewMode == VM_LIST ||
 					uViewMode == VM_DETAILS)
@@ -2294,7 +2294,7 @@ void Explorerplusplus::OnIdaRClick(void)
 
 				/* DON'T free the image list. */
 
-				/* The origin of the menu will be fixed at the centerpoint
+				/* The origin of the menu will be fixed at the centre point
 				of the items icon. */
 				ptMenuOrigin.x = ptItem.x + cx / 2;
 				ptMenuOrigin.y = ptItem.y + cy / 2;
@@ -2659,41 +2659,41 @@ void Explorerplusplus::OnSortBy(UINT uSortMode)
 {
 	UINT uCurrentSortMode;
 
-	m_pFolderView[m_iObjectIndex]->GetSortMode(&uCurrentSortMode);
+	m_pShellBrowser[m_iObjectIndex]->GetSortMode(&uCurrentSortMode);
 
-	if(!m_pFolderView[m_iObjectIndex]->IsGroupViewEnabled() &&
+	if(!m_pShellBrowser[m_iObjectIndex]->IsGroupViewEnabled() &&
 		uSortMode == uCurrentSortMode)
 	{
 		m_pActiveShellBrowser->ToggleSortAscending();
 	}
-	else if(m_pFolderView[m_iObjectIndex]->IsGroupViewEnabled())
+	else if(m_pShellBrowser[m_iObjectIndex]->IsGroupViewEnabled())
 	{
 		m_pActiveShellBrowser->SetGrouping(FALSE);
 	}
 
-	m_pFolderView[m_iObjectIndex]->SortFolder(uSortMode);
+	m_pShellBrowser[m_iObjectIndex]->SortFolder(uSortMode);
 }
 
 void Explorerplusplus::OnGroupBy(UINT uSortMode)
 {
 	UINT uCurrentSortMode;
 
-	m_pFolderView[m_iObjectIndex]->GetSortMode(&uCurrentSortMode);
+	m_pShellBrowser[m_iObjectIndex]->GetSortMode(&uCurrentSortMode);
 
 	/* If group view is already enabled, and the current sort
 	mode matches the supplied sort mode, toggle the ascending/
 	descending flag. */
-	if(m_pFolderView[m_iObjectIndex]->IsGroupViewEnabled() &&
+	if(m_pShellBrowser[m_iObjectIndex]->IsGroupViewEnabled() &&
 		uSortMode == uCurrentSortMode)
 	{
 		m_pActiveShellBrowser->ToggleSortAscending();
 	}
-	else if(!m_pFolderView[m_iObjectIndex]->IsGroupViewEnabled())
+	else if(!m_pShellBrowser[m_iObjectIndex]->IsGroupViewEnabled())
 	{
 		m_pActiveShellBrowser->SetGroupingFlag(TRUE);
 	}
 
-	m_pFolderView[m_iObjectIndex]->SortFolder(uSortMode);
+	m_pShellBrowser[m_iObjectIndex]->SortFolder(uSortMode);
 }
 
 void Explorerplusplus::OnHome(void)
@@ -2762,8 +2762,8 @@ void Explorerplusplus::SaveDirectorySpecificSettings(int iTab)
 
 		ds.pidlDirectory = m_pShellBrowser[iIndexInternal]->QueryCurrentDirectoryIdl();
 
-		m_pFolderView[iIndexInternal]->GetSortMode(&ds.dsi.SortMode);
-		m_pFolderView[iIndexInternal]->GetCurrentViewMode(&ds.dsi.ViewMode);
+		m_pShellBrowser[iIndexInternal]->GetSortMode(&ds.dsi.SortMode);
+		m_pShellBrowser[iIndexInternal]->GetCurrentViewMode(&ds.dsi.ViewMode);
 
 		ColumnExport_t ce;
 
@@ -2801,8 +2801,8 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 				{
 					int iIndexInternal = (int)tcItem.lParam;
 
-					m_pFolderView[iIndexInternal]->SetSortMode(ds.dsi.SortMode);
-					m_pFolderView[iIndexInternal]->SetCurrentViewMode(ds.dsi.ViewMode);
+					m_pShellBrowser[iIndexInternal]->SetSortMode(ds.dsi.SortMode);
+					m_pShellBrowser[iIndexInternal]->SetCurrentViewMode(ds.dsi.ViewMode);
 
 					ColumnExport_t ce;
 
@@ -2835,7 +2835,7 @@ HWND Explorerplusplus::GetActiveListView() const
 	return m_hActiveListView;
 }
 
-IShellBrowser2 *Explorerplusplus::GetActiveShellBrowser() const
+CFolderView *Explorerplusplus::GetActiveShellBrowser() const
 {
 	return m_pActiveShellBrowser;
 }

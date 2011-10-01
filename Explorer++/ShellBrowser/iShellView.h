@@ -4,32 +4,17 @@
 #include <list>
 #include "iPathManager.h"
 #include "../Helper/Helper.h"
+#include "../Helper/DropHandler.h"
+#include "../Helper/Macros.h"
 
 #define WM_USER_UPDATEWINDOWS		(WM_APP + 17)
 #define WM_USER_FILESADDED			(WM_APP + 51)
-#define WM_USER_RELEASEBROWSER		(WM_APP + 52)
 #define WM_USER_STARTEDBROWSING		(WM_APP + 55)
 #define WM_USER_NEWITEMINSERTED		(WM_APP + 200)
 #define WM_USER_FOLDEREMPTY			(WM_APP + 201)
 #define WM_USER_FILTERINGAPPLIED	(WM_APP + 202)
 #define WM_USER_GETCOLUMNNAMEINDEX	(WM_APP + 203)
 #define WM_USER_DIRECTORYMODIFIED	(WM_APP + 204)
-
-/* {A330851D-E911-41cd-8310-3BFC12A8D7F4} */
-DEFINE_GUID(IID_IFolderView, 
-0xa330851d, 0xe911, 0x41cd, 0x83, 0x10, 0x3b, 0xfc, 0x12, 0xa8, 0xd7, 0xf4);
-
-/* {34B619D6-81F7-4f19-BFF1-093008FB61A3} */
-DEFINE_GUID(IID_IShellView, 
-0x34b619d6, 0x81f7, 0x4f19, 0xbf, 0xf1, 0x9, 0x30, 0x8, 0xfb, 0x61, 0xa3);
-
-/* {CCBA1097-DF3D-4d4f-AD2D-41EF5D79AEA6} */
-DEFINE_GUID(IID_IShellBrowser, 
-0xccba1097, 0xdf3d, 0x4d4f, 0xad, 0x2d, 0x41, 0xef, 0x5d, 0x79, 0xae, 0xa6);
-
-/* {EA626B86-B1C3-4c0d-BE71-8369FDD8EFE0} */
-DEFINE_GUID(IID_IShellFolder, 
-0xea626b86, 0xb1c3, 0x4c0d, 0xbe, 0x71, 0x83, 0x69, 0xfd, 0xd8, 0xef, 0xe0);
 
 typedef struct
 {
@@ -254,118 +239,565 @@ typedef enum
 	CM_PRINTERMODEL			= 64
 } COLUMNS;
 
-[
-	  uuid(62F890DA-C361-11d1-A54D-0000F8751BA7)
-]
-__interface MyIFolderView2 : IUnknown
+class CItemObject
 {
-	virtual BOOL	GetAutoArrange(void) const;
-	virtual HRESULT	SortFolder(UINT);
-	virtual HRESULT	SetCurrentViewMode(DWORD);
-	virtual HRESULT	GetCurrentViewMode(UINT *) const;
-	virtual HRESULT	GetSortMode(UINT *) const;
-	virtual HRESULT	SetSortMode(UINT SortMode);
-	virtual BOOL	IsGroupViewEnabled(void) const;
-	virtual int		GetId(void) const;
-	virtual void	SetId(int ID);
-	virtual void	SetTerminationStatus(void);
-	virtual void	SetResourceModule(HINSTANCE hResourceModule);
+public:
+
+	LPITEMIDLIST	pridl;
+	TCHAR			szDisplayName[MAX_PATH];
+	BOOL			bReal;
+	BOOL			bIconRetrieved;
+	BOOL			bThumbnailRetreived;
+	int				iIcon;
+
+	/* Only used for folders. Records whether
+	the folders size has been retrieved yet. */
+	BOOL			bFolderSizeRetrieved;
+
+	/* These are only used for drives. They are
+	needed for when a drive is removed from the
+	system, in which case the drive name is needed
+	so that the removed drive can be found. */
+	BOOL			bDrive;
+	TCHAR			szDrive[4];
+
+	/* Used for temporary sorting in details mode (i.e.
+	when items need to be rearranged). */
+	int				iRelativeSort;
 };
 
-__interface MyIShellView3 : IUnknown
+typedef struct
 {
-	virtual HRESULT Refresh(void);
-};
+	TCHAR szHeader[512];
+	int iGroupId;
 
-[
-	  uuid(62F890DA-C361-11d1-A54D-0000F8751BA8)
-]
-__interface IShellBrowser2 : IUnknown
+	/* Used to record the number of items in this group.
+	Mimics the feature available in Windows Vista and later. */
+	int nItems;
+} TypeGroup_t;
+
+class CFolderView : public IDropTarget, public IDropFilesCallback
 {
-	virtual HRESULT			BrowseFolder(TCHAR *Path,UINT wFlags);
-	virtual HRESULT			BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags);
-	virtual void			UpdateFileSelectionInfo(int,BOOL);
-	virtual int				GetFolderIndex(void) const;
-	virtual void			FilesModified(DWORD Action,TCHAR *FileName,int EventId,int iFolderIndex);
-	virtual void			DirectoryAltered(void);
-	virtual HRESULT			QueryFullItemName(int iIndex,TCHAR *FullItemPath) const;
-	virtual UINT			QueryCurrentDirectory(int,TCHAR *) const;
-	virtual LPITEMIDLIST	QueryCurrentDirectoryIdl(void) const;
-	virtual HRESULT			CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,IN POINT *pt,IN BOOL bBackOrForward);
-	virtual int				QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
-	virtual BOOL			IsBackHistory(void) const;
-	virtual BOOL			IsForwardHistory(void) const;
-	virtual void			GetBackHistory(std::list<LPITEMIDLIST> *lHistory) const;
-	virtual void			GetForwardHistory(std::list<LPITEMIDLIST> *lHistory) const;
-	virtual LPITEMIDLIST	RetrieveHistoryItemWithoutUpdate(int iItem);
-	virtual LPITEMIDLIST	RetrieveHistoryItem(int iItem);
-	virtual BOOL			CanBrowseUp() const;
-	virtual void			ToggleGrouping(void);
-	virtual void			SetGrouping(BOOL bShowInGroups);
-	virtual void			SetGroupingFlag(BOOL bShowInGroups);
-	virtual int				SelectFiles(TCHAR *FileNamePattern);
-	virtual void			SelectItems(const std::list<std::wstring> &PastedFileList);
-	virtual DWORD			QueryFileAttributes(int iItem) const;
-	virtual void			DragStarted(int iFirstItem,POINT *ptCursor);
-	virtual LPWIN32_FIND_DATA	QueryFileFindData(int iItem) const;
-	virtual void			OnListViewGetDisplayInfo(LPARAM lParam);
-	virtual LPITEMIDLIST		QueryItemRelativeIdl(int iItem) const;
-	virtual BOOL			InVirtualFolder(void) const;
-	virtual BOOL			CanCreate(void) const;
-	virtual void			SetDirMonitorId(int iDirMonitorId);
-	virtual int				GetDirMonitorId(void) const;
-	virtual void			DragStopped(void);
-	virtual BOOL			IsFileReal(int iItem) const;
-	virtual int				LocateFileItemIndex(const TCHAR *szFileName) const;
-	virtual BOOL			DeghostItem(int iItem);
-	virtual BOOL			GhostItem(int iItem);
-	virtual int				QueryNumItems(void) const;
-	virtual int				QueryNumSelectedFiles(void) const;
-	virtual int				QueryNumSelectedFolders(void) const;
-	virtual void			QueryFolderInfo(FolderInfo_t *pFolderInfo);
-	virtual void			GetFilter(TCHAR *szFilter,int cchMax) const;
-	virtual void			SetFilter(TCHAR *szFilter);
-	virtual BOOL			GetFilterStatus(void) const;
-	virtual void			SetFilterStatus(BOOL bFilter);
-	virtual BOOL			GetFilterCaseSensitive(void) const;
-	virtual void			SetFilterCaseSensitive(BOOL bCaseSensitive);
-	virtual BOOL			ToggleSortAscending(void);
-	virtual BOOL			ToggleAutoArrange(void);
-	virtual BOOL			QueryAutoArrange(void) const;
-	virtual BOOL			QueryShowHidden(void) const;
-	virtual BOOL			ToggleShowHidden(void);
-	virtual BOOL			GetSortAscending(void) const;
-	virtual BOOL			SetSortAscending(BOOL bAscending);
-	virtual BOOL			SetShowHidden(BOOL bShowHidden);
-	virtual void			SetUserOptions(InitialSettings_t *is);
-	virtual BOOL			QueryDragging(void) const;
-	virtual void			ColumnClicked(int iColumn);
-	virtual void			QueryCurrentSortModes(std::list<int> *pSortModes) const;
-	virtual void			SetGlobalSettings(GlobalSettings_t *gs);
-	virtual int				QueryNumSelected(void) const;
-	virtual size_t			QueryNumActiveColumns(void) const;
-	virtual void			ToggleGridlines(void);
-	virtual BOOL			QueryGridlinesActive(void) const;
-	virtual void			ExportCurrentColumns(std::list<Column_t> *pColumns);
-	virtual void			ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped);
-	virtual void			ImportAllColumns(ColumnExport_t *pce);
-	virtual void			ExportAllColumns(ColumnExport_t *pcie);
-	virtual void			QueueRename(LPCITEMIDLIST pidlItem);
-	virtual void			RefreshAllIcons(void);
-	virtual void			OnDeviceChange(WPARAM wParam,LPARAM lParam);
-	virtual void			SetHideSystemFiles(BOOL bHideSystemFiles);
-	virtual void			SetShowExtensions(BOOL bShowExtensions);
-	virtual void			SetHideLinkExtension(BOOL bHideLinkExtension);
-	virtual void			SetShowFolderSizes(BOOL bShowFolderSizes);
-	virtual void			SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable);
-	virtual void			SetShowFriendlyDates(BOOL bShowFriendlyDates);
-	virtual void			SetInsertSorted(BOOL bInsertSorted);
-	virtual void			SetForceSize(BOOL bForceSize);
-	virtual void			SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
-};
+public:
 
-void InitializeFolderView(HWND hOwner,HWND hListView,
-MyIFolderView2 **pFolderView,InitialSettings_t *pSettings,
-HANDLE hIconThread,HANDLE hFolderSizeThread);
+	static CFolderView	*CreateNew(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread);
+
+	/* IUnknown methods. */
+	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
+	ULONG __stdcall		AddRef(void);
+	ULONG __stdcall		Release(void);
+
+	/* Navigation. */
+	HRESULT				BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags);
+	HRESULT				BrowseFolder(TCHAR *szPath,UINT wFlags);
+	HRESULT				Refresh(void);
+
+	/* Drag and Drop. */
+	void				DragStarted(int iFirstItem,POINT *ptCursor);
+	void				DragStopped(void);
+	HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
+	HRESULT _stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
+	HRESULT _stdcall	DragLeave(void);
+	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect);
+
+	/* Drag and Drop support. */
+	BOOL				QueryDragging(void) const;
+
+	/* Get/Set current state. */
+	LPITEMIDLIST		QueryCurrentDirectoryIdl(void) const;
+	UINT				QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const;
+	BOOL				GetAutoArrange(void) const;
+	HRESULT				SortFolder(UINT SortMode);
+	HRESULT				SetCurrentViewMode(DWORD ViewMode);
+	HRESULT				GetCurrentViewMode(UINT *pViewMode) const;
+	HRESULT				GetSortMode(UINT *SortMode) const;
+	HRESULT				SetSortMode(UINT SortMode);
+	BOOL				IsGroupViewEnabled(void) const;
+	BOOL				ToggleSortAscending(void);
+	BOOL				GetSortAscending(void) const;
+	BOOL				SetSortAscending(BOOL bAscending);
+	BOOL				ToggleAutoArrange(void);
+	BOOL				QueryAutoArrange(void) const;
+	BOOL				QueryShowHidden(void) const;
+	BOOL				SetShowHidden(BOOL bShowHidden);
+	BOOL				ToggleShowHidden(void);
+	BOOL				IsBackHistory(void) const;
+	BOOL				IsForwardHistory(void) const;
+	void				GetBackHistory(std::list<LPITEMIDLIST> *lHistory) const;
+	void				GetForwardHistory(std::list<LPITEMIDLIST> *lHistory) const;
+	LPITEMIDLIST		RetrieveHistoryItemWithoutUpdate(int iItem);
+	LPITEMIDLIST		RetrieveHistoryItem(int iItem);
+	BOOL				CanBrowseUp(void) const;
+	int					QueryNumItems(void) const;
+	int					QueryNumSelectedFiles(void) const;
+	int					QueryNumSelectedFolders(void) const;
+	int					QueryNumSelected(void) const;
+
+	/* Settings. */
+	void				SetUserOptions(InitialSettings_t *is);
+	void				SetGlobalSettings(GlobalSettings_t *gs);
+
+	/* ID. */
+	int					GetId(void) const;
+	void				SetId(int ID);
+
+	/* Directory modification support. */
+	void				FilesModified(DWORD Action,TCHAR *FileName,int EventId,int iFolderIndex);
+	void				DirectoryAltered(void);
+	void				SetDirMonitorId(int iDirMonitorId);
+	int					GetDirMonitorId(void) const;
+	int					GetFolderIndex(void) const;
+
+	/* Item information. */
+	LPWIN32_FIND_DATA	QueryFileFindData(int iItem) const;
+	LPITEMIDLIST		QueryItemRelativeIdl(int iItem) const;
+	DWORD				QueryFileAttributes(int iItem) const;
+	int					QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
+	BOOL				IsFileReal(int iItem) const;
+	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath) const;
+	
+	/* Column support. */
+	int					SetAllColumnData(void);
+	void				ExportCurrentColumns(std::list<Column_t> *pColumns);
+	void				ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped);
+
+	/* Thumbnails view. */
+	int					GetExtractedThumbnail(HBITMAP hThumbnailBitmap);
+
+	/* Folder size support. */
+	int					SetAllFolderSizeColumnData(void);
+
+	/* Filtering. */
+	void				GetFilter(TCHAR *szFilter,int cchMax) const;
+	void				SetFilter(TCHAR *szFilter);
+	BOOL				GetFilterStatus(void) const;
+	void				SetFilterStatus(BOOL bFilter);
+	BOOL				GetFilterCaseSensitive(void) const;
+	void				SetFilterCaseSensitive(BOOL bCaseSensitive);
+
+	void				UpdateFileSelectionInfo(int,BOOL);
+	HRESULT				CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,IN POINT *pt,IN BOOL bBackOrForward);
+	int					SelectFiles(TCHAR *FileNamePattern);
+	void				QueryFolderInfo(FolderInfo_t *pFolderInfo);
+	int					LocateFileItemIndex(const TCHAR *szFileName) const;
+	BOOL				DeghostItem(int iItem);
+	BOOL				GhostItem(int iItem);
+	void				OnListViewGetDisplayInfo(LPARAM lParam);
+	void				AddToIconFinderQueue(LVITEM *plvItem);
+	void				EmptyIconFinderQueue(void);
+	void				AddToThumbnailFinderQueue(LPARAM lParam);
+	void				EmptyThumbnailsQueue(void);
+	BOOL				InVirtualFolder(void) const;
+	BOOL				CanCreate(void) const;
+
+	/* Column queueing. */
+	void				AddToColumnQueue(int iItem);
+	void				EmptyColumnQueue(void);
+	BOOL				RemoveFromColumnQueue(int *iItem);
+
+	/* Folder size queueing. */
+	void				AddToFolderQueue(int iItem);
+	void				EmptyFolderQueue(void);
+	BOOL				RemoveFromFolderQueue(int *iItem);
+
+	/* Listview sorting. */
+	int CALLBACK		Sort(LPARAM lParam1,LPARAM lParam2) const;
+	int					SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType) const;
+	int CALLBACK		SortByName(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortBySize(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByType(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateModified(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize) const;
+	int CALLBACK		SortByComments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateDeleted(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByAttributes(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByRealSize(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByShortName(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByOwner(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByProductName(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByCompany(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDescription(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByFileVersion(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByProductVersion(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int VersionProperty) const;
+	int CALLBACK		SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByExtension(LPARAM lParam1,LPARAM lParam2) const;
+	int	CALLBACK		SortByDateCreated(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateAccessed(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByTitle(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortBySubject(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByAuthor(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByKeywords(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DWORD dwPropertyType) const;
+	int CALLBACK		SortByCameraModel(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateTaken(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByWidth(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByHeight(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId) const;
+	int CALLBACK		SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByVirtualType(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2) const;
+
+	void				ToggleGrouping(void);
+	void				SetGrouping(BOOL bShowInGroups);
+	void				SetGroupingFlag(BOOL bShowInGroups);
+
+	void				SetHideSystemFiles(BOOL bHideSystemFiles);
+	void				SetShowExtensions(BOOL bShowExtensions);
+	void				SetHideLinkExtension(BOOL bHideLinkExtension);
+	void				SetShowFolderSizes(BOOL bShowFolderSizes);
+	void				SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable);
+	void				SetShowFriendlyDates(BOOL bShowFriendlyDates);
+	void				SetInsertSorted(BOOL bInsertSorted);
+	void				SetForceSize(BOOL bForceSize);
+	void				SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
+
+	int CALLBACK		SortTemporary(LPARAM lParam1,LPARAM lParam2);
+
+	BOOL				GetTerminationStatus(void) const;
+	void				SetTerminationStatus(void);
+
+	void				ColumnClicked(int iClickedColumn);
+	void				QueryCurrentSortModes(std::list<int> *pSortModes) const;
+	size_t				QueryNumActiveColumns(void) const;
+	void				ToggleGridlines(void);
+	BOOL				QueryGridlinesActive(void) const;
+	void				SetResourceModule(HINSTANCE hResourceModule);
+	void				ImportAllColumns(ColumnExport_t *pce);
+	void				ExportAllColumns(ColumnExport_t *pce);
+	void				QueueRename(LPCITEMIDLIST pidlItem);
+	void				SelectItems(const std::list<std::wstring> &PastedFileList);
+	void				RefreshAllIcons(void);
+	void				OnDeviceChange(WPARAM wParam,LPARAM lParam);
+
+private:
+
+	DISALLOW_COPY_AND_ASSIGN(CFolderView);
+
+	typedef struct
+	{
+		TCHAR	szFileName[MAX_PATH];
+		DWORD	dwAction;
+		int		iFolderIndex;
+	} AlteredFile_t;
+
+	typedef struct
+	{
+		int		iItem;
+		int		iItemInternal;
+
+		BOOL	bPosition;
+		int		iAfter;
+	} AwaitingAdd_t;
+
+	typedef struct
+	{
+		TCHAR szFileName[MAX_PATH];
+	} Added_t;
+
+	typedef struct
+	{
+		TCHAR szFileName[MAX_PATH];
+		POINT DropPoint;
+	} DroppedFile_t;
+
+	typedef struct
+	{
+		TCHAR szFileName[MAX_PATH];
+	} DraggedFile_t;
+
+	CFolderView(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread);
+	~CFolderView();
+
+	void				InitializeItemMap(int iStart,int iEnd);
+	int					GenerateUniqueItemId(void);
+	BOOL				GhostItemInternal(int iItem,BOOL bGhost);
+	void				DetermineFolderVirtual(LPITEMIDLIST pidlDirectory);
+	void				VerifySortMode(void);
+	void				AllocateInitialItemMemory(void);
+
+	/* Browsing support. */
+	int					BrowseVirtualFolder(TCHAR *szParsingName);
+	int					BrowseVirtualFolder(LPITEMIDLIST pidlDirectory);
+	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
+	void inline			InsertAwaitingItems(BOOL bInsertIntoGroup);
+	BOOL				IsFileFiltered(int iItemInternal) const;
+	TCHAR				*ProcessItemFileName(int iItemInternal);
+	HRESULT inline		AddItemInternal(LPITEMIDLIST pidlDirectory,LPITEMIDLIST pidlRelative,TCHAR *szFileName,int iItemIndex,BOOL bPosition);
+	HRESULT inline		AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
+	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory,LPITEMIDLIST pidlRelative,TCHAR *szFileName);
+	void				ResetFolderMemoryAllocations(void);
+	void				SetCurrentViewModeInternal(DWORD ViewMode);
+
+	/* Listview column support. */
+	void				PlaceColumns(void);
+	void				SetColumnData(unsigned int ColumnId,int iItem,int iColumnIndex);
+	void				InsertColumn(unsigned int ColumnId,int iColumndIndex,int iWidth);
+	void				SetActiveColumnSet(void);
+	unsigned int		DetermineColumnSortMode(int iColumnId) const;
+	void				GetColumnInternal(unsigned int id,Column_t *pci) const;
+	void				SaveColumnWidths(void);
+
+	/* Listview columns - set column data. */
+	int					SetNameColumnData(HWND hListView,int iItem,int iColumn);
+	int					SetSizeColumnData(HWND hListView,int iItem,int iColumn);
+	int					SetRealSizeColumnData(HWND hListView,int iItem,int iColumn);
+	int					SetTypeColumnData(HWND hListView,int iItem,int iColumn);
+	void				SetVirtualTypeColumnData(int iItem,int iColumn);
+	void				SetTotalSizeColumnData(int iItem,int iColumn,BOOL bTotalSize);
+	void				SetFileSystemColumnData(int iItem,int iColumn);
+	int					SetTimeColumnData(HWND hListView,int iItem,int iColumn,int TimeType);
+	int					SetAttributeColumnData(HWND hListView,int iItem,int iColumn);
+	int					SetShortNameColumnData(HWND hListView,int iItem,int iColumn);
+	int					SetOwnerColumnData(HWND hListView,int iItem,int iColumn);
+	int					SetVersionColumnData(HWND hListView,int iItem,int iColumn,TCHAR *lpszVersion);
+	int					SetShortcutColumnData(HWND hListView,int iItem,int iColumn);
+	int					SetHardLinksColumnData(HWND hListView,int iItem,int iColumn);
+	int					SetExtensionColumnData(HWND hListView,int iItem,int iColumn);
+	int					SetSummaryColumnData(HWND hListView,int iItem,int iColumn,DWORD dwPropertyType);
+	int					SetImageColumnData(HWND hListView,int iItem,int iColumn,PROPID PropertyId);
+	void				SetControlPanelComments(int iItem,int iColumn);
+	void				SetNumPrinterDocumentsColumnData(int iItem,int iColumn);
+	void				SetPrinterStatusColumnData(int iItem,int iColumn);
+	void				SetPrinterCommentsColumnData(int iItem,int iColumn);
+	void				SetPrinterLocationColumnData(int iItem,int iColumn);
+	void				SetPrinterModelColumnData(int iItem,int iColumn);
+	void				SetNetworkAdapterStatusColumnData(int iItem,int iColumn);
+	void				SetMediaStatusColumnData(int iItem,int iColumn,int iType);
+
+	/* Device change support. */
+	void				UpdateDriveIcon(TCHAR *szDrive);
+	void				RemoveDrive(TCHAR *szDrive);
+	
+	/* Directory altered support. */
+	void				OnFileActionAdded(TCHAR *szFileName);
+	void				RemoveItem(int iItemInternal);
+	void				RemoveItemInternal(TCHAR *szFileName);
+	void				ModifyItemInternal(TCHAR *FileName);
+	void				OnFileActionRenamedOldName(TCHAR *szFileName);
+	void				OnFileActionRenamedNewName(TCHAR *szFileName);
+	void				RenameItem(int iItemInternal,TCHAR *szNewFileName);
+	int					DetermineItemSortedPosition(LPARAM lParam) const;
+	int					SortItemsRelative(LPARAM lParam1,LPARAM lParam2) const;
+	int					DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2) const;
+
+	/* Filtering support. */
+	BOOL				IsFilenameFiltered(TCHAR *FileName) const;
+	void				RemoveFilteredItems(void);
+	void				RemoveFilteredItem(int iItem,int iItemInternal);
+	void				UpdateFiltering(void);
+	void				UnfilterAllItems(void);
+
+	/* Listview group support (real files). */
+	int					DetermineItemGroup(int iItemInternal);
+	void				DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionType,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemCameraPropertyGroup(int iItemInternal,PROPID PropertyId,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+
+	/* Listview group support (virtual files). */
+	void				DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyType,TCHAR *szGroupHeader,int cchMax) const;
+
+	/* Other grouping support. */
+	int					CheckGroup(TCHAR *szGroupHeader,PFNLVGROUPCOMPARE pfnGroupCompare);
+	void				InsertItemIntoGroup(int iItem,int iGroupId);
+	void				MoveItemsIntoGroups(void);
+
+	/* Thumbnails view. */
+	void				SetupThumbnailsView(void);
+	void				RemoveThumbnailsView(void);
+	int					GetIconThumbnail(int iInternalIndex);
+	int					GetThumbnailInternal(int iType,int iInternalIndex,HBITMAP hThumbnailBitmap);
+	void				DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex);
+	void				DrawThumbnailInternal(HDC hdcBacking,HBITMAP hThumbnailBitmap);
+
+	/* Tiles view. */
+	void				InsertTileViewColumns(void);
+	void				DeleteTileViewColumns(void);
+	void				SetTileViewInfo(void);
+	void				SetTileViewItemInfo(int iItem,int iItemInternal);
+
+	/* Drag and Drop support. */
+	HRESULT				InitializeDragDropHelpers(void);
+	DWORD				CheckItemLocations(IDataObject *pDataObject,int iDroppedItem);
+	void				HandleDragSelection(POINT *ppt);
+	void				RepositionLocalFiles(POINT *ppt);
+	void				ScrollListViewFromCursor(HWND hListView,POINT *CursorPos);
+	void				PositionDroppedItems(void);
+	void				OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt);
+
+	/* Miscellaneous. */
+	BOOL				CompareVirtualFolders(UINT uFolderCSIDL) const;
+	int					LocateFileItemInternalIndex(const TCHAR *szFileName) const;
+	HRESULT				RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMax);
+	void				ApplyHeaderSortArrow(void);
+	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName) const;
+	void				CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns);
+
+
+	int					m_iRefCount;
+
+	HWND				m_hListView;
+	HWND				m_hOwner;
+
+	BOOL				m_bPerformingDrag;
+	BOOL				m_bNotifiedOfTermination;
+	HIMAGELIST			m_hListViewImageList;
+
+	/* Stores a WIN32_FIND_DATA structure for each file.
+	Only valid for 'real' files. */
+	WIN32_FIND_DATA *	m_pwfdFiles;
+
+	/* Stores various extra information on files, such
+	as display name. */
+	CItemObject *		m_pExtraItemInfo;
+
+	/* Manages browsing history. */
+	CPathManager *		m_pPathManager;
+
+	HANDLE				m_hThread;
+	HANDLE				m_hFolderSizeThread;
+
+	/* Internal state. */
+	LPITEMIDLIST		m_pidlDirectory;
+	HINSTANCE			m_hResourceModule;
+	HANDLE				m_hIconEvent;
+	TCHAR				m_CurDir[MAX_PATH];
+	ULARGE_INTEGER		m_ulTotalDirSize;
+	ULARGE_INTEGER		m_ulFileSelectionSize;
+	DWORD				m_dwMajorVersion;
+	UINT				m_SortMode;
+	UINT				m_ViewMode;
+	BOOL				m_bVirtualFolder;
+	BOOL				m_bFolderVisited;
+	BOOL				m_bShowFolderSizes;
+	BOOL				m_bDisableFolderSizesNetworkRemovable;
+	BOOL				m_bForceSize;
+	SizeDisplayFormat_t	m_SizeDisplayFormat;
+	int					m_nTotalItems;
+	int					m_NumFilesSelected;
+	int					m_NumFoldersSelected;
+	int					m_iCurrentAllocation;
+	int					m_iCachedPosition;
+	int					m_iDirMonitorId;
+	int					m_iFolderIcon;
+	int					m_iFileIcon;
+	int *				m_pItemMap;
+	int					m_iDropped;
+
+	/* Stores a unique index for each folder.
+	This may be needed so that folders can be
+	told apart when adding files from directory
+	modification. */
+	int					m_iUniqueFolderIndex;
+
+	/* User options variables. */
+	BOOL				m_bAutoArrange;
+	BOOL				m_bShowInGroups;
+	BOOL				m_bSortAscending;
+	BOOL				m_bShowFriendlyDates;
+	BOOL				m_bGridlinesActive;
+	BOOL				m_bShowHidden;
+	BOOL				m_bShowExtensions;
+	BOOL				m_bHideSystemFiles;
+	BOOL				m_bHideLinkExtension;
+	BOOL				m_bInsertSorted;
+
+	/* ID. */
+	int					m_ID;
+
+	/* Stores information on files that
+	have been modified (i.e. created, deleted,
+	renamed, etc). */
+	CRITICAL_SECTION	m_csDirectoryAltered;
+	std::list<AlteredFile_t>	m_AlteredList;
+	std::list<Added_t>	m_FilesAdded;
+
+	/* Stores information on files that have
+	been created and are awaiting insertion
+	into the listview. */
+	std::list<AwaitingAdd_t>	m_AwaitingAddList;
+	int					m_nAwaitingAdd;
+
+	/* Shell new. */
+	BOOL				m_bNewItemCreated;
+	LPITEMIDLIST		m_pidlNewItem;
+	int					m_iIndexNewItem;
+
+	/* File selection. */
+	std::list<std::wstring>	m_FileSelectionList;
+
+	/* Column gathering information. */
+	std::list<int>		m_pColumnInfoList;
+	CRITICAL_SECTION	m_column_cs;
+	HANDLE				m_hColumnQueueEvent;
+
+	/* Folder size information. */
+	std::list<int>		m_pFolderInfoList;
+	CRITICAL_SECTION	m_folder_cs;
+	HANDLE				m_hFolderQueueEvent;
+
+	/* Thumbnails. */
+	BOOL				m_bThumbnailsSetup;
+
+	/* Column related data. */
+	std::list<Column_t> *m_pActiveColumnList;
+	std::list<Column_t>	m_RealFolderColumnList;
+	std::list<Column_t>	m_MyComputerColumnList;
+	std::list<Column_t>	m_ControlPanelColumnList;
+	std::list<Column_t>	m_RecycleBinColumnList;
+	std::list<Column_t>	m_PrintersColumnList;
+	std::list<Column_t>	m_NetworkConnectionsColumnList;
+	std::list<Column_t>	m_MyNetworkPlacesColumnList;
+	BOOL				m_bColumnsPlaced;
+	int					m_nCurrentColumns;
+	int					m_nActiveColumns;
+	unsigned int		m_iPreviousSortedColumnId;
+
+	/* Drag and drop related data. */
+	IDragSourceHelper *	m_pDragSourceHelper;
+	IDropTargetHelper *	m_pDropTargetHelper;
+	std::list<DroppedFile_t>	m_DroppedFileNameList;
+	std::list<DraggedFile_t>	m_DraggedFilesList;
+	DragTypes_t			m_DragType;
+	POINT				m_ptDraggedOffset;
+	BOOL				m_bDataAccept;
+	BOOL				m_bDragging;
+	BOOL				m_bDeselectDropFolder;
+	BOOL				m_bOnSameDrive;
+	int					m_bOverFolder;
+	int					m_iDropFolder;
+
+	/* Listview groups. The group id is declared
+	explicitly, rather than taken from the size
+	of the group list, to avoid warnings concerning
+	size_t and int. */
+	std::list<TypeGroup_t>	m_GroupList;
+	int					m_iGroupId;
+
+	/* Filtering related data. */
+	std::list<int>		m_FilteredItemsList;
+	TCHAR				m_szFilter[512];
+	BOOL				m_bApplyFilter;
+	BOOL				m_bFilterCaseSensitive;
+
+	BOOL volatile		m_bBrowsing;
+};
 
 #endif

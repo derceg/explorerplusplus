@@ -486,19 +486,19 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 					(LPBYTE)pidlDirectory,ILGetSize(pidlDirectory));
 				CoTaskMemFree((LPVOID)pidlDirectory);
 
-				m_pFolderView[(int)tcItem.lParam]->GetCurrentViewMode(&ViewMode);
+				m_pShellBrowser[(int)tcItem.lParam]->GetCurrentViewMode(&ViewMode);
 
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ViewMode"),ViewMode);
 
-				m_pFolderView[(int)tcItem.lParam]->GetSortMode(&SortMode);
+				m_pShellBrowser[(int)tcItem.lParam]->GetSortMode(&SortMode);
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortMode"),SortMode);
 
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"),m_pShellBrowser[(int)tcItem.lParam]->GetSortAscending());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"),m_pFolderView[(int)tcItem.lParam]->IsGroupViewEnabled());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"),m_pShellBrowser[(int)tcItem.lParam]->IsGroupViewEnabled());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ApplyFilter"),m_pShellBrowser[(int)tcItem.lParam]->GetFilterStatus());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"),m_pShellBrowser[(int)tcItem.lParam]->GetFilterCaseSensitive());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"),m_pShellBrowser[(int)tcItem.lParam]->QueryShowHidden());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AutoArrange"),m_pFolderView[(int)tcItem.lParam]->GetAutoArrange());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AutoArrange"),m_pShellBrowser[(int)tcItem.lParam]->GetAutoArrange());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowGridlines"),m_pShellBrowser[(int)tcItem.lParam]->QueryGridlinesActive());
 
 				TCHAR szFilter[512];

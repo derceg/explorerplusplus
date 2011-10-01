@@ -732,7 +732,7 @@ private:
 
 	/* IExplorerplusplus methods. */
 	HWND					GetActiveListView() const;
-	IShellBrowser2			*GetActiveShellBrowser() const;
+	CFolderView				*GetActiveShellBrowser() const;
 
 	/* Miscellaneous. */
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
@@ -790,9 +790,8 @@ private:
 	HWND					m_hDrivesToolbar;
 	HWND					m_hApplicationToolbar;
 
-	MyIFolderView2 *		m_pFolderView[MAX_TABS];
-	IShellBrowser2 *		m_pShellBrowser[MAX_TABS];
-	IShellBrowser2 *		m_pActiveShellBrowser;
+	CFolderView *			m_pShellBrowser[MAX_TABS];
+	CFolderView *			m_pActiveShellBrowser;
 	IDirectoryMonitor *		m_pDirMon;
 	CMyTreeView *			m_pMyTreeView;
 	CCustomMenu *			m_pCustomMenu;

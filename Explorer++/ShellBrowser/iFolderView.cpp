@@ -31,17 +31,9 @@ HRESULT __stdcall CFolderView::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = NULL;
 
-	if(iid == IID_IFolderView)
+	if(iid == IID_IUnknown)
 	{
-		*ppvObject = static_cast<MyIFolderView2 *>(this);
-	}
-	else if(iid == IID_IShellView)
-	{
-		*ppvObject=static_cast<MyIShellView3 *>(this);
-	}
-	else if(iid == IID_IShellBrowser)
-	{
-		*ppvObject = static_cast<IShellBrowser2 *>(this);
+		*ppvObject = this;
 	}
 
 	if(*ppvObject)
@@ -71,12 +63,10 @@ ULONG __stdcall CFolderView::Release(void)
 	return m_iRefCount;
 }
 
-void InitializeFolderView(HWND hOwner,HWND hListView,
-MyIFolderView2 **pFolderView,InitialSettings_t *pSettings,
-HANDLE hIconThread,HANDLE hFolderSizeThread)
+CFolderView *CFolderView::CreateNew(HWND hOwner,HWND hListView,
+	InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread)
 {
-	*pFolderView = new CFolderView(hOwner,hListView,pSettings,
-		hIconThread,hFolderSizeThread);
+	return new CFolderView(hOwner,hListView,pSettings,hIconThread,hFolderSizeThread);
 }
 
 CFolderView::CFolderView(HWND hOwner,HWND hListView,
