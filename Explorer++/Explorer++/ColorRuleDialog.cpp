@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "ColorRuleDialog.h"
+#include "ColorRuleHelper.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
 #include "../Helper/XMLSettings.h"
@@ -29,7 +30,7 @@ const TCHAR CColorRuleDialogPersistentSettings::SETTINGS_KEY[] = _T("ColorRules"
 const COLORREF CColorRuleDialogPersistentSettings::DEFAULT_INITIAL_COLOR = RGB(0,94,138);
 
 CColorRuleDialog::CColorRuleDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,ColorRule_t *pColorRule,BOOL bEdit) :
+	int iResource,HWND hParent,NColorRuleHelper::ColorRule_t *pColorRule,BOOL bEdit) :
 CBaseDialog(hInstance,iResource,hParent,false)
 {
 	m_pColorRule = pColorRule;

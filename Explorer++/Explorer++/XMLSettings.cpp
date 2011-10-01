@@ -1304,7 +1304,7 @@ void Explorerplusplus::LoadColorRulesFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 
 	if(hr == S_OK)
 	{
-		m_ColorRuleList.clear();
+		m_ColorRules.clear();
 		LoadColorRulesFromXMLInternal(pNode);
 	}
 
@@ -1325,7 +1325,7 @@ void Explorerplusplus::LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
 	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
 	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
 	MSXML2::IXMLDOMNode			*pNextSibling = NULL;
-	ColorRule_t					ColorRule;
+	NColorRuleHelper::ColorRule_t	ColorRule;
 	BOOL						bDescriptionFound = FALSE;
 	BOOL						bFilenamePatternFound = FALSE;
 	BSTR						bstrName;
@@ -1390,7 +1390,7 @@ void Explorerplusplus::LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
 	{
 		ColorRule.rgbColour = RGB(r,g,b);
 
-		m_ColorRuleList.push_back(ColorRule);
+		m_ColorRules.push_back(ColorRule);
 	}
 
 	hr = pNode->get_nextSibling(&pNextSibling);
@@ -1420,7 +1420,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	SysFreeString(bstr);
 	bstr = NULL;
 
-	for each(auto ColorRule in m_ColorRuleList)
+	for each(auto ColorRule in m_ColorRules)
 	{
 		SaveColorRulesToXMLInternal(pXMLDom,pe,ColorRule);
 	}
@@ -1435,7 +1435,7 @@ MSXML2::IXMLDOMElement *pRoot)
 }
 
 void Explorerplusplus::SaveColorRulesToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
-	MSXML2::IXMLDOMElement *pe,const ColorRule_t &ColorRule)
+	MSXML2::IXMLDOMElement *pe,const NColorRuleHelper::ColorRule_t &ColorRule)
 {
 	MSXML2::IXMLDOMElement		*pParentNode = NULL;
 	BSTR						bstr_wsntt = SysAllocString(L"\n\t\t");

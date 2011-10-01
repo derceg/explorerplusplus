@@ -1041,7 +1041,7 @@ void Explorerplusplus::SaveColorRulesToRegistry(void)
 
 	if(lRes == ERROR_SUCCESS)
 	{
-		for each(auto ColorRule in m_ColorRuleList)
+		for each(auto ColorRule in m_ColorRules)
 		{
 			SaveColorRulesToRegistryInternal(hKey,&ColorRule,iCount);
 			iCount++;
@@ -1052,7 +1052,7 @@ void Explorerplusplus::SaveColorRulesToRegistry(void)
 }
 
 void Explorerplusplus::SaveColorRulesToRegistryInternal(HKEY hKey,
-	ColorRule_t *pColorRule,int iCount)
+	NColorRuleHelper::ColorRule_t *pColorRule,int iCount)
 {
 	HKEY hKeyChild;
 	TCHAR szKeyName[32];
@@ -1081,7 +1081,7 @@ void Explorerplusplus::LoadColorRulesFromRegistry(void)
 
 	if(lRes == ERROR_SUCCESS)
 	{
-		m_ColorRuleList.clear();
+		m_ColorRules.clear();
 		LoadColorRulesFromRegistryInternal(hKey);
 		RegCloseKey(hKey);
 	}
@@ -1096,7 +1096,7 @@ void Explorerplusplus::LoadColorRulesFromRegistryInternal(HKEY hKey)
 	while(RegEnumKeyEx(hKey,dwIndex++,szKeyName,&dwKeyLength,NULL,
 		NULL,NULL,NULL) == ERROR_SUCCESS)
 	{
-		ColorRule_t ColorRule;
+		NColorRuleHelper::ColorRule_t ColorRule;
 		HKEY hKeyChild;
 
 		/* Open the subkey. First, attempt to load
@@ -1119,7 +1119,7 @@ void Explorerplusplus::LoadColorRulesFromRegistryInternal(HKEY hKey)
 
 		if(lDescriptionStatus == ERROR_SUCCESS && lFilenamePatternStatus == ERROR_SUCCESS)
 		{
-			m_ColorRuleList.push_back(ColorRule);
+			m_ColorRules.push_back(ColorRule);
 		}
 
 		RegCloseKey(hKeyChild);

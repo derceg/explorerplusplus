@@ -522,11 +522,6 @@ void CFolderView::SetResourceModule(HINSTANCE hResourceModule)
 	m_hResourceModule = hResourceModule;
 }
 
-void CFolderView::Terminate(void)
-{
-	SendMessage(m_hOwner,WM_USER_RELEASEBROWSER,(WPARAM)m_ID,NULL);
-}
-
 HRESULT CFolderView::Refresh()
 {
 	BrowseFolder(m_pidlDirectory,SBSP_SAMEBROWSER|SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
@@ -539,19 +534,9 @@ void CFolderView::SetHideSystemFiles(BOOL bHideSystemFiles)
 	m_bHideSystemFiles = bHideSystemFiles;
 }
 
-BOOL CFolderView::GetHideSystemFiles(void) const
-{
-	return m_bHideSystemFiles;
-}
-
 void CFolderView::SetShowExtensions(BOOL bShowExtensions)
 {
 	m_bShowExtensions = bShowExtensions;
-}
-
-BOOL CFolderView::GetShowExtensions(void) const
-{
-	return m_bShowExtensions;
 }
 
 void CFolderView::SetHideLinkExtension(BOOL bHideLinkExtension)
@@ -559,19 +544,9 @@ void CFolderView::SetHideLinkExtension(BOOL bHideLinkExtension)
 	m_bHideLinkExtension = bHideLinkExtension;
 }
 
-BOOL CFolderView::GetHideLinkExtension(void) const
-{
-	return m_bHideLinkExtension;
-}
-
 void CFolderView::SetShowFolderSizes(BOOL bShowFolderSizes)
 {
 	m_bShowFolderSizes = bShowFolderSizes;
-}
-
-BOOL CFolderView::GetShowFolderSizes(void) const
-{
-	return m_bShowFolderSizes;
 }
 
 void CFolderView::SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable)
@@ -584,19 +559,9 @@ void CFolderView::SetShowFriendlyDates(BOOL bShowFriendlyDates)
 	m_bShowFriendlyDates = bShowFriendlyDates;
 }
 
-BOOL CFolderView::GetShowFriendlyDates(void) const
-{
-	return m_bShowFriendlyDates;
-}
-
 void CFolderView::SetInsertSorted(BOOL bInsertSorted)
 {
 	m_bInsertSorted = bInsertSorted;
-}
-
-BOOL CFolderView::GetInsertSorted(void) const
-{
-	return m_bInsertSorted;
 }
 
 void CFolderView::SetForceSize(BOOL bForceSize)

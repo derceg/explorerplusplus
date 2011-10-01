@@ -240,5 +240,6 @@ BOOL			lCheckDlgButton(HWND hDlg,int ButtonId,BOOL bCheck);
 void			TrimStringLeft(std::wstring &str,const std::wstring &strWhitespace);
 void			TrimStringRight(std::wstring &str,const std::wstring &strWhitespace);
 void			TrimString(std::wstring &str,const std::wstring &strWhitespace);
+void			AddStyleToToolbar(UINT *fStyle,UINT fStyleToAdd);
 
 #endif

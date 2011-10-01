@@ -269,6 +269,7 @@
     <ClCompile Include="BookmarkIPHelper.cpp" />
     <ClCompile Include="BookmarksToolbar.cpp" />
     <ClCompile Include="ColorRuleDialog.cpp" />
+    <ClCompile Include="ColorRuleHelper.cpp" />
     <ClCompile Include="CustomizeColorsDialog.cpp" />
     <ClCompile Include="DestroyFilesDialog.cpp" />
     <ClCompile Include="DisplayColoursDialog.cpp" />
@@ -332,6 +333,7 @@
     <ClInclude Include="BookmarkIPHelper.h" />
     <ClInclude Include="BookmarksToolbar.h" />
     <ClInclude Include="ColorRuleDialog.h" />
+    <ClInclude Include="ColorRuleHelper.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />
     <ClInclude Include="DestroyFilesDialog.h" />
     <ClInclude Include="DialogHelper.h" />

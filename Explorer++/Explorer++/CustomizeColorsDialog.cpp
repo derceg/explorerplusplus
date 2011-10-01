@@ -24,7 +24,7 @@
 const TCHAR CCustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("CustomizeColors");
 
 CCustomizeColorsDialog::CCustomizeColorsDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,std::vector<ColorRule_t> *pColorRuleList) :
+	int iResource,HWND hParent,std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList) :
 CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_pColorRuleList = pColorRuleList;
@@ -151,7 +151,7 @@ void CCustomizeColorsDialog::GetResizableControlInformation(CBaseDialog::DialogS
 	ControlList.push_back(Control);
 }
 
-void CCustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const ColorRule_t &ColorRule,
+void CCustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const NColorRuleHelper::ColorRule_t &ColorRule,
 	int iIndex)
 {
 	TCHAR szTemp[512];
@@ -255,7 +255,7 @@ void CCustomizeColorsDialog::OnNew()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
 
-	ColorRule_t ColorRule;
+	NColorRuleHelper::ColorRule_t ColorRule;
 
 	CColorRuleDialog ColorRuleDialog(GetInstance(),IDD_NEWCOLORRULE,m_hDlg,&ColorRule,FALSE);
 
@@ -366,7 +366,7 @@ void CCustomizeColorsDialog::OnDelete()
 		{
 			int nItems = static_cast<int>(m_pColorRuleList->size());
 
-			std::vector<ColorRule_t>::iterator itr = m_pColorRuleList->begin();
+			auto itr = m_pColorRuleList->begin();
 			std::advance(itr,iSelected);
 			m_pColorRuleList->erase(itr);
 

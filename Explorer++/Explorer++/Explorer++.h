@@ -7,6 +7,7 @@
 #include "BookmarksToolbar.h"
 #include "DrivesToolbar.h"
 #include "TabContainer.h"
+#include "ColorRuleHelper.h"
 #include "../ShellBrowser/iShellView.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/BaseDialog.h"
@@ -84,9 +85,6 @@ public:
 	static void			DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,void *pData);
 
 private:
-
-	static const COLORREF	CF_COMPRESSED = RGB(0,0,255);
-	static const COLORREF	CF_ENCRYPTED = RGB(0,128,0);
 
 	static const int		DEFAULT_LISTVIEW_HOVER_TIME = 500;
 
@@ -522,7 +520,6 @@ private:
 	void					ValidateSingleColumnSet(int iColumnSet,std::list<Column_t> *pColumnList);
 	void					ApplyLoadedSettings(void);
 	void					ApplyToolbarSettings(void);
-	void					AddStyleToToolbar(UINT *fStyle,UINT fStyleToAdd);
 	void					SetDefaultValues(void);
 	void					TestConfigFile(void);
 	void					SaveTabSettingsToRegistry(void);
@@ -542,7 +539,7 @@ private:
 	void					LoadColorRulesFromRegistry(void);
 	void					LoadColorRulesFromRegistryInternal(HKEY hKey);
 	void					SaveColorRulesToRegistry(void);
-	void					SaveColorRulesToRegistryInternal(HKEY hKey,ColorRule_t *pColorRule,int iCount);
+	void					SaveColorRulesToRegistryInternal(HKEY hKey,NColorRuleHelper::ColorRule_t *pColorRule,int iCount);
 	void					SaveApplicationToolbarToRegistryInternal(HKEY hKey,ApplicationButton_t	*pab,int count);
 	void					SaveToolbarInformationToRegistry(void);
 	void					LoadToolbarInformationFromRegistry(void);
@@ -599,9 +596,6 @@ private:
 	/* Default settings. */
 	void					SetDefaultTabSettings(TabInfo_t *pTabInfo);
 
-	/* Color rules. */
-	void					InitializeColorRules(void);
-
 	/* Arrange menu. */
 	void					InitializeArrangeMenuItems(void);
 	void					SetActiveArrangeMenuItems(void);
@@ -643,6 +637,7 @@ private:
 	BOOL					CanPaste(void);
 
 	/* Tabs. */
+	void					PushGlobalSettingsToTab(int iTabId);
 	void					DuplicateTab(int iTabInternal);
 
 	/* Tab proxy's. */
@@ -668,6 +663,12 @@ private:
 
 	/* Filtering. */
 	void					SetFilterStatus(void);
+
+	/* Options dialog. */
+	void					OnShowOptions(void);
+	void					AddLanguages(HWND hDlg);
+	WORD					AddLanguageToComboBox(HWND hComboBox,TCHAR *szImageDirectory,TCHAR *szFileName);
+	int						GetLanguageIDFromIndex(HWND hDlg,int iIndex);
 
 	/* Default settings dialog. */
 	void					OnDefaultSettingsNewTabDir(HWND hDlg);
@@ -700,7 +701,7 @@ private:
 	void					LoadColorRulesFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode);
 	void					SaveColorRulesToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					SaveColorRulesToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe,const ColorRule_t &ColorRule);
+	void					SaveColorRulesToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe,const NColorRuleHelper::ColorRule_t &ColorRule);
 	void					LoadToolbarInformationFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					SaveToolbarInformationToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveToolbarInformationToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
@@ -721,12 +722,6 @@ private:
 	/* Miscellaneous. */
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
 	BOOL					CompareVirtualFolders(TCHAR *szDirectory,UINT uFolderCSIDL);
-	void					OnShowOptions(void);
-	void					AddLanguages(HWND hDlg);
-	WORD					AddLanguageToComboBox(HWND hComboBox,TCHAR *szImageDirectory,TCHAR *szFileName);
-	int						GetLanguageIDFromIndex(HWND hDlg,int iIndex);
-	void					PushGlobalSettingsToTab(int iTabId);
-	void					PushGlobalSettingsToAllTabs(void);
 	void					CreateViewsMenu(POINT *ptOrigin);
 	void					SetMenuItemBitmap(HMENU hMenu,UINT ItemID,int iBitmap);
 	void					SetMenuOwnerDraw(HMENU hMenu);
@@ -855,7 +850,6 @@ private:
 	BOOL					m_bAlwaysOpenNewTab;
 	BOOL					m_bShowFolderSizes;
 	BOOL					m_bDisableFolderSizesNetworkRemovable;
-	BOOL					m_bUnlockFolders;
 	BOOL					m_bOpenNewTabNextToCurrent;
 	BOOL					m_bConfirmCloseTabs;
 	BOOL					m_bTreeViewDelayEnabled;
@@ -925,7 +919,7 @@ private:
 	CBookmarksToolbar		*m_pBookmarksToolbar;
 
 	/* Customize colors. */
-	std::vector<ColorRule_t>	m_ColorRuleList;
+	std::vector<NColorRuleHelper::ColorRule_t>	m_ColorRules;
 
 	/* Undo support. */
 	CFileActionHandler		m_FileActionHandler;

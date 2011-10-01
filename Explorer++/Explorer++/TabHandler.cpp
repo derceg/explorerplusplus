@@ -37,6 +37,8 @@ LRESULT CALLBACK TabSubclassProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lP
 
 extern LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
+extern std::list<std::wstring> g_TabDirs;
+
 void Explorerplusplus::InitializeTabs(void)
 {
 	/* The tab backing will hold the tab window. */
@@ -474,6 +476,103 @@ int *pTabObjectIndex)
 	a proxy window for each tab. This proxy window
 	will create the taskbar thumbnail for that tab. */
 	CreateTabProxy(pidlDirectory,iTabId,bSwitchToNewTab);
+
+	return S_OK;
+}
+
+HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
+{
+	TCHAR							szDirectory[MAX_PATH];
+	HRESULT							hr;
+	int								nTabsCreated = 0;
+	int								i = 0;
+
+	if(!g_TabDirs.empty())
+	{
+		for each(auto strDirectory in g_TabDirs)
+		{
+			StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),strDirectory.c_str());
+
+			if(lstrcmp(strDirectory.c_str(),_T("..")) == 0)
+			{
+				/* Get the parent of the current directory,
+				and browse to it. */
+				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
+				PathRemoveFileSpec(szDirectory);
+			}
+			else if(lstrcmp(strDirectory.c_str(),_T(".")) == 0)
+			{
+				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
+			}
+
+			hr = CreateNewTab(szDirectory,NULL,NULL,TRUE,NULL);
+
+			if(hr == S_OK)
+				nTabsCreated++;
+		}
+	}
+	else
+	{
+		if(m_StartupMode == STARTUP_PREVIOUSTABS)
+			nTabsCreated = pLoadSave->LoadPreviousTabs();
+	}
+
+	if(nTabsCreated == 0)
+	{
+		hr = CreateNewTab(m_DefaultTabDirectory,NULL,NULL,TRUE,NULL);
+
+		if(FAILED(hr))
+			hr = CreateNewTab(m_DefaultTabDirectoryStatic,NULL,NULL,TRUE,NULL);
+
+		if(hr == S_OK)
+		{
+			nTabsCreated++;
+		}
+	}
+
+	if(nTabsCreated == 0)
+	{
+		/* Should never end up here. */
+		return E_FAIL;
+	}
+
+	/* Tabs created on startup will NOT have
+	any automatic updates. The only thing that
+	needs to be done is to monitor each
+	directory. The tab that is finally switched
+	to will have an associated update of window
+	states. */
+	for(i = 0;i < nTabsCreated;i++)
+	{
+		TC_ITEM tcItem;
+
+		tcItem.mask	= TCIF_PARAM;
+		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
+
+		HandleDirectoryMonitoring((int)tcItem.lParam);
+	}
+
+	if(!m_bAlwaysShowTabBar)
+	{
+		if(nTabsCreated == 1)
+		{
+			m_bShowTabBar = FALSE;
+		}
+	}
+
+	/* m_iLastSelectedTab is the tab that was selected when the
+	program was last closed. */
+	if(m_iLastSelectedTab >= TabCtrl_GetItemCount(m_hTabCtrl) ||
+		m_iLastSelectedTab < 0)
+		m_iLastSelectedTab = 0;
+
+	/* Set the focus back to the tab that had the focus when the program
+	was last closed. */
+	TabCtrl_SetCurSel(m_hTabCtrl,m_iLastSelectedTab);
+
+	m_iTabSelectedItem = m_iLastSelectedTab;
+
+	OnTabChangeInternal(TRUE);
 
 	return S_OK;
 }

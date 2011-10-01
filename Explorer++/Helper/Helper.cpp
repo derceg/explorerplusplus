@@ -2275,3 +2275,9 @@ void TrimString(std::wstring &str,const std::wstring &strWhitespace)
 	TrimStringLeft(str,strWhitespace);
 	TrimStringRight(str,strWhitespace);
 }
+
+void AddStyleToToolbar(UINT *fStyle,UINT fStyleToAdd)
+{
+	if((*fStyle & fStyleToAdd) != fStyleToAdd)
+		*fStyle |= fStyleToAdd;
+}

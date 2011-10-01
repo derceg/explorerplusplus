@@ -33,23 +33,6 @@ CRITICAL_SECTION	g_icon_cs;
 int					g_nAPCsRan;
 int					g_nAPCsQueued;
 
-HRESULT CFolderView::GetAttributesOf(TCHAR *Object,UINT *Attributes) const
-{
-	int i = 0;
-
-	while(StrCmp(Object,m_pwfdFiles[i].cFileName) != 0)
-	{
-		i++;
-	}
-
-	if((m_pwfdFiles[i].dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) == FILE_ATTRIBUTE_HIDDEN)
-	{
-		*Attributes &= SFGAO_GHOSTED;
-	}
-
-	return S_OK;
-}
-
 void CFolderView::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 {
 	ULARGE_INTEGER	ulFileSize;
@@ -101,18 +84,6 @@ int CFolderView::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const
 	StringCchCopy(Buffer,BufferSize,m_pwfdFiles[(int)lvItem.lParam].cFileName);
 
 	return lstrlen(Buffer);
-}
-
-void CFolderView::QueryName(int iIndex,TCHAR *FileName) const
-{
-	LVITEM lvItem;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iIndex;
-	lvItem.iSubItem	= 0;
-	ListView_GetItem(m_hListView,&lvItem);
-
-	StringCchCopy(FileName,MAX_PATH,m_pwfdFiles[(int)lvItem.lParam].cFileName);
 }
 
 HRESULT CFolderView::QueryFullItemName(int iIndex,TCHAR *FullItemPath) const

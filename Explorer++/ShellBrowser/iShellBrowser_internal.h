@@ -236,7 +236,6 @@ public:
 	DWORD				QueryFileAttributes(int iItem) const;
 	int					QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
 	BOOL				IsFileReal(int iItem) const;
-	void				QueryName(int iIndex,TCHAR *FileName) const;
 	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath) const;
 	
 	/* Column support. */
@@ -272,7 +271,6 @@ public:
 	void				EmptyThumbnailsQueue(void);
 	BOOL				InVirtualFolder(void) const;
 	BOOL				CanCreate(void) const;
-	HRESULT				GetAttributesOf(TCHAR *Object,UINT *Attributes) const;
 
 	/* Column queueing. */
 	void				AddToColumnQueue(int iItem);
@@ -333,7 +331,6 @@ public:
 
 	BOOL				GetTerminationStatus(void) const;
 	void				SetTerminationStatus(void);
-	void				Terminate(void);
 
 	void				ColumnClicked(int iClickedColumn);
 	void				QueryCurrentSortModes(std::list<int> *pSortModes) const;
@@ -488,18 +485,12 @@ private:
 	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName) const;
 	void				CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns);
 	void				SetHideSystemFiles(BOOL bHideSystemFiles);
-	BOOL				GetHideSystemFiles(void) const;
 	void				SetShowExtensions(BOOL bShowExtensions);
-	BOOL				GetShowExtensions(void) const;
 	void				SetHideLinkExtension(BOOL bHideLinkExtension);
-	BOOL				GetHideLinkExtension(void) const;
 	void				SetShowFolderSizes(BOOL bShowFolderSizes);
-	BOOL				GetShowFolderSizes(void) const;
 	void				SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable);
 	void				SetShowFriendlyDates(BOOL bShowFriendlyDates);
-	BOOL				GetShowFriendlyDates(void) const;
 	void				SetInsertSorted(BOOL bInsertSorted);
-	BOOL				GetInsertSorted(void) const;
 	void				SetForceSize(BOOL bForceSize);
 	void				SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
 
@@ -539,7 +530,6 @@ private:
 	UINT				m_ViewMode;
 	BOOL				m_bVirtualFolder;
 	BOOL				m_bFolderVisited;
-	BOOL				m_bCurrentFolderRenamed;
 	BOOL				m_bShowFolderSizes;
 	BOOL				m_bDisableFolderSizesNetworkRemovable;
 	BOOL				m_bForceSize;
@@ -562,7 +552,6 @@ private:
 	int					m_iUniqueFolderIndex;
 
 	/* User options variables. */
-	BOOL				m_bUnlockFolders;
 	BOOL				m_bAutoArrange;
 	BOOL				m_bShowInGroups;
 	BOOL				m_bSortAscending;

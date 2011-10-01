@@ -1228,7 +1228,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_TOOLS_CUSTOMIZECOLORS:
 			{
-				CCustomizeColorsDialog CustomizeColorsDialog(g_hLanguageModule,IDD_CUSTOMIZECOLORS,hwnd,&m_ColorRuleList);
+				CCustomizeColorsDialog CustomizeColorsDialog(g_hLanguageModule,IDD_CUSTOMIZECOLORS,hwnd,&m_ColorRules);
 
 				CustomizeColorsDialog.ShowModalDialog();
 

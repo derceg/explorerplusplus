@@ -1,10 +1,6 @@
 #ifndef SHELLVIEW_INCLUDED
 #define SHELLVIEW_INCLUDED
 
-#include <windows.h>
-#include <unknwn.h>
-#include <shlobj.h>
-#include <shlwapi.h>
 #include <list>
 #include "iPathManager.h"
 #include "../Helper/Helper.h"
@@ -292,7 +288,6 @@ __interface IShellBrowser2 : IUnknown
 	virtual int				GetFolderIndex(void) const;
 	virtual void			FilesModified(DWORD Action,TCHAR *FileName,int EventId,int iFolderIndex);
 	virtual void			DirectoryAltered(void);
-	virtual void			QueryName(int iIndex,TCHAR *FileName) const;
 	virtual HRESULT			QueryFullItemName(int iIndex,TCHAR *FullItemPath) const;
 	virtual UINT			QueryCurrentDirectory(int,TCHAR *) const;
 	virtual LPITEMIDLIST	QueryCurrentDirectoryIdl(void) const;
@@ -359,18 +354,12 @@ __interface IShellBrowser2 : IUnknown
 	virtual void			RefreshAllIcons(void);
 	virtual void			OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	virtual void			SetHideSystemFiles(BOOL bHideSystemFiles);
-	virtual BOOL			GetHideSystemFiles(void) const;
 	virtual void			SetShowExtensions(BOOL bShowExtensions);
-	virtual BOOL			GetShowExtensions(void) const;
 	virtual void			SetHideLinkExtension(BOOL bHideLinkExtension);
-	virtual BOOL			GetHideLinkExtension(void) const;
 	virtual void			SetShowFolderSizes(BOOL bShowFolderSizes);
-	virtual BOOL			GetShowFolderSizes(void) const;
 	virtual void			SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable);
 	virtual void			SetShowFriendlyDates(BOOL bShowFriendlyDates);
-	virtual BOOL			GetShowFriendlyDates(void) const;
 	virtual void			SetInsertSorted(BOOL bInsertSorted);
-	virtual BOOL			GetInsertSorted(void) const;
 	virtual void			SetForceSize(BOOL bForceSize);
 	virtual void			SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
 };

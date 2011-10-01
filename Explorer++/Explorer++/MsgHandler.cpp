@@ -2534,7 +2534,7 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 
 				/* Loop through each filter. Decide whether to change the font of the
 				current item based on its filename and/or attributes. */
-				for each(auto ColorRule in m_ColorRuleList)
+				for each(auto ColorRule in m_ColorRules)
 				{
 					BOOL bMatchFileName = FALSE;
 					BOOL bMatchAttributes = FALSE;

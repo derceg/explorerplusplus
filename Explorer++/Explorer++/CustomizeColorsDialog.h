@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "Explorer++_internal.h"
+#include "ColorRuleHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -33,7 +34,7 @@ class CCustomizeColorsDialog : public CBaseDialog
 {
 public:
 
-	CCustomizeColorsDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::vector<ColorRule_t> *pColorRuleList);
+	CCustomizeColorsDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList);
 	~CCustomizeColorsDialog();
 
 protected:
@@ -52,7 +53,7 @@ private:
 
 	void	OnNew();
 	void	OnEdit();
-	void	InsertColorRuleIntoListView(HWND hListView,const ColorRule_t &ColorRule,int iIndex);
+	void	InsertColorRuleIntoListView(HWND hListView,const NColorRuleHelper::ColorRule_t &ColorRule,int iIndex);
 	void	EditColorRule(int iSelected);
 	void	OnMove(BOOL bUp);
 	void	OnDelete();
@@ -61,7 +62,7 @@ private:
 	void	OnCancel();
 
 	HICON	m_hDialogIcon;
-	std::vector<ColorRule_t>	*m_pColorRuleList;
+	std::vector<NColorRuleHelper::ColorRule_t>	*m_pColorRuleList;
 
 	CCustomizeColorsDialogPersistentSettings	*m_pccdps;
 };

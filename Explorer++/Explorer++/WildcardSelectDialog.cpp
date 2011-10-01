@@ -158,8 +158,7 @@ void CWildcardSelectDialog::SelectItems(TCHAR *szPattern)
 	for(int i = 0;i < nItems;i++)
 	{
 		TCHAR szFilename[MAX_PATH];
-
-		m_pexpp->GetActiveShellBrowser()->QueryName(i,szFilename);
+		m_pexpp->GetActiveShellBrowser()->QueryDisplayName(i,SIZEOF_ARRAY(szFilename),szFilename);
 
 		if(CheckWildcardMatch(szPattern,szFilename,FALSE) == 1)
 		{

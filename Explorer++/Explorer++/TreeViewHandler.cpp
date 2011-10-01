@@ -775,3 +775,56 @@ void Explorerplusplus::OnTreeViewPaste(void)
 		}
 	}
 }
+
+void Explorerplusplus::HandleTreeViewSelection(void)
+{
+	HTREEITEM		hItem;
+	LPITEMIDLIST	pidlDirectory = NULL;
+	TCHAR			szDirectory[MAX_PATH];
+	TCHAR			szRoot[MAX_PATH];
+	UINT			uDriveType;
+	BOOL			bNetworkPath = FALSE;
+
+	if(!m_bSynchronizeTreeview)
+	{
+		return;
+	}
+
+	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+
+	GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
+
+	if(PathIsUNC(szDirectory))
+	{
+		bNetworkPath = TRUE;
+	}
+	else
+	{
+		PathStripToRoot(szRoot);
+		uDriveType = GetDriveType(szRoot);
+
+		bNetworkPath = (uDriveType == DRIVE_REMOTE);
+	}
+
+	/* To improve performance, do not automatically sync the
+	treeview with network or UNC paths. */
+	if(!bNetworkPath)
+	{
+		hItem = m_pMyTreeView->LocateItem(pidlDirectory);
+
+		if(hItem != NULL)
+		{
+			/* TVN_SELCHANGED is NOT sent when the new selected
+			item is the same as the old selected item. It is only
+			sent when the two are different.
+			Therefore, the only case to handle is when the treeview
+			selection is changed by browsing using the listview. */
+			if(TreeView_GetSelection(m_hTreeView) != hItem)
+				m_bSelectingTreeViewDirectory = TRUE;
+
+			SendMessage(m_hTreeView,TVM_SELECTITEM,(WPARAM)TVGN_CARET,(LPARAM)hItem);
+		}
+	}
+
+	CoTaskMemFree(pidlDirectory);
+}

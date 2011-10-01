@@ -730,8 +730,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	StringCchCopy(NewFileName,SIZEOF_ARRAY(NewFileName),CurrentDirectory);
 	StringCchCopy(OldFileName,SIZEOF_ARRAY(OldFileName),CurrentDirectory);
 
-	m_pActiveShellBrowser->QueryName(pItem->iItem,
-	OldName);
+	m_pActiveShellBrowser->QueryDisplayName(pItem->iItem,SIZEOF_ARRAY(OldName),OldName);
 	PathAppend(OldFileName,OldName);
 
 	BOOL bRes = PathAppend(NewFileName,pItem->pszText);
@@ -1676,4 +1675,48 @@ void Explorerplusplus::BuildListViewFileSelectionList(HWND hListView,
 
 	pFileSelectionList->assign(FileSelectionList.begin(),
 		FileSelectionList.end());
+}
+
+int Explorerplusplus::HighlightSimilarFiles(HWND ListView)
+{
+	TCHAR	FullFileName[MAX_PATH];
+	TCHAR	TestFile[MAX_PATH];
+	HRESULT	hr;
+	BOOL	bSimilarTypes;
+	int		iSelected;
+	int		nItems;
+	int		nSimilar = 0;
+	int		i = 0;
+
+	iSelected = ListView_GetNextItem(ListView,
+	-1,LVNI_SELECTED);
+
+	if(iSelected == -1)
+		return -1;
+
+	hr = m_pActiveShellBrowser->QueryFullItemName(iSelected,TestFile);
+
+	if(SUCCEEDED(hr))
+	{
+		nItems = ListView_GetItemCount(ListView);
+
+		for(i = 0;i < nItems;i++)
+		{
+			m_pActiveShellBrowser->QueryFullItemName(i,FullFileName);
+
+			bSimilarTypes = CompareFileTypes(FullFileName,TestFile);
+
+			if(bSimilarTypes)
+			{
+				NListView::ListView_SelectItem(ListView,i,TRUE);
+				nSimilar++;
+			}
+			else
+			{
+				NListView::ListView_SelectItem(ListView,i,FALSE);
+			}
+		}
+	}
+
+	return nSimilar;
 }

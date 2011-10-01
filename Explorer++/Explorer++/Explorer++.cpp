@@ -60,7 +60,7 @@ m_hContainer(hwnd)
 
 	m_bBlockNext = FALSE;
 
-	InitializeColorRules();
+	m_ColorRules = NColorRuleHelper::GetDefaultColorRules();
 
 	SetDefaultValues();
 	SetAllDefaultColumns();
@@ -176,7 +176,6 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_bAlwaysOpenNewTab				= FALSE;
 	m_bShowFolderSizes				= FALSE;
 	m_bDisableFolderSizesNetworkRemovable	 = FALSE;
-	m_bUnlockFolders				= TRUE;
 	m_StartupMode					= STARTUP_PREVIOUSTABS;
 	m_bExtendTabControl				= FALSE;
 	m_bShowUserNameInTitleBar		= FALSE;
