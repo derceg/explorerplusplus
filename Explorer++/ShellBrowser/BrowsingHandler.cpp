@@ -24,7 +24,7 @@
 #include "../Helper/Macros.h"
 
 
-HRESULT CFolderView::BrowseFolder(TCHAR *szPath,UINT wFlags)
+HRESULT CShellBrowser::BrowseFolder(TCHAR *szPath,UINT wFlags)
 {
 	LPITEMIDLIST pidlDirectory	= NULL;
 	HRESULT hr;
@@ -41,7 +41,7 @@ HRESULT CFolderView::BrowseFolder(TCHAR *szPath,UINT wFlags)
 	return hr;
 }
 
-HRESULT CFolderView::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
+HRESULT CShellBrowser::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 {
 	LPITEMIDLIST	pidl = NULL;
 	TCHAR			szParsingPath[MAX_PATH];
@@ -137,7 +137,7 @@ HRESULT CFolderView::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 	return S_OK;
 }
 
-void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
+void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 {
 	LVITEM lv;
 	ULARGE_INTEGER ulFileSize;
@@ -291,7 +291,7 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	m_nAwaitingAdd = 0;
 }
 
-BOOL CFolderView::IsFileFiltered(int iItemInternal) const
+BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 {
 	BOOL bHideSystemFile	= FALSE;
 	BOOL bFilenameFiltered	= FALSE;
@@ -314,7 +314,7 @@ BOOL CFolderView::IsFileFiltered(int iItemInternal) const
 /* Processes an items filename. Essentially checks
 if the extension (if any) needs to be removed, and
 removes it if it does. */
-TCHAR *CFolderView::ProcessItemFileName(int iItemInternal)
+TCHAR *CShellBrowser::ProcessItemFileName(int iItemInternal)
 {
 	BOOL bHideExtension = FALSE;
 	TCHAR *pExt = NULL;
@@ -358,7 +358,7 @@ TCHAR *CFolderView::ProcessItemFileName(int iItemInternal)
 	return pszDisplay;
 }
 
-void CFolderView::RemoveItem(int iItemInternal)
+void CShellBrowser::RemoveItem(int iItemInternal)
 {
 	ULARGE_INTEGER	ulFileSize;
 	LVFINDINFO		lvfi;
@@ -411,7 +411,7 @@ void CFolderView::RemoveItem(int iItemInternal)
 	}
 }
 
-HRESULT CFolderView::ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,
+HRESULT CShellBrowser::ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,
 BOOL *bStoreHistory)
 {
 	if((uFlags & SBSP_RELATIVE) == SBSP_RELATIVE)
@@ -483,7 +483,7 @@ BOOL *bStoreHistory)
 	return S_OK;
 }
 
-int CFolderView::BrowseVirtualFolder(TCHAR *szParsingName)
+int CShellBrowser::BrowseVirtualFolder(TCHAR *szParsingName)
 {
 	LPITEMIDLIST pidl				= NULL;
 	int nItems = 0;
@@ -497,7 +497,7 @@ int CFolderView::BrowseVirtualFolder(TCHAR *szParsingName)
 	return nItems;
 }
 
-int CFolderView::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
+int CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 {
 	IShellFolder	*pDesktopFolder = NULL;
 	IShellFolder	*pShellFolder = NULL;
@@ -582,7 +582,7 @@ int CFolderView::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 	return nItems;
 }
 
-HRESULT inline CFolderView::AddItemInternal(LPITEMIDLIST pidlDirectory,
+HRESULT inline CShellBrowser::AddItemInternal(LPITEMIDLIST pidlDirectory,
 LPITEMIDLIST pidlRelative,TCHAR *szFileName,int iItemIndex,BOOL bPosition)
 {
 	int uItemId;
@@ -592,7 +592,7 @@ LPITEMIDLIST pidlRelative,TCHAR *szFileName,int iItemIndex,BOOL bPosition)
 	return AddItemInternal(iItemIndex,uItemId,bPosition);
 }
 
-HRESULT inline CFolderView::AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition)
+HRESULT inline CShellBrowser::AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition)
 {
 	AwaitingAdd_t	AwaitingAdd;
 
@@ -613,7 +613,7 @@ HRESULT inline CFolderView::AddItemInternal(int iItemIndex,int iItemId,BOOL bPos
 	return S_OK;
 }
 
-int inline CFolderView::SetItemInformation(LPITEMIDLIST pidlDirectory,
+int inline CShellBrowser::SetItemInformation(LPITEMIDLIST pidlDirectory,
 LPITEMIDLIST pidlRelative,TCHAR *szFileName)
 {
 	LPITEMIDLIST	pidlItem = NULL;

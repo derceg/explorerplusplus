@@ -8,7 +8,7 @@ class CTabContainer
 {
 public:
 
-	CTabContainer(HWND hTabCtrl,CFolderView **pShellBrowsers,IExplorerplusplus *pexpp);
+	CTabContainer(HWND hTabCtrl,CShellBrowser **pShellBrowsers,IExplorerplusplus *pexpp);
 	~CTabContainer();
 
 	void			InsertTab();
@@ -17,13 +17,13 @@ public:
 	int				GetSelection();
 	void			SetSelection(int Index);
 
-	CFolderView		*GetBrowserForTab(int Index);
+	CShellBrowser	*GetBrowserForTab(int Index);
 
 private:
 
 	HWND				m_hTabCtrl;
 
-	CFolderView			**m_pShellBrowsers;
+	CShellBrowser		**m_pShellBrowsers;
 	IExplorerplusplus	*m_pexpp;
 };
 

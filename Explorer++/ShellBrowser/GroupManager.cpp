@@ -42,12 +42,12 @@ std::list<TypeGroup_t> *g_pGroupList = NULL;
 
 /* Simply sets the grouping flag, without actually moving
 items into groups. */
-void CFolderView::SetGroupingFlag(BOOL bShowInGroups)
+void CShellBrowser::SetGroupingFlag(BOOL bShowInGroups)
 {
 	m_bShowInGroups = bShowInGroups;
 }
 
-void CFolderView::SetGrouping(BOOL bShowInGroups)
+void CShellBrowser::SetGrouping(BOOL bShowInGroups)
 {
 	m_bShowInGroups = bShowInGroups;
 
@@ -63,7 +63,7 @@ void CFolderView::SetGrouping(BOOL bShowInGroups)
 	}
 }
 
-void CFolderView::ToggleGrouping(void)
+void CShellBrowser::ToggleGrouping(void)
 {
 	m_bShowInGroups = !m_bShowInGroups;
 
@@ -152,7 +152,7 @@ TCHAR *RetrieveGroupHeader(int iGroupId)
  * Determines the id of the group the specified
  * item belongs to.
  */
-int CFolderView::DetermineItemGroup(int iItemInternal)
+int CShellBrowser::DetermineItemGroup(int iItemInternal)
 {
 	PFNLVGROUPCOMPARE	pfnGroupCompare = NULL;
 	TCHAR				szGroupHeader[512];
@@ -346,7 +346,7 @@ int CFolderView::DetermineItemGroup(int iItemInternal)
  * into its sorted position with the specified
  * header text.
  */
-int CFolderView::CheckGroup(TCHAR *szGroupHeader,
+int CShellBrowser::CheckGroup(TCHAR *szGroupHeader,
 PFNLVGROUPCOMPARE pfnGroupCompare)
 {
 	LVINSERTGROUPSORTED			lvigs;
@@ -442,7 +442,7 @@ PFNLVGROUPCOMPARE pfnGroupCompare)
  * is non-NULL.
  */
 /* TODO: These groups have changed as of Windows Visa.*/
-void CFolderView::DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR ch;
 	std::list<TypeGroup_t>::iterator itr;
@@ -469,7 +469,7 @@ void CFolderView::DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,
  * Also returns the text header for the group when szGroupHeader
  * is non-NULL.
  */
-void CFolderView::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR *SizeGroups[] = {_T("Folders"),_T("Tiny"),_T("Small"),_T("Medium"),_T("Large"),_T("Huge")};
 	int SizeGroupLimits[] = {0,0,32 * KBYTE,100 * KBYTE,MBYTE,10 * MBYTE};
@@ -508,7 +508,7 @@ void CFolderView::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeader,
  * is non-NULL.
  */
 /* TODO: These groups have changed as of Windows Vista. */
-void CFolderView::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	IShellFolder *pShellFolder	= NULL;
 	LPITEMIDLIST pidlComplete	= NULL;
@@ -567,7 +567,7 @@ void CFolderView::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHe
 	StringCchCopy(szGroupHeader,512,SizeGroups[iSize]);
 }
 
-void CFolderView::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	LPITEMIDLIST				pidlComplete = NULL;
 	LPITEMIDLIST				pidlDirectory = NULL;
@@ -586,7 +586,7 @@ void CFolderView::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroup
 	CoTaskMemFree(pidlDirectory);
 }
 
-void CFolderView::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR *szGroupHeader,int cchMax) const
 {
 	/* TODO: Move strings into string table. */
 	SYSTEMTIME	stCurrentTime;
@@ -650,7 +650,7 @@ void CFolderView::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR *
 }
 
 /* TODO: Check if works in XP. */
-void CFolderView::DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyType,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyType,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR						szFullFileName[MAX_PATH];
 	TCHAR						szComment[512];
@@ -670,7 +670,7 @@ void CFolderView::DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyTy
 }
 
 /* TODO: Need to sort based on percentage free. */
-void CFolderView::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	std::list<TypeGroup_t>::iterator itr;
 	LPITEMIDLIST pidlComplete	= NULL;
@@ -723,7 +723,7 @@ void CFolderView::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHe
 	StringCchCopy(szGroupHeader,cchMax,szFreeSpace);
 }
 
-void CFolderView::DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR FullFileName[MAX_PATH];
 	std::list<TypeGroup_t>::iterator itr;
@@ -738,7 +738,7 @@ void CFolderView::DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHe
 	StringCchCopy(szGroupHeader,cchMax,szAttributes);
 }
 
-void CFolderView::DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR FullFileName[MAX_PATH];
 	std::list<TypeGroup_t>::iterator itr;
@@ -752,7 +752,7 @@ void CFolderView::DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHeader
 	StringCchCopy(szGroupHeader,cchMax,szOwner);
 }
 
-void CFolderView::DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionType,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionType,TCHAR *szGroupHeader,int cchMax) const
 {
 	BOOL bGroupFound = FALSE;
 	TCHAR FullFileName[MAX_PATH];
@@ -774,7 +774,7 @@ void CFolderView::DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionTy
 	StringCchCopy(szGroupHeader,cchMax,szVersion);
 }
 
-void CFolderView::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID PropertyId,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID PropertyId,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR szFullFileName[MAX_PATH];
 	std::list<TypeGroup_t>::iterator itr;
@@ -793,7 +793,7 @@ void CFolderView::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID Prop
 	StringCchCopy(szGroupHeader,cchMax,szProperty);
 }
 
-void CFolderView::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	TCHAR FullFileName[MAX_PATH];
 	TCHAR *pExt;
@@ -815,7 +815,7 @@ void CFolderView::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHe
 	}
 }
 
-void CFolderView::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	LPITEMIDLIST pidlComplete = NULL;
 	IShellFolder *pShellFolder	= NULL;
@@ -860,7 +860,7 @@ void CFolderView::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupH
 }
 
 /* TODO: Fix. Need to check for each adapter. */
-void CFolderView::DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	std::list<TypeGroup_t>::iterator itr;
 
@@ -913,7 +913,7 @@ void CFolderView::DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHea
 	StringCchCopy(szGroupHeader,cchMax,szStatus);
 }
 
-void CFolderView::InsertItemIntoGroup(int iItem,int iGroupId)
+void CShellBrowser::InsertItemIntoGroup(int iItem,int iGroupId)
 {
 	LVITEM Item;
 
@@ -925,7 +925,7 @@ void CFolderView::InsertItemIntoGroup(int iItem,int iGroupId)
 	ListView_SetItem(m_hListView,&Item);
 }
 
-void CFolderView::MoveItemsIntoGroups(void)
+void CShellBrowser::MoveItemsIntoGroups(void)
 {
 	LVITEM Item;
 	int nItems;

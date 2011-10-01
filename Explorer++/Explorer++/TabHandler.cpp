@@ -390,7 +390,7 @@ int *pTabObjectIndex)
 	pSettings->bForceSize	= m_bForceSize;
 	pSettings->sdf			= m_SizeDisplayFormat;
 
-	m_pShellBrowser[iTabId] = CFolderView::CreateNew(m_hContainer,m_hListView[iTabId],pSettings,
+	m_pShellBrowser[iTabId] = CShellBrowser::CreateNew(m_hContainer,m_hListView[iTabId],pSettings,
 		m_hIconThread,m_hFolderSizeThread);
 
 	if(pSettings->bApplyFilter)
@@ -1468,7 +1468,7 @@ UINT Explorerplusplus::GetDefaultSortMode(const LPITEMIDLIST &pidlDirectory)
 	return uSortMode;
 }
 
-/* TODO: Code shared with CFolderView. */
+/* TODO: Code shared with CShellBrowser. */
 unsigned int Explorerplusplus::DetermineColumnSortMode(UINT uColumnId)
 {
 	switch(uColumnId)

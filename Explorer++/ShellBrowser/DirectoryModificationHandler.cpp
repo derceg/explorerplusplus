@@ -29,7 +29,7 @@
 BOOL g_bNewFileRenamed = FALSE;
 static int iRenamedItem;
 
-void CFolderView::DirectoryAltered(void)
+void CShellBrowser::DirectoryAltered(void)
 {
 	BOOL bNewItemCreated;
 
@@ -149,7 +149,7 @@ void CALLBACK TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 	SendMessage(hwnd,WM_USER_FILESADDED,(WPARAM)idEvent,0);
 }
 
-void CFolderView::FilesModified(DWORD Action,TCHAR *FileName,
+void CShellBrowser::FilesModified(DWORD Action,TCHAR *FileName,
 int EventId,int iFolderIndex)
 {
 	EnterCriticalSection(&m_csDirectoryAltered);
@@ -167,7 +167,7 @@ int EventId,int iFolderIndex)
 	LeaveCriticalSection(&m_csDirectoryAltered);
 }
 
-void CFolderView::OnFileActionAdded(TCHAR *szFileName)
+void CShellBrowser::OnFileActionAdded(TCHAR *szFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
 	LPITEMIDLIST	pidlFull = NULL;
@@ -264,7 +264,7 @@ void CFolderView::OnFileActionAdded(TCHAR *szFileName)
 	}
 }
 
-void CFolderView::RemoveItemInternal(TCHAR *szFileName)
+void CShellBrowser::RemoveItemInternal(TCHAR *szFileName)
 {
 	std::list<Added_t>::iterator itr;
 	int iItemInternal;
@@ -294,7 +294,7 @@ void CFolderView::RemoveItemInternal(TCHAR *szFileName)
 /*
  * Modifies the attributes of an item currently in the listview.
  */
-void CFolderView::ModifyItemInternal(TCHAR *FileName)
+void CShellBrowser::ModifyItemInternal(TCHAR *FileName)
 {
 	HANDLE			hFirstFile;
 	ULARGE_INTEGER	ulFileSize;
@@ -459,7 +459,7 @@ void CFolderView::ModifyItemInternal(TCHAR *FileName)
 	}
 }
 
-void CFolderView::OnFileActionRenamedOldName(TCHAR *szFileName)
+void CShellBrowser::OnFileActionRenamedOldName(TCHAR *szFileName)
 {
 	std::list<Added_t>::iterator itrAdded;
 	BOOL bFileHandled = FALSE;
@@ -489,7 +489,7 @@ void CFolderView::OnFileActionRenamedOldName(TCHAR *szFileName)
 	}
 }
 
-void CFolderView::OnFileActionRenamedNewName(TCHAR *szFileName)
+void CShellBrowser::OnFileActionRenamedNewName(TCHAR *szFileName)
 {
 	if(g_bNewFileRenamed)
 	{
@@ -511,7 +511,7 @@ void CFolderView::OnFileActionRenamedNewName(TCHAR *szFileName)
 adds items as well as the code that finds their icons.
 ALL changes to an items name/internal properties/icon/overlay icon
 should go through a central function. */
-void CFolderView::RenameItem(int iItemInternal,TCHAR *szNewFileName)
+void CShellBrowser::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
 	LPITEMIDLIST	pidlFull = NULL;

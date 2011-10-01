@@ -276,11 +276,11 @@ typedef struct
 	int nItems;
 } TypeGroup_t;
 
-class CFolderView : public IDropTarget, public IDropFilesCallback
+class CShellBrowser : public IDropTarget, public IDropFilesCallback
 {
 public:
 
-	static CFolderView	*CreateNew(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread);
+	static CShellBrowser *CreateNew(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
@@ -479,7 +479,7 @@ public:
 
 private:
 
-	DISALLOW_COPY_AND_ASSIGN(CFolderView);
+	DISALLOW_COPY_AND_ASSIGN(CShellBrowser);
 
 	typedef struct
 	{
@@ -513,8 +513,8 @@ private:
 		TCHAR szFileName[MAX_PATH];
 	} DraggedFile_t;
 
-	CFolderView(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread);
-	~CFolderView();
+	CShellBrowser(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread);
+	~CShellBrowser();
 
 	void				InitializeItemMap(int iStart,int iEnd);
 	int					GenerateUniqueItemId(void);

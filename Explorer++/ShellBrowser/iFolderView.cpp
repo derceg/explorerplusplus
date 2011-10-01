@@ -27,7 +27,7 @@
 BOOL g_bInitialized = FALSE;
 
 /* IUnknown interface members. */
-HRESULT __stdcall CFolderView::QueryInterface(REFIID iid, void **ppvObject)
+HRESULT __stdcall CShellBrowser::QueryInterface(REFIID iid, void **ppvObject)
 {
 	*ppvObject = NULL;
 
@@ -45,12 +45,12 @@ HRESULT __stdcall CFolderView::QueryInterface(REFIID iid, void **ppvObject)
 	return E_NOINTERFACE;
 }
 
-ULONG __stdcall CFolderView::AddRef(void)
+ULONG __stdcall CShellBrowser::AddRef(void)
 {
 	return ++m_iRefCount;
 }
 
-ULONG __stdcall CFolderView::Release(void)
+ULONG __stdcall CShellBrowser::Release(void)
 {
 	m_iRefCount--;
 	
@@ -63,13 +63,13 @@ ULONG __stdcall CFolderView::Release(void)
 	return m_iRefCount;
 }
 
-CFolderView *CFolderView::CreateNew(HWND hOwner,HWND hListView,
+CShellBrowser *CShellBrowser::CreateNew(HWND hOwner,HWND hListView,
 	InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread)
 {
-	return new CFolderView(hOwner,hListView,pSettings,hIconThread,hFolderSizeThread);
+	return new CShellBrowser(hOwner,hListView,pSettings,hIconThread,hFolderSizeThread);
 }
 
-CFolderView::CFolderView(HWND hOwner,HWND hListView,
+CShellBrowser::CShellBrowser(HWND hOwner,HWND hListView,
 InitialSettings_t *pSettings,HANDLE hIconThread,
 HANDLE hFolderSizeThread) :
 m_hOwner(hOwner),
@@ -164,7 +164,7 @@ m_hFolderSizeThread(hFolderSizeThread)
 	m_hFolderQueueEvent = CreateEvent(NULL,TRUE,TRUE,NULL);
 }
 
-CFolderView::~CFolderView()
+CShellBrowser::~CShellBrowser()
 {
 	EmptyIconFinderQueue();
 	EmptyThumbnailsQueue();
@@ -207,7 +207,7 @@ CFolderView::~CFolderView()
 	free(m_pwfdFiles);
 }
 
-BOOL CFolderView::GetAutoArrange(void) const
+BOOL CShellBrowser::GetAutoArrange(void) const
 {
 	return m_bAutoArrange;
 }
@@ -217,7 +217,7 @@ BOOL CFolderView::GetAutoArrange(void) const
 not called when a tab is first set up (in which case
 the view mode still needs to be setup), or when entering
 a folder. */
-HRESULT CFolderView::SetCurrentViewMode(DWORD ViewMode)
+HRESULT CShellBrowser::SetCurrentViewMode(DWORD ViewMode)
 {
 	if(ViewMode == m_ViewMode)
 		return S_FALSE;
@@ -256,7 +256,7 @@ This function also initializes any items needed to support
 the current view mode. This MUST be done within this
 function, as when a tab is first opened, the view settings
 will need to be initialized. */
-void CFolderView::SetCurrentViewModeInternal(DWORD ViewMode)
+void CShellBrowser::SetCurrentViewModeInternal(DWORD ViewMode)
 {
 	DWORD dwStyle;
 
@@ -360,7 +360,7 @@ void CFolderView::SetCurrentViewModeInternal(DWORD ViewMode)
 	SendMessage(m_hListView,LVM_SETVIEW,dwStyle,0);
 }
 
-HRESULT CFolderView::GetCurrentViewMode(UINT *pViewMode) const
+HRESULT CShellBrowser::GetCurrentViewMode(UINT *pViewMode) const
 {
 	if(pViewMode == NULL)
 		return E_INVALIDARG;
@@ -370,26 +370,26 @@ HRESULT CFolderView::GetCurrentViewMode(UINT *pViewMode) const
 	return S_OK;
 }
 
-HRESULT CFolderView::GetSortMode(UINT *SortMode) const
+HRESULT CShellBrowser::GetSortMode(UINT *SortMode) const
 {
 	*SortMode = m_SortMode;
 
 	return S_OK;
 }
 
-HRESULT CFolderView::SetSortMode(UINT SortMode)
+HRESULT CShellBrowser::SetSortMode(UINT SortMode)
 {
 	m_SortMode	= SortMode;
 
 	return S_OK;
 }
 
-BOOL CFolderView::IsGroupViewEnabled(void) const
+BOOL CShellBrowser::IsGroupViewEnabled(void) const
 {
 	return m_bShowInGroups;
 }
 
-void CFolderView::InitializeItemMap(int iStart,int iEnd)
+void CShellBrowser::InitializeItemMap(int iStart,int iEnd)
 {
 	int i = 0;
 
@@ -401,7 +401,7 @@ void CFolderView::InitializeItemMap(int iStart,int iEnd)
 	m_iCachedPosition = 0;
 }
 
-HRESULT CFolderView::InitializeDragDropHelpers(void)
+HRESULT CShellBrowser::InitializeDragDropHelpers(void)
 {
 	HRESULT hr;
 
@@ -422,7 +422,7 @@ HRESULT CFolderView::InitializeDragDropHelpers(void)
 	return hr;
 }
 
-void CFolderView::SetUserOptions(InitialSettings_t *is)
+void CShellBrowser::SetUserOptions(InitialSettings_t *is)
 {
 	m_bAutoArrange			= is->bAutoArrange;
 	m_bGridlinesActive		= is->bGridlinesActive;
@@ -453,7 +453,7 @@ void CFolderView::SetUserOptions(InitialSettings_t *is)
 	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 }
 
-void CFolderView::CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns)
+void CShellBrowser::CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns)
 {
 	std::list<Column_t>::iterator	itr;
 	Column_t						ci;
@@ -470,24 +470,24 @@ void CFolderView::CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std:
 	}
 }
 
-void CFolderView::SetGlobalSettings(GlobalSettings_t *gs)
+void CShellBrowser::SetGlobalSettings(GlobalSettings_t *gs)
 {
 	m_bShowExtensions		= gs->bShowExtensions;
 	m_bShowFriendlyDates	= gs->bShowFriendlyDates;
 	m_bShowFolderSizes		= gs->bShowFolderSizes;
 }
 
-int CFolderView::GetId(void) const
+int CShellBrowser::GetId(void) const
 {
 	return m_ID;
 }
 
-void CFolderView::SetId(int ID)
+void CShellBrowser::SetId(int ID)
 {
 	m_ID = ID;
 }
 
-void CFolderView::AllocateInitialItemMemory(void)
+void CShellBrowser::AllocateInitialItemMemory(void)
 {
 	m_pwfdFiles			= (WIN32_FIND_DATA *)malloc(DEFAULT_MEM_ALLOC * sizeof(WIN32_FIND_DATA));
 	m_pExtraItemInfo	= (CItemObject *)malloc(DEFAULT_MEM_ALLOC * sizeof(CItemObject));
@@ -495,76 +495,76 @@ void CFolderView::AllocateInitialItemMemory(void)
 	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;
 }
 
-void CFolderView::ToggleGridlines(void)
+void CShellBrowser::ToggleGridlines(void)
 {
 	m_bGridlinesActive = !m_bGridlinesActive;
 
 	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 }
 
-BOOL CFolderView::QueryGridlinesActive(void) const
+BOOL CShellBrowser::QueryGridlinesActive(void) const
 {
 	return m_bGridlinesActive;
 }
 
-void CFolderView::SetResourceModule(HINSTANCE hResourceModule)
+void CShellBrowser::SetResourceModule(HINSTANCE hResourceModule)
 {
 	m_hResourceModule = hResourceModule;
 }
 
-HRESULT CFolderView::Refresh()
+HRESULT CShellBrowser::Refresh()
 {
 	BrowseFolder(m_pidlDirectory,SBSP_SAMEBROWSER|SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 
 	return S_OK;
 }
 
-void CFolderView::SetHideSystemFiles(BOOL bHideSystemFiles)
+void CShellBrowser::SetHideSystemFiles(BOOL bHideSystemFiles)
 {
 	m_bHideSystemFiles = bHideSystemFiles;
 }
 
-void CFolderView::SetShowExtensions(BOOL bShowExtensions)
+void CShellBrowser::SetShowExtensions(BOOL bShowExtensions)
 {
 	m_bShowExtensions = bShowExtensions;
 }
 
-void CFolderView::SetHideLinkExtension(BOOL bHideLinkExtension)
+void CShellBrowser::SetHideLinkExtension(BOOL bHideLinkExtension)
 {
 	m_bHideLinkExtension = bHideLinkExtension;
 }
 
-void CFolderView::SetShowFolderSizes(BOOL bShowFolderSizes)
+void CShellBrowser::SetShowFolderSizes(BOOL bShowFolderSizes)
 {
 	m_bShowFolderSizes = bShowFolderSizes;
 }
 
-void CFolderView::SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable)
+void CShellBrowser::SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable)
 {
 	m_bDisableFolderSizesNetworkRemovable = bDisableFolderSizesNetworkRemovable;
 }
 
-void CFolderView::SetShowFriendlyDates(BOOL bShowFriendlyDates)
+void CShellBrowser::SetShowFriendlyDates(BOOL bShowFriendlyDates)
 {
 	m_bShowFriendlyDates = bShowFriendlyDates;
 }
 
-void CFolderView::SetInsertSorted(BOOL bInsertSorted)
+void CShellBrowser::SetInsertSorted(BOOL bInsertSorted)
 {
 	m_bInsertSorted = bInsertSorted;
 }
 
-void CFolderView::SetForceSize(BOOL bForceSize)
+void CShellBrowser::SetForceSize(BOOL bForceSize)
 {
 	m_bForceSize = bForceSize;
 }
 
-void CFolderView::SetSizeDisplayFormat(SizeDisplayFormat_t sdf)
+void CShellBrowser::SetSizeDisplayFormat(SizeDisplayFormat_t sdf)
 {
 	m_SizeDisplayFormat = sdf;
 }
 
-void CFolderView::InsertTileViewColumns(void)
+void CShellBrowser::InsertTileViewColumns(void)
 {
 	LVTILEVIEWINFO lvtvi;
 	LVCOLUMN lvColumn;
@@ -591,14 +591,14 @@ void CFolderView::InsertTileViewColumns(void)
 	ListView_SetTileViewInfo(m_hListView,&lvtvi);
 }
 
-void CFolderView::DeleteTileViewColumns(void)
+void CShellBrowser::DeleteTileViewColumns(void)
 {
 	ListView_DeleteColumn(m_hListView,3);
 	ListView_DeleteColumn(m_hListView,2);
 	ListView_DeleteColumn(m_hListView,1);
 }
 
-void CFolderView::SetTileViewInfo(void)
+void CShellBrowser::SetTileViewInfo(void)
 {
 	LVITEM lvItem;
 	BOOL bRes;
@@ -622,7 +622,7 @@ void CFolderView::SetTileViewInfo(void)
 }
 
 /* TODO: Make this function configurable. */
-void CFolderView::SetTileViewItemInfo(int iItem,int iItemInternal)
+void CShellBrowser::SetTileViewItemInfo(int iItem,int iItemInternal)
 {
 	SHFILEINFO shfi;
 	LVTILEINFO lvti;

@@ -32,7 +32,7 @@ BOOL					g_bcsThumbnailInitialized = FALSE;
 int g_nThumbnailAPCsQueued = 0;
 int g_nThumbnailAPCsRun = 0;
 
-void CFolderView::SetupThumbnailsView(void)
+void CShellBrowser::SetupThumbnailsView(void)
 {
 	HIMAGELIST himl;
 	LVITEM lvItem;
@@ -72,7 +72,7 @@ void CFolderView::SetupThumbnailsView(void)
 	m_bThumbnailsSetup = TRUE;
 }
 
-void CFolderView::RemoveThumbnailsView(void)
+void CShellBrowser::RemoveThumbnailsView(void)
 {
 	LVITEM		lvItem;
 	HIMAGELIST	himl;
@@ -106,14 +106,14 @@ void CFolderView::RemoveThumbnailsView(void)
 	m_bThumbnailsSetup = FALSE;
 }
 
-void CFolderView::EmptyThumbnailsQueue(void)
+void CShellBrowser::EmptyThumbnailsQueue(void)
 {
 	EnterCriticalSection(&g_csThumbnails);
 	g_ThumbnailQueue.clear();
 	LeaveCriticalSection(&g_csThumbnails);
 }
 
-void CFolderView::AddToThumbnailFinderQueue(LPARAM lParam)
+void CShellBrowser::AddToThumbnailFinderQueue(LPARAM lParam)
 {
 	EnterCriticalSection(&g_csThumbnails);
 
@@ -205,13 +205,13 @@ void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
 	HRESULT hr;
 	BOOL bQueueNotEmpty;
 	ListViewInfo_t	pListViewInfo;
-	CFolderView *pFolderView = NULL;
+	CShellBrowser *pShellBrowser = NULL;
 
-	pFolderView = reinterpret_cast<CFolderView *>(dwParam);
+	pShellBrowser = reinterpret_cast<CShellBrowser *>(dwParam);
 
 	/* If this module is in the process of been
 	shut down, DO NOT load any more thumbnails. */
-	if(pFolderView->GetTerminationStatus())
+	if(pShellBrowser->GetTerminationStatus())
 		return;
 
 	bQueueNotEmpty = RemoveFromThumbnailsFinderQueue(&pListViewInfo,NULL);
@@ -256,7 +256,7 @@ void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
 						int iItem;
 						int iImage;
 
-						iImage = pFolderView->GetExtractedThumbnail(hThumbnailBitmap);
+						iImage = pShellBrowser->GetExtractedThumbnail(hThumbnailBitmap);
 
 						lvfi.flags	= LVFI_PARAM;
 						lvfi.lParam	= pListViewInfo.iItem;
@@ -296,20 +296,20 @@ void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
 }
 
 /* Draws a thumbnail based on an items icon. */
-int CFolderView::GetIconThumbnail(int iInternalIndex)
+int CShellBrowser::GetIconThumbnail(int iInternalIndex)
 {
 	return GetThumbnailInternal(THUMBNAIL_TYPE_ICON,iInternalIndex,
 		NULL);
 }
 
 /* Draws an items extracted thumbnail. */
-int CFolderView::GetExtractedThumbnail(HBITMAP hThumbnailBitmap)
+int CShellBrowser::GetExtractedThumbnail(HBITMAP hThumbnailBitmap)
 {
 	return GetThumbnailInternal(THUMBNAIL_TYPE_EXTRACTED,0,
 		hThumbnailBitmap);
 }
 
-int CFolderView::GetThumbnailInternal(int iType,
+int CShellBrowser::GetThumbnailInternal(int iType,
 int iInternalIndex,HBITMAP hThumbnailBitmap)
 {
 	HDC hdc;
@@ -356,7 +356,7 @@ int iInternalIndex,HBITMAP hThumbnailBitmap)
 	return iImage;
 }
 
-void CFolderView::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex)
+void CShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex)
 {
 	LPITEMIDLIST pidlFull = NULL;
 	HICON hIcon;
@@ -378,7 +378,7 @@ void CFolderView::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex)
 	DestroyIcon(hIcon);
 }
 
-void CFolderView::DrawThumbnailInternal(HDC hdcBacking,HBITMAP hThumbnailBitmap)
+void CShellBrowser::DrawThumbnailInternal(HDC hdcBacking,HBITMAP hThumbnailBitmap)
 {
 	HDC hdcThumbnail;
 	HBITMAP hThumbnailBitmapOld;

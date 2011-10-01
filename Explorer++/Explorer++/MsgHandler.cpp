@@ -2835,7 +2835,7 @@ HWND Explorerplusplus::GetActiveListView() const
 	return m_hActiveListView;
 }
 
-CFolderView *Explorerplusplus::GetActiveShellBrowser() const
+CShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 {
 	return m_pActiveShellBrowser;
 }

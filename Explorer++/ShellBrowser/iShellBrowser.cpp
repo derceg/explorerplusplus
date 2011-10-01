@@ -33,7 +33,7 @@ CRITICAL_SECTION	g_icon_cs;
 int					g_nAPCsRan;
 int					g_nAPCsQueued;
 
-void CFolderView::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
+void CShellBrowser::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 {
 	ULARGE_INTEGER	ulFileSize;
 	BOOL			IsFolder;
@@ -64,7 +64,7 @@ void CFolderView::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 	}
 }
 
-BOOL CFolderView::IsFilenameFiltered(TCHAR *FileName) const
+BOOL CShellBrowser::IsFilenameFiltered(TCHAR *FileName) const
 {
 	if(CheckWildcardMatch(m_szFilter,FileName,m_bFilterCaseSensitive))
 		return FALSE;
@@ -72,7 +72,7 @@ BOOL CFolderView::IsFilenameFiltered(TCHAR *FileName) const
 	return TRUE;
 }
 
-int CFolderView::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const
+int CShellBrowser::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const
 {
 	LVITEM lvItem;
 
@@ -86,7 +86,7 @@ int CFolderView::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const
 	return lstrlen(Buffer);
 }
 
-HRESULT CFolderView::QueryFullItemName(int iIndex,TCHAR *FullItemPath) const
+HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath) const
 {
 	LVITEM			lvItem;
 	BOOL			bRes;
@@ -106,7 +106,7 @@ HRESULT CFolderView::QueryFullItemName(int iIndex,TCHAR *FullItemPath) const
 	return E_FAIL;
 }
 
-void CFolderView::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName) const
+void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName) const
 {
 	LPITEMIDLIST	pidlComplete = NULL;
 
@@ -117,7 +117,7 @@ void CFolderView::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileN
 	CoTaskMemFree(pidlComplete);
 }
 
-UINT CFolderView::QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const
+UINT CShellBrowser::QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const
 {
 	if(BufferSize < (lstrlen(m_CurDir) + 1))
 	{
@@ -130,12 +130,12 @@ UINT CFolderView::QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const
 	return lstrlen(m_CurDir);
 }
 
-LPITEMIDLIST CFolderView::QueryCurrentDirectoryIdl(void) const
+LPITEMIDLIST CShellBrowser::QueryCurrentDirectoryIdl(void) const
 {
 	return ILClone(m_pidlDirectory);
 }
 
-HRESULT CFolderView::CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,
+HRESULT CShellBrowser::CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,
 IN POINT *pt,IN BOOL bBackOrForward)
 {
 	int iSel;
@@ -153,7 +153,7 @@ IN POINT *pt,IN BOOL bBackOrForward)
 	return S_OK;
 }
 
-BOOL CFolderView::IsBackHistory(void) const
+BOOL CShellBrowser::IsBackHistory(void) const
 {
 	int nBackPathsStored;
 
@@ -165,7 +165,7 @@ BOOL CFolderView::IsBackHistory(void) const
 	return TRUE;
 }
 
-BOOL CFolderView::IsForwardHistory(void) const
+BOOL CShellBrowser::IsForwardHistory(void) const
 {
 	int nForwardPathsStored;
 
@@ -177,34 +177,34 @@ BOOL CFolderView::IsForwardHistory(void) const
 	return TRUE;
 }
 
-void CFolderView::GetBackHistory(std::list<LPITEMIDLIST> *lHistory) const
+void CShellBrowser::GetBackHistory(std::list<LPITEMIDLIST> *lHistory) const
 {
 	return m_pPathManager->GetBackHistory(lHistory);
 }
 
-void CFolderView::GetForwardHistory(std::list<LPITEMIDLIST> *lHistory) const
+void CShellBrowser::GetForwardHistory(std::list<LPITEMIDLIST> *lHistory) const
 {
 	return m_pPathManager->GetForwardHistory(lHistory);
 }
 
-LPITEMIDLIST CFolderView::RetrieveHistoryItemWithoutUpdate(int iItem)
+LPITEMIDLIST CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)
 {
 	return m_pPathManager->RetrievePathWithoutUpdate(iItem);
 }
 
-LPITEMIDLIST CFolderView::RetrieveHistoryItem(int iItem)
+LPITEMIDLIST CShellBrowser::RetrieveHistoryItem(int iItem)
 {
 	return m_pPathManager->RetrievePath(iItem);
 }
 
-BOOL CFolderView::CanBrowseUp(void) const
+BOOL CShellBrowser::CanBrowseUp(void) const
 {
 	return !IsNamespaceRoot(m_pidlDirectory);
 }
 
 /* TODO: Convert to using pidl's here, rather than
 file names. */
-int CFolderView::SelectFiles(TCHAR *FileNamePattern)
+int CShellBrowser::SelectFiles(TCHAR *FileNamePattern)
 {
 	int iItem;
 	
@@ -221,7 +221,7 @@ int CFolderView::SelectFiles(TCHAR *FileNamePattern)
 	return 0;
 }
 
-int CFolderView::LocateFileItemIndex(const TCHAR *szFileName) const
+int CShellBrowser::LocateFileItemIndex(const TCHAR *szFileName) const
 {
 	LV_FINDINFO	lvFind;
 	int			iItem;
@@ -241,7 +241,7 @@ int CFolderView::LocateFileItemIndex(const TCHAR *szFileName) const
 	return -1;
 }
 
-int CFolderView::LocateFileItemInternalIndex(const TCHAR *szFileName) const
+int CShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 {
 	LVITEM	lvItem;
 	int		i = 0;
@@ -264,7 +264,7 @@ int CFolderView::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 	return -1;
 }
 
-DWORD CFolderView::QueryFileAttributes(int iItem) const
+DWORD CShellBrowser::QueryFileAttributes(int iItem) const
 {
 	LVITEM lvItem;
 
@@ -276,7 +276,7 @@ DWORD CFolderView::QueryFileAttributes(int iItem) const
 	return m_pwfdFiles[(int)lvItem.lParam].dwFileAttributes;
 }
 
-WIN32_FIND_DATA *CFolderView::QueryFileFindData(int iItem) const
+WIN32_FIND_DATA *CShellBrowser::QueryFileFindData(int iItem) const
 {
 	LVITEM lvItem;
 
@@ -288,7 +288,7 @@ WIN32_FIND_DATA *CFolderView::QueryFileFindData(int iItem) const
 	return &m_pwfdFiles[(int)lvItem.lParam];
 }
 
-void CFolderView::DragStarted(int iFirstItem,POINT *ptCursor)
+void CShellBrowser::DragStarted(int iFirstItem,POINT *ptCursor)
 {
 	DraggedFile_t	df;
 	int				iSelected = -1;
@@ -316,14 +316,14 @@ void CFolderView::DragStarted(int iFirstItem,POINT *ptCursor)
 	m_bDragging = TRUE;
 }
 
-void CFolderView::DragStopped(void)
+void CShellBrowser::DragStopped(void)
 {
 	m_DraggedFilesList.clear();
 
 	m_bDragging = FALSE;
 }
 
-void CFolderView::OnListViewGetDisplayInfo(LPARAM lParam)
+void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 {
 	NMLVDISPINFO	*pnmv = NULL;
 	LVITEM			*plvItem = NULL;
@@ -374,7 +374,7 @@ void CFolderView::OnListViewGetDisplayInfo(LPARAM lParam)
 	plvItem->mask |= LVIF_DI_SETITEM;
 }
 
-void CFolderView::AddToIconFinderQueue(LVITEM *plvItem)
+void CShellBrowser::AddToIconFinderQueue(LVITEM *plvItem)
 {
 	EnterCriticalSection(&g_icon_cs);
 
@@ -408,7 +408,7 @@ void CFolderView::AddToIconFinderQueue(LVITEM *plvItem)
 	LeaveCriticalSection(&g_icon_cs);
 }
 
-void CFolderView::EmptyIconFinderQueue(void)
+void CShellBrowser::EmptyIconFinderQueue(void)
 {
 	EnterCriticalSection(&g_icon_cs);
 
@@ -534,7 +534,7 @@ void CALLBACK FindIconAPC(ULONG_PTR dwParam)
 	}
 }
 
-LPITEMIDLIST CFolderView::QueryItemRelativeIdl(int iItem) const
+LPITEMIDLIST CShellBrowser::QueryItemRelativeIdl(int iItem) const
 {
 	LVITEM lvItem;
 	BOOL bRet;
@@ -550,7 +550,7 @@ LPITEMIDLIST CFolderView::QueryItemRelativeIdl(int iItem) const
 	return NULL;
 }
 
-BOOL CFolderView::InVirtualFolder(void) const
+BOOL CShellBrowser::InVirtualFolder(void) const
 {
 	return m_bVirtualFolder;
 }
@@ -558,7 +558,7 @@ BOOL CFolderView::InVirtualFolder(void) const
 /* We can create files in this folder if it is
 part of the filesystem, or if it is the root of
 the namespace (i.e. the desktop). */
-BOOL CFolderView::CanCreate(void) const
+BOOL CShellBrowser::CanCreate(void) const
 {
 	LPITEMIDLIST	pidl = NULL;
 	HRESULT			hr;
@@ -576,17 +576,17 @@ BOOL CFolderView::CanCreate(void) const
 	return bCanCreate;
 }
 
-void CFolderView::SetDirMonitorId(int iDirMonitorId)
+void CShellBrowser::SetDirMonitorId(int iDirMonitorId)
 {
 	m_iDirMonitorId = iDirMonitorId;
 }
 
-int CFolderView::GetDirMonitorId(void) const
+int CShellBrowser::GetDirMonitorId(void) const
 {
 	return m_iDirMonitorId;
 }
 
-HRESULT CFolderView::RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMax)
+HRESULT CShellBrowser::RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMax)
 {
 	LVITEM	lvItem;
 	BOOL	bItem;
@@ -608,7 +608,7 @@ HRESULT CFolderView::RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMa
 	}
 }
 
-BOOL CFolderView::CompareVirtualFolders(UINT uFolderCSIDL) const
+BOOL CShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 {
 	TCHAR	szParsingPath[MAX_PATH];
 
@@ -620,7 +620,7 @@ BOOL CFolderView::CompareVirtualFolders(UINT uFolderCSIDL) const
 	return FALSE;
 }
 
-int CFolderView::GenerateUniqueItemId(void)
+int CShellBrowser::GenerateUniqueItemId(void)
 {
 	BOOL	bFound = FALSE;
 	int		i = 0;
@@ -664,7 +664,7 @@ int CFolderView::GenerateUniqueItemId(void)
 	}
 }
 
-void CFolderView::PositionDroppedItems(void)
+void CShellBrowser::PositionDroppedItems(void)
 {
 	std::list<DroppedFile_t>::iterator	itr;
 	BOOL							bDropItemSet = FALSE;
@@ -839,7 +839,7 @@ void CFolderView::PositionDroppedItems(void)
 	}
 }
 
-int CFolderView::DetermineItemSortedPosition(LPARAM lParam) const
+int CShellBrowser::DetermineItemSortedPosition(LPARAM lParam) const
 {
 	LVITEM	lvItem;
 	BOOL	bItem;
@@ -879,7 +879,7 @@ int CFolderView::DetermineItemSortedPosition(LPARAM lParam) const
 	return i - 1;
 }
 
-BOOL CFolderView::IsFileReal(int iItem) const
+BOOL CShellBrowser::IsFileReal(int iItem) const
 {
 	LVITEM	lvItem;
 	BOOL	bRes;
@@ -895,17 +895,17 @@ BOOL CFolderView::IsFileReal(int iItem) const
 	return FALSE;
 }
 
-BOOL CFolderView::GhostItem(int iItem)
+BOOL CShellBrowser::GhostItem(int iItem)
 {
 	return GhostItemInternal(iItem,TRUE);
 }
 
-BOOL CFolderView::DeghostItem(int iItem)
+BOOL CShellBrowser::DeghostItem(int iItem)
 {
 	return GhostItemInternal(iItem,FALSE);
 }
 
-BOOL CFolderView::GhostItemInternal(int iItem,BOOL bGhost)
+BOOL CShellBrowser::GhostItemInternal(int iItem,BOOL bGhost)
 {
 	LVITEM	lvItem;
 	BOOL	bRet;
@@ -935,7 +935,7 @@ BOOL CFolderView::GhostItemInternal(int iItem,BOOL bGhost)
 	return TRUE;
 }
 
-void CFolderView::RemoveFilteredItems(void)
+void CShellBrowser::RemoveFilteredItems(void)
 {
 	LVITEM			lvItem;
 	int				nItems;
@@ -965,7 +965,7 @@ void CFolderView::RemoveFilteredItems(void)
 	SendMessage(m_hOwner,WM_USER_UPDATEWINDOWS,0,0);
 }
 
-void CFolderView::RemoveFilteredItem(int iItem,int iItemInternal)
+void CShellBrowser::RemoveFilteredItem(int iItem,int iItemInternal)
 {
 	ULARGE_INTEGER	ulFileSize;
 
@@ -993,33 +993,33 @@ void CFolderView::RemoveFilteredItem(int iItem,int iItemInternal)
 	m_FilteredItemsList.push_back(iItemInternal);
 }
 
-int CFolderView::QueryNumItems(void) const
+int CShellBrowser::QueryNumItems(void) const
 {
 	return m_nTotalItems;
 }
 
-int CFolderView::QueryNumSelectedFiles(void) const
+int CShellBrowser::QueryNumSelectedFiles(void) const
 {
 	return m_NumFilesSelected;
 }
 
-int CFolderView::QueryNumSelectedFolders(void) const
+int CShellBrowser::QueryNumSelectedFolders(void) const
 {
 	return m_NumFoldersSelected;
 }
 
-int CFolderView::QueryNumSelected(void) const
+int CShellBrowser::QueryNumSelected(void) const
 {
 	return m_NumFilesSelected + m_NumFoldersSelected;
 }
 
-void CFolderView::QueryFolderInfo(FolderInfo_t *pFolderInfo)
+void CShellBrowser::QueryFolderInfo(FolderInfo_t *pFolderInfo)
 {
 	pFolderInfo->TotalFolderSize.QuadPart		= m_ulTotalDirSize.QuadPart;
 	pFolderInfo->TotalSelectionSize.QuadPart	= m_ulFileSelectionSize.QuadPart;
 }
 
-void CFolderView::DetermineFolderVirtual(LPITEMIDLIST pidlDirectory)
+void CShellBrowser::DetermineFolderVirtual(LPITEMIDLIST pidlDirectory)
 {
 	TCHAR szParsingPath[MAX_PATH];
 
@@ -1037,7 +1037,7 @@ void CFolderView::DetermineFolderVirtual(LPITEMIDLIST pidlDirectory)
 	}
 }
 
-void CFolderView::SetFilter(TCHAR *szFilter)
+void CShellBrowser::SetFilter(TCHAR *szFilter)
 {
 	StringCchCopy(m_szFilter,SIZEOF_ARRAY(m_szFilter),szFilter);
 
@@ -1048,34 +1048,34 @@ void CFolderView::SetFilter(TCHAR *szFilter)
 	}
 }
 
-void CFolderView::GetFilter(TCHAR *szFilter,int cchMax) const
+void CShellBrowser::GetFilter(TCHAR *szFilter,int cchMax) const
 {
 	StringCchCopy(szFilter,cchMax,m_szFilter);
 }
 
-void CFolderView::SetFilterStatus(BOOL bFilter)
+void CShellBrowser::SetFilterStatus(BOOL bFilter)
 {
 	m_bApplyFilter = bFilter;
 
 	UpdateFiltering();
 }
 
-BOOL CFolderView::GetFilterStatus(void) const
+BOOL CShellBrowser::GetFilterStatus(void) const
 {
 	return m_bApplyFilter;
 }
 
-void CFolderView::SetFilterCaseSensitive(BOOL bFilterCaseSensitive)
+void CShellBrowser::SetFilterCaseSensitive(BOOL bFilterCaseSensitive)
 {
 	m_bFilterCaseSensitive = bFilterCaseSensitive;
 }
 
-BOOL CFolderView::GetFilterCaseSensitive(void) const
+BOOL CShellBrowser::GetFilterCaseSensitive(void) const
 {
 	return m_bFilterCaseSensitive;
 }
 
-void CFolderView::UpdateFiltering(void)
+void CShellBrowser::UpdateFiltering(void)
 {
 	if(m_bApplyFilter)
 	{
@@ -1094,7 +1094,7 @@ void CFolderView::UpdateFiltering(void)
 	}
 }
 
-void CFolderView::UnfilterAllItems(void)
+void CShellBrowser::UnfilterAllItems(void)
 {
 	std::list<int>::iterator	itr;
 	AwaitingAdd_t		AwaitingAdd;
@@ -1118,7 +1118,7 @@ void CFolderView::UnfilterAllItems(void)
 	SendMessage(m_hOwner,WM_USER_UPDATEWINDOWS,0,0);
 }
 
-void CFolderView::VerifySortMode(void)
+void CShellBrowser::VerifySortMode(void)
 {
 	BOOL	bValid = FALSE;
 	int		i = 0;
@@ -1221,26 +1221,26 @@ void CFolderView::VerifySortMode(void)
 	}
 }
 
-BOOL CFolderView::ToggleSortAscending(void)
+BOOL CShellBrowser::ToggleSortAscending(void)
 {
 	m_bSortAscending = !m_bSortAscending;
 
 	return m_bSortAscending;
 }
 
-BOOL CFolderView::SetSortAscending(BOOL bAscending)
+BOOL CShellBrowser::SetSortAscending(BOOL bAscending)
 {
 	m_bSortAscending = bAscending;
 
 	return m_bSortAscending;
 }
 
-BOOL CFolderView::GetSortAscending(void) const
+BOOL CShellBrowser::GetSortAscending(void) const
 {
 	return m_bSortAscending;
 }
 
-BOOL CFolderView::ToggleAutoArrange(void)
+BOOL CShellBrowser::ToggleAutoArrange(void)
 {
 	m_bAutoArrange = !m_bAutoArrange;
 
@@ -1249,31 +1249,31 @@ BOOL CFolderView::ToggleAutoArrange(void)
 	return m_bAutoArrange;
 }
 
-BOOL CFolderView::QueryAutoArrange(void) const
+BOOL CShellBrowser::QueryAutoArrange(void) const
 {
 	return m_bAutoArrange;
 }
 
-BOOL CFolderView::QueryShowHidden(void) const
+BOOL CShellBrowser::QueryShowHidden(void) const
 {
 	return m_bShowHidden;
 }
 
-BOOL CFolderView::SetShowHidden(BOOL bShowHidden)
+BOOL CShellBrowser::SetShowHidden(BOOL bShowHidden)
 {
 	m_bShowHidden = bShowHidden;
 
 	return m_bShowHidden;
 }
 
-BOOL CFolderView::ToggleShowHidden(void)
+BOOL CShellBrowser::ToggleShowHidden(void)
 {
 	m_bShowHidden = !m_bShowHidden;
 
 	return m_bShowHidden;
 }
 
-void CFolderView::ResetFolderMemoryAllocations(void)
+void CShellBrowser::ResetFolderMemoryAllocations(void)
 {
 	HIMAGELIST himl;
 	HIMAGELIST himlOld;
@@ -1330,17 +1330,17 @@ void CFolderView::ResetFolderMemoryAllocations(void)
 	m_AwaitingAddList.clear();
 }
 
-BOOL CFolderView::QueryDragging(void) const
+BOOL CShellBrowser::QueryDragging(void) const
 {
 	return m_bPerformingDrag;
 }
 
-BOOL CFolderView::GetTerminationStatus(void) const
+BOOL CShellBrowser::GetTerminationStatus(void) const
 {
 	return m_bNotifiedOfTermination;
 }
 
-void CFolderView::SetTerminationStatus(void)
+void CShellBrowser::SetTerminationStatus(void)
 {
 	EmptyIconFinderQueue();
 	EmptyThumbnailsQueue();
@@ -1349,7 +1349,7 @@ void CFolderView::SetTerminationStatus(void)
 	m_bNotifiedOfTermination = TRUE;
 }
 
-void CFolderView::QueryCurrentSortModes(std::list<int> *pSortModes) const
+void CShellBrowser::QueryCurrentSortModes(std::list<int> *pSortModes) const
 {
 	std::list<Column_t>::iterator itr;
 	int ColumnSortMode;
@@ -1365,7 +1365,7 @@ void CFolderView::QueryCurrentSortModes(std::list<int> *pSortModes) const
 	}
 }
 
-void CFolderView::ExportCurrentColumns(std::list<Column_t> *pColumns)
+void CShellBrowser::ExportCurrentColumns(std::list<Column_t> *pColumns)
 {
 	std::list<Column_t>::iterator itr;
 	Column_t Column;
@@ -1388,7 +1388,7 @@ void CFolderView::ExportCurrentColumns(std::list<Column_t> *pColumns)
 	}
 }
 
-void CFolderView::ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped)
+void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped)
 {
 	std::list<Column_t>::iterator itr;
 	std::list<Column_t>::iterator itr2;
@@ -1469,7 +1469,7 @@ void CFolderView::ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapp
 	m_bColumnsPlaced = FALSE;
 }
 
-void CFolderView::GetColumnInternal(unsigned int id,Column_t *pci) const
+void CShellBrowser::GetColumnInternal(unsigned int id,Column_t *pci) const
 {
 	std::list<Column_t>::iterator itr;
 
@@ -1488,7 +1488,7 @@ This method is used when a file is created
 using the shell new menu, and the item
 may or may not have been inserted into
 the listview yet. */
-void CFolderView::QueueRename(LPCITEMIDLIST pidlItem)
+void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
 {
 	/* Items are inserted within the context
 	of this thread. Therefore, either pending
@@ -1541,7 +1541,7 @@ void CFolderView::QueueRename(LPCITEMIDLIST pidlItem)
 	}
 }
 
-void CFolderView::SelectItems(const std::list<std::wstring> &PastedFileList)
+void CShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)
 {
 	int i = 0;
 
@@ -1574,7 +1574,7 @@ void CFolderView::SelectItems(const std::list<std::wstring> &PastedFileList)
 /* Refreshes all icons in the current
 window. This may be needed when a file
 association changes, for example. */
-void CFolderView::RefreshAllIcons(void)
+void CShellBrowser::RefreshAllIcons(void)
 {
 	LVITEM lvItem;
 	int i = 0;
@@ -1595,7 +1595,7 @@ void CFolderView::RefreshAllIcons(void)
 	}
 }
 
-void CFolderView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
+void CShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 {
 	/* Note changes made here may have no effect. Since
 	the icon for the cd/dvd/etc. may not have been
@@ -1685,7 +1685,7 @@ void CFolderView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CFolderView::UpdateDriveIcon(TCHAR *szDrive)
+void CShellBrowser::UpdateDriveIcon(TCHAR *szDrive)
 {
 	LPITEMIDLIST			pidlDrive = NULL;
 	LPITEMIDLIST			pidlItem = NULL;
@@ -1748,7 +1748,7 @@ void CFolderView::UpdateDriveIcon(TCHAR *szDrive)
 	}
 }
 
-void CFolderView::RemoveDrive(TCHAR *szDrive)
+void CShellBrowser::RemoveDrive(TCHAR *szDrive)
 {
 	LVITEM lvItem;
 	int iItemInternal = -1;
@@ -1775,7 +1775,7 @@ void CFolderView::RemoveDrive(TCHAR *szDrive)
 		RemoveItem(iItemInternal);
 }
 
-int CFolderView::GetFolderIndex(void) const
+int CShellBrowser::GetFolderIndex(void) const
 {
 	return m_iUniqueFolderIndex;
 }

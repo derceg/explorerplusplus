@@ -17,7 +17,7 @@
 #include "TabContainer.h"
 
 
-CTabContainer::CTabContainer(HWND hTabCtrl,CFolderView **pShellBrowsers,IExplorerplusplus *pexpp) :
+CTabContainer::CTabContainer(HWND hTabCtrl,CShellBrowser **pShellBrowsers,IExplorerplusplus *pexpp) :
 m_hTabCtrl(hTabCtrl),
 m_pShellBrowsers(pShellBrowsers),
 m_pexpp(pexpp)
@@ -44,7 +44,7 @@ void CTabContainer::SetSelection(int Index)
 	m_pexpp->SetTabSelection(Index);
 }
 
-CFolderView *CTabContainer::GetBrowserForTab(int Index)
+CShellBrowser *CTabContainer::GetBrowserForTab(int Index)
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;

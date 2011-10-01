@@ -78,11 +78,8 @@ int CALLBACK SortByNetworkAdapterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM
 
 int CALLBACK SortByNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-	
-	return pFolderView->SortByName(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByName(lParam1,lParam2);
 }
 
 /*
@@ -91,7 +88,7 @@ Drives
 Folders
 Normal items
 */
-int CALLBACK CFolderView::SortByName(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByName(LPARAM lParam1,LPARAM lParam2) const
 {
 	int ReturnValue;
 
@@ -170,14 +167,11 @@ int CALLBACK CFolderView::SortByName(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortBySizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortBySize(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortBySize(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortBySize(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortBySize(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -256,14 +250,11 @@ int CALLBACK CFolderView::SortBySize(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortByTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByType(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByType(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByType(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByType(LPARAM lParam1,LPARAM lParam2) const
 {
 	IShellFolder	*pShellFolder1 = NULL;
 	IShellFolder	*pShellFolder2 = NULL;
@@ -384,29 +375,23 @@ int CALLBACK CFolderView::SortByType(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortByDateModifiedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByDateModified(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByDateModified(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByDateModified(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByDateModified(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByDate(lParam1,lParam2,DATE_MODIFIED);
 }
 
 int CALLBACK SortByDateDeletedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByDateDeleted(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByDateDeleted(lParam1,lParam2);
 }
 
 /* TODO: Implement. */
-int CFolderView::SortByDateDeleted(LPARAM lParam1,LPARAM lParam2) const
+int CShellBrowser::SortByDateDeleted(LPARAM lParam1,LPARAM lParam2) const
 {
 	int			ReturnValue;
 
@@ -425,7 +410,7 @@ DateType:
 2 - Accessed;
 */
 /* TODO: DateType -> enum. */
-int CFolderView::SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType) const
+int CShellBrowser::SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType) const
 {
 	BOOL	IsFolder1;
 	BOOL	IsFolder2;
@@ -494,14 +479,11 @@ int CFolderView::SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType) const
 
 int CALLBACK SortByTotalSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByTotalSize(lParam1,lParam2,TRUE);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByTotalSize(lParam1,lParam2,TRUE);
 }
 
-int CALLBACK CFolderView::SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize) const
+int CALLBACK CShellBrowser::SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize) const
 {
 	IShellFolder	*pShellFolder1 = NULL;
 	IShellFolder	*pShellFolder2 = NULL;
@@ -573,24 +555,18 @@ int CALLBACK CFolderView::SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTo
 
 int CALLBACK SortByFreeSpaceStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByTotalSize(lParam1,lParam2,FALSE);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByTotalSize(lParam1,lParam2,FALSE);
 }
 
 int CALLBACK SortByOriginalLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByOriginalLocation(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByOriginalLocation(lParam1,lParam2);
 }
 
 /* TODO: Implement. */
-int CALLBACK CFolderView::SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2) const
 {
 	int			ReturnValue;
 
@@ -604,14 +580,11 @@ int CALLBACK CFolderView::SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2) 
 
 int CALLBACK SortByAttributesStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByAttributes(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByAttributes(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByAttributes(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByAttributes(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -674,14 +647,11 @@ int CALLBACK CFolderView::SortByAttributes(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortByRealSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByRealSize(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByRealSize(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByRealSize(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByRealSize(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -754,14 +724,11 @@ int CALLBACK CFolderView::SortByRealSize(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortByShortNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByShortName(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByShortName(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByShortName(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByShortName(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -809,14 +776,11 @@ int CALLBACK CFolderView::SortByShortName(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortByOwnerStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByOwner(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByOwner(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByOwner(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByOwner(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -874,75 +838,60 @@ int CALLBACK CFolderView::SortByOwner(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortByProductNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByProductName(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByProductName(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByProductName(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByProductName(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByVersionInfo(lParam1,lParam2,VERSION_PRODUCTNAME);
 }
 
 int CALLBACK SortByCompanyStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByCompany(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByCompany(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByCompany(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByCompany(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByVersionInfo(lParam1,lParam2,VERSION_COMPANY);
 }
 
 int CALLBACK SortByDescriptionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByDescription(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByDescription(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByDescription(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByDescription(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByVersionInfo(lParam1,lParam2,VERSION_DESCRIPTION);
 }
 
 int CALLBACK SortByFileVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByFileVersion(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByFileVersion(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByFileVersion(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByFileVersion(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByVersionInfo(lParam1,lParam2,VERSION_FILEVERSION);
 }
 
 int CALLBACK SortByProductVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByProductVersion(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByProductVersion(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByProductVersion(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByProductVersion(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByVersionInfo(lParam1,lParam2,VERSION_PRODUCTVERSION);
 }
 
-int CALLBACK CFolderView::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int VersionProperty) const
+int CALLBACK CShellBrowser::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int VersionProperty) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1003,14 +952,11 @@ int CALLBACK CFolderView::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int Ve
 
 int CALLBACK SortByShortcutToStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByShortcutTo(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByShortcutTo(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1071,14 +1017,11 @@ int CALLBACK CFolderView::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortByHardlinksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByHardlinks(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByHardlinks(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1136,14 +1079,11 @@ int CALLBACK CFolderView::SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortByExtensionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByExtension(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByExtension(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByExtension(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByExtension(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1202,103 +1142,82 @@ int CALLBACK CFolderView::SortByExtension(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortByDateCreatedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByDateCreated(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByDateCreated(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByDateCreated(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByDateCreated(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByDate(lParam1,lParam2,DATE_CREATED);
 }
 
 int CALLBACK SortByDateAccessedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByDateAccessed(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByDateAccessed(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByDateAccessed(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByDateAccessed(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByDate(lParam1,lParam2,DATE_ACCESSED);
 }
 
 int CALLBACK SortByTitleStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByTitle(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByTitle(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByTitle(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByTitle(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_TITLE);
 }
 
 int CALLBACK SortBySubjectStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortBySubject(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortBySubject(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortBySubject(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortBySubject(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_SUBJECT);
 }
 
 int CALLBACK SortByAuthorStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByAuthor(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByAuthor(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByAuthor(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByAuthor(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_AUTHOR);
 }
 
 int CALLBACK SortByKeywordsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByKeywords(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByKeywords(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByKeywords(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByKeywords(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_KEYWORDS);
 }
 
 int CALLBACK SortByCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByComments(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByComments(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByComments(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByComments(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_COMMENT);
 }
 
-int CALLBACK CFolderView::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DWORD dwPropertyType) const
+int CALLBACK CShellBrowser::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DWORD dwPropertyType) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1359,61 +1278,49 @@ int CALLBACK CFolderView::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DW
 
 int CALLBACK SortByCameraModelStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByCameraModel(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByCameraModel(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByCameraModel(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByCameraModel(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByImageProperty(lParam1,lParam2,PropertyTagEquipModel);
 }
 
 int CALLBACK SortByDateTakenStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByDateTaken(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByDateTaken(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByDateTaken(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByDateTaken(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByImageProperty(lParam1,lParam2,PropertyTagDateTime);
 }
 
 int CALLBACK SortByWidthStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByWidth(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByWidth(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByWidth(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByWidth(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByImageProperty(lParam1,lParam2,PropertyTagImageWidth);
 }
 
 int CALLBACK SortByHeightStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByHeight(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByHeight(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByHeight(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByHeight(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByImageProperty(lParam1,lParam2,PropertyTagImageHeight);
 }
 
-int CALLBACK CFolderView::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId) const
+int CALLBACK CShellBrowser::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1474,14 +1381,11 @@ int CALLBACK CFolderView::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROP
 
 int CALLBACK SortByVirtualCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByVirtualComments(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByVirtualComments(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1536,14 +1440,11 @@ int CALLBACK CFolderView::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) c
 
 int CALLBACK SortByFileSystemStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByFileSystem(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByFileSystem(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const
 {
 	int				ReturnValue = 0;
 	TCHAR			szFullFileName1[MAX_PATH];
@@ -1613,14 +1514,11 @@ int CALLBACK CFolderView::SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortByVirtualTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByVirtualType(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByVirtualType(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByVirtualType(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByVirtualType(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1692,14 +1590,11 @@ int CALLBACK CFolderView::SortByVirtualType(LPARAM lParam1,LPARAM lParam2) const
 
 int CALLBACK SortByNumPrinterDocumentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByNumPrinterDocuments(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByNumPrinterDocuments(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2) const
 {
 	HANDLE hPrinter1;
 	HANDLE hPrinter2;
@@ -1753,14 +1648,11 @@ int CALLBACK CFolderView::SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam
 
 int CALLBACK SortByPrinterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByPrinterStatus(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByPrinterStatus(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA *File1		= NULL;
 	WIN32_FIND_DATA *File2		= NULL;
@@ -1844,14 +1736,11 @@ int CALLBACK CFolderView::SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) con
 
 int CALLBACK SortByPrinterCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByPrinterComments(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByPrinterComments(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA *File1		= NULL;
 	WIN32_FIND_DATA *File2		= NULL;
@@ -1909,14 +1798,11 @@ int CALLBACK CFolderView::SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) c
 
 int CALLBACK SortByPrinterLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByPrinterLocation(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByPrinterLocation(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA *File1		= NULL;
 	WIN32_FIND_DATA *File2		= NULL;
@@ -1974,14 +1860,11 @@ int CALLBACK CFolderView::SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2) c
 
 int CALLBACK SortByNetworkAdapterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->SortByNetworkAdapterStatus(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->SortByNetworkAdapterStatus(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2) const
 {
 	WIN32_FIND_DATA *File1		= NULL;
 	WIN32_FIND_DATA *File2		= NULL;
@@ -2052,19 +1935,16 @@ int CALLBACK CFolderView::SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lPara
 
 int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	CFolderView	*pFolderView = NULL;
-
-	pFolderView = (CFolderView *)lParamSort;
-
-	return pFolderView->Sort(lParam1,lParam2);
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->Sort(lParam1,lParam2);
 }
 
-int CALLBACK CFolderView::Sort(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::Sort(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortItemsRelative(lParam1,lParam2);
 }
 
-int CFolderView::SortItemsRelative(LPARAM lParam1,LPARAM lParam2) const
+int CShellBrowser::SortItemsRelative(LPARAM lParam1,LPARAM lParam2) const
 {
 	int iSort;
 
@@ -2079,7 +1959,7 @@ int CFolderView::SortItemsRelative(LPARAM lParam1,LPARAM lParam2) const
 	return iSort;
 }
 
-int CFolderView::DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2) const
+int CShellBrowser::DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2) const
 {
 	switch(m_SortMode)
 	{
@@ -2243,7 +2123,7 @@ int CFolderView::DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2) c
 	return 0;
 }
 
-HRESULT CFolderView::SortFolder(UINT SortMode)
+HRESULT CShellBrowser::SortFolder(UINT SortMode)
 {
 	m_SortMode = SortMode;
 

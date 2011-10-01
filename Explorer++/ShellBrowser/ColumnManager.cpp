@@ -68,7 +68,7 @@ namespace
 	const UINT MEDIAMETADATA_TYPE_YEAR = 23;
 }
 
-void CFolderView::SetColumnData(unsigned int ColumnId,int iItem,int iColumnIndex)
+void CShellBrowser::SetColumnData(unsigned int ColumnId,int iItem,int iColumnIndex)
 {
 	switch(ColumnId)
 	{
@@ -309,11 +309,8 @@ void CFolderView::SetColumnData(unsigned int ColumnId,int iItem,int iColumnIndex
 
 void CALLBACK SetAllColumnDataAPC(ULONG_PTR dwParam)
 {
-	CFolderView *pFolderView;
-
-	pFolderView = (CFolderView *)dwParam;
-
-	pFolderView->SetAllColumnData();
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(dwParam);
+	pShellBrowser->SetAllColumnData();
 }
 
 /* Queueing model:
@@ -328,12 +325,12 @@ between queue removal and emptying the queue.
 
 Folder sizes are NOT calculated here. They are done
 within a separate thread called from the main thread. */
-void CFolderView::AddToColumnQueue(int iItem)
+void CShellBrowser::AddToColumnQueue(int iItem)
 {
 	m_pColumnInfoList.push_back(iItem);
 }
 
-void CFolderView::EmptyColumnQueue(void)
+void CShellBrowser::EmptyColumnQueue(void)
 {
 	EnterCriticalSection(&m_column_cs);
 
@@ -342,7 +339,7 @@ void CFolderView::EmptyColumnQueue(void)
 	LeaveCriticalSection(&m_column_cs);
 }
 
-BOOL CFolderView::RemoveFromColumnQueue(int *iItem)
+BOOL CShellBrowser::RemoveFromColumnQueue(int *iItem)
 {
 	BOOL bQueueNotEmpty;
 
@@ -373,7 +370,7 @@ BOOL CFolderView::RemoveFromColumnQueue(int *iItem)
 	return bQueueNotEmpty;
 }
 
-int CFolderView::SetAllColumnData(void)
+int CShellBrowser::SetAllColumnData(void)
 {
 	std::list<Column_t>			pActiveColumnList;
 	std::list<Column_t>::iterator	itr;
@@ -418,12 +415,12 @@ end:
 	return 1;
 }
 
-void CFolderView::AddToFolderQueue(int iItem)
+void CShellBrowser::AddToFolderQueue(int iItem)
 {
 	m_pFolderInfoList.push_back(iItem);
 }
 
-void CFolderView::EmptyFolderQueue(void)
+void CShellBrowser::EmptyFolderQueue(void)
 {
 	EnterCriticalSection(&m_folder_cs);
 
@@ -432,7 +429,7 @@ void CFolderView::EmptyFolderQueue(void)
 	LeaveCriticalSection(&m_folder_cs);
 }
 
-BOOL CFolderView::RemoveFromFolderQueue(int *iItem)
+BOOL CShellBrowser::RemoveFromFolderQueue(int *iItem)
 {
 	BOOL bQueueNotEmpty;
 
@@ -468,14 +465,11 @@ BOOL CFolderView::RemoveFromFolderQueue(int *iItem)
 
 void CALLBACK SetAllFolderSizeColumnDataAPC(ULONG_PTR dwParam)
 {
-	CFolderView *pFolderView;
-
-	pFolderView = (CFolderView *)dwParam;
-
-	pFolderView->SetAllFolderSizeColumnData();
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(dwParam);
+	pShellBrowser->SetAllFolderSizeColumnData();
 }
 
-int CFolderView::SetAllFolderSizeColumnData(void)
+int CShellBrowser::SetAllFolderSizeColumnData(void)
 {
 	std::list<Column_t>::iterator itr;
 	LVITEM lvItem;
@@ -556,7 +550,7 @@ int CFolderView::SetAllFolderSizeColumnData(void)
 	return 0;
 }
 
-int CFolderView::SetNameColumnData(HWND hListView,int iItem,int iColumn)
+int CShellBrowser::SetNameColumnData(HWND hListView,int iItem,int iColumn)
 {
 	LVITEM	File;
 	BOOL	bItem;
@@ -575,7 +569,7 @@ int CFolderView::SetNameColumnData(HWND hListView,int iItem,int iColumn)
 	return m_nTotalItems;
 }
 
-int CFolderView::SetSizeColumnData(HWND hListView,int iItem,int iColumn)
+int CShellBrowser::SetSizeColumnData(HWND hListView,int iItem,int iColumn)
 {
 	LVITEM			lvItem;
 	TCHAR			lpszFileSize[32];
@@ -606,7 +600,7 @@ int CFolderView::SetSizeColumnData(HWND hListView,int iItem,int iColumn)
 	return m_nTotalItems;
 }
 
-int CFolderView::SetRealSizeColumnData(HWND hListView,int iItem,int iColumn)
+int CShellBrowser::SetRealSizeColumnData(HWND hListView,int iItem,int iColumn)
 {
 	LVITEM File;
 	ULARGE_INTEGER lRealFileSize;
@@ -653,7 +647,7 @@ int CFolderView::SetRealSizeColumnData(HWND hListView,int iItem,int iColumn)
 	return m_nTotalItems;
 }
 
-int CFolderView::SetTypeColumnData(HWND hListView,int iItem,int iColumn)
+int CShellBrowser::SetTypeColumnData(HWND hListView,int iItem,int iColumn)
 {
 	SHFILEINFO shfi;
 	TCHAR FullFileName[MAX_PATH];
@@ -668,7 +662,7 @@ int CFolderView::SetTypeColumnData(HWND hListView,int iItem,int iColumn)
 	return m_nTotalItems;
 }
 
-void CFolderView::SetVirtualTypeColumnData(int iItem,int iColumn)
+void CShellBrowser::SetVirtualTypeColumnData(int iItem,int iColumn)
 {
 	LPITEMIDLIST pidlComplete	= NULL;
 	LVITEM lvItem;
@@ -692,7 +686,7 @@ void CFolderView::SetVirtualTypeColumnData(int iItem,int iColumn)
 	}
 }
 
-void CFolderView::SetTotalSizeColumnData(int iItem,int iColumn,BOOL bTotalSize)
+void CShellBrowser::SetTotalSizeColumnData(int iItem,int iColumn,BOOL bTotalSize)
 {
 	LPITEMIDLIST pidlComplete	= NULL;
 	IShellFolder *pShellFolder	= NULL;
@@ -759,7 +753,7 @@ void CFolderView::SetTotalSizeColumnData(int iItem,int iColumn,BOOL bTotalSize)
 	}
 }
 
-void CFolderView::SetFileSystemColumnData(int iItem,int iColumn)
+void CShellBrowser::SetFileSystemColumnData(int iItem,int iColumn)
 {
 	LPITEMIDLIST pidlComplete	= NULL;
 	IShellFolder *pShellFolder	= NULL;
@@ -812,7 +806,7 @@ void CFolderView::SetFileSystemColumnData(int iItem,int iColumn)
 	}
 }
 
-int CFolderView::SetTimeColumnData(HWND hListView,int iItem,int iColumn,int TimeType)
+int CShellBrowser::SetTimeColumnData(HWND hListView,int iItem,int iColumn,int TimeType)
 {
 	LVITEM File;
 	TCHAR lpszFileTime[64];
@@ -857,7 +851,7 @@ int CFolderView::SetTimeColumnData(HWND hListView,int iItem,int iColumn,int Time
 	return m_nTotalItems;
 }
 
-int CFolderView::SetAttributeColumnData(HWND hListView,int iItem,int iColumn)
+int CShellBrowser::SetAttributeColumnData(HWND hListView,int iItem,int iColumn)
 {
 	TCHAR lpszAttributes[32];
 	TCHAR FullFileName[MAX_PATH];
@@ -876,7 +870,7 @@ int CFolderView::SetAttributeColumnData(HWND hListView,int iItem,int iColumn)
 	return m_nTotalItems;
 }
 
-int CFolderView::SetShortNameColumnData(HWND hListView,int iItem,int iColumn)
+int CShellBrowser::SetShortNameColumnData(HWND hListView,int iItem,int iColumn)
 {
 	LVITEM File;
 	BOOL bItem;
@@ -901,7 +895,7 @@ int CFolderView::SetShortNameColumnData(HWND hListView,int iItem,int iColumn)
 	return m_nTotalItems;
 }
 
-int CFolderView::SetOwnerColumnData(HWND hListView,int iItem,int iColumn)
+int CShellBrowser::SetOwnerColumnData(HWND hListView,int iItem,int iColumn)
 {
 	TCHAR FullFileName[MAX_PATH];
 	TCHAR szOwner[512] = EMPTY_STRING;
@@ -919,7 +913,7 @@ int CFolderView::SetOwnerColumnData(HWND hListView,int iItem,int iColumn)
 	return m_nTotalItems;
 }
 
-int CFolderView::SetVersionColumnData(HWND hListView,int iItem,int iColumn,TCHAR *lpszVersion)
+int CShellBrowser::SetVersionColumnData(HWND hListView,int iItem,int iColumn,TCHAR *lpszVersion)
 {
 	LVITEM File;
 	TCHAR FullFileName[MAX_PATH];
@@ -953,7 +947,7 @@ int CFolderView::SetVersionColumnData(HWND hListView,int iItem,int iColumn,TCHAR
 	return m_nTotalItems;
 }
 
-int CFolderView::SetShortcutColumnData(HWND hListView,int iItem,int iColumn)
+int CShellBrowser::SetShortcutColumnData(HWND hListView,int iItem,int iColumn)
 {
 	LVITEM File;
 	TCHAR FullFileName[MAX_PATH];
@@ -985,7 +979,7 @@ int CFolderView::SetShortcutColumnData(HWND hListView,int iItem,int iColumn)
 	return m_nTotalItems;
 }
 
-int CFolderView::SetHardLinksColumnData(HWND hListView,int iItem,int iColumn)
+int CShellBrowser::SetHardLinksColumnData(HWND hListView,int iItem,int iColumn)
 {
 	LVITEM File;
 	TCHAR FullFileName[MAX_PATH];
@@ -1018,7 +1012,7 @@ int CFolderView::SetHardLinksColumnData(HWND hListView,int iItem,int iColumn)
 	return m_nTotalItems;
 }
 
-int CFolderView::SetExtensionColumnData(HWND hListView,int iItem,int iColumn)
+int CShellBrowser::SetExtensionColumnData(HWND hListView,int iItem,int iColumn)
 {
 	LVITEM File;
 	TCHAR *pExt = NULL;
@@ -1046,7 +1040,7 @@ int CFolderView::SetExtensionColumnData(HWND hListView,int iItem,int iColumn)
 	return m_nTotalItems;
 }
 
-int CFolderView::SetSummaryColumnData(HWND hListView,int iItem,int iColumn,DWORD dwPropertyType)
+int CShellBrowser::SetSummaryColumnData(HWND hListView,int iItem,int iColumn,DWORD dwPropertyType)
 {
 	LVITEM File;
 	TCHAR szFullFileName[MAX_PATH];
@@ -1080,7 +1074,7 @@ int CFolderView::SetSummaryColumnData(HWND hListView,int iItem,int iColumn,DWORD
 	return m_nTotalItems;
 }
 
-int CFolderView::SetImageColumnData(HWND hListView,int iItem,int iColumn,PROPID PropertyId)
+int CShellBrowser::SetImageColumnData(HWND hListView,int iItem,int iColumn,PROPID PropertyId)
 {
 	LVITEM	File;
 	TCHAR	szFullFileName[MAX_PATH];
@@ -1114,7 +1108,7 @@ int CFolderView::SetImageColumnData(HWND hListView,int iItem,int iColumn,PROPID 
 	return m_nTotalItems;
 }
 
-void CFolderView::SetControlPanelComments(int iItem,int iColumn)
+void CShellBrowser::SetControlPanelComments(int iItem,int iColumn)
 {
 	TCHAR	szInfoTip[512];
 	HRESULT	hr;
@@ -1132,7 +1126,7 @@ void CFolderView::SetControlPanelComments(int iItem,int iColumn)
 	}
 }
 
-void CFolderView::SetNumPrinterDocumentsColumnData(int iItem,int iColumn)
+void CShellBrowser::SetNumPrinterDocumentsColumnData(int iItem,int iColumn)
 {
 	HANDLE hPrinter;
 	LVITEM lvItem;
@@ -1175,7 +1169,7 @@ void CFolderView::SetNumPrinterDocumentsColumnData(int iItem,int iColumn)
 	}
 }
 
-void CFolderView::SetPrinterStatusColumnData(int iItem,int iColumn)
+void CShellBrowser::SetPrinterStatusColumnData(int iItem,int iColumn)
 {
 	HANDLE hPrinter;
 	LVITEM lvItem;
@@ -1219,7 +1213,7 @@ void CFolderView::SetPrinterStatusColumnData(int iItem,int iColumn)
 	}
 }
 
-void CFolderView::SetPrinterCommentsColumnData(int iItem,int iColumn)
+void CShellBrowser::SetPrinterCommentsColumnData(int iItem,int iColumn)
 {
 	HANDLE hPrinter;
 	LVITEM lvItem;
@@ -1262,7 +1256,7 @@ void CFolderView::SetPrinterCommentsColumnData(int iItem,int iColumn)
 	}
 }
 
-void CFolderView::SetPrinterLocationColumnData(int iItem,int iColumn)
+void CShellBrowser::SetPrinterLocationColumnData(int iItem,int iColumn)
 {
 	HANDLE hPrinter;
 	LVITEM lvItem;
@@ -1305,7 +1299,7 @@ void CFolderView::SetPrinterLocationColumnData(int iItem,int iColumn)
 	}
 }
 
-void CFolderView::SetPrinterModelColumnData(int iItem,int iColumn)
+void CShellBrowser::SetPrinterModelColumnData(int iItem,int iColumn)
 {
 	HANDLE hPrinter;
 	LVITEM lvItem;
@@ -1348,7 +1342,7 @@ void CFolderView::SetPrinterModelColumnData(int iItem,int iColumn)
 	}
 }
 
-void CFolderView::SetNetworkAdapterStatusColumnData(int iItem,int iColumn)
+void CShellBrowser::SetNetworkAdapterStatusColumnData(int iItem,int iColumn)
 {
 	TCHAR szStatus[32] = EMPTY_STRING;
 	IP_ADAPTER_ADDRESSES *pAdapterAddresses = NULL;
@@ -1413,7 +1407,7 @@ void CFolderView::SetNetworkAdapterStatusColumnData(int iItem,int iColumn)
 	ListView_SetItemText(m_hListView,iItem,iColumn,szStatus);
 }
 
-void CFolderView::SetMediaStatusColumnData(int iItem,int iColumn,int iType)
+void CShellBrowser::SetMediaStatusColumnData(int iItem,int iColumn,int iType)
 {
 	LVITEM	File;
 	TCHAR	szFullFileName[MAX_PATH];
@@ -1732,7 +1726,7 @@ void CFolderView::SetMediaStatusColumnData(int iItem,int iColumn,int iType)
 	}
 }
 
-void CFolderView::PlaceColumns(void)
+void CShellBrowser::PlaceColumns(void)
 {
 	std::list<Column_t>::iterator	itr;
 	int							iColumnIndex = 0;
@@ -1768,7 +1762,7 @@ void CFolderView::PlaceColumns(void)
 	}
 }
 
-void CFolderView::InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWidth)
+void CShellBrowser::InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWidth)
 {
 	HWND		hHeader;
 	HDITEM		hdItem;
@@ -1804,7 +1798,7 @@ void CFolderView::InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWidth
 	Header_SetItem(hHeader,iActualColumnIndex,&hdItem);
 }
 
-void CFolderView::SetActiveColumnSet(void)
+void CShellBrowser::SetActiveColumnSet(void)
 {
 	std::list<Column_t> *pActiveColumnList = NULL;
 
@@ -1856,7 +1850,7 @@ void CFolderView::SetActiveColumnSet(void)
 	}
 }
 
-unsigned int CFolderView::DetermineColumnSortMode(int iColumnId) const
+unsigned int CShellBrowser::DetermineColumnSortMode(int iColumnId) const
 {
 	switch(iColumnId)
 	{
@@ -2020,7 +2014,7 @@ unsigned int CFolderView::DetermineColumnSortMode(int iColumnId) const
 	return 0;
 }
 
-void CFolderView::ColumnClicked(int iClickedColumn)
+void CShellBrowser::ColumnClicked(int iClickedColumn)
 {
 	std::list<Column_t>::iterator itr;
 	int iCurrentColumn = 0;
@@ -2055,7 +2049,7 @@ void CFolderView::ColumnClicked(int iClickedColumn)
 	SortFolder(SortMode);
 }
 
-void CFolderView::ApplyHeaderSortArrow(void)
+void CShellBrowser::ApplyHeaderSortArrow(void)
 {
 	HWND hHeader;
 	HDITEM hdItem;
@@ -2133,12 +2127,12 @@ void CFolderView::ApplyHeaderSortArrow(void)
 	m_iPreviousSortedColumnId = iColumnId;
 }
 
-size_t CFolderView::QueryNumActiveColumns(void) const
+size_t CShellBrowser::QueryNumActiveColumns(void) const
 {
 	return m_pActiveColumnList->size();
 }
 
-void CFolderView::ImportAllColumns(ColumnExport_t *pce)
+void CShellBrowser::ImportAllColumns(ColumnExport_t *pce)
 {
 	CopyColumnsInternal(&m_ControlPanelColumnList,&pce->ControlPanelColumnList);
 	CopyColumnsInternal(&m_MyComputerColumnList,&pce->MyComputerColumnList);
@@ -2149,7 +2143,7 @@ void CFolderView::ImportAllColumns(ColumnExport_t *pce)
 	CopyColumnsInternal(&m_RecycleBinColumnList,&pce->RecycleBinColumnList);
 }
 
-void CFolderView::ExportAllColumns(ColumnExport_t *pce)
+void CShellBrowser::ExportAllColumns(ColumnExport_t *pce)
 {
 	SaveColumnWidths();
 
@@ -2162,7 +2156,7 @@ void CFolderView::ExportAllColumns(ColumnExport_t *pce)
 	pce->RecycleBinColumnList			= m_RecycleBinColumnList;
 }
 
-void CFolderView::SaveColumnWidths(void)
+void CShellBrowser::SaveColumnWidths(void)
 {
 	std::list<Column_t> *pActiveColumnList = NULL;
 	std::list<Column_t>::iterator itr;
