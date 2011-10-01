@@ -166,7 +166,7 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 	return DefSubclassProc(hTab,msg,wParam,lParam);
 }
 
-std::wstring Explorerplusplus::GetTabName(int iTab)
+std::wstring Explorerplusplus::GetTabName(int iTab) const
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
@@ -633,7 +633,7 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 				tell the taskbar to reposition it. */
 				if(m_iTabSelectedItem == (nTabs - 1))
 				{
-					m_pTaskbarList3->SetTabOrder(itr->hProxy,NULL);
+					m_pTaskbarList->SetTabOrder(itr->hProxy,NULL);
 				}
 				else
 				{
@@ -646,12 +646,12 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 					{
 						if(itrNext->iTabId == (int)tcItem.lParam)
 						{
-							m_pTaskbarList3->SetTabOrder(itr->hProxy,itrNext->hProxy);
+							m_pTaskbarList->SetTabOrder(itr->hProxy,itrNext->hProxy);
 						}
 					}
 				}
 
-				m_pTaskbarList3->SetTabActive(itr->hProxy,m_hContainer,0);
+				m_pTaskbarList->SetTabActive(itr->hProxy,m_hContainer,0);
 				break;
 			}
 		}
@@ -790,28 +790,7 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 	}
 
 	RemoveTabFromControl(TabIndex);
-
-	if(m_bTaskbarInitialised)
-	{
-		for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
-		{
-			if(itr->iTabId == iInternalIndex)
-			{
-				m_pTaskbarList3->UnregisterTab(itr->hProxy);
-
-				TabProxy_t *ptp = reinterpret_cast<TabProxy_t *>(GetWindowLongPtr(itr->hProxy,GWLP_USERDATA));
-				DestroyWindow(itr->hProxy);
-				free(ptp);
-
-				HICON hIcon = reinterpret_cast<HICON>(GetClassLongPtr(itr->hProxy,GCLP_HICONSM));
-				UnregisterClass(reinterpret_cast<LPCWSTR>(MAKEWORD(itr->atomClass,0)),GetModuleHandle(0));
-				DestroyIcon(hIcon);
-
-				m_TabProxyList.erase(itr);
-				break;
-			}
-		}
-	}
+	RemoveTabProxy(iInternalIndex);
 
 	EnterCriticalSection(&g_csDirMonCallback);
 	ReleaseTabId(iInternalIndex);
@@ -1440,7 +1419,7 @@ void Explorerplusplus::SetTabProxyIcon(int iTabId,HICON hIcon)
 	}
 }
 
-int Explorerplusplus::GetCurrentTabId()
+int Explorerplusplus::GetCurrentTabId() const
 {
 	return m_iObjectIndex;
 }
@@ -1688,4 +1667,16 @@ void Explorerplusplus::OnTabMClick(WPARAM wParam,LPARAM lParam)
 			CloseTab(iTabHit);
 		}
 	}
+}
+
+void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
+{
+	GlobalSettings_t gs;	
+
+	/* These settings are global to the whole program. */
+	gs.bShowExtensions		= m_bShowExtensionsGlobal;
+	gs.bShowFriendlyDates	= m_bShowFriendlyDatesGlobal;
+	gs.bShowFolderSizes		= m_bShowFolderSizes;
+
+	m_pShellBrowser[iTabId]->SetGlobalSettings(&gs);
 }

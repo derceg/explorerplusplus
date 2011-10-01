@@ -4,6 +4,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
+#include "../Helper/FileOperations.h"
 
 class CDestroyFilesDialog;
 

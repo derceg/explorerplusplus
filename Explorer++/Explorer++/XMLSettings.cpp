@@ -35,6 +35,7 @@
 #include "SetDefaultColumnsDialog.h"
 #include "AddBookmarkDialog.h"
 #include "DisplayColoursDialog.h"
+#include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/XMLSettings.h"
 #include "../Helper/Macros.h"
 

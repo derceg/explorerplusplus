@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "MainResource.h"
 #include "../Helper/Macros.h"
 
 

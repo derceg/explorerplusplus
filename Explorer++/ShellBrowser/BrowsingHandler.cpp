@@ -85,8 +85,6 @@ HRESULT CFolderView::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	SendMessage(m_hOwner,WM_USER_STARTEDBROWSING,m_ID,(WPARAM)szParsingPath);
 
-	//CheckFolderLockState(szParsingPath);
-
 	StringCchCopy(m_CurDir,SIZEOF_ARRAY(m_CurDir),szParsingPath);
 
 	if(StoreHistory)

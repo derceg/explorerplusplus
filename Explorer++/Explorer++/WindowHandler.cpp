@@ -17,8 +17,10 @@
 #include "Explorer++_internal.h"
 #include "BookmarksToolbar.h"
 #include "DrivesToolbar.h"
+#include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FileContextMenuManager.h"
+#include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
 
 

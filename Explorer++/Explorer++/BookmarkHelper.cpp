@@ -16,6 +16,7 @@
 #include <algorithm>
 #include "Explorer++_internal.h"
 #include "BookmarkHelper.h"
+#include "MainResource.h"
 #include "../Helper/Macros.h"
 
 

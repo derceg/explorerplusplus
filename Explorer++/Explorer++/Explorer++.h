@@ -9,14 +9,16 @@
 #include "TabContainer.h"
 #include "ColorRuleHelper.h"
 #include "../ShellBrowser/iShellView.h"
+#include "../MyTreeView/MyTreeView.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Bookmark.h"
+#include "../Helper/DropHandler.h"
+#include "../Helper/CustomMenu.h"
 #import <msxml3.dll> raw_interfaces_only
 
-#define MAX_TABS					100
 #define MENU_BOOKMARK_STARTID		10000
 #define MENU_BOOKMARK_ENDID			11000
 #define MENU_HEADER_STARTID			12000
@@ -40,9 +42,6 @@ lParam not currently used. */
 /* Registry keys used to store program settings. */
 #define REG_MAIN_KEY				_T("Software\\Explorer++")
 #define REG_SETTINGS_KEY			_T("Software\\Explorer++\\Settings")
-
-#define TAB_WINDOW_HEIGHT			24
-#define DEFAULT_TREEVIEW_WIDTH		208
 
 class Explorerplusplus : public IExplorerplusplus, public IFileContextMenuExternal,
 	public NBookmarkIPHelper::IPBookmarkNotificationGet, public NBookmarkIPHelper::IPBookmarkNotificationSet
@@ -86,10 +85,19 @@ public:
 
 private:
 
+	static const UINT		MAX_TABS = 100;
+
 	static const int		DEFAULT_LISTVIEW_HOVER_TIME = 500;
 
 	static const int		MIN_SHELL_MENU_ID = 1;
 	static const int		MAX_SHELL_MENU_ID = 1000;
+
+	static const UINT		MINIMUM_DISPLAYWINDOW_HEIGHT = 70;
+	static const UINT		DEFAULT_DISPLAYWINDOW_HEIGHT = 90;
+
+	static const UINT		DEFAULT_TREEVIEW_WIDTH = 208;
+
+	static const UINT		TAB_WINDOW_HEIGHT = 24;
 
 	enum MousewheelSource_t
 	{
@@ -166,6 +174,13 @@ private:
 	{
 		LPITEMIDLIST				pidlDirectory;
 		DirectorySettingsInternal_t	dsi;
+	};
+
+	struct DirectoryAltered_t
+	{
+		int		iIndex;
+		int		iFolderIndex;
+		void	*pData;
 	};
 
 	class CLoadSaveRegistry : public ILoadSave
@@ -316,7 +331,7 @@ private:
 	void					OnChangeCBChain(WPARAM wParam,LPARAM lParam);
 	void					OnSetFocus(void);
 	int						HighlightSimilarFiles(HWND ListView);
-	void					ShowHiddenFiles(void);
+	void					OnShowHiddenFiles(void);
 	HRESULT					OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	LRESULT					StatusBarMenuSelect(WPARAM wParam,LPARAM lParam);
 	void					HandleDirectoryMonitoring(int iTabId);
@@ -445,7 +460,7 @@ private:
 	void					RefreshTab(int iTabId);
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
-	int						GetCurrentTabId();
+	int						GetCurrentTabId() const;
 
 	/* Clone Window. */
 	void					OnCloneWindow(void);
@@ -574,6 +589,8 @@ private:
 	void					RegisterTab(HWND hTabProxy,TCHAR *szDisplayName,BOOL bTabActive);
 	HBITMAP					CaptureTabScreenshot(int iTabId);
 	void					GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi);
+	void					RemoveTabProxy(int iInternalIndex);
+	void					InvalidateTaskbarThumbnailBitmap(int iTabId);
 
 	/* Windows 7 jumplist tasks. */
 	void					SetupJumplistTasks();
@@ -648,8 +665,6 @@ private:
 	void					HandleFileSelectionDisplayZero(void);
 	void					HandleFileSelectionDisplayOne(void);
 	void					HandleFileSelectionDisplayMore(void);
-	void					FormatDisplayString(TCHAR *szDisplayRaw,int iSelected,TCHAR *szFullFileName,TCHAR *szDisplayFinal,UINT cchMax);
-	void					TranslateDisplayWindowBuffer(TCHAR *szSymbol,UINT cchMax,int iSelected,TCHAR *szFullFileName);
 
 	/* Columns. */
 	void					OnSelectColumns();
@@ -711,13 +726,13 @@ private:
 	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,TabInfo_t *pTabInfo);
 
 	/* Tabs. */
-	std::wstring			GetTabName(int iTab);
+	std::wstring			GetTabName(int iTab) const;
 	void					SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
 	void					SetTabSelection(int Index);
 
 	/* IExplorerplusplus methods. */
-	HWND					GetActiveListView();
-	IShellBrowser2			*GetActiveShellBrowser();
+	HWND					GetActiveListView() const;
+	IShellBrowser2			*GetActiveShellBrowser() const;
 
 	/* Miscellaneous. */
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
@@ -746,7 +761,7 @@ private:
 	void					CycleViewState(BOOL bCycleForward);
 	int						GetViewModeMenuId(UINT uViewMode);
 	int						GetViewModeMenuStringId(UINT uViewMode);
-	BOOL					VerifyLanguageVersion(TCHAR *szLanguageModule);
+	BOOL					VerifyLanguageVersion(TCHAR *szLanguageModule) const;
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	void					PlayNavigationSound(void);
 	CStatusBar				*GetStatusBar();
@@ -899,9 +914,7 @@ private:
 	BOOL					m_bHideLinkExtensionGlobal;
 	
 	/* Windows 7 taskbar thumbnail previews. */
-	DwmInvalidateIconicBitmapsProc	DwmInvalidateIconicBitmaps;
-	HMODULE					m_hDwmapi;
-	ITaskbarList4			*m_pTaskbarList3;
+	ITaskbarList4			*m_pTaskbarList;
 	std::list<TabProxyInfo_t>	m_TabProxyList;
 	UINT					m_uTaskbarButtonCreatedMessage;
 	BOOL					m_bTaskbarInitialised;
@@ -1004,12 +1017,6 @@ private:
 	HTREEITEM				m_hTVMButtonItem;
 
 	BOOL					m_bBlockNext;
-};
-
-struct TabProxy_t
-{
-	Explorerplusplus	*pContainer;
-	int			iTabId;
 };
 
 #endif

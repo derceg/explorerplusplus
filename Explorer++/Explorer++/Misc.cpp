@@ -17,13 +17,15 @@
 #include <shobjidl.h>
 #include "Explorer++.h"
 #include "SelectColumnsDialog.h"
+#include "MainResource.h"
+#include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/FolderSize.h"
 #include "../Helper/Macros.h"
-#include "MainResource.h"
 
 
 void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
@@ -301,13 +303,6 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::ShowHiddenFiles(void)
-{
-	m_pActiveShellBrowser->ToggleShowHidden();
-
-	RefreshTab(m_iObjectIndex);
-}
-
 void Explorerplusplus::CopyToFolder(BOOL bMove)
 {
 	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
@@ -446,52 +441,6 @@ HRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 	}
 
 	return E_NOTIMPL;
-}
-
-void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
-{
-	BOOL	m_bSeenDirectory = FALSE;
-	DWORD	dwAttributes;
-	int		iItem = -1;
-	int		iFolderItem = -1;
-
-	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVIS_SELECTED)) != -1)
-	{
-		dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(iItem);
-
-		if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
-		{
-			m_bSeenDirectory = TRUE;
-			iFolderItem = iItem;
-		}
-		else
-		{
-			OpenListViewItem(iItem,FALSE,FALSE);
-		}
-	}
-
-	if(m_bSeenDirectory)
-		OpenListViewItem(iFolderItem,bOpenInNewTab,FALSE);
-}
-
-void Explorerplusplus::SetComboBoxExTitleString(HWND CbEx,LPITEMIDLIST pidl,TCHAR *szDisplayText)
-{
-	COMBOBOXEXITEM	cbItem;
-	SHFILEINFO		shfi;
-
-	SHGetFileInfo((LPTSTR)pidl,NULL,&shfi,NULL,SHGFI_PIDL|SHGFI_SYSICONINDEX);
-
-	SendMessage(CbEx,CB_RESETCONTENT,0,0);
-
-	cbItem.mask				= CBEIF_TEXT|CBEIF_IMAGE|CBEIF_INDENT|CBEIF_SELECTEDIMAGE;
-	cbItem.iItem			= -1;
-	cbItem.iImage			= shfi.iIcon;
-	cbItem.iSelectedImage	= shfi.iIcon;
-	cbItem.iIndent			= 1;
-	cbItem.iOverlay			= 1;
-	cbItem.pszText			= szDisplayText;
-
-	SendMessage(CbEx,CBEM_SETITEM,(WPARAM)0,(LPARAM)&cbItem);
 }
 
 HRESULT Explorerplusplus::TestListViewSelectionAttributes(SFGAOF *pItemAttributes)
@@ -1222,144 +1171,6 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 	}
 }
 
-void Explorerplusplus::FormatDisplayString(TCHAR *szDisplayRaw,int iSelected,
-TCHAR *szFullFileName,TCHAR *szDisplayFinal,UINT cchMax)
-{
-	TCHAR szOutputTemp[512];
-	TCHAR szTemp[512];
-	BOOL bTrackingBrace = FALSE;
-	int iOutputTemp = 0;
-	int iTemp = 0;
-	int i = 0;
-
-	/* Read the raw buffer, placing characters into temporary buffer.
-	If a '{' character is encountered, hold it and what follows in a
-	separate buffer. If the end of the string is reached before a
-	matching '}' is found, just copy this to the output buffer.
-	If a matching '}' is found, but the text does not match any special
-	character, just copy it to the output. If a matching '}' is found,
-	and the text does match a special symbol, translate it. */
-
-	for(i = 0;i < lstrlen(szDisplayRaw);i++)
-	while(i < lstrlen(szDisplayRaw) && iOutputTemp < (SIZEOF_ARRAY(szOutputTemp) - 1))
-	{
-		if(bTrackingBrace)
-		{
-			if(iTemp < (SIZEOF_ARRAY(szTemp) - 1))
-				szTemp[iTemp++] = szDisplayRaw[i];
-
-			/* Reached a closing brace, so translate
-			what we have. */
-			if(szDisplayRaw[i] == '}')
-			{
-				int iCopy;
-
-				szTemp[iTemp++] = '\0';
-
-				TranslateDisplayWindowBuffer(szTemp,SIZEOF_ARRAY(szTemp),iSelected,szFullFileName);
-
-				iCopy = min((unsigned int)lstrlen(szTemp),(unsigned int)(SIZEOF_ARRAY(szOutputTemp) - iOutputTemp - 1));
-				memcpy(&szOutputTemp[iOutputTemp],szTemp,iCopy * sizeof(TCHAR));
-
-				iOutputTemp += lstrlen(szTemp);
-
-				bTrackingBrace = FALSE;
-			}
-		}
-		else if(szDisplayRaw[i] == '{')
-		{
-			iTemp = 0;
-
-			szTemp[iTemp++] = szDisplayRaw[i];
-
-			bTrackingBrace = TRUE;
-		}
-		else
-		{
-			szOutputTemp[iOutputTemp++] = szDisplayRaw[i];
-		}
-
-		i++;
-	}
-
-	szOutputTemp[iOutputTemp++] = '\0';
-
-	if(bTrackingBrace)
-		StringCchCat(szOutputTemp,SIZEOF_ARRAY(szOutputTemp),szTemp);
-
-	StringCchCopy(szDisplayFinal,cchMax,szOutputTemp);
-}
-
-void Explorerplusplus::TranslateDisplayWindowBuffer(TCHAR *szSymbol,UINT cchMax,int iSelected,TCHAR *szFullFileName)
-{
-	if(lstrcmp(szSymbol,_T("{name}")) == 0)
-	{
-		TCHAR szOutput[MAX_PATH];
-
-		StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),szFullFileName);
-		PathStripPath(szOutput);
-		StringCchCopy(szSymbol,cchMax,szOutput);
-	}
-	else if(lstrcmp(szSymbol,_T("{date_modified}")) == 0)
-	{
-		WIN32_FIND_DATA	*pwfd = NULL;
-		TCHAR szFileDate[256];
-
-		pwfd = m_pActiveShellBrowser->QueryFileFindData(iSelected);
-
-		CreateFileTimeString(&pwfd->ftLastWriteTime,
-			szFileDate,SIZEOF_ARRAY(szFileDate),
-			m_bShowFriendlyDatesGlobal);
-
-		StringCchCopy(szSymbol,cchMax,szFileDate);
-	}
-	else if(lstrcmp(szSymbol,_T("{type}")) == 0)
-	{
-		WIN32_FIND_DATA	*pwfd = NULL;
-		SHFILEINFO		shfi;
-
-		pwfd = m_pActiveShellBrowser->QueryFileFindData(iSelected);
-
-		SHGetFileInfo(szFullFileName,pwfd->dwFileAttributes,
-			&shfi,sizeof(shfi),SHGFI_TYPENAME|SHGFI_USEFILEATTRIBUTES);
-
-		StringCchCopy(szSymbol,cchMax,shfi.szTypeName);
-	}
-	else if(lstrcmp(szSymbol,_T("{width}")) == 0)
-	{
-		Gdiplus::Image *pimg = NULL;
-		TCHAR szOutput[256];
-		UINT uWidth;
-
-		pimg = new Gdiplus::Image(szFullFileName,FALSE);
-
-		if(pimg->GetLastStatus() == Gdiplus::Ok)
-		{
-			uWidth = pimg->GetWidth();
-			StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("%u"),uWidth);
-			StringCchCopy(szSymbol,cchMax,szOutput);
-
-			delete pimg;
-		}
-	}
-	else if(lstrcmp(szSymbol,_T("{height}")) == 0)
-	{
-		Gdiplus::Image *pimg = NULL;
-		TCHAR szOutput[256];
-		UINT uHeight;
-
-		pimg = new Gdiplus::Image(szFullFileName,FALSE);
-
-		if(pimg->GetLastStatus() == Gdiplus::Ok)
-		{
-			uHeight = pimg->GetHeight();
-			StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("%u"),uHeight);
-			StringCchCopy(szSymbol,cchMax,szOutput);
-			delete pimg;
-		}
-	}
-}
-
 void Explorerplusplus::HandleFileSelectionDisplayMore(void)
 {
 	TCHAR			szNumSelected[64] = EMPTY_STRING;
@@ -1426,18 +1237,6 @@ int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 	be shown. */
 	PostMessage(m_hContainer,WM_APP_FOLDERSIZECOMPLETED,
 		(WPARAM)pDWFolderSizeCompletion,0);
-}
-
-void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
-{
-	GlobalSettings_t gs;	
-
-	/* These settings are global to the whole program. */
-	gs.bShowExtensions		= m_bShowExtensionsGlobal;
-	gs.bShowFriendlyDates	= m_bShowFriendlyDatesGlobal;
-	gs.bShowFolderSizes		= m_bShowFolderSizes;
-
-	m_pShellBrowser[iTabId]->SetGlobalSettings(&gs);
 }
 
 void Explorerplusplus::CreateViewsMenu(POINT *ptOrigin)
@@ -1512,7 +1311,7 @@ BOOL Explorerplusplus::CheckItemSelection(void)
 	return FALSE;
 }
 
-BOOL Explorerplusplus::VerifyLanguageVersion(TCHAR *szLanguageModule)
+BOOL Explorerplusplus::VerifyLanguageVersion(TCHAR *szLanguageModule) const
 {
 	TCHAR szImageName[MAX_PATH];
 	DWORD dwpvProcessLS;

@@ -15,6 +15,9 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/iDropSource.h"
+#include "../Helper/Controls.h"
+#include "../Helper/iDataObject.h"
 #include "../Helper/Macros.h"
 
 
@@ -210,4 +213,22 @@ void Explorerplusplus::OnAddressBarBeginDrag(void)
 
 		pDragSourceHelper->Release();
 	}
+}
+
+void Explorerplusplus::SetComboBoxExTitleString(HWND CbEx,LPITEMIDLIST pidl,TCHAR *szDisplayText)
+{
+	SHFILEINFO shfi;
+	SHGetFileInfo(reinterpret_cast<LPTSTR>(pidl),NULL,&shfi,NULL,SHGFI_PIDL|SHGFI_SYSICONINDEX);
+
+	SendMessage(CbEx,CB_RESETCONTENT,0,0);
+
+	COMBOBOXEXITEM cbItem;
+	cbItem.mask				= CBEIF_TEXT|CBEIF_IMAGE|CBEIF_INDENT|CBEIF_SELECTEDIMAGE;
+	cbItem.iItem			= -1;
+	cbItem.iImage			= shfi.iIcon;
+	cbItem.iSelectedImage	= shfi.iIcon;
+	cbItem.iIndent			= 1;
+	cbItem.iOverlay			= 1;
+	cbItem.pszText			= szDisplayText;
+	SendMessage(CbEx,CBEM_SETITEM,0,reinterpret_cast<LPARAM>(&cbItem));
 }

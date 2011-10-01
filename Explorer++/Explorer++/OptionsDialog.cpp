@@ -20,6 +20,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "SetDefaultColumnsDialog.h"
+#include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ListViewHelper.h"
@@ -45,6 +46,7 @@ struct FileSize_t
 	TCHAR				szDisplayName[64];
 };
 
+/* TODO: Strings into string table. */
 static const FileSize_t g_FileSizes[] =
 {{SIZE_FORMAT_BYTES,_T("Bytes")},
 {SIZE_FORMAT_KBYTES,_T("KB")},

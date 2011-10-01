@@ -28,6 +28,7 @@
 #include "SetDefaultColumnsDialog.h"
 #include "AddBookmarkDialog.h"
 #include "DisplayColoursDialog.h"
+#include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
 

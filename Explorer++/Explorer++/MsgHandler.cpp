@@ -15,8 +15,11 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "WildcardSelectDialog.h"
+#include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Controls.h"
+#include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
 
 
@@ -1203,18 +1206,7 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 
 	UpdateWindowStates();
 
-	if(DwmInvalidateIconicBitmaps != NULL)
-	{
-		std::list<TabProxyInfo_t>::iterator itr;
-
-		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
-		{
-			if(itr->iTabId == iTabId)
-			{
-				DwmInvalidateIconicBitmaps(itr->hProxy);
-			}
-		}
-	}
+	InvalidateTaskbarThumbnailBitmap(iTabId);
 
 	SetTabIcon();
 }
@@ -2838,12 +2830,19 @@ void Explorerplusplus::PlayNavigationSound(void)
 	}
 }
 
-HWND Explorerplusplus::GetActiveListView()
+HWND Explorerplusplus::GetActiveListView() const
 {
 	return m_hActiveListView;
 }
 
-IShellBrowser2 *Explorerplusplus::GetActiveShellBrowser()
+IShellBrowser2 *Explorerplusplus::GetActiveShellBrowser() const
 {
 	return m_pActiveShellBrowser;
+}
+
+void Explorerplusplus::OnShowHiddenFiles(void)
+{
+	m_pActiveShellBrowser->ToggleShowHidden();
+
+	RefreshTab(m_iObjectIndex);
 }

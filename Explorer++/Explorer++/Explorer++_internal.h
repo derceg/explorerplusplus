@@ -3,19 +3,7 @@
 
 #include <list>
 #include "../ShellBrowser/iShellView.h"
-#include "../Helper/iDropSource.h"
-#include "../Helper/Controls.h"
-#include "../Helper/RegistrySettings.h"
-#include "../Helper/Helper.h"
-#include "../Helper/FolderSize.h"
 #include "../Helper/StatusBar.h"
-#include "../MyTreeView/MyTreeView.h"
-#include "../Helper/iDataObject.h"
-#include "../Helper/FileOperations.h"
-#include "../Helper/CustomMenu.h"
-#include "../DisplayWindow/DisplayWindow.h"
-#include "../HolderWindow/HolderWindow.h"
-#include "MainResource.h"
 
 /* Used to share global data across the
 classes within the Explorer++ project. */
@@ -64,13 +52,13 @@ namespace NExplorerplusplus
 and the dialogs. */
 __interface IExplorerplusplus
 {
-	HWND			GetActiveListView();
-	IShellBrowser2	*GetActiveShellBrowser();
+	HWND			GetActiveListView() const;
+	IShellBrowser2	*GetActiveShellBrowser() const;
 
-	std::wstring	GetTabName(int iTab);
+	std::wstring	GetTabName(int iTab) const;
 	void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
 	void			RefreshTab(int iTabId);
-	int				GetCurrentTabId();
+	int				GetCurrentTabId() const;
 
 	/* Temporary. */
 	void			SetTabSelection(int Index);
@@ -99,10 +87,6 @@ need to be included here. */
 #ifndef SHIL_JUMBO
 	#define SHIL_JUMBO	0x4
 #endif
-
-/* Display window defaults. */
-#define MINIMUM_DISPLAYWINDOW_HEIGHT	70
-#define DEFAULT_DISPLAYWINDOW_HEIGHT	90
 
 #define WM_APP_TABMCLICK		(WM_APP + 53)
 #define WM_APP_ASSOCCHANGED		(WM_APP + 54)
@@ -165,20 +149,6 @@ appears on the tab control. */
 #define TAB_TOOLBAR_HEIGHT			20
 
 #define DEFAULT_COLUMN_WIDTH	150
-
-/* These definitions are needed to target
-Windows 7 specific features, while remaining
-compliant with XP and Vista. They are copied
-directly from the appropriate header file. */
-#define WM_DWMSENDICONICTHUMBNAIL           0x0323
-#define WM_DWMSENDICONICLIVEPREVIEWBITMAP   0x0326
-#define MSGFLT_ADD 1
-
-typedef BOOL (WINAPI *ChangeWindowMessageFilterProc)(UINT message,DWORD dwFlag);
-typedef HRESULT (STDAPICALLTYPE *DwmSetWindowAttributeProc)(HWND hwnd,DWORD dwAttribute,LPCVOID pvAttribute,DWORD cbAttribute);
-typedef HRESULT (STDAPICALLTYPE *DwmSetIconicThumbnailProc)(HWND hwnd,HBITMAP hbmp,DWORD dwSITFlags);
-typedef HRESULT (STDAPICALLTYPE *DwmSetIconicLivePreviewBitmapProc)(HWND hwnd,HBITMAP hbmp,POINT *pptClient,DWORD dwSITFlags);
-typedef HRESULT (STDAPICALLTYPE *DwmInvalidateIconicBitmapsProc)(HWND hwnd);
 
 #define VALIDATE_REALFOLDER_COLUMNS			0
 #define VALIDATE_CONTROLPANEL_COLUMNS		1
@@ -482,12 +452,5 @@ BOOL LoadWindowPosition(WINDOWPLACEMENT *pwndpl);
 BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl);
 BOOL LoadAllowMultipleInstancesFromRegistry(void);
 BOOL LoadAllowMultipleInstancesFromXML(void);
-
-struct DirectoryAltered_t
-{
-	int		iIndex;
-	int		iFolderIndex;
-	void	*pData;
-};
 
 #endif

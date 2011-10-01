@@ -19,6 +19,7 @@
 #include "iServiceProvider.h"
 #include "IDropFilesCallback.h"
 #include "ListView.h"
+#include "MainResource.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ContextMenuManager.h"
@@ -26,6 +27,9 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/iDropSource.h"
+#include "../Helper/Controls.h"
+#include "../Helper/iDataObject.h"
 #include "../Helper/Macros.h"
 
 
@@ -1719,4 +1723,30 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView)
 	}
 
 	return nSimilar;
+}
+
+void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
+{
+	BOOL	m_bSeenDirectory = FALSE;
+	DWORD	dwAttributes;
+	int		iItem = -1;
+	int		iFolderItem = -1;
+
+	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVIS_SELECTED)) != -1)
+	{
+		dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(iItem);
+
+		if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+		{
+			m_bSeenDirectory = TRUE;
+			iFolderItem = iItem;
+		}
+		else
+		{
+			OpenListViewItem(iItem,FALSE,FALSE);
+		}
+	}
+
+	if(m_bSeenDirectory)
+		OpenListViewItem(iFolderItem,bOpenInNewTab,FALSE);
 }

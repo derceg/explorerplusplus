@@ -17,6 +17,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Version.h"
+#include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/Macros.h"

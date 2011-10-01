@@ -437,7 +437,7 @@ void Explorerplusplus::HandleTabText(int iTab,int iTabId)
 				if(itr->iTabId == iTabId)
 				{
 					SetWindowText(itr->hProxy,szExpandedTabText);
-					m_pTaskbarList3->SetThumbnailTooltip(itr->hProxy,szExpandedTabText);
+					m_pTaskbarList->SetThumbnailTooltip(itr->hProxy,szExpandedTabText);
 					break;
 				}
 			}

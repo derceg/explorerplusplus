@@ -11,6 +11,5 @@ extern HWND	CreateTabControl(HWND,UINT Style);
 extern HWND CreateToolbar(HWND hParent,DWORD dwStyle,DWORD dwExStyle);
 extern HWND	CreateTreeView(HWND,DWORD);
 extern int	ResizeStatusBar(HWND,int,int);
-extern void	SetComboBoxExTitleString(HWND CbEx,TCHAR *Path);
 
 #endif

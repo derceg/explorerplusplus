@@ -56,7 +56,7 @@ m_hContainer(hwnd)
 	m_zDeltaTotal					= 0;
 	m_iPreviousTabSelectionId		= -1;
 
-	m_pTaskbarList3					= NULL;
+	m_pTaskbarList					= NULL;
 
 	m_bBlockNext = FALSE;
 
@@ -140,17 +140,6 @@ m_hContainer(hwnd)
 			m_ViewModes.push_back(ViewMode);
 		}
 	}
-
-	m_hDwmapi = LoadLibrary(_T("dwmapi.dll"));
-
-	if(m_hDwmapi != NULL)
-	{
-		DwmInvalidateIconicBitmaps = (DwmInvalidateIconicBitmapsProc)GetProcAddress(m_hDwmapi,"DwmInvalidateIconicBitmaps");
-	}
-	else
-	{
-		DwmInvalidateIconicBitmaps = NULL;
-	}
 }
 
 Explorerplusplus::~Explorerplusplus()
@@ -160,11 +149,6 @@ Explorerplusplus::~Explorerplusplus()
 	delete m_pBookmarksToolbar;
 
 	m_pDirMon->Release();
-
-	if(m_hDwmapi != NULL)
-	{
-		FreeLibrary(m_hDwmapi);
-	}
 }
 
 void Explorerplusplus::SetDefaultValues(void)

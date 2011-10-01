@@ -26,8 +26,12 @@
 #include "HelpFileMissingDialog.h"
 #include "DisplayColoursDialog.h"
 #include "IModelessDialogNotification.h"
+#include "MainResource.h"
+#include "../DisplayWindow/DisplayWindow.h"
+#include "../HolderWindow/HolderWindow.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
 
 
@@ -980,7 +984,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case IDM_VIEW_SHOWHIDDENFILES:
-			ShowHiddenFiles();
+			OnShowHiddenFiles();
 			break;
 
 		case TOOLBAR_REFRESH:

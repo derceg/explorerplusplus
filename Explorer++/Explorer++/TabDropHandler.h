@@ -2,6 +2,7 @@
 #define TABDROPHANDLER_INCLUDED
 
 #include "TabContainer.h"
+#include "../Helper/DropHandler.h"
 
 class CTabDropHandler : public IDropTarget
 {

@@ -16,6 +16,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
 
@@ -24,6 +25,26 @@ namespace
 {
 	LRESULT CALLBACK MainWndProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 	LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+
+	typedef BOOL (WINAPI *ChangeWindowMessageFilterProc)(UINT message,DWORD dwFlag);
+	typedef HRESULT (STDAPICALLTYPE *DwmSetWindowAttributeProc)(HWND hwnd,DWORD dwAttribute,LPCVOID pvAttribute,DWORD cbAttribute);
+	typedef HRESULT (STDAPICALLTYPE *DwmSetIconicThumbnailProc)(HWND hwnd,HBITMAP hbmp,DWORD dwSITFlags);
+	typedef HRESULT (STDAPICALLTYPE *DwmSetIconicLivePreviewBitmapProc)(HWND hwnd,HBITMAP hbmp,POINT *pptClient,DWORD dwSITFlags);
+	typedef HRESULT (STDAPICALLTYPE *DwmInvalidateIconicBitmapsProc)(HWND hwnd);
+
+	struct TabProxy_t
+	{
+		Explorerplusplus	*pContainer;
+		int					iTabId;
+	};
+
+	/* These definitions are needed to target
+	Windows 7 specific features, while remaining
+	compliant with XP and Vista. They are copied
+	directly from the appropriate header file. */
+	static const UINT WM_DWMSENDICONICTHUMBNAIL = 0x0323;
+	static const UINT WM_DWMSENDICONICLIVEPREVIEWBITMAP = 0x0326;
+	static const UINT MSGFLT_ADD = 1;
 }
 
 void Explorerplusplus::InitializeTaskbarThumbnails()
@@ -81,14 +102,14 @@ LRESULT CALLBACK Explorerplusplus::MainWndTaskbarThumbnailProc(HWND hwnd,UINT uM
 {
 	if(uMsg == m_uTaskbarButtonCreatedMessage)
 	{
-		if(m_pTaskbarList3 != NULL)
+		if(m_pTaskbarList != NULL)
 		{
-			m_pTaskbarList3->Release();
+			m_pTaskbarList->Release();
 		}
 
 		CoCreateInstance(CLSID_TaskbarList,NULL,CLSCTX_INPROC_SERVER,
-			IID_ITaskbarList4,reinterpret_cast<LPVOID *>(&m_pTaskbarList3));
-		m_pTaskbarList3->HrInit();
+			IID_ITaskbarList4,reinterpret_cast<LPVOID *>(&m_pTaskbarList));
+		m_pTaskbarList->HrInit();
 
 		m_bTaskbarInitialised = TRUE;
 
@@ -239,18 +260,68 @@ void Explorerplusplus::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL
 	}
 }
 
+void Explorerplusplus::RemoveTabProxy(int iInternalIndex)
+{
+	if(m_bTaskbarInitialised)
+	{
+		for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+		{
+			if(itr->iTabId == iInternalIndex)
+			{
+				m_pTaskbarList->UnregisterTab(itr->hProxy);
+
+				TabProxy_t *ptp = reinterpret_cast<TabProxy_t *>(GetWindowLongPtr(itr->hProxy,GWLP_USERDATA));
+				DestroyWindow(itr->hProxy);
+				free(ptp);
+
+				HICON hIcon = reinterpret_cast<HICON>(GetClassLongPtr(itr->hProxy,GCLP_HICONSM));
+				UnregisterClass(reinterpret_cast<LPCWSTR>(MAKEWORD(itr->atomClass,0)),GetModuleHandle(0));
+				DestroyIcon(hIcon);
+
+				m_TabProxyList.erase(itr);
+				break;
+			}
+		}
+	}
+}
+
+void Explorerplusplus::InvalidateTaskbarThumbnailBitmap(int iTabId)
+{
+	HMODULE hDwmapi = LoadLibrary(_T("dwmapi.dll"));
+
+	if(hDwmapi != NULL)
+	{
+		DwmInvalidateIconicBitmapsProc DwmInvalidateIconicBitmaps = reinterpret_cast<DwmInvalidateIconicBitmapsProc>(
+			GetProcAddress(hDwmapi,"DwmInvalidateIconicBitmaps"));
+
+		if(DwmInvalidateIconicBitmaps != NULL)
+		{
+			for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+			{
+				if(itr->iTabId == iTabId)
+				{
+					DwmInvalidateIconicBitmaps(itr->hProxy);
+					break;
+				}
+			}
+		}
+
+		FreeLibrary(hDwmapi);
+	}
+}
+
 void Explorerplusplus::RegisterTab(HWND hTabProxy,TCHAR *szDisplayName,BOOL bTabActive)
 {
 	/* Register and insert the tab into the current list of
 	taskbar thumbnails. */
-	m_pTaskbarList3->RegisterTab(hTabProxy,m_hContainer);
-	m_pTaskbarList3->SetTabOrder(hTabProxy,NULL);
+	m_pTaskbarList->RegisterTab(hTabProxy,m_hContainer);
+	m_pTaskbarList->SetTabOrder(hTabProxy,NULL);
 
-	m_pTaskbarList3->SetThumbnailTooltip(hTabProxy,szDisplayName);
+	m_pTaskbarList->SetThumbnailTooltip(hTabProxy,szDisplayName);
 
 	if(bTabActive)
 	{
-		m_pTaskbarList3->SetTabActive(hTabProxy,m_hContainer,0);
+		m_pTaskbarList->SetTabActive(hTabProxy,m_hContainer,0);
 	}
 }
 

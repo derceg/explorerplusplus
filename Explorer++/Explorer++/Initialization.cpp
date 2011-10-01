@@ -17,6 +17,7 @@
 #include "Explorer++.h"
 #include "CustomizeColorsDialog.h"
 #include "BookmarkHelper.h"
+#include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
