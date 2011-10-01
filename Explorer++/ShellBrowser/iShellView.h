@@ -278,7 +278,13 @@ typedef struct
 
 class CShellBrowser : public IDropTarget, public IDropFilesCallback
 {
+	friend int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+
 public:
+
+	/* TODO: Private. */
+	static const int THUMBNAIL_ITEM_WIDTH = 120;
+	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
 	static CShellBrowser *CreateNew(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread);
 
@@ -307,7 +313,7 @@ public:
 	LPITEMIDLIST		QueryCurrentDirectoryIdl(void) const;
 	UINT				QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const;
 	BOOL				GetAutoArrange(void) const;
-	HRESULT				SortFolder(UINT SortMode);
+	void				SortFolder(UINT SortMode);
 	HRESULT				SetCurrentViewMode(DWORD ViewMode);
 	HRESULT				GetCurrentViewMode(UINT *pViewMode) const;
 	HRESULT				GetSortMode(UINT *SortMode) const;
@@ -400,51 +406,6 @@ public:
 	void				EmptyFolderQueue(void);
 	BOOL				RemoveFromFolderQueue(int *iItem);
 
-	/* Listview sorting. */
-	int CALLBACK		Sort(LPARAM lParam1,LPARAM lParam2) const;
-	int					SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType) const;
-	int CALLBACK		SortByName(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortBySize(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByType(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByDateModified(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize) const;
-	int CALLBACK		SortByComments(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByDateDeleted(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByAttributes(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByRealSize(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByShortName(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByOwner(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByProductName(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByCompany(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByDescription(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByFileVersion(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByProductVersion(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int VersionProperty) const;
-	int CALLBACK		SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByExtension(LPARAM lParam1,LPARAM lParam2) const;
-	int	CALLBACK		SortByDateCreated(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByDateAccessed(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByTitle(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortBySubject(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByAuthor(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByKeywords(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DWORD dwPropertyType) const;
-	int CALLBACK		SortByCameraModel(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByDateTaken(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByWidth(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByHeight(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId) const;
-	int CALLBACK		SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByVirtualType(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2) const;
-
 	void				ToggleGrouping(void);
 	void				SetGrouping(BOOL bShowInGroups);
 	void				SetGroupingFlag(BOOL bShowInGroups);
@@ -481,6 +442,22 @@ private:
 
 	DISALLOW_COPY_AND_ASSIGN(CShellBrowser);
 
+	enum DateType_t
+	{
+		DATE_TYPE_CREATED,
+		DATE_TYPE_MODIFIED,
+		DATE_TYPE_ACCESSED
+	};
+
+	enum VersionInfo_t
+	{
+		VERSION_INFO_PRODUCT_NAME,
+		VERSION_INFO_COMPANY,
+		VERSION_INFO_DESCRIPTION,
+		VERSION_INFO_FILE_VERSION,
+		VERSION_INFO_PRODUCT_VERSION
+	};
+
 	typedef struct
 	{
 		TCHAR	szFileName[MAX_PATH];
@@ -513,6 +490,9 @@ private:
 		TCHAR szFileName[MAX_PATH];
 	} DraggedFile_t;
 
+	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
+	static const int THUMBNAIL_ITEM_VERTICAL_SPACING = 20;
+
 	CShellBrowser(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread);
 	~CShellBrowser();
 
@@ -524,8 +504,8 @@ private:
 	void				AllocateInitialItemMemory(void);
 
 	/* Browsing support. */
-	int					BrowseVirtualFolder(TCHAR *szParsingName);
-	int					BrowseVirtualFolder(LPITEMIDLIST pidlDirectory);
+	void				BrowseVirtualFolder(TCHAR *szParsingName);
+	void				BrowseVirtualFolder(LPITEMIDLIST pidlDirectory);
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void inline			InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(int iItemInternal) const;
@@ -535,6 +515,51 @@ private:
 	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory,LPITEMIDLIST pidlRelative,TCHAR *szFileName);
 	void				ResetFolderMemoryAllocations(void);
 	void				SetCurrentViewModeInternal(DWORD ViewMode);
+
+	/* Sorting. */
+	int CALLBACK		Sort(LPARAM lParam1,LPARAM lParam2) const;
+	int					SortByDate(LPARAM lParam1,LPARAM lParam2,DateType_t DateType) const;
+	int CALLBACK		SortByName(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortBySize(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByType(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateModified(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize) const;
+	int CALLBACK		SortByComments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateDeleted(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByAttributes(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByRealSize(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByShortName(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByOwner(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByProductName(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByCompany(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDescription(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByFileVersion(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByProductVersion(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,VersionInfo_t VersionInfo) const;
+	int CALLBACK		SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByExtension(LPARAM lParam1,LPARAM lParam2) const;
+	int	CALLBACK		SortByDateCreated(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateAccessed(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByTitle(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortBySubject(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByAuthor(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByKeywords(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DWORD dwPropertyType) const;
+	int CALLBACK		SortByCameraModel(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByDateTaken(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByWidth(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByHeight(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId) const;
+	int CALLBACK		SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByVirtualType(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2) const;
 
 	/* Listview column support. */
 	void				PlaceColumns(void);
@@ -585,7 +610,6 @@ private:
 	void				OnFileActionRenamedNewName(TCHAR *szFileName);
 	void				RenameItem(int iItemInternal,TCHAR *szNewFileName);
 	int					DetermineItemSortedPosition(LPARAM lParam) const;
-	int					SortItemsRelative(LPARAM lParam1,LPARAM lParam2) const;
 	int					DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2) const;
 
 	/* Filtering support. */
@@ -796,8 +820,6 @@ private:
 	TCHAR				m_szFilter[512];
 	BOOL				m_bApplyFilter;
 	BOOL				m_bFilterCaseSensitive;
-
-	BOOL volatile		m_bBrowsing;
 };
 
 #endif

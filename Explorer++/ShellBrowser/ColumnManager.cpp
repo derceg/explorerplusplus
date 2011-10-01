@@ -384,20 +384,8 @@ int CShellBrowser::SetAllColumnData(void)
 
 	while(bQueueNotEmpty)
 	{
-		if(m_bBrowsing)
-		{
-			goto end;
-			break;
-		}
-
 		for(itr = pActiveColumnList.begin();itr != pActiveColumnList.end();itr++)
 		{
-			if(m_bBrowsing)
-			{
-				goto end;
-				break;
-			}
-
 			if(itr->bChecked)
 			{
 				SetColumnData(itr->id,iItem,iColumnIndex++);
@@ -409,8 +397,6 @@ int CShellBrowser::SetAllColumnData(void)
 	}
 
 	ApplyHeaderSortArrow();
-
-end:
 
 	return 1;
 }

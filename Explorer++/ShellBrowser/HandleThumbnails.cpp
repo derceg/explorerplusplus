@@ -237,8 +237,8 @@ void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
 				if(SUCCEEDED(hr))
 				{
 					dwFlags = IEIFLAG_OFFLINE|IEIFLAG_QUALITY;
-					size.cx = THUMBNAIL_ITEM_WIDTH;
-					size.cy = THUMBNAIL_ITEM_HEIGHT;
+					size.cx = CShellBrowser::THUMBNAIL_ITEM_WIDTH;
+					size.cy = CShellBrowser::THUMBNAIL_ITEM_HEIGHT;
 
 					/* Note that this may return E_PENDING (on Vista),
 					which seems to indicate the request in pending.

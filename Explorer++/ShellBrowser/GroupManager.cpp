@@ -21,6 +21,13 @@
 #include "../Helper/Macros.h"
 
 
+namespace
+{
+	static const UINT KBYTE = 1024;
+	static const UINT MBYTE = 1024 * 1024;
+	static const UINT GBYTE = 1024 * 1024 *1024;
+}
+
 #define GROUP_BY_DATECREATED	0
 #define GROUP_BY_DATEMODIFIED	1
 #define GROUP_BY_DATEACCESSED	2
@@ -367,7 +374,7 @@ PFNLVGROUPCOMPARE pfnGroupCompare)
 			iGroupId = itr->iGroupId;
 			itr->nItems++;
 
-			if(m_dwMajorVersion >= WINDOWS_VISTA_MAJORVERSION)
+			if(m_dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
 			{
 				StringCchPrintf(wszHeader,SIZEOF_ARRAY(wszHeader),
 					_T("%s (%d)"),szGroupHeader,itr->nItems);
@@ -393,7 +400,7 @@ PFNLVGROUPCOMPARE pfnGroupCompare)
 		TypeGroup.nItems = 1;
 		m_GroupList.push_back(TypeGroup);
 
-		if(m_dwMajorVersion >= WINDOWS_VISTA_MAJORVERSION)
+		if(m_dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
 		{
 			StringCchPrintf(wszHeader,SIZEOF_ARRAY(wszHeader),
 				_T("%s (%d)"),szGroupHeader,TypeGroup.nItems);

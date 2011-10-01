@@ -14,7 +14,7 @@
 
 #include "stdafx.h"
 #include <list>
-#include <gdiplus.h>
+#include <cassert>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Controls.h"
@@ -24,70 +24,218 @@
 #include "../Helper/Macros.h"
 
 
-#define DATE_CREATED			0
-#define DATE_MODIFIED			1
-#define DATE_ACCESSED			2
-
-#define VERSION_PRODUCTNAME		0
-#define VERSION_COMPANY			1
-#define VERSION_DESCRIPTION		2
-#define VERSION_FILEVERSION		3
-#define VERSION_PRODUCTVERSION	4
-
-int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-
-int CALLBACK SortByDateModifiedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortBySizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByTotalSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByFreeSpaceStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByDateDeletedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByOriginalLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByAttributesStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByRealSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByShortNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByOwnerStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByProductNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByCompanyStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByDescriptionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByFileVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByProductVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByShortcutToStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByHardlinksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByExtensionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByDateCreatedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByDateAccessedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByTitleStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortBySubjectStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByAuthorStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByKeywordsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByCameraModelStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByDateTakenStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByWidthStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByHeightStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByVirtualCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByFileSystemStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByVirtualTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByNumPrinterDocumentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByPrinterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByPrinterCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByPrinterLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-int CALLBACK SortByNetworkAdapterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-
-int CALLBACK SortByNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
+int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
 	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByName(lParam1,lParam2);
+	return pShellBrowser->Sort(lParam1,lParam2);
 }
 
-/*
-Sorting order:
-Drives
-Folders
-Normal items
-*/
+int CALLBACK CShellBrowser::Sort(LPARAM lParam1,LPARAM lParam2) const
+{
+	int iSort = DetermineRelativeItemPositions(lParam1,lParam2);
+
+	if(iSort == 0)
+	{
+		iSort = StrCmpLogicalW(m_pExtraItemInfo[lParam1].szDisplayName,
+			m_pExtraItemInfo[lParam2].szDisplayName);
+	}
+
+	if(!m_bSortAscending)
+	{
+		iSort = -iSort;
+	}
+
+	return iSort;
+}
+
+int CShellBrowser::DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2) const
+{
+	switch(m_SortMode)
+	{
+	case FSM_NAME:
+		return SortByName(lParam1,lParam2);
+		break;
+
+	case FSM_TYPE:
+		return SortByType(lParam1,lParam2);
+		break;
+
+	case FSM_SIZE:
+		return SortBySize(lParam1,lParam2);
+		break;
+
+	case FSM_DATEMODIFIED:
+		return SortByDateModified(lParam1,lParam2);
+		break;
+
+	case FSM_TOTALSIZE:
+		return SortByTotalSize(lParam1,lParam2,TRUE);
+		break;
+
+	case FSM_FREESPACE:
+		return SortByTotalSize(lParam1,lParam2,FALSE);
+		break;
+
+	case FSM_DATEDELETED:
+		return SortByDateDeleted(lParam1,lParam2);
+		break;
+
+	case FSM_ORIGINALLOCATION:
+		return SortByOriginalLocation(lParam1,lParam2);
+		break;
+
+	case FSM_ATTRIBUTES:
+		return SortByAttributes(lParam1,lParam2);
+		break;
+
+	case FSM_REALSIZE:
+		return SortByRealSize(lParam1,lParam2);
+		break;
+
+	case FSM_SHORTNAME:
+		return SortByShortName(lParam1,lParam2);
+		break;
+
+	case FSM_OWNER:
+		return SortByOwner(lParam1,lParam2);
+		break;
+
+	case FSM_PRODUCTNAME:
+		return SortByProductName(lParam1,lParam2);
+		break;
+
+	case FSM_COMPANY:
+		return SortByCompany(lParam1,lParam2);
+		break;
+
+	case FSM_DESCRIPTION:
+		return SortByDescription(lParam1,lParam2);
+		break;
+
+	case FSM_FILEVERSION:
+		return SortByFileVersion(lParam1,lParam2);
+		break;
+
+	case FSM_PRODUCTVERSION:
+		return SortByProductVersion(lParam1,lParam2);
+		break;
+
+	case FSM_SHORTCUTTO:
+		return SortByShortcutTo(lParam1,lParam2);
+		break;
+
+	case FSM_HARDLINKS:
+		return SortByHardlinks(lParam1,lParam2);
+		break;
+
+	case FSM_EXTENSION:
+		return SortByExtension(lParam1,lParam2);
+		break;
+
+	case FSM_CREATED:
+		return SortByDateCreated(lParam1,lParam2);
+		break;
+
+	case FSM_ACCESSED:
+		return SortByDateAccessed(lParam1,lParam2);
+		break;
+
+	case FSM_TITLE:
+		return SortByTitle(lParam1,lParam2);
+		break;
+
+	case FSM_SUBJECT:
+		return SortBySubject(lParam1,lParam2);
+		break;
+
+	case FSM_AUTHOR:
+		return SortByAuthor(lParam1,lParam2);
+		break;
+
+	case FSM_KEYWORDS:
+		return SortByKeywords(lParam1,lParam2);
+		break;
+
+	case FSM_COMMENTS:
+		return SortByComments(lParam1,lParam2);
+		break;
+
+	case FSM_CAMERAMODEL:
+		return SortByCameraModel(lParam1,lParam2);
+		break;
+
+	case FSM_DATETAKEN:
+		return SortByDateTaken(lParam1,lParam2);
+		break;
+
+	case FSM_WIDTH:
+		return SortByWidth(lParam1,lParam2);
+		break;
+
+	case FSM_HEIGHT:
+		return SortByHeight(lParam1,lParam2);
+		break;
+
+	case FSM_VIRTUALCOMMENTS:
+		return SortByVirtualComments(lParam1,lParam2);
+		break;
+
+	case FSM_FILESYSTEM:
+		return SortByFileSystem(lParam1,lParam2);
+		break;
+
+	case FSM_VIRTUALTYPE:
+		return SortByVirtualType(lParam1,lParam2);
+		break;
+
+	case FSM_NUMPRINTERDOCUMENTS:
+		return SortByNumPrinterDocuments(lParam1,lParam2);
+		break;
+
+	case FSM_PRINTERSTATUS:
+		return SortByPrinterStatus(lParam1,lParam2);
+		break;
+
+	case FSM_PRINTERCOMMENTS:
+		return SortByPrinterComments(lParam1,lParam2);
+		break;
+
+	case FSM_PRINTERLOCATION:
+		return SortByPrinterLocation(lParam1,lParam2);
+		break;
+
+	case FSM_NETWORKADAPTER_STATUS:
+		return SortByNetworkAdapterStatus(lParam1,lParam2);
+		break;
+	}
+
+	return 0;
+}
+
+void CShellBrowser::SortFolder(UINT SortMode)
+{
+	m_SortMode = SortMode;
+
+	if(m_bShowInGroups)
+	{
+		ListView_EnableGroupView(m_hListView,FALSE);
+		ListView_RemoveAllGroups(m_hListView);
+		ListView_EnableGroupView(m_hListView,TRUE);
+
+		SetGrouping(TRUE);
+	}
+
+	SendMessage(m_hListView,LVM_SORTITEMS,reinterpret_cast<WPARAM>(this),reinterpret_cast<LPARAM>(SortStub));
+
+	/* If in details view, the column sort
+	arrow will need to be changed to reflect
+	the new sorting mode. */
+	if(m_ViewMode == VM_DETAILS)
+	{
+		ApplyHeaderSortArrow();
+	}
+}
+
 int CALLBACK CShellBrowser::SortByName(LPARAM lParam1,LPARAM lParam2) const
 {
 	int ReturnValue;
@@ -159,16 +307,7 @@ int CALLBACK CShellBrowser::SortByName(LPARAM lParam1,LPARAM lParam2) const
 
 	ReturnValue = StrCmpLogicalW(m_pExtraItemInfo[lParam1].szDisplayName,m_pExtraItemInfo[lParam2].szDisplayName);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortBySizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortBySize(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortBySize(LPARAM lParam1,LPARAM lParam2) const
@@ -207,9 +346,6 @@ int CALLBACK CShellBrowser::SortBySize(LPARAM lParam1,LPARAM lParam2) const
 				ReturnValue = -1;
 			else
 				ReturnValue = 0;
-
-			if(!m_bSortAscending)
-				ReturnValue = -ReturnValue;
 		}
 
 		return ReturnValue;
@@ -242,16 +378,7 @@ int CALLBACK CShellBrowser::SortBySize(LPARAM lParam1,LPARAM lParam2) const
 	else
 		ReturnValue = 0;
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByType(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByType(LPARAM lParam1,LPARAM lParam2) const
@@ -273,7 +400,7 @@ int CALLBACK CShellBrowser::SortByType(LPARAM lParam1,LPARAM lParam2) const
 	BOOL			IsFolder2;
 	BOOL			bRoot1;
 	BOOL			bRoot2;
-	int				ReturnValue;	
+	int				ReturnValue;
 
 	if(m_bVirtualFolder)
 	{
@@ -367,120 +494,73 @@ int CALLBACK CShellBrowser::SortByType(LPARAM lParam1,LPARAM lParam2) const
 
 	ReturnValue = lstrcmp(shfi1.szTypeName,shfi2.szTypeName);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
 }
 
-int CALLBACK SortByDateModifiedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
+int CALLBACK CShellBrowser::SortByDateCreated(LPARAM lParam1,LPARAM lParam2) const
 {
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByDateModified(lParam1,lParam2);
+	return SortByDate(lParam1,lParam2,DATE_TYPE_CREATED);
 }
 
 int CALLBACK CShellBrowser::SortByDateModified(LPARAM lParam1,LPARAM lParam2) const
 {
-	return SortByDate(lParam1,lParam2,DATE_MODIFIED);
+	return SortByDate(lParam1,lParam2,DATE_TYPE_MODIFIED);
 }
 
-int CALLBACK SortByDateDeletedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
+int CALLBACK CShellBrowser::SortByDateAccessed(LPARAM lParam1,LPARAM lParam2) const
 {
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByDateDeleted(lParam1,lParam2);
+	return SortByDate(lParam1,lParam2,DATE_TYPE_ACCESSED);
 }
 
 /* TODO: Implement. */
 int CShellBrowser::SortByDateDeleted(LPARAM lParam1,LPARAM lParam2) const
 {
-	int			ReturnValue;
+	int ReturnValue;
 
 	ReturnValue = 0;
-
-	if(!m_bSortAscending)
-		ReturnValue = -ReturnValue;
 
 	return ReturnValue;
 }
 
-/*
-DateType:
-0 - Created.
-1 - Modified.
-2 - Accessed;
-*/
-/* TODO: DateType -> enum. */
-int CShellBrowser::SortByDate(LPARAM lParam1,LPARAM lParam2,int DateType) const
+int CShellBrowser::SortByDate(LPARAM lParam1,LPARAM lParam2,DateType_t DateType) const
 {
-	BOOL	IsFolder1;
-	BOOL	IsFolder2;
-	int		ReturnValue = 0;
+	int ReturnValue = 0;
 
-	IsFolder1 = (m_pwfdFiles[lParam1].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (m_pwfdFiles[lParam2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
+	BOOL IsFolder1 = (m_pwfdFiles[lParam1].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
+	BOOL IsFolder2 = (m_pwfdFiles[lParam2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
 	
-	if(IsFolder1 && IsFolder2)
+	if((IsFolder1 && IsFolder2) ||
+		(!IsFolder1 && !IsFolder2))
 	{
 		switch(DateType)
 		{
-			case DATE_CREATED:
+			case DATE_TYPE_CREATED:
 				ReturnValue = CompareFileTime(&m_pwfdFiles[lParam1].ftCreationTime,&m_pwfdFiles[lParam2].ftCreationTime);
 				break;
 
-			case DATE_MODIFIED:
+			case DATE_TYPE_MODIFIED:
 				ReturnValue = CompareFileTime(&m_pwfdFiles[lParam1].ftLastWriteTime,&m_pwfdFiles[lParam2].ftLastWriteTime);
 				break;
 
-			case DATE_ACCESSED:
+			case DATE_TYPE_ACCESSED:
 				ReturnValue = CompareFileTime(&m_pwfdFiles[lParam1].ftLastAccessTime,&m_pwfdFiles[lParam2].ftLastAccessTime);
 				break;
 
 			default:
-				ReturnValue = 0;
+				assert(false);
 				break;
 		}
-
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
-		return ReturnValue;
 	}
-
-	if(IsFolder1)
+	else if(IsFolder1 && !IsFolder2)
 	{
-		return -1;
+		ReturnValue = -1;
 	}
-
-	if(IsFolder2)
+	else if(!IsFolder1 && IsFolder2)
 	{
-		return 1;
+		ReturnValue = 1;
 	}
-
-	switch(DateType)
-	{
-		case 0:
-			ReturnValue = CompareFileTime(&m_pwfdFiles[lParam1].ftCreationTime,&m_pwfdFiles[lParam2].ftCreationTime);
-			break;
-
-		case 1:
-			ReturnValue = CompareFileTime(&m_pwfdFiles[lParam1].ftLastWriteTime,&m_pwfdFiles[lParam2].ftLastWriteTime);
-			break;
-
-		case 2:
-			ReturnValue = CompareFileTime(&m_pwfdFiles[lParam1].ftLastAccessTime,&m_pwfdFiles[lParam2].ftLastAccessTime);
-			break;
-	}
-
-	if(!m_bSortAscending)
-		ReturnValue = -ReturnValue;
 
 	return ReturnValue;
-}
-
-int CALLBACK SortByTotalSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByTotalSize(lParam1,lParam2,TRUE);
 }
 
 int CALLBACK CShellBrowser::SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize) const
@@ -553,35 +633,14 @@ int CALLBACK CShellBrowser::SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL b
 	return ReturnValue;
 }
 
-int CALLBACK SortByFreeSpaceStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByTotalSize(lParam1,lParam2,FALSE);
-}
-
-int CALLBACK SortByOriginalLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByOriginalLocation(lParam1,lParam2);
-}
-
 /* TODO: Implement. */
 int CALLBACK CShellBrowser::SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2) const
 {
-	int			ReturnValue;
+	int ReturnValue;
 
 	ReturnValue = 0;
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByAttributesStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByAttributes(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByAttributes(LPARAM lParam1,LPARAM lParam2) const
@@ -605,9 +664,6 @@ int CALLBACK CShellBrowser::SortByAttributes(LPARAM lParam1,LPARAM lParam2) cons
 	if(IsFolder1 && IsFolder2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
 	}
@@ -639,16 +695,7 @@ int CALLBACK CShellBrowser::SortByAttributes(LPARAM lParam1,LPARAM lParam2) cons
 
 	ReturnValue = lstrcmp(szAttributes1,szAttributes2);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByRealSizeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByRealSize(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByRealSize(LPARAM lParam1,LPARAM lParam2) const
@@ -671,9 +718,6 @@ int CALLBACK CShellBrowser::SortByRealSize(LPARAM lParam1,LPARAM lParam2) const
 	if(IsFolder1 && IsFolder2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
 	}
@@ -716,16 +760,7 @@ int CALLBACK CShellBrowser::SortByRealSize(LPARAM lParam1,LPARAM lParam2) const
 	else
 		ReturnValue = 0;
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByShortNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByShortName(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByShortName(LPARAM lParam1,LPARAM lParam2) const
@@ -746,9 +781,6 @@ int CALLBACK CShellBrowser::SortByShortName(LPARAM lParam1,LPARAM lParam2) const
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 		return ReturnValue;
 	}
 
@@ -768,16 +800,7 @@ int CALLBACK CShellBrowser::SortByShortName(LPARAM lParam1,LPARAM lParam2) const
 
 	ReturnValue = lstrcmp(m_pwfdFiles[lParam1].cAlternateFileName,m_pwfdFiles[lParam2].cAlternateFileName);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByOwnerStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByOwner(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByOwner(LPARAM lParam1,LPARAM lParam2) const
@@ -801,9 +824,6 @@ int CALLBACK CShellBrowser::SortByOwner(LPARAM lParam1,LPARAM lParam2) const
 	if(IsFolder1 && IsFolder2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
 	}
@@ -830,68 +850,35 @@ int CALLBACK CShellBrowser::SortByOwner(LPARAM lParam1,LPARAM lParam2) const
 
 	ReturnValue = lstrcmp(szOwner1,szOwner2);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByProductNameStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByProductName(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByProductName(LPARAM lParam1,LPARAM lParam2) const
 {
-	return SortByVersionInfo(lParam1,lParam2,VERSION_PRODUCTNAME);
-}
-
-int CALLBACK SortByCompanyStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByCompany(lParam1,lParam2);
+	return SortByVersionInfo(lParam1,lParam2,VERSION_INFO_PRODUCT_NAME);
 }
 
 int CALLBACK CShellBrowser::SortByCompany(LPARAM lParam1,LPARAM lParam2) const
 {
-	return SortByVersionInfo(lParam1,lParam2,VERSION_COMPANY);
-}
-
-int CALLBACK SortByDescriptionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByDescription(lParam1,lParam2);
+	return SortByVersionInfo(lParam1,lParam2,VERSION_INFO_COMPANY);
 }
 
 int CALLBACK CShellBrowser::SortByDescription(LPARAM lParam1,LPARAM lParam2) const
 {
-	return SortByVersionInfo(lParam1,lParam2,VERSION_DESCRIPTION);
-}
-
-int CALLBACK SortByFileVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByFileVersion(lParam1,lParam2);
+	return SortByVersionInfo(lParam1,lParam2,VERSION_INFO_DESCRIPTION);
 }
 
 int CALLBACK CShellBrowser::SortByFileVersion(LPARAM lParam1,LPARAM lParam2) const
 {
-	return SortByVersionInfo(lParam1,lParam2,VERSION_FILEVERSION);
-}
-
-int CALLBACK SortByProductVersionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByProductVersion(lParam1,lParam2);
+	return SortByVersionInfo(lParam1,lParam2,VERSION_INFO_FILE_VERSION);
 }
 
 int CALLBACK CShellBrowser::SortByProductVersion(LPARAM lParam1,LPARAM lParam2) const
 {
-	return SortByVersionInfo(lParam1,lParam2,VERSION_PRODUCTVERSION);
+	return SortByVersionInfo(lParam1,lParam2,VERSION_INFO_PRODUCT_VERSION);
 }
 
-int CALLBACK CShellBrowser::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int VersionProperty) const
+int CALLBACK CShellBrowser::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,VersionInfo_t VersionInfo) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -913,9 +900,6 @@ int CALLBACK CShellBrowser::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int 
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 		return ReturnValue;
 	}
 
@@ -936,24 +920,13 @@ int CALLBACK CShellBrowser::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,int 
 	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
 	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
 
-	GetVersionInfoString(FullFileName1,
-	_T("ProductName"),szVersionBuf1,SIZEOF_ARRAY(szVersionBuf1));
-
-	GetVersionInfoString(FullFileName2,
-	_T("ProductName"),szVersionBuf2,SIZEOF_ARRAY(szVersionBuf2));
+	/* TODO: */
+	GetVersionInfoString(FullFileName1,_T("ProductName"),szVersionBuf1,SIZEOF_ARRAY(szVersionBuf1));
+	GetVersionInfoString(FullFileName2,_T("ProductName"),szVersionBuf2,SIZEOF_ARRAY(szVersionBuf2));
 
 	ReturnValue = lstrcmp(szVersionBuf1,szVersionBuf2);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByShortcutToStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByShortcutTo(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const
@@ -977,9 +950,6 @@ int CALLBACK CShellBrowser::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) cons
 	if(IsFolder1 && IsFolder2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
 	}
@@ -1009,16 +979,7 @@ int CALLBACK CShellBrowser::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) cons
 
 	ReturnValue = lstrcmp(szResolvedLinkPath1,szResolvedLinkPath2);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByHardlinksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByHardlinks(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const
@@ -1042,9 +1003,6 @@ int CALLBACK CShellBrowser::SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const
 	if(IsFolder1 && IsFolder2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
 	}
@@ -1071,16 +1029,7 @@ int CALLBACK CShellBrowser::SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const
 
 	ReturnValue = dwNumHardLinks1 - dwNumHardLinks2;
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByExtensionStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByExtension(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByExtension(LPARAM lParam1,LPARAM lParam2) const
@@ -1104,9 +1053,6 @@ int CALLBACK CShellBrowser::SortByExtension(LPARAM lParam1,LPARAM lParam2) const
 	if(IsFolder1 && IsFolder2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
 	}
@@ -1134,38 +1080,7 @@ int CALLBACK CShellBrowser::SortByExtension(LPARAM lParam1,LPARAM lParam2) const
 	/* TODO: Need to check if pExt == NULL. */
 	ReturnValue = lstrcmp(pExt1,pExt2);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByDateCreatedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByDateCreated(lParam1,lParam2);
-}
-
-int CALLBACK CShellBrowser::SortByDateCreated(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortByDate(lParam1,lParam2,DATE_CREATED);
-}
-
-int CALLBACK SortByDateAccessedStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByDateAccessed(lParam1,lParam2);
-}
-
-int CALLBACK CShellBrowser::SortByDateAccessed(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortByDate(lParam1,lParam2,DATE_ACCESSED);
-}
-
-int CALLBACK SortByTitleStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByTitle(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByTitle(LPARAM lParam1,LPARAM lParam2) const
@@ -1173,21 +1088,9 @@ int CALLBACK CShellBrowser::SortByTitle(LPARAM lParam1,LPARAM lParam2) const
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_TITLE);
 }
 
-int CALLBACK SortBySubjectStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortBySubject(lParam1,lParam2);
-}
-
 int CALLBACK CShellBrowser::SortBySubject(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_SUBJECT);
-}
-
-int CALLBACK SortByAuthorStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByAuthor(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByAuthor(LPARAM lParam1,LPARAM lParam2) const
@@ -1195,21 +1098,9 @@ int CALLBACK CShellBrowser::SortByAuthor(LPARAM lParam1,LPARAM lParam2) const
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_AUTHOR);
 }
 
-int CALLBACK SortByKeywordsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByKeywords(lParam1,lParam2);
-}
-
 int CALLBACK CShellBrowser::SortByKeywords(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_KEYWORDS);
-}
-
-int CALLBACK SortByCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByComments(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByComments(LPARAM lParam1,LPARAM lParam2) const
@@ -1239,9 +1130,6 @@ int CALLBACK CShellBrowser::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 		return ReturnValue;
 	}
 
@@ -1270,16 +1158,7 @@ int CALLBACK CShellBrowser::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,
 
 	ReturnValue = lstrcmp(szPropertyBuf1,szPropertyBuf2);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByCameraModelStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByCameraModel(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByCameraModel(LPARAM lParam1,LPARAM lParam2) const
@@ -1287,32 +1166,14 @@ int CALLBACK CShellBrowser::SortByCameraModel(LPARAM lParam1,LPARAM lParam2) con
 	return SortByImageProperty(lParam1,lParam2,PropertyTagEquipModel);
 }
 
-int CALLBACK SortByDateTakenStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByDateTaken(lParam1,lParam2);
-}
-
 int CALLBACK CShellBrowser::SortByDateTaken(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByImageProperty(lParam1,lParam2,PropertyTagDateTime);
 }
 
-int CALLBACK SortByWidthStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByWidth(lParam1,lParam2);
-}
-
 int CALLBACK CShellBrowser::SortByWidth(LPARAM lParam1,LPARAM lParam2) const
 {
 	return SortByImageProperty(lParam1,lParam2,PropertyTagImageWidth);
-}
-
-int CALLBACK SortByHeightStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByHeight(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByHeight(LPARAM lParam1,LPARAM lParam2) const
@@ -1342,9 +1203,6 @@ int CALLBACK CShellBrowser::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PR
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 		return ReturnValue;
 	}
 
@@ -1373,16 +1231,7 @@ int CALLBACK CShellBrowser::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PR
 
 	ReturnValue = lstrcmp(szPropertyBuf1,szPropertyBuf2);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByVirtualCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByVirtualComments(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) const
@@ -1404,9 +1253,6 @@ int CALLBACK CShellBrowser::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2)
 	if(IsFolder1 && IsFolder2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
 	}
@@ -1432,16 +1278,7 @@ int CALLBACK CShellBrowser::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = lstrcmp(szInfoTip1,szInfoTip2);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByFileSystemStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByFileSystem(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const
@@ -1506,16 +1343,7 @@ int CALLBACK CShellBrowser::SortByFileSystem(LPARAM lParam1,LPARAM lParam2) cons
 			ReturnValue = lstrcmp(szFileSystemName1,szFileSystemName2);
 	}
 
-	if(!m_bSortAscending)
-		ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByVirtualTypeStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByVirtualType(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByVirtualType(LPARAM lParam1,LPARAM lParam2) const
@@ -1582,16 +1410,7 @@ int CALLBACK CShellBrowser::SortByVirtualType(LPARAM lParam1,LPARAM lParam2) con
 		CoTaskMemFree(pidlComplete2);
 	}
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByNumPrinterDocumentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByNumPrinterDocuments(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2) const
@@ -1639,17 +1458,7 @@ int CALLBACK CShellBrowser::SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lPar
 		free(pPrinterInfo22);
 	}
 
-
-	if(!m_bSortAscending)
-		ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByPrinterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByPrinterStatus(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) const
@@ -1669,9 +1478,6 @@ int CALLBACK CShellBrowser::SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) c
 	if(IsFolder1 && IsFolder2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
 
 		return ReturnValue;
 	}
@@ -1722,22 +1528,9 @@ int CALLBACK CShellBrowser::SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) c
 		ClosePrinter(hPrinter);
 	}*/
 
-
-
 	ReturnValue = 0;
 
-
-
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByPrinterCommentsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByPrinterComments(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) const
@@ -1762,9 +1555,6 @@ int CALLBACK CShellBrowser::SortByPrinterComments(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 		return ReturnValue;
 	}
 
@@ -1790,16 +1580,7 @@ int CALLBACK CShellBrowser::SortByPrinterComments(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = lstrcmp(shfi1.szTypeName,shfi2.szTypeName);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByPrinterLocationStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByPrinterLocation(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2) const
@@ -1824,9 +1605,6 @@ int CALLBACK CShellBrowser::SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2)
 	{
 		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
 
-		if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 		return ReturnValue;
 	}
 
@@ -1852,16 +1630,7 @@ int CALLBACK CShellBrowser::SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2)
 
 	ReturnValue = lstrcmp(shfi1.szTypeName,shfi2.szTypeName);
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortByNetworkAdapterStatusStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->SortByNetworkAdapterStatus(lParam1,lParam2);
 }
 
 int CALLBACK CShellBrowser::SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2) const
@@ -1927,222 +1696,5 @@ int CALLBACK CShellBrowser::SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lPa
 
 	ReturnValue = 0;
 
-	if(!m_bSortAscending)
-			ReturnValue = -ReturnValue;
-
 	return ReturnValue;
-}
-
-int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->Sort(lParam1,lParam2);
-}
-
-int CALLBACK CShellBrowser::Sort(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortItemsRelative(lParam1,lParam2);
-}
-
-int CShellBrowser::SortItemsRelative(LPARAM lParam1,LPARAM lParam2) const
-{
-	int iSort;
-
-	iSort = DetermineRelativeItemPositions(lParam1,lParam2);
-
-	if(iSort == 0)
-	{
-		iSort = StrCmpLogicalW(m_pExtraItemInfo[lParam1].szDisplayName,
-			m_pExtraItemInfo[lParam2].szDisplayName);
-	}
-
-	return iSort;
-}
-
-int CShellBrowser::DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2) const
-{
-	switch(m_SortMode)
-	{
-	case FSM_NAME:
-		return SortByNameStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_TYPE:
-		return SortByTypeStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_SIZE:
-		return SortBySizeStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_DATEMODIFIED:
-		return SortByDateModifiedStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_TOTALSIZE:
-		return SortByTotalSizeStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_FREESPACE:
-		return SortByFreeSpaceStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_DATEDELETED:
-		return SortByDateDeletedStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_ORIGINALLOCATION:
-		return SortByOriginalLocationStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_ATTRIBUTES:
-		return SortByAttributesStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_REALSIZE:
-		return SortByRealSizeStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_SHORTNAME:
-		return SortByShortNameStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_OWNER:
-		return SortByOwnerStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_PRODUCTNAME:
-		return SortByProductNameStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_COMPANY:
-		return SortByCompanyStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_DESCRIPTION:
-		return SortByDescriptionStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_FILEVERSION:
-		return SortByFileVersionStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_PRODUCTVERSION:
-		return SortByProductVersionStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_SHORTCUTTO:
-		return SortByShortcutToStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_HARDLINKS:
-		return SortByHardlinksStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_EXTENSION:
-		return SortByExtensionStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_CREATED:
-		return SortByDateCreatedStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_ACCESSED:
-		return SortByDateAccessedStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_TITLE:
-		return SortByTitleStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_SUBJECT:
-		return SortBySubjectStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_AUTHOR:
-		return SortByAuthorStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_KEYWORDS:
-		return SortByKeywordsStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_COMMENTS:
-		return SortByCommentsStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_CAMERAMODEL:
-		return SortByCameraModelStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_DATETAKEN:
-		return SortByDateTakenStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_WIDTH:
-		return SortByWidthStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_HEIGHT:
-		return SortByHeightStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_VIRTUALCOMMENTS:
-		return SortByVirtualCommentsStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_FILESYSTEM:
-		return SortByFileSystemStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_VIRTUALTYPE:
-		return SortByVirtualTypeStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_NUMPRINTERDOCUMENTS:
-		return SortByNumPrinterDocumentsStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_PRINTERSTATUS:
-		return SortByPrinterStatusStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_PRINTERCOMMENTS:
-		return SortByPrinterCommentsStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_PRINTERLOCATION:
-		return SortByPrinterLocationStub(lParam1,lParam2,(LPARAM)this);
-		break;
-
-	case FSM_NETWORKADAPTER_STATUS:
-		return SortByNetworkAdapterStatusStub(lParam1,lParam2,(LPARAM)this);
-		break;
-	}
-
-	return 0;
-}
-
-HRESULT CShellBrowser::SortFolder(UINT SortMode)
-{
-	m_SortMode = SortMode;
-
-	if(m_bShowInGroups)
-	{
-		ListView_EnableGroupView(m_hListView,FALSE);
-		ListView_RemoveAllGroups(m_hListView);
-		ListView_EnableGroupView(m_hListView,TRUE);
-
-		SetGrouping(TRUE);
-	}
-
-	SendMessage(m_hListView,LVM_SORTITEMS,(WPARAM)this,(LPARAM)SortStub);
-
-	/* If in details view, the column sort
-	arrow will need to be changed to reflect
-	the new sorting mode. */
-	if(m_ViewMode == VM_DETAILS)
-		ApplyHeaderSortArrow();
-
-	return S_OK;
 }

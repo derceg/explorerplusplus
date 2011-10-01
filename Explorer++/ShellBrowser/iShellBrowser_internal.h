@@ -5,36 +5,15 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/DropHandler.h"
 
-#define KBYTE					1024
-#define MBYTE					1024 * 1024
-#define GBYTE					1024 * 1024 *1024
-
 #define DEFAULT_MEM_ALLOC					250
 
 #define MEM_ALLOCATION_LEVEL_LOW	1000
 #define MEM_ALLOCATION_LEVEL_MEDIUM	5000
 
-/* Used for testing what version of Windows we're running on. */
-#define WINDOWS_VISTA_MAJORVERSION	6
-#define WINDOWS_XP_MAJORVERSION		5
-
 /* This is only defined for Windows Vista and later.
 If building for XP as well, this definition will
 need to be included here. */
 #define SHIL_JUMBO	0x4
-
-#define VALIDATE_REALFOLDER_COLUMNS			0
-#define VALIDATE_CONTROLPANEL_COLUMNS		1
-#define VALIDATE_MYCOMPUTER_COLUMNS			2
-#define VALIDATE_RECYCLEBIN_COLUMNS			3
-#define VALIDATE_PRINTERS_COLUMNS			4
-#define VALIDATE_NETWORKCONNECTIONS_COLUMNS	5
-#define VALIDATE_MYNETWORKPLACES_COLUMNS	6
-
-#define THUMBNAIL_ITEM_WIDTH				120
-#define THUMBNAIL_ITEM_HEIGHT				120
-#define THUMBNAIL_ITEM_HORIZONTAL_SPACING	20
-#define THUMBNAIL_ITEM_VERTICAL_SPACING		20
 
 #define THUMBNAIL_TYPE_ICON			0
 #define THUMBNAIL_TYPE_EXTRACTED	1

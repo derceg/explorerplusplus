@@ -26,10 +26,8 @@
 
 HRESULT CShellBrowser::BrowseFolder(TCHAR *szPath,UINT wFlags)
 {
-	LPITEMIDLIST pidlDirectory	= NULL;
-	HRESULT hr;
-
-	hr = GetIdlFromParsingName(szPath,&pidlDirectory);
+	LPITEMIDLIST pidlDirectory = NULL;
+	HRESULT hr = GetIdlFromParsingName(szPath,&pidlDirectory);
 
 	if(SUCCEEDED(hr))
 	{
@@ -43,15 +41,9 @@ HRESULT CShellBrowser::BrowseFolder(TCHAR *szPath,UINT wFlags)
 
 HRESULT CShellBrowser::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 {
-	LPITEMIDLIST	pidl = NULL;
-	TCHAR			szParsingPath[MAX_PATH];
-	BOOL			StoreHistory = TRUE;
-	HRESULT			hr;
-	int				nItems = 0;
-
 	SetCursor(LoadCursor(NULL,IDC_WAIT));
 
-	pidl = ILClone(pidlDirectory);
+	LPITEMIDLIST pidl = ILClone(pidlDirectory);
 
 	if(m_bFolderVisited)
 	{
@@ -60,35 +52,39 @@ HRESULT CShellBrowser::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	/* The path may not be absolute, in which case it will
 	need to be completed. */
-	hr = ParsePath(&pidl,wFlags,&StoreHistory);
+	BOOL StoreHistory = TRUE;
+	HRESULT hr = ParsePath(&pidl,wFlags,&StoreHistory);
 
 	if(hr != S_OK)
 	{
-		/* Parsing error. */
 		SetCursor(LoadCursor(NULL,IDC_ARROW));
 		return E_FAIL;
 	}
 
-	m_bBrowsing = TRUE;
 	EmptyIconFinderQueue();
 	EmptyThumbnailsQueue();
 	EmptyColumnQueue();
 	EmptyFolderQueue();
-	m_bBrowsing = FALSE;
+
+	/* TODO: Wait for any background threads to finish processing. */
 
 	EnterCriticalSection(&m_csDirectoryAltered);
 	m_FilesAdded.clear();
 	m_FileSelectionList.clear();
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
+	TCHAR szParsingPath[MAX_PATH];
 	GetDisplayName(pidl,szParsingPath,SHGDN_FORPARSING);
 
-	SendMessage(m_hOwner,WM_USER_STARTEDBROWSING,m_ID,(WPARAM)szParsingPath);
+	/* TODO: Method callback. */
+	SendMessage(m_hOwner,WM_USER_STARTEDBROWSING,m_ID,reinterpret_cast<WPARAM>(szParsingPath));
 
 	StringCchCopy(m_CurDir,SIZEOF_ARRAY(m_CurDir),szParsingPath);
 
 	if(StoreHistory)
+	{
 		m_pPathManager->StoreIdl(pidl);
+	}
 
 	if(m_bFolderVisited)
 	{
@@ -97,14 +93,14 @@ HRESULT CShellBrowser::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 
 	m_nTotalItems = 0;
 
-	nItems = BrowseVirtualFolder(pidl);
+	BrowseVirtualFolder(pidl);
 
 	CoTaskMemFree(pidl);
 
 	/* Stop the list view from redrawing itself each time is inserted.
 	Redrawing will be allowed once all items have being inserted.
 	(reduces lag when a large number of items are going to be inserted). */
-	SendMessage(m_hListView,WM_SETREDRAW,(WPARAM)FALSE,(LPARAM)NULL);
+	SendMessage(m_hListView,WM_SETREDRAW,FALSE,NULL);
 
 	ListView_DeleteAllItems(m_hListView);
 
@@ -126,7 +122,7 @@ HRESULT CShellBrowser::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 	ListView_EnsureVisible(m_hListView,0,FALSE);
 
 	/* Allow the listview to redraw itself once again. */
-	SendMessage(m_hListView,WM_SETREDRAW,(WPARAM)TRUE,(LPARAM)NULL);
+	SendMessage(m_hListView,WM_SETREDRAW,TRUE,NULL);
 
 	m_bFolderVisited = TRUE;
 
@@ -483,21 +479,17 @@ BOOL *bStoreHistory)
 	return S_OK;
 }
 
-int CShellBrowser::BrowseVirtualFolder(TCHAR *szParsingName)
+void CShellBrowser::BrowseVirtualFolder(TCHAR *szParsingName)
 {
-	LPITEMIDLIST pidl				= NULL;
-	int nItems = 0;
-
+	LPITEMIDLIST pidl = NULL;
 	GetIdlFromParsingName(szParsingName,&pidl);
 
-	nItems = BrowseVirtualFolder(pidl);
+	BrowseVirtualFolder(pidl);
 
 	CoTaskMemFree(pidl);
-
-	return nItems;
 }
 
-int CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
+void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 {
 	IShellFolder	*pDesktopFolder = NULL;
 	IShellFolder	*pShellFolder = NULL;
@@ -508,7 +500,6 @@ int CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 	TCHAR			szFileName[MAX_PATH];
 	ULONG			uFetched;
 	HRESULT			hr;
-	int				nItems = 0;
 
 	DetermineFolderVirtual(pidlDirectory);
 
@@ -563,8 +554,6 @@ int CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 						StrRetToBuf(&str,rgelt,szFileName,MAX_PATH);
 
 						AddItemInternal(pidlDirectory,rgelt,szFileName,-1,FALSE);
-
-						nItems++;
 					}
 
 					CoTaskMemFree((LPVOID)rgelt);
@@ -578,8 +567,6 @@ int CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 
 		pDesktopFolder->Release();
 	}
-
-	return nItems;
 }
 
 HRESULT inline CShellBrowser::AddItemInternal(LPITEMIDLIST pidlDirectory,
