@@ -338,7 +338,7 @@ void CCustomizeColorsDialog::OnMove(BOOL bUp)
 		std::advance(itrSelected,iSelected);
 
 		auto itrSwap = m_pColorRuleList->begin();
-		std::advance(itrSelected,iSwap);
+		std::advance(itrSwap,iSwap);
 
 		std::iter_swap(itrSelected,itrSwap);
 
