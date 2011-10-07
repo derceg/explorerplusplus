@@ -2253,7 +2253,7 @@ Explorerplusplus::CLoadSaveXML::~CLoadSaveXML()
 		ReleaseSaveEnvironment();
 }
 
-void Explorerplusplus::CLoadSaveXML::InitializeLoadEnvironment(void)
+void Explorerplusplus::CLoadSaveXML::InitializeLoadEnvironment()
 {
 	TCHAR szConfigFile[MAX_PATH];
 	VARIANT_BOOL status;
@@ -2284,7 +2284,7 @@ clean:
 	return;
 }
 
-void Explorerplusplus::CLoadSaveXML::ReleaseLoadEnvironment(void)
+void Explorerplusplus::CLoadSaveXML::ReleaseLoadEnvironment()
 {
 	if(m_bLoadedCorrectly)
 	{
@@ -2293,7 +2293,7 @@ void Explorerplusplus::CLoadSaveXML::ReleaseLoadEnvironment(void)
 	}
 }
 
-void Explorerplusplus::CLoadSaveXML::InitializeSaveEnvironment(void)
+void Explorerplusplus::CLoadSaveXML::InitializeSaveEnvironment()
 {
 	MSXML2::IXMLDOMProcessingInstruction	*pi = NULL;
 	MSXML2::IXMLDOMComment					*pc = NULL;
@@ -2347,7 +2347,7 @@ clean:
 	if (pc) pc->Release();
 }
 
-void Explorerplusplus::CLoadSaveXML::ReleaseSaveEnvironment(void)
+void Explorerplusplus::CLoadSaveXML::ReleaseSaveEnvironment()
 {
 	HANDLE	hProcess;
 	TCHAR	szConfigFile[MAX_PATH];
@@ -2381,82 +2381,82 @@ void Explorerplusplus::CLoadSaveXML::ReleaseSaveEnvironment(void)
 	m_pXMLDom = NULL;
 }
 
-void Explorerplusplus::CLoadSaveXML::LoadGenericSettings(void)
+void Explorerplusplus::CLoadSaveXML::LoadGenericSettings()
 {
 	m_pContainer->LoadGenericSettingsFromXML(m_pXMLDom);
 }
 
-void Explorerplusplus::CLoadSaveXML::LoadBookmarks(void)
+void Explorerplusplus::CLoadSaveXML::LoadBookmarks()
 {
 	m_pContainer->LoadBookmarksFromXML(m_pXMLDom);
 }
 
-int Explorerplusplus::CLoadSaveXML::LoadPreviousTabs(void)
+int Explorerplusplus::CLoadSaveXML::LoadPreviousTabs()
 {
 	return m_pContainer->LoadTabSettingsFromXML(m_pXMLDom);
 }
 
-void Explorerplusplus::CLoadSaveXML::LoadDefaultColumns(void)
+void Explorerplusplus::CLoadSaveXML::LoadDefaultColumns()
 {
 	m_pContainer->LoadDefaultColumnsFromXML(m_pXMLDom);
 }
 
-void Explorerplusplus::CLoadSaveXML::LoadApplicationToolbar(void)
+void Explorerplusplus::CLoadSaveXML::LoadApplicationToolbar()
 {
 	m_pContainer->LoadApplicationToolbarFromXML(m_pXMLDom);
 }
 
-void Explorerplusplus::CLoadSaveXML::LoadToolbarInformation(void)
+void Explorerplusplus::CLoadSaveXML::LoadToolbarInformation()
 {
 	m_pContainer->LoadToolbarInformationFromXML(m_pXMLDom);
 }
 
-void Explorerplusplus::CLoadSaveXML::LoadColorRules(void)
+void Explorerplusplus::CLoadSaveXML::LoadColorRules()
 {
 	m_pContainer->LoadColorRulesFromXML(m_pXMLDom);
 }
 
-void Explorerplusplus::CLoadSaveXML::LoadState(void)
+void Explorerplusplus::CLoadSaveXML::LoadState()
 {
 	m_pContainer->LoadStateFromXML(m_pXMLDom);
 }
 
-void Explorerplusplus::CLoadSaveXML::SaveGenericSettings(void)
+void Explorerplusplus::CLoadSaveXML::SaveGenericSettings()
 {
 	m_pContainer->SaveGenericSettingsToXML(m_pXMLDom,m_pRoot);
 }
 
-void Explorerplusplus::CLoadSaveXML::SaveBookmarks(void)
+void Explorerplusplus::CLoadSaveXML::SaveBookmarks()
 {
 	m_pContainer->SaveBookmarksToXML(m_pXMLDom,m_pRoot);
 }
 
-void Explorerplusplus::CLoadSaveXML::SaveTabs(void)
+void Explorerplusplus::CLoadSaveXML::SaveTabs()
 {
 	m_pContainer->SaveTabSettingsToXML(m_pXMLDom,m_pRoot);
 }
 
-void Explorerplusplus::CLoadSaveXML::SaveDefaultColumns(void)
+void Explorerplusplus::CLoadSaveXML::SaveDefaultColumns()
 {
 	m_pContainer->SaveDefaultColumnsToXML(m_pXMLDom,m_pRoot);
 }
 
-void Explorerplusplus::CLoadSaveXML::SaveApplicationToolbar(void)
+void Explorerplusplus::CLoadSaveXML::SaveApplicationToolbar()
 {
 	m_pContainer->SaveApplicationToolbarToXML(m_pXMLDom,m_pRoot);
 }
 
-void Explorerplusplus::CLoadSaveXML::SaveToolbarInformation(void)
+void Explorerplusplus::CLoadSaveXML::SaveToolbarInformation()
 {
 	m_pContainer->SaveToolbarInformationToXML(m_pXMLDom,m_pRoot);
 }
 
-void Explorerplusplus::CLoadSaveXML::SaveColorRules(void)
+void Explorerplusplus::CLoadSaveXML::SaveColorRules()
 {
 	m_pContainer->SaveColorRulesToXML(m_pXMLDom,m_pRoot);
 }
 
-void Explorerplusplus::CLoadSaveXML::SaveState(void)
+void Explorerplusplus::CLoadSaveXML::SaveState()
 {
 	m_pContainer->SaveStateToXML(m_pXMLDom,m_pRoot);
 }

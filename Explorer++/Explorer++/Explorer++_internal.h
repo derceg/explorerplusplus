@@ -422,29 +422,31 @@ extern HWND g_hwndManageBookmarks;
 /* Save/load interface. This allows multiple
 methods of saving/loading data, as long as it
 conforms to this specification. */
-__interface ILoadSave
+class ILoadSave
 {
 public:
 
+	virtual ~ILoadSave(){};
+
 	/* Loading functions. */
-	virtual void	LoadGenericSettings(void);
-	virtual void	LoadBookmarks();
-	virtual int		LoadPreviousTabs(void);
-	virtual void	LoadDefaultColumns(void);
-	virtual void	LoadApplicationToolbar(void);
-	virtual void	LoadToolbarInformation(void);
-	virtual void	LoadColorRules(void);
-	virtual void	LoadState(void);
+	virtual void	LoadGenericSettings() = 0;
+	virtual void	LoadBookmarks() = 0;
+	virtual int		LoadPreviousTabs() = 0;
+	virtual void	LoadDefaultColumns() = 0;
+	virtual void	LoadApplicationToolbar() = 0;
+	virtual void	LoadToolbarInformation() = 0;
+	virtual void	LoadColorRules() = 0;
+	virtual void	LoadState() = 0;
 
 	/* Saving functions. */
-	virtual void	SaveGenericSettings(void);
-	virtual void	SaveBookmarks();
-	virtual void	SaveTabs(void);
-	virtual void	SaveDefaultColumns(void);
-	virtual void	SaveApplicationToolbar(void);
-	virtual void	SaveToolbarInformation(void);
-	virtual void	SaveColorRules(void);
-	virtual void	SaveState(void);
+	virtual void	SaveGenericSettings() = 0;
+	virtual void	SaveBookmarks() = 0;
+	virtual void	SaveTabs() = 0;
+	virtual void	SaveDefaultColumns() = 0;
+	virtual void	SaveApplicationToolbar() = 0;
+	virtual void	SaveToolbarInformation() = 0;
+	virtual void	SaveColorRules() = 0;
+	virtual void	SaveState() = 0;
 };
 
 BOOL TestConfigFileInternal(void);

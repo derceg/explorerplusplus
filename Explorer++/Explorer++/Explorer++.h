@@ -191,24 +191,24 @@ private:
 		~CLoadSaveRegistry();
 
 		/* Loading functions. */
-		void	LoadGenericSettings(void);
-		void	LoadBookmarks(void);
-		int		LoadPreviousTabs(void);
-		void	LoadDefaultColumns(void);
-		void	LoadApplicationToolbar(void);
-		void	LoadToolbarInformation(void);
-		void	LoadColorRules(void);
-		void	LoadState(void);
+		void	LoadGenericSettings();
+		void	LoadBookmarks();
+		int		LoadPreviousTabs();
+		void	LoadDefaultColumns();
+		void	LoadApplicationToolbar();
+		void	LoadToolbarInformation();
+		void	LoadColorRules();
+		void	LoadState();
 
 		/* Saving functions. */
-		void	SaveGenericSettings(void);
-		void	SaveBookmarks(void);
-		void	SaveTabs(void);
-		void	SaveDefaultColumns(void);
-		void	SaveApplicationToolbar(void);
-		void	SaveToolbarInformation(void);
-		void	SaveColorRules(void);
-		void	SaveState(void);
+		void	SaveGenericSettings();
+		void	SaveBookmarks();
+		void	SaveTabs();
+		void	SaveDefaultColumns();
+		void	SaveApplicationToolbar();
+		void	SaveToolbarInformation();
+		void	SaveColorRules();
+		void	SaveState();
 
 	private:
 
@@ -222,32 +222,32 @@ private:
 		CLoadSaveXML(Explorerplusplus *pContainer,BOOL bLoad);
 		~CLoadSaveXML();
 
-		void	InitializeLoadEnvironment(void);
-		void	ReleaseLoadEnvironment(void);
-		void	InitializeSaveEnvironment(void);
-		void	ReleaseSaveEnvironment(void);
-
 		/* Loading functions. */
-		void	LoadGenericSettings(void);
-		void	LoadBookmarks(void);
-		int		LoadPreviousTabs(void);
-		void	LoadDefaultColumns(void);
-		void	LoadApplicationToolbar(void);
-		void	LoadToolbarInformation(void);
-		void	LoadColorRules(void);
-		void	LoadState(void);
+		void	LoadGenericSettings();
+		void	LoadBookmarks();
+		int		LoadPreviousTabs();
+		void	LoadDefaultColumns();
+		void	LoadApplicationToolbar();
+		void	LoadToolbarInformation();
+		void	LoadColorRules();
+		void	LoadState();
 
 		/* Saving functions. */
-		void	SaveGenericSettings(void);
-		void	SaveBookmarks(void);
-		void	SaveTabs(void);
-		void	SaveDefaultColumns(void);
-		void	SaveApplicationToolbar(void);
-		void	SaveToolbarInformation(void);
-		void	SaveColorRules(void);
-		void	SaveState(void);
+		void	SaveGenericSettings();
+		void	SaveBookmarks();
+		void	SaveTabs();
+		void	SaveDefaultColumns();
+		void	SaveApplicationToolbar();
+		void	SaveToolbarInformation();
+		void	SaveColorRules();
+		void	SaveState();
 
 	private:
+
+		void	InitializeLoadEnvironment();
+		void	ReleaseLoadEnvironment();
+		void	InitializeSaveEnvironment();
+		void	ReleaseSaveEnvironment();
 
 		Explorerplusplus		*m_pContainer;
 		BOOL					m_bLoad;

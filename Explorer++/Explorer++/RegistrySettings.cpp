@@ -1299,82 +1299,82 @@ Explorerplusplus::CLoadSaveRegistry::~CLoadSaveRegistry()
 
 }
 
-void Explorerplusplus::CLoadSaveRegistry::LoadGenericSettings(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadGenericSettings()
 {
 	m_pContainer->LoadSettings(REG_MAIN_KEY);
 }
 
-void Explorerplusplus::CLoadSaveRegistry::LoadBookmarks(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadBookmarks()
 {
 	m_pContainer->LoadBookmarksFromRegistry();
 }
 
-int Explorerplusplus::CLoadSaveRegistry::LoadPreviousTabs(void)
+int Explorerplusplus::CLoadSaveRegistry::LoadPreviousTabs()
 {
 	return m_pContainer->LoadTabSettingsFromRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::LoadDefaultColumns(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadDefaultColumns()
 {
 	m_pContainer->LoadDefaultColumnsFromRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::LoadApplicationToolbar(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadApplicationToolbar()
 {
 	m_pContainer->LoadApplicationToolbarFromRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::LoadToolbarInformation(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadToolbarInformation()
 {
 	m_pContainer->LoadToolbarInformationFromRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::LoadColorRules(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadColorRules()
 {
 	m_pContainer->LoadColorRulesFromRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::LoadState(void)
+void Explorerplusplus::CLoadSaveRegistry::LoadState()
 {
 	m_pContainer->LoadStateFromRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::SaveGenericSettings(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveGenericSettings()
 {
 	m_pContainer->SaveSettings();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::SaveBookmarks(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveBookmarks()
 {
 	m_pContainer->SaveBookmarksToRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::SaveTabs(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveTabs()
 {
 	m_pContainer->SaveTabSettingsToRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::SaveDefaultColumns(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveDefaultColumns()
 {
 	m_pContainer->SaveDefaultColumnsToRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::SaveApplicationToolbar(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveApplicationToolbar()
 {
 	m_pContainer->SaveApplicationToolbarToRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::SaveToolbarInformation(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveToolbarInformation()
 {
 	m_pContainer->SaveToolbarInformationToRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::SaveColorRules(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveColorRules()
 {
 	m_pContainer->SaveColorRulesToRegistry();
 }
 
-void Explorerplusplus::CLoadSaveRegistry::SaveState(void)
+void Explorerplusplus::CLoadSaveRegistry::SaveState()
 {
 	m_pContainer->SaveStateToRegistry();
 }
