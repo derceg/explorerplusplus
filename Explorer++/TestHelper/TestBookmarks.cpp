@@ -92,26 +92,40 @@ class CTestBookmarkItemNotifier : public NBookmark::IBookmarkItemNotification
 {
 public:
 
-	void	OnBookmarkItemModified(const GUID &guid);
-	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark);
-	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder);
+	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
+	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
+
+	void	OnBookmarkModified(const GUID &guid);
+	void	OnBookmarkFolderModified(const GUID &guid);
+
 	void	OnBookmarkRemoved(const GUID &guid);
 	void	OnBookmarkFolderRemoved(const GUID &guid);
+
+private:
+
+	GUID	m_guidBookmark;
 };
 
-void CTestBookmarkItemNotifier::OnBookmarkItemModified(const GUID &guid)
-{
-
-}
-
-void CTestBookmarkItemNotifier::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark)
+void CTestBookmarkItemNotifier::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position)
 {
 	EXPECT_EQ(std::wstring(L"Test name"),Bookmark.GetName());
 	EXPECT_EQ(std::wstring(L"Test location"),Bookmark.GetLocation());
 	EXPECT_EQ(std::wstring(L"Test description"),Bookmark.GetDescription());
+
+	m_guidBookmark = Bookmark.GetGUID();
 }
 
-void CTestBookmarkItemNotifier::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder)
+void CTestBookmarkItemNotifier::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position)
+{
+
+}
+
+void CTestBookmarkItemNotifier::OnBookmarkModified(const GUID &guid)
+{
+	EXPECT_EQ(TRUE,IsEqualGUID(guid,m_guidBookmark));
+}
+
+void CTestBookmarkItemNotifier::OnBookmarkFolderModified(const GUID &guid)
 {
 
 }
@@ -129,10 +143,12 @@ void CTestBookmarkItemNotifier::OnBookmarkFolderRemoved(const GUID &guid)
 TEST(BookmarkTest,UpdateNotifications)
 {
 	CBookmarkFolder BookmarkFolderParent = CBookmarkFolder::Create(L"Test");
-	CBookmark Bookmark(L"Test name",L"Test location",L"Test description");
 
 	CTestBookmarkItemNotifier *ptbn = new CTestBookmarkItemNotifier();
 	CBookmarkItemNotifier::GetInstance().AddObserver(ptbn);
 
+	CBookmark Bookmark(L"Test name",L"Test location",L"Test description");
 	BookmarkFolderParent.InsertBookmark(Bookmark);
+
+	Bookmark.SetName(L"New test folder name");
 }
