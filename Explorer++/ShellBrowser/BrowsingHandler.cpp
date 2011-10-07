@@ -310,7 +310,7 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 /* Processes an items filename. Essentially checks
 if the extension (if any) needs to be removed, and
 removes it if it does. */
-TCHAR *CShellBrowser::ProcessItemFileName(int iItemInternal)
+TCHAR *CShellBrowser::ProcessItemFileName(int iItemInternal) const
 {
 	BOOL bHideExtension = FALSE;
 	TCHAR *pExt = NULL;

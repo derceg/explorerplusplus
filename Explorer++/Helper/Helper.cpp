@@ -436,6 +436,8 @@ BOOL SetProcessTokenPrivilege(DWORD ProcessId,TCHAR *PrivilegeName,BOOL bEnableP
 
 	OpenProcessToken(hProcess,TOKEN_ALL_ACCESS,&hToken);
 
+	CloseHandle(hProcess);
+
 	LookupPrivilegeValue(NULL,PrivilegeName,&luid);
 
 	tp.PrivilegeCount				= 1;
@@ -446,9 +448,11 @@ BOOL SetProcessTokenPrivilege(DWORD ProcessId,TCHAR *PrivilegeName,BOOL bEnableP
 	else
 		tp.Privileges[0].Attributes	= 0;
 
-	CloseHandle(hProcess);
+	BOOL Res = AdjustTokenPrivileges(hToken,FALSE,&tp,0,NULL,NULL);
 
-	return AdjustTokenPrivileges(hToken,FALSE,&tp,0,NULL,NULL);
+	CloseHandle(hToken);
+
+	return Res;
 }
 
 BOOL CompareFileTypes(TCHAR *pszFile1,TCHAR *pszFile2)
@@ -808,7 +812,7 @@ struct LANGCODEPAGE
 	WORD wCodePage;
 } *lpTranslate;
 
-BOOL GetVersionInfoString(TCHAR *szFileName,TCHAR *szVersionInfo,TCHAR *szBuffer,UINT cbBufLen)
+BOOL GetVersionInfoString(const TCHAR *szFileName,const TCHAR *szVersionInfo,TCHAR *szBuffer,UINT cbBufLen)
 {
 	LPVOID lpData;
 	TCHAR szSubBlock[64];
@@ -2158,7 +2162,7 @@ HRESULT GetMediaMetadata(TCHAR *szFileName,LPCWSTR szAttribute,BYTE **pszOutput)
 
 						if(SUCCEEDED(hr))
 						{
-							*pszOutput = (BYTE *)malloc(cbLength * sizeof(TCHAR));
+							*pszOutput = (BYTE *)malloc(cbLength);
 
 							if(*pszOutput != NULL)
 							{

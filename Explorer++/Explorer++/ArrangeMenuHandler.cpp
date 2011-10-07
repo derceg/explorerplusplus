@@ -265,10 +265,6 @@ UINT Explorerplusplus::GetArrangeMenuItemStringIndex(UINT uItemId)
 		return IDS_SORTBY_FILESYSTEM;
 		break;
 
-	case IDM_SORTBY_VIRTUALTYPE:
-		return IDS_SORTBY_TYPE;
-		break;
-
 	case IDM_SORTBY_NUMPRINTERDOCUMENTS:
 		return IDS_SORTBY_NUMPRINTERDOCUMENTS;
 		break;
@@ -495,10 +491,6 @@ int Explorerplusplus::DetermineSortModeMenuId(int SortMode)
 			return IDM_SORTBY_FILESYSTEM;
 			break;
 
-		case FSM_VIRTUALTYPE:
-			return IDM_SORTBY_VIRTUALTYPE;
-			break;
-
 		case FSM_NUMPRINTERDOCUMENTS:
 			return IDM_SORTBY_NUMPRINTERDOCUMENTS;
 			break;
@@ -657,10 +649,6 @@ int Explorerplusplus::DetermineGroupModeMenuId(int SortMode)
 
 		case FSM_FILESYSTEM:
 			return IDM_GROUPBY_FILESYSTEM;
-			break;
-
-		case FSM_VIRTUALTYPE:
-			return IDM_GROUPBY_VIRTUALTYPE;
 			break;
 
 		case FSM_NUMPRINTERDOCUMENTS:

@@ -124,7 +124,6 @@ typedef enum
 	FSM_VIRTUALCOMMENTS		= 33,
 
 	FSM_FILESYSTEM			= 34,
-	FSM_VIRTUALTYPE			= 35,
 
 	FSM_NUMPRINTERDOCUMENTS	= 36,
 	FSM_PRINTERSTATUS		= 37,
@@ -190,7 +189,6 @@ typedef enum
 	CM_TOTALSIZE			= 29,
 	CM_FREESPACE			= 30,
 	CM_FILESYSTEM			= 31,
-	CM_VIRTUALTYPE			= 32,
 
 	/* Recycle Bin. */
 	CM_ORIGINALLOCATION		= 33,
@@ -449,7 +447,42 @@ private:
 		DATE_TYPE_ACCESSED
 	};
 
-	enum VersionInfo_t
+	enum MediaMetadataType_t
+	{
+		MEDIAMETADATA_TYPE_BITRATE,
+		MEDIAMETADATA_TYPE_COPYRIGHT,
+		MEDIAMETADATA_TYPE_DURATION,
+		MEDIAMETADATA_TYPE_PROTECTED,
+		MEDIAMETADATA_TYPE_RATING,
+		MEDIAMETADATA_TYPE_ALBUM_ARTIST,
+		MEDIAMETADATA_TYPE_ALBUM_TITLE,
+		MEDIAMETADATA_TYPE_BEATS_PER_MINUTE,
+		MEDIAMETADATA_TYPE_COMPOSER,
+		MEDIAMETADATA_TYPE_CONDUCTOR,
+		MEDIAMETADATA_TYPE_DIRECTOR,
+		MEDIAMETADATA_TYPE_GENRE,
+		MEDIAMETADATA_TYPE_LANGUAGE,
+		MEDIAMETADATA_TYPE_BROADCASTDATE,
+		MEDIAMETADATA_TYPE_CHANNEL,
+		MEDIAMETADATA_TYPE_STATIONNAME,
+		MEDIAMETADATA_TYPE_MOOD,
+		MEDIAMETADATA_TYPE_PARENTALRATING,
+		MEDIAMETADATA_TYPE_PARENTALRATINGREASON,
+		MEDIAMETADATA_TYPE_PERIOD,
+		MEDIAMETADATA_TYPE_PRODUCER,
+		MEDIAMETADATA_TYPE_PUBLISHER,
+		MEDIAMETADATA_TYPE_WRITER,
+		MEDIAMETADATA_TYPE_YEAR
+	};
+
+	enum TimeType_t
+	{
+		COLUMN_TIME_MODIFIED,
+		COLUMN_TIME_CREATED,
+		COLUMN_TIME_ACCESSED
+	};
+
+	enum VersionInfoType_t
 	{
 		VERSION_INFO_PRODUCT_NAME,
 		VERSION_INFO_COMPANY,
@@ -458,37 +491,46 @@ private:
 		VERSION_INFO_PRODUCT_VERSION
 	};
 
-	typedef struct
+	enum PrinterInformationType_t
+	{
+		PRINTER_INFORMATION_TYPE_NUM_JOBS,
+		PRINTER_INFORMATION_TYPE_STATUS,
+		PRINTER_INFORMATION_TYPE_COMMENTS,
+		PRINTER_INFORMATION_TYPE_LOCATION,
+		PRINTER_INFORMATION_TYPE_MODEL
+	};
+
+	struct AlteredFile_t
 	{
 		TCHAR	szFileName[MAX_PATH];
 		DWORD	dwAction;
 		int		iFolderIndex;
-	} AlteredFile_t;
+	};
 
-	typedef struct
+	struct AwaitingAdd_t
 	{
 		int		iItem;
 		int		iItemInternal;
 
 		BOOL	bPosition;
 		int		iAfter;
-	} AwaitingAdd_t;
+	};
 
-	typedef struct
+	struct Added_t
 	{
 		TCHAR szFileName[MAX_PATH];
-	} Added_t;
+	};
 
-	typedef struct
+	struct DroppedFile_t
 	{
 		TCHAR szFileName[MAX_PATH];
 		POINT DropPoint;
-	} DroppedFile_t;
+	};
 
-	typedef struct
+	struct DraggedFile_t
 	{
 		TCHAR szFileName[MAX_PATH];
-	} DraggedFile_t;
+	};
 
 	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
 	static const int THUMBNAIL_ITEM_VERTICAL_SPACING = 20;
@@ -509,7 +551,7 @@ private:
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void inline			InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(int iItemInternal) const;
-	TCHAR				*ProcessItemFileName(int iItemInternal);
+	TCHAR				*ProcessItemFileName(int iItemInternal) const;
 	HRESULT inline		AddItemInternal(LPITEMIDLIST pidlDirectory,LPITEMIDLIST pidlRelative,TCHAR *szFileName,int iItemIndex,BOOL bPosition);
 	HRESULT inline		AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
 	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory,LPITEMIDLIST pidlRelative,TCHAR *szFileName);
@@ -536,7 +578,7 @@ private:
 	int CALLBACK		SortByDescription(LPARAM lParam1,LPARAM lParam2) const;
 	int CALLBACK		SortByFileVersion(LPARAM lParam1,LPARAM lParam2) const;
 	int CALLBACK		SortByProductVersion(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,VersionInfo_t VersionInfo) const;
+	int CALLBACK		SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,VersionInfoType_t VersioninfoType) const;
 	int CALLBACK		SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const;
 	int CALLBACK		SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const;
 	int CALLBACK		SortByExtension(LPARAM lParam1,LPARAM lParam2) const;
@@ -554,7 +596,6 @@ private:
 	int CALLBACK		SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId) const;
 	int CALLBACK		SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) const;
 	int CALLBACK		SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByVirtualType(LPARAM lParam1,LPARAM lParam2) const;
 	int CALLBACK		SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2) const;
 	int CALLBACK		SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) const;
 	int CALLBACK		SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) const;
@@ -563,39 +604,36 @@ private:
 
 	/* Listview column support. */
 	void				PlaceColumns(void);
-	void				SetColumnData(unsigned int ColumnId,int iItem,int iColumnIndex);
+	void				SetColumnText(UINT ColumnID,int ItemIndex,int ColumnIndex);
+	std::wstring		GetColumnText(UINT ColumnID,int InternalIndex) const;
 	void				InsertColumn(unsigned int ColumnId,int iColumndIndex,int iWidth);
 	void				SetActiveColumnSet(void);
 	unsigned int		DetermineColumnSortMode(int iColumnId) const;
 	void				GetColumnInternal(unsigned int id,Column_t *pci) const;
 	void				SaveColumnWidths(void);
 
-	/* Listview columns - set column data. */
-	int					SetNameColumnData(HWND hListView,int iItem,int iColumn);
-	int					SetSizeColumnData(HWND hListView,int iItem,int iColumn);
-	int					SetRealSizeColumnData(HWND hListView,int iItem,int iColumn);
-	int					SetTypeColumnData(HWND hListView,int iItem,int iColumn);
-	void				SetVirtualTypeColumnData(int iItem,int iColumn);
-	void				SetTotalSizeColumnData(int iItem,int iColumn,BOOL bTotalSize);
-	void				SetFileSystemColumnData(int iItem,int iColumn);
-	int					SetTimeColumnData(HWND hListView,int iItem,int iColumn,int TimeType);
-	int					SetAttributeColumnData(HWND hListView,int iItem,int iColumn);
-	int					SetShortNameColumnData(HWND hListView,int iItem,int iColumn);
-	int					SetOwnerColumnData(HWND hListView,int iItem,int iColumn);
-	int					SetVersionColumnData(HWND hListView,int iItem,int iColumn,TCHAR *lpszVersion);
-	int					SetShortcutColumnData(HWND hListView,int iItem,int iColumn);
-	int					SetHardLinksColumnData(HWND hListView,int iItem,int iColumn);
-	int					SetExtensionColumnData(HWND hListView,int iItem,int iColumn);
-	int					SetSummaryColumnData(HWND hListView,int iItem,int iColumn,DWORD dwPropertyType);
-	int					SetImageColumnData(HWND hListView,int iItem,int iColumn,PROPID PropertyId);
-	void				SetControlPanelComments(int iItem,int iColumn);
-	void				SetNumPrinterDocumentsColumnData(int iItem,int iColumn);
-	void				SetPrinterStatusColumnData(int iItem,int iColumn);
-	void				SetPrinterCommentsColumnData(int iItem,int iColumn);
-	void				SetPrinterLocationColumnData(int iItem,int iColumn);
-	void				SetPrinterModelColumnData(int iItem,int iColumn);
-	void				SetNetworkAdapterStatusColumnData(int iItem,int iColumn);
-	void				SetMediaStatusColumnData(int iItem,int iColumn,int iType);
+	/* Listview columns. */
+	std::wstring		GetNameColumnText(int InternalIndex) const;
+	std::wstring		GetTypeColumnText(int InternalIndex) const;
+	std::wstring		GetSizeColumnText(int InternalIndex) const;
+	std::wstring		GetTimeColumnText(int InternalIndex,TimeType_t TimeType) const;
+	std::wstring		GetAttributeColumnText(int InternalIndex) const;
+	std::wstring		GetRealSizeColumnText(int InternalIndex) const;
+	std::wstring		GetShortNameColumnText(int InternalIndex) const;
+	std::wstring		GetOwnerColumnText(int InternalIndex) const;
+	std::wstring		GetVersionColumnText(int InternalIndex,VersionInfoType_t VersioninfoType) const;
+	std::wstring		GetShortcutToColumnText(int InternalIndex) const;
+	std::wstring		GetHardLinksColumnText(int InternalIndex) const;
+	std::wstring		GetExtensionColumnText(int InternalIndex) const;
+	std::wstring		GetSummaryColumnText(int InternalIndex,DWORD PropertyType) const;
+	std::wstring		GetImageColumnText(int InternalIndex,PROPID PropertyID) const;
+	std::wstring		GetFileSystemColumnText(int InternalIndex) const;
+	std::wstring		GetDriveSpaceColumnText(int InternalIndex,bool TotalSize) const;
+	std::wstring		GetControlPanelCommentsColumnText(int InternalIndex) const;
+	std::wstring		GetPrinterColumnText(int InternalIndex,PrinterInformationType_t PrinterInformationType) const;
+	std::wstring		GetNetworkAdapterColumnText(int InternalIndex) const;
+	std::wstring		GetMediaMetadataColumnText(int InternalIndex,MediaMetadataType_t MediaMetaDataType) const;
+	const TCHAR			*GetMediaMetadataAttributeName(MediaMetadataType_t MediaMetaDataType) const;
 
 	/* Device change support. */
 	void				UpdateDriveIcon(TCHAR *szDrive);

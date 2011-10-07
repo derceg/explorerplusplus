@@ -18,9 +18,8 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <gdiplus.h>
 #include <list>
-#include <assert.h>
+#include <cassert>
 
 /* Temporarily disable the "conditional expression is
 constant" warning. */
@@ -32,286 +31,10 @@ constant" warning. */
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/Macros.h"
 
-
-#define COLUMN_TIME_MODIFIED	0
-#define COLUMN_TIME_CREATED		1
-#define COLUMN_TIME_ACCESSED	2
-
-namespace
-{
-	const UINT MEDIAMETADATA_TYPE_BITRATE = 0;
-	const UINT MEDIAMETADATA_TYPE_COPYRIGHT = 1;
-	const UINT MEDIAMETADATA_TYPE_DURATION = 2;
-	const UINT MEDIAMETADATA_TYPE_PROTECTED = 3;
-	const UINT MEDIAMETADATA_TYPE_RATING = 4;
-	const UINT MEDIAMETADATA_TYPE_ALBUMARTIST = 5;
-	const UINT MEDIAMETADATA_TYPE_ALBUM = 6;
-	const UINT MEDIAMETADATA_TYPE_BEATSPERMINUTE = 7;
-	const UINT MEDIAMETADATA_TYPE_COMPOSER = 8;
-	const UINT MEDIAMETADATA_TYPE_CONDUCTOR = 9;
-	const UINT MEDIAMETADATA_TYPE_DIRECTOR = 10;
-	const UINT MEDIAMETADATA_TYPE_GENRE = 11;
-	const UINT MEDIAMETADATA_TYPE_LANGUAGE = 12;
-	const UINT MEDIAMETADATA_TYPE_BROADCASTDATE = 13;
-	const UINT MEDIAMETADATA_TYPE_CHANNEL = 14;
-	const UINT MEDIAMETADATA_TYPE_STATIONNAME = 15;
-	const UINT MEDIAMETADATA_TYPE_MOOD = 16;
-	const UINT MEDIAMETADATA_TYPE_PARENTALRATING = 17;
-	const UINT MEDIAMETADATA_TYPE_PARENTALRATINGREASON = 18;
-	const UINT MEDIAMETADATA_TYPE_PERIOD = 19;
-	const UINT MEDIAMETADATA_TYPE_PRODUCER = 20;
-	const UINT MEDIAMETADATA_TYPE_PUBLISHER = 21;
-	const UINT MEDIAMETADATA_TYPE_WRITER = 22;
-	const UINT MEDIAMETADATA_TYPE_YEAR = 23;
-}
-
-void CShellBrowser::SetColumnData(unsigned int ColumnId,int iItem,int iColumnIndex)
-{
-	switch(ColumnId)
-	{
-		case CM_NAME:
-			SetNameColumnData(m_hListView,iItem,iColumnIndex);
-			break;
-
-		case CM_TYPE:
-			SetTypeColumnData(m_hListView,iItem,iColumnIndex);
-			break;
-		case CM_SIZE:
-			SetSizeColumnData(m_hListView,iItem,iColumnIndex);
-			break;
-
-		case CM_DATEMODIFIED:
-			SetTimeColumnData(m_hListView,iItem,iColumnIndex,COLUMN_TIME_MODIFIED);
-			break;
-		case CM_CREATED:
-			SetTimeColumnData(m_hListView,iItem,iColumnIndex,COLUMN_TIME_CREATED);
-			break;
-		case CM_ACCESSED:
-			SetTimeColumnData(m_hListView,iItem,iColumnIndex,COLUMN_TIME_ACCESSED);
-			break;
-
-		case CM_ATTRIBUTES:
-			SetAttributeColumnData(m_hListView,iItem,iColumnIndex);
-			break;
-		case CM_REALSIZE:
-			SetRealSizeColumnData(m_hListView,iItem,iColumnIndex);
-			break;
-		case CM_SHORTNAME:
-			SetShortNameColumnData(m_hListView,iItem,iColumnIndex);
-			break;
-		case CM_OWNER:
-			SetOwnerColumnData(m_hListView,iItem,iColumnIndex);
-			break;
-
-		case CM_PRODUCTNAME:
-			SetVersionColumnData(m_hListView,iItem,iColumnIndex,_T("ProductName"));
-			break;
-		case CM_COMPANY:
-			SetVersionColumnData(m_hListView,iItem,iColumnIndex,_T("CompanyName"));
-			break;
-		case CM_DESCRIPTION:
-			SetVersionColumnData(m_hListView,iItem,iColumnIndex,_T("FileDescription"));
-			break;
-		case CM_FILEVERSION:
-			SetVersionColumnData(m_hListView,iItem,iColumnIndex,_T("FileVersion"));
-			break;
-		case CM_PRODUCTVERSION:
-			SetVersionColumnData(m_hListView,iItem,iColumnIndex,_T("ProductVersion"));
-			break;
-
-		case CM_SHORTCUTTO:
-			SetShortcutColumnData(m_hListView,iItem,iColumnIndex);
-			break;
-		case CM_HARDLINKS:
-			SetHardLinksColumnData(m_hListView,iItem,iColumnIndex);
-			break;
-		case CM_EXTENSION:
-			SetExtensionColumnData(m_hListView,iItem,iColumnIndex);
-			break;
-
-		case CM_TITLE:
-			SetSummaryColumnData(m_hListView,iItem,iColumnIndex,PROPERTY_ID_TITLE);
-			break;
-		case CM_SUBJECT:
-			SetSummaryColumnData(m_hListView,iItem,iColumnIndex,PROPERTY_ID_SUBJECT);
-			break;
-		case CM_AUTHOR:
-			SetSummaryColumnData(m_hListView,iItem,iColumnIndex,PROPERTY_ID_AUTHOR);
-			break;
-		case CM_KEYWORDS:
-			SetSummaryColumnData(m_hListView,iItem,iColumnIndex,PROPERTY_ID_KEYWORDS);
-			break;
-		case CM_COMMENT:
-			SetSummaryColumnData(m_hListView,iItem,iColumnIndex,PROPERTY_ID_COMMENT);
-			break;
-
-		case CM_CAMERAMODEL:
-			SetImageColumnData(m_hListView,iItem,iColumnIndex,PropertyTagEquipModel);
-			break;
-		case CM_DATETAKEN:
-			SetImageColumnData(m_hListView,iItem,iColumnIndex,PropertyTagExifDTOrig);
-			break;
-		case CM_WIDTH:
-			SetImageColumnData(m_hListView,iItem,iColumnIndex,PropertyTagImageWidth);
-			break;
-		case CM_HEIGHT:
-			SetImageColumnData(m_hListView,iItem,iColumnIndex,PropertyTagImageHeight);
-			break;
-
-		case CM_VIRTUALCOMMENTS:
-			SetControlPanelComments(iItem,iColumnIndex);
-			break;
-
-		case CM_VIRTUALTYPE:
-			SetVirtualTypeColumnData(iItem,iColumnIndex);
-			break;
-
-		case CM_TOTALSIZE:
-			SetTotalSizeColumnData(iItem,iColumnIndex,TRUE);
-			break;
-
-		case CM_FREESPACE:
-			SetTotalSizeColumnData(iItem,iColumnIndex,FALSE);
-			break;
-
-		case CM_FILESYSTEM:
-			SetFileSystemColumnData(iItem,iColumnIndex);
-			break;
-
-		case CM_NUMPRINTERDOCUMENTS:
-			SetNumPrinterDocumentsColumnData(iItem,iColumnIndex);
-			break;
-
-		case CM_PRINTERSTATUS:
-			SetPrinterStatusColumnData(iItem,iColumnIndex);
-			break;
-
-		case CM_PRINTERCOMMENTS:
-			SetPrinterCommentsColumnData(iItem,iColumnIndex);
-			break;
-
-		case CM_PRINTERLOCATION:
-			SetPrinterLocationColumnData(iItem,iColumnIndex);
-			break;
-
-		case CM_PRINTERMODEL:
-			SetPrinterModelColumnData(iItem,iColumnIndex);
-			break;
-
-		case CM_NETWORKADAPTER_STATUS:
-			SetNetworkAdapterStatusColumnData(iItem,iColumnIndex);
-			break;
-
-		case CM_MEDIA_BITRATE:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_BITRATE);
-			break;
-
-		case CM_MEDIA_COPYRIGHT:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_COPYRIGHT);
-			break;
-
-		case CM_MEDIA_DURATION:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_DURATION);
-			break;
-
-		case CM_MEDIA_PROTECTED:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_PROTECTED);
-			break;
-
-		case CM_MEDIA_RATING:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_RATING);
-			break;
-
-		case CM_MEDIA_ALBUMARTIST:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_ALBUMARTIST);
-			break;
-
-		case CM_MEDIA_ALBUM:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_ALBUM);
-			break;
-
-		case CM_MEDIA_BEATSPERMINUTE:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_BEATSPERMINUTE);
-			break;
-
-		case CM_MEDIA_COMPOSER:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_COMPOSER);
-			break;
-
-		case CM_MEDIA_CONDUCTOR:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_CONDUCTOR);
-			break;
-
-		case CM_MEDIA_DIRECTOR:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_DIRECTOR);
-			break;
-
-		case CM_MEDIA_GENRE:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_GENRE);
-			break;
-
-		case CM_MEDIA_LANGUAGE:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_LANGUAGE);
-			break;
-
-		case CM_MEDIA_BROADCASTDATE:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_BROADCASTDATE);
-			break;
-
-		case CM_MEDIA_CHANNEL:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_CHANNEL);
-			break;
-
-		case CM_MEDIA_STATIONNAME:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_STATIONNAME);
-			break;
-
-		case CM_MEDIA_MOOD:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_MOOD);
-			break;
-
-		case CM_MEDIA_PARENTALRATING:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_PARENTALRATING);
-			break;
-
-		case CM_MEDIA_PARENTALRATINGREASON:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
-			break;
-
-		case CM_MEDIA_PERIOD:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_PERIOD);
-			break;
-
-		case CM_MEDIA_PRODUCER:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_PRODUCER);
-			break;
-
-		case CM_MEDIA_PUBLISHER:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_PUBLISHER);
-			break;
-
-		case CM_MEDIA_WRITER:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_WRITER);
-			break;
-
-		case CM_MEDIA_YEAR:
-			SetMediaStatusColumnData(iItem,iColumnIndex,MEDIAMETADATA_TYPE_YEAR);
-			break;
-
-		default:
-			assert(false);
-			break;
-	}
-}
-
-void CALLBACK SetAllColumnDataAPC(ULONG_PTR dwParam)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(dwParam);
-	pShellBrowser->SetAllColumnData();
-}
 
 /* Queueing model:
 When first browsing into a folder, all items in queue
@@ -368,37 +91,6 @@ BOOL CShellBrowser::RemoveFromColumnQueue(int *iItem)
 	LeaveCriticalSection(&m_column_cs);
 
 	return bQueueNotEmpty;
-}
-
-int CShellBrowser::SetAllColumnData(void)
-{
-	std::list<Column_t>			pActiveColumnList;
-	std::list<Column_t>::iterator	itr;
-	BOOL						bQueueNotEmpty;
-	int							iItem;
-	int							iColumnIndex = 0;
-
-	pActiveColumnList = *m_pActiveColumnList;
-
-	bQueueNotEmpty = RemoveFromColumnQueue(&iItem);
-
-	while(bQueueNotEmpty)
-	{
-		for(itr = pActiveColumnList.begin();itr != pActiveColumnList.end();itr++)
-		{
-			if(itr->bChecked)
-			{
-				SetColumnData(itr->id,iItem,iColumnIndex++);
-			}
-		}
-		iColumnIndex = 0;
-
-		bQueueNotEmpty = RemoveFromColumnQueue(&iItem);
-	}
-
-	ApplyHeaderSortArrow();
-
-	return 1;
 }
 
 void CShellBrowser::AddToFolderQueue(int iItem)
@@ -536,1180 +228,935 @@ int CShellBrowser::SetAllFolderSizeColumnData(void)
 	return 0;
 }
 
-int CShellBrowser::SetNameColumnData(HWND hListView,int iItem,int iColumn)
+void CALLBACK SetAllColumnDataAPC(ULONG_PTR dwParam)
 {
-	LVITEM	File;
-	BOOL	bItem;
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(dwParam);
+	pShellBrowser->SetAllColumnData();
+}
 
-	File.mask		= LVIF_PARAM;
-	File.iSubItem	= 0;
-	File.iItem		= iItem;
-	bItem = ListView_GetItem(hListView,&File);
+int CShellBrowser::SetAllColumnData(void)
+{
+	std::list<Column_t>			pActiveColumnList;
+	BOOL						bQueueNotEmpty;
+	int							iItem;
+	int							iColumnIndex = 0;
 
-	if(bItem)
+	pActiveColumnList = *m_pActiveColumnList;
+
+	bQueueNotEmpty = RemoveFromColumnQueue(&iItem);
+
+	while(bQueueNotEmpty)
 	{
-		ListView_SetItemText(hListView,iItem,iColumn,
-			ProcessItemFileName((int)File.lParam));
+		for(auto itr = pActiveColumnList.begin();itr != pActiveColumnList.end();itr++)
+		{
+			if(itr->bChecked)
+			{
+				SetColumnText(itr->id,iItem,iColumnIndex++);
+			}
+		}
+		iColumnIndex = 0;
+
+		bQueueNotEmpty = RemoveFromColumnQueue(&iItem);
 	}
 
-	return m_nTotalItems;
+	ApplyHeaderSortArrow();
+
+	return 1;
 }
 
-int CShellBrowser::SetSizeColumnData(HWND hListView,int iItem,int iColumn)
+void CShellBrowser::SetColumnText(UINT ColumnID,int ItemIndex,int ColumnIndex)
 {
-	LVITEM			lvItem;
-	TCHAR			lpszFileSize[32];
-	ULARGE_INTEGER	lFileSize;
-	BOOL			bItem;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iSubItem	= 0;
-	lvItem.iItem	= iItem;
-	bItem = ListView_GetItem(hListView,&lvItem);
-
-	if(bItem)
-	{
-		/* Is this item a file or a folder? */
-		if((m_pwfdFiles[(int)lvItem.lParam].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
-			FILE_ATTRIBUTE_DIRECTORY)
-		{
-			lFileSize.LowPart = m_pwfdFiles[(int)lvItem.lParam].nFileSizeLow;
-			lFileSize.HighPart = m_pwfdFiles[(int)lvItem.lParam].nFileSizeHigh;
-
-			FormatSizeString(lFileSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
-				m_bForceSize,m_SizeDisplayFormat);
-
-			ListView_SetItemText(hListView,iItem,iColumn,lpszFileSize);
-		}
-	}
-
-	return m_nTotalItems;
-}
-
-int CShellBrowser::SetRealSizeColumnData(HWND hListView,int iItem,int iColumn)
-{
-	LVITEM File;
-	ULARGE_INTEGER lRealFileSize;
-	DWORD ClusterSize;
-	DWORD RealFileSize;
-	TCHAR Root[MAX_PATH];
-	TCHAR lpszFileSize[32];
-	BOOL bItem;
-
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(hListView,&File);
-
-	if(bItem)
-	{
-		StringCchCopy(Root,SIZEOF_ARRAY(Root),m_CurDir);
-		PathStripToRoot(Root);
-
-		if((m_pwfdFiles[(int)File.lParam].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-			FILE_ATTRIBUTE_DIRECTORY)
-		{
-			StringCchCopy(lpszFileSize,SIZEOF_ARRAY(lpszFileSize),EMPTY_STRING);
-		}
-		else
-		{
-			ClusterSize = GetClusterSize(Root);
-
-			RealFileSize = m_pwfdFiles[(int)File.lParam].nFileSizeLow;
-
-			if(RealFileSize != 0 && (RealFileSize % ClusterSize) != 0)
-				RealFileSize += ClusterSize - (RealFileSize % ClusterSize);
-
-			lRealFileSize.LowPart = RealFileSize;
-			lRealFileSize.HighPart = m_pwfdFiles[(int)File.lParam].nFileSizeHigh;
-
-			FormatSizeString(lRealFileSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
-				m_bForceSize,m_SizeDisplayFormat);
-		}
-
-		ListView_SetItemText(hListView,iItem,iColumn,lpszFileSize);
-	}
-
-	return m_nTotalItems;
-}
-
-int CShellBrowser::SetTypeColumnData(HWND hListView,int iItem,int iColumn)
-{
-	SHFILEINFO shfi;
-	TCHAR FullFileName[MAX_PATH];
-
-	QueryFullItemName(iItem,FullFileName);
-
-	SHGetFileInfo(FullFileName,0,
-	&shfi,sizeof(SHFILEINFO),SHGFI_TYPENAME);
-
-	ListView_SetItemText(m_hListView,iItem,iColumn,shfi.szTypeName);
-
-	return m_nTotalItems;
-}
-
-void CShellBrowser::SetVirtualTypeColumnData(int iItem,int iColumn)
-{
-	LPITEMIDLIST pidlComplete	= NULL;
 	LVITEM lvItem;
-	SHFILEINFO shfi;
-	BOOL bItem;
-
 	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
 	lvItem.iSubItem	= 0;
-	bItem = ListView_GetItem(m_hListView,&lvItem);
+	lvItem.iItem	= ItemIndex;
+	BOOL ItemRetrieved = ListView_GetItem(m_hListView,&lvItem);
+	ItemRetrieved;
 
-	if(bItem)
-	{
-		pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lvItem.lParam].pridl);
+	assert(ItemRetrieved);
 
-		SHGetFileInfo((LPTSTR)pidlComplete,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_TYPENAME);
+	std::wstring ColumnText = GetColumnText(ColumnID,static_cast<int>(lvItem.lParam));
 
-		ListView_SetItemText(m_hListView,iItem,iColumn,shfi.szTypeName);
-
-		CoTaskMemFree(pidlComplete);
-	}
+	TCHAR ColumnTextTemp[1024];
+	StringCchCopy(ColumnTextTemp,SIZEOF_ARRAY(ColumnTextTemp),ColumnText.c_str());
+	ListView_SetItemText(m_hListView,ItemIndex,ColumnIndex,ColumnTextTemp);
 }
 
-void CShellBrowser::SetTotalSizeColumnData(int iItem,int iColumn,BOOL bTotalSize)
+std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 {
-	LPITEMIDLIST pidlComplete	= NULL;
-	IShellFolder *pShellFolder	= NULL;
-	LPITEMIDLIST pidlRelative	= NULL;
-	ULARGE_INTEGER nTotalBytes;
-	ULARGE_INTEGER nFreeBytes;
-	LVITEM File;
-	TCHAR szItem[MAX_PATH];
-	TCHAR szSizeBuf[32];
-	STRRET str;
-	BOOL bRoot;
-	BOOL bItem;
-
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(m_hListView,&File);
-
-	if(bItem)
+	switch(ColumnID)
 	{
-		pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)File.lParam].pridl);
+	case CM_NAME:
+		return GetNameColumnText(InternalIndex);
+		break;
 
-		SHBindToParent(pidlComplete,IID_IShellFolder,
-			(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
+	case CM_TYPE:
+		return GetTypeColumnText(InternalIndex);
+		break;
+	case CM_SIZE:
+		return GetSizeColumnText(InternalIndex);
+		break;
 
-		pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-		StrRetToBuf(&str,pidlRelative,szItem,SIZEOF_ARRAY(szItem));
+	case CM_DATEMODIFIED:
+		return GetTimeColumnText(InternalIndex,COLUMN_TIME_MODIFIED);
+		break;
+	case CM_CREATED:
+		return GetTimeColumnText(InternalIndex,COLUMN_TIME_CREATED);
+		break;
+	case CM_ACCESSED:
+		return GetTimeColumnText(InternalIndex,COLUMN_TIME_ACCESSED);
+		break;
 
-		bRoot = PathIsRoot(szItem);
+	case CM_ATTRIBUTES:
+		return GetAttributeColumnText(InternalIndex);
+		break;
+	case CM_REALSIZE:
+		return GetRealSizeColumnText(InternalIndex);
+		break;
+	case CM_SHORTNAME:
+		return GetShortNameColumnText(InternalIndex);
+		break;
+	case CM_OWNER:
+		return GetOwnerColumnText(InternalIndex);
+		break;
 
-		if(bRoot)
-		{
-			BOOL bRes;
+	case CM_PRODUCTNAME:
+		return GetVersionColumnText(InternalIndex,VERSION_INFO_PRODUCT_NAME);
+		break;
+	case CM_COMPANY:
+		return GetVersionColumnText(InternalIndex,VERSION_INFO_COMPANY);
+		break;
+	case CM_DESCRIPTION:
+		return GetVersionColumnText(InternalIndex,VERSION_INFO_DESCRIPTION);
+		break;
+	case CM_FILEVERSION:
+		return GetVersionColumnText(InternalIndex,VERSION_INFO_FILE_VERSION);
+		break;
+	case CM_PRODUCTVERSION:
+		return GetVersionColumnText(InternalIndex,VERSION_INFO_PRODUCT_VERSION);
+		break;
 
-			bRes = GetDiskFreeSpaceEx(szItem,NULL,&nTotalBytes,&nFreeBytes);
+	case CM_SHORTCUTTO:
+		return GetShortcutToColumnText(InternalIndex);
+		break;
+	case CM_HARDLINKS:
+		return GetHardLinksColumnText(InternalIndex);
+		break;
+	case CM_EXTENSION:
+		return GetExtensionColumnText(InternalIndex);
+		break;
 
-			if(bRes)
-			{
-				if(bTotalSize)
-				{
-					FormatSizeString(nTotalBytes,szSizeBuf,
-						SIZEOF_ARRAY(szSizeBuf),m_bForceSize,m_SizeDisplayFormat);
-				}
-				else
-				{
-					FormatSizeString(nFreeBytes,szSizeBuf,
-						SIZEOF_ARRAY(szSizeBuf),m_bForceSize,m_SizeDisplayFormat);
-				}
-			}
-			else
-			{
-				StringCchCopy(szSizeBuf,SIZEOF_ARRAY(szSizeBuf),EMPTY_STRING);
-			}
+	case CM_TITLE:
+		return GetSummaryColumnText(InternalIndex,PROPERTY_ID_TITLE);
+		break;
+	case CM_SUBJECT:
+		return GetSummaryColumnText(InternalIndex,PROPERTY_ID_SUBJECT);
+		break;
+	case CM_AUTHOR:
+		return GetSummaryColumnText(InternalIndex,PROPERTY_ID_AUTHOR);
+		break;
+	case CM_KEYWORDS:
+		return GetSummaryColumnText(InternalIndex,PROPERTY_ID_KEYWORDS);
+		break;
+	case CM_COMMENT:
+		return GetSummaryColumnText(InternalIndex,PROPERTY_ID_COMMENT);
+		break;
 
-			ListView_SetItemText(m_hListView,iItem,iColumn,szSizeBuf);
-		}
-		else
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,EMPTY_STRING);
-		}
+	case CM_CAMERAMODEL:
+		return GetImageColumnText(InternalIndex,PropertyTagEquipModel);
+		break;
+	case CM_DATETAKEN:
+		return GetImageColumnText(InternalIndex,PropertyTagExifDTOrig);
+		break;
+	case CM_WIDTH:
+		return GetImageColumnText(InternalIndex,PropertyTagImageWidth);
+		break;
+	case CM_HEIGHT:
+		return GetImageColumnText(InternalIndex,PropertyTagImageHeight);
+		break;
 
-		pShellFolder->Release();
-		CoTaskMemFree(pidlComplete);
+	case CM_VIRTUALCOMMENTS:
+		return GetControlPanelCommentsColumnText(InternalIndex);
+		break;
+
+	case CM_TOTALSIZE:
+		return GetDriveSpaceColumnText(InternalIndex,true);
+		break;
+
+	case CM_FREESPACE:
+		return GetDriveSpaceColumnText(InternalIndex,false);
+		break;
+
+	case CM_FILESYSTEM:
+		return GetFileSystemColumnText(InternalIndex);
+		break;
+
+	case CM_ORIGINALLOCATION:
+		break;
+
+	case CM_DATEDELETED:
+		break;
+
+	case CM_NUMPRINTERDOCUMENTS:
+		return GetPrinterColumnText(InternalIndex,PRINTER_INFORMATION_TYPE_NUM_JOBS);
+		break;
+
+	case CM_PRINTERSTATUS:
+		return GetPrinterColumnText(InternalIndex,PRINTER_INFORMATION_TYPE_STATUS);
+		break;
+
+	case CM_PRINTERCOMMENTS:
+		return GetPrinterColumnText(InternalIndex,PRINTER_INFORMATION_TYPE_COMMENTS);
+		break;
+
+	case CM_PRINTERLOCATION:
+		return GetPrinterColumnText(InternalIndex,PRINTER_INFORMATION_TYPE_LOCATION);
+		break;
+
+	case CM_PRINTERMODEL:
+		return GetPrinterColumnText(InternalIndex,PRINTER_INFORMATION_TYPE_MODEL);
+		break;
+
+	case CM_NETWORKADAPTER_STATUS:
+		return GetNetworkAdapterColumnText(InternalIndex);
+		break;
+
+	case CM_MEDIA_BITRATE:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_BITRATE);
+		break;
+	case CM_MEDIA_COPYRIGHT:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_COPYRIGHT);
+		break;
+	case CM_MEDIA_DURATION:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_DURATION);
+		break;
+	case CM_MEDIA_PROTECTED:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PROTECTED);
+		break;
+	case CM_MEDIA_RATING:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_RATING);
+		break;
+	case CM_MEDIA_ALBUMARTIST:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_ALBUM_ARTIST);
+		break;
+	case CM_MEDIA_ALBUM:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_ALBUM_TITLE);
+		break;
+	case CM_MEDIA_BEATSPERMINUTE:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_BEATS_PER_MINUTE);
+		break;
+	case CM_MEDIA_COMPOSER:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_COMPOSER);
+		break;
+	case CM_MEDIA_CONDUCTOR:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_CONDUCTOR);
+		break;
+	case CM_MEDIA_DIRECTOR:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_DIRECTOR);
+		break;
+	case CM_MEDIA_GENRE:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_GENRE);
+		break;
+	case CM_MEDIA_LANGUAGE:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_LANGUAGE);
+		break;
+	case CM_MEDIA_BROADCASTDATE:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_BROADCASTDATE);
+		break;
+	case CM_MEDIA_CHANNEL:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_CHANNEL);
+		break;
+	case CM_MEDIA_STATIONNAME:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_STATIONNAME);
+		break;
+	case CM_MEDIA_MOOD:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_MOOD);
+		break;
+	case CM_MEDIA_PARENTALRATING:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PARENTALRATING);
+		break;
+	case CM_MEDIA_PARENTALRATINGREASON:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
+		break;
+	case CM_MEDIA_PERIOD:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PERIOD);
+		break;
+	case CM_MEDIA_PRODUCER:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PRODUCER);
+		break;
+	case CM_MEDIA_PUBLISHER:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PUBLISHER);
+		break;
+	case CM_MEDIA_WRITER:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_WRITER);
+		break;
+	case CM_MEDIA_YEAR:
+		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_YEAR);
+		break;
+
+	default:
+		assert(false);
+		break;
 	}
+
+	return EMPTY_STRING;
 }
 
-void CShellBrowser::SetFileSystemColumnData(int iItem,int iColumn)
+std::wstring CShellBrowser::GetNameColumnText(int InternalIndex) const
 {
-	LPITEMIDLIST pidlComplete	= NULL;
-	IShellFolder *pShellFolder	= NULL;
-	LPITEMIDLIST pidlRelative	= NULL;
-	LVITEM File;
-	TCHAR szItem[MAX_PATH];
-	STRRET str;
-	BOOL bRoot;
-	BOOL bItem;
-
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(m_hListView,&File);
-
-	if(bItem)
-	{
-		pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)File.lParam].pridl);
-
-		SHBindToParent(pidlComplete,IID_IShellFolder,
-			(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
-
-		pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-		StrRetToBuf(&str,pidlRelative,szItem,SIZEOF_ARRAY(szItem));
-
-		bRoot = PathIsRoot(szItem);
-
-		if(bRoot)
-		{
-			TCHAR szFileSystemName[MAX_PATH];
-			BOOL bRes;
-
-			bRes = GetVolumeInformation(szItem,NULL,0,NULL,NULL,NULL,szFileSystemName,
-				SIZEOF_ARRAY(szFileSystemName));
-
-			if(!bRes)
-			{
-				StringCchCopy(szFileSystemName,SIZEOF_ARRAY(szFileSystemName),EMPTY_STRING);
-			}
-
-			ListView_SetItemText(m_hListView,iItem,iColumn,szFileSystemName);
-		}
-		else
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,EMPTY_STRING);
-		}
-
-		pShellFolder->Release();
-		CoTaskMemFree(pidlComplete);
-	}
+	return ProcessItemFileName(InternalIndex);
 }
 
-int CShellBrowser::SetTimeColumnData(HWND hListView,int iItem,int iColumn,int TimeType)
-{
-	LVITEM File;
-	TCHAR lpszFileTime[64];
-	BOOL bItem;
-	int iReturn = -1;
+std::wstring CShellBrowser::GetTypeColumnText(int InternalIndex) const
+{	
+	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex].pridl);
 
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(hListView,&File);
+	SHFILEINFO shfi;
+	DWORD_PTR Res = SHGetFileInfo(reinterpret_cast<LPTSTR>(pidlComplete),0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_TYPENAME);
 
-	if(bItem)
+	CoTaskMemFree(pidlComplete);
+
+	if(Res == 0)
 	{
-		switch(TimeType)
-		{
-		case COLUMN_TIME_MODIFIED:
-			iReturn = CreateFileTimeString(&m_pwfdFiles[(int)File.lParam].ftLastWriteTime,
-				lpszFileTime,SIZEOF_ARRAY(lpszFileTime),m_bShowFriendlyDates);
-			break;
-
-		case COLUMN_TIME_CREATED:
-			iReturn = CreateFileTimeString(&m_pwfdFiles[(int)File.lParam].ftCreationTime,
-				lpszFileTime,SIZEOF_ARRAY(lpszFileTime),m_bShowFriendlyDates);
-			break;
-
-		case COLUMN_TIME_ACCESSED:
-			iReturn = CreateFileTimeString(&m_pwfdFiles[(int)File.lParam].ftLastAccessTime,
-				lpszFileTime,SIZEOF_ARRAY(lpszFileTime),m_bShowFriendlyDates);
-			break;
-		}
-
-		if(iReturn != -1)
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,lpszFileTime);
-		}
-		else
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,EMPTY_STRING);
-		}
+		return EMPTY_STRING;
 	}
 
-	return m_nTotalItems;
+	return shfi.szTypeName;
 }
 
-int CShellBrowser::SetAttributeColumnData(HWND hListView,int iItem,int iColumn)
+std::wstring CShellBrowser::GetSizeColumnText(int InternalIndex) const
 {
-	TCHAR lpszAttributes[32];
+	if((m_pwfdFiles[InternalIndex].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	{
+		return EMPTY_STRING;
+	}
+
+	ULARGE_INTEGER FileSize = {m_pwfdFiles[InternalIndex].nFileSizeLow,m_pwfdFiles[InternalIndex].nFileSizeHigh};
+
+	TCHAR FileSizeText[64];
+	FormatSizeString(FileSize,FileSizeText,SIZEOF_ARRAY(FileSizeText),m_bForceSize,m_SizeDisplayFormat);
+
+	return FileSizeText;
+}
+
+std::wstring CShellBrowser::GetTimeColumnText(int InternalIndex,TimeType_t TimeType) const
+{
+	TCHAR FileTime[64];
+	int Res = -1;
+
+	switch(TimeType)
+	{
+	case COLUMN_TIME_MODIFIED:
+		Res = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftLastWriteTime,
+			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
+		break;
+
+	case COLUMN_TIME_CREATED:
+		Res = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftCreationTime,
+			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
+		break;
+
+	case COLUMN_TIME_ACCESSED:
+		Res = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftLastAccessTime,
+			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+
+	if(Res == -1)
+	{
+		return EMPTY_STRING;
+	}
+
+	return FileTime;
+}
+
+std::wstring CShellBrowser::GetAttributeColumnText(int InternalIndex) const
+{
 	TCHAR FullFileName[MAX_PATH];
-	HRESULT hr;
+	QueryFullItemNameInternal(InternalIndex,FullFileName);
 
-	hr = QueryFullItemName(iItem,FullFileName);
+	TCHAR AttributeString[32];
+	BuildFileAttributeString(FullFileName,AttributeString,SIZEOF_ARRAY(AttributeString));
 
-	if(SUCCEEDED(hr))
-	{
-		BuildFileAttributeString(FullFileName,lpszAttributes,
-			SIZEOF_ARRAY(lpszAttributes));
-
-		ListView_SetItemText(m_hListView,iItem,iColumn,lpszAttributes);
-	}
-
-	return m_nTotalItems;
+	return AttributeString;
 }
 
-int CShellBrowser::SetShortNameColumnData(HWND hListView,int iItem,int iColumn)
+std::wstring CShellBrowser::GetRealSizeColumnText(int InternalIndex) const
 {
-	LVITEM File;
-	BOOL bItem;
-
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(hListView,&File);
-
-	if(bItem)
+	if((m_pwfdFiles[InternalIndex].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
-		if(lstrlen(m_pwfdFiles[(int)File.lParam].cAlternateFileName) > 0)
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,m_pwfdFiles[(int)File.lParam].cAlternateFileName);
-		}
-		else
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,m_pwfdFiles[(int)File.lParam].cFileName);
-		}
+		return EMPTY_STRING;
 	}
 
-	return m_nTotalItems;
+	TCHAR Root[MAX_PATH];
+	StringCchCopy(Root,SIZEOF_ARRAY(Root),m_CurDir);
+	PathStripToRoot(Root);
+
+	LONG ClusterSize = GetClusterSize(Root);
+
+	ULARGE_INTEGER RealFileSize = {m_pwfdFiles[InternalIndex].nFileSizeLow,m_pwfdFiles[InternalIndex].nFileSizeHigh};
+
+	if(RealFileSize.QuadPart != 0 && (RealFileSize.QuadPart % ClusterSize) != 0)
+	{
+		RealFileSize.QuadPart += ClusterSize - (RealFileSize.QuadPart % ClusterSize);
+	}
+
+	TCHAR RealFileSizeText[32];
+	FormatSizeString(RealFileSize,RealFileSizeText,SIZEOF_ARRAY(RealFileSizeText),
+		m_bForceSize,m_SizeDisplayFormat);
+
+	return RealFileSizeText;
 }
 
-int CShellBrowser::SetOwnerColumnData(HWND hListView,int iItem,int iColumn)
+std::wstring CShellBrowser::GetShortNameColumnText(int InternalIndex) const
+{
+	if(lstrlen(m_pwfdFiles[InternalIndex].cAlternateFileName) == 0)
+	{
+		return m_pwfdFiles[InternalIndex].cFileName;
+	}
+
+	return m_pwfdFiles[InternalIndex].cAlternateFileName;
+}
+
+std::wstring CShellBrowser::GetOwnerColumnText(int InternalIndex) const
 {
 	TCHAR FullFileName[MAX_PATH];
-	TCHAR szOwner[512] = EMPTY_STRING;
-	HRESULT hr;
+	QueryFullItemNameInternal(InternalIndex,FullFileName);
 
-	hr = QueryFullItemName(iItem,FullFileName);
+	TCHAR Owner[512];
+	size_t Size = GetFileOwner(FullFileName,Owner,SIZEOF_ARRAY(Owner));
 
-	if(SUCCEEDED(hr))
+	if(Size == 0)
 	{
-		GetFileOwner(FullFileName,szOwner,SIZEOF_ARRAY(szOwner));
-
-		ListView_SetItemText(m_hListView,iItem,iColumn,szOwner);
+		return EMPTY_STRING;
 	}
 
-	return m_nTotalItems;
+	return Owner;
 }
 
-int CShellBrowser::SetVersionColumnData(HWND hListView,int iItem,int iColumn,TCHAR *lpszVersion)
+std::wstring CShellBrowser::GetVersionColumnText(int InternalIndex,VersionInfoType_t VersioninfoType) const
 {
-	LVITEM File;
+	std::wstring VersionInfoName;
+
+	switch(VersioninfoType)
+	{
+	case VERSION_INFO_PRODUCT_NAME:
+		VersionInfoName = L"ProductName";
+		break;
+
+	case VERSION_INFO_COMPANY:
+		VersionInfoName = L"CompanyName";
+		break;
+
+	case VERSION_INFO_DESCRIPTION:
+		VersionInfoName = L"FileDescription";
+		break;
+
+	case VERSION_INFO_FILE_VERSION:
+		VersionInfoName = L"FileVersion";
+		break;
+
+	case VERSION_INFO_PRODUCT_VERSION:
+		VersionInfoName = L"ProductVersion";
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+
 	TCHAR FullFileName[MAX_PATH];
-	TCHAR szVersionBuf[512];
-	BOOL bVersionInfoObtained = FALSE;
-	BOOL bItem;
+	QueryFullItemNameInternal(InternalIndex,FullFileName);
 
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(hListView,&File);
+	TCHAR VersionInfo[512];
+	BOOL VersionInfoObtained = GetVersionInfoString(FullFileName,VersionInfoName.c_str(),
+		VersionInfo,SIZEOF_ARRAY(VersionInfo));
 
-	if(bItem)
+	if(!VersionInfoObtained)
 	{
-		StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-		PathAppend(FullFileName,m_pwfdFiles[(int)File.lParam].cFileName);
-
-		bVersionInfoObtained = GetVersionInfoString(FullFileName,
-			lpszVersion,szVersionBuf,SIZEOF_ARRAY(szVersionBuf));
-
-		if(bVersionInfoObtained)
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,szVersionBuf);
-		}
-		else
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,EMPTY_STRING);
-		}
+		return EMPTY_STRING;
 	}
 
-	return m_nTotalItems;
+	return VersionInfo;
 }
 
-int CShellBrowser::SetShortcutColumnData(HWND hListView,int iItem,int iColumn)
+std::wstring CShellBrowser::GetShortcutToColumnText(int InternalIndex) const
 {
-	LVITEM File;
 	TCHAR FullFileName[MAX_PATH];
-	TCHAR szResolvedLinkPath[MAX_PATH];
-	HRESULT hr;
-	BOOL bItem;
+	QueryFullItemNameInternal(InternalIndex,FullFileName);
 
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(hListView,&File);
+	TCHAR ResolvedLinkPath[MAX_PATH];
+	HRESULT hr = NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName,
+		ResolvedLinkPath,SIZEOF_ARRAY(ResolvedLinkPath));
 
-	if(bItem)
+	if(FAILED(hr))
 	{
-		StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-		PathAppend(FullFileName,m_pwfdFiles[(int)File.lParam].cFileName);
-		hr = NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName,szResolvedLinkPath,SIZEOF_ARRAY(szResolvedLinkPath));
-
-		if(SUCCEEDED(hr))
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,szResolvedLinkPath);
-		}
-		else
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,EMPTY_STRING);
-		}
+		return EMPTY_STRING;	
 	}
 
-	return m_nTotalItems;
+	return ResolvedLinkPath;
 }
 
-int CShellBrowser::SetHardLinksColumnData(HWND hListView,int iItem,int iColumn)
+std::wstring CShellBrowser::GetHardLinksColumnText(int InternalIndex) const
 {
-	LVITEM File;
 	TCHAR FullFileName[MAX_PATH];
-	TCHAR szNumHardLinks[32];
-	DWORD dwNumHardLinks;
-	BOOL bItem;
+	QueryFullItemNameInternal(InternalIndex,FullFileName);
+	DWORD NumHardLinks = GetNumFileHardLinks(FullFileName);
 
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(hListView,&File);
-
-	if(bItem)
+	if(NumHardLinks == -1)
 	{
-		StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-		PathAppend(FullFileName,m_pwfdFiles[(int)File.lParam].cFileName);
-		dwNumHardLinks = GetNumFileHardLinks(FullFileName);
-
-		if(dwNumHardLinks == -1)
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,EMPTY_STRING);
-		}
-		else
-		{
-			StringCchPrintf(szNumHardLinks,SIZEOF_ARRAY(szNumHardLinks),_T("%ld"),dwNumHardLinks);
-			ListView_SetItemText(m_hListView,iItem,iColumn,szNumHardLinks);
-		}
+		return EMPTY_STRING;
 	}
 
-	return m_nTotalItems;
+	TCHAR NumHardLinksString[32];
+	StringCchPrintf(NumHardLinksString,SIZEOF_ARRAY(NumHardLinksString),_T("%ld"),NumHardLinks);
+	
+	return NumHardLinksString;
 }
 
-int CShellBrowser::SetExtensionColumnData(HWND hListView,int iItem,int iColumn)
+std::wstring CShellBrowser::GetExtensionColumnText(int InternalIndex) const
 {
-	LVITEM File;
-	TCHAR *pExt = NULL;
-	BOOL bItem;
+	TCHAR *Extension = PathFindExtension(m_pwfdFiles[InternalIndex].cFileName);
 
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(hListView,&File);
-
-	if(bItem)
+	if(*Extension != '.')
 	{
-		pExt = PathFindExtension(m_pwfdFiles[(int)File.lParam].cFileName);
-
-		if(*pExt != '.')
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,EMPTY_STRING);
-		}
-		else
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,pExt + 1);
-		}
+		return EMPTY_STRING;
 	}
 
-	return m_nTotalItems;
+	return Extension + 1;
 }
 
-int CShellBrowser::SetSummaryColumnData(HWND hListView,int iItem,int iColumn,DWORD dwPropertyType)
+std::wstring CShellBrowser::GetSummaryColumnText(int InternalIndex,DWORD PropertyType) const
 {
-	LVITEM File;
-	TCHAR szFullFileName[MAX_PATH];
-	TCHAR szPropertyBuf[512];
-	int iRes;
-	BOOL bItem;
+	TCHAR FullFileName[MAX_PATH];
+	QueryFullItemNameInternal(InternalIndex,FullFileName);
 
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(hListView,&File);
+	TCHAR FileProperty[512];
+	int Res = ReadFileProperty(FullFileName,PropertyType,FileProperty,
+		SIZEOF_ARRAY(FileProperty));
 
-	if(bItem)
+	if(Res == -1)
 	{
-		StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
-		PathAppend(szFullFileName,m_pwfdFiles[(int)File.lParam].cFileName);
-
-		iRes = ReadFileProperty(szFullFileName,dwPropertyType,szPropertyBuf,
-			SIZEOF_ARRAY(szPropertyBuf));
-
-		if(iRes == -1)
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,EMPTY_STRING);
-		}
-		else
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,szPropertyBuf);
-		}
+		return EMPTY_STRING;
 	}
 
-	return m_nTotalItems;
+	return FileProperty;
 }
 
-int CShellBrowser::SetImageColumnData(HWND hListView,int iItem,int iColumn,PROPID PropertyId)
+std::wstring CShellBrowser::GetImageColumnText(int InternalIndex,PROPID PropertyID) const
 {
-	LVITEM	File;
-	TCHAR	szFullFileName[MAX_PATH];
-	TCHAR	szPropertyBuf[512];
-	BOOL	bRes;
-	BOOL	bItem;
+	TCHAR FullFileName[MAX_PATH];
+	QueryFullItemNameInternal(InternalIndex,FullFileName);
 
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(hListView,&File);
+	TCHAR ImageProperty[512];
+	BOOL Res = ReadImageProperty(FullFileName,PropertyID,ImageProperty,
+		SIZEOF_ARRAY(ImageProperty));
 
-	if(bItem)
+	if(!Res)
 	{
-		StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
-		PathAppend(szFullFileName,m_pwfdFiles[(int)File.lParam].cFileName);
-
-		bRes = ReadImageProperty(szFullFileName,PropertyId,szPropertyBuf,
-			SIZEOF_ARRAY(szPropertyBuf));
-
-		if(bRes)
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,szPropertyBuf);
-		}
-		else
-		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,EMPTY_STRING);
-		}
+		return EMPTY_STRING;
 	}
 
-	return m_nTotalItems;
+	return ImageProperty;
 }
 
-void CShellBrowser::SetControlPanelComments(int iItem,int iColumn)
+std::wstring CShellBrowser::GetFileSystemColumnText(int InternalIndex) const
 {
-	TCHAR	szInfoTip[512];
-	HRESULT	hr;
+	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex].pridl);
 
-	hr = RetrieveItemInfoTip(iItem,szInfoTip,SIZEOF_ARRAY(szInfoTip));
+	TCHAR FullFileName[MAX_PATH];
+	GetDisplayName(pidlComplete,FullFileName,SHGDN_FORPARSING);
 
-	if(SUCCEEDED(hr))
+	CoTaskMemFree(pidlComplete);
+
+	BOOL IsRoot = PathIsRoot(FullFileName);
+
+	if(!IsRoot)
 	{
-		ReplaceCharacters(szInfoTip,'\n',' ');
-		ListView_SetItemText(m_hListView,iItem,iColumn,szInfoTip);
+		return EMPTY_STRING;
+	}
+
+	TCHAR FileSystemName[MAX_PATH];
+	BOOL Res = GetVolumeInformation(FullFileName,NULL,0,NULL,NULL,NULL,FileSystemName,
+		SIZEOF_ARRAY(FileSystemName));
+
+	if(!Res)
+	{
+		return EMPTY_STRING;
+	}
+
+	return FileSystemName;
+}
+
+std::wstring CShellBrowser::GetDriveSpaceColumnText(int InternalIndex,bool TotalSize) const
+{
+	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex].pridl);
+
+	TCHAR FullFileName[MAX_PATH];
+	GetDisplayName(pidlComplete,FullFileName,SHGDN_FORPARSING);
+
+	CoTaskMemFree(pidlComplete);
+
+	BOOL IsRoot = PathIsRoot(FullFileName);
+
+	if(!IsRoot)
+	{
+		return EMPTY_STRING;
+	}
+
+	ULARGE_INTEGER TotalBytes;
+	ULARGE_INTEGER FreeBytes;
+	BOOL Res = GetDiskFreeSpaceEx(FullFileName,NULL,&TotalBytes,&FreeBytes);
+
+	if(!Res)
+	{
+		return EMPTY_STRING;
+	}
+
+	TCHAR SizeText[32];
+
+	if(TotalSize)
+	{
+		FormatSizeString(TotalBytes,SizeText,SIZEOF_ARRAY(SizeText),m_bForceSize,m_SizeDisplayFormat);
 	}
 	else
 	{
-		ListView_SetItemText(m_hListView,iItem,iColumn,EMPTY_STRING);
+		FormatSizeString(FreeBytes,SizeText,SIZEOF_ARRAY(SizeText),m_bForceSize,m_SizeDisplayFormat);
 	}
+
+	return SizeText;
 }
 
-void CShellBrowser::SetNumPrinterDocumentsColumnData(int iItem,int iColumn)
+std::wstring CShellBrowser::GetControlPanelCommentsColumnText(int InternalIndex) const
 {
-	HANDLE hPrinter;
-	LVITEM lvItem;
-	PRINTER_INFO_2 *pPrinterInfo2;
-	TCHAR szNumJobs[32]	= EMPTY_STRING;
-	DWORD cbNeeded;
-	DWORD cbSize;
-	BOOL bRes;
-	BOOL bItem;
+	TCHAR InfoTip[512];
+	HRESULT hr = GetFileInfoTip(m_hOwner,m_pidlDirectory,const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[InternalIndex].pridl),
+		InfoTip,SIZEOF_ARRAY(InfoTip));
 
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	bItem = ListView_GetItem(m_hListView,&lvItem);
-
-	if(bItem)
+	if(FAILED(hr))
 	{
-		bRes = OpenPrinter(m_pExtraItemInfo[(int)lvItem.lParam].szDisplayName,&hPrinter,NULL);
+		return EMPTY_STRING;
+	}
 
-		if(bRes)
+	ReplaceCharacters(InfoTip,'\n',' ');
+
+	return InfoTip;
+}
+
+std::wstring CShellBrowser::GetPrinterColumnText(int InternalIndex,PrinterInformationType_t PrinterInformationType) const
+{
+	TCHAR PrinterInformation[256] = EMPTY_STRING;
+
+	HANDLE hPrinter;
+	BOOL Res = OpenPrinter(m_pExtraItemInfo[InternalIndex].szDisplayName,&hPrinter,NULL);
+
+	if(Res)
+	{
+		DWORD BytesNeeded;
+		GetPrinter(hPrinter,2,NULL,0,&BytesNeeded);
+
+		PRINTER_INFO_2 *PrinterInfo2 = reinterpret_cast<PRINTER_INFO_2 *>(new char[BytesNeeded]);
+		Res = GetPrinter(hPrinter,2,reinterpret_cast<LPBYTE>(PrinterInfo2),BytesNeeded,&BytesNeeded);
+
+		if(Res)
 		{
-			GetPrinter(hPrinter,2,NULL,0,&cbNeeded);
-
-			pPrinterInfo2 = (PRINTER_INFO_2 *)malloc(cbNeeded);
-
-			cbSize = cbNeeded;
-
-			bRes = GetPrinter(hPrinter,2,(LPBYTE)pPrinterInfo2,cbSize,&cbNeeded);
-
-			if(bRes)
+			switch(PrinterInformationType)
 			{
-				StringCchPrintf(szNumJobs,SIZEOF_ARRAY(szNumJobs),
-					_T("%d"),pPrinterInfo2->cJobs);
-			}
+			case PRINTER_INFORMATION_TYPE_NUM_JOBS:
+				StringCchPrintf(PrinterInformation,SIZEOF_ARRAY(PrinterInformation),
+					_T("%d"),PrinterInfo2->cJobs);
+				break;
 
-			free(pPrinterInfo2);
+			case PRINTER_INFORMATION_TYPE_STATUS:
+				StringCchCopyEx(PrinterInformation,SIZEOF_ARRAY(PrinterInformation),
+					DecodePrinterStatus(PrinterInfo2->Status),NULL,NULL,STRSAFE_IGNORE_NULLS);
+				break;
+
+			case PRINTER_INFORMATION_TYPE_COMMENTS:
+				StringCchCopyEx(PrinterInformation,SIZEOF_ARRAY(PrinterInformation),
+					PrinterInfo2->pComment,NULL,NULL,STRSAFE_IGNORE_NULLS);
+				break;
+
+			case PRINTER_INFORMATION_TYPE_LOCATION:
+				StringCchCopyEx(PrinterInformation,SIZEOF_ARRAY(PrinterInformation),
+					PrinterInfo2->pLocation,NULL,NULL,STRSAFE_IGNORE_NULLS);
+				break;
+
+			case PRINTER_INFORMATION_TYPE_MODEL:
+				StringCchCopyEx(PrinterInformation,SIZEOF_ARRAY(PrinterInformation),
+					PrinterInfo2->pDriverName,NULL,NULL,STRSAFE_IGNORE_NULLS);
+				break;
+
+			default:
+				assert(false);
+				break;
+			}
 		}
 
-		ListView_SetItemText(m_hListView,iItem,iColumn,szNumJobs);
+		delete[] PrinterInfo2;
+		ClosePrinter(hPrinter);
 	}
+
+	return PrinterInformation;
 }
 
-void CShellBrowser::SetPrinterStatusColumnData(int iItem,int iColumn)
+std::wstring CShellBrowser::GetNetworkAdapterColumnText(int InternalIndex) const
 {
-	HANDLE hPrinter;
-	LVITEM lvItem;
-	PRINTER_INFO_2 *pPrinterInfo2;
-	TCHAR szNumJobs[32]	= EMPTY_STRING;
-	DWORD cbNeeded;
-	DWORD cbSize;
-	BOOL bRes;
-	BOOL bItem;
+	ULONG OutBufLen = 0;
+	GetAdaptersAddresses(AF_UNSPEC,0,NULL,NULL,&OutBufLen);
+	IP_ADAPTER_ADDRESSES *AdapterAddresses = reinterpret_cast<IP_ADAPTER_ADDRESSES *>(new char[OutBufLen]);
+	GetAdaptersAddresses(AF_UNSPEC,0,NULL,AdapterAddresses,&OutBufLen);
 
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	bItem = ListView_GetItem(m_hListView,&lvItem);
+	IP_ADAPTER_ADDRESSES *AdapaterAddress = AdapterAddresses;
 
-	if(bItem)
+	while(AdapaterAddress != NULL &&
+		lstrcmp(AdapaterAddress->FriendlyName,m_pwfdFiles[InternalIndex].cFileName) != 0)
 	{
-		bRes = OpenPrinter(m_pExtraItemInfo[(int)lvItem.lParam].szDisplayName,&hPrinter,NULL);
-
-		if(bRes)
-		{
-			GetPrinter(hPrinter,2,NULL,0,&cbNeeded);
-
-			pPrinterInfo2 = (PRINTER_INFO_2 *)malloc(cbNeeded);
-
-			cbSize = cbNeeded;
-
-			bRes = GetPrinter(hPrinter,2,(LPBYTE)pPrinterInfo2,cbSize,&cbNeeded);
-
-			if(bRes)
-			{
-				StringCchCopyEx(szNumJobs,SIZEOF_ARRAY(szNumJobs),
-					DecodePrinterStatus(pPrinterInfo2->Status),NULL,NULL,STRSAFE_IGNORE_NULLS);
-			}
-
-			free(pPrinterInfo2);
-			ClosePrinter(hPrinter);
-		}
-
-		ListView_SetItemText(m_hListView,iItem,iColumn,szNumJobs);
+		AdapaterAddress = AdapaterAddress->Next;
 	}
-}
 
-void CShellBrowser::SetPrinterCommentsColumnData(int iItem,int iColumn)
-{
-	HANDLE hPrinter;
-	LVITEM lvItem;
-	PRINTER_INFO_2 *pPrinterInfo2;
-	TCHAR szNumJobs[32]	= EMPTY_STRING;
-	DWORD cbNeeded;
-	DWORD cbSize;
-	BOOL bRes;
-	BOOL bItem;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	bItem = ListView_GetItem(m_hListView,&lvItem);
-
-	if(bItem)
-	{
-		bRes = OpenPrinter(m_pExtraItemInfo[(int)lvItem.lParam].szDisplayName,&hPrinter,NULL);
-
-		if(bRes)
-		{
-			GetPrinter(hPrinter,2,NULL,0,&cbNeeded);
-
-			pPrinterInfo2 = (PRINTER_INFO_2 *)malloc(cbNeeded);
-
-			cbSize = cbNeeded;
-
-			bRes = GetPrinter(hPrinter,2,(LPBYTE)pPrinterInfo2,cbSize,&cbNeeded);
-
-			if(bRes)
-			{
-				StringCchCopyEx(szNumJobs,SIZEOF_ARRAY(szNumJobs),
-					pPrinterInfo2->pComment,NULL,NULL,STRSAFE_IGNORE_NULLS);
-			}
-
-			free(pPrinterInfo2);
-		}
-
-		ListView_SetItemText(m_hListView,iItem,iColumn,szNumJobs);
-	}
-}
-
-void CShellBrowser::SetPrinterLocationColumnData(int iItem,int iColumn)
-{
-	HANDLE hPrinter;
-	LVITEM lvItem;
-	PRINTER_INFO_2 *pPrinterInfo2;
-	TCHAR szNumJobs[32]	= EMPTY_STRING;
-	DWORD cbNeeded;
-	DWORD cbSize;
-	BOOL bRes;
-	BOOL bItem;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	bItem = ListView_GetItem(m_hListView,&lvItem);
-
-	if(bItem)
-	{
-		bRes = OpenPrinter(m_pExtraItemInfo[(int)lvItem.lParam].szDisplayName,&hPrinter,NULL);
-
-		if(bRes)
-		{
-			GetPrinter(hPrinter,2,NULL,0,&cbNeeded);
-
-			pPrinterInfo2 = (PRINTER_INFO_2 *)malloc(cbNeeded);
-
-			cbSize = cbNeeded;
-
-			bRes = GetPrinter(hPrinter,2,(LPBYTE)pPrinterInfo2,cbSize,&cbNeeded);
-
-			if(bRes)
-			{
-				StringCchCopyEx(szNumJobs,SIZEOF_ARRAY(szNumJobs),
-					pPrinterInfo2->pLocation,NULL,NULL,STRSAFE_IGNORE_NULLS);
-			}
-
-			free(pPrinterInfo2);
-		}
-
-		ListView_SetItemText(m_hListView,iItem,iColumn,szNumJobs);
-	}
-}
-
-void CShellBrowser::SetPrinterModelColumnData(int iItem,int iColumn)
-{
-	HANDLE hPrinter;
-	LVITEM lvItem;
-	PRINTER_INFO_2 *pPrinterInfo2;
-	TCHAR szNumJobs[32]	= EMPTY_STRING;
-	DWORD cbNeeded;
-	DWORD cbSize;
-	BOOL bRes;
-	BOOL bItem;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	bItem = ListView_GetItem(m_hListView,&lvItem);
-
-	if(bItem)
-	{
-		bRes = OpenPrinter(m_pExtraItemInfo[(int)lvItem.lParam].szDisplayName,&hPrinter,NULL);
-
-		if(bRes)
-		{
-			GetPrinter(hPrinter,2,NULL,0,&cbNeeded);
-
-			pPrinterInfo2 = (PRINTER_INFO_2 *)malloc(cbNeeded);
-
-			cbSize = cbNeeded;
-
-			bRes = GetPrinter(hPrinter,2,(LPBYTE)pPrinterInfo2,cbSize,&cbNeeded);
-
-			if(bRes)
-			{
-				StringCchCopyEx(szNumJobs,SIZEOF_ARRAY(szNumJobs),
-					pPrinterInfo2->pDriverName,NULL,NULL,STRSAFE_IGNORE_NULLS);
-			}
-
-			free(pPrinterInfo2);
-		}
-
-		ListView_SetItemText(m_hListView,iItem,iColumn,szNumJobs);
-	}
-}
-
-void CShellBrowser::SetNetworkAdapterStatusColumnData(int iItem,int iColumn)
-{
-	TCHAR szStatus[32] = EMPTY_STRING;
-	IP_ADAPTER_ADDRESSES *pAdapterAddresses = NULL;
-	UINT uStatusID = 0;
-	ULONG ulOutBufLen = 0;
-
-	GetAdaptersAddresses(AF_UNSPEC,0,NULL,NULL,&ulOutBufLen);
-
-	pAdapterAddresses = (IP_ADAPTER_ADDRESSES *)malloc(ulOutBufLen);
-
-	GetAdaptersAddresses(AF_UNSPEC,0,NULL,pAdapterAddresses,&ulOutBufLen);
+	std::wstring Status;
 
 	/* TODO: These strings need to be setup correctly. */
-	/*switch(pAdapterAddresses->OperStatus)
+	switch(AdapaterAddress->OperStatus)
 	{
 		case IfOperStatusUp:
-			uStatusID = IDS_NETWORKADAPTER_CONNECTED;
+			Status = L"Connected";
 			break;
 
 		case IfOperStatusDown:
-			uStatusID = IDS_NETWORKADAPTER_DISCONNECTED;
+			Status = L"Disconnected";
 			break;
 
 		case IfOperStatusTesting:
-			uStatusID = IDS_NETWORKADAPTER_TESTING;
+			Status = L"Testing";
 			break;
 
 		case IfOperStatusUnknown:
-			uStatusID = IDS_NETWORKADAPTER_UNKNOWN;
+			Status = L"Unknown";
 			break;
 
 		case IfOperStatusDormant:
-			uStatusID = IDS_NETWORKADAPTER_DORMANT;
+			Status = L"Dormant";
 			break;
 
 		case IfOperStatusNotPresent:
-			uStatusID = IDS_NETWORKADAPTER_NOTPRESENT;
+			Status = L"Not present";
 			break;
 
 		case IfOperStatusLowerLayerDown:
-			uStatusID = IDS_NETWORKADAPTER_LOWLAYER;
+			Status = L"Lower layer non-operational";
 			break;
-	}*/
+	}
 
-	free(pAdapterAddresses);
+	delete[] AdapterAddresses;
 
-	LoadString(m_hResourceModule,uStatusID,
-		szStatus,SIZEOF_ARRAY(szStatus));
-
-	/* TODO: Fix. */
-	/*LVITEM	lvItem;
-	ULONG	uAdapterIndex;
-	DWORD	dwRet;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	ListView_GetItem(m_hListView,&lvItem);
-
-	dwRet = GetAdapterIndex(m_pwfdFiles[(int)lvItem.lParam].cFileName,&uAdapterIndex);*/
-
-	ListView_SetItemText(m_hListView,iItem,iColumn,szStatus);
+	return Status;
 }
 
-void CShellBrowser::SetMediaStatusColumnData(int iItem,int iColumn,int iType)
+std::wstring CShellBrowser::GetMediaMetadataColumnText(int InternalIndex,MediaMetadataType_t MediaMetaDataType) const
 {
-	LVITEM	File;
-	TCHAR	szFullFileName[MAX_PATH];
-	TCHAR	szOutput[256];
-	TCHAR	*pszTemp = NULL;
-	QWORD	*pqwTemp = NULL;
-	DWORD	*pdwTemp = NULL;
-	BOOL	*pbTemp = NULL;
-	HRESULT	hr = E_FAIL;
-	BOOL	bItem;
+	TCHAR FullFileName[MAX_PATH];
+	QueryFullItemNameInternal(InternalIndex,FullFileName);
 
-	File.mask		= LVIF_PARAM;
-	File.iItem		= iItem;
-	File.iSubItem	= 0;
-	bItem = ListView_GetItem(m_hListView,&File);
+	const TCHAR *AttributeName = GetMediaMetadataAttributeName(MediaMetaDataType);
 
-	if(bItem)
+	BYTE *TempBuffer = NULL;
+	HRESULT hr = GetMediaMetadata(FullFileName,AttributeName,&TempBuffer);
+
+	if(!SUCCEEDED(hr))
 	{
-		StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
-		PathAppend(szFullFileName,m_pwfdFiles[(int)File.lParam].cFileName);
+		return EMPTY_STRING;
+	}
 
-		switch(iType)
+	TCHAR szOutput[512];
+
+	switch(MediaMetaDataType)
+	{
+	case MEDIAMETADATA_TYPE_BITRATE:
 		{
-		case MEDIAMETADATA_TYPE_BITRATE:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMBitrate,(BYTE **)&pdwTemp);
+			DWORD BitRate = *(reinterpret_cast<DWORD *>(TempBuffer));
 
-			if(SUCCEEDED(hr))
+			if(BitRate > 1000)
 			{
-				/* TODO: Fix (bps->Kbps). */
-				StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("%d bps"),*pdwTemp);
-
-				free(pdwTemp);
+				StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("%d kbps"),BitRate / 1000);
 			}
-			break;
-
-		case MEDIAMETADATA_TYPE_COPYRIGHT:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMCopyright,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
+			else
 			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
+				StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),_T("%d bps"),BitRate);
 			}
-			break;
-
-		case MEDIAMETADATA_TYPE_DURATION:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMDuration,(BYTE **)&pqwTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				boost::posix_time::wtime_facet *Facet = new boost::posix_time::wtime_facet();
-				Facet->time_duration_format(L"%H:%M:%S");
-
-				std::wstringstream DateStream;
-				DateStream.imbue(std::locale(DateStream.getloc(),Facet));
-
-				/* Note that the duration itself is in 100-nanosecond units
-				(see http://msdn.microsoft.com/en-us/library/windows/desktop/dd798053(v=vs.85).aspx). */
-				boost::posix_time::time_duration Duration = boost::posix_time::microseconds(*pqwTemp / 10);
-				DateStream << Duration;
-
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),DateStream.str().c_str());
-
-				free(pqwTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_PROTECTED:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMProtected,(BYTE **)&pbTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				if(*pbTemp)
-				{
-					StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),L"Yes");
-				}
-				else
-				{
-					StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),L"No");
-				}
-
-				free(pbTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_RATING:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMRating,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_ALBUMARTIST:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMAlbumArtist,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_ALBUM:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMAlbumTitle,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_BEATSPERMINUTE:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMBeatsPerMinute,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_COMPOSER:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMComposer,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_CONDUCTOR:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMConductor,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_DIRECTOR:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMDirector,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_GENRE:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMGenre,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_LANGUAGE:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMLanguage,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_BROADCASTDATE:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMMediaOriginalBroadcastDateTime,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_CHANNEL:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMMediaOriginalChannel,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_STATIONNAME:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMMediaStationName,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_MOOD:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMMood,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_PARENTALRATING:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMParentalRating,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_PARENTALRATINGREASON:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMParentalRatingReason,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_PERIOD:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMPeriod,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_PRODUCER:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMProducer,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_PUBLISHER:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMPublisher,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_WRITER:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMWriter,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
-
-		case MEDIAMETADATA_TYPE_YEAR:
-			hr = GetMediaMetadata(szFullFileName,g_wszWMYear,(BYTE **)&pszTemp);
-
-			if(SUCCEEDED(hr))
-			{
-				StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),pszTemp);
-
-				free(pszTemp);
-			}
-			break;
 		}
+		break;
 
-		if(SUCCEEDED(hr))
+	case MEDIAMETADATA_TYPE_DURATION:
 		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,szOutput);
+			boost::posix_time::wtime_facet *Facet = new boost::posix_time::wtime_facet();
+			Facet->time_duration_format(L"%H:%M:%S");
+
+			std::wstringstream DateStream;
+			DateStream.imbue(std::locale(DateStream.getloc(),Facet));
+
+			/* Note that the duration itself is in 100-nanosecond units
+			(see http://msdn.microsoft.com/en-us/library/windows/desktop/dd798053(v=vs.85).aspx). */
+			boost::posix_time::time_duration Duration = boost::posix_time::microseconds(*(reinterpret_cast<QWORD *>(TempBuffer)) / 10);
+			DateStream << Duration;
+
+			StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),DateStream.str().c_str());
+		}
+		break;
+
+	case MEDIAMETADATA_TYPE_PROTECTED:
+		if(*(reinterpret_cast<BOOL *>(TempBuffer)))
+		{
+			StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),L"Yes");
 		}
 		else
 		{
-			ListView_SetItemText(m_hListView,iItem,iColumn,EMPTY_STRING);
+			StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),L"No");
 		}
+		break;
+
+	case MEDIAMETADATA_TYPE_COPYRIGHT:
+	case MEDIAMETADATA_TYPE_RATING:
+	case MEDIAMETADATA_TYPE_ALBUM_ARTIST:
+	case MEDIAMETADATA_TYPE_ALBUM_TITLE:
+	case MEDIAMETADATA_TYPE_BEATS_PER_MINUTE:
+	case MEDIAMETADATA_TYPE_COMPOSER:
+	case MEDIAMETADATA_TYPE_CONDUCTOR:
+	case MEDIAMETADATA_TYPE_DIRECTOR:
+	case MEDIAMETADATA_TYPE_GENRE:
+	case MEDIAMETADATA_TYPE_LANGUAGE:
+	case MEDIAMETADATA_TYPE_BROADCASTDATE:
+	case MEDIAMETADATA_TYPE_CHANNEL:
+	case MEDIAMETADATA_TYPE_STATIONNAME:
+	case MEDIAMETADATA_TYPE_MOOD:
+	case MEDIAMETADATA_TYPE_PARENTALRATING:
+	case MEDIAMETADATA_TYPE_PARENTALRATINGREASON:
+	case MEDIAMETADATA_TYPE_PERIOD:
+	case MEDIAMETADATA_TYPE_PRODUCER:
+	case MEDIAMETADATA_TYPE_PUBLISHER:
+	case MEDIAMETADATA_TYPE_WRITER:
+	case MEDIAMETADATA_TYPE_YEAR:
+	default:
+		StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),reinterpret_cast<TCHAR *>(TempBuffer));
+		break;
 	}
+
+	free(TempBuffer);
+
+	return szOutput;
+}
+
+const TCHAR *CShellBrowser::GetMediaMetadataAttributeName(MediaMetadataType_t MediaMetaDataType) const
+{
+	switch(MediaMetaDataType)
+	{
+	case MEDIAMETADATA_TYPE_BITRATE:
+		return g_wszWMBitrate;
+		break;
+
+	case MEDIAMETADATA_TYPE_COPYRIGHT:
+		return g_wszWMCopyright;
+		break;
+
+	case MEDIAMETADATA_TYPE_DURATION:
+		return g_wszWMDuration;
+		break;
+
+	case MEDIAMETADATA_TYPE_PROTECTED:
+		return g_wszWMProtected;
+		break;
+
+	case MEDIAMETADATA_TYPE_RATING:
+		return g_wszWMRating;
+		break;
+
+	case MEDIAMETADATA_TYPE_ALBUM_ARTIST:
+		return g_wszWMAlbumArtist;
+		break;
+
+	case MEDIAMETADATA_TYPE_ALBUM_TITLE:
+		return g_wszWMAlbumTitle;
+		break;
+
+	case MEDIAMETADATA_TYPE_BEATS_PER_MINUTE:
+		return g_wszWMBeatsPerMinute;
+		break;
+
+	case MEDIAMETADATA_TYPE_COMPOSER:
+		return g_wszWMComposer;
+		break;
+
+	case MEDIAMETADATA_TYPE_CONDUCTOR:
+		return g_wszWMConductor;
+		break;
+
+	case MEDIAMETADATA_TYPE_DIRECTOR:
+		return g_wszWMDirector;
+		break;
+
+	case MEDIAMETADATA_TYPE_GENRE:
+		return g_wszWMGenre;
+		break;
+
+	case MEDIAMETADATA_TYPE_LANGUAGE:
+		return g_wszWMLanguage;
+		break;
+
+	case MEDIAMETADATA_TYPE_BROADCASTDATE:
+		return g_wszWMMediaOriginalBroadcastDateTime;
+		break;
+
+	case MEDIAMETADATA_TYPE_CHANNEL:
+		return g_wszWMMediaOriginalChannel;
+		break;
+
+	case MEDIAMETADATA_TYPE_STATIONNAME:
+		return g_wszWMMediaStationName;
+		break;
+
+	case MEDIAMETADATA_TYPE_MOOD:
+		return g_wszWMMood;
+		break;
+
+	case MEDIAMETADATA_TYPE_PARENTALRATING:
+		return g_wszWMParentalRating;
+		break;
+
+	case MEDIAMETADATA_TYPE_PARENTALRATINGREASON:
+		return g_wszWMParentalRatingReason;
+		break;
+
+	case MEDIAMETADATA_TYPE_PERIOD:
+		return g_wszWMPeriod;
+		break;
+
+	case MEDIAMETADATA_TYPE_PRODUCER:
+		return g_wszWMProducer;
+		break;
+
+	case MEDIAMETADATA_TYPE_PUBLISHER:
+		return g_wszWMPublisher;
+		break;
+
+	case MEDIAMETADATA_TYPE_WRITER:
+		return g_wszWMWriter;
+		break;
+
+	case MEDIAMETADATA_TYPE_YEAR:
+		return g_wszWMYear;
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+
+	return NULL;
 }
 
 void CShellBrowser::PlaceColumns(void)
@@ -1962,10 +1409,6 @@ unsigned int CShellBrowser::DetermineColumnSortMode(int iColumnId) const
 
 		case CM_FILESYSTEM:
 			return FSM_FILESYSTEM;
-			break;
-
-		case CM_VIRTUALTYPE:
-			return FSM_VIRTUALTYPE;
 			break;
 
 		case CM_ORIGINALLOCATION:

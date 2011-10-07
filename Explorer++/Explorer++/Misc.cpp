@@ -1475,10 +1475,6 @@ int Explorerplusplus::LookupColumnNameStringIndex(int iColumnId)
 		return IDS_COLUMN_NAME_FILESYSTEM;
 		break;
 
-	case CM_VIRTUALTYPE:
-		return IDS_COLUMN_NAME_VIRTUALTYPE;
-		break;
-
 	case CM_ORIGINALLOCATION:
 		return IDS_COLUMN_NAME_ORIGINALLOCATION;
 		break;
@@ -1737,10 +1733,6 @@ int Explorerplusplus::LookupColumnDescriptionStringIndex(int iColumnId)
 
 		case CM_FILESYSTEM:
 			return IDS_COLUMN_DESCRIPTION_FILESYSTEM;
-			break;
-
-		case CM_VIRTUALTYPE:
-			return IDS_COLUMN_DESCRIPTION_TYPE;
 			break;
 
 		case CM_NUMPRINTERDOCUMENTS:

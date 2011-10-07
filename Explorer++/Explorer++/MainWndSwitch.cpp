@@ -780,10 +780,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			OnSortBy(FSM_FILESYSTEM);
 			break;
 
-		case IDM_SORTBY_VIRTUALTYPE:
-			OnSortBy(FSM_VIRTUALTYPE);
-			break;
-
 		case IDM_SORTBY_NUMPRINTERDOCUMENTS:
 			OnSortBy(FSM_NUMPRINTERDOCUMENTS);
 			break;
@@ -934,10 +930,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_GROUPBY_FILESYSTEM:
 			OnGroupBy(FSM_FILESYSTEM);
-			break;
-
-		case IDM_GROUPBY_VIRTUALTYPE:
-			OnGroupBy(FSM_VIRTUALTYPE);
 			break;
 
 		case IDM_GROUPBY_NUMPRINTERDOCUMENTS:

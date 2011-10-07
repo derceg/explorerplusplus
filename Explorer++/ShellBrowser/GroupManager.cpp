@@ -319,11 +319,6 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			pfnGroupCompare = NameComparison;
 			break;
 
-		case FSM_VIRTUALTYPE:
-			DetermineItemTypeGroupVirtual(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
-			break;
-
 		case FSM_NUMPRINTERDOCUMENTS:
 			break;
 

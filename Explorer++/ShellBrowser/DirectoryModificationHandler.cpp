@@ -434,7 +434,7 @@ void CShellBrowser::ModifyItemInternal(TCHAR *FileName)
 					{
 						if(itrColumn->bChecked)
 						{
-							SetColumnData(itrColumn->id,iItem,iColumnIndex++);
+							SetColumnText(itrColumn->id,iItem,iColumnIndex++);
 						}
 					}
 				}

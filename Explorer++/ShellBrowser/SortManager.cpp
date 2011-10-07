@@ -184,10 +184,6 @@ int CShellBrowser::DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2)
 		return SortByFileSystem(lParam1,lParam2);
 		break;
 
-	case FSM_VIRTUALTYPE:
-		return SortByVirtualType(lParam1,lParam2);
-		break;
-
 	case FSM_NUMPRINTERDOCUMENTS:
 		return SortByNumPrinterDocuments(lParam1,lParam2);
 		break;
@@ -878,7 +874,7 @@ int CALLBACK CShellBrowser::SortByProductVersion(LPARAM lParam1,LPARAM lParam2) 
 	return SortByVersionInfo(lParam1,lParam2,VERSION_INFO_PRODUCT_VERSION);
 }
 
-int CALLBACK CShellBrowser::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,VersionInfo_t VersionInfo) const
+int CALLBACK CShellBrowser::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,VersionInfoType_t VersioninfoType) const
 {
 	WIN32_FIND_DATA	*File1 = NULL;
 	WIN32_FIND_DATA	*File2 = NULL;
@@ -1341,73 +1337,6 @@ int CALLBACK CShellBrowser::SortByFileSystem(LPARAM lParam1,LPARAM lParam2) cons
 			ReturnValue = 1;
 		else if(bRes1 && bRes2)
 			ReturnValue = lstrcmp(szFileSystemName1,szFileSystemName2);
-	}
-
-	return ReturnValue;
-}
-
-int CALLBACK CShellBrowser::SortByVirtualType(LPARAM lParam1,LPARAM lParam2) const
-{
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	LPITEMIDLIST	pidlComplete1 = NULL;
-	LPITEMIDLIST	pidlComplete2 = NULL;
-	LPITEMIDLIST	pidlComplete = NULL;
-	IShellFolder	*pShellFolder = NULL;
-	LPITEMIDLIST	pidlRelative = NULL;
-	SHFILEINFO		shfi1;
-	SHFILEINFO		shfi2;
-	STRRET			str;
-	TCHAR			szItem1[MAX_PATH];
-	TCHAR			szItem2[MAX_PATH];
-	BOOL			bRoot1;
-	BOOL			bRoot2;
-	int				ReturnValue;
-
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam1].pridl);
-	SHBindToParent(pidlComplete,IID_IShellFolder,
-		(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
-
-	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-	StrRetToBuf(&str,pidlRelative,szItem1,SIZEOF_ARRAY(szItem1));
-
-	CoTaskMemFree(pidlComplete);
-	pShellFolder->Release();
-	pShellFolder = NULL;
-
-	pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam2].pridl);
-	SHBindToParent(pidlComplete,IID_IShellFolder,
-		(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
-
-	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-	StrRetToBuf(&str,pidlRelative,szItem2,SIZEOF_ARRAY(szItem2));
-
-	CoTaskMemFree(pidlComplete);
-	pShellFolder->Release();
-	pShellFolder = NULL;
-
-	bRoot1 = PathIsRoot(szItem1);
-	bRoot2 = PathIsRoot(szItem2);
-
-	if(bRoot1 && !bRoot2)
-		return -1;
-	else if(!bRoot1 && bRoot2)
-		return 1;
-	else
-	{
-		pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lParam1].pridl);
-		pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lParam2].pridl);
-
-		SHGetFileInfo((LPTSTR)pidlComplete1,0,&shfi1,sizeof(shfi1),SHGFI_PIDL|SHGFI_TYPENAME);
-		SHGetFileInfo((LPTSTR)pidlComplete2,0,&shfi2,sizeof(shfi2),SHGFI_PIDL|SHGFI_TYPENAME);
-
-		ReturnValue = lstrcmp(shfi1.szTypeName,shfi2.szTypeName);
-
-		CoTaskMemFree(pidlComplete1);
-		CoTaskMemFree(pidlComplete2);
 	}
 
 	return ReturnValue;

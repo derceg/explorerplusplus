@@ -1597,10 +1597,6 @@ unsigned int Explorerplusplus::DetermineColumnSortMode(UINT uColumnId)
 			return FSM_FILESYSTEM;
 			break;
 
-		case CM_VIRTUALTYPE:
-			return FSM_VIRTUALTYPE;
-			break;
-
 		case CM_ORIGINALLOCATION:
 			return FSM_ORIGINALLOCATION;
 			break;

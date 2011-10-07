@@ -1436,7 +1436,7 @@ void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwa
 
 					for(i = 0;i < m_nTotalItems;i++)
 					{
-						SetColumnData(itr->id,i,iColumn);
+						SetColumnText(itr->id,i,iColumn);
 					}
 				}
 			}
