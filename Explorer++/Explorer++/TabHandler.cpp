@@ -1624,6 +1624,102 @@ unsigned int Explorerplusplus::DetermineColumnSortMode(UINT uColumnId)
 		case CM_NETWORKADAPTER_STATUS:
 			return FSM_NETWORKADAPTER_STATUS;
 			break;
+
+		case CM_MEDIA_BITRATE:
+			return FSM_MEDIA_BITRATE;
+			break;
+
+		case CM_MEDIA_COPYRIGHT:
+			return FSM_MEDIA_COPYRIGHT;
+			break;
+
+		case CM_MEDIA_DURATION:
+			return FSM_MEDIA_DURATION;
+			break;
+
+		case CM_MEDIA_PROTECTED:
+			return FSM_MEDIA_PROTECTED;
+			break;
+
+		case CM_MEDIA_RATING:
+			return FSM_MEDIA_RATING;
+			break;
+
+		case CM_MEDIA_ALBUMARTIST:
+			return FSM_MEDIA_ALBUMARTIST;
+			break;
+
+		case CM_MEDIA_ALBUM:
+			return FSM_MEDIA_ALBUM;
+			break;
+
+		case CM_MEDIA_BEATSPERMINUTE:
+			return FSM_MEDIA_BEATSPERMINUTE;
+			break;
+
+		case CM_MEDIA_COMPOSER:
+			return FSM_MEDIA_COMPOSER;
+			break;
+
+		case CM_MEDIA_CONDUCTOR:
+			return FSM_MEDIA_CONDUCTOR;
+			break;
+
+		case CM_MEDIA_DIRECTOR:
+			return FSM_MEDIA_DIRECTOR;
+			break;
+
+		case CM_MEDIA_GENRE:
+			return FSM_MEDIA_GENRE;
+			break;
+
+		case CM_MEDIA_LANGUAGE:
+			return FSM_MEDIA_LANGUAGE;
+			break;
+
+		case CM_MEDIA_BROADCASTDATE:
+			return FSM_MEDIA_BROADCASTDATE;
+			break;
+
+		case CM_MEDIA_CHANNEL:
+			return FSM_MEDIA_CHANNEL;
+			break;
+
+		case CM_MEDIA_STATIONNAME:
+			return FSM_MEDIA_STATIONNAME;
+			break;
+
+		case CM_MEDIA_MOOD:
+			return FSM_MEDIA_MOOD;
+			break;
+
+		case CM_MEDIA_PARENTALRATING:
+			return FSM_MEDIA_PARENTALRATING;
+			break;
+
+		case CM_MEDIA_PARENTALRATINGREASON:
+			return FSM_MEDIA_PARENTALRATINGREASON;
+			break;
+
+		case CM_MEDIA_PERIOD:
+			return FSM_MEDIA_PERIOD;
+			break;
+
+		case CM_MEDIA_PRODUCER:
+			return FSM_MEDIA_PRODUCER;
+			break;
+
+		case CM_MEDIA_PUBLISHER:
+			return FSM_MEDIA_PUBLISHER;
+			break;
+
+		case CM_MEDIA_WRITER:
+			return FSM_MEDIA_WRITER;
+			break;
+
+		case CM_MEDIA_YEAR:
+			return FSM_MEDIA_YEAR;
+			break;
 	}
 
 	return 0;

@@ -231,37 +231,30 @@ int CShellBrowser::SetAllFolderSizeColumnData(void)
 void CALLBACK SetAllColumnDataAPC(ULONG_PTR dwParam)
 {
 	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(dwParam);
-	pShellBrowser->SetAllColumnData();
+	pShellBrowser->SetAllColumnText();
 }
 
-int CShellBrowser::SetAllColumnData(void)
+void CShellBrowser::SetAllColumnText(void)
 {
-	std::list<Column_t>			pActiveColumnList;
-	BOOL						bQueueNotEmpty;
-	int							iItem;
-	int							iColumnIndex = 0;
+	int ItemIndex;
+	BOOL QueueNotEmpty = RemoveFromColumnQueue(&ItemIndex);
 
-	pActiveColumnList = *m_pActiveColumnList;
-
-	bQueueNotEmpty = RemoveFromColumnQueue(&iItem);
-
-	while(bQueueNotEmpty)
+	while(QueueNotEmpty)
 	{
-		for(auto itr = pActiveColumnList.begin();itr != pActiveColumnList.end();itr++)
+		int iColumnIndex = 0;
+
+		for(auto itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
 		{
 			if(itr->bChecked)
 			{
-				SetColumnText(itr->id,iItem,iColumnIndex++);
+				SetColumnText(itr->id,ItemIndex,iColumnIndex++);
 			}
 		}
-		iColumnIndex = 0;
 
-		bQueueNotEmpty = RemoveFromColumnQueue(&iItem);
+		QueueNotEmpty = RemoveFromColumnQueue(&ItemIndex);
 	}
 
 	ApplyHeaderSortArrow();
-
-	return 1;
 }
 
 void CShellBrowser::SetColumnText(UINT ColumnID,int ItemIndex,int ColumnIndex)
@@ -585,11 +578,11 @@ std::wstring CShellBrowser::GetAttributeColumnText(int InternalIndex) const
 	return AttributeString;
 }
 
-std::wstring CShellBrowser::GetRealSizeColumnText(int InternalIndex) const
+bool CShellBrowser::GetRealSizeColumnRawData(int InternalIndex,ULARGE_INTEGER &RealFileSize) const
 {
 	if((m_pwfdFiles[InternalIndex].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
-		return EMPTY_STRING;
+		return false;
 	}
 
 	TCHAR Root[MAX_PATH];
@@ -598,11 +591,26 @@ std::wstring CShellBrowser::GetRealSizeColumnText(int InternalIndex) const
 
 	LONG ClusterSize = GetClusterSize(Root);
 
-	ULARGE_INTEGER RealFileSize = {m_pwfdFiles[InternalIndex].nFileSizeLow,m_pwfdFiles[InternalIndex].nFileSizeHigh};
+	ULARGE_INTEGER RealFileSizeTemp = {m_pwfdFiles[InternalIndex].nFileSizeLow,m_pwfdFiles[InternalIndex].nFileSizeHigh};
 
-	if(RealFileSize.QuadPart != 0 && (RealFileSize.QuadPart % ClusterSize) != 0)
+	if(RealFileSizeTemp.QuadPart != 0 && (RealFileSizeTemp.QuadPart % ClusterSize) != 0)
 	{
-		RealFileSize.QuadPart += ClusterSize - (RealFileSize.QuadPart % ClusterSize);
+		RealFileSizeTemp.QuadPart += ClusterSize - (RealFileSizeTemp.QuadPart % ClusterSize);
+	}
+
+	RealFileSize = RealFileSizeTemp;
+
+	return true;
+}
+
+std::wstring CShellBrowser::GetRealSizeColumnText(int InternalIndex) const
+{
+	ULARGE_INTEGER RealFileSize;
+	bool Res = GetRealSizeColumnRawData(InternalIndex,RealFileSize);
+
+	if(!Res)
+	{
+		return EMPTY_STRING;
 	}
 
 	TCHAR RealFileSizeText[32];
@@ -701,11 +709,17 @@ std::wstring CShellBrowser::GetShortcutToColumnText(int InternalIndex) const
 	return ResolvedLinkPath;
 }
 
-std::wstring CShellBrowser::GetHardLinksColumnText(int InternalIndex) const
+DWORD CShellBrowser::GetHardLinksColumnRawData(int InternalIndex) const
 {
 	TCHAR FullFileName[MAX_PATH];
 	QueryFullItemNameInternal(InternalIndex,FullFileName);
-	DWORD NumHardLinks = GetNumFileHardLinks(FullFileName);
+
+	return GetNumFileHardLinks(FullFileName);
+}
+
+std::wstring CShellBrowser::GetHardLinksColumnText(int InternalIndex) const
+{
+	DWORD NumHardLinks = GetHardLinksColumnRawData(InternalIndex);
 
 	if(NumHardLinks == -1)
 	{
@@ -720,6 +734,11 @@ std::wstring CShellBrowser::GetHardLinksColumnText(int InternalIndex) const
 
 std::wstring CShellBrowser::GetExtensionColumnText(int InternalIndex) const
 {
+	if((m_pwfdFiles[InternalIndex].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	{
+		return EMPTY_STRING;
+	}
+
 	TCHAR *Extension = PathFindExtension(m_pwfdFiles[InternalIndex].cFileName);
 
 	if(*Extension != '.')
@@ -792,7 +811,7 @@ std::wstring CShellBrowser::GetFileSystemColumnText(int InternalIndex) const
 	return FileSystemName;
 }
 
-std::wstring CShellBrowser::GetDriveSpaceColumnText(int InternalIndex,bool TotalSize) const
+BOOL CShellBrowser::GetDriveSpaceColumnRawData(int InternalIndex,bool TotalSize,ULARGE_INTEGER &DriveSpace) const
 {
 	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex].pridl);
 
@@ -805,12 +824,29 @@ std::wstring CShellBrowser::GetDriveSpaceColumnText(int InternalIndex,bool Total
 
 	if(!IsRoot)
 	{
-		return EMPTY_STRING;
+		return FALSE;
 	}
 
 	ULARGE_INTEGER TotalBytes;
 	ULARGE_INTEGER FreeBytes;
 	BOOL Res = GetDiskFreeSpaceEx(FullFileName,NULL,&TotalBytes,&FreeBytes);
+
+	if(TotalSize)
+	{
+		DriveSpace = TotalBytes;
+	}
+	else
+	{
+		DriveSpace = FreeBytes;
+	}
+
+	return Res;
+}
+
+std::wstring CShellBrowser::GetDriveSpaceColumnText(int InternalIndex,bool TotalSize) const
+{
+	ULARGE_INTEGER DriveSpace;
+	BOOL Res = GetDriveSpaceColumnRawData(InternalIndex,TotalSize,DriveSpace);
 
 	if(!Res)
 	{
@@ -818,15 +854,7 @@ std::wstring CShellBrowser::GetDriveSpaceColumnText(int InternalIndex,bool Total
 	}
 
 	TCHAR SizeText[32];
-
-	if(TotalSize)
-	{
-		FormatSizeString(TotalBytes,SizeText,SIZEOF_ARRAY(SizeText),m_bForceSize,m_SizeDisplayFormat);
-	}
-	else
-	{
-		FormatSizeString(FreeBytes,SizeText,SIZEOF_ARRAY(SizeText),m_bForceSize,m_SizeDisplayFormat);
-	}
+	FormatSizeString(DriveSpace,SizeText,SIZEOF_ARRAY(SizeText),m_bForceSize,m_SizeDisplayFormat);
 
 	return SizeText;
 }
@@ -1437,6 +1465,106 @@ unsigned int CShellBrowser::DetermineColumnSortMode(int iColumnId) const
 
 		case CM_NETWORKADAPTER_STATUS:
 			return FSM_NETWORKADAPTER_STATUS;
+			break;
+
+		case CM_MEDIA_BITRATE:
+			return FSM_MEDIA_BITRATE;
+			break;
+
+		case CM_MEDIA_COPYRIGHT:
+			return FSM_MEDIA_COPYRIGHT;
+			break;
+
+		case CM_MEDIA_DURATION:
+			return FSM_MEDIA_DURATION;
+			break;
+
+		case CM_MEDIA_PROTECTED:
+			return FSM_MEDIA_PROTECTED;
+			break;
+
+		case CM_MEDIA_RATING:
+			return FSM_MEDIA_RATING;
+			break;
+
+		case CM_MEDIA_ALBUMARTIST:
+			return FSM_MEDIA_ALBUMARTIST;
+			break;
+
+		case CM_MEDIA_ALBUM:
+			return FSM_MEDIA_ALBUM;
+			break;
+
+		case CM_MEDIA_BEATSPERMINUTE:
+			return FSM_MEDIA_BEATSPERMINUTE;
+			break;
+
+		case CM_MEDIA_COMPOSER:
+			return FSM_MEDIA_COMPOSER;
+			break;
+
+		case CM_MEDIA_CONDUCTOR:
+			return FSM_MEDIA_CONDUCTOR;
+			break;
+
+		case CM_MEDIA_DIRECTOR:
+			return FSM_MEDIA_DIRECTOR;
+			break;
+
+		case CM_MEDIA_GENRE:
+			return FSM_MEDIA_GENRE;
+			break;
+
+		case CM_MEDIA_LANGUAGE:
+			return FSM_MEDIA_LANGUAGE;
+			break;
+
+		case CM_MEDIA_BROADCASTDATE:
+			return FSM_MEDIA_BROADCASTDATE;
+			break;
+
+		case CM_MEDIA_CHANNEL:
+			return FSM_MEDIA_CHANNEL;
+			break;
+
+		case CM_MEDIA_STATIONNAME:
+			return FSM_MEDIA_STATIONNAME;
+			break;
+
+		case CM_MEDIA_MOOD:
+			return FSM_MEDIA_MOOD;
+			break;
+
+		case CM_MEDIA_PARENTALRATING:
+			return FSM_MEDIA_PARENTALRATING;
+			break;
+
+		case CM_MEDIA_PARENTALRATINGREASON:
+			return FSM_MEDIA_PARENTALRATINGREASON;
+			break;
+
+		case CM_MEDIA_PERIOD:
+			return FSM_MEDIA_PERIOD;
+			break;
+
+		case CM_MEDIA_PRODUCER:
+			return FSM_MEDIA_PRODUCER;
+			break;
+
+		case CM_MEDIA_PUBLISHER:
+			return FSM_MEDIA_PUBLISHER;
+			break;
+
+		case CM_MEDIA_WRITER:
+			return FSM_MEDIA_WRITER;
+			break;
+
+		case CM_MEDIA_YEAR:
+			return FSM_MEDIA_YEAR;
+			break;
+
+		default:
+			assert(false);
 			break;
 	}
 

@@ -19,194 +19,11 @@
 #include "iShellBrowser_internal.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/Macros.h"
 
-
-int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
-	return pShellBrowser->Sort(lParam1,lParam2);
-}
-
-int CALLBACK CShellBrowser::Sort(LPARAM lParam1,LPARAM lParam2) const
-{
-	int iSort = DetermineRelativeItemPositions(lParam1,lParam2);
-
-	if(iSort == 0)
-	{
-		iSort = StrCmpLogicalW(m_pExtraItemInfo[lParam1].szDisplayName,
-			m_pExtraItemInfo[lParam2].szDisplayName);
-	}
-
-	if(!m_bSortAscending)
-	{
-		iSort = -iSort;
-	}
-
-	return iSort;
-}
-
-int CShellBrowser::DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2) const
-{
-	switch(m_SortMode)
-	{
-	case FSM_NAME:
-		return SortByName(lParam1,lParam2);
-		break;
-
-	case FSM_TYPE:
-		return SortByType(lParam1,lParam2);
-		break;
-
-	case FSM_SIZE:
-		return SortBySize(lParam1,lParam2);
-		break;
-
-	case FSM_DATEMODIFIED:
-		return SortByDateModified(lParam1,lParam2);
-		break;
-
-	case FSM_TOTALSIZE:
-		return SortByTotalSize(lParam1,lParam2,TRUE);
-		break;
-
-	case FSM_FREESPACE:
-		return SortByTotalSize(lParam1,lParam2,FALSE);
-		break;
-
-	case FSM_DATEDELETED:
-		return SortByDateDeleted(lParam1,lParam2);
-		break;
-
-	case FSM_ORIGINALLOCATION:
-		return SortByOriginalLocation(lParam1,lParam2);
-		break;
-
-	case FSM_ATTRIBUTES:
-		return SortByAttributes(lParam1,lParam2);
-		break;
-
-	case FSM_REALSIZE:
-		return SortByRealSize(lParam1,lParam2);
-		break;
-
-	case FSM_SHORTNAME:
-		return SortByShortName(lParam1,lParam2);
-		break;
-
-	case FSM_OWNER:
-		return SortByOwner(lParam1,lParam2);
-		break;
-
-	case FSM_PRODUCTNAME:
-		return SortByProductName(lParam1,lParam2);
-		break;
-
-	case FSM_COMPANY:
-		return SortByCompany(lParam1,lParam2);
-		break;
-
-	case FSM_DESCRIPTION:
-		return SortByDescription(lParam1,lParam2);
-		break;
-
-	case FSM_FILEVERSION:
-		return SortByFileVersion(lParam1,lParam2);
-		break;
-
-	case FSM_PRODUCTVERSION:
-		return SortByProductVersion(lParam1,lParam2);
-		break;
-
-	case FSM_SHORTCUTTO:
-		return SortByShortcutTo(lParam1,lParam2);
-		break;
-
-	case FSM_HARDLINKS:
-		return SortByHardlinks(lParam1,lParam2);
-		break;
-
-	case FSM_EXTENSION:
-		return SortByExtension(lParam1,lParam2);
-		break;
-
-	case FSM_CREATED:
-		return SortByDateCreated(lParam1,lParam2);
-		break;
-
-	case FSM_ACCESSED:
-		return SortByDateAccessed(lParam1,lParam2);
-		break;
-
-	case FSM_TITLE:
-		return SortByTitle(lParam1,lParam2);
-		break;
-
-	case FSM_SUBJECT:
-		return SortBySubject(lParam1,lParam2);
-		break;
-
-	case FSM_AUTHOR:
-		return SortByAuthor(lParam1,lParam2);
-		break;
-
-	case FSM_KEYWORDS:
-		return SortByKeywords(lParam1,lParam2);
-		break;
-
-	case FSM_COMMENTS:
-		return SortByComments(lParam1,lParam2);
-		break;
-
-	case FSM_CAMERAMODEL:
-		return SortByCameraModel(lParam1,lParam2);
-		break;
-
-	case FSM_DATETAKEN:
-		return SortByDateTaken(lParam1,lParam2);
-		break;
-
-	case FSM_WIDTH:
-		return SortByWidth(lParam1,lParam2);
-		break;
-
-	case FSM_HEIGHT:
-		return SortByHeight(lParam1,lParam2);
-		break;
-
-	case FSM_VIRTUALCOMMENTS:
-		return SortByVirtualComments(lParam1,lParam2);
-		break;
-
-	case FSM_FILESYSTEM:
-		return SortByFileSystem(lParam1,lParam2);
-		break;
-
-	case FSM_NUMPRINTERDOCUMENTS:
-		return SortByNumPrinterDocuments(lParam1,lParam2);
-		break;
-
-	case FSM_PRINTERSTATUS:
-		return SortByPrinterStatus(lParam1,lParam2);
-		break;
-
-	case FSM_PRINTERCOMMENTS:
-		return SortByPrinterComments(lParam1,lParam2);
-		break;
-
-	case FSM_PRINTERLOCATION:
-		return SortByPrinterLocation(lParam1,lParam2);
-		break;
-
-	case FSM_NETWORKADAPTER_STATUS:
-		return SortByNetworkAdapterStatus(lParam1,lParam2);
-		break;
-	}
-
-	return 0;
-}
 
 void CShellBrowser::SortFolder(UINT SortMode)
 {
@@ -232,1398 +49,618 @@ void CShellBrowser::SortFolder(UINT SortMode)
 	}
 }
 
-int CALLBACK CShellBrowser::SortByName(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
-	int ReturnValue;
-
-	if(m_bVirtualFolder)
-	{
-		LPITEMIDLIST	pidlComplete = NULL;
-		LPITEMIDLIST	pidlRelative = NULL;
-		IShellFolder	*pShellFolder = NULL;
-		STRRET			str;
-		TCHAR			szItem1[MAX_PATH];
-		TCHAR			szItem2[MAX_PATH];
-		BOOL			bRoot1;
-		BOOL			bRoot2;
-
-		pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam1].pridl);
-		SHBindToParent(pidlComplete,IID_IShellFolder,
-		(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
-
-		pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-		StrRetToBuf(&str,pidlRelative,szItem1,SIZEOF_ARRAY(szItem1));
-
-		CoTaskMemFree(pidlComplete);
-		pShellFolder->Release();
-		pShellFolder = NULL;
-
-		pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam2].pridl);
-		SHBindToParent(pidlComplete,IID_IShellFolder,
-		(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
-
-		pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-		StrRetToBuf(&str,pidlRelative,szItem2,SIZEOF_ARRAY(szItem2));
-
-		CoTaskMemFree(pidlComplete);
-		pShellFolder->Release();
-		pShellFolder = NULL;
-
-		bRoot1 = PathIsRoot(szItem1);
-		bRoot2 = PathIsRoot(szItem2);
-
-		if(bRoot1 && !bRoot2)
-			return -1;
-		else if(!bRoot1 && bRoot2)
-			return 1;
-		else if(bRoot1 && bRoot2)
-		{
-			/* Sort by drive letter. */
-			PathStripToRoot(szItem1);
-			PathStripToRoot(szItem2);
-
-			return lstrcmp(szItem1,szItem2);
-		}
-	}
-
-	if(!CompareVirtualFolders(CSIDL_BITBUCKET))
-	{
-		if(((m_pwfdFiles[lParam1].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)&&
-			((m_pwfdFiles[lParam2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
-		{
-			return -1;
-		}
-
-		if(((m_pwfdFiles[lParam1].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)&&
-			((m_pwfdFiles[lParam2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
-		{
-			return 1;
-		}
-	}
-
-	ReturnValue = StrCmpLogicalW(m_pExtraItemInfo[lParam1].szDisplayName,m_pExtraItemInfo[lParam2].szDisplayName);
-
-	return ReturnValue;
+	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
+	return pShellBrowser->Sort(static_cast<int>(lParam1),static_cast<int>(lParam2));
 }
 
-int CALLBACK CShellBrowser::SortBySize(LPARAM lParam1,LPARAM lParam2) const
+/* Also see NBookmarkHelper::Sort. */
+int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 {
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	int				ReturnValue;
+	int ComparisonResult = 0;
 
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
+	bool IsFolder1 = ((m_pwfdFiles[InternalIndex1].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder2 = ((m_pwfdFiles[InternalIndex2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	
+	/* Folders will always be sorted separately from files,
+	except in the recycle bin. */
+	if(IsFolder1 && !IsFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
+	{
+		ComparisonResult = -1;
+	}
+	else if(!IsFolder1 && IsFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
+	{
+		ComparisonResult = 1;
+	}
+	else
+	{
+		switch(m_SortMode)
+		{
+		case FSM_NAME:
+			ComparisonResult = SortByName(InternalIndex1,InternalIndex2);
+			break;
 
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
+		case FSM_TYPE:
+			ComparisonResult = SortByType(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_SIZE:
+			ComparisonResult = SortBySize(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_DATEMODIFIED:
+			ComparisonResult = SortByDate(InternalIndex1,InternalIndex2,DATE_TYPE_MODIFIED);
+			break;
+
+		case FSM_TOTALSIZE:
+			ComparisonResult = SortByTotalSize(InternalIndex1,InternalIndex2,TRUE);
+			break;
+
+		case FSM_FREESPACE:
+			ComparisonResult = SortByTotalSize(InternalIndex1,InternalIndex2,FALSE);
+			break;
+
+		case FSM_DATEDELETED:
+			ComparisonResult = SortByDateDeleted(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_ORIGINALLOCATION:
+			ComparisonResult = SortByOriginalLocation(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_ATTRIBUTES:
+			ComparisonResult = SortByAttributes(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_REALSIZE:
+			ComparisonResult = SortByRealSize(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_SHORTNAME:
+			ComparisonResult = SortByShortName(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_OWNER:
+			ComparisonResult = SortByOwner(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_PRODUCTNAME:
+			ComparisonResult = SortByVersionInfo(InternalIndex1,InternalIndex2,VERSION_INFO_PRODUCT_NAME);
+			break;
+
+		case FSM_COMPANY:
+			ComparisonResult = SortByVersionInfo(InternalIndex1,InternalIndex2,VERSION_INFO_COMPANY);
+			break;
+
+		case FSM_DESCRIPTION:
+			ComparisonResult = SortByVersionInfo(InternalIndex1,InternalIndex2,VERSION_INFO_DESCRIPTION);
+			break;
+
+		case FSM_FILEVERSION:
+			ComparisonResult = SortByVersionInfo(InternalIndex1,InternalIndex2,VERSION_INFO_FILE_VERSION);
+			break;
+
+		case FSM_PRODUCTVERSION:
+			ComparisonResult = SortByVersionInfo(InternalIndex1,InternalIndex2,VERSION_INFO_PRODUCT_VERSION);
+			break;
+
+		case FSM_SHORTCUTTO:
+			ComparisonResult = SortByShortcutTo(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_HARDLINKS:
+			ComparisonResult = SortByHardlinks(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_EXTENSION:
+			ComparisonResult = SortByExtension(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_CREATED:
+			ComparisonResult = SortByDate(InternalIndex1,InternalIndex2,DATE_TYPE_CREATED);
+			break;
+
+		case FSM_ACCESSED:
+			ComparisonResult = SortByDate(InternalIndex1,InternalIndex2,DATE_TYPE_ACCESSED);
+			break;
+
+		case FSM_TITLE:
+			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,PROPERTY_ID_TITLE);
+			break;
+
+		case FSM_SUBJECT:
+			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,PROPERTY_ID_SUBJECT);
+			break;
+
+		case FSM_AUTHOR:
+			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,PROPERTY_ID_AUTHOR);
+			break;
+
+		case FSM_KEYWORDS:
+			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,PROPERTY_ID_KEYWORDS);
+			break;
+
+		case FSM_COMMENTS:
+			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,PROPERTY_ID_COMMENT);
+			break;
+
+		case FSM_CAMERAMODEL:
+			ComparisonResult = SortByImageProperty(InternalIndex1,InternalIndex2,PropertyTagEquipModel);
+			break;
+
+		case FSM_DATETAKEN:
+			ComparisonResult = SortByImageProperty(InternalIndex1,InternalIndex2,PropertyTagDateTime);
+			break;
+
+		case FSM_WIDTH:
+			ComparisonResult = SortByImageProperty(InternalIndex1,InternalIndex2,PropertyTagImageWidth);
+			break;
+
+		case FSM_HEIGHT:
+			ComparisonResult = SortByImageProperty(InternalIndex1,InternalIndex2,PropertyTagImageHeight);
+			break;
+
+		case FSM_VIRTUALCOMMENTS:
+			ComparisonResult = SortByVirtualComments(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_FILESYSTEM:
+			ComparisonResult = SortByFileSystem(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_NUMPRINTERDOCUMENTS:
+			ComparisonResult = SortByPrinterProperty(InternalIndex1,InternalIndex2,PRINTER_INFORMATION_TYPE_NUM_JOBS);
+			break;
+
+		case FSM_PRINTERSTATUS:
+			ComparisonResult = SortByPrinterProperty(InternalIndex1,InternalIndex2,PRINTER_INFORMATION_TYPE_STATUS);
+			break;
+
+		case FSM_PRINTERCOMMENTS:
+			ComparisonResult = SortByPrinterProperty(InternalIndex1,InternalIndex2,PRINTER_INFORMATION_TYPE_COMMENTS);
+			break;
+
+		case FSM_PRINTERLOCATION:
+			ComparisonResult = SortByPrinterProperty(InternalIndex1,InternalIndex2,PRINTER_INFORMATION_TYPE_LOCATION);
+			break;
+
+		case FSM_NETWORKADAPTER_STATUS:
+			ComparisonResult = SortByNetworkAdapterStatus(InternalIndex1,InternalIndex2);
+			break;
+
+		case FSM_MEDIA_BITRATE:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_BITRATE);
+			break;
+
+		case FSM_MEDIA_COPYRIGHT:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_COPYRIGHT);
+			break;
+
+		case FSM_MEDIA_DURATION:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_DURATION);
+			break;
+
+		case FSM_MEDIA_PROTECTED:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PROTECTED);
+			break;
+
+		case FSM_MEDIA_RATING:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_RATING);
+			break;
+
+		case FSM_MEDIA_ALBUMARTIST:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_ALBUM_ARTIST);
+			break;
+
+		case FSM_MEDIA_ALBUM:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_ALBUM_TITLE);
+			break;
+
+		case FSM_MEDIA_BEATSPERMINUTE:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_BEATS_PER_MINUTE);
+			break;
+
+		case FSM_MEDIA_COMPOSER:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_COMPOSER);
+			break;
+
+		case FSM_MEDIA_CONDUCTOR:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_CONDUCTOR);
+			break;
+
+		case FSM_MEDIA_DIRECTOR:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_DIRECTOR);
+			break;
+
+		case FSM_MEDIA_GENRE:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_GENRE);
+			break;
+
+		case FSM_MEDIA_LANGUAGE:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_LANGUAGE);
+			break;
+
+		case FSM_MEDIA_BROADCASTDATE:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_BROADCASTDATE);
+			break;
+
+		case FSM_MEDIA_CHANNEL:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_CHANNEL);
+			break;
+
+		case FSM_MEDIA_STATIONNAME:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_STATIONNAME);
+			break;
+
+		case FSM_MEDIA_MOOD:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_MOOD);
+			break;
+
+		case FSM_MEDIA_PARENTALRATING:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PARENTALRATING);
+			break;
+
+		case FSM_MEDIA_PARENTALRATINGREASON:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
+			break;
+
+		case FSM_MEDIA_PERIOD:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PERIOD);
+			break;
+
+		case FSM_MEDIA_PRODUCER:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PRODUCER);
+			break;
+
+		case FSM_MEDIA_PUBLISHER:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PUBLISHER);
+			break;
+
+		case FSM_MEDIA_WRITER:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_WRITER);
+			break;
+
+		case FSM_MEDIA_YEAR:
+			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_YEAR);
+			break;
+
+		default:
+			assert(false);
+			break;
+		}
+	}
+
+	if(ComparisonResult == 0)
+	{
+		/* By default, items that are equal will be sub-sorted
+		by their display names. */
+		ComparisonResult = StrCmpLogicalW(m_pExtraItemInfo[InternalIndex1].szDisplayName,
+			m_pExtraItemInfo[InternalIndex2].szDisplayName);
+	}
+
+	if(!m_bSortAscending)
+	{
+		ComparisonResult = -ComparisonResult;
+	}
+
+	return ComparisonResult;
+}
+
+int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) const
+{
+	if(m_bVirtualFolder)
+	{
+		TCHAR FullFileName1[MAX_PATH];
+		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex1].pridl);
+		GetDisplayName(pidlComplete1,FullFileName1,SHGDN_FORPARSING);
+		CoTaskMemFree(pidlComplete1);
+
+		TCHAR FullFileName2[MAX_PATH];
+		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex2].pridl);
+		GetDisplayName(pidlComplete2,FullFileName2,SHGDN_FORPARSING);
+		CoTaskMemFree(pidlComplete2);
+
+		BOOL IsRoot1 = PathIsRoot(FullFileName1);
+		BOOL IsRoot2 = PathIsRoot(FullFileName2);
+
+		if(IsRoot1 && !IsRoot2)
+		{
+			return -1;
+		}
+		else if(!IsRoot1 && IsRoot2)
+		{
+			return 1;
+		}
+		else if(IsRoot1 && IsRoot2)
+		{
+			/* If the items been compared are both drives,
+			sort by drive letter, rather than display name. */
+			return StrCmpLogicalW(FullFileName1,FullFileName2);
+		}
+	}
+
+	std::wstring Name1 = GetNameColumnText(InternalIndex1);
+	std::wstring Name2 = GetNameColumnText(InternalIndex2);
+
+	return StrCmpLogicalW(Name1.c_str(),Name2.c_str());
+}
+
+int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) const
+{
+	bool IsFolder1 = ((m_pwfdFiles[InternalIndex1].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder2 = ((m_pwfdFiles[InternalIndex2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	
 	if(IsFolder1 && IsFolder2)
 	{
-		if(m_pExtraItemInfo[(int)lParam1].bFolderSizeRetrieved
-			&& !m_pExtraItemInfo[(int)lParam2].bFolderSizeRetrieved)
-			ReturnValue = -1;
-		else if(!m_pExtraItemInfo[(int)lParam1].bFolderSizeRetrieved
-			&& m_pExtraItemInfo[(int)lParam2].bFolderSizeRetrieved)
-			ReturnValue = 1;
-		else
+		if(m_pExtraItemInfo[InternalIndex1].bFolderSizeRetrieved && !m_pExtraItemInfo[InternalIndex2].bFolderSizeRetrieved)
 		{
-			double FileSize1 = File1->nFileSizeLow + (File1->nFileSizeHigh * pow(2.0,32.0));
-			double FileSize2 = File2->nFileSizeLow + (File2->nFileSizeHigh * pow(2.0,32.0));
-
-			double fRes;
-			fRes = FileSize1 - FileSize2;
-
-			if(fRes > 0)
-				ReturnValue = 1;
-			else if(fRes < 0)
-				ReturnValue = -1;
-			else
-				ReturnValue = 0;
+			return 1;
 		}
-
-		return ReturnValue;
+		else if(!m_pExtraItemInfo[InternalIndex1].bFolderSizeRetrieved && m_pExtraItemInfo[InternalIndex2].bFolderSizeRetrieved)
+		{
+			return -1;
+		}
 	}
 
-	if(IsFolder1)
+	ULARGE_INTEGER FileSize1 = {m_pwfdFiles[InternalIndex1].nFileSizeLow,m_pwfdFiles[InternalIndex1].nFileSizeHigh};
+	ULARGE_INTEGER FileSize2 = {m_pwfdFiles[InternalIndex2].nFileSizeLow,m_pwfdFiles[InternalIndex2].nFileSizeHigh};
+
+	if(FileSize1.QuadPart > FileSize2.QuadPart)
 	{
-		ReturnValue = -1;
-
-		return ReturnValue;
+		return 1;
 	}
-
-	if(IsFolder2)
+	else if(FileSize1.QuadPart < FileSize2.QuadPart)
 	{
-		ReturnValue = 1;
-
-		return ReturnValue;
+		return -1;
 	}
 
-	double FileSize1 = File1->nFileSizeLow + (File1->nFileSizeHigh * pow(2.0,32.0));
-	double FileSize2 = File2->nFileSizeLow + (File2->nFileSizeHigh * pow(2.0,32.0));
-
-	double fRes;
-	fRes = FileSize1 - FileSize2;
-
-	if(fRes > 0)
-		ReturnValue = 1;
-	else if(fRes < 0)
-		ReturnValue = -1;
-	else
-		ReturnValue = 0;
-
-	return ReturnValue;
+	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByType(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByType(int InternalIndex1,int InternalIndex2) const
 {
-	IShellFolder	*pShellFolder1 = NULL;
-	IShellFolder	*pShellFolder2 = NULL;
-	LPITEMIDLIST	pidlComplete1 = NULL;
-	LPITEMIDLIST	pidlComplete2 = NULL;
-	LPITEMIDLIST	pidlRelative1 = NULL;
-	LPITEMIDLIST	pidlRelative2 = NULL;
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	SHFILEINFO		shfi1;
-	SHFILEINFO		shfi2;
-	STRRET			str;
-	TCHAR			szItem1[MAX_PATH];
-	TCHAR			szItem2[MAX_PATH];
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	BOOL			bRoot1;
-	BOOL			bRoot2;
-	int				ReturnValue;
-
 	if(m_bVirtualFolder)
 	{
-		LPITEMIDLIST	pidlComplete = NULL;
-		IShellFolder	*pShellFolder = NULL;
-		LPITEMIDLIST	pidlRelative = NULL;
-		STRRET			str;
-		TCHAR			szItem1[MAX_PATH];
-		TCHAR			szItem2[MAX_PATH];
-		BOOL			bRoot1;
-		BOOL			bRoot2;
+		TCHAR FullFileName1[MAX_PATH];
+		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex1].pridl);
+		GetDisplayName(pidlComplete1,FullFileName1,SHGDN_FORPARSING);
+		CoTaskMemFree(pidlComplete1);
 
-		pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam1].pridl);
-		SHBindToParent(pidlComplete,IID_IShellFolder,
-		(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
+		TCHAR FullFileName2[MAX_PATH];
+		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex2].pridl);
+		GetDisplayName(pidlComplete2,FullFileName2,SHGDN_FORPARSING);
+		CoTaskMemFree(pidlComplete2);
 
-		pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-		StrRetToBuf(&str,pidlRelative,szItem1,SIZEOF_ARRAY(szItem1));
+		BOOL IsRoot1 = PathIsRoot(FullFileName1);
+		BOOL IsRoot2 = PathIsRoot(FullFileName2);
 
-		SHGetFileInfo((LPTSTR)pidlComplete,0,&shfi1,sizeof(shfi1),SHGFI_PIDL|SHGFI_TYPENAME);
-
-		CoTaskMemFree(pidlComplete);
-		pShellFolder->Release();
-		pShellFolder = NULL;
-
-		pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam2].pridl);
-		SHBindToParent(pidlComplete,IID_IShellFolder,
-		(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
-
-		pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-		StrRetToBuf(&str,pidlRelative,szItem2,SIZEOF_ARRAY(szItem2));
-
-		SHGetFileInfo((LPTSTR)pidlComplete,0,&shfi2,sizeof(shfi2),SHGFI_PIDL|SHGFI_TYPENAME);
-
-		CoTaskMemFree(pidlComplete);
-		pShellFolder->Release();
-		pShellFolder = NULL;
-
-		bRoot1 = PathIsRoot(szItem1);
-		bRoot2 = PathIsRoot(szItem2);
-
-		if(bRoot1 && !bRoot2)
-			return -1;
-		else if(!bRoot1 && bRoot2)
-			return 1;
-		else if(bRoot1 && bRoot2)
-			return lstrcmp(shfi1.szTypeName,shfi2.szTypeName);
-	}
-
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-
-	if(IsFolder1 && !IsFolder2)
-	{
-		return -1;
-	}
-
-	if(IsFolder2 && !IsFolder1)
-	{
-		return 1;
-	}
-
-	pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam1].pridl);
-	pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam2].pridl);
-
-	SHGetFileInfo((LPTSTR)pidlComplete1,0,&shfi1,sizeof(shfi1),SHGFI_PIDL|SHGFI_TYPENAME);
-	SHGetFileInfo((LPTSTR)pidlComplete2,0,&shfi2,sizeof(shfi2),SHGFI_PIDL|SHGFI_TYPENAME);
-
-	SHBindToParent(pidlComplete1,IID_IShellFolder,
-	(void **)&pShellFolder1,(LPCITEMIDLIST *)&pidlRelative1);
-
-	pShellFolder1->GetDisplayNameOf(pidlRelative1,SHGDN_FORPARSING,&str);
-	StrRetToBuf(&str,pidlRelative1,szItem1,SIZEOF_ARRAY(szItem1));
-
-	SHBindToParent(pidlComplete2,IID_IShellFolder,
-	(void **)&pShellFolder2,(LPCITEMIDLIST *)&pidlRelative2);
-
-	pShellFolder2->GetDisplayNameOf(pidlRelative2,SHGDN_FORPARSING,&str);
-	StrRetToBuf(&str,pidlRelative2,szItem2,SIZEOF_ARRAY(szItem2));
-
-	bRoot1 = PathIsRoot(szItem1);
-	bRoot2 = PathIsRoot(szItem2);
-
-	pShellFolder2->Release();
-	pShellFolder1->Release();
-	CoTaskMemFree(pidlComplete2);
-	CoTaskMemFree(pidlComplete1);
-
-	ReturnValue = lstrcmp(shfi1.szTypeName,shfi2.szTypeName);
-
-	return ReturnValue;
-}
-
-int CALLBACK CShellBrowser::SortByDateCreated(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortByDate(lParam1,lParam2,DATE_TYPE_CREATED);
-}
-
-int CALLBACK CShellBrowser::SortByDateModified(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortByDate(lParam1,lParam2,DATE_TYPE_MODIFIED);
-}
-
-int CALLBACK CShellBrowser::SortByDateAccessed(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortByDate(lParam1,lParam2,DATE_TYPE_ACCESSED);
-}
-
-/* TODO: Implement. */
-int CShellBrowser::SortByDateDeleted(LPARAM lParam1,LPARAM lParam2) const
-{
-	int ReturnValue;
-
-	ReturnValue = 0;
-
-	return ReturnValue;
-}
-
-int CShellBrowser::SortByDate(LPARAM lParam1,LPARAM lParam2,DateType_t DateType) const
-{
-	int ReturnValue = 0;
-
-	BOOL IsFolder1 = (m_pwfdFiles[lParam1].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	BOOL IsFolder2 = (m_pwfdFiles[lParam2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if((IsFolder1 && IsFolder2) ||
-		(!IsFolder1 && !IsFolder2))
-	{
-		switch(DateType)
+		if(IsRoot1 && !IsRoot2)
 		{
-			case DATE_TYPE_CREATED:
-				ReturnValue = CompareFileTime(&m_pwfdFiles[lParam1].ftCreationTime,&m_pwfdFiles[lParam2].ftCreationTime);
-				break;
-
-			case DATE_TYPE_MODIFIED:
-				ReturnValue = CompareFileTime(&m_pwfdFiles[lParam1].ftLastWriteTime,&m_pwfdFiles[lParam2].ftLastWriteTime);
-				break;
-
-			case DATE_TYPE_ACCESSED:
-				ReturnValue = CompareFileTime(&m_pwfdFiles[lParam1].ftLastAccessTime,&m_pwfdFiles[lParam2].ftLastAccessTime);
-				break;
-
-			default:
-				assert(false);
-				break;
+			return -1;
+		}
+		else if(!IsRoot1 && IsRoot2)
+		{
+			return 1;
 		}
 	}
-	else if(IsFolder1 && !IsFolder2)
-	{
-		ReturnValue = -1;
-	}
-	else if(!IsFolder1 && IsFolder2)
-	{
-		ReturnValue = 1;
-	}
 
-	return ReturnValue;
+	std::wstring Type1 = GetTypeColumnText(InternalIndex1);
+	std::wstring Type2 = GetTypeColumnText(InternalIndex2);
+
+	return StrCmpLogicalW(Type1.c_str(),Type2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize) const
+int CALLBACK CShellBrowser::SortByDate(int InternalIndex1,int InternalIndex2,DateType_t DateType) const
 {
-	IShellFolder	*pShellFolder1 = NULL;
-	IShellFolder	*pShellFolder2 = NULL;
-	LPITEMIDLIST	pidlComplete1 = NULL;
-	LPITEMIDLIST	pidlComplete2 = NULL;
-	LPITEMIDLIST	pidlRelative1 = NULL;
-	LPITEMIDLIST	pidlRelative2 = NULL;
-	STRRET			str;
-	TCHAR			szItem1[MAX_PATH];
-	TCHAR			szItem2[MAX_PATH];
-	ULARGE_INTEGER	nTotalBytes1;
-	ULARGE_INTEGER	nTotalBytes2;
-	ULARGE_INTEGER	nFreeBytes1;
-	ULARGE_INTEGER	nFreeBytes2;
-	BOOL			bRoot1;
-	BOOL			bRoot2;
-	int				ReturnValue;
+	switch(DateType)
+	{
+	case DATE_TYPE_CREATED:
+		return CompareFileTime(&m_pwfdFiles[InternalIndex1].ftCreationTime,&m_pwfdFiles[InternalIndex2].ftCreationTime);
+		break;
 
-	pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam1].pridl);
-	SHBindToParent(pidlComplete1,IID_IShellFolder,
-	(void **)&pShellFolder1,(LPCITEMIDLIST *)&pidlRelative1);
+	case DATE_TYPE_MODIFIED:
+		return CompareFileTime(&m_pwfdFiles[InternalIndex1].ftLastWriteTime,&m_pwfdFiles[InternalIndex2].ftLastWriteTime);
+		break;
 
-	pShellFolder1->GetDisplayNameOf(pidlRelative1,SHGDN_FORPARSING,&str);
-	StrRetToBuf(&str,pidlRelative1,szItem1,SIZEOF_ARRAY(szItem1));
+	case DATE_TYPE_ACCESSED:
+		return CompareFileTime(&m_pwfdFiles[InternalIndex1].ftLastAccessTime,&m_pwfdFiles[InternalIndex2].ftLastAccessTime);
+		break;
 
-	pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam2].pridl);
-	SHBindToParent(pidlComplete2,IID_IShellFolder,
-	(void **)&pShellFolder2,(LPCITEMIDLIST *)&pidlRelative2);
+	default:
+		assert(false);
+		break;
+	}
 
-	pShellFolder2->GetDisplayNameOf(pidlRelative2,SHGDN_FORPARSING,&str);
-	StrRetToBuf(&str,pidlRelative2,szItem2,SIZEOF_ARRAY(szItem2));
+	return 0;
+}
 
-	bRoot1 = PathIsRoot(szItem1);
-	bRoot2 = PathIsRoot(szItem2);
+int CALLBACK CShellBrowser::SortByTotalSize(int InternalIndex1,int InternalIndex2,bool TotalSize) const
+{
+	ULARGE_INTEGER DriveSpace1;
+	BOOL Res1 = GetDriveSpaceColumnRawData(InternalIndex1,TotalSize,DriveSpace1);
 
-	if(bRoot1 && !bRoot2)
-		return -1;
-	else if(!bRoot1 && bRoot2)
+	ULARGE_INTEGER DriveSpace2;
+	BOOL Res2 = GetDriveSpaceColumnRawData(InternalIndex2,TotalSize,DriveSpace2);
+
+	if(Res1 && !Res2)
+	{
 		return 1;
-	else if(!bRoot1 && !bRoot2)
+	}
+	else if(!Res1 && Res2)
+	{
+		return -1;
+	}
+	else if(!Res1 && !Res2)
+	{
 		return 0;
-
-	GetDiskFreeSpaceEx(szItem1,NULL,&nTotalBytes1,&nFreeBytes1);
-
-	GetDiskFreeSpaceEx(szItem2,NULL,&nTotalBytes2,&nFreeBytes2);
-
-	CoTaskMemFree(pidlComplete2);
-	CoTaskMemFree(pidlComplete1);
-	pShellFolder2->Release();
-	pShellFolder1->Release();
-
-	if(!bTotalSize)
-	{
-		if(nFreeBytes1.QuadPart == nFreeBytes2.QuadPart)
-			ReturnValue = 0;
-		else
-			ReturnValue = nFreeBytes1.QuadPart > nFreeBytes2.QuadPart ? 1 : -1;
-	}
-	else
-	{
-		if(nTotalBytes1.QuadPart == nTotalBytes2.QuadPart)
-			ReturnValue = 0;
-		else
-			ReturnValue = nTotalBytes1.QuadPart > nTotalBytes2.QuadPart ? 1 : -1;
 	}
 
-	return ReturnValue;
+	if(DriveSpace1.QuadPart > DriveSpace2.QuadPart)
+	{
+		return 1;
+	}
+	else if(DriveSpace1.QuadPart < DriveSpace2.QuadPart)
+	{
+		return -1;
+	}
+
+	return 0;
 }
 
 /* TODO: Implement. */
-int CALLBACK CShellBrowser::SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByOriginalLocation(int InternalIndex1,int InternalIndex2) const
 {
-	int ReturnValue;
-
-	ReturnValue = 0;
-
-	return ReturnValue;
+	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByAttributes(LPARAM lParam1,LPARAM lParam2) const
+/* TODO: Implement. */
+int CALLBACK CShellBrowser::SortByDateDeleted(int InternalIndex1,int InternalIndex2) const
 {
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	TCHAR			szAttributes1[32];
-	TCHAR			szAttributes2[32];
-	TCHAR			FullFileName1[MAX_PATH];
-	TCHAR			FullFileName2[MAX_PATH];
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	int				ReturnValue;
-
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
-	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
-
-	/* Build the attribute string for the first item. */
-	BuildFileAttributeString(FullFileName1,szAttributes1,
-	SIZEOF_ARRAY(szAttributes1));
-
-	/* Build the attribute string for the second item. */
-	BuildFileAttributeString(FullFileName2,szAttributes2,
-	SIZEOF_ARRAY(szAttributes2));
-
-	ReturnValue = lstrcmp(szAttributes1,szAttributes2);
-
-	return ReturnValue;
+	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByRealSize(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByAttributes(int InternalIndex1,int InternalIndex2) const
 {
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	TCHAR			szRoot[MAX_PATH];
-	long long		fRes;
-	DWORD			ClusterSize;
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	int				ReturnValue;
+	std::wstring AttributeString1 = GetAttributeColumnText(InternalIndex1);
+	std::wstring AttributeString2 = GetAttributeColumnText(InternalIndex2);
 
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	long long FileSize1 = (long long)(File1->nFileSizeLow + (File1->nFileSizeHigh * pow(2.0,32.0)));
-	long long FileSize2 = (long long)(File2->nFileSizeLow + (File2->nFileSizeHigh * pow(2.0,32.0)));
-
-	/* Determine the root of the current directory. */
-	StringCchCopy(szRoot,SIZEOF_ARRAY(szRoot),m_CurDir);
-	PathStripToRoot(szRoot);
-
-	ClusterSize = GetClusterSize(szRoot);
-
-	if(FileSize1 != 0)
-		FileSize1 += ClusterSize - (FileSize1 % ClusterSize);
-
-	if(FileSize2 != 0)
-		FileSize2 += ClusterSize - (FileSize2 % ClusterSize);
-
-	fRes = FileSize1 - FileSize2;
-
-	if(fRes > 0)
-		ReturnValue = 1;
-	else if(fRes < 0)
-		ReturnValue = -1;
-	else
-		ReturnValue = 0;
-
-	return ReturnValue;
+	return StrCmpLogicalW(AttributeString1.c_str(),AttributeString2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByShortName(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByRealSize(int InternalIndex1,int InternalIndex2) const
 {
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	int				ReturnValue;
+	ULARGE_INTEGER RealFileSize1;
+	bool Res1 = GetRealSizeColumnRawData(InternalIndex1,RealFileSize1);
 
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
+	ULARGE_INTEGER RealFileSize2;
+	bool Res2 = GetRealSizeColumnRawData(InternalIndex2,RealFileSize2);
 
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
+	if(Res1 && !Res2)
 	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
+		return 1;
+	}
+	else if(!Res1 && Res2)
+	{
+		return -1;
+	}
+	else if(!Res1 && !Res2)
+	{
+		return 0;
 	}
 
-	if(IsFolder1)
+	if(RealFileSize1.QuadPart > RealFileSize2.QuadPart)
 	{
-		ReturnValue = -1;
-
-		return ReturnValue;
+		return 1;
+	}
+	else if(RealFileSize1.QuadPart < RealFileSize2.QuadPart)
+	{
+		return -1;
 	}
 
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	ReturnValue = lstrcmp(m_pwfdFiles[lParam1].cAlternateFileName,m_pwfdFiles[lParam2].cAlternateFileName);
-
-	return ReturnValue;
+	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByOwner(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByShortName(int InternalIndex1,int InternalIndex2) const
 {
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	TCHAR			FullFileName1[MAX_PATH];
-	TCHAR			FullFileName2[MAX_PATH];
-	TCHAR			szOwner1[512];
-	TCHAR			szOwner2[512];
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	int				ReturnValue;
+	std::wstring ShortName1 = GetShortNameColumnText(InternalIndex1);
+	std::wstring ShortName2 = GetShortNameColumnText(InternalIndex2);
 
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
-	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
-
-	GetFileOwner(FullFileName1,szOwner1,SIZEOF_ARRAY(szOwner1));
-	GetFileOwner(FullFileName2,szOwner1,SIZEOF_ARRAY(szOwner2));
-
-	ReturnValue = lstrcmp(szOwner1,szOwner2);
-
-	return ReturnValue;
+	return StrCmpLogicalW(ShortName1.c_str(),ShortName2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByProductName(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByOwner(int InternalIndex1,int InternalIndex2) const
 {
-	return SortByVersionInfo(lParam1,lParam2,VERSION_INFO_PRODUCT_NAME);
+	std::wstring Owner1 = GetOwnerColumnText(InternalIndex1);
+	std::wstring Owner2 = GetOwnerColumnText(InternalIndex2);
+
+	return StrCmpLogicalW(Owner1.c_str(),Owner2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByCompany(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByVersionInfo(int InternalIndex1,int InternalIndex2,VersionInfoType_t VersioninfoType) const
 {
-	return SortByVersionInfo(lParam1,lParam2,VERSION_INFO_COMPANY);
+	std::wstring VersionInfo1 = GetVersionColumnText(InternalIndex1,VersioninfoType);
+	std::wstring VersionInfo2 = GetVersionColumnText(InternalIndex2,VersioninfoType);
+
+	return StrCmpLogicalW(VersionInfo1.c_str(),VersionInfo2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByDescription(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByShortcutTo(int InternalIndex1,int InternalIndex2) const
 {
-	return SortByVersionInfo(lParam1,lParam2,VERSION_INFO_DESCRIPTION);
+	std::wstring ResolvedLinkPath1 = GetShortcutToColumnText(InternalIndex1);
+	std::wstring ResolvedLinkPath2 = GetShortcutToColumnText(InternalIndex2);
+
+	return StrCmpLogicalW(ResolvedLinkPath1.c_str(),ResolvedLinkPath2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByFileVersion(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByHardlinks(int InternalIndex1,int InternalIndex2) const
 {
-	return SortByVersionInfo(lParam1,lParam2,VERSION_INFO_FILE_VERSION);
+	DWORD NumHardLinks1 = GetHardLinksColumnRawData(InternalIndex1);
+	DWORD NumHardLinks2 = GetHardLinksColumnRawData(InternalIndex2);
+
+	return NumHardLinks1 - NumHardLinks2;
 }
 
-int CALLBACK CShellBrowser::SortByProductVersion(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByExtension(int InternalIndex1,int InternalIndex2) const
 {
-	return SortByVersionInfo(lParam1,lParam2,VERSION_INFO_PRODUCT_VERSION);
+	std::wstring Extension1 = GetExtensionColumnText(InternalIndex1);
+	std::wstring Extension2 = GetExtensionColumnText(InternalIndex2);
+
+	return StrCmpLogicalW(Extension1.c_str(),Extension2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,VersionInfoType_t VersioninfoType) const
+int CALLBACK CShellBrowser::SortBySummaryProperty(int InternalIndex1,int InternalIndex2,DWORD PropertyType) const
 {
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	TCHAR			FullFileName1[MAX_PATH];
-	TCHAR			FullFileName2[MAX_PATH];
-	TCHAR			szVersionBuf1[512];
-	TCHAR			szVersionBuf2[512];
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	int				ReturnValue;
+	std::wstring FileProperty1 = GetSummaryColumnText(InternalIndex1,PropertyType);
+	std::wstring FileProperty2 = GetSummaryColumnText(InternalIndex2,PropertyType);
 
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
-	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
-
-	/* TODO: */
-	GetVersionInfoString(FullFileName1,_T("ProductName"),szVersionBuf1,SIZEOF_ARRAY(szVersionBuf1));
-	GetVersionInfoString(FullFileName2,_T("ProductName"),szVersionBuf2,SIZEOF_ARRAY(szVersionBuf2));
-
-	ReturnValue = lstrcmp(szVersionBuf1,szVersionBuf2);
-
-	return ReturnValue;
+	return StrCmpLogicalW(FileProperty1.c_str(),FileProperty2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByImageProperty(int InternalIndex1,int InternalIndex2,PROPID PropertyId) const
 {
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	TCHAR			FullFileName1[MAX_PATH];
-	TCHAR			FullFileName2[MAX_PATH];
-	TCHAR			szResolvedLinkPath1[MAX_PATH];
-	TCHAR			szResolvedLinkPath2[MAX_PATH];
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	int				ReturnValue;
+	std::wstring ImageProperty1 = GetImageColumnText(InternalIndex1,PropertyId);
+	std::wstring ImageProperty2 = GetImageColumnText(InternalIndex2,PropertyId);
 
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
-	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
-
-	NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName1,szResolvedLinkPath1,
-	SIZEOF_ARRAY(szResolvedLinkPath1));
-
-	NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName2,szResolvedLinkPath2,
-	SIZEOF_ARRAY(szResolvedLinkPath2));
-
-	ReturnValue = lstrcmp(szResolvedLinkPath1,szResolvedLinkPath2);
-
-	return ReturnValue;
+	return StrCmpLogicalW(ImageProperty1.c_str(),ImageProperty2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByVirtualComments(int InternalIndex1,int InternalIndex2) const
 {
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	TCHAR			FullFileName1[MAX_PATH];
-	TCHAR			FullFileName2[MAX_PATH];
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	DWORD			dwNumHardLinks1;
-	DWORD			dwNumHardLinks2;
-	int				ReturnValue;
+	std::wstring Comments1 = GetControlPanelCommentsColumnText(InternalIndex1);
+	std::wstring Comments2 = GetControlPanelCommentsColumnText(InternalIndex2);
 
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
-	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
-
-	dwNumHardLinks1 = GetNumFileHardLinks(FullFileName1);
-	dwNumHardLinks2 = GetNumFileHardLinks(FullFileName2);
-
-	ReturnValue = dwNumHardLinks1 - dwNumHardLinks2;
-
-	return ReturnValue;
+	return StrCmpLogicalW(Comments1.c_str(),Comments2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByExtension(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByFileSystem(int InternalIndex1,int InternalIndex2) const
 {
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	TCHAR			FullFileName1[MAX_PATH];
-	TCHAR			FullFileName2[MAX_PATH];
-	TCHAR			*pExt1 = NULL;
-	TCHAR			*pExt2 = NULL;
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	int				ReturnValue;
+	std::wstring FileSystemName1 = GetFileSystemColumnText(InternalIndex1);
+	std::wstring FileSystemName2 = GetFileSystemColumnText(InternalIndex2);
 
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
-	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
-
-	pExt1 = PathFindExtension(File1->cFileName);
-	pExt2 = PathFindExtension(File2->cFileName);
-
-	/* TODO: Need to check if pExt == NULL. */
-	ReturnValue = lstrcmp(pExt1,pExt2);
-
-	return ReturnValue;
+	return StrCmpLogicalW(FileSystemName1.c_str(),FileSystemName2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByTitle(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByPrinterProperty(int InternalIndex1,int InternalIndex2,PrinterInformationType_t PrinterInformationType) const
 {
-	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_TITLE);
+	std::wstring PrinterInformation1 = GetPrinterColumnText(InternalIndex1,PrinterInformationType);
+	std::wstring PrinterInformation2 = GetPrinterColumnText(InternalIndex2,PrinterInformationType);
+
+	return StrCmpLogicalW(PrinterInformation1.c_str(),PrinterInformation2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortBySubject(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByNetworkAdapterStatus(int InternalIndex1,int InternalIndex2) const
 {
-	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_SUBJECT);
+	std::wstring Status1 = GetNetworkAdapterColumnText(InternalIndex1);
+	std::wstring Status2 = GetNetworkAdapterColumnText(InternalIndex2);
+
+	return StrCmpLogicalW(Status1.c_str(),Status2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByAuthor(LPARAM lParam1,LPARAM lParam2) const
+int CALLBACK CShellBrowser::SortByMediaMetadata(int InternalIndex1,int InternalIndex2,MediaMetadataType_t MediaMetaDataType) const
 {
-	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_AUTHOR);
-}
+	std::wstring MediaMetadata1 = GetMediaMetadataColumnText(InternalIndex1,MediaMetaDataType);
+	std::wstring MediaMetadata2 = GetMediaMetadataColumnText(InternalIndex2,MediaMetaDataType);
 
-int CALLBACK CShellBrowser::SortByKeywords(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_KEYWORDS);
-}
-
-int CALLBACK CShellBrowser::SortByComments(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortBySummaryProperty(lParam1,lParam2,PROPERTY_ID_COMMENT);
-}
-
-int CALLBACK CShellBrowser::SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DWORD dwPropertyType) const
-{
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	TCHAR			FullFileName1[MAX_PATH];
-	TCHAR			FullFileName2[MAX_PATH];
-	TCHAR			szPropertyBuf1[512];
-	TCHAR			szPropertyBuf2[512];
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	int				ReturnValue;
-
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
-	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
-
-	ReadFileProperty(FullFileName1,dwPropertyType,szPropertyBuf1,
-	SIZEOF_ARRAY(szPropertyBuf1));
-
-	ReadFileProperty(FullFileName2,dwPropertyType,szPropertyBuf2,
-	SIZEOF_ARRAY(szPropertyBuf2));
-
-	ReturnValue = lstrcmp(szPropertyBuf1,szPropertyBuf2);
-
-	return ReturnValue;
-}
-
-int CALLBACK CShellBrowser::SortByCameraModel(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortByImageProperty(lParam1,lParam2,PropertyTagEquipModel);
-}
-
-int CALLBACK CShellBrowser::SortByDateTaken(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortByImageProperty(lParam1,lParam2,PropertyTagDateTime);
-}
-
-int CALLBACK CShellBrowser::SortByWidth(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortByImageProperty(lParam1,lParam2,PropertyTagImageWidth);
-}
-
-int CALLBACK CShellBrowser::SortByHeight(LPARAM lParam1,LPARAM lParam2) const
-{
-	return SortByImageProperty(lParam1,lParam2,PropertyTagImageHeight);
-}
-
-int CALLBACK CShellBrowser::SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId) const
-{
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	TCHAR			FullFileName1[MAX_PATH];
-	TCHAR			FullFileName2[MAX_PATH];
-	TCHAR			szPropertyBuf1[512];
-	TCHAR			szPropertyBuf2[512];
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	int				ReturnValue;
-
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	PathCombine(FullFileName1,m_CurDir,File1->cFileName);
-	PathCombine(FullFileName2,m_CurDir,File2->cFileName);
-
-	ReadImageProperty(FullFileName1,PropertyId,szPropertyBuf1,
-	SIZEOF_ARRAY(szPropertyBuf1));
-
-	ReadImageProperty(FullFileName2,PropertyId,szPropertyBuf2,
-	SIZEOF_ARRAY(szPropertyBuf2));
-
-	ReturnValue = lstrcmp(szPropertyBuf1,szPropertyBuf2);
-
-	return ReturnValue;
-}
-
-int CALLBACK CShellBrowser::SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) const
-{
-	WIN32_FIND_DATA	*File1 = NULL;
-	WIN32_FIND_DATA	*File2 = NULL;
-	TCHAR			szInfoTip1[512];
-	TCHAR			szInfoTip2[512];
-	BOOL			IsFolder1;
-	BOOL			IsFolder2;
-	int				ReturnValue;
-
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	GetFileInfoTip(m_hOwner,m_pidlDirectory,const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[(int)lParam1].pridl),
-		szInfoTip1,SIZEOF_ARRAY(szInfoTip1));
-	GetFileInfoTip(m_hOwner,m_pidlDirectory,const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[(int)lParam2].pridl),
-		szInfoTip2,SIZEOF_ARRAY(szInfoTip2));
-
-	ReturnValue = lstrcmp(szInfoTip1,szInfoTip2);
-
-	return ReturnValue;
-}
-
-int CALLBACK CShellBrowser::SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const
-{
-	int				ReturnValue = 0;
-	TCHAR			szFullFileName1[MAX_PATH];
-	TCHAR			szFullFileName2[MAX_PATH];
-	BOOL			bRoot1;
-	BOOL			bRoot2;
-	BOOL			bRes1;
-	BOOL			bRes2;
-	TCHAR			szFileSystemName1[32];
-	TCHAR			szFileSystemName2[32];
-
-	LPITEMIDLIST	pidlComplete = NULL;
-	LPITEMIDLIST	pidlRelative = NULL;
-	IShellFolder	*pShellFolder = NULL;
-	STRRET			str;
-
-	pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam1].pridl);
-	SHBindToParent(pidlComplete,IID_IShellFolder,
-		(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
-
-	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-	StrRetToBuf(&str,pidlRelative,szFullFileName1,SIZEOF_ARRAY(szFullFileName1));
-
-	CoTaskMemFree(pidlComplete);
-	pShellFolder->Release();
-	pShellFolder = NULL;
-
-	pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[lParam2].pridl);
-	SHBindToParent(pidlComplete,IID_IShellFolder,
-		(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
-
-	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-	StrRetToBuf(&str,pidlRelative,szFullFileName2,SIZEOF_ARRAY(szFullFileName2));
-
-	CoTaskMemFree(pidlComplete);
-	pShellFolder->Release();
-	pShellFolder = NULL;
-
-	bRoot1 = PathIsRoot(szFullFileName1);
-	bRoot2 = PathIsRoot(szFullFileName2);
-
-	if(bRoot1 && !bRoot2)
-		ReturnValue = -1;
-	else if(!bRoot1 && bRoot2)
-		ReturnValue = 1;
-	else if(bRoot1 && bRoot2)
-	{
-		bRes1 = GetVolumeInformation(szFullFileName1,NULL,0,NULL,
-			NULL,NULL,szFileSystemName1,SIZEOF_ARRAY(szFileSystemName1));
-
-		bRes2 = GetVolumeInformation(szFullFileName2,NULL,0,NULL,
-			NULL,NULL,szFileSystemName2,SIZEOF_ARRAY(szFileSystemName2));
-
-		if(bRes1 && !bRes2)
-			ReturnValue = -1;
-		else if(!bRes1 && bRes2)
-			ReturnValue = 1;
-		else if(bRes1 && bRes2)
-			ReturnValue = lstrcmp(szFileSystemName1,szFileSystemName2);
-	}
-
-	return ReturnValue;
-}
-
-int CALLBACK CShellBrowser::SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2) const
-{
-	HANDLE hPrinter1;
-	HANDLE hPrinter2;
-	PRINTER_INFO_2 *pPrinterInfo21 = NULL;
-	PRINTER_INFO_2 *pPrinterInfo22 = NULL;
-	DWORD cbNeeded;
-	DWORD cbSize;
-	BOOL bRes1;
-	BOOL bRes2;
-	int ReturnValue = 0;
-
-	bRes1 = OpenPrinter(m_pExtraItemInfo[(int)lParam1].szDisplayName,&hPrinter1,NULL);
-	bRes2 = OpenPrinter(m_pExtraItemInfo[(int)lParam2].szDisplayName,&hPrinter2,NULL);
-
-	if(bRes1 && !bRes2)
-		ReturnValue = -1;
-	else if(!bRes1 && bRes2)
-		ReturnValue = 1;
-	else if(!bRes1 && !bRes2)
-		ReturnValue = 0;
-	else if(bRes1 && bRes2)
-	{
-		GetPrinter(hPrinter1,2,NULL,0,&cbNeeded);
-
-		pPrinterInfo21 = (PRINTER_INFO_2 *)malloc(cbNeeded);
-
-		cbSize = cbNeeded;
-
-		bRes1 = GetPrinter(hPrinter1,2,(LPBYTE)pPrinterInfo21,cbSize,&cbNeeded);
-
-		GetPrinter(hPrinter2,2,NULL,0,&cbNeeded);
-
-		pPrinterInfo22 = (PRINTER_INFO_2 *)malloc(cbNeeded);
-
-		cbSize = cbNeeded;
-
-		bRes2 = GetPrinter(hPrinter2,2,(LPBYTE)pPrinterInfo22,cbSize,&cbNeeded);
-
-		ReturnValue = pPrinterInfo21->cJobs < pPrinterInfo22->cJobs;
-
-		free(pPrinterInfo21);
-		free(pPrinterInfo22);
-	}
-
-	return ReturnValue;
-}
-
-int CALLBACK CShellBrowser::SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) const
-{
-	WIN32_FIND_DATA *File1		= NULL;
-	WIN32_FIND_DATA *File2		= NULL;
-	BOOL IsFolder1;
-	BOOL IsFolder2;
-	int ReturnValue;
-
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-
-
-	/* TODO: Fix. */
-	/*HANDLE hPrinter;
-	PRINTER_INFO_2 *pPrinterInfo1;
-	TCHAR szNumJobs[32]	= EMPTY_STRING;
-	DWORD cbNeeded;
-	DWORD cbSize;
-	BOOL bRes;
-
-	bRes = OpenPrinter(m_pExtraItemInfo[(int)lParam1].szDisplayName,&hPrinter,NULL);
-
-	if(bRes)
-	{
-		GetPrinter(hPrinter,2,NULL,0,&cbNeeded);
-
-		pPrinterInfo1 = (PRINTER_INFO_2 *)malloc(cbNeeded);
-
-		cbSize = cbNeeded;
-
-		bRes = GetPrinter(hPrinter,2,(LPBYTE)pPrinterInfo1,cbSize,&cbNeeded);
-
-		if(bRes)
-		{
-			StringCchCopyEx(szNumJobs,SIZEOF_ARRAY(szNumJobs),
-			DecodePrinterStatus(pPrinterInfo1->Status),NULL,NULL,STRSAFE_IGNORE_NULLS);
-		}
-
-		free(pPrinterInfo1);
-		ClosePrinter(hPrinter);
-	}*/
-
-	ReturnValue = 0;
-
-	return ReturnValue;
-}
-
-int CALLBACK CShellBrowser::SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) const
-{
-	WIN32_FIND_DATA *File1		= NULL;
-	WIN32_FIND_DATA *File2		= NULL;
-	LPITEMIDLIST pidlComplete1	= NULL;
-	LPITEMIDLIST pidlComplete2	= NULL;
-	BOOL IsFolder1;
-	BOOL IsFolder2;
-	SHFILEINFO shfi1;
-	SHFILEINFO shfi2;
-	int ReturnValue;
-
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lParam1].pridl);
-	pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lParam2].pridl);
-
-	SHGetFileInfo((LPTSTR)pidlComplete1,0,&shfi1,sizeof(shfi1),SHGFI_PIDL | SHGFI_TYPENAME);
-	SHGetFileInfo((LPTSTR)pidlComplete2,0,&shfi2,sizeof(shfi2),SHGFI_PIDL | SHGFI_TYPENAME);
-
-	ReturnValue = lstrcmp(shfi1.szTypeName,shfi2.szTypeName);
-
-	return ReturnValue;
-}
-
-int CALLBACK CShellBrowser::SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2) const
-{
-	WIN32_FIND_DATA *File1		= NULL;
-	WIN32_FIND_DATA *File2		= NULL;
-	LPITEMIDLIST pidlComplete1	= NULL;
-	LPITEMIDLIST pidlComplete2	= NULL;
-	BOOL IsFolder1;
-	BOOL IsFolder2;
-	SHFILEINFO shfi1;
-	SHFILEINFO shfi2;
-	int ReturnValue;
-
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	IsFolder1 = (File1->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	IsFolder2 = (File2->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY;
-	
-	if(IsFolder1 && IsFolder2)
-	{
-		ReturnValue = StrCmpI(File1->cFileName,File2->cFileName);
-
-		return ReturnValue;
-	}
-
-	if(IsFolder1)
-	{
-		ReturnValue = -1;
-
-		return ReturnValue;
-	}
-
-	if(IsFolder2)
-	{
-		ReturnValue = 1;
-
-		return ReturnValue;
-	}
-
-	pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lParam1].pridl);
-	pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lParam2].pridl);
-
-	SHGetFileInfo((LPTSTR)pidlComplete1,0,&shfi1,sizeof(shfi1),SHGFI_PIDL | SHGFI_TYPENAME);
-	SHGetFileInfo((LPTSTR)pidlComplete2,0,&shfi2,sizeof(shfi2),SHGFI_PIDL | SHGFI_TYPENAME);
-
-	ReturnValue = lstrcmp(shfi1.szTypeName,shfi2.szTypeName);
-
-	return ReturnValue;
-}
-
-int CALLBACK CShellBrowser::SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2) const
-{
-	WIN32_FIND_DATA *File1		= NULL;
-	WIN32_FIND_DATA *File2		= NULL;
-	LPITEMIDLIST pidlComplete1	= NULL;
-	LPITEMIDLIST pidlComplete2	= NULL;
-	int ReturnValue;
-
-	File1 = &m_pwfdFiles[(int)lParam1];
-	File2 = &m_pwfdFiles[(int)lParam2];
-
-	pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lParam1].pridl);
-	pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lParam2].pridl);
-
-
-	/*TCHAR szStatus[32]						= EMPTY_STRING;
-	IP_ADAPTER_ADDRESSES *pAdapterAddresses	= NULL;
-	UINT uStatusID;
-	ULONG ulOutBufLen						= 0;
-
-	GetAdaptersAddresses(AF_UNSPEC,0,NULL,NULL,&ulOutBufLen);
-
-	pAdapterAddresses = (IP_ADAPTER_ADDRESSES *)malloc(ulOutBufLen);
-
-	GetAdaptersAddresses(AF_UNSPEC,0,NULL,pAdapterAddresses,&ulOutBufLen);
-
-	switch(pAdapterAddresses->OperStatus)
-	{
-		case IfOperStatusUp:
-			uStatusID = IDS_NETWORKADAPTER_CONNECTED;
-			break;
-
-		case IfOperStatusDown:
-			uStatusID = IDS_NETWORKADAPTER_DISCONNECTED;
-			break;
-
-		case IfOperStatusTesting:
-			uStatusID = IDS_NETWORKADAPTER_TESTING;
-			break;
-
-		case IfOperStatusUnknown:
-			uStatusID = IDS_NETWORKADAPTER_UNKNOWN;
-			break;
-
-		case IfOperStatusDormant:
-			uStatusID = IDS_NETWORKADAPTER_DORMANT;
-			break;
-
-		case IfOperStatusNotPresent:
-			uStatusID = IDS_NETWORKADAPTER_NOTPRESENT;
-			break;
-
-		case IfOperStatusLowerLayerDown:
-			uStatusID = IDS_NETWORKADAPTER_LOWLAYER;
-			break;
-	}
-
-	LoadString(m_hResourceModule,uStatusID,
-		szStatus,SIZEOF_ARRAY(szStatus));*/
-
-
-	ReturnValue = 0;
-
-	return ReturnValue;
+	return StrCmpLogicalW(MediaMetadata1.c_str(),MediaMetadata2.c_str());
 }

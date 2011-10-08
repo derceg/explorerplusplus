@@ -857,7 +857,7 @@ int CShellBrowser::DetermineItemSortedPosition(LPARAM lParam) const
 		bItem = ListView_GetItem(m_hListView,&lvItem);
 
 		if(bItem)
-			res = Sort(lParam,lvItem.lParam);
+			res = Sort(static_cast<int>(lParam),static_cast<int>(lvItem.lParam));
 		else
 			res = 0;
 

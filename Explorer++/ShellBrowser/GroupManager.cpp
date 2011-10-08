@@ -14,6 +14,7 @@
 
 #include "stdafx.h"
 #include <list>
+#include <cassert>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
@@ -334,6 +335,10 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 		case FSM_NETWORKADAPTER_STATUS:
 			DetermineItemNetworkStatus(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = NameComparison;
+			break;
+
+		default:
+			assert(false);
 			break;
 	}
 

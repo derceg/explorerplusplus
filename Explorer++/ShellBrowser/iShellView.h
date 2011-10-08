@@ -130,7 +130,32 @@ typedef enum
 	FSM_PRINTERCOMMENTS		= 38,
 	FSM_PRINTERLOCATION		= 39,
 
-	FSM_NETWORKADAPTER_STATUS	= 40
+	FSM_NETWORKADAPTER_STATUS	= 40,
+
+	FSM_MEDIA_BITRATE		= 41,
+	FSM_MEDIA_COPYRIGHT		= 42,
+	FSM_MEDIA_DURATION		= 43,
+	FSM_MEDIA_PROTECTED		= 44,
+	FSM_MEDIA_RATING		= 45,
+	FSM_MEDIA_ALBUMARTIST	= 46,
+	FSM_MEDIA_ALBUM			= 47,
+	FSM_MEDIA_BEATSPERMINUTE	= 48,
+	FSM_MEDIA_COMPOSER		= 49,
+	FSM_MEDIA_CONDUCTOR		= 50,
+	FSM_MEDIA_DIRECTOR		= 51,
+	FSM_MEDIA_GENRE			= 52,
+	FSM_MEDIA_LANGUAGE		= 53,
+	FSM_MEDIA_BROADCASTDATE	= 54,
+	FSM_MEDIA_CHANNEL		= 55,
+	FSM_MEDIA_STATIONNAME	= 56,
+	FSM_MEDIA_MOOD			= 57,
+	FSM_MEDIA_PARENTALRATING	= 58,
+	FSM_MEDIA_PARENTALRATINGREASON	= 59,
+	FSM_MEDIA_PERIOD		= 60,
+	FSM_MEDIA_PRODUCER		= 61,
+	FSM_MEDIA_PUBLISHER		= 62,
+	FSM_MEDIA_WRITER			= 63,
+	FSM_MEDIA_YEAR			= 64
 } SORT_MODES;
 
 typedef enum
@@ -204,10 +229,6 @@ typedef enum
 	CM_NETWORKADAPTER_STATUS	= 39,
 
 	/* Media metadata. */
-	//CM_MEDIA_TITLE
-	//CM_MEDIA_SUBTITLE
-	//CM_MEDIA_WIDTH
-	//CM_MEDIA_HEIGHT
 	CM_MEDIA_BITRATE		= 40,
 	CM_MEDIA_COPYRIGHT		= 41,
 	CM_MEDIA_DURATION		= 42,
@@ -277,6 +298,7 @@ typedef struct
 class CShellBrowser : public IDropTarget, public IDropFilesCallback
 {
 	friend int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
+	friend void CALLBACK SetAllColumnDataAPC(ULONG_PTR dwParam);
 
 public:
 
@@ -361,7 +383,6 @@ public:
 	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath) const;
 	
 	/* Column support. */
-	int					SetAllColumnData(void);
 	void				ExportCurrentColumns(std::list<Column_t> *pColumns);
 	void				ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped);
 
@@ -559,52 +580,34 @@ private:
 	void				SetCurrentViewModeInternal(DWORD ViewMode);
 
 	/* Sorting. */
-	int CALLBACK		Sort(LPARAM lParam1,LPARAM lParam2) const;
-	int					SortByDate(LPARAM lParam1,LPARAM lParam2,DateType_t DateType) const;
-	int CALLBACK		SortByName(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortBySize(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByType(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByDateModified(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByTotalSize(LPARAM lParam1,LPARAM lParam2,BOOL bTotalSize) const;
-	int CALLBACK		SortByComments(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByDateDeleted(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByOriginalLocation(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByAttributes(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByRealSize(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByShortName(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByOwner(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByProductName(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByCompany(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByDescription(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByFileVersion(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByProductVersion(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByVersionInfo(LPARAM lParam1,LPARAM lParam2,VersionInfoType_t VersioninfoType) const;
-	int CALLBACK		SortByShortcutTo(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByHardlinks(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByExtension(LPARAM lParam1,LPARAM lParam2) const;
-	int	CALLBACK		SortByDateCreated(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByDateAccessed(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByTitle(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortBySubject(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByAuthor(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByKeywords(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortBySummaryProperty(LPARAM lParam1,LPARAM lParam2,DWORD dwPropertyType) const;
-	int CALLBACK		SortByCameraModel(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByDateTaken(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByWidth(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByHeight(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByImageProperty(LPARAM lParam1,LPARAM lParam2,PROPID PropertyId) const;
-	int CALLBACK		SortByVirtualComments(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByFileSystem(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByNumPrinterDocuments(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByPrinterStatus(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByPrinterComments(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByPrinterLocation(LPARAM lParam1,LPARAM lParam2) const;
-	int CALLBACK		SortByNetworkAdapterStatus(LPARAM lParam1,LPARAM lParam2) const;
+	int CALLBACK		Sort(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByName(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortBySize(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByType(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByDate(int InternalIndex1,int InternalIndex2,DateType_t DateType) const;
+	int CALLBACK		SortByTotalSize(int InternalIndex1,int InternalIndex2,bool TotalSize) const;
+	int CALLBACK		SortByOriginalLocation(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByDateDeleted(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByAttributes(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByRealSize(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByShortName(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByOwner(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByVersionInfo(int InternalIndex1,int InternalIndex2,VersionInfoType_t VersioninfoType) const;
+	int CALLBACK		SortByShortcutTo(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByHardlinks(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByExtension(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortBySummaryProperty(int InternalIndex1,int InternalIndex2,DWORD PropertyType) const;
+	int CALLBACK		SortByImageProperty(int InternalIndex1,int InternalIndex2,PROPID PropertyId) const;
+	int CALLBACK		SortByVirtualComments(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByFileSystem(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByPrinterProperty(int InternalIndex1,int InternalIndex2,PrinterInformationType_t PrinterInformationType) const;
+	int CALLBACK		SortByNetworkAdapterStatus(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByMediaMetadata(int InternalIndex1,int InternalIndex2,MediaMetadataType_t MediaMetaDataType) const;
 
 	/* Listview column support. */
-	void				PlaceColumns(void);
+	void				SetAllColumnText(void);
 	void				SetColumnText(UINT ColumnID,int ItemIndex,int ColumnIndex);
+	void				PlaceColumns(void);
 	std::wstring		GetColumnText(UINT ColumnID,int InternalIndex) const;
 	void				InsertColumn(unsigned int ColumnId,int iColumndIndex,int iWidth);
 	void				SetActiveColumnSet(void);
@@ -618,16 +621,19 @@ private:
 	std::wstring		GetSizeColumnText(int InternalIndex) const;
 	std::wstring		GetTimeColumnText(int InternalIndex,TimeType_t TimeType) const;
 	std::wstring		GetAttributeColumnText(int InternalIndex) const;
+	bool				GetRealSizeColumnRawData(int InternalIndex,ULARGE_INTEGER &RealFileSize) const;
 	std::wstring		GetRealSizeColumnText(int InternalIndex) const;
 	std::wstring		GetShortNameColumnText(int InternalIndex) const;
 	std::wstring		GetOwnerColumnText(int InternalIndex) const;
 	std::wstring		GetVersionColumnText(int InternalIndex,VersionInfoType_t VersioninfoType) const;
 	std::wstring		GetShortcutToColumnText(int InternalIndex) const;
+	DWORD				GetHardLinksColumnRawData(int InternalIndex) const;
 	std::wstring		GetHardLinksColumnText(int InternalIndex) const;
 	std::wstring		GetExtensionColumnText(int InternalIndex) const;
 	std::wstring		GetSummaryColumnText(int InternalIndex,DWORD PropertyType) const;
 	std::wstring		GetImageColumnText(int InternalIndex,PROPID PropertyID) const;
 	std::wstring		GetFileSystemColumnText(int InternalIndex) const;
+	BOOL				GetDriveSpaceColumnRawData(int InternalIndex,bool TotalSize,ULARGE_INTEGER &DriveSpace) const;
 	std::wstring		GetDriveSpaceColumnText(int InternalIndex,bool TotalSize) const;
 	std::wstring		GetControlPanelCommentsColumnText(int InternalIndex) const;
 	std::wstring		GetPrinterColumnText(int InternalIndex,PrinterInformationType_t PrinterInformationType) const;
@@ -648,7 +654,6 @@ private:
 	void				OnFileActionRenamedNewName(TCHAR *szFileName);
 	void				RenameItem(int iItemInternal,TCHAR *szNewFileName);
 	int					DetermineItemSortedPosition(LPARAM lParam) const;
-	int					DetermineRelativeItemPositions(LPARAM lParam1,LPARAM lParam2) const;
 
 	/* Filtering support. */
 	BOOL				IsFilenameFiltered(TCHAR *FileName) const;

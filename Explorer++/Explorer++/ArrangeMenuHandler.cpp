@@ -284,6 +284,106 @@ UINT Explorerplusplus::GetArrangeMenuItemStringIndex(UINT uItemId)
 	case IDM_SORTBY_NETWORKADAPTER_STATUS:
 		return IDS_SORTBY_NETWORKADAPTERSTATUS;
 		break;
+
+	case IDM_SORTBY_MEDIA_BITRATE:
+		return IDS_COLUMN_NAME_BITRATE;
+		break;
+
+	case IDM_SORTBY_MEDIA_COPYRIGHT:
+		return IDS_COLUMN_NAME_COPYRIGHT;
+		break;
+
+	case IDM_SORTBY_MEDIA_DURATION:
+		return IDS_COLUMN_NAME_DURATION;
+		break;
+
+	case IDM_SORTBY_MEDIA_PROTECTED:
+		return IDS_COLUMN_NAME_PROTECTED;
+		break;
+
+	case IDM_SORTBY_MEDIA_RATING:
+		return IDS_COLUMN_NAME_RATING;
+		break;
+
+	case IDM_SORTBY_MEDIA_ALBUM_ARTIST:
+		return IDS_COLUMN_NAME_ALBUMARTIST;
+		break;
+
+	case IDM_SORTBY_MEDIA_ALBUM:
+		return IDS_COLUMN_NAME_ALBUM;
+		break;
+
+	case IDM_SORTBY_MEDIA_BEATS_PER_MINUTE:
+		return IDS_COLUMN_NAME_BEATSPERMINUTE;
+		break;
+
+	case IDM_SORTBY_MEDIA_COMPOSER:
+		return IDS_COLUMN_NAME_COMPOSER;
+		break;
+
+	case IDM_SORTBY_MEDIA_CONDUCTOR:
+		return IDS_COLUMN_NAME_CONDUCTOR;
+		break;
+
+	case IDM_SORTBY_MEDIA_DIRECTOR:
+		return IDS_COLUMN_NAME_DIRECTOR;
+		break;
+
+	case IDM_SORTBY_MEDIA_GENRE:
+		return IDS_COLUMN_NAME_GENRE;
+		break;
+
+	case IDM_SORTBY_MEDIA_LANGUAGE:
+		return IDS_COLUMN_NAME_LANGUAGE;
+		break;
+
+	case IDM_SORTBY_MEDIA_BROADCAST_DATE:
+		return IDS_COLUMN_NAME_BROADCASTDATE;
+		break;
+
+	case IDM_SORTBY_MEDIA_CHANNEL:
+		return IDS_COLUMN_NAME_CHANNEL;
+		break;
+
+	case IDM_SORTBY_MEDIA_STATION_NAME:
+		return IDS_COLUMN_NAME_STATIONNAME;
+		break;
+
+	case IDM_SORTBY_MEDIA_MOOD:
+		return IDS_COLUMN_NAME_MOOD;
+		break;
+
+	case IDM_SORTBY_MEDIA_PARENTAL_RATING:
+		return IDS_COLUMN_NAME_PARENTALRATING;
+		break;
+
+	case IDM_SORTBY_MEDIA_PARENTAL_RATNG_REASON:
+		return IDS_COLUMN_NAME_PARENTALRATINGREASON;
+		break;
+
+	case IDM_SORTBY_MEDIA_PERIOD:
+		return IDS_COLUMN_NAME_PERIOD;
+		break;
+
+	case IDM_SORTBY_MEDIA_PRODUCER:
+		return IDS_COLUMN_NAME_PRODUCER;
+		break;
+
+	case IDM_SORTBY_MEDIA_PUBLISHER:
+		return IDS_COLUMN_NAME_PUBLISHER;
+		break;
+
+	case IDM_SORTBY_MEDIA_WRITER:
+		return IDS_COLUMN_NAME_WRITER;
+		break;
+
+	case IDM_SORTBY_MEDIA_YEAR:
+		return IDS_COLUMN_NAME_YEAR;
+		break;
+
+	default:
+		assert(false);
+		break;
 	}
 
 	return 0;
@@ -510,6 +610,106 @@ int Explorerplusplus::DetermineSortModeMenuId(int SortMode)
 		case FSM_NETWORKADAPTER_STATUS:
 			return IDM_SORTBY_NETWORKADAPTER_STATUS;
 			break;
+
+		case FSM_MEDIA_BITRATE:
+			return IDM_SORTBY_MEDIA_BITRATE;
+			break;
+
+		case FSM_MEDIA_COPYRIGHT:
+			return IDM_SORTBY_MEDIA_COPYRIGHT;
+			break;
+
+		case FSM_MEDIA_DURATION:
+			return IDM_SORTBY_MEDIA_DURATION;
+			break;
+
+		case FSM_MEDIA_PROTECTED:
+			return IDM_SORTBY_MEDIA_PROTECTED;
+			break;
+
+		case FSM_MEDIA_RATING:
+			return IDM_SORTBY_MEDIA_RATING;
+			break;
+
+		case FSM_MEDIA_ALBUMARTIST:
+			return IDM_SORTBY_MEDIA_ALBUM_ARTIST;
+			break;
+
+		case FSM_MEDIA_ALBUM:
+			return IDM_SORTBY_MEDIA_ALBUM;
+			break;
+
+		case FSM_MEDIA_BEATSPERMINUTE:
+			return IDM_SORTBY_MEDIA_BEATS_PER_MINUTE;
+			break;
+
+		case FSM_MEDIA_COMPOSER:
+			return IDM_SORTBY_MEDIA_COMPOSER;
+			break;
+
+		case FSM_MEDIA_CONDUCTOR:
+			return IDM_SORTBY_MEDIA_CONDUCTOR;
+			break;
+
+		case FSM_MEDIA_DIRECTOR:
+			return IDM_SORTBY_MEDIA_DIRECTOR;
+			break;
+
+		case FSM_MEDIA_GENRE:
+			return IDM_SORTBY_MEDIA_GENRE;
+			break;
+
+		case FSM_MEDIA_LANGUAGE:
+			return IDM_SORTBY_MEDIA_LANGUAGE;
+			break;
+
+		case FSM_MEDIA_BROADCASTDATE:
+			return IDM_SORTBY_MEDIA_BROADCAST_DATE;
+			break;
+
+		case FSM_MEDIA_CHANNEL:
+			return IDM_SORTBY_MEDIA_CHANNEL;
+			break;
+
+		case FSM_MEDIA_STATIONNAME:
+			return IDM_SORTBY_MEDIA_STATION_NAME;
+			break;
+
+		case FSM_MEDIA_MOOD:
+			return IDM_SORTBY_MEDIA_MOOD;
+			break;
+
+		case FSM_MEDIA_PARENTALRATING:
+			return IDM_SORTBY_MEDIA_PARENTAL_RATING;
+			break;
+
+		case FSM_MEDIA_PARENTALRATINGREASON:
+			return IDM_SORTBY_MEDIA_PARENTAL_RATNG_REASON;
+			break;
+
+		case FSM_MEDIA_PERIOD:
+			return IDM_SORTBY_MEDIA_PERIOD;
+			break;
+
+		case FSM_MEDIA_PRODUCER:
+			return IDM_SORTBY_MEDIA_PRODUCER;
+			break;
+
+		case FSM_MEDIA_PUBLISHER:
+			return IDM_SORTBY_MEDIA_PUBLISHER;
+			break;
+
+		case FSM_MEDIA_WRITER:
+			return IDM_SORTBY_MEDIA_WRITER;
+			break;
+
+		case FSM_MEDIA_YEAR:
+			return IDM_SORTBY_MEDIA_YEAR;
+			break;
+
+		default:
+			assert(false);
+			break;
 	}
 
 	return -1;
@@ -669,6 +869,106 @@ int Explorerplusplus::DetermineGroupModeMenuId(int SortMode)
 
 		case FSM_NETWORKADAPTER_STATUS:
 			return IDM_GROUPBY_NETWORKADAPTER_STATUS;
+			break;
+
+		case FSM_MEDIA_BITRATE:
+			return IDM_GROUPBY_MEDIA_BITRATE;
+			break;
+
+		case FSM_MEDIA_COPYRIGHT:
+			return IDM_GROUPBY_MEDIA_COPYRIGHT;
+			break;
+
+		case FSM_MEDIA_DURATION:
+			return IDM_GROUPBY_MEDIA_DURATION;
+			break;
+
+		case FSM_MEDIA_PROTECTED:
+			return IDM_GROUPBY_MEDIA_PROTECTED;
+			break;
+
+		case FSM_MEDIA_RATING:
+			return IDM_GROUPBY_MEDIA_RATING;
+			break;
+
+		case FSM_MEDIA_ALBUMARTIST:
+			return IDM_GROUPBY_MEDIA_ALBUM_ARTIST;
+			break;
+
+		case FSM_MEDIA_ALBUM:
+			return IDM_GROUPBY_MEDIA_ALBUM;
+			break;
+
+		case FSM_MEDIA_BEATSPERMINUTE:
+			return IDM_GROUPBY_MEDIA_BEATS_PER_MINUTE;
+			break;
+
+		case FSM_MEDIA_COMPOSER:
+			return IDM_GROUPBY_MEDIA_COMPOSER;
+			break;
+
+		case FSM_MEDIA_CONDUCTOR:
+			return IDM_GROUPBY_MEDIA_CONDUCTOR;
+			break;
+
+		case FSM_MEDIA_DIRECTOR:
+			return IDM_GROUPBY_MEDIA_DIRECTOR;
+			break;
+
+		case FSM_MEDIA_GENRE:
+			return IDM_GROUPBY_MEDIA_GENRE;
+			break;
+
+		case FSM_MEDIA_LANGUAGE:
+			return IDM_GROUPBY_MEDIA_LANGUAGE;
+			break;
+
+		case FSM_MEDIA_BROADCASTDATE:
+			return IDM_GROUPBY_MEDIA_BROADCAST_DATE;
+			break;
+
+		case FSM_MEDIA_CHANNEL:
+			return IDM_GROUPBY_MEDIA_CHANNEL;
+			break;
+
+		case FSM_MEDIA_STATIONNAME:
+			return IDM_GROUPBY_MEDIA_STATION_NAME;
+			break;
+
+		case FSM_MEDIA_MOOD:
+			return IDM_GROUPBY_MEDIA_MOOD;
+			break;
+
+		case FSM_MEDIA_PARENTALRATING:
+			return IDM_GROUPBY_MEDIA_PARENTAL_RATING;
+			break;
+
+		case FSM_MEDIA_PARENTALRATINGREASON:
+			return IDM_GROUPBY_MEDIA_PARENTAL_RATING_REASON;
+			break;
+
+		case FSM_MEDIA_PERIOD:
+			return IDM_GROUPBY_MEDIA_PERIOD;
+			break;
+
+		case FSM_MEDIA_PRODUCER:
+			return IDM_GROUPBY_MEDIA_PRODUCER;
+			break;
+
+		case FSM_MEDIA_PUBLISHER:
+			return IDM_GROUPBY_MEDIA_PUBLISHER;
+			break;
+
+		case FSM_MEDIA_WRITER:
+			return IDM_GROUPBY_MEDIA_WRITER;
+			break;
+
+		case FSM_MEDIA_YEAR:
+			return IDM_GROUPBY_MEDIA_YEAR;
+			break;
+
+		default:
+			assert(false);
 			break;
 	}
 
