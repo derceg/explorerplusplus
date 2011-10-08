@@ -51,7 +51,6 @@ HWND g_hwndSearch;
 HWND g_hwndOptions;
 HWND g_hwndManageBookmarks;
 
-HINSTANCE g_hLanguageModule;
 TCHAR g_szLang[32];
 BOOL g_bForceLanguageLoad = FALSE;
 

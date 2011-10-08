@@ -59,7 +59,7 @@ void Explorerplusplus::CreateFolderControls(void)
 	reach the window procedure provided by CMyTreeView. */
 	SetWindowSubclass(m_hTreeView,TreeViewSubclassStub,1,(DWORD_PTR)this);
 
-	LoadString(g_hLanguageModule,IDS_HIDEFOLDERSPANE,szTemp,SIZEOF_ARRAY(szTemp));
+	LoadString(m_hLanguageModule,IDS_HIDEFOLDERSPANE,szTemp,SIZEOF_ARRAY(szTemp));
 	m_hFoldersToolbar = CreateTabToolbar(m_hHolder,FOLDERS_TOOLBAR_CLOSE,szTemp);
 }
 
@@ -732,7 +732,7 @@ void Explorerplusplus::OnTreeViewSetFileAttributes(void)
 
 			sfaiList.push_back(sfai);
 
-			CSetFileAttributesDialog SetFileAttributesDialog(g_hLanguageModule,
+			CSetFileAttributesDialog SetFileAttributesDialog(m_hLanguageModule,
 				IDD_SETFILEATTRIBUTES,m_hContainer,sfaiList);
 
 			SetFileAttributesDialog.ShowModalDialog();

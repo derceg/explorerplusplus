@@ -84,7 +84,7 @@ void Explorerplusplus::OnShowOptions(void)
 	/* General options page. */
 	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
 	psp[nSheet].dwFlags		= PSP_DEFAULT;
-	psp[nSheet].hInstance	= g_hLanguageModule;
+	psp[nSheet].hInstance	= m_hLanguageModule;
 	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_GENERAL);
 	psp[nSheet].lParam		= (LPARAM)this;
 	psp[nSheet].pfnDlgProc	= GeneralSettingsProcStub;
@@ -95,7 +95,7 @@ void Explorerplusplus::OnShowOptions(void)
 	/* Files and Folders options page. */
 	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
 	psp[nSheet].dwFlags		= PSP_DEFAULT;
-	psp[nSheet].hInstance	= g_hLanguageModule;
+	psp[nSheet].hInstance	= m_hLanguageModule;
 	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_FILESFOLDERS);
 	psp[nSheet].lParam		= (LPARAM)this;
 	psp[nSheet].pfnDlgProc	= FilesFoldersProcStub;
@@ -106,7 +106,7 @@ void Explorerplusplus::OnShowOptions(void)
 	/* Window options page. */
 	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
 	psp[nSheet].dwFlags		= PSP_DEFAULT;
-	psp[nSheet].hInstance	= g_hLanguageModule;
+	psp[nSheet].hInstance	= m_hLanguageModule;
 	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_WINDOW);
 	psp[nSheet].lParam		= (LPARAM)this;
 	psp[nSheet].pfnDlgProc	= WindowProcStub;
@@ -117,7 +117,7 @@ void Explorerplusplus::OnShowOptions(void)
 	/* Tab settings options page. */
 	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
 	psp[nSheet].dwFlags		= PSP_DEFAULT;
-	psp[nSheet].hInstance	= g_hLanguageModule;
+	psp[nSheet].hInstance	= m_hLanguageModule;
 	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_TABS);
 	psp[nSheet].lParam		= (LPARAM)this;
 	psp[nSheet].pfnDlgProc	= TabSettingsProcStub;
@@ -128,7 +128,7 @@ void Explorerplusplus::OnShowOptions(void)
 	/* Default settings options page. */
 	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
 	psp[nSheet].dwFlags		= PSP_DEFAULT;
-	psp[nSheet].hInstance	= g_hLanguageModule;
+	psp[nSheet].hInstance	= m_hLanguageModule;
 	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_DEFAULT);
 	psp[nSheet].lParam		= (LPARAM)this;
 	psp[nSheet].pfnDlgProc	= DefaultSettingsProcStub;
@@ -137,7 +137,7 @@ void Explorerplusplus::OnShowOptions(void)
 	nSheet++;
 
 	/* Load the main dialog title. */
-	LoadString(g_hLanguageModule,IDS_OPTIONSDIALOG_TITLE,
+	LoadString(m_hLanguageModule,IDS_OPTIONSDIALOG_TITLE,
 		szTitle,SIZEOF_ARRAY(szTitle));
 
 	psh.dwSize		= sizeof(PROPSHEETHEADER);
@@ -373,7 +373,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 								break;
 							}
 
-							LoadString(g_hLanguageModule,IDS_ERR_FILEMANAGERSETTING,
+							LoadString(m_hLanguageModule,IDS_ERR_FILEMANAGERSETTING,
 								szErrorMsg,SIZEOF_ARRAY(szErrorMsg));
 
 							if(bSuccess)
@@ -1167,7 +1167,7 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 			case IDC_BUTTON_DEFAULTCOLUMNS:
 				{
-					CSetDefaultColumnsDialog SetDefaultColumnsDialog(g_hLanguageModule,IDD_SETDEFAULTCOLUMNS,hDlg,this,&m_RealFolderColumnList,
+					CSetDefaultColumnsDialog SetDefaultColumnsDialog(m_hLanguageModule,IDD_SETDEFAULTCOLUMNS,hDlg,this,&m_RealFolderColumnList,
 						&m_MyComputerColumnList,&m_ControlPanelColumnList,&m_RecycleBinColumnList,&m_PrintersColumnList,&m_NetworkConnectionsColumnList,
 						&m_MyNetworkPlacesColumnList);
 					SetDefaultColumnsDialog.ShowModalDialog();
@@ -1237,7 +1237,7 @@ void Explorerplusplus::OnDefaultSettingsNewTabDir(HWND hDlg)
 	HRESULT hr;
 
 	/* Load the dialog helper message. */
-	LoadString(g_hLanguageModule,IDS_DEFAULTSETTINGS_NEWTAB,
+	LoadString(m_hLanguageModule,IDS_DEFAULTSETTINGS_NEWTAB,
 		szHelper,SIZEOF_ARRAY(szHelper));
 
 	GetDlgItemText(hDlg,IDC_DEFAULT_NEWTABDIR_EDIT,szNewTabDir,

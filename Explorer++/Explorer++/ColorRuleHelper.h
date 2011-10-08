@@ -14,7 +14,7 @@ namespace NColorRuleHelper
 		COLORREF		rgbColour;
 	};
 
-	std::vector<ColorRule_t> GetDefaultColorRules();
+	std::vector<ColorRule_t> GetDefaultColorRules(HMODULE hLanguageModule);
 }
 
 #endif

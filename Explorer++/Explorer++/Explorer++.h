@@ -48,6 +48,8 @@ class Explorerplusplus : public IExplorerplusplus, public IFileContextMenuExtern
 {
 	friend LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
+	friend void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
+
 public:
 
 	Explorerplusplus(HWND);
@@ -77,8 +79,6 @@ public:
 	INT_PTR CALLBACK	ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	LRESULT CALLBACK	MainWndTaskbarThumbnailProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
-
-	void				FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
 
 	/* Directory modification. */
 	static void			DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,void *pData);
@@ -181,6 +181,63 @@ private:
 		int		iIndex;
 		int		iFolderIndex;
 		void	*pData;
+	};
+
+	struct DWFolderSizeCompletion_t
+	{
+		ULARGE_INTEGER	liFolderSize;
+		int				uId;
+		int				iTabId;
+	};
+
+	struct DWFolderSize_t
+	{
+		int	uId;
+		int	iTabId;
+		BOOL bValid;
+	};
+
+	struct FolderSizeExtraInfo_t
+	{
+		void	*pContainer;
+		int		uId;
+	};
+
+	/* This structure is stored with
+	every listview. */
+	struct ListViewInfo_t
+	{
+		int iObjectIndex;
+	};
+
+	/* Save/load interface. This allows multiple
+	methods of saving/loading data, as long as it
+	conforms to this specification. */
+	class ILoadSave
+	{
+	public:
+
+		virtual ~ILoadSave(){};
+
+		/* Loading functions. */
+		virtual void	LoadGenericSettings() = 0;
+		virtual void	LoadBookmarks() = 0;
+		virtual int		LoadPreviousTabs() = 0;
+		virtual void	LoadDefaultColumns() = 0;
+		virtual void	LoadApplicationToolbar() = 0;
+		virtual void	LoadToolbarInformation() = 0;
+		virtual void	LoadColorRules() = 0;
+		virtual void	LoadState() = 0;
+
+		/* Saving functions. */
+		virtual void	SaveGenericSettings() = 0;
+		virtual void	SaveBookmarks() = 0;
+		virtual void	SaveTabs() = 0;
+		virtual void	SaveDefaultColumns() = 0;
+		virtual void	SaveApplicationToolbar() = 0;
+		virtual void	SaveToolbarInformation() = 0;
+		virtual void	SaveColorRules() = 0;
+		virtual void	SaveState() = 0;
 	};
 
 	class CLoadSaveRegistry : public ILoadSave
@@ -767,6 +824,7 @@ private:
 	CStatusBar				*GetStatusBar();
 	UINT					GetDefaultSortMode(const LPITEMIDLIST &pidlDirectory);
 	unsigned int			DetermineColumnSortMode(UINT uColumnId);
+	void					FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
 
 
 
@@ -799,6 +857,8 @@ private:
 	HANDLE					m_hIconThread;
 	HANDLE					m_hTreeViewIconThread;
 	HANDLE					m_hFolderSizeThread;
+
+	HMODULE					m_hLanguageModule;
 
 	/** Internal state. **/
 	HWND					m_hActiveListView;

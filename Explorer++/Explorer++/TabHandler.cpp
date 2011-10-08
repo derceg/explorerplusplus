@@ -68,7 +68,7 @@ void Explorerplusplus::InitializeTabs(void)
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
 	TCHAR szTabCloseTip[64];
-	LoadString(g_hLanguageModule,IDS_TAB_CLOSE_TIP,szTabCloseTip,SIZEOF_ARRAY(szTabCloseTip));
+	LoadString(m_hLanguageModule,IDS_TAB_CLOSE_TIP,szTabCloseTip,SIZEOF_ARRAY(szTabCloseTip));
 	m_hTabWindowToolbar	= CreateTabToolbar(m_hTabBacking,TABTOOLBAR_CLOSE,szTabCloseTip);
 }
 
@@ -405,7 +405,7 @@ int *pTabObjectIndex)
 	SetWindowSubclass(m_hListView[iTabId],ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
 	m_pShellBrowser[iTabId]->SetId(iTabId);
-	m_pShellBrowser[iTabId]->SetResourceModule(g_hLanguageModule);
+	m_pShellBrowser[iTabId]->SetResourceModule(m_hLanguageModule);
 	m_pShellBrowser[iTabId]->SetHideSystemFiles(m_bHideSystemFilesGlobal);
 	m_pShellBrowser[iTabId]->SetShowExtensions(m_bShowExtensionsGlobal);
 	m_pShellBrowser[iTabId]->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
@@ -1080,8 +1080,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_RENAMETAB:
 			{
-				CRenameTabDialog RenameTabDialog(g_hLanguageModule,IDD_RENAMETAB,m_hContainer,iTabHit,this);
-
+				CRenameTabDialog RenameTabDialog(m_hLanguageModule,IDD_RENAMETAB,m_hContainer,iTabHit,this);
 				RenameTabDialog.ShowModalDialog();
 			}
 			break;

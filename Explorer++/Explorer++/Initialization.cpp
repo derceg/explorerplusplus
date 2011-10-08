@@ -31,16 +31,16 @@ void Explorerplusplus::InitializeBookmarks(void)
 {
 	TCHAR szTemp[64];
 
-	LoadString(g_hLanguageModule,IDS_BOOKMARKS_ALLBOOKMARKS,szTemp,SIZEOF_ARRAY(szTemp));
+	LoadString(m_hLanguageModule,IDS_BOOKMARKS_ALLBOOKMARKS,szTemp,SIZEOF_ARRAY(szTemp));
 	m_bfAllBookmarks = CBookmarkFolder::CreateNew(szTemp);
 
 	/* Set up the 'Bookmarks Toolbar' and 'Bookmarks Menu' folders. */
-	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSTOOLBAR,szTemp,SIZEOF_ARRAY(szTemp));
+	LoadString(m_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSTOOLBAR,szTemp,SIZEOF_ARRAY(szTemp));
 	CBookmarkFolder bfBookmarksToolbar = CBookmarkFolder::Create(szTemp);
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksToolbar);
 	m_guidBookmarksToolbar = bfBookmarksToolbar.GetGUID();
 
-	LoadString(g_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSMENU,szTemp,SIZEOF_ARRAY(szTemp));
+	LoadString(m_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSMENU,szTemp,SIZEOF_ARRAY(szTemp));
 	CBookmarkFolder bfBookmarksMenu = CBookmarkFolder::Create(szTemp);
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu);
 	m_guidBookmarksMenu = bfBookmarksMenu.GetGUID();
@@ -84,7 +84,7 @@ void Explorerplusplus::InitializeMenus(void)
 
 	for(itr = m_ViewModes.begin();itr != m_ViewModes.end();itr++)
 	{
-		LoadString(g_hLanguageModule,GetViewModeMenuStringId(itr->uViewMode),
+		LoadString(m_hLanguageModule,GetViewModeMenuStringId(itr->uViewMode),
 			szText,SIZEOF_ARRAY(szText));
 
 		mii.cbSize		= sizeof(mii);

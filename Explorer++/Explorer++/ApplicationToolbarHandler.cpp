@@ -66,7 +66,7 @@ void Explorerplusplus::InitializeApplicationToolbar(void)
 
 void Explorerplusplus::ApplicationToolbarNewButton(void)
 {
-	DialogBoxParam(g_hLanguageModule,
+	DialogBoxParam(m_hLanguageModule,
 		MAKEINTRESOURCE(IDD_EDITAPPLICATIONBUTTON),
 		m_hContainer,ApplicationToolbarNewButtonProcStub,(LPARAM)this);
 }
@@ -169,7 +169,7 @@ void Explorerplusplus::ApplicationToolbarShowItemProperties(int iItem)
 			/* Record which item was selected. */
 			m_pAppButtonSelected = pab;
 
-			DialogBoxParam(g_hLanguageModule,
+			DialogBoxParam(m_hLanguageModule,
 				MAKEINTRESOURCE(IDD_EDITAPPLICATIONBUTTON),
 				m_hContainer,ApplicationButtonPropertiesProcStub,(LPARAM)this);
 		}
@@ -192,7 +192,7 @@ void Explorerplusplus::ApplicationToolbarDeleteItem(int iItem)
 			TCHAR szInfoMsg[128];
 			int	iMessageBoxReturn;
 
-			LoadString(g_hLanguageModule,IDS_APPLICATIONBUTTON_DELETE,
+			LoadString(m_hLanguageModule,IDS_APPLICATIONBUTTON_DELETE,
 				szInfoMsg,SIZEOF_ARRAY(szInfoMsg));
 
 			iMessageBoxReturn = MessageBox(m_hContainer,szInfoMsg,
@@ -522,7 +522,7 @@ void Explorerplusplus::OnApplicationToolbarNewButtonInit(HWND hDlg)
 
 	CheckDlgButton(hDlg,IDC_CHECK_SHOWAPPNAME,BST_CHECKED);
 
-	LoadString(g_hLanguageModule,IDS_GENERAL_NEWAPPLICATIONBUTTON,
+	LoadString(m_hLanguageModule,IDS_GENERAL_NEWAPPLICATIONBUTTON,
 		szTemp,SIZEOF_ARRAY(szTemp));
 
 	SetWindowText(hDlg,szTemp);
@@ -605,7 +605,7 @@ void Explorerplusplus::OnApplicationToolbarRClick(void)
 	MENUITEMINFO mii;
 
 	TCHAR szTemp[64];
-	LoadString(g_hLanguageModule,IDS_APPLICATIONBUTTON_NEW,
+	LoadString(m_hLanguageModule,IDS_APPLICATIONBUTTON_NEW,
 		szTemp,SIZEOF_ARRAY(szTemp));
 
 	mii.cbSize		= sizeof(mii);

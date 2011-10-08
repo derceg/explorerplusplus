@@ -73,7 +73,7 @@ void Explorerplusplus::CreateMainControls(void)
 
 		case ID_ADDRESSTOOLBAR:
 			CreateAddressBar();
-			LoadString(g_hLanguageModule,IDS_ADDRESSBAR,szBandText,SIZEOF_ARRAY(szBandText));
+			LoadString(m_hLanguageModule,IDS_ADDRESSBAR,szBandText,SIZEOF_ARRAY(szBandText));
 			GetWindowRect(m_hAddressBar,&rc);
 			m_ToolbarInformation[i].cyMinChild = GetRectHeight(&rc);
 			m_ToolbarInformation[i].lpText = szBandText;

@@ -112,16 +112,16 @@ void Explorerplusplus::OnWindowCreate(void)
 	/* These need to occur after the language module
 	has been initialized, but before the tabs are
 	restored. */
-	SetMenu(m_hContainer,LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_MAINMENU)));
-	m_hArrangeSubMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_ARRANGEMENU)),0);
-	m_hArrangeSubMenuRClick			= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_ARRANGEMENU)),0);
-	m_hGroupBySubMenu				= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_GROUPBY_MENU)),0);
-	m_hGroupBySubMenuRClick			= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_GROUPBY_MENU)),0);
-	m_hTabRightClickMenu			= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_TAB_RCLICK)),0);
-	m_hToolbarRightClickMenu		= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_TOOLBAR_MENU)),0);
-	m_hApplicationRightClickMenu	= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)),0);
-	m_hDisplayWindowRightClickMenu	= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)),0);
-	m_hViewsMenu					= GetSubMenu(LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_VIEWS_MENU)),0);
+	SetMenu(m_hContainer,LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_MAINMENU)));
+	m_hArrangeSubMenu				= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_ARRANGEMENU)),0);
+	m_hArrangeSubMenuRClick			= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_ARRANGEMENU)),0);
+	m_hGroupBySubMenu				= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_GROUPBY_MENU)),0);
+	m_hGroupBySubMenuRClick			= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_GROUPBY_MENU)),0);
+	m_hTabRightClickMenu			= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_TAB_RCLICK)),0);
+	m_hToolbarRightClickMenu		= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_TOOLBAR_MENU)),0);
+	m_hApplicationRightClickMenu	= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)),0);
+	m_hDisplayWindowRightClickMenu	= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)),0);
+	m_hViewsMenu					= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_VIEWS_MENU)),0);
 
 	HBITMAP hb;
 
@@ -321,7 +321,7 @@ void Explorerplusplus::SetLanguageModule(void)
 
 	if(m_Language == LANG_ENGLISH)
 	{
-		g_hLanguageModule = GetModuleHandle(NULL);
+		m_hLanguageModule = GetModuleHandle(NULL);
 	}
 	else
 	{
@@ -353,7 +353,7 @@ void Explorerplusplus::SetLanguageModule(void)
 				if it matches the current internal version. */
 				if(VerifyLanguageVersion(szFullFileName))
 				{
-					g_hLanguageModule = LoadLibrary(szFullFileName);
+					m_hLanguageModule = LoadLibrary(szFullFileName);
 				}
 				else
 				{
@@ -372,7 +372,7 @@ void Explorerplusplus::SetLanguageModule(void)
 					{
 						if(VerifyLanguageVersion(szFullFileName))
 						{
-							g_hLanguageModule = LoadLibrary(szFullFileName);
+							m_hLanguageModule = LoadLibrary(szFullFileName);
 						}
 						else
 						{
@@ -479,9 +479,9 @@ void Explorerplusplus::SetLanguageModule(void)
 
 	/* The language DLL was not found/could not be loaded.
 	Use the default internal resource set. */
-	if(g_hLanguageModule == NULL)
+	if(m_hLanguageModule == NULL)
 	{
-		g_hLanguageModule = GetModuleHandle(NULL);
+		m_hLanguageModule = GetModuleHandle(NULL);
 
 		m_Language = LANG_ENGLISH;
 	}
@@ -938,7 +938,7 @@ void Explorerplusplus::OnSaveFileSlack(void)
 
 void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
 {
-	CWildcardSelectDialog WilcardSelectDialog(g_hLanguageModule,
+	CWildcardSelectDialog WilcardSelectDialog(m_hLanguageModule,
 		IDD_WILDCARDSELECT,m_hContainer,bSelect,this);
 
 	WilcardSelectDialog.ShowModalDialog();
@@ -2052,7 +2052,7 @@ void Explorerplusplus::OnCreateNewFolder(void)
 	{
 		TCHAR	szTemp[512];
 
-		LoadString(g_hLanguageModule,IDS_NEWFOLDERERROR,szTemp,
+		LoadString(m_hLanguageModule,IDS_NEWFOLDERERROR,szTemp,
 		SIZEOF_ARRAY(szTemp));
 
 		MessageBox(m_hContainer,szTemp,NExplorerplusplus::WINDOW_NAME,
@@ -2154,7 +2154,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard(void)
 		if(Column.bChecked)
 		{
 			TCHAR szText[64];
-			LoadString(g_hLanguageModule,LookupColumnNameStringIndex(Column.id),szText,SIZEOF_ARRAY(szText));
+			LoadString(m_hLanguageModule,LookupColumnNameStringIndex(Column.id),szText,SIZEOF_ARRAY(szText));
 
 			strColumnInfo += std::wstring(szText) + _T("\t");
 

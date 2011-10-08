@@ -376,121 +376,121 @@ void Explorerplusplus::AddStringsToMainToolbar(void)
 {
 	TCHAR szText[64];
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_BACK),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_BACK),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_FORWARD),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_FORWARD),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_UP),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_UP),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_FOLDERS),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_FOLDERS),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_COPYTO),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_COPYTO),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_MOVETO),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_MOVETO),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_NEWFOLDER),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_NEWFOLDER),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_COPY),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_COPY),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_CUT),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_CUT),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_PASTE),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_PASTE),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_DELETE),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_DELETE),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_VIEWS),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_VIEWS),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_SEARCH),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_SEARCH),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_PROPERTIES),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_PROPERTIES),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_REFRESH),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_REFRESH),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_ADDBOOKMARK),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_ADDBOOKMARK),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_NEWTAB),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_NEWTAB),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_OPENCOMMANDPROMPT),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_OPENCOMMANDPROMPT),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_ORGANIZEBOOKMARKS),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_ORGANIZEBOOKMARKS),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(g_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_DELETEPERMANENTLY),
+	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_DELETEPERMANENTLY),
 		szText,SIZEOF_ARRAY(szText));
 	/* Double NULL terminated. */
 	szText[lstrlen(szText) + 1] = '\0';

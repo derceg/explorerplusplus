@@ -140,7 +140,7 @@ void Explorerplusplus::SetupJumplistTasks()
 	GetCurrentProcessImageName(szCurrentProcess,SIZEOF_ARRAY(szCurrentProcess));
 
 	TCHAR szName[256];
-	LoadString(g_hLanguageModule,IDS_TASKS_NEWTAB,szName,SIZEOF_ARRAY(szName));
+	LoadString(m_hLanguageModule,IDS_TASKS_NEWTAB,szName,SIZEOF_ARRAY(szName));
 
 	/* New tab task. */
 	JumpListTaskInformation jlti;

@@ -60,7 +60,7 @@ m_hContainer(hwnd)
 
 	m_bBlockNext = FALSE;
 
-	m_ColorRules = NColorRuleHelper::GetDefaultColorRules();
+	m_ColorRules = NColorRuleHelper::GetDefaultColorRules(m_hLanguageModule);
 
 	SetDefaultValues();
 	SetAllDefaultColumns();

@@ -28,8 +28,6 @@
 #include "../Helper/Macros.h"
 
 
-void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
-
 void Explorerplusplus::ValidateLoadedSettings(void)
 {
 	if(m_TreeViewWidth <= 0)
@@ -295,7 +293,7 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam,LPARAM lParam)
 		m_pStatusBar->HandleStatusBarMenuOpen();
 
 		TCHAR szBuffer[512];
-		LoadString(g_hLanguageModule,LOWORD(wParam),
+		LoadString(m_hLanguageModule,LOWORD(wParam),
 			szBuffer,SIZEOF_ARRAY(szBuffer));
 		SetWindowText(m_hStatusBar,szBuffer);
 	}
@@ -322,7 +320,7 @@ void Explorerplusplus::CopyToFolder(BOOL bMove)
 	}
 
 	TCHAR szTemp[128];
-	LoadString(g_hLanguageModule,IDS_GENERAL_COPY_TO_FOLDER_TITLE,szTemp,SIZEOF_ARRAY(szTemp));
+	LoadString(m_hLanguageModule,IDS_GENERAL_COPY_TO_FOLDER_TITLE,szTemp,SIZEOF_ARRAY(szTemp));
 	NFileOperations::CopyFilesToFolder(m_hContainer,szTemp,FullFilenameList,bMove);
 }
 
@@ -680,7 +678,7 @@ HRESULT Explorerplusplus::HandleStatusText(void)
 
 		if((nFilesSelected + nFoldersSelected) == 1)
 		{
-			LoadString(g_hLanguageModule,IDS_GENERAL_SELECTED_ONEITEM,szTemp,
+			LoadString(m_hLanguageModule,IDS_GENERAL_SELECTED_ONEITEM,szTemp,
 				SIZEOF_ARRAY(szTemp));
 
 			/* One item selected. Form:
@@ -690,7 +688,7 @@ HRESULT Explorerplusplus::HandleStatusText(void)
 		}
 		else
 		{
-			LoadString(g_hLanguageModule,IDS_GENERAL_SELECTED_MOREITEMS,szTemp,
+			LoadString(m_hLanguageModule,IDS_GENERAL_SELECTED_MOREITEMS,szTemp,
 				SIZEOF_ARRAY(szTemp));
 
 			/* More than one item selected. Form:
@@ -705,7 +703,7 @@ HRESULT Explorerplusplus::HandleStatusText(void)
 
 		if(nTotal == 1)
 		{
-			LoadString(g_hLanguageModule,IDS_GENERAL_ONEITEM,szTemp,
+			LoadString(m_hLanguageModule,IDS_GENERAL_ONEITEM,szTemp,
 				SIZEOF_ARRAY(szTemp));
 
 			/* Text: '1 item' */
@@ -714,7 +712,7 @@ HRESULT Explorerplusplus::HandleStatusText(void)
 		}
 		else
 		{
-			LoadString(g_hLanguageModule,IDS_GENERAL_MOREITEMS,szTemp,
+			LoadString(m_hLanguageModule,IDS_GENERAL_MOREITEMS,szTemp,
 				SIZEOF_ARRAY(szTemp));
 
 			/* Text: 'n Items' */
@@ -727,7 +725,7 @@ HRESULT Explorerplusplus::HandleStatusText(void)
 
 	if(m_pActiveShellBrowser->InVirtualFolder())
 	{
-		LoadString(g_hLanguageModule,IDS_GENERAL_VIRTUALFOLDER,lpszSizeBuffer,
+		LoadString(m_hLanguageModule,IDS_GENERAL_VIRTUALFOLDER,lpszSizeBuffer,
 			SIZEOF_ARRAY(lpszSizeBuffer));
 	}
 	else
@@ -969,9 +967,9 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 
 						StringCchCopy(pfs->szPath,MAX_PATH,szFullItemName);
 
-						LoadString(g_hLanguageModule,IDS_GENERAL_TOTALSIZE,
+						LoadString(m_hLanguageModule,IDS_GENERAL_TOTALSIZE,
 							szTotalSize,SIZEOF_ARRAY(szTotalSize));
-						LoadString(g_hLanguageModule,IDS_GENERAL_CALCULATING,
+						LoadString(m_hLanguageModule,IDS_GENERAL_CALCULATING,
 							szCalculating,SIZEOF_ARRAY(szCalculating));
 						StringCchPrintf(szDisplayText,SIZEOF_ARRAY(szDisplayText),
 							_T("%s: %s"),szTotalSize,szCalculating);
@@ -1006,7 +1004,7 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 				szFileDate,SIZEOF_ARRAY(szFileDate),
 				m_bShowFriendlyDatesGlobal);
 
-			LoadString(g_hLanguageModule,IDS_GENERAL_DATEMODIFIED,szDateModified,
+			LoadString(m_hLanguageModule,IDS_GENERAL_DATEMODIFIED,szDateModified,
 				SIZEOF_ARRAY(szDateModified));
 
 			StringCchPrintf(szDisplayDate,
@@ -1029,12 +1027,12 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 				if(pimg->GetLastStatus() == Gdiplus::Ok)
 				{
 					uWidth = pimg->GetWidth();
-					LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_IMAGEWIDTH,szTemp,SIZEOF_ARRAY(szTemp));
+					LoadString(m_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_IMAGEWIDTH,szTemp,SIZEOF_ARRAY(szTemp));
 					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),szTemp,uWidth);
 					DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
 
 					uHeight = pimg->GetHeight();
-					LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_IMAGEHEIGHT,szTemp,SIZEOF_ARRAY(szTemp));
+					LoadString(m_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_IMAGEHEIGHT,szTemp,SIZEOF_ARRAY(szTemp));
 					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),szTemp,uHeight);
 					DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
 
@@ -1090,12 +1088,12 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 
 					if(uBitDepth == -1)
 					{
-						LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_BITDEPTHUNKNOWN,szTemp,SIZEOF_ARRAY(szTemp));
+						LoadString(m_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_BITDEPTHUNKNOWN,szTemp,SIZEOF_ARRAY(szTemp));
 						StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),szTemp);
 					}
 					else
 					{
-						LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_BITDEPTH,szTemp,SIZEOF_ARRAY(szTemp));
+						LoadString(m_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_BITDEPTH,szTemp,SIZEOF_ARRAY(szTemp));
 						StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),szTemp,uBitDepth);
 					}
 
@@ -1104,12 +1102,12 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 					Gdiplus::REAL res;
 
 					res = pimg->GetHorizontalResolution();
-					LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_HORIZONTALRESOLUTION,szTemp,SIZEOF_ARRAY(szTemp));
+					LoadString(m_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_HORIZONTALRESOLUTION,szTemp,SIZEOF_ARRAY(szTemp));
 					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),szTemp,res);
 					DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
 
 					res = pimg->GetVerticalResolution();
-					LoadString(g_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_VERTICALRESOLUTION,szTemp,SIZEOF_ARRAY(szTemp));
+					LoadString(m_hLanguageModule,IDS_GENERAL_DISPLAYWINDOW_VERTICALRESOLUTION,szTemp,SIZEOF_ARRAY(szTemp));
 					StringCchPrintf(szOutput,SIZEOF_ARRAY(szOutput),szTemp,res);
 					DisplayWindow_BufferText(m_hDisplayWindow,szOutput);
 				}
@@ -1185,7 +1183,7 @@ void Explorerplusplus::HandleFileSelectionDisplayMore(void)
 
 	nSelected = m_pActiveShellBrowser->QueryNumSelected();
 
-	LoadString(g_hLanguageModule,IDS_GENERAL_SELECTED_MOREITEMS,
+	LoadString(m_hLanguageModule,IDS_GENERAL_SELECTED_MOREITEMS,
 		szMore,SIZEOF_ARRAY(szMore));
 
 	StringCchPrintf(szNumSelected,SIZEOF_ARRAY(szNumSelected),
@@ -1200,7 +1198,7 @@ void Explorerplusplus::HandleFileSelectionDisplayMore(void)
 		FormatSizeString(FolderInfo.TotalSelectionSize,szTotalSizeFragment,
 			SIZEOF_ARRAY(szTotalSizeFragment),m_bForceSize,m_SizeDisplayFormat);
 
-		LoadString(g_hLanguageModule,IDS_GENERAL_TOTALFILESIZE,
+		LoadString(m_hLanguageModule,IDS_GENERAL_TOTALFILESIZE,
 		szTotalSizeString,SIZEOF_ARRAY(szTotalSizeString));
 
 		StringCchPrintf(szTotalSize,SIZEOF_ARRAY(szTotalSize),
@@ -1212,12 +1210,8 @@ void Explorerplusplus::HandleFileSelectionDisplayMore(void)
 
 void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData)
 {
-	FolderSizeExtraInfo_t *pfsei = NULL;
-
-	pfsei = (FolderSizeExtraInfo_t *)pData;
-
-	((Explorerplusplus *)pfsei->pContainer)->FolderSizeCallback(pfsei,nFolders,nFiles,lTotalFolderSize);
-
+	Explorerplusplus::FolderSizeExtraInfo_t *pfsei = reinterpret_cast<Explorerplusplus::FolderSizeExtraInfo_t *>(pData);
+	reinterpret_cast<Explorerplusplus *>(pfsei->pContainer)->FolderSizeCallback(pfsei,nFolders,nFiles,lTotalFolderSize);
 	free(pfsei);
 }
 
@@ -1273,7 +1267,7 @@ int Explorerplusplus::CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,i
 	FormatSizeString(TotalNumberOfFreeBytes,szFreeSpace,
 		SIZEOF_ARRAY(szFreeSpace));
 
-	LoadString(g_hLanguageModule,IDS_GENERAL_FREE,szFree,SIZEOF_ARRAY(szFree));
+	LoadString(m_hLanguageModule,IDS_GENERAL_FREE,szFree,SIZEOF_ARRAY(szFree));
 
 	StringCchPrintf(szFreeSpaceString,SIZEOF_ARRAY(szFreeSpace),
 	_T("%s %s (%.0f%%)"),szFreeSpace,szFree,TotalNumberOfFreeBytes.QuadPart * 100.0 / TotalNumberOfBytes.QuadPart);
@@ -1761,7 +1755,7 @@ int Explorerplusplus::LookupColumnDescriptionStringIndex(int iColumnId)
 
 void Explorerplusplus::OnSelectColumns()
 {
-	CSelectColumnsDialog SelectColumnsDialog(g_hLanguageModule,IDD_SELECTCOLUMNS,m_hContainer,this);
+	CSelectColumnsDialog SelectColumnsDialog(m_hLanguageModule,IDD_SELECTCOLUMNS,m_hContainer,this);
 	SelectColumnsDialog.ShowModalDialog();
 
 	UpdateArrangeMenuItems();

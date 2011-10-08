@@ -74,19 +74,10 @@ __interface IExplorerplusplus
 	HRESULT			BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 };
 
-extern HINSTANCE g_hLanguageModule;
-
 /* Used when setting Explorer++ as the default
 file manager. */
 #define SHELL_DEFAULT_INTERNAL_COMMAND_NAME _T("openinexplorer++")
 #define SHELL_DEFAULT_MENU_TEXT _T("Open In Explorer++")
-
-/* This is only defined for Windows Vista and later.
-If building for XP as well, this definition will
-need to be included here. */
-#ifndef SHIL_JUMBO
-	#define SHIL_JUMBO	0x4
-#endif
 
 #define WM_APP_TABMCLICK		(WM_APP + 53)
 #define WM_APP_ASSOCCHANGED		(WM_APP + 54)
@@ -238,13 +229,6 @@ bitmap). */
 #define SHELLIMAGES_DELETEPERMANENTLY	31
 #define SHELLIMAGES_CMDADMIN			32
 
-/* This structure is stored with
-every listview. */
-struct ListViewInfo_t
-{
-	int		iObjectIndex;
-};
-
 struct ApplicationButton_t
 {
 	/* External. */
@@ -256,26 +240,6 @@ struct ApplicationButton_t
 	ApplicationButton_t *pNext;
 	ApplicationButton_t	*pPrevious;
 	int		iImage;
-};
-
-struct FolderSizeExtraInfo_t
-{
-	void	*pContainer;
-	int		uId;
-};
-
-struct DWFolderSize_t
-{
-	int	uId;
-	int	iTabId;
-	BOOL bValid;
-};
-
-struct DWFolderSizeCompletion_t
-{
-	ULARGE_INTEGER	liFolderSize;
-	int				uId;
-	int				iTabId;
 };
 
 /* Used to store settings for individual directories. */
@@ -418,36 +382,6 @@ extern TCHAR g_szLang[32];
 extern HWND g_hwndSearch;
 extern HWND g_hwndOptions;
 extern HWND g_hwndManageBookmarks;
-
-/* Save/load interface. This allows multiple
-methods of saving/loading data, as long as it
-conforms to this specification. */
-class ILoadSave
-{
-public:
-
-	virtual ~ILoadSave(){};
-
-	/* Loading functions. */
-	virtual void	LoadGenericSettings() = 0;
-	virtual void	LoadBookmarks() = 0;
-	virtual int		LoadPreviousTabs() = 0;
-	virtual void	LoadDefaultColumns() = 0;
-	virtual void	LoadApplicationToolbar() = 0;
-	virtual void	LoadToolbarInformation() = 0;
-	virtual void	LoadColorRules() = 0;
-	virtual void	LoadState() = 0;
-
-	/* Saving functions. */
-	virtual void	SaveGenericSettings() = 0;
-	virtual void	SaveBookmarks() = 0;
-	virtual void	SaveTabs() = 0;
-	virtual void	SaveDefaultColumns() = 0;
-	virtual void	SaveApplicationToolbar() = 0;
-	virtual void	SaveToolbarInformation() = 0;
-	virtual void	SaveColorRules() = 0;
-	virtual void	SaveState() = 0;
-};
 
 BOOL TestConfigFileInternal(void);
 BOOL LoadWindowPosition(WINDOWPLACEMENT *pwndpl);

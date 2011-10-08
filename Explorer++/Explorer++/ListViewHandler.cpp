@@ -720,9 +720,9 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		StrChr(pItem->pszText,'>') != NULL ||
 		StrChr(pItem->pszText,'|') != NULL)
 	{
-		LoadString(g_hLanguageModule,IDS_ERR_FILENAMEINVALID,
+		LoadString(m_hLanguageModule,IDS_ERR_FILENAMEINVALID,
 			szError,SIZEOF_ARRAY(szError));
-		LoadString(g_hLanguageModule,IDS_ERR_FILENAMEINVALID_MSGTITLE,
+		LoadString(m_hLanguageModule,IDS_ERR_FILENAMEINVALID_MSGTITLE,
 			szTitle,SIZEOF_ARRAY(szTitle));
 
 		MessageBox(m_hContainer,szError,szTitle,MB_ICONERROR);
@@ -781,7 +781,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	/* If the file was not renamed, show an error message. */
 	if(!ret)
 	{
-		LoadString(g_hLanguageModule,IDS_FILERENAMEERROR,szTemp,
+		LoadString(m_hLanguageModule,IDS_FILERENAMEERROR,szTemp,
 		SIZEOF_ARRAY(szTemp));
 
 		MessageBox(m_hContainer,szTemp,NExplorerplusplus::WINDOW_NAME,
@@ -907,7 +907,7 @@ void Explorerplusplus::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 		CreateFileTimeString(&pwfd->ftLastWriteTime,
 			szDateModified,SIZEOF_ARRAY(szDateModified),m_bShowFriendlyDatesGlobal);
 
-		LoadString(g_hLanguageModule,IDS_GENERAL_DATEMODIFIED,szDate,
+		LoadString(m_hLanguageModule,IDS_GENERAL_DATEMODIFIED,szDate,
 				SIZEOF_ARRAY(szDate));
 
 		StringCchPrintf(szInfoTip,cchMax,_T("%s: %s"),
@@ -1020,7 +1020,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 
 HMENU Explorerplusplus::InitializeRightClickMenu(void)
 {
-	HMENU hMenu = GetSubMenu(LoadMenu(g_hLanguageModule,
+	HMENU hMenu = GetSubMenu(LoadMenu(m_hLanguageModule,
 		MAKEINTRESOURCE(IDR_MAINMENU_RCLICK)),0);
 
 	MENUITEMINFO mii;
@@ -1028,7 +1028,7 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 	for each(auto ViewMode in m_ViewModes)
 	{
 		TCHAR szTemp[64];
-		LoadString(g_hLanguageModule,GetViewModeMenuStringId(ViewMode.uViewMode),
+		LoadString(m_hLanguageModule,GetViewModeMenuStringId(ViewMode.uViewMode),
 			szTemp,SIZEOF_ARRAY(szTemp));
 
 		mii.cbSize		= sizeof(mii);
@@ -1114,7 +1114,7 @@ void Explorerplusplus::OnListViewHeaderRClick(POINT *pCursorPos)
 	int							iItem = 0;
 	int							i = 0;
 
-	hHeaderPopupMenu = LoadMenu(g_hLanguageModule,MAKEINTRESOURCE(IDR_HEADER_MENU));
+	hHeaderPopupMenu = LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_HEADER_MENU));
 
 	hMenu = GetSubMenu(hHeaderPopupMenu,0);
 
@@ -1128,7 +1128,7 @@ void Explorerplusplus::OnListViewHeaderRClick(POINT *pCursorPos)
 		{
 			if(itr->id == pHeaderList[i])
 			{
-				LoadString(g_hLanguageModule,LookupColumnNameStringIndex(itr->id),
+				LoadString(m_hLanguageModule,LookupColumnNameStringIndex(itr->id),
 					szColumnText,SIZEOF_ARRAY(szColumnText));
 
 				if(itr->bChecked)
@@ -1436,7 +1436,7 @@ void Explorerplusplus::OnListViewFileRename(void)
 			}
 		}
 
-		CMassRenameDialog CMassRenameDialog(g_hLanguageModule,IDD_MASSRENAME,
+		CMassRenameDialog CMassRenameDialog(m_hLanguageModule,IDD_MASSRENAME,
 			m_hContainer,FullFilenameList,&m_FileActionHandler);
 		CMassRenameDialog.ShowModalDialog();
 	}
@@ -1616,7 +1616,7 @@ void Explorerplusplus::OnListViewSetFileAttributes(void)
 			sfaiList.push_back(sfai);
 		}
 
-		CSetFileAttributesDialog SetFileAttributesDialog(g_hLanguageModule,
+		CSetFileAttributesDialog SetFileAttributesDialog(m_hLanguageModule,
 			IDD_SETFILEATTRIBUTES,m_hContainer,sfaiList);
 
 		SetFileAttributesDialog.ShowModalDialog();

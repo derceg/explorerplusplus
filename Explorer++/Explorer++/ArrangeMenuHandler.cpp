@@ -428,7 +428,7 @@ int Explorerplusplus::InsertArrangeMenuItems(HMENU hMenu)
 	for(itr = m_pActiveArrangeMenuItems->begin();itr != m_pActiveArrangeMenuItems->end();itr++)
 	{
 		uStringIndex = GetArrangeMenuItemStringIndex(itr->SortById);
-		LoadString(g_hLanguageModule,uStringIndex,szStringTemp,SIZEOF_ARRAY(szStringTemp));
+		LoadString(m_hLanguageModule,uStringIndex,szStringTemp,SIZEOF_ARRAY(szStringTemp));
 
 		mi.cbSize		= sizeof(mi);
 		mi.fMask		= MIIM_ID|MIIM_STRING;

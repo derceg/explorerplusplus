@@ -218,7 +218,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 				FormatSizeString(pDWFolderSizeCompletion->liFolderSize,szFolderSize,
 					SIZEOF_ARRAY(szFolderSize),m_bForceSize,m_SizeDisplayFormat);
 
-				LoadString(g_hLanguageModule,IDS_GENERAL_TOTALSIZE,
+				LoadString(m_hLanguageModule,IDS_GENERAL_TOTALSIZE,
 					szTotalSize,SIZEOF_ARRAY(szTotalSize));
 
 				StringCchPrintf(szSizeString,SIZEOF_ARRAY(szSizeString),
@@ -631,7 +631,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_VIEW_CHANGEDISPLAYCOLOURS:
 			{
-				CDisplayColoursDialog DisplayColoursDialog(g_hLanguageModule,IDD_DISPLAYCOLOURS,hwnd,
+				CDisplayColoursDialog DisplayColoursDialog(m_hLanguageModule,IDD_DISPLAYCOLOURS,hwnd,
 					m_hDisplayWindow,m_DisplayWindowCentreColor.ToCOLORREF(),m_DisplayWindowSurroundColor.ToCOLORREF());
 				DisplayColoursDialog.ShowModalDialog();
 			}
@@ -639,7 +639,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_FILTER_FILTERRESULTS:
 			{
-				CFilterDialog FilterDialog(g_hLanguageModule,IDD_FILTER,hwnd,this);
+				CFilterDialog FilterDialog(m_hLanguageModule,IDD_FILTER,hwnd,this);
 				FilterDialog.ShowModalDialog();
 			}
 			break;
@@ -1263,7 +1263,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 					FullFilenameList.push_back(szFullFilename);
 				}
 
-				CMergeFilesDialog CMergeFilesDialog(g_hLanguageModule,IDD_MERGEFILES,
+				CMergeFilesDialog CMergeFilesDialog(m_hLanguageModule,IDD_MERGEFILES,
 					m_hContainer,szCurrentDirectory,FullFilenameList,m_bShowFriendlyDatesGlobal);
 
 				CMergeFilesDialog.ShowModalDialog();
@@ -1279,7 +1279,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 					TCHAR szFullFilename[MAX_PATH];
 					m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullFilename);
 
-					CSplitFileDialog SplitFileDialog(g_hLanguageModule,IDD_SPLITFILE,hwnd,szFullFilename);
+					CSplitFileDialog SplitFileDialog(m_hLanguageModule,IDD_SPLITFILE,hwnd,szFullFilename);
 
 					SplitFileDialog.ShowModalDialog();
 				}
@@ -1298,7 +1298,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 					FullFilenameList.push_back(szFullFilename);
 				}
 
-				CDestroyFilesDialog CDestroyFilesDialog(g_hLanguageModule,IDD_DESTROYFILES,
+				CDestroyFilesDialog CDestroyFilesDialog(m_hLanguageModule,IDD_DESTROYFILES,
 					m_hContainer,FullFilenameList,m_bShowFriendlyDatesGlobal);
 
 				CDestroyFilesDialog.ShowModalDialog();
@@ -1373,7 +1373,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				GetDisplayName(szCurrentDirectory,szDisplayName,SHGDN_INFOLDER);
 				CBookmark Bookmark(szDisplayName,szCurrentDirectory,EMPTY_STRING);
 
-				CAddBookmarkDialog AddBookmarkDialog(g_hLanguageModule,IDD_ADD_BOOKMARK,hwnd,*m_bfAllBookmarks,Bookmark);
+				CAddBookmarkDialog AddBookmarkDialog(m_hLanguageModule,IDD_ADD_BOOKMARK,hwnd,*m_bfAllBookmarks,Bookmark);
 				AddBookmarkDialog.ShowModalDialog();
 			}
 			break;
@@ -1382,7 +1382,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 			if(g_hwndManageBookmarks == NULL)
 			{
-				CManageBookmarksDialog *pManageBookmarksDialog = new CManageBookmarksDialog(g_hLanguageModule,IDD_MANAGE_BOOKMARKS,hwnd,*m_bfAllBookmarks);
+				CManageBookmarksDialog *pManageBookmarksDialog = new CManageBookmarksDialog(m_hLanguageModule,IDD_MANAGE_BOOKMARKS,hwnd,*m_bfAllBookmarks);
 				g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(new CModelessDialogNotification());
 			}
 			else
@@ -1398,7 +1398,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				TCHAR szCurrentDirectory[MAX_PATH];
 				m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),szCurrentDirectory);
 
-				CSearchDialog *SearchDialog = new CSearchDialog(g_hLanguageModule,IDD_SEARCH,hwnd,szCurrentDirectory,this);
+				CSearchDialog *SearchDialog = new CSearchDialog(m_hLanguageModule,IDD_SEARCH,hwnd,szCurrentDirectory,this);
 				g_hwndSearch = SearchDialog->ShowModelessDialog(new CModelessDialogNotification());
 			}
 			else
@@ -1409,8 +1409,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_TOOLS_CUSTOMIZECOLORS:
 			{
-				CCustomizeColorsDialog CustomizeColorsDialog(g_hLanguageModule,IDD_CUSTOMIZECOLORS,hwnd,&m_ColorRules);
-
+				CCustomizeColorsDialog CustomizeColorsDialog(m_hLanguageModule,IDD_CUSTOMIZECOLORS,hwnd,&m_ColorRules);
 				CustomizeColorsDialog.ShowModalDialog();
 
 				/* Causes the active listview to redraw (therefore
@@ -1454,7 +1453,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 				if(!bOpenedHelpFile)
 				{
-					CHelpFileMissingDialog HelpFileMissingDialog(g_hLanguageModule,IDD_HELPFILEMISSING,hwnd);
+					CHelpFileMissingDialog HelpFileMissingDialog(m_hLanguageModule,IDD_HELPFILEMISSING,hwnd);
 					HelpFileMissingDialog.ShowModalDialog();
 				}
 			}
@@ -1462,7 +1461,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_HELP_ABOUT:
 			{
-				CAboutDialog AboutDialog(g_hLanguageModule,IDD_ABOUT,hwnd);
+				CAboutDialog AboutDialog(m_hLanguageModule,IDD_ABOUT,hwnd);
 				AboutDialog.ShowModalDialog();
 			}
 			break;
