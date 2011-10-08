@@ -6,6 +6,9 @@ Current version: 1.3.1
 Version 1.3.2 (xx/xx/2011)
 --------------------------
 Bug fixes:
+- Under some circumstances, a copy and paste/drag and drop
+  operation would fail (when copying a message from Outlook
+  2010, for example).
 - Fixed bug in customize colors dialog (entries were not been
   moved up/down correctly).
 - When renaming a file in the listview with IME turned on,
