@@ -11,6 +11,8 @@ Bug fixes:
 - When renaming a file in the listview with IME turned on,
   text was been overwritten (because the text selection was
   modified). Fixed.
+- Links to zip files will now be opened in an external program,
+  if 'Open zip files in Explorer++' is unchecked.
 
 Version 1.3.1 (05/09/2011)
 --------------------------
