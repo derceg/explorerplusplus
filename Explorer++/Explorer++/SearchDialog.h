@@ -6,6 +6,7 @@
 #include <string>
 #include <regex>
 #include <unordered_map>
+#include <boost/circular_buffer.hpp>
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
@@ -60,9 +61,12 @@ private:
 	CSearchDialogPersistentSettings(const CSearchDialogPersistentSettings &);
 	CSearchDialogPersistentSettings & operator=(const CSearchDialogPersistentSettings &);
 
+	template <typename T> void	CircularBufferToList(const boost::circular_buffer<T> &cb,std::list<T> &list);
+	template <typename T> void	ListToCircularBuffer(const std::list<T> &list,boost::circular_buffer<T> &cb);
+
 	TCHAR						m_szSearchPattern[MAX_PATH];
 	std::list<std::wstring>		m_SearchDirectories;
-	std::list<std::wstring>		m_SearchPatterns;
+	boost::circular_buffer<std::wstring>	*m_pSearchPatterns;
 	BOOL						m_bSearchSubFolders;
 	BOOL						m_bUseRegularExpressions;
 	BOOL						m_bCaseInsensitive;
