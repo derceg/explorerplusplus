@@ -3,6 +3,12 @@ Explorer++ Version History
 
 Current version: 1.3.2
 
+Version 1.3.3 (xx/xx/2011)
+--------------------------
+Bug fixes:
+- The media duration column was previously showing times in
+  100-nanosecond units. Updated to hh:mm:ss.
+
 Version 1.3.2 (11/10/2011)
 --------------------------
 Bug fixes:
