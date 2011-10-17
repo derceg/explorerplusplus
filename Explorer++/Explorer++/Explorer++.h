@@ -608,10 +608,6 @@ private:
 	void					LoadApplicationToolbarFromRegistry(void);
 	void					LoadApplicationToolbarFromRegistryInternal(HKEY hKey);
 	void					SaveApplicationToolbarToRegistry(void);
-	void					LoadColorRulesFromRegistry(void);
-	void					LoadColorRulesFromRegistryInternal(HKEY hKey);
-	void					SaveColorRulesToRegistry(void);
-	void					SaveColorRulesToRegistryInternal(HKEY hKey,NColorRuleHelper::ColorRule_t *pColorRule,int iCount);
 	void					SaveApplicationToolbarToRegistryInternal(HKEY hKey,ApplicationButton_t	*pab,int count);
 	void					SaveToolbarInformationToRegistry(void);
 	void					LoadToolbarInformationFromRegistry(void);
@@ -770,10 +766,6 @@ private:
 	void					LoadApplicationToolbarFromXMLInternal(MSXML2::IXMLDOMNode *pNode);
 	void					SaveApplicationToolbarToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveApplicationToolbarToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe,ApplicationButton_t *pab);
-	void					LoadColorRulesFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode);
-	void					SaveColorRulesToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					SaveColorRulesToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe,const NColorRuleHelper::ColorRule_t &ColorRule);
 	void					LoadToolbarInformationFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					SaveToolbarInformationToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveToolbarInformationToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);

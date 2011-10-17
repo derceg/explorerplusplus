@@ -122,11 +122,11 @@ will need to be changed correspondingly. */
 #define HASH_LARGETOOLBARICONS		10895007
 #define HASH_PLAYNAVIGATIONSOUND	1987363412
 
-typedef struct
+struct ColumnXMLSaveData
 {
 	TCHAR			szName[64];
 	unsigned int	id;
-} ColumnXMLSaveData;
+};
 
 /* Maps column save names to id's. */
 static ColumnXMLSaveData ColumnData[] =
@@ -1290,186 +1290,6 @@ MSXML2::IXMLDOMElement *pe,ApplicationButton_t *pab)
 	SysFreeString(bstr_wsntt);
 }
 
-void Explorerplusplus::LoadColorRulesFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
-{
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	BSTR						bstr = NULL;
-	HRESULT						hr;
-
-	if(!pXMLDom)
-		goto clean;
-
-	bstr = SysAllocString(L"//ColorRule");
-	hr = pXMLDom->selectSingleNode(bstr,&pNode);
-
-	if(hr == S_OK)
-	{
-		m_ColorRules.clear();
-		LoadColorRulesFromXMLInternal(pNode);
-	}
-
-clean:
-	if (bstr) SysFreeString(bstr);
-	if (pNodes) pNodes->Release();
-	if (pNode) pNode->Release();
-
-	return;
-}
-
-/* Start at the first node. Read all of its attributes
-and then step down into any children, before traversing
-any sibling nodes (and stepping into their child items,
-etc). */
-void Explorerplusplus::LoadColorRulesFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
-{
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
-	MSXML2::IXMLDOMNode			*pNextSibling = NULL;
-	NColorRuleHelper::ColorRule_t	ColorRule;
-	BOOL						bDescriptionFound = FALSE;
-	BOOL						bFilenamePatternFound = FALSE;
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	BYTE						r = 0;
-	BYTE						g = 0;
-	BYTE						b = 0;
-	HRESULT						hr;
-	long						nAttributeNodes;
-	long						i = 0;
-
-	hr = pNode->get_attributes(&am);
-
-	if(FAILED(hr))
-		return;
-
-	/* Retrieve the total number of attributes
-	attached to this node. */
-	am->get_length(&nAttributeNodes);
-
-	for(i = 0;i < nAttributeNodes;i++)
-	{
-		am->get_item(i, &pAttributeNode);
-
-		/* Element name. */
-		pAttributeNode->get_nodeName(&bstrName);
-
-		/* Element value. */
-		pAttributeNode->get_text(&bstrValue);
-
-		if(lstrcmpi(bstrName,L"Name") == 0)
-		{
-			ColorRule.strDescription = _bstr_t(bstrValue);
-
-			bDescriptionFound = TRUE;
-		}
-		else if(lstrcmpi(bstrName,L"FilenamePattern") == 0)
-		{
-			ColorRule.strFilterPattern = _bstr_t(bstrValue);
-
-			bFilenamePatternFound = TRUE;
-		}
-		else if(lstrcmpi(bstrName,L"Attributes") == 0)
-		{
-			ColorRule.dwFilterAttributes = NXMLSettings::DecodeIntValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,L"r") == 0)
-		{
-			r = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,L"g") == 0)
-		{
-			g = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-		}
-		else if(lstrcmpi(bstrName,L"b") == 0)
-		{
-			b = (BYTE)NXMLSettings::DecodeIntValue(bstrValue);
-		}
-	}
-
-	if(bDescriptionFound && bFilenamePatternFound)
-	{
-		ColorRule.rgbColour = RGB(r,g,b);
-
-		m_ColorRules.push_back(ColorRule);
-	}
-
-	hr = pNode->get_nextSibling(&pNextSibling);
-
-	if(hr == S_OK)
-	{
-		hr = pNextSibling->get_nextSibling(&pNextSibling);
-
-		if(hr == S_OK)
-		{
-			LoadColorRulesFromXMLInternal(pNextSibling);
-		}
-	}
-}
-
-void Explorerplusplus::SaveColorRulesToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
-{
-	MSXML2::IXMLDOMElement		*pe = NULL;
-	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
-	BSTR						bstr;
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pRoot);
-
-	bstr = SysAllocString(L"ColorRules");
-	pXMLDom->createElement(bstr,&pe);
-	SysFreeString(bstr);
-	bstr = NULL;
-
-	for each(auto ColorRule in m_ColorRules)
-	{
-		SaveColorRulesToXMLInternal(pXMLDom,pe,ColorRule);
-	}
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
-
-	NXMLSettings::AppendChildToParent(pe, pRoot);
-	pe->Release();
-	pe = NULL;
-
-	SysFreeString(bstr_wsnt);
-}
-
-void Explorerplusplus::SaveColorRulesToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
-	MSXML2::IXMLDOMElement *pe,const NColorRuleHelper::ColorRule_t &ColorRule)
-{
-	MSXML2::IXMLDOMElement		*pParentNode = NULL;
-	BSTR						bstr_wsntt = SysAllocString(L"\n\t\t");
-	BSTR						bstr_indent;
-	WCHAR						wszIndent[128];
-	static int					iIndent = 2;
-	int							i = 0;
-
-	StringCchPrintf(wszIndent,SIZEOF_ARRAY(wszIndent),L"\n");
-
-	for(i = 0;i < iIndent;i++)
-		StringCchCat(wszIndent,SIZEOF_ARRAY(wszIndent),L"\t");
-
-	bstr_indent = SysAllocString(wszIndent);
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_indent,pe);
-
-	SysFreeString(bstr_indent);
-	bstr_indent = NULL;
-
-	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("ColorRule"),ColorRule.strDescription.c_str());
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("FilenamePattern"),ColorRule.strFilterPattern.c_str());
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Attributes"),NXMLSettings::EncodeIntValue(ColorRule.dwFilterAttributes));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("r"),NXMLSettings::EncodeIntValue(GetRValue(ColorRule.rgbColour)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("g"),NXMLSettings::EncodeIntValue(GetGValue(ColorRule.rgbColour)));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("b"),NXMLSettings::EncodeIntValue(GetBValue(ColorRule.rgbColour)));
-
-	pParentNode->Release();
-	pParentNode = NULL;
-
-	SysFreeString(bstr_wsntt);
-}
-
 void Explorerplusplus::LoadToolbarInformationFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
@@ -2413,7 +2233,7 @@ void Explorerplusplus::CLoadSaveXML::LoadToolbarInformation()
 
 void Explorerplusplus::CLoadSaveXML::LoadColorRules()
 {
-	m_pContainer->LoadColorRulesFromXML(m_pXMLDom);
+	NColorRuleHelper::LoadColorRulesFromXML(m_pXMLDom,m_pContainer->m_ColorRules);
 }
 
 void Explorerplusplus::CLoadSaveXML::LoadState()
@@ -2453,7 +2273,7 @@ void Explorerplusplus::CLoadSaveXML::SaveToolbarInformation()
 
 void Explorerplusplus::CLoadSaveXML::SaveColorRules()
 {
-	m_pContainer->SaveColorRulesToXML(m_pXMLDom,m_pRoot);
+	NColorRuleHelper::SaveColorRulesToXML(m_pXMLDom,m_pRoot,m_pContainer->m_ColorRules);
 }
 
 void Explorerplusplus::CLoadSaveXML::SaveState()

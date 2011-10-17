@@ -67,6 +67,6 @@
 #include <wmsdk.h>
 #include <vfw.h>
 #include <dwmapi.h>
-#include <assert.h>
 #include <iostream>
 #include <sstream>
+#include <cassert>

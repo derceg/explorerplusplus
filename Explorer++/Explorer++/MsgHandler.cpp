@@ -23,13 +23,6 @@
 #include "../Helper/Macros.h"
 
 
-UINT DirectoryWatchFlags	=	FILE_NOTIFY_CHANGE_FILE_NAME|FILE_NOTIFY_CHANGE_SIZE|
-								FILE_NOTIFY_CHANGE_DIR_NAME|FILE_NOTIFY_CHANGE_ATTRIBUTES|
-								FILE_NOTIFY_CHANGE_LAST_WRITE|FILE_NOTIFY_CHANGE_LAST_ACCESS|
-								FILE_NOTIFY_CHANGE_CREATION|FILE_NOTIFY_CHANGE_SECURITY;
-
-UINT uParentWatchFlags		=	FILE_NOTIFY_CHANGE_DIR_NAME;
-
 DWORD WINAPI Thread_IconFinder(LPVOID pParam);
 void CALLBACK IconThreadInitialization(ULONG_PTR dwParam);
 void CALLBACK QuitIconAPC(ULONG_PTR dwParam);
@@ -1393,8 +1386,10 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 		pDirectoryAltered->pData		= this;
 
 		/* Start monitoring the directory that was opened. */
-		iDirMonitorId = m_pDirMon->WatchDirectory(szDirectoryToWatch,DirectoryWatchFlags,
-		DirectoryAlteredCallback,FALSE,(void *)pDirectoryAltered);
+		iDirMonitorId = m_pDirMon->WatchDirectory(szDirectoryToWatch,FILE_NOTIFY_CHANGE_FILE_NAME|
+			FILE_NOTIFY_CHANGE_SIZE|FILE_NOTIFY_CHANGE_DIR_NAME|FILE_NOTIFY_CHANGE_ATTRIBUTES|
+			FILE_NOTIFY_CHANGE_LAST_WRITE|FILE_NOTIFY_CHANGE_LAST_ACCESS|FILE_NOTIFY_CHANGE_CREATION|
+			FILE_NOTIFY_CHANGE_SECURITY,DirectoryAlteredCallback,FALSE,(void *)pDirectoryAltered);
 	}
 
 	m_pShellBrowser[iTabId]->SetDirMonitorId(iDirMonitorId);

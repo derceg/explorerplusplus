@@ -33,21 +33,18 @@
 #include "../Helper/Macros.h"
 
 
-#define REG_BOOKMARKS_KEY			_T("Software\\Explorer++\\Bookmarks")
-#define REG_TABS_KEY				_T("Software\\Explorer++\\Tabs")
-#define REG_TOOLBARS_KEY			_T("Software\\Explorer++\\Toolbars")
-#define REG_COLUMNS_KEY				_T("Software\\Explorer++\\DefaultColumns")
-#define REG_APPLICATIONS_KEY		_T("Software\\Explorer++\\ApplicationToolbar")
-#define REG_DIALOGS_KEY				_T("Software\\Explorer++\\Dialogs")
-#define REG_COLORS_KEY				_T("Software\\Explorer++\\ColorRules")
+namespace
+{
+	const TCHAR REG_BOOKMARKS_KEY[] = _T("Software\\Explorer++\\Bookmarks");
+	const TCHAR REG_TABS_KEY[] = _T("Software\\Explorer++\\Tabs");
+	const TCHAR REG_TOOLBARS_KEY[] = _T("Software\\Explorer++\\Toolbars");
+	const TCHAR REG_COLUMNS_KEY[] = _T("Software\\Explorer++\\DefaultColumns");
+	const TCHAR REG_APPLICATIONS_KEY[] = _T("Software\\Explorer++\\ApplicationToolbar");
+	const TCHAR REG_DIALOGS_KEY[] = _T("Software\\Explorer++\\Dialogs");
+}
 
 #define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Gdiplus::Color(255,255,255)
 #define DEFAULT_DISPLAYWINDOW_SURROUND_COLOR	Gdiplus::Color(0,94,138)
-
-TCHAR pszDirectoriesKey[]	= _T("Directories");
-TCHAR pszCustomDirsKey[]	= _T("Custom Directories");
-
-extern DWORD g_Language;
 
 BOOL LoadWindowPosition(WINDOWPLACEMENT *pwndpl)
 {
@@ -233,7 +230,7 @@ LONG Explorerplusplus::LoadSettings(LPCTSTR KeyPath)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		/* User setiings. */
+		/* User settings. */
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("LastSelectedTab"),(LPDWORD)&m_iLastSelectedTab);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowExtensions"),(LPDWORD)&m_bShowExtensionsGlobal);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowStatusBar"),(LPDWORD)&m_bShowStatusBar);
@@ -1025,110 +1022,6 @@ void Explorerplusplus::LoadApplicationToolbarFromRegistryInternal(HKEY hKey)
 	}
 }
 
-void Explorerplusplus::SaveColorRulesToRegistry(void)
-{
-	/* First, delete the 'ColorRules' key, along
-	with all of its subkeys. */
-	SHDeleteKey(HKEY_CURRENT_USER,REG_COLORS_KEY);
-
-	HKEY hKey;
-	DWORD Disposition;
-
-	LONG lRes = RegCreateKeyEx(HKEY_CURRENT_USER,REG_COLORS_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	int iCount = 0;
-
-	if(lRes == ERROR_SUCCESS)
-	{
-		for each(auto ColorRule in m_ColorRules)
-		{
-			SaveColorRulesToRegistryInternal(hKey,&ColorRule,iCount);
-			iCount++;
-		}
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::SaveColorRulesToRegistryInternal(HKEY hKey,
-	NColorRuleHelper::ColorRule_t *pColorRule,int iCount)
-{
-	HKEY hKeyChild;
-	TCHAR szKeyName[32];
-	DWORD Disposition;
-
-	_itow_s(iCount,szKeyName,SIZEOF_ARRAY(szKeyName),10);
-	RegCreateKeyEx(hKey,szKeyName,0,NULL,
-		REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKeyChild,
-		&Disposition);
-
-	NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("Description"),pColorRule->strDescription.c_str());
-	NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("FilenamePattern"),pColorRule->strFilterPattern.c_str());
-	NRegistrySettings::SaveDwordToRegistry(hKeyChild,_T("Attributes"),pColorRule->dwFilterAttributes);
-	RegSetValueEx(hKeyChild,_T("Color"),0,REG_BINARY,reinterpret_cast<LPBYTE>(&pColorRule->rgbColour),
-		sizeof(pColorRule->rgbColour));
-
-	RegCloseKey(hKeyChild);
-}
-
-void Explorerplusplus::LoadColorRulesFromRegistry(void)
-{
-	HKEY hKey;
-
-	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER,REG_COLORS_KEY,
-		0,KEY_READ,&hKey);
-
-	if(lRes == ERROR_SUCCESS)
-	{
-		m_ColorRules.clear();
-		LoadColorRulesFromRegistryInternal(hKey);
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadColorRulesFromRegistryInternal(HKEY hKey)
-{
-	TCHAR szKeyName[256];
-	DWORD dwIndex = 0;
-	DWORD dwKeyLength = SIZEOF_ARRAY(szKeyName);
-
-	while(RegEnumKeyEx(hKey,dwIndex++,szKeyName,&dwKeyLength,NULL,
-		NULL,NULL,NULL) == ERROR_SUCCESS)
-	{
-		NColorRuleHelper::ColorRule_t ColorRule;
-		HKEY hKeyChild;
-
-		/* Open the subkey. First, attempt to load
-		the type. If there is no type specified, ignore
-		the key. If any other values are missing, also
-		ignore the key. */
-		RegOpenKeyEx(hKey,szKeyName,0,KEY_READ,&hKeyChild);
-
-		LONG lDescriptionStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,_T("Description"),
-			ColorRule.strDescription);
-		LONG lFilenamePatternStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,_T("FilenamePattern"),
-			ColorRule.strFilterPattern);
-		NRegistrySettings::ReadDwordFromRegistry(hKeyChild,_T("Attributes"),
-			&ColorRule.dwFilterAttributes);
-
-		DWORD dwType = REG_BINARY;
-		DWORD dwSize = sizeof(ColorRule.rgbColour);
-		RegQueryValueEx(hKeyChild,_T("Color"),0,&dwType,
-			reinterpret_cast<LPBYTE>(&ColorRule.rgbColour),&dwSize);
-
-		if(lDescriptionStatus == ERROR_SUCCESS && lFilenamePatternStatus == ERROR_SUCCESS)
-		{
-			m_ColorRules.push_back(ColorRule);
-		}
-
-		RegCloseKey(hKeyChild);
-
-		dwKeyLength = SIZEOF_ARRAY(szKeyName);
-	}
-}
-
 void Explorerplusplus::SaveToolbarInformationToRegistry(void)
 {
 	HKEY	hKey;
@@ -1331,7 +1224,7 @@ void Explorerplusplus::CLoadSaveRegistry::LoadToolbarInformation()
 
 void Explorerplusplus::CLoadSaveRegistry::LoadColorRules()
 {
-	m_pContainer->LoadColorRulesFromRegistry();
+	NColorRuleHelper::LoadColorRulesFromRegistry(m_pContainer->m_ColorRules);
 }
 
 void Explorerplusplus::CLoadSaveRegistry::LoadState()
@@ -1371,7 +1264,7 @@ void Explorerplusplus::CLoadSaveRegistry::SaveToolbarInformation()
 
 void Explorerplusplus::CLoadSaveRegistry::SaveColorRules()
 {
-	m_pContainer->SaveColorRulesToRegistry();
+	NColorRuleHelper::SaveColorRulesToRegistry(m_pContainer->m_ColorRules);
 }
 
 void Explorerplusplus::CLoadSaveRegistry::SaveState()
