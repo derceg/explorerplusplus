@@ -20,21 +20,6 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "SearchDialog.h"
-#include "WildcardSelectDialog.h"
-#include "RenameTabDialog.h"
-#include "MassRenameDialog.h"
-#include "FilterDialog.h"
-#include "ColorRuleDialog.h"
-#include "CustomizeColorsDialog.h"
-#include "SplitFileDialog.h"
-#include "DestroyFilesDialog.h"
-#include "MergeFilesDialog.h"
-#include "SetFileAttributesDialog.h"
-#include "SelectColumnsDialog.h"
-#include "SetDefaultColumnsDialog.h"
-#include "AddBookmarkDialog.h"
-#include "DisplayColoursDialog.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/XMLSettings.h"
 #include "../Helper/Macros.h"
@@ -1128,168 +1113,6 @@ MSXML2::IXMLDOMElement *pWndPosNode)
 	pParentNode = NULL;
 }
 
-void Explorerplusplus::LoadApplicationToolbarFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
-{
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	BSTR						bstr = NULL;
-	HRESULT						hr;
-
-	if(!pXMLDom)
-		goto clean;
-
-	bstr = SysAllocString(L"//ApplicationButton");
-	hr = pXMLDom->selectSingleNode(bstr,&pNode);
-
-	if(hr == S_OK)
-	{
-		LoadApplicationToolbarFromXMLInternal(pNode);
-	}
-
-clean:
-	if (bstr) SysFreeString(bstr);
-	if (pNodes) pNodes->Release();
-	if (pNode) pNode->Release();
-
-	return;
-}
-
-/* Start at the first node. Read all of its attributes
-and then step down into any children, before traversing
-any sibling nodes (and stepping into their child items,
-etc). */
-void Explorerplusplus::LoadApplicationToolbarFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
-{
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
-	MSXML2::IXMLDOMNode			*pNextSibling = NULL;
-	TCHAR						szName[512];
-	TCHAR						szCommand[512];
-	BOOL						bNameFound = FALSE;
-	BOOL						bCommandFound = FALSE;
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	BOOL						bShowNameOnToolbar = TRUE;
-	HRESULT						hr;
-	long						nAttributeNodes;
-	long						i = 0;
-
-	hr = pNode->get_attributes(&am);
-
-	if(FAILED(hr))
-		return;
-
-	/* Retrieve the total number of attributes
-	attached to this node. */
-	am->get_length(&nAttributeNodes);
-
-	for(i = 0;i < nAttributeNodes;i++)
-	{
-		am->get_item(i, &pAttributeNode);
-
-		/* Element name. */
-		pAttributeNode->get_nodeName(&bstrName);
-
-		/* Element value. */
-		pAttributeNode->get_text(&bstrValue);
-
-		if(lstrcmpi(bstrName,L"Name") == 0)
-		{
-			StringCchCopy(szName,SIZEOF_ARRAY(szName),bstrValue);
-
-			bNameFound = TRUE;
-		}
-		else if(lstrcmpi(bstrName,L"Command") == 0)
-		{
-			StringCchCopy(szCommand,SIZEOF_ARRAY(szCommand),bstrValue);
-
-			bCommandFound = TRUE;
-		}
-		else if(lstrcmpi(bstrName,L"ShowNameOnToolbar") == 0)
-		{
-			bShowNameOnToolbar = NXMLSettings::DecodeBoolValue(bstrValue);
-		}
-	}
-
-	if(bNameFound && bCommandFound)
-		ApplicationToolbarAddItem(szName,szCommand,bShowNameOnToolbar);
-
-	hr = pNode->get_nextSibling(&pNextSibling);
-
-	if(hr == S_OK)
-	{
-		hr = pNextSibling->get_nextSibling(&pNextSibling);
-
-		if(hr == S_OK)
-		{
-			LoadApplicationToolbarFromXMLInternal(pNextSibling);
-		}
-	}
-}
-
-void Explorerplusplus::SaveApplicationToolbarToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
-{
-	MSXML2::IXMLDOMElement		*pe = NULL;
-	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
-	BSTR						bstr;
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pRoot);
-
-	bstr = SysAllocString(L"ApplicationToolbar");
-	pXMLDom->createElement(bstr,&pe);
-	SysFreeString(bstr);
-	bstr = NULL;
-
-	if(m_pAppButtons != NULL)
-	{
-		SaveApplicationToolbarToXMLInternal(pXMLDom,pe,m_pAppButtons);
-	}
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
-
-	NXMLSettings::AppendChildToParent(pe, pRoot);
-	pe->Release();
-	pe = NULL;
-
-	SysFreeString(bstr_wsnt);
-}
-
-void Explorerplusplus::SaveApplicationToolbarToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pe,ApplicationButton_t *pab)
-{
-	MSXML2::IXMLDOMElement		*pParentNode = NULL;
-	BSTR						bstr_wsntt = SysAllocString(L"\n\t\t");
-	BSTR						bstr_indent;
-	WCHAR						wszIndent[128];
-	static int					iIndent = 2;
-	int							i = 0;
-
-	StringCchPrintf(wszIndent,SIZEOF_ARRAY(wszIndent),L"\n");
-
-	for(i = 0;i < iIndent;i++)
-		StringCchCat(wszIndent,SIZEOF_ARRAY(wszIndent),L"\t");
-
-	bstr_indent = SysAllocString(wszIndent);
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_indent,pe);
-
-	SysFreeString(bstr_indent);
-	bstr_indent = NULL;
-
-	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("ApplicationButton"),pab->szName);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Command"),pab->szCommand);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowNameOnToolbar"),NXMLSettings::EncodeBoolValue(pab->bShowNameOnToolbar));
-
-	if(pab->pNext != NULL)
-		SaveApplicationToolbarToXMLInternal(pXMLDom,pe,pab->pNext);
-
-	pParentNode->Release();
-	pParentNode = NULL;
-
-	SysFreeString(bstr_wsntt);
-}
-
 void Explorerplusplus::LoadToolbarInformationFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
@@ -1437,142 +1260,6 @@ MSXML2::IXMLDOMElement *pe)
 
 	SysFreeString(bstr_wsntt);
 	SysFreeString(bstr_wsnttt);
-}
-
-void Explorerplusplus::LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
-{
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	BSTR						bstr = NULL;
-	HRESULT						hr;
-	long						length;
-	long						lChildNodes;
-
-	if(pXMLDom == NULL)
-		goto clean;
-
-	bstr = SysAllocString(L"//State/*");
-	pXMLDom->selectNodes(bstr,&pNodes);
-
-	if(!pNodes)
-	{
-		goto clean;
-	}
-	else
-	{
-		pNodes->get_length(&length);
-
-		for(long i = 0;i < length;i++)
-		{
-			/* This should never fail, as the number
-			of nodes has already been counted (so
-			they must exist). */
-			hr = pNodes->get_item(i,&pNode);
-
-			if(SUCCEEDED(hr))
-			{
-				hr = pNode->get_attributes(&am);
-
-				if(SUCCEEDED(hr))
-				{
-					/* Retrieve the total number of attributes
-					attached to this node. */
-					am->get_length(&lChildNodes);
-
-					if(lChildNodes >= 1)
-					{
-						am->get_item(0,&pChildNode);
-
-						/* Element name. */
-						pChildNode->get_nodeName(&bstrName);
-
-						/* Element value. */
-						pChildNode->get_text(&bstrValue);
-
-						if(lstrcmpi(bstrValue,_T("ColorRules")) == 0)
-							CColorRuleDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("CustomizeColors")) == 0)
-							CCustomizeColorsDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("Search")) == 0)
-							CSearchDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("WildcardSelect")) == 0)
-							CWildcardSelectDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("RenameTab")) == 0)
-							CRenameTabDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("MassRename")) == 0)
-							CMassRenameDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("Filter")) == 0)
-							CFilterDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("SplitFile")) == 0)
-							CSplitFileDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("DestroyFiles")) == 0)
-							CDestroyFilesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("MergeFiles")) == 0)
-							CMergeFilesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("SetFileAttributes")) == 0)
-							CSetFileAttributesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("SelectColumns")) == 0)
-							CSelectColumnsDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("SetDefaultColumns")) == 0)
-							CSetDefaultColumnsDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("AddBookmark")) == 0)
-							CAddBookmarkDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("DisplayColors")) == 0)
-							CDisplayColoursDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-					}
-				}
-			}
-
-			pNode->Release();
-			pNode = NULL;
-		}
-	}
-
-clean:
-	if (bstr) SysFreeString(bstr);
-	if (pNodes) pNodes->Release();
-	if (pNode) pNode->Release();
-}
-
-void Explorerplusplus::SaveStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
-{
-	MSXML2::IXMLDOMElement	*pe = NULL;
-	BSTR					bstr = NULL;
-	BSTR					bstr_wsnt = SysAllocString(L"\n\t");
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pRoot);
-
-	bstr = SysAllocString(L"State");
-	pXMLDom->createElement(bstr,&pe);
-	SysFreeString(bstr);
-	bstr = NULL;
-
-	CSearchDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CWildcardSelectDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CSetFileAttributesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CRenameTabDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CMassRenameDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CFilterDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CColorRuleDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CCustomizeColorsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CSplitFileDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CDestroyFilesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CMergeFilesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CSelectColumnsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CSetDefaultColumnsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CAddBookmarkDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CDisplayColoursDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
-
-	NXMLSettings::AppendChildToParent(pe,pRoot);
-	pe->Release();
-	pe = NULL;
 }
 
 unsigned long hash_setting(unsigned char *str)
@@ -2236,9 +1923,9 @@ void Explorerplusplus::CLoadSaveXML::LoadColorRules()
 	NColorRuleHelper::LoadColorRulesFromXML(m_pXMLDom,m_pContainer->m_ColorRules);
 }
 
-void Explorerplusplus::CLoadSaveXML::LoadState()
+void Explorerplusplus::CLoadSaveXML::LoadDialogStates()
 {
-	m_pContainer->LoadStateFromXML(m_pXMLDom);
+	m_pContainer->LoadDialogStatesFromXML(m_pXMLDom);
 }
 
 void Explorerplusplus::CLoadSaveXML::SaveGenericSettings()
@@ -2276,9 +1963,9 @@ void Explorerplusplus::CLoadSaveXML::SaveColorRules()
 	NColorRuleHelper::SaveColorRulesToXML(m_pXMLDom,m_pRoot,m_pContainer->m_ColorRules);
 }
 
-void Explorerplusplus::CLoadSaveXML::SaveState()
+void Explorerplusplus::CLoadSaveXML::SaveDialogStates()
 {
-	m_pContainer->SaveStateToXML(m_pXMLDom,m_pRoot);
+	m_pContainer->SaveDialogStatesToXML(m_pXMLDom,m_pRoot);
 }
 
 BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)

@@ -23,21 +23,24 @@
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/RegistrySettings.h"
+#include "../Helper/XMLSettings.h"
 #include "../Helper/Macros.h"
 
 
-DWORD ApplicationToolbarStyles	=	WS_CHILD |WS_VISIBLE |WS_CLIPSIBLINGS |WS_CLIPCHILDREN |
-								TBSTYLE_TOOLTIPS | TBSTYLE_LIST | TBSTYLE_TRANSPARENT |
-								TBSTYLE_FLAT | CCS_NODIVIDER| CCS_NORESIZE;
+namespace
+{
+	const TCHAR REG_APPLICATIONS_KEY[] = _T("Software\\Explorer++\\ApplicationToolbar");
+}
 
 INT_PTR CALLBACK ApplicationToolbarNewButtonProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 INT_PTR CALLBACK ApplicationButtonPropertiesProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 void Explorerplusplus::CreateApplicationToolbar(void)
 {
-	HIMAGELIST	himlSmall;
-
-	m_hApplicationToolbar = CreateToolbar(m_hMainRebar,ApplicationToolbarStyles,
+	m_hApplicationToolbar = CreateToolbar(m_hMainRebar,WS_CHILD|WS_VISIBLE|
+		WS_CLIPSIBLINGS|WS_CLIPCHILDREN|TBSTYLE_TOOLTIPS|TBSTYLE_LIST|
+		TBSTYLE_TRANSPARENT|TBSTYLE_FLAT|CCS_NODIVIDER|CCS_NORESIZE,
 		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DRAWDDARROWS|
 		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
@@ -45,6 +48,7 @@ void Explorerplusplus::CreateApplicationToolbar(void)
 	SendMessage(m_hApplicationToolbar,TB_BUTTONSTRUCTSIZE,(WPARAM)sizeof(TBBUTTON),0);
 
 	/* Assign the system image list to the toolbar. */
+	HIMAGELIST himlSmall;
 	Shell_GetImageLists(NULL,&himlSmall);
 	SendMessage(m_hApplicationToolbar,TB_SETIMAGELIST,0,(LPARAM)himlSmall);
 
@@ -630,4 +634,263 @@ void Explorerplusplus::OnApplicationToolbarRClick(void)
 
 	/* Now, remove the item from the menu. */
 	DeleteMenu(m_hToolbarRightClickMenu,7,MF_BYPOSITION);
+}
+
+void Explorerplusplus::LoadApplicationToolbarFromRegistry(void)
+{
+	HKEY hKey;
+	LONG ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY,
+		0,KEY_READ,&hKey);
+
+	if(ReturnValue == ERROR_SUCCESS)
+	{
+		LoadApplicationToolbarFromRegistryInternal(hKey);
+
+		RegCloseKey(hKey);
+	}
+}
+
+void Explorerplusplus::LoadApplicationToolbarFromRegistryInternal(HKEY hKey)
+{
+	TCHAR	szItemKey[256];
+	int		i = 0;
+	StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("%d"),i);
+
+	HKEY hKeyChild;
+	LONG ReturnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hKeyChild);
+
+	while(ReturnValue == ERROR_SUCCESS)
+	{
+		TCHAR szName[512];
+		TCHAR szCommand[512];
+		BOOL bShowNameOnToolbar = TRUE;
+
+		LONG lNameStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,_T("Name"),
+			szName,SIZEOF_ARRAY(szName));
+		LONG lCommandStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,_T("Command"),
+			szCommand,SIZEOF_ARRAY(szCommand));
+		NRegistrySettings::ReadDwordFromRegistry(hKeyChild,_T("ShowNameOnToolbar"),
+			reinterpret_cast<DWORD *>(&bShowNameOnToolbar));
+
+		if(lNameStatus == ERROR_SUCCESS && lCommandStatus == ERROR_SUCCESS)
+		{
+			/* Create the application button. */
+			ApplicationToolbarAddItem(szName,szCommand,bShowNameOnToolbar);
+		}
+
+		RegCloseKey(hKeyChild);
+
+		i++;
+
+		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
+			_T("%d"),i);
+
+		ReturnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hKeyChild);
+	}
+}
+
+void Explorerplusplus::SaveApplicationToolbarToRegistry(void)
+{
+	SHDeleteKey(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY);
+
+	HKEY hKey;
+	LONG ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY,
+		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,NULL);
+
+	if(ReturnValue == ERROR_SUCCESS)
+	{
+		if(m_pAppButtons != NULL)
+			SaveApplicationToolbarToRegistryInternal(hKey,m_pAppButtons,0);
+
+		RegCloseKey(hKey);
+	}
+}
+
+void Explorerplusplus::SaveApplicationToolbarToRegistryInternal(HKEY hKey,
+ApplicationButton_t	*pab,int count)
+{
+	TCHAR szKeyName[32];
+	_itow_s(count,szKeyName,SIZEOF_ARRAY(szKeyName),10);
+
+	HKEY hKeyChild;
+	LONG ReturnValue = RegCreateKeyEx(hKey,szKeyName,0,NULL,
+		REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKeyChild,NULL);
+
+	if(ReturnValue == ERROR_SUCCESS)
+	{
+		NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("Name"),pab->szName);
+		NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("Command"),pab->szCommand);
+		NRegistrySettings::SaveDwordToRegistry(hKeyChild,_T("ShowNameOnToolbar"),pab->bShowNameOnToolbar);
+
+		count++;
+
+		RegCloseKey(hKeyChild);
+	}
+
+	if(pab->pNext != NULL)
+	{
+		SaveApplicationToolbarToRegistryInternal(hKey,pab->pNext,count);
+	}
+}
+
+void Explorerplusplus::LoadApplicationToolbarFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+{
+	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
+	MSXML2::IXMLDOMNode			*pNode = NULL;
+	BSTR						bstr = NULL;
+	HRESULT						hr;
+
+	if(!pXMLDom)
+		goto clean;
+
+	bstr = SysAllocString(L"//ApplicationButton");
+	hr = pXMLDom->selectSingleNode(bstr,&pNode);
+
+	if(hr == S_OK)
+	{
+		LoadApplicationToolbarFromXMLInternal(pNode);
+	}
+
+clean:
+	if (bstr) SysFreeString(bstr);
+	if (pNodes) pNodes->Release();
+	if (pNode) pNode->Release();
+
+	return;
+}
+
+/* Start at the first node. Read all of its attributes
+and then step down into any children, before traversing
+any sibling nodes (and stepping into their child items,
+etc). */
+void Explorerplusplus::LoadApplicationToolbarFromXMLInternal(MSXML2::IXMLDOMNode *pNode)
+{
+	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
+	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
+	MSXML2::IXMLDOMNode			*pNextSibling = NULL;
+	TCHAR						szName[512];
+	TCHAR						szCommand[512];
+	BOOL						bNameFound = FALSE;
+	BOOL						bCommandFound = FALSE;
+	BSTR						bstrName;
+	BSTR						bstrValue;
+	BOOL						bShowNameOnToolbar = TRUE;
+	HRESULT						hr;
+	long						nAttributeNodes;
+	long						i = 0;
+
+	hr = pNode->get_attributes(&am);
+
+	if(FAILED(hr))
+		return;
+
+	/* Retrieve the total number of attributes
+	attached to this node. */
+	am->get_length(&nAttributeNodes);
+
+	for(i = 0;i < nAttributeNodes;i++)
+	{
+		am->get_item(i, &pAttributeNode);
+
+		/* Element name. */
+		pAttributeNode->get_nodeName(&bstrName);
+
+		/* Element value. */
+		pAttributeNode->get_text(&bstrValue);
+
+		if(lstrcmpi(bstrName,L"Name") == 0)
+		{
+			StringCchCopy(szName,SIZEOF_ARRAY(szName),bstrValue);
+
+			bNameFound = TRUE;
+		}
+		else if(lstrcmpi(bstrName,L"Command") == 0)
+		{
+			StringCchCopy(szCommand,SIZEOF_ARRAY(szCommand),bstrValue);
+
+			bCommandFound = TRUE;
+		}
+		else if(lstrcmpi(bstrName,L"ShowNameOnToolbar") == 0)
+		{
+			bShowNameOnToolbar = NXMLSettings::DecodeBoolValue(bstrValue);
+		}
+	}
+
+	if(bNameFound && bCommandFound)
+		ApplicationToolbarAddItem(szName,szCommand,bShowNameOnToolbar);
+
+	hr = pNode->get_nextSibling(&pNextSibling);
+
+	if(hr == S_OK)
+	{
+		hr = pNextSibling->get_nextSibling(&pNextSibling);
+
+		if(hr == S_OK)
+		{
+			LoadApplicationToolbarFromXMLInternal(pNextSibling);
+		}
+	}
+}
+
+void Explorerplusplus::SaveApplicationToolbarToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+MSXML2::IXMLDOMElement *pRoot)
+{
+	MSXML2::IXMLDOMElement		*pe = NULL;
+	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
+	BSTR						bstr;
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pRoot);
+
+	bstr = SysAllocString(L"ApplicationToolbar");
+	pXMLDom->createElement(bstr,&pe);
+	SysFreeString(bstr);
+	bstr = NULL;
+
+	if(m_pAppButtons != NULL)
+	{
+		SaveApplicationToolbarToXMLInternal(pXMLDom,pe,m_pAppButtons);
+	}
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
+
+	NXMLSettings::AppendChildToParent(pe, pRoot);
+	pe->Release();
+	pe = NULL;
+
+	SysFreeString(bstr_wsnt);
+}
+
+void Explorerplusplus::SaveApplicationToolbarToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
+MSXML2::IXMLDOMElement *pe,ApplicationButton_t *pab)
+{
+	MSXML2::IXMLDOMElement		*pParentNode = NULL;
+	BSTR						bstr_wsntt = SysAllocString(L"\n\t\t");
+	BSTR						bstr_indent;
+	WCHAR						wszIndent[128];
+	static int					iIndent = 2;
+	int							i = 0;
+
+	StringCchPrintf(wszIndent,SIZEOF_ARRAY(wszIndent),L"\n");
+
+	for(i = 0;i < iIndent;i++)
+		StringCchCat(wszIndent,SIZEOF_ARRAY(wszIndent),L"\t");
+
+	bstr_indent = SysAllocString(wszIndent);
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_indent,pe);
+
+	SysFreeString(bstr_indent);
+	bstr_indent = NULL;
+
+	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("ApplicationButton"),pab->szName);
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Command"),pab->szCommand);
+	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowNameOnToolbar"),NXMLSettings::EncodeBoolValue(pab->bShowNameOnToolbar));
+
+	if(pab->pNext != NULL)
+		SaveApplicationToolbarToXMLInternal(pXMLDom,pe,pab->pNext);
+
+	pParentNode->Release();
+	pParentNode = NULL;
+
+	SysFreeString(bstr_wsntt);
 }

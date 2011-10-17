@@ -529,25 +529,23 @@ void Explorerplusplus::OnTBReset(void)
 
 void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 {
-	NMTBGETINFOTIP	*ptbgit = NULL;
-	LPITEMIDLIST	pidl = NULL;
-	TCHAR			szInfoTip[1024];
-	TCHAR			szPath[MAX_PATH];
-
-	ptbgit = (NMTBGETINFOTIP *)lParam;
+	NMTBGETINFOTIP *ptbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
 
 	StringCchCopy(ptbgit->pszText,ptbgit->cchTextMax,EMPTY_STRING);
 
-	/* TODO: String table. */
 	if(ptbgit->iItem == TOOLBAR_BACK)
 	{
 		if(m_pActiveShellBrowser->IsBackHistory())
 		{
-			pidl = m_pActiveShellBrowser->RetrieveHistoryItemWithoutUpdate(-1);
+			LPITEMIDLIST pidl = m_pActiveShellBrowser->RetrieveHistoryItemWithoutUpdate(-1);
 
+			TCHAR szPath[MAX_PATH];
 			GetDisplayName(pidl,szPath,SHGDN_INFOLDER);
-			StringCchPrintf(szInfoTip,SIZEOF_ARRAY(szInfoTip),
-				_T("Back to %s"),szPath);
+
+			TCHAR szInfoTip[1024];
+			TCHAR szTemp[64];
+			LoadString(m_hLanguageModule,IDS_MAIN_TOOLBAR_BACK,szTemp,SIZEOF_ARRAY(szTemp));
+			StringCchPrintf(szInfoTip,SIZEOF_ARRAY(szInfoTip),szTemp,szPath);
 
 			StringCchCopy(ptbgit->pszText,ptbgit->cchTextMax,szInfoTip);
 		}
@@ -556,11 +554,15 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 	{
 		if(m_pActiveShellBrowser->IsForwardHistory())
 		{
-			pidl = m_pActiveShellBrowser->RetrieveHistoryItemWithoutUpdate(1);
+			LPITEMIDLIST pidl = m_pActiveShellBrowser->RetrieveHistoryItemWithoutUpdate(1);
 
+			TCHAR szPath[MAX_PATH];
 			GetDisplayName(pidl,szPath,SHGDN_INFOLDER);
-			StringCchPrintf(szInfoTip,SIZEOF_ARRAY(szInfoTip),
-				_T("Forward to %s"),szPath);
+
+			TCHAR szInfoTip[1024];
+			TCHAR szTemp[64];
+			LoadString(m_hLanguageModule,IDS_MAIN_TOOLBAR_FORWARD,szTemp,SIZEOF_ARRAY(szTemp));
+			StringCchPrintf(szInfoTip,SIZEOF_ARRAY(szInfoTip),szTemp,szPath);
 
 			StringCchCopy(ptbgit->pszText,ptbgit->cchTextMax,szInfoTip);
 		}
@@ -572,13 +574,13 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 		LRESULT				lResult;
 		int					iIndex;
 
-		iIndex = (int)SendMessage(m_hApplicationToolbar,
-			TB_COMMANDTOINDEX,ptbgit->iItem,0);
+		iIndex = static_cast<int>(SendMessage(m_hApplicationToolbar,
+			TB_COMMANDTOINDEX,ptbgit->iItem,0));
 
 		if(iIndex != -1)
 		{
 			lResult = SendMessage(m_hApplicationToolbar,
-				TB_GETBUTTON,iIndex,(LPARAM)&tbButton);
+				TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
 
 			if(lResult)
 			{

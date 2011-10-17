@@ -265,7 +265,7 @@ void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 	(*pLoadSave)->LoadApplicationToolbar();
 	(*pLoadSave)->LoadToolbarInformation();
 	(*pLoadSave)->LoadColorRules();
-	(*pLoadSave)->LoadState();
+	(*pLoadSave)->LoadDialogStates();
 
 	ValidateLoadedSettings();
 }
@@ -1460,9 +1460,9 @@ void Explorerplusplus::OnStartedBrowsing(int iTabId,TCHAR *szFolderPath)
 
 	if(iTabId == m_iObjectIndex)
 	{
-		/* TODO: String table. */
-		StringCchPrintf(szLoadingText,SIZEOF_ARRAY(szLoadingText),
-			_T("Loading %s..."),szFolderPath);
+		TCHAR szTemp[64];
+		LoadString(m_hLanguageModule,IDS_GENERAL_LOADING,szTemp,SIZEOF_ARRAY(szTemp));
+		StringCchPrintf(szLoadingText,SIZEOF_ARRAY(szLoadingText),szTemp,szFolderPath);
 
 		/* Browsing of a folder has started. Set the status bar text to indicate that
 		the folder is been loaded. */
@@ -2731,7 +2731,7 @@ void Explorerplusplus::SaveAllSettings(void)
 	pLoadSave->SaveApplicationToolbar();
 	pLoadSave->SaveToolbarInformation();
 	pLoadSave->SaveColorRules();
-	pLoadSave->SaveState();
+	pLoadSave->SaveDialogStates();
 
 	delete pLoadSave;
 }

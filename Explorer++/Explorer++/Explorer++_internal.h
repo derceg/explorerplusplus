@@ -83,17 +83,6 @@ file manager. */
 #define WM_APP_ASSOCCHANGED		(WM_APP + 54)
 #define WM_APP_KEYDOWN			(WM_APP + 55)
 
-/* The number of toolbars that appear in the
-main rebar. */
-#define NUM_MAIN_TOOLBARS	5
-
-/* Main toolbar id's. */
-#define	ID_MAINTOOLBAR			0
-#define	ID_ADDRESSTOOLBAR		1
-#define	ID_BOOKMARKSTOOLBAR		2
-#define	ID_DRIVESTOOLBAR		3
-#define	ID_APPLICATIONSTOOLBAR	4
-
 /* Rebar menu id's. */
 #define ID_REBAR_MENU_BACK_START	2000
 #define ID_REBAR_MENU_BACK_END		2999
@@ -228,19 +217,6 @@ bitmap). */
 #define SHELLIMAGES_PASTESHORTCUT		30
 #define SHELLIMAGES_DELETEPERMANENTLY	31
 #define SHELLIMAGES_CMDADMIN			32
-
-struct ApplicationButton_t
-{
-	/* External. */
-	TCHAR	szName[512];
-	TCHAR	szCommand[512];
-	BOOL	bShowNameOnToolbar;
-
-	/* Internal. */
-	ApplicationButton_t *pNext;
-	ApplicationButton_t	*pPrevious;
-	int		iImage;
-};
 
 /* Used to store settings for individual directories. */
 struct DirectorySettingsInternal_t
@@ -378,10 +354,6 @@ CM_SIZE,CM_TYPE,CM_DATEMODIFIED};
 extern CRITICAL_SECTION g_csDirMonCallback;
 extern BOOL g_bForceLanguageLoad;
 extern TCHAR g_szLang[32];
-
-extern HWND g_hwndSearch;
-extern HWND g_hwndOptions;
-extern HWND g_hwndManageBookmarks;
 
 BOOL TestConfigFileInternal(void);
 BOOL LoadWindowPosition(WINDOWPLACEMENT *pwndpl);

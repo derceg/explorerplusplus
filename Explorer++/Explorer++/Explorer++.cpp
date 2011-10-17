@@ -19,6 +19,10 @@
 
 CRITICAL_SECTION	g_csDirMonCallback;
 
+extern HWND g_hwndSearch;
+extern HWND g_hwndOptions;
+extern HWND g_hwndManageBookmarks;
+
 Explorerplusplus::Explorerplusplus(HWND hwnd) :
 m_hContainer(hwnd)
 {

@@ -42,18 +42,18 @@ int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam
 /* TODO: Define in class. */
 struct FileSize_t
 {
-	SizeDisplayFormat_t	sdf;
-	TCHAR				szDisplayName[64];
+	SizeDisplayFormat_t sdf;
+	UINT StringID;
 };
 
 /* TODO: Strings into string table. */
 static const FileSize_t g_FileSizes[] =
-{{SIZE_FORMAT_BYTES,_T("Bytes")},
-{SIZE_FORMAT_KBYTES,_T("KB")},
-{SIZE_FORMAT_MBYTES,_T("MB")},
-{SIZE_FORMAT_GBYTES,_T("GB")},
-{SIZE_FORMAT_TBYTES,_T("TB")},
-{SIZE_FORMAT_PBYTES,_T("PB")}};
+{{SIZE_FORMAT_BYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_BYTES},
+{SIZE_FORMAT_KBYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_KB},
+{SIZE_FORMAT_MBYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_MB},
+{SIZE_FORMAT_GBYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_GB},
+{SIZE_FORMAT_TBYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_TB},
+{SIZE_FORMAT_PBYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_PB}};
 
 BOOL bRefreshAllTabs;
 
@@ -61,6 +61,8 @@ static HWND g_hOptionsPropertyDialog	= NULL;
 
 HICON g_hNewTabDirIcon;
 TCHAR g_szNewTabDirectory[MAX_PATH];
+
+extern HWND g_hwndOptions;
 
 void Explorerplusplus::OnShowOptions(void)
 {
@@ -498,7 +500,6 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 		case WM_INITDIALOG:
 			{
 				HWND hCBSize;
-				int i = 0;
 
 				if(m_bHideSystemFilesGlobal)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SYSTEMFILES,BST_CHECKED);
@@ -539,13 +540,17 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 				hCBSize = GetDlgItem(hDlg,IDC_COMBO_FILESIZES);
 
-				for(i = 0;i < SIZEOF_ARRAY(g_FileSizes);i++)
+				for(int i = 0;i < SIZEOF_ARRAY(g_FileSizes);i++)
 				{
-					SendMessage(hCBSize,CB_ADDSTRING,0,(LPARAM)g_FileSizes[i].szDisplayName);
+					TCHAR szTemp[32];
+					LoadString(m_hLanguageModule,g_FileSizes[i].StringID,szTemp,SIZEOF_ARRAY(szTemp));
+					SendMessage(hCBSize,CB_ADDSTRING,0,reinterpret_cast<LPARAM>(szTemp));
 					SendMessage(hCBSize,CB_SETITEMDATA,i,g_FileSizes[i].sdf);
 
 					if(g_FileSizes[i].sdf == m_SizeDisplayFormat)
+					{
 						SendMessage(hCBSize,CB_SETCURSEL,i,0);
+					}
 				}
 
 				EnableWindow(hCBSize,m_bForceSize);

@@ -312,25 +312,24 @@ void Explorerplusplus::HandleMainWindowText(void)
 
 	if(m_bShowPrivilegeLevelInTitleBar)
 	{
-		TCHAR szPrivilegeAddition[32];
-		TCHAR szPrivilege[32];
+		TCHAR szPrivilegeAddition[64];
+		TCHAR szPrivilege[64];
 
-		/* TODO: String table. */
 		if(CheckGroupMembership(GROUP_ADMINISTRATORS))
 		{
-			StringCchPrintf(szPrivilege,SIZEOF_ARRAY(szPrivilege),_T("Administrators"));
+			LoadString(m_hLanguageModule,IDS_PRIVILEGE_LEVEL_ADMINISTRATORS,szPrivilege,SIZEOF_ARRAY(szPrivilege));
 		}
 		else if(CheckGroupMembership(GROUP_POWERUSERS))
 		{
-			StringCchPrintf(szPrivilege,SIZEOF_ARRAY(szPrivilege),_T("Power Users"));
+			LoadString(m_hLanguageModule,IDS_PRIVILEGE_LEVEL_POWER_USERS,szPrivilege,SIZEOF_ARRAY(szPrivilege));
 		}
 		else if(CheckGroupMembership(GROUP_USERS))
 		{
-			StringCchPrintf(szPrivilege,SIZEOF_ARRAY(szPrivilege),_T("Users"));
+			LoadString(m_hLanguageModule,IDS_PRIVILEGE_LEVEL_USERS,szPrivilege,SIZEOF_ARRAY(szPrivilege));
 		}
 		else if(CheckGroupMembership(GROUP_USERSRESTRICTED))
 		{
-			StringCchPrintf(szPrivilege,SIZEOF_ARRAY(szPrivilege),_T("Users/Restricted"));
+			LoadString(m_hLanguageModule,IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED,szPrivilege,SIZEOF_ARRAY(szPrivilege));
 		}
 
 		if(m_bShowUserNameInTitleBar)

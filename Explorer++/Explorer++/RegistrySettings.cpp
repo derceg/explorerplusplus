@@ -13,21 +13,6 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "SearchDialog.h"
-#include "WildcardSelectDialog.h"
-#include "SetFileAttributesDialog.h"
-#include "RenameTabDialog.h"
-#include "MassRenameDialog.h"
-#include "FilterDialog.h"
-#include "ColorRuleDialog.h"
-#include "CustomizeColorsDialog.h"
-#include "SplitFileDialog.h"
-#include "DestroyFilesDialog.h"
-#include "MergeFilesDialog.h"
-#include "SelectColumnsDialog.h"
-#include "SetDefaultColumnsDialog.h"
-#include "AddBookmarkDialog.h"
-#include "DisplayColoursDialog.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
@@ -39,8 +24,6 @@ namespace
 	const TCHAR REG_TABS_KEY[] = _T("Software\\Explorer++\\Tabs");
 	const TCHAR REG_TOOLBARS_KEY[] = _T("Software\\Explorer++\\Toolbars");
 	const TCHAR REG_COLUMNS_KEY[] = _T("Software\\Explorer++\\DefaultColumns");
-	const TCHAR REG_APPLICATIONS_KEY[] = _T("Software\\Explorer++\\ApplicationToolbar");
-	const TCHAR REG_DIALOGS_KEY[] = _T("Software\\Explorer++\\Dialogs");
 }
 
 #define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Gdiplus::Color(255,255,255)
@@ -914,114 +897,6 @@ void Explorerplusplus::LoadDefaultColumnsFromRegistry(void)
 	return;
 }
 
-void Explorerplusplus::SaveApplicationToolbarToRegistry(void)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	/* First, delete the 'ApplicationToolbar' key, along
-	with all of its subkeys. */
-	SHDeleteKey(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY);
-
-	/* Open/Create the main key that is used to store data. */
-	ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		if(m_pAppButtons != NULL)
-			SaveApplicationToolbarToRegistryInternal(hKey,m_pAppButtons,0);
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::SaveApplicationToolbarToRegistryInternal(HKEY hKey,
-ApplicationButton_t	*pab,int count)
-{
-	HKEY				hKeyChild;
-	TCHAR				szKeyName[32];
-	DWORD				Disposition;
-	LONG				ReturnValue;
-
-	_itow_s(count,szKeyName,SIZEOF_ARRAY(szKeyName),10);
-	ReturnValue = RegCreateKeyEx(hKey,szKeyName,0,NULL,
-		REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKeyChild,
-		&Disposition);
-
-	NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("Name"),pab->szName);
-	NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("Command"),pab->szCommand);
-	NRegistrySettings::SaveDwordToRegistry(hKeyChild,_T("ShowNameOnToolbar"),pab->bShowNameOnToolbar);
-
-	count++;
-
-	RegCloseKey(hKeyChild);
-
-	if(pab->pNext != NULL)
-		SaveApplicationToolbarToRegistryInternal(hKey,pab->pNext,count);
-}
-
-void Explorerplusplus::LoadApplicationToolbarFromRegistry(void)
-{
-	HKEY		hKey;
-	LONG		ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY,
-		0,KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		LoadApplicationToolbarFromRegistryInternal(hKey);
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadApplicationToolbarFromRegistryInternal(HKEY hKey)
-{
-	HKEY	hKeyChild;
-	TCHAR	szItemKey[256];
-	TCHAR	szName[512];
-	TCHAR	szCommand[512];
-	LONG	lNameStatus;
-	LONG	lCommandStatus;
-	LONG	ReturnValue;
-	BOOL	bShowNameOnToolbar = TRUE;
-	int		i = 0;
-
-	StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-		_T("%d"),i);
-
-	ReturnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hKeyChild);
-
-	while(ReturnValue == ERROR_SUCCESS)
-	{
-		lNameStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,_T("Name"),
-			szName,SIZEOF_ARRAY(szName));
-		lCommandStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,_T("Command"),
-			szCommand,SIZEOF_ARRAY(szCommand));
-		NRegistrySettings::ReadDwordFromRegistry(hKeyChild,_T("ShowNameOnToolbar"),
-			(LPDWORD)&bShowNameOnToolbar);
-
-		if(lNameStatus == ERROR_SUCCESS && lCommandStatus == ERROR_SUCCESS)
-		{
-			/* Create the application button. */
-			ApplicationToolbarAddItem(szName,szCommand,bShowNameOnToolbar);
-		}
-
-		RegCloseKey(hKeyChild);
-
-		i++;
-
-		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-			_T("%d"),i);
-
-		ReturnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hKeyChild);
-	}
-}
-
 void Explorerplusplus::SaveToolbarInformationToRegistry(void)
 {
 	HKEY	hKey;
@@ -1120,67 +995,6 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry(void)
 	}
 }
 
-void Explorerplusplus::SaveStateToRegistry(void)
-{
-	HKEY	hKey;
-	DWORD	Disposition;
-	LONG	ReturnValue;
-
-	ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_DIALOGS_KEY,
-		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
-		&Disposition);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		CSearchDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CWildcardSelectDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CSetFileAttributesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CRenameTabDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CMassRenameDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CFilterDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CColorRuleDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CCustomizeColorsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CSplitFileDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CDestroyFilesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CMergeFilesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CSelectColumnsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CSetDefaultColumnsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CAddBookmarkDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CDisplayColoursDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-
-		RegCloseKey(hKey);
-	}
-}
-
-void Explorerplusplus::LoadStateFromRegistry(void)
-{
-	HKEY				hKey;
-	LONG				ReturnValue;
-
-	ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_DIALOGS_KEY,0,KEY_READ,&hKey);
-
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		CSearchDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CWildcardSelectDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CSetFileAttributesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CRenameTabDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CMassRenameDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CFilterDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CColorRuleDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CCustomizeColorsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CSplitFileDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CDestroyFilesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CMergeFilesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CSelectColumnsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CSetDefaultColumnsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CAddBookmarkDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CDisplayColoursDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-
-		RegCloseKey(hKey);
-	}
-}
-
 Explorerplusplus::CLoadSaveRegistry::CLoadSaveRegistry(Explorerplusplus *pContainer) :
 m_pContainer(pContainer)
 {
@@ -1227,9 +1041,9 @@ void Explorerplusplus::CLoadSaveRegistry::LoadColorRules()
 	NColorRuleHelper::LoadColorRulesFromRegistry(m_pContainer->m_ColorRules);
 }
 
-void Explorerplusplus::CLoadSaveRegistry::LoadState()
+void Explorerplusplus::CLoadSaveRegistry::LoadDialogStates()
 {
-	m_pContainer->LoadStateFromRegistry();
+	m_pContainer->LoadDialogStatesFromRegistry();
 }
 
 void Explorerplusplus::CLoadSaveRegistry::SaveGenericSettings()
@@ -1267,7 +1081,7 @@ void Explorerplusplus::CLoadSaveRegistry::SaveColorRules()
 	NColorRuleHelper::SaveColorRulesToRegistry(m_pContainer->m_ColorRules);
 }
 
-void Explorerplusplus::CLoadSaveRegistry::SaveState()
+void Explorerplusplus::CLoadSaveRegistry::SaveDialogStates()
 {
-	m_pContainer->SaveStateToRegistry();
+	m_pContainer->SaveDialogStatesToRegistry();
 }

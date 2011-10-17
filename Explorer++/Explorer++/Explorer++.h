@@ -8,6 +8,7 @@
 #include "DrivesToolbar.h"
 #include "TabContainer.h"
 #include "ColorRuleHelper.h"
+#include "ApplicationToolbarHelper.h"
 #include "../ShellBrowser/iShellView.h"
 #include "../MyTreeView/MyTreeView.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -98,6 +99,17 @@ private:
 	static const UINT		DEFAULT_TREEVIEW_WIDTH = 208;
 
 	static const UINT		TAB_WINDOW_HEIGHT = 24;
+
+	/* The number of toolbars that appear in the
+	main rebar. */
+	static const int NUM_MAIN_TOOLBARS = 5;
+
+	/* Main toolbar id's. */
+	static const int ID_MAINTOOLBAR = 0;
+	static const int ID_ADDRESSTOOLBAR = 1;
+	static const int ID_BOOKMARKSTOOLBAR = 2;
+	static const int ID_DRIVESTOOLBAR = 3;
+	static const int ID_APPLICATIONSTOOLBAR = 4;
 
 	enum MousewheelSource_t
 	{
@@ -227,7 +239,7 @@ private:
 		virtual void	LoadApplicationToolbar() = 0;
 		virtual void	LoadToolbarInformation() = 0;
 		virtual void	LoadColorRules() = 0;
-		virtual void	LoadState() = 0;
+		virtual void	LoadDialogStates() = 0;
 
 		/* Saving functions. */
 		virtual void	SaveGenericSettings() = 0;
@@ -237,7 +249,7 @@ private:
 		virtual void	SaveApplicationToolbar() = 0;
 		virtual void	SaveToolbarInformation() = 0;
 		virtual void	SaveColorRules() = 0;
-		virtual void	SaveState() = 0;
+		virtual void	SaveDialogStates() = 0;
 	};
 
 	class CLoadSaveRegistry : public ILoadSave
@@ -255,7 +267,7 @@ private:
 		void	LoadApplicationToolbar();
 		void	LoadToolbarInformation();
 		void	LoadColorRules();
-		void	LoadState();
+		void	LoadDialogStates();
 
 		/* Saving functions. */
 		void	SaveGenericSettings();
@@ -265,7 +277,7 @@ private:
 		void	SaveApplicationToolbar();
 		void	SaveToolbarInformation();
 		void	SaveColorRules();
-		void	SaveState();
+		void	SaveDialogStates();
 
 	private:
 
@@ -287,7 +299,7 @@ private:
 		void	LoadApplicationToolbar();
 		void	LoadToolbarInformation();
 		void	LoadColorRules();
-		void	LoadState();
+		void	LoadDialogStates();
 
 		/* Saving functions. */
 		void	SaveGenericSettings();
@@ -297,7 +309,7 @@ private:
 		void	SaveApplicationToolbar();
 		void	SaveToolbarInformation();
 		void	SaveColorRules();
-		void	SaveState();
+		void	SaveDialogStates();
 
 	private:
 
@@ -611,8 +623,8 @@ private:
 	void					SaveApplicationToolbarToRegistryInternal(HKEY hKey,ApplicationButton_t	*pab,int count);
 	void					SaveToolbarInformationToRegistry(void);
 	void					LoadToolbarInformationFromRegistry(void);
-	void					SaveStateToRegistry(void);
-	void					LoadStateFromRegistry(void);
+	void					SaveDialogStatesToRegistry(void);
+	void					LoadDialogStatesFromRegistry(void);
 
 	/* Window state update. */
 	void					UpdateWindowStates(void);
@@ -769,8 +781,8 @@ private:
 	void					LoadToolbarInformationFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					SaveToolbarInformationToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveToolbarInformationToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
-	void					LoadStateFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					SaveStateToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
+	void					LoadDialogStatesFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
+	void					SaveDialogStatesToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					MapAttributeToValue(MSXML2::IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
 	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,TabInfo_t *pTabInfo);
 

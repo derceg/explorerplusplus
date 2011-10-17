@@ -272,6 +272,7 @@
     <ClCompile Include="ColorRuleHelper.cpp" />
     <ClCompile Include="CustomizeColorsDialog.cpp" />
     <ClCompile Include="DestroyFilesDialog.cpp" />
+    <ClCompile Include="DialogHelper.cpp" />
     <ClCompile Include="DisplayColoursDialog.cpp" />
     <ClCompile Include="DrivesToolbar.cpp" />
     <ClCompile Include="EventSwitcher.cpp" />
@@ -329,6 +330,7 @@
   <ItemGroup>
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="AddBookmarkDialog.h" />
+    <ClInclude Include="ApplicationToolbarHelper.h" />
     <ClInclude Include="BookmarkHelper.h" />
     <ClInclude Include="BookmarkIPHelper.h" />
     <ClInclude Include="BookmarksToolbar.h" />

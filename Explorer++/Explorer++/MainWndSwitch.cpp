@@ -41,6 +41,10 @@
 have been corrected. */
 extern HIMAGELIST himlMenu;
 
+extern HWND g_hwndSearch;
+extern HWND g_hwndOptions;
+extern HWND g_hwndManageBookmarks;
+
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	Explorerplusplus *pContainer = (Explorerplusplus *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
