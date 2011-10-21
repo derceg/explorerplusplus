@@ -83,7 +83,7 @@ size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf)
 			iSizeIndex++;
 		}
 
-		if(iSizeIndex > SIZEOF_ARRAY(pszSizeTypes))
+		if(iSizeIndex > (SIZEOF_ARRAY(pszSizeTypes) - 1))
 		{
 			StringCchCopy(pszFileSize,cchBuf,EMPTY_STRING);
 			return;
