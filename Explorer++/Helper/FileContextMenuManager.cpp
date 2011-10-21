@@ -23,13 +23,15 @@ LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
 	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
-	LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList)
+	LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList) :
+m_hwnd(hwnd),
+m_pidlParent(ILClone(pidlParent)),
+m_pShellContext3(NULL),
+m_pShellContext2(NULL),
+m_pShellContext(NULL)
 {
 	IContextMenu *pContextMenu = NULL;
 	HRESULT hr;
-
-	m_hwnd = hwnd;
-	m_pidlParent = ILClone(pidlParent);
 
 	for each(auto pidl in pidlItemList)
 	{
@@ -88,10 +90,6 @@ CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
 
 	if(SUCCEEDED(hr))
 	{
-		m_pShellContext3 = NULL;
-		m_pShellContext2 = NULL;
-		m_pShellContext = NULL;
-
 		/* First, try to get IContextMenu3, then IContextMenu2, and if neither of these
 		are available, IContextMenu. */
 		hr = pContextMenu->QueryInterface(IID_IContextMenu3,
