@@ -175,6 +175,9 @@
     <ClCompile Include="DialogHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UpdateCheckDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Explorer++.h">
@@ -298,6 +301,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ApplicationToolbarHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdateCheckDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

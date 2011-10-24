@@ -26,6 +26,7 @@
 #include "HelpFileMissingDialog.h"
 #include "DisplayColoursDialog.h"
 #include "IModelessDialogNotification.h"
+#include "UpdateCheckDialog.h"
 #include "MainResource.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../HolderWindow/HolderWindow.h"
@@ -1460,6 +1461,13 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 					CHelpFileMissingDialog HelpFileMissingDialog(m_hLanguageModule,IDD_HELPFILEMISSING,hwnd);
 					HelpFileMissingDialog.ShowModalDialog();
 				}
+			}
+			break;
+
+		case IDM_HELP_CHECKFORUPDATES:
+			{
+				CUpdateCheckDialog UpdateCheckDialog(m_hLanguageModule,IDD_UPDATECHECK,hwnd);
+				UpdateCheckDialog.ShowModalDialog();
 			}
 			break;
 

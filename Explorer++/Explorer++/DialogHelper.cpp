@@ -29,6 +29,7 @@
 #include "SetDefaultColumnsDialog.h"
 #include "AddBookmarkDialog.h"
 #include "DisplayColoursDialog.h"
+#include "UpdateCheckDialog.h"
 #include "../Helper/XMLSettings.h"
 
 
@@ -59,6 +60,7 @@ void Explorerplusplus::LoadDialogStatesFromRegistry(void)
 		CSetDefaultColumnsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CAddBookmarkDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 		CDisplayColoursDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		CUpdateCheckDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -87,6 +89,7 @@ void Explorerplusplus::SaveDialogStatesToRegistry(void)
 		CSetDefaultColumnsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CAddBookmarkDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 		CDisplayColoursDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		CUpdateCheckDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}
@@ -176,6 +179,8 @@ void Explorerplusplus::LoadDialogStatesFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 							CAddBookmarkDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 						else if(lstrcmpi(bstrValue,_T("DisplayColors")) == 0)
 							CDisplayColoursDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
+						else if(lstrcmpi(bstrValue,_T("UpdateCheck")) == 0)
+							CUpdateCheckDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
 					}
 				}
 			}
@@ -220,6 +225,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	CSetDefaultColumnsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CAddBookmarkDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 	CDisplayColoursDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	CUpdateCheckDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 

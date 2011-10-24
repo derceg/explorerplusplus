@@ -116,7 +116,7 @@
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -163,7 +163,7 @@
       <Culture>0x0c09</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -202,7 +202,7 @@
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <TypeLibraryFile>
       </TypeLibraryFile>
@@ -240,7 +240,7 @@
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;shell32.lib;gdiplus.lib;msimg32.lib;shlwapi.lib;psapi.lib;mpr.lib;uxtheme.lib;vfw32.lib;winmm.lib;urlmon.lib;wininet.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)Explorer++.exe</OutputFile>
       <TypeLibraryFile>shobjidl.idl</TypeLibraryFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -317,6 +317,7 @@
     <ClCompile Include="TabHandler.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
+    <ClCompile Include="UpdateCheckDialog.cpp" />
     <ClCompile Include="WildcardSelectDialog.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
     <ClCompile Include="WinMain.cpp" />
@@ -368,6 +369,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="TabDropHandler.h" />
+    <ClInclude Include="UpdateCheckDialog.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
   </ItemGroup>
   <ItemGroup>

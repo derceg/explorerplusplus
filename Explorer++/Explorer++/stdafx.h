@@ -70,3 +70,4 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <WinInet.h>
