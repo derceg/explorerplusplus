@@ -1155,13 +1155,9 @@ int Explorerplusplus::OnClose(void)
 {
 	if(m_bConfirmCloseTabs && (TabCtrl_GetItemCount(m_hTabCtrl) > 1))
 	{
-		int response;
-
-		response = MessageBox(m_hContainer,
-		_T("Are you sure you want to \
-close all the current tabs?"),
-		NExplorerplusplus::WINDOW_NAME,
-		MB_ICONINFORMATION|MB_YESNO);
+		TCHAR szTemp[128];
+		LoadString(m_hLanguageModule,IDS_GENERAL_CLOSE_ALL_TABS,szTemp,SIZEOF_ARRAY(szTemp));
+		int response = MessageBox(m_hContainer,szTemp,NExplorerplusplus::WINDOW_NAME,MB_ICONINFORMATION|MB_YESNO);
 
 		/* If the user clicked no, return without
 		closing. */
@@ -1243,15 +1239,14 @@ void Explorerplusplus::OnResolveLink(void)
 
 void Explorerplusplus::OnSaveDirectoryListing(void)
 {
-	TCHAR	FullFileName[MAX_PATH] = _T("Directory Listing.txt");
-	BOOL	bSaveNameRetrieved;
-
-	bSaveNameRetrieved = GetFileNameFromUser(m_hContainer,
-	FullFileName,m_CurrentDirectory);
+	TCHAR FileName[MAX_PATH];
+	LoadString(m_hLanguageModule,IDS_GENERAL_DIRECTORY_LISTING_FILENAME,FileName,SIZEOF_ARRAY(FileName));
+	StringCchCat(FileName,SIZEOF_ARRAY(FileName),_T(".txt"));
+	BOOL bSaveNameRetrieved = GetFileNameFromUser(m_hContainer,FileName,m_CurrentDirectory);
 
 	if(bSaveNameRetrieved)
 	{
-		NFileOperations::SaveDirectoryListing(m_CurrentDirectory,FullFileName);
+		NFileOperations::SaveDirectoryListing(m_CurrentDirectory,FileName);
 	}
 }
 

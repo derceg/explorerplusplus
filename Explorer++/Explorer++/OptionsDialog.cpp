@@ -46,7 +46,6 @@ struct FileSize_t
 	UINT StringID;
 };
 
-/* TODO: Strings into string table. */
 static const FileSize_t g_FileSizes[] =
 {{SIZE_FORMAT_BYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_BYTES},
 {SIZE_FORMAT_KBYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_KB},

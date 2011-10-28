@@ -838,72 +838,61 @@ void Explorerplusplus::HandleFileSelectionDisplay(void)
 
 void Explorerplusplus::HandleFileSelectionDisplayZero(void)
 {
-	SHFILEINFO		shfi;
-	TCHAR			szFolderName[MAX_PATH];
-	TCHAR			szCurrentDirectory[MAX_PATH];
-	LPITEMIDLIST	pidlDirectory = NULL;
-	LPITEMIDLIST	pidlComputer = NULL;
-
 	/* Clear out any previous data shown in the display window. */
 	DisplayWindow_ClearTextBuffer(m_hDisplayWindow);
 	DisplayWindow_SetThumbnailFile(m_hDisplayWindow,EMPTY_STRING,FALSE);
 
+	TCHAR szCurrentDirectory[MAX_PATH];
 	m_pActiveShellBrowser->QueryCurrentDirectory(MAX_PATH,szCurrentDirectory);
-	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+	LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
+	LPITEMIDLIST pidlComputer = NULL;
 	SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidlComputer);
 
 	if(CompareIdls(pidlDirectory,pidlComputer))
 	{
-		char szCPUBrand[64];
-		WCHAR wszCPUBrand[64];
 		TCHAR szDisplay[512];
-		TCHAR szTemp[512];
-		DWORD dwSize;
-
-		dwSize = SIZEOF_ARRAY(szDisplay);
+		DWORD dwSize = SIZEOF_ARRAY(szDisplay);
 		GetComputerName(szDisplay,&dwSize);
 		DisplayWindow_BufferText(m_hDisplayWindow,szDisplay);
 
-
+		char szCPUBrand[64];
 		GetCPUBrandString(szCPUBrand,SIZEOF_ARRAY(szCPUBrand));
 
-		#ifndef UNICODE
-		StringCchCopy(wszCPUBrand,SIZEOF_ARRAY(wszCPUBrand),szCPUBrand);
-		#else
+		TCHAR szTemp[512];
+		WCHAR wszCPUBrand[64];
 		MultiByteToWideChar(CP_ACP,0,szCPUBrand,-1,wszCPUBrand,SIZEOF_ARRAY(wszCPUBrand));
-		#endif
-
-		StringCchPrintf(szDisplay,SIZEOF_ARRAY(szDisplay),_T("Processor: %s"),wszCPUBrand);
+		LoadString(m_hLanguageModule,IDS_GENERAL_DISPLAY_WINDOW_PROCESSOR,szTemp,SIZEOF_ARRAY(szTemp));
+		StringCchPrintf(szDisplay,SIZEOF_ARRAY(szDisplay),szTemp,wszCPUBrand);
 		DisplayWindow_BufferText(m_hDisplayWindow,szDisplay);
 
-
 		MEMORYSTATUSEX msex;
-
 		msex.dwLength = sizeof(msex);
 		GlobalMemoryStatusEx(&msex);
 
 		ULARGE_INTEGER lTotalPhysicalMem;
-
 		lTotalPhysicalMem.QuadPart = msex.ullTotalPhys;
-		FormatSizeString(lTotalPhysicalMem,szTemp,
-			SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szDisplay,SIZEOF_ARRAY(szDisplay),
-			_T("Memory: %s"),szTemp);
+
+		TCHAR szMemorySize[32];
+		FormatSizeString(lTotalPhysicalMem,szMemorySize,SIZEOF_ARRAY(szMemorySize));
+		LoadString(m_hLanguageModule,IDS_GENERAL_DISPLAY_WINDOW_MEMORY,szTemp,SIZEOF_ARRAY(szTemp));
+		StringCchPrintf(szDisplay,SIZEOF_ARRAY(szDisplay),szTemp,szMemorySize);
 		DisplayWindow_BufferText(m_hDisplayWindow,szDisplay);
 	}
 	else
 	{
 		/* Folder name. */
+		TCHAR szFolderName[MAX_PATH];
 		GetDisplayName(szCurrentDirectory,szFolderName,SHGDN_INFOLDER);
 		DisplayWindow_BufferText(m_hDisplayWindow,szFolderName);
 
 		/* Folder type. */
-		SHGetFileInfo((LPTSTR)pidlDirectory,NULL,&shfi,
-			sizeof(shfi),SHGFI_PIDL|SHGFI_TYPENAME);
+		SHFILEINFO shfi;
+		SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidlDirectory),NULL,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_TYPENAME);
 		DisplayWindow_BufferText(m_hDisplayWindow,shfi.szTypeName);
 	}
 
+	CoTaskMemFree(pidlComputer);
 	CoTaskMemFree(pidlDirectory);
 }
 
@@ -1134,34 +1123,33 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 
 			if(PathIsRoot(szFullItemName))
 			{
+				TCHAR szMsg[64];
+				TCHAR szTemp[64];
 				ULARGE_INTEGER ulTotalNumberOfBytes;
 				ULARGE_INTEGER ulTotalNumberOfFreeBytes;
-				TCHAR szSize[32];
-				TCHAR szFileSystem[MAX_PATH + 1];
-				TCHAR szMsg[64];
-				BOOL bRet;
-
-				bRet = GetDiskFreeSpaceEx(szFullItemName,NULL,&ulTotalNumberOfBytes,
-					&ulTotalNumberOfFreeBytes);
+				BOOL bRet = GetDiskFreeSpaceEx(szFullItemName,NULL,&ulTotalNumberOfBytes,&ulTotalNumberOfFreeBytes);
 
 				if(bRet)
 				{
-					FormatSizeString(ulTotalNumberOfFreeBytes,szSize,
-						SIZEOF_ARRAY(szSize));
-					StringCchPrintf(szMsg,SIZEOF_ARRAY(szMsg),_T("Free Space: %s"),szSize);
+					TCHAR szSize[32];
+					FormatSizeString(ulTotalNumberOfFreeBytes,szSize,SIZEOF_ARRAY(szSize));
+					LoadString(m_hLanguageModule,IDS_GENERAL_DISPLAY_WINDOW_FREE_SPACE,szTemp,SIZEOF_ARRAY(szTemp));
+					StringCchPrintf(szMsg,SIZEOF_ARRAY(szMsg),szTemp,szSize);
 					DisplayWindow_BufferText(m_hDisplayWindow,szMsg);
 
 					FormatSizeString(ulTotalNumberOfBytes,szSize,SIZEOF_ARRAY(szSize));
-					StringCchPrintf(szMsg,SIZEOF_ARRAY(szMsg),_T("Total Size: %s"),szSize);
+					LoadString(m_hLanguageModule,IDS_GENERAL_DISPLAY_WINDOW_TOTAL_SIZE,szTemp,SIZEOF_ARRAY(szTemp));
+					StringCchPrintf(szMsg,SIZEOF_ARRAY(szMsg),szTemp,szSize);
 					DisplayWindow_BufferText(m_hDisplayWindow,szMsg);
 				}
 
-				bRet = GetVolumeInformation(szFullItemName,NULL,0,NULL,NULL,NULL,szFileSystem,
-					SIZEOF_ARRAY(szFileSystem));
+				TCHAR szFileSystem[MAX_PATH + 1];
+				bRet = GetVolumeInformation(szFullItemName,NULL,0,NULL,NULL,NULL,szFileSystem,SIZEOF_ARRAY(szFileSystem));
 
 				if(bRet)
 				{
-					StringCchPrintf(szMsg,SIZEOF_ARRAY(szMsg),_T("File System: %s"),szFileSystem);
+					LoadString(m_hLanguageModule,IDS_GENERAL_DISPLAY_WINDOW_FILE_SYSTEM,szTemp,SIZEOF_ARRAY(szTemp));
+					StringCchPrintf(szMsg,SIZEOF_ARRAY(szMsg),szTemp,szFileSystem);
 					DisplayWindow_BufferText(m_hDisplayWindow,szMsg);
 				}
 			}
