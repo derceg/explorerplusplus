@@ -1412,6 +1412,7 @@ void CFolderView::SetMediaStatusColumnData(int iItem,int iColumn,int iType)
 	TCHAR	*pszTemp = NULL;
 	QWORD	*pqwTemp = NULL;
 	DWORD	*pdwTemp = NULL;
+	BOOL	*pbTemp = NULL;
 	HRESULT	hr = E_FAIL;
 	BOOL	bItem;
 
@@ -1473,7 +1474,21 @@ void CFolderView::SetMediaStatusColumnData(int iItem,int iColumn,int iType)
 			break;
 
 		case MEDIAMETADATA_TYPE_PROTECTED:
-			/* TODO: Implement. */
+			hr = GetMediaMetadata(szFullFileName,g_wszWMProtected,(BYTE **)&pbTemp);
+
+			if(SUCCEEDED(hr))
+			{
+				if(*pbTemp)
+				{
+					StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),L"Yes");
+				}
+				else
+				{
+					StringCchCopy(szOutput,SIZEOF_ARRAY(szOutput),L"No");
+				}
+
+				free(pbTemp);
+			}
 			break;
 
 		case MEDIAMETADATA_TYPE_RATING:
