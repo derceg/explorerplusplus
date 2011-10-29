@@ -1676,13 +1676,13 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard,const TCHAR *szString,BO
 			}
 			else
 			{
-				TCHAR ch1;
-				TCHAR ch2;
+				TCHAR szCharacter1[1];
+				LCMapString(LOCALE_USER_DEFAULT,LCMAP_LOWERCASE,szWildcard,1,szCharacter1,SIZEOF_ARRAY(szCharacter1));
 
-				ch1 = LOWORD(CharLower((LPTSTR)MAKEWORD(*szWildcard,0)));
-				ch2 = LOWORD(CharLower((LPTSTR)MAKEWORD(*szString,0)));
+				TCHAR szCharacter2[1];
+				LCMapString(LOCALE_USER_DEFAULT,LCMAP_LOWERCASE,szString,1,szCharacter2,SIZEOF_ARRAY(szCharacter2));
 
-				bCurrentMatch = (ch1 == ch2);
+				bCurrentMatch = (szCharacter1[0] == szCharacter2[0]);
 			}
 
 			szString++;
