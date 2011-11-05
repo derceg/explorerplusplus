@@ -9,6 +9,7 @@ New features:
 - Implemented the media protection column.
 
 Bug fixes:
+- Fixed two multithreaded bugs in the search dialog.
 - In certain areas (such as the search dialog), Unicode
   characters were not been converted to lowercase correctly.
   Fixed.
