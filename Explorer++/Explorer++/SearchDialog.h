@@ -168,7 +168,6 @@ private:
 	BOOL						m_bSearching;
 	BOOL						m_bStopSearching;
 	TCHAR						m_szSearchButton[32];
-	BOOL						m_bExit;
 
 	CSearch						*m_pSearch;
 

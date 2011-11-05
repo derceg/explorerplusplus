@@ -9,7 +9,13 @@ New features:
 - Implemented the media protection column.
 
 Bug fixes:
-- Fixed two multithreaded bugs in the search dialog.
+- If the search dialog was closed while searching, the
+  application would crash. Fixed.
+- When clicking the 'Close' button while searching (in the
+  search dialog), the dialog would not close until the
+  search was finished. It could also result in a crash.
+  Fixed.
+- Fixed multithreaded bug in the search dialog.
 - In certain areas (such as the search dialog), Unicode
   characters were not been converted to lowercase correctly.
   Fixed.
