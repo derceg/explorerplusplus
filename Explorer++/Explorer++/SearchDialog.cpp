@@ -53,7 +53,6 @@ CBaseDialog(hInstance,iResource,hParent,true)
 
 	m_bSearching		= FALSE;
 	m_bStopSearching	= FALSE;
-	m_bExit				= FALSE;
 	m_bSetSearchTimer	= TRUE;
 	m_iInternalIndex	= 0;
 	m_iPreviousSelectedColumn	= -1;
@@ -287,15 +286,7 @@ INT_PTR CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 		break;
 
 	case IDEXIT:
-		if(m_bSearching)
-		{
-			m_bExit = TRUE;
-			m_bStopSearching = TRUE;
-		}
-		else
-		{
-			DestroyWindow(m_hDlg);
-		}
+		DestroyWindow(m_hDlg);
 		break;
 
 	case IDCANCEL:
@@ -853,11 +844,6 @@ INT_PTR CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 					LoadString(GetInstance(),IDS_SEARCH_CANCELLED_MESSAGE,
 						szTemp,SIZEOF_ARRAY(szTemp));
 					SetDlgItemText(m_hDlg,IDC_STATIC_STATUS,szTemp);
-
-					if(m_bExit)
-					{
-						DestroyWindow(m_hDlg);
-					}
 				}
 
 				assert(m_pSearch != NULL);
@@ -979,15 +965,7 @@ INT_PTR CSearchDialog::OnTimer(int iTimerID)
 
 INT_PTR CSearchDialog::OnClose()
 {
-	if(m_bSearching)
-	{
-		m_bExit = TRUE;
-		m_bStopSearching = TRUE;
-	}
-	else
-	{
-		DestroyWindow(m_hDlg);
-	}
+	DestroyWindow(m_hDlg);
 
 	return 0;
 }
