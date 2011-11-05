@@ -388,6 +388,7 @@ void CSearchDialog::OnSearch()
 
 		m_pSearch = new CSearch(m_hDlg,szBaseDirectory,szSearchPattern,
 			dwAttributes,bUseRegularExpressions,bCaseInsensitive,bSearchSubFolders);
+		m_pSearch->AddRef();
 
 		/* Save the search directory and search pattern (only if they are not
 		the same as the most recent entry). */
@@ -475,6 +476,11 @@ void CSearchDialog::OnSearch()
 
 		if(m_pSearch != NULL)
 		{
+			/* Note that m_pSearch does not need to be
+			released here. Once the search object finishes,
+			it will send a WM_APP_SEARCHFINISHED message.
+			The handler for this message will then release
+			m_pSearch. */
 			m_pSearch->StopSearching();
 		}
 	}
@@ -1059,6 +1065,8 @@ void CSearch::StartSearching()
 
 	SendMessage(m_hDlg,NSearchDialog::WM_APP_SEARCHFINISHED,0,
 		MAKELPARAM(m_iFoldersFound,m_iFilesFound));
+
+	Release();
 }
 
 void CSearch::SearchDirectory(const TCHAR *szDirectory)
@@ -1070,11 +1078,19 @@ void CSearch::SearchDirectory(const TCHAR *szDirectory)
 
 	SearchDirectoryInternal(szDirectory,&SubFolderList);
 
-	/* TODO: Critical section not released. */
+	bool bStop = false;
+
 	EnterCriticalSection(&m_csStop);
 	if(m_bStopSearching)
-		return;
+	{
+		bStop = true;
+	}
 	LeaveCriticalSection(&m_csStop);
+
+	if(bStop)
+	{
+		return;
+	}
 
 	if(m_bSearchSubFolders)
 	{
@@ -1101,14 +1117,10 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 
 	if(hFindFile != INVALID_HANDLE_VALUE)
 	{
-		while(FindNextFile(hFindFile,&wfd) != 0)
-		{
-			/* TODO: Critical section not released. */
-			EnterCriticalSection(&m_csStop);
-			if(m_bStopSearching)
-				break;
-			LeaveCriticalSection(&m_csStop);
+		bool bStop = false;
 
+		while(FindNextFile(hFindFile,&wfd) != 0 && !bStop)
+		{
 			if(lstrcmpi(wfd.cFileName,_T(".")) != 0 &&
 				lstrcmpi(wfd.cFileName,_T("..")) != 0)
 			{
@@ -1184,6 +1196,13 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 					pSubFolderList->push_back(szSubFolder);
 				}
 			}
+
+			EnterCriticalSection(&m_csStop);
+			if(m_bStopSearching)
+			{
+				bStop = true;
+			}
+			LeaveCriticalSection(&m_csStop);
 		}
 
 		FindClose(hFindFile);
