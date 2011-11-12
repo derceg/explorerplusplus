@@ -1,9 +1,9 @@
 Explorer++ Version History
 --------------------------
 
-Current version: 1.3.3
+Current version: 1.3.4
 
-Version 1.3.4 (xx/xx/2011)
+Version 1.3.4 (12/11/2011)
 --------------------------
 New features:
 - Implemented the media protection column.
