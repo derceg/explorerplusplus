@@ -22,6 +22,7 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ListViewHelper.h"
 
 
 BOOL g_bNewFileRenamed = FALSE;
@@ -117,11 +118,11 @@ void CFolderView::DirectoryAltered(void)
 
 		if(iIndex != -1)
 		{
-			ListView_SelectItem(m_hListView,iIndex,TRUE);
+			NListView::ListView_SelectItem(m_hListView,iIndex,TRUE);
 
 			if(!bFocusSet)
 			{
-				ListView_FocusItem(m_hListView,iIndex,TRUE);
+				NListView::ListView_FocusItem(m_hListView,iIndex,TRUE);
 				ListView_EnsureVisible(m_hListView,iIndex,TRUE);
 
 				bFocusSet = TRUE;

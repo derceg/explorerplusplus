@@ -18,6 +18,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Bookmark.h"
+#include "../Helper/ListViewHelper.h"
 #include "MainResource.h"
 
 
@@ -193,7 +194,7 @@ void Explorerplusplus::OnOrganizeBookmarksInit(HWND hDlg)
 	TreeView_SelectItem(hFolders,TreeView_GetRoot(hFolders));
 
 	/* Select the first item. */
-	ListView_SelectItem(hListView,0,TRUE);
+	NListView::ListView_SelectItem(hListView,0,TRUE);
 
 	SetFocus(hListView);
 
@@ -251,9 +252,9 @@ void Explorerplusplus::MoveColumnItem(HWND hDlg,BOOL bUp)
 	if(iSelected != -1)
 	{
 		if(bUp)
-			ListView_SwapItems(hListView,iSelected,iSelected - 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected - 1);
 		else
-			ListView_SwapItems(hListView,iSelected,iSelected + 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected + 1);
 
 		SetFocus(hListView);
 	}
@@ -305,7 +306,7 @@ void Explorerplusplus::OrganizeBookmarksMove(HWND hDlg,BOOL bUp)
 
 		m_Bookmark.SwapBookmarks(&BookmarkSelected,&BookmarkSwap);
 
-		ListView_SwapItemsNolParam(hListView,iSelected,iSwap);
+		NListView::ListView_SwapItemsNolParam(hListView,iSelected,iSwap);
 	}
 }
 
@@ -578,7 +579,7 @@ void Explorerplusplus::OnOrganizeBookmarksDelete(HWND hDlg)
 			if(iSelected == (nItems - 1))
 				iSelected--;
 
-			ListView_SelectItem(hListView,iSelected,TRUE);
+			NListView::ListView_SelectItem(hListView,iSelected,TRUE);
 
 			SetFocus(hListView);
 		}

@@ -119,20 +119,6 @@ enum SizeDisplayFormat_t
 	SIZE_FORMAT_PBYTES
 };
 
-/* Listview helper functions. */
-int				ListView_SelectAllItems(HWND hListView);
-int				ListView_InvertSelection(HWND hListView);
-void			ListView_HandleInsertionMark(HWND hListView,int iItemFocus,POINT *ppt);
-BOOL			ListView_SelectItem(HWND hListView,int nItem,BOOL bSelect);
-BOOL			ListView_FocusItem(HWND hListView,int nItem,BOOL bFocus);
-int				ListView_DeselectAllItems(HWND hListView);
-DWORD			ListView_SetGridlines(HWND hListView,BOOL bEnableGridlines);
-void			ListView_SetAutoArrange(HWND hListView,BOOL bAutoArrange);
-HRESULT			ListView_SetBackgroundImage(HWND hListView,UINT Image);
-void			ListView_SwapItems(HWND hListView,int iItem1,int iItem2);
-void			ListView_SwapItemsNolParam(HWND hListView,int iItem1,int iItem2);
-void			ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate,UINT HoverTime);
-
 /* Tab control helper functions. */
 void			TabCtrl_SwapItems(HWND hTabCtrl,int iItem1,int iItem2);
 void			TabCtrl_SetItemText(HWND,int,TCHAR *);

@@ -168,18 +168,3 @@ void AddPathsToComboBoxEx(HWND CbEx,TCHAR *Path)
 		FindClose(hFirstFile);
 	}
 }
-
-void ListView_AddRemoveExtendedStyle(HWND hListView,DWORD dwStyle,BOOL bAdd)
-{
-	DWORD	dwExtendedStyle;
-
-	dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
-
-	if(bAdd)
-		dwExtendedStyle |= dwStyle;
-	else
-		dwExtendedStyle &= ~dwStyle;
-
-	ListView_SetExtendedListViewStyle(hListView,
-		dwExtendedStyle);
-}

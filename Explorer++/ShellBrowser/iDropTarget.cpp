@@ -18,6 +18,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/DropHandler.h"
+#include "../Helper/ListViewHelper.h"
 
 
 /* Scroll definitions. */
@@ -119,9 +120,9 @@ HRESULT _stdcall CFolderView::DragOver(DWORD grfKeyState,POINTL ptl,DWORD *pdwEf
 	if(m_bDataAccept)
 	{
 		if(!m_bOverFolder)
-			ListView_HandleInsertionMark(m_hListView,0,&pt);
+			NListView::ListView_HandleInsertionMark(m_hListView,0,&pt);
 		else
-			ListView_HandleInsertionMark(m_hListView,0,NULL);
+			NListView::ListView_HandleInsertionMark(m_hListView,0,NULL);
 	}
 
 	return S_OK;
@@ -328,7 +329,7 @@ HRESULT _stdcall CFolderView::DragLeave(void)
 {
 	m_pDropTargetHelper->DragLeave();
 
-	ListView_HandleInsertionMark(m_hListView,0,NULL);
+	NListView::ListView_HandleInsertionMark(m_hListView,0,NULL);
 
 	if(m_bDeselectDropFolder)
 	{
@@ -487,7 +488,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 			files if nothing was actually copied/moved). */
 			if(!m_bOverFolder)
 			{
-				ListView_DeselectAllItems(m_hListView);
+				NListView::ListView_SelectAllItems(m_hListView,FALSE);
 			}
 
 			pDropHandler->Release();
@@ -501,7 +502,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	}*/
 
 	/* Remove the insertion mark from the listview. */
-	ListView_HandleInsertionMark(m_hListView,0,NULL);
+	NListView::ListView_HandleInsertionMark(m_hListView,0,NULL);
 
 	//m_bPerformingDrag = FALSE;
 
@@ -538,7 +539,7 @@ void CFolderView::RepositionLocalFiles(POINT *ppt)
 	to be moved. Therefore, if the style is on, turn it
 	off, move the items, and the turn it back on. */
 	if(m_bAutoArrange)
-		ListView_SetAutoArrange(m_hListView,FALSE);
+		NListView::ListView_SetAutoArrange(m_hListView,FALSE);
 
 	for(itr = m_DraggedFilesList.begin();
 		itr != m_DraggedFilesList.end();itr++)
@@ -742,7 +743,7 @@ void CFolderView::RepositionLocalFiles(POINT *ppt)
 	}
 
 	if(m_bAutoArrange)
-		ListView_SetAutoArrange(m_hListView,TRUE);
+		NListView::ListView_SetAutoArrange(m_hListView,TRUE);
 
 	m_bDragging = FALSE;
 

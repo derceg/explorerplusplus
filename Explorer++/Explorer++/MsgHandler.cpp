@@ -16,6 +16,7 @@
 #include "Explorer++_internal.h"
 #include "WildcardSelectDialog.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ListViewHelper.h"
 
 
 /* Visibility states should NOT be included here. The visibility of
@@ -2152,7 +2153,7 @@ void Explorerplusplus::OnCreateNewFolder(void)
 	if(SUCCEEDED(hr))
 	{
 		m_bCountingDown = TRUE;
-		ListView_DeselectAllItems(m_hActiveListView);
+		NListView::ListView_SelectAllItems(m_hActiveListView,FALSE);
 		SetFocus(m_hActiveListView);
 
 		GetIdlFromParsingName(szNewFolderName,&pidlItem);

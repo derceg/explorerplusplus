@@ -21,6 +21,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
+#include "../Helper/ListViewHelper.h"
 
 
 const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetDefaultColumns");
@@ -335,7 +336,7 @@ void CSetDefaultColumnsDialog::SetupFolderColumns(FolderType_t FolderType)
 		iItem++;
 	}
 
-	ListView_SelectItem(hListView,0,TRUE);
+	NListView::ListView_SelectItem(hListView,0,TRUE);
 }
 
 std::list<Column_t> *CSetDefaultColumnsDialog::GetCurrentColumnList(FolderType_t FolderType)
@@ -405,11 +406,11 @@ void CSetDefaultColumnsDialog::OnMoveColumn(bool bUp)
 	{
 		if(bUp)
 		{
-			ListView_SwapItems(hListView,iSelected,iSelected - 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected - 1);
 		}
 		else
 		{
-			ListView_SwapItems(hListView,iSelected,iSelected + 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected + 1);
 		}
 
 		SetFocus(hListView);

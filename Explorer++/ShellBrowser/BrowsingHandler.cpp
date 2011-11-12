@@ -20,6 +20,7 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ListViewHelper.h"
 
 
 HRESULT CFolderView::BrowseFolder(TCHAR *szPath,UINT wFlags)
@@ -165,7 +166,7 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 		SendMessage(m_hOwner,WM_USER_FOLDEREMPTY,m_ID,FALSE);
 	}
 
-	/* Make the listview allocate space (for internal data strctures)
+	/* Make the listview allocate space (for internal data structures)
 	for all the items at once, rather than individually.
 	Acts as a speed optimization. */
 	ListView_SetItemCount(m_hListView,m_nAwaitingAdd + nPrevItems);
@@ -179,7 +180,7 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	lv.iSubItem		= 0;
 
 	if(m_bAutoArrange)
-		ListView_SetAutoArrange(m_hListView,FALSE);
+		NListView::ListView_SetAutoArrange(m_hListView,FALSE);
 
 	for(auto itr = m_AwaitingAddList.begin();itr != m_AwaitingAddList.end();itr++)
 	{
@@ -258,7 +259,7 @@ void inline CFolderView::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	}
 
 	if(m_bAutoArrange)
-		ListView_SetAutoArrange(m_hListView,TRUE);
+		NListView::ListView_SetAutoArrange(m_hListView,TRUE);
 
 	m_nTotalItems = nPrevItems + nAdded;
 

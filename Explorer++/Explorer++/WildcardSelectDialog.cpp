@@ -20,6 +20,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
+#include "../Helper/ListViewHelper.h"
 
 
 const TCHAR CWildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("WildcardSelect");
@@ -161,7 +162,7 @@ void CWildcardSelectDialog::SelectItems(TCHAR *szPattern)
 
 		if(CheckWildcardMatch(szPattern,szFilename,FALSE) == 1)
 		{
-			ListView_SelectItem(hListView,i,m_bSelect);
+			NListView::ListView_SelectItem(hListView,i,m_bSelect);
 		}
 	}
 }

@@ -20,6 +20,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
+#include "../Helper/ListViewHelper.h"
 
 
 BOOL g_bInitialized = FALSE;
@@ -152,9 +153,9 @@ HANDLE hFolderSizeThread)
 
 	SetUserOptions(pSettings);
 
-	ListView_SetAutoArrange(m_hListView,m_bAutoArrange);
+	NListView::ListView_SetAutoArrange(m_hListView,m_bAutoArrange);
 
-	ListView_SetGridlines(m_hListView,m_bGridlinesActive);
+	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 
 	m_nAwaitingAdd = 0;
 
@@ -400,9 +401,9 @@ void CFolderView::SetCurrentViewModeInternal(DWORD ViewMode)
 	m_ViewMode = ViewMode;
 
 	if(ViewMode != VM_DETAILS)
-		ListView_SetGridlines(m_hListView,FALSE);
+		NListView::ListView_SetGridlines(m_hListView,FALSE);
 	else
-		ListView_SetGridlines(m_hListView,m_bGridlinesActive);
+		NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 
 	SendMessage(m_hListView,LVM_SETVIEW,dwStyle,0);
 }
@@ -513,7 +514,7 @@ void CFolderView::SetUserOptions(InitialSettings_t *is)
 	CopyColumnsInternal(&m_RealFolderColumnList,is->pRealFolderColumnList);
 	CopyColumnsInternal(&m_RecycleBinColumnList,is->pRecycleBinColumnList);
 
-	ListView_SetGridlines(m_hListView,m_bGridlinesActive);
+	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 }
 
 void CFolderView::CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns)
@@ -567,7 +568,7 @@ void CFolderView::ToggleGridlines(void)
 {
 	m_bGridlinesActive = !m_bGridlinesActive;
 
-	ListView_SetGridlines(m_hListView,m_bGridlinesActive);
+	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 }
 
 BOOL CFolderView::QueryGridlinesActive(void)
