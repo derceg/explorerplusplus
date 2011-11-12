@@ -1,6 +1,6 @@
 #define MAJOR_VERSION	1
 #define MINOR_VERSION	3
-#define MICRO_VERSION	3
+#define MICRO_VERSION	4
 #define BUILD_VERSION	0
 
 #define QUOTE_(x)		#x
