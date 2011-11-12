@@ -3,6 +3,12 @@ Explorer++ Version History
 
 Current version: 1.3.4
 
+Version 1.3.5 (xx/xx/2011)
+--------------------------
+Bug fixes:
+- The 'Open in New Tab' menu item was not always been added
+  to the folder context menu. Fixed.
+
 Version 1.3.4 (12/11/2011)
 --------------------------
 New features:
