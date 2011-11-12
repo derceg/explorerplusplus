@@ -15,6 +15,7 @@
 #include <list>
 #include "Bookmark.h"
 #include "RegistrySettings.h"
+#include "Macros.h"
 
 
 #define ROOT_NAME	_T("Bookmarks")

@@ -24,6 +24,7 @@
 #include "HelpFileMissingDialog.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);

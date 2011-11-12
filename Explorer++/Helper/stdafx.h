@@ -42,10 +42,6 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES	1
 #define STRICT
 
-#define SIZEOF_ARRAY(array)	sizeof(array) / sizeof(array[0])
-
-#define EMPTY_STRING	_T("")
-
 /* Disable 'unreferenced formal parameter' warning. */
 #pragma warning( disable : 4100 )
 

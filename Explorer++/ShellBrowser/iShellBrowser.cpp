@@ -21,6 +21,7 @@
 #include "../Helper/FolderSize.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 void CALLBACK	TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime);

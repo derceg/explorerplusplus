@@ -19,6 +19,7 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 /* Scroll definitions. */

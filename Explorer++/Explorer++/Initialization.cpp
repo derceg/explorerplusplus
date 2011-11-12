@@ -20,6 +20,7 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/Macros.h"
 #include "../Helper/Bookmark.h"
 #include "MainResource.h"
 

@@ -15,6 +15,7 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/Macros.h"
 
 
 /* Called when the user presses 'Enter' while

@@ -18,6 +18,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Bookmark.h"
+#include "../Helper/Macros.h"
 #include "MainResource.h"
 
 

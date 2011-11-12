@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/Macros.h"
 
 
 DWORD ApplicationToolbarStyles	=	WS_CHILD |WS_VISIBLE |WS_CLIPSIBLINGS |WS_CLIPCHILDREN |

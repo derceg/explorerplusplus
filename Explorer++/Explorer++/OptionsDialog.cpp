@@ -23,6 +23,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 #define NUM_DIALOG_OPTIONS_PAGES	5

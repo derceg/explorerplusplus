@@ -17,6 +17,7 @@
 #include "MergeFilesDialog.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 namespace NMergeFilesDialog

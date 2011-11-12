@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "ListViewHelper.h"
+#include "Macros.h"
 
 
 void NListView::ListView_SelectItem(HWND hListView,int iItem,BOOL bSelect)

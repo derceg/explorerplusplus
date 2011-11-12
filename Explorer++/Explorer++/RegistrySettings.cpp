@@ -27,6 +27,7 @@
 #include "SelectColumnsDialog.h"
 #include "SetDefaultColumnsDialog.h"
 #include "../Helper/RegistrySettings.h"
+#include "../Helper/Macros.h"
 
 
 #define REG_BOOKMARKS_KEY			_T("Software\\Explorer++\\Bookmarks")

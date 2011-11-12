@@ -18,6 +18,7 @@
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/Macros.h"
 
 
 #define GROUP_BY_DATECREATED	0

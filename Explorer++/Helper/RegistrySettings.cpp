@@ -15,6 +15,7 @@
 #include <list>
 #include <string>
 #include "RegistrySettings.h"
+#include "Macros.h"
 
 
 LONG NRegistrySettings::SaveDwordToRegistry(HKEY hKey,const TCHAR *szKey,DWORD dwValue)

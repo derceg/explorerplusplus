@@ -25,6 +25,7 @@
 #include "MainResource.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
+#include "../Helper/Macros.h"
 
 
 const TCHAR CMassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename");

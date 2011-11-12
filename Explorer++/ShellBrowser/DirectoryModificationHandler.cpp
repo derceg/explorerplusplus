@@ -23,6 +23,7 @@
 #include "../Helper/FolderSize.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 BOOL g_bNewFileRenamed = FALSE;

@@ -22,6 +22,7 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetDefaultColumns");

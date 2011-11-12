@@ -20,6 +20,7 @@
 #include "../Helper/Bookmark.h"
 #include "../Helper/ShellHelper.h"
 #include "MainResource.h"
+#include "../Helper/Macros.h"
 
 
 #define INITIAL_HEIGHT_DELTA	-71

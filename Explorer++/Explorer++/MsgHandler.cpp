@@ -17,6 +17,7 @@
 #include "WildcardSelectDialog.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/Macros.h"
 
 
 /* Visibility states should NOT be included here. The visibility of

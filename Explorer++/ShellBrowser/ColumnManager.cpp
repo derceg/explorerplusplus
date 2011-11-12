@@ -32,6 +32,7 @@ constant" warning. */
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
 #include "../Helper/FolderSize.h"
+#include "../Helper/Macros.h"
 
 
 #define COLUMN_TIME_MODIFIED	0

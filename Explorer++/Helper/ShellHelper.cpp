@@ -16,6 +16,7 @@
 #include "ShellHelper.h"
 #include "FileOperations.h"
 #include "RegistrySettings.h"
+#include "Macros.h"
 
 
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,

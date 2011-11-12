@@ -18,6 +18,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
+#include "../Helper/Macros.h"
 
 
 #define TREEVIEW_FOLDER_OPEN_DELAY	500

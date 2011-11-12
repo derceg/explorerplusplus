@@ -16,6 +16,7 @@
 #include "Helper.h"
 #include "FileOperations.h"
 #include "ShellHelper.h"
+#include "Macros.h"
 
 
 /* Local helpers. */

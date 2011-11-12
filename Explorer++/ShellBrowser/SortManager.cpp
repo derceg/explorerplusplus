@@ -21,6 +21,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
+#include "../Helper/Macros.h"
 
 
 #define DATE_CREATED			0

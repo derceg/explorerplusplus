@@ -18,6 +18,7 @@
 #include "RegistrySettings.h"
 #include "XMLSettings.h"
 #include "Helper.h"
+#include "Macros.h"
 
 
 CDialogSettings::CDialogSettings(const TCHAR *szSettingsKey,bool bSavePosition)

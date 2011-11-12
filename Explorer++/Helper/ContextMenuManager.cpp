@@ -21,6 +21,7 @@
 #include "Helper.h"
 #include "ContextMenuManager.h"
 #include "ShellHelper.h"
+#include "Macros.h"
 
 
 const TCHAR CContextMenuManager::CMH_FOLDER_DRAG_AND_DROP[] = _T("Folder\\ShellEx\\DragDropHandlers");

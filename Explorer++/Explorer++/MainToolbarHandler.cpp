@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "../Helper/Macros.h"
 
 
 void Explorerplusplus::SetInitialToolbarButtons(void)
