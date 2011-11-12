@@ -28,30 +28,43 @@ void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
 
 	FileContextMenuInfo_t *pfcmi = reinterpret_cast<FileContextMenuInfo_t *>(dwData);
 
-	if(pfcmi->uFrom == FROM_LISTVIEW || pfcmi->uFrom == FROM_TREEVIEW ||
-		pfcmi->uFrom == FROM_DRIVEBAR)
+	bool AddNewTabMenuItem = false;
+
+	if(pfcmi->uFrom == FROM_LISTVIEW)
 	{
 		if(pidlItemList.size() == 1)
 		{
 			SFGAOF FileAttributes = SFGAO_FOLDER;
 
-			std::vector<LPITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
-
-			GetItemAttributes(pidlItemVector[0],&FileAttributes);
+			LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
+			GetItemAttributes(pidlComplete,&FileAttributes);
+			CoTaskMemFree(pidlComplete);
 
 			if(FileAttributes & SFGAO_FOLDER)
 			{
-				MENUITEMINFO mii;
-				TCHAR szTemp[64];
-
-				LoadString(m_hLanguageModule,IDS_GENERAL_OPEN_IN_NEW_TAB,szTemp,SIZEOF_ARRAY(szTemp));
-				mii.cbSize		= sizeof(MENUITEMINFO);
-				mii.fMask		= MIIM_STRING|MIIM_ID;
-				mii.wID			= MENU_OPEN_IN_NEW_TAB;
-				mii.dwTypeData	= szTemp;
-				InsertMenuItem(hMenu,1,TRUE,&mii);
+				AddNewTabMenuItem = true;
 			}
 		}
+	}
+	else if(pfcmi->uFrom == FROM_TREEVIEW || pfcmi->uFrom == FROM_DRIVEBAR)
+	{
+		/* The treeview and drives toolbar only contain
+		folders, so the new tab menu item will always
+		be shown. */
+		AddNewTabMenuItem = true;
+	}
+
+	if(AddNewTabMenuItem)
+	{
+		MENUITEMINFO mii;
+		TCHAR szTemp[64];
+
+		LoadString(m_hLanguageModule,IDS_GENERAL_OPEN_IN_NEW_TAB,szTemp,SIZEOF_ARRAY(szTemp));
+		mii.cbSize		= sizeof(mii);
+		mii.fMask		= MIIM_STRING|MIIM_ID;
+		mii.wID			= MENU_OPEN_IN_NEW_TAB;
+		mii.dwTypeData	= szTemp;
+		InsertMenuItem(hMenu,1,TRUE,&mii);
 	}
 }
 
