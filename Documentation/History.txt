@@ -8,6 +8,7 @@ Version 1.3.5 (xx/xx/2011)
 Bug fixes:
 - The 'Open in New Tab' menu item was not always been added
   to the folder context menu. Fixed.
+- A UTF-16 LE BOM is now written when pasting text (as a file).
 
 Version 1.3.4 (12/11/2011)
 --------------------------
