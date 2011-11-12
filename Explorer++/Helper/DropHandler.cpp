@@ -1179,6 +1179,10 @@ HRESULT CDropHandler::CopyTextToFile(IN TCHAR *pszDestDirectory,
 	{
 		DWORD nBytesWritten;
 
+		/* UTF-16 LE BOM. */
+		WriteFile(hFile,reinterpret_cast<LPCVOID>("\xFF\xFE"),2,
+			&nBytesWritten,NULL);
+
 		WriteFile(hFile,(LPCVOID)pszText,
 			lstrlen(pszText) * sizeof(WCHAR),
 			&nBytesWritten,NULL);
