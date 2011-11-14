@@ -18,6 +18,8 @@ namespace NExplorerplusplus
 	saved to/loaded from. */
 	const TCHAR XML_FILENAME[]		= _T("config.xml");
 
+	const TCHAR LOG_FILENAME[]		= _T("Explorer++.log");
+
 	/* Command line arguments supplied to the program
 	for each jump list task. */
 	const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[]	= _T("-open_new_tab");

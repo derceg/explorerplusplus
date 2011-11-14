@@ -15,7 +15,9 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <pantheios\backends\bec.file.h>
 #include "Explorer++.h"
+#include "LoggingFrontend.h"
 #include "Version.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
@@ -176,6 +178,10 @@ ensure you have administrator privileges."),NExplorerplusplus::WINDOW_NAME,MB_IC
 				CloseHandle(hMutex);
 
 			bExit = TRUE;
+		}
+		else if(lstrcmp(szPath,_T("-enable_logging")) == 0)
+		{
+			NLoggingFrontend::EnableLogging(true);
 		}
 		else
 		{
@@ -338,6 +344,27 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	pCommandLine = GetCommandLine();
 
 	bExit = ProcessCommandLine(pCommandLine);
+
+	/* The stock backend file implementation will
+	create the file specified in pantheios_be_file_setFilePath
+	as soon as it is called.
+	Therefore, to avoid creating the log file when
+	it isn't needed, we'll simply avoid calling
+	pantheios_be_file_setFilePath. Note that the
+	backend implementation will then buffer entries
+	until a file is specified. However, the custom
+	frontend will block all entries when logging is
+	disabled, which ensures nothing is actually buffered. */
+	if(NLoggingFrontend::CheckLoggingEnabled())
+	{
+		TCHAR szLogFile[MAX_PATH];
+		GetCurrentProcessImageName(szLogFile,SIZEOF_ARRAY(szLogFile));
+
+		PathRemoveFileSpec(szLogFile);
+		PathAppend(szLogFile,NExplorerplusplus::LOG_FILENAME);
+
+		pantheios_be_file_setFilePath(szLogFile);
+	}
 
 	/* Can't open folders that are children of the
 	control panel. If the command line only refers
