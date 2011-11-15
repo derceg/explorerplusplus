@@ -16,6 +16,7 @@
 
 #include "stdafx.h"
 #include <pantheios\backends\bec.file.h>
+#include <pantheios\inserters\integer.hpp>
 #include "Explorer++.h"
 #include "LoggingFrontend.h"
 #include "Version.h"
@@ -473,6 +474,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	BOOL bLoadSettingsFromXML;
 
 	bLoadSettingsFromXML = TestConfigFileInternal();
+	pantheios::log(pantheios::informational,_T("bLoadSettingsFromXML = "),pantheios::integer(bLoadSettingsFromXML));
 
 	if(bLoadSettingsFromXML)
 	{

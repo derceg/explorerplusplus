@@ -105,6 +105,7 @@ HRESULT CNewMenuClient::SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem,NMCSAEI_FLA
 		/* Now, start an in-place rename
 		of the item. */
 		case NMCSAEI_EDIT:
+			pantheios::log(pantheios::informational,_T("Starting in-place rename of item created via new menu"));
 			m_pexpp->GetActiveShellBrowser()->QueueRename(pidlItem);
 			break;
 	}
