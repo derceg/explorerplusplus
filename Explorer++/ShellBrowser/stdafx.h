@@ -54,3 +54,6 @@
 #include <unknwn.h>
 #include <wmsdk.h>
 #include <gdiplus.h>
+
+/* Pantheios header files. */
+#include <pantheios\pantheios.hpp>
