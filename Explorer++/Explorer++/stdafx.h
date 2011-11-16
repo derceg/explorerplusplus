@@ -70,3 +70,6 @@
 #include <assert.h>
 #include <iostream>
 #include <sstream>
+
+/* Pantheios header files. */
+#include <pantheios\pantheios.hpp>

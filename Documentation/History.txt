@@ -10,6 +10,13 @@ Bug fixes:
   to the folder context menu. Fixed.
 - A UTF-16 LE BOM is now written when pasting text (as a file).
 
+Misc:
+- Logging is now avilable. It can be enabled using the following
+  command:
+  explorer++.exe -enable_logging
+  Information will then be saved to Explorer++.log, which will
+  be created within the same directory as the executable.
+
 Version 1.3.4 (12/11/2011)
 --------------------------
 New features:
