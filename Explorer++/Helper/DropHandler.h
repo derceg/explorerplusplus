@@ -45,7 +45,9 @@ private:
 
 	HRESULT	CopyHDropData(IDataObject *pDataObject,BOOL bPrefferedEffect,DWORD dwEffect,std::list<std::wstring> &PastedFileList);
 	HRESULT	CopyShellIDListData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
-	HRESULT	CopyFileDescriptorData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
+	HRESULT CopyAnsiFileDescriptorData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
+	HRESULT CopyUnicodeFileDescriptorData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
+	HRESULT CopyFileDescriptorData(IDataObject *pDataObject,FILEGROUPDESCRIPTORW *pfgd,std::list<std::wstring> &PastedFileList);
 	HRESULT	CopyUnicodeTextData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
 	HRESULT	CopyAnsiTextData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
 	HRESULT	CopyDIBV5Data(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
@@ -58,7 +60,8 @@ private:
 
 	/* Holds the drop formats supported. */
 	static FORMATETC	m_ftcHDrop;
-	static FORMATETC	m_ftcFileDescriptor;
+	static FORMATETC	m_ftcFileDescriptorA;
+	static FORMATETC	m_ftcFileDescriptorW;
 	static FORMATETC	m_ftcShellIDList;
 	static FORMATETC	m_ftcText;
 	static FORMATETC	m_ftcUnicodeText;
