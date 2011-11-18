@@ -86,3 +86,6 @@
 #include <propvarutil.h>
 #include <assert.h>
 #include <list>
+
+/* Pantheios header files. */
+#include <pantheios\pantheios.hpp>
