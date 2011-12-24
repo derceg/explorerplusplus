@@ -1097,8 +1097,6 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 	{
 		case WM_INITDIALOG:
 			{
-				UINT		ItemToCheck;
-
 				if(m_bShowHiddenGlobal)
 					CheckDlgButton(hDlg,IDC_SHOWHIDDENGLOBAL,BST_CHECKED);
 
@@ -1111,72 +1109,63 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 				if(m_bSortAscendingGlobal)
 					CheckDlgButton(hDlg,IDC_SORTASCENDINGGLOBAL,BST_CHECKED);
 
-				switch(m_ViewModeGlobal)
+				HWND hComboBox = GetDlgItem(hDlg,IDC_OPTIONS_DEFAULT_VIEW);
+				int SelectedIndex = -1;
+
+				for each(auto ViewMode in m_ViewModes)
 				{
-					case VM_THUMBNAILS:
-						ItemToCheck = IDC_DEFAULT_THUMBNAILS;
-						break;
+					int StringID = GetViewModeMenuStringId(ViewMode.uViewMode);
 
-					case VM_TILES:
-						ItemToCheck = IDC_DEFAULT_TILES;
-						break;
+					TCHAR szTemp[64];
+					LoadString(m_hLanguageModule,StringID,szTemp,SIZEOF_ARRAY(szTemp));
 
-					case VM_ICONS:
-						ItemToCheck = IDC_DEFAULT_ICONS;
-						break;
+					int Index = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,reinterpret_cast<LPARAM>(szTemp)));
 
-					case VM_SMALLICONS:
-						ItemToCheck = IDC_DEFAULT_SMALLICONS;
-						break;
+					if(Index != CB_ERR)
+					{
+						SendMessage(hComboBox,CB_SETITEMDATA,Index,ViewMode.uViewMode);
+					}
 
-					case VM_LIST:
-						ItemToCheck = IDC_DEFAULT_LIST;
-						break;
-
-					case VM_DETAILS:
-						ItemToCheck = IDC_DEFAULT_DETAILS;
-						break;
-
-					default:
-						ItemToCheck = IDC_DEFAULT_ICONS;
-						m_ViewModeGlobal = VM_ICONS;
-						break;
+					if(ViewMode.uViewMode == m_ViewModeGlobal)
+					{
+						SelectedIndex = Index;
+					}
 				}
-				CheckDlgButton(hDlg,ItemToCheck,BST_CHECKED);
+
+				SendMessage(hComboBox,CB_SETCURSEL,SelectedIndex,0);
 			}
 			break;
 
 		case WM_COMMAND:
-			switch(LOWORD(wParam))
+			if(HIWORD(wParam) != 0)
 			{
-			/* With buttons, check if the item
-			was selected first (as changes in focus
-			may cause this message to be sent). */
-			case IDC_DEFAULT_THUMBNAILS:
-			case IDC_DEFAULT_TILES:
-			case IDC_DEFAULT_ICONS:
-			case IDC_DEFAULT_SMALLICONS:
-			case IDC_DEFAULT_LIST:
-			case IDC_DEFAULT_DETAILS:
-				if(IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED)
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
-
-			case IDC_SHOWHIDDENGLOBAL:
-			case IDC_AUTOARRANGEGLOBAL:
-			case IDC_SORTASCENDINGGLOBAL:
-			case IDC_SHOWINGROUPSGLOBAL:
-				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
-				break;
-
-			case IDC_BUTTON_DEFAULTCOLUMNS:
+				switch(HIWORD(wParam))
 				{
-					CSetDefaultColumnsDialog SetDefaultColumnsDialog(m_hLanguageModule,IDD_SETDEFAULTCOLUMNS,hDlg,this,&m_RealFolderColumnList,
-						&m_MyComputerColumnList,&m_ControlPanelColumnList,&m_RecycleBinColumnList,&m_PrintersColumnList,&m_NetworkConnectionsColumnList,
-						&m_MyNetworkPlacesColumnList);
-					SetDefaultColumnsDialog.ShowModalDialog();
+				case CBN_SELCHANGE:
+					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					break;
 				}
-				break;
+			}
+			else
+			{
+				switch(LOWORD(wParam))
+				{
+				case IDC_SHOWHIDDENGLOBAL:
+				case IDC_AUTOARRANGEGLOBAL:
+				case IDC_SORTASCENDINGGLOBAL:
+				case IDC_SHOWINGROUPSGLOBAL:
+					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					break;
+
+				case IDC_BUTTON_DEFAULTCOLUMNS:
+					{
+						CSetDefaultColumnsDialog SetDefaultColumnsDialog(m_hLanguageModule,IDD_SETDEFAULTCOLUMNS,hDlg,this,&m_RealFolderColumnList,
+							&m_MyComputerColumnList,&m_ControlPanelColumnList,&m_RecycleBinColumnList,&m_PrintersColumnList,&m_NetworkConnectionsColumnList,
+							&m_MyNetworkPlacesColumnList);
+						SetDefaultColumnsDialog.ShowModalDialog();
+					}
+					break;
+				}
 			}
 			break;
 
@@ -1201,18 +1190,9 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 						m_bSortAscendingGlobal = (IsDlgButtonChecked(hDlg,IDC_SORTASCENDINGGLOBAL)
 							== BST_CHECKED);
 
-						if(IsDlgButtonChecked(hDlg,IDC_DEFAULT_THUMBNAILS) == BST_CHECKED)
-							m_ViewModeGlobal = VM_THUMBNAILS;
-						else if(IsDlgButtonChecked(hDlg,IDC_DEFAULT_TILES) == BST_CHECKED)
-							m_ViewModeGlobal = VM_TILES;
-						else if(IsDlgButtonChecked(hDlg,IDC_DEFAULT_ICONS) == BST_CHECKED)
-							m_ViewModeGlobal = VM_ICONS;
-						else if(IsDlgButtonChecked(hDlg,IDC_DEFAULT_SMALLICONS) == BST_CHECKED)
-							m_ViewModeGlobal = VM_SMALLICONS;
-						else if(IsDlgButtonChecked(hDlg,IDC_DEFAULT_LIST) == BST_CHECKED)
-							m_ViewModeGlobal = VM_LIST;
-						else if(IsDlgButtonChecked(hDlg,IDC_DEFAULT_DETAILS) == BST_CHECKED)
-							m_ViewModeGlobal = VM_DETAILS;
+						HWND hComboBox = GetDlgItem(hDlg,IDC_OPTIONS_DEFAULT_VIEW);
+						int SelectedIndex = static_cast<int>(SendMessage(hComboBox,CB_GETCURSEL,0,0));
+						m_ViewModeGlobal = static_cast<int>(SendMessage(hComboBox,CB_GETITEMDATA,SelectedIndex,0));
 
 						SaveAllSettings();
 					}
