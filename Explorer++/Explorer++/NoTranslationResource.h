@@ -57,13 +57,14 @@
 #define IDA_TAB7                        40429
 #define IDA_TAB8                        40430
 #define IDA_LASTTAB                     40431
+#define IDA_HELP_HELP                   40433
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        241
-#define _APS_NEXT_COMMAND_VALUE         40433
+#define _APS_NEXT_COMMAND_VALUE         40434
 #define _APS_NEXT_CONTROL_VALUE         1255
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

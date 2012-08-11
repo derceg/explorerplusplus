@@ -1434,6 +1434,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			}
 			break;
 
+		case IDA_HELP_HELP:
 		case IDM_HELP_HELP:
 			{
 				TCHAR szHelpFile[MAX_PATH];
