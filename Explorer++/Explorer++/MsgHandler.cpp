@@ -2525,7 +2525,7 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 					/* Only match against the filename if it's not empty. */
 					if(ColorRule.strFilterPattern.size() > 0)
 					{
-						if(CheckWildcardMatch(ColorRule.strFilterPattern.c_str(),szFileName,TRUE) == 1)
+						if(CheckWildcardMatch(ColorRule.strFilterPattern.c_str(),szFileName,!ColorRule.caseInsensitive) == 1)
 						{
 							bMatchFileName = TRUE;
 						}

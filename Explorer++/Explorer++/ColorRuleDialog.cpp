@@ -53,6 +53,9 @@ INT_PTR CColorRuleDialog::OnInitDialog()
 
 		m_cfCurrentColor = m_pColorRule->rgbColour;
 
+		if(m_pColorRule->caseInsensitive)
+			CheckDlgButton(m_hDlg,IDC_CHECK_CASE_INSENSITIVE,BST_CHECKED);
+
 		if(m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_COMPRESSED)
 			CheckDlgButton(m_hDlg,IDC_CHECK_COMPRESSED,BST_CHECKED);
 
@@ -133,6 +136,8 @@ void CColorRuleDialog::OnOk()
 	GetWindowString(GetDlgItem(m_hDlg,IDC_EDIT_FILENAMEPATTERN),m_pColorRule->strFilterPattern);
 
 	m_pColorRule->rgbColour = m_cfCurrentColor;
+
+	m_pColorRule->caseInsensitive = (IsDlgButtonChecked(m_hDlg,IDC_CHECK_CASE_INSENSITIVE) == BST_CHECKED);
 
 	m_pColorRule->dwFilterAttributes = 0;
 

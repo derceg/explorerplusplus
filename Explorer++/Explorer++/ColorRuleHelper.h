@@ -11,6 +11,7 @@ namespace NColorRuleHelper
 
 		/* Filename and attribute filtering. */
 		std::wstring	strFilterPattern;
+		BOOL			caseInsensitive;
 		DWORD			dwFilterAttributes;
 
 		COLORREF		rgbColour;
