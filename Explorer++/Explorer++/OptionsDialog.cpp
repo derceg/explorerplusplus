@@ -316,7 +316,6 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 						HWND hEdit;
 						TCHAR szNewTabDir[MAX_PATH];
 						TCHAR szVirtualParsingPath[MAX_PATH];
-						TCHAR szErrorMsg[256];
 						NDefaultFileManager::ReplaceExplorerModes_t ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
 						BOOL bSuccess;
 						HRESULT hr;
@@ -374,15 +373,15 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 								break;
 							}
 
-							LoadString(m_hLanguageModule,IDS_ERR_FILEMANAGERSETTING,
-								szErrorMsg,SIZEOF_ARRAY(szErrorMsg));
-
 							if(bSuccess)
 							{
 								m_ReplaceExplorerMode = ReplaceExplorerMode;
 							}
 							else
 							{
+								TCHAR szErrorMsg[256];
+								LoadString(m_hLanguageModule,IDS_ERR_FILEMANAGERSETTING,
+									szErrorMsg,SIZEOF_ARRAY(szErrorMsg));
 								MessageBox(hDlg,szErrorMsg,NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING);
 
 								int nIDButton;
