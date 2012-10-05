@@ -408,41 +408,44 @@ void Explorerplusplus::HandleTabText(int iTabId)
 
 void Explorerplusplus::HandleTabText(int iTab,int iTabId)
 {
-	/* Can optimize - store folder name, only change when
-	folder changes. */
+	TCHAR szFinalTabText[MAX_PATH];
+
 	if(!m_TabInfo[iTabId].bUseCustomName)
 	{
-		LPITEMIDLIST pidlDirectory = NULL;
-		TCHAR szTabText[MAX_PATH];
-		TCHAR szExpandedTabText[MAX_PATH];
+		LPITEMIDLIST pidlDirectory = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
 
-		pidlDirectory = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
+		TCHAR szTabText[MAX_PATH];
 		GetDisplayName(pidlDirectory,szTabText,SHGDN_INFOLDER);
 
 		StringCchCopy(m_TabInfo[iTabId].szName,
 			SIZEOF_ARRAY(m_TabInfo[iTabId].szName),szTabText);
 
+		TCHAR szExpandedTabText[MAX_PATH];
 		ReplaceCharacterWithString(szTabText,szExpandedTabText,
 			SIZEOF_ARRAY(szExpandedTabText),'&',_T("&&"));
 
 		TabCtrl_SetItemText(m_hTabCtrl,iTab,szExpandedTabText);
-
-		std::list<TabProxyInfo_t>::iterator itr;
-
-		if(m_bTaskbarInitialised)
-		{
-			for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
-			{
-				if(itr->iTabId == iTabId)
-				{
-					SetWindowText(itr->hProxy,szExpandedTabText);
-					m_pTaskbarList->SetThumbnailTooltip(itr->hProxy,szExpandedTabText);
-					break;
-				}
-			}
-		}
+		StringCchCopy(szFinalTabText,SIZEOF_ARRAY(szFinalTabText),szExpandedTabText);
 
 		CoTaskMemFree(pidlDirectory);
+	}
+	else
+	{
+		StringCchCopy(szFinalTabText,SIZEOF_ARRAY(szFinalTabText),m_TabInfo[iTabId].szName);
+	}
+
+	/* Set the tab proxy text. */
+	if(m_bTaskbarInitialised)
+	{
+		for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
+		{
+			if(itr->iTabId == iTabId)
+			{
+				SetWindowText(itr->hProxy,szFinalTabText);
+				m_pTaskbarList->SetThumbnailTooltip(itr->hProxy,szFinalTabText);
+				break;
+			}
+		}
 	}
 }
 
