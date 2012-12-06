@@ -130,7 +130,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 
 					if(pnmm->dwItemSpec != -1)
 					{
-						int iIndex = static_cast<int>(SendMessage(m_hToolbar,TB_COMMANDTOINDEX,LOWORD(wParam),0));
+						int iIndex = static_cast<int>(SendMessage(m_hToolbar,TB_COMMANDTOINDEX,pnmm->dwItemSpec,0));
 
 						if(iIndex != -1)
 						{
