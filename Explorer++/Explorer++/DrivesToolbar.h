@@ -4,16 +4,22 @@
 #include <list>
 #include <unordered_map>
 #include <boost\serialization\strong_typedef.hpp>
+#include "../Helper/FileContextMenuManager.h"
 
-class CDrivesToolbar
+class CDrivesToolbar : public IFileContextMenuExternal
 {
 	friend LRESULT CALLBACK DrivesToolbarProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 	friend LRESULT CALLBACK DrivesToolbarParentProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 public:
 
-	CDrivesToolbar(HWND hToolbar,UINT uIDStart,UINT uIDEnd,IExplorerplusplus *pexpp);
+	CDrivesToolbar(HWND hToolbar,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp);
 	~CDrivesToolbar();
+
+	/* IFileContextMenuExternal methods. */
+	void	AddMenuEntries(LPITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
+	BOOL	HandleShellMenuItem(LPITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,TCHAR *szCmd);
+	void	HandleCustomMenuItem(LPITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,int iCmd);
 
 private:
 
@@ -27,6 +33,11 @@ private:
 
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
+
+	static const int MIN_SHELL_MENU_ID = 1;
+	static const int MAX_SHELL_MENU_ID = 1000;
+
+	static const int MENU_ID_OPEN_IN_NEW_TAB = (MAX_SHELL_MENU_ID + 1);
 
 	LRESULT CALLBACK DrivesToolbarProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -44,6 +55,8 @@ private:
 	void		UpdateDriveIcon(const std::wstring &DrivePath);
 
 	HWND		m_hToolbar;
+
+	HINSTANCE	m_hInstance;
 
 	UINT		m_uIDStart;
 	UINT		m_uIDEnd;

@@ -38,7 +38,6 @@ lParam not currently used. */
 /* Private definitions. */
 #define FROM_LISTVIEW				0
 #define FROM_TREEVIEW				1
-#define FROM_DRIVEBAR				3
 
 /* Registry keys used to store program settings. */
 #define REG_MAIN_KEY				_T("Software\\Explorer++")

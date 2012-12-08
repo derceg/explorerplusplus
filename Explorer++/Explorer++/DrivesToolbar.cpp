@@ -14,15 +14,17 @@
 #include "stdafx.h"
 #include "Explorer++_internal.h"
 #include "DrivesToolbar.h"
+#include "MainResource.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
 
 
-CDrivesToolbar::CDrivesToolbar(HWND hToolbar,UINT uIDStart,UINT uIDEnd,IExplorerplusplus *pexpp) :
+CDrivesToolbar::CDrivesToolbar(HWND hToolbar,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
 m_hToolbar(hToolbar),
 m_uIDStart(uIDStart),
 m_uIDEnd(uIDEnd),
+m_hInstance(hInstance),
 m_pexpp(pexpp),
 m_IDCounter(0)
 {
@@ -146,11 +148,8 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 								std::list<LPITEMIDLIST> pidlItemList;
 								CFileContextMenuManager fcmm(m_hToolbar,pidlItem,pidlItemList);
 
-								/* TODO: */
-								/*CStatusBar StatusBar(m_hStatusBar);
-
-								fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,&StatusBar,
-									NULL,FALSE,GetKeyState(VK_SHIFT) & 0x80);*/
+								fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,m_pexpp->GetStatusBar(),
+									NULL,FALSE,GetKeyState(VK_SHIFT) & 0x80);
 
 								CoTaskMemFree(pidlItem);
 							}
@@ -316,4 +315,41 @@ std::wstring CDrivesToolbar::GetDrivePath(int iIndex)
 	assert(itr != m_mapID.end());
 
 	return itr->second;
+}
+
+void CDrivesToolbar::AddMenuEntries(LPITEMIDLIST pidlParent,
+	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
+{
+	TCHAR szTemp[64];
+	LoadString(m_hInstance,IDS_GENERAL_OPEN_IN_NEW_TAB,szTemp,SIZEOF_ARRAY(szTemp));
+
+	MENUITEMINFO mii;
+	mii.cbSize		= sizeof(mii);
+	mii.fMask		= MIIM_STRING|MIIM_ID;
+	mii.wID			= MENU_ID_OPEN_IN_NEW_TAB;
+	mii.dwTypeData	= szTemp;
+	InsertMenuItem(hMenu,1,TRUE,&mii);
+}
+
+BOOL CDrivesToolbar::HandleShellMenuItem(LPITEMIDLIST pidlParent,
+	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
+{
+	if(StrCmpI(szCmd,_T("open")) == 0)
+	{
+		m_pexpp->OpenItem(pidlParent,FALSE,FALSE);
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+void CDrivesToolbar::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
+	const std::list<LPITEMIDLIST> &pidlItemList,int iCmd)
+{
+	switch(iCmd)
+	{
+	case MENU_ID_OPEN_IN_NEW_TAB:
+		m_pexpp->BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+		break;
+	}
 }

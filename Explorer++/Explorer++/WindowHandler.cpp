@@ -195,7 +195,7 @@ void Explorerplusplus::CreateDrivesToolbar(void)
 		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
 	m_pDrivesToolbar = new CDrivesToolbar(m_hDrivesToolbar,
-		TOOLBAR_DRIVES_ID_START,TOOLBAR_DRIVES_ID_END,this);
+		TOOLBAR_DRIVES_ID_START,TOOLBAR_DRIVES_ID_END,m_hLanguageModule,this);
 }
 
 void Explorerplusplus::CreateStatusBar(void)
@@ -277,13 +277,6 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 						if(pnmh->hwndFrom == m_hBookmarksToolbar)
 						{
 							/* TODO: [Bookmarks] Show bookmarks menu. */
-						}
-						else if(pnmh->hwndFrom == m_hDrivesToolbar)
-						{
-							/* The drives toolbar will handle right-clicking of
-							its items, so if the NM_RCLICK message is received
-							here, it means the toolbar background was clicked. */
-							OnMainToolbarRClick();
 						}
 						else if(pnmh->hwndFrom == m_hApplicationToolbar)
 						{

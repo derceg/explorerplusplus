@@ -46,10 +46,10 @@ void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
 			}
 		}
 	}
-	else if(pfcmi->uFrom == FROM_TREEVIEW || pfcmi->uFrom == FROM_DRIVEBAR)
+	else if(pfcmi->uFrom == FROM_TREEVIEW)
 	{
-		/* The treeview and drives toolbar only contain
-		folders, so the new tab menu item will always
+		/* The treeview only contains folders,
+		so the new tab menu item will always
 		be shown. */
 		AddNewTabMenuItem = true;
 	}
