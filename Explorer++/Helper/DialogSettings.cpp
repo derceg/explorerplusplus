@@ -105,11 +105,11 @@ void CDialogSettings::SaveXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,
 		return;
 	}
 
-	MSXML2::IXMLDOMElement *pParentNode = NULL;
 	BSTR bstr_wsntt = SysAllocString(L"\n\t\t");
-
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	SysFreeString(bstr_wsntt);
 
+	MSXML2::IXMLDOMElement *pParentNode = NULL;
 	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("DialogState"),m_szSettingsKey);
 
 	if(m_bSavePosition)
