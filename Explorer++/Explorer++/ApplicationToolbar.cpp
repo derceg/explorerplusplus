@@ -191,14 +191,17 @@ void CApplicationToolbar::AddButtonToToolbar(const ApplicationButton_t &Button)
 	tbButton.iBitmap	= shfi.iIcon;
 	tbButton.idCommand	= m_uIDStart + Button.ID;
 	tbButton.fsState	= TBSTATE_ENABLED;
-	tbButton.fsStyle	= BTNS_AUTOSIZE;
+	tbButton.fsStyle	= BTNS_AUTOSIZE|BTNS_SHOWTEXT;
 	tbButton.dwData		= Button.ID;
 	tbButton.iString	= NULL;
 
 	if(Button.ShowNameOnToolbar)
 	{
-		tbButton.fsStyle |= BTNS_SHOWTEXT;
 		tbButton.iString = reinterpret_cast<INT_PTR>(Button.Name.c_str());
+	}
+	else
+	{
+		tbButton.iString = reinterpret_cast<INT_PTR>(EMPTY_STRING);
 	}
 
 	SendMessage(m_hToolbar,TB_ADDBUTTONS,static_cast<WPARAM>(1),reinterpret_cast<LPARAM>(&tbButton));
