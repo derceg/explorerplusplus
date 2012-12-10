@@ -217,7 +217,12 @@ void CApplicationToolbar::UpdateButton(int iItem)
 		ApplicationInfo_t ai = ProcessCommand(Button->Command);
 
 		SHFILEINFO shfi;
-		SHGetFileInfo(ai.Application.c_str(),0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
+		DWORD_PTR ret = SHGetFileInfo(ai.Application.c_str(),0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
+
+		if(ret == 0)
+		{
+			shfi.iIcon = 0;
+		}
 
 		TBBUTTONINFO tbi;
 		TCHAR Name[512];
