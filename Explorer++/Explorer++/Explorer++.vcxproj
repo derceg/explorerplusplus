@@ -261,8 +261,9 @@
     </ClCompile>
     <ClCompile Include="AddBookmarkDialog.cpp" />
     <ClCompile Include="AddressBarHandler.cpp" />
+    <ClCompile Include="ApplicationToolbar.cpp" />
+    <ClCompile Include="ApplicationToolbarButtonDialog.cpp" />
     <ClCompile Include="ApplicationToolbarDropHandler.cpp" />
-    <ClCompile Include="ApplicationToolbarHandler.cpp" />
     <ClCompile Include="ArrangeMenuHandler.cpp" />
     <ClCompile Include="BookmarkHandler.cpp" />
     <ClCompile Include="BookmarkHelper.cpp" />
@@ -333,7 +334,9 @@
   <ItemGroup>
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="AddBookmarkDialog.h" />
-    <ClInclude Include="ApplicationToolbarHelper.h" />
+    <ClInclude Include="ApplicationToolbar.h" />
+    <ClInclude Include="ApplicationToolbarButtonDialog.h" />
+    <ClInclude Include="ApplicationToolbarDropHandler.h" />
     <ClInclude Include="BookmarkHelper.h" />
     <ClInclude Include="BookmarkIPHelper.h" />
     <ClInclude Include="BookmarksToolbar.h" />

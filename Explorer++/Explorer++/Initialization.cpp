@@ -165,11 +165,6 @@ void Explorerplusplus::InitializeMenus(void)
 	/* <---- Toolbar right click menu ----> */
 	SetMenuOwnerDraw(m_hToolbarRightClickMenu);
 
-	/* <---- Application toolbar right click menu ----> */
-	SetMenuOwnerDraw(m_hApplicationRightClickMenu);
-	SetMenuItemBitmap(m_hApplicationRightClickMenu,IDM_APP_DELETE,SHELLIMAGES_DELETE);
-	SetMenuItemBitmap(m_hApplicationRightClickMenu,IDM_APP_PROPERTIES,SHELLIMAGES_PROPERTIES);
-
 	/* <---- Display window right click menu ----> */
 	SetMenuOwnerDraw(m_hDisplayWindowRightClickMenu);
 

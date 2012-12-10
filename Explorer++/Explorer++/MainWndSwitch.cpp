@@ -381,16 +381,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		}
 	}
 
-	if(LOWORD(wParam) >= TOOLBAR_APPLICATIONS_ID_START)
-	{
-		int iIndex;
-
-		iIndex = (int)SendMessage(m_hApplicationToolbar,
-			TB_COMMANDTOINDEX,LOWORD(wParam),0);
-
-		ApplicationToolbarOpenItem(iIndex,EMPTY_STRING);
-	}
-
 	switch(LOWORD(wParam))
 	{
 		case TOOLBAR_NEWTAB:
@@ -1576,22 +1566,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			break;
 
 		case IDM_BT_NEWFOLDER:
-			break;
-
-		case IDM_APP_OPEN:
-			ApplicationToolbarOpenItem(m_iSelectedRClick,EMPTY_STRING);
-			break;
-
-		case IDM_APP_NEW:
-			ApplicationToolbarNewButton();
-			break;
-
-		case IDM_APP_DELETE:
-			ApplicationToolbarDeleteItem(m_iSelectedRClick);
-			break;
-
-		case IDM_APP_PROPERTIES:
-			ApplicationToolbarShowItemProperties(m_iSelectedRClick);
 			break;
 
 		/* Listview column header context menu. */

@@ -6,9 +6,9 @@
 #include "BookmarkIPHelper.h"
 #include "BookmarksToolbar.h"
 #include "DrivesToolbar.h"
+#include "ApplicationToolbar.h"
 #include "TabContainer.h"
 #include "ColorRuleHelper.h"
-#include "ApplicationToolbarHelper.h"
 #include "../ShellBrowser/iShellView.h"
 #include "../MyTreeView/MyTreeView.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -74,9 +74,6 @@ public:
 	INT_PTR CALLBACK	WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-
-	INT_PTR CALLBACK	ApplicationButtonPropertiesProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	ApplicationToolbarNewButtonProc(HWND hDlg,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	LRESULT CALLBACK	MainWndTaskbarThumbnailProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
@@ -332,37 +329,6 @@ private:
 
 	friend CLoadSaveXML;
 
-	class CApplicationToolbarDrop : public IDropTarget
-	{
-	public:
-		CApplicationToolbarDrop(Explorerplusplus *pContainer);
-		~CApplicationToolbarDrop();
-
-		/* IUnknown methods. */
-		HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
-		ULONG __stdcall		AddRef(void);
-		ULONG __stdcall		Release(void);
-
-		/* Drag and drop. */
-		HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect);
-		HRESULT _stdcall	DragOver(DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
-		HRESULT _stdcall	DragLeave(void);
-		HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect);
-
-	private:
-		int m_iRefCount;
-		Explorerplusplus *m_pContainer;
-
-		/* Drag and drop. */
-		IDragSourceHelper *	m_pDragSourceHelper;
-		IDropTargetHelper *	m_pDropTargetHelper;
-		BOOL m_bAcceptData;
-
-		HRESULT	InitializeDragDropHelpers(void);
-	};
-
-	friend CApplicationToolbarDrop;
-
 	LRESULT CALLBACK		WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	/* Internal private functions. */
@@ -418,7 +384,7 @@ private:
 	void					OnToolbarViews(void);
 	void					ShowToolbarViewsDropdown(void);
 	void					OnMainToolbarRClick(void);
-	void					OnApplicationToolbarRClick(void);
+	void					OnApplicationToolbarRClick();
 	void					OnAddressBarGo(void);
 	void					OnSortByAscending(BOOL bSortAscending);
 	void					OnPreviousWindow(void);
@@ -548,28 +514,6 @@ private:
 	void					SetDefaultNetworkConnectionsColumns(std::list<Column_t> *pColumns);
 	void					SetDefaultMyNetworkPlacesColumns(std::list<Column_t> *pColumns);
 
-	/* Application toolbar. */
-	void					InitializeApplicationToolbar(void);
-	void					ApplicationToolbarNewButton(void);
-	ApplicationButton_t		*ApplicationToolbarAddItem(TCHAR *szName,TCHAR *szCommand,BOOL bShowNameOnToolbar);
-	void					ApplicationToolbarAddButtonsToToolbar(void);
-	void					ApplicationToolbarAddButtonToToolbar(ApplicationButton_t *pab);
-	void					ApplicationToolbarRefreshButton(int iItem);
-	void					ApplicationToolbarOpenItem(int iItem,TCHAR *szParameters);
-	void					ApplicationToolbarDeleteItem(int iItem);
-	void					ApplicationToolbarShowItemProperties(int iItem);
-
-	/* Application button properties dialog. */
-	void					OnApplicationButtonPropertiesInit(HWND hDlg);
-	void					OnApplicationButtonPropertiesOk(HWND hDlg);
-
-	/* New application button dialog. */
-	void					OnApplicationToolbarNewButtonInit(HWND hDlg);
-	void					OnApplicationToolbarNewButtonOk(HWND hDlg);
-
-	/* Shared between application dialogs. */
-	void					OnApplicationToolbarCommandButton(HWND hDlg);
-
 	/* File infotips. */
 	void					CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax);
 
@@ -581,7 +525,7 @@ private:
 	void					CreateAddressBar(void);
 	void					CreateBookmarksToolbar(void);
 	void					CreateDrivesToolbar(void);
-	void					CreateApplicationToolbar(void);
+	void					CreateApplicationToolbar();
 	HWND					CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip);
 	void					CreateTabBacking(void);
 
@@ -616,10 +560,8 @@ private:
 	void					InitializeBookmarks(void);
 	void					SaveBookmarksToRegistry(void);
 	void					LoadBookmarksFromRegistry(void);
-	void					LoadApplicationToolbarFromRegistry(void);
-	void					LoadApplicationToolbarFromRegistryInternal(HKEY hKey);
-	void					SaveApplicationToolbarToRegistry(void);
-	void					SaveApplicationToolbarToRegistryInternal(HKEY hKey,ApplicationButton_t	*pab,int count);
+	void					LoadApplicationToolbarFromRegistry();
+	void					SaveApplicationToolbarToRegistry();
 	void					SaveToolbarInformationToRegistry(void);
 	void					LoadToolbarInformationFromRegistry(void);
 	void					SaveDialogStatesToRegistry(void);
@@ -694,7 +636,7 @@ private:
 	void					OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
-	void					OpenFileItem(LPITEMIDLIST pidlItem,TCHAR *szParameters);
+	void					OpenFileItem(LPITEMIDLIST pidlItem,const TCHAR *szParameters);
 	HRESULT					OnListViewCopy(BOOL bCopy);
 	HRESULT					ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset,UINT iStartOffset);
 	HRESULT					ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles);
@@ -774,9 +716,7 @@ private:
 	void					SaveWindowPositionToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveWindowPositionToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pWndPosNode);
 	void					LoadApplicationToolbarFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					LoadApplicationToolbarFromXMLInternal(MSXML2::IXMLDOMNode *pNode);
 	void					SaveApplicationToolbarToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					SaveApplicationToolbarToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe,ApplicationButton_t *pab);
 	void					LoadToolbarInformationFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					SaveToolbarInformationToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveToolbarInformationToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
@@ -874,7 +814,6 @@ private:
 	HMENU					m_hGroupBySubMenuRClick;
 	HMENU					m_hTabRightClickMenu;
 	HMENU					m_hToolbarRightClickMenu;
-	HMENU					m_hApplicationRightClickMenu;
 	HMENU					m_hDisplayWindowRightClickMenu;
 	HMENU					m_hViewsMenu;
 	TCHAR					m_CurrentDirectory[MAX_PATH];
@@ -1013,11 +952,7 @@ private:
 	CDrivesToolbar			*m_pDrivesToolbar;
 
 	/* Application toolbar. */
-	ApplicationButton_t		*m_pAppButtons;
-	ApplicationButton_t		*m_pAppButtonSelected;
-	int						m_nAppButtons;
-	int						m_iAppIdOffset;
-	int						m_iSelectedRClick;
+	CApplicationToolbar		*m_pApplicationToolbar;
 
 	/* Display window folder sizes. */
 	std::list<DWFolderSize_t>	m_DWFolderSizes;

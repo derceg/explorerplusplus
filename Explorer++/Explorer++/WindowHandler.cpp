@@ -17,6 +17,7 @@
 #include "Explorer++_internal.h"
 #include "BookmarksToolbar.h"
 #include "DrivesToolbar.h"
+#include "ApplicationToolbar.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -198,6 +199,18 @@ void Explorerplusplus::CreateDrivesToolbar(void)
 		TOOLBAR_DRIVES_ID_START,TOOLBAR_DRIVES_ID_END,m_hLanguageModule,this);
 }
 
+void Explorerplusplus::CreateApplicationToolbar()
+{
+	m_hApplicationToolbar = CreateToolbar(m_hMainRebar,WS_CHILD|WS_VISIBLE|
+		WS_CLIPSIBLINGS|WS_CLIPCHILDREN|TBSTYLE_TOOLTIPS|TBSTYLE_LIST|
+		TBSTYLE_TRANSPARENT|TBSTYLE_FLAT|CCS_NODIVIDER|CCS_NORESIZE,
+		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DRAWDDARROWS|
+		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
+
+	m_pApplicationToolbar = new CApplicationToolbar(m_hApplicationToolbar,
+		TOOLBAR_APPLICATIONS_ID_START,TOOLBAR_APPLICATIONS_ID_END,m_hLanguageModule,this);
+}
+
 void Explorerplusplus::CreateStatusBar(void)
 {
 	UINT Style = WS_CHILD|WS_CLIPSIBLINGS|SBARS_SIZEGRIP|WS_CLIPCHILDREN;
@@ -280,27 +293,7 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 						}
 						else if(pnmh->hwndFrom == m_hApplicationToolbar)
 						{
-							if(pnmm->dwItemSpec != -1)
-							{
-								int iItem;
-
-								iItem = (int)SendMessage(m_hApplicationToolbar,
-									TB_COMMANDTOINDEX,pnmm->dwItemSpec,0);
-
-								m_iSelectedRClick = iItem;
-
-								POINT ptCursor;
-								DWORD dwPos;
-
-								SetFocus(m_hApplicationToolbar);
-								dwPos = GetMessagePos();
-								ptCursor.x = GET_X_LPARAM(dwPos);
-								ptCursor.y = GET_Y_LPARAM(dwPos);
-
-								TrackPopupMenu(m_hApplicationRightClickMenu,TPM_LEFTALIGN,
-									ptCursor.x,ptCursor.y,0,m_hMainRebar,NULL);
-							}
-							else
+							if(pnmm->dwItemSpec == -1)
 							{
 								OnApplicationToolbarRClick();
 							}
@@ -317,6 +310,38 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 	}
 
 	return DefSubclassProc(hwnd,msg,wParam,lParam);
+}
+
+void Explorerplusplus::OnApplicationToolbarRClick()
+{
+	MENUITEMINFO mii;
+
+	TCHAR szTemp[64];
+	LoadString(m_hLanguageModule,IDS_APPLICATIONBUTTON_NEW,
+		szTemp,SIZEOF_ARRAY(szTemp));
+
+	mii.cbSize		= sizeof(mii);
+	mii.fMask		= MIIM_ID|MIIM_STRING;
+	mii.dwTypeData	= szTemp;
+	mii.wID			= IDM_APP_NEW;
+
+	/* Add the item to the menu. */
+	InsertMenuItem(m_hToolbarRightClickMenu,7,TRUE,&mii);
+
+	/* Set it to be owner drawn. */
+	SetMenuItemOwnerDrawn(m_hToolbarRightClickMenu,7);
+
+	OnMainToolbarRClick();
+
+	mii.cbSize	= sizeof(mii);
+	mii.fMask	= MIIM_DATA;
+	GetMenuItemInfo(m_hToolbarRightClickMenu,7,TRUE,&mii);
+
+	/* Free the owner drawn data. */
+	free((void *)mii.dwItemData);
+
+	/* Now, remove the item from the menu. */
+	DeleteMenu(m_hToolbarRightClickMenu,7,MF_BYPOSITION);
 }
 
 void Explorerplusplus::SetStatusBarParts(int width)
@@ -558,30 +583,6 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 			StringCchPrintf(szInfoTip,SIZEOF_ARRAY(szInfoTip),szTemp,szPath);
 
 			StringCchCopy(ptbgit->pszText,ptbgit->cchTextMax,szInfoTip);
-		}
-	}
-	else if(ptbgit->iItem >= TOOLBAR_APPLICATIONS_ID_START)
-	{
-		TBBUTTON			tbButton;
-		ApplicationButton_t *pab = NULL;
-		LRESULT				lResult;
-		int					iIndex;
-
-		iIndex = static_cast<int>(SendMessage(m_hApplicationToolbar,
-			TB_COMMANDTOINDEX,ptbgit->iItem,0));
-
-		if(iIndex != -1)
-		{
-			lResult = SendMessage(m_hApplicationToolbar,
-				TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
-
-			if(lResult)
-			{
-				pab = (ApplicationButton_t *)tbButton.dwData;
-
-				StringCchPrintf(ptbgit->pszText,ptbgit->cchTextMax,_T("%s\n%s"),
-					pab->szName,pab->szCommand);
-			}
 		}
 	}
 }

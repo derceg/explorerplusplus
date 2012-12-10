@@ -51,7 +51,8 @@ namespace NExplorerplusplus
 }
 
 /* Basic interface between Explorerplusplus
-and the dialogs. */
+and some of the other components (such as the
+dialogs and toolbars). */
 __interface IExplorerplusplus
 {
 	HWND			GetActiveListView() const;
@@ -74,6 +75,8 @@ __interface IExplorerplusplus
 
 	HRESULT			BrowseFolder(const TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 	HRESULT			BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
+
+	void			OpenFileItem(LPITEMIDLIST pidlItem,const TCHAR *szParameters);
 };
 
 /* Used when setting Explorer++ as the default

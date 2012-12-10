@@ -76,7 +76,6 @@ m_hContainer(hwnd)
 	GetVirtualFolderParsingPath(CSIDL_DRIVES,m_DefaultTabDirectory);
 
 	InitializeMainToolbars();
-	InitializeApplicationToolbar();
 
 	InitializeCriticalSection(&g_csDirMonCallback);
 

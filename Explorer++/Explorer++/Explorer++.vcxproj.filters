@@ -13,9 +13,6 @@
     <ClCompile Include="ApplicationToolbarDropHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ApplicationToolbarHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ArrangeMenuHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -184,6 +181,12 @@
     <ClCompile Include="LoggingImplicitLink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ApplicationToolbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationToolbarButtonDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Explorer++.h">
@@ -306,13 +309,19 @@
     <ClInclude Include="ColorRuleHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ApplicationToolbarHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UpdateCheckDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LoggingFrontend.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationToolbar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationToolbarDropHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationToolbarButtonDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

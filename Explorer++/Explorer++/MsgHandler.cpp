@@ -112,7 +112,6 @@ void Explorerplusplus::OnWindowCreate(void)
 	m_hGroupBySubMenuRClick			= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_GROUPBY_MENU)),0);
 	m_hTabRightClickMenu			= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_TAB_RCLICK)),0);
 	m_hToolbarRightClickMenu		= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_TOOLBAR_MENU)),0);
-	m_hApplicationRightClickMenu	= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)),0);
 	m_hDisplayWindowRightClickMenu	= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)),0);
 	m_hViewsMenu					= GetSubMenu(LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_VIEWS_MENU)),0);
 
@@ -852,7 +851,7 @@ void Explorerplusplus::OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,B
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER);
 }
 
-void Explorerplusplus::OpenFileItem(LPITEMIDLIST pidlItem,TCHAR *szParameters)
+void Explorerplusplus::OpenFileItem(LPITEMIDLIST pidlItem,const TCHAR *szParameters)
 {
 	TCHAR			szItemDirectory[MAX_PATH];
 	LPITEMIDLIST	pidlParent = NULL;

@@ -24,6 +24,7 @@ namespace
 	const TCHAR REG_TABS_KEY[] = _T("Software\\Explorer++\\Tabs");
 	const TCHAR REG_TOOLBARS_KEY[] = _T("Software\\Explorer++\\Toolbars");
 	const TCHAR REG_COLUMNS_KEY[] = _T("Software\\Explorer++\\DefaultColumns");
+	const TCHAR REG_APPLICATIONS_KEY[] = _T("Software\\Explorer++\\ApplicationToolbar");
 }
 
 #define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Gdiplus::Color(255,255,255)
@@ -990,6 +991,35 @@ void Explorerplusplus::LoadToolbarInformationFromRegistry(void)
 
 			ReturnValue = RegOpenKeyEx(hKey,szItemKey,0,KEY_READ,&hToolbarKey);
 		}
+
+		RegCloseKey(hKey);
+	}
+}
+
+void Explorerplusplus::LoadApplicationToolbarFromRegistry()
+{
+	HKEY hKey;
+	LONG ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY,0,KEY_READ,&hKey);
+
+	if(ReturnValue == ERROR_SUCCESS)
+	{
+		CApplicationToolbarPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+
+		RegCloseKey(hKey);
+	}
+}
+
+void Explorerplusplus::SaveApplicationToolbarToRegistry()
+{
+	SHDeleteKey(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY);
+
+	HKEY hKey;
+	LONG ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_APPLICATIONS_KEY,
+		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,NULL);
+
+	if(ReturnValue == ERROR_SUCCESS)
+	{
+		CApplicationToolbarPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
 
 		RegCloseKey(hKey);
 	}

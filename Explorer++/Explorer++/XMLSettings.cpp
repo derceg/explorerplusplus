@@ -1262,6 +1262,57 @@ MSXML2::IXMLDOMElement *pe)
 	SysFreeString(bstr_wsnttt);
 }
 
+void Explorerplusplus::LoadApplicationToolbarFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+{
+	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
+	MSXML2::IXMLDOMNode			*pNode = NULL;
+	BSTR						bstr = NULL;
+	HRESULT						hr;
+
+	if(!pXMLDom)
+		goto clean;
+
+	bstr = SysAllocString(L"//ApplicationButton");
+	hr = pXMLDom->selectSingleNode(bstr,&pNode);
+
+	if(hr == S_OK)
+	{
+		CApplicationToolbarPersistentSettings::GetInstance().LoadXMLSettings(pNode);
+	}
+
+clean:
+	if (bstr) SysFreeString(bstr);
+	if (pNodes) pNodes->Release();
+	if (pNode) pNode->Release();
+
+	return;
+}
+
+void Explorerplusplus::SaveApplicationToolbarToXML(MSXML2::IXMLDOMDocument *pXMLDom,
+MSXML2::IXMLDOMElement *pRoot)
+{
+	MSXML2::IXMLDOMElement		*pe = NULL;
+	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
+	BSTR						bstr;
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pRoot);
+
+	bstr = SysAllocString(L"ApplicationToolbar");
+	pXMLDom->createElement(bstr,&pe);
+	SysFreeString(bstr);
+	bstr = NULL;
+
+	CApplicationToolbarPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
+
+	NXMLSettings::AppendChildToParent(pe, pRoot);
+	pe->Release();
+	pe = NULL;
+
+	SysFreeString(bstr_wsnt);
+}
+
 unsigned long hash_setting(unsigned char *str)
 {
 	unsigned long hash = 5381;
@@ -1272,7 +1323,6 @@ unsigned long hash_setting(unsigned char *str)
 
 	return hash;
 }
-
 
 /* Maps attribute name to their corresponding internal variable. */
 void Explorerplusplus::MapAttributeToValue(MSXML2::IXMLDOMNode *pNode,
