@@ -344,7 +344,17 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 	/* Forward the message to the treeview, so that
 	it can handle the message as well. */
 	SendMessage(m_hTreeView,WM_DEVICECHANGE,wParam,lParam);
-	SendMessage(m_hDrivesToolbar,WM_DEVICECHANGE,wParam,lParam);
+
+	switch(wParam)
+	{
+	case DBT_DEVICEARRIVAL:
+		CHardwareChangeNotifier::GetInstance().NotifyDeviceArrival(reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
+		break;
+
+	case DBT_DEVICEREMOVECOMPLETE:
+		CHardwareChangeNotifier::GetInstance().NotifyDeviceRemovalComplete(reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
+		break;
+	}
 
 	return TRUE;
 }

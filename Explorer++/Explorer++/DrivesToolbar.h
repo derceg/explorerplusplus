@@ -4,9 +4,10 @@
 #include <list>
 #include <unordered_map>
 #include <boost\serialization\strong_typedef.hpp>
+#include "HardwareChangeNotifier.h"
 #include "../Helper/FileContextMenuManager.h"
 
-class CDrivesToolbar : public IFileContextMenuExternal
+class CDrivesToolbar : public IFileContextMenuExternal, public NHardwareChangeNotifier::INotification
 {
 	friend LRESULT CALLBACK DrivesToolbarProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 	friend LRESULT CALLBACK DrivesToolbarParentProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
@@ -54,7 +55,6 @@ private:
 
 	void		UpdateDriveIcon(const std::wstring &DrivePath);
 
-	void		OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	void		OnDeviceArrival(DEV_BROADCAST_HDR *dbh);
 	void		OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh);
 

@@ -30,13 +30,15 @@ m_IDCounter(0)
 {
 	InitializeToolbar();
 
-	/* TODO: Register for hardware change notifications. */
+	CHardwareChangeNotifier::GetInstance().AddObserver(this);
 }
 
 CDrivesToolbar::~CDrivesToolbar()
 {
 	RemoveWindowSubclass(m_hToolbar,DrivesToolbarProcStub,SUBCLASS_ID);
 	RemoveWindowSubclass(GetParent(m_hToolbar),DrivesToolbarParentProcStub,PARENT_SUBCLASS_ID);
+
+	CHardwareChangeNotifier::GetInstance().RemoveObserver(this);
 }
 
 void CDrivesToolbar::InitializeToolbar()
@@ -88,27 +90,9 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarProc(HWND hwnd,UINT uMsg,WPARAM wP
 			}
 		}
 		break;
-
-	case WM_DEVICECHANGE:
-		OnDeviceChange(wParam,lParam);
-		break;
 	}
 
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
-}
-
-void CDrivesToolbar::OnDeviceChange(WPARAM wParam,LPARAM lParam)
-{
-	switch(wParam)
-	{
-	case DBT_DEVICEARRIVAL:
-		OnDeviceArrival(reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
-		break;
-
-	case DBT_DEVICEREMOVECOMPLETE:
-		OnDeviceRemoveComplete(reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
-		break;
-	}
 }
 
 void CDrivesToolbar::OnDeviceArrival(DEV_BROADCAST_HDR *dbh)

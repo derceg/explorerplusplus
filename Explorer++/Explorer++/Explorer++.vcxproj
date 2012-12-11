@@ -280,6 +280,7 @@
     <ClCompile Include="Explorer++.cpp" />
     <ClCompile Include="FilterDialog.cpp" />
     <ClCompile Include="HandleWindowState.cpp" />
+    <ClCompile Include="HardwareChangeNotifier.cpp" />
     <ClCompile Include="HelpFileMissingDialog.cpp" />
     <ClCompile Include="IDropFilesCallback.cpp" />
     <ClCompile Include="IModelessDialogNotification.cpp" />
@@ -351,6 +352,7 @@
     <ClInclude Include="Explorer++VersionInfo.h" />
     <ClInclude Include="Explorer++_internal.h" />
     <ClInclude Include="FilterDialog.h" />
+    <ClInclude Include="HardwareChangeNotifier.h" />
     <ClInclude Include="HelpFileMissingDialog.h" />
     <ClInclude Include="IDropFilesCallback.h" />
     <ClInclude Include="IModelessDialogNotification.h" />
