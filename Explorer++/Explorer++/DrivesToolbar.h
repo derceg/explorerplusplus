@@ -54,6 +54,10 @@ private:
 
 	void		UpdateDriveIcon(const std::wstring &DrivePath);
 
+	void		OnDeviceChange(WPARAM wParam,LPARAM lParam);
+	void		OnDeviceArrival(DEV_BROADCAST_HDR *dbh);
+	void		OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh);
+
 	HWND		m_hToolbar;
 
 	HINSTANCE	m_hInstance;

@@ -325,121 +325,28 @@ void Explorerplusplus::CopyToFolder(BOOL bMove)
 	NFileOperations::CopyFilesToFolder(m_hContainer,szTemp,FullFilenameList,bMove);
 }
 
-HRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
+LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 {
-	TCITEM tcItem;
-	int nTabs;
-	int i = 0;
-
 	/* Forward this notification out to all tabs (if a
 	tab is currently in my computer, it will need to
 	update its contents). */
-	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	for(i = 0;i < nTabs;i++)
+	for(int i = 0;i < nTabs;i++)
 	{
+		TCITEM tcItem;
 		tcItem.mask = TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-		m_pShellBrowser[(int)tcItem.lParam]->OnDeviceChange(wParam,lParam);
+		m_pShellBrowser[static_cast<int>(tcItem.lParam)]->OnDeviceChange(wParam,lParam);
 	}
 
 	/* Forward the message to the treeview, so that
 	it can handle the message as well. */
 	SendMessage(m_hTreeView,WM_DEVICECHANGE,wParam,lParam);
+	SendMessage(m_hDrivesToolbar,WM_DEVICECHANGE,wParam,lParam);
 
-	switch(wParam)
-	{
-		/* Device has being added/inserted into the system. Update the
-		drives toolbar as necessary. */
-		case DBT_DEVICEARRIVAL:
-			{
-				DEV_BROADCAST_HDR *dbh = NULL;
-
-				dbh = (DEV_BROADCAST_HDR *)lParam;
-
-				if(dbh->dbch_devicetype == DBT_DEVTYP_VOLUME)
-				{
-					DEV_BROADCAST_VOLUME	*pdbv = NULL;
-					TCHAR					chDrive;
-					TCHAR					szDrive[4];
-
-					pdbv = (DEV_BROADCAST_VOLUME *)dbh;
-
-					/* Build a string that will form the drive name. */
-					chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
-					StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),
-						_T("%c:\\"),chDrive);
-
-					/* Is there a change in media, or a change
-					in the physical device?
-					If this is only a change in media, simply
-					update any icons that may need updating;
-					else if this is a change in the physical
-					device, add the device in the required
-					areas. */
-					/* TODO: */
-					//if(pdbv->dbcv_flags & DBTF_MEDIA)
-					//{
-					//	UpdateDrivesToolbarIcon(szDrive);
-					//}
-					//else
-					//{
-					//	/* Add the drive to the toolbar. The button
-					//	will automatically be inserted into its
-					//	correct, sorted position. */
-					//	InsertDriveIntoDrivesToolbar(szDrive);
-
-					//	UpdateToolbarBandSizing(m_hMainRebar,m_hDrivesToolbar);
-					//}
-				}
-			}
-			break;
-
-		case DBT_DEVICEREMOVECOMPLETE:
-			{
-				DEV_BROADCAST_HDR				*dbh = NULL;
-
-				dbh = (DEV_BROADCAST_HDR *)lParam;
-
-				switch(dbh->dbch_devicetype)
-				{
-					case DBT_DEVTYP_VOLUME:
-						{
-							DEV_BROADCAST_VOLUME	*pdbv = NULL;
-							TCHAR					chDrive;
-							TCHAR					szDrive[4];
-
-							pdbv = (DEV_BROADCAST_VOLUME *)dbh;
-
-							/* Build a string that will form the drive name. */
-							chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
-							StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),_T("%c:\\"),chDrive);
-
-							/* Media changed or drive removed? */
-							/* TODO: */
-							//if(pdbv->dbcv_flags & DBTF_MEDIA)
-							//{
-							//	UpdateDrivesToolbarIcon(szDrive);
-							//}
-							//else
-							//{
-							//	/* The device was removed from the system.
-							//	Remove its button from the drive toolbar. */
-							//	RemoveDriveFromDrivesToolbar(szDrive);
-
-							//	UpdateToolbarBandSizing(m_hMainRebar,m_hDrivesToolbar);
-							//}
-						}
-						break;
-				}
-
-				return TRUE;
-			}
-			break;
-	}
-
-	return E_NOTIMPL;
+	return TRUE;
 }
 
 HRESULT Explorerplusplus::TestListViewSelectionAttributes(SFGAOF *pItemAttributes)

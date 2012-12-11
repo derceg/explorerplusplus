@@ -88,9 +88,86 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarProc(HWND hwnd,UINT uMsg,WPARAM wP
 			}
 		}
 		break;
+
+	case WM_DEVICECHANGE:
+		OnDeviceChange(wParam,lParam);
+		break;
 	}
 
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+void CDrivesToolbar::OnDeviceChange(WPARAM wParam,LPARAM lParam)
+{
+	switch(wParam)
+	{
+	case DBT_DEVICEARRIVAL:
+		OnDeviceArrival(reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
+		break;
+
+	case DBT_DEVICEREMOVECOMPLETE:
+		OnDeviceRemoveComplete(reinterpret_cast<DEV_BROADCAST_HDR *>(lParam));
+		break;
+	}
+}
+
+void CDrivesToolbar::OnDeviceArrival(DEV_BROADCAST_HDR *dbh)
+{
+	if(dbh->dbch_devicetype != DBT_DEVTYP_VOLUME)
+	{
+		return;
+	}
+
+	DEV_BROADCAST_VOLUME *pdbv = reinterpret_cast<DEV_BROADCAST_VOLUME *>(dbh);
+
+	/* Build a string that will form the drive name. */
+	TCHAR szDrive[4];
+	TCHAR chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+	StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),_T("%c:\\"),chDrive);
+
+	/* Is there a change in media, or a change
+	in the physical device?
+	If this is only a change in media, simply
+	update any icons that may need updating;
+	else if this is a change in the physical
+	device, add the device in the required
+	areas. */
+	if(pdbv->dbcv_flags & DBTF_MEDIA)
+	{
+		UpdateDriveIcon(szDrive);
+	}
+	else
+	{
+		/* A drive was added to the system,
+		so add it to the toolbar. */
+		InsertDrive(szDrive);
+	}
+}
+
+void CDrivesToolbar::OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh)
+{
+	if(dbh->dbch_devicetype != DBT_DEVTYP_VOLUME)
+	{
+		return;
+	}
+
+	DEV_BROADCAST_VOLUME *pdbv = reinterpret_cast<DEV_BROADCAST_VOLUME *>(dbh);
+
+	TCHAR szDrive[4];
+	TCHAR chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+	StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),_T("%c:\\"),chDrive);
+
+	/* Media changed or drive removed? */
+	if(pdbv->dbcv_flags & DBTF_MEDIA)
+	{
+		UpdateDriveIcon(szDrive);
+	}
+	else
+	{
+		/* The device was removed from the system.
+		Remove its button from the toolbar. */
+		RemoveDrive(szDrive);
+	}
 }
 
 LRESULT CALLBACK DrivesToolbarParentProcStub(HWND hwnd,UINT uMsg,
@@ -229,6 +306,7 @@ void CDrivesToolbar::InsertDrive(const std::wstring &DrivePath)
 	tbButton.dwData		= m_IDCounter;
 	tbButton.iString	= reinterpret_cast<INT_PTR>(szDisplayName);
 	SendMessage(m_hToolbar,TB_INSERTBUTTON,Position,reinterpret_cast<LPARAM>(&tbButton));
+	UpdateToolbarBandSizing(GetParent(m_hToolbar),m_hToolbar);
 
 	m_mapID.insert(std::make_pair(m_IDCounter,DrivePath));
 	++m_IDCounter;
@@ -238,8 +316,12 @@ void CDrivesToolbar::RemoveDrive(const std::wstring &DrivePath)
 {
 	DriveInformation_t di = GetDrivePosition(DrivePath);
 
-	SendMessage(m_hToolbar,TB_DELETEBUTTON,di.Position,0);
-	m_mapID.erase(di.ID);
+	if(di.Position != -1)
+	{
+		SendMessage(m_hToolbar,TB_DELETEBUTTON,di.Position,0);
+		UpdateToolbarBandSizing(GetParent(m_hToolbar),m_hToolbar);
+		m_mapID.erase(di.ID);
+	}
 }
 
 /* Updates an items icon. This may be necessary,
@@ -248,9 +330,12 @@ void CDrivesToolbar::UpdateDriveIcon(const std::wstring &DrivePath)
 {
 	DriveInformation_t di = GetDrivePosition(DrivePath);
 
-	SHFILEINFO shfi;
-	SHGetFileInfo(DrivePath.c_str(),0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
-	SendMessage(m_hToolbar,TB_CHANGEBITMAP,di.ID,shfi.iIcon);
+	if(di.Position != -1)
+	{
+		SHFILEINFO shfi;
+		SHGetFileInfo(DrivePath.c_str(),0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
+		SendMessage(m_hToolbar,TB_CHANGEBITMAP,di.ID,shfi.iIcon);
+	}
 }
 
 int CDrivesToolbar::GetSortedPosition(const std::wstring &DrivePath)
@@ -300,8 +385,6 @@ CDrivesToolbar::DriveInformation_t CDrivesToolbar::GetDrivePosition(const std::w
 			break;
 		}
 	}
-
-	assert(di.Position != -1);
 
 	return di;
 }

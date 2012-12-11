@@ -366,7 +366,7 @@ private:
 	void					OnSetFocus(void);
 	int						HighlightSimilarFiles(HWND ListView);
 	void					OnShowHiddenFiles(void);
-	HRESULT					OnDeviceChange(WPARAM wParam,LPARAM lParam);
+	LRESULT					OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	LRESULT					StatusBarMenuSelect(WPARAM wParam,LPARAM lParam);
 	void					HandleDirectoryMonitoring(int iTabId);
 	void					OnTbnDropDown(LPARAM lParam);
