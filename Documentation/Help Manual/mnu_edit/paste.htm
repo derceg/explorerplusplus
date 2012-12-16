@@ -7,22 +7,21 @@
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <title>Edit/Paste</title>
 <link rel="stylesheet" type="text/css" href="../explorer++.css">
-<script language="javascript" src="../rollover.js"> </script>
 </head>
 
-<body onload="javascript:attachdiv()">
+<body>
 
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
   <tr>
     <td>
-    <h2><a href="../nav/mnu-edit.htm">Edit</a>/<img border="0" src="../images/icons/paste.png" hspace="5" width="16" height="16">Paste</h2>
+    <h2><a name="top"></a><a href="../nav/mnu-edit.htm">Edit</a>/<img border="0" src="../images/icons/paste.png" hspace="5" width="16" height="16">Paste</h2>
     </td>
     <td width="100" align="right">
     <img border="0" src="../images/keys/ctrl.png" width="48" height="45"><img border="0" src="../images/keys/v.png" width="45" height="45"></td>
   </tr>
 </table>
 <p>This menu item takes data from the clipboard and pastes it into the files 
-pane, even if the folders pane has the focus.&nbsp; If files or folders were
+pane, or the folders pane if it has the focus.&nbsp; If files or folders were
 <a href="cut.htm">cut</a> in order to place them on the clipboard, then they are 
 deleted at this time.&nbsp; <b>Explorer++</b> handles various types of data, and 
 the pasting method, differently, according to the following table:</p>
@@ -34,6 +33,20 @@ the pasting method, differently, according to the following table:</p>
       <p align="center"><b>Paste method</b></td>
       <td bgcolor="#D3D3D3" valign="top">
       <p align="center"><b>Result</b></td>
+    </tr>
+    <tr>
+      <td width="76" align="center">files/folders</td>
+      <td width="184">paste into blank area of files pane</td>
+      <td valign="top">files/folders pasted normally to location of the files 
+      pane</td>
+    </tr>
+    <tr>
+      <td width="76" align="center">files/folders</td>
+      <td width="184">paste into folders pane (using menu item, or toolbar 
+      button)</td>
+      <td valign="top">files/folders pasted into the folder having the focus in 
+      the folders pane.&nbsp; New files/folders will, of course, appear in the 
+      files pane (contents of focused folder).</td>
     </tr>
     <tr>
       <td width="76" align="center">text</td>
@@ -50,8 +63,9 @@ the pasting method, differently, according to the following table:</p>
       <td width="76" align="center">text</td>
       <td width="184">paste into folders pane (using menu item, or toolbar 
       button)</td>
-      <td valign="top">text pasted as new text file (as above) into Files pane 
-      (current active folder), even if the folders pane has the focus.</td>
+      <td valign="top">text pasted as new text file (as above) into the folder 
+      having the focus in the folders pane.&nbsp; New file will, of course, 
+      appear in the files pane (contents of focused folder).</td>
     </tr>
     <tr>
       <td width="76" align="center">bitmap<br>
@@ -67,6 +81,8 @@ the pasting method, differently, according to the following table:</p>
 </blockquote>
 <p>See <a href="copy.htm">Copy</a> for a discussion of behavior when file names 
 are duplicated.</p>
+<p><a title="Top of page" href="#top" style="background-color:transparent">
+<img border="0" src="../images/common/arrow_top.gif" width="23" height="23"></a></p>
 
 </body>
 

@@ -11,7 +11,7 @@
 
 <body onload="javascript:attachdiv()">
 
-<h2 class="Heading_2_no_table"><a href="tab_bar.htm">Tab bar</a>/Context-menu</h2>
+<h2 class="Heading_2_no_table"><a name="top"></a><a href="tab_bar.htm">Tab bar</a>/Context-menu</h2>
 <p><b>Click</b> or <b><i>Hover</i></b> on an item for more ...<br>
 <map name="FPMap0">
 <area coords="3, 3, 160, 22" shape="rect" onmouseover="javascript:rollovr(this,'{31}/new.png','{2}/new_tab.htm','{1}')">
@@ -25,7 +25,7 @@
 <area coords="3, 178, 160, 197" shape="rect" onmouseover="javascript:rollovr(this,'{31}/close_other.gif','#close_other','{1}')">
 <area coords="3, 198, 160, 217" shape="rect" onmouseover="javascript:rollovr(this,'{31}/close.gif','{2}/close_tab.htm','{1}')">
 </map>
-<img id="MAINimg" border="0" src="../images/tab_bar_context.png" usemap="#FPMap0" width="168" height="225"></p>
+<img id="MAINimg" border="0" src="../images/pane_tabs/tab_bar_context.png" usemap="#FPMap0" width="168" height="225"></p>
 <p>&nbsp;</p>
 <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse" bordercolor="#111111" width="100%">
   <tr>
@@ -43,7 +43,7 @@ Placement of the tab is dependent on an
 <table border="0" style="border-collapse: collapse" bordercolor="#111111" cellspacing="0" cellpadding="0">
   <tr>
     <td width="34" align="center">
-    <img border="0" src="../images/info24x24.gif" hspace="0" width="24" height="24"></td>
+    <img border="0" src="../images/common/info24x24.gif" hspace="0" width="24" height="24"></td>
     <td width="3" bgcolor="#0000FF">&nbsp;</td>
     <td width="10">&nbsp;</td>
     <td><b><font color="#0000FF" size="3">Info:</font></b> Duplicating a tab 
@@ -59,7 +59,7 @@ the current folder.</p>
 <table border="0" style="border-collapse: collapse" bordercolor="#111111" cellspacing="0" cellpadding="0">
   <tr>
     <td width="34" align="center">
-    <img border="0" src="../images/info24x24.gif" hspace="0" width="24" height="24"></td>
+    <img border="0" src="../images/common/info24x24.gif" hspace="0" width="24" height="24"></td>
     <td width="3" bgcolor="#0000FF">&nbsp;</td>
     <td width="10">&nbsp;</td>
     <td><b><font color="#0000FF" size="3">Info:</font></b> The
@@ -76,7 +76,7 @@ tabs currently open.</p>
 <table border="0" cellspacing="1" style="border-collapse: collapse" bordercolor="#111111" width="100%">
   <tr>
     <td width="100%">
-    <img border="0" src="../images/tab_rename.png" hspace="5" align="left" width="226" height="125">Ordinarily, 
+    <img border="0" src="../images/pane_tabs/tab_rename.png" hspace="5" align="left" width="226" height="125">Ordinarily, 
     a newly created tab assumes the name of the actual folder it displays (minus 
     the drive and path information).&nbsp; This item, however, allows you to 
     rename the tab to something more suitable to your needs.&nbsp; For example, 
@@ -95,19 +95,18 @@ tabs currently open.</p>
   </tr>
   <tr>
     <td width="34" align="center">
-    <img border="0" src="../images/bug28x32.gif" width="28" height="32"></td>
-    <td width="3" bgcolor="#E78C10">&nbsp;</td>
+    <img border="0" src="../images/common/info24x24.gif" hspace="0" width="24" height="24"></td>
+    <td width="3" bgcolor="#0000FF">&nbsp;</td>
     <td width="10">&nbsp;</td>
-    <td><b><font size="3" color="#E78C10">Bug:</font></b> On first opening the
-    <i>Rename Tab</i> dialog, the &quot;Use custom name:&quot; setting is always shown as 
-    active, even if the tab is displaying the &quot;current folder's name&quot;.&nbsp; 
-    Functionality, however, is not impaired - the dialog works as it should.</td>
+    <td><b><font color="#0000FF" size="3">Info:</font></b> On first opening the
+    <i>Rename Tab</i> dialog, the &quot;Use custom name:&quot; setting is always selected 
+    as a convenience; it is assumed that you want to set a custom name.</td>
   </tr>
 </table>
 <p>&nbsp;</p>
 <h3><a name="lock"></a>Lock Tab</h3>
 <p>
-<img border="0" src="../images/tab_locked.png" align="left" hspace="5" width="88" height="25">This 
+<img border="0" src="../images/pane_tabs/tab_locked.png" align="left" hspace="5" width="88" height="25">This 
 item locks the tab, preventing it from being closed.&nbsp; The tab's icon is 
 changed, and the menu item becomes checked, reminding the user that the tab is 
 locked.&nbsp; Locked tabs can still be <a href="tab_bar.htm#re-arrange">
@@ -119,23 +118,13 @@ preserved between sessions.</p>
 <p>This item locks the tab, as above (ie. can't be closed), but also prevents 
 the address from being changed by double-clicking on a folder or drive.&nbsp; A 
 new tab is opened instead, displaying the desired new address.</p>
-<table border="0" style="border-collapse: collapse" bordercolor="#111111" cellspacing="0" cellpadding="0">
-  <tr>
-    <td width="34" align="center">
-    <img border="0" src="../images/bug28x32.gif" width="28" height="32"></td>
-    <td width="3" bgcolor="#E78C10">&nbsp;</td>
-    <td width="10">&nbsp;</td>
-    <td><b><font size="3" color="#E78C10">Bug:</font></b> When a new tab is 
-    opened in this manner, the <a href="tab_bar.htm#close">close button</a> on 
-    the Tab bar is initially inactive for that tab.&nbsp; Changing tabs, 
-    however, restores correct behavior.</td>
-  </tr>
-</table>
 <p>&nbsp;</p>
 <h3><a name="close_other"></a>Close Other Tabs</h3>
 <p>This item closes all tabs on the Tab bar <b>except</b> the tab whose context 
 menu you are using, even if that tab is not active.&nbsp; Of course, when all 
 other tabs are closed, the remaining tab becomes active.</p>
+<p><a title="Top of page" href="#top" style="background-color:transparent">
+<img border="0" src="../images/common/arrow_top.gif" width="23" height="23"></a></p>
 
 </body>
 

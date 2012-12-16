@@ -12,18 +12,28 @@
 
 <body onload="javascript:attachdiv()">
 
-<h2 class="Heading_2_no_table"><a href="../nav/mnu-actions.htm">Actions</a>/Destroy 
-Files...</h2>
+<h2 class="Heading_2_no_table"><a name="top"></a>
+<a href="../nav/mnu-actions.htm">Actions</a>/Destroy File(s)...</h2>
 <p style="margin-bottom: -16">&nbsp;</p>
 <table border="0" cellpadding="0" cellspacing="1" style="border-collapse: collapse" bordercolor="#111111">
   <tr>
-    <td width="271">
-    <img border="0" src="../images/destroy.png" width="258" height="277"></td>
+    <td width="441" colspan="2"><b>Click</b> or <b><i>Hover</i></b> on an item 
+    for more ...</td>
+  </tr>
+  <tr>
+    <td width="441"><map name="FPMap0">
+    <area coords="12, 66, 407, 257" shape="rect" onmouseover="javascript:rollovr(this,'{7}/396x192.png','#x','Files to be destroyed, selected before opening dialog')">
+    <area coords="19, 294, 163, 310" shape="rect" onmouseover="javascript:rollovr(this,'{21}/145x17.gif','#what','{1}')">
+    <area coords="19, 320, 123, 336" shape="rect" onmouseover="javascript:rollovr(this,'{21}/145x17.gif','#3pass','{1}')">
+    <area coords="253, 385, 325, 405" shape="rect" onmouseover="javascript:rollovr(this,'{23}/73x21.gif','#x','Confirmation dialog, then destroys files')">
+    <area coords="334, 385, 406, 405" shape="rect" onmouseover="javascript:rollovr(this,'{23}/73x21.gif','#x','{5}')">
+    </map>
+    <img id="MAINimg" border="0" src="../images/mnu_actions/destroy.png" usemap="#FPMap0" width="421" height="422"></td>
     <td valign="top">
     <h3>Page Contents</h3>
     <ol>
       <li><a href="#why">Why use secure deletion?</a></li>
-      <li><a href="#what">What does Destroy Files actually do?</a></li>
+      <li><a href="#what">What does Destroy File(s) actually do?</a></li>
       <li><a href="#speed">Speed</a></li>
       <li><a href="#termination">Early termination</a></li>
       <li><a href="#disclaimer">Disclaimer</a></li>
@@ -31,13 +41,23 @@ Files...</h2>
     </td>
   </tr>
 </table>
-<p>&nbsp;</p>
-<p>The <b>Destroy Files...</b> action securely deletes selected files by 
+<p>The <b>Destroy File(s)...</b> action securely deletes selected files by 
 overwriting their file space, preventing file recovery.&nbsp; The dialog allows</p>
 <ul>
   <li>removal of files marked for deletion, and</li>
   <li>selection of either a 1-pass or 3-pass overwrite.</li>
 </ul>
+<table border="0" style="border-collapse: collapse" bordercolor="#111111" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="34" align="center">
+    <img border="0" src="../images/common/caution24x24.gif" hspace="0" width="24" height="24"></td>
+    <td width="4" bgcolor="#FF0000">&nbsp;</td>
+    <td width="10">&nbsp;</td>
+    <td bgcolor="#FDE1E1"><b><font size="3" color="#FF0000">Caution:</font></b> 
+    The <b>Destroy File(s)</b> action is not the same as the
+    <a href="../mnu_file/delete_perm.htm">Delete Permanently</a> routine!</td>
+  </tr>
+</table>
 <p>&nbsp;</p>
 <h3><a name="why"></a>Why use secure deletion?</h3>
 <p>Today's computer stores <b>much</b> more than just games and documents; many 
@@ -70,7 +90,7 @@ safeguard some of our personal data.</p>
 <table border="0" style="border-collapse: collapse" bordercolor="#111111" cellspacing="0" cellpadding="0">
   <tr>
     <td width="34" align="center">
-    <img border="0" src="../images/info24x24.gif" hspace="0" width="24" height="24"></td>
+    <img border="0" src="../images/common/info24x24.gif" hspace="0" width="24" height="24"></td>
     <td width="3" bgcolor="#0000FF">&nbsp;</td>
     <td width="10">&nbsp;</td>
     <td><b><font color="#0000FF" size="3">Info:</font></b> USB flash drives, 
@@ -79,9 +99,9 @@ safeguard some of our personal data.</p>
   </tr>
 </table>
 <p>&nbsp;</p>
-<h3><a name="what"></a>What does Destroy Files actually do?</h3>
-<p>The Destroy Files (secure deletion) routine performs the following tasks on 
-each file:</p>
+<h3><a name="what"></a>What does Destroy File(s) actually do?</h3>
+<p>The <b>Destroy File(s)</b> - secure deletion - routine performs the following 
+tasks on each file:</p>
 <ol>
   <li>locates file data</li>
   <li>determines the actual size of the file on disk, i.e. how many clusters are 
@@ -94,7 +114,7 @@ each file:</p>
   <li>starts at the beginning of the file, and writes in the first-pass data, 
   0x00 over the length of the whole file.&nbsp; This overwriting effectively 
   eliminates the former contents of the file.</li>
-  <li>if <b>3-pass overwrite</b> has been chosen, then<ol>
+  <li><a name="3pass"></a>if <b>3-pass overwrite</b> has been chosen, then<ol>
     <li>starts at the beginning of the file, and writes in the second-pass data 
     - 0xFF - over the length of the whole file.</li>
     <li>then, writes in a <i>random</i> set of data, again byte by byte, as the 
@@ -109,7 +129,7 @@ each file:</p>
 </ol>
 <p>&nbsp;</p>
 <h3><a name="speed"></a>Speed</h3>
-<p><b>Destroy Files</b> writes data either once or three times, one byte at a 
+<p><b>Destroy File(s)</b> writes data either once or three times, one byte at a 
 time, and is, therefore, somewhat <i>disk intensive</i>.&nbsp; What this means 
 is that the routine is not as fast as normal file writing.&nbsp; Calculation of 
 an estimated write time would be difficult, since it would be dependent on a 
@@ -123,7 +143,7 @@ number of <i>uncertain</i> aspects, namely</p>
   which indirectly could affect write times</li>
   <li>etc.</li>
 </ul>
-<p>Attempting to use <b>Destroy Files</b> on a large file may create a <b>very</b> 
+<p>Attempting to use <b>Destroy File(s)</b> on a large file may create a <b>very</b> 
 long wait time, so the following estimates are included here for reference and 
 comparison:</p>
 <blockquote>
@@ -221,15 +241,15 @@ secure deletion, could take as long as 11.5 hours!&nbsp; Sleep on it!</p>
 <h3><a name="termination"></a>Early termination</h3>
 <p>On the <a href="#hardware">hardware</a> listed above, the Windows Task 
 Manager reports that <b>Explorer++</b> is using between 95% and 99% of the CPU 
-time during a <b>Destroy Files</b> operation, despite the fact that the process 
-is operating at <i>Normal</i> priority.&nbsp; The effect of this is that</p>
+time during a <b>Destroy File(s)</b> operation, despite the fact that the 
+process is operating at <i>Normal</i> priority.&nbsp; The effect of this is that</p>
 <ul>
-  <li>the appearance of <b>Explorer++</b> (not the Destroy Files dialog) is that 
-  of a program that has &quot;stopped responding to the system&quot;, and</li>
+  <li>the appearance of <b>Explorer++</b> (not the <b>Destroy File(s)</b> 
+  dialog) is that of a program that has &quot;stopped responding to the system&quot;, and</li>
   <li>attempting to switch to another application (via the taskbar) and do 
   something else is a waste of time.</li>
 </ul>
-<p>If <b>Destroy Files</b> is launched in error on a large file (see
+<p>If <b>Destroy File(s)</b> is launched in error on a large file (see
 <a href="#times">times</a> above), it can be prematurely terminated using the 
 Task Manager by</p>
 <ol>
@@ -239,7 +259,7 @@ Task Manager by</p>
   <li>agreeing to the warning dialog</li>
 </ol>
 <p>The effect of this is to forcefully close <b>Explorer++</b> and, of course, 
-the <b>Destroy Files</b> dialog (a child window), freeing up your system 
+the <b>Destroy File(s)</b> dialog (a child window), freeing up your system 
 resources.&nbsp; However, take note that</p>
 <ul>
   <li>settings for <b>Explorer++</b> (ie. open tabs, views, etc.) may not have 
@@ -249,14 +269,16 @@ resources.&nbsp; However, take note that</p>
 </ul>
 <p>&nbsp;</p>
 <h3><a name="disclaimer"></a>Disclaimer</h3>
-<p>Although the <b>Destroy Files</b> action is deemed to be secure, <b>
+<p>Although the <b>Destroy File(s)</b> action is deemed to be secure, <b>
 Explorer++</b> is released under the GNU General Public
 <a href="../mnu_help/License.txt">License</a> and no warranty as to suitability 
 is offered.&nbsp; Section 15 of the GNU license states that the program is 
 provided &quot;as-is&quot; without warranty of any kind.</p>
-<p>In other words, if you use the <b>Destroy Files</b> routine, and you <b>still</b> 
-get busted for importing ivory when the Police seize your computer and find your 
-files, you're on your own!</p>
+<p>In other words, if you use the <b>Destroy File(s)</b> routine, and you <b>
+still</b> get busted for importing ivory when the Police seize your computer and 
+find your files, you're on your own!</p>
+<p><a title="Top of page" href="#top" style="background-color:transparent">
+<img border="0" src="../images/common/arrow_top.gif" width="23" height="23"></a></p>
 
 </body>
 

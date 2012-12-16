@@ -11,6 +11,10 @@
 		<param name="Local" value="misc/about_help.htm">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Accelerator keys">
+		<param name="Local" value="appendixB/keys.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Attributes">
 		<param name="See Also" value="Attributes">
 		</OBJECT>
@@ -32,6 +36,40 @@
 			<param name="Local" value="mnu_file/set_file_attr.htm">
 			</OBJECT>
 	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Auto Arrange">
+		<param name="Local" value="mnu_view/auto_arrange.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Autosize columns">
+		<param name="Local" value="mnu_view/autosize_col.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Back">
+		<param name="Local" value="mnu_go/back.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Bookmarks">
+		<param name="See Also" value="Bookmarks">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="add">
+			<param name="Local" value="mnu_bookmarks/bookmark_tab.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="organize">
+			<param name="Local" value="mnu_bookmarks/organize.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Clone window">
+		<param name="Local" value="mnu_file/clone_win.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Colors, customize">
+		<param name="Local" value="mnu_tools/customize_colors.htm">
+		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Columns">
 		<param name="See Also" value="Columns">
@@ -76,6 +114,28 @@
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Defaults">
+		<param name="Local" value="mnu_tools/options-default_settings.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Delay, treeview">
+		<param name="Local" value="mnu_tools/window/disable_delay.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Directory listing, save">
+		<param name="Local" value="mnu_file/save_dir_list.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Display window">
+		<param name="Local" value="pane_dispwin/disp_win.htm">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="change colors">
+			<param name="Local" value="mnu_view/change_dw_colors.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="File slack">
 		<param name="See Also" value="File slack">
 		</OBJECT>
@@ -111,12 +171,28 @@
 			<param name="Local" value="mnu_actions/merge_files.htm">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="properties">
+			<param name="Local" value="mnu_file/properties.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="rename">
 			<param name="Local" value="mnu_file/rename.htm">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="show hidden">
+			<param name="Local" value="mnu_view/show_hidden.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="sort">
+			<param name="Local" value="mnu_view/sort_by.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="split">
 			<param name="Local" value="mnu_actions/split_file.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="superhidden">
+			<param name="Local" value="appendixA/superhidden.htm">
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
@@ -136,7 +212,20 @@
 			<param name="Name" value="pane, visibility">
 			<param name="Local" value="mnu_view/folders.htm">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Special">
+			<param name="Local" value="mnu_go/go_special.htm">
+			<param name="Local" value="mnu_go/go_userdata.htm">
+			</OBJECT>
 	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Forward">
+		<param name="Local" value="mnu_go/forward.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Group by">
+		<param name="Local" value="mnu_view/group_by.htm">
+		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Hard links">
 		<param name="See Also" value="Hard links">
@@ -166,10 +255,6 @@
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
-		<param name="Name" value="Group by">
-		<param name="Local" value="mnu_view/group_by.htm">
-		</OBJECT>
-	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Hidden files">
 		<param name="Local" value="mnu_view/show_hidden.htm">
 		</OBJECT>
@@ -184,6 +269,10 @@
 			</OBJECT>
 	</UL>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Language">
+		<param name="Local" value="mnu_tools/general/language.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Menu">
 		<param name="Local" value="nav/mnu-actions.htm">
 		<param name="Local" value="nav/mnu-bookmarks.htm">
@@ -194,6 +283,22 @@
 		<param name="Local" value="nav/mnu-selection.htm">
 		<param name="Local" value="nav/mnu-tools.htm">
 		<param name="Local" value="nav/mnu-view.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Options">
+		<param name="Local" value="mnu_tools/options-default_settings.htm">
+		<param name="Local" value="mnu_tools/options-files_and_folders.htm">
+		<param name="Local" value="mnu_tools/options-general.htm">
+		<param name="Local" value="mnu_tools/options-window.htm">
+		<param name="Local" value="mnu_tools/options-tabs.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Refresh">
+		<param name="Local" value="mnu_view/refresh.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Search">
+		<param name="Local" value="mnu_tools/search.htm">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Select">
@@ -221,6 +326,10 @@
 			<param name="Local" value="mnu_selection/sel_none.htm">
 			</OBJECT>
 	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Shortcut keys">
+		<param name="Local" value="appendixB/keys.htm">
+		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Shortcuts">
 		<param name="See Also" value="Shortcuts">
@@ -254,6 +363,10 @@
 		<param name="Local" value="mnu_view/status_bar.htm">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Special folders, see Folders">
+		<param name="See Also" value="Folders">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Tab">
 		<param name="See Also" value="Tab">
 		</OBJECT>
@@ -271,6 +384,10 @@
 			<param name="Local" value="mnu_file/close_tab.htm">
 			</OBJECT>
 		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="context menu">
+			<param name="Local" value="pane_tabs/context_menu.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
 			<param name="Name" value="default folder">
 			<param name="Local" value="mnu_tools/general/def_new_tab.htm">
 			</OBJECT>
@@ -286,10 +403,58 @@
 			<param name="Name" value="new (create)">
 			<param name="Local" value="mnu_file/new_tab.htm">
 			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="restore on startup">
+			<param name="Local" value="mnu_tools/general/onstartup.htm">
+			</OBJECT>
 	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Title bar, settings">
+		<param name="Local" value="mnu_tools/window/titlebar.htm">
+		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Title page">
 		<param name="Local" value="misc/title.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Toolbars">
+		<param name="Local" value="mnu_view/toolbars.htm">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Address">
+			<param name="Local" value="toolbars/address.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Application">
+			<param name="Local" value="toolbars/application.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Bookmarks">
+			<param name="Local" value="toolbars/bookmarks.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Drives">
+			<param name="Local" value="toolbars/drives.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Main">
+			<param name="Local" value="toolbars/main.htm">
+			</OBJECT>
+		<UL>
+			<LI> <OBJECT type="text/sitemap">
+				<param name="Name" value="customize">
+				<param name="Local" value="toolbars/customize.htm">
+				</OBJECT>
+		</UL>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Undo">
+		<param name="Local" value="mnu_edit/undo.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Up">
+		<param name="Local" value="mnu_go/up1level.htm">
 		</OBJECT>
 	<LI> <OBJECT type="text/sitemap">
 		<param name="Name" value="Views">
