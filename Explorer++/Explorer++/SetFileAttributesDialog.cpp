@@ -316,7 +316,7 @@ void CSetFileAttributesDialog::OnOk()
 		SetFileAttributes(File.szFullFileName,FileAttributes);
 
 		HANDLE hFile = CreateFile(File.szFullFileName,FILE_WRITE_ATTRIBUTES,0,
-			NULL,OPEN_EXISTING,NULL,NULL);
+			NULL,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS,NULL);
 
 		if(hFile != INVALID_HANDLE_VALUE)
 		{
