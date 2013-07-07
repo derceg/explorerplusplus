@@ -31,17 +31,26 @@ void Explorerplusplus::InitializeBookmarks(void)
 {
 	TCHAR szTemp[64];
 
-	LoadString(m_hLanguageModule,IDS_BOOKMARKS_ALLBOOKMARKS,szTemp,SIZEOF_ARRAY(szTemp));
-	m_bfAllBookmarks = CBookmarkFolder::CreateNew(szTemp);
+	GUID RootGuid;
 
-	/* Set up the 'Bookmarks Toolbar' and 'Bookmarks Menu' folders. */
+	/* The cast to RPC_WSTR is required for the reason
+	discussed here: http://social.msdn.microsoft.com/Forums/vstudio/en-US/d1b4550a-407b-4c09-8560-0ab9ef6ff754/error-while-compiling-c2664. */
+	UuidFromString(reinterpret_cast<RPC_WSTR>(NBookmarkHelper::ROOT_GUID),&RootGuid);
+
+	LoadString(m_hLanguageModule,IDS_BOOKMARKS_ALLBOOKMARKS,szTemp,SIZEOF_ARRAY(szTemp));
+	m_bfAllBookmarks = CBookmarkFolder::CreateNew(szTemp, RootGuid);
+
+	GUID ToolbarGuid;
+	UuidFromString(reinterpret_cast<RPC_WSTR>(NBookmarkHelper::TOOLBAR_GUID),&ToolbarGuid);
 	LoadString(m_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSTOOLBAR,szTemp,SIZEOF_ARRAY(szTemp));
-	CBookmarkFolder bfBookmarksToolbar = CBookmarkFolder::Create(szTemp);
+	CBookmarkFolder bfBookmarksToolbar = CBookmarkFolder::Create(szTemp,ToolbarGuid);
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksToolbar);
 	m_guidBookmarksToolbar = bfBookmarksToolbar.GetGUID();
 
+	GUID MenuGuid;
+	UuidFromString(reinterpret_cast<RPC_WSTR>(NBookmarkHelper::MENU_GUID),&MenuGuid);
 	LoadString(m_hLanguageModule,IDS_BOOKMARKS_BOOKMARKSMENU,szTemp,SIZEOF_ARRAY(szTemp));
-	CBookmarkFolder bfBookmarksMenu = CBookmarkFolder::Create(szTemp);
+	CBookmarkFolder bfBookmarksMenu = CBookmarkFolder::Create(szTemp,MenuGuid);
 	m_bfAllBookmarks->InsertBookmarkFolder(bfBookmarksMenu);
 	m_guidBookmarksMenu = bfBookmarksMenu.GetGUID();
 

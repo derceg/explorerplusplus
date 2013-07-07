@@ -35,7 +35,9 @@ class CBookmarkFolder
 {
 public:
 
+	static CBookmarkFolder	Create(const std::wstring &strName,GUID &guid);
 	static CBookmarkFolder	Create(const std::wstring &strName);
+	static CBookmarkFolder	*CreateNew(const std::wstring &strName,GUID &guid);
 	static CBookmarkFolder	*CreateNew(const std::wstring &strName);
 	static CBookmarkFolder	Unserialize(void *pSerializedData);
 	static CBookmarkFolder	UnserializeFromRegistry(const std::wstring &strKey);
@@ -93,10 +95,10 @@ private:
 		FILETIME	ftModified;
 	};
 
-	CBookmarkFolder(const std::wstring &str,InitializationType_t InitializationType);
+	CBookmarkFolder(const std::wstring &str,InitializationType_t InitializationType,GUID *guid);
 	CBookmarkFolder(void *pSerializedData);
 
-	void			Initialize(const std::wstring &strName);
+	void			Initialize(const std::wstring &strName,GUID *guid);
 	void			InitializeFromRegistry(const std::wstring &strKey);
 
 	GUID			m_guid;

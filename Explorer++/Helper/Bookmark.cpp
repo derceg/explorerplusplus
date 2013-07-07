@@ -155,14 +155,24 @@ NBookmark::SerializedData_t CBookmark::Serialize() const
 	return sd;
 }
 
+CBookmarkFolder CBookmarkFolder::Create(const std::wstring &strName,GUID &guid)
+{
+	return CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL,&guid);
+}
+
 CBookmarkFolder CBookmarkFolder::Create(const std::wstring &strName)
 {
-	return CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL);
+	return CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL,NULL);
+}
+
+CBookmarkFolder *CBookmarkFolder::CreateNew(const std::wstring &strName,GUID &guid)
+{
+	return new CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL,&guid);
 }
 
 CBookmarkFolder *CBookmarkFolder::CreateNew(const std::wstring &strName)
 {
-	return new CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL);
+	return new CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL,NULL);
 }
 
 CBookmarkFolder CBookmarkFolder::Unserialize(void *pSerializedData)
@@ -172,10 +182,10 @@ CBookmarkFolder CBookmarkFolder::Unserialize(void *pSerializedData)
 
 CBookmarkFolder CBookmarkFolder::UnserializeFromRegistry(const std::wstring &strKey)
 {
-	return CBookmarkFolder(strKey,INITIALIZATION_TYPE_REGISTRY);
+	return CBookmarkFolder(strKey,INITIALIZATION_TYPE_REGISTRY, NULL);
 }
 
-CBookmarkFolder::CBookmarkFolder(const std::wstring &str,InitializationType_t InitializationType)
+CBookmarkFolder::CBookmarkFolder(const std::wstring &str,InitializationType_t InitializationType,GUID *guid)
 {
 	switch(InitializationType)
 	{
@@ -184,7 +194,7 @@ CBookmarkFolder::CBookmarkFolder(const std::wstring &str,InitializationType_t In
 		break;
 
 	default:
-		Initialize(str);
+		Initialize(str,guid);
 		break;
 	}
 }
@@ -211,9 +221,16 @@ CBookmarkFolder::~CBookmarkFolder()
 
 }
 
-void CBookmarkFolder::Initialize(const std::wstring &strName)
+void CBookmarkFolder::Initialize(const std::wstring &strName,GUID *guid)
 {
-	CoCreateGuid(&m_guid);
+	if(guid != NULL)
+	{
+		m_guid = *guid;
+	}
+	else
+	{
+		CoCreateGuid(&m_guid);
+	}
 
 	m_strName = strName;
 	m_nChildFolders = 0;
@@ -230,8 +247,14 @@ void CBookmarkFolder::InitializeFromRegistry(const std::wstring &strKey)
 
 	if(lRes == ERROR_SUCCESS)
 	{
-		/* TODO: Write GUID. */
-		//NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ID"),reinterpret_cast<DWORD *>(&m_ID));
+		std::wstring stringGuid;
+		NRegistrySettings::ReadStringFromRegistry(hKey,_T("GUID"),stringGuid);
+		stringGuid = stringGuid.substr(1,stringGuid.length() - 2);
+
+		TCHAR stringGuidTemp[128];
+		StringCchCopy(stringGuidTemp,SIZEOF_ARRAY(stringGuidTemp),stringGuid.c_str());
+		UuidFromString(reinterpret_cast<RPC_WSTR>(stringGuidTemp),&m_guid);
+
 		NRegistrySettings::ReadStringFromRegistry(hKey,_T("Name"),m_strName);
 		NRegistrySettings::ReadDwordFromRegistry(hKey,_T("DateCreatedLow"),&m_ftCreated.dwLowDateTime);
 		NRegistrySettings::ReadDwordFromRegistry(hKey,_T("DateCreatedHigh"),&m_ftCreated.dwHighDateTime);
@@ -273,9 +296,9 @@ void CBookmarkFolder::SerializeToRegistry(const std::wstring &strKey)
 
 	if(lRes == ERROR_SUCCESS)
 	{
-		/* These details don't need to be saved for the root bookmark. */
-		/* TODO: Read GUID. */
-		//NRegistrySettings::SaveDwordToRegistry(hKey,_T("ID"),m_ID);
+		TCHAR guidString[128];
+		StringFromGUID2(m_guid,guidString,SIZEOF_ARRAY(guidString));
+		NRegistrySettings::SaveStringToRegistry(hKey,_T("GUID"),guidString);
 		NRegistrySettings::SaveStringToRegistry(hKey,_T("Name"),m_strName.c_str());
 		NRegistrySettings::SaveDwordToRegistry(hKey,_T("DateCreatedLow"),m_ftCreated.dwLowDateTime);
 		NRegistrySettings::SaveDwordToRegistry(hKey,_T("DateCreatedHigh"),m_ftCreated.dwHighDateTime);
