@@ -134,7 +134,7 @@
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalLibraryDirectories>$(BOOST_LIB);$(PANTHEIOS)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(PANTHEIOS)\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -181,7 +181,7 @@
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalLibraryDirectories>$(BOOST_LIB);$(PANTHEIOS)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(PANTHEIOS)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -217,7 +217,7 @@
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalLibraryDirectories>$(BOOST_LIB);$(PANTHEIOS)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(PANTHEIOS)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -255,7 +255,7 @@
       <RandomizedBaseAddress>true</RandomizedBaseAddress>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <TargetMachine>MachineX64</TargetMachine>
-      <AdditionalLibraryDirectories>$(BOOST_LIB);$(PANTHEIOS)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(PANTHEIOS)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -345,6 +345,7 @@
     <ClInclude Include="BookmarkHelper.h" />
     <ClInclude Include="BookmarkIPHelper.h" />
     <ClInclude Include="BookmarksToolbar.h" />
+    <ClInclude Include="BoostCheck.h" />
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="ColorRuleHelper.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />

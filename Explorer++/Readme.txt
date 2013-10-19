@@ -3,9 +3,6 @@ The projects within this solution make use of the Boost C++ libraries (http://ww
 - BOOST
   Boost installation directory (e.g. C:\Program Files (x86)\boost\boost_1_46_1).
 
-- BOOST_LIB
-  Library directory within Boost (e.g. C:\Program Files (x86)\boost\boost_1_46_1\stage\lib).
-
 - PANTHEIOS
   Pantheios installation directory (e.g. C:\pantheios-1.0.1-beta212).
 

@@ -2,6 +2,7 @@
 #define EXPLORER_INCLUDED
 
 #include "Explorer++_internal.h"
+#include "BoostCheck.h"
 #include "BookmarkHelper.h"
 #include "BookmarkIPHelper.h"
 #include "BookmarksToolbar.h"
