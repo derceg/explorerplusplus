@@ -98,7 +98,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
-      <Command>subwcrev.exe "$(SolutionDir).." "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -142,7 +143,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PreBuildEvent>
-      <Command>subwcrev.exe "$(SolutionDir).." "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -184,7 +186,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <PreBuildEvent>
-      <Command>subwcrev.exe "$(SolutionDir).." "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Full</Optimization>
@@ -219,7 +222,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>
-      <Command>subwcrev.exe "$(SolutionDir).." "$(SolutionDir)Explorer++\Version.h.tmpl" "$(SolutionDir)Explorer++\Version.h"</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
@@ -393,7 +397,7 @@
     <None Include="res\Shell Images Large.bmp" />
     <None Include="res\Shell Images.bmp" />
     <None Include="res\Tab Close.bmp" />
-    <None Include="Version.h.tmpl" />
+    <None Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
