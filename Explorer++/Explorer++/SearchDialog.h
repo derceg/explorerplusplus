@@ -160,6 +160,8 @@ private:
 	static const int MENU_ID_OPEN_FILE_LOCATION = (MAX_SHELL_MENU_ID + 1);
 
 	void						OnSearch();
+	void						StartSearching();
+	void						StopSearching();
 	void						UpdateListViewHeader();
 
 	TCHAR						m_szSearchDirectory[MAX_PATH];

@@ -317,163 +317,174 @@ void CSearchDialog::OnSearch()
 {
 	if(!m_bSearching)
 	{
-		ShowWindow(GetDlgItem(m_hDlg,IDC_LINK_STATUS),SW_HIDE);
-		ShowWindow(GetDlgItem(m_hDlg,IDC_STATIC_STATUS),SW_SHOW);
-
-		m_AwaitingSearchItems.clear();
-		m_SearchItemsMapInternal.clear();
-
-		ListView_DeleteAllItems(GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS));
-
-		TCHAR szBaseDirectory[MAX_PATH];
-		TCHAR szSearchPattern[MAX_PATH];
-
-		/* Get the directory and name, and remove leading and
-		trailing whitespace. */
-		GetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,szBaseDirectory,
-			SIZEOF_ARRAY(szBaseDirectory));
-		PathRemoveBlanks(szBaseDirectory);
-		GetDlgItemText(m_hDlg,IDC_COMBO_NAME,szSearchPattern,
-			SIZEOF_ARRAY(szSearchPattern));
-		PathRemoveBlanks(szSearchPattern);
-
-		BOOL bSearchSubFolders = IsDlgButtonChecked(m_hDlg,IDC_CHECK_SEARCHSUBFOLDERS) ==
-			BST_CHECKED;
-
-		BOOL bUseRegularExpressions = IsDlgButtonChecked(m_hDlg,IDC_CHECK_USEREGULAREXPRESSIONS) ==
-			BST_CHECKED;
-
-		BOOL bCaseInsensitive = IsDlgButtonChecked(m_hDlg,IDC_CHECK_CASEINSENSITIVE) ==
-			BST_CHECKED;
-
-		/* Turn search patterns of the form '???' into '*???*', and
-		use this modified string to search. */
-		if(!bUseRegularExpressions && lstrlen(szSearchPattern) > 0)
-		{
-			if(szSearchPattern[0] != '*' &&
-				szSearchPattern[lstrlen(szSearchPattern) - 1] != '*')
-			{
-
-				TCHAR szTemp[MAX_PATH];
-
-				StringCchPrintf(szTemp,SIZEOF_ARRAY(szTemp),_T("*%s*"),
-					szSearchPattern);
-				StringCchCopy(szSearchPattern,SIZEOF_ARRAY(szSearchPattern),
-					szTemp);
-			}
-		}
-
-		DWORD dwAttributes = 0;
-
-		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_ARCHIVE) == BST_CHECKED)
-			dwAttributes |= FILE_ATTRIBUTE_ARCHIVE;
-
-		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_HIDDEN) == BST_CHECKED)
-			dwAttributes |= FILE_ATTRIBUTE_HIDDEN;
-
-		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_READONLY) == BST_CHECKED)
-			dwAttributes |= FILE_ATTRIBUTE_READONLY;
-
-		if(IsDlgButtonChecked(m_hDlg,IDC_CHECK_SYSTEM) == BST_CHECKED)
-			dwAttributes |= FILE_ATTRIBUTE_SYSTEM;
-
-		m_pSearch = new CSearch(m_hDlg,szBaseDirectory,szSearchPattern,
-			dwAttributes,bUseRegularExpressions,bCaseInsensitive,bSearchSubFolders);
-		m_pSearch->AddRef();
-
-		/* Save the search directory and search pattern (only if they are not
-		the same as the most recent entry). */
-		BOOL bSaveEntry = FALSE;
-
-		if(m_sdps->m_SearchDirectories.empty() ||
-			lstrcmp(szBaseDirectory,
-			m_sdps->m_SearchDirectories.begin()->c_str()) != 0)
-		{
-			bSaveEntry = TRUE;
-		}
-
-		if(bSaveEntry)
-		{
-			/* TODO: Switch to circular buffer. */
-			m_sdps->m_SearchDirectories.push_front(szBaseDirectory);
-
-			HWND hComboBox = GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY);
-			SendMessage(hComboBox,CB_INSERTSTRING,0,reinterpret_cast<LPARAM>(szBaseDirectory));
-
-			ComboBox_SetCurSel(hComboBox,0);
-		}
-
-		bSaveEntry = FALSE;
-
-		if(m_sdps->m_pSearchPatterns->empty() ||
-			lstrcmp(szSearchPattern,m_sdps->m_pSearchPatterns->begin()->c_str()) != 0)
-		{
-			bSaveEntry = TRUE;
-		}
-
-		if(bSaveEntry)
-		{
-			TCHAR szSearchPatternOriginal[MAX_PATH];
-			GetDlgItemText(m_hDlg,IDC_COMBO_NAME,szSearchPatternOriginal,
-				SIZEOF_ARRAY(szSearchPatternOriginal));
-
-			std::wstring strSearchPatternOriginal(szSearchPatternOriginal);
-			auto itr = std::find_if(m_sdps->m_pSearchPatterns->begin(),m_sdps->m_pSearchPatterns->end(),
-				[strSearchPatternOriginal](const std::wstring Pattern){return Pattern.compare(strSearchPatternOriginal) == 0;});
-
-			HWND hComboBox = GetDlgItem(m_hDlg,IDC_COMBO_NAME);
-
-			ComboBox_SetCurSel(hComboBox,-1);
-
-			/* Remove the current element from both the list and the
-			combo box. It will be reinserted at the front of both below. */
-			if(itr != m_sdps->m_pSearchPatterns->end())
-			{
-				auto index = std::distance(m_sdps->m_pSearchPatterns->begin(),itr);
-				SendMessage(hComboBox,CB_DELETESTRING,index,0);
-
-				m_sdps->m_pSearchPatterns->erase(itr);
-			}
-
-			m_sdps->m_pSearchPatterns->push_front(szSearchPatternOriginal);
-
-			SendMessage(hComboBox,CB_INSERTSTRING,0,reinterpret_cast<LPARAM>(szSearchPatternOriginal));
-			ComboBox_SetCurSel(hComboBox,0);
-			ComboBox_SetEditSel(hComboBox,-1,-1);
-
-			if(ComboBox_GetCount(hComboBox) > m_sdps->m_pSearchPatterns->capacity())
-			{
-				SendMessage(hComboBox,CB_DELETESTRING,ComboBox_GetCount(hComboBox) - 1,0);
-			}
-		}
-
-		GetDlgItemText(m_hDlg,IDSEARCH,m_szSearchButton,SIZEOF_ARRAY(m_szSearchButton));
-
-		TCHAR szTemp[64];
-
-		LoadString(GetInstance(),IDS_STOP,szTemp,SIZEOF_ARRAY(szTemp));
-		SetDlgItemText(m_hDlg,IDSEARCH,szTemp);
-
-		m_bSearching = TRUE;
-
-		/* Create a background thread, and search using it... */
-		HANDLE hThread = CreateThread(NULL,0,NSearchDialog::SearchThread,
-			reinterpret_cast<LPVOID>(m_pSearch),0,NULL);
-		CloseHandle(hThread);
+		StartSearching();
 	}
 	else
 	{
-		m_bStopSearching = TRUE;
+		StopSearching();
+	}
+}
 
-		if(m_pSearch != NULL)
+void CSearchDialog::StartSearching()
+{
+	ShowWindow(GetDlgItem(m_hDlg, IDC_LINK_STATUS), SW_HIDE);
+	ShowWindow(GetDlgItem(m_hDlg, IDC_STATIC_STATUS), SW_SHOW);
+
+	m_AwaitingSearchItems.clear();
+	m_SearchItemsMapInternal.clear();
+
+	ListView_DeleteAllItems(GetDlgItem(m_hDlg, IDC_LISTVIEW_SEARCHRESULTS));
+
+	TCHAR szBaseDirectory[MAX_PATH];
+	TCHAR szSearchPattern[MAX_PATH];
+
+	/* Get the directory and name, and remove leading and
+	trailing whitespace. */
+	/* TODO: Verify fields. */
+	GetDlgItemText(m_hDlg, IDC_COMBO_DIRECTORY, szBaseDirectory,
+		SIZEOF_ARRAY(szBaseDirectory));
+	PathRemoveBlanks(szBaseDirectory);
+	GetDlgItemText(m_hDlg, IDC_COMBO_NAME, szSearchPattern,
+		SIZEOF_ARRAY(szSearchPattern));
+	PathRemoveBlanks(szSearchPattern);
+
+	BOOL bSearchSubFolders = IsDlgButtonChecked(m_hDlg, IDC_CHECK_SEARCHSUBFOLDERS) ==
+		BST_CHECKED;
+
+	BOOL bUseRegularExpressions = IsDlgButtonChecked(m_hDlg, IDC_CHECK_USEREGULAREXPRESSIONS) ==
+		BST_CHECKED;
+
+	BOOL bCaseInsensitive = IsDlgButtonChecked(m_hDlg, IDC_CHECK_CASEINSENSITIVE) ==
+		BST_CHECKED;
+
+	/* Turn search patterns of the form '???' into '*???*', and
+	use this modified string to search. */
+	if(!bUseRegularExpressions && lstrlen(szSearchPattern) > 0)
+	{
+		if(szSearchPattern[0] != '*' &&
+			szSearchPattern[lstrlen(szSearchPattern) - 1] != '*')
 		{
-			/* Note that m_pSearch does not need to be
-			released here. Once the search object finishes,
-			it will send a WM_APP_SEARCHFINISHED message.
-			The handler for this message will then release
-			m_pSearch. */
-			m_pSearch->StopSearching();
+
+			TCHAR szTemp[MAX_PATH];
+
+			StringCchPrintf(szTemp, SIZEOF_ARRAY(szTemp), _T("*%s*"),
+				szSearchPattern);
+			StringCchCopy(szSearchPattern, SIZEOF_ARRAY(szSearchPattern),
+				szTemp);
 		}
+	}
+
+	DWORD dwAttributes = 0;
+
+	if(IsDlgButtonChecked(m_hDlg, IDC_CHECK_ARCHIVE) == BST_CHECKED)
+		dwAttributes |= FILE_ATTRIBUTE_ARCHIVE;
+
+	if(IsDlgButtonChecked(m_hDlg, IDC_CHECK_HIDDEN) == BST_CHECKED)
+		dwAttributes |= FILE_ATTRIBUTE_HIDDEN;
+
+	if(IsDlgButtonChecked(m_hDlg, IDC_CHECK_READONLY) == BST_CHECKED)
+		dwAttributes |= FILE_ATTRIBUTE_READONLY;
+
+	if(IsDlgButtonChecked(m_hDlg, IDC_CHECK_SYSTEM) == BST_CHECKED)
+		dwAttributes |= FILE_ATTRIBUTE_SYSTEM;
+
+	m_pSearch = new CSearch(m_hDlg, szBaseDirectory, szSearchPattern,
+		dwAttributes, bUseRegularExpressions, bCaseInsensitive, bSearchSubFolders);
+	m_pSearch->AddRef();
+
+	/* Save the search directory and search pattern (only if they are not
+	the same as the most recent entry). */
+	BOOL bSaveEntry = FALSE;
+
+	if(m_sdps->m_SearchDirectories.empty() ||
+		lstrcmp(szBaseDirectory,
+		m_sdps->m_SearchDirectories.begin()->c_str()) != 0)
+	{
+		bSaveEntry = TRUE;
+	}
+
+	if(bSaveEntry)
+	{
+		/* TODO: Switch to circular buffer. */
+		m_sdps->m_SearchDirectories.push_front(szBaseDirectory);
+
+		HWND hComboBox = GetDlgItem(m_hDlg, IDC_COMBO_DIRECTORY);
+		SendMessage(hComboBox, CB_INSERTSTRING, 0, reinterpret_cast<LPARAM>(szBaseDirectory));
+
+		ComboBox_SetCurSel(hComboBox, 0);
+	}
+
+	bSaveEntry = FALSE;
+
+	if(m_sdps->m_pSearchPatterns->empty() ||
+		lstrcmp(szSearchPattern, m_sdps->m_pSearchPatterns->begin()->c_str()) != 0)
+	{
+		bSaveEntry = TRUE;
+	}
+
+	if(bSaveEntry)
+	{
+		TCHAR szSearchPatternOriginal[MAX_PATH];
+		GetDlgItemText(m_hDlg, IDC_COMBO_NAME, szSearchPatternOriginal,
+			SIZEOF_ARRAY(szSearchPatternOriginal));
+
+		std::wstring strSearchPatternOriginal(szSearchPatternOriginal);
+		auto itr = std::find_if(m_sdps->m_pSearchPatterns->begin(), m_sdps->m_pSearchPatterns->end(),
+			[strSearchPatternOriginal] (const std::wstring Pattern){return Pattern.compare(strSearchPatternOriginal) == 0; });
+
+		HWND hComboBox = GetDlgItem(m_hDlg, IDC_COMBO_NAME);
+
+		ComboBox_SetCurSel(hComboBox, -1);
+
+		/* Remove the current element from both the list and the
+		combo box. It will be reinserted at the front of both below. */
+		if(itr != m_sdps->m_pSearchPatterns->end())
+		{
+			auto index = std::distance(m_sdps->m_pSearchPatterns->begin(), itr);
+			SendMessage(hComboBox, CB_DELETESTRING, index, 0);
+
+			m_sdps->m_pSearchPatterns->erase(itr);
+		}
+
+		m_sdps->m_pSearchPatterns->push_front(szSearchPatternOriginal);
+
+		SendMessage(hComboBox, CB_INSERTSTRING, 0, reinterpret_cast<LPARAM>(szSearchPatternOriginal));
+		ComboBox_SetCurSel(hComboBox, 0);
+		ComboBox_SetEditSel(hComboBox, -1, -1);
+
+		if(ComboBox_GetCount(hComboBox) > m_sdps->m_pSearchPatterns->capacity())
+		{
+			SendMessage(hComboBox, CB_DELETESTRING, ComboBox_GetCount(hComboBox) - 1, 0);
+		}
+	}
+
+	GetDlgItemText(m_hDlg, IDSEARCH, m_szSearchButton, SIZEOF_ARRAY(m_szSearchButton));
+
+	TCHAR szTemp[64];
+
+	LoadString(GetInstance(), IDS_STOP, szTemp, SIZEOF_ARRAY(szTemp));
+	SetDlgItemText(m_hDlg, IDSEARCH, szTemp);
+
+	m_bSearching = TRUE;
+
+	/* Create a background thread, and search using it... */
+	HANDLE hThread = CreateThread(NULL, 0, NSearchDialog::SearchThread,
+		reinterpret_cast<LPVOID>(m_pSearch), 0, NULL);
+	CloseHandle(hThread);
+}
+
+void CSearchDialog::StopSearching()
+{
+	m_bStopSearching = TRUE;
+
+	if(m_pSearch != NULL)
+	{
+		/* Note that m_pSearch does not need to be
+		released here. Once the search object finishes,
+		it will send a WM_APP_SEARCHFINISHED message.
+		The handler for this message will then release
+		m_pSearch. */
+		m_pSearch->StopSearching();
 	}
 }
 
