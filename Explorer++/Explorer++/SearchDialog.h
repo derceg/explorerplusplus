@@ -65,8 +65,8 @@ private:
 	template <typename T> void	ListToCircularBuffer(const std::list<T> &list,boost::circular_buffer<T> &cb);
 
 	TCHAR						m_szSearchPattern[MAX_PATH];
-	std::list<std::wstring>		m_SearchDirectories;
 	boost::circular_buffer<std::wstring>	*m_pSearchPatterns;
+	boost::circular_buffer<std::wstring>	*m_pSearchDirectories;
 	BOOL						m_bSearchSubFolders;
 	BOOL						m_bUseRegularExpressions;
 	BOOL						m_bCaseInsensitive;
@@ -162,7 +162,7 @@ private:
 	void						OnSearch();
 	void						StartSearching();
 	void						StopSearching();
-	void						SaveSearchEntry();
+	void						SaveEntry(int comboBoxId, boost::circular_buffer<std::wstring> &buffer);
 	void						UpdateListViewHeader();
 
 	TCHAR						m_szSearchDirectory[MAX_PATH];

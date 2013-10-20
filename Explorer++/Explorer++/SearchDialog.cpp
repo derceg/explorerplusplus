@@ -132,7 +132,7 @@ INT_PTR CSearchDialog::OnInitDialog()
 	lCheckDlgButton(m_hDlg,IDC_CHECK_CASEINSENSITIVE,m_sdps->m_bCaseInsensitive);
 	lCheckDlgButton(m_hDlg,IDC_CHECK_USEREGULAREXPRESSIONS,m_sdps->m_bUseRegularExpressions);
 
-	for each(auto strDirectory in m_sdps->m_SearchDirectories)
+	for each(auto strDirectory in *m_sdps->m_pSearchDirectories)
 	{
 		SendDlgItemMessage(m_hDlg,IDC_COMBO_DIRECTORY,CB_INSERTSTRING,static_cast<WPARAM>(-1),
 			reinterpret_cast<LPARAM>(strDirectory.c_str()));
@@ -395,22 +395,15 @@ void CSearchDialog::StartSearching()
 	the same as the most recent entry). */
 	BOOL bSaveEntry = FALSE;
 
-	if(m_sdps->m_SearchDirectories.empty() ||
-		lstrcmp(szBaseDirectory,
-		m_sdps->m_SearchDirectories.begin()->c_str()) != 0)
+	if(m_sdps->m_pSearchDirectories->empty() ||
+		lstrcmp(szBaseDirectory, m_sdps->m_pSearchDirectories->begin()->c_str()) != 0)
 	{
 		bSaveEntry = TRUE;
 	}
 
 	if(bSaveEntry)
 	{
-		/* TODO: Switch to circular buffer. */
-		m_sdps->m_SearchDirectories.push_front(szBaseDirectory);
-
-		HWND hComboBox = GetDlgItem(m_hDlg, IDC_COMBO_DIRECTORY);
-		SendMessage(hComboBox, CB_INSERTSTRING, 0, reinterpret_cast<LPARAM>(szBaseDirectory));
-
-		ComboBox_SetCurSel(hComboBox, 0);
+		SaveEntry(IDC_COMBO_DIRECTORY, *m_sdps->m_pSearchDirectories);
 	}
 
 	bSaveEntry = FALSE;
@@ -423,7 +416,7 @@ void CSearchDialog::StartSearching()
 
 	if(bSaveEntry)
 	{
-		SaveSearchEntry();
+		SaveEntry(IDC_COMBO_NAME, *m_sdps->m_pSearchPatterns);
 	}
 
 	GetDlgItemText(m_hDlg, IDSEARCH, m_szSearchButton, SIZEOF_ARRAY(m_szSearchButton));
@@ -441,40 +434,38 @@ void CSearchDialog::StartSearching()
 	CloseHandle(hThread);
 }
 
-void CSearchDialog::SaveSearchEntry()
+void CSearchDialog::SaveEntry(int comboBoxId, boost::circular_buffer<std::wstring> &buffer)
 {
-	TCHAR szSearchPatternOriginal[MAX_PATH];
-	GetDlgItemText(m_hDlg, IDC_COMBO_NAME, szSearchPatternOriginal,
-		SIZEOF_ARRAY(szSearchPatternOriginal));
+	TCHAR entry[MAX_PATH];
+	GetDlgItemText(m_hDlg, comboBoxId, entry, SIZEOF_ARRAY(entry));
 
-	std::wstring strSearchPatternOriginal(szSearchPatternOriginal);
-	auto itr = std::find_if(m_sdps->m_pSearchPatterns->begin(), m_sdps->m_pSearchPatterns->end(),
-		[strSearchPatternOriginal] (const std::wstring Pattern)
+	std::wstring strEntry(entry);
+	auto itr = std::find_if(buffer.begin(), buffer.end(),
+		[strEntry] (const std::wstring Pattern)
 	{
-		return Pattern.compare(strSearchPatternOriginal) == 0;
+		return Pattern.compare(strEntry) == 0;
 	});
 
-	HWND hComboBox = GetDlgItem(m_hDlg, IDC_COMBO_NAME);
-
+	HWND hComboBox = GetDlgItem(m_hDlg, comboBoxId);
 	ComboBox_SetCurSel(hComboBox, -1);
 
-	/* Remove the current element from both the list and the
-	combo box. It will be reinserted at the front of both below. */
-	if(itr != m_sdps->m_pSearchPatterns->end())
+	if(itr != buffer.end())
 	{
-		auto index = std::distance(m_sdps->m_pSearchPatterns->begin(), itr);
+		/* Remove the current element from both the list and the
+		combo box. It will be reinserted at the front of both below. */
+		auto index = std::distance(buffer.begin(), itr);
 		SendMessage(hComboBox, CB_DELETESTRING, index, 0);
 
-		m_sdps->m_pSearchPatterns->erase(itr);
+		buffer.erase(itr);
 	}
 
-	m_sdps->m_pSearchPatterns->push_front(szSearchPatternOriginal);
+	buffer.push_front(entry);
 
-	SendMessage(hComboBox, CB_INSERTSTRING, 0, reinterpret_cast<LPARAM>(szSearchPatternOriginal));
+	SendMessage(hComboBox, CB_INSERTSTRING, 0, reinterpret_cast<LPARAM>(entry));
 	ComboBox_SetCurSel(hComboBox, 0);
 	ComboBox_SetEditSel(hComboBox, -1, -1);
 
-	if(ComboBox_GetCount(hComboBox) > m_sdps->m_pSearchPatterns->capacity())
+	if(ComboBox_GetCount(hComboBox) > buffer.capacity())
 	{
 		SendMessage(hComboBox, CB_DELETESTRING, ComboBox_GetCount(hComboBox) - 1, 0);
 	}
@@ -1267,6 +1258,7 @@ CDialogSettings(SETTINGS_KEY)
 		EMPTY_STRING);
 
 	m_pSearchPatterns	= new boost::circular_buffer<std::wstring>(NDialogHelper::DEFAULT_HISTORY_SIZE);
+	m_pSearchDirectories = new boost::circular_buffer<std::wstring>(NDialogHelper::DEFAULT_HISTORY_SIZE);
 
 	ColumnInfo_t ci;
 	ci.SortMode			= SORT_NAME;
@@ -1306,7 +1298,10 @@ void CSearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 	NRegistrySettings::SaveDwordToRegistry(hKey,_T("Hidden"),m_bHidden);
 	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ReadOnly"),m_bReadOnly);
 	NRegistrySettings::SaveDwordToRegistry(hKey,_T("System"),m_bSystem);
-	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Directory"),m_SearchDirectories);
+
+	std::list<std::wstring> SearchDirectoriesList;
+	CircularBufferToList(*m_pSearchDirectories, SearchDirectoriesList);
+	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Directory"),SearchDirectoriesList);
 
 	std::list<std::wstring> SearchPatternList;
 	CircularBufferToList(*m_pSearchPatterns,SearchPatternList);
@@ -1328,7 +1323,10 @@ void CSearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Hidden"),reinterpret_cast<LPDWORD>(&m_bHidden));
 	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ReadOnly"),reinterpret_cast<LPDWORD>(&m_bReadOnly));
 	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("System"),reinterpret_cast<LPDWORD>(&m_bSystem));
-	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Directory"),m_SearchDirectories);
+
+	std::list<std::wstring> SearchDirectoriesList;
+	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Directory"),SearchDirectoriesList);
+	ListToCircularBuffer(SearchDirectoriesList, *m_pSearchDirectories);
 
 	std::list<std::wstring> SearchPatternList;
 	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Pattern"),SearchPatternList);
@@ -1343,7 +1341,10 @@ void CSearchDialogPersistentSettings::SaveExtraXMLSettings(
 {
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth1"),NXMLSettings::EncodeIntValue(m_iColumnWidth1));
 	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth2"),NXMLSettings::EncodeIntValue(m_iColumnWidth2));
-	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Directory"),m_SearchDirectories);
+
+	std::list<std::wstring> SearchDirectoriesList;
+	CircularBufferToList(*m_pSearchDirectories, SearchDirectoriesList);
+	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Directory"),SearchDirectoriesList);
 
 	std::list<std::wstring> SearchPatternList;
 	CircularBufferToList(*m_pSearchPatterns,SearchPatternList);
@@ -1373,7 +1374,7 @@ void CSearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bs
 	}
 	else if(CheckWildcardMatch(_T("Directory*"),bstrName,TRUE))
 	{
-		m_SearchDirectories.push_back(bstrValue);
+		m_pSearchDirectories->push_back(bstrValue);
 	}
 	else if(CheckWildcardMatch(_T("Pattern*"),bstrName,TRUE))
 	{
