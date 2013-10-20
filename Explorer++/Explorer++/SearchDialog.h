@@ -162,6 +162,7 @@ private:
 	void						OnSearch();
 	void						StartSearching();
 	void						StopSearching();
+	void						SaveSearchEntry();
 	void						UpdateListViewHeader();
 
 	TCHAR						m_szSearchDirectory[MAX_PATH];

@@ -364,7 +364,6 @@ void CSearchDialog::StartSearching()
 		if(szSearchPattern[0] != '*' &&
 			szSearchPattern[lstrlen(szSearchPattern) - 1] != '*')
 		{
-
 			TCHAR szTemp[MAX_PATH];
 
 			StringCchPrintf(szTemp, SIZEOF_ARRAY(szTemp), _T("*%s*"),
@@ -424,38 +423,7 @@ void CSearchDialog::StartSearching()
 
 	if(bSaveEntry)
 	{
-		TCHAR szSearchPatternOriginal[MAX_PATH];
-		GetDlgItemText(m_hDlg, IDC_COMBO_NAME, szSearchPatternOriginal,
-			SIZEOF_ARRAY(szSearchPatternOriginal));
-
-		std::wstring strSearchPatternOriginal(szSearchPatternOriginal);
-		auto itr = std::find_if(m_sdps->m_pSearchPatterns->begin(), m_sdps->m_pSearchPatterns->end(),
-			[strSearchPatternOriginal] (const std::wstring Pattern){return Pattern.compare(strSearchPatternOriginal) == 0; });
-
-		HWND hComboBox = GetDlgItem(m_hDlg, IDC_COMBO_NAME);
-
-		ComboBox_SetCurSel(hComboBox, -1);
-
-		/* Remove the current element from both the list and the
-		combo box. It will be reinserted at the front of both below. */
-		if(itr != m_sdps->m_pSearchPatterns->end())
-		{
-			auto index = std::distance(m_sdps->m_pSearchPatterns->begin(), itr);
-			SendMessage(hComboBox, CB_DELETESTRING, index, 0);
-
-			m_sdps->m_pSearchPatterns->erase(itr);
-		}
-
-		m_sdps->m_pSearchPatterns->push_front(szSearchPatternOriginal);
-
-		SendMessage(hComboBox, CB_INSERTSTRING, 0, reinterpret_cast<LPARAM>(szSearchPatternOriginal));
-		ComboBox_SetCurSel(hComboBox, 0);
-		ComboBox_SetEditSel(hComboBox, -1, -1);
-
-		if(ComboBox_GetCount(hComboBox) > m_sdps->m_pSearchPatterns->capacity())
-		{
-			SendMessage(hComboBox, CB_DELETESTRING, ComboBox_GetCount(hComboBox) - 1, 0);
-		}
+		SaveSearchEntry();
 	}
 
 	GetDlgItemText(m_hDlg, IDSEARCH, m_szSearchButton, SIZEOF_ARRAY(m_szSearchButton));
@@ -471,6 +439,45 @@ void CSearchDialog::StartSearching()
 	HANDLE hThread = CreateThread(NULL, 0, NSearchDialog::SearchThread,
 		reinterpret_cast<LPVOID>(m_pSearch), 0, NULL);
 	CloseHandle(hThread);
+}
+
+void CSearchDialog::SaveSearchEntry()
+{
+	TCHAR szSearchPatternOriginal[MAX_PATH];
+	GetDlgItemText(m_hDlg, IDC_COMBO_NAME, szSearchPatternOriginal,
+		SIZEOF_ARRAY(szSearchPatternOriginal));
+
+	std::wstring strSearchPatternOriginal(szSearchPatternOriginal);
+	auto itr = std::find_if(m_sdps->m_pSearchPatterns->begin(), m_sdps->m_pSearchPatterns->end(),
+		[strSearchPatternOriginal] (const std::wstring Pattern)
+	{
+		return Pattern.compare(strSearchPatternOriginal) == 0;
+	});
+
+	HWND hComboBox = GetDlgItem(m_hDlg, IDC_COMBO_NAME);
+
+	ComboBox_SetCurSel(hComboBox, -1);
+
+	/* Remove the current element from both the list and the
+	combo box. It will be reinserted at the front of both below. */
+	if(itr != m_sdps->m_pSearchPatterns->end())
+	{
+		auto index = std::distance(m_sdps->m_pSearchPatterns->begin(), itr);
+		SendMessage(hComboBox, CB_DELETESTRING, index, 0);
+
+		m_sdps->m_pSearchPatterns->erase(itr);
+	}
+
+	m_sdps->m_pSearchPatterns->push_front(szSearchPatternOriginal);
+
+	SendMessage(hComboBox, CB_INSERTSTRING, 0, reinterpret_cast<LPARAM>(szSearchPatternOriginal));
+	ComboBox_SetCurSel(hComboBox, 0);
+	ComboBox_SetEditSel(hComboBox, -1, -1);
+
+	if(ComboBox_GetCount(hComboBox) > m_sdps->m_pSearchPatterns->capacity())
+	{
+		SendMessage(hComboBox, CB_DELETESTRING, ComboBox_GetCount(hComboBox) - 1, 0);
+	}
 }
 
 void CSearchDialog::StopSearching()
