@@ -19,6 +19,7 @@
 #define GENERAL_ALLOCATION_UNIT	1024
 
 CApplicationToolbarDropHandler::CApplicationToolbarDropHandler(HWND hToolbar) :
+m_RefCount(1),
 m_hToolbar(hToolbar)
 {
 	/* Initialize the drag source helper, and use it to initialize the drop target helper. */
