@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include <stack>
 #include "Explorer++_internal.h"
+#include "MainImages.h"
 #include "ManageBookmarksDialog.h"
 #include "BookmarkHelper.h"
 #include "MainResource.h"

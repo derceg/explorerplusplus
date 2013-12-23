@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include <list>
 #include "Explorer++.h"
+#include "MainImages.h"
 #include "CustomizeColorsDialog.h"
 #include "BookmarkHelper.h"
 #include "../DisplayWindow/DisplayWindow.h"

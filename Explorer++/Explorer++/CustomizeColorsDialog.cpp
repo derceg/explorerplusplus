@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Explorer++_internal.h"
+#include "MainImages.h"
 #include "CustomizeColorsDialog.h"
 #include "ColorRuleDialog.h"
 #include "MainResource.h"

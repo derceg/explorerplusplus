@@ -135,6 +135,200 @@ static ColumnXMLSaveData ColumnData[] =
 
 unsigned long hash_setting(unsigned char *str);
 
+BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
+{
+	MSXML2::IXMLDOMDocument *pXMLDom;
+	TCHAR szConfigFile[MAX_PATH];
+	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
+	MSXML2::IXMLDOMNode			*pNode = NULL;
+	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
+	MSXML2::IXMLDOMNode			*pChildNode = NULL;
+	BSTR						bstrName;
+	BSTR						bstrValue;
+	BSTR						bstr = NULL;
+	VARIANT_BOOL				status;
+	VARIANT						var;
+	HRESULT						hr;
+	long						length;
+	long						nChildNodes;
+	int							i = 0;
+
+	pXMLDom = NXMLSettings::DomFromCOM();
+
+	if(!pXMLDom)
+		goto clean;
+
+	GetCurrentProcessImageName(szConfigFile, SIZEOF_ARRAY(szConfigFile));
+	PathRemoveFileSpec(szConfigFile);
+	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
+
+	var = NXMLSettings::VariantString(szConfigFile);
+	pXMLDom->load(var, &status);
+
+	if(status != VARIANT_TRUE)
+		goto clean;
+
+	bstr = SysAllocString(L"//WindowPosition/*");
+	pXMLDom->selectNodes(bstr, &pNodes);
+
+	pwndpl->length = sizeof(WINDOWPLACEMENT);
+
+	if(!pNodes)
+	{
+		goto clean;
+	}
+	else
+	{
+		pNodes->get_length(&length);
+
+		/* There should only be one node
+		under 'WindowPosition'. */
+		if(length == 1)
+		{
+			pNodes->get_item(0, &pNode);
+
+			hr = pNode->get_attributes(&am);
+
+			if(SUCCEEDED(hr))
+			{
+				am->get_length(&nChildNodes);
+
+				for(i = 1; i < nChildNodes; i++)
+				{
+					am->get_item(i, &pChildNode);
+
+					/* Element name. */
+					pChildNode->get_nodeName(&bstrName);
+
+					/* Element value. */
+					pChildNode->get_text(&bstrValue);
+
+					if(lstrcmp(bstrName, _T("Flags")) == 0)
+						pwndpl->flags = NXMLSettings::DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName, _T("ShowCmd")) == 0)
+						pwndpl->showCmd = NXMLSettings::DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName, _T("MinPositionX")) == 0)
+						pwndpl->ptMinPosition.x = NXMLSettings::DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName, _T("MinPositionY")) == 0)
+						pwndpl->ptMinPosition.y = NXMLSettings::DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName, _T("MaxPositionX")) == 0)
+						pwndpl->ptMaxPosition.x = NXMLSettings::DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName, _T("MaxPositionY")) == 0)
+						pwndpl->ptMaxPosition.y = NXMLSettings::DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName, _T("NormalPositionLeft")) == 0)
+						pwndpl->rcNormalPosition.left = NXMLSettings::DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName, _T("NormalPositionTop")) == 0)
+						pwndpl->rcNormalPosition.top = NXMLSettings::DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName, _T("NormalPositionRight")) == 0)
+						pwndpl->rcNormalPosition.right = NXMLSettings::DecodeIntValue(bstrValue);
+					else if(lstrcmp(bstrName, _T("NormalPositionBottom")) == 0)
+						pwndpl->rcNormalPosition.bottom = NXMLSettings::DecodeIntValue(bstrValue);
+				}
+			}
+
+			pNode->Release();
+			pNode = NULL;
+		}
+	}
+
+clean:
+	if(&var) VariantClear(&var);
+	if(bstr) SysFreeString(bstr);
+	if(pNodes) pNodes->Release();
+	if(pNode) pNode->Release();
+
+	return TRUE;
+}
+
+BOOL LoadAllowMultipleInstancesFromXML(void)
+{
+	MSXML2::IXMLDOMDocument *pXMLDom;
+	TCHAR szConfigFile[MAX_PATH];
+	VARIANT_BOOL status;
+	VARIANT var;
+	BOOL bAllowMultipleInstances = TRUE;
+
+	pXMLDom = NXMLSettings::DomFromCOM();
+
+	if(!pXMLDom)
+		goto clean;
+
+	GetCurrentProcessImageName(szConfigFile, SIZEOF_ARRAY(szConfigFile));
+	PathRemoveFileSpec(szConfigFile);
+	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
+
+	var = NXMLSettings::VariantString(szConfigFile);
+	pXMLDom->load(var, &status);
+
+	if(status != VARIANT_TRUE)
+		goto clean;
+
+	BSTR						bstr = NULL;
+	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
+	MSXML2::IXMLDOMNode			*pNode = NULL;
+	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
+	MSXML2::IXMLDOMNode			*pNodeAttribute = NULL;
+	BSTR						bstrName;
+	BSTR						bstrValue;
+	HRESULT						hr;
+	BOOL						bFound = FALSE;
+	long						length;
+
+	bstr = SysAllocString(L"//Settings/*");
+	pXMLDom->selectNodes(bstr, &pNodes);
+
+	if(!pNodes)
+	{
+		goto clean;
+	}
+	else
+	{
+		pNodes->get_length(&length);
+
+		for(long i = 0; i < length; i++)
+		{
+			if(bFound)
+				break;
+
+			pNodes->get_item(i, &pNode);
+
+			hr = pNode->get_attributes(&am);
+
+			if(SUCCEEDED(hr))
+			{
+				hr = am->get_item(0, &pNodeAttribute);
+
+				if(SUCCEEDED(hr))
+				{
+					/* Element name. */
+					pNodeAttribute->get_text(&bstrName);
+
+					/* Element value. */
+					pNode->get_text(&bstrValue);
+
+					if(lstrcmp(bstrName, _T("AllowMultipleInstances")) == 0)
+					{
+						bAllowMultipleInstances = NXMLSettings::DecodeBoolValue(bstrValue);
+
+						bFound = TRUE;
+					}
+
+					pNodeAttribute->Release();
+					pNodeAttribute = NULL;
+				}
+			}
+
+			pNode->Release();
+			pNode = NULL;
+		}
+	}
+
+clean:
+	if(&var) VariantClear(&var);
+
+	return bAllowMultipleInstances;
+}
+
 void Explorerplusplus::LoadGenericSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 {
 	BSTR						bstr = NULL;
@@ -2016,198 +2210,4 @@ void Explorerplusplus::CLoadSaveXML::SaveColorRules()
 void Explorerplusplus::CLoadSaveXML::SaveDialogStates()
 {
 	m_pContainer->SaveDialogStatesToXML(m_pXMLDom,m_pRoot);
-}
-
-BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
-{
-	MSXML2::IXMLDOMDocument *pXMLDom;
-	TCHAR szConfigFile[MAX_PATH];
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	BSTR						bstr = NULL;
-	VARIANT_BOOL				status;
-	VARIANT						var;
-	HRESULT						hr;
-	long						length;
-	long						nChildNodes;
-	int							i = 0;
-
-	pXMLDom = NXMLSettings::DomFromCOM();
-
-	if(!pXMLDom)
-		goto clean;
-
-	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
-	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
-
-	var = NXMLSettings::VariantString(szConfigFile);
-	pXMLDom->load(var,&status);
-
-	if(status != VARIANT_TRUE)
-		goto clean;
-
-	bstr = SysAllocString(L"//WindowPosition/*");
-	pXMLDom->selectNodes(bstr,&pNodes);
-
-	pwndpl->length = sizeof(WINDOWPLACEMENT);
-
-	if(!pNodes)
-	{
-		goto clean;
-	}
-	else
-	{
-		pNodes->get_length(&length);
-
-		/* There should only be one node
-		under 'WindowPosition'. */
-		if(length == 1)
-		{
-			pNodes->get_item(0, &pNode);
-
-			hr = pNode->get_attributes(&am);
-
-			if(SUCCEEDED(hr))
-			{
-				am->get_length(&nChildNodes);
-
-				for(i = 1;i < nChildNodes;i++)
-				{
-					am->get_item(i,&pChildNode);
-
-					/* Element name. */
-					pChildNode->get_nodeName(&bstrName);
-
-					/* Element value. */
-					pChildNode->get_text(&bstrValue);
-
-					if(lstrcmp(bstrName,_T("Flags")) == 0)
-						pwndpl->flags = NXMLSettings::DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("ShowCmd")) == 0)
-						pwndpl->showCmd = NXMLSettings::DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("MinPositionX")) == 0)
-						pwndpl->ptMinPosition.x = NXMLSettings::DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("MinPositionY")) == 0)
-						pwndpl->ptMinPosition.y = NXMLSettings::DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("MaxPositionX")) == 0)
-						pwndpl->ptMaxPosition.x = NXMLSettings::DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("MaxPositionY")) == 0)
-						pwndpl->ptMaxPosition.y = NXMLSettings::DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("NormalPositionLeft")) == 0)
-						pwndpl->rcNormalPosition.left = NXMLSettings::DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("NormalPositionTop")) == 0)
-						pwndpl->rcNormalPosition.top = NXMLSettings::DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("NormalPositionRight")) == 0)
-						pwndpl->rcNormalPosition.right = NXMLSettings::DecodeIntValue(bstrValue);
-					else if(lstrcmp(bstrName,_T("NormalPositionBottom")) == 0)
-						pwndpl->rcNormalPosition.bottom = NXMLSettings::DecodeIntValue(bstrValue);
-				}
-			}
-
-			pNode->Release();
-			pNode = NULL;
-		}
-	}
-
-clean:
-	if(&var) VariantClear(&var);
-	if (bstr) SysFreeString(bstr);
-	if (pNodes) pNodes->Release();
-	if (pNode) pNode->Release();
-
-	return TRUE;
-}
-
-BOOL LoadAllowMultipleInstancesFromXML(void)
-{
-	MSXML2::IXMLDOMDocument *pXMLDom;
-	TCHAR szConfigFile[MAX_PATH];
-	VARIANT_BOOL status;
-	VARIANT var;
-	BOOL bAllowMultipleInstances = TRUE;
-
-	pXMLDom = NXMLSettings::DomFromCOM();
-
-	if(!pXMLDom)
-		goto clean;
-
-	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
-	PathRemoveFileSpec(szConfigFile);
-	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
-
-	var = NXMLSettings::VariantString(szConfigFile);
-	pXMLDom->load(var,&status);
-
-	if(status != VARIANT_TRUE)
-		goto clean;
-
-	BSTR						bstr = NULL;
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pNodeAttribute = NULL;
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	HRESULT						hr;
-	BOOL						bFound = FALSE;
-	long						length;
-
-	bstr = SysAllocString(L"//Settings/*");
-	pXMLDom->selectNodes(bstr,&pNodes);
-
-	if(!pNodes)
-	{
-		goto clean;
-	}
-	else
-	{
-		pNodes->get_length(&length);
-
-		for(long i = 0;i < length;i++)
-		{
-			if(bFound)
-				break;
-
-			pNodes->get_item(i,&pNode);
-
-			hr = pNode->get_attributes(&am);
-
-			if(SUCCEEDED(hr))
-			{
-				hr = am->get_item(0,&pNodeAttribute);
-
-				if(SUCCEEDED(hr))
-				{
-					/* Element name. */
-					pNodeAttribute->get_text(&bstrName);
-
-					/* Element value. */
-					pNode->get_text(&bstrValue);
-
-					if(lstrcmp(bstrName,_T("AllowMultipleInstances")) == 0)
-					{
-						bAllowMultipleInstances = NXMLSettings::DecodeBoolValue(bstrValue);
-
-						bFound = TRUE;
-					}
-
-					pNodeAttribute->Release();
-					pNodeAttribute = NULL;
-				}
-			}
-
-			pNode->Release();
-			pNode = NULL;
-		}
-	}
-
-clean:
-	if(&var) VariantClear(&var);
-
-	return bAllowMultipleInstances;
 }

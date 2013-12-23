@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include <regex>
 #include "Explorer++_internal.h"
+#include "MainImages.h"
 #include "SearchDialog.h"
 #include "DialogHelper.h"
 #include "MainResource.h"

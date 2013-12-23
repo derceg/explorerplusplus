@@ -16,6 +16,7 @@
 #include <list>
 #include <algorithm>
 #include "Explorer++.h"
+#include "MainImages.h"
 #include "RenameTabDialog.h"
 #include "TabDropHandler.h"
 #include "MainResource.h"

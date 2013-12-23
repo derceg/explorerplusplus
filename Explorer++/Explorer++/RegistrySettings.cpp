@@ -31,7 +31,7 @@ namespace
 #define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Gdiplus::Color(255,255,255)
 #define DEFAULT_DISPLAYWINDOW_SURROUND_COLOR	Gdiplus::Color(0,94,138)
 
-BOOL LoadWindowPosition(WINDOWPLACEMENT *pwndpl)
+BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
 {
 	HKEY hSettingsKey;
 	BOOL bRes = FALSE;

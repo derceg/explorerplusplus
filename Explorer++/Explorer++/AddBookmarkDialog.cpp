@@ -15,6 +15,7 @@
 #include <stack>
 #include "Explorer++_internal.h"
 #include "AddBookmarkDialog.h"
+#include "MainImages.h"
 #include "BookmarkHelper.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"

@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include <algorithm>
 #include "Explorer++.h"
+#include "MainImages.h"
 #include "BookmarksToolbar.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"

@@ -19,6 +19,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "MainImages.h"
 #include "SetDefaultColumnsDialog.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"

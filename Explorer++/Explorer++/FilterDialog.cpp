@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include <list>
 #include "Explorer++_internal.h"
+#include "MainImages.h"
 #include "FilterDialog.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"

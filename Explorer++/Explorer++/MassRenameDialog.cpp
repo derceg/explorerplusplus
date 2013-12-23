@@ -21,6 +21,7 @@
 #include <regex>
 #include <iomanip>
 #include "Explorer++_internal.h"
+#include "MainImages.h"
 #include "MassRenameDialog.h"
 #include "MainResource.h"
 #include "../Helper/RegistrySettings.h"

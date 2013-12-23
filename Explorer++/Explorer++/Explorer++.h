@@ -179,6 +179,21 @@ private:
 		UINT uFrom;
 	};
 
+	/* Used to store settings for individual directories. */
+	struct DirectorySettingsInternal_t
+	{
+		UINT	SortMode;
+		UINT	ViewMode;
+
+		std::list<Column_t>	RealFolderColumnList;
+		std::list<Column_t>	MyComputerColumnList;
+		std::list<Column_t>	ControlPanelColumnList;
+		std::list<Column_t>	RecycleBinColumnList;
+		std::list<Column_t>	PrintersColumnList;
+		std::list<Column_t>	NetworkConnectionsColumnList;
+		std::list<Column_t>	MyNetworkPlacesColumnList;
+	};
+
 	struct DirectorySettings_t
 	{
 		LPITEMIDLIST				pidlDirectory;

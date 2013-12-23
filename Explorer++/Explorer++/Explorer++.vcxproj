@@ -367,12 +367,14 @@
     <ClInclude Include="iShellView2.h" />
     <ClInclude Include="ListView.h" />
     <ClInclude Include="LoggingFrontend.h" />
+    <ClInclude Include="MainImages.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="ManageBookmarksDialog.h" />
     <ClInclude Include="MassRenameDialog.h" />
     <ClInclude Include="MergeFilesDialog.h" />
     <ClInclude Include="NewBookmarkFolderDialog.h" />
     <ClInclude Include="NoTranslationResource.h" />
+    <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="RenameTabDialog.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SearchDialog.h" />
@@ -385,6 +387,7 @@
     <ClInclude Include="TabDropHandler.h" />
     <ClInclude Include="UpdateCheckDialog.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
+    <ClInclude Include="XMLSettings.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\About Image.bmp" />

@@ -18,6 +18,8 @@
 #include <pantheios\backends\bec.file.h>
 #include <pantheios\inserters\integer.hpp>
 #include "Explorer++.h"
+#include "RegistrySettings.h"
+#include "XMLSettings.h"
 #include "LoggingFrontend.h"
 #include "Version.h"
 #include "MainResource.h"
@@ -587,7 +589,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	}
 	else
 	{
-		bWindowPosLoaded = LoadWindowPosition(&wndpl);
+		bWindowPosLoaded = LoadWindowPositionFromRegistry(&wndpl);
 	}
 
 	/* If no window position was loaded, use
