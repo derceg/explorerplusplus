@@ -46,7 +46,8 @@ private:
 	CApplicationToolbarPersistentSettings(const CApplicationToolbarPersistentSettings &);
 	CApplicationToolbarPersistentSettings & operator=(const CApplicationToolbarPersistentSettings &);
 
-	void AddButton(std::wstring Name,std::wstring Command,BOOL ShowNameOnToolbar);
+	bool AddButton(const std::wstring &name, const std::wstring &command,
+		BOOL showNameOnToolbar, ApplicationButton_t *buttonOut);
 
 	std::vector<ApplicationButton_t> m_Buttons;
 	int m_IDCounter;

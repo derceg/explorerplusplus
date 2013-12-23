@@ -269,15 +269,13 @@ void CApplicationToolbar::ShowNewItemDialog()
 void CApplicationToolbar::AddNewItem(const std::wstring &name, const std::wstring &command,
 	BOOL showNameOnToolbar)
 {
-	ApplicationButton_t Button;
-	Button.Name = name;
-	Button.Command = command;
-	Button.ShowNameOnToolbar = showNameOnToolbar;
+	ApplicationButton_t button;
+	bool success = m_atps->AddButton(name, command, showNameOnToolbar, &button);
 
-	Button.ID = m_atps->m_IDCounter++;
-	m_atps->m_Buttons.push_back(Button);
-
-	AddButtonToToolbar(Button);
+	if(success)
+	{
+		AddButtonToToolbar(button);
+	}
 }
 
 /* If any parameters are provided to this method,
@@ -500,7 +498,7 @@ void CApplicationToolbarPersistentSettings::LoadRegistrySettings(HKEY hParentKey
 
 		if(lNameStatus == ERROR_SUCCESS && lCommandStatus == ERROR_SUCCESS)
 		{
-			AddButton(szName,szCommand,bShowNameOnToolbar);
+			AddButton(szName,szCommand,bShowNameOnToolbar,NULL);
 		}
 
 		RegCloseKey(hKeyChild);
@@ -588,7 +586,7 @@ void CApplicationToolbarPersistentSettings::LoadXMLSettings(MSXML2::IXMLDOMNode 
 
 	if(bNameFound && bCommandFound)
 	{
-		AddButton(szName,szCommand,bShowNameOnToolbar);
+		AddButton(szName,szCommand,bShowNameOnToolbar,NULL);
 	}
 
 	MSXML2::IXMLDOMNode *pNextSibling = NULL;
@@ -624,13 +622,26 @@ void CApplicationToolbarPersistentSettings::SaveXMLSettings(MSXML2::IXMLDOMDocum
 	SysFreeString(bstr_wsntt);
 }
 
-void CApplicationToolbarPersistentSettings::AddButton(std::wstring Name,std::wstring Command,BOOL ShowNameOnToolbar)
+bool CApplicationToolbarPersistentSettings::AddButton(const std::wstring &name, const std::wstring &command,
+	BOOL showNameOnToolbar, ApplicationButton_t *buttonOut)
 {
-	ApplicationButton_t Button;
-	Button.Name = Name;
-	Button.Command = Command;
-	Button.ShowNameOnToolbar = ShowNameOnToolbar;
-	Button.ID = m_IDCounter++;
+	if(name.length() == 0 ||
+		command.length() == 0)
+	{
+		return false;
+	}
 
-	m_Buttons.push_back(Button);
+	ApplicationButton_t button;
+	button.Name = name;
+	button.Command = command;
+	button.ShowNameOnToolbar = showNameOnToolbar;
+	button.ID = m_IDCounter++;
+	m_Buttons.push_back(button);
+
+	if(buttonOut != NULL)
+	{
+		*buttonOut = button;
+	}
+
+	return true;
 }
