@@ -31,6 +31,8 @@ private:
 
 	static const TCHAR SETTINGS_KEY[];
 
+	static const TCHAR SETTING_FILTER_LIST[];
+
 	CFilterDialogPersistentSettings();
 
 	CFilterDialogPersistentSettings(const CFilterDialogPersistentSettings &);

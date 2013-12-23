@@ -27,6 +27,8 @@
 
 const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetDefaultColumns");
 
+const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _T("Folder");
+
 CSetDefaultColumnsDialog::CSetDefaultColumnsDialog(HINSTANCE hInstance,int iResource,HWND hParent,
 	IExplorerplusplus *pexpp,std::list<Column_t> *pRealFolderColumnList,std::list<Column_t> *pMyComputerColumnList,
 	std::list<Column_t> *pControlPanelColumnList,std::list<Column_t> *pRecycleBinColumnList,
@@ -437,23 +439,23 @@ CSetDefaultColumnsDialogPersistentSettings& CSetDefaultColumnsDialogPersistentSe
 
 void CSetDefaultColumnsDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("Folder"),m_FolderType);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_FOLDER_TYPE, m_FolderType);
 }
 
 void CSetDefaultColumnsDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Folder"),reinterpret_cast<DWORD *>(&m_FolderType));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_FOLDER_TYPE, reinterpret_cast<DWORD *>(&m_FolderType));
 }
 
 void CSetDefaultColumnsDialogPersistentSettings::SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,
 	MSXML2::IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Folder"),NXMLSettings::EncodeIntValue(m_FolderType));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_FOLDER_TYPE, NXMLSettings::EncodeIntValue(m_FolderType));
 }
 
 void CSetDefaultColumnsDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
-	if(lstrcmpi(bstrName,_T("Folder")) == 0)
+	if(lstrcmpi(bstrName, SETTING_FOLDER_TYPE) == 0)
 	{
 		m_FolderType = static_cast<FolderType_t>(NXMLSettings::DecodeIntValue(bstrValue));
 	}

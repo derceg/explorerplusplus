@@ -39,6 +39,21 @@ private:
 
 	static const TCHAR SETTINGS_KEY[];
 
+	static const TCHAR SETTING_COLUMN_WIDTH_1[];
+	static const TCHAR SETTING_COLUMN_WIDTH_2[];
+	static const TCHAR SETTING_SEARCH_DIRECTORY_TEXT[];
+	static const TCHAR SETTING_SEARCH_SUB_FOLDERS[];
+	static const TCHAR SETTING_USE_REGULAR_EXPRESSIONS[];
+	static const TCHAR SETTING_CASE_INSENSITIVE[];
+	static const TCHAR SETTING_ARCHIVE[];
+	static const TCHAR SETTING_HIDDEN[];
+	static const TCHAR SETTING_READ_ONLY[];
+	static const TCHAR SETTING_SYSTEM[];
+	static const TCHAR SETTING_DIRECTORY_LIST[];
+	static const TCHAR SETTING_PATTERN_LIST[];
+	static const TCHAR SETTING_SORT_MODE[];
+	static const TCHAR SETTING_SORT_ASCENDING[];
+
 	enum SortMode_t
 	{
 		SORT_NAME = 1,

@@ -42,6 +42,21 @@ namespace NSearchDialog
 
 const TCHAR CSearchDialogPersistentSettings::SETTINGS_KEY[] = _T("Search");
 
+const TCHAR CSearchDialogPersistentSettings::SETTING_COLUMN_WIDTH_1[] = _T("ColumnWidth1");
+const TCHAR CSearchDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("ColumnWidth2");
+const TCHAR CSearchDialogPersistentSettings::SETTING_SEARCH_DIRECTORY_TEXT[] = _T("SearchDirectoryText");
+const TCHAR CSearchDialogPersistentSettings::SETTING_SEARCH_SUB_FOLDERS[] = _T("SearchSubFolders");
+const TCHAR CSearchDialogPersistentSettings::SETTING_USE_REGULAR_EXPRESSIONS[] = _T("UseRegularExpressions");
+const TCHAR CSearchDialogPersistentSettings::SETTING_CASE_INSENSITIVE[] = _T("CaseInsensitive");
+const TCHAR CSearchDialogPersistentSettings::SETTING_ARCHIVE[] = _T("Archive");
+const TCHAR CSearchDialogPersistentSettings::SETTING_HIDDEN[] = _T("Hidden");
+const TCHAR CSearchDialogPersistentSettings::SETTING_READ_ONLY[] = _T("ReadOnly");
+const TCHAR CSearchDialogPersistentSettings::SETTING_SYSTEM[] = _T("System");
+const TCHAR CSearchDialogPersistentSettings::SETTING_SORT_MODE[] = _T("SortMode");
+const TCHAR CSearchDialogPersistentSettings::SETTING_SORT_ASCENDING[] = _T("SortAscending");
+const TCHAR CSearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Directory");
+const TCHAR CSearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
+
 CSearchDialog::CSearchDialog(HINSTANCE hInstance,int iResource,
 	HWND hParent,TCHAR *szSearchDirectory,IExplorerplusplus *pexpp) :
 CBaseDialog(hInstance,iResource,hParent,true)
@@ -1288,131 +1303,120 @@ CSearchDialogPersistentSettings& CSearchDialogPersistentSettings::GetInstance()
 
 void CSearchDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ColumnWidth1"),m_iColumnWidth1);
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ColumnWidth2"),m_iColumnWidth2);
-	NRegistrySettings::SaveStringToRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern);
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("SearchSubFolders"),m_bSearchSubFolders);
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("UseRegularExpressions"),m_bUseRegularExpressions);
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("CaseInsensitive"),m_bCaseInsensitive);
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("Archive"),m_bArchive);
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("Hidden"),m_bHidden);
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("ReadOnly"),m_bReadOnly);
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("System"),m_bSystem);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_COLUMN_WIDTH_1, m_iColumnWidth1);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_COLUMN_WIDTH_2, m_iColumnWidth2);
+	NRegistrySettings::SaveStringToRegistry(hKey, SETTING_SEARCH_DIRECTORY_TEXT, m_szSearchPattern);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SEARCH_SUB_FOLDERS, m_bSearchSubFolders);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_USE_REGULAR_EXPRESSIONS, m_bUseRegularExpressions);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_CASE_INSENSITIVE, m_bCaseInsensitive);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_ARCHIVE, m_bArchive);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_HIDDEN, m_bHidden);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_READ_ONLY, m_bReadOnly);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SYSTEM, m_bSystem);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SORT_MODE, m_SortMode);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_SORT_ASCENDING, m_bSortAscending);
 
 	std::list<std::wstring> SearchDirectoriesList;
 	CircularBufferToList(*m_pSearchDirectories, SearchDirectoriesList);
-	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Directory"),SearchDirectoriesList);
+	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_DIRECTORY_LIST, SearchDirectoriesList);
 
 	std::list<std::wstring> SearchPatternList;
 	CircularBufferToList(*m_pSearchPatterns,SearchPatternList);
-	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Pattern"),SearchPatternList);
-
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("SortMode"),m_SortMode);
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("SortAscending"),m_bSortAscending);
+	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_PATTERN_LIST, SearchPatternList);
 }
 
 void CSearchDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ColumnWidth1"),reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ColumnWidth2"),reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
-	NRegistrySettings::ReadStringFromRegistry(hKey,_T("SearchDirectoryText"),m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern));
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("SearchSubFolders"),reinterpret_cast<LPDWORD>(&m_bSearchSubFolders));
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("UseRegularExpressions"),reinterpret_cast<LPDWORD>(&m_bUseRegularExpressions));
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("CaseInsensitive"),reinterpret_cast<LPDWORD>(&m_bCaseInsensitive));
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Archive"),reinterpret_cast<LPDWORD>(&m_bArchive));
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Hidden"),reinterpret_cast<LPDWORD>(&m_bHidden));
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("ReadOnly"),reinterpret_cast<LPDWORD>(&m_bReadOnly));
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("System"),reinterpret_cast<LPDWORD>(&m_bSystem));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_COLUMN_WIDTH_1, reinterpret_cast<LPDWORD>(&m_iColumnWidth1));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_COLUMN_WIDTH_2, reinterpret_cast<LPDWORD>(&m_iColumnWidth2));
+	NRegistrySettings::ReadStringFromRegistry(hKey, SETTING_SEARCH_DIRECTORY_TEXT, m_szSearchPattern, SIZEOF_ARRAY(m_szSearchPattern));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_SEARCH_SUB_FOLDERS, reinterpret_cast<LPDWORD>(&m_bSearchSubFolders));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_USE_REGULAR_EXPRESSIONS, reinterpret_cast<LPDWORD>(&m_bUseRegularExpressions));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_CASE_INSENSITIVE, reinterpret_cast<LPDWORD>(&m_bCaseInsensitive));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_ARCHIVE, reinterpret_cast<LPDWORD>(&m_bArchive));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_HIDDEN, reinterpret_cast<LPDWORD>(&m_bHidden));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_READ_ONLY, reinterpret_cast<LPDWORD>(&m_bReadOnly));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_SYSTEM, reinterpret_cast<LPDWORD>(&m_bSystem));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_SORT_MODE, reinterpret_cast<LPDWORD>(&m_SortMode));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_SORT_ASCENDING, reinterpret_cast<LPDWORD>(&m_bSortAscending));
 
 	std::list<std::wstring> SearchDirectoriesList;
-	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Directory"),SearchDirectoriesList);
+	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_DIRECTORY_LIST, SearchDirectoriesList);
 	ListToCircularBuffer(SearchDirectoriesList, *m_pSearchDirectories);
 
 	std::list<std::wstring> SearchPatternList;
-	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Pattern"),SearchPatternList);
+	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_PATTERN_LIST, SearchPatternList);
 	ListToCircularBuffer(SearchPatternList,*m_pSearchPatterns);
-
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("SortMode"),reinterpret_cast<LPDWORD>(&m_SortMode));
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("SortAscending"),reinterpret_cast<LPDWORD>(&m_bSortAscending));
 }
 
 void CSearchDialogPersistentSettings::SaveExtraXMLSettings(
 	MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth1"),NXMLSettings::EncodeIntValue(m_iColumnWidth1));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ColumnWidth2"),NXMLSettings::EncodeIntValue(m_iColumnWidth2));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_1, NXMLSettings::EncodeIntValue(m_iColumnWidth1));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COLUMN_WIDTH_2, NXMLSettings::EncodeIntValue(m_iColumnWidth2));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SEARCH_DIRECTORY_TEXT, m_szSearchPattern);
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SEARCH_SUB_FOLDERS, NXMLSettings::EncodeBoolValue(m_bSearchSubFolders));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_USE_REGULAR_EXPRESSIONS, NXMLSettings::EncodeBoolValue(m_bUseRegularExpressions));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_CASE_INSENSITIVE, NXMLSettings::EncodeBoolValue(m_bCaseInsensitive));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_ARCHIVE, NXMLSettings::EncodeBoolValue(m_bArchive));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_HIDDEN, NXMLSettings::EncodeBoolValue(m_bHidden));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_READ_ONLY, NXMLSettings::EncodeBoolValue(m_bReadOnly));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SYSTEM, NXMLSettings::EncodeBoolValue(m_bSystem));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_MODE, NXMLSettings::EncodeIntValue(m_SortMode));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SORT_ASCENDING, NXMLSettings::EncodeBoolValue(m_bSortAscending));
 
 	std::list<std::wstring> SearchDirectoriesList;
 	CircularBufferToList(*m_pSearchDirectories, SearchDirectoriesList);
-	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Directory"),SearchDirectoriesList);
+	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_DIRECTORY_LIST, SearchDirectoriesList);
 
 	std::list<std::wstring> SearchPatternList;
-	CircularBufferToList(*m_pSearchPatterns,SearchPatternList);
-	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Pattern"),SearchPatternList);
-
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SearchDirectoryText"),m_szSearchPattern);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SearchSubFolders"),NXMLSettings::EncodeBoolValue(m_bSearchSubFolders));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("UseRegularExpressions"),NXMLSettings::EncodeBoolValue(m_bUseRegularExpressions));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CaseInsensitive"),NXMLSettings::EncodeBoolValue(m_bCaseInsensitive));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Archive"),NXMLSettings::EncodeBoolValue(m_bArchive));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Hidden"),NXMLSettings::EncodeBoolValue(m_bHidden));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ReadOnly"),NXMLSettings::EncodeBoolValue(m_bReadOnly));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("System"),NXMLSettings::EncodeBoolValue(m_bSystem));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortMode"),NXMLSettings::EncodeIntValue(m_SortMode));
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortAscending"),NXMLSettings::EncodeBoolValue(m_bSortAscending));
+	CircularBufferToList(*m_pSearchPatterns, SearchPatternList);
+	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST, SearchPatternList);
 }
 
 void CSearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
-	if(lstrcmpi(bstrName,_T("ColumnWidth1")) == 0)
+	if(lstrcmpi(bstrName, SETTING_COLUMN_WIDTH_1) == 0)
 	{
 		m_iColumnWidth1 = NXMLSettings::DecodeIntValue(bstrValue);
 	}
-	else if(lstrcmpi(bstrName,_T("ColumnWidth2")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_COLUMN_WIDTH_2) == 0)
 	{
 		m_iColumnWidth2 = NXMLSettings::DecodeIntValue(bstrValue);
 	}
-	else if(CheckWildcardMatch(_T("Directory*"),bstrName,TRUE))
-	{
-		m_pSearchDirectories->push_back(bstrValue);
-	}
-	else if(CheckWildcardMatch(_T("Pattern*"),bstrName,TRUE))
-	{
-		m_pSearchPatterns->push_back(bstrValue);
-	}
-	else if(lstrcmpi(bstrName,_T("SearchDirectoryText")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_SEARCH_DIRECTORY_TEXT) == 0)
 	{
 		StringCchCopy(m_szSearchPattern,SIZEOF_ARRAY(m_szSearchPattern),bstrValue);
 	}
-	else if(lstrcmpi(bstrName,_T("SearchSubFolders")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_SEARCH_SUB_FOLDERS) == 0)
 	{
 		m_bSearchSubFolders = NXMLSettings::DecodeBoolValue(bstrValue);
 	}
-	else if(lstrcmpi(bstrName,_T("UseRegularExpressions")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_USE_REGULAR_EXPRESSIONS) == 0)
 	{
 		m_bUseRegularExpressions = NXMLSettings::DecodeBoolValue(bstrValue);
 	}
-	else if(lstrcmpi(bstrName,_T("CaseInsensitive")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_CASE_INSENSITIVE) == 0)
 	{
 		m_bCaseInsensitive = NXMLSettings::DecodeBoolValue(bstrValue);
 	}
-	else if(lstrcmpi(bstrName,_T("Archive")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_ARCHIVE) == 0)
 	{
 		m_bArchive = NXMLSettings::DecodeBoolValue(bstrValue);
 	}
-	else if(lstrcmpi(bstrName,_T("Hidden")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_HIDDEN) == 0)
 	{
 		m_bHidden = NXMLSettings::DecodeBoolValue(bstrValue);
 	}
-	else if(lstrcmpi(bstrName,_T("ReadOnly")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_READ_ONLY) == 0)
 	{
 		m_bReadOnly = NXMLSettings::DecodeBoolValue(bstrValue);
 	}
-	else if(lstrcmpi(bstrName,_T("System")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_SYSTEM) == 0)
 	{
 		m_bSystem = NXMLSettings::DecodeBoolValue(bstrValue);
 	}
-	else if(lstrcmpi(bstrName,_T("SortMode")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_SORT_MODE) == 0)
 	{
 		int SortMode = NXMLSettings::DecodeIntValue(bstrValue);
 
@@ -1427,9 +1431,19 @@ void CSearchDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bs
 			break;
 		}
 	}
-	else if(lstrcmpi(bstrName,_T("SortAscending")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_SORT_ASCENDING) == 0)
 	{
 		m_bSortAscending = NXMLSettings::DecodeBoolValue(bstrValue);
+	}
+	else if(CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, bstrName, lstrlen(SETTING_DIRECTORY_LIST),
+		SETTING_DIRECTORY_LIST, lstrlen(SETTING_DIRECTORY_LIST)) == CSTR_EQUAL)
+	{
+		m_pSearchDirectories->push_back(bstrValue);
+	}
+	else if(CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, bstrName, lstrlen(SETTING_PATTERN_LIST),
+		SETTING_PATTERN_LIST, lstrlen(SETTING_PATTERN_LIST)) == CSTR_EQUAL)
+	{
+		m_pSearchPatterns->push_back(bstrValue);
 	}
 }
 

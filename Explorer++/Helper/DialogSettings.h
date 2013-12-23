@@ -37,6 +37,12 @@ protected:
 
 private:
 
+	static const TCHAR SETTING_POSITION[];
+	static const TCHAR SETTING_POSITION_X[];
+	static const TCHAR SETTING_POSITION_Y[];
+	static const TCHAR SETTING_WIDTH[];
+	static const TCHAR SETTING_HEIGHT[];
+
 	TCHAR			m_szSettingsKey[256];
 
 	bool			m_bSavePosition;

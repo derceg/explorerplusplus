@@ -26,6 +26,9 @@
 
 const TCHAR CWildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("WildcardSelect");
 
+const TCHAR CWildcardSelectDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
+const TCHAR CWildcardSelectDialogPersistentSettings::SETTING_CURRENT_TEXT[] = _T("CurrentText");
+
 CWildcardSelectDialog::CWildcardSelectDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,BOOL bSelect,IExplorerplusplus *pexpp) :
 CBaseDialog(hInstance,iResource,hParent,true)
@@ -214,32 +217,33 @@ CWildcardSelectDialogPersistentSettings& CWildcardSelectDialogPersistentSettings
 
 void CWildcardSelectDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Pattern"),m_PatternList);
-	NRegistrySettings::SaveStringToRegistry(hKey,_T("CurrentText"),m_szPattern);
+	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_PATTERN_LIST, m_PatternList);
+	NRegistrySettings::SaveStringToRegistry(hKey, SETTING_CURRENT_TEXT, m_szPattern);
 }
 
 void CWildcardSelectDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Pattern"),m_PatternList);
-	NRegistrySettings::ReadStringFromRegistry(hKey,_T("CurrentText"),m_szPattern,
+	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_PATTERN_LIST, m_PatternList);
+	NRegistrySettings::ReadStringFromRegistry(hKey, SETTING_CURRENT_TEXT, m_szPattern,
 		SIZEOF_ARRAY(m_szPattern));
 }
 
 void CWildcardSelectDialogPersistentSettings::SaveExtraXMLSettings(
 	MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Pattern"),m_PatternList);
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CurrentText"),m_szPattern);
+	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_PATTERN_LIST, m_PatternList);
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_CURRENT_TEXT, m_szPattern);
 }
 
 void CWildcardSelectDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
-	if(lstrcmpi(bstrName,_T("CurrentText")) == 0)
-	{
-		StringCchCopy(m_szPattern,SIZEOF_ARRAY(m_szPattern),bstrValue);
-	}
-	else if(CheckWildcardMatch(_T("Pattern*"),bstrName,TRUE))
+	if(CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, bstrName, lstrlen(SETTING_PATTERN_LIST),
+		SETTING_PATTERN_LIST, lstrlen(SETTING_PATTERN_LIST)) == CSTR_EQUAL)
 	{
 		m_PatternList.push_back(bstrValue);
+	}
+	else if(lstrcmpi(bstrName, SETTING_CURRENT_TEXT) == 0)
+	{
+		StringCchCopy(m_szPattern,SIZEOF_ARRAY(m_szPattern),bstrValue);
 	}
 }

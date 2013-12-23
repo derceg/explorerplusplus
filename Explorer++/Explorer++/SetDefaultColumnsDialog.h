@@ -41,6 +41,8 @@ private:
 
 	static const TCHAR SETTINGS_KEY[];
 
+	static const TCHAR SETTING_FOLDER_TYPE[];
+
 	CSetDefaultColumnsDialogPersistentSettings();
 
 	CSetDefaultColumnsDialogPersistentSettings(const CSetDefaultColumnsDialogPersistentSettings &);

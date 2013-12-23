@@ -22,6 +22,8 @@
 
 const TCHAR CDestroyFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("DestroyFiles");
 
+const TCHAR CDestroyFilesDialogPersistentSettings::SETTING_OVERWRITE_METHOD[] = _T("OverwriteMethod");
+
 CDestroyFilesDialog::CDestroyFilesDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,std::list<std::wstring> FullFilenameList,
 	BOOL bShowFriendlyDates) :
@@ -327,23 +329,23 @@ CDestroyFilesDialogPersistentSettings& CDestroyFilesDialogPersistentSettings::Ge
 
 void CDestroyFilesDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveDwordToRegistry(hKey,_T("OverwriteMethod"),m_uOverwriteMethod);
+	NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_OVERWRITE_METHOD, m_uOverwriteMethod);
 }
 
 void CDestroyFilesDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadDwordFromRegistry(hKey,_T("OverwriteMethod"),reinterpret_cast<LPDWORD>(&m_uOverwriteMethod));
+	NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_OVERWRITE_METHOD, reinterpret_cast<LPDWORD>(&m_uOverwriteMethod));
 }
 
 void CDestroyFilesDialogPersistentSettings::SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,
 	MSXML2::IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("OverwriteMethod"),NXMLSettings::EncodeIntValue(m_uOverwriteMethod));
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_OVERWRITE_METHOD, NXMLSettings::EncodeIntValue(m_uOverwriteMethod));
 }
 
 void CDestroyFilesDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
-	if(lstrcmpi(bstrName,_T("OverwriteMethod")) == 0)
+	if(lstrcmpi(bstrName, SETTING_OVERWRITE_METHOD) == 0)
 	{
 		m_uOverwriteMethod = static_cast<NFileOperations::OverwriteMethod_t>(NXMLSettings::DecodeIntValue(bstrValue));
 	}

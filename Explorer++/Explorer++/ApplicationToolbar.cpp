@@ -31,6 +31,10 @@
 #include "../Helper/Macros.h"
 
 
+const TCHAR CApplicationToolbarPersistentSettings::SETTING_NAME[] = _T("Name");
+const TCHAR CApplicationToolbarPersistentSettings::SETTING_COMMAND[] = _T("Command");
+const TCHAR CApplicationToolbarPersistentSettings::SETTING_SHOW_NAME_ON_TOOLBAR[] = _T("ShowNameOnToolbar");
+
 CApplicationToolbar::CApplicationToolbar(HWND hToolbar,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
 m_hToolbar(hToolbar),
 m_uIDStart(uIDStart),
@@ -455,11 +459,11 @@ void CApplicationToolbarPersistentSettings::LoadRegistrySettings(HKEY hParentKey
 		TCHAR szCommand[512];
 		BOOL bShowNameOnToolbar = TRUE;
 
-		LONG lNameStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,_T("Name"),
-			szName,SIZEOF_ARRAY(szName));
-		LONG lCommandStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild,_T("Command"),
-			szCommand,SIZEOF_ARRAY(szCommand));
-		NRegistrySettings::ReadDwordFromRegistry(hKeyChild,_T("ShowNameOnToolbar"),
+		LONG lNameStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild, SETTING_NAME,
+			szName, SIZEOF_ARRAY(szName));
+		LONG lCommandStatus = NRegistrySettings::ReadStringFromRegistry(hKeyChild, SETTING_COMMAND,
+			szCommand, SIZEOF_ARRAY(szCommand));
+		NRegistrySettings::ReadDwordFromRegistry(hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR,
 			reinterpret_cast<DWORD *>(&bShowNameOnToolbar));
 
 		if(lNameStatus == ERROR_SUCCESS && lCommandStatus == ERROR_SUCCESS)
@@ -491,9 +495,9 @@ void CApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey
 
 		if(ReturnValue == ERROR_SUCCESS)
 		{
-			NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("Name"),Button.Name.c_str());
-			NRegistrySettings::SaveStringToRegistry(hKeyChild,_T("Command"),Button.Command.c_str());
-			NRegistrySettings::SaveDwordToRegistry(hKeyChild,_T("ShowNameOnToolbar"),Button.ShowNameOnToolbar);
+			NRegistrySettings::SaveStringToRegistry(hKeyChild, SETTING_NAME, Button.Name.c_str());
+			NRegistrySettings::SaveStringToRegistry(hKeyChild, SETTING_COMMAND, Button.Command.c_str());
+			NRegistrySettings::SaveDwordToRegistry(hKeyChild, SETTING_SHOW_NAME_ON_TOOLBAR, Button.ShowNameOnToolbar);
 
 			index++;
 
@@ -532,19 +536,19 @@ void CApplicationToolbarPersistentSettings::LoadXMLSettings(MSXML2::IXMLDOMNode 
 		pAttributeNode->get_nodeName(&bstrName);
 		pAttributeNode->get_text(&bstrValue);
 
-		if(lstrcmpi(bstrName,L"Name") == 0)
+		if(lstrcmpi(bstrName, SETTING_NAME) == 0)
 		{
 			StringCchCopy(szName,SIZEOF_ARRAY(szName),bstrValue);
 
 			bNameFound = TRUE;
 		}
-		else if(lstrcmpi(bstrName,L"Command") == 0)
+		else if(lstrcmpi(bstrName, SETTING_COMMAND) == 0)
 		{
 			StringCchCopy(szCommand,SIZEOF_ARRAY(szCommand),bstrValue);
 
 			bCommandFound = TRUE;
 		}
-		else if(lstrcmpi(bstrName,L"ShowNameOnToolbar") == 0)
+		else if(lstrcmpi(bstrName, SETTING_SHOW_NAME_ON_TOOLBAR) == 0)
 		{
 			bShowNameOnToolbar = NXMLSettings::DecodeBoolValue(bstrValue);
 		}
@@ -579,8 +583,8 @@ void CApplicationToolbarPersistentSettings::SaveXMLSettings(MSXML2::IXMLDOMDocum
 
 		MSXML2::IXMLDOMElement *pParentNode = NULL;
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("ApplicationButton"),Button.Name.c_str());
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Command"),Button.Command.c_str());
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowNameOnToolbar"),NXMLSettings::EncodeBoolValue(Button.ShowNameOnToolbar));
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COMMAND, Button.Command.c_str());
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SHOW_NAME_ON_TOOLBAR, NXMLSettings::EncodeBoolValue(Button.ShowNameOnToolbar));
 
 		pParentNode->Release();
 	}

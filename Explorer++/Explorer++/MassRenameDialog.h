@@ -29,6 +29,10 @@ private:
 	friend CMassRenameDialog;
 
 	static const TCHAR SETTINGS_KEY[];
+
+	static const TCHAR SETTING_COLUMN_WIDTH_1[];
+	static const TCHAR SETTING_COLUMN_WIDTH_2[];
+
 	static const int DEFAULT_MASS_RENAME_COLUMN_WIDTH = 250;
 
 	CMassRenameDialogPersistentSettings();

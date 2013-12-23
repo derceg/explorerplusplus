@@ -31,6 +31,9 @@ private:
 
 	static const TCHAR SETTINGS_KEY[];
 
+	static const TCHAR SETTING_SIZE[];
+	static const TCHAR SETTING_SIZE_GROUP[];
+
 	CSplitFileDialogPersistentSettings();
 
 	CSplitFileDialogPersistentSettings(const CSplitFileDialogPersistentSettings &);

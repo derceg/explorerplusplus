@@ -21,6 +21,12 @@
 #include "Macros.h"
 
 
+const TCHAR CDialogSettings::SETTING_POSITION[] = _T("Position");
+const TCHAR CDialogSettings::SETTING_POSITION_X[] = _T("PosX");
+const TCHAR CDialogSettings::SETTING_POSITION_Y[] = _T("PosY");
+const TCHAR CDialogSettings::SETTING_WIDTH[] = _T("Width");
+const TCHAR CDialogSettings::SETTING_HEIGHT[] = _T("Height");
+
 CDialogSettings::CDialogSettings(const TCHAR *szSettingsKey,bool bSavePosition)
 {
 	StringCchCopy(m_szSettingsKey,SIZEOF_ARRAY(m_szSettingsKey),
@@ -53,12 +59,12 @@ void CDialogSettings::SaveRegistrySettings(HKEY hParentKey)
 	{
 		if(m_bSavePosition)
 		{
-			RegSetValueEx(hKey,_T("Position"),0,REG_BINARY,
+			RegSetValueEx(hKey, SETTING_POSITION, 0, REG_BINARY,
 				reinterpret_cast<LPBYTE>(&m_ptDialog),
 				sizeof(m_ptDialog));
 
-			NRegistrySettings::SaveDwordToRegistry(hKey,_T("Width"),m_iWidth);
-			NRegistrySettings::SaveDwordToRegistry(hKey,_T("Height"),m_iHeight);
+			NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_WIDTH, m_iWidth);
+			NRegistrySettings::SaveDwordToRegistry(hKey, SETTING_HEIGHT, m_iHeight);
 		}
 
 		SaveExtraRegistrySettings(hKey);
@@ -80,12 +86,12 @@ void CDialogSettings::LoadRegistrySettings(HKEY hParentKey)
 		if(m_bSavePosition)
 		{
 			DWORD dwSize = sizeof(POINT);
-			RegQueryValueEx(hKey,_T("Position"),
-				NULL,NULL,(LPBYTE)&m_ptDialog,&dwSize);
+			RegQueryValueEx(hKey, SETTING_POSITION,
+				NULL, NULL, (LPBYTE) &m_ptDialog, &dwSize);
 
-			NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Width"),
+			NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_WIDTH,
 				reinterpret_cast<DWORD *>(&m_iWidth));
-			NRegistrySettings::ReadDwordFromRegistry(hKey,_T("Height"),
+			NRegistrySettings::ReadDwordFromRegistry(hKey, SETTING_HEIGHT,
 				reinterpret_cast<DWORD *>(&m_iHeight));
 		}
 
@@ -114,13 +120,13 @@ void CDialogSettings::SaveXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,
 
 	if(m_bSavePosition)
 	{
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("PosX"),
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_POSITION_X,
 			NXMLSettings::EncodeIntValue(m_ptDialog.x));
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("PosY"),
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_POSITION_Y,
 			NXMLSettings::EncodeIntValue(m_ptDialog.y));
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Width"),
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_WIDTH,
 			NXMLSettings::EncodeIntValue(m_iWidth));
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Height"),
+		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_HEIGHT,
 			NXMLSettings::EncodeIntValue(m_iHeight));
 	}
 
@@ -144,22 +150,22 @@ void CDialogSettings::LoadXMLSettings(MSXML2::IXMLDOMNamedNodeMap *pam,long lChi
 
 		if(m_bSavePosition)
 		{
-			if(lstrcmpi(bstrName,_T("PosX")) == 0)
+			if(lstrcmpi(bstrName, SETTING_POSITION_X) == 0)
 			{
 				m_ptDialog.x = NXMLSettings::DecodeIntValue(bstrValue);
 				bHandled = true;
 			}
-			else if(lstrcmpi(bstrName,_T("PosY")) == 0)
+			else if(lstrcmpi(bstrName, SETTING_POSITION_Y) == 0)
 			{
 				m_ptDialog.y = NXMLSettings::DecodeIntValue(bstrValue);
 				bHandled = true;
 			}
-			else if(lstrcmpi(bstrName,_T("Width")) == 0)
+			else if(lstrcmpi(bstrName, SETTING_WIDTH) == 0)
 			{
 				m_iWidth = NXMLSettings::DecodeIntValue(bstrValue);
 				bHandled = true;
 			}
-			else if(lstrcmpi(bstrName,_T("Height")) == 0)
+			else if(lstrcmpi(bstrName, SETTING_HEIGHT) == 0)
 			{
 				m_iHeight = NXMLSettings::DecodeIntValue(bstrValue);
 				bHandled = true;

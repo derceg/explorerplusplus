@@ -33,6 +33,9 @@ private:
 
 	static const	TCHAR SETTINGS_KEY[];
 
+	static const	TCHAR SETTING_PATTERN_LIST[];
+	static const	TCHAR SETTING_CURRENT_TEXT[];
+
 	CWildcardSelectDialogPersistentSettings();
 
 	CWildcardSelectDialogPersistentSettings(const CWildcardSelectDialogPersistentSettings &);

@@ -30,6 +30,8 @@ private:
 
 	static const TCHAR SETTINGS_KEY[];
 
+	static const TCHAR SETTING_OVERWRITE_METHOD[];
+
 	CDestroyFilesDialogPersistentSettings();
 
 	CDestroyFilesDialogPersistentSettings(const CDestroyFilesDialogPersistentSettings &);

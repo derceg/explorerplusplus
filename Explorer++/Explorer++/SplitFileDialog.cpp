@@ -38,6 +38,9 @@ namespace NSplitFileDialog
 
 const TCHAR CSplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile");
 
+const TCHAR CSplitFileDialogPersistentSettings::SETTING_SIZE[] = _T("Size");
+const TCHAR CSplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGroup");
+
 CSplitFileDialog::CSplitFileDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,std::wstring strFullFilename) :
 CBaseDialog(hInstance,iResource,hParent,false)
@@ -656,30 +659,30 @@ CSplitFileDialogPersistentSettings& CSplitFileDialogPersistentSettings::GetInsta
 
 void CSplitFileDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveStringToRegistry(hKey,_T("Size"),m_strSplitSize.c_str());
-	NRegistrySettings::SaveStringToRegistry(hKey,_T("SizeGroup"),m_strSplitGroup.c_str());
+	NRegistrySettings::SaveStringToRegistry(hKey, SETTING_SIZE, m_strSplitSize.c_str());
+	NRegistrySettings::SaveStringToRegistry(hKey, SETTING_SIZE_GROUP, m_strSplitGroup.c_str());
 }
 
 void CSplitFileDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadStringFromRegistry(hKey,_T("Size"),m_strSplitSize);
-	NRegistrySettings::ReadStringFromRegistry(hKey,_T("SizeGroup"),m_strSplitGroup);
+	NRegistrySettings::ReadStringFromRegistry(hKey, SETTING_SIZE, m_strSplitSize);
+	NRegistrySettings::ReadStringFromRegistry(hKey, SETTING_SIZE_GROUP, m_strSplitGroup);
 }
 
 void CSplitFileDialogPersistentSettings::SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,
 	MSXML2::IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Size"),m_strSplitSize.c_str());
-	NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SizeGroup"),m_strSplitGroup.c_str());
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE, m_strSplitSize.c_str());
+	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE_GROUP, m_strSplitGroup.c_str());
 }
 
 void CSplitFileDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
-	if(lstrcmpi(bstrName,_T("Size")) == 0)
+	if(lstrcmpi(bstrName, SETTING_SIZE) == 0)
 	{
 		m_strSplitSize = _bstr_t(bstrValue);
 	}
-	else if(lstrcmpi(bstrName,_T("SizeGroup")) == 0)
+	else if(lstrcmpi(bstrName, SETTING_SIZE_GROUP) == 0)
 	{
 		m_strSplitGroup = _bstr_t(bstrValue);
 	}

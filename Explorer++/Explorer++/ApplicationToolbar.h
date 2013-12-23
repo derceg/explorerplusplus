@@ -36,6 +36,10 @@ private:
 
 	friend CApplicationToolbar;
 
+	static const TCHAR SETTING_NAME[];
+	static const TCHAR SETTING_COMMAND[];
+	static const TCHAR SETTING_SHOW_NAME_ON_TOOLBAR[];
+
 	CApplicationToolbarPersistentSettings();
 
 	CApplicationToolbarPersistentSettings(const CApplicationToolbarPersistentSettings &);

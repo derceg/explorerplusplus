@@ -24,6 +24,8 @@
 
 const TCHAR CFilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
+const TCHAR CFilterDialogPersistentSettings::SETTING_FILTER_LIST[] = _T("Filter");
+
 CFilterDialog::CFilterDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,IExplorerplusplus *pexpp) :
 CBaseDialog(hInstance,iResource,hParent,true)
@@ -208,23 +210,24 @@ CFilterDialogPersistentSettings& CFilterDialogPersistentSettings::GetInstance()
 
 void CFilterDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::SaveStringListToRegistry(hKey,_T("Filter"),m_FilterList);
+	NRegistrySettings::SaveStringListToRegistry(hKey, SETTING_FILTER_LIST, m_FilterList);
 }
 
 void CFilterDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-	NRegistrySettings::ReadStringListFromRegistry(hKey,_T("Filter"),m_FilterList);
+	NRegistrySettings::ReadStringListFromRegistry(hKey, SETTING_FILTER_LIST, m_FilterList);
 }
 
 void CFilterDialogPersistentSettings::SaveExtraXMLSettings(
 	MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
 {
-	NXMLSettings::AddStringListToNode(pXMLDom,pParentNode,_T("Filter"),m_FilterList);
+	NXMLSettings::AddStringListToNode(pXMLDom, pParentNode, SETTING_FILTER_LIST, m_FilterList);
 }
 
 void CFilterDialogPersistentSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
-	if(CheckWildcardMatch(_T("Filter*"),bstrName,TRUE))
+	if(CompareString(LOCALE_INVARIANT, NORM_IGNORECASE, bstrName, lstrlen(SETTING_FILTER_LIST),
+		SETTING_FILTER_LIST, lstrlen(SETTING_FILTER_LIST)) == CSTR_EQUAL)
 	{
 		m_FilterList.push_back(bstrValue);
 	}
