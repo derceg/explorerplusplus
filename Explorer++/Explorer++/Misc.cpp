@@ -18,6 +18,7 @@
 #include <pantheios\inserters\integer.hpp>
 #include "Explorer++.h"
 #include "SelectColumnsDialog.h"
+#include "DefaultColumns.h"
 #include "MainResource.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/FileOperations.h"
@@ -49,7 +50,7 @@ void Explorerplusplus::ValidateToolbarSettings(void)
 	int								nButtons;
 	int								i = 0;
 
-	nButtons = sizeof(ToolbarButtonSet) / sizeof(ToolbarButtonSet[0]);
+	nButtons = sizeof(TOOLBAR_BUTTON_SET) / sizeof(TOOLBAR_BUTTON_SET[0]);
 
 	ButtonMap = (int *)malloc(sizeof(int) * nButtons);
 
@@ -115,38 +116,38 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet,std::list<Column_t
 	switch(iColumnSet)
 	{
 		case VALIDATE_REALFOLDER_COLUMNS:
-			iTotalColumnSize = SIZEOF_ARRAY(g_RealFolderColumns);
-			pColumns = g_RealFolderColumns;
+			iTotalColumnSize = SIZEOF_ARRAY(REAL_FOLDER_DEFAULT_COLUMNS);
+			pColumns = REAL_FOLDER_DEFAULT_COLUMNS;
 			break;
 
 		case VALIDATE_CONTROLPANEL_COLUMNS:
-			iTotalColumnSize = SIZEOF_ARRAY(g_ControlPanelColumns);
-			pColumns = g_ControlPanelColumns;
+			iTotalColumnSize = SIZEOF_ARRAY(CONTROL_PANEL_DEFAULT_COLUMNS);
+			pColumns = CONTROL_PANEL_DEFAULT_COLUMNS;
 			break;
 
 		case VALIDATE_MYCOMPUTER_COLUMNS:
-			iTotalColumnSize = SIZEOF_ARRAY(g_MyComputerColumns);
-			pColumns = g_MyComputerColumns;
+			iTotalColumnSize = SIZEOF_ARRAY(MY_COMPUTER_DEFAULT_COLUMNS);
+			pColumns = MY_COMPUTER_DEFAULT_COLUMNS;
 			break;
 
 		case VALIDATE_RECYCLEBIN_COLUMNS:
-			iTotalColumnSize = SIZEOF_ARRAY(g_RecycleBinColumns);
-			pColumns = g_RecycleBinColumns;
+			iTotalColumnSize = SIZEOF_ARRAY(RECYCLE_BIN_DEFAULT_COLUMNS);
+			pColumns = RECYCLE_BIN_DEFAULT_COLUMNS;
 			break;
 
 		case VALIDATE_PRINTERS_COLUMNS:
-			iTotalColumnSize = SIZEOF_ARRAY(g_PrintersColumns);
-			pColumns = g_PrintersColumns;
+			iTotalColumnSize = SIZEOF_ARRAY(PRINTERS_DEFAULT_COLUMNS);
+			pColumns = PRINTERS_DEFAULT_COLUMNS;
 			break;
 
 		case VALIDATE_NETWORKCONNECTIONS_COLUMNS:
-			iTotalColumnSize = SIZEOF_ARRAY(g_NetworkConnectionsColumns);
-			pColumns = g_NetworkConnectionsColumns;
+			iTotalColumnSize = SIZEOF_ARRAY(NETWORK_CONNECTIONS_DEFAULT_COLUMNS);
+			pColumns = NETWORK_CONNECTIONS_DEFAULT_COLUMNS;
 			break;
 
 		case VALIDATE_MYNETWORKPLACES_COLUMNS:
-			iTotalColumnSize = SIZEOF_ARRAY(g_MyNetworkPlacesColumns);
-			pColumns = g_MyNetworkPlacesColumns;
+			iTotalColumnSize = SIZEOF_ARRAY(MY_NETWORK_PLACES_DEFAULT_COLUMNS);
+			pColumns = MY_NETWORK_PLACES_DEFAULT_COLUMNS;
 			break;
 	}
 

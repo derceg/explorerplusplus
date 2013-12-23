@@ -36,7 +36,12 @@
 #include "../Helper/Macros.h"
 
 
-#define FOLDER_SIZE_LINE_INDEX	1
+static const int FOLDER_SIZE_LINE_INDEX = 1;
+
+/* Defines the distance between the cursor
+and the right edge of the treeview during
+a resizing operation. */
+static const int TREEVIEW_DRAG_OFFSET = 8;
 
 /* TODO: Remove once custom menu image lists
 have been corrected. */

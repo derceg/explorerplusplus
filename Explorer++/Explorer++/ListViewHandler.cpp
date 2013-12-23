@@ -33,6 +33,33 @@
 #include "../Helper/Macros.h"
 
 
+static unsigned int g_RealFolderHeaderList[] =
+{CM_NAME, CM_TYPE, CM_SIZE, CM_DATEMODIFIED,
+CM_AUTHOR, CM_TITLE};
+
+static unsigned int g_ControlPanelHeaderList[] =
+{CM_NAME, CM_VIRTUALCOMMENTS};
+
+static unsigned int g_MyComputerHeaderList[] =
+{CM_NAME, CM_TYPE, CM_TOTALSIZE,
+CM_FREESPACE, CM_VIRTUALCOMMENTS,
+CM_FILESYSTEM};
+
+static unsigned int g_NetworkConnectionsHeaderList[] =
+{CM_NAME, CM_TYPE, CM_NETWORKADAPTER_STATUS,
+CM_OWNER};
+
+static unsigned int g_NetworkHeaderList[] =
+{CM_NAME, CM_VIRTUALCOMMENTS};
+
+static unsigned int g_PrintersHeaderList[] =
+{CM_NAME, CM_NUMPRINTERDOCUMENTS, CM_PRINTERSTATUS,
+CM_PRINTERCOMMENTS, CM_PRINTERLOCATION};
+
+static unsigned int g_RecycleBinHeaderList[] =
+{CM_NAME, CM_ORIGINALLOCATION, CM_DATEDELETED,
+CM_SIZE, CM_TYPE, CM_DATEMODIFIED};
+
 LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)

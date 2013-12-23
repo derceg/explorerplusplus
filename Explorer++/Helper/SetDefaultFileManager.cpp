@@ -42,25 +42,25 @@ namespace NDefaultFileManagerInternal
 	const TCHAR *SHELL_DEFAULT_VALUE	= _T("none");
 
 	BOOL SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t ReplacementType,
-		TCHAR *szInternalCommand,TCHAR *szMenuText);
+		const TCHAR *szInternalCommand, const TCHAR *szMenuText);
 	BOOL RemoveAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t ReplacementType,
-		TCHAR *szInternalCommand);
+		const TCHAR *szInternalCommand);
 }
 
-BOOL NDefaultFileManager::SetAsDefaultFileManagerFileSystem(TCHAR *szInternalCommand,TCHAR *szMenuText)
+BOOL NDefaultFileManager::SetAsDefaultFileManagerFileSystem(const TCHAR *szInternalCommand, const TCHAR *szMenuText)
 {
 	return NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(REPLACEEXPLORER_FILESYSTEM,
 		szInternalCommand,szMenuText);
 }
 
-BOOL NDefaultFileManager::SetAsDefaultFileManagerAll(TCHAR *szInternalCommand,TCHAR *szMenuText)
+BOOL NDefaultFileManager::SetAsDefaultFileManagerAll(const TCHAR *szInternalCommand, const TCHAR *szMenuText)
 {
 	return NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(REPLACEEXPLORER_ALL,
 		szInternalCommand,szMenuText);
 }
 
 BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t ReplacementType,
-	TCHAR *szInternalCommand,TCHAR *szMenuText)
+	const TCHAR *szInternalCommand, const TCHAR *szMenuText)
 {
 	OSVERSIONINFO osvi;
 	osvi.dwOSVersionInfoSize = sizeof(osvi);
@@ -113,7 +113,7 @@ BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(NDefaultFileMa
 			/* Now, set the defaault value for the key. This
 			default value will be the text that is shown on the
 			context menu for folders. */
-			RegSetValueEx(hKeyApp,NULL,0,REG_SZ,reinterpret_cast<LPBYTE>(szMenuText),
+			RegSetValueEx(hKeyApp,NULL,0,REG_SZ,reinterpret_cast<const BYTE *>(szMenuText),
 				(lstrlen(szMenuText) + 1) * sizeof(TCHAR));
 
 			/* Now, create the "command" sub-key. */
@@ -143,7 +143,7 @@ BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(NDefaultFileMa
 				{
 					/* Set the current entry as the default. */
 					lRes = RegSetValueEx(hKeyShell,NULL,0,REG_SZ,
-						reinterpret_cast<LPBYTE>(szInternalCommand),
+						reinterpret_cast<const BYTE *>(szInternalCommand),
 						(lstrlen(szInternalCommand) + 1) * sizeof(TCHAR));
 
 					if(lRes == ERROR_SUCCESS)
@@ -164,20 +164,20 @@ BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(NDefaultFileMa
 	return bSuccess;
 }
 
-BOOL NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(TCHAR *szInternalCommand)
+BOOL NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(const TCHAR *szInternalCommand)
 {
 	return NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(REPLACEEXPLORER_FILESYSTEM,
 		szInternalCommand);
 }
 
-BOOL NDefaultFileManager::RemoveAsDefaultFileManagerAll(TCHAR *szInternalCommand)
+BOOL NDefaultFileManager::RemoveAsDefaultFileManagerAll(const TCHAR *szInternalCommand)
 {
 	return NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(REPLACEEXPLORER_ALL,
 		szInternalCommand);
 }
 
 BOOL NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t ReplacementType,
-	TCHAR *szInternalCommand)
+	const TCHAR *szInternalCommand)
 {
 	OSVERSIONINFO osvi;
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);

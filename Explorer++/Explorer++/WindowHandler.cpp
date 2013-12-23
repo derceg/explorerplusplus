@@ -25,6 +25,13 @@
 #include "../Helper/Macros.h"
 
 
+static const int TOOLBAR_BOOKMARK_START = TOOLBAR_ID_START + 1000;
+static const int TOOLBAR_BOOKMARK_END = TOOLBAR_BOOKMARK_START + 1000;
+static const int TOOLBAR_DRIVES_ID_START = TOOLBAR_BOOKMARK_END + 1;
+static const int TOOLBAR_DRIVES_ID_END = TOOLBAR_DRIVES_ID_START + 1000;
+static const int TOOLBAR_APPLICATIONS_ID_START = TOOLBAR_DRIVES_ID_END + 1;
+static const int TOOLBAR_APPLICATIONS_ID_END = TOOLBAR_APPLICATIONS_ID_START + 1000;
+
 DWORD BookmarkToolbarStyles	=	WS_CHILD |WS_VISIBLE |WS_CLIPSIBLINGS |WS_CLIPCHILDREN |
 								TBSTYLE_TOOLTIPS | TBSTYLE_LIST | TBSTYLE_TRANSPARENT |
 								TBSTYLE_FLAT | CCS_NODIVIDER| CCS_NORESIZE;
@@ -505,9 +512,9 @@ BOOL Explorerplusplus::OnTBGetButtonInfo(LPARAM lParam)
 	pnmtb = (NMTOOLBAR *)lParam;
 
 	/* The cast below is to fix C4018 (signed/unsigned mismatch). */
-	if((pnmtb->iItem >= 0) && ((unsigned int)pnmtb->iItem < sizeof(ToolbarButtonSet) / sizeof(ToolbarButtonSet[0])))
+	if((pnmtb->iItem >= 0) && ((unsigned int)pnmtb->iItem < sizeof(TOOLBAR_BUTTON_SET) / sizeof(TOOLBAR_BUTTON_SET[0])))
 	{
-		id = ToolbarButtonSet[pnmtb->iItem];
+		id = TOOLBAR_BUTTON_SET[pnmtb->iItem];
 
 		pnmtb->tbButton.fsState		= TBSTATE_ENABLED;
 		pnmtb->tbButton.fsStyle		= BTNS_BUTTON | BTNS_AUTOSIZE | LookupToolbarButtonExtraStyles(id);

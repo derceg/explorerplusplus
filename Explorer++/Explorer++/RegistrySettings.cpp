@@ -12,6 +12,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include "DefaultColumns.h"
 #include "Explorer++.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/RegistrySettings.h"

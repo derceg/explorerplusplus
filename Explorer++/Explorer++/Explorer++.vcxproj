@@ -349,6 +349,7 @@
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="ColorRuleHelper.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />
+    <ClInclude Include="DefaultColumns.h" />
     <ClInclude Include="DestroyFilesDialog.h" />
     <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DisplayColoursDialog.h" />

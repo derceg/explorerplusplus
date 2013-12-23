@@ -334,6 +334,10 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 						{
 							bSuccess = TRUE;
 
+							TCHAR menuText[256];
+							LoadString(m_hLanguageModule, IDS_OPEN_IN_EXPLORERPLUSPLUS,
+								menuText, SIZEOF_ARRAY(menuText));
+
 							switch(ReplaceExplorerMode)
 							{
 							case NDefaultFileManager::REPLACEEXPLORER_NONE:
@@ -359,14 +363,14 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 								NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 								NDefaultFileManager::RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 								bSuccess = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
-									SHELL_DEFAULT_INTERNAL_COMMAND_NAME,SHELL_DEFAULT_MENU_TEXT);
+									SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText);
 								break;
 
 							case NDefaultFileManager::REPLACEEXPLORER_ALL:
 								NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 								NDefaultFileManager::RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 								bSuccess = NDefaultFileManager::SetAsDefaultFileManagerAll(
-									SHELL_DEFAULT_INTERNAL_COMMAND_NAME,SHELL_DEFAULT_MENU_TEXT);
+									SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText);
 								break;
 							}
 

@@ -15,6 +15,7 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "WildcardSelectDialog.h"
+#include "DefaultColumns.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
@@ -22,6 +23,34 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
 
+
+/* The treeview is offset by a small
+amount on the left. */
+static const int TREEVIEW_X_CLEARANCE = 1;
+
+/* The offset from the top of the parent
+window to the treeview. */
+static const int TREEVIEW_Y_CLEARANCE = 20;
+
+/* The spacing between the right edge of
+the treeview and the holder window. */
+static const int TREEVIEW_HOLDER_CLEARANCE = 4;
+
+/* Width and height of the toolbar on
+the folders pane. */
+static const int FOLDERS_TOOLBAR_WIDTH = 16;
+static const int FOLDERS_TOOLBAR_HEIGHT = 16;
+
+static const int FOLDERS_TOOLBAR_X_OFFSET = -20;
+static const int FOLDERS_TOOLBAR_Y_OFFSET = 3;
+
+static const int TAB_TOOLBAR_X_OFFSET = -20;
+static const int TAB_TOOLBAR_Y_OFFSET = 5;
+
+/* Width and height of the toolbar that
+appears on the tab control. */
+static const int TAB_TOOLBAR_WIDTH = 20;
+static const int TAB_TOOLBAR_HEIGHT = 20;
 
 DWORD WINAPI Thread_IconFinder(LPVOID pParam);
 void CALLBACK IconThreadInitialization(ULONG_PTR dwParam);
@@ -1871,11 +1900,11 @@ void Explorerplusplus::SetDefaultRealFolderColumns(std::list<Column_t> *pColumns
 
 	pColumns->clear();
 
-	for(i = 0;i <SIZEOF_ARRAY(g_RealFolderColumns);i++)
+	for(i = 0;i <SIZEOF_ARRAY(REAL_FOLDER_DEFAULT_COLUMNS);i++)
 	{
-		Column.id		= g_RealFolderColumns[i].id;
-		Column.bChecked	= g_RealFolderColumns[i].bChecked;
-		Column.iWidth	= g_RealFolderColumns[i].iWidth;
+		Column.id		= REAL_FOLDER_DEFAULT_COLUMNS[i].id;
+		Column.bChecked	= REAL_FOLDER_DEFAULT_COLUMNS[i].bChecked;
+		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1887,11 +1916,11 @@ void Explorerplusplus::SetDefaultControlPanelColumns(std::list<Column_t> *pColum
 
 	pColumns->clear();
 
-	for(i = 0;i <SIZEOF_ARRAY(g_ControlPanelColumns);i++)
+	for(i = 0;i <SIZEOF_ARRAY(CONTROL_PANEL_DEFAULT_COLUMNS);i++)
 	{
-		Column.id		= g_ControlPanelColumns[i].id;
-		Column.bChecked	= g_ControlPanelColumns[i].bChecked;
-		Column.iWidth	= g_RealFolderColumns[i].iWidth;
+		Column.id		= CONTROL_PANEL_DEFAULT_COLUMNS[i].id;
+		Column.bChecked	= CONTROL_PANEL_DEFAULT_COLUMNS[i].bChecked;
+		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1903,11 +1932,11 @@ void Explorerplusplus::SetDefaultMyComputerColumns(std::list<Column_t> *pColumns
 
 	pColumns->clear();
 
-	for(i = 0;i <SIZEOF_ARRAY(g_MyComputerColumns);i++)
+	for(i = 0;i <SIZEOF_ARRAY(MY_COMPUTER_DEFAULT_COLUMNS);i++)
 	{
-		Column.id		= g_MyComputerColumns[i].id;
-		Column.bChecked	= g_MyComputerColumns[i].bChecked;
-		Column.iWidth	= g_RealFolderColumns[i].iWidth;
+		Column.id		= MY_COMPUTER_DEFAULT_COLUMNS[i].id;
+		Column.bChecked	= MY_COMPUTER_DEFAULT_COLUMNS[i].bChecked;
+		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1919,11 +1948,11 @@ void Explorerplusplus::SetDefaultRecycleBinColumns(std::list<Column_t> *pColumns
 
 	pColumns->clear();
 
-	for(i = 0;i <SIZEOF_ARRAY(g_RecycleBinColumns);i++)
+	for(i = 0;i <SIZEOF_ARRAY(RECYCLE_BIN_DEFAULT_COLUMNS);i++)
 	{
-		Column.id		= g_RecycleBinColumns[i].id;
-		Column.bChecked	= g_RecycleBinColumns[i].bChecked;
-		Column.iWidth	= g_RealFolderColumns[i].iWidth;
+		Column.id		= RECYCLE_BIN_DEFAULT_COLUMNS[i].id;
+		Column.bChecked	= RECYCLE_BIN_DEFAULT_COLUMNS[i].bChecked;
+		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1935,11 +1964,11 @@ void Explorerplusplus::SetDefaultPrintersColumns(std::list<Column_t> *pColumns)
 
 	pColumns->clear();
 
-	for(i = 0;i <SIZEOF_ARRAY(g_PrintersColumns);i++)
+	for(i = 0;i <SIZEOF_ARRAY(PRINTERS_DEFAULT_COLUMNS);i++)
 	{
-		Column.id		= g_PrintersColumns[i].id;
-		Column.bChecked	= g_PrintersColumns[i].bChecked;
-		Column.iWidth	= g_RealFolderColumns[i].iWidth;
+		Column.id		= PRINTERS_DEFAULT_COLUMNS[i].id;
+		Column.bChecked	= PRINTERS_DEFAULT_COLUMNS[i].bChecked;
+		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1951,11 +1980,11 @@ void Explorerplusplus::SetDefaultNetworkConnectionsColumns(std::list<Column_t> *
 
 	pColumns->clear();
 
-	for(i = 0;i <SIZEOF_ARRAY(g_NetworkConnectionsColumns);i++)
+	for(i = 0;i <SIZEOF_ARRAY(NETWORK_CONNECTIONS_DEFAULT_COLUMNS);i++)
 	{
-		Column.id		= g_NetworkConnectionsColumns[i].id;
-		Column.bChecked	= g_NetworkConnectionsColumns[i].bChecked;
-		Column.iWidth	= g_RealFolderColumns[i].iWidth;
+		Column.id		= NETWORK_CONNECTIONS_DEFAULT_COLUMNS[i].id;
+		Column.bChecked	= NETWORK_CONNECTIONS_DEFAULT_COLUMNS[i].bChecked;
+		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }
@@ -1967,11 +1996,11 @@ void Explorerplusplus::SetDefaultMyNetworkPlacesColumns(std::list<Column_t> *pCo
 
 	pColumns->clear();
 
-	for(i = 0;i <SIZEOF_ARRAY(g_MyNetworkPlacesColumns);i++)
+	for(i = 0;i <SIZEOF_ARRAY(MY_NETWORK_PLACES_DEFAULT_COLUMNS);i++)
 	{
-		Column.id		= g_MyNetworkPlacesColumns[i].id;
-		Column.bChecked	= g_MyNetworkPlacesColumns[i].bChecked;
-		Column.iWidth	= g_RealFolderColumns[i].iWidth;
+		Column.id		= MY_NETWORK_PLACES_DEFAULT_COLUMNS[i].id;
+		Column.bChecked	= MY_NETWORK_PLACES_DEFAULT_COLUMNS[i].bChecked;
+		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
 		pColumns->push_back(Column);
 	}
 }

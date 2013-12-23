@@ -130,10 +130,12 @@ ensure you have administrator privileges."),NExplorerplusplus::WINDOW_NAME,MB_IC
 		}
 		else if(lstrcmp(szPath,_T("-set_as_default")) == 0)
 		{
-			BOOL bSuccess;
+			TCHAR menuText[256];
+			LoadString(GetModuleHandle(0), IDS_OPEN_IN_EXPLORERPLUSPLUS,
+				menuText, SIZEOF_ARRAY(menuText));
 
-			bSuccess = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME,
-				SHELL_DEFAULT_MENU_TEXT);
+			BOOL bSuccess = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
+				SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText);
 
 			if(bSuccess)
 			{

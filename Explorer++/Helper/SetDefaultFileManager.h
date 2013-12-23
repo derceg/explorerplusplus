@@ -10,10 +10,10 @@ namespace NDefaultFileManager
 		REPLACEEXPLORER_ALL			= 3
 	};
 
-	BOOL	SetAsDefaultFileManagerFileSystem(TCHAR *szInternalCommand,TCHAR *szMenuText);
-	BOOL	SetAsDefaultFileManagerAll(TCHAR *szInternalCommand,TCHAR *szMenuText);
-	BOOL	RemoveAsDefaultFileManagerFileSystem(TCHAR *szInternalCommand);
-	BOOL	RemoveAsDefaultFileManagerAll(TCHAR *szInternalCommand);
+	BOOL	SetAsDefaultFileManagerFileSystem(const TCHAR *szInternalCommand, const TCHAR *szMenuText);
+	BOOL	SetAsDefaultFileManagerAll(const TCHAR *szInternalCommand, const TCHAR *szMenuText);
+	BOOL	RemoveAsDefaultFileManagerFileSystem(const TCHAR *szInternalCommand);
+	BOOL	RemoveAsDefaultFileManagerAll(const TCHAR *szInternalCommand);
 }
 
 #endif
