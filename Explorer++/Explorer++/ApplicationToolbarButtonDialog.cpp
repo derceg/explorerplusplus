@@ -43,6 +43,12 @@ INT_PTR CApplicationToolbarButtonDialog::OnInitDialog()
 	SetDlgItemText(m_hDlg,IDC_APP_EDIT_NAME,m_Button->Name.c_str());
 	SetDlgItemText(m_hDlg,IDC_APP_EDIT_COMMAND,m_Button->Command.c_str());
 
+	if(m_Button->Name.length() == 0 ||
+		m_Button->Command.length() == 0)
+	{
+		EnableWindow(GetDlgItem(m_hDlg, IDOK), FALSE);
+	}
+
 	UINT uCheck = m_Button->ShowNameOnToolbar ? BST_CHECKED : BST_UNCHECKED;
 	CheckDlgButton(m_hDlg,IDC_CHECK_SHOWAPPNAME,uCheck);
 
@@ -55,19 +61,39 @@ INT_PTR CApplicationToolbarButtonDialog::OnInitDialog()
 
 INT_PTR CApplicationToolbarButtonDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
-	switch(LOWORD(wParam))
+	if(HIWORD(wParam) != 0)
 	{
-	case IDC_APP_BUTTON_CHOOSE_FILE:
-		OnChooseFile();
-		break;
+		switch(HIWORD(wParam))
+		{
+		case EN_CHANGE:
+			if(LOWORD(wParam) != IDC_APP_EDIT_NAME &&
+				LOWORD(wParam) != IDC_APP_EDIT_COMMAND)
+			{
+				break;
+			}
 
-	case IDOK:
-		OnOk();
-		break;
+			BOOL enable = (GetWindowTextLength(GetDlgItem(m_hDlg, IDC_APP_EDIT_NAME)) != 0 &&
+				GetWindowTextLength(GetDlgItem(m_hDlg, IDC_APP_EDIT_COMMAND)) != 0);
+			EnableWindow(GetDlgItem(m_hDlg, IDOK), enable);
+			break;
+		}
+	}
+	else
+	{
+		switch(LOWORD(wParam))
+		{
+		case IDC_APP_BUTTON_CHOOSE_FILE:
+			OnChooseFile();
+			break;
 
-	case IDCANCEL:
-		OnCancel();
-		break;
+		case IDOK:
+			OnOk();
+			break;
+
+		case IDCANCEL:
+			OnCancel();
+			break;
+		}
 	}
 
 	return 0;
@@ -110,12 +136,25 @@ void CApplicationToolbarButtonDialog::OnChooseFile()
 
 void CApplicationToolbarButtonDialog::OnOk()
 {
-	/* TODO: Must not be empty. */
 	TCHAR Name[512];
 	GetDlgItemText(m_hDlg,IDC_APP_EDIT_NAME,Name,SIZEOF_ARRAY(Name));
 
 	TCHAR Command[512];
 	GetDlgItemText(m_hDlg,IDC_APP_EDIT_COMMAND,Command,SIZEOF_ARRAY(Command));
+
+	bool validated = true;
+
+	if(lstrlen(Name) == 0 ||
+		lstrlen(Command) == 0)
+	{
+		validated = false;
+	}
+
+	if(!validated)
+	{
+		EndDialog(m_hDlg, 0);
+		return;
+	}
 
 	m_Button->Name = Name;
 	m_Button->Command = Command;
