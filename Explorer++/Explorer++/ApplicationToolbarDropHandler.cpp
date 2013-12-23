@@ -16,19 +16,17 @@
 #include "../Helper/Macros.h"
 
 
-#define GENERAL_ALLOCATION_UNIT	1024
-
-CApplicationToolbarDropHandler::CApplicationToolbarDropHandler(HWND hToolbar) :
+CApplicationToolbarDropHandler::CApplicationToolbarDropHandler(HWND hToolbar, CApplicationToolbar *toolbar) :
 m_RefCount(1),
-m_hToolbar(hToolbar)
+m_hToolbar(hToolbar),
+m_toolbar(toolbar)
 {
-	/* Initialize the drag source helper, and use it to initialize the drop target helper. */
-	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
-	IID_IDragSourceHelper,(LPVOID *)&m_pDragSourceHelper);
+	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, NULL, CLSCTX_INPROC_SERVER,
+		IID_IDragSourceHelper, (LPVOID *) &m_pDragSourceHelper);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = m_pDragSourceHelper->QueryInterface(IID_IDropTargetHelper,(LPVOID *)&m_pDropTargetHelper);
+		hr = m_pDragSourceHelper->QueryInterface(IID_IDropTargetHelper, (LPVOID *) &m_pDropTargetHelper);
 	}
 }
 
@@ -52,7 +50,7 @@ ULONG __stdcall CApplicationToolbarDropHandler::AddRef(void)
 ULONG __stdcall CApplicationToolbarDropHandler::Release(void)
 {
 	m_RefCount--;
-	
+
 	if(m_RefCount == 0)
 	{
 		delete this;
@@ -63,40 +61,33 @@ ULONG __stdcall CApplicationToolbarDropHandler::Release(void)
 }
 
 HRESULT _stdcall CApplicationToolbarDropHandler::DragEnter(IDataObject *pDataObject,
-DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect)
+	DWORD grfKeyStat, POINTL pt, DWORD *pdwEffect)
 {
-	FORMATETC	ftc = {CF_HDROP,0,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
-	HRESULT		hr;
-
-	/* Check whether the drop source has the type of data (CF_HDROP)
-	that is needed for this drag operation. */
-	hr = pDataObject->QueryGetData(&ftc);
+	FORMATETC ftc = GetSupportedDropFormat();
+	HRESULT hr = pDataObject->QueryGetData(&ftc);
 
 	/* DON'T use SUCCEEDED (QueryGetData() will return S_FALSE on
 	failure). */
 	if(hr == S_OK)
 	{
-		*pdwEffect		= DROPEFFECT_COPY;
+		*pdwEffect = DROPEFFECT_COPY;
 	}
 	else
 	{
-		*pdwEffect		= DROPEFFECT_NONE;
+		*pdwEffect = DROPEFFECT_NONE;
 	}
 
-	/* Notify the drop target helper that an object has been dragged into
-	the window. */
-	m_pDropTargetHelper->DragEnter(m_hToolbar,pDataObject,(POINT *)&pt,*pdwEffect);
+	m_pDropTargetHelper->DragEnter(m_hToolbar, pDataObject, (POINT *) &pt, *pdwEffect);
 
 	return hr;
 }
 
 HRESULT _stdcall CApplicationToolbarDropHandler::DragOver(DWORD grfKeyState,
-POINTL pt,DWORD *pdwEffect)
+	POINTL pt, DWORD *pdwEffect)
 {
 	*pdwEffect = DROPEFFECT_COPY;
 
-	/* Notify the drop helper of the current operation. */
-	m_pDropTargetHelper->DragOver((LPPOINT)&pt,*pdwEffect);
+	m_pDropTargetHelper->DragOver((LPPOINT) &pt, *pdwEffect);
 
 	return S_OK;
 }
@@ -108,121 +99,109 @@ HRESULT _stdcall CApplicationToolbarDropHandler::DragLeave(void)
 	return S_OK;
 }
 
-HRESULT _stdcall CApplicationToolbarDropHandler::Drop(IDataObject *pDataObject,
-DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
+FORMATETC CApplicationToolbarDropHandler::GetSupportedDropFormat()
 {
-	//FORMATETC		ftc;
-	//STGMEDIUM		stg;
-	//DROPFILES		*pdf = NULL;
-	//ApplicationButton_t	*pab = NULL;
-	//TCHAR			szName[512];
-	//HRESULT			hr;
-	//int				nDroppedFiles;
+	FORMATETC ftc = {CF_HDROP, 0, DVASPECT_CONTENT, -1, TYMED_HGLOBAL};
+	return ftc;
+}
 
-	//ftc.cfFormat	= CF_HDROP;
-	//ftc.ptd			= NULL;
-	//ftc.dwAspect	= DVASPECT_CONTENT;
-	//ftc.lindex		= -1;
-	//ftc.tymed		= TYMED_HGLOBAL;
+HRESULT _stdcall CApplicationToolbarDropHandler::Drop(IDataObject *pDataObject,
+	DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
+{
+	FORMATETC ftc = GetSupportedDropFormat();
+	STGMEDIUM stg;
+	HRESULT hr = pDataObject->GetData(&ftc, &stg);
 
-	///* Does the dropped object contain the type of
-	//data we need? */
-	//hr = pDataObject->GetData(&ftc,&stg);
+	if(hr == S_OK)
+	{
+		m_pDropTargetHelper->Drop(pDataObject, (POINT *) &ptl, *pdwEffect);
 
-	//if(hr == S_OK)
-	//{
-	//	/* Need to remove the drag image before any files are copied/moved.
-	//	This is because a copy/replace dialog may need to shown (if there
-	//	is a collision), and the drag image no longer needs to be there.
-	//	The insertion mark may stay until the end. */
-	//	m_pDropTargetHelper->Drop(pDataObject,(POINT *)&ptl,*pdwEffect);
+		DROPFILES *df = reinterpret_cast<DROPFILES *>(GlobalLock(stg.hGlobal));
 
-	//	pdf = (DROPFILES *)GlobalLock(stg.hGlobal);
+		if(df != NULL)
+		{
+			POINT pt;
+			pt.x = ptl.x;
+			pt.y = ptl.y;
+			ScreenToClient(m_hToolbar, &pt);
 
-	//	if(pdf != NULL)
-	//	{
-	//		TCHAR	szFullFileName[MAX_PATH];
-	//		POINT	pt;
-	//		int		iButton;
-	//		int		i = 0;
+			/* Check whether the files were dropped over
+			another toolbar button. If they were, pass
+			the list of dropped files to the application
+			represented by the button. */
+			int buttonIndex = static_cast<int>(SendMessage(m_hToolbar, TB_HITTEST, 0, (LPARAM) &pt));
 
-	//		/* Request a count of the number of files that have been dropped. */
-	//		nDroppedFiles = DragQueryFile((HDROP)pdf,0xFFFFFFFF,NULL,NULL);
+			if(buttonIndex >= 0)
+			{
+				OpenExistingButton(df, buttonIndex);
+			}
+			else
+			{
+				AddNewButton(df);
+			}
 
-	//		pt.x = ptl.x;
-	//		pt.y = ptl.y;
+			GlobalUnlock(stg.hGlobal);
+		}
 
-	//		ScreenToClient(m_hToolbar,&pt);
-
-	//		/* Check whether the files were dropped over another toolbar button. If
-	//		they were, open the dropped file in the application represented by the
-	//		button. */
-	//		iButton = (int)SendMessage(m_pContainer->m_hApplicationToolbar,TB_HITTEST,0,(LPARAM)&pt);
-
-	//		/* Pass the dropped files to the application... */
-	//		if(iButton >= 0)
-	//		{
-	//			TCHAR *pszParameters = NULL;
-	//			TCHAR szParameter[512];
-	//			int iAllocated = 0;
-
-	//			iAllocated = GENERAL_ALLOCATION_UNIT;
-	//			pszParameters = (TCHAR *)malloc(iAllocated * sizeof(TCHAR));
-	//			memset(pszParameters,0,iAllocated * sizeof(TCHAR));
-
-	//			if(pszParameters != NULL)
-	//			{
-	//				/* Build the command line... */
-	//				for(i = 0;i < nDroppedFiles;i++)
-	//				{
-	//					DragQueryFile((HDROP)pdf,i,szFullFileName,
-	//						SIZEOF_ARRAY(szFullFileName));
-
-	//					if((lstrlen(szFullFileName) + lstrlen(pszParameters)) > iAllocated)
-	//					{
-	//						iAllocated += GENERAL_ALLOCATION_UNIT;
-	//						pszParameters = (TCHAR *)realloc(pszParameters,iAllocated * sizeof(TCHAR));
-	//					}
-
-	//					StringCchPrintf(szParameter,SIZEOF_ARRAY(szParameter),_T(" \"%s\""),szFullFileName);
-	//					StrCat(pszParameters,szParameter);
-	//				}
-
-	//				m_pContainer->ApplicationToolbarOpenItem(iButton,pszParameters);
-
-	//				free(pszParameters);
-	//			}
-	//		}
-	//		else
-	//		{
-	//			for(i = 0;i < nDroppedFiles;i++)
-	//			{
-	//				/* Determine the name of the dropped file. */
-	//				DragQueryFile((HDROP)pdf,i,szFullFileName,
-	//					SIZEOF_ARRAY(szFullFileName));
-
-	//				/* Make sure this item is a file (and not
-	//				a folder). */
-
-	//				/* Remove the path and any extension. */
-	//				StringCchCopy(szName,SIZEOF_ARRAY(szName),szFullFileName);
-	//				PathStripPath(szName);
-
-	//				if(szName[0] != '.')
-	//					PathRemoveExtension(szName);
-
-	//				pab = m_pContainer->ApplicationToolbarAddItem(szName,szFullFileName,TRUE);
-
-	//				/* Add the application button to the toolbar. */
-	//				m_pContainer->ApplicationToolbarAddButtonToToolbar(pab);
-	//			}
-	//		}
-
-	//		GlobalUnlock(stg.hGlobal);
-	//	}
-
-	//	ReleaseStgMedium(&stg);
-	//}
+		ReleaseStgMedium(&stg);
+	}
 
 	return S_OK;
+}
+
+void CApplicationToolbarDropHandler::OpenExistingButton(DROPFILES *df, int buttonIndex)
+{
+	int numFiles = DragQueryFile(reinterpret_cast<HDROP>(df), 0xFFFFFFFF, NULL, NULL);
+
+	std::wstring parameters;
+
+	for(int i = 0; i < numFiles; i++)
+	{
+		TCHAR path[MAX_PATH];
+		DragQueryFile((HDROP) df, i, path, SIZEOF_ARRAY(path));
+
+		if(i != 0)
+		{
+			parameters.append(_T(" "));
+		}
+
+		TCHAR parameter[MAX_PATH];
+		StringCchPrintf(parameter, SIZEOF_ARRAY(parameter), _T("\"%s\""), path);
+		parameters.append(parameter);
+	}
+
+	m_toolbar->OpenItem(buttonIndex, &parameters);
+}
+
+void CApplicationToolbarDropHandler::AddNewButton(DROPFILES *df)
+{
+	int numFiles = DragQueryFile(reinterpret_cast<HDROP>(df), 0xFFFFFFFF, NULL, NULL);
+
+	for(int i = 0; i < numFiles; i++)
+	{
+		TCHAR path[MAX_PATH];
+		DragQueryFile(reinterpret_cast<HDROP>(df), i, path, SIZEOF_ARRAY(path));
+
+		DWORD attributes = GetFileAttributes(path);
+
+		/* Ignore folders. */
+		if(attributes != INVALID_FILE_ATTRIBUTES &&
+			(attributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+		{
+			continue;
+		}
+
+		/* The name of the button will be set
+		to the filename (without any extension). */
+		TCHAR buttonName[MAX_PATH];
+		StringCchCopy(buttonName, SIZEOF_ARRAY(buttonName), path);
+		PathStripPath(buttonName);
+
+		if(buttonName[0] != '.')
+		{
+			PathRemoveExtension(buttonName);
+		}
+
+		m_toolbar->AddNewItem(buttonName, path, TRUE);
+	}
 }

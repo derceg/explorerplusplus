@@ -8,6 +8,7 @@
 #import <msxml3.dll> raw_interfaces_only
 
 class CApplicationToolbar;
+class CApplicationToolbarDropHandler;
 
 struct ApplicationButton_t
 {
@@ -60,6 +61,12 @@ public:
 	CApplicationToolbar(HWND hToolbar,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp);
 	~CApplicationToolbar();
 
+	void				ShowNewItemDialog();
+	void				AddNewItem(const std::wstring &name, const std::wstring &command, BOOL showNameOnToolbar);
+	void				OpenItem(int iItem, std::wstring *parameters);
+	void				ShowItemProperties(int iItem);
+	void				DeleteItem(int iItem);
+
 private:
 
 	static const UINT_PTR PARENT_SUBCLASS_ID = 1;
@@ -73,11 +80,6 @@ private:
 	LRESULT CALLBACK	ParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	void				Initialize();
-
-	void				NewItem();
-	void				OpenItem(int iItem);
-	void				ShowItemProperties(int iItem);
-	void				DeleteItem(int iItem);
 
 	void				AddButtonsToToolbar();
 	void				AddButtonToToolbar(const ApplicationButton_t &Button);

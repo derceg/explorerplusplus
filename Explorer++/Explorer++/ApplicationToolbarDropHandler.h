@@ -1,11 +1,15 @@
 #ifndef APPLICATIONTOOLBARDROPHANDLER_INCLUDED
 #define APPLICATIONTOOLBARDROPHANDLER_INCLUDED
 
+#include "ApplicationToolbar.h"
+
+class CApplicationToolbar;
+
 class CApplicationToolbarDropHandler : public IDropTarget
 {
 public:
 
-	CApplicationToolbarDropHandler(HWND hToolbar);
+	CApplicationToolbarDropHandler(HWND hToolbar, CApplicationToolbar *toolbar);
 	~CApplicationToolbarDropHandler();
 
 	/* IUnknown methods. */
@@ -21,14 +25,18 @@ public:
 
 private:
 
+	static FORMATETC	GetSupportedDropFormat();
+	void				AddNewButton(DROPFILES *df);
+	void				OpenExistingButton(DROPFILES *df, int buttonIndex);
+
 	ULONG				m_RefCount;
 
+	CApplicationToolbar	*m_toolbar;
 	HWND				m_hToolbar;
 
 	/* Drag and drop. */
 	IDragSourceHelper	*m_pDragSourceHelper;
 	IDropTargetHelper	*m_pDropTargetHelper;
-	BOOL				m_bAcceptData;
 };
 
 #endif

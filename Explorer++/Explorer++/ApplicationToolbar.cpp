@@ -66,7 +66,7 @@ void CApplicationToolbar::Initialize()
 
 	AddButtonsToToolbar();
 
-	m_patd = new CApplicationToolbarDropHandler(m_hToolbar);
+	m_patd = new CApplicationToolbarDropHandler(m_hToolbar, this);
 	RegisterDragDrop(m_hToolbar,m_patd);
 
 	SetWindowSubclass(GetParent(m_hToolbar),ParentProcStub,PARENT_SUBCLASS_ID,
@@ -90,7 +90,7 @@ LRESULT CALLBACK CApplicationToolbar::ParentProc(HWND hwnd,UINT uMsg,WPARAM wPar
 			LOWORD(wParam) <= m_uIDEnd)
 		{
 			int iIndex = static_cast<int>(SendMessage(m_hToolbar,TB_COMMANDTOINDEX,LOWORD(wParam),0));
-			OpenItem(iIndex);
+			OpenItem(iIndex, NULL);
 			return 0;
 		}
 		else
@@ -98,11 +98,11 @@ LRESULT CALLBACK CApplicationToolbar::ParentProc(HWND hwnd,UINT uMsg,WPARAM wPar
 			switch(LOWORD(wParam))
 			{
 			case IDM_APP_OPEN:
-				OpenItem(m_RightClickItem);
+				OpenItem(m_RightClickItem, NULL);
 				return 0;
 
 			case IDM_APP_NEW:
-				NewItem();
+				ShowNewItemDialog();
 				return 0;
 
 			case IDM_APP_DELETE:
@@ -248,7 +248,7 @@ void CApplicationToolbar::UpdateButton(int iItem)
 	}
 }
 
-void CApplicationToolbar::NewItem()
+void CApplicationToolbar::ShowNewItemDialog()
 {
 	ApplicationButton_t Button;
 	Button.ShowNameOnToolbar = TRUE;
@@ -266,8 +266,28 @@ void CApplicationToolbar::NewItem()
 	}
 }
 
-void CApplicationToolbar::OpenItem(int iItem)
+void CApplicationToolbar::AddNewItem(const std::wstring &name, const std::wstring &command,
+	BOOL showNameOnToolbar)
 {
+	ApplicationButton_t Button;
+	Button.Name = name;
+	Button.Command = command;
+	Button.ShowNameOnToolbar = showNameOnToolbar;
+
+	Button.ID = m_atps->m_IDCounter++;
+	m_atps->m_Buttons.push_back(Button);
+
+	AddButtonToToolbar(Button);
+}
+
+/* If any parameters are provided to this method,
+they will be passed to the application along
+with the default parameters (i.e. those attached
+to the button). */
+void CApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
+{
+	assert(iItem >= 0 && iItem < m_atps->m_Buttons.size());
+
 	ApplicationButton_t *Button = MapToolbarButtonToItem(iItem);
 
 	if(Button != NULL)
@@ -279,7 +299,15 @@ void CApplicationToolbar::OpenItem(int iItem)
 
 		if(SUCCEEDED(hr))
 		{
-			m_pexpp->OpenFileItem(pidl,ai.Parameters.c_str());
+			std::wstring combinedParameters = ai.Parameters;
+
+			if(parameters != NULL && parameters->length() > 0)
+			{
+				combinedParameters.append(_T(" "));
+				combinedParameters.append(*parameters);
+			}
+
+			m_pexpp->OpenFileItem(pidl, combinedParameters.c_str());
 			CoTaskMemFree(pidl);
 		}
 	}
@@ -357,6 +385,8 @@ CApplicationToolbar::ApplicationInfo_t CApplicationToolbar::ProcessCommand(const
 
 void CApplicationToolbar::ShowItemProperties(int iItem)
 {
+	assert(iItem >= 0 && iItem < m_atps->m_Buttons.size());
+
 	ApplicationButton_t *Button = MapToolbarButtonToItem(iItem);
 
 	if(Button != NULL)
@@ -374,6 +404,8 @@ void CApplicationToolbar::ShowItemProperties(int iItem)
 
 void CApplicationToolbar::DeleteItem(int iItem)
 {
+	assert(iItem >= 0 && iItem < m_atps->m_Buttons.size());
+
 	TCHAR szInfoMsg[128];
 	LoadString(m_hInstance,IDS_APPLICATIONBUTTON_DELETE,
 		szInfoMsg,SIZEOF_ARRAY(szInfoMsg));
