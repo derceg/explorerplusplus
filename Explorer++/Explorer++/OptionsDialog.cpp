@@ -39,22 +39,19 @@ INT_PTR CALLBACK	TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lP
 int CALLBACK PropSheetProcStub(HWND hDlg,UINT msg,LPARAM lParam);
 int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
 
-/* TODO: Define in class. */
 struct FileSize_t
 {
 	SizeDisplayFormat_t sdf;
 	UINT StringID;
 };
 
-static const FileSize_t g_FileSizes[] =
-{{SIZE_FORMAT_BYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_BYTES},
-{SIZE_FORMAT_KBYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_KB},
-{SIZE_FORMAT_MBYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_MB},
-{SIZE_FORMAT_GBYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_GB},
-{SIZE_FORMAT_TBYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_TB},
-{SIZE_FORMAT_PBYTES,IDS_OPTIONS_DIALOG_FILE_SIZE_PB}};
-
-BOOL bRefreshAllTabs;
+static const FileSize_t FILE_SIZES[] =
+{{SIZE_FORMAT_BYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_BYTES},
+{SIZE_FORMAT_KBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_KB},
+{SIZE_FORMAT_MBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_MB},
+{SIZE_FORMAT_GBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_GB},
+{SIZE_FORMAT_TBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_TB},
+{SIZE_FORMAT_PBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_PB}};
 
 static HWND g_hOptionsPropertyDialog	= NULL;
 
@@ -538,14 +535,14 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 				hCBSize = GetDlgItem(hDlg,IDC_COMBO_FILESIZES);
 
-				for(int i = 0;i < SIZEOF_ARRAY(g_FileSizes);i++)
+				for(int i = 0;i < SIZEOF_ARRAY(FILE_SIZES);i++)
 				{
 					TCHAR szTemp[32];
-					LoadString(m_hLanguageModule,g_FileSizes[i].StringID,szTemp,SIZEOF_ARRAY(szTemp));
+					LoadString(m_hLanguageModule,FILE_SIZES[i].StringID,szTemp,SIZEOF_ARRAY(szTemp));
 					SendMessage(hCBSize,CB_ADDSTRING,0,reinterpret_cast<LPARAM>(szTemp));
-					SendMessage(hCBSize,CB_SETITEMDATA,i,g_FileSizes[i].sdf);
+					SendMessage(hCBSize,CB_SETITEMDATA,i,FILE_SIZES[i].sdf);
 
-					if(g_FileSizes[i].sdf == m_SizeDisplayFormat)
+					if(FILE_SIZES[i].sdf == m_SizeDisplayFormat)
 					{
 						SendMessage(hCBSize,CB_SETCURSEL,i,0);
 					}
