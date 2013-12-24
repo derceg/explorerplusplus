@@ -19,6 +19,8 @@ public:
 	void			SaveXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	void			LoadXMLSettings(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
 
+	bool			GetSettingsKey(TCHAR *out, int outLength);
+
 protected:
 
 	virtual void	SaveExtraRegistrySettings(HKEY hKey);

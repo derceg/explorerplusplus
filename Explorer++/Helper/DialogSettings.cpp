@@ -183,6 +183,17 @@ void CDialogSettings::LoadXMLSettings(MSXML2::IXMLDOMNamedNodeMap *pam,long lChi
 	m_bStateSaved = TRUE;
 }
 
+bool CDialogSettings::GetSettingsKey(TCHAR *out, int outLength)
+{
+	if(outLength < (lstrlen(m_szSettingsKey) + 1))
+	{
+		return false;
+	}
+
+	StringCchCopy(out, outLength, m_szSettingsKey);
+	return true;
+}
+
 /* No extra values are saved or loaded by default.
 Derived class should override these to save any
 dialog specific values they need. */

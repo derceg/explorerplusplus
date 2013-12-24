@@ -35,32 +35,44 @@
 
 namespace
 {
-	const TCHAR REG_DIALOGS_KEY[] = _T("Software\\Explorer++\\Dialogs");
+	const TCHAR DIALOGS_REGISTRY_KEY[] = _T("Software\\Explorer++\\Dialogs");
+	const TCHAR DIALOGS_XML_KEY[] = _T("State");
+
+	/* Safe provided that the object returned through
+	GetInstance is stable throughout the lifetime of
+	the program (which is true, as these are all
+	singletons). */
+	CDialogSettings* const DIALOG_SETTINGS[] = {
+		&CSearchDialogPersistentSettings::GetInstance(),
+		&CWildcardSelectDialogPersistentSettings::GetInstance(),
+		&CSetFileAttributesDialogPersistentSettings::GetInstance(),
+		&CRenameTabDialogPersistentSettings::GetInstance(),
+		&CMassRenameDialogPersistentSettings::GetInstance(),
+		&CFilterDialogPersistentSettings::GetInstance(),
+		&CColorRuleDialogPersistentSettings::GetInstance(),
+		&CCustomizeColorsDialogPersistentSettings::GetInstance(),
+		&CSplitFileDialogPersistentSettings::GetInstance(),
+		&CDestroyFilesDialogPersistentSettings::GetInstance(),
+		&CMergeFilesDialogPersistentSettings::GetInstance(),
+		&CSelectColumnsDialogPersistentSettings::GetInstance(),
+		&CSetDefaultColumnsDialogPersistentSettings::GetInstance(),
+		&CAddBookmarkDialogPersistentSettings::GetInstance(),
+		&CDisplayColoursDialogPersistentSettings::GetInstance(),
+		&CUpdateCheckDialogPersistentSettings::GetInstance()
+	};
 }
 
 void Explorerplusplus::LoadDialogStatesFromRegistry(void)
 {
 	HKEY hKey;
-	LONG ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_DIALOGS_KEY,0,KEY_READ,&hKey);
+	LONG ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,DIALOGS_REGISTRY_KEY,0,KEY_READ,&hKey);
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		CSearchDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CWildcardSelectDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CSetFileAttributesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CRenameTabDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CMassRenameDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CFilterDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CColorRuleDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CCustomizeColorsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CSplitFileDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CDestroyFilesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CMergeFilesDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CSelectColumnsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CSetDefaultColumnsDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CAddBookmarkDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CDisplayColoursDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
-		CUpdateCheckDialogPersistentSettings::GetInstance().LoadRegistrySettings(hKey);
+		for each(CDialogSettings *ds in DIALOG_SETTINGS)
+		{
+			ds->LoadRegistrySettings(hKey);
+		}
 
 		RegCloseKey(hKey);
 	}
@@ -69,27 +81,15 @@ void Explorerplusplus::LoadDialogStatesFromRegistry(void)
 void Explorerplusplus::SaveDialogStatesToRegistry(void)
 {
 	HKEY hKey;
-	LONG ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_DIALOGS_KEY,
+	LONG ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,DIALOGS_REGISTRY_KEY,
 		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,NULL);
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		CSearchDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CWildcardSelectDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CSetFileAttributesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CRenameTabDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CMassRenameDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CFilterDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CColorRuleDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CCustomizeColorsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CSplitFileDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CDestroyFilesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CMergeFilesDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CSelectColumnsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CSetDefaultColumnsDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CAddBookmarkDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CDisplayColoursDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
-		CUpdateCheckDialogPersistentSettings::GetInstance().SaveRegistrySettings(hKey);
+		for each(CDialogSettings *ds in DIALOG_SETTINGS)
+		{
+			ds->SaveRegistrySettings(hKey);
+		}
 
 		RegCloseKey(hKey);
 	}
@@ -111,7 +111,10 @@ void Explorerplusplus::LoadDialogStatesFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 	if(pXMLDom == NULL)
 		goto clean;
 
-	bstr = SysAllocString(L"//State/*");
+	TCHAR tempNodeSelector[64];
+	StringCchPrintf(tempNodeSelector, SIZEOF_ARRAY(tempNodeSelector),
+		_T("//%s/*"), DIALOGS_XML_KEY);
+	bstr = SysAllocString(tempNodeSelector);
 	pXMLDom->selectNodes(bstr,&pNodes);
 
 	if(!pNodes)
@@ -143,44 +146,25 @@ void Explorerplusplus::LoadDialogStatesFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 					{
 						am->get_item(0,&pChildNode);
 
-						/* Element name. */
 						pChildNode->get_nodeName(&bstrName);
-
-						/* Element value. */
 						pChildNode->get_text(&bstrValue);
 
-						if(lstrcmpi(bstrValue,_T("ColorRules")) == 0)
-							CColorRuleDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("CustomizeColors")) == 0)
-							CCustomizeColorsDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("Search")) == 0)
-							CSearchDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("WildcardSelect")) == 0)
-							CWildcardSelectDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("RenameTab")) == 0)
-							CRenameTabDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("MassRename")) == 0)
-							CMassRenameDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("Filter")) == 0)
-							CFilterDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("SplitFile")) == 0)
-							CSplitFileDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("DestroyFiles")) == 0)
-							CDestroyFilesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("MergeFiles")) == 0)
-							CMergeFilesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("SetFileAttributes")) == 0)
-							CSetFileAttributesDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("SelectColumns")) == 0)
-							CSelectColumnsDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("SetDefaultColumns")) == 0)
-							CSetDefaultColumnsDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("AddBookmark")) == 0)
-							CAddBookmarkDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("DisplayColors")) == 0)
-							CDisplayColoursDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
-						else if(lstrcmpi(bstrValue,_T("UpdateCheck")) == 0)
-							CUpdateCheckDialogPersistentSettings::GetInstance().LoadXMLSettings(am,lChildNodes);
+						for each(CDialogSettings *ds in DIALOG_SETTINGS)
+						{
+							TCHAR settingsKey[64];
+							bool success = ds->GetSettingsKey(settingsKey, SIZEOF_ARRAY(settingsKey));
+							assert(success);
+
+							if(!success)
+							{
+								continue;
+							}
+
+							if(lstrcmpi(bstrValue, settingsKey) == 0)
+							{
+								ds->LoadXMLSettings(am, lChildNodes);
+							}
+						}
 					}
 				}
 			}
@@ -205,27 +189,15 @@ MSXML2::IXMLDOMElement *pRoot)
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pRoot);
 
-	bstr = SysAllocString(L"State");
+	bstr = SysAllocString(DIALOGS_XML_KEY);
 	pXMLDom->createElement(bstr,&pe);
 	SysFreeString(bstr);
 	bstr = NULL;
 
-	CSearchDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CWildcardSelectDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CSetFileAttributesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CRenameTabDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CMassRenameDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CFilterDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CColorRuleDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CCustomizeColorsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CSplitFileDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CDestroyFilesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CMergeFilesDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CSelectColumnsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CSetDefaultColumnsDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CAddBookmarkDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CDisplayColoursDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
-	CUpdateCheckDialogPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom,pe);
+	for each(CDialogSettings *ds in DIALOG_SETTINGS)
+	{
+		ds->SaveXMLSettings(pXMLDom, pe);
+	}
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
 
