@@ -284,7 +284,7 @@ with the default parameters (i.e. those attached
 to the button). */
 void CApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 {
-	assert(iItem >= 0 && iItem < m_atps->m_Buttons.size());
+	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
 
 	ApplicationButton_t *Button = MapToolbarButtonToItem(iItem);
 
@@ -383,7 +383,7 @@ CApplicationToolbar::ApplicationInfo_t CApplicationToolbar::ProcessCommand(const
 
 void CApplicationToolbar::ShowItemProperties(int iItem)
 {
-	assert(iItem >= 0 && iItem < m_atps->m_Buttons.size());
+	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
 
 	ApplicationButton_t *Button = MapToolbarButtonToItem(iItem);
 
@@ -402,7 +402,7 @@ void CApplicationToolbar::ShowItemProperties(int iItem)
 
 void CApplicationToolbar::DeleteItem(int iItem)
 {
-	assert(iItem >= 0 && iItem < m_atps->m_Buttons.size());
+	assert(iItem >= 0 && static_cast<size_t>(iItem) < m_atps->m_Buttons.size());
 
 	TCHAR szInfoMsg[128];
 	LoadString(m_hInstance,IDS_APPLICATIONBUTTON_DELETE,
