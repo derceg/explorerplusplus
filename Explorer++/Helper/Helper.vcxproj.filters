@@ -1,201 +1,216 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Bookmark.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Controls.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CustomMenu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DriveInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DropHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FolderSize.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Helper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="iDataObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="iDirectoryMonitor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="iEnumFormatEtc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ContextMenuManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="BaseDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FileContextMenuManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="StatusBar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ReferenceCount.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Dialog Support</Filter>
     </ClCompile>
     <ClCompile Include="DialogSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="XMLSettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SetDefaultFileManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ResizableDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RegistrySettings.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FileActionHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FileOperations.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ListViewHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="iDropSource.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Dialog Support</Filter>
     </ClCompile>
     <ClCompile Include="MessageForwarder.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Dialog Support</Filter>
     </ClCompile>
-    <ClCompile Include="BaseWindow.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="ResizableDialog.cpp">
+      <Filter>Dialog Support</Filter>
     </ClCompile>
     <ClCompile Include="ComboBox.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Control Support</Filter>
     </ClCompile>
     <ClCompile Include="ComboBoxHelper.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Control Support</Filter>
+    </ClCompile>
+    <ClCompile Include="Controls.c">
+      <Filter>Control Support</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewHelper.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
+    <ClCompile Include="StatusBar.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistrySettings.cpp">
+      <Filter>Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="XMLSettings.cpp">
+      <Filter>Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="FileOperations.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="FolderSize.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="iDirectoryMonitor.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellHelper.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
+    <ClCompile Include="ContextMenuManager.cpp">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="FileContextMenuManager.cpp">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="SetDefaultFileManager.cpp">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClCompile>
+    <ClCompile Include="Bookmark.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
+    <ClCompile Include="DropHandler.cpp">
+      <Filter>Drag and Drop</Filter>
+    </ClCompile>
+    <ClCompile Include="iDataObject.cpp">
+      <Filter>Drag and Drop</Filter>
+    </ClCompile>
+    <ClCompile Include="iEnumFormatEtc.cpp">
+      <Filter>Drag and Drop</Filter>
+    </ClCompile>
+    <ClCompile Include="iDropSource.cpp">
+      <Filter>Drag and Drop</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseWindow.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomMenu.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="DriveInfo.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="FileActionHandler.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="Helper.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="ReferenceCount.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Miscellaneous</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bookmark.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Controls.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CustomMenu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DropHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FileOperations.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FolderSize.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Helper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="iDataObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="iDirectoryMonitor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="iEnumFormatEtc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ContextMenuManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BaseDialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FileContextMenuManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="StatusBar.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ReferenceCount.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DialogSettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="XMLSettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SetDefaultFileManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ResizableDialog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RegistrySettings.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="FileActionHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ListViewHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Macros.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="iDropSource.h">
-      <Filter>Header Files</Filter>
+      <Filter>Dialog Support</Filter>
     </ClInclude>
     <ClInclude Include="MessageForwarder.h">
-      <Filter>Header Files</Filter>
+      <Filter>Dialog Support</Filter>
     </ClInclude>
-    <ClInclude Include="BaseWindow.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ResizableDialog.h">
+      <Filter>Dialog Support</Filter>
     </ClInclude>
     <ClInclude Include="ComboBox.h">
-      <Filter>Header Files</Filter>
+      <Filter>Control Support</Filter>
     </ClInclude>
     <ClInclude Include="ComboBoxHelper.h">
-      <Filter>Header Files</Filter>
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="Controls.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="ListViewHelper.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="StatusBar.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="Bookmark.h">
+      <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="DropHandler.h">
+      <Filter>Drag and Drop</Filter>
+    </ClInclude>
+    <ClInclude Include="iDataObject.h">
+      <Filter>Drag and Drop</Filter>
+    </ClInclude>
+    <ClInclude Include="iDropSource.h">
+      <Filter>Drag and Drop</Filter>
+    </ClInclude>
+    <ClInclude Include="iEnumFormatEtc.h">
+      <Filter>Drag and Drop</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseWindow.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="CustomMenu.h">
+      <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="DriveInfo.h">
-      <Filter>Header Files</Filter>
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="FileActionHandler.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="Helper.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="ReferenceCount.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="FileContextMenuManager.h">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClInclude>
+    <ClInclude Include="SetDefaultFileManager.h">
+      <Filter>Shell\Shell Integration</Filter>
+    </ClInclude>
+    <ClInclude Include="FileOperations.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="FolderSize.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="iDirectoryMonitor.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellHelper.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="RegistrySettings.h">
+      <Filter>Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLSettings.h">
+      <Filter>Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogSettings.h">
+      <Filter>Dialog Support</Filter>
+    </ClInclude>
+    <ClInclude Include="Macros.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="ContextMenuManager.h">
+      <Filter>Shell\Shell Integration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{9a9f4520-e49c-4e93-a3d5-447dfffaf540}</UniqueIdentifier>
+    <Filter Include="Dialog Support">
+      <UniqueIdentifier>{e37f7d79-dfed-428f-8e4e-3858bae6605b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{ae1e72d9-3fd9-43e3-b707-8e38b190d179}</UniqueIdentifier>
+    <Filter Include="Control Support">
+      <UniqueIdentifier>{e0d0fe53-9884-4abb-83b0-7bce82b496ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{e8f7900c-74b7-46e5-a93a-ea871a69c786}</UniqueIdentifier>
+    <Filter Include="Settings">
+      <UniqueIdentifier>{77b40642-2c8f-42f4-bb13-b17050e92283}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shell">
+      <UniqueIdentifier>{29c0a679-252e-4760-be8c-dde182da34d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shell\Shell Integration">
+      <UniqueIdentifier>{91c6f3d8-5038-415b-be81-a252e07c6526}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bookmarks">
+      <UniqueIdentifier>{81017066-bf1f-450a-9080-da0c057abfc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Drag and Drop">
+      <UniqueIdentifier>{dd33bfdb-859c-4f78-bc0d-21d67122afee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Miscellaneous">
+      <UniqueIdentifier>{a38722e8-52ce-4c89-9647-355edcdc155d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
