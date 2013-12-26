@@ -20,9 +20,9 @@ All three declarations are from
 ShObjIdl.h. */
 typedef /* [v1_enum] */ 
 enum KNOWNDESTCATEGORY
-    {	KDC_FREQUENT	= 1,
+	{	KDC_FREQUENT	= 1,
 	KDC_RECENT	= ( KDC_FREQUENT + 1 ) 
-    } 	KNOWNDESTCATEGORY;
+	} 	KNOWNDESTCATEGORY;
 
 EXTERN_C const IID IID_ICustomDestinationList;
 
@@ -122,21 +122,6 @@ enum SizeDisplayFormat_t
 /* Tab control helper functions. */
 void			TabCtrl_SwapItems(HWND hTabCtrl,int iItem1,int iItem2);
 void			TabCtrl_SetItemText(HWND,int,TCHAR *);
-
-/* Drive information. */
-BOOL			GetDriveGeometryEx(TCHAR *lpszDrive,DISK_GEOMETRY_EX *pDiskGeometry,DWORD dwSize);
-BOOL			GetDriveLayoutEx(TCHAR *lpszDrive,DRIVE_LAYOUT_INFORMATION_EX **pDriveLayout,DWORD BufSize);
-BOOL			GetDrivePerformanceInfo(TCHAR *lpszDrive,DISK_PERFORMANCE *pDiskPerformance);
-BOOL			GetFileSystemInfo(TCHAR *lpszDrive,FILESYSTEM_STATISTICS *pStatistics,DWORD BufSize);
-BOOL			GetNtfsVolumeInfo(TCHAR *lpszDrive,NTFS_VOLUME_DATA_BUFFER *pNtfsVolumeInfo,DWORD BufSize);
-TCHAR *			GetPartitionName(LARGE_INTEGER StartingOffset);
-LARGE_INTEGER	GetDriveLength(TCHAR *lpszDrive);
-BOOL			GetFileAllocationInfo(TCHAR *lpszFileName,STARTING_VCN_INPUT_BUFFER *pStartingVcn,RETRIEVAL_POINTERS_BUFFER *pRetrievalPointers,DWORD BufSize);
-LONG			GetSectorSize(TCHAR *Drive);
-LONG			GetClusterSize(TCHAR *Drive);
-int				GetNumberOfUsedPartitions(DRIVE_LAYOUT_INFORMATION_EX *pDriveLayout);
-LONG			GetFileSectorSize(TCHAR *FileName);
-TCHAR			GetDriveNameFromMask(ULONG unitmask);
 
 /* Drag and drop helpers. */
 DWORD			DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,BOOL bDataAccept,BOOL bOnSameDrive);

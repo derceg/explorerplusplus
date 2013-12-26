@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include <sstream>
 #include "Helper.h"
+#include "DriveInfo.h"
 #include "FileOperations.h"
 #include "ShellHelper.h"
 #include "Macros.h"
@@ -21,10 +22,6 @@
 
 /* Local helpers. */
 void	EnterAttributeIntoString(BOOL bEnter,TCHAR *String,int Pos,TCHAR chAttribute);
-BOOL	GetFileAllocationInfo(TCHAR *lpszFileName,STARTING_VCN_INPUT_BUFFER *pStartingVcn,
-							  RETRIEVAL_POINTERS_BUFFER *pRetrievalPointers,DWORD BufSize);
-BOOL	GetNtfsVolumeInfo(TCHAR *lpszDrive,NTFS_VOLUME_DATA_BUFFER *pNtfsVolumeInfo,DWORD BufSize);
-TCHAR	*GetPartitionName(LARGE_INTEGER StartingOffset);
 
 void FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
 size_t cchBuf)
@@ -361,47 +358,6 @@ BOOL GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSi
 	CloseHandle(hFile);
 
 	return TRUE;
-}
-
-LONG GetFileSectorSize(TCHAR *FileName)
-{
-	LONG SectorSize;
-	LONG FileSize;
-	LONG SectorFileSize;
-	HANDLE hFile;
-	int SectorCount = 0;
-	TCHAR Root[MAX_PATH];
-
-	if(FileName == NULL)
-		return -1;
-
-	/* Get a handle to the file. */
-	hFile = CreateFile(FileName,GENERIC_READ,
-	FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,NULL,NULL);
-
-	if(hFile == INVALID_HANDLE_VALUE)
-		return -1;
-
-	/* Get the files size (count of number of actual
-	number of bytes in file). */
-	FileSize = GetFileSize(hFile,NULL);
-
-	StringCchCopy(Root,SIZEOF_ARRAY(Root),FileName);
-	PathStripToRoot(Root);
-
-	/* Get the sector size of the drive the file resides on. */
-	SectorSize = GetSectorSize(Root);
-
-	SectorFileSize = 0;
-	while(SectorFileSize < FileSize)
-	{
-		SectorFileSize += SectorSize;
-		SectorCount++;
-	}
-
-	CloseHandle(hFile);
-
-	return SectorCount;
 }
 
 BOOL FileTimeToLocalSystemTime(LPFILETIME lpFileTime,LPSYSTEMTIME lpLocalTime)

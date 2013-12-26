@@ -17,6 +17,7 @@
 #include "iShellBrowser_internal.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Helper.h"
+#include "../Helper/DriveInfo.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/ShellHelper.h"

@@ -216,6 +216,7 @@
     <ClInclude Include="Controls.h" />
     <ClInclude Include="CustomMenu.h" />
     <ClInclude Include="DialogSettings.h" />
+    <ClInclude Include="DriveInfo.h" />
     <ClInclude Include="DropHandler.h" />
     <ClInclude Include="FileActionHandler.h" />
     <ClInclude Include="FileContextMenuManager.h" />

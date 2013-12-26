@@ -23,6 +23,7 @@
 #include "MyTreeView.h"
 #include "MyTreeViewInternal.h"
 #include "../Helper/Helper.h"
+#include "../Helper/DriveInfo.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
 
@@ -1340,8 +1341,8 @@ HTREEITEM CMyTreeView::LocateItemByPath(TCHAR *szItemPath,BOOL bExpand)
 	hItem = TreeView_GetChild(m_hTreeView,hMyComputer);
 
 	/* My Computer node may not be expanded. */
-    if(hItem == NULL)
-        return NULL;
+	if(hItem == NULL)
+		return NULL;
 
 	ptr = cstrtok_s(FullItemPathCopy,_T("\\"),&next_token);
 

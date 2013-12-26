@@ -37,6 +37,7 @@ http://stackoverflow.com/questions/2364774/why-do-i-need-to-compile-datetime-in-
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
+#include "../Helper/DriveInfo.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/Macros.h"

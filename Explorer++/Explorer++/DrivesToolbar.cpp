@@ -15,6 +15,7 @@
 #include "Explorer++_internal.h"
 #include "DrivesToolbar.h"
 #include "MainResource.h"
+#include "../Helper/DriveInfo.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
