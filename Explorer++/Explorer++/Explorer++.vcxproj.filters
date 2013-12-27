@@ -154,12 +154,6 @@
     <ClCompile Include="MsgHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="RegistrySettings.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="XMLSettings.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="WindowHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -189,6 +183,12 @@
     </ClCompile>
     <ClCompile Include="WinMain.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="XMLSettings.cpp">
+      <Filter>Settings</Filter>
+    </ClCompile>
+    <ClCompile Include="RegistrySettings.cpp">
+      <Filter>Settings</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -339,11 +339,11 @@
     <ClInclude Include="ListView.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="RegistrySettings.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="XMLSettings.h">
-      <Filter>Core</Filter>
+      <Filter>Settings</Filter>
+    </ClInclude>
+    <ClInclude Include="RegistrySettings.h">
+      <Filter>Settings</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -437,6 +437,9 @@
     </Filter>
     <Filter Include="Context Menu Support\New Menu">
       <UniqueIdentifier>{ab5e701f-15f5-4cd1-901a-77738a8f1779}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings">
+      <UniqueIdentifier>{7611b74e-ed4f-469a-9ac8-eb7ce05b6942}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
