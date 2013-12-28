@@ -17,7 +17,7 @@
 #include "Macros.h"
 
 
-LONG GetClusterSize(TCHAR *Drive)
+LONG GetClusterSize(const TCHAR *Drive)
 {
 	DWORD SectorsPerCluster;
 	DWORD BytesPerSector;
@@ -27,7 +27,7 @@ LONG GetClusterSize(TCHAR *Drive)
 	return BytesPerSector * SectorsPerCluster;
 }
 
-LONG GetSectorSize(TCHAR *Drive)
+LONG GetSectorSize(const TCHAR *Drive)
 {
 	DWORD BytesPerSector;
 
@@ -49,7 +49,7 @@ TCHAR GetDriveNameFromMask(ULONG unitmask)
 	return (TCHAR)BitNum + 'A';
 }
 
-LONG GetFileSectorSize(TCHAR *FileName)
+LONG GetFileSectorSize(const TCHAR *FileName)
 {
 	LONG SectorSize;
 	LONG FileSize;

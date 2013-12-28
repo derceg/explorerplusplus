@@ -129,7 +129,7 @@ size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf)
 	StringCchCopy(pszFileSize,cchBuf,str.c_str());
 }
 
-int CreateFileTimeString(FILETIME *FileTime,
+int CreateFileTimeString(const FILETIME *FileTime,
 TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate)
 {
 	SYSTEMTIME SystemTime;
@@ -214,7 +214,7 @@ TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate)
 	return -1;
 }
 
-HRESULT GetBitmapDimensions(TCHAR *FileName,SIZE *BitmapSize)
+HRESULT GetBitmapDimensions(const TCHAR *FileName,SIZE *BitmapSize)
 {
 	HANDLE hFile;
 	HANDLE hMappedFile;
@@ -261,7 +261,7 @@ HRESULT GetBitmapDimensions(TCHAR *FileName,SIZE *BitmapSize)
 	return S_OK;
 }
 
-HINSTANCE StartCommandPrompt(TCHAR *Directory,bool Elevated)
+HINSTANCE StartCommandPrompt(const TCHAR *Directory,bool Elevated)
 {
 	HINSTANCE hNewInstance = NULL;
 
@@ -360,7 +360,7 @@ BOOL GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSi
 	return TRUE;
 }
 
-BOOL FileTimeToLocalSystemTime(LPFILETIME lpFileTime,LPSYSTEMTIME lpLocalTime)
+BOOL FileTimeToLocalSystemTime(const LPFILETIME lpFileTime,LPSYSTEMTIME lpLocalTime)
 {
 	SYSTEMTIME SystemTime;
 
@@ -369,7 +369,7 @@ BOOL FileTimeToLocalSystemTime(LPFILETIME lpFileTime,LPSYSTEMTIME lpLocalTime)
 	return SystemTimeToTzSpecificLocalTime(NULL,&SystemTime,lpLocalTime);
 }
 
-BOOL LocalSystemTimeToFileTime(LPSYSTEMTIME lpLocalTime,LPFILETIME lpFileTime)
+BOOL LocalSystemTimeToFileTime(const LPSYSTEMTIME lpLocalTime,LPFILETIME lpFileTime)
 {
 	SYSTEMTIME SystemTime;
 
@@ -378,7 +378,7 @@ BOOL LocalSystemTimeToFileTime(LPSYSTEMTIME lpLocalTime,LPFILETIME lpFileTime)
 	return SystemTimeToFileTime(&SystemTime,lpFileTime);
 }
 
-BOOL SetProcessTokenPrivilege(DWORD ProcessId,TCHAR *PrivilegeName,BOOL bEnablePrivilege)
+BOOL SetProcessTokenPrivilege(DWORD ProcessId,const TCHAR *PrivilegeName,BOOL bEnablePrivilege)
 {
 	HANDLE hProcess;
 	HANDLE hToken;
@@ -411,7 +411,7 @@ BOOL SetProcessTokenPrivilege(DWORD ProcessId,TCHAR *PrivilegeName,BOOL bEnableP
 	return Res;
 }
 
-BOOL CompareFileTypes(TCHAR *pszFile1,TCHAR *pszFile2)
+BOOL CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2)
 {
 	SHFILEINFO shfi1;
 	SHFILEINFO shfi2;
@@ -519,17 +519,17 @@ BOOL lShowWindow(HWND hwnd,BOOL bShowWindow)
 	return ShowWindow(hwnd,WindowShowState);
 }
 
-int GetRectHeight(RECT *rc)
+int GetRectHeight(const RECT *rc)
 {
 	return rc->bottom - rc->top;
 }
 
-int GetRectWidth(RECT *rc)
+int GetRectWidth(const RECT *rc)
 {
 	return rc->right - rc->left;
 }
 
-DWORD BuildFileAttributeString(TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize)
+DWORD BuildFileAttributeString(const TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize)
 {
 	HANDLE hFindFile;
 	WIN32_FIND_DATA wfd;
@@ -582,7 +582,7 @@ void EnterAttributeIntoString(BOOL bEnter,TCHAR *String,int Pos,TCHAR chAttribut
 		String[Pos] = '-';
 }
 
-size_t GetFileOwner(TCHAR *szFile,TCHAR *szOwner,DWORD BufSize)
+size_t GetFileOwner(const TCHAR *szFile,TCHAR *szOwner,DWORD BufSize)
 {
 	HANDLE hFile;
 	PSID pSid;
@@ -830,7 +830,7 @@ BOOL GetVersionInfoString(const TCHAR *szFileName,const TCHAR *szVersionInfo,TCH
 	return bRet;
 }
 
-DWORD GetNumFileHardLinks(TCHAR *lpszFileName)
+DWORD GetNumFileHardLinks(const TCHAR *lpszFileName)
 {
 	HANDLE hFile;
 	BY_HANDLE_FILE_INFORMATION FileInfo;
@@ -854,7 +854,7 @@ DWORD GetNumFileHardLinks(TCHAR *lpszFileName)
 	return FileInfo.nNumberOfLinks;
 }
 
-int ReadFileProperty(TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *lpszPropertyBuf,DWORD dwBufLen)
+int ReadFileProperty(const TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *lpszPropertyBuf,DWORD dwBufLen)
 {
 	HANDLE hFile;
 	TCHAR szCommentStreamName[512];
@@ -1087,7 +1087,7 @@ int SetFileProperty(TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *szNewValue)
 	return 0;
 }
 
-BOOL ReadImageProperty(TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen)
+BOOL ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen)
 {
 	Gdiplus::GdiplusStartupInput	StartupInput;
 	WCHAR				wszImage[MAX_PATH];
@@ -1355,7 +1355,7 @@ void WriteFileSlack(TCHAR *szFileName,void *pData,int iDataSize)
 	CloseHandle(hFile);
 }
 
-int ReadFileSlack(TCHAR *FileName,TCHAR *pszSlack,int iBufferLen)
+int ReadFileSlack(const TCHAR *FileName,TCHAR *pszSlack,int iBufferLen)
 {
 	HANDLE			hFile;
 	DWORD			FileSize;
@@ -1438,7 +1438,7 @@ int ReadFileSlack(TCHAR *FileName,TCHAR *pszSlack,int iBufferLen)
 	return nBytesRead;
 }
 
-BOOL GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,TCHAR *InitialDirectory)
+BOOL GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,const TCHAR *InitialDirectory)
 {
 	TCHAR *Filter = _T("Text Document (*.txt)\0*.txt\0All Files\0*.*\0\0");
 	OPENFILENAME ofn;
@@ -1699,7 +1699,7 @@ void RetrieveAdapterInfo(void)
 	}
 }
 
-BOOL IsImage(TCHAR *szFileName)
+BOOL IsImage(const TCHAR *szFileName)
 {
 	static TCHAR *ImageExts[10] = {_T("bmp"),_T("ico"),
 	_T("gif"),_T("jpg"),_T("exf"),_T("png"),_T("tif"),_T("wmf"),_T("emf"),_T("tiff")};
@@ -1911,7 +1911,7 @@ DWORD GetCurrentProcessImageName(TCHAR *szImageName,DWORD nSize)
 	return dwRet;
 }
 
-WORD GetFileLanguage(TCHAR *szFullFileName)
+WORD GetFileLanguage(const TCHAR *szFullFileName)
 {
 	LANGANDCODEPAGE	*plcp = NULL;
 	DWORD			dwLen;
@@ -1942,7 +1942,7 @@ WORD GetFileLanguage(TCHAR *szFullFileName)
 	return wLanguage;
 }
 
-BOOL GetFileProductVersion(TCHAR *szFullFileName,
+BOOL GetFileProductVersion(const TCHAR *szFullFileName,
 DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS)
 {
 	VS_FIXEDFILEINFO	*pvsffi = NULL;
@@ -2005,8 +2005,8 @@ void GetCPUBrandString(char *pszCPUBrand,UINT cchBuf)
 	StringCchCopyA(pszCPUBrand,cchBuf,szCPUBrand);
 }
 
-void ReplaceCharacterWithString(TCHAR *szBaseString,TCHAR *szOutput,
-UINT cchMax,TCHAR chToReplace,TCHAR *szReplacement)
+void ReplaceCharacterWithString(const TCHAR *szBaseString,TCHAR *szOutput,
+UINT cchMax,TCHAR chToReplace,const TCHAR *szReplacement)
 {
 	TCHAR szNewString[1024];
 	int iBase = 0;
@@ -2078,7 +2078,7 @@ TCHAR *ReplaceSubString(TCHAR *szString,TCHAR *szSubString,TCHAR *szReplacement)
 	return szDest;
 }
 
-HRESULT GetMediaMetadata(TCHAR *szFileName,LPCWSTR szAttribute,BYTE **pszOutput)
+HRESULT GetMediaMetadata(const TCHAR *szFileName,const TCHAR *szAttribute,BYTE **pszOutput)
 {
 	typedef HRESULT (WINAPI *WMCREATEEDITOR_PROC)(IWMMetadataEditor **);
 	WMCREATEEDITOR_PROC pWMCreateEditor = NULL;
@@ -2175,7 +2175,7 @@ void UpdateToolbarBandSizing(HWND hRebar,HWND hToolbar)
 	}
 }
 
-void MergeDateTime(SYSTEMTIME *pstOutput,SYSTEMTIME *pstDate,SYSTEMTIME *pstTime)
+void MergeDateTime(SYSTEMTIME *pstOutput,const SYSTEMTIME *pstDate,const SYSTEMTIME *pstTime)
 {
 	/* Date fields. */
 	pstOutput->wYear		= pstDate->wYear;

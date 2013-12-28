@@ -13,5 +13,5 @@ namespace NListView
 	void	ListView_SetBackgroundImage(HWND hListView,UINT uImage);
 	void	ListView_SwapItems(HWND hListView,int iItem1,int iItem2);
 	void	ListView_SwapItemsNolParam(HWND hListView,int iItem1,int iItem2);
-	void	ListView_HandleInsertionMark(HWND hListView,int iItemFocus,POINT *ppt);
+	void	ListView_HandleInsertionMark(HWND hListView,int iItemFocus,const POINT *ppt);
 }

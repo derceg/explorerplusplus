@@ -56,7 +56,7 @@ HRESULT GetIdlFromParsingName(const TCHAR *szParsingName,LPITEMIDLIST *pidl)
 	return hr;
 }
 
-HRESULT GetDisplayName(TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags)
+HRESULT GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags)
 {
 	if(szParsingPath == NULL ||
 		szDisplayName == NULL)
@@ -110,7 +110,7 @@ HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uF
 	return hr;
 }
 
-HRESULT GetItemAttributes(TCHAR *szItemParsingPath,SFGAOF *pItemAttributes)
+HRESULT GetItemAttributes(const TCHAR *szItemParsingPath,SFGAOF *pItemAttributes)
 {
 	if(szItemParsingPath == NULL ||
 		pItemAttributes == NULL)
@@ -248,7 +248,7 @@ BOOL IsNamespaceRoot(LPCITEMIDLIST pidl)
 	return bNamespaceRoot;
 }
 
-BOOL CheckIdl(LPITEMIDLIST pidl)
+BOOL CheckIdl(LPCITEMIDLIST pidl)
 {
 	LPITEMIDLIST	pidlCheck = NULL;
 	TCHAR			szTabText[MAX_PATH];
@@ -264,7 +264,7 @@ BOOL CheckIdl(LPITEMIDLIST pidl)
 	return TRUE;
 }
 
-BOOL IsIdlDirectory(LPITEMIDLIST pidl)
+BOOL IsIdlDirectory(LPCITEMIDLIST pidl)
 {
 	SFGAOF Attributes;
 
@@ -278,7 +278,7 @@ BOOL IsIdlDirectory(LPITEMIDLIST pidl)
 	return FALSE;
 }
 
-HRESULT DecodeFriendlyPath(TCHAR *szFriendlyPath,TCHAR *szParsingPath)
+HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath)
 {
 	LPITEMIDLIST pidl = NULL;
 	TCHAR szName[MAX_PATH];
@@ -919,7 +919,7 @@ i.e. of the form:
 ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}
 (My Computer GUID, Windows 7)
 */
-BOOL IsPathGUID(TCHAR *szPath)
+BOOL IsPathGUID(const TCHAR *szPath)
 {
 	if(szPath == NULL)
 	{
@@ -963,7 +963,7 @@ Basic procedure:
  5. If the path is a URL, pass it straight out, else
  6. If the path is relative, add it onto onto the current directory
 */
-void DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest)
+void DecodePath(const TCHAR *szInitialPath,const TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest)
 {
 	TCHAR szExpandedPath[MAX_PATH];
 	TCHAR szCanonicalPath[MAX_PATH];
@@ -1263,7 +1263,7 @@ will attempted to be loaded.
 Regardless of whether or not a DLL was actually
 loaded, the object will be initialized with a call
 to CoCreateInstance. */
-BOOL LoadIUnknownFromCLSID(IN TCHAR *szCLSID,
+BOOL LoadIUnknownFromCLSID(IN const TCHAR *szCLSID,
 OUT ContextMenuHandler_t *pContextMenuHandler)
 {
 	HKEY hCLSIDKey;

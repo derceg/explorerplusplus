@@ -455,7 +455,7 @@ void NListView::ListView_SwapItemsNolParam(HWND hListView,int iItem1,int iItem2)
 	ListView_SetCheckState(hListView,iItem2,bItem1Checked);
 }
 
-void NListView::ListView_HandleInsertionMark(HWND hListView,int iItemFocus,POINT *ppt)
+void NListView::ListView_HandleInsertionMark(HWND hListView,int iItemFocus,const POINT *ppt)
 {
 	/* Remove the insertion mark. */
 	if(ppt == NULL)

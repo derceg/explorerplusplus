@@ -19,12 +19,12 @@ struct ContextMenuHandler_t
 	IUnknown	*pUnknown;
 };
 
-void			DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest);
+void			DecodePath(const TCHAR *szInitialPath,const TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest);
 HRESULT			GetIdlFromParsingName(const TCHAR *szParsingName,LPITEMIDLIST *pidl);
-HRESULT			GetDisplayName(TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags);
+HRESULT			GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags);
 HRESULT			GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uFlags);
-BOOL			CheckIdl(LPITEMIDLIST pidl);
-BOOL			IsIdlDirectory(LPITEMIDLIST pidl);
+BOOL			CheckIdl(LPCITEMIDLIST pidl);
+BOOL			IsIdlDirectory(LPCITEMIDLIST pidl);
 void			GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath);
 HRESULT			GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent);
 BOOL			IsNamespaceRoot(LPCITEMIDLIST pidl);
@@ -35,10 +35,10 @@ BOOL			MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD
 HRESULT			BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN std::list<std::wstring> FilenameList);
 HRESULT			BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN LPCITEMIDLIST pidlDirectory,IN std::list<LPITEMIDLIST> pidlList);
 HRESULT			BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder);
-BOOL			IsPathGUID(TCHAR *szPath);
+BOOL			IsPathGUID(const TCHAR *szPath);
 BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
 void			SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,DVTARGETDEVICE *ptd,DWORD dwAspect,LONG lindex,DWORD tymed);
 HRESULT			AddJumpListTasks(std::list<JumpListTaskInformation> TaskList);
 BOOL			LoadContextMenuHandlers(IN const TCHAR *szRegKey,OUT std::list<ContextMenuHandler_t> *pContextMenuHandlers);
-BOOL			LoadIUnknownFromCLSID(IN TCHAR *szCLSID,OUT ContextMenuHandler_t *pContextMenuHandler);
+BOOL			LoadIUnknownFromCLSID(IN const TCHAR *szCLSID,OUT ContextMenuHandler_t *pContextMenuHandler);
 BOOL			CopyTextToClipboard(const std::wstring &str);
