@@ -1,5 +1,4 @@
-#ifndef CONTROLS_INCLUDED
-#define CONTROLS_INCLUDED
+#pragma once
 
 #include <windows.h>
 
@@ -11,5 +10,3 @@ extern HWND	CreateTabControl(HWND,UINT Style);
 extern HWND CreateToolbar(HWND hParent,DWORD dwStyle,DWORD dwExStyle);
 extern HWND	CreateTreeView(HWND,DWORD);
 extern int	ResizeStatusBar(HWND,int,int);
-
-#endif

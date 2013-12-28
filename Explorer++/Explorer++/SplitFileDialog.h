@@ -1,5 +1,4 @@
-#ifndef SPLITFILEDIALOG_INCLUDED
-#define SPLITFILEDIALOG_INCLUDED
+#pragma once
 
 #include <list>
 #include <string>
@@ -138,5 +137,3 @@ private:
 
 	CSplitFileDialogPersistentSettings	*m_psfdps;
 };
-
-#endif

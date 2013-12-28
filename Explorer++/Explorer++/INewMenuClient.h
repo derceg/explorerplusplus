@@ -1,5 +1,4 @@
-#ifndef INEWMENUCLIENT_INCLUDED
-#define INEWMENUCLIENT_INCLUDED
+#pragma once
 
 #include "Explorer++_internal.h"
 
@@ -35,5 +34,3 @@ private:
 	ULONG				m_RefCount;
 	IExplorerplusplus	*m_pexpp;
 };
-
-#endif

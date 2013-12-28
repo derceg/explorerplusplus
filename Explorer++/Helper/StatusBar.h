@@ -1,5 +1,4 @@
-#ifndef STATUSBAR_INCLUDED
-#define STATUSBAR_INCLUDED
+#pragma once
 
 #include <list>
 #include <string>
@@ -26,5 +25,3 @@ private:
 
 	bool			m_bAlteredStatusBarParts;
 };
-
-#endif

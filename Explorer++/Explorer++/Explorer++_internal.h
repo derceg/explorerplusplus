@@ -1,5 +1,4 @@
-﻿#ifndef EXPLORERINTERNAL_INCLUDED
-#define EXPLORERINTERNAL_INCLUDED
+﻿#pragma once
 
 #include <list>
 #include "../ShellBrowser/iShellView.h"
@@ -145,5 +144,3 @@ extern BOOL g_bForceLanguageLoad;
 extern TCHAR g_szLang[32];
 
 BOOL TestConfigFileInternal(void);
-
-#endif

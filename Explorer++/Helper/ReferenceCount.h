@@ -1,5 +1,4 @@
-#ifndef REFERENCECOUNT_INCLUDED
-#define REFERENCECOUNT_INCLUDED
+#pragma once
 
 __interface IReferenceCount
 {
@@ -21,5 +20,3 @@ private:
 
 	LONG	m_RefCount;
 };
-
-#endif

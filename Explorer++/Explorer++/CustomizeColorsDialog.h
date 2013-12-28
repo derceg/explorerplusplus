@@ -1,5 +1,4 @@
-#ifndef CUSTOMIZECOLORSDIALOG_INCLUDED
-#define CUSTOMIZECOLORSDIALOG_INCLUDED
+#pragma once
 
 #include <vector>
 #include "Explorer++_internal.h"
@@ -66,5 +65,3 @@ private:
 
 	CCustomizeColorsDialogPersistentSettings	*m_pccdps;
 };
-
-#endif

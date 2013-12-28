@@ -1,5 +1,4 @@
-#ifndef BOOKMARK_INCLUDED
-#define BOOKMARK_INCLUDED
+#pragma once
 
 #include <list>
 #include <vector>
@@ -232,5 +231,3 @@ private:
 
 	std::list<NBookmark::IBookmarkItemNotification *>	m_listObservers;
 };
-
-#endif

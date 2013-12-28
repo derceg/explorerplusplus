@@ -1,5 +1,4 @@
-#ifndef MERGEFILESDIALOG_INCLUDED
-#define MERGEFILESDIALOG_INCLUDED
+#pragma once
 
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
@@ -90,5 +89,3 @@ private:
 
 	CMergeFilesDialogPersistentSettings	*m_pmfdps;
 };
-
-#endif

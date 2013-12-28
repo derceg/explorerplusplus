@@ -1,5 +1,4 @@
-#ifndef MASSRENAMEDIALOG_INCLUDED
-#define MASSRENAMEDIALOG_INCLUDED
+#pragma once
 
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
@@ -76,5 +75,3 @@ private:
 
 	CMassRenameDialogPersistentSettings	*m_pmrdps;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef HOLDERWINDOWINTERNAL_INCLUDED
-#define HOLDERWINDOWINTERNAL_INCLUDED
+#pragma once
 
 /* Used for testing what version of Windows we're running on. */
 #define WINDOWS_VISTA_MAJORVERSION	6
@@ -26,5 +25,3 @@ private:
 	DWORD	m_dwMajorVersion;
 	BOOL	m_bHolderResizing;
 };
-
-#endif

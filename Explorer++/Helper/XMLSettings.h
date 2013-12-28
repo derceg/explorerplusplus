@@ -1,5 +1,4 @@
-#ifndef XMLSETTINGS_INCLUDED
-#define XMLSETTINGS_INCLUDED
+#pragma once
 
 #import <msxml3.dll> raw_interfaces_only
 
@@ -21,5 +20,3 @@ namespace NXMLSettings
 	Gdiplus::Color	ReadXMLColorData2(MSXML2::IXMLDOMNode *pNode);
 	HFONT	ReadXMLFontData(MSXML2::IXMLDOMNode *pNode);
 }
-
-#endif

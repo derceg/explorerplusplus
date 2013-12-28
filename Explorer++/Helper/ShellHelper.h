@@ -1,5 +1,4 @@
-#ifndef SHELLHELPER_INCLUDED
-#define SHELLHELPER_INCLUDED
+#pragma once
 
 #include <list>
 
@@ -43,5 +42,3 @@ HRESULT			AddJumpListTasks(std::list<JumpListTaskInformation> TaskList);
 BOOL			LoadContextMenuHandlers(IN const TCHAR *szRegKey,OUT std::list<ContextMenuHandler_t> *pContextMenuHandlers);
 BOOL			LoadIUnknownFromCLSID(IN TCHAR *szCLSID,OUT ContextMenuHandler_t *pContextMenuHandler);
 BOOL			CopyTextToClipboard(const std::wstring &str);
-
-#endif

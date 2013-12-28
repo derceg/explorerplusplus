@@ -1,5 +1,4 @@
-#ifndef DISPLAYCOLOURSDIALOG_INCLUDED
-#define DISPLAYCOLOURSDIALOG_INCLUDED
+#pragma once
 
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -93,5 +92,3 @@ private:
 
 	CDisplayColoursDialogPersistentSettings	*m_pdcdps;
 };
-
-#endif

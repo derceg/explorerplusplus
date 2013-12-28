@@ -1,5 +1,4 @@
-#ifndef HELPER_INCLUDED
-#define HELPER_INCLUDED
+#pragma once
 
 #include <windows.h>
 #include <winioctl.h>
@@ -226,5 +225,3 @@ void			TrimStringLeft(std::wstring &str,const std::wstring &strWhitespace);
 void			TrimStringRight(std::wstring &str,const std::wstring &strWhitespace);
 void			TrimString(std::wstring &str,const std::wstring &strWhitespace);
 void			AddStyleToToolbar(UINT *fStyle,UINT fStyleToAdd);
-
-#endif

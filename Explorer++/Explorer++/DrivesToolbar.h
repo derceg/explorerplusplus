@@ -1,5 +1,4 @@
-#ifndef DRIVESTOOLBAR_INCLUDED
-#define DRIVESTOOLBAR_INCLUDED
+#pragma once
 
 #include <list>
 #include <unordered_map>
@@ -70,5 +69,3 @@ private:
 	std::unordered_map<IDCounter,std::wstring> m_mapID;
 	IDCounter	m_IDCounter;
 };
-
-#endif

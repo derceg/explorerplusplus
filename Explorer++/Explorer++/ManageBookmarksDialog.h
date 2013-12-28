@@ -1,5 +1,4 @@
-#ifndef MANAGEBOOKMARKSDIALOG_INCLUDED
-#define MANAGEBOOKMARKSDIALOG_INCLUDED
+#pragma once
 
 #include "BookmarkHelper.h"
 #include "../Helper/BaseDialog.h"
@@ -172,5 +171,3 @@ private:
 
 	CManageBookmarksDialogPersistentSettings	*m_pmbdps;
 };
-
-#endif

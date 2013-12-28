@@ -1,5 +1,4 @@
-#ifndef IDROPFILESCALLBACK_INCLUDED
-#define IDROPFILESCALLBACK_INCLUDED
+#pragma once
 
 #include "Explorer++_internal.h"
 #include "../Helper/DropHandler.h"
@@ -24,5 +23,3 @@ private:
 	ULONG				m_RefCount;
 	IExplorerplusplus	*m_pexpp;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef BOOKMARKIPHELPER_INCLUDED
-#define BOOKMARKIPHELPER_INCLUDED
+#pragma once
 
 #include "Explorer++_internal.h"
 #include "../Helper/Bookmark.h"
@@ -83,5 +82,3 @@ private:
 
 	NBookmarkIPHelper::IPBookmarkNotificationSet *m_pipbns;
 };
-
-#endif

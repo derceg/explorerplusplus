@@ -1,5 +1,4 @@
-#ifndef ISHELLVIEW2_INCLUDED
-#define ISHELLVIEW2_INCLUDED
+#pragma once
 
 #include "Explorer++_internal.h"
 
@@ -43,5 +42,3 @@ private:
 	ULONG				m_RefCount;
 	IExplorerplusplus	*m_pexpp;
 };
-
-#endif

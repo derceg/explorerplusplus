@@ -1,5 +1,4 @@
-#ifndef BOOKMARKSTOOLBAR_INCLUDED
-#define BOOKMARKSTOOLBAR_INCLUDED
+#pragma once
 
 #include "../Helper/Bookmark.h"
 
@@ -95,5 +94,3 @@ private:
 
 	CBookmarksToolbarDropHandler	*m_pbtdh;
 };
-
-#endif

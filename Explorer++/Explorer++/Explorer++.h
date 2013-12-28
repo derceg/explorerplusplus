@@ -1,5 +1,4 @@
-#ifndef EXPLORER_INCLUDED
-#define EXPLORER_INCLUDED
+#pragma once
 
 #include "Explorer++_internal.h"
 #include "BoostCheck.h"
@@ -1031,5 +1030,3 @@ private:
 
 	BOOL					m_bBlockNext;
 };
-
-#endif

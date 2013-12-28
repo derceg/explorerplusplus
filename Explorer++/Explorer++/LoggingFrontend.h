@@ -1,10 +1,7 @@
-#ifndef LOGGINGFRONTEND_INCLUDED
-#define LOGGINGFRONTEND_INCLUDED
+#pragma once
 
 namespace NLoggingFrontend
 {
 	bool CheckLoggingEnabled();
 	void EnableLogging(bool Enable);
 }
-
-#endif

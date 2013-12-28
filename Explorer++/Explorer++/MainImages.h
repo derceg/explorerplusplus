@@ -1,5 +1,4 @@
-#ifndef MAIN_IMAGES_INCLUDED
-#define MAIN_IMAGES_INCLUDED
+#pragma once
 
 /* These define the order of the images
 within the shell bitmap resource. The
@@ -40,5 +39,3 @@ bitmap). */
 #define SHELLIMAGES_PASTESHORTCUT		30
 #define SHELLIMAGES_DELETEPERMANENTLY	31
 #define SHELLIMAGES_CMDADMIN			32
-
-#endif

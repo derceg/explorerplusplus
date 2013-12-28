@@ -1,5 +1,4 @@
-#ifndef APPLICATIONTOOLBARBUTTONDIALOG_INCLUDED
-#define APPLICATIONTOOLBARBUTTONDIALOG_INCLUDED
+#pragma once
 
 #include "ApplicationToolbar.h"
 #include "../Helper/BaseDialog.h"
@@ -28,5 +27,3 @@ private:
 	ApplicationButton_t	*m_Button;
 	bool				m_IsNew;
 };
-
-#endif

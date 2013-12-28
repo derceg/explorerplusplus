@@ -1,5 +1,4 @@
-#ifndef DROPHANDLER_INCLUDED
-#define DROPHANDLER_INCLUDED
+#pragma once
 
 #include <list>
 #include "Helper.h"
@@ -77,5 +76,3 @@ private:
 	TCHAR				*m_szDestDirectory;
 	BOOL				m_bRenameOnCollision;
 };
-
-#endif

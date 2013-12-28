@@ -1,5 +1,4 @@
-#ifndef MESSAGEFORWARDER_INCLUDED
-#define MESSAGEFORWARDER_INCLUDED
+#pragma once
 
 class CMessageForwarder
 {
@@ -49,5 +48,3 @@ private:
 	WPARAM			m_wParam;
 	LPARAM			m_lParam;
 };
-
-#endif

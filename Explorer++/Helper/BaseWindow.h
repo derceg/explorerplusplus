@@ -1,5 +1,4 @@
-#ifndef BASEWINDOW_INCLUDED
-#define BASEWINDOW_INCLUDED
+#pragma once
 
 #include "MessageForwarder.h"
 
@@ -20,5 +19,3 @@ private:
 
 	LRESULT CALLBACK BaseWindowProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 };
-
-#endif

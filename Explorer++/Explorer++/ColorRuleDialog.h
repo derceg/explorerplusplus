@@ -1,5 +1,4 @@
-#ifndef COLORRULEDIALOG_INCLUDED
-#define COLORRULEDIALOG_INCLUDED
+#pragma once
 
 #include "CustomizeColorsDialog.h"
 #include "../Helper/BaseDialog.h"
@@ -70,5 +69,3 @@ private:
 
 	CColorRuleDialogPersistentSettings	*m_pcrdps;
 };
-
-#endif

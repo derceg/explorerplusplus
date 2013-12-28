@@ -1,5 +1,4 @@
-#ifndef PATHMANAGER_INCLUDED
-#define PATHMANAGER_INCLUDED
+#pragma once
 
 #include <list>
 
@@ -39,5 +38,3 @@ private:
 
 	LPITEMIDLIST *ppidlList;
 };
-
-#endif

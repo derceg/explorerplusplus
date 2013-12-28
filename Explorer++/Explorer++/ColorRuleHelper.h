@@ -1,5 +1,4 @@
-#ifndef COLORRULEHELPER_INCLUDED
-#define COLORRULEHELPER_INCLUDED
+#pragma once
 
 #import <msxml3.dll> raw_interfaces_only
 
@@ -25,5 +24,3 @@ namespace NColorRuleHelper
 	void	LoadColorRulesFromXML(MSXML2::IXMLDOMDocument *pXMLDom,std::vector<ColorRule_t> &ColorRules);
 	void	SaveColorRulesToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot,const std::vector<ColorRule_t> &ColorRules);
 }
-
-#endif

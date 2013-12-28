@@ -1,5 +1,4 @@
-#ifndef SETDEFAULTCOLUMNSDIALOG_INCLUDED
-#define SETDEFAULTCOLUMNSDIALOG_INCLUDED
+#pragma once
 
 #include <unordered_map>
 #include "../Helper/BaseDialog.h"
@@ -102,6 +101,3 @@ private:
 
 	CSetDefaultColumnsDialogPersistentSettings	*m_psdcdps;
 };
-
-
-#endif

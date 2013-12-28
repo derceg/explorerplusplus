@@ -1,5 +1,4 @@
-#ifndef MYTREEVIEWINTERNAL_INCLUDED
-#define MYTREEVIEWINTERNAL_INCLUDED
+#pragma once
 
 #define DEFAULT_ITEM_ALLOCATION		100
 
@@ -19,5 +18,3 @@ typedef struct
 	LPITEMIDLIST	pidlFull;
 	HTREEITEM		hItem;
 } TreeViewInfo_t;
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef RENAMETABDIALOG_INCLUDED
-#define RENAMETABDIALOG_INCLUDED
+#pragma once
 
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -54,5 +53,3 @@ private:
 	int		m_iTab;
 	TCHAR	m_szTabName[256];
 };
-
-#endif

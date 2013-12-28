@@ -1,5 +1,4 @@
-#ifndef REGISTRYSETTINGS_INCLUDED
-#define REGISTRYSETTINGS_INCLUDED
+#pragma once
 
 #include <tchar.h>
 
@@ -13,5 +12,3 @@ namespace NRegistrySettings
 	LONG	SaveStringListToRegistry(HKEY hKey,const TCHAR *szBaseKeyName,const std::list<std::wstring> &strList);
 	LONG	ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBaseKeyName,std::list<std::wstring> &strList);
 }
-
-#endif

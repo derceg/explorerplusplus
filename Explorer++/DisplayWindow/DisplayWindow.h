@@ -1,5 +1,4 @@
-#ifndef DISPLAY_INCLUDED
-#define DISPLAY_INCLUDED
+#pragma once
 
 #include <gdiplus.h>
 #include <vector>
@@ -148,5 +147,3 @@ private:
 };
 
 HWND CreateDisplayWindow(HWND Parent,DWInitialSettings_t *pSettings);
-
-#endif

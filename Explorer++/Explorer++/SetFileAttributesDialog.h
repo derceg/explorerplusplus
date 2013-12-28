@@ -1,5 +1,4 @@
-#ifndef SETFILEATTRIBUTES_INCLUDED
-#define SETFILEATTRIBUTES_INCLUDED
+#pragma once
 
 #include <list>
 #include "../Helper/BaseDialog.h"
@@ -96,5 +95,3 @@ private:
 	BOOL	m_bCreationDateEnabled;
 	BOOL	m_bAccessDateEnabled;
 };
-
-#endif

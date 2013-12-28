@@ -1,5 +1,4 @@
-#ifndef WILDCARDSELECT_INCLUDED
-#define WILDCARDSELECT_INCLUDED
+#pragma once
 
 #include <list>
 #include <string>
@@ -76,5 +75,3 @@ private:
 
 	CWildcardSelectDialogPersistentSettings	*m_pwsdps;
 };
-
-#endif

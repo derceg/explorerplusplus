@@ -1,5 +1,4 @@
-#ifndef BASEDIALOG_INCLUDED
-#define BASEDIALOG_INCLUDED
+#pragma once
 
 #include "ResizableDialog.h"
 #include "MessageForwarder.h"
@@ -62,5 +61,3 @@ private:
 	int				m_iMinHeight;
 	CResizableDialog	*m_prd;
 };
-
-#endif

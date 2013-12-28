@@ -1,5 +1,4 @@
-#ifndef APPLICATIONTOOLBAR_INCLUDED
-#define APPLICATIONTOOLBAR_INCLUDED
+#pragma once
 
 #include <vector>
 #include "Explorer++_internal.h"
@@ -104,5 +103,3 @@ private:
 
 	CApplicationToolbarPersistentSettings	*m_atps;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef LISTVIEWHELPER_INCLUDED
-#define LISTVIEWHELPER_INCLUDED
+#pragma once
 
 namespace NListView
 {
@@ -16,5 +15,3 @@ namespace NListView
 	void	ListView_SwapItemsNolParam(HWND hListView,int iItem1,int iItem2);
 	void	ListView_HandleInsertionMark(HWND hListView,int iItemFocus,POINT *ppt);
 }
-
-#endif

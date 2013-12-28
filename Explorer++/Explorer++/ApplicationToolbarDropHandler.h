@@ -1,5 +1,4 @@
-#ifndef APPLICATIONTOOLBARDROPHANDLER_INCLUDED
-#define APPLICATIONTOOLBARDROPHANDLER_INCLUDED
+#pragma once
 
 #include "ApplicationToolbar.h"
 
@@ -38,5 +37,3 @@ private:
 	IDragSourceHelper	*m_pDragSourceHelper;
 	IDropTargetHelper	*m_pDropTargetHelper;
 };
-
-#endif

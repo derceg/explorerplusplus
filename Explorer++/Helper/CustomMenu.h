@@ -1,5 +1,4 @@
-#ifndef CUSTOMMENU_INCLUDED
-#define CUSTOMMENU_INCLUDED
+#pragma once
 
 /* ALL custom menu item's must
 have this data structure attached. */
@@ -27,5 +26,3 @@ private:
 	HMENU m_hMenu;
 	HIMAGELIST m_himl;
 };
-
-#endif

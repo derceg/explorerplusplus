@@ -1,5 +1,4 @@
-#ifndef LISTVIEW_INCLUDED
-#define LISTVIEW_INCLUDED
+#pragma once
 
 #include "../Helper/BaseWindow.h"
 
@@ -37,5 +36,3 @@ private:
 	RenameStage_t		m_RenameStage;
 	bool				m_BeginRename;
 };
-
-#endif

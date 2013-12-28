@@ -1,5 +1,4 @@
-#ifndef SETDEFAULTFILEMANAGER_INCLUDED
-#define SETDEFAULTFILEMANAGER_INCLUDED
+#pragma once
 
 namespace NDefaultFileManager
 {
@@ -15,5 +14,3 @@ namespace NDefaultFileManager
 	BOOL	RemoveAsDefaultFileManagerFileSystem(const TCHAR *szInternalCommand);
 	BOOL	RemoveAsDefaultFileManagerAll(const TCHAR *szInternalCommand);
 }
-
-#endif

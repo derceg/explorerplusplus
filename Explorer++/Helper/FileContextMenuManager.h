@@ -1,5 +1,4 @@
-#ifndef FILECONTEXTMENUMANAGER_INCLUDED
-#define FILECONTEXTMENUMANAGER_INCLUDED
+#pragma once
 
 #include <list>
 #include "StatusBar.h"
@@ -52,5 +51,3 @@ private:
 	LPITEMIDLIST		m_pidlParent;
 	std::list<LPITEMIDLIST>	m_pidlItemList;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef DEFAULT_COLUMNS_INCLUDED
-#define DEFAULT_COLUMNS_INCLUDED
+#pragma once
 
 #include "../ShellBrowser/iShellView.h"
 
@@ -95,5 +94,3 @@ static const Column_t NETWORK_CONNECTIONS_DEFAULT_COLUMNS[] =
 static const Column_t MY_NETWORK_PLACES_DEFAULT_COLUMNS[] =
 {{CM_NAME, TRUE, DEFAULT_COLUMN_WIDTH},
 {CM_VIRTUALCOMMENTS, TRUE, DEFAULT_COLUMN_WIDTH}};
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef HARDWARECHANGENOTIFIER_INCLUDED
-#define HARDWARECHANGENOTIFIER_INCLUDED
+#pragma once
 
 #include <list>
 
@@ -41,5 +40,3 @@ private:
 
 	std::list<NHardwareChangeNotifier::INotification *>	m_Observers;
 };
-
-#endif

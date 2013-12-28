@@ -1,5 +1,4 @@
-#ifndef DIALOGSETTINGS_INCLUDED
-#define DIALOGSETTINGS_INCLUDED
+#pragma once
 
 #include <list>
 #include <string>
@@ -49,5 +48,3 @@ private:
 
 	bool			m_bSavePosition;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef COMBOBOX_INCLUDED
-#define COMBOBOX_INCLUDED
+#pragma once
 
 #include "BaseWindow.h"
 
@@ -35,5 +34,3 @@ private:
 
 	bool	m_SuppressAutocomplete;
 };
-
-#endif

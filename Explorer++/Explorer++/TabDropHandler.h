@@ -1,5 +1,4 @@
-#ifndef TABDROPHANDLER_INCLUDED
-#define TABDROPHANDLER_INCLUDED
+#pragma once
 
 #include "TabContainer.h"
 #include "../Helper/DropHandler.h"
@@ -49,5 +48,3 @@ private:
 	DragTypes_t			m_DragType;
 	std::wstring		m_RepresentativeDrive;
 };
-
-#endif

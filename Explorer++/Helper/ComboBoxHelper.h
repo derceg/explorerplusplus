@@ -1,9 +1,6 @@
-#ifndef COMBOBOXHELPER_INCLUDED
-#define COMBOBOXHELPER_INCLUDED
+#pragma once
 
 namespace NComboBox
 {
 	std::list<std::wstring>	ComboBox_GetStrings(HWND hComboBox);
 }
-
-#endif

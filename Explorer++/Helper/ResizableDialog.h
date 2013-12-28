@@ -1,5 +1,4 @@
-#ifndef RESIZABLEDIALOG_INCLUDED
-#define RESIZABLEDIALOG_INCLUDED
+#pragma once
 
 #include <list>
 
@@ -54,5 +53,3 @@ private:
 	HWND	m_hDlg;
 	std::list<ControlInternal_t> m_ControlList;
 };
-
-#endif

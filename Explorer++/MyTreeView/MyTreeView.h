@@ -1,5 +1,4 @@
-#ifndef TREEVIEW_INCLUDED
-#define TREEVIEW_INCLUDED
+#pragma once
 
 #include <commctrl.h>
 #include <shlwapi.h>
@@ -201,5 +200,3 @@ typedef struct
 
 	IShellFolder	*pShellFolder;
 } ThreadInfo_t;
-
-#endif

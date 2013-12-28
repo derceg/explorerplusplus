@@ -1,5 +1,4 @@
-#ifndef TABCONTAINER_INCLUDED
-#define TABCONTAINER_INCLUDED
+#pragma once
 
 #include "Explorer++_internal.h"
 #include "../ShellBrowser/iShellView.h"
@@ -26,5 +25,3 @@ private:
 	CShellBrowser		**m_pShellBrowsers;
 	IExplorerplusplus	*m_pexpp;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef SHELLVIEW_INCLUDED
-#define SHELLVIEW_INCLUDED
+#pragma once
 
 #include <list>
 #include "iPathManager.h"
@@ -864,5 +863,3 @@ private:
 	BOOL				m_bApplyFilter;
 	BOOL				m_bFilterCaseSensitive;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef DIRECTORYMONITOR_INCLUDED
-#define DIRECTORYMONITOR_ICLUDED
+#pragma once
 
 #include <windows.h>
 
@@ -17,5 +16,3 @@ __interface IDirectoryMonitor : IUnknown
 };
 
 HRESULT CreateDirectoryMonitor(IDirectoryMonitor **pDirectoryMonitor);
-
-#endif

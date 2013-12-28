@@ -1,5 +1,4 @@
-#ifndef ADDBOOKMARKDIALOG_INCLUDED
-#define ADDBOOKMARKDIALOG_INCLUDED
+#pragma once
 
 #include <unordered_set>
 #include "BookmarkHelper.h"
@@ -101,5 +100,3 @@ private:
 
 	CAddBookmarkDialogPersistentSettings	*m_pabdps;
 };
-
-#endif

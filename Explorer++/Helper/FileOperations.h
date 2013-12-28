@@ -1,5 +1,4 @@
-#ifndef FILEOPERATIONS_INCLUDED
-#define FILEOPERATIONS_INCLUDED
+#pragma once
 
 #include <list>
 
@@ -35,5 +34,3 @@ HRESULT	CopyFilesToClipboard(std::list<std::wstring> FileNameList,BOOL bMove,IDa
 
 int		PasteLinksToClipboardFiles(TCHAR *szDestination);
 int		PasteHardLinks(TCHAR *szDestination);
-
-#endif

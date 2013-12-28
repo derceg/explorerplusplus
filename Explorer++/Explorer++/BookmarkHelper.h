@@ -1,5 +1,4 @@
-#ifndef BOOKMARKHELPER_INCLUDED
-#define BOOKMARKHELPER_INCLUDED
+#pragma once
 
 #include <unordered_set>
 #include <unordered_map>
@@ -110,5 +109,3 @@ private:
 	std::unordered_map<UINT,GUID>	m_mapID;
 	UINT							m_uIDCounter;
 };
-
-#endif

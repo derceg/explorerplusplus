@@ -1,5 +1,4 @@
-#ifndef IMODELESSDIALOGNOTIFICATION_INCLUDED
-#define IMODELESSDIALOGNOTIFICATION_INCLUDED
+#pragma once
 
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ReferenceCount.h"
@@ -21,5 +20,3 @@ private:
 
 	ULONG m_RefCount;
 };
-
-#endif

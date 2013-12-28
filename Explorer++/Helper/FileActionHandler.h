@@ -1,5 +1,4 @@
-#ifndef FILEACTIONHANDLER_INCLUDED
-#define FILEACTIONHANDLER_INCLUDED
+#pragma once
 
 #include <stack>
 
@@ -47,5 +46,3 @@ private:
 
 	std::stack<UndoItem_t>	stackFileActions;
 };
-
-#endif

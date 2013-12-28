@@ -1,5 +1,4 @@
-#ifndef NEWBOOKMARKFOLDERDIALOG_INCLUDED
-#define NEWBOOKMARKFOLDERDIALOG_INCLUDED
+#pragma once
 
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
@@ -48,5 +47,3 @@ private:
 
 	CNewBookmarkFolderDialogPersistentSettings	*m_pnbfdps;
 };
-
-#endif

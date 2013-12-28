@@ -1,5 +1,4 @@
-#ifndef HELPFILEMISSINGDIALOG_INCLUDED
-#define HELPFILEMISSINGDIALOG_INCLUDED
+#pragma once
 
 #include "../Helper/BaseDialog.h"
 
@@ -17,5 +16,3 @@ protected:
 	INT_PTR	OnNotify(NMHDR *pnmhdr);
 	INT_PTR	OnClose();
 };
-
-#endif

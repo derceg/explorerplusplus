@@ -1,5 +1,4 @@
-#ifndef CONTEXTMENUMANAGER_INCLUDED
-#define CONTEXTMENUMANAGER_INCLUDED
+#pragma once
 
 #include <list>
 #include <ShObjIdl.h>
@@ -81,5 +80,3 @@ private:
 	UINT							m_uMaxID;
 	CStatusBar						*m_pStatusBar;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef ABOUTDIALOG_INCLUDED
-#define ABOUTDIALOG_INCLUDED
+#pragma once
 
 #include "../Helper/BaseDialog.h"
 
@@ -21,5 +20,3 @@ private:
 
 	HICON	m_hIcon;
 };
-
-#endif

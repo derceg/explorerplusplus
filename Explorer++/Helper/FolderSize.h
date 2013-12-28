@@ -1,5 +1,4 @@
-#ifndef FOLDERSIZE_INCLUDED
-#define FOLDERSIZE_INCLUDED
+#pragma once
 
 typedef struct
 {
@@ -11,5 +10,3 @@ typedef struct
 
 DWORD WINAPI	Thread_CalculateFolderSize(LPVOID lpParameter);
 HRESULT			CalculateFolderSize(TCHAR *szPath,int *nFolders,int *nFiles,PULARGE_INTEGER lTotalFolderSize);
-
-#endif

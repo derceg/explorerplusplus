@@ -1,5 +1,4 @@
-#ifndef DESTROYFILESDIALOG_INCLUDED
-#define DESTROYFILESDIALOG_INCLUDED
+#pragma once
 
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
@@ -73,5 +72,3 @@ private:
 
 	BOOL	m_bShowFriendlyDates;
 };
-
-#endif

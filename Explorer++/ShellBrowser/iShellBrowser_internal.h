@@ -1,5 +1,4 @@
-#ifndef SHELLBROWSER_INTERNAL_INCLUDED
-#define SHELLBROWSER_INTERNAL_INCLUDED
+#pragma once
 
 #include "../Helper/Helper.h"
 #include "../Helper/FileOperations.h"
@@ -75,5 +74,3 @@ extern BOOL g_bcsThumbnailInitialized;
 void CALLBACK	FindThumbnailAPC(ULONG_PTR dwParam);
 
 void CALLBACK SetAllFolderSizeColumnDataAPC(ULONG_PTR dwParam);
-
-#endif

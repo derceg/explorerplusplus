@@ -1,9 +1,6 @@
-#ifndef XML_SETTINGS_INCLUDED
-#define XML_SETTINGS_INCLUDED
+#pragma once
 
 #include <Windows.h>
 
 BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl);
 BOOL LoadAllowMultipleInstancesFromXML(void);
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef FILTERDIALOG_INCLUDED
-#define FILTERDIALOG_INCLUDED
+#pragma once
 
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
@@ -68,5 +67,3 @@ private:
 
 	CFilterDialogPersistentSettings	*m_pfdps;
 };
-
-#endif

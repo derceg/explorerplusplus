@@ -1,5 +1,4 @@
-#ifndef SEARCHDIALOG_INCLUDED
-#define SEARCHDIALOG_INCLUDED
+#pragma once
 
 #include <list>
 #include <vector>
@@ -201,5 +200,3 @@ private:
 
 	CSearchDialogPersistentSettings	*m_sdps;
 };
-
-#endif

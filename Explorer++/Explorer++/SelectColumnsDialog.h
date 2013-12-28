@@ -1,5 +1,4 @@
-#ifndef SELECTCOLUMNSDIALOG_INCLUDED
-#define SELECTCOLUMNSDIALOG_INCLUDED
+#pragma once
 
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
@@ -60,5 +59,3 @@ private:
 
 	CSelectColumnsDialogPersistentSettings	*m_pscdps;
 };
-
-#endif
