@@ -72,9 +72,9 @@ HRESULT GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFl
 	if(SUCCEEDED(hr))
 	{
 		hr = GetDisplayName(pidl,szDisplayName,uFlags);
-	}
 
-	CoTaskMemFree(pidl);
+		CoTaskMemFree(pidl);
+	}
 
 	return hr;
 }
