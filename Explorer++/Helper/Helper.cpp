@@ -214,53 +214,6 @@ TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate)
 	return -1;
 }
 
-HRESULT GetBitmapDimensions(const TCHAR *FileName,SIZE *BitmapSize)
-{
-	HANDLE hFile;
-	HANDLE hMappedFile;
-	BITMAPFILEHEADER *BitmapFileHeader;
-	BITMAPINFOHEADER *BitmapInfoHeader;
-	LPVOID Address;
-
-	if((FileName == NULL) || (BitmapSize == NULL))
-		return E_INVALIDARG;
-
-	hFile = CreateFile(FileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,0,NULL);
-
-	if(hFile == INVALID_HANDLE_VALUE)
-		return E_FAIL;
-
-	hMappedFile = CreateFileMapping(hFile,NULL,PAGE_READONLY,0,0,_T("MappedFile"));
-
-	if(hMappedFile == NULL)
-	{
-		CloseHandle(hFile);
-		return E_FAIL;
-	}
-
-	Address = MapViewOfFile(hMappedFile,FILE_MAP_READ,0,0,0);
-
-	if(Address == NULL)
-	{
-		CloseHandle(hFile);
-		CloseHandle(hMappedFile);
-		return E_FAIL;
-	}
-
-	BitmapInfoHeader = (BITMAPINFOHEADER *)(LPBYTE)((TCHAR *)Address + sizeof(BITMAPFILEHEADER));
-
-	BitmapFileHeader = (BITMAPFILEHEADER *)(LPBYTE)Address;
-
-	BitmapSize->cx = BitmapInfoHeader->biWidth;
-	BitmapSize->cy = BitmapInfoHeader->biHeight;
-
-	CloseHandle(hFile);
-	UnmapViewOfFile(Address);
-	CloseHandle(hMappedFile);
-
-	return S_OK;
-}
-
 HINSTANCE StartCommandPrompt(const TCHAR *Directory,bool Elevated)
 {
 	HINSTANCE hNewInstance = NULL;
@@ -423,47 +376,6 @@ BOOL CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2)
 		return TRUE;
 
 	return FALSE;
-}
-
-BOOL SetFileSparse(TCHAR *szFileName)
-{
-	HANDLE hFile;
-	DWORD NumBytesReturned;
-	BOOL res;
-
-	hFile = CreateFile(szFileName,FILE_WRITE_DATA,0,
-	NULL,OPEN_EXISTING,NULL,NULL);
-
-	if(hFile == INVALID_HANDLE_VALUE)
-		return FALSE;
-
-	res = DeviceIoControl(hFile,FSCTL_SET_SPARSE,NULL,0,
-	NULL,0,&NumBytesReturned,NULL);
-
-	CloseHandle(hFile);
-
-	return res;
-}
-
-void CheckItem(HWND hwnd,BOOL bCheck)
-{
-	DWORD CheckState;
-
-	if(bCheck)
-		CheckState = BST_CHECKED;
-	else
-		CheckState = BST_UNCHECKED;
-
-	SendMessage(hwnd,BM_SETCHECK,(WPARAM)CheckState,(LPARAM)0);
-}
-
-BOOL IsItemChecked(HWND hwnd)
-{
-	LRESULT CheckState;
-
-	CheckState = SendMessage(hwnd,BM_GETCHECK,0,0);
-
-	return (CheckState == BST_CHECKED) ? TRUE : FALSE;
 }
 
 TCHAR *PrintComma(unsigned long nPrint)
@@ -972,121 +884,6 @@ int ReadFileProperty(const TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *lpszP
 	return dwPropertyLength;
 }
 
-typedef struct
-{
-	DWORD Id;
-	DWORD Offset;
-} PropertyDeclarations_t;
-
-int SetFileProperty(TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *szNewValue)
-{
-	HANDLE hFile;
-	PropertyDeclarations_t *pPropertyDeclarations = NULL;
-	TCHAR szCommentStreamName[512];
-	DWORD dwNumBytesRead;
-	DWORD dwSectionLength;
-	DWORD dwPropertyCount;
-	DWORD dwPropertyMarker;
-	DWORD dwSectionOffset;
-	DWORD dwNumBytesWritten;
-	BOOL bFound = FALSE;
-	unsigned int i = 0;
-	TCHAR szBuf[512];
-	int iPropertyNumber;
-
-	StringCchPrintf(szCommentStreamName,SIZEOF_ARRAY(szCommentStreamName),
-	_T("%s:%cSummaryInformation"),lpszFileName,0x5);
-	hFile = CreateFile(szCommentStreamName,GENERIC_READ,FILE_SHARE_READ,NULL,
-	OPEN_EXISTING,NULL,NULL);
-
-	if(hFile == INVALID_HANDLE_VALUE)
-		return -1;
-
-	/*Constant offset.*/
-	SetFilePointer(hFile,0x2C,0,FILE_CURRENT);
-
-	/*Read out the section offset (the SummaryInformation stream only has one offset anyway...).*/
-	ReadFile(hFile,(LPBYTE)&dwSectionOffset,sizeof(dwSectionOffset),&dwNumBytesRead,NULL);
-
-	/*The secion offset is from the start of the stream. Go back to the start of the stream,
-	and then go to the start of the section.*/
-	SetFilePointer(hFile,0,0,FILE_BEGIN);
-
-	/* Read header and section declarations. */
-	ReadFile(hFile,(LPBYTE)szBuf,512,&dwNumBytesRead,NULL);
-
-	SetFilePointer(hFile,dwSectionOffset,0,FILE_BEGIN);
-
-	/*Since this is the only section, the section length gives the length from the
-	start of the section to the end of the stream. The property count gives the
-	number of properties assocciated with this file (author, comments, etc).*/
-	ReadFile(hFile,(LPBYTE)&dwSectionLength,sizeof(DWORD),&dwNumBytesRead,NULL);
-	ReadFile(hFile,(LPBYTE)&dwPropertyCount,sizeof(DWORD),&dwNumBytesRead,NULL);
-
-	pPropertyDeclarations = (PropertyDeclarations_t *)malloc(dwPropertyCount * sizeof(PropertyDeclarations_t));
-
-	/*Go through each property, try to find the one that was asked for.
-	This is in the property declarations part.*/
-	for(i = 0;i < dwPropertyCount;i++)
-	{
-		ReadFile(hFile,(LPBYTE)&pPropertyDeclarations[i],sizeof(PropertyDeclarations_t),&dwNumBytesRead,NULL);
-
-		if(pPropertyDeclarations[i].Id == dwPropertyType)
-		{
-			bFound = TRUE;
-			iPropertyNumber = i;
-		}
-	}
-
-	if(!bFound)
-	{
-		free(pPropertyDeclarations);
-		CloseHandle(hFile);
-		return -1;
-	}
-
-	TCHAR szPropertyBuf[512];
-	int iCurrentSize;
-	int iSizeDifferential;
-	ReadFileProperty(lpszFileName,dwPropertyType,szPropertyBuf,512);
-	iCurrentSize = lstrlen(szPropertyBuf);
-
-	iSizeDifferential = lstrlen(szNewValue) - iCurrentSize;
-
-	dwSectionLength += iSizeDifferential;
-
-	/* New section length (offset 0x30). */
-	SetFilePointer(hFile,dwSectionOffset,0,FILE_BEGIN);
-	WriteFile(hFile,(LPCVOID)&dwSectionLength,sizeof(dwSectionLength),&dwNumBytesWritten,NULL);
-
-	/* Beginning of the property declarations table. */
-	SetFilePointer(hFile,0x38,0,FILE_BEGIN);
-
-	/* Property declarations after specfied one. */
-	SetFilePointer(hFile,(iPropertyNumber + 1) * sizeof(PropertyDeclarations_t),0,FILE_CURRENT);
-
-	for(i = iPropertyNumber + 1;i < dwPropertyCount;i++)
-	{
-		WriteFile(hFile,(LPCVOID)&pPropertyDeclarations[i],sizeof(PropertyDeclarations_t),&dwNumBytesWritten,NULL);
-		pPropertyDeclarations[i].Offset += iSizeDifferential; 
-	}
-
-	/*Go back to the start of the offset, then to the property that is desired (property offsets
-	are given from the start of the section).*/
-	/*SetFilePointer(hFile,0,0,FILE_BEGIN);
-	SetFilePointer(hFile,dwSectionOffset,0,FILE_BEGIN);
-	SetFilePointer(hFile,dwPropertyOffset,0,FILE_CURRENT);*/
-
-	/*Read the property marker. If this is not equal to 0x1E, then this is not a valid property
-	(1E indicates a NULL terminated string prepended by dword string length).*/
-	ReadFile(hFile,(LPBYTE)&dwPropertyMarker,sizeof(dwPropertyMarker),&dwNumBytesRead,NULL);
-	
-	free(pPropertyDeclarations);
-	CloseHandle(hFile);
-
-	return 0;
-}
-
 BOOL ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen)
 {
 	Gdiplus::GdiplusStartupInput	StartupInput;
@@ -1190,169 +987,6 @@ BOOL ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,
 	Gdiplus::GdiplusShutdown(Token);
 
 	return bFound;
-}
-
-int DumpSummaryInformationStream(TCHAR *lpszInputFile,TCHAR *lpszOutputFile)
-{
-	HANDLE hInputFile;
-	HANDLE hOutputFile;
-	TCHAR szCommentStreamName[512];
-	DWORD dwNumBytesRead;
-	DWORD NumBytesWritten;
-	LPVOID Buffer[512];
-	DWORD FileSize;
-
-	StringCchPrintf(szCommentStreamName,SIZEOF_ARRAY(szCommentStreamName),
-	_T("%s:%cDocumentSummaryInformation"),lpszInputFile,0x5);
-
-	hInputFile = CreateFile(szCommentStreamName,GENERIC_READ,FILE_SHARE_READ,NULL,
-	OPEN_EXISTING,NULL,NULL);
-
-	if(hInputFile == INVALID_HANDLE_VALUE)
-		return -1;
-
-	FileSize = GetFileSize(hInputFile,NULL);
-
-	ReadFile(hInputFile,Buffer,FileSize,&dwNumBytesRead,NULL);
-
-	hOutputFile = CreateFile(lpszOutputFile,GENERIC_WRITE,0,NULL,OPEN_EXISTING,
-	NULL,NULL);
-
-	WriteFile(hOutputFile,Buffer,dwNumBytesRead,&NumBytesWritten,NULL);
-
-	CloseHandle(hInputFile);
-	CloseHandle(hOutputFile);
-
-	return NumBytesWritten;
-}
-
-int EnumFileStreams(TCHAR *lpszFileName)
-{
-	HANDLE hFile;
-	WIN32_STREAM_ID sid;
-	WCHAR wszStreamName[MAX_PATH];
-	LPVOID lpContext = NULL;
-	DWORD dwNumBytesRead;
-	DWORD dwNumBytesSeekedLow;
-	DWORD dwNumBytesSeekedHigh;
-	int iNumStreams = 0;
-
-	hFile = CreateFile(lpszFileName,GENERIC_READ,FILE_SHARE_READ,NULL,
-	OPEN_EXISTING,NULL,NULL);
-
-	if(hFile == INVALID_HANDLE_VALUE)
-		return -1;
-
-	BackupRead(hFile,(LPBYTE)&sid,20,&dwNumBytesRead,FALSE,FALSE,&lpContext);
-
-	BackupRead(hFile,(LPBYTE)wszStreamName,sid.dwStreamNameSize,
-	&dwNumBytesRead,FALSE,FALSE,&lpContext);
-
-	/*Seek to the end of this stream (this is the default data
-	stream for the file).*/
-	BackupSeek(hFile,sid.Size.LowPart,sid.Size.HighPart,
-	&dwNumBytesSeekedLow,&dwNumBytesSeekedHigh,&lpContext);
-
-	BackupRead(hFile,(LPBYTE)&sid,20,&dwNumBytesRead,FALSE,FALSE,&lpContext);
-	while(dwNumBytesRead != 0)
-	{
-		BackupRead(hFile,(LPBYTE)wszStreamName,sid.dwStreamNameSize,
-		&dwNumBytesRead,FALSE,FALSE,&lpContext);
-
-		BackupSeek(hFile,sid.Size.LowPart,sid.Size.HighPart,
-		&dwNumBytesSeekedLow,&dwNumBytesSeekedHigh,&lpContext);
-
-		if(sid.dwStreamId == BACKUP_ALTERNATE_DATA)
-			iNumStreams++;
-
-		BackupRead(hFile,(LPBYTE)&sid,20,&dwNumBytesRead,FALSE,FALSE,&lpContext);
-	}
-	
-	BackupRead(hFile,NULL,0,NULL,TRUE,FALSE,&lpContext);
-
-	CloseHandle(hFile);
-
-	return 1;
-}
-
-void WriteFileSlack(TCHAR *szFileName,void *pData,int iDataSize)
-{
-	HANDLE hFile;
-	DWORD FileSize;
-	DWORD NumBytesWritten;
-	DWORD SectorsPerCluster;
-	DWORD BytesPerSector;
-	LARGE_INTEGER lRealFileSize;
-	TCHAR Root[MAX_PATH];
-	LONG FileSectorSize;
-
-	/*The SE_MANAGE_VOLUME_NAME privilege is needed to set
-	the valid data length of a file.*/
-	if(!SetProcessTokenPrivilege(GetCurrentProcessId(),SE_MANAGE_VOLUME_NAME,TRUE))
-		return;
-
-	hFile = CreateFile(szFileName,GENERIC_WRITE,
-	FILE_SHARE_READ|FILE_SHARE_WRITE|FILE_SHARE_DELETE,NULL,OPEN_EXISTING,
-	NULL,NULL);
-
-	if(hFile == INVALID_HANDLE_VALUE)
-		return;
-
-	StringCchCopy(Root,SIZEOF_ARRAY(Root),szFileName);
-	PathStripToRoot(Root);
-
-	GetDiskFreeSpace(Root,&SectorsPerCluster,&BytesPerSector,NULL,NULL);
-
-	/*Ask for the files logical size.*/
-	FileSize = GetFileSize(hFile,NULL);
-
-	/*Determine the files actual size (i.e. the
-	size it physically takes up on disk).*/
-	GetRealFileSize(szFileName,&lRealFileSize);
-
-	if((FileSize % GetClusterSize(Root)) == 0)
-	{
-		/*This file takes up an exact number of clusters,
-		thus there is no free space at the end of the file
-		to write data.*/
-		CloseHandle(hFile);
-		return;
-	}
-	
-	FileSectorSize = GetFileSectorSize(szFileName);
-	if((FileSectorSize % SectorsPerCluster) == 0)
-	{
-		/*This file has data in all the sectors of its clusters.
-		Data written to the end of a sector in use is wiped when
-		the file is shrunk. Therefore, cannot write data to the end
-		of this file.*/
-		CloseHandle(hFile);
-		return;
-	}
-
-	/* Extend the file to the physical end of file. */
-	SetFilePointerEx(hFile,lRealFileSize,NULL,FILE_BEGIN);
-	SetEndOfFile(hFile);
-	SetFileValidData(hFile,lRealFileSize.QuadPart);
-
-	/*Move back to the first spare sector.*/
-	SetFilePointer(hFile,FileSectorSize * BytesPerSector,NULL,FILE_BEGIN);
-
-	/*Write the data to be hidden into the file.*/
-	WriteFile(hFile,pData,iDataSize,&NumBytesWritten,NULL);
-
-	/*The data that was written must be flushed.
-	If it is not, the os will not physically
-	write the data to disk before the file is
-	shrunk.*/
-	FlushFileBuffers(hFile);
-
-	/*Now shrink the file back to its original size.*/
-	SetFilePointer(hFile,FileSize,NULL,FILE_BEGIN);
-	SetEndOfFile(hFile);
-	SetFileValidData(hFile,FileSize);
-
-	CloseHandle(hFile);
 }
 
 int ReadFileSlack(const TCHAR *FileName,TCHAR *pszSlack,int iBufferLen)
@@ -1682,23 +1316,6 @@ TCHAR *DecodePrinterStatus(DWORD dwStatus)
 	return NULL;
 }
 
-void RetrieveAdapterInfo(void)
-{
-	IP_ADAPTER_ADDRESSES *pAdapterAddresses	= NULL;
-	ULONG ulOutBufLen						= 0;
-
-	GetAdaptersAddresses(AF_UNSPEC,0,NULL,NULL,&ulOutBufLen);
-
-	pAdapterAddresses = (IP_ADAPTER_ADDRESSES *)malloc(ulOutBufLen);
-
-	if(pAdapterAddresses != NULL)
-	{
-		GetAdaptersAddresses(AF_UNSPEC,0,NULL,pAdapterAddresses,&ulOutBufLen);
-
-		free(pAdapterAddresses);
-	}
-}
-
 BOOL IsImage(const TCHAR *szFileName)
 {
 	static TCHAR *ImageExts[10] = {_T("bmp"),_T("ico"),
@@ -1734,18 +1351,6 @@ void ReplaceCharacters(TCHAR *str,char ch,char replacement)
 		if(str[i] == ch)
 			str[i] = replacement;
 	}
-}
-
-void ShowLastError(void)
-{
-	LPVOID ErrorMessage;
-
-	FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER|
-	FORMAT_MESSAGE_FROM_SYSTEM,NULL,GetLastError(),
-	MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT),(LPTSTR)&ErrorMessage,
-	0,NULL);
-
-	MessageBox(NULL,(LPTSTR)ErrorMessage,EMPTY_STRING,MB_OK|MB_ICONQUESTION);
 }
 
 TCHAR *GetToken(TCHAR *ptr,TCHAR *Buffer,TCHAR *BufferLength)
@@ -2055,27 +1660,6 @@ void CenterWindow(HWND hParent,HWND hChild)
 
 	SetWindowPos(hChild,NULL,ptOrigin.x,ptOrigin.y,
 		0,0,SWP_NOSIZE|SWP_SHOWWINDOW|SWP_NOZORDER);
-}
-
-TCHAR *ReplaceSubString(TCHAR *szString,TCHAR *szSubString,TCHAR *szReplacement)
-{
-	static TCHAR szDest[1024];
-	TCHAR szTemp[1024];
-	TCHAR *pSub = NULL;
-
-	StringCchCopy(szDest,SIZEOF_ARRAY(szDest),szString);
-
-	while((pSub = StrStr(szDest,szSubString)) != NULL)
-	{
-		StringCchCopy(szTemp,SIZEOF_ARRAY(szTemp),szDest);
-
-		StringCchCopyN(szDest,SIZEOF_ARRAY(szDest),szTemp,
-			pSub - szDest);
-		StringCchCat(szDest,SIZEOF_ARRAY(szDest),szReplacement);
-		StringCchCat(szDest,SIZEOF_ARRAY(szDest),&szTemp[pSub - szDest + lstrlen(szSubString)]);
-	}
-
-	return szDest;
 }
 
 HRESULT GetMediaMetadata(const TCHAR *szFileName,const TCHAR *szAttribute,BYTE **pszOutput)

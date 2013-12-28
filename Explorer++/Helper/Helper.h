@@ -129,13 +129,11 @@ DWORD			DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,BOOL 
 int				CreateFileTimeString(const FILETIME *FileTime,TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate);
 BOOL			GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize);
 BOOL			CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2);
-BOOL			SetFileSparse(TCHAR *szFileName);
 DWORD			BuildFileAttributeString(const TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize);
 void			BuildFileAttributeStringInternal(DWORD dwFileAttributes,TCHAR *szOutput,DWORD cchMax);
 size_t			GetFileOwner(const TCHAR *szFile,TCHAR *szOwner,DWORD BufSize);
 DWORD			GetNumFileHardLinks(const TCHAR *lpszFileName);
 int				ReadFileProperty(const TCHAR *lpszFileName,DWORD dwPropertyId,TCHAR *lpszPropertyBuf,DWORD dwBufLen);
-int				SetFileProperty(TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *szNewValue);
 HRESULT			GetItemAttributes(const TCHAR *szItemParsingPath,SFGAOF *pItemAttributes);
 HRESULT			GetItemAttributes(LPCITEMIDLIST pidl,SFGAOF *pItemAttributes);
 BOOL			ExecuteFileAction(HWND hwnd,const TCHAR *szVerb,const TCHAR *szParameters,const TCHAR *szStartDirectory,LPCITEMIDLIST pidl);
@@ -157,16 +155,7 @@ BOOL			lEnableMenuItem(HMENU hMenu,UINT ItemID,BOOL bEnable);
 BOOL			LocalSystemTimeToFileTime(const LPSYSTEMTIME lpLocalTime,LPFILETIME lpFileTime);
 BOOL			FileTimeToLocalSystemTime(const LPFILETIME lpFileTime,LPSYSTEMTIME lpLocalTime);
 
-/* File streams. */
-int				DumpSummaryInformationStream(TCHAR *lpszInputFile,TCHAR *lpszOutputFile);
-int				EnumFileStreams(TCHAR *lpszFileName);
-void			ReadFileStreams(TCHAR *lpszFile);
-
-/* Bitmap helper functions. */
-HRESULT			GetBitmapDimensions(const TCHAR *FileName,SIZE *BitmapSize);
-
 /* File slack. */
-void			WriteFileSlack(TCHAR *szFileName,void *pData,int iDataSize);
 int				ReadFileSlack(const TCHAR *FileName,TCHAR *pszSlack,int iBufferLen);
 
 /* Default icon indices. */
@@ -182,7 +171,6 @@ BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,const TCHAR *InitialDir
 
 /* Device related. */
 TCHAR			*DecodePrinterStatus(DWORD dwStatus);
-void			RetrieveAdapterInfo(void);
 
 /* Process helpers. */
 DWORD			GetCurrentProcessImageName(TCHAR *szImageName,DWORD nSize);
@@ -198,13 +186,9 @@ void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBu
 void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf);
 HINSTANCE		StartCommandPrompt(const TCHAR *Directory,bool Elevated);
 BOOL			SetProcessTokenPrivilege(DWORD ProcessId,const TCHAR *PrivilegeName,BOOL bEnablePrivilege);
-void			ShowLastError(void);
 int				GetRectHeight(const RECT *rc);
 int				GetRectWidth(const RECT *rc);
-void			CheckItem(HWND hwnd,BOOL bCheck);
-BOOL			IsItemChecked(HWND hwnd);
 BOOL			lShowWindow(HWND hwnd,BOOL bShowWindow);
-void			EnumLoggedOnUsers(void);
 TCHAR			*PrintComma(unsigned long nPrint);
 TCHAR			*PrintCommaLargeNum(LARGE_INTEGER lPrint);
 BOOL			CheckWildcardMatch(const TCHAR *szWildcard,const TCHAR *szString,BOOL bCaseSensitive);
@@ -216,7 +200,6 @@ void			AddGripperStyle(UINT *fStyle,BOOL bAddGripper);
 void			AddWindowStyle(HWND hwnd,UINT fStyle,BOOL bAdd);
 void			ReplaceCharacterWithString(const TCHAR *szBaseString,TCHAR *szOutput,UINT cchMax,TCHAR chToReplace,const TCHAR *szReplacement);
 void			CenterWindow(HWND hParent,HWND hChild);
-TCHAR			*ReplaceSubString(TCHAR *szString,TCHAR *szSubString,TCHAR *szReplacement);
 void			UpdateToolbarBandSizing(HWND hRebar,HWND hToolbar);
 void			MergeDateTime(SYSTEMTIME *pstOutput,const SYSTEMTIME *pstDate,const SYSTEMTIME *pstTime);
 void			GetWindowString(HWND hwnd,std::wstring &str);

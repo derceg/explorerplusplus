@@ -421,56 +421,6 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath)
 	return E_FAIL;
 }
 
-BOOL IsDirectoryRoot(TCHAR *Path)
-{
-	TCHAR *Drives	= NULL;
-	DWORD Size;
-	BOOL Break		= FALSE;
-
-	/* Find out how much space is needed to hold the list of drive
-	names. */
-	Size = GetLogicalDriveStrings(0,NULL);
-
-	Drives = (TCHAR *)malloc((Size + 1) * sizeof(TCHAR));
-
-	if(Drives == NULL)
-		return FALSE;
-
-	/* Ask the system for a list of the current drives in the system.
-	This list is returned as a double NULL terminated buffer. */
-	Size = GetLogicalDriveStrings(Size,Drives);
-
-	if(Size != 0)
-	{
-		while(Break == FALSE)
-		{
-			/* String list containing drive list is double NULL terminated.
-			Detect if the character after the end of the current string is
-			another NULL byte. */
-			if(*(Drives) == '\0')
-			{
-				/* Break out of the loop at the next iteration (double NULL byte
-				set has being found). */
-				Break = TRUE;
-			}
-			else
-			{
-				if(StrCmpI(Drives,Path) == 0)
-				{
-					/* The path name of this drive matches up with the supplied
-					path. Thus, the supplied path is a directory root. */
-					return TRUE;
-				}
-			}
-
-			Drives += lstrlen(Drives) + 1;
-		}
-	}
-
-	/* No matches found. The path specified is not a directory root. */
-	return FALSE;
-}
-
 int GetDefaultFolderIconIndex(void)
 {
 	return GetDefaultIcon(DEFAULT_ICON_FOLDER);
