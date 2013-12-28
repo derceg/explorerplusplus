@@ -2,11 +2,11 @@
 
 #include <windows.h>
 
-extern void	AddPathsToComboBoxEx(HWND,TCHAR *);
-extern HWND	CreateComboBox(HWND,DWORD);
-extern HWND	CreateListView(HWND,DWORD);
-extern HWND	CreateStatusBar(HWND,DWORD);
-extern HWND	CreateTabControl(HWND,UINT Style);
-extern HWND CreateToolbar(HWND hParent,DWORD dwStyle,DWORD dwExStyle);
-extern HWND	CreateTreeView(HWND,DWORD);
-extern int	ResizeStatusBar(HWND,int,int);
+void	AddPathsToComboBoxEx(HWND,TCHAR *);
+HWND	CreateComboBox(HWND,DWORD);
+HWND	CreateListView(HWND,DWORD);
+HWND	CreateStatusBar(HWND,DWORD);
+HWND	CreateTabControl(HWND,UINT Style);
+HWND	CreateToolbar(HWND hParent,DWORD dwStyle,DWORD dwExStyle);
+HWND	CreateTreeView(HWND,DWORD);
+int		ResizeStatusBar(HWND,int,int);
