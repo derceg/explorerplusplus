@@ -20,7 +20,7 @@
 
 
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
-	std::list<JumpListTaskInformation> TaskList);
+	const std::list<JumpListTaskInformation> &TaskList);
 HRESULT AddJumpListTaskInternal(IObjectCollection *poc,const TCHAR *pszName,
 	const TCHAR *pszPath,const TCHAR *pszArguments,const TCHAR *pszIconPath,int iIcon);
 
@@ -1022,7 +1022,7 @@ void SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,
 	pftc->ptd		= ptd;
 }
 
-HRESULT AddJumpListTasks(std::list<JumpListTaskInformation> TaskList)
+HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList)
 {
 	if(TaskList.size() == 0)
 	{
@@ -1076,7 +1076,7 @@ HRESULT AddJumpListTasks(std::list<JumpListTaskInformation> TaskList)
 }
 
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
-	std::list<JumpListTaskInformation> TaskList)
+	const std::list<JumpListTaskInformation> &TaskList)
 {
 	for each(auto jtli in TaskList)
 	{

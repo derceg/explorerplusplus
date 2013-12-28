@@ -38,7 +38,7 @@ HRESULT			BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFol
 BOOL			IsPathGUID(const TCHAR *szPath);
 BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
 void			SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,DVTARGETDEVICE *ptd,DWORD dwAspect,LONG lindex,DWORD tymed);
-HRESULT			AddJumpListTasks(std::list<JumpListTaskInformation> TaskList);
+HRESULT			AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList);
 BOOL			LoadContextMenuHandlers(IN const TCHAR *szRegKey,OUT std::list<ContextMenuHandler_t> *pContextMenuHandlers);
 BOOL			LoadIUnknownFromCLSID(IN const TCHAR *szCLSID,OUT ContextMenuHandler_t *pContextMenuHandler);
 BOOL			CopyTextToClipboard(const std::wstring &str);
