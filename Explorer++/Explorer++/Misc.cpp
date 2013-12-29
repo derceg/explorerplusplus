@@ -826,7 +826,7 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 	SHFILEINFO		shfi;
 	TCHAR			szFullItemName[MAX_PATH];
 	TCHAR			szFileDate[256];
-	TCHAR			szDisplayDate[MAX_STRING_LENGTH];
+	TCHAR			szDisplayDate[512];
 	TCHAR			szDisplayName[MAX_PATH];
 	TCHAR			szDateModified[256];
 	int				iSelected;

@@ -134,9 +134,9 @@ TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate)
 {
 	SYSTEMTIME SystemTime;
 	FILETIME LocalFileTime;
-	TCHAR TempBuffer[MAX_STRING_LENGTH];
-	TCHAR DateBuffer[MAX_STRING_LENGTH];
-	TCHAR TimeBuffer[MAX_STRING_LENGTH];
+	TCHAR TempBuffer[512];
+	TCHAR DateBuffer[512];
+	TCHAR TimeBuffer[512];
 	SYSTEMTIME CurrentTime;
 	int iReturn1 = 0;
 	int iReturn2 = 0;
@@ -172,23 +172,23 @@ TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate)
 			else
 			{
 				iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT,LOCALE_USE_CP_ACP,&SystemTime,
-				NULL,DateBuffer,MAX_STRING_LENGTH);
+					NULL, DateBuffer,512);
 			}
 		}
 		else
 		{
 			iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT,LOCALE_USE_CP_ACP,&SystemTime,
-			NULL,DateBuffer,MAX_STRING_LENGTH);
+				NULL, DateBuffer,512);
 		}
 	}
 	else
 	{
 		iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT,LOCALE_USE_CP_ACP,&SystemTime,
-		NULL,DateBuffer,MAX_STRING_LENGTH);
+			NULL, DateBuffer,512);
 	}
 
 	iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT,LOCALE_USE_CP_ACP,&SystemTime,
-	NULL,TimeBuffer,MAX_STRING_LENGTH);
+		NULL, TimeBuffer,512);
 	
 	if(iReturn1 && iReturn2)
 	{

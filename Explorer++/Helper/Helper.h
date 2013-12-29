@@ -60,8 +60,6 @@ public:
 
 };
 
-#define MAX_STRING_LENGTH	512
-
 /* SummaryInformation stream constants. */
 #define PROPERTY_ID_TITLE		0x02
 #define PROPERTY_ID_SUBJECT		0x03
