@@ -1229,33 +1229,30 @@ HRESULT GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax)
 	return hr;
 }
 
-HRESULT GetItemInfoTip(LPITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchMax)
+HRESULT GetItemInfoTip(LPCITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchMax)
 {
 	IShellFolder	*pShellFolder = NULL;
 	IQueryInfo		*pQueryInfo = NULL;
-	LPITEMIDLIST	pidlRelative = NULL;
-	LPCWSTR			ppwszTip = NULL;
+	LPCITEMIDLIST	pidlRelative = NULL;
+	LPWSTR			ppwszTip = NULL;
 	HRESULT			hr;
 
-	hr = SHBindToParent(pidlComplete, IID_IShellFolder, (void **) &pShellFolder, (LPCITEMIDLIST *) &pidlRelative);
+	hr = SHBindToParent(pidlComplete, IID_IShellFolder,
+		reinterpret_cast<void **>(&pShellFolder), &pidlRelative);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = pShellFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *) &pidlRelative,
-			IID_IQueryInfo, 0, (void **) &pQueryInfo);
+		hr = pShellFolder->GetUIObjectOf(NULL, 1, &pidlRelative,
+			IID_IQueryInfo, 0, reinterpret_cast<void **>(&pQueryInfo));
 
 		if(SUCCEEDED(hr))
 		{
-			hr = pQueryInfo->GetInfoTip(QITIPF_USESLOWTIP, (WCHAR **) &ppwszTip);
+			hr = pQueryInfo->GetInfoTip(QITIPF_USESLOWTIP, &ppwszTip);
 
-			if(SUCCEEDED(hr))
+			if(SUCCEEDED(hr) && (ppwszTip != NULL))
 			{
-				#ifndef UNICODE
-				WideCharToMultiByte(CP_ACP, 0, ppwszTip, -1, szInfoTip,
-					cchMax, NULL, NULL);
-				#else
 				StringCchCopy(szInfoTip, cchMax, ppwszTip);
-				#endif
+				CoTaskMemFree(ppwszTip);
 			}
 
 			pQueryInfo->Release();

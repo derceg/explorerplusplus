@@ -55,4 +55,4 @@ int				GetDefaultFileIconIndex(void);
 
 /* Infotips. */
 HRESULT			GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax);
-HRESULT			GetItemInfoTip(LPITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchMax);
+HRESULT			GetItemInfoTip(LPCITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchMax);
