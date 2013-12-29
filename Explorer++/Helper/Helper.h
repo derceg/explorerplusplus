@@ -69,30 +69,6 @@ public:
 #define PROPERTY_ID_KEYWORDS	0x05
 #define PROPERTY_ID_COMMENT		0x06
 
-/* DocumentSummaryInformation stream. */
-#define PROPERTY_ID_CATEGORY	0x02
-
-#define EXE_INVALID				0x4
-
-/* ShellHelper definitions. */
-#define DEFAULT_ICON_FOLDER		0
-#define DEFAULT_ICON_FILE		1
-
-/* CP_ACP is defined for ANSI, but there is no
-corresponding definition for Unicode. Therefore,
-add a definition here. */
-#define CP_UNICODE	1200
-
-#define FRIENDLY_NAME_DESKTOP	_T("Desktop")
-#define FRIENDLY_NAME_PICTURES	_T("Pictures")
-#define FRIENDLY_NAME_MUSIC		_T("Music")
-#define FRIENDLY_NAME_VIDEOS	_T("Videos")
-#define FRIENDLY_NAME_DOCUMENTS	_T("Documents")
-
-/* See: http://msdn.microsoft.com/en-us/library/bb776902(v=VS.85).aspx#CFSTR_SHELLIDLIST */
-#define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
-#define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
-
 typedef struct
 {
 	WORD wLanguage;

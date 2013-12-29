@@ -4,6 +4,19 @@
 
 #define CONTROL_PANEL_CATEGORY_VIEW	_T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")
 
+#define DEFAULT_ICON_FOLDER	0
+#define DEFAULT_ICON_FILE	1
+
+#define FRIENDLY_NAME_DESKTOP	_T("Desktop")
+#define FRIENDLY_NAME_PICTURES	_T("Pictures")
+#define FRIENDLY_NAME_MUSIC		_T("Music")
+#define FRIENDLY_NAME_VIDEOS	_T("Videos")
+#define FRIENDLY_NAME_DOCUMENTS	_T("Documents")
+
+/* See: http://msdn.microsoft.com/en-us/library/bb776902(v=VS.85).aspx#CFSTR_SHELLIDLIST */
+#define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
+#define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
+
 struct JumpListTaskInformation
 {
 	const TCHAR	*pszName;
