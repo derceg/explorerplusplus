@@ -122,9 +122,6 @@ enum SizeDisplayFormat_t
 void			TabCtrl_SwapItems(HWND hTabCtrl,int iItem1,int iItem2);
 void			TabCtrl_SetItemText(HWND,int,TCHAR *);
 
-/* Drag and drop helpers. */
-DWORD			DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,BOOL bDataAccept,BOOL bOnSameDrive);
-
 /* File helpers. */
 int				CreateFileTimeString(const FILETIME *FileTime,TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate);
 BOOL			GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize);
@@ -134,9 +131,6 @@ void			BuildFileAttributeStringInternal(DWORD dwFileAttributes,TCHAR *szOutput,D
 size_t			GetFileOwner(const TCHAR *szFile,TCHAR *szOwner,DWORD BufSize);
 DWORD			GetNumFileHardLinks(const TCHAR *lpszFileName);
 int				ReadFileProperty(const TCHAR *lpszFileName,DWORD dwPropertyId,TCHAR *lpszPropertyBuf,DWORD dwBufLen);
-HRESULT			GetItemAttributes(const TCHAR *szItemParsingPath,SFGAOF *pItemAttributes);
-HRESULT			GetItemAttributes(LPCITEMIDLIST pidl,SFGAOF *pItemAttributes);
-BOOL			ExecuteFileAction(HWND hwnd,const TCHAR *szVerb,const TCHAR *szParameters,const TCHAR *szStartDirectory,LPCITEMIDLIST pidl);
 BOOL			GetVersionInfoString(const TCHAR *szFileName,const TCHAR *szVersionInfo,TCHAR *szBuffer,UINT cbBufLen);
 BOOL			ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen);
 BOOL			IsImage(const TCHAR *FileName);
@@ -157,14 +151,6 @@ BOOL			FileTimeToLocalSystemTime(const LPFILETIME lpFileTime,LPSYSTEMTIME lpLoca
 
 /* File slack. */
 int				ReadFileSlack(const TCHAR *FileName,TCHAR *pszSlack,int iBufferLen);
-
-/* Default icon indices. */
-int				GetDefaultIcon(int iIconType);
-int				GetDefaultFolderIconIndex(void);
-int				GetDefaultFileIconIndex(void);
-
-/* Infotips. */
-HRESULT			GetFileInfoTip(HWND hwnd,LPCITEMIDLIST pidlDirectory,LPCITEMIDLIST *pridl,TCHAR *szInfoTip,UINT cchMax);
 
 /* User interaction. */
 BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,const TCHAR *InitialDirectory);
@@ -195,7 +181,6 @@ BOOL			CheckWildcardMatch(const TCHAR *szWildcard,const TCHAR *szString,BOOL bCa
 BOOL			CheckWildcardMatchInternal(const TCHAR *szWildcard,const TCHAR *szString,BOOL bCaseSensitive);
 void			ReplaceCharacters(TCHAR *str,char ch,char replacement);
 TCHAR			*GetToken(TCHAR *ptr,TCHAR *Buffer,TCHAR *BufferLength);
-HRESULT			DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath);
 void			AddGripperStyle(UINT *fStyle,BOOL bAddGripper);
 void			AddWindowStyle(HWND hwnd,UINT fStyle,BOOL bAdd);
 void			ReplaceCharacterWithString(const TCHAR *szBaseString,TCHAR *szOutput,UINT cchMax,TCHAR chToReplace,const TCHAR *szReplacement);

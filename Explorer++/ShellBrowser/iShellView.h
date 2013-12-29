@@ -711,7 +711,6 @@ private:
 	/* Miscellaneous. */
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL) const;
 	int					LocateFileItemInternalIndex(const TCHAR *szFileName) const;
-	HRESULT				RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMax);
 	void				ApplyHeaderSortArrow(void);
 	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName) const;
 	void				CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns);

@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include <list>
 #include "TabDropHandler.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
 
 

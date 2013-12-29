@@ -16,6 +16,7 @@
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ListViewHelper.h"

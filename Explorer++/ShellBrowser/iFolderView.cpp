@@ -18,6 +18,7 @@
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ListViewHelper.h"

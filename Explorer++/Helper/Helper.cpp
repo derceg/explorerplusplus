@@ -1396,60 +1396,6 @@ TCHAR *GetToken(TCHAR *ptr,TCHAR *Buffer,TCHAR *BufferLength)
 	return p;
 }
 
-HRESULT GetItemInfoTip(const TCHAR *szItemPath,TCHAR *szInfoTip,int cchMax)
-{
-	LPITEMIDLIST	pidlItem = NULL;
-	HRESULT			hr;
-
-	hr = GetIdlFromParsingName(szItemPath,&pidlItem);
-
-	if(SUCCEEDED(hr))
-	{
-		hr = GetItemInfoTip(pidlItem,szInfoTip,cchMax);
-
-		CoTaskMemFree(pidlItem);
-	}
-
-	return hr;
-}
-
-HRESULT GetItemInfoTip(LPITEMIDLIST pidlComplete,TCHAR *szInfoTip,int cchMax)
-{
-	IShellFolder	*pShellFolder = NULL;
-	IQueryInfo		*pQueryInfo = NULL;
-	LPITEMIDLIST	pidlRelative = NULL;
-	LPCWSTR			ppwszTip = NULL;
-	HRESULT			hr;
-
-	hr = SHBindToParent(pidlComplete,IID_IShellFolder,(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
-
-	if(SUCCEEDED(hr))
-	{
-		hr = pShellFolder->GetUIObjectOf(NULL,1,(LPCITEMIDLIST *)&pidlRelative,
-			IID_IQueryInfo,0,(void **)&pQueryInfo);
-
-		if(SUCCEEDED(hr))
-		{
-			hr = pQueryInfo->GetInfoTip(QITIPF_USENAME,(WCHAR **)&ppwszTip);
-
-			if(SUCCEEDED(hr))
-			{
-				#ifndef UNICODE
-				WideCharToMultiByte(CP_ACP,0,ppwszTip,-1,szInfoTip,
-					cchMax,NULL,NULL);
-				#else
-				StringCchCopy(szInfoTip,cchMax,ppwszTip);
-				#endif
-			}
-
-			pQueryInfo->Release();
-		}
-		pShellFolder->Release();
-	}
-
-	return hr;
-}
-
 void AddGripperStyle(UINT *fStyle,BOOL bAddGripper)
 {
 	if(bAddGripper)

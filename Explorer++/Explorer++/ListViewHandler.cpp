@@ -908,20 +908,12 @@ void Explorerplusplus::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 	virtual folder. Otherwise, show the modified date. */
 	if((m_InfoTipType == INFOTIP_SYSTEM) || m_pActiveShellBrowser->InVirtualFolder())
 	{
-		LPITEMIDLIST	pidlDirectory = NULL;
-		LPITEMIDLIST	pridlItem = NULL;
-
-		pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-		pridlItem = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
-
-		hr = GetFileInfoTip(m_hContainer,pidlDirectory,const_cast<LPCITEMIDLIST *>(&pridlItem),
-			szInfoTip,cchMax);
+		TCHAR szFullFileName[MAX_PATH];
+		m_pActiveShellBrowser->QueryFullItemName(iItem, szFullFileName);
+		hr = GetItemInfoTip(szFullFileName, szInfoTip, cchMax);
 
 		if(!SUCCEEDED(hr))
 			StringCchCopy(szInfoTip,cchMax,EMPTY_STRING);
-
-		CoTaskMemFree(pidlDirectory);
-		CoTaskMemFree(pridlItem);
 	}
 	else
 	{

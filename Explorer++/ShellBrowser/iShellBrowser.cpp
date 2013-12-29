@@ -587,28 +587,6 @@ int CShellBrowser::GetDirMonitorId(void) const
 	return m_iDirMonitorId;
 }
 
-HRESULT CShellBrowser::RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMax)
-{
-	LVITEM	lvItem;
-	BOOL	bItem;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	bItem = ListView_GetItem(m_hListView,&lvItem);
-
-	if(bItem)
-	{
-		return GetFileInfoTip(m_hOwner,m_pidlDirectory,
-			const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[(int)lvItem.lParam].pridl),
-			szInfoTip,(UINT)cchMax);
-	}
-	else
-	{
-		return E_FAIL;
-	}
-}
-
 BOOL CShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 {
 	TCHAR	szParsingPath[MAX_PATH];

@@ -28,8 +28,6 @@ BOOL			IsIdlDirectory(LPCITEMIDLIST pidl);
 void			GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath);
 HRESULT			GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent);
 BOOL			IsNamespaceRoot(LPCITEMIDLIST pidl);
-HRESULT			GetItemInfoTip(const TCHAR *szItemPath,TCHAR *szInfoTip,int cchMax);
-HRESULT			GetItemInfoTip(LPITEMIDLIST pidlComplete,TCHAR *szInfoTip,int cchMax);
 HRESULT			GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,DWORD uParsingFlags);
 BOOL			MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize);
 HRESULT			BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN std::list<std::wstring> FilenameList);
@@ -42,3 +40,19 @@ HRESULT			AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList);
 BOOL			LoadContextMenuHandlers(IN const TCHAR *szRegKey,OUT std::list<ContextMenuHandler_t> *pContextMenuHandlers);
 BOOL			LoadIUnknownFromCLSID(IN const TCHAR *szCLSID,OUT ContextMenuHandler_t *pContextMenuHandler);
 BOOL			CopyTextToClipboard(const std::wstring &str);
+HRESULT			GetItemAttributes(const TCHAR *szItemParsingPath, SFGAOF *pItemAttributes);
+HRESULT			GetItemAttributes(LPCITEMIDLIST pidl, SFGAOF *pItemAttributes);
+BOOL			ExecuteFileAction(HWND hwnd, const TCHAR *szVerb, const TCHAR *szParameters, const TCHAR *szStartDirectory, LPCITEMIDLIST pidl);
+HRESULT			DecodeFriendlyPath(const TCHAR *szFriendlyPath, TCHAR *szParsingPath);
+
+/* Drag and drop helpers. */
+DWORD			DetermineCurrentDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept, BOOL bOnSameDrive);
+
+/* Default icon indices. */
+int				GetDefaultIcon(int iIconType);
+int				GetDefaultFolderIconIndex(void);
+int				GetDefaultFileIconIndex(void);
+
+/* Infotips. */
+HRESULT			GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax);
+HRESULT			GetItemInfoTip(LPITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchMax);

@@ -868,9 +868,11 @@ std::wstring CShellBrowser::GetDriveSpaceColumnText(int InternalIndex,bool Total
 
 std::wstring CShellBrowser::GetControlPanelCommentsColumnText(int InternalIndex) const
 {
+	TCHAR szFullFileName[MAX_PATH];
+	QueryFullItemNameInternal(InternalIndex, szFullFileName);
+
 	TCHAR InfoTip[512];
-	HRESULT hr = GetFileInfoTip(m_hOwner,m_pidlDirectory,const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[InternalIndex].pridl),
-		InfoTip,SIZEOF_ARRAY(InfoTip));
+	HRESULT hr = GetItemInfoTip(szFullFileName, InfoTip, SIZEOF_ARRAY(InfoTip));
 
 	if(FAILED(hr))
 	{

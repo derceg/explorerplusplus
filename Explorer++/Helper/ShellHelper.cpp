@@ -459,78 +459,6 @@ int GetDefaultIcon(int iIconType)
 	return shfi.iIcon;
 }
 
-HRESULT GetFileInfoTip(HWND hwnd,LPCITEMIDLIST pidlDirectory,LPCITEMIDLIST *pridl,
-TCHAR *szInfoTip,UINT cchMax)
-{
-	if(pidlDirectory == NULL ||
-		pridl == NULL ||
-		szInfoTip == NULL ||
-		cchMax == 0)
-	{
-		return E_FAIL;
-	}
-
-	IShellFolder *pDesktopFolder = NULL;
-	IShellFolder *pShellFolder = NULL;
-	IQueryInfo *pQueryInfo = NULL;
-	LPWSTR ppwszTip = NULL;
-	HRESULT hr;
-
-	hr = SHGetDesktopFolder(&pDesktopFolder);
-
-	if(SUCCEEDED(hr))
-	{
-		if(IsNamespaceRoot(pidlDirectory))
-		{
-			hr = SHGetDesktopFolder(&pShellFolder);
-		}
-		else
-		{
-			hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
-				IID_IShellFolder,(void **)&pShellFolder);
-		}
-
-		if(SUCCEEDED(hr))
-		{
-			hr = pShellFolder->GetUIObjectOf(hwnd,1,pridl,
-			IID_IQueryInfo,0,(void **)&pQueryInfo);
-
-			if(SUCCEEDED(hr))
-			{
-				hr = pQueryInfo->GetInfoTip(QITIPF_USESLOWTIP,&ppwszTip);
-
-				if(SUCCEEDED(hr) && ppwszTip != NULL)
-				{
-					#ifndef UNICODE
-					WideCharToMultiByte(CP_ACP,0,ppwszTip,-1,szInfoTip,
-					cchMax,NULL,NULL);
-					#else
-					StringCchCopy(szInfoTip,cchMax,ppwszTip);
-					#endif
-
-					CoTaskMemFree((LPVOID)ppwszTip);
-				}
-				else
-				{
-					/* On Windows XP, seem to be able to disable folder infotips...
-					If this is done, hr will return success, but ppwszTip will be
-					NULL. Just copy in the empty string, which will cause nothing to
-					be shown. */
-					StringCchCopy(szInfoTip,cchMax,EMPTY_STRING);
-				}
-
-				pQueryInfo->Release();
-			}
-
-			pShellFolder->Release();
-		}
-
-		pDesktopFolder->Release();
-	}
-
-	return hr;
-}
-
 HRESULT GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,DWORD uParsingFlags)
 {
 	if(szFolderName == NULL)
@@ -1282,4 +1210,58 @@ OUT ContextMenuHandler_t *pContextMenuHandler)
 	}
 
 	return bSuccess;
+}
+
+HRESULT GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax)
+{
+	LPITEMIDLIST	pidlItem = NULL;
+	HRESULT			hr;
+
+	hr = GetIdlFromParsingName(szItemPath, &pidlItem);
+
+	if(SUCCEEDED(hr))
+	{
+		hr = GetItemInfoTip(pidlItem, szInfoTip, cchMax);
+
+		CoTaskMemFree(pidlItem);
+	}
+
+	return hr;
+}
+
+HRESULT GetItemInfoTip(LPITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchMax)
+{
+	IShellFolder	*pShellFolder = NULL;
+	IQueryInfo		*pQueryInfo = NULL;
+	LPITEMIDLIST	pidlRelative = NULL;
+	LPCWSTR			ppwszTip = NULL;
+	HRESULT			hr;
+
+	hr = SHBindToParent(pidlComplete, IID_IShellFolder, (void **) &pShellFolder, (LPCITEMIDLIST *) &pidlRelative);
+
+	if(SUCCEEDED(hr))
+	{
+		hr = pShellFolder->GetUIObjectOf(NULL, 1, (LPCITEMIDLIST *) &pidlRelative,
+			IID_IQueryInfo, 0, (void **) &pQueryInfo);
+
+		if(SUCCEEDED(hr))
+		{
+			hr = pQueryInfo->GetInfoTip(QITIPF_USESLOWTIP, (WCHAR **) &ppwszTip);
+
+			if(SUCCEEDED(hr))
+			{
+				#ifndef UNICODE
+				WideCharToMultiByte(CP_ACP, 0, ppwszTip, -1, szInfoTip,
+					cchMax, NULL, NULL);
+				#else
+				StringCchCopy(szInfoTip, cchMax, ppwszTip);
+				#endif
+			}
+
+			pQueryInfo->Release();
+		}
+		pShellFolder->Release();
+	}
+
+	return hr;
 }
