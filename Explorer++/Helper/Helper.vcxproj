@@ -191,6 +191,7 @@
     <ClCompile Include="iDropSource.cpp" />
     <ClCompile Include="iEnumFormatEtc.cpp" />
     <ClCompile Include="ListViewHelper.cpp" />
+    <ClCompile Include="MenuHelper.cpp" />
     <ClCompile Include="MessageForwarder.cpp" />
     <ClCompile Include="ReferenceCount.cpp" />
     <ClCompile Include="RegistrySettings.cpp" />
@@ -229,6 +230,7 @@
     <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="ListViewHelper.h" />
     <ClInclude Include="Macros.h" />
+    <ClInclude Include="MenuHelper.h" />
     <ClInclude Include="MessageForwarder.h" />
     <ClInclude Include="ReferenceCount.h" />
     <ClInclude Include="RegistrySettings.h" />

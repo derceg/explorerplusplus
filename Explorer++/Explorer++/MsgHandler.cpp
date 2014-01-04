@@ -21,6 +21,7 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/Macros.h"
 
 

@@ -115,10 +115,6 @@ BOOL			GetFileProductVersion(const TCHAR *szFullFileName,DWORD *pdwProductVersio
 BOOL			GetProcessOwner(TCHAR *szOwner,DWORD BufSize);
 BOOL			CheckGroupMembership(GroupType_t GroupType);
 
-/* Menu helpers. */
-BOOL			lCheckMenuItem(HMENU hMenu,UINT ItemID,BOOL bCheck);
-BOOL			lEnableMenuItem(HMENU hMenu,UINT ItemID,BOOL bEnable);
-
 /* Time helpers. */
 BOOL			LocalSystemTimeToFileTime(const LPSYSTEMTIME lpLocalTime,LPFILETIME lpFileTime);
 BOOL			FileTimeToLocalSystemTime(const LPFILETIME lpFileTime,LPSYSTEMTIME lpLocalTime);

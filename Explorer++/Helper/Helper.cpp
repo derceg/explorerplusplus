@@ -244,34 +244,6 @@ HINSTANCE StartCommandPrompt(const TCHAR *Directory,bool Elevated)
 	return hNewInstance;
 }
 
-BOOL lCheckMenuItem(HMENU hMenu,UINT ItemID,BOOL bCheck)
-{
-	if(bCheck)
-	{
-		CheckMenuItem(hMenu,ItemID,MF_CHECKED);
-		return TRUE;
-	}
-	else
-	{
-		CheckMenuItem(hMenu,ItemID,MF_UNCHECKED);
-		return FALSE;
-	}
-}
-
-BOOL lEnableMenuItem(HMENU hMenu,UINT ItemID,BOOL bEnable)
-{
-	if(bEnable)
-	{
-		EnableMenuItem(hMenu,ItemID,MF_ENABLED);
-		return TRUE;
-	}
-	else
-	{
-		EnableMenuItem(hMenu,ItemID,MF_GRAYED);
-		return FALSE;
-	}
-}
-
 BOOL GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize)
 {
 	LARGE_INTEGER lFileSize;

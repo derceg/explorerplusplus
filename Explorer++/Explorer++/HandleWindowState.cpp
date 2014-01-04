@@ -16,11 +16,12 @@
 #include <list>
 #include <shobjidl.h>
 #include "Explorer++.h"
+#include "MainResource.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ShellHelper.h"
-#include "MainResource.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/Macros.h"
 
 

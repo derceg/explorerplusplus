@@ -30,6 +30,7 @@
 #include "../Helper/iDropSource.h"
 #include "../Helper/Controls.h"
 #include "../Helper/iDataObject.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/Macros.h"
 
 
