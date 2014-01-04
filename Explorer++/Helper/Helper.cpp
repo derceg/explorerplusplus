@@ -1324,7 +1324,7 @@ TCHAR *DecodePrinterStatus(DWORD dwStatus)
 
 BOOL IsImage(const TCHAR *szFileName)
 {
-	static TCHAR *ImageExts[10] = {_T("bmp"),_T("ico"),
+	static const TCHAR *ImageExts[] = {_T("bmp"),_T("ico"),
 	_T("gif"),_T("jpg"),_T("exf"),_T("png"),_T("tif"),_T("wmf"),_T("emf"),_T("tiff")};
 	TCHAR *ext;
 	int i = 0;
@@ -1338,7 +1338,7 @@ BOOL IsImage(const TCHAR *szFileName)
 
 		ext++;
 
-		for(i = 0;i < 10;i++)
+		for(i = 0;i < SIZEOF_ARRAY(ImageExts);i++)
 		{
 			if(lstrcmpi(ext,ImageExts[i]) == 0)
 				return TRUE;
