@@ -94,6 +94,9 @@
     <ClCompile Include="MenuHelper.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="TabHelper.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -190,6 +193,9 @@
       <Filter>Shell\Shell Integration</Filter>
     </ClInclude>
     <ClInclude Include="MenuHelper.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="TabHelper.h">
       <Filter>Control Support</Filter>
     </ClInclude>
   </ItemGroup>

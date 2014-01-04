@@ -92,10 +92,6 @@ enum SizeDisplayFormat_t
 	SIZE_FORMAT_PBYTES
 };
 
-/* Tab control helper functions. */
-void			TabCtrl_SwapItems(HWND hTabCtrl,int iItem1,int iItem2);
-void			TabCtrl_SetItemText(HWND,int,TCHAR *);
-
 /* File helpers. */
 int				CreateFileTimeString(const FILETIME *FileTime,TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate);
 BOOL			GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize);
