@@ -316,19 +316,27 @@ BOOL GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSi
 BOOL FileTimeToLocalSystemTime(const LPFILETIME lpFileTime,LPSYSTEMTIME lpLocalTime)
 {
 	SYSTEMTIME SystemTime;
+	BOOL result = FileTimeToSystemTime(lpFileTime,&SystemTime);
 
-	FileTimeToSystemTime(lpFileTime,&SystemTime);
+	if(result)
+	{
+		result = SystemTimeToTzSpecificLocalTime(NULL,&SystemTime,lpLocalTime);
+	}
 
-	return SystemTimeToTzSpecificLocalTime(NULL,&SystemTime,lpLocalTime);
+	return result;
 }
 
 BOOL LocalSystemTimeToFileTime(const LPSYSTEMTIME lpLocalTime,LPFILETIME lpFileTime)
 {
 	SYSTEMTIME SystemTime;
+	BOOL result = TzSpecificLocalTimeToSystemTime(NULL,lpLocalTime,&SystemTime);
 
-	TzSpecificLocalTimeToSystemTime(NULL,lpLocalTime,&SystemTime);
+	if(result)
+	{
+		result = SystemTimeToFileTime(&SystemTime,lpFileTime);
+	}
 
-	return SystemTimeToFileTime(&SystemTime,lpFileTime);
+	return result;
 }
 
 BOOL SetProcessTokenPrivilege(DWORD ProcessId,const TCHAR *PrivilegeName,BOOL bEnablePrivilege)
@@ -369,11 +377,14 @@ BOOL CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2)
 	SHFILEINFO shfi1;
 	SHFILEINFO shfi2;
 
-	SHGetFileInfo(pszFile1,NULL,&shfi1,sizeof(shfi1),SHGFI_TYPENAME);
-	SHGetFileInfo(pszFile2,NULL,&shfi2,sizeof(shfi2),SHGFI_TYPENAME);
+	DWORD_PTR result1 = SHGetFileInfo(pszFile1,NULL,&shfi1,sizeof(shfi1),SHGFI_TYPENAME);
+	DWORD_PTR result2 = SHGetFileInfo(pszFile2,NULL,&shfi2,sizeof(shfi2),SHGFI_TYPENAME);
 
-	if(StrCmp(shfi1.szTypeName,shfi2.szTypeName) == 0)
+	if(result1 != 0 && result2 != 0 &&
+		StrCmp(shfi1.szTypeName,shfi2.szTypeName) == 0)
+	{
 		return TRUE;
+	}
 
 	return FALSE;
 }

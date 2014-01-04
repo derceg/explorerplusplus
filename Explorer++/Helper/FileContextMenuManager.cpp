@@ -70,10 +70,14 @@ m_pShellContext(NULL)
 		{
 			IShellFolder *pDesktopFolder = NULL;
 
-			SHGetDesktopFolder(&pDesktopFolder);
-			hr = pDesktopFolder->BindToObject(pidlParent,NULL,
-				IID_IShellFolder,reinterpret_cast<void **>(&pShellFolder));
-			pDesktopFolder->Release();
+			hr = SHGetDesktopFolder(&pDesktopFolder);
+
+			if(SUCCEEDED(hr))
+			{
+				hr = pDesktopFolder->BindToObject(pidlParent, NULL,
+					IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
+				pDesktopFolder->Release();
+			}
 		}
 
 		if(SUCCEEDED(hr))
