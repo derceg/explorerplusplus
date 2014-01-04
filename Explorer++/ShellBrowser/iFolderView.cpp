@@ -636,7 +636,7 @@ void CShellBrowser::SetTileViewItemInfo(int iItem,int iItemInternal)
 	lvti.puColumns	= uColumns;
 	ListView_SetTileInfo(m_hListView,&lvti);
 
-	QueryFullItemName(iItem,FullFileName);
+	QueryFullItemName(iItem,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 	SHGetFileInfo(FullFileName,0,
 		&shfi,sizeof(SHFILEINFO),SHGFI_TYPENAME);

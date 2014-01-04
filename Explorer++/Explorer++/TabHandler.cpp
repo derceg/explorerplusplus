@@ -1149,7 +1149,7 @@ void Explorerplusplus::InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,
 	/* If no custom name is set, use the folders name. */
 	if(!m_TabInfo[iTabId].bUseCustomName)
 	{
-		GetDisplayName(pidlDirectory,szTabText,SHGDN_INFOLDER);
+		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
 
 		StringCchCopy(m_TabInfo[iTabId].szName,
 			SIZEOF_ARRAY(m_TabInfo[iTabId].szName),szTabText);
@@ -1423,7 +1423,7 @@ UINT Explorerplusplus::GetDefaultSortMode(const LPITEMIDLIST &pidlDirectory)
 	std::list<Column_t> *pColumns = NULL;
 
 	TCHAR szDirectory[MAX_PATH];
-	GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
+	GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
 
 	if(CompareVirtualFolders(szDirectory,CSIDL_CONTROLS))
 	{

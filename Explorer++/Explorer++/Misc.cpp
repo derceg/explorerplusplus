@@ -316,7 +316,7 @@ void Explorerplusplus::CopyToFolder(BOOL bMove)
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 		FullFilenameList.push_back(szFullFilename);
 	}
@@ -695,7 +695,7 @@ BOOL Explorerplusplus::CompareVirtualFolders(TCHAR *szDirectory,UINT uFolderCSID
 {
 	TCHAR szParsingPath[MAX_PATH];
 
-	GetVirtualFolderParsingPath(uFolderCSIDL,szParsingPath);
+	GetVirtualFolderParsingPath(uFolderCSIDL,szParsingPath,SIZEOF_ARRAY(szParsingPath));
 
 	if(StrCmp(szDirectory,szParsingPath) == 0)
 		return TRUE;
@@ -807,7 +807,7 @@ void Explorerplusplus::HandleFileSelectionDisplayZero(void)
 	{
 		/* Folder name. */
 		TCHAR szFolderName[MAX_PATH];
-		GetDisplayName(szCurrentDirectory,szFolderName,SHGDN_INFOLDER);
+		GetDisplayName(szCurrentDirectory,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 		DisplayWindow_BufferText(m_hDisplayWindow,szFolderName);
 
 		/* Folder type. */
@@ -841,13 +841,13 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 		/* File name. */
 		DisplayWindow_BufferText(m_hDisplayWindow,szDisplayName);
 
-		m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName);
+		m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName,SIZEOF_ARRAY(szFullItemName));
 
 		if(!m_pActiveShellBrowser->InVirtualFolder())
 		{
 			DWORD dwAttributes;
 
-			m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName);
+			m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName,SIZEOF_ARRAY(szFullItemName));
 
 			pwfd = m_pActiveShellBrowser->QueryFileFindData(iSelected);
 
@@ -1043,7 +1043,7 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 		}
 		else
 		{
-			m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName);
+			m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName,SIZEOF_ARRAY(szFullItemName));
 
 			if(PathIsRoot(szFullItemName))
 			{

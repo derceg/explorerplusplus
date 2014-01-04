@@ -379,7 +379,7 @@ public:
 	DWORD				QueryFileAttributes(int iItem) const;
 	int					QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
 	BOOL				IsFileReal(int iItem) const;
-	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath) const;
+	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;
 	
 	/* Column support. */
 	void				ExportCurrentColumns(std::list<Column_t> *pColumns);
@@ -712,7 +712,7 @@ private:
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL) const;
 	int					LocateFileItemInternalIndex(const TCHAR *szFileName) const;
 	void				ApplyHeaderSortArrow(void);
-	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName) const;
+	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName,UINT cchMax) const;
 	void				CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns);
 
 

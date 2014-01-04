@@ -197,7 +197,7 @@ int CShellBrowser::SetAllFolderSizeColumnData(void)
 					{
 						iItemInternal = (int)lvItem.lParam;
 
-						QueryFullItemName(iItem,FullItemPath);
+						QueryFullItemName(iItem,FullItemPath,SIZEOF_ARRAY(FullItemPath));
 
 						CalculateFolderSize(FullItemPath,&nFolders,&nFiles,&lTotalFolderSize);
 
@@ -577,7 +577,7 @@ std::wstring CShellBrowser::GetTimeColumnText(int InternalIndex,TimeType_t TimeT
 std::wstring CShellBrowser::GetAttributeColumnText(int InternalIndex) const
 {
 	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName);
+	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 	TCHAR AttributeString[32];
 	BuildFileAttributeString(FullFileName,AttributeString,SIZEOF_ARRAY(AttributeString));
@@ -640,7 +640,7 @@ std::wstring CShellBrowser::GetShortNameColumnText(int InternalIndex) const
 std::wstring CShellBrowser::GetOwnerColumnText(int InternalIndex) const
 {
 	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName);
+	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 	TCHAR Owner[512];
 	size_t Size = GetFileOwner(FullFileName,Owner,SIZEOF_ARRAY(Owner));
@@ -685,7 +685,7 @@ std::wstring CShellBrowser::GetVersionColumnText(int InternalIndex,VersionInfoTy
 	}
 
 	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName);
+	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 	TCHAR VersionInfo[512];
 	BOOL VersionInfoObtained = GetVersionInfoString(FullFileName,VersionInfoName.c_str(),
@@ -702,7 +702,7 @@ std::wstring CShellBrowser::GetVersionColumnText(int InternalIndex,VersionInfoTy
 std::wstring CShellBrowser::GetShortcutToColumnText(int InternalIndex) const
 {
 	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName);
+	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 	TCHAR ResolvedLinkPath[MAX_PATH];
 	HRESULT hr = NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName,
@@ -719,7 +719,7 @@ std::wstring CShellBrowser::GetShortcutToColumnText(int InternalIndex) const
 DWORD CShellBrowser::GetHardLinksColumnRawData(int InternalIndex) const
 {
 	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName);
+	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 	return GetNumFileHardLinks(FullFileName);
 }
@@ -759,7 +759,7 @@ std::wstring CShellBrowser::GetExtensionColumnText(int InternalIndex) const
 std::wstring CShellBrowser::GetSummaryColumnText(int InternalIndex,DWORD PropertyType) const
 {
 	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName);
+	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 	TCHAR FileProperty[512];
 	int Res = ReadFileProperty(FullFileName,PropertyType,FileProperty,
@@ -776,7 +776,7 @@ std::wstring CShellBrowser::GetSummaryColumnText(int InternalIndex,DWORD Propert
 std::wstring CShellBrowser::GetImageColumnText(int InternalIndex,PROPID PropertyID) const
 {
 	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName);
+	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 	TCHAR ImageProperty[512];
 	BOOL Res = ReadImageProperty(FullFileName,PropertyID,ImageProperty,
@@ -795,7 +795,7 @@ std::wstring CShellBrowser::GetFileSystemColumnText(int InternalIndex) const
 	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex].pridl);
 
 	TCHAR FullFileName[MAX_PATH];
-	GetDisplayName(pidlComplete,FullFileName,SHGDN_FORPARSING);
+	GetDisplayName(pidlComplete,FullFileName,SIZEOF_ARRAY(FullFileName),SHGDN_FORPARSING);
 
 	CoTaskMemFree(pidlComplete);
 
@@ -823,7 +823,7 @@ BOOL CShellBrowser::GetDriveSpaceColumnRawData(int InternalIndex,bool TotalSize,
 	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex].pridl);
 
 	TCHAR FullFileName[MAX_PATH];
-	GetDisplayName(pidlComplete,FullFileName,SHGDN_FORPARSING);
+	GetDisplayName(pidlComplete,FullFileName,SIZEOF_ARRAY(FullFileName),SHGDN_FORPARSING);
 
 	CoTaskMemFree(pidlComplete);
 
@@ -869,7 +869,7 @@ std::wstring CShellBrowser::GetDriveSpaceColumnText(int InternalIndex,bool Total
 std::wstring CShellBrowser::GetControlPanelCommentsColumnText(int InternalIndex) const
 {
 	TCHAR szFullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex, szFullFileName);
+	QueryFullItemNameInternal(InternalIndex, szFullFileName, SIZEOF_ARRAY(szFullFileName));
 
 	TCHAR InfoTip[512];
 	HRESULT hr = GetItemInfoTip(szFullFileName, InfoTip, SIZEOF_ARRAY(InfoTip));
@@ -998,7 +998,7 @@ std::wstring CShellBrowser::GetNetworkAdapterColumnText(int InternalIndex) const
 std::wstring CShellBrowser::GetMediaMetadataColumnText(int InternalIndex,MediaMetadataType_t MediaMetaDataType) const
 {
 	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName);
+	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 	const TCHAR *AttributeName = GetMediaMetadataAttributeName(MediaMetaDataType);
 

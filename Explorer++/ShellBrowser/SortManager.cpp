@@ -353,12 +353,12 @@ int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) co
 	{
 		TCHAR FullFileName1[MAX_PATH];
 		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex1].pridl);
-		GetDisplayName(pidlComplete1,FullFileName1,SHGDN_FORPARSING);
+		GetDisplayName(pidlComplete1,FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete1);
 
 		TCHAR FullFileName2[MAX_PATH];
 		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex2].pridl);
-		GetDisplayName(pidlComplete2,FullFileName2,SHGDN_FORPARSING);
+		GetDisplayName(pidlComplete2,FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete2);
 
 		BOOL IsRoot1 = PathIsRoot(FullFileName1);
@@ -424,12 +424,12 @@ int CALLBACK CShellBrowser::SortByType(int InternalIndex1,int InternalIndex2) co
 	{
 		TCHAR FullFileName1[MAX_PATH];
 		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex1].pridl);
-		GetDisplayName(pidlComplete1,FullFileName1,SHGDN_FORPARSING);
+		GetDisplayName(pidlComplete1,FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete1);
 
 		TCHAR FullFileName2[MAX_PATH];
 		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex2].pridl);
-		GetDisplayName(pidlComplete2,FullFileName2,SHGDN_FORPARSING);
+		GetDisplayName(pidlComplete2,FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete2);
 
 		BOOL IsRoot1 = PathIsRoot(FullFileName1);

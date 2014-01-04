@@ -224,7 +224,7 @@ int iDroppedItem)
 					DragQueryFile((HDROP)pdf,iDroppedItem,szFullFileName,
 						SIZEOF_ARRAY(szFullFileName));
 
-					GetDisplayName(pidlDest,szDestDirectory,SHGDN_FORPARSING);
+					GetDisplayName(pidlDest,szDestDirectory,SIZEOF_ARRAY(szDestDirectory),SHGDN_FORPARSING);
 
 					bOnSameDrive = PathIsSameRoot(szDestDirectory,szFullFileName);
 
@@ -270,7 +270,7 @@ POINTL pt,DWORD *pdwEffect)
 	{
 		pidlDirectory = BuildPath(tvht.hItem);
 
-		GetDisplayName(pidlDirectory,szDestDirectory,SHGDN_FORPARSING);
+		GetDisplayName(pidlDirectory,szDestDirectory,SIZEOF_ARRAY(szDestDirectory),SHGDN_FORPARSING);
 
 		CDropHandler *pDropHandler = CDropHandler::CreateNew();
 		pDropHandler->Drop(pDataObject,

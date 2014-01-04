@@ -556,7 +556,7 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 			LPITEMIDLIST pidl = m_pActiveShellBrowser->RetrieveHistoryItemWithoutUpdate(-1);
 
 			TCHAR szPath[MAX_PATH];
-			GetDisplayName(pidl,szPath,SHGDN_INFOLDER);
+			GetDisplayName(pidl,szPath,SIZEOF_ARRAY(szPath),SHGDN_INFOLDER);
 
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
@@ -573,7 +573,7 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 			LPITEMIDLIST pidl = m_pActiveShellBrowser->RetrieveHistoryItemWithoutUpdate(1);
 
 			TCHAR szPath[MAX_PATH];
-			GetDisplayName(pidl,szPath,SHGDN_INFOLDER);
+			GetDisplayName(pidl,szPath,SIZEOF_ARRAY(szPath),SHGDN_INFOLDER);
 
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
@@ -653,7 +653,7 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 
 		for(itr = lHistory.begin();itr != lHistory.end();itr++)
 		{
-			GetDisplayName(*itr,szDisplayName,SHGDN_INFOLDER);
+			GetDisplayName(*itr,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
 			mii.cbSize		= sizeof(mii);
 			mii.fMask		= MIIM_ID|MIIM_STRING;

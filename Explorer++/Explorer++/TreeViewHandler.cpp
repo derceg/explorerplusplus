@@ -349,7 +349,7 @@ void Explorerplusplus::OnTreeViewCopyItemPath(void)
 	{
 		pidl = m_pMyTreeView->BuildPath(hItem);
 
-		GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
+		GetDisplayName(pidl,szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
 
 		CopyTextToClipboard(szFullFileName);
 
@@ -372,7 +372,7 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths(void)
 	{
 		pidl = m_pMyTreeView->BuildPath(hItem);
 
-		GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
+		GetDisplayName(pidl,szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
 
 		dwBufferSize = sizeof(uni);
 		dwRet = WNetGetUniversalName(szFullFileName,UNIVERSAL_NAME_INFO_LEVEL,
@@ -403,7 +403,7 @@ void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 		std::list<std::wstring> FileNameList;
 		TCHAR szFullFileName[MAX_PATH];
 
-		GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
+		GetDisplayName(pidl,szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
 
 		std::wstring stringFileName(szFullFileName);
 		FileNameList.push_back(stringFileName);
@@ -511,7 +511,7 @@ int Explorerplusplus::OnTreeViewBeginLabelEdit(LPARAM lParam)
 
 	/* Save the old filename, in the case that the file
 	needs to be renamed. */
-	GetDisplayName(pidl,m_OldTreeViewFileName,SHGDN_FORPARSING);
+	GetDisplayName(pidl,m_OldTreeViewFileName,SIZEOF_ARRAY(m_OldTreeViewFileName),SHGDN_FORPARSING);
 
 	return FALSE;
 }
@@ -719,7 +719,7 @@ void Explorerplusplus::OnTreeViewSetFileAttributes(void)
 	NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
 
 	LPITEMIDLIST pidlItem = m_pMyTreeView->BuildPath(hItem);
-	HRESULT hr = GetDisplayName(pidlItem,sfai.szFullFileName,SHGDN_FORPARSING);
+	HRESULT hr = GetDisplayName(pidlItem,sfai.szFullFileName,SIZEOF_ARRAY(sfai.szFullFileName),SHGDN_FORPARSING);
 	CoTaskMemFree(pidlItem);
 
 	if(hr == S_OK)
@@ -762,7 +762,7 @@ void Explorerplusplus::OnTreeViewPaste(void)
 
 			assert(pidl != NULL);
 
-			GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
+			GetDisplayName(pidl,szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
 
 			/* Name must be double NULL terminated. */
 			szFullFileName[lstrlen(szFullFileName) + 1] = '\0';
@@ -795,7 +795,7 @@ void Explorerplusplus::HandleTreeViewSelection(void)
 
 	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
-	GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
+	GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
 
 	if(PathIsUNC(szDirectory))
 	{

@@ -607,7 +607,7 @@ void Explorerplusplus::OnNewTab(void)
 		TCHAR FullItemPath[MAX_PATH];
 
 		/* An item is selected, so get its full pathname. */
-		m_pActiveShellBrowser->QueryFullItemName(iSelected,FullItemPath);
+		m_pActiveShellBrowser->QueryFullItemName(iSelected,FullItemPath,SIZEOF_ARRAY(FullItemPath));
 
 		/* If the selected item is a folder, open that folder
 		in a new tab, else just use the default new tab directory. */
@@ -790,7 +790,7 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 			TCHAR	szItemPath[MAX_PATH];
 			TCHAR	szTargetPath[MAX_PATH];
 
-			GetDisplayName(pidlItem,szItemPath,SHGDN_FORPARSING);
+			GetDisplayName(pidlItem,szItemPath,SIZEOF_ARRAY(szItemPath),SHGDN_FORPARSING);
 
 			hr = NFileOperations::ResolveLink(m_hContainer,0,szItemPath,szTargetPath,SIZEOF_ARRAY(szTargetPath));
 
@@ -848,7 +848,7 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 			TCHAR szParsingPath[MAX_PATH];
 			TCHAR szExplorerPath[MAX_PATH];
 
-			GetDisplayName(pidlItem,szParsingPath,SHGDN_FORPARSING);
+			GetDisplayName(pidlItem,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
 			MyExpandEnvironmentStrings(_T("%windir%\\explorer.exe"),
 				szExplorerPath,SIZEOF_ARRAY(szExplorerPath));
@@ -889,7 +889,7 @@ void Explorerplusplus::OpenFileItem(LPITEMIDLIST pidlItem,const TCHAR *szParamet
 
 	ILRemoveLastID(pidlParent);
 
-	GetDisplayName(pidlParent,szItemDirectory,SHGDN_FORPARSING);
+	GetDisplayName(pidlParent,szItemDirectory,SIZEOF_ARRAY(szItemDirectory),SHGDN_FORPARSING);
 
 	ExecuteFileAction(m_hContainer,EMPTY_STRING,szParameters,szItemDirectory,(LPCITEMIDLIST)pidlItem);
 
@@ -929,7 +929,7 @@ void Explorerplusplus::OnSaveFileSlack(void)
 	int		nBytesRetrieved;
 
 	bSaveNameRetrieved = GetFileNameFromUser(m_hContainer,
-	szSaveFileName,m_CurrentDirectory);
+	szSaveFileName,SIZEOF_ARRAY(szSaveFileName),m_CurrentDirectory);
 
 	if(bSaveNameRetrieved)
 	{
@@ -937,7 +937,7 @@ void Explorerplusplus::OnSaveFileSlack(void)
 
 		if(iItem != -1)
 		{
-			m_pActiveShellBrowser->QueryFullItemName(iItem,szSlackFileName);
+			m_pActiveShellBrowser->QueryFullItemName(iItem,szSlackFileName,SIZEOF_ARRAY(szSlackFileName));
 
 			nBytesRetrieved = ReadFileSlack(szSlackFileName,pszSlack,SIZEOF_ARRAY(pszSlack));
 
@@ -1240,7 +1240,7 @@ void Explorerplusplus::OnResolveLink(void)
 
 	if(iItem != -1)
 	{
-		m_pActiveShellBrowser->QueryFullItemName(iItem,ShortcutFileName);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,ShortcutFileName,SIZEOF_ARRAY(ShortcutFileName));
 
 		hr = NFileOperations::ResolveLink(m_hContainer,0,ShortcutFileName,szFullFileName,SIZEOF_ARRAY(szFullFileName));
 
@@ -1270,7 +1270,7 @@ void Explorerplusplus::OnSaveDirectoryListing(void)
 	TCHAR FileName[MAX_PATH];
 	LoadString(m_hLanguageModule,IDS_GENERAL_DIRECTORY_LISTING_FILENAME,FileName,SIZEOF_ARRAY(FileName));
 	StringCchCat(FileName,SIZEOF_ARRAY(FileName),_T(".txt"));
-	BOOL bSaveNameRetrieved = GetFileNameFromUser(m_hContainer,FileName,m_CurrentDirectory);
+	BOOL bSaveNameRetrieved = GetFileNameFromUser(m_hContainer,FileName,SIZEOF_ARRAY(FileName),m_CurrentDirectory);
 
 	if(bSaveNameRetrieved)
 	{
@@ -1392,7 +1392,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 	m_pShellBrowser[iTabId]->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectoryToWatch),
 		szDirectoryToWatch);
 
-	GetVirtualFolderParsingPath(CSIDL_BITBUCKET,szRecycleBin);
+	GetVirtualFolderParsingPath(CSIDL_BITBUCKET,szRecycleBin,SIZEOF_ARRAY(szRecycleBin));
 
 	/* Don't watch virtual folders (the 'recycle bin' may be an
 	exception to this). */
@@ -1728,7 +1728,7 @@ void Explorerplusplus::SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl)
 	/* Don't use SUCCEEDED(hr). */
 	if(hr == S_OK)
 	{
-		GetDisplayName(pidl,szFolderName,SHGDN_INFOLDER);
+		GetDisplayName(pidl,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 
 		mii.cbSize		= sizeof(mii);
 		mii.fMask		= MIIM_STRING;
@@ -1840,7 +1840,7 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 
 		GetCurrentProcessImageName(szCurrentProcess,SIZEOF_ARRAY(szCurrentProcess));
 
-		GetDisplayName(pidlDirectory,szPath,SHGDN_FORPARSING);
+		GetDisplayName(pidlDirectory,szPath,SIZEOF_ARRAY(szPath),SHGDN_FORPARSING);
 		StringCchPrintf(szParameters,SIZEOF_ARRAY(szParameters),_T("\"%s\""),szPath);
 
 		sei.cbSize			= sizeof(sei);
@@ -2540,7 +2540,7 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 				DWORD dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(static_cast<int>(pnmcd->dwItemSpec));
 
 				TCHAR szFileName[MAX_PATH];
-				m_pActiveShellBrowser->QueryFullItemName(static_cast<int>(pnmcd->dwItemSpec),szFileName);
+				m_pActiveShellBrowser->QueryFullItemName(static_cast<int>(pnmcd->dwItemSpec),szFileName,SIZEOF_ARRAY(szFileName));
 				PathStripPath(szFileName);
 
 				/* Loop through each filter. Decide whether to change the font of the

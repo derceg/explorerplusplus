@@ -74,7 +74,7 @@ HRESULT CShellBrowser::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
 	TCHAR szParsingPath[MAX_PATH];
-	GetDisplayName(pidl,szParsingPath,SHGDN_FORPARSING);
+	GetDisplayName(pidl,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
 	/* TODO: Method callback. */
 	SendMessage(m_hOwner,WM_USER_STARTEDBROWSING,m_ID,reinterpret_cast<WPARAM>(szParsingPath));

@@ -19,6 +19,7 @@
 #include "iPathManager.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/Macros.h"
 
 
 CPathManager::CPathManager()
@@ -192,7 +193,7 @@ UINT CPathManager::CreateHistoryPopupMenu(HWND Parent,POINT *Origin,BOOL bBack)
 
 		for(i = iEndIndex - 1;i >= iStartIndex;i--)
 		{
-			GetDisplayName(ppidlList[i],szMenuText,SHGDN_INFOLDER);
+			GetDisplayName(ppidlList[i],szMenuText,SIZEOF_ARRAY(szMenuText),SHGDN_INFOLDER);
 			AppendMenu(hMenu,MF_STRING,iEndIndex - i,szMenuText);
 		}
 	}
@@ -206,7 +207,7 @@ UINT CPathManager::CreateHistoryPopupMenu(HWND Parent,POINT *Origin,BOOL bBack)
 
 		for(i = iStartIndex;i < iEndIndex;i++)
 		{
-			GetDisplayName(ppidlList[i],szMenuText,SHGDN_INFOLDER);
+			GetDisplayName(ppidlList[i],szMenuText,SIZEOF_ARRAY(szMenuText),SHGDN_INFOLDER);
 			AppendMenu(hMenu,MF_STRING,i - iStartIndex + 1,szMenuText);
 		}
 	}

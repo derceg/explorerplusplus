@@ -556,7 +556,7 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::Drop(IDataObject *pDataObject,
 				if(PathIsDirectory(szFullFileName))
 				{
 					TCHAR szDisplayName[MAX_PATH];
-					GetDisplayName(szFullFileName,szDisplayName,SHGDN_INFOLDER);
+					GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
 					CBookmark Bookmark(szDisplayName,szFullFileName,EMPTY_STRING);
 

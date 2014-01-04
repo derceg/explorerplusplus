@@ -84,8 +84,8 @@ m_hContainer(hwnd)
 	InitializeTabMap();
 
 	/* Default folder (i.e. My Computer). */
-	GetVirtualFolderParsingPath(CSIDL_DRIVES,m_DefaultTabDirectoryStatic);
-	GetVirtualFolderParsingPath(CSIDL_DRIVES,m_DefaultTabDirectory);
+	GetVirtualFolderParsingPath(CSIDL_DRIVES,m_DefaultTabDirectoryStatic,SIZEOF_ARRAY(m_DefaultTabDirectoryStatic));
+	GetVirtualFolderParsingPath(CSIDL_DRIVES,m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory));
 
 	InitializeMainToolbars();
 

@@ -290,11 +290,11 @@ void Explorerplusplus::HandleMainWindowText(void)
 	GUID will be shown). */
 	if(m_bShowFullTitlePath && !m_pActiveShellBrowser->InVirtualFolder())
 	{
-		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SHGDN_FORPARSING);
+		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SIZEOF_ARRAY(szFolderDisplayName),SHGDN_FORPARSING);
 	}
 	else
 	{
-		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SHGDN_NORMAL);
+		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SIZEOF_ARRAY(szFolderDisplayName),SHGDN_NORMAL);
 	}
 
 	StringCchPrintf(szTitle,SIZEOF_ARRAY(szTitle),
@@ -357,7 +357,7 @@ void Explorerplusplus::HandleAddressBarText(void)
 
 	TCHAR szParsingPath[MAX_PATH];
 
-	GetDisplayName(pidl,szParsingPath,SHGDN_FORPARSING);
+	GetDisplayName(pidl,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
 	/* If the path is a GUID (i.e. of the form
 	::{20D04FE0-3AEA-1069-A2D8-08002B30309D}), we'll
@@ -367,7 +367,7 @@ void Explorerplusplus::HandleAddressBarText(void)
 	be shown directly to users. */
 	if(IsPathGUID(szParsingPath))
 	{
-		GetDisplayName(pidl,szAddressBarTitle,SHGDN_INFOLDER);
+		GetDisplayName(pidl,szAddressBarTitle,SIZEOF_ARRAY(szAddressBarTitle),SHGDN_INFOLDER);
 	}
 	else
 	{
@@ -415,7 +415,7 @@ void Explorerplusplus::HandleTabText(int iTab,int iTabId)
 		LPITEMIDLIST pidlDirectory = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
 
 		TCHAR szTabText[MAX_PATH];
-		GetDisplayName(pidlDirectory,szTabText,SHGDN_INFOLDER);
+		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
 
 		StringCchCopy(m_TabInfo[iTabId].szName,
 			SIZEOF_ARRAY(m_TabInfo[iTabId].szName),szTabText);

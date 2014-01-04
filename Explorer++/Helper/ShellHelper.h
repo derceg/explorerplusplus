@@ -34,14 +34,14 @@ struct ContextMenuHandler_t
 
 void			DecodePath(const TCHAR *szInitialPath,const TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest);
 HRESULT			GetIdlFromParsingName(const TCHAR *szParsingName,LPITEMIDLIST *pidl);
-HRESULT			GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags);
-HRESULT			GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uFlags);
+HRESULT			GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags);
+HRESULT			GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags);
 BOOL			CheckIdl(LPCITEMIDLIST pidl);
 BOOL			IsIdlDirectory(LPCITEMIDLIST pidl);
-void			GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath);
+void			GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath,UINT cchMax);
 HRESULT			GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent);
 BOOL			IsNamespaceRoot(LPCITEMIDLIST pidl);
-HRESULT			GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,DWORD uParsingFlags);
+HRESULT			GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,UINT cchMax,DWORD uParsingFlags);
 BOOL			MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize);
 HRESULT			BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN std::list<std::wstring> FilenameList);
 HRESULT			BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN LPCITEMIDLIST pidlDirectory,IN std::list<LPITEMIDLIST> pidlList);
@@ -56,7 +56,7 @@ BOOL			CopyTextToClipboard(const std::wstring &str);
 HRESULT			GetItemAttributes(const TCHAR *szItemParsingPath, SFGAOF *pItemAttributes);
 HRESULT			GetItemAttributes(LPCITEMIDLIST pidl, SFGAOF *pItemAttributes);
 BOOL			ExecuteFileAction(HWND hwnd, const TCHAR *szVerb, const TCHAR *szParameters, const TCHAR *szStartDirectory, LPCITEMIDLIST pidl);
-HRESULT			DecodeFriendlyPath(const TCHAR *szFriendlyPath, TCHAR *szParsingPath);
+HRESULT			DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT cchMax);
 
 /* Drag and drop helpers. */
 DWORD			DetermineCurrentDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept, BOOL bOnSameDrive);

@@ -87,7 +87,7 @@ int CShellBrowser::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) con
 	return lstrlen(Buffer);
 }
 
-HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath) const
+HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const
 {
 	LVITEM			lvItem;
 	BOOL			bRes;
@@ -99,7 +99,7 @@ HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath) const
 
 	if(bRes)
 	{
-		QueryFullItemNameInternal((int)lvItem.lParam,FullItemPath);
+		QueryFullItemNameInternal((int)lvItem.lParam,FullItemPath,cchMax);
 
 		return S_OK;
 	}
@@ -107,13 +107,13 @@ HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath) const
 	return E_FAIL;
 }
 
-void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName) const
+void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName,UINT cchMax) const
 {
 	LPITEMIDLIST	pidlComplete = NULL;
 
 	pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[iItemInternal].pridl);
 
-	GetDisplayName(pidlComplete,szFullFileName,SHGDN_FORPARSING);
+	GetDisplayName(pidlComplete,szFullFileName,cchMax,SHGDN_FORPARSING);
 
 	CoTaskMemFree(pidlComplete);
 }
@@ -591,7 +591,7 @@ BOOL CShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 {
 	TCHAR	szParsingPath[MAX_PATH];
 
-	GetVirtualFolderParsingPath(uFolderCSIDL,szParsingPath);
+	GetVirtualFolderParsingPath(uFolderCSIDL,szParsingPath,SIZEOF_ARRAY(szParsingPath));
 
 	if(StrCmp(m_CurDir,szParsingPath) == 0)
 		return TRUE;
@@ -1487,7 +1487,7 @@ void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
 	int nItems;
 	int i = 0;
 
-	GetDisplayName(pidlItem,szItem,SHGDN_INFOLDER);
+	GetDisplayName(pidlItem,szItem,SIZEOF_ARRAY(szItem),SHGDN_INFOLDER);
 
 	nItems = ListView_GetItemCount(m_hListView);
 
@@ -1678,7 +1678,7 @@ void CShellBrowser::UpdateDriveIcon(TCHAR *szDrive)
 
 	/* Look for the item using its display name, NOT
 	its drive letter/name. */
-	GetDisplayName(szDrive,szDisplayName,SHGDN_INFOLDER);
+	GetDisplayName(szDrive,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
 	hr = GetIdlFromParsingName(szDrive,&pidlDrive);
 

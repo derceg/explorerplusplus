@@ -168,7 +168,7 @@ void Explorerplusplus::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
 					bOpenInNewTab = TRUE;
 				}
 
-				GetDisplayName(pidlComplete,szParsingPath,SHGDN_FORPARSING);
+				GetDisplayName(pidlComplete,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 				BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 
 				m_bTreeViewOpenInNewTab = TRUE;

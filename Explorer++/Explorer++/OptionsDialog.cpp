@@ -442,7 +442,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 						/* The folder may be virtual, in which case, it needs
 						to be decoded. */
-						hr = DecodeFriendlyPath(szNewTabDir,szVirtualParsingPath);
+						hr = DecodeFriendlyPath(szNewTabDir,szVirtualParsingPath,SIZEOF_ARRAY(szVirtualParsingPath));
 
 						if(SUCCEEDED(hr))
 							StringCchCopy(m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory),
@@ -1228,7 +1228,7 @@ void Explorerplusplus::OnDefaultSettingsNewTabDir(HWND hDlg)
 	GetDlgItemText(hDlg,IDC_DEFAULT_NEWTABDIR_EDIT,szNewTabDir,
 		SIZEOF_ARRAY(szNewTabDir));
 
-	hr = DecodeFriendlyPath(szNewTabDir,szVirtualParsingPath);
+	hr = DecodeFriendlyPath(szNewTabDir,szVirtualParsingPath,SIZEOF_ARRAY(szVirtualParsingPath));
 
 	if(SUCCEEDED(hr))
 		StringCchCopy(g_szNewTabDirectory,SIZEOF_ARRAY(g_szNewTabDirectory),
@@ -1303,7 +1303,7 @@ void Explorerplusplus::DefaultSettingsSetNewTabDir(HWND hEdit,LPITEMIDLIST pidl)
 	else
 		uNameFlags = SHGDN_INFOLDER;
 
-	GetDisplayName(pidl,szNewTabDir,uNameFlags);
+	GetDisplayName(pidl,szNewTabDir,SIZEOF_ARRAY(szNewTabDir),uNameFlags);
 
 	SendMessage(hEdit,WM_SETTEXT,0,(LPARAM)szNewTabDir);
 }

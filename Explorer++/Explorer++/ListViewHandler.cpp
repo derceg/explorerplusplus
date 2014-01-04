@@ -487,7 +487,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 
 				pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
-				GetDisplayName(pidl,szRoot,SHGDN_FORPARSING);
+				GetDisplayName(pidl,szRoot,SIZEOF_ARRAY(szRoot),SHGDN_FORPARSING);
 				PathStripToRoot(szRoot);
 
 				/* Go to the root of this directory. */
@@ -909,7 +909,7 @@ void Explorerplusplus::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 	if((m_InfoTipType == INFOTIP_SYSTEM) || m_pActiveShellBrowser->InVirtualFolder())
 	{
 		TCHAR szFullFileName[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem, szFullFileName);
+		m_pActiveShellBrowser->QueryFullItemName(iItem, szFullFileName, SIZEOF_ARRAY(szFullFileName));
 		hr = GetItemInfoTip(szFullFileName, szInfoTip, cchMax);
 
 		if(!SUCCEEDED(hr))
@@ -1257,7 +1257,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 
 		TCHAR szFullFilename[MAX_PATH];
 
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 		std::wstring stringFilename(szFullFilename);
 
@@ -1354,7 +1354,7 @@ void Explorerplusplus::OnListViewFileDelete(BOOL bPermanent)
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 		FullFilenameList.push_back(szFullFilename);
 	}
 
@@ -1450,7 +1450,7 @@ void Explorerplusplus::OnListViewFileRename(void)
 
 			if(iIndex != -1)
 			{
-				m_pActiveShellBrowser->QueryFullItemName(iIndex,szFullFilename);
+				m_pActiveShellBrowser->QueryFullItemName(iIndex,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 				FullFilenameList.push_back(szFullFilename);
 			}
 		}
@@ -1514,7 +1514,7 @@ void Explorerplusplus::OnListViewCopyItemPath(void)
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 		strItemPaths += szFullFilename + std::wstring(_T("\r\n"));
 	}
@@ -1537,7 +1537,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths(void)
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 		TCHAR szBuffer[1024];
 
@@ -1627,7 +1627,7 @@ void Explorerplusplus::OnListViewSetFileAttributes(void)
 		{
 			NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
 
-			m_pActiveShellBrowser->QueryFullItemName(iSel,sfai.szFullFileName);
+			m_pActiveShellBrowser->QueryFullItemName(iSel,sfai.szFullFileName,SIZEOF_ARRAY(sfai.szFullFileName));
 
 			WIN32_FIND_DATA *pwfd = m_pActiveShellBrowser->QueryFileFindData(iSel);
 			sfai.wfd = *pwfd;
@@ -1690,7 +1690,7 @@ void Explorerplusplus::BuildListViewFileSelectionList(HWND hListView,
 		TCHAR szFullFileName[MAX_PATH];
 
 		m_pActiveShellBrowser->QueryFullItemName(iItem,
-			szFullFileName);
+			szFullFileName,SIZEOF_ARRAY(szFullFileName));
 
 		std::wstring stringFileName(szFullFileName);
 		FileSelectionList.push_back(stringFileName);
@@ -1717,7 +1717,7 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView)
 	if(iSelected == -1)
 		return -1;
 
-	hr = m_pActiveShellBrowser->QueryFullItemName(iSelected,TestFile);
+	hr = m_pActiveShellBrowser->QueryFullItemName(iSelected,TestFile,SIZEOF_ARRAY(TestFile));
 
 	if(SUCCEEDED(hr))
 	{
@@ -1725,7 +1725,7 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView)
 
 		for(i = 0;i < nItems;i++)
 		{
-			m_pActiveShellBrowser->QueryFullItemName(i,FullFileName);
+			m_pActiveShellBrowser->QueryFullItemName(i,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 			bSimilarTypes = CompareFileTypes(FullFileName,TestFile);
 

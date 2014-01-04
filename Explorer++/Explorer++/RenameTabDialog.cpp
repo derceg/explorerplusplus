@@ -113,7 +113,7 @@ void CRenameTabDialog::OnOk()
 		LPITEMIDLIST pidlDirectory = NULL;
 
 		pidlDirectory = m_pexpp->GetActiveShellBrowser()->QueryCurrentDirectoryIdl();
-		GetDisplayName(pidlDirectory,szTabText,SHGDN_INFOLDER);
+		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
 
 		CoTaskMemFree(pidlDirectory);
 	}

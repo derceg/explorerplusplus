@@ -127,7 +127,7 @@ BOOL			FileTimeToLocalSystemTime(const LPFILETIME lpFileTime,LPSYSTEMTIME lpLoca
 int				ReadFileSlack(const TCHAR *FileName,TCHAR *pszSlack,int iBufferLen);
 
 /* User interaction. */
-BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,const TCHAR *InitialDirectory);
+BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR *InitialDirectory);
 
 /* Device related. */
 TCHAR			*DecodePrinterStatus(DWORD dwStatus);

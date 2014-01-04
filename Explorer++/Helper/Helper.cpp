@@ -1072,8 +1072,14 @@ int ReadFileSlack(const TCHAR *FileName,TCHAR *pszSlack,int iBufferLen)
 	return nBytesRead;
 }
 
-BOOL GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,const TCHAR *InitialDirectory)
+BOOL GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR *InitialDirectory)
 {
+	/* As per the documentation for
+	the OPENFILENAME structure, the
+	length of the filename buffer
+	should be at least 256. */
+	assert(cchMax >= 256);
+
 	TCHAR *Filter = _T("Text Document (*.txt)\0*.txt\0All Files\0*.*\0\0");
 	OPENFILENAME ofn;
 	BOOL bRet;
@@ -1085,7 +1091,7 @@ BOOL GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,const TCHAR *InitialDirec
 	ofn.nMaxCustFilter		= 0;
 	ofn.nFilterIndex		= 0;
 	ofn.lpstrFile			= FullFileName;
-	ofn.nMaxFile			= MAX_PATH;
+	ofn.nMaxFile			= cchMax;
 	ofn.lpstrFileTitle		= NULL;
 	ofn.nMaxFileTitle		= 0;
 	ofn.lpstrInitialDir		= InitialDirectory;
