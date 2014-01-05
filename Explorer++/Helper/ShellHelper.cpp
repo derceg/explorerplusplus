@@ -176,7 +176,7 @@ BOOL ExecuteFileAction(HWND hwnd,const TCHAR *szVerb,const TCHAR *szParameters,c
 	return ShellExecuteEx(&ExecInfo);
 }
 
-void GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath,UINT cchMax)
+HRESULT GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath,UINT cchMax)
 {
 	IShellFolder *pShellFolder		= NULL;
 	IShellFolder *pDesktopFolder	= NULL;
@@ -202,7 +202,7 @@ void GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath,UINT cch
 
 				if(SUCCEEDED(hr))
 				{
-					StrRetToBuf(&str,pidlRelative,szParsingPath,cchMax);
+					hr = StrRetToBuf(&str,pidlRelative,szParsingPath,cchMax);
 				}
 
 				pShellFolder->Release();
@@ -213,6 +213,8 @@ void GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath,UINT cch
 
 		pDesktopFolder->Release();
 	}
+
+	return hr;
 }
 
 HRESULT GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent)
