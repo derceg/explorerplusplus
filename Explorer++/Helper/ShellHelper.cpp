@@ -770,23 +770,24 @@ HRESULT BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolde
 		return E_FAIL;
 	}
 
-	IShellFolder *pDesktopFolder = NULL;
 	HRESULT hr;
 
 	*pShellFolder = NULL;
 
-	hr = SHGetDesktopFolder(&pDesktopFolder);
-
-	if(SUCCEEDED(hr))
+	if(IsNamespaceRoot(pidlDirectory))
 	{
-		if(IsNamespaceRoot(pidlDirectory))
+		hr = SHGetDesktopFolder(pShellFolder);
+	}
+	else
+	{
+		IShellFolder *pDesktopFolder = NULL;
+		hr = SHGetDesktopFolder(&pDesktopFolder);
+
+		if(SUCCEEDED(hr))
 		{
-			hr = SHGetDesktopFolder(pShellFolder);
-		}
-		else
-		{
-			hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
-				IID_IShellFolder,(LPVOID *)pShellFolder);
+			hr = pDesktopFolder->BindToObject(pidlDirectory, NULL,
+				IID_IShellFolder, reinterpret_cast<void **>(pShellFolder));
+			pDesktopFolder->Release();
 		}
 	}
 
