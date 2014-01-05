@@ -477,76 +477,56 @@ void EnterAttributeIntoString(BOOL bEnter,TCHAR *String,int Pos,TCHAR chAttribut
 		String[Pos] = '-';
 }
 
-size_t GetFileOwner(const TCHAR *szFile,TCHAR *szOwner,DWORD BufSize)
+BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax)
 {
-	HANDLE hFile;
-	PSID pSid;
-	PSECURITY_DESCRIPTOR pSecurityDescriptor;
-	DWORD dwRes;
-	TCHAR szAccountName[512];
-	DWORD dwAccountName = SIZEOF_ARRAY(szAccountName);
-	TCHAR szDomainName[512];
-	DWORD dwDomainName = SIZEOF_ARRAY(szDomainName);
-	size_t ReturnLength = 0;
-	SID_NAME_USE eUse;
-	LPTSTR StringSid;
-	BOOL bRes;
+	BOOL success = FALSE;
 
-	/* The SE_SECURITY_NAME privilege is needed to call GetSecurityInfo on the given file. */
-	bRes = SetProcessTokenPrivilege(GetCurrentProcessId(),SE_SECURITY_NAME,TRUE);
-
-	if(!bRes)
-		return 0;
-
-	hFile = CreateFile(szFile,STANDARD_RIGHTS_READ|ACCESS_SYSTEM_SECURITY,FILE_SHARE_READ,NULL,OPEN_EXISTING,
-	FILE_FLAG_BACKUP_SEMANTICS,NULL);
+	HANDLE hFile = CreateFile(szFile, READ_CONTROL, FILE_SHARE_READ, NULL,
+		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
 	if(hFile != INVALID_HANDLE_VALUE)
 	{
-		pSid = (PSID)GlobalAlloc(GMEM_FIXED,sizeof(PSID));
+		PSID pSidOwner = NULL;
+		PSECURITY_DESCRIPTOR pSD = NULL;
+		DWORD dwRet = GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION,
+			&pSidOwner, NULL, NULL, NULL, &pSD);
 
-		pSecurityDescriptor = (PSECURITY_DESCRIPTOR)GlobalAlloc(GMEM_FIXED,sizeof(PSECURITY_DESCRIPTOR));
-
-		dwRes = GetSecurityInfo(hFile,SE_FILE_OBJECT,OWNER_SECURITY_INFORMATION,&pSid,
-			NULL,NULL,NULL,&pSecurityDescriptor);
-
-		if(dwRes != ERROR_SUCCESS)
+		if(dwRet == ERROR_SUCCESS)
 		{
-			CloseHandle(hFile);
-			return 0;
-		}
+			TCHAR accountName[512];
+			DWORD accountNameLength = SIZEOF_ARRAY(accountName);
+			TCHAR domainName[512];
+			DWORD domainNameLength = SIZEOF_ARRAY(domainName);
+			SID_NAME_USE eUse;
+			BOOL bRet = LookupAccountSid(NULL, pSidOwner, accountName, &accountNameLength,
+				domainName, &domainNameLength, &eUse);
 
-		bRes = LookupAccountSid(NULL,pSid,szAccountName,&dwAccountName,
-			szDomainName,&dwDomainName,&eUse);
-
-		/* LookupAccountSid failed. */
-		if(bRes == 0)
-		{
-			bRes = ConvertSidToStringSid(pSid,&StringSid);
-
-			if(bRes != 0)
+			if(bRet)
 			{
-				StringCchCopy(szOwner,BufSize,StringSid);
-
-				LocalFree(StringSid);
-				ReturnLength = lstrlen(StringSid);
+				StringCchPrintf(szOwner, cchMax, _T("%s\\%s"), domainName, accountName);
+				success = TRUE;
 			}
-		}
-		else
-		{
-			StringCchPrintf(szOwner,BufSize,_T("%s\\%s"),szDomainName,szAccountName);
+			else
+			{
+				LPTSTR stringSid;
+				bRet = ConvertSidToStringSid(pSidOwner, &stringSid);
 
-			ReturnLength = lstrlen(szAccountName);
+				if(bRet)
+				{
+					StringCchCopy(szOwner, cchMax, stringSid);
+
+					LocalFree(stringSid);
+					success = TRUE;
+				}
+			}
+
+			LocalFree(pSD);
 		}
 
-		LocalFree(&pSecurityDescriptor);
 		CloseHandle(hFile);
 	}
 
-	/* Reset the privilege. */
-	SetProcessTokenPrivilege(GetCurrentProcessId(),SE_SECURITY_NAME,FALSE);
-
-	return ReturnLength;
+	return success;
 }
 
 BOOL GetProcessOwner(TCHAR *szOwner,DWORD BufSize)

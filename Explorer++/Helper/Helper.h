@@ -98,7 +98,7 @@ BOOL			GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFile
 BOOL			CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2);
 DWORD			BuildFileAttributeString(const TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize);
 void			BuildFileAttributeStringInternal(DWORD dwFileAttributes,TCHAR *szOutput,DWORD cchMax);
-size_t			GetFileOwner(const TCHAR *szFile,TCHAR *szOwner,DWORD BufSize);
+BOOL			GetFileOwner(const TCHAR *szFile,TCHAR *szOwner,size_t cchMax);
 DWORD			GetNumFileHardLinks(const TCHAR *lpszFileName);
 int				ReadFileProperty(const TCHAR *lpszFileName,DWORD dwPropertyId,TCHAR *lpszPropertyBuf,DWORD dwBufLen);
 BOOL			GetVersionInfoString(const TCHAR *szFileName,const TCHAR *szVersionInfo,TCHAR *szBuffer,UINT cbBufLen);

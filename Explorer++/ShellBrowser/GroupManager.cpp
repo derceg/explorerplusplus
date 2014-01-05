@@ -754,7 +754,12 @@ void CShellBrowser::DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHead
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
 	PathAppend(FullFileName,m_pwfdFiles[iItemInternal].cFileName);
 
-	GetFileOwner(FullFileName,szOwner,SIZEOF_ARRAY(szOwner));
+	BOOL ret = GetFileOwner(FullFileName,szOwner,SIZEOF_ARRAY(szOwner));
+
+	if(!ret)
+	{
+		StringCchCopy(szOwner,SIZEOF_ARRAY(szOwner),EMPTY_STRING);
+	}
 
 	StringCchCopy(szGroupHeader,cchMax,szOwner);
 }

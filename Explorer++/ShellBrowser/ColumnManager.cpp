@@ -643,9 +643,9 @@ std::wstring CShellBrowser::GetOwnerColumnText(int InternalIndex) const
 	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 	TCHAR Owner[512];
-	size_t Size = GetFileOwner(FullFileName,Owner,SIZEOF_ARRAY(Owner));
+	BOOL ret = GetFileOwner(FullFileName,Owner,SIZEOF_ARRAY(Owner));
 
-	if(Size == 0)
+	if(!ret)
 	{
 		return EMPTY_STRING;
 	}
