@@ -32,7 +32,7 @@ size_t cchBuf)
 void FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
 size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf)
 {
-	TCHAR *pszSizeTypes[] = {_T("bytes"),_T("KB"),_T("MB"),_T("GB"),_T("TB"),_T("PB")};
+	static const TCHAR *SIZE_STRINGS[] = {_T("bytes"),_T("KB"),_T("MB"),_T("GB"),_T("TB"),_T("PB")};
 
 	double fFileSize = static_cast<double>(lFileSize.QuadPart);
 	int iSizeIndex = 0;
@@ -80,7 +80,7 @@ size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf)
 			iSizeIndex++;
 		}
 
-		if(iSizeIndex > (SIZEOF_ARRAY(pszSizeTypes) - 1))
+		if(iSizeIndex > (SIZEOF_ARRAY(SIZE_STRINGS) - 1))
 		{
 			StringCchCopy(pszFileSize,cchBuf,EMPTY_STRING);
 			return;
@@ -124,7 +124,7 @@ size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf)
 	ss.imbue(std::locale(""));
 	ss.precision(iPrecision);
 
-	ss << std::fixed << fFileSize << _T(" ") << pszSizeTypes[iSizeIndex];
+	ss << std::fixed << fFileSize << _T(" ") << SIZE_STRINGS[iSizeIndex];
 	std::wstring str = ss.str();
 	StringCchCopy(pszFileSize,cchBuf,str.c_str());
 }
@@ -1244,7 +1244,7 @@ TCHAR *DecodePrinterStatus(DWORD dwStatus)
 
 BOOL IsImage(const TCHAR *szFileName)
 {
-	static const TCHAR *ImageExts[] = {_T("bmp"),_T("ico"),
+	static const TCHAR *IMAGE_EXTS[] = {_T("bmp"),_T("ico"),
 	_T("gif"),_T("jpg"),_T("exf"),_T("png"),_T("tif"),_T("wmf"),_T("emf"),_T("tiff")};
 	TCHAR *ext;
 	int i = 0;
@@ -1258,9 +1258,9 @@ BOOL IsImage(const TCHAR *szFileName)
 
 		ext++;
 
-		for(i = 0;i < SIZEOF_ARRAY(ImageExts);i++)
+		for(i = 0;i < SIZEOF_ARRAY(IMAGE_EXTS);i++)
 		{
-			if(lstrcmpi(ext,ImageExts[i]) == 0)
+			if(lstrcmpi(ext,IMAGE_EXTS[i]) == 0)
 				return TRUE;
 		}
 	}
