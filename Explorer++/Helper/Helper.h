@@ -108,7 +108,7 @@ WORD			GetFileLanguage(const TCHAR *szFullFileName);
 BOOL			GetFileProductVersion(const TCHAR *szFullFileName,DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS);
 
 /* Ownership and access. */
-BOOL			GetProcessOwner(TCHAR *szOwner,DWORD BufSize);
+BOOL			GetProcessOwner(TCHAR *szOwner,size_t cchMax);
 BOOL			CheckGroupMembership(GroupType_t GroupType);
 
 /* Time helpers. */

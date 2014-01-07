@@ -20,8 +20,8 @@
 #include "Macros.h"
 
 
-/* Local helpers. */
-void	EnterAttributeIntoString(BOOL bEnter,TCHAR *String,int Pos,TCHAR chAttribute);
+void EnterAttributeIntoString(BOOL bEnter,TCHAR *String,int Pos,TCHAR chAttribute);
+BOOL FormatUserName(PSID sid, TCHAR *userName, size_t cchMax);
 
 void FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,
 size_t cchBuf)
@@ -493,33 +493,7 @@ BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax)
 
 		if(dwRet == ERROR_SUCCESS)
 		{
-			TCHAR accountName[512];
-			DWORD accountNameLength = SIZEOF_ARRAY(accountName);
-			TCHAR domainName[512];
-			DWORD domainNameLength = SIZEOF_ARRAY(domainName);
-			SID_NAME_USE eUse;
-			BOOL bRet = LookupAccountSid(NULL, pSidOwner, accountName, &accountNameLength,
-				domainName, &domainNameLength, &eUse);
-
-			if(bRet)
-			{
-				StringCchPrintf(szOwner, cchMax, _T("%s\\%s"), domainName, accountName);
-				success = TRUE;
-			}
-			else
-			{
-				LPTSTR stringSid;
-				bRet = ConvertSidToStringSid(pSidOwner, &stringSid);
-
-				if(bRet)
-				{
-					StringCchCopy(szOwner, cchMax, stringSid);
-
-					LocalFree(stringSid);
-					success = TRUE;
-				}
-			}
-
+			success = FormatUserName(pSidOwner, szOwner, cchMax);
 			LocalFree(pSD);
 		}
 
@@ -529,21 +503,15 @@ BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax)
 	return success;
 }
 
-BOOL GetProcessOwner(TCHAR *szOwner,DWORD BufSize)
+BOOL GetProcessOwner(TCHAR *szOwner,size_t cchMax)
 {
 	HANDLE hProcess;
 	HANDLE hToken;
 	TOKEN_USER *pTokenUser = NULL;
-	SID_NAME_USE eUse;
-	LPTSTR StringSid;
-	TCHAR szAccountName[512];
-	DWORD dwAccountName = SIZEOF_ARRAY(szAccountName);
-	TCHAR szDomainName[512];
-	DWORD dwDomainName = SIZEOF_ARRAY(szDomainName);
 	DWORD ReturnLength;
 	DWORD dwSize = 0;
 	BOOL bRes;
-	BOOL bReturn = FALSE;
+	BOOL success = FALSE;
 
 	hProcess = OpenProcess(PROCESS_ALL_ACCESS,FALSE,GetCurrentProcessId());
 
@@ -560,41 +528,49 @@ BOOL GetProcessOwner(TCHAR *szOwner,DWORD BufSize)
 			if(pTokenUser != NULL)
 			{
 				GetTokenInformation(hToken,TokenUser,(LPVOID)pTokenUser,dwSize,&ReturnLength);
-
-				bRes = LookupAccountSid(NULL,pTokenUser->User.Sid,szAccountName,&dwAccountName,
-					szDomainName,&dwDomainName,&eUse);
-
-				/* LookupAccountSid failed. */
-				if(bRes == 0)
-				{
-					bRes = ConvertSidToStringSid(pTokenUser->User.Sid,&StringSid);
-
-					if(bRes != 0)
-					{
-						StringCchCopy(szOwner,BufSize,StringSid);
-
-						LocalFree(StringSid);
-
-						bReturn = TRUE;
-					}
-				}
-				else
-				{
-					StringCchPrintf(szOwner,BufSize,_T("%s\\%s"),szDomainName,szAccountName);
-
-					bReturn = TRUE;
-				}
-
+				success = FormatUserName(pTokenUser->User.Sid, szOwner, cchMax);
 				GlobalFree(pTokenUser);
 			}
 		}
+
 		CloseHandle(hProcess);
 	}
 
-	if(!bReturn)
-		StringCchCopy(szOwner,BufSize,EMPTY_STRING);
+	return success;
+}
 
-	return bReturn;
+BOOL FormatUserName(PSID sid, TCHAR *userName, size_t cchMax)
+{
+	BOOL success = FALSE;
+
+	TCHAR accountName[512];
+	DWORD accountNameLength = SIZEOF_ARRAY(accountName);
+	TCHAR domainName[512];
+	DWORD domainNameLength = SIZEOF_ARRAY(domainName);
+	SID_NAME_USE eUse;
+	BOOL bRet = LookupAccountSid(NULL, sid, accountName, &accountNameLength,
+		domainName, &domainNameLength, &eUse);
+
+	if(bRet)
+	{
+		StringCchPrintf(userName, cchMax, _T("%s\\%s"), domainName, accountName);
+		success = TRUE;
+	}
+	else
+	{
+		LPTSTR stringSid;
+		bRet = ConvertSidToStringSid(sid, &stringSid);
+
+		if(bRet)
+		{
+			StringCchCopy(userName, cchMax, stringSid);
+
+			LocalFree(stringSid);
+			success = TRUE;
+		}
+	}
+
+	return success;
 }
 
 BOOL CheckGroupMembership(GroupType_t GroupType)
