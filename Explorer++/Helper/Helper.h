@@ -96,8 +96,8 @@ enum SizeDisplayFormat_t
 int				CreateFileTimeString(const FILETIME *FileTime,TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate);
 BOOL			GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize);
 BOOL			CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2);
-DWORD			BuildFileAttributeString(const TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize);
-void			BuildFileAttributeStringInternal(DWORD dwFileAttributes,TCHAR *szOutput,DWORD cchMax);
+DWORD			BuildFileAttributeString(const TCHAR *lpszFileName,TCHAR *szOutput,DWORD cchMax);
+void			BuildFileAttributeString(DWORD dwFileAttributes,TCHAR *szOutput,DWORD cchMax);
 BOOL			GetFileOwner(const TCHAR *szFile,TCHAR *szOwner,size_t cchMax);
 DWORD			GetNumFileHardLinks(const TCHAR *lpszFileName);
 int				ReadFileProperty(const TCHAR *lpszFileName,DWORD dwPropertyId,TCHAR *lpszPropertyBuf,DWORD dwBufLen);

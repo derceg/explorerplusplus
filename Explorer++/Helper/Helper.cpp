@@ -369,7 +369,7 @@ TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint)
 	return p;
 }
 
-DWORD BuildFileAttributeString(const TCHAR *lpszFileName,TCHAR *Buffer,DWORD BufSize)
+DWORD BuildFileAttributeString(const TCHAR *lpszFileName,TCHAR *szOutput,DWORD cchMax)
 {
 	HANDLE hFindFile;
 	WIN32_FIND_DATA wfd;
@@ -384,18 +384,18 @@ DWORD BuildFileAttributeString(const TCHAR *lpszFileName,TCHAR *Buffer,DWORD Buf
 
 	if(hFindFile == INVALID_HANDLE_VALUE)
 	{
-		StringCchCopy(Buffer,BufSize,EMPTY_STRING);
+		StringCchCopy(szOutput,cchMax,EMPTY_STRING);
 		return 0;
 	}
 
-	BuildFileAttributeStringInternal(wfd.dwFileAttributes,Buffer,BufSize);
+	BuildFileAttributeString(wfd.dwFileAttributes,szOutput,cchMax);
 
 	FindClose(hFindFile);
 
 	return wfd.dwFileAttributes;
 }
 
-void BuildFileAttributeStringInternal(DWORD dwFileAttributes,TCHAR *szOutput,DWORD cchMax)
+void BuildFileAttributeString(DWORD dwFileAttributes,TCHAR *szOutput,DWORD cchMax)
 {
 	TCHAR szAttributes[8];
 	int i = 0;
