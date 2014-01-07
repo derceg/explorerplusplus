@@ -106,17 +106,15 @@ BOOL			ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffe
 BOOL			IsImage(const TCHAR *FileName);
 WORD			GetFileLanguage(const TCHAR *szFullFileName);
 BOOL			GetFileProductVersion(const TCHAR *szFullFileName,DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS);
+int				ReadFileSlack(const TCHAR *FileName, TCHAR *pszSlack, int iBufferLen);
 
 /* Ownership and access. */
-BOOL			GetProcessOwner(DWORD dwProcessId,TCHAR *szOwner,size_t cchMax);
 BOOL			CheckGroupMembership(GroupType_t GroupType);
 
 /* Time helpers. */
 BOOL			LocalSystemTimeToFileTime(const LPSYSTEMTIME lpLocalTime,LPFILETIME lpFileTime);
 BOOL			FileTimeToLocalSystemTime(const LPFILETIME lpFileTime,LPSYSTEMTIME lpLocalTime);
-
-/* File slack. */
-int				ReadFileSlack(const TCHAR *FileName,TCHAR *pszSlack,int iBufferLen);
+void			MergeDateTime(SYSTEMTIME *pstOutput, const SYSTEMTIME *pstDate, const SYSTEMTIME *pstTime);
 
 /* User interaction. */
 BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR *InitialDirectory);
@@ -126,6 +124,8 @@ TCHAR			*DecodePrinterStatus(DWORD dwStatus);
 
 /* Process helpers. */
 DWORD			GetProcessImageName(DWORD dwProcessId,TCHAR *szImageName,DWORD nSize);
+BOOL			GetProcessOwner(DWORD dwProcessId, TCHAR *szOwner, size_t cchMax);
+BOOL			SetProcessTokenPrivilege(DWORD dwProcessId, const TCHAR *PrivilegeName, BOOL bEnablePrivilege);
 
 /* Computer information. */
 void			GetCPUBrandString(char *pszCPUBrand,UINT cchBuf);
@@ -137,25 +137,29 @@ HRESULT			GetMediaMetadata(const TCHAR *szFileName,const TCHAR *szAttribute,BYTE
 void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf);
 void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf);
 HINSTANCE		StartCommandPrompt(const TCHAR *Directory,bool Elevated);
-BOOL			SetProcessTokenPrivilege(DWORD dwProcessId,const TCHAR *PrivilegeName,BOOL bEnablePrivilege);
-int				GetRectHeight(const RECT *rc);
-int				GetRectWidth(const RECT *rc);
-BOOL			lShowWindow(HWND hwnd,BOOL bShowWindow);
 TCHAR			*PrintComma(unsigned long nPrint);
 TCHAR			*PrintCommaLargeNum(LARGE_INTEGER lPrint);
 BOOL			CheckWildcardMatch(const TCHAR *szWildcard,const TCHAR *szString,BOOL bCaseSensitive);
 BOOL			CheckWildcardMatchInternal(const TCHAR *szWildcard,const TCHAR *szString,BOOL bCaseSensitive);
 void			ReplaceCharacters(TCHAR *str,char ch,char replacement);
 TCHAR			*GetToken(TCHAR *ptr,TCHAR *Buffer,TCHAR *BufferLength);
-void			AddGripperStyle(UINT *fStyle,BOOL bAddGripper);
-void			AddWindowStyle(HWND hwnd,UINT fStyle,BOOL bAdd);
 void			ReplaceCharacterWithString(const TCHAR *szBaseString,TCHAR *szOutput,UINT cchMax,TCHAR chToReplace,const TCHAR *szReplacement);
-void			CenterWindow(HWND hParent,HWND hChild);
-void			UpdateToolbarBandSizing(HWND hRebar,HWND hToolbar);
-void			MergeDateTime(SYSTEMTIME *pstOutput,const SYSTEMTIME *pstDate,const SYSTEMTIME *pstTime);
-void			GetWindowString(HWND hwnd,std::wstring &str);
-BOOL			lCheckDlgButton(HWND hDlg,int ButtonId,BOOL bCheck);
 void			TrimStringLeft(std::wstring &str,const std::wstring &strWhitespace);
 void			TrimStringRight(std::wstring &str,const std::wstring &strWhitespace);
 void			TrimString(std::wstring &str,const std::wstring &strWhitespace);
-void			AddStyleToToolbar(UINT *fStyle,UINT fStyleToAdd);
+
+/* Window helpers. */
+BOOL			lShowWindow(HWND hwnd, BOOL bShowWindow);
+void			AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd);
+void			CenterWindow(HWND hParent, HWND hChild);
+void			GetWindowString(HWND hwnd, std::wstring &str);
+int				GetRectHeight(const RECT *rc);
+int				GetRectWidth(const RECT *rc);
+
+/* Dialog. */
+BOOL			lCheckDlgButton(HWND hDlg, int ButtonId, BOOL bCheck);
+
+/* Toolbar/Rebar. */
+void			AddStyleToToolbar(UINT *fStyle, UINT fStyleToAdd);
+void			AddGripperStyle(UINT *fStyle, BOOL bAddGripper);
+void			UpdateToolbarBandSizing(HWND hRebar, HWND hToolbar);
