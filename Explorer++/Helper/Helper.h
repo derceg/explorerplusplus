@@ -137,7 +137,7 @@ HRESULT			GetMediaMetadata(const TCHAR *szFileName,const TCHAR *szAttribute,BYTE
 void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf);
 void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf);
 HINSTANCE		StartCommandPrompt(const TCHAR *Directory,bool Elevated);
-BOOL			SetProcessTokenPrivilege(DWORD ProcessId,const TCHAR *PrivilegeName,BOOL bEnablePrivilege);
+BOOL			SetProcessTokenPrivilege(DWORD dwProcessId,const TCHAR *PrivilegeName,BOOL bEnablePrivilege);
 int				GetRectHeight(const RECT *rc);
 int				GetRectWidth(const RECT *rc);
 BOOL			lShowWindow(HWND hwnd,BOOL bShowWindow);

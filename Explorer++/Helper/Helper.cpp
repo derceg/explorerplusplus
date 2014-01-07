@@ -311,37 +311,49 @@ BOOL LocalSystemTimeToFileTime(const LPSYSTEMTIME lpLocalTime,LPFILETIME lpFileT
 	return result;
 }
 
-BOOL SetProcessTokenPrivilege(DWORD ProcessId,const TCHAR *PrivilegeName,BOOL bEnablePrivilege)
+BOOL SetProcessTokenPrivilege(DWORD dwProcessId, const TCHAR *PrivilegeName, BOOL bEnablePrivilege)
 {
-	HANDLE hProcess;
-	HANDLE hToken;
-	TOKEN_PRIVILEGES tp;
-	LUID luid;
+	BOOL success = FALSE;
 
-	hProcess = OpenProcess(PROCESS_ALL_ACCESS,FALSE,ProcessId);
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
 
-	if(hProcess == NULL)
-		return FALSE;
+	if(hProcess != NULL)
+	{
+		HANDLE hToken;
+		BOOL bRet = OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES, &hToken);
 
-	OpenProcessToken(hProcess,TOKEN_ALL_ACCESS,&hToken);
+		if(bRet)
+		{
+			LUID luid;
+			bRet = LookupPrivilegeValue(NULL, PrivilegeName, &luid);
 
-	CloseHandle(hProcess);
+			if(bRet)
+			{
+				TOKEN_PRIVILEGES tp;
+				tp.PrivilegeCount = 1;
+				tp.Privileges[0].Luid = luid;
 
-	LookupPrivilegeValue(NULL,PrivilegeName,&luid);
+				if(bEnablePrivilege)
+				{
+					tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+				}
+				else
+				{
+					tp.Privileges[0].Attributes = 0;
+				}
 
-	tp.PrivilegeCount				= 1;
-	tp.Privileges[0].Luid			= luid;
+				bRet = AdjustTokenPrivileges(hToken, FALSE, &tp, 0, NULL, NULL);
 
-	if(bEnablePrivilege)
-		tp.Privileges[0].Attributes	= SE_PRIVILEGE_ENABLED;
-	else
-		tp.Privileges[0].Attributes	= 0;
+				success = bRet && (GetLastError() == ERROR_SUCCESS);
+			}
 
-	BOOL Res = AdjustTokenPrivileges(hToken,FALSE,&tp,0,NULL,NULL);
+			CloseHandle(hToken);
+		}
 
-	CloseHandle(hToken);
+		CloseHandle(hProcess);
+	}
 
-	return Res;
+	return success;
 }
 
 BOOL CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2)
