@@ -1228,7 +1228,7 @@ BOOL Explorerplusplus::VerifyLanguageVersion(TCHAR *szLanguageModule) const
 	BOOL bSuccess1;
 	BOOL bSuccess2;
 
-	dwRet = GetCurrentProcessImageName(szImageName,SIZEOF_ARRAY(szImageName));
+	dwRet = GetProcessImageName(GetCurrentProcessId(),szImageName,SIZEOF_ARRAY(szImageName));
 
 	if(dwRet != 0)
 	{

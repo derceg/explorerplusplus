@@ -128,7 +128,7 @@ BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(NDefaultFileMa
 
 				/* Get the current location of the program, and use
 				it as part of the command. */
-				GetCurrentProcessImageName(szExecutable,
+				GetProcessImageName(GetCurrentProcessId(),szExecutable,
 					SIZEOF_ARRAY(szExecutable));
 
 				StringCchPrintf(szCommand,SIZEOF_ARRAY(szCommand),

@@ -1439,7 +1439,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		case IDM_HELP_HELP:
 			{
 				TCHAR szHelpFile[MAX_PATH];
-				GetCurrentProcessImageName(szHelpFile,SIZEOF_ARRAY(szHelpFile));
+				GetProcessImageName(GetCurrentProcessId(),szHelpFile,SIZEOF_ARRAY(szHelpFile));
 				PathRemoveFileSpec(szHelpFile);
 				PathAppend(szHelpFile,NExplorerplusplus::HELP_FILE_NAME);
 

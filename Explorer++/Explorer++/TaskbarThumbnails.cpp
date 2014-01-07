@@ -137,7 +137,7 @@ LRESULT CALLBACK Explorerplusplus::MainWndTaskbarThumbnailProc(HWND hwnd,UINT uM
 void Explorerplusplus::SetupJumplistTasks()
 {
 	TCHAR szCurrentProcess[MAX_PATH];
-	GetCurrentProcessImageName(szCurrentProcess,SIZEOF_ARRAY(szCurrentProcess));
+	GetProcessImageName(GetCurrentProcessId(),szCurrentProcess,SIZEOF_ARRAY(szCurrentProcess));
 
 	TCHAR szName[256];
 	LoadString(m_hLanguageModule,IDS_TASKS_NEWTAB,szName,SIZEOF_ARRAY(szName));

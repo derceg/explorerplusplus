@@ -503,11 +503,11 @@ BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax)
 	return success;
 }
 
-BOOL GetProcessOwner(TCHAR *szOwner, size_t cchMax)
+BOOL GetProcessOwner(DWORD dwProcessId, TCHAR *szOwner, size_t cchMax)
 {
 	BOOL success = FALSE;
 
-	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetCurrentProcessId());
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, dwProcessId);
 
 	if(hProcess != NULL)
 	{
@@ -543,6 +543,21 @@ BOOL GetProcessOwner(TCHAR *szOwner, size_t cchMax)
 	}
 
 	return success;
+}
+
+DWORD GetProcessImageName(DWORD dwProcessId, TCHAR *szImageName, DWORD nSize)
+{
+	DWORD dwRet = 0;
+
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, dwProcessId);
+
+	if(hProcess != NULL)
+	{
+		dwRet = GetModuleFileNameEx(hProcess, NULL, szImageName, nSize);
+		CloseHandle(hProcess);
+	}
+
+	return dwRet;
 }
 
 BOOL FormatUserName(PSID sid, TCHAR *userName, size_t cchMax)
@@ -1330,24 +1345,6 @@ void AddWindowStyle(HWND hwnd,UINT fStyle,BOOL bAdd)
 	}
 
 	SetWindowLongPtr(hwnd,GWL_STYLE,fCurrentStyle);
-}
-
-DWORD GetCurrentProcessImageName(TCHAR *szImageName,DWORD nSize)
-{
-	HANDLE	hProcess;
-	DWORD	dwProcessId;
-	DWORD	dwRet = 0;
-
-	dwProcessId = GetCurrentProcessId();
-	hProcess = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ,FALSE,dwProcessId);
-
-	if(hProcess != NULL)
-	{
-		dwRet = GetModuleFileNameEx(hProcess,NULL,szImageName,nSize);
-		CloseHandle(hProcess);
-	}
-
-	return dwRet;
 }
 
 WORD GetFileLanguage(const TCHAR *szFullFileName)

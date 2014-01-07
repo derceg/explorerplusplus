@@ -307,7 +307,7 @@ void Explorerplusplus::HandleMainWindowText(void)
 
 	if(m_bShowUserNameInTitleBar)
 	{
-		GetProcessOwner(szOwner,SIZEOF_ARRAY(szOwner));
+		GetProcessOwner(GetCurrentProcessId(),szOwner,SIZEOF_ARRAY(szOwner));
 
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),szOwner);
 	}

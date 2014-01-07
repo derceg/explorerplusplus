@@ -158,7 +158,7 @@ BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 	if(!pXMLDom)
 		goto clean;
 
-	GetCurrentProcessImageName(szConfigFile, SIZEOF_ARRAY(szConfigFile));
+	GetProcessImageName(GetCurrentProcessId(),szConfigFile, SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
 
@@ -253,7 +253,7 @@ BOOL LoadAllowMultipleInstancesFromXML(void)
 	if(!pXMLDom)
 		goto clean;
 
-	GetCurrentProcessImageName(szConfigFile, SIZEOF_ARRAY(szConfigFile));
+	GetProcessImageName(GetCurrentProcessId(),szConfigFile, SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
 
@@ -2017,7 +2017,7 @@ void Explorerplusplus::CLoadSaveXML::InitializeLoadEnvironment()
 	if(!m_pXMLDom)
 		goto clean;
 
-	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
+	GetProcessImageName(GetCurrentProcessId(),szConfigFile,SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
 

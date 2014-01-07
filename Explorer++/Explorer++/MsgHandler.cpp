@@ -245,7 +245,7 @@ BOOL TestConfigFileInternal(void)
 	/* To ensure the configuration file is loaded from the same directory
 	as the executable, determine the fully qualified path of the executable,
 	then save the configuration file in that directory. */
-	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
+	GetProcessImageName(GetCurrentProcessId(),szConfigFile,SIZEOF_ARRAY(szConfigFile));
 
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
@@ -320,7 +320,7 @@ void Explorerplusplus::SetLanguageModule(void)
 		/* Language has been forced on the command
 		line by the user. Attempt to find the
 		corresponding DLL. */
-		GetCurrentProcessImageName(szLanguageModule,SIZEOF_ARRAY(szLanguageModule));
+		GetProcessImageName(GetCurrentProcessId(),szLanguageModule,SIZEOF_ARRAY(szLanguageModule));
 		PathRemoveFileSpec(szLanguageModule);
 		StringCchPrintf(szName,SIZEOF_ARRAY(szName),_T("Explorer++%2s.dll"),g_szLang);
 		PathAppend(szLanguageModule,szName);
@@ -347,7 +347,7 @@ void Explorerplusplus::SetLanguageModule(void)
 	}
 	else
 	{
-		GetCurrentProcessImageName(szLanguageModule,SIZEOF_ARRAY(szLanguageModule));
+		GetProcessImageName(GetCurrentProcessId(),szLanguageModule,SIZEOF_ARRAY(szLanguageModule));
 		PathRemoveFileSpec(szLanguageModule);
 
 		StringCchCopy(szNamePattern,SIZEOF_ARRAY(szNamePattern),szLanguageModule);
@@ -1839,7 +1839,7 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 		TCHAR szPath[MAX_PATH];
 		TCHAR szParameters[512];
 
-		GetCurrentProcessImageName(szCurrentProcess,SIZEOF_ARRAY(szCurrentProcess));
+		GetProcessImageName(GetCurrentProcessId(),szCurrentProcess,SIZEOF_ARRAY(szCurrentProcess));
 
 		GetDisplayName(pidlDirectory,szPath,SIZEOF_ARRAY(szPath),SHGDN_FORPARSING);
 		StringCchPrintf(szParameters,SIZEOF_ARRAY(szParameters),_T("\"%s\""),szPath);
@@ -2444,7 +2444,7 @@ void Explorerplusplus::OnCloneWindow(void)
 	TCHAR szQuotedCurrentDirectory[MAX_PATH];
 	SHELLEXECUTEINFO sei;
 
-	GetCurrentProcessImageName(szExecutable,
+	GetProcessImageName(GetCurrentProcessId(),szExecutable,
 		SIZEOF_ARRAY(szExecutable));
 
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),

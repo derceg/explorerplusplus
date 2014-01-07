@@ -108,7 +108,7 @@ WORD			GetFileLanguage(const TCHAR *szFullFileName);
 BOOL			GetFileProductVersion(const TCHAR *szFullFileName,DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS);
 
 /* Ownership and access. */
-BOOL			GetProcessOwner(TCHAR *szOwner,size_t cchMax);
+BOOL			GetProcessOwner(DWORD dwProcessId,TCHAR *szOwner,size_t cchMax);
 BOOL			CheckGroupMembership(GroupType_t GroupType);
 
 /* Time helpers. */
@@ -125,7 +125,7 @@ BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR
 TCHAR			*DecodePrinterStatus(DWORD dwStatus);
 
 /* Process helpers. */
-DWORD			GetCurrentProcessImageName(TCHAR *szImageName,DWORD nSize);
+DWORD			GetProcessImageName(DWORD dwProcessId,TCHAR *szImageName,DWORD nSize);
 
 /* Computer information. */
 void			GetCPUBrandString(char *pszCPUBrand,UINT cchBuf);

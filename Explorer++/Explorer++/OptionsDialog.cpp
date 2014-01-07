@@ -1326,7 +1326,7 @@ void Explorerplusplus::AddLanguages(HWND hDlg)
 	SendMessage(hLanguageComboBox,CB_ADDSTRING,0,(LPARAM)_T("English"));
 	SendMessage(hLanguageComboBox,CB_SETITEMDATA,0,9);
 
-	GetCurrentProcessImageName(szImageDirectory,SIZEOF_ARRAY(szImageDirectory));
+	GetProcessImageName(GetCurrentProcessId(),szImageDirectory,SIZEOF_ARRAY(szImageDirectory));
 	PathRemoveFileSpec(szImageDirectory);
 	StringCchCopy(szNamePattern,SIZEOF_ARRAY(szNamePattern),szImageDirectory);
 	PathAppend(szNamePattern,_T("Explorer++??.dll"));
