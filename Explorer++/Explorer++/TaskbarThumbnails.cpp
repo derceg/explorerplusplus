@@ -18,6 +18,7 @@
 #include "Explorer++.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/ProcessHelper.h"
 #include "../Helper/Macros.h"
 
 

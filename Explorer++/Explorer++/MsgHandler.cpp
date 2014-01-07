@@ -22,6 +22,7 @@
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/MenuHelper.h"
+#include "../Helper/ProcessHelper.h"
 #include "../Helper/Macros.h"
 
 

@@ -33,6 +33,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/ProcessHelper.h"
 #include "../Helper/Macros.h"
 
 

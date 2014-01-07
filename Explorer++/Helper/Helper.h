@@ -110,6 +110,7 @@ int				ReadFileSlack(const TCHAR *FileName, TCHAR *pszSlack, int iBufferLen);
 
 /* Ownership and access. */
 BOOL			CheckGroupMembership(GroupType_t GroupType);
+BOOL			FormatUserName(PSID sid, TCHAR *userName, size_t cchMax);
 
 /* Time helpers. */
 BOOL			LocalSystemTimeToFileTime(const LPSYSTEMTIME lpLocalTime,LPFILETIME lpFileTime);
@@ -121,11 +122,6 @@ BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR
 
 /* Device related. */
 TCHAR			*DecodePrinterStatus(DWORD dwStatus);
-
-/* Process helpers. */
-DWORD			GetProcessImageName(DWORD dwProcessId,TCHAR *szImageName,DWORD nSize);
-BOOL			GetProcessOwner(DWORD dwProcessId, TCHAR *szOwner, size_t cchMax);
-BOOL			SetProcessTokenPrivilege(DWORD dwProcessId, const TCHAR *PrivilegeName, BOOL bEnablePrivilege);
 
 /* Computer information. */
 void			GetCPUBrandString(char *pszCPUBrand,UINT cchBuf);

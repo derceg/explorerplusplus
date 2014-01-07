@@ -31,6 +31,7 @@ The value of the "command" sub-key will be of the form:
 
 #include "stdafx.h"
 #include "Helper.h"
+#include "ProcessHelper.h"
 #include "SetDefaultFileManager.h"
 #include "Macros.h"
 

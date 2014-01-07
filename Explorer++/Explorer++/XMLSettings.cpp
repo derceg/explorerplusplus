@@ -22,6 +22,7 @@
 #include "Explorer++.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/XMLSettings.h"
+#include "../Helper/ProcessHelper.h"
 #include "../Helper/Macros.h"
 
 #import <msxml3.dll> raw_interfaces_only
