@@ -503,34 +503,40 @@ BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax)
 	return success;
 }
 
-BOOL GetProcessOwner(TCHAR *szOwner,size_t cchMax)
+BOOL GetProcessOwner(TCHAR *szOwner, size_t cchMax)
 {
-	HANDLE hProcess;
-	HANDLE hToken;
-	TOKEN_USER *pTokenUser = NULL;
-	DWORD ReturnLength;
-	DWORD dwSize = 0;
-	BOOL bRes;
 	BOOL success = FALSE;
 
-	hProcess = OpenProcess(PROCESS_ALL_ACCESS,FALSE,GetCurrentProcessId());
+	HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, GetCurrentProcessId());
 
 	if(hProcess != NULL)
 	{
-		bRes = OpenProcessToken(hProcess,TOKEN_ALL_ACCESS,&hToken);
+		HANDLE hToken;
+		BOOL bRet = OpenProcessToken(hProcess, TOKEN_QUERY, &hToken);
 
-		if(bRes)
+		if(bRet)
 		{
-			GetTokenInformation(hToken,TokenUser,NULL,0,&dwSize);
+			DWORD dwSize = 0;
+			bRet = GetTokenInformation(hToken, TokenUser, NULL, 0, &dwSize);
 
-			pTokenUser = (PTOKEN_USER)GlobalAlloc(GMEM_FIXED,dwSize);
-
-			if(pTokenUser != NULL)
+			if(!bRet && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
 			{
-				GetTokenInformation(hToken,TokenUser,(LPVOID)pTokenUser,dwSize,&ReturnLength);
-				success = FormatUserName(pTokenUser->User.Sid, szOwner, cchMax);
-				GlobalFree(pTokenUser);
+				TOKEN_USER *pTokenUser = reinterpret_cast<TOKEN_USER *>(GlobalAlloc(GMEM_FIXED, dwSize));
+
+				if(pTokenUser != NULL)
+				{
+					bRet = GetTokenInformation(hToken, TokenUser, reinterpret_cast<LPVOID>(pTokenUser), dwSize, &dwSize);
+
+					if(bRet)
+					{
+						success = FormatUserName(pTokenUser->User.Sid, szOwner, cchMax);
+					}
+
+					GlobalFree(pTokenUser);
+				}
 			}
+
+			CloseHandle(hToken);
 		}
 
 		CloseHandle(hProcess);
