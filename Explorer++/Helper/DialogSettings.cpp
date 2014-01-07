@@ -18,6 +18,7 @@
 #include "RegistrySettings.h"
 #include "XMLSettings.h"
 #include "Helper.h"
+#include "WindowHelper.h"
 #include "Macros.h"
 
 

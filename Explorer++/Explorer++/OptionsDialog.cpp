@@ -26,6 +26,7 @@
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ProcessHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 

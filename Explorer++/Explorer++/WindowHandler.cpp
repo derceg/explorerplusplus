@@ -22,6 +22,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Controls.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 

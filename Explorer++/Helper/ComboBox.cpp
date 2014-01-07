@@ -29,6 +29,7 @@
 
 #include "stdafx.h"
 #include "Helper.h"
+#include "WindowHelper.h"
 #include "ComboBoxHelper.h"
 #include "ComboBox.h"
 #include "Macros.h"

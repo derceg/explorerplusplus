@@ -19,6 +19,7 @@
 #include "BookmarksToolbar.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 

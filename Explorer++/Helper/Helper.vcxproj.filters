@@ -100,6 +100,9 @@
     <ClCompile Include="ProcessHelper.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="WindowHelper.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -203,6 +206,9 @@
     </ClInclude>
     <ClInclude Include="ProcessHelper.h">
       <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowHelper.h">
+      <Filter>Control Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

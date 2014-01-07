@@ -15,6 +15,7 @@
 #include "DisplayWindow.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 

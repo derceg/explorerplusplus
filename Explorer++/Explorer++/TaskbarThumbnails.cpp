@@ -19,6 +19,7 @@
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ProcessHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 

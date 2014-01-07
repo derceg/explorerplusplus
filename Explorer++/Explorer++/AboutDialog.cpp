@@ -22,6 +22,7 @@
 #include "Version.h"
 #include "../Helper/Helper.h"
 #include "../Helper/BaseDialog.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 

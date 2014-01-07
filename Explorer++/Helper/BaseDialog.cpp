@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include <unordered_map>
+#include "WindowHelper.h"
 #include "BaseDialog.h"
 #include "Helper.h"
 

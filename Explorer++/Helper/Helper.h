@@ -144,14 +144,6 @@ void			TrimStringLeft(std::wstring &str,const std::wstring &strWhitespace);
 void			TrimStringRight(std::wstring &str,const std::wstring &strWhitespace);
 void			TrimString(std::wstring &str,const std::wstring &strWhitespace);
 
-/* Window helpers. */
-BOOL			lShowWindow(HWND hwnd, BOOL bShowWindow);
-void			AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd);
-void			CenterWindow(HWND hParent, HWND hChild);
-void			GetWindowString(HWND hwnd, std::wstring &str);
-int				GetRectHeight(const RECT *rc);
-int				GetRectWidth(const RECT *rc);
-
 /* Dialog. */
 BOOL			lCheckDlgButton(HWND hDlg, int ButtonId, BOOL bCheck);
 
