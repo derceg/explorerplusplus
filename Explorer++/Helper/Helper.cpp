@@ -897,14 +897,15 @@ int ReadFileSlack(const TCHAR *FileName,TCHAR *pszSlack,int iBufferLen)
 				after the logical end of file can be read. */
 				SetFilePointer(hFile,FileSectorSize * BytesPerSector,NULL,FILE_BEGIN);
 
-				pszSlackTemp = (TCHAR *)malloc(SpareSectors * BytesPerSector);
+				DWORD allocationSize = SpareSectors * BytesPerSector;
+				pszSlackTemp = (TCHAR *)malloc(allocationSize);
 
 				if(pszSlackTemp != NULL)
 				{
 					/* Read out the data contained after the logical end of file. */
-					ReadFile(hFile,(LPVOID)pszSlackTemp,SpareSectors * BytesPerSector,&nBytesRead,NULL);
-
+					ReadFile(hFile,(LPVOID)pszSlackTemp,allocationSize,&nBytesRead,NULL);
 					memcpy_s(pszSlack,iBufferLen,pszSlackTemp,nBytesRead);
+					free(pszSlackTemp);
 				}
 			}
 
