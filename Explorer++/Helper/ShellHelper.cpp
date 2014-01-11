@@ -33,22 +33,20 @@ HRESULT GetIdlFromParsingName(const TCHAR *szParsingName,LPITEMIDLIST *pidl)
 	}
 
 	IShellFolder *pDesktopFolder = NULL;
-	WCHAR szParsingNameW[MAX_PATH];
 	HRESULT hr;
 
 	hr = SHGetDesktopFolder(&pDesktopFolder);
 
 	if(SUCCEEDED(hr))
 	{
-		#ifndef UNICODE
-		MultiByteToWideChar(CP_ACP,0,szParsingName,
-		-1,szParsingNameW,SIZEOF_ARRAY(szParsingNameW));
-		#else
-		StringCchCopy(szParsingNameW,SIZEOF_ARRAY(szParsingNameW),szParsingName);
-		#endif
+		/* For some reason, ParseDisplayName
+		takes a pointer to a non-constant
+		string, so copy the incoming string. */
+		TCHAR szParsingNameTemp[MAX_PATH];
+		StringCchCopy(szParsingNameTemp, SIZEOF_ARRAY(szParsingNameTemp), szParsingName);
 
 		hr = pDesktopFolder->ParseDisplayName(NULL,NULL,
-		szParsingNameW,NULL,pidl,NULL);
+			szParsingNameTemp,NULL,pidl,NULL);
 
 		pDesktopFolder->Release();
 	}

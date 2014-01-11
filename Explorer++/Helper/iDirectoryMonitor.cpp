@@ -58,7 +58,6 @@ private:
 	but are not queued as APC's themselves). */
 	static void CALLBACK	WatchDirectoryInternal(ULONG_PTR dwParam);
 	static void				DeleteRequest(ULONG_PTR dwParam);
-	static void				CopyDirectoryChangeFileName(FILE_NOTIFY_INFORMATION *pfni,TCHAR *szFileName,size_t iBufLen);
 
 	class CDirInfo
 	{
@@ -342,19 +341,22 @@ DWORD NumberOfBytesTransferred,LPOVERLAPPED lpOverlapped)
 		pDirInfo = reinterpret_cast<CDirInfo *>(lpOverlapped->hEvent);
 
 		pfni = pDirInfo->m_FileNotifyBuffer;
+		int i = 0;
 
-		CopyDirectoryChangeFileName(pfni,szFileName,SIZEOF_ARRAY(szFileName));
-
-		pDirInfo->m_DirectoryAltered(szFileName,pfni->Action,pDirInfo->m_pData);
-
-		while(pfni->NextEntryOffset != 0)
+		do
 		{
-			pfni = (FILE_NOTIFY_INFORMATION *)((LPBYTE)pfni + pfni->NextEntryOffset);
+			if(i != 0)
+			{
+				pfni = (FILE_NOTIFY_INFORMATION *) ((LPBYTE) pfni + pfni->NextEntryOffset);
+			}
 
-			CopyDirectoryChangeFileName(pfni,szFileName,SIZEOF_ARRAY(szFileName));
-
+			/* FileNameLength is size in bytes NOT characters. */
+			StringCchCopyN(szFileName,SIZEOF_ARRAY(szFileName),
+				pfni->FileName,pfni->FileNameLength / sizeof(TCHAR));
 			pDirInfo->m_DirectoryAltered(szFileName,pfni->Action,pDirInfo->m_pData);
-		}
+
+			i++;
+		} while(pfni->NextEntryOffset != 0);
 
 		free(pDirInfo->m_FileNotifyBuffer);
 
@@ -437,20 +439,4 @@ void CALLBACK CDirectoryMonitor::StopDirectoryWatch(ULONG_PTR dwParam)
 	CloseHandle(hDirectory);
 
 	hDirectory = NULL;
-}
-
-void CDirectoryMonitor::CopyDirectoryChangeFileName(FILE_NOTIFY_INFORMATION *pfni,
-TCHAR *szFileName,size_t iBufLen)
-{
-	#ifndef UNICODE
-	nConverted = WideCharToMultiByte(CP_ACP,0,pfni->FileName,
-		(pfni->FileNameLength / sizeof(pfni->FileName[0])) + 1,
-		szFileName,iBufLen,NULL,NULL);
-
-	szFileName[nConverted - 1] = '\0';
-	#else
-	/* FileNameLength is size in bytes NOT characters. */
-	StringCchCopyN(szFileName,iBufLen,
-		pfni->FileName,pfni->FileNameLength / sizeof(TCHAR));
-	#endif
 }

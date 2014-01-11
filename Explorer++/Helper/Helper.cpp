@@ -716,15 +716,12 @@ int ReadFileProperty(const TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *lpszP
 		return -1;
 	}
 
-	#ifdef UNICODE
-	/* Convert the property string from its current codepage to UTF-16, as expected by our caller. */
-	MultiByteToWideChar(uCodepage,MB_PRECOMPOSED,
-		lpszProperty,dwPropertyLength,
-		lpszPropertyBuf,dwBufLen);
+	/* Convert the property string from its
+	current codepage to UTF-16, as expected
+	by the caller. */
+	MultiByteToWideChar(uCodepage,MB_PRECOMPOSED,lpszProperty,
+		dwPropertyLength,lpszPropertyBuf,dwBufLen);
 	dwPropertyLength = lstrlen(lpszPropertyBuf) + 1;
-	#else
-	StringCchCopy(lpszPropertyBuf,dwBufLen,lpszProperty);
-	#endif
 
 	free((LPVOID)lpszProperty);
 	CloseHandle(hFile);
@@ -735,7 +732,6 @@ int ReadFileProperty(const TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *lpszP
 BOOL ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen)
 {
 	Gdiplus::GdiplusStartupInput	StartupInput;
-	WCHAR				wszImage[MAX_PATH];
 	Gdiplus::PropertyItem	*pPropItems = NULL;
 	char				pTempBuffer[512];
 	ULONG_PTR			Token;
@@ -747,14 +743,7 @@ BOOL ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,
 
 	GdiplusStartup(&Token,&StartupInput,NULL);
 
-	#ifndef UNICODE
-	MultiByteToWideChar(CP_ACP,0,lpszImage,
-	-1,wszImage,SIZEOF_ARRAY(wszImage));
-	#else
-	StringCchCopy(wszImage,SIZEOF_ARRAY(wszImage),lpszImage);
-	#endif
-
-	Gdiplus::Image *image = new Gdiplus::Image(wszImage,FALSE);
+	Gdiplus::Image *image = new Gdiplus::Image(lpszImage,FALSE);
 
 	if(image->GetLastStatus() != Gdiplus::Ok)
 	{
@@ -816,17 +805,17 @@ BOOL ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,
 		}
 
 		if(bFound)
+		{
 			memcpy(pTempBuffer,pPropItems[i].value,pPropItems[i].length);
-		else
-			pPropBuffer = NULL;
 
-		/* All property strings are ANSI. */
-		#ifndef UNICODE
-		StringCchCopy((char *)pPropBuffer,dwBufLen,pTempBuffer);
-		#else
-		MultiByteToWideChar(CP_ACP,0,pTempBuffer,
-			-1,(WCHAR *)pPropBuffer,dwBufLen);
-		#endif
+			/* All property strings are ANSI. */
+			MultiByteToWideChar(CP_ACP,0,pTempBuffer,-1,
+				(WCHAR *)pPropBuffer,dwBufLen);
+		}
+		else
+		{
+			pPropBuffer = NULL;
+		}
 
 		free(pPropItems);
 	}
