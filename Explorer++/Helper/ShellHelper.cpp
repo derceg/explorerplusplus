@@ -1050,17 +1050,25 @@ HRESULT AddJumpListTaskInternal(IObjectCollection *poc,const TCHAR *pszName,
 
 		if(SUCCEEDED(hr))
 		{
-			InitPropVariantFromString(pszName,&pv);
+			hr = InitPropVariantFromString(pszName,&pv);
 
-			/* See: http://msdn.microsoft.com/en-us/library/bb787584(VS.85).aspx */
-			PROPERTYKEY PKEY_Title;
-			CLSIDFromString(L"{F29F85E0-4FF9-1068-AB91-08002B27B3D9}",&PKEY_Title.fmtid);
-			PKEY_Title.pid = 2;
+			if(SUCCEEDED(hr))
+			{
+				/* See: http://msdn.microsoft.com/en-us/library/bb787584(VS.85).aspx */
+				PROPERTYKEY keyTitle;
+				keyTitle.pid = 2;
+				hr = CLSIDFromString(L"{F29F85E0-4FF9-1068-AB91-08002B27B3D9}",&keyTitle.fmtid);
 
-			pps->SetValue(PKEY_Title,pv);
-			pps->Commit();
+				if(SUCCEEDED(hr))
+				{
+					pps->SetValue(keyTitle,pv);
+					pps->Commit();
 
-			poc->AddObject(pShellLink);
+					poc->AddObject(pShellLink);
+				}
+
+				PropVariantClear(&pv);
+			}
 
 			pps->Release();
 		}
