@@ -205,32 +205,44 @@ void NListView::ListView_AddRemoveExtendedStyle(HWND hListView,DWORD dwStyle,BOO
 	ListView_SetExtendedListViewStyle(hListView,dwExtendedStyle);
 }
 
-void NListView::ListView_SetBackgroundImage(HWND hListView,UINT uImage)
+/* Sets the background image in the
+listview. uImage should be the index
+of a bitmap resource in the current
+executable. */
+BOOL NListView::ListView_SetBackgroundImage(HWND hListView,UINT uImage)
 {
 	TCHAR szModuleName[MAX_PATH];
-	GetModuleFileName(NULL,szModuleName,SIZEOF_ARRAY(szModuleName));
+	DWORD dwRet = GetModuleFileName(NULL,szModuleName,SIZEOF_ARRAY(szModuleName));
+
+	if(dwRet == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+	{
+		return FALSE;
+	}
 
 	LVBKIMAGE lvbki;
-	lvbki.ulFlags = LVBKIF_STYLE_NORMAL|LVBKIF_SOURCE_URL;
-	lvbki.xOffsetPercent = 45;
-	lvbki.yOffsetPercent = 50;
 
 	TCHAR szBitmap[512];
 
 	if(uImage == 0)
 	{
-		lvbki.pszImage = NULL;
+		lvbki.ulFlags = LVBKIF_SOURCE_NONE;
 	}
 	else
 	{
-		/* 2 means an image resource, 3 would mean an icon. */
+		/* See http://msdn.microsoft.com/en-us/library/aa767740(v=vs.85).aspx
+		for information on the res protocol, and
+		http://msdn.microsoft.com/en-us/library/ms648009(v=vs.85).aspx for
+		a list of resource types. */
 		StringCchPrintf(szBitmap,SIZEOF_ARRAY(szBitmap),
-			_T("res://%s/#2/#%d"),szModuleName,uImage);
+			_T("res://%s/#%d/#%d"),szModuleName,RT_BITMAP,uImage);
 
+		lvbki.ulFlags = LVBKIF_STYLE_NORMAL | LVBKIF_SOURCE_URL;
+		lvbki.xOffsetPercent = 45;
+		lvbki.yOffsetPercent = 50;
 		lvbki.pszImage = szBitmap;
 	}
 
-	ListView_SetBkImage(hListView,&lvbki);
+	return ListView_SetBkImage(hListView,&lvbki);
 }
 
 void NListView::ListView_SwapItems(HWND hListView,int iItem1,int iItem2)

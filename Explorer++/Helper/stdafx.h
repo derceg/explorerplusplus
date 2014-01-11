@@ -52,6 +52,7 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <windowsx.h>
+#include <WinUser.h>
 #include <iostream>
 #include <string>
 #include <commctrl.h>

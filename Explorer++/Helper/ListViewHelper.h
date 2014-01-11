@@ -10,7 +10,7 @@ namespace NListView
 	void	ListView_SetAutoArrange(HWND hListView,BOOL bAutoArrange);
 	void	ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate,UINT uHoverTime);
 	void	ListView_AddRemoveExtendedStyle(HWND hListView,DWORD dwStyle,BOOL bAdd);
-	void	ListView_SetBackgroundImage(HWND hListView,UINT uImage);
+	BOOL	ListView_SetBackgroundImage(HWND hListView,UINT uImage);
 	void	ListView_SwapItems(HWND hListView,int iItem1,int iItem2);
 	void	ListView_SwapItemsNolParam(HWND hListView,int iItem1,int iItem2);
 	void	ListView_HandleInsertionMark(HWND hListView,int iItemFocus,const POINT *ppt);
