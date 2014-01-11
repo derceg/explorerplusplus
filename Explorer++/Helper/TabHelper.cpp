@@ -16,38 +16,39 @@
 #include "Macros.h"
 
 
-void TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
+BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 {
 	TCITEM tcItem;
-	LPARAM lParam1;
-	LPARAM lParam2;
 	TCHAR szText1[512];
-	TCHAR szText2[512];
-	int iImage1;
-	int iImage2;
-	BOOL res;
-
 	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
 	tcItem.pszText = szText1;
 	tcItem.cchTextMax = SIZEOF_ARRAY(szText1);
+	BOOL bRet = TabCtrl_GetItem(hTabCtrl, iItem1, &tcItem);
 
-	res = TabCtrl_GetItem(hTabCtrl, iItem1, &tcItem);
+	if(!bRet)
+	{
+		return FALSE;
+	}
 
-	if(!res)
-		return;
-
+	LPARAM lParam1;
+	int iImage1;
 	lParam1 = tcItem.lParam;
 	iImage1 = tcItem.iImage;
 
+	TCHAR szText2[512];
 	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
 	tcItem.pszText = szText2;
 	tcItem.cchTextMax = SIZEOF_ARRAY(szText2);
 
-	res = TabCtrl_GetItem(hTabCtrl, iItem2, &tcItem);
+	bRet = TabCtrl_GetItem(hTabCtrl, iItem2, &tcItem);
 
-	if(!res)
-		return;
+	if(!bRet)
+	{
+		return FALSE;
+	}
 
+	LPARAM lParam2;
+	int iImage2;
 	lParam2 = tcItem.lParam;
 	iImage2 = tcItem.iImage;
 
@@ -55,26 +56,31 @@ void TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 	tcItem.pszText = szText1;
 	tcItem.lParam = lParam1;
 	tcItem.iImage = iImage1;
+	bRet = TabCtrl_SetItem(hTabCtrl, iItem2, &tcItem);
 
-	TabCtrl_SetItem(hTabCtrl, iItem2, &tcItem);
+	if(!bRet)
+	{
+		return FALSE;
+	}
 
 	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
 	tcItem.pszText = szText2;
 	tcItem.lParam = lParam2;
 	tcItem.iImage = iImage2;
+	bRet = TabCtrl_SetItem(hTabCtrl, iItem1, &tcItem);
 
-	TabCtrl_SetItem(hTabCtrl, iItem1, &tcItem);
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
-void TabCtrl_SetItemText(HWND Tab, int iTab, TCHAR *Text)
+BOOL TabCtrl_SetItemText(HWND hTabCtrl, int iItem, TCHAR *pszText)
 {
 	TCITEM tcItem;
-
-	if(Text == NULL)
-		return;
-
 	tcItem.mask = TCIF_TEXT;
-	tcItem.pszText = Text;
-
-	SendMessage(Tab, TCM_SETITEM, iTab, reinterpret_cast<LPARAM>(&tcItem));
+	tcItem.pszText = pszText;
+	return TabCtrl_SetItem(hTabCtrl, iItem, &tcItem);
 }
