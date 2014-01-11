@@ -52,7 +52,8 @@ public:
 
 private:
 
-	void	DuplicateStorageMedium(STGMEDIUM *pstgDest,STGMEDIUM *pstgSrc,FORMATETC *pftc);
+	BOOL	DuplicateStorageMedium(STGMEDIUM *pstgDest,STGMEDIUM *pstgSrc,FORMATETC *pftc);
+	BOOL	DuplicateData(STGMEDIUM *pstgDest,STGMEDIUM *pstgSrc,FORMATETC *pftc);
 
 	LONG							m_lRefCount;
 
@@ -157,7 +158,13 @@ HRESULT __stdcall CDataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 		   dao.fe.tymed & pFormatEtc->tymed &&
 		   dao.fe.dwAspect == pFormatEtc->dwAspect)
 		{
-			DuplicateStorageMedium(pMedium,&dao.stg,&dao.fe);
+			BOOL bRet = DuplicateStorageMedium(pMedium,&dao.stg,&dao.fe);
+
+			if(!bRet)
+			{
+				return STG_E_MEDIUMFULL;
+			}
+
 			return S_OK;
 		}
 	}
@@ -165,7 +172,7 @@ HRESULT __stdcall CDataObject::GetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 	return DV_E_FORMATETC;
 }
 
-void CDataObject::DuplicateStorageMedium(STGMEDIUM *pstgDest,STGMEDIUM *pstgSrc,FORMATETC *pftc)
+BOOL CDataObject::DuplicateStorageMedium(STGMEDIUM *pstgDest,STGMEDIUM *pstgSrc,FORMATETC *pftc)
 {
 	pstgDest->tymed = pstgSrc->tymed;
 	pstgDest->pUnkForRelease = NULL;
@@ -176,14 +183,16 @@ void CDataObject::DuplicateStorageMedium(STGMEDIUM *pstgDest,STGMEDIUM *pstgSrc,
 		pstgSrc->pUnkForRelease->AddRef();
 	}
 
+	BOOL success = TRUE;
+
 	switch(pftc->tymed)
 	{
 	case TYMED_HGLOBAL:
-		pstgDest->hGlobal = (HGLOBAL)OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,NULL);
-		break;
-
 	case TYMED_FILE:
-		pstgDest->lpszFileName = (LPOLESTR)OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,NULL);
+	case TYMED_GDI:
+	case TYMED_MFPICT:
+	case TYMED_ENHMF:
+		success = DuplicateData(pstgDest, pstgSrc, pftc);
 		break;
 
 	case TYMED_ISTREAM:
@@ -196,21 +205,47 @@ void CDataObject::DuplicateStorageMedium(STGMEDIUM *pstgDest,STGMEDIUM *pstgSrc,
 		pstgSrc->pstg->AddRef();
 		break;
 
+	case TYMED_NULL:
+		/* Do nothing. */
+		break;
+	}
+
+	return success;
+}
+
+BOOL CDataObject::DuplicateData(STGMEDIUM *pstgDest,STGMEDIUM *pstgSrc,FORMATETC *pftc)
+{
+	HANDLE hData = OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,0);
+
+	if(hData == NULL)
+	{
+		return FALSE;
+	}
+
+	switch(pftc->tymed)
+	{
+	case TYMED_HGLOBAL:
+		pstgDest->hGlobal = hData;
+		break;
+
+	case TYMED_FILE:
+		pstgDest->lpszFileName = reinterpret_cast<LPOLESTR>(hData);
+		break;
+
 	case TYMED_GDI:
-		pstgDest->hBitmap = (HBITMAP)OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,NULL);
+		pstgDest->hBitmap = reinterpret_cast<HBITMAP>(hData);
 		break;
 
 	case TYMED_MFPICT:
-		pstgDest->hMetaFilePict = (HMETAFILEPICT)OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,NULL);
+		pstgDest->hMetaFilePict = hData;
 		break;
 
 	case TYMED_ENHMF:
-		pstgDest->hEnhMetaFile = (HENHMETAFILE)OleDuplicateData(pstgSrc->hGlobal,pftc->cfFormat,NULL);
-		break;
-
-	case TYMED_NULL:
+		pstgDest->hEnhMetaFile = reinterpret_cast<HENHMETAFILE>(hData);
 		break;
 	}
+
+	return TRUE;
 }
 
 HRESULT __stdcall CDataObject::GetDataHere(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
@@ -267,7 +302,12 @@ HRESULT __stdcall CDataObject::SetData(FORMATETC *pFormatEtc,STGMEDIUM *pMedium,
 	}
 	else
 	{
-		DuplicateStorageMedium(&dao.stg,pMedium,pFormatEtc);
+		BOOL bRet = DuplicateStorageMedium(&dao.stg,pMedium,pFormatEtc);
+
+		if(!bRet)
+		{
+			return E_OUTOFMEMORY;
+		}
 	}
 
 	m_daoList.push_back(dao);
