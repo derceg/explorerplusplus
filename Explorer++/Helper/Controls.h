@@ -1,12 +1,10 @@
 #pragma once
 
-#include <windows.h>
-
-void	AddPathsToComboBoxEx(HWND,TCHAR *);
-HWND	CreateComboBox(HWND,DWORD);
-HWND	CreateListView(HWND,DWORD);
-HWND	CreateStatusBar(HWND,DWORD);
-HWND	CreateTabControl(HWND,UINT Style);
-HWND	CreateToolbar(HWND hParent,DWORD dwStyle,DWORD dwExStyle);
-HWND	CreateTreeView(HWND,DWORD);
-int		ResizeStatusBar(HWND,int,int);
+HWND CreateListView(HWND hParent, DWORD dwStyle);
+HWND CreateTreeView(HWND hParent, DWORD dwStyle);
+HWND CreateStatusBar(HWND hParent, DWORD dwStyle);
+HWND CreateToolbar(HWND hParent, DWORD dwStyle, DWORD dwExStyle);
+HWND CreateComboBox(HWND Parent, DWORD dwStyle);
+HWND CreateTabControl(HWND hParent, DWORD dwStyle);
+BOOL PinStatusBar(HWND hStatusBar, int Width, int Height);
+BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *Path);

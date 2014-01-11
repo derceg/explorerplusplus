@@ -1142,7 +1142,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* <---- Status bar ----> */
 
-	ResizeStatusBar(m_hStatusBar,MainWindowWidth,MainWindowHeight);
+	PinStatusBar(m_hStatusBar,MainWindowWidth,MainWindowHeight);
 	SetStatusBarParts(MainWindowWidth);
 
 
