@@ -171,7 +171,7 @@
     <ClCompile Include="ComboBox.cpp" />
     <ClCompile Include="ComboBoxHelper.cpp" />
     <ClCompile Include="ContextMenuManager.cpp" />
-    <ClCompile Include="Controls.c">
+    <ClCompile Include="Controls.cpp">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
