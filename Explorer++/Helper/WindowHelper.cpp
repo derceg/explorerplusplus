@@ -22,22 +22,39 @@ This means placing the child window 45% of the
 way from the top of the parent window (with 55%
 of the space left between the bottom of the
 child window and the bottom of the parent window).*/
-void CenterWindow(HWND hParent, HWND hChild)
+BOOL CenterWindow(HWND hParent, HWND hChild)
 {
 	RECT rcParent;
+	BOOL bRet = GetClientRect(hParent, &rcParent);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
 	RECT rcChild;
+	bRet = GetClientRect(hChild, &rcChild);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
+	/* Take the offset between the two windows,
+	and map it back to the desktop. */
 	POINT ptOrigin;
-
-	GetClientRect(hParent, &rcParent);
-	GetClientRect(hChild, &rcChild);
-
-	/* Take the offset between the two windows, and map it back to the
-	desktop. */
 	ptOrigin.x = (GetRectWidth(&rcParent) - GetRectWidth(&rcChild)) / 2;
-	ptOrigin.y = (LONG) ((GetRectHeight(&rcParent) - GetRectHeight(&rcChild)) * 0.45);
-	MapWindowPoints(hParent, HWND_DESKTOP, &ptOrigin, 1);
+	ptOrigin.y = static_cast<LONG>((GetRectHeight(&rcParent) - GetRectHeight(&rcChild)) * 0.45);
 
-	SetWindowPos(hChild, NULL, ptOrigin.x, ptOrigin.y,
+	SetLastError(0);
+	int iRet = MapWindowPoints(hParent, HWND_DESKTOP, &ptOrigin, 1);
+
+	if(iRet == 0 && GetLastError() != 0)
+	{
+		return FALSE;
+	}
+
+	return SetWindowPos(hChild, NULL, ptOrigin.x, ptOrigin.y,
 		0, 0, SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOZORDER);
 }
 
@@ -65,11 +82,14 @@ BOOL lShowWindow(HWND hwnd, BOOL bShowWindow)
 	return ShowWindow(hwnd, WindowShowState);
 }
 
-void AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd)
+BOOL AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd)
 {
-	LONG_PTR fCurrentStyle;
+	LONG_PTR fCurrentStyle = GetWindowLongPtr(hwnd, GWL_STYLE);
 
-	fCurrentStyle = GetWindowLongPtr(hwnd, GWL_STYLE);
+	if(fCurrentStyle == 0)
+	{
+		return FALSE;
+	}
 
 	if(bAdd)
 	{
@@ -84,7 +104,11 @@ void AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd)
 			fCurrentStyle &= ~fStyle;
 	}
 
-	SetWindowLongPtr(hwnd, GWL_STYLE, fCurrentStyle);
+	/* See the documentation for SetWindowLongPtr
+	for an explanation of why this is necessary. */
+	SetLastError(0);
+	LONG_PTR lRet = SetWindowLongPtr(hwnd, GWL_STYLE, fCurrentStyle);
+	return (lRet == 0) && (GetLastError() != 0);
 }
 
 int GetRectHeight(const RECT *rc)
