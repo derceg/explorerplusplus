@@ -57,18 +57,14 @@ CEnumFormatEtc::CEnumFormatEtc(std::list<FORMATETC> feList)
 	{
 		FORMATETC ftc = fe;
 
-		if(fe.ptd)
+		if(fe.ptd != NULL)
 		{
-			ftc.ptd = (DVTARGETDEVICE *)CoTaskMemAlloc(sizeof(DVTARGETDEVICE));
+			ftc.ptd = reinterpret_cast<DVTARGETDEVICE *>(CoTaskMemAlloc(fe.ptd->tdSize));
 
 			if(ftc.ptd != NULL)
 			{
-				*ftc.ptd = *fe.ptd;
+				memcpy(ftc.ptd, fe.ptd, fe.ptd->tdSize);
 			}
-		}
-		else
-		{
-			ftc.ptd = NULL;
 		}
 
 		m_feList.push_back(ftc);
@@ -79,7 +75,13 @@ CEnumFormatEtc::CEnumFormatEtc(std::list<FORMATETC> feList)
 
 CEnumFormatEtc::~CEnumFormatEtc()
 {
-
+	for each(auto fe in m_feList)
+	{
+		if(fe.ptd != NULL)
+		{
+			CoTaskMemFree(fe.ptd);
+		}
+	}
 }
 
 /* IUnknown interface members. */
@@ -138,17 +140,14 @@ HRESULT __stdcall CEnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltF
 		{
 			memcpy(&rgelt[0],&(*itr),sizeof(FORMATETC));
 
-			if(itr->ptd)
+			if(itr->ptd != NULL)
 			{
-				rgelt->ptd = (DVTARGETDEVICE *)CoTaskMemAlloc(sizeof(DVTARGETDEVICE));
+				rgelt[0].ptd = reinterpret_cast<DVTARGETDEVICE *>(CoTaskMemAlloc(itr->ptd->tdSize));
 
-				if(rgelt->ptd == NULL)
+				if(rgelt[0].ptd == NULL)
 					return S_FALSE;
 
-				if(itr->ptd != NULL)
-					*rgelt->ptd = *itr->ptd;
-				else
-					rgelt->ptd=NULL;
+				memcpy(rgelt[0].ptd, itr->ptd, itr->ptd->tdSize);
 			}
 
 			break;
