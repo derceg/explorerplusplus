@@ -84,7 +84,7 @@ void CStatusBar::HandleStatusBarMenuClose(void)
 	/* Restore the previous parts. */
 	SendMessage(m_hwnd,SB_SETPARTS,m_nParts,reinterpret_cast<LPARAM>(m_pPartWidths));
 
-	delete m_pPartWidths;
+	delete[] m_pPartWidths;
 
 	for each(auto strText in m_TextList)
 	{
