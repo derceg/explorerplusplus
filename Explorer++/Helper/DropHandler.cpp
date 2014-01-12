@@ -170,9 +170,9 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 			{
 				dwEffect = *pdwEffect;
 				bPrefferedEffect = TRUE;
-
-				GlobalUnlock(stg.hGlobal);
 			}
+
+			GlobalUnlock(stg.hGlobal);
 		}
 
 		ReleaseStgMedium(&stg);
