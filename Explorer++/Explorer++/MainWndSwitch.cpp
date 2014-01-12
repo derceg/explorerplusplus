@@ -71,6 +71,12 @@ LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 			for this window. */
 			SetWindowLongPtr(hwnd,GWLP_USERDATA,(LONG_PTR)pContainer);
 			break;
+
+		case WM_NCDESTROY:
+			SetWindowLongPtr(hwnd,GWLP_USERDATA,0);
+			delete pContainer;
+			return 0;
+			break;
 	}
 
 	/* Jump across to the member window function (will handle all requests). */
