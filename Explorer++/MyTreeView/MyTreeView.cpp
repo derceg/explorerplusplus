@@ -69,13 +69,13 @@ HANDLE hIconsThread)
 
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 
-	AddRoot();
-
 	m_bDragging			= FALSE;
 	m_bDragCancelled	= FALSE;
 	m_bDragAllowed		= FALSE;
 
 	m_bShowHidden		= TRUE;
+
+	AddRoot();
 
 	InitializeDragDropHelpers();
 

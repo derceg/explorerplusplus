@@ -35,6 +35,7 @@ m_hContainer(hwnd)
 
 	/* Initial state. */
 	m_nSelected						= 0;
+	m_nSelectedOnInvert				= 0;
 	m_iObjectIndex					= 0;
 	m_iMaxArrangeMenuItem			= 0;
 	m_bCountingUp					= FALSE;
@@ -56,6 +57,17 @@ m_hContainer(hwnd)
 	g_hwndSearch					= NULL;
 	g_hwndOptions					= NULL;
 	g_hwndManageBookmarks			= NULL;
+	m_hMainRebar					= NULL;
+	m_hStatusBar					= NULL;
+	m_hHolder						= NULL;
+	m_hTabBacking					= NULL;
+	m_hTabCtrl						= NULL;
+	m_hTabWindowToolbar				= NULL;
+	m_hDisplayWindow				= NULL;
+	m_hTreeView						= NULL;
+	m_hFoldersToolbar				= NULL;
+	m_hLastActiveWindow				= NULL;
+	m_hActiveListView				= NULL;
 	m_ListViewMButtonItem			= -1;
 	m_zDeltaTotal					= 0;
 	m_iPreviousTabSelectionId		= -1;

@@ -95,6 +95,7 @@ CDisplayWindow::CDisplayWindow(HWND hDisplayWindow,DWInitialSettings_t *pInitial
 	m_bShowThumbnail = FALSE;
 	m_bThumbnailExtracted = FALSE;
 	m_bThumbnailExtractionFailed = FALSE;
+	m_hBitmapBackground = NULL;
 
 	InitializeCriticalSection(&m_csDWThumbnails);
 }

@@ -803,6 +803,7 @@ void Explorerplusplus::HandleTreeViewSelection(void)
 	}
 	else
 	{
+		StringCchCopy(szRoot,SIZEOF_ARRAY(szRoot),szDirectory);
 		PathStripToRoot(szRoot);
 		uDriveType = GetDriveType(szRoot);
 
