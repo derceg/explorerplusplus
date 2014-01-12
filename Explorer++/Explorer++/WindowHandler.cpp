@@ -105,17 +105,17 @@ void Explorerplusplus::CreateMainControls(void)
 
 		case ID_DRIVESTOOLBAR:
 			CreateDrivesToolbar();
-			ToolbarSize = (DWORD)SendMessage(m_hDrivesToolbar,TB_GETBUTTONSIZE,0,0);
+			ToolbarSize = (DWORD)SendMessage(m_pDrivesToolbar->GetHWND(),TB_GETBUTTONSIZE,0,0);
 			m_ToolbarInformation[i].cyMinChild = HIWORD(ToolbarSize);
 			m_ToolbarInformation[i].cyMaxChild = HIWORD(ToolbarSize);
 			m_ToolbarInformation[i].cyChild = HIWORD(ToolbarSize);
-			SendMessage(m_hDrivesToolbar,TB_GETMAXSIZE,0,(LPARAM)&sz);
+			SendMessage(m_pDrivesToolbar->GetHWND(),TB_GETMAXSIZE,0,(LPARAM)&sz);
 
 			if(m_ToolbarInformation[i].cx == 0)
 				m_ToolbarInformation[i].cx = sz.cx;
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
-			m_ToolbarInformation[i].hwndChild = m_hDrivesToolbar;
+			m_ToolbarInformation[i].hwndChild = m_pDrivesToolbar->GetHWND();
 			break;
 
 		case ID_APPLICATIONSTOOLBAR:
@@ -199,11 +199,8 @@ void Explorerplusplus::CreateBookmarksToolbar(void)
 
 void Explorerplusplus::CreateDrivesToolbar(void)
 {
-	m_hDrivesToolbar = CreateToolbar(m_hMainRebar,BookmarkToolbarStyles,
-		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
-
-	m_pDrivesToolbar = new CDrivesToolbar(m_hDrivesToolbar,
-		TOOLBAR_DRIVES_ID_START,TOOLBAR_DRIVES_ID_END,m_hLanguageModule,this);
+	 m_pDrivesToolbar = CDrivesToolbar::Create(m_hMainRebar, TOOLBAR_DRIVES_ID_START,
+		TOOLBAR_DRIVES_ID_END, m_hLanguageModule, this);
 }
 
 void Explorerplusplus::CreateApplicationToolbar()

@@ -583,7 +583,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_TOOLBARS_DRIVES:
 			m_bShowDrivesToolbar = !m_bShowDrivesToolbar;
-			ShowMainRebarBand(m_hDrivesToolbar,m_bShowDrivesToolbar);
+			ShowMainRebarBand(m_pDrivesToolbar->GetHWND(),m_bShowDrivesToolbar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
@@ -1791,7 +1791,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wPara
 					break;
 
 				case ID_DRIVESTOOLBAR:
-					hToolbar = m_hDrivesToolbar;
+					hToolbar = m_pDrivesToolbar->GetHWND();
 					himlMenu = himlSmall;
 					break;
 

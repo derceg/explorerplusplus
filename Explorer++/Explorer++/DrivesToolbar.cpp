@@ -18,18 +18,23 @@
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
 
 
-CDrivesToolbar::CDrivesToolbar(HWND hToolbar,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
-m_hToolbar(hToolbar),
+CDrivesToolbar *CDrivesToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp)
+{
+	return new CDrivesToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp);
+}
+
+CDrivesToolbar::CDrivesToolbar(HWND hParent,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
 m_uIDStart(uIDStart),
 m_uIDEnd(uIDEnd),
 m_hInstance(hInstance),
 m_pexpp(pexpp),
 m_IDCounter(0)
 {
-	InitializeToolbar();
+	InitializeToolbar(hParent);
 
 	CHardwareChangeNotifier::GetInstance().AddObserver(this);
 }
@@ -42,8 +47,14 @@ CDrivesToolbar::~CDrivesToolbar()
 	CHardwareChangeNotifier::GetInstance().RemoveObserver(this);
 }
 
-void CDrivesToolbar::InitializeToolbar()
+void CDrivesToolbar::InitializeToolbar(HWND hParent)
 {
+	m_hToolbar = CreateToolbar(hParent, WS_CHILD | WS_VISIBLE |
+		WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS |
+		TBSTYLE_LIST | TBSTYLE_TRANSPARENT | TBSTYLE_FLAT |
+		CCS_NODIVIDER | CCS_NORESIZE, TBSTYLE_EX_DOUBLEBUFFER |
+		TBSTYLE_EX_HIDECLIPPEDBUTTONS);
+
 	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
 	SendMessage(m_hToolbar,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 
@@ -52,13 +63,22 @@ void CDrivesToolbar::InitializeToolbar()
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himlSmall));
 
 	SetWindowSubclass(m_hToolbar,DrivesToolbarProcStub,SUBCLASS_ID,reinterpret_cast<DWORD_PTR>(this));
-
-	SetWindowSubclass(GetParent(m_hToolbar),DrivesToolbarParentProcStub,PARENT_SUBCLASS_ID,
+	SetWindowSubclass(hParent,DrivesToolbarParentProcStub,PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
 
 	InsertDrives();
 }
 
+HWND CDrivesToolbar::GetHWND() const
+{
+	return m_hToolbar;
+}
+
+/* This subclass is removed when
+the CDrivesToolbar is deleted,
+so even if there is a message
+received after WM_NCDESTROY,
+this function won't be called. */
 LRESULT CALLBACK DrivesToolbarProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
@@ -90,6 +110,11 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarProc(HWND hwnd,UINT uMsg,WPARAM wP
 				m_pexpp->BrowseFolder(itr->second.c_str(),SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
 			}
 		}
+		break;
+
+	case WM_NCDESTROY:
+		delete this;
+		return 0;
 		break;
 	}
 

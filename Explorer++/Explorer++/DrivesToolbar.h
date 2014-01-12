@@ -13,8 +13,13 @@ class CDrivesToolbar : public IFileContextMenuExternal, public NHardwareChangeNo
 
 public:
 
-	CDrivesToolbar(HWND hToolbar,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp);
-	~CDrivesToolbar();
+	/* This lifetime of this class is
+	tied to its window. When the window
+	is destroyed, this class will
+	automatically free itself. */
+	static CDrivesToolbar *Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
+
+	HWND	GetHWND() const;
 
 	/* IFileContextMenuExternal methods. */
 	void	AddMenuEntries(LPITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
@@ -42,7 +47,10 @@ private:
 	LRESULT CALLBACK DrivesToolbarProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	void		InitializeToolbar();
+	CDrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
+	~CDrivesToolbar();
+
+	void		InitializeToolbar(HWND hParent);
 
 	void		InsertDrives();
 	void		InsertDrive(const std::wstring &DrivePath);
