@@ -104,8 +104,6 @@ private:
 	void	OnSetFont(HFONT hFont);
 	void	OnSetTextColor(COLORREF hColor);
 
-	void	ApplyDefaultFont(HDC hdc);
-
 	void	PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect);
 
 	void	OnSize(WPARAM wParam,LPARAM lParam);

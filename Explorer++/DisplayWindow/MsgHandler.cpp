@@ -289,7 +289,10 @@ void CDisplayWindow::PaintText(HDC hdc,unsigned int x,unsigned int y)
 	unsigned int i = 0;
 
 	/* Needed to get character widths properly. */
-	ApplyDefaultFont(hdc);
+	HGDIOBJ hOriginalObject = SelectObject(hdc,m_hDisplayFont);
+
+	SetBkMode(hdc,TRANSPARENT);
+	SetTextColor(hdc,m_TextColor);
 
 	GetClientRect(m_hDisplayWindow,&rcClient);
 	xCurrent = x;
@@ -325,21 +328,13 @@ void CDisplayWindow::PaintText(HDC hdc,unsigned int x,unsigned int y)
 	/* Needed for thumbnail image. */
 	xCurrent += iCurrentColumnWidth + TEXT_COLUMN_SPACING;
 	m_xColumnFinal = xCurrent;
+
+	SelectObject(hdc,hOriginalObject);
 }
 
 void CDisplayWindow::TransparentTextOut(HDC hdc,TCHAR *Text,RECT *prcText)
 {
-	ApplyDefaultFont(hdc);
-
 	DrawText(hdc,Text,lstrlen(Text),prcText,DT_LEFT|DT_NOPREFIX);
-}
-
-void CDisplayWindow::ApplyDefaultFont(HDC hdc)
-{
-	SelectObject(hdc,m_hDisplayFont);
-
-	SetBkMode(hdc,TRANSPARENT);
-	SetTextColor(hdc,m_TextColor);
 }
 
 LONG CDisplayWindow::OnMouseMove(LPARAM lParam)
