@@ -590,7 +590,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_TOOLBARS_APPLICATIONTOOLBAR:
 			m_bShowApplicationToolbar = !m_bShowApplicationToolbar;
-			ShowMainRebarBand(m_hApplicationToolbar,m_bShowApplicationToolbar);
+			ShowMainRebarBand(m_pApplicationToolbar->GetHWND(),m_bShowApplicationToolbar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
@@ -1796,7 +1796,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wPara
 					break;
 
 				case ID_APPLICATIONSTOOLBAR:
-					hToolbar = m_hApplicationToolbar;
+					hToolbar = m_pApplicationToolbar->GetHWND();
 					himlMenu = himlSmall;
 					break;
 				}

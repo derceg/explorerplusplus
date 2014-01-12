@@ -120,17 +120,17 @@ void Explorerplusplus::CreateMainControls(void)
 
 		case ID_APPLICATIONSTOOLBAR:
 			CreateApplicationToolbar();
-			ToolbarSize = (DWORD)SendMessage(m_hApplicationToolbar,TB_GETBUTTONSIZE,0,0);
+			ToolbarSize = (DWORD)SendMessage(m_pApplicationToolbar->GetHWND(),TB_GETBUTTONSIZE,0,0);
 			m_ToolbarInformation[i].cyMinChild = HIWORD(ToolbarSize);
 			m_ToolbarInformation[i].cyMaxChild = HIWORD(ToolbarSize);
 			m_ToolbarInformation[i].cyChild = HIWORD(ToolbarSize);
-			SendMessage(m_hApplicationToolbar,TB_GETMAXSIZE,0,(LPARAM)&sz);
+			SendMessage(m_pApplicationToolbar->GetHWND(),TB_GETMAXSIZE,0,(LPARAM)&sz);
 
 			if(m_ToolbarInformation[i].cx == 0)
 				m_ToolbarInformation[i].cx = sz.cx;
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
-			m_ToolbarInformation[i].hwndChild = m_hApplicationToolbar;
+			m_ToolbarInformation[i].hwndChild = m_pApplicationToolbar->GetHWND();
 			break;
 		}
 
@@ -205,14 +205,8 @@ void Explorerplusplus::CreateDrivesToolbar(void)
 
 void Explorerplusplus::CreateApplicationToolbar()
 {
-	m_hApplicationToolbar = CreateToolbar(m_hMainRebar,WS_CHILD|WS_VISIBLE|
-		WS_CLIPSIBLINGS|WS_CLIPCHILDREN|TBSTYLE_TOOLTIPS|TBSTYLE_LIST|
-		TBSTYLE_TRANSPARENT|TBSTYLE_FLAT|CCS_NODIVIDER|CCS_NORESIZE,
-		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DRAWDDARROWS|
-		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
-
-	m_pApplicationToolbar = new CApplicationToolbar(m_hApplicationToolbar,
-		TOOLBAR_APPLICATIONS_ID_START,TOOLBAR_APPLICATIONS_ID_END,m_hLanguageModule,this);
+	 m_pApplicationToolbar = CApplicationToolbar::Create(m_hMainRebar, TOOLBAR_APPLICATIONS_ID_START,
+		TOOLBAR_APPLICATIONS_ID_END, m_hLanguageModule, this);
 }
 
 void Explorerplusplus::CreateStatusBar(void)
@@ -295,7 +289,7 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 						{
 							/* TODO: [Bookmarks] Show bookmarks menu. */
 						}
-						else if(pnmh->hwndFrom == m_hApplicationToolbar)
+						else if(pnmh->hwndFrom == m_pApplicationToolbar->GetHWND())
 						{
 							if(pnmm->dwItemSpec == -1)
 							{

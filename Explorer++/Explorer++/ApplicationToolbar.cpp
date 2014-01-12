@@ -28,6 +28,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
+#include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
 
 
@@ -35,26 +36,37 @@ const TCHAR CApplicationToolbarPersistentSettings::SETTING_NAME[] = _T("Name");
 const TCHAR CApplicationToolbarPersistentSettings::SETTING_COMMAND[] = _T("Command");
 const TCHAR CApplicationToolbarPersistentSettings::SETTING_SHOW_NAME_ON_TOOLBAR[] = _T("ShowNameOnToolbar");
 
-CApplicationToolbar::CApplicationToolbar(HWND hToolbar,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
-m_hToolbar(hToolbar),
+CApplicationToolbar *CApplicationToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp)
+{
+	return new CApplicationToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp);
+}
+
+CApplicationToolbar::CApplicationToolbar(HWND hParent,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
 m_uIDStart(uIDStart),
 m_uIDEnd(uIDEnd),
 m_hInstance(hInstance),
 m_pexpp(pexpp)
 {
-	Initialize();
+	Initialize(hParent);
 }
 
 CApplicationToolbar::~CApplicationToolbar()
 {
-	RemoveWindowSubclass(GetParent(m_hToolbar),ParentProcStub,PARENT_SUBCLASS_ID);
+	RemoveWindowSubclass(m_hToolbar, WndProcStub, SUBCLASS_ID);
+	RemoveWindowSubclass(GetParent(m_hToolbar),ParentWndProcStub,PARENT_SUBCLASS_ID);
 
 	RevokeDragDrop(m_hToolbar);
 	m_patd->Release();
 }
 
-void CApplicationToolbar::Initialize()
+void CApplicationToolbar::Initialize(HWND hParent)
 {
+	m_hToolbar = CreateToolbar(hParent, WS_CHILD | WS_VISIBLE |
+		WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST |
+		TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NORESIZE,
+		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS |
+		TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS);
+
 	m_atps = &CApplicationToolbarPersistentSettings::GetInstance();
 
 	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
@@ -64,24 +76,49 @@ void CApplicationToolbar::Initialize()
 	Shell_GetImageLists(NULL,&himlSmall);
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himlSmall));
 
-	AddButtonsToToolbar();
-
 	m_patd = new CApplicationToolbarDropHandler(m_hToolbar, this);
 	RegisterDragDrop(m_hToolbar,m_patd);
 
-	SetWindowSubclass(GetParent(m_hToolbar),ParentProcStub,PARENT_SUBCLASS_ID,
+	SetWindowSubclass(m_hToolbar, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(hParent,ParentWndProcStub,PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
+
+	AddButtonsToToolbar();
 }
 
-LRESULT CALLBACK ParentProcStub(HWND hwnd,UINT uMsg,
+HWND CApplicationToolbar::GetHWND() const
+{
+	return m_hToolbar;
+}
+
+LRESULT CALLBACK WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+{
+	CApplicationToolbar *pat = reinterpret_cast<CApplicationToolbar *>(dwRefData);
+	return pat->WndProc(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK CApplicationToolbar::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch(uMsg)
+	{
+	case WM_NCDESTROY:
+		delete this;
+		return 0;
+		break;
+	}
+
+	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK ParentWndProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	CApplicationToolbar *pat = reinterpret_cast<CApplicationToolbar *>(dwRefData);
-
-	return pat->ParentProc(hwnd,uMsg,wParam,lParam);
+	return pat->ParentWndProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CApplicationToolbar::ParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK CApplicationToolbar::ParentWndProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	switch(uMsg)
 	{

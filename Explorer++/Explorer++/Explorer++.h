@@ -803,7 +803,6 @@ private:
 	HWND					m_hFoldersToolbar;
 	HWND					m_hTabBacking;
 	HWND					m_hBookmarksToolbar;
-	HWND					m_hApplicationToolbar;
 
 	CShellBrowser *			m_pShellBrowser[MAX_TABS];
 	CShellBrowser *			m_pActiveShellBrowser;

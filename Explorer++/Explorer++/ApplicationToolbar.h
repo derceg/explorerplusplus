@@ -54,12 +54,14 @@ private:
 
 class CApplicationToolbar
 {
-	friend LRESULT CALLBACK ParentProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
+	friend LRESULT CALLBACK WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	friend LRESULT CALLBACK ParentWndProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 public:
 
-	CApplicationToolbar(HWND hToolbar,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp);
-	~CApplicationToolbar();
+	static CApplicationToolbar *Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
+
+	HWND				GetHWND() const;
 
 	void				ShowNewItemDialog();
 	void				AddNewItem(const std::wstring &name, const std::wstring &command, BOOL showNameOnToolbar);
@@ -69,6 +71,7 @@ public:
 
 private:
 
+	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 1;
 
 	struct ApplicationInfo_t
@@ -77,9 +80,13 @@ private:
 		std::wstring Parameters;
 	};
 
-	LRESULT CALLBACK	ParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void				Initialize();
+	CApplicationToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
+	~CApplicationToolbar();
+
+	void				Initialize(HWND hParent);
 
 	void				AddButtonsToToolbar();
 	void				AddButtonToToolbar(const ApplicationButton_t &Button);
