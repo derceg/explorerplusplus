@@ -81,7 +81,7 @@ void CDisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 {
 	HDC hdcMem	= CreateCompatibleDC(hdc);
 	HBITMAP hBitmap	= CreateCompatibleBitmap(hdc,rc->right-rc->left,rc->bottom-rc->top);
-	SelectObject(hdcMem,hBitmap);
+	HGDIOBJ hOriginalObject = SelectObject(hdcMem,hBitmap);
 
 	/* Draw the stored background on top of the patched area. */
 	BitBlt(hdcMem,UpdateRect->left,UpdateRect->top,rc->right,rc->bottom,m_hdcBackground,
@@ -99,8 +99,9 @@ void CDisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 	BitBlt(hdc,UpdateRect->left,UpdateRect->top,rc->right,rc->bottom,hdcMem,
 	UpdateRect->left,UpdateRect->top,SRCCOPY);
 
-	DeleteDC(hdcMem);
+	SelectObject(hdcMem,hOriginalObject);
 	DeleteObject(hBitmap);
+	DeleteDC(hdcMem);
 }
 
 void CDisplayWindow::DrawThumbnail(HDC hdcMem)
