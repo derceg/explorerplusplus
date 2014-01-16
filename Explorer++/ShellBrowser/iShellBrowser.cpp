@@ -1605,7 +1605,7 @@ void CShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 					pdbv = (DEV_BROADCAST_VOLUME *)dbh;
 
 					/* Build a string that will form the drive name. */
-					chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+					chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 					StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),
 						_T("%c:\\"),chDrive);
 
@@ -1636,7 +1636,7 @@ void CShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 					pdbv = (DEV_BROADCAST_VOLUME *)dbh;
 
 					/* Build a string that will form the drive name. */
-					chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+					chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 					StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),_T("%c:\\"),chDrive);
 
 					/* The device was removed from the system.

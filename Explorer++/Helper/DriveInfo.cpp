@@ -36,7 +36,7 @@ LONG GetSectorSize(const TCHAR *Drive)
 	return BytesPerSector;
 }
 
-TCHAR GetDriveNameFromMask(ULONG unitmask)
+TCHAR GetDriveLetterFromMask(ULONG unitmask)
 {
 	int BitNum = 0;
 

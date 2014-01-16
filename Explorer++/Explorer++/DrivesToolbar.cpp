@@ -102,7 +102,7 @@ void CDrivesToolbar::OnDeviceArrival(DEV_BROADCAST_HDR *dbh)
 
 	/* Build a string that will form the drive name. */
 	TCHAR szDrive[4];
-	TCHAR chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+	TCHAR chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 	StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),_T("%c:\\"),chDrive);
 
 	/* Is there a change in media, or a change
@@ -134,7 +134,7 @@ void CDrivesToolbar::OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh)
 	DEV_BROADCAST_VOLUME *pdbv = reinterpret_cast<DEV_BROADCAST_VOLUME *>(dbh);
 
 	TCHAR szDrive[4];
-	TCHAR chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+	TCHAR chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 	StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),_T("%c:\\"),chDrive);
 
 	/* Media changed or drive removed? */

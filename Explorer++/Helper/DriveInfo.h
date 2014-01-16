@@ -4,5 +4,5 @@
 
 LONG	GetClusterSize(const TCHAR *Drive);
 LONG	GetSectorSize(const TCHAR *Drive);
-TCHAR	GetDriveNameFromMask(ULONG unitmask);
+TCHAR	GetDriveLetterFromMask(ULONG unitmask);
 LONG	GetFileSectorSize(const TCHAR *FileName);

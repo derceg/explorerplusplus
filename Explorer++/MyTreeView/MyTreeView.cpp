@@ -1541,7 +1541,7 @@ LRESULT CALLBACK CMyTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 					pdbv = (DEV_BROADCAST_VOLUME *)dbh;
 
 					/* Build a string that will form the drive name. */
-					DriveLetter = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+					DriveLetter = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 					StringCchPrintf(DriveName,SIZEOF_ARRAY(DriveName),_T("%c:\\"),DriveLetter);
 
 					if(pdbv->dbcv_flags & DBTF_MEDIA)
@@ -1671,7 +1671,7 @@ LRESULT CALLBACK CMyTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 							pdbv = (DEV_BROADCAST_VOLUME *)dbh;
 
 							/* Build a string that will form the drive name. */
-							DriveLetter = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+							DriveLetter = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 							StringCchPrintf(DriveName,SIZEOF_ARRAY(DriveName),_T("%c:\\"),DriveLetter);
 
 							if(pdbv->dbcv_flags & DBTF_MEDIA)
