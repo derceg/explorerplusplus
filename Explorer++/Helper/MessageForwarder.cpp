@@ -69,6 +69,10 @@ INT_PTR CMessageForwarder::ForwardMessage(HWND hwnd,UINT uMsg,WPARAM wParam,LPAR
 			return OnTimer(static_cast<int>(wParam));
 			break;
 
+		case WM_MBUTTONUP:
+			return OnMButtonUp(&MAKEPOINTS(lParam));
+			break;
+
 		case WM_COMMAND:
 			return OnCommand(wParam,lParam);
 			break;
@@ -130,6 +134,11 @@ INT_PTR CMessageForwarder::OnCtlColorEdit(HWND hwnd,HDC hdc)
 INT_PTR CMessageForwarder::OnHScroll(HWND hwnd)
 {
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
+}
+
+INT_PTR CMessageForwarder::OnMButtonUp(const POINTS *pts)
+{
+	return GetDefaultReturnValue(m_hwnd, m_uMsg, m_wParam, m_lParam);
 }
 
 INT_PTR CMessageForwarder::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)

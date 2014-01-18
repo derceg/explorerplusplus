@@ -28,97 +28,67 @@ CDrivesToolbar *CDrivesToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd,
 }
 
 CDrivesToolbar::CDrivesToolbar(HWND hParent,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
+CBaseWindow(CreateDrivesToolbar(hParent)),
 m_uIDStart(uIDStart),
 m_uIDEnd(uIDEnd),
 m_hInstance(hInstance),
 m_pexpp(pexpp),
 m_IDCounter(0)
 {
-	InitializeToolbar(hParent);
+	Initialize(hParent);
 
 	CHardwareChangeNotifier::GetInstance().AddObserver(this);
 }
 
 CDrivesToolbar::~CDrivesToolbar()
 {
-	RemoveWindowSubclass(m_hToolbar,DrivesToolbarProcStub,SUBCLASS_ID);
-	RemoveWindowSubclass(GetParent(m_hToolbar),DrivesToolbarParentProcStub,PARENT_SUBCLASS_ID);
+	RemoveWindowSubclass(GetParent(m_hwnd),DrivesToolbarParentProcStub,PARENT_SUBCLASS_ID);
 
 	CHardwareChangeNotifier::GetInstance().RemoveObserver(this);
 }
 
-void CDrivesToolbar::InitializeToolbar(HWND hParent)
+HWND CDrivesToolbar::CreateDrivesToolbar(HWND hParent)
 {
-	m_hToolbar = CreateToolbar(hParent, WS_CHILD | WS_VISIBLE |
+	return CreateToolbar(hParent, WS_CHILD | WS_VISIBLE |
 		WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS |
 		TBSTYLE_LIST | TBSTYLE_TRANSPARENT | TBSTYLE_FLAT |
 		CCS_NODIVIDER | CCS_NORESIZE, TBSTYLE_EX_DOUBLEBUFFER |
 		TBSTYLE_EX_HIDECLIPPEDBUTTONS);
+}
 
-	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
-	SendMessage(m_hToolbar,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
+void CDrivesToolbar::Initialize(HWND hParent)
+{
+	SendMessage(m_hwnd,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
+	SendMessage(m_hwnd,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 
 	HIMAGELIST himlSmall;
 	Shell_GetImageLists(NULL,&himlSmall);
-	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himlSmall));
+	SendMessage(m_hwnd,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himlSmall));
 
-	SetWindowSubclass(m_hToolbar,DrivesToolbarProcStub,SUBCLASS_ID,reinterpret_cast<DWORD_PTR>(this));
 	SetWindowSubclass(hParent,DrivesToolbarParentProcStub,PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
 
 	InsertDrives();
 }
 
-HWND CDrivesToolbar::GetHWND() const
+INT_PTR CDrivesToolbar::OnMButtonUp(const POINTS *pts)
 {
-	return m_hToolbar;
-}
+	POINT pt;
+	POINTSTOPOINT(pt, *pts);
+	int iIndex = static_cast<int>(SendMessage(m_hwnd, TB_HITTEST, 0, reinterpret_cast<LPARAM>(&pt)));
 
-/* This subclass is removed when
-the CDrivesToolbar is deleted,
-so even if there is a message
-received after WM_NCDESTROY,
-this function won't be called. */
-LRESULT CALLBACK DrivesToolbarProcStub(HWND hwnd,UINT uMsg,
-	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
-{
-	CDrivesToolbar *pdt = reinterpret_cast<CDrivesToolbar *>(dwRefData);
-
-	return pdt->DrivesToolbarProc(hwnd,uMsg,wParam,lParam);
-}
-
-LRESULT CALLBACK CDrivesToolbar::DrivesToolbarProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
-{
-	switch(uMsg)
+	if(iIndex >= 0)
 	{
-	case WM_MBUTTONUP:
-		{
-			POINT ptCursor;
-			ptCursor.x = GET_X_LPARAM(lParam);
-			ptCursor.y = GET_Y_LPARAM(lParam);
+		TBBUTTON tbButton;
+		SendMessage(m_hwnd, TB_GETBUTTON, iIndex, reinterpret_cast<LPARAM>(&tbButton));
 
-			int iIndex = static_cast<int>(SendMessage(m_hToolbar,TB_HITTEST,0,reinterpret_cast<LPARAM>(&ptCursor)));
+		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
+		assert(itr != m_mapID.end());
 
-			if(iIndex >= 0)
-			{
-				TBBUTTON tbButton;
-				SendMessage(m_hToolbar,TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
-
-				auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
-				assert(itr != m_mapID.end());
-
-				m_pexpp->BrowseFolder(itr->second.c_str(),SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-			}
-		}
-		break;
-
-	case WM_NCDESTROY:
-		delete this;
-		return 0;
-		break;
+		m_pexpp->BrowseFolder(itr->second.c_str(), SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
 	}
 
-	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+	return 0;
 }
 
 void CDrivesToolbar::OnDeviceArrival(DEV_BROADCAST_HDR *dbh)
@@ -196,7 +166,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 		if(LOWORD(wParam) >= m_uIDStart &&
 			LOWORD(wParam) <= m_uIDEnd)
 		{
-			int iIndex = static_cast<int>(SendMessage(m_hToolbar,TB_COMMANDTOINDEX,LOWORD(wParam),0));
+			int iIndex = static_cast<int>(SendMessage(m_hwnd,TB_COMMANDTOINDEX,LOWORD(wParam),0));
 
 			if(iIndex != -1)
 			{
@@ -209,7 +179,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 		break;
 
 	case WM_NOTIFY:
-		if(reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hToolbar)
+		if(reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hwnd)
 		{
 			switch(reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
@@ -219,7 +189,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 
 					if(pnmm->dwItemSpec != -1)
 					{
-						int iIndex = static_cast<int>(SendMessage(m_hToolbar,TB_COMMANDTOINDEX,pnmm->dwItemSpec,0));
+						int iIndex = static_cast<int>(SendMessage(m_hwnd,TB_COMMANDTOINDEX,pnmm->dwItemSpec,0));
 
 						if(iIndex != -1)
 						{
@@ -230,10 +200,10 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 
 							if(SUCCEEDED(hr))
 							{
-								ClientToScreen(m_hToolbar,&pnmm->pt);
+								ClientToScreen(m_hwnd,&pnmm->pt);
 
 								std::list<LPITEMIDLIST> pidlItemList;
-								CFileContextMenuManager fcmm(m_hToolbar,pidlItem,pidlItemList);
+								CFileContextMenuManager fcmm(m_hwnd,pidlItem,pidlItemList);
 
 								fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,m_pexpp->GetStatusBar(),
 									NULL,FALSE,GetKeyState(VK_SHIFT) & 0x80);
@@ -251,7 +221,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 				{
 					NMTBGETINFOTIP *pnmtbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
 
-					int iIndex = static_cast<int>(SendMessage(m_hToolbar,TB_COMMANDTOINDEX,pnmtbgit->iItem,0));
+					int iIndex = static_cast<int>(SendMessage(m_hwnd,TB_COMMANDTOINDEX,pnmtbgit->iItem,0));
 
 					if(iIndex != -1)
 					{
@@ -315,8 +285,8 @@ void CDrivesToolbar::InsertDrive(const std::wstring &DrivePath)
 	tbButton.fsStyle	= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_NOPREFIX;
 	tbButton.dwData		= m_IDCounter;
 	tbButton.iString	= reinterpret_cast<INT_PTR>(szDisplayName);
-	SendMessage(m_hToolbar,TB_INSERTBUTTON,Position,reinterpret_cast<LPARAM>(&tbButton));
-	UpdateToolbarBandSizing(GetParent(m_hToolbar),m_hToolbar);
+	SendMessage(m_hwnd,TB_INSERTBUTTON,Position,reinterpret_cast<LPARAM>(&tbButton));
+	UpdateToolbarBandSizing(GetParent(m_hwnd),m_hwnd);
 
 	m_mapID.insert(std::make_pair(m_IDCounter,DrivePath));
 	++m_IDCounter;
@@ -328,8 +298,8 @@ void CDrivesToolbar::RemoveDrive(const std::wstring &DrivePath)
 
 	if(di.Position != -1)
 	{
-		SendMessage(m_hToolbar,TB_DELETEBUTTON,di.Position,0);
-		UpdateToolbarBandSizing(GetParent(m_hToolbar),m_hToolbar);
+		SendMessage(m_hwnd,TB_DELETEBUTTON,di.Position,0);
+		UpdateToolbarBandSizing(GetParent(m_hwnd),m_hwnd);
 		m_mapID.erase(di.ID);
 	}
 }
@@ -344,7 +314,7 @@ void CDrivesToolbar::UpdateDriveIcon(const std::wstring &DrivePath)
 	{
 		SHFILEINFO shfi;
 		SHGetFileInfo(DrivePath.c_str(),0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
-		SendMessage(m_hToolbar,TB_CHANGEBITMAP,di.ID,shfi.iIcon);
+		SendMessage(m_hwnd,TB_CHANGEBITMAP,di.ID,shfi.iIcon);
 	}
 }
 
@@ -352,12 +322,12 @@ int CDrivesToolbar::GetSortedPosition(const std::wstring &DrivePath)
 {
 	int Position = 0;
 
-	int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
+	int nButtons = static_cast<int>(SendMessage(m_hwnd,TB_BUTTONCOUNT,0,0));
 
 	for(int i = 0;i < nButtons;i++)
 	{
 		TBBUTTON tbButton;
-		SendMessage(m_hToolbar,TB_GETBUTTON,i,reinterpret_cast<LPARAM>(&tbButton));
+		SendMessage(m_hwnd,TB_GETBUTTON,i,reinterpret_cast<LPARAM>(&tbButton));
 
 		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
 		assert(itr != m_mapID.end());
@@ -378,12 +348,12 @@ CDrivesToolbar::DriveInformation_t CDrivesToolbar::GetDrivePosition(const std::w
 	DriveInformation_t di;
 	di.Position = -1;
 
-	int nButtons = static_cast<int>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0));
+	int nButtons = static_cast<int>(SendMessage(m_hwnd,TB_BUTTONCOUNT,0,0));
 
 	for(int i = 0;i < nButtons;i++)
 	{
 		TBBUTTON tbButton;
-		SendMessage(m_hToolbar,TB_GETBUTTON,i,reinterpret_cast<LPARAM>(&tbButton));
+		SendMessage(m_hwnd,TB_GETBUTTON,i,reinterpret_cast<LPARAM>(&tbButton));
 
 		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
 		assert(itr != m_mapID.end());
@@ -402,7 +372,7 @@ CDrivesToolbar::DriveInformation_t CDrivesToolbar::GetDrivePosition(const std::w
 std::wstring CDrivesToolbar::GetDrivePath(int iIndex)
 {
 	TBBUTTON tbButton;
-	SendMessage(m_hToolbar,TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
+	SendMessage(m_hwnd,TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
 
 	auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
 	assert(itr != m_mapID.end());

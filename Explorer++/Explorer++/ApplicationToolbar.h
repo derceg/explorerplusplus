@@ -3,6 +3,7 @@
 #include <vector>
 #include "Explorer++_internal.h"
 #include "ApplicationToolbarDropHandler.h"
+#include "../Helper/BaseWindow.h"
 
 #import <msxml3.dll> raw_interfaces_only
 
@@ -52,16 +53,13 @@ private:
 	int m_IDCounter;
 };
 
-class CApplicationToolbar
+class CApplicationToolbar : public CBaseWindow
 {
-	friend LRESULT CALLBACK WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	friend LRESULT CALLBACK ParentWndProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 public:
 
 	static CApplicationToolbar *Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
-
-	HWND				GetHWND() const;
 
 	void				ShowNewItemDialog();
 	void				AddNewItem(const std::wstring &name, const std::wstring &command, BOOL showNameOnToolbar);
@@ -71,7 +69,6 @@ public:
 
 private:
 
-	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 1;
 
 	struct ApplicationInfo_t
@@ -80,11 +77,12 @@ private:
 		std::wstring Parameters;
 	};
 
-	LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	CApplicationToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp);
 	~CApplicationToolbar();
+
+	static HWND			CreateApplicationToolbar(HWND hParent);
 
 	void				Initialize(HWND hParent);
 
@@ -94,8 +92,6 @@ private:
 
 	ApplicationInfo_t	ProcessCommand(const std::wstring &Command);
 	ApplicationButton_t	*MapToolbarButtonToItem(int index);
-
-	HWND				m_hToolbar;
 
 	HINSTANCE			m_hInstance;
 

@@ -42,6 +42,7 @@ CApplicationToolbar *CApplicationToolbar::Create(HWND hParent, UINT uIDStart, UI
 }
 
 CApplicationToolbar::CApplicationToolbar(HWND hParent,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
+CBaseWindow(CreateApplicationToolbar(hParent)),
 m_uIDStart(uIDStart),
 m_uIDEnd(uIDEnd),
 m_hInstance(hInstance),
@@ -52,63 +53,39 @@ m_pexpp(pexpp)
 
 CApplicationToolbar::~CApplicationToolbar()
 {
-	RemoveWindowSubclass(m_hToolbar, WndProcStub, SUBCLASS_ID);
-	RemoveWindowSubclass(GetParent(m_hToolbar),ParentWndProcStub,PARENT_SUBCLASS_ID);
+	RemoveWindowSubclass(GetParent(m_hwnd),ParentWndProcStub,PARENT_SUBCLASS_ID);
 
-	RevokeDragDrop(m_hToolbar);
+	RevokeDragDrop(m_hwnd);
 	m_patd->Release();
 }
 
-void CApplicationToolbar::Initialize(HWND hParent)
+HWND CApplicationToolbar::CreateApplicationToolbar(HWND hParent)
 {
-	m_hToolbar = CreateToolbar(hParent, WS_CHILD | WS_VISIBLE |
+	return CreateToolbar(hParent, WS_CHILD | WS_VISIBLE |
 		WS_CLIPSIBLINGS | WS_CLIPCHILDREN | TBSTYLE_TOOLTIPS | TBSTYLE_LIST |
 		TBSTYLE_TRANSPARENT | TBSTYLE_FLAT | CCS_NODIVIDER | CCS_NORESIZE,
 		TBSTYLE_EX_MIXEDBUTTONS | TBSTYLE_EX_DRAWDDARROWS |
 		TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS);
+}
 
+void CApplicationToolbar::Initialize(HWND hParent)
+{
 	m_atps = &CApplicationToolbarPersistentSettings::GetInstance();
 
-	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
-	SendMessage(m_hToolbar,TB_BUTTONSTRUCTSIZE,static_cast<WPARAM>(sizeof(TBBUTTON)),0);
+	SendMessage(m_hwnd,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
+	SendMessage(m_hwnd,TB_BUTTONSTRUCTSIZE,static_cast<WPARAM>(sizeof(TBBUTTON)),0);
 
 	HIMAGELIST himlSmall;
 	Shell_GetImageLists(NULL,&himlSmall);
-	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himlSmall));
+	SendMessage(m_hwnd,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himlSmall));
 
-	m_patd = new CApplicationToolbarDropHandler(m_hToolbar, this);
-	RegisterDragDrop(m_hToolbar,m_patd);
+	m_patd = new CApplicationToolbarDropHandler(m_hwnd, this);
+	RegisterDragDrop(m_hwnd,m_patd);
 
-	SetWindowSubclass(m_hToolbar, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 	SetWindowSubclass(hParent,ParentWndProcStub,PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
 
 	AddButtonsToToolbar();
-}
-
-HWND CApplicationToolbar::GetHWND() const
-{
-	return m_hToolbar;
-}
-
-LRESULT CALLBACK WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
-	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
-{
-	CApplicationToolbar *pat = reinterpret_cast<CApplicationToolbar *>(dwRefData);
-	return pat->WndProc(hwnd, uMsg, wParam, lParam);
-}
-
-LRESULT CALLBACK CApplicationToolbar::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	switch(uMsg)
-	{
-	case WM_NCDESTROY:
-		delete this;
-		return 0;
-		break;
-	}
-
-	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
 LRESULT CALLBACK ParentWndProcStub(HWND hwnd,UINT uMsg,
@@ -126,7 +103,7 @@ LRESULT CALLBACK CApplicationToolbar::ParentWndProc(HWND hwnd,UINT uMsg,WPARAM w
 		if(LOWORD(wParam) >= m_uIDStart &&
 			LOWORD(wParam) <= m_uIDEnd)
 		{
-			int iIndex = static_cast<int>(SendMessage(m_hToolbar,TB_COMMANDTOINDEX,LOWORD(wParam),0));
+			int iIndex = static_cast<int>(SendMessage(m_hwnd,TB_COMMANDTOINDEX,LOWORD(wParam),0));
 			OpenItem(iIndex, NULL);
 			return 0;
 		}
@@ -154,7 +131,7 @@ LRESULT CALLBACK CApplicationToolbar::ParentWndProc(HWND hwnd,UINT uMsg,WPARAM w
 		break;
 
 	case WM_NOTIFY:
-		if(reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hToolbar)
+		if(reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hwnd)
 		{
 			switch(reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
@@ -164,7 +141,7 @@ LRESULT CALLBACK CApplicationToolbar::ParentWndProc(HWND hwnd,UINT uMsg,WPARAM w
 
 					if(pnmm->dwItemSpec != -1)
 					{
-						int iIndex = static_cast<int>(SendMessage(m_hToolbar,TB_COMMANDTOINDEX,pnmm->dwItemSpec,0));
+						int iIndex = static_cast<int>(SendMessage(m_hwnd,TB_COMMANDTOINDEX,pnmm->dwItemSpec,0));
 
 						if(iIndex != -1)
 						{
@@ -173,9 +150,9 @@ LRESULT CALLBACK CApplicationToolbar::ParentWndProc(HWND hwnd,UINT uMsg,WPARAM w
 							HMENU RightClickMenu = GetSubMenu(LoadMenu(m_hInstance,
 								MAKEINTRESOURCE(IDR_APPLICATIONTOOLBAR_MENU)),0);
 
-							ClientToScreen(m_hToolbar,&pnmm->pt);
+							ClientToScreen(m_hwnd,&pnmm->pt);
 							TrackPopupMenu(RightClickMenu,TPM_LEFTALIGN,
-								pnmm->pt.x,pnmm->pt.y,0,m_hToolbar,NULL);
+								pnmm->pt.x,pnmm->pt.y,0,m_hwnd,NULL);
 						}
 
 						return TRUE;
@@ -187,7 +164,7 @@ LRESULT CALLBACK CApplicationToolbar::ParentWndProc(HWND hwnd,UINT uMsg,WPARAM w
 				{
 					NMTBGETINFOTIP *pnmtbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
 
-					int iIndex = static_cast<int>(SendMessage(m_hToolbar,TB_COMMANDTOINDEX,pnmtbgit->iItem,0));
+					int iIndex = static_cast<int>(SendMessage(m_hwnd,TB_COMMANDTOINDEX,pnmtbgit->iItem,0));
 					ApplicationButton_t *Button = MapToolbarButtonToItem(iIndex);
 
 					if(Button != NULL)
@@ -245,8 +222,8 @@ void CApplicationToolbar::AddButtonToToolbar(const ApplicationButton_t &Button)
 		tbButton.iString = reinterpret_cast<INT_PTR>(EMPTY_STRING);
 	}
 
-	SendMessage(m_hToolbar,TB_ADDBUTTONS,static_cast<WPARAM>(1),reinterpret_cast<LPARAM>(&tbButton));
-	UpdateToolbarBandSizing(GetParent(m_hToolbar),m_hToolbar);
+	SendMessage(m_hwnd,TB_ADDBUTTONS,static_cast<WPARAM>(1),reinterpret_cast<LPARAM>(&tbButton));
+	UpdateToolbarBandSizing(GetParent(m_hwnd),m_hwnd);
 }
 
 void CApplicationToolbar::UpdateButton(int iItem)
@@ -281,7 +258,7 @@ void CApplicationToolbar::UpdateButton(int iItem)
 			tbi.pszText = EMPTY_STRING;
 		}
 
-		SendMessage(m_hToolbar,TB_SETBUTTONINFO,iItem,reinterpret_cast<LPARAM>(&tbi));
+		SendMessage(m_hwnd,TB_SETBUTTONINFO,iItem,reinterpret_cast<LPARAM>(&tbi));
 	}
 }
 
@@ -291,7 +268,7 @@ void CApplicationToolbar::ShowNewItemDialog()
 	Button.ShowNameOnToolbar = TRUE;
 
 	CApplicationToolbarButtonDialog ApplicationToolbarButtonDialog(m_hInstance,
-		IDD_EDITAPPLICATIONBUTTON,m_hToolbar,&Button,true);
+		IDD_EDITAPPLICATIONBUTTON,m_hwnd,&Button,true);
 	INT_PTR ret = ApplicationToolbarButtonDialog.ShowModalDialog();
 
 	if(ret == 1)
@@ -427,7 +404,7 @@ void CApplicationToolbar::ShowItemProperties(int iItem)
 	if(Button != NULL)
 	{
 		CApplicationToolbarButtonDialog ApplicationToolbarButtonDialog(m_hInstance,
-			IDD_EDITAPPLICATIONBUTTON,m_hToolbar,Button,false);
+			IDD_EDITAPPLICATIONBUTTON,m_hwnd,Button,false);
 		INT_PTR ret = ApplicationToolbarButtonDialog.ShowModalDialog();
 
 		if(ret == 1)
@@ -445,13 +422,13 @@ void CApplicationToolbar::DeleteItem(int iItem)
 	LoadString(m_hInstance,IDS_APPLICATIONBUTTON_DELETE,
 		szInfoMsg,SIZEOF_ARRAY(szInfoMsg));
 
-	int iMessageBoxReturn = MessageBox(m_hToolbar,szInfoMsg,
+	int iMessageBoxReturn = MessageBox(m_hwnd,szInfoMsg,
 		NExplorerplusplus::WINDOW_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
 
 	if(iMessageBoxReturn == IDYES)
 	{
 		TBBUTTON tbButton;
-		LRESULT lResult = SendMessage(m_hToolbar,TB_GETBUTTON,iItem,reinterpret_cast<LPARAM>(&tbButton));
+		LRESULT lResult = SendMessage(m_hwnd,TB_GETBUTTON,iItem,reinterpret_cast<LPARAM>(&tbButton));
 
 		if(lResult)
 		{
@@ -462,8 +439,8 @@ void CApplicationToolbar::DeleteItem(int iItem)
 			if(itr != m_atps->m_Buttons.end())
 			{
 				m_atps->m_Buttons.erase(itr);
-				SendMessage(m_hToolbar,TB_DELETEBUTTON,iItem,0);
-				UpdateToolbarBandSizing(GetParent(m_hToolbar),m_hToolbar);
+				SendMessage(m_hwnd,TB_DELETEBUTTON,iItem,0);
+				UpdateToolbarBandSizing(GetParent(m_hwnd),m_hwnd);
 			}
 		}
 	}
@@ -477,7 +454,7 @@ ApplicationButton_t *CApplicationToolbar::MapToolbarButtonToItem(int iIndex)
 	}
 
 	TBBUTTON tbButton;
-	LRESULT lResult = SendMessage(m_hToolbar,TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
+	LRESULT lResult = SendMessage(m_hwnd,TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
 
 	if(lResult)
 	{

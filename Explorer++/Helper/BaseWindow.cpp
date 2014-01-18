@@ -16,14 +16,20 @@
 
 
 CBaseWindow::CBaseWindow(HWND hwnd) :
-CMessageForwarder()
+CMessageForwarder(),
+m_hwnd(hwnd)
 {
 	SetWindowSubclass(hwnd,BaseWindowProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 }
 
 CBaseWindow::~CBaseWindow()
 {
-	
+	RemoveWindowSubclass(m_hwnd, BaseWindowProcStub, 0);
+}
+
+HWND CBaseWindow::GetHWND() const
+{
+	return m_hwnd;
 }
 
 LRESULT CALLBACK BaseWindowProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,
@@ -39,7 +45,6 @@ LRESULT CALLBACK CBaseWindow::BaseWindowProc(HWND hwnd,UINT uMsg,WPARAM wParam,L
 	switch(uMsg)
 	{
 	case WM_NCDESTROY:
-		RemoveWindowSubclass(hwnd,BaseWindowProcStub,0);
 		delete this;
 		return 0;
 		break;
