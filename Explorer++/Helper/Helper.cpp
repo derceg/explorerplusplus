@@ -247,7 +247,7 @@ HINSTANCE StartCommandPrompt(const TCHAR *Directory,bool Elevated)
 BOOL GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize)
 {
 	LARGE_INTEGER lFileSize;
-	LONG ClusterSize;
+	DWORD dwClusterSize;
 	HANDLE hFile;
 	TCHAR szRoot[MAX_PATH];
 
@@ -270,13 +270,13 @@ BOOL GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSi
 		PathStripToRoot(szRoot);
 
 		/* Get the cluster size of the drive the file resides on. */
-		ClusterSize = GetClusterSize(szRoot);
+		GetClusterSize(szRoot, &dwClusterSize);
 
-		if((lpRealFileSize->QuadPart % ClusterSize) != 0)
+		if((lpRealFileSize->QuadPart % dwClusterSize) != 0)
 		{
 			/* The real size is the logical file size rounded up to the end of the
 			nearest cluster. */
-			lpRealFileSize->QuadPart += ClusterSize - (lpRealFileSize->QuadPart % ClusterSize);
+			lpRealFileSize->QuadPart += dwClusterSize - (lpRealFileSize->QuadPart % dwClusterSize);
 		}
 	}
 

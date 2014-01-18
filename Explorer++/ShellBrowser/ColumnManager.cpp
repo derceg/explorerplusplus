@@ -596,13 +596,19 @@ bool CShellBrowser::GetRealSizeColumnRawData(int InternalIndex,ULARGE_INTEGER &R
 	StringCchCopy(Root,SIZEOF_ARRAY(Root),m_CurDir);
 	PathStripToRoot(Root);
 
-	LONG ClusterSize = GetClusterSize(Root);
+	DWORD dwClusterSize;
+	BOOL bRet = GetClusterSize(Root, &dwClusterSize);
+
+	if(!bRet)
+	{
+		return false;
+	}
 
 	ULARGE_INTEGER RealFileSizeTemp = {m_pwfdFiles[InternalIndex].nFileSizeLow,m_pwfdFiles[InternalIndex].nFileSizeHigh};
 
-	if(RealFileSizeTemp.QuadPart != 0 && (RealFileSizeTemp.QuadPart % ClusterSize) != 0)
+	if(RealFileSizeTemp.QuadPart != 0 && (RealFileSizeTemp.QuadPart % dwClusterSize) != 0)
 	{
-		RealFileSizeTemp.QuadPart += ClusterSize - (RealFileSizeTemp.QuadPart % ClusterSize);
+		RealFileSizeTemp.QuadPart += dwClusterSize - (RealFileSizeTemp.QuadPart % dwClusterSize);
 	}
 
 	RealFileSize = RealFileSizeTemp;

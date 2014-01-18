@@ -17,14 +17,30 @@
 #include "Macros.h"
 
 
-LONG GetClusterSize(const TCHAR *Drive)
+BOOL GetClusterSize(const TCHAR *Drive, DWORD *pdwClusterSize)
 {
-	DWORD SectorsPerCluster;
-	DWORD BytesPerSector;
+	DWORD dwSectorsPerCluster;
+	DWORD dwBytesPerSector;
+	BOOL bRet = GetDiskFreeSpace(Drive,&dwSectorsPerCluster,&dwBytesPerSector,NULL,NULL);
 
-	GetDiskFreeSpace(Drive,&SectorsPerCluster,&BytesPerSector,NULL,NULL);
+	if(!bRet)
+	{
+		return FALSE;
+	}
 
-	return BytesPerSector * SectorsPerCluster;
+	/* It's not expected that this
+	will ever actually overflow.
+	The cluster size should be
+	_far_ below the maximum
+	DWORD value. */
+	HRESULT hr = DWordMult(dwBytesPerSector, dwSectorsPerCluster, pdwClusterSize);
+
+	if(FAILED(hr))
+	{
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 TCHAR GetDriveLetterFromMask(ULONG unitmask)

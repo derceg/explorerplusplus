@@ -183,7 +183,12 @@ BOOL NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(NDefaultFil
 	OSVERSIONINFO osvi;
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
-	GetVersionEx(&osvi);
+	BOOL bRet = GetVersionEx(&osvi);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
 
 	if(osvi.dwMajorVersion == WINDOWS_XP_MAJORVERSION &&
 		ReplacementType == NDefaultFileManager::REPLACEEXPLORER_ALL)
@@ -212,33 +217,39 @@ BOOL NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(NDefaultFil
 		break;
 	}
 
-	HKEY hKeyShell;
-	LONG lRes1;
-	LSTATUS lRes2 = 1;
+	BOOL bSuccess = FALSE;
 
 	/* Remove the shell default value. */
-	lRes1 = RegOpenKeyEx(HKEY_CLASSES_ROOT,
+	HKEY hKeyShell;
+	LONG lRes = RegOpenKeyEx(HKEY_CLASSES_ROOT,
 		pszSubKey,0,KEY_WRITE,&hKeyShell);
 
-	if(lRes1 == ERROR_SUCCESS)
+	if(lRes == ERROR_SUCCESS)
 	{
-		lRes1 = RegSetValueEx(hKeyShell,NULL,0,REG_SZ,
+		lRes = RegSetValueEx(hKeyShell,NULL,0,REG_SZ,
 			reinterpret_cast<const BYTE *>(pszDefaultValue),
 			(lstrlen(pszDefaultValue) + 1) * sizeof(TCHAR));
 
-		if(lRes1 == ERROR_SUCCESS)
+		if(lRes == ERROR_SUCCESS)
 		{
 			TCHAR szDeleteSubKey[512];
-
-			StringCchPrintf(szDeleteSubKey,SIZEOF_ARRAY(szDeleteSubKey),_T("%s\\%s"),
+			HRESULT hr = StringCchPrintf(szDeleteSubKey,SIZEOF_ARRAY(szDeleteSubKey),_T("%s\\%s"),
 				pszSubKey,szInternalCommand);
 
-			/* Remove the main command key. */
-			lRes2 = SHDeleteKey(HKEY_CLASSES_ROOT,szDeleteSubKey);
+			if(SUCCEEDED(hr))
+			{
+				/* Remove the main command key. */
+				lRes = SHDeleteKey(HKEY_CLASSES_ROOT, szDeleteSubKey);
+
+				if(lRes == ERROR_SUCCESS)
+				{
+					bSuccess = TRUE;
+				}
+			}
 		}
 
 		RegCloseKey(hKeyShell);
 	}
 
-	return ((lRes1 == ERROR_SUCCESS) && (lRes2 == ERROR_SUCCESS));
+	return bSuccess;
 }

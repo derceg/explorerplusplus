@@ -2,5 +2,5 @@
 
 #include <Windows.h>
 
-LONG	GetClusterSize(const TCHAR *Drive);
+BOOL	GetClusterSize(const TCHAR *Drive, DWORD *pdwClusterSize);
 TCHAR	GetDriveLetterFromMask(ULONG unitmask);
