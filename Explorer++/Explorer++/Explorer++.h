@@ -372,7 +372,6 @@ private:
 	void					OnFileRename(void);
 	void					OnFileDelete(BOOL bPermanent);
 	void					OnWildcardSelect(BOOL bSelect);
-	void					OnSaveFileSlack(void);
 	void					OnDirChanged(int iTabId);
 	void					OnResolveLink(void);
 	void					OnTabCtrlGetDispInfo(LPARAM lParam);

@@ -920,46 +920,6 @@ void Explorerplusplus::OnMainToolbarRClick(void)
 		ptCursor.x,ptCursor.y,0,m_hMainRebar,NULL);
 }
 
-void Explorerplusplus::OnSaveFileSlack(void)
-{
-	HANDLE	hFile;
-	TCHAR	pszSlack[4096];
-	TCHAR	szSlackFileName[MAX_PATH];
-	TCHAR	szSaveFileName[MAX_PATH] = EMPTY_STRING;
-	DWORD	nBytesWritten;
-	BOOL	bSaveNameRetrieved;
-	int		iItem;
-	int		nBytesRetrieved;
-
-	bSaveNameRetrieved = GetFileNameFromUser(m_hContainer,
-	szSaveFileName,SIZEOF_ARRAY(szSaveFileName),m_CurrentDirectory);
-
-	if(bSaveNameRetrieved)
-	{
-		iItem = ListView_GetNextItem(m_hActiveListView,-1,LVNI_FOCUSED);
-
-		if(iItem != -1)
-		{
-			m_pActiveShellBrowser->QueryFullItemName(iItem,szSlackFileName,SIZEOF_ARRAY(szSlackFileName));
-
-			nBytesRetrieved = ReadFileSlack(szSlackFileName,pszSlack,SIZEOF_ARRAY(pszSlack));
-
-			if(nBytesRetrieved != -1)
-			{
-				hFile = CreateFile(szSaveFileName,GENERIC_WRITE,0,NULL,
-				OPEN_ALWAYS,0,NULL);
-
-				if(hFile != INVALID_HANDLE_VALUE)
-				{
-					WriteFile(hFile,(LPVOID)pszSlack,nBytesRetrieved,&nBytesWritten,NULL);
-
-					CloseHandle(hFile);
-				}
-			}
-		}
-	}
-}
-
 void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
 {
 	CWildcardSelectDialog WilcardSelectDialog(m_hLanguageModule,

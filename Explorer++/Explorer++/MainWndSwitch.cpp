@@ -537,10 +537,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 			OnWildcardSelect(FALSE);
 			break;
 
-		case IDM_EDIT_SHOWFILESLACK:
-			OnSaveFileSlack();
-			break;
-
 		case IDM_EDIT_RESOLVELINK:
 			OnResolveLink();
 			break;

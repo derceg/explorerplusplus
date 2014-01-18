@@ -106,7 +106,6 @@ BOOL			ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffe
 BOOL			IsImage(const TCHAR *FileName);
 WORD			GetFileLanguage(const TCHAR *szFullFileName);
 BOOL			GetFileProductVersion(const TCHAR *szFullFileName,DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS);
-int				ReadFileSlack(const TCHAR *FileName, TCHAR *pszSlack, int iBufferLen);
 
 /* Ownership and access. */
 BOOL			CheckGroupMembership(GroupType_t GroupType);

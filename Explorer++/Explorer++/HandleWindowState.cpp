@@ -98,7 +98,6 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_MOVETOFOLDER,CanCutOrCopySelection() && GetFocus() != m_hTreeView);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_WILDCARDDESELECT,m_nSelected);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_SELECTNONE,m_nSelected);
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_SHOWFILESLACK,m_nSelected);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_RESOLVELINK,m_nSelected);
 
 	lCheckMenuItem(hProgramMenu,IDM_VIEW_STATUSBAR,m_bShowStatusBar);
