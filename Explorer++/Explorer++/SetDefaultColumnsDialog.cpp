@@ -100,6 +100,7 @@ INT_PTR CSetDefaultColumnsDialog::OnInitDialog()
 	m_PreviousFolderType = m_psdcdps->m_FolderType;
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
+	SetWindowTheme(hListView, L"Explorer", NULL);
 
 	ListView_SetExtendedListViewStyleEx(hListView,
 	LVS_EX_CHECKBOXES,LVS_EX_CHECKBOXES);
@@ -216,8 +217,8 @@ INT_PTR CSetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
-	case LVN_ITEMCHANGING:
-		OnLvnItemChanging(reinterpret_cast<NMLISTVIEW *>(pnmhdr));
+	case LVN_ITEMCHANGED:
+		OnLvnItemChanged(reinterpret_cast<NMLISTVIEW *>(pnmhdr));
 		break;
 	}
 
@@ -378,7 +379,7 @@ std::list<Column_t> *CSetDefaultColumnsDialog::GetCurrentColumnList(FolderType_t
 	return NULL;
 }
 
-void CSetDefaultColumnsDialog::OnLvnItemChanging(NMLISTVIEW *pnmlv)
+void CSetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 {
 	if(pnmlv->uNewState & LVIS_SELECTED)
 	{
@@ -409,11 +410,11 @@ void CSetDefaultColumnsDialog::OnMoveColumn(bool bUp)
 	{
 		if(bUp)
 		{
-			NListView::ListView_SwapItems(hListView,iSelected,iSelected - 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected - 1,TRUE);
 		}
 		else
 		{
-			NListView::ListView_SwapItems(hListView,iSelected,iSelected + 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected + 1,TRUE);
 		}
 
 		SetFocus(hListView);

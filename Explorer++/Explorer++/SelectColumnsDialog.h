@@ -49,7 +49,7 @@ private:
 
 	void	OnOk();
 	void	OnCancel();
-	void	OnLvnItemChanging(NMLISTVIEW *pnmlv);
+	void	OnLvnItemChanged(NMLISTVIEW *pnmlv);
 	void	OnMoveColumn(bool bUp);
 
 	IExplorerplusplus	*m_pexpp;

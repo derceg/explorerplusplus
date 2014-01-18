@@ -76,7 +76,7 @@ private:
 	void	OnOk();
 	void	OnCancel();
 	void	OnCbnSelChange();
-	void	OnLvnItemChanging(NMLISTVIEW *pnmlv);
+	void	OnLvnItemChanged(NMLISTVIEW *pnmlv);
 	void	OnMoveColumn(bool bUp);
 
 	void	SaveCurrentColumnState(FolderType_t FolderType);

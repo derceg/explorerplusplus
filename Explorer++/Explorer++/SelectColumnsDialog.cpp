@@ -179,8 +179,8 @@ INT_PTR CSelectColumnsDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
-	case LVN_ITEMCHANGING:
-		OnLvnItemChanging(reinterpret_cast<NMLISTVIEW *>(pnmhdr));
+	case LVN_ITEMCHANGED:
+		OnLvnItemChanged(reinterpret_cast<NMLISTVIEW *>(pnmhdr));
 		break;
 	}
 
@@ -248,7 +248,7 @@ void CSelectColumnsDialog::OnCancel()
 	EndDialog(m_hDlg,0);
 }
 
-void CSelectColumnsDialog::OnLvnItemChanging(NMLISTVIEW *pnmlv)
+void CSelectColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 {
 	if(pnmlv->uNewState & LVIS_SELECTED)
 	{
@@ -279,11 +279,11 @@ void CSelectColumnsDialog::OnMoveColumn(bool bUp)
 	{
 		if(bUp)
 		{
-			NListView::ListView_SwapItems(hListView,iSelected,iSelected - 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected - 1,TRUE);
 		}
 		else
 		{
-			NListView::ListView_SwapItems(hListView,iSelected,iSelected + 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected + 1,TRUE);
 		}
 
 		m_bColumnsSwapped = TRUE;

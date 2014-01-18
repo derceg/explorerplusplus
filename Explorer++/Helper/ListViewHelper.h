@@ -7,11 +7,10 @@ namespace NListView
 	int		ListView_InvertSelection(HWND hListView);
 	void	ListView_FocusItem(HWND hListView,int iItem,BOOL bFocus);
 	void	ListView_SetGridlines(HWND hListView,BOOL bEnableGridlines);
-	void	ListView_SetAutoArrange(HWND hListView,BOOL bAutoArrange);
+	BOOL	ListView_SetAutoArrange(HWND hListView,BOOL bAutoArrange);
 	void	ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate,UINT uHoverTime);
 	void	ListView_AddRemoveExtendedStyle(HWND hListView,DWORD dwStyle,BOOL bAdd);
 	BOOL	ListView_SetBackgroundImage(HWND hListView,UINT uImage);
-	void	ListView_SwapItems(HWND hListView,int iItem1,int iItem2);
-	void	ListView_SwapItemsNolParam(HWND hListView,int iItem1,int iItem2);
-	void	ListView_HandleInsertionMark(HWND hListView,int iItemFocus,const POINT *ppt);
+	BOOL	ListView_SwapItems(HWND hListView,int iItem1,int iItem2,BOOL bSwapLPARAM);
+	void	ListView_PositionInsertMark(HWND hListView,const POINT *ppt);
 }

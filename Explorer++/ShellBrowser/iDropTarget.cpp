@@ -122,9 +122,9 @@ HRESULT _stdcall CShellBrowser::DragOver(DWORD grfKeyState,POINTL ptl,DWORD *pdw
 	if(m_bDataAccept)
 	{
 		if(!m_bOverFolder)
-			NListView::ListView_HandleInsertionMark(m_hListView,0,&pt);
+			NListView::ListView_PositionInsertMark(m_hListView,&pt);
 		else
-			NListView::ListView_HandleInsertionMark(m_hListView,0,NULL);
+			NListView::ListView_PositionInsertMark(m_hListView,NULL);
 	}
 
 	return S_OK;
@@ -331,7 +331,7 @@ HRESULT _stdcall CShellBrowser::DragLeave(void)
 {
 	m_pDropTargetHelper->DragLeave();
 
-	NListView::ListView_HandleInsertionMark(m_hListView,0,NULL);
+	NListView::ListView_PositionInsertMark(m_hListView,NULL);
 
 	if(m_bDeselectDropFolder)
 	{
@@ -509,7 +509,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	}*/
 
 	/* Remove the insertion mark from the listview. */
-	NListView::ListView_HandleInsertionMark(m_hListView,0,NULL);
+	NListView::ListView_PositionInsertMark(m_hListView,NULL);
 
 	//m_bPerformingDrag = FALSE;
 
@@ -634,7 +634,7 @@ void CShellBrowser::RepositionLocalFiles(POINT *ppt)
 					lvhti.pt = pt;
 					iHitItem = ListView_HitTest(m_hListView,&lvhti);
 
-					/* Based on ListView_HandleInsertionMark() code. */
+					/* Based on ListView_PositionInsertMark() code. */
 					if(iHitItem != -1 && lvhti.flags & LVHT_ONITEM)
 					{
 						ListView_GetItemRect(m_hListView,lvhti.iItem,&rcItem,LVIR_BOUNDS);
