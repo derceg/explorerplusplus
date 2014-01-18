@@ -53,6 +53,7 @@ struct AsyncOperationInfo_t
 	DWORD			dwEffect;
 };
 
+int CopyFileDescriptorAToW(FILEDESCRIPTORW *pfdw, const FILEDESCRIPTORA *pfda);
 DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter);
 BOOL CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi);
 LRESULT CALLBACK DropWindowSubclass(HWND hwnd,UINT uMsg,
@@ -349,31 +350,32 @@ HRESULT CDropHandler::CopyAnsiFileDescriptorData(IDataObject *pDataObject,
 
 	if(hr == S_OK)
 	{
-		FILEGROUPDESCRIPTORA *pfgd = (FILEGROUPDESCRIPTORA *)GlobalLock(stg.hGlobal);
+		FILEGROUPDESCRIPTORA *pfgda = (FILEGROUPDESCRIPTORA *)GlobalLock(stg.hGlobal);
 
-		if(pfgd != NULL)
+		if(pfgda != NULL)
 		{
-			FILEGROUPDESCRIPTORW *pfgdw = (FILEGROUPDESCRIPTORW *)malloc(sizeof(FILEGROUPDESCRIPTORW) + ((pfgd->cItems - 1) * sizeof(FILEDESCRIPTORW)));
-			pfgdw->cItems = pfgd->cItems;
+			FILEGROUPDESCRIPTORW *pfgdw = (FILEGROUPDESCRIPTORW *)malloc(sizeof(FILEGROUPDESCRIPTORW) + ((pfgda->cItems - 1) * sizeof(FILEDESCRIPTORW)));
 
-			for(UINT i = 0;i < pfgd->cItems;i++)
+			if(pfgdw != NULL)
 			{
-				pfgdw->fgd[i].dwFlags = pfgd->fgd[i].dwFlags;
-				pfgdw->fgd[i].clsid = pfgd->fgd[i].clsid;
-				pfgdw->fgd[i].sizel = pfgd->fgd[i].sizel;
-				pfgdw->fgd[i].pointl = pfgd->fgd[i].pointl;
-				pfgdw->fgd[i].dwFileAttributes = pfgd->fgd[i].dwFileAttributes;
-				pfgdw->fgd[i].ftCreationTime = pfgd->fgd[i].ftCreationTime;
-				pfgdw->fgd[i].ftLastAccessTime = pfgd->fgd[i].ftLastAccessTime;
-				pfgdw->fgd[i].ftLastWriteTime = pfgd->fgd[i].ftLastWriteTime;
-				pfgdw->fgd[i].nFileSizeHigh = pfgd->fgd[i].nFileSizeHigh;
-				pfgdw->fgd[i].nFileSizeLow = pfgd->fgd[i].nFileSizeLow;
-				MultiByteToWideChar(CP_ACP,0,pfgd->fgd[i].cFileName,-1,pfgdw->fgd[i].cFileName,SIZEOF_ARRAY(pfgdw->fgd[i].cFileName));
+				int nSuccessfullyCopied = 0;
+
+				for(UINT i = 0; i < pfgda->cItems; i++)
+				{
+					int iRet = CopyFileDescriptorAToW(&pfgdw->fgd[nSuccessfullyCopied], &pfgda->fgd[i]);
+
+					if(iRet != 0)
+					{
+						nSuccessfullyCopied++;
+					}
+				}
+
+				pfgdw->cItems = nSuccessfullyCopied;
+
+				CopyFileDescriptorData(pDataObject, pfgdw, PastedFileList);
+
+				free(pfgdw);
 			}
-
-			CopyFileDescriptorData(pDataObject,pfgdw,PastedFileList);
-
-			free(pfgdw);
 
 			GlobalUnlock(stg.hGlobal);
 		}
@@ -382,6 +384,21 @@ HRESULT CDropHandler::CopyAnsiFileDescriptorData(IDataObject *pDataObject,
 	}
 
 	return hr;
+}
+
+int CopyFileDescriptorAToW(FILEDESCRIPTORW *pfdw, const FILEDESCRIPTORA *pfda)
+{
+	pfdw->dwFlags = pfda->dwFlags;
+	pfdw->clsid = pfda->clsid;
+	pfdw->sizel = pfda->sizel;
+	pfdw->pointl = pfda->pointl;
+	pfdw->dwFileAttributes = pfda->dwFileAttributes;
+	pfdw->ftCreationTime = pfda->ftCreationTime;
+	pfdw->ftLastAccessTime = pfda->ftLastAccessTime;
+	pfdw->ftLastWriteTime = pfda->ftLastWriteTime;
+	pfdw->nFileSizeHigh = pfda->nFileSizeHigh;
+	pfdw->nFileSizeLow = pfda->nFileSizeLow;
+	return MultiByteToWideChar(CP_ACP, 0, pfda->cFileName, -1, pfdw->cFileName, SIZEOF_ARRAY(pfdw->cFileName));
 }
 
 HRESULT CDropHandler::CopyUnicodeFileDescriptorData(IDataObject *pDataObject,
@@ -707,20 +724,23 @@ HRESULT CDropHandler::CopyAnsiTextData(IDataObject *pDataObject,
 		{
 			WCHAR *pszUnicodeText = new WCHAR[strlen(pText) + 1];
 
-			MultiByteToWideChar(CP_ACP,0,pText,-1,pszUnicodeText,
+			int iRet = MultiByteToWideChar(CP_ACP,0,pText,-1,pszUnicodeText,
 				static_cast<int>(strlen(pText) + 1));
 
-			TCHAR szFullFileName[MAX_PATH];
-
-			hr = CopyTextToFile(m_szDestDirectory,pszUnicodeText,szFullFileName);
-
-			if(hr == S_OK)
+			if(iRet != 0)
 			{
-				TCHAR szFileName[MAX_PATH];
-				StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
-				PathStripPath(szFileName);
+				TCHAR szFullFileName[MAX_PATH];
 
-				PastedFileList.push_back(szFileName);
+				hr = CopyTextToFile(m_szDestDirectory, pszUnicodeText, szFullFileName);
+
+				if(hr == S_OK)
+				{
+					TCHAR szFileName[MAX_PATH];
+					StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
+					PathStripPath(szFileName);
+
+					PastedFileList.push_back(szFileName);
+				}
 			}
 
 			delete[] pszUnicodeText;
