@@ -207,6 +207,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TabHelper.cpp" />
+    <ClCompile Include="TimeHelper.cpp" />
     <ClCompile Include="WindowHelper.cpp" />
     <ClCompile Include="XMLSettings.cpp" />
   </ItemGroup>
@@ -244,6 +245,7 @@
     <ClInclude Include="StatusBar.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TabHelper.h" />
+    <ClInclude Include="TimeHelper.h" />
     <ClInclude Include="WindowHelper.h" />
     <ClInclude Include="XMLSettings.h" />
   </ItemGroup>

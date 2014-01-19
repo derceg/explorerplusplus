@@ -18,6 +18,7 @@
 #include "SetFileAttributesDialog.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
+#include "../Helper/TimeHelper.h"
 
 
 const TCHAR CSetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetFileAttributes");

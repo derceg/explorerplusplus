@@ -103,6 +103,9 @@
     <ClCompile Include="Controls.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
+    <ClCompile Include="TimeHelper.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -209,6 +212,9 @@
     </ClInclude>
     <ClInclude Include="WindowHelper.h">
       <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeHelper.h">
+      <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -111,11 +111,6 @@ BOOL			GetFileProductVersion(const TCHAR *szFullFileName,DWORD *pdwProductVersio
 BOOL			CheckGroupMembership(GroupType_t GroupType);
 BOOL			FormatUserName(PSID sid, TCHAR *userName, size_t cchMax);
 
-/* Time helpers. */
-BOOL			LocalSystemTimeToFileTime(const LPSYSTEMTIME lpLocalTime,LPFILETIME lpFileTime);
-BOOL			FileTimeToLocalSystemTime(const LPFILETIME lpFileTime,LPSYSTEMTIME lpLocalTime);
-void			MergeDateTime(SYSTEMTIME *pstOutput, const SYSTEMTIME *pstDate, const SYSTEMTIME *pstTime);
-
 /* User interaction. */
 BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR *InitialDirectory);
 

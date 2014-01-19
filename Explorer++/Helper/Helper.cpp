@@ -285,32 +285,6 @@ BOOL GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSi
 	return TRUE;
 }
 
-BOOL FileTimeToLocalSystemTime(const LPFILETIME lpFileTime,LPSYSTEMTIME lpLocalTime)
-{
-	SYSTEMTIME SystemTime;
-	BOOL result = FileTimeToSystemTime(lpFileTime,&SystemTime);
-
-	if(result)
-	{
-		result = SystemTimeToTzSpecificLocalTime(NULL,&SystemTime,lpLocalTime);
-	}
-
-	return result;
-}
-
-BOOL LocalSystemTimeToFileTime(const LPSYSTEMTIME lpLocalTime,LPFILETIME lpFileTime)
-{
-	SYSTEMTIME SystemTime;
-	BOOL result = TzSpecificLocalTimeToSystemTime(NULL,lpLocalTime,&SystemTime);
-
-	if(result)
-	{
-		result = SystemTimeToFileTime(&SystemTime,lpFileTime);
-	}
-
-	return result;
-}
-
 BOOL CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2)
 {
 	SHFILEINFO shfi1;
@@ -1301,21 +1275,6 @@ void UpdateToolbarBandSizing(HWND hRebar,HWND hToolbar)
 		rbbi.cxIdeal	= sz.cx;
 		SendMessage(hRebar,RB_SETBANDINFO,iBand,(LPARAM)&rbbi);
 	}
-}
-
-void MergeDateTime(SYSTEMTIME *pstOutput,const SYSTEMTIME *pstDate,const SYSTEMTIME *pstTime)
-{
-	/* Date fields. */
-	pstOutput->wYear		= pstDate->wYear;
-	pstOutput->wMonth		= pstDate->wMonth;
-	pstOutput->wDayOfWeek	= pstDate->wDayOfWeek;
-	pstOutput->wDay			= pstDate->wDay;
-
-	/* Time fields. */
-	pstOutput->wHour			= pstTime->wHour;
-	pstOutput->wMinute			= pstTime->wMinute;
-	pstOutput->wSecond			= pstTime->wSecond;
-	pstOutput->wMilliseconds	= pstTime->wMilliseconds;
 }
 
 BOOL lCheckDlgButton(HWND hDlg,int ButtonId,BOOL bCheck)
