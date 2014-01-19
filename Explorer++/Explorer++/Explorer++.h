@@ -934,6 +934,7 @@ private:
 
 	/* Tabs. */
 	CTabContainer			*m_pTabContainer;
+	HFONT					m_hTabFont;
 
 	/* Bookmarks. */
 	CBookmarkFolder *		m_bfAllBookmarks;

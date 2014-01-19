@@ -88,18 +88,6 @@ HWND CreateTabControl(HWND hParent, DWORD dwStyle)
 	HWND hTabControl = CreateWindowEx(0, WC_TABCONTROL, EMPTY_STRING,
 		dwStyle, 0, 0, 0, 0, hParent, NULL, GetModuleHandle(0), NULL);
 
-	if(hTabControl)
-	{
-		/* Set a smaller (more readable) font. */
-		HFONT hFont = CreateFont(15, 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE, ANSI_CHARSET,
-			OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, FF_DONTCARE, NULL);
-
-		if(hFont != NULL)
-		{
-			SendMessage(hTabControl, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0));
-		}
-	}
-
 	return hTabControl;
 }
 

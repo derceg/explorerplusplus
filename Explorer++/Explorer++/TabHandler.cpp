@@ -54,6 +54,14 @@ void Explorerplusplus::InitializeTabs(void)
 
 	m_hTabCtrl = CreateTabControl(m_hTabBacking,TabCtrlStyles);
 
+	m_hTabFont = CreateFont(15, 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE, ANSI_CHARSET,
+		OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, FF_DONTCARE, NULL);
+
+	if(m_hTabFont != NULL)
+	{
+		SendMessage(m_hTabCtrl, WM_SETFONT, reinterpret_cast<WPARAM>(m_hTabFont), MAKELPARAM(TRUE, 0));
+	}
+
 	/* TODO: The image list is been leaked. */
 	HIMAGELIST himlSmall = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,100);
 	AddDefaultTabIcons(himlSmall);
