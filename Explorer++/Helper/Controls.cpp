@@ -180,3 +180,91 @@ BOOL AddPathsToComboBoxEx(HWND hComboBoxEx, const TCHAR *Path)
 
 	return success;
 }
+
+BOOL lCheckDlgButton(HWND hDlg, int ButtonId, BOOL bCheck)
+{
+	UINT uCheck;
+
+	if(bCheck)
+	{
+		uCheck = BST_CHECKED;
+	}
+	else
+	{
+		uCheck = BST_UNCHECKED;
+	}
+
+	return CheckDlgButton(hDlg, ButtonId, uCheck);
+}
+
+void AddStyleToToolbar(UINT *fStyle, UINT fStyleToAdd)
+{
+	if((*fStyle & fStyleToAdd) != fStyleToAdd)
+	{
+		*fStyle |= fStyleToAdd;
+	}
+}
+
+void AddGripperStyle(UINT *fStyle, BOOL bAddGripper)
+{
+	if(bAddGripper)
+	{
+		/* Remove the no-gripper style (if present). */
+		if((*fStyle & RBBS_NOGRIPPER) == RBBS_NOGRIPPER)
+		{
+			*fStyle &= ~RBBS_NOGRIPPER;
+		}
+
+		/* Only add the gripper style if it isn't already present. */
+		if((*fStyle & RBBS_GRIPPERALWAYS) != RBBS_GRIPPERALWAYS)
+		{
+			*fStyle |= RBBS_GRIPPERALWAYS;
+		}
+	}
+	else
+	{
+		if((*fStyle & RBBS_GRIPPERALWAYS) == RBBS_GRIPPERALWAYS)
+		{
+			*fStyle &= ~RBBS_GRIPPERALWAYS;
+		}
+
+		if((*fStyle & RBBS_NOGRIPPER) != RBBS_NOGRIPPER)
+		{
+			*fStyle |= RBBS_NOGRIPPER;
+		}
+	}
+}
+
+void UpdateToolbarBandSizing(HWND hRebar, HWND hToolbar)
+{
+	REBARBANDINFO rbbi;
+	SIZE sz;
+	int nBands;
+	int iBand = -1;
+	int i = 0;
+
+	nBands = (int) SendMessage(hRebar, RB_GETBANDCOUNT, 0, 0);
+
+	for(i = 0; i < nBands; i++)
+	{
+		rbbi.cbSize = sizeof(rbbi);
+		rbbi.fMask = RBBIM_CHILD;
+		SendMessage(hRebar, RB_GETBANDINFO, i, reinterpret_cast<LPARAM>(&rbbi));
+
+		if(rbbi.hwndChild == hToolbar)
+		{
+			iBand = i;
+			break;
+		}
+	}
+
+	if(iBand != -1)
+	{
+		SendMessage(hToolbar, TB_GETMAXSIZE, 0, reinterpret_cast<LPARAM>(&sz));
+
+		rbbi.cbSize = sizeof(rbbi);
+		rbbi.fMask = RBBIM_IDEALSIZE;
+		rbbi.cxIdeal = sz.cx;
+		SendMessage(hRebar, RB_SETBANDINFO, iBand, reinterpret_cast<LPARAM>(&rbbi));
+	}
+}

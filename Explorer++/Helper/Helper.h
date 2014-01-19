@@ -134,11 +134,3 @@ void			ReplaceCharacterWithString(const TCHAR *szBaseString,TCHAR *szOutput,UINT
 void			TrimStringLeft(std::wstring &str,const std::wstring &strWhitespace);
 void			TrimStringRight(std::wstring &str,const std::wstring &strWhitespace);
 void			TrimString(std::wstring &str,const std::wstring &strWhitespace);
-
-/* Dialog. */
-BOOL			lCheckDlgButton(HWND hDlg, int ButtonId, BOOL bCheck);
-
-/* Toolbar/Rebar. */
-void			AddStyleToToolbar(UINT *fStyle, UINT fStyleToAdd);
-void			AddGripperStyle(UINT *fStyle, BOOL bAddGripper);
-void			UpdateToolbarBandSizing(HWND hRebar, HWND hToolbar);

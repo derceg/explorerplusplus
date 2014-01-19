@@ -1042,30 +1042,6 @@ TCHAR *GetToken(TCHAR *ptr,TCHAR *Buffer,TCHAR *BufferLength)
 	return p;
 }
 
-void AddGripperStyle(UINT *fStyle,BOOL bAddGripper)
-{
-	if(bAddGripper)
-	{
-		/* Remove the no-gripper style (if present). */
-		if((*fStyle & RBBS_NOGRIPPER) == RBBS_NOGRIPPER)
-			*fStyle &= ~RBBS_NOGRIPPER;
-
-		/* Only add the gripper style if it isn't already present. */
-		if((*fStyle & RBBS_GRIPPERALWAYS) != RBBS_GRIPPERALWAYS)
-			*fStyle |= RBBS_GRIPPERALWAYS;
-	}
-	else
-	{
-		/* Remove the gripper style (if present). */
-		if((*fStyle & RBBS_GRIPPERALWAYS) == RBBS_GRIPPERALWAYS)
-			*fStyle &= ~RBBS_GRIPPERALWAYS;
-
-		/* Only add the gripper style if it isn't already present. */
-		if((*fStyle & RBBS_NOGRIPPER) != RBBS_NOGRIPPER)
-			*fStyle |= RBBS_NOGRIPPER;
-	}
-}
-
 WORD GetFileLanguage(const TCHAR *szFullFileName)
 {
 	LANGANDCODEPAGE	*plcp = NULL;
@@ -1243,56 +1219,6 @@ HRESULT GetMediaMetadata(const TCHAR *szFileName,const TCHAR *szAttribute,BYTE *
 	return hr;
 }
 
-void UpdateToolbarBandSizing(HWND hRebar,HWND hToolbar)
-{
-	REBARBANDINFO rbbi;
-	SIZE sz;
-	int nBands;
-	int iBand = -1;
-	int i = 0;
-
-	nBands = (int)SendMessage(hRebar,RB_GETBANDCOUNT,0,0);
-
-	for(i = 0;i < nBands;i++)
-	{
-		rbbi.cbSize	= sizeof(rbbi);
-		rbbi.fMask	= RBBIM_CHILD;
-		SendMessage(hRebar,RB_GETBANDINFO,i,(LPARAM)&rbbi);
-
-		if(rbbi.hwndChild == hToolbar)
-		{
-			iBand = i;
-			break;
-		}
-	}
-
-	if(iBand != -1)
-	{
-		SendMessage(hToolbar,TB_GETMAXSIZE,0,(LPARAM)&sz);
-
-		rbbi.cbSize		= sizeof(rbbi);
-		rbbi.fMask		= RBBIM_IDEALSIZE;
-		rbbi.cxIdeal	= sz.cx;
-		SendMessage(hRebar,RB_SETBANDINFO,iBand,(LPARAM)&rbbi);
-	}
-}
-
-BOOL lCheckDlgButton(HWND hDlg,int ButtonId,BOOL bCheck)
-{
-	UINT uCheck;
-
-	if(bCheck)
-	{
-		uCheck = BST_CHECKED;
-	}
-	else
-	{
-		uCheck = BST_UNCHECKED;
-	}
-
-	return CheckDlgButton(hDlg,ButtonId,uCheck);
-}
-
 void TrimStringLeft(std::wstring &str,const std::wstring &strWhitespace)
 {
 	size_t pos = str.find_first_not_of(strWhitespace);
@@ -1309,10 +1235,4 @@ void TrimString(std::wstring &str,const std::wstring &strWhitespace)
 {
 	TrimStringLeft(str,strWhitespace);
 	TrimStringRight(str,strWhitespace);
-}
-
-void AddStyleToToolbar(UINT *fStyle,UINT fStyleToAdd)
-{
-	if((*fStyle & fStyleToAdd) != fStyleToAdd)
-		*fStyle |= fStyleToAdd;
 }

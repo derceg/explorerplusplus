@@ -26,6 +26,7 @@
 #include "../Helper/XMLSettings.h"
 #include "../Helper/ComboBox.h"
 #include "../Helper/WindowHelper.h"
+#include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
 
 
