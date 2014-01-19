@@ -97,6 +97,7 @@ required for VS 2010. */
 
 #include <assert.h>
 #include <list>
+#include <memory>
 
 /* Pantheios header files. */
 #include <pantheios\pantheios.hpp>

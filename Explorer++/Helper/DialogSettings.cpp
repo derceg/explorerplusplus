@@ -184,7 +184,7 @@ void CDialogSettings::LoadXMLSettings(MSXML2::IXMLDOMNamedNodeMap *pam,long lChi
 	m_bStateSaved = TRUE;
 }
 
-bool CDialogSettings::GetSettingsKey(TCHAR *out, int outLength)
+bool CDialogSettings::GetSettingsKey(TCHAR *out, int outLength) const
 {
 	if(outLength < (lstrlen(m_szSettingsKey) + 1))
 	{

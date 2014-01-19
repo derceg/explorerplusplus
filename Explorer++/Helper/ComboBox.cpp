@@ -35,7 +35,7 @@
 #include "Macros.h"
 
 
-UINT CComboBox::m_StaticSubclassCounter = 0;
+UINT_PTR CComboBox::m_StaticSubclassCounter = 0;
 
 CComboBox *CComboBox::CreateNew(HWND hComboBox)
 {

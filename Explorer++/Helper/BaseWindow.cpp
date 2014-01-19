@@ -19,12 +19,12 @@ CBaseWindow::CBaseWindow(HWND hwnd) :
 CMessageForwarder(),
 m_hwnd(hwnd)
 {
-	SetWindowSubclass(hwnd,BaseWindowProcStub,0,reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(hwnd, BaseWindowProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 }
 
 CBaseWindow::~CBaseWindow()
 {
-	RemoveWindowSubclass(m_hwnd, BaseWindowProcStub, 0);
+	RemoveWindowSubclass(m_hwnd, BaseWindowProcStub, SUBCLASS_ID);
 }
 
 HWND CBaseWindow::GetHWND() const

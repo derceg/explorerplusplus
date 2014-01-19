@@ -82,7 +82,7 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 			m_dsc = DIALOG_SIZE_CONSTRAINT_NONE;
 			GetResizableControlInformation(m_dsc,ControlList);
 
-			m_prd = new CResizableDialog(m_hDlg,ControlList);
+			m_prd = std::unique_ptr<CResizableDialog>(new CResizableDialog(m_hDlg, ControlList));
 		}
 		break;
 
@@ -188,7 +188,7 @@ CMessageForwarder()
 
 CBaseDialog::~CBaseDialog()
 {
-	delete m_prd;
+
 }
 
 HINSTANCE CBaseDialog::GetInstance() const

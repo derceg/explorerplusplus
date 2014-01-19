@@ -27,7 +27,7 @@ public:
 	};
 
 	CBaseDialog(HINSTANCE hInstance,int iResource,HWND hParent,bool bResizable);
-	~CBaseDialog();
+	virtual ~CBaseDialog();
 
 	INT_PTR			ShowModalDialog();
 	HWND			ShowModelessDialog(IModelessDialogNotification *pmdn = NULL);
@@ -59,5 +59,5 @@ private:
 	DialogSizeConstraint	m_dsc;
 	int				m_iMinWidth;
 	int				m_iMinHeight;
-	CResizableDialog	*m_prd;
+	std::unique_ptr<CResizableDialog> m_prd;
 };
