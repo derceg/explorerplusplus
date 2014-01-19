@@ -69,7 +69,7 @@ public:
 
 private:
 
-	static const UINT_PTR PARENT_SUBCLASS_ID = 1;
+	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	struct ApplicationInfo_t
 	{
