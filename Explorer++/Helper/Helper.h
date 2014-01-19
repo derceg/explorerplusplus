@@ -119,9 +119,6 @@ void			MergeDateTime(SYSTEMTIME *pstOutput, const SYSTEMTIME *pstDate, const SYS
 /* User interaction. */
 BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR *InitialDirectory);
 
-/* Device related. */
-TCHAR			*DecodePrinterStatus(DWORD dwStatus);
-
 /* Computer information. */
 void			GetCPUBrandString(char *pszCPUBrand,UINT cchBuf);
 

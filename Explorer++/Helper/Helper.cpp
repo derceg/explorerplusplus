@@ -592,26 +592,25 @@ BOOL GetVersionInfoString(const TCHAR *szFileName,const TCHAR *szVersionInfo,TCH
 
 DWORD GetNumFileHardLinks(const TCHAR *lpszFileName)
 {
-	HANDLE hFile;
-	BY_HANDLE_FILE_INFORMATION FileInfo;
-	BOOL bRes;
+	DWORD nLinks = 0;
 
-	hFile = CreateFile(lpszFileName,FILE_READ_ATTRIBUTES,FILE_SHARE_READ,NULL,
-	OPEN_EXISTING,NULL,NULL);
+	HANDLE hFile = CreateFile(lpszFileName, FILE_READ_ATTRIBUTES, FILE_SHARE_READ, NULL,
+		OPEN_EXISTING, NULL, NULL);
 
-	if(hFile == INVALID_HANDLE_VALUE)
-		return 0;
-
-	bRes = GetFileInformationByHandle(hFile,&FileInfo);
-
-	CloseHandle(hFile);
-
-	if(bRes == 0)
+	if(hFile != INVALID_HANDLE_VALUE)
 	{
-		return 0;
+		BY_HANDLE_FILE_INFORMATION FileInfo;
+		BOOL bRet = GetFileInformationByHandle(hFile, &FileInfo);
+
+		if(bRet)
+		{
+			nLinks = FileInfo.nNumberOfLinks;
+		}
+
+		CloseHandle(hFile);
 	}
 
-	return FileInfo.nNumberOfLinks;
+	return nLinks;
 }
 
 int ReadFileProperty(const TCHAR *lpszFileName,DWORD dwPropertyType,TCHAR *lpszPropertyBuf,DWORD dwBufLen)
@@ -989,30 +988,6 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard,const TCHAR *szString,BO
 	return FALSE;
 }
 
-TCHAR *DecodePrinterStatus(DWORD dwStatus)
-{
-	if(dwStatus == 0)
-		return _T("Ready");
-	else if(dwStatus & PRINTER_STATUS_BUSY)
-		return _T("Busy");
-	else if(dwStatus & PRINTER_STATUS_ERROR)
-		return _T("Error");
-	else if(dwStatus & PRINTER_STATUS_INITIALIZING)
-		return _T("Initializing");
-	else if(dwStatus & PRINTER_STATUS_IO_ACTIVE)
-		return _T("Active");
-	else if(dwStatus & PRINTER_STATUS_NOT_AVAILABLE)
-		return _T("Unavailable");
-	else if(dwStatus & PRINTER_STATUS_OFFLINE)
-		return _T("Offline");
-	else if(dwStatus & PRINTER_STATUS_OUT_OF_MEMORY)
-		return _T("Out of memory");
-	else if(dwStatus & PRINTER_STATUS_NO_TONER)
-		return _T("Out of toner");
-
-	return NULL;
-}
-
 BOOL IsImage(const TCHAR *szFileName)
 {
 	static const TCHAR *IMAGE_EXTS[] = {_T("bmp"),_T("ico"),
@@ -1173,12 +1148,6 @@ DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS)
 			VerQueryValue(pData,_T("\\"),
 				(LPVOID *)&pvsffi,&uLen);
 
-			/* To retrieve the product version numbers:
-			HIWORD(pvsffi->dwProductVersionMS);
-			LOWORD(pvsffi->dwProductVersionMS);
-			HIWORD(pvsffi->dwProductVersionLS);
-			LOWORD(pvsffi->dwProductVersionLS); */
-
 			if(uLen > 0)
 			{
 				*pdwProductVersionLS = pvsffi->dwProductVersionLS;
@@ -1200,7 +1169,7 @@ void GetCPUBrandString(char *pszCPUBrand,UINT cchBuf)
 	char szCPUBrand[64];
 
 	/* Refer to cpuid documentation at:
-	ms-help://MS.VSCC.v90/MS.MSDNQTR.v90.en/dv_vclang/html/f8c344d3-91bf-405f-8622-cb0e337a6bdc.htm */
+	http://msdn.microsoft.com/en-us/library/hskdteyh(v=vs.100).aspx */
 	__cpuid(CPUInfo,0x80000002);
 	memcpy(szCPUBrand,CPUInfo,sizeof(CPUInfo));
 	__cpuid(CPUInfo,0x80000003);

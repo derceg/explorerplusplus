@@ -43,6 +43,8 @@ http://stackoverflow.com/questions/2364774/why-do-i-need-to-compile-datetime-in-
 #include "../Helper/Macros.h"
 
 
+BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax);
+
 /* Queueing model:
 When first browsing into a folder, all items in queue
 are cleared.
@@ -893,6 +895,7 @@ std::wstring CShellBrowser::GetControlPanelCommentsColumnText(int InternalIndex)
 std::wstring CShellBrowser::GetPrinterColumnText(int InternalIndex,PrinterInformationType_t PrinterInformationType) const
 {
 	TCHAR PrinterInformation[256] = EMPTY_STRING;
+	TCHAR szStatus[256];
 
 	HANDLE hPrinter;
 	BOOL Res = OpenPrinter(m_pExtraItemInfo[InternalIndex].szDisplayName,&hPrinter,NULL);
@@ -915,8 +918,13 @@ std::wstring CShellBrowser::GetPrinterColumnText(int InternalIndex,PrinterInform
 				break;
 
 			case PRINTER_INFORMATION_TYPE_STATUS:
-				StringCchCopyEx(PrinterInformation,SIZEOF_ARRAY(PrinterInformation),
-					DecodePrinterStatus(PrinterInfo2->Status),NULL,NULL,STRSAFE_IGNORE_NULLS);
+				Res = GetPrinterStatusDescription(PrinterInfo2->Status, szStatus, SIZEOF_ARRAY(szStatus));
+
+				if(Res)
+				{
+					StringCchCopyEx(PrinterInformation, SIZEOF_ARRAY(PrinterInformation),
+						szStatus, NULL, NULL, STRSAFE_IGNORE_NULLS);
+				}
 				break;
 
 			case PRINTER_INFORMATION_TYPE_COMMENTS:
@@ -945,6 +953,54 @@ std::wstring CShellBrowser::GetPrinterColumnText(int InternalIndex,PrinterInform
 	}
 
 	return PrinterInformation;
+}
+
+BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax)
+{
+	BOOL bSuccess = TRUE;
+
+	if(dwStatus == 0)
+	{
+		StringCchCopy(szStatus, cchMax, _T("Ready"));
+	}
+	else if(dwStatus & PRINTER_STATUS_BUSY)
+	{
+		StringCchCopy(szStatus, cchMax, _T("Busy"));
+	}
+	else if(dwStatus & PRINTER_STATUS_ERROR)
+	{
+		StringCchCopy(szStatus, cchMax, _T("Error"));
+	}
+	else if(dwStatus & PRINTER_STATUS_INITIALIZING)
+	{
+		StringCchCopy(szStatus, cchMax, _T("Initializing"));
+	}
+	else if(dwStatus & PRINTER_STATUS_IO_ACTIVE)
+	{
+		StringCchCopy(szStatus, cchMax, _T("Active"));
+	}
+	else if(dwStatus & PRINTER_STATUS_NOT_AVAILABLE)
+	{
+		StringCchCopy(szStatus, cchMax, _T("Unavailable"));
+	}
+	else if(dwStatus & PRINTER_STATUS_OFFLINE)
+	{
+		StringCchCopy(szStatus, cchMax, _T("Offline"));
+	}
+	else if(dwStatus & PRINTER_STATUS_OUT_OF_MEMORY)
+	{
+		StringCchCopy(szStatus, cchMax, _T("Out of memory"));
+	}
+	else if(dwStatus & PRINTER_STATUS_NO_TONER)
+	{
+		StringCchCopy(szStatus, cchMax, _T("Out of toner"));
+	}
+	else
+	{
+		bSuccess = FALSE;
+	}
+
+	return bSuccess;
 }
 
 std::wstring CShellBrowser::GetNetworkAdapterColumnText(int InternalIndex) const
