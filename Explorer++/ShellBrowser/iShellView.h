@@ -4,6 +4,7 @@
 #include "iPathManager.h"
 #include "../Helper/Helper.h"
 #include "../Helper/DropHandler.h"
+#include "../Helper/StringHelper.h"
 #include "../Helper/Macros.h"
 
 #define WM_USER_UPDATEWINDOWS		(WM_APP + 17)

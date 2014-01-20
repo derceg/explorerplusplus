@@ -81,17 +81,6 @@ typedef enum
 	GROUP_USERSRESTRICTED
 } GroupType_t;
 
-enum SizeDisplayFormat_t
-{
-	SIZE_FORMAT_NONE,
-	SIZE_FORMAT_BYTES,
-	SIZE_FORMAT_KBYTES,
-	SIZE_FORMAT_MBYTES,
-	SIZE_FORMAT_GBYTES,
-	SIZE_FORMAT_TBYTES,
-	SIZE_FORMAT_PBYTES
-};
-
 /* File helpers. */
 int				CreateFileTimeString(const FILETIME *FileTime,TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate);
 BOOL			GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize);
@@ -114,23 +103,7 @@ BOOL			FormatUserName(PSID sid, TCHAR *userName, size_t cchMax);
 /* User interaction. */
 BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR *InitialDirectory);
 
-/* Computer information. */
-void			GetCPUBrandString(char *pszCPUBrand,UINT cchBuf);
-
-/* Media metadata. */
-HRESULT			GetMediaMetadata(const TCHAR *szFileName,const TCHAR *szAttribute,BYTE **pszOutput);
-
 /* General helper functions. */
-void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf);
-void			FormatSizeString(ULARGE_INTEGER lFileSize,TCHAR *pszFileSize,size_t cchBuf,BOOL bForceSize,SizeDisplayFormat_t sdf);
-HINSTANCE		StartCommandPrompt(const TCHAR *Directory,bool Elevated);
-TCHAR			*PrintComma(unsigned long nPrint);
-TCHAR			*PrintCommaLargeNum(LARGE_INTEGER lPrint);
-BOOL			CheckWildcardMatch(const TCHAR *szWildcard,const TCHAR *szString,BOOL bCaseSensitive);
-BOOL			CheckWildcardMatchInternal(const TCHAR *szWildcard,const TCHAR *szString,BOOL bCaseSensitive);
-void			ReplaceCharacters(TCHAR *str,char ch,char replacement);
-TCHAR			*GetToken(TCHAR *ptr,TCHAR *Buffer,TCHAR *BufferLength);
-void			ReplaceCharacterWithString(const TCHAR *szBaseString,TCHAR *szOutput,UINT cchMax,TCHAR chToReplace,const TCHAR *szReplacement);
-void			TrimStringLeft(std::wstring &str,const std::wstring &strWhitespace);
-void			TrimStringRight(std::wstring &str,const std::wstring &strWhitespace);
-void			TrimString(std::wstring &str,const std::wstring &strWhitespace);
+HINSTANCE		StartCommandPrompt(const TCHAR *Directory, bool Elevated);
+void			GetCPUBrandString(char *pszCPUBrand, UINT cchBuf);
+HRESULT			GetMediaMetadata(const TCHAR *szFileName, const TCHAR *szAttribute, BYTE **pszOutput);

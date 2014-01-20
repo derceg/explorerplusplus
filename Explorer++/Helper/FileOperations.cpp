@@ -18,6 +18,7 @@
 #include "Helper.h"
 #include "iDataObject.h"
 #include "ShellHelper.h"
+#include "StringHelper.h"
 #include "Macros.h"
 
 

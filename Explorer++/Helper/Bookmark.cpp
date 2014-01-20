@@ -18,6 +18,7 @@
 #include "Bookmark.h"
 #include "RegistrySettings.h"
 #include "Helper.h"
+#include "StringHelper.h"
 #include "Macros.h"
 
 
