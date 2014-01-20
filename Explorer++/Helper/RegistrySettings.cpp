@@ -36,35 +36,36 @@ LONG NRegistrySettings::SaveStringToRegistry(HKEY hKey,const TCHAR *szKey,const 
 		lstrlen(szValue) * sizeof(TCHAR));
 }
 
-LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const TCHAR *szKey,TCHAR *szOutput,DWORD BufferSize)
+LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const TCHAR *szKey,TCHAR *szOutput,DWORD cchMax)
 {
 	LONG	lRes;
 	DWORD	dwType;
-	DWORD	dwBufSize;
+	DWORD	dwBufByteSize;
+	DWORD	dwBufChSize;
 
-	dwBufSize = BufferSize;
-
-	lRes = RegQueryValueEx(hKey,szKey,0,&dwType,reinterpret_cast<LPBYTE>(szOutput),&dwBufSize);
+	dwBufByteSize = cchMax * sizeof(TCHAR);
+	lRes = RegQueryValueEx(hKey,szKey,0,&dwType,reinterpret_cast<LPBYTE>(szOutput),&dwBufByteSize);
+	dwBufChSize = dwBufByteSize / sizeof(TCHAR);
 
 	/* The returned buffer size includes any terminating
 	NULL bytes (if the string was stored with a NULL byte).
 	Therefore, if the string was stored with a NULL byte,
-	the returned character String[dwBufSize - 1] will be
+	the returned character String[dwBufChSize - 1] will be
 	a NULL byte; if a string was not stored with a NULL byte,
 	the size (and string) will not include any NULL bytes,
-	and a NULL byte must be placed at String[dwBufSize],
+	and a NULL byte must be placed at String[dwBufChSize],
 	providing that buffer size is smaller than the size
 	of the incoming buffer. */
-	if(dwBufSize == 0 || dwType != REG_SZ)
+	if(dwBufChSize == 0 || dwType != REG_SZ)
 	{
 		szOutput[0] = '\0';
 	}
 	else
 	{
-		if(szOutput[dwBufSize - 1] != '\0')
+		if(szOutput[dwBufChSize - 1] != '\0')
 		{
-			dwBufSize = min(dwBufSize,BufferSize);
-			szOutput[dwBufSize] = '\0';
+			dwBufChSize = min(dwBufChSize, cchMax - 1);
+			szOutput[dwBufChSize] = '\0';
 		}
 	}
 
