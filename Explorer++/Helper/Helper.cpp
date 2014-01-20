@@ -192,57 +192,55 @@ BOOL CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2)
 	return FALSE;
 }
 
-DWORD BuildFileAttributeString(const TCHAR *lpszFileName,TCHAR *szOutput,DWORD cchMax)
+HRESULT BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, DWORD cchMax)
 {
-	HANDLE hFindFile;
-	WIN32_FIND_DATA wfd;
-
 	/* FindFirstFile is used instead of GetFileAttributes() or
 	GetFileAttributesEx() because of its behaviour
 	in relation to system files that normally
 	won't have their attributes given (such as the
 	pagefile, which neither of the two functions
 	above can retrieve the attributes of). */
-	hFindFile = FindFirstFile(lpszFileName,&wfd);
+	WIN32_FIND_DATA wfd;
+	HANDLE hFindFile = FindFirstFile(lpszFileName, &wfd);
+	HRESULT hr = E_FAIL;
 
-	if(hFindFile == INVALID_HANDLE_VALUE)
+	if(hFindFile != INVALID_HANDLE_VALUE)
 	{
-		StringCchCopy(szOutput,cchMax,EMPTY_STRING);
-		return 0;
+		hr = BuildFileAttributeString(wfd.dwFileAttributes, szOutput, cchMax);
+		FindClose(hFindFile);
 	}
 
-	BuildFileAttributeString(wfd.dwFileAttributes,szOutput,cchMax);
-
-	FindClose(hFindFile);
-
-	return wfd.dwFileAttributes;
+	return hr;
 }
 
-void BuildFileAttributeString(DWORD dwFileAttributes,TCHAR *szOutput,DWORD cchMax)
+HRESULT BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, DWORD cchMax)
 {
 	TCHAR szAttributes[8];
 	int i = 0;
 
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE,szAttributes,i++,'A');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_HIDDEN,szAttributes,i++,'H');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_READONLY,szAttributes,i++,'R');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_SYSTEM,szAttributes,i++,'S');
-	EnterAttributeIntoString((dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY,
-		szAttributes,i++,'D');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED,szAttributes,i++,'C');
-	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED,szAttributes,i++,'E');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE, szAttributes, i++, 'A');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_HIDDEN, szAttributes, i++, 'H');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_READONLY, szAttributes, i++, 'R');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_SYSTEM, szAttributes, i++, 'S');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY, szAttributes, i++, 'D');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_COMPRESSED, szAttributes, i++, 'C');
+	EnterAttributeIntoString(dwFileAttributes & FILE_ATTRIBUTE_ENCRYPTED, szAttributes, i++, 'E');
 
 	szAttributes[i] = '\0';
 
-	StringCchCopy(szOutput,cchMax,szAttributes);
+	return StringCchCopy(szOutput, cchMax, szAttributes);
 }
 
-void EnterAttributeIntoString(BOOL bEnter,TCHAR *String,int Pos,TCHAR chAttribute)
+void EnterAttributeIntoString(BOOL bEnter, TCHAR *String, int Pos, TCHAR chAttribute)
 {
 	if(bEnter)
+	{
 		String[Pos] = chAttribute;
+	}
 	else
+	{
 		String[Pos] = '-';
+	}
 }
 
 BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax)
