@@ -14,9 +14,6 @@
 #include "stdafx.h"
 #include "Helper.h"
 #include "DriveInfo.h"
-#include "FileOperations.h"
-#include "ShellHelper.h"
-#include "ProcessHelper.h"
 #include "Macros.h"
 
 
