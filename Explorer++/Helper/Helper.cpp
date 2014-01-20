@@ -711,27 +711,29 @@ BOOL IsImage(const TCHAR *szFileName)
 
 WORD GetFileLanguage(const TCHAR *szFullFileName)
 {
-	LANGANDCODEPAGE	*plcp = NULL;
-	DWORD			dwLen;
-	DWORD			dwHandle;
-	WORD			wLanguage = 0;
-	UINT			uLen;
-	void			*pTranslateInfo = NULL;
-
-	dwLen = GetFileVersionInfoSize(szFullFileName,&dwHandle);
+	WORD wLanguage = 0;
+	DWORD dwLen = GetFileVersionInfoSize(szFullFileName,NULL);
 
 	if(dwLen > 0)
 	{
-		pTranslateInfo = malloc(dwLen);
+		void *pTranslateInfo = malloc(dwLen);
 
 		if(pTranslateInfo != NULL)
 		{
-			GetFileVersionInfo(szFullFileName,NULL,dwLen,pTranslateInfo);
-			VerQueryValue(pTranslateInfo,_T("\\VarFileInfo\\Translation"),
-				(LPVOID *)&plcp,&uLen);
+			BOOL bRet = GetFileVersionInfo(szFullFileName,NULL,dwLen,pTranslateInfo);
 
-			if(uLen >= sizeof(LANGANDCODEPAGE))
-				wLanguage = PRIMARYLANGID(plcp[0].wLanguage);
+			if(bRet)
+			{
+				LANGANDCODEPAGE *plcp = NULL;
+				UINT uLen;
+				bRet = VerQueryValue(pTranslateInfo, _T("\\VarFileInfo\\Translation"),
+					(LPVOID *) &plcp, &uLen);
+
+				if(bRet && (uLen >= sizeof(LANGANDCODEPAGE)))
+				{
+					wLanguage = PRIMARYLANGID(plcp[0].wLanguage);
+				}
+			}
 
 			free(pTranslateInfo);
 		}
