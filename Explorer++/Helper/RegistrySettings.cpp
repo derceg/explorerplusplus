@@ -119,9 +119,7 @@ LONG NRegistrySettings::ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBase
 	LONG lRes;
 	int i = 0;
 
-	lRes = ERROR_SUCCESS;
-
-	while(lRes == ERROR_SUCCESS)
+	do
 	{
 		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
 			_T("%s%d"),szBaseKeyName,i++);
@@ -129,13 +127,22 @@ LONG NRegistrySettings::ReadStringListFromRegistry(HKEY hKey,const TCHAR *szBase
 		lRes = ReadStringFromRegistry(hKey,szItemKey,
 			szTemp,SIZEOF_ARRAY(szTemp));
 
-		if(lRes != ERROR_SUCCESS)
+		if(lRes == ERROR_SUCCESS)
 		{
-			return lRes;
+			strList.push_back(szTemp);
 		}
+	} while(lRes == ERROR_SUCCESS);
 
-		strList.push_back(szTemp);
+	/* It is expected that the loop
+	above will halt when the next
+	key in the list doesn't exist.
+	If it halts for some other
+	reason (such as the buffer been
+	to small), then that's an error. */
+	if(lRes == ERROR_FILE_NOT_FOUND)
+	{
+		return ERROR_SUCCESS;
 	}
 
-	return ERROR_SUCCESS;
+	return lRes;
 }

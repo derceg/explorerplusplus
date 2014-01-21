@@ -98,6 +98,7 @@
     <ClCompile Include="TestBookmarks.cpp" />
     <ClCompile Include="TestDataObject.cpp" />
     <ClCompile Include="TestHelper.cpp" />
+    <ClCompile Include="TestRegistry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Helper\Helper.vcxproj">

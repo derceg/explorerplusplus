@@ -1,6 +1,8 @@
 #pragma once
 
 #include <tchar.h>
+#include <string>
+#include <list>
 
 namespace NRegistrySettings
 {
