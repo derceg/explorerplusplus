@@ -702,7 +702,7 @@ private:
 	/* Options dialog. */
 	void					OnShowOptions(void);
 	void					AddLanguages(HWND hDlg);
-	WORD					AddLanguageToComboBox(HWND hComboBox,TCHAR *szImageDirectory,TCHAR *szFileName);
+	BOOL					AddLanguageToComboBox(HWND hComboBox, TCHAR *szImageDirectory, TCHAR *szFileName, WORD *pdwLanguage);
 	int						GetLanguageIDFromIndex(HWND hDlg,int iIndex);
 
 	/* Default settings dialog. */
