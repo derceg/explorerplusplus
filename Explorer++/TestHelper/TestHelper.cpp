@@ -130,6 +130,32 @@ TEST(GetFileLanguage, French)
 	TestGetFileLanguage(L"Explorer++FR.dll", LANG_FRENCH);
 }
 
+void TestVersionInfoString(TCHAR *szDLL, const TCHAR *szVersionInfo, const TCHAR *szExpectedValue)
+{
+	/* Somewhat flaky, as it relies
+	on the users default language
+	been English. */
+	TCHAR szOutput[512];
+	BOOL bRet = GetVersionInfoString(szDLL, szVersionInfo, szOutput, SIZEOF_ARRAY(szOutput));
+	ASSERT_EQ(TRUE, bRet);
+	EXPECT_STREQ(szExpectedValue, szOutput);
+}
+
+TEST(GetVersionInfoString, Simple)
+{
+	TCHAR szDLL[MAX_PATH];
+	GetTestResourceFilePath(L"VersionInfo.dll", szDLL, SIZEOF_ARRAY(szDLL));
+
+	TestVersionInfoString(szDLL, L"CompanyName", L"Test company");
+	TestVersionInfoString(szDLL, L"FileDescription", L"Test file description");
+	TestVersionInfoString(szDLL, L"FileVersion", L"1.18.3.3624");
+	TestVersionInfoString(szDLL, L"InternalName", L"VersionI.dll");
+	TestVersionInfoString(szDLL, L"LegalCopyright", L"Copyright (C) 2014");
+	TestVersionInfoString(szDLL, L"OriginalFilename", L"VersionI.dll");
+	TestVersionInfoString(szDLL, L"ProductName", L"Test product name");
+	TestVersionInfoString(szDLL, L"ProductVersion", L"1.18.23.4728");
+}
+
 int _tmain(int argc, _TCHAR* argv[])
 {
 	::testing::InitGoogleTest(&argc,argv);
