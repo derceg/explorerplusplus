@@ -44,7 +44,7 @@ BOOL			GetVersionInfoString(const TCHAR *szFileName,const TCHAR *szVersionInfo,T
 BOOL			ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen);
 HRESULT			GetMediaMetadata(const TCHAR *szFileName, const TCHAR *szAttribute, BYTE **pszOutput);
 BOOL			IsImage(const TCHAR *FileName);
-WORD			GetFileLanguage(const TCHAR *szFullFileName);
+BOOL			GetFileLanguage(const TCHAR *szFullFileName, WORD *pwLanguage);
 BOOL			GetFileProductVersion(const TCHAR *szFullFileName,DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS);
 
 /* Ownership and access. */

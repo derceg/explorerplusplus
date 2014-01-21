@@ -316,6 +316,7 @@ void Explorerplusplus::SetLanguageModule(void)
 	TCHAR			szFullFileName[MAX_PATH];
 	TCHAR			szName[MAX_PATH];
 	WORD			wLanguage;
+	BOOL			bRet;
 
 	if(g_bForceLanguageLoad)
 	{
@@ -327,9 +328,16 @@ void Explorerplusplus::SetLanguageModule(void)
 		StringCchPrintf(szName,SIZEOF_ARRAY(szName),_T("Explorer++%2s.dll"),g_szLang);
 		PathAppend(szLanguageModule,szName);
 
-		wLanguage = GetFileLanguage(szLanguageModule);
+		bRet = GetFileLanguage(szLanguageModule, &wLanguage);
 
-		m_Language = wLanguage;
+		if(bRet)
+		{
+			m_Language = wLanguage;
+		}
+		else
+		{
+			m_Language = LANG_ENGLISH;
+		}
 	}
 	else
 	{
@@ -364,11 +372,11 @@ void Explorerplusplus::SetLanguageModule(void)
 		{
 			StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),szLanguageModule);
 			PathAppend(szFullFileName,wfd.cFileName);
-			wLanguage = GetFileLanguage(szFullFileName);
+			bRet = GetFileLanguage(szFullFileName, &wLanguage);
 
 			BOOL bLanguageMismatch = FALSE;
 
-			if(wLanguage == m_Language)
+			if(bRet && (wLanguage == m_Language))
 			{
 				/* Using translation DLL's built for other versions of
 				the executable will most likely crash the program due
@@ -390,9 +398,9 @@ void Explorerplusplus::SetLanguageModule(void)
 				{
 					StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),szLanguageModule);
 					PathAppend(szFullFileName,wfd.cFileName);
-					wLanguage = GetFileLanguage(szFullFileName);
+					bRet = GetFileLanguage(szFullFileName, &wLanguage);
 
-					if(wLanguage == m_Language)
+					if(bRet && (wLanguage == m_Language))
 					{
 						if(VerifyLanguageVersion(szFullFileName))
 						{

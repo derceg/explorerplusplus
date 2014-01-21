@@ -115,7 +115,8 @@ void TestGetFileLanguage(const TCHAR *szFile, WORD wExpectedLanguage)
 	GetTestResourceFilePath(szFile, szDLL, SIZEOF_ARRAY(szDLL));
 
 	WORD wLanguage;
-	wLanguage = GetFileLanguage(szDLL);
+	BOOL bRet = GetFileLanguage(szDLL, &wLanguage);
+	ASSERT_EQ(TRUE, bRet);
 	EXPECT_EQ(wExpectedLanguage, wLanguage);
 }
 

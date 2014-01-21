@@ -17,7 +17,15 @@
 #include "Macros.h"
 
 
-void EnterAttributeIntoString(BOOL bEnter,TCHAR *String,int Pos,TCHAR chAttribute);
+enum VersionSubBlockType_t
+{
+	ROOT,
+	TRANSLATION
+};
+
+void EnterAttributeIntoString(BOOL bEnter, TCHAR *String, int Pos, TCHAR chAttribute);
+BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subBlockType,
+	WORD *pwLanguage, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS);
 
 int CreateFileTimeString(const FILETIME *FileTime,
 TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate)
@@ -709,73 +717,75 @@ BOOL IsImage(const TCHAR *szFileName)
 	return FALSE;
 }
 
-WORD GetFileLanguage(const TCHAR *szFullFileName)
+BOOL GetFileProductVersion(const TCHAR *szFullFileName,
+	DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS)
 {
-	WORD wLanguage = 0;
-	DWORD dwLen = GetFileVersionInfoSize(szFullFileName,NULL);
+	return GetFileVersionValue(szFullFileName, ROOT, NULL,
+		pdwProductVersionLS, pdwProductVersionMS);
+}
+
+BOOL GetFileLanguage(const TCHAR *szFullFileName, WORD *pwLanguage)
+{
+	return GetFileVersionValue(szFullFileName, TRANSLATION,
+		pwLanguage, NULL, NULL);
+}
+
+BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subBlockType,
+	WORD *pwLanguage, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS)
+{
+	BOOL bSuccess = FALSE;
+	DWORD dwLen = GetFileVersionInfoSize(szFullFileName, NULL);
 
 	if(dwLen > 0)
 	{
-		void *pTranslateInfo = malloc(dwLen);
+		void *pBlock = malloc(dwLen);
 
-		if(pTranslateInfo != NULL)
+		if(pBlock != NULL)
 		{
-			BOOL bRet = GetFileVersionInfo(szFullFileName,NULL,dwLen,pTranslateInfo);
+			BOOL bRet = GetFileVersionInfo(szFullFileName, NULL, dwLen, pBlock);
 
 			if(bRet)
 			{
-				LANGANDCODEPAGE *plcp = NULL;
-				UINT uLen;
-				bRet = VerQueryValue(pTranslateInfo, _T("\\VarFileInfo\\Translation"),
-					(LPVOID *) &plcp, &uLen);
+				TCHAR szSubBlock[64];
+				LPVOID *pBuffer = NULL;
+				UINT uStructureSize = 0;
 
-				if(bRet && (uLen >= sizeof(LANGANDCODEPAGE)))
+				LANGANDCODEPAGE *plcp = NULL;
+				VS_FIXEDFILEINFO *pvsffi = NULL;
+
+				if(subBlockType == ROOT)
 				{
-					wLanguage = PRIMARYLANGID(plcp[0].wLanguage);
+					StringCchCopy(szSubBlock, SIZEOF_ARRAY(szSubBlock), _T("\\"));
+					pBuffer = reinterpret_cast<LPVOID *>(&pvsffi);
+					uStructureSize = sizeof(VS_FIXEDFILEINFO);
+				}
+				else if(subBlockType == TRANSLATION)
+				{
+					StringCchCopy(szSubBlock, SIZEOF_ARRAY(szSubBlock), _T("\\VarFileInfo\\Translation"));
+					pBuffer = reinterpret_cast<LPVOID *>(&plcp);
+					uStructureSize = sizeof(LANGANDCODEPAGE);
+				}
+
+				UINT uLen;
+				bRet = VerQueryValue(pBlock, szSubBlock, pBuffer, &uLen);
+
+				if(bRet && (uLen >= uStructureSize))
+				{
+					if(subBlockType == ROOT)
+					{
+						*pdwProductVersionLS = pvsffi->dwProductVersionLS;
+						*pdwProductVersionMS = pvsffi->dwProductVersionMS;
+					}
+					else if(subBlockType == TRANSLATION)
+					{
+						*pwLanguage = PRIMARYLANGID(plcp[0].wLanguage);
+					}
+
+					bSuccess = TRUE;
 				}
 			}
 
-			free(pTranslateInfo);
-		}
-	}
-
-	return wLanguage;
-}
-
-BOOL GetFileProductVersion(const TCHAR *szFullFileName,
-DWORD *pdwProductVersionLS,DWORD *pdwProductVersionMS)
-{
-	VS_FIXEDFILEINFO	*pvsffi = NULL;
-	DWORD			dwLen;
-	DWORD			dwHandle;
-	UINT			uLen;
-	BOOL			bSuccess = FALSE;
-	void			*pData = NULL;
-
-	*pdwProductVersionLS = 0;
-	*pdwProductVersionMS = 0;
-
-	dwLen = GetFileVersionInfoSize(szFullFileName,&dwHandle);
-
-	if(dwLen > 0)
-	{
-		pData = malloc(dwLen);
-
-		if(pData != NULL)
-		{
-			GetFileVersionInfo(szFullFileName,NULL,dwLen,pData);
-			VerQueryValue(pData,_T("\\"),
-				(LPVOID *)&pvsffi,&uLen);
-
-			if(uLen > 0)
-			{
-				*pdwProductVersionLS = pvsffi->dwProductVersionLS;
-				*pdwProductVersionMS = pvsffi->dwProductVersionMS;
-
-				bSuccess = TRUE;
-			}
-
-			free(pData);
+			free(pBlock);
 		}
 	}
 
