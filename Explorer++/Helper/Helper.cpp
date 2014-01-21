@@ -20,12 +20,16 @@
 enum VersionSubBlockType_t
 {
 	ROOT,
-	TRANSLATION
+	TRANSLATION,
+	STRING_TABLE_VALUE
 };
 
 void EnterAttributeIntoString(BOOL bEnter, TCHAR *String, int Pos, TCHAR chAttribute);
 BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subBlockType,
-	WORD *pwLanguage, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS);
+	WORD *pwLanguage, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS,
+	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
+BOOL GetStringTableValue(void *pBlock, LANGANDCODEPAGE *plcp, UINT nItems,
+	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
 
 int CreateFileTimeString(const FILETIME *FileTime,
 TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate)
@@ -351,74 +355,6 @@ BOOL CheckGroupMembership(GroupType_t GroupType)
 	return bMember;
 }
 
-struct LANGCODEPAGE
-{
-	WORD wLanguage;
-	WORD wCodePage;
-} *lpTranslate;
-
-BOOL GetVersionInfoString(const TCHAR *szFileName,const TCHAR *szVersionInfo,TCHAR *szBuffer,UINT cbBufLen)
-{
-	LPVOID lpData;
-	TCHAR szSubBlock[64];
-	TCHAR *lpszLocalBuf = NULL;
-	LANGID UserLangId;
-	DWORD dwLen;
-	DWORD dwHandle = NULL;
-	UINT cbTranslate;
-	UINT cbLen;
-	BOOL bRet = FALSE;
-	unsigned int i = 0;
-
-	dwLen = GetFileVersionInfoSize(szFileName,&dwHandle);
-
-	if(dwLen > 0)
-	{
-		lpData = malloc(dwLen);
-
-		if(lpData != NULL)
-		{
-			if(GetFileVersionInfo(szFileName,0,dwLen,lpData) != 0)
-			{
-				UserLangId = GetUserDefaultLangID();
-
-				VerQueryValue(lpData,_T("\\VarFileInfo\\Translation"),(LPVOID *)&lpTranslate,&cbTranslate);
-
-				for(i = 0;i < (cbTranslate / sizeof(LANGCODEPAGE));i++)
-				{
-					/* If the bottom eight bits of the language id's match, use this
-					version information (since this means that the version information
-					and the users default language are the same). Also use this version
-					information if the language is not specified (i.e. wLanguage is 0). */
-					if((lpTranslate[i].wLanguage & 0xFF) == (UserLangId & 0xFF) ||
-						lpTranslate[i].wLanguage == 0)
-					{
-						StringCchPrintf(szSubBlock,SIZEOF_ARRAY(szSubBlock),
-							_T("\\StringFileInfo\\%04X%04X\\%s"),lpTranslate[i].wLanguage,
-							lpTranslate[i].wCodePage,szVersionInfo);
-
-						if(VerQueryValue(lpData,szSubBlock,(LPVOID *)&lpszLocalBuf,&cbLen) != 0)
-						{
-							/* The buffer may be NULL if the specified data was not found
-							within the file. */
-							if(lpszLocalBuf != NULL)
-							{
-								StringCchCopy(szBuffer,cbBufLen,lpszLocalBuf);
-
-								bRet = TRUE;
-								break;
-							}
-						}
-					}
-				}
-			}
-			free(lpData);
-		}
-	}
-
-	return bRet;
-}
-
 DWORD GetNumFileHardLinks(const TCHAR *lpszFileName)
 {
 	DWORD nLinks = 0;
@@ -721,17 +657,26 @@ BOOL GetFileProductVersion(const TCHAR *szFullFileName,
 	DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS)
 {
 	return GetFileVersionValue(szFullFileName, ROOT, NULL,
-		pdwProductVersionLS, pdwProductVersionMS);
+		pdwProductVersionLS, pdwProductVersionMS,
+		NULL, NULL, 0);
 }
 
 BOOL GetFileLanguage(const TCHAR *szFullFileName, WORD *pwLanguage)
 {
 	return GetFileVersionValue(szFullFileName, TRANSLATION,
-		pwLanguage, NULL, NULL);
+		pwLanguage, NULL, NULL, NULL, NULL, 0);
+}
+
+BOOL GetVersionInfoString(const TCHAR *szFullFileName, const TCHAR *szVersionInfo,
+	TCHAR *szVersionBuffer, UINT cchMax)
+{
+	return GetFileVersionValue(szFullFileName, STRING_TABLE_VALUE,
+		NULL, NULL, NULL, szVersionInfo, szVersionBuffer, cchMax);
 }
 
 BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subBlockType,
-	WORD *pwLanguage, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS)
+	WORD *pwLanguage, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS,
+	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax)
 {
 	BOOL bSuccess = FALSE;
 	DWORD dwLen = GetFileVersionInfoSize(szFullFileName, NULL);
@@ -759,7 +704,8 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 					pBuffer = reinterpret_cast<LPVOID *>(&pvsffi);
 					uStructureSize = sizeof(VS_FIXEDFILEINFO);
 				}
-				else if(subBlockType == TRANSLATION)
+				else if(subBlockType == TRANSLATION ||
+					subBlockType == STRING_TABLE_VALUE)
 				{
 					StringCchCopy(szSubBlock, SIZEOF_ARRAY(szSubBlock), _T("\\VarFileInfo\\Translation"));
 					pBuffer = reinterpret_cast<LPVOID *>(&plcp);
@@ -771,6 +717,8 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 
 				if(bRet && (uLen >= uStructureSize))
 				{
+					bSuccess = TRUE;
+
 					if(subBlockType == ROOT)
 					{
 						*pdwProductVersionLS = pvsffi->dwProductVersionLS;
@@ -780,12 +728,51 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 					{
 						*pwLanguage = PRIMARYLANGID(plcp[0].wLanguage);
 					}
-
-					bSuccess = TRUE;
+					else if(subBlockType == STRING_TABLE_VALUE)
+					{
+						bSuccess = GetStringTableValue(pBlock, plcp, uLen / sizeof(LANGANDCODEPAGE),
+							szVersionInfo, szVersionBuffer, cchMax);
+					}
 				}
 			}
 
 			free(pBlock);
+		}
+	}
+
+	return bSuccess;
+}
+
+BOOL GetStringTableValue(void *pBlock, LANGANDCODEPAGE *plcp, UINT nItems,
+	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax)
+{
+	BOOL bSuccess = FALSE;
+	LANGID UserLangId = GetUserDefaultLangID();
+
+	for(UINT i = 0; i < nItems; i++)
+	{
+		/* If the bottom eight bits of the language id's match, use this
+		version information (since this means that the version information
+		and the users default language are the same). Also use this version
+		information if the language is not specified (i.e. wLanguage is 0). */
+		if((plcp[i].wLanguage & 0xFF) == (UserLangId & 0xFF) ||
+			plcp[i].wLanguage == 0)
+		{
+			TCHAR szSubBlock[64];
+			StringCchPrintf(szSubBlock, SIZEOF_ARRAY(szSubBlock),
+				_T("\\StringFileInfo\\%04X%04X\\%s"), plcp[i].wLanguage,
+				plcp[i].wCodePage, szVersionInfo);
+
+			TCHAR *szBuffer;
+			UINT uLen;
+			BOOL bRet = VerQueryValue(pBlock, szSubBlock, reinterpret_cast<LPVOID *>(&szBuffer), &uLen);
+
+			if(bRet && (uLen > 0))
+			{
+				StringCchCopy(szVersionBuffer, cchMax, szBuffer);
+				bSuccess = TRUE;
+				break;
+			}
 		}
 	}
 
