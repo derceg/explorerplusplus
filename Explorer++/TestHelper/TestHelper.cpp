@@ -2,6 +2,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/StringHelper.h"
 #include "../Helper/ProcessHelper.h"
+#include "../Helper/FileOperations.h"
 #include "../Helper/Macros.h"
 #include "gtest\gtest.h"
 
@@ -67,7 +68,7 @@ DWORD GetCurrentProcessImageName(TCHAR *szProcessPath, DWORD cchMax)
 	return GetProcessImageName(GetCurrentProcessId(), szProcessPath, cchMax);
 }
 
-void GetTestResourceFilePath(const TCHAR *szFile, TCHAR *szOutput, size_t cchMax)
+void GetTestResourceDirectory(TCHAR *szResourceDirectory, size_t cchMax)
 {
 	TCHAR szProcessPath[MAX_PATH];
 	DWORD dwRet = GetCurrentProcessImageName(szProcessPath, SIZEOF_ARRAY(szProcessPath));
@@ -76,14 +77,21 @@ void GetTestResourceFilePath(const TCHAR *szFile, TCHAR *szOutput, size_t cchMax
 	BOOL bRet = PathRemoveFileSpec(szProcessPath);
 	ASSERT_EQ(TRUE, bRet);
 
-	TCHAR szFullFileName[MAX_PATH];
-	TCHAR *szRet = PathCombine(szFullFileName, szProcessPath, L"..\\TestResources");
+	ASSERT_EQ(MAX_PATH, cchMax);
+	TCHAR *szRet = PathCombine(szResourceDirectory, szProcessPath, L"..\\TestResources");
 	ASSERT_NE(nullptr, szRet);
+}
 
-	bRet = PathAppend(szFullFileName, szFile);
+void GetTestResourceFilePath(const TCHAR *szFile, TCHAR *szOutput, size_t cchMax)
+{
+	TCHAR szFullFileName[MAX_PATH];
+	GetTestResourceDirectory(szFullFileName, SIZEOF_ARRAY(szFullFileName));
+
+	BOOL bRet = PathAppend(szFullFileName, szFile);
 	ASSERT_EQ(TRUE, bRet);
 
-	StringCchCopy(szOutput, cchMax, szFullFileName);
+	HRESULT hr = StringCchCopy(szOutput, cchMax, szFullFileName);
+	ASSERT_TRUE(SUCCEEDED(hr));
 }
 
 void TestGetFileProductVersion(const TCHAR *szFile, DWORD dwExpectedLS, DWORD dwExpectedMS)
@@ -154,6 +162,87 @@ TEST(GetVersionInfoString, Simple)
 	TestVersionInfoString(szDLL, L"OriginalFilename", L"VersionI.dll");
 	TestVersionInfoString(szDLL, L"ProductName", L"Test product name");
 	TestVersionInfoString(szDLL, L"ProductVersion", L"1.18.23.4728");
+}
+
+class HardLinkTest : public ::testing::Test
+{
+public:
+
+	HardLinkTest() : m_bDeleteDirectory(FALSE)
+	{
+
+	}
+
+protected:
+
+	void SetUp()
+	{
+		GetTestResourceDirectory(m_szResourceDirectory, SIZEOF_ARRAY(m_szResourceDirectory));
+		BOOL bRet = PathAppend(m_szResourceDirectory, L"HardLinkTemp");
+		ASSERT_NE(FALSE, bRet);
+
+		bRet = CreateDirectory(m_szResourceDirectory, NULL);
+		ASSERT_NE(FALSE, bRet);
+
+		m_bDeleteDirectory = TRUE;
+	}
+
+	void TearDown()
+	{
+		if(m_bDeleteDirectory)
+		{
+			std::list<std::wstring> fileList;
+			fileList.push_back(m_szResourceDirectory);
+			BOOL bRet = NFileOperations::DeleteFiles(NULL, fileList, TRUE, TRUE);
+			ASSERT_EQ(TRUE, bRet);
+		}
+	}
+
+	void CreateTestFileHardLink(const TCHAR *szOriginalFile, const TCHAR *szNewFileName)
+	{
+		TCHAR szCopy[MAX_PATH];
+		TCHAR *szRet = PathCombine(szCopy, m_szResourceDirectory, szNewFileName);
+		ASSERT_NE(nullptr, szRet);
+
+		BOOL bRet = CreateHardLink(szCopy, szOriginalFile, NULL);
+		ASSERT_NE(FALSE, bRet);
+	}
+
+	TCHAR m_szResourceDirectory[MAX_PATH];
+
+private:
+
+	BOOL m_bDeleteDirectory;
+};
+
+TEST_F(HardLinkTest, Simple)
+{
+	TCHAR szRoot[MAX_PATH];
+	StringCchCopy(szRoot, SIZEOF_ARRAY(szRoot), m_szResourceDirectory);
+	BOOL bRet = PathStripToRoot(szRoot);
+	ASSERT_NE(FALSE, bRet);
+
+	TCHAR szName[32];
+	bRet = GetVolumeInformation(szRoot, NULL, 0, NULL, NULL, NULL, szName, SIZEOF_ARRAY(szName));
+	ASSERT_NE(FALSE, bRet);
+
+	/* A little hacky, but hard links are
+	only supported on NTFS. */
+	if(lstrcmp(L"NTFS", szName) != 0)
+	{
+		return;
+	}
+
+	TCHAR szOriginalFile[MAX_PATH];
+	GetTestResourceFilePath(L"VersionInfo.dll", szOriginalFile, SIZEOF_ARRAY(szOriginalFile));
+
+	CreateTestFileHardLink(szOriginalFile, L"HardLinkCopy1");
+	CreateTestFileHardLink(szOriginalFile, L"HardLinkCopy2");
+	CreateTestFileHardLink(szOriginalFile, L"HardLinkCopy3");
+
+	/* 4 hard links expected - 3 copies + the original. */
+	DWORD dwLinks = GetNumFileHardLinks(szOriginalFile);
+	EXPECT_EQ(4, dwLinks);
 }
 
 int _tmain(int argc, _TCHAR* argv[])

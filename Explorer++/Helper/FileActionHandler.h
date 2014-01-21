@@ -16,7 +16,7 @@ public:
 	~CFileActionHandler();
 
 	BOOL	RenameFiles(const std::list<RenamedItem_t> &ItemList);
-	BOOL	DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL bPermanent);
+	BOOL	DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL bPermanent,BOOL bSilent);
 
 	void	Undo();
 	BOOL	CanUndo();

@@ -53,7 +53,7 @@ BOOL NFileOperations::RenameFile(const std::wstring &strOldFilename,
 }
 
 BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,
-	BOOL bPermanent)
+	BOOL bPermanent,BOOL bSilent)
 {
 	TCHAR *pszFullFilenames = NFileOperations::BuildFilenameList(FullFilenameList);
 
@@ -62,6 +62,11 @@ BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullF
 	if(!bPermanent)
 	{
 		fFlags = FOF_ALLOWUNDO;
+	}
+
+	if(bSilent)
+	{
+		fFlags |= FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;
 	}
 
 	SHFILEOPSTRUCT shfo;

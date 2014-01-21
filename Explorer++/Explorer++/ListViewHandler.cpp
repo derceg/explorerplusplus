@@ -1359,7 +1359,7 @@ void Explorerplusplus::OnListViewFileDelete(BOOL bPermanent)
 		FullFilenameList.push_back(szFullFilename);
 	}
 
-	m_FileActionHandler.DeleteFiles(m_hContainer,FullFilenameList,bPermanent);
+	m_FileActionHandler.DeleteFiles(m_hContainer,FullFilenameList,bPermanent,FALSE);
 }
 
 void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)

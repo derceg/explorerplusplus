@@ -69,9 +69,9 @@ BOOL CFileActionHandler::RenameFiles(const std::list<RenamedItem_t> &ItemList)
 }
 
 BOOL CFileActionHandler::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,
-	BOOL bPermanent)
+	BOOL bPermanent,BOOL bSilent)
 {
-	BOOL bRes = NFileOperations::DeleteFiles(hwnd,FullFilenameList,bPermanent);
+	BOOL bRes = NFileOperations::DeleteFiles(hwnd,FullFilenameList,bPermanent,bSilent);
 
 	if(bRes)
 	{
