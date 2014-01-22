@@ -34,7 +34,6 @@ typedef enum
 /* File helpers. */
 BOOL			CreateFileTimeString(const FILETIME *FileTime, TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate);
 BOOL			GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize);
-BOOL			GetFileClusterSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize);
 BOOL			CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2);
 HRESULT			BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, DWORD cchMax);
 HRESULT			BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, DWORD cchMax);

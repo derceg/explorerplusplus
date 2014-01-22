@@ -19,6 +19,7 @@
 #include "iDataObject.h"
 #include "ShellHelper.h"
 #include "StringHelper.h"
+#include "DriveInfo.h"
 #include "Macros.h"
 
 
@@ -26,6 +27,7 @@
 #define PASTE_CLIPBOARD_HARDLINK	1
 
 int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType);
+BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFileSize);
 
 BOOL NFileOperations::RenameFile(const std::wstring &strOldFilename,
 	const std::wstring &strNewFilename)
@@ -594,6 +596,52 @@ BOOL NFileOperations::CreateBrowseDialog(HWND hOwner,const std::wstring &strTitl
 	CoUninitialize();
 
 	return bSuccessful;
+}
+
+BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFileSize)
+{
+	DWORD dwClusterSize;
+
+	LARGE_INTEGER lFileSize;
+	BOOL bRet = GetFileSizeEx(strFilename.c_str(), &lFileSize);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
+	TCHAR szRoot[MAX_PATH];
+	HRESULT hr = StringCchCopy(szRoot, SIZEOF_ARRAY(szRoot), strFilename.c_str());
+
+	if(FAILED(hr))
+	{
+		return FALSE;
+	}
+
+	bRet = PathStripToRoot(szRoot);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
+	bRet = GetClusterSize(szRoot, &dwClusterSize);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
+	if((lFileSize.QuadPart % dwClusterSize) != 0)
+	{
+		/* The real size is the logical file size rounded up to the end of the
+		nearest cluster. */
+		lFileSize.QuadPart += dwClusterSize - (lFileSize.QuadPart % dwClusterSize);
+	}
+
+	*lpRealFileSize = lFileSize;
+
+	return TRUE;
 }
 
 void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,OverwriteMethod_t uOverwriteMethod)

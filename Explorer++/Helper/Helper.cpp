@@ -13,7 +13,6 @@
 
 #include "stdafx.h"
 #include "Helper.h"
-#include "DriveInfo.h"
 #include "Macros.h"
 
 
@@ -143,52 +142,6 @@ BOOL GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize)
 	}
 
 	return bSuccess;
-}
-
-BOOL GetFileClusterSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize)
-{
-	DWORD dwClusterSize;
-
-	LARGE_INTEGER lFileSize;
-	BOOL bRet = GetFileSizeEx(strFilename.c_str(), &lFileSize);
-
-	if(!bRet)
-	{
-		return FALSE;
-	}
-
-	TCHAR szRoot[MAX_PATH];
-	HRESULT hr = StringCchCopy(szRoot, SIZEOF_ARRAY(szRoot), strFilename.c_str());
-
-	if(FAILED(hr))
-	{
-		return FALSE;
-	}
-
-	bRet = PathStripToRoot(szRoot);
-
-	if(!bRet)
-	{
-		return FALSE;
-	}
-
-	bRet = GetClusterSize(szRoot, &dwClusterSize);
-
-	if(!bRet)
-	{
-		return FALSE;
-	}
-
-	if((lFileSize.QuadPart % dwClusterSize) != 0)
-	{
-		/* The real size is the logical file size rounded up to the end of the
-		nearest cluster. */
-		lFileSize.QuadPart += dwClusterSize - (lFileSize.QuadPart % dwClusterSize);
-	}
-
-	*lpRealFileSize = lFileSize;
-
-	return TRUE;
 }
 
 BOOL CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2)
