@@ -14,3 +14,5 @@
 #include <tchar.h>
 #include <Shlwapi.h>
 #include <strsafe.h>
+#include <ShObjIdl.h>
+#include <ShlGuid.h>

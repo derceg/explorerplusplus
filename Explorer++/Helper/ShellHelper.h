@@ -17,6 +17,12 @@
 #define HIDA_GetPIDLFolder(pida) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[0])
 #define HIDA_GetPIDLItem(pida, i) (LPCITEMIDLIST)(((LPBYTE)pida)+(pida)->aoffset[i+1])
 
+const SHCOLUMNID SCID_TITLE = {PSGUID_SUMMARYINFORMATION, PIDSI_TITLE};
+const SHCOLUMNID SCID_SUBJECT = {PSGUID_SUMMARYINFORMATION, PIDSI_SUBJECT};
+const SHCOLUMNID SCID_AUTHOR = {PSGUID_SUMMARYINFORMATION, PIDSI_AUTHOR};
+const SHCOLUMNID SCID_KEYWORDS = {PSGUID_SUMMARYINFORMATION, PIDSI_KEYWORDS};
+const SHCOLUMNID SCID_COMMENTS = {PSGUID_SUMMARYINFORMATION, PIDSI_COMMENTS};
+
 /* The following declarations, relating to
 ICustomDestinationList, are only valid for
 Windows 7. If building for an earlier
@@ -97,6 +103,8 @@ BOOL			MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD
 HRESULT			BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN std::list<std::wstring> FilenameList);
 HRESULT			BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN LPCITEMIDLIST pidlDirectory,IN std::list<LPITEMIDLIST> pidlList);
 HRESULT			BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder);
+HRESULT			BindToIdl(LPCITEMIDLIST pidl, REFIID riid, void **ppv);
+HRESULT			GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid, PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax);
 BOOL			IsPathGUID(const TCHAR *szPath);
 BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
 void			SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,DVTARGETDEVICE *ptd,DWORD dwAspect,LONG lindex,DWORD tymed);

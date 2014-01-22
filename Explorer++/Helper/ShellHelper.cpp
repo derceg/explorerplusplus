@@ -792,6 +792,48 @@ HRESULT BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolde
 	return hr;
 }
 
+HRESULT BindToIdl(LPCITEMIDLIST pidl, REFIID riid, void **ppv)
+{
+	IShellFolder *pDesktop = NULL;
+	HRESULT hr = SHGetDesktopFolder(&pDesktop);
+
+	if(SUCCEEDED(hr))
+	{
+		/* See http://blogs.msdn.com/b/oldnewthing/archive/2011/08/30/10202076.aspx. */
+		if(pidl->mkid.cb)
+		{
+			hr = pDesktop->BindToObject(pidl, NULL, riid, ppv);
+		}
+		else
+		{
+			hr = pDesktop->QueryInterface(riid, ppv);
+		}
+
+		pDesktop->Release();
+	}
+
+	return hr;
+}
+
+HRESULT GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid,
+	PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax)
+{
+	VARIANT vt;
+	HRESULT hr = pShellFolder->GetDetailsEx(pidl, pscid, &vt);
+
+	if(SUCCEEDED(hr))
+	{
+		hr = VariantChangeType(&vt, &vt, 0, VT_BSTR);
+
+		if(SUCCEEDED(hr))
+		{
+			hr = StringCchCopy(szDetail, cchMax, V_BSTR(&vt));
+		}
+	}
+
+	return hr;
+}
+
 /* Returns TRUE if a path is a GUID;
 i.e. of the form:
 

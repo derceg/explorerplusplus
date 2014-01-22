@@ -349,19 +349,19 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_TITLE:
-		return GetSummaryColumnText(InternalIndex,PROPERTY_ID_TITLE);
+		return GetSummaryColumnText(InternalIndex, &SCID_TITLE);
 		break;
 	case CM_SUBJECT:
-		return GetSummaryColumnText(InternalIndex,PROPERTY_ID_SUBJECT);
+		return GetSummaryColumnText(InternalIndex, &SCID_SUBJECT);
 		break;
 	case CM_AUTHOR:
-		return GetSummaryColumnText(InternalIndex,PROPERTY_ID_AUTHOR);
+		return GetSummaryColumnText(InternalIndex, &SCID_AUTHOR);
 		break;
 	case CM_KEYWORDS:
-		return GetSummaryColumnText(InternalIndex,PROPERTY_ID_KEYWORDS);
+		return GetSummaryColumnText(InternalIndex, &SCID_KEYWORDS);
 		break;
 	case CM_COMMENT:
-		return GetSummaryColumnText(InternalIndex,PROPERTY_ID_COMMENT);
+		return GetSummaryColumnText(InternalIndex, &SCID_COMMENTS);
 		break;
 
 	case CM_CAMERAMODEL:
@@ -764,21 +764,32 @@ std::wstring CShellBrowser::GetExtensionColumnText(int InternalIndex) const
 	return Extension + 1;
 }
 
-std::wstring CShellBrowser::GetSummaryColumnText(int InternalIndex,DWORD PropertyType) const
+HRESULT CShellBrowser::GetItemDetails(int InternalIndex, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const
 {
-	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
+	IShellFolder2 *pShellFolder = NULL;
+	HRESULT hr = BindToIdl(m_pidlDirectory, IID_IShellFolder2, reinterpret_cast<void **>(&pShellFolder));
 
-	TCHAR FileProperty[512];
-	int Res = ReadFileProperty(FullFileName,PropertyType,FileProperty,
-		SIZEOF_ARRAY(FileProperty));
-
-	if(Res == -1)
+	if(SUCCEEDED(hr))
 	{
-		return EMPTY_STRING;
+		hr = GetShellItemDetailsEx(pShellFolder, pscid, m_pExtraItemInfo[InternalIndex].pridl,
+			szDetail, cchMax);
+		pShellFolder->Release();
 	}
 
-	return FileProperty;
+	return hr;
+}
+
+std::wstring CShellBrowser::GetSummaryColumnText(int InternalIndex, const SHCOLUMNID *pscid) const
+{
+	TCHAR szDetail[512];
+	HRESULT hr = GetItemDetails(InternalIndex, pscid, szDetail, SIZEOF_ARRAY(szDetail));
+
+	if(SUCCEEDED(hr))
+	{
+		return szDetail;
+	}
+
+	return EMPTY_STRING;
 }
 
 std::wstring CShellBrowser::GetImageColumnText(int InternalIndex,PROPID PropertyID) const

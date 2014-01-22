@@ -10,13 +10,6 @@ Windows. */
 #define WINDOWS_VISTA_SEVEN_MAJORVERSION	6
 #define WINDOWS_XP_MAJORVERSION				5
 
-/* SummaryInformation stream constants. */
-#define PROPERTY_ID_TITLE		0x02
-#define PROPERTY_ID_SUBJECT		0x03
-#define PROPERTY_ID_AUTHOR		0x04
-#define PROPERTY_ID_KEYWORDS	0x05
-#define PROPERTY_ID_COMMENT		0x06
-
 typedef struct
 {
 	WORD wLanguage;
@@ -39,7 +32,6 @@ HRESULT			BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, D
 HRESULT			BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, DWORD cchMax);
 BOOL			GetFileOwner(const TCHAR *szFile,TCHAR *szOwner,size_t cchMax);
 DWORD			GetNumFileHardLinks(const TCHAR *lpszFileName);
-int				ReadFileProperty(const TCHAR *lpszFileName,DWORD dwPropertyId,TCHAR *lpszPropertyBuf,DWORD dwBufLen);
 BOOL			ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen);
 HRESULT			GetMediaMetadata(const TCHAR *szFileName, const TCHAR *szAttribute, BYTE **pszOutput);
 BOOL			IsImage(const TCHAR *FileName);

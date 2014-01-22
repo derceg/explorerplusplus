@@ -166,23 +166,23 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_TITLE:
-			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,PROPERTY_ID_TITLE);
+			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,&SCID_TITLE);
 			break;
 
 		case FSM_SUBJECT:
-			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,PROPERTY_ID_SUBJECT);
+			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,&SCID_SUBJECT);
 			break;
 
 		case FSM_AUTHOR:
-			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,PROPERTY_ID_AUTHOR);
+			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,&SCID_AUTHOR);
 			break;
 
 		case FSM_KEYWORDS:
-			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,PROPERTY_ID_KEYWORDS);
+			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,&SCID_KEYWORDS);
 			break;
 
 		case FSM_COMMENTS:
-			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,PROPERTY_ID_COMMENT);
+			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,&SCID_COMMENTS);
 			break;
 
 		case FSM_CAMERAMODEL:
@@ -609,12 +609,12 @@ int CALLBACK CShellBrowser::SortByExtension(int InternalIndex1,int InternalIndex
 	return StrCmpLogicalW(Extension1.c_str(),Extension2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortBySummaryProperty(int InternalIndex1,int InternalIndex2,DWORD PropertyType) const
+int CALLBACK CShellBrowser::SortBySummaryProperty(int InternalIndex1, int InternalIndex2, const SHCOLUMNID *pscid) const
 {
-	std::wstring FileProperty1 = GetSummaryColumnText(InternalIndex1,PropertyType);
-	std::wstring FileProperty2 = GetSummaryColumnText(InternalIndex2,PropertyType);
+	std::wstring FileProperty1 = GetSummaryColumnText(InternalIndex1, pscid);
+	std::wstring FileProperty2 = GetSummaryColumnText(InternalIndex2, pscid);
 
-	return StrCmpLogicalW(FileProperty1.c_str(),FileProperty2.c_str());
+	return StrCmpLogicalW(FileProperty1.c_str(), FileProperty2.c_str());
 }
 
 int CALLBACK CShellBrowser::SortByImageProperty(int InternalIndex1,int InternalIndex2,PROPID PropertyId) const

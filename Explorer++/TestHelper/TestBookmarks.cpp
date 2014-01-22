@@ -1,8 +1,7 @@
 #include "stdafx.h"
-#include <string>
+#include "gtest\gtest.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/Macros.h"
-#include "gtest\gtest.h"
 
 TEST(BookmarkTest,BookmarkCreation)
 {

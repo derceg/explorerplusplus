@@ -596,7 +596,7 @@ private:
 	int CALLBACK		SortByShortcutTo(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByHardlinks(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByExtension(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortBySummaryProperty(int InternalIndex1,int InternalIndex2,DWORD PropertyType) const;
+	int CALLBACK		SortBySummaryProperty(int InternalIndex1, int InternalIndex2, const SHCOLUMNID *pscid) const;
 	int CALLBACK		SortByImageProperty(int InternalIndex1,int InternalIndex2,PROPID PropertyId) const;
 	int CALLBACK		SortByVirtualComments(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByFileSystem(int InternalIndex1,int InternalIndex2) const;
@@ -630,7 +630,8 @@ private:
 	DWORD				GetHardLinksColumnRawData(int InternalIndex) const;
 	std::wstring		GetHardLinksColumnText(int InternalIndex) const;
 	std::wstring		GetExtensionColumnText(int InternalIndex) const;
-	std::wstring		GetSummaryColumnText(int InternalIndex,DWORD PropertyType) const;
+	HRESULT				GetItemDetails(int InternalIndex, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const;
+	std::wstring		GetSummaryColumnText(int InternalIndex, const SHCOLUMNID *pscid) const;
 	std::wstring		GetImageColumnText(int InternalIndex,PROPID PropertyID) const;
 	std::wstring		GetFileSystemColumnText(int InternalIndex) const;
 	BOOL				GetDriveSpaceColumnRawData(int InternalIndex,bool TotalSize,ULARGE_INTEGER &DriveSpace) const;
@@ -679,7 +680,7 @@ private:
 	void				DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 	void				DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 	void				DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyType,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemSummaryGroup(int iItemInternal, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax) const;
 
 	/* Other grouping support. */
 	int					CheckGroup(TCHAR *szGroupHeader,PFNLVGROUPCOMPARE pfnGroupCompare);
