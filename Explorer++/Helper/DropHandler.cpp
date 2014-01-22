@@ -308,7 +308,7 @@ HRESULT CDropHandler::CopyShellIDListData(IDataObject *pDataObject,
 
 			LPCITEMIDLIST pidlDirectory = HIDA_GetPIDLFolder(pcida);
 
-			hr = BindToShellFolder(pidlDirectory,&pShellFolder);
+			hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 			if(SUCCEEDED(hr))
 			{

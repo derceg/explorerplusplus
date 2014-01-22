@@ -760,38 +760,6 @@ HRESULT BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
 	return S_OK;
 }
 
-HRESULT BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder)
-{
-	if(pidlDirectory == NULL ||
-		pShellFolder == NULL)
-	{
-		return E_FAIL;
-	}
-
-	HRESULT hr;
-
-	*pShellFolder = NULL;
-
-	if(IsNamespaceRoot(pidlDirectory))
-	{
-		hr = SHGetDesktopFolder(pShellFolder);
-	}
-	else
-	{
-		IShellFolder *pDesktopFolder = NULL;
-		hr = SHGetDesktopFolder(&pDesktopFolder);
-
-		if(SUCCEEDED(hr))
-		{
-			hr = pDesktopFolder->BindToObject(pidlDirectory, NULL,
-				IID_IShellFolder, reinterpret_cast<void **>(pShellFolder));
-			pDesktopFolder->Release();
-		}
-	}
-
-	return hr;
-}
-
 HRESULT BindToIdl(LPCITEMIDLIST pidl, REFIID riid, void **ppv)
 {
 	IShellFolder *pDesktop = NULL;

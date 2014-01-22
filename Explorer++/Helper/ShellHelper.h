@@ -102,7 +102,6 @@ HRESULT			GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,UINT cchMax,DWORD uP
 BOOL			MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize);
 HRESULT			BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN std::list<std::wstring> FilenameList);
 HRESULT			BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,IN LPCITEMIDLIST pidlDirectory,IN std::list<LPITEMIDLIST> pidlList);
-HRESULT			BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder);
 HRESULT			BindToIdl(LPCITEMIDLIST pidl, REFIID riid, void **ppv);
 HRESULT			GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid, PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax);
 BOOL			IsPathGUID(const TCHAR *szPath);
