@@ -544,22 +544,22 @@ std::wstring CShellBrowser::GetSizeColumnText(int InternalIndex) const
 std::wstring CShellBrowser::GetTimeColumnText(int InternalIndex,TimeType_t TimeType) const
 {
 	TCHAR FileTime[64];
-	int Res = -1;
+	BOOL bRet = FALSE;
 
 	switch(TimeType)
 	{
 	case COLUMN_TIME_MODIFIED:
-		Res = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftLastWriteTime,
+		bRet = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftLastWriteTime,
 			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
 		break;
 
 	case COLUMN_TIME_CREATED:
-		Res = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftCreationTime,
+		bRet = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftCreationTime,
 			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
 		break;
 
 	case COLUMN_TIME_ACCESSED:
-		Res = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftLastAccessTime,
+		bRet = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftLastAccessTime,
 			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
 		break;
 
@@ -568,7 +568,7 @@ std::wstring CShellBrowser::GetTimeColumnText(int InternalIndex,TimeType_t TimeT
 		break;
 	}
 
-	if(Res == -1)
+	if(!bRet)
 	{
 		return EMPTY_STRING;
 	}

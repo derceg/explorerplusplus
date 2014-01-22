@@ -31,158 +31,162 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 BOOL GetStringTableValue(void *pBlock, LANGANDCODEPAGE *plcp, UINT nItems,
 	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
 
-int CreateFileTimeString(const FILETIME *FileTime,
-TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate)
+BOOL CreateFileTimeString(const FILETIME *FileTime,
+	TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
 {
-	SYSTEMTIME SystemTime;
 	FILETIME LocalFileTime;
-	TCHAR TempBuffer[512];
-	TCHAR DateBuffer[512];
-	TCHAR TimeBuffer[512];
-	SYSTEMTIME CurrentTime;
-	int iReturn1 = 0;
-	int iReturn2 = 0;
+	SYSTEMTIME SystemTime;
+	BOOL bRet1 = FileTimeToLocalFileTime(FileTime, &LocalFileTime);
+	BOOL bRet2 = FileTimeToSystemTime(&LocalFileTime, &SystemTime);
 
-	if(FileTime == NULL)
+	if(!bRet1 || !bRet2)
 	{
-		Buffer = NULL;
-		return -1;
+		return FALSE;
 	}
 
-	FileTimeToLocalFileTime(FileTime,&LocalFileTime);
-	FileTimeToSystemTime(&LocalFileTime,&SystemTime);
-	
+	SYSTEMTIME CurrentTime;
 	GetLocalTime(&CurrentTime);
+
+	TCHAR DateBuffer[512];
+	int iReturn1 = 0;
 
 	if(bFriendlyDate)
 	{
 		if((CurrentTime.wYear == SystemTime.wYear) &&
-		(CurrentTime.wMonth == SystemTime.wMonth))
+			(CurrentTime.wMonth == SystemTime.wMonth))
 		{
 			if(CurrentTime.wDay == SystemTime.wDay)
 			{
-				StringCchCopy(DateBuffer,SIZEOF_ARRAY(DateBuffer),_T("Today"));
+				StringCchCopy(DateBuffer, SIZEOF_ARRAY(DateBuffer), _T("Today"));
 
 				iReturn1 = 1;
 			}
 			else if(CurrentTime.wDay == (SystemTime.wDay + 1))
 			{
-				StringCchCopy(DateBuffer,SIZEOF_ARRAY(DateBuffer),_T("Yesterday"));
+				StringCchCopy(DateBuffer, SIZEOF_ARRAY(DateBuffer), _T("Yesterday"));
 
 				iReturn1 = 1;
 			}
 			else
 			{
-				iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT,LOCALE_USE_CP_ACP,&SystemTime,
-					NULL, DateBuffer,512);
+				iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, &SystemTime,
+					NULL, DateBuffer, 512);
 			}
 		}
 		else
 		{
-			iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT,LOCALE_USE_CP_ACP,&SystemTime,
-				NULL, DateBuffer,512);
+			iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, &SystemTime,
+				NULL, DateBuffer, 512);
 		}
 	}
 	else
 	{
-		iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT,LOCALE_USE_CP_ACP,&SystemTime,
-			NULL, DateBuffer,512);
+		iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, &SystemTime,
+			NULL, DateBuffer, 512);
 	}
 
-	iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT,LOCALE_USE_CP_ACP,&SystemTime,
-		NULL, TimeBuffer,512);
-	
-	if(iReturn1 && iReturn2)
+	TCHAR TimeBuffer[512];
+	int iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, &SystemTime,
+		NULL, TimeBuffer, 512);
+
+	if((iReturn1 != 0) && (iReturn2 != 0))
 	{
-		StringCchPrintf(TempBuffer,SIZEOF_ARRAY(TempBuffer),
-			_T("%s, %s"),DateBuffer,TimeBuffer);
-
-		if(MaxCharacters < (lstrlen(TempBuffer) + 1))
-		{
-			Buffer = NULL;
-
-			return lstrlen(TempBuffer) + 1;
-		}
-		else
-		{
-			StringCchCopy(Buffer,MaxCharacters,TempBuffer);
-
-			return lstrlen(TempBuffer) + 1;
-		}
+		StringCchPrintf(szBuffer, cchMax, _T("%s, %s"), DateBuffer, TimeBuffer);
 	}
-
-	Buffer = NULL;
 
 	return -1;
 }
 
-HINSTANCE StartCommandPrompt(const TCHAR *Directory,bool Elevated)
+HINSTANCE StartCommandPrompt(const TCHAR *Directory, bool Elevated)
 {
 	HINSTANCE hNewInstance = NULL;
 
 	TCHAR SystemPath[MAX_PATH];
-	BOOL bRes = SHGetSpecialFolderPath(NULL,SystemPath,CSIDL_SYSTEM,0);
+	BOOL bRes = SHGetSpecialFolderPath(NULL, SystemPath, CSIDL_SYSTEM, 0);
 
 	if(bRes)
 	{
 		TCHAR CommandPath[MAX_PATH];
-		PathCombine(CommandPath,SystemPath,_T("cmd.exe"));
+		TCHAR *szRet = PathCombine(CommandPath, SystemPath, _T("cmd.exe"));
 
-		TCHAR Operation[32];
-
-		if(Elevated)
+		if(szRet != NULL)
 		{
-			StringCchCopy(Operation,SIZEOF_ARRAY(Operation),_T("runas"));
-		}
-		else
-		{
-			StringCchCopy(Operation,SIZEOF_ARRAY(Operation),_T("open"));
-		}
+			TCHAR Operation[32];
 
-		hNewInstance = ShellExecute(NULL,Operation,CommandPath,NULL,Directory,
-		SW_SHOWNORMAL);
+			if(Elevated)
+			{
+				StringCchCopy(Operation, SIZEOF_ARRAY(Operation), _T("runas"));
+			}
+			else
+			{
+				StringCchCopy(Operation, SIZEOF_ARRAY(Operation), _T("open"));
+			}
+
+			hNewInstance = ShellExecute(NULL, Operation, CommandPath, NULL, Directory,
+				SW_SHOWNORMAL);
+		}
 	}
 
 	return hNewInstance;
 }
 
-BOOL GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize)
+BOOL GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize)
 {
-	LARGE_INTEGER lFileSize;
-	DWORD dwClusterSize;
-	HANDLE hFile;
-	TCHAR szRoot[MAX_PATH];
+	BOOL bSuccess = FALSE;
+	HANDLE hFile = CreateFile(szFileName, GENERIC_READ,
+		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, NULL, NULL);
 
-	/* Get a handle to the file. */
-	hFile = CreateFile(strFilename.c_str(),GENERIC_READ,
-	FILE_SHARE_READ|FILE_SHARE_WRITE,NULL,OPEN_EXISTING,NULL,NULL);
-
-	if(hFile == INVALID_HANDLE_VALUE)
-		return FALSE;
-
-	/* Get the files size (count of number of actual
-	number of bytes in file). */
-	GetFileSizeEx(hFile,&lFileSize);
-
-	*lpRealFileSize = lFileSize;
-
-	if(lFileSize.QuadPart != 0)
+	if(hFile != INVALID_HANDLE_VALUE)
 	{
-		StringCchCopy(szRoot,SIZEOF_ARRAY(szRoot),strFilename.c_str());
-		PathStripToRoot(szRoot);
-
-		/* Get the cluster size of the drive the file resides on. */
-		GetClusterSize(szRoot, &dwClusterSize);
-
-		if((lpRealFileSize->QuadPart % dwClusterSize) != 0)
-		{
-			/* The real size is the logical file size rounded up to the end of the
-			nearest cluster. */
-			lpRealFileSize->QuadPart += dwClusterSize - (lpRealFileSize->QuadPart % dwClusterSize);
-		}
+		bSuccess = GetFileSizeEx(hFile, lpFileSize);
+		CloseHandle(hFile);
 	}
 
-	CloseHandle(hFile);
+	return bSuccess;
+}
+
+BOOL GetFileClusterSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize)
+{
+	DWORD dwClusterSize;
+
+	LARGE_INTEGER lFileSize;
+	BOOL bRet = GetFileSizeEx(strFilename.c_str(), &lFileSize);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
+	TCHAR szRoot[MAX_PATH];
+	HRESULT hr = StringCchCopy(szRoot, SIZEOF_ARRAY(szRoot), strFilename.c_str());
+
+	if(FAILED(hr))
+	{
+		return FALSE;
+	}
+
+	bRet = PathStripToRoot(szRoot);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
+	bRet = GetClusterSize(szRoot, &dwClusterSize);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
+	if((lFileSize.QuadPart % dwClusterSize) != 0)
+	{
+		/* The real size is the logical file size rounded up to the end of the
+		nearest cluster. */
+		lFileSize.QuadPart += dwClusterSize - (lFileSize.QuadPart % dwClusterSize);
+	}
+
+	*lpRealFileSize = lFileSize;
 
 	return TRUE;
 }

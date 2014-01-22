@@ -627,7 +627,7 @@ void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,Overwri
 
 	/* Determine the actual size of the file on disk
 	(i.e. how many clusters it is allocated). */
-	GetRealFileSize(strFilename,&lRealFileSize);
+	GetFileClusterSize(strFilename,&lRealFileSize);
 
 	/* Open the file, block any sharing mode, to stop the file
 	been opened while it is overwritten. */

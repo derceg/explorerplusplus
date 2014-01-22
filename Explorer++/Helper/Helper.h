@@ -32,8 +32,9 @@ typedef enum
 } GroupType_t;
 
 /* File helpers. */
-int				CreateFileTimeString(const FILETIME *FileTime,TCHAR *Buffer,int MaxCharacters,BOOL bFriendlyDate);
-BOOL			GetRealFileSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize);
+BOOL			CreateFileTimeString(const FILETIME *FileTime, TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate);
+BOOL			GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize);
+BOOL			GetFileClusterSize(const std::wstring &strFilename,PLARGE_INTEGER lpRealFileSize);
 BOOL			CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2);
 HRESULT			BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, DWORD cchMax);
 HRESULT			BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, DWORD cchMax);
