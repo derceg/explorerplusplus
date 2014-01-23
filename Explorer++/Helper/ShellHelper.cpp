@@ -99,7 +99,7 @@ HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,UINT cch
 
 		if(SUCCEEDED(hr))
 		{
-			StrRetToBuf(&str,pidlDirectory,szDisplayName,cchMax);
+			hr = StrRetToBuf(&str,pidlDirectory,szDisplayName,cchMax);
 		}
 
 		pShellFolder->Release();
@@ -174,42 +174,15 @@ BOOL ExecuteFileAction(HWND hwnd,const TCHAR *szVerb,const TCHAR *szParameters,c
 	return ShellExecuteEx(&ExecInfo);
 }
 
-HRESULT GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath,UINT cchMax)
+HRESULT GetCsidlParsingPath(UINT uFolderCSIDL, TCHAR *szParsingPath, UINT cchMax)
 {
-	IShellFolder *pShellFolder		= NULL;
-	IShellFolder *pDesktopFolder	= NULL;
-	LPITEMIDLIST pidl				= NULL;
-	LPITEMIDLIST pidlRelative		= NULL;
-	STRRET str;
-	HRESULT hr;
-
-	hr = SHGetDesktopFolder(&pDesktopFolder);
+	LPITEMIDLIST pidl = NULL;
+	HRESULT hr = SHGetFolderLocation(NULL, uFolderCSIDL, NULL, 0, &pidl);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = SHGetFolderLocation(NULL,uFolderCSIDL,NULL,0,&pidl);
-
-		if(SUCCEEDED(hr))
-		{
-			hr = SHBindToParent(pidl,IID_IShellFolder,(void **)&pShellFolder,
-			(LPCITEMIDLIST *)&pidlRelative);
-
-			if(SUCCEEDED(hr))
-			{
-				hr = pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-
-				if(SUCCEEDED(hr))
-				{
-					hr = StrRetToBuf(&str,pidlRelative,szParsingPath,cchMax);
-				}
-
-				pShellFolder->Release();
-			}
-
-			CoTaskMemFree(pidl);
-		}
-
-		pDesktopFolder->Release();
+		hr = GetDisplayName(pidl, szParsingPath, cchMax, SHGDN_FORPARSING);
+		CoTaskMemFree(pidl);
 	}
 
 	return hr;
@@ -289,7 +262,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_CONTROLS,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_CONTROLS,szParsingPath,cchMax);
 		return S_OK;
 	}
 
@@ -299,7 +272,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_BITBUCKET,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_BITBUCKET,szParsingPath,cchMax);
 		return S_OK;
 	}
 
@@ -309,7 +282,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_DRIVES,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_DRIVES,szParsingPath,cchMax);
 		return S_OK;
 	}
 
@@ -319,7 +292,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_NETWORK,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_NETWORK,szParsingPath,cchMax);
 		return S_OK;
 	}
 
@@ -329,7 +302,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_CONNECTIONS,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_CONNECTIONS,szParsingPath,cchMax);
 		return S_OK;
 	}
 
@@ -339,7 +312,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_PRINTERS,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_PRINTERS,szParsingPath,cchMax);
 		return S_OK;
 	}
 
@@ -349,7 +322,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_FAVORITES,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_FAVORITES,szParsingPath,cchMax);
 		return S_OK;
 	}
 
@@ -359,7 +332,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYPICTURES,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_MYPICTURES,szParsingPath,cchMax);
 		return S_OK;
 	}
 
@@ -369,7 +342,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYMUSIC,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_MYMUSIC,szParsingPath,cchMax);
 		return S_OK;
 	}
 
@@ -379,42 +352,42 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYVIDEO,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_MYVIDEO,szParsingPath,cchMax);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_DESKTOP,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetVirtualFolderParsingPath(CSIDL_DESKTOP,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_DESKTOP,szParsingPath,cchMax);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_PICTURES,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYPICTURES,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_MYPICTURES,szParsingPath,cchMax);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_MUSIC,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYMUSIC,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_MYMUSIC,szParsingPath,cchMax);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_VIDEOS,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYVIDEO,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_MYVIDEO,szParsingPath,cchMax);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_DOCUMENTS,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYDOCUMENTS,szParsingPath,cchMax);
+		GetCsidlParsingPath(CSIDL_MYDOCUMENTS,szParsingPath,cchMax);
 		return S_OK;
 	}
 

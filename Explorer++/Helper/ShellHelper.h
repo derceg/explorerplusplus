@@ -95,7 +95,7 @@ HRESULT			GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cc
 HRESULT			GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags);
 BOOL			CheckIdl(LPCITEMIDLIST pidl);
 BOOL			IsIdlDirectory(LPCITEMIDLIST pidl);
-HRESULT			GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath,UINT cchMax);
+HRESULT			GetCsidlParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath,UINT cchMax);
 HRESULT			GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent);
 BOOL			IsNamespaceRoot(LPCITEMIDLIST pidl);
 HRESULT			GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,UINT cchMax,DWORD uParsingFlags);
