@@ -330,32 +330,15 @@ HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent,TCHAR *szParsingPath)
 
 HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent,LPITEMIDLIST pidlDirectory)
 {
-	IShellFolder	*pDesktopFolder = NULL;
 	IShellFolder	*pShellFolder = NULL;
 	HRESULT			hr;
 
-	hr = SHGetDesktopFolder(&pDesktopFolder);
+	hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{
-		if(IsNamespaceRoot(pidlDirectory))
-		{
-			hr = SHGetDesktopFolder(&pShellFolder);
-		}
-		else
-		{
-			hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
-			IID_IShellFolder,(LPVOID *)&pShellFolder);
-		}
-
-		if(SUCCEEDED(hr))
-		{
-			AddDirectoryInternal(pShellFolder,pidlDirectory,hParent);
-
-			pShellFolder->Release();
-		}
-
-		pDesktopFolder->Release();
+		AddDirectoryInternal(pShellFolder,pidlDirectory,hParent);
+		pShellFolder->Release();
 	}
 
 	return hr;

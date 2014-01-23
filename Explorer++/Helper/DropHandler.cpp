@@ -856,7 +856,6 @@ HRESULT CDropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 
 void CDropHandler::HandleRightClickDrop(void)
 {
-	IShellFolder *pDesktop = NULL;
 	IShellFolder *pShellFolder = NULL;
 	IDropTarget *pDrop = NULL;
 	LPITEMIDLIST pidlDirectory = NULL;
@@ -867,34 +866,27 @@ void CDropHandler::HandleRightClickDrop(void)
 
 	if(SUCCEEDED(hr))
 	{
-		hr = SHGetDesktopFolder(&pDesktop);
+		hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
-			hr = pDesktop->BindToObject(pidlDirectory,0,IID_IShellFolder,(void **)&pShellFolder);
+			dwe = m_dwEffect;
+
+			hr = pShellFolder->CreateViewObject(m_hwndDrop,IID_IDropTarget,(void **)&pDrop);
 
 			if(SUCCEEDED(hr))
 			{
+				pDrop->DragEnter(m_pDataObject,MK_RBUTTON,m_ptl,&dwe);
+
 				dwe = m_dwEffect;
+				pDrop->Drop(m_pDataObject,m_grfKeyState,m_ptl,&dwe);
 
-				hr = pShellFolder->CreateViewObject(m_hwndDrop,IID_IDropTarget,(void **)&pDrop);
+				pDrop->DragLeave();
 
-				if(SUCCEEDED(hr))
-				{
-					pDrop->DragEnter(m_pDataObject,MK_RBUTTON,m_ptl,&dwe);
-
-					dwe = m_dwEffect;
-					pDrop->Drop(m_pDataObject,m_grfKeyState,m_ptl,&dwe);
-
-					pDrop->DragLeave();
-
-					pDrop->Release();
-				}
-
-				pShellFolder->Release();
+				pDrop->Release();
 			}
 
-			pDesktop->Release();
+			pShellFolder->Release();
 		}
 
 		CoTaskMemFree(pidlDirectory);

@@ -61,24 +61,7 @@ m_pShellContext(NULL)
 	else
 	{
 		IShellFolder *pShellFolder = NULL;
-
-		if(IsNamespaceRoot(pidlParent))
-		{
-			hr = SHGetDesktopFolder(&pShellFolder);
-		}
-		else
-		{
-			IShellFolder *pDesktopFolder = NULL;
-
-			hr = SHGetDesktopFolder(&pDesktopFolder);
-
-			if(SUCCEEDED(hr))
-			{
-				hr = pDesktopFolder->BindToObject(pidlParent, NULL,
-					IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
-				pDesktopFolder->Release();
-			}
-		}
+		hr = BindToIdl(pidlParent, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{

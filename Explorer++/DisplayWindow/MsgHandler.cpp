@@ -167,7 +167,6 @@ void CDisplayWindow::ExtractThumbnailImage(void)
 void CDisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 {
 	IExtractImage *pExtractImage = NULL;
-	IShellFolder *pShellDesktop = NULL;
 	IShellFolder *pShellFolder = NULL;
 	LPITEMIDLIST pidlParent = NULL;
 	LPITEMIDLIST pidlFull = NULL;
@@ -193,84 +192,77 @@ void CDisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 
 		pridl = ILClone(ILFindLastID(pidlFull));
 
-		hr = SHGetDesktopFolder(&pShellDesktop);
+		hr = BindToIdl(pidlParent, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
-			hr = pShellDesktop->BindToObject(pidlParent,NULL,IID_IShellFolder,(void **)&pShellFolder);
+			hr = pShellFolder->GetUIObjectOf(NULL,1,(LPCITEMIDLIST *)&pridl,
+				IID_IExtractImage,NULL,(void **)&pExtractImage);
 
 			if(SUCCEEDED(hr))
 			{
-				hr = pShellFolder->GetUIObjectOf(NULL,1,(LPCITEMIDLIST *)&pridl,
-					IID_IExtractImage,NULL,(void **)&pExtractImage);
+				GetClientRect(m_hDisplayWindow,&rc);
+
+				/* First, query the thumbnail so that its actual aspect
+				ratio can be calculated. */
+				dwFlags = IEIFLAG_OFFLINE|IEIFLAG_QUALITY|IEIFLAG_ORIGSIZE;
+				size.cx = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
+				size.cy = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
+
+				hr = pExtractImage->GetLocation(szImage,MAX_PATH,
+					&dwPriority,&size,32,&dwFlags);
 
 				if(SUCCEEDED(hr))
 				{
-					GetClientRect(m_hDisplayWindow,&rc);
-
-					/* First, query the thumbnail so that its actual aspect
-					ratio can be calculated. */
-					dwFlags = IEIFLAG_OFFLINE|IEIFLAG_QUALITY|IEIFLAG_ORIGSIZE;
-					size.cx = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
-					size.cy = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
-
-					hr = pExtractImage->GetLocation(szImage,MAX_PATH,
-						&dwPriority,&size,32,&dwFlags);
+					hr = pExtractImage->Extract(&hBitmap);
 
 					if(SUCCEEDED(hr))
 					{
-						hr = pExtractImage->Extract(&hBitmap);
+						/* Get bitmap information (including height and width). */
+						GetObject(hBitmap,sizeof(BITMAP),&bm);
+
+						/* Delete the original bitmap. */
+						DeleteObject(hBitmap);
+
+						/* ...now query the thumbnail again, this time adjusting
+						the width of the suggested area based on the actual aspect
+						ratio. */
+						dwFlags = IEIFLAG_OFFLINE|IEIFLAG_QUALITY|IEIFLAG_ASPECT|IEIFLAG_ORIGSIZE;
+						size.cy = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
+						size.cx = (LONG)((double)size.cy * ((double)bm.bmWidth / (double)bm.bmHeight));
+						m_iImageWidth = size.cx;
+						m_iImageHeight = size.cy;
+						pExtractImage->GetLocation(szImage,MAX_PATH,
+							&dwPriority,&size,32,&dwFlags);
+						hr = pExtractImage->Extract(&m_hbmThumbnail);
 
 						if(SUCCEEDED(hr))
 						{
-							/* Get bitmap information (including height and width). */
-							GetObject(hBitmap,sizeof(BITMAP),&bm);
+							/* Check first if we've been cancelled. This might happen,
+							for example, if another file is selected while the current
+							thumbnail is been found. */
+							EnterCriticalSection(&m_csDWThumbnails);
 
-							/* Delete the original bitmap. */
-							DeleteObject(hBitmap);
-
-							/* ...now query the thumbnail again, this time adjusting
-							the width of the suggested area based on the actual aspect
-							ratio. */
-							dwFlags = IEIFLAG_OFFLINE|IEIFLAG_QUALITY|IEIFLAG_ASPECT|IEIFLAG_ORIGSIZE;
-							size.cy = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
-							size.cx = (LONG)((double)size.cy * ((double)bm.bmWidth / (double)bm.bmHeight));
-							m_iImageWidth = size.cx;
-							m_iImageHeight = size.cy;
-							pExtractImage->GetLocation(szImage,MAX_PATH,
-								&dwPriority,&size,32,&dwFlags);
-							hr = pExtractImage->Extract(&m_hbmThumbnail);
-
-							if(SUCCEEDED(hr))
+							if(!pte->bCancelled)
 							{
-								/* Check first if we've been cancelled. This might happen,
-								for example, if another file is selected while the current
-								thumbnail is been found. */
-								EnterCriticalSection(&m_csDWThumbnails);
-
-								if(!pte->bCancelled)
-								{
-									m_bThumbnailExtractionFailed = FALSE;
-									InvalidateRect(m_hDisplayWindow,NULL,FALSE);
-								}
-
-								LeaveCriticalSection(&m_csDWThumbnails);
+								m_bThumbnailExtractionFailed = FALSE;
+								InvalidateRect(m_hDisplayWindow,NULL,FALSE);
 							}
-							else
-							{
-								m_bThumbnailExtractionFailed = TRUE;
-								m_hbmThumbnail = NULL;
-							}
+
+							LeaveCriticalSection(&m_csDWThumbnails);
+						}
+						else
+						{
+							m_bThumbnailExtractionFailed = TRUE;
+							m_hbmThumbnail = NULL;
 						}
 					}
-
-					pExtractImage->Release();
 				}
 
-				pShellFolder->Release();
+				pExtractImage->Release();
 			}
 
-			pShellDesktop->Release();
+			pShellFolder->Release();
 		}
 
 		CoTaskMemFree(pidlFull);

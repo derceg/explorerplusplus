@@ -191,7 +191,6 @@ LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask)
 	assert(pidlDirectory != NULL);
 	assert(szAction != NULL);
 
-	IShellFolder		*pDesktopFolder = NULL;
 	IShellFolder		*pShellParentFolder = NULL;
 	IShellFolder		*pShellFolder = NULL;
 	IContextMenu		*pContext = NULL;
@@ -217,32 +216,13 @@ LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask)
 	}
 	else
 	{
-		hr = SHGetDesktopFolder(&pDesktopFolder);
+		hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
-			if(IsNamespaceRoot(pidlDirectory))
-			{
-				hr = pDesktopFolder->GetUIObjectOf(m_hContainer,nFiles,
-				(LPCITEMIDLIST *)ppidl,IID_IContextMenu,0,(LPVOID *)&pContext);
-			}
-			else
-			{
-				hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
-				IID_IShellFolder,(LPVOID *)&pShellFolder);
-
-				if(SUCCEEDED(hr))
-				{
-					hr = pShellFolder->GetUIObjectOf(m_hContainer,nFiles,
-						(LPCITEMIDLIST *)ppidl,IID_IContextMenu,0,(LPVOID *)&pContext);
-
-					pShellFolder->Release();
-					pShellFolder = NULL;
-				}
-			}
-
-			pDesktopFolder->Release();
-			pDesktopFolder = NULL;
+			hr = pShellFolder->GetUIObjectOf(m_hContainer, nFiles,
+				ppidl, IID_IContextMenu, 0, reinterpret_cast<void **>(&pContext));
+			pShellFolder->Release();
 		}
 	}
 

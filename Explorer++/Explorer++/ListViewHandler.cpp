@@ -398,7 +398,6 @@ void Explorerplusplus::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
 		initially clicked on. */
 		if(ht.iItem == m_ListViewMButtonItem)
 		{
-			IShellFolder *pDesktopFolder	= NULL;
 			IShellFolder *pShellFolder		= NULL;
 			LPITEMIDLIST pidl				= NULL;
 			LPITEMIDLIST ridl				= NULL;
@@ -407,43 +406,33 @@ void Explorerplusplus::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
 			STRRET str;
 			HRESULT hr;
 
-			hr = SHGetDesktopFolder(&pDesktopFolder);
+			pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+			hr = BindToIdl(pidl, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 			if(SUCCEEDED(hr))
 			{
-				pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-				hr = pDesktopFolder->BindToObject(pidl,NULL,IID_IShellFolder,(LPVOID *)&pShellFolder);
+				ridl = m_pActiveShellBrowser->QueryItemRelativeIdl(ht.iItem);
 
-				if(!SUCCEEDED(hr))
-				{
-					hr = SHGetDesktopFolder(&pShellFolder);
-				}
+				hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&ridl,&uAttributes);
 
 				if(SUCCEEDED(hr))
 				{
-					ridl = m_pActiveShellBrowser->QueryItemRelativeIdl(ht.iItem);
-
-					hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&ridl,&uAttributes);
-
-					if(SUCCEEDED(hr))
+					if((uAttributes & SFGAO_FOLDER) &&
+						!(uAttributes & SFGAO_STREAM))
 					{
-						if((uAttributes & SFGAO_FOLDER) &&
-							!(uAttributes & SFGAO_STREAM))
-						{
-							/* Folder item. */
-							pShellFolder->GetDisplayNameOf(ridl,SHGDN_FORPARSING,&str);
-							StrRetToBuf(&str,ridl,szParsingPath,MAX_PATH);
+						/* Folder item. */
+						pShellFolder->GetDisplayNameOf(ridl,SHGDN_FORPARSING,&str);
+						StrRetToBuf(&str,ridl,szParsingPath,MAX_PATH);
 
-							BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
-						}
+						BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
 					}
-
-					CoTaskMemFree(ridl);
-					pShellFolder->Release();
 				}
-				CoTaskMemFree(pidl);
-				pDesktopFolder->Release();
+
+				CoTaskMemFree(ridl);
+				pShellFolder->Release();
 			}
+
+			CoTaskMemFree(pidl);
 		}
 	}
 }
@@ -997,20 +986,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	LPCITEMIDLIST pidlChildFolder = ILFindLastID(pidlDirectory);
 
 	IShellFolder *pShellFolder = NULL;
-	HRESULT hr;
-
-	if(IsNamespaceRoot(pidlParent))
-	{
-		hr = SHGetDesktopFolder(&pShellFolder);
-	}
-	else
-	{
-		IShellFolder *pDesktopFolder = NULL;
-		SHGetDesktopFolder(&pDesktopFolder);
-		hr = pDesktopFolder->BindToObject(pidlParent,NULL,
-			IID_IShellFolder,reinterpret_cast<void **>(&pShellFolder));
-		pDesktopFolder->Release();
-	}
+	HRESULT hr = BindToIdl(pidlParent, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{
