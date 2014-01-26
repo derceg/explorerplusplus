@@ -335,101 +335,77 @@ DWORD GetNumFileHardLinks(const TCHAR *lpszFileName)
 	return nLinks;
 }
 
-BOOL ReadImageProperty(const TCHAR *lpszImage,UINT PropertyId,void *pPropBuffer,DWORD dwBufLen)
+BOOL ReadImageProperty(const TCHAR *lpszImage, PROPID propId, TCHAR *szProperty, int cchMax)
 {
-	Gdiplus::GdiplusStartupInput	StartupInput;
-	Gdiplus::PropertyItem	*pPropItems = NULL;
-	char				pTempBuffer[512];
-	ULONG_PTR			Token;
-	UINT				Size;
-	UINT				NumProperties;
-	Gdiplus::Status		res;
-	BOOL				bFound = FALSE;
-	unsigned int		i = 0;
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR token;
+	Gdiplus::Status status = GdiplusStartup(&token, &gdiplusStartupInput, NULL);
 
-	GdiplusStartup(&Token,&StartupInput,NULL);
-
-	Gdiplus::Image *image = new Gdiplus::Image(lpszImage,FALSE);
-
-	if(image->GetLastStatus() != Gdiplus::Ok)
+	if(status != Gdiplus::Ok)
 	{
-		delete image;
 		return FALSE;
 	}
 
-	if(PropertyId == PropertyTagImageWidth)
+	BOOL bSuccess = FALSE;
+
+	/* This object needs to be
+	deleted before GdiplusShutdown
+	is called. If it were stack
+	allocated, it would go out of
+	scope _after_ the call to
+	GdiplusShutdown. By allocating
+	it on the heap, the lifetime
+	can be directly controlled. */
+	Gdiplus::Image *image = new Gdiplus::Image(lpszImage, FALSE);
+
+	if(image->GetLastStatus() == Gdiplus::Ok)
 	{
-		UINT uWidth;
-
-		uWidth = image->GetWidth();
-
-		bFound = TRUE;
-
-		StringCchPrintf((LPWSTR)pPropBuffer,dwBufLen,L"%u pixels",uWidth);
-	}
-	else if(PropertyId == PropertyTagImageHeight)
-	{
-		UINT uHeight;
-
-		uHeight = image->GetHeight();
-
-		bFound = TRUE;
-
-		StringCchPrintf((LPWSTR)pPropBuffer,dwBufLen,L"%u pixels",uHeight);
-	}
-	else
-	{
-		image->GetPropertySize(&Size,&NumProperties);
-
-		pPropItems = (Gdiplus::PropertyItem *)malloc(Size);
-		res = image->GetAllPropertyItems(Size,NumProperties,pPropItems);
-
-		if(res == Gdiplus::Ok)
+		if(propId == PropertyTagImageWidth)
 		{
-			for(i = 0;i < NumProperties;i++)
-			{
-				if(pPropItems[i].id == PropertyId)
-				{
-					bFound = TRUE;
-					break;
-				}
-			}
+			bSuccess = TRUE;
+			StringCchPrintf(szProperty, cchMax, _T("%u pixels"), image->GetWidth());
 		}
-
-		if(!bFound && (PropertyId == PropertyTagExifDTOrig))
+		else if(propId == PropertyTagImageHeight)
 		{
-			/* If the specified tag is PropertyTagExifDTOrig, we'll
-			transparently fall back on PropertyTagDateTime. */
-			for(i = 0;i < NumProperties;i++)
-			{
-				if(pPropItems[i].id == PropertyTagDateTime)
-				{
-					bFound = TRUE;
-					break;
-				}
-			}
-		}
-
-		if(bFound)
-		{
-			memcpy(pTempBuffer,pPropItems[i].value,pPropItems[i].length);
-
-			/* All property strings are ANSI. */
-			MultiByteToWideChar(CP_ACP,0,pTempBuffer,-1,
-				(WCHAR *)pPropBuffer,dwBufLen);
+			bSuccess = TRUE;
+			StringCchPrintf(szProperty, cchMax, _T("%u pixels"), image->GetHeight());
 		}
 		else
 		{
-			pPropBuffer = NULL;
-		}
+			UINT size = image->GetPropertyItemSize(propId);
 
-		free(pPropItems);
+			if(size != 0)
+			{
+				Gdiplus::PropertyItem *propertyItem = reinterpret_cast<Gdiplus::PropertyItem *>(malloc(size));
+
+				if(propertyItem != NULL)
+				{
+					status = image->GetPropertyItem(propId, size, propertyItem);
+
+					if(status == Gdiplus::Ok)
+					{
+						if(propertyItem->type == PropertyTagTypeASCII)
+						{
+							int iRes = MultiByteToWideChar(CP_ACP, 0, reinterpret_cast<LPCSTR>(propertyItem->value), -1,
+								szProperty, cchMax);
+
+							if(iRes != 0)
+							{
+								bSuccess = TRUE;
+							}
+						}
+					}
+
+					free(propertyItem);
+				}
+			}
+		}
 	}
 
 	delete image;
-	Gdiplus::GdiplusShutdown(Token);
+	Gdiplus::GdiplusShutdown(token);
 
-	return bFound;
+	return bSuccess;
 }
 
 BOOL GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR *InitialDirectory)

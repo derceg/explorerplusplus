@@ -368,7 +368,7 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		return GetImageColumnText(InternalIndex,PropertyTagEquipModel);
 		break;
 	case CM_DATETAKEN:
-		return GetImageColumnText(InternalIndex,PropertyTagExifDTOrig);
+		return GetImageColumnText(InternalIndex,PropertyTagDateTime);
 		break;
 	case CM_WIDTH:
 		return GetImageColumnText(InternalIndex,PropertyTagImageWidth);
