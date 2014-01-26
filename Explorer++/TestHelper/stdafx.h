@@ -16,3 +16,4 @@
 #include <strsafe.h>
 #include <ShObjIdl.h>
 #include <ShlGuid.h>
+#include <GdiPlus.h>

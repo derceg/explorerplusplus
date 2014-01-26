@@ -214,3 +214,25 @@ TEST_F(HardLinkTest, Simple)
 	DWORD dwLinks = GetNumFileHardLinks(szOriginalFile);
 	EXPECT_EQ(4, dwLinks);
 }
+
+void TestReadImageProperty(const TCHAR *szFile, PROPID propId, const TCHAR *szPropertyExpected)
+{
+	TCHAR szFullFileName[MAX_PATH];
+	GetTestResourceFilePath(szFile, szFullFileName, SIZEOF_ARRAY(szFullFileName));
+
+	TCHAR szProperty[512];
+	BOOL bRes = ReadImageProperty(szFullFileName, propId, szProperty, SIZEOF_ARRAY(szProperty));
+	ASSERT_EQ(TRUE, bRes);
+
+	EXPECT_STREQ(szPropertyExpected, szProperty);
+}
+
+TEST(ReadImageProperty, EquipMake)
+{
+	TestReadImageProperty(L"Metadata.jpg", PropertyTagEquipMake, L"Test camera maker");
+}
+
+TEST(ReadImageProperty, EquipModel)
+{
+	TestReadImageProperty(L"Metadata.jpg", PropertyTagEquipModel, L"Test camera model");
+}
