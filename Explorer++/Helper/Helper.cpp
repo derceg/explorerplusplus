@@ -452,19 +452,20 @@ BOOL IsImage(const TCHAR *szFileName)
 	TCHAR *ext;
 	int i = 0;
 
-	if(szFileName != NULL)
+	ext = PathFindExtension(szFileName);
+
+	if(ext == NULL || (ext + 1) == NULL)
 	{
-		ext = PathFindExtension(szFileName);
+		return FALSE;
+	}
 
-		if(ext == NULL || (ext + 1) == NULL)
-			return FALSE;
+	ext++;
 
-		ext++;
-
-		for(i = 0;i < SIZEOF_ARRAY(IMAGE_EXTS);i++)
+	for(i = 0;i < SIZEOF_ARRAY(IMAGE_EXTS);i++)
+	{
+		if(lstrcmpi(ext, IMAGE_EXTS[i]) == 0)
 		{
-			if(lstrcmpi(ext,IMAGE_EXTS[i]) == 0)
-				return TRUE;
+			return TRUE;
 		}
 	}
 
