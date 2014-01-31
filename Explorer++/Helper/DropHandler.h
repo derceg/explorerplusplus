@@ -23,7 +23,7 @@ class CDropHandler : public CReferenceCount
 public:
 
 	/* As this class is reference counted, the constructor
-	and deconstructor are both private. Use this method to
+	and destructor are both private. Use this method to
 	get a new instance of this class. */
 	static CDropHandler	*CreateNew();
 
