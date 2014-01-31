@@ -842,9 +842,6 @@ HRESULT CDropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 
 				delete[] pData;
 
-				TCHAR szFileName[MAX_PATH];
-				StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
-				PathStripPath(szFileName);
 				PastedFileList.push_back(szFileName);
 			}
 
