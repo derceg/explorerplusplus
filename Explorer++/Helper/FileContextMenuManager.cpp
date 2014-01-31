@@ -202,7 +202,7 @@ HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 	{
 		TCHAR szCmd[64];
 
-		HRESULT hr = m_pActualContext->GetCommandString(iCmd - iMinID,GCS_VERB,
+		hr = m_pActualContext->GetCommandString(iCmd - iMinID,GCS_VERB,
 			NULL,reinterpret_cast<LPSTR>(szCmd),SIZEOF_ARRAY(szCmd));
 
 		BOOL bHandled = FALSE;
