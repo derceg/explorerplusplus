@@ -3,20 +3,29 @@
 #include "../Helper/iDataObject.h"
 #include "../Helper/Macros.h"
 
-TEST(iDataObjectTest,Simple)
+TEST(iDataObject, QueryInterface)
 {
 	IDataObject *pDataObject = NULL;
-	CreateDataObject(NULL,NULL,&pDataObject,0);
+	HRESULT hr = CreateDataObject(NULL, NULL, &pDataObject, 0);
+	ASSERT_TRUE(SUCCEEDED(hr));
+
+	IDataObject *pOut = NULL;
+	hr = pDataObject->QueryInterface(IID_IDataObject, reinterpret_cast<void **>(&pOut));
+	EXPECT_EQ(S_OK, hr);
+}
+
+TEST(iDataObject, QueryGetData)
+{
+	IDataObject *pDataObject = NULL;
+	HRESULT hr = CreateDataObject(NULL, NULL, &pDataObject, 0);
+	ASSERT_TRUE(SUCCEEDED(hr));
 
 	FORMATETC ftc;
-	ftc.cfFormat	= CF_TEXT;
-	ftc.dwAspect	= DVASPECT_CONTENT;
-	ftc.lindex		= -1;
-	ftc.ptd			= NULL;
-	ftc.tymed		= TYMED_HGLOBAL;
-	EXPECT_EQ(DV_E_FORMATETC,pDataObject->QueryGetData(&ftc));
-
-	EXPECT_EQ(E_NOTIMPL,pDataObject->DAdvise(NULL,ADVF_NODATA,NULL,NULL));
-	EXPECT_EQ(OLE_E_ADVISENOTSUPPORTED,pDataObject->DUnadvise(0));
-	EXPECT_EQ(OLE_E_ADVISENOTSUPPORTED,pDataObject->EnumDAdvise(NULL));
+	ftc.cfFormat = CF_TEXT;
+	ftc.dwAspect = DVASPECT_CONTENT;
+	ftc.lindex = -1;
+	ftc.ptd = NULL;
+	ftc.tymed = TYMED_HGLOBAL;
+	hr = pDataObject->QueryGetData(&ftc);
+	EXPECT_EQ(DV_E_FORMATETC, hr);
 }
