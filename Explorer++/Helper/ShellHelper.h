@@ -4,9 +4,6 @@
 
 #define CONTROL_PANEL_CATEGORY_VIEW	_T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")
 
-#define DEFAULT_ICON_FOLDER	0
-#define DEFAULT_ICON_FILE	1
-
 #define FRIENDLY_NAME_DESKTOP	_T("Desktop")
 #define FRIENDLY_NAME_PICTURES	_T("Pictures")
 #define FRIENDLY_NAME_MUSIC		_T("Music")
@@ -74,6 +71,12 @@ public:
 
 };
 
+enum DefaultIconType
+{
+	DEFAULT_ICON_FOLDER,
+	DEFAULT_ICON_FILE
+};
+
 struct JumpListTaskInformation
 {
 	const TCHAR	*pszName;
@@ -120,9 +123,9 @@ HRESULT			DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UI
 DWORD			DetermineCurrentDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept, BOOL bOnSameDrive);
 
 /* Default icon indices. */
-int				GetDefaultIcon(int iIconType);
 int				GetDefaultFolderIconIndex(void);
 int				GetDefaultFileIconIndex(void);
+int				GetDefaultIcon(DefaultIconType defaultIconType);
 
 /* Infotips. */
 HRESULT			GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax);

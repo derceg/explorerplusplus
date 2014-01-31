@@ -7,22 +7,22 @@
 
 /* Major version numbers for various versions of
 Windows. */
-#define WINDOWS_VISTA_SEVEN_MAJORVERSION	6
-#define WINDOWS_XP_MAJORVERSION				5
+const int WINDOWS_VISTA_SEVEN_MAJORVERSION = 6;
+const int WINDOWS_XP_MAJORVERSION = 5;
 
-typedef struct
+struct LangAndCodePage
 {
 	WORD wLanguage;
 	WORD wCodePage;
-} LANGANDCODEPAGE;
+};
 
-typedef enum
+enum GroupType_t
 {
 	GROUP_ADMINISTRATORS,
 	GROUP_POWERUSERS,
 	GROUP_USERS,
 	GROUP_USERSRESTRICTED
-} GroupType_t;
+};
 
 /* File helpers. */
 BOOL			CreateFileTimeString(const FILETIME *FileTime, TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate);

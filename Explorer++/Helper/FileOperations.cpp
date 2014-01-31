@@ -23,10 +23,13 @@
 #include "Macros.h"
 
 
-#define PASTE_CLIPBOARD_LINK		0
-#define PASTE_CLIPBOARD_HARDLINK	1
+enum PasteType
+{
+	PASTE_CLIPBOARD_LINK,
+	PASTE_CLIPBOARD_HARDLINK
+};
 
-int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType);
+int PasteFilesFromClipboardSpecial(TCHAR *szDestination, PasteType pasteType);
 BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFileSize);
 
 BOOL NFileOperations::RenameFile(const std::wstring &strOldFilename,
@@ -420,7 +423,7 @@ int PasteHardLinks(TCHAR *szDestination)
 }
 
 /* TODO: Use CDropHandler. */
-int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType)
+int PasteFilesFromClipboardSpecial(TCHAR *szDestination,PasteType pasteType)
 {
 	IDataObject	*ClipboardObject = NULL;
 	DROPFILES	*pdf = NULL;
@@ -465,7 +468,7 @@ int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType)
 
 					PathAppend(szLinkFileName,szFileName);
 
-					switch(fPasteType)
+					switch(pasteType)
 					{
 					case PASTE_CLIPBOARD_LINK:
 						PathRenameExtension(szLinkFileName,_T(".lnk"));

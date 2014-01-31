@@ -27,7 +27,7 @@ void EnterAttributeIntoString(BOOL bEnter, TCHAR *String, int Pos, TCHAR chAttri
 BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subBlockType,
 	WORD *pwLanguage, DWORD *pdwProductVersionLS, DWORD *pdwProductVersionMS,
 	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
-BOOL GetStringTableValue(void *pBlock, LANGANDCODEPAGE *plcp, UINT nItems,
+BOOL GetStringTableValue(void *pBlock, LangAndCodePage *plcp, UINT nItems,
 	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
 
 BOOL CreateFileTimeString(const FILETIME *FileTime,
@@ -514,7 +514,7 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 				LPVOID *pBuffer = NULL;
 				UINT uStructureSize = 0;
 
-				LANGANDCODEPAGE *plcp = NULL;
+				LangAndCodePage *plcp = NULL;
 				VS_FIXEDFILEINFO *pvsffi = NULL;
 
 				if(subBlockType == ROOT)
@@ -528,7 +528,7 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 				{
 					StringCchCopy(szSubBlock, SIZEOF_ARRAY(szSubBlock), _T("\\VarFileInfo\\Translation"));
 					pBuffer = reinterpret_cast<LPVOID *>(&plcp);
-					uStructureSize = sizeof(LANGANDCODEPAGE);
+					uStructureSize = sizeof(LangAndCodePage);
 				}
 
 				UINT uLen;
@@ -549,7 +549,7 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 					}
 					else if(subBlockType == STRING_TABLE_VALUE)
 					{
-						bSuccess = GetStringTableValue(pBlock, plcp, uLen / sizeof(LANGANDCODEPAGE),
+						bSuccess = GetStringTableValue(pBlock, plcp, uLen / sizeof(LangAndCodePage),
 							szVersionInfo, szVersionBuffer, cchMax);
 					}
 				}
@@ -562,7 +562,7 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 	return bSuccess;
 }
 
-BOOL GetStringTableValue(void *pBlock, LANGANDCODEPAGE *plcp, UINT nItems,
+BOOL GetStringTableValue(void *pBlock, LangAndCodePage *plcp, UINT nItems,
 	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax)
 {
 	BOOL bSuccess = FALSE;

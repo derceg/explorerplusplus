@@ -404,21 +404,18 @@ int GetDefaultFileIconIndex(void)
 	return GetDefaultIcon(DEFAULT_ICON_FILE);
 }
 
-int GetDefaultIcon(int iIconType)
+int GetDefaultIcon(DefaultIconType defaultIconType)
 {
 	SHFILEINFO shfi;
 	DWORD dwFileAttributes;
 
-	switch(iIconType)
+	switch(defaultIconType)
 	{
 		case DEFAULT_ICON_FOLDER:
 			dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY|FILE_ATTRIBUTE_NORMAL;
 			break;
 
 		case DEFAULT_ICON_FILE:
-			dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
-			break;
-
 		default:
 			dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
 			break;
