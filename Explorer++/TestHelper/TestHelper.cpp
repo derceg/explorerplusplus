@@ -236,3 +236,37 @@ TEST(ReadImageProperty, EquipModel)
 {
 	TestReadImageProperty(L"Metadata.jpg", PropertyTagEquipModel, L"Test camera model");
 }
+
+TEST(GetFileSizeEx, Simple)
+{
+	TCHAR szFullFileName[MAX_PATH];
+	GetTestResourceFilePath(L"Explorer++CA.dll", szFullFileName, SIZEOF_ARRAY(szFullFileName));
+
+	LARGE_INTEGER lFileSize;
+	BOOL bRes = GetFileSizeEx(szFullFileName, &lFileSize);
+	ASSERT_EQ(TRUE, bRes);
+
+	EXPECT_EQ(62464, lFileSize.QuadPart);
+}
+
+void TestCompareFileTypes(const TCHAR *szFile1, const TCHAR *szFile2, BOOL bSameExpected)
+{
+	TCHAR szFullFileName1[MAX_PATH];
+	GetTestResourceFilePath(szFile1, szFullFileName1, SIZEOF_ARRAY(szFullFileName1));
+
+	TCHAR szFullFileName2[MAX_PATH];
+	GetTestResourceFilePath(szFile2, szFullFileName2, SIZEOF_ARRAY(szFullFileName2));
+
+	BOOL bRes = CompareFileTypes(szFullFileName1, szFullFileName2);
+	EXPECT_EQ(bSameExpected, bRes);
+}
+
+TEST(CompareFileTypes, Same)
+{
+	TestCompareFileTypes(L"Explorer++CA.dll", L"Explorer++FR.dll", TRUE);
+}
+
+TEST(CompareFileTypes, Different)
+{
+	TestCompareFileTypes(L"Explorer++CA.dll", L"Metadata.jpg", FALSE);
+}
