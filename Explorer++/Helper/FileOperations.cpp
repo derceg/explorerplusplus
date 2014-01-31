@@ -100,7 +100,6 @@ BOOL NFileOperations::CopyFilesToFolder(HWND hOwner,const std::wstring &strTitle
 
 	TCHAR *pszFullFilenames = NFileOperations::BuildFilenameList(FullFilenameList);
 
-	/* TODO: Pass off to copy function. */
 	SHFILEOPSTRUCT shfo;
 
 	if(bMove)
@@ -669,7 +668,6 @@ void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,Overwri
 
 	if(bFolder)
 	{
-		/* TODO: Recurse. */
 		return;
 	}
 
