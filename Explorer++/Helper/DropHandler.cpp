@@ -637,30 +637,34 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 				PastedFileList.push_back(szFileName);
 			}
 
-			HGLOBAL hglb = NULL;
-			DWORD *pdwCopyEffect = NULL;
 			FORMATETC ftc;
-			STGMEDIUM stg1;
-
 			ftc.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PERFORMEDDROPEFFECT);
 			ftc.ptd			= NULL;
 			ftc.dwAspect	= DVASPECT_CONTENT;
 			ftc.lindex		= -1;
 			ftc.tymed		= TYMED_HGLOBAL;
 
-			hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
+			HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
 
-			pdwCopyEffect = (DWORD *)GlobalLock(hglb);
+			if(hGlobal != NULL)
+			{
+				DWORD *pdwCopyEffect = (DWORD *) GlobalLock(hGlobal);
 
-			*pdwCopyEffect = DROPEFFECT_COPY;
+				if(pdwCopyEffect != NULL)
+				{
+					*pdwCopyEffect = DROPEFFECT_COPY;
+					GlobalUnlock(hGlobal);
 
-			GlobalUnlock(hglb);
+					STGMEDIUM stg;
+					stg.tymed = TYMED_HGLOBAL;
+					stg.pUnkForRelease = NULL;
+					stg.hGlobal = hGlobal;
 
-			stg1.tymed			= TYMED_HGLOBAL;
-			stg1.pUnkForRelease	= 0;
-			stg1.hGlobal		= hglb;
+					pDataObject->SetData(&ftc, &stg, FALSE);
+				}
 
-			pDataObject->SetData(&ftc,&stg1,FALSE);
+				GlobalFree(hGlobal);
+			}
 		}
 
 		if(pBuffer != NULL)
