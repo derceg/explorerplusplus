@@ -291,14 +291,16 @@ BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString, 
 	return FALSE;
 }
 
-void ReplaceCharacters(TCHAR *str, char ch, char replacement)
+void ReplaceCharacter(TCHAR *str, TCHAR ch, TCHAR chReplacement)
 {
 	int  i = 0;
 
 	for(i = 0; i < lstrlen(str); i++)
 	{
 		if(str[i] == ch)
-			str[i] = replacement;
+		{
+			str[i] = chReplacement;
+		}
 	}
 }
 
@@ -312,7 +314,7 @@ void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput,
 	szNewString[0] = '\0';
 	for(i = 0; i < lstrlen(szBaseString); i++)
 	{
-		if(szBaseString[i] == '&')
+		if(szBaseString[i] == chToReplace)
 		{
 			StringCchCatN(szNewString, SIZEOF_ARRAY(szNewString),
 				&szBaseString[iBase], i - iBase);

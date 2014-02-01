@@ -17,7 +17,7 @@ void FormatSizeString(ULARGE_INTEGER lFileSize, TCHAR *pszFileSize,
 TCHAR *PrintComma(unsigned long nPrint);
 TCHAR *PrintCommaLargeNum(LARGE_INTEGER lPrint);
 BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCaseSensitive);
-void ReplaceCharacters(TCHAR *str, char ch, char replacement);
+void ReplaceCharacter(TCHAR *str, TCHAR ch, TCHAR chReplacement);
 void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput,
 	UINT cchMax, TCHAR chToReplace, const TCHAR *szReplacement);
 TCHAR *GetToken(TCHAR *ptr, TCHAR *Buffer, TCHAR *BufferLength);

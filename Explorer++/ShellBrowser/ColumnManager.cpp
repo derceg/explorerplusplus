@@ -898,7 +898,7 @@ std::wstring CShellBrowser::GetControlPanelCommentsColumnText(int InternalIndex)
 		return EMPTY_STRING;
 	}
 
-	ReplaceCharacters(InfoTip,'\n',' ');
+	ReplaceCharacter(InfoTip,'\n',' ');
 
 	return InfoTip;
 }

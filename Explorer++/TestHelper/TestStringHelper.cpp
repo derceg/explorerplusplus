@@ -3,7 +3,7 @@
 #include "../Helper/StringHelper.h"
 #include "../Helper/Macros.h"
 
-TEST(WildcardTest, SimpleMatches)
+TEST(CheckWildcardMatch, SimpleMatches)
 {
 	EXPECT_EQ(TRUE, CheckWildcardMatch(_T("*.txt"), _T("Test.txt"), TRUE));
 	EXPECT_EQ(TRUE, CheckWildcardMatch(_T("?.txt"), _T("1.txt"), TRUE));
@@ -11,7 +11,7 @@ TEST(WildcardTest, SimpleMatches)
 	EXPECT_EQ(TRUE, CheckWildcardMatch(_T("Test?1*txt"), _T("Test11test.txt"), TRUE));
 }
 
-TEST(WildcardTest, UnicodeMatches)
+TEST(CheckWildcardMatch, UnicodeMatches)
 {
 	/* Warning C4566 (character represented by universal-character-name
 	'char' cannot be represented in the current code page (page)) is given
@@ -30,7 +30,7 @@ TEST(WildcardTest, UnicodeMatches)
 	#pragma warning(pop)
 }
 
-TEST(FormatSizeTest, Simple)
+TEST(FormatSizeString, Simple)
 {
 	ULARGE_INTEGER ulSize;
 	TCHAR szSize[128];
@@ -58,4 +58,61 @@ TEST(FormatSizeTest, Simple)
 	ulSize.QuadPart = 1000202039296;
 	FormatSizeString(ulSize, szSize, SIZEOF_ARRAY(szSize));
 	EXPECT_STREQ(L"931 GB", szSize);
+}
+
+TEST(PrintComma, Simple)
+{
+	TCHAR *szOut = PrintComma(1234567890);
+	EXPECT_STREQ(L"1,234,567,890", szOut);
+}
+
+TEST(ReplaceCharacter, NoMatches)
+{
+	TCHAR szText[] = L"This is a test string";
+	ReplaceCharacter(szText, 'z', 'y');
+	EXPECT_STREQ(L"This is a test string", szText);
+}
+
+TEST(ReplaceCharacter, Simple)
+{
+	TCHAR szText[] = L"This is a test string";
+	ReplaceCharacter(szText, 't', 'b');
+	EXPECT_STREQ(L"This is a besb sbring", szText);
+}
+
+TEST(ReplaceCharacterWithString, NoMatches)
+{
+	TCHAR szOut[64];
+	ReplaceCharacterWithString(L"Hello world", szOut, SIZEOF_ARRAY(szOut),
+		'z', L"replacement");
+	EXPECT_STREQ(L"Hello world", szOut);
+}
+
+TEST(ReplaceCharacterWithString, Simple)
+{
+	TCHAR szOut[64];
+	ReplaceCharacterWithString(L"Hello world", szOut, SIZEOF_ARRAY(szOut),
+		'o', L"replacement");
+	EXPECT_STREQ(L"Hellreplacement wreplacementrld", szOut);
+}
+
+TEST(TrimStringLeft, Simple)
+{
+	std::wstring text(L"  Test text");
+	TrimStringLeft(text, L" ");
+	EXPECT_EQ(L"Test text", text);
+}
+
+TEST(TrimStringRight, Simple)
+{
+	std::wstring text(L"Test text  ");
+	TrimStringRight(text, L" ");
+	EXPECT_EQ(L"Test text", text);
+}
+
+TEST(TrimString, Simple)
+{
+	std::wstring text(L"  Test text  ");
+	TrimString(text, L" ");
+	EXPECT_EQ(L"Test text", text);
 }
