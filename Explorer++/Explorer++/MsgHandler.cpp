@@ -1363,7 +1363,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 	m_pShellBrowser[iTabId]->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectoryToWatch),
 		szDirectoryToWatch);
 
-	GetCsidlParsingPath(CSIDL_BITBUCKET,szRecycleBin,SIZEOF_ARRAY(szRecycleBin));
+	GetCsidlDisplayName(CSIDL_BITBUCKET,szRecycleBin,SIZEOF_ARRAY(szRecycleBin),SHGDN_FORPARSING);
 
 	/* Don't watch virtual folders (the 'recycle bin' may be an
 	exception to this). */

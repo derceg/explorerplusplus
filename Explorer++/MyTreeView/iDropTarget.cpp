@@ -108,7 +108,7 @@ DWORD CMyTreeView::GetCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,
 	{
 		bOnSameDrive = CheckItemLocations(m_pDataObject,hItem,0);
 
-		dwEffect = DetermineCurrentDragEffect(grfKeyState,
+		dwEffect = DetermineDragEffect(grfKeyState,
 			dwCurrentEffect,m_bDataAccept,bOnSameDrive);
 	}
 	else

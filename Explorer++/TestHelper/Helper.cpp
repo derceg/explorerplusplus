@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "gtest\gtest.h"
 #include "../Helper/ProcessHelper.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
 #include "Helper.h"
 
@@ -23,6 +24,15 @@ void GetTestResourceDirectory(TCHAR *szResourceDirectory, size_t cchMax)
 	ASSERT_NE(nullptr, szRet);
 }
 
+void GetTestResourceDirectoryIdl(LPITEMIDLIST *pidl)
+{
+	TCHAR szResourceDirectory[MAX_PATH];
+	GetTestResourceDirectory(szResourceDirectory, SIZEOF_ARRAY(szResourceDirectory));
+
+	HRESULT hr = GetIdlFromParsingName(szResourceDirectory, pidl);
+	ASSERT_TRUE(SUCCEEDED(hr));
+}
+
 void GetTestResourceFilePath(const TCHAR *szFile, TCHAR *szOutput, size_t cchMax)
 {
 	TCHAR szFullFileName[MAX_PATH];
@@ -32,5 +42,14 @@ void GetTestResourceFilePath(const TCHAR *szFile, TCHAR *szOutput, size_t cchMax
 	ASSERT_EQ(TRUE, bRet);
 
 	HRESULT hr = StringCchCopy(szOutput, cchMax, szFullFileName);
+	ASSERT_TRUE(SUCCEEDED(hr));
+}
+
+void GetTestResourceFileIdl(const TCHAR *szFile, LPITEMIDLIST *pidl)
+{
+	TCHAR szFullFileName[MAX_PATH];
+	GetTestResourceFilePath(szFile, szFullFileName, SIZEOF_ARRAY(szFullFileName));
+
+	HRESULT hr = GetIdlFromParsingName(szFullFileName, pidl);
 	ASSERT_TRUE(SUCCEEDED(hr));
 }

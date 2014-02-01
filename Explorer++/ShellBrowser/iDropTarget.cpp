@@ -69,7 +69,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 			m_bDataAccept = TRUE;
 
 			m_bOnSameDrive = CheckItemLocations(pDataObject,0);
-			*pdwEffect = DetermineCurrentDragEffect(grfKeyState,*pdwEffect,
+			*pdwEffect = DetermineDragEffect(grfKeyState,*pdwEffect,
 				m_bDataAccept,m_bOnSameDrive);
 		}
 		else
@@ -101,7 +101,7 @@ HRESULT _stdcall CShellBrowser::DragOver(DWORD grfKeyState,POINTL ptl,DWORD *pdw
 	RECT	rc;
 	POINT	pt;
 
-	*pdwEffect = DetermineCurrentDragEffect(grfKeyState,*pdwEffect,
+	*pdwEffect = DetermineDragEffect(grfKeyState,*pdwEffect,
 		m_bDataAccept,m_bOnSameDrive);
 
 	pt.x = ptl.x;
@@ -457,7 +457,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 
 					/* The drop effect will be the same for all files
 					that are been dragged locally. */
-					dwEffect = DetermineCurrentDragEffect(grfKeyState,*pdwEffect,
+					dwEffect = DetermineDragEffect(grfKeyState,*pdwEffect,
 						m_bDataAccept,m_bOnSameDrive);
 
 					if(dwEffect == DROPEFFECT_MOVE)

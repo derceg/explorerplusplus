@@ -263,7 +263,7 @@ HTREEITEM CMyTreeView::AddRoot(void)
 
 	if(SUCCEEDED(hr))
 	{
-		GetCsidlParsingPath(CSIDL_DESKTOP,szDesktopParsingPath,SIZEOF_ARRAY(szDesktopParsingPath));
+		GetCsidlDisplayName(CSIDL_DESKTOP,szDesktopParsingPath,SIZEOF_ARRAY(szDesktopParsingPath),SHGDN_FORPARSING);
 		GetDisplayName(szDesktopParsingPath,szDesktopDisplayName,SIZEOF_ARRAY(szDesktopDisplayName),SHGDN_INFOLDER);
 
 		SHGetFileInfo((LPTSTR)pidl,NULL,&shfi,NULL,SHGFI_PIDL|SHGFI_SYSICONINDEX);

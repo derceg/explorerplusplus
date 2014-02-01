@@ -108,6 +108,20 @@ HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,UINT cch
 	return hr;
 }
 
+HRESULT GetCsidlDisplayName(int csidl, TCHAR *szFolderName, UINT cchMax, DWORD uParsingFlags)
+{
+	LPITEMIDLIST pidl = NULL;
+	HRESULT hr = SHGetFolderLocation(NULL, csidl, NULL, 0, &pidl);
+
+	if(SUCCEEDED(hr))
+	{
+		hr = GetDisplayName(pidl, szFolderName, cchMax, uParsingFlags);
+		CoTaskMemFree(pidl);
+	}
+
+	return hr;
+}
+
 HRESULT GetItemAttributes(const TCHAR *szItemParsingPath,SFGAOF *pItemAttributes)
 {
 	if(szItemParsingPath == NULL ||
@@ -172,20 +186,6 @@ BOOL ExecuteFileAction(HWND hwnd,const TCHAR *szVerb,const TCHAR *szParameters,c
 	ExecInfo.hInstApp		= NULL;
 
 	return ShellExecuteEx(&ExecInfo);
-}
-
-HRESULT GetCsidlParsingPath(UINT uFolderCSIDL, TCHAR *szParsingPath, UINT cchMax)
-{
-	LPITEMIDLIST pidl = NULL;
-	HRESULT hr = SHGetFolderLocation(NULL, uFolderCSIDL, NULL, 0, &pidl);
-
-	if(SUCCEEDED(hr))
-	{
-		hr = GetDisplayName(pidl, szParsingPath, cchMax, SHGDN_FORPARSING);
-		CoTaskMemFree(pidl);
-	}
-
-	return hr;
 }
 
 HRESULT GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent)
@@ -262,7 +262,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetCsidlParsingPath(CSIDL_CONTROLS,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_CONTROLS,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
@@ -272,7 +272,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetCsidlParsingPath(CSIDL_BITBUCKET,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_BITBUCKET,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
@@ -282,7 +282,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetCsidlParsingPath(CSIDL_DRIVES,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_DRIVES,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
@@ -292,7 +292,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetCsidlParsingPath(CSIDL_NETWORK,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_NETWORK,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
@@ -302,7 +302,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetCsidlParsingPath(CSIDL_CONNECTIONS,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_CONNECTIONS,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
@@ -312,7 +312,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetCsidlParsingPath(CSIDL_PRINTERS,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_PRINTERS,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
@@ -322,7 +322,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetCsidlParsingPath(CSIDL_FAVORITES,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_FAVORITES,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
@@ -332,7 +332,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetCsidlParsingPath(CSIDL_MYPICTURES,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_MYPICTURES,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
@@ -342,7 +342,7 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetCsidlParsingPath(CSIDL_MYMUSIC,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_MYMUSIC,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
@@ -352,42 +352,42 @@ HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetCsidlParsingPath(CSIDL_MYVIDEO,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_MYVIDEO,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_DESKTOP,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetCsidlParsingPath(CSIDL_DESKTOP,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_DESKTOP,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_PICTURES,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetCsidlParsingPath(CSIDL_MYPICTURES,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_MYPICTURES,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_MUSIC,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetCsidlParsingPath(CSIDL_MYMUSIC,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_MYMUSIC,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_VIDEOS,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetCsidlParsingPath(CSIDL_MYVIDEO,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_MYVIDEO,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_DOCUMENTS,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetCsidlParsingPath(CSIDL_MYDOCUMENTS,szParsingPath,cchMax);
+		GetCsidlDisplayName(CSIDL_MYDOCUMENTS,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
@@ -429,29 +429,6 @@ int GetDefaultIcon(DefaultIconType defaultIconType)
 	return shfi.iIcon;
 }
 
-HRESULT GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,UINT cchMax,DWORD uParsingFlags)
-{
-	if(szFolderName == NULL)
-	{
-		return E_FAIL;
-	}
-
-	LPITEMIDLIST pidl = NULL;
-	HRESULT hr;
-
-	hr = SHGetFolderLocation(NULL,csidl,NULL,0,&pidl);
-
-	/* Don't use SUCCEEDED(hr). */
-	if(hr == S_OK)
-	{
-		hr = GetDisplayName(pidl,szFolderName,cchMax,uParsingFlags);
-
-		CoTaskMemFree(pidl);
-	}
-
-	return hr;
-}
-
 BOOL MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize)
 {
 	HANDLE hProcess;
@@ -478,38 +455,7 @@ BOOL MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD n
 	return bRet;
 }
 
-BOOL CopyTextToClipboard(const std::wstring &str)
-{
-	if(!OpenClipboard(NULL))
-	{
-		return FALSE;
-	}
-
-	EmptyClipboard();
-
-	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE,(str.size() + 1) * sizeof(TCHAR));
-	BOOL bRes = FALSE;
-
-	if(hGlobal != NULL)
-	{
-		LPVOID pMem = GlobalLock(hGlobal);
-		memcpy(pMem,str.c_str(),(str.size() + 1) * sizeof(TCHAR));
-		GlobalUnlock(hGlobal);
-
-		HANDLE hData = SetClipboardData(CF_UNICODETEXT,hGlobal);
-
-		if(hData != NULL)
-		{
-			bRes = TRUE;
-		}
-	}
-
-	CloseClipboard();
-
-	return bRes;
-}
-
-DWORD DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,
+DWORD DetermineDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,
 BOOL bDataAccept,BOOL bOnSameDrive)
 {
 	DWORD dwEffect = DROPEFFECT_NONE;
@@ -889,11 +835,6 @@ void DecodePath(const TCHAR *szInitialPath,const TCHAR *szCurrentDirectory,TCHAR
 
 BOOL CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2)
 {
-	if(pidl1 == NULL || pidl2 == NULL)
-	{
-		return FALSE;
-	}
-
 	IShellFolder *pDesktopFolder = NULL;
 	HRESULT hr;
 	BOOL ret = FALSE;
@@ -904,7 +845,7 @@ BOOL CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2)
 	{
 		hr = pDesktopFolder->CompareIDs(0,pidl1,pidl2);
 
-		if(short(HRESULT_CODE(hr) == 0))
+		if(HRESULT_CODE(hr) == 0)
 		{
 			ret = TRUE;
 		}
@@ -913,22 +854,6 @@ BOOL CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2)
 	}
 
 	return ret;
-}
-
-void SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,
-	DVTARGETDEVICE *ptd,DWORD dwAspect,LONG lindex,
-	DWORD tymed)
-{
-	if(pftc == NULL)
-	{
-		return;
-	}
-
-	pftc->cfFormat	= cfFormat;
-	pftc->tymed		= tymed;
-	pftc->lindex	= lindex;
-	pftc->dwAspect	= dwAspect;
-	pftc->ptd		= ptd;
 }
 
 HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList)

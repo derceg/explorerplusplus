@@ -49,3 +49,5 @@ BOOL			GetFileNameFromUser(HWND hwnd,TCHAR *FullFileName,UINT cchMax,const TCHAR
 /* General helper functions. */
 HINSTANCE		StartCommandPrompt(const TCHAR *Directory, bool Elevated);
 void			GetCPUBrandString(char *pszCPUBrand, UINT cchBuf);
+void			SetFORMATETC(FORMATETC *pftc, CLIPFORMAT cfFormat, DVTARGETDEVICE *ptd, DWORD dwAspect, LONG lindex, DWORD tymed);
+BOOL			CopyTextToClipboard(const std::wstring &str);

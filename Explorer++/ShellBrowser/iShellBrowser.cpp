@@ -591,7 +591,7 @@ BOOL CShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 {
 	TCHAR	szParsingPath[MAX_PATH];
 
-	GetCsidlParsingPath(uFolderCSIDL,szParsingPath,SIZEOF_ARRAY(szParsingPath));
+	GetCsidlDisplayName(uFolderCSIDL,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
 	if(StrCmp(m_CurDir,szParsingPath) == 0)
 		return TRUE;

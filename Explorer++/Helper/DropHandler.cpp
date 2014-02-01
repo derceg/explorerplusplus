@@ -945,7 +945,7 @@ void CDropHandler::CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD 
 			locations. */
 			bOnSameDrive = CheckItemLocations(i);
 
-			dwEffect = DetermineCurrentDragEffect(m_grfKeyState,
+			dwEffect = DetermineDragEffect(m_grfKeyState,
 			m_dwEffect,TRUE,bOnSameDrive);
 		}
 

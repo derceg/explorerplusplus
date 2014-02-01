@@ -697,7 +697,7 @@ BOOL Explorerplusplus::CompareVirtualFolders(TCHAR *szDirectory,UINT uFolderCSID
 {
 	TCHAR szParsingPath[MAX_PATH];
 
-	GetCsidlParsingPath(uFolderCSIDL,szParsingPath,SIZEOF_ARRAY(szParsingPath));
+	GetCsidlDisplayName(uFolderCSIDL,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
 	if(StrCmp(szDirectory,szParsingPath) == 0)
 		return TRUE;
