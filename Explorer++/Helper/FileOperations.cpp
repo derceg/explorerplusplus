@@ -406,12 +406,6 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 	return hr;
 }
 
-struct HANDLETOMAPPINGS
-{
-	UINT			uNumberOfMappings;
-	LPSHNAMEMAPPING	lpSHNameMapping;
-};
-
 int PasteLinksToClipboardFiles(TCHAR *szDestination)
 {
 	return PasteFilesFromClipboardSpecial(szDestination,PASTE_CLIPBOARD_LINK);
