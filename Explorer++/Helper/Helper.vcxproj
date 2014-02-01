@@ -241,6 +241,7 @@
     <ClInclude Include="ReferenceCount.h" />
     <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="ResizableDialog.h" />
+    <ClInclude Include="ResourceHelper.h" />
     <ClInclude Include="SetDefaultFileManager.h" />
     <ClInclude Include="ShellHelper.h" />
     <ClInclude Include="StatusBar.h" />

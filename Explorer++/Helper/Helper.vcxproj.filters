@@ -222,6 +222,9 @@
     <ClInclude Include="StringHelper.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
+    <ClInclude Include="ResourceHelper.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">

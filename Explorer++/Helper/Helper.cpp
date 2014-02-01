@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Helper.h"
+#include "ResourceHelper.h"
 #include "Macros.h"
 
 
@@ -132,13 +133,15 @@ HINSTANCE StartCommandPrompt(const TCHAR *Directory, bool Elevated)
 BOOL GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize)
 {
 	BOOL bSuccess = FALSE;
-	HANDLE hFile = CreateFile(szFileName, GENERIC_READ,
-		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, NULL, NULL);
 
-	if(hFile != INVALID_HANDLE_VALUE)
+	std::unique_ptr<HANDLE, CreateFileDeleter> hFile(
+		CreateFile(szFileName, GENERIC_READ,
+		FILE_SHARE_READ | FILE_SHARE_WRITE,
+		NULL, OPEN_EXISTING, NULL, NULL));
+
+	if(hFile.get() != INVALID_HANDLE_VALUE)
 	{
-		bSuccess = GetFileSizeEx(hFile, lpFileSize);
-		CloseHandle(hFile);
+		bSuccess = GetFileSizeEx(hFile.get(), lpFileSize);
 	}
 
 	return bSuccess;
@@ -170,13 +173,12 @@ HRESULT BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, DWO
 	pagefile, which neither of the two functions
 	above can retrieve the attributes of). */
 	WIN32_FIND_DATA wfd;
-	HANDLE hFindFile = FindFirstFile(lpszFileName, &wfd);
+	std::unique_ptr<HANDLE, FindCloseDeleter> hFindFile(FindFirstFile(lpszFileName, &wfd));
 	HRESULT hr = E_FAIL;
 
-	if(hFindFile != INVALID_HANDLE_VALUE)
+	if(hFindFile.get() != INVALID_HANDLE_VALUE)
 	{
 		hr = BuildFileAttributeString(wfd.dwFileAttributes, szOutput, cchMax);
-		FindClose(hFindFile);
 	}
 
 	return hr;
@@ -216,14 +218,15 @@ BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax)
 {
 	BOOL success = FALSE;
 
-	HANDLE hFile = CreateFile(szFile, READ_CONTROL, FILE_SHARE_READ, NULL,
-		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	std::unique_ptr<HANDLE, CreateFileDeleter> hFile(
+		CreateFile(szFile, READ_CONTROL, FILE_SHARE_READ, NULL,
+		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL));
 
-	if(hFile != INVALID_HANDLE_VALUE)
+	if(hFile.get() != INVALID_HANDLE_VALUE)
 	{
 		PSID pSidOwner = NULL;
 		PSECURITY_DESCRIPTOR pSD = NULL;
-		DWORD dwRet = GetSecurityInfo(hFile, SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION,
+		DWORD dwRet = GetSecurityInfo(hFile.get(), SE_FILE_OBJECT, OWNER_SECURITY_INFORMATION,
 			&pSidOwner, NULL, NULL, NULL, &pSD);
 
 		if(dwRet == ERROR_SUCCESS)
@@ -231,8 +234,6 @@ BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax)
 			success = FormatUserName(pSidOwner, szOwner, cchMax);
 			LocalFree(pSD);
 		}
-
-		CloseHandle(hFile);
 	}
 
 	return success;
@@ -316,20 +317,19 @@ DWORD GetNumFileHardLinks(const TCHAR *lpszFileName)
 {
 	DWORD nLinks = 0;
 
-	HANDLE hFile = CreateFile(lpszFileName, FILE_READ_ATTRIBUTES, FILE_SHARE_READ, NULL,
-		OPEN_EXISTING, NULL, NULL);
+	std::unique_ptr<HANDLE, CreateFileDeleter> hFile(
+		CreateFile(lpszFileName, FILE_READ_ATTRIBUTES,
+		FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL));
 
-	if(hFile != INVALID_HANDLE_VALUE)
+	if(hFile.get() != INVALID_HANDLE_VALUE)
 	{
 		BY_HANDLE_FILE_INFORMATION FileInfo;
-		BOOL bRet = GetFileInformationByHandle(hFile, &FileInfo);
+		BOOL bRet = GetFileInformationByHandle(hFile.get(), &FileInfo);
 
 		if(bRet)
 		{
 			nLinks = FileInfo.nNumberOfLinks;
 		}
-
-		CloseHandle(hFile);
 	}
 
 	return nLinks;
