@@ -20,7 +20,7 @@ class CEnumFormatEtc : public IEnumFORMATETC
 {
 public:
 
-	CEnumFormatEtc(std::list<FORMATETC> feList);
+	CEnumFormatEtc(const std::list<FORMATETC> &feList);
 	~CEnumFormatEtc();
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
@@ -41,14 +41,14 @@ private:
 	int				m_iNumFormats;
 };
 
-HRESULT CreateEnumFormatEtc(std::list<FORMATETC> feList,IEnumFORMATETC **ppEnumFormatEtc)
+HRESULT CreateEnumFormatEtc(const std::list<FORMATETC> &feList,IEnumFORMATETC **ppEnumFormatEtc)
 {
 	*ppEnumFormatEtc = new CEnumFormatEtc(feList);
 
 	return S_OK;
 }
 
-CEnumFormatEtc::CEnumFormatEtc(std::list<FORMATETC> feList)
+CEnumFormatEtc::CEnumFormatEtc(const std::list<FORMATETC> &feList)
 {
 	m_lRefCount = 1;
 	m_iIndex = 0;

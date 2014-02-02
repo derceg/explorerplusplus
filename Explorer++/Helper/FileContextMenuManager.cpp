@@ -23,7 +23,7 @@ LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
 	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
-	LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList) :
+	LPCITEMIDLIST pidlParent, const std::list<LPITEMIDLIST> &pidlItemList) :
 m_hwnd(hwnd),
 m_pidlParent(ILClone(pidlParent)),
 m_pShellContext3(NULL),
@@ -128,7 +128,7 @@ CFileContextMenuManager::~CFileContextMenuManager()
 }
 
 HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
-	int iMinID,int iMaxID,POINT *ppt,CStatusBar *pStatusBar,
+	int iMinID,int iMaxID,const POINT *ppt,CStatusBar *pStatusBar,
 	DWORD_PTR dwData,BOOL bRename,BOOL bExtended)
 {
 	if(m_pActualContext == NULL)

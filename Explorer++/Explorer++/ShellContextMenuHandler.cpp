@@ -21,7 +21,7 @@
 
 #define MENU_OPEN_IN_NEW_TAB	(MAX_SHELL_MENU_ID + 1)
 
-void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
+void Explorerplusplus::AddMenuEntries(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
 	assert(dwData != NULL);
@@ -68,8 +68,8 @@ void Explorerplusplus::AddMenuEntries(LPITEMIDLIST pidlParent,
 	}
 }
 
-BOOL Explorerplusplus::HandleShellMenuItem(LPITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
+BOOL Explorerplusplus::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
+	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
 {
 	FileContextMenuInfo_t *pfcmi = reinterpret_cast<FileContextMenuInfo_t *>(dwData);
 
@@ -143,7 +143,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(LPITEMIDLIST pidlParent,
 	return FALSE;
 }
 
-void Explorerplusplus::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
+void Explorerplusplus::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,int iCmd)
 {
 	switch(iCmd)

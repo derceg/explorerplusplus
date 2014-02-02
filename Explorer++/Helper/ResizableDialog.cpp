@@ -17,10 +17,9 @@
 
 
 CResizableDialog::CResizableDialog(HWND hDlg,
-	const std::list<Control_t> &ControlList)
+	const std::list<Control_t> &ControlList) :
+	m_hDlg(hDlg)
 {
-	m_hDlg = hDlg;
-
 	ControlInternal_t ControlInternal;
 	HWND hwnd;
 	RECT rcDlg;

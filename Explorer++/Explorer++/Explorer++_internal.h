@@ -68,14 +68,14 @@ __interface IExplorerplusplus
 	int				LookupColumnNameStringIndex(int iColumnId);
 	int				LookupColumnDescriptionStringIndex(int iColumnId);
 
-	void			OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
+	void			OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 
 	CStatusBar		*GetStatusBar();
 
 	HRESULT			BrowseFolder(const TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
-	HRESULT			BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
+	HRESULT			BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 
-	void			OpenFileItem(LPITEMIDLIST pidlItem,const TCHAR *szParameters);
+	void			OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
 };
 
 /* Used when setting Explorer++ as the default

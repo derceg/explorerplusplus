@@ -174,15 +174,13 @@ INT_PTR CBaseDialog::GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPA
 
 CBaseDialog::CBaseDialog(HINSTANCE hInstance,int iResource,
 	HWND hParent,bool bResizable) :
-CMessageForwarder()
+CMessageForwarder(),
+m_hInstance(hInstance),
+m_iResource(iResource),
+m_hParent(hParent),
+m_bResizable(bResizable)
 {
-	m_hInstance = hInstance;
-	m_iResource = iResource;
-	m_hParent = hParent;
-	m_bResizable = bResizable;
-
 	m_prd = NULL;
-
 	m_bShowingModelessDialog = FALSE;
 }
 

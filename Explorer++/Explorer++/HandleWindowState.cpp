@@ -502,7 +502,7 @@ void Explorerplusplus::SetTabIcon(int iIndex,int iTabId)
 /* Sets a tabs icon. Normally, this icon
 is the folders icon, however if the tab
 is locked, the icon will be a lock. */
-void Explorerplusplus::SetTabIcon(int iIndex,int iTabId,LPITEMIDLIST pidlDirectory)
+void Explorerplusplus::SetTabIcon(int iIndex,int iTabId,LPCITEMIDLIST pidlDirectory)
 {
 	TCITEM			tcItem;
 	SHFILEINFO		shfi;

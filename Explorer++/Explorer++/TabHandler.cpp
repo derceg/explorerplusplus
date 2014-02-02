@@ -255,7 +255,7 @@ int Explorerplusplus::GenerateUniqueTabId(void)
 		return -1;
 }
 
-HRESULT Explorerplusplus::CreateNewTab(TCHAR *TabDirectory,
+HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
 InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
@@ -287,7 +287,7 @@ int *pTabObjectIndex)
 
 /* Creates a new tab. If the settings argument is NULL,
 the global settings will be used. */
-HRESULT Explorerplusplus::CreateNewTab(LPITEMIDLIST pidlDirectory,
+HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
@@ -482,7 +482,7 @@ int *pTabObjectIndex)
 	/* If we're running on Windows 7, we'll create
 	a proxy window for each tab. This proxy window
 	will create the taskbar thumbnail for that tab. */
-	CreateTabProxy(pidlDirectory,iTabId,bSwitchToNewTab);
+	CreateTabProxy(iTabId,bSwitchToNewTab);
 
 	return S_OK;
 }
@@ -1150,7 +1150,7 @@ void Explorerplusplus::AddDefaultTabIcons(HIMAGELIST himlTab)
 	ImageList_Destroy(himlTemp);
 }
 
-void Explorerplusplus::InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId)
+void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId)
 {
 	TCITEM		tcItem;
 	TCHAR		szTabText[MAX_PATH];
@@ -1428,7 +1428,7 @@ int Explorerplusplus::GetCurrentTabId() const
 	return m_iObjectIndex;
 }
 
-UINT Explorerplusplus::GetDefaultSortMode(const LPITEMIDLIST &pidlDirectory)
+UINT Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory)
 {
 	std::list<Column_t> *pColumns = NULL;
 

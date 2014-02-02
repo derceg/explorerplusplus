@@ -314,8 +314,8 @@ public:
 	ULONG __stdcall		Release(void);
 
 	/* Navigation. */
-	HRESULT				BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags);
-	HRESULT				BrowseFolder(TCHAR *szPath,UINT wFlags);
+	HRESULT				BrowseFolder(const TCHAR *szPath,UINT wFlags);
+	HRESULT				BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags);
 	HRESULT				Refresh(void);
 
 	/* Drag and Drop. */

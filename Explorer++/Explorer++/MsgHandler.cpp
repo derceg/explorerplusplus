@@ -696,7 +696,7 @@ void Explorerplusplus::OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenI
 	CoTaskMemFree(pidl);
 }
 
-void Explorerplusplus::OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	LPITEMIDLIST	pidlItem = NULL;
 	HRESULT			hr;
@@ -711,7 +711,7 @@ void Explorerplusplus::OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNew
 	}
 }
 
-void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	SFGAOF uAttributes = SFGAO_FOLDER|SFGAO_STREAM|SFGAO_LINK;
 	LPITEMIDLIST pidlControlPanel = NULL;
@@ -881,7 +881,7 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 	}
 }
 
-void Explorerplusplus::OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	if(bOpenInNewWindow)
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,FALSE,FALSE,TRUE);
@@ -891,7 +891,7 @@ void Explorerplusplus::OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,B
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER);
 }
 
-void Explorerplusplus::OpenFileItem(LPITEMIDLIST pidlItem,const TCHAR *szParameters)
+void Explorerplusplus::OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters)
 {
 	TCHAR			szItemDirectory[MAX_PATH];
 	LPITEMIDLIST	pidlParent = NULL;
@@ -902,7 +902,7 @@ void Explorerplusplus::OpenFileItem(LPITEMIDLIST pidlItem,const TCHAR *szParamet
 
 	GetDisplayName(pidlParent,szItemDirectory,SIZEOF_ARRAY(szItemDirectory),SHGDN_FORPARSING);
 
-	ExecuteFileAction(m_hContainer,EMPTY_STRING,szParameters,szItemDirectory,(LPCITEMIDLIST)pidlItem);
+	ExecuteFileAction(m_hContainer,EMPTY_STRING,szParameters,szItemDirectory,pidlItem);
 
 	CoTaskMemFree(pidlParent);
 }
@@ -1765,7 +1765,7 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 /* ALL calls to browse a folder in the current tab MUST
 pass through this function. This ensures that tabs that
 have their addresses locked will not change directory. */
-HRESULT Explorerplusplus::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
+HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 {
 	HRESULT hr = E_FAIL;
 	int iTabObjectIndex = -1;
@@ -1794,7 +1794,7 @@ HRESULT Explorerplusplus::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 	return hr;
 }
 
-HRESULT Explorerplusplus::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,
+HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags,
 BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 {
 	HRESULT hr = E_FAIL;

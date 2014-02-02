@@ -2,6 +2,7 @@
 
 #include <list>
 #include <string>
+#include "Macros.h"
 
 #import <msxml3.dll> raw_interfaces_only
 
@@ -18,7 +19,7 @@ public:
 	void			SaveXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	void			LoadXMLSettings(MSXML2::IXMLDOMNamedNodeMap *pam,long lChildNodes);
 
-	bool			GetSettingsKey(TCHAR *out, int outLength) const;
+	bool			GetSettingsKey(TCHAR *out, size_t cchMax) const;
 
 protected:
 
@@ -32,11 +33,10 @@ protected:
 	void			RestoreDialogPosition(HWND hDlg,bool bRestoreSize);
 
 	BOOL			m_bStateSaved;
-	POINT			m_ptDialog;
-	int				m_iWidth;
-	int				m_iHeight;
 
 private:
+
+	DISALLOW_COPY_AND_ASSIGN(CDialogSettings);
 
 	static const TCHAR SETTING_POSITION[];
 	static const TCHAR SETTING_POSITION_X[];
@@ -44,7 +44,10 @@ private:
 	static const TCHAR SETTING_WIDTH[];
 	static const TCHAR SETTING_HEIGHT[];
 
-	TCHAR			m_szSettingsKey[256];
+	const std::wstring m_szSettingsKey;
+	const bool		m_bSavePosition;
 
-	bool			m_bSavePosition;
+	POINT			m_ptDialog;
+	int				m_iWidth;
+	int				m_iHeight;
 };

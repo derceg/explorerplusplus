@@ -26,11 +26,11 @@ namespace NFileOperations
 	BOOL	CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,LPITEMIDLIST *ppidl);
 };
 
-HRESULT	CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax);
+HRESULT	CreateNewFolder(const TCHAR *Directory, TCHAR *szNewFolderName, int cchMax);
 
-HRESULT	CopyFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject);
-HRESULT	CutFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject);
-HRESULT	CopyFilesToClipboard(std::list<std::wstring> FileNameList,BOOL bMove,IDataObject **pClipboardDataObject);
+HRESULT	CopyFiles(const std::list<std::wstring> &FileNameList, IDataObject **pClipboardDataObject);
+HRESULT	CutFiles(const std::list<std::wstring> &FileNameList, IDataObject **pClipboardDataObject);
+HRESULT	CopyFilesToClipboard(const std::list<std::wstring> &FileNameList, BOOL bMove, IDataObject **pClipboardDataObject);
 
-int		PasteLinksToClipboardFiles(TCHAR *szDestination);
-int		PasteHardLinks(TCHAR *szDestination);
+int		PasteLinksToClipboardFiles(const TCHAR *szDestination);
+int		PasteHardLinks(const TCHAR *szDestination);

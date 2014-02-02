@@ -2,4 +2,4 @@
 
 #include <list>
 
-HRESULT CreateEnumFormatEtc(std::list<FORMATETC> feList,IEnumFORMATETC **ppEnumFormatEtc);
+HRESULT CreateEnumFormatEtc(const std::list<FORMATETC> &feList, IEnumFORMATETC **ppEnumFormatEtc);

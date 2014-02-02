@@ -2,6 +2,7 @@
 
 #include <list>
 #include <string>
+#include "Macros.h"
 
 class CStatusBar
 {
@@ -17,7 +18,9 @@ public:
 
 private:
 
-	HWND			m_hwnd;
+	DISALLOW_COPY_AND_ASSIGN(CStatusBar);
+
+	const HWND		m_hwnd;
 
 	int				m_nParts;
 	int				*m_pPartWidths;

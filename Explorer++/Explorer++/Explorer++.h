@@ -405,8 +405,8 @@ private:
 	void					OnNextWindow(void);
 	HRESULT					BrowseFolder(const TCHAR *szPath,UINT wFlags);
 	HRESULT					BrowseFolder(const TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
-	HRESULT					BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags);
-	HRESULT					BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
+	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags);
+	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 	int						DetermineListViewObjectIndex(HWND hListView);
 	void					OnLockToolbars(void);
 	void					LoadAllSettings(ILoadSave **pLoadSave);
@@ -498,9 +498,9 @@ private:
 
 	/* Tabs. */
 	void					SelectAdjacentTab(BOOL bNextTab);
-	HRESULT					CreateNewTab(TCHAR *TabDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
-	HRESULT					CreateNewTab(LPITEMIDLIST pidlDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
-	void					InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
+	HRESULT					CreateNewTab(const TCHAR *TabDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
+	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
+	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
 	bool					CloseTab(int TabIndex);
 	void					RemoveTabFromControl(int iTab);
 	bool					OnCloseTab(void);
@@ -591,7 +591,7 @@ private:
 	void					SetTabIcon(void);
 	void					SetTabIcon(int iTabId);
 	void					SetTabIcon(int iIndex,int iTabId);
-	void					SetTabIcon(int iIndex,int iTabId,LPITEMIDLIST pidlDirectory);
+	void					SetTabIcon(int iIndex,int iTabId,LPCITEMIDLIST pidlDirectory);
 	void					HandleTreeViewSelection(void);
 	void					SetStatusBarParts(int width);
 	void					ResizeWindows(void);
@@ -604,8 +604,8 @@ private:
 
 	/* Windows 7 taskbar thumbnail previews. */
 	void					InitializeTaskbarThumbnails();
-	ATOM					RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirectory);
-	void					CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwitchToNewTab);
+	ATOM					RegisterTabProxyClass(const TCHAR *szClassName);
+	void					CreateTabProxy(int iTabId,BOOL bSwitchToNewTab);
 	void					RegisterTab(HWND hTabProxy,TCHAR *szDisplayName,BOOL bTabActive);
 	HBITMAP					CaptureTabScreenshot(int iTabId);
 	void					GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi);
@@ -647,19 +647,19 @@ private:
 	void					GotoFolder(int FolderCSIDL);
 	void					OpenAllSelectedItems(BOOL bOpenInNewTab);
 	void					OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
-	void					OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
-	void					OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
-	void					OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
-	void					OpenFileItem(LPITEMIDLIST pidlItem,const TCHAR *szParameters);
+	void					OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
+	void					OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
+	void					OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
+	void					OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
 	HRESULT					OnListViewCopy(BOOL bCopy);
 	HRESULT					ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset,UINT iStartOffset);
 	HRESULT					ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles);
 	HRESULT					ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask);
 
 	/* File context menu. */
-	void					AddMenuEntries(LPITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
-	BOOL					HandleShellMenuItem(LPITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,TCHAR *szCmd);
-	void					HandleCustomMenuItem(LPITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,int iCmd);
+	void					AddMenuEntries(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
+	BOOL					HandleShellMenuItem(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd);
+	void					HandleCustomMenuItem(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,int iCmd);
 
 	/* Listview selection file tests. */
 	void					BuildListViewFileSelectionList(HWND hListView,std::list<std::wstring> *pFileSelectionList);
@@ -779,7 +779,7 @@ private:
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	void					PlayNavigationSound(void);
 	CStatusBar				*GetStatusBar();
-	UINT					GetDefaultSortMode(const LPITEMIDLIST &pidlDirectory);
+	UINT					GetDefaultSortMode(LPCITEMIDLIST pidlDirectory);
 	unsigned int			DetermineColumnSortMode(UINT uColumnId);
 	void					FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
 

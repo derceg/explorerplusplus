@@ -624,7 +624,7 @@ int CALLBACK CSearchDialog::SortResultsByPath(LPARAM lParam1,LPARAM lParam2)
 	return StrCmpLogicalW(szPath1,szPath2);
 }
 
-void CSearchDialog::AddMenuEntries(LPITEMIDLIST pidlParent,
+void CSearchDialog::AddMenuEntries(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
 	LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
@@ -653,8 +653,8 @@ void CSearchDialog::AddMenuEntries(LPITEMIDLIST pidlParent,
 	InsertMenuItem(hMenu,1,TRUE,&mii);
 }
 
-BOOL CSearchDialog::HandleShellMenuItem(LPITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
+BOOL CSearchDialog::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
+	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
 {
 	if(StrCmpI(szCmd,_T("open")) == 0)
 	{
@@ -671,7 +671,7 @@ BOOL CSearchDialog::HandleShellMenuItem(LPITEMIDLIST pidlParent,
 	return FALSE;
 }
 
-void CSearchDialog::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
+void CSearchDialog::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,int iCmd)
 {
 	switch(iCmd)

@@ -158,7 +158,7 @@ void Explorerplusplus::SetupJumplistTasks()
 	AddJumpListTasks(TaskList);
 }
 
-ATOM Explorerplusplus::RegisterTabProxyClass(TCHAR *szClassName,LPITEMIDLIST pidlDirectory)
+ATOM Explorerplusplus::RegisterTabProxyClass(const TCHAR *szClassName)
 {
 	WNDCLASSEX wcex;
 	wcex.cbSize			= sizeof(wcex);
@@ -185,7 +185,7 @@ References:
 http://dotnet.dzone.com/news/windows-7-taskbar-tabbed
 http://channel9.msdn.com/learn/courses/Windows7/Taskbar/Win7TaskbarNative/Exercise-Experiment-with-the-New-Windows-7-Taskbar-Features/
 */
-void Explorerplusplus::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL bSwitchToNewTab)
+void Explorerplusplus::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 {
 	HWND hTabProxy;
 	TabProxyInfo_t tpi;
@@ -211,7 +211,7 @@ void Explorerplusplus::CreateTabProxy(LPITEMIDLIST pidlDirectory,int iTabId,BOOL
 
 	StringCchPrintf(szClassName,SIZEOF_ARRAY(szClassName),_T("Explorer++TabProxy%d"),iCount++);
 
-	aRet = RegisterTabProxyClass(szClassName,pidlDirectory);
+	aRet = RegisterTabProxyClass(szClassName);
 
 	if(aRet != 0)
 	{

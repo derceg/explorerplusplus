@@ -19,7 +19,7 @@ public:
 	BOOL	DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL bPermanent,BOOL bSilent);
 
 	void	Undo();
-	BOOL	CanUndo();
+	BOOL	CanUndo() const;
 
 private:
 
@@ -44,5 +44,5 @@ private:
 	void	UndoRenameOperation(const std::list<RenamedItem_t> &RenamedItemList);
 	void	UndoDeleteOperation(const std::list<std::wstring> &DeletedItemList);
 
-	std::stack<UndoItem_t>	stackFileActions;
+	std::stack<UndoItem_t>	m_stackFileActions;
 };

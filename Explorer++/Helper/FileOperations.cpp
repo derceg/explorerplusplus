@@ -29,7 +29,7 @@ enum PasteType
 	PASTE_CLIPBOARD_HARDLINK
 };
 
-int PasteFilesFromClipboardSpecial(TCHAR *szDestination, PasteType pasteType);
+int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteType);
 BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFileSize);
 
 BOOL NFileOperations::RenameFile(const std::wstring &strOldFilename,
@@ -147,7 +147,7 @@ TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &Filenam
 	return pszFilenames;
 }
 
-HRESULT CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax)
+HRESULT CreateNewFolder(const TCHAR *Directory,TCHAR *szNewFolderName,int cchMax)
 {
 	WIN32_FIND_DATA	wfd;
 	HANDLE			hFirstFile;
@@ -348,17 +348,17 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 	return FALSE;
 }
 
-HRESULT CopyFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject)
+HRESULT CopyFiles(const std::list<std::wstring> &FileNameList,IDataObject **pClipboardDataObject)
 {
 	return CopyFilesToClipboard(FileNameList,FALSE,pClipboardDataObject);
 }
 
-HRESULT CutFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject)
+HRESULT CutFiles(const std::list<std::wstring> &FileNameList,IDataObject **pClipboardDataObject)
 {
 	return CopyFilesToClipboard(FileNameList,TRUE,pClipboardDataObject);
 }
 
-HRESULT CopyFilesToClipboard(std::list<std::wstring> FileNameList,
+HRESULT CopyFilesToClipboard(const std::list<std::wstring> &FileNameList,
 BOOL bMove,IDataObject **pClipboardDataObject)
 {
 	FORMATETC ftc[2];
@@ -406,18 +406,18 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 	return hr;
 }
 
-int PasteLinksToClipboardFiles(TCHAR *szDestination)
+int PasteLinksToClipboardFiles(const TCHAR *szDestination)
 {
 	return PasteFilesFromClipboardSpecial(szDestination,PASTE_CLIPBOARD_LINK);
 }
 
-int PasteHardLinks(TCHAR *szDestination)
+int PasteHardLinks(const TCHAR *szDestination)
 {
 	return PasteFilesFromClipboardSpecial(szDestination,PASTE_CLIPBOARD_HARDLINK);
 }
 
 /* TODO: Use CDropHandler. */
-int PasteFilesFromClipboardSpecial(TCHAR *szDestination,PasteType pasteType)
+int PasteFilesFromClipboardSpecial(const TCHAR *szDestination,PasteType pasteType)
 {
 	IDataObject	*ClipboardObject = NULL;
 	DROPFILES	*pdf = NULL;

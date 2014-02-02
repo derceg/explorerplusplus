@@ -3,6 +3,7 @@
 #include "ResizableDialog.h"
 #include "MessageForwarder.h"
 #include "ReferenceCount.h"
+#include "Macros.h"
 
 __interface IModelessDialogNotification : public IReferenceCount
 {
@@ -45,17 +46,19 @@ protected:
 
 private:
 
+	DISALLOW_COPY_AND_ASSIGN(CBaseDialog);
+
 	INT_PTR CALLBACK	BaseDialogProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	HINSTANCE		m_hInstance;
-	int				m_iResource;
-	HWND			m_hParent;
+	const HINSTANCE	m_hInstance;
+	const int		m_iResource;
+	const HWND		m_hParent;
 	IModelessDialogNotification	*m_pmdn;
 
 	BOOL			m_bShowingModelessDialog;
 
 	/* Used only with resizable dialogs. */
-	bool			m_bResizable;
+	const bool		m_bResizable;
 	DialogSizeConstraint	m_dsc;
 	int				m_iMinWidth;
 	int				m_iMinHeight;

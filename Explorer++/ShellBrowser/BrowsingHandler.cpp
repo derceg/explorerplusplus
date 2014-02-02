@@ -24,7 +24,7 @@
 #include "../Helper/Macros.h"
 
 
-HRESULT CShellBrowser::BrowseFolder(TCHAR *szPath,UINT wFlags)
+HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath,UINT wFlags)
 {
 	LPITEMIDLIST pidlDirectory = NULL;
 	HRESULT hr = GetIdlFromParsingName(szPath,&pidlDirectory);
@@ -39,7 +39,7 @@ HRESULT CShellBrowser::BrowseFolder(TCHAR *szPath,UINT wFlags)
 	return hr;
 }
 
-HRESULT CShellBrowser::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
+HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 {
 	SetCursor(LoadCursor(NULL,IDC_WAIT));
 

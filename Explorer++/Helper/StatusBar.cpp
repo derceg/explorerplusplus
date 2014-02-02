@@ -16,10 +16,9 @@
 #include "StatusBar.h"
 
 
-CStatusBar::CStatusBar(HWND hwnd)
+CStatusBar::CStatusBar(HWND hwnd) :
+m_hwnd(hwnd)
 {
-	m_hwnd = hwnd;
-
 	m_bAlteredStatusBarParts = false;
 	m_nParts = 0;
 }
