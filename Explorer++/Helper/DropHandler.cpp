@@ -1215,8 +1215,8 @@ void CDropHandler::CreateShortcutToDroppedFile(TCHAR *szFullFileName)
 	NFileOperations::CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
 }
 
-HRESULT CDropHandler::CopyTextToFile(IN TCHAR *pszDestDirectory,
-	IN WCHAR *pszText,OUT TCHAR *pszFullFileNameOut)
+HRESULT CDropHandler::CopyTextToFile(const TCHAR *pszDestDirectory,
+	const WCHAR *pszText,TCHAR *pszFullFileNameOut)
 {
 	SYSTEMTIME st;
 	FILETIME ft;

@@ -516,16 +516,9 @@ BOOL bDataAccept,BOOL bOnSameDrive)
 	return dwEffect;
 }
 
-HRESULT BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
-	IN std::list<std::wstring> FilenameList)
+HRESULT BuildHDropList(FORMATETC *pftc,STGMEDIUM *pstg,
+	const std::list<std::wstring> &FilenameList)
 {
-	if(pftc == NULL ||
-		pstg == NULL ||
-		FilenameList.size() == 0)
-	{
-		return E_FAIL;
-	}
-
 	SetFORMATETC(pftc,CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
 
 	UINT uSize = 0;
@@ -586,9 +579,9 @@ HRESULT BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
 /* Builds a CIDA structure. Returns the structure and its size
 via arguments.
 Returns S_OK on success; E_FAIL on failure. */
-HRESULT BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
-	IN LPCITEMIDLIST pidlDirectory,
-	IN std::list<LPITEMIDLIST> pidlList)
+HRESULT BuildShellIDList(FORMATETC *pftc,STGMEDIUM *pstg,
+	LPCITEMIDLIST pidlDirectory,
+	const std::list<LPITEMIDLIST> &pidlList)
 {
 	if(pftc == NULL ||
 		pstg == NULL ||
@@ -987,8 +980,8 @@ is up to the caller to free both the DLL's and objects
 returned.
 
 http://www.ureader.com/msg/16601280.aspx */
-BOOL LoadContextMenuHandlers(IN const TCHAR *szRegKey,
-	OUT std::list<ContextMenuHandler_t> *pContextMenuHandlers)
+BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
+	std::list<ContextMenuHandler_t> &ContextMenuHandlers)
 {
 	HKEY hKey = NULL;
 	BOOL bSuccess = FALSE;
@@ -1029,7 +1022,7 @@ BOOL LoadContextMenuHandlers(IN const TCHAR *szRegKey,
 
 					if(bRes)
 					{
-						pContextMenuHandlers->push_back(ContextMenuHandler);
+						ContextMenuHandlers.push_back(ContextMenuHandler);
 					}
 				}
 
@@ -1055,8 +1048,8 @@ will attempted to be loaded.
 Regardless of whether or not a DLL was actually
 loaded, the object will be initialized with a call
 to CoCreateInstance. */
-BOOL LoadIUnknownFromCLSID(IN const TCHAR *szCLSID,
-OUT ContextMenuHandler_t *pContextMenuHandler)
+BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID,
+	ContextMenuHandler_t *pContextMenuHandler)
 {
 	HKEY hCLSIDKey;
 	HKEY hDllKey;

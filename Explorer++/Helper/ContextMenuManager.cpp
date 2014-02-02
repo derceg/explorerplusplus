@@ -67,7 +67,7 @@ CContextMenuManager::CContextMenuManager(ContextMenuType_t ContextMenuType,
 		return;
 	}
 
-	BOOL bRet = LoadContextMenuHandlers(pszRegContext,&m_ContextMenuHandlers);
+	BOOL bRet = LoadContextMenuHandlers(pszRegContext,m_ContextMenuHandlers);
 
 	if(!bRet)
 	{
