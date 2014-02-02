@@ -698,20 +698,25 @@ BOOL CopyTextToClipboard(const std::wstring &str)
 
 	EmptyClipboard();
 
-	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, (str.size() + 1) * sizeof(TCHAR));
+	size_t stringSize = (str.size() + 1) * sizeof(TCHAR);
+	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE, stringSize);
 	BOOL bRes = FALSE;
 
 	if(hGlobal != NULL)
 	{
 		LPVOID pMem = GlobalLock(hGlobal);
-		memcpy(pMem, str.c_str(), (str.size() + 1) * sizeof(TCHAR));
-		GlobalUnlock(hGlobal);
 
-		HANDLE hData = SetClipboardData(CF_UNICODETEXT, hGlobal);
-
-		if(hData != NULL)
+		if(pMem != NULL)
 		{
-			bRes = TRUE;
+			memcpy(pMem, str.c_str(), stringSize);
+			GlobalUnlock(hGlobal);
+
+			HANDLE hData = SetClipboardData(CF_UNICODETEXT, hGlobal);
+
+			if(hData != NULL)
+			{
+				bRes = TRUE;
+			}
 		}
 	}
 
