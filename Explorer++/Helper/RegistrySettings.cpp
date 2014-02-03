@@ -33,7 +33,7 @@ LONG NRegistrySettings::ReadDwordFromRegistry(HKEY hKey,const TCHAR *szKey,DWORD
 LONG NRegistrySettings::SaveStringToRegistry(HKEY hKey,const TCHAR *szKey,const TCHAR *szValue)
 {
 	return RegSetValueEx(hKey,szKey,0,REG_SZ,reinterpret_cast<const BYTE *>(szValue),
-		lstrlen(szValue) * sizeof(TCHAR));
+		(lstrlen(szValue) + 1) * sizeof(TCHAR));
 }
 
 LONG NRegistrySettings::ReadStringFromRegistry(HKEY hKey,const TCHAR *szKey,TCHAR *szOutput,DWORD cchMax)
