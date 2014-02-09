@@ -32,9 +32,12 @@ The value of the "command" sub-key will be of the form:
 #include "stdafx.h"
 #include "Helper.h"
 #include "ProcessHelper.h"
+#include "RegistrySettings.h"
 #include "SetDefaultFileManager.h"
 #include "Macros.h"
 
+
+using namespace NRegistrySettings;
 
 namespace NDefaultFileManagerInternal
 {
@@ -66,7 +69,12 @@ BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(NDefaultFileMa
 	OSVERSIONINFO osvi;
 	osvi.dwOSVersionInfoSize = sizeof(osvi);
 
-	GetVersionEx(&osvi);
+	BOOL bRet = GetVersionEx(&osvi);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
 
 	if(osvi.dwMajorVersion == WINDOWS_XP_MAJORVERSION &&
 		ReplacementType == NDefaultFileManager::REPLACEEXPLORER_ALL)
@@ -91,69 +99,63 @@ BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(NDefaultFileMa
 		break;
 	}
 
-	HKEY hKeyShell;
-	LONG lRes;
 	BOOL bSuccess = FALSE;
 
-	lRes = RegOpenKeyEx(HKEY_CLASSES_ROOT,
+	HKEY hKeyShell;
+	LONG lRes = RegOpenKeyEx(HKEY_CLASSES_ROOT,
 		pszSubKey,0,KEY_WRITE,&hKeyShell);
 
 	if(lRes == ERROR_SUCCESS)
 	{
 		HKEY hKeyApp;
-		DWORD Disposition;
-
 		lRes = RegCreateKeyEx(hKeyShell,szInternalCommand,
 			0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,
-			NULL,&hKeyApp,&Disposition);
+			NULL,&hKeyApp,NULL);
 
 		if(lRes == ERROR_SUCCESS)
 		{
-			HKEY hKeyCommand;
-
 			/* Now, set the defaault value for the key. This
 			default value will be the text that is shown on the
 			context menu for folders. */
-			RegSetValueEx(hKeyApp,NULL,0,REG_SZ,reinterpret_cast<const BYTE *>(szMenuText),
-				(lstrlen(szMenuText) + 1) * sizeof(TCHAR));
-
-			/* Now, create the "command" sub-key. */
-			lRes = RegCreateKeyEx(hKeyApp,_T("command"),
-				0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,
-				NULL,&hKeyCommand,&Disposition);
+			lRes = SaveStringToRegistry(hKeyApp, NULL, szMenuText);
 
 			if(lRes == ERROR_SUCCESS)
 			{
-				TCHAR szCommand[512];
-				TCHAR szExecutable[MAX_PATH];
-
-				/* Get the current location of the program, and use
-				it as part of the command. */
-				GetProcessImageName(GetCurrentProcessId(),szExecutable,
-					SIZEOF_ARRAY(szExecutable));
-
-				StringCchPrintf(szCommand,SIZEOF_ARRAY(szCommand),
-					_T("\"%s\" \"%%1\""),szExecutable);
-
-				/* ...and write the command out. */
-				lRes = RegSetValueEx(hKeyCommand,NULL,0,REG_SZ,
-					reinterpret_cast<LPBYTE>(szCommand),
-					(lstrlen(szCommand) + 1) * sizeof(TCHAR));
+				/* Now, create the "command" sub-key. */
+				HKEY hKeyCommand;
+				lRes = RegCreateKeyEx(hKeyApp, _T("command"),
+					0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE,
+					NULL, &hKeyCommand, NULL);
 
 				if(lRes == ERROR_SUCCESS)
 				{
-					/* Set the current entry as the default. */
-					lRes = RegSetValueEx(hKeyShell,NULL,0,REG_SZ,
-						reinterpret_cast<const BYTE *>(szInternalCommand),
-						(lstrlen(szInternalCommand) + 1) * sizeof(TCHAR));
+					TCHAR szCommand[512];
+					TCHAR szExecutable[MAX_PATH];
+
+					/* Get the current location of the program, and use
+					it as part of the command. */
+					GetProcessImageName(GetCurrentProcessId(), szExecutable,
+						SIZEOF_ARRAY(szExecutable));
+
+					StringCchPrintf(szCommand, SIZEOF_ARRAY(szCommand),
+						_T("\"%s\" \"%%1\""), szExecutable);
+
+					/* ...and write the command out. */
+					lRes = SaveStringToRegistry(hKeyCommand, NULL, szCommand);
 
 					if(lRes == ERROR_SUCCESS)
 					{
-						bSuccess = TRUE;
-					}
-				}
+						/* Set the current entry as the default. */
+						lRes = SaveStringToRegistry(hKeyShell, NULL, szInternalCommand);
 
-				RegCloseKey(hKeyCommand);
+						if(lRes == ERROR_SUCCESS)
+						{
+							bSuccess = TRUE;
+						}
+					}
+
+					RegCloseKey(hKeyCommand);
+				}
 			}
 
 			RegCloseKey(hKeyApp);
@@ -226,9 +228,7 @@ BOOL NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(NDefaultFil
 
 	if(lRes == ERROR_SUCCESS)
 	{
-		lRes = RegSetValueEx(hKeyShell,NULL,0,REG_SZ,
-			reinterpret_cast<const BYTE *>(pszDefaultValue),
-			(lstrlen(pszDefaultValue) + 1) * sizeof(TCHAR));
+		lRes = SaveStringToRegistry(hKeyShell, NULL, pszDefaultValue);
 
 		if(lRes == ERROR_SUCCESS)
 		{
