@@ -184,6 +184,7 @@
     <ClCompile Include="FileActionHandler.cpp" />
     <ClCompile Include="FileContextMenuManager.cpp" />
     <ClCompile Include="FileOperations.cpp" />
+    <ClCompile Include="FileWrappers.cpp" />
     <ClCompile Include="FolderSize.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="iDataObject.cpp" />
@@ -227,6 +228,7 @@
     <ClInclude Include="FileActionHandler.h" />
     <ClInclude Include="FileContextMenuManager.h" />
     <ClInclude Include="FileOperations.h" />
+    <ClInclude Include="FileWrappers.h" />
     <ClInclude Include="FolderSize.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="iDataObject.h" />
@@ -241,7 +243,6 @@
     <ClInclude Include="ReferenceCount.h" />
     <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="ResizableDialog.h" />
-    <ClInclude Include="ResourceHelper.h" />
     <ClInclude Include="SetDefaultFileManager.h" />
     <ClInclude Include="ShellHelper.h" />
     <ClInclude Include="StatusBar.h" />
@@ -249,6 +250,7 @@
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="TabHelper.h" />
     <ClInclude Include="TimeHelper.h" />
+    <ClInclude Include="UniqueHandle.h" />
     <ClInclude Include="WindowHelper.h" />
     <ClInclude Include="XMLSettings.h" />
   </ItemGroup>

@@ -109,6 +109,9 @@
     <ClCompile Include="StringHelper.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="FileWrappers.cpp">
+      <Filter>Resource Wrappers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -222,8 +225,11 @@
     <ClInclude Include="StringHelper.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceHelper.h">
-      <Filter>Miscellaneous</Filter>
+    <ClInclude Include="FileWrappers.h">
+      <Filter>Resource Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="UniqueHandle.h">
+      <Filter>Resource Wrappers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -250,6 +256,9 @@
     </Filter>
     <Filter Include="Miscellaneous">
       <UniqueIdentifier>{a38722e8-52ce-4c89-9647-355edcdc155d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Wrappers">
+      <UniqueIdentifier>{343c29c4-2960-44de-8115-240e788f10a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

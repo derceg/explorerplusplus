@@ -13,7 +13,7 @@
 
 #include "stdafx.h"
 #include "Helper.h"
-#include "ResourceHelper.h"
+#include "FileWrappers.h"
 #include "Macros.h"
 
 
@@ -134,12 +134,11 @@ BOOL GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize)
 {
 	BOOL bSuccess = FALSE;
 
-	std::unique_ptr<HANDLE, CreateFileDeleter> hFile(
-		CreateFile(szFileName, GENERIC_READ,
+	HFilePtr hFile = CreateFilePtr(szFileName, GENERIC_READ,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
-		NULL, OPEN_EXISTING, NULL, NULL));
+		NULL, OPEN_EXISTING, NULL, NULL);
 
-	if(hFile.get() != INVALID_HANDLE_VALUE)
+	if(hFile)
 	{
 		bSuccess = GetFileSizeEx(hFile.get(), lpFileSize);
 	}
@@ -173,10 +172,10 @@ HRESULT BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, DWO
 	pagefile, which neither of the two functions
 	above can retrieve the attributes of). */
 	WIN32_FIND_DATA wfd;
-	std::unique_ptr<HANDLE, FindCloseDeleter> hFindFile(FindFirstFile(lpszFileName, &wfd));
+	HFindFilePtr hFindFile = FindFirstFilePtr(lpszFileName, &wfd);
 	HRESULT hr = E_FAIL;
 
-	if(hFindFile.get() != INVALID_HANDLE_VALUE)
+	if(hFindFile)
 	{
 		hr = BuildFileAttributeString(wfd.dwFileAttributes, szOutput, cchMax);
 	}
@@ -218,11 +217,10 @@ BOOL GetFileOwner(const TCHAR *szFile, TCHAR *szOwner, size_t cchMax)
 {
 	BOOL success = FALSE;
 
-	std::unique_ptr<HANDLE, CreateFileDeleter> hFile(
-		CreateFile(szFile, READ_CONTROL, FILE_SHARE_READ, NULL,
-		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL));
+	HFilePtr hFile = CreateFilePtr(szFile, READ_CONTROL, FILE_SHARE_READ, NULL,
+		OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 
-	if(hFile.get() != INVALID_HANDLE_VALUE)
+	if(hFile)
 	{
 		PSID pSidOwner = NULL;
 		PSECURITY_DESCRIPTOR pSD = NULL;
@@ -317,11 +315,10 @@ DWORD GetNumFileHardLinks(const TCHAR *lpszFileName)
 {
 	DWORD nLinks = 0;
 
-	std::unique_ptr<HANDLE, CreateFileDeleter> hFile(
-		CreateFile(lpszFileName, FILE_READ_ATTRIBUTES,
-		FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL));
+	HFilePtr hFile = CreateFilePtr(lpszFileName, FILE_READ_ATTRIBUTES,
+		FILE_SHARE_READ, NULL, OPEN_EXISTING, NULL, NULL);
 
-	if(hFile.get() != INVALID_HANDLE_VALUE)
+	if(hFile)
 	{
 		BY_HANDLE_FILE_INFORMATION FileInfo;
 		BOOL bRet = GetFileInformationByHandle(hFile.get(), &FileInfo);
