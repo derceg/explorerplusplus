@@ -100,6 +100,7 @@
     </ClCompile>
     <ClCompile Include="TestBookmarks.cpp" />
     <ClCompile Include="TestDataObject.cpp" />
+    <ClCompile Include="TestFolderSize.cpp" />
     <ClCompile Include="TestHelper.cpp" />
     <ClCompile Include="TestRegistry.cpp" />
     <ClCompile Include="TestShellHelper.cpp" />
