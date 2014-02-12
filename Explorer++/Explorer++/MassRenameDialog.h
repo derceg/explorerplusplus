@@ -15,14 +15,6 @@ public:
 
 	static CMassRenameDialogPersistentSettings &GetInstance();
 
-protected:
-
-	void			SaveExtraRegistrySettings(HKEY hKey);
-	void			LoadExtraRegistrySettings(HKEY hKey);
-
-	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
-	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
-
 private:
 
 	friend CMassRenameDialog;
@@ -38,6 +30,12 @@ private:
 
 	CMassRenameDialogPersistentSettings(const CMassRenameDialogPersistentSettings &);
 	CMassRenameDialogPersistentSettings & operator=(const CMassRenameDialogPersistentSettings &);
+
+	void SaveExtraRegistrySettings(HKEY hKey);
+	void LoadExtraRegistrySettings(HKEY hKey);
+
+	void SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pParentNode);
+	void LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	int	m_iColumnWidth1;
 	int	m_iColumnWidth2;
@@ -57,11 +55,10 @@ protected:
 	INT_PTR	OnClose();
 	INT_PTR	OnDestroy();
 
-	void	SaveState();
-
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
-
 private:
+
+	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void	SaveState();
 
 	void	OnOk();
 	void	OnCancel();

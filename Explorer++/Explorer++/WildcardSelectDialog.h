@@ -18,14 +18,6 @@ public:
 
 	static			CWildcardSelectDialogPersistentSettings &GetInstance();
 
-protected:
-
-	void			SaveExtraRegistrySettings(HKEY hKey);
-	void			LoadExtraRegistrySettings(HKEY hKey);
-
-	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
-	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
-
 private:
 
 	friend			CWildcardSelectDialog;
@@ -39,6 +31,12 @@ private:
 
 	CWildcardSelectDialogPersistentSettings(const CWildcardSelectDialogPersistentSettings &);
 	CWildcardSelectDialogPersistentSettings & operator=(const CWildcardSelectDialogPersistentSettings &);
+
+	void			SaveExtraRegistrySettings(HKEY hKey);
+	void			LoadExtraRegistrySettings(HKEY hKey);
+
+	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pParentNode);
+	void			LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	TCHAR			m_szPattern[256];
 	std::list<std::wstring>	m_PatternList;
@@ -58,11 +56,10 @@ protected:
 	INT_PTR	OnClose();
 	INT_PTR	OnDestroy();
 
-	void	SaveState();
-
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
-
 private:
+
+	void				GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void				SaveState();
 
 	void				OnOk();
 	void				OnCancel();

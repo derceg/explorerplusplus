@@ -59,15 +59,14 @@ protected:
 	INT_PTR	OnDestroy();
 	INT_PTR	OnNcDestroy();
 
-	void	SaveState();
-
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
-
 private:
 
 	static const COLORREF ERROR_BACKGROUND_COLOR = RGB(255,188,188);
 
 	CAddBookmarkDialog & operator = (const CAddBookmarkDialog &abd);
+
+	void		GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void		SaveState();
 
 	void		SetDialogIcon();
 

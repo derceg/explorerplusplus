@@ -23,12 +23,6 @@ public:
 
 protected:
 
-	virtual void	SaveExtraRegistrySettings(HKEY hKey);
-	virtual void	LoadExtraRegistrySettings(HKEY hKey);
-
-	virtual void	SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
-	virtual void	LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
-
 	void			SaveDialogPosition(HWND hDlg);
 	void			RestoreDialogPosition(HWND hDlg,bool bRestoreSize);
 
@@ -43,6 +37,12 @@ private:
 	static const TCHAR SETTING_POSITION_Y[];
 	static const TCHAR SETTING_WIDTH[];
 	static const TCHAR SETTING_HEIGHT[];
+
+	virtual void	SaveExtraRegistrySettings(HKEY hKey);
+	virtual void	LoadExtraRegistrySettings(HKEY hKey);
+
+	virtual void	SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pParentNode);
+	virtual void	LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	const std::wstring m_szSettingsKey;
 	const bool		m_bSavePosition;

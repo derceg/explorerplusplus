@@ -24,14 +24,6 @@ public:
 
 	static CSearchDialogPersistentSettings &GetInstance();
 
-protected:
-
-	void			SaveExtraRegistrySettings(HKEY hKey);
-	void			LoadExtraRegistrySettings(HKEY hKey);
-
-	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
-	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
-
 private:
 
 	friend CSearchDialog;
@@ -74,6 +66,12 @@ private:
 
 	CSearchDialogPersistentSettings(const CSearchDialogPersistentSettings &);
 	CSearchDialogPersistentSettings & operator=(const CSearchDialogPersistentSettings &);
+
+	void						SaveExtraRegistrySettings(HKEY hKey);
+	void						LoadExtraRegistrySettings(HKEY hKey);
+
+	void						SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pParentNode);
+	void						LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	template <typename T> void	CircularBufferToList(const boost::circular_buffer<T> &cb,std::list<T> &list);
 	template <typename T> void	ListToCircularBuffer(const std::list<T> &list,boost::circular_buffer<T> &cb);
@@ -156,11 +154,7 @@ protected:
 	INT_PTR	OnClose();
 	INT_PTR	OnNcDestroy();
 
-	void	SaveState();
-
 	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
-
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
 private:
 
@@ -172,6 +166,9 @@ private:
 	static const int MAX_SHELL_MENU_ID = 1000;
 
 	static const int MENU_ID_OPEN_FILE_LOCATION = (MAX_SHELL_MENU_ID + 1);
+
+	void						GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void						SaveState();
 
 	void						OnSearch();
 	void						StartSearching();

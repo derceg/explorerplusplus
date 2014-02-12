@@ -39,9 +39,6 @@ protected:
 
 	INT_PTR			GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	virtual void	GetResizableControlInformation(DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
-	virtual void	SaveState();
-
 	HWND			m_hDlg;
 
 private:
@@ -49,6 +46,9 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(CBaseDialog);
 
 	INT_PTR CALLBACK	BaseDialogProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
+
+	virtual void	GetResizableControlInformation(DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	virtual void	SaveState();
 
 	const HINSTANCE	m_hInstance;
 	const int		m_iResource;

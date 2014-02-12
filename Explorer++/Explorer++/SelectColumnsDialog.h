@@ -41,11 +41,10 @@ protected:
 	INT_PTR	OnClose();
 	INT_PTR	OnDestroy();
 
-	void	SaveState();
-
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
-
 private:
+
+	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void	SaveState();
 
 	void	OnOk();
 	void	OnCancel();

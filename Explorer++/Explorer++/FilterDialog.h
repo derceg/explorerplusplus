@@ -16,14 +16,6 @@ public:
 
 	static CFilterDialogPersistentSettings &GetInstance();
 
-protected:
-
-	void			SaveExtraRegistrySettings(HKEY hKey);
-	void			LoadExtraRegistrySettings(HKEY hKey);
-
-	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
-	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
-
 private:
 
 	friend CFilterDialog;
@@ -36,6 +28,12 @@ private:
 
 	CFilterDialogPersistentSettings(const CFilterDialogPersistentSettings &);
 	CFilterDialogPersistentSettings & operator=(const CFilterDialogPersistentSettings &);
+
+	void SaveExtraRegistrySettings(HKEY hKey);
+	void LoadExtraRegistrySettings(HKEY hKey);
+
+	void SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pParentNode);
+	void LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	std::list<std::wstring>	m_FilterList;
 };
@@ -53,11 +51,11 @@ protected:
 	INT_PTR				OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR				OnClose();
 	INT_PTR				OnDestroy();
-	void				SaveState();
-
-	void				GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
 
 private:
+
+	void				GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void				SaveState();
 
 	void				OnOk();
 	void				OnCancel();

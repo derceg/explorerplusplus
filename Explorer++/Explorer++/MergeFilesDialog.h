@@ -62,13 +62,12 @@ protected:
 	INT_PTR	OnClose();
 	INT_PTR	OnDestroy();
 
-	void	SaveState();
-
 	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
-
 private:
+
+	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void	SaveState();
 
 	void	OnOk();
 	void	OnCancel();

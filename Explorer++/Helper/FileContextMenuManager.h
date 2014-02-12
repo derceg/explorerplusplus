@@ -8,18 +8,18 @@ __interface IFileContextMenuExternal
 {
 	/* Allows the caller to add custom entries to the
 	context menu before it is shown. */
-	virtual void	AddMenuEntries(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
+	void	AddMenuEntries(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
 
 	/* Allows the caller to handle the processing
 	of a shell menu item. For example, the 'Open'
 	item may be processed internally.
 	Returns TRUE if the item was processed;
 	FALSE otherwise. */
-	virtual BOOL	HandleShellMenuItem(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd);
+	BOOL	HandleShellMenuItem(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd);
 
 	/* Handles the processing for one of the menu
 	items that was added by the caller. */
-	virtual void	HandleCustomMenuItem(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,int iCmd);
+	void	HandleCustomMenuItem(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,int iCmd);
 };
 
 class CFileContextMenuManager
