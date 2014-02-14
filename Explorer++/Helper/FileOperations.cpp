@@ -363,8 +363,6 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 {
 	FORMATETC ftc[2];
 	STGMEDIUM stg[2];
-	HRESULT hr;
-
 	BuildHDropList(&ftc[0],&stg[0],FileNameList);
 
 	ftc[1].cfFormat			= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
@@ -372,35 +370,47 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 	ftc[1].dwAspect			= DVASPECT_CONTENT;
 	ftc[1].lindex			= -1;
 	ftc[1].tymed			= TYMED_HGLOBAL;
-	
+
+	HRESULT hr = E_FAIL;
 	HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
 
-	DWORD *pdwCopyEffect = static_cast<DWORD *>(GlobalLock(hglb));
-
-	if(bMove)
-		*pdwCopyEffect = DROPEFFECT_MOVE;
-	else
-		*pdwCopyEffect = DROPEFFECT_COPY;
-
-	GlobalUnlock(hglb);
-
-	stg[1].pUnkForRelease	= 0;
-
-	stg[1].hGlobal			= hglb;
-	stg[1].tymed			= TYMED_HGLOBAL;
-
-	hr = CreateDataObject(ftc,stg,pClipboardDataObject,2);
-
-	IAsyncOperation *pAsyncOperation = NULL;
-
-	(*pClipboardDataObject)->QueryInterface(IID_IAsyncOperation,(void **)&pAsyncOperation);
-
-	pAsyncOperation->SetAsyncMode(TRUE);
-	pAsyncOperation->Release();
-
-	if(SUCCEEDED(hr))
+	if(hglb != NULL)
 	{
-		hr = OleSetClipboard(*pClipboardDataObject);
+		DWORD *pdwCopyEffect = static_cast<DWORD *>(GlobalLock(hglb));
+
+		if(pdwCopyEffect != NULL)
+		{
+			if(bMove)
+			{
+				*pdwCopyEffect = DROPEFFECT_MOVE;
+			}
+			else
+			{
+				*pdwCopyEffect = DROPEFFECT_COPY;
+			}
+
+			GlobalUnlock(hglb);
+
+			stg[1].pUnkForRelease = NULL;
+			stg[1].hGlobal = hglb;
+			stg[1].tymed = TYMED_HGLOBAL;
+
+			hr = CreateDataObject(ftc, stg, pClipboardDataObject, 2);
+
+			if(SUCCEEDED(hr))
+			{
+				IAsyncOperation *pAsyncOperation = NULL;
+				hr = (*pClipboardDataObject)->QueryInterface(IID_IAsyncOperation, reinterpret_cast<void **>(&pAsyncOperation));
+
+				if(SUCCEEDED(hr))
+				{
+					pAsyncOperation->SetAsyncMode(TRUE);
+					pAsyncOperation->Release();
+
+					hr = OleSetClipboard(*pClipboardDataObject);
+				}
+			}
+		}
 	}
 
 	return hr;
