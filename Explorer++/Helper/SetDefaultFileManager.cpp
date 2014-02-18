@@ -41,9 +41,9 @@ using namespace NRegistrySettings;
 
 namespace NDefaultFileManagerInternal
 {
-	const TCHAR *KEY_DIRECTORY_SHELL	= _T("Directory\\shell");
-	const TCHAR *KEY_FOLDER_SHELL		= _T("Folder\\shell");
-	const TCHAR *SHELL_DEFAULT_VALUE	= _T("none");
+	const TCHAR KEY_DIRECTORY_SHELL[]	= _T("Directory\\shell");
+	const TCHAR KEY_FOLDER_SHELL[]		= _T("Folder\\shell");
+	const TCHAR SHELL_DEFAULT_VALUE[]	= _T("none");
 
 	BOOL SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t ReplacementType,
 		const TCHAR *szInternalCommand, const TCHAR *szMenuText);
@@ -86,14 +86,11 @@ BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(NDefaultFileMa
 
 	switch(ReplacementType)
 	{
-	case NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM:
-		pszSubKey = KEY_DIRECTORY_SHELL;
-		break;
-
 	case NDefaultFileManager::REPLACEEXPLORER_ALL:
 		pszSubKey = KEY_FOLDER_SHELL;
 		break;
 
+	case NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM:
 	default:
 		pszSubKey = KEY_DIRECTORY_SHELL;
 		break;
@@ -203,16 +200,12 @@ BOOL NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(NDefaultFil
 
 	switch(ReplacementType)
 	{
-	case NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM:
-		pszSubKey = KEY_DIRECTORY_SHELL;
-		pszDefaultValue = SHELL_DEFAULT_VALUE;
-		break;
-
 	case NDefaultFileManager::REPLACEEXPLORER_ALL:
 		pszSubKey = KEY_FOLDER_SHELL;
 		pszDefaultValue = EMPTY_STRING;
 		break;
 
+	case NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM:
 	default:
 		pszSubKey = KEY_DIRECTORY_SHELL;
 		pszDefaultValue = SHELL_DEFAULT_VALUE;
