@@ -28,7 +28,7 @@ CStatusBar::~CStatusBar()
 
 }
 
-void CStatusBar::SetPartText(int iPart,TCHAR *szText)
+void CStatusBar::SetPartText(int iPart, const TCHAR *szText)
 {
 	SendMessage(m_hwnd,SB_SETTEXT,MAKEWORD(iPart,0),
 		reinterpret_cast<LPARAM>(szText));

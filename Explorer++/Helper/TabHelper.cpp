@@ -77,10 +77,16 @@ BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 	return TRUE;
 }
 
-BOOL TabCtrl_SetItemText(HWND hTabCtrl, int iItem, TCHAR *pszText)
+BOOL TabCtrl_SetItemText(HWND hTabCtrl, int iItem, const TCHAR *pszText)
 {
+	/* The const_cast below isn't
+	particularly good, but is
+	required. Information is only
+	being set, so the function
+	has no reason to modify the
+	string. */
 	TCITEM tcItem;
 	tcItem.mask = TCIF_TEXT;
-	tcItem.pszText = pszText;
+	tcItem.pszText = const_cast<LPTSTR>(pszText);
 	return TabCtrl_SetItem(hTabCtrl, iItem, &tcItem);
 }

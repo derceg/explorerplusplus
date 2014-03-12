@@ -11,7 +11,7 @@ public:
 	CStatusBar(HWND hwnd);
 	~CStatusBar();
 
-	void			SetPartText(int iPart,TCHAR *szText);
+	void			SetPartText(int iPart, const TCHAR *szText);
 
 	void			HandleStatusBarMenuOpen(void);
 	void			HandleStatusBarMenuClose(void);
