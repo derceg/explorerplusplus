@@ -149,13 +149,9 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 				}
 			}
 
-			INT_PTR Res = OnDestroy();
-
 			/* Within WM_DESTROY, all child windows
 			still exist. */
 			SaveState();
-
-			return Res;
 		}
 		break;
 
