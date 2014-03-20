@@ -35,5 +35,7 @@ private:
 
 	DISALLOW_COPY_AND_ASSIGN(CBaseWindow);
 
+	static const UINT_PTR SUBCLASS_ID = 0;
+
 	LRESULT CALLBACK BaseWindowProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 };

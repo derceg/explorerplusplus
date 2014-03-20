@@ -18,6 +18,7 @@
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ListViewHelper.h"
@@ -635,7 +636,7 @@ void CShellBrowser::SetTileViewItemInfo(int iItem,int iItemInternal)
 	lvti.puColumns	= uColumns;
 	ListView_SetTileInfo(m_hListView,&lvti);
 
-	QueryFullItemName(iItem,FullFileName);
+	QueryFullItemName(iItem,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 	SHGetFileInfo(FullFileName,0,
 		&shfi,sizeof(SHFILEINFO),SHGFI_TYPENAME);

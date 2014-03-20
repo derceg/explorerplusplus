@@ -21,6 +21,9 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
+#include "../Helper/MenuHelper.h"
+#include "../Helper/ProcessHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -244,7 +247,7 @@ BOOL TestConfigFileInternal(void)
 	/* To ensure the configuration file is loaded from the same directory
 	as the executable, determine the fully qualified path of the executable,
 	then save the configuration file in that directory. */
-	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
+	GetProcessImageName(GetCurrentProcessId(),szConfigFile,SIZEOF_ARRAY(szConfigFile));
 
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
@@ -313,20 +316,28 @@ void Explorerplusplus::SetLanguageModule(void)
 	TCHAR			szFullFileName[MAX_PATH];
 	TCHAR			szName[MAX_PATH];
 	WORD			wLanguage;
+	BOOL			bRet;
 
 	if(g_bForceLanguageLoad)
 	{
 		/* Language has been forced on the command
 		line by the user. Attempt to find the
 		corresponding DLL. */
-		GetCurrentProcessImageName(szLanguageModule,SIZEOF_ARRAY(szLanguageModule));
+		GetProcessImageName(GetCurrentProcessId(),szLanguageModule,SIZEOF_ARRAY(szLanguageModule));
 		PathRemoveFileSpec(szLanguageModule);
 		StringCchPrintf(szName,SIZEOF_ARRAY(szName),_T("Explorer++%2s.dll"),g_szLang);
 		PathAppend(szLanguageModule,szName);
 
-		wLanguage = GetFileLanguage(szLanguageModule);
+		bRet = GetFileLanguage(szLanguageModule, &wLanguage);
 
-		m_Language = wLanguage;
+		if(bRet)
+		{
+			m_Language = wLanguage;
+		}
+		else
+		{
+			m_Language = LANG_ENGLISH;
+		}
 	}
 	else
 	{
@@ -346,7 +357,7 @@ void Explorerplusplus::SetLanguageModule(void)
 	}
 	else
 	{
-		GetCurrentProcessImageName(szLanguageModule,SIZEOF_ARRAY(szLanguageModule));
+		GetProcessImageName(GetCurrentProcessId(),szLanguageModule,SIZEOF_ARRAY(szLanguageModule));
 		PathRemoveFileSpec(szLanguageModule);
 
 		StringCchCopy(szNamePattern,SIZEOF_ARRAY(szNamePattern),szLanguageModule);
@@ -361,11 +372,11 @@ void Explorerplusplus::SetLanguageModule(void)
 		{
 			StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),szLanguageModule);
 			PathAppend(szFullFileName,wfd.cFileName);
-			wLanguage = GetFileLanguage(szFullFileName);
+			bRet = GetFileLanguage(szFullFileName, &wLanguage);
 
 			BOOL bLanguageMismatch = FALSE;
 
-			if(wLanguage == m_Language)
+			if(bRet && (wLanguage == m_Language))
 			{
 				/* Using translation DLL's built for other versions of
 				the executable will most likely crash the program due
@@ -387,9 +398,9 @@ void Explorerplusplus::SetLanguageModule(void)
 				{
 					StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),szLanguageModule);
 					PathAppend(szFullFileName,wfd.cFileName);
-					wLanguage = GetFileLanguage(szFullFileName);
+					bRet = GetFileLanguage(szFullFileName, &wLanguage);
 
-					if(wLanguage == m_Language)
+					if(bRet && (wLanguage == m_Language))
 					{
 						if(VerifyLanguageVersion(szFullFileName))
 						{
@@ -607,7 +618,7 @@ void Explorerplusplus::OnNewTab(void)
 		TCHAR FullItemPath[MAX_PATH];
 
 		/* An item is selected, so get its full pathname. */
-		m_pActiveShellBrowser->QueryFullItemName(iSelected,FullItemPath);
+		m_pActiveShellBrowser->QueryFullItemName(iSelected,FullItemPath,SIZEOF_ARRAY(FullItemPath));
 
 		/* If the selected item is a folder, open that folder
 		in a new tab, else just use the default new tab directory. */
@@ -685,7 +696,7 @@ void Explorerplusplus::OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenI
 	CoTaskMemFree(pidl);
 }
 
-void Explorerplusplus::OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	LPITEMIDLIST	pidlItem = NULL;
 	HRESULT			hr;
@@ -700,7 +711,7 @@ void Explorerplusplus::OpenItem(TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNew
 	}
 }
 
-void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	SFGAOF uAttributes = SFGAO_FOLDER|SFGAO_STREAM|SFGAO_LINK;
 	LPITEMIDLIST pidlControlPanel = NULL;
@@ -790,7 +801,7 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 			TCHAR	szItemPath[MAX_PATH];
 			TCHAR	szTargetPath[MAX_PATH];
 
-			GetDisplayName(pidlItem,szItemPath,SHGDN_FORPARSING);
+			GetDisplayName(pidlItem,szItemPath,SIZEOF_ARRAY(szItemPath),SHGDN_FORPARSING);
 
 			hr = NFileOperations::ResolveLink(m_hContainer,0,szItemPath,szTargetPath,SIZEOF_ARRAY(szTargetPath));
 
@@ -848,7 +859,7 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 			TCHAR szParsingPath[MAX_PATH];
 			TCHAR szExplorerPath[MAX_PATH];
 
-			GetDisplayName(pidlItem,szParsingPath,SHGDN_FORPARSING);
+			GetDisplayName(pidlItem,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
 			MyExpandEnvironmentStrings(_T("%windir%\\explorer.exe"),
 				szExplorerPath,SIZEOF_ARRAY(szExplorerPath));
@@ -870,7 +881,7 @@ void Explorerplusplus::OpenItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bO
 	}
 }
 
-void Explorerplusplus::OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	if(bOpenInNewWindow)
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,FALSE,FALSE,TRUE);
@@ -880,7 +891,7 @@ void Explorerplusplus::OpenFolderItem(LPITEMIDLIST pidlItem,BOOL bOpenInNewTab,B
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER);
 }
 
-void Explorerplusplus::OpenFileItem(LPITEMIDLIST pidlItem,const TCHAR *szParameters)
+void Explorerplusplus::OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters)
 {
 	TCHAR			szItemDirectory[MAX_PATH];
 	LPITEMIDLIST	pidlParent = NULL;
@@ -889,9 +900,9 @@ void Explorerplusplus::OpenFileItem(LPITEMIDLIST pidlItem,const TCHAR *szParamet
 
 	ILRemoveLastID(pidlParent);
 
-	GetDisplayName(pidlParent,szItemDirectory,SHGDN_FORPARSING);
+	GetDisplayName(pidlParent,szItemDirectory,SIZEOF_ARRAY(szItemDirectory),SHGDN_FORPARSING);
 
-	ExecuteFileAction(m_hContainer,EMPTY_STRING,szParameters,szItemDirectory,(LPCITEMIDLIST)pidlItem);
+	ExecuteFileAction(m_hContainer,EMPTY_STRING,szParameters,szItemDirectory,pidlItem);
 
 	CoTaskMemFree(pidlParent);
 }
@@ -915,46 +926,6 @@ void Explorerplusplus::OnMainToolbarRClick(void)
 
 	TrackPopupMenu(m_hToolbarRightClickMenu,TPM_LEFTALIGN,
 		ptCursor.x,ptCursor.y,0,m_hMainRebar,NULL);
-}
-
-void Explorerplusplus::OnSaveFileSlack(void)
-{
-	HANDLE	hFile;
-	TCHAR	pszSlack[4096];
-	TCHAR	szSlackFileName[MAX_PATH];
-	TCHAR	szSaveFileName[MAX_PATH] = EMPTY_STRING;
-	DWORD	nBytesWritten;
-	BOOL	bSaveNameRetrieved;
-	int		iItem;
-	int		nBytesRetrieved;
-
-	bSaveNameRetrieved = GetFileNameFromUser(m_hContainer,
-	szSaveFileName,m_CurrentDirectory);
-
-	if(bSaveNameRetrieved)
-	{
-		iItem = ListView_GetNextItem(m_hActiveListView,-1,LVNI_FOCUSED);
-
-		if(iItem != -1)
-		{
-			m_pActiveShellBrowser->QueryFullItemName(iItem,szSlackFileName);
-
-			nBytesRetrieved = ReadFileSlack(szSlackFileName,pszSlack,SIZEOF_ARRAY(pszSlack));
-
-			if(nBytesRetrieved != -1)
-			{
-				hFile = CreateFile(szSaveFileName,GENERIC_WRITE,0,NULL,
-				OPEN_ALWAYS,0,NULL);
-
-				if(hFile != INVALID_HANDLE_VALUE)
-				{
-					WriteFile(hFile,(LPVOID)pszSlack,nBytesRetrieved,&nBytesWritten,NULL);
-
-					CloseHandle(hFile);
-				}
-			}
-		}
-	}
 }
 
 void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
@@ -1139,7 +1110,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* <---- Status bar ----> */
 
-	ResizeStatusBar(m_hStatusBar,MainWindowWidth,MainWindowHeight);
+	PinStatusBar(m_hStatusBar,MainWindowWidth,MainWindowHeight);
 	SetStatusBarParts(MainWindowWidth);
 
 
@@ -1240,7 +1211,7 @@ void Explorerplusplus::OnResolveLink(void)
 
 	if(iItem != -1)
 	{
-		m_pActiveShellBrowser->QueryFullItemName(iItem,ShortcutFileName);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,ShortcutFileName,SIZEOF_ARRAY(ShortcutFileName));
 
 		hr = NFileOperations::ResolveLink(m_hContainer,0,ShortcutFileName,szFullFileName,SIZEOF_ARRAY(szFullFileName));
 
@@ -1270,7 +1241,7 @@ void Explorerplusplus::OnSaveDirectoryListing(void)
 	TCHAR FileName[MAX_PATH];
 	LoadString(m_hLanguageModule,IDS_GENERAL_DIRECTORY_LISTING_FILENAME,FileName,SIZEOF_ARRAY(FileName));
 	StringCchCat(FileName,SIZEOF_ARRAY(FileName),_T(".txt"));
-	BOOL bSaveNameRetrieved = GetFileNameFromUser(m_hContainer,FileName,m_CurrentDirectory);
+	BOOL bSaveNameRetrieved = GetFileNameFromUser(m_hContainer,FileName,SIZEOF_ARRAY(FileName),m_CurrentDirectory);
 
 	if(bSaveNameRetrieved)
 	{
@@ -1392,7 +1363,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 	m_pShellBrowser[iTabId]->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectoryToWatch),
 		szDirectoryToWatch);
 
-	GetVirtualFolderParsingPath(CSIDL_BITBUCKET,szRecycleBin);
+	GetCsidlDisplayName(CSIDL_BITBUCKET,szRecycleBin,SIZEOF_ARRAY(szRecycleBin),SHGDN_FORPARSING);
 
 	/* Don't watch virtual folders (the 'recycle bin' may be an
 	exception to this). */
@@ -1728,7 +1699,7 @@ void Explorerplusplus::SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl)
 	/* Don't use SUCCEEDED(hr). */
 	if(hr == S_OK)
 	{
-		GetDisplayName(pidl,szFolderName,SHGDN_INFOLDER);
+		GetDisplayName(pidl,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 
 		mii.cbSize		= sizeof(mii);
 		mii.fMask		= MIIM_STRING;
@@ -1794,7 +1765,7 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 /* ALL calls to browse a folder in the current tab MUST
 pass through this function. This ensures that tabs that
 have their addresses locked will not change directory. */
-HRESULT Explorerplusplus::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
+HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 {
 	HRESULT hr = E_FAIL;
 	int iTabObjectIndex = -1;
@@ -1823,7 +1794,7 @@ HRESULT Explorerplusplus::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 	return hr;
 }
 
-HRESULT Explorerplusplus::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags,
+HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags,
 BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 {
 	HRESULT hr = E_FAIL;
@@ -1838,9 +1809,9 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 		TCHAR szPath[MAX_PATH];
 		TCHAR szParameters[512];
 
-		GetCurrentProcessImageName(szCurrentProcess,SIZEOF_ARRAY(szCurrentProcess));
+		GetProcessImageName(GetCurrentProcessId(),szCurrentProcess,SIZEOF_ARRAY(szCurrentProcess));
 
-		GetDisplayName(pidlDirectory,szPath,SHGDN_FORPARSING);
+		GetDisplayName(pidlDirectory,szPath,SIZEOF_ARRAY(szPath),SHGDN_FORPARSING);
 		StringCchPrintf(szParameters,SIZEOF_ARRAY(szParameters),_T("\"%s\""),szPath);
 
 		sei.cbSize			= sizeof(sei);
@@ -2443,7 +2414,7 @@ void Explorerplusplus::OnCloneWindow(void)
 	TCHAR szQuotedCurrentDirectory[MAX_PATH];
 	SHELLEXECUTEINFO sei;
 
-	GetCurrentProcessImageName(szExecutable,
+	GetProcessImageName(GetCurrentProcessId(),szExecutable,
 		SIZEOF_ARRAY(szExecutable));
 
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),
@@ -2540,7 +2511,7 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 				DWORD dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(static_cast<int>(pnmcd->dwItemSpec));
 
 				TCHAR szFileName[MAX_PATH];
-				m_pActiveShellBrowser->QueryFullItemName(static_cast<int>(pnmcd->dwItemSpec),szFileName);
+				m_pActiveShellBrowser->QueryFullItemName(static_cast<int>(pnmcd->dwItemSpec),szFileName,SIZEOF_ARRAY(szFileName));
 				PathStripPath(szFileName);
 
 				/* Loop through each filter. Decide whether to change the font of the

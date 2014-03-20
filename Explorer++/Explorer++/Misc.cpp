@@ -27,6 +27,8 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/FolderSize.h"
+#include "../Helper/ProcessHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -316,7 +318,7 @@ void Explorerplusplus::CopyToFolder(BOOL bMove)
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 		FullFilenameList.push_back(szFullFilename);
 	}
@@ -695,7 +697,7 @@ BOOL Explorerplusplus::CompareVirtualFolders(TCHAR *szDirectory,UINT uFolderCSID
 {
 	TCHAR szParsingPath[MAX_PATH];
 
-	GetVirtualFolderParsingPath(uFolderCSIDL,szParsingPath);
+	GetCsidlDisplayName(uFolderCSIDL,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
 	if(StrCmp(szDirectory,szParsingPath) == 0)
 		return TRUE;
@@ -807,7 +809,7 @@ void Explorerplusplus::HandleFileSelectionDisplayZero(void)
 	{
 		/* Folder name. */
 		TCHAR szFolderName[MAX_PATH];
-		GetDisplayName(szCurrentDirectory,szFolderName,SHGDN_INFOLDER);
+		GetDisplayName(szCurrentDirectory,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 		DisplayWindow_BufferText(m_hDisplayWindow,szFolderName);
 
 		/* Folder type. */
@@ -826,7 +828,7 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 	SHFILEINFO		shfi;
 	TCHAR			szFullItemName[MAX_PATH];
 	TCHAR			szFileDate[256];
-	TCHAR			szDisplayDate[MAX_STRING_LENGTH];
+	TCHAR			szDisplayDate[512];
 	TCHAR			szDisplayName[MAX_PATH];
 	TCHAR			szDateModified[256];
 	int				iSelected;
@@ -841,13 +843,13 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 		/* File name. */
 		DisplayWindow_BufferText(m_hDisplayWindow,szDisplayName);
 
-		m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName);
+		m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName,SIZEOF_ARRAY(szFullItemName));
 
 		if(!m_pActiveShellBrowser->InVirtualFolder())
 		{
 			DWORD dwAttributes;
 
-			m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName);
+			m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName,SIZEOF_ARRAY(szFullItemName));
 
 			pwfd = m_pActiveShellBrowser->QueryFileFindData(iSelected);
 
@@ -1043,7 +1045,7 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 		}
 		else
 		{
-			m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName);
+			m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullItemName,SIZEOF_ARRAY(szFullItemName));
 
 			if(PathIsRoot(szFullItemName))
 			{
@@ -1228,7 +1230,7 @@ BOOL Explorerplusplus::VerifyLanguageVersion(TCHAR *szLanguageModule) const
 	BOOL bSuccess1;
 	BOOL bSuccess2;
 
-	dwRet = GetCurrentProcessImageName(szImageName,SIZEOF_ARRAY(szImageName));
+	dwRet = GetProcessImageName(GetCurrentProcessId(),szImageName,SIZEOF_ARRAY(szImageName));
 
 	if(dwRet != 0)
 	{

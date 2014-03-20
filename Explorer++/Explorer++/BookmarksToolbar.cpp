@@ -19,6 +19,7 @@
 #include "BookmarksToolbar.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -556,7 +557,7 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::Drop(IDataObject *pDataObject,
 				if(PathIsDirectory(szFullFileName))
 				{
 					TCHAR szDisplayName[MAX_PATH];
-					GetDisplayName(szFullFileName,szDisplayName,SHGDN_INFOLDER);
+					GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
 					CBookmark Bookmark(szDisplayName,szFullFileName,EMPTY_STRING);
 

@@ -87,7 +87,7 @@ int CShellBrowser::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) con
 	return lstrlen(Buffer);
 }
 
-HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath) const
+HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const
 {
 	LVITEM			lvItem;
 	BOOL			bRes;
@@ -99,7 +99,7 @@ HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath) const
 
 	if(bRes)
 	{
-		QueryFullItemNameInternal((int)lvItem.lParam,FullItemPath);
+		QueryFullItemNameInternal((int)lvItem.lParam,FullItemPath,cchMax);
 
 		return S_OK;
 	}
@@ -107,13 +107,13 @@ HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath) const
 	return E_FAIL;
 }
 
-void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName) const
+void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName,UINT cchMax) const
 {
 	LPITEMIDLIST	pidlComplete = NULL;
 
 	pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[iItemInternal].pridl);
 
-	GetDisplayName(pidlComplete,szFullFileName,SHGDN_FORPARSING);
+	GetDisplayName(pidlComplete,szFullFileName,cchMax,SHGDN_FORPARSING);
 
 	CoTaskMemFree(pidlComplete);
 }
@@ -587,33 +587,11 @@ int CShellBrowser::GetDirMonitorId(void) const
 	return m_iDirMonitorId;
 }
 
-HRESULT CShellBrowser::RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMax)
-{
-	LVITEM	lvItem;
-	BOOL	bItem;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	bItem = ListView_GetItem(m_hListView,&lvItem);
-
-	if(bItem)
-	{
-		return GetFileInfoTip(m_hOwner,m_pidlDirectory,
-			const_cast<LPCITEMIDLIST *>(&m_pExtraItemInfo[(int)lvItem.lParam].pridl),
-			szInfoTip,(UINT)cchMax);
-	}
-	else
-	{
-		return E_FAIL;
-	}
-}
-
 BOOL CShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 {
 	TCHAR	szParsingPath[MAX_PATH];
 
-	GetVirtualFolderParsingPath(uFolderCSIDL,szParsingPath);
+	GetCsidlDisplayName(uFolderCSIDL,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
 	if(StrCmp(m_CurDir,szParsingPath) == 0)
 		return TRUE;
@@ -1509,7 +1487,7 @@ void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
 	int nItems;
 	int i = 0;
 
-	GetDisplayName(pidlItem,szItem,SHGDN_INFOLDER);
+	GetDisplayName(pidlItem,szItem,SIZEOF_ARRAY(szItem),SHGDN_INFOLDER);
 
 	nItems = ListView_GetItemCount(m_hListView);
 
@@ -1627,7 +1605,7 @@ void CShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 					pdbv = (DEV_BROADCAST_VOLUME *)dbh;
 
 					/* Build a string that will form the drive name. */
-					chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+					chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 					StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),
 						_T("%c:\\"),chDrive);
 
@@ -1658,7 +1636,7 @@ void CShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 					pdbv = (DEV_BROADCAST_VOLUME *)dbh;
 
 					/* Build a string that will form the drive name. */
-					chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+					chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 					StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),_T("%c:\\"),chDrive);
 
 					/* The device was removed from the system.
@@ -1700,7 +1678,7 @@ void CShellBrowser::UpdateDriveIcon(TCHAR *szDrive)
 
 	/* Look for the item using its display name, NOT
 	its drive letter/name. */
-	GetDisplayName(szDrive,szDisplayName,SHGDN_INFOLDER);
+	GetDisplayName(szDrive,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
 	hr = GetIdlFromParsingName(szDrive,&pidlDrive);
 

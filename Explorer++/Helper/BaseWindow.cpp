@@ -19,12 +19,12 @@ CBaseWindow::CBaseWindow(HWND hwnd) :
 CMessageForwarder(),
 m_hwnd(hwnd)
 {
-	SetWindowSubclass(hwnd,BaseWindowProcStub,0,reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(hwnd, BaseWindowProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 }
 
 CBaseWindow::~CBaseWindow()
 {
-	RemoveWindowSubclass(m_hwnd, BaseWindowProcStub, 0);
+	RemoveWindowSubclass(m_hwnd, BaseWindowProcStub, SUBCLASS_ID);
 }
 
 HWND CBaseWindow::GetHWND() const
@@ -44,6 +44,12 @@ LRESULT CALLBACK CBaseWindow::BaseWindowProc(HWND hwnd,UINT uMsg,WPARAM wParam,L
 {
 	switch(uMsg)
 	{
+	/* With compiler support for
+	the final keyword, OnNcDestroy
+	should be overridden by this
+	class and marked final (since
+	derived classes can never receive
+	the WM_NCDESTROY message). */
 	case WM_NCDESTROY:
 		delete this;
 		return 0;

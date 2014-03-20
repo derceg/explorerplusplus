@@ -25,10 +25,10 @@ CFileActionHandler::CFileActionHandler()
 
 CFileActionHandler::~CFileActionHandler()
 {
-	while(stackFileActions.size() > 0)
+	while(m_stackFileActions.size() > 0)
 	{
-		UndoItem_t UndoItem = stackFileActions.top();
-		stackFileActions.pop();
+		UndoItem_t UndoItem = m_stackFileActions.top();
+		m_stackFileActions.pop();
 
 		delete UndoItem.pInfo;
 	}
@@ -58,7 +58,7 @@ BOOL CFileActionHandler::RenameFiles(const std::list<RenamedItem_t> &ItemList)
 		UndoItem_t UndoItem;
 		UndoItem.Type = FILE_ACTION_RENAMED;
 		UndoItem.pInfo = reinterpret_cast<void *>(pRenamedItemList);
-		stackFileActions.push(UndoItem);
+		m_stackFileActions.push(UndoItem);
 
 		return TRUE;
 	}
@@ -69,9 +69,9 @@ BOOL CFileActionHandler::RenameFiles(const std::list<RenamedItem_t> &ItemList)
 }
 
 BOOL CFileActionHandler::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,
-	BOOL bPermanent)
+	BOOL bPermanent,BOOL bSilent)
 {
-	BOOL bRes = NFileOperations::DeleteFiles(hwnd,FullFilenameList,bPermanent);
+	BOOL bRes = NFileOperations::DeleteFiles(hwnd,FullFilenameList,bPermanent,bSilent);
 
 	if(bRes)
 	{
@@ -80,7 +80,7 @@ BOOL CFileActionHandler::DeleteFiles(HWND hwnd,const std::list<std::wstring> &Fu
 		UndoItem_t UndoItem;
 		UndoItem.Type = FILE_ACTION_DELETED;
 		UndoItem.pInfo = reinterpret_cast<void *>(pDeletedItemList);
-		stackFileActions.push(UndoItem);
+		m_stackFileActions.push(UndoItem);
 	}
 
 	return bRes;
@@ -88,10 +88,10 @@ BOOL CFileActionHandler::DeleteFiles(HWND hwnd,const std::list<std::wstring> &Fu
 
 void CFileActionHandler::Undo()
 {
-	if(!stackFileActions.empty())
+	if(!m_stackFileActions.empty())
 	{
-		UndoItem_t UndoItem = stackFileActions.top();
-		stackFileActions.pop();
+		UndoItem_t UndoItem = m_stackFileActions.top();
+		m_stackFileActions.pop();
 
 		assert(UndoItem.pInfo != NULL);
 
@@ -143,7 +143,7 @@ void CFileActionHandler::UndoDeleteOperation(const std::list<std::wstring> &Dele
 	 - Push delete action onto stack. */
 }
 
-BOOL CFileActionHandler::CanUndo()
+BOOL CFileActionHandler::CanUndo() const
 {
-	return !stackFileActions.empty();
+	return !m_stackFileActions.empty();
 }

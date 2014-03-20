@@ -18,6 +18,7 @@
 #include "RegistrySettings.h"
 #include "XMLSettings.h"
 #include "Helper.h"
+#include "WindowHelper.h"
 #include "Macros.h"
 
 
@@ -27,12 +28,10 @@ const TCHAR CDialogSettings::SETTING_POSITION_Y[] = _T("PosY");
 const TCHAR CDialogSettings::SETTING_WIDTH[] = _T("Width");
 const TCHAR CDialogSettings::SETTING_HEIGHT[] = _T("Height");
 
-CDialogSettings::CDialogSettings(const TCHAR *szSettingsKey,bool bSavePosition)
+CDialogSettings::CDialogSettings(const TCHAR *szSettingsKey,bool bSavePosition) :
+m_szSettingsKey(szSettingsKey),
+m_bSavePosition(bSavePosition)
 {
-	StringCchCopy(m_szSettingsKey,SIZEOF_ARRAY(m_szSettingsKey),
-		szSettingsKey);
-	m_bSavePosition = bSavePosition;
-
 	m_bStateSaved = FALSE;
 }
 
@@ -51,7 +50,7 @@ void CDialogSettings::SaveRegistrySettings(HKEY hParentKey)
 	HKEY hKey;
 	DWORD dwDisposition;
 
-	LONG lRes = RegCreateKeyEx(hParentKey,m_szSettingsKey,
+	LONG lRes = RegCreateKeyEx(hParentKey,m_szSettingsKey.c_str(),
 		0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,
 		&dwDisposition);
 
@@ -78,7 +77,7 @@ void CDialogSettings::LoadRegistrySettings(HKEY hParentKey)
 	HKEY hKey;
 	LONG lRes;
 
-	lRes = RegOpenKeyEx(hParentKey,m_szSettingsKey,0,
+	lRes = RegOpenKeyEx(hParentKey,m_szSettingsKey.c_str(),0,
 		KEY_READ,&hKey);
 
 	if(lRes == ERROR_SUCCESS)
@@ -116,7 +115,7 @@ void CDialogSettings::SaveXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,
 	SysFreeString(bstr_wsntt);
 
 	MSXML2::IXMLDOMElement *pParentNode = NULL;
-	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("DialogState"),m_szSettingsKey);
+	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("DialogState"),m_szSettingsKey.c_str());
 
 	if(m_bSavePosition)
 	{
@@ -183,14 +182,14 @@ void CDialogSettings::LoadXMLSettings(MSXML2::IXMLDOMNamedNodeMap *pam,long lChi
 	m_bStateSaved = TRUE;
 }
 
-bool CDialogSettings::GetSettingsKey(TCHAR *out, int outLength)
+bool CDialogSettings::GetSettingsKey(TCHAR *out, size_t cchMax) const
 {
-	if(outLength < (lstrlen(m_szSettingsKey) + 1))
+	if(cchMax < (m_szSettingsKey.length() + 1))
 	{
 		return false;
 	}
 
-	StringCchCopy(out, outLength, m_szSettingsKey);
+	StringCchCopy(out, cchMax, m_szSettingsKey.c_str());
 	return true;
 }
 

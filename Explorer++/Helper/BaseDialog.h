@@ -3,6 +3,7 @@
 #include "ResizableDialog.h"
 #include "MessageForwarder.h"
 #include "ReferenceCount.h"
+#include "Macros.h"
 
 __interface IModelessDialogNotification : public IReferenceCount
 {
@@ -27,7 +28,7 @@ public:
 	};
 
 	CBaseDialog(HINSTANCE hInstance,int iResource,HWND hParent,bool bResizable);
-	~CBaseDialog();
+	virtual ~CBaseDialog();
 
 	INT_PTR			ShowModalDialog();
 	HWND			ShowModelessDialog(IModelessDialogNotification *pmdn = NULL);
@@ -38,26 +39,28 @@ protected:
 
 	INT_PTR			GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	virtual void	GetResizableControlInformation(DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
-	virtual void	SaveState();
-
 	HWND			m_hDlg;
 
 private:
 
+	DISALLOW_COPY_AND_ASSIGN(CBaseDialog);
+
 	INT_PTR CALLBACK	BaseDialogProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	HINSTANCE		m_hInstance;
-	int				m_iResource;
-	HWND			m_hParent;
+	virtual void	GetResizableControlInformation(DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	virtual void	SaveState();
+
+	const HINSTANCE	m_hInstance;
+	const int		m_iResource;
+	const HWND		m_hParent;
 	IModelessDialogNotification	*m_pmdn;
 
 	BOOL			m_bShowingModelessDialog;
 
 	/* Used only with resizable dialogs. */
-	bool			m_bResizable;
+	const bool		m_bResizable;
 	DialogSizeConstraint	m_dsc;
 	int				m_iMinWidth;
 	int				m_iMinHeight;
-	CResizableDialog	*m_prd;
+	std::unique_ptr<CResizableDialog> m_prd;
 };

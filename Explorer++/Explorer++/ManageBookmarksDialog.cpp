@@ -20,6 +20,7 @@
 #include "MainResource.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 

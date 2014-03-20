@@ -2,7 +2,5 @@
 
 #include <Windows.h>
 
-LONG	GetClusterSize(TCHAR *Drive);
-LONG	GetSectorSize(TCHAR *Drive);
-TCHAR	GetDriveNameFromMask(ULONG unitmask);
-LONG	GetFileSectorSize(TCHAR *FileName);
+BOOL	GetClusterSize(const TCHAR *Drive, DWORD *pdwClusterSize);
+TCHAR	GetDriveLetterFromMask(ULONG unitmask);

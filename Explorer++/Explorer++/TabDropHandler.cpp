@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include <list>
 #include "TabDropHandler.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -203,7 +204,7 @@ DWORD CTabDropHandler::DetermineCurrentDragEffect(int iTab,DWORD grfKeyState,DWO
 			m_pTabContainer->GetBrowserForTab(iTab)->QueryCurrentDirectory(SIZEOF_ARRAY(szDestDirectory),szDestDirectory);
 
 			BOOL bOnSameDrive = PathIsSameRoot(szDestDirectory,m_RepresentativeDrive.c_str());
-			DropEffect = ::DetermineCurrentDragEffect(grfKeyState,CurrentDropEffect,m_AcceptData,bOnSameDrive);
+			DropEffect = ::DetermineDragEffect(grfKeyState,CurrentDropEffect,m_AcceptData,bOnSameDrive);
 		}
 	}
 

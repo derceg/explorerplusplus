@@ -266,27 +266,27 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case FSM_TITLE:
-			DetermineItemCommentGroup(iItemInternal,PROPERTY_ID_TITLE,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(iItemInternal,&SCID_TITLE,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = NameComparison;
 			break;
 
 		case FSM_SUBJECT:
-			DetermineItemCommentGroup(iItemInternal,PROPERTY_ID_SUBJECT,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(iItemInternal,&SCID_SUBJECT,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = NameComparison;
 			break;
 
 		case FSM_AUTHOR:
-			DetermineItemCommentGroup(iItemInternal,PROPERTY_ID_AUTHOR,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(iItemInternal,&SCID_AUTHOR,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = NameComparison;
 			break;
 
 		case FSM_KEYWORDS:
-			DetermineItemCommentGroup(iItemInternal,PROPERTY_ID_KEYWORDS,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(iItemInternal,&SCID_KEYWORDS,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = NameComparison;
 			break;
 
 		case FSM_COMMENTS:
-			DetermineItemCommentGroup(iItemInternal,PROPERTY_ID_COMMENT,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(iItemInternal,&SCID_COMMENTS,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = NameComparison;
 			break;
 
@@ -656,24 +656,19 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 	StringCchCopy(szGroupHeader,cchMax,ModifiedGroups[iModified]);
 }
 
-/* TODO: Check if works in XP. */
-void CShellBrowser::DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyType,TCHAR *szGroupHeader,int cchMax) const
+void CShellBrowser::DetermineItemSummaryGroup(int iItemInternal, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax) const
 {
-	TCHAR						szFullFileName[MAX_PATH];
-	TCHAR						szComment[512];
-	std::list<TypeGroup_t>::iterator	itr;
-	int							iRes;
+	TCHAR szDetail[512];
+	HRESULT hr = GetItemDetails(iItemInternal, pscid, szDetail, SIZEOF_ARRAY(szDetail));
 
-	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
-	PathAppend(szFullFileName,m_pwfdFiles[iItemInternal].cFileName);
-
-	iRes = ReadFileProperty(szFullFileName,dwPropertyType,szComment,
-		SIZEOF_ARRAY(szComment));
-
-	if(iRes == -1)
-		StringCchCopy(szComment,SIZEOF_ARRAY(szComment),_T("Unspecified"));
-
-	StringCchCopy(szGroupHeader,cchMax,szComment);
+	if(SUCCEEDED(hr) && lstrlen(szDetail) > 0)
+	{
+		StringCchCopy(szGroupHeader, cchMax, szDetail);
+	}
+	else
+	{
+		StringCchCopy(szGroupHeader, cchMax, _T("Unspecified"));
+	}
 }
 
 /* TODO: Need to sort based on percentage free. */
@@ -754,7 +749,12 @@ void CShellBrowser::DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHead
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
 	PathAppend(FullFileName,m_pwfdFiles[iItemInternal].cFileName);
 
-	GetFileOwner(FullFileName,szOwner,SIZEOF_ARRAY(szOwner));
+	BOOL ret = GetFileOwner(FullFileName,szOwner,SIZEOF_ARRAY(szOwner));
+
+	if(!ret)
+	{
+		StringCchCopy(szOwner,SIZEOF_ARRAY(szOwner),EMPTY_STRING);
+	}
 
 	StringCchCopy(szGroupHeader,cchMax,szOwner);
 }

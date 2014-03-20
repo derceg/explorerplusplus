@@ -52,6 +52,7 @@
 #include <winsock2.h>
 #include <windows.h>
 #include <windowsx.h>
+#include <WinUser.h>
 #include <iostream>
 #include <string>
 #include <commctrl.h>
@@ -84,8 +85,20 @@
 #include <intrin.h>
 #include <wmsdk.h>
 #include <propvarutil.h>
+
+/* See http://connect.microsoft.com/VisualStudio/feedback/details/621653/including-stdint-after-intsafe-generates-warnings.
+This workaround is only
+required for VS 2010. */
+#pragma warning(push)
+#pragma warning(disable:4005)
+#include <stdint.h>
+#include <intsafe.h>
+#pragma warning(pop)
+
 #include <assert.h>
 #include <list>
+#include <memory>
+#include <sstream>
 
 /* Pantheios header files. */
 #include <pantheios\pantheios.hpp>

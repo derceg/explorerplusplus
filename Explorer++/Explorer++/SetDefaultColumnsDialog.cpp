@@ -64,7 +64,7 @@ INT_PTR CSetDefaultColumnsDialog::OnInitDialog()
 	TCHAR szFolderName[MAX_PATH];
 	int iPos;
 
-	GetCsidlFolderName(CSIDL_CONTROLS,szFolderName,SHGDN_INFOLDER);
+	GetCsidlDisplayName(CSIDL_CONTROLS,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
 	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_CONTROL_PANEL));
 
@@ -72,23 +72,23 @@ INT_PTR CSetDefaultColumnsDialog::OnInitDialog()
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
 	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_GENERAL));
 
-	GetCsidlFolderName(CSIDL_DRIVES,szFolderName,SHGDN_INFOLDER);
+	GetCsidlDisplayName(CSIDL_DRIVES,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
 	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_COMPUTER));
 
-	GetCsidlFolderName(CSIDL_CONNECTIONS,szFolderName,SHGDN_INFOLDER);
+	GetCsidlDisplayName(CSIDL_CONNECTIONS,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
 	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_NETWORK));
 
-	GetCsidlFolderName(CSIDL_NETWORK,szFolderName,SHGDN_INFOLDER);
+	GetCsidlDisplayName(CSIDL_NETWORK,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
 	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_NETWORK_PLACES));
 
-	GetCsidlFolderName(CSIDL_PRINTERS,szFolderName,SHGDN_INFOLDER);
+	GetCsidlDisplayName(CSIDL_PRINTERS,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
 	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_PRINTERS));
 
-	GetCsidlFolderName(CSIDL_BITBUCKET,szFolderName,SHGDN_INFOLDER);
+	GetCsidlDisplayName(CSIDL_BITBUCKET,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
 	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_RECYCLE_BIN));
 
@@ -100,6 +100,7 @@ INT_PTR CSetDefaultColumnsDialog::OnInitDialog()
 	m_PreviousFolderType = m_psdcdps->m_FolderType;
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
+	SetWindowTheme(hListView, L"Explorer", NULL);
 
 	ListView_SetExtendedListViewStyleEx(hListView,
 	LVS_EX_CHECKBOXES,LVS_EX_CHECKBOXES);
@@ -216,8 +217,8 @@ INT_PTR CSetDefaultColumnsDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
-	case LVN_ITEMCHANGING:
-		OnLvnItemChanging(reinterpret_cast<NMLISTVIEW *>(pnmhdr));
+	case LVN_ITEMCHANGED:
+		OnLvnItemChanged(reinterpret_cast<NMLISTVIEW *>(pnmhdr));
 		break;
 	}
 
@@ -378,7 +379,7 @@ std::list<Column_t> *CSetDefaultColumnsDialog::GetCurrentColumnList(FolderType_t
 	return NULL;
 }
 
-void CSetDefaultColumnsDialog::OnLvnItemChanging(NMLISTVIEW *pnmlv)
+void CSetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 {
 	if(pnmlv->uNewState & LVIS_SELECTED)
 	{
@@ -409,11 +410,11 @@ void CSetDefaultColumnsDialog::OnMoveColumn(bool bUp)
 	{
 		if(bUp)
 		{
-			NListView::ListView_SwapItems(hListView,iSelected,iSelected - 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected - 1,TRUE);
 		}
 		else
 		{
-			NListView::ListView_SwapItems(hListView,iSelected,iSelected + 1);
+			NListView::ListView_SwapItems(hListView,iSelected,iSelected + 1,TRUE);
 		}
 
 		SetFocus(hListView);

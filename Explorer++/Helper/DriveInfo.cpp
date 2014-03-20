@@ -17,26 +17,33 @@
 #include "Macros.h"
 
 
-LONG GetClusterSize(TCHAR *Drive)
+BOOL GetClusterSize(const TCHAR *Drive, DWORD *pdwClusterSize)
 {
-	DWORD SectorsPerCluster;
-	DWORD BytesPerSector;
+	DWORD dwSectorsPerCluster;
+	DWORD dwBytesPerSector;
+	BOOL bRet = GetDiskFreeSpace(Drive,&dwSectorsPerCluster,&dwBytesPerSector,NULL,NULL);
 
-	GetDiskFreeSpace(Drive,&SectorsPerCluster,&BytesPerSector,NULL,NULL);
+	if(!bRet)
+	{
+		return FALSE;
+	}
 
-	return BytesPerSector * SectorsPerCluster;
+	/* It's not expected that this
+	will ever actually overflow.
+	The cluster size should be
+	_far_ below the maximum
+	DWORD value. */
+	HRESULT hr = DWordMult(dwBytesPerSector, dwSectorsPerCluster, pdwClusterSize);
+
+	if(FAILED(hr))
+	{
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
-LONG GetSectorSize(TCHAR *Drive)
-{
-	DWORD BytesPerSector;
-
-	GetDiskFreeSpace(Drive,NULL,&BytesPerSector,NULL,NULL);
-
-	return BytesPerSector;
-}
-
-TCHAR GetDriveNameFromMask(ULONG unitmask)
+TCHAR GetDriveLetterFromMask(ULONG unitmask)
 {
 	int BitNum = 0;
 
@@ -47,45 +54,4 @@ TCHAR GetDriveNameFromMask(ULONG unitmask)
 	}
 
 	return (TCHAR)BitNum + 'A';
-}
-
-LONG GetFileSectorSize(TCHAR *FileName)
-{
-	LONG SectorSize;
-	LONG FileSize;
-	LONG SectorFileSize;
-	HANDLE hFile;
-	int SectorCount = 0;
-	TCHAR Root[MAX_PATH];
-
-	if(FileName == NULL)
-		return -1;
-
-	/* Get a handle to the file. */
-	hFile = CreateFile(FileName, GENERIC_READ,
-		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, NULL, NULL);
-
-	if(hFile == INVALID_HANDLE_VALUE)
-		return -1;
-
-	/* Get the files size (count of number of actual
-	number of bytes in file). */
-	FileSize = GetFileSize(hFile, NULL);
-
-	StringCchCopy(Root, SIZEOF_ARRAY(Root), FileName);
-	PathStripToRoot(Root);
-
-	/* Get the sector size of the drive the file resides on. */
-	SectorSize = GetSectorSize(Root);
-
-	SectorFileSize = 0;
-	while(SectorFileSize < FileSize)
-	{
-		SectorFileSize += SectorSize;
-		SectorCount++;
-	}
-
-	CloseHandle(hFile);
-
-	return SectorCount;
 }

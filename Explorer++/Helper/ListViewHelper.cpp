@@ -16,6 +16,9 @@
 #include "Macros.h"
 
 
+BOOL GetListViewItem(HWND hListView, LVITEM *pLVItem, UINT mask, UINT stateMask,
+	int iItem, int iSubItem, TCHAR *pszText, int cchMax);
+
 void NListView::ListView_SelectItem(HWND hListView,int iItem,BOOL bSelect)
 {
 	UINT uNewState;
@@ -114,9 +117,14 @@ void NListView::ListView_SetGridlines(HWND hListView,BOOL bEnableGridlines)
 	ListView_SetExtendedListViewStyle(hListView,dwExtendedStyle);
 }
 
-void NListView::ListView_SetAutoArrange(HWND hListView,BOOL bAutoArrange)
+BOOL NListView::ListView_SetAutoArrange(HWND hListView,BOOL bAutoArrange)
 {
 	LONG_PTR lStyle = GetWindowLongPtr(hListView,GWL_STYLE);
+
+	if(lStyle == 0)
+	{
+		return FALSE;
+	}
 
 	if(bAutoArrange)
 	{
@@ -133,7 +141,15 @@ void NListView::ListView_SetAutoArrange(HWND hListView,BOOL bAutoArrange)
 		}
 	}
 
-	SetWindowLongPtr(hListView,GWL_STYLE,lStyle);
+	SetLastError(0);
+	LONG_PTR lRet = SetWindowLongPtr(hListView,GWL_STYLE,lStyle);
+
+	if(lRet == 0 && GetLastError() != 0)
+	{
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
 void NListView::ListView_ActivateOneClickSelect(HWND hListView,BOOL bActivate,UINT uHoverTime)
@@ -205,257 +221,111 @@ void NListView::ListView_AddRemoveExtendedStyle(HWND hListView,DWORD dwStyle,BOO
 	ListView_SetExtendedListViewStyle(hListView,dwExtendedStyle);
 }
 
-void NListView::ListView_SetBackgroundImage(HWND hListView,UINT uImage)
+/* Sets the background image in the
+listview. uImage should be the index
+of a bitmap resource in the current
+executable. */
+BOOL NListView::ListView_SetBackgroundImage(HWND hListView,UINT uImage)
 {
 	TCHAR szModuleName[MAX_PATH];
-	GetModuleFileName(NULL,szModuleName,SIZEOF_ARRAY(szModuleName));
+	DWORD dwRet = GetModuleFileName(NULL,szModuleName,SIZEOF_ARRAY(szModuleName));
+
+	if(dwRet == 0 || GetLastError() == ERROR_INSUFFICIENT_BUFFER)
+	{
+		return FALSE;
+	}
 
 	LVBKIMAGE lvbki;
-	lvbki.ulFlags = LVBKIF_STYLE_NORMAL|LVBKIF_SOURCE_URL;
-	lvbki.xOffsetPercent = 45;
-	lvbki.yOffsetPercent = 50;
 
 	TCHAR szBitmap[512];
 
 	if(uImage == 0)
 	{
-		lvbki.pszImage = NULL;
+		lvbki.ulFlags = LVBKIF_SOURCE_NONE;
 	}
 	else
 	{
-		/* 2 means an image resource, 3 would mean an icon. */
+		/* See http://msdn.microsoft.com/en-us/library/aa767740(v=vs.85).aspx
+		for information on the res protocol, and
+		http://msdn.microsoft.com/en-us/library/ms648009(v=vs.85).aspx for
+		a list of resource types. */
 		StringCchPrintf(szBitmap,SIZEOF_ARRAY(szBitmap),
-			_T("res://%s/#2/#%d"),szModuleName,uImage);
+			_T("res://%s/#%d/#%d"),szModuleName,RT_BITMAP,uImage);
 
+		lvbki.ulFlags = LVBKIF_STYLE_NORMAL | LVBKIF_SOURCE_URL;
+		lvbki.xOffsetPercent = 45;
+		lvbki.yOffsetPercent = 50;
 		lvbki.pszImage = szBitmap;
 	}
 
-	ListView_SetBkImage(hListView,&lvbki);
+	return ListView_SetBkImage(hListView,&lvbki);
 }
 
-void NListView::ListView_SwapItems(HWND hListView,int iItem1,int iItem2)
+BOOL GetListViewItem(HWND hListView, LVITEM *pLVItem, UINT mask, UINT stateMask,
+	int iItem, int iSubItem, TCHAR *pszText, int cchMax)
 {
-	LVITEM lvItem;
-	LPARAM lParam1;
-	LPARAM lParam2;
-	TCHAR szText1[512];
-	TCHAR szText2[512];
-	BOOL bItem1Checked;
-	BOOL bItem2Checked;
-	UINT Item1StateMask;
-	UINT Item2StateMask;
-	BOOL res;
+	pLVItem->mask = mask;
+	pLVItem->stateMask = stateMask;
+	pLVItem->iItem = iItem;
+	pLVItem->iSubItem = iSubItem;
 
-	lvItem.mask			= LVIF_TEXT | LVIF_PARAM;
-	lvItem.iItem		= iItem1;
-	lvItem.iSubItem		= 0;
-	lvItem.pszText		= szText1;
-	lvItem.cchTextMax	= SIZEOF_ARRAY(szText1);
-
-	res = ListView_GetItem(hListView,&lvItem);
-
-	if(!res)
+	if(mask & LVIF_TEXT)
 	{
-		return;
+		pLVItem->pszText = pszText;
+		pLVItem->cchTextMax = cchMax;
 	}
 
-	lParam1 = lvItem.lParam;
-
-	lvItem.mask			= LVIF_TEXT | LVIF_PARAM;
-	lvItem.iItem		= iItem2;
-	lvItem.iSubItem		= 0;
-	lvItem.pszText		= szText2;
-	lvItem.cchTextMax	= SIZEOF_ARRAY(szText2);
-
-	res = ListView_GetItem(hListView,&lvItem);
-
-	if(!res)
-	{
-		return;
-	}
-
-	lParam2 = lvItem.lParam;
-
-	lvItem.mask		= LVIF_TEXT | LVIF_PARAM;
-	lvItem.iItem	= iItem1;
-	lvItem.iSubItem	= 0;
-	lvItem.pszText	= szText2;
-	lvItem.lParam	= lParam2;
-	ListView_SetItem(hListView,&lvItem);
-
-	lvItem.mask		= LVIF_TEXT | LVIF_PARAM;
-	lvItem.iItem	= iItem2;
-	lvItem.iSubItem	= 0;
-	lvItem.pszText	= szText1;
-	lvItem.lParam	= lParam1;
-	ListView_SetItem(hListView,&lvItem);
-
-	/* Swap all sub-items. */
-	HWND hHeader;
-	TCHAR szBuffer1[512];
-	TCHAR szBuffer2[512];
-	int nColumns;
-	int iSubItem = 1;
-	int i = 0;
-
-	hHeader = ListView_GetHeader(hListView);
-
-	nColumns = Header_GetItemCount(hHeader);
-
-	for(i = 1;i < nColumns;i++)
-	{
-		lvItem.mask			= LVIF_TEXT;
-		lvItem.iItem		= iItem1;
-		lvItem.iSubItem		= iSubItem;
-		lvItem.pszText		= szBuffer1;
-		lvItem.cchTextMax	= SIZEOF_ARRAY(szBuffer1);
-
-		ListView_GetItem(hListView,&lvItem);
-
-		lvItem.mask			= LVIF_TEXT;
-		lvItem.iItem		= iItem2;
-		lvItem.iSubItem		= iSubItem;
-		lvItem.pszText		= szBuffer2;
-		lvItem.cchTextMax	= SIZEOF_ARRAY(szBuffer2);
-
-		ListView_GetItem(hListView,&lvItem);
-
-		lvItem.mask		= LVIF_TEXT;
-		lvItem.iItem	= iItem1;
-		lvItem.iSubItem	= iSubItem;
-		lvItem.pszText	= szBuffer2;
-		ListView_SetItem(hListView,&lvItem);
-
-		lvItem.mask		= LVIF_TEXT;
-		lvItem.iItem	= iItem2;
-		lvItem.iSubItem	= iSubItem;
-		lvItem.pszText	= szBuffer1;
-		ListView_SetItem(hListView,&lvItem);
-
-		iSubItem++;
-	}
-
-	Item1StateMask = ListView_GetItemState(hListView,iItem1,LVIS_CUT | LVIS_FOCUSED | LVIS_SELECTED);
-	Item2StateMask = ListView_GetItemState(hListView,iItem2,LVIS_CUT | LVIS_FOCUSED | LVIS_SELECTED);
-
-	ListView_SetItemState(hListView,iItem1,Item2StateMask,LVIS_CUT | LVIS_FOCUSED | LVIS_SELECTED);
-	ListView_SetItemState(hListView,iItem2,Item1StateMask,LVIS_CUT | LVIS_FOCUSED | LVIS_SELECTED);
-
-	bItem1Checked = ListView_GetCheckState(hListView,iItem1);
-	bItem2Checked = ListView_GetCheckState(hListView,iItem2);
-
-	ListView_SetCheckState(hListView,iItem1,bItem2Checked);
-	ListView_SetCheckState(hListView,iItem2,bItem1Checked);
+	return ListView_GetItem(hListView, pLVItem);
 }
 
-void NListView::ListView_SwapItemsNolParam(HWND hListView,int iItem1,int iItem2)
+BOOL NListView::ListView_SwapItems(HWND hListView, int iItem1, int iItem2, BOOL bSwapLPARAM)
 {
-	LVITEM lvItem;
+	UINT mask = LVIF_IMAGE | LVIF_INDENT | LVIF_STATE | LVIF_TEXT;
+	UINT stateMask = static_cast<UINT>(-1);
+
+	if(bSwapLPARAM)
+	{
+		mask |= LVIF_PARAM;
+	}
+
+	LVITEM lvItem1;
 	TCHAR szText1[512];
+	BOOL bRet1 = GetListViewItem(hListView, &lvItem1, mask, stateMask, iItem1, 0, szText1, SIZEOF_ARRAY(szText1));
+
+	LVITEM lvItem2;
 	TCHAR szText2[512];
-	BOOL bItem1Checked;
-	BOOL bItem2Checked;
-	UINT Item1StateMask;
-	UINT Item2StateMask;
-	BOOL res;
+	BOOL bRet2 = GetListViewItem(hListView, &lvItem2, mask, stateMask, iItem2, 0, szText2, SIZEOF_ARRAY(szText2));
 
-	lvItem.mask			= LVIF_TEXT;
-	lvItem.iItem		= iItem1;
-	lvItem.iSubItem		= 0;
-	lvItem.pszText		= szText1;
-	lvItem.cchTextMax	= SIZEOF_ARRAY(szText1);
-
-	res = ListView_GetItem(hListView,&lvItem);
-
-	if(!res)
+	if(!bRet1 || !bRet2)
 	{
-		return;
+		return FALSE;
 	}
 
-	lvItem.mask			= LVIF_TEXT;
-	lvItem.iItem		= iItem2;
-	lvItem.iSubItem		= 0;
-	lvItem.pszText		= szText2;
-	lvItem.cchTextMax	= SIZEOF_ARRAY(szText2);
+	lvItem1.iItem = iItem2;
+	ListView_SetItem(hListView, &lvItem1);
 
-	res = ListView_GetItem(hListView,&lvItem);
+	lvItem2.iItem = iItem1;
+	ListView_SetItem(hListView, &lvItem2);
 
-	if(!res)
+	HWND hHeader = ListView_GetHeader(hListView);
+	int nColumns = Header_GetItemCount(hHeader);
+
+	for(int i = 1; i < nColumns; i++)
 	{
-		return;
+		TCHAR szColumn1[512];
+		ListView_GetItemText(hListView, iItem1, i, szColumn1, SIZEOF_ARRAY(szColumn1));
+
+		TCHAR szColumn2[512];
+		ListView_GetItemText(hListView, iItem2, i, szColumn2, SIZEOF_ARRAY(szColumn2));
+
+		ListView_SetItemText(hListView, iItem1, i, szColumn2);
+		ListView_SetItemText(hListView, iItem2, i, szColumn1);
 	}
 
-	lvItem.mask		= LVIF_TEXT;
-	lvItem.iItem	= iItem1;
-	lvItem.iSubItem	= 0;
-	lvItem.pszText	= szText2;
-	ListView_SetItem(hListView,&lvItem);
-
-	lvItem.mask		= LVIF_TEXT;
-	lvItem.iItem	= iItem2;
-	lvItem.iSubItem	= 0;
-	lvItem.pszText	= szText1;
-	ListView_SetItem(hListView,&lvItem);
-
-	/* Swap all sub-items. */
-	HWND hHeader;
-	TCHAR szBuffer1[512];
-	TCHAR szBuffer2[512];
-	int nColumns;
-	int iSubItem = 1;
-	int i = 0;
-
-	hHeader = ListView_GetHeader(hListView);
-
-	nColumns = Header_GetItemCount(hHeader);
-
-	for(i = 0;i < nColumns;i++)
-	{
-		lvItem.mask			= LVIF_TEXT;
-		lvItem.iItem		= iItem1;
-		lvItem.iSubItem		= iSubItem;
-		lvItem.pszText		= szBuffer1;
-		lvItem.cchTextMax	= SIZEOF_ARRAY(szBuffer1);
-
-		ListView_GetItem(hListView,&lvItem);
-
-		lvItem.mask			= LVIF_TEXT;
-		lvItem.iItem		= iItem2;
-		lvItem.iSubItem		= iSubItem;
-		lvItem.pszText		= szBuffer2;
-		lvItem.cchTextMax	= SIZEOF_ARRAY(szBuffer2);
-
-		ListView_GetItem(hListView,&lvItem);
-
-		lvItem.mask		= LVIF_TEXT;
-		lvItem.iItem	= iItem1;
-		lvItem.iSubItem	= iSubItem;
-		lvItem.pszText	= szBuffer2;
-		ListView_SetItem(hListView,&lvItem);
-
-		lvItem.mask		= LVIF_TEXT;
-		lvItem.iItem	= iItem2;
-		lvItem.iSubItem	= iSubItem;
-		lvItem.pszText	= szBuffer1;
-		ListView_SetItem(hListView,&lvItem);
-
-		iSubItem++;
-	}
-
-	Item1StateMask = ListView_GetItemState(hListView,iItem1,LVIS_CUT | LVIS_FOCUSED | LVIS_SELECTED);
-	Item2StateMask = ListView_GetItemState(hListView,iItem2,LVIS_CUT | LVIS_FOCUSED | LVIS_SELECTED);
-
-	ListView_SetItemState(hListView,iItem1,Item2StateMask,LVIS_CUT | LVIS_FOCUSED | LVIS_SELECTED);
-	ListView_SetItemState(hListView,iItem2,Item1StateMask,LVIS_CUT | LVIS_FOCUSED | LVIS_SELECTED);
-
-	bItem1Checked = ListView_GetCheckState(hListView,iItem1);
-	bItem2Checked = ListView_GetCheckState(hListView,iItem2);
-
-	ListView_SetCheckState(hListView,iItem1,bItem2Checked);
-	ListView_SetCheckState(hListView,iItem2,bItem1Checked);
+	return TRUE;
 }
 
-void NListView::ListView_HandleInsertionMark(HWND hListView,int iItemFocus,POINT *ppt)
+void NListView::ListView_PositionInsertMark(HWND hListView,const POINT *ppt)
 {
 	/* Remove the insertion mark. */
 	if(ppt == NULL)
@@ -472,6 +342,7 @@ void NListView::ListView_HandleInsertionMark(HWND hListView,int iItemFocus,POINT
 	RECT ItemRect;
 	DWORD dwFlags = 0;
 	int iNext;
+	BOOL bRet;
 
 	LV_HITTESTINFO item;
 	item.pt = *ppt;
@@ -480,15 +351,15 @@ void NListView::ListView_HandleInsertionMark(HWND hListView,int iItemFocus,POINT
 
 	if(iItem != -1 && item.flags & LVHT_ONITEM)
 	{
-		ListView_GetItemRect(hListView,item.iItem,&ItemRect,LVIR_BOUNDS);
+		bRet = ListView_GetItemRect(hListView,item.iItem,&ItemRect,LVIR_BOUNDS);
 
 		/* If the cursor is on the left side
 		of this item, set the insertion before
 		this item; if it is on the right side
 		of this item, set the insertion mark
 		after this item. */
-		if((ppt->x - ItemRect.left) >
-			((ItemRect.right - ItemRect.left)/2))
+		if(bRet &&
+			(ppt->x - ItemRect.left) > ((ItemRect.right - ItemRect.left)/2))
 		{
 			iNext = iItem;
 			dwFlags = LVIM_AFTER;
@@ -522,7 +393,7 @@ void NListView::ListView_HandleInsertionMark(HWND hListView,int iItemFocus,POINT
 			iNext = ListView_FindItem(hListView,-1,&lvfi);
 		}
 
-		ListView_GetItemRect(hListView,iNext,&ItemRect,LVIR_BOUNDS);
+		bRet = ListView_GetItemRect(hListView,iNext,&ItemRect,LVIR_BOUNDS);
 
 		/* This situation only occurs at the
 		end of the row. Prior to this, it is
@@ -532,8 +403,8 @@ void NListView::ListView_HandleInsertionMark(HWND hListView,int iItemFocus,POINT
 		Once the end of the row is reached, the
 		item found will be on the left side of
 		the cursor. */
-		if(ppt->x > ItemRect.left +
-			((ItemRect.right - ItemRect.left)/2))
+		if(bRet &&
+			ppt->x > (ItemRect.left + ((ItemRect.right - ItemRect.left)/2)))
 		{
 			/* At the end of a row, VK_UP appears to
 			find the next item up. Therefore, if we're
@@ -558,13 +429,14 @@ void NListView::ListView_HandleInsertionMark(HWND hListView,int iItemFocus,POINT
 		int nItems = ListView_GetItemCount(hListView);
 
 		/* Last item is at position nItems - 1. */
-		ListView_GetItemRect(hListView,nItems - 1,&ItemRect,LVIR_BOUNDS);
+		bRet = ListView_GetItemRect(hListView,nItems - 1,&ItemRect,LVIR_BOUNDS);
 
 		/* Special case needed for very last item. If cursor is within 0.5 to 1.5 width
 		of last item, and is greater than it's y coordinate, snap the insertion mark to
 		this item. */
-		if((ppt->x > ItemRect.left + ((ItemRect.right - ItemRect.left)/2)) &&
-			ppt->x < ItemRect.right + ((ItemRect.right - ItemRect.left)/2) + 2 &&
+		if(bRet &&
+			ppt->x > (ItemRect.left + ((ItemRect.right - ItemRect.left)/2)) &&
+			ppt->x < (ItemRect.right + ((ItemRect.right - ItemRect.left)/2) + 2) &&
 			ppt->y > ItemRect.top)
 		{
 			iNext = nItems - 1;

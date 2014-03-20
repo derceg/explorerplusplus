@@ -225,7 +225,7 @@ void CMyTreeView::DirectoryAlteredRenameFile(TCHAR *szFullFileName)
 		}
 	}
 
-    if(!hDeskItem && !hItem)
+	if(!hDeskItem && !hItem)
 	{
 		BOOL bFound = FALSE;
 
@@ -440,7 +440,7 @@ void CMyTreeView::AddItemInternal(HTREEITEM hParent,TCHAR *szFullFileName)
 					m_pItemInfo[iItemId].pidl = ILClone(pidlComplete);
 					m_pItemInfo[iItemId].pridl = ILClone(pidlRelative);
 
-					GetDisplayName(szFullFileName,szDisplayName,SHGDN_NORMAL);
+					GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_NORMAL);
 
 					tvItem.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_CHILDREN;
 					tvItem.pszText			= szDisplayName;

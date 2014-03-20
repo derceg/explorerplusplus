@@ -20,7 +20,7 @@
 
 
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
-	std::list<JumpListTaskInformation> TaskList);
+	const std::list<JumpListTaskInformation> &TaskList);
 HRESULT AddJumpListTaskInternal(IObjectCollection *poc,const TCHAR *pszName,
 	const TCHAR *pszPath,const TCHAR *pszArguments,const TCHAR *pszIconPath,int iIcon);
 
@@ -33,22 +33,20 @@ HRESULT GetIdlFromParsingName(const TCHAR *szParsingName,LPITEMIDLIST *pidl)
 	}
 
 	IShellFolder *pDesktopFolder = NULL;
-	WCHAR szParsingNameW[MAX_PATH];
 	HRESULT hr;
 
 	hr = SHGetDesktopFolder(&pDesktopFolder);
 
 	if(SUCCEEDED(hr))
 	{
-		#ifndef UNICODE
-		MultiByteToWideChar(CP_ACP,0,szParsingName,
-		-1,szParsingNameW,SIZEOF_ARRAY(szParsingNameW));
-		#else
-		StringCchCopy(szParsingNameW,SIZEOF_ARRAY(szParsingNameW),szParsingName);
-		#endif
+		/* For some reason, ParseDisplayName
+		takes a pointer to a non-constant
+		string, so copy the incoming string. */
+		TCHAR szParsingNameTemp[MAX_PATH];
+		StringCchCopy(szParsingNameTemp, SIZEOF_ARRAY(szParsingNameTemp), szParsingName);
 
 		hr = pDesktopFolder->ParseDisplayName(NULL,NULL,
-		szParsingNameW,NULL,pidl,NULL);
+			szParsingNameTemp,NULL,pidl,NULL);
 
 		pDesktopFolder->Release();
 	}
@@ -56,7 +54,7 @@ HRESULT GetIdlFromParsingName(const TCHAR *szParsingName,LPITEMIDLIST *pidl)
 	return hr;
 }
 
-HRESULT GetDisplayName(TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags)
+HRESULT GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags)
 {
 	if(szParsingPath == NULL ||
 		szDisplayName == NULL)
@@ -71,15 +69,15 @@ HRESULT GetDisplayName(TCHAR *szParsingPath,TCHAR *szDisplayName,DWORD uFlags)
 
 	if(SUCCEEDED(hr))
 	{
-		hr = GetDisplayName(pidl,szDisplayName,uFlags);
-	}
+		hr = GetDisplayName(pidl,szDisplayName,cchMax,uFlags);
 
-	CoTaskMemFree(pidl);
+		CoTaskMemFree(pidl);
+	}
 
 	return hr;
 }
 
-HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uFlags)
+HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags)
 {
 	if(pidlDirectory == NULL ||
 		szDisplayName == NULL)
@@ -101,7 +99,7 @@ HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uF
 
 		if(SUCCEEDED(hr))
 		{
-			StrRetToBuf(&str,pidlDirectory,szDisplayName,MAX_PATH);
+			hr = StrRetToBuf(&str,pidlDirectory,szDisplayName,cchMax);
 		}
 
 		pShellFolder->Release();
@@ -110,7 +108,21 @@ HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,DWORD uF
 	return hr;
 }
 
-HRESULT GetItemAttributes(TCHAR *szItemParsingPath,SFGAOF *pItemAttributes)
+HRESULT GetCsidlDisplayName(int csidl, TCHAR *szFolderName, UINT cchMax, DWORD uParsingFlags)
+{
+	LPITEMIDLIST pidl = NULL;
+	HRESULT hr = SHGetFolderLocation(NULL, csidl, NULL, 0, &pidl);
+
+	if(SUCCEEDED(hr))
+	{
+		hr = GetDisplayName(pidl, szFolderName, cchMax, uParsingFlags);
+		CoTaskMemFree(pidl);
+	}
+
+	return hr;
+}
+
+HRESULT GetItemAttributes(const TCHAR *szItemParsingPath,SFGAOF *pItemAttributes)
 {
 	if(szItemParsingPath == NULL ||
 		pItemAttributes == NULL)
@@ -176,45 +188,6 @@ BOOL ExecuteFileAction(HWND hwnd,const TCHAR *szVerb,const TCHAR *szParameters,c
 	return ShellExecuteEx(&ExecInfo);
 }
 
-void GetVirtualFolderParsingPath(UINT uFolderCSIDL,TCHAR *szParsingPath)
-{
-	IShellFolder *pShellFolder		= NULL;
-	IShellFolder *pDesktopFolder	= NULL;
-	LPITEMIDLIST pidl				= NULL;
-	LPITEMIDLIST pidlRelative		= NULL;
-	STRRET str;
-	HRESULT hr;
-
-	hr = SHGetDesktopFolder(&pDesktopFolder);
-
-	if(SUCCEEDED(hr))
-	{
-		hr = SHGetFolderLocation(NULL,uFolderCSIDL,NULL,0,&pidl);
-
-		if(SUCCEEDED(hr))
-		{
-			hr = SHBindToParent(pidl,IID_IShellFolder,(void **)&pShellFolder,
-			(LPCITEMIDLIST *)&pidlRelative);
-
-			if(SUCCEEDED(hr))
-			{
-				hr = pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
-
-				if(SUCCEEDED(hr))
-				{
-					StrRetToBuf(&str,pidlRelative,szParsingPath,MAX_PATH);
-				}
-
-				pShellFolder->Release();
-			}
-
-			CoTaskMemFree(pidl);
-		}
-
-		pDesktopFolder->Release();
-	}
-}
-
 HRESULT GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent)
 {
 	if(IsNamespaceRoot(pidlDirectory))
@@ -248,12 +221,12 @@ BOOL IsNamespaceRoot(LPCITEMIDLIST pidl)
 	return bNamespaceRoot;
 }
 
-BOOL CheckIdl(LPITEMIDLIST pidl)
+BOOL CheckIdl(LPCITEMIDLIST pidl)
 {
 	LPITEMIDLIST	pidlCheck = NULL;
 	TCHAR			szTabText[MAX_PATH];
 
-	if(!SUCCEEDED(GetDisplayName(pidl,szTabText,SHGDN_FORPARSING)))
+	if(!SUCCEEDED(GetDisplayName(pidl,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_FORPARSING)))
 		return FALSE;
 
 	if(!SUCCEEDED(GetIdlFromParsingName(szTabText,&pidlCheck)))
@@ -264,7 +237,7 @@ BOOL CheckIdl(LPITEMIDLIST pidl)
 	return TRUE;
 }
 
-BOOL IsIdlDirectory(LPITEMIDLIST pidl)
+BOOL IsIdlDirectory(LPCITEMIDLIST pidl)
 {
 	SFGAOF Attributes;
 
@@ -278,197 +251,147 @@ BOOL IsIdlDirectory(LPITEMIDLIST pidl)
 	return FALSE;
 }
 
-HRESULT DecodeFriendlyPath(TCHAR *szFriendlyPath,TCHAR *szParsingPath)
+HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT cchMax)
 {
 	LPITEMIDLIST pidl = NULL;
 	TCHAR szName[MAX_PATH];
 
 	SHGetFolderLocation(NULL,CSIDL_CONTROLS,NULL,0,&pidl);
-	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	GetDisplayName(pidl,szName,SIZEOF_ARRAY(szName),SHGDN_INFOLDER);
 	CoTaskMemFree(pidl);
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_CONTROLS,szParsingPath);
+		GetCsidlDisplayName(CSIDL_CONTROLS,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(NULL,CSIDL_BITBUCKET,NULL,0,&pidl);
-	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	GetDisplayName(pidl,szName,SIZEOF_ARRAY(szName),SHGDN_INFOLDER);
 	CoTaskMemFree(pidl);
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_BITBUCKET,szParsingPath);
+		GetCsidlDisplayName(CSIDL_BITBUCKET,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidl);
-	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	GetDisplayName(pidl,szName,SIZEOF_ARRAY(szName),SHGDN_INFOLDER);
 	CoTaskMemFree(pidl);
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_DRIVES,szParsingPath);
+		GetCsidlDisplayName(CSIDL_DRIVES,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(NULL,CSIDL_NETWORK,NULL,0,&pidl);
-	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	GetDisplayName(pidl,szName,SIZEOF_ARRAY(szName),SHGDN_INFOLDER);
 	CoTaskMemFree(pidl);
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_NETWORK,szParsingPath);
+		GetCsidlDisplayName(CSIDL_NETWORK,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(NULL,CSIDL_CONNECTIONS,NULL,0,&pidl);
-	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	GetDisplayName(pidl,szName,SIZEOF_ARRAY(szName),SHGDN_INFOLDER);
 	CoTaskMemFree(pidl);
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_CONNECTIONS,szParsingPath);
+		GetCsidlDisplayName(CSIDL_CONNECTIONS,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(NULL,CSIDL_PRINTERS,NULL,0,&pidl);
-	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	GetDisplayName(pidl,szName,SIZEOF_ARRAY(szName),SHGDN_INFOLDER);
 	CoTaskMemFree(pidl);
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_PRINTERS,szParsingPath);
+		GetCsidlDisplayName(CSIDL_PRINTERS,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(NULL,CSIDL_FAVORITES,NULL,0,&pidl);
-	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	GetDisplayName(pidl,szName,SIZEOF_ARRAY(szName),SHGDN_INFOLDER);
 	CoTaskMemFree(pidl);
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_FAVORITES,szParsingPath);
+		GetCsidlDisplayName(CSIDL_FAVORITES,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(NULL,CSIDL_MYPICTURES,NULL,0,&pidl);
-	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	GetDisplayName(pidl,szName,SIZEOF_ARRAY(szName),SHGDN_INFOLDER);
 	CoTaskMemFree(pidl);
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYPICTURES,szParsingPath);
+		GetCsidlDisplayName(CSIDL_MYPICTURES,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(NULL,CSIDL_MYMUSIC,NULL,0,&pidl);
-	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	GetDisplayName(pidl,szName,SIZEOF_ARRAY(szName),SHGDN_INFOLDER);
 	CoTaskMemFree(pidl);
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYMUSIC,szParsingPath);
+		GetCsidlDisplayName(CSIDL_MYMUSIC,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	SHGetFolderLocation(NULL,CSIDL_MYVIDEO,NULL,0,&pidl);
-	GetDisplayName(pidl,szName,SHGDN_INFOLDER);
+	GetDisplayName(pidl,szName,SIZEOF_ARRAY(szName),SHGDN_INFOLDER);
 	CoTaskMemFree(pidl);
 
 	if(lstrcmpi(szName,szFriendlyPath) == 0)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYVIDEO,szParsingPath);
+		GetCsidlDisplayName(CSIDL_MYVIDEO,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_DESKTOP,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetVirtualFolderParsingPath(CSIDL_DESKTOP,szParsingPath);
+		GetCsidlDisplayName(CSIDL_DESKTOP,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_PICTURES,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYPICTURES,szParsingPath);
+		GetCsidlDisplayName(CSIDL_MYPICTURES,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_MUSIC,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYMUSIC,szParsingPath);
+		GetCsidlDisplayName(CSIDL_MYMUSIC,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_VIDEOS,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYVIDEO,szParsingPath);
+		GetCsidlDisplayName(CSIDL_MYVIDEO,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	if(CompareString(LOCALE_INVARIANT,NORM_IGNORECASE,
 		FRIENDLY_NAME_DOCUMENTS,-1,szFriendlyPath,-1) == CSTR_EQUAL)
 	{
-		GetVirtualFolderParsingPath(CSIDL_MYDOCUMENTS,szParsingPath);
+		GetCsidlDisplayName(CSIDL_MYDOCUMENTS,szParsingPath,cchMax,SHGDN_FORPARSING);
 		return S_OK;
 	}
 
 	return E_FAIL;
-}
-
-BOOL IsDirectoryRoot(TCHAR *Path)
-{
-	TCHAR *Drives	= NULL;
-	DWORD Size;
-	BOOL Break		= FALSE;
-
-	/* Find out how much space is needed to hold the list of drive
-	names. */
-	Size = GetLogicalDriveStrings(0,NULL);
-
-	Drives = (TCHAR *)malloc((Size + 1) * sizeof(TCHAR));
-
-	if(Drives == NULL)
-		return FALSE;
-
-	/* Ask the system for a list of the current drives in the system.
-	This list is returned as a double NULL terminated buffer. */
-	Size = GetLogicalDriveStrings(Size,Drives);
-
-	if(Size != 0)
-	{
-		while(Break == FALSE)
-		{
-			/* String list containing drive list is double NULL terminated.
-			Detect if the character after the end of the current string is
-			another NULL byte. */
-			if(*(Drives) == '\0')
-			{
-				/* Break out of the loop at the next iteration (double NULL byte
-				set has being found). */
-				Break = TRUE;
-			}
-			else
-			{
-				if(StrCmpI(Drives,Path) == 0)
-				{
-					/* The path name of this drive matches up with the supplied
-					path. Thus, the supplied path is a directory root. */
-					return TRUE;
-				}
-			}
-
-			Drives += lstrlen(Drives) + 1;
-		}
-	}
-
-	/* No matches found. The path specified is not a directory root. */
-	return FALSE;
 }
 
 int GetDefaultFolderIconIndex(void)
@@ -481,21 +404,18 @@ int GetDefaultFileIconIndex(void)
 	return GetDefaultIcon(DEFAULT_ICON_FILE);
 }
 
-int GetDefaultIcon(int iIconType)
+int GetDefaultIcon(DefaultIconType defaultIconType)
 {
 	SHFILEINFO shfi;
 	DWORD dwFileAttributes;
 
-	switch(iIconType)
+	switch(defaultIconType)
 	{
 		case DEFAULT_ICON_FOLDER:
 			dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY|FILE_ATTRIBUTE_NORMAL;
 			break;
 
 		case DEFAULT_ICON_FILE:
-			dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
-			break;
-
 		default:
 			dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
 			break;
@@ -507,101 +427,6 @@ int GetDefaultIcon(int iIconType)
 	sizeof(SHFILEINFO),SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES);
 
 	return shfi.iIcon;
-}
-
-HRESULT GetFileInfoTip(HWND hwnd,LPCITEMIDLIST pidlDirectory,LPCITEMIDLIST *pridl,
-TCHAR *szInfoTip,UINT cchMax)
-{
-	if(pidlDirectory == NULL ||
-		pridl == NULL ||
-		szInfoTip == NULL ||
-		cchMax == 0)
-	{
-		return E_FAIL;
-	}
-
-	IShellFolder *pDesktopFolder = NULL;
-	IShellFolder *pShellFolder = NULL;
-	IQueryInfo *pQueryInfo = NULL;
-	LPWSTR ppwszTip = NULL;
-	HRESULT hr;
-
-	hr = SHGetDesktopFolder(&pDesktopFolder);
-
-	if(SUCCEEDED(hr))
-	{
-		if(IsNamespaceRoot(pidlDirectory))
-		{
-			hr = SHGetDesktopFolder(&pShellFolder);
-		}
-		else
-		{
-			hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
-				IID_IShellFolder,(void **)&pShellFolder);
-		}
-
-		if(SUCCEEDED(hr))
-		{
-			hr = pShellFolder->GetUIObjectOf(hwnd,1,pridl,
-			IID_IQueryInfo,0,(void **)&pQueryInfo);
-
-			if(SUCCEEDED(hr))
-			{
-				hr = pQueryInfo->GetInfoTip(QITIPF_USESLOWTIP,&ppwszTip);
-
-				if(SUCCEEDED(hr) && ppwszTip != NULL)
-				{
-					#ifndef UNICODE
-					WideCharToMultiByte(CP_ACP,0,ppwszTip,-1,szInfoTip,
-					cchMax,NULL,NULL);
-					#else
-					StringCchCopy(szInfoTip,cchMax,ppwszTip);
-					#endif
-
-					CoTaskMemFree((LPVOID)ppwszTip);
-				}
-				else
-				{
-					/* On Windows XP, seem to be able to disable folder infotips...
-					If this is done, hr will return success, but ppwszTip will be
-					NULL. Just copy in the empty string, which will cause nothing to
-					be shown. */
-					StringCchCopy(szInfoTip,cchMax,EMPTY_STRING);
-				}
-
-				pQueryInfo->Release();
-			}
-
-			pShellFolder->Release();
-		}
-
-		pDesktopFolder->Release();
-	}
-
-	return hr;
-}
-
-HRESULT GetCsidlFolderName(UINT csidl,TCHAR *szFolderName,DWORD uParsingFlags)
-{
-	if(szFolderName == NULL)
-	{
-		return E_FAIL;
-	}
-
-	LPITEMIDLIST pidl = NULL;
-	HRESULT hr;
-
-	hr = SHGetFolderLocation(NULL,csidl,NULL,0,&pidl);
-
-	/* Don't use SUCCEEDED(hr). */
-	if(hr == S_OK)
-	{
-		hr = GetDisplayName(pidl,szFolderName,uParsingFlags);
-
-		CoTaskMemFree(pidl);
-	}
-
-	return hr;
 }
 
 BOOL MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize)
@@ -630,38 +455,7 @@ BOOL MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD n
 	return bRet;
 }
 
-BOOL CopyTextToClipboard(const std::wstring &str)
-{
-	if(!OpenClipboard(NULL))
-	{
-		return FALSE;
-	}
-
-	EmptyClipboard();
-
-	HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE,(str.size() + 1) * sizeof(TCHAR));
-	BOOL bRes = FALSE;
-
-	if(hGlobal != NULL)
-	{
-		LPVOID pMem = GlobalLock(hGlobal);
-		memcpy(pMem,str.c_str(),(str.size() + 1) * sizeof(TCHAR));
-		GlobalUnlock(hGlobal);
-
-		HANDLE hData = SetClipboardData(CF_UNICODETEXT,hGlobal);
-
-		if(hData != NULL)
-		{
-			bRes = TRUE;
-		}
-	}
-
-	CloseClipboard();
-
-	return bRes;
-}
-
-DWORD DetermineCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,
+DWORD DetermineDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,
 BOOL bDataAccept,BOOL bOnSameDrive)
 {
 	DWORD dwEffect = DROPEFFECT_NONE;
@@ -722,16 +516,9 @@ BOOL bDataAccept,BOOL bOnSameDrive)
 	return dwEffect;
 }
 
-HRESULT BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
-	IN std::list<std::wstring> FilenameList)
+HRESULT BuildHDropList(FORMATETC *pftc,STGMEDIUM *pstg,
+	const std::list<std::wstring> &FilenameList)
 {
-	if(pftc == NULL ||
-		pstg == NULL ||
-		FilenameList.size() == 0)
-	{
-		return E_FAIL;
-	}
-
 	SetFORMATETC(pftc,CF_HDROP,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL);
 
 	UINT uSize = 0;
@@ -792,9 +579,9 @@ HRESULT BuildHDropList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
 /* Builds a CIDA structure. Returns the structure and its size
 via arguments.
 Returns S_OK on success; E_FAIL on failure. */
-HRESULT BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
-	IN LPCITEMIDLIST pidlDirectory,
-	IN std::list<LPITEMIDLIST> pidlList)
+HRESULT BuildShellIDList(FORMATETC *pftc,STGMEDIUM *pstg,
+	LPCITEMIDLIST pidlDirectory,
+	const std::list<LPITEMIDLIST> &pidlList)
 {
 	if(pftc == NULL ||
 		pstg == NULL ||
@@ -882,31 +669,42 @@ HRESULT BuildShellIDList(OUT FORMATETC *pftc,OUT STGMEDIUM *pstg,
 	return S_OK;
 }
 
-HRESULT BindToShellFolder(LPCITEMIDLIST pidlDirectory,IShellFolder **pShellFolder)
+HRESULT BindToIdl(LPCITEMIDLIST pidl, REFIID riid, void **ppv)
 {
-	if(pidlDirectory == NULL ||
-		pShellFolder == NULL)
-	{
-		return E_FAIL;
-	}
-
-	IShellFolder *pDesktopFolder = NULL;
-	HRESULT hr;
-
-	*pShellFolder = NULL;
-
-	hr = SHGetDesktopFolder(&pDesktopFolder);
+	IShellFolder *pDesktop = NULL;
+	HRESULT hr = SHGetDesktopFolder(&pDesktop);
 
 	if(SUCCEEDED(hr))
 	{
-		if(IsNamespaceRoot(pidlDirectory))
+		/* See http://blogs.msdn.com/b/oldnewthing/archive/2011/08/30/10202076.aspx. */
+		if(pidl->mkid.cb)
 		{
-			hr = SHGetDesktopFolder(pShellFolder);
+			hr = pDesktop->BindToObject(pidl, NULL, riid, ppv);
 		}
 		else
 		{
-			hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
-				IID_IShellFolder,(LPVOID *)pShellFolder);
+			hr = pDesktop->QueryInterface(riid, ppv);
+		}
+
+		pDesktop->Release();
+	}
+
+	return hr;
+}
+
+HRESULT GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid,
+	PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax)
+{
+	VARIANT vt;
+	HRESULT hr = pShellFolder->GetDetailsEx(pidl, pscid, &vt);
+
+	if(SUCCEEDED(hr))
+	{
+		hr = VariantChangeType(&vt, &vt, 0, VT_BSTR);
+
+		if(SUCCEEDED(hr))
+		{
+			hr = StringCchCopy(szDetail, cchMax, V_BSTR(&vt));
 		}
 	}
 
@@ -919,7 +717,7 @@ i.e. of the form:
 ::{20D04FE0-3AEA-1069-A2D8-08002B30309D}
 (My Computer GUID, Windows 7)
 */
-BOOL IsPathGUID(TCHAR *szPath)
+BOOL IsPathGUID(const TCHAR *szPath)
 {
 	if(szPath == NULL)
 	{
@@ -963,7 +761,7 @@ Basic procedure:
  5. If the path is a URL, pass it straight out, else
  6. If the path is relative, add it onto onto the current directory
 */
-void DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest)
+void DecodePath(const TCHAR *szInitialPath,const TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest)
 {
 	TCHAR szExpandedPath[MAX_PATH];
 	TCHAR szCanonicalPath[MAX_PATH];
@@ -981,7 +779,7 @@ void DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingP
 	}
 	else
 	{
-		hr = DecodeFriendlyPath(szInitialPath,szVirtualParsingPath);
+		hr = DecodeFriendlyPath(szInitialPath,szVirtualParsingPath,SIZEOF_ARRAY(szVirtualParsingPath));
 
 		if(SUCCEEDED(hr))
 		{
@@ -1030,11 +828,6 @@ void DecodePath(TCHAR *szInitialPath,TCHAR *szCurrentDirectory,TCHAR *szParsingP
 
 BOOL CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2)
 {
-	if(pidl1 == NULL || pidl2 == NULL)
-	{
-		return FALSE;
-	}
-
 	IShellFolder *pDesktopFolder = NULL;
 	HRESULT hr;
 	BOOL ret = FALSE;
@@ -1045,7 +838,7 @@ BOOL CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2)
 	{
 		hr = pDesktopFolder->CompareIDs(0,pidl1,pidl2);
 
-		if(short(HRESULT_CODE(hr) == 0))
+		if(HRESULT_CODE(hr) == 0)
 		{
 			ret = TRUE;
 		}
@@ -1056,23 +849,7 @@ BOOL CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2)
 	return ret;
 }
 
-void SetFORMATETC(FORMATETC *pftc,CLIPFORMAT cfFormat,
-	DVTARGETDEVICE *ptd,DWORD dwAspect,LONG lindex,
-	DWORD tymed)
-{
-	if(pftc == NULL)
-	{
-		return;
-	}
-
-	pftc->cfFormat	= cfFormat;
-	pftc->tymed		= tymed;
-	pftc->lindex	= lindex;
-	pftc->dwAspect	= dwAspect;
-	pftc->ptd		= ptd;
-}
-
-HRESULT AddJumpListTasks(std::list<JumpListTaskInformation> TaskList)
+HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList)
 {
 	if(TaskList.size() == 0)
 	{
@@ -1126,7 +903,7 @@ HRESULT AddJumpListTasks(std::list<JumpListTaskInformation> TaskList)
 }
 
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
-	std::list<JumpListTaskInformation> TaskList)
+	const std::list<JumpListTaskInformation> &TaskList)
 {
 	for each(auto jtli in TaskList)
 	{
@@ -1169,17 +946,25 @@ HRESULT AddJumpListTaskInternal(IObjectCollection *poc,const TCHAR *pszName,
 
 		if(SUCCEEDED(hr))
 		{
-			InitPropVariantFromString(pszName,&pv);
+			hr = InitPropVariantFromString(pszName,&pv);
 
-			/* See: http://msdn.microsoft.com/en-us/library/bb787584(VS.85).aspx */
-			PROPERTYKEY PKEY_Title;
-			CLSIDFromString(L"{F29F85E0-4FF9-1068-AB91-08002B27B3D9}",&PKEY_Title.fmtid);
-			PKEY_Title.pid = 2;
+			if(SUCCEEDED(hr))
+			{
+				/* See: http://msdn.microsoft.com/en-us/library/bb787584(VS.85).aspx */
+				PROPERTYKEY keyTitle;
+				keyTitle.pid = 2;
+				hr = CLSIDFromString(L"{F29F85E0-4FF9-1068-AB91-08002B27B3D9}",&keyTitle.fmtid);
 
-			pps->SetValue(PKEY_Title,pv);
-			pps->Commit();
+				if(SUCCEEDED(hr))
+				{
+					pps->SetValue(keyTitle,pv);
+					pps->Commit();
 
-			poc->AddObject(pShellLink);
+					poc->AddObject(pShellLink);
+				}
+
+				PropVariantClear(&pv);
+			}
 
 			pps->Release();
 		}
@@ -1195,8 +980,8 @@ is up to the caller to free both the DLL's and objects
 returned.
 
 http://www.ureader.com/msg/16601280.aspx */
-BOOL LoadContextMenuHandlers(IN const TCHAR *szRegKey,
-	OUT std::list<ContextMenuHandler_t> *pContextMenuHandlers)
+BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
+	std::list<ContextMenuHandler_t> &ContextMenuHandlers)
 {
 	HKEY hKey = NULL;
 	BOOL bSuccess = FALSE;
@@ -1237,7 +1022,7 @@ BOOL LoadContextMenuHandlers(IN const TCHAR *szRegKey,
 
 					if(bRes)
 					{
-						pContextMenuHandlers->push_back(ContextMenuHandler);
+						ContextMenuHandlers.push_back(ContextMenuHandler);
 					}
 				}
 
@@ -1263,8 +1048,8 @@ will attempted to be loaded.
 Regardless of whether or not a DLL was actually
 loaded, the object will be initialized with a call
 to CoCreateInstance. */
-BOOL LoadIUnknownFromCLSID(IN TCHAR *szCLSID,
-OUT ContextMenuHandler_t *pContextMenuHandler)
+BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID,
+	ContextMenuHandler_t *pContextMenuHandler)
 {
 	HKEY hCLSIDKey;
 	HKEY hDllKey;
@@ -1332,4 +1117,55 @@ OUT ContextMenuHandler_t *pContextMenuHandler)
 	}
 
 	return bSuccess;
+}
+
+HRESULT GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax)
+{
+	LPITEMIDLIST	pidlItem = NULL;
+	HRESULT			hr;
+
+	hr = GetIdlFromParsingName(szItemPath, &pidlItem);
+
+	if(SUCCEEDED(hr))
+	{
+		hr = GetItemInfoTip(pidlItem, szInfoTip, cchMax);
+
+		CoTaskMemFree(pidlItem);
+	}
+
+	return hr;
+}
+
+HRESULT GetItemInfoTip(LPCITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchMax)
+{
+	IShellFolder	*pShellFolder = NULL;
+	IQueryInfo		*pQueryInfo = NULL;
+	LPCITEMIDLIST	pidlRelative = NULL;
+	LPWSTR			ppwszTip = NULL;
+	HRESULT			hr;
+
+	hr = SHBindToParent(pidlComplete, IID_IShellFolder,
+		reinterpret_cast<void **>(&pShellFolder), &pidlRelative);
+
+	if(SUCCEEDED(hr))
+	{
+		hr = pShellFolder->GetUIObjectOf(NULL, 1, &pidlRelative,
+			IID_IQueryInfo, 0, reinterpret_cast<void **>(&pQueryInfo));
+
+		if(SUCCEEDED(hr))
+		{
+			hr = pQueryInfo->GetInfoTip(QITIPF_USESLOWTIP, &ppwszTip);
+
+			if(SUCCEEDED(hr) && (ppwszTip != NULL))
+			{
+				StringCchCopy(szInfoTip, cchMax, ppwszTip);
+				CoTaskMemFree(ppwszTip);
+			}
+
+			pQueryInfo->Release();
+		}
+		pShellFolder->Release();
+	}
+
+	return hr;
 }

@@ -25,6 +25,8 @@
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/XMLSettings.h"
 #include "../Helper/ComboBox.h"
+#include "../Helper/WindowHelper.h"
+#include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
 
 
@@ -293,7 +295,7 @@ INT_PTR CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 
 			if(pidl != NULL)
 			{
-				GetDisplayName(pidl,szParsingPath,SHGDN_FORPARSING);
+				GetDisplayName(pidl,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 				SetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,szParsingPath);
 
 				CoTaskMemFree(pidl);
@@ -622,7 +624,7 @@ int CALLBACK CSearchDialog::SortResultsByPath(LPARAM lParam1,LPARAM lParam2)
 	return StrCmpLogicalW(szPath1,szPath2);
 }
 
-void CSearchDialog::AddMenuEntries(LPITEMIDLIST pidlParent,
+void CSearchDialog::AddMenuEntries(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
 	LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
@@ -651,8 +653,8 @@ void CSearchDialog::AddMenuEntries(LPITEMIDLIST pidlParent,
 	InsertMenuItem(hMenu,1,TRUE,&mii);
 }
 
-BOOL CSearchDialog::HandleShellMenuItem(LPITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
+BOOL CSearchDialog::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
+	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
 {
 	if(StrCmpI(szCmd,_T("open")) == 0)
 	{
@@ -669,7 +671,7 @@ BOOL CSearchDialog::HandleShellMenuItem(LPITEMIDLIST pidlParent,
 	return FALSE;
 }
 
-void CSearchDialog::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
+void CSearchDialog::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,int iCmd)
 {
 	switch(iCmd)
@@ -680,7 +682,7 @@ void CSearchDialog::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
 
 			TCHAR szFilename[MAX_PATH];
 			LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
-			GetDisplayName(pidlComplete,szFilename,SHGDN_INFOLDER|SHGDN_FORPARSING);
+			GetDisplayName(pidlComplete,szFilename,SIZEOF_ARRAY(szFilename),SHGDN_INFOLDER|SHGDN_FORPARSING);
 			CoTaskMemFree(pidlComplete);
 
 			m_pexpp->GetActiveShellBrowser()->SelectFiles(szFilename);
@@ -955,11 +957,11 @@ INT_PTR CSearchDialog::OnTimer(int iTimerID)
 
 		LPITEMIDLIST pidl = *itr;
 
-		GetDisplayName(pidl,szDirectory,SHGDN_FORPARSING);
+		GetDisplayName(pidl,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
 		PathRemoveFileSpec(szDirectory);
 
-		GetDisplayName(pidl,szFullFileName,SHGDN_FORPARSING);
-		GetDisplayName(pidl,szFileName,SHGDN_INFOLDER|SHGDN_FORPARSING);
+		GetDisplayName(pidl,szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
+		GetDisplayName(pidl,szFileName,SIZEOF_ARRAY(szFileName),SHGDN_INFOLDER|SHGDN_FORPARSING);
 
 		SHGetFileInfo((LPCWSTR)pidl,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
 

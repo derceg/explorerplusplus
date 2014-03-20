@@ -18,13 +18,19 @@
 #include "Helper.h"
 #include "iDataObject.h"
 #include "ShellHelper.h"
+#include "StringHelper.h"
+#include "DriveInfo.h"
 #include "Macros.h"
 
 
-#define PASTE_CLIPBOARD_LINK		0
-#define PASTE_CLIPBOARD_HARDLINK	1
+enum PasteType
+{
+	PASTE_CLIPBOARD_LINK,
+	PASTE_CLIPBOARD_HARDLINK
+};
 
-int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType);
+int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteType);
+BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFileSize);
 
 BOOL NFileOperations::RenameFile(const std::wstring &strOldFilename,
 	const std::wstring &strNewFilename)
@@ -52,7 +58,7 @@ BOOL NFileOperations::RenameFile(const std::wstring &strOldFilename,
 }
 
 BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,
-	BOOL bPermanent)
+	BOOL bPermanent,BOOL bSilent)
 {
 	TCHAR *pszFullFilenames = NFileOperations::BuildFilenameList(FullFilenameList);
 
@@ -61,6 +67,11 @@ BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullF
 	if(!bPermanent)
 	{
 		fFlags = FOF_ALLOWUNDO;
+	}
+
+	if(bSilent)
+	{
+		fFlags |= FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;
 	}
 
 	SHFILEOPSTRUCT shfo;
@@ -92,7 +103,6 @@ BOOL NFileOperations::CopyFilesToFolder(HWND hOwner,const std::wstring &strTitle
 
 	TCHAR *pszFullFilenames = NFileOperations::BuildFilenameList(FullFilenameList);
 
-	/* TODO: Pass off to copy function. */
 	SHFILEOPSTRUCT shfo;
 
 	if(bMove)
@@ -137,7 +147,7 @@ TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &Filenam
 	return pszFilenames;
 }
 
-HRESULT CreateNewFolder(TCHAR *Directory,TCHAR *szNewFolderName,int cchMax)
+HRESULT CreateNewFolder(const TCHAR *Directory,TCHAR *szNewFolderName,int cchMax)
 {
 	WIN32_FIND_DATA	wfd;
 	HANDLE			hFirstFile;
@@ -338,23 +348,21 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 	return FALSE;
 }
 
-HRESULT CopyFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject)
+HRESULT CopyFiles(const std::list<std::wstring> &FileNameList,IDataObject **pClipboardDataObject)
 {
 	return CopyFilesToClipboard(FileNameList,FALSE,pClipboardDataObject);
 }
 
-HRESULT CutFiles(std::list<std::wstring> FileNameList,IDataObject **pClipboardDataObject)
+HRESULT CutFiles(const std::list<std::wstring> &FileNameList,IDataObject **pClipboardDataObject)
 {
 	return CopyFilesToClipboard(FileNameList,TRUE,pClipboardDataObject);
 }
 
-HRESULT CopyFilesToClipboard(std::list<std::wstring> FileNameList,
+HRESULT CopyFilesToClipboard(const std::list<std::wstring> &FileNameList,
 BOOL bMove,IDataObject **pClipboardDataObject)
 {
 	FORMATETC ftc[2];
 	STGMEDIUM stg[2];
-	HRESULT hr;
-
 	BuildHDropList(&ftc[0],&stg[0],FileNameList);
 
 	ftc[1].cfFormat			= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
@@ -362,58 +370,64 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 	ftc[1].dwAspect			= DVASPECT_CONTENT;
 	ftc[1].lindex			= -1;
 	ftc[1].tymed			= TYMED_HGLOBAL;
-	
+
+	HRESULT hr = E_FAIL;
 	HGLOBAL hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
 
-	DWORD *pdwCopyEffect = static_cast<DWORD *>(GlobalLock(hglb));
-
-	if(bMove)
-		*pdwCopyEffect = DROPEFFECT_MOVE;
-	else
-		*pdwCopyEffect = DROPEFFECT_COPY;
-
-	GlobalUnlock(hglb);
-
-	stg[1].pUnkForRelease	= 0;
-
-	stg[1].hGlobal			= hglb;
-	stg[1].tymed			= TYMED_HGLOBAL;
-
-	hr = CreateDataObject(ftc,stg,pClipboardDataObject,2);
-
-	IAsyncOperation *pAsyncOperation = NULL;
-
-	(*pClipboardDataObject)->QueryInterface(IID_IAsyncOperation,(void **)&pAsyncOperation);
-
-	pAsyncOperation->SetAsyncMode(TRUE);
-	pAsyncOperation->Release();
-
-	if(SUCCEEDED(hr))
+	if(hglb != NULL)
 	{
-		hr = OleSetClipboard(*pClipboardDataObject);
+		DWORD *pdwCopyEffect = static_cast<DWORD *>(GlobalLock(hglb));
+
+		if(pdwCopyEffect != NULL)
+		{
+			if(bMove)
+			{
+				*pdwCopyEffect = DROPEFFECT_MOVE;
+			}
+			else
+			{
+				*pdwCopyEffect = DROPEFFECT_COPY;
+			}
+
+			GlobalUnlock(hglb);
+
+			stg[1].pUnkForRelease = NULL;
+			stg[1].hGlobal = hglb;
+			stg[1].tymed = TYMED_HGLOBAL;
+
+			hr = CreateDataObject(ftc, stg, pClipboardDataObject, 2);
+
+			if(SUCCEEDED(hr))
+			{
+				IAsyncOperation *pAsyncOperation = NULL;
+				hr = (*pClipboardDataObject)->QueryInterface(IID_IAsyncOperation, reinterpret_cast<void **>(&pAsyncOperation));
+
+				if(SUCCEEDED(hr))
+				{
+					pAsyncOperation->SetAsyncMode(TRUE);
+					pAsyncOperation->Release();
+
+					hr = OleSetClipboard(*pClipboardDataObject);
+				}
+			}
+		}
 	}
 
 	return hr;
 }
 
-struct HANDLETOMAPPINGS
-{
-	UINT			uNumberOfMappings;
-	LPSHNAMEMAPPING	lpSHNameMapping;
-};
-
-int PasteLinksToClipboardFiles(TCHAR *szDestination)
+int PasteLinksToClipboardFiles(const TCHAR *szDestination)
 {
 	return PasteFilesFromClipboardSpecial(szDestination,PASTE_CLIPBOARD_LINK);
 }
 
-int PasteHardLinks(TCHAR *szDestination)
+int PasteHardLinks(const TCHAR *szDestination)
 {
 	return PasteFilesFromClipboardSpecial(szDestination,PASTE_CLIPBOARD_HARDLINK);
 }
 
 /* TODO: Use CDropHandler. */
-int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType)
+int PasteFilesFromClipboardSpecial(const TCHAR *szDestination,PasteType pasteType)
 {
 	IDataObject	*ClipboardObject = NULL;
 	DROPFILES	*pdf = NULL;
@@ -458,7 +472,7 @@ int PasteFilesFromClipboardSpecial(TCHAR *szDestination,UINT fPasteType)
 
 					PathAppend(szLinkFileName,szFileName);
 
-					switch(fPasteType)
+					switch(pasteType)
 					{
 					case PASTE_CLIPBOARD_LINK:
 						PathRenameExtension(szLinkFileName,_T(".lnk"));
@@ -590,6 +604,52 @@ BOOL NFileOperations::CreateBrowseDialog(HWND hOwner,const std::wstring &strTitl
 	return bSuccessful;
 }
 
+BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFileSize)
+{
+	DWORD dwClusterSize;
+
+	LARGE_INTEGER lFileSize;
+	BOOL bRet = GetFileSizeEx(strFilename.c_str(), &lFileSize);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
+	TCHAR szRoot[MAX_PATH];
+	HRESULT hr = StringCchCopy(szRoot, SIZEOF_ARRAY(szRoot), strFilename.c_str());
+
+	if(FAILED(hr))
+	{
+		return FALSE;
+	}
+
+	bRet = PathStripToRoot(szRoot);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
+	bRet = GetClusterSize(szRoot, &dwClusterSize);
+
+	if(!bRet)
+	{
+		return FALSE;
+	}
+
+	if((lFileSize.QuadPart % dwClusterSize) != 0)
+	{
+		/* The real size is the logical file size rounded up to the end of the
+		nearest cluster. */
+		lFileSize.QuadPart += dwClusterSize - (lFileSize.QuadPart % dwClusterSize);
+	}
+
+	*lpRealFileSize = lFileSize;
+
+	return TRUE;
+}
+
 void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,OverwriteMethod_t uOverwriteMethod)
 {
 	HANDLE			hFile;
@@ -615,13 +675,12 @@ void NFileOperations::DeleteFileSecurely(const std::wstring &strFilename,Overwri
 
 	if(bFolder)
 	{
-		/* TODO: Recurse. */
 		return;
 	}
 
 	/* Determine the actual size of the file on disk
 	(i.e. how many clusters it is allocated). */
-	GetRealFileSize(strFilename,&lRealFileSize);
+	GetFileClusterSize(strFilename,&lRealFileSize);
 
 	/* Open the file, block any sharing mode, to stop the file
 	been opened while it is overwritten. */

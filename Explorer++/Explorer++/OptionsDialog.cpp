@@ -25,6 +25,8 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/ProcessHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -442,7 +444,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 						/* The folder may be virtual, in which case, it needs
 						to be decoded. */
-						hr = DecodeFriendlyPath(szNewTabDir,szVirtualParsingPath);
+						hr = DecodeFriendlyPath(szNewTabDir,szVirtualParsingPath,SIZEOF_ARRAY(szVirtualParsingPath));
 
 						if(SUCCEEDED(hr))
 							StringCchCopy(m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory),
@@ -1228,7 +1230,7 @@ void Explorerplusplus::OnDefaultSettingsNewTabDir(HWND hDlg)
 	GetDlgItemText(hDlg,IDC_DEFAULT_NEWTABDIR_EDIT,szNewTabDir,
 		SIZEOF_ARRAY(szNewTabDir));
 
-	hr = DecodeFriendlyPath(szNewTabDir,szVirtualParsingPath);
+	hr = DecodeFriendlyPath(szNewTabDir,szVirtualParsingPath,SIZEOF_ARRAY(szVirtualParsingPath));
 
 	if(SUCCEEDED(hr))
 		StringCchCopy(g_szNewTabDirectory,SIZEOF_ARRAY(g_szNewTabDirectory),
@@ -1303,7 +1305,7 @@ void Explorerplusplus::DefaultSettingsSetNewTabDir(HWND hEdit,LPITEMIDLIST pidl)
 	else
 		uNameFlags = SHGDN_INFOLDER;
 
-	GetDisplayName(pidl,szNewTabDir,uNameFlags);
+	GetDisplayName(pidl,szNewTabDir,SIZEOF_ARRAY(szNewTabDir),uNameFlags);
 
 	SendMessage(hEdit,WM_SETTEXT,0,(LPARAM)szNewTabDir);
 }
@@ -1326,7 +1328,7 @@ void Explorerplusplus::AddLanguages(HWND hDlg)
 	SendMessage(hLanguageComboBox,CB_ADDSTRING,0,(LPARAM)_T("English"));
 	SendMessage(hLanguageComboBox,CB_SETITEMDATA,0,9);
 
-	GetCurrentProcessImageName(szImageDirectory,SIZEOF_ARRAY(szImageDirectory));
+	GetProcessImageName(GetCurrentProcessId(),szImageDirectory,SIZEOF_ARRAY(szImageDirectory));
 	PathRemoveFileSpec(szImageDirectory);
 	StringCchCopy(szNamePattern,SIZEOF_ARRAY(szNamePattern),szImageDirectory);
 	PathAppend(szNamePattern,_T("Explorer++??.dll"));
@@ -1336,24 +1338,21 @@ void Explorerplusplus::AddLanguages(HWND hDlg)
 	/* Enumerate all the possible language DLL's. */
 	if(hFindFile != INVALID_HANDLE_VALUE)
 	{
-		wLanguage = AddLanguageToComboBox(hLanguageComboBox,
-			szImageDirectory,wfd.cFileName);
-
-		if(wLanguage == m_Language)
-			iSel = iIndex;
-
-		iIndex++;
-
-		while(FindNextFile(hFindFile,&wfd) != 0)
+		do
 		{
-			wLanguage = AddLanguageToComboBox(hLanguageComboBox,
-			szImageDirectory,wfd.cFileName);
+			BOOL bRet = AddLanguageToComboBox(hLanguageComboBox,
+				szImageDirectory,wfd.cFileName,&wLanguage);
 
-			if(wLanguage == m_Language)
-				iSel = iIndex;
+			if(bRet)
+			{
+				if(wLanguage == m_Language)
+				{
+					iSel = iIndex;
+				}
 
-			iIndex++;
-		}
+				iIndex++;
+			}
+		} while(FindNextFile(hFindFile, &wfd));
 
 		FindClose(hFindFile);
 	}
@@ -1362,63 +1361,40 @@ void Explorerplusplus::AddLanguages(HWND hDlg)
 	SendMessage(hLanguageComboBox,CB_SETCURSEL,iSel,0);
 }
 
-WORD Explorerplusplus::AddLanguageToComboBox(HWND hComboBox,
-TCHAR *szImageDirectory,TCHAR *szFileName)
+BOOL Explorerplusplus::AddLanguageToComboBox(HWND hComboBox,
+	TCHAR *szImageDirectory, TCHAR *szFileName, WORD *pdwLanguage)
 {
-	TCHAR			szFullFileName[MAX_PATH];
-	TCHAR			szLanguageName[32];
-	LANGANDCODEPAGE	*plcp = NULL;
-	DWORD			dwLen;
-	DWORD			dwHandle;
-	WORD			wRet = 0;
-	UINT			uLen;
-	void			*pTranslateInfo = NULL;
-	int				iIndex;
+	TCHAR szFullFileName[MAX_PATH];
+	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), szImageDirectory);
+	PathAppend(szFullFileName, szFileName);
 
-	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),szImageDirectory);
-	PathAppend(szFullFileName,szFileName);
+	BOOL bSuccess = FALSE;
+	WORD wLanguage;
+	BOOL bRet = GetFileLanguage(szFullFileName, &wLanguage);
 
-	dwLen = GetFileVersionInfoSize(szFullFileName,&dwHandle);
-
-	if(dwLen > 0)
+	if(bRet)
 	{
-		pTranslateInfo = malloc(dwLen);
+		TCHAR szLanguageName[32];
 
-		if(pTranslateInfo != NULL)
+		int iRet = GetLocaleInfo(wLanguage, LOCALE_SNATIVELANGNAME,
+			szLanguageName, SIZEOF_ARRAY(szLanguageName));
+
+		if(iRet != 0)
 		{
-			GetFileVersionInfo(szFullFileName,NULL,dwLen,pTranslateInfo);
-			VerQueryValue(pTranslateInfo,_T("\\VarFileInfo\\Translation"),
-				(LPVOID *)&plcp,&uLen);
+			int iIndex = (int) SendMessage(hComboBox, CB_ADDSTRING, 0, (LPARAM) szLanguageName);
 
-			if(uLen >= sizeof(LANGANDCODEPAGE))
+			if(iIndex != CB_ERR)
 			{
-				if(plcp[0].wLanguage == LANG_SINHALA)
-				{
-					StringCchCopy(szLanguageName,SIZEOF_ARRAY(szLanguageName),
-						_T("Sinhala"));
-				}
-				else
-				{
-					GetLocaleInfo(plcp[0].wLanguage,LOCALE_SNATIVELANGNAME,
-						szLanguageName,SIZEOF_ARRAY(szLanguageName));
-				}
+				/* Associate the language identifier with the item. */
+				SendMessage(hComboBox, CB_SETITEMDATA, iIndex, wLanguage);
 
-				iIndex = (int)SendMessage(hComboBox,CB_ADDSTRING,0,(LPARAM)szLanguageName);
-
-				if(iIndex != CB_ERR)
-				{
-					/* Associate the language identifier with the item. */
-					SendMessage(hComboBox,CB_SETITEMDATA,iIndex,PRIMARYLANGID(plcp[0].wLanguage));
-				}
-
-				wRet = PRIMARYLANGID(plcp[0].wLanguage);
+				*pdwLanguage = wLanguage;
+				bSuccess = TRUE;
 			}
-
-			free(pTranslateInfo);
 		}
 	}
 
-	return wRet;
+	return bSuccess;
 }
 
 int Explorerplusplus::GetLanguageIDFromIndex(HWND hDlg,int iIndex)

@@ -4,6 +4,7 @@
 #include "iPathManager.h"
 #include "../Helper/Helper.h"
 #include "../Helper/DropHandler.h"
+#include "../Helper/StringHelper.h"
 #include "../Helper/Macros.h"
 
 #define WM_USER_UPDATEWINDOWS		(WM_APP + 17)
@@ -313,8 +314,8 @@ public:
 	ULONG __stdcall		Release(void);
 
 	/* Navigation. */
-	HRESULT				BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags);
-	HRESULT				BrowseFolder(TCHAR *szPath,UINT wFlags);
+	HRESULT				BrowseFolder(const TCHAR *szPath,UINT wFlags);
+	HRESULT				BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags);
 	HRESULT				Refresh(void);
 
 	/* Drag and Drop. */
@@ -379,7 +380,7 @@ public:
 	DWORD				QueryFileAttributes(int iItem) const;
 	int					QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
 	BOOL				IsFileReal(int iItem) const;
-	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath) const;
+	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;
 	
 	/* Column support. */
 	void				ExportCurrentColumns(std::list<Column_t> *pColumns);
@@ -595,7 +596,7 @@ private:
 	int CALLBACK		SortByShortcutTo(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByHardlinks(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByExtension(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortBySummaryProperty(int InternalIndex1,int InternalIndex2,DWORD PropertyType) const;
+	int CALLBACK		SortBySummaryProperty(int InternalIndex1, int InternalIndex2, const SHCOLUMNID *pscid) const;
 	int CALLBACK		SortByImageProperty(int InternalIndex1,int InternalIndex2,PROPID PropertyId) const;
 	int CALLBACK		SortByVirtualComments(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByFileSystem(int InternalIndex1,int InternalIndex2) const;
@@ -629,7 +630,8 @@ private:
 	DWORD				GetHardLinksColumnRawData(int InternalIndex) const;
 	std::wstring		GetHardLinksColumnText(int InternalIndex) const;
 	std::wstring		GetExtensionColumnText(int InternalIndex) const;
-	std::wstring		GetSummaryColumnText(int InternalIndex,DWORD PropertyType) const;
+	HRESULT				GetItemDetails(int InternalIndex, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const;
+	std::wstring		GetSummaryColumnText(int InternalIndex, const SHCOLUMNID *pscid) const;
 	std::wstring		GetImageColumnText(int InternalIndex,PROPID PropertyID) const;
 	std::wstring		GetFileSystemColumnText(int InternalIndex) const;
 	BOOL				GetDriveSpaceColumnRawData(int InternalIndex,bool TotalSize,ULARGE_INTEGER &DriveSpace) const;
@@ -678,7 +680,7 @@ private:
 	void				DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 	void				DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 	void				DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemCommentGroup(int iItemInternal,DWORD dwPropertyType,TCHAR *szGroupHeader,int cchMax) const;
+	void				DetermineItemSummaryGroup(int iItemInternal, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax) const;
 
 	/* Other grouping support. */
 	int					CheckGroup(TCHAR *szGroupHeader,PFNLVGROUPCOMPARE pfnGroupCompare);
@@ -711,9 +713,8 @@ private:
 	/* Miscellaneous. */
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL) const;
 	int					LocateFileItemInternalIndex(const TCHAR *szFileName) const;
-	HRESULT				RetrieveItemInfoTip(int iItem,TCHAR *szInfoTip,size_t cchMax);
 	void				ApplyHeaderSortArrow(void);
-	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName) const;
+	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName,UINT cchMax) const;
 	void				CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns);
 
 

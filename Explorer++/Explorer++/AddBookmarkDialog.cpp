@@ -18,6 +18,7 @@
 #include "MainImages.h"
 #include "BookmarkHelper.h"
 #include "MainResource.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 

@@ -23,7 +23,7 @@ class CDropHandler : public CReferenceCount
 public:
 
 	/* As this class is reference counted, the constructor
-	and deconstructor are both private. Use this method to
+	and destructor are both private. Use this method to
 	get a new instance of this class. */
 	static CDropHandler	*CreateNew();
 
@@ -54,7 +54,7 @@ private:
 	void	CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD dwPreferredEffect);
 	void	CopyDroppedFilesInternal(const std::list<std::wstring> &FullFilenameList,BOOL bCopy,BOOL bRenameOnCollision);
 	void	CreateShortcutToDroppedFile(TCHAR *szFullFileName);
-	HRESULT	CopyTextToFile(IN TCHAR *pszDestDirectory,IN WCHAR *pszText,OUT TCHAR *pszFullFileNameOut);
+	HRESULT	CopyTextToFile(const TCHAR *pszDestDirectory, const WCHAR *pszText, TCHAR *pszFullFileNameOut);
 	BOOL	CheckItemLocations(int iDroppedItem);
 
 	/* Holds the drop formats supported. */

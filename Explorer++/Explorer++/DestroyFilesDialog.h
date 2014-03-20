@@ -15,14 +15,6 @@ public:
 
 	static CDestroyFilesDialogPersistentSettings &GetInstance();
 
-protected:
-
-	void			SaveExtraRegistrySettings(HKEY hKey);
-	void			LoadExtraRegistrySettings(HKEY hKey);
-
-	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
-	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
-
 private:
 
 	friend CDestroyFilesDialog;
@@ -35,6 +27,12 @@ private:
 
 	CDestroyFilesDialogPersistentSettings(const CDestroyFilesDialogPersistentSettings &);
 	CDestroyFilesDialogPersistentSettings & operator=(const CDestroyFilesDialogPersistentSettings &);
+
+	void SaveExtraRegistrySettings(HKEY hKey);
+	void LoadExtraRegistrySettings(HKEY hKey);
+
+	void SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pParentNode);
+	void LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	NFileOperations::OverwriteMethod_t	m_uOverwriteMethod;
 };
@@ -54,11 +52,10 @@ protected:
 	INT_PTR	OnClose();
 	INT_PTR	OnDestroy();
 
-	void	SaveState();
-
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
-
 private:
+
+	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void	SaveState();
 
 	void	OnOk();
 	void	OnCancel();

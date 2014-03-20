@@ -145,7 +145,7 @@ void Explorerplusplus::OnAddressBarBeginDrag(void)
 
 			/* The name of the file will be the folder name, followed by .lnk. */
 			TCHAR szDisplayName[MAX_PATH];
-			GetDisplayName(pidlDirectory,szDisplayName,SHGDN_INFOLDER);
+			GetDisplayName(pidlDirectory,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 			StringCchCat(szDisplayName,SIZEOF_ARRAY(szDisplayName),_T(".lnk"));
 			StringCchCopy(pfd[0].cFileName,SIZEOF_ARRAY(pfd[0].cFileName),szDisplayName);
 
@@ -172,7 +172,7 @@ void Explorerplusplus::OnAddressBarBeginDrag(void)
 			{
 				TCHAR szPath[MAX_PATH];
 
-				GetDisplayName(pidlDirectory,szPath,SHGDN_FORPARSING);
+				GetDisplayName(pidlDirectory,szPath,SIZEOF_ARRAY(szPath),SHGDN_FORPARSING);
 
 				pShellLink->SetPath(szPath);
 

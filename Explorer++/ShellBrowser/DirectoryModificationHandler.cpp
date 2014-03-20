@@ -548,7 +548,7 @@ void CShellBrowser::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 
 		if(SUCCEEDED(hr))
 		{
-			hr = GetDisplayName(szFullFileName,szDisplayName,SHGDN_INFOLDER|SHGDN_FORPARSING);
+			hr = GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER|SHGDN_FORPARSING);
 
 			if(SUCCEEDED(hr))
 			{

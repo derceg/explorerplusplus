@@ -19,6 +19,7 @@
 #include "MainResource.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -172,7 +173,7 @@ void CCustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const NC
 		StringCchCopy(szTemp,SIZEOF_ARRAY(szTemp),ColorRule.strFilterPattern.c_str());
 		ListView_SetItemText(hListView,iActualIndex,1,szTemp);
 
-		BuildFileAttributeStringInternal(ColorRule.dwFilterAttributes,szTemp,SIZEOF_ARRAY(szTemp));
+		BuildFileAttributeString(ColorRule.dwFilterAttributes,szTemp,SIZEOF_ARRAY(szTemp));
 		ListView_SetItemText(hListView,iActualIndex,2,szTemp);
 	}
 }
@@ -307,7 +308,7 @@ void CCustomizeColorsDialog::EditColorRule(int iSelected)
 			(*m_pColorRuleList)[iSelected].strFilterPattern.c_str());
 		ListView_SetItemText(hListView,iSelected,1,szTemp);
 
-		BuildFileAttributeStringInternal((*m_pColorRuleList)[iSelected].dwFilterAttributes,
+		BuildFileAttributeString((*m_pColorRuleList)[iSelected].dwFilterAttributes,
 			szTemp,SIZEOF_ARRAY(szTemp));
 		ListView_SetItemText(hListView,iSelected,2,szTemp);
 	}
@@ -345,7 +346,7 @@ void CCustomizeColorsDialog::OnMove(BOOL bUp)
 
 		std::iter_swap(itrSelected,itrSwap);
 
-		NListView::ListView_SwapItemsNolParam(hListView,iSelected,iSwap);
+		NListView::ListView_SwapItems(hListView,iSelected,iSwap,FALSE);
 	}
 }
 

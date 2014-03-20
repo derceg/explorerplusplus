@@ -68,10 +68,10 @@ private:
 	HRESULT	GetMenuHelperText(UINT uID,TCHAR *szText,UINT cchMax);
 	void	InvokeMenuEntry(HWND hwnd,UINT uCmd);
 
-	int		GetMenuItemPos(HMENU hMenu,UINT uID);
-	void	RemoveDuplicateSeperators(HMENU hMenu);
+	static int GetMenuItemPos(HMENU hMenu,UINT uID);
+	static void RemoveDuplicateSeperators(HMENU hMenu);
 
-	ItemType_t	GetItemType(LPCITEMIDLIST pidl);
+	static ItemType_t GetItemType(LPCITEMIDLIST pidl);
 
 	std::list<ContextMenuHandler_t>	m_ContextMenuHandlers;
 	std::list<MenuHandler_t>		m_MenuHandlers;

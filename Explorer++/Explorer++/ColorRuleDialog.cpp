@@ -17,6 +17,7 @@
 #include "MainResource.h"
 #include "../Helper/Helper.h"
 #include "../Helper/XMLSettings.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 

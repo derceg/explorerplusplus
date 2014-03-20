@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include "Macros.h"
 
 /* Within a resizable dialog, controls
 either: move, resize, or hold the same
@@ -40,6 +41,8 @@ public:
 
 private:
 
+	DISALLOW_COPY_AND_ASSIGN(CResizableDialog);
+
 	struct ControlInternal_t
 	{
 		int					iID;
@@ -50,6 +53,6 @@ private:
 		int					iHeightDelta;
 	};
 
-	HWND	m_hDlg;
+	const HWND m_hDlg;
 	std::list<ControlInternal_t> m_ControlList;
 };

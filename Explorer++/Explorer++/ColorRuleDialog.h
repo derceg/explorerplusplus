@@ -14,14 +14,6 @@ public:
 
 	static CColorRuleDialogPersistentSettings &GetInstance();
 
-protected:
-
-	void			SaveExtraRegistrySettings(HKEY hKey);
-	void			LoadExtraRegistrySettings(HKEY hKey);
-
-	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
-	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
-
 private:
 
 	friend CColorRuleDialog;
@@ -33,6 +25,12 @@ private:
 
 	CColorRuleDialogPersistentSettings(const CColorRuleDialogPersistentSettings &);
 	CColorRuleDialogPersistentSettings & operator=(const CColorRuleDialogPersistentSettings &);
+
+	void		SaveExtraRegistrySettings(HKEY hKey);
+	void		LoadExtraRegistrySettings(HKEY hKey);
+
+	void		SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pParentNode);
+	void		LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	COLORREF	m_cfInitialColor;
 	COLORREF	m_cfCustomColors[16];

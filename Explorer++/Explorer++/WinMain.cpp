@@ -25,6 +25,7 @@
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
+#include "../Helper/ProcessHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -193,7 +194,7 @@ ensure you have administrator privileges."),NExplorerplusplus::WINDOW_NAME,MB_IC
 			TCHAR szParsingPath[MAX_PATH];
 			TCHAR szCurrentDirectory[MAX_PATH];
 
-			GetCurrentProcessImageName(szCurrentDirectory,
+			GetProcessImageName(GetCurrentProcessId(),szCurrentDirectory,
 				SIZEOF_ARRAY(szCurrentDirectory));
 			PathRemoveFileSpec(szCurrentDirectory);
 
@@ -363,7 +364,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	if(NLoggingFrontend::CheckLoggingEnabled())
 	{
 		TCHAR szLogFile[MAX_PATH];
-		GetCurrentProcessImageName(szLogFile,SIZEOF_ARRAY(szLogFile));
+		GetProcessImageName(GetCurrentProcessId(),szLogFile,SIZEOF_ARRAY(szLogFile));
 
 		PathRemoveFileSpec(szLogFile);
 		PathAppend(szLogFile,NExplorerplusplus::LOG_FILENAME);

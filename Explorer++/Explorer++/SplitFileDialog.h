@@ -16,14 +16,6 @@ public:
 
 	static CSplitFileDialogPersistentSettings &GetInstance();
 
-protected:
-
-	void			SaveExtraRegistrySettings(HKEY hKey);
-	void			LoadExtraRegistrySettings(HKEY hKey);
-
-	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
-	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
-
 private:
 
 	friend CSplitFileDialog;
@@ -37,6 +29,12 @@ private:
 
 	CSplitFileDialogPersistentSettings(const CSplitFileDialogPersistentSettings &);
 	CSplitFileDialogPersistentSettings & operator=(const CSplitFileDialogPersistentSettings &);
+
+	void			SaveExtraRegistrySettings(HKEY hKey);
+	void			LoadExtraRegistrySettings(HKEY hKey);
+
+	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pParentNode);
+	void			LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	std::wstring	m_strSplitSize;
 	std::wstring	m_strSplitGroup;

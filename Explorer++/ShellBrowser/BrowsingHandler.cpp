@@ -24,7 +24,7 @@
 #include "../Helper/Macros.h"
 
 
-HRESULT CShellBrowser::BrowseFolder(TCHAR *szPath,UINT wFlags)
+HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath,UINT wFlags)
 {
 	LPITEMIDLIST pidlDirectory = NULL;
 	HRESULT hr = GetIdlFromParsingName(szPath,&pidlDirectory);
@@ -39,7 +39,7 @@ HRESULT CShellBrowser::BrowseFolder(TCHAR *szPath,UINT wFlags)
 	return hr;
 }
 
-HRESULT CShellBrowser::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
+HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 {
 	SetCursor(LoadCursor(NULL,IDC_WAIT));
 
@@ -74,7 +74,7 @@ HRESULT CShellBrowser::BrowseFolder(LPITEMIDLIST pidlDirectory,UINT wFlags)
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
 	TCHAR szParsingPath[MAX_PATH];
-	GetDisplayName(pidl,szParsingPath,SHGDN_FORPARSING);
+	GetDisplayName(pidl,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
 	/* TODO: Method callback. */
 	SendMessage(m_hOwner,WM_USER_STARTEDBROWSING,m_ID,reinterpret_cast<WPARAM>(szParsingPath));
@@ -491,7 +491,6 @@ void CShellBrowser::BrowseVirtualFolder(TCHAR *szParsingName)
 
 void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 {
-	IShellFolder	*pDesktopFolder = NULL;
 	IShellFolder	*pShellFolder = NULL;
 	IEnumIDList		*pEnumIDList = NULL;
 	LPITEMIDLIST	rgelt = NULL;
@@ -503,69 +502,54 @@ void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 
 	DetermineFolderVirtual(pidlDirectory);
 
-	hr = SHGetDesktopFolder(&pDesktopFolder);
+	hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{
-		if(IsNamespaceRoot(pidlDirectory))
-		{
-			hr = SHGetDesktopFolder(&pShellFolder);
-		}
-		else
-		{
-			hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
-			IID_IShellFolder,(LPVOID *)&pShellFolder);
-		}
-
 		m_pidlDirectory = ILClone(pidlDirectory);
 
-		if(SUCCEEDED(hr))
+		EnumFlags = SHCONTF_FOLDERS|SHCONTF_NONFOLDERS;
+
+		if(m_bShowHidden)
+			EnumFlags |= SHCONTF_INCLUDEHIDDEN;
+
+		hr = pShellFolder->EnumObjects(m_hOwner,EnumFlags,&pEnumIDList);
+
+		if(SUCCEEDED(hr) && pEnumIDList != NULL)
 		{
-			EnumFlags = SHCONTF_FOLDERS|SHCONTF_NONFOLDERS;
-
-			if(m_bShowHidden)
-				EnumFlags |= SHCONTF_INCLUDEHIDDEN;
-
-			hr = pShellFolder->EnumObjects(m_hOwner,EnumFlags,&pEnumIDList);
-
-			if(SUCCEEDED(hr) && pEnumIDList != NULL)
+			uFetched = 1;
+			while(pEnumIDList->Next(1,&rgelt,&uFetched) == S_OK && (uFetched == 1))
 			{
-				uFetched = 1;
-				while(pEnumIDList->Next(1,&rgelt,&uFetched) == S_OK && (uFetched == 1))
+				ULONG uAttributes = SFGAO_FOLDER;
+
+				pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&rgelt,&uAttributes);
+
+				/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
+				a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
+				so that items in real folders can still be shown with extensions, even
+				if the global, Explorer option is disabled.
+				Also use only SHGDN_INFOLDER if this item is a folder. This is to ensure
+				that specific folders in Windows 7 (those under C:\Users\Username) appear
+				correctly. */
+				if(m_bVirtualFolder || (uAttributes & SFGAO_FOLDER))
+					hr = pShellFolder->GetDisplayNameOf(rgelt,SHGDN_INFOLDER,&str);
+				else
+					hr = pShellFolder->GetDisplayNameOf(rgelt,SHGDN_INFOLDER|SHGDN_FORPARSING,&str);
+
+				if(SUCCEEDED(hr))
 				{
-					ULONG uAttributes = SFGAO_FOLDER;
+					StrRetToBuf(&str,rgelt,szFileName,MAX_PATH);
 
-					pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&rgelt,&uAttributes);
-
-					/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
-					a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
-					so that items in real folders can still be shown with extensions, even
-					if the global, Explorer option is disabled.
-					Also use only SHGDN_INFOLDER if this item is a folder. This is to ensure
-					that specific folders in Windows 7 (those under C:\Users\Username) appear
-					correctly. */
-					if(m_bVirtualFolder || (uAttributes & SFGAO_FOLDER))
-						hr = pShellFolder->GetDisplayNameOf(rgelt,SHGDN_INFOLDER,&str);
-					else
-						hr = pShellFolder->GetDisplayNameOf(rgelt,SHGDN_INFOLDER|SHGDN_FORPARSING,&str);
-
-					if(SUCCEEDED(hr))
-					{
-						StrRetToBuf(&str,rgelt,szFileName,MAX_PATH);
-
-						AddItemInternal(pidlDirectory,rgelt,szFileName,-1,FALSE);
-					}
-
-					CoTaskMemFree((LPVOID)rgelt);
+					AddItemInternal(pidlDirectory,rgelt,szFileName,-1,FALSE);
 				}
 
-				pEnumIDList->Release();
+				CoTaskMemFree((LPVOID)rgelt);
 			}
 
-			pShellFolder->Release();
+			pEnumIDList->Release();
 		}
 
-		pDesktopFolder->Release();
+		pShellFolder->Release();
 	}
 }
 

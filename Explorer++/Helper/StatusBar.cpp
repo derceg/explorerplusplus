@@ -16,10 +16,9 @@
 #include "StatusBar.h"
 
 
-CStatusBar::CStatusBar(HWND hwnd)
+CStatusBar::CStatusBar(HWND hwnd) :
+m_hwnd(hwnd)
 {
-	m_hwnd = hwnd;
-
 	m_bAlteredStatusBarParts = false;
 	m_nParts = 0;
 }
@@ -29,7 +28,7 @@ CStatusBar::~CStatusBar()
 
 }
 
-void CStatusBar::SetPartText(int iPart,TCHAR *szText)
+void CStatusBar::SetPartText(int iPart, const TCHAR *szText)
 {
 	SendMessage(m_hwnd,SB_SETTEXT,MAKEWORD(iPart,0),
 		reinterpret_cast<LPARAM>(szText));

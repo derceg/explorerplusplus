@@ -62,72 +62,79 @@ CContextMenuManager::CContextMenuManager(ContextMenuType_t ContextMenuType,
 		break;
 	}
 
-	if(pszRegContext != NULL)
+	if(pszRegContext == NULL)
 	{
-		LoadContextMenuHandlers(pszRegContext,&m_ContextMenuHandlers);
+		return;
+	}
 
-		/* Initialize the shell extensions, and extract
-		an IContextMenu interface. */
-		for each(auto ContextMenuHandler in m_ContextMenuHandlers)
+	BOOL bRet = LoadContextMenuHandlers(pszRegContext,m_ContextMenuHandlers);
+
+	if(!bRet)
+	{
+		return;
+	}
+
+	/* Initialize the shell extensions, and extract
+	an IContextMenu interface. */
+	for each(auto ContextMenuHandler in m_ContextMenuHandlers)
+	{
+		IShellExtInit *pShellExtInit = NULL;
+		HRESULT hr;
+
+		IUnknown *pUnknown = ContextMenuHandler.pUnknown;
+
+		hr = pUnknown->QueryInterface(IID_IShellExtInit,
+			reinterpret_cast<void **>(&pShellExtInit));
+
+		if(SUCCEEDED(hr))
 		{
-			IShellExtInit *pShellExtInit = NULL;
-			HRESULT hr;
+			MenuHandler_t MenuHandler;
+			IContextMenu *pContextMenu = NULL;
+			IContextMenu2 *pContextMenu2 = NULL;
+			IContextMenu3 *pContextMenu3 = NULL;
 
-			IUnknown *pUnknown = ContextMenuHandler.pUnknown;
+			pShellExtInit->Initialize(pidlDirectory,pDataObject,NULL);
+			pShellExtInit->Release();
 
-			hr = pUnknown->QueryInterface(IID_IShellExtInit,
-				reinterpret_cast<void **>(&pShellExtInit));
-
-			if(SUCCEEDED(hr))
+			if(pUnkSite != NULL)
 			{
-				MenuHandler_t MenuHandler;
-				IContextMenu *pContextMenu = NULL;
-				IContextMenu2 *pContextMenu2 = NULL;
-				IContextMenu3 *pContextMenu3 = NULL;
+				IObjectWithSite *pObjectSite = NULL;
 
-				pShellExtInit->Initialize(pidlDirectory,pDataObject,NULL);
-				pShellExtInit->Release();
+				hr = pUnknown->QueryInterface(IID_IObjectWithSite,reinterpret_cast<void **>(&pObjectSite));
 
-				if(pUnkSite != NULL)
+				if(SUCCEEDED(hr))
 				{
-					IObjectWithSite *pObjectSite = NULL;
-
-					hr = pUnknown->QueryInterface(IID_IObjectWithSite,reinterpret_cast<void **>(&pObjectSite));
-
-					if(SUCCEEDED(hr))
-					{
-						pObjectSite->SetSite(pUnkSite);
-						pObjectSite->Release();
-					}
+					pObjectSite->SetSite(pUnkSite);
+					pObjectSite->Release();
 				}
-
-				hr = pUnknown->QueryInterface(IID_IContextMenu3,
-					reinterpret_cast<void **>(&pContextMenu3));
-				MenuHandler.pContextMenuActual = pContextMenu3;
-
-				if(FAILED(hr) || pContextMenu3 == NULL)
-				{
-					hr = pUnknown->QueryInterface(IID_IContextMenu2,
-						reinterpret_cast<void **>(&pContextMenu2));
-					MenuHandler.pContextMenuActual = pContextMenu2;
-
-					if(FAILED(hr) || pContextMenu2 == NULL)
-					{
-						hr = pUnknown->QueryInterface(IID_IContextMenu,
-							reinterpret_cast<void **>(&pContextMenu));
-						MenuHandler.pContextMenuActual = pContextMenu;
-					}
-				}
-
-				MenuHandler.pContextMenu = pContextMenu;
-				MenuHandler.pContextMenu2 = pContextMenu2;
-				MenuHandler.pContextMenu3 = pContextMenu3;
-
-				MenuHandler.uStartID = 0;
-				MenuHandler.uEndID = 0;
-
-				m_MenuHandlers.push_back(MenuHandler);
 			}
+
+			hr = pUnknown->QueryInterface(IID_IContextMenu3,
+				reinterpret_cast<void **>(&pContextMenu3));
+			MenuHandler.pContextMenuActual = pContextMenu3;
+
+			if(FAILED(hr) || pContextMenu3 == NULL)
+			{
+				hr = pUnknown->QueryInterface(IID_IContextMenu2,
+					reinterpret_cast<void **>(&pContextMenu2));
+				MenuHandler.pContextMenuActual = pContextMenu2;
+
+				if(FAILED(hr) || pContextMenu2 == NULL)
+				{
+					hr = pUnknown->QueryInterface(IID_IContextMenu,
+						reinterpret_cast<void **>(&pContextMenu));
+					MenuHandler.pContextMenuActual = pContextMenu;
+				}
+			}
+
+			MenuHandler.pContextMenu = pContextMenu;
+			MenuHandler.pContextMenu2 = pContextMenu2;
+			MenuHandler.pContextMenu3 = pContextMenu3;
+
+			MenuHandler.uStartID = 0;
+			MenuHandler.uEndID = 0;
+
+			m_MenuHandlers.push_back(MenuHandler);
 		}
 	}
 }
@@ -173,8 +180,13 @@ bool CContextMenuManager::ShowMenu(HWND hwnd,HMENU hMenu,
 
 	AddMenuEntries(hMenu,uIDPrevious,uMinID,uMaxID);
 
-	SetWindowSubclass(hwnd,ContextMenuHookProc,CONTEXT_MENU_SUBCLASS_ID,
+	BOOL bRet = SetWindowSubclass(hwnd,ContextMenuHookProc,CONTEXT_MENU_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
+
+	if(!bRet)
+	{
+		return false;
+	}
 
 	UINT uCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RIGHTBUTTON|
 		TPM_VERTICAL|TPM_RETURNCMD,pt.x,pt.y,0,hwnd,NULL);

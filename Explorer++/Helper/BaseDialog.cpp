@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include <unordered_map>
+#include "WindowHelper.h"
 #include "BaseDialog.h"
 #include "Helper.h"
 
@@ -81,7 +82,7 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 			m_dsc = DIALOG_SIZE_CONSTRAINT_NONE;
 			GetResizableControlInformation(m_dsc,ControlList);
 
-			m_prd = new CResizableDialog(m_hDlg,ControlList);
+			m_prd = std::unique_ptr<CResizableDialog>(new CResizableDialog(m_hDlg, ControlList));
 		}
 		break;
 
@@ -148,13 +149,9 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 				}
 			}
 
-			INT_PTR Res = OnDestroy();
-
 			/* Within WM_DESTROY, all child windows
 			still exist. */
 			SaveState();
-
-			return Res;
 		}
 		break;
 
@@ -173,21 +170,19 @@ INT_PTR CBaseDialog::GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPA
 
 CBaseDialog::CBaseDialog(HINSTANCE hInstance,int iResource,
 	HWND hParent,bool bResizable) :
-CMessageForwarder()
+CMessageForwarder(),
+m_hInstance(hInstance),
+m_iResource(iResource),
+m_hParent(hParent),
+m_bResizable(bResizable)
 {
-	m_hInstance = hInstance;
-	m_iResource = iResource;
-	m_hParent = hParent;
-	m_bResizable = bResizable;
-
 	m_prd = NULL;
-
 	m_bShowingModelessDialog = FALSE;
 }
 
 CBaseDialog::~CBaseDialog()
 {
-	delete m_prd;
+
 }
 
 HINSTANCE CBaseDialog::GetInstance() const

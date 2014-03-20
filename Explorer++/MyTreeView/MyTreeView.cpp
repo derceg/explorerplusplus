@@ -263,8 +263,8 @@ HTREEITEM CMyTreeView::AddRoot(void)
 
 	if(SUCCEEDED(hr))
 	{
-		GetVirtualFolderParsingPath(CSIDL_DESKTOP,szDesktopParsingPath);
-		GetDisplayName(szDesktopParsingPath,szDesktopDisplayName,SHGDN_INFOLDER);
+		GetCsidlDisplayName(CSIDL_DESKTOP,szDesktopParsingPath,SIZEOF_ARRAY(szDesktopParsingPath),SHGDN_FORPARSING);
+		GetDisplayName(szDesktopParsingPath,szDesktopDisplayName,SIZEOF_ARRAY(szDesktopDisplayName),SHGDN_INFOLDER);
 
 		SHGetFileInfo((LPTSTR)pidl,NULL,&shfi,NULL,SHGFI_PIDL|SHGFI_SYSICONINDEX);
 
@@ -330,32 +330,15 @@ HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent,TCHAR *szParsingPath)
 
 HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent,LPITEMIDLIST pidlDirectory)
 {
-	IShellFolder	*pDesktopFolder = NULL;
 	IShellFolder	*pShellFolder = NULL;
 	HRESULT			hr;
 
-	hr = SHGetDesktopFolder(&pDesktopFolder);
+	hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{
-		if(IsNamespaceRoot(pidlDirectory))
-		{
-			hr = SHGetDesktopFolder(&pShellFolder);
-		}
-		else
-		{
-			hr = pDesktopFolder->BindToObject(pidlDirectory,NULL,
-			IID_IShellFolder,(LPVOID *)&pShellFolder);
-		}
-
-		if(SUCCEEDED(hr))
-		{
-			AddDirectoryInternal(pShellFolder,pidlDirectory,hParent);
-
-			pShellFolder->Release();
-		}
-
-		pDesktopFolder->Release();
+		AddDirectoryInternal(pShellFolder,pidlDirectory,hParent);
+		pShellFolder->Release();
 	}
 
 	return hr;
@@ -519,8 +502,8 @@ int CALLBACK CMyTreeView::CompareItems(LPARAM lParam1,LPARAM lParam2)
 	int iItemId1 = (int)lParam1;
 	int iItemId2 = (int)lParam2;
 
-	GetDisplayName(m_pItemInfo[iItemId1].pidl,szDisplayName1,SHGDN_FORPARSING);
-	GetDisplayName(m_pItemInfo[iItemId2].pidl,szDisplayName2,SHGDN_FORPARSING);
+	GetDisplayName(m_pItemInfo[iItemId1].pidl,szDisplayName1,SIZEOF_ARRAY(szDisplayName1),SHGDN_FORPARSING);
+	GetDisplayName(m_pItemInfo[iItemId2].pidl,szDisplayName2,SIZEOF_ARRAY(szDisplayName2),SHGDN_FORPARSING);
 
 	if(PathIsRoot(szDisplayName1) && !PathIsRoot(szDisplayName2))
 	{
@@ -548,8 +531,8 @@ int CALLBACK CMyTreeView::CompareItems(LPARAM lParam1,LPARAM lParam2)
 		}
 		else
 		{
-			GetDisplayName(m_pItemInfo[iItemId1].pidl,szDisplayName1,SHGDN_INFOLDER);
-			GetDisplayName(m_pItemInfo[iItemId2].pidl,szDisplayName2,SHGDN_INFOLDER);
+			GetDisplayName(m_pItemInfo[iItemId1].pidl,szDisplayName1,SIZEOF_ARRAY(szDisplayName1),SHGDN_INFOLDER);
+			GetDisplayName(m_pItemInfo[iItemId2].pidl,szDisplayName2,SIZEOF_ARRAY(szDisplayName2),SHGDN_INFOLDER);
 
 			return StrCmpLogicalW(szDisplayName1,szDisplayName2);
 		}
@@ -580,8 +563,8 @@ HTREEITEM hParent)
 		bVirtualFolder = TRUE;
 	}
 
-	hr = GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
-	hr = GetDisplayName(pidlDirectory,szDirectory2,SHGDN_FORPARSING);
+	hr = GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
+	hr = GetDisplayName(pidlDirectory,szDirectory2,SIZEOF_ARRAY(szDirectory2),SHGDN_FORPARSING);
 
 	hr = SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidl);
 
@@ -827,7 +810,7 @@ LPITEMIDLIST pidlDirectory,HTREEITEM hParent)
 	HRESULT			hr;
 	int				iMonitorId = -1;
 
-	GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
+	GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
 
 	EnumFlags = SHCONTF_FOLDERS;
 
@@ -872,7 +855,7 @@ LPITEMIDLIST pidlDirectory,HTREEITEM hParent)
 
 						iMonitorId = -1;
 
-						hr = GetDisplayName(pidlComplete,szDirectory,SHGDN_FORPARSING);
+						hr = GetDisplayName(pidlComplete,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
 
 						pItemInfo = (ItemInfo_t *)malloc(sizeof(ItemInfo_t));
 
@@ -1038,7 +1021,7 @@ HTREEITEM CMyTreeView::DetermineItemSortedPosition(HTREEITEM hParent,TCHAR *szIt
 
 			pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
-			GetDisplayName(pItemInfo->pidl,szFullItemPath,SHGDN_FORPARSING);
+			GetDisplayName(pItemInfo->pidl,szFullItemPath,SIZEOF_ARRAY(szFullItemPath),SHGDN_FORPARSING);
 
 			Attributes = GetFileAttributes(szFullItemPath);
 
@@ -1093,7 +1076,7 @@ HTREEITEM CMyTreeView::DetermineDriveSortedPosition(HTREEITEM hParent,TCHAR *szI
 
 		pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
-		GetDisplayName(pItemInfo->pidl,szFullItemPath,SHGDN_FORPARSING);
+		GetDisplayName(pItemInfo->pidl,szFullItemPath,SIZEOF_ARRAY(szFullItemPath),SHGDN_FORPARSING);
 
 		if(PathIsRoot(szFullItemPath))
 		{
@@ -1356,7 +1339,7 @@ HTREEITEM CMyTreeView::LocateItemByPath(TCHAR *szItemPath,BOOL bExpand)
 
 	pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
-	GetDisplayName(pItemInfo->pidl,szItemName,SHGDN_FORPARSING);
+	GetDisplayName(pItemInfo->pidl,szItemName,SIZEOF_ARRAY(szItemName),SHGDN_FORPARSING);
 
 	while(StrCmpI(ptr,szItemName) != 0)
 	{
@@ -1371,7 +1354,7 @@ HTREEITEM CMyTreeView::LocateItemByPath(TCHAR *szItemPath,BOOL bExpand)
 
 		pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
-		GetDisplayName(pItemInfo->pidl,szItemName,SHGDN_FORPARSING);
+		GetDisplayName(pItemInfo->pidl,szItemName,SIZEOF_ARRAY(szItemName),SHGDN_FORPARSING);
 	}
 
 	Item.mask = TVIF_TEXT;
@@ -1541,7 +1524,7 @@ LRESULT CALLBACK CMyTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 					pdbv = (DEV_BROADCAST_VOLUME *)dbh;
 
 					/* Build a string that will form the drive name. */
-					DriveLetter = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+					DriveLetter = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 					StringCchPrintf(DriveName,SIZEOF_ARRAY(DriveName),_T("%c:\\"),DriveLetter);
 
 					if(pdbv->dbcv_flags & DBTF_MEDIA)
@@ -1551,7 +1534,7 @@ LRESULT CALLBACK CMyTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 						if(hItem != NULL)
 						{
 							SHGetFileInfo(DriveName,0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
-							GetDisplayName(DriveName,szDisplayName,SHGDN_INFOLDER);
+							GetDisplayName(DriveName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
 							/* Update the drives icon and display name. */
 							tvItem.mask				= TVIF_HANDLE|TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE;
@@ -1671,7 +1654,7 @@ LRESULT CALLBACK CMyTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 							pdbv = (DEV_BROADCAST_VOLUME *)dbh;
 
 							/* Build a string that will form the drive name. */
-							DriveLetter = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+							DriveLetter = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 							StringCchPrintf(DriveName,SIZEOF_ARRAY(DriveName),_T("%c:\\"),DriveLetter);
 
 							if(pdbv->dbcv_flags & DBTF_MEDIA)
@@ -1681,7 +1664,7 @@ LRESULT CALLBACK CMyTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 								if(hItem != NULL)
 								{
 									SHGetFileInfo(DriveName,0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
-									GetDisplayName(DriveName,szDisplayName,SHGDN_INFOLDER);
+									GetDisplayName(DriveName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
 									/* Update the drives icon and display name. */
 									tvItem.mask				= TVIF_HANDLE|TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE;

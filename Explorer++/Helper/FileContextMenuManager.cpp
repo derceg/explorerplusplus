@@ -23,7 +23,7 @@ LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
 	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
-	LPITEMIDLIST pidlParent,std::list<LPITEMIDLIST> pidlItemList) :
+	LPCITEMIDLIST pidlParent, const std::list<LPITEMIDLIST> &pidlItemList) :
 m_hwnd(hwnd),
 m_pidlParent(ILClone(pidlParent)),
 m_pShellContext3(NULL),
@@ -61,20 +61,7 @@ m_pShellContext(NULL)
 	else
 	{
 		IShellFolder *pShellFolder = NULL;
-
-		if(IsNamespaceRoot(pidlParent))
-		{
-			hr = SHGetDesktopFolder(&pShellFolder);
-		}
-		else
-		{
-			IShellFolder *pDesktopFolder = NULL;
-
-			SHGetDesktopFolder(&pDesktopFolder);
-			hr = pDesktopFolder->BindToObject(pidlParent,NULL,
-				IID_IShellFolder,reinterpret_cast<void **>(&pShellFolder));
-			pDesktopFolder->Release();
-		}
+		hr = BindToIdl(pidlParent, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
@@ -141,7 +128,7 @@ CFileContextMenuManager::~CFileContextMenuManager()
 }
 
 HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
-	int iMinID,int iMaxID,POINT *ppt,CStatusBar *pStatusBar,
+	int iMinID,int iMaxID,const POINT *ppt,CStatusBar *pStatusBar,
 	DWORD_PTR dwData,BOOL bRename,BOOL bExtended)
 {
 	if(m_pActualContext == NULL)
@@ -163,6 +150,11 @@ HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 
 	HMENU hMenu = CreatePopupMenu();
 
+	if(hMenu == NULL)
+	{
+		return E_FAIL;
+	}
+
 	UINT uFlags = CMF_NORMAL;
 
 	if(bExtended)
@@ -175,23 +167,30 @@ HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 		uFlags |= CMF_CANRENAME;
 	}
 
-	m_pActualContext->QueryContextMenu(hMenu,0,iMinID,
+	HRESULT hr = m_pActualContext->QueryContextMenu(hMenu,0,iMinID,
 		iMaxID,uFlags);
+
+	if(FAILED(hr))
+	{
+		return hr;
+	}
 
 	/* Allow the caller to add custom entries to the menu. */
 	pfcme->AddMenuEntries(m_pidlParent,m_pidlItemList,dwData,hMenu);
 
+	BOOL bWindowSubclassed = FALSE;
+
 	if(m_pShellContext3 != NULL || m_pShellContext2 != NULL)
 	{
 		/* Subclass the owner window, so that the shell can handle menu messages. */
-		SetWindowSubclass(m_hwnd,ShellMenuHookProcStub,CONTEXT_MENU_SUBCLASS_ID,
+		bWindowSubclassed = SetWindowSubclass(m_hwnd,ShellMenuHookProcStub,CONTEXT_MENU_SUBCLASS_ID,
 			reinterpret_cast<DWORD_PTR>(this));
 	}
 
 	int iCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RETURNCMD,ppt->x,ppt->y,
 		0,m_hwnd,NULL);
 
-	if(m_pShellContext3 != NULL || m_pShellContext2 != NULL)
+	if(bWindowSubclassed)
 	{
 		/* Restore previous window procedure. */
 		RemoveWindowSubclass(m_hwnd,ShellMenuHookProcStub,CONTEXT_MENU_SUBCLASS_ID);
@@ -203,7 +202,7 @@ HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 	{
 		TCHAR szCmd[64];
 
-		HRESULT hr = m_pActualContext->GetCommandString(iCmd - iMinID,GCS_VERB,
+		hr = m_pActualContext->GetCommandString(iCmd - iMinID,GCS_VERB,
 			NULL,reinterpret_cast<LPSTR>(szCmd),SIZEOF_ARRAY(szCmd));
 
 		BOOL bHandled = FALSE;

@@ -53,6 +53,7 @@ struct AsyncOperationInfo_t
 	DWORD			dwEffect;
 };
 
+int CopyFileDescriptorAToW(FILEDESCRIPTORW *pfdw, const FILEDESCRIPTORA *pfda);
 DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter);
 BOOL CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi);
 LRESULT CALLBACK DropWindowSubclass(HWND hwnd,UINT uMsg,
@@ -170,9 +171,9 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 			{
 				dwEffect = *pdwEffect;
 				bPrefferedEffect = TRUE;
-
-				GlobalUnlock(stg.hGlobal);
 			}
+
+			GlobalUnlock(stg.hGlobal);
 		}
 
 		ReleaseStgMedium(&stg);
@@ -307,7 +308,7 @@ HRESULT CDropHandler::CopyShellIDListData(IDataObject *pDataObject,
 
 			LPCITEMIDLIST pidlDirectory = HIDA_GetPIDLFolder(pcida);
 
-			hr = BindToShellFolder(pidlDirectory,&pShellFolder);
+			hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 			if(SUCCEEDED(hr))
 			{
@@ -349,31 +350,32 @@ HRESULT CDropHandler::CopyAnsiFileDescriptorData(IDataObject *pDataObject,
 
 	if(hr == S_OK)
 	{
-		FILEGROUPDESCRIPTORA *pfgd = (FILEGROUPDESCRIPTORA *)GlobalLock(stg.hGlobal);
+		FILEGROUPDESCRIPTORA *pfgda = (FILEGROUPDESCRIPTORA *)GlobalLock(stg.hGlobal);
 
-		if(pfgd != NULL)
+		if(pfgda != NULL)
 		{
-			FILEGROUPDESCRIPTORW *pfgdw = (FILEGROUPDESCRIPTORW *)malloc(sizeof(FILEGROUPDESCRIPTORW) + ((pfgd->cItems - 1) * sizeof(FILEDESCRIPTORW)));
-			pfgdw->cItems = pfgd->cItems;
+			FILEGROUPDESCRIPTORW *pfgdw = (FILEGROUPDESCRIPTORW *)malloc(sizeof(FILEGROUPDESCRIPTORW) + ((pfgda->cItems - 1) * sizeof(FILEDESCRIPTORW)));
 
-			for(UINT i = 0;i < pfgd->cItems;i++)
+			if(pfgdw != NULL)
 			{
-				pfgdw->fgd[i].dwFlags = pfgd->fgd[i].dwFlags;
-				pfgdw->fgd[i].clsid = pfgd->fgd[i].clsid;
-				pfgdw->fgd[i].sizel = pfgd->fgd[i].sizel;
-				pfgdw->fgd[i].pointl = pfgd->fgd[i].pointl;
-				pfgdw->fgd[i].dwFileAttributes = pfgd->fgd[i].dwFileAttributes;
-				pfgdw->fgd[i].ftCreationTime = pfgd->fgd[i].ftCreationTime;
-				pfgdw->fgd[i].ftLastAccessTime = pfgd->fgd[i].ftLastAccessTime;
-				pfgdw->fgd[i].ftLastWriteTime = pfgd->fgd[i].ftLastWriteTime;
-				pfgdw->fgd[i].nFileSizeHigh = pfgd->fgd[i].nFileSizeHigh;
-				pfgdw->fgd[i].nFileSizeLow = pfgd->fgd[i].nFileSizeLow;
-				MultiByteToWideChar(CP_ACP,0,pfgd->fgd[i].cFileName,-1,pfgdw->fgd[i].cFileName,SIZEOF_ARRAY(pfgdw->fgd[i].cFileName));
+				int nSuccessfullyCopied = 0;
+
+				for(UINT i = 0; i < pfgda->cItems; i++)
+				{
+					int iRet = CopyFileDescriptorAToW(&pfgdw->fgd[nSuccessfullyCopied], &pfgda->fgd[i]);
+
+					if(iRet != 0)
+					{
+						nSuccessfullyCopied++;
+					}
+				}
+
+				pfgdw->cItems = nSuccessfullyCopied;
+
+				CopyFileDescriptorData(pDataObject, pfgdw, PastedFileList);
+
+				free(pfgdw);
 			}
-
-			CopyFileDescriptorData(pDataObject,pfgdw,PastedFileList);
-
-			free(pfgdw);
 
 			GlobalUnlock(stg.hGlobal);
 		}
@@ -382,6 +384,21 @@ HRESULT CDropHandler::CopyAnsiFileDescriptorData(IDataObject *pDataObject,
 	}
 
 	return hr;
+}
+
+int CopyFileDescriptorAToW(FILEDESCRIPTORW *pfdw, const FILEDESCRIPTORA *pfda)
+{
+	pfdw->dwFlags = pfda->dwFlags;
+	pfdw->clsid = pfda->clsid;
+	pfdw->sizel = pfda->sizel;
+	pfdw->pointl = pfda->pointl;
+	pfdw->dwFileAttributes = pfda->dwFileAttributes;
+	pfdw->ftCreationTime = pfda->ftCreationTime;
+	pfdw->ftLastAccessTime = pfda->ftLastAccessTime;
+	pfdw->ftLastWriteTime = pfda->ftLastWriteTime;
+	pfdw->nFileSizeHigh = pfda->nFileSizeHigh;
+	pfdw->nFileSizeLow = pfda->nFileSizeLow;
+	return MultiByteToWideChar(CP_ACP, 0, pfda->cFileName, -1, pfdw->cFileName, SIZEOF_ARRAY(pfdw->cFileName));
 }
 
 HRESULT CDropHandler::CopyUnicodeFileDescriptorData(IDataObject *pDataObject,
@@ -620,30 +637,34 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 				PastedFileList.push_back(szFileName);
 			}
 
-			HGLOBAL hglb = NULL;
-			DWORD *pdwCopyEffect = NULL;
 			FORMATETC ftc;
-			STGMEDIUM stg1;
-
 			ftc.cfFormat	= (CLIPFORMAT)RegisterClipboardFormat(CFSTR_PERFORMEDDROPEFFECT);
 			ftc.ptd			= NULL;
 			ftc.dwAspect	= DVASPECT_CONTENT;
 			ftc.lindex		= -1;
 			ftc.tymed		= TYMED_HGLOBAL;
 
-			hglb = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
+			HGLOBAL hGlobal = GlobalAlloc(GMEM_MOVEABLE,sizeof(DWORD));
 
-			pdwCopyEffect = (DWORD *)GlobalLock(hglb);
+			if(hGlobal != NULL)
+			{
+				DWORD *pdwCopyEffect = (DWORD *) GlobalLock(hGlobal);
 
-			*pdwCopyEffect = DROPEFFECT_COPY;
+				if(pdwCopyEffect != NULL)
+				{
+					*pdwCopyEffect = DROPEFFECT_COPY;
+					GlobalUnlock(hGlobal);
 
-			GlobalUnlock(hglb);
+					STGMEDIUM stg;
+					stg.tymed = TYMED_HGLOBAL;
+					stg.pUnkForRelease = NULL;
+					stg.hGlobal = hGlobal;
 
-			stg1.tymed			= TYMED_HGLOBAL;
-			stg1.pUnkForRelease	= 0;
-			stg1.hGlobal		= hglb;
+					pDataObject->SetData(&ftc, &stg, FALSE);
+				}
 
-			pDataObject->SetData(&ftc,&stg1,FALSE);
+				GlobalFree(hGlobal);
+			}
 		}
 
 		if(pBuffer != NULL)
@@ -707,20 +728,23 @@ HRESULT CDropHandler::CopyAnsiTextData(IDataObject *pDataObject,
 		{
 			WCHAR *pszUnicodeText = new WCHAR[strlen(pText) + 1];
 
-			MultiByteToWideChar(CP_ACP,0,pText,-1,pszUnicodeText,
+			int iRet = MultiByteToWideChar(CP_ACP,0,pText,-1,pszUnicodeText,
 				static_cast<int>(strlen(pText) + 1));
 
-			TCHAR szFullFileName[MAX_PATH];
-
-			hr = CopyTextToFile(m_szDestDirectory,pszUnicodeText,szFullFileName);
-
-			if(hr == S_OK)
+			if(iRet != 0)
 			{
-				TCHAR szFileName[MAX_PATH];
-				StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
-				PathStripPath(szFileName);
+				TCHAR szFullFileName[MAX_PATH];
 
-				PastedFileList.push_back(szFileName);
+				hr = CopyTextToFile(m_szDestDirectory, pszUnicodeText, szFullFileName);
+
+				if(hr == S_OK)
+				{
+					TCHAR szFileName[MAX_PATH];
+					StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
+					PathStripPath(szFileName);
+
+					PastedFileList.push_back(szFileName);
+				}
 			}
 
 			delete[] pszUnicodeText;
@@ -818,9 +842,6 @@ HRESULT CDropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 
 				delete[] pData;
 
-				TCHAR szFileName[MAX_PATH];
-				StringCchCopy(szFileName,SIZEOF_ARRAY(szFileName),szFullFileName);
-				PathStripPath(szFileName);
 				PastedFileList.push_back(szFileName);
 			}
 
@@ -836,7 +857,6 @@ HRESULT CDropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 
 void CDropHandler::HandleRightClickDrop(void)
 {
-	IShellFolder *pDesktop = NULL;
 	IShellFolder *pShellFolder = NULL;
 	IDropTarget *pDrop = NULL;
 	LPITEMIDLIST pidlDirectory = NULL;
@@ -847,34 +867,27 @@ void CDropHandler::HandleRightClickDrop(void)
 
 	if(SUCCEEDED(hr))
 	{
-		hr = SHGetDesktopFolder(&pDesktop);
+		hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
-			hr = pDesktop->BindToObject(pidlDirectory,0,IID_IShellFolder,(void **)&pShellFolder);
+			dwe = m_dwEffect;
+
+			hr = pShellFolder->CreateViewObject(m_hwndDrop,IID_IDropTarget,(void **)&pDrop);
 
 			if(SUCCEEDED(hr))
 			{
+				pDrop->DragEnter(m_pDataObject,MK_RBUTTON,m_ptl,&dwe);
+
 				dwe = m_dwEffect;
+				pDrop->Drop(m_pDataObject,m_grfKeyState,m_ptl,&dwe);
 
-				hr = pShellFolder->CreateViewObject(m_hwndDrop,IID_IDropTarget,(void **)&pDrop);
+				pDrop->DragLeave();
 
-				if(SUCCEEDED(hr))
-				{
-					pDrop->DragEnter(m_pDataObject,MK_RBUTTON,m_ptl,&dwe);
-
-					dwe = m_dwEffect;
-					pDrop->Drop(m_pDataObject,m_grfKeyState,m_ptl,&dwe);
-
-					pDrop->DragLeave();
-
-					pDrop->Release();
-				}
-
-				pShellFolder->Release();
+				pDrop->Release();
 			}
 
-			pDesktop->Release();
+			pShellFolder->Release();
 		}
 
 		CoTaskMemFree(pidlDirectory);
@@ -932,7 +945,7 @@ void CDropHandler::CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD 
 			locations. */
 			bOnSameDrive = CheckItemLocations(i);
 
-			dwEffect = DetermineCurrentDragEffect(m_grfKeyState,
+			dwEffect = DetermineDragEffect(m_grfKeyState,
 			m_dwEffect,TRUE,bOnSameDrive);
 		}
 
@@ -1202,8 +1215,8 @@ void CDropHandler::CreateShortcutToDroppedFile(TCHAR *szFullFileName)
 	NFileOperations::CreateLinkToFile(szFullFileName,szLink,EMPTY_STRING);
 }
 
-HRESULT CDropHandler::CopyTextToFile(IN TCHAR *pszDestDirectory,
-	IN WCHAR *pszText,OUT TCHAR *pszFullFileNameOut)
+HRESULT CDropHandler::CopyTextToFile(const TCHAR *pszDestDirectory,
+	const WCHAR *pszText,TCHAR *pszFullFileNameOut)
 {
 	SYSTEMTIME st;
 	FILETIME ft;

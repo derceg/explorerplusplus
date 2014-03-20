@@ -26,14 +26,6 @@ public:
 
 	static CSetDefaultColumnsDialogPersistentSettings &GetInstance();
 
-protected:
-
-	void			SaveExtraRegistrySettings(HKEY hKey);
-	void			LoadExtraRegistrySettings(HKEY hKey);
-
-	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode);
-	void			LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue);
-
 private:
 
 	friend CSetDefaultColumnsDialog;
@@ -46,6 +38,12 @@ private:
 
 	CSetDefaultColumnsDialogPersistentSettings(const CSetDefaultColumnsDialogPersistentSettings &);
 	CSetDefaultColumnsDialogPersistentSettings & operator=(const CSetDefaultColumnsDialogPersistentSettings &);
+
+	void			SaveExtraRegistrySettings(HKEY hKey);
+	void			LoadExtraRegistrySettings(HKEY hKey);
+
+	void			SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pParentNode);
+	void			LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	FolderType_t	m_FolderType;
 };
@@ -67,16 +65,15 @@ protected:
 	INT_PTR	OnClose();
 	INT_PTR	OnDestroy();
 
-	void	SaveState();
-
-	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,std::list<CResizableDialog::Control_t> &ControlList);
-
 private:
+
+	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
+	void	SaveState();
 
 	void	OnOk();
 	void	OnCancel();
 	void	OnCbnSelChange();
-	void	OnLvnItemChanging(NMLISTVIEW *pnmlv);
+	void	OnLvnItemChanged(NMLISTVIEW *pnmlv);
 	void	OnMoveColumn(bool bUp);
 
 	void	SaveCurrentColumnState(FolderType_t FolderType);

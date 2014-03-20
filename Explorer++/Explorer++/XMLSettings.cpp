@@ -22,6 +22,7 @@
 #include "Explorer++.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/XMLSettings.h"
+#include "../Helper/ProcessHelper.h"
 #include "../Helper/Macros.h"
 
 #import <msxml3.dll> raw_interfaces_only
@@ -158,7 +159,7 @@ BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 	if(!pXMLDom)
 		goto clean;
 
-	GetCurrentProcessImageName(szConfigFile, SIZEOF_ARRAY(szConfigFile));
+	GetProcessImageName(GetCurrentProcessId(),szConfigFile, SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
 
@@ -253,7 +254,7 @@ BOOL LoadAllowMultipleInstancesFromXML(void)
 	if(!pXMLDom)
 		goto clean;
 
-	GetCurrentProcessImageName(szConfigFile, SIZEOF_ARRAY(szConfigFile));
+	GetProcessImageName(GetCurrentProcessId(),szConfigFile, SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile, NExplorerplusplus::XML_FILENAME);
 
@@ -2017,7 +2018,7 @@ void Explorerplusplus::CLoadSaveXML::InitializeLoadEnvironment()
 	if(!m_pXMLDom)
 		goto clean;
 
-	GetCurrentProcessImageName(szConfigFile,SIZEOF_ARRAY(szConfigFile));
+	GetProcessImageName(GetCurrentProcessId(),szConfigFile,SIZEOF_ARRAY(szConfigFile));
 	PathRemoveFileSpec(szConfigFile);
 	PathAppend(szConfigFile,NExplorerplusplus::XML_FILENAME);
 

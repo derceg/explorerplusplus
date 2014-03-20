@@ -19,6 +19,7 @@
 #include "iShellBrowser_internal.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
 
@@ -193,7 +194,6 @@ Bitmap creation occurs as follows:
 void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
 {
 	IExtractImage *pExtractImage = NULL;
-	IShellFolder *pShellDesktop = NULL;
 	IShellFolder *pShellFolder = NULL;
 	LPITEMIDLIST pidlParent = NULL;
 	LPITEMIDLIST pridl = NULL;
@@ -223,68 +223,61 @@ void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
 
 		pridl = ILClone(ILFindLastID(pListViewInfo.pidlFull));
 
-		hr = SHGetDesktopFolder(&pShellDesktop);
+		hr = BindToIdl(pidlParent, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
-			hr = pShellDesktop->BindToObject(pidlParent,NULL,IID_IShellFolder,(void **)&pShellFolder);
+			hr = pShellFolder->GetUIObjectOf(NULL,1,(LPCITEMIDLIST *)&pridl,
+				IID_IExtractImage,NULL,(void **)&pExtractImage);
 
 			if(SUCCEEDED(hr))
 			{
-				hr = pShellFolder->GetUIObjectOf(NULL,1,(LPCITEMIDLIST *)&pridl,
-					IID_IExtractImage,NULL,(void **)&pExtractImage);
+				dwFlags = IEIFLAG_OFFLINE|IEIFLAG_QUALITY;
+				size.cx = CShellBrowser::THUMBNAIL_ITEM_WIDTH;
+				size.cy = CShellBrowser::THUMBNAIL_ITEM_HEIGHT;
+
+				/* Note that this may return E_PENDING (on Vista),
+				which seems to indicate the request in pending.
+				Attempting to extract the image appears to succeed
+				regardless (perhaps after some delay). */
+				pExtractImage->GetLocation(szImage,MAX_PATH,
+					&dwPriority,&size,32,&dwFlags);
+
+				hr = pExtractImage->Extract(&hThumbnailBitmap);
 
 				if(SUCCEEDED(hr))
 				{
-					dwFlags = IEIFLAG_OFFLINE|IEIFLAG_QUALITY;
-					size.cx = CShellBrowser::THUMBNAIL_ITEM_WIDTH;
-					size.cy = CShellBrowser::THUMBNAIL_ITEM_HEIGHT;
+					LVFINDINFO lvfi;
+					LVITEM lvItem;
+					int iItem;
+					int iImage;
 
-					/* Note that this may return E_PENDING (on Vista),
-					which seems to indicate the request in pending.
-					Attempting to extract the image appears to succeed
-					regardless (perhaps after some delay). */
-					pExtractImage->GetLocation(szImage,MAX_PATH,
-						&dwPriority,&size,32,&dwFlags);
+					iImage = pShellBrowser->GetExtractedThumbnail(hThumbnailBitmap);
 
-					hr = pExtractImage->Extract(&hThumbnailBitmap);
+					lvfi.flags	= LVFI_PARAM;
+					lvfi.lParam	= pListViewInfo.iItem;
+					iItem = ListView_FindItem(pListViewInfo.hListView,-1,&lvfi);
 
-					if(SUCCEEDED(hr))
+					/* If the item is still in the listview, set its
+					image to the new image index. */
+					if(iItem != -1)
 					{
-						LVFINDINFO lvfi;
-						LVITEM lvItem;
-						int iItem;
-						int iImage;
+						lvItem.mask		= LVIF_IMAGE;
+						lvItem.iItem	= iItem;
+						lvItem.iSubItem	= 0;
+						lvItem.iImage	= iImage;
+						ListView_SetItem(pListViewInfo.hListView,&lvItem);
 
-						iImage = pShellBrowser->GetExtractedThumbnail(hThumbnailBitmap);
-
-						lvfi.flags	= LVFI_PARAM;
-						lvfi.lParam	= pListViewInfo.iItem;
-						iItem = ListView_FindItem(pListViewInfo.hListView,-1,&lvfi);
-
-						/* If the item is still in the listview, set its
-						image to the new image index. */
-						if(iItem != -1)
-						{
-							lvItem.mask		= LVIF_IMAGE;
-							lvItem.iItem	= iItem;
-							lvItem.iSubItem	= 0;
-							lvItem.iImage	= iImage;
-							ListView_SetItem(pListViewInfo.hListView,&lvItem);
-
-							pListViewInfo.m_pExtraItemInfo->bThumbnailRetreived = TRUE;
-						}
-
-						DeleteObject(hThumbnailBitmap);
+						pListViewInfo.m_pExtraItemInfo->bThumbnailRetreived = TRUE;
 					}
 
-					pExtractImage->Release();
+					DeleteObject(hThumbnailBitmap);
 				}
 
-				pShellFolder->Release();
+				pExtractImage->Release();
 			}
 
-			pShellDesktop->Release();
+			pShellFolder->Release();
 		}
 
 		CoTaskMemFree(pidlParent);
@@ -292,7 +285,6 @@ void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
 
 		bQueueNotEmpty = RemoveFromThumbnailsFinderQueue(&pListViewInfo,NULL);
 	}
-	return;
 }
 
 /* Draws a thumbnail based on an items icon. */

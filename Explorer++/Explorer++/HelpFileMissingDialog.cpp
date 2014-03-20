@@ -15,6 +15,7 @@
 #include "HelpFileMissingDialog.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
+#include "../Helper/WindowHelper.h"
 
 CHelpFileMissingDialog::CHelpFileMissingDialog(HINSTANCE hInstance,int iResource,HWND hParent) :
 CBaseDialog(hInstance,iResource,hParent,false)

@@ -24,6 +24,8 @@
 #include "../Helper/Controls.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
+#include "../Helper/MenuHelper.h"
+#include "../Helper/TabHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -51,6 +53,14 @@ void Explorerplusplus::InitializeTabs(void)
 	}
 
 	m_hTabCtrl = CreateTabControl(m_hTabBacking,TabCtrlStyles);
+
+	m_hTabFont = CreateFont(15, 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE, ANSI_CHARSET,
+		OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, FF_DONTCARE, NULL);
+
+	if(m_hTabFont != NULL)
+	{
+		SendMessage(m_hTabCtrl, WM_SETFONT, reinterpret_cast<WPARAM>(m_hTabFont), MAKELPARAM(TRUE, 0));
+	}
 
 	/* TODO: The image list is been leaked. */
 	HIMAGELIST himlSmall = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,100);
@@ -245,7 +255,7 @@ int Explorerplusplus::GenerateUniqueTabId(void)
 		return -1;
 }
 
-HRESULT Explorerplusplus::CreateNewTab(TCHAR *TabDirectory,
+HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
 InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
@@ -277,7 +287,7 @@ int *pTabObjectIndex)
 
 /* Creates a new tab. If the settings argument is NULL,
 the global settings will be used. */
-HRESULT Explorerplusplus::CreateNewTab(LPITEMIDLIST pidlDirectory,
+HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
@@ -472,7 +482,7 @@ int *pTabObjectIndex)
 	/* If we're running on Windows 7, we'll create
 	a proxy window for each tab. This proxy window
 	will create the taskbar thumbnail for that tab. */
-	CreateTabProxy(pidlDirectory,iTabId,bSwitchToNewTab);
+	CreateTabProxy(iTabId,bSwitchToNewTab);
 
 	return S_OK;
 }
@@ -1140,7 +1150,7 @@ void Explorerplusplus::AddDefaultTabIcons(HIMAGELIST himlTab)
 	ImageList_Destroy(himlTemp);
 }
 
-void Explorerplusplus::InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId)
+void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId)
 {
 	TCITEM		tcItem;
 	TCHAR		szTabText[MAX_PATH];
@@ -1149,7 +1159,7 @@ void Explorerplusplus::InsertNewTab(LPITEMIDLIST pidlDirectory,int iNewTabIndex,
 	/* If no custom name is set, use the folders name. */
 	if(!m_TabInfo[iTabId].bUseCustomName)
 	{
-		GetDisplayName(pidlDirectory,szTabText,SHGDN_INFOLDER);
+		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
 
 		StringCchCopy(m_TabInfo[iTabId].szName,
 			SIZEOF_ARRAY(m_TabInfo[iTabId].szName),szTabText);
@@ -1418,12 +1428,12 @@ int Explorerplusplus::GetCurrentTabId() const
 	return m_iObjectIndex;
 }
 
-UINT Explorerplusplus::GetDefaultSortMode(const LPITEMIDLIST &pidlDirectory)
+UINT Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory)
 {
 	std::list<Column_t> *pColumns = NULL;
 
 	TCHAR szDirectory[MAX_PATH];
-	GetDisplayName(pidlDirectory,szDirectory,SHGDN_FORPARSING);
+	GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
 
 	if(CompareVirtualFolders(szDirectory,CSIDL_CONTROLS))
 	{

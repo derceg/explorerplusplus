@@ -11,14 +11,14 @@ namespace NBookmark
 {
 	__interface IBookmarkItemNotification
 	{
-		virtual void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
-		virtual void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
+		void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
+		void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
 
-		virtual void	OnBookmarkModified(const GUID &guid);
-		virtual void	OnBookmarkFolderModified(const GUID &guid);
+		void	OnBookmarkModified(const GUID &guid);
+		void	OnBookmarkFolderModified(const GUID &guid);
 
-		virtual void	OnBookmarkRemoved(const GUID &guid);
-		virtual void	OnBookmarkFolderRemoved(const GUID &guid);
+		void	OnBookmarkRemoved(const GUID &guid);
+		void	OnBookmarkFolderRemoved(const GUID &guid);
 	};
 
 	struct SerializedData_t

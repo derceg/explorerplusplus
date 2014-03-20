@@ -7,9 +7,9 @@ public:
 	CMessageForwarder();
 	virtual ~CMessageForwarder();
 
-	INT_PTR			ForwardMessage(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
-
 protected:
+
+	INT_PTR			ForwardMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	virtual INT_PTR	OnInitDialog();
 	virtual INT_PTR	OnTimer(int iTimerID);

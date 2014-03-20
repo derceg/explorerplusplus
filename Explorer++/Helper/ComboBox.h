@@ -2,7 +2,7 @@
 
 #include "BaseWindow.h"
 
-class CComboBox : CBaseWindow
+class CComboBox : public CBaseWindow
 {
 	friend LRESULT CALLBACK ComboBoxEditProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 	friend LRESULT CALLBACK ComboBoxParentProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
@@ -17,20 +17,19 @@ protected:
 
 private:
 
-	CComboBox(HWND hComboBox);
+	DISALLOW_COPY_AND_ASSIGN(CComboBox);
 
-	CComboBox(const CComboBox &);
-	CComboBox & operator = (const CComboBox &);
+	CComboBox(HWND hComboBox);
+	~CComboBox();
 
 	LRESULT CALLBACK ComboBoxEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK ComboBoxParentProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	INT_PTR	OnCBNEditChange();
 
-	static UINT m_StaticSubclassCounter;
+	static UINT_PTR m_StaticSubclassCounter;
 
-	HWND	m_hComboBox;
-	UINT	m_SubclassCounter;
+	UINT_PTR m_SubclassCounter;
 
 	bool	m_SuppressAutocomplete;
 };

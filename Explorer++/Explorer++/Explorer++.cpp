@@ -68,6 +68,7 @@ m_hContainer(hwnd)
 	m_hFoldersToolbar				= NULL;
 	m_hLastActiveWindow				= NULL;
 	m_hActiveListView				= NULL;
+	m_hTabFont						= NULL;
 	m_ListViewMButtonItem			= -1;
 	m_zDeltaTotal					= 0;
 	m_iPreviousTabSelectionId		= -1;
@@ -84,8 +85,8 @@ m_hContainer(hwnd)
 	InitializeTabMap();
 
 	/* Default folder (i.e. My Computer). */
-	GetVirtualFolderParsingPath(CSIDL_DRIVES,m_DefaultTabDirectoryStatic);
-	GetVirtualFolderParsingPath(CSIDL_DRIVES,m_DefaultTabDirectory);
+	GetCsidlDisplayName(CSIDL_DRIVES,m_DefaultTabDirectoryStatic,SIZEOF_ARRAY(m_DefaultTabDirectoryStatic),SHGDN_FORPARSING);
+	GetCsidlDisplayName(CSIDL_DRIVES,m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory),SHGDN_FORPARSING);
 
 	InitializeMainToolbars();
 
@@ -159,6 +160,11 @@ m_hContainer(hwnd)
 
 Explorerplusplus::~Explorerplusplus()
 {
+	if(m_hTabFont != NULL)
+	{
+		DeleteObject(m_hTabFont);
+	}
+
 	/* Bookmarks teardown. */
 	delete m_pipbin;
 	delete m_pBookmarksToolbar;

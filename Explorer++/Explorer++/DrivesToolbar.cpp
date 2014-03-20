@@ -102,7 +102,7 @@ void CDrivesToolbar::OnDeviceArrival(DEV_BROADCAST_HDR *dbh)
 
 	/* Build a string that will form the drive name. */
 	TCHAR szDrive[4];
-	TCHAR chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+	TCHAR chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 	StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),_T("%c:\\"),chDrive);
 
 	/* Is there a change in media, or a change
@@ -134,7 +134,7 @@ void CDrivesToolbar::OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh)
 	DEV_BROADCAST_VOLUME *pdbv = reinterpret_cast<DEV_BROADCAST_VOLUME *>(dbh);
 
 	TCHAR szDrive[4];
-	TCHAR chDrive = GetDriveNameFromMask(pdbv->dbcv_unitmask);
+	TCHAR chDrive = GetDriveLetterFromMask(pdbv->dbcv_unitmask);
 	StringCchPrintf(szDrive,SIZEOF_ARRAY(szDrive),_T("%c:\\"),chDrive);
 
 	/* Media changed or drive removed? */
@@ -380,7 +380,7 @@ std::wstring CDrivesToolbar::GetDrivePath(int iIndex)
 	return itr->second;
 }
 
-void CDrivesToolbar::AddMenuEntries(LPITEMIDLIST pidlParent,
+void CDrivesToolbar::AddMenuEntries(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
 	TCHAR szTemp[64];
@@ -394,8 +394,8 @@ void CDrivesToolbar::AddMenuEntries(LPITEMIDLIST pidlParent,
 	InsertMenuItem(hMenu,1,TRUE,&mii);
 }
 
-BOOL CDrivesToolbar::HandleShellMenuItem(LPITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,TCHAR *szCmd)
+BOOL CDrivesToolbar::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
+	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
 {
 	if(StrCmpI(szCmd,_T("open")) == 0)
 	{
@@ -406,7 +406,7 @@ BOOL CDrivesToolbar::HandleShellMenuItem(LPITEMIDLIST pidlParent,
 	return FALSE;
 }
 
-void CDrivesToolbar::HandleCustomMenuItem(LPITEMIDLIST pidlParent,
+void CDrivesToolbar::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,int iCmd)
 {
 	switch(iCmd)

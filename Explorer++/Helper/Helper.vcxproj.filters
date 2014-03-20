@@ -19,9 +19,6 @@
     <ClCompile Include="ComboBoxHelper.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
-    <ClCompile Include="Controls.c">
-      <Filter>Control Support</Filter>
-    </ClCompile>
     <ClCompile Include="ListViewHelper.cpp">
       <Filter>Control Support</Filter>
     </ClCompile>
@@ -90,6 +87,30 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuHelper.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
+    <ClCompile Include="TabHelper.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessHelper.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowHelper.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
+    <ClCompile Include="Controls.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeHelper.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="StringHelper.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
+    <ClCompile Include="FileWrappers.cpp">
+      <Filter>Resource Wrappers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +207,30 @@
     <ClInclude Include="ContextMenuManager.h">
       <Filter>Shell\Shell Integration</Filter>
     </ClInclude>
+    <ClInclude Include="MenuHelper.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="TabHelper.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessHelper.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowHelper.h">
+      <Filter>Control Support</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeHelper.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="StringHelper.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="FileWrappers.h">
+      <Filter>Resource Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="UniqueHandle.h">
+      <Filter>Resource Wrappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">
@@ -211,6 +256,9 @@
     </Filter>
     <Filter Include="Miscellaneous">
       <UniqueIdentifier>{a38722e8-52ce-4c89-9647-355edcdc155d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Wrappers">
+      <UniqueIdentifier>{343c29c4-2960-44de-8115-240e788f10a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

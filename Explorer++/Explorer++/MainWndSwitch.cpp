@@ -33,6 +33,8 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/ProcessHelper.h"
+#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -533,10 +535,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 
 		case IDM_EDIT_WILDCARDDESELECT:
 			OnWildcardSelect(FALSE);
-			break;
-
-		case IDM_EDIT_SHOWFILESLACK:
-			OnSaveFileSlack();
 			break;
 
 		case IDM_EDIT_RESOLVELINK:
@@ -1265,7 +1263,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 				{
 					TCHAR szFullFilename[MAX_PATH];
-					m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+					m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 					FullFilenameList.push_back(szFullFilename);
 				}
 
@@ -1283,7 +1281,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				if(iSelected != -1)
 				{
 					TCHAR szFullFilename[MAX_PATH];
-					m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullFilename);
+					m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 					CSplitFileDialog SplitFileDialog(m_hLanguageModule,IDD_SPLITFILE,hwnd,szFullFilename);
 
@@ -1300,7 +1298,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 				{
 					TCHAR szFullFilename[MAX_PATH];
-					m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+					m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 					FullFilenameList.push_back(szFullFilename);
 				}
 
@@ -1376,7 +1374,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 				TCHAR szCurrentDirectory[MAX_PATH];
 				TCHAR szDisplayName[MAX_PATH];
 				m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),szCurrentDirectory);
-				GetDisplayName(szCurrentDirectory,szDisplayName,SHGDN_INFOLDER);
+				GetDisplayName(szCurrentDirectory,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 				CBookmark Bookmark(szDisplayName,szCurrentDirectory,EMPTY_STRING);
 
 				CAddBookmarkDialog AddBookmarkDialog(m_hLanguageModule,IDD_ADD_BOOKMARK,hwnd,*m_bfAllBookmarks,Bookmark);
@@ -1439,7 +1437,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		case IDM_HELP_HELP:
 			{
 				TCHAR szHelpFile[MAX_PATH];
-				GetCurrentProcessImageName(szHelpFile,SIZEOF_ARRAY(szHelpFile));
+				GetProcessImageName(GetCurrentProcessId(),szHelpFile,SIZEOF_ARRAY(szHelpFile));
 				PathRemoveFileSpec(szHelpFile);
 				PathAppend(szHelpFile,NExplorerplusplus::HELP_FILE_NAME);
 

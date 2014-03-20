@@ -16,11 +16,14 @@
 #include <list>
 #include <shobjidl.h>
 #include "Explorer++.h"
+#include "MainResource.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ShellHelper.h"
-#include "MainResource.h"
+#include "../Helper/MenuHelper.h"
+#include "../Helper/TabHelper.h"
+#include "../Helper/ProcessHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -95,7 +98,6 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_MOVETOFOLDER,CanCutOrCopySelection() && GetFocus() != m_hTreeView);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_WILDCARDDESELECT,m_nSelected);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_SELECTNONE,m_nSelected);
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_SHOWFILESLACK,m_nSelected);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_RESOLVELINK,m_nSelected);
 
 	lCheckMenuItem(hProgramMenu,IDM_VIEW_STATUSBAR,m_bShowStatusBar);
@@ -290,11 +292,11 @@ void Explorerplusplus::HandleMainWindowText(void)
 	GUID will be shown). */
 	if(m_bShowFullTitlePath && !m_pActiveShellBrowser->InVirtualFolder())
 	{
-		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SHGDN_FORPARSING);
+		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SIZEOF_ARRAY(szFolderDisplayName),SHGDN_FORPARSING);
 	}
 	else
 	{
-		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SHGDN_NORMAL);
+		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SIZEOF_ARRAY(szFolderDisplayName),SHGDN_NORMAL);
 	}
 
 	StringCchPrintf(szTitle,SIZEOF_ARRAY(szTitle),
@@ -305,7 +307,7 @@ void Explorerplusplus::HandleMainWindowText(void)
 
 	if(m_bShowUserNameInTitleBar)
 	{
-		GetProcessOwner(szOwner,SIZEOF_ARRAY(szOwner));
+		GetProcessOwner(GetCurrentProcessId(),szOwner,SIZEOF_ARRAY(szOwner));
 
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),szOwner);
 	}
@@ -357,7 +359,7 @@ void Explorerplusplus::HandleAddressBarText(void)
 
 	TCHAR szParsingPath[MAX_PATH];
 
-	GetDisplayName(pidl,szParsingPath,SHGDN_FORPARSING);
+	GetDisplayName(pidl,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
 	/* If the path is a GUID (i.e. of the form
 	::{20D04FE0-3AEA-1069-A2D8-08002B30309D}), we'll
@@ -367,7 +369,7 @@ void Explorerplusplus::HandleAddressBarText(void)
 	be shown directly to users. */
 	if(IsPathGUID(szParsingPath))
 	{
-		GetDisplayName(pidl,szAddressBarTitle,SHGDN_INFOLDER);
+		GetDisplayName(pidl,szAddressBarTitle,SIZEOF_ARRAY(szAddressBarTitle),SHGDN_INFOLDER);
 	}
 	else
 	{
@@ -415,7 +417,7 @@ void Explorerplusplus::HandleTabText(int iTab,int iTabId)
 		LPITEMIDLIST pidlDirectory = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
 
 		TCHAR szTabText[MAX_PATH];
-		GetDisplayName(pidlDirectory,szTabText,SHGDN_INFOLDER);
+		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
 
 		StringCchCopy(m_TabInfo[iTabId].szName,
 			SIZEOF_ARRAY(m_TabInfo[iTabId].szName),szTabText);
@@ -500,7 +502,7 @@ void Explorerplusplus::SetTabIcon(int iIndex,int iTabId)
 /* Sets a tabs icon. Normally, this icon
 is the folders icon, however if the tab
 is locked, the icon will be a lock. */
-void Explorerplusplus::SetTabIcon(int iIndex,int iTabId,LPITEMIDLIST pidlDirectory)
+void Explorerplusplus::SetTabIcon(int iIndex,int iTabId,LPCITEMIDLIST pidlDirectory)
 {
 	TCITEM			tcItem;
 	SHFILEINFO		shfi;

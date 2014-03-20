@@ -470,7 +470,7 @@ void CMergeFilesDialog::OnMove(bool bUp)
 
 		std::iter_swap(itrSelected,itrSwap);
 
-		NListView::ListView_SwapItemsNolParam(hListView,iSelected,iSwap);
+		NListView::ListView_SwapItems(hListView,iSelected,iSwap,FALSE);
 	}
 }
 

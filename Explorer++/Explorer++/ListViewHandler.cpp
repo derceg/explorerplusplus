@@ -30,6 +30,7 @@
 #include "../Helper/iDropSource.h"
 #include "../Helper/Controls.h"
 #include "../Helper/iDataObject.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/Macros.h"
 
 
@@ -397,7 +398,6 @@ void Explorerplusplus::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
 		initially clicked on. */
 		if(ht.iItem == m_ListViewMButtonItem)
 		{
-			IShellFolder *pDesktopFolder	= NULL;
 			IShellFolder *pShellFolder		= NULL;
 			LPITEMIDLIST pidl				= NULL;
 			LPITEMIDLIST ridl				= NULL;
@@ -406,43 +406,33 @@ void Explorerplusplus::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
 			STRRET str;
 			HRESULT hr;
 
-			hr = SHGetDesktopFolder(&pDesktopFolder);
+			pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+			hr = BindToIdl(pidl, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 			if(SUCCEEDED(hr))
 			{
-				pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-				hr = pDesktopFolder->BindToObject(pidl,NULL,IID_IShellFolder,(LPVOID *)&pShellFolder);
+				ridl = m_pActiveShellBrowser->QueryItemRelativeIdl(ht.iItem);
 
-				if(!SUCCEEDED(hr))
-				{
-					hr = SHGetDesktopFolder(&pShellFolder);
-				}
+				hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&ridl,&uAttributes);
 
 				if(SUCCEEDED(hr))
 				{
-					ridl = m_pActiveShellBrowser->QueryItemRelativeIdl(ht.iItem);
-
-					hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&ridl,&uAttributes);
-
-					if(SUCCEEDED(hr))
+					if((uAttributes & SFGAO_FOLDER) &&
+						!(uAttributes & SFGAO_STREAM))
 					{
-						if((uAttributes & SFGAO_FOLDER) &&
-							!(uAttributes & SFGAO_STREAM))
-						{
-							/* Folder item. */
-							pShellFolder->GetDisplayNameOf(ridl,SHGDN_FORPARSING,&str);
-							StrRetToBuf(&str,ridl,szParsingPath,MAX_PATH);
+						/* Folder item. */
+						pShellFolder->GetDisplayNameOf(ridl,SHGDN_FORPARSING,&str);
+						StrRetToBuf(&str,ridl,szParsingPath,MAX_PATH);
 
-							BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
-						}
+						BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
 					}
-
-					CoTaskMemFree(ridl);
-					pShellFolder->Release();
 				}
-				CoTaskMemFree(pidl);
-				pDesktopFolder->Release();
+
+				CoTaskMemFree(ridl);
+				pShellFolder->Release();
 			}
+
+			CoTaskMemFree(pidl);
 		}
 	}
 }
@@ -487,7 +477,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 
 				pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
-				GetDisplayName(pidl,szRoot,SHGDN_FORPARSING);
+				GetDisplayName(pidl,szRoot,SIZEOF_ARRAY(szRoot),SHGDN_FORPARSING);
 				PathStripToRoot(szRoot);
 
 				/* Go to the root of this directory. */
@@ -908,20 +898,12 @@ void Explorerplusplus::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 	virtual folder. Otherwise, show the modified date. */
 	if((m_InfoTipType == INFOTIP_SYSTEM) || m_pActiveShellBrowser->InVirtualFolder())
 	{
-		LPITEMIDLIST	pidlDirectory = NULL;
-		LPITEMIDLIST	pridlItem = NULL;
-
-		pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-		pridlItem = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
-
-		hr = GetFileInfoTip(m_hContainer,pidlDirectory,const_cast<LPCITEMIDLIST *>(&pridlItem),
-			szInfoTip,cchMax);
+		TCHAR szFullFileName[MAX_PATH];
+		m_pActiveShellBrowser->QueryFullItemName(iItem, szFullFileName, SIZEOF_ARRAY(szFullFileName));
+		hr = GetItemInfoTip(szFullFileName, szInfoTip, cchMax);
 
 		if(!SUCCEEDED(hr))
 			StringCchCopy(szInfoTip,cchMax,EMPTY_STRING);
-
-		CoTaskMemFree(pidlDirectory);
-		CoTaskMemFree(pridlItem);
 	}
 	else
 	{
@@ -1004,20 +986,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	LPCITEMIDLIST pidlChildFolder = ILFindLastID(pidlDirectory);
 
 	IShellFolder *pShellFolder = NULL;
-	HRESULT hr;
-
-	if(IsNamespaceRoot(pidlParent))
-	{
-		hr = SHGetDesktopFolder(&pShellFolder);
-	}
-	else
-	{
-		IShellFolder *pDesktopFolder = NULL;
-		SHGetDesktopFolder(&pDesktopFolder);
-		hr = pDesktopFolder->BindToObject(pidlParent,NULL,
-			IID_IShellFolder,reinterpret_cast<void **>(&pShellFolder));
-		pDesktopFolder->Release();
-	}
+	HRESULT hr = BindToIdl(pidlParent, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{
@@ -1265,7 +1234,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 
 		TCHAR szFullFilename[MAX_PATH];
 
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 		std::wstring stringFilename(szFullFilename);
 
@@ -1362,11 +1331,11 @@ void Explorerplusplus::OnListViewFileDelete(BOOL bPermanent)
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 		FullFilenameList.push_back(szFullFilename);
 	}
 
-	m_FileActionHandler.DeleteFiles(m_hContainer,FullFilenameList,bPermanent);
+	m_FileActionHandler.DeleteFiles(m_hContainer,FullFilenameList,bPermanent,FALSE);
 }
 
 void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
@@ -1458,7 +1427,7 @@ void Explorerplusplus::OnListViewFileRename(void)
 
 			if(iIndex != -1)
 			{
-				m_pActiveShellBrowser->QueryFullItemName(iIndex,szFullFilename);
+				m_pActiveShellBrowser->QueryFullItemName(iIndex,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 				FullFilenameList.push_back(szFullFilename);
 			}
 		}
@@ -1522,7 +1491,7 @@ void Explorerplusplus::OnListViewCopyItemPath(void)
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 		strItemPaths += szFullFilename + std::wstring(_T("\r\n"));
 	}
@@ -1545,7 +1514,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths(void)
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename);
+		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 		TCHAR szBuffer[1024];
 
@@ -1635,7 +1604,7 @@ void Explorerplusplus::OnListViewSetFileAttributes(void)
 		{
 			NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
 
-			m_pActiveShellBrowser->QueryFullItemName(iSel,sfai.szFullFileName);
+			m_pActiveShellBrowser->QueryFullItemName(iSel,sfai.szFullFileName,SIZEOF_ARRAY(sfai.szFullFileName));
 
 			WIN32_FIND_DATA *pwfd = m_pActiveShellBrowser->QueryFileFindData(iSel);
 			sfai.wfd = *pwfd;
@@ -1698,7 +1667,7 @@ void Explorerplusplus::BuildListViewFileSelectionList(HWND hListView,
 		TCHAR szFullFileName[MAX_PATH];
 
 		m_pActiveShellBrowser->QueryFullItemName(iItem,
-			szFullFileName);
+			szFullFileName,SIZEOF_ARRAY(szFullFileName));
 
 		std::wstring stringFileName(szFullFileName);
 		FileSelectionList.push_back(stringFileName);
@@ -1725,7 +1694,7 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView)
 	if(iSelected == -1)
 		return -1;
 
-	hr = m_pActiveShellBrowser->QueryFullItemName(iSelected,TestFile);
+	hr = m_pActiveShellBrowser->QueryFullItemName(iSelected,TestFile,SIZEOF_ARRAY(TestFile));
 
 	if(SUCCEEDED(hr))
 	{
@@ -1733,7 +1702,7 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView)
 
 		for(i = 0;i < nItems;i++)
 		{
-			m_pActiveShellBrowser->QueryFullItemName(i,FullFileName);
+			m_pActiveShellBrowser->QueryFullItemName(i,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 			bSimilarTypes = CompareFileTypes(FullFileName,TestFile);
 

@@ -5,8 +5,16 @@
 
 #pragma once
 
+/* Disable the '#pragma deprecated' warning. */
+#pragma warning( disable : 4995 )
+
 #include "targetver.h"
 
 #include <Windows.h>
-#include <stdio.h>
 #include <tchar.h>
+#include <Shlwapi.h>
+#include <strsafe.h>
+#include <ShObjIdl.h>
+#include <ShlObj.h>
+#include <ShlGuid.h>
+#include <GdiPlus.h>
