@@ -47,7 +47,7 @@ void CShellBrowser::SetupThumbnailsView(void)
 	/* Need to get the normal (32x32) image list for thumbnails, so that
 	the regular size icon is shown for items with a thumbnail that hasn't
 	been found yet (and not the large or extra large icon). */
-	SHGetImageList(SHIL_LARGE,IID_IImageList,(void **)&pImageList);
+	SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
 	ListView_SetImageList(m_hListView,(HIMAGELIST)pImageList,LVSIL_NORMAL);
 	pImageList->Release();
 
@@ -223,12 +223,12 @@ void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
 
 		pridl = ILClone(ILFindLastID(pListViewInfo.pidlFull));
 
-		hr = BindToIdl(pidlParent, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
+		hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
-			hr = pShellFolder->GetUIObjectOf(NULL,1,(LPCITEMIDLIST *)&pridl,
-				IID_IExtractImage,NULL,(void **)&pExtractImage);
+			hr = GetUIObjectOf(pShellFolder, NULL, 1, (LPCITEMIDLIST *) &pridl,
+				IID_PPV_ARGS(&pExtractImage));
 
 			if(SUCCEEDED(hr))
 			{

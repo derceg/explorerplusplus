@@ -192,12 +192,12 @@ void CDisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 
 		pridl = ILClone(ILFindLastID(pidlFull));
 
-		hr = BindToIdl(pidlParent, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
+		hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
-			hr = pShellFolder->GetUIObjectOf(NULL,1,(LPCITEMIDLIST *)&pridl,
-				IID_IExtractImage,NULL,(void **)&pExtractImage);
+			hr = GetUIObjectOf(pShellFolder, NULL, 1, (LPCITEMIDLIST *) &pridl,
+				IID_PPV_ARGS(&pExtractImage));
 
 			if(SUCCEEDED(hr))
 			{

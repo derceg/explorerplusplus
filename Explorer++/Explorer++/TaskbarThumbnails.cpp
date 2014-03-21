@@ -110,7 +110,7 @@ LRESULT CALLBACK Explorerplusplus::MainWndTaskbarThumbnailProc(HWND hwnd,UINT uM
 		}
 
 		CoCreateInstance(CLSID_TaskbarList,NULL,CLSCTX_INPROC_SERVER,
-			IID_ITaskbarList4,reinterpret_cast<LPVOID *>(&m_pTaskbarList));
+			IID_PPV_ARGS(&m_pTaskbarList));
 		m_pTaskbarList->HrInit();
 
 		m_bTaskbarInitialised = TRUE;

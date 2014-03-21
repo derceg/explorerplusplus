@@ -637,7 +637,7 @@ HRESULT GetMediaMetadata(const TCHAR *szFileName,const TCHAR *szAttribute,BYTE *
 
 				if(SUCCEEDED(hr))
 				{
-					hr = pEditor->QueryInterface(IID_IWMHeaderInfo,(void **)&pWMHeaderInfo);
+					hr = pEditor->QueryInterface(IID_PPV_ARGS(&pWMHeaderInfo));
 
 					if(SUCCEEDED(hr))
 					{

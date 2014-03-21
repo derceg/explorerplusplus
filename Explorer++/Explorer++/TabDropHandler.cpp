@@ -26,9 +26,9 @@ m_RefCount(1)
 	SetWindowSubclass(m_hTabCtrl,TabCtrlProcStub,SUBCLASS_ID,reinterpret_cast<DWORD_PTR>(this));
 
 	CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
-		IID_IDragSourceHelper,reinterpret_cast<LPVOID *>(&m_pDragSourceHelper));
+		IID_PPV_ARGS(&m_pDragSourceHelper));
 
-	m_pDragSourceHelper->QueryInterface(IID_IDropTargetHelper,reinterpret_cast<void **>(&m_pDropTargetHelper));
+	m_pDragSourceHelper->QueryInterface(IID_PPV_ARGS(&m_pDropTargetHelper));
 }
 
 CTabDropHandler::~CTabDropHandler()

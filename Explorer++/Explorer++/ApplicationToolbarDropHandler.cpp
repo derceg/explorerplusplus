@@ -22,11 +22,11 @@ m_hToolbar(hToolbar),
 m_toolbar(toolbar)
 {
 	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, NULL, CLSCTX_INPROC_SERVER,
-		IID_IDragSourceHelper, (LPVOID *) &m_pDragSourceHelper);
+		IID_PPV_ARGS(&m_pDragSourceHelper));
 
 	if(SUCCEEDED(hr))
 	{
-		hr = m_pDragSourceHelper->QueryInterface(IID_IDropTargetHelper, (LPVOID *) &m_pDropTargetHelper);
+		hr = m_pDragSourceHelper->QueryInterface(IID_PPV_ARGS(&m_pDropTargetHelper));
 	}
 }
 

@@ -201,14 +201,13 @@ LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask)
 
 	if(nFiles == 0)
 	{
-		hr = SHBindToParent(pidlDirectory,IID_IShellFolder,(void **)&pShellParentFolder,
+		hr = SHBindToParent(pidlDirectory, IID_PPV_ARGS(&pShellParentFolder),
 		(LPCITEMIDLIST *)&pidlRelative);
 
 		if(SUCCEEDED(hr))
 		{
-			hr = pShellParentFolder->GetUIObjectOf(m_hContainer,1,
-				(LPCITEMIDLIST *)&pidlRelative,IID_IContextMenu,0,
-				(LPVOID *)&pContext);
+			hr = GetUIObjectOf(pShellParentFolder, m_hContainer, 1,
+				(LPCITEMIDLIST *) &pidlRelative, IID_PPV_ARGS(&pContext));
 
 			pShellParentFolder->Release();
 			pShellParentFolder = NULL;
@@ -216,12 +215,12 @@ LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask)
 	}
 	else
 	{
-		hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
+		hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
-			hr = pShellFolder->GetUIObjectOf(m_hContainer, nFiles,
-				ppidl, IID_IContextMenu, 0, reinterpret_cast<void **>(&pContext));
+			hr = GetUIObjectOf(pShellFolder, m_hContainer, nFiles,
+				ppidl, IID_PPV_ARGS(&pContext));
 			pShellFolder->Release();
 		}
 	}

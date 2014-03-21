@@ -68,7 +68,7 @@ HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)
 	HWND hListView = CreateListView(hParent,Style);
 
 	IImageList *pImageList = NULL;
-	SHGetImageList(SHIL_SMALL,IID_IImageList,reinterpret_cast<void **>(&pImageList));
+	SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
 	ListView_SetImageList(hListView,reinterpret_cast<HIMAGELIST>(pImageList),LVSIL_SMALL);
 	pImageList->Release();
 
@@ -407,7 +407,7 @@ void Explorerplusplus::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
 			HRESULT hr;
 
 			pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-			hr = BindToIdl(pidl, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
+			hr = BindToIdl(pidl, IID_PPV_ARGS(&pShellFolder));
 
 			if(SUCCEEDED(hr))
 			{
@@ -986,13 +986,12 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	LPCITEMIDLIST pidlChildFolder = ILFindLastID(pidlDirectory);
 
 	IShellFolder *pShellFolder = NULL;
-	HRESULT hr = BindToIdl(pidlParent, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
+	HRESULT hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{
 		IDataObject *pDataObject = NULL;
-		hr = pShellFolder->GetUIObjectOf(NULL,1,&pidlChildFolder,IID_IDataObject,
-			NULL,reinterpret_cast<void **>(&pDataObject));
+		hr = GetUIObjectOf(pShellFolder, NULL, 1, &pidlChildFolder, IID_PPV_ARGS(&pDataObject));
 
 		if(SUCCEEDED(hr))
 		{
@@ -1242,7 +1241,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 	}
 
 	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_ALL,
-		IID_IDragSourceHelper,reinterpret_cast<LPVOID *>(&pDragSourceHelper));
+		IID_PPV_ARGS(&pDragSourceHelper));
 
 	if(SUCCEEDED(hr))
 	{
@@ -1263,7 +1262,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 			IAsyncOperation *pAsyncOperation = NULL;
 			
 			hr = CreateDataObject(ftc,stg,&pDataObject,2);
-			pDataObject->QueryInterface(IID_IAsyncOperation,(void **)&pAsyncOperation);
+			pDataObject->QueryInterface(IID_PPV_ARGS(&pAsyncOperation));
 
 			assert(pAsyncOperation != NULL);
 

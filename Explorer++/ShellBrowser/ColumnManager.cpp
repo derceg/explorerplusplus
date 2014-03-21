@@ -767,7 +767,7 @@ std::wstring CShellBrowser::GetExtensionColumnText(int InternalIndex) const
 HRESULT CShellBrowser::GetItemDetails(int InternalIndex, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const
 {
 	IShellFolder2 *pShellFolder = NULL;
-	HRESULT hr = BindToIdl(m_pidlDirectory, IID_IShellFolder2, reinterpret_cast<void **>(&pShellFolder));
+	HRESULT hr = BindToIdl(m_pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{

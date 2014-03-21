@@ -14,7 +14,7 @@ void TestGetShellItemDetailsEx(TCHAR *szFileName, const SHCOLUMNID *pscid, const
 	ASSERT_TRUE(SUCCEEDED(hr));
 
 	IShellFolder2 *pShellFolder = NULL;
-	hr = BindToIdl(pidlResourceDirectory, IID_IShellFolder2, reinterpret_cast<void **>(&pShellFolder));
+	hr = BindToIdl(pidlResourceDirectory, IID_PPV_ARGS(&pShellFolder));
 	ASSERT_TRUE(SUCCEEDED(hr));
 
 	LPITEMIDLIST pidlItem = NULL;

@@ -400,7 +400,7 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 			if(SUCCEEDED(hr))
 			{
 				IAsyncOperation *pAsyncOperation = NULL;
-				hr = (*pClipboardDataObject)->QueryInterface(IID_IAsyncOperation, reinterpret_cast<void **>(&pAsyncOperation));
+				hr = (*pClipboardDataObject)->QueryInterface(IID_PPV_ARGS(&pAsyncOperation));
 
 				if(SUCCEEDED(hr))
 				{
@@ -501,7 +501,7 @@ HRESULT NFileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 {
 	IShellLink *pShellLink = NULL;
 	HRESULT hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
-		IID_IShellLink,reinterpret_cast<LPVOID *>(&pShellLink));
+		IID_PPV_ARGS(&pShellLink));
 
 	if(SUCCEEDED(hr))
 	{
@@ -509,7 +509,7 @@ HRESULT NFileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 		pShellLink->SetDescription(strLinkDescription.c_str());
 
 		IPersistFile *pPersistFile = NULL;
-		hr = pShellLink->QueryInterface(IID_IPersistFile,reinterpret_cast<LPVOID *>(&pPersistFile));
+		hr = pShellLink->QueryInterface(IID_PPV_ARGS(&pPersistFile));
 
 		if(SUCCEEDED(hr))
 		{
@@ -536,12 +536,12 @@ HRESULT NFileOperations::ResolveLink(HWND hwnd,DWORD fFlags,TCHAR *szLinkFilenam
 
 	IShellLink *pShellLink = NULL;
 	HRESULT hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
-		IID_IShellLink,reinterpret_cast<LPVOID *>(&pShellLink));
+		IID_PPV_ARGS(&pShellLink));
 
 	if(hr == S_OK)
 	{
 		IPersistFile *pPersistFile = NULL;
-		hr = pShellLink->QueryInterface(IID_IPersistFile,reinterpret_cast<LPVOID *>(&pPersistFile));
+		hr = pShellLink->QueryInterface(IID_PPV_ARGS(&pPersistFile));
 
 		if(hr == S_OK)
 		{

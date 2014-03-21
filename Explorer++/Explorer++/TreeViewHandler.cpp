@@ -193,7 +193,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	TreeView_SelectItem(m_hTreeView,hItem);
 	pidl = m_pMyTreeView->BuildPath(hItem);
 
-	hr = SHBindToParent(pidl,IID_IShellFolder,(void **)&pShellParentFolder,
+	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellParentFolder),
 	(LPCITEMIDLIST *)&pidlRelative);
 
 	if(SUCCEEDED(hr))

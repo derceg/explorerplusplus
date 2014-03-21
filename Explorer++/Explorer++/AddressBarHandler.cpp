@@ -113,7 +113,7 @@ void Explorerplusplus::OnAddressBarBeginDrag(void)
 	HRESULT hr;
 
 	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_ALL,
-		IID_IDragSourceHelper,(LPVOID *)&pDragSourceHelper);
+		IID_PPV_ARGS(&pDragSourceHelper));
 
 	if(SUCCEEDED(hr))
 	{
@@ -166,7 +166,7 @@ void Explorerplusplus::OnAddressBarBeginDrag(void)
 			HRESULT hr;
 
 			hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
-				IID_IShellLink,(LPVOID*)&pShellLink);
+				IID_PPV_ARGS(&pShellLink));
 
 			if(SUCCEEDED(hr))
 			{
@@ -176,7 +176,7 @@ void Explorerplusplus::OnAddressBarBeginDrag(void)
 
 				pShellLink->SetPath(szPath);
 
-				hr = pShellLink->QueryInterface(IID_IPersistStream,(LPVOID*)&pPersistStream);
+				hr = pShellLink->QueryInterface(IID_PPV_ARGS(&pPersistStream));
 
 				if(SUCCEEDED(hr))
 				{

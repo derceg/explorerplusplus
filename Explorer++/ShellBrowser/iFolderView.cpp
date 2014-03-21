@@ -267,7 +267,7 @@ void CShellBrowser::SetCurrentViewModeInternal(DWORD ViewMode)
 		{
 			IImageList *pImageList = NULL;
 
-			SHGetImageList(SHIL_JUMBO,IID_IImageList,(void **)&pImageList);
+			SHGetImageList(SHIL_JUMBO, IID_PPV_ARGS(&pImageList));
 			ListView_SetImageList(m_hListView,(HIMAGELIST)pImageList,LVSIL_NORMAL);
 			pImageList->Release();
 		}
@@ -277,7 +277,7 @@ void CShellBrowser::SetCurrentViewModeInternal(DWORD ViewMode)
 		{
 			IImageList *pImageList = NULL;
 
-			SHGetImageList(SHIL_EXTRALARGE,IID_IImageList,(void **)&pImageList);
+			SHGetImageList(SHIL_EXTRALARGE, IID_PPV_ARGS(&pImageList));
 			ListView_SetImageList(m_hListView,(HIMAGELIST)pImageList,LVSIL_NORMAL);
 			pImageList->Release();
 		}
@@ -295,7 +295,7 @@ void CShellBrowser::SetCurrentViewModeInternal(DWORD ViewMode)
 		{
 			IImageList *pImageList = NULL;
 
-			SHGetImageList(SHIL_LARGE,IID_IImageList,(void **)&pImageList);
+			SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
 			ListView_SetImageList(m_hListView,(HIMAGELIST)pImageList,LVSIL_NORMAL);
 			pImageList->Release();
 		}
@@ -408,11 +408,11 @@ HRESULT CShellBrowser::InitializeDragDropHelpers(void)
 
 	/* Initialize the drag source helper, and use it to initialize the drop target helper. */
 	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
-	IID_IDragSourceHelper,(LPVOID *)&m_pDragSourceHelper);
+		IID_PPV_ARGS(&m_pDragSourceHelper));
 
 	if(SUCCEEDED(hr))
 	{
-		hr = m_pDragSourceHelper->QueryInterface(IID_IDropTargetHelper,(LPVOID *)&m_pDropTargetHelper);
+		hr = m_pDragSourceHelper->QueryInterface(IID_PPV_ARGS(&m_pDropTargetHelper));
 
 		RegisterDragDrop(m_hListView,this);
 

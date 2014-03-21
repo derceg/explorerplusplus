@@ -83,8 +83,7 @@ CContextMenuManager::CContextMenuManager(ContextMenuType_t ContextMenuType,
 
 		IUnknown *pUnknown = ContextMenuHandler.pUnknown;
 
-		hr = pUnknown->QueryInterface(IID_IShellExtInit,
-			reinterpret_cast<void **>(&pShellExtInit));
+		hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pShellExtInit));
 
 		if(SUCCEEDED(hr))
 		{
@@ -100,7 +99,7 @@ CContextMenuManager::CContextMenuManager(ContextMenuType_t ContextMenuType,
 			{
 				IObjectWithSite *pObjectSite = NULL;
 
-				hr = pUnknown->QueryInterface(IID_IObjectWithSite,reinterpret_cast<void **>(&pObjectSite));
+				hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pObjectSite));
 
 				if(SUCCEEDED(hr))
 				{
@@ -109,20 +108,17 @@ CContextMenuManager::CContextMenuManager(ContextMenuType_t ContextMenuType,
 				}
 			}
 
-			hr = pUnknown->QueryInterface(IID_IContextMenu3,
-				reinterpret_cast<void **>(&pContextMenu3));
+			hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu3));
 			MenuHandler.pContextMenuActual = pContextMenu3;
 
 			if(FAILED(hr) || pContextMenu3 == NULL)
 			{
-				hr = pUnknown->QueryInterface(IID_IContextMenu2,
-					reinterpret_cast<void **>(&pContextMenu2));
+				hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu2));
 				MenuHandler.pContextMenuActual = pContextMenu2;
 
 				if(FAILED(hr) || pContextMenu2 == NULL)
 				{
-					hr = pUnknown->QueryInterface(IID_IContextMenu,
-						reinterpret_cast<void **>(&pContextMenu));
+					hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu));
 					MenuHandler.pContextMenuActual = pContextMenu;
 				}
 			}

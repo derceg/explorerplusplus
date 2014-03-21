@@ -45,15 +45,13 @@ m_pShellContext(NULL)
 		IShellFolder *pShellParentFolder = NULL;
 		LPCITEMIDLIST pidlRelative = NULL;
 
-		hr = SHBindToParent(pidlParent,IID_IShellFolder,
-			reinterpret_cast<void **>(&pShellParentFolder),
+		hr = SHBindToParent(pidlParent, IID_PPV_ARGS(&pShellParentFolder),
 			&pidlRelative);
 
 		if(SUCCEEDED(hr))
 		{
-			hr = pShellParentFolder->GetUIObjectOf(hwnd,1,
-				&pidlRelative,IID_IContextMenu,0,
-				reinterpret_cast<void **>(&pContextMenu));
+			hr = GetUIObjectOf(pShellParentFolder, hwnd, 1,
+				&pidlRelative, IID_PPV_ARGS(&pContextMenu));
 
 			pShellParentFolder->Release();
 		}
@@ -61,15 +59,14 @@ m_pShellContext(NULL)
 	else
 	{
 		IShellFolder *pShellFolder = NULL;
-		hr = BindToIdl(pidlParent, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
+		hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
 			std::vector<LPITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
 
-			hr = pShellFolder->GetUIObjectOf(hwnd,static_cast<UINT>(pidlItemList.size()),
-				const_cast<LPCITEMIDLIST *>(&pidlItemVector[0]),IID_IContextMenu,
-				0,reinterpret_cast<void **>(&pContextMenu));
+			hr = GetUIObjectOf(pShellFolder, hwnd, static_cast<UINT>(pidlItemList.size()),
+				const_cast<LPCITEMIDLIST *>(&pidlItemVector[0]), IID_PPV_ARGS(&pContextMenu));
 
 			pShellFolder->Release();
 		}
@@ -79,20 +76,17 @@ m_pShellContext(NULL)
 	{
 		/* First, try to get IContextMenu3, then IContextMenu2, and if neither of these
 		are available, IContextMenu. */
-		hr = pContextMenu->QueryInterface(IID_IContextMenu3,
-			reinterpret_cast<void **>(&m_pShellContext3));
+		hr = pContextMenu->QueryInterface(IID_PPV_ARGS(&m_pShellContext3));
 		m_pActualContext = m_pShellContext3;
 
 		if(FAILED(hr))
 		{
-			hr = pContextMenu->QueryInterface(IID_IContextMenu2,
-				reinterpret_cast<void **>(&m_pShellContext2));
+			hr = pContextMenu->QueryInterface(IID_PPV_ARGS(&m_pShellContext2));
 			m_pActualContext = m_pShellContext2;
 
 			if(FAILED(hr))
 			{
-				hr = pContextMenu->QueryInterface(IID_IContextMenu,
-					reinterpret_cast<void **>(&m_pShellContext));
+				hr = pContextMenu->QueryInterface(IID_PPV_ARGS(&m_pShellContext));
 				m_pActualContext = m_pShellContext;
 			}
 		}

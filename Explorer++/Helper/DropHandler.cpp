@@ -308,7 +308,7 @@ HRESULT CDropHandler::CopyShellIDListData(IDataObject *pDataObject,
 
 			LPCITEMIDLIST pidlDirectory = HIDA_GetPIDLFolder(pcida);
 
-			hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
+			hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
 			if(SUCCEEDED(hr))
 			{
@@ -319,7 +319,7 @@ HRESULT CDropHandler::CopyShellIDListData(IDataObject *pDataObject,
 				{
 					pidlItem = HIDA_GetPIDLItem(pcida,i);
 
-					hr = pShellFolder->BindToStorage(pidlItem,NULL,IID_IStorage,(LPVOID *)&pStorage);
+					hr = pShellFolder->BindToStorage(pidlItem, NULL, IID_PPV_ARGS(&pStorage));
 
 					if(SUCCEEDED(hr))
 					{
@@ -582,7 +582,7 @@ HRESULT CDropHandler::CopyFileDescriptorData(IDataObject *pDataObject,
 
 					IStorage *pStorage = NULL;
 					hr = StgCreateStorageEx(szFullFileName,STGM_READWRITE|STGM_TRANSACTED|STGM_CREATE,STGFMT_STORAGE,
-						0,NULL,NULL,IID_IStorage,reinterpret_cast<void **>(&pStorage));
+						0,NULL,NULL,IID_PPV_ARGS(&pStorage));
 
 					if(hr == S_OK)
 					{
@@ -867,13 +867,13 @@ void CDropHandler::HandleRightClickDrop(void)
 
 	if(SUCCEEDED(hr))
 	{
-		hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
+		hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
 			dwe = m_dwEffect;
 
-			hr = pShellFolder->CreateViewObject(m_hwndDrop,IID_IDropTarget,(void **)&pDrop);
+			hr = pShellFolder->CreateViewObject(m_hwndDrop, IID_PPV_ARGS(&pDrop));
 
 			if(SUCCEEDED(hr))
 			{
@@ -995,7 +995,7 @@ void CDropHandler::CopyDroppedFilesInternal(const std::list<std::wstring> &FullF
 	BOOL bAsyncSupported = FALSE;
 
 	/* Does the drop source support asynchronous copy? */
-	HRESULT hr = m_pDataObject->QueryInterface(IID_IAsyncOperation,reinterpret_cast<void **>(&pao));
+	HRESULT hr = m_pDataObject->QueryInterface(IID_PPV_ARGS(&pao));
 
 	if(hr == S_OK)
 	{

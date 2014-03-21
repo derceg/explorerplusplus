@@ -29,13 +29,13 @@ protected:
 TEST_F(iDataObjectTest, QueryInterface)
 {
 	IUnknown *pUnknownOut = NULL;
-	HRESULT hr = m_pDataObject->QueryInterface(IID_IUnknown, reinterpret_cast<void **>(&pUnknownOut));
+	HRESULT hr = m_pDataObject->QueryInterface(IID_PPV_ARGS(&pUnknownOut));
 	EXPECT_EQ(S_OK, hr);
 
 	pUnknownOut->Release();
 
 	IDataObject *pDataObjectOut = NULL;
-	hr = m_pDataObject->QueryInterface(IID_IDataObject, reinterpret_cast<void **>(&pDataObjectOut));
+	hr = m_pDataObject->QueryInterface(IID_PPV_ARGS(&pDataObjectOut));
 	EXPECT_EQ(S_OK, hr);
 
 	pDataObjectOut->Release();

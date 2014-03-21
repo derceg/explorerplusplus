@@ -199,8 +199,7 @@ void CShellBrowser::OnFileActionAdded(TCHAR *szFileName)
 	If the file is not added, store its filename. */
 	if(SUCCEEDED(hr))
 	{
-		hr = SHBindToParent(pidlFull,IID_IShellFolder,
-			(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
+		hr = SHBindToParent(pidlFull, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
 
 		if(SUCCEEDED(hr))
 		{
@@ -544,7 +543,7 @@ void CShellBrowser::RenameItem(int iItemInternal,TCHAR *szNewFileName)
 
 	if(SUCCEEDED(hr))
 	{
-		hr = SHBindToParent(pidlFull,IID_IShellFolder,(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
+		hr = SHBindToParent(pidlFull, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *) &pidlRelative);
 
 		if(SUCCEEDED(hr))
 		{

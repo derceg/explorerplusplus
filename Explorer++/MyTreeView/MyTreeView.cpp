@@ -333,7 +333,7 @@ HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent,LPITEMIDLIST pidlDirectory)
 	IShellFolder	*pShellFolder = NULL;
 	HRESULT			hr;
 
-	hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
+	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{
@@ -950,7 +950,7 @@ DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
 
 			if(bValid)
 			{
-				hr = SHBindToParent(pidl,IID_IShellFolder,(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
+				hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *) &pidlRelative);
 
 				if(SUCCEEDED(hr))
 				{
@@ -1789,11 +1789,11 @@ HRESULT CMyTreeView::InitializeDragDropHelpers(void)
 
 	/* Initialize the drag source helper, and use it to initialize the drop target helper. */
 	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
-	IID_IDragSourceHelper,(LPVOID *)&m_pDragSourceHelper);
+		IID_PPV_ARGS(&m_pDragSourceHelper));
 
 	if(SUCCEEDED(hr))
 	{
-		hr = m_pDragSourceHelper->QueryInterface(IID_IDropTargetHelper,(LPVOID *)&m_pDropTargetHelper);
+		hr = m_pDragSourceHelper->QueryInterface(IID_PPV_ARGS(&m_pDropTargetHelper));
 
 		RegisterDragDrop(m_hTreeView,this);
 	}
@@ -1936,22 +1936,21 @@ HRESULT CMyTreeView::OnBeginDrag(int iItemId,DragTypes_t DragType)
 	HRESULT				hr;	
 
 	hr = CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_ALL,
-		IID_IDragSourceHelper,(LPVOID *)&pDragSourceHelper);
+		IID_PPV_ARGS(&pDragSourceHelper));
 
 	if(SUCCEEDED(hr))
 	{
 		pItemInfo = &m_pItemInfo[iItemId];
 
-		hr = SHBindToParent(pItemInfo->pidl,IID_IShellFolder,
-			(LPVOID *)&pShellFolder,(LPCITEMIDLIST *)&ridl);
+		hr = SHBindToParent(pItemInfo->pidl, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&ridl);
 
 		if(SUCCEEDED(hr))
 		{
 			/* Needs to be done from the parent folder for the drag/dop to work correctly.
 			If done from the desktop folder, only links to files are created. They are
 			not copied/moved. */
-			pShellFolder->GetUIObjectOf(m_hTreeView,1,(LPCITEMIDLIST *)&ridl,
-				IID_IDataObject,NULL,(LPVOID *)&pDataObject);
+			GetUIObjectOf(pShellFolder, m_hTreeView, 1, (LPCITEMIDLIST *) &ridl,
+				IID_PPV_ARGS(&pDataObject));
 
 			pDragSourceHelper->InitializeFromWindow(m_hTreeView,&pt,pDataObject);
 

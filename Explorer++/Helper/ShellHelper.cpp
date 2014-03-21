@@ -90,7 +90,7 @@ HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,UINT cch
 	STRRET str;
 	HRESULT hr;
 
-	hr = SHBindToParent(pidlDirectory,IID_IShellFolder,(void **)&pShellFolder,
+	hr = SHBindToParent(pidlDirectory, IID_PPV_ARGS(&pShellFolder),
 	(LPCITEMIDLIST *)&pidlRelative);
 
 	if(SUCCEEDED(hr))
@@ -157,7 +157,7 @@ HRESULT GetItemAttributes(LPCITEMIDLIST pidl,SFGAOF *pItemAttributes)
 	LPITEMIDLIST	pidlRelative = NULL;
 	HRESULT			hr;
 
-	hr = SHBindToParent(pidl,IID_IShellFolder,(void **)&pShellFolder,
+	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder),
 	(LPCITEMIDLIST *)&pidlRelative);
 
 	if(SUCCEEDED(hr))
@@ -692,6 +692,12 @@ HRESULT BindToIdl(LPCITEMIDLIST pidl, REFIID riid, void **ppv)
 	return hr;
 }
 
+HRESULT GetUIObjectOf(IShellFolder *pShellFolder, HWND hwndOwner,
+	UINT cidl, PCUITEMID_CHILD_ARRAY apidl, REFIID riid, void **ppv)
+{
+	return pShellFolder->GetUIObjectOf(hwndOwner, cidl, apidl, riid, nullptr, ppv);
+}
+
 HRESULT GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid,
 	PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax)
 {
@@ -860,14 +866,14 @@ HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList)
 	HRESULT hr;
 
 	hr = CoCreateInstance(CLSID_DestinationList,NULL,CLSCTX_INPROC_SERVER,
-		IID_ICustomDestinationList,(LPVOID *)&pCustomDestinationList);
+		IID_PPV_ARGS(&pCustomDestinationList));
 
 	if(SUCCEEDED(hr))
 	{
 		IObjectArray *poa = NULL;
 		UINT uMinSlots;
 
-		hr = pCustomDestinationList->BeginList(&uMinSlots,IID_IObjectArray,(void **)&poa);
+		hr = pCustomDestinationList->BeginList(&uMinSlots, IID_PPV_ARGS(&poa));
 
 		if(SUCCEEDED(hr))
 		{
@@ -876,13 +882,13 @@ HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList)
 			IObjectCollection *poc = NULL;
 
 			hr = CoCreateInstance(CLSID_EnumerableObjectCollection,NULL,CLSCTX_INPROC_SERVER,
-				IID_IObjectCollection,(LPVOID *)&poc);
+				IID_PPV_ARGS(&poc));
 
 			if(SUCCEEDED(hr))
 			{
 				AddJumpListTasksInternal(poc,TaskList);
 
-				hr = poc->QueryInterface(IID_IObjectArray,(void **)&poa);
+				hr = poc->QueryInterface(IID_PPV_ARGS(&poa));
 
 				if(SUCCEEDED(hr))
 				{
@@ -931,7 +937,7 @@ HRESULT AddJumpListTaskInternal(IObjectCollection *poc,const TCHAR *pszName,
 	HRESULT hr;
 
 	hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
-		IID_IShellLink,(LPVOID *)&pShellLink);
+		IID_PPV_ARGS(&pShellLink));
 
 	if(SUCCEEDED(hr))
 	{
@@ -942,7 +948,7 @@ HRESULT AddJumpListTaskInternal(IObjectCollection *poc,const TCHAR *pszName,
 		IPropertyStore *pps = NULL;
 		PROPVARIANT pv;
 
-		hr = pShellLink->QueryInterface(IID_IPropertyStore,(void **)&pps);
+		hr = pShellLink->QueryInterface(IID_PPV_ARGS(&pps));
 
 		if(SUCCEEDED(hr))
 		{
@@ -1097,7 +1103,7 @@ BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID,
 		IUnknown *pUnknown = NULL;
 
 		hr = CoCreateInstance(clsid,NULL,CLSCTX_INPROC_SERVER,
-			IID_IUnknown,(LPVOID *)&pUnknown);
+			IID_PPV_ARGS(&pUnknown));
 
 		if(hr == S_OK)
 		{
@@ -1144,13 +1150,12 @@ HRESULT GetItemInfoTip(LPCITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchM
 	LPWSTR			ppwszTip = NULL;
 	HRESULT			hr;
 
-	hr = SHBindToParent(pidlComplete, IID_IShellFolder,
-		reinterpret_cast<void **>(&pShellFolder), &pidlRelative);
+	hr = SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = pShellFolder->GetUIObjectOf(NULL, 1, &pidlRelative,
-			IID_IQueryInfo, 0, reinterpret_cast<void **>(&pQueryInfo));
+		hr = GetUIObjectOf(pShellFolder, NULL, 1, &pidlRelative,
+			IID_PPV_ARGS(&pQueryInfo));
 
 		if(SUCCEEDED(hr))
 		{

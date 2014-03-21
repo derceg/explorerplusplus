@@ -417,8 +417,7 @@ void CMyTreeView::AddItemInternal(HTREEITEM hParent,TCHAR *szFullFileName)
 			SHGetFileInfo(szFullFileName,NULL,&shfi,
 				sizeof(shfi),SHGFI_SYSICONINDEX);
 
-			hr = SHBindToParent(pidlComplete,IID_IShellFolder,
-				(void **)&pShellFolder,(LPCITEMIDLIST *)&pidlRelative);
+			hr = SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
 
 			if(SUCCEEDED(hr))
 			{

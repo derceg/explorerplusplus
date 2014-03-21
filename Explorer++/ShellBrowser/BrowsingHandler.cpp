@@ -502,7 +502,7 @@ void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 
 	DetermineFolderVirtual(pidlDirectory);
 
-	hr = BindToIdl(pidlDirectory, IID_IShellFolder, reinterpret_cast<void **>(&pShellFolder));
+	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{

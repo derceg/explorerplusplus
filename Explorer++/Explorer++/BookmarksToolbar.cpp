@@ -354,10 +354,10 @@ m_guidBookmarksToolbar(guidBookmarksToolbar),
 m_ulRefCount(1)
 {
 	CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
-		IID_IDragSourceHelper,reinterpret_cast<LPVOID *>(&m_pDragSourceHelper));
+		IID_PPV_ARGS(&m_pDragSourceHelper));
 
 	/* Note that the above call is assumed to always succeed. */
-	m_pDragSourceHelper->QueryInterface(IID_IDropTargetHelper,reinterpret_cast<void **>(&m_pDropTargetHelper));
+	m_pDragSourceHelper->QueryInterface(IID_PPV_ARGS(&m_pDropTargetHelper));
 }
 
 CBookmarksToolbarDropHandler::~CBookmarksToolbarDropHandler()
