@@ -42,9 +42,6 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES	1
 #define STRICT
 
-/* Disable the '#pragma deprecated' warning. */
-#pragma warning( disable : 4995 )
-
 // Windows Header Files:
 #include <winsock2.h>
 #include <windows.h>
@@ -79,7 +76,14 @@
 #include <Iphlpapi.h>
 #include <psapi.h>
 #include <userenv.h>
+
+/* Temporarily disable the
+"#pragma deprecated" warning. */
+#pragma warning(push)
+#pragma warning(disable:4995)
 #include <intrin.h>
+#pragma warning(pop)
+
 #include <wmsdk.h>
 #include <propvarutil.h>
 
@@ -98,4 +102,7 @@ required for VS 2010. */
 #include <sstream>
 
 /* Pantheios header files. */
+#pragma warning(push)
+#pragma warning(disable:4995)
 #include <pantheios\pantheios.hpp>
+#pragma warning(pop)
