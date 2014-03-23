@@ -330,7 +330,7 @@ void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput,
 	StringCchCopy(szOutput, cchMax, szNewString);
 }
 
-TCHAR *GetToken(TCHAR *ptr, TCHAR *Buffer, TCHAR *BufferLength)
+TCHAR *GetToken(TCHAR *ptr, TCHAR *Buffer)
 {
 	TCHAR *p;
 	int i = 0;

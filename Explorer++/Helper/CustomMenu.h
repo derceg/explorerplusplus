@@ -17,8 +17,8 @@ public:
 	~CCustomMenu(void);
 
 	void	OnInitMenu(WPARAM wParam);
-	BOOL	OnMeasureItem(WPARAM wParam,LPARAM lParam);
-	BOOL	OnDrawItem(WPARAM wParam,LPARAM lParam);
+	BOOL	OnMeasureItem(MEASUREITEMSTRUCT *pMeasureItem);
+	BOOL	OnDrawItem(DRAWITEMSTRUCT *pDrawItem);
 
 private:
 

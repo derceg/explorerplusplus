@@ -118,51 +118,79 @@ INT_PTR CMessageForwarder::OnInitDialog()
 
 INT_PTR CMessageForwarder::OnTimer(int iTimerID)
 {
+	UNREFERENCED_PARAMETER(iTimerID);
+
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
 INT_PTR CMessageForwarder::OnCtlColorStatic(HWND hwnd,HDC hdc)
 {
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(hdc);
+
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
 INT_PTR CMessageForwarder::OnCtlColorEdit(HWND hwnd,HDC hdc)
 {
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(hdc);
+
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
 INT_PTR CMessageForwarder::OnHScroll(HWND hwnd)
 {
+	UNREFERENCED_PARAMETER(hwnd);
+
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
 INT_PTR CMessageForwarder::OnMButtonUp(const POINTS *pts)
 {
+	UNREFERENCED_PARAMETER(pts);
+
 	return GetDefaultReturnValue(m_hwnd, m_uMsg, m_wParam, m_lParam);
 }
 
 INT_PTR CMessageForwarder::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
 {
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(uCmd);
+	UNREFERENCED_PARAMETER(uDevice);
+	UNREFERENCED_PARAMETER(dwKeys);
+
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
 INT_PTR CMessageForwarder::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
 INT_PTR CMessageForwarder::OnNotify(NMHDR *pnmhdr)
 {
+	UNREFERENCED_PARAMETER(pnmhdr);
+
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
 INT_PTR CMessageForwarder::OnGetMinMaxInfo(LPMINMAXINFO pmmi)
 {
+	UNREFERENCED_PARAMETER(pmmi);
+
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
 INT_PTR CMessageForwarder::OnSize(int iType,int iWidth,int iHeight)
 {
+	UNREFERENCED_PARAMETER(iType);
+	UNREFERENCED_PARAMETER(iWidth);
+	UNREFERENCED_PARAMETER(iHeight);
+
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }
 
@@ -183,10 +211,15 @@ INT_PTR CMessageForwarder::OnNcDestroy()
 
 void CMessageForwarder::OnEMSetSel(WPARAM &wParam,LPARAM &lParam)
 {
-
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
 }
 
 INT_PTR CMessageForwarder::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(uMsg);
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
 	return GetDefaultReturnValue(m_hwnd,m_uMsg,m_wParam,m_lParam);
 }

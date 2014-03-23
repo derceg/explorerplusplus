@@ -42,7 +42,7 @@ private:
 
 	BOOL	CheckDropFormatSupported(IDataObject *pDataObject,FORMATETC *pftc);
 
-	HRESULT	CopyHDropData(IDataObject *pDataObject,BOOL bPrefferedEffect,DWORD dwEffect,std::list<std::wstring> &PastedFileList);
+	HRESULT	CopyHDropData(IDataObject *pDataObject,BOOL bPrefferedEffect,DWORD dwEffect);
 	HRESULT	CopyShellIDListData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
 	HRESULT CopyAnsiFileDescriptorData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);
 	HRESULT CopyUnicodeFileDescriptorData(IDataObject *pDataObject,std::list<std::wstring> &PastedFileList);

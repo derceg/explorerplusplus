@@ -161,6 +161,8 @@ ULONG __stdcall CDirectoryMonitor::Release(void)
 
 DWORD WINAPI Thread_DirModifiedInternal(LPVOID lpParameter)
 {
+	UNREFERENCED_PARAMETER(lpParameter);
+
 	/* This is the main thread. Sleeps until woken up by a
 	change notification, and then goes back to sleep. */
 

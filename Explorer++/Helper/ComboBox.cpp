@@ -76,6 +76,8 @@ INT_PTR CComboBox::OnDestroy()
 LRESULT CALLBACK ComboBoxEditProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CComboBox *pcb = reinterpret_cast<CComboBox *>(dwRefData);
 
 	return pcb->ComboBoxEditProc(hwnd,uMsg,wParam,lParam);
@@ -100,6 +102,8 @@ LRESULT CALLBACK CComboBox::ComboBoxEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 LRESULT CALLBACK ComboBoxParentProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CComboBox *pcb = reinterpret_cast<CComboBox *>(dwRefData);
 
 	return pcb->ComboBoxParentProc(hwnd,uMsg,wParam,lParam);

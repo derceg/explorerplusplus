@@ -198,22 +198,24 @@ Derived class should override these to save any
 dialog specific values they need. */
 void CDialogSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-
+	UNREFERENCED_PARAMETER(hKey);
 }
 
 void CDialogSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
-
+	UNREFERENCED_PARAMETER(hKey);
 }
 
 void CDialogSettings::SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
 {
-
+	UNREFERENCED_PARAMETER(pXMLDom);
+	UNREFERENCED_PARAMETER(pParentNode);
 }
 
 void CDialogSettings::LoadExtraXMLSettings(BSTR bstrName,BSTR bstrValue)
 {
-
+	UNREFERENCED_PARAMETER(bstrName);
+	UNREFERENCED_PARAMETER(bstrValue);
 }
 
 void CDialogSettings::SaveDialogPosition(HWND hDlg)

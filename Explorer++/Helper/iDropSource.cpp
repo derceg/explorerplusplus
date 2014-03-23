@@ -124,5 +124,7 @@ HRESULT _stdcall CDropSource::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKey
 
 HRESULT _stdcall CDropSource::GiveFeedback(DWORD dwEffect)
 {
+	UNREFERENCED_PARAMETER(dwEffect);
+
 	return DRAGDROP_S_USEDEFAULTCURSORS;
 }

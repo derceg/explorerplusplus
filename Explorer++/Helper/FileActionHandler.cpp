@@ -135,6 +135,8 @@ void CFileActionHandler::UndoRenameOperation(const std::list<RenamedItem_t> &Ren
 
 void CFileActionHandler::UndoDeleteOperation(const std::list<std::wstring> &DeletedItemList)
 {
+	UNREFERENCED_PARAMETER(DeletedItemList);
+
 	/* Move the file back out of the recycle bin,
 	and push a delete action back onto the stack.
 	Steps:

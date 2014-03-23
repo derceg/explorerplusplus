@@ -124,6 +124,8 @@ ULONG __stdcall CEnumFormatEtc::Release(void)
 
 HRESULT __stdcall CEnumFormatEtc::Next(ULONG celt,FORMATETC *rgelt,ULONG *pceltFetched)
 {
+	UNREFERENCED_PARAMETER(celt);
+
 	if(m_iIndex >= m_iNumFormats)
 	{
 		if(pceltFetched != NULL)
@@ -178,5 +180,7 @@ HRESULT __stdcall CEnumFormatEtc::Reset(void)
 
 HRESULT __stdcall CEnumFormatEtc::Clone(IEnumFORMATETC **ppEnum)
 {
+	UNREFERENCED_PARAMETER(ppEnum);
+
 	return E_NOTIMPL;
 }

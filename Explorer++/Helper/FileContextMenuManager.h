@@ -32,7 +32,7 @@ public:
 	/* Shows the context menu. */
 	HRESULT				ShowMenu(IFileContextMenuExternal *pfcme,int iMinID,int iMaxID,const POINT *ppt,CStatusBar *pStatusBar,DWORD_PTR dwData,BOOL bRename = FALSE,BOOL bExtended = FALSE);
 
-	LRESULT CALLBACK	ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,DWORD_PTR dwRefData);
+	LRESULT CALLBACK	ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 private:
 

@@ -243,13 +243,15 @@ HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
 	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CFileContextMenuManager *pfcmm = reinterpret_cast<CFileContextMenuManager *>(dwRefData);
 
-	return pfcmm->ShellMenuHookProc(hwnd,Msg,wParam,lParam,dwRefData);
+	return pfcmm->ShellMenuHookProc(hwnd,Msg,wParam,lParam);
 }
 
 LRESULT CALLBACK CFileContextMenuManager::ShellMenuHookProc(HWND hwnd,UINT uMsg,WPARAM wParam,
-	LPARAM lParam,DWORD_PTR dwRefData)
+	LPARAM lParam)
 {
 	switch(uMsg)
 	{

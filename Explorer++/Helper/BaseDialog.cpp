@@ -165,6 +165,11 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 
 INT_PTR CBaseDialog::GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(hwnd);
+	UNREFERENCED_PARAMETER(uMsg);
+	UNREFERENCED_PARAMETER(wParam);
+	UNREFERENCED_PARAMETER(lParam);
+
 	return 0;
 }
 
@@ -229,7 +234,8 @@ HWND CBaseDialog::ShowModelessDialog(IModelessDialogNotification *pmdn)
 void CBaseDialog::GetResizableControlInformation(DialogSizeConstraint &dsc,
 	std::list<CResizableDialog::Control_t> &ControlList)
 {
-
+	UNREFERENCED_PARAMETER(dsc);
+	UNREFERENCED_PARAMETER(ControlList);
 }
 
 void CBaseDialog::SaveState()

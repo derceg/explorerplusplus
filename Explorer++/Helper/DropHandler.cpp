@@ -184,9 +184,13 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 
 	if(CheckDropFormatSupported(pDataObject,&m_ftcHDrop))
 	{
+		/* CopyHDropData may copy the data
+		in a background thread, so it
+		notifies the caller itself (rather
+		than returning a list of files
+		in PastedFileList). */
 		pantheios::log(pantheios::debug,_T("Helper - Copying CF_HDROP data"));
-		hrCopy = CopyHDropData(pDataObject,bPrefferedEffect,dwEffect,
-			PastedFileList);
+		hrCopy = CopyHDropData(pDataObject,bPrefferedEffect,dwEffect);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcShellIDList))
 	{
@@ -269,7 +273,7 @@ BOOL CDropHandler::CheckDropFormatSupported(IDataObject *pDataObject,FORMATETC *
 }
 
 HRESULT CDropHandler::CopyHDropData(IDataObject *pDataObject,
-	BOOL bPrefferedEffect,DWORD dwEffect,std::list<std::wstring> &PastedFileList)
+	BOOL bPrefferedEffect,DWORD dwEffect)
 {
 	STGMEDIUM stg;
 	HRESULT hr = pDataObject->GetData(&m_ftcHDrop,&stg);
@@ -293,6 +297,11 @@ HRESULT CDropHandler::CopyHDropData(IDataObject *pDataObject,
 HRESULT CDropHandler::CopyShellIDListData(IDataObject *pDataObject,
 	std::list<std::wstring> &PastedFileList)
 {
+	/* Once this function actually
+	copies the specified files, this
+	can be removed. */
+	UNREFERENCED_PARAMETER(PastedFileList);
+
 	STGMEDIUM stg;
 	HRESULT hr;
 
@@ -1045,6 +1054,9 @@ void CDropHandler::CopyDroppedFilesInternal(const std::list<std::wstring> &FullF
 LRESULT CALLBACK DropWindowSubclass(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+	UNREFERENCED_PARAMETER(dwRefData);
+
 	switch(uMsg)
 	{
 	case WM_APP_COPYOPERATIONFINISHED:
@@ -1329,6 +1341,10 @@ BOOL CDropHandler::CheckItemLocations(int iDroppedItem)
 /* TODO: */
 void CreateDropOptionsMenu(HWND hDrop,LPCITEMIDLIST pidlDirectory,IDataObject *pDataObject)
 {
+	UNREFERENCED_PARAMETER(hDrop);
+	UNREFERENCED_PARAMETER(pidlDirectory);
+	UNREFERENCED_PARAMETER(pDataObject);
+
 	/*list<ContextMenuHandler_t> ContextMenuHandlers;
 	MENUITEMINFO mii;
 

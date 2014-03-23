@@ -42,9 +42,6 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES	1
 #define STRICT
 
-/* Disable 'unreferenced formal parameter' warning. */
-#pragma warning( disable : 4100 )
-
 /* Disable the '#pragma deprecated' warning. */
 #pragma warning( disable : 4995 )
 

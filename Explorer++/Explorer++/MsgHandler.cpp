@@ -1488,13 +1488,11 @@ void Explorerplusplus::OnAutoSizeColumns(void)
 
 BOOL Explorerplusplus::OnMeasureItem(WPARAM wParam,LPARAM lParam)
 {
-	MEASUREITEMSTRUCT	*pMeasureItem = NULL;
-
-	pMeasureItem = (MEASUREITEMSTRUCT *)lParam;
+	MEASUREITEMSTRUCT	*pMeasureItem = (MEASUREITEMSTRUCT *)lParam;
 
 	if(pMeasureItem->CtlType == ODT_MENU)
 	{
-		return m_pCustomMenu->OnMeasureItem(wParam,lParam);
+		return m_pCustomMenu->OnMeasureItem(pMeasureItem);
 	}
 
 	return TRUE;
@@ -1502,13 +1500,11 @@ BOOL Explorerplusplus::OnMeasureItem(WPARAM wParam,LPARAM lParam)
 
 BOOL Explorerplusplus::OnDrawItem(WPARAM wParam,LPARAM lParam)
 {
-	DRAWITEMSTRUCT	*pDrawItem = NULL;
-
-	pDrawItem = (DRAWITEMSTRUCT *)lParam;
+	DRAWITEMSTRUCT	*pDrawItem = (DRAWITEMSTRUCT *)lParam;
 
 	if(pDrawItem->CtlType == ODT_MENU)
 	{
-		return m_pCustomMenu->OnDrawItem(wParam,lParam);
+		return m_pCustomMenu->OnDrawItem(pDrawItem);
 	}
 
 	return TRUE;

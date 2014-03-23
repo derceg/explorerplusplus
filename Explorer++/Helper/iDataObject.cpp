@@ -250,6 +250,9 @@ BOOL CDataObject::DuplicateData(STGMEDIUM *pstgDest,STGMEDIUM *pstgSrc,FORMATETC
 
 HRESULT __stdcall CDataObject::GetDataHere(FORMATETC *pFormatEtc,STGMEDIUM *pMedium)
 {
+	UNREFERENCED_PARAMETER(pFormatEtc);
+	UNREFERENCED_PARAMETER(pMedium);
+
 	return DV_E_TYMED;
 }
 
@@ -275,6 +278,8 @@ HRESULT	__stdcall CDataObject::QueryGetData(FORMATETC *pFormatEtc)
 
 HRESULT __stdcall CDataObject::GetCanonicalFormatEtc(FORMATETC *pFormatEtcIn,FORMATETC *pFormatEtcOut)
 {
+	UNREFERENCED_PARAMETER(pFormatEtcIn);
+
 	if(pFormatEtcOut == NULL)
 	{
 		return E_INVALIDARG;
@@ -339,16 +344,25 @@ HRESULT __stdcall CDataObject::EnumFormatEtc(DWORD dwDirection,IEnumFORMATETC **
 
 HRESULT __stdcall CDataObject::DAdvise(FORMATETC *pFormatEtc,DWORD advf,IAdviseSink *pAdvSink,DWORD *pdwConnection)
 {
+	UNREFERENCED_PARAMETER(pFormatEtc);
+	UNREFERENCED_PARAMETER(advf);
+	UNREFERENCED_PARAMETER(pAdvSink);
+	UNREFERENCED_PARAMETER(pdwConnection);
+
 	return E_NOTIMPL;
 }
 
 HRESULT __stdcall CDataObject::DUnadvise(DWORD dwConnection)
 {
+	UNREFERENCED_PARAMETER(dwConnection);
+
 	return OLE_E_ADVISENOTSUPPORTED;
 }
 
 HRESULT __stdcall CDataObject::EnumDAdvise(IEnumSTATDATA **ppenumAdvise)
 {
+	UNREFERENCED_PARAMETER(ppenumAdvise);
+
 	return OLE_E_ADVISENOTSUPPORTED;
 }
 
@@ -359,6 +373,10 @@ See: http://us.generation-nt.com/iasyncoperation-idataobject-help-45020022.html 
 HRESULT __stdcall CDataObject::EndOperation(HRESULT hResult,
 IBindCtx *pbcReserved,DWORD dwEffects)
 {
+	UNREFERENCED_PARAMETER(hResult);
+	UNREFERENCED_PARAMETER(pbcReserved);
+	UNREFERENCED_PARAMETER(dwEffects);
+
 	m_bInOperation = FALSE;
 	return S_OK;
 }
@@ -386,6 +404,8 @@ HRESULT __stdcall CDataObject::SetAsyncMode(BOOL fDoOpAsync)
 
 HRESULT __stdcall CDataObject::StartOperation(IBindCtx *pbcReserved)
 {
+	UNREFERENCED_PARAMETER(pbcReserved);
+
 	m_bInOperation = TRUE;
 
 	return S_OK;
