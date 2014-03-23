@@ -261,7 +261,7 @@ WPARAM wParam,LPARAM lParam)
 				hdc = GetDC(DisplayWindow);
 				RECT rc;
 				GetClientRect(DisplayWindow,&rc);
-				DrawGradientFill(hdc,&rc,&rc);
+				DrawGradientFill(hdc,&rc);
 				ReleaseDC(DisplayWindow,hdc);
 				RedrawWindow(DisplayWindow,NULL,NULL,RDW_INVALIDATE);
 			}
@@ -274,7 +274,7 @@ WPARAM wParam,LPARAM lParam)
 				hdc = GetDC(DisplayWindow);
 				RECT rc;
 				GetClientRect(DisplayWindow,&rc);
-				DrawGradientFill(hdc,&rc,&rc);
+				DrawGradientFill(hdc,&rc);
 				ReleaseDC(DisplayWindow,hdc);
 				RedrawWindow(DisplayWindow,NULL,NULL,RDW_INVALIDATE);
 			}
@@ -315,7 +315,7 @@ WPARAM wParam,LPARAM lParam)
 			break;
 
 		case WM_SIZE:
-			OnSize(wParam,lParam);
+			OnSize(LOWORD(lParam), HIWORD(lParam));
 			break;
 	}
 

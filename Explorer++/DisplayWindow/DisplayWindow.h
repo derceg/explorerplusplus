@@ -96,8 +96,8 @@ private:
 	LONG	OnMouseMove(LPARAM lParam);
 	void	OnLButtonDown(LPARAM lParam);
 	void	OnRButtonUp(WPARAM wParam,LPARAM lParam);
-	void	DrawGradientFill(HDC,RECT *,RECT *);
-	void	PaintText(HDC hdc,unsigned int,unsigned int);
+	void	DrawGradientFill(HDC,RECT *);
+	void	PaintText(HDC,unsigned int);
 	void	TransparentTextOut(HDC hdc,TCHAR *Text,RECT *prcText);
 	void	DrawThumbnail(HDC hdcMem);
 	void	OnSetThumbnailFile(WPARAM wParam,LPARAM lParam);
@@ -106,7 +106,7 @@ private:
 
 	void	PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect);
 
-	void	OnSize(WPARAM wParam,LPARAM lParam);
+	void	OnSize(int width, int height);
 
 	void	ExtractThumbnailImage(void);
 	void	CancelThumbnailExtraction(void);

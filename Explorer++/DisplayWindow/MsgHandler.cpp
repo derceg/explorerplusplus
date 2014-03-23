@@ -46,7 +46,7 @@ at the top and bottom of the thumbnail. */
 
 std::list<ThumbnailEntry_t>	g_ThumbnailEntries;
 
-void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc,RECT *UpdateRect)
+void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc)
 {
 	if(m_hBitmapBackground)
 	{
@@ -88,7 +88,7 @@ void CDisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
 	BitBlt(hdcMem,UpdateRect->left,UpdateRect->top,rc->right,rc->bottom,m_hdcBackground,
 	UpdateRect->left,UpdateRect->top,SRCCOPY);
 
-	PaintText(hdcMem,m_LeftIndent,m_LineSpacing);
+	PaintText(hdcMem,m_LeftIndent);
 	DrawIconEx(hdcMem,MAIN_ICON_LEFT,MAIN_ICON_TOP,m_hMainIcon,
 		MAIN_ICON_WIDTH,MAIN_ICON_HEIGHT,NULL,NULL,DI_NORMAL);
 
@@ -271,7 +271,7 @@ void CDisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 	}
 }
 
-void CDisplayWindow::PaintText(HDC hdc,unsigned int x,unsigned int y)
+void CDisplayWindow::PaintText(HDC hdc,unsigned int x)
 {
 	RECT rcClient;
 	RECT rcText;
@@ -481,15 +481,15 @@ void CDisplayWindow::OnSetThumbnailFile(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CDisplayWindow::OnSize(WPARAM wParam,LPARAM lParam)
+void CDisplayWindow::OnSize(int width, int height)
 {
 	HDC		hdc;
 	RECT	rc;
 
 	hdc = GetDC(m_hDisplayWindow);
 
-	SetRect(&rc,0,0,LOWORD(lParam),HIWORD(lParam));
-	DrawGradientFill(hdc,&rc,NULL);
+	SetRect(&rc,0,0,width,height);
+	DrawGradientFill(hdc,&rc);
 
 	ReleaseDC(m_hDisplayWindow,hdc);
 
