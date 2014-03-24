@@ -1,7 +1,11 @@
 #pragma once
 
 #include <gdiplus.h>
+
+#pragma warning(push)
+#pragma warning(disable:4995)
 #include <vector>
+#pragma warning(pop)
 
 #define DWM_BASE				(WM_APP + 100)
 

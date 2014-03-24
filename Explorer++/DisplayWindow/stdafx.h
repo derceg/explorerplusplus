@@ -35,9 +35,6 @@
 
 #define OEMRESOURCE
 
-/* Disable the '#pragma deprecated' warning. */
-#pragma warning( disable : 4995 )
-
 // Windows Header Files:
 #include <windows.h>
 #include <windowsx.h>
