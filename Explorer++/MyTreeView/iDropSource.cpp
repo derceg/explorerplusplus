@@ -43,5 +43,7 @@ HRESULT _stdcall CMyTreeView::QueryContinueDrag(BOOL fEscapePressed,DWORD grfKey
 
 HRESULT _stdcall CMyTreeView::GiveFeedback(DWORD dwEffect)
 {
+	UNREFERENCED_PARAMETER(dwEffect);
+
 	return DRAGDROP_S_USEDEFAULTCURSORS;
 }

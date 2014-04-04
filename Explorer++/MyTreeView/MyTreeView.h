@@ -62,7 +62,7 @@ public:
 private:
 
 	/* Message handlers. */
-	LRESULT CALLBACK	OnNotify(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK	OnNotify(NMHDR *pnmhdr);
 	LRESULT		OnSetCursor(void);
 
 	void		DirectoryModified(DWORD dwAction,TCHAR *szFullFileName);
@@ -77,7 +77,7 @@ private:
 	void		UpdateParent(TCHAR *szParent);
 	void		UpdateParent(HTREEITEM hParent);
 	LRESULT CALLBACK	OnDeviceChange(WPARAM wParam,LPARAM lParam);
-	void		OnGetDisplayInfo(LPARAM lParam);
+	void		OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
 	void		UpdateChildren(HTREEITEM hParent,LPITEMIDLIST pidlParent);
 	LPITEMIDLIST	UpdateItemInfo(LPITEMIDLIST pidlParent,int iItemId);
 

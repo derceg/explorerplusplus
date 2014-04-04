@@ -99,6 +99,8 @@ CMyTreeView::~CMyTreeView()
 LRESULT CALLBACK TreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,
 UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CMyTreeView *pMyTreeView = (CMyTreeView *)dwRefData;
 
 	return pMyTreeView->TreeViewProc(hwnd,uMsg,wParam,lParam);
@@ -200,26 +202,26 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			break;
 
 		case WM_NOTIFY:
-			return OnNotify(hwnd,msg,wParam,lParam);
+			return OnNotify(reinterpret_cast<NMHDR *>(lParam));
 			break;
 	}
 
 	return DefSubclassProc(hwnd,msg,wParam,lParam);
 }
 
-LRESULT CALLBACK CMyTreeView::OnNotify(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK CMyTreeView::OnNotify(NMHDR *pnmhdr)
 {
-	NMHDR *nmhdr;
-	nmhdr = (NMHDR *)lParam;
-
-	switch(nmhdr->code)
+	switch(pnmhdr->code)
 	{
 	case TVN_BEGINDRAG:
-		OnBeginDrag((int)((NMTREEVIEW *)lParam)->itemNew.lParam,DRAG_TYPE_LEFTCLICK);
+		{
+			NMTREEVIEW *pnmTreeView = reinterpret_cast<NMTREEVIEW *>(pnmhdr);
+			OnBeginDrag(static_cast<int>(pnmTreeView->itemNew.lParam), DRAG_TYPE_LEFTCLICK);
+		}
 		break;
 
 	case TVN_GETDISPINFO:
-		OnGetDisplayInfo(lParam);
+		OnGetDisplayInfo(reinterpret_cast<NMTVDISPINFO *>(pnmhdr));
 		break;
 	}
 
@@ -344,15 +346,9 @@ HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent,LPITEMIDLIST pidlDirectory)
 	return hr;
 }
 
-void CMyTreeView::OnGetDisplayInfo(LPARAM lParam)
+void CMyTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 {
-	NMTVDISPINFO	*pnmv = NULL;
-	TVITEM			*ptvItem = NULL;
-	NMHDR			*nmhdr = NULL;
-
-	pnmv	= (NMTVDISPINFO *)lParam;
-	ptvItem	= &pnmv->item;
-	nmhdr	= &pnmv->hdr;
+	TVITEM *ptvItem = &pnmtvdi->item;
 
 	if((ptvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
@@ -381,7 +377,7 @@ void CMyTreeView::AddToIconFinderQueue(TVITEM *plvItem)
 	{
 		g_ntvAPCsQueued++;
 
-		QueueUserAPC(TVFindIconAPC,m_hThread,(ULONG_PTR)this);
+		QueueUserAPC(TVFindIconAPC,m_hThread,NULL);
 	}
 
 	LeaveCriticalSection(&g_tv_icon_cs);
@@ -439,6 +435,8 @@ BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pTreeViewInfo)
 
 void CALLBACK TVFindIconAPC(ULONG_PTR dwParam)
 {
+	UNREFERENCED_PARAMETER(dwParam);
+
 	TreeViewInfo_t	pTreeViewInfo;
 	TVITEM			tvItem;
 	SHFILEINFO		shfi;
@@ -1804,7 +1802,30 @@ HRESULT CMyTreeView::InitializeDragDropHelpers(void)
 /* IUnknown interface members. */
 HRESULT __stdcall CMyTreeView::QueryInterface(REFIID iid, void **ppvObject)
 {
+	if(ppvObject == NULL)
+	{
+		return E_POINTER;
+	}
+
 	*ppvObject = NULL;
+
+	if(iid == IID_IUnknown)
+	{
+		/* IDropTarget and IDropSource
+		both derive from IUnknown, so
+		need to explicitly indicate
+		which is required (in this
+		case, both are equally good). */
+		*ppvObject = static_cast<IUnknown *>(static_cast<IDropTarget *>(this));
+	}
+	else if(iid == IID_IDropTarget)
+	{
+		*ppvObject = static_cast<IDropTarget *>(this);
+	}
+	else if(iid == IID_IDropSource)
+	{
+		*ppvObject = static_cast<IDropSource *>(this);
+	}
 
 	if(*ppvObject)
 	{

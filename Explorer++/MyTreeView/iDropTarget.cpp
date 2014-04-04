@@ -86,6 +86,10 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 
 void CALLBACK DragScrollTimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 {
+	UNREFERENCED_PARAMETER(uMsg);
+	UNREFERENCED_PARAMETER(idEvent);
+	UNREFERENCED_PARAMETER(dwTime);
+
 	g_bAllowScroll = TRUE;
 
 	KillTimer(hwnd,DRAGSCROLL_TIMER_ID);
@@ -121,6 +125,10 @@ DWORD CMyTreeView::GetCurrentDragEffect(DWORD grfKeyState,DWORD dwCurrentEffect,
 
 void CALLBACK DragExpandTimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 {
+	UNREFERENCED_PARAMETER(uMsg);
+	UNREFERENCED_PARAMETER(idEvent);
+	UNREFERENCED_PARAMETER(dwTime);
+
 	TreeView_Expand(hwnd,g_hExpand,TVE_EXPAND);
 
 	KillTimer(hwnd,DRAGEXPAND_TIMER_ID);
