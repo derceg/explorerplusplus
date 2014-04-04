@@ -28,9 +28,6 @@
 
 #define ISOLATION_AWARE_ENABLED	1
 
-/* Disable the '#pragma deprecated' warning. */
-#pragma warning( disable : 4995 )
-
 // Windows Header Files:
 #include <Winsock2.h>
 #include <windows.h>
@@ -53,4 +50,7 @@
 #include <gdiplus.h>
 
 /* Pantheios header files. */
+#pragma warning(push)
+#pragma warning(disable:4995)
 #include <pantheios\pantheios.hpp>
+#pragma warning(pop)

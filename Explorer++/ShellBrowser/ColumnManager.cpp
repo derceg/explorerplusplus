@@ -32,7 +32,10 @@ the library (also see
 http://stackoverflow.com/questions/2364774/why-do-i-need-to-compile-datetime-in-boost-if-i-am-not-using-to-string-or-from-s). */
 #define BOOST_DATE_TIME_NO_LIB
 
+#pragma warning(push)
+#pragma warning(disable:4995)
 #include <boost\date_time\posix_time\posix_time.hpp>
+#pragma warning(pop)
 
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
