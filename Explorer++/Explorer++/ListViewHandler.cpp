@@ -320,7 +320,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 					ActiveColumnList.insert(itr,Column);
 
-					m_pActiveShellBrowser->ImportColumns(&ActiveColumnList,TRUE);
+					m_pActiveShellBrowser->ImportColumns(&ActiveColumnList);
 
 					RefreshTab(m_iObjectIndex);
 

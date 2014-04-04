@@ -384,13 +384,13 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 		all columns. */
 		if(iOffset == 0)
 		{
-			m_pActiveShellBrowser->ImportColumns(&m_pActiveColumnList,TRUE);
+			m_pActiveShellBrowser->ImportColumns(&m_pActiveColumnList);
 
 			RefreshTab(m_iObjectIndex);
 		}
 		else
 		{
-			m_pActiveShellBrowser->ImportColumns(&m_pActiveColumnList,FALSE);
+			m_pActiveShellBrowser->ImportColumns(&m_pActiveColumnList);
 		}
 	}
 

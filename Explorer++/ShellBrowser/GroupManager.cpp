@@ -89,6 +89,8 @@ void CShellBrowser::ToggleGrouping(void)
 
 INT CALLBACK NameComparison(INT Group1_ID, INT Group2_ID, void *pvData)
 {
+	UNREFERENCED_PARAMETER(pvData);
+
 	TCHAR *pszGroupHeader1 = NULL;
 	TCHAR *pszGroupHeader2 = NULL;
 	int iReturnValue;
@@ -116,6 +118,8 @@ INT CALLBACK NameComparison(INT Group1_ID, INT Group2_ID, void *pvData)
 
 INT CALLBACK FreeSpaceComparison(INT Group1_ID, INT Group2_ID, void *pvData)
 {
+	UNREFERENCED_PARAMETER(pvData);
+
 	TCHAR *pszGroupHeader1 = NULL;
 	TCHAR *pszGroupHeader2 = NULL;
 	int iReturnValue;
@@ -434,7 +438,7 @@ PFNLVGROUPCOMPARE pfnGroupCompare)
 		}
 
 		lvigs.pfnGroupCompare = (PFNLVGROUPCOMPARE)pfnGroupCompare;
-		lvigs.pvData = (void *)m_hListView;
+		lvigs.pvData = NULL;
 
 		ListView_InsertGroupSorted(m_hListView,&lvigs);
 	}
@@ -571,7 +575,7 @@ void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroup
 		iSize = 0;
 	}
 
-	StringCchCopy(szGroupHeader,512,SizeGroups[iSize]);
+	StringCchCopy(szGroupHeader,cchMax,SizeGroups[iSize]);
 }
 
 void CShellBrowser::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
@@ -867,6 +871,11 @@ void CShellBrowser::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGrou
 /* TODO: Fix. Need to check for each adapter. */
 void CShellBrowser::DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
+	/* When this function is
+	properly implemented, this
+	can be removed. */
+	UNREFERENCED_PARAMETER(iItemInternal);
+
 	std::list<TypeGroup_t>::iterator itr;
 
 	TCHAR szStatus[32] = EMPTY_STRING;

@@ -153,6 +153,9 @@ void CShellBrowser::DirectoryAltered(void)
 
 void CALLBACK TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
 {
+	UNREFERENCED_PARAMETER(uMsg);
+	UNREFERENCED_PARAMETER(dwTime);
+
 	KillTimer(hwnd,idEvent);
 
 	SendMessage(hwnd,WM_USER_FILESADDED,(WPARAM)idEvent,0);

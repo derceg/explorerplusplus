@@ -28,9 +28,6 @@
 
 #define ISOLATION_AWARE_ENABLED	1
 
-/* Disable 'unreferenced formal parameter' warning. */
-#pragma warning( disable : 4100 )
-
 /* Disable the '#pragma deprecated' warning. */
 #pragma warning( disable : 4995 )
 

@@ -24,7 +24,7 @@
 #include "../Helper/FolderSize.h"
 
 
-BOOL RemoveFromThumbnailsFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent);
+BOOL RemoveFromThumbnailsFinderQueue(ListViewInfo_t *pListViewInfo);
 
 std::list<ListViewInfo_t>	g_ThumbnailQueue;
 CRITICAL_SECTION		g_csThumbnails;
@@ -138,7 +138,7 @@ void CShellBrowser::AddToThumbnailFinderQueue(LPARAM lParam)
 	LeaveCriticalSection(&g_csThumbnails);
 }
 
-BOOL RemoveFromThumbnailsFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent)
+BOOL RemoveFromThumbnailsFinderQueue(ListViewInfo_t *pListViewInfo)
 {
 	BOOL bQueueNotEmpty;
 
@@ -214,7 +214,7 @@ void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
 	if(pShellBrowser->GetTerminationStatus())
 		return;
 
-	bQueueNotEmpty = RemoveFromThumbnailsFinderQueue(&pListViewInfo,NULL);
+	bQueueNotEmpty = RemoveFromThumbnailsFinderQueue(&pListViewInfo);
 
 	while(bQueueNotEmpty)
 	{
@@ -283,7 +283,7 @@ void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
 		CoTaskMemFree(pidlParent);
 		CoTaskMemFree(pridl);
 
-		bQueueNotEmpty = RemoveFromThumbnailsFinderQueue(&pListViewInfo,NULL);
+		bQueueNotEmpty = RemoveFromThumbnailsFinderQueue(&pListViewInfo);
 	}
 }
 

@@ -511,12 +511,18 @@ int CALLBACK CShellBrowser::SortByTotalSize(int InternalIndex1,int InternalIndex
 /* TODO: Implement. */
 int CALLBACK CShellBrowser::SortByOriginalLocation(int InternalIndex1,int InternalIndex2) const
 {
+	UNREFERENCED_PARAMETER(InternalIndex1);
+	UNREFERENCED_PARAMETER(InternalIndex2);
+
 	return 0;
 }
 
 /* TODO: Implement. */
 int CALLBACK CShellBrowser::SortByDateDeleted(int InternalIndex1,int InternalIndex2) const
 {
+	UNREFERENCED_PARAMETER(InternalIndex1);
+	UNREFERENCED_PARAMETER(InternalIndex2);
+
 	return 0;
 }
 

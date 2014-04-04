@@ -384,7 +384,7 @@ public:
 	
 	/* Column support. */
 	void				ExportCurrentColumns(std::list<Column_t> *pColumns);
-	void				ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped);
+	void				ImportColumns(std::list<Column_t> *pColumns);
 
 	/* Thumbnails view. */
 	int					GetExtractedThumbnail(HBITMAP hThumbnailBitmap);

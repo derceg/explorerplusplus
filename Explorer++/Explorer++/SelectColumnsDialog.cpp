@@ -233,7 +233,7 @@ void CSelectColumnsDialog::OnOk()
 		ColumnTempList.push_back(Column);
 	}
 
-	m_pexpp->GetActiveShellBrowser()->ImportColumns(&ColumnTempList,m_bColumnsSwapped);
+	m_pexpp->GetActiveShellBrowser()->ImportColumns(&ColumnTempList);
 
 	if(m_bColumnsSwapped)
 	{

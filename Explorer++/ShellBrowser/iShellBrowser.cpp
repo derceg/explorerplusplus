@@ -403,7 +403,7 @@ void CShellBrowser::AddToIconFinderQueue(LVITEM *plvItem)
 	{
 		g_nAPCsQueued++;
 
-		QueueUserAPC(FindIconAPC,m_hThread,(ULONG_PTR)this);
+		QueueUserAPC(FindIconAPC,m_hThread,NULL);
 	}
 
 	LeaveCriticalSection(&g_icon_cs);
@@ -495,6 +495,8 @@ is invalid, and so this is not expected to be a
 problem. */
 void CALLBACK FindIconAPC(ULONG_PTR dwParam)
 {
+	UNREFERENCED_PARAMETER(dwParam);
+
 	ListViewInfo_t	pListViewInfo;
 	LVITEM			lvItem;
 	SHFILEINFO		shfi;
@@ -1367,7 +1369,7 @@ void CShellBrowser::ExportCurrentColumns(std::list<Column_t> *pColumns)
 	}
 }
 
-void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns,BOOL bColumnsSwapped)
+void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns)
 {
 	std::list<Column_t>::iterator itr;
 	std::list<Column_t>::iterator itr2;
