@@ -38,9 +38,6 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES	1
 #define STRICT
 
-/* Disable the '#pragma deprecated' warning. */
-#pragma warning( disable : 4995 )
-
 // Windows Header Files:
 #include <winsock2.h>
 #include <windows.h>
@@ -74,3 +71,10 @@
 #include <Iphlpapi.h>
 #include <psapi.h>
 #include <userenv.h>
+
+#pragma warning(push)
+#pragma warning(disable:4995)
+#include <list>
+#pragma warning(pop)
+
+#include <vector>

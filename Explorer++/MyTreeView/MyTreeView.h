@@ -1,9 +1,5 @@
 #pragma once
 
-#include <commctrl.h>
-#include <shlwapi.h>
-#include <list>
-#include <vector>
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/DropHandler.h"
 
