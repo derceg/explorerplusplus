@@ -882,7 +882,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXML
 		tcItem.mask	= TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-		wsprintf(szNodeName,_T("%d"),i);
+		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), i);
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Tab"),szNodeName);
 
 		m_pShellBrowser[(int)tcItem.lParam]->QueryCurrentDirectory(MAX_PATH,szTabDirectory);
@@ -1439,7 +1439,7 @@ MSXML2::IXMLDOMElement *pe)
 		rbi.fMask = RBBIM_ID|RBBIM_CHILD|RBBIM_SIZE|RBBIM_STYLE;
 		SendMessage(m_hMainRebar,RB_GETBANDINFO,i,(LPARAM)&rbi);
 
-		wsprintf(szNodeName,_T("%d"),i);
+		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), i);
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Toolbar"),szNodeName);
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("id"),

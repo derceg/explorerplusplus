@@ -35,9 +35,6 @@
 
 #define OEMRESOURCE
 
-/* Disable the '#pragma deprecated' warning. */
-#pragma warning( disable : 4995 )
-
 // Windows Header Files:
 #include <windows.h>
 #include <windowsx.h>
@@ -64,10 +61,18 @@
 #include <wmsdk.h>
 #include <vfw.h>
 #include <dwmapi.h>
-#include <iostream>
-#include <sstream>
-#include <cassert>
 #include <WinInet.h>
 
+#pragma warning(push)
+#pragma warning(disable:4995)
+#include <iostream>
+#include <sstream>
+#pragma warning(pop)
+
+#include <cassert>
+
 /* Pantheios header files. */
+#pragma warning(push)
+#pragma warning(disable:4995)
 #include <pantheios\pantheios.hpp>
+#pragma warning(pop)
