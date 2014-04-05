@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "gtest\gtest.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"

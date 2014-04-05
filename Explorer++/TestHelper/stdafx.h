@@ -5,9 +5,6 @@
 
 #pragma once
 
-/* Disable the '#pragma deprecated' warning. */
-#pragma warning( disable : 4995 )
-
 #include "targetver.h"
 
 #include <Windows.h>
@@ -18,3 +15,8 @@
 #include <ShlObj.h>
 #include <ShlGuid.h>
 #include <GdiPlus.h>
+
+#pragma warning(push)
+#pragma warning(disable:4995)
+#include "gtest\gtest.h"
+#pragma warning(pop)

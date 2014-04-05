@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "gtest\gtest.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
 

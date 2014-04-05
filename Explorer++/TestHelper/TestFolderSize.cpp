@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "gtest\gtest.h"
 #include "../Helper/FolderSize.h"
 #include "../Helper/Macros.h"
 #include "Helper.h"

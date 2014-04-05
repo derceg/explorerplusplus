@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "gtest\gtest.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/Macros.h"
 

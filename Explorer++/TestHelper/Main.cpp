@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "gtest\gtest.h"
 
 class OleEnvironment : public ::testing::Environment
 {
