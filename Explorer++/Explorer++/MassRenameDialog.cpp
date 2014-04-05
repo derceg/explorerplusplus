@@ -176,6 +176,8 @@ void CMassRenameDialog::GetResizableControlInformation(CBaseDialog::DialogSizeCo
 
 INT_PTR CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	if(HIWORD(wParam) != 0)
 	{
 		switch(HIWORD(wParam))

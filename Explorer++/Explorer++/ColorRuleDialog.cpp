@@ -101,6 +101,8 @@ INT_PTR CColorRuleDialog::OnInitDialog()
 
 INT_PTR CColorRuleDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	if(HIWORD(wParam) != 0)
 	{
 		switch(HIWORD(wParam))
@@ -208,6 +210,8 @@ void CColorRuleDialog::OnChangeColor()
 LRESULT CALLBACK NColorRuleDialog::StaticColorProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CColorRuleDialog *pcrd = reinterpret_cast<CColorRuleDialog *>(dwRefData);
 
 	return pcrd->StaticColorProc(hwnd,uMsg,wParam,lParam);

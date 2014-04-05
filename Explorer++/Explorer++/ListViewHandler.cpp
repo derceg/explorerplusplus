@@ -94,6 +94,8 @@ HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)
 LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	Explorerplusplus *pexpp = reinterpret_cast<Explorerplusplus *>(dwRefData);
 
 	return pexpp->ListViewSubclassProc(hwnd,uMsg,wParam,lParam);
@@ -200,11 +202,19 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			break;
 
 		case WM_MBUTTONDOWN:
-			OnListViewMButtonDown(wParam,lParam);
+			{
+				POINT pt;
+				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+				OnListViewMButtonDown(&pt);
+			}
 			break;
 
 		case WM_MBUTTONUP:
-			OnListViewMButtonUp(wParam,lParam);
+			{
+				POINT pt;
+				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+				OnListViewMButtonUp(&pt);
+			}
 			break;
 
 		/* If no item is currently been dragged, and the last drag
@@ -361,13 +371,10 @@ void Explorerplusplus::OnListViewLButtonDown(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void Explorerplusplus::OnListViewMButtonDown(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnListViewMButtonDown(POINT *pt)
 {
 	LV_HITTESTINFO ht;
-
-	ht.pt.x = LOWORD(lParam);
-	ht.pt.y = HIWORD(lParam);
-
+	ht.pt = *pt;
 	ListView_HitTest(m_hActiveListView,&ht);
 
 	if(ht.flags != LVHT_NOWHERE && ht.iItem != -1)
@@ -382,13 +389,10 @@ void Explorerplusplus::OnListViewMButtonDown(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void Explorerplusplus::OnListViewMButtonUp(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnListViewMButtonUp(POINT *pt)
 {
 	LV_HITTESTINFO	ht;
-
-	ht.pt.x = LOWORD(lParam);
-	ht.pt.y = HIWORD(lParam);
-
+	ht.pt = *pt;
 	ListView_HitTest(m_hActiveListView,&ht);
 
 	if(ht.flags != LVHT_NOWHERE)
@@ -924,7 +928,7 @@ void Explorerplusplus::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 	}
 }
 
-void Explorerplusplus::OnListViewRClick(HWND hParent,POINT *pCursorPos)
+void Explorerplusplus::OnListViewRClick(POINT *pCursorPos)
 {
 	/* It may be possible for the active tab/folder
 	to change while the menu is been shown (e.g. if

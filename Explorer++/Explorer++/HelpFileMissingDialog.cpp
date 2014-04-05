@@ -37,6 +37,8 @@ INT_PTR CHelpFileMissingDialog::OnInitDialog()
 
 INT_PTR CHelpFileMissingDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDOK:

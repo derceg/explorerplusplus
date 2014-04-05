@@ -155,7 +155,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 		lCheckMenuItem(hProgramMenu,IDM_ARRANGEICONSBY_AUTOARRANGE,m_pActiveShellBrowser->QueryAutoArrange());
 	}
 
-	SetArrangeMenuItemStates(hProgramMenu);
+	SetArrangeMenuItemStates();
 }
 
 /*
@@ -163,7 +163,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 * 'arrange menu', which appears as a
 * submenu in other higher level menus.
 */
-void Explorerplusplus::SetArrangeMenuItemStates(HMENU hProgramMenu)
+void Explorerplusplus::SetArrangeMenuItemStates()
 {
 	UINT ItemToCheck;
 	UINT SortMode;

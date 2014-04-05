@@ -103,6 +103,8 @@ void CWildcardSelectDialog::GetResizableControlInformation(CBaseDialog::DialogSi
 
 INT_PTR CWildcardSelectDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDOK:

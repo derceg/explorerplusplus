@@ -38,6 +38,8 @@ INT_PTR CNewBookmarkFolderDialog::OnInitDialog()
 
 INT_PTR CNewBookmarkFolderDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDOK:

@@ -91,6 +91,8 @@ void CApplicationToolbar::Initialize(HWND hParent)
 LRESULT CALLBACK ParentWndProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CApplicationToolbar *pat = reinterpret_cast<CApplicationToolbar *>(dwRefData);
 	return pat->ParentWndProc(hwnd,uMsg,wParam,lParam);
 }

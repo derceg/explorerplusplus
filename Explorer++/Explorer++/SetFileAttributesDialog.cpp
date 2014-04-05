@@ -156,6 +156,8 @@ void CSetFileAttributesDialog::InitializeAttributesStructure(void)
 
 INT_PTR CSetFileAttributesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDC_MODIFICATION_RESET:

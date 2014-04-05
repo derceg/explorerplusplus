@@ -80,6 +80,8 @@ ULONG __stdcall CTabDropHandler::Release(void)
 LRESULT CALLBACK TabCtrlProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CTabDropHandler *ptdh = reinterpret_cast<CTabDropHandler *>(dwRefData);
 
 	return ptdh->TabCtrlProc(hwnd,uMsg,wParam,lParam);

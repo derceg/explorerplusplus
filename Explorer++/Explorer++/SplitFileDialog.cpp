@@ -189,6 +189,8 @@ INT_PTR CSplitFileDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 
 INT_PTR CSplitFileDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	if(HIWORD(wParam) != 0)
 	{
 		switch(HIWORD(wParam))
@@ -275,6 +277,8 @@ void CSplitFileDialog::SaveState()
 
 INT_PTR CSplitFileDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(uMsg)
 	{
 	case NSplitFileDialog::WM_APP_SETTOTALSPLITCOUNT:

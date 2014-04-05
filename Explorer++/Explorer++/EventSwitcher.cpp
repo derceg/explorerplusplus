@@ -146,7 +146,7 @@ void Explorerplusplus::OnRightClick(NMHDR *nmhdr)
 		CursorPos.x = GET_X_LPARAM(dwPos);
 		CursorPos.y = GET_Y_LPARAM(dwPos);
 
-		OnListViewRClick(m_hActiveListView,&CursorPos);
+		OnListViewRClick(&CursorPos);
 	}
 	else if(nmhdr->hwndFrom == ListView_GetHeader(m_hActiveListView))
 	{

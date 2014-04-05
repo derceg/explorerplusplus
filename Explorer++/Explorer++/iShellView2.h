@@ -36,7 +36,7 @@ private:
 	HRESULT __stdcall	GetItemObject(UINT uItem,REFIID riid,void **ppv);
 
 	/* IOleWindow methods. */
-	HRESULT __stdcall	GetWindow(HWND *);
+	HRESULT __stdcall	GetWindow(HWND *phwnd);
 	HRESULT __stdcall	ContextSensitiveHelp(BOOL bHelp);
 
 	ULONG				m_RefCount;

@@ -94,6 +94,8 @@ namespace
 	LRESULT CALLBACK MainWndProcStub(HWND hwnd,UINT uMsg,
 		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 	{
+		UNREFERENCED_PARAMETER(uIdSubclass);
+
 		Explorerplusplus *pexpp = reinterpret_cast<Explorerplusplus *>(dwRefData);
 
 		return pexpp->MainWndTaskbarThumbnailProc(hwnd,uMsg,wParam,lParam);

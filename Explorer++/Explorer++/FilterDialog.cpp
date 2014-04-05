@@ -108,6 +108,8 @@ void CFilterDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstr
 
 INT_PTR CFilterDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDOK:

@@ -164,6 +164,8 @@ void Explorerplusplus::OnShowOptions(void)
 
 int CALLBACK PropSheetProcStub(HWND hDlg,UINT msg,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(msg)
 	{
 		case PSCB_INITIALIZED:
@@ -1264,6 +1266,9 @@ void Explorerplusplus::OnDefaultSettingsNewTabDir(HWND hDlg)
 
 int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData)
 {
+	UNREFERENCED_PARAMETER(lParam);
+	UNREFERENCED_PARAMETER(lpData);
+
 	switch(uMsg)
 	{
 	case BFFM_INITIALIZED:

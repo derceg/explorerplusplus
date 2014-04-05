@@ -86,6 +86,8 @@ void Explorerplusplus::InitializeTabs(void)
 LRESULT CALLBACK TabSubclassProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->TabSubclassProc(hwnd,uMsg,wParam,lParam);
@@ -115,7 +117,11 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 			break;
 
 		case WM_LBUTTONDOWN:
-			OnTabCtrlLButtonDown(wParam,lParam);
+			{
+				POINT pt;
+				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+				OnTabCtrlLButtonDown(&pt);
+			}
 			break;
 
 		case WM_LBUTTONUP:
@@ -123,7 +129,11 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 			break;
 
 		case WM_MOUSEMOVE:
-			OnTabCtrlMouseMove(wParam,lParam);
+			{
+				POINT pt;
+				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+				OnTabCtrlMouseMove(&pt);
+			}
 			break;
 
 		case WM_MBUTTONUP:
@@ -131,7 +141,11 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 			break;
 
 		case WM_RBUTTONUP:
-			OnTabCtrlRButtonUp(wParam,lParam);
+			{
+				POINT pt;
+				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+				OnTabCtrlRButtonUp(&pt);
+			}
 			break;
 
 		case WM_CAPTURECHANGED:
@@ -924,17 +938,11 @@ void Explorerplusplus::OnInitTabMenu(WPARAM wParam)
 		!(m_TabInfo[(int)tcItem.lParam].bLocked || m_TabInfo[(int)tcItem.lParam].bAddressLocked));
 }
 
-void Explorerplusplus::OnTabCtrlLButtonDown(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnTabCtrlLButtonDown(POINT *pt)
 {
 	TCHITTESTINFO info;
-	int ItemNum;
-
-	/* The cursor position will be tested to see if
-	there is a tab beneath it. */
-	info.pt.x	= LOWORD(lParam);
-	info.pt.y	= HIWORD(lParam);
-
-	ItemNum = TabCtrl_HitTest(m_hTabCtrl,&info);
+	info.pt = *pt;
+	int ItemNum = TabCtrl_HitTest(m_hTabCtrl,&info);
 
 	if(info.flags != TCHT_NOWHERE)
 	{
@@ -957,25 +965,17 @@ void Explorerplusplus::OnTabCtrlLButtonUp(void)
 	m_bTabBeenDragged = FALSE;
 }
 
-void Explorerplusplus::OnTabCtrlMouseMove(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnTabCtrlMouseMove(POINT *pt)
 {
 	/* Is a tab currently been dragged? */
 	if(m_bTabBeenDragged)
 	{
-		TCHITTESTINFO HitTestInfo;
-		POINT MousePos;
-		int iSwap;
-		int iSelected;
-
 		/* Dragged tab. */
-		iSelected = TabCtrl_GetCurFocus(m_hTabCtrl);
+		int iSelected = TabCtrl_GetCurFocus(m_hTabCtrl);
 
-		MousePos.x	= LOWORD(lParam);
-		MousePos.y	= HIWORD(lParam);
-
-		HitTestInfo.pt		= MousePos;
-
-		iSwap = TabCtrl_HitTest(m_hTabCtrl,&HitTestInfo);
+		TCHITTESTINFO HitTestInfo;
+		HitTestInfo.pt = *pt;
+		int iSwap = TabCtrl_HitTest(m_hTabCtrl,&HitTestInfo);
 
 		/* Check:
 		- If the cursor is over an item.
@@ -984,8 +984,8 @@ void Explorerplusplus::OnTabCtrlMouseMove(WPARAM wParam,LPARAM lParam)
 		- If the cursor has passed to the right of the dragged tab. */
 		if(HitTestInfo.flags != TCHT_NOWHERE &&
 			iSwap != iSelected &&
-			(MousePos.x < m_rcDraggedTab.left ||
-			MousePos.x > m_rcDraggedTab.right))
+			(pt->x < m_rcDraggedTab.left ||
+			pt->x > m_rcDraggedTab.right))
 		{
 			RECT rcSwap;
 
@@ -995,7 +995,7 @@ void Explorerplusplus::OnTabCtrlMouseMove(WPARAM wParam,LPARAM lParam)
 			tabs are adjusted whenever the dragged tab
 			passes a boundary, not when the cursor is
 			released. */
-			if(MousePos.x > m_rcDraggedTab.right)
+			if(pt->x > m_rcDraggedTab.right)
 			{
 				/* Cursor has gone past the right edge of
 				the dragged tab. */
@@ -1023,30 +1023,22 @@ void Explorerplusplus::OnTabCtrlMouseMove(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void Explorerplusplus::OnTabCtrlRButtonUp(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnTabCtrlRButtonUp(POINT *pt)
 {
 	TCHITTESTINFO tcHitTest;
-	POINT ptCursor;
-	int iTabHit;
-
-	ptCursor.x	= LOWORD(lParam);
-	ptCursor.y	= HIWORD(lParam);
-
-	tcHitTest.pt = ptCursor;
-
-	iTabHit = TabCtrl_HitTest(m_hTabCtrl,&tcHitTest);
+	tcHitTest.pt = *pt;
+	int iTabHit = TabCtrl_HitTest(m_hTabCtrl,&tcHitTest);
 
 	if(tcHitTest.flags != TCHT_NOWHERE)
 	{
-		UINT Command;
-
-		ClientToScreen(m_hTabCtrl,&ptCursor);
+		POINT ptCopy = *pt;
+		ClientToScreen(m_hTabCtrl,&ptCopy);
 
 		m_iTabMenuItem = iTabHit;
 
-		Command = TrackPopupMenu(m_hTabRightClickMenu,
+		UINT Command = TrackPopupMenu(m_hTabRightClickMenu,
 		TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
-		ptCursor.x,ptCursor.y,0,m_hTabCtrl,NULL);
+		ptCopy.x,ptCopy.y,0,m_hTabCtrl,NULL);
 
 		ProcessTabCommand(Command,iTabHit);
 	}
@@ -1735,13 +1727,8 @@ unsigned int Explorerplusplus::DetermineColumnSortMode(UINT uColumnId)
 	return 0;
 }
 
-void Explorerplusplus::OnTabMClick(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnTabMClick(POINT *pt)
 {
-	TCHITTESTINFO	htInfo;
-	int				iTabHit;
-	int				x;
-	int				y;
-
 	/* Only close a tab if the tab control
 	actually has focused (i.e. if the middle mouse
 	button was clicked on the control, then the
@@ -1749,14 +1736,11 @@ void Explorerplusplus::OnTabMClick(WPARAM wParam,LPARAM lParam)
 	somewhere else, it won't). */
 	if(GetFocus() == m_hTabCtrl)
 	{
-		x = LOWORD(lParam);
-		y = HIWORD(lParam);
-
-		htInfo.pt.x = x;
-		htInfo.pt.y = y;
+		TCHITTESTINFO htInfo;
+		htInfo.pt = *pt;
 
 		/* Find the tab that the click occurred over. */
-		iTabHit = TabCtrl_HitTest(m_hTabCtrl,&htInfo);
+		int iTabHit = TabCtrl_HitTest(m_hTabCtrl,&htInfo);
 
 		if(iTabHit != -1)
 		{

@@ -161,6 +161,8 @@ INT_PTR CAddBookmarkDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
 
 INT_PTR CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	if(HIWORD(wParam) != 0)
 	{
 		switch(HIWORD(wParam))
@@ -309,6 +311,8 @@ BOOL CAddBookmarkDialog::OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi)
 LRESULT CALLBACK NAddBookmarkDialog::TreeViewEditProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CAddBookmarkDialog *pabd = reinterpret_cast<CAddBookmarkDialog *>(dwRefData);
 
 	return pabd->TreeViewEditProc(hwnd,uMsg,wParam,lParam);
@@ -441,7 +445,9 @@ INT_PTR CAddBookmarkDialog::OnNcDestroy()
 void CAddBookmarkDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,
 	const CBookmark &Bookmark,std::size_t Position)
 {
-
+	UNREFERENCED_PARAMETER(ParentBookmarkFolder);
+	UNREFERENCED_PARAMETER(Bookmark);
+	UNREFERENCED_PARAMETER(Position);
 }
 
 void CAddBookmarkDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
@@ -467,7 +473,7 @@ void CAddBookmarkDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBook
 
 void CAddBookmarkDialog::OnBookmarkModified(const GUID &guid)
 {
-
+	UNREFERENCED_PARAMETER(guid);
 }
 
 void CAddBookmarkDialog::OnBookmarkFolderModified(const GUID &guid)
@@ -477,7 +483,7 @@ void CAddBookmarkDialog::OnBookmarkFolderModified(const GUID &guid)
 
 void CAddBookmarkDialog::OnBookmarkRemoved(const GUID &guid)
 {
-
+	UNREFERENCED_PARAMETER(guid);
 }
 
 void CAddBookmarkDialog::OnBookmarkFolderRemoved(const GUID &guid)

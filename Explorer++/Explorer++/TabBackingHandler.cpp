@@ -32,6 +32,8 @@ void Explorerplusplus::CreateTabBacking(void)
 LRESULT CALLBACK TabBackingProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->TabBackingProc(hwnd,uMsg,wParam,lParam);

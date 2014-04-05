@@ -59,6 +59,8 @@ INT_PTR CRenameTabDialog::OnInitDialog()
 
 INT_PTR CRenameTabDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDC_RENAMETAB_USEFOLDERNAME:

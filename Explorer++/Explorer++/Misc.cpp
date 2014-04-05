@@ -1132,6 +1132,9 @@ void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolder
 void Explorerplusplus::FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,
 int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 {
+	UNREFERENCED_PARAMETER(nFolders);
+	UNREFERENCED_PARAMETER(nFiles);
+
 	DWFolderSizeCompletion_t *pDWFolderSizeCompletion = NULL;
 
 	pDWFolderSizeCompletion = (DWFolderSizeCompletion_t *)malloc(sizeof(DWFolderSizeCompletion_t));

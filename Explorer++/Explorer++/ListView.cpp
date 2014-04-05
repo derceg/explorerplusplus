@@ -65,6 +65,8 @@ void CListViewEdit::OnEMSetSel(WPARAM &wParam,LPARAM &lParam)
 
 INT_PTR CListViewEdit::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(uMsg)
 	{
 	case WM_APP_KEYDOWN:

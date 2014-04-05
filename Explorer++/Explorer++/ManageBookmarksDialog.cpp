@@ -332,6 +332,8 @@ void CManageBookmarksDialog::RemoveSearchFieldDefaultState()
 LRESULT CALLBACK NManageBookmarksDialog::EditSearchProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CManageBookmarksDialog *pmbd = reinterpret_cast<CManageBookmarksDialog *>(dwRefData);
 
 	return pmbd->EditSearchProc(hwnd,uMsg,wParam,lParam);
@@ -392,6 +394,10 @@ INT_PTR CManageBookmarksDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
 
 INT_PTR CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
 {
+	UNREFERENCED_PARAMETER(dwKeys);
+	UNREFERENCED_PARAMETER(uDevice);
+	UNREFERENCED_PARAMETER(hwnd);
+
 	switch(uCmd)
 	{
 	case APPCOMMAND_BROWSER_BACKWARD:
@@ -558,6 +564,8 @@ void CManageBookmarksDialog::OnNewFolder()
 
 void CManageBookmarksDialog::OnDeleteBookmark(const GUID &guid)
 {
+	UNREFERENCED_PARAMETER(guid);
+
 	/* TODO: Move the bookmark/bookmark folder to the trash folder. */
 }
 
@@ -1179,6 +1187,8 @@ void CManageBookmarksDialog::OnBookmarkFolderAdded(const CBookmarkFolder &Parent
 
 void CManageBookmarksDialog::OnBookmarkModified(const GUID &guid)
 {
+	UNREFERENCED_PARAMETER(guid);
+
 	/* TODO: Notify listview if necessary. */
 }
 
@@ -1189,6 +1199,8 @@ void CManageBookmarksDialog::OnBookmarkFolderModified(const GUID &guid)
 
 void CManageBookmarksDialog::OnBookmarkRemoved(const GUID &guid)
 {
+	UNREFERENCED_PARAMETER(guid);
+
 	/* TODO: Notify listview if necessary. */
 }
 

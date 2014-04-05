@@ -279,6 +279,8 @@ void CMergeFilesDialog::GetResizableControlInformation(CBaseDialog::DialogSizeCo
 
 INT_PTR CMergeFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDC_MERGE_BUTTON_OUTPUT:
@@ -320,6 +322,8 @@ INT_PTR CMergeFilesDialog::OnDestroy()
 
 INT_PTR CMergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(uMsg)
 	{
 	case NMergeFilesDialog::WM_APP_SETTOTALMERGECOUNT:

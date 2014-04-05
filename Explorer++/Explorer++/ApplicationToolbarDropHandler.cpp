@@ -37,7 +37,27 @@ CApplicationToolbarDropHandler::~CApplicationToolbarDropHandler()
 
 HRESULT __stdcall CApplicationToolbarDropHandler::QueryInterface(REFIID iid, void **ppvObject)
 {
+	if(ppvObject == NULL)
+	{
+		return E_POINTER;
+	}
+
 	*ppvObject = NULL;
+
+	if(iid == IID_IUnknown)
+	{
+		*ppvObject = static_cast<IUnknown *>(this);
+	}
+	else if(iid == IID_IDropTarget)
+	{
+		*ppvObject = static_cast<IDropTarget *>(this);
+	}
+
+	if(*ppvObject)
+	{
+		AddRef();
+		return S_OK;
+	}
 
 	return E_NOINTERFACE;
 }
@@ -61,8 +81,10 @@ ULONG __stdcall CApplicationToolbarDropHandler::Release(void)
 }
 
 HRESULT _stdcall CApplicationToolbarDropHandler::DragEnter(IDataObject *pDataObject,
-	DWORD grfKeyStat, POINTL pt, DWORD *pdwEffect)
+	DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
 {
+	UNREFERENCED_PARAMETER(grfKeyState);
+
 	FORMATETC ftc = GetSupportedDropFormat();
 	HRESULT hr = pDataObject->QueryGetData(&ftc);
 
@@ -85,6 +107,8 @@ HRESULT _stdcall CApplicationToolbarDropHandler::DragEnter(IDataObject *pDataObj
 HRESULT _stdcall CApplicationToolbarDropHandler::DragOver(DWORD grfKeyState,
 	POINTL pt, DWORD *pdwEffect)
 {
+	UNREFERENCED_PARAMETER(grfKeyState);
+
 	*pdwEffect = DROPEFFECT_COPY;
 
 	m_pDropTargetHelper->DragOver((LPPOINT) &pt, *pdwEffect);
@@ -108,6 +132,8 @@ FORMATETC CApplicationToolbarDropHandler::GetSupportedDropFormat()
 HRESULT _stdcall CApplicationToolbarDropHandler::Drop(IDataObject *pDataObject,
 	DWORD grfKeyState, POINTL ptl, DWORD *pdwEffect)
 {
+	UNREFERENCED_PARAMETER(grfKeyState);
+
 	FORMATETC ftc = GetSupportedDropFormat();
 	STGMEDIUM stg;
 	HRESULT hr = pDataObject->GetData(&ftc, &stg);

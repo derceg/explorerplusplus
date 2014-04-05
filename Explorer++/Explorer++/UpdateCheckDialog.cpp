@@ -211,6 +211,8 @@ void CUpdateCheckDialog::OnUpdateCheckSuccess(Version_t *Version)
 
 INT_PTR CUpdateCheckDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDOK:
@@ -227,6 +229,8 @@ INT_PTR CUpdateCheckDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 
 INT_PTR CUpdateCheckDialog::OnTimer(int iTimerID)
 {
+	UNREFERENCED_PARAMETER(iTimerID);
+
 	if(m_UpdateCheckComplete)
 	{
 		return 0;

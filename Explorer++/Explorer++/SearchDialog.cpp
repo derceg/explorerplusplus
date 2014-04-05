@@ -266,6 +266,8 @@ void CSearchDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstr
 
 INT_PTR CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDSEARCH:
@@ -317,6 +319,8 @@ INT_PTR CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 
 int CALLBACK NSearchDialog::BrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	assert(lpData != NULL);
 
 	TCHAR *szSearchPattern = reinterpret_cast<TCHAR *>(lpData);
@@ -627,6 +631,8 @@ int CALLBACK CSearchDialog::SortResultsByPath(LPARAM lParam1,LPARAM lParam2)
 void CSearchDialog::AddMenuEntries(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
+	UNREFERENCED_PARAMETER(dwData);
+
 	LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
 	SFGAOF ItemAttributes = SFGAO_FOLDER;
 	GetItemAttributes(pidlComplete,&ItemAttributes);
@@ -656,6 +662,8 @@ void CSearchDialog::AddMenuEntries(LPCITEMIDLIST pidlParent,
 BOOL CSearchDialog::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
 {
+	UNREFERENCED_PARAMETER(dwData);
+
 	if(StrCmpI(szCmd,_T("open")) == 0)
 	{
 		for each(auto pidlItem in pidlItemList)

@@ -66,6 +66,8 @@ void Explorerplusplus::CreateFolderControls(void)
 LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->TreeViewSubclass(hwnd,uMsg,wParam,lParam);
@@ -602,6 +604,8 @@ LRESULT Explorerplusplus::OnTreeViewKeyDown(LPARAM lParam)
 LRESULT CALLBACK TreeViewHolderProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->TreeViewHolderProc(hwnd,uMsg,wParam,lParam);

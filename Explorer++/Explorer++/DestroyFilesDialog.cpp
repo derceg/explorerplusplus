@@ -217,6 +217,8 @@ INT_PTR CDestroyFilesDialog::OnCtlColorStatic(HWND hwnd,HDC hdc)
 
 INT_PTR CDestroyFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDOK:

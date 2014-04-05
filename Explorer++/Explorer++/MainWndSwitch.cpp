@@ -115,11 +115,11 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		break;
 
 	case WM_MEASUREITEM:
-		return OnMeasureItem(wParam,lParam);
+		return OnMeasureItem(reinterpret_cast<MEASUREITEMSTRUCT *>(lParam));
 		break;
 
 	case WM_DRAWITEM:
-		return OnDrawItem(wParam,lParam);
+		return OnDrawItem(reinterpret_cast<DRAWITEMSTRUCT *>(lParam));
 		break;
 
 	case WM_DEVICECHANGE:
@@ -143,7 +143,11 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		break;
 
 	case WM_APP_TABMCLICK:
-		OnTabMClick(wParam,lParam);
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+			OnTabMClick(&pt);
+		}
 		break;
 
 	case WM_USER_DISPLAYWINDOWRESIZED:
@@ -301,11 +305,19 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		break;
 
 	case WM_NDW_RCLICK:
-		OnNdwRClick(wParam,lParam);
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+			OnNdwRClick(&pt);
+		}
 		break;
 
 	case WM_NDW_ICONRCLICK:
-		OnNdwIconRClick(wParam,lParam);
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+			OnNdwIconRClick(&pt);
+		}
 		break;
 
 	case WM_CHANGECBCHAIN:
@@ -317,15 +329,15 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		break;
 
 	case WM_APPCOMMAND:
-		OnAppCommand(wParam,lParam);
+		OnAppCommand(GET_APPCOMMAND_LPARAM(lParam));
 		break;
 
 	case WM_COMMAND:
-		return CommandHandler(hwnd,Msg,wParam,lParam);
+		return CommandHandler(hwnd,wParam);
 		break;
 
 	case WM_NOTIFY:
-		return NotifyHandler(hwnd,Msg,wParam,lParam);
+		return NotifyHandler(lParam);
 		break;
 
 	case WM_SIZE:
@@ -344,7 +356,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 	return DefWindowProc(hwnd,Msg,wParam,lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 {
 	if(!HIWORD(wParam) && LOWORD(wParam) >= MENU_BOOKMARK_STARTID &&
 	LOWORD(wParam) <= MENU_BOOKMARK_ENDID)
@@ -1603,10 +1615,9 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,UINT Msg,WPARAM wPar
 /*
  * WM_NOTIFY handler for the main window.
  */
-LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 {
-	NMHDR *nmhdr;
-	nmhdr = (NMHDR *)lParam;
+	NMHDR *nmhdr = reinterpret_cast<NMHDR *>(lParam);
 
 	switch(nmhdr->code)
 	{
@@ -1711,11 +1722,11 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wPara
 			break;
 
 		case TBN_QUERYINSERT:
-			return OnTBQueryInsert(lParam);
+			return OnTBQueryInsert();
 			break;
 
 		case TBN_QUERYDELETE:
-			return OnTBQueryDelete(lParam);
+			return OnTBQueryDelete();
 			break;
 
 		case TBN_GETBUTTONINFO:
@@ -1723,7 +1734,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd,UINT Msg,WPARAM wPara
 			break;
 
 		case TBN_RESTORE:
-			return OnTBRestore(lParam);
+			return OnTBRestore();
 			break;
 
 		case TBN_GETINFOTIP:

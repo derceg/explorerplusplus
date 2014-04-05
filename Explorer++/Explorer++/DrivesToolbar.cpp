@@ -153,6 +153,8 @@ void CDrivesToolbar::OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh)
 LRESULT CALLBACK DrivesToolbarParentProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CDrivesToolbar *pdt = reinterpret_cast<CDrivesToolbar *>(dwRefData);
 
 	return pdt->DrivesToolbarParentProc(hwnd,uMsg,wParam,lParam);
@@ -383,6 +385,10 @@ std::wstring CDrivesToolbar::GetDrivePath(int iIndex)
 void CDrivesToolbar::AddMenuEntries(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
+	UNREFERENCED_PARAMETER(pidlParent);
+	UNREFERENCED_PARAMETER(pidlItemList);
+	UNREFERENCED_PARAMETER(dwData);
+
 	TCHAR szTemp[64];
 	LoadString(m_hInstance,IDS_GENERAL_OPEN_IN_NEW_TAB,szTemp,SIZEOF_ARRAY(szTemp));
 
@@ -397,6 +403,9 @@ void CDrivesToolbar::AddMenuEntries(LPCITEMIDLIST pidlParent,
 BOOL CDrivesToolbar::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
 {
+	UNREFERENCED_PARAMETER(pidlItemList);
+	UNREFERENCED_PARAMETER(dwData);
+
 	if(StrCmpI(szCmd,_T("open")) == 0)
 	{
 		m_pexpp->OpenItem(pidlParent,FALSE,FALSE);
@@ -409,6 +418,8 @@ BOOL CDrivesToolbar::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
 void CDrivesToolbar::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	const std::list<LPITEMIDLIST> &pidlItemList,int iCmd)
 {
+	UNREFERENCED_PARAMETER(pidlItemList);
+
 	switch(iCmd)
 	{
 	case MENU_ID_OPEN_IN_NEW_TAB:

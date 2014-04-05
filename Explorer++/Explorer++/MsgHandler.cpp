@@ -61,6 +61,8 @@ void CALLBACK QuitIconAPC(ULONG_PTR dwParam);
 
 DWORD WINAPI Thread_IconFinder(LPVOID pParam)
 {
+	UNREFERENCED_PARAMETER(pParam);
+
 	/* OLE initialization is no longer done from within
 	this function. This is because of the fact that the
 	first APC may run BEFORE this thread initialization
@@ -87,6 +89,8 @@ DWORD WINAPI Thread_IconFinder(LPVOID pParam)
 
 void CALLBACK IconThreadInitialization(ULONG_PTR dwParam)
 {
+	UNREFERENCED_PARAMETER(dwParam);
+
 	/* This will be balanced out by a corresponding
 	CoUninitialize() when the thread is ended.
 	It must be apartment threaded, or some icons (such
@@ -99,6 +103,8 @@ void CALLBACK IconThreadInitialization(ULONG_PTR dwParam)
 
 void CALLBACK QuitIconAPC(ULONG_PTR dwParam)
 {
+	UNREFERENCED_PARAMETER(dwParam);
+
 	CoUninitialize();
 }
 
@@ -1486,10 +1492,8 @@ void Explorerplusplus::OnAutoSizeColumns(void)
 	}
 }
 
-BOOL Explorerplusplus::OnMeasureItem(WPARAM wParam,LPARAM lParam)
+BOOL Explorerplusplus::OnMeasureItem(MEASUREITEMSTRUCT *pMeasureItem)
 {
-	MEASUREITEMSTRUCT	*pMeasureItem = (MEASUREITEMSTRUCT *)lParam;
-
 	if(pMeasureItem->CtlType == ODT_MENU)
 	{
 		return m_pCustomMenu->OnMeasureItem(pMeasureItem);
@@ -1498,10 +1502,8 @@ BOOL Explorerplusplus::OnMeasureItem(WPARAM wParam,LPARAM lParam)
 	return TRUE;
 }
 
-BOOL Explorerplusplus::OnDrawItem(WPARAM wParam,LPARAM lParam)
+BOOL Explorerplusplus::OnDrawItem(DRAWITEMSTRUCT *pDrawItem)
 {
-	DRAWITEMSTRUCT	*pDrawItem = (DRAWITEMSTRUCT *)lParam;
-
 	if(pDrawItem->CtlType == ODT_MENU)
 	{
 		return m_pCustomMenu->OnDrawItem(pDrawItem);
@@ -2046,12 +2048,8 @@ void Explorerplusplus::OnCreateNewFolder(void)
 	}
 }
 
-void Explorerplusplus::OnAppCommand(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnAppCommand(UINT cmd)
 {
-	UINT	cmd;
-
-	cmd = GET_APPCOMMAND_LPARAM(lParam);
-
 	switch(cmd)
 	{
 	case APPCOMMAND_BROWSER_BACKWARD:
@@ -2287,7 +2285,7 @@ void Explorerplusplus::OnIdaRClick(void)
 			}
 		}
 
-		OnListViewRClick(m_hActiveListView,&ptMenuOrigin);
+		OnListViewRClick(&ptMenuOrigin);
 	}
 	else if(hFocus == m_hTreeView)
 	{
@@ -2457,32 +2455,21 @@ void Explorerplusplus::ShowMainRebarBand(HWND hwnd,BOOL bShow)
 	}
 }
 
-void Explorerplusplus::OnNdwIconRClick(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnNdwIconRClick(POINT *pt)
 {
-	LPITEMIDLIST pidlDirectory	= NULL;
-	POINT pt;
-
-	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-
-	pt.x = GET_X_LPARAM(lParam);
-	pt.y = GET_Y_LPARAM(lParam);
-	ClientToScreen(m_hDisplayWindow,&pt);
-
-	OnListViewRClick(m_hDisplayWindow,&pt);
+	POINT ptCopy = *pt;
+	ClientToScreen(m_hDisplayWindow,&ptCopy);
+	OnListViewRClick(&ptCopy);
 }
 
-void Explorerplusplus::OnNdwRClick(WPARAM wParam,LPARAM lParam)
+void Explorerplusplus::OnNdwRClick(POINT *pt)
 {
-	POINT pt;
-
-	pt.x = GET_X_LPARAM(lParam);
-	pt.y = GET_Y_LPARAM(lParam);
-
-	ClientToScreen(m_hDisplayWindow,&pt);
+	POINT ptCopy = *pt;
+	ClientToScreen(m_hDisplayWindow,&ptCopy);
 
 	TrackPopupMenu(m_hDisplayWindowRightClickMenu,
 		TPM_LEFTALIGN|TPM_RIGHTBUTTON|TPM_VERTICAL,
-		pt.x,pt.y,0,m_hContainer,NULL);
+		ptCopy.x,ptCopy.y,0,m_hContainer,NULL);
 }
 
 LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)

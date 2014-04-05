@@ -353,8 +353,8 @@ private:
 	/* <----Private message handlers.----> */
 
 	/* Main window private message handlers. */
-	LRESULT CALLBACK		CommandHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
-	LRESULT CALLBACK		NotifyHandler(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+	LRESULT CALLBACK		CommandHandler(HWND hwnd, WPARAM wParam);
+	LRESULT CALLBACK		NotifyHandler(LPARAM lParam);
 	BOOL					OnSize(int MainWindowWidth,int MainWindowHeight);
 	int						OnClose(void);
 	int						OnDestroy(void);
@@ -384,7 +384,7 @@ private:
 	LRESULT					StatusBarMenuSelect(WPARAM wParam,LPARAM lParam);
 	void					HandleDirectoryMonitoring(int iTabId);
 	void					OnTbnDropDown(LPARAM lParam);
-	void					OnTabMClick(WPARAM wParam,LPARAM lParam);
+	void					OnTabMClick(POINT *pt);
 	void					OnDisplayWindowResized(WPARAM wParam);
 	void					OnStartedBrowsing(int iTabId,TCHAR *szPath);
 	void					OnDuplicateTab(int iTab);
@@ -393,8 +393,8 @@ private:
 	void					OnLockTabAndAddress(int iTab);
 	void					HandleTabToolbarItemStates(void);
 	void					OnAutoSizeColumns(void);
-	BOOL					OnMeasureItem(WPARAM wParam,LPARAM lParam);
-	BOOL					OnDrawItem(WPARAM wParam,LPARAM lParam);
+	BOOL					OnMeasureItem(MEASUREITEMSTRUCT *pMeasureItem);
+	BOOL					OnDrawItem(DRAWITEMSTRUCT *pDrawItem);
 	void					OnToolbarViews(void);
 	void					ShowToolbarViewsDropdown(void);
 	void					OnMainToolbarRClick(void);
@@ -413,15 +413,15 @@ private:
 	void					OnShellNewItemCreated(LPARAM lParam);
 	void					OnCreateNewFolder(void);
 	void					OnPaste(void);
-	void					OnAppCommand(WPARAM wParam,LPARAM lParam);
+	void					OnAppCommand(UINT cmd);
 	void					OnBrowseBack(void);
 	void					OnBrowseForward(void);
 	void					OnRefresh(void);
 	void					OnDirectoryModified(int iTabId);
 	void					OnIdaRClick(void);
 	void					OnAssocChanged(void);
-	void					OnNdwRClick(WPARAM wParam,LPARAM lParam);
-	void					OnNdwIconRClick(WPARAM wParam,LPARAM lParam);
+	void					OnNdwRClick(POINT *pt);
+	void					OnNdwIconRClick(POINT *pt);
 	LRESULT					OnCustomDraw(LPARAM lParam);
 	void					OnSortBy(UINT uSortMode);
 	void					OnGroupBy(UINT uSortMode);
@@ -431,8 +431,8 @@ private:
 	void					OnSelectTab(int iTab,BOOL bSetFocus);
 
 	/* ListView private message handlers. */
-	void					OnListViewMButtonDown(WPARAM wParam,LPARAM lParam);
-	void					OnListViewMButtonUp(WPARAM wParam,LPARAM lParam);
+	void					OnListViewMButtonDown(POINT *pt);
+	void					OnListViewMButtonUp(POINT *pt);
 	void					OnListViewLButtonDown(WPARAM wParam,LPARAM lParam);
 	void					OnListViewDoubleClick(NMHDR *nmhdr);
 	void					OnListViewFileRename(void);
@@ -445,7 +445,7 @@ private:
 	BOOL					OnListViewEndLabelEdit(LPARAM lParam);
 	void					OnListViewGetDisplayInfo(LPARAM lParam);
 	void					OnListViewFileDelete(BOOL bPermanent);
-	void					OnListViewRClick(HWND hParent,POINT *pCursorPos);
+	void					OnListViewRClick(POINT *pCursorPos);
 	void					OnListViewBackgroundRClick(POINT *pCursorPos);
 	void					OnListViewItemRClick(POINT *pCursorPos);
 	void					OnListViewHeaderRClick(POINT *pCursorPos);
@@ -473,19 +473,19 @@ private:
 	void					OnTreeViewPaste(void);
 
 	/* Main toolbar private message handlers. */
-	BOOL					OnTBQueryInsert(LPARAM lParam);
-	BOOL					OnTBQueryDelete(LPARAM lParam);
+	BOOL					OnTBQueryInsert();
+	BOOL					OnTBQueryDelete();
 	BOOL					OnTBGetButtonInfo(LPARAM lParam);
-	BOOL					OnTBRestore(LPARAM lParam);
+	BOOL					OnTBRestore();
 	void					OnTBReset(void);
 	void					OnTBGetInfoTip(LPARAM lParam);
 
 	/* Tab control private message handlers. */
 	void					OnInitTabMenu(WPARAM wParam);
-	void					OnTabCtrlLButtonDown(WPARAM wParam,LPARAM lParam);
+	void					OnTabCtrlLButtonDown(POINT *pt);
 	void					OnTabCtrlLButtonUp(void);
-	void					OnTabCtrlMouseMove(WPARAM wParam,LPARAM lParam);
-	void					OnTabCtrlRButtonUp(WPARAM wParam,LPARAM lParam);
+	void					OnTabCtrlMouseMove(POINT *pt);
+	void					OnTabCtrlRButtonUp(POINT *pt);
 	void					ProcessTabCommand(UINT uMenuID,int iTabHit);
 
 	/* Address bar private message handlers. */
@@ -516,7 +516,7 @@ private:
 	/* Menus. */
 	HMENU					InitializeRightClickMenu(void);
 	void					SetProgramMenuItemStates(HMENU hProgramMenu);
-	void					SetArrangeMenuItemStates(HMENU);
+	void					SetArrangeMenuItemStates();
 
 	/* Columns. */
 	void					SetAllDefaultColumns(void);
@@ -554,7 +554,7 @@ private:
 	/* Settings. */
 	void					SaveAllSettings(void);
 	LONG					SaveSettings();
-	LONG					LoadSettings(LPCTSTR);
+	LONG					LoadSettings();
 	void					ValidateLoadedSettings(void);
 	void					ValidateToolbarSettings(void);
 	void					ValidateColumns(void);

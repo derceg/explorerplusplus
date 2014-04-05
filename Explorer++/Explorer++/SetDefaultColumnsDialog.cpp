@@ -184,6 +184,8 @@ void CSetDefaultColumnsDialog::GetResizableControlInformation(CBaseDialog::Dialo
 
 INT_PTR CSetDefaultColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(HIWORD(wParam))
 	{
 	case CBN_SELCHANGE:

@@ -95,6 +95,8 @@ INT_PTR CAboutDialog::OnInitDialog()
 
 INT_PTR CAboutDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDOK:

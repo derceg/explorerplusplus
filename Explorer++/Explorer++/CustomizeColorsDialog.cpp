@@ -180,6 +180,8 @@ void CCustomizeColorsDialog::InsertColorRuleIntoListView(HWND hListView,const NC
 
 INT_PTR CCustomizeColorsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDC_BUTTON_NEW:

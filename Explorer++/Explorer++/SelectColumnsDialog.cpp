@@ -153,6 +153,8 @@ void CSelectColumnsDialog::GetResizableControlInformation(CBaseDialog::DialogSiz
 
 INT_PTR CSelectColumnsDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	switch(LOWORD(wParam))
 	{
 	case IDC_COLUMNS_MOVEUP:

@@ -77,6 +77,8 @@ void CBookmarksToolbar::InitializeToolbar()
 LRESULT CALLBACK BookmarksToolbarProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CBookmarksToolbar *pbt = reinterpret_cast<CBookmarksToolbar *>(dwRefData);
 
 	return pbt->BookmarksToolbarProc(hwnd,uMsg,wParam,lParam);
@@ -115,6 +117,8 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 LRESULT CALLBACK BookmarksToolbarParentProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	CBookmarksToolbar *pbt = reinterpret_cast<CBookmarksToolbar *>(dwRefData);
 
 	return pbt->BookmarksToolbarParentProc(hwnd,uMsg,wParam,lParam);
@@ -404,8 +408,10 @@ ULONG __stdcall CBookmarksToolbarDropHandler::Release(void)
 }
 
 HRESULT __stdcall CBookmarksToolbarDropHandler::DragEnter(IDataObject *pDataObject,
-	DWORD grfKeyStat,POINTL pt,DWORD *pdwEffect)
+	DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
+	UNREFERENCED_PARAMETER(grfKeyState);
+
 	bool m_bValid = false;
 	bool m_bAllFolders = true;
 
@@ -465,6 +471,8 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::DragEnter(IDataObject *pDataObje
 HRESULT __stdcall CBookmarksToolbarDropHandler::DragOver(DWORD grfKeyState,
 	POINTL pt,DWORD *pdwEffect)
 {
+	UNREFERENCED_PARAMETER(grfKeyState);
+
 	if(m_bAcceptData)
 	{
 		*pdwEffect = DROPEFFECT_COPY;
@@ -520,6 +528,8 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::DragLeave(void)
 HRESULT __stdcall CBookmarksToolbarDropHandler::Drop(IDataObject *pDataObject,
 	DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
+	UNREFERENCED_PARAMETER(grfKeyState);
+
 	FORMATETC ftc = {CF_HDROP,0,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 	STGMEDIUM stg;
 

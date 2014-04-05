@@ -79,6 +79,8 @@ BOOL CALLBACK CIPBookmarkItemNotifier::BookmarkNotifierEnumWindows(HWND hwnd,voi
 
 void CIPBookmarkItemNotifier::OnBookmarkModified(const GUID &guid)
 {
+	UNREFERENCED_PARAMETER(guid);
+
 	/* TODO: Need to be able to look up the specified bookmark and
 	serialize it. */
 	//BookmarkItemModified(sd,false);
@@ -86,6 +88,8 @@ void CIPBookmarkItemNotifier::OnBookmarkModified(const GUID &guid)
 
 void CIPBookmarkItemNotifier::OnBookmarkFolderModified(const GUID &guid)
 {
+	UNREFERENCED_PARAMETER(guid);
+
 	/* TODO: Serialize. */
 	//BookmarkItemModified(,true);
 }
@@ -277,6 +281,8 @@ void CIPBookmarkObserver::BookmarkItemAdded(void *pData,bool bFolder)
 
 void CIPBookmarkObserver::BookmarkItemModified(void *pData)
 {
+	UNREFERENCED_PARAMETER(pData);
+
 	//IPBookmarkModifiedNotification_t *pipbmn = reinterpret_cast<IPBookmarkModifiedNotification_t *>(pData);
 
 	/* TODO: Find the bookmark and modify it. */
@@ -284,6 +290,8 @@ void CIPBookmarkObserver::BookmarkItemModified(void *pData)
 
 void CIPBookmarkObserver::BookmarkItemRemoved(void *pData)
 {
+	UNREFERENCED_PARAMETER(pData);
+
 	//IPBookmarkRemovedNotification_t *pipbrn = reinterpret_cast<IPBookmarkRemovedNotification_t *>(pData);
 
 	/* TODO: Find the bookmarks parent, and remove the

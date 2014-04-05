@@ -61,6 +61,8 @@ INT_PTR CApplicationToolbarButtonDialog::OnInitDialog()
 
 INT_PTR CApplicationToolbarButtonDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	if(HIWORD(wParam) != 0)
 	{
 		switch(HIWORD(wParam))

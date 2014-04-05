@@ -258,6 +258,8 @@ HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 LRESULT CALLBACK RebarSubclassStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
 	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
 
 	return pContainer->RebarSubclass(hwnd,uMsg,wParam,lParam);
@@ -484,12 +486,12 @@ void Explorerplusplus::InsertToolbarButtons(void)
 	free(ptbButton);
 }
 
-BOOL Explorerplusplus::OnTBQueryInsert(LPARAM lParam)
+BOOL Explorerplusplus::OnTBQueryInsert()
 {
 	return TRUE;
 }
 
-BOOL Explorerplusplus::OnTBQueryDelete(LPARAM lParam)
+BOOL Explorerplusplus::OnTBQueryDelete()
 {
 	/* All buttons can be deleted. */
 	return TRUE;
@@ -525,7 +527,7 @@ BOOL Explorerplusplus::OnTBGetButtonInfo(LPARAM lParam)
 	}
 }
 
-BOOL Explorerplusplus::OnTBRestore(LPARAM lParam)
+BOOL Explorerplusplus::OnTBRestore()
 {
 	return 0;
 }

@@ -165,6 +165,8 @@ void CDisplayColoursDialog::InitializePreviewWindow()
 
 INT_PTR CDisplayColoursDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
+	UNREFERENCED_PARAMETER(lParam);
+
 	if(HIWORD(wParam) != 0)
 	{
 		switch(HIWORD(wParam))
@@ -254,6 +256,8 @@ void CDisplayColoursDialog::OnChooseFont()
 
 INT_PTR CDisplayColoursDialog::OnHScroll(HWND hwnd)
 {
+	UNREFERENCED_PARAMETER(hwnd);
+
 	UpdateEditControlsFromSlider(m_CenterGroup);
 	UpdateEditControlsFromSlider(m_SurroundingGroup);
 

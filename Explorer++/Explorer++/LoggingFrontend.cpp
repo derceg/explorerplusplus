@@ -30,23 +30,31 @@ namespace
 
 PANTHEIOS_CALL(int) pantheios_fe_init(void *reserved,void **ptoken)
 {
-    *ptoken = NULL;
+	UNREFERENCED_PARAMETER(reserved);
 
-    return 0;
+	*ptoken = NULL;
+
+	return 0;
 }
 
 PANTHEIOS_CALL(void) pantheios_fe_uninit(void *token)
 {
-
+	UNREFERENCED_PARAMETER(token);
 }
 
 PANTHEIOS_CALL(PAN_CHAR_T const *) pantheios_fe_getProcessIdentity(void *token)
 {
+	UNREFERENCED_PARAMETER(token);
+
 	return L"Explorer++";
 }
 
 PANTHEIOS_CALL(int) pantheios_fe_isSeverityLogged(void *token,int severity,int backEndId)
 {
+	UNREFERENCED_PARAMETER(token);
+	UNREFERENCED_PARAMETER(severity);
+	UNREFERENCED_PARAMETER(backEndId);
+
 	if(g_EnableLogging)
 	{
 		return 1;

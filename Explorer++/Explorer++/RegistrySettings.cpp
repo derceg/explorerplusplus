@@ -200,7 +200,7 @@ LONG Explorerplusplus::SaveSettings(void)
 	return ReturnValue;
 }
 
-LONG Explorerplusplus::LoadSettings(LPCTSTR KeyPath)
+LONG Explorerplusplus::LoadSettings()
 {
 	HKEY			hSettingsKey;
 	LONG			ReturnValue;
@@ -1039,7 +1039,7 @@ Explorerplusplus::CLoadSaveRegistry::~CLoadSaveRegistry()
 
 void Explorerplusplus::CLoadSaveRegistry::LoadGenericSettings()
 {
-	m_pContainer->LoadSettings(REG_MAIN_KEY);
+	m_pContainer->LoadSettings();
 }
 
 void Explorerplusplus::CLoadSaveRegistry::LoadBookmarks()

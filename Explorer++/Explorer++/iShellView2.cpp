@@ -79,21 +79,31 @@ ULONG __stdcall CShellView2::Release(void)
 
 HRESULT CShellView2::CreateViewWindow2(LPSV2CVW2_PARAMS lpParams)
 {
+	UNREFERENCED_PARAMETER(lpParams);
+
 	return S_OK;
 }
 
 HRESULT CShellView2::GetView(SHELLVIEWID *pvid,ULONG uView)
 {
+	UNREFERENCED_PARAMETER(pvid);
+	UNREFERENCED_PARAMETER(uView);
+
 	return S_OK;
 }
 
 HRESULT CShellView2::HandleRename(LPCITEMIDLIST pidlNew)
 {
+	UNREFERENCED_PARAMETER(pidlNew);
+
 	return S_OK;
 }
 
 HRESULT CShellView2::SelectAndPositionItem(LPCITEMIDLIST pidlItem,UINT uFlags,POINT *ppt)
 {
+	UNREFERENCED_PARAMETER(uFlags);
+	UNREFERENCED_PARAMETER(ppt);
+
 	LPITEMIDLIST pidlComplete = NULL;
 	LPITEMIDLIST pidlDirectory = NULL;
 
@@ -110,28 +120,38 @@ HRESULT CShellView2::SelectAndPositionItem(LPCITEMIDLIST pidlItem,UINT uFlags,PO
 	return S_OK;
 }
 
-HRESULT CShellView2::GetWindow(HWND *)
+HRESULT CShellView2::GetWindow(HWND *phwnd)
 {
+	UNREFERENCED_PARAMETER(phwnd);
+
 	return S_OK;
 }
 
 HRESULT CShellView2::ContextSensitiveHelp(BOOL bHelp)
 {
+	UNREFERENCED_PARAMETER(bHelp);
+
 	return S_OK;
 }
 
 HRESULT CShellView2::TranslateAccelerator(MSG *msg)
 {
+	UNREFERENCED_PARAMETER(msg);
+
 	return S_OK;
 }
 
 HRESULT CShellView2::EnableModeless(BOOL fEnable)
 {
+	UNREFERENCED_PARAMETER(fEnable);
+
 	return S_OK;
 }
 
 HRESULT CShellView2::UIActivate(UINT uActivate)
 {
+	UNREFERENCED_PARAMETER(uActivate);
+
 	return S_OK;
 }
 
@@ -142,6 +162,12 @@ HRESULT CShellView2::Refresh(void)
 
 HRESULT CShellView2::CreateViewWindow(IShellView *psvPrevious,LPCFOLDERSETTINGS pfs,IShellBrowser *psb,RECT *prcView,HWND *phWnd)
 {
+	UNREFERENCED_PARAMETER(psvPrevious);
+	UNREFERENCED_PARAMETER(pfs);
+	UNREFERENCED_PARAMETER(psb);
+	UNREFERENCED_PARAMETER(prcView);
+	UNREFERENCED_PARAMETER(phWnd);
+
 	return S_OK;
 }
 
@@ -152,11 +178,17 @@ HRESULT CShellView2::DestroyViewWindow(void)
 
 HRESULT CShellView2::GetCurrentInfo(LPFOLDERSETTINGS pfs)
 {
+	UNREFERENCED_PARAMETER(pfs);
+
 	return S_OK;
 }
 
 HRESULT CShellView2::AddPropertySheetPages(DWORD dwReserved,LPFNSVADDPROPSHEETPAGE pfn,LPARAM lparam)
 {
+	UNREFERENCED_PARAMETER(dwReserved);
+	UNREFERENCED_PARAMETER(pfn);
+	UNREFERENCED_PARAMETER(lparam);
+
 	return S_OK;
 }
 
@@ -167,10 +199,17 @@ HRESULT CShellView2::SaveViewState(void)
 
 HRESULT CShellView2::SelectItem(LPCITEMIDLIST pidlItem,SVSIF uFlags)
 {
+	UNREFERENCED_PARAMETER(pidlItem);
+	UNREFERENCED_PARAMETER(uFlags);
+
 	return S_OK;
 }
 
 HRESULT CShellView2::GetItemObject(UINT uItem,REFIID riid,void **ppv)
 {
+	UNREFERENCED_PARAMETER(uItem);
+	UNREFERENCED_PARAMETER(riid);
+	UNREFERENCED_PARAMETER(ppv);
+
 	return S_OK;
 }
