@@ -169,12 +169,14 @@ DWORD WINAPI Thread_DirModifiedInternal(LPVOID lpParameter)
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 
 	/* Warning C4127 (conditional expression is
-	constant) temporarily disabled for this funtion. */
-	#pragma warning( disable : 4127 )
+	constant) temporarily disabled for this function. */
+	#pragma warning(push)
+	#pragma warning(disable:4127)
 	while(TRUE)
 	{
 		SleepEx(INFINITE,TRUE);
 	}
+	#pragma warning(pop)
 
 	return 0;
 }
