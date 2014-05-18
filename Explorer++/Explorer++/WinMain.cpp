@@ -339,7 +339,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 		{
 			MessageBox(NULL,
 				_T("This application needs at least Windows XP or above to run properly."),
-				_T("Explorer++"),MB_ICONERROR | MB_OK);
+				NExplorerplusplus::APP_NAME,MB_ICONERROR | MB_OK);
 
 			return 0;
 		}
