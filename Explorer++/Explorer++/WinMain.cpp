@@ -264,7 +264,6 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInf
 	SYSTEMTIME stLocalTime;
 	TCHAR szFileName[MAX_PATH];
 	TCHAR szPath[MAX_PATH];
-	TCHAR szAppName[] = _T("Explorer++");
 	LONG ret = EXCEPTION_CONTINUE_SEARCH;
 
 	hDbgHelp = LoadLibrary(_T("Dbghelp.dll"));
@@ -281,7 +280,7 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInf
 
 			StringCchPrintf(szFileName,SIZEOF_ARRAY(szFileName),
 				_T("%s\\%s%s-%02d%02d%04d-%02d%02d%02d.dmp"),
-				szPath,szAppName,VERSION_STRING_W,stLocalTime.wDay,stLocalTime.wMonth,
+				szPath,NExplorerplusplus::WINDOW_NAME,VERSION_STRING_W,stLocalTime.wDay,stLocalTime.wMonth,
 				stLocalTime.wYear,stLocalTime.wHour,stLocalTime.wMinute,stLocalTime.wSecond);
 			hFile = CreateFile(szFileName,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,
 				FILE_ATTRIBUTE_NORMAL,NULL);
