@@ -46,28 +46,9 @@ void Explorerplusplus::ValidateLoadedSettings(void)
 
 void Explorerplusplus::ValidateToolbarSettings(void)
 {
-	std::list<ToolbarButton_t>::iterator	itr;
-	BOOL							bCorrupted = FALSE;
-	int								*ButtonMap;
-	int								nButtons;
-	int								i = 0;
+	BOOL bCorrupted = FALSE;
 
-	nButtons = sizeof(TOOLBAR_BUTTON_SET) / sizeof(TOOLBAR_BUTTON_SET[0]);
-
-	ButtonMap = (int *)malloc(sizeof(int) * nButtons);
-
-	for(i = 0;i < nButtons;i++)
-	{
-		ButtonMap[i] = 0;
-	}
-
-	/* Two things to check:
-	- Firstly, that all items id's are within range,
-	- and secondly, that no item is duplicated (except for
-	separators).
-	An empty set of items (i.e. no buttons on the toolbar) is
-	allowed. */
-	for(itr = m_tbInitial.begin();itr != m_tbInitial.end();itr++)
+	for(auto itr = m_tbInitial.begin();itr != m_tbInitial.end();itr++)
 	{
 		if(itr->iItemID < TOOLBAR_ID_START)
 		{
@@ -76,22 +57,10 @@ void Explorerplusplus::ValidateToolbarSettings(void)
 		}
 	}
 
-	if(!bCorrupted)
-	{
-		for(i = 0;i < nButtons;i++)
-		{
-			if(ButtonMap[i] > 1)
-			{
-				bCorrupted = TRUE;
-				break;
-			}
-		}
-	}
-
 	if(bCorrupted)
+	{
 		SetInitialToolbarButtons();
-
-	free(ButtonMap);
+	}
 }
 
 void Explorerplusplus::ValidateColumns(void)
