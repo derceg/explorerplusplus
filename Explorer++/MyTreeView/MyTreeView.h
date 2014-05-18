@@ -22,16 +22,13 @@ public:
 	HRESULT _stdcall	QueryContinueDrag(BOOL fEscapePressed,DWORD gfrKeyState);
 	HRESULT _stdcall	GiveFeedback(DWORD dwEffect);
 
+	LRESULT CALLBACK	TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 	/* User functions. */
-	LRESULT CALLBACK	TreeViewProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	HRESULT				AddDirectory(HTREEITEM hParent,LPITEMIDLIST pidlDirectory);
-	void				AddDirectoryInternal(IShellFolder *pShellFolder,LPITEMIDLIST pidlDirectory,HTREEITEM hParent);
 	LPITEMIDLIST		BuildPath(HTREEITEM hTreeItem);
 	HTREEITEM			LocateItem(LPITEMIDLIST pidlDirectory);
-	HTREEITEM			LocateDeletedItem(IN TCHAR *szFullFileName);
-	HTREEITEM			LocateItemByPath(TCHAR *szItemPath,BOOL bExpand);
 	void				EraseItems(HTREEITEM hParent);
-	HTREEITEM			LocateItemOnDesktopTree(TCHAR *szFullFileName);
 	BOOL				QueryDragging(void);
 	DWORD WINAPI		Thread_SubFolders(LPVOID pParam);
 	void				SetShowHidden(BOOL bShowHidden);
@@ -39,8 +36,6 @@ public:
 
 	/* Sorting. */
 	int CALLBACK		CompareItems(LPARAM lParam1,LPARAM lParam2);
-
-	static void			DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,void *pData);
 
 	/* Drag and Drop. */
 	HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
@@ -55,6 +50,7 @@ private:
 	/* Message handlers. */
 	LRESULT CALLBACK	OnNotify(NMHDR *pnmhdr);
 
+	void		AddDirectoryInternal(IShellFolder *pShellFolder, LPITEMIDLIST pidlDirectory, HTREEITEM hParent);
 	void		DirectoryModified(DWORD dwAction,TCHAR *szFullFileName);
 	void		DirectoryAltered(void);
 	HTREEITEM	AddRoot(void);
@@ -70,6 +66,11 @@ private:
 	void		OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
 	void		UpdateChildren(HTREEITEM hParent,LPITEMIDLIST pidlParent);
 	LPITEMIDLIST	UpdateItemInfo(LPITEMIDLIST pidlParent,int iItemId);
+	HTREEITEM	LocateDeletedItem(IN TCHAR *szFullFileName);
+	HTREEITEM	LocateItemByPath(TCHAR *szItemPath, BOOL bExpand);
+	HTREEITEM	LocateItemOnDesktopTree(TCHAR *szFullFileName);
+
+	static void	DirectoryAlteredCallback(TCHAR *szFileName, DWORD dwAction, void *pData);
 
 	/* Directory modification. */
 	void		DirectoryAlteredAddFile(TCHAR *szFullFileName);
