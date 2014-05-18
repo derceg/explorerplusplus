@@ -299,8 +299,10 @@ void Explorerplusplus::HandleMainWindowText(void)
 		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SIZEOF_ARRAY(szFolderDisplayName),SHGDN_NORMAL);
 	}
 
+	TCHAR szTemp[64];
+	LoadString(m_hLanguageModule, IDS_MAIN_WINDOW_TITLE, szTemp, SIZEOF_ARRAY(szTemp));
 	StringCchPrintf(szTitle,SIZEOF_ARRAY(szTitle),
-	_T("%s - Explorer++"),szFolderDisplayName);
+	szTemp,szFolderDisplayName,NExplorerplusplus::WINDOW_NAME);
 
 	if(m_bShowUserNameInTitleBar || m_bShowPrivilegeLevelInTitleBar)
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),_T(" ["));
