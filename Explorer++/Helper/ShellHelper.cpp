@@ -712,6 +712,8 @@ HRESULT GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *psc
 		{
 			hr = StringCchCopy(szDetail, cchMax, V_BSTR(&vt));
 		}
+
+		VariantClear(&vt);
 	}
 
 	return hr;
