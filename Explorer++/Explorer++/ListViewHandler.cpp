@@ -450,9 +450,9 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 	switch(lv_key->wVKey)
 	{
 		case VK_RETURN:
-			if((GetKeyState(VK_CONTROL) & 0x80) &&
-			!(GetKeyState(VK_SHIFT) & 0x80) &&
-			!(GetKeyState(VK_MENU) & 0x80))
+			if((GetKeyState(VK_CONTROL) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_MENU) & 0x8000))
 			{
 				/* Key press: Ctrl+Enter
 				Action: Open item in background tab. */
@@ -465,16 +465,16 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 			break;
 
 		case VK_DELETE:
-			if(GetKeyState(VK_SHIFT) & 0x80)
+			if(GetKeyState(VK_SHIFT) & 0x8000)
 				OnListViewFileDelete(TRUE);
 			else
 				OnListViewFileDelete(FALSE);
 			break;
 
 		case VK_BACK:
-			if((GetKeyState(VK_CONTROL) & 0x80) &&
-			!(GetKeyState(VK_SHIFT) & 0x80) &&
-			!(GetKeyState(VK_MENU) & 0x80))
+			if((GetKeyState(VK_CONTROL) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_MENU) & 0x8000))
 			{
 				LPITEMIDLIST pidl = NULL;
 				TCHAR szRoot[MAX_PATH];
@@ -497,9 +497,9 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 			break;
 
 		case 'A':
-			if((GetKeyState(VK_CONTROL) & 0x80) &&
-			!(GetKeyState(VK_SHIFT) & 0x80) &&
-			!(GetKeyState(VK_MENU) & 0x80))
+			if((GetKeyState(VK_CONTROL) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_MENU) & 0x8000))
 			{
 				m_bCountingUp = TRUE;
 				NListView::ListView_SelectAllItems(m_hActiveListView,TRUE);
@@ -508,16 +508,16 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 			break;
 
 		case 'C':
-			if((GetKeyState(VK_CONTROL) & 0x80) &&
-			!(GetKeyState(VK_SHIFT) & 0x80) &&
-			!(GetKeyState(VK_MENU) & 0x80))
+			if((GetKeyState(VK_CONTROL) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_MENU) & 0x8000))
 				OnListViewCopy(TRUE);
 			break;
 
 		case 'I':
-			if((GetKeyState(VK_CONTROL) & 0x80) &&
-			!(GetKeyState(VK_SHIFT) & 0x80) &&
-			!(GetKeyState(VK_MENU) & 0x80))
+			if((GetKeyState(VK_CONTROL) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_MENU) & 0x8000))
 			{
 				m_bInverted = TRUE;
 				m_nSelectedOnInvert = m_nSelected;
@@ -527,16 +527,16 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 			break;
 
 		case 'V':
-			if((GetKeyState(VK_CONTROL) & 0x80) &&
-			!(GetKeyState(VK_SHIFT) & 0x80) &&
-			!(GetKeyState(VK_MENU) & 0x80))
+			if((GetKeyState(VK_CONTROL) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_MENU) & 0x8000))
 				OnListViewPaste();
 			break;
 
 		case 'X':
-			if((GetKeyState(VK_CONTROL) & 0x80) &&
-			!(GetKeyState(VK_SHIFT) & 0x80) &&
-			!(GetKeyState(VK_MENU) & 0x80))
+			if((GetKeyState(VK_CONTROL) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_MENU) & 0x8000))
 				OnListViewCopy(FALSE);
 			break;
 	}
@@ -948,9 +948,9 @@ void Explorerplusplus::OnListViewRClick(POINT *pCursorPos)
 
 	SetForegroundWindow(m_hContainer);
 
-	if((GetKeyState(VK_SHIFT) & 0x80) &&
-		!(GetKeyState(VK_CONTROL) & 0x80) &&
-		!(GetKeyState(VK_MENU) & 0x80))
+	if((GetKeyState(VK_SHIFT) & 0x8000) &&
+		!(GetKeyState(VK_CONTROL) & 0x8000) &&
+		!(GetKeyState(VK_MENU) & 0x8000))
 	{
 		LVHITTESTINFO lvhti;
 
@@ -1089,7 +1089,7 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 		CStatusBar StatusBar(m_hStatusBar);
 
 		fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,pCursorPos,&StatusBar,
-			reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,GetKeyState(VK_SHIFT) & 0x80);
+			reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,GetKeyState(VK_SHIFT) & 0x8000);
 
 		CoTaskMemFree(pidlDirectory);
 

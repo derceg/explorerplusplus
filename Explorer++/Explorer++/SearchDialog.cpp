@@ -795,7 +795,7 @@ INT_PTR CSearchDialog::OnNotify(NMHDR *pnmhdr)
 							ptCursor.y = GET_Y_LPARAM(dwCursorPos);
 
 							fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&ptCursor,m_pexpp->GetStatusBar(),
-								NULL,FALSE,GetKeyState(VK_SHIFT) & 0x80);
+								NULL,FALSE,GetKeyState(VK_SHIFT) & 0x8000);
 
 							CoTaskMemFree(pidlDirectory);
 							CoTaskMemFree(pidlFull);

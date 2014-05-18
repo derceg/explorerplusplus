@@ -234,7 +234,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 				CStatusBar StatusBar(m_hStatusBar);
 
 				fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,ppt,&StatusBar,
-					reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,GetKeyState(VK_SHIFT) & 0x80);
+					reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,GetKeyState(VK_SHIFT) & 0x8000);
 
 				CoTaskMemFree(pidlParent);
 			}
@@ -564,30 +564,30 @@ LRESULT Explorerplusplus::OnTreeViewKeyDown(LPARAM lParam)
 	switch(nmtvkd->wVKey)
 	{
 	case VK_DELETE:
-		if(GetKeyState(VK_SHIFT) & 0x80)
+		if(GetKeyState(VK_SHIFT) & 0x8000)
 			OnTreeViewFileDelete(TRUE);
 		else
 			OnTreeViewFileDelete(FALSE);
 		break;
 
 	case 'C':
-		if((GetKeyState(VK_CONTROL) & 0x80) &&
-			!(GetKeyState(VK_SHIFT) & 0x80) &&
-			!(GetKeyState(VK_MENU) & 0x80))
+		if((GetKeyState(VK_CONTROL) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_MENU) & 0x8000))
 			OnTreeViewCopy(TRUE);
 		break;
 
 	case 'V':
-		if((GetKeyState(VK_CONTROL) & 0x80) &&
-			!(GetKeyState(VK_SHIFT) & 0x80) &&
-			!(GetKeyState(VK_MENU) & 0x80))
+		if((GetKeyState(VK_CONTROL) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_MENU) & 0x8000))
 			OnTreeViewPaste();
 		break;
 
 	case 'X':
-		if((GetKeyState(VK_CONTROL) & 0x80) &&
-			!(GetKeyState(VK_SHIFT) & 0x80) &&
-			!(GetKeyState(VK_MENU) & 0x80))
+		if((GetKeyState(VK_CONTROL) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_MENU) & 0x8000))
 			OnTreeViewCopy(FALSE);
 		break;
 	}
@@ -595,7 +595,7 @@ LRESULT Explorerplusplus::OnTreeViewKeyDown(LPARAM lParam)
 	/* If the ctrl key is down, this key sequence
 	is likely a modifier. Stop any other pressed
 	key from been used in an incremental search. */
-	if(GetKeyState(VK_CONTROL) & 0x80)
+	if(GetKeyState(VK_CONTROL) & 0x8000)
 		return 1;
 
 	return 0;

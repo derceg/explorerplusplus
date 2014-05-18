@@ -765,9 +765,9 @@ void CManageBookmarksDialog::OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd)
 		break;
 
 	case 'A':
-		if((GetKeyState(VK_CONTROL) & 0x80) &&
-			!(GetKeyState(VK_SHIFT) & 0x80) &&
-			!(GetKeyState(VK_MENU) & 0x80))
+		if((GetKeyState(VK_CONTROL) & 0x8000) &&
+			!(GetKeyState(VK_SHIFT) & 0x8000) &&
+			!(GetKeyState(VK_MENU) & 0x8000))
 		{
 			HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 			NListView::ListView_SelectAllItems(hListView,TRUE);
