@@ -1595,40 +1595,46 @@ void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)
 
 void Explorerplusplus::OnPreviousWindow(void)
 {
-	HWND	hFocus;
-
-	hFocus = GetFocus();
-
-	if(hFocus == m_hActiveListView)
+	if(m_bListViewRenaming)
 	{
-		if(m_bShowFolders)
+		SendMessage(ListView_GetEditControl(m_hActiveListView),
+			WM_APP_KEYDOWN, VK_TAB, 0);
+	}
+	else
+	{
+		HWND hFocus = GetFocus();
+
+		if(hFocus == m_hActiveListView)
 		{
-			SetFocus(m_hTreeView);
+			if(m_bShowFolders)
+			{
+				SetFocus(m_hTreeView);
+			}
+			else
+			{
+				if(m_bShowAddressBar)
+				{
+					SetFocus(m_hAddressBar);
+				}
+			}
 		}
-		else
+		else if(hFocus == m_hTreeView)
 		{
 			if(m_bShowAddressBar)
 			{
 				SetFocus(m_hAddressBar);
 			}
+			else
+			{
+				/* Always shown. */
+				SetFocus(m_hActiveListView);
+			}
 		}
-	}
-	else if(hFocus == m_hTreeView)
-	{
-		if(m_bShowAddressBar)
-		{
-			SetFocus(m_hAddressBar);
-		}
-		else
+		else if(hFocus == (HWND) SendMessage(m_hAddressBar, CBEM_GETEDITCONTROL, 0, 0))
 		{
 			/* Always shown. */
 			SetFocus(m_hActiveListView);
 		}
-	}
-	else if(hFocus == (HWND)SendMessage(m_hAddressBar,CBEM_GETEDITCONTROL,0,0))
-	{
-		/* Always shown. */
-		SetFocus(m_hActiveListView);
 	}
 }
 
@@ -1638,8 +1644,6 @@ void Explorerplusplus::OnPreviousWindow(void)
  */
 void Explorerplusplus::OnNextWindow(void)
 {
-	HWND	hFocus;
-
 	if(m_bListViewRenaming)
 	{
 		SendMessage(ListView_GetEditControl(m_hActiveListView),
@@ -1647,7 +1651,7 @@ void Explorerplusplus::OnNextWindow(void)
 	}
 	else
 	{
-		hFocus = GetFocus();
+		HWND hFocus = GetFocus();
 
 		/* Check if the next target window is visible.
 		If it is, select it, else select the next

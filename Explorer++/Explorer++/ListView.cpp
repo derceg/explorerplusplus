@@ -114,13 +114,27 @@ INT_PTR CListViewEdit::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 				int iNewSel;
 
-				if(iSel == (nItems - 1))
+				if(GetKeyState(VK_SHIFT) & 0x8000)
 				{
-					iNewSel = 0;
+					if(iSel == 0)
+					{
+						iNewSel = nItems - 1;
+					}
+					else
+					{
+						iNewSel = iSel - 1;
+					}
 				}
 				else
 				{
-					iNewSel = iSel + 1;
+					if(iSel == (nItems - 1))
+					{
+						iNewSel = 0;
+					}
+					else
+					{
+						iNewSel = iSel + 1;
+					}
 				}
 
 				ListView_EditLabel(hListView,iNewSel);
