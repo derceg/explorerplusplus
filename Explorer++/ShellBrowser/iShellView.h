@@ -567,7 +567,6 @@ private:
 	void				AllocateInitialItemMemory(void);
 
 	/* Browsing support. */
-	void				BrowseVirtualFolder(TCHAR *szParsingName);
 	void				BrowseVirtualFolder(LPITEMIDLIST pidlDirectory);
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void inline			InsertAwaitingItems(BOOL bInsertIntoGroup);

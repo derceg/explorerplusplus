@@ -479,16 +479,6 @@ BOOL *bStoreHistory)
 	return S_OK;
 }
 
-void CShellBrowser::BrowseVirtualFolder(TCHAR *szParsingName)
-{
-	LPITEMIDLIST pidl = NULL;
-	GetIdlFromParsingName(szParsingName,&pidl);
-
-	BrowseVirtualFolder(pidl);
-
-	CoTaskMemFree(pidl);
-}
-
 void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 {
 	IShellFolder	*pShellFolder = NULL;
