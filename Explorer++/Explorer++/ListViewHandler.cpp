@@ -805,7 +805,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		LoadString(m_hLanguageModule,IDS_FILERENAMEERROR,szTemp,
 		SIZEOF_ARRAY(szTemp));
 
-		MessageBox(m_hContainer,szTemp,NExplorerplusplus::WINDOW_NAME,
+		MessageBox(m_hContainer,szTemp,NExplorerplusplus::APP_NAME,
 			MB_ICONWARNING|MB_OK);
 	}
 

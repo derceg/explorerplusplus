@@ -425,7 +425,7 @@ void CApplicationToolbar::DeleteItem(int iItem)
 		szInfoMsg,SIZEOF_ARRAY(szInfoMsg));
 
 	int iMessageBoxReturn = MessageBox(m_hwnd,szInfoMsg,
-		NExplorerplusplus::WINDOW_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
+		NExplorerplusplus::APP_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
 
 	if(iMessageBoxReturn == IDYES)
 	{

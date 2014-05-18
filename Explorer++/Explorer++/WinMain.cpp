@@ -123,12 +123,12 @@ BOOL ProcessCommandLine(TCHAR *pCommandLine)
 			if(bSuccess)
 			{
 				MessageBox(NULL,_T("Explorer++ successfully removed as default file manager."),
-					NExplorerplusplus::WINDOW_NAME,MB_OK);
+					NExplorerplusplus::APP_NAME,MB_OK);
 			}
 			else
 			{
 				MessageBox(NULL,_T("Could not remove Explorer++ as default file manager. Please \
-ensure you have administrator privileges."),NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_OK);
+ensure you have administrator privileges."),NExplorerplusplus::APP_NAME,MB_ICONWARNING|MB_OK);
 			}
 		}
 		else if(lstrcmp(szPath,_T("-set_as_default")) == 0)
@@ -143,12 +143,12 @@ ensure you have administrator privileges."),NExplorerplusplus::WINDOW_NAME,MB_IC
 			if(bSuccess)
 			{
 				MessageBox(NULL,_T("Explorer++ successfully set as default file manager."),
-					NExplorerplusplus::WINDOW_NAME,MB_OK);
+					NExplorerplusplus::APP_NAME,MB_OK);
 			}
 			else
 			{
 				MessageBox(NULL,_T("Could not set Explorer++ as default file manager. Please \
-ensure you have administrator privileges."),NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_OK);
+ensure you have administrator privileges."),NExplorerplusplus::APP_NAME,MB_ICONWARNING|MB_OK);
 			}
 		}
 		else if(lstrcmp(szPath,NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT) == 0)
@@ -222,7 +222,7 @@ supplying their name:\n\
 e.g. explorer++.exe \"control panel\"\nwill open the \
 Control Panel\n");
 
-	MessageBox(NULL,UsageString,NExplorerplusplus::WINDOW_NAME,MB_OK);
+	MessageBox(NULL,UsageString,NExplorerplusplus::APP_NAME,MB_OK);
 }
 
 void ClearRegistrySettings(void)
@@ -232,9 +232,9 @@ void ClearRegistrySettings(void)
 	lStatus = SHDeleteKey(HKEY_CURRENT_USER,REG_MAIN_KEY);
 
 	if(lStatus == ERROR_SUCCESS)
-		MessageBox(NULL,_T("Settings cleared successfully."),NExplorerplusplus::WINDOW_NAME,MB_OK);
+		MessageBox(NULL,_T("Settings cleared successfully."),NExplorerplusplus::APP_NAME,MB_OK);
 	else
-		MessageBox(NULL,_T("Settings could not be cleared."),NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING);
+		MessageBox(NULL,_T("Settings could not be cleared."),NExplorerplusplus::APP_NAME,MB_ICONWARNING);
 }
 
 ATOM RegisterMainWindowClass(HINSTANCE hInstance)
@@ -280,7 +280,7 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInf
 
 			StringCchPrintf(szFileName,SIZEOF_ARRAY(szFileName),
 				_T("%s\\%s%s-%02d%02d%04d-%02d%02d%02d.dmp"),
-				szPath,NExplorerplusplus::WINDOW_NAME,VERSION_STRING_W,stLocalTime.wDay,stLocalTime.wMonth,
+				szPath,NExplorerplusplus::APP_NAME,VERSION_STRING_W,stLocalTime.wDay,stLocalTime.wMonth,
 				stLocalTime.wYear,stLocalTime.wHour,stLocalTime.wMinute,stLocalTime.wSecond);
 			hFile = CreateFile(szFileName,GENERIC_WRITE,0,NULL,CREATE_ALWAYS,
 				FILE_ATTRIBUTE_NORMAL,NULL);
@@ -551,7 +551,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 	if(res == 0)
 	{
-		MessageBox(NULL,_T("Could not register class"),NExplorerplusplus::WINDOW_NAME,
+		MessageBox(NULL,_T("Could not register class"),NExplorerplusplus::APP_NAME,
 			MB_OK|MB_ICONERROR);
 
 		FreeLibrary(hRichEditLib);
@@ -566,7 +566,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	container for all child windows created. */
 	hwnd = CreateWindow(
 	NExplorerplusplus::CLASS_NAME,
-	NExplorerplusplus::WINDOW_NAME,
+	NExplorerplusplus::APP_NAME,
 	WS_OVERLAPPEDWINDOW,
 	CW_USEDEFAULT,
 	CW_USEDEFAULT,
@@ -579,7 +579,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 	if(hwnd == NULL)
 	{
-		MessageBox(NULL,_T("Could not create main window."),NExplorerplusplus::WINDOW_NAME,
+		MessageBox(NULL,_T("Could not create main window."),NExplorerplusplus::APP_NAME,
 			MB_OK|MB_ICONERROR);
 
 		FreeLibrary(hRichEditLib);

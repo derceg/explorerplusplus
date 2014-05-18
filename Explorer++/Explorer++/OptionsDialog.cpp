@@ -388,7 +388,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 								TCHAR szErrorMsg[256];
 								LoadString(m_hLanguageModule,IDS_ERR_FILEMANAGERSETTING,
 									szErrorMsg,SIZEOF_ARRAY(szErrorMsg));
-								MessageBox(hDlg,szErrorMsg,NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING);
+								MessageBox(hDlg,szErrorMsg,NExplorerplusplus::APP_NAME,MB_ICONWARNING);
 
 								int nIDButton;
 

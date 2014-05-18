@@ -510,7 +510,7 @@ void Explorerplusplus::SetLanguageModule(void)
 
 				/* Main window hasn't been constructed yet, so this
 				message box doesn't have any owner window. */
-				MessageBox(NULL,szTemp,NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING);
+				MessageBox(NULL,szTemp,NExplorerplusplus::APP_NAME,MB_ICONWARNING);
 			}
 		}
 	}
@@ -1162,7 +1162,7 @@ int Explorerplusplus::OnClose(void)
 	{
 		TCHAR szTemp[128];
 		LoadString(m_hLanguageModule,IDS_GENERAL_CLOSE_ALL_TABS,szTemp,SIZEOF_ARRAY(szTemp));
-		int response = MessageBox(m_hContainer,szTemp,NExplorerplusplus::WINDOW_NAME,MB_ICONINFORMATION|MB_YESNO);
+		int response = MessageBox(m_hContainer,szTemp,NExplorerplusplus::APP_NAME,MB_ICONINFORMATION|MB_YESNO);
 
 		/* If the user clicked no, return without
 		closing. */
@@ -2047,7 +2047,7 @@ void Explorerplusplus::OnCreateNewFolder(void)
 		LoadString(m_hLanguageModule,IDS_NEWFOLDERERROR,szTemp,
 		SIZEOF_ARRAY(szTemp));
 
-		MessageBox(m_hContainer,szTemp,NExplorerplusplus::WINDOW_NAME,
+		MessageBox(m_hContainer,szTemp,NExplorerplusplus::APP_NAME,
 			MB_ICONERROR|MB_OK);
 	}
 }

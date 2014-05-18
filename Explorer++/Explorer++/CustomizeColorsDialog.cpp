@@ -364,7 +364,7 @@ void CCustomizeColorsDialog::OnDelete()
 			szInfoMsg,SIZEOF_ARRAY(szInfoMsg));
 
 		int iRes = MessageBox(m_hDlg,szInfoMsg,
-			NExplorerplusplus::WINDOW_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
+			NExplorerplusplus::APP_NAME,MB_YESNO|MB_ICONINFORMATION|MB_DEFBUTTON2);
 
 		if(iRes == IDYES)
 		{

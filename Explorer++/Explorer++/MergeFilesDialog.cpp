@@ -343,7 +343,7 @@ INT_PTR CMergeFilesDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lPara
 			TCHAR szTemp[64];
 			LoadString(GetInstance(),IDS_MERGE_FILES_OUTPUTFILEINVALID,
 				szTemp,SIZEOF_ARRAY(szTemp));
-			MessageBox(m_hDlg,szTemp,NExplorerplusplus::WINDOW_NAME,MB_ICONWARNING|MB_OK);
+			MessageBox(m_hDlg,szTemp,NExplorerplusplus::APP_NAME,MB_ICONWARNING|MB_OK);
 
 			assert(m_pMergeFiles != NULL);
 
@@ -379,7 +379,7 @@ void CMergeFilesDialog::OnOk()
 			LoadString(GetInstance(),IDS_MERGE_OUTPUTINVALID,
 				szTemp,SIZEOF_ARRAY(szTemp));
 
-			MessageBox(m_hDlg,szTemp,NExplorerplusplus::WINDOW_NAME,
+			MessageBox(m_hDlg,szTemp,NExplorerplusplus::APP_NAME,
 				MB_ICONWARNING|MB_OK);
 			return;
 		}

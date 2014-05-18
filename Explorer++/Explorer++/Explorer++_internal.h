@@ -8,7 +8,7 @@
 classes within the Explorer++ project. */
 namespace NExplorerplusplus
 {
-	const TCHAR WINDOW_NAME[]		= _T("Explorer++");
+	const TCHAR APP_NAME[]			= _T("Explorer++");
 	const TCHAR CLASS_NAME[]		= _T("Explorer++");
 
 	const TCHAR HELP_FILE_NAME[]	= _T("Explorer++ Help.chm");

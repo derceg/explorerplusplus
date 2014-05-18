@@ -270,7 +270,7 @@ void CDestroyFilesDialog::OnOk()
 
 	/* The default button in this message box will be the second
 	button (i.e. the no button). */
-	int iRes = MessageBox(m_hDlg,szConfirmation,NExplorerplusplus::WINDOW_NAME,
+	int iRes = MessageBox(m_hDlg,szConfirmation,NExplorerplusplus::APP_NAME,
 		MB_ICONWARNING|MB_SETFOREGROUND|MB_YESNO|MB_DEFBUTTON2);
 
 	switch(iRes)
