@@ -24,11 +24,9 @@ public:
 
 	/* User functions. */
 	LRESULT CALLBACK	TreeViewProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
-	HRESULT				AddDirectory(HTREEITEM hParent,TCHAR *szParsingPath);
 	HRESULT				AddDirectory(HTREEITEM hParent,LPITEMIDLIST pidlDirectory);
 	void				AddDirectoryInternal(IShellFolder *pShellFolder,LPITEMIDLIST pidlDirectory,HTREEITEM hParent);
 	LPITEMIDLIST		BuildPath(HTREEITEM hTreeItem);
-	HTREEITEM			LocateItem(TCHAR *szParsingPath);
 	HTREEITEM			LocateItem(LPITEMIDLIST pidlDirectory);
 	HTREEITEM			LocateDeletedItem(IN TCHAR *szFullFileName);
 	HTREEITEM			LocateItemByPath(TCHAR *szItemPath,BOOL bExpand);
@@ -36,14 +34,13 @@ public:
 	HTREEITEM			LocateItemOnDesktopTree(TCHAR *szFullFileName);
 	BOOL				QueryDragging(void);
 	DWORD WINAPI		Thread_SubFolders(LPVOID pParam);
-	DWORD WINAPI		Thread_AddDirectoryInternal(IShellFolder *pShellFolder,LPITEMIDLIST pidlDirectory,HTREEITEM hParent);
 	void				SetShowHidden(BOOL bShowHidden);
 	void				RefreshAllIcons(void);
 
 	/* Sorting. */
 	int CALLBACK		CompareItems(LPARAM lParam1,LPARAM lParam2);
 
-	static void DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,void *pData);
+	static void			DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,void *pData);
 
 	/* Drag and Drop. */
 	HRESULT _stdcall	DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
@@ -53,13 +50,10 @@ public:
 
 	void				MonitorDrivePublic(TCHAR *szDrive);
 
-	int					m_iProcessing;
-
 private:
 
 	/* Message handlers. */
 	LRESULT CALLBACK	OnNotify(NMHDR *pnmhdr);
-	LRESULT		OnSetCursor(void);
 
 	void		DirectoryModified(DWORD dwAction,TCHAR *szFullFileName);
 	void		DirectoryAltered(void);

@@ -59,7 +59,6 @@ HANDLE hIconsThread)
 
 	m_pDirMon = pDirMon;
 
-
 	m_uItemMap = (int *)malloc(DEFAULT_ITEM_ALLOCATION * sizeof(int));
 	m_pItemInfo = (ItemInfo_t *)malloc(DEFAULT_ITEM_ALLOCATION * sizeof(ItemInfo_t));
 
@@ -82,8 +81,6 @@ HANDLE hIconsThread)
 	m_bQueryRemoveCompleted = FALSE;
 	HANDLE hThread = CreateThread(NULL,0,Thread_MonitorAllDrives,this,0,NULL);
 	CloseHandle(hThread);
-
-	m_iProcessing = 0;
 }
 
 CMyTreeView::~CMyTreeView()
@@ -124,10 +121,6 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 		case WM_DEVICECHANGE:
 			return OnDeviceChange(wParam,lParam);
-			break;
-
-		case WM_SETCURSOR:
-			return OnSetCursor();
 			break;
 
 		case WM_RBUTTONDOWN:
@@ -228,24 +221,6 @@ LRESULT CALLBACK CMyTreeView::OnNotify(NMHDR *pnmhdr)
 	return 0;
 }
 
-LRESULT CMyTreeView::OnSetCursor(void)
-{
-	/* If the "app starting" cursor needs
-	to be shown, return TRUE to prevent the
-	OS from automatically resetting the
-	cursor; else return FALSE to allow the
-	OS to set the default cursor. */
-	if(m_iProcessing > 0)
-	{
-		SetCursor(LoadCursor(NULL,IDC_APPSTARTING));
-		return TRUE;
-	}
-
-	/* Set the cursor back to the default. */
-	SetCursor(LoadCursor(NULL,IDC_ARROW));
-	return FALSE;
-}
-
 HTREEITEM CMyTreeView::AddRoot(void)
 {
 	IShellFolder	*pDesktopFolder = NULL;
@@ -307,27 +282,6 @@ HTREEITEM CMyTreeView::AddRoot(void)
 	}
 
 	return hDesktop;
-}
-
-/*
-* Adds all the folder objects within a directory to the
-* specified treeview control.
-*/
-HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent,TCHAR *szParsingPath)
-{
-	LPITEMIDLIST	pidlDirectory = NULL;
-	HRESULT			hr;
-
-	hr = GetIdlFromParsingName(szParsingPath,&pidlDirectory);
-
-	if(SUCCEEDED(hr))
-	{
-		hr = AddDirectory(hParent,pidlDirectory);
-
-		CoTaskMemFree(pidlDirectory);
-	}
-
-	return hr;
 }
 
 HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent,LPITEMIDLIST pidlDirectory)
@@ -541,37 +495,21 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder,LPITEMIDLIST p
 HTREEITEM hParent)
 {
 	IEnumIDList		*pEnumIDList = NULL;
-	LPITEMIDLIST	pidl = NULL;
 	LPITEMIDLIST	rgelt = NULL;
 	ThreadInfo_t	*pThreadInfo = NULL;
 	SHCONTF			EnumFlags;
 	TCHAR			szDirectory[MAX_PATH];
-	TCHAR			szDirectory2[MAX_PATH];
 	ULONG			uFetched;
 	TVINSERTSTRUCT	tvis;
 	TVITEMEX		tvItem;
 	HRESULT			hr;
 	BOOL			bVirtualFolder;
-	BOOL			bMyComputer = FALSE;
 
 	bVirtualFolder = !SHGetPathFromIDList(pidlDirectory,szDirectory);
 
 	if(IsNamespaceRoot(pidlDirectory))
 	{
 		bVirtualFolder = TRUE;
-	}
-
-	hr = GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
-	hr = GetDisplayName(pidlDirectory,szDirectory2,SIZEOF_ARRAY(szDirectory2),SHGDN_FORPARSING);
-
-	hr = SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidl);
-
-	if(SUCCEEDED(hr))
-	{
-		if(CompareIdls(pidlDirectory,pidl))
-			bMyComputer = TRUE;
-
-		CoTaskMemFree(pidl);
 	}
 
 	SendMessage(m_hTreeView,WM_SETREDRAW,(WPARAM)FALSE,(LPARAM)NULL);
@@ -613,54 +551,49 @@ HTREEITEM hParent)
 
 					if(SUCCEEDED(hr))
 					{
-						BOOL bSkipItem = FALSE;
-
 						StrRetToBuf(&str,rgelt,ItemName,SIZEOF_ARRAY(ItemName));
 
-						if (!bSkipItem)
-						{ 
-							pidlComplete = ILCombine(pidlDirectory,rgelt);
+						pidlComplete = ILCombine(pidlDirectory,rgelt);
 
-							iItemId = GenerateUniqueItemId();
-							m_pItemInfo[iItemId].pidl = ILClone(pidlComplete);
-							m_pItemInfo[iItemId].pridl = ILClone(rgelt);
+						iItemId = GenerateUniqueItemId();
+						m_pItemInfo[iItemId].pidl = ILClone(pidlComplete);
+						m_pItemInfo[iItemId].pridl = ILClone(rgelt);
 
-							ItemStore.iItemId = iItemId;
-							StringCchCopy(ItemStore.ItemName,SIZEOF_ARRAY(ItemStore.ItemName),ItemName);
+						ItemStore.iItemId = iItemId;
+						StringCchCopy(ItemStore.ItemName,SIZEOF_ARRAY(ItemStore.ItemName),ItemName);
 
-							/* If this is a virtual directory, we'll post sort the items,
-							otherwise we'll pre-sort. */
-							if(bVirtualFolder)
+						/* If this is a virtual directory, we'll post sort the items,
+						otherwise we'll pre-sort. */
+						if(bVirtualFolder)
+						{
+							vItems.push_back(ItemStore);
+						}
+						else
+						{
+							itr = vItems.end();
+
+							/* Compare to the last item in the array and work
+							backwards. */
+							if(vItems.size() > 0)
 							{
-								vItems.push_back(ItemStore);
-							}
-							else
-							{
-								itr = vItems.end();
+								itr--;
 
-								/* Compare to the last item in the array and work
-								backwards. */
-								if(vItems.size() > 0)
+								while(StrCmpLogicalW(ItemName,itr->ItemName) < 0 && itr != vItems.begin())
 								{
 									itr--;
-
-									while(StrCmpLogicalW(ItemName,itr->ItemName) < 0 && itr != vItems.begin())
-									{
-										itr--;
-									}
-
-									/* itr in this case is the item AFTER
-									which the current item should be inserted.
-									The only exception to this is when we are
-									inserting an item at the start of the list,
-									in which case we need to insert BEFORE the
-									first item. */
-									if(itr != vItems.begin() || StrCmpLogicalW(ItemName,itr->ItemName) > 0)
-										itr++;
 								}
 
-								vItems.insert(itr,ItemStore);
+								/* itr in this case is the item AFTER
+								which the current item should be inserted.
+								The only exception to this is when we are
+								inserting an item at the start of the list,
+								in which case we need to insert BEFORE the
+								first item. */
+								if(itr != vItems.begin() || StrCmpLogicalW(ItemName,itr->ItemName) > 0)
+									itr++;
 							}
+
+							vItems.insert(itr,ItemStore);
 						}
 
 						CoTaskMemFree(pidlComplete);
@@ -782,117 +715,6 @@ DWORD WINAPI Thread_SubFoldersStub(LPVOID pParam)
 	pMyTreeView->Thread_SubFolders(pParam);
 
 	CoUninitialize();
-
-	return 0;
-}
-
-/* Check nearest ancestor that IS in treeview. If this ancestor is been expanded,
-queue a callback operation; else expand it.
-Once the ancestor has been expanded, the callback will be run. This will then
-check whether the ancestor is the direct parent of the item, or if it is
-farther up the tree. If it is the direct parent, the item will simply be
-selected. If it isn't the direct parent, this procedure will repeat, except that
-the nearest ancestor is now the ancestor that was just expanded. */
-DWORD WINAPI CMyTreeView::Thread_AddDirectoryInternal(IShellFolder *pShellFolder,
-LPITEMIDLIST pidlDirectory,HTREEITEM hParent)
-{
-	IEnumIDList		*pEnumIDList = NULL;
-	LPITEMIDLIST	rgelt = NULL;
-	ItemInfo_t		*pItemInfo = NULL;
-	SHCONTF			EnumFlags;
-	TCHAR			szDirectory[MAX_PATH];
-	ULONG			uFetched;
-	HTREEITEM		hItem;
-	TVINSERTSTRUCT	tvis;
-	TVITEMEX		tvItem;
-	HRESULT			hr;
-	int				iMonitorId = -1;
-
-	GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
-
-	EnumFlags = SHCONTF_FOLDERS;
-
-	if(m_bShowHidden)
-		EnumFlags |= SHCONTF_INCLUDEHIDDEN;
-
-	hr = pShellFolder->EnumObjects(NULL,EnumFlags,&pEnumIDList);
-
-	if(SUCCEEDED(hr))
-	{
-		/* Iterate over the subfolders items, and place them in the tree. */
-		uFetched = 1;
-		while(pEnumIDList->Next(1,&rgelt,&uFetched) == S_OK && (uFetched == 1))
-		{
-			SHFILEINFO shfi;
-			ULONG Attributes = SFGAO_FOLDER|SFGAO_STREAM|SFGAO_FILESYSTEM;
-
-			/* Only retrieve the attributes for this item. */
-			hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&rgelt,&Attributes);
-
-			if(SUCCEEDED(hr))
-			{
-				/* Is the item a folder? (SFGAO_STREAM is set on .zip files, along with
-				SFGAO_FOLDER). */
-				if((Attributes & SFGAO_FOLDER) && !(Attributes & SFGAO_STREAM))
-				{
-					LPITEMIDLIST	pidlComplete = NULL;
-					STRRET			str;
-					TCHAR			ItemName[MAX_PATH];
-					UINT			ItemMask;
-
-					hr = pShellFolder->GetDisplayNameOf(rgelt,SHGDN_NORMAL,&str);
-
-					if(SUCCEEDED(hr))
-					{
-						StrRetToBuf(&str,rgelt,ItemName,SIZEOF_ARRAY(ItemName));
-
-						pidlComplete = ILCombine(pidlDirectory,rgelt);
-
-						SHGetFileInfo((LPTSTR)pidlComplete,NULL,
-						&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX|SHGFI_ATTRIBUTES);
-
-						iMonitorId = -1;
-
-						hr = GetDisplayName(pidlComplete,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
-
-						pItemInfo = (ItemInfo_t *)malloc(sizeof(ItemInfo_t));
-
-						pItemInfo->pidl			= ILCombine(pidlDirectory,rgelt);
-
-						ItemMask = TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_CHILDREN;
-
-						tvItem.mask				= ItemMask;
-						tvItem.pszText			= ItemName;
-						tvItem.cchTextMax		= lstrlen(ItemName);
-						tvItem.iImage			= shfi.iIcon;
-						tvItem.iSelectedImage	= shfi.iIcon;
-						tvItem.lParam			= (LPARAM)pItemInfo;
-						tvItem.cChildren		= ((shfi.dwAttributes & SFGAO_HASSUBFOLDER) == SFGAO_HASSUBFOLDER) ? 1:0;
-
-						tvis.hInsertAfter		= DetermineItemSortedPosition(hParent,szDirectory);
-						tvis.hParent			= hParent;
-						tvis.itemex				= tvItem;
-
-						hItem = TreeView_InsertItem(m_hTreeView,&tvis);
-
-						CoTaskMemFree(pidlComplete);
-					}
-				}
-			}
-
-			CoTaskMemFree(rgelt);
-		}
-
-		pEnumIDList->Release();
-	}
-
-	tvItem.mask		= TVIF_HANDLE|TVIF_PARAM;
-	tvItem.hItem	= hParent;
-	TreeView_GetItem(m_hTreeView,&tvItem);
-
-	pItemInfo = (ItemInfo_t *)tvItem.lParam;
-
-	TreeView_Expand(m_hTreeView,hParent,TVE_EXPAND);
 
 	return 0;
 }
@@ -1105,24 +927,6 @@ LPITEMIDLIST CMyTreeView::BuildPath(HTREEITEM hTreeItem)
 	pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
 	return ILClone(pItemInfo->pidl);
-}
-
-HTREEITEM CMyTreeView::LocateItem(TCHAR *szParsingPath)
-{
-	LPITEMIDLIST	pidl = NULL;
-	HTREEITEM		hItem = NULL;
-	HRESULT			hr;
-
-	hr = GetIdlFromParsingName(szParsingPath,&pidl);
-
-	if(SUCCEEDED(hr))
-	{
-		hItem = LocateItem(pidl);
-
-		CoTaskMemFree(pidl);
-	}
-
-	return hItem;
 }
 
 HTREEITEM CMyTreeView::LocateItem(LPITEMIDLIST pidlDirectory)
