@@ -345,6 +345,9 @@
     <ClInclude Include="RegistrySettings.h">
       <Filter>Settings</Filter>
     </ClInclude>
+    <ClInclude Include="afxres.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
