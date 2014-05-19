@@ -35,8 +35,6 @@ DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 void CALLBACK		TVFindIconAPC(ULONG_PTR dwParam);
 BOOL				RemoveFromIconFinderQueue(TreeViewInfo_t *pListViewInfo);
 
-DWORD	g_ThreadId;
-
 CRITICAL_SECTION g_tv_icon_cs;
 int g_ntvAPCsRan = 0;
 int g_ntvAPCsQueued = 0;
@@ -648,7 +646,7 @@ HTREEITEM hParent)
 		pThreadInfo->hParent		= hParent;
 		pThreadInfo->pMyTreeView	= this;
 
-		HANDLE hThread = CreateThread(NULL,0,Thread_SubFoldersStub,pThreadInfo,0,&g_ThreadId);
+		HANDLE hThread = CreateThread(NULL,0,Thread_SubFoldersStub,pThreadInfo,0,NULL);
 		CloseHandle(hThread);
 	}
 }
