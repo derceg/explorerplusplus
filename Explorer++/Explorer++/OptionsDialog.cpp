@@ -907,7 +907,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 					/* Required if show full title path or show username/privilege level
 					in title bar options change. */
-					HandleMainWindowText();
+					UpdateMainWindowText();
 
 					if(!m_bAlwaysShowTabBar)
 					{

@@ -498,14 +498,9 @@ void Explorerplusplus::AddStringsToMainToolbar(void)
 	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 }
 
-/*
- * Sets the state of the items in the main toolbar.
- */
-void Explorerplusplus::HandleToolbarItemStates(void)
+void Explorerplusplus::UpdateMainToolbar(void)
 {
-    BOOL	bVirtualFolder;
-
-    bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
+	BOOL bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
 	SendMessage(m_hMainToolbar,TB_ENABLEBUTTON,TOOLBAR_UP,m_pActiveShellBrowser->CanBrowseUp());
 

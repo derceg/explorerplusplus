@@ -65,7 +65,7 @@ LRESULT CALLBACK Explorerplusplus::EditSubclass(HWND hwnd,UINT msg,WPARAM wParam
 			break;
 
 		case WM_SETFOCUS:
-			HandleToolbarItemStates();
+			UpdateMainToolbar();
 			break;
 
 		case WM_MOUSEWHEEL:

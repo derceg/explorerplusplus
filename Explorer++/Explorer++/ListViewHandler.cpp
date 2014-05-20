@@ -112,7 +112,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 		case WM_SETFOCUS:
 			m_hLastActiveWindow = ListView;
-			HandleToolbarItemStates();
+			UpdateMainToolbar();
 			break;
 
 		case WM_LBUTTONDOWN:
@@ -643,9 +643,9 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	if(m_bCountingUp || m_bCountingDown || m_bInverted)
 		return;
 
-	HandleFileSelectionDisplay();
-	HandleStatusText();
-	HandleToolbarItemStates();
+	UpdateDisplayWindow();
+	UpdateStatusBarText();
+	UpdateMainToolbar();
 }
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)

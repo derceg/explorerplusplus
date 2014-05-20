@@ -40,15 +40,14 @@ void Explorerplusplus::UpdateWindowStates(void)
 {
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),m_CurrentDirectory);
 
-	HandleMainWindowText();
-	HandleAddressBarText();
-	HandleToolbarItemStates();
-	HandleTabText();
-	HandleTreeViewSelection();
-	HandleStatusText();
-	HandleTabToolbarItemStates();
-
-	HandleFileSelectionDisplay();
+	UpdateMainWindowText();
+	UpdateAddressBarText();
+	UpdateMainToolbar();
+	UpdateTabText();
+	UpdateTreeViewSelection();
+	UpdateStatusBarText();
+	UpdateTabToolbar();
+	UpdateDisplayWindow();
 
 	if(m_bShowFolders)
 		SendMessage(m_hMainToolbar,TB_CHECKBUTTON,(WPARAM)TOOLBAR_FOLDERS,(LPARAM)TRUE);
@@ -279,10 +278,7 @@ void Explorerplusplus::SetArrangeMenuItemStates()
 		ItemToCheck,MF_BYCOMMAND);
 }
 
-/*
- * Sets the title text for the main window.
- */
-void Explorerplusplus::HandleMainWindowText(void)
+void Explorerplusplus::UpdateMainWindowText(void)
 {
 	TCHAR	szTitle[512];
 	TCHAR	szFolderDisplayName[MAX_PATH];
@@ -352,7 +348,7 @@ void Explorerplusplus::HandleMainWindowText(void)
 	SetWindowText(m_hContainer,szTitle);
 }
 
-void Explorerplusplus::HandleAddressBarText(void)
+void Explorerplusplus::UpdateAddressBarText(void)
 {
 	LPITEMIDLIST pidl = NULL;
 	TCHAR szAddressBarTitle[MAX_PATH];
@@ -384,12 +380,12 @@ void Explorerplusplus::HandleAddressBarText(void)
 	CoTaskMemFree(pidl);
 }
 
-void Explorerplusplus::HandleTabText(void)
+void Explorerplusplus::UpdateTabText(void)
 {
-	HandleTabText(m_iTabSelectedItem,m_iObjectIndex);
+	UpdateTabText(m_iTabSelectedItem,m_iObjectIndex);
 }
 
-void Explorerplusplus::HandleTabText(int iTabId)
+void Explorerplusplus::UpdateTabText(int iTabId)
 {
 	TCITEM tcItem;
 	int nTabs;
@@ -404,13 +400,13 @@ void Explorerplusplus::HandleTabText(int iTabId)
 
 		if((int)tcItem.lParam == iTabId)
 		{
-			HandleTabText(i,iTabId);
+			UpdateTabText(i,iTabId);
 			break;
 		}
 	}
 }
 
-void Explorerplusplus::HandleTabText(int iTab,int iTabId)
+void Explorerplusplus::UpdateTabText(int iTab,int iTabId)
 {
 	TCHAR szFinalTabText[MAX_PATH];
 

@@ -543,7 +543,7 @@ void Explorerplusplus::OnTBReset(void)
 		SendMessage(m_hMainToolbar,TB_DELETEBUTTON,i,0);
 
 	InsertToolbarButtons();
-	HandleToolbarItemStates();
+	UpdateMainToolbar();
 }
 
 void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)

@@ -1223,7 +1223,7 @@ void Explorerplusplus::OnLockTabInternal(int iTab,int iTabId)
 	currently selected tab, then the tab close
 	button on the toolbar will need to be updated. */
 	if(iTabId == m_iObjectIndex)
-		HandleTabToolbarItemStates();
+		UpdateTabToolbar();
 }
 
 void Explorerplusplus::OnLockTabAndAddress(int iTab)
@@ -1246,10 +1246,10 @@ void Explorerplusplus::OnLockTabAndAddress(int iTab)
 	currently selected tab, then the tab close
 	button on the toolbar will need to be updated. */
 	if((int)tcItem.lParam == m_iObjectIndex)
-		HandleTabToolbarItemStates();
+		UpdateTabToolbar();
 }
 
-void Explorerplusplus::HandleTabToolbarItemStates(void)
+void Explorerplusplus::UpdateTabToolbar(void)
 {
 	int nTabs;
 

@@ -545,7 +545,7 @@ BOOL Explorerplusplus::AreAllSelectedFilesReal(void)
 	return TRUE;
 }
 
-HRESULT Explorerplusplus::HandleStatusText(void)
+HRESULT Explorerplusplus::UpdateStatusBarText(void)
 {
 	FolderInfo_t	FolderInfo;
 	int				nTotal;
@@ -715,7 +715,7 @@ void *pData)
 	LeaveCriticalSection(&g_csDirMonCallback);
 }
 
-void Explorerplusplus::HandleFileSelectionDisplay(void)
+void Explorerplusplus::UpdateDisplayWindow(void)
 {
 	int nSelected;
 
@@ -724,14 +724,14 @@ void Explorerplusplus::HandleFileSelectionDisplay(void)
 	nSelected = m_pActiveShellBrowser->QueryNumSelected();
 
 	if(nSelected == 0)
-		HandleFileSelectionDisplayZero();
+		UpdateDisplayWindowZero();
 	else if(nSelected == 1)
-		HandleFileSelectionDisplayOne();
+		UpdateDisplayWindowOne();
 	else if(nSelected > 1)
-		HandleFileSelectionDisplayMore();
+		UpdateDisplayWindowMore();
 }
 
-void Explorerplusplus::HandleFileSelectionDisplayZero(void)
+void Explorerplusplus::UpdateDisplayWindowZero(void)
 {
 	/* Clear out any previous data shown in the display window. */
 	DisplayWindow_ClearTextBuffer(m_hDisplayWindow);
@@ -791,7 +791,7 @@ void Explorerplusplus::HandleFileSelectionDisplayZero(void)
 	CoTaskMemFree(pidlDirectory);
 }
 
-void Explorerplusplus::HandleFileSelectionDisplayOne(void)
+void Explorerplusplus::UpdateDisplayWindowOne(void)
 {
 	WIN32_FIND_DATA	*pwfd = NULL;
 	SHFILEINFO		shfi;
@@ -1052,7 +1052,7 @@ void Explorerplusplus::HandleFileSelectionDisplayOne(void)
 	}
 }
 
-void Explorerplusplus::HandleFileSelectionDisplayMore(void)
+void Explorerplusplus::UpdateDisplayWindowMore(void)
 {
 	TCHAR			szNumSelected[64] = EMPTY_STRING;
 	TCHAR			szTotalSize[64] = EMPTY_STRING;

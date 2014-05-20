@@ -391,7 +391,7 @@ private:
 	void					OnLockTab(int iTab);
 	void					OnLockTabInternal(int iTab,int iTabId);
 	void					OnLockTabAndAddress(int iTab);
-	void					HandleTabToolbarItemStates(void);
+	void					UpdateTabToolbar(void);
 	void					OnAutoSizeColumns(void);
 	BOOL					OnMeasureItem(MEASUREITEMSTRUCT *pMeasureItem);
 	BOOL					OnDrawItem(DRAWITEMSTRUCT *pDrawItem);
@@ -583,23 +583,23 @@ private:
 
 	/* Window state update. */
 	void					UpdateWindowStates(void);
-	void					HandleMainWindowText(void);
-	void					HandleAddressBarText(void);
-	void					HandleTabText(void);
-	void					HandleTabText(int iTabId);
-	void					HandleTabText(int iTab,int iTabId);
+	void					UpdateMainWindowText(void);
+	void					UpdateAddressBarText(void);
+	void					UpdateTabText(void);
+	void					UpdateTabText(int iTabId);
+	void					UpdateTabText(int iTab,int iTabId);
 	void					SetTabIcon(void);
 	void					SetTabIcon(int iTabId);
 	void					SetTabIcon(int iIndex,int iTabId);
 	void					SetTabIcon(int iIndex,int iTabId,LPCITEMIDLIST pidlDirectory);
-	void					HandleTreeViewSelection(void);
+	void					UpdateTreeViewSelection(void);
 	void					SetStatusBarParts(int width);
 	void					ResizeWindows(void);
 	void					SetListViewInitialPosition(HWND hListView);
 	void					AdjustFolderPanePosition(void);
 	void					SetComboBoxExTitleString(HWND CbEx,LPITEMIDLIST pidl,TCHAR *szDisplayText);
-	void					HandleToolbarItemStates(void);
-	HRESULT					HandleStatusText(void);
+	void					UpdateMainToolbar(void);
+	HRESULT					UpdateStatusBarText(void);
 	void					ToggleFolders(void);
 
 	/* Windows 7 taskbar thumbnail previews. */
@@ -681,10 +681,10 @@ private:
 	void					SetTabProxyIcon(int iTabId,HICON hIcon);
 
 	/* Display window file information. */
-	void					HandleFileSelectionDisplay(void);
-	void					HandleFileSelectionDisplayZero(void);
-	void					HandleFileSelectionDisplayOne(void);
-	void					HandleFileSelectionDisplayMore(void);
+	void					UpdateDisplayWindow(void);
+	void					UpdateDisplayWindowZero(void);
+	void					UpdateDisplayWindowOne(void);
+	void					UpdateDisplayWindowMore(void);
 
 	/* Columns. */
 	void					OnSelectColumns();

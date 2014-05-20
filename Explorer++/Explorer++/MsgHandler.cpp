@@ -2211,8 +2211,8 @@ void Explorerplusplus::OnDirectoryModified(int iTabId)
 
 	if(iTabId == m_iObjectIndex)
 	{
-		HandleStatusText();
-		HandleFileSelectionDisplay();
+		UpdateStatusBarText();
+		UpdateDisplayWindow();
 	}
 }
 
@@ -2402,7 +2402,7 @@ void Explorerplusplus::OnAssocChanged(void)
 	m_pMyTreeView->RefreshAllIcons();
 
 	/* Address bar. */
-	HandleAddressBarText();
+	UpdateAddressBarText();
 }
 
 void Explorerplusplus::OnCloneWindow(void)

@@ -79,7 +79,7 @@ WPARAM wParam,LPARAM lParam)
 	switch(uMsg)
 	{
 	case WM_SETFOCUS:
-		HandleToolbarItemStates();
+		UpdateMainToolbar();
 		break;
 
 	case WM_MBUTTONDOWN:
@@ -783,7 +783,7 @@ void Explorerplusplus::OnTreeViewPaste(void)
 	}
 }
 
-void Explorerplusplus::HandleTreeViewSelection(void)
+void Explorerplusplus::UpdateTreeViewSelection(void)
 {
 	HTREEITEM		hItem;
 	LPITEMIDLIST	pidlDirectory = NULL;
