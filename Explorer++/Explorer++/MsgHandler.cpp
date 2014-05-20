@@ -647,20 +647,6 @@ void Explorerplusplus::OnNewTab(void)
 }
 
 /*
- * Called when a key is pressed in the main combobox
- * (i.e. the address bar).
- */
-void Explorerplusplus::OnComboBoxKeyDown(WPARAM wParam)
-{
-	switch(wParam)
-	{
-		case VK_RETURN:
-			OnAddressBarGo();
-			break;
-	}
-}
-
-/*
  * Navigates to the folder specified by the incoming
  * csidl.
  */

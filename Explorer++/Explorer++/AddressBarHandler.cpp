@@ -58,7 +58,7 @@ LRESULT CALLBACK Explorerplusplus::EditSubclass(HWND hwnd,UINT msg,WPARAM wParam
 			switch(wParam)
 			{
 				case VK_RETURN:
-					SendMessage(m_hContainer,CBN_KEYDOWN,VK_RETURN,0);
+					OnAddressBarGo();
 					return 0;
 					break;
 			}

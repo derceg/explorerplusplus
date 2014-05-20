@@ -101,10 +101,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		return 0;
 		break;
 
-	case CBN_KEYDOWN:
-		OnComboBoxKeyDown(wParam);
-		break;
-
 	case WM_INITMENU:
 		m_pCustomMenu->OnInitMenu(wParam);
 		SetProgramMenuItemStates((HMENU)wParam);

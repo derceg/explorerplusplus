@@ -28,10 +28,6 @@
 #define TOOLBAR_START				5000
 #define TABTOOLBAR_CLOSE			(TOOLBAR_START + 33)
 
-/* wParam contains virtual code of key that was pressed,
-lParam not currently used. */
-#define CBN_KEYDOWN					WM_APP + 2
-
 /* Sent when a folder size calculation has finished. */
 #define WM_APP_FOLDERSIZECOMPLETED	WM_APP + 3
 
@@ -367,7 +363,6 @@ private:
 	void					OnSetFileAttributes(void);
 	void					OnShowFileProperties(void);
 	void					OnWindowCreate(void);
-	void					OnComboBoxKeyDown(WPARAM wParam);
 	void					OnNewTab(void);
 	void					OnFileRename(void);
 	void					OnFileDelete(BOOL bPermanent);
