@@ -145,7 +145,6 @@ private:
 	HWND				m_hParent;
 	int					m_iRefCount;
 	IDirectoryMonitor	*m_pDirMon;
-	TCHAR				m_szOldName[MAX_PATH];
 	BOOL				m_bShowHidden;
 
 	/* Subfolder thread. */
