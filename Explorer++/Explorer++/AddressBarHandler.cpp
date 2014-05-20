@@ -217,20 +217,26 @@ void Explorerplusplus::OnAddressBarBeginDrag(void)
 	}
 }
 
-void Explorerplusplus::SetComboBoxExTitleString(HWND CbEx,LPITEMIDLIST pidl,TCHAR *szDisplayText)
+void Explorerplusplus::SetAddressBarText(LPITEMIDLIST pidl, const TCHAR *szDisplayText)
 {
 	SHFILEINFO shfi;
-	SHGetFileInfo(reinterpret_cast<LPTSTR>(pidl),NULL,&shfi,NULL,SHGFI_PIDL|SHGFI_SYSICONINDEX);
+	DWORD_PTR dwRet = SHGetFileInfo(reinterpret_cast<LPTSTR>(pidl), NULL, &shfi,
+		NULL, SHGFI_PIDL | SHGFI_SYSICONINDEX);
 
-	SendMessage(CbEx,CB_RESETCONTENT,0,0);
+	if(dwRet == 0)
+	{
+		return;
+	}
+
+	SendMessage(m_hAddressBar, CB_RESETCONTENT, 0, 0);
 
 	COMBOBOXEXITEM cbItem;
-	cbItem.mask				= CBEIF_TEXT|CBEIF_IMAGE|CBEIF_INDENT|CBEIF_SELECTEDIMAGE;
-	cbItem.iItem			= -1;
-	cbItem.iImage			= shfi.iIcon;
-	cbItem.iSelectedImage	= shfi.iIcon;
-	cbItem.iIndent			= 1;
-	cbItem.iOverlay			= 1;
-	cbItem.pszText			= szDisplayText;
-	SendMessage(CbEx,CBEM_SETITEM,0,reinterpret_cast<LPARAM>(&cbItem));
+	cbItem.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
+	cbItem.iItem = -1;
+	cbItem.iImage = shfi.iIcon;
+	cbItem.iSelectedImage = shfi.iIcon;
+	cbItem.iIndent = 1;
+	cbItem.iOverlay = 1;
+	cbItem.pszText = const_cast<LPTSTR>(szDisplayText);
+	SendMessage(m_hAddressBar, CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
 }

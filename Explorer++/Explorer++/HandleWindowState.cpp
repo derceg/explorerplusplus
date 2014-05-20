@@ -375,7 +375,7 @@ void Explorerplusplus::UpdateAddressBarText(void)
 			szParsingPath);
 	}
 
-	SetComboBoxExTitleString(m_hAddressBar,pidl,szAddressBarTitle);
+	SetAddressBarText(pidl,szAddressBarTitle);
 
 	CoTaskMemFree(pidl);
 }

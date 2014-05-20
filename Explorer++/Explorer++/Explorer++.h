@@ -394,7 +394,6 @@ private:
 	void					ShowToolbarViewsDropdown(void);
 	void					OnMainToolbarRClick(void);
 	void					OnApplicationToolbarRClick();
-	void					OnAddressBarGo(void);
 	void					OnSortByAscending(BOOL bSortAscending);
 	void					OnPreviousWindow(void);
 	void					OnNextWindow(void);
@@ -483,8 +482,11 @@ private:
 	void					OnTabCtrlRButtonUp(POINT *pt);
 	void					ProcessTabCommand(UINT uMenuID,int iTabHit);
 
-	/* Address bar private message handlers. */
+	/* Address bar. */
+	void					CreateAddressBar(void);
+	void					OnAddressBarGo(void);
 	void					OnAddressBarBeginDrag(void);
+	void					SetAddressBarText(LPITEMIDLIST pidl, const TCHAR *szDisplayText);
 
 	/* Holder window private message handlers. */
 	LRESULT CALLBACK		TreeViewHolderWindowCommandHandler(WPARAM wParam);
@@ -531,7 +533,6 @@ private:
 	void					CreateMainControls(void);
 	void					CreateFolderControls(void);
 	void					CreateMainToolbar(void);
-	void					CreateAddressBar(void);
 	void					CreateBookmarksToolbar(void);
 	void					CreateDrivesToolbar(void);
 	void					CreateApplicationToolbar();
@@ -592,7 +593,6 @@ private:
 	void					ResizeWindows(void);
 	void					SetListViewInitialPosition(HWND hListView);
 	void					AdjustFolderPanePosition(void);
-	void					SetComboBoxExTitleString(HWND CbEx,LPITEMIDLIST pidl,TCHAR *szDisplayText);
 	void					UpdateMainToolbar(void);
 	HRESULT					UpdateStatusBarText(void);
 	void					ToggleFolders(void);
