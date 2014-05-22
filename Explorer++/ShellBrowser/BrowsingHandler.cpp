@@ -652,7 +652,7 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	else
 	{
 		StringCchCopy(m_pwfdFiles[uItemId].cFileName,
-			sizeof(m_pwfdFiles[uItemId].cFileName)/sizeof(m_pwfdFiles[uItemId].cFileName[0]),szFileName);
+			SIZEOF_ARRAY(m_pwfdFiles[uItemId].cFileName), szFileName);
 		m_pwfdFiles[uItemId].nFileSizeLow			= 0;
 		m_pwfdFiles[uItemId].nFileSizeHigh			= 0;
 		m_pwfdFiles[uItemId].dwFileAttributes		= FILE_ATTRIBUTE_DIRECTORY;
