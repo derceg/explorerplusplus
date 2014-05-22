@@ -18,7 +18,7 @@ public:
 private:
 
 	/* IDropFilesCallback methods. */
-	void OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt);
+	void OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt);
 
 	ULONG				m_RefCount;
 	IExplorerplusplus	*m_pexpp;

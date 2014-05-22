@@ -227,7 +227,7 @@ These are handled by:
 3. DragOver()
 4. DragLeave()
 */
-void CShellBrowser::HandleDragSelection(POINT *ppt)
+void CShellBrowser::HandleDragSelection(const POINT *ppt)
 {
 	LVHITTESTINFO	info;
 	BOOL			bClash = FALSE;
@@ -344,7 +344,7 @@ HRESULT _stdcall CShellBrowser::DragLeave(void)
 	return S_OK;
 }
 
-void CShellBrowser::OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt)
+void CShellBrowser::OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt)
 {
 	DroppedFile_t DroppedFile;
 	POINT ptOrigin;
@@ -529,7 +529,7 @@ int CALLBACK CShellBrowser::SortTemporary(LPARAM lParam1,LPARAM lParam2)
 		m_pExtraItemInfo[lParam2].iRelativeSort;
 }
 
-void CShellBrowser::RepositionLocalFiles(POINT *ppt)
+void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
 {
 	std::list<DraggedFile_t>::iterator	itr;
 	POINT							pt;
@@ -754,7 +754,7 @@ void CShellBrowser::RepositionLocalFiles(POINT *ppt)
 	m_bPerformingDrag = FALSE;
 }
 
-void CShellBrowser::ScrollListViewFromCursor(HWND hListView,POINT *CursorPos)
+void CShellBrowser::ScrollListViewFromCursor(HWND hListView, const POINT *CursorPos)
 {
 	RECT		rc;
 	LONG_PTR	fStyle;

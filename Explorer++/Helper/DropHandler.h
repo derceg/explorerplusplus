@@ -15,7 +15,7 @@ enum DragTypes_t
 IUnknown needed to support CShellBrowser. */
 __interface IDropFilesCallback : public IUnknown
 {
-	void OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt);
+	void OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt);
 };
 
 class CDropHandler : public CReferenceCount

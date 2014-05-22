@@ -43,7 +43,7 @@ public:
 	HRESULT _stdcall	DragLeave(void);
 	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
 
-	void				MonitorDrivePublic(TCHAR *szDrive);
+	void				MonitorDrivePublic(const TCHAR *szDrive);
 
 private:
 
@@ -51,31 +51,31 @@ private:
 	LRESULT CALLBACK	OnNotify(NMHDR *pnmhdr);
 
 	void		AddDirectoryInternal(IShellFolder *pShellFolder, LPITEMIDLIST pidlDirectory, HTREEITEM hParent);
-	void		DirectoryModified(DWORD dwAction,TCHAR *szFullFileName);
+	void		DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName);
 	void		DirectoryAltered(void);
 	HTREEITEM	AddRoot(void);
-	void		AddItem(TCHAR *szFullFileName);
-	void		AddItemInternal(HTREEITEM hParent,TCHAR *szFullFileName);
-	void		AddDrive(TCHAR *szDrive);
-	void		RenameItem(HTREEITEM hItem,TCHAR *szFullFileName);
-	void		RemoveItem(TCHAR *szFullFileName);
+	void		AddItem(const TCHAR *szFullFileName);
+	void		AddItemInternal(HTREEITEM hParent, const TCHAR *szFullFileName);
+	void		AddDrive(const TCHAR *szDrive);
+	void		RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName);
+	void		RemoveItem(const TCHAR *szFullFileName);
 	void		RemoveItem(HTREEITEM hItem);
-	void		UpdateParent(TCHAR *szParent);
+	void		UpdateParent(const TCHAR *szParent);
 	void		UpdateParent(HTREEITEM hParent);
 	LRESULT CALLBACK	OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	void		OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
 	void		UpdateChildren(HTREEITEM hParent,LPITEMIDLIST pidlParent);
 	LPITEMIDLIST	UpdateItemInfo(LPITEMIDLIST pidlParent,int iItemId);
-	HTREEITEM	LocateDeletedItem(IN TCHAR *szFullFileName);
-	HTREEITEM	LocateItemByPath(TCHAR *szItemPath, BOOL bExpand);
-	HTREEITEM	LocateItemOnDesktopTree(TCHAR *szFullFileName);
+	HTREEITEM	LocateDeletedItem(const TCHAR *szFullFileName);
+	HTREEITEM	LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand);
+	HTREEITEM	LocateItemOnDesktopTree(const TCHAR *szFullFileName);
 
 	static void	DirectoryAlteredCallback(TCHAR *szFileName, DWORD dwAction, void *pData);
 
 	/* Directory modification. */
-	void		DirectoryAlteredAddFile(TCHAR *szFullFileName);
-	void		DirectoryAlteredRemoveFile(TCHAR *szFullFileName);
-	void		DirectoryAlteredRenameFile(TCHAR *szFullFileName);
+	void		DirectoryAlteredAddFile(const TCHAR *szFullFileName);
+	void		DirectoryAlteredRemoveFile(const TCHAR *szFullFileName);
+	void		DirectoryAlteredRenameFile(const TCHAR *szFullFileName);
 
 	/* Icons. */
 	void		AddToIconFinderQueue(TVITEM *plvItem);
@@ -94,15 +94,15 @@ private:
 	/* Icon refresh. */
 	void		RefreshAllIconsInternal(HTREEITEM hFirstSibling);
 
-	HTREEITEM	LocateExistingItem(TCHAR *szParsingPath);
+	HTREEITEM	LocateExistingItem(const TCHAR *szParsingPath);
 	HTREEITEM	LocateExistingItem(LPITEMIDLIST pidlDirectory);
 	HTREEITEM	LocateItemInternal(LPITEMIDLIST pidlDirectory,BOOL bOnlyLocateExistingItem);
 	void		MonitorAllDrives(void);
-	void		MonitorDrive(TCHAR *szDrive);
-	HTREEITEM	DetermineDriveSortedPosition(HTREEITEM hParent,TCHAR *szItemName);
-	HTREEITEM	DetermineItemSortedPosition(HTREEITEM hParent,TCHAR *szItem);
-	BOOL		IsDesktop(TCHAR *szPath);
-	BOOL		IsDesktopSubChild(TCHAR *szFullFileName);
+	void		MonitorDrive(const TCHAR *szDrive);
+	HTREEITEM	DetermineDriveSortedPosition(HTREEITEM hParent, const TCHAR *szItemName);
+	HTREEITEM	DetermineItemSortedPosition(HTREEITEM hParent, const TCHAR *szItem);
+	BOOL		IsDesktop(const TCHAR *szPath);
+	BOOL		IsDesktopSubChild(const TCHAR *szFullFileName);
 
 
 

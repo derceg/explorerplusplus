@@ -357,7 +357,7 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
  * into its sorted position with the specified
  * header text.
  */
-int CShellBrowser::CheckGroup(TCHAR *szGroupHeader,
+int CShellBrowser::CheckGroup(const TCHAR *szGroupHeader,
 PFNLVGROUPCOMPARE pfnGroupCompare)
 {
 	LVINSERTGROUPSORTED			lvigs;

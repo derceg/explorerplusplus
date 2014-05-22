@@ -65,13 +65,13 @@ ULONG __stdcall CShellBrowser::Release(void)
 }
 
 CShellBrowser *CShellBrowser::CreateNew(HWND hOwner,HWND hListView,
-	InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread)
+	const InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread)
 {
 	return new CShellBrowser(hOwner,hListView,pSettings,hIconThread,hFolderSizeThread);
 }
 
 CShellBrowser::CShellBrowser(HWND hOwner,HWND hListView,
-InitialSettings_t *pSettings,HANDLE hIconThread,
+const InitialSettings_t *pSettings,HANDLE hIconThread,
 HANDLE hFolderSizeThread) :
 m_hOwner(hOwner),
 m_hListView(hListView),
@@ -423,7 +423,7 @@ HRESULT CShellBrowser::InitializeDragDropHelpers(void)
 	return hr;
 }
 
-void CShellBrowser::SetUserOptions(InitialSettings_t *is)
+void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 {
 	m_bAutoArrange			= is->bAutoArrange;
 	m_bGridlinesActive		= is->bGridlinesActive;
@@ -443,35 +443,18 @@ void CShellBrowser::SetUserOptions(InitialSettings_t *is)
 
 	StringCchCopy(m_szFilter,SIZEOF_ARRAY(m_szFilter),is->szFilter);
 
-	CopyColumnsInternal(&m_ControlPanelColumnList,is->pControlPanelColumnList);
-	CopyColumnsInternal(&m_MyComputerColumnList,is->pMyComputerColumnList);
-	CopyColumnsInternal(&m_MyNetworkPlacesColumnList,is->pMyNetworkPlacesColumnList);
-	CopyColumnsInternal(&m_NetworkConnectionsColumnList,is->pNetworkConnectionsColumnList);
-	CopyColumnsInternal(&m_PrintersColumnList,is->pPrintersColumnList);
-	CopyColumnsInternal(&m_RealFolderColumnList,is->pRealFolderColumnList);
-	CopyColumnsInternal(&m_RecycleBinColumnList,is->pRecycleBinColumnList);
+	m_ControlPanelColumnList = *is->pControlPanelColumnList;
+	m_MyComputerColumnList = *is->pMyComputerColumnList;
+	m_MyNetworkPlacesColumnList = *is->pMyNetworkPlacesColumnList;
+	m_NetworkConnectionsColumnList = *is->pNetworkConnectionsColumnList;
+	m_PrintersColumnList = *is->pPrintersColumnList;
+	m_RealFolderColumnList = *is->pRealFolderColumnList;
+	m_RecycleBinColumnList = *is->pRecycleBinColumnList;
 
 	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 }
 
-void CShellBrowser::CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns)
-{
-	std::list<Column_t>::iterator	itr;
-	Column_t						ci;
-
-	pInternalColumns->clear();
-
-	for(itr = pColumns->begin();itr != pColumns->end();itr++)
-	{
-		ci.id		= itr->id;
-		ci.bChecked	= itr->bChecked;
-		ci.iWidth	= itr->iWidth;
-
-		pInternalColumns->push_back(ci);
-	}
-}
-
-void CShellBrowser::SetGlobalSettings(GlobalSettings_t *gs)
+void CShellBrowser::SetGlobalSettings(const GlobalSettings_t *gs)
 {
 	m_bShowExtensions		= gs->bShowExtensions;
 	m_bShowFriendlyDates	= gs->bShowFriendlyDates;

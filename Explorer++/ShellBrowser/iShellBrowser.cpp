@@ -65,7 +65,7 @@ void CShellBrowser::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 	}
 }
 
-BOOL CShellBrowser::IsFilenameFiltered(TCHAR *FileName) const
+BOOL CShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
 {
 	if(CheckWildcardMatch(m_szFilter,FileName,m_bFilterCaseSensitive))
 		return FALSE;
@@ -205,7 +205,7 @@ BOOL CShellBrowser::CanBrowseUp(void) const
 
 /* TODO: Convert to using pidl's here, rather than
 file names. */
-int CShellBrowser::SelectFiles(TCHAR *FileNamePattern)
+int CShellBrowser::SelectFiles(const TCHAR *FileNamePattern)
 {
 	int iItem;
 	
@@ -375,7 +375,7 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	plvItem->mask |= LVIF_DI_SETITEM;
 }
 
-void CShellBrowser::AddToIconFinderQueue(LVITEM *plvItem)
+void CShellBrowser::AddToIconFinderQueue(const LVITEM *plvItem)
 {
 	EnterCriticalSection(&g_icon_cs);
 
@@ -1018,7 +1018,7 @@ void CShellBrowser::DetermineFolderVirtual(LPITEMIDLIST pidlDirectory)
 	}
 }
 
-void CShellBrowser::SetFilter(TCHAR *szFilter)
+void CShellBrowser::SetFilter(const TCHAR *szFilter)
 {
 	StringCchCopy(m_szFilter,SIZEOF_ARRAY(m_szFilter),szFilter);
 
@@ -1666,7 +1666,7 @@ void CShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 	}
 }
 
-void CShellBrowser::UpdateDriveIcon(TCHAR *szDrive)
+void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 {
 	LPITEMIDLIST			pidlDrive = NULL;
 	LPITEMIDLIST			pidlItem = NULL;
@@ -1729,7 +1729,7 @@ void CShellBrowser::UpdateDriveIcon(TCHAR *szDrive)
 	}
 }
 
-void CShellBrowser::RemoveDrive(TCHAR *szDrive)
+void CShellBrowser::RemoveDrive(const TCHAR *szDrive)
 {
 	LVITEM lvItem;
 	int iItemInternal = -1;

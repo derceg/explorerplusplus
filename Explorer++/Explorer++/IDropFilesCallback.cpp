@@ -65,7 +65,7 @@ ULONG __stdcall CDropFilesCallback::Release(void)
 	return m_RefCount;
 }
 
-void CDropFilesCallback::OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt)
+void CDropFilesCallback::OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt)
 {
 	UNREFERENCED_PARAMETER(ppt);
 

@@ -802,7 +802,7 @@ DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
 	return 0;
 }
 
-HTREEITEM CMyTreeView::DetermineItemSortedPosition(HTREEITEM hParent,TCHAR *szItem)
+HTREEITEM CMyTreeView::DetermineItemSortedPosition(HTREEITEM hParent, const TCHAR *szItem)
 {
 	HTREEITEM	htInsertAfter = NULL;
 
@@ -866,7 +866,7 @@ HTREEITEM CMyTreeView::DetermineItemSortedPosition(HTREEITEM hParent,TCHAR *szIt
 	return htInsertAfter;
 }
 
-HTREEITEM CMyTreeView::DetermineDriveSortedPosition(HTREEITEM hParent,TCHAR *szItemName)
+HTREEITEM CMyTreeView::DetermineDriveSortedPosition(HTREEITEM hParent, const TCHAR *szItemName)
 {
 	HTREEITEM	htItem;
 	HTREEITEM	hPreviousItem;
@@ -948,7 +948,7 @@ folder in Windows 7 has a display name of
 direct path lookup will fail. */
 /* TODO: Store parsing name with each item, and
 match against that. */
-HTREEITEM CMyTreeView::LocateDeletedItem(IN TCHAR *szFullFileName)
+HTREEITEM CMyTreeView::LocateDeletedItem(const TCHAR *szFullFileName)
 {
 	HTREEITEM hItem = NULL;
 	LPITEMIDLIST pidl = NULL;
@@ -1006,7 +1006,7 @@ HTREEITEM CMyTreeView::LocateDeletedItem(IN TCHAR *szFullFileName)
 	return hItem;
 }
 
-HTREEITEM CMyTreeView::LocateExistingItem(TCHAR *szParsingPath)
+HTREEITEM CMyTreeView::LocateExistingItem(const TCHAR *szParsingPath)
 {
 	LPITEMIDLIST	pidl = NULL;
 	HTREEITEM		hItem;
@@ -1095,7 +1095,7 @@ HTREEITEM CMyTreeView::LocateItemInternal(LPITEMIDLIST pidlDirectory,BOOL bOnlyL
 	return hItem;
 }
 
-HTREEITEM CMyTreeView::LocateItemByPath(TCHAR *szItemPath,BOOL bExpand)
+HTREEITEM CMyTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 {
 	LPITEMIDLIST	pidlMyComputer	= NULL;
 	HTREEITEM		hMyComputer;
@@ -1196,7 +1196,7 @@ HTREEITEM CMyTreeView::LocateItemByPath(TCHAR *szItemPath,BOOL bExpand)
 
 /* Locate an item which is a Desktop (sub)child, if visible.
    Does not expand any item */
-HTREEITEM CMyTreeView::LocateItemOnDesktopTree(TCHAR *szFullFileName)
+HTREEITEM CMyTreeView::LocateItemOnDesktopTree(const TCHAR *szFullFileName)
 {
 	HTREEITEM	hItem;
 	TVITEMEX	tvItem;
@@ -1527,12 +1527,12 @@ DWORD WINAPI Thread_MonitorAllDrives(LPVOID pParam)
 	return 1;
 }
 
-void CMyTreeView::MonitorDrivePublic(TCHAR *szDrive)
+void CMyTreeView::MonitorDrivePublic(const TCHAR *szDrive)
 {
 	MonitorDrive(szDrive);
 }
 
-void CMyTreeView::MonitorDrive(TCHAR *szDrive)
+void CMyTreeView::MonitorDrive(const TCHAR *szDrive)
 {
 	DirectoryAltered_t		*pDirectoryAltered = NULL;
 	DEV_BROADCAST_HANDLE	dbv;
@@ -1794,7 +1794,7 @@ HRESULT CMyTreeView::OnBeginDrag(int iItemId,DragTypes_t DragType)
 	return hr;
 }
 
-BOOL CMyTreeView::IsDesktop(TCHAR *szPath)
+BOOL CMyTreeView::IsDesktop(const TCHAR *szPath)
 {
 	TCHAR szDesktop[MAX_PATH];
 
@@ -1803,7 +1803,7 @@ BOOL CMyTreeView::IsDesktop(TCHAR *szPath)
 	return (lstrcmp(szPath,szDesktop) == 0);
 }
 
-BOOL CMyTreeView::IsDesktopSubChild(TCHAR *szFullFileName)
+BOOL CMyTreeView::IsDesktopSubChild(const TCHAR *szFullFileName)
 {
 	TCHAR szDesktop[MAX_PATH];
 

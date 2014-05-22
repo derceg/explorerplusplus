@@ -1774,15 +1774,15 @@ size_t CShellBrowser::QueryNumActiveColumns(void) const
 	return m_pActiveColumnList->size();
 }
 
-void CShellBrowser::ImportAllColumns(ColumnExport_t *pce)
+void CShellBrowser::ImportAllColumns(const ColumnExport_t *pce)
 {
-	CopyColumnsInternal(&m_ControlPanelColumnList,&pce->ControlPanelColumnList);
-	CopyColumnsInternal(&m_MyComputerColumnList,&pce->MyComputerColumnList);
-	CopyColumnsInternal(&m_MyNetworkPlacesColumnList,&pce->MyNetworkPlacesColumnList);
-	CopyColumnsInternal(&m_NetworkConnectionsColumnList,&pce->NetworkConnectionsColumnList);
-	CopyColumnsInternal(&m_PrintersColumnList,&pce->PrintersColumnList);
-	CopyColumnsInternal(&m_RealFolderColumnList,&pce->RealFolderColumnList);
-	CopyColumnsInternal(&m_RecycleBinColumnList,&pce->RecycleBinColumnList);
+	m_ControlPanelColumnList = pce->ControlPanelColumnList;
+	m_MyComputerColumnList = pce->MyComputerColumnList;
+	m_MyNetworkPlacesColumnList = pce->MyNetworkPlacesColumnList;
+	m_NetworkConnectionsColumnList = pce->NetworkConnectionsColumnList;
+	m_PrintersColumnList = pce->PrintersColumnList;
+	m_RealFolderColumnList = pce->RealFolderColumnList;
+	m_RecycleBinColumnList = pce->RecycleBinColumnList;
 }
 
 void CShellBrowser::ExportAllColumns(ColumnExport_t *pce)

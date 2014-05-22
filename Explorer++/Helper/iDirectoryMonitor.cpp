@@ -32,12 +32,12 @@ public:
 	ULONG		__stdcall	AddRef(void);
 	ULONG		__stdcall	Release(void);
 
-	int		WatchDirectory(TCHAR *Directory,UINT WatchFlags,
-		void (*DirectoryAltered)(TCHAR *szFileName,DWORD dwAction,void *pData),
-		BOOL	bWatchSubTree,void *pData);
-	int WatchDirectory(HANDLE hDirectory,TCHAR *Directory,UINT WatchFlags,
-		void (*DirectoryAltered)(TCHAR *szFileName,DWORD dwAction,void *pData),
-		BOOL bWatchSubTree,void *pData);
+	int	WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
+		OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree,
+		void *pData);
+	int	WatchDirectory(HANDLE hDirectory, const TCHAR *Directory,
+		UINT WatchFlags, OnDirectoryAltered onDirectoryAltered,
+		BOOL bWatchSubTree, void *pData);
 	BOOL	StopDirectoryMonitor(int iStopId);
 
 private:
@@ -62,7 +62,7 @@ private:
 	class CDirInfo
 	{
 	public:
-		void	(*m_DirectoryAltered)(TCHAR *szFileName,DWORD dwAction,void *pData);
+		OnDirectoryAltered		m_OnDirectoryAltered;
 
 		CDirectoryMonitor		*m_pDirectoryMonitor;
 		FILE_NOTIFY_INFORMATION	*m_FileNotifyBuffer;
@@ -195,9 +195,8 @@ void CALLBACK CDirectoryMonitor::ExitWorkerThread(ULONG_PTR dwParam)
 	ExitThread(0);
 }
 
-int CDirectoryMonitor::WatchDirectory(TCHAR *Directory,UINT WatchFlags,
-void (*DirectoryAltered)(TCHAR *szFileName,DWORD dwAction,void *pData),
-BOOL bWatchSubTree,void *pData)
+int CDirectoryMonitor::WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
+	OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData)
 {
 	CDirInfo	pDirInfo;
 
@@ -208,7 +207,7 @@ BOOL bWatchSubTree,void *pData)
 	pDirInfo.m_hThread				= m_hThread;
 	pDirInfo.m_WatchFlags			= WatchFlags;
 	pDirInfo.m_UniqueId				= m_UniqueId;
-	pDirInfo.m_DirectoryAltered		= DirectoryAltered;
+	pDirInfo.m_OnDirectoryAltered	= onDirectoryAltered;
 	pDirInfo.m_pData				= pData;
 	pDirInfo.m_bWatchSubTree		= bWatchSubTree;
 	pDirInfo.m_bMarkedForDeletion	= FALSE;
@@ -247,9 +246,8 @@ BOOL bWatchSubTree,void *pData)
 	return m_UniqueId++;
 }
 
-int CDirectoryMonitor::WatchDirectory(HANDLE hDirectory,TCHAR *Directory,
-UINT WatchFlags,void (*DirectoryAltered)(TCHAR *szFileName,DWORD dwAction,void *pData),
-BOOL bWatchSubTree,void *pData)
+int CDirectoryMonitor::WatchDirectory(HANDLE hDirectory, const TCHAR *Directory,
+	UINT WatchFlags, OnDirectoryAltered onDirectoryAltered, BOOL bWatchSubTree, void *pData)
 {
 	CDirInfo	pDirInfo;
 
@@ -260,7 +258,7 @@ BOOL bWatchSubTree,void *pData)
 	pDirInfo.m_hThread				= m_hThread;
 	pDirInfo.m_WatchFlags			= WatchFlags;
 	pDirInfo.m_UniqueId				= m_UniqueId;
-	pDirInfo.m_DirectoryAltered		= DirectoryAltered;
+	pDirInfo.m_OnDirectoryAltered	= onDirectoryAltered;
 	pDirInfo.m_pData				= pData;
 	pDirInfo.m_bWatchSubTree		= bWatchSubTree;
 	pDirInfo.m_bMarkedForDeletion	= FALSE;
@@ -357,7 +355,7 @@ DWORD NumberOfBytesTransferred,LPOVERLAPPED lpOverlapped)
 			/* FileNameLength is size in bytes NOT characters. */
 			StringCchCopyN(szFileName,SIZEOF_ARRAY(szFileName),
 				pfni->FileName,pfni->FileNameLength / sizeof(TCHAR));
-			pDirInfo->m_DirectoryAltered(szFileName,pfni->Action,pDirInfo->m_pData);
+			pDirInfo->m_OnDirectoryAltered(szFileName,pfni->Action,pDirInfo->m_pData);
 
 			i++;
 		} while(pfni->NextEntryOffset != 0);

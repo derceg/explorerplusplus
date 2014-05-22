@@ -544,7 +544,7 @@ void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 }
 
 HRESULT inline CShellBrowser::AddItemInternal(LPITEMIDLIST pidlDirectory,
-LPITEMIDLIST pidlRelative,TCHAR *szFileName,int iItemIndex,BOOL bPosition)
+LPITEMIDLIST pidlRelative,const TCHAR *szFileName,int iItemIndex,BOOL bPosition)
 {
 	int uItemId;
 
@@ -575,7 +575,7 @@ HRESULT inline CShellBrowser::AddItemInternal(int iItemIndex,int iItemId,BOOL bP
 }
 
 int inline CShellBrowser::SetItemInformation(LPITEMIDLIST pidlDirectory,
-LPITEMIDLIST pidlRelative,TCHAR *szFileName)
+LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 {
 	LPITEMIDLIST	pidlItem = NULL;
 	HANDLE			hFirstFile;

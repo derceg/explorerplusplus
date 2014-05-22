@@ -306,7 +306,9 @@ public:
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	static CShellBrowser *CreateNew(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread);
+	static CShellBrowser *CreateNew(HWND hOwner, HWND hListView,
+		const InitialSettings_t *pSettings, HANDLE hIconThread,
+		HANDLE hFolderSizeThread);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
@@ -360,15 +362,15 @@ public:
 	int					QueryNumSelected(void) const;
 
 	/* Settings. */
-	void				SetUserOptions(InitialSettings_t *is);
-	void				SetGlobalSettings(GlobalSettings_t *gs);
+	void				SetUserOptions(const InitialSettings_t *is);
+	void				SetGlobalSettings(const GlobalSettings_t *gs);
 
 	/* ID. */
 	int					GetId(void) const;
 	void				SetId(int ID);
 
 	/* Directory modification support. */
-	void				FilesModified(DWORD Action,TCHAR *FileName,int EventId,int iFolderIndex);
+	void				FilesModified(DWORD Action, const TCHAR *FileName, int EventId, int iFolderIndex);
 	void				DirectoryAltered(void);
 	void				SetDirMonitorId(int iDirMonitorId);
 	int					GetDirMonitorId(void) const;
@@ -394,7 +396,7 @@ public:
 
 	/* Filtering. */
 	void				GetFilter(TCHAR *szFilter,int cchMax) const;
-	void				SetFilter(TCHAR *szFilter);
+	void				SetFilter(const TCHAR *szFilter);
 	BOOL				GetFilterStatus(void) const;
 	void				SetFilterStatus(BOOL bFilter);
 	BOOL				GetFilterCaseSensitive(void) const;
@@ -402,13 +404,13 @@ public:
 
 	void				UpdateFileSelectionInfo(int,BOOL);
 	HRESULT				CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,IN POINT *pt,IN BOOL bBackOrForward);
-	int					SelectFiles(TCHAR *FileNamePattern);
+	int					SelectFiles(const TCHAR *FileNamePattern);
 	void				QueryFolderInfo(FolderInfo_t *pFolderInfo);
 	int					LocateFileItemIndex(const TCHAR *szFileName) const;
 	BOOL				DeghostItem(int iItem);
 	BOOL				GhostItem(int iItem);
 	void				OnListViewGetDisplayInfo(LPARAM lParam);
-	void				AddToIconFinderQueue(LVITEM *plvItem);
+	void				AddToIconFinderQueue(const LVITEM *plvItem);
 	void				EmptyIconFinderQueue(void);
 	void				AddToThumbnailFinderQueue(LPARAM lParam);
 	void				EmptyThumbnailsQueue(void);
@@ -450,7 +452,7 @@ public:
 	void				ToggleGridlines(void);
 	BOOL				QueryGridlinesActive(void) const;
 	void				SetResourceModule(HINSTANCE hResourceModule);
-	void				ImportAllColumns(ColumnExport_t *pce);
+	void				ImportAllColumns(const ColumnExport_t *pce);
 	void				ExportAllColumns(ColumnExport_t *pce);
 	void				QueueRename(LPCITEMIDLIST pidlItem);
 	void				SelectItems(const std::list<std::wstring> &PastedFileList);
@@ -556,7 +558,9 @@ private:
 	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
 	static const int THUMBNAIL_ITEM_VERTICAL_SPACING = 20;
 
-	CShellBrowser(HWND hOwner,HWND hListView,InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread);
+	CShellBrowser(HWND hOwner, HWND hListView,
+		const InitialSettings_t *pSettings, HANDLE hIconThread,
+		HANDLE hFolderSizeThread);
 	~CShellBrowser();
 
 	void				InitializeItemMap(int iStart,int iEnd);
@@ -572,9 +576,9 @@ private:
 	void inline			InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(int iItemInternal) const;
 	TCHAR				*ProcessItemFileName(int iItemInternal) const;
-	HRESULT inline		AddItemInternal(LPITEMIDLIST pidlDirectory,LPITEMIDLIST pidlRelative,TCHAR *szFileName,int iItemIndex,BOOL bPosition);
+	HRESULT inline		AddItemInternal(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
 	HRESULT inline		AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
-	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory,LPITEMIDLIST pidlRelative,TCHAR *szFileName);
+	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName);
 	void				ResetFolderMemoryAllocations(void);
 	void				SetCurrentViewModeInternal(DWORD ViewMode);
 
@@ -642,21 +646,21 @@ private:
 	const TCHAR			*GetMediaMetadataAttributeName(MediaMetadataType_t MediaMetaDataType) const;
 
 	/* Device change support. */
-	void				UpdateDriveIcon(TCHAR *szDrive);
-	void				RemoveDrive(TCHAR *szDrive);
+	void				UpdateDriveIcon(const TCHAR *szDrive);
+	void				RemoveDrive(const TCHAR *szDrive);
 	
 	/* Directory altered support. */
-	void				OnFileActionAdded(TCHAR *szFileName);
+	void				OnFileActionAdded(const TCHAR *szFileName);
 	void				RemoveItem(int iItemInternal);
-	void				RemoveItemInternal(TCHAR *szFileName);
-	void				ModifyItemInternal(TCHAR *FileName);
-	void				OnFileActionRenamedOldName(TCHAR *szFileName);
-	void				OnFileActionRenamedNewName(TCHAR *szFileName);
-	void				RenameItem(int iItemInternal,TCHAR *szNewFileName);
+	void				RemoveItemInternal(const TCHAR *szFileName);
+	void				ModifyItemInternal(const TCHAR *FileName);
+	void				OnFileActionRenamedOldName(const TCHAR *szFileName);
+	void				OnFileActionRenamedNewName(const TCHAR *szFileName);
+	void				RenameItem(int iItemInternal, const TCHAR *szNewFileName);
 	int					DetermineItemSortedPosition(LPARAM lParam) const;
 
 	/* Filtering support. */
-	BOOL				IsFilenameFiltered(TCHAR *FileName) const;
+	BOOL				IsFilenameFiltered(const TCHAR *FileName) const;
 	void				RemoveFilteredItems(void);
 	void				RemoveFilteredItem(int iItem,int iItemInternal);
 	void				UpdateFiltering(void);
@@ -682,7 +686,7 @@ private:
 	void				DetermineItemSummaryGroup(int iItemInternal, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax) const;
 
 	/* Other grouping support. */
-	int					CheckGroup(TCHAR *szGroupHeader,PFNLVGROUPCOMPARE pfnGroupCompare);
+	int					CheckGroup(const TCHAR *szGroupHeader, PFNLVGROUPCOMPARE pfnGroupCompare);
 	void				InsertItemIntoGroup(int iItem,int iGroupId);
 	void				MoveItemsIntoGroups(void);
 
@@ -703,18 +707,17 @@ private:
 	/* Drag and Drop support. */
 	HRESULT				InitializeDragDropHelpers(void);
 	DWORD				CheckItemLocations(IDataObject *pDataObject,int iDroppedItem);
-	void				HandleDragSelection(POINT *ppt);
-	void				RepositionLocalFiles(POINT *ppt);
-	void				ScrollListViewFromCursor(HWND hListView,POINT *CursorPos);
+	void				HandleDragSelection(const POINT *ppt);
+	void				RepositionLocalFiles(const POINT *ppt);
+	void				ScrollListViewFromCursor(HWND hListView, const POINT *CursorPos);
 	void				PositionDroppedItems(void);
-	void				OnDropFile(const std::list<std::wstring> &PastedFileList,POINT *ppt);
+	void				OnDropFile(const std::list<std::wstring> &PastedFileList, const POINT *ppt);
 
 	/* Miscellaneous. */
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL) const;
 	int					LocateFileItemInternalIndex(const TCHAR *szFileName) const;
 	void				ApplyHeaderSortArrow(void);
 	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName,UINT cchMax) const;
-	void				CopyColumnsInternal(std::list<Column_t> *pInternalColumns,std::list<Column_t> *pColumns);
 
 
 	int					m_iRefCount;

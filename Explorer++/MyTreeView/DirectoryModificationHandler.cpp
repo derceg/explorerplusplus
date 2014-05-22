@@ -84,7 +84,7 @@ void CMyTreeView::DirectoryAltered(void)
 
 /* TODO: Will have to change this. If AddItem() fails for some
 reason, then add the item to the tracking list. */
-void CMyTreeView::DirectoryAlteredAddFile(TCHAR *szFullFileName)
+void CMyTreeView::DirectoryAlteredAddFile(const TCHAR *szFullFileName)
 {
 	LPITEMIDLIST pidlComplete = NULL;
 	HRESULT hr;
@@ -110,7 +110,7 @@ void CMyTreeView::DirectoryAlteredAddFile(TCHAR *szFullFileName)
 	}
 }
 
-void CMyTreeView::DirectoryAlteredRemoveFile(TCHAR *szFullFileName)
+void CMyTreeView::DirectoryAlteredRemoveFile(const TCHAR *szFullFileName)
 {
 	TCHAR szParent[MAX_PATH];
 	HTREEITEM hItem;
@@ -166,7 +166,7 @@ void CMyTreeView::DirectoryAlteredRemoveFile(TCHAR *szFullFileName)
 	}
 }
 
-void CMyTreeView::DirectoryAlteredRenameFile(TCHAR *szFullFileName)
+void CMyTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
 {
 	HTREEITEM hItem;
 	HTREEITEM hDeskItem;
@@ -294,7 +294,7 @@ void *pData)
 	pMyTreeView->DirectoryModified(dwAction,szFullFileName);
 }
 
-void CMyTreeView::DirectoryModified(DWORD dwAction,TCHAR *szFullFileName)
+void CMyTreeView::DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName)
 {
 	EnterCriticalSection(&m_cs);
 
@@ -311,7 +311,7 @@ void CMyTreeView::DirectoryModified(DWORD dwAction,TCHAR *szFullFileName)
 	LeaveCriticalSection(&m_cs);
 }
 
-void CMyTreeView::AddDrive(TCHAR *szDrive)
+void CMyTreeView::AddDrive(const TCHAR *szDrive)
 {
 	LPITEMIDLIST	pidlMyComputer = NULL;
 	HTREEITEM		hMyComputer;
@@ -332,7 +332,7 @@ void CMyTreeView::AddDrive(TCHAR *szDrive)
 	}
 }
 
-void CMyTreeView::AddItem(TCHAR *szFullFileName)
+void CMyTreeView::AddItem(const TCHAR *szFullFileName)
 {
 	TCHAR			szDirectory[MAX_PATH];
 	HTREEITEM		hParent;
@@ -374,7 +374,7 @@ void CMyTreeView::AddItem(TCHAR *szFullFileName)
 	}
 }
 
-void CMyTreeView::AddItemInternal(HTREEITEM hParent,TCHAR *szFullFileName)
+void CMyTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
 	LPITEMIDLIST	pidlComplete = NULL;
@@ -470,7 +470,7 @@ void CMyTreeView::AddItemInternal(HTREEITEM hParent,TCHAR *szFullFileName)
 the items display text, and updating it's pidl. Note that the children of
 this item MUST ALL BE UPDATED as well, since their pidl's will also
 change. */
-void CMyTreeView::RenameItem(HTREEITEM hItem,TCHAR *szFullFileName)
+void CMyTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 {
 	TVITEMEX	tvItem;
 	ItemInfo_t	*pItemInfo = NULL;
@@ -570,7 +570,7 @@ LPITEMIDLIST CMyTreeView::UpdateItemInfo(LPITEMIDLIST pidlParent,int iItemId)
 	return m_pItemInfo[iItemId].pidl;
 }
 
-void CMyTreeView::RemoveItem(TCHAR *szFullFileName)
+void CMyTreeView::RemoveItem(const TCHAR *szFullFileName)
 {
 	HTREEITEM hItem;
 
@@ -588,7 +588,7 @@ void CMyTreeView::RemoveItem(HTREEITEM hItem)
 	TreeView_DeleteItem(m_hTreeView,hItem);
 }
 
-void CMyTreeView::UpdateParent(TCHAR *szParent)
+void CMyTreeView::UpdateParent(const TCHAR *szParent)
 {
 	HTREEITEM hParent;
 
