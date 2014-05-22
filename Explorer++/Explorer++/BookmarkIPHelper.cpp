@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: BookmarkIPHelper.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides inter-process bookmark notification functionality.
  *

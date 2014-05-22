@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: TaskbarThumbnails.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * The methods in this file manage the tab proxy windows. A tab
  * proxy is created when a taskbar thumbnail needs to be shown.

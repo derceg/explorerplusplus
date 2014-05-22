@@ -2,7 +2,7 @@
  *
  * Project: ShellBrowser
  * File: ColumnManager.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Handles the columns in details view.
  *

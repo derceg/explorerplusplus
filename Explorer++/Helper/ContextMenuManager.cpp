@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: ContextMenuManager.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * This class is designed to show an existing menu, with
  * has been modified to also show menu items inserted

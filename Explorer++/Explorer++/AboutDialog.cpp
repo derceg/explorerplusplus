@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: AboutDialog.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Manages the 'About' dialog box.
  *

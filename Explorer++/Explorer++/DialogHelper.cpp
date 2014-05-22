@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: DialogHelper.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Dialog helper functionality.
  *

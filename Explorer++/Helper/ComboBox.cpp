@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: ComboBox.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Wraps a standard combo box control. Provides additional
  * autocomplete functionality.

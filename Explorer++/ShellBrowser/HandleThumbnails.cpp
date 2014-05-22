@@ -2,7 +2,7 @@
  *
  * Project: ShellBrowser
  * File: HandleThumbnails.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Handles thumbnails view, including
  * preparing the listview and drawing

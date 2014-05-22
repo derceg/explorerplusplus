@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: FileActionHandler.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Performs file actions and saves information about them.
  * Also allows file actions to be undone.

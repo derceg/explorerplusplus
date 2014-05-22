@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: TreeViewHandler.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Handles messages associated with the main
  * treeview control.

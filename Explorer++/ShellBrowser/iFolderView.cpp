@@ -2,7 +2,7 @@
  *
  * Project: ShellBrowser
  * File: iFolderView.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Constructs/deconstructs the browser
  * object. Also contains some auxiliary

@@ -2,7 +2,7 @@
  *
  * Project: HolderWindow
  * File: HolderWindow.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Manages the 'holder window'. This window acts as a generic
  * container for child windows.

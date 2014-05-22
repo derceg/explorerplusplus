@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: EvenSwitcher.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Switches events based on the currently selected window
  * (principally the listview and treeview).

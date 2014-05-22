@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: WildcardSelectDialog.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Allows items to be selected/deselected based
  * on a wildcard filter.

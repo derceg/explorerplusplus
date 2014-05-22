@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: WindowHandler.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Manages the creation of windows as well
  * as housing various window procedures.

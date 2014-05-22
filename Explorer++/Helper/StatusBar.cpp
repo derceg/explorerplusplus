@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: StatusBar.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides a degree of abstraction for a status bar.
  *

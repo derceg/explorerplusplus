@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: Settings.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Processes and forwards incoming messages for the main
  * window.

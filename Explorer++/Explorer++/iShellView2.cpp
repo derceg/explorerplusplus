@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: iShellView2.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Used to support new item creation in Windows XP. That is,
  * when an item is created using the new menu, this class

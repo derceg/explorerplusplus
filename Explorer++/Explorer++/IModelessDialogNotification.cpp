@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: IModelessDialogNotification.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Handles modeless dialog notifications.
  *

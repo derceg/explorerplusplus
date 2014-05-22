@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: Helper.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Contains various helper functions.
  *

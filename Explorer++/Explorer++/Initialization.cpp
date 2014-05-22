@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: Initialization.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Includes miscellaneous functions related to
  * the top-level GUI component.

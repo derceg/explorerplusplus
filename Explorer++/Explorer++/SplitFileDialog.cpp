@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: SplitFileDialog.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides the ability to split a file into several
  * pieces.

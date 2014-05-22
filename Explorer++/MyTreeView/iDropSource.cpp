@@ -2,7 +2,7 @@
  *
  * Project: MyTreeView
  * File: iDropSource.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides support for acting as a drop source.
  *

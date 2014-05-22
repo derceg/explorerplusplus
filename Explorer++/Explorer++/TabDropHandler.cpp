@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: TabDropHandler.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Manages drag and drop for the main tab control.
  *

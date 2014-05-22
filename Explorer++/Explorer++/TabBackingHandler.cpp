@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: TabBackingHandler.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Manages the 'tab backing' panel, which sits
  * behind the tab control.

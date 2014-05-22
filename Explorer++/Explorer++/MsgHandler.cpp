@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: MsgHandler.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Handles messages passed back from the main GUI components.
  *

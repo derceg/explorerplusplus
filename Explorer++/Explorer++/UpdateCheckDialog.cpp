@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: UpdateCheckDialog.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * This dialog performs an update check (i.e. it checks
  * whether a new version is available). Note that this

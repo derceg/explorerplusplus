@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: iNewMenuClient.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Used to support new item creation in Windows Vista and later.
  * That is, when an item is created using the new menu, this

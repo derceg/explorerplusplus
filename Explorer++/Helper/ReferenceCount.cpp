@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: ReferenceCount.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Basic reference counting class.
  *

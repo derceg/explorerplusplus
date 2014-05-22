@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: XMLSettings.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Loads and saves all settings associated with
  * Explorer++ from/to an XML configuration file.

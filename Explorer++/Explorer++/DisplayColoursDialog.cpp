@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: DisplayColoursDialog.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Handles the 'Change Display Colours' dialog and associated messages.
  *

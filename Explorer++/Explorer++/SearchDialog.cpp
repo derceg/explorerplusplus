@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: SearchDialog.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Handles all messages associated with the 'Search' dialog box.
  *

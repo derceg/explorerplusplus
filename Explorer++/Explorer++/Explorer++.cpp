@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: Explorer++.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Main file for the Explorerplusplus class.
  *

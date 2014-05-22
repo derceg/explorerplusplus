@@ -2,7 +2,7 @@
  *
  * Project: ShellBrowser
  * File: GroupManager.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Includes code for placing items into
  * groups.

@@ -2,7 +2,7 @@
  *
  * Project: MyTreeView
  * File: MyTreeView.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Wraps a treeview control. Specifically handles
  * adding directories to it and selecting directories.

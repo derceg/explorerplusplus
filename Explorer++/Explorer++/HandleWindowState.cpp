@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: HandleWindowState.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Keeps track of the state of the main window
  * and its child windows.

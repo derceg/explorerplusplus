@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: iServiceProvider.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Part of the internal system that supports the new menu.
  *

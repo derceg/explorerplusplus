@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: Bookmark.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Implements a bookmark system, with both bookmark folders
  * and bookmarks.

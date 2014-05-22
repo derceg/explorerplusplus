@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: MassRenameDialog.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides support for the mass renaming of files.
  * The following special characters are supported:

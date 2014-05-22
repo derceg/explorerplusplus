@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: ApplicationToolbarDropHandler.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Handles drag and drop for the application toolbar.
  *

@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: XMLSettings.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * XML helper functions. Intended to be used when
  * reading from/writing to an XML file.

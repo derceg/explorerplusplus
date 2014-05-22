@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: iEnumFormatEtc.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides an implementation of iEnumFormatEtc.
  *

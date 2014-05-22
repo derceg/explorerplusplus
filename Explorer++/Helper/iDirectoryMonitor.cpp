@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: iDirectoryMonitor.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Class to monitor directories for changes (e.g. file renaming,
  * deleting, creation, etc.). Monitoring is performed

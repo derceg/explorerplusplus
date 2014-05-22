@@ -2,7 +2,7 @@
  *
  * Project: DisplayWindow
  * File: MsgHandler.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Handles GUI messages for the display window.
  *

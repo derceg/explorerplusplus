@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: ShellHelper.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides various shell related functionality.
  *

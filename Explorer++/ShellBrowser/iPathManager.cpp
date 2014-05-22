@@ -2,7 +2,7 @@
  *
  * Project: ShellBrowser
  * File: iPathManager.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Remembers path history, and
  * includes the ability to browse

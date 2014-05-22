@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: LoggingFrontend.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides a logging frontend for Pantheios. By default,
  * this frontend will enable all logging in debug mode,

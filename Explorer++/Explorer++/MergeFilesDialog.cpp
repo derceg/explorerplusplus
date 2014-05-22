@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: MergeFiles.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides support for merging files.
  *

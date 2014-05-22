@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: ResizableDialog.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Updates the size/position of a set of controls within
  * a resizable dialog.

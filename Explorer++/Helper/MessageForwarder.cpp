@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: MessageForwarder.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Forwards messages received within a window procedure.
  *

@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: BookmarksToolbar.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Initializes the bookmarks toolbar and handles update
  * notifications, window messages, etc.

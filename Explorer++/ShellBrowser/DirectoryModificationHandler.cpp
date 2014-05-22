@@ -2,7 +2,7 @@
  *
  * Project: ShellBrowser
  * File: DirectoryModificationHandler.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Handles directory modification messages,
  * including adding, deleting and renaming

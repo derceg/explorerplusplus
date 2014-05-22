@@ -2,7 +2,7 @@
  *
  * Project: DisplayWindow
  * File: DisplayWindow.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Creates and manages a 'display window'. This window
  * can be used to show various information (e.g. file

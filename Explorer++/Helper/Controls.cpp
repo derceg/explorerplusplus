@@ -2,7 +2,7 @@
  *
  * Project: Helper
  * File: Controls.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Generic implementation of control creation.
  *

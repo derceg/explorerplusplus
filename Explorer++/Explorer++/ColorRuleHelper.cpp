@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: ColorRuleHelper.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides helper functionality for the color rules (which are
  * used to color files, based on their filename an/or

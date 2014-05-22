@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: SetFileAttributesDialog.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides the ability to change the attributes
  * and creation/modification/access dates of a set

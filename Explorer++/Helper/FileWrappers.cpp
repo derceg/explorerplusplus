@@ -2,7 +2,7 @@
 *
 * Project: Helper
 * File: FileWrappers.cpp
-* License: GPL - See COPYING in the top level directory
+* License: GPL - See LICENSE in the top level directory
 *
 * Provides unique_handle wrappers for file-related
 * functions. These wrappers exist to ensure that

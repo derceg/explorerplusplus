@@ -2,7 +2,7 @@
  *
  * Project: ShellBrowser
  * File: iShellBrowser.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Main file for folder browsing support.
  *

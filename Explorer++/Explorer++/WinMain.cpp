@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: Settings.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Explorer++ is an Explorer-like file manager for
  * Windows XP, Vista and 7.

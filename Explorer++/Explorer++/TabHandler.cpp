@@ -2,7 +2,7 @@
  *
  * Project: Explorer++
  * File: TabHandler.cpp
- * License: GPL - See COPYING in the top level directory
+ * License: GPL - See LICENSE in the top level directory
  *
  * Provides tab management as well as the
  * handling of messages associated with the tabs.
