@@ -528,7 +528,7 @@ void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 
 				if(SUCCEEDED(hr))
 				{
-					StrRetToBuf(&str,rgelt,szFileName,MAX_PATH);
+					StrRetToBuf(&str, rgelt, szFileName, SIZEOF_ARRAY(szFileName));
 
 					AddItemInternal(pidlDirectory,rgelt,szFileName,-1,FALSE);
 				}
@@ -615,7 +615,8 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	m_pExtraItemInfo[uItemId].bIconRetrieved		= FALSE;
 	m_pExtraItemInfo[uItemId].bThumbnailRetreived	= FALSE;
 	m_pExtraItemInfo[uItemId].bFolderSizeRetrieved	= FALSE;
-	StringCchCopy(m_pExtraItemInfo[uItemId].szDisplayName,MAX_PATH,szFileName);
+	StringCchCopy(m_pExtraItemInfo[uItemId].szDisplayName,
+		SIZEOF_ARRAY(m_pExtraItemInfo[uItemId].szDisplayName), szFileName);
 
 	pidlItem = ILCombine(pidlDirectory,pidlRelative);
 

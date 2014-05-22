@@ -349,7 +349,7 @@ void CMassRenameDialog::ProcessFileName(const std::wstring &strTarget,
 	const std::wstring &strFilename,int iFileIndex,std::wstring &strOutput)
 {
 	TCHAR szBaseName[MAX_PATH];
-	StringCchCopy(szBaseName,MAX_PATH,strFilename.c_str());
+	StringCchCopy(szBaseName, SIZEOF_ARRAY(szBaseName), strFilename.c_str());
 	PathRemoveExtension(szBaseName);
 
 	TCHAR *pExt = PathFindExtension(strFilename.c_str());

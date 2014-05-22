@@ -539,7 +539,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 	if(iItemInternal == -1)
 		return;
 
-	StringCchCopy(szFullFileName,MAX_PATH,m_CurDir);
+	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
 	PathAppend(szFullFileName,szNewFileName);
 
 	hr = GetIdlFromParsingName(szFullFileName,&pidlFull);
@@ -614,7 +614,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 	else
 	{
 		StringCchCopy(m_pExtraItemInfo[iItemInternal].szDisplayName,
-			MAX_PATH,szNewFileName);
+			SIZEOF_ARRAY(m_pExtraItemInfo[iItemInternal].szDisplayName), szNewFileName);
 
 		StringCchCopy(m_pwfdFiles[iItemInternal].cFileName,
 			SIZEOF_ARRAY(m_pwfdFiles[iItemInternal].cFileName),

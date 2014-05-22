@@ -651,7 +651,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 	HRESULT						hr;
 	InitialSettings_t			*pSettings = NULL;
 	TabInfo_t					*pTabInfo = NULL;
-	TCHAR						**szDirectory = NULL;
+	TCHAR						szDirectory[MAX_PATH];
 	std::list<Column_t>			RealFolderColumnList;
 	std::list<Column_t>			MyComputerColumnList;
 	std::list<Column_t>			ControlPanelColumnList;
@@ -677,13 +677,6 @@ int Explorerplusplus::LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 	else
 	{
 		pNodes->get_length(&length);
-
-		szDirectory = (TCHAR **)malloc(sizeof(TCHAR *) * length);
-
-		for(long i = 0; i < length; i++)
-		{
-			szDirectory[i] = (TCHAR *)malloc(MAX_PATH * sizeof(TCHAR));
-		}
 
 		pSettings = (InitialSettings_t *)malloc(sizeof(InitialSettings_t) * length);
 		pTabInfo = (TabInfo_t *)malloc(sizeof(TabInfo_t) * length);
@@ -729,7 +722,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 						pChildNode->get_text(&bstrValue);
 
 						if(lstrcmp(bstrName,L"Directory") == 0)
-							StringCchCopy(szDirectory[i],MAX_PATH,bstrValue);
+							StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),bstrValue);
 						else
 							MapTabAttributeValue(bstrName,bstrValue,&pSettings[i],&pTabInfo[i]);
 					}
@@ -814,7 +807,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 				}
 			}
 
-			hr = CreateNewTab(szDirectory[i],&pSettings[i],&pTabInfo[i],TRUE,NULL);
+			hr = CreateNewTab(szDirectory,&pSettings[i],&pTabInfo[i],TRUE,NULL);
 
 			if(hr == S_OK)
 				nTabsCreated++;
@@ -885,7 +878,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXML
 		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), i);
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Tab"),szNodeName);
 
-		m_pShellBrowser[(int)tcItem.lParam]->QueryCurrentDirectory(MAX_PATH,szTabDirectory);
+		m_pShellBrowser[(int) tcItem.lParam]->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Directory"),szTabDirectory);
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ApplyFilter"),

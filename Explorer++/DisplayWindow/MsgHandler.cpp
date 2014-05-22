@@ -209,7 +209,7 @@ void CDisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 				size.cx = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
 				size.cy = GetRectHeight(&rc) - THUMB_HEIGHT_DELTA;
 
-				hr = pExtractImage->GetLocation(szImage,MAX_PATH,
+				hr = pExtractImage->GetLocation(szImage,SIZEOF_ARRAY(szImage),
 					&dwPriority,&size,32,&dwFlags);
 
 				if(SUCCEEDED(hr))
@@ -232,7 +232,7 @@ void CDisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 						size.cx = (LONG)((double)size.cy * ((double)bm.bmWidth / (double)bm.bmHeight));
 						m_iImageWidth = size.cx;
 						m_iImageHeight = size.cy;
-						pExtractImage->GetLocation(szImage,MAX_PATH,
+						pExtractImage->GetLocation(szImage,SIZEOF_ARRAY(szImage),
 							&dwPriority,&size,32,&dwFlags);
 						hr = pExtractImage->Extract(&m_hbmThumbnail);
 

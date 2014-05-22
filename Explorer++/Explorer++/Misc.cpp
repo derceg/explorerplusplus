@@ -738,7 +738,7 @@ void Explorerplusplus::UpdateDisplayWindowZero(void)
 	DisplayWindow_SetThumbnailFile(m_hDisplayWindow,EMPTY_STRING,FALSE);
 
 	TCHAR szCurrentDirectory[MAX_PATH];
-	m_pActiveShellBrowser->QueryCurrentDirectory(MAX_PATH,szCurrentDirectory);
+	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
 	LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
 	LPITEMIDLIST pidlComputer = NULL;
@@ -807,7 +807,7 @@ void Explorerplusplus::UpdateDisplayWindowOne(void)
 	if(iSelected != -1)
 	{
 		m_pActiveShellBrowser->QueryDisplayName(iSelected,
-			MAX_PATH,szDisplayName);
+			SIZEOF_ARRAY(szDisplayName), szDisplayName);
 
 		/* File name. */
 		DisplayWindow_BufferText(m_hDisplayWindow,szDisplayName);
@@ -849,7 +849,7 @@ void Explorerplusplus::UpdateDisplayWindowOne(void)
 
 						pfs->pfnCallback	= FolderSizeCallbackStub;
 
-						StringCchCopy(pfs->szPath,MAX_PATH,szFullItemName);
+						StringCchCopy(pfs->szPath, SIZEOF_ARRAY(pfs->szPath), szFullItemName);
 
 						LoadString(m_hLanguageModule,IDS_GENERAL_TOTALSIZE,
 							szTotalSize,SIZEOF_ARRAY(szTotalSize));

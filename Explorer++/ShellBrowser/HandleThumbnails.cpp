@@ -240,7 +240,7 @@ void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
 				which seems to indicate the request in pending.
 				Attempting to extract the image appears to succeed
 				regardless (perhaps after some delay). */
-				pExtractImage->GetLocation(szImage,MAX_PATH,
+				pExtractImage->GetLocation(szImage,SIZEOF_ARRAY(szImage),
 					&dwPriority,&size,32,&dwFlags);
 
 				hr = pExtractImage->Extract(&hThumbnailBitmap);

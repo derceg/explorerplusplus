@@ -481,7 +481,7 @@ int *pTabObjectIndex)
 	hr = m_pShellBrowser[iTabId]->BrowseFolder(pidlDirectory,uFlags);
 
 	if(bSwitchToNewTab)
-		m_pShellBrowser[iTabId]->QueryCurrentDirectory(MAX_PATH,m_CurrentDirectory);
+		m_pShellBrowser[iTabId]->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory), m_CurrentDirectory);
 
 	if(hr != S_OK)
 	{

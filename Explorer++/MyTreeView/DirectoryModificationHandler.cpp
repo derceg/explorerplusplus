@@ -288,7 +288,7 @@ void *pData)
 
 	pMyTreeView = (CMyTreeView *)pDirectoryAltered->pMyTreeView;
 
-	StringCchCopy(szFullFileName,MAX_PATH,pDirectoryAltered->szPath);
+	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), pDirectoryAltered->szPath);
 	PathAppend(szFullFileName,szFileName);
 
 	pMyTreeView->DirectoryModified(dwAction,szFullFileName);
@@ -348,7 +348,7 @@ void CMyTreeView::AddItem(const TCHAR *szFullFileName)
 	}
 	else
 	{
-		StringCchCopy(szDirectory,MAX_PATH,szFullFileName);
+		StringCchCopy(szDirectory, SIZEOF_ARRAY(szDirectory), szFullFileName);
 		PathRemoveFileSpec(szDirectory);
 
 		// Check if it is a desktop (sub)child
@@ -493,7 +493,7 @@ void CMyTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 
 		CoTaskMemFree(pItemInfo->pidl);
 
-		StringCchCopy(szFileName,MAX_PATH,szFullFileName);
+		StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
 		PathStripPath(szFileName);
 
 		hr = GetIdlFromParsingName(szFullFileName,&pItemInfo->pidl);

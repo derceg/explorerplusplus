@@ -1263,7 +1263,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 		case IDM_ACTIONS_MERGEFILES:
 			{
 				TCHAR szCurrentDirectory[MAX_PATH];
-				m_pActiveShellBrowser->QueryCurrentDirectory(MAX_PATH,szCurrentDirectory);
+				m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
 
 				std::list<std::wstring>	FullFilenameList;
 				int iItem = -1;

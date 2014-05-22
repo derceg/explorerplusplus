@@ -701,7 +701,7 @@ HRESULT CDropHandler::CopyUnicodeTextData(IDataObject *pDataObject,
 		{
 			TCHAR szFullFileName[MAX_PATH];
 
-			hr = CopyTextToFile(m_szDestDirectory,pText,szFullFileName);
+			hr = CopyTextToFile(m_szDestDirectory, pText, szFullFileName, SIZEOF_ARRAY(szFullFileName));
 
 			if(hr == S_OK)
 			{
@@ -744,7 +744,8 @@ HRESULT CDropHandler::CopyAnsiTextData(IDataObject *pDataObject,
 			{
 				TCHAR szFullFileName[MAX_PATH];
 
-				hr = CopyTextToFile(m_szDestDirectory, pszUnicodeText, szFullFileName);
+				hr = CopyTextToFile(m_szDestDirectory, pszUnicodeText,
+					szFullFileName, SIZEOF_ARRAY(szFullFileName));
 
 				if(hr == S_OK)
 				{
@@ -1228,7 +1229,7 @@ void CDropHandler::CreateShortcutToDroppedFile(TCHAR *szFullFileName)
 }
 
 HRESULT CDropHandler::CopyTextToFile(const TCHAR *pszDestDirectory,
-	const WCHAR *pszText,TCHAR *pszFullFileNameOut)
+	const WCHAR *pszText,TCHAR *pszFullFileNameOut, size_t outLen)
 {
 	SYSTEMTIME st;
 	FILETIME ft;
@@ -1281,8 +1282,7 @@ HRESULT CDropHandler::CopyTextToFile(const TCHAR *pszDestDirectory,
 
 		CloseHandle(hFile);
 
-		StringCchCopy(pszFullFileNameOut,MAX_PATH,
-			szFullFileName);
+		StringCchCopy(pszFullFileNameOut,outLen,szFullFileName);
 
 		hr = S_OK;
 	}

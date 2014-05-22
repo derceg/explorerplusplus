@@ -309,7 +309,7 @@ void CShellBrowser::DragStarted(int iFirstItem,POINT *ptCursor)
 
 	while((iSelected = ListView_GetNextItem(m_hListView,iSelected,LVNI_SELECTED)) != -1)
 	{
-		QueryDisplayName(iSelected,MAX_PATH,df.szFileName);
+		QueryDisplayName(iSelected, SIZEOF_ARRAY(df.szFileName), df.szFileName);
 
 		m_DraggedFilesList.push_back(df);
 	}

@@ -172,7 +172,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 					if(!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
 					{
 						ListView_GetItemRect(m_hActiveListView,lvhti.iItem,&rc,LVIR_LABEL);
-						ListView_GetItemText(m_hActiveListView,lvhti.iItem,0,szText,MAX_PATH);
+						ListView_GetItemText(m_hActiveListView,lvhti.iItem,0,szText,SIZEOF_ARRAY(szText));
 
 						hdc = GetDC(m_hActiveListView);
 						GetTextExtentPoint32(hdc,szText,lstrlen(szText),&sz);
@@ -426,7 +426,7 @@ void Explorerplusplus::OnListViewMButtonUp(POINT *pt)
 					{
 						/* Folder item. */
 						pShellFolder->GetDisplayNameOf(ridl,SHGDN_FORPARSING,&str);
-						StrRetToBuf(&str,ridl,szParsingPath,MAX_PATH);
+						StrRetToBuf(&str,ridl,szParsingPath,SIZEOF_ARRAY(szParsingPath));
 
 						BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
 					}
@@ -751,7 +751,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		return 0;
 	}
 
-	m_pActiveShellBrowser->QueryCurrentDirectory(MAX_PATH,CurrentDirectory);
+	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(CurrentDirectory), CurrentDirectory);
 	StringCchCopy(NewFileName,SIZEOF_ARRAY(NewFileName),CurrentDirectory);
 	StringCchCopy(OldFileName,SIZEOF_ARRAY(OldFileName),CurrentDirectory);
 

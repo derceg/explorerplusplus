@@ -1173,7 +1173,7 @@ HTREEITEM CMyTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 		hItem = hNextItem;
 
 		Item.pszText	= ItemText;
-		Item.cchTextMax	= MAX_PATH;
+		Item.cchTextMax	= SIZEOF_ARRAY(ItemText);
 		Item.hItem		= hItem;
 		TreeView_GetItem(m_hTreeView,&Item);
 
@@ -1185,7 +1185,7 @@ HTREEITEM CMyTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 				return NULL;
 
 			Item.pszText	= ItemText;
-			Item.cchTextMax	= MAX_PATH;
+			Item.cchTextMax	= SIZEOF_ARRAY(ItemText);
 			Item.hItem		= hItem;
 			TreeView_GetItem(m_hTreeView,&Item);
 		}
@@ -1241,7 +1241,7 @@ HTREEITEM CMyTreeView::LocateItemOnDesktopTree(const TCHAR *szFullFileName)
 			tvItem.mask			= TVIF_TEXT;
 			tvItem.hItem		= hItem;
 			tvItem.pszText		= szCurrentItem;
-			tvItem.cchTextMax	= MAX_PATH;
+			tvItem.cchTextMax	= SIZEOF_ARRAY(szCurrentItem);
 			TreeView_GetItem(m_hTreeView,&tvItem);
 
 			if(lstrcmp(szCurrentItem,pItemName) == 0)
@@ -1554,7 +1554,7 @@ void CMyTreeView::MonitorDrive(const TCHAR *szDrive)
 		{
 			pDirectoryAltered = (DirectoryAltered_t *)malloc(sizeof(DirectoryAltered_t));
 
-			StringCchCopy(pDirectoryAltered->szPath,MAX_PATH,szDrive);
+			StringCchCopy(pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath), szDrive);
 			pDirectoryAltered->pMyTreeView	= this;
 
 			iMonitorId = m_pDirMon->WatchDirectory(hDrive,szDrive,FILE_NOTIFY_CHANGE_DIR_NAME,

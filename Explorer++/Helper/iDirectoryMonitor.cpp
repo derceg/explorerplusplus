@@ -218,7 +218,7 @@ int CDirectoryMonitor::WatchDirectory(const TCHAR *Directory, UINT WatchFlags,
 	CD/DVD drives etc). */
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 
-	StringCchCopy(pDirInfo.m_DirPath,MAX_PATH,Directory);
+	StringCchCopy(pDirInfo.m_DirPath, SIZEOF_ARRAY(pDirInfo.m_DirPath), Directory);
 
 	pDirInfo.m_hDirectory = CreateFile(pDirInfo.m_DirPath,
 	FILE_LIST_DIRECTORY,FILE_SHARE_READ|FILE_SHARE_DELETE|FILE_SHARE_WRITE,
@@ -269,7 +269,7 @@ int CDirectoryMonitor::WatchDirectory(HANDLE hDirectory, const TCHAR *Directory,
 	CD/DVD drives etc). */
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 
-	StringCchCopy(pDirInfo.m_DirPath,MAX_PATH,Directory);
+	StringCchCopy(pDirInfo.m_DirPath, SIZEOF_ARRAY(pDirInfo.m_DirPath), Directory);
 
 	pDirInfo.m_hDirectory = hDirectory;
 
