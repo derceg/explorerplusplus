@@ -165,6 +165,9 @@ Explorerplusplus::~Explorerplusplus()
 		DeleteObject(m_hTabFont);
 	}
 
+	delete m_pTabContainer;
+	delete m_pCustomMenu;
+
 	/* Bookmarks teardown. */
 	delete m_pipbin;
 	delete m_pBookmarksToolbar;

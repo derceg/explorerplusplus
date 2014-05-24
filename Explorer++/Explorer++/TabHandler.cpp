@@ -67,7 +67,6 @@ void Explorerplusplus::InitializeTabs(void)
 	AddDefaultTabIcons(himlSmall);
 	TabCtrl_SetImageList(m_hTabCtrl,himlSmall);
 
-	/* TODO: Needs to be freed when closing. */
 	m_pTabContainer = new CTabContainer(m_hTabCtrl,m_pShellBrowser,this);
 
 	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hTabCtrl,m_pTabContainer);
