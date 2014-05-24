@@ -1646,8 +1646,8 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 
 		case LVN_ITEMCHANGING:
 			{
-				UINT uViewMode;
-				m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+				UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
+
 				if(uViewMode == VM_LIST)
 				{
 					if(m_bBlockNext)
@@ -1682,8 +1682,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 				KB813791. */
 				if(m_dwMajorVersion == WINDOWS_XP_MAJORVERSION)
 				{
-					UINT uViewMode;
-					m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+					UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
 
 					DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(m_hActiveListView);
 

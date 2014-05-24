@@ -336,10 +336,10 @@ public:
 	UINT				QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const;
 	BOOL				GetAutoArrange(void) const;
 	void				SortFolder(UINT SortMode);
-	HRESULT				SetCurrentViewMode(DWORD ViewMode);
-	HRESULT				GetCurrentViewMode(UINT *pViewMode) const;
-	HRESULT				GetSortMode(UINT *SortMode) const;
-	HRESULT				SetSortMode(UINT SortMode);
+	UINT				GetCurrentViewMode() const;
+	void				SetCurrentViewMode(UINT ViewMode);
+	UINT				GetSortMode() const;
+	void				SetSortMode(UINT SortMode);
 	BOOL				IsGroupViewEnabled(void) const;
 	BOOL				ToggleSortAscending(void);
 	BOOL				GetSortAscending(void) const;
@@ -580,7 +580,7 @@ private:
 	HRESULT inline		AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
 	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName);
 	void				ResetFolderMemoryAllocations(void);
-	void				SetCurrentViewModeInternal(DWORD ViewMode);
+	void				SetCurrentViewModeInternal(UINT ViewMode);
 
 	/* Sorting. */
 	int CALLBACK		Sort(int InternalIndex1,int InternalIndex2) const;

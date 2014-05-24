@@ -1121,12 +1121,9 @@ int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 
 void Explorerplusplus::CreateViewsMenu(POINT *ptOrigin)
 {
-	UINT	uViewMode;
-	int		ItemToCheck;
+	UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
 
-	m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
-
-	ItemToCheck = GetViewModeMenuId(uViewMode);
+	int ItemToCheck = GetViewModeMenuId(uViewMode);
 	CheckMenuRadioItem(m_hViewsMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,
 		ItemToCheck,MF_BYCOMMAND);
 

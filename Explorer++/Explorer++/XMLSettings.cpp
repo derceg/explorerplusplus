@@ -907,10 +907,10 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXML
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortAscending"),
 			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->GetSortAscending()));
 
-		m_pShellBrowser[(int)tcItem.lParam]->GetSortMode(&SortMode);
+		SortMode = m_pShellBrowser[(int) tcItem.lParam]->GetSortMode();
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortMode"),NXMLSettings::EncodeIntValue(SortMode));
 
-		m_pShellBrowser[(int)tcItem.lParam]->GetCurrentViewMode(&ViewMode);
+		ViewMode = m_pShellBrowser[(int) tcItem.lParam]->GetCurrentViewMode();
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ViewMode"),NXMLSettings::EncodeIntValue(ViewMode));
 
 		bstr = SysAllocString(L"Columns");

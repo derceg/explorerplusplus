@@ -468,11 +468,11 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 					(LPBYTE)pidlDirectory,ILGetSize(pidlDirectory));
 				CoTaskMemFree((LPVOID)pidlDirectory);
 
-				m_pShellBrowser[(int)tcItem.lParam]->GetCurrentViewMode(&ViewMode);
+				ViewMode = m_pShellBrowser[(int) tcItem.lParam]->GetCurrentViewMode();
 
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ViewMode"),ViewMode);
 
-				m_pShellBrowser[(int)tcItem.lParam]->GetSortMode(&SortMode);
+				SortMode = m_pShellBrowser[(int) tcItem.lParam]->GetSortMode();
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortMode"),SortMode);
 
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"),m_pShellBrowser[(int)tcItem.lParam]->GetSortAscending());

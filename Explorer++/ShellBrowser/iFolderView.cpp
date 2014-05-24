@@ -213,15 +213,22 @@ BOOL CShellBrowser::GetAutoArrange(void) const
 	return m_bAutoArrange;
 }
 
+UINT CShellBrowser::GetCurrentViewMode() const
+{
+	return m_ViewMode;
+}
+
 /* This function is only called on 'hard' view changes
 (i.e. view changes resulting from user requests). It is
 not called when a tab is first set up (in which case
 the view mode still needs to be setup), or when entering
 a folder. */
-HRESULT CShellBrowser::SetCurrentViewMode(DWORD ViewMode)
+void CShellBrowser::SetCurrentViewMode(UINT ViewMode)
 {
 	if(ViewMode == m_ViewMode)
-		return S_FALSE;
+	{
+		return;
+	}
 
 	if(m_ViewMode == VM_THUMBNAILS && ViewMode != VM_THUMBNAILS)
 		RemoveThumbnailsView();
@@ -248,8 +255,6 @@ HRESULT CShellBrowser::SetCurrentViewMode(DWORD ViewMode)
 			SetTileViewInfo();
 			break;
 	}
-
-	return S_OK;
 }
 
 /* Explicitly sets the view mode within in the listview.
@@ -257,7 +262,7 @@ This function also initializes any items needed to support
 the current view mode. This MUST be done within this
 function, as when a tab is first opened, the view settings
 will need to be initialized. */
-void CShellBrowser::SetCurrentViewModeInternal(DWORD ViewMode)
+void CShellBrowser::SetCurrentViewModeInternal(UINT ViewMode)
 {
 	DWORD dwStyle;
 
@@ -361,28 +366,14 @@ void CShellBrowser::SetCurrentViewModeInternal(DWORD ViewMode)
 	SendMessage(m_hListView,LVM_SETVIEW,dwStyle,0);
 }
 
-HRESULT CShellBrowser::GetCurrentViewMode(UINT *pViewMode) const
+UINT CShellBrowser::GetSortMode() const
 {
-	if(pViewMode == NULL)
-		return E_INVALIDARG;
-
-	*pViewMode = m_ViewMode;
-
-	return S_OK;
+	return m_SortMode;
 }
 
-HRESULT CShellBrowser::GetSortMode(UINT *SortMode) const
-{
-	*SortMode = m_SortMode;
-
-	return S_OK;
-}
-
-HRESULT CShellBrowser::SetSortMode(UINT SortMode)
+void CShellBrowser::SetSortMode(UINT SortMode)
 {
 	m_SortMode	= SortMode;
-
-	return S_OK;
 }
 
 BOOL CShellBrowser::IsGroupViewEnabled(void) const

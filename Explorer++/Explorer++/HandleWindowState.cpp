@@ -63,9 +63,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	UINT ItemToCheck;
 	UINT ListViewStyle;
 	BOOL bVirtualFolder;
-	UINT uViewMode;
 
-	m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+	UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
 
 	bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
@@ -177,7 +176,7 @@ void Explorerplusplus::SetArrangeMenuItemStates()
 
 	bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
-	m_pShellBrowser[m_iObjectIndex]->GetSortMode(&SortMode);
+	SortMode = m_pShellBrowser[m_iObjectIndex]->GetSortMode();
 
 	bShowInGroups = m_pShellBrowser[m_iObjectIndex]->IsGroupViewEnabled();
 

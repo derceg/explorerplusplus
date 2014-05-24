@@ -165,8 +165,9 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 				TCHAR szText[MAX_PATH];
 				RECT rc;
 				SIZE sz;
-				UINT uViewMode;
-				m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+
+				UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
+
 				if(uViewMode == VM_LIST)
 				{
 					if(!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
@@ -1049,8 +1050,7 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 	mii.hSubMenu	= m_hGroupBySubMenuRClick;
 	SetMenuItemInfo(hMenu,IDM_POPUP_GROUPBY,FALSE,&mii);
 
-	UINT uViewMode;
-	m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode(&uViewMode);
+	UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
 
 	if(uViewMode == VM_LIST)
 	{
