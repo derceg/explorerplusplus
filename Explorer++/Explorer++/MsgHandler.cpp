@@ -1324,8 +1324,11 @@ void Explorerplusplus::OnDrawClipboard(void)
 	SendMessage(m_hMainToolbar,TB_ENABLEBUTTON,(WPARAM)TOOLBAR_PASTE,
 		!m_pActiveShellBrowser->InVirtualFolder() && IsClipboardFormatAvailable(CF_HDROP));
 
-	/* Forward the message to the next window in the chain. */
-	SendMessage(m_hNextClipboardViewer,WM_DRAWCLIPBOARD,0,0);
+	if(m_hNextClipboardViewer != NULL)
+	{
+		/* Forward the message to the next window in the chain. */
+		SendMessage(m_hNextClipboardViewer, WM_DRAWCLIPBOARD, 0, 0);
+	}
 }
 
 /*
