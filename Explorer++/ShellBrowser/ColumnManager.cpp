@@ -1806,37 +1806,30 @@ void CShellBrowser::SaveColumnWidths(void)
 
 	if(CompareVirtualFolders(CSIDL_CONTROLS))
 	{
-		/* Control panel. */
 		pActiveColumnList = &m_ControlPanelColumnList;
 	}
 	else if(CompareVirtualFolders(CSIDL_DRIVES))
 	{
-		/* My Computer. */
 		pActiveColumnList = &m_MyComputerColumnList;
 	}
 	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
-		/* Recycle Bin. */
 		pActiveColumnList = &m_RecycleBinColumnList;
 	}
 	else if(CompareVirtualFolders(CSIDL_PRINTERS))
 	{
-		/* Printers virtual folder. */
 		pActiveColumnList = &m_PrintersColumnList;
 	}
 	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
 	{
-		/* Network connections virtual folder. */
 		pActiveColumnList = &m_NetworkConnectionsColumnList;
 	}
 	else if(CompareVirtualFolders(CSIDL_NETWORK))
 	{
-		/* My Network Places (Network on Vista) virtual folder. */
 		pActiveColumnList = &m_MyNetworkPlacesColumnList;
 	}
 	else
 	{
-		/* Real folder. */
 		pActiveColumnList = &m_RealFolderColumnList;
 	}
 
