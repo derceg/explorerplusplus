@@ -220,8 +220,8 @@ void Explorerplusplus::OnCreate(void)
 
 	/* Register for any shell changes. This should
 	be done after the tabs have been created. */
-	SHChangeNotifyRegister(m_hContainer,SHCNRF_ShellLevel,SHCNE_ASSOCCHANGED,
-		WM_APP_ASSOCCHANGED,1,&shcne);
+	m_SHChangeNotifyID = SHChangeNotifyRegister(m_hContainer,SHCNRF_ShellLevel,
+		SHCNE_ASSOCCHANGED,WM_APP_ASSOCCHANGED,1,&shcne);
 
 
 
@@ -1127,6 +1127,11 @@ int Explorerplusplus::OnDestroy(void)
 			remains there after we exit. */
 			OleFlushClipboard();
 		}
+	}
+
+	if(m_SHChangeNotifyID != 0)
+	{
+		SHChangeNotifyDeregister(m_SHChangeNotifyID);
 	}
 
 	QueueUserAPC(QuitIconAPC,m_hIconThread,NULL);

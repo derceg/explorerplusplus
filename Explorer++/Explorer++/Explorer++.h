@@ -825,6 +825,7 @@ private:
 	int						m_iMaxArrangeMenuItem;
 	int						m_iLastSelectedTab;
 	int						m_iTabSelectedItem;
+	ULONG					m_SHChangeNotifyID;
 
 	std::list<ViewMode_t>	m_ViewModes;
 
