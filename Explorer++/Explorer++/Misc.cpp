@@ -1168,7 +1168,7 @@ int Explorerplusplus::CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,i
  * in the window that currently has focus; FALSE
  * otherwise.
  */
-BOOL Explorerplusplus::CheckItemSelection(void)
+BOOL Explorerplusplus::AnyItemsSelected(void)
 {
 	HWND hFocus;
 
