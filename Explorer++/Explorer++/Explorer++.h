@@ -761,7 +761,7 @@ private:
 	int						GetViewModeMenuStringId(UINT uViewMode);
 	BOOL					VerifyLanguageVersion(TCHAR *szLanguageModule) const;
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
-	void					PlayNavigationSound(void);
+	void					PlayNavigationSound(void) const;
 	CStatusBar				*GetStatusBar();
 	UINT					GetDefaultSortMode(LPCITEMIDLIST pidlDirectory);
 	unsigned int			DetermineColumnSortMode(UINT uColumnId);

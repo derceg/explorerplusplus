@@ -2671,7 +2671,7 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 	}
 }
 
-void Explorerplusplus::PlayNavigationSound(void)
+void Explorerplusplus::PlayNavigationSound(void) const
 {
 	if(m_bPlayNavigationSound)
 	{
