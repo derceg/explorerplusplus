@@ -213,6 +213,15 @@ BOOL CShellBrowser::GetAutoArrange(void) const
 	return m_bAutoArrange;
 }
 
+BOOL CShellBrowser::ToggleAutoArrange(void)
+{
+	m_bAutoArrange = !m_bAutoArrange;
+
+	NListView::ListView_SetAutoArrange(m_hListView, m_bAutoArrange);
+
+	return m_bAutoArrange;
+}
+
 UINT CShellBrowser::GetCurrentViewMode() const
 {
 	return m_ViewMode;

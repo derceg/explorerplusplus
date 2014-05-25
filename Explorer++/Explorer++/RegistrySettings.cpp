@@ -479,7 +479,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"),m_pShellBrowser[(int)tcItem.lParam]->IsGroupViewEnabled());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ApplyFilter"),m_pShellBrowser[(int)tcItem.lParam]->GetFilterStatus());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"),m_pShellBrowser[(int)tcItem.lParam]->GetFilterCaseSensitive());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"),m_pShellBrowser[(int)tcItem.lParam]->QueryShowHidden());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"),m_pShellBrowser[(int)tcItem.lParam]->GetShowHidden());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AutoArrange"),m_pShellBrowser[(int)tcItem.lParam]->GetAutoArrange());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowGridlines"),m_pShellBrowser[(int)tcItem.lParam]->QueryGridlinesActive());
 

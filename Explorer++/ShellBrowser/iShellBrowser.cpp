@@ -1202,10 +1202,8 @@ void CShellBrowser::VerifySortMode(void)
 	}
 }
 
-BOOL CShellBrowser::ToggleSortAscending(void)
+BOOL CShellBrowser::GetSortAscending(void) const
 {
-	m_bSortAscending = !m_bSortAscending;
-
 	return m_bSortAscending;
 }
 
@@ -1216,21 +1214,14 @@ BOOL CShellBrowser::SetSortAscending(BOOL bAscending)
 	return m_bSortAscending;
 }
 
-BOOL CShellBrowser::GetSortAscending(void) const
+BOOL CShellBrowser::ToggleSortAscending(void)
 {
+	m_bSortAscending = !m_bSortAscending;
+
 	return m_bSortAscending;
 }
 
-BOOL CShellBrowser::ToggleAutoArrange(void)
-{
-	m_bAutoArrange = !m_bAutoArrange;
-
-	NListView::ListView_SetAutoArrange(m_hListView,m_bAutoArrange);
-
-	return m_bAutoArrange;
-}
-
-BOOL CShellBrowser::QueryShowHidden(void) const
+BOOL CShellBrowser::GetShowHidden(void) const
 {
 	return m_bShowHidden;
 }

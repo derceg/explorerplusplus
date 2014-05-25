@@ -899,7 +899,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXML
 			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->QueryGridlinesActive()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowHidden"),
-			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->QueryShowHidden()));
+			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->GetShowHidden()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowInGroups"),
 			NXMLSettings::EncodeBoolValue(m_pShellBrowser[(int)tcItem.lParam]->IsGroupViewEnabled()));

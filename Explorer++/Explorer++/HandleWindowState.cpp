@@ -107,7 +107,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_DRIVES,m_bShowDrivesToolbar);
 	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_APPLICATIONTOOLBAR,m_bShowApplicationToolbar);
 	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_LOCKTOOLBARS,m_bLockToolbars);
-	lCheckMenuItem(hProgramMenu,IDM_VIEW_SHOWHIDDENFILES,m_pActiveShellBrowser->QueryShowHidden());
+	lCheckMenuItem(hProgramMenu,IDM_VIEW_SHOWHIDDENFILES,m_pActiveShellBrowser->GetShowHidden());
 	lCheckMenuItem(hProgramMenu,IDM_FILTER_APPLYFILTER,m_pActiveShellBrowser->GetFilterStatus());
 
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_NEWFOLDER,!bVirtualFolder);
