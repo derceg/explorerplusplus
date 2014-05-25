@@ -81,7 +81,7 @@ m_hContainer(hwnd)
 	m_ColorRules = NColorRuleHelper::GetDefaultColorRules(m_hLanguageModule);
 
 	SetDefaultValues();
-	SetAllDefaultColumns();
+	SetDefaultColumns();
 
 	InitializeTabMap();
 

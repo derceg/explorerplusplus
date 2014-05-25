@@ -1835,129 +1835,24 @@ BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow)
 	return hr;
 }
 
-void Explorerplusplus::SetAllDefaultColumns(void)
+void Explorerplusplus::SetDefaultColumns()
 {
 	/* Set the default columns as the initial set. When the
 	settings are loaded, these columns may be overwritten. */
-	SetDefaultRealFolderColumns(&m_RealFolderColumnList);
-	SetDefaultControlPanelColumns(&m_ControlPanelColumnList);
-	SetDefaultMyComputerColumns(&m_MyComputerColumnList);
-	SetDefaultRecycleBinColumns(&m_RecycleBinColumnList);
-	SetDefaultPrintersColumns(&m_PrintersColumnList);
-	SetDefaultNetworkConnectionsColumns(&m_NetworkConnectionsColumnList);
-	SetDefaultMyNetworkPlacesColumns(&m_MyNetworkPlacesColumnList);
-}
-
-void Explorerplusplus::SetDefaultRealFolderColumns(std::list<Column_t> *pColumns)
-{
-	Column_t Column;
-	int i = 0;
-
-	pColumns->clear();
-
-	for(i = 0;i <SIZEOF_ARRAY(REAL_FOLDER_DEFAULT_COLUMNS);i++)
-	{
-		Column.id		= REAL_FOLDER_DEFAULT_COLUMNS[i].id;
-		Column.bChecked	= REAL_FOLDER_DEFAULT_COLUMNS[i].bChecked;
-		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
-		pColumns->push_back(Column);
-	}
-}
-
-void Explorerplusplus::SetDefaultControlPanelColumns(std::list<Column_t> *pColumns)
-{
-	Column_t Column;
-	int i = 0;
-
-	pColumns->clear();
-
-	for(i = 0;i <SIZEOF_ARRAY(CONTROL_PANEL_DEFAULT_COLUMNS);i++)
-	{
-		Column.id		= CONTROL_PANEL_DEFAULT_COLUMNS[i].id;
-		Column.bChecked	= CONTROL_PANEL_DEFAULT_COLUMNS[i].bChecked;
-		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
-		pColumns->push_back(Column);
-	}
-}
-
-void Explorerplusplus::SetDefaultMyComputerColumns(std::list<Column_t> *pColumns)
-{
-	Column_t Column;
-	int i = 0;
-
-	pColumns->clear();
-
-	for(i = 0;i <SIZEOF_ARRAY(MY_COMPUTER_DEFAULT_COLUMNS);i++)
-	{
-		Column.id		= MY_COMPUTER_DEFAULT_COLUMNS[i].id;
-		Column.bChecked	= MY_COMPUTER_DEFAULT_COLUMNS[i].bChecked;
-		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
-		pColumns->push_back(Column);
-	}
-}
-
-void Explorerplusplus::SetDefaultRecycleBinColumns(std::list<Column_t> *pColumns)
-{
-	Column_t Column;
-	int i = 0;
-
-	pColumns->clear();
-
-	for(i = 0;i <SIZEOF_ARRAY(RECYCLE_BIN_DEFAULT_COLUMNS);i++)
-	{
-		Column.id		= RECYCLE_BIN_DEFAULT_COLUMNS[i].id;
-		Column.bChecked	= RECYCLE_BIN_DEFAULT_COLUMNS[i].bChecked;
-		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
-		pColumns->push_back(Column);
-	}
-}
-
-void Explorerplusplus::SetDefaultPrintersColumns(std::list<Column_t> *pColumns)
-{
-	Column_t Column;
-	int i = 0;
-
-	pColumns->clear();
-
-	for(i = 0;i <SIZEOF_ARRAY(PRINTERS_DEFAULT_COLUMNS);i++)
-	{
-		Column.id		= PRINTERS_DEFAULT_COLUMNS[i].id;
-		Column.bChecked	= PRINTERS_DEFAULT_COLUMNS[i].bChecked;
-		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
-		pColumns->push_back(Column);
-	}
-}
-
-void Explorerplusplus::SetDefaultNetworkConnectionsColumns(std::list<Column_t> *pColumns)
-{
-	Column_t Column;
-	int i = 0;
-
-	pColumns->clear();
-
-	for(i = 0;i <SIZEOF_ARRAY(NETWORK_CONNECTIONS_DEFAULT_COLUMNS);i++)
-	{
-		Column.id		= NETWORK_CONNECTIONS_DEFAULT_COLUMNS[i].id;
-		Column.bChecked	= NETWORK_CONNECTIONS_DEFAULT_COLUMNS[i].bChecked;
-		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
-		pColumns->push_back(Column);
-	}
-}
-
-void Explorerplusplus::SetDefaultMyNetworkPlacesColumns(std::list<Column_t> *pColumns)
-{
-	Column_t Column;
-	int i = 0;
-
-	pColumns->clear();
-
-	for(i = 0;i <SIZEOF_ARRAY(MY_NETWORK_PLACES_DEFAULT_COLUMNS);i++)
-	{
-		Column.id		= MY_NETWORK_PLACES_DEFAULT_COLUMNS[i].id;
-		Column.bChecked	= MY_NETWORK_PLACES_DEFAULT_COLUMNS[i].bChecked;
-		Column.iWidth	= REAL_FOLDER_DEFAULT_COLUMNS[i].iWidth;
-		pColumns->push_back(Column);
-	}
+	m_RealFolderColumnList = std::list<Column_t>(REAL_FOLDER_DEFAULT_COLUMNS,
+		REAL_FOLDER_DEFAULT_COLUMNS + SIZEOF_ARRAY(REAL_FOLDER_DEFAULT_COLUMNS));
+	m_ControlPanelColumnList = std::list<Column_t>(CONTROL_PANEL_DEFAULT_COLUMNS,
+		CONTROL_PANEL_DEFAULT_COLUMNS + SIZEOF_ARRAY(CONTROL_PANEL_DEFAULT_COLUMNS));
+	m_MyComputerColumnList = std::list<Column_t>(MY_COMPUTER_DEFAULT_COLUMNS,
+		MY_COMPUTER_DEFAULT_COLUMNS + SIZEOF_ARRAY(MY_COMPUTER_DEFAULT_COLUMNS));
+	m_RecycleBinColumnList = std::list<Column_t>(RECYCLE_BIN_DEFAULT_COLUMNS,
+		RECYCLE_BIN_DEFAULT_COLUMNS + SIZEOF_ARRAY(RECYCLE_BIN_DEFAULT_COLUMNS));
+	m_PrintersColumnList = std::list<Column_t>(PRINTERS_DEFAULT_COLUMNS,
+		PRINTERS_DEFAULT_COLUMNS + SIZEOF_ARRAY(PRINTERS_DEFAULT_COLUMNS));
+	m_NetworkConnectionsColumnList = std::list<Column_t>(NETWORK_CONNECTIONS_DEFAULT_COLUMNS,
+		NETWORK_CONNECTIONS_DEFAULT_COLUMNS + SIZEOF_ARRAY(NETWORK_CONNECTIONS_DEFAULT_COLUMNS));
+	m_MyNetworkPlacesColumnList = std::list<Column_t>(MY_NETWORK_PLACES_DEFAULT_COLUMNS,
+		MY_NETWORK_PLACES_DEFAULT_COLUMNS + SIZEOF_ARRAY(MY_NETWORK_PLACES_DEFAULT_COLUMNS));
 }
 
 void Explorerplusplus::OnLockToolbars(void)

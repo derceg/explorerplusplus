@@ -516,14 +516,7 @@ private:
 	void					SetArrangeMenuItemStates();
 
 	/* Columns. */
-	void					SetAllDefaultColumns(void);
-	void					SetDefaultRealFolderColumns(std::list<Column_t> *pColumns);
-	void					SetDefaultControlPanelColumns(std::list<Column_t> *pColumns);
-	void					SetDefaultMyComputerColumns(std::list<Column_t> *pColumns);
-	void					SetDefaultRecycleBinColumns(std::list<Column_t> *pColumns);
-	void					SetDefaultPrintersColumns(std::list<Column_t> *pColumns);
-	void					SetDefaultNetworkConnectionsColumns(std::list<Column_t> *pColumns);
-	void					SetDefaultMyNetworkPlacesColumns(std::list<Column_t> *pColumns);
+	void					SetDefaultColumns();
 
 	/* File infotips. */
 	void					CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax);
