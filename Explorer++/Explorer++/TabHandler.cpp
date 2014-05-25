@@ -97,7 +97,7 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 	switch(msg)
 	{
 		case WM_INITMENU:
-			OnInitTabMenu(wParam);
+			OnInitTabMenu(reinterpret_cast<HMENU>(wParam));
 			SendMessage(m_hContainer,WM_INITMENU,wParam,lParam);
 			break;
 
@@ -925,19 +925,16 @@ void Explorerplusplus::OnTabSelectionChange(void)
 	OnTabChangeInternal(TRUE);
 }
 
-void Explorerplusplus::OnInitTabMenu(WPARAM wParam)
+void Explorerplusplus::OnInitTabMenu(HMENU hMenu)
 {
-	HMENU hTabMenu;
 	TCITEM tcItem;
 
 	tcItem.mask = TCIF_PARAM;
 	TabCtrl_GetItem(m_hTabCtrl,m_iTabMenuItem,&tcItem);
 
-	hTabMenu = (HMENU)wParam;
-
-	lCheckMenuItem(hTabMenu,IDM_TAB_LOCKTAB,m_TabInfo[(int)tcItem.lParam].bLocked);
-	lCheckMenuItem(hTabMenu,IDM_TAB_LOCKTABANDADDRESS,m_TabInfo[(int)tcItem.lParam].bAddressLocked);
-	lEnableMenuItem(hTabMenu,IDM_TAB_CLOSETAB,
+	lCheckMenuItem(hMenu,IDM_TAB_LOCKTAB,m_TabInfo[(int)tcItem.lParam].bLocked);
+	lCheckMenuItem(hMenu,IDM_TAB_LOCKTABANDADDRESS,m_TabInfo[(int)tcItem.lParam].bAddressLocked);
+	lEnableMenuItem(hMenu,IDM_TAB_CLOSETAB,
 		!(m_TabInfo[(int)tcItem.lParam].bLocked || m_TabInfo[(int)tcItem.lParam].bAddressLocked));
 }
 

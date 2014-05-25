@@ -475,7 +475,7 @@ private:
 	void					OnTBGetInfoTip(LPARAM lParam);
 
 	/* Tab control private message handlers. */
-	void					OnInitTabMenu(WPARAM wParam);
+	void					OnInitTabMenu(HMENU hMenu);
 	void					OnTabCtrlLButtonDown(POINT *pt);
 	void					OnTabCtrlLButtonUp(void);
 	void					OnTabCtrlMouseMove(POINT *pt);
