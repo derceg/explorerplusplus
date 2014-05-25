@@ -198,7 +198,13 @@ std::wstring Explorerplusplus::GetTabName(int iTab) const
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+	BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+	assert(res);
+
+	if(!res)
+	{
+		return std::wstring();
+	}
 
 	return std::wstring(m_TabInfo[static_cast<int>(tcItem.lParam)].szName);
 }
@@ -207,7 +213,13 @@ void Explorerplusplus::SetTabName(int iTab,std::wstring strName,BOOL bUseCustomN
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+	BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+	assert(res);
+
+	if(!res)
+	{
+		return;
+	}
 
 	StringCchCopy(m_TabInfo[static_cast<int>(tcItem.lParam)].szName,
 		SIZEOF_ARRAY(m_TabInfo[static_cast<int>(tcItem.lParam)].szName),strName.c_str());
@@ -802,7 +814,13 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 
 	TCITEM tcItem;
 	tcItem.mask = TCIF_IMAGE|TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,TabIndex,&tcItem);
+	BOOL res = TabCtrl_GetItem(m_hTabCtrl,TabIndex,&tcItem);
+	assert(res);
+
+	if(!res)
+	{
+		return false;
+	}
 
 	int iInternalIndex = static_cast<int>(tcItem.lParam);
 
@@ -928,14 +946,21 @@ void Explorerplusplus::OnTabSelectionChange(void)
 void Explorerplusplus::OnInitTabMenu(HMENU hMenu)
 {
 	TCITEM tcItem;
-
 	tcItem.mask = TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,m_iTabMenuItem,&tcItem);
+	BOOL res = TabCtrl_GetItem(m_hTabCtrl,m_iTabMenuItem,&tcItem);
+	assert(res);
 
-	lCheckMenuItem(hMenu,IDM_TAB_LOCKTAB,m_TabInfo[(int)tcItem.lParam].bLocked);
-	lCheckMenuItem(hMenu,IDM_TAB_LOCKTABANDADDRESS,m_TabInfo[(int)tcItem.lParam].bAddressLocked);
-	lEnableMenuItem(hMenu,IDM_TAB_CLOSETAB,
-		!(m_TabInfo[(int)tcItem.lParam].bLocked || m_TabInfo[(int)tcItem.lParam].bAddressLocked));
+	if(!res)
+	{
+		return;
+	}
+
+	int internalIndex = static_cast<int>(tcItem.lParam);
+
+	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, m_TabInfo[internalIndex].bLocked);
+	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, m_TabInfo[internalIndex].bAddressLocked);
+	lEnableMenuItem(hMenu, IDM_TAB_CLOSETAB,
+		!(m_TabInfo[internalIndex].bLocked || m_TabInfo[internalIndex].bAddressLocked));
 }
 
 void Explorerplusplus::OnTabCtrlLButtonDown(POINT *pt)
@@ -1056,20 +1081,24 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 			{
 				TCITEM tcItem;
 				tcItem.mask = TCIF_PARAM;
-				TabCtrl_GetItem(m_hTabCtrl,iTabHit,&tcItem);
+				BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTabHit,&tcItem);
+				assert(res);
 
-				LPITEMIDLIST pidlCurrent = m_pShellBrowser[static_cast<int>(tcItem.lParam)]->QueryCurrentDirectoryIdl();
-
-				LPITEMIDLIST pidlParent = NULL;
-				HRESULT hr = GetVirtualParentPath(pidlCurrent,&pidlParent);
-
-				if(SUCCEEDED(hr))
+				if(res)
 				{
-					BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-					CoTaskMemFree(pidlParent);
-				}
+					LPITEMIDLIST pidlCurrent = m_pShellBrowser[static_cast<int>(tcItem.lParam)]->QueryCurrentDirectoryIdl();
 
-				CoTaskMemFree(pidlCurrent);
+					LPITEMIDLIST pidlParent = NULL;
+					HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
+
+					if(SUCCEEDED(hr))
+					{
+						BrowseFolder(pidlParent, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+						CoTaskMemFree(pidlParent);
+					}
+
+					CoTaskMemFree(pidlCurrent);
+				}
 			}
 			break;
 
@@ -1189,9 +1218,14 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 void Explorerplusplus::OnDuplicateTab(int iTab)
 {
 	TCITEM tcItem;
-
 	tcItem.mask = TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+	BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+	assert(res);
+
+	if(!res)
+	{
+		return;
+	}
 
 	DuplicateTab((int)tcItem.lParam);
 }
@@ -1199,9 +1233,14 @@ void Explorerplusplus::OnDuplicateTab(int iTab)
 void Explorerplusplus::OnLockTab(int iTab)
 {
 	TCITEM tcItem;
-
 	tcItem.mask = TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+	BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+	assert(res);
+
+	if(!res)
+	{
+		return;
+	}
 
 	OnLockTabInternal(iTab,(int)tcItem.lParam);
 }
@@ -1229,23 +1268,30 @@ void Explorerplusplus::OnLockTabInternal(int iTab,int iTabId)
 void Explorerplusplus::OnLockTabAndAddress(int iTab)
 {
 	TCITEM tcItem;
-
 	tcItem.mask = TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+	BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+	assert(res);
 
-	m_TabInfo[(int)tcItem.lParam].bAddressLocked = !m_TabInfo[(int)tcItem.lParam].bAddressLocked;
-
-	if(m_TabInfo[(int)tcItem.lParam].bAddressLocked)
+	if(!res)
 	{
-		m_TabInfo[(int)tcItem.lParam].bLocked = FALSE;
+		return;
 	}
 
-	SetTabIcon(iTab,(int)tcItem.lParam);
+	int internalIndex = static_cast<int>(tcItem.lParam);
+
+	m_TabInfo[internalIndex].bAddressLocked = !m_TabInfo[internalIndex].bAddressLocked;
+
+	if(m_TabInfo[internalIndex].bAddressLocked)
+	{
+		m_TabInfo[internalIndex].bLocked = FALSE;
+	}
+
+	SetTabIcon(iTab, internalIndex);
 
 	/* If the tab that was locked/unlocked is the
 	currently selected tab, then the tab close
 	button on the toolbar will need to be updated. */
-	if((int)tcItem.lParam == m_iObjectIndex)
+	if(internalIndex == m_iObjectIndex)
 		UpdateTabToolbar();
 }
 

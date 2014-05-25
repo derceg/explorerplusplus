@@ -48,7 +48,13 @@ CShellBrowser *CTabContainer::GetBrowserForTab(int Index)
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,Index,&tcItem);
+	BOOL res = TabCtrl_GetItem(m_hTabCtrl,Index,&tcItem);
+	assert(res);
+
+	if(!res)
+	{
+		return NULL;
+	}
 
 	return m_pShellBrowsers[tcItem.lParam];
 }

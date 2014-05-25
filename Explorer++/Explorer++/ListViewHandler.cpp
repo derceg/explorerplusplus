@@ -68,9 +68,13 @@ HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)
 	HWND hListView = CreateListView(hParent,Style);
 
 	IImageList *pImageList = NULL;
-	SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
-	ListView_SetImageList(hListView,reinterpret_cast<HIMAGELIST>(pImageList),LVSIL_SMALL);
-	pImageList->Release();
+	HRESULT hr = SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
+
+	if(SUCCEEDED(hr))
+	{
+		ListView_SetImageList(hListView, reinterpret_cast<HIMAGELIST>(pImageList), LVSIL_SMALL);
+		pImageList->Release();
+	}
 
 	DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
