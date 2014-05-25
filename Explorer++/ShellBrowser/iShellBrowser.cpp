@@ -1230,11 +1230,6 @@ BOOL CShellBrowser::ToggleAutoArrange(void)
 	return m_bAutoArrange;
 }
 
-BOOL CShellBrowser::QueryAutoArrange(void) const
-{
-	return m_bAutoArrange;
-}
-
 BOOL CShellBrowser::QueryShowHidden(void) const
 {
 	return m_bShowHidden;

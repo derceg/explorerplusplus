@@ -150,7 +150,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 		lEnableMenuItem(hProgramMenu,IDM_VIEW_GROUPBY,TRUE);
 
 		lEnableMenuItem(hProgramMenu,IDM_ARRANGEICONSBY_AUTOARRANGE,TRUE);
-		lCheckMenuItem(hProgramMenu,IDM_ARRANGEICONSBY_AUTOARRANGE,m_pActiveShellBrowser->QueryAutoArrange());
+		lCheckMenuItem(hProgramMenu,IDM_ARRANGEICONSBY_AUTOARRANGE,m_pActiveShellBrowser->GetAutoArrange());
 	}
 
 	SetArrangeMenuItemStates();

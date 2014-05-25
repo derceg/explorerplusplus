@@ -345,7 +345,6 @@ public:
 	BOOL				GetSortAscending(void) const;
 	BOOL				SetSortAscending(BOOL bAscending);
 	BOOL				ToggleAutoArrange(void);
-	BOOL				QueryAutoArrange(void) const;
 	BOOL				QueryShowHidden(void) const;
 	BOOL				SetShowHidden(BOOL bShowHidden);
 	BOOL				ToggleShowHidden(void);
