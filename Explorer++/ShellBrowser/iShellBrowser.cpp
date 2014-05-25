@@ -1316,20 +1316,20 @@ void CShellBrowser::SetTerminationStatus(void)
 	m_bNotifiedOfTermination = TRUE;
 }
 
-void CShellBrowser::QueryCurrentSortModes(std::list<int> *pSortModes) const
+std::list<int> CShellBrowser::QueryCurrentSortModes() const
 {
-	std::list<Column_t>::iterator itr;
-	int ColumnSortMode;
+	std::list<int> sortModes;
 
-	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
+	for(auto itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
 	{
 		if(itr->bChecked)
 		{
-			ColumnSortMode = DetermineColumnSortMode(itr->id);
-
-			pSortModes->push_back(ColumnSortMode);
+			int ColumnSortMode = DetermineColumnSortMode(itr->id);
+			sortModes.push_back(ColumnSortMode);
 		}
 	}
+
+	return sortModes;
 }
 
 void CShellBrowser::ExportCurrentColumns(std::list<Column_t> *pColumns)

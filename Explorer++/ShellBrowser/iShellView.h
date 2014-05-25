@@ -446,7 +446,7 @@ public:
 	void				SetTerminationStatus(void);
 
 	void				ColumnClicked(int iClickedColumn);
-	void				QueryCurrentSortModes(std::list<int> *pSortModes) const;
+	std::list<int>		QueryCurrentSortModes() const;
 	size_t				QueryNumActiveColumns(void) const;
 	void				ToggleGridlines(void);
 	BOOL				QueryGridlinesActive(void) const;
