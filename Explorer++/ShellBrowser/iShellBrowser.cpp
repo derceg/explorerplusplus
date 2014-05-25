@@ -178,14 +178,14 @@ BOOL CShellBrowser::IsForwardHistory(void) const
 	return TRUE;
 }
 
-void CShellBrowser::GetBackHistory(std::list<LPITEMIDLIST> *lHistory) const
+std::list<LPITEMIDLIST> CShellBrowser::GetBackHistory() const
 {
-	return m_pPathManager->GetBackHistory(lHistory);
+	return m_pPathManager->GetBackHistory();
 }
 
-void CShellBrowser::GetForwardHistory(std::list<LPITEMIDLIST> *lHistory) const
+std::list<LPITEMIDLIST> CShellBrowser::GetForwardHistory() const
 {
-	return m_pPathManager->GetForwardHistory(lHistory);
+	return m_pPathManager->GetForwardHistory();
 }
 
 LPITEMIDLIST CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)

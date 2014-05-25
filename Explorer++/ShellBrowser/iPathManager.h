@@ -11,8 +11,8 @@ public:
 	int				GetNumBackPathsStored(void);
 	int				GetNumForwardPathsStored(void);
 	UINT			CreateHistoryPopupMenu(HWND,POINT *,BOOL);
-	void			GetBackHistory(std::list<LPITEMIDLIST> *lHistory);
-	void			GetForwardHistory(std::list<LPITEMIDLIST> *lHistory);
+	std::list<LPITEMIDLIST>	GetBackHistory();
+	std::list<LPITEMIDLIST>	GetForwardHistory();
 
 	void			StoreIdl(LPITEMIDLIST pidl);
 	LPITEMIDLIST	RetrievePath(int iIndex);

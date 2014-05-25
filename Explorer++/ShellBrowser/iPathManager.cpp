@@ -133,42 +133,34 @@ int CPathManager::GetNumForwardPathsStored(void)
 	return m_nTotal - m_iCurrent;
 }
 
-void CPathManager::GetBackHistory(std::list<LPITEMIDLIST> *lHistory)
+std::list<LPITEMIDLIST> CPathManager::GetBackHistory()
 {
-	int nPaths;
-	int iStartIndex;
-	int iEndIndex;
-	int i = 0;
+	std::list<LPITEMIDLIST> history;
 
-	nPaths = GetNumBackPathsStored();
+	int iStartIndex = m_iCurrent > 10 ? m_iCurrent - 10 : 0;
+	int iEndIndex = m_iCurrent - 1;
 
-	iEndIndex = m_iCurrent - 1;
-
-	iStartIndex = m_iCurrent > 10 ? m_iCurrent - 10 : 0;
-
-	for(i = iEndIndex - 1;i >= iStartIndex;i--)
+	for(int i = iEndIndex - 1;i >= iStartIndex;i--)
 	{
-		lHistory->push_back(ILClone(ppidlList[i]));
+		history.push_back(ILClone(ppidlList[i]));
 	}
+
+	return history;
 }
 
-void CPathManager::GetForwardHistory(std::list<LPITEMIDLIST> *lHistory)
+std::list<LPITEMIDLIST> CPathManager::GetForwardHistory()
 {
-	int nPaths;
-	int iStartIndex;
-	int iEndIndex;
-	int i = 0;
+	std::list<LPITEMIDLIST> history;
 
-	nPaths = GetNumForwardPathsStored();
+	int iStartIndex = m_iCurrent;
+	int iEndIndex = (m_nTotal - m_iCurrent) > 10 ? m_iCurrent + 10 : m_nTotal;
 
-	iStartIndex = m_iCurrent;
-
-	iEndIndex = (m_nTotal - m_iCurrent) > 10 ? m_iCurrent + 10 : m_nTotal;
-
-	for(i = iStartIndex;i < iEndIndex;i++)
+	for(int i = iStartIndex;i < iEndIndex;i++)
 	{
-		lHistory->push_back(ILClone(ppidlList[i]));
+		history.push_back(ILClone(ppidlList[i]));
 	}
+
+	return history;
 }
 
 UINT CPathManager::CreateHistoryPopupMenu(HWND Parent,POINT *Origin,BOOL bBack)

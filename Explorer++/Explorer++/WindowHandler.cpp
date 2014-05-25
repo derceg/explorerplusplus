@@ -630,34 +630,32 @@ void Explorerplusplus::AdjustMainToolbarSize(void)
 HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 {
 	HMENU hSubMenu = NULL;
-	std::list<LPITEMIDLIST> lHistory;
-	std::list<LPITEMIDLIST>::iterator itr;
-	MENUITEMINFO mii;
-	TCHAR szDisplayName[MAX_PATH];
+	std::list<LPITEMIDLIST> history;
 	int iBase;
-	int i = 0;
 
 	if(bBack)
 	{
-		m_pActiveShellBrowser->GetBackHistory(&lHistory);
-
 		iBase = ID_REBAR_MENU_BACK_START;
+		history = m_pActiveShellBrowser->GetBackHistory();
 	}
 	else
 	{
-		m_pActiveShellBrowser->GetForwardHistory(&lHistory);
-
 		iBase = ID_REBAR_MENU_FORWARD_START;
+		history = m_pActiveShellBrowser->GetForwardHistory();
 	}
 
-	if(lHistory.size() > 0)
+	if(history.size() > 0)
 	{
+		int i = 0;
+
 		hSubMenu = CreateMenu();
 
-		for(itr = lHistory.begin();itr != lHistory.end();itr++)
+		for(auto itr = history.begin();itr != history.end();itr++)
 		{
+			TCHAR szDisplayName[MAX_PATH];
 			GetDisplayName(*itr,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
+			MENUITEMINFO mii;
 			mii.cbSize		= sizeof(mii);
 			mii.fMask		= MIIM_ID|MIIM_STRING;
 			mii.wID			= iBase + i + 1;
@@ -669,7 +667,7 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 			CoTaskMemFree(*itr);
 		}
 
-		lHistory.clear();
+		history.clear();
 
 		SetMenuOwnerDraw(hSubMenu);
 	}
