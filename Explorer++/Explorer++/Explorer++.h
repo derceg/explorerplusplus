@@ -135,11 +135,6 @@ private:
 		UINT GroupById;
 	};
 
-	struct ToolbarButton_t
-	{
-		int iItemID;
-	};
-
 	struct TabInfo_t
 	{
 		BOOL	bLocked;

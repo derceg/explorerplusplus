@@ -78,6 +78,11 @@ __interface IExplorerplusplus
 	void			OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
 };
 
+struct ToolbarButton_t
+{
+	int iItemID;
+};
+
 /* Used when setting Explorer++ as the default
 file manager. */
 static const TCHAR SHELL_DEFAULT_INTERNAL_COMMAND_NAME[] = _T("openinexplorer++");

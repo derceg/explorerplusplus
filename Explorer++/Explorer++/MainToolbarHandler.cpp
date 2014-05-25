@@ -14,87 +14,15 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "MainImages.h"
+#include "DefaultToolbarButtons.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
 
 
 void Explorerplusplus::SetInitialToolbarButtons(void)
 {
-	ToolbarButton_t	tb;
-
-	m_tbInitial.clear();
-
-	tb.iItemID		= TOOLBAR_BACK;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_FORWARD;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_UP;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_SEPARATOR;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_FOLDERS;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_SEPARATOR;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_CUT;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_COPY;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_PASTE;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_DELETE;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_DELETEPERMANENTLY;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_PROPERTIES;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_SEARCH;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_SEPARATOR;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_NEWFOLDER;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_COPYTO;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_MOVETO;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_SEPARATOR;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_VIEWS;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_OPENCOMMANDPROMPT;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_REFRESH;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_SEPARATOR;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_ADDBOOKMARK;
-	m_tbInitial.push_back(tb);
-
-	tb.iItemID		= TOOLBAR_ORGANIZEBOOKMARKS;
-	m_tbInitial.push_back(tb);
+	m_tbInitial = std::list<ToolbarButton_t>(DEFAULT_TOOLBAR_BUTTONS,
+		DEFAULT_TOOLBAR_BUTTONS + SIZEOF_ARRAY(DEFAULT_TOOLBAR_BUTTONS));
 }
 
 int Explorerplusplus::LookupToolbarButtonTextID(int iButtonID)
