@@ -494,6 +494,8 @@ private:
 	void					OnTreeViewHolderWindowTimer(void);
 
 	/* Tabs. */
+	void					InitializeTabs(void);
+	void					AddDefaultTabIcons(HIMAGELIST himlTab);
 	void					SelectAdjacentTab(BOOL bNextTab);
 	HRESULT					CreateNewTab(const TCHAR *TabDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
 	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
@@ -506,6 +508,11 @@ private:
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
 	int						GetCurrentTabId() const;
+	std::wstring			GetTabName(int iTab) const;
+	void					SetTabName(int iTab, std::wstring strName, BOOL bUseCustomName);
+	void					SetTabSelection(int Index);
+	void					PushGlobalSettingsToTab(int iTabId);
+	void					DuplicateTab(int iTabInternal);
 
 	/* Clone Window. */
 	void					OnCloneWindow(void);
@@ -661,10 +668,6 @@ private:
 	BOOL					AreAllSelectedFilesReal(void);
 	BOOL					CanPaste(void);
 
-	/* Tabs. */
-	void					PushGlobalSettingsToTab(int iTabId);
-	void					DuplicateTab(int iTabInternal);
-
 	/* Tab proxy's. */
 	void					SetTabProxyIcon(int iTabId,HICON hIcon);
 
@@ -727,11 +730,6 @@ private:
 	void					MapAttributeToValue(MSXML2::IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
 	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,TabInfo_t *pTabInfo);
 
-	/* Tabs. */
-	std::wstring			GetTabName(int iTab) const;
-	void					SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
-	void					SetTabSelection(int Index);
-
 	/* IExplorerplusplus methods. */
 	HWND					GetActiveListView() const;
 	CShellBrowser			*GetActiveShellBrowser() const;
@@ -752,8 +750,6 @@ private:
 	void					AddStringsToMainToolbar(void);
 	void					CreateStatusBar(void);
 	void					InitializeDisplayWindow(void);
-	void					InitializeTabs(void);
-	void					AddDefaultTabIcons(HIMAGELIST himlTab);
 	void					InitializeMenus(void);
 	void					SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl);
 	int						CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,int nBuffer);
