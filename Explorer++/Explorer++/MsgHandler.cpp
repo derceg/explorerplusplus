@@ -115,7 +115,7 @@ void CALLBACK QuitIconAPC(ULONG_PTR dwParam)
  * initial settings must be in place before
  * this.
  */
-void Explorerplusplus::OnWindowCreate(void)
+void Explorerplusplus::OnCreate(void)
 {
 	ILoadSave *pLoadSave = NULL;
 

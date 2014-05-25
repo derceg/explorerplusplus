@@ -357,7 +357,7 @@ private:
 	void					OnTabSelectionChange(void);
 	void					OnSetFileAttributes(void);
 	void					OnShowFileProperties(void);
-	void					OnWindowCreate(void);
+	void					OnCreate(void);
 	void					OnNewTab(void);
 	void					OnFileRename(void);
 	void					OnFileDelete(BOOL bPermanent);

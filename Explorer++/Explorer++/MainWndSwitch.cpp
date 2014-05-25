@@ -93,7 +93,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 	switch(Msg)
 	{
 	case WM_CREATE:
-		OnWindowCreate();
+		OnCreate();
 		break;
 
 	case WM_SETFOCUS:
