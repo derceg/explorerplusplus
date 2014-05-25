@@ -136,7 +136,11 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 			break;
 
 		case WM_MBUTTONUP:
-			SendMessage(m_hContainer,WM_APP_TABMCLICK,wParam,lParam);
+			{
+				POINT pt;
+				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+				OnTabMClick(&pt);
+			}
 			break;
 
 		case WM_RBUTTONUP:

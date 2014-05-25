@@ -138,14 +138,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		m_hLastActiveWindow = m_hTreeView;
 		break;
 
-	case WM_APP_TABMCLICK:
-		{
-			POINT pt;
-			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-			OnTabMClick(&pt);
-		}
-		break;
-
 	case WM_USER_DISPLAYWINDOWRESIZED:
 		OnDisplayWindowResized(wParam);
 		break;
