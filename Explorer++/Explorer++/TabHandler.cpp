@@ -139,7 +139,7 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 			{
 				POINT pt;
 				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-				OnTabMClick(&pt);
+				OnTabCtrlMButtonUp(&pt);
 			}
 			break;
 
@@ -1730,7 +1730,7 @@ unsigned int Explorerplusplus::DetermineColumnSortMode(UINT uColumnId)
 	return 0;
 }
 
-void Explorerplusplus::OnTabMClick(POINT *pt)
+void Explorerplusplus::OnTabCtrlMButtonUp(POINT *pt)
 {
 	/* Only close a tab if the tab control
 	actually has focused (i.e. if the middle mouse

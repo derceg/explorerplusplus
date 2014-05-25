@@ -379,7 +379,7 @@ private:
 	LRESULT					StatusBarMenuSelect(WPARAM wParam,LPARAM lParam);
 	void					HandleDirectoryMonitoring(int iTabId);
 	void					OnTbnDropDown(LPARAM lParam);
-	void					OnTabMClick(POINT *pt);
+	void					OnTabCtrlMButtonUp(POINT *pt);
 	void					OnDisplayWindowResized(WPARAM wParam);
 	void					OnStartedBrowsing(int iTabId,TCHAR *szPath);
 	void					OnDuplicateTab(int iTab);
