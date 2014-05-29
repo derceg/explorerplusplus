@@ -59,14 +59,8 @@ void Explorerplusplus::UpdateWindowStates(void)
 */
 void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 {
-	LONG WindowStyle;
-	UINT ItemToCheck;
-	UINT ListViewStyle;
-	BOOL bVirtualFolder;
-
 	UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
-
-	bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
+	BOOL bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYITEMPATH,AnyItemsSelected());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYUNIVERSALFILEPATHS,AnyItemsSelected());
@@ -115,10 +109,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_MERGEFILES,m_nSelected > 1);
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_DESTROYFILES,m_nSelected);
 
-	WindowStyle = GetWindowLong(m_hActiveListView,GWL_STYLE);
-	ListViewStyle = (WindowStyle & LVS_TYPEMASK);
-
-	ItemToCheck = GetViewModeMenuId(uViewMode);
+	UINT ItemToCheck = GetViewModeMenuId(uViewMode);
 	CheckMenuRadioItem(hProgramMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,ItemToCheck,MF_BYCOMMAND);
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_CLOSETAB,TabCtrl_GetItemCount(m_hTabCtrl));
