@@ -289,7 +289,10 @@ void *pData)
 	pMyTreeView = (CMyTreeView *)pDirectoryAltered->pMyTreeView;
 
 	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), pDirectoryAltered->szPath);
-	PathAppend(szFullFileName,szFileName);
+	if(!PathAppend(szFullFileName, szFileName))
+	{
+		return;
+	}
 
 	pMyTreeView->DirectoryModified(dwAction,szFullFileName);
 }
