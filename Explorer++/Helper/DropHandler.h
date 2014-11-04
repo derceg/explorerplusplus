@@ -5,6 +5,10 @@
 #include "FileOperations.h"
 #include "ReferenceCount.h"
 
+/* now using in drop handler for shell extension file copy */
+HRESULT	CreateDataObject(FORMATETC *,STGMEDIUM *,IDataObject **,int);
+
+
 enum DragTypes_t
 {
 	DRAG_TYPE_LEFTCLICK,
