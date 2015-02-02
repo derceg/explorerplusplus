@@ -10,6 +10,8 @@
  * /F	- Filename
  * /B	- Basename (filename without extension)
  * /E	- Extension
+ * /L	- Lowercase filename
+ * /U	- Uppercase filename
  *
  * Written by David Erceg
  * www.explorerplusplus.com
@@ -26,6 +28,7 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 #include "../Helper/Macros.h"
+#include <algorithm>
 
 
 const TCHAR CMassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename");
@@ -255,6 +258,16 @@ BOOL CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
 						reinterpret_cast<LPARAM>(_T("/N")));
 					break;
+
+				case IDM_MASSRENAME_LCASE:
+					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
+						reinterpret_cast<LPARAM>(_T("/L")));
+					break;
+
+				case IDM_MASSRENAME_UCASE:
+					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
+						reinterpret_cast<LPARAM>(_T("/U")));
+					break;
 				}
 			}
 			break;
@@ -398,6 +411,18 @@ void CMassRenameDialog::ProcessFileName(const std::wstring strTarget,
 	while((iPos = strOutput.find(_T("/E"))) != std::wstring::npos)
 	{
 		strOutput.replace(iPos,2,pExt);
+	}
+
+	while((iPos = strOutput.find(_T("/L"))) != std::wstring::npos)
+	{
+		strOutput.replace(iPos,2,strFilename);
+		transform(strOutput.begin(), strOutput.end(), strOutput.begin(), tolower);
+	}
+
+	while((iPos = strOutput.find(_T("/U"))) != std::wstring::npos)
+	{
+		strOutput.replace(iPos,2,strFilename);
+		transform(strOutput.begin(), strOutput.end(), strOutput.begin(), toupper);
 	}
 }
 
