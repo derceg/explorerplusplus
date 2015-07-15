@@ -1009,7 +1009,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 				pDataObject,&ServiceProvider);
 
 			cmm.ShowMenu(m_hContainer,hMenu,IDM_FILE_COPYFOLDERPATH,MIN_SHELL_MENU_ID,
-				MAX_SHELL_MENU_ID,*pCursorPos,*m_pStatusBar);
+				MAX_SHELL_MENU_ID,*pCursorPos,*m_pStatusBar,GetKeyState(VK_SHIFT) & 0x8000);
 
 			pDataObject->Release();
 		}
