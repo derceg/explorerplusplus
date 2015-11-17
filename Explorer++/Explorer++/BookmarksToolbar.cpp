@@ -233,7 +233,7 @@ void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
 	tbb.iString		= reinterpret_cast<INT_PTR>(szName);
 	SendMessage(m_hToolbar,TB_INSERTBUTTON,Position,reinterpret_cast<LPARAM>(&tbb));
 
-	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,guid));
+	m_mapID.insert(std::make_pair(m_uIDCounter,guid));
 	++m_uIDCounter;
 }
 

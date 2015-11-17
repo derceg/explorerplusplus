@@ -70,6 +70,13 @@
 #pragma warning(pop)
 
 #include <cassert>
+#include <algorithm>
+#include <memory>
+
+#ifdef _WIN32_WINNT_WIN8
+#define IAsyncOperation IDataObjectAsyncCapability
+#define IID_IAsyncOperation IID_IDataObjectAsyncCapability
+#endif
 
 /* Pantheios header files. */
 #pragma warning(push)
