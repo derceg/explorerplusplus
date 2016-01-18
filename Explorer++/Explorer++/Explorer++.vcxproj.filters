@@ -190,6 +190,9 @@
     <ClCompile Include="RegistrySettings.cpp">
       <Filter>Settings</Filter>
     </ClCompile>
+    <ClCompile Include="CustomMenu.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">

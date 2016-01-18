@@ -729,14 +729,16 @@ private:
 	HWND					GetActiveListView() const;
 	CShellBrowser			*GetActiveShellBrowser() const;
 
+	/* Custom menus. */
+	void					SetMenuOwnerDraw(HMENU hMenu);
+	void					SetMenuOwnerDrawInternal(HMENU hMenu, int nMenus);
+	void					SetMenuItemOwnerDrawn(HMENU hMenu, int iItem);
+	void					SetMenuItemBitmap(HMENU hMenu, UINT ItemID, int iBitmap);
+
 	/* Miscellaneous. */
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
 	BOOL					CompareVirtualFolders(TCHAR *szDirectory,UINT uFolderCSIDL);
 	void					CreateViewsMenu(POINT *ptOrigin);
-	void					SetMenuItemBitmap(HMENU hMenu,UINT ItemID,int iBitmap);
-	void					SetMenuOwnerDraw(HMENU hMenu);
-	void					SetMenuOwnerDrawInternal(HMENU hMenu,int nMenus);
-	void					SetMenuItemOwnerDrawn(HMENU hMenu,int iItem);
 	void					SetInitialToolbarButtons(void);
 	int						LookupToolbarButtonTextID(int iButtonID);
 	int						LookupToolbarButtonImage(int iButtonID);
