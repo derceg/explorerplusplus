@@ -23,4 +23,6 @@ namespace NXMLSettings
 	COLORREF	ReadXMLColorData(MSXML2::IXMLDOMNode *pNode);
 	Gdiplus::Color	ReadXMLColorData2(MSXML2::IXMLDOMNode *pNode);
 	HFONT	ReadXMLFontData(MSXML2::IXMLDOMNode *pNode);
+
+	void	SafeBSTRRelease(BSTR bstr);
 }

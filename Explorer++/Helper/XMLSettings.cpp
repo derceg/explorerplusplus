@@ -14,6 +14,7 @@
 
 #include "stdafx.h"
 #include "XMLSettings.h"
+#include "Helper.h"
 #include "Macros.h"
 
 
@@ -108,36 +109,36 @@ VARIANT NXMLSettings::VariantString(const WCHAR *str)
 /* Helper function to append a whitespace text node to a
 specified element. */
 void NXMLSettings::AddWhiteSpaceToNode(MSXML2::IXMLDOMDocument* pDom,
-BSTR bstrWs,MSXML2::IXMLDOMNode *pNode)
+	BSTR bstrWs, MSXML2::IXMLDOMNode *pNode)
 {
 	MSXML2::IXMLDOMText	*pws = NULL;
 	MSXML2::IXMLDOMNode	*pBuf = NULL;
 
-	pDom->createTextNode(bstrWs,&pws);
-	pNode->appendChild(pws,&pBuf);
+	HRESULT hr = pDom->createTextNode(bstrWs,&pws);
 
-	if(pws)
-		pws->Release();
+	if(FAILED(hr))
+	{
+		goto clean;
+	}
 
-	pws = NULL;
+	hr = pNode->appendChild(pws,&pBuf);
 
-	if(pBuf)
-		pBuf->Release();
+	if(FAILED(hr))
+	{
+		goto clean;
+	}
 
-	pBuf = NULL;
+clean:
+	SafeRelease(&pws);
+	SafeRelease(&pBuf);
 }
 
 /* Helper function to append a child to a parent node. */
 void NXMLSettings::AppendChildToParent(MSXML2::IXMLDOMNode *pChild, MSXML2::IXMLDOMNode *pParent)
 {
 	MSXML2::IXMLDOMNode	*pNode = NULL;
-
 	pParent->appendChild(pChild, &pNode);
-
-	if(pNode)
-		pNode->Release();
-
-	pNode = NULL;
+	SafeRelease(&pNode);
 }
 
 void NXMLSettings::AddAttributeToNode(MSXML2::IXMLDOMDocument *pXMLDom,
@@ -189,43 +190,71 @@ MSXML2::IXMLDOMElement *pParentNode,const TCHAR *szBaseKeyName,
 }
 
 void NXMLSettings::CreateElementNode(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement **pParentNode,
-MSXML2::IXMLDOMElement *pGrandparentNode,const WCHAR *szElementName,
-const WCHAR *szAttributeName)
+	MSXML2::IXMLDOMElement **pParentNode,
+	MSXML2::IXMLDOMElement *pGrandparentNode, const WCHAR *szElementName,
+	const WCHAR *szAttributeName)
 {
-	MSXML2::IXMLDOMAttribute	*pa = NULL;
-	MSXML2::IXMLDOMAttribute	*pa1 = NULL;
-	BSTR						bstr = NULL;
-	VARIANT						var;
+	BSTR bstrElement = NULL;
+	BSTR bstrName = NULL;
+	VARIANT var;
+	bool varInitialized = false;
+	MSXML2::IXMLDOMAttribute *pa = NULL;
+	MSXML2::IXMLDOMAttribute *pa1 = NULL;
+	HRESULT hr;
 
-	bstr = SysAllocString(szElementName);
-	pXMLDom->createElement(bstr,pParentNode);
-	SysFreeString(bstr);
-	bstr = NULL;
+	bstrElement = SysAllocString(szElementName);
 
-	bstr = SysAllocString(L"name");
-
-	var = VariantString(szAttributeName);
-
-	pXMLDom->createAttribute(bstr,&pa);
-	pa->put_value(var);
-	(*pParentNode)->setAttributeNode(pa,&pa1);
-
-	SysFreeString(bstr);
-	bstr = NULL;
-
-	if (pa1)
+	if(bstrElement == NULL)
 	{
-		pa1->Release();
-		pa1 = NULL;
+		goto clean;
 	}
 
-	pa->Release();
-	pa = NULL;
+	hr = pXMLDom->createElement(bstrElement, pParentNode);
 
-	VariantClear(&var);
+	if(FAILED(hr))
+	{
+		goto clean;
+	}
 
-	AppendChildToParent(*pParentNode,pGrandparentNode);
+	bstrName = SysAllocString(L"name");
+
+	if(bstrName == NULL)
+	{
+		goto clean;
+	}
+
+	var = VariantString(szAttributeName);
+	varInitialized = true;
+
+	hr = pXMLDom->createAttribute(bstrName, &pa);
+
+	if(FAILED(hr))
+	{
+		goto clean;
+	}
+
+	hr = pa->put_value(var);
+
+	if(FAILED(hr))
+	{
+		goto clean;
+	}
+
+	hr = (*pParentNode)->setAttributeNode(pa, &pa1);
+
+	if(FAILED(hr))
+	{
+		goto clean;
+	}
+
+	AppendChildToParent(*pParentNode, pGrandparentNode);
+
+clean:
+	SafeBSTRRelease(bstrElement);
+	SafeBSTRRelease(bstrName);
+	if(varInitialized) { VariantClear(&var); }
+	SafeRelease(&pa);
+	SafeRelease(&pa1);
 }
 
 const TCHAR	*NXMLSettings::EncodeBoolValue(BOOL value)
@@ -402,4 +431,12 @@ HFONT NXMLSettings::ReadXMLFontData(MSXML2::IXMLDOMNode *pNode)
 	FontInfo.lfQuality			= PROOF_QUALITY;
 
 	return CreateFontIndirect(&FontInfo);
+}
+
+void NXMLSettings::SafeBSTRRelease(BSTR bstr)
+{
+	if(bstr != NULL)
+	{
+		SysFreeString(bstr);
+	}
 }
