@@ -21,6 +21,9 @@ private:
 	static const TCHAR SETTINGS_KEY[];
 	static const COLORREF DEFAULT_INITIAL_COLOR;
 
+	static const TCHAR SETTING_INITIAL_COLOR[];
+	static const TCHAR SETTING_CUSTOM_COLORS[];
+
 	CColorRuleDialogPersistentSettings();
 
 	CColorRuleDialogPersistentSettings(const CColorRuleDialogPersistentSettings &);

@@ -30,6 +30,9 @@ namespace NColorRuleDialog
 const TCHAR CColorRuleDialogPersistentSettings::SETTINGS_KEY[] = _T("ColorRules");
 const COLORREF CColorRuleDialogPersistentSettings::DEFAULT_INITIAL_COLOR = RGB(0,94,138);
 
+const TCHAR CColorRuleDialogPersistentSettings::SETTING_INITIAL_COLOR[] = _T("InitialColor");
+const TCHAR CColorRuleDialogPersistentSettings::SETTING_CUSTOM_COLORS[] = _T("CustomColors");
+
 CColorRuleDialog::CColorRuleDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,NColorRuleHelper::ColorRule_t *pColorRule,BOOL bEdit) :
 CBaseDialog(hInstance,iResource,hParent,false)
@@ -264,11 +267,11 @@ CColorRuleDialogPersistentSettings& CColorRuleDialogPersistentSettings::GetInsta
 
 void CColorRuleDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 {
-	RegSetValueEx(hKey,_T("InitialColor"),0,REG_BINARY,
+	RegSetValueEx(hKey,SETTING_INITIAL_COLOR,0,REG_BINARY,
 		reinterpret_cast<LPBYTE>(&m_cfInitialColor),
 		sizeof(m_cfInitialColor));
 
-	RegSetValueEx(hKey,_T("CustomColors"),0,REG_BINARY,
+	RegSetValueEx(hKey,SETTING_CUSTOM_COLORS,0,REG_BINARY,
 		reinterpret_cast<LPBYTE>(&m_cfCustomColors),
 		sizeof(m_cfCustomColors));
 }
@@ -276,11 +279,11 @@ void CColorRuleDialogPersistentSettings::SaveExtraRegistrySettings(HKEY hKey)
 void CColorRuleDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 {
 	DWORD dwSize = sizeof(m_cfInitialColor);
-	RegQueryValueEx(hKey,_T("InitialColor"),NULL,NULL,
+	RegQueryValueEx(hKey,SETTING_INITIAL_COLOR,NULL,NULL,
 		reinterpret_cast<LPBYTE>(&m_cfInitialColor),&dwSize);
 
 	dwSize = sizeof(m_cfCustomColors);
-	RegQueryValueEx(hKey,_T("CustomColors"),NULL,NULL,
+	RegQueryValueEx(hKey,SETTING_CUSTOM_COLORS,NULL,NULL,
 		reinterpret_cast<LPBYTE>(&m_cfCustomColors),&dwSize);
 }
 
