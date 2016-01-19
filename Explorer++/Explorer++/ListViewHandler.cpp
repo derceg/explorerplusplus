@@ -1753,3 +1753,25 @@ void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
 	if(m_bSeenDirectory)
 		OpenListViewItem(iFolderItem,bOpenInNewTab,FALSE);
 }
+
+void Explorerplusplus::OpenListViewItem(int iItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
+{
+	LPITEMIDLIST	pidlComplete = NULL;
+	LPITEMIDLIST	pidl = NULL;
+	LPITEMIDLIST	ridl = NULL;
+
+	pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+	ridl = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+
+	if(ridl != NULL)
+	{
+		pidlComplete = ILCombine(pidl, ridl);
+
+		OpenItem(pidlComplete, bOpenInNewTab, bOpenInNewWindow);
+
+		CoTaskMemFree(pidlComplete);
+		CoTaskMemFree(ridl);
+	}
+
+	CoTaskMemFree(pidl);
+}

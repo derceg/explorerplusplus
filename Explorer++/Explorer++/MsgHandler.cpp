@@ -193,28 +193,6 @@ void Explorerplusplus::GotoFolder(int FolderCSIDL)
 	}
 }
 
-void Explorerplusplus::OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
-{
-	LPITEMIDLIST	pidlComplete = NULL;
-	LPITEMIDLIST	pidl = NULL;
-	LPITEMIDLIST	ridl = NULL;
-
-	pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-	ridl = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
-
-	if(ridl != NULL)
-	{
-		pidlComplete = ILCombine(pidl,ridl);
-
-		OpenItem(pidlComplete,bOpenInNewTab,bOpenInNewWindow);
-
-		CoTaskMemFree(pidlComplete);
-		CoTaskMemFree(ridl);
-	}
-
-	CoTaskMemFree(pidl);
-}
-
 void Explorerplusplus::OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	LPITEMIDLIST	pidlItem = NULL;
