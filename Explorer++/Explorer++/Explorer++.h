@@ -619,6 +619,7 @@ private:
 
 	/* Languages. */
 	void					SetLanguageModule(void);
+	BOOL					VerifyLanguageVersion(TCHAR *szLanguageModule) const;
 
 	/* Default settings. */
 	void					SetDefaultTabSettings(TabInfo_t *pTabInfo);
@@ -756,7 +757,6 @@ private:
 	void					CycleViewState(BOOL bCycleForward);
 	int						GetViewModeMenuId(UINT uViewMode);
 	int						GetViewModeMenuStringId(UINT uViewMode);
-	BOOL					VerifyLanguageVersion(TCHAR *szLanguageModule) const;
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	void					PlayNavigationSound(void) const;
 	CStatusBar				*GetStatusBar();
