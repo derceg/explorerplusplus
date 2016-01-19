@@ -17,6 +17,9 @@
 #include "Macros.h"
 
 
+static const TCHAR BOOL_YES[] = _T("yes");
+static const TCHAR BOOL_NO[] = _T("no");
+
 /* Helper function to create a DOM instance. */
 MSXML2::IXMLDOMDocument *NXMLSettings::DomFromCOM()
 {
@@ -38,8 +41,8 @@ MSXML2::IXMLDOMDocument *NXMLSettings::DomFromCOM()
 }
 
 void NXMLSettings::WriteStandardSetting(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pGrandparentNode,TCHAR *szElementName,
-TCHAR *szAttributeName,TCHAR *szAttributeValue)
+	MSXML2::IXMLDOMElement *pGrandparentNode, const TCHAR *szElementName,
+	const TCHAR *szAttributeName, const TCHAR *szAttributeValue)
 {
 	MSXML2::IXMLDOMElement		*pParentNode = NULL;
 	MSXML2::IXMLDOMAttribute	*pa = NULL;
@@ -225,21 +228,22 @@ const WCHAR *szAttributeName)
 	AppendChildToParent(*pParentNode,pGrandparentNode);
 }
 
-WCHAR *NXMLSettings::EncodeBoolValue(BOOL bValue)
+const TCHAR	*NXMLSettings::EncodeBoolValue(BOOL value)
 {
-	static WCHAR	yes[] = L"yes";
-	static WCHAR	no[] = L"no";
+	if(value)
+	{
+		return BOOL_YES;
+	}
 
-	if(bValue)
-		return yes;
-
-	return no;
+	return BOOL_NO;
 }
 
-BOOL NXMLSettings::DecodeBoolValue(WCHAR *wszValue)
+BOOL NXMLSettings::DecodeBoolValue(const TCHAR *value)
 {
-	if(lstrcmp(wszValue,L"yes") == 0)
+	if(lstrcmp(value, BOOL_YES) == 0)
+	{
 		return TRUE;
+	}
 
 	return FALSE;
 }

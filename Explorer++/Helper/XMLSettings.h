@@ -5,15 +5,19 @@
 namespace NXMLSettings
 {
 	MSXML2::IXMLDOMDocument	*DomFromCOM();
-	void	WriteStandardSetting(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pGrandparentNode,TCHAR *szElementName,TCHAR *szAttributeName,TCHAR *szAttributeValue);
+	void	WriteStandardSetting(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pGrandparentNode,
+		const TCHAR *szElementName,const TCHAR *szAttributeName,const TCHAR *szAttributeValue);
 	VARIANT VariantString(const WCHAR *str);
 	void	AddWhiteSpaceToNode(MSXML2::IXMLDOMDocument* pDom,BSTR bstrWs,MSXML2::IXMLDOMNode *pNode);
 	void	AppendChildToParent(MSXML2::IXMLDOMNode *pChild, MSXML2::IXMLDOMNode *pParent);
-	void	AddAttributeToNode(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode,const WCHAR *wszAttributeName,const WCHAR *wszAttributeValue);
-	void	AddStringListToNode(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode,const TCHAR *szBaseKeyName,const std::list<std::wstring> &strList);
-	void	CreateElementNode(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement **pParentNode,MSXML2::IXMLDOMElement *pGrandparentNode,const WCHAR *szElementName,const WCHAR *szAttributeName);
-	WCHAR	*EncodeBoolValue(BOOL bValue);
-	BOOL	DecodeBoolValue(WCHAR *wszValue);
+	void	AddAttributeToNode(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode,
+		const WCHAR *wszAttributeName,const WCHAR *wszAttributeValue);
+	void	AddStringListToNode(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode,
+		const TCHAR *szBaseKeyName,const std::list<std::wstring> &strList);
+	void	CreateElementNode(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement **pParentNode,
+		MSXML2::IXMLDOMElement *pGrandparentNode,const WCHAR *szElementName,const WCHAR *szAttributeName);
+	const TCHAR	*EncodeBoolValue(BOOL value);
+	BOOL	DecodeBoolValue(const TCHAR *value);
 	WCHAR	*EncodeIntValue(int iValue);
 	int		DecodeIntValue(WCHAR *wszValue);
 	COLORREF	ReadXMLColorData(MSXML2::IXMLDOMNode *pNode);
