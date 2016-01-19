@@ -193,6 +193,9 @@
     <ClCompile Include="CustomMenu.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Language.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">

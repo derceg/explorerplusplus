@@ -293,6 +293,7 @@
     <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="iServiceProvider.cpp" />
     <ClCompile Include="iShellView2.cpp" />
+    <ClCompile Include="Language.cpp" />
     <ClCompile Include="ListView.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="LoggingFrontend.cpp" />
