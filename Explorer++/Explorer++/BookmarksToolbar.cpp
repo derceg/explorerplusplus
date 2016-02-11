@@ -41,7 +41,6 @@ CBookmarksToolbar::~CBookmarksToolbar()
 {
 	ImageList_Destroy(m_himl);
 
-	RevokeDragDrop(m_hToolbar);
 	m_pbtdh->Release();
 
 	RemoveWindowSubclass(m_hToolbar,BookmarksToolbarProcStub,SUBCLASS_ID);
@@ -108,6 +107,10 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 				/* TODO: If this is a bookmark, open it in a new tab. */
 			}
 		}
+		break;
+
+	case WM_DESTROY:
+		RevokeDragDrop(m_hToolbar);
 		break;
 	}
 
