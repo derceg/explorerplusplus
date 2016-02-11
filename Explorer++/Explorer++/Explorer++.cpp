@@ -171,6 +171,7 @@ Explorerplusplus::~Explorerplusplus()
 
 	/* Bookmarks teardown. */
 	delete m_pipbin;
+	delete m_pipbo;
 	delete m_pBookmarksToolbar;
 
 	m_pDirMon->Release();
