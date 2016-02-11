@@ -78,6 +78,8 @@ m_hContainer(hwnd)
 
 	m_bBlockNext = FALSE;
 
+	SetLanguageModule();
+
 	m_ColorRules = NColorRuleHelper::GetDefaultColorRules(m_hLanguageModule);
 
 	SetDefaultValues();

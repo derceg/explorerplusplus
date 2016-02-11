@@ -89,8 +89,6 @@ void Explorerplusplus::OnCreate(void)
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 
-	SetLanguageModule();
-
 	InitializeBookmarks();
 
 	m_hIconThread = CreateThread(NULL, 0, Thread_IconFinder, NULL, 0, NULL);
