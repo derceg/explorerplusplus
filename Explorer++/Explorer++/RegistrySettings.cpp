@@ -51,6 +51,8 @@ BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
 		{
 			bRes = TRUE;
 		}
+
+		RegCloseKey(hSettingsKey);
 	}
 
 	return bRes;
@@ -516,6 +518,8 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 					SaveColumnWidthsToRegistry(hColumnsKey,_T("PrinterColumnWidths"),&cie.PrintersColumnList);
 					SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkColumnWidths"),&cie.NetworkConnectionsColumnList);
 					SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"),&cie.MyNetworkPlacesColumnList);
+
+					RegCloseKey(hColumnsKey);
 				}
 
 				/* High-level settings. */
