@@ -1,6 +1,6 @@
 #pragma once
 
-#define REQUIRED_BOOST_VERSION 105400
+#define REQUIRED_BOOST_VERSION 106000
 
 #include <boost\version.hpp>
 #include <boost\preprocessor\stringize.hpp>
