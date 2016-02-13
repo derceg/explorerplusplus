@@ -446,7 +446,6 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 	LPITEMIDLIST	pidlCurrentDirectory = NULL;
 
 	pidlDirectory = m_pMyTreeView->BuildPath(g_NewSelectionItem);
-
 	pidlCurrentDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
 	if(!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick &&
@@ -460,6 +459,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 		}
 	}
 
+	CoTaskMemFree(pidlCurrentDirectory);
 	CoTaskMemFree(pidlDirectory);
 
 	KillTimer(m_hHolder,0);
