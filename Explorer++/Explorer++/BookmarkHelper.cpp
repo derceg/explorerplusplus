@@ -190,10 +190,10 @@ HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent,const CB
 	tvis.itemex				= tviex;
 	HTREEITEM hItem = TreeView_InsertItem(m_hTreeView,&tvis);
 
-	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,BookmarkFolder.GetGUID()));
+	m_mapID.insert(std::make_pair(m_uIDCounter,BookmarkFolder.GetGUID()));
 	++m_uIDCounter;
 
-	m_mapItem.insert(std::make_pair<GUID,HTREEITEM>(BookmarkFolder.GetGUID(),hItem));
+	m_mapItem.insert(std::make_pair(BookmarkFolder.GetGUID(),hItem));
 
 	return hItem;
 }
@@ -406,7 +406,7 @@ int CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strNam
 	lvi.lParam		= m_uIDCounter;
 	int iItem = ListView_InsertItem(m_hListView,&lvi);
 
-	m_mapID.insert(std::make_pair<UINT,GUID>(m_uIDCounter,guid));
+	m_mapID.insert(std::make_pair(m_uIDCounter,guid));
 	++m_uIDCounter;
 
 	return iItem;
