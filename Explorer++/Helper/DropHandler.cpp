@@ -1036,7 +1036,11 @@ void CDropHandler::CopyDroppedFilesInternal(const std::list<std::wstring> &FullF
 
 		HANDLE hThread = CreateThread(NULL,0,CopyDroppedFilesInternalAsyncStub,
 			reinterpret_cast<LPVOID>(ppfi),0,NULL);
-		CloseHandle(hThread);
+
+		if(hThread != NULL)
+		{
+			CloseHandle(hThread);
+		}
 	}
 	else
 	{
