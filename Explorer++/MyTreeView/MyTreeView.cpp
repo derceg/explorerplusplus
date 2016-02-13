@@ -42,7 +42,8 @@ int g_ntvAPCsQueued = 0;
 std::list<TreeViewInfo_t> g_pTreeViewInfoList;
 
 CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon,
-HANDLE hIconsThread)
+HANDLE hIconsThread) :
+m_iRefCount(1)
 {
 	m_hTreeView = hTreeView;
 	m_hParent = hParent;
