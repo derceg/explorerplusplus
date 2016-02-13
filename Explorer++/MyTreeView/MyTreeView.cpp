@@ -43,7 +43,8 @@ std::list<TreeViewInfo_t> g_pTreeViewInfoList;
 
 CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon,
 HANDLE hIconsThread) :
-m_iRefCount(1)
+m_iRefCount(1),
+m_bDragDropRegistered(FALSE)
 {
 	m_hTreeView = hTreeView;
 	m_hParent = hParent;
@@ -195,6 +196,14 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 		case WM_NOTIFY:
 			return OnNotify(reinterpret_cast<NMHDR *>(lParam));
+			break;
+
+		case WM_DESTROY:
+			if(m_bDragDropRegistered)
+			{
+				RevokeDragDrop(m_hTreeView);
+				m_bDragDropRegistered = FALSE;
+			}
 			break;
 	}
 
@@ -1596,7 +1605,15 @@ HRESULT CMyTreeView::InitializeDragDropHelpers(void)
 	{
 		hr = m_pDragSourceHelper->QueryInterface(IID_PPV_ARGS(&m_pDropTargetHelper));
 
-		RegisterDragDrop(m_hTreeView,this);
+		if(SUCCEEDED(hr))
+		{
+			hr = RegisterDragDrop(m_hTreeView, this);
+
+			if(SUCCEEDED(hr))
+			{
+				m_bDragDropRegistered = TRUE;
+			}
+		}
 	}
 
 	return hr;
