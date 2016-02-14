@@ -160,6 +160,7 @@ private:
 	int					m_iFolderIcon;
 
 	/* Drag and drop. */
+	BOOL				m_bDragDropRegistered;
 	IDragSourceHelper	*m_pDragSourceHelper;
 	IDropTargetHelper	*m_pDropTargetHelper;
 	IDataObject			*m_pDataObject;
