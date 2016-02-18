@@ -18,6 +18,9 @@
 #include "RegistrySettings.h"
 #include "Macros.h"
 
+const TCHAR SEH_DIRECTORY_BACKGROUND[] = _T("Directory\\Background\\shellex\\ContextMenuHandlers");
+const TCHAR SEH_DRIVE_DRAG_AND_DROP[] = _T("Drive\\shellex\\DragDropHandlers");
+const TCHAR SEH_FOLDER_DRAG_AND_DROP[] = _T("Folder\\ShellEx\\DragDropHandlers");
 
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
 	const std::list<JumpListTaskInformation> &TaskList);
@@ -1127,6 +1130,131 @@ BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID,
 	return bSuccess;
 }
 
+/* loosely following and reusing:::  CContextMenuManager::CContextMenuManager  and  LoadContextMenuHandlers */
+BOOL LoadShellExtensionHandlers(bool bCopy, LPCITEMIDLIST pidlDirectory, IDataObject *pDataObject) {
+	BOOL ret;
+	/* return true if none of the shells succeeded */
+	ret = 1;
+
+	const TCHAR *pszRegContexts[] = { SEH_FOLDER_DRAG_AND_DROP };
+	std::list<ContextMenuHandler_t>	m_ShellExtensionHandlers;
+
+	BOOL bRet;
+
+	for each(auto pszRegContext in pszRegContexts)
+	{
+		/* load handler interfaces from registry */
+		bRet = LoadContextMenuHandlers(pszRegContext,m_ShellExtensionHandlers);
+
+		if(bRet == 0)
+		{
+			continue;
+		}
+		/* initialize extensions and extract interfaces, as in contextmenumanager */
+
+		for each(auto ContextMenuHandler in m_ShellExtensionHandlers) {
+			IShellExtInit *pShellExtInit = NULL;
+			HRESULT hr;
+
+			IUnknown *pUnknown = ContextMenuHandler.pUnknown;
+
+			hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pShellExtInit));
+
+			if(SUCCEEDED(hr))
+			{
+				IContextMenu *pContextMenu = NULL;
+				IContextMenu2 *pContextMenu2 = NULL;
+				IContextMenu3 *pContextMenu3 = NULL;
+				IContextMenu *pContextMenuActual = NULL;
+
+				/* TODO: don't know what this is... */
+				IUnknown *pUnkSite = NULL;
+				
+				/* Initialize shell extension */
+				try {
+				pShellExtInit->Initialize(pidlDirectory,pDataObject,NULL);
+				pShellExtInit->Release();
+				} catch(...) {
+					continue;
+				}
+
+				if(pUnkSite != NULL)
+				{
+					IObjectWithSite *pObjectSite = NULL;
+
+					hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pObjectSite));
+
+					if(SUCCEEDED(hr))
+					{
+						pObjectSite->SetSite(pUnkSite);
+						pObjectSite->Release();
+					}
+				}
+
+				hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu3));
+				pContextMenuActual = pContextMenu3;
+
+				if(FAILED(hr) || pContextMenu3 == NULL)
+				{
+					hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu2));
+					pContextMenuActual = pContextMenu2;
+
+					if(FAILED(hr) || pContextMenu2 == NULL)
+					{
+						hr = pUnknown->QueryInterface(IID_PPV_ARGS(&pContextMenu));
+						pContextMenuActual = pContextMenu;
+					}
+				}
+
+				CMINVOKECOMMANDINFO pici;
+
+				pici.cbSize			= sizeof(CMINVOKECOMMANDINFO);
+				/* no hotkey pressed? */
+				pici.dwHotKey		= 0;
+				pici.fMask			= 0;
+				pici.hIcon			= NULL;
+				pici.hwnd			= NULL;
+				/* no working directory */
+				pici.lpDirectory	= NULL;
+				/* no parameters to pass */
+				pici.lpParameters	= NULL;
+				pici.nShow			= 0;
+				/* the common verb is dword(0) for copy, dword(1) for move */
+				if(bCopy) {
+					pici.lpVerb		= reinterpret_cast<LPCSTR>(DWORD(0)) ;
+				} else {
+					pici.lpVerb		= reinterpret_cast<LPCSTR>(DWORD(1)) ;
+				}
+
+				/* execute command */
+				hr = pContextMenuActual->InvokeCommand(&pici);
+
+				/* cleanup */
+				
+				if(pContextMenuActual != NULL)
+				{
+						pContextMenuActual->Release();
+				}
+
+				/* ...and free the necessary DLL's. */
+				ContextMenuHandler.pUnknown->Release();
+				if(ContextMenuHandler.hDLL != NULL)
+				{
+					FreeLibrary(ContextMenuHandler.hDLL);
+				}
+				
+				if(hr == S_OK) {
+					ret = 0;
+					break;
+				}
+			}
+			continue;
+		}
+	}
+
+	return ret;
+}
+
 HRESULT GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax)
 {
 	LPITEMIDLIST	pidlItem = NULL;
@@ -1176,3 +1304,5 @@ HRESULT GetItemInfoTip(LPCITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchM
 
 	return hr;
 }
+
+

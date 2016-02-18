@@ -977,8 +977,41 @@ void CDropHandler::CopyDroppedFiles(const HDROP &hd,BOOL bPreferredEffect,DWORD 
 		}
 	}
 
-	CopyDroppedFilesInternal(CopyFilenameList,TRUE,bRenameOnCollision);
-	CopyDroppedFilesInternal(MoveFilenameList,FALSE,bRenameOnCollision);
+	LPITEMIDLIST pidlDirectory = NULL;
+	HRESULT hr;
+	BOOL ret;
+	/* create pidl for target directory
+	/*  --"For nondefault drag-and-drop menu extensions, this parameter specifies the target folder." */
+	hr = GetIdlFromParsingName(m_szDestDirectory, &pidlDirectory);
+	if(SUCCEEDED(hr)) {
+		LPCITEMIDLIST pidlDirectoryC = pidlDirectory;
+
+		/* create IDataObject of the file lists */
+		FORMATETC copy_ftc, move_ftc;
+		STGMEDIUM copy_stg, move_stg;
+		BuildHDropList(&copy_ftc, &copy_stg, CopyFilenameList);
+		BuildHDropList(&move_ftc, &move_stg, MoveFilenameList);
+		IDataObject *copy_pDataObject = NULL;
+		IDataObject *move_pDataObject = NULL;
+		hr = CreateDataObject(&copy_ftc,&copy_stg,&copy_pDataObject,1);
+		hr = CreateDataObject(&move_ftc,&move_stg,&move_pDataObject,1);
+
+		/* Check against shell extensions before executing internal copy/move */
+		ret = LoadShellExtensionHandlers(TRUE, pidlDirectoryC, copy_pDataObject);
+		if(ret)
+		{
+			CopyDroppedFilesInternal(CopyFilenameList,TRUE,bRenameOnCollision);
+		}
+
+		ret = LoadShellExtensionHandlers(FALSE, pidlDirectoryC, move_pDataObject);
+		if(ret)
+		{
+			CopyDroppedFilesInternal(MoveFilenameList,FALSE,bRenameOnCollision);
+		}
+
+		/* cleanup ... TODO ... what about pidlDirectoryC? */
+		CoTaskMemFree(pidlDirectory);
+	}
 }
 
 void CDropHandler::CopyDroppedFilesInternal(const std::list<std::wstring> &FullFilenameList,
