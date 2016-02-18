@@ -515,6 +515,8 @@ int Explorerplusplus::OnTreeViewBeginLabelEdit(LPARAM lParam)
 	needs to be renamed. */
 	GetDisplayName(pidl,m_OldTreeViewFileName,SIZEOF_ARRAY(m_OldTreeViewFileName),SHGDN_FORPARSING);
 
+	CoTaskMemFree(pidl);
+
 	return FALSE;
 }
 
