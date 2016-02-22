@@ -331,7 +331,7 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 	return TRUE;
 }
 
-HRESULT Explorerplusplus::TestListViewSelectionAttributes(SFGAOF *pItemAttributes)
+HRESULT Explorerplusplus::TestListViewSelectionAttributes(SFGAOF *pItemAttributes) const
 {
 	LPITEMIDLIST	pidlDirectory = NULL;
 	LPITEMIDLIST	ridl = NULL;
@@ -359,7 +359,7 @@ HRESULT Explorerplusplus::TestListViewSelectionAttributes(SFGAOF *pItemAttribute
 	return hr;
 }
 
-HRESULT Explorerplusplus::TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes)
+HRESULT Explorerplusplus::TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const
 {
 	HTREEITEM		hItem;
 	LPITEMIDLIST	pidl = NULL;
@@ -379,37 +379,36 @@ HRESULT Explorerplusplus::TestTreeViewSelectionAttributes(SFGAOF *pItemAttribute
 	return hr;
 }
 
-BOOL Explorerplusplus::IsRenamePossible(void)
+BOOL Explorerplusplus::IsRenamePossible(void) const
 {
-	SFGAOF	ItemAttributes;
-	HRESULT	hr;
+	return TestItemAttributes(SFGAO_CANRENAME);
+}
 
-	ItemAttributes = SFGAO_CANRENAME;
+BOOL Explorerplusplus::IsDeletionPossible(void) const
+{
+	return TestItemAttributes(SFGAO_CANDELETE);
+}
 
-	hr = GetSelectionAttributes(&ItemAttributes);
+BOOL Explorerplusplus::CanShowFileProperties(void) const
+{
+	return TestItemAttributes(SFGAO_HASPROPSHEET);
+}
+
+/* Returns TRUE if all the specified attributes are set on the selected items. */
+BOOL Explorerplusplus::TestItemAttributes(SFGAOF attributes) const
+{
+	SFGAOF commonAttributes = attributes;
+	HRESULT hr = GetSelectionAttributes(&commonAttributes);
 
 	if(SUCCEEDED(hr))
-		return (ItemAttributes & SFGAO_CANRENAME) == SFGAO_CANRENAME;
+	{
+		return (commonAttributes & attributes) == attributes;
+	}
 
 	return FALSE;
 }
 
-BOOL Explorerplusplus::IsDeletionPossible(void)
-{
-	SFGAOF	ItemAttributes;
-	HRESULT	hr;
-
-	ItemAttributes = SFGAO_CANDELETE;
-
-	hr = GetSelectionAttributes(&ItemAttributes);
-
-	if(SUCCEEDED(hr))
-		return (ItemAttributes & SFGAO_CANDELETE) == SFGAO_CANDELETE;
-
-	return FALSE;
-}
-
-HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes)
+HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes) const
 {
 	HWND	hFocus;
 	HRESULT	hr = E_FAIL;
@@ -424,22 +423,7 @@ HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes)
 	return hr;
 }
 
-BOOL Explorerplusplus::CanShowFileProperties(void)
-{
-	SFGAOF	ItemAttributes;
-	HRESULT	hr;
-
-	ItemAttributes = SFGAO_HASPROPSHEET;
-
-	hr = GetSelectionAttributes(&ItemAttributes);
-
-	if(SUCCEEDED(hr))
-		return (ItemAttributes & SFGAO_HASPROPSHEET) == SFGAO_HASPROPSHEET;
-
-	return FALSE;
-}
-
-BOOL Explorerplusplus::CanCutOrCopySelection(void)
+BOOL Explorerplusplus::CanCutOrCopySelection(void) const
 {
 	HWND hFocus;
 
@@ -478,7 +462,7 @@ BOOL Explorerplusplus::CanCutOrCopySelection(void)
 	return FALSE;
 }
 
-BOOL Explorerplusplus::CanPaste(void)
+BOOL Explorerplusplus::CanPaste(void) const
 {
 	HWND hFocus = GetFocus();
 
@@ -529,7 +513,7 @@ BOOL Explorerplusplus::CanPaste(void)
 	return FALSE;
 }
 
-BOOL Explorerplusplus::AreAllSelectedFilesReal(void)
+BOOL Explorerplusplus::AreAllSelectedFilesReal(void) const
 {
 	int iItem = -1;
 

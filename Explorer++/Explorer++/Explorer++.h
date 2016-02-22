@@ -655,15 +655,16 @@ private:
 
 	/* Listview selection file tests. */
 	void					BuildListViewFileSelectionList(HWND hListView,std::list<std::wstring> *pFileSelectionList);
-	HRESULT					TestListViewSelectionAttributes(SFGAOF *pItemAttributes);
-	HRESULT					TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes);	
-	HRESULT					GetSelectionAttributes(SFGAOF *pItemAttributes);
-	BOOL					IsRenamePossible(void);
-	BOOL					IsDeletionPossible(void);
-	BOOL					CanShowFileProperties(void);
-	BOOL					CanCutOrCopySelection(void);
-	BOOL					AreAllSelectedFilesReal(void);
-	BOOL					CanPaste(void);
+	HRESULT					TestListViewSelectionAttributes(SFGAOF *pItemAttributes) const;
+	HRESULT					TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
+	HRESULT					GetSelectionAttributes(SFGAOF *pItemAttributes) const;
+	BOOL					IsRenamePossible(void) const;
+	BOOL					IsDeletionPossible(void) const;
+	BOOL					CanShowFileProperties(void) const;
+	BOOL					CanCutOrCopySelection(void) const;
+	BOOL					AreAllSelectedFilesReal(void) const;
+	BOOL					CanPaste(void) const;
+	BOOL					TestItemAttributes(SFGAOF attributes) const;
 
 	/* Tab proxy's. */
 	void					SetTabProxyIcon(int iTabId,HICON hIcon);
