@@ -1178,11 +1178,8 @@ HRESULT GetItemInfoTip(LPCITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchM
 }
 
 HRESULT ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,
-	LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles, TCHAR *szAction, DWORD fMask)
+	LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask)
 {
-	assert(pidlDirectory != NULL);
-	assert(szAction != NULL);
-
 	IShellFolder		*pShellParentFolder = NULL;
 	IShellFolder		*pShellFolder = NULL;
 	IContextMenu		*pContext = NULL;
@@ -1217,7 +1214,7 @@ HRESULT ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,
 		}
 	}
 
-	if(pContext != NULL)
+	if(SUCCEEDED(hr))
 	{
 		/* Action string MUST be ANSI. */
 #ifdef UNICODE
