@@ -44,24 +44,16 @@ LRESULT CALLBACK BaseWindowProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lPa
 
 LRESULT CALLBACK CBaseWindow::BaseWindowProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
-	switch(uMsg)
-	{
-	/* With compiler support for
-	the final keyword, OnNcDestroy
-	should be overridden by this
-	class and marked final (since
-	derived classes can never receive
-	the WM_NCDESTROY message). */
-	case WM_NCDESTROY:
-		delete this;
-		return 0;
-		break;
-	}
-
 	return ForwardMessage(hwnd,uMsg,wParam,lParam);
 }
 
-INT_PTR CBaseWindow::GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+INT_PTR CBaseWindow::GetDefaultReturnValue(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+INT_PTR CBaseWindow::OnNcDestroy()
+{
+	delete this;
+	return 0;
 }
