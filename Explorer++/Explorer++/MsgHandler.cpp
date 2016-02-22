@@ -738,7 +738,7 @@ void Explorerplusplus::OnResolveLink(void)
 	}
 }
 
-void Explorerplusplus::OnSaveDirectoryListing(void)
+void Explorerplusplus::OnSaveDirectoryListing(void) const
 {
 	TCHAR FileName[MAX_PATH];
 	LoadString(m_hLanguageModule,IDS_GENERAL_DIRECTORY_LISTING_FILENAME,FileName,SIZEOF_ARRAY(FileName));

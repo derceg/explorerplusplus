@@ -1176,3 +1176,70 @@ HRESULT GetItemInfoTip(LPCITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchM
 
 	return hr;
 }
+
+HRESULT ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,
+	LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles, TCHAR *szAction, DWORD fMask)
+{
+	assert(pidlDirectory != NULL);
+	assert(szAction != NULL);
+
+	IShellFolder		*pShellParentFolder = NULL;
+	IShellFolder		*pShellFolder = NULL;
+	IContextMenu		*pContext = NULL;
+	LPITEMIDLIST		pidlRelative = NULL;
+	CMINVOKECOMMANDINFO	cmici;
+	HRESULT				hr = S_FALSE;
+	char				szActionA[32];
+
+	if(nFiles == 0)
+	{
+		hr = SHBindToParent(pidlDirectory, IID_PPV_ARGS(&pShellParentFolder),
+			(LPCITEMIDLIST *) &pidlRelative);
+
+		if(SUCCEEDED(hr))
+		{
+			hr = GetUIObjectOf(pShellParentFolder, hwndOwner, 1,
+				(LPCITEMIDLIST *) &pidlRelative, IID_PPV_ARGS(&pContext));
+
+			pShellParentFolder->Release();
+			pShellParentFolder = NULL;
+		}
+	}
+	else
+	{
+		hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
+
+		if(SUCCEEDED(hr))
+		{
+			hr = GetUIObjectOf(pShellFolder, hwndOwner, nFiles,
+				ppidl, IID_PPV_ARGS(&pContext));
+			pShellFolder->Release();
+		}
+	}
+
+	if(pContext != NULL)
+	{
+		/* Action string MUST be ANSI. */
+#ifdef UNICODE
+		WideCharToMultiByte(CP_ACP, 0, szAction, -1, szActionA,
+			SIZEOF_ARRAY(szActionA), NULL, NULL);
+#else
+		StringCchCopy(szActionA, SIZEOF_ARRAY(szActionA), szAction);
+#endif
+
+		cmici.cbSize = sizeof(CMINVOKECOMMANDINFO);
+		cmici.fMask = fMask;
+		cmici.hwnd = hwndOwner;
+		cmici.lpVerb = szActionA;
+		cmici.lpParameters = NULL;
+		cmici.lpDirectory = NULL;
+		cmici.nShow = SW_SHOW;
+
+		hr = pContext->InvokeCommand(&cmici);
+
+		pContext->Release();
+		pContext = NULL;
+	}
+
+	return hr;
+}

@@ -15,7 +15,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 
-void Explorerplusplus::OnCopyItemPath(void)
+void Explorerplusplus::OnCopyItemPath(void) const
 {
 	HWND hFocus;
 
@@ -31,7 +31,7 @@ void Explorerplusplus::OnCopyItemPath(void)
 	}
 }
 
-void Explorerplusplus::OnCopyUniversalPaths(void)
+void Explorerplusplus::OnCopyUniversalPaths(void) const
 {
 	HWND hFocus;
 
@@ -103,7 +103,7 @@ void Explorerplusplus::OnFileDelete(BOOL bPermanent)
 	}
 }
 
-void Explorerplusplus::OnSetFileAttributes(void)
+void Explorerplusplus::OnSetFileAttributes(void) const
 {
 	HWND hFocus;
 
@@ -119,7 +119,7 @@ void Explorerplusplus::OnSetFileAttributes(void)
 	}
 }
 
-void Explorerplusplus::OnShowFileProperties(void)
+void Explorerplusplus::OnShowFileProperties(void) const
 {
 	HWND hFocus;
 

@@ -1445,7 +1445,7 @@ void Explorerplusplus::OnListViewFileRename(void)
 	}
 }
 
-void Explorerplusplus::OnListViewShowFileProperties(void)
+void Explorerplusplus::OnListViewShowFileProperties(void) const
 {
 	LPITEMIDLIST	*ppidl = NULL;
 	LPITEMIDLIST	pidlDirectory = NULL;
@@ -1485,7 +1485,7 @@ void Explorerplusplus::OnListViewShowFileProperties(void)
 	free(ppidl);
 }
 
-void Explorerplusplus::OnListViewCopyItemPath(void)
+void Explorerplusplus::OnListViewCopyItemPath(void) const
 {
 	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
@@ -1508,7 +1508,7 @@ void Explorerplusplus::OnListViewCopyItemPath(void)
 	CopyTextToClipboard(strItemPaths);
 }
 
-void Explorerplusplus::OnListViewCopyUniversalPaths(void)
+void Explorerplusplus::OnListViewCopyUniversalPaths(void) const
 {
 	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
@@ -1598,7 +1598,7 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 	return hr;
 }
 
-void Explorerplusplus::OnListViewSetFileAttributes(void)
+void Explorerplusplus::OnListViewSetFileAttributes(void) const
 {
 	if(ListView_GetSelectedCount(m_hActiveListView) > 0)
 	{
@@ -1684,7 +1684,7 @@ void Explorerplusplus::BuildListViewFileSelectionList(HWND hListView,
 		FileSelectionList.end());
 }
 
-int Explorerplusplus::HighlightSimilarFiles(HWND ListView)
+int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 {
 	TCHAR	FullFileName[MAX_PATH];
 	TCHAR	TestFile[MAX_PATH];

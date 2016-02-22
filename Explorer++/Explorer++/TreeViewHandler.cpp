@@ -170,7 +170,7 @@ void Explorerplusplus::OnTreeViewFileDelete(BOOL bPermanent)
 			fMask = CMIC_MASK_SHIFT_DOWN;
 		}
 
-		hr = ExecuteActionFromContextMenu(pidl,NULL,0,_T("delete"),fMask);
+		hr = ExecuteActionFromContextMenu(pidl,NULL,m_hContainer,0,_T("delete"),fMask);
 
 		CoTaskMemFree(pidl);
 	}
@@ -259,7 +259,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
  * Shows the properties dialog for the currently
  * selected treeview item.
  */
-void Explorerplusplus::OnTreeViewShowFileProperties(void)
+void Explorerplusplus::OnTreeViewShowFileProperties(void) const
 {
 	LPITEMIDLIST	pidlDirectory = NULL;
 	HTREEITEM		hItem;
@@ -339,7 +339,7 @@ BOOL Explorerplusplus::OnTreeViewItemExpanding(LPARAM lParam)
 	return FALSE;
 }
 
-void Explorerplusplus::OnTreeViewCopyItemPath(void)
+void Explorerplusplus::OnTreeViewCopyItemPath(void) const
 {
 	HTREEITEM		hItem;
 	LPITEMIDLIST	pidl;
@@ -359,7 +359,7 @@ void Explorerplusplus::OnTreeViewCopyItemPath(void)
 	}
 }
 
-void Explorerplusplus::OnTreeViewCopyUniversalPaths(void)
+void Explorerplusplus::OnTreeViewCopyUniversalPaths(void) const
 {
 	HTREEITEM		hItem;
 	LPITEMIDLIST	pidl;
@@ -712,7 +712,7 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowCommandHandler(WPARAM wPa
 	return 1;
 }
 
-void Explorerplusplus::OnTreeViewSetFileAttributes(void)
+void Explorerplusplus::OnTreeViewSetFileAttributes(void) const
 {
 	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
 

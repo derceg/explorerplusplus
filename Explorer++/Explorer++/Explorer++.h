@@ -349,27 +349,15 @@ private:
 	BOOL					OnSize(int MainWindowWidth,int MainWindowHeight);
 	int						OnClose(void);
 	int						OnDestroy(void);
-	void					OnSaveDirectoryListing(void);
-	void					OnCopyItemPath(void);
-	void					OnCopyUniversalPaths(void);
 	void					OnCopy(BOOL bCopy);
 	void					OnRightClick(NMHDR *nmhdr);
 	void					OnTabSelectionChange(void);
-	void					OnSetFileAttributes(void);
-	void					OnShowFileProperties(void);
 	void					OnCreate(void);
-	void					OnNewTab(void);
-	void					OnFileRename(void);
-	void					OnFileDelete(BOOL bPermanent);
-	void					OnWildcardSelect(BOOL bSelect);
 	void					OnDirChanged(int iTabId);
-	void					OnResolveLink(void);
 	void					OnTabCtrlGetDispInfo(LPARAM lParam);
 	void					OnDrawClipboard(void);
 	void					OnChangeCBChain(WPARAM wParam,LPARAM lParam);
 	void					OnSetFocus(void);
-	int						HighlightSimilarFiles(HWND ListView);
-	void					OnShowHiddenFiles(void);
 	LRESULT					OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	LRESULT					StatusBarMenuSelect(WPARAM wParam,LPARAM lParam);
 	void					HandleDirectoryMonitoring(int iTabId);
@@ -419,6 +407,20 @@ private:
 	void					OnSelectTab(int iTab);
 	void					OnSelectTab(int iTab,BOOL bSetFocus);
 
+	/* Main menu handlers. */
+	void					OnNewTab(void);
+	void					OnSaveDirectoryListing(void) const;
+	void					OnCopyItemPath(void) const;
+	void					OnCopyUniversalPaths(void) const;
+	void					OnSetFileAttributes(void) const;
+	void					OnFileDelete(BOOL bPermanent);
+	void					OnFileRename(void);
+	void					OnShowFileProperties(void) const;
+	void					OnResolveLink(void);
+	int						HighlightSimilarFiles(HWND ListView) const;
+	void					OnWildcardSelect(BOOL bSelect);
+	void					OnShowHiddenFiles(void);
+
 	/* ListView private message handlers. */
 	void					OnListViewMButtonDown(POINT *pt);
 	void					OnListViewMButtonUp(POINT *pt);
@@ -439,26 +441,26 @@ private:
 	void					OnListViewItemRClick(POINT *pCursorPos);
 	void					OnListViewHeaderRClick(POINT *pCursorPos);
 	int						GetColumnHeaderMenuList(unsigned int **pHeaderList);
-	void					OnListViewShowFileProperties(void);
-	void					OnListViewCopyItemPath(void);
-	void					OnListViewCopyUniversalPaths(void);
-	void					OnListViewSetFileAttributes(void);
+	void					OnListViewShowFileProperties(void) const;
+	void					OnListViewCopyItemPath(void) const;
+	void					OnListViewCopyUniversalPaths(void) const;
+	void					OnListViewSetFileAttributes(void) const;
 	void					OnListViewPaste(void);
 
 	/* TreeView private message handlers. */
 	void					OnTreeViewFileRename(void);
 	void					OnTreeViewFileDelete(BOOL bPermanent);
 	void					OnTreeViewRightClick(WPARAM wParam,LPARAM lParam);
-	void					OnTreeViewShowFileProperties(void);
+	void					OnTreeViewShowFileProperties(void) const;
 	BOOL					OnTreeViewItemExpanding(LPARAM lParam);
 	void					OnTreeViewSelChanged(LPARAM lParam);
 	int						OnTreeViewBeginLabelEdit(LPARAM lParam);
 	int						OnTreeViewEndLabelEdit(LPARAM lParam);
 	LRESULT					OnTreeViewKeyDown(LPARAM lParam);
-	void					OnTreeViewCopyItemPath(void);
+	void					OnTreeViewCopyItemPath(void) const;
 	void					OnTreeViewCopy(BOOL bCopy);
-	void					OnTreeViewSetFileAttributes(void);
-	void					OnTreeViewCopyUniversalPaths(void);
+	void					OnTreeViewSetFileAttributes(void) const;
+	void					OnTreeViewCopyUniversalPaths(void) const;
 	void					OnTreeViewPaste(void);
 
 	/* Main toolbar private message handlers. */
@@ -644,8 +646,7 @@ private:
 	void					OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
 	HRESULT					OnListViewCopy(BOOL bCopy);
 	HRESULT					ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset,UINT iStartOffset);
-	HRESULT					ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles);
-	HRESULT					ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles,TCHAR *szAction,DWORD fMask);
+	HRESULT					ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles) const;
 
 	/* File context menu. */
 	void					AddMenuEntries(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
