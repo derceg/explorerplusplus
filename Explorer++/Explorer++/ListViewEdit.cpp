@@ -4,7 +4,7 @@
  * File: ListView.cpp
  * License: GPL - See LICENSE in the top level directory
  *
- * Manages the main listview.
+ * Manages the edit control in the main listview.
  *
  * Written by David Erceg
  * www.explorerplusplus.com
@@ -13,7 +13,7 @@
 
 #include "stdafx.h"
 #include "Explorer++_internal.h"
-#include "ListView.h"
+#include "ListViewEdit.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 

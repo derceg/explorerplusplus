@@ -300,7 +300,7 @@
     <ClCompile Include="iServiceProvider.cpp" />
     <ClCompile Include="iShellView2.cpp" />
     <ClCompile Include="Language.cpp" />
-    <ClCompile Include="ListView.cpp" />
+    <ClCompile Include="ListViewEdit.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="LoggingFrontend.cpp" />
     <ClCompile Include="LoggingImplicitLink.cpp" />
@@ -374,7 +374,7 @@
     <ClInclude Include="INewMenuClient.h" />
     <ClInclude Include="iServiceProvider.h" />
     <ClInclude Include="iShellView2.h" />
-    <ClInclude Include="ListView.h" />
+    <ClInclude Include="ListViewEdit.h" />
     <ClInclude Include="LoggingFrontend.h" />
     <ClInclude Include="MainImages.h" />
     <ClInclude Include="MainResource.h" />

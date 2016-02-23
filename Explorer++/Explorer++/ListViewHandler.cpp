@@ -18,7 +18,7 @@
 #include "MassRenameDialog.h"
 #include "iServiceProvider.h"
 #include "IDropFilesCallback.h"
-#include "ListView.h"
+#include "ListViewEdit.h"
 #include "MainResource.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/ShellHelper.h"

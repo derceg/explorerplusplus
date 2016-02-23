@@ -139,9 +139,6 @@
     <ClCompile Include="Initialization.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ListView.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ListViewHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -194,6 +191,9 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Language.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ListViewEdit.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -342,9 +342,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ListView.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="XMLSettings.h">
       <Filter>Settings</Filter>
     </ClInclude>
@@ -352,6 +349,9 @@
       <Filter>Settings</Filter>
     </ClInclude>
     <ClInclude Include="DefaultToolbarButtons.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ListViewEdit.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
