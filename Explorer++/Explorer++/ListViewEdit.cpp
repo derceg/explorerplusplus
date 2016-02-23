@@ -25,7 +25,6 @@ CListViewEdit *CListViewEdit::CreateNew(HWND hwnd,int ItemIndex,IExplorerplusplu
 
 CListViewEdit::CListViewEdit(HWND hwnd,int ItemIndex,IExplorerplusplus *pexpp) :
 CBaseWindow(hwnd),
-m_hEdit(hwnd),
 m_ItemIndex(ItemIndex),
 m_pexpp(pexpp),
 m_RenameStage(RENAME_FILENAME),
@@ -81,17 +80,17 @@ INT_PTR CListViewEdit::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 					switch(m_RenameStage)
 					{
 					case RENAME_FILENAME:
-						SendMessage(m_hEdit,EM_SETSEL,Index + 1,-1);
+						SendMessage(m_hwnd,EM_SETSEL,Index + 1,-1);
 						m_RenameStage = RENAME_EXTENSION;
 						break;
 
 					case RENAME_EXTENSION:
-						SendMessage(m_hEdit,EM_SETSEL,0,-1);
+						SendMessage(m_hwnd,EM_SETSEL,0,-1);
 						m_RenameStage = RENAME_ENTIRE;
 						break;
 
 					case RENAME_ENTIRE:
-						SendMessage(m_hEdit,EM_SETSEL,0,Index);
+						SendMessage(m_hwnd,EM_SETSEL,0,Index);
 						m_RenameStage = RENAME_FILENAME;
 						break;
 
@@ -105,7 +104,7 @@ INT_PTR CListViewEdit::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 		case VK_TAB:
 			{
-				HWND hListView = GetParent(m_hEdit);
+				HWND hListView = GetParent(m_hwnd);
 
 				int iSel = ListView_GetNextItem(hListView,-1,LVNI_ALL|LVNI_SELECTED);
 				NListView::ListView_SelectItem(hListView,iSel,FALSE);
@@ -150,7 +149,7 @@ INT_PTR CListViewEdit::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 int CListViewEdit::GetExtensionIndex()
 {
 	TCHAR szFileName[MAX_PATH];
-	GetWindowText(m_hEdit,szFileName,SIZEOF_ARRAY(szFileName));
+	GetWindowText(m_hwnd,szFileName,SIZEOF_ARRAY(szFileName));
 
 	DWORD dwAttributes = m_pexpp->GetActiveShellBrowser()->QueryFileAttributes(m_ItemIndex);
 

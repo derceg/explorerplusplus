@@ -29,7 +29,6 @@ private:
 
 	int					GetExtensionIndex();
 
-	HWND				m_hEdit;
 	IExplorerplusplus	*m_pexpp;
 
 	int					m_ItemIndex;
