@@ -62,7 +62,7 @@ static HWND g_hOptionsPropertyDialog	= NULL;
 HICON g_hNewTabDirIcon;
 TCHAR g_szNewTabDirectory[MAX_PATH];
 
-void Explorerplusplus::OnShowOptions(void)
+void Explorerplusplus::ShowOptions(void)
 {
 	PROPSHEETPAGE	psp[NUM_DIALOG_OPTIONS_PAGES];
 	HPROPSHEETPAGE	hpsp[NUM_DIALOG_OPTIONS_PAGES];

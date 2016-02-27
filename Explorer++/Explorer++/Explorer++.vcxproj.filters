@@ -199,6 +199,9 @@
     <ClCompile Include="Navigation.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="MainMenuHandler.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">

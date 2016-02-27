@@ -412,6 +412,12 @@ private:
 	void					PlayNavigationSound() const;
 
 	/* Main menu handlers. */
+	void					OnWildcardSelect(BOOL bSelect);
+	void					OnSearch();
+	void					OnCustomizeColors();
+	void					OnShowOptions();
+	void					OnShowHelp();
+
 	void					OnNewTab();
 	void					OnSaveDirectoryListing(void) const;
 	void					OnCopyItemPath(void) const;
@@ -422,7 +428,6 @@ private:
 	void					OnShowFileProperties(void) const;
 	void					OnResolveLink(void);
 	int						HighlightSimilarFiles(HWND ListView) const;
-	void					OnWildcardSelect(BOOL bSelect);
 	void					OnShowHiddenFiles(void);
 
 	/* ListView private message handlers. */
@@ -692,7 +697,7 @@ private:
 	void					SetFilterStatus(void);
 
 	/* Options dialog. */
-	void					OnShowOptions(void);
+	void					ShowOptions(void);
 	void					AddLanguages(HWND hDlg);
 	BOOL					AddLanguageToComboBox(HWND hComboBox, const TCHAR *szImageDirectory, const TCHAR *szFileName, WORD *pdwLanguage);
 	int						GetLanguageIDFromIndex(HWND hDlg,int iIndex);

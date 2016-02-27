@@ -304,6 +304,7 @@
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="LoggingFrontend.cpp" />
     <ClCompile Include="LoggingImplicitLink.cpp" />
+    <ClCompile Include="MainMenuHandler.cpp" />
     <ClCompile Include="MainToolbarHandler.cpp" />
     <ClCompile Include="MainWndSwitch.cpp" />
     <ClCompile Include="ManageBookmarksDialog.cpp" />

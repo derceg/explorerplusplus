@@ -14,7 +14,6 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
-#include "WildcardSelectDialog.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
@@ -361,14 +360,6 @@ void Explorerplusplus::OnMainToolbarRClick(void)
 
 	TrackPopupMenu(m_hToolbarRightClickMenu,TPM_LEFTALIGN,
 		ptCursor.x,ptCursor.y,0,m_hMainRebar,NULL);
-}
-
-void Explorerplusplus::OnWildcardSelect(BOOL bSelect)
-{
-	CWildcardSelectDialog WilcardSelectDialog(m_hLanguageModule,
-		IDD_WILDCARDSELECT,m_hContainer,bSelect,this);
-
-	WilcardSelectDialog.ShowModalDialog();
 }
 
 BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)

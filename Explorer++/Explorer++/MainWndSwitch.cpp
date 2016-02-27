@@ -14,16 +14,13 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "SearchDialog.h"
 #include "AboutDialog.h"
 #include "FilterDialog.h"
-#include "CustomizeColorsDialog.h"
 #include "SplitFileDialog.h"
 #include "DestroyFilesDialog.h"
 #include "MergeFilesDialog.h"
 #include "AddBookmarkDialog.h"
 #include "ManageBookmarksDialog.h"
-#include "HelpFileMissingDialog.h"
 #include "DisplayColoursDialog.h"
 #include "IModelessDialogNotification.h"
 #include "UpdateCheckDialog.h"
@@ -34,7 +31,6 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Controls.h"
-#include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
@@ -1394,71 +1390,20 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 		case TOOLBAR_SEARCH:
 		case IDM_TOOLS_SEARCH:
-			if(g_hwndSearch == NULL)
-			{
-				TCHAR szCurrentDirectory[MAX_PATH];
-				m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),szCurrentDirectory);
-
-				CSearchDialog *SearchDialog = new CSearchDialog(m_hLanguageModule,IDD_SEARCH,hwnd,szCurrentDirectory,this);
-				g_hwndSearch = SearchDialog->ShowModelessDialog(new CModelessDialogNotification());
-			}
-			else
-			{
-				SetFocus(g_hwndSearch);
-			}
+			OnSearch();
 			break;
 
 		case IDM_TOOLS_CUSTOMIZECOLORS:
-			{
-				CCustomizeColorsDialog CustomizeColorsDialog(m_hLanguageModule,IDD_CUSTOMIZECOLORS,hwnd,&m_ColorRules);
-				CustomizeColorsDialog.ShowModalDialog();
-
-				/* Causes the active listview to redraw (therefore
-				applying any updated color schemes). */
-				InvalidateRect(m_hActiveListView,NULL,FALSE);
-			}
+			OnCustomizeColors();
 			break;
 
 		case IDM_TOOLS_OPTIONS:
-			if(g_hwndOptions == NULL)
-			{
-				OnShowOptions();
-			}
-			else
-			{
-				SetFocus(g_hwndOptions);
-			}
+			OnShowOptions();
 			break;
 
 		case IDA_HELP_HELP:
 		case IDM_HELP_HELP:
-			{
-				TCHAR szHelpFile[MAX_PATH];
-				GetProcessImageName(GetCurrentProcessId(),szHelpFile,SIZEOF_ARRAY(szHelpFile));
-				PathRemoveFileSpec(szHelpFile);
-				PathAppend(szHelpFile,NExplorerplusplus::HELP_FILE_NAME);
-
-				LPITEMIDLIST pidl = NULL;
-				HRESULT hr = GetIdlFromParsingName(szHelpFile,&pidl);
-
-				bool bOpenedHelpFile = false;
-
-				if(SUCCEEDED(hr))
-				{
-					BOOL bRes = ExecuteFileAction(m_hContainer,NULL,NULL,NULL,pidl);
-
-					if(bRes)
-					{
-						bOpenedHelpFile = true;
-					}
-				}
-
-				if(!bOpenedHelpFile)
-				{
-					CHelpFileMissingDialog HelpFileMissingDialog(m_hLanguageModule,IDD_HELPFILEMISSING,hwnd);
-					HelpFileMissingDialog.ShowModalDialog();
-				}
-			}
+			OnShowHelp();
 			break;
 
 		case IDM_HELP_CHECKFORUPDATES:
