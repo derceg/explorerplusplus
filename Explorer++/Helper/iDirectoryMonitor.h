@@ -3,7 +3,7 @@
 #include <windows.h>
 
 
-typedef void (*OnDirectoryAltered)(TCHAR *szFileName, DWORD dwAction, void *pData);
+typedef void (*OnDirectoryAltered)(const TCHAR *szFileName, DWORD dwAction, void *pData);
 
 /* Main exported interface. */
 __interface IDirectoryMonitor : IUnknown

@@ -277,8 +277,7 @@ void CMyTreeView::DirectoryAlteredRenameFile(const TCHAR *szFullFileName)
 	}
 }
 
-void CMyTreeView::DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,
-void *pData)
+void CMyTreeView::DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData)
 {
 	DirectoryAltered_t	*pDirectoryAltered = NULL;
 	CMyTreeView			*pMyTreeView = NULL;

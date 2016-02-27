@@ -646,7 +646,7 @@ BOOL Explorerplusplus::CompareVirtualFolders(UINT uFolderCSIDL)
 	return CompareVirtualFolders(m_CurrentDirectory,uFolderCSIDL);
 }
 
-BOOL Explorerplusplus::CompareVirtualFolders(TCHAR *szDirectory,UINT uFolderCSIDL)
+BOOL Explorerplusplus::CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL)
 {
 	TCHAR szParsingPath[MAX_PATH];
 
@@ -673,7 +673,7 @@ Possible bugs:
    If this runs after the tab is freed, the tab existence
    check will fail, and the shell browser function won't be called.
 */
-void Explorerplusplus::DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,
+void Explorerplusplus::DirectoryAlteredCallback(const TCHAR *szFileName,DWORD dwAction,
 void *pData)
 {
 	DirectoryAltered_t	*pDirectoryAltered = NULL;
@@ -1115,7 +1115,7 @@ void Explorerplusplus::CreateViewsMenu(POINT *ptOrigin)
 		0,m_hContainer,NULL);
 }
 
-int Explorerplusplus::CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,int nBuffer)
+int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer)
 {
 	ULARGE_INTEGER	TotalNumberOfBytes;
 	ULARGE_INTEGER	TotalNumberOfFreeBytes;

@@ -701,7 +701,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 	return nTabsCreated;
 }
 
-void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns)
+void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns)
 {
 	typedef struct
 	{
@@ -729,7 +729,7 @@ void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyN
 	free(pColumnList);
 }
 
-void Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns)
+void Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns)
 {
 	typedef struct
 	{
@@ -762,7 +762,7 @@ void Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKe
 	}
 }
 
-void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns)
+void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns)
 {
 	std::list<Column_t>::iterator	itr;
 	ColumnOld_t					*pColumnList = NULL;
@@ -784,7 +784,7 @@ void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,st
 	free(pColumnList);
 }
 
-void Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns)
+void Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns)
 {
 	ColumnOld_t		ColumnList[64];
 	Column_t		Column;

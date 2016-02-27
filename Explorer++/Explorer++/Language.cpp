@@ -235,7 +235,7 @@ void Explorerplusplus::SetLanguageModule(void)
 	}
 }
 
-BOOL Explorerplusplus::VerifyLanguageVersion(TCHAR *szLanguageModule) const
+BOOL Explorerplusplus::VerifyLanguageVersion(const TCHAR *szLanguageModule) const
 {
 	TCHAR szImageName[MAX_PATH];
 	DWORD dwpvProcessLS;

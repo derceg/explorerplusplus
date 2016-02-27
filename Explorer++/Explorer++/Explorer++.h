@@ -74,7 +74,7 @@ public:
 	LRESULT CALLBACK	MainWndTaskbarThumbnailProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	/* Directory modification. */
-	static void			DirectoryAlteredCallback(TCHAR *szFileName,DWORD dwAction,void *pData);
+	static void			DirectoryAlteredCallback(const TCHAR *szFileName,DWORD dwAction,void *pData);
 
 private:
 
@@ -364,7 +364,7 @@ private:
 	void					OnTbnDropDown(LPARAM lParam);
 	void					OnTabCtrlMButtonUp(POINT *pt);
 	void					OnDisplayWindowResized(WPARAM wParam);
-	void					OnStartedBrowsing(int iTabId,TCHAR *szPath);
+	void					OnStartedBrowsing(int iTabId, const TCHAR *szPath);
 	void					OnDuplicateTab(int iTab);
 	void					OnLockTab(int iTab);
 	void					OnLockTabInternal(int iTab,int iTabId);
@@ -558,10 +558,10 @@ private:
 	void					TestConfigFile(void);
 	void					SaveTabSettingsToRegistry(void);
 	int						LoadTabSettingsFromRegistry(void);
-	void					LoadColumnFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns);
-	void					SaveColumnToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns);
-	void					LoadColumnWidthsFromRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns);
-	void					SaveColumnWidthsToRegistry(HKEY hColumnsKey,TCHAR *szKeyName,std::list<Column_t> *pColumns);
+	void					LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns);
+	void					SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns);
+	void					LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns);
+	void					SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns);
 	void					LoadDefaultColumnsFromRegistry(void);
 	void					SaveDefaultColumnsToRegistry(void);
 	void					InitializeBookmarks(void);
@@ -598,7 +598,7 @@ private:
 	void					InitializeTaskbarThumbnails();
 	ATOM					RegisterTabProxyClass(const TCHAR *szClassName);
 	void					CreateTabProxy(int iTabId,BOOL bSwitchToNewTab);
-	void					RegisterTab(HWND hTabProxy,TCHAR *szDisplayName,BOOL bTabActive);
+	void					RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive);
 	HBITMAP					CaptureTabScreenshot(int iTabId);
 	void					GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi);
 	void					RemoveTabProxy(int iInternalIndex);
@@ -621,7 +621,7 @@ private:
 
 	/* Languages. */
 	void					SetLanguageModule(void);
-	BOOL					VerifyLanguageVersion(TCHAR *szLanguageModule) const;
+	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
 
 	/* Default settings. */
 	void					SetDefaultTabSettings(TabInfo_t *pTabInfo);
@@ -682,8 +682,8 @@ private:
 	void					CopyColumnInfoToClipboard(void);
 
 	/* Bookmark handling. */
-	HRESULT					ExpandAndBrowsePath(TCHAR *szPath);
-	HRESULT					ExpandAndBrowsePath(TCHAR *szPath,BOOL bOpenInNewTab,BOOL bSwitchToNewTab);
+	HRESULT					ExpandAndBrowsePath(const TCHAR *szPath);
+	HRESULT					ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab);
 
 	/* Filtering. */
 	void					SetFilterStatus(void);
@@ -691,13 +691,13 @@ private:
 	/* Options dialog. */
 	void					OnShowOptions(void);
 	void					AddLanguages(HWND hDlg);
-	BOOL					AddLanguageToComboBox(HWND hComboBox, TCHAR *szImageDirectory, TCHAR *szFileName, WORD *pdwLanguage);
+	BOOL					AddLanguageToComboBox(HWND hComboBox, const TCHAR *szImageDirectory, const TCHAR *szFileName, WORD *pdwLanguage);
 	int						GetLanguageIDFromIndex(HWND hDlg,int iIndex);
 
 	/* Default settings dialog. */
 	void					OnDefaultSettingsNewTabDir(HWND hDlg);
 	void					DefaultSettingsSetNewTabDir(HWND hEdit,LPITEMIDLIST pidl);
-	void					DefaultSettingsSetNewTabDir(HWND hEdit,TCHAR *szPath);
+	void					DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath);
 
 	/* Files and folders dialog. */
 	void					SetInfoTipWindowStates(HWND hDlg);
@@ -710,7 +710,7 @@ private:
 	void					SaveTabSettingsToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	void					SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
 	int						LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,std::list<Column_t> *pColumns);
-	void					SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pColumnsNode,std::list<Column_t> *pColumns,TCHAR *szColumnSet,int iIndent);
+	void					SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pColumnsNode, std::list<Column_t> *pColumns, const TCHAR *szColumnSet, int iIndent);
 	int						LoadBookmarksFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
 	void					SaveBookmarksToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
 	int						LoadDefaultColumnsFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
@@ -740,7 +740,7 @@ private:
 
 	/* Miscellaneous. */
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
-	BOOL					CompareVirtualFolders(TCHAR *szDirectory,UINT uFolderCSIDL);
+	BOOL					CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 	void					CreateViewsMenu(POINT *ptOrigin);
 	void					SetInitialToolbarButtons(void);
 	int						LookupToolbarButtonTextID(int iButtonID);
@@ -752,7 +752,7 @@ private:
 	void					InitializeDisplayWindow(void);
 	void					InitializeMenus(void);
 	void					SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl);
-	int						CreateDriveFreeSpaceString(TCHAR *szPath,TCHAR *szBuffer,int nBuffer);
+	int						CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
 	BOOL					AnyItemsSelected(void);
 	void					ShowMainRebarBand(HWND hwnd,BOOL bShow);
 	BOOL					OnMouseWheel(MousewheelSource_t MousewheelSource,WPARAM wParam,LPARAM lParam);

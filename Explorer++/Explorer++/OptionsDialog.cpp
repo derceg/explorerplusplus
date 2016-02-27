@@ -1279,7 +1279,7 @@ int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam
 	return 0;
 }
 
-void Explorerplusplus::DefaultSettingsSetNewTabDir(HWND hEdit,TCHAR *szPath)
+void Explorerplusplus::DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath)
 {
 	LPITEMIDLIST	pidl = NULL;
 	HRESULT			hr;
@@ -1367,7 +1367,7 @@ void Explorerplusplus::AddLanguages(HWND hDlg)
 }
 
 BOOL Explorerplusplus::AddLanguageToComboBox(HWND hComboBox,
-	TCHAR *szImageDirectory, TCHAR *szFileName, WORD *pdwLanguage)
+	const TCHAR *szImageDirectory, const TCHAR *szFileName, WORD *pdwLanguage)
 {
 	TCHAR szFullFileName[MAX_PATH];
 	StringCchCopy(szFullFileName, SIZEOF_ARRAY(szFullFileName), szImageDirectory);

@@ -70,7 +70,7 @@ private:
 	HTREEITEM	LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand);
 	HTREEITEM	LocateItemOnDesktopTree(const TCHAR *szFullFileName);
 
-	static void	DirectoryAlteredCallback(TCHAR *szFileName, DWORD dwAction, void *pData);
+	static void	DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
 
 	/* Directory modification. */
 	void		DirectoryAlteredAddFile(const TCHAR *szFullFileName);

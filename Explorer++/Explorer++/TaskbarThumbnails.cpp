@@ -314,7 +314,7 @@ void Explorerplusplus::InvalidateTaskbarThumbnailBitmap(int iTabId)
 	}
 }
 
-void Explorerplusplus::RegisterTab(HWND hTabProxy,TCHAR *szDisplayName,BOOL bTabActive)
+void Explorerplusplus::RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive)
 {
 	/* Register and insert the tab into the current list of
 	taskbar thumbnails. */

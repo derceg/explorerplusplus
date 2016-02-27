@@ -954,7 +954,7 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 	SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,(LPARAM)MAKELPARAM(rc.right,rc.bottom));
 }
 
-void Explorerplusplus::OnStartedBrowsing(int iTabId,TCHAR *szFolderPath)
+void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
 {
 	TCHAR	szLoadingText[512];
 

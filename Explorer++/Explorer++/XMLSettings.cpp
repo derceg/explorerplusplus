@@ -1210,8 +1210,8 @@ MSXML2::IXMLDOMElement *pColumnsNode)
 }
 
 void Explorerplusplus::SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pColumnsNode,std::list<Column_t> *pColumns,
-TCHAR *szColumnSet,int iIndent)
+MSXML2::IXMLDOMElement *pColumnsNode, std::list<Column_t> *pColumns,
+const TCHAR *szColumnSet, int iIndent)
 {
 	MSXML2::IXMLDOMElement		*pColumnNode = NULL;
 	std::list<Column_t>::iterator	itr;
