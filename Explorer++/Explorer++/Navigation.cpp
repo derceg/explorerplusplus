@@ -31,13 +31,11 @@ void Explorerplusplus::OnBrowseForward()
 
 void Explorerplusplus::OnHome()
 {
-	HRESULT hr;
-
-	hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE);
+	HRESULT hr = BrowseFolder(m_DefaultTabDirectory, SBSP_ABSOLUTE);
 
 	if(FAILED(hr))
 	{
-		BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE);
+		BrowseFolder(m_DefaultTabDirectoryStatic, SBSP_ABSOLUTE);
 	}
 }
 
@@ -46,11 +44,15 @@ void Explorerplusplus::OnNavigateUp()
 	TCHAR szDirectory[MAX_PATH];
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory),
 		szDirectory);
+
 	PathStripPath(szDirectory);
 
-	BrowseFolder(EMPTY_STRING,SBSP_PARENT|SBSP_SAMEBROWSER);
+	HRESULT hr = BrowseFolder(EMPTY_STRING, SBSP_PARENT | SBSP_SAMEBROWSER);
 
-	m_pActiveShellBrowser->SelectFiles(szDirectory);
+	if(SUCCEEDED(hr))
+	{
+		m_pActiveShellBrowser->SelectFiles(szDirectory);
+	}
 }
 
 /*
@@ -59,10 +61,8 @@ void Explorerplusplus::OnNavigateUp()
 */
 void Explorerplusplus::GotoFolder(int FolderCSIDL)
 {
-	LPITEMIDLIST	pidl = NULL;
-	HRESULT			hr;
-
-	hr = SHGetFolderLocation(NULL, FolderCSIDL, NULL, 0, &pidl);
+	LPITEMIDLIST pidl = NULL;
+	HRESULT hr = SHGetFolderLocation(NULL, FolderCSIDL, NULL, 0, &pidl);
 
 	/* Don't use SUCCEEDED(hr). */
 	if(hr == S_OK)
@@ -95,13 +95,11 @@ HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath, UINT wFlags)
 HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath, UINT wFlags,
 	BOOL bOpenInNewTab, BOOL bSwitchToNewTab, BOOL bOpenInNewWindow)
 {
-	LPITEMIDLIST	pidl = NULL;
-	HRESULT			hr = S_FALSE;
-
 	/* Doesn't matter if we can't get the pidl here,
 	as some paths will be relative, or will be filled
 	by the shellbrowser (e.g. when browsing back/forward). */
-	hr = GetIdlFromParsingName(szPath, &pidl);
+	LPITEMIDLIST pidl = NULL;
+	HRESULT hr = GetIdlFromParsingName(szPath, &pidl);
 
 	BrowseFolder(pidl, wFlags, bOpenInNewTab, bSwitchToNewTab, bOpenInNewWindow);
 
@@ -118,7 +116,7 @@ pass through this function. This ensures that tabs that
 have their addresses locked will not change directory. */
 HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags)
 {
-	HRESULT hr = E_FAIL;
+	HRESULT hr;
 	int iTabObjectIndex = -1;
 
 	if(!m_TabInfo[m_iObjectIndex].bAddressLocked)
@@ -190,13 +188,19 @@ HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags,
 		else
 		{
 			if(m_TabInfo[m_iObjectIndex].bAddressLocked)
+			{
 				hr = CreateNewTab(pidlDirectory, NULL, NULL, TRUE, &iTabObjectIndex);
+			}
 			else
+			{
 				hr = CreateNewTab(pidlDirectory, NULL, NULL, bSwitchToNewTab, &iTabObjectIndex);
+			}
 		}
 
 		if(SUCCEEDED(hr))
+		{
 			OnDirChanged(iTabObjectIndex);
+		}
 	}
 
 	return hr;
