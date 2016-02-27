@@ -15,7 +15,6 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "WildcardSelectDialog.h"
-#include "DefaultColumns.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
@@ -1153,26 +1152,6 @@ void Explorerplusplus::SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl)
 		/* Now, delete the menu .*/
 		DeleteMenu(hMenu,uMenuID,MF_BYCOMMAND);
 	}
-}
-
-void Explorerplusplus::SetDefaultColumns()
-{
-	/* Set the default columns as the initial set. When the
-	settings are loaded, these columns may be overwritten. */
-	m_RealFolderColumnList = std::list<Column_t>(REAL_FOLDER_DEFAULT_COLUMNS,
-		REAL_FOLDER_DEFAULT_COLUMNS + SIZEOF_ARRAY(REAL_FOLDER_DEFAULT_COLUMNS));
-	m_ControlPanelColumnList = std::list<Column_t>(CONTROL_PANEL_DEFAULT_COLUMNS,
-		CONTROL_PANEL_DEFAULT_COLUMNS + SIZEOF_ARRAY(CONTROL_PANEL_DEFAULT_COLUMNS));
-	m_MyComputerColumnList = std::list<Column_t>(MY_COMPUTER_DEFAULT_COLUMNS,
-		MY_COMPUTER_DEFAULT_COLUMNS + SIZEOF_ARRAY(MY_COMPUTER_DEFAULT_COLUMNS));
-	m_RecycleBinColumnList = std::list<Column_t>(RECYCLE_BIN_DEFAULT_COLUMNS,
-		RECYCLE_BIN_DEFAULT_COLUMNS + SIZEOF_ARRAY(RECYCLE_BIN_DEFAULT_COLUMNS));
-	m_PrintersColumnList = std::list<Column_t>(PRINTERS_DEFAULT_COLUMNS,
-		PRINTERS_DEFAULT_COLUMNS + SIZEOF_ARRAY(PRINTERS_DEFAULT_COLUMNS));
-	m_NetworkConnectionsColumnList = std::list<Column_t>(NETWORK_CONNECTIONS_DEFAULT_COLUMNS,
-		NETWORK_CONNECTIONS_DEFAULT_COLUMNS + SIZEOF_ARRAY(NETWORK_CONNECTIONS_DEFAULT_COLUMNS));
-	m_MyNetworkPlacesColumnList = std::list<Column_t>(MY_NETWORK_PLACES_DEFAULT_COLUMNS,
-		MY_NETWORK_PLACES_DEFAULT_COLUMNS + SIZEOF_ARRAY(MY_NETWORK_PLACES_DEFAULT_COLUMNS));
 }
 
 void Explorerplusplus::OnLockToolbars(void)
