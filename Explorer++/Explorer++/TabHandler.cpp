@@ -284,6 +284,47 @@ int Explorerplusplus::GenerateUniqueTabId(void)
 		return -1;
 }
 
+/*
+* Creates a new tab. If a folder is selected,
+* that folder is opened in a new tab, else
+* the default directory is opened.
+*/
+void Explorerplusplus::OnNewTab()
+{
+	int		iSelected;
+	HRESULT	hr;
+	BOOL	bFolderSelected = FALSE;
+
+	iSelected = ListView_GetNextItem(m_hActiveListView,
+		-1, LVNI_FOCUSED | LVNI_SELECTED);
+
+	if(iSelected != -1)
+	{
+		TCHAR FullItemPath[MAX_PATH];
+
+		/* An item is selected, so get its full pathname. */
+		m_pActiveShellBrowser->QueryFullItemName(iSelected, FullItemPath, SIZEOF_ARRAY(FullItemPath));
+
+		/* If the selected item is a folder, open that folder
+		in a new tab, else just use the default new tab directory. */
+		if(PathIsDirectory(FullItemPath))
+		{
+			bFolderSelected = TRUE;
+			BrowseFolder(FullItemPath, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+		}
+	}
+
+	/* Either no items are selected, or the focused + selected
+	item was not a folder; open the default tab directory. */
+	if(!bFolderSelected)
+	{
+		hr = BrowseFolder(m_DefaultTabDirectory, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+
+		if(FAILED(hr))
+			BrowseFolder(m_DefaultTabDirectoryStatic, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+	}
+}
+
 HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
 InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)

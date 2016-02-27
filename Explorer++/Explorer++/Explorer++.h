@@ -411,7 +411,7 @@ private:
 	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags, BOOL bOpenInNewTab, BOOL bSwitchToNewTab, BOOL bOpenInNewWindow);
 
 	/* Main menu handlers. */
-	void					OnNewTab(void);
+	void					OnNewTab();
 	void					OnSaveDirectoryListing(void) const;
 	void					OnCopyItemPath(void) const;
 	void					OnCopyUniversalPaths(void) const;
