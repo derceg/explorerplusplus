@@ -412,11 +412,18 @@ private:
 	void					PlayNavigationSound() const;
 
 	/* Main menu handlers. */
+	void					OnChangeDisplayColors();
+	void					OnFilterResults();
+	void					OnMergeFiles();
+	void					OnSplitFile();
+	void					OnDestroyFiles();
 	void					OnWildcardSelect(BOOL bSelect);
 	void					OnSearch();
 	void					OnCustomizeColors();
 	void					OnShowOptions();
 	void					OnShowHelp();
+	void					OnCheckForUpdates();
+	void					OnAbout();
 
 	void					OnNewTab();
 	void					OnSaveDirectoryListing(void) const;

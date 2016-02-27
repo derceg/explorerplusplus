@@ -14,16 +14,9 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "AboutDialog.h"
-#include "FilterDialog.h"
-#include "SplitFileDialog.h"
-#include "DestroyFilesDialog.h"
-#include "MergeFilesDialog.h"
 #include "AddBookmarkDialog.h"
 #include "ManageBookmarksDialog.h"
-#include "DisplayColoursDialog.h"
 #include "IModelessDialogNotification.h"
-#include "UpdateCheckDialog.h"
 #include "ModelessDialogs.h"
 #include "MainResource.h"
 #include "../DisplayWindow/DisplayWindow.h"
@@ -627,18 +620,11 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_VIEW_CHANGEDISPLAYCOLOURS:
-			{
-				CDisplayColoursDialog DisplayColoursDialog(m_hLanguageModule,IDD_DISPLAYCOLOURS,hwnd,
-					m_hDisplayWindow,m_DisplayWindowCentreColor.ToCOLORREF(),m_DisplayWindowSurroundColor.ToCOLORREF());
-				DisplayColoursDialog.ShowModalDialog();
-			}
+			OnChangeDisplayColors();
 			break;
 
 		case IDM_FILTER_FILTERRESULTS:
-			{
-				CFilterDialog FilterDialog(m_hLanguageModule,IDD_FILTER,hwnd,this);
-				FilterDialog.ShowModalDialog();
-			}
+			OnFilterResults();
 			break;
 
 		case IDM_FILTER_APPLYFILTER:
@@ -1246,60 +1232,15 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_ACTIONS_MERGEFILES:
-			{
-				TCHAR szCurrentDirectory[MAX_PATH];
-				m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
-
-				std::list<std::wstring>	FullFilenameList;
-				int iItem = -1;
-
-				while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
-				{
-					TCHAR szFullFilename[MAX_PATH];
-					m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
-					FullFilenameList.push_back(szFullFilename);
-				}
-
-				CMergeFilesDialog CMergeFilesDialog(m_hLanguageModule,IDD_MERGEFILES,
-					m_hContainer,szCurrentDirectory,FullFilenameList,m_bShowFriendlyDatesGlobal);
-
-				CMergeFilesDialog.ShowModalDialog();
-			}
+			OnMergeFiles();
 			break;
 
 		case IDM_ACTIONS_SPLITFILE:
-			{
-				int iSelected = ListView_GetNextItem(m_hActiveListView,-1,LVNI_SELECTED);
-
-				if(iSelected != -1)
-				{
-					TCHAR szFullFilename[MAX_PATH];
-					m_pActiveShellBrowser->QueryFullItemName(iSelected,szFullFilename,SIZEOF_ARRAY(szFullFilename));
-
-					CSplitFileDialog SplitFileDialog(m_hLanguageModule,IDD_SPLITFILE,hwnd,szFullFilename);
-
-					SplitFileDialog.ShowModalDialog();
-				}
-			}
+			OnSplitFile();
 			break;
 
 		case IDM_ACTIONS_DESTROYFILES:
-			{
-				std::list<std::wstring>	FullFilenameList;
-				int iItem = -1;
-
-				while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
-				{
-					TCHAR szFullFilename[MAX_PATH];
-					m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
-					FullFilenameList.push_back(szFullFilename);
-				}
-
-				CDestroyFilesDialog CDestroyFilesDialog(m_hLanguageModule,IDD_DESTROYFILES,
-					m_hContainer,FullFilenameList,m_bShowFriendlyDatesGlobal);
-
-				CDestroyFilesDialog.ShowModalDialog();
-			}
+			OnDestroyFiles();
 			break;
 
 		case IDM_GO_BACK:
@@ -1407,17 +1348,11 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_HELP_CHECKFORUPDATES:
-			{
-				CUpdateCheckDialog UpdateCheckDialog(m_hLanguageModule,IDD_UPDATECHECK,hwnd);
-				UpdateCheckDialog.ShowModalDialog();
-			}
+			OnCheckForUpdates();
 			break;
 
 		case IDM_HELP_ABOUT:
-			{
-				CAboutDialog AboutDialog(m_hLanguageModule,IDD_ABOUT,hwnd);
-				AboutDialog.ShowModalDialog();
-			}
+			OnAbout();
 			break;
 
 
