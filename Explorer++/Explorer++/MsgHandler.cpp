@@ -16,7 +16,6 @@
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/ListViewHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/MenuHelper.h"
@@ -630,56 +629,6 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 	SetTabIcon();
 }
 
-void Explorerplusplus::OnResolveLink(void)
-{
-	TCHAR	ShortcutFileName[MAX_PATH];
-	TCHAR	szFullFileName[MAX_PATH];
-	TCHAR	szPath[MAX_PATH];
-	HRESULT	hr;
-	int		iItem;
-
-	iItem = ListView_GetNextItem(m_hActiveListView,-1,LVNI_FOCUSED);
-
-	if(iItem != -1)
-	{
-		m_pActiveShellBrowser->QueryFullItemName(iItem,ShortcutFileName,SIZEOF_ARRAY(ShortcutFileName));
-
-		hr = NFileOperations::ResolveLink(m_hContainer,0,ShortcutFileName,szFullFileName,SIZEOF_ARRAY(szFullFileName));
-
-		if(hr == S_OK)
-		{
-			/* Strip the filename, just leaving the path component. */
-			StringCchCopy(szPath,SIZEOF_ARRAY(szPath),szFullFileName);
-			PathRemoveFileSpec(szPath);
-
-			hr = BrowseFolder(szPath,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-
-			if(SUCCEEDED(hr))
-			{
-				/* Strip off the path, and select the shortcut target
-				in the listview. */
-				PathStripPath(szFullFileName);
-				m_pActiveShellBrowser->SelectFiles(szFullFileName);
-
-				SetFocus(m_hActiveListView);
-			}
-		}
-	}
-}
-
-void Explorerplusplus::OnSaveDirectoryListing(void) const
-{
-	TCHAR FileName[MAX_PATH];
-	LoadString(m_hLanguageModule,IDS_GENERAL_DIRECTORY_LISTING_FILENAME,FileName,SIZEOF_ARRAY(FileName));
-	StringCchCat(FileName,SIZEOF_ARRAY(FileName),_T(".txt"));
-	BOOL bSaveNameRetrieved = GetFileNameFromUser(m_hContainer,FileName,SIZEOF_ARRAY(FileName),m_CurrentDirectory);
-
-	if(bSaveNameRetrieved)
-	{
-		NFileOperations::SaveDirectoryListing(m_CurrentDirectory,FileName);
-	}
-}
-
 void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)
 {
 	HWND			ToolTipControl;
@@ -1185,37 +1134,6 @@ void Explorerplusplus::OnShellNewItemCreated(LPARAM lParam)
 	{
 		/* Start editing the label for this item. */
 		hEdit = ListView_EditLabel(m_hActiveListView,iRenamedItem);
-	}
-}
-
-void Explorerplusplus::OnCreateNewFolder(void)
-{
-	TCHAR			szNewFolderName[32768];
-	LPITEMIDLIST	pidlItem = NULL;
-	HRESULT			hr;
-
-	hr = CreateNewFolder(m_CurrentDirectory,szNewFolderName,SIZEOF_ARRAY(szNewFolderName));
-
-	if(SUCCEEDED(hr))
-	{
-		m_bCountingDown = TRUE;
-		NListView::ListView_SelectAllItems(m_hActiveListView,FALSE);
-		SetFocus(m_hActiveListView);
-
-		GetIdlFromParsingName(szNewFolderName,&pidlItem);
-		m_pActiveShellBrowser->QueueRename((LPITEMIDLIST)pidlItem);
-
-		CoTaskMemFree(pidlItem);
-	}
-	else
-	{
-		TCHAR	szTemp[512];
-
-		LoadString(m_hLanguageModule,IDS_NEWFOLDERERROR,szTemp,
-		SIZEOF_ARRAY(szTemp));
-
-		MessageBox(m_hContainer,szTemp,NExplorerplusplus::APP_NAME,
-			MB_ICONERROR|MB_OK);
 	}
 }
 

@@ -384,7 +384,6 @@ private:
 	void					OnLockToolbars(void);
 	void					LoadAllSettings(ILoadSave **pLoadSave);
 	void					OnShellNewItemCreated(LPARAM lParam);
-	void					OnCreateNewFolder(void);
 	void					OnPaste(void);
 	void					OnAppCommand(UINT cmd);
 	void					OnRefresh(void);
@@ -424,16 +423,17 @@ private:
 	void					OnShowHelp();
 	void					OnCheckForUpdates();
 	void					OnAbout();
+	void					OnSaveDirectoryListing() const;
+	void					OnCreateNewFolder();
+	void					OnResolveLink();
 
 	void					OnNewTab();
-	void					OnSaveDirectoryListing(void) const;
 	void					OnCopyItemPath(void) const;
 	void					OnCopyUniversalPaths(void) const;
 	void					OnSetFileAttributes(void) const;
 	void					OnFileDelete(BOOL bPermanent);
 	void					OnFileRename(void);
 	void					OnShowFileProperties(void) const;
-	void					OnResolveLink(void);
 	int						HighlightSimilarFiles(HWND ListView) const;
 	void					OnShowHiddenFiles(void);
 
