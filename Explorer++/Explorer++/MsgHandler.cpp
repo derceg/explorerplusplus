@@ -1245,6 +1245,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		break;
 
 	case APPCOMMAND_BROWSER_SEARCH:
+		OnSearch();
 		break;
 
 	case APPCOMMAND_CLOSE:
@@ -1261,6 +1262,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		break;
 
 	case APPCOMMAND_HELP:
+		OnShowHelp();
 		break;
 
 	case APPCOMMAND_NEW:
