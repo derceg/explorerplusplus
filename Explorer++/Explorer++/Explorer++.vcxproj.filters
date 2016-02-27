@@ -196,6 +196,9 @@
     <ClCompile Include="ListViewEdit.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Navigation.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">

@@ -311,6 +311,7 @@
     <ClCompile Include="MergeFilesDialog.cpp" />
     <ClCompile Include="Misc.cpp" />
     <ClCompile Include="MsgHandler.cpp" />
+    <ClCompile Include="Navigation.cpp" />
     <ClCompile Include="NewBookmarkFolderDialog.cpp" />
     <ClCompile Include="OptionsDialog.cpp" />
     <ClCompile Include="RegistrySettings.cpp" />

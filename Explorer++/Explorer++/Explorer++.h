@@ -380,10 +380,6 @@ private:
 	void					OnSortByAscending(BOOL bSortAscending);
 	void					OnPreviousWindow(void);
 	void					OnNextWindow(void);
-	HRESULT					BrowseFolder(const TCHAR *szPath,UINT wFlags);
-	HRESULT					BrowseFolder(const TCHAR *szPath,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
-	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags);
-	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 	int						DetermineListViewObjectIndex(HWND hListView);
 	void					OnLockToolbars(void);
 	void					LoadAllSettings(ILoadSave **pLoadSave);
@@ -391,8 +387,6 @@ private:
 	void					OnCreateNewFolder(void);
 	void					OnPaste(void);
 	void					OnAppCommand(UINT cmd);
-	void					OnBrowseBack(void);
-	void					OnBrowseForward(void);
 	void					OnRefresh(void);
 	void					OnDirectoryModified(int iTabId);
 	void					OnIdaRClick(void);
@@ -402,10 +396,19 @@ private:
 	LRESULT					OnCustomDraw(LPARAM lParam);
 	void					OnSortBy(UINT uSortMode);
 	void					OnGroupBy(UINT uSortMode);
-	void					OnHome(void);
-	void					OnNavigateUp(void);
 	void					OnSelectTab(int iTab);
 	void					OnSelectTab(int iTab,BOOL bSetFocus);
+
+	/* Navigation. */
+	void					OnBrowseBack();
+	void					OnBrowseForward();
+	void					OnHome();
+	void					OnNavigateUp();
+	void					GotoFolder(int FolderCSIDL);
+	HRESULT					BrowseFolder(const TCHAR *szPath, UINT wFlags);
+	HRESULT					BrowseFolder(const TCHAR *szPath, UINT wFlags, BOOL bOpenInNewTab, BOOL bSwitchToNewTab, BOOL bOpenInNewWindow);
+	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags);
+	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags, BOOL bOpenInNewTab, BOOL bSwitchToNewTab, BOOL bOpenInNewWindow);
 
 	/* Main menu handlers. */
 	void					OnNewTab(void);
@@ -637,7 +640,6 @@ private:
 
 	/* File operations. */
 	void					CopyToFolder(BOOL bMove);
-	void					GotoFolder(int FolderCSIDL);
 	void					OpenAllSelectedItems(BOOL bOpenInNewTab);
 	void					OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
