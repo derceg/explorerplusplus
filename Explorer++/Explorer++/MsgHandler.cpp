@@ -1236,6 +1236,10 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		OnBrowseForward();
 		break;
 
+	case APPCOMMAND_BROWSER_HOME:
+		OnHome();
+		break;
+
 	case APPCOMMAND_BROWSER_FAVORITES:
 		break;
 
