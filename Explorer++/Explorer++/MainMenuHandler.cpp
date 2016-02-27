@@ -89,6 +89,8 @@ void Explorerplusplus::OnShowHelp()
 		{
 			bOpenedHelpFile = true;
 		}
+
+		CoTaskMemFree(pidl);
 	}
 
 	if(!bOpenedHelpFile)
