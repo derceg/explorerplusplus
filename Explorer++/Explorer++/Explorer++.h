@@ -409,6 +409,7 @@ private:
 	HRESULT					BrowseFolder(const TCHAR *szPath, UINT wFlags, BOOL bOpenInNewTab, BOOL bSwitchToNewTab, BOOL bOpenInNewWindow);
 	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags);
 	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags, BOOL bOpenInNewTab, BOOL bSwitchToNewTab, BOOL bOpenInNewWindow);
+	void					PlayNavigationSound() const;
 
 	/* Main menu handlers. */
 	void					OnNewTab();
@@ -762,7 +763,6 @@ private:
 	int						GetViewModeMenuId(UINT uViewMode);
 	int						GetViewModeMenuStringId(UINT uViewMode);
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
-	void					PlayNavigationSound(void) const;
 	CStatusBar				*GetStatusBar();
 	UINT					GetDefaultSortMode(LPCITEMIDLIST pidlDirectory);
 	unsigned int			DetermineColumnSortMode(UINT uColumnId);

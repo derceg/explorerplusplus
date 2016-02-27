@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "MainResource.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 
@@ -193,4 +194,13 @@ HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags,
 	}
 
 	return hr;
+}
+
+void Explorerplusplus::PlayNavigationSound() const
+{
+	if(m_bPlayNavigationSound)
+	{
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART), NULL,
+			SND_RESOURCE | SND_ASYNC);
+	}
 }

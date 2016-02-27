@@ -1940,15 +1940,6 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 	}
 }
 
-void Explorerplusplus::PlayNavigationSound(void) const
-{
-	if(m_bPlayNavigationSound)
-	{
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART),NULL,
-			SND_RESOURCE|SND_ASYNC);
-	}
-}
-
 HWND Explorerplusplus::GetActiveListView() const
 {
 	return m_hActiveListView;
