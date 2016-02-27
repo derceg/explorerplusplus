@@ -14,11 +14,9 @@
 #include "stdafx.h"
 #include "Explorer++_internal.h"
 #include "IModelessDialogNotification.h"
+#include "ModelessDialogs.h"
 #include "MainResource.h"
 
-
-extern HWND g_hwndSearch;
-extern HWND g_hwndManageBookmarks;
 
 CModelessDialogNotification::CModelessDialogNotification() :
 m_RefCount(1)

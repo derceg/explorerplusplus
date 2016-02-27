@@ -20,6 +20,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "MainImages.h"
+#include "ModelessDialogs.h"
 #include "SetDefaultColumnsDialog.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
@@ -60,8 +61,6 @@ static HWND g_hOptionsPropertyDialog	= NULL;
 
 HICON g_hNewTabDirIcon;
 TCHAR g_szNewTabDirectory[MAX_PATH];
-
-extern HWND g_hwndOptions;
 
 void Explorerplusplus::OnShowOptions(void)
 {

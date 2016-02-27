@@ -27,6 +27,7 @@
 #include "DisplayColoursDialog.h"
 #include "IModelessDialogNotification.h"
 #include "UpdateCheckDialog.h"
+#include "ModelessDialogs.h"
 #include "MainResource.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../HolderWindow/HolderWindow.h"
@@ -48,10 +49,6 @@ static const int TREEVIEW_DRAG_OFFSET = 8;
 /* TODO: Remove once custom menu image lists
 have been corrected. */
 extern HIMAGELIST himlMenu;
-
-extern HWND g_hwndSearch;
-extern HWND g_hwndOptions;
-extern HWND g_hwndManageBookmarks;
 
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {

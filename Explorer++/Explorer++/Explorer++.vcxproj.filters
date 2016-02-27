@@ -357,6 +357,9 @@
     <ClInclude Include="ListViewEdit.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="ModelessDialogs.h">
+      <Filter>Dialog Support</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

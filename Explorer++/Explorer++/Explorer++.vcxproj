@@ -382,6 +382,7 @@
     <ClInclude Include="ManageBookmarksDialog.h" />
     <ClInclude Include="MassRenameDialog.h" />
     <ClInclude Include="MergeFilesDialog.h" />
+    <ClInclude Include="ModelessDialogs.h" />
     <ClInclude Include="NewBookmarkFolderDialog.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="RegistrySettings.h" />

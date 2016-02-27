@@ -18,10 +18,11 @@
 #include <pantheios\backends\bec.file.h>
 #include <pantheios\inserters\integer.hpp>
 #include "Explorer++.h"
-#include "RegistrySettings.h"
-#include "XMLSettings.h"
 #include "LoggingFrontend.h"
+#include "ModelessDialogs.h"
+#include "RegistrySettings.h"
 #include "Version.h"
+#include "XMLSettings.h"
 #include "MainResource.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
@@ -639,6 +640,10 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	UpdateWindow(hwnd);
 
 	hAccl = LoadAccelerators(hInstance,MAKEINTRESOURCE(IDR_MAINACCELERATORS));
+
+	g_hwndSearch = NULL;
+	g_hwndOptions = NULL;
+	g_hwndManageBookmarks = NULL;
 
 	/* Enter the message loop... */
 	while(GetMessage(&msg,NULL,0,0) > 0)

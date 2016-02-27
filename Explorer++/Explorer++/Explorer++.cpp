@@ -20,10 +20,6 @@
 
 CRITICAL_SECTION	g_csDirMonCallback;
 
-extern HWND g_hwndSearch;
-extern HWND g_hwndOptions;
-extern HWND g_hwndManageBookmarks;
-
 Explorerplusplus::Explorerplusplus(HWND hwnd) :
 m_hContainer(hwnd)
 {
@@ -55,9 +51,6 @@ m_hContainer(hwnd)
 	m_bDragCancelled				= FALSE;
 	m_bDragAllowed					= FALSE;
 	m_pActiveShellBrowser			= NULL;
-	g_hwndSearch					= NULL;
-	g_hwndOptions					= NULL;
-	g_hwndManageBookmarks			= NULL;
 	m_hMainRebar					= NULL;
 	m_hStatusBar					= NULL;
 	m_hHolder						= NULL;
