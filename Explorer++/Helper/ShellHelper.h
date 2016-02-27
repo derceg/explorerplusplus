@@ -115,6 +115,8 @@ BOOL			LoadIUnknownFromCLSID(const TCHAR *szCLSID, ContextMenuHandler_t *pContex
 HRESULT			GetItemAttributes(const TCHAR *szItemParsingPath, SFGAOF *pItemAttributes);
 HRESULT			GetItemAttributes(LPCITEMIDLIST pidl, SFGAOF *pItemAttributes);
 BOOL			ExecuteFileAction(HWND hwnd, const TCHAR *szVerb, const TCHAR *szParameters, const TCHAR *szStartDirectory, LPCITEMIDLIST pidl);
+BOOL			ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters);
+BOOL			ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters);
 HRESULT			DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT cchMax);
 HRESULT			ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory, LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask);
 

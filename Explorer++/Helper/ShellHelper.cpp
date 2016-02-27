@@ -12,11 +12,12 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Helper.h"
-#include "ShellHelper.h"
 #include "FileOperations.h"
-#include "RegistrySettings.h"
+#include "Helper.h"
 #include "Macros.h"
+#include "ProcessHelper.h"
+#include "RegistrySettings.h"
+#include "ShellHelper.h"
 
 
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
@@ -172,20 +173,44 @@ HRESULT GetItemAttributes(LPCITEMIDLIST pidl,SFGAOF *pItemAttributes)
 
 BOOL ExecuteFileAction(HWND hwnd,const TCHAR *szVerb,const TCHAR *szParameters,const TCHAR *szStartDirectory,LPCITEMIDLIST pidl)
 {
-	SHELLEXECUTEINFO ExecInfo;
+	SHELLEXECUTEINFO sei;
 
-	ExecInfo.cbSize			= sizeof(SHELLEXECUTEINFO);
-	ExecInfo.fMask			= SEE_MASK_INVOKEIDLIST;
-	ExecInfo.lpVerb			= szVerb;
-	ExecInfo.lpIDList		= (LPVOID)pidl;
-	ExecInfo.hwnd			= hwnd;
-	ExecInfo.nShow			= SW_SHOW;
-	ExecInfo.lpParameters	= szParameters;
-	ExecInfo.lpDirectory	= szStartDirectory;
-	ExecInfo.lpFile			= NULL;
-	ExecInfo.hInstApp		= NULL;
+	sei.cbSize			= sizeof(SHELLEXECUTEINFO);
+	sei.fMask			= SEE_MASK_INVOKEIDLIST;
+	sei.lpVerb			= szVerb;
+	sei.lpIDList		= (LPVOID)pidl;
+	sei.hwnd			= hwnd;
+	sei.nShow			= SW_SHOW;
+	sei.lpParameters	= szParameters;
+	sei.lpDirectory		= szStartDirectory;
+	sei.lpFile			= NULL;
+	sei.hInstApp		= NULL;
 
-	return ShellExecuteEx(&ExecInfo);
+	return ShellExecuteEx(&sei);
+}
+
+BOOL ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters)
+{
+	TCHAR szCurrentProcess[MAX_PATH];
+	GetProcessImageName(GetCurrentProcessId(), szCurrentProcess, SIZEOF_ARRAY(szCurrentProcess));
+
+	return ExecuteAndShowProcess(hwnd, szCurrentProcess, szParameters);
+}
+
+BOOL ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters)
+{
+	SHELLEXECUTEINFO sei;
+
+	sei.cbSize			= sizeof(sei);
+	sei.fMask			= SEE_MASK_DEFAULT;
+	sei.lpVerb			= _T("open");
+	sei.lpFile			= szProcess;
+	sei.lpParameters	= szParameters;
+	sei.lpDirectory		= NULL;
+	sei.hwnd			= hwnd;
+	sei.nShow			= SW_SHOW;
+
+	return ShellExecuteEx(&sei);
 }
 
 HRESULT GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent)

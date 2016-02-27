@@ -1633,30 +1633,15 @@ void Explorerplusplus::OnAssocChanged(void)
 
 void Explorerplusplus::OnCloneWindow(void)
 {
-	TCHAR szExecutable[MAX_PATH];
 	TCHAR szCurrentDirectory[MAX_PATH];
-	TCHAR szQuotedCurrentDirectory[MAX_PATH];
-	SHELLEXECUTEINFO sei;
-
-	GetProcessImageName(GetCurrentProcessId(),szExecutable,
-		SIZEOF_ARRAY(szExecutable));
-
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),
 		szCurrentDirectory);
 
-	StringCchPrintf(szQuotedCurrentDirectory,
-		SIZEOF_ARRAY(szQuotedCurrentDirectory),
+	TCHAR szQuotedCurrentDirectory[MAX_PATH];
+	StringCchPrintf(szQuotedCurrentDirectory, SIZEOF_ARRAY(szQuotedCurrentDirectory),
 		_T("\"%s\""),szCurrentDirectory);
 
-	sei.cbSize			= sizeof(sei);
-	sei.fMask			= 0;
-	sei.lpVerb			= _T("open");
-	sei.lpFile			= szExecutable;
-	sei.lpParameters	= szQuotedCurrentDirectory;
-	sei.lpDirectory		= NULL;
-	sei.hwnd			= NULL;
-	sei.nShow			= SW_SHOW;
-	ShellExecuteEx(&sei);
+	ExecuteAndShowCurrentProcess(m_hContainer, szQuotedCurrentDirectory);
 }
 
 void Explorerplusplus::ShowMainRebarBand(HWND hwnd,BOOL bShow)

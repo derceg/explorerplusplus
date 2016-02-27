@@ -151,26 +151,15 @@ HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags,
 
 	if(bOpenInNewWindow)
 	{
-		/* Create a new instance of this program, with the
-		specified path as an argument. */
-		SHELLEXECUTEINFO sei;
-		TCHAR szCurrentProcess[MAX_PATH];
 		TCHAR szPath[MAX_PATH];
 		TCHAR szParameters[512];
 
-		GetProcessImageName(GetCurrentProcessId(), szCurrentProcess, SIZEOF_ARRAY(szCurrentProcess));
-
+		/* Create a new instance of this program, with the
+		specified path as an argument. */
 		GetDisplayName(pidlDirectory, szPath, SIZEOF_ARRAY(szPath), SHGDN_FORPARSING);
 		StringCchPrintf(szParameters, SIZEOF_ARRAY(szParameters), _T("\"%s\""), szPath);
 
-		sei.cbSize = sizeof(sei);
-		sei.fMask = SEE_MASK_DEFAULT;
-		sei.lpVerb = _T("open");
-		sei.lpFile = szCurrentProcess;
-		sei.lpParameters = szParameters;
-		sei.lpDirectory = NULL;
-		sei.nShow = SW_SHOW;
-		ShellExecuteEx(&sei);
+		ExecuteAndShowCurrentProcess(m_hContainer, szParameters);
 	}
 	else
 	{
