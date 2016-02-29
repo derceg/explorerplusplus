@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include "Explorer++_internal.h"
 #include "BoostCheck.h"
 #include "BookmarkHelper.h"
@@ -556,6 +557,18 @@ private:
 	void					InitializeMainToolbars(void);
 	void					AdjustMainToolbarSize(void);
 
+	/* Main toolbar. */
+	void					SetInitialToolbarButtons();
+	void					AddButtonsToMainToolbar();
+	void					AddButtonToMainToolbar(int iButtonId);
+	void					AddStringsToMainToolbar();
+	void					AddStringToMainToolbar(int iButtonId);
+	void					GetMainToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize);
+	int						LookupToolbarButtonTextID(int iButtonID);
+	int						LookupToolbarButtonImage(int iButtonID);
+	BYTE					LookupToolbarButtonExtraStyles(int iButtonID);
+	TBBUTTON				GetMainToolbarButtonDetails(int iButtonId);
+
 	/* Directory specific settings. */
 	void					SaveDirectorySpecificSettings(int iTab);
 	void					SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDirectory);
@@ -757,12 +770,6 @@ private:
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
 	BOOL					CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 	void					CreateViewsMenu(POINT *ptOrigin);
-	void					SetInitialToolbarButtons(void);
-	int						LookupToolbarButtonTextID(int iButtonID);
-	int						LookupToolbarButtonImage(int iButtonID);
-	BYTE					LookupToolbarButtonExtraStyles(int iButtonID);
-	void					InsertToolbarButtons(void);
-	void					AddStringsToMainToolbar(void);
 	void					CreateStatusBar(void);
 	void					InitializeDisplayWindow(void);
 	void					InitializeMenus(void);
@@ -955,6 +962,7 @@ private:
 	/* Main toolbar. */
 	HIMAGELIST				m_himlToolbarSmall;
 	HIMAGELIST				m_himlToolbarLarge;
+	std::unordered_map<int, int>	m_mainToolbarStringMap;
 
 	/* Toolbar buttons. */
 	std::list<ToolbarButton_t>	m_tbInitial;

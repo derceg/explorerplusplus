@@ -2,6 +2,8 @@
 
 #define EMPTY_STRING _T("")
 
+#define UNUSED(x) ((void)(x))
+
 /* TODO: Switch to this once the compiler
 provides support for constexpr.
 See:

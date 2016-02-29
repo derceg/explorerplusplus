@@ -171,7 +171,7 @@ void Explorerplusplus::CreateMainToolbar(void)
 	SendMessage(m_hMainToolbar,TB_SETIMAGELIST,0,(LPARAM)*phiml);
 
 	AddStringsToMainToolbar();
-	InsertToolbarButtons();
+	AddButtonsToMainToolbar();
 
 	if(!m_bLoadSettingsFromXML)
 	{
@@ -440,50 +440,18 @@ void Explorerplusplus::ToggleFolders(void)
 	ResizeWindows();
 }
 
-void Explorerplusplus::InsertToolbarButtons(void)
+void Explorerplusplus::AddButtonsToMainToolbar()
 {
-	std::list<ToolbarButton_t>::iterator	itr;
-	TBBUTTON						*ptbButton = NULL;
-	BYTE							StandardStyle;
-	unsigned int					iCurrent = 0;
-
-	/* Standard style that all toolbar buttons will have. */
-	StandardStyle = BTNS_BUTTON | BTNS_AUTOSIZE;
-
-	ptbButton = (TBBUTTON *)malloc(m_tbInitial.size() * sizeof(TBBUTTON));
-
-	/* Fill out the button information... */
-	for(itr = m_tbInitial.begin();itr != m_tbInitial.end();itr++)
+	for each (auto toolbarButton in m_tbInitial)
 	{
-		if(iCurrent < m_tbInitial.size())
-		{
-			if(itr->iItemID == TOOLBAR_SEPARATOR)
-			{
-				ptbButton[iCurrent].iBitmap		= 0;
-				ptbButton[iCurrent].idCommand	= 0;
-				ptbButton[iCurrent].fsState		= TBSTATE_ENABLED;
-				ptbButton[iCurrent].fsStyle		= BTNS_SEP;
-				ptbButton[iCurrent].dwData		= 0;
-				ptbButton[iCurrent].iString		= 0;
-			}
-			else
-			{
-				ptbButton[iCurrent].iBitmap		= LookupToolbarButtonImage(itr->iItemID);
-				ptbButton[iCurrent].idCommand	= itr->iItemID;
-				ptbButton[iCurrent].fsState		= TBSTATE_ENABLED;
-				ptbButton[iCurrent].fsStyle		= StandardStyle | LookupToolbarButtonExtraStyles(itr->iItemID);
-				ptbButton[iCurrent].dwData		= 0;
-				ptbButton[iCurrent].iString		= (INT_PTR)itr->iItemID - TOOLBAR_BACK;
-			}
-
-			iCurrent++;
-		}
+		AddButtonToMainToolbar(toolbarButton.iItemID);
 	}
+}
 
-	/* Add the buttons to the toolbar. */
-	SendMessage(m_hMainToolbar,TB_ADDBUTTONS,(WPARAM)iCurrent,(LPARAM)ptbButton);
-
-	free(ptbButton);
+void Explorerplusplus::AddButtonToMainToolbar(int iButtonId)
+{
+	TBBUTTON tbButton = GetMainToolbarButtonDetails(iButtonId);
+	SendMessage(m_hMainToolbar, TB_ADDBUTTONS, 1, reinterpret_cast<LPARAM>(&tbButton));
 }
 
 BOOL Explorerplusplus::OnTBQueryInsert()
@@ -497,26 +465,24 @@ BOOL Explorerplusplus::OnTBQueryDelete()
 	return TRUE;
 }
 
+/* This function is the reason why the toolbar string pool is used. When
+customizing the toolbar, the text assigned to pszText is used. However, when
+restoring the toolbar (via TB_SAVERESTORE), a TBN_GETBUTTONINFO notification is
+sent for each button, and the iString parameter must be set to a valid string or
+index. */
 BOOL Explorerplusplus::OnTBGetButtonInfo(LPARAM lParam)
 {
-	NMTOOLBAR		*pnmtb = NULL;
-	static TCHAR	szText[64];
-	int				id;
-
-	pnmtb = (NMTOOLBAR *)lParam;
+	NMTOOLBAR *pnmtb = reinterpret_cast<NMTOOLBAR *>(lParam);
 
 	/* The cast below is to fix C4018 (signed/unsigned mismatch). */
-	if((pnmtb->iItem >= 0) && ((unsigned int)pnmtb->iItem < sizeof(TOOLBAR_BUTTON_SET) / sizeof(TOOLBAR_BUTTON_SET[0])))
+	if((pnmtb->iItem >= 0) && ((unsigned int)pnmtb->iItem < SIZEOF_ARRAY(TOOLBAR_BUTTON_SET)))
 	{
-		id = TOOLBAR_BUTTON_SET[pnmtb->iItem];
+		int iButtonId = TOOLBAR_BUTTON_SET[pnmtb->iItem];
 
-		pnmtb->tbButton.fsState		= TBSTATE_ENABLED;
-		pnmtb->tbButton.fsStyle		= BTNS_BUTTON | BTNS_AUTOSIZE | LookupToolbarButtonExtraStyles(id);
-		pnmtb->tbButton.idCommand	= id;
-		pnmtb->tbButton.iBitmap		= LookupToolbarButtonImage(id);
-		pnmtb->tbButton.iString		= (INT_PTR)id - TOOLBAR_BACK;
-		pnmtb->tbButton.dwData		= 0;
+		pnmtb->tbButton = GetMainToolbarButtonDetails(iButtonId);
 
+		TCHAR szText[64];
+		GetMainToolbarButtonText(iButtonId, szText, SIZEOF_ARRAY(szText));
 		StringCchCopy(pnmtb->pszText,pnmtb->cchText,szText);
 
 		return TRUE;
@@ -542,7 +508,7 @@ void Explorerplusplus::OnTBReset(void)
 	for(i = nButtons - 1;i >= 0;i--)
 		SendMessage(m_hMainToolbar,TB_DELETEBUTTON,i,0);
 
-	InsertToolbarButtons();
+	AddButtonsToMainToolbar();
 	UpdateMainToolbar();
 }
 

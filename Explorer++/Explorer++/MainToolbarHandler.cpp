@@ -19,7 +19,7 @@
 #include "../Helper/Macros.h"
 
 
-void Explorerplusplus::SetInitialToolbarButtons(void)
+void Explorerplusplus::SetInitialToolbarButtons()
 {
 	m_tbInitial = std::list<ToolbarButton_t>(DEFAULT_TOOLBAR_BUTTONS,
 		DEFAULT_TOOLBAR_BUTTONS + SIZEOF_ARRAY(DEFAULT_TOOLBAR_BUTTONS));
@@ -301,129 +301,35 @@ BYTE Explorerplusplus::LookupToolbarButtonExtraStyles(int iButtonID)
 	return 0;
 }
 
-void Explorerplusplus::AddStringsToMainToolbar(void)
+void Explorerplusplus::AddStringsToMainToolbar()
+{
+	for(int i = 0; i < SIZEOF_ARRAY(TOOLBAR_BUTTON_SET); i++)
+	{
+		AddStringToMainToolbar(TOOLBAR_BUTTON_SET[i]);
+	}
+}
+
+void Explorerplusplus::AddStringToMainToolbar(int iButtonId)
 {
 	TCHAR szText[64];
 
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_BACK),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
+	/* The string must be double NULL-terminated. */
+	GetMainToolbarButtonText(iButtonId, szText, SIZEOF_ARRAY(szText));
 	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
 
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_FORWARD),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
+	int index = static_cast<int>(SendMessage(m_hMainToolbar, TB_ADDSTRING, NULL, reinterpret_cast<LPARAM>(szText)));
 
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_UP),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
+	m_mainToolbarStringMap.insert(std::make_pair(iButtonId, index));
+}
 
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_FOLDERS),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
+void Explorerplusplus::GetMainToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize)
+{
+	int res = LoadString(m_hLanguageModule, LookupToolbarButtonTextID(iButtonId), szText, bufSize);
+	assert(res != 0);
 
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_COPYTO),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_MOVETO),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_NEWFOLDER),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_COPY),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_CUT),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_PASTE),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_DELETE),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_VIEWS),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_SEARCH),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_PROPERTIES),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_REFRESH),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_ADDBOOKMARK),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_NEWTAB),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_OPENCOMMANDPROMPT),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_ORGANIZEBOOKMARKS),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
-
-	LoadString(m_hLanguageModule,LookupToolbarButtonTextID(TOOLBAR_DELETEPERMANENTLY),
-		szText,SIZEOF_ARRAY(szText));
-	/* Double NULL terminated. */
-	szText[lstrlen(szText) + 1] = '\0';
-	SendMessage(m_hMainToolbar,TB_ADDSTRING,(WPARAM)0,(LPARAM)szText);
+	/* It doesn't really make sense to return this. If the string isn't in the
+	string table, there's a bug somewhere in the program. */
+	UNUSED(res);
 }
 
 void Explorerplusplus::UpdateMainToolbar(void)
@@ -448,4 +354,40 @@ void Explorerplusplus::UpdateMainToolbar(void)
 	SendMessage(m_hMainToolbar,TB_ENABLEBUTTON,(WPARAM)TOOLBAR_OPENCOMMANDPROMPT,!bVirtualFolder);
 
 	SendMessage(m_hMainToolbar,TB_ENABLEBUTTON,TOOLBAR_NEWFOLDER,!bVirtualFolder);
+}
+
+TBBUTTON Explorerplusplus::GetMainToolbarButtonDetails(int iButtonId)
+{
+	TBBUTTON tbButton;
+
+	ZeroMemory(&tbButton, sizeof(tbButton));
+
+	if(iButtonId == TOOLBAR_SEPARATOR)
+	{
+		tbButton.iBitmap	= 0;
+		tbButton.idCommand	= 0;
+		tbButton.fsState	= TBSTATE_ENABLED;
+		tbButton.fsStyle	= BTNS_SEP;
+		tbButton.dwData		= 0;
+		tbButton.iString	= 0;
+	}
+	else
+	{
+		/* Standard style that all toolbar buttons will have. */
+		BYTE StandardStyle = BTNS_BUTTON | BTNS_AUTOSIZE;
+
+		auto itr = m_mainToolbarStringMap.find(iButtonId);
+		assert(itr != m_mainToolbarStringMap.end());
+
+		int stringIndex = itr->second;
+
+		tbButton.iBitmap	= LookupToolbarButtonImage(iButtonId);
+		tbButton.idCommand	= iButtonId;
+		tbButton.fsState	= TBSTATE_ENABLED;
+		tbButton.fsStyle	= StandardStyle | LookupToolbarButtonExtraStyles(iButtonId);
+		tbButton.dwData		= 0;
+		tbButton.iString	= stringIndex;
+	}
+
+	return tbButton;
 }
