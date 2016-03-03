@@ -480,14 +480,6 @@ private:
 	void					OnTreeViewCopyUniversalPaths(void) const;
 	void					OnTreeViewPaste(void);
 
-	/* Main toolbar private message handlers. */
-	BOOL					OnTBQueryInsert();
-	BOOL					OnTBQueryDelete();
-	BOOL					OnTBGetButtonInfo(LPARAM lParam);
-	BOOL					OnTBRestore();
-	void					OnTBReset(void);
-	void					OnTBGetInfoTip(LPARAM lParam);
-
 	/* Tab control private message handlers. */
 	void					OnInitTabMenu(HMENU hMenu);
 	void					OnTabCtrlLButtonDown(POINT *pt);
@@ -546,7 +538,6 @@ private:
 	HWND					CreateMainListView(HWND hParent,DWORD Style);
 	void					CreateMainControls(void);
 	void					CreateFolderControls(void);
-	void					CreateMainToolbar(void);
 	void					CreateBookmarksToolbar(void);
 	void					CreateDrivesToolbar(void);
 	void					CreateApplicationToolbar();
@@ -558,16 +549,25 @@ private:
 	void					AdjustMainToolbarSize(void);
 
 	/* Main toolbar. */
+	void					CreateMainToolbar();
 	void					SetInitialToolbarButtons();
 	void					AddButtonsToMainToolbar();
 	void					AddButtonToMainToolbar(int iButtonId);
+	TBBUTTON				GetMainToolbarButtonDetails(int iButtonId);
 	void					AddStringsToMainToolbar();
 	void					AddStringToMainToolbar(int iButtonId);
 	void					GetMainToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize);
-	int						LookupToolbarButtonTextID(int iButtonID);
 	int						LookupToolbarButtonImage(int iButtonID);
 	BYTE					LookupToolbarButtonExtraStyles(int iButtonID);
-	TBBUTTON				GetMainToolbarButtonDetails(int iButtonId);
+	int						LookupToolbarButtonTextID(int iButtonID);
+
+	/* Main toolbar private message handlers. */
+	BOOL					OnTBQueryInsert();
+	BOOL					OnTBQueryDelete();
+	BOOL					OnTBRestore();
+	BOOL					OnTBGetButtonInfo(LPARAM lParam);
+	void					OnTBReset(void);
+	void					OnTBGetInfoTip(LPARAM lParam);
 
 	/* Directory specific settings. */
 	void					SaveDirectorySpecificSettings(int iTab);
