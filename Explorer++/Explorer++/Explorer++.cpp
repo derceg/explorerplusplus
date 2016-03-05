@@ -238,6 +238,8 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_bShowFriendlyDatesGlobal		= TRUE;
 	m_bHideSystemFilesGlobal		= FALSE;
 	m_bHideLinkExtensionGlobal		= FALSE;
+	m_bDisplayMixedGlobal			= FALSE;
+	m_bSortNonLogicalGlobal			= FALSE;
 }
 
 void Explorerplusplus::SetDefaultColumns()
