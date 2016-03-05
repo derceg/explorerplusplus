@@ -1153,16 +1153,8 @@ void Explorerplusplus::OnListViewHeaderRClick(POINT *pCursorPos)
 		}
 	}
 
-	SetMenuOwnerDraw(hMenu);
-
 	TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RIGHTBUTTON|TPM_VERTICAL,
 		pCursorPos->x,pCursorPos->y,0,m_hContainer,NULL);
-
-	mii.cbSize	= sizeof(mii);
-	mii.fMask	= MIIM_DATA;
-	GetMenuItemInfo(hHeaderPopupMenu,0,TRUE,&mii);
-
-	free((CustomMenuInfo_t *)mii.dwItemData);
 
 	DestroyMenu(hHeaderPopupMenu);
 }
