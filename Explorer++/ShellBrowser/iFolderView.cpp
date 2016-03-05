@@ -109,6 +109,9 @@ m_hFolderSizeThread(hFolderSizeThread)
 	m_bHideSystemFiles		= FALSE;
 	m_bHideLinkExtension	= FALSE;
 
+	m_bDisplayMixed			= FALSE;
+	m_bSortNonLogical		= FALSE;
+
 	m_bColumnsPlaced		= FALSE;
 	m_bOverFolder			= FALSE;
 	m_bDragging				= FALSE;
@@ -459,6 +462,8 @@ void CShellBrowser::SetGlobalSettings(const GlobalSettings_t *gs)
 	m_bShowExtensions		= gs->bShowExtensions;
 	m_bShowFriendlyDates	= gs->bShowFriendlyDates;
 	m_bShowFolderSizes		= gs->bShowFolderSizes;
+	m_bDisplayMixed			= gs->bDisplayMixed;
+	m_bSortNonLogical		= gs->bSortNonLogical;
 }
 
 int CShellBrowser::GetId(void) const
@@ -544,6 +549,16 @@ void CShellBrowser::SetForceSize(BOOL bForceSize)
 void CShellBrowser::SetSizeDisplayFormat(SizeDisplayFormat_t sdf)
 {
 	m_SizeDisplayFormat = sdf;
+}
+
+void CShellBrowser::SetDisplayMixed(BOOL bDisplayMixed)
+{
+	m_bDisplayMixed = bDisplayMixed;
+}
+
+void CShellBrowser::SetSortNonLogical(BOOL bSortNonLogical)
+{
+	m_bSortNonLogical = bSortNonLogical;
 }
 
 void CShellBrowser::InsertTileViewColumns(void)

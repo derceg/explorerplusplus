@@ -75,6 +75,8 @@ typedef struct
 	BOOL bShowSizesInBytes;
 	BOOL bShowFriendlyDates;
 	BOOL bShowFolderSizes;
+	BOOL bDisplayMixed;
+	BOOL bSortNonLogical;
 } GlobalSettings_t;
 
 typedef struct
@@ -440,6 +442,9 @@ public:
 	void				SetForceSize(BOOL bForceSize);
 	void				SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
 
+	void				SetDisplayMixed(BOOL bDisplayMixed);
+	void				SetSortNonLogical(BOOL bSortNonLogical);
+
 	int CALLBACK		SortTemporary(LPARAM lParam1,LPARAM lParam2);
 
 	BOOL				GetTerminationStatus(void) const;
@@ -786,6 +791,8 @@ private:
 	BOOL				m_bHideSystemFiles;
 	BOOL				m_bHideLinkExtension;
 	BOOL				m_bInsertSorted;
+	BOOL				m_bDisplayMixed;
+	BOOL				m_bSortNonLogical;
 
 	/* ID. */
 	int					m_ID;

@@ -493,6 +493,8 @@ int *pTabObjectIndex)
 	m_pShellBrowser[iTabId]->SetShowFolderSizes(m_bShowFolderSizes);
 	m_pShellBrowser[iTabId]->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
 	m_pShellBrowser[iTabId]->SetInsertSorted(m_bInsertSorted);
+	m_pShellBrowser[iTabId]->SetDisplayMixed(m_bDisplayMixedGlobal);
+	m_pShellBrowser[iTabId]->SetSortNonLogical(m_bSortNonLogicalGlobal);
 
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
@@ -1844,6 +1846,8 @@ void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 	gs.bShowExtensions		= m_bShowExtensionsGlobal;
 	gs.bShowFriendlyDates	= m_bShowFriendlyDatesGlobal;
 	gs.bShowFolderSizes		= m_bShowFolderSizes;
+	gs.bDisplayMixed		= m_bDisplayMixedGlobal;
+	gs.bSortNonLogical		= m_bSortNonLogicalGlobal;
 
 	m_pShellBrowser[iTabId]->SetGlobalSettings(&gs);
 }

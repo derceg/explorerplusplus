@@ -145,6 +145,9 @@ LONG Explorerplusplus::SaveSettings(void)
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("LargeToolbarIcons"),m_bLargeToolbarIcons);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("PlayNavigationSound"),m_bPlayNavigationSound);
 
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("DisplayMixedFilesAndFolders"),m_bDisplayMixedGlobal);
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("SortNamesInNonLogicalOrder"),m_bSortNonLogicalGlobal);
+
 		NRegistrySettings::SaveStringToRegistry(hSettingsKey,_T("NewTabDirectory"),m_DefaultTabDirectory);
 
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("Language"),m_Language);
@@ -266,6 +269,9 @@ LONG Explorerplusplus::LoadSettings()
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("OverwriteExistingFilesConfirmation"),(LPDWORD)&m_bOverwriteExistingFilesConfirmation);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("LargeToolbarIcons"),(LPDWORD)&m_bLargeToolbarIcons);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("PlayNavigationSound"),(LPDWORD)&m_bPlayNavigationSound);
+
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("DisplayMixedFilesAndFolders"),(LPDWORD)&m_bDisplayMixedGlobal);
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("SortNamesInNonLogicalOrder"),(LPDWORD)&m_bSortNonLogicalGlobal);
 
 		NRegistrySettings::ReadStringFromRegistry(hSettingsKey,_T("NewTabDirectory"),m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory));
 
