@@ -1532,12 +1532,26 @@ void Explorerplusplus::OnNdwIconRClick(POINT *pt)
 
 void Explorerplusplus::OnNdwRClick(POINT *pt)
 {
-	POINT ptCopy = *pt;
-	ClientToScreen(m_hDisplayWindow,&ptCopy);
+	HMENU hMenu = LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK));
 
-	TrackPopupMenu(m_hDisplayWindowRightClickMenu,
-		TPM_LEFTALIGN|TPM_RIGHTBUTTON|TPM_VERTICAL,
-		ptCopy.x,ptCopy.y,0,m_hContainer,NULL);
+	if(hMenu != NULL)
+	{
+		HMENU hPopupMenu = GetSubMenu(hMenu, 0);
+
+		if(hPopupMenu != NULL)
+		{
+			POINT ptCopy = *pt;
+			BOOL bRes = ClientToScreen(m_hDisplayWindow, &ptCopy);
+
+			if(bRes)
+			{
+				TrackPopupMenu(hPopupMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL,
+					ptCopy.x, ptCopy.y, 0, m_hContainer, NULL);
+			}
+		}
+
+		DestroyMenu(hMenu);
+	}
 }
 
 LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)

@@ -830,7 +830,6 @@ private:
 	HMENU					m_hGroupBySubMenuRClick;
 	HMENU					m_hTabRightClickMenu;
 	HMENU					m_hToolbarRightClickMenu;
-	HMENU					m_hDisplayWindowRightClickMenu;
 	HMENU					m_hViewsMenu;
 	TCHAR					m_CurrentDirectory[MAX_PATH];
 	TCHAR					m_DefaultTabDirectoryStatic[MAX_PATH];

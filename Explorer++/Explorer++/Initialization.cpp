@@ -113,7 +113,6 @@ void Explorerplusplus::OnCreate(void)
 	m_hGroupBySubMenuRClick = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
 	m_hTabRightClickMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_TAB_RCLICK)), 0);
 	m_hToolbarRightClickMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_TOOLBAR_MENU)), 0);
-	m_hDisplayWindowRightClickMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_DISPLAYWINDOW_RCLICK)), 0);
 	m_hViewsMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_VIEWS_MENU)), 0);
 
 	HBITMAP hb;
@@ -348,9 +347,6 @@ void Explorerplusplus::InitializeMenus(void)
 
 	/* <---- Toolbar right click menu ----> */
 	SetMenuOwnerDraw(m_hToolbarRightClickMenu);
-
-	/* <---- Display window right click menu ----> */
-	SetMenuOwnerDraw(m_hDisplayWindowRightClickMenu);
 
 	/* <---- Toolbar views menu ----> */
 	SetMenuOwnerDraw(m_hViewsMenu);
