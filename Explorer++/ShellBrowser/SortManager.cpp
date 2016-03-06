@@ -63,8 +63,10 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	bool IsFolder1 = ((m_pwfdFiles[InternalIndex1].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	bool IsFolder2 = ((m_pwfdFiles[InternalIndex2].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	
-	/* Folders will always be sorted separately from files,
+	/* Folders will by default be sorted separately from files,
 	except in the recycle bin. */
+	/* If [x] Display mixed files and folders option is checked,
+	files and folders are sorted together. */
 	if(!m_bDisplayMixed && IsFolder1 && !IsFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
 		ComparisonResult = -1;
@@ -335,11 +337,13 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	{
 		/* By default, items that are equal will be sub-sorted
 		by their display names. */
-		if (m_bSortNonLogical) {
+		if (m_bSortNonLogical)
+		{
 			ComparisonResult = StrCmpIW(m_pExtraItemInfo[InternalIndex1].szDisplayName,
 				m_pExtraItemInfo[InternalIndex2].szDisplayName);
 		}
-		else {
+		else
+		{
 			ComparisonResult = StrCmpLogicalW(m_pExtraItemInfo[InternalIndex1].szDisplayName,
 				m_pExtraItemInfo[InternalIndex2].szDisplayName);
 		}
@@ -382,10 +386,12 @@ int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) co
 		{
 			/* If the items been compared are both drives,
 			sort by drive letter, rather than display name. */
-			if (m_bSortNonLogical) {
+			if (m_bSortNonLogical)
+			{
 				return StrCmpIW(FullFileName1,FullFileName2);
 			}
-			else {
+			else
+			{
 				return StrCmpLogicalW(FullFileName1,FullFileName2);
 			}
 		}
@@ -394,10 +400,12 @@ int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) co
 	std::wstring Name1 = GetNameColumnText(InternalIndex1);
 	std::wstring Name2 = GetNameColumnText(InternalIndex2);
 
-	if (m_bSortNonLogical) {
+	if (m_bSortNonLogical)
+	{
 		return StrCmpIW(Name1.c_str(),Name2.c_str());
 	}
-	else {
+	else
+	{
 		return StrCmpLogicalW(Name1.c_str(),Name2.c_str());
 	}
 }
