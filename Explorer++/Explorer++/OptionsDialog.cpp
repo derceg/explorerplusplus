@@ -537,14 +537,22 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					CheckDlgButton(hDlg,IDC_OPTIONS_CHECK_SHOWINFOTIPS,BST_CHECKED);
 
 				if(m_InfoTipType == INFOTIP_SYSTEM)
+				{
 					CheckDlgButton(hDlg,IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,BST_CHECKED);
+				}
 				else
+				{
 					CheckDlgButton(hDlg,IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,BST_CHECKED);
+				}
 
 				if (m_bDisplayMixedGlobal)
+				{
 					CheckDlgButton(hDlg,IDC_MIXED_FILES_AND_FOLDERS,BST_CHECKED);
+				}
 				if (m_bSortNonLogicalGlobal)
+				{
 					CheckDlgButton(hDlg,IDC_SORT_NAMES_NONLOGICAL,BST_CHECKED);
+				}
 				
 				hCBSize = GetDlgItem(hDlg,IDC_COMBO_FILESIZES);
 
