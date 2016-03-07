@@ -376,7 +376,6 @@ private:
 	BOOL					OnDrawItem(DRAWITEMSTRUCT *pDrawItem);
 	void					OnToolbarViews(void);
 	void					ShowToolbarViewsDropdown(void);
-	void					OnMainToolbarRClick(void);
 	void					OnApplicationToolbarRClick();
 	void					OnSortByAscending(BOOL bSortAscending);
 	void					OnPreviousWindow(void);
@@ -568,6 +567,7 @@ private:
 	BOOL					OnTBGetButtonInfo(LPARAM lParam);
 	void					OnTBReset(void);
 	void					OnTBGetInfoTip(LPARAM lParam);
+	void					OnMainToolbarRClick();
 
 	/* Directory specific settings. */
 	void					SaveDirectorySpecificSettings(int iTab);

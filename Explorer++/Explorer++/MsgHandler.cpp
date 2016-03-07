@@ -18,7 +18,6 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/RegistrySettings.h"
-#include "../Helper/MenuHelper.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
@@ -338,27 +337,6 @@ void Explorerplusplus::OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParame
 	ExecuteFileAction(m_hContainer,EMPTY_STRING,szParameters,szItemDirectory,pidlItem);
 
 	CoTaskMemFree(pidlParent);
-}
-
-void Explorerplusplus::OnMainToolbarRClick(void)
-{
-	POINT ptCursor;
-	DWORD dwPos;
-
-	lCheckMenuItem(m_hToolbarRightClickMenu,IDM_TOOLBARS_ADDRESSBAR,m_bShowAddressBar);
-	lCheckMenuItem(m_hToolbarRightClickMenu,IDM_TOOLBARS_MAINTOOLBAR,m_bShowMainToolbar);
-	lCheckMenuItem(m_hToolbarRightClickMenu,IDM_TOOLBARS_BOOKMARKSTOOLBAR,m_bShowBookmarksToolbar);
-	lCheckMenuItem(m_hToolbarRightClickMenu,IDM_TOOLBARS_DRIVES,m_bShowDrivesToolbar);
-	lCheckMenuItem(m_hToolbarRightClickMenu,IDM_TOOLBARS_APPLICATIONTOOLBAR,m_bShowApplicationToolbar);
-	lCheckMenuItem(m_hToolbarRightClickMenu,IDM_TOOLBARS_LOCKTOOLBARS,m_bLockToolbars);
-
-	SetFocus(m_hMainToolbar);
-	dwPos = GetMessagePos();
-	ptCursor.x = GET_X_LPARAM(dwPos);
-	ptCursor.y = GET_Y_LPARAM(dwPos);
-
-	TrackPopupMenu(m_hToolbarRightClickMenu,TPM_LEFTALIGN,
-		ptCursor.x,ptCursor.y,0,m_hMainRebar,NULL);
 }
 
 BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
