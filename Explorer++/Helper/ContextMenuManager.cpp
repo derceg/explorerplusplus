@@ -233,9 +233,19 @@ void CContextMenuManager::AddMenuEntries(HMENU hMenu,
 	{
 		if(itr->pContextMenuActual != NULL)
 		{
-			HRESULT hr = itr->pContextMenuActual->QueryContextMenu(
-				hMenu,iStartPos,iMinID + iOffset,iMaxID,
-				CMF_NORMAL|CMF_EXPLORE);
+			/* Windows 10 right-click crashes in QueryContextMenu call
+			in OneDrive's FileSyncShell[64].dll - handle the exception here. */
+			HRESULT hr = MAKE_HRESULT(SEVERITY_ERROR,0,0);
+			try
+			{
+				hr = itr->pContextMenuActual->QueryContextMenu(
+					hMenu,iStartPos,iMinID + iOffset,iMaxID,
+					CMF_NORMAL|CMF_EXPLORE);
+			}
+			catch (...)
+			{
+				continue;
+			}
 
 			if(HRESULT_SEVERITY(hr) == SEVERITY_SUCCESS)
 			{
