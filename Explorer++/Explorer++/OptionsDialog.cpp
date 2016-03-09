@@ -600,6 +600,8 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 				case IDC_SETTINGS_CHECK_ZIPFILES:
 				case IDC_SETTINGS_CHECK_FRIENDLYDATES:
 				case IDC_OPTIONS_HOVER_TIME:
+				case IDC_MIXED_FILES_AND_FOLDERS:
+				case IDC_SORT_NAMES_NONLOGICAL:
 					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
 					break;
 
