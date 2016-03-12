@@ -721,3 +721,10 @@ BOOL CopyTextToClipboard(const std::wstring &str)
 
 	return bRes;
 }
+
+bool IsKeyDown(int nVirtKey)
+{
+	SHORT status = (GetKeyState(nVirtKey) & 0x8000);
+
+	return (status != 0);
+}

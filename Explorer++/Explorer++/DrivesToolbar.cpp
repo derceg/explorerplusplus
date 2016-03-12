@@ -208,7 +208,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 								CFileContextMenuManager fcmm(m_hwnd,pidlItem,pidlItemList);
 
 								fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,m_pexpp->GetStatusBar(),
-									NULL,FALSE,GetKeyState(VK_SHIFT) & 0x8000);
+									NULL,FALSE,IsKeyDown(VK_SHIFT));
 
 								CoTaskMemFree(pidlItem);
 							}

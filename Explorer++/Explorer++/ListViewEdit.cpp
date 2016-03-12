@@ -113,7 +113,7 @@ INT_PTR CListViewEdit::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 
 				int iNewSel;
 
-				if(GetKeyState(VK_SHIFT) & 0x8000)
+				if(IsKeyDown(VK_SHIFT))
 				{
 					if(iSel == 0)
 					{
