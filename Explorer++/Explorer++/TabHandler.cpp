@@ -1194,23 +1194,19 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 void Explorerplusplus::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
-	HIMAGELIST himlTemp;
-	HBITMAP hBitmap;
-	ICONINFO IconInfo;
+	HIMAGELIST himlTemp = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48);
 
-	himlTemp = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
-
-	hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-
+	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_SHELLIMAGES));
 	ImageList_Add(himlTemp,hBitmap,NULL);
 	DeleteObject(hBitmap);
 
+	ICONINFO IconInfo;
 	GetIconInfo(ImageList_GetIcon(himlTemp,SHELLIMAGES_LOCK,
 		ILD_TRANSPARENT),&IconInfo);
 	ImageList_Add(himlTab,IconInfo.hbmColor,IconInfo.hbmMask);
-
 	DeleteObject(IconInfo.hbmColor);
 	DeleteObject(IconInfo.hbmMask);
+
 	ImageList_Destroy(himlTemp);
 }
 
