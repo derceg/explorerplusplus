@@ -51,9 +51,9 @@ appears on the tab control. */
 static const int TAB_TOOLBAR_WIDTH = 20;
 static const int TAB_TOOLBAR_HEIGHT = 20;
 
-void CALLBACK QuitIconAPC(ULONG_PTR dwParam);
+void CALLBACK UninitializeCOMAPC(ULONG_PTR dwParam);
 
-void CALLBACK QuitIconAPC(ULONG_PTR dwParam)
+void CALLBACK UninitializeCOMAPC(ULONG_PTR dwParam)
 {
 	UNREFERENCED_PARAMETER(dwParam);
 
@@ -545,7 +545,7 @@ int Explorerplusplus::OnDestroy(void)
 		SHChangeNotifyDeregister(m_SHChangeNotifyID);
 	}
 
-	QueueUserAPC(QuitIconAPC,m_hIconThread,NULL);
+	QueueUserAPC(UninitializeCOMAPC,m_hIconThread,NULL);
 
 	ImageList_Destroy(m_himlToolbarSmall);
 	ImageList_Destroy(m_himlToolbarLarge);

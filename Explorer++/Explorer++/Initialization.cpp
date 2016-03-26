@@ -26,12 +26,12 @@
 #include "MainResource.h"
 
 
-DWORD WINAPI Thread_IconFinder(LPVOID pParam);
-void CALLBACK IconThreadInitialization(ULONG_PTR dwParam);
+DWORD WINAPI WorkerThreadProc(LPVOID pParam);
+void CALLBACK InitializeCOMAPC(ULONG_PTR dwParam);
 
 extern HIMAGELIST himlMenu;
 
-DWORD WINAPI Thread_IconFinder(LPVOID pParam)
+DWORD WINAPI WorkerThreadProc(LPVOID pParam)
 {
 	UNREFERENCED_PARAMETER(pParam);
 
@@ -59,7 +59,7 @@ DWORD WINAPI Thread_IconFinder(LPVOID pParam)
 	return 0;
 }
 
-void CALLBACK IconThreadInitialization(ULONG_PTR dwParam)
+void CALLBACK InitializeCOMAPC(ULONG_PTR dwParam)
 {
 	UNREFERENCED_PARAMETER(dwParam);
 
@@ -91,17 +91,9 @@ void Explorerplusplus::OnCreate(void)
 
 	InitializeBookmarks();
 
-	m_hIconThread = CreateThread(NULL, 0, Thread_IconFinder, NULL, 0, NULL);
-	SetThreadPriority(m_hIconThread, THREAD_PRIORITY_BELOW_NORMAL);
-	QueueUserAPC(IconThreadInitialization, m_hIconThread, NULL);
-
-	m_hTreeViewIconThread = CreateThread(NULL, 0, Thread_IconFinder, NULL, 0, NULL);
-	SetThreadPriority(m_hTreeViewIconThread, THREAD_PRIORITY_BELOW_NORMAL);
-	QueueUserAPC(IconThreadInitialization, m_hTreeViewIconThread, NULL);
-
-	m_hFolderSizeThread = CreateThread(NULL, 0, Thread_IconFinder, NULL, 0, NULL);
-	SetThreadPriority(m_hFolderSizeThread, THREAD_PRIORITY_BELOW_NORMAL);
-	QueueUserAPC(IconThreadInitialization, m_hFolderSizeThread, NULL);
+	m_hIconThread = CreateWorkerThread();
+	m_hTreeViewIconThread = CreateWorkerThread();
+	m_hFolderSizeThread = CreateWorkerThread();
 
 	/* These need to occur after the language module
 	has been initialized, but before the tabs are
@@ -199,6 +191,16 @@ void Explorerplusplus::OnCreate(void)
 	m_hNextClipboardViewer = SetClipboardViewer(m_hContainer);
 
 	SetFocus(m_hActiveListView);
+}
+
+/* Creates a low priority worker thread, and initializes COM on that thread. */
+HANDLE Explorerplusplus::CreateWorkerThread()
+{
+	HANDLE hThread = CreateThread(NULL, 0, WorkerThreadProc, NULL, 0, NULL);
+	SetThreadPriority(hThread, THREAD_PRIORITY_BELOW_NORMAL);
+	QueueUserAPC(InitializeCOMAPC, hThread, NULL);
+
+	return hThread;
 }
 
 void Explorerplusplus::InitializeBookmarks(void)

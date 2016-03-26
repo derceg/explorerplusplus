@@ -766,6 +766,9 @@ private:
 	void					SetMenuItemOwnerDrawn(HMENU hMenu, int iItem);
 	void					SetMenuItemBitmap(HMENU hMenu, UINT ItemID, int iBitmap);
 
+	/* Helpers. */
+	HANDLE					CreateWorkerThread();
+
 	/* Miscellaneous. */
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
 	BOOL					CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
