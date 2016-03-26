@@ -1222,6 +1222,12 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 				pShellFolder->Release();
 
+				CoTaskMemFree(pidlNetwork);
+				CoTaskMemFree(pidlConnections);
+				CoTaskMemFree(pidlPrinters);
+				CoTaskMemFree(pidlBitBucket);
+				CoTaskMemFree(pidlControls);
+				CoTaskMemFree(pidlDrives);
 				CoTaskMemFree(pidl);
 			}
 			break;

@@ -530,6 +530,8 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 			TCHAR szPath[MAX_PATH];
 			GetDisplayName(pidl, szPath, SIZEOF_ARRAY(szPath), SHGDN_INFOLDER);
 
+			CoTaskMemFree(pidl);
+
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
 			LoadString(m_hLanguageModule, IDS_MAIN_TOOLBAR_BACK, szTemp, SIZEOF_ARRAY(szTemp));
@@ -546,6 +548,8 @@ void Explorerplusplus::OnTBGetInfoTip(LPARAM lParam)
 
 			TCHAR szPath[MAX_PATH];
 			GetDisplayName(pidl, szPath, SIZEOF_ARRAY(szPath), SHGDN_INFOLDER);
+
+			CoTaskMemFree(pidl);
 
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
