@@ -1203,6 +1203,8 @@ void Explorerplusplus::AddDefaultTabIcons(HIMAGELIST himlTab)
 	hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
 
 	ImageList_Add(himlTemp,hBitmap,NULL);
+	DeleteObject(hBitmap);
+
 	GetIconInfo(ImageList_GetIcon(himlTemp,SHELLIMAGES_LOCK,
 		ILD_TRANSPARENT),&IconInfo);
 	ImageList_Add(himlTab,IconInfo.hbmColor,IconInfo.hbmMask);
