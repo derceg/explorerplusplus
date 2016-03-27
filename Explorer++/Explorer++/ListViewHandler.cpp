@@ -67,6 +67,11 @@ HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)
 {
 	HWND hListView = CreateListView(hParent,Style);
 
+	if(hListView == NULL)
+	{
+		return NULL;
+	}
+
 	IImageList *pImageList = NULL;
 	HRESULT hr = SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
 
@@ -426,14 +431,21 @@ void Explorerplusplus::OnListViewMButtonUp(POINT *pt)
 
 				if(SUCCEEDED(hr))
 				{
+					/* Is this a folder? */
 					if((uAttributes & SFGAO_FOLDER) &&
 						!(uAttributes & SFGAO_STREAM))
 					{
-						/* Folder item. */
-						pShellFolder->GetDisplayNameOf(ridl,SHGDN_FORPARSING,&str);
-						StrRetToBuf(&str,ridl,szParsingPath,SIZEOF_ARRAY(szParsingPath));
+						hr = pShellFolder->GetDisplayNameOf(ridl,SHGDN_FORPARSING,&str);
 
-						BrowseFolder(szParsingPath,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
+						if(SUCCEEDED(hr))
+						{
+							hr = StrRetToBuf(&str, ridl, szParsingPath, SIZEOF_ARRAY(szParsingPath));
+
+							if(SUCCEEDED(hr))
+							{
+								BrowseFolder(szParsingPath, SBSP_ABSOLUTE, TRUE, FALSE, FALSE);
+							}
+						}
 					}
 				}
 
@@ -485,17 +497,21 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 				!IsKeyDown(VK_SHIFT) &&
 				!IsKeyDown(VK_MENU))
 			{
-				LPITEMIDLIST pidl = NULL;
+				LPITEMIDLIST pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+
 				TCHAR szRoot[MAX_PATH];
+				HRESULT hr = GetDisplayName(pidl,szRoot,SIZEOF_ARRAY(szRoot),SHGDN_FORPARSING);
 
-				pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+				if(SUCCEEDED(hr))
+				{
+					BOOL bRes = PathStripToRoot(szRoot);
 
-				GetDisplayName(pidl,szRoot,SIZEOF_ARRAY(szRoot),SHGDN_FORPARSING);
-				PathStripToRoot(szRoot);
-
-				/* Go to the root of this directory. */
-				BrowseFolder(szRoot,
-					SBSP_ABSOLUTE|SBSP_SAMEBROWSER);
+					if(bRes)
+					{
+						/* Go to the root of this directory. */
+						BrowseFolder(szRoot, SBSP_ABSOLUTE | SBSP_SAMEBROWSER);
+					}
+				}
 
 				CoTaskMemFree(pidl);
 			}
@@ -665,13 +681,13 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
-	ListViewInfo_t	*plvi = NULL;
+	ListViewInfo_t	*plvi = (ListViewInfo_t *)GetWindowLongPtr(hListView,GWLP_USERDATA);
+	assert(plvi != 0);
 
-	plvi = (ListViewInfo_t *)GetWindowLongPtr(hListView,GWLP_USERDATA);
-
-	if(plvi->iObjectIndex < MAX_TABS &&
-		m_uTabMap[plvi->iObjectIndex] == 1)
+	if(plvi->iObjectIndex < MAX_TABS && m_uTabMap[plvi->iObjectIndex] == 1)
+	{
 		return plvi->iObjectIndex;
+	}
 
 	return -1;
 }
@@ -679,7 +695,9 @@ int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 {
 	if(!IsRenamePossible())
+	{
 		return TRUE;
+	}
 
 	/* Subclass the edit window. The only reason this is
 	done is so that when the listview item is put into
@@ -688,6 +706,12 @@ BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 	selection works directly from here in Windows Vista,
 	it does not work in Windows XP. */
 	HWND hEdit = ListView_GetEditControl(m_hActiveListView);
+
+	if(hEdit == NULL)
+	{
+		return TRUE;
+	}
+
 	CListViewEdit::CreateNew(hEdit,reinterpret_cast<NMLVDISPINFO *>(lParam)->item.iItem,this);
 
 	m_bListViewRenaming = TRUE;
