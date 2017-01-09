@@ -65,11 +65,11 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	
 	/* Folders will always be sorted separately from files,
 	except in the recycle bin. */
-	if(IsFolder1 && !IsFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
+	if(!m_bDisplayMixed && IsFolder1 && !IsFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
 		ComparisonResult = -1;
 	}
-	else if(!IsFolder1 && IsFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
+	else if(!m_bDisplayMixed && !IsFolder1 && IsFolder2 && !CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
 		ComparisonResult = 1;
 	}
@@ -335,8 +335,15 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	{
 		/* By default, items that are equal will be sub-sorted
 		by their display names. */
-		ComparisonResult = StrCmpLogicalW(m_pExtraItemInfo[InternalIndex1].szDisplayName,
-			m_pExtraItemInfo[InternalIndex2].szDisplayName);
+		if (m_bSortNonLogical) {
+			ComparisonResult = StrCmpIW(m_pExtraItemInfo[InternalIndex1].szDisplayName,
+				m_pExtraItemInfo[InternalIndex2].szDisplayName);			
+		}
+		else {
+			ComparisonResult = StrCmpLogicalW(m_pExtraItemInfo[InternalIndex1].szDisplayName,
+				m_pExtraItemInfo[InternalIndex2].szDisplayName);			
+		}
+
 	}
 
 	if(!m_bSortAscending)
@@ -376,14 +383,24 @@ int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) co
 		{
 			/* If the items been compared are both drives,
 			sort by drive letter, rather than display name. */
-			return StrCmpLogicalW(FullFileName1,FullFileName2);
+			if (m_bSortNonLogical) {
+				return StrCmpIW(FullFileName1,FullFileName2);
+			}
+			else {
+				return StrCmpLogicalW(FullFileName1,FullFileName2);
+			}
 		}
 	}
 
 	std::wstring Name1 = GetNameColumnText(InternalIndex1);
 	std::wstring Name2 = GetNameColumnText(InternalIndex2);
 
-	return StrCmpLogicalW(Name1.c_str(),Name2.c_str());
+	if (m_bSortNonLogical) {
+		return StrCmpIW(Name1.c_str(),Name2.c_str());
+	}
+	else {
+		return StrCmpLogicalW(Name1.c_str(),Name2.c_str());
+	}
 }
 
 int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) const

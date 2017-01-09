@@ -932,6 +932,8 @@ private:
 	BOOL					m_bShowGridlinesGlobal;
 	BOOL					m_bHideSystemFilesGlobal;
 	BOOL					m_bHideLinkExtensionGlobal;
+	BOOL					m_bDisplayMixedGlobal;
+	BOOL					m_bSortNonLogicalGlobal;
 	
 	/* Windows 7 taskbar thumbnail previews. */
 	ITaskbarList4			*m_pTaskbarList;

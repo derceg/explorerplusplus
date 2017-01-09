@@ -107,6 +107,8 @@ will need to be changed correspondingly. */
 #define HASH_OVERWRITEEXISTINGFILESCONFIRMATION	1625342835
 #define HASH_LARGETOOLBARICONS		10895007
 #define HASH_PLAYNAVIGATIONSOUND	1987363412
+#define HASH_DISPLAYMIXEDFILESANDFOLDERS	1168704423
+#define HASH_SORTNAMESINNONLOGICALORDER		1471765850
 
 struct ColumnXMLSaveData
 {
@@ -573,6 +575,11 @@ MSXML2::IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SortAscendingGlobal"),NXMLSettings::EncodeBoolValue(m_bSortAscendingGlobal));
 
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt, pe);
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisplayMixedFilesAndFolders"),NXMLSettings::EncodeBoolValue(m_bDisplayMixedGlobal));
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SortNamesInNonLogicalOrder"),NXMLSettings::EncodeBoolValue(m_bSortNonLogicalGlobal));
+	
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	_itow_s(m_StartupMode,szValue,SIZEOF_ARRAY(szValue),10);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("StartupMode"),szValue);
@@ -1760,6 +1767,14 @@ WCHAR *wszName,WCHAR *wszValue)
 		m_bUseFullRowSelect = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
+	case HASH_DISPLAYMIXEDFILESANDFOLDERS:
+		m_bDisplayMixedGlobal = NXMLSettings::DecodeBoolValue(wszValue);
+		break;
+
+	case HASH_SORTNAMESINNONLOGICALORDER:
+		m_bSortNonLogicalGlobal = NXMLSettings::DecodeBoolValue(wszValue);
+		break;
+		
 	case HASH_TOOLBARSTATE:
 		{
 			MSXML2::IXMLDOMNode	*pChildNode = NULL;
