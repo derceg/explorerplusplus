@@ -63,7 +63,6 @@
 #include <accctrl.h>
 #include <aclapi.h>
 #include <sddl.h>
-#include <gdiplus.h>
 #include <Lm.h>
 #include <intshcut.h>
 #include <strsafe.h>
@@ -71,6 +70,11 @@
 #include <Iphlpapi.h>
 #include <psapi.h>
 #include <userenv.h>
+
+#pragma warning(push)
+#pragma warning(disable:4458)
+#include <gdiplus.h>
+#pragma warning(pop)
 
 #pragma warning(push)
 #pragma warning(disable:4995)

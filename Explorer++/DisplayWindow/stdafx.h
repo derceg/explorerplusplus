@@ -47,13 +47,23 @@
 #include <shobjidl.h>
 #include <shlobj.h>
 #include <tchar.h>
-#include <Imagehlp.h>
 #include <shellapi.h>
 #include <prsht.h>
 #include <math.h>
 #include <richedit.h>
 #include <objidl.h>
 #include <shlguid.h>
-#include <gdiplus.h>
 #include <strsafe.h>
 #include <psapi.h>
+
+/* This workaround is
+required for VS 2015. */
+#pragma warning(push)
+#pragma warning(disable:4091)
+#include <Imagehlp.h>
+#pragma warning(pop)
+
+#pragma warning(push)
+#pragma warning(disable:4458)
+#include <gdiplus.h>
+#pragma warning(pop)

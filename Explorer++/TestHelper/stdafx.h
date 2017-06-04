@@ -14,7 +14,11 @@
 #include <ShObjIdl.h>
 #include <ShlObj.h>
 #include <ShlGuid.h>
+
+#pragma warning(push)
+#pragma warning(disable:4458)
 #include <GdiPlus.h>
+#pragma warning(pop)
 
 #pragma warning(push)
 #pragma warning(disable:4995)

@@ -68,7 +68,6 @@
 #include <accctrl.h>
 #include <aclapi.h>
 #include <sddl.h>
-#include <gdiplus.h>
 #include <Lm.h>
 #include <intshcut.h>
 #include <strsafe.h>
@@ -76,6 +75,14 @@
 #include <Iphlpapi.h>
 #include <psapi.h>
 #include <userenv.h>
+
+/* See https://stackoverflow.com/questions/39797242/where-do-i-get-the-correct-gdi-c-wrappers-from-for-vs21015.
+This workaround is
+required for VS 2015. */
+#pragma warning(push)
+#pragma warning(disable:4458)
+#include <gdiplus.h>
+#pragma warning(pop)
 
 /* Temporarily disable the
 "#pragma deprecated" warning. */

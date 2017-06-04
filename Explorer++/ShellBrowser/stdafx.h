@@ -47,7 +47,11 @@
 #include <iphlpapi.h>
 #include <unknwn.h>
 #include <wmsdk.h>
+
+#pragma warning(push)
+#pragma warning(disable:4458)
 #include <gdiplus.h>
+#pragma warning(pop)
 
 /* Pantheios header files. */
 #pragma warning(push)
