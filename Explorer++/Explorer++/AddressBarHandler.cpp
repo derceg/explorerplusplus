@@ -165,7 +165,6 @@ void Explorerplusplus::OnAddressBarBeginDrag(void)
 
 			IShellLink *pShellLink = NULL;
 			IPersistStream *pPersistStream = NULL;
-			HRESULT hr;
 
 			hr = CoCreateInstance(CLSID_ShellLink,NULL,CLSCTX_INPROC_SERVER,
 				IID_PPV_ARGS(&pShellLink));

@@ -189,18 +189,18 @@ int CShellBrowser::SetAllFolderSizeColumnData(void)
 					int				nFolders;
 					int				nFiles;
 
-					LVITEM lvItem;
+					LVITEM lvChildItem;
 					int iItemInternal;
 					BOOL bRes;
 
-					lvItem.mask		= LVIF_PARAM;
-					lvItem.iItem	= iItem;
-					lvItem.iSubItem	= 0;
-					bRes = ListView_GetItem(m_hListView,&lvItem);
+					lvChildItem.mask		= LVIF_PARAM;
+					lvChildItem.iItem		= iItem;
+					lvChildItem.iSubItem	= 0;
+					bRes = ListView_GetItem(m_hListView,&lvChildItem);
 
 					if(bRes)
 					{
-						iItemInternal = (int)lvItem.lParam;
+						iItemInternal = (int)lvChildItem.lParam;
 
 						QueryFullItemName(iItem,FullItemPath,SIZEOF_ARRAY(FullItemPath));
 
@@ -209,11 +209,11 @@ int CShellBrowser::SetAllFolderSizeColumnData(void)
 						/* Does the item still exist? */
 						/* TODO: Need to lock this against the main thread. */
 						/* TODO: Discard the result if the folder was deleted. */
-						if(m_pItemMap[(int)lvItem.lParam] == 1)
+						if(m_pItemMap[(int)lvChildItem.lParam] == 1)
 						{
-							m_pwfdFiles[(int)lvItem.lParam].nFileSizeLow = lTotalFolderSize.LowPart;
-							m_pwfdFiles[(int)lvItem.lParam].nFileSizeHigh = lTotalFolderSize.HighPart;
-							m_pExtraItemInfo[(int)lvItem.lParam].bFolderSizeRetrieved = TRUE;
+							m_pwfdFiles[(int)lvChildItem.lParam].nFileSizeLow = lTotalFolderSize.LowPart;
+							m_pwfdFiles[(int)lvChildItem.lParam].nFileSizeHigh = lTotalFolderSize.HighPart;
+							m_pExtraItemInfo[(int)lvChildItem.lParam].bFolderSizeRetrieved = TRUE;
 
 							FormatSizeString(lTotalFolderSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
 								m_bForceSize,m_SizeDisplayFormat);

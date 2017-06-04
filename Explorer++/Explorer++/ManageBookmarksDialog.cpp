@@ -636,7 +636,7 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 	ptCursor.y = GET_Y_LPARAM(dwCursorPos);
 
 	HMENU hMenu = CreatePopupMenu();
-	int iItem = 0;
+	int iMenuItem = 0;
 
 	for each(auto ci in m_pmbdps->m_vectorColumnInfo)
 	{
@@ -661,9 +661,9 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 			mii.fState |= MFS_DISABLED;
 		}
 
-		InsertMenuItem(hMenu,iItem,TRUE,&mii);
+		InsertMenuItem(hMenu,iMenuItem,TRUE,&mii);
 
-		++iItem;
+		++iMenuItem;
 	}
 
 	int iCmd = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RETURNCMD,ptCursor.x,ptCursor.y,0,m_hDlg,NULL);
@@ -697,15 +697,15 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 				HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
 				CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
 
-				int iItem = 0;
+				int iBookmarkItem = 0;
 
 				for(auto itrBookmarks = BookmarkFolder.begin();itrBookmarks != BookmarkFolder.end();++itrBookmarks)
 				{
 					TCHAR szColumn[256];
 					GetBookmarkItemColumnInfo(*itrBookmarks,itr->ColumnType,szColumn,SIZEOF_ARRAY(szColumn));
-					ListView_SetItemText(hListView,iItem,iColumn,szColumn);
+					ListView_SetItemText(hListView,iBookmarkItem,iColumn,szColumn);
 
-					++iItem;
+					++iBookmarkItem;
 				}
 			}
 

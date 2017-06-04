@@ -701,7 +701,6 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 		{
 			if(itr->iTabId == m_iObjectIndex)
 			{
-				TCITEM tcItem;
 				int nTabs;
 
 				nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
@@ -716,12 +715,13 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 				{
 					std::list<TabProxyInfo_t>::iterator itrNext;
 
-					tcItem.mask = TCIF_PARAM;
-					TabCtrl_GetItem(m_hTabCtrl,m_iTabSelectedItem + 1,&tcItem);
+					TCITEM tcNextItem;
+					tcNextItem.mask = TCIF_PARAM;
+					TabCtrl_GetItem(m_hTabCtrl,m_iTabSelectedItem + 1,&tcNextItem);
 
 					for(itrNext = m_TabProxyList.begin();itrNext != m_TabProxyList.end();itrNext++)
 					{
-						if(itrNext->iTabId == (int)tcItem.lParam)
+						if(itrNext->iTabId == (int)tcNextItem.lParam)
 						{
 							m_pTaskbarList->SetTabOrder(itr->hProxy,itrNext->hProxy);
 						}

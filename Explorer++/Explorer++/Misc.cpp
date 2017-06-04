@@ -209,13 +209,13 @@ void Explorerplusplus::ApplyToolbarSettings(void)
 
 void Explorerplusplus::AdjustFolderPanePosition(void)
 {
-	RECT rc;
+	RECT rcMainWindow;
 	int IndentTop		= 0;
 	int IndentBottom	= 0;
 	int height;
 
-	GetClientRect(m_hContainer,&rc);
-	height = GetRectHeight(&rc);
+	GetClientRect(m_hContainer,&rcMainWindow);
+	height = GetRectHeight(&rcMainWindow);
 
 	if(m_hMainRebar)
 	{
@@ -237,19 +237,19 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 
 	if(m_bShowDisplayWindow)
 	{
-		RECT rc;
+		RECT rcDisplayWindow;
 
-		GetWindowRect(m_hDisplayWindow,&rc);
+		GetWindowRect(m_hDisplayWindow,&rcDisplayWindow);
 
-		IndentBottom += rc.bottom - rc.top;
+		IndentBottom += rcDisplayWindow.bottom - rcDisplayWindow.top;
 	}
 
 	if(m_bShowFolders)
 	{
-		RECT rc;
-		GetClientRect(m_hHolder,&rc);
+		RECT rcHolder;
+		GetClientRect(m_hHolder,&rcHolder);
 
-		SetWindowPos(m_hHolder,NULL,0,IndentTop,rc.right,
+		SetWindowPos(m_hHolder,NULL,0,IndentTop,rcHolder.right,
 		height-IndentBottom-IndentTop,SWP_SHOWWINDOW|SWP_NOZORDER);
 	}
 }
