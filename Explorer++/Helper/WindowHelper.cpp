@@ -101,7 +101,7 @@ BOOL AddWindowStyle(HWND hwnd, UINT fStyle, BOOL bAdd)
 	{
 		/* Only remove the style if it is present. */
 		if((fCurrentStyle & fStyle) == fStyle)
-			fCurrentStyle &= ~fStyle;
+			fCurrentStyle &= ~static_cast<LONG_PTR>(fStyle);
 	}
 
 	/* See the documentation for SetWindowLongPtr
