@@ -30,7 +30,7 @@
 
 
 const TCHAR CUpdateCheckDialogPersistentSettings::SETTINGS_KEY[] = _T("UpdateCheck");
-const TCHAR CUpdateCheckDialog::VERSION_FILE_URL[] = _T("http://explorerplusplus.com/software/version.txt");
+const TCHAR CUpdateCheckDialog::VERSION_FILE_URL[] = _T("https://explorerplusplus.com/software/version.txt");
 
 CUpdateCheckDialog::CUpdateCheckDialog(HINSTANCE hInstance,int iResource,HWND hParent) :
 CBaseDialog(hInstance,iResource,hParent,false),
