@@ -1,7 +1,12 @@
 #define MAJOR_VERSION	1
 #define MINOR_VERSION	3
 #define MICRO_VERSION	99
-#define BUILD_VERSION	1
+
+#ifdef ENVIRONMENT_BUILD_NUMBER
+#define BUILD_VERSION	ENVIRONMENT_BUILD_NUMBER
+#else
+#define BUILD_VERSION	0
+#endif
 
 #define QUOTE_(x)		#x
 #define QUOTE(x)		QUOTE_(x)
