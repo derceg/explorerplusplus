@@ -1,0 +1,50 @@
+version: 1.4.0.{build}
+image: Visual Studio 2015
+configuration: Release
+
+platform:
+- Win32
+- x64
+
+environment:
+  BOOST: C:\Libraries\boost_1_60_0
+  STLSOFT: C:\dependencies\stlsoft-1.9.124
+  PANTHEIOS: C:\dependencies\pantheios-1.0.1-beta216
+
+before_build:
+- cmd: >-
+    mkdir C:\dependencies
+
+    cd C:\dependencies
+
+
+    appveyor DownloadFile "https://downloads.sourceforge.net/project/stlsoft/STLSoft 1.9/1.9.124/stlsoft-1.9.124-hdrs.zip"
+
+    7z x stlsoft-1.9.124-hdrs.zip
+
+
+    appveyor DownloadFile "https://downloads.sourceforge.net/project/pantheios/Pantheios (C and Cxx)/1.0.1 (beta 216)/pantheios-1.0.1-beta216.zip"
+
+    7z x pantheios-1.0.1-beta216.zip
+
+
+    cd C:\dependencies\pantheios-1.0.1-beta216\build
+
+
+    SET "vcvarsall=C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
+
+
+    IF "%PLATFORM%" == "Win32" (call "%vcvarsall%" x86 && cd vc14) ELSE (call "%vcvarsall%" amd64 && cd vc14.x64)
+
+
+    nmake build.libs
+
+build:
+  project: Explorer++\Explorer++.sln
+  verbosity: minimal
+
+artifacts:
+- path: Explorer++\Explorer++\$(CONFIGURATION)\Explorer++.exe
+- path: Explorer++\Explorer++\$(CONFIGURATION)\Explorer++.pdb
+- path: Explorer++\Explorer++\x64\$(CONFIGURATION)\Explorer++.exe
+- path: Explorer++\Explorer++\x64\$(CONFIGURATION)\Explorer++.pdb
