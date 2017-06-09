@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/ggvn28se8xhes3x3/branch/master?svg=true)](https://ci.appveyor.com/project/derceg/explorerplusplus/branch/master)
+
 Explorer++
 ==========
 
