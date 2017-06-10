@@ -1,12 +1,10 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/ggvn28se8xhes3x3/branch/master?svg=true)](https://ci.appveyor.com/project/derceg/explorerplusplus/branch/master)
 
-Explorer++
-==========
+# Explorer++
 
 Explorer++ is a lightweight and fast file manager for Windows.
 
-Features
---------
+## Features
 
 * With the option to save to the registry or a configuration file, Explorer++ is __completely portable__
 * __Tabbed browsing__ for easy management of multiple folders
@@ -21,3 +19,7 @@ Features
 * __Search__ for files using their name and attributes
 * Switch between icon, list, detail, thumbnail and tile view
 * Filter files
+
+## Building Explorer++
+
+For instructions on how to build Explorer++, see the [wiki](https://github.com/derceg/explorerplusplus/wiki/Building-Explorerplusplus).
