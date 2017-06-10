@@ -20,6 +20,16 @@ Explorer++ is a lightweight and fast file manager for Windows.
 * Switch between icon, list, detail, thumbnail and tile view
 * Filter files
 
+## Latest Builds
+
+Up-to-date builds can be downloaded via AppVeyor. The links below will be for the most recent build that has taken place:
+
+32-bit: [Explorer++.exe](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/Explorer++/Explorer++/Release/Explorer++.exe?branch=master&job=Platform%3A%20Win32) ([.pdb](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/Explorer++/Explorer++/Release/Explorer++.pdb?branch=master&job=Platform%3A%20Win32))
+
+64-bit: [Explorer++.exe](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/Explorer++/Explorer++/x64/Release/Explorer++.exe?branch=master&job=Platform%3A%20x64) ([.pdb](https://ci.appveyor.com/api/projects/derceg/explorerplusplus/artifacts/Explorer++/Explorer++/x64/Release/Explorer++.pdb?branch=master&job=Platform%3A%20x64))
+
+For a full list of builds, see the [AppVeyor page](https://ci.appveyor.com/project/derceg/explorerplusplus) for this project.
+
 ## Building Explorer++
 
 For instructions on how to build Explorer++, see the [wiki](https://github.com/derceg/explorerplusplus/wiki/Building-Explorerplusplus).
