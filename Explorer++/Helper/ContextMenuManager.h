@@ -20,7 +20,8 @@ public:
 
 	/* Loads the context menu handlers bound to
 	a specific registry key. */
-	CContextMenuManager(ContextMenuType_t ContextMenuType,LPCITEMIDLIST pidlDirectory,IDataObject *pDataObject,IUnknown *pUnkSite);
+	CContextMenuManager(ContextMenuType_t ContextMenuType, LPCITEMIDLIST pidlDirectory, IDataObject *pDataObject,
+		IUnknown *pUnkSite, const std::vector<std::wstring> &blacklistedCLSIDEntries);
 
 	/* Releases the DLL's as well as the IUnknown
 	interfaces. */

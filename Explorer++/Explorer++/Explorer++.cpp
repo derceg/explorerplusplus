@@ -20,6 +20,19 @@
 
 CRITICAL_SECTION	g_csDirMonCallback;
 
+/* These entries correspond to shell
+extensions that are known to be
+incompatible with Explorer++. They
+won't be loaded on any background
+context menus. */
+const std::vector<std::wstring> Explorerplusplus::BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES = {
+	/* OneDrive file sync extension
+	(see https://github.com/derceg/explorerplusplus/issues/35
+	for a description of the issue
+	associated with this extension). */
+	_T("{CB3D0F55-BC2C-4C1A-85ED-23ED75B5106B}")
+};
+
 Explorerplusplus::Explorerplusplus(HWND hwnd) :
 m_hContainer(hwnd)
 {

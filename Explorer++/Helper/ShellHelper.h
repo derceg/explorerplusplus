@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <vector>
 
 #define CONTROL_PANEL_CATEGORY_VIEW	_T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")
 
@@ -110,7 +111,7 @@ HRESULT			GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *p
 BOOL			IsPathGUID(const TCHAR *szPath);
 BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
 HRESULT			AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList);
-BOOL			LoadContextMenuHandlers(const TCHAR *szRegKey, std::list<ContextMenuHandler_t> &ContextMenuHandlers);
+BOOL			LoadContextMenuHandlers(const TCHAR *szRegKey, std::list<ContextMenuHandler_t> &ContextMenuHandlers, const std::vector<std::wstring> &blacklistedCLSIDEntries);
 BOOL			LoadIUnknownFromCLSID(const TCHAR *szCLSID, ContextMenuHandler_t *pContextMenuHandler);
 HRESULT			GetItemAttributes(const TCHAR *szItemParsingPath, SFGAOF *pItemAttributes);
 HRESULT			GetItemAttributes(LPCITEMIDLIST pidl, SFGAOF *pItemAttributes);

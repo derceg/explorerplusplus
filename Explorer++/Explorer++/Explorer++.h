@@ -104,6 +104,8 @@ private:
 	static const int ID_DRIVESTOOLBAR = 3;
 	static const int ID_APPLICATIONSTOOLBAR = 4;
 
+	static const std::vector<std::wstring> BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES;
+
 	enum MousewheelSource_t
 	{
 		MOUSEWHEEL_SOURCE_LISTVIEW,

@@ -12,6 +12,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <boost\algorithm\string\predicate.hpp>
 #include "FileOperations.h"
 #include "Helper.h"
 #include "Macros.h"
@@ -1012,9 +1013,15 @@ HRESULT AddJumpListTaskInternal(IObjectCollection *poc,const TCHAR *pszName,
 is up to the caller to free both the DLL's and objects
 returned.
 
-http://www.ureader.com/msg/16601280.aspx */
+http://www.ureader.com/msg/16601280.aspx
+
+Also note that a set of blacklisted CLSID entries can be
+provided. Any entries in this set will be ignored (i.e. they
+won't be loaded). Each entry should be a CLSID with the enclosing
+braces included. */
 BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
-	std::list<ContextMenuHandler_t> &ContextMenuHandlers)
+	std::list<ContextMenuHandler_t> &ContextMenuHandlers,
+	const std::vector<std::wstring> &blacklistedCLSIDEntries)
 {
 	HKEY hKey = NULL;
 	BOOL bSuccess = FALSE;
@@ -1049,13 +1056,17 @@ BOOL LoadContextMenuHandlers(const TCHAR *szRegKey,
 
 				if(lSubKeyRes == ERROR_SUCCESS)
 				{
-					ContextMenuHandler_t ContextMenuHandler;
-
-					BOOL bRes = LoadIUnknownFromCLSID(szCLSID,&ContextMenuHandler);
-
-					if(bRes)
+					if (std::none_of(blacklistedCLSIDEntries.begin(), blacklistedCLSIDEntries.end(),
+						[&szCLSID](std::wstring blacklistedEntry) { return boost::iequals(szCLSID, blacklistedEntry); }))
 					{
-						ContextMenuHandlers.push_back(ContextMenuHandler);
+						ContextMenuHandler_t ContextMenuHandler;
+
+						BOOL bRes = LoadIUnknownFromCLSID(szCLSID, &ContextMenuHandler);
+
+						if (bRes)
+						{
+							ContextMenuHandlers.push_back(ContextMenuHandler);
+						}
 					}
 				}
 
