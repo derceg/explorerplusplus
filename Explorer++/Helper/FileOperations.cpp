@@ -48,7 +48,7 @@ BOOL NFileOperations::RenameFile(const std::wstring &strOldFilename,
 	shfo.wFunc	= FO_RENAME;
 	shfo.pFrom	= pszOldFilename;
 	shfo.pTo	= pszNewFilename;
-	shfo.fFlags	= FOF_ALLOWUNDO;
+	shfo.fFlags	= FOF_ALLOWUNDO | FOF_SILENT;
 	BOOL bRes = (!SHFileOperation(&shfo) && !shfo.fAnyOperationsAborted);
 
 	delete[] pszOldFilename;
