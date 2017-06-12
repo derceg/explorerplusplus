@@ -22,6 +22,11 @@ private:
 	static const int NMCSAEI_SELECT = 0x0000;
 	static const int NMCSAEI_EDIT = 0x0001;
 
+	/* From testing, this value is sent
+	on Windows 10 when an item needs to
+	be put into rename mode. */
+	static const int NMCSAEI_EDIT_WINDOWS_10 = 0x0003;
+
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
 	ULONG __stdcall		AddRef(void);
