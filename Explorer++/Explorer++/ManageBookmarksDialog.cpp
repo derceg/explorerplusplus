@@ -433,6 +433,14 @@ INT_PTR CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	{
 		switch(LOWORD(wParam))
 		{
+		case TOOLBAR_ID_BACK:
+			BrowseBack();
+			break;
+
+		case TOOLBAR_ID_FORWARD:
+			BrowseForward();
+			break;
+
 		case TOOLBAR_ID_ORGANIZE:
 			ShowOrganizeMenu();
 			break;
