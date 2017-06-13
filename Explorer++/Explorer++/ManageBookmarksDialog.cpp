@@ -122,18 +122,24 @@ void CManageBookmarksDialog::SetupToolbar()
 	TBBUTTON tbb;
 	TCHAR szTemp[64];
 
+	LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_BACK, szTemp, SIZEOF_ARRAY(szTemp));
+
 	tbb.iBitmap		= SHELLIMAGES_BACK;
 	tbb.idCommand	= TOOLBAR_ID_BACK;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE;
 	tbb.dwData		= 0;
+	tbb.iString		= reinterpret_cast<INT_PTR>(szTemp);
 	SendMessage(m_hToolbar,TB_INSERTBUTTON,0,reinterpret_cast<LPARAM>(&tbb));
+
+	LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_FORWARD, szTemp, SIZEOF_ARRAY(szTemp));
 
 	tbb.iBitmap		= SHELLIMAGES_FORWARD;
 	tbb.idCommand	= TOOLBAR_ID_FORWARD;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE;
 	tbb.dwData		= 0;
+	tbb.iString		= reinterpret_cast<INT_PTR>(szTemp);
 	SendMessage(m_hToolbar,TB_INSERTBUTTON,1,reinterpret_cast<LPARAM>(&tbb));
 
 	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_TOOLBAR_ORGANIZE,szTemp,SIZEOF_ARRAY(szTemp));
