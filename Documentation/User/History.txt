@@ -1,6 +1,91 @@
 Explorer++ Version History
 --------------------------
 
+Current version: 1.3.5
+
+Version 1.3.5 (03/02/2013)
+--------------------------
+New features:
+- Added support for another drag and drop format (which is used,
+  for example, by Outlook 2003 when copying attachments).
+
+Bug fixes:
+- The 'Open in New Tab' menu item was not always been added
+  to the folder context menu. Fixed.
+- Previously, file times could not be set for a directory using
+  the set file attributes dialog. Fixed.
+- A UTF-16 LE BOM is now written when pasting text (as a file).
+
+Misc:
+- Logging is now avilable. It can be enabled using the following
+  command:
+  explorer++.exe -enable_logging
+  Information will then be saved to Explorer++.log, which will
+  be created within the same directory as the executable.
+
+Version 1.3.4 (12/11/2011)
+--------------------------
+New features:
+- Implemented the media protection column.
+
+Bug fixes:
+- If the search dialog was closed while searching, the
+  application would crash. Fixed.
+- When clicking the 'Close' button while searching (in the
+  search dialog), the dialog would not close until the
+  search was finished. It could also result in a crash.
+  Fixed.
+- Fixed multithreaded bug in the search dialog.
+- In certain areas (such as the search dialog), Unicode
+  characters were not been converted to lowercase correctly.
+  Fixed.
+
+Version 1.3.3 (29/10/2011)
+--------------------------
+Bug fixes:
+- The media duration column was previously showing times in
+  100-nanosecond units. Updated to hh:mm:ss.
+- The processed search string (rather than original search
+  string) was been stored in the search dialog. Fixed.
+
+Misc:
+- When searching using the search dialog, if the filename
+  entered already appears in the history list, it will simply
+  be swapped to the first position (rather than been re-entered).
+- The number of history entries stored for the filename field
+  in the search dialog is now capped at 20.
+
+Version 1.3.2 (11/10/2011)
+--------------------------
+Bug fixes:
+- Under some circumstances, a copy and paste/drag and drop
+  operation would fail (when copying a message from Outlook
+  2010, for example).
+- Fixed bug in customize colors dialog (entries were not been
+  moved up/down correctly).
+- When renaming a file in the listview with IME turned on,
+  text was been overwritten (because the text selection was
+  modified). Fixed.
+- Links to zip files will now be opened in an external program,
+  if 'Open zip files in Explorer++' is unchecked.
+
+Version 1.3.1 (05/09/2011)
+--------------------------
+New features:
+- The sort mode and direction are now saved in the search
+  dialog.
+
+Bug fixes:
+- The image in the about dialog would not be shown when a
+  translation was loaded. Fixed.
+
+Misc:
+- The help file (if present) can now be launched from the
+  Help|Help menu. It must be named "Explorer++ Help.chm"
+  and be in the same folder as the Explorer++ executable.
+- Updated 'Always hide the link (.lnk) extension' option
+  to read 'Hide the link (.lnk) extension'.
+
 Version 1.3 (20/08/2011)
 ------------------------
 New features:
