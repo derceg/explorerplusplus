@@ -44,7 +44,5 @@ build:
   verbosity: minimal
 
 artifacts:
-- path: Explorer++\Explorer++\$(CONFIGURATION)\Explorer++.exe
-- path: Explorer++\Explorer++\$(CONFIGURATION)\Explorer++.pdb
-- path: Explorer++\Explorer++\x64\$(CONFIGURATION)\Explorer++.exe
-- path: Explorer++\Explorer++\x64\$(CONFIGURATION)\Explorer++.pdb
+- path: Explorer++\Explorer++\$(PLATFORM)\$(CONFIGURATION)\Explorer++.exe
+- path: Explorer++\Explorer++\$(PLATFORM)\$(CONFIGURATION)\Explorer++.pdb
