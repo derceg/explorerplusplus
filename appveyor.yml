@@ -42,7 +42,32 @@ before_build:
 build:
   project: Explorer++\Explorer++.sln
   verbosity: minimal
+after_build:
+- cmd: >-
+    cd %APPVEYOR_BUILD_FOLDER%
 
+
+    IF "%PLATFORM%" == "Win32" (SET "arch=x86") ELSE (SET "arch=x64")
+
+
+    SET "archiveName=explorer++_%arch%.zip"
+
+
+    7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.exe
+
+    7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Documentation\User\History.txt
+
+    7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Documentation\User\License.txt
+
+    7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Documentation\User\Readme.txt
+
+
+    SET "symbolArchiveName=explorer++_%arch%_symbols.zip"
+
+
+    7z a %symbolArchiveName% %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.pdb
 artifacts:
-- path: Explorer++\Explorer++\$(PLATFORM)\$(CONFIGURATION)\Explorer++.exe
-- path: Explorer++\Explorer++\$(PLATFORM)\$(CONFIGURATION)\Explorer++.pdb
+- path: explorer++_x86.zip
+- path: explorer++_x86_symbols.zip
+- path: explorer++_x64.zip
+- path: explorer++_x64_symbols.zip
