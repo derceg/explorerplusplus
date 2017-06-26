@@ -1,4 +1,5 @@
-Explorer++ [version] [build_type]
+Explorer++
+----------
 
 Copyright (c) 2005-2011 David Erceg
 
