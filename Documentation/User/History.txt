@@ -8,6 +8,15 @@ Version 1.4.0
 New features:
 
 Bug fixes:
+- When right-clicking on the listview background in Windows 10,
+  Explorer++ would crash. To resolve this, the OneDrive shell
+  extension is now ignored when showing the menu. See #35.
+- When renaming a file, it's possible to press tab to put the next
+  file into edit mode. On Windows 10, pressing tab would select the
+  next file, but it would not go into edit mode. Fixed. See #50.
+- Previously, when creating a file via the new menu in Windows 10,
+  the file would not be put into edit mode. Fixed. See #48.
+- Fixed a number of memory leaks.
 
 Misc:
 - Builds are now digitally signed.
