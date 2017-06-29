@@ -10,6 +10,17 @@ environment:
   BOOST: C:\Libraries\boost_1_60_0
   STLSOFT: C:\dependencies\stlsoft-1.9.124
   PANTHEIOS: C:\dependencies\pantheios-1.0.1-beta216
+  PFX_ENC_PASS:
+    secure: /FOQcwja5XcXpFQqbYnMhOcUTmiwNh4mDFBm9oUh/gaV8Z6V5d45lZrbM8DrKInV
+  PFX_PASS:
+    secure: MNjAMRrIqjMaFQDSnflh+UHZFZqRwuR9Wmsstd78A1gKnZduxJhiY93rMAnsXMgJ
+
+# Decrypt the code signing certificate.
+install:
+- cmd: >-
+    nuget install secure-file -ExcludeVersion
+
+    IF DEFINED PFX_ENC_PASS (secure-file\tools\secure-file -decrypt %APPVEYOR_BUILD_FOLDER%\authenticode.pfx.enc -secret %PFX_ENC_PASS%)
 
 before_build:
 - cmd: >-
@@ -42,8 +53,13 @@ before_build:
 build:
   project: Explorer++\Explorer++.sln
   verbosity: minimal
+
+# Sign and package the executable.
 after_build:
 - cmd: >-
+    IF DEFINED PFX_PASS ("C:\Program Files (x86)\Windows Kits\8.1\bin\x64\signtool.exe" sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /f %APPVEYOR_BUILD_FOLDER%\authenticode.pfx /p %PFX_PASS% %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.exe)
+
+
     cd %APPVEYOR_BUILD_FOLDER%
 
 
@@ -66,6 +82,7 @@ after_build:
 
 
     7z a %symbolArchiveName% %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.pdb
+
 artifacts:
 - path: explorer++_x86.zip
 - path: explorer++_x86_symbols.zip
