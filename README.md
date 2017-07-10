@@ -1,4 +1,5 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/ggvn28se8xhes3x3/branch/master?svg=true)](https://ci.appveyor.com/project/derceg/explorerplusplus/branch/master)
+[![Crowdin](https://d322cqt584bo4o.cloudfront.net/explorerplusplus/localized.svg)](https://crowdin.com/project/explorerplusplus)
 
 # Explorer++
 
@@ -41,3 +42,7 @@ For a full list of builds, see the [AppVeyor page](https://ci.appveyor.com/proje
 ## Building Explorer++
 
 For instructions on how to build Explorer++, see the [wiki](https://github.com/derceg/explorerplusplus/wiki/Building-Explorerplusplus).
+
+## Translations
+
+Translations are managed with [Crowdin](https://crowdin.com/project/explorerplusplus). To contribute to a translation, sign up with Crowdin, then edit the file corresponding to your language. If your language isn't listed, use the contact link shown on the project page to request it.
