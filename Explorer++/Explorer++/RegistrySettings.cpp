@@ -413,12 +413,11 @@ void Explorerplusplus::LoadBookmarksFromRegistry(void)
 	ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_BOOKMARKS_KEY,
 		0,KEY_READ,&hBookmarksKey);
 
-	if(ReturnValue == ERROR_SUCCESS)
-	{
-		/* TODO: Load bookmarks. */
+	if (ReturnValue != ERROR_SUCCESS)
+		return;
 
-		RegCloseKey(hBookmarksKey);
-	}
+	*m_bfAllBookmarks = CBookmarkFolder::UnserializeFromRegistry(REG_BOOKMARKS_KEY);
+	RegCloseKey(hBookmarksKey);
 }
 
 void Explorerplusplus::SaveTabSettingsToRegistry(void)
