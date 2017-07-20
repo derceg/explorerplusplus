@@ -124,7 +124,8 @@ class CBookmark
 {
 public:
 
-	CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription);
+	CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription); 
+	CBookmark(HKEY hKey, TCHAR *szKey);
 	CBookmark(void *pSerializedData);
 	~CBookmark();
 
