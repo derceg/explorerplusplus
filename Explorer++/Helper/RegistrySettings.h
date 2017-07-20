@@ -6,6 +6,8 @@
 
 namespace NRegistrySettings
 {
+	LONG	SaveBinToRegistry(HKEY hKey, const TCHAR *szKey, const LPBYTE value, UINT uSize);
+	LONG	ReadBinFromRegistry(HKEY hKey, const TCHAR *szKey, LPBYTE pValue, DWORD uSize);
 	LONG	SaveDwordToRegistry(HKEY hKey,const TCHAR *szKey,DWORD dwValue);
 	LONG	ReadDwordFromRegistry(HKEY hKey,const TCHAR *szKey,DWORD *pReturnValue);
 	LONG	SaveStringToRegistry(HKEY hKey,const TCHAR *szKey,const TCHAR *szValue);

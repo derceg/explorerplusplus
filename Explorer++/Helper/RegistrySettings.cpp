@@ -17,6 +17,15 @@
 #include "RegistrySettings.h"
 #include "Macros.h"
 
+LONG NRegistrySettings::SaveBinToRegistry(HKEY hKey, const TCHAR * szKey, const LPBYTE value, UINT uSize)
+{
+	return RegSetValueEx(hKey, szKey, 0, REG_BINARY, value, uSize);
+}
+
+LONG NRegistrySettings::ReadBinFromRegistry(HKEY hKey, const TCHAR * szKey, LPBYTE pValue, DWORD uSize)
+{
+	return RegQueryValueEx(hKey, szKey, 0, 0, pValue, &uSize);
+}
 
 LONG NRegistrySettings::SaveDwordToRegistry(HKEY hKey,const TCHAR *szKey,DWORD dwValue)
 {
