@@ -24,13 +24,15 @@
 
 
 CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar,CBookmarkFolder &AllBookmarks,
-	const GUID &guidBookmarksToolbar,UINT uIDStart,UINT uIDEnd) :
+	const GUID &guidBookmarksToolbar,UINT uIDStart,UINT uIDEnd,
+	IExplorerplusplus *pexpp) :
 m_hToolbar(hToolbar),
 m_AllBookmarks(AllBookmarks),
 m_guidBookmarksToolbar(guidBookmarksToolbar),
 m_uIDStart(uIDStart),
 m_uIDEnd(uIDEnd),
-m_uIDCounter(0)
+m_uIDCounter(0),
+m_pexpp(pexpp)
 {
 	InitializeToolbar();
 
@@ -127,7 +129,7 @@ LRESULT CALLBACK BookmarksToolbarParentProcStub(HWND hwnd,UINT uMsg,
 	return pbt->BookmarksToolbarParentProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch(uMsg)
 	{
@@ -135,9 +137,10 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd,UINT uM
 		if(LOWORD(wParam) >= m_uIDStart &&
 			LOWORD(wParam) <= m_uIDEnd)
 		{
-			/* TODO: Map the id back to a GUID, and
+			/* Map the id back to a GUID, and
 			then open the bookmark/show a dropdown
 			list. */
+			BookmarkClicked(UINT(wParam) - m_uIDStart);
 			return 0;
 		}
 		break;
@@ -163,10 +166,46 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd,UINT uM
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
+void CBookmarksToolbar::BookmarkClicked(UINT bookmarkUID)
+{
+	if (m_mapID.count(bookmarkUID) != 1)
+		return; // Just ignore invalid calls
+
+	const GUID guid = m_mapID.at(bookmarkUID);
+
+	auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks, m_guidBookmarksToolbar);
+	assert(variantBookmarksToolbar.type() == typeid(CBookmarkFolder));
+	const CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
+
+	for each(auto variantBookmark in BookmarksToolbarFolder)
+	{
+		if (variantBookmark.type() == typeid(CBookmarkFolder))
+		{
+			const CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
+
+			if (guid == BookmarkFolder.GetGUID())
+			{
+				// TODO: Show bookmark folder as a menu
+
+
+			}
+		}
+		else
+		{
+			const CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
+
+			if (guid == Bookmark.GetGUID())
+			{
+				// TODO: Show bookmark in new tab!
+				m_pexpp->BrowseFolder(Bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+			}
+		}
+	}
+}
+
 void CBookmarksToolbar::InsertBookmarkItems()
 {
-	/* The bookmarks toolbar folder should always be a direct child
-	of the root. */
+	/* The bookmarks toolbar folder should always be a direct child of the root. */
 	auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks,m_guidBookmarksToolbar);
 	assert(variantBookmarksToolbar.type() == typeid(CBookmarkFolder));
 	const CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
@@ -214,29 +253,23 @@ void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
 	assert(Position <= static_cast<std::size_t>(SendMessage(m_hToolbar,TB_BUTTONCOUNT,0,0)));
 
 	TCHAR szName[256];
+	ZeroMemory(szName, 256);
 	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());
 
-	int iImage;
-
-	if(bFolder)
-	{
-		iImage = SHELLIMAGES_NEWTAB;
-	}
-	else
-	{
-		iImage = SHELLIMAGES_FAV;
-	}
+	const int iImage = bFolder ? SHELLIMAGES_NEWTAB : SHELLIMAGES_FAV;
 
 	TBBUTTON tbb;
+	ZeroMemory(&tbb, sizeof(TBBUTTON));
 	tbb.iBitmap		= iImage;
 	tbb.idCommand	= m_uIDStart + m_uIDCounter;
 	tbb.fsState		= TBSTATE_ENABLED;
-	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_NOPREFIX;
+	tbb.fsStyle		= BTNS_BUTTON | BTNS_AUTOSIZE | BTNS_SHOWTEXT | BTNS_NOPREFIX;
 	tbb.dwData		= m_uIDCounter;
 	tbb.iString		= reinterpret_cast<INT_PTR>(szName);
-	SendMessage(m_hToolbar,TB_INSERTBUTTON,Position,reinterpret_cast<LPARAM>(&tbb));
 
-	m_mapID.insert(std::make_pair(m_uIDCounter,guid));
+	SendMessage(m_hToolbar, TB_INSERTBUTTON, Position, reinterpret_cast<LPARAM>(&tbb));
+
+	m_mapID.insert(std::make_pair(m_uIDCounter, guid));
 	++m_uIDCounter;
 }
 
