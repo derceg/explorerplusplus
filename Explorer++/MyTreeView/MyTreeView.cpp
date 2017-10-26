@@ -1551,52 +1551,46 @@ void CMyTreeView::MonitorDrive(const TCHAR *szDrive)
 	DriveEvent_t			de;
 	int						iMonitorId;
 
-	const int type = GetDriveType(szDrive);
-
-	// Don't monitor removable drives
-	if (type == DRIVE_REMOVABLE)
-		return;
-
-	// Don't monitor remote drives
-	if (type == DRIVE_REMOTE)
-		return;
-
-	hDrive = CreateFile(szDrive,
+	/* Remote (i.e. network) drives will NOT be monitored. */
+	if(GetDriveType(szDrive) != DRIVE_REMOTE)
+	{
+		hDrive = CreateFile(szDrive,
 			FILE_LIST_DIRECTORY,FILE_SHARE_READ|
 			FILE_SHARE_DELETE|FILE_SHARE_WRITE,
 			NULL,OPEN_EXISTING,FILE_FLAG_BACKUP_SEMANTICS|
 			FILE_FLAG_OVERLAPPED,NULL);
 
-	if (hDrive == INVALID_HANDLE_VALUE)
-		return;
+		if(hDrive != INVALID_HANDLE_VALUE)
+		{
+			pDirectoryAltered = (DirectoryAltered_t *)malloc(sizeof(DirectoryAltered_t));
 
-	pDirectoryAltered = (DirectoryAltered_t *)malloc(sizeof(DirectoryAltered_t));
+			StringCchCopy(pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath), szDrive);
+			pDirectoryAltered->pMyTreeView	= this;
 
-	StringCchCopy(pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath), szDrive);
-	pDirectoryAltered->pMyTreeView = this;
+			iMonitorId = m_pDirMon->WatchDirectory(hDrive,szDrive,FILE_NOTIFY_CHANGE_DIR_NAME,
+				CMyTreeView::DirectoryAlteredCallback,TRUE,(void *)pDirectoryAltered);
 
-	iMonitorId = m_pDirMon->WatchDirectory(hDrive, szDrive, FILE_NOTIFY_CHANGE_DIR_NAME,
-		CMyTreeView::DirectoryAlteredCallback, TRUE, (void *)pDirectoryAltered);
+			dbv.dbch_size		= sizeof(dbv);
+			dbv.dbch_devicetype	= DBT_DEVTYP_HANDLE;
+			dbv.dbch_handle		= hDrive;
 
-	dbv.dbch_size = sizeof(dbv);
-	dbv.dbch_devicetype = DBT_DEVTYP_HANDLE;
-	dbv.dbch_handle = hDrive;
+			/* Register to receive hardware events (i.e. insertion,
+			removal, etc) for the specified drive. */
+			hDevNotify = RegisterDeviceNotification(m_hTreeView,
+				&dbv,DEVICE_NOTIFY_WINDOW_HANDLE);
 
-	/* Register to receive hardware events (i.e. insertion,
-	removal, etc) for the specified drive. */
-	hDevNotify = RegisterDeviceNotification(m_hTreeView,
-		&dbv, DEVICE_NOTIFY_WINDOW_HANDLE);
+			/* If the handle was successfully registered, log the
+			drive path, handle and monitoring id. */
+			if(hDevNotify != NULL)
+			{
+				StringCchCopy(de.szDrive,SIZEOF_ARRAY(de.szDrive),szDrive);
+				de.hDrive = hDrive;
+				de.iMonitorId = iMonitorId;
 
-	if (hDevNotify == NULL)
-		return;
-
-	/* If the handle was successfully registered, log the
-	drive path, handle and monitoring id. */
-	StringCchCopy(de.szDrive, SIZEOF_ARRAY(de.szDrive), szDrive);
-	de.hDrive = hDrive;
-	de.iMonitorId = iMonitorId;
-
-	m_pDriveList.push_back(de);
+				m_pDriveList.push_back(de);
+			}
+		}
+	}
 }
 
 HRESULT CMyTreeView::InitializeDragDropHelpers(void)
