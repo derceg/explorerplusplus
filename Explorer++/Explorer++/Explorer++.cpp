@@ -77,6 +77,7 @@ m_hContainer(hwnd)
 	m_hActiveListView				= NULL;
 	m_hTabFont						= NULL;
 	m_hNextClipboardViewer			= NULL;
+	m_hLanguageModule				= NULL;
 	m_ListViewMButtonItem			= -1;
 	m_zDeltaTotal					= 0;
 	m_iPreviousTabSelectionId		= -1;
