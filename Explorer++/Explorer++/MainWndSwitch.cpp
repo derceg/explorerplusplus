@@ -232,47 +232,19 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		{
 			COPYDATASTRUCT *pcds = reinterpret_cast<COPYDATASTRUCT *>(lParam);
 
-			if(pcds->cbData < sizeof(NExplorerplusplus::IPNotificationType_t))
+			if (pcds->lpData != NULL)
 			{
-				return FALSE;
-			}
-
-			NExplorerplusplus::IPNotificationType_t *ipnt = reinterpret_cast<NExplorerplusplus::IPNotificationType_t *>(pcds->lpData);
-
-			switch(*ipnt)
-			{
-			case NExplorerplusplus::IP_NOTIFICATION_TYPE_NEW_TAB:
-				/* TODO: */
-				break;
-
-			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_ADDED:
-			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_ADDED:
-			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_MODIFIED:
-			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_MODIFIED:
-			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_REMOVED:
-			case NExplorerplusplus::IP_NOTIFICATION_TYPE_BOOKMARK_FOLDER_REMOVED:
-				{
-					m_pipbo->OnNotificationReceived(*ipnt,pcds->lpData);
-				}
-				break;
-
-			default:
-				return FALSE;
-				break;
-			}
-
-			/* TODO: */
-			/*if(pcds->lpData != NULL)
-			{
-			BrowseFolder((TCHAR *)pcds->lpData,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+				BrowseFolder((TCHAR *)pcds->lpData, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
 			}
 			else
 			{
-			HRESULT hr = BrowseFolder(m_DefaultTabDirectory,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+				HRESULT hr = BrowseFolder(m_DefaultTabDirectory, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
 
-			if(FAILED(hr))
-			BrowseFolder(m_DefaultTabDirectoryStatic,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
-			}*/
+				if (FAILED(hr))
+				{
+					BrowseFolder(m_DefaultTabDirectoryStatic, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+				}
+			}
 
 			return TRUE;
 		}

@@ -4,7 +4,6 @@
 #include "Explorer++_internal.h"
 #include "BoostCheck.h"
 #include "BookmarkHelper.h"
-#include "BookmarkIPHelper.h"
 #include "BookmarksToolbar.h"
 #include "DrivesToolbar.h"
 #include "ApplicationToolbar.h"
@@ -40,8 +39,7 @@
 #define REG_MAIN_KEY				_T("Software\\Explorer++")
 #define REG_SETTINGS_KEY			_T("Software\\Explorer++\\Settings")
 
-class Explorerplusplus : public IExplorerplusplus, public IFileContextMenuExternal,
-	public NBookmarkIPHelper::IPBookmarkNotificationGet, public NBookmarkIPHelper::IPBookmarkNotificationSet
+class Explorerplusplus : public IExplorerplusplus, public IFileContextMenuExternal
 {
 	friend LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
@@ -644,12 +642,6 @@ private:
 	int						GenerateUniqueTabId(void);
 	BOOL					CheckTabIdStatus(int iTabId);
 
-	/* IPBookmarkNotificationGet methods. */
-	bool					GetIPBroadcast() const;
-
-	/* IPBookmarkNotificationSet methods. */
-	void					SetIPBroadcast(bool bBroadcast);
-
 	/* Languages. */
 	void					SetLanguageModule(void);
 	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
@@ -949,9 +941,6 @@ private:
 	CBookmarkFolder *		m_bfAllBookmarks;
 	GUID					m_guidBookmarksToolbar;
 	GUID					m_guidBookmarksMenu;
-	CIPBookmarkItemNotifier	*m_pipbin;
-	CIPBookmarkObserver		*m_pipbo;
-	bool					m_bBroadcastIPBookmarkNotifications;
 	CBookmarksToolbar		*m_pBookmarksToolbar;
 
 	/* Customize colors. */

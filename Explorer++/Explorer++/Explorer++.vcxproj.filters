@@ -19,9 +19,6 @@
     <ClCompile Include="BookmarkHelper.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
-    <ClCompile Include="BookmarkIPHelper.cpp">
-      <Filter>Bookmarks</Filter>
-    </ClCompile>
     <ClCompile Include="BookmarksToolbar.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
@@ -217,9 +214,6 @@
       <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="BookmarkHelper.h">
-      <Filter>Bookmarks</Filter>
-    </ClInclude>
-    <ClInclude Include="BookmarkIPHelper.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="BookmarksToolbar.h">
