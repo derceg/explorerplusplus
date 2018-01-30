@@ -27,8 +27,6 @@
 namespace NManageBookmarksDialog
 {
 	int CALLBACK		SortBookmarksStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-
-	LRESULT CALLBACK	EditSearchProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 }
 
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
@@ -39,9 +37,6 @@ m_AllBookmarks(AllBookmarks),
 m_guidCurrentFolder(AllBookmarks.GetGUID()),
 m_bNewFolderAdded(false),
 m_bListViewInitialized(false),
-m_bSearchFieldBlank(true),
-m_bEditingSearchField(false),
-m_hEditSearchFont(NULL),
 m_bSaveHistory(true),
 CBaseDialog(hInstance,iResource,hParent,true)
 {
@@ -66,7 +61,6 @@ INT_PTR CManageBookmarksDialog::OnInitDialog()
 {
 	/* TODO: Enable drag and drop for listview and treeview. */
 	SetDialogIcon();
-	SetupSearchField();
 	SetupToolbar();
 	SetupTreeView();
 	SetupListView();
@@ -91,14 +85,6 @@ void CManageBookmarksDialog::SetDialogIcon()
 
 	DeleteObject(hBitmap);
 	ImageList_Destroy(himl);
-}
-
-void CManageBookmarksDialog::SetupSearchField()
-{
-	HWND hEdit = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH);
-	SetWindowSubclass(hEdit,NManageBookmarksDialog::EditSearchProcStub,
-		0,reinterpret_cast<DWORD_PTR>(this));
-	SetSearchFieldDefaultState();
 }
 
 void CManageBookmarksDialog::SetupToolbar()
@@ -176,13 +162,13 @@ void CManageBookmarksDialog::SetupToolbar()
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW),&rcTreeView);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,reinterpret_cast<LPPOINT>(&rcTreeView),2);
 
-	RECT rcSearch;
-	GetWindowRect(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH),&rcSearch);
-	MapWindowPoints(HWND_DESKTOP,m_hDlg,reinterpret_cast<LPPOINT>(&rcSearch),2);
+	RECT rcListView;
+	GetWindowRect(GetDlgItem(m_hDlg, IDC_MANAGEBOOKMARKS_LISTVIEW), &rcListView);
+	MapWindowPoints(HWND_DESKTOP, m_hDlg, reinterpret_cast<LPPOINT>(&rcListView), 2);
 
 	DWORD dwButtonSize = static_cast<DWORD>(SendMessage(m_hToolbar,TB_GETBUTTONSIZE,0,0));
-	SetWindowPos(m_hToolbar,NULL,rcTreeView.left,rcSearch.top - (HIWORD(dwButtonSize) - GetRectHeight(&rcSearch)) / 2,
-		rcSearch.left - rcTreeView.left - 10,HIWORD(dwButtonSize),0);
+	SetWindowPos(m_hToolbar,NULL,rcTreeView.left,(rcTreeView.top - HIWORD(dwButtonSize)) / 2,
+		rcListView.right - rcTreeView.left,HIWORD(dwButtonSize),0);
 }
 
 void CManageBookmarksDialog::SetupTreeView()
@@ -288,116 +274,6 @@ int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2
 	return iRes;
 }
 
-/* Changes the font within the search edit
-control, and sets the default text. */
-void CManageBookmarksDialog::SetSearchFieldDefaultState()
-{
-	HWND hEdit = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH);
-
-	LOGFONT lf;
-	HFONT hCurentFont = reinterpret_cast<HFONT>(SendMessage(hEdit,WM_GETFONT,0,0));
-	GetObject(hCurentFont,sizeof(lf),reinterpret_cast<LPVOID>(&lf));
-
-	HFONT hPrevEditSearchFont = m_hEditSearchFont;
-
-	lf.lfItalic = TRUE;
-	m_hEditSearchFont = CreateFontIndirect(&lf);
-	SendMessage(hEdit,WM_SETFONT,reinterpret_cast<WPARAM>(m_hEditSearchFont),MAKEWORD(TRUE,0));
-
-	if(hPrevEditSearchFont != NULL)
-	{
-		DeleteFont(hPrevEditSearchFont);
-	}
-
-	TCHAR szTemp[64];
-	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_DEFAULT_SEARCH_TEXT,szTemp,SIZEOF_ARRAY(szTemp));
-	SetWindowText(hEdit,szTemp);
-}
-
-/* Resets the font within the search
-field and removes any text. */
-void CManageBookmarksDialog::RemoveSearchFieldDefaultState()
-{
-	HWND hEdit = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH);
-
-	LOGFONT lf;
-	HFONT hCurentFont = reinterpret_cast<HFONT>(SendMessage(hEdit,WM_GETFONT,0,0));
-	GetObject(hCurentFont,sizeof(lf),reinterpret_cast<LPVOID>(&lf));
-
-	HFONT hPrevEditSearchFont = m_hEditSearchFont;
-
-	lf.lfItalic = FALSE;
-	m_hEditSearchFont = CreateFontIndirect(&lf);
-	SendMessage(hEdit,WM_SETFONT,reinterpret_cast<WPARAM>(m_hEditSearchFont),MAKEWORD(TRUE,0));
-
-	DeleteFont(hPrevEditSearchFont);
-
-	SetWindowText(hEdit,EMPTY_STRING);
-}
-
-LRESULT CALLBACK NManageBookmarksDialog::EditSearchProcStub(HWND hwnd,UINT uMsg,
-	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	CManageBookmarksDialog *pmbd = reinterpret_cast<CManageBookmarksDialog *>(dwRefData);
-
-	return pmbd->EditSearchProc(hwnd,uMsg,wParam,lParam);
-}
-
-LRESULT CALLBACK CManageBookmarksDialog::EditSearchProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
-{
-	switch(Msg)
-	{
-	case WM_SETFOCUS:
-		if(m_bSearchFieldBlank)
-		{
-			RemoveSearchFieldDefaultState();
-		}
-
-		m_bEditingSearchField = true;
-		break;
-
-	case WM_KILLFOCUS:
-		if(GetWindowTextLength(hwnd) == 0)
-		{
-			m_bSearchFieldBlank = true;
-			SetSearchFieldDefaultState();
-		}
-		else
-		{
-			m_bSearchFieldBlank = false;
-		}
-
-		m_bEditingSearchField = false;
-		break;
-	}
-
-	return DefSubclassProc(hwnd,Msg,wParam,lParam);
-}
-
-INT_PTR CManageBookmarksDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
-{
-	if(hwnd == GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH))
-	{
-		if(m_bSearchFieldBlank &&
-			!m_bEditingSearchField)
-		{
-			SetTextColor(hdc,SEARCH_TEXT_COLOR);
-			SetBkMode(hdc,TRANSPARENT);
-			return reinterpret_cast<INT_PTR>(GetSysColorBrush(COLOR_WINDOW));
-		}
-		else
-		{
-			SetTextColor(hdc,GetSysColor(COLOR_WINDOWTEXT));
-			SetBkMode(hdc,TRANSPARENT);
-			return reinterpret_cast<INT_PTR>(GetSysColorBrush(COLOR_WINDOW));
-		}
-	}
-
-	return 0;
-}
-
 INT_PTR CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys)
 {
 	UNREFERENCED_PARAMETER(dwKeys);
@@ -420,103 +296,93 @@ INT_PTR CManageBookmarksDialog::OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DW
 
 INT_PTR CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 {
-	if(HIWORD(wParam) != 0)
+	UNREFERENCED_PARAMETER(lParam);
+
+	switch(LOWORD(wParam))
 	{
-		switch(HIWORD(wParam))
-		{
-		case EN_CHANGE:
-			OnEnChange(reinterpret_cast<HWND>(lParam));
-			break;
-		}
-	}
-	else
-	{
-		switch(LOWORD(wParam))
-		{
-		case TOOLBAR_ID_BACK:
-			BrowseBack();
-			break;
+	case TOOLBAR_ID_BACK:
+		BrowseBack();
+		break;
 
-		case TOOLBAR_ID_FORWARD:
-			BrowseForward();
-			break;
+	case TOOLBAR_ID_FORWARD:
+		BrowseForward();
+		break;
 
-		case TOOLBAR_ID_ORGANIZE:
-			ShowOrganizeMenu();
-			break;
+	case TOOLBAR_ID_ORGANIZE:
+		ShowOrganizeMenu();
+		break;
 
-		case TOOLBAR_ID_VIEWS:
-			ShowViewMenu();
-			break;
+	case TOOLBAR_ID_VIEWS:
+		ShowViewMenu();
+		break;
 
-		case IDM_MB_ORGANIZE_NEWFOLDER:
-			OnNewFolder();
-			break;
+	case IDM_MB_ORGANIZE_NEWFOLDER:
+		OnNewFolder();
+		break;
 
-		case IDM_MB_VIEW_SORTBYNAME:
-			SortListViewItems(NBookmarkHelper::SM_NAME);
-			break;
+	case IDM_MB_VIEW_SORTBYNAME:
+		SortListViewItems(NBookmarkHelper::SM_NAME);
+		break;
 
-		case IDM_MB_VIEW_SORTBYLOCATION:
-			SortListViewItems(NBookmarkHelper::SM_LOCATION);
-			break;
+	case IDM_MB_VIEW_SORTBYLOCATION:
+		SortListViewItems(NBookmarkHelper::SM_LOCATION);
+		break;
 
-		case IDM_MB_VIEW_SORTBYVISITDATE:
-			SortListViewItems(NBookmarkHelper::SM_VISIT_DATE);
-			break;
+	case IDM_MB_VIEW_SORTBYVISITDATE:
+		SortListViewItems(NBookmarkHelper::SM_VISIT_DATE);
+		break;
 
-		case IDM_MB_VIEW_SORTBYVISITCOUNT:
-			SortListViewItems(NBookmarkHelper::SM_VISIT_COUNT);
-			break;
+	case IDM_MB_VIEW_SORTBYVISITCOUNT:
+		SortListViewItems(NBookmarkHelper::SM_VISIT_COUNT);
+		break;
 
-		case IDM_MB_VIEW_SORTBYADDED:
-			SortListViewItems(NBookmarkHelper::SM_ADDED);
-			break;
+	case IDM_MB_VIEW_SORTBYADDED:
+		SortListViewItems(NBookmarkHelper::SM_ADDED);
+		break;
 
-		case IDM_MB_VIEW_SORTBYLASTMODIFIED:
-			SortListViewItems(NBookmarkHelper::SM_LAST_MODIFIED);
-			break;
+	case IDM_MB_VIEW_SORTBYLASTMODIFIED:
+		SortListViewItems(NBookmarkHelper::SM_LAST_MODIFIED);
+		break;
 
-		case IDM_MB_VIEW_SORTASCENDING:
-			m_pmbdps->m_bSortAscending = true;
-			SortListViewItems(m_pmbdps->m_SortMode);
-			break;
+	case IDM_MB_VIEW_SORTASCENDING:
+		m_pmbdps->m_bSortAscending = true;
+		SortListViewItems(m_pmbdps->m_SortMode);
+		break;
 
-		case IDM_MB_VIEW_SORTDESCENDING:
-			m_pmbdps->m_bSortAscending = false;
-			SortListViewItems(m_pmbdps->m_SortMode);
-			break;
+	case IDM_MB_VIEW_SORTDESCENDING:
+		m_pmbdps->m_bSortAscending = false;
+		SortListViewItems(m_pmbdps->m_SortMode);
+		break;
 
-			/* TODO: */
-		case IDM_MB_BOOKMARK_OPEN:
-			break;
+		/* TODO: */
+	case IDM_MB_BOOKMARK_OPEN:
+		break;
 
-		case IDM_MB_BOOKMARK_OPENINNEWTAB:
-			break;
+	case IDM_MB_BOOKMARK_OPENINNEWTAB:
+		break;
 
-		case IDM_MB_BOOKMARK_OPENINNEWWINDOW:
-			break;
+	case IDM_MB_BOOKMARK_OPENINNEWWINDOW:
+		break;
 
-		case IDM_MB_BOOKMARK_CUT:
-			break;
+	case IDM_MB_BOOKMARK_CUT:
+		break;
 
-		/* TODO: Need to copy bookmark information to
-		the clipboard using a custom format. */
-		case IDM_MB_BOOKMARK_COPY:
-			break;
+	/* TODO: Need to copy bookmark information to
+	the clipboard using a custom format. */
+	case IDM_MB_BOOKMARK_COPY:
+		break;
 
-		case IDM_MB_BOOKMARK_DELETE:
-			//OnDeleteBookmark();
-			break;
+	case IDM_MB_BOOKMARK_DELETE:
+		//OnDeleteBookmark();
+		break;
 
-		case IDOK:
-			OnOk();
-			break;
+	case IDOK:
+		OnOk();
+		break;
 
-		case IDCANCEL:
-			OnCancel();
-			break;
-		}
+	case IDCANCEL:
+		OnCancel();
+		break;
 	}
 
 	return 0;
@@ -581,37 +447,6 @@ void CManageBookmarksDialog::OnDeleteBookmark(const GUID &guid)
 	UNREFERENCED_PARAMETER(guid);
 
 	/* TODO: Move the bookmark/bookmark folder to the trash folder. */
-}
-
-void CManageBookmarksDialog::OnEnChange(HWND hEdit)
-{
-	if(hEdit != GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_EDITSEARCH))
-	{
-		return;
-	}
-
-	std::wstring strSearch;
-	GetWindowString(hEdit,strSearch);
-
-	/* TODO: */
-	if(strSearch.size() > 0)
-	{
-		std::list<CBookmark> MatchList;
-
-		/* Loop through each bookmark, beginning from the
-		root bookmark and match the entered text against
-		each bookmarks name, location and description. */
-		for(auto itr = m_AllBookmarks.begin();itr != m_AllBookmarks.end();itr++)
-		{
-
-		}
-
-		/* Once all matches have been found, switch to a new
-		view showing all the matched items. This will need to
-		be a special case, as m_guidCurrentFolder will no longer
-		be valid. Items that are removed/added/modified will have
-		to be specifically checked. */
-	}
 }
 
 void CManageBookmarksDialog::OnListViewRClick()
@@ -1264,7 +1099,6 @@ INT_PTR CManageBookmarksDialog::OnDestroy()
 {
 	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
 	DestroyIcon(m_hDialogIcon);
-	DeleteFont(m_hEditSearchFont);
 	ImageList_Destroy(m_himlToolbar);
 
 	return 0;

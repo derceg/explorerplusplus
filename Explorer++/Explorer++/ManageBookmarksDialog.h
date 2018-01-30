@@ -65,7 +65,6 @@ public:
 	~CManageBookmarksDialog();
 
 	int CALLBACK		SortBookmarks(LPARAM lParam1,LPARAM lParam2);
-	LRESULT CALLBACK	EditSearchProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
 	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
@@ -77,7 +76,6 @@ public:
 protected:
 
 	INT_PTR	OnInitDialog();
-	INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc);
 	INT_PTR	OnAppCommand(HWND hwnd,UINT uCmd,UINT uDevice,DWORD dwKeys);
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnNotify(NMHDR *pnmhdr);
@@ -89,8 +87,6 @@ protected:
 
 private:
 
-	static const COLORREF SEARCH_TEXT_COLOR = RGB(120,120,120);
-
 	static const int TOOLBAR_ID_BACK			= 10000;
 	static const int TOOLBAR_ID_FORWARD			= 10001;
 	static const int TOOLBAR_ID_ORGANIZE		= 10002;
@@ -101,7 +97,6 @@ private:
 
 	void		SetDialogIcon();
 
-	void		SetupSearchField();
 	void		SetupToolbar();
 	void		SetupTreeView();
 	void		SetupListView();
@@ -113,9 +108,6 @@ private:
 	void		GetBookmarkColumnInfo(const CBookmark &Bookmark,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
 	void		GetBookmarkFolderColumnInfo(const CBookmarkFolder &BookmarkFolder,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
 
-	void		SetSearchFieldDefaultState();
-	void		RemoveSearchFieldDefaultState();
-
 	void		BrowseBack();
 	void		BrowseForward();
 	void		BrowseBookmarkFolder(const CBookmarkFolder &BookmarkFolder);
@@ -125,7 +117,6 @@ private:
 	void		OnNewFolder();
 	void		OnDeleteBookmark(const GUID &guid);
 
-	void		OnEnChange(HWND hEdit);
 	void		OnDblClk(NMHDR *pnmhdr);
 	void		OnRClick(NMHDR *pnmhdr);
 
@@ -164,10 +155,6 @@ private:
 
 	bool						m_bListViewInitialized;
 	CBookmarkListView			*m_pBookmarkListView;
-
-	HFONT						m_hEditSearchFont;
-	bool						m_bSearchFieldBlank;
-	bool						m_bEditingSearchField;
 
 	CManageBookmarksDialogPersistentSettings	*m_pmbdps;
 };
