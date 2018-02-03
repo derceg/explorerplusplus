@@ -91,7 +91,6 @@ private:
 	static const int TOOLBAR_ID_FORWARD			= 10001;
 	static const int TOOLBAR_ID_ORGANIZE		= 10002;
 	static const int TOOLBAR_ID_VIEWS			= 10003;
-	static const int TOOLBAR_ID_IMPORTEXPORT	= 10004;
 
 	CManageBookmarksDialog & operator = (const CManageBookmarksDialog &mbd);
 

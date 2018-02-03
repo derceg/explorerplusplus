@@ -149,16 +149,6 @@ void CManageBookmarksDialog::SetupToolbar()
 	tbb.iString		= reinterpret_cast<INT_PTR>(szTemp);
 	SendMessage(m_hToolbar,TB_INSERTBUTTON,3,reinterpret_cast<LPARAM>(&tbb));
 
-	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_TOOLBAR_IMPORTEXPORT,szTemp,SIZEOF_ARRAY(szTemp));
-
-	tbb.iBitmap		= SHELLIMAGES_PROPERTIES;
-	tbb.idCommand	= TOOLBAR_ID_IMPORTEXPORT;
-	tbb.fsState		= TBSTATE_ENABLED;
-	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_DROPDOWN;
-	tbb.dwData		= 0;
-	tbb.iString		= reinterpret_cast<INT_PTR>(szTemp);
-	SendMessage(m_hToolbar,TB_INSERTBUTTON,4,reinterpret_cast<LPARAM>(&tbb));
-
 	RECT rcTreeView;
 	GetWindowRect(GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW),&rcTreeView);
 	MapWindowPoints(HWND_DESKTOP,m_hDlg,reinterpret_cast<LPPOINT>(&rcTreeView),2);
