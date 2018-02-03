@@ -364,14 +364,6 @@ INT_PTR CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	case IDM_MB_BOOKMARK_OPENINNEWWINDOW:
 		break;
 
-	case IDM_MB_BOOKMARK_CUT:
-		break;
-
-	/* TODO: Need to copy bookmark information to
-	the clipboard using a custom format. */
-	case IDM_MB_BOOKMARK_COPY:
-		break;
-
 	case IDM_MB_BOOKMARK_DELETE:
 		//OnDeleteBookmark();
 		break;
@@ -625,15 +617,6 @@ void CManageBookmarksDialog::OnLvnKeyDown(NMLVKEYDOWN *pnmlvkd)
 		break;
 
 	/* TODO: */
-	case 'C':
-		break;
-
-	case 'V':
-		break;
-
-	case 'X':
-		break;
-
 	case VK_RETURN:
 		break;
 
