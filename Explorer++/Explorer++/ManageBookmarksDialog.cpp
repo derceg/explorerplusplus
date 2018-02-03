@@ -31,8 +31,9 @@ namespace NManageBookmarksDialog
 
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
-CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,
-	CBookmarkFolder &AllBookmarks) :
+CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+	IExplorerplusplus *pexpp, CBookmarkFolder &AllBookmarks) :
+m_pexpp(pexpp),
 m_AllBookmarks(AllBookmarks),
 m_guidCurrentFolder(AllBookmarks.GetGUID()),
 m_bNewFolderAdded(false),
@@ -925,8 +926,8 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 		}
 		else if(variantBookmark.type() == typeid(CBookmark))
 		{
-			/* TODO: Send the bookmark back to the main
-			window to open. */
+			CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
+			m_pexpp->BrowseFolder(Bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, FALSE, FALSE, FALSE);
 		}
 	}
 }

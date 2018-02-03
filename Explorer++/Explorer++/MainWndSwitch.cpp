@@ -1298,7 +1298,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 		case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 			if(g_hwndManageBookmarks == NULL)
 			{
-				CManageBookmarksDialog *pManageBookmarksDialog = new CManageBookmarksDialog(m_hLanguageModule,IDD_MANAGE_BOOKMARKS,hwnd,*m_bfAllBookmarks);
+				CManageBookmarksDialog *pManageBookmarksDialog = new CManageBookmarksDialog(m_hLanguageModule,IDD_MANAGE_BOOKMARKS,hwnd,this,*m_bfAllBookmarks);
 				g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(new CModelessDialogNotification());
 			}
 			else

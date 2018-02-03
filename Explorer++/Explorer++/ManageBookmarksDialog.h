@@ -61,7 +61,7 @@ class CManageBookmarksDialog : public CBaseDialog, public NBookmark::IBookmarkIt
 {
 public:
 
-	CManageBookmarksDialog(HINSTANCE hInstance,int iResource,HWND hParent,CBookmarkFolder &AllBookmarks);
+	CManageBookmarksDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp, CBookmarkFolder &AllBookmarks);
 	~CManageBookmarksDialog();
 
 	int CALLBACK		SortBookmarks(LPARAM lParam1,LPARAM lParam2);
@@ -139,6 +139,8 @@ private:
 
 	HWND						m_hToolbar;
 	HIMAGELIST					m_himlToolbar;
+
+	IExplorerplusplus			*m_pexpp;
 
 	CBookmarkFolder				&m_AllBookmarks;
 
