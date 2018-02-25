@@ -66,35 +66,35 @@ INT_PTR CSetDefaultColumnsDialog::OnInitDialog()
 
 	GetCsidlDisplayName(CSIDL_CONTROLS,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_CONTROL_PANEL));
+	m_FolderMap.insert(std::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_CONTROL_PANEL));
 
 	LoadString(GetInstance(),IDS_DEFAULTCOLUMNS_GENERAL,szFolderName,SIZEOF_ARRAY(szFolderName));
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_GENERAL));
+	m_FolderMap.insert(std::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_GENERAL));
 
 	GetCsidlDisplayName(CSIDL_DRIVES,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_COMPUTER));
+	m_FolderMap.insert(std::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_COMPUTER));
 
 	GetCsidlDisplayName(CSIDL_CONNECTIONS,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_NETWORK));
+	m_FolderMap.insert(std::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_NETWORK));
 
 	GetCsidlDisplayName(CSIDL_NETWORK,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_NETWORK_PLACES));
+	m_FolderMap.insert(std::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_NETWORK_PLACES));
 
 	GetCsidlDisplayName(CSIDL_PRINTERS,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_PRINTERS));
+	m_FolderMap.insert(std::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_PRINTERS));
 
 	GetCsidlDisplayName(CSIDL_BITBUCKET,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szFolderName)));
-	m_FolderMap.insert(std::tr1::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_RECYCLE_BIN));
+	m_FolderMap.insert(std::unordered_map<int,FolderType_t>::value_type(iPos,FOLDER_TYPE_RECYCLE_BIN));
 
 	auto FolderType = m_psdcdps->m_FolderType;
 	auto itr = std::find_if(m_FolderMap.begin(),m_FolderMap.end(),
-		[FolderType](const std::tr1::unordered_map<int,FolderType_t>::value_type &vt){return vt.second == FolderType;});
+		[FolderType](const std::unordered_map<int,FolderType_t>::value_type &vt){return vt.second == FolderType;});
 	SendMessage(hComboBox,CB_SETCURSEL,itr->first,0);
 
 	m_PreviousFolderType = m_psdcdps->m_FolderType;

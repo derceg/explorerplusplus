@@ -369,7 +369,7 @@ void CMassRenameDialog::ProcessFileName(const std::wstring &strTarget,
 		std::wstring::const_iterator itrStart = strOutput.begin();
 		std::wstring::const_iterator itrEnd = strOutput.end();
 
-		if(std::tr1::regex_search(itrStart,itrEnd,mr,rxPattern))
+		if(std::regex_search(itrStart,itrEnd,mr,rxPattern))
 		{
 			std::wstringstream ss;
 

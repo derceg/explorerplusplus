@@ -20,7 +20,7 @@
 
 namespace
 {
-	std::tr1::unordered_map<HWND,CBaseDialog *>	g_WindowMap;
+	std::unordered_map<HWND,CBaseDialog *>	g_WindowMap;
 }
 
 INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam)
@@ -41,7 +41,7 @@ INT_PTR CALLBACK BaseDialogProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lPa
 			correct object.
 			May also use thunks - see
 			http://www.hackcraft.net/cpp/windowsThunk/ */
-			g_WindowMap.insert(std::tr1::unordered_map<HWND,CBaseDialog *>::
+			g_WindowMap.insert(std::unordered_map<HWND,CBaseDialog *>::
 				value_type(hDlg,reinterpret_cast<CBaseDialog *>(lParam)));
 		}
 		break;

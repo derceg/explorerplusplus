@@ -77,7 +77,7 @@ INT_PTR CMergeFilesDialog::OnInitDialog()
 	(e.g. document.txt.part1), order them alphabetically. */
 	for each(auto strFullFilename in m_FullFilenameList)
 	{
-		if(!std::tr1::regex_match(strFullFilename,rxPattern))
+		if(!std::regex_match(strFullFilename,rxPattern))
 		{
 			bAllMatchPattern = false;
 			break;
@@ -94,7 +94,7 @@ INT_PTR CMergeFilesDialog::OnInitDialog()
 		pattern, construct the output filename
 		from the first files name. */
 		rxPattern.assign(_T("[\\.]?part[0-9]+"),std::regex_constants::icase);
-		strOutputFilename = std::tr1::regex_replace(m_FullFilenameList.front(),
+		strOutputFilename = std::regex_replace(m_FullFilenameList.front(),
 			rxPattern,std::wstring(_T("")));
 	}
 	else

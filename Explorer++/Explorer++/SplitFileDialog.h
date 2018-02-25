@@ -123,7 +123,7 @@ private:
 	bool			m_bSplittingFile;
 	bool			m_bStopSplitting;
 
-	std::tr1::unordered_map<int,SizeType_t>	m_SizeMap;
+	std::unordered_map<int,SizeType_t>	m_SizeMap;
 
 	CSplitFile		*m_pSplitFile;
 	HFONT			m_hHelperTextFont;

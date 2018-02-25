@@ -91,7 +91,7 @@ private:
 	std::list<Column_t>	*m_pNetworkConnectionsColumnList;
 	std::list<Column_t>	*m_pMyNetworkPlacesColumnList;
 
-	std::tr1::unordered_map<int,FolderType_t>	m_FolderMap;
+	std::unordered_map<int,FolderType_t>	m_FolderMap;
 	FolderType_t		m_PreviousFolderType;
 
 	HICON				m_hDialogIcon;

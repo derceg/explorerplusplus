@@ -113,16 +113,16 @@ INT_PTR CSplitFileDialog::OnInitDialog()
 
 	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_BYTES,szTemp,SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
-	m_SizeMap.insert(std::tr1::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_BYTES));
+	m_SizeMap.insert(std::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_BYTES));
 	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_KB,szTemp,SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
-	m_SizeMap.insert(std::tr1::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_KB));
+	m_SizeMap.insert(std::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_KB));
 	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_MB,szTemp,SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
-	m_SizeMap.insert(std::tr1::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_MB));
+	m_SizeMap.insert(std::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_MB));
 	LoadString(GetInstance(),IDS_SPLIT_FILE_SIZE_GB,szTemp,SIZEOF_ARRAY(szTemp));
 	iPos = static_cast<int>(SendMessage(hComboBox,CB_INSERTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(szTemp)));
-	m_SizeMap.insert(std::tr1::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_GB));
+	m_SizeMap.insert(std::unordered_map<int,SizeType_t>::value_type(iPos,SIZE_TYPE_GB));
 
 	SendMessage(hComboBox,CB_SELECTSTRING,static_cast<WPARAM>(-1),reinterpret_cast<LPARAM>(m_psfdps->m_strSplitGroup.c_str()));
 
