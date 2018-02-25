@@ -45,7 +45,7 @@ typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(
 BOOL ProcessCommandLine(TCHAR *pCommandLine);
 void ShowUsage(void);
 void ClearRegistrySettings(void);
-ATOM RegisterMainWindowClass(void);
+ATOM RegisterMainWindowClass(HINSTANCE hInstance);
 LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInfo);
 
 DWORD dwControlClasses = ICC_BAR_CLASSES|ICC_COOL_CLASSES|
