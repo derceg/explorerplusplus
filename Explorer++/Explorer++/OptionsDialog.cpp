@@ -221,19 +221,6 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 				}
 				CheckDlgButton(hDlg,nIDButton,BST_CHECKED);
 
-				/* If we're running on Windows XP, stop the user
-				from selecting the 'Replace Explorer for all
-				folders' option. */
-				if(m_dwMajorVersion == WINDOWS_XP_MAJORVERSION)
-				{
-					EnableWindow(GetDlgItem(hDlg,IDC_OPTION_REPLACEEXPLORER_ALL),FALSE);
-
-					if(m_ReplaceExplorerMode == NDefaultFileManager::REPLACEEXPLORER_ALL)
-					{
-						m_ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
-					}
-				}
-
 				switch(m_ReplaceExplorerMode)
 				{
 				case NDefaultFileManager::REPLACEEXPLORER_NONE:

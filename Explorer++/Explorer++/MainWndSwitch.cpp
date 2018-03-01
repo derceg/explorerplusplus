@@ -1522,27 +1522,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 			return OnListViewEndLabelEdit(lParam);
 			break;
 
-		case LVN_ENDSCROLL:
-			{
-				/* There's a bug within Windows XP that causes gridlines
-				within a listview to draw incorrectly. See references to
-				KB813791. */
-				if(m_dwMajorVersion == WINDOWS_XP_MAJORVERSION)
-				{
-					UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
-
-					DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(m_hActiveListView);
-
-					if((uViewMode == VM_DETAILS) &&
-						(dwExtendedStyle & LVS_EX_GRIDLINES))
-					{
-						InvalidateRect(m_hActiveListView,NULL,TRUE);
-						UpdateWindow(m_hActiveListView);
-					}
-				}
-			}
-			break;
-
 		case LVN_GETDISPINFO:
 			OnListViewGetDisplayInfo(lParam);
 			break;

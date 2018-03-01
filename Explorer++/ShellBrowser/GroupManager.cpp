@@ -378,17 +378,14 @@ PFNLVGROUPCOMPARE pfnGroupCompare)
 			iGroupId = itr->iGroupId;
 			itr->nItems++;
 
-			if(m_dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
-			{
-				StringCchPrintf(wszHeader,SIZEOF_ARRAY(wszHeader),
-					_T("%s (%d)"),szGroupHeader,itr->nItems);
+			StringCchPrintf(wszHeader, SIZEOF_ARRAY(wszHeader),
+				_T("%s (%d)"), szGroupHeader, itr->nItems);
 
-				lvGroup.cbSize		= sizeof(LVGROUP);
-				lvGroup.mask		= LVGF_HEADER;
-				lvGroup.pszHeader	= wszHeader;
+			lvGroup.cbSize = sizeof(LVGROUP);
+			lvGroup.mask = LVGF_HEADER;
+			lvGroup.pszHeader = wszHeader;
 
-				ListView_SetGroupInfo(m_hListView,iGroupId,&lvGroup);
-			}
+			ListView_SetGroupInfo(m_hListView, iGroupId, &lvGroup);
 
 			break;
 		}
@@ -404,39 +401,16 @@ PFNLVGROUPCOMPARE pfnGroupCompare)
 		TypeGroup.nItems = 1;
 		m_GroupList.push_back(TypeGroup);
 
-		if(m_dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
-		{
-			StringCchPrintf(wszHeader,SIZEOF_ARRAY(wszHeader),
-				_T("%s (%d)"),szGroupHeader,TypeGroup.nItems);
-		}
-		else if(m_dwMajorVersion >= WINDOWS_XP_MAJORVERSION)
-		{
-			StringCchPrintf(wszHeader,SIZEOF_ARRAY(wszHeader),
-				_T("%s"),szGroupHeader);
-		}
+		StringCchPrintf(wszHeader, SIZEOF_ARRAY(wszHeader),
+			_T("%s (%d)"), szGroupHeader, TypeGroup.nItems);
 
 		/* The group is not in the listview, so insert it in. */
 		lvigs.lvGroup.cbSize	= sizeof(LVGROUP);
-		lvigs.lvGroup.mask		= LVGF_HEADER|LVGF_GROUPID;
+		lvigs.lvGroup.mask		= LVGF_HEADER | LVGF_GROUPID | LVGF_STATE;
+		lvigs.lvGroup.state		= LVGS_COLLAPSIBLE;
 		lvigs.lvGroup.pszHeader	= wszHeader;
 		lvigs.lvGroup.iGroupId	= iGroupId;
 		lvigs.lvGroup.stateMask	= 0;
-
-		OSVERSIONINFO vi;
-
-		vi.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
-
-		if(GetVersionEx(&vi) != 0)
-		{
-			/* LVGS_COLLAPSIBLE is only valid on Windows Vista
-			and later. */
-			if(vi.dwMajorVersion > WINDOWS_XP_MAJORVERSION)
-			{
-				lvigs.lvGroup.mask	|= LVGF_STATE;
-				lvigs.lvGroup.state	= LVGS_COLLAPSIBLE;
-			}
-		}
-
 		lvigs.pfnGroupCompare = (PFNLVGROUPCOMPARE)pfnGroupCompare;
 		lvigs.pvData = NULL;
 

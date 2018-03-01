@@ -334,12 +334,12 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 	if(GetVersionEx(&VersionInfo) != 0)
 	{
-		/* Are we running on at least Windows XP?
+		/* Are we running on at least Windows Vista?
 		If not, show an error message and exit. */
-		if(VersionInfo.dwMajorVersion < WINDOWS_XP_MAJORVERSION)
+		if(VersionInfo.dwMajorVersion < WINDOWS_VISTA_SEVEN_MAJORVERSION)
 		{
 			MessageBox(NULL,
-				_T("This application needs at least Windows XP or above to run properly."),
+				_T("This application needs at least Windows Vista or above to run properly."),
 				NExplorerplusplus::APP_NAME,MB_ICONERROR | MB_OK);
 
 			return 0;
@@ -418,28 +418,20 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 					}
 					else
 					{
-						VersionInfo.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
+						LPITEMIDLIST pidlControlPanelCategory = NULL;
 
-						if(GetVersionEx(&VersionInfo) != 0)
+						hr = GetIdlFromParsingName(CONTROL_PANEL_CATEGORY_VIEW,
+							&pidlControlPanelCategory);
+
+						if (SUCCEEDED(hr))
 						{
-							if(VersionInfo.dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
+							if (ILIsParent(pidlControlPanelCategory, pidl, FALSE) &&
+								!CompareIdls(pidlControlPanelCategory, pidl))
 							{
-								LPITEMIDLIST pidlControlPanelCategory = NULL;
-
-								hr = GetIdlFromParsingName(CONTROL_PANEL_CATEGORY_VIEW,
-									&pidlControlPanelCategory);
-
-								if(SUCCEEDED(hr))
-								{
-									if(ILIsParent(pidlControlPanelCategory,pidl,FALSE) &&
-										!CompareIdls(pidlControlPanelCategory,pidl))
-									{
-										bControlPanelChild = TRUE;
-									}
-
-									CoTaskMemFree(pidlControlPanelCategory);
-								}
+								bControlPanelChild = TRUE;
 							}
+
+							CoTaskMemFree(pidlControlPanelCategory);
 						}
 					}
 

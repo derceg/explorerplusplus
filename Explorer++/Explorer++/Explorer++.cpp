@@ -109,63 +109,39 @@ m_hContainer(hwnd)
 	m_iCutTabInternal		= 0;
 	m_hCutTreeViewItem		= NULL;
 
-	/* View modes. */
-	OSVERSIONINFO VersionInfo;
 	ViewMode_t ViewMode;
 
+	ViewMode.uViewMode = VM_EXTRALARGEICONS;
+	m_ViewModes.push_back(ViewMode);
+
+	ViewMode.uViewMode = VM_LARGEICONS;
+	m_ViewModes.push_back(ViewMode);
+
+	ViewMode.uViewMode = VM_ICONS;
+	m_ViewModes.push_back(ViewMode);
+
+	ViewMode.uViewMode = VM_SMALLICONS;
+	m_ViewModes.push_back(ViewMode);
+
+	ViewMode.uViewMode = VM_LIST;
+	m_ViewModes.push_back(ViewMode);
+
+	ViewMode.uViewMode = VM_DETAILS;
+	m_ViewModes.push_back(ViewMode);
+
+	ViewMode.uViewMode = VM_THUMBNAILS;
+	m_ViewModes.push_back(ViewMode);
+
+	ViewMode.uViewMode = VM_TILES;
+	m_ViewModes.push_back(ViewMode);
+
+	OSVERSIONINFO VersionInfo;
 	VersionInfo.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
 
 	if(GetVersionEx(&VersionInfo) != 0)
 	{
 		m_dwMajorVersion = VersionInfo.dwMajorVersion;
 		m_dwMinorVersion = VersionInfo.dwMinorVersion;
-
-		if(VersionInfo.dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
-		{
-			ViewMode.uViewMode = VM_EXTRALARGEICONS;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_LARGEICONS;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_ICONS;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_SMALLICONS;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_LIST;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_DETAILS;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_THUMBNAILS;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_TILES;
-			m_ViewModes.push_back(ViewMode);
-		}
-		else
-		{
-			ViewMode.uViewMode = VM_THUMBNAILS;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_TILES;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_ICONS;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_SMALLICONS;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_LIST;
-			m_ViewModes.push_back(ViewMode);
-
-			ViewMode.uViewMode = VM_DETAILS;
-			m_ViewModes.push_back(ViewMode);
-		}
 	}
 }
 

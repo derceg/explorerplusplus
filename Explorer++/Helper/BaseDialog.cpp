@@ -108,26 +108,6 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 		}
 		break;
 
-	case WM_NOTIFY:
-		switch(reinterpret_cast<NMHDR *>(lParam)->code)
-		{
-		case LVN_ENDSCROLL:
-			{
-				OSVERSIONINFO VersionInfo;
-				VersionInfo.dwOSVersionInfoSize	= sizeof(VersionInfo);
-				GetVersionEx(&VersionInfo);
-
-				/* Automatic fix for KB813791 (gridlines draw incorrectly on Windows XP). */
-				if(VersionInfo.dwMajorVersion == WINDOWS_XP_MAJORVERSION)
-				{
-					InvalidateRect(reinterpret_cast<NMHDR *>(lParam)->hwndFrom,NULL,TRUE);
-					UpdateWindow(reinterpret_cast<NMHDR *>(lParam)->hwndFrom);
-				}
-			}
-			break;
-		}
-		break;
-
 	case WM_SIZE:
 		if(m_bResizable)
 		{

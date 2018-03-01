@@ -184,25 +184,22 @@ void Explorerplusplus::OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL b
 	 - Category View:
 	   ::{26EE0668-A00A-44D7-9371-BEB064C98683} (Vista and Win 7)
 	*/
-	if(m_dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
+	if (!bControlPanelParent)
 	{
-		if(!bControlPanelParent)
+		hr = GetIdlFromParsingName(CONTROL_PANEL_CATEGORY_VIEW, &pidlControlPanel);
+
+		if (SUCCEEDED(hr))
 		{
-			hr = GetIdlFromParsingName(CONTROL_PANEL_CATEGORY_VIEW,&pidlControlPanel);
-
-			if(SUCCEEDED(hr))
+			/* Check if the parent of the item is the control panel.
+			If it is, pass it to the shell to open, rather than
+			opening it in-place. */
+			if (ILIsParent(pidlControlPanel, pidlItem, FALSE) &&
+				!CompareIdls(pidlControlPanel, pidlItem))
 			{
-				/* Check if the parent of the item is the control panel.
-				If it is, pass it to the shell to open, rather than
-				opening it in-place. */
-				if(ILIsParent(pidlControlPanel,pidlItem,FALSE) &&
-					!CompareIdls(pidlControlPanel,pidlItem))
-				{
-					bControlPanelParent = TRUE;
-				}
-
-				CoTaskMemFree(pidlControlPanel);
+				bControlPanelParent = TRUE;
 			}
+
+			CoTaskMemFree(pidlControlPanel);
 		}
 	}
 
@@ -1671,10 +1668,7 @@ int Explorerplusplus::GetViewModeMenuStringId(UINT uViewMode)
 			break;
 
 		case VM_ICONS:
-			if(m_dwMajorVersion >= WINDOWS_VISTA_SEVEN_MAJORVERSION)
-				return IDS_VIEW_MEDIUMICONS;
-			else if(m_dwMajorVersion >= WINDOWS_XP_MAJORVERSION)
-				return IDS_VIEW_ICONS;
+			return IDS_VIEW_MEDIUMICONS;
 			break;
 
 		case VM_SMALLICONS:

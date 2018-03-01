@@ -84,14 +84,6 @@ m_hFolderSizeThread(hFolderSizeThread)
 
 	AllocateInitialItemMemory();
 
-	OSVERSIONINFO VersionInfo;
-	VersionInfo.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
-
-	if(GetVersionEx(&VersionInfo) != 0)
-	{
-		m_dwMajorVersion = VersionInfo.dwMajorVersion;
-	}
-
 	m_pPathManager			= new CPathManager();
 
 	m_SortMode				= FSM_NAME;

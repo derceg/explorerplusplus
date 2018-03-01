@@ -66,22 +66,6 @@ BOOL NDefaultFileManager::SetAsDefaultFileManagerAll(const TCHAR *szInternalComm
 BOOL NDefaultFileManagerInternal::SetAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t ReplacementType,
 	const TCHAR *szInternalCommand, const TCHAR *szMenuText)
 {
-	OSVERSIONINFO osvi;
-	osvi.dwOSVersionInfoSize = sizeof(osvi);
-
-	BOOL bRet = GetVersionEx(&osvi);
-
-	if(!bRet)
-	{
-		return FALSE;
-	}
-
-	if(osvi.dwMajorVersion == WINDOWS_XP_MAJORVERSION &&
-		ReplacementType == NDefaultFileManager::REPLACEEXPLORER_ALL)
-	{
-		return FALSE;
-	}
-
 	const TCHAR *pszSubKey = NULL;
 
 	switch(ReplacementType)
@@ -179,22 +163,6 @@ BOOL NDefaultFileManager::RemoveAsDefaultFileManagerAll(const TCHAR *szInternalC
 BOOL NDefaultFileManagerInternal::RemoveAsDefaultFileManagerInternal(NDefaultFileManager::ReplaceExplorerModes_t ReplacementType,
 	const TCHAR *szInternalCommand)
 {
-	OSVERSIONINFO osvi;
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-	BOOL bRet = GetVersionEx(&osvi);
-
-	if(!bRet)
-	{
-		return FALSE;
-	}
-
-	if(osvi.dwMajorVersion == WINDOWS_XP_MAJORVERSION &&
-		ReplacementType == NDefaultFileManager::REPLACEEXPLORER_ALL)
-	{
-		return FALSE;
-	}
-
 	const TCHAR *pszSubKey = NULL;
 	const TCHAR *pszDefaultValue = NULL;
 

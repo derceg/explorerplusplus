@@ -749,7 +749,6 @@ private:
 	TCHAR				m_CurDir[MAX_PATH];
 	ULARGE_INTEGER		m_ulTotalDirSize;
 	ULARGE_INTEGER		m_ulFileSelectionSize;
-	DWORD				m_dwMajorVersion;
 	UINT				m_SortMode;
 	UINT				m_ViewMode;
 	BOOL				m_bVirtualFolder;

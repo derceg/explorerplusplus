@@ -8,7 +8,6 @@
 /* Major version numbers for various versions of
 Windows. */
 const int WINDOWS_VISTA_SEVEN_MAJORVERSION = 6;
-const int WINDOWS_XP_MAJORVERSION = 5;
 
 struct LangAndCodePage
 {
