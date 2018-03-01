@@ -30,19 +30,6 @@ CHolderWindow::CHolderWindow(HWND hHolder)
 {
 	m_hHolder = hHolder;
 	m_bHolderResizing	= FALSE;
-
-	OSVERSIONINFO VersionInfo;
-
-	VersionInfo.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
-
-	/* Need the OS version (for retrieving the nonclient
-	text used to draw the window header). See the documentation
-	for NONCLIENTMETRICS. ONLY NEEDED WHEN COMPILING FOR
-	VISTA OR LATER (i.e. WINVER >= 0x0600). */
-	if(GetVersionEx(&VersionInfo) != 0)
-	{
-		m_dwMajorVersion = VersionInfo.dwMajorVersion;
-	}
 }
 
 CHolderWindow::~CHolderWindow()

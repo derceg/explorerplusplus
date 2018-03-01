@@ -22,6 +22,5 @@ private:
 
 
 	HWND	m_hHolder;
-	DWORD	m_dwMajorVersion;
 	BOOL	m_bHolderResizing;
 };
