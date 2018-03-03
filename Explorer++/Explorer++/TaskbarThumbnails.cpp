@@ -28,7 +28,6 @@ namespace
 	LRESULT CALLBACK MainWndProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 	LRESULT CALLBACK TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
-	typedef BOOL (WINAPI *ChangeWindowMessageFilterProc)(UINT message,DWORD dwFlag);
 	typedef HRESULT (STDAPICALLTYPE *DwmSetWindowAttributeProc)(HWND hwnd,DWORD dwAttribute,LPCVOID pvAttribute,DWORD cbAttribute);
 	typedef HRESULT (STDAPICALLTYPE *DwmSetIconicThumbnailProc)(HWND hwnd,HBITMAP hbmp,DWORD dwSITFlags);
 	typedef HRESULT (STDAPICALLTYPE *DwmSetIconicLivePreviewBitmapProc)(HWND hwnd,HBITMAP hbmp,POINT *pptClient,DWORD dwSITFlags);
@@ -64,23 +63,9 @@ void Explorerplusplus::InitializeTaskbarThumbnails()
 
 	m_uTaskbarButtonCreatedMessage = RegisterWindowMessage(_T("TaskbarButtonCreated"));
 
-	HMODULE hUser32 = LoadLibrary(_T("user32.dll"));
-
-	if(hUser32 != NULL)
-	{
-		/* If directly targeting Windows 7, this can be switched
-		to static, rather than dynamic linking. */
-		ChangeWindowMessageFilterProc ChangeWindowMessageFilter = (ChangeWindowMessageFilterProc)GetProcAddress(hUser32,"ChangeWindowMessageFilter");
-
-		if(ChangeWindowMessageFilter != NULL)
-		{
-			ChangeWindowMessageFilter(m_uTaskbarButtonCreatedMessage,MSGFLT_ADD);
-			ChangeWindowMessageFilter(WM_DWMSENDICONICTHUMBNAIL,MSGFLT_ADD);
-			ChangeWindowMessageFilter(WM_DWMSENDICONICLIVEPREVIEWBITMAP,MSGFLT_ADD);
-		}
-
-		FreeLibrary(hUser32);
-	}
+	ChangeWindowMessageFilter(m_uTaskbarButtonCreatedMessage, MSGFLT_ADD);
+	ChangeWindowMessageFilter(WM_DWMSENDICONICTHUMBNAIL, MSGFLT_ADD);
+	ChangeWindowMessageFilter(WM_DWMSENDICONICLIVEPREVIEWBITMAP, MSGFLT_ADD);
 
 	/* Subclass the main window until the above message (TaskbarButtonCreated) is caught. */
 	SetWindowSubclass(m_hContainer,MainWndProcStub,0,reinterpret_cast<DWORD_PTR>(this));
