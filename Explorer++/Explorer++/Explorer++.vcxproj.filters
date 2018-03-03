@@ -55,9 +55,6 @@
     <ClCompile Include="iServiceProvider.cpp">
       <Filter>Context Menu Support\New Menu</Filter>
     </ClCompile>
-    <ClCompile Include="iShellView2.cpp">
-      <Filter>Context Menu Support\New Menu</Filter>
-    </ClCompile>
     <ClCompile Include="LoggingFrontend.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
@@ -283,9 +280,6 @@
       <Filter>Context Menu Support\New Menu</Filter>
     </ClInclude>
     <ClInclude Include="iServiceProvider.h">
-      <Filter>Context Menu Support\New Menu</Filter>
-    </ClInclude>
-    <ClInclude Include="iShellView2.h">
       <Filter>Context Menu Support\New Menu</Filter>
     </ClInclude>
     <ClInclude Include="IModelessDialogNotification.h">

@@ -308,7 +308,6 @@
     <ClCompile Include="INewMenuClient.cpp" />
     <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="iServiceProvider.cpp" />
-    <ClCompile Include="iShellView2.cpp" />
     <ClCompile Include="Language.cpp" />
     <ClCompile Include="ListViewEdit.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
@@ -387,7 +386,6 @@
     <ClInclude Include="IModelessDialogNotification.h" />
     <ClInclude Include="INewMenuClient.h" />
     <ClInclude Include="iServiceProvider.h" />
-    <ClInclude Include="iShellView2.h" />
     <ClInclude Include="ListViewEdit.h" />
     <ClInclude Include="LoggingFrontend.h" />
     <ClInclude Include="MainImages.h" />

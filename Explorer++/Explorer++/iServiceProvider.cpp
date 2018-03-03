@@ -13,7 +13,6 @@
 
 #include "stdafx.h"
 #include "iServiceProvider.h"
-#include "iShellView2.h"
 #include "INewMenuClient.h"
 
 
@@ -82,11 +81,7 @@ HRESULT CServiceProvider::QueryService(REFGUID guidService,REFIID riid,void **pp
 
 	*ppv = NULL;
 
-	if(riid == IID_IShellView2)
-	{
-		*ppv = new CShellView2(m_pexpp);
-	}
-	else if(riid == IID_INewMenuClient)
+	if(riid == IID_INewMenuClient)
 	{
 		*ppv = new CNewMenuClient(m_pexpp);
 	}
