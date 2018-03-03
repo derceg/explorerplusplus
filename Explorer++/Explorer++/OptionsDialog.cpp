@@ -1104,7 +1104,7 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 				for each(auto ViewMode in m_ViewModes)
 				{
-					int StringID = GetViewModeMenuStringId(ViewMode.uViewMode);
+					int StringID = GetViewModeMenuStringId(ViewMode);
 
 					TCHAR szTemp[64];
 					LoadString(m_hLanguageModule,StringID,szTemp,SIZEOF_ARRAY(szTemp));
@@ -1113,10 +1113,10 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 					if(Index != CB_ERR)
 					{
-						SendMessage(hComboBox,CB_SETITEMDATA,Index,ViewMode.uViewMode);
+						SendMessage(hComboBox,CB_SETITEMDATA,Index,ViewMode);
 					}
 
-					if(ViewMode.uViewMode == m_ViewModeGlobal)
+					if(ViewMode == m_ViewModeGlobal)
 					{
 						SelectedIndex = Index;
 					}

@@ -1066,12 +1066,12 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 	for each(auto ViewMode in m_ViewModes)
 	{
 		TCHAR szTemp[64];
-		LoadString(m_hLanguageModule,GetViewModeMenuStringId(ViewMode.uViewMode),
+		LoadString(m_hLanguageModule,GetViewModeMenuStringId(ViewMode),
 			szTemp,SIZEOF_ARRAY(szTemp));
 
 		mii.cbSize		= sizeof(mii);
 		mii.fMask		= MIIM_ID|MIIM_STRING;
-		mii.wID			= GetViewModeMenuId(ViewMode.uViewMode);
+		mii.wID			= GetViewModeMenuId(ViewMode);
 		mii.dwTypeData	= szTemp;
 		InsertMenuItem(hMenu,IDM_RCLICK_VIEW_PLACEHOLDER,FALSE,&mii);
 	}

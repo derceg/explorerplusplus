@@ -123,13 +123,6 @@ private:
 		INFOTIP_CUSTOM	= 1
 	};
 
-	/* Describes the view modes and their order
-	(as they differ on Windows XP and Vista/7). */
-	struct ViewMode_t
-	{
-		UINT uViewMode;
-	};
-
 	struct ArrangeMenuItem_t
 	{
 		UINT SortById;
@@ -847,7 +840,7 @@ private:
 	ULONG					m_SHChangeNotifyID;
 	bool					m_InitializationFinished;
 
-	std::list<ViewMode_t>	m_ViewModes;
+	std::list<UINT>			m_ViewModes;
 
 	/* Initialization. */
 	BOOL					m_bLoadSettingsFromXML;

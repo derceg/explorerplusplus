@@ -109,31 +109,14 @@ m_hContainer(hwnd)
 	m_iCutTabInternal		= 0;
 	m_hCutTreeViewItem		= NULL;
 
-	ViewMode_t ViewMode;
-
-	ViewMode.uViewMode = VM_EXTRALARGEICONS;
-	m_ViewModes.push_back(ViewMode);
-
-	ViewMode.uViewMode = VM_LARGEICONS;
-	m_ViewModes.push_back(ViewMode);
-
-	ViewMode.uViewMode = VM_ICONS;
-	m_ViewModes.push_back(ViewMode);
-
-	ViewMode.uViewMode = VM_SMALLICONS;
-	m_ViewModes.push_back(ViewMode);
-
-	ViewMode.uViewMode = VM_LIST;
-	m_ViewModes.push_back(ViewMode);
-
-	ViewMode.uViewMode = VM_DETAILS;
-	m_ViewModes.push_back(ViewMode);
-
-	ViewMode.uViewMode = VM_THUMBNAILS;
-	m_ViewModes.push_back(ViewMode);
-
-	ViewMode.uViewMode = VM_TILES;
-	m_ViewModes.push_back(ViewMode);
+	m_ViewModes.push_back(VM_EXTRALARGEICONS);
+	m_ViewModes.push_back(VM_LARGEICONS);
+	m_ViewModes.push_back(VM_ICONS);
+	m_ViewModes.push_back(VM_SMALLICONS);
+	m_ViewModes.push_back(VM_LIST);
+	m_ViewModes.push_back(VM_DETAILS);
+	m_ViewModes.push_back(VM_THUMBNAILS);
+	m_ViewModes.push_back(VM_TILES);
 }
 
 Explorerplusplus::~Explorerplusplus()
