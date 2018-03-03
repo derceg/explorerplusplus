@@ -4,9 +4,6 @@
  * File: Settings.cpp
  * License: GPL - See LICENSE in the top level directory
  *
- * Explorer++ is an Explorer-like file manager for
- * Windows XP, Vista and 7.
- *
  * This is the main module for Explorer++. Handles startup.
  *
  * Written by David Erceg
