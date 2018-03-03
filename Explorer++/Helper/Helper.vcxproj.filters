@@ -231,6 +231,9 @@
     <ClInclude Include="UniqueHandle.h">
       <Filter>Resource Wrappers</Filter>
     </ClInclude>
+    <ClInclude Include="..\targetver.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">

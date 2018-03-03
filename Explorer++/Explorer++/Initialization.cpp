@@ -146,8 +146,7 @@ void Explorerplusplus::OnCreate(void)
 	Windows 7, so we'll set the internal setting to
 	false if we're running on an earlier version
 	of Windows. */
-	if(!(m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
-		m_dwMinorVersion >= 1))
+	if(!IsWindows7OrGreater())
 	{
 		m_bShowTaskbarThumbnails = FALSE;
 	}

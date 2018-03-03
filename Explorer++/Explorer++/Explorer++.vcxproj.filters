@@ -369,6 +369,9 @@
     <ClInclude Include="BookmarkTreeView.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
+    <ClInclude Include="..\targetver.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

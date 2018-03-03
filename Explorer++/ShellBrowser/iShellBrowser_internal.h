@@ -9,11 +9,6 @@
 #define MEM_ALLOCATION_LEVEL_LOW	1000
 #define MEM_ALLOCATION_LEVEL_MEDIUM	5000
 
-/* This is only defined for Windows Vista and later.
-If building for XP as well, this definition will
-need to be included here. */
-#define SHIL_JUMBO	0x4
-
 #define THUMBNAIL_TYPE_ICON			0
 #define THUMBNAIL_TYPE_EXTRACTED	1
 

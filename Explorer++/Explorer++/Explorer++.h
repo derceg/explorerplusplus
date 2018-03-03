@@ -833,8 +833,6 @@ private:
 	TCHAR					m_DefaultTabDirectory[MAX_PATH];
 	TCHAR					m_OldTreeViewFileName[MAX_PATH];
 	DWORD					m_Language;
-	DWORD					m_dwMajorVersion;
-	DWORD					m_dwMinorVersion;
 	LONG					m_DisplayWindowHeight;
 	BOOL					m_bTreeViewRightClick;
 	BOOL					m_bSelectingTreeViewDirectory;

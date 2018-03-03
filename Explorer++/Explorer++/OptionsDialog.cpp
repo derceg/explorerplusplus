@@ -973,8 +973,7 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 	{
 		case WM_INITDIALOG:
 			{
-				if(!(m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
-					m_dwMinorVersion >= 1))
+				if(!IsWindows7OrGreater())
 				{
 					EnableWindow(GetDlgItem(hDlg,IDC_TABS_TASKBARTHUMBNAILS),FALSE);
 

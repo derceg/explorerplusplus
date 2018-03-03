@@ -323,27 +323,19 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	HMODULE			hRichEditLib;
 	HWND			hwnd;
 	HACCEL			hAccl;
-	OSVERSIONINFO	VersionInfo;
 	HANDLE			hMutex = NULL;
 	TCHAR			*pCommandLine	= NULL;
 	MSG				msg;
 	LONG			res;
 	BOOL			bExit = FALSE;
 
-	VersionInfo.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
-
-	if(GetVersionEx(&VersionInfo) != 0)
+	if (!IsWindowsVistaOrGreater())
 	{
-		/* Are we running on at least Windows Vista?
-		If not, show an error message and exit. */
-		if(VersionInfo.dwMajorVersion < WINDOWS_VISTA_SEVEN_MAJORVERSION)
-		{
-			MessageBox(NULL,
-				_T("This application needs at least Windows Vista or above to run properly."),
-				NExplorerplusplus::APP_NAME,MB_ICONERROR | MB_OK);
+		MessageBox(NULL,
+			_T("This application needs at least Windows Vista or above to run properly."),
+			NExplorerplusplus::APP_NAME, MB_ICONERROR | MB_OK);
 
-			return 0;
-		}
+		return 0;
 	}
 
 	/* Initialize OLE, as well as the various window classes that

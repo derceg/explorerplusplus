@@ -42,20 +42,17 @@ namespace
 
 	/* These definitions are needed to target
 	Windows 7 specific features, while remaining
-	compliant with XP and Vista. They are copied
-	directly from the appropriate header file. */
+	compliant with Vista. They are copied directly
+	from the appropriate header file. */
 	static const UINT WM_DWMSENDICONICTHUMBNAIL = 0x0323;
 	static const UINT WM_DWMSENDICONICLIVEPREVIEWBITMAP = 0x0326;
-	static const UINT MSGFLT_ADD = 1;
 }
 
 void Explorerplusplus::InitializeTaskbarThumbnails()
 {
 	m_bTaskbarInitialised = FALSE;
 
-	if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
-		m_dwMinorVersion == 0) ||
-		m_dwMajorVersion < WINDOWS_VISTA_SEVEN_MAJORVERSION)
+	if(!IsWindows7OrGreater())
 	{
 		return;
 	}
@@ -197,9 +194,7 @@ void Explorerplusplus::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 
 	/* If we're not running on Windows 7 or later, return without
 	doing anything. */
-	if((m_dwMajorVersion == WINDOWS_VISTA_SEVEN_MAJORVERSION &&
-		m_dwMinorVersion == 0) ||
-		m_dwMajorVersion < WINDOWS_VISTA_SEVEN_MAJORVERSION)
+	if(!IsWindows7OrGreater())
 	{
 		return;
 	}

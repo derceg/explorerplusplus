@@ -134,15 +134,6 @@ m_hContainer(hwnd)
 
 	ViewMode.uViewMode = VM_TILES;
 	m_ViewModes.push_back(ViewMode);
-
-	OSVERSIONINFO VersionInfo;
-	VersionInfo.dwOSVersionInfoSize	= sizeof(OSVERSIONINFO);
-
-	if(GetVersionEx(&VersionInfo) != 0)
-	{
-		m_dwMajorVersion = VersionInfo.dwMajorVersion;
-		m_dwMinorVersion = VersionInfo.dwMinorVersion;
-	}
 }
 
 Explorerplusplus::~Explorerplusplus()
