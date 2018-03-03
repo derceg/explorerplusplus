@@ -240,9 +240,6 @@
     <ClInclude Include="AboutDialog.h">
       <Filter>General Dialogs</Filter>
     </ClInclude>
-    <ClInclude Include="BoostCheck.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="DestroyFilesDialog.h">
       <Filter>General Dialogs</Filter>
     </ClInclude>
@@ -421,6 +418,7 @@
     <None Include="Version.h">
       <Filter>Core</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource Files">

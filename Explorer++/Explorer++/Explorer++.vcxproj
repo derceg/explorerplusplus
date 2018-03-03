@@ -117,7 +117,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(BOOST);$(STLSOFT)\include;$(PANTHEIOS)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(STLSOFT)\include;$(PANTHEIOS)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0c09</Culture>
@@ -169,7 +169,7 @@
       <WarningLevel>Level4</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <CallingConvention>Cdecl</CallingConvention>
-      <AdditionalIncludeDirectories>$(BOOST);$(STLSOFT)\include;$(PANTHEIOS)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(STLSOFT)\include;$(PANTHEIOS)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0c09</Culture>
@@ -211,7 +211,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(BOOST);$(STLSOFT)\include;$(PANTHEIOS)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(STLSOFT)\include;$(PANTHEIOS)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
@@ -252,7 +252,7 @@
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>$(BOOST);$(STLSOFT)\include;$(PANTHEIOS)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(STLSOFT)\include;$(PANTHEIOS)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <ResourceOutputFileName>$(IntDir)Explorer++Main.res</ResourceOutputFileName>
@@ -366,7 +366,6 @@
     <ClInclude Include="BookmarkListView.h" />
     <ClInclude Include="BookmarksToolbar.h" />
     <ClInclude Include="BookmarkTreeView.h" />
-    <ClInclude Include="BoostCheck.h" />
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="ColorRuleHelper.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />
@@ -412,6 +411,7 @@
     <ClInclude Include="XMLSettings.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="res\About Image.bmp" />
     <None Include="res\Display Window.ico" />
     <None Include="res\Explorer++ Small.ico" />
@@ -474,10 +474,17 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\boost.1.60.0.0\build\native\boost.targets" Condition="Exists('..\packages\boost.1.60.0.0\build\native\boost.targets')" />
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties RESOURCE_FILE="Explorer++.rc" />
     </VisualStudio>
   </ProjectExtensions>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\boost.1.60.0.0\build\native\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost.1.60.0.0\build\native\boost.targets'))" />
+  </Target>
 </Project>

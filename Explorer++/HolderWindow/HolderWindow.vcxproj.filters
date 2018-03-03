@@ -33,4 +33,7 @@
       <UniqueIdentifier>{add27810-c45f-4091-a7b5-30d61e001ed7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>

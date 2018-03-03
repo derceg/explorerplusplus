@@ -2,7 +2,6 @@
 
 #include <unordered_map>
 #include "Explorer++_internal.h"
-#include "BoostCheck.h"
 #include "BookmarkHelper.h"
 #include "BookmarksToolbar.h"
 #include "DrivesToolbar.h"

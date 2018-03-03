@@ -264,4 +264,7 @@
       <UniqueIdentifier>{343c29c4-2960-44de-8115-240e788f10a5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
 </Project>
