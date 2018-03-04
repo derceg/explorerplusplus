@@ -489,9 +489,9 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 				{
 					hr = DwmSetIconicThumbnail(hwnd,hbmThumbnail,0);
 				}
-			}
 
-			FreeLibrary(hDwmapi);
+				FreeLibrary(hDwmapi);
+			}
 
 			/* Delete the thumbnail bitmap. */
 			DeleteObject(hbmTab);
@@ -532,9 +532,9 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 				{
 					DwmSetIconicLivePreviewBitmap(hwnd,tpi.hbm,&tpi.ptOrigin,0);
 				}
-			}
 
-			FreeLibrary(hDwmapi);
+				FreeLibrary(hDwmapi);
+			}
 
 			if(tpi.hbm != NULL)
 			{
