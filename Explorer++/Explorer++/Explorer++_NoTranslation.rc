@@ -26,6 +26,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 
 1                       RT_MANIFEST             "Explorer++.exe.manifest"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Icon
@@ -34,8 +35,9 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_MAIN                ICON                    "res\\Explorer++.ico"
+
 IDI_DISPLAYWINDOW       ICON                    "res\\Display Window.ico"
-IDI_MAIN_SMALL          ICON                    "res\\Explorer++ Small.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -43,13 +45,21 @@ IDI_MAIN_SMALL          ICON                    "res\\Explorer++ Small.ico"
 //
 
 IDB_TABTOOLBAR_CLOSE    BITMAP                  "res\\Tab Close.bmp"
+
 IDB_SHELLIMAGES         BITMAP                  "res\\Shell Images.bmp"
+
 IDB_FILTERINGAPPLIED    BITMAP                  "res\\Filtering Applied.bmp"
+
 IDB_FOLDEREMPTY         BITMAP                  "res\\Folder Empty.bmp"
+
 IDB_FOLDERLOCKED        BITMAP                  "res\\Folder Locked.bmp"
+
 IDB_ABOUT               BITMAP                  "res\\About Image.bmp"
+
 IDB_NOPREVIEWAVAILABLE  BITMAP                  "res\\No Preview Available.bmp"
+
 IDB_SHELLIMAGES_LARGE   BITMAP                  "res\\Shell Images Large.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -147,6 +157,7 @@ END
 //
 
 IDR_WAVE_NAVIGATIONSTART WAVE                    "res\\Navigation Start.wav"
+
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 

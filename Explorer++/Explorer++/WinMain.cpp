@@ -247,8 +247,8 @@ ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 	wcex.cbClsExtra		= 0;
 	wcex.cbWndExtra		= sizeof(Explorerplusplus *);
 	wcex.hInstance		= hInstance;
-	wcex.hIcon			= (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,48,48,LR_VGACOLOR);
-	wcex.hIconSm		= (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MAIN_SMALL),IMAGE_ICON,16,16,LR_VGACOLOR);
+	wcex.hIcon			= (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,GetSystemMetrics(SM_CXICON),GetSystemMetrics(SM_CYICON),LR_DEFAULTCOLOR);
+	wcex.hIconSm		= (HICON)LoadImage(hInstance,MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,GetSystemMetrics(SM_CXSMICON),GetSystemMetrics(SM_CYSMICON),LR_DEFAULTCOLOR);
 	wcex.hCursor		= LoadCursor(NULL,IDC_ARROW);
 	wcex.hbrBackground	= (HBRUSH)NULL;
 	wcex.lpszMenuName	= NULL;

@@ -10,7 +10,6 @@
 #define IDB_FOLDEREMPTY                 149
 #define IDR_MAINACCELERATORS            152
 #define IDB_SHELLIMAGES                 205
-#define IDI_MAIN_SMALL                  206
 #define IDB_ABOUT                       231
 #define IDR_WAVE_NAVIGATIONSTART        235
 #define IDB_NOPREVIEWAVAILABLE          236
@@ -63,7 +62,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        241
+#define _APS_NEXT_RESOURCE_VALUE        242
 #define _APS_NEXT_COMMAND_VALUE         40434
 #define _APS_NEXT_CONTROL_VALUE         1255
 #define _APS_NEXT_SYMED_VALUE           101

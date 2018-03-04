@@ -56,7 +56,7 @@ CSetDefaultColumnsDialog::~CSetDefaultColumnsDialog()
 
 INT_PTR CSetDefaultColumnsDialog::OnInitDialog()
 {
-	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
+	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
 
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_COMBOBOX);

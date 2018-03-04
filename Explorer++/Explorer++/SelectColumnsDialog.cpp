@@ -41,7 +41,7 @@ CSelectColumnsDialog::~CSelectColumnsDialog()
 
 INT_PTR CSelectColumnsDialog::OnInitDialog()
 {
-	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN_SMALL));
+	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN));
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
