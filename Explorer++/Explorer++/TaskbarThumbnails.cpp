@@ -450,15 +450,15 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 			/* If the current height of the main window
 			is less than the width, we'll create a thumbnail
 			of maximum width; else maximum height. */
-			if((iBitmapWidth / iMaxWidth) > (iBitmapHeight / iMaxHeight))
+			if(((double) iBitmapWidth / (double) iMaxWidth) > ((double) iBitmapHeight / (double) iMaxHeight))
 			{
 				iWidth = iMaxWidth;
-				iHeight = iMaxWidth * iBitmapHeight / iBitmapWidth;
+				iHeight = (int) ceil(iMaxWidth * ((double)iBitmapHeight / (double)iBitmapWidth));
 			}
 			else
 			{
 				iHeight = iMaxHeight;
-				iWidth = iMaxHeight * iBitmapWidth / iBitmapHeight;
+				iWidth = (int) ceil(iMaxHeight * ((double) iBitmapWidth / (double) iBitmapHeight));
 			}
 
 			/* Thumbnail bitmap. */
