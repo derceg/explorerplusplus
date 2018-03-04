@@ -32,6 +32,33 @@ CBookmark::CBookmark(const std::wstring &strName,const std::wstring &strLocation
 	GetSystemTimeAsFileTime(&m_ftCreated);
 }
 
+CBookmark::CBookmark(HKEY hKey, TCHAR *szKey)
+{
+	BookmarkSerialized_t *pbs = new BookmarkSerialized_t;
+	int result = NRegistrySettings::ReadBinFromRegistry(hKey, szKey, 
+		reinterpret_cast<LPBYTE>(pbs), sizeof(BookmarkSerialized_t));
+
+	if (result != ERROR_SUCCESS)
+		return;
+
+	if (pbs->uSize != sizeof(BookmarkSerialized_t))
+	{
+		throw NBookmark::VERSION_NUMBER_MISMATCH;
+	}
+
+	m_guid = pbs->guid;
+
+	m_strName = pbs->Name;
+	m_strLocation = pbs->Location;
+	m_strDescription = pbs->Description;
+
+	m_iVisitCount = pbs->iVisitCount;
+	m_ftLastVisited = pbs->ftLastVisited;
+
+	m_ftCreated = pbs->ftCreated;
+	m_ftModified = pbs->ftModified;
+}
+
 /* TODO: Transform to named constructor. */
 CBookmark::CBookmark(void *pSerializedData)
 {
@@ -134,6 +161,7 @@ NBookmark::SerializedData_t CBookmark::Serialize() const
 	/* Save ALL the properties for this bookmark into
 	a structure, and return that structure. */
 	BookmarkSerialized_t *pbs = new BookmarkSerialized_t;
+	ZeroMemory(pbs, sizeof(BookmarkSerialized_t));
 
 	pbs->uSize = sizeof(BookmarkSerialized_t);
 
@@ -246,47 +274,59 @@ void CBookmarkFolder::InitializeFromRegistry(const std::wstring &strKey)
 	HKEY hKey;
 	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER,strKey.c_str(),0,KEY_READ,&hKey);
 
-	if(lRes == ERROR_SUCCESS)
+	if (lRes != ERROR_SUCCESS)
+		return;
+
+	m_nChildFolders = 0;
+
+	std::wstring stringGuid;
+	NRegistrySettings::ReadStringFromRegistry(hKey, _T("GUID"), stringGuid);
+	stringGuid = stringGuid.substr(1, stringGuid.length() - 2);
+
+	TCHAR stringGuidTemp[128];
+	StringCchCopy(stringGuidTemp, SIZEOF_ARRAY(stringGuidTemp), stringGuid.c_str());
+	UuidFromString(reinterpret_cast<RPC_WSTR>(stringGuidTemp), &m_guid);
+
+	NRegistrySettings::ReadStringFromRegistry(hKey, _T("Name"), m_strName);
+	NRegistrySettings::ReadDwordFromRegistry(hKey, _T("DateCreatedLow"), &m_ftCreated.dwLowDateTime);
+	NRegistrySettings::ReadDwordFromRegistry(hKey, _T("DateCreatedHigh"), &m_ftCreated.dwHighDateTime);
+	NRegistrySettings::ReadDwordFromRegistry(hKey, _T("DateModifiedLow"), &m_ftModified.dwLowDateTime);
+	NRegistrySettings::ReadDwordFromRegistry(hKey, _T("DateModifiedHigh"), &m_ftModified.dwHighDateTime);
+
+	TCHAR szSubKeyName[256];
+	DWORD dwSize = SIZEOF_ARRAY(szSubKeyName);
+	int iIndex = 0;
+
+	while (RegEnumKeyEx(hKey, iIndex, szSubKeyName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
 	{
-		std::wstring stringGuid;
-		NRegistrySettings::ReadStringFromRegistry(hKey,_T("GUID"),stringGuid);
-		stringGuid = stringGuid.substr(1,stringGuid.length() - 2);
+		TCHAR szSubKey[256];
+		StringCchPrintf(szSubKey, SIZEOF_ARRAY(szSubKey), _T("%s\\%s"), strKey.c_str(), szSubKeyName);
 
-		TCHAR stringGuidTemp[128];
-		StringCchCopy(stringGuidTemp,SIZEOF_ARRAY(stringGuidTemp),stringGuid.c_str());
-		UuidFromString(reinterpret_cast<RPC_WSTR>(stringGuidTemp),&m_guid);
-
-		NRegistrySettings::ReadStringFromRegistry(hKey,_T("Name"),m_strName);
-		NRegistrySettings::ReadDwordFromRegistry(hKey,_T("DateCreatedLow"),&m_ftCreated.dwLowDateTime);
-		NRegistrySettings::ReadDwordFromRegistry(hKey,_T("DateCreatedHigh"),&m_ftCreated.dwHighDateTime);
-		NRegistrySettings::ReadDwordFromRegistry(hKey,_T("DateModifiedLow"),&m_ftModified.dwLowDateTime);
-		NRegistrySettings::ReadDwordFromRegistry(hKey,_T("DateModifiedHigh"),&m_ftModified.dwHighDateTime);
-
-		TCHAR szSubKeyName[256];
-		DWORD dwSize = SIZEOF_ARRAY(szSubKeyName);
-		int iIndex = 0;
-
-		while(RegEnumKeyEx(hKey,iIndex,szSubKeyName,&dwSize,NULL,NULL,NULL,NULL) == ERROR_SUCCESS)
+		if (CheckWildcardMatch(_T("BookmarkFolder_*"), szSubKeyName, FALSE))
 		{
-			TCHAR szSubKey[256];
-			StringCchPrintf(szSubKey,SIZEOF_ARRAY(szSubKey),_T("%s\\%s"),strKey.c_str(),szSubKeyName);
-
-			if(CheckWildcardMatch(_T("BookmarkFolder_*"),szSubKeyName,FALSE))
-			{
-				CBookmarkFolder BookmarkFolder = CBookmarkFolder::UnserializeFromRegistry(szSubKey);
-				m_ChildList.push_back(BookmarkFolder);
-			}
-			else if(CheckWildcardMatch(_T("Bookmark_*"),szSubKeyName,FALSE))
-			{
-				/* TODO: Create bookmark. */
-			}
-
-			dwSize = SIZEOF_ARRAY(szSubKeyName);
-			iIndex++;
+			m_ChildList.push_back(CBookmarkFolder::UnserializeFromRegistry(szSubKey));
+			m_nChildFolders++;
 		}
 
-		RegCloseKey(hKey);
+		dwSize = SIZEOF_ARRAY(szSubKeyName);
+		iIndex++;
 	}
+
+	iIndex = 0;
+	while (RegEnumValue(hKey, iIndex, szSubKeyName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS)
+	{
+		TCHAR szSubKey[256];
+		StringCchPrintf(szSubKey, SIZEOF_ARRAY(szSubKey), _T("%s\\%s"), strKey.c_str(), szSubKeyName);
+
+		if (CheckWildcardMatch(_T("Bookmark_*"), szSubKeyName, FALSE))
+		{
+			m_ChildList.push_back(CBookmark(hKey, szSubKeyName));
+		}
+
+		dwSize = SIZEOF_ARRAY(szSubKeyName);
+		iIndex++;
+	}
+	RegCloseKey(hKey);
 }
 
 void CBookmarkFolder::SerializeToRegistry(const std::wstring &strKey)
@@ -295,40 +335,43 @@ void CBookmarkFolder::SerializeToRegistry(const std::wstring &strKey)
 	LONG lRes = RegCreateKeyEx(HKEY_CURRENT_USER,strKey.c_str(),
 	0,NULL,REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hKey,NULL);
 
-	if(lRes == ERROR_SUCCESS)
+	if (lRes != ERROR_SUCCESS)
+		return;
+
+	TCHAR guidString[128];
+	StringFromGUID2(m_guid, guidString, SIZEOF_ARRAY(guidString));
+	NRegistrySettings::SaveStringToRegistry(hKey, _T("GUID"), guidString);
+	NRegistrySettings::SaveStringToRegistry(hKey, _T("Name"), m_strName.c_str());
+	NRegistrySettings::SaveDwordToRegistry(hKey, _T("DateCreatedLow"), m_ftCreated.dwLowDateTime);
+	NRegistrySettings::SaveDwordToRegistry(hKey, _T("DateCreatedHigh"), m_ftCreated.dwHighDateTime);
+	NRegistrySettings::SaveDwordToRegistry(hKey, _T("DateModifiedLow"), m_ftModified.dwLowDateTime);
+	NRegistrySettings::SaveDwordToRegistry(hKey, _T("DateModifiedHigh"), m_ftModified.dwHighDateTime);
+
+	int iItem = 0;
+
+	for each(auto Variant in m_ChildList)
 	{
-		TCHAR guidString[128];
-		StringFromGUID2(m_guid,guidString,SIZEOF_ARRAY(guidString));
-		NRegistrySettings::SaveStringToRegistry(hKey,_T("GUID"),guidString);
-		NRegistrySettings::SaveStringToRegistry(hKey,_T("Name"),m_strName.c_str());
-		NRegistrySettings::SaveDwordToRegistry(hKey,_T("DateCreatedLow"),m_ftCreated.dwLowDateTime);
-		NRegistrySettings::SaveDwordToRegistry(hKey,_T("DateCreatedHigh"),m_ftCreated.dwHighDateTime);
-		NRegistrySettings::SaveDwordToRegistry(hKey,_T("DateModifiedLow"),m_ftModified.dwLowDateTime);
-		NRegistrySettings::SaveDwordToRegistry(hKey,_T("DateModifiedHigh"),m_ftModified.dwHighDateTime);
+		TCHAR szSubKey[256];
 
-		int iItem = 0;
-
-		for each(auto Variant in m_ChildList)
+		if (CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(&Variant))
 		{
-			TCHAR szSubKey[256];
+			StringCchPrintf(szSubKey, SIZEOF_ARRAY(szSubKey), _T("%s\\BookmarkFolder_%d"), strKey.c_str(), iItem);
+			pBookmarkFolder->SerializeToRegistry(szSubKey);
+		}
+		else if (CBookmark *pBookmark = boost::get<CBookmark>(&Variant))
+		{
+			StringCchPrintf(szSubKey, SIZEOF_ARRAY(szSubKey), _T("Bookmark_%d"), iItem);
+			
+			NBookmark::SerializedData_t data = pBookmark->Serialize();
+			NRegistrySettings::SaveBinToRegistry(hKey, szSubKey, reinterpret_cast<LPBYTE>(data.pData), data.uSize);
 
-			if(CBookmarkFolder *pBookmarkFolder = boost::get<CBookmarkFolder>(&Variant))
-			{
-				StringCchPrintf(szSubKey,SIZEOF_ARRAY(szSubKey),_T("%s\\BookmarkFolder_%d"),strKey.c_str(),iItem);
-				pBookmarkFolder->SerializeToRegistry(szSubKey);
-			}
-			else if(CBookmark *pBookmark = boost::get<CBookmark>(&Variant))
-			{
-				StringCchPrintf(szSubKey,SIZEOF_ARRAY(szSubKey),_T("%s\\Bookmark_%d"),strKey.c_str(),iItem);
-
-				/* TODO: Serialize. */
-			}
-
-			iItem++;
+			delete data.pData;
 		}
 
-		RegCloseKey(hKey);
+		iItem++;
 	}
+
+	RegCloseKey(hKey);
 }
 
 std::wstring CBookmarkFolder::GetName() const

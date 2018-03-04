@@ -147,7 +147,7 @@ void Explorerplusplus::CreateBookmarksToolbar(void)
 		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
 	m_pBookmarksToolbar = new CBookmarksToolbar(m_hBookmarksToolbar,
-		*m_bfAllBookmarks,m_guidBookmarksToolbar,TOOLBAR_BOOKMARK_START,TOOLBAR_BOOKMARK_END);
+		*m_bfAllBookmarks,m_guidBookmarksToolbar,TOOLBAR_BOOKMARK_START,TOOLBAR_BOOKMARK_END, this);
 }
 
 void Explorerplusplus::CreateDrivesToolbar(void)

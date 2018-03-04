@@ -45,7 +45,7 @@ class CBookmarksToolbar : public NBookmark::IBookmarkItemNotification
 
 public:
 
-	CBookmarksToolbar(HWND hToolbar,CBookmarkFolder &AllBookmarks,const GUID &guidBookmarksToolbar,UINT uIDStart,UINT uIDEnd);
+	CBookmarksToolbar(HWND hToolbar,CBookmarkFolder &AllBookmarks,const GUID &guidBookmarksToolbar,UINT uIDStart,UINT uIDEnd, IExplorerplusplus *m_pexpp);
 	~CBookmarksToolbar();
 
 	/* IBookmarkItemNotification methods. */
@@ -58,13 +58,15 @@ public:
 
 private:
 
-	CBookmarksToolbar & operator = (const CBookmarksToolbar &bt);
+	CBookmarksToolbar & operator= (const CBookmarksToolbar &bt);
 
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	LRESULT CALLBACK	BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	BookmarksToolbarParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
+
+	void    BookmarkClicked(UINT bookmarkIndex);
 
 	void	InitializeToolbar();
 
@@ -93,4 +95,5 @@ private:
 	UINT							m_uIDCounter;
 
 	CBookmarksToolbarDropHandler	*m_pbtdh;
+	IExplorerplusplus	*m_pexpp;
 };
