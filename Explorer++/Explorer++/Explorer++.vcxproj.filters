@@ -55,12 +55,6 @@
     <ClCompile Include="iServiceProvider.cpp">
       <Filter>Context Menu Support\New Menu</Filter>
     </ClCompile>
-    <ClCompile Include="LoggingFrontend.cpp">
-      <Filter>Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="LoggingImplicitLink.cpp">
-      <Filter>Logging</Filter>
-    </ClCompile>
     <ClCompile Include="DialogHelper.cpp">
       <Filter>Dialog Support</Filter>
     </ClCompile>
@@ -202,6 +196,9 @@
     <ClCompile Include="BookmarkTreeView.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="Logging.cpp">
+      <Filter>Logging</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -282,9 +279,6 @@
     <ClInclude Include="IModelessDialogNotification.h">
       <Filter>Dialog Support</Filter>
     </ClInclude>
-    <ClInclude Include="LoggingFrontend.h">
-      <Filter>Logging</Filter>
-    </ClInclude>
     <ClInclude Include="MainImages.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -362,6 +356,9 @@
     </ClInclude>
     <ClInclude Include="..\targetver.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging.h">
+      <Filter>Logging</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

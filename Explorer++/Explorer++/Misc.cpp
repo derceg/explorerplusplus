@@ -15,7 +15,6 @@
 #include "stdafx.h"
 #include <list>
 #include <shobjidl.h>
-#include <pantheios\inserters\integer.hpp>
 #include "Explorer++.h"
 #include "SelectColumnsDialog.h"
 #include "DefaultColumns.h"
@@ -30,6 +29,7 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/Logging.h"
 
 
 void Explorerplusplus::ValidateLoadedSettings(void)
@@ -689,8 +689,8 @@ void *pData)
 	{
 		TCHAR szDirectory[MAX_PATH];
 		pContainer->m_pShellBrowser[pDirectoryAltered->iIndex]->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
-		pantheios::log(pantheios::debug,_T("Directory change notification received for \""),szDirectory,_T("\", Action = "),
-			pantheios::integer(dwAction),_T(", Filename = \""),szFileName,_T("\""));
+		LOG(debug) << _T("Directory change notification received for \"") << szDirectory << _T("\", Action = ") << dwAction
+			<< _T(", Filename = \"") << szFileName << _T("\"");
 
 		pContainer->m_pShellBrowser[pDirectoryAltered->iIndex]->FilesModified(dwAction,
 			szFileName,pDirectoryAltered->iIndex,pDirectoryAltered->iFolderIndex);

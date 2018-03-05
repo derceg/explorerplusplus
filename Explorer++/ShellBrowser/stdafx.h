@@ -36,9 +36,3 @@
 #pragma warning(disable:4458)
 #include <gdiplus.h>
 #pragma warning(pop)
-
-/* Pantheios header files. */
-#pragma warning(push)
-#pragma warning(disable:4995)
-#include <pantheios\pantheios.hpp>
-#pragma warning(pop)

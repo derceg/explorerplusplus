@@ -15,6 +15,7 @@
 
 #include "stdafx.h"
 #include "INewMenuClient.h"
+#include "../Helper/Logging.h"
 
 
 CNewMenuClient::CNewMenuClient(IExplorerplusplus *pexpp) :
@@ -106,7 +107,7 @@ HRESULT CNewMenuClient::SelectAndEditItem(PCIDLIST_ABSOLUTE pidlItem,NMCSAEI_FLA
 		of the item. */
 		case NMCSAEI_EDIT:
 		case NMCSAEI_EDIT_WINDOWS_10:
-			pantheios::log(pantheios::informational,_T("Starting in-place rename of item created via new menu"));
+			LOG(info) << _T("Starting in-place rename of item created via new menu");
 			m_pexpp->GetActiveShellBrowser()->QueueRename(pidlItem);
 			break;
 	}

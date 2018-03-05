@@ -7,9 +7,6 @@ platform:
 - x64
 
 environment:
-  BOOST: C:\Libraries\boost_1_60_0
-  STLSOFT: C:\dependencies\stlsoft-1.9.124
-  PANTHEIOS: C:\dependencies\pantheios-1.0.1-beta216
   PFX_ENC_PASS:
     secure: /FOQcwja5XcXpFQqbYnMhOcUTmiwNh4mDFBm9oUh/gaV8Z6V5d45lZrbM8DrKInV
   PFX_PASS:
@@ -21,34 +18,6 @@ install:
     nuget install secure-file -ExcludeVersion
 
     IF DEFINED PFX_ENC_PASS (secure-file\tools\secure-file -decrypt %APPVEYOR_BUILD_FOLDER%\authenticode.pfx.enc -secret %PFX_ENC_PASS%)
-
-before_build:
-- cmd: >-
-    mkdir C:\dependencies
-
-    cd C:\dependencies
-
-
-    appveyor DownloadFile "https://downloads.sourceforge.net/project/stlsoft/STLSoft 1.9/1.9.124/stlsoft-1.9.124-hdrs.zip"
-
-    7z x stlsoft-1.9.124-hdrs.zip
-
-
-    appveyor DownloadFile "https://downloads.sourceforge.net/project/pantheios/Pantheios (C and Cxx)/1.0.1 (beta 216)/pantheios-1.0.1-beta216.zip"
-
-    7z x pantheios-1.0.1-beta216.zip
-
-
-    cd C:\dependencies\pantheios-1.0.1-beta216\build
-
-
-    SET "vcvarsall=C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat"
-
-
-    IF "%PLATFORM%" == "Win32" (call "%vcvarsall%" x86 && cd vc14) ELSE (call "%vcvarsall%" amd64 && cd vc14.x64)
-
-
-    nmake build.libs
 
 build:
   project: Explorer++\Explorer++.sln

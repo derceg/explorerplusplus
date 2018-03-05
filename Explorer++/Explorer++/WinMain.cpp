@@ -12,10 +12,8 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <pantheios\backends\bec.file.h>
-#include <pantheios\inserters\integer.hpp>
 #include "Explorer++.h"
-#include "LoggingFrontend.h"
+#include "Logging.h"
 #include "ModelessDialogs.h"
 #include "RegistrySettings.h"
 #include "Version.h"
@@ -25,6 +23,7 @@
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/Logging.h"
 
 
 /* Default window size/position. */
@@ -185,7 +184,7 @@ ensure you have administrator privileges."),NExplorerplusplus::APP_NAME,MB_ICONW
 		}
 		else if(lstrcmp(szPath,_T("-enable_logging")) == 0)
 		{
-			NLoggingFrontend::EnableLogging(true);
+			boost::log::core::get()->set_logging_enabled(true);
 		}
 		else
 		{
@@ -335,6 +334,15 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 		return 0;
 	}
 
+	bool enableLogging =
+#ifdef _DEBUG
+		true;
+#else
+		false;
+#endif;
+
+	boost::log::core::get()->set_logging_enabled(enableLogging);
+
 	/* Initialize OLE, as well as the various window classes that
 	will be needed (listview, TreeView, comboboxex, etc.). */
 	INITCOMMONCONTROLSEX	ccEx;
@@ -348,26 +356,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 	bExit = ProcessCommandLine(pCommandLine);
 
-	/* The stock backend file implementation will
-	create the file specified in pantheios_be_file_setFilePath
-	as soon as it is called.
-	Therefore, to avoid creating the log file when
-	it isn't needed, we'll simply avoid calling
-	pantheios_be_file_setFilePath. Note that the
-	backend implementation will then buffer entries
-	until a file is specified. However, the custom
-	frontend will block all entries when logging is
-	disabled, which ensures nothing is actually buffered. */
-	if(NLoggingFrontend::CheckLoggingEnabled())
-	{
-		TCHAR szLogFile[MAX_PATH];
-		GetProcessImageName(GetCurrentProcessId(),szLogFile,SIZEOF_ARRAY(szLogFile));
-
-		PathRemoveFileSpec(szLogFile);
-		PathAppend(szLogFile,NExplorerplusplus::LOG_FILENAME);
-
-		pantheios_be_file_setFilePath(szLogFile);
-	}
+	InitializeLogging(NExplorerplusplus::LOG_FILENAME);
 
 	/* Can't open folders that are children of the
 	control panel. If the command line only refers
@@ -468,7 +457,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	BOOL bLoadSettingsFromXML;
 
 	bLoadSettingsFromXML = TestConfigFileInternal();
-	pantheios::log(pantheios::informational,_T("bLoadSettingsFromXML = "),pantheios::integer(bLoadSettingsFromXML));
+	LOG(info) << _T("bLoadSettingsFromXML = ") << bLoadSettingsFromXML;
 
 	if(bLoadSettingsFromXML)
 	{

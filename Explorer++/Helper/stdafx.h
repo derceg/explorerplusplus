@@ -92,9 +92,3 @@ required for VS 2010. */
 #define IAsyncOperation IDataObjectAsyncCapability
 #define IID_IAsyncOperation IID_IDataObjectAsyncCapability
 #endif
-
-/* Pantheios header files. */
-#pragma warning(push)
-#pragma warning(disable:4995)
-#include <pantheios\pantheios.hpp>
-#pragma warning(pop)

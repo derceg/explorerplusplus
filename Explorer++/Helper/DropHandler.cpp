@@ -19,6 +19,7 @@
 #include "ShellHelper.h"
 #include "ContextMenuManager.h"
 #include "Macros.h"
+#include "Logging.h"
 
 
 #define WM_APP_COPYOPERATIONFINISHED	(WM_APP + 1)
@@ -189,37 +190,37 @@ void CDropHandler::HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl)
 		notifies the caller itself (rather
 		than returning a list of files
 		in PastedFileList). */
-		pantheios::log(pantheios::debug,_T("Helper - Copying CF_HDROP data"));
+		LOG(debug) << _T("Helper - Copying CF_HDROP data");
 		hrCopy = CopyHDropData(pDataObject,bPrefferedEffect,dwEffect);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcShellIDList))
 	{
-		pantheios::log(pantheios::debug,_T("Helper - Copying CFSTR_SHELLIDLIST data"));
+		LOG(debug) << _T("Helper - Copying CFSTR_SHELLIDLIST data");
 		hrCopy = CopyShellIDListData(pDataObject,PastedFileList);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcFileDescriptorA))
 	{
-		pantheios::log(pantheios::debug,_T("Helper - Copying CFSTR_FILEDESCRIPTORA data"));
+		LOG(debug) << _T("Helper - Copying CFSTR_FILEDESCRIPTORA data");
 		hrCopy = CopyAnsiFileDescriptorData(pDataObject,PastedFileList);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcFileDescriptorW))
 	{
-		pantheios::log(pantheios::debug,_T("Helper - Copying CFSTR_FILEDESCRIPTORW data"));
+		LOG(debug) << _T("Helper - Copying CFSTR_FILEDESCRIPTORW data");
 		hrCopy = CopyUnicodeFileDescriptorData(pDataObject,PastedFileList);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcUnicodeText))
 	{
-		pantheios::log(pantheios::debug,_T("Helper - Copying CF_UNICODETEXT data"));
+		LOG(debug) << _T("Helper - Copying CF_UNICODETEXT data");
 		hrCopy = CopyUnicodeTextData(pDataObject,PastedFileList);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcText))
 	{
-		pantheios::log(pantheios::debug,_T("Helper - Copying CF_TEXT data"));
+		LOG(debug) << _T("Helper - Copying CF_TEXT data");
 		hrCopy = CopyAnsiTextData(pDataObject,PastedFileList);
 	}
 	else if(CheckDropFormatSupported(pDataObject,&m_ftcDIBV5))
 	{
-		pantheios::log(pantheios::debug,_T("Helper - Copying CF_DIBV5 data"));
+		LOG(debug) << _T("Helper - Copying CF_DIBV5 data");
 		hrCopy = CopyDIBV5Data(pDataObject,PastedFileList);
 	}
 

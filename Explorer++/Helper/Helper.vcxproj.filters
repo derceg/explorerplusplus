@@ -112,6 +112,9 @@
     <ClCompile Include="FileWrappers.cpp">
       <Filter>Resource Wrappers</Filter>
     </ClCompile>
+    <ClCompile Include="Logging.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -232,6 +235,9 @@
       <Filter>Resource Wrappers</Filter>
     </ClInclude>
     <ClInclude Include="..\targetver.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>
