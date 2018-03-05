@@ -19,6 +19,10 @@ install:
 
     IF DEFINED PFX_ENC_PASS (secure-file\tools\secure-file -decrypt %APPVEYOR_BUILD_FOLDER%\authenticode.pfx.enc -secret %PFX_ENC_PASS%)
 
+before_build:
+- cmd: >-
+    nuget restore Explorer++\Explorer++.sln
+
 build:
   project: Explorer++\Explorer++.sln
   verbosity: minimal
