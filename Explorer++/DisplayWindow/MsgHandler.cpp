@@ -55,7 +55,7 @@ void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc)
 
 	/* Create the (temporary) off-screen buffer used for drawing. */
 	m_hBitmapBackground	= CreateCompatibleBitmap(hdc,rc->right - rc->left,rc->bottom - rc->top);
-	SelectObject(m_hdcBackground,m_hBitmapBackground);
+	HGDIOBJ originalBackgroundObject = SelectObject(m_hdcBackground,m_hBitmapBackground);
 
 	Gdiplus::Graphics graphics(m_hdcBackground);
 
@@ -76,6 +76,8 @@ void CDisplayWindow::DrawGradientFill(HDC hdc,RECT *rc)
 	so that it is visually separated from other windows. */
 	Gdiplus::Pen NewPen(BORDER_COLOUR,1);
 	graphics.DrawLine(&NewPen,0,0,rc->right,0);
+
+	SelectObject(m_hdcBackground, originalBackgroundObject);
 }
 
 void CDisplayWindow::PatchBackground(HDC hdc,RECT *rc,RECT *UpdateRect)
