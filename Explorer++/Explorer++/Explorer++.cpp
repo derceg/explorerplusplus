@@ -80,6 +80,7 @@ m_hContainer(hwnd)
 	m_ListViewMButtonItem			= -1;
 	m_zDeltaTotal					= 0;
 	m_iPreviousTabSelectionId		= -1;
+	m_InitializationFinished		= false;
 
 	m_pTaskbarList					= NULL;
 

@@ -356,6 +356,11 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	int				nTabs;
 	int				i = 0;
 
+	if (!m_InitializationFinished)
+	{
+		return TRUE;
+	}
+
 	if(m_hMainRebar)
 	{
 		GetWindowRect(m_hMainRebar,&rc);

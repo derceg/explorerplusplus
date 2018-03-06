@@ -191,6 +191,8 @@ void Explorerplusplus::OnCreate(void)
 	m_hNextClipboardViewer = SetClipboardViewer(m_hContainer);
 
 	SetFocus(m_hActiveListView);
+
+	m_InitializationFinished = true;
 }
 
 /* Creates a low priority worker thread, and initializes COM on that thread. */

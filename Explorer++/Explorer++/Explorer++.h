@@ -847,6 +847,7 @@ private:
 	int						m_iLastSelectedTab;
 	int						m_iTabSelectedItem;
 	ULONG					m_SHChangeNotifyID;
+	bool					m_InitializationFinished;
 
 	std::list<ViewMode_t>	m_ViewModes;
 
