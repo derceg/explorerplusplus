@@ -1696,47 +1696,50 @@ void CShellBrowser::ApplyHeaderSortArrow(void)
 	HWND hHeader;
 	HDITEM hdItem;
 	std::list<Column_t>::iterator itr;
-	BOOL bPreviousColumnExists = FALSE;
+	BOOL previousColumnFound = FALSE;
 	int iColumn = 0;
 	int iPreviousSortedColumn = 0;
 	int iColumnId = -1;
 
 	hHeader = ListView_GetHeader(m_hListView);
 
-	/* Search through the currently active columns to find the column that previously
-	had the up/down arrow. */
-	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
+	if (m_PreviousSortColumnExists)
 	{
-		/* Only increment if this column is actually been shown. */
-		if(itr->bChecked)
+		/* Search through the currently active columns to find the column that previously
+		had the up/down arrow. */
+		for (itr = m_pActiveColumnList->begin(); itr != m_pActiveColumnList->end(); itr++)
 		{
-			if(m_iPreviousSortedColumnId == itr->id)
+			/* Only increment if this column is actually been shown. */
+			if (itr->bChecked)
 			{
-				bPreviousColumnExists = TRUE;
-				break;
+				if (m_iPreviousSortedColumnId == itr->id)
+				{
+					previousColumnFound = TRUE;
+					break;
+				}
+
+				iPreviousSortedColumn++;
+			}
+		}
+
+		if (previousColumnFound)
+		{
+			hdItem.mask = HDI_FORMAT;
+			Header_GetItem(hHeader, iPreviousSortedColumn, &hdItem);
+
+			if (hdItem.fmt & HDF_SORTUP)
+			{
+				hdItem.fmt &= ~HDF_SORTUP;
+			}
+			else if (hdItem.fmt & HDF_SORTDOWN)
+			{
+				hdItem.fmt &= ~HDF_SORTDOWN;
 			}
 
-			iPreviousSortedColumn++;
+			/* Remove the up/down arrow from the column by which
+			results were previously sorted. */
+			Header_SetItem(hHeader, iPreviousSortedColumn, &hdItem);
 		}
-	}
-
-	if(bPreviousColumnExists)
-	{
-		hdItem.mask = HDI_FORMAT;
-		Header_GetItem(hHeader,iPreviousSortedColumn,&hdItem);
-
-		if(hdItem.fmt & HDF_SORTUP)
-		{
-			hdItem.fmt &= ~HDF_SORTUP;
-		}
-		else if(hdItem.fmt & HDF_SORTDOWN)
-		{
-			hdItem.fmt &= ~HDF_SORTDOWN;
-		}
-
-		/* Remove the up/down arrow from the column by which
-		results were previously sorted. */
-		Header_SetItem(hHeader,iPreviousSortedColumn,&hdItem);
 	}
 
 	/* Find the index of the column representing the current sort mode. */
@@ -1767,6 +1770,7 @@ void CShellBrowser::ApplyHeaderSortArrow(void)
 	Header_SetItem(hHeader,iColumn,&hdItem);
 
 	m_iPreviousSortedColumnId = iColumnId;
+	m_PreviousSortColumnExists = true;
 }
 
 size_t CShellBrowser::QueryNumActiveColumns(void) const

@@ -127,6 +127,8 @@ m_hFolderSizeThread(hFolderSizeThread)
 
 	m_pidlDirectory			= NULL;
 
+	m_PreviousSortColumnExists = false;
+
 	SetUserOptions(pSettings);
 
 	NListView::ListView_SetAutoArrange(m_hListView,m_bAutoArrange);

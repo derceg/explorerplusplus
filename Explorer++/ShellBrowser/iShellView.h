@@ -836,6 +836,7 @@ private:
 	BOOL				m_bColumnsPlaced;
 	int					m_nCurrentColumns;
 	int					m_nActiveColumns;
+	bool				m_PreviousSortColumnExists;
 	unsigned int		m_iPreviousSortedColumnId;
 
 	/* Drag and drop related data. */
