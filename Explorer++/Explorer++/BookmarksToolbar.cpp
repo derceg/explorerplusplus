@@ -23,9 +23,10 @@
 #include "../Helper/Macros.h"
 
 
-CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar,CBookmarkFolder &AllBookmarks,
-	const GUID &guidBookmarksToolbar,UINT uIDStart,UINT uIDEnd) :
+CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, IExplorerplusplus *pexpp, CBookmarkFolder &AllBookmarks,
+	const GUID &guidBookmarksToolbar, UINT uIDStart, UINT uIDEnd) :
 m_hToolbar(hToolbar),
+m_pexpp(pexpp),
 m_AllBookmarks(AllBookmarks),
 m_guidBookmarksToolbar(guidBookmarksToolbar),
 m_uIDStart(uIDStart),
@@ -104,7 +105,18 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 				TBBUTTON tbButton;
 				SendMessage(m_hToolbar,TB_GETBUTTON,iIndex,reinterpret_cast<LPARAM>(&tbButton));
 
-				/* TODO: If this is a bookmark, open it in a new tab. */
+				if (auto variantBookmarkItem = GetBookmarkItemFromToolbarIndex(iIndex))
+				{
+					if (variantBookmarkItem->type() == typeid(CBookmarkFolder))
+					{
+						/* TODO: Open all sub-bookmarks. */
+					}
+					else
+					{
+						CBookmark &Bookmark = boost::get<CBookmark>(*variantBookmarkItem);
+						m_pexpp->BrowseFolder(Bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, TRUE, FALSE, FALSE);
+					}
+				}
 			}
 		}
 		break;
@@ -328,6 +340,25 @@ void CBookmarksToolbar::RemoveBookmarkItem(const GUID &guid)
 
 		m_mapID.erase(iIndex);
 	}
+}
+
+boost::optional<NBookmarkHelper::variantBookmark_t> CBookmarksToolbar::GetBookmarkItemFromToolbarIndex(int index)
+{
+	TBBUTTON tbButton;
+	SendMessage(m_hToolbar, TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbButton));
+
+	auto itr = m_mapID.find(static_cast<UINT>(tbButton.dwData));
+
+	if (itr == m_mapID.end())
+	{
+		return boost::none;
+	}
+
+	auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks, m_guidBookmarksToolbar);
+	CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
+
+	auto variantBookmarkItem = NBookmarkHelper::GetBookmarkItem(BookmarksToolbarFolder, itr->second);
+	return variantBookmarkItem;
 }
 
 int CBookmarksToolbar::GetBookmarkItemIndex(const GUID &guid)
