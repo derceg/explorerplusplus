@@ -32,29 +32,6 @@ CBookmark::CBookmark(const std::wstring &strName,const std::wstring &strLocation
 	GetSystemTimeAsFileTime(&m_ftCreated);
 }
 
-/* TODO: Transform to named constructor. */
-CBookmark::CBookmark(void *pSerializedData)
-{
-	const BookmarkSerialized_t *pbs = reinterpret_cast<BookmarkSerialized_t *>(pSerializedData);
-
-	if(pbs->uSize != sizeof(BookmarkSerialized_t))
-	{
-		throw NBookmark::VERSION_NUMBER_MISMATCH;
-	}
-
-	m_guid = pbs->guid;
-
-	m_strName = pbs->Name;
-	m_strLocation = pbs->Location;
-	m_strDescription = pbs->Description;
-
-	m_iVisitCount = pbs->iVisitCount;
-	m_ftLastVisited = pbs->ftLastVisited;
-
-	m_ftCreated = pbs->ftCreated;
-	m_ftModified = pbs->ftModified;
-}
-
 CBookmark::~CBookmark()
 {
 
@@ -129,33 +106,6 @@ FILETIME CBookmark::GetDateModified() const
 	return m_ftModified;
 }
 
-NBookmark::SerializedData_t CBookmark::Serialize() const
-{
-	/* Save ALL the properties for this bookmark into
-	a structure, and return that structure. */
-	BookmarkSerialized_t *pbs = new BookmarkSerialized_t;
-
-	pbs->uSize = sizeof(BookmarkSerialized_t);
-
-	pbs->guid = m_guid;
-
-	StringCchCopy(pbs->Name,SIZEOF_ARRAY(pbs->Name),m_strName.c_str());
-	StringCchCopy(pbs->Location,SIZEOF_ARRAY(pbs->Location),m_strLocation.c_str());
-	StringCchCopy(pbs->Description,SIZEOF_ARRAY(pbs->Description),m_strDescription.c_str());
-
-	pbs->iVisitCount = m_iVisitCount;
-	pbs->ftLastVisited = m_ftLastVisited;
-
-	pbs->ftCreated = m_ftCreated;
-	pbs->ftModified = m_ftModified;
-
-	NBookmark::SerializedData_t sd;
-	sd.pData = pbs;
-	sd.uSize = sizeof(BookmarkSerialized_t);
-
-	return sd;
-}
-
 CBookmarkFolder CBookmarkFolder::Create(const std::wstring &strName,GUID &guid)
 {
 	return CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL,&guid);
@@ -176,11 +126,6 @@ CBookmarkFolder *CBookmarkFolder::CreateNew(const std::wstring &strName)
 	return new CBookmarkFolder(strName,INITIALIZATION_TYPE_NORMAL,NULL);
 }
 
-CBookmarkFolder CBookmarkFolder::Unserialize(void *pSerializedData)
-{
-	return CBookmarkFolder(pSerializedData);
-}
-
 CBookmarkFolder CBookmarkFolder::UnserializeFromRegistry(const std::wstring &strKey)
 {
 	return CBookmarkFolder(strKey,INITIALIZATION_TYPE_REGISTRY, NULL);
@@ -198,23 +143,6 @@ CBookmarkFolder::CBookmarkFolder(const std::wstring &str,InitializationType_t In
 		Initialize(str,guid);
 		break;
 	}
-}
-
-CBookmarkFolder::CBookmarkFolder(void *pSerializedData)
-{
-	const BookmarkFolderSerialized_t *pbfs = reinterpret_cast<BookmarkFolderSerialized_t *>(pSerializedData);
-
-	if(pbfs->uSize != sizeof(BookmarkFolderSerialized_t))
-	{
-		throw NBookmark::VERSION_NUMBER_MISMATCH;
-	}
-
-	m_guid = pbfs->guid;
-
-	m_strName = pbfs->Name;
-
-	m_ftCreated = pbfs->ftCreated;
-	m_ftModified = pbfs->ftModified;
 }
 
 CBookmarkFolder::~CBookmarkFolder()
@@ -434,26 +362,6 @@ bool CBookmarkFolder::HasChildFolder() const
 	}
 
 	return false;
-}
-
-NBookmark::SerializedData_t CBookmarkFolder::Serialize() const
-{
-	BookmarkFolderSerialized_t *pbfs = new BookmarkFolderSerialized_t;
-
-	pbfs->uSize = sizeof(BookmarkFolderSerialized_t);
-
-	pbfs->guid = m_guid;
-
-	StringCchCopy(pbfs->Name,SIZEOF_ARRAY(pbfs->Name),m_strName.c_str());
-
-	pbfs->ftCreated = m_ftCreated;
-	pbfs->ftModified = m_ftModified;
-
-	NBookmark::SerializedData_t sd;
-	sd.pData = pbfs;
-	sd.uSize = sizeof(BookmarkFolderSerialized_t);
-
-	return sd;
 }
 
 CBookmarkItemNotifier::CBookmarkItemNotifier()
