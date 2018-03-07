@@ -287,6 +287,7 @@
     <ClCompile Include="BookmarkHelper.cpp" />
     <ClCompile Include="BookmarkListView.cpp" />
     <ClCompile Include="BookmarksToolbar.cpp" />
+    <ClCompile Include="BookmarkTreeView.cpp" />
     <ClCompile Include="ColorRuleDialog.cpp" />
     <ClCompile Include="ColorRuleHelper.cpp" />
     <ClCompile Include="CustomizeColorsDialog.cpp" />
@@ -363,6 +364,7 @@
     <ClInclude Include="BookmarkHelper.h" />
     <ClInclude Include="BookmarkListView.h" />
     <ClInclude Include="BookmarksToolbar.h" />
+    <ClInclude Include="BookmarkTreeView.h" />
     <ClInclude Include="BoostCheck.h" />
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="ColorRuleHelper.h" />

@@ -202,6 +202,9 @@
     <ClCompile Include="BookmarkListView.cpp">
       <Filter>Bookmarks</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkTreeView.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -361,6 +364,9 @@
       <Filter>Dialog Support</Filter>
     </ClInclude>
     <ClInclude Include="BookmarkListView.h">
+      <Filter>Bookmarks</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkTreeView.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,6 +2,7 @@
 
 #include <unordered_set>
 #include "BookmarkHelper.h"
+#include "BookmarkTreeView.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
