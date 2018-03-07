@@ -37,6 +37,32 @@ CBookmark::~CBookmark()
 
 }
 
+void CBookmark::SerializeToRegistry(const std::wstring &strKey)
+{
+	HKEY hKey;
+	LONG lRes = RegCreateKeyEx(HKEY_CURRENT_USER, strKey.c_str(),
+		0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL);
+
+	if (lRes == ERROR_SUCCESS)
+	{
+		TCHAR guidString[128];
+		StringFromGUID2(m_guid, guidString, SIZEOF_ARRAY(guidString));
+		NRegistrySettings::SaveStringToRegistry(hKey, _T("GUID"), guidString);
+		NRegistrySettings::SaveStringToRegistry(hKey, _T("Name"), m_strName.c_str());
+		NRegistrySettings::SaveStringToRegistry(hKey, _T("Location"), m_strLocation.c_str());
+		NRegistrySettings::SaveStringToRegistry(hKey, _T("Description"), m_strDescription.c_str());
+		NRegistrySettings::SaveDwordToRegistry(hKey, _T("VisitCount"), m_iVisitCount);
+		NRegistrySettings::SaveDwordToRegistry(hKey, _T("DateLastVisitedLow"), m_ftLastVisited.dwLowDateTime);
+		NRegistrySettings::SaveDwordToRegistry(hKey, _T("DateLastVisitedHigh"), m_ftLastVisited.dwHighDateTime);
+		NRegistrySettings::SaveDwordToRegistry(hKey, _T("DateCreatedLow"), m_ftCreated.dwLowDateTime);
+		NRegistrySettings::SaveDwordToRegistry(hKey, _T("DateCreatedHigh"), m_ftCreated.dwHighDateTime);
+		NRegistrySettings::SaveDwordToRegistry(hKey, _T("DateModifiedLow"), m_ftModified.dwLowDateTime);
+		NRegistrySettings::SaveDwordToRegistry(hKey, _T("DateModifiedHigh"), m_ftModified.dwHighDateTime);
+
+		RegCloseKey(hKey);
+	}
+}
+
 std::wstring CBookmark::GetName() const
 {
 	return m_strName;
@@ -248,8 +274,7 @@ void CBookmarkFolder::SerializeToRegistry(const std::wstring &strKey)
 			else if(CBookmark *pBookmark = boost::get<CBookmark>(&Variant))
 			{
 				StringCchPrintf(szSubKey,SIZEOF_ARRAY(szSubKey),_T("%s\\Bookmark_%d"),strKey.c_str(),iItem);
-
-				/* TODO: Serialize. */
+				pBookmark->SerializeToRegistry(szSubKey);
 			}
 
 			iItem++;

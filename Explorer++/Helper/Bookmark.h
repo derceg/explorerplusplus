@@ -103,6 +103,8 @@ public:
 	CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription);
 	~CBookmark();
 
+	void			SerializeToRegistry(const std::wstring &strKey);
+
 	GUID			GetGUID() const;
 
 	std::wstring	GetName() const;
