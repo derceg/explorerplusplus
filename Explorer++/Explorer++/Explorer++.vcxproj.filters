@@ -199,6 +199,9 @@
     <ClCompile Include="MainMenuHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkListView.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -356,6 +359,9 @@
     </ClInclude>
     <ClInclude Include="ModelessDialogs.h">
       <Filter>Dialog Support</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkListView.h">
+      <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

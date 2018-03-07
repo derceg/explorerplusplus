@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BookmarkHelper.h"
+#include "BookmarkListView.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
