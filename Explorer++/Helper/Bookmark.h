@@ -76,6 +76,8 @@ private:
 	void			Initialize(const std::wstring &strName,GUID *guid);
 	void			InitializeFromRegistry(const std::wstring &strKey);
 
+	void			UpdateModificationTime();
+
 	GUID			m_guid;
 
 	std::wstring	m_strName;
@@ -124,6 +126,8 @@ public:
 	FILETIME		GetDateModified() const;
 
 private:
+
+	void			UpdateModificationTime();
 
 	GUID			m_guid;
 

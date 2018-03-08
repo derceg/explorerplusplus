@@ -30,6 +30,7 @@ CBookmark::CBookmark(const std::wstring &strName,const std::wstring &strLocation
 {
 	CoCreateGuid(&m_guid);
 	GetSystemTimeAsFileTime(&m_ftCreated);
+	m_ftModified = m_ftCreated;
 }
 
 CBookmark::~CBookmark()
@@ -82,6 +83,8 @@ void CBookmark::SetName(const std::wstring &strName)
 {
 	m_strName = strName;
 
+	UpdateModificationTime();
+
 	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkModified(m_guid);
 }
 
@@ -89,12 +92,16 @@ void CBookmark::SetLocation(const std::wstring &strLocation)
 {
 	m_strLocation = strLocation;
 
+	UpdateModificationTime();
+
 	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkModified(m_guid);
 }
 
 void CBookmark::SetDescription(const std::wstring &strDescription)
 {
 	m_strDescription = strDescription;
+
+	UpdateModificationTime();
 
 	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkModified(m_guid);
 }
@@ -130,6 +137,11 @@ FILETIME CBookmark::GetDateCreated() const
 FILETIME CBookmark::GetDateModified() const
 {
 	return m_ftModified;
+}
+
+void CBookmark::UpdateModificationTime()
+{
+	GetSystemTimeAsFileTime(&m_ftModified);
 }
 
 CBookmarkFolder CBookmarkFolder::Create(const std::wstring &strName,GUID &guid)
@@ -293,6 +305,8 @@ void CBookmarkFolder::SetName(const std::wstring &strName)
 {
 	m_strName = strName;
 
+	UpdateModificationTime();
+
 	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkFolderModified(m_guid);
 }
 
@@ -309,6 +323,11 @@ FILETIME CBookmarkFolder::GetDateCreated() const
 FILETIME CBookmarkFolder::GetDateModified() const
 {
 	return m_ftModified;
+}
+
+void CBookmarkFolder::UpdateModificationTime()
+{
+	GetSystemTimeAsFileTime(&m_ftModified);
 }
 
 void CBookmarkFolder::InsertBookmark(const CBookmark &Bookmark)
