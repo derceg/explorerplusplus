@@ -345,7 +345,12 @@ void CBookmarksToolbar::RemoveBookmarkItem(const GUID &guid)
 boost::optional<NBookmarkHelper::variantBookmark_t> CBookmarksToolbar::GetBookmarkItemFromToolbarIndex(int index)
 {
 	TBBUTTON tbButton;
-	SendMessage(m_hToolbar, TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbButton));
+	BOOL ret = static_cast<BOOL>(SendMessage(m_hToolbar, TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbButton)));
+
+	if (!ret)
+	{
+		return boost::none;
+	}
 
 	auto itr = m_mapID.find(static_cast<UINT>(tbButton.dwData));
 
