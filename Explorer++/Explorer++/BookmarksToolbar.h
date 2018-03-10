@@ -80,6 +80,7 @@ private:
 
 	void	RemoveBookmarkItem(const GUID &guid);
 
+	bool	OnCommand(WPARAM wParam, LPARAM lParam);
 	bool	OnGetInfoTip(NMTBGETINFOTIP *infoTip);
 
 	int		GetBookmarkItemIndex(const GUID &guid);

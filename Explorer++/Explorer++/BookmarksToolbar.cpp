@@ -144,12 +144,8 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd,UINT uM
 	switch(uMsg)
 	{
 	case WM_COMMAND:
-		if(LOWORD(wParam) >= m_uIDStart &&
-			LOWORD(wParam) <= m_uIDEnd)
+		if (OnCommand(wParam, lParam))
 		{
-			/* TODO: Map the id back to a GUID, and
-			then open the bookmark/show a dropdown
-			list. */
 			return 0;
 		}
 		break;
@@ -171,6 +167,39 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd,UINT uM
 	}
 
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+bool CBookmarksToolbar::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	UNREFERENCED_PARAMETER(lParam);
+
+	if (!(LOWORD(wParam) >= m_uIDStart &&
+		LOWORD(wParam) <= m_uIDEnd))
+	{
+		return false;
+	}
+
+	int index = static_cast<int>(SendMessage(m_hToolbar, TB_COMMANDTOINDEX, LOWORD(wParam), 0));
+
+	if (index == -1)
+	{
+		return false;
+	}
+
+	auto variantBookmarkItem = GetBookmarkItemFromToolbarIndex(index);
+
+	if (!variantBookmarkItem)
+	{
+		return false;
+	}
+
+	if (variantBookmarkItem->type() == typeid(CBookmark))
+	{
+		CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
+		m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, FALSE, FALSE, FALSE);
+	}
+
+	return true;
 }
 
 bool CBookmarksToolbar::OnGetInfoTip(NMTBGETINFOTIP *infoTip)
