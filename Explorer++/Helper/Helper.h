@@ -5,10 +5,6 @@
 #include <list>
 #include <ShObjIdl.h>
 
-/* Major version numbers for various versions of
-Windows. */
-const int WINDOWS_VISTA_SEVEN_MAJORVERSION = 6;
-
 struct LangAndCodePage
 {
 	WORD wLanguage;
