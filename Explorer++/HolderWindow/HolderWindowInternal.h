@@ -1,9 +1,5 @@
 #pragma once
 
-/* Used for testing what version of Windows we're running on. */
-#define WINDOWS_VISTA_MAJORVERSION	6
-#define WINDOWS_XP_MAJORVERSION		5
-
 class CHolderWindow
 {
 public:
