@@ -340,9 +340,6 @@ void Explorerplusplus::InitializeMenus(void)
 	SetMenuItemBitmap(m_hTabRightClickMenu,IDM_FILE_NEWTAB,SHELLIMAGES_NEWTAB);
 	SetMenuItemBitmap(m_hTabRightClickMenu,IDM_TAB_REFRESH,SHELLIMAGES_REFRESH);
 
-	/* <---- Toolbar right click menu ----> */
-	SetMenuOwnerDraw(m_hToolbarRightClickMenu);
-
 	/* <---- Toolbar views menu ----> */
 	SetMenuOwnerDraw(m_hViewsMenu);
 
