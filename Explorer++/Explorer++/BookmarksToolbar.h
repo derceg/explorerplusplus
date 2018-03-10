@@ -80,6 +80,8 @@ private:
 
 	void	RemoveBookmarkItem(const GUID &guid);
 
+	bool	OnGetInfoTip(NMTBGETINFOTIP *infoTip);
+
 	int		GetBookmarkItemIndex(const GUID &guid);
 
 	boost::optional<NBookmarkHelper::variantBookmark_t>	GetBookmarkItemFromToolbarIndex(int index);

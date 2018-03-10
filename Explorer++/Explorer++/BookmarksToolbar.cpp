@@ -160,11 +160,9 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd,UINT uM
 			switch(reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
 			case TBN_GETINFOTIP:
+				if (OnGetInfoTip(reinterpret_cast<NMTBGETINFOTIP *>(lParam)))
 				{
-					//NMTBGETINFOTIP *pnmtbgit = reinterpret_cast<NMTBGETINFOTIP *>(lParam);
-
-					/* TODO: Build an infotip for the bookmark. */
-					//return 0;
+					return 0;
 				}
 				break;
 			}
@@ -173,6 +171,35 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd,UINT uM
 	}
 
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+bool CBookmarksToolbar::OnGetInfoTip(NMTBGETINFOTIP *infoTip)
+{
+	int index = static_cast<int>(SendMessage(m_hToolbar, TB_COMMANDTOINDEX, infoTip->iItem, 0));
+
+	if (index == -1)
+	{
+		return false;
+	}
+
+	auto variantBookmarkItem = GetBookmarkItemFromToolbarIndex(index);
+
+	if (!variantBookmarkItem)
+	{
+		return false;
+	}
+
+	if (variantBookmarkItem->type() == typeid(CBookmark))
+	{
+		CBookmark &Bookmark = boost::get<CBookmark>(*variantBookmarkItem);
+
+		StringCchPrintf(infoTip->pszText, infoTip->cchTextMax, _T("%s\n%s"),
+			Bookmark.GetName().c_str(), Bookmark.GetLocation().c_str());
+
+		return true;
+	}
+
+	return false;
 }
 
 void CBookmarksToolbar::InsertBookmarkItems()
