@@ -340,9 +340,6 @@ void Explorerplusplus::InitializeMenus(void)
 	SetMenuItemBitmap(m_hTabRightClickMenu,IDM_FILE_NEWTAB,SHELLIMAGES_NEWTAB);
 	SetMenuItemBitmap(m_hTabRightClickMenu,IDM_TAB_REFRESH,SHELLIMAGES_REFRESH);
 
-	/* <---- Toolbar views menu ----> */
-	SetMenuOwnerDraw(m_hViewsMenu);
-
 	/* CCustomMenu will handle the drawing of all owner drawn menus. */
 	m_pCustomMenu = new CCustomMenu(m_hContainer,hMenu,himlMenu);
 
