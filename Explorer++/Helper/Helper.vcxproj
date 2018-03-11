@@ -205,6 +205,7 @@
     <ClCompile Include="iDirectoryMonitor.cpp" />
     <ClCompile Include="iDropSource.cpp" />
     <ClCompile Include="iEnumFormatEtc.cpp" />
+    <ClCompile Include="ImageHelper.cpp" />
     <ClCompile Include="ListViewHelper.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="MenuHelper.cpp" />
@@ -251,6 +252,7 @@
     <ClInclude Include="iDirectoryMonitor.h" />
     <ClInclude Include="iDropSource.h" />
     <ClInclude Include="iEnumFormatEtc.h" />
+    <ClInclude Include="ImageHelper.h" />
     <ClInclude Include="ListViewHelper.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="Macros.h" />

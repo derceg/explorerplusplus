@@ -115,6 +115,9 @@
     <ClCompile Include="Logging.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="ImageHelper.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -238,6 +241,9 @@
       <Filter>Miscellaneous</Filter>
     </ClInclude>
     <ClInclude Include="Logging.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageHelper.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>
