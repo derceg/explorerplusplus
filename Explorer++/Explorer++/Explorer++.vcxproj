@@ -307,6 +307,7 @@
     <ClCompile Include="DestroyFilesDialog.cpp" />
     <ClCompile Include="DialogHelper.cpp" />
     <ClCompile Include="DisplayColoursDialog.cpp" />
+    <ClCompile Include="DisplayWindow.cpp" />
     <ClCompile Include="DrivesToolbar.cpp" />
     <ClCompile Include="EventSwitcher.cpp" />
     <ClCompile Include="Explorer++.cpp" />

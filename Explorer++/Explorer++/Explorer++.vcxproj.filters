@@ -196,6 +196,9 @@
     <ClCompile Include="Logging.cpp">
       <Filter>Logging</Filter>
     </ClCompile>
+    <ClCompile Include="DisplayWindow.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
