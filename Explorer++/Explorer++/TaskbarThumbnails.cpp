@@ -244,13 +244,13 @@ void Explorerplusplus::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 	}
 }
 
-void Explorerplusplus::RemoveTabProxy(int iInternalIndex)
+void Explorerplusplus::RemoveTabProxy(int iTabId)
 {
 	if(m_bTaskbarInitialised)
 	{
 		for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 		{
-			if(itr->iTabId == iInternalIndex)
+			if(itr->iTabId == iTabId)
 			{
 				m_pTaskbarList->UnregisterTab(itr->hProxy);
 

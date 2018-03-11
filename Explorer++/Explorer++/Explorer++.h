@@ -622,7 +622,7 @@ private:
 	void					RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive);
 	HBITMAP					CaptureTabScreenshot(int iTabId);
 	void					GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi);
-	void					RemoveTabProxy(int iInternalIndex);
+	void					RemoveTabProxy(int iTabId);
 	void					InvalidateTaskbarThumbnailBitmap(int iTabId);
 
 	/* Windows 7 jumplist tasks. */
