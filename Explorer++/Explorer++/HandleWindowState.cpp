@@ -425,18 +425,7 @@ void Explorerplusplus::UpdateTabText(int iTab,int iTabId)
 	}
 
 	/* Set the tab proxy text. */
-	if(m_bTaskbarInitialised)
-	{
-		for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
-		{
-			if(itr->iTabId == iTabId)
-			{
-				SetWindowText(itr->hProxy,szFinalTabText);
-				m_pTaskbarList->SetThumbnailTooltip(itr->hProxy,szFinalTabText);
-				break;
-			}
-		}
-	}
+	UpdateTaskbarThumbnailTtitle(iTabId, szFinalTabText);
 }
 
 void Explorerplusplus::SetTabIcon(void)

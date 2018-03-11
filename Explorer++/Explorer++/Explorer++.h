@@ -624,6 +624,9 @@ private:
 	void					GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi);
 	void					RemoveTabProxy(int iTabId);
 	void					InvalidateTaskbarThumbnailBitmap(int iTabId);
+	void					UpdateTaskbarThumbnailsForTabSelectionChange(int selectedTabId);
+	void					UpdateTaskbarThumbnailTtitle(int tabId, const std::wstring &title);
+	void					SetTabProxyIcon(int iTabId, HICON hIcon);
 
 	/* Windows 7 jumplist tasks. */
 	void					SetupJumplistTasks();
@@ -679,9 +682,6 @@ private:
 	BOOL					AreAllSelectedFilesReal(void) const;
 	BOOL					CanPaste(void) const;
 	BOOL					TestItemAttributes(SFGAOF attributes) const;
-
-	/* Tab proxy's. */
-	void					SetTabProxyIcon(int iTabId,HICON hIcon);
 
 	/* Display window file information. */
 	void					UpdateDisplayWindow(void);

@@ -724,3 +724,80 @@ void Explorerplusplus::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi
 	DeleteDC(hdcTabSrc);
 	ReleaseDC(hTab,hdcTab);
 }
+
+void Explorerplusplus::UpdateTaskbarThumbnailsForTabSelectionChange(int selectedTabId)
+{
+	if (!m_bTaskbarInitialised)
+	{
+		return;
+	}
+
+	for (const TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
+	{
+		if (tabProxyInfo.iTabId == selectedTabId)
+		{
+			int nTabs;
+
+			nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+
+			/* Potentially the tab may have swapped position, so
+			tell the taskbar to reposition it. */
+			if (m_iTabSelectedItem == (nTabs - 1))
+			{
+				m_pTaskbarList->SetTabOrder(tabProxyInfo.hProxy, NULL);
+			}
+			else
+			{
+				TCITEM tcNextItem;
+				tcNextItem.mask = TCIF_PARAM;
+				TabCtrl_GetItem(m_hTabCtrl, m_iTabSelectedItem + 1, &tcNextItem);
+
+				for (const TabProxyInfo_t &tabProxyInfoNext : m_TabProxyList)
+				{
+					if (tabProxyInfoNext.iTabId == tcNextItem.lParam)
+					{
+						m_pTaskbarList->SetTabOrder(tabProxyInfo.hProxy, tabProxyInfoNext.hProxy);
+					}
+				}
+			}
+
+			m_pTaskbarList->SetTabActive(tabProxyInfo.hProxy, m_hContainer, 0);
+			break;
+		}
+	}
+}
+
+void Explorerplusplus::UpdateTaskbarThumbnailTtitle(int tabId, const std::wstring &title)
+{
+	if (!m_bTaskbarInitialised)
+	{
+		return;
+	}
+
+	for (const TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
+	{
+		if (tabProxyInfo.iTabId == tabId)
+		{
+			SetWindowText(tabProxyInfo.hProxy, title.c_str());
+			m_pTaskbarList->SetThumbnailTooltip(tabProxyInfo.hProxy, title.c_str());
+			break;
+		}
+	}
+}
+
+void Explorerplusplus::SetTabProxyIcon(int iTabId, HICON hIcon)
+{
+	for (const TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
+	{
+		if (tabProxyInfo.iTabId == iTabId)
+		{
+			HICON hIconTemp = (HICON)GetClassLongPtr(tabProxyInfo.hProxy, GCLP_HICONSM);
+			DestroyIcon(hIconTemp);
+
+			hIconTemp = CopyIcon(hIcon);
+
+			SetClassLongPtr(tabProxyInfo.hProxy, GCLP_HICONSM, (LONG_PTR)hIconTemp);
+			break;
+		}
+	}
+}

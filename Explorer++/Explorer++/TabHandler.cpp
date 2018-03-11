@@ -693,46 +693,7 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 	ShowWindow(m_hActiveListView,SW_SHOW);
 
 	/* Inform the taskbar that this tab has become active. */
-	if(m_bTaskbarInitialised)
-	{
-		std::list<TabProxyInfo_t>::iterator itr;
-
-		for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
-		{
-			if(itr->iTabId == m_iObjectIndex)
-			{
-				int nTabs;
-
-				nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-				/* POtentially the tab may have swapped position, so
-				tell the taskbar to reposition it. */
-				if(m_iTabSelectedItem == (nTabs - 1))
-				{
-					m_pTaskbarList->SetTabOrder(itr->hProxy,NULL);
-				}
-				else
-				{
-					std::list<TabProxyInfo_t>::iterator itrNext;
-
-					TCITEM tcNextItem;
-					tcNextItem.mask = TCIF_PARAM;
-					TabCtrl_GetItem(m_hTabCtrl,m_iTabSelectedItem + 1,&tcNextItem);
-
-					for(itrNext = m_TabProxyList.begin();itrNext != m_TabProxyList.end();itrNext++)
-					{
-						if(itrNext->iTabId == (int)tcNextItem.lParam)
-						{
-							m_pTaskbarList->SetTabOrder(itr->hProxy,itrNext->hProxy);
-						}
-					}
-				}
-
-				m_pTaskbarList->SetTabActive(itr->hProxy,m_hContainer,0);
-				break;
-			}
-		}
-	}
+	UpdateTaskbarThumbnailsForTabSelectionChange(m_iObjectIndex);
 
 	if(bSetFocus)
 	{
@@ -1504,27 +1465,6 @@ void Explorerplusplus::DuplicateTab(int iTabInternal)
 		szTabDirectory);
 
 	BrowseFolder(szTabDirectory,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
-}
-
-void Explorerplusplus::SetTabProxyIcon(int iTabId,HICON hIcon)
-{
-	std::list<TabProxyInfo_t>::iterator itr;
-
-	for(itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
-	{
-		if(itr->iTabId == iTabId)
-		{
-			HICON hIconTemp;
-
-			hIconTemp = (HICON)GetClassLongPtr(itr->hProxy,GCLP_HICONSM);
-			DestroyIcon(hIconTemp);
-
-			hIconTemp = CopyIcon(hIcon);
-
-			SetClassLongPtr(itr->hProxy,GCLP_HICONSM,(LONG_PTR)hIconTemp);
-			break;
-		}
-	}
 }
 
 int Explorerplusplus::GetCurrentTabId() const
