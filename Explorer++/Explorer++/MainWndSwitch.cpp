@@ -1359,39 +1359,39 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDA_TAB1:
-			OnSelectTab(0);
+			OnSelectTabByIndex(0);
 			break;
 
 		case IDA_TAB2:
-			OnSelectTab(1);
+			OnSelectTabByIndex(1);
 			break;
 
 		case IDA_TAB3:
-			OnSelectTab(2);
+			OnSelectTabByIndex(2);
 			break;
 
 		case IDA_TAB4:
-			OnSelectTab(3);
+			OnSelectTabByIndex(3);
 			break;
 
 		case IDA_TAB5:
-			OnSelectTab(4);
+			OnSelectTabByIndex(4);
 			break;
 
 		case IDA_TAB6:
-			OnSelectTab(5);
+			OnSelectTabByIndex(5);
 			break;
 
 		case IDA_TAB7:
-			OnSelectTab(6);
+			OnSelectTabByIndex(6);
 			break;
 
 		case IDA_TAB8:
-			OnSelectTab(7);
+			OnSelectTabByIndex(7);
 			break;
 
 		case IDA_LASTTAB:
-			OnSelectTab(-1);
+			OnSelectTabByIndex(-1);
 			break;
 
 		case TOOLBAR_VIEWS:

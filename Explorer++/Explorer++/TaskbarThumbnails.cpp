@@ -345,7 +345,7 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 			ShowWindow(m_hContainer,SW_RESTORE);
 		}
 
-		OnSelectTab(iTabId,FALSE);
+		OnSelectTabByIndex(iTabId,FALSE);
 		return 0;
 		break;
 

@@ -809,12 +809,12 @@ void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 	OnTabChangeInternal(TRUE);
 }
 
-void Explorerplusplus::OnSelectTab(int iTab)
+void Explorerplusplus::OnSelectTabByIndex(int iTab)
 {
-	return OnSelectTab(iTab,TRUE);
+	return OnSelectTabByIndex(iTab,TRUE);
 }
 
-void Explorerplusplus::OnSelectTab(int iTab,BOOL bSetFocus)
+void Explorerplusplus::OnSelectTabByIndex(int iTab,BOOL bSetFocus)
 {
 	int nTabs;
 
