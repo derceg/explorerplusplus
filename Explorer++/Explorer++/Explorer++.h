@@ -385,6 +385,8 @@ private:
 	LRESULT					OnCustomDraw(LPARAM lParam);
 	void					OnSortBy(UINT uSortMode);
 	void					OnGroupBy(UINT uSortMode);
+	void					OnSelectTabById(int tabId, BOOL setFocus);
+	int						GetTabIndexById(int tabId);
 	void					OnSelectTabByIndex(int iTab);
 	void					OnSelectTabByIndex(int iTab,BOOL bSetFocus);
 

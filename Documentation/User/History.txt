@@ -23,6 +23,8 @@ Bug fixes:
   the file would not be put into edit mode. Fixed. See #48.
 - The Explorer++ icon shown in the volume mixer was larger than it
   should have been. Fixed. See #24.
+- Under certain conditions, switching to a tab using the taskbar
+  thumbnails would result in the wrong tab being selected. Fixed.
 - Fixed a number of memory leaks.
 
 Misc:

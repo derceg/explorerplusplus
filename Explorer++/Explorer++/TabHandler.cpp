@@ -809,6 +809,33 @@ void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 	OnTabChangeInternal(TRUE);
 }
 
+void Explorerplusplus::OnSelectTabById(int tabId, BOOL setFocus)
+{
+	int index = GetTabIndexById(tabId);
+	assert(index != -1);
+
+	OnSelectTabByIndex(index, setFocus);
+}
+
+int Explorerplusplus::GetTabIndexById(int tabId)
+{
+	int numTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+
+	for (int i = 0; i < numTabs; i++)
+	{
+		TCITEM tcItem;
+		tcItem.mask = TCIF_PARAM;
+		TabCtrl_GetItem(m_hTabCtrl, i, &tcItem);
+
+		if (tcItem.lParam == tabId)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
 {
 	return OnSelectTabByIndex(iTab,TRUE);
