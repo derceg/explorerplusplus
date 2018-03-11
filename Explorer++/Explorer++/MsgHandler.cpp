@@ -850,26 +850,6 @@ void Explorerplusplus::OnAutoSizeColumns(void)
 	}
 }
 
-BOOL Explorerplusplus::OnMeasureItem(MEASUREITEMSTRUCT *pMeasureItem)
-{
-	if(pMeasureItem->CtlType == ODT_MENU)
-	{
-		return m_pCustomMenu->OnMeasureItem(pMeasureItem);
-	}
-
-	return TRUE;
-}
-
-BOOL Explorerplusplus::OnDrawItem(DRAWITEMSTRUCT *pDrawItem)
-{
-	if(pDrawItem->CtlType == ODT_MENU)
-	{
-		return m_pCustomMenu->OnDrawItem(pDrawItem);
-	}
-
-	return TRUE;
-}
-
 /* Cycle through the current views. */
 void Explorerplusplus::OnToolbarViews(void)
 {
@@ -1063,14 +1043,6 @@ void Explorerplusplus::SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl)
 	}
 	else
 	{
-		mii.cbSize		= sizeof(mii);
-		mii.fMask		= MIIM_DATA;
-		GetMenuItemInfo(hMenu,uMenuID,FALSE,&mii);
-
-		/* Free the custom menu information. */
-		free((CustomMenuInfo_t *)mii.dwItemData);
-
-		/* Now, delete the menu .*/
 		DeleteMenu(hMenu,uMenuID,MF_BYCOMMAND);
 	}
 }

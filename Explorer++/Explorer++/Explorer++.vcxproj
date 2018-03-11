@@ -304,7 +304,6 @@
     <ClCompile Include="ColorRuleDialog.cpp" />
     <ClCompile Include="ColorRuleHelper.cpp" />
     <ClCompile Include="CustomizeColorsDialog.cpp" />
-    <ClCompile Include="CustomMenu.cpp" />
     <ClCompile Include="DestroyFilesDialog.cpp" />
     <ClCompile Include="DialogHelper.cpp" />
     <ClCompile Include="DisplayColoursDialog.cpp" />

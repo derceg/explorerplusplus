@@ -980,23 +980,8 @@ int Explorerplusplus::DetermineGroupModeMenuId(int SortMode)
  */
 void Explorerplusplus::DeletePreviousArrangeMenuItems(void)
 {
-	MENUITEMINFO	mii;
-	int				i = 0;
-
-	for(i = m_iMaxArrangeMenuItem - 1;i >= 0;i--)
+	for(int i = m_iMaxArrangeMenuItem - 1;i >= 0;i--)
 	{
-		mii.cbSize	= sizeof(mii);
-		mii.fMask	= MIIM_DATA;
-		GetMenuItemInfo(m_hArrangeSubMenu,i,TRUE,&mii);
-
-		free((CustomMenuInfo_t *)mii.dwItemData);
-
-		mii.cbSize	= sizeof(mii);
-		mii.fMask	= MIIM_DATA;
-		GetMenuItemInfo(m_hGroupBySubMenu,i,TRUE,&mii);
-
-		free((CustomMenuInfo_t *)mii.dwItemData);
-
 		DeleteMenu(m_hArrangeSubMenu,i,MF_BYPOSITION);
 		DeleteMenu(m_hArrangeSubMenuRClick,i,MF_BYPOSITION);
 		DeleteMenu(m_hGroupBySubMenu,i,MF_BYPOSITION);
@@ -1047,11 +1032,4 @@ void Explorerplusplus::UpdateArrangeMenuItems(void)
 	SortModes.clear();
 
 	m_iMaxArrangeMenuItem = InsertArrangeMenuItems(m_hArrangeSubMenu);
-
-	/* Do NOT mark the whole menu to be owner
-	drawn. The lower menus (below the sort modes)
-	are already owner drawn. ONLY mark the current
-	sort modes as owner drawn. */
-	SetMenuOwnerDrawInternal(m_hArrangeSubMenu,m_iMaxArrangeMenuItem);
-	SetMenuOwnerDrawInternal(m_hGroupBySubMenu,m_iMaxArrangeMenuItem);
 }

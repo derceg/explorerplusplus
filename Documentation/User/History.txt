@@ -29,6 +29,8 @@ Misc:
 - Windows XP is no longer supported. Windows Vista is now the minumum
   supported version.
 - Builds are now digitally signed.
+- All menus are now drawn in the standard system style, rather than
+  a custom style.
 
 Version 1.3.5 (03/02/2013)
 --------------------------

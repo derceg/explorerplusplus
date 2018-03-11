@@ -462,8 +462,6 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 		}
 
 		history.clear();
-
-		SetMenuOwnerDraw(hSubMenu);
 	}
 
 	return hSubMenu;

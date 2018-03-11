@@ -127,7 +127,6 @@ Explorerplusplus::~Explorerplusplus()
 	}
 
 	delete m_pTabContainer;
-	delete m_pCustomMenu;
 
 	/* Bookmarks teardown. */
 	delete m_pBookmarksToolbar;

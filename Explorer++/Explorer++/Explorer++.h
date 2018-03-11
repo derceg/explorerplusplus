@@ -16,7 +16,7 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/DropHandler.h"
-#include "../Helper/CustomMenu.h"
+#include "../Helper/ImageWrappers.h"
 #import <msxml3.dll> raw_interfaces_only
 
 #define MENU_BOOKMARK_STARTID		10000
@@ -364,8 +364,6 @@ private:
 	void					OnLockTabAndAddress(int iTab);
 	void					UpdateTabToolbar(void);
 	void					OnAutoSizeColumns(void);
-	BOOL					OnMeasureItem(MEASUREITEMSTRUCT *pMeasureItem);
-	BOOL					OnDrawItem(DRAWITEMSTRUCT *pDrawItem);
 	void					OnToolbarViews(void);
 	void					ShowToolbarViewsDropdown(void);
 	void					OnApplicationToolbarRClick();
@@ -746,14 +744,13 @@ private:
 	HWND					GetActiveListView() const;
 	CShellBrowser			*GetActiveShellBrowser() const;
 
-	/* Custom menus. */
-	void					SetMenuOwnerDraw(HMENU hMenu);
-	void					SetMenuOwnerDrawInternal(HMENU hMenu, int nMenus);
-	void					SetMenuItemOwnerDrawn(HMENU hMenu, int iItem);
-	void					SetMenuItemBitmap(HMENU hMenu, UINT ItemID, int iBitmap);
-
 	/* Helpers. */
 	HANDLE					CreateWorkerThread();
+
+	/* Menus. */
+	void					InitializeMenus(void);
+	void					SetMenuImages();
+	void					SetMenuItemImageFromImageList(HMENU menu, UINT menuItemId, HIMAGELIST imageList, int bitmapIndex, std::vector<HBitmapPtr> &menuImages);
 
 	/* Miscellaneous. */
 	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
@@ -761,7 +758,6 @@ private:
 	void					CreateViewsMenu(POINT *ptOrigin);
 	void					CreateStatusBar(void);
 	void					InitializeDisplayWindow(void);
-	void					InitializeMenus(void);
 	void					SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl);
 	int						CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
 	BOOL					AnyItemsSelected(void);
@@ -800,7 +796,6 @@ private:
 	CShellBrowser *			m_pActiveShellBrowser;
 	IDirectoryMonitor *		m_pDirMon;
 	CMyTreeView *			m_pMyTreeView;
-	CCustomMenu *			m_pCustomMenu;
 	CStatusBar *			m_pStatusBar;
 	HANDLE					m_hIconThread;
 	HANDLE					m_hTreeViewIconThread;
@@ -1001,6 +996,9 @@ private:
 	/* Cut items data. */
 	std::list<std::wstring>	m_CutFileNameList;
 	int						m_iCutTabInternal;
+
+	/* Menu images. */
+	std::vector<HBitmapPtr>	m_menuImages;
 
 	/* Arrange menu related data. */
 	std::list<ArrangeMenuItem_t>	m_ArrangeList;

@@ -191,7 +191,6 @@
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
     </ClCompile>
-    <ClCompile Include="CustomMenu.cpp" />
     <ClCompile Include="DialogSettings.cpp" />
     <ClCompile Include="DriveInfo.cpp" />
     <ClCompile Include="DropHandler.cpp" />
@@ -238,7 +237,6 @@
     <ClInclude Include="ComboBoxHelper.h" />
     <ClInclude Include="ContextMenuManager.h" />
     <ClInclude Include="Controls.h" />
-    <ClInclude Include="CustomMenu.h" />
     <ClInclude Include="DialogSettings.h" />
     <ClInclude Include="DriveInfo.h" />
     <ClInclude Include="DropHandler.h" />
@@ -253,6 +251,7 @@
     <ClInclude Include="iDropSource.h" />
     <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="ImageHelper.h" />
+    <ClInclude Include="ImageWrappers.h" />
     <ClInclude Include="ListViewHelper.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="Macros.h" />

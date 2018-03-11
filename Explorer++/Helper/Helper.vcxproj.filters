@@ -70,9 +70,6 @@
     <ClCompile Include="BaseWindow.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
-    <ClCompile Include="CustomMenu.cpp">
-      <Filter>Miscellaneous</Filter>
-    </ClCompile>
     <ClCompile Include="DriveInfo.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
@@ -162,9 +159,6 @@
     <ClInclude Include="BaseWindow.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="CustomMenu.h">
-      <Filter>Miscellaneous</Filter>
-    </ClInclude>
     <ClInclude Include="DriveInfo.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
@@ -245,6 +239,9 @@
     </ClInclude>
     <ClInclude Include="ImageHelper.h">
       <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageWrappers.h">
+      <Filter>Resource Wrappers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

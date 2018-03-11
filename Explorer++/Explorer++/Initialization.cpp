@@ -14,6 +14,7 @@
 
 #include "stdafx.h"
 #include <list>
+#include <map>
 #include "Explorer++.h"
 #include "MainImages.h"
 #include "CustomizeColorsDialog.h"
@@ -22,6 +23,7 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "MainResource.h"
 
@@ -29,7 +31,47 @@
 DWORD WINAPI WorkerThreadProc(LPVOID pParam);
 void CALLBACK InitializeCOMAPC(ULONG_PTR dwParam);
 
-extern HIMAGELIST himlMenu;
+const std::map<UINT, int> MAIN_MENU_IMAGE_MAPPINGS = {
+	{ IDM_FILE_NEWTAB, SHELLIMAGES_NEWTAB },
+	{ IDM_FILE_OPENCOMMANDPROMPT, SHELLIMAGES_CMD },
+	{ IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR, SHELLIMAGES_CMDADMIN },
+	{ IDM_FILE_DELETE, SHELLIMAGES_DELETE },
+	{ IDM_FILE_DELETEPERMANENTLY, SHELLIMAGES_DELETEPERMANENTLY },
+	{ IDM_FILE_RENAME, SHELLIMAGES_RENAME },
+	{ IDM_FILE_PROPERTIES, SHELLIMAGES_PROPERTIES },
+
+	{ IDM_EDIT_UNDO, SHELLIMAGES_UNDO },
+	{ IDM_EDIT_COPY, SHELLIMAGES_COPY },
+	{ IDM_EDIT_CUT, SHELLIMAGES_CUT },
+	{ IDM_EDIT_PASTE, SHELLIMAGES_PASTE },
+	{ IDM_EDIT_PASTESHORTCUT, SHELLIMAGES_PASTESHORTCUT },
+	{ IDM_EDIT_COPYTOFOLDER, SHELLIMAGES_COPYTO },
+	{ IDM_EDIT_MOVETOFOLDER, SHELLIMAGES_MOVETO },
+
+	{ IDM_ACTIONS_NEWFOLDER, SHELLIMAGES_NEWFOLDER },
+
+	{ IDM_VIEW_REFRESH, SHELLIMAGES_REFRESH },
+
+	{ IDM_FILTER_FILTERRESULTS, SHELLIMAGES_FILTER },
+
+	{ IDM_GO_BACK, SHELLIMAGES_BACK },
+	{ IDM_GO_FORWARD, SHELLIMAGES_FORWARD },
+	{ IDM_GO_UPONELEVEL, SHELLIMAGES_UP },
+
+	{ IDM_BOOKMARKS_BOOKMARKTHISTAB, SHELLIMAGES_ADDFAV },
+	{ IDM_BOOKMARKS_MANAGEBOOKMARKS, SHELLIMAGES_FAV },
+
+	{ IDM_TOOLS_SEARCH, SHELLIMAGES_SEARCH },
+	{ IDM_TOOLS_CUSTOMIZECOLORS, SHELLIMAGES_CUSTOMIZECOLORS },
+	{ IDM_TOOLS_OPTIONS, SHELLIMAGES_OPTIONS },
+
+	{ IDM_HELP_HELP, SHELLIMAGES_HELP }
+};
+
+const std::map<UINT, int> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
+	{ IDM_FILE_NEWTAB, SHELLIMAGES_NEWTAB },
+	{ IDM_TAB_REFRESH, SHELLIMAGES_REFRESH }
+};
 
 DWORD WINAPI WorkerThreadProc(LPVOID pParam)
 {
@@ -249,12 +291,7 @@ void Explorerplusplus::InitializeDisplayWindow(void)
 
 void Explorerplusplus::InitializeMenus(void)
 {
-	HMENU	hMenu;
-	HBITMAP	hBitmap;
-	int		nTopLevelMenus;
-	int		i = 0;
-
-	hMenu = GetMenu(m_hContainer);
+	HMENU hMenu = GetMenu(m_hContainer);
 
 	/* Insert the view mode (icons, small icons, details, etc) menus in. */
 	MENUITEMINFO mii;
@@ -278,70 +315,7 @@ void Explorerplusplus::InitializeMenus(void)
 	DeleteMenu(hMenu,IDM_VIEW_PLACEHOLDER,MF_BYCOMMAND);
 	DeleteMenu(m_hViewsMenu,IDM_VIEW_PLACEHOLDER,MF_BYCOMMAND);
 
-	nTopLevelMenus = GetMenuItemCount(hMenu);
-
-	/* Loop through each of the top level menus, setting
-	all sub menus to owner drawn. Don't set top-level
-	parent menus to owner drawn. */
-	for(i = 0;i < nTopLevelMenus;i++)
-	{
-		SetMenuOwnerDraw(GetSubMenu(hMenu,i));
-	}
-
-	himlMenu = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
-
-	/* Contains all images used on the menus. */
-	hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-
-	ImageList_Add(himlMenu,hBitmap,NULL);
-
-	/* <---- Associate menu items with a particular image ----> */
-
-	/* <---- Main menu ----> */
-
-	SetMenuItemBitmap(hMenu,IDM_FILE_NEWTAB,SHELLIMAGES_NEWTAB);
-	SetMenuItemBitmap(hMenu,IDM_FILE_OPENCOMMANDPROMPT,SHELLIMAGES_CMD);
-	SetMenuItemBitmap(hMenu,IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR,SHELLIMAGES_CMDADMIN);
-	SetMenuItemBitmap(hMenu,IDM_FILE_DELETE,SHELLIMAGES_DELETE);
-	SetMenuItemBitmap(hMenu,IDM_FILE_DELETEPERMANENTLY,SHELLIMAGES_DELETEPERMANENTLY);
-	SetMenuItemBitmap(hMenu,IDM_FILE_RENAME,SHELLIMAGES_RENAME);
-	SetMenuItemBitmap(hMenu,IDM_FILE_PROPERTIES,SHELLIMAGES_PROPERTIES);
-
-	SetMenuItemBitmap(hMenu,IDM_EDIT_UNDO,SHELLIMAGES_UNDO);
-	SetMenuItemBitmap(hMenu,IDM_EDIT_COPY,SHELLIMAGES_COPY);
-	SetMenuItemBitmap(hMenu,IDM_EDIT_CUT,SHELLIMAGES_CUT);
-	SetMenuItemBitmap(hMenu,IDM_EDIT_PASTE,SHELLIMAGES_PASTE);
-	SetMenuItemBitmap(hMenu,IDM_EDIT_PASTESHORTCUT,SHELLIMAGES_PASTESHORTCUT);
-	SetMenuItemBitmap(hMenu,IDM_EDIT_COPYTOFOLDER,SHELLIMAGES_COPYTO);
-	SetMenuItemBitmap(hMenu,IDM_EDIT_MOVETOFOLDER,SHELLIMAGES_MOVETO);
-
-	SetMenuItemBitmap(hMenu,IDM_ACTIONS_NEWFOLDER,SHELLIMAGES_NEWFOLDER);
-
-	SetMenuItemBitmap(hMenu,IDM_VIEW_REFRESH,SHELLIMAGES_REFRESH);
-
-	SetMenuItemBitmap(hMenu,IDM_FILTER_FILTERRESULTS,SHELLIMAGES_FILTER);
-
-	SetMenuItemBitmap(hMenu,IDM_GO_BACK,SHELLIMAGES_BACK);
-	SetMenuItemBitmap(hMenu,IDM_GO_FORWARD,SHELLIMAGES_FORWARD);
-	SetMenuItemBitmap(hMenu,IDM_GO_UPONELEVEL,SHELLIMAGES_UP);
-
-	SetMenuItemBitmap(hMenu,IDM_BOOKMARKS_BOOKMARKTHISTAB,SHELLIMAGES_ADDFAV);
-	SetMenuItemBitmap(hMenu,IDM_BOOKMARKS_MANAGEBOOKMARKS,SHELLIMAGES_FAV);
-
-	SetMenuItemBitmap(hMenu,IDM_TOOLS_SEARCH,SHELLIMAGES_SEARCH);
-	SetMenuItemBitmap(hMenu,IDM_TOOLS_CUSTOMIZECOLORS,SHELLIMAGES_CUSTOMIZECOLORS);
-	SetMenuItemBitmap(hMenu,IDM_TOOLS_OPTIONS,SHELLIMAGES_OPTIONS);
-
-	SetMenuItemBitmap(hMenu,IDM_HELP_HELP,SHELLIMAGES_HELP);
-
-	SetMenuOwnerDraw(m_hTabRightClickMenu);
-
-	/* <---- Tab right click menu ----> */
-	SetMenuItemBitmap(m_hTabRightClickMenu,IDM_FILE_NEWTAB,SHELLIMAGES_NEWTAB);
-	SetMenuItemBitmap(m_hTabRightClickMenu,IDM_TAB_REFRESH,SHELLIMAGES_REFRESH);
-
-	/* CCustomMenu will handle the drawing of all owner drawn menus. */
-	m_pCustomMenu = new CCustomMenu(m_hContainer,hMenu,himlMenu);
+	SetMenuImages();
 
 	SetGoMenuName(hMenu,IDM_GO_MYCOMPUTER,CSIDL_DRIVES);
 	SetGoMenuName(hMenu,IDM_GO_MYDOCUMENTS,CSIDL_PERSONAL);
@@ -354,14 +328,76 @@ void Explorerplusplus::InitializeMenus(void)
 	SetGoMenuName(hMenu,IDM_GO_CDBURNING,CSIDL_CDBURN_AREA);
 	SetGoMenuName(hMenu,IDM_GO_MYNETWORKPLACES,CSIDL_NETWORK);
 	SetGoMenuName(hMenu,IDM_GO_NETWORKCONNECTIONS,CSIDL_CONNECTIONS);
+}
 
-	DeleteObject(hBitmap);
+void Explorerplusplus::SetMenuImages()
+{
+	HImageListPtr imageList = HImageListPtr(ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48));
 
-	/* Arrange submenu. */
-	SetMenuOwnerDraw(m_hArrangeSubMenu);
+	if (!imageList)
+	{
+		return;
+	}
 
-	/* Group by submenu. */
-	SetMenuOwnerDraw(m_hGroupBySubMenu);
+	HBitmapPtr bitmap = HBitmapPtr(static_cast<HBITMAP>(LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDB_SHELLIMAGES), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION)));
+
+	if (!bitmap)
+	{
+		return;
+	}
+
+	int res = ImageList_Add(imageList.get(), bitmap.get(), nullptr);
+
+	if (res == -1)
+	{
+		return;
+	}
+
+	HMENU mainMenu = GetMenu(m_hContainer);
+
+	for (auto mapping : MAIN_MENU_IMAGE_MAPPINGS)
+	{
+		SetMenuItemImageFromImageList(mainMenu, mapping.first, imageList.get(), mapping.second, m_menuImages);
+	}
+
+	for (auto mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
+	{
+		SetMenuItemImageFromImageList(m_hTabRightClickMenu, mapping.first, imageList.get(), mapping.second, m_menuImages);
+	}
+}
+
+void Explorerplusplus::SetMenuItemImageFromImageList(HMENU menu, UINT menuItemId, HIMAGELIST imageList, int bitmapIndex, std::vector<HBitmapPtr> &menuImages)
+{
+	HIconPtr icon = HIconPtr(ImageList_GetIcon(imageList, bitmapIndex, ILD_NORMAL));
+
+	if (!icon)
+	{
+		return;
+	}
+
+	HBitmapPtr bitmapPARGB32 = HBitmapPtr(ImageHelper::IconToBitmapPARGB32(icon.get(), 16, 16));
+
+	if (!bitmapPARGB32)
+	{
+		return;
+	}
+
+	MENUITEMINFO mii;
+	mii.cbSize = sizeof(mii);
+	mii.fMask = MIIM_BITMAP;
+	mii.hbmpItem = bitmapPARGB32.get();
+	BOOL res = SetMenuItemInfo(menu, menuItemId, FALSE, &mii);
+
+	if (res)
+	{
+		/* The bitmap needs to live
+		for as long as the menu
+		does. It's up to the caller
+		to ensure that the bitmap
+		is destroyed at the appropriate
+		time. */
+		menuImages.push_back(std::move(bitmapPARGB32));
+	}
 }
 
 void Explorerplusplus::SetDefaultTabSettings(TabInfo_t *pTabInfo)

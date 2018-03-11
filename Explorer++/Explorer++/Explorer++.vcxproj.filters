@@ -175,9 +175,6 @@
     <ClCompile Include="RegistrySettings.cpp">
       <Filter>Settings</Filter>
     </ClCompile>
-    <ClCompile Include="CustomMenu.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Language.cpp">
       <Filter>Core</Filter>
     </ClCompile>

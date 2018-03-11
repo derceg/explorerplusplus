@@ -35,10 +35,6 @@ and the right edge of the treeview during
 a resizing operation. */
 static const int TREEVIEW_DRAG_OFFSET = 8;
 
-/* TODO: Remove once custom menu image lists
-have been corrected. */
-extern HIMAGELIST himlMenu;
-
 LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
 {
 	Explorerplusplus *pContainer = (Explorerplusplus *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
@@ -88,20 +84,11 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		break;
 
 	case WM_INITMENU:
-		m_pCustomMenu->OnInitMenu(wParam);
 		SetProgramMenuItemStates((HMENU)wParam);
 		break;
 
 	case WM_MENUSELECT:
 		StatusBarMenuSelect(wParam,lParam);
-		break;
-
-	case WM_MEASUREITEM:
-		return OnMeasureItem(reinterpret_cast<MEASUREITEMSTRUCT *>(lParam));
-		break;
-
-	case WM_DRAWITEM:
-		return OnDrawItem(reinterpret_cast<DRAWITEMSTRUCT *>(lParam));
 		break;
 
 	case WM_DEVICECHANGE:
@@ -1588,7 +1575,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 				NMREBARCHEVRON *pnmrc = NULL;
 				HWND hToolbar = NULL;
 				HMENU hMenu;
-				HIMAGELIST himlBackup;
 				HIMAGELIST himlSmall;
 				MENUITEMINFO mii;
 				TCHAR szText[512];
@@ -1606,7 +1592,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 
 				pnmrc = (NMREBARCHEVRON *)lParam;
 
-				himlBackup = himlMenu;
+				HIMAGELIST himlMenu = nullptr;
 
 				Shell_GetImageLists(NULL,&himlSmall);
 
@@ -1716,8 +1702,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 													}
 												}
 
-												SetMenuOwnerDraw(hSubMenu);
-
 												fMask |= MIIM_SUBMENU;
 											}
 											break;
@@ -1739,8 +1723,8 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 								mii.dwTypeData	= szText;
 								InsertMenuItem(hMenu,iMenu,TRUE,&mii);
 
-								SetMenuItemOwnerDrawn(hMenu,iMenu);
-								SetMenuItemBitmap(hMenu,tbButton.idCommand,tbButton.iBitmap);	
+								/* TODO: Update the image
+								for this menu item. */
 							}
 							iMenu++;
 						}
@@ -1795,8 +1779,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 				}
 
 				DestroyMenu(hMenu);
-
-				himlMenu = himlBackup;
 			}
 			break;
 	}
