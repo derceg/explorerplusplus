@@ -683,9 +683,9 @@ private:
 
 	/* Display window file information. */
 	void					UpdateDisplayWindow(void);
-	void					UpdateDisplayWindowZero(void);
-	void					UpdateDisplayWindowOne(void);
-	void					UpdateDisplayWindowMore(void);
+	void					UpdateDisplayWindowForZeroFiles(void);
+	void					UpdateDisplayWindowForOneFile(void);
+	void					UpdateDisplayWindowForMultipleFiles(void);
 
 	/* Columns. */
 	void					OnSelectColumns();

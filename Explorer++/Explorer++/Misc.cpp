@@ -708,14 +708,14 @@ void Explorerplusplus::UpdateDisplayWindow(void)
 	nSelected = m_pActiveShellBrowser->QueryNumSelected();
 
 	if(nSelected == 0)
-		UpdateDisplayWindowZero();
+		UpdateDisplayWindowForZeroFiles();
 	else if(nSelected == 1)
-		UpdateDisplayWindowOne();
+		UpdateDisplayWindowForOneFile();
 	else if(nSelected > 1)
-		UpdateDisplayWindowMore();
+		UpdateDisplayWindowForMultipleFiles();
 }
 
-void Explorerplusplus::UpdateDisplayWindowZero(void)
+void Explorerplusplus::UpdateDisplayWindowForZeroFiles(void)
 {
 	/* Clear out any previous data shown in the display window. */
 	DisplayWindow_ClearTextBuffer(m_hDisplayWindow);
@@ -775,7 +775,7 @@ void Explorerplusplus::UpdateDisplayWindowZero(void)
 	CoTaskMemFree(pidlDirectory);
 }
 
-void Explorerplusplus::UpdateDisplayWindowOne(void)
+void Explorerplusplus::UpdateDisplayWindowForOneFile(void)
 {
 	WIN32_FIND_DATA	*pwfd = NULL;
 	SHFILEINFO		shfi;
@@ -1036,7 +1036,7 @@ void Explorerplusplus::UpdateDisplayWindowOne(void)
 	}
 }
 
-void Explorerplusplus::UpdateDisplayWindowMore(void)
+void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(void)
 {
 	TCHAR			szNumSelected[64] = EMPTY_STRING;
 	TCHAR			szTotalSize[64] = EMPTY_STRING;
