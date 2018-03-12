@@ -547,35 +547,35 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_VIEW_EXTRALARGEICONS:
-			m_pShellBrowser[m_selectedTabId]->SetCurrentViewMode(VM_EXTRALARGEICONS);
+			m_pActiveShellBrowser->SetCurrentViewMode(VM_EXTRALARGEICONS);
 			break;
 
 		case IDM_VIEW_LARGEICONS:
-			m_pShellBrowser[m_selectedTabId]->SetCurrentViewMode(VM_LARGEICONS);
+			m_pActiveShellBrowser->SetCurrentViewMode(VM_LARGEICONS);
 			break;
 
 		case IDM_VIEW_ICONS:
-			m_pShellBrowser[m_selectedTabId]->SetCurrentViewMode(VM_ICONS);
+			m_pActiveShellBrowser->SetCurrentViewMode(VM_ICONS);
 			break;
 
 		case IDM_VIEW_SMALLICONS:
-			m_pShellBrowser[m_selectedTabId]->SetCurrentViewMode(VM_SMALLICONS);
+			m_pActiveShellBrowser->SetCurrentViewMode(VM_SMALLICONS);
 			break;
 
 		case IDM_VIEW_LIST:
-			m_pShellBrowser[m_selectedTabId]->SetCurrentViewMode(VM_LIST);
+			m_pActiveShellBrowser->SetCurrentViewMode(VM_LIST);
 			break;
 
 		case IDM_VIEW_DETAILS:
-			m_pShellBrowser[m_selectedTabId]->SetCurrentViewMode(VM_DETAILS);
+			m_pActiveShellBrowser->SetCurrentViewMode(VM_DETAILS);
 			break;
 
 		case IDM_VIEW_THUMBNAILS:
-			m_pShellBrowser[m_selectedTabId]->SetCurrentViewMode(VM_THUMBNAILS);
+			m_pActiveShellBrowser->SetCurrentViewMode(VM_THUMBNAILS);
 			break;
 
 		case IDM_VIEW_TILES:
-			m_pShellBrowser[m_selectedTabId]->SetCurrentViewMode(VM_TILES);
+			m_pActiveShellBrowser->SetCurrentViewMode(VM_TILES);
 			break;
 
 		case IDM_VIEW_CHANGEDISPLAYCOLOURS:
@@ -1480,7 +1480,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 
 		case LVN_ITEMCHANGING:
 			{
-				UINT uViewMode = m_pShellBrowser[m_selectedTabId]->GetCurrentViewMode();
+				UINT uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
 
 				if(uViewMode == VM_LIST)
 				{

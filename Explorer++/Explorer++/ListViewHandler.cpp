@@ -175,7 +175,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 				RECT rc;
 				SIZE sz;
 
-				UINT uViewMode = m_pShellBrowser[m_selectedTabId]->GetCurrentViewMode();
+				UINT uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
 
 				if(uViewMode == VM_LIST)
 				{
@@ -1088,7 +1088,7 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 	mii.hSubMenu	= m_hGroupBySubMenuRClick;
 	SetMenuItemInfo(hMenu,IDM_POPUP_GROUPBY,FALSE,&mii);
 
-	UINT uViewMode = m_pShellBrowser[m_selectedTabId]->GetCurrentViewMode();
+	UINT uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
 
 	if(uViewMode == VM_LIST)
 	{

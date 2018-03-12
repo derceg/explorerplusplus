@@ -59,7 +59,7 @@ void Explorerplusplus::UpdateWindowStates(void)
 */
 void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 {
-	UINT uViewMode = m_pShellBrowser[m_selectedTabId]->GetCurrentViewMode();
+	UINT uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
 	BOOL bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYITEMPATH,AnyItemsSelected());
@@ -167,9 +167,9 @@ void Explorerplusplus::SetArrangeMenuItemStates()
 
 	bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
-	SortMode = m_pShellBrowser[m_selectedTabId]->GetSortMode();
+	SortMode = m_pActiveShellBrowser->GetSortMode();
 
-	bShowInGroups = m_pShellBrowser[m_selectedTabId]->IsGroupViewEnabled();
+	bShowInGroups = m_pActiveShellBrowser->IsGroupViewEnabled();
 
 	/* Go through both the sort by and group by menus and
 	remove all the checkmarks. Alternatively, could remember
