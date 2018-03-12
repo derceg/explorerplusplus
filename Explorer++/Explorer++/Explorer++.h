@@ -11,11 +11,9 @@
 #include "../ShellBrowser/iShellView.h"
 #include "../MyTreeView/MyTreeView.h"
 #include "../Helper/FileContextMenuManager.h"
-#include "../Helper/BaseDialog.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Bookmark.h"
-#include "../Helper/DropHandler.h"
 #include "../Helper/ImageWrappers.h"
 #import <msxml3.dll> raw_interfaces_only
 
