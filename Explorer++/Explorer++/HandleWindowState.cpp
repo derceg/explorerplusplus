@@ -59,7 +59,7 @@ void Explorerplusplus::UpdateWindowStates(void)
 */
 void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 {
-	UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
+	UINT uViewMode = m_pShellBrowser[m_selectedTabId]->GetCurrentViewMode();
 	BOOL bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYITEMPATH,AnyItemsSelected());
@@ -167,9 +167,9 @@ void Explorerplusplus::SetArrangeMenuItemStates()
 
 	bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
-	SortMode = m_pShellBrowser[m_iObjectIndex]->GetSortMode();
+	SortMode = m_pShellBrowser[m_selectedTabId]->GetSortMode();
 
-	bShowInGroups = m_pShellBrowser[m_iObjectIndex]->IsGroupViewEnabled();
+	bShowInGroups = m_pShellBrowser[m_selectedTabId]->IsGroupViewEnabled();
 
 	/* Go through both the sort by and group by menus and
 	remove all the checkmarks. Alternatively, could remember
@@ -372,7 +372,7 @@ void Explorerplusplus::UpdateAddressBarText(void)
 
 void Explorerplusplus::UpdateTabText(void)
 {
-	UpdateTabText(m_iTabSelectedItem,m_iObjectIndex);
+	UpdateTabText(m_iTabSelectedItem,m_selectedTabId);
 }
 
 void Explorerplusplus::UpdateTabText(int iTabId)
@@ -434,7 +434,7 @@ void Explorerplusplus::SetTabIcon(void)
 
 	pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
-	SetTabIcon(m_iTabSelectedItem,m_iObjectIndex,pidl);
+	SetTabIcon(m_iTabSelectedItem,m_selectedTabId,pidl);
 
 	CoTaskMemFree(pidl);
 }

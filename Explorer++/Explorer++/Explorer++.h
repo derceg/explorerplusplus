@@ -829,7 +829,7 @@ private:
 	BOOL					m_bLanguageLoaded;
 	BOOL					m_bTreeViewOpenInNewTab;
 	unsigned int			m_TreeViewWidth;
-	int						m_iObjectIndex;
+	int						m_selectedTabId;
 	int						m_iMaxArrangeMenuItem;
 	int						m_iLastSelectedTab;
 	int						m_iTabSelectedItem;

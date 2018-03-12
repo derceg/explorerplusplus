@@ -514,11 +514,11 @@ int *pTabObjectIndex)
 		ShowWindow(m_hActiveListView,SW_HIDE);
 		ShowWindow(m_hListView[iTabId],SW_SHOW);
 
-		m_iObjectIndex			= iTabId;
+		m_selectedTabId			= iTabId;
 		m_iTabSelectedItem		= iNewTabIndex;
 
-		m_hActiveListView		= m_hListView[m_iObjectIndex];
-		m_pActiveShellBrowser	= m_pShellBrowser[m_iObjectIndex];
+		m_hActiveListView		= m_hListView[m_selectedTabId];
+		m_pActiveShellBrowser	= m_pShellBrowser[m_selectedTabId];
 
 		SetFocus(m_hListView[iTabId]);
 
@@ -669,10 +669,10 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 	/* Hide the old listview. */
 	ShowWindow(m_hActiveListView,SW_HIDE);
 
-	m_iObjectIndex = (int)tcItem.lParam;
+	m_selectedTabId = (int)tcItem.lParam;
 
-	m_hActiveListView		= m_hListView[m_iObjectIndex];
-	m_pActiveShellBrowser	= m_pShellBrowser[m_iObjectIndex];
+	m_hActiveListView		= m_hListView[m_selectedTabId];
+	m_pActiveShellBrowser	= m_pShellBrowser[m_selectedTabId];
 
 	/* The selected tab has changed, so update the current
 	directory. Although this is not needed internally, context
@@ -693,14 +693,14 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 	ShowWindow(m_hActiveListView,SW_SHOW);
 
 	/* Inform the taskbar that this tab has become active. */
-	UpdateTaskbarThumbnailsForTabSelectionChange(m_iObjectIndex);
+	UpdateTaskbarThumbnailsForTabSelectionChange(m_selectedTabId);
 
 	if(bSetFocus)
 	{
 		SetFocus(m_hActiveListView);
 	}
 
-	m_iPreviousTabSelectionId = m_iObjectIndex;
+	m_iPreviousTabSelectionId = m_selectedTabId;
 }
 
 void Explorerplusplus::RefreshAllTabs(void)
@@ -1288,7 +1288,7 @@ void Explorerplusplus::OnLockTabInternal(int iTab,int iTabId)
 	/* If the tab that was locked/unlocked is the
 	currently selected tab, then the tab close
 	button on the toolbar will need to be updated. */
-	if(iTabId == m_iObjectIndex)
+	if(iTabId == m_selectedTabId)
 		UpdateTabToolbar();
 }
 
@@ -1318,7 +1318,7 @@ void Explorerplusplus::OnLockTabAndAddress(int iTab)
 	/* If the tab that was locked/unlocked is the
 	currently selected tab, then the tab close
 	button on the toolbar will need to be updated. */
-	if(internalIndex == m_iObjectIndex)
+	if(internalIndex == m_selectedTabId)
 		UpdateTabToolbar();
 }
 
@@ -1328,7 +1328,7 @@ void Explorerplusplus::UpdateTabToolbar(void)
 
 	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	if(nTabs > 1 && !(m_TabInfo[m_iObjectIndex].bLocked || m_TabInfo[m_iObjectIndex].bAddressLocked))
+	if(nTabs > 1 && !(m_TabInfo[m_selectedTabId].bLocked || m_TabInfo[m_selectedTabId].bAddressLocked))
 	{
 		/* Enable the tab close button. */
 		SendMessage(m_hTabWindowToolbar,TB_SETSTATE,
@@ -1469,7 +1469,7 @@ void Explorerplusplus::DuplicateTab(int iTabInternal)
 
 int Explorerplusplus::GetCurrentTabId() const
 {
-	return m_iObjectIndex;
+	return m_selectedTabId;
 }
 
 UINT Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory)

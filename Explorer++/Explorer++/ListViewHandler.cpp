@@ -175,7 +175,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 				RECT rc;
 				SIZE sz;
 
-				UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
+				UINT uViewMode = m_pShellBrowser[m_selectedTabId]->GetCurrentViewMode();
 
 				if(uViewMode == VM_LIST)
 				{
@@ -342,7 +342,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 					m_pActiveShellBrowser->ImportColumns(&ActiveColumnList);
 
-					RefreshTab(m_iObjectIndex);
+					RefreshTab(m_selectedTabId);
 
 					return TRUE;
 				}
@@ -647,7 +647,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	/* Only update internal selection info
 	if the listview that sent the change
 	notification is active. */
-	if(iObjectIndex == m_iObjectIndex)
+	if(iObjectIndex == m_selectedTabId)
 	{
 		if(Selected)
 		{
@@ -1088,7 +1088,7 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 	mii.hSubMenu	= m_hGroupBySubMenuRClick;
 	SetMenuItemInfo(hMenu,IDM_POPUP_GROUPBY,FALSE,&mii);
 
-	UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
+	UINT uViewMode = m_pShellBrowser[m_selectedTabId]->GetCurrentViewMode();
 
 	if(uViewMode == VM_LIST)
 	{
@@ -1312,7 +1312,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 			/* Need to remember which tab started the drag (as
 			it may be different from the tab in which the drag
 			finishes). */
-			iDragStartObjectIndex = m_iObjectIndex;
+			iDragStartObjectIndex = m_selectedTabId;
 
 			DWORD dwEffect;
 
@@ -1598,7 +1598,7 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 		if(SUCCEEDED(hr))
 		{
 			m_pClipboardDataObject = pClipboardDataObject;
-			m_iCutTabInternal = m_iObjectIndex;
+			m_iCutTabInternal = m_selectedTabId;
 
 			TCHAR szFilename[MAX_PATH];
 

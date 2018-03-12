@@ -487,7 +487,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 		uFlags = SWP_NOZORDER;
 
-		if((int)tcItem.lParam == m_iObjectIndex)
+		if((int)tcItem.lParam == m_selectedTabId)
 			uFlags |= SWP_SHOWWINDOW;
 
 		if(!m_bShowTabBarAtBottom)
@@ -817,7 +817,7 @@ void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
 {
 	TCHAR	szLoadingText[512];
 
-	if(iTabId == m_iObjectIndex)
+	if(iTabId == m_selectedTabId)
 	{
 		TCHAR szTemp[64];
 		LoadString(m_hLanguageModule,IDS_GENERAL_LOADING,szTemp,SIZEOF_ARRAY(szTemp));
@@ -858,7 +858,7 @@ void Explorerplusplus::OnToolbarViews(void)
 
 void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 {
-	UINT uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
+	UINT uViewMode = m_pShellBrowser[m_selectedTabId]->GetCurrentViewMode();
 
 	std::list<UINT>::iterator itr;
 
@@ -893,7 +893,7 @@ void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 		}
 	}
 
-	m_pShellBrowser[m_iObjectIndex]->SetCurrentViewMode(*itr);
+	m_pShellBrowser[m_selectedTabId]->SetCurrentViewMode(*itr);
 }
 
 void Explorerplusplus::ShowToolbarViewsDropdown(void)
@@ -917,10 +917,10 @@ void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)
 	{
 		m_pActiveShellBrowser->SetSortAscending(bSortAscending);
 
-		UINT SortMode = m_pShellBrowser[m_iObjectIndex]->GetSortMode();
+		UINT SortMode = m_pShellBrowser[m_selectedTabId]->GetSortMode();
 
 		/* It is quicker to re-sort the folder than refresh it. */
-		m_pShellBrowser[m_iObjectIndex]->SortFolder(SortMode);
+		m_pShellBrowser[m_selectedTabId]->SortFolder(SortMode);
 	}
 }
 
@@ -1158,7 +1158,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 
 void Explorerplusplus::OnRefresh(void)
 {
-	RefreshTab(m_iObjectIndex);
+	RefreshTab(m_selectedTabId);
 }
 
 void Explorerplusplus::CopyColumnInfoToClipboard(void)
@@ -1241,7 +1241,7 @@ void Explorerplusplus::OnDirectoryModified(int iTabId)
 	   the display window)
 	*/
 
-	if(iTabId == m_iObjectIndex)
+	if(iTabId == m_selectedTabId)
 	{
 		UpdateStatusBarText();
 		UpdateDisplayWindow();
@@ -1302,7 +1302,7 @@ void Explorerplusplus::OnIdaRClick(void)
 
 				ClientToScreen(m_hActiveListView,&ptItem);
 
-				uViewMode = m_pShellBrowser[m_iObjectIndex]->GetCurrentViewMode();
+				uViewMode = m_pShellBrowser[m_selectedTabId]->GetCurrentViewMode();
 
 				if(uViewMode == VM_SMALLICONS || uViewMode == VM_LIST ||
 					uViewMode == VM_DETAILS)
@@ -1662,39 +1662,39 @@ int Explorerplusplus::GetViewModeMenuStringId(UINT uViewMode)
 
 void Explorerplusplus::OnSortBy(UINT uSortMode)
 {
-	UINT uCurrentSortMode = m_pShellBrowser[m_iObjectIndex]->GetSortMode();
+	UINT uCurrentSortMode = m_pShellBrowser[m_selectedTabId]->GetSortMode();
 
-	if(!m_pShellBrowser[m_iObjectIndex]->IsGroupViewEnabled() &&
+	if(!m_pShellBrowser[m_selectedTabId]->IsGroupViewEnabled() &&
 		uSortMode == uCurrentSortMode)
 	{
 		m_pActiveShellBrowser->ToggleSortAscending();
 	}
-	else if(m_pShellBrowser[m_iObjectIndex]->IsGroupViewEnabled())
+	else if(m_pShellBrowser[m_selectedTabId]->IsGroupViewEnabled())
 	{
 		m_pActiveShellBrowser->SetGrouping(FALSE);
 	}
 
-	m_pShellBrowser[m_iObjectIndex]->SortFolder(uSortMode);
+	m_pShellBrowser[m_selectedTabId]->SortFolder(uSortMode);
 }
 
 void Explorerplusplus::OnGroupBy(UINT uSortMode)
 {
-	UINT uCurrentSortMode = m_pShellBrowser[m_iObjectIndex]->GetSortMode();
+	UINT uCurrentSortMode = m_pShellBrowser[m_selectedTabId]->GetSortMode();
 
 	/* If group view is already enabled, and the current sort
 	mode matches the supplied sort mode, toggle the ascending/
 	descending flag. */
-	if(m_pShellBrowser[m_iObjectIndex]->IsGroupViewEnabled() &&
+	if(m_pShellBrowser[m_selectedTabId]->IsGroupViewEnabled() &&
 		uSortMode == uCurrentSortMode)
 	{
 		m_pActiveShellBrowser->ToggleSortAscending();
 	}
-	else if(!m_pShellBrowser[m_iObjectIndex]->IsGroupViewEnabled())
+	else if(!m_pShellBrowser[m_selectedTabId]->IsGroupViewEnabled())
 	{
 		m_pActiveShellBrowser->SetGroupingFlag(TRUE);
 	}
 
-	m_pShellBrowser[m_iObjectIndex]->SortFolder(uSortMode);
+	m_pShellBrowser[m_selectedTabId]->SortFolder(uSortMode);
 }
 
 void Explorerplusplus::SaveAllSettings(void)
@@ -1812,5 +1812,5 @@ void Explorerplusplus::OnShowHiddenFiles(void)
 {
 	m_pActiveShellBrowser->ToggleShowHidden();
 
-	RefreshTab(m_iObjectIndex);
+	RefreshTab(m_selectedTabId);
 }

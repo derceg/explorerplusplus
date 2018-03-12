@@ -46,7 +46,7 @@ m_hContainer(hwnd)
 	/* Initial state. */
 	m_nSelected						= 0;
 	m_nSelectedOnInvert				= 0;
-	m_iObjectIndex					= 0;
+	m_selectedTabId					= 0;
 	m_iMaxArrangeMenuItem			= 0;
 	m_bCountingUp					= FALSE;
 	m_bCountingDown					= FALSE;
