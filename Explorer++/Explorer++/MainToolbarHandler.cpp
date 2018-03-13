@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Explorer++_internal.h"
 #include "MainImages.h"
 #include "DefaultToolbarButtons.h"
 #include "MainResource.h"
@@ -62,7 +63,7 @@ void Explorerplusplus::CreateMainToolbar()
 			TBSAVEPARAMS	tbSave;
 
 			tbSave.hkr = HKEY_CURRENT_USER;
-			tbSave.pszSubKey = REG_SETTINGS_KEY;
+			tbSave.pszSubKey = NExplorerplusplus::REG_SETTINGS_KEY;
 			tbSave.pszValueName = _T("ToolbarState");
 
 			SendMessage(m_hMainToolbar, TB_SAVERESTORE, FALSE, (LPARAM) &tbSave);

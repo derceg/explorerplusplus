@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include "DefaultColumns.h"
 #include "Explorer++.h"
+#include "Explorer++_internal.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
@@ -36,7 +37,7 @@ BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
 	HKEY hSettingsKey;
 	BOOL bRes = FALSE;
 
-	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER,REG_SETTINGS_KEY,0,
+	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER,NExplorerplusplus::REG_SETTINGS_KEY,0,
 		KEY_READ,&hSettingsKey);
 
 	if(lRes == ERROR_SUCCESS)
@@ -63,7 +64,7 @@ BOOL LoadAllowMultipleInstancesFromRegistry(void)
 	BOOL bAllowMultipleInstances = TRUE;
 
 	HKEY hSettingsKey;
-	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER,REG_SETTINGS_KEY,0,KEY_READ,&hSettingsKey);
+	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER,NExplorerplusplus::REG_SETTINGS_KEY,0,KEY_READ,&hSettingsKey);
 
 	if(lRes == ERROR_SUCCESS)
 	{
@@ -84,7 +85,7 @@ LONG Explorerplusplus::SaveSettings(void)
 	TBSAVEPARAMS	tbSave;
 
 	/* Open/Create the main key that is used to store data. */
-	ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,REG_SETTINGS_KEY,0,NULL,
+	ReturnValue = RegCreateKeyEx(HKEY_CURRENT_USER,NExplorerplusplus::REG_SETTINGS_KEY,0,NULL,
 	REG_OPTION_NON_VOLATILE,KEY_WRITE,NULL,&hSettingsKey,&Disposition);
 
 	if(ReturnValue == ERROR_SUCCESS)
@@ -191,7 +192,7 @@ LONG Explorerplusplus::SaveSettings(void)
 			(LPBYTE)&LogFont,sizeof(LOGFONT));
 
 		tbSave.hkr			= HKEY_CURRENT_USER;
-		tbSave.pszSubKey	= REG_SETTINGS_KEY;
+		tbSave.pszSubKey	= NExplorerplusplus::REG_SETTINGS_KEY;
 		tbSave.pszValueName	= _T("ToolbarState");
 
 		SendMessage(m_hMainToolbar,TB_SAVERESTORE,TRUE,(LPARAM)&tbSave);
@@ -213,7 +214,7 @@ LONG Explorerplusplus::LoadSettings()
 	LONG			lStatus;
 
 	/* Open/Create the main key that is used to store data. */
-	ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER,REG_SETTINGS_KEY,0,KEY_READ,&hSettingsKey);
+	ReturnValue = RegOpenKeyEx(HKEY_CURRENT_USER, NExplorerplusplus::REG_SETTINGS_KEY,0,KEY_READ,&hSettingsKey);
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{

@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Explorer++_internal.h"
 #include "Logging.h"
 #include "ModelessDialogs.h"
 #include "RegistrySettings.h"
@@ -226,7 +227,7 @@ void ClearRegistrySettings(void)
 {
 	LSTATUS lStatus;
 
-	lStatus = SHDeleteKey(HKEY_CURRENT_USER,REG_MAIN_KEY);
+	lStatus = SHDeleteKey(HKEY_CURRENT_USER, NExplorerplusplus::REG_MAIN_KEY);
 
 	if(lStatus == ERROR_SUCCESS)
 		MessageBox(NULL,_T("Settings cleared successfully."),NExplorerplusplus::APP_NAME,MB_OK);

@@ -32,10 +32,6 @@
 #define FROM_LISTVIEW				0
 #define FROM_TREEVIEW				1
 
-/* Registry keys used to store program settings. */
-#define REG_MAIN_KEY				_T("Software\\Explorer++")
-#define REG_SETTINGS_KEY			_T("Software\\Explorer++\\Settings")
-
 class Explorerplusplus : public IExplorerplusplus, public IFileContextMenuExternal
 {
 	friend LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
