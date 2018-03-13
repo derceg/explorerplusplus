@@ -575,7 +575,7 @@ int Explorerplusplus::OnClose(void)
 			return 1;
 	}
 
-	m_iLastSelectedTab = m_iTabSelectedItem;
+	m_iLastSelectedTab = m_selectedTabIndex;
 
 	m_bShowTaskbarThumbnails = m_bShowTaskbarThumbnailsProvisional;
 

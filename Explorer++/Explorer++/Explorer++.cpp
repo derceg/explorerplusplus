@@ -41,7 +41,7 @@ m_hContainer(hwnd)
 	first tab will open at the index
 	m_iTabSelectedItem + 1 - therefore
 	this variable must be initialized. */
-	m_iTabSelectedItem				= 0;
+	m_selectedTabIndex				= 0;
 
 	/* Initial state. */
 	m_nSelected						= 0;

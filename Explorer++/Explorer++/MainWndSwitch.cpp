@@ -1351,7 +1351,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDA_TAB_DUPLICATETAB:
-			OnDuplicateTab(m_iTabSelectedItem);
+			OnDuplicateTab(m_selectedTabIndex);
 			break;
 
 		case IDA_HOME:

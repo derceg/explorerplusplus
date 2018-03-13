@@ -235,8 +235,8 @@ void Explorerplusplus::SetTabName(int iTab,std::wstring strName,BOOL bUseCustomN
 
 void Explorerplusplus::SetTabSelection(int Index)
 {
-	m_iTabSelectedItem = Index;
-	TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
+	m_selectedTabIndex = Index;
+	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
 	OnTabChangeInternal(TRUE);
 }
 
@@ -371,7 +371,7 @@ int *pTabObjectIndex)
 		return E_FAIL;
 
 	if(m_bOpenNewTabNextToCurrent)
-		iNewTabIndex = m_iTabSelectedItem + 1;
+		iNewTabIndex = m_selectedTabIndex + 1;
 	else
 		iNewTabIndex = TabCtrl_GetItemCount(m_hTabCtrl);
 
@@ -515,7 +515,7 @@ int *pTabObjectIndex)
 		ShowWindow(m_hListView[iTabId],SW_SHOW);
 
 		m_selectedTabId			= iTabId;
-		m_iTabSelectedItem		= iNewTabIndex;
+		m_selectedTabIndex		= iNewTabIndex;
 
 		m_hActiveListView		= m_hListView[m_selectedTabId];
 		m_pActiveShellBrowser	= m_pShellBrowser[m_selectedTabId];
@@ -647,7 +647,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	was last closed. */
 	TabCtrl_SetCurSel(m_hTabCtrl,m_iLastSelectedTab);
 
-	m_iTabSelectedItem = m_iLastSelectedTab;
+	m_selectedTabIndex = m_iLastSelectedTab;
 
 	OnTabChangeInternal(TRUE);
 
@@ -664,7 +664,7 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 	TCITEM tcItem;
 
 	tcItem.mask = TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,m_iTabSelectedItem,&tcItem);
+	TabCtrl_GetItem(m_hTabCtrl,m_selectedTabIndex,&tcItem);
 
 	/* Hide the old listview. */
 	ShowWindow(m_hActiveListView,SW_HIDE);
@@ -750,22 +750,22 @@ void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 	{
 		/* If this is the last tab in the order,
 		wrap the selection back to the start. */
-		if(m_iTabSelectedItem == (nTabs - 1))
-			m_iTabSelectedItem = 0;
+		if(m_selectedTabIndex == (nTabs - 1))
+			m_selectedTabIndex = 0;
 		else
-			m_iTabSelectedItem++;
+			m_selectedTabIndex++;
 	}
 	else
 	{
 		/* If this is the first tab in the order,
 		wrap the selection back to the end. */
-		if(m_iTabSelectedItem == 0)
-			m_iTabSelectedItem = nTabs - 1;
+		if(m_selectedTabIndex == 0)
+			m_selectedTabIndex = nTabs - 1;
 		else
-			m_iTabSelectedItem--;
+			m_selectedTabIndex--;
 	}
 
-	TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
+	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
 
 	OnTabChangeInternal(TRUE);
 }
@@ -810,24 +810,24 @@ void Explorerplusplus::OnSelectTabByIndex(int iTab,BOOL bSetFocus)
 
 	if(iTab == -1)
 	{
-		m_iTabSelectedItem = nTabs - 1;
+		m_selectedTabIndex = nTabs - 1;
 	}
 	else
 	{
 		if(iTab < nTabs)
-			m_iTabSelectedItem = iTab;
+			m_selectedTabIndex = iTab;
 		else
-			m_iTabSelectedItem = nTabs - 1;
+			m_selectedTabIndex = nTabs - 1;
 	}
 
-	TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
+	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
 
 	OnTabChangeInternal(bSetFocus);
 }
 
 bool Explorerplusplus::OnCloseTab(void)
 {
-	return CloseTab(m_iTabSelectedItem);
+	return CloseTab(m_selectedTabIndex);
 }
 
 bool Explorerplusplus::CloseTab(int TabIndex)
@@ -895,11 +895,11 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 void Explorerplusplus::RemoveTabFromControl(int iTab)
 {
 	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-	int iNewTabSelection = m_iTabSelectedItem;
+	int iNewTabSelection = m_selectedTabIndex;
 
 	/* If there was a previously active tab, the focus
 	should be switched back to it. */
-	if(iTab == m_iTabSelectedItem &&
+	if(iTab == m_selectedTabIndex &&
 		!m_TabSelectionHistory.empty())
 	{
 		for(int i = 0;i < nTabs;i++)
@@ -936,9 +936,9 @@ void Explorerplusplus::RemoveTabFromControl(int iTab)
 		iNewTabSelection--;
 	}
 
-	m_iTabSelectedItem = iNewTabSelection;
+	m_selectedTabIndex = iNewTabSelection;
 
-	TabCtrl_SetCurSel(m_hTabCtrl,m_iTabSelectedItem);
+	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
 	OnTabChangeInternal(TRUE);
 
 	m_TabSelectionHistory.erase(std::remove_if(m_TabSelectionHistory.begin(),m_TabSelectionHistory.end(),
@@ -967,7 +967,7 @@ void Explorerplusplus::RefreshTab(int iTabId)
 
 void Explorerplusplus::OnTabSelectionChange(void)
 {
-	m_iTabSelectedItem = TabCtrl_GetCurSel(m_hTabCtrl);
+	m_selectedTabIndex = TabCtrl_GetCurSel(m_hTabCtrl);
 
 	OnTabChangeInternal(TRUE);
 }
@@ -1071,7 +1071,7 @@ void Explorerplusplus::OnTabCtrlMouseMove(POINT *pt)
 			/* The index of the selected tab has now changed
 			(but the actual tab/browser selected remains the
 			same). */
-			m_iTabSelectedItem = iSwap;
+			m_selectedTabIndex = iSwap;
 			TabCtrl_SetCurFocus(m_hTabCtrl,iSwap);
 		}
 	}

@@ -742,7 +742,7 @@ void Explorerplusplus::UpdateTaskbarThumbnailsForTabSelectionChange(int selected
 
 			/* Potentially the tab may have swapped position, so
 			tell the taskbar to reposition it. */
-			if (m_iTabSelectedItem == (nTabs - 1))
+			if (m_selectedTabIndex == (nTabs - 1))
 			{
 				m_pTaskbarList->SetTabOrder(tabProxyInfo.hProxy, NULL);
 			}
@@ -750,7 +750,7 @@ void Explorerplusplus::UpdateTaskbarThumbnailsForTabSelectionChange(int selected
 			{
 				TCITEM tcNextItem;
 				tcNextItem.mask = TCIF_PARAM;
-				TabCtrl_GetItem(m_hTabCtrl, m_iTabSelectedItem + 1, &tcNextItem);
+				TabCtrl_GetItem(m_hTabCtrl, m_selectedTabIndex + 1, &tcNextItem);
 
 				for (const TabProxyInfo_t &tabProxyInfoNext : m_TabProxyList)
 				{

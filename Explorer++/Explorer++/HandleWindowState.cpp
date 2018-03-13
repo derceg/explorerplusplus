@@ -372,7 +372,7 @@ void Explorerplusplus::UpdateAddressBarText(void)
 
 void Explorerplusplus::UpdateTabText(void)
 {
-	UpdateTabText(m_iTabSelectedItem,m_selectedTabId);
+	UpdateTabText(m_selectedTabIndex,m_selectedTabId);
 }
 
 void Explorerplusplus::UpdateTabText(int iTabId)
@@ -434,7 +434,7 @@ void Explorerplusplus::SetTabIcon(void)
 
 	pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
-	SetTabIcon(m_iTabSelectedItem,m_selectedTabId,pidl);
+	SetTabIcon(m_selectedTabIndex,m_selectedTabId,pidl);
 
 	CoTaskMemFree(pidl);
 }
