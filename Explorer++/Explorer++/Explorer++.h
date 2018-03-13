@@ -807,7 +807,6 @@ private:
 	HWND					m_hActiveListView;
 	HWND					m_hLastActiveWindow;
 	HWND					m_hNextClipboardViewer;
-	LPITEMIDLIST			m_pidlDirectory;
 	HMENU					m_hArrangeSubMenu;
 	HMENU					m_hGroupBySubMenu;
 	HMENU					m_hArrangeSubMenuRClick;
