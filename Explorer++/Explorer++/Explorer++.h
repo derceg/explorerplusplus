@@ -656,7 +656,6 @@ private:
 	void					OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
 	HRESULT					OnListViewCopy(BOOL bCopy);
-	HRESULT					ProcessShellMenuCommand(IContextMenu *pContextMenu,UINT CmdIDOffset,UINT iStartOffset);
 	HRESULT					ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles) const;
 
 	/* File context menu. */

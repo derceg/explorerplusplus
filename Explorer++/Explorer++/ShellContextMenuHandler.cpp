@@ -184,21 +184,3 @@ HRESULT Explorerplusplus::ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,
 {
 	return ExecuteActionFromContextMenu(pidlDirectory, ppidl, m_hContainer, nFiles, _T("properties"), 0);
 }
-
-HRESULT Explorerplusplus::ProcessShellMenuCommand(IContextMenu *pContextMenu,
-	UINT CmdIDOffset,UINT iStartOffset)
-{
-	assert(pContextMenu != NULL);
-
-	CMINVOKECOMMANDINFO	cmici;
-
-	cmici.cbSize		= sizeof(CMINVOKECOMMANDINFO);
-	cmici.fMask			= 0;
-	cmici.hwnd			= m_hContainer;
-	cmici.lpVerb		= (LPCSTR)MAKEWORD(CmdIDOffset - iStartOffset,0);
-	cmici.lpParameters	= NULL;
-	cmici.lpDirectory	= NULL;
-	cmici.nShow			= SW_SHOW;
-
-	return pContextMenu->InvokeCommand(&cmici);
-}
