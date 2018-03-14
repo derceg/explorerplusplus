@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <unordered_map>
 #include "Explorer++_internal.h"
 #include "BookmarkHelper.h"
@@ -783,7 +784,7 @@ private:
 	HWND					m_hHolder;
 	HWND					m_hAddressBar;
 	HWND					m_hMainToolbar;
-	HWND					m_hListView[MAX_TABS];
+	std::map<int, HWND>		m_hListView;
 	HWND					m_hFoldersToolbar;
 	HWND					m_hTabBacking;
 	HWND					m_hBookmarksToolbar;
