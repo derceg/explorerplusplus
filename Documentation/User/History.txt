@@ -25,6 +25,8 @@ Bug fixes:
   should have been. Fixed. See #24.
 - Under certain conditions, switching to a tab using the taskbar
   thumbnails would result in the wrong tab being selected. Fixed.
+- Under certain conditions, refreshing a tab via the tab right-click
+  menu would result in the wrong tab being refreshed. Fixed.
 - Fixed a number of memory leaks.
 
 Misc:
