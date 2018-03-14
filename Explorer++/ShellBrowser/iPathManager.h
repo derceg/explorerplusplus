@@ -20,8 +20,6 @@ public:
 	LPITEMIDLIST	RetrieveAndValidateIdl(int iIndex);
 
 private:
-	int m_iRefCount;
-
 	#define DEFAULT_ALLOCATION	10
 
 	/* Points one past the "current" path. */

@@ -24,8 +24,6 @@
 
 CPathManager::CPathManager()
 {
-	m_iRefCount = 1;
-
 	m_iCurrent = 0;
 
 	m_nAllocated = DEFAULT_ALLOCATION;
