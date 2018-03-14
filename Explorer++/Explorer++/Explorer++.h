@@ -784,13 +784,10 @@ private:
 	HWND					m_hHolder;
 	HWND					m_hAddressBar;
 	HWND					m_hMainToolbar;
-	std::map<int, HWND>		m_hListView;
 	HWND					m_hFoldersToolbar;
 	HWND					m_hTabBacking;
 	HWND					m_hBookmarksToolbar;
 
-	CShellBrowser *			m_pShellBrowser[MAX_TABS];
-	CShellBrowser *			m_pActiveShellBrowser;
 	IDirectoryMonitor *		m_pDirMon;
 	CMyTreeView *			m_pMyTreeView;
 	CStatusBar *			m_pStatusBar;
@@ -801,7 +798,6 @@ private:
 	HMODULE					m_hLanguageModule;
 
 	/** Internal state. **/
-	HWND					m_hActiveListView;
 	HWND					m_hLastActiveWindow;
 	HWND					m_hNextClipboardViewer;
 	HMENU					m_hArrangeSubMenu;
@@ -839,9 +835,14 @@ private:
 	COLORREF				m_DisplayWindowTextColor;
 	HFONT					m_DisplayWindowFont;
 
-	/* Internal tab state. */
+	/* Tabs. */
 	TabInfo_t				m_TabInfo[MAX_TABS];
 	UINT					m_uTabMap[MAX_TABS];
+	std::map<int, HWND>		m_hListView;
+	CShellBrowser *			m_pShellBrowser[MAX_TABS];
+
+	HWND					m_hActiveListView;
+	CShellBrowser *			m_pActiveShellBrowser;
 
 	/* Directory-specific settings. */
 	std::list<DirectorySettings_t>	m_DirectorySettingsList;
