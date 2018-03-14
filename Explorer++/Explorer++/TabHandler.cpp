@@ -797,6 +797,15 @@ int Explorerplusplus::GetTabIndexById(int tabId)
 	return -1;
 }
 
+int Explorerplusplus::GetTabIdByIndex(int index)
+{
+	TCITEM tcItem;
+	tcItem.mask = TCIF_PARAM;
+	TabCtrl_GetItem(m_hTabCtrl, index, &tcItem);
+
+	return static_cast<int>(tcItem.lParam);
+}
+
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
 {
 	return OnSelectTabByIndex(iTab,TRUE);
@@ -1132,7 +1141,10 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 			break;
 
 		case IDM_TAB_REFRESH:
-			RefreshTab(iTabHit);
+		{
+			int tabId = GetTabIdByIndex(iTabHit);
+			RefreshTab(tabId);
+		}
 			break;
 
 		case IDM_TAB_REFRESHALL:

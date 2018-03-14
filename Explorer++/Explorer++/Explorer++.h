@@ -381,6 +381,7 @@ private:
 	void					OnGroupBy(UINT uSortMode);
 	void					OnSelectTabById(int tabId, BOOL setFocus);
 	int						GetTabIndexById(int tabId);
+	int						GetTabIdByIndex(int index);
 	void					OnSelectTabByIndex(int iTab);
 	void					OnSelectTabByIndex(int iTab,BOOL bSetFocus);
 
