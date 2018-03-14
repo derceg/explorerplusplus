@@ -36,6 +36,8 @@ const std::vector<std::wstring> Explorerplusplus::BLACKLISTED_BACKGROUND_MENU_CL
 Explorerplusplus::Explorerplusplus(HWND hwnd) :
 m_hContainer(hwnd)
 {
+	m_hLanguageModule				= nullptr;
+
 	/* When the 'open new tabs next to
 	current' option is activated, the
 	first tab will open at the index
