@@ -881,10 +881,13 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 	m_pDirMon->StopDirectoryMonitor(m_pShellBrowser[iInternalIndex]->GetDirMonitorId());
 
 	m_pShellBrowser[iInternalIndex]->SetTerminationStatus();
-	DestroyWindow(m_hListView[iInternalIndex]);
-
 	m_pShellBrowser[iInternalIndex]->Release();
-	m_pShellBrowser[iInternalIndex] = NULL;
+	m_pShellBrowser.erase(iInternalIndex);
+
+	DestroyWindow(m_hListView[iInternalIndex]);
+	m_hListView.erase(iInternalIndex);
+
+	m_TabInfo.erase(iInternalIndex);
 
 	if(!m_bAlwaysShowTabBar)
 	{
