@@ -524,12 +524,12 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				}
 
 				/* High-level settings. */
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("Locked"),m_TabInfo[(int)tcItem.lParam].bLocked);
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AddressLocked"),m_TabInfo[(int)tcItem.lParam].bAddressLocked);
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("UseCustomName"),m_TabInfo[(int)tcItem.lParam].bUseCustomName);
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("Locked"),m_TabInfo.at((int)tcItem.lParam).bLocked);
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AddressLocked"),m_TabInfo.at((int)tcItem.lParam).bAddressLocked);
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("UseCustomName"),m_TabInfo.at((int)tcItem.lParam).bUseCustomName);
 
-				if(m_TabInfo[(int)tcItem.lParam].bUseCustomName)
-					NRegistrySettings::SaveStringToRegistry(hTabKey,_T("CustomName"),m_TabInfo[(int)tcItem.lParam].szName);
+				if(m_TabInfo.at((int)tcItem.lParam).bUseCustomName)
+					NRegistrySettings::SaveStringToRegistry(hTabKey,_T("CustomName"),m_TabInfo.at((int)tcItem.lParam).szName);
 				else
 					NRegistrySettings::SaveStringToRegistry(hTabKey,_T("CustomName"),EMPTY_STRING);
 

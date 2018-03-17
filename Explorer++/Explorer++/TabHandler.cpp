@@ -208,7 +208,7 @@ std::wstring Explorerplusplus::GetTabName(int iTab)
 		return std::wstring();
 	}
 
-	return std::wstring(m_TabInfo[static_cast<int>(tcItem.lParam)].szName);
+	return std::wstring(m_TabInfo.at(static_cast<int>(tcItem.lParam)).szName);
 }
 
 void Explorerplusplus::SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName)
@@ -223,9 +223,9 @@ void Explorerplusplus::SetTabName(int iTab,std::wstring strName,BOOL bUseCustomN
 		return;
 	}
 
-	StringCchCopy(m_TabInfo[static_cast<int>(tcItem.lParam)].szName,
-		SIZEOF_ARRAY(m_TabInfo[static_cast<int>(tcItem.lParam)].szName),strName.c_str());
-	m_TabInfo[static_cast<int>(tcItem.lParam)].bUseCustomName = bUseCustomName;
+	StringCchCopy(m_TabInfo.at(static_cast<int>(tcItem.lParam)).szName,
+		SIZEOF_ARRAY(m_TabInfo.at(static_cast<int>(tcItem.lParam)).szName),strName.c_str());
+	m_TabInfo.at(static_cast<int>(tcItem.lParam)).bUseCustomName = bUseCustomName;
 
 	TCHAR szName[256];
 	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());
@@ -865,8 +865,8 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 	int iInternalIndex = static_cast<int>(tcItem.lParam);
 
 	/* The tab is locked. Don't close it. */
-	if(m_TabInfo[iInternalIndex].bLocked ||
-		m_TabInfo[iInternalIndex].bAddressLocked)
+	if(m_TabInfo.at(iInternalIndex).bLocked ||
+		m_TabInfo.at(iInternalIndex).bAddressLocked)
 	{
 		return false;
 	}
@@ -1000,10 +1000,10 @@ void Explorerplusplus::OnInitTabMenu(HMENU hMenu)
 
 	int internalIndex = static_cast<int>(tcItem.lParam);
 
-	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, m_TabInfo[internalIndex].bLocked);
-	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, m_TabInfo[internalIndex].bAddressLocked);
+	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, m_TabInfo.at(internalIndex).bLocked);
+	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, m_TabInfo.at(internalIndex).bAddressLocked);
 	lEnableMenuItem(hMenu, IDM_TAB_CLOSETAB,
-		!(m_TabInfo[internalIndex].bLocked || m_TabInfo[internalIndex].bAddressLocked));
+		!(m_TabInfo.at(internalIndex).bLocked || m_TabInfo.at(internalIndex).bAddressLocked));
 }
 
 void Explorerplusplus::OnTabCtrlLButtonDown(POINT *pt)
@@ -1222,15 +1222,15 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 	TCHAR		szExpandedTabText[MAX_PATH];
 
 	/* If no custom name is set, use the folders name. */
-	if(!m_TabInfo[iTabId].bUseCustomName)
+	if(!m_TabInfo.at(iTabId).bUseCustomName)
 	{
 		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
 
-		StringCchCopy(m_TabInfo[iTabId].szName,
-			SIZEOF_ARRAY(m_TabInfo[iTabId].szName),szTabText);
+		StringCchCopy(m_TabInfo.at(iTabId).szName,
+			SIZEOF_ARRAY(m_TabInfo.at(iTabId).szName),szTabText);
 	}
 
-	ReplaceCharacterWithString(m_TabInfo[iTabId].szName,szExpandedTabText,
+	ReplaceCharacterWithString(m_TabInfo.at(iTabId).szName,szExpandedTabText,
 		SIZEOF_ARRAY(szExpandedTabText),'&',_T("&&"));
 
 	/* Tab control insertion information. The folders name will be used
@@ -1291,13 +1291,13 @@ void Explorerplusplus::OnLockTab(int iTab)
 
 void Explorerplusplus::OnLockTabInternal(int iTab,int iTabId)
 {
-	m_TabInfo[iTabId].bLocked = !m_TabInfo[iTabId].bLocked;
+	m_TabInfo.at(iTabId).bLocked = !m_TabInfo.at(iTabId).bLocked;
 
 	/* The "Lock Tab" and "Lock Tab and Address" options
 	are mutually exclusive. */
-	if(m_TabInfo[iTabId].bLocked)
+	if(m_TabInfo.at(iTabId).bLocked)
 	{
-		m_TabInfo[iTabId].bAddressLocked = FALSE;
+		m_TabInfo.at(iTabId).bAddressLocked = FALSE;
 	}
 
 	SetTabIcon(iTab,iTabId);
@@ -1323,11 +1323,11 @@ void Explorerplusplus::OnLockTabAndAddress(int iTab)
 
 	int internalIndex = static_cast<int>(tcItem.lParam);
 
-	m_TabInfo[internalIndex].bAddressLocked = !m_TabInfo[internalIndex].bAddressLocked;
+	m_TabInfo.at(internalIndex).bAddressLocked = !m_TabInfo.at(internalIndex).bAddressLocked;
 
-	if(m_TabInfo[internalIndex].bAddressLocked)
+	if(m_TabInfo.at(internalIndex).bAddressLocked)
 	{
-		m_TabInfo[internalIndex].bLocked = FALSE;
+		m_TabInfo.at(internalIndex).bLocked = FALSE;
 	}
 
 	SetTabIcon(iTab, internalIndex);
@@ -1345,7 +1345,7 @@ void Explorerplusplus::UpdateTabToolbar(void)
 
 	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	if(nTabs > 1 && !(m_TabInfo[m_selectedTabId].bLocked || m_TabInfo[m_selectedTabId].bAddressLocked))
+	if(nTabs > 1 && !(m_TabInfo.at(m_selectedTabId).bLocked || m_TabInfo.at(m_selectedTabId).bAddressLocked))
 	{
 		/* Enable the tab close button. */
 		SendMessage(m_hTabWindowToolbar,TB_SETSTATE,

@@ -120,7 +120,7 @@ HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags)
 	HRESULT hr;
 	int iTabObjectIndex = -1;
 
-	if(!m_TabInfo[m_selectedTabId].bAddressLocked)
+	if(!m_TabInfo.at(m_selectedTabId).bAddressLocked)
 	{
 		hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory, wFlags);
 
@@ -164,7 +164,7 @@ HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags,
 	}
 	else
 	{
-		if(!bOpenInNewTab && !m_TabInfo[m_selectedTabId].bAddressLocked)
+		if(!bOpenInNewTab && !m_TabInfo.at(m_selectedTabId).bAddressLocked)
 		{
 			hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory, wFlags);
 
@@ -177,7 +177,7 @@ HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags,
 		}
 		else
 		{
-			if(m_TabInfo[m_selectedTabId].bAddressLocked)
+			if(m_TabInfo.at(m_selectedTabId).bAddressLocked)
 			{
 				hr = CreateNewTab(pidlDirectory, NULL, NULL, TRUE, &iTabObjectIndex);
 			}

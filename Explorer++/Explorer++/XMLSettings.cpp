@@ -936,15 +936,15 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXML
 
 		/* High-level settings. */
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Locked"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo[(int)tcItem.lParam].bLocked));
+			NXMLSettings::EncodeBoolValue(m_TabInfo.at((int)tcItem.lParam).bLocked));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("AddressLocked"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo[(int)tcItem.lParam].bAddressLocked));
+			NXMLSettings::EncodeBoolValue(m_TabInfo.at((int)tcItem.lParam).bAddressLocked));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("UseCustomName"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo[(int)tcItem.lParam].bUseCustomName));
+			NXMLSettings::EncodeBoolValue(m_TabInfo.at((int)tcItem.lParam).bUseCustomName));
 
-		if(m_TabInfo[(int)tcItem.lParam].bUseCustomName)
+		if(m_TabInfo.at((int)tcItem.lParam).bUseCustomName)
 			NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CustomName"),
-			m_TabInfo[(int)tcItem.lParam].szName);
+			m_TabInfo.at((int)tcItem.lParam).szName);
 		else
 			NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CustomName"),
 			EMPTY_STRING);

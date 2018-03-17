@@ -400,15 +400,15 @@ void Explorerplusplus::UpdateTabText(int iTab,int iTabId)
 {
 	TCHAR szFinalTabText[MAX_PATH];
 
-	if(!m_TabInfo[iTabId].bUseCustomName)
+	if(!m_TabInfo.at(iTabId).bUseCustomName)
 	{
 		LPITEMIDLIST pidlDirectory = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
 
 		TCHAR szTabText[MAX_PATH];
 		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
 
-		StringCchCopy(m_TabInfo[iTabId].szName,
-			SIZEOF_ARRAY(m_TabInfo[iTabId].szName),szTabText);
+		StringCchCopy(m_TabInfo.at(iTabId).szName,
+			SIZEOF_ARRAY(m_TabInfo.at(iTabId).szName),szTabText);
 
 		TCHAR szExpandedTabText[MAX_PATH];
 		ReplaceCharacterWithString(szTabText,szExpandedTabText,
@@ -421,7 +421,7 @@ void Explorerplusplus::UpdateTabText(int iTab,int iTabId)
 	}
 	else
 	{
-		StringCchCopy(szFinalTabText,SIZEOF_ARRAY(szFinalTabText),m_TabInfo[iTabId].szName);
+		StringCchCopy(szFinalTabText,SIZEOF_ARRAY(szFinalTabText),m_TabInfo.at(iTabId).szName);
 	}
 
 	/* Set the tab proxy text. */
@@ -488,7 +488,7 @@ void Explorerplusplus::SetTabIcon(int iIndex,int iTabId,LPCITEMIDLIST pidlDirect
 	int				iRemoveImage;
 
 	/* If the tab is locked, use a lock icon. */
-	if(m_TabInfo[iTabId].bAddressLocked || m_TabInfo[iTabId].bLocked)
+	if(m_TabInfo.at(iTabId).bAddressLocked || m_TabInfo.at(iTabId).bLocked)
 	{
 		iImage = TAB_ICON_LOCK_INDEX;
 	}
