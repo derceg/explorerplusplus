@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <unordered_map>
 #include "Explorer++_internal.h"
 #include "BookmarkHelper.h"
@@ -838,7 +837,7 @@ private:
 	/* Tabs. */
 	TabInfo_t				m_TabInfo[MAX_TABS];
 	UINT					m_uTabMap[MAX_TABS];
-	std::map<int, HWND>		m_hListView;
+	std::unordered_map<int, HWND>	m_hListView;
 	CShellBrowser *			m_pShellBrowser[MAX_TABS];
 
 	HWND					m_hActiveListView;
