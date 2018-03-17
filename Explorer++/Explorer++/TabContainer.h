@@ -2,12 +2,13 @@
 
 #include "Explorer++_internal.h"
 #include "../ShellBrowser/iShellView.h"
+#include <unordered_map>
 
 class CTabContainer
 {
 public:
 
-	CTabContainer(HWND hTabCtrl,CShellBrowser **pShellBrowsers,IExplorerplusplus *pexpp);
+	CTabContainer(HWND hTabCtrl, std::unordered_map<int, CShellBrowser *> *pShellBrowsers, IExplorerplusplus *pexpp);
 	~CTabContainer();
 
 	void			InsertTab();
@@ -22,6 +23,6 @@ private:
 
 	HWND				m_hTabCtrl;
 
-	CShellBrowser		**m_pShellBrowsers;
+	std::unordered_map<int, CShellBrowser *>	*m_pShellBrowsers;
 	IExplorerplusplus	*m_pexpp;
 };

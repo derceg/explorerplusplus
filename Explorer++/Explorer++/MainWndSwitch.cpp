@@ -104,7 +104,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		occurs after the specified tab index has been
 		freed (in which case nothing happens), or before. */
 		if(CheckTabIdStatus((int)wParam))
-			m_pShellBrowser[wParam]->DirectoryAltered();
+			m_pShellBrowser[static_cast<int>(wParam)]->DirectoryAltered();
 		break;
 
 	case WM_USER_TREEVIEW_GAINEDFOCUS:

@@ -500,7 +500,7 @@ private:
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
 	int						GetCurrentTabId() const;
-	std::wstring			GetTabName(int iTab) const;
+	std::wstring			GetTabName(int iTab);
 	void					SetTabName(int iTab, std::wstring strName, BOOL bUseCustomName);
 	void					SetTabSelection(int Index);
 	void					PushGlobalSettingsToTab(int iTabId);
@@ -835,10 +835,10 @@ private:
 	HFONT					m_DisplayWindowFont;
 
 	/* Tabs. */
-	TabInfo_t				m_TabInfo[MAX_TABS];
+	std::unordered_map<int, TabInfo_t> m_TabInfo;
 	UINT					m_uTabMap[MAX_TABS];
 	std::unordered_map<int, HWND>	m_hListView;
-	CShellBrowser *			m_pShellBrowser[MAX_TABS];
+	std::unordered_map<int, CShellBrowser *> m_pShellBrowser;
 
 	HWND					m_hActiveListView;
 	CShellBrowser *			m_pActiveShellBrowser;

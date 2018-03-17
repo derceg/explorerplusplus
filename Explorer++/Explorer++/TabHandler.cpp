@@ -69,7 +69,7 @@ void Explorerplusplus::InitializeTabs(void)
 	AddDefaultTabIcons(himlSmall);
 	TabCtrl_SetImageList(m_hTabCtrl,himlSmall);
 
-	m_pTabContainer = new CTabContainer(m_hTabCtrl,m_pShellBrowser,this);
+	m_pTabContainer = new CTabContainer(m_hTabCtrl,&m_pShellBrowser,this);
 
 	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hTabCtrl,m_pTabContainer);
 	RegisterDragDrop(m_hTabCtrl,pTabDropHandler);
@@ -196,7 +196,7 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 	return DefSubclassProc(hTab,msg,wParam,lParam);
 }
 
-std::wstring Explorerplusplus::GetTabName(int iTab) const
+std::wstring Explorerplusplus::GetTabName(int iTab)
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;

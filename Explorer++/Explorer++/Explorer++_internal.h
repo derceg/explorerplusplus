@@ -36,7 +36,7 @@ __interface IExplorerplusplus
 	HWND			GetActiveListView() const;
 	CShellBrowser	*GetActiveShellBrowser() const;
 
-	std::wstring	GetTabName(int iTab) const;
+	std::wstring	GetTabName(int iTab);
 	void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
 	void			RefreshTab(int iTabId);
 	int				GetCurrentTabId() const;

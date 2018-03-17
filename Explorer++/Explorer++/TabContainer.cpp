@@ -17,7 +17,7 @@
 #include "TabContainer.h"
 
 
-CTabContainer::CTabContainer(HWND hTabCtrl,CShellBrowser **pShellBrowsers,IExplorerplusplus *pexpp) :
+CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, CShellBrowser *> *pShellBrowsers, IExplorerplusplus *pexpp) :
 m_hTabCtrl(hTabCtrl),
 m_pShellBrowsers(pShellBrowsers),
 m_pexpp(pexpp)
@@ -56,5 +56,5 @@ CShellBrowser *CTabContainer::GetBrowserForTab(int Index)
 		return NULL;
 	}
 
-	return m_pShellBrowsers[tcItem.lParam];
+	return (*m_pShellBrowsers)[static_cast<int>(tcItem.lParam)];
 }
