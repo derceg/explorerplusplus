@@ -54,8 +54,10 @@ void Explorerplusplus::InitializeTabs(void)
 
 	m_hTabCtrl = CreateTabControl(m_hTabBacking,TabCtrlStyles);
 
-	m_hTabFont = CreateFont(15, 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE, ANSI_CHARSET,
-		OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, PROOF_QUALITY, FF_DONTCARE, NULL);
+	NONCLIENTMETRICS ncm;
+	ncm.cbSize = sizeof(ncm);
+	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
+	m_hTabFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
 
 	if(m_hTabFont != NULL)
 	{
