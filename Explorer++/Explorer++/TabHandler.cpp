@@ -673,7 +673,7 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 
 	m_selectedTabId = (int)tcItem.lParam;
 
-	m_hActiveListView		= m_hListView[m_selectedTabId];
+	m_hActiveListView		= m_hListView.at(m_selectedTabId);
 	m_pActiveShellBrowser	= m_pShellBrowser[m_selectedTabId];
 
 	/* The selected tab has changed, so update the current
@@ -884,7 +884,7 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 	m_pShellBrowser[iInternalIndex]->Release();
 	m_pShellBrowser.erase(iInternalIndex);
 
-	DestroyWindow(m_hListView[iInternalIndex]);
+	DestroyWindow(m_hListView.at(iInternalIndex));
 	m_hListView.erase(iInternalIndex);
 
 	m_TabInfo.erase(iInternalIndex);

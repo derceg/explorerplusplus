@@ -591,17 +591,19 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	if(m_pShellBrowser[iObjectIndex]->QueryDragging())
 		return;
 
+	HWND listView = m_hListView.at(iObjectIndex);
+
 	if(ItemChanged->uChanged == LVIF_STATE &&
 		((LVIS_STATEIMAGEMASK & ItemChanged->uNewState) >> 12) != 0 &&
 		((LVIS_STATEIMAGEMASK & ItemChanged->uOldState) >> 12) != 0)
 	{
-		if(ListView_GetCheckState(m_hListView[iObjectIndex],ItemChanged->iItem))
+		if(ListView_GetCheckState(listView,ItemChanged->iItem))
 		{
-			NListView::ListView_SelectItem(m_hListView[iObjectIndex],ItemChanged->iItem,TRUE);
+			NListView::ListView_SelectItem(listView,ItemChanged->iItem,TRUE);
 		}
 		else
 		{
-			NListView::ListView_SelectItem(m_hListView[iObjectIndex],ItemChanged->iItem,FALSE);
+			NListView::ListView_SelectItem(listView,ItemChanged->iItem,FALSE);
 		}
 
 		return;
@@ -621,13 +623,13 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 
 	if(Selected)
 	{
-		if(ListView_GetCheckState(m_hListView[iObjectIndex],ItemChanged->iItem) == 0)
-			ListView_SetCheckState(m_hListView[iObjectIndex],ItemChanged->iItem,TRUE);
+		if(ListView_GetCheckState(listView,ItemChanged->iItem) == 0)
+			ListView_SetCheckState(listView,ItemChanged->iItem,TRUE);
 	}
 	else
 	{
-		if(ListView_GetCheckState(m_hListView[iObjectIndex],ItemChanged->iItem) != 0)
-			ListView_SetCheckState(m_hListView[iObjectIndex],ItemChanged->iItem,FALSE);
+		if(ListView_GetCheckState(listView,ItemChanged->iItem) != 0)
+			ListView_SetCheckState(listView,ItemChanged->iItem,FALSE);
 	}
 
 	/* The selection for this tab has changed, so invalidate any
@@ -873,7 +875,7 @@ void Explorerplusplus::OnListViewGetDisplayInfo(LPARAM lParam)
 	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
 	/* Find the tab associated with this call. */
-	while((nmhdr->hwndFrom != m_hListView[iIndex])  && nTabsProcessed < nTabs)
+	while((nmhdr->hwndFrom != m_hListView.at(iIndex))  && nTabsProcessed < nTabs)
 	{
 		tcItem.mask = TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl,nTabsProcessed,&tcItem);

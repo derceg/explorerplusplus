@@ -126,18 +126,18 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 	case WM_USER_FOLDEREMPTY:
 		{
 			if((BOOL)lParam == TRUE)
-				NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],IDB_FOLDEREMPTY);
+				NListView::ListView_SetBackgroundImage(m_hListView.at((int)wParam),IDB_FOLDEREMPTY);
 			else
-				NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],NULL);
+				NListView::ListView_SetBackgroundImage(m_hListView.at((int)wParam),NULL);
 		}
 		break;
 
 	case WM_USER_FILTERINGAPPLIED:
 		{
 			if((BOOL)lParam == TRUE)
-				NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],IDB_FILTERINGAPPLIED);
+				NListView::ListView_SetBackgroundImage(m_hListView.at((int)wParam),IDB_FILTERINGAPPLIED);
 			else
-				NListView::ListView_SetBackgroundImage(m_hListView[(int)wParam],NULL);
+				NListView::ListView_SetBackgroundImage(m_hListView.at((int)wParam),NULL);
 		}
 		break;
 

@@ -695,7 +695,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 							RefreshTab((int)tcItem.lParam);
 
-							NListView::ListView_ActivateOneClickSelect(m_hListView[(int)tcItem.lParam],m_bOneClickActivate,m_OneClickActivateHoverTime);
+							NListView::ListView_ActivateOneClickSelect(m_hListView.at((int)tcItem.lParam),m_bOneClickActivate,m_OneClickActivateHoverTime);
 						}
 
 						SaveAllSettings();
@@ -858,7 +858,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							tcItem.mask	= TCIF_PARAM;
 							TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-							dwExtendedStyle = ListView_GetExtendedListViewStyle(m_hListView[(int)tcItem.lParam]);
+							dwExtendedStyle = ListView_GetExtendedListViewStyle(m_hListView.at((int)tcItem.lParam));
 
 							if(bCheckBoxSelection)
 							{
@@ -869,7 +869,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 								dwExtendedStyle &= ~LVS_EX_CHECKBOXES;
 							}
 
-							ListView_SetExtendedListViewStyle(m_hListView[(int)tcItem.lParam],
+							ListView_SetExtendedListViewStyle(m_hListView.at((int)tcItem.lParam),
 								dwExtendedStyle);
 						}
 
@@ -929,7 +929,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							m_pShellBrowser[(int)tcItem.lParam]->ToggleGridlines();
 						}
 
-						NListView::ListView_AddRemoveExtendedStyle(m_hListView[(int)tcItem.lParam],
+						NListView::ListView_AddRemoveExtendedStyle(m_hListView.at((int)tcItem.lParam),
 							LVS_EX_FULLROWSELECT,m_bUseFullRowSelect);
 					}
 
