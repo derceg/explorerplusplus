@@ -716,7 +716,6 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 {
 	DirectoryAltered_t	*pDirectoryAltered = NULL;
 	TCHAR				szDirectoryToWatch[MAX_PATH];
-	TCHAR				szRecycleBin[MAX_PATH];
 	int					iDirMonitorId;
 
 	iDirMonitorId		= m_pShellBrowser[iTabId]->GetDirMonitorId();
@@ -726,8 +725,6 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 
 	m_pShellBrowser[iTabId]->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectoryToWatch),
 		szDirectoryToWatch);
-
-	GetCsidlDisplayName(CSIDL_BITBUCKET,szRecycleBin,SIZEOF_ARRAY(szRecycleBin),SHGDN_FORPARSING);
 
 	/* Don't watch virtual folders (the 'recycle bin' may be an
 	exception to this). */
