@@ -6,7 +6,7 @@
    name="Explorer++"
    type="win32"
 />
-<description>.NET control deployment tool</description>
+<description>Explorer++</description>
 <dependency>
    <dependentAssembly>
      <assemblyIdentity
