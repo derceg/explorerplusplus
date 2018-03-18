@@ -603,12 +603,14 @@ void CShellBrowser::SetTileViewItemInfo(int iItem,int iItemInternal)
 	SHFILEINFO shfi;
 	LVTILEINFO lvti;
 	UINT uColumns[2] = {1,2};
+	int columnFormats[2] = { LVCFMT_LEFT, LVCFMT_LEFT };
 	TCHAR FullFileName[MAX_PATH];
 
 	lvti.cbSize		= sizeof(lvti);
 	lvti.iItem		= iItem;
 	lvti.cColumns	= 2;
 	lvti.puColumns	= uColumns;
+	lvti.piColFmt	= columnFormats;
 	ListView_SetTileInfo(m_hListView,&lvti);
 
 	QueryFullItemName(iItem,FullFileName,SIZEOF_ARRAY(FullFileName));
