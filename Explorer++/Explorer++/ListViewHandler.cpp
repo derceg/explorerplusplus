@@ -859,35 +859,26 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
  */
 void Explorerplusplus::OnListViewGetDisplayInfo(LPARAM lParam)
 {
-	NMLVDISPINFO	*pnmv = NULL;
-	LVITEM			*plvItem = NULL;
-	NMHDR			*nmhdr = NULL;
-	int				iIndex = 0;
-	TCITEM			tcItem;
-	int				nTabsProcessed = 0;
-	int				nTabs;
+	NMLVDISPINFO *pnmv = (NMLVDISPINFO *)lParam;
+	NMHDR * nmhdr = &pnmv->hdr;
 
-	pnmv = (NMLVDISPINFO *)lParam;
-
-	plvItem = &pnmv->item;
-	nmhdr = &pnmv->hdr;
-
-	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
 	/* Find the tab associated with this call. */
-	while((nmhdr->hwndFrom != m_hListView.at(iIndex))  && nTabsProcessed < nTabs)
+	for (int i = 0; i < nTabs; i++)
 	{
+		TCITEM tcItem;
 		tcItem.mask = TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl,nTabsProcessed,&tcItem);
+		TabCtrl_GetItem(m_hTabCtrl, i, &tcItem);
 
-		iIndex = (int)tcItem.lParam;
+		int tabIndex = static_cast<int>(tcItem.lParam);
 
-		nTabsProcessed++;
+		if (nmhdr->hwndFrom == m_hListView.at(tabIndex))
+		{
+			m_pShellBrowser[tabIndex]->OnListViewGetDisplayInfo(lParam);
+			break;
+		}
 	}
-
-	m_pShellBrowser[iIndex]->OnListViewGetDisplayInfo(lParam);
-
-	return;
 }
 
 /*
