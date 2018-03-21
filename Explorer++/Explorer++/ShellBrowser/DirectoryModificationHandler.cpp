@@ -20,6 +20,36 @@
 BOOL g_bNewFileRenamed = FALSE;
 static int iRenamedItem;
 
+void CShellBrowser::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
+{
+	SHChangeNotifyEntry shcne;
+	shcne.pidl = pidl;
+	shcne.fRecursive = FALSE;
+	m_shChangeNotifyId = SHChangeNotifyRegister(m_hListView, SHCNRF_ShellLevel | SHCNRF_InterruptLevel | SHCNRF_NewDelivery,
+		SHCNE_ATTRIBUTES | SHCNE_CREATE | SHCNE_DELETE | SHCNE_MKDIR | SHCNE_RENAMEFOLDER | SHCNE_RENAMEITEM |
+		SHCNE_RMDIR | SHCNE_UPDATEDIR | SHCNE_UPDATEITEM, WM_APP_SHELL_NOTIFY, 1, &shcne);
+
+	if (m_shChangeNotifyId == 0)
+	{
+		TCHAR path[MAX_PATH];
+		HRESULT hr = GetDisplayName(pidl, path, SIZEOF_ARRAY(path), SHGDN_FORPARSING);
+
+		if (SUCCEEDED(hr))
+		{
+			LOG(warning) << L"Couldn't monitor directory \"" << path << L"\" for changes.";
+		}
+	}
+}
+
+void CShellBrowser::StopDirectoryMonitoring()
+{
+	if (m_shChangeNotifyId != 0)
+	{
+		SHChangeNotifyDeregister(m_shChangeNotifyId);
+		m_shChangeNotifyId = 0;
+	}
+}
+
 void CShellBrowser::DirectoryAltered(void)
 {
 	BOOL bNewItemCreated;

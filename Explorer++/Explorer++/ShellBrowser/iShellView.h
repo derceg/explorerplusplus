@@ -172,6 +172,8 @@ public:
 	void				SetId(int ID);
 
 	/* Directory modification support. */
+	void				StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl);
+	void				StopDirectoryMonitoring();
 	void				FilesModified(DWORD Action, const TCHAR *FileName, int EventId, int iFolderIndex);
 	void				DirectoryAltered(void);
 	int					GetFolderIndex(void) const;
@@ -327,6 +329,7 @@ private:
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 152;
+	static const UINT WM_APP_SHELL_NOTIFY = WM_APP + 153;
 
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
@@ -574,6 +577,9 @@ private:
 
 	/* ID. */
 	int					m_ID;
+
+	/* Directory monitoring. */
+	ULONG				m_shChangeNotifyId;
 
 	/* Stores information on files that
 	have been modified (i.e. created, deleted,

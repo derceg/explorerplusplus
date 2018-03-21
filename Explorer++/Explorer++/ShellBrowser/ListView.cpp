@@ -28,6 +28,11 @@ LRESULT CALLBACK CShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam
 	case WM_APP_ICON_RESULT_READY:
 		ProcessIconResult(static_cast<int>(wParam));
 		break;
+
+	case WM_APP_SHELL_NOTIFY:
+		/* TODO: Handle change
+		notifications. */
+		return 0;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);

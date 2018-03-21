@@ -69,7 +69,8 @@ m_columnThreadPool(1),
 m_columnResultIDCounter(0),
 m_itemImageThreadPool(1),
 m_thumbnailResultIDCounter(0),
-m_iconResultIDCounter(0)
+m_iconResultIDCounter(0),
+m_shChangeNotifyId(0)
 {
 	m_iRefCount = 1;
 
@@ -139,10 +140,19 @@ m_iconResultIDCounter(0)
 
 		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 	});
+
+	m_ListViewSubclassed = SetWindowSubclass(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 }
 
 CShellBrowser::~CShellBrowser()
 {
+	StopDirectoryMonitoring();
+
+	if (m_ListViewSubclassed)
+	{
+		RemoveWindowSubclass(m_hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID);
+	}
+
 	HWND hParent = GetParent(m_hListView);
 
 	if (m_ListViewParentSubclassed && hParent != NULL)

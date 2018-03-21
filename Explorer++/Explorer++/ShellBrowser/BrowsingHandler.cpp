@@ -54,6 +54,8 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 		return E_FAIL;
 	}
 
+	StopDirectoryMonitoring();
+
 	/* TODO: Wait for any background threads to finish processing. */
 
 	m_columnThreadPool.clear_queue();
@@ -122,6 +124,8 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	m_bFolderVisited = TRUE;
 
 	SetCursor(LoadCursor(NULL,IDC_ARROW));
+
+	StartDirectoryMonitoring(pidlDirectory);
 
 	m_iUniqueFolderIndex++;
 
