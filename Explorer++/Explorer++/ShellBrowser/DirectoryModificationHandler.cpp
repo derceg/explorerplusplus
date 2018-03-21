@@ -163,6 +163,54 @@ void CShellBrowser::RemoveItem(const TCHAR *szFileName)
 	}
 }
 
+void CShellBrowser::RemoveItem(int iItemInternal)
+{
+	ULARGE_INTEGER	ulFileSize;
+	LVFINDINFO		lvfi;
+	BOOL			bFolder;
+	int				iItem;
+	int				nItems;
+
+	if (iItemInternal == -1)
+		return;
+
+	/* Is this item a folder? */
+	bFolder = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+		FILE_ATTRIBUTE_DIRECTORY;
+
+	/* Take the file size of the removed file away from the total
+	directory size. */
+	ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
+	ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
+
+	m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
+
+	/* Locate the item within the listview.
+	Could use filename, providing removed
+	items are always deleted before new
+	items are inserted. */
+	lvfi.flags = LVFI_PARAM;
+	lvfi.lParam = iItemInternal;
+	iItem = ListView_FindItem(m_hListView, -1, &lvfi);
+
+	if (iItem != -1)
+	{
+		/* Remove the item from the listview. */
+		ListView_DeleteItem(m_hListView, iItem);
+	}
+
+	m_itemInfoMap.erase(iItemInternal);
+
+	nItems = ListView_GetItemCount(m_hListView);
+
+	m_nTotalItems--;
+
+	if (nItems == 0 && !m_bApplyFilter)
+	{
+		ApplyFolderEmptyBackgroundImage(true);
+	}
+}
+
 /*
  * Modifies the attributes of an item currently in the listview.
  */
