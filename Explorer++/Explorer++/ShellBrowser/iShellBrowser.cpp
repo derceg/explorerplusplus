@@ -1051,10 +1051,6 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 		ImageList_Destroy(himlOld);
 	}
 
-	EnterCriticalSection(&m_csDirectoryAltered);
-	m_AlteredList.clear();
-	LeaveCriticalSection(&m_csDirectoryAltered);
-
 	m_itemIDCounter = 0;
 
 	m_itemInfoMap.clear();

@@ -16,10 +16,6 @@
 #include "../Helper/Macros.h"
 #include "../Helper/Logging.h"
 
-
-BOOL g_bNewFileRenamed = FALSE;
-static int iRenamedItem;
-
 void CShellBrowser::StartDirectoryMonitoring(PCIDLIST_ABSOLUTE pidl)
 {
 	SHChangeNotifyEntry shcne;
@@ -59,128 +55,6 @@ void CShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 	/* TODO: Handle events.*/
 
 	SHChangeNotification_Unlock(lock);
-}
-
-void CShellBrowser::DirectoryAltered(void)
-{
-	BOOL bNewItemCreated;
-
-	EnterCriticalSection(&m_csDirectoryAltered);
-
-	bNewItemCreated = m_bNewItemCreated;
-
-	SendMessage(m_hListView,WM_SETREDRAW,(WPARAM)FALSE,(LPARAM)NULL);
-
-	LOG(debug) << _T("ShellBrowser - Starting directory change update for \"") << m_CurDir << _T("\"");
-
-	/* Potential problem:
-	After a file is created, it may be renamed shortly afterwards.
-	If the rename occurs before the file is added here, the
-	addition won't be registered (since technically, the file
-	does not exist), and the rename operation will not take place.
-	Adding an item that does not exist will corrupt the programs
-	state.
-
-	Solution:
-	If a file does not exist when adding it, temporarily remember
-	its filename. On the next rename operation, if the renamed
-	file matches the name of the added file, add the file in-place
-	with its new name.
-	The operation should NOT be queued, as it is possible that
-	other actions for the file will take place before the addition,
-	which will again result in an incorrect state.
-	*/
-	for(const auto &af : m_AlteredList)
-	{
-		/* Only undertake the modification if the unique folder
-		index on the modified item and current folder match up
-		(i.e. ensure the directory has not changed since these
-		files were modified). */
-		if(af.iFolderIndex == m_iUniqueFolderIndex)
-		{
-			switch(af.dwAction)
-			{
-			case FILE_ACTION_ADDED:
-				LOG(debug) << _T("ShellBrowser - Adding \"") << af.szFileName << _T("\"");
-				OnFileActionAdded(af.szFileName);
-				break;
-
-			case FILE_ACTION_MODIFIED:
-				LOG(debug) << _T("ShellBrowser - Modifying \"") << af.szFileName << _T("\"");
-				ModifyItemInternal(af.szFileName);
-				break;
-
-			case FILE_ACTION_REMOVED:
-				LOG(debug) << _T("ShellBrowser - Removing \"") << af.szFileName << _T("\"");
-				RemoveItemInternal(af.szFileName);
-				break;
-
-			case FILE_ACTION_RENAMED_OLD_NAME:
-				LOG(debug) << _T("ShellBrowser - Old name received \"") << af.szFileName << _T("\"");
-				OnFileActionRenamedOldName(af.szFileName);
-				break;
-
-			case FILE_ACTION_RENAMED_NEW_NAME:
-				LOG(debug) << _T("ShellBrowser - New name received \"") << af.szFileName << _T("\"");
-				OnFileActionRenamedNewName(af.szFileName);
-				break;
-			}
-		}
-	}
-
-	LOG(debug) << _T("ShellBrowser - Finished directory change update for \"") << m_CurDir << _T("\"");
-
-	SendMessage(m_hListView,WM_SETREDRAW,(WPARAM)TRUE,(LPARAM)NULL);
-
-	/* Ensure the first dropped item is visible. */
-	if(m_iDropped != -1)
-	{
-		if(!ListView_IsItemVisible(m_hListView,m_iDropped))
-			ListView_EnsureVisible(m_hListView,m_iDropped,TRUE);
-
-		m_iDropped = -1;
-	}
-
-	SendMessage(m_hOwner,WM_USER_DIRECTORYMODIFIED,m_ID,0);
-
-	if(bNewItemCreated && !m_bNewItemCreated)
-		SendMessage(m_hOwner,WM_USER_NEWITEMINSERTED,0,m_iIndexNewItem);
-
-	m_AlteredList.clear();
-
-	BOOL bFocusSet = FALSE;
-	int iIndex;
-
-	/* Select the specified items, and place the
-	focus on the first item. */
-	auto itr = m_FileSelectionList.begin();
-	while(itr != m_FileSelectionList.end())
-	{
-		iIndex = LocateFileItemIndex(itr->c_str());
-
-		if(iIndex != -1)
-		{
-			NListView::ListView_SelectItem(m_hListView,iIndex,TRUE);
-
-			if(!bFocusSet)
-			{
-				NListView::ListView_FocusItem(m_hListView,iIndex,TRUE);
-				ListView_EnsureVisible(m_hListView,iIndex,TRUE);
-
-				bFocusSet = TRUE;
-			}
-
-			itr = m_FileSelectionList.erase(itr);
-		}
-		else
-		{
-			++itr;
-		}
-	}
-
-	LeaveCriticalSection(&m_csDirectoryAltered);
-
-	return;
 }
 
 void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
@@ -470,52 +344,6 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow = 0;
 			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh = 0;
 		}
-	}
-}
-
-void CShellBrowser::OnFileActionRenamedOldName(const TCHAR *szFileName)
-{
-	std::list<Added_t>::iterator itrAdded;
-	BOOL bFileHandled = FALSE;
-
-	/* Loop through each file that is awaiting add to check for the
-	renamed file. */
-	for(itrAdded = m_FilesAdded.begin();itrAdded != m_FilesAdded.end();itrAdded++)
-	{
-		if(lstrcmp(szFileName,itrAdded->szFileName) == 0)
-		{
-			bFileHandled = TRUE;
-
-			g_bNewFileRenamed = TRUE;
-
-			m_FilesAdded.erase(itrAdded);
-
-			break;
-		}
-	}
-
-	if(!bFileHandled)
-	{
-		/* Find the index of the item that was renamed...
-		Store the index so that it is known which item needs
-		renaming when the files new name is received. */
-		iRenamedItem = LocateFileItemInternalIndex(szFileName);
-	}
-}
-
-void CShellBrowser::OnFileActionRenamedNewName(const TCHAR *szFileName)
-{
-	if(g_bNewFileRenamed)
-	{
-		/* The file that was previously added was renamed before
-		it could be added. Add the file now. */
-		OnFileActionAdded(szFileName);
-
-		g_bNewFileRenamed = FALSE;
-	}
-	else
-	{
-		RenameItem(iRenamedItem,szFileName);
 	}
 }
 

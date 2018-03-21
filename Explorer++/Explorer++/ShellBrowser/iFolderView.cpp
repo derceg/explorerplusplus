@@ -116,8 +116,6 @@ m_shChangeNotifyId(0)
 
 	m_nAwaitingAdd = 0;
 
-	InitializeCriticalSection(&m_csDirectoryAltered);
-
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 	m_iFileIcon = GetDefaultFileIconIndex();
 
@@ -177,8 +175,6 @@ CShellBrowser::~CShellBrowser()
 	/* Release the drag and drop helpers. */
 	m_pDropTargetHelper->Release();
 	m_pDragSourceHelper->Release();
-
-	DeleteCriticalSection(&m_csDirectoryAltered);
 
 	int nItems = ListView_GetItemCount(m_hListView);
 

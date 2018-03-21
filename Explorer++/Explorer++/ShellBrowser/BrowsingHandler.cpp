@@ -65,10 +65,8 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	m_iconResults.clear();
 	m_thumbnailResults.clear();
 
-	EnterCriticalSection(&m_csDirectoryAltered);
 	m_FilesAdded.clear();
 	m_FileSelectionList.clear();
-	LeaveCriticalSection(&m_csDirectoryAltered);
 
 	TCHAR szParsingPath[MAX_PATH];
 	GetDisplayName(pidl,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
