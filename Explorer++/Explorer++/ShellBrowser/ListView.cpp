@@ -30,8 +30,7 @@ LRESULT CALLBACK CShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam
 		break;
 
 	case WM_APP_SHELL_NOTIFY:
-		/* TODO: Handle change
-		notifications. */
+		OnShellNotify(wParam, lParam);
 		return 0;
 	}
 

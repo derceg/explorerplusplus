@@ -50,6 +50,17 @@ void CShellBrowser::StopDirectoryMonitoring()
 	}
 }
 
+void CShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
+{
+	PIDLIST_ABSOLUTE *pidls;
+	LONG event;
+	HANDLE lock = SHChangeNotification_Lock(reinterpret_cast<HANDLE>(wParam), static_cast<DWORD>(lParam), &pidls, &event);
+
+	/* TODO: Handle events.*/
+
+	SHChangeNotification_Unlock(lock);
+}
+
 void CShellBrowser::DirectoryAltered(void)
 {
 	BOOL bNewItemCreated;

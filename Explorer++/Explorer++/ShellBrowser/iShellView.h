@@ -408,6 +408,7 @@ private:
 	void				RemoveDrive(const TCHAR *szDrive);
 	
 	/* Directory altered support. */
+	void				OnShellNotify(WPARAM wParam, LPARAM lParam);
 	void				OnFileActionAdded(const TCHAR *szFileName);
 	void				RemoveItem(int iItemInternal);
 	void				RemoveItemInternal(const TCHAR *szFileName);
