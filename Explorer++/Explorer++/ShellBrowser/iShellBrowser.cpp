@@ -1333,7 +1333,7 @@ void CShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 					}
 					else
 					{
-						OnFileActionAdded(szDrive);
+						AddItem(szDrive);
 					}
 				}
 			}

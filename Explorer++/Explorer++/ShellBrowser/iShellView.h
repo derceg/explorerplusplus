@@ -399,10 +399,10 @@ private:
 	
 	/* Directory altered support. */
 	void				OnShellNotify(WPARAM wParam, LPARAM lParam);
-	void				OnFileActionAdded(const TCHAR *szFileName);
+	void				AddItem(const TCHAR *szFileName);
 	void				RemoveItem(int iItemInternal);
-	void				RemoveItemInternal(const TCHAR *szFileName);
-	void				ModifyItemInternal(const TCHAR *FileName);
+	void				RemoveItem(const TCHAR *szFileName);
+	void				ModifyItem(const TCHAR *FileName);
 	void				RenameItem(int iItemInternal, const TCHAR *szNewFileName);
 	int					DetermineItemSortedPosition(LPARAM lParam) const;
 
