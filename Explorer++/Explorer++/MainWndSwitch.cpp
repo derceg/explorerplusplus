@@ -92,17 +92,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		UpdateWindowStates();
 		break;
 
-	case WM_USER_FILESADDED:
-	{
-		auto itr = m_Tabs.find(static_cast<int>(wParam));
-
-		if (itr != m_Tabs.end())
-		{
-			itr->second.shellBrower->DirectoryAltered();
-		}
-	}
-		break;
-
 	case WM_USER_TREEVIEW_GAINEDFOCUS:
 		m_hLastActiveWindow = m_hTreeView;
 		break;

@@ -183,34 +183,6 @@ void CShellBrowser::DirectoryAltered(void)
 	return;
 }
 
-void CALLBACK TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime)
-{
-	UNREFERENCED_PARAMETER(uMsg);
-	UNREFERENCED_PARAMETER(dwTime);
-
-	KillTimer(hwnd,idEvent);
-
-	SendMessage(hwnd,WM_USER_FILESADDED,(WPARAM)idEvent,0);
-}
-
-void CShellBrowser::FilesModified(DWORD Action,const TCHAR *FileName,
-int EventId,int iFolderIndex)
-{
-	EnterCriticalSection(&m_csDirectoryAltered);
-
-	SetTimer(m_hOwner,EventId,200,TimerProc);
-
-	AlteredFile_t af;
-
-	StringCchCopy(af.szFileName,SIZEOF_ARRAY(af.szFileName),FileName);
-	af.dwAction = Action;
-	af.iFolderIndex = iFolderIndex;
-
-	m_AlteredList.push_back(af);
-
-	LeaveCriticalSection(&m_csDirectoryAltered);
-}
-
 void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 {
 	IShellFolder	*pShellFolder = NULL;

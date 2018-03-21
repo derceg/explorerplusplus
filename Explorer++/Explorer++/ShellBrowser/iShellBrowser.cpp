@@ -21,8 +21,6 @@
 
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
-void CALLBACK	TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime);
-
 void CShellBrowser::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 {
 	ULARGE_INTEGER	ulFileSize;
