@@ -155,28 +155,11 @@ void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 
 void CShellBrowser::RemoveItemInternal(const TCHAR *szFileName)
 {
-	std::list<Added_t>::iterator itr;
-	int iItemInternal;
-	BOOL bFound = FALSE;
+	int iItemInternal = LocateFileItemInternalIndex(szFileName);
 
-	/* First check if this item is in the queue of awaiting
-	items. If it is, remove it. */
-	for(itr = m_FilesAdded.begin();itr != m_FilesAdded.end();itr++)
+	if (iItemInternal != -1)
 	{
-		if(lstrcmp(szFileName,itr->szFileName) == 0)
-		{
-			m_FilesAdded.erase(itr);
-			bFound = TRUE;
-			break;
-		}
-	}
-
-	if(!bFound)
-	{
-		iItemInternal = LocateFileItemInternalIndex(szFileName);
-
-		if(iItemInternal != -1)
-			RemoveItem(iItemInternal);
+		RemoveItem(iItemInternal);
 	}
 }
 
