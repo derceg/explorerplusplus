@@ -155,8 +155,6 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 		m_CurrentDirectory);
 	SetCurrentDirectory(m_CurrentDirectory);
 
-	HandleDirectoryMonitoring(iTabId);
-
 	UpdateArrangeMenuItems();
 
 	m_nSelected = 0;

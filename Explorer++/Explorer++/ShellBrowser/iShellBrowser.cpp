@@ -435,16 +435,6 @@ BOOL CShellBrowser::CanCreate(void) const
 	return bCanCreate;
 }
 
-void CShellBrowser::SetDirMonitorId(int iDirMonitorId)
-{
-	m_iDirMonitorId = iDirMonitorId;
-}
-
-int CShellBrowser::GetDirMonitorId(void) const
-{
-	return m_iDirMonitorId;
-}
-
 BOOL CShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 {
 	TCHAR	szParsingPath[MAX_PATH];

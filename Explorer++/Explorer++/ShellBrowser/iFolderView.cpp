@@ -96,7 +96,6 @@ m_iconResultIDCounter(0)
 	m_bVirtualFolder		= FALSE;
 	m_bThumbnailsSetup		= FALSE;
 	m_nCurrentColumns		= 0;
-	m_iDirMonitorId			= -1;
 	m_pActiveColumnList		= NULL;
 	m_bPerformingDrag		= FALSE;
 	m_nActiveColumns		= 0;

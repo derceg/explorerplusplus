@@ -83,9 +83,6 @@ public:
 
 	LRESULT CALLBACK	MainWndTaskbarThumbnailProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	/* Directory modification. */
-	static void			DirectoryAlteredCallback(const TCHAR *szFileName,DWORD dwAction,void *pData);
-
 private:
 
 	static const int		MIN_SHELL_MENU_ID = 1;
@@ -174,13 +171,6 @@ private:
 	{
 		LPITEMIDLIST				pidlDirectory;
 		DirectorySettingsInternal_t	dsi;
-	};
-
-	struct DirectoryAltered_t
-	{
-		int		iIndex;
-		int		iFolderIndex;
-		void	*pData;
 	};
 
 	struct DWFolderSizeCompletion_t
@@ -339,7 +329,7 @@ private:
 	void					OnSetFocus(void);
 	LRESULT					OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	LRESULT					StatusBarMenuSelect(WPARAM wParam,LPARAM lParam);
-	void					HandleDirectoryMonitoring(int iTabId);
+	LRESULT					OnTbnDropDown(LPARAM lParam);
 	void					OnTabCtrlMButtonUp(POINT *pt);
 	void					OnDisplayWindowResized(WPARAM wParam);
 	void					OnStartedBrowsing(int iTabId, const TCHAR *szPath);

@@ -174,8 +174,6 @@ public:
 	/* Directory modification support. */
 	void				FilesModified(DWORD Action, const TCHAR *FileName, int EventId, int iFolderIndex);
 	void				DirectoryAltered(void);
-	void				SetDirMonitorId(int iDirMonitorId);
-	int					GetDirMonitorId(void) const;
 	int					GetFolderIndex(void) const;
 
 	/* Item information. */
@@ -550,7 +548,8 @@ private:
 	int					m_nTotalItems;
 	int					m_NumFilesSelected;
 	int					m_NumFoldersSelected;
-	int					m_iDirMonitorId;
+	int					m_iCurrentAllocation;
+	int					m_iCachedPosition;
 	int					m_iFolderIcon;
 	int					m_iFileIcon;
 	int					m_iDropped;
