@@ -65,7 +65,6 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	m_iconResults.clear();
 	m_thumbnailResults.clear();
 
-	m_FilesAdded.clear();
 	m_FileSelectionList.clear();
 
 	TCHAR szParsingPath[MAX_PATH];

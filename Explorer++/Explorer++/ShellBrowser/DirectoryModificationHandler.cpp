@@ -88,99 +88,72 @@ void CShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 	SHChangeNotification_Unlock(lock);
 }
 
-void CShellBrowser::AddItem(const TCHAR *szFileName)
+void CShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 {
 	IShellFolder	*pShellFolder = NULL;
-	LPITEMIDLIST	pidlFull = NULL;
 	LPITEMIDLIST	pidlRelative = NULL;
-	Added_t			Added;
-	TCHAR			FullFileName[MAX_PATH];
 	TCHAR			szDisplayName[MAX_PATH];
 	STRRET			str;
 	BOOL			bFileAdded = FALSE;
 	HRESULT hr;
 
-	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,szFileName);
+	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
 
-	hr = GetIdlFromParsingName(FullFileName,&pidlFull);
-
-	/* It is possible that by the time a file is registered here,
-	it will have already been renamed. In this the following
-	check will fail.
-	If the file is not added, store its filename. */
 	if(SUCCEEDED(hr))
 	{
-		hr = SHBindToParent(pidlFull, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
+		/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
+		a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
+		so that items in real folders can still be shown with extensions, even
+		if the global, Explorer option is disabled. */
+		if(m_bVirtualFolder)
+			hr = pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_INFOLDER,&str);
+		else
+			hr = pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_INFOLDER|SHGDN_FORPARSING,&str);
 
 		if(SUCCEEDED(hr))
 		{
-			/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
-			a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
-			so that items in real folders can still be shown with extensions, even
-			if the global, Explorer option is disabled. */
-			if(m_bVirtualFolder)
-				hr = pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_INFOLDER,&str);
-			else
-				hr = pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_INFOLDER|SHGDN_FORPARSING,&str);
+			StrRetToBuf(&str,pidlRelative,szDisplayName,SIZEOF_ARRAY(szDisplayName));
 
-			if(SUCCEEDED(hr))
+			std::list<DroppedFile_t>::iterator itr;
+			BOOL bDropped = FALSE;
+
+			if(!m_DroppedFileNameList.empty())
 			{
-				StrRetToBuf(&str,pidlRelative,szDisplayName,SIZEOF_ARRAY(szDisplayName));
-
-				std::list<DroppedFile_t>::iterator itr;
-				BOOL bDropped = FALSE;
-
-				if(!m_DroppedFileNameList.empty())
+				for(itr = m_DroppedFileNameList.begin();itr != m_DroppedFileNameList.end();itr++)
 				{
-					for(itr = m_DroppedFileNameList.begin();itr != m_DroppedFileNameList.end();itr++)
+					if(lstrcmp(szDisplayName,itr->szFileName) == 0)
 					{
-						if(lstrcmp(szDisplayName,itr->szFileName) == 0)
-						{
-							bDropped = TRUE;
-							break;
-						}
+						bDropped = TRUE;
+						break;
 					}
 				}
-
-				/* Only insert the item in its sorted position if it
-				wasn't dropped in. */
-				if(m_bInsertSorted && !bDropped)
-				{
-					int iItemId;
-					int iSorted;
-
-					iItemId = SetItemInformation(m_pidlDirectory,pidlRelative,szDisplayName);
-
-					iSorted = DetermineItemSortedPosition(iItemId);
-
-					AddItemInternal(iSorted,iItemId,TRUE);
-				}
-				else
-				{
-					/* Just add the item to the end of the list. */
-					AddItemInternal(m_pidlDirectory,pidlRelative,szDisplayName,-1,FALSE);
-				}
-				
-				InsertAwaitingItems(m_bShowInGroups);
-
-				bFileAdded = TRUE;
 			}
 
-			pShellFolder->Release();
+			/* Only insert the item in its sorted position if it
+			wasn't dropped in. */
+			if(m_bInsertSorted && !bDropped)
+			{
+				int iItemId;
+				int iSorted;
+
+				iItemId = SetItemInformation(m_pidlDirectory,pidlRelative,szDisplayName);
+
+				iSorted = DetermineItemSortedPosition(iItemId);
+
+				AddItemInternal(iSorted,iItemId,TRUE);
+			}
+			else
+			{
+				/* Just add the item to the end of the list. */
+				AddItemInternal(m_pidlDirectory,pidlRelative,szDisplayName,-1,FALSE);
+			}
+				
+			InsertAwaitingItems(m_bShowInGroups);
+
+			bFileAdded = TRUE;
 		}
 
-		CoTaskMemFree(pidlFull);
-	}
-	
-	if(!bFileAdded)
-	{
-		/* The file does not exist. However, it is possible
-		that is was simply renamed shortly after been created.
-		Record the filename temporarily (so that it can later
-		be added). */
-		StringCchCopy(Added.szFileName,SIZEOF_ARRAY(Added.szFileName),szFileName);
-		m_FilesAdded.push_back(Added);
+		pShellFolder->Release();
 	}
 }
 
