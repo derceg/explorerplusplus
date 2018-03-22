@@ -54,6 +54,22 @@ void CShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 
 	switch (event)
 	{
+	case SHCNE_RENAMEFOLDER:
+	case SHCNE_RENAMEITEM:
+		if (ILIsParent(m_pidlDirectory, pidls[0], TRUE) && ILIsParent(m_pidlDirectory, pidls[1], TRUE))
+		{
+			RenameItem(pidls[0], pidls[1]);
+		}
+		else if (ILIsParent(m_pidlDirectory, pidls[0], TRUE))
+		{
+			RemoveItem(pidls[0]);
+		}
+		else if (ILIsParent(m_pidlDirectory, pidls[1], TRUE))
+		{
+			/* TODO: Add item. */
+		}
+		break;
+
 	case SHCNE_RMDIR:
 	case SHCNE_DELETE:
 		/* Only the current directory is monitored, so notifications
