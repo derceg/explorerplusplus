@@ -393,116 +393,98 @@ void CShellBrowser::ModifyItem(const TCHAR *FileName)
 	}
 }
 
-/* Renames an item currently in the listview.
- */
+/* Renames an item currently in the listview. */
 /* TODO: This code should be coalesced with the code that
 adds items as well as the code that finds their icons.
 ALL changes to an items name/internal properties/icon/overlay icon
 should go through a central function. */
-void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
+void CShellBrowser::RenameItem(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew)
 {
 	IShellFolder	*pShellFolder = NULL;
-	LPITEMIDLIST	pidlFull = NULL;
 	LPITEMIDLIST	pidlRelative = NULL;
 	SHFILEINFO		shfi;
 	LVFINDINFO		lvfi;
 	TCHAR			szDisplayName[MAX_PATH];
 	LVITEM			lvItem;
-	TCHAR			szFullFileName[MAX_PATH];
 	DWORD_PTR		res;
 	HRESULT			hr;
 	int				iItem;
 
-	if(iItemInternal == -1)
+	int iItemInternal = LocateFileItemInternalIndex(pidlOld);
+
+	if (iItemInternal == -1)
+	{
 		return;
+	}
 
-	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
-	PathAppend(szFullFileName,szNewFileName);
-
-	hr = GetIdlFromParsingName(szFullFileName,&pidlFull);
+	hr = SHBindToParent(pidlNew, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *) &pidlRelative);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = SHBindToParent(pidlFull, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *) &pidlRelative);
+		hr = GetDisplayName(pidlNew,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER|SHGDN_FORPARSING);
 
 		if(SUCCEEDED(hr))
 		{
-			hr = GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER|SHGDN_FORPARSING);
+			m_itemInfoMap.at(iItemInternal).pidlComplete.reset(ILClone(pidlNew));
+			m_itemInfoMap.at(iItemInternal).pridl.reset(ILClone(pidlRelative));
+			StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
+				SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName),
+				szDisplayName);
 
-			if(SUCCEEDED(hr))
-			{
-				m_itemInfoMap.at(iItemInternal).pidlComplete.reset(ILClone(pidlFull));
-				m_itemInfoMap.at(iItemInternal).pridl.reset(ILClone(pidlRelative));
-				StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
-					SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName),
-					szDisplayName);
-
-				/* Need to update internal storage for the item, since
+			/* Need to update internal storage for the item, since
 				it's name has now changed. */
-				StringCchCopy(m_itemInfoMap.at(iItemInternal).wfd.cFileName,
-					SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).wfd.cFileName),
-					szNewFileName);
+			StringCchCopy(m_itemInfoMap.at(iItemInternal).wfd.cFileName,
+				SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).wfd.cFileName),
+				szDisplayName);
 
-				/* The files' type may have changed, so retrieve the files'
-				icon again. */
-				res = SHGetFileInfo((LPTSTR)pidlFull,0,&shfi,
-					sizeof(SHFILEINFO),SHGFI_PIDL|SHGFI_ICON|
-					SHGFI_OVERLAYINDEX);
+			/* The files' type may have changed, so retrieve the files'
+			icon again. */
+			res = SHGetFileInfo((LPTSTR)pidlNew,0,&shfi,
+				sizeof(SHFILEINFO),SHGFI_PIDL|SHGFI_ICON|
+				SHGFI_OVERLAYINDEX);
 
-				if(res != 0)
+			if(res != 0)
+			{
+				/* Locate the item within the listview. */
+				lvfi.flags	= LVFI_PARAM;
+				lvfi.lParam	= iItemInternal;
+				iItem = ListView_FindItem(m_hListView,-1,&lvfi);
+
+				if(iItem != -1)
 				{
-					/* Locate the item within the listview. */
-					lvfi.flags	= LVFI_PARAM;
-					lvfi.lParam	= iItemInternal;
-					iItem = ListView_FindItem(m_hListView,-1,&lvfi);
+					BasicItemInfo_t basicItemInfo = getBasicItemInfo(iItemInternal);
+					Preferences_t preferences = CreatePreferencesStructure();
+					std::wstring filename = ProcessItemFileName(basicItemInfo, preferences);
 
-					if(iItem != -1)
+					TCHAR filenameCopy[MAX_PATH];
+					StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());
+
+					lvItem.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE;
+					lvItem.iItem = iItem;
+					lvItem.iSubItem = 0;
+					lvItem.iImage = shfi.iIcon;
+					lvItem.pszText = filenameCopy;
+					lvItem.stateMask = LVIS_OVERLAYMASK;
+
+					/* As well as resetting the items icon, we'll also set
+					it's overlay again (the overlay could change, for example,
+					if the file is changed to a shortcut). */
+					lvItem.state		= INDEXTOOVERLAYMASK(shfi.iIcon >> 24);
+
+					/* Update the item in the listview. */
+					ListView_SetItem(m_hListView,&lvItem);
+
+					/* TODO: Does the file need to be filtered out? */
+					if(IsFileFiltered(iItemInternal))
 					{
-						BasicItemInfo_t basicItemInfo = getBasicItemInfo(iItemInternal);
-						Preferences_t preferences = CreatePreferencesStructure();
-						std::wstring filename = ProcessItemFileName(basicItemInfo, preferences);
-
-						TCHAR filenameCopy[MAX_PATH];
-						StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());
-
-						lvItem.mask			= LVIF_TEXT|LVIF_IMAGE|LVIF_STATE;
-						lvItem.iItem		= iItem;
-						lvItem.iSubItem		= 0;
-						lvItem.iImage		= shfi.iIcon;
-						lvItem.pszText		= filenameCopy;
-						lvItem.stateMask	= LVIS_OVERLAYMASK;
-
-						/* As well as resetting the items icon, we'll also set
-						it's overlay again (the overlay could change, for example,
-						if the file is changed to a shortcut). */
-						lvItem.state		= INDEXTOOVERLAYMASK(shfi.iIcon >> 24);
-
-						/* Update the item in the listview. */
-						ListView_SetItem(m_hListView,&lvItem);
-
-						/* TODO: Does the file need to be filtered out? */
-						if(IsFileFiltered(iItemInternal))
-						{
-							RemoveFilteredItem(iItem,iItemInternal);
-						}
+						RemoveFilteredItem(iItem,iItemInternal);
 					}
-
-					DestroyIcon(shfi.hIcon);
 				}
-			}
 
-			pShellFolder->Release();
+				DestroyIcon(shfi.hIcon);
+			}
 		}
 
-		CoTaskMemFree(pidlFull);
-	}
-	else
-	{
-		StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
-			SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName), szNewFileName);
-
-		StringCchCopy(m_itemInfoMap.at(iItemInternal).wfd.cFileName,
-			SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).wfd.cFileName),
-			szNewFileName);
+		pShellFolder->Release();
 	}
 }

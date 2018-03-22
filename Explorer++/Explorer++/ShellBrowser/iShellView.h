@@ -403,7 +403,7 @@ private:
 	void				RemoveItem(int iItemInternal);
 	void				RemoveItem(PCIDLIST_ABSOLUTE pidl);
 	void				ModifyItem(const TCHAR *FileName);
-	void				RenameItem(int iItemInternal, const TCHAR *szNewFileName);
+	void				RenameItem(PCIDLIST_ABSOLUTE pidlOld, PCIDLIST_ABSOLUTE pidlNew);
 	int					DetermineItemSortedPosition(LPARAM lParam) const;
 
 	/* Filtering support. */
