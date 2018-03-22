@@ -52,7 +52,22 @@ void CShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 	LONG event;
 	HANDLE lock = SHChangeNotification_Lock(reinterpret_cast<HANDLE>(wParam), static_cast<DWORD>(lParam), &pidls, &event);
 
-	/* TODO: Handle events.*/
+	switch (event)
+	{
+	case SHCNE_RMDIR:
+	case SHCNE_DELETE:
+		/* Only the current directory is monitored, so notifications
+		should only arrive for items in that directory. However, if
+		the user has just changed directories, a notification could
+		still come in for the previous directory. Therefore, it's
+		important to verify that the item is actually a child of
+		the current directory. */
+		if (ILIsParent(m_pidlDirectory, pidls[0], TRUE))
+		{
+			RemoveItem(pidls[0]);
+		}
+		break;
+	}
 
 	SHChangeNotification_Unlock(lock);
 }
