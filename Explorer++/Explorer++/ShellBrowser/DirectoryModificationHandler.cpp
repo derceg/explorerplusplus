@@ -93,6 +93,8 @@ void CShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
+	SendMessage(m_hOwner, WM_USER_DIRECTORYMODIFIED, m_ID, 0);
+
 	SHChangeNotification_Unlock(lock);
 }
 
