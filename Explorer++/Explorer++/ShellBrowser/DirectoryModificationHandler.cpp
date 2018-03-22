@@ -153,9 +153,9 @@ void CShellBrowser::AddItem(const TCHAR *szFileName)
 	}
 }
 
-void CShellBrowser::RemoveItem(const TCHAR *szFileName)
+void CShellBrowser::RemoveItem(PCIDLIST_ABSOLUTE pidl)
 {
-	int iItemInternal = LocateFileItemInternalIndex(szFileName);
+	int iItemInternal = LocateFileItemInternalIndex(pidl);
 
 	if (iItemInternal != -1)
 	{

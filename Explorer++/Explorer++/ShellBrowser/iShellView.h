@@ -401,7 +401,7 @@ private:
 	void				OnShellNotify(WPARAM wParam, LPARAM lParam);
 	void				AddItem(const TCHAR *szFileName);
 	void				RemoveItem(int iItemInternal);
-	void				RemoveItem(const TCHAR *szFileName);
+	void				RemoveItem(PCIDLIST_ABSOLUTE pidl);
 	void				ModifyItem(const TCHAR *FileName);
 	void				RenameItem(int iItemInternal, const TCHAR *szNewFileName);
 	int					DetermineItemSortedPosition(LPARAM lParam) const;
@@ -476,6 +476,7 @@ private:
 
 	/* Miscellaneous. */
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL) const;
+	int					LocateFileItemInternalIndex(PCIDLIST_ABSOLUTE pidl) const;
 	int					LocateFileItemInternalIndex(const TCHAR *szFileName) const;
 	boost::optional<int>	LocateItemByInternalIndex(int internalIndex) const;
 	void				ApplyHeaderSortArrow(void);
