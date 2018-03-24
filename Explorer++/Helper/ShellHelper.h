@@ -21,6 +21,9 @@ const SHCOLUMNID SCID_AUTHOR = {PSGUID_SUMMARYINFORMATION, PIDSI_AUTHOR};
 const SHCOLUMNID SCID_KEYWORDS = {PSGUID_SUMMARYINFORMATION, PIDSI_KEYWORDS};
 const SHCOLUMNID SCID_COMMENTS = {PSGUID_SUMMARYINFORMATION, PIDSI_COMMENTS};
 
+const SHCOLUMNID SCID_ORIGINAL_LOCATION = { PSGUID_DISPLACED, PID_DISPLACED_FROM };
+const SHCOLUMNID SCID_DATE_DELETED = { PSGUID_DISPLACED, PID_DISPLACED_DATE };
+
 /* The following declarations, relating to
 ICustomDestinationList, are only valid for
 Windows 7. If building for an earlier
@@ -107,7 +110,10 @@ HRESULT			BuildHDropList(FORMATETC *pftc, STGMEDIUM *pstg, const std::list<std::
 HRESULT			BuildShellIDList(FORMATETC *pftc, STGMEDIUM *pstg, LPCITEMIDLIST pidlDirectory, const std::list<LPITEMIDLIST> &pidlList);
 HRESULT			BindToIdl(LPCITEMIDLIST pidl, REFIID riid, void **ppv);
 HRESULT			GetUIObjectOf(IShellFolder *pShellFolder, HWND hwndOwner, UINT cidl, PCUITEMID_CHILD_ARRAY apidl, REFIID riid, void **ppv);
-HRESULT			GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid, PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax);
+HRESULT			GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid, PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
+HRESULT			ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
+HRESULT			ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax);
+HRESULT			ConvertDateVariantToString(DATE date, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
 BOOL			IsPathGUID(const TCHAR *szPath);
 BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
 HRESULT			AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList);

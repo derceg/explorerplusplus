@@ -352,19 +352,19 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_TITLE:
-		return GetSummaryColumnText(InternalIndex, &SCID_TITLE);
+		return GetItemDetailsColumnText(InternalIndex, &SCID_TITLE);
 		break;
 	case CM_SUBJECT:
-		return GetSummaryColumnText(InternalIndex, &SCID_SUBJECT);
+		return GetItemDetailsColumnText(InternalIndex, &SCID_SUBJECT);
 		break;
 	case CM_AUTHOR:
-		return GetSummaryColumnText(InternalIndex, &SCID_AUTHOR);
+		return GetItemDetailsColumnText(InternalIndex, &SCID_AUTHOR);
 		break;
 	case CM_KEYWORDS:
-		return GetSummaryColumnText(InternalIndex, &SCID_KEYWORDS);
+		return GetItemDetailsColumnText(InternalIndex, &SCID_KEYWORDS);
 		break;
 	case CM_COMMENT:
-		return GetSummaryColumnText(InternalIndex, &SCID_COMMENTS);
+		return GetItemDetailsColumnText(InternalIndex, &SCID_COMMENTS);
 		break;
 
 	case CM_CAMERAMODEL:
@@ -397,9 +397,11 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_ORIGINALLOCATION:
+		return GetItemDetailsColumnText(InternalIndex, &SCID_ORIGINAL_LOCATION);
 		break;
 
 	case CM_DATEDELETED:
+		return GetItemDetailsColumnText(InternalIndex, &SCID_DATE_DELETED);
 		break;
 
 	case CM_NUMPRINTERDOCUMENTS:
@@ -769,20 +771,33 @@ std::wstring CShellBrowser::GetExtensionColumnText(int InternalIndex) const
 
 HRESULT CShellBrowser::GetItemDetails(int InternalIndex, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const
 {
+	VARIANT vt;
+	HRESULT hr = GetItemDetailsRawData(InternalIndex, pscid, &vt);
+
+	if (SUCCEEDED(hr))
+	{
+		hr = ConvertVariantToString(&vt, szDetail, cchMax, m_bShowFriendlyDates);
+		VariantClear(&vt);
+	}
+
+	return hr;
+}
+
+HRESULT CShellBrowser::GetItemDetailsRawData(int InternalIndex, const SHCOLUMNID *pscid, VARIANT *vt) const
+{
 	IShellFolder2 *pShellFolder = NULL;
 	HRESULT hr = BindToIdl(m_pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
-		hr = GetShellItemDetailsEx(pShellFolder, pscid, m_pExtraItemInfo[InternalIndex].pridl,
-			szDetail, cchMax);
+		hr = pShellFolder->GetDetailsEx(m_pExtraItemInfo[InternalIndex].pridl, pscid, vt);
 		pShellFolder->Release();
 	}
 
 	return hr;
 }
 
-std::wstring CShellBrowser::GetSummaryColumnText(int InternalIndex, const SHCOLUMNID *pscid) const
+std::wstring CShellBrowser::GetItemDetailsColumnText(int InternalIndex, const SHCOLUMNID *pscid) const
 {
 	TCHAR szDetail[512];
 	HRESULT hr = GetItemDetails(InternalIndex, pscid, szDetail, SIZEOF_ARRAY(szDetail));

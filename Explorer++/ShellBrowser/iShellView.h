@@ -588,8 +588,6 @@ private:
 	int CALLBACK		SortByType(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByDate(int InternalIndex1,int InternalIndex2,DateType_t DateType) const;
 	int CALLBACK		SortByTotalSize(int InternalIndex1,int InternalIndex2,bool TotalSize) const;
-	int CALLBACK		SortByOriginalLocation(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByDateDeleted(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByAttributes(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByRealSize(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByShortName(int InternalIndex1,int InternalIndex2) const;
@@ -598,7 +596,7 @@ private:
 	int CALLBACK		SortByShortcutTo(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByHardlinks(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByExtension(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortBySummaryProperty(int InternalIndex1, int InternalIndex2, const SHCOLUMNID *pscid) const;
+	int CALLBACK		SortByItemDetails(int InternalIndex1, int InternalIndex2, const SHCOLUMNID *pscid) const;
 	int CALLBACK		SortByImageProperty(int InternalIndex1,int InternalIndex2,PROPID PropertyId) const;
 	int CALLBACK		SortByVirtualComments(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByFileSystem(int InternalIndex1,int InternalIndex2) const;
@@ -633,7 +631,8 @@ private:
 	std::wstring		GetHardLinksColumnText(int InternalIndex) const;
 	std::wstring		GetExtensionColumnText(int InternalIndex) const;
 	HRESULT				GetItemDetails(int InternalIndex, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const;
-	std::wstring		GetSummaryColumnText(int InternalIndex, const SHCOLUMNID *pscid) const;
+	HRESULT				GetItemDetailsRawData(int InternalIndex, const SHCOLUMNID *pscid, VARIANT *vt) const;
+	std::wstring		GetItemDetailsColumnText(int InternalIndex, const SHCOLUMNID *pscid) const;
 	std::wstring		GetImageColumnText(int InternalIndex,PROPID PropertyID) const;
 	std::wstring		GetFileSystemColumnText(int InternalIndex) const;
 	BOOL				GetDriveSpaceColumnRawData(int InternalIndex,bool TotalSize,ULARGE_INTEGER &DriveSpace) const;

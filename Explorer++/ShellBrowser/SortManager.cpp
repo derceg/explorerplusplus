@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include <list>
 #include <cassert>
+#include <propvarutil.h>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Controls.h"
@@ -102,11 +103,11 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_DATEDELETED:
-			ComparisonResult = SortByDateDeleted(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByItemDetails(InternalIndex1, InternalIndex2, &SCID_DATE_DELETED);
 			break;
 
 		case FSM_ORIGINALLOCATION:
-			ComparisonResult = SortByOriginalLocation(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByItemDetails(InternalIndex1, InternalIndex2, &SCID_ORIGINAL_LOCATION);
 			break;
 
 		case FSM_ATTRIBUTES:
@@ -166,23 +167,23 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_TITLE:
-			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,&SCID_TITLE);
+			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&SCID_TITLE);
 			break;
 
 		case FSM_SUBJECT:
-			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,&SCID_SUBJECT);
+			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&SCID_SUBJECT);
 			break;
 
 		case FSM_AUTHOR:
-			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,&SCID_AUTHOR);
+			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&SCID_AUTHOR);
 			break;
 
 		case FSM_KEYWORDS:
-			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,&SCID_KEYWORDS);
+			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&SCID_KEYWORDS);
 			break;
 
 		case FSM_COMMENTS:
-			ComparisonResult = SortBySummaryProperty(InternalIndex1,InternalIndex2,&SCID_COMMENTS);
+			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&SCID_COMMENTS);
 			break;
 
 		case FSM_CAMERAMODEL:
@@ -508,24 +509,6 @@ int CALLBACK CShellBrowser::SortByTotalSize(int InternalIndex1,int InternalIndex
 	return 0;
 }
 
-/* TODO: Implement. */
-int CALLBACK CShellBrowser::SortByOriginalLocation(int InternalIndex1,int InternalIndex2) const
-{
-	UNREFERENCED_PARAMETER(InternalIndex1);
-	UNREFERENCED_PARAMETER(InternalIndex2);
-
-	return 0;
-}
-
-/* TODO: Implement. */
-int CALLBACK CShellBrowser::SortByDateDeleted(int InternalIndex1,int InternalIndex2) const
-{
-	UNREFERENCED_PARAMETER(InternalIndex1);
-	UNREFERENCED_PARAMETER(InternalIndex2);
-
-	return 0;
-}
-
 int CALLBACK CShellBrowser::SortByAttributes(int InternalIndex1,int InternalIndex2) const
 {
 	std::wstring AttributeString1 = GetAttributeColumnText(InternalIndex1);
@@ -615,12 +598,32 @@ int CALLBACK CShellBrowser::SortByExtension(int InternalIndex1,int InternalIndex
 	return StrCmpLogicalW(Extension1.c_str(),Extension2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortBySummaryProperty(int InternalIndex1, int InternalIndex2, const SHCOLUMNID *pscid) const
+int CALLBACK CShellBrowser::SortByItemDetails(int InternalIndex1, int InternalIndex2, const SHCOLUMNID *pscid) const
 {
-	std::wstring FileProperty1 = GetSummaryColumnText(InternalIndex1, pscid);
-	std::wstring FileProperty2 = GetSummaryColumnText(InternalIndex2, pscid);
+	VARIANT vt1;
+	HRESULT hr1 = GetItemDetailsRawData(InternalIndex1, pscid, &vt1);
 
-	return StrCmpLogicalW(FileProperty1.c_str(), FileProperty2.c_str());
+	VARIANT vt2;
+	HRESULT hr2 = GetItemDetailsRawData(InternalIndex2, pscid, &vt2);
+
+	int ret = 0;
+
+	if (SUCCEEDED(hr1) && SUCCEEDED(hr2) && vt1.vt == vt2.vt)
+	{
+		ret = VariantCompare(vt1, vt2);
+	}
+
+	if (SUCCEEDED(hr1))
+	{
+		VariantClear(&vt1);
+	}
+
+	if (SUCCEEDED(hr2))
+	{
+		VariantClear(&vt2);
+	}
+
+	return ret;
 }
 
 int CALLBACK CShellBrowser::SortByImageProperty(int InternalIndex1,int InternalIndex2,PROPID PropertyId) const

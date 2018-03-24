@@ -725,24 +725,79 @@ HRESULT GetUIObjectOf(IShellFolder *pShellFolder, HWND hwndOwner,
 }
 
 HRESULT GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid,
-	PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax)
+	PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate)
 {
 	VARIANT vt;
 	HRESULT hr = pShellFolder->GetDetailsEx(pidl, pscid, &vt);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = VariantChangeType(&vt, &vt, 0, VT_BSTR);
-
-		if(SUCCEEDED(hr))
-		{
-			hr = StringCchCopy(szDetail, cchMax, V_BSTR(&vt));
-		}
-
+		hr = ConvertVariantToString(&vt, szDetail, cchMax, friendlyDate);
 		VariantClear(&vt);
 	}
 
 	return hr;
+}
+
+HRESULT ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate)
+{
+	HRESULT hr;
+
+	switch (vt->vt)
+	{
+	case VT_DATE:
+		hr = ConvertDateVariantToString(vt->date, szDetail, cchMax, friendlyDate);
+		break;
+
+	default:
+		hr = ConvertGenericVariantToString(vt, szDetail, cchMax);
+		break;
+	}
+
+	return hr;
+}
+
+HRESULT ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax)
+{
+	VARIANT vtDest;
+	VariantInit(&vtDest);
+	HRESULT hr = VariantChangeType(&vtDest, vt, 0, VT_BSTR);
+
+	if (SUCCEEDED(hr))
+	{
+		hr = StringCchCopy(szDetail, cchMax, V_BSTR(&vtDest));
+		VariantClear(&vtDest);
+	}
+
+	return hr;
+}
+
+HRESULT ConvertDateVariantToString(DATE date, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate)
+{
+	SYSTEMTIME systemTime;
+	int variantConverted = VariantTimeToSystemTime(date, &systemTime);
+
+	if (!variantConverted)
+	{
+		return E_FAIL;
+	}
+
+	SYSTEMTIME localSystemTime;
+	BOOL systemTimeConverted = SystemTimeToTzSpecificLocalTime(nullptr, &systemTime, &localSystemTime);
+
+	if (!systemTimeConverted)
+	{
+		return E_FAIL;
+	}
+
+	BOOL dateStringCreated = CreateSystemTimeString(&localSystemTime, szDetail, cchMax, friendlyDate);
+
+	if (!dateStringCreated)
+	{
+		return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 /* Returns TRUE if a path is a GUID;

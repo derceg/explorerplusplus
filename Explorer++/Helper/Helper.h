@@ -21,6 +21,7 @@ enum GroupType_t
 
 /* File helpers. */
 BOOL			CreateFileTimeString(const FILETIME *FileTime, TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate);
+BOOL			CreateSystemTimeString(const SYSTEMTIME *systemTime, TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate);
 BOOL			GetFileSizeEx(const TCHAR *szFileName, PLARGE_INTEGER lpFileSize);
 BOOL			CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2);
 HRESULT			BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, DWORD cchMax);

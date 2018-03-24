@@ -6,6 +6,8 @@ Current version: 1.3.5
 Version 1.4.0
 -------------
 New features:
+- Support for the "Date Deleted" and "Original Location" recycle
+  bin columns has been implemented.
 - When renaming a file, it's possible to move to the next item by
   pressing tab. Shift+tab can now be used to move to the previous
   item.

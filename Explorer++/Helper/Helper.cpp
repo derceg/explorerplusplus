@@ -44,24 +44,30 @@ BOOL CreateFileTimeString(const FILETIME *FileTime,
 		return FALSE;
 	}
 
+	return CreateSystemTimeString(&SystemTime, szBuffer, cchMax, bFriendlyDate);
+}
+
+BOOL CreateSystemTimeString(const SYSTEMTIME *systemTime,
+	TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
+{
 	SYSTEMTIME CurrentTime;
 	GetLocalTime(&CurrentTime);
 
 	TCHAR DateBuffer[512];
 	int iReturn1 = 0;
 
-	if(bFriendlyDate)
+	if (bFriendlyDate)
 	{
-		if((CurrentTime.wYear == SystemTime.wYear) &&
-			(CurrentTime.wMonth == SystemTime.wMonth))
+		if ((CurrentTime.wYear == systemTime->wYear) &&
+			(CurrentTime.wMonth == systemTime->wMonth))
 		{
-			if(CurrentTime.wDay == SystemTime.wDay)
+			if (CurrentTime.wDay == systemTime->wDay)
 			{
 				StringCchCopy(DateBuffer, SIZEOF_ARRAY(DateBuffer), _T("Today"));
 
 				iReturn1 = 1;
 			}
-			else if(CurrentTime.wDay == (SystemTime.wDay + 1))
+			else if (CurrentTime.wDay == (systemTime->wDay + 1))
 			{
 				StringCchCopy(DateBuffer, SIZEOF_ARRAY(DateBuffer), _T("Yesterday"));
 
@@ -69,32 +75,33 @@ BOOL CreateFileTimeString(const FILETIME *FileTime,
 			}
 			else
 			{
-				iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, &SystemTime,
+				iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, systemTime,
 					NULL, DateBuffer, 512);
 			}
 		}
 		else
 		{
-			iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, &SystemTime,
+			iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, systemTime,
 				NULL, DateBuffer, 512);
 		}
 	}
 	else
 	{
-		iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, &SystemTime,
+		iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, systemTime,
 			NULL, DateBuffer, 512);
 	}
 
 	TCHAR TimeBuffer[512];
-	int iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, &SystemTime,
+	int iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, systemTime,
 		NULL, TimeBuffer, 512);
 
-	if((iReturn1 != 0) && (iReturn2 != 0))
+	if ((iReturn1 != 0) && (iReturn2 != 0))
 	{
 		StringCchPrintf(szBuffer, cchMax, _T("%s, %s"), DateBuffer, TimeBuffer);
+		return TRUE;
 	}
 
-	return -1;
+	return FALSE;
 }
 
 HINSTANCE StartCommandPrompt(const TCHAR *Directory, bool Elevated)
