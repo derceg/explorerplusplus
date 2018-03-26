@@ -64,10 +64,9 @@ void Explorerplusplus::InitializeTabs(void)
 		SendMessage(m_hTabCtrl, WM_SETFONT, reinterpret_cast<WPARAM>(m_hTabFont), MAKELPARAM(TRUE, 0));
 	}
 
-	/* TODO: The image list is been leaked. */
-	HIMAGELIST himlSmall = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,100);
-	AddDefaultTabIcons(himlSmall);
-	TabCtrl_SetImageList(m_hTabCtrl,himlSmall);
+	m_hTabCtrlImageList = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,100);
+	AddDefaultTabIcons(m_hTabCtrlImageList);
+	TabCtrl_SetImageList(m_hTabCtrl, m_hTabCtrlImageList);
 
 	m_pTabContainer = new CTabContainer(m_hTabCtrl,&m_pShellBrowser,this);
 

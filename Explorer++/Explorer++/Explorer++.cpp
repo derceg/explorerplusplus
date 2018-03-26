@@ -78,6 +78,7 @@ m_hContainer(hwnd)
 	m_hLastActiveWindow				= NULL;
 	m_hActiveListView				= NULL;
 	m_hTabFont						= NULL;
+	m_hTabCtrlImageList				= nullptr;
 	m_hNextClipboardViewer			= NULL;
 	m_ListViewMButtonItem			= -1;
 	m_zDeltaTotal					= 0;
@@ -126,6 +127,11 @@ Explorerplusplus::~Explorerplusplus()
 	if(m_hTabFont != NULL)
 	{
 		DeleteObject(m_hTabFont);
+	}
+
+	if (m_hTabCtrlImageList != nullptr)
+	{
+		ImageList_Destroy(m_hTabCtrlImageList);
 	}
 
 	delete m_pTabContainer;

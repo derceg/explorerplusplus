@@ -918,6 +918,7 @@ private:
 	/* Tabs. */
 	CTabContainer			*m_pTabContainer;
 	HFONT					m_hTabFont;
+	HIMAGELIST				m_hTabCtrlImageList;
 
 	/* Bookmarks. */
 	CBookmarkFolder *		m_bfAllBookmarks;
