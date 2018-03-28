@@ -225,20 +225,9 @@ int CShellBrowser::LocateFileItemIndex(const TCHAR *szFileName) const
 
 int CShellBrowser::LocateFileItemInternalIndex(PCIDLIST_ABSOLUTE pidl) const
 {
-	for (int i = 0; i < m_nTotalItems; i++)
+	for (const auto &item : m_itemInfoMap)
 	{
-		LVITEM lvItem;
-		lvItem.mask = LVIF_PARAM;
-		lvItem.iItem = i;
-		lvItem.iSubItem = 0;
-		BOOL itemRetrieved = ListView_GetItem(m_hListView, &lvItem);
-
-		if (!itemRetrieved)
-		{
-			continue;
-		}
-
-		LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory, m_itemInfoMap.at(static_cast<int>(lvItem.lParam)).pridl.get());
+		LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory, item.second.pridl.get());
 
 		// declaration of 'boost_scope_exit_aux_args' hides global declaration
 		#pragma warning(push)
@@ -251,7 +240,7 @@ int CShellBrowser::LocateFileItemInternalIndex(PCIDLIST_ABSOLUTE pidl) const
 
 		if (CompareIdls(pidlComplete, pidl))
 		{
-			return static_cast<int>(lvItem.lParam);
+			return item.first;
 		}
 	}
 
