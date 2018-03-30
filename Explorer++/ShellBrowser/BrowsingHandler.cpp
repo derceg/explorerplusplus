@@ -86,6 +86,13 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 		m_pPathManager->StoreIdl(pidl);
 	}
 
+	/* Stop the list view from redrawing itself each time is inserted.
+	Redrawing will be allowed once all items have being inserted.
+	(reduces lag when a large number of items are going to be inserted). */
+	SendMessage(m_hListView, WM_SETREDRAW, FALSE, NULL);
+
+	ListView_DeleteAllItems(m_hListView);
+
 	if(m_bFolderVisited)
 	{
 		ResetFolderMemoryAllocations();
@@ -96,13 +103,6 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	BrowseVirtualFolder(pidl);
 
 	CoTaskMemFree(pidl);
-
-	/* Stop the list view from redrawing itself each time is inserted.
-	Redrawing will be allowed once all items have being inserted.
-	(reduces lag when a large number of items are going to be inserted). */
-	SendMessage(m_hListView,WM_SETREDRAW,FALSE,NULL);
-
-	ListView_DeleteAllItems(m_hListView);
 
 	/* Window updates needs these to be set. */
 	m_NumFilesSelected		= 0;
