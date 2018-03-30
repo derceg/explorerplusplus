@@ -16,6 +16,9 @@ Bug fixes:
 - When right-clicking on the listview background in Windows 10,
   Explorer++ would crash. To resolve this, the OneDrive shell
   extension is now ignored when showing the menu. See #35.
+- Fixed issue with date conversion. Previously, dates would be
+  converted in the current time zone, rather than the time zone
+  in effect at the time being converted.
 - Fixed an issue that caused taskbar thumbnails (shown on Windows 7
   and above) to not always be displayed correctly. See #55.
 - When renaming a file, it's possible to press tab to put the next

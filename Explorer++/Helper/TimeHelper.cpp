@@ -15,7 +15,7 @@
 #include "TimeHelper.h"
 
 
-BOOL LocalSystemTimeToFileTime(const LPSYSTEMTIME lpLocalTime, LPFILETIME lpFileTime)
+BOOL LocalSystemTimeToFileTime(const SYSTEMTIME *lpLocalTime, FILETIME *lpFileTime)
 {
 	SYSTEMTIME SystemTime;
 	BOOL result = TzSpecificLocalTimeToSystemTime(NULL, lpLocalTime, &SystemTime);
@@ -28,7 +28,7 @@ BOOL LocalSystemTimeToFileTime(const LPSYSTEMTIME lpLocalTime, LPFILETIME lpFile
 	return result;
 }
 
-BOOL FileTimeToLocalSystemTime(const LPFILETIME lpFileTime, LPSYSTEMTIME lpLocalTime)
+BOOL FileTimeToLocalSystemTime(const FILETIME *lpFileTime, SYSTEMTIME *lpLocalTime)
 {
 	SYSTEMTIME SystemTime;
 	BOOL result = FileTimeToSystemTime(lpFileTime, &SystemTime);

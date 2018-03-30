@@ -15,6 +15,7 @@
 #include "Helper.h"
 #include "FileWrappers.h"
 #include "Macros.h"
+#include "TimeHelper.h"
 
 
 enum VersionSubBlockType_t
@@ -34,17 +35,15 @@ BOOL GetStringTableValue(void *pBlock, LangAndCodePage *plcp, UINT nItems,
 BOOL CreateFileTimeString(const FILETIME *FileTime,
 	TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
 {
-	FILETIME LocalFileTime;
-	SYSTEMTIME SystemTime;
-	BOOL bRet1 = FileTimeToLocalFileTime(FileTime, &LocalFileTime);
-	BOOL bRet2 = FileTimeToSystemTime(&LocalFileTime, &SystemTime);
+	SYSTEMTIME localSystemTime;
+	BOOL ret = FileTimeToLocalSystemTime(FileTime, &localSystemTime);
 
-	if(!bRet1 || !bRet2)
+	if (!ret)
 	{
 		return FALSE;
 	}
 
-	return CreateSystemTimeString(&SystemTime, szBuffer, cchMax, bFriendlyDate);
+	return CreateSystemTimeString(&localSystemTime, szBuffer, cchMax, bFriendlyDate);
 }
 
 BOOL CreateSystemTimeString(const SYSTEMTIME *systemTime,

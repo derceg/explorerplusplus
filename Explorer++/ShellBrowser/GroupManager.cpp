@@ -20,6 +20,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/TimeHelper.h"
 
 
 namespace
@@ -578,7 +579,6 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 	/* TODO: Move strings into string table. */
 	SYSTEMTIME	stCurrentTime;
 	SYSTEMTIME	stFileTime;
-	FILETIME	ftLocalFileTime;
 	TCHAR		*ModifiedGroups[] = {_T("Today"),_T("Yesterday"),_T("This Week"),_T("Last Week"),_T("This Month"),
 		_T("Last Month"),_T("This Year"),_T("Last Year"),_T("Two Years Ago"),_T("Long ago"),_T("Unspecified")};
 	int			iModified;
@@ -588,19 +588,21 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 	switch(iDateType)
 	{
 	case GROUP_BY_DATEMODIFIED:
-		FileTimeToLocalFileTime(&m_pwfdFiles[iItemInternal].ftLastWriteTime,&ftLocalFileTime);
+		FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftLastWriteTime, &stFileTime);
 		break;
 
 	case GROUP_BY_DATECREATED:
-		FileTimeToLocalFileTime(&m_pwfdFiles[iItemInternal].ftCreationTime,&ftLocalFileTime);
+		FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftCreationTime, &stFileTime);
 		break;
 
 	case GROUP_BY_DATEACCESSED:
-		FileTimeToLocalFileTime(&m_pwfdFiles[iItemInternal].ftLastAccessTime,&ftLocalFileTime);
+		FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftLastAccessTime, &stFileTime);
 		break;
-	}
 
-	FileTimeToSystemTime(&ftLocalFileTime,&stFileTime);
+	default:
+		assert(false);
+		return;
+	}
 
 	if(stFileTime.wYear == stCurrentTime.wYear)
 	{
