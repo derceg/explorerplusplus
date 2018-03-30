@@ -206,6 +206,8 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case FSM_ORIGINALLOCATION:
+			DetermineItemSummaryGroup(iItemInternal, &SCID_ORIGINAL_LOCATION, szGroupHeader, SIZEOF_ARRAY(szGroupHeader));
+			pfnGroupCompare = NameComparison;
 			break;
 
 		case FSM_ATTRIBUTES:
