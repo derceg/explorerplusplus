@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <list>
-#include "../ShellBrowser/iShellView.h"
+#include "ShellBrowser/iShellView.h"
 #include "../Helper/StatusBar.h"
 
 /* Used to share global data across the

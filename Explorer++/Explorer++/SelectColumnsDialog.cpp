@@ -16,7 +16,7 @@
 #include "Explorer++_internal.h"
 #include "SelectColumnsDialog.h"
 #include "MainResource.h"
-#include "../ShellBrowser/iShellView.h"
+#include "ShellBrowser/iShellView.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"

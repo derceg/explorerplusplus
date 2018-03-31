@@ -202,6 +202,36 @@
     <ClCompile Include="HolderWindow.cpp">
       <Filter>Holder Window</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\BrowsingHandler.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\ColumnManager.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\DirectoryModificationHandler.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\GroupManager.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\HandleThumbnails.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\iDropTarget.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\iFolderView.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\iPathManager.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\iShellBrowser.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\SortManager.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -369,6 +399,15 @@
     <ClInclude Include="HolderWindowInternal.h">
       <Filter>Holder Window</Filter>
     </ClInclude>
+    <ClInclude Include="ShellBrowser\iPathManager.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\iShellBrowser_internal.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\iShellView.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -468,6 +507,9 @@
     </Filter>
     <Filter Include="Holder Window">
       <UniqueIdentifier>{d9276f12-e3f5-4d23-a177-79772ff8b9dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ShellBrowser">
+      <UniqueIdentifier>{c4c4c6aa-6087-4b72-bcd0-4a1c19499130}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

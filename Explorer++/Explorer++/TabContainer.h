@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Explorer++_internal.h"
-#include "../ShellBrowser/iShellView.h"
+#include "ShellBrowser/iShellView.h"
 #include <unordered_map>
 
 class CTabContainer

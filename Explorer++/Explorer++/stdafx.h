@@ -20,6 +20,7 @@
 #define OEMRESOURCE
 
 // Windows Header Files:
+#include <Winsock2.h>
 #include <windows.h>
 #include <windowsx.h>
 #include <winuser.h>

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ShellBrowser/iShellView.h"
+#include "ShellBrowser/iShellView.h"
 
 static const int DEFAULT_COLUMN_WIDTH = 150;
 

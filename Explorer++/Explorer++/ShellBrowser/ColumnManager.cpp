@@ -21,6 +21,7 @@
 #include <list>
 #include <cassert>
 #include <boost\date_time\posix_time\posix_time.hpp>
+#include <iphlpapi.h>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"

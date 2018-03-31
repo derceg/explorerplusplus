@@ -8,7 +8,7 @@
 #include "ApplicationToolbar.h"
 #include "TabContainer.h"
 #include "ColorRuleHelper.h"
-#include "../ShellBrowser/iShellView.h"
+#include "ShellBrowser/iShellView.h"
 #include "../MyTreeView/MyTreeView.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/SetDefaultFileManager.h"
