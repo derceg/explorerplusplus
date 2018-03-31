@@ -16,6 +16,8 @@
 #include "FileWrappers.h"
 #include "Macros.h"
 #include "TimeHelper.h"
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 
 enum VersionSubBlockType_t
@@ -32,11 +34,11 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 BOOL GetStringTableValue(void *pBlock, LangAndCodePage *plcp, UINT nItems,
 	const TCHAR *szVersionInfo, TCHAR *szVersionBuffer, UINT cchMax);
 
-BOOL CreateFileTimeString(const FILETIME *FileTime,
+BOOL CreateFileTimeString(const FILETIME *utcFileTime,
 	TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
 {
 	SYSTEMTIME localSystemTime;
-	BOOL ret = FileTimeToLocalSystemTime(FileTime, &localSystemTime);
+	BOOL ret = FileTimeToLocalSystemTime(utcFileTime, &localSystemTime);
 
 	if (!ret)
 	{
@@ -46,57 +48,75 @@ BOOL CreateFileTimeString(const FILETIME *FileTime,
 	return CreateSystemTimeString(&localSystemTime, szBuffer, cchMax, bFriendlyDate);
 }
 
-BOOL CreateSystemTimeString(const SYSTEMTIME *systemTime,
+BOOL CreateSystemTimeString(const SYSTEMTIME *localSystemTime,
 	TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
 {
-	SYSTEMTIME CurrentTime;
-	GetLocalTime(&CurrentTime);
-
 	TCHAR DateBuffer[512];
 	int iReturn1 = 0;
 
 	if (bFriendlyDate)
 	{
-		if ((CurrentTime.wYear == systemTime->wYear) &&
-			(CurrentTime.wMonth == systemTime->wMonth))
+		BOOL ret = CreateFriendlySystemTimeString(localSystemTime, DateBuffer, SIZEOF_ARRAY(DateBuffer));
+
+		if (ret)
 		{
-			if (CurrentTime.wDay == systemTime->wDay)
-			{
-				StringCchCopy(DateBuffer, SIZEOF_ARRAY(DateBuffer), _T("Today"));
-
-				iReturn1 = 1;
-			}
-			else if (CurrentTime.wDay == (systemTime->wDay + 1))
-			{
-				StringCchCopy(DateBuffer, SIZEOF_ARRAY(DateBuffer), _T("Yesterday"));
-
-				iReturn1 = 1;
-			}
-			else
-			{
-				iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, systemTime,
-					NULL, DateBuffer, 512);
-			}
+			iReturn1 = 1;
 		}
 		else
 		{
-			iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, systemTime,
-				NULL, DateBuffer, 512);
+			iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
+				NULL, DateBuffer, SIZEOF_ARRAY(DateBuffer));
 		}
 	}
 	else
 	{
-		iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, systemTime,
-			NULL, DateBuffer, 512);
+		iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
+			NULL, DateBuffer, SIZEOF_ARRAY(DateBuffer));
 	}
 
 	TCHAR TimeBuffer[512];
-	int iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, systemTime,
-		NULL, TimeBuffer, 512);
+	int iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
+		NULL, TimeBuffer, SIZEOF_ARRAY(TimeBuffer));
 
 	if ((iReturn1 != 0) && (iReturn2 != 0))
 	{
 		StringCchPrintf(szBuffer, cchMax, _T("%s, %s"), DateBuffer, TimeBuffer);
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime,
+	TCHAR *szBuffer, size_t cchMax)
+{
+	using namespace boost::gregorian;
+	using namespace boost::posix_time;
+
+	FILETIME localFileTime;
+	BOOL ret = SystemTimeToFileTime(localSystemTime, &localFileTime);
+
+	if (!ret)
+	{
+		return FALSE;
+	}
+
+	ptime inputPosixTime = from_ftime<ptime>(localFileTime);
+	date inputDate = inputPosixTime.date();
+
+	date today = day_clock::local_day();
+
+	if (inputDate == today)
+	{
+		StringCchCopy(szBuffer, cchMax, _T("Today"));
+		return TRUE;
+	}
+
+	date yesterday = today - days(1);
+
+	if (inputDate == yesterday)
+	{
+		StringCchCopy(szBuffer, cchMax, _T("Yesterday"));
 		return TRUE;
 	}
 

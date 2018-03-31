@@ -36,6 +36,10 @@ Bug fixes:
 - When grouping items by date created/modified/accessed, the items
   weren't being properly sorted into their groups (as month/year
   boundaries weren't being handled). Fixed.
+- Previously, when a date was formatted as a friendly date,
+  year/month boundaries weren't being taken into account. This meant
+  that a date would only be shown as "Yesterday" if it was in the
+  same month/year as the current date. Fixed.
 - Fixed a number of memory leaks.
 
 Misc:
