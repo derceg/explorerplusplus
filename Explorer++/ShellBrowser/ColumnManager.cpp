@@ -21,17 +21,6 @@
 #include <list>
 #include <cassert>
 
-/* According to http://www.boost.org/doc/libs/release/more/getting_started/windows.html#header-only-libraries,
-Boost.DateTime has a binary
-component that's only required
-if, for example, you're using
-to_string/from_string. Those
-functions aren't been used in
-this case, so explicitly exclude
-the library (also see
-http://stackoverflow.com/questions/2364774/why-do-i-need-to-compile-datetime-in-boost-if-i-am-not-using-to-string-or-from-s). */
-#define BOOST_DATE_TIME_NO_LIB
-
 #pragma warning(push)
 #pragma warning(disable:4995)
 #include <boost\date_time\posix_time\posix_time.hpp>
