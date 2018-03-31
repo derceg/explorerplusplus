@@ -33,6 +33,9 @@ Bug fixes:
 - Under certain conditions, refreshing a tab via the tab right-click
   menu would result in the wrong tab being refreshed. Fixed.
 - Fixed a crash that could occur when switching directories.
+- When grouping items by date created/modified/accessed, the items
+  weren't being properly sorted into their groups (as month/year
+  boundaries weren't being handled). Fixed.
 - Fixed a number of memory leaks.
 
 Misc:

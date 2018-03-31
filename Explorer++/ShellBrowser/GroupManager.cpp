@@ -15,6 +15,8 @@
 #include "stdafx.h"
 #include <list>
 #include <cassert>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
@@ -576,27 +578,24 @@ void CShellBrowser::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGro
 
 void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR *szGroupHeader,int cchMax) const
 {
-	/* TODO: Move strings into string table. */
-	SYSTEMTIME	stCurrentTime;
-	SYSTEMTIME	stFileTime;
-	TCHAR		*ModifiedGroups[] = {_T("Today"),_T("Yesterday"),_T("This Week"),_T("Last Week"),_T("This Month"),
-		_T("Last Month"),_T("This Year"),_T("Last Year"),_T("Two Years Ago"),_T("Long ago"),_T("Unspecified")};
-	int			iModified;
+	using namespace boost::gregorian;
+	using namespace boost::posix_time;
 
-	GetLocalTime(&stCurrentTime);
+	SYSTEMTIME stFileTime;
+	BOOL ret = FALSE;
 
 	switch(iDateType)
 	{
 	case GROUP_BY_DATEMODIFIED:
-		FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftLastWriteTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftLastWriteTime, &stFileTime);
 		break;
 
 	case GROUP_BY_DATECREATED:
-		FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftCreationTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftCreationTime, &stFileTime);
 		break;
 
 	case GROUP_BY_DATEACCESSED:
-		FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftLastAccessTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftLastAccessTime, &stFileTime);
 		break;
 
 	default:
@@ -604,38 +603,98 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 		return;
 	}
 
-	if(stFileTime.wYear == stCurrentTime.wYear)
+	if (!ret)
 	{
-		if(stFileTime.wMonth == stCurrentTime.wMonth)
-		{
-			if(stFileTime.wDay == stCurrentTime.wDay)
-				iModified = 0;
-			else if(stFileTime.wDay == (stCurrentTime.wDay - 1))
-				iModified = 1;
-			else if(stFileTime.wDay >= (stCurrentTime.wDay - 7))
-				iModified = 3;
-			else
-				iModified = 4;
-		}
-		else
-		{
-			if(stFileTime.wMonth == (stCurrentTime.wMonth - 1))
-				iModified = 5;
-			else
-				iModified = 6;
-		}
-	}
-	else
-	{
-		if(stFileTime.wYear == (stCurrentTime.wYear - 1))
-			iModified = 6;
-		else if(stFileTime.wYear == (stCurrentTime.wYear - 2))
-			iModified = 7;
-		else
-			iModified = 8;
+		/* TODO: Move strings into string table. */
+		StringCchCopy(szGroupHeader, cchMax, _T("Unspecified"));
+		return;
 	}
 
-	StringCchCopy(szGroupHeader,cchMax,ModifiedGroups[iModified]);
+	FILETIME localFileTime;
+	ret = SystemTimeToFileTime(&stFileTime, &localFileTime);
+
+	if (!ret)
+	{
+		StringCchCopy(szGroupHeader, cchMax, _T("Unspecified"));
+		return;
+	}
+
+	ptime filePosixTime = from_ftime<ptime>(localFileTime);
+	date fileDate = filePosixTime.date();
+
+	date today = day_clock::local_day();
+
+	if (fileDate > today)
+	{
+		StringCchCopy(szGroupHeader, cchMax, _T("Sometime in the future"));
+		return;
+	}
+
+	if (fileDate == today)
+	{
+		StringCchCopy(szGroupHeader, cchMax, _T("Today"));
+		return;
+	}
+
+	date yesterday = today - days(1);
+
+	if (fileDate == yesterday)
+	{
+		StringCchCopy(szGroupHeader, cchMax, _T("Yesterday"));
+		return;
+	}
+
+	// Note that this assumes that Sunday is the first day of the week.
+	unsigned short currentWeekday = today.day_of_week().as_number();
+	date startOfWeek = today - days(currentWeekday);
+
+	if (fileDate >= startOfWeek)
+	{
+		StringCchCopy(szGroupHeader, cchMax, _T("This week"));
+		return;
+	}
+
+	date startOfLastWeek = startOfWeek - weeks(1);
+
+	if (fileDate >= startOfLastWeek)
+	{
+		StringCchCopy(szGroupHeader, cchMax, _T("Last week"));
+		return;
+	}
+
+	date startOfMonth = date(today.year(), today.month(), 1);
+
+	if (fileDate >= startOfMonth)
+	{
+		StringCchCopy(szGroupHeader, cchMax, _T("This month"));
+		return;
+	}
+
+	date startOfLastMonth = startOfMonth - months(1);
+
+	if (fileDate >= startOfLastMonth)
+	{
+		StringCchCopy(szGroupHeader, cchMax, _T("Last month"));
+		return;
+	}
+
+	date startOfYear = date(today.year(), 1, 1);
+
+	if (fileDate >= startOfYear)
+	{
+		StringCchCopy(szGroupHeader, cchMax, _T("This year"));
+		return;
+	}
+
+	date startOfLastYear = startOfYear - years(1);
+
+	if (fileDate >= startOfLastYear)
+	{
+		StringCchCopy(szGroupHeader, cchMax, _T("Last year"));
+		return;
+	}
+
+	StringCchCopy(szGroupHeader, cchMax, _T("Long ago"));
 }
 
 void CShellBrowser::DetermineItemSummaryGroup(int iItemInternal, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax) const
