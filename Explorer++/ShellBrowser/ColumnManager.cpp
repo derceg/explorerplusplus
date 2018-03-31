@@ -20,12 +20,7 @@
 #include "stdafx.h"
 #include <list>
 #include <cassert>
-
-#pragma warning(push)
-#pragma warning(disable:4995)
 #include <boost\date_time\posix_time\posix_time.hpp>
-#pragma warning(pop)
-
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
