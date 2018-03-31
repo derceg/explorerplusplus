@@ -14,9 +14,9 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "HolderWindow.h"
 #include "SetFileAttributesDialog.h"
 #include "MainResource.h"
-#include "../HolderWindow/HolderWindow.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"

@@ -199,6 +199,9 @@
     <ClCompile Include="DisplayWindow.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="HolderWindow.cpp">
+      <Filter>Holder Window</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -360,6 +363,12 @@
     <ClInclude Include="Logging.h">
       <Filter>Logging</Filter>
     </ClInclude>
+    <ClInclude Include="HolderWindow.h">
+      <Filter>Holder Window</Filter>
+    </ClInclude>
+    <ClInclude Include="HolderWindowInternal.h">
+      <Filter>Holder Window</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -456,6 +465,9 @@
     </Filter>
     <Filter Include="Settings">
       <UniqueIdentifier>{7611b74e-ed4f-469a-9ac8-eb7ce05b6942}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Holder Window">
+      <UniqueIdentifier>{d9276f12-e3f5-4d23-a177-79772ff8b9dc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,6 @@
 /******************************************************************
  *
- * Project: HolderWindow
+ * Project: Explorer++
  * File: HolderWindow.cpp
  * License: GPL - See LICENSE in the top level directory
  *
