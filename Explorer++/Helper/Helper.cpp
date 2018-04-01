@@ -66,7 +66,7 @@ BOOL CreateSystemTimeString(const SYSTEMTIME *localSystemTime,
 		NULL, DateBuffer, SIZEOF_ARRAY(DateBuffer));
 
 	TCHAR TimeBuffer[512];
-	int iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
+	int iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP | TIME_NOSECONDS, localSystemTime,
 		NULL, TimeBuffer, SIZEOF_ARRAY(TimeBuffer));
 
 	if ((iReturn1 != 0) && (iReturn2 != 0))
@@ -118,7 +118,7 @@ BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime,
 	}
 
 	TCHAR timeComponent[512];
-	int timeFormatted = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
+	int timeFormatted = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP | TIME_NOSECONDS, localSystemTime,
 		NULL, timeComponent, SIZEOF_ARRAY(timeComponent));
 
 	if (timeFormatted == 0)
