@@ -50,6 +50,9 @@ Misc:
 - Builds are now digitally signed.
 - All menus are now drawn in the standard system style, rather than
   a custom style.
+- The format used to display dates has been updated. Previously, the
+  date and time were separated by a comma. Now, they're separated by a
+  space.
 
 Version 1.3.5 (03/02/2013)
 --------------------------

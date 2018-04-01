@@ -51,28 +51,19 @@ BOOL CreateFileTimeString(const FILETIME *utcFileTime,
 BOOL CreateSystemTimeString(const SYSTEMTIME *localSystemTime,
 	TCHAR *szBuffer, size_t cchMax, BOOL bFriendlyDate)
 {
-	TCHAR DateBuffer[512];
-	int iReturn1 = 0;
-
 	if (bFriendlyDate)
 	{
-		BOOL ret = CreateFriendlySystemTimeString(localSystemTime, DateBuffer, SIZEOF_ARRAY(DateBuffer));
+		BOOL ret = CreateFriendlySystemTimeString(localSystemTime, szBuffer, cchMax);
 
 		if (ret)
 		{
-			iReturn1 = 1;
-		}
-		else
-		{
-			iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
-				NULL, DateBuffer, SIZEOF_ARRAY(DateBuffer));
+			return TRUE;
 		}
 	}
-	else
-	{
-		iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
-			NULL, DateBuffer, SIZEOF_ARRAY(DateBuffer));
-	}
+
+	TCHAR DateBuffer[512];
+	int iReturn1 = GetDateFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
+		NULL, DateBuffer, SIZEOF_ARRAY(DateBuffer));
 
 	TCHAR TimeBuffer[512];
 	int iReturn2 = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
@@ -80,7 +71,7 @@ BOOL CreateSystemTimeString(const SYSTEMTIME *localSystemTime,
 
 	if ((iReturn1 != 0) && (iReturn2 != 0))
 	{
-		StringCchPrintf(szBuffer, cchMax, _T("%s, %s"), DateBuffer, TimeBuffer);
+		StringCchPrintf(szBuffer, cchMax, _T("%s %s"), DateBuffer, TimeBuffer);
 		return TRUE;
 	}
 
@@ -101,22 +92,44 @@ BOOL CreateFriendlySystemTimeString(const SYSTEMTIME *localSystemTime,
 		return FALSE;
 	}
 
+	TCHAR dateComponent[512];
+	bool dateComponentSet = false;
+
 	ptime inputPosixTime = from_ftime<ptime>(localFileTime);
 	date inputDate = inputPosixTime.date();
 
 	date today = day_clock::local_day();
+	date yesterday = today - days(1);
 
 	if (inputDate == today)
 	{
-		StringCchCopy(szBuffer, cchMax, _T("Today"));
-		return TRUE;
+		StringCchCopy(dateComponent, SIZEOF_ARRAY(dateComponent), _T("Today"));
+		dateComponentSet = true;
+	}
+	else if (inputDate == yesterday)
+	{
+		StringCchCopy(dateComponent, SIZEOF_ARRAY(dateComponent), _T("Yesterday"));
+		dateComponentSet = true;
 	}
 
-	date yesterday = today - days(1);
-
-	if (inputDate == yesterday)
+	if (!dateComponentSet)
 	{
-		StringCchCopy(szBuffer, cchMax, _T("Yesterday"));
+		return FALSE;
+	}
+
+	TCHAR timeComponent[512];
+	int timeFormatted = GetTimeFormat(LOCALE_USER_DEFAULT, LOCALE_USE_CP_ACP, localSystemTime,
+		NULL, timeComponent, SIZEOF_ARRAY(timeComponent));
+
+	if (timeFormatted == 0)
+	{
+		return FALSE;
+	}
+
+	HRESULT hr = StringCchPrintf(szBuffer, cchMax, _T("%s, %s"), dateComponent, timeComponent);
+
+	if (SUCCEEDED(hr))
+	{
 		return TRUE;
 	}
 
