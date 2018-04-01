@@ -99,7 +99,7 @@ void CSetFileAttributesDialog::InitializeDateFields()
 	/* Use the dates of the first file... */
 	FileTimeToLocalSystemTime(&pwfd->ftLastWriteTime,&m_LocalWrite);
 	FileTimeToLocalSystemTime(&pwfd->ftCreationTime,&m_LocalCreation);
-	FileTimeToLocalSystemTime(&pwfd->ftLastAccessTime,&m_LocalCreation);
+	FileTimeToLocalSystemTime(&pwfd->ftLastAccessTime,&m_LocalAccess);
 
 	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONDATE),GDT_VALID,&m_LocalWrite);
 	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONTIME),GDT_VALID,&m_LocalWrite);
@@ -107,8 +107,8 @@ void CSetFileAttributesDialog::InitializeDateFields()
 	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONDATE),GDT_VALID,&m_LocalCreation);
 	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_CREATIONTIME),GDT_VALID,&m_LocalCreation);
 
-	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSDATE),GDT_VALID,&m_LocalCreation);
-	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSTIME),GDT_VALID,&m_LocalCreation);
+	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSDATE),GDT_VALID,&m_LocalAccess);
+	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_ACCESSTIME),GDT_VALID,&m_LocalAccess);
 
 	/* All date/time fields are disabled initially. */
 	DateTime_SetSystemtime(GetDlgItem(m_hDlg,IDC_MODIFICATIONDATE),GDT_NONE,NULL);

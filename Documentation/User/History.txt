@@ -40,6 +40,8 @@ Bug fixes:
   year/month boundaries weren't being taken into account. This meant
   that a date would only be shown as "Yesterday" if it was in the
   same month/year as the current date. Fixed.
+- When opening the set file attributes dialog, the creation date
+  shown was incorrect. Fixed.
 - Fixed a number of memory leaks.
 
 Misc:
