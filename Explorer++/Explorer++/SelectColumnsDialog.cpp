@@ -13,6 +13,7 @@
 
 #include "stdafx.h"
 #include <algorithm>
+#include <functional>
 #include "Explorer++_internal.h"
 #include "SelectColumnsDialog.h"
 #include "MainResource.h"
@@ -57,6 +58,8 @@ INT_PTR CSelectColumnsDialog::OnInitDialog()
 	std::list<Column_t> ActiveColumnList;
 	m_pexpp->GetActiveShellBrowser()->ExportCurrentColumns(&ActiveColumnList);
 
+	ActiveColumnList.sort(std::bind(&CSelectColumnsDialog::CompareColumns, this, std::placeholders::_1, std::placeholders::_2));
+
 	int iItem = 0;
 
 	for each(auto Column in ActiveColumnList)
@@ -86,6 +89,44 @@ INT_PTR CSelectColumnsDialog::OnInitDialog()
 	m_pscdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
+}
+
+bool CSelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t &column2)
+{
+	if (column1.bChecked && column2.bChecked)
+	{
+		// If both column are checked, preserve the input ordering (this is
+		// the order that the columns will actually appear in the listview).
+		// This matches the behavior of Windows Explorer.
+		return false;
+	}
+	else if (column1.bChecked && !column2.bChecked)
+	{
+		return true;
+	}
+	else if (!column1.bChecked && column2.bChecked)
+	{
+		return false;
+	}
+
+	TCHAR column1Text[64];
+	LoadString(GetInstance(), m_pexpp->LookupColumnNameStringIndex(column1.id),
+		column1Text, SIZEOF_ARRAY(column1Text));
+
+	TCHAR column2Text[64];
+	LoadString(GetInstance(), m_pexpp->LookupColumnNameStringIndex(column2.id),
+		column2Text, SIZEOF_ARRAY(column2Text));
+
+	int ret = StrCmpLogicalW(column1Text, column2Text);
+
+	if (ret == -1)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void CSelectColumnsDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,

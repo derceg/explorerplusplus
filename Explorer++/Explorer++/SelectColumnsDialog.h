@@ -43,6 +43,8 @@ protected:
 
 private:
 
+	bool	CompareColumns(const Column_t &column1, const Column_t &column2);
+
 	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
 	void	SaveState();
 
