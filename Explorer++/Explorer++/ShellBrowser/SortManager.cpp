@@ -175,7 +175,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Subject);
 			break;
 
-		case FSM_AUTHOR:
+		case FSM_AUTHORS:
 			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Author);
 			break;
 

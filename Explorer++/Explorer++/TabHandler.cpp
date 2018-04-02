@@ -1623,8 +1623,8 @@ unsigned int Explorerplusplus::DetermineColumnSortMode(UINT uColumnId)
 			return FSM_SUBJECT;
 			break;
 
-		case CM_AUTHOR:
-			return FSM_AUTHOR;
+		case CM_AUTHORS:
+			return FSM_AUTHORS;
 			break;
 
 		case CM_KEYWORDS:

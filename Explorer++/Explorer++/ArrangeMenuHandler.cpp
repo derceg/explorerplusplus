@@ -559,7 +559,7 @@ int Explorerplusplus::DetermineSortModeMenuId(int SortMode)
 			return IDM_SORTBY_SUBJECT;
 			break;
 
-		case FSM_AUTHOR:
+		case FSM_AUTHORS:
 			return IDM_SORTBY_AUTHOR;
 			break;
 
@@ -819,7 +819,7 @@ int Explorerplusplus::DetermineGroupModeMenuId(int SortMode)
 			return IDM_GROUPBY_SUBJECT;
 			break;
 
-		case FSM_AUTHOR:
+		case FSM_AUTHORS:
 			return IDM_GROUPBY_AUTHOR;
 			break;
 

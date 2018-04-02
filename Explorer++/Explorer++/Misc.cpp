@@ -878,8 +878,8 @@ int Explorerplusplus::LookupColumnNameStringIndex(int iColumnId)
 		return IDS_COLUMN_NAME_SUBJECT;
 		break;
 
-	case CM_AUTHOR:
-		return IDS_COLUMN_NAME_AUTHOR;
+	case CM_AUTHORS:
+		return IDS_COLUMN_NAME_AUTHORS;
 		break;
 
 	case CM_KEYWORDS:
@@ -1138,8 +1138,8 @@ int Explorerplusplus::LookupColumnDescriptionStringIndex(int iColumnId)
 			return IDS_COLUMN_DESCRIPTION_SUBJECT;
 			break;
 
-		case CM_AUTHOR:
-			return IDS_COLUMN_DESCRIPTION_AUTHOR;
+		case CM_AUTHORS:
+			return IDS_COLUMN_DESCRIPTION_AUTHORS;
 			break;
 
 		case CM_KEYWORDS:

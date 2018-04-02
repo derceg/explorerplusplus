@@ -687,7 +687,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_SORTBY_AUTHOR:
-			OnSortBy(FSM_AUTHOR);
+			OnSortBy(FSM_AUTHORS);
 			break;
 
 		case IDM_SORTBY_KEYWORDS:
@@ -935,7 +935,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_GROUPBY_AUTHOR:
-			OnGroupBy(FSM_AUTHOR);
+			OnGroupBy(FSM_AUTHORS);
 			break;
 
 		case IDM_GROUPBY_KEYWORDS:

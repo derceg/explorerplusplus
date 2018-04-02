@@ -343,7 +343,7 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 	case CM_SUBJECT:
 		return GetItemDetailsColumnText(InternalIndex, &PKEY_Subject);
 		break;
-	case CM_AUTHOR:
+	case CM_AUTHORS:
 		return GetItemDetailsColumnText(InternalIndex, &PKEY_Author);
 		break;
 	case CM_KEYWORDS:
@@ -1481,8 +1481,8 @@ unsigned int CShellBrowser::DetermineColumnSortMode(int iColumnId) const
 			return FSM_SUBJECT;
 			break;
 
-		case CM_AUTHOR:
-			return FSM_AUTHOR;
+		case CM_AUTHORS:
+			return FSM_AUTHORS;
 			break;
 
 		case CM_KEYWORDS:

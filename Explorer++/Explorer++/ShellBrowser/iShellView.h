@@ -113,7 +113,7 @@ typedef enum
 
 	FSM_TITLE				= 24,
 	FSM_SUBJECT				= 25,
-	FSM_AUTHOR				= 26,
+	FSM_AUTHORS				= 26,
 	FSM_KEYWORDS			= 27,
 
 	FSM_CAMERAMODEL			= 29,
@@ -197,7 +197,7 @@ typedef enum
 	/* File summary information. */
 	CM_TITLE				= 19,
 	CM_SUBJECT				= 20,
-	CM_AUTHOR				= 21,
+	CM_AUTHORS				= 21,
 	CM_KEYWORDS				= 22,
 	CM_COMMENT				= 23,
 

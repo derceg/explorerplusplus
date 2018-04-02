@@ -36,7 +36,7 @@
 
 static unsigned int g_RealFolderHeaderList[] =
 {CM_NAME, CM_TYPE, CM_SIZE, CM_DATEMODIFIED,
-CM_AUTHOR, CM_TITLE};
+CM_AUTHORS, CM_TITLE};
 
 static unsigned int g_ControlPanelHeaderList[] =
 {CM_NAME, CM_VIRTUALCOMMENTS};

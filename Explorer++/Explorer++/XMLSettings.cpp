@@ -126,7 +126,7 @@ static ColumnXMLSaveData ColumnData[] =
 {_T("HardLinks"),CM_HARDLINKS},{_T("Extension"),CM_EXTENSION},
 {_T("Created"),CM_CREATED},{_T("Accessed"),CM_ACCESSED},
 {_T("Title"),CM_TITLE},{_T("Subject"),CM_SUBJECT},
-{_T("Author"),CM_AUTHOR},{_T("Keywords"),CM_KEYWORDS},
+{_T("Author"),CM_AUTHORS},{_T("Keywords"),CM_KEYWORDS},
 {_T("Comment"),CM_COMMENT},{_T("CameraModel"),CM_CAMERAMODEL},
 {_T("DateTaken"),CM_DATETAKEN},{_T("Width"),CM_WIDTH},
 {_T("Height"),CM_HEIGHT},{_T("TotalSize"),CM_TOTALSIZE},

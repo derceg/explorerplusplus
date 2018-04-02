@@ -304,7 +304,7 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_AUTHOR:
+		case FSM_AUTHORS:
 			DetermineItemSummaryGroup(iItemInternal,&PKEY_Author,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
