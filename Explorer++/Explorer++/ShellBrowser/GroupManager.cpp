@@ -42,16 +42,6 @@ namespace
 
 #define GROUP_OTHER				27
 
-TCHAR *RetrieveGroupHeader(int iGroupId);
-
-/* Group sorting. */
-INT CALLBACK	NameComparison(INT Group1_ID, INT Group2_ID, void *pvData);
-INT CALLBACK	FreeSpaceComparison(INT Group1_ID, INT Group2_ID, void *pvData);
-
-BOOL g_bSortAscending;
-
-std::list<TypeGroup_t> *g_pGroupList = NULL;
-
 /* Simply sets the grouping flag, without actually moving
 items into groups. */
 void CShellBrowser::SetGroupingFlag(BOOL bShowInGroups)
@@ -91,10 +81,14 @@ void CShellBrowser::ToggleGrouping(void)
 	}
 }
 
-INT CALLBACK NameComparison(INT Group1_ID, INT Group2_ID, void *pvData)
+INT CALLBACK CShellBrowser::GroupNameComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData)
 {
-	UNREFERENCED_PARAMETER(pvData);
+	CShellBrowser *shellBrowser = reinterpret_cast<CShellBrowser *>(pvData);
+	return shellBrowser->GroupNameComparison(Group1_ID, Group2_ID);
+}
 
+INT CALLBACK CShellBrowser::GroupNameComparison(INT Group1_ID, INT Group2_ID)
+{
 	TCHAR *pszGroupHeader1 = NULL;
 	TCHAR *pszGroupHeader2 = NULL;
 	int iReturnValue;
@@ -102,28 +96,42 @@ INT CALLBACK NameComparison(INT Group1_ID, INT Group2_ID, void *pvData)
 	pszGroupHeader1 = RetrieveGroupHeader(Group1_ID);
 	pszGroupHeader2 = RetrieveGroupHeader(Group2_ID);
 
-	if(lstrcmpi(pszGroupHeader1,_T("Other")) == 0 &&
-		lstrcmpi(pszGroupHeader2,_T("Other")) != 0)
+	if (lstrcmpi(pszGroupHeader1, _T("Other")) == 0 &&
+		lstrcmpi(pszGroupHeader2, _T("Other")) != 0)
+	{
 		iReturnValue = 1;
-	else if(lstrcmpi(pszGroupHeader1,_T("Other")) != 0 &&
-		lstrcmpi(pszGroupHeader2,_T("Other")) == 0)
+	}
+	else if (lstrcmpi(pszGroupHeader1, _T("Other")) != 0 &&
+		lstrcmpi(pszGroupHeader2, _T("Other")) == 0)
+	{
 		iReturnValue = -1;
-	else if(lstrcmpi(pszGroupHeader1,_T("Other")) == 0 &&
-		lstrcmpi(pszGroupHeader2,_T("Other")) == 0)
+	}
+	else if (lstrcmpi(pszGroupHeader1, _T("Other")) == 0 &&
+		lstrcmpi(pszGroupHeader2, _T("Other")) == 0)
+	{
 		iReturnValue = 0;
+	}
 	else
-		iReturnValue = StrCmpLogicalW(pszGroupHeader1,pszGroupHeader2);
+	{
+		iReturnValue = StrCmpLogicalW(pszGroupHeader1, pszGroupHeader2);
+	}
 
-	if(!g_bSortAscending)
+	if (!m_bSortAscending)
+	{
 		iReturnValue = -iReturnValue;
+	}
 
 	return iReturnValue;
 }
 
-INT CALLBACK FreeSpaceComparison(INT Group1_ID, INT Group2_ID, void *pvData)
+INT CALLBACK CShellBrowser::GroupFreeSpaceComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData)
 {
-	UNREFERENCED_PARAMETER(pvData);
+	CShellBrowser *shellBrowser = reinterpret_cast<CShellBrowser *>(pvData);
+	return shellBrowser->GroupFreeSpaceComparison(Group1_ID, Group2_ID);
+}
 
+INT CALLBACK CShellBrowser::GroupFreeSpaceComparison(INT Group1_ID, INT Group2_ID)
+{
 	TCHAR *pszGroupHeader1 = NULL;
 	TCHAR *pszGroupHeader2 = NULL;
 	int iReturnValue;
@@ -131,29 +139,39 @@ INT CALLBACK FreeSpaceComparison(INT Group1_ID, INT Group2_ID, void *pvData)
 	pszGroupHeader1 = RetrieveGroupHeader(Group1_ID);
 	pszGroupHeader2 = RetrieveGroupHeader(Group2_ID);
 
-	if(lstrcmpi(pszGroupHeader1,_T("Unspecified")) == 0 &&
-		lstrcmpi(pszGroupHeader2,_T("Unspecified")) != 0)
+	if (lstrcmpi(pszGroupHeader1, _T("Unspecified")) == 0 &&
+		lstrcmpi(pszGroupHeader2, _T("Unspecified")) != 0)
+	{
 		iReturnValue = 1;
-	else if(lstrcmpi(pszGroupHeader1,_T("Unspecified")) != 0 &&
-		lstrcmpi(pszGroupHeader2,_T("Unspecified")) == 0)
+	}
+	else if (lstrcmpi(pszGroupHeader1, _T("Unspecified")) != 0 &&
+		lstrcmpi(pszGroupHeader2, _T("Unspecified")) == 0)
+	{
 		iReturnValue = -1;
-	else if(lstrcmpi(pszGroupHeader1,_T("Unspecified")) == 0 &&
-		lstrcmpi(pszGroupHeader2,_T("Unspecified")) == 0)
+	}
+	else if (lstrcmpi(pszGroupHeader1, _T("Unspecified")) == 0 &&
+		lstrcmpi(pszGroupHeader2, _T("Unspecified")) == 0)
+	{
 		iReturnValue = 0;
+	}
 	else
-		iReturnValue = StrCmpLogicalW(pszGroupHeader1,pszGroupHeader2);
+	{
+		iReturnValue = StrCmpLogicalW(pszGroupHeader1, pszGroupHeader2);
+	}
 
-	if(!g_bSortAscending)
+	if (!m_bSortAscending)
+	{
 		iReturnValue = -iReturnValue;
+	}
 
 	return iReturnValue;
 }
 
-TCHAR *RetrieveGroupHeader(int iGroupId)
+TCHAR *CShellBrowser::RetrieveGroupHeader(int iGroupId)
 {
 	std::list<TypeGroup_t>::iterator	itr;
 
-	for(itr = g_pGroupList->begin();itr != g_pGroupList->end();itr++)
+	for(itr = m_GroupList.begin();itr != m_GroupList.end();itr++)
 	{
 		if(itr->iGroupId == iGroupId)
 		{
@@ -178,32 +196,32 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 	{
 		case FSM_NAME:
 			DetermineItemNameGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_TYPE:
 			DetermineItemTypeGroupVirtual(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_SIZE:
 			DetermineItemSizeGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_DATEMODIFIED:
 			DetermineItemDateGroup(iItemInternal,GROUP_BY_DATEMODIFIED,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_TOTALSIZE:
 			DetermineItemTotalSizeGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_FREESPACE:
 			DetermineItemFreeSpaceGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = FreeSpaceComparison;
+			pfnGroupCompare = GroupFreeSpaceComparisonStub;
 			break;
 
 		case FSM_DATEDELETED:
@@ -211,47 +229,47 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 
 		case FSM_ORIGINALLOCATION:
 			DetermineItemSummaryGroup(iItemInternal, &SCID_ORIGINAL_LOCATION, szGroupHeader, SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_ATTRIBUTES:
 			DetermineItemAttributeGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_SHORTNAME:
 			DetermineItemNameGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_OWNER:
 			DetermineItemOwnerGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_PRODUCTNAME:
 			DetermineItemVersionGroup(iItemInternal,_T("ProductName"),szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_COMPANY:
 			DetermineItemVersionGroup(iItemInternal,_T("CompanyName"),szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_DESCRIPTION:
 			DetermineItemVersionGroup(iItemInternal,_T("FileDescription"),szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_FILEVERSION:
 			DetermineItemVersionGroup(iItemInternal,_T("FileVersion"),szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_PRODUCTVERSION:
 			DetermineItemVersionGroup(iItemInternal,_T("ProductVersion"),szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_SHORTCUTTO:
@@ -262,63 +280,63 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 
 		case FSM_EXTENSION:
 			DetermineItemExtensionGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_CREATED:
 			DetermineItemDateGroup(iItemInternal,GROUP_BY_DATECREATED,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_ACCESSED:
 			DetermineItemDateGroup(iItemInternal,GROUP_BY_DATEACCESSED,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_TITLE:
 			DetermineItemSummaryGroup(iItemInternal,&SCID_TITLE,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_SUBJECT:
 			DetermineItemSummaryGroup(iItemInternal,&SCID_SUBJECT,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_AUTHOR:
 			DetermineItemSummaryGroup(iItemInternal,&SCID_AUTHOR,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_KEYWORDS:
 			DetermineItemSummaryGroup(iItemInternal,&SCID_KEYWORDS,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_COMMENTS:
 			DetermineItemSummaryGroup(iItemInternal,&SCID_COMMENTS,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 
 		case FSM_CAMERAMODEL:
 			DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagEquipModel,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_DATETAKEN:
 			DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagDateTime,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_WIDTH:
 			DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagImageWidth,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_HEIGHT:
 			DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagImageHeight,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 
@@ -327,7 +345,7 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 
 		case FSM_FILESYSTEM:
 			DetermineItemFileSystemGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_NUMPRINTERDOCUMENTS:
@@ -344,7 +362,7 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 
 		case FSM_NETWORKADAPTER_STATUS:
 			DetermineItemNetworkStatus(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
-			pfnGroupCompare = NameComparison;
+			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		default:
@@ -417,8 +435,8 @@ PFNLVGROUPCOMPARE pfnGroupCompare)
 		lvigs.lvGroup.pszHeader	= wszHeader;
 		lvigs.lvGroup.iGroupId	= iGroupId;
 		lvigs.lvGroup.stateMask	= 0;
-		lvigs.pfnGroupCompare = (PFNLVGROUPCOMPARE)pfnGroupCompare;
-		lvigs.pvData = NULL;
+		lvigs.pfnGroupCompare	= pfnGroupCompare;
+		lvigs.pvData			= reinterpret_cast<void *>(this);
 
 		ListView_InsertGroupSorted(m_hListView,&lvigs);
 	}
@@ -993,10 +1011,6 @@ void CShellBrowser::MoveItemsIntoGroups(void)
 
 	m_GroupList.clear();
 	m_iGroupId = 0;
-
-	g_bSortAscending = m_bSortAscending;
-
-	g_pGroupList = &m_GroupList;
 
 	for(i = 0;i < nItems ;i++)
 	{

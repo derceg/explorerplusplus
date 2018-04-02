@@ -42,6 +42,9 @@ Bug fixes:
   same month/year as the current date. Fixed.
 - When opening the set file attributes dialog, the creation date
   shown was incorrect. Fixed.
+- There was an issue that meant that the group sorting direction
+  in one tab could affect the group sorting order in other tabs.
+  Fixed.
 - Fixed a number of memory leaks.
 
 Misc:

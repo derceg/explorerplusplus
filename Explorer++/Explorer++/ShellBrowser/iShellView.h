@@ -665,6 +665,11 @@ private:
 	void				UnfilterAllItems(void);
 
 	/* Listview group support (real files). */
+	static INT CALLBACK	GroupNameComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData);
+	INT CALLBACK		GroupNameComparison(INT Group1_ID, INT Group2_ID);
+	static INT CALLBACK	GroupFreeSpaceComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData);
+	INT CALLBACK		GroupFreeSpaceComparison(INT Group1_ID, INT Group2_ID);
+	TCHAR				*RetrieveGroupHeader(int iGroupId);
 	int					DetermineItemGroup(int iItemInternal);
 	void				DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 	void				DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
