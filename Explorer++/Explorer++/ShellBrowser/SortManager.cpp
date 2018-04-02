@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include <list>
 #include <cassert>
+#include <propkey.h>
 #include <propvarutil.h>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
@@ -167,23 +168,23 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_TITLE:
-			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&SCID_TITLE);
+			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Title);
 			break;
 
 		case FSM_SUBJECT:
-			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&SCID_SUBJECT);
+			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Subject);
 			break;
 
 		case FSM_AUTHOR:
-			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&SCID_AUTHOR);
+			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Author);
 			break;
 
 		case FSM_KEYWORDS:
-			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&SCID_KEYWORDS);
+			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Keywords);
 			break;
 
 		case FSM_COMMENTS:
-			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&SCID_COMMENTS);
+			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Comment);
 			break;
 
 		case FSM_CAMERAMODEL:

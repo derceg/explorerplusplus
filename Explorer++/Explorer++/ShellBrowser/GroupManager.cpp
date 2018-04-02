@@ -18,6 +18,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <iphlpapi.h>
+#include <propkey.h>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
@@ -294,27 +295,27 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case FSM_TITLE:
-			DetermineItemSummaryGroup(iItemInternal,&SCID_TITLE,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(iItemInternal,&PKEY_Title,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_SUBJECT:
-			DetermineItemSummaryGroup(iItemInternal,&SCID_SUBJECT,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(iItemInternal,&PKEY_Subject,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_AUTHOR:
-			DetermineItemSummaryGroup(iItemInternal,&SCID_AUTHOR,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(iItemInternal,&PKEY_Author,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_KEYWORDS:
-			DetermineItemSummaryGroup(iItemInternal,&SCID_KEYWORDS,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(iItemInternal,&PKEY_Keywords,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_COMMENTS:
-			DetermineItemSummaryGroup(iItemInternal,&SCID_COMMENTS,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(iItemInternal,&PKEY_Comment,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 

@@ -22,6 +22,7 @@
 #include <cassert>
 #include <boost\date_time\posix_time\posix_time.hpp>
 #include <iphlpapi.h>
+#include <propkey.h>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Helper.h"
@@ -337,19 +338,19 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_TITLE:
-		return GetItemDetailsColumnText(InternalIndex, &SCID_TITLE);
+		return GetItemDetailsColumnText(InternalIndex, &PKEY_Title);
 		break;
 	case CM_SUBJECT:
-		return GetItemDetailsColumnText(InternalIndex, &SCID_SUBJECT);
+		return GetItemDetailsColumnText(InternalIndex, &PKEY_Subject);
 		break;
 	case CM_AUTHOR:
-		return GetItemDetailsColumnText(InternalIndex, &SCID_AUTHOR);
+		return GetItemDetailsColumnText(InternalIndex, &PKEY_Author);
 		break;
 	case CM_KEYWORDS:
-		return GetItemDetailsColumnText(InternalIndex, &SCID_KEYWORDS);
+		return GetItemDetailsColumnText(InternalIndex, &PKEY_Keywords);
 		break;
 	case CM_COMMENT:
-		return GetItemDetailsColumnText(InternalIndex, &SCID_COMMENTS);
+		return GetItemDetailsColumnText(InternalIndex, &PKEY_Comment);
 		break;
 
 	case CM_CAMERAMODEL:
