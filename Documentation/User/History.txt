@@ -383,7 +383,7 @@ New features:
  - Explorer++ can now be restricted to only running one instance
    by deselecting 'Allow multiple instances' in the options
    dialog.
- - 'Large Icons' and 'Extra Large Icons' view modes added (vista
+ - 'Large Icons' and 'Extra Large Icons' view modes added (Vista
    and later).
  - It is now possible to browse through tabs by moving the mouse
    over the tab window, and scrolling with the mouse wheel.
