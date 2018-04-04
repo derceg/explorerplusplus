@@ -57,6 +57,9 @@ Misc:
   date and time were separated by a comma. Now, they're separated by a
   space.
 - Dates are now displayed without seconds.
+- The way in which the document summary fields (e.g. title, subject)
+  are retrieved has been updated. This means that the fields should
+  now be displayed for more file types (e.g. Word documents).
 - The columns in the select columns dialog are now sorted by name,
   with the current set of columns appearing at the top of the list.
 
