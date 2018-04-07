@@ -66,6 +66,10 @@ Misc:
 - The columns in the select columns dialog are now sorted by
   name, with the current set of columns appearing at the top of
   the list.
+- When grouping by file extension, the application would attempt
+  to retrieve the extension for both files and folders. Now, the
+  extension will only be retrieved for files. Folders will be
+  grouped together in a "Folder" group.
 
 Version 1.3.5 (03/02/2013)
 --------------------------

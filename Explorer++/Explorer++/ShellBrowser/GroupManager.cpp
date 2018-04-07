@@ -862,19 +862,21 @@ void CShellBrowser::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID Pr
 
 void CShellBrowser::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
-	TCHAR FullFileName[MAX_PATH];
-	TCHAR *pExt;
+	if ((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	{
+		LoadString(m_hResourceModule, IDS_GROUPBY_EXTENSION_FOLDER, szGroupHeader, cchMax);
+		return;
+	}
 
+	TCHAR FullFileName[MAX_PATH];
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
 	PathAppend(FullFileName,m_pwfdFiles[iItemInternal].cFileName);
 
-	pExt = PathFindExtension(FullFileName);
+	TCHAR *pExt = PathFindExtension(FullFileName);
 
-	/* TODO: Folder? */
 	if(*pExt == '\0')
 	{
-		/* TODO: Move into string table. */
-		StringCchCopy(szGroupHeader,cchMax,_T("None"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_EXTENSION_NONE, szGroupHeader, cchMax);
 	}
 	else
 	{
