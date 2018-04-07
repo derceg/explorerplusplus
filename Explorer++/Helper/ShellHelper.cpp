@@ -747,6 +747,12 @@ HRESULT ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax
 	switch (vt->vt)
 	{
 	case VT_DATE:
+		/* Although dates can be converted directly to strings, a custom
+		conversion function is used for two reasons:
+		1. To ensure that the date is in the local timezone (dates are
+		in UTC by default).
+		2. To ensure that the date display is consistent with how other
+		dates in the application are displayed. */
 		hr = ConvertDateVariantToString(vt->date, szDetail, cchMax, friendlyDate);
 		break;
 
