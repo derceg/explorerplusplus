@@ -1397,7 +1397,7 @@ void CShellBrowser::SetActiveColumnSet(void)
 	}
 }
 
-unsigned int CShellBrowser::DetermineColumnSortMode(int iColumnId) const
+unsigned int CShellBrowser::DetermineColumnSortMode(int iColumnId)
 {
 	switch(iColumnId)
 	{

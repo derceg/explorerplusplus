@@ -765,7 +765,6 @@ private:
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	CStatusBar				*GetStatusBar();
 	UINT					GetDefaultSortMode(LPCITEMIDLIST pidlDirectory);
-	unsigned int			DetermineColumnSortMode(UINT uColumnId);
 	void					FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
 
 

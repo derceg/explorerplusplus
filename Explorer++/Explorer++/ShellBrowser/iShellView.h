@@ -386,6 +386,7 @@ public:
 	/* Column support. */
 	void				ExportCurrentColumns(std::list<Column_t> *pColumns);
 	void				ImportColumns(std::list<Column_t> *pColumns);
+	static unsigned int	DetermineColumnSortMode(int iColumnId);
 
 	/* Thumbnails view. */
 	int					GetExtractedThumbnail(HBITMAP hThumbnailBitmap);
@@ -611,7 +612,6 @@ private:
 	std::wstring		GetColumnText(UINT ColumnID,int InternalIndex) const;
 	void				InsertColumn(unsigned int ColumnId,int iColumndIndex,int iWidth);
 	void				SetActiveColumnSet(void);
-	unsigned int		DetermineColumnSortMode(int iColumnId) const;
 	void				GetColumnInternal(unsigned int id,Column_t *pci) const;
 	void				SaveColumnWidths(void);
 
