@@ -1913,6 +1913,10 @@ int CShellBrowser::LookupColumnNameStringIndex(int iColumnId)
 	case CM_MEDIA_YEAR:
 		return IDS_COLUMN_NAME_YEAR;
 		break;
+
+	default:
+		assert(false);
+		break;
 	}
 
 	return 0;
@@ -2064,6 +2068,10 @@ int CShellBrowser::LookupColumnDescriptionStringIndex(int iColumnId)
 
 	case CM_MEDIA_BITRATE:
 		return IDS_COLUMN_DESCRIPTION_BITRATE;
+		break;
+
+	default:
+		assert(false);
 		break;
 	}
 
