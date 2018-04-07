@@ -142,7 +142,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		break;
 
 	case WM_USER_GETCOLUMNNAMEINDEX:
-		return LookupColumnNameStringIndex((int)wParam);
+		return CShellBrowser::LookupColumnNameStringIndex((int)wParam);
 		break;
 
 	case WM_USER_DIRECTORYMODIFIED:

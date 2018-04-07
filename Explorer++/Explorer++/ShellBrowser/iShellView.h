@@ -387,6 +387,8 @@ public:
 	void				ExportCurrentColumns(std::list<Column_t> *pColumns);
 	void				ImportColumns(std::list<Column_t> *pColumns);
 	static unsigned int	DetermineColumnSortMode(int iColumnId);
+	static int			LookupColumnNameStringIndex(int iColumnId);
+	static int			LookupColumnDescriptionStringIndex(int iColumnId);
 
 	/* Thumbnails view. */
 	int					GetExtractedThumbnail(HBITMAP hThumbnailBitmap);

@@ -685,8 +685,6 @@ private:
 
 	/* Columns. */
 	void					OnSelectColumns();
-	int						LookupColumnNameStringIndex(int iColumnId);
-	int						LookupColumnDescriptionStringIndex(int iColumnId);
 	void					CopyColumnInfoToClipboard(void);
 
 	/* Bookmark handling. */

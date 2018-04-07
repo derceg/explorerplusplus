@@ -1158,7 +1158,7 @@ void Explorerplusplus::OnListViewHeaderRClick(POINT *pCursorPos)
 		{
 			if(itr->id == pHeaderList[i])
 			{
-				LoadString(m_hLanguageModule,LookupColumnNameStringIndex(itr->id),
+				LoadString(m_hLanguageModule,CShellBrowser::LookupColumnNameStringIndex(itr->id),
 					szColumnText,SIZEOF_ARRAY(szColumnText));
 
 				if(itr->bChecked)

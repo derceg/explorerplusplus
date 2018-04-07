@@ -44,9 +44,6 @@ __interface IExplorerplusplus
 	/* Temporary. */
 	void			SetTabSelection(int Index);
 
-	int				LookupColumnNameStringIndex(int iColumnId);
-	int				LookupColumnDescriptionStringIndex(int iColumnId);
-
 	void			OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 
 	CStatusBar		*GetStatusBar();

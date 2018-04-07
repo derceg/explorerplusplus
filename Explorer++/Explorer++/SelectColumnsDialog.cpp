@@ -65,7 +65,7 @@ INT_PTR CSelectColumnsDialog::OnInitDialog()
 	for each(auto Column in ActiveColumnList)
 	{
 		TCHAR szText[64];
-		LoadString(GetInstance(),m_pexpp->LookupColumnNameStringIndex(Column.id),
+		LoadString(GetInstance(),CShellBrowser::LookupColumnNameStringIndex(Column.id),
 			szText,SIZEOF_ARRAY(szText));
 
 		LVITEM lvItem;
@@ -110,11 +110,11 @@ bool CSelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_
 	}
 
 	TCHAR column1Text[64];
-	LoadString(GetInstance(), m_pexpp->LookupColumnNameStringIndex(column1.id),
+	LoadString(GetInstance(), CShellBrowser::LookupColumnNameStringIndex(column1.id),
 		column1Text, SIZEOF_ARRAY(column1Text));
 
 	TCHAR column2Text[64];
-	LoadString(GetInstance(), m_pexpp->LookupColumnNameStringIndex(column2.id),
+	LoadString(GetInstance(), CShellBrowser::LookupColumnNameStringIndex(column2.id),
 		column2Text, SIZEOF_ARRAY(column2Text));
 
 	int ret = StrCmpLogicalW(column1Text, column2Text);
@@ -303,7 +303,7 @@ void CSelectColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(hListView,&lvItem);
 
-		int iDescriptionStringIndex = m_pexpp->LookupColumnDescriptionStringIndex(static_cast<int>(lvItem.lParam));
+		int iDescriptionStringIndex = CShellBrowser::LookupColumnDescriptionStringIndex(static_cast<int>(lvItem.lParam));
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetInstance(),iDescriptionStringIndex,szColumnDescription,

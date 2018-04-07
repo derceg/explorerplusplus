@@ -326,7 +326,7 @@ void CSetDefaultColumnsDialog::SetupFolderColumns(FolderType_t FolderType)
 	for each(auto Column in *pColumnList)
 	{
 		TCHAR szText[64];
-		LoadString(GetInstance(),m_pexpp->LookupColumnNameStringIndex(Column.id),
+		LoadString(GetInstance(),CShellBrowser::LookupColumnNameStringIndex(Column.id),
 			szText,SIZEOF_ARRAY(szText));
 
 		LVITEM lvItem;
@@ -393,7 +393,7 @@ void CSetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(hListView,&lvItem);
 
-		int iDescriptionStringIndex = m_pexpp->LookupColumnDescriptionStringIndex(static_cast<int>(lvItem.lParam));
+		int iDescriptionStringIndex = CShellBrowser::LookupColumnDescriptionStringIndex(static_cast<int>(lvItem.lParam));
 
 		TCHAR szColumnDescription[128];
 		LoadString(GetInstance(),iDescriptionStringIndex,szColumnDescription,
