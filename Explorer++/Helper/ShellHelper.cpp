@@ -12,6 +12,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <boost\algorithm\string\join.hpp>
 #include <boost\algorithm\string\predicate.hpp>
 #include "FileOperations.h"
 #include "Helper.h"
@@ -749,24 +750,13 @@ HRESULT ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax
 		hr = ConvertDateVariantToString(vt->date, szDetail, cchMax, friendlyDate);
 		break;
 
+	case VT_ARRAY|VT_BSTR:
+		hr = ConvertVariantStringArrayToString(vt->parray, szDetail, cchMax);
+		break;
+
 	default:
 		hr = ConvertGenericVariantToString(vt, szDetail, cchMax);
 		break;
-	}
-
-	return hr;
-}
-
-HRESULT ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax)
-{
-	VARIANT vtDest;
-	VariantInit(&vtDest);
-	HRESULT hr = VariantChangeType(&vtDest, vt, 0, VT_BSTR);
-
-	if (SUCCEEDED(hr))
-	{
-		hr = StringCchCopy(szDetail, cchMax, V_BSTR(&vtDest));
-		VariantClear(&vtDest);
 	}
 
 	return hr;
@@ -798,6 +788,69 @@ HRESULT ConvertDateVariantToString(DATE date, TCHAR *szDetail, size_t cchMax, BO
 	}
 
 	return S_OK;
+}
+
+HRESULT ConvertVariantStringArrayToString(SAFEARRAY *array, TCHAR *szDetail, size_t cchMax)
+{
+	UINT dimensions = SafeArrayGetDim(array);
+
+	if (dimensions != 1)
+	{
+		return E_INVALIDARG;
+	}
+
+	HRESULT hr;
+	LONG lowerBound;
+	hr = SafeArrayGetLBound(array, 1, &lowerBound);
+
+	if (!SUCCEEDED(hr))
+	{
+		return hr;
+	}
+
+	LONG upperBound;
+	hr = SafeArrayGetUBound(array, 1, &upperBound);
+
+	if (!SUCCEEDED(hr))
+	{
+		return hr;
+	}
+
+	std::vector<std::wstring> strings;
+
+	for (long i = lowerBound; i <= upperBound; i++)
+	{
+		BSTR element;
+		hr = SafeArrayGetElement(array, &i, reinterpret_cast<void *>(&element));
+
+		if (SUCCEEDED(hr))
+		{
+			strings.push_back(element);
+
+			SysFreeString(element);
+		}
+	}
+
+	std::wstring finalString = boost::algorithm::join(strings, L"; ");
+
+	StringCchCopy(szDetail, cchMax, finalString.c_str());
+
+	return S_OK;
+}
+
+HRESULT ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax)
+{
+	VARIANT vtDest;
+	VariantInit(&vtDest);
+	HRESULT hr = VariantChangeType(&vtDest, vt, 0, VT_BSTR);
+
+	if (SUCCEEDED(hr))
+	{
+		hr = StringCchCopy(szDetail, cchMax, V_BSTR(&vtDest));
+		VariantClear(&vtDest);
+	}
+
+	return hr;
 }
 
 /* Returns TRUE if a path is a GUID;

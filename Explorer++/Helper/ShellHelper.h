@@ -106,6 +106,7 @@ HRESULT			BindToIdl(LPCITEMIDLIST pidl, REFIID riid, void **ppv);
 HRESULT			GetUIObjectOf(IShellFolder *pShellFolder, HWND hwndOwner, UINT cidl, PCUITEMID_CHILD_ARRAY apidl, REFIID riid, void **ppv);
 HRESULT			GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid, PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
 HRESULT			ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
+HRESULT			ConvertVariantStringArrayToString(SAFEARRAY *array, TCHAR *szDetail, size_t cchMax);
 HRESULT			ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax);
 HRESULT			ConvertDateVariantToString(DATE date, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
 BOOL			IsPathGUID(const TCHAR *szPath);
