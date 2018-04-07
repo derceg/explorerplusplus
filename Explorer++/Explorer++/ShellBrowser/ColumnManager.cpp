@@ -1319,7 +1319,7 @@ void CShellBrowser::InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWid
 	int			iActualColumnIndex;
 	int			iStringIndex;
 
-	iStringIndex = (int)SendMessage(m_hOwner,WM_USER_GETCOLUMNNAMEINDEX,ColumnId,0);
+	iStringIndex = LookupColumnNameStringIndex(ColumnId);
 
 	LoadString(m_hResourceModule,iStringIndex,
 		szText,SIZEOF_ARRAY(szText));
