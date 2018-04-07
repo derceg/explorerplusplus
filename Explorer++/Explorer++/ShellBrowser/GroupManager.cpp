@@ -21,6 +21,7 @@
 #include <propkey.h>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
+#include "MainResource.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
@@ -625,8 +626,7 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 
 	if (!ret)
 	{
-		/* TODO: Move strings into string table. */
-		StringCchCopy(szGroupHeader, cchMax, _T("Unspecified"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_UNSPECIFIED, szGroupHeader, cchMax);
 		return;
 	}
 
@@ -635,7 +635,7 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 
 	if (!ret)
 	{
-		StringCchCopy(szGroupHeader, cchMax, _T("Unspecified"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_UNSPECIFIED, szGroupHeader, cchMax);
 		return;
 	}
 
@@ -646,13 +646,13 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 
 	if (fileDate > today)
 	{
-		StringCchCopy(szGroupHeader, cchMax, _T("Sometime in the future"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_DATE_FUTURE, szGroupHeader, cchMax);
 		return;
 	}
 
 	if (fileDate == today)
 	{
-		StringCchCopy(szGroupHeader, cchMax, _T("Today"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_DATE_TODAY, szGroupHeader, cchMax);
 		return;
 	}
 
@@ -660,7 +660,7 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 
 	if (fileDate == yesterday)
 	{
-		StringCchCopy(szGroupHeader, cchMax, _T("Yesterday"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_DATE_YESTERDAY, szGroupHeader, cchMax);
 		return;
 	}
 
@@ -670,7 +670,7 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 
 	if (fileDate >= startOfWeek)
 	{
-		StringCchCopy(szGroupHeader, cchMax, _T("This week"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_DATE_THIS_WEEK, szGroupHeader, cchMax);
 		return;
 	}
 
@@ -678,7 +678,7 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 
 	if (fileDate >= startOfLastWeek)
 	{
-		StringCchCopy(szGroupHeader, cchMax, _T("Last week"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_DATE_LAST_WEEK, szGroupHeader, cchMax);
 		return;
 	}
 
@@ -686,7 +686,7 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 
 	if (fileDate >= startOfMonth)
 	{
-		StringCchCopy(szGroupHeader, cchMax, _T("This month"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_DATE_THIS_MONTH, szGroupHeader, cchMax);
 		return;
 	}
 
@@ -694,7 +694,7 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 
 	if (fileDate >= startOfLastMonth)
 	{
-		StringCchCopy(szGroupHeader, cchMax, _T("Last month"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_DATE_LAST_MONTH, szGroupHeader, cchMax);
 		return;
 	}
 
@@ -702,7 +702,7 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 
 	if (fileDate >= startOfYear)
 	{
-		StringCchCopy(szGroupHeader, cchMax, _T("This year"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_DATE_THIS_YEAR, szGroupHeader, cchMax);
 		return;
 	}
 
@@ -710,11 +710,11 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 
 	if (fileDate >= startOfLastYear)
 	{
-		StringCchCopy(szGroupHeader, cchMax, _T("Last year"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_DATE_LAST_YEAR, szGroupHeader, cchMax);
 		return;
 	}
 
-	StringCchCopy(szGroupHeader, cchMax, _T("Long ago"));
+	LoadString(m_hResourceModule, IDS_GROUPBY_DATE_LONG_AGO, szGroupHeader, cchMax);
 }
 
 void CShellBrowser::DetermineItemSummaryGroup(int iItemInternal, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax) const
@@ -909,14 +909,12 @@ void CShellBrowser::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGrou
 
 		if(!bRes || *szFileSystemName == '\0')
 		{
-			/* TODO: Move into string table. */
-			StringCchCopy(szFileSystemName,SIZEOF_ARRAY(szFileSystemName),_T("Unspecified"));
+			LoadString(m_hResourceModule, IDS_GROUPBY_UNSPECIFIED, szFileSystemName, SIZEOF_ARRAY(szFileSystemName));
 		}
 	}
 	else
 	{
-		/* TODO: Move into string table. */
-		StringCchCopy(szFileSystemName,SIZEOF_ARRAY(szFileSystemName),_T("Unspecified"));
+		LoadString(m_hResourceModule, IDS_GROUPBY_UNSPECIFIED, szFileSystemName, SIZEOF_ARRAY(szFileSystemName));
 	}
 
 	StringCchCopy(szGroupHeader,cchMax,szFileSystemName);
