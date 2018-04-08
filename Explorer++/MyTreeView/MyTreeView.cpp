@@ -315,7 +315,7 @@ void CMyTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 {
 	TVITEM *ptvItem = &pnmtvdi->item;
 
-	if((ptvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
+	if((ptvItem->mask & TVIF_IMAGE) == TVIF_IMAGE)
 	{
 		ptvItem->iImage	= m_iFolderIcon;
 		ptvItem->iSelectedImage	= m_iFolderIcon;
