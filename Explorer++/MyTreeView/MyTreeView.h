@@ -48,7 +48,7 @@ public:
 private:
 
 	/* Message handlers. */
-	LRESULT CALLBACK	OnNotify(NMHDR *pnmhdr);
+	LRESULT CALLBACK	OnNotify(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void		AddDirectoryInternal(IShellFolder *pShellFolder, LPITEMIDLIST pidlDirectory, HTREEITEM hParent);
 	void		DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName);

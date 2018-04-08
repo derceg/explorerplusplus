@@ -195,7 +195,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			break;
 
 		case WM_NOTIFY:
-			return OnNotify(reinterpret_cast<NMHDR *>(lParam));
+			return OnNotify(hwnd, msg, wParam, lParam);
 			break;
 
 		case WM_DESTROY:
@@ -210,8 +210,11 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 	return DefSubclassProc(hwnd,msg,wParam,lParam);
 }
 
-LRESULT CALLBACK CMyTreeView::OnNotify(NMHDR *pnmhdr)
+LRESULT CALLBACK CMyTreeView::OnNotify(HWND hwnd,
+	UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	NMHDR *pnmhdr = reinterpret_cast<NMHDR *>(lParam);
+
 	switch(pnmhdr->code)
 	{
 	case TVN_BEGINDRAG:
@@ -226,7 +229,7 @@ LRESULT CALLBACK CMyTreeView::OnNotify(NMHDR *pnmhdr)
 		break;
 	}
 
-	return 0;
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 HTREEITEM CMyTreeView::AddRoot(void)
