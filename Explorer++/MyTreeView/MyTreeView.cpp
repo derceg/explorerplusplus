@@ -108,9 +108,6 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 {
 	switch(msg)
 	{
-		case WM_CREATE:
-			break;
-
 		case WM_SETFOCUS:
 			SendMessage(m_hParent,WM_USER_TREEVIEW_GAINEDFOCUS,0,0);
 			break;
