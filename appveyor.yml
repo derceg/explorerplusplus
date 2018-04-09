@@ -47,7 +47,7 @@ after_build:
     SET "archiveName=explorer++_%arch%.zip"
 
 
-    hhc "%APPVEYOR_BUILD_FOLDER%\Documentation\User\Help Manual\explorer++.hhp"
+    CALL %APPVEYOR_BUILD_FOLDER%\compile-help-file.bat
 
 
     7z a %archiveName% %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.exe
