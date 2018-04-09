@@ -664,6 +664,10 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(HWND hwnd,
 		break;
 
 	case TVN_ENDLABELEDIT:
+		/* TODO: Should return the value from this function. Can't do it
+		at the moment, since the treeview looks items up by their label
+		when a directory modification event is received (meaning that if
+		the label changes, the lookup for the old file name will fail). */
 		OnTreeViewEndLabelEdit(lParam);
 		break;
 
