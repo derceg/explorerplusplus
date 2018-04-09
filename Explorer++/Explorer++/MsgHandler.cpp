@@ -751,7 +751,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 	m_pShellBrowser[iTabId]->SetDirMonitorId(iDirMonitorId);
 }
 
-void Explorerplusplus::OnTbnDropDown(LPARAM lParam)
+LRESULT Explorerplusplus::OnTbnDropDown(LPARAM lParam)
 {
 	NMTOOLBAR		*nmTB = NULL;
 	LPITEMIDLIST	pidl = NULL;
@@ -776,6 +776,8 @@ void Explorerplusplus::OnTbnDropDown(LPARAM lParam)
 
 			CoTaskMemFree(pidl);
 		}
+
+		return TBDDRET_DEFAULT;
 	}
 	else if(nmTB->iItem == TOOLBAR_FORWARD)
 	{
@@ -791,11 +793,17 @@ void Explorerplusplus::OnTbnDropDown(LPARAM lParam)
 
 			CoTaskMemFree(pidl);
 		}
+
+		return TBDDRET_DEFAULT;
 	}
 	else if(nmTB->iItem == TOOLBAR_VIEWS)
 	{
 		ShowToolbarViewsDropdown();
+
+		return TBDDRET_DEFAULT;
 	}
+
+	return TBDDRET_NODEFAULT;
 }
 
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)

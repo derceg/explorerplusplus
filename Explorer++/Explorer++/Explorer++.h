@@ -332,7 +332,7 @@ private:
 
 	/* Main window private message handlers. */
 	LRESULT CALLBACK		CommandHandler(HWND hwnd, WPARAM wParam);
-	LRESULT CALLBACK		NotifyHandler(LPARAM lParam);
+	LRESULT CALLBACK		NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	BOOL					OnSize(int MainWindowWidth,int MainWindowHeight);
 	int						OnClose(void);
 	int						OnDestroy(void);
@@ -348,7 +348,7 @@ private:
 	LRESULT					OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	LRESULT					StatusBarMenuSelect(WPARAM wParam,LPARAM lParam);
 	void					HandleDirectoryMonitoring(int iTabId);
-	void					OnTbnDropDown(LPARAM lParam);
+	LRESULT					OnTbnDropDown(LPARAM lParam);
 	void					OnTabCtrlMButtonUp(POINT *pt);
 	void					OnDisplayWindowResized(WPARAM wParam);
 	void					OnStartedBrowsing(int iTabId, const TCHAR *szPath);
@@ -482,7 +482,7 @@ private:
 
 	/* Holder window private message handlers. */
 	LRESULT CALLBACK		TreeViewHolderWindowCommandHandler(WPARAM wParam);
-	LRESULT CALLBACK		TreeViewHolderWindowNotifyHandler(LPARAM lParam);
+	LRESULT CALLBACK		TreeViewHolderWindowNotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void					OnTreeViewHolderWindowTimer(void);
 
 	/* Tabs. */

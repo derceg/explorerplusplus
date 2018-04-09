@@ -266,7 +266,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		break;
 
 	case WM_NOTIFY:
-		return NotifyHandler(lParam);
+		return NotifyHandler(hwnd, Msg, wParam, lParam);
 		break;
 
 	case WM_SIZE:
@@ -1441,7 +1441,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 /*
  * WM_NOTIFY handler for the main window.
  */
-LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	NMHDR *nmhdr = reinterpret_cast<NMHDR *>(lParam);
 
@@ -1486,6 +1486,8 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 						return TRUE;
 					}
 				}
+
+				return FALSE;
 			}
 			break;
 
@@ -1518,7 +1520,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 			break;
 
 		case TBN_DROPDOWN:
-			OnTbnDropDown(lParam);
+			return OnTbnDropDown(lParam);
 			break;
 
 		case TBN_INITCUSTOMIZE:
@@ -1779,5 +1781,5 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(LPARAM lParam)
 			break;
 	}
 
-	return 0;
+	return DefWindowProc(hwnd, msg, wParam, lParam);
 }

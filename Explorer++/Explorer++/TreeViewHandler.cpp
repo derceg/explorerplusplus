@@ -631,7 +631,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 	switch(msg)
 	{
 	case WM_NOTIFY:
-		return TreeViewHolderWindowNotifyHandler(lParam);
+		return TreeViewHolderWindowNotifyHandler(hwnd, msg, wParam, lParam);
 		break;
 
 	case WM_COMMAND:
@@ -646,7 +646,8 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 	return DefSubclassProc(hwnd,msg,wParam,lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(HWND hwnd,
+	UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(((LPNMHDR)lParam)->code)
 	{
@@ -709,7 +710,7 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(LPARAM lPar
 		break;
 	}
 
-	return 0;
+	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
 LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowCommandHandler(WPARAM wParam)
