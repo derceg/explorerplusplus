@@ -1561,6 +1561,30 @@ void Explorerplusplus::OnTabCtrlMButtonUp(POINT *pt)
 	}
 }
 
+void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)
+{
+	HWND			ToolTipControl;
+	LPNMTTDISPINFO	lpnmtdi;
+	NMHDR			*nmhdr = NULL;
+	static TCHAR	szTabToolTip[512];
+	TCITEM			tcItem;
+
+	lpnmtdi = (LPNMTTDISPINFO)lParam;
+	nmhdr = &lpnmtdi->hdr;
+
+	ToolTipControl = (HWND)SendMessage(m_hTabCtrl, TCM_GETTOOLTIPS, 0, 0);
+
+	if (nmhdr->hwndFrom == ToolTipControl)
+	{
+		tcItem.mask = TCIF_PARAM;
+		TabCtrl_GetItem(m_hTabCtrl, nmhdr->idFrom, &tcItem);
+
+		m_pShellBrowser[(int)tcItem.lParam]->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
+			szTabToolTip);
+		lpnmtdi->lpszText = szTabToolTip;
+	}
+}
+
 void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 {
 	GlobalSettings_t gs;	
