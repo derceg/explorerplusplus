@@ -204,3 +204,45 @@ void Explorerplusplus::PlayNavigationSound() const
 			SND_RESOURCE | SND_ASYNC);
 	}
 }
+
+void Explorerplusplus::OnDirChanged(int iTabId)
+{
+	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
+		m_CurrentDirectory);
+	SetCurrentDirectory(m_CurrentDirectory);
+
+	HandleDirectoryMonitoring(iTabId);
+
+	UpdateArrangeMenuItems();
+
+	m_nSelected = 0;
+
+	/* Set the focus back to the first item. */
+	ListView_SetItemState(m_hActiveListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
+
+	UpdateWindowStates();
+
+	InvalidateTaskbarThumbnailBitmap(iTabId);
+
+	SetTabIcon();
+}
+
+void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
+{
+	TCHAR	szLoadingText[512];
+
+	if (iTabId == m_selectedTabId)
+	{
+		TCHAR szTemp[64];
+		LoadString(m_hLanguageModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
+		StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, szFolderPath);
+
+		/* Browsing of a folder has started. Set the status bar text to indicate that
+		the folder is been loaded. */
+		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)0 | 0, (LPARAM)szLoadingText);
+
+		/* Clear the text in all other parts of the status bar. */
+		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)1 | 0, (LPARAM)EMPTY_STRING);
+		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)2 | 0, (LPARAM)EMPTY_STRING);
+	}
+}
