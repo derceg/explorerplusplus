@@ -751,61 +751,6 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 	m_pShellBrowser[iTabId]->SetDirMonitorId(iDirMonitorId);
 }
 
-LRESULT Explorerplusplus::OnTbnDropDown(LPARAM lParam)
-{
-	NMTOOLBAR		*nmTB = NULL;
-	LPITEMIDLIST	pidl = NULL;
-	POINT			ptOrigin;
-	RECT			rc;
-	HRESULT			hr;
-
-	nmTB = (NMTOOLBAR *)lParam;
-
-	GetWindowRect(m_hMainToolbar,&rc);
-
-	ptOrigin.x = rc.left;
-	ptOrigin.y = rc.bottom - 4;
-
-	if(nmTB->iItem == TOOLBAR_BACK)
-	{
-		hr = m_pActiveShellBrowser->CreateHistoryPopup(m_hContainer,&pidl,&ptOrigin,TRUE);
-
-		if(SUCCEEDED(hr))
-		{
-			BrowseFolder(pidl,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
-
-			CoTaskMemFree(pidl);
-		}
-
-		return TBDDRET_DEFAULT;
-	}
-	else if(nmTB->iItem == TOOLBAR_FORWARD)
-	{
-		SendMessage(m_hMainToolbar,TB_GETRECT,(WPARAM)TOOLBAR_BACK,(LPARAM)&rc);
-
-		ptOrigin.x += rc.right;
-
-		hr = m_pActiveShellBrowser->CreateHistoryPopup(m_hContainer,&pidl,&ptOrigin,FALSE);
-
-		if(SUCCEEDED(hr))
-		{
-			BrowseFolder(pidl,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
-
-			CoTaskMemFree(pidl);
-		}
-
-		return TBDDRET_DEFAULT;
-	}
-	else if(nmTB->iItem == TOOLBAR_VIEWS)
-	{
-		ShowToolbarViewsDropdown();
-
-		return TBDDRET_DEFAULT;
-	}
-
-	return TBDDRET_NODEFAULT;
-}
-
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
 	RECT	rc;
