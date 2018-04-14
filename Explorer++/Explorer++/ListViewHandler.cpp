@@ -1286,16 +1286,16 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 			BuildShellIDList(&ftc[1],&stg[1],pidlDirectory,ItemList);
 
 			IDataObject *pDataObject = NULL;
-			IAsyncOperation *pAsyncOperation = NULL;
+			IDataObjectAsyncCapability *pAsyncCapability = NULL;
 			
 			hr = CreateDataObject(ftc,stg,&pDataObject,2);
-			pDataObject->QueryInterface(IID_PPV_ARGS(&pAsyncOperation));
+			pDataObject->QueryInterface(IID_PPV_ARGS(&pAsyncCapability));
 
-			assert(pAsyncOperation != NULL);
+			assert(pAsyncCapability != NULL);
 
 			/* Docs mention setting the argument to VARIANT_TRUE/VARIANT_FALSE.
 			But the argument is a BOOL, so we'll go with regular TRUE/FALSE. */
-			pAsyncOperation->SetAsyncMode(TRUE);
+			pAsyncCapability->SetAsyncMode(TRUE);
 
 			hr = pDragSourceHelper->InitializeFromWindow(m_hActiveListView,&pt,pDataObject);
 
@@ -1322,9 +1322,9 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 
 			BOOL bInAsyncOp;
 
-			hr = pAsyncOperation->InOperation(&bInAsyncOp);
+			hr = pAsyncCapability->InOperation(&bInAsyncOp);
 
-			pAsyncOperation->Release();
+			pAsyncCapability->Release();
 			pDataObject->Release();
 			pDropSource->Release();
 		}

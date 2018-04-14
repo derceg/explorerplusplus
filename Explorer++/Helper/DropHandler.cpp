@@ -41,7 +41,7 @@ struct PastedFilesInfo_t
 	BOOL					bCopy;
 	BOOL					bRenameOnCollision;
 
-	IAsyncOperation			*pao;
+	IDataObjectAsyncCapability	*pac;
 
 	IDropFilesCallback		*pDropFilesCallback;
 	POINT					pt;
@@ -49,7 +49,7 @@ struct PastedFilesInfo_t
 
 struct AsyncOperationInfo_t
 {
-	IAsyncOperation	*pao;
+	IDataObjectAsyncCapability	*pac;
 	HRESULT			hr;
 	DWORD			dwEffect;
 };
@@ -997,32 +997,32 @@ void CDropHandler::CopyDroppedFilesInternal(const std::list<std::wstring> &FullF
 	ppfi->strDestDirectory		= m_szDestDirectory;
 	ppfi->bCopy					= bCopy;
 	ppfi->bRenameOnCollision	= bRenameOnCollision;
-	ppfi->pao					= NULL;
+	ppfi->pac					= NULL;
 	ppfi->pDropFilesCallback	= m_pDropFilesCallback;
 	ppfi->pt.x					= m_ptl.x;
 	ppfi->pt.y					= m_ptl.y;
 
-	IAsyncOperation *pao = NULL;
+	IDataObjectAsyncCapability *pac = NULL;
 	BOOL bAsyncSupported = FALSE;
 
 	/* Does the drop source support asynchronous copy? */
-	HRESULT hr = m_pDataObject->QueryInterface(IID_PPV_ARGS(&pao));
+	HRESULT hr = m_pDataObject->QueryInterface(IID_PPV_ARGS(&pac));
 
 	if(hr == S_OK)
 	{
-		pao->GetAsyncMode(&bAsyncSupported);
+		pac->GetAsyncMode(&bAsyncSupported);
 
 		if(!bAsyncSupported)
 		{
-			pao->Release();
+			pac->Release();
 		}
 	}
 
 	if(bAsyncSupported)
 	{
-		pao->StartOperation(NULL);
+		pac->StartOperation(NULL);
 
-		ppfi->pao = pao;
+		ppfi->pac = pac;
 
 		/* The copy operation is going to occur on a background thread,
 		which means that we can't release this object until the background
@@ -1068,8 +1068,8 @@ WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 	case WM_APP_COPYOPERATIONFINISHED:
 		{
 			AsyncOperationInfo_t *paoi = reinterpret_cast<AsyncOperationInfo_t *>(wParam);
-			paoi->pao->EndOperation(paoi->hr,NULL,paoi->dwEffect);
-			paoi->pao->Release();
+			paoi->pac->EndOperation(paoi->hr,NULL,paoi->dwEffect);
+			paoi->pac->Release();
 
 			RemoveWindowSubclass(hwnd,DropWindowSubclass,SUBCLASS_ID);
 			return 0;
@@ -1098,7 +1098,7 @@ DWORD WINAPI CopyDroppedFilesInternalAsyncStub(LPVOID lpParameter)
 
 	AsyncOperationInfo_t aoi;
 
-	aoi.pao = ppfi->pao;
+	aoi.pac = ppfi->pac;
 
 	if(bRes)
 	{

@@ -399,13 +399,13 @@ BOOL bMove,IDataObject **pClipboardDataObject)
 
 			if(SUCCEEDED(hr))
 			{
-				IAsyncOperation *pAsyncOperation = NULL;
-				hr = (*pClipboardDataObject)->QueryInterface(IID_PPV_ARGS(&pAsyncOperation));
+				IDataObjectAsyncCapability *pAsyncCapability = NULL;
+				hr = (*pClipboardDataObject)->QueryInterface(IID_PPV_ARGS(&pAsyncCapability));
 
 				if(SUCCEEDED(hr))
 				{
-					pAsyncOperation->SetAsyncMode(TRUE);
-					pAsyncOperation->Release();
+					pAsyncCapability->SetAsyncMode(TRUE);
+					pAsyncCapability->Release();
 
 					hr = OleSetClipboard(*pClipboardDataObject);
 				}

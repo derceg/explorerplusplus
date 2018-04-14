@@ -22,7 +22,7 @@ struct DataObjectInternal
 	STGMEDIUM	stg;
 };
 
-class CDataObject : public IDataObject, public IAsyncOperation
+class CDataObject : public IDataObject, public IDataObjectAsyncCapability
 {
 public:
 
@@ -108,9 +108,9 @@ HRESULT __stdcall CDataObject::QueryInterface(REFIID iid, void **ppvObject)
 	{
 		*ppvObject = this;
 	}
-	else if(IsEqualIID(iid,IID_IAsyncOperation))
+	else if(IsEqualIID(iid, IID_IDataObjectAsyncCapability))
 	{
-		*ppvObject = static_cast<IAsyncOperation *>(this);
+		*ppvObject = static_cast<IDataObjectAsyncCapability *>(this);
 	}
 
 	if(*ppvObject)
