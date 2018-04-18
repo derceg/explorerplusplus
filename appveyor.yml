@@ -12,9 +12,6 @@ environment:
   PFX_PASS:
     secure: MNjAMRrIqjMaFQDSnflh+UHZFZqRwuR9Wmsstd78A1gKnZduxJhiY93rMAnsXMgJ
 
-cache:
-  - Explorer++\packages -> Explorer++\**\packages.config
-
 # Decrypt the code signing certificate.
 install:
 - cmd: >-
