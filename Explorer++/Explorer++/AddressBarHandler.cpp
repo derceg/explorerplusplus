@@ -183,9 +183,12 @@ void Explorerplusplus::OnAddressBarBeginDrag(void)
 				{
 					IStream *pStream = NULL;
 
-					CreateStreamOnHGlobal(hglb,FALSE,&pStream);
+					hr = CreateStreamOnHGlobal(hglb,FALSE,&pStream);
 
-					hr = pPersistStream->Save(pStream,TRUE);
+					if (SUCCEEDED(hr))
+					{
+						hr = pPersistStream->Save(pStream, TRUE);
+					}
 				}
 			}
 
