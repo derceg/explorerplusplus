@@ -40,6 +40,7 @@ release = '1.3.5'
 # ones.
 extensions = [
     'sphinx.ext.todo',
+    'sphinx.ext.autosectionlabel',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -183,3 +184,7 @@ epub_exclude_files = ['search.html']
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# -- Options for autosectionlabel extension ----------------------------------
+
+autosectionlabel_prefix_document = True
