@@ -47,7 +47,7 @@ browsing experience. Aside from basic navigation, **Explorer++** has:
   Windows Explorer
 - much more...!
 
-**Explorer++** requires Windows XP, Vista or Seven (32-bit or 64-bit
+**Explorer++** requires Windows XP, Vista, 7, 8 or 10 (32-bit or 64-bit
 systems) to run; there is no installation required.
 
 **Explorer++** uses English as its native language, but can be used with
