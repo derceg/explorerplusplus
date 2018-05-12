@@ -1,3 +1,13 @@
+.admonition.admonition-bug,
+.admonition.admonition-incomplete {
+  background: #ffedcc;
+}
+
+.admonition.admonition-bug .admonition-title,
+.admonition.admonition-incomplete .admonition-title {
+  background: #f0b37e;
+}
+
 .bolditalic {
   font-style: italic;
   font-weight: bold;

@@ -2,10 +2,13 @@ Welcome to Explorer++'s documentation!
 ======================================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :titlesonly:
+   :caption: Contents
 
-
+   about_explorer++
+   menus/index
+   toolbars/index
+   panes/index
 
 Indices and tables
 ==================
