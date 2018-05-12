@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Explorer++'
-copyright = '2018, Allen Titley'
+copyright = '2018, Explorer++'
 author = 'Allen Titley'
 
 # The short X.Y version
