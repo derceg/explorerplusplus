@@ -2,6 +2,7 @@ Refresh
 -------
 
 :kbd:`F5`
+
 :kbd:`Ctrl` + :kbd:`R`
 
 In the files pane, all files (depending on **Explorer++** setup) are
