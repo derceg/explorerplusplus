@@ -1,3 +1,19 @@
+/* By default, table columns won't wrap. This means that if a table ends up
+being too wide, it will need to be scrolled horizontally. To avoid this, the
+styles below are used to ensure that the table contents will wrap.
+See https://github.com/rtfd/sphinx_rtd_theme/issues/117. */
+@media screen and (min-width: 767px) {
+  .wy-table-responsive table td {
+    /* !important prevents the common CSS stylesheets from overriding
+       this as on RTD they are loaded after this stylesheet */
+    white-space: normal !important;
+  }
+
+  .wy-table-responsive {
+    overflow: visible !important;
+  }
+}
+
 .admonition.admonition-bug,
 .admonition.admonition-incomplete {
   background: #ffedcc;
