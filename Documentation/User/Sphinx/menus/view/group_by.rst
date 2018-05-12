@@ -1,6 +1,8 @@
 Group By
 --------
 
+.. image:: /_static/images/nav/mnu-view-group_by.png
+
 This menu selects a sorting order and grouping for display of files and
 folders in the Files pane.
 
