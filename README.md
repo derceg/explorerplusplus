@@ -1,4 +1,5 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/ggvn28se8xhes3x3/branch/master?svg=true)](https://ci.appveyor.com/project/derceg/explorerplusplus/branch/master)
+[![Documentation Status](https://readthedocs.org/projects/explorerplusplus/badge/?version=latest)](http://explorerplusplus.readthedocs.io/en/latest/?badge=latest)
 [![Crowdin](https://d322cqt584bo4o.cloudfront.net/explorerplusplus/localized.svg)](https://crowdin.com/project/explorerplusplus)
 
 # Explorer++
