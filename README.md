@@ -48,6 +48,10 @@ For a full list of builds, see the [AppVeyor page](https://ci.appveyor.com/proje
 
 For instructions on how to build Explorer++, see the [wiki](https://github.com/derceg/explorerplusplus/wiki/Building-Explorerplusplus).
 
+## Documentation
+
+Documentation is available online at [Read the Docs](http://explorerplusplus.readthedocs.io/en/latest/).
+
 ## Translations
 
 Translations are managed with [Crowdin](https://crowdin.com/project/explorerplusplus). To contribute to a translation, sign up with Crowdin, then edit the file corresponding to your language. If your language isn't listed, use the contact link shown on the project page to request it.
