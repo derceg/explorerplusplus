@@ -14,14 +14,14 @@ browsing experience. Aside from basic navigation, **Explorer++** has:
 - a two paned interface, like Windows Explorer, but with multiple tabs
   in the files pane. You can have many locations open at once and
   quickly change from tab to tab.
-- a :doc:`*Drives* toolbar <toolbars/drives>`, showing all
-  available volumes - disk drives - (including network and USB
-  drives). Jump to a drive with a single mouse click.
-- a :doc:`*Bookmarks* menu <menus/bookmarks/index>` (similar to
-  Windows Explorer favorites, but with more functionality),
-  and a :doc:`*Bookmarks* toolbar <toolbars/bookmarks>`
-- an :doc:`*Application* toolbar <toolbars/application>` where you
-  can create shortcuts to your favorite applications
+- a :doc:`Drives toolbar <toolbars/drives>`, showing all available
+  volumes - disk drives - (including network and USB drives). Jump to a
+  drive with a single mouse click.
+- a :doc:`Bookmarks menu <menus/bookmarks/index>` (similar to Windows
+  Explorer favorites, but with more functionality), and a
+  :doc:`Bookmarks toolbar <toolbars/bookmarks>`
+- an :doc:`Application toolbar <toolbars/application>` where you can
+  create shortcuts to your favorite applications
 - :doc:`Show Command Prompt <menus/file/show_command_prompt>` built into
   **Explorer++**
 - :doc:`attribute control <menus/file/set_file_attributes>` (set, clear)
@@ -32,7 +32,7 @@ browsing experience. Aside from basic navigation, **Explorer++** has:
   pieces, for email or other purposes, and quickly
   :doc:`merge <menus/actions/merge_files>` pieces back into the
   original file
-- a *:doc:`destroy files <menus/actions/destroy_files>`* function
+- a :doc:`destroy files <menus/actions/destroy_files>` function
   which deletes files, then wipes their former disk space clean. This
   provides secure erasing of files.
 - a built-in file :doc:`search <menus/tools/search>` function which
