@@ -10,7 +10,7 @@ items - Mass Rename>` items are selected.
 Single item
 ~~~~~~~~~~~
 
-.. image:: /_static./images/mnu_file/rename_single_item.png
+.. image:: /_static/images/mnu_file/rename_single_item.png
 
 **Explorer++** allows you to edit the name in an *in-place* edit box, keeping
 the extension the same. The extension may be edited, but must be deleted then
