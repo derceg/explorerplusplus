@@ -70,6 +70,12 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
+# global.rst contains some global declarations that may be used across the
+# project.
+rst_prolog = """
+.. include:: /global.rst
+"""
+
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -101,6 +107,9 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
+
+def setup(app):
+    app.add_stylesheet('css/custom.css')
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
