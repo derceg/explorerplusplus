@@ -411,9 +411,11 @@ Recycle Bin
 +-----------------------+-----------------------+-----------------------+
 | ✓ 1                   | Name                  | file or folder name   |
 +-----------------------+-----------------------+-----------------------+
-| ✓ 2                   | Original Location     | n/a (future feature?) |
+| ✓ 2                   | Original Location     | original file or      |
+|                       |                       | folder location       |
 +-----------------------+-----------------------+-----------------------+
-| ✓ 3                   | Date Deleted          | n/a (future feature?) |
+| ✓ 3                   | Date Deleted          | date the file or      |
+|                       |                       | folder was deleted    |
 +-----------------------+-----------------------+-----------------------+
 | ✓ 4                   | Size                  | file size or folder   |
 |                       |                       | contents size (if     |
