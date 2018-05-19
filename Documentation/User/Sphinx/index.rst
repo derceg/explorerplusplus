@@ -9,10 +9,3 @@ Welcome to Explorer++'s documentation!
    menus/index
    toolbars/index
    panes/index
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
