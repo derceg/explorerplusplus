@@ -109,12 +109,21 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 				{
 					if (variantBookmarkItem->type() == typeid(CBookmarkFolder))
 					{
-						/* TODO: Open all sub-bookmarks. */
+						const CBookmarkFolder &bookmarkFolder = boost::get<CBookmarkFolder>(*variantBookmarkItem);
+
+						for each(auto variantBookmarkChild in bookmarkFolder)
+						{
+							if (variantBookmarkChild.type() == typeid(CBookmark))
+							{
+								CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkChild);
+								m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, TRUE, FALSE, FALSE);
+							}
+						}
 					}
 					else
 					{
-						CBookmark &Bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-						m_pexpp->BrowseFolder(Bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, TRUE, FALSE, FALSE);
+						CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
+						m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, TRUE, FALSE, FALSE);
 					}
 				}
 			}
