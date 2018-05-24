@@ -1,0 +1,28 @@
+files:
+  - source: /Explorer++/Explorer++/Explorer++.rc
+    translation: /Translations/Explorer++%two_letters_code%/Explorer++%two_letters_code%.rc
+    languages_mapping:
+      two_letters_code:
+        ca: CA
+        cs: CS
+        da: DA
+        de: DE
+        es-ES: ES
+        fa: FA
+        fr: FR
+        hu: HU
+        it: IT
+        ja: JA
+        ko: KO
+        nl: NL
+        no: NO
+        pl: PL
+        pt-PT: PT
+        ro: RO
+        ru: RU
+        si-LK: SI
+        sv-SE: SV
+        tr: TR
+        uk: UK
+        vi: VI
+        zh-CN: ZH
