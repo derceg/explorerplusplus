@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<?if $(var.Platform) = "x64" ?>
+	<?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+	<?define UpgradeCode = "5A4AE2AB-6246-4C67-8D0F-5DBD4FBE93C8" ?>
+<?else ?>
+	<?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+<?define UpgradeCode = "5FCCCA87-38B5-44DA-AB5A-20D784DF0461" ?>
+<?endif ?>
+
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="*" Name="Explorer++" Language="1033" Version="!(bind.FileVersion.ExplorerppEXE)" Manufacturer="Explorer++ contributors" UpgradeCode="5A4AE2AB-6246-4C67-8D0F-5DBD4FBE93C8">
+	<Product Id="*" Name="Explorer++" Language="1033" Version="!(bind.FileVersion.ExplorerppEXE)" Manufacturer="Explorer++ contributors" UpgradeCode="$(var.UpgradeCode)">
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -24,7 +33,7 @@
 
 	<Fragment>
 		<Directory Id="TARGETDIR" Name="SourceDir">
-			<Directory Id="ProgramFilesFolder">
+			<Directory Id="$(var.PlatformProgramFilesFolder)">
 				<Directory Id="INSTALLFOLDER" Name="Explorer++" />
 			</Directory>
 			<Directory Id="ProgramMenuFolder">
