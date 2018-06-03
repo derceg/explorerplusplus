@@ -11,6 +11,8 @@
 			<ComponentRef Id="ApplicationShortcut" />
 		</Feature>
 
+		<WixVariable Id="WixUILicenseRtf" Value="res/gpl-3.0.rtf" />
+
 		<Icon Id="Explorerpp.ico" SourceFile="$(var.Explorer++.ProjectDir)res\Explorer++.ico" />
 
 		<!-- This is the icon used in the add/remove programs dialog. -->
