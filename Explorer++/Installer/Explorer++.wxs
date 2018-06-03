@@ -9,6 +9,11 @@
 		<Feature Id="Complete" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
 		</Feature>
+
+		<Icon Id="Explorerpp.ico" SourceFile="$(var.Explorer++.ProjectDir)res\Explorer++.ico" />
+
+		<!-- This is the icon used in the add/remove programs dialog. -->
+		<Property Id="ARPPRODUCTICON" Value="Explorerpp.ico" />
 	</Product>
 
 	<Fragment>
