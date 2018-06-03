@@ -31,6 +31,182 @@
     </WixExtension>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Translations\Explorer++CA\Explorer++CA.vcxproj">
+      <Name>Explorer++CA</Name>
+      <Project>{b04f5fb8-e387-46ca-95e3-fb5eb9ba13aa}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++CS\Explorer++CS.vcxproj">
+      <Name>Explorer++CS</Name>
+      <Project>{41a8e3d6-1da0-4659-92e4-4da770a3301e}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++DA\Explorer++DA.vcxproj">
+      <Name>Explorer++DA</Name>
+      <Project>{f7e8d901-b316-447d-95f7-7fc45a34e2b0}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++DE\Explorer++DE.vcxproj">
+      <Name>Explorer++DE</Name>
+      <Project>{866a029f-39b3-4fa4-9fbd-45c2f24cdb11}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++ES\Explorer++ES.vcxproj">
+      <Name>Explorer++ES</Name>
+      <Project>{0556bc85-8759-4df3-b000-8861c1df5ffb}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++FA\Explorer++FA.vcxproj">
+      <Name>Explorer++FA</Name>
+      <Project>{3009733d-08d2-4050-b7e6-f1d691cd00ed}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++FR\Explorer++FR.vcxproj">
+      <Name>Explorer++FR</Name>
+      <Project>{1610cd3c-0f28-46d8-8bb3-8df637614aa0}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++HU\Explorer++HU.vcxproj">
+      <Name>Explorer++HU</Name>
+      <Project>{f71cbedc-07f5-4c44-acaf-2e4c1ff83f44}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++IT\Explorer++IT.vcxproj">
+      <Name>Explorer++IT</Name>
+      <Project>{a6ed4294-d661-433d-aa3b-6e08377e8660}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++JA\Explorer++JA.vcxproj">
+      <Name>Explorer++JA</Name>
+      <Project>{56f9de1e-4a09-4295-b79d-e77f8ef7a72f}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++KO\Explorer++KO.vcxproj">
+      <Name>Explorer++KO</Name>
+      <Project>{ea394f59-ea04-49be-85fe-8801452bfce3}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++NL\Explorer++NL.vcxproj">
+      <Name>Explorer++NL</Name>
+      <Project>{36663c1c-afc5-4ae6-a3e0-df35fd0a529e}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++NO\Explorer++NO.vcxproj">
+      <Name>Explorer++NO</Name>
+      <Project>{9eebe31b-c6ec-4602-af18-70a1b2655ed3}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++PL\Explorer++PL.vcxproj">
+      <Name>Explorer++PL</Name>
+      <Project>{8d9a2712-7719-4a37-95f2-032cbc4433fa}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++PT\Explorer++PT.vcxproj">
+      <Name>Explorer++PT</Name>
+      <Project>{b17d5217-d79b-4a19-b439-a96743862558}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++RO\Explorer++RO.vcxproj">
+      <Name>Explorer++RO</Name>
+      <Project>{db50fb8f-1547-4d64-a892-d29500e7cbb3}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++RU\Explorer++RU.vcxproj">
+      <Name>Explorer++RU</Name>
+      <Project>{fbe246f1-7c03-4238-b771-801523bfcbda}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++SI\Explorer++SI.vcxproj">
+      <Name>Explorer++SI</Name>
+      <Project>{9c2de9f7-9181-4fa4-8dc0-05779a631c32}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++SV\Explorer++SV.vcxproj">
+      <Name>Explorer++SV</Name>
+      <Project>{d9350b7e-1eb4-41fc-81db-feb223a911f4}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++TR\Explorer++TR.vcxproj">
+      <Name>Explorer++TR</Name>
+      <Project>{e885f322-0ee6-4bd3-a35d-b262efa94639}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++UK\Explorer++UK.vcxproj">
+      <Name>Explorer++UK</Name>
+      <Project>{b31026c5-6baf-4c69-bb4c-9c811b1beec7}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Translations\Explorer++ZH\Explorer++ZH.vcxproj">
+      <Name>Explorer++ZH</Name>
+      <Project>{c12096bf-f80b-4abe-892c-247af2a5458a}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
     <ProjectReference Include="..\Explorer++\Explorer++.vcxproj">
       <Name>Explorer++</Name>
       <Project>{7544a240-2ebf-4dc1-b55b-c8ae32672ed0}</Project>

@@ -48,6 +48,72 @@
 						<Shortcut Id="ApplicationDesktopShortcut" Directory="DesktopFolder" Name="Explorer++" WorkingDirectory="INSTALLDIR" Icon="Explorerpp.ico" IconIndex="0" Advertise="yes" />
 					</File>
 			</Component>
+			<Component Id="CatalanTranslation" Guid="F991E89C-C776-4F58-926A-B8EA63292AAE">
+				<File Id="CatalanDLL" Source="$(var.Explorer++CA.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="CzechTranslation" Guid="21502F40-6E55-4D6C-9DD7-DEDC8FE2D70A">
+				<File Id="CzechDLL" Source="$(var.Explorer++CS.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="DanishTranslation" Guid="0DE4D191-6B28-42B5-B9EE-09D2F07BF817">
+				<File Id="DanishDLL" Source="$(var.Explorer++DA.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="GermanTranslation" Guid="253F8457-6861-468B-ADAA-A291FA8941D7">
+				<File Id="GermanDLL" Source="$(var.Explorer++DE.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="SpanishTranslation" Guid="94A01289-2368-4414-AE1E-91F36CB7B6A4">
+				<File Id="SpanishDLL" Source="$(var.Explorer++ES.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="PersianTranslation" Guid="6E06E678-6E38-40CD-88EA-D73B639DD64C">
+				<File Id="PersianDLL" Source="$(var.Explorer++FA.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="FrenchTranslation" Guid="C89702B5-8DF8-40D8-BDC4-D51AA845907C">
+				<File Id="FrenchDLL" Source="$(var.Explorer++FR.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="HungarianTranslation" Guid="194FB780-6CF3-485E-A782-2B7FE21DEAC7">
+				<File Id="HungarianDLL" Source="$(var.Explorer++HU.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="ItalianTranslation" Guid="32591CF9-DA7F-4244-8648-4BBCA8D67B45">
+				<File Id="ItalianDLL" Source="$(var.Explorer++IT.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="JapaneseTranslation" Guid="3ADAE17A-53D9-48E9-8522-2774F4AD028B">
+				<File Id="JapaneseDLL" Source="$(var.Explorer++JA.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="KoreanTranslation" Guid="BE1C5FF6-E813-46C8-BDB9-A23296E73DAA">
+				<File Id="KoreanDLL" Source="$(var.Explorer++KO.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="DutchTranslation" Guid="11395C79-2998-4C32-BEB0-A68EBAA3B7F8">
+				<File Id="DutchDLL" Source="$(var.Explorer++NL.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="NorwegianTranslation" Guid="1C298559-442C-4EC7-B2D1-2B12A749175E">
+				<File Id="NorwegianDLL" Source="$(var.Explorer++NO.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="PolishTranslation" Guid="C6A8C4D0-2183-428E-B1CA-341BA0D305CB">
+				<File Id="PolishDLL" Source="$(var.Explorer++PL.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="PortugueseTranslation" Guid="EA28EA7D-B509-4807-ABC3-F432002DA4DA">
+				<File Id="PortugueseDLL" Source="$(var.Explorer++PT.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="RomanianTranslation" Guid="342F8272-E702-4594-A329-0C60E27584B4">
+				<File Id="RomanianDLL" Source="$(var.Explorer++RO.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="RussianTranslation" Guid="68AD9176-B5BD-4E17-911A-EF3A142D03C3">
+				<File Id="RussianDLL" Source="$(var.Explorer++RU.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="SinhalaTranslation" Guid="9498A177-47D8-40E8-B86E-7602D1BCBBD1">
+				<File Id="SinhalaDLL" Source="$(var.Explorer++SI.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="SwedishTranslation" Guid="B93F6D2B-B490-4C03-BD41-68F3C73D821D">
+				<File Id="SwedishDLL" Source="$(var.Explorer++SV.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="TurkishTranslation" Guid="181D5945-8026-4756-BA1F-85696E7629F7">
+				<File Id="TurkishDLL" Source="$(var.Explorer++TR.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="UkrainianTranslation" Guid="343C6FDF-FE50-476E-9BC2-FCD89E108631">
+				<File Id="UkrainianDLL" Source="$(var.Explorer++UK.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="ChineseTranslation" Guid="06FB3620-50FD-46E3-BF77-C5C4546C0A75">
+				<File Id="ChineseDLL" Source="$(var.Explorer++ZH.TargetPath)" KeyPath="yes" />
+			</Component>
 		</ComponentGroup>
 	</Fragment>
 </Wix>
