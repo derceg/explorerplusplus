@@ -8,6 +8,7 @@
 
 		<Feature Id="Complete" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
+			<ComponentRef Id="ApplicationShortcut" />
 		</Feature>
 
 		<Icon Id="Explorerpp.ico" SourceFile="$(var.Explorer++.ProjectDir)res\Explorer++.ico" />
@@ -24,6 +25,14 @@
 			<Directory Id="ProgramFilesFolder">
 				<Directory Id="INSTALLFOLDER" Name="Explorer++" />
 			</Directory>
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="ApplicationProgramsFolder" Name="Explorer++">
+					<Component Id="ApplicationShortcut" Guid="F0F35050-BCA2-4688-BB89-FEA2BA4C4AF1">
+						<RegistryValue Root="HKCU" Key="Software\[ProductName]" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
+						<RemoveFolder Id="CleanUpShortct" Directory="ApplicationProgramsFolder" On="uninstall" />
+					</Component>
+				</Directory>
+			</Directory>
 		</Directory>
 	</Fragment>
 
@@ -31,7 +40,8 @@
 		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
 			<Component Id="MainExecutable" Guid="64A067D6-381D-4C81-A24D-F0FC735B5E19">
 					<File Id="ExplorerppEXE" Name="Explorer++.exe" DiskId="1" Source="$(var.Explorer++.TargetPath)" KeyPath="yes" Checksum="yes">
-				</File>
+						<Shortcut Id="ApplicationStartMenuShortcut" Directory="ApplicationProgramsFolder" Name="Explorer++" WorkingDirectory="INSTALLDIR" Icon="Explorerpp.ico" IconIndex="0" Advertise="yes" />
+					</File>
 			</Component>
 		</ComponentGroup>
 	</Fragment>
