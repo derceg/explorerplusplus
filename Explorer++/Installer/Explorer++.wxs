@@ -30,6 +30,7 @@
 			<Directory Id="ProgramMenuFolder">
 				<Directory Id="ApplicationProgramsFolder" Name="Explorer++">
 					<Component Id="ApplicationShortcut" Guid="F0F35050-BCA2-4688-BB89-FEA2BA4C4AF1">
+						<Shortcut Id="UninstallProduct" Name="Uninstall Explorer++" Description="Uninstalls Explorer++" Target="[SystemFolder]msiexec.exe" Arguments="/x [ProductCode]" />
 						<RegistryValue Root="HKCU" Key="Software\[ProductName]" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
 						<RemoveFolder Id="CleanUpShortct" Directory="ApplicationProgramsFolder" On="uninstall" />
 					</Component>
