@@ -48,6 +48,15 @@
 						<Shortcut Id="ApplicationDesktopShortcut" Directory="DesktopFolder" Name="Explorer++" WorkingDirectory="INSTALLDIR" Icon="Explorerpp.ico" IconIndex="0" Advertise="yes" />
 					</File>
 			</Component>
+			<Component Id="History" Guid="0CB49788-9CBD-403C-863C-A02060659179">
+				<File Id="History" Source="$(var.SolutionDir)..\Documentation\User\History.txt" KeyPath="yes" />
+			</Component>
+			<Component Id="License" Guid="975F5EE5-957C-457F-BE1A-EF50CFFB5E0C">
+				<File Id="License" Source="$(var.SolutionDir)..\Documentation\User\License.txt" KeyPath="yes" />
+			</Component>
+			<Component Id="Readme" Guid="184D8A24-6930-4639-8C51-703DF78C6EA2">
+				<File Id="Readme" Source="$(var.SolutionDir)..\Documentation\User\Readme.txt" KeyPath="yes" />
+			</Component>
 			<Component Id="CatalanTranslation" Guid="F991E89C-C776-4F58-926A-B8EA63292AAE">
 				<File Id="CatalanDLL" Source="$(var.Explorer++CA.TargetPath)" KeyPath="yes" />
 			</Component>
