@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++", "Explorer++\Explorer++.vcxproj", "{7544A240-2EBF-4DC1-B55B-C8AE32672ED0}"
 EndProject
@@ -63,6 +63,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++UK", "..\Translations\Explorer++UK\Explorer++UK.vcxproj", "{B31026C5-6BAF-4C69-BB4C-9C811B1BEEC7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++ZH", "..\Translations\Explorer++ZH\Explorer++ZH.vcxproj", "{C12096BF-F80B-4ABE-892C-247AF2A5458A}"
+EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Installer\Installer.wixproj", "{3CD109B0-FB57-446C-AE40-CF4FD45793EF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7544A240-2EBF-4DC1-B55B-C8AE32672ED0} = {7544A240-2EBF-4DC1-B55B-C8AE32672ED0}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -300,6 +305,14 @@ Global
 		{C12096BF-F80B-4ABE-892C-247AF2A5458A}.Release|x64.Build.0 = Release|Win32
 		{C12096BF-F80B-4ABE-892C-247AF2A5458A}.Test|Win32.ActiveCfg = Release|Win32
 		{C12096BF-F80B-4ABE-892C-247AF2A5458A}.Test|x64.ActiveCfg = Release|Win32
+		{3CD109B0-FB57-446C-AE40-CF4FD45793EF}.Debug|Win32.ActiveCfg = Debug|x86
+		{3CD109B0-FB57-446C-AE40-CF4FD45793EF}.Debug|Win32.Build.0 = Debug|x86
+		{3CD109B0-FB57-446C-AE40-CF4FD45793EF}.Debug|x64.ActiveCfg = Debug|x86
+		{3CD109B0-FB57-446C-AE40-CF4FD45793EF}.Release|Win32.ActiveCfg = Release|x86
+		{3CD109B0-FB57-446C-AE40-CF4FD45793EF}.Release|Win32.Build.0 = Release|x86
+		{3CD109B0-FB57-446C-AE40-CF4FD45793EF}.Release|x64.ActiveCfg = Release|x86
+		{3CD109B0-FB57-446C-AE40-CF4FD45793EF}.Test|Win32.ActiveCfg = Release|x86
+		{3CD109B0-FB57-446C-AE40-CF4FD45793EF}.Test|x64.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -329,6 +342,7 @@ Global
 		{C12096BF-F80B-4ABE-892C-247AF2A5458A} = {F29F24CD-0668-462F-80AE-649CB12F1860}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {504CEF86-1D85-4DF5-84B2-ECA032747EC4}
 		VisualSVNWorkingCopyRoot = 
 	EndGlobalSection
 EndGlobal

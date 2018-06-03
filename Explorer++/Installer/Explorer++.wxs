@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="*" Name="Explorer++" Language="1033" Version="!(bind.FileVersion.ExplorerppEXE)" Manufacturer="Explorer++ contributors" UpgradeCode="5A4AE2AB-6246-4C67-8D0F-5DBD4FBE93C8">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes" />
+
+		<Feature Id="Complete" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="Explorer++" />
+			</Directory>
+		</Directory>
+	</Fragment>
+
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<Component Id="MainExecutable" Guid="64A067D6-381D-4C81-A24D-F0FC735B5E19">
+					<File Id="ExplorerppEXE" Name="Explorer++.exe" DiskId="1" Source="$(var.Explorer++.TargetPath)" KeyPath="yes" Checksum="yes">
+				</File>
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+</Wix>
