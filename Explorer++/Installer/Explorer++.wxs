@@ -33,6 +33,7 @@
 					</Component>
 				</Directory>
 			</Directory>
+			<Directory Id="DesktopFolder" Name="Desktop" />
 		</Directory>
 	</Fragment>
 
@@ -41,6 +42,7 @@
 			<Component Id="MainExecutable" Guid="64A067D6-381D-4C81-A24D-F0FC735B5E19">
 					<File Id="ExplorerppEXE" Name="Explorer++.exe" DiskId="1" Source="$(var.Explorer++.TargetPath)" KeyPath="yes" Checksum="yes">
 						<Shortcut Id="ApplicationStartMenuShortcut" Directory="ApplicationProgramsFolder" Name="Explorer++" WorkingDirectory="INSTALLDIR" Icon="Explorerpp.ico" IconIndex="0" Advertise="yes" />
+						<Shortcut Id="ApplicationDesktopShortcut" Directory="DesktopFolder" Name="Explorer++" WorkingDirectory="INSTALLDIR" Icon="Explorerpp.ico" IconIndex="0" Advertise="yes" />
 					</File>
 			</Component>
 		</ComponentGroup>
