@@ -61,10 +61,14 @@ after_build:
     7z a explorer++_%arch%_symbols.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.pdb
 
 
+    copy "%APPVEYOR_BUILD_FOLDER%\Explorer++\Installer\bin\%arch%\%CONFIGURATION%\Explorer++ Setup.msi" "Explorer++ Setup.msi"
+
+
     7z a explorer++_translations.zip %APPVEYOR_BUILD_FOLDER%\Explorer++\Win32\%CONFIGURATION%\Explorer++*.dll
 artifacts:
 - path: explorer++_x86.zip
 - path: explorer++_x86_symbols.zip
 - path: explorer++_x64.zip
 - path: explorer++_x64_symbols.zip
+- path: Explorer++ Setup.msi
 - path: explorer++_translations.zip
