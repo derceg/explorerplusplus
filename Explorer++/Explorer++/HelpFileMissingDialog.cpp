@@ -60,7 +60,8 @@ INT_PTR CHelpFileMissingDialog::OnNotify(NMHDR *pnmhdr)
 	case NM_CLICK:
 	case NM_RETURN:
 		{
-			if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_SYSLINK_DOWNLOAD))
+			if(pnmhdr->hwndFrom == GetDlgItem(m_hDlg,IDC_SYSLINK_DOWNLOAD) ||
+				pnmhdr->hwndFrom == GetDlgItem(m_hDlg, IDC_SYSLINK_READTHEDOCS))
 			{
 				PNMLINK pnmlink = reinterpret_cast<PNMLINK>(pnmhdr);
 				ShellExecute(NULL,L"open",pnmlink->item.szUrl,
