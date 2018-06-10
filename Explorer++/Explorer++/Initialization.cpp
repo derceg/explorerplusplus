@@ -221,7 +221,6 @@ void Explorerplusplus::OnCreate(void)
 
 
 
-	/* Mark the main menus as owner drawn. */
 	InitializeMenus();
 
 	InitializeArrangeMenuItems();
