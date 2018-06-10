@@ -109,14 +109,6 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 			SendMessage(m_hContainer,WM_MENUSELECT,wParam,lParam);
 			break;
 
-		case WM_MEASUREITEM:
-			SendMessage(m_hContainer,WM_MEASUREITEM,wParam,lParam);
-			break;
-
-		case WM_DRAWITEM:
-			SendMessage(m_hContainer,WM_DRAWITEM,wParam,lParam);
-			break;
-
 		case WM_LBUTTONDOWN:
 			{
 				POINT pt;
