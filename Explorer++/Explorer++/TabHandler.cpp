@@ -100,7 +100,6 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 	{
 		case WM_INITMENU:
 			OnInitTabMenu(reinterpret_cast<HMENU>(wParam));
-			SendMessage(m_hContainer,WM_INITMENU,wParam,lParam);
 			break;
 
 		case WM_MENUSELECT:
