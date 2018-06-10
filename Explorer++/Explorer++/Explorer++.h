@@ -747,8 +747,6 @@ private:
 	void					SetMenuItemImageFromImageList(HMENU menu, UINT menuItemId, HIMAGELIST imageList, int bitmapIndex, std::vector<HBitmapPtr> &menuImages);
 
 	/* Miscellaneous. */
-	BOOL					CompareVirtualFolders(UINT uFolderCSIDL);
-	BOOL					CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 	void					CreateViewsMenu(POINT *ptOrigin);
 	void					CreateStatusBar(void);
 	void					InitializeDisplayWindow(void);

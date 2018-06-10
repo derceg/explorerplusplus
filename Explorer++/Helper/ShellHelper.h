@@ -121,6 +121,7 @@ BOOL			ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters);
 BOOL			ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters);
 HRESULT			DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT cchMax);
 HRESULT			ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory, LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask);
+BOOL			CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 
 /* Drag and drop helpers. */
 DWORD			DetermineDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept, BOOL bOnSameDrive);

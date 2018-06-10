@@ -18,6 +18,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
 #include "MainResource.h"
 
 
@@ -395,15 +396,15 @@ UINT Explorerplusplus::GetArrangeMenuItemStringIndex(UINT uItemId)
  */
 void Explorerplusplus::SetActiveArrangeMenuItems(void)
 {
-	if(CompareVirtualFolders(CSIDL_DRIVES))
+	if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_DRIVES))
 	{
 		m_pActiveArrangeMenuItems = &m_ArrangeMenuMyComputer;
 	}
-	else if(CompareVirtualFolders(CSIDL_CONTROLS))
+	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_CONTROLS))
 	{
 		m_pActiveArrangeMenuItems = &m_ArrangeMenuControlPanel;
 	}
-	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
+	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_BITBUCKET))
 	{
 		m_pActiveArrangeMenuItems = &m_ArrangeMenuRecycleBin;
 	}

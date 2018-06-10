@@ -1190,32 +1190,32 @@ int Explorerplusplus::GetColumnHeaderMenuList(unsigned int **pHeaderList)
 {
 	int nItems;
 
-	if(CompareVirtualFolders(CSIDL_DRIVES))
+	if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_DRIVES))
 	{
 		*pHeaderList = g_MyComputerHeaderList;
 		nItems = sizeof(g_MyComputerHeaderList) / sizeof(g_MyComputerHeaderList[0]);
 	}
-	else if(CompareVirtualFolders(CSIDL_CONTROLS))
+	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_CONTROLS))
 	{
 		*pHeaderList = g_ControlPanelHeaderList;
 		nItems = sizeof(g_ControlPanelHeaderList) / sizeof(g_ControlPanelHeaderList[0]);
 	}
-	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
+	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_BITBUCKET))
 	{
 		*pHeaderList = g_RecycleBinHeaderList;
 		nItems = sizeof(g_RecycleBinHeaderList) / sizeof(g_RecycleBinHeaderList[0]);
 	}
-	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
+	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_CONNECTIONS))
 	{
 		*pHeaderList = g_NetworkConnectionsHeaderList;
 		nItems = sizeof(g_NetworkConnectionsHeaderList) / sizeof(g_NetworkConnectionsHeaderList[0]);
 	}
-	else if(CompareVirtualFolders(CSIDL_NETWORK))
+	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_NETWORK))
 	{
 		*pHeaderList = g_NetworkHeaderList;
 		nItems = sizeof(g_NetworkHeaderList) / sizeof(g_NetworkHeaderList[0]);
 	}
-	else if(CompareVirtualFolders(CSIDL_PRINTERS))
+	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_PRINTERS))
 	{
 		*pHeaderList = g_PrintersHeaderList;
 		nItems = sizeof(g_PrintersHeaderList) / sizeof(g_PrintersHeaderList[0]);

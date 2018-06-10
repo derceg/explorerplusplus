@@ -639,23 +639,6 @@ HRESULT Explorerplusplus::UpdateStatusBarText(void)
 	return S_OK;
 }
 
-BOOL Explorerplusplus::CompareVirtualFolders(UINT uFolderCSIDL)
-{
-	return CompareVirtualFolders(m_CurrentDirectory,uFolderCSIDL);
-}
-
-BOOL Explorerplusplus::CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL)
-{
-	TCHAR szParsingPath[MAX_PATH];
-
-	GetCsidlDisplayName(uFolderCSIDL,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
-
-	if(StrCmp(szDirectory,szParsingPath) == 0)
-		return TRUE;
-
-	return FALSE;
-}
-
 /*
 RUNS IN CONTEXT OF DIRECTORY MOINTORING WORKER THREAD.
 Possible bugs:
