@@ -1390,7 +1390,7 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 				pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 				pidl = m_pActiveShellBrowser->QueryItemRelativeIdl(ht.iItem);
 
-				ShowMultipleFileProperties(pidlDirectory,(LPCITEMIDLIST *)&pidl,1);
+				ShowMultipleFileProperties(pidlDirectory, (LPCITEMIDLIST *)&pidl, m_hContainer, 1);
 
 				CoTaskMemFree(pidl);
 				CoTaskMemFree(pidlDirectory);
@@ -1489,7 +1489,7 @@ void Explorerplusplus::OnListViewShowFileProperties(void) const
 	}
 
 	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-	ShowMultipleFileProperties(pidlDirectory,(LPCITEMIDLIST *)ppidl,nSelected);
+	ShowMultipleFileProperties(pidlDirectory, (LPCITEMIDLIST *)ppidl, m_hContainer, nSelected);
 	CoTaskMemFree(pidlDirectory);
 
 	for(i = 0;i < nSelected;i++)

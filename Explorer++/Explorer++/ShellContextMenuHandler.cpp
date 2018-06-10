@@ -178,9 +178,3 @@ void Explorerplusplus::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 			break;
 	}
 }
-
-HRESULT Explorerplusplus::ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,
-	LPCITEMIDLIST *ppidl, int nFiles) const
-{
-	return ExecuteActionFromContextMenu(pidlDirectory, ppidl, m_hContainer, nFiles, _T("properties"), 0);
-}

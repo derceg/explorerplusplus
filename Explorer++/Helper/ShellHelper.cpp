@@ -1327,6 +1327,12 @@ HRESULT GetItemInfoTip(LPCITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchM
 	return hr;
 }
 
+HRESULT ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory, LPCITEMIDLIST *ppidl,
+	HWND hwndOwner, int nFiles)
+{
+	return ExecuteActionFromContextMenu(pidlDirectory, ppidl, hwndOwner, nFiles, _T("properties"), 0);
+}
+
 HRESULT ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,
 	LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask)
 {

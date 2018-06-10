@@ -657,7 +657,6 @@ private:
 	void					OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
 	HRESULT					OnListViewCopy(BOOL bCopy);
-	HRESULT					ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory,LPCITEMIDLIST *ppidl,int nFiles) const;
 
 	/* File context menu. */
 	void					AddMenuEntries(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);

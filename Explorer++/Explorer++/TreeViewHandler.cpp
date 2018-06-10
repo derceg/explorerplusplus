@@ -269,7 +269,7 @@ void Explorerplusplus::OnTreeViewShowFileProperties(void) const
 	/* Get the path of the currently selected item. */
 	pidlDirectory = m_pMyTreeView->BuildPath(hItem);
 
-	ShowMultipleFileProperties(pidlDirectory,NULL,0);
+	ShowMultipleFileProperties(pidlDirectory,NULL, m_hContainer,0);
 
 	CoTaskMemFree(pidlDirectory);
 }
