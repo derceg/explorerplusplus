@@ -8,9 +8,9 @@ platform:
 
 environment:
   PFX_ENC_PASS:
-    secure: /FOQcwja5XcXpFQqbYnMhOcUTmiwNh4mDFBm9oUh/gaV8Z6V5d45lZrbM8DrKInV
+    secure: vl0ntw9DjQdAno9nYVe0osg2tBmXD7gW75NLfxIvxMDW3GiVlJlFcESf7v6f7qKe
   PFX_PASS:
-    secure: MNjAMRrIqjMaFQDSnflh+UHZFZqRwuR9Wmsstd78A1gKnZduxJhiY93rMAnsXMgJ
+    secure: rgMy2ixSiaW0sk2CwaHwO5pK8U98ynzt/jjiGNRSYPfaAcOTRZ5oX+fsgqn6qP54
 
 # Decrypt the code signing certificate.
 install:
