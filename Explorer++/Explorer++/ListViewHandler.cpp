@@ -830,6 +830,9 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		}
 	}
 
+	if (lstrcmp(OldFileName, NewFileName) == 0)
+		return FALSE;
+
 	CFileActionHandler::RenamedItem_t RenamedItem;
 	RenamedItem.strOldFilename = OldFileName;
 	RenamedItem.strNewFilename = NewFileName;
