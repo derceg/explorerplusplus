@@ -50,7 +50,7 @@ comfortable (less mouse clicks) or faster.
 Hover time (ms)
 +++++++++++++++
 
-incomplete
+Hover time is the time taken for the item to be selected when using single click to open an item. Hovering over a item in single click to open mode is equivilent to clicking on it in double click to open mode. 
 
 .. note::
 
