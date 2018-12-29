@@ -80,9 +80,9 @@ HRESULT GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cchM
 	return hr;
 }
 
-HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags)
+HRESULT GetDisplayName(LPCITEMIDLIST pidl,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags)
 {
-	if(pidlDirectory == NULL ||
+	if(pidl == NULL ||
 		szDisplayName == NULL)
 	{
 		return E_FAIL;
@@ -93,7 +93,7 @@ HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,UINT cch
 	STRRET str;
 	HRESULT hr;
 
-	hr = SHBindToParent(pidlDirectory, IID_PPV_ARGS(&pShellFolder),
+	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder),
 	(LPCITEMIDLIST *)&pidlRelative);
 
 	if(SUCCEEDED(hr))
@@ -102,7 +102,7 @@ HRESULT GetDisplayName(LPCITEMIDLIST pidlDirectory,TCHAR *szDisplayName,UINT cch
 
 		if(SUCCEEDED(hr))
 		{
-			hr = StrRetToBuf(&str,pidlDirectory,szDisplayName,cchMax);
+			hr = StrRetToBuf(&str,pidl,szDisplayName,cchMax);
 		}
 
 		pShellFolder->Release();
