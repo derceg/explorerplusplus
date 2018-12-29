@@ -78,6 +78,13 @@ void CShellBrowser::OnShellNotify(WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
+	case SHCNE_UPDATEITEM:
+		if (ILIsParent(m_pidlDirectory, pidls[0], TRUE))
+		{
+			ModifyItem(pidls[0]);
+		}
+		break;
+
 	case SHCNE_RMDIR:
 	case SHCNE_DELETE:
 		/* Only the current directory is monitored, so notifications
@@ -228,167 +235,113 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 /*
  * Modifies the attributes of an item currently in the listview.
  */
-void CShellBrowser::ModifyItem(const TCHAR *FileName)
+void CShellBrowser::ModifyItem(PCIDLIST_ABSOLUTE pidl)
 {
 	HANDLE			hFirstFile;
 	ULARGE_INTEGER	ulFileSize;
 	LVITEM			lvItem;
 	TCHAR			FullFileName[MAX_PATH];
 	BOOL			bFolder;
-	BOOL			res;
 	int				iItem;
-	int				iItemInternal = -1;
 
-	iItem = LocateFileItemIndex(FileName);
+	int iItemInternal = LocateFileItemInternalIndex(pidl);
 
-	/* Although an item may not have been added to the listview
-	yet, it is critical that its' size still be updated if
-	necessary.
-	It is possible (and quite likely) that the file add and
-	modified messages will be sent in the same group, meaning
-	that when the modification message is processed, the item
-	is not in the listview, but it still needs to be updated.
-	Therefore, instead of searching for items solely in the
-	listview, also look through the list of pending file
-	additions. */
-
-	if(iItem == -1)
+	if (iItemInternal == -1)
 	{
-		/* The item doesn't exist in the listview. This can
-		happen when a file has been created with a non-zero
-		size, but an item has not yet been inserted into
-		the listview.
-		Search through the list of items waiting to be
-		inserted, so that files the have just been created
-		can be updated without them residing within the
-		listview. */
-		std::list<AwaitingAdd_t>::iterator itr;
-
-		for(itr = m_AwaitingAddList.begin();itr!= m_AwaitingAddList.end();itr++)
-		{
-			if(lstrcmp(m_itemInfoMap.at(itr->iItemInternal).wfd.cFileName,FileName) == 0)
-			{
-				iItemInternal = itr->iItemInternal;
-				break;
-			}
-		}
-	}
-	else
-	{
-		/* The item exists in the listview. Determine its
-		internal index from its listview information. */
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= iItem;
-		lvItem.iSubItem	= 0;
-		res = ListView_GetItem(m_hListView,&lvItem);
-
-		if(res != FALSE)
-			iItemInternal = (int)lvItem.lParam;
-
-		TCHAR szFullFileName[MAX_PATH];
-		StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
-		PathAppend(szFullFileName,FileName);
-
-		/* When a file is modified, its icon overlay may change.
-		This is the case when modifying a file managed by
-		TortoiseSVN, for example. */
-		SHFILEINFO shfi;
-		DWORD_PTR dwRes = SHGetFileInfo(szFullFileName,0,&shfi,sizeof(SHFILEINFO),SHGFI_ICON|SHGFI_OVERLAYINDEX);
-
-		if(dwRes != 0)
-		{
-			lvItem.mask			= LVIF_STATE;
-			lvItem.iItem		= iItem;
-			lvItem.iSubItem		= 0;
-			lvItem.stateMask	= LVIS_OVERLAYMASK;
-			lvItem.state		= INDEXTOOVERLAYMASK(shfi.iIcon >> 24);
-			ListView_SetItem(m_hListView,&lvItem);
-
-			DestroyIcon(shfi.hIcon);
-		}
+		return;
 	}
 
-	if(iItemInternal != -1)
-	{
-		/* Is this item a folder? */
-		bFolder = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-			FILE_ATTRIBUTE_DIRECTORY;
+	LVFINDINFO lvfi;
+	lvfi.flags = LVFI_PARAM;
+	lvfi.lParam = iItemInternal;
+	iItem = ListView_FindItem(m_hListView, -1, &lvfi);
 
+	/* TODO: Item may
+	have been filtered
+	out. */
+	if (iItem == -1)
+	{
+		return;
+	}
+
+	/* When a file is modified, its icon overlay may change.
+	This is the case when modifying a file managed by
+	TortoiseSVN, for example. */
+	SHFILEINFO shfi;
+	DWORD_PTR dwRes = SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidl), 0, &shfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
+
+	if (dwRes != 0)
+	{
+		lvItem.mask = LVIF_STATE;
+		lvItem.iItem = iItem;
+		lvItem.iSubItem = 0;
+		lvItem.stateMask = LVIS_OVERLAYMASK;
+		lvItem.state = INDEXTOOVERLAYMASK(shfi.iIcon >> 24);
+		ListView_SetItem(m_hListView, &lvItem);
+
+		DestroyIcon(shfi.hIcon);
+	}
+
+	/* Is this item a folder? */
+	bFolder = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+		FILE_ATTRIBUTE_DIRECTORY;
+
+	ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
+	ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
+
+	m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
+
+	if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
+	== LVIS_SELECTED)
+	{
+		m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
+	}
+
+	GetDisplayName(pidl, FullFileName, SIZEOF_ARRAY(FullFileName), SHGDN_FORPARSING);
+
+	hFirstFile = FindFirstFile(FullFileName, &m_itemInfoMap.at(iItemInternal).wfd);
+
+	if(hFirstFile != INVALID_HANDLE_VALUE)
+	{
 		ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
 		ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
-		m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
+		m_ulTotalDirSize.QuadPart += ulFileSize.QuadPart;
 
 		if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
-		== LVIS_SELECTED)
+			== LVIS_SELECTED)
 		{
 			ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
 			ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
-			m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
+			m_ulFileSelectionSize.QuadPart += ulFileSize.QuadPart;
 		}
 
-		StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-		PathAppend(FullFileName,FileName);
-
-		hFirstFile = FindFirstFile(FullFileName,&m_itemInfoMap.at(iItemInternal).wfd);
-
-		if(hFirstFile != INVALID_HANDLE_VALUE)
+		if((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) ==
+			FILE_ATTRIBUTE_HIDDEN)
 		{
-			ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
-			ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
+			ListView_SetItemState(m_hListView,iItem,LVIS_CUT,LVIS_CUT);
+		}
+		else
+			ListView_SetItemState(m_hListView,iItem,0,LVIS_CUT);
 
-			m_ulTotalDirSize.QuadPart += ulFileSize.QuadPart;
+		if(m_ViewMode == VM_DETAILS)
+		{
+			std::list<Column_t>::iterator itrColumn;
 
-			if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
-				== LVIS_SELECTED)
+			if (m_pActiveColumnList != NULL)
 			{
-				ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
-				ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
-
-				m_ulFileSelectionSize.QuadPart += ulFileSize.QuadPart;
-			}
-
-			if((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) ==
-				FILE_ATTRIBUTE_HIDDEN)
-			{
-				ListView_SetItemState(m_hListView,iItem,LVIS_CUT,LVIS_CUT);
-			}
-			else
-				ListView_SetItemState(m_hListView,iItem,0,LVIS_CUT);
-
-			if(m_ViewMode == VM_DETAILS)
-			{
-				std::list<Column_t>::iterator itrColumn;
-
-				if(m_pActiveColumnList != NULL)
+				for (itrColumn = m_pActiveColumnList->begin(); itrColumn != m_pActiveColumnList->end(); itrColumn++)
 				{
-					for(itrColumn = m_pActiveColumnList->begin();itrColumn != m_pActiveColumnList->end();itrColumn++)
+					if (itrColumn->bChecked)
 					{
-						if(itrColumn->bChecked)
-						{
-							QueueColumnTask(iItemInternal, itrColumn->id);
-						}
+						QueueColumnTask(iItemInternal, itrColumn->id);
 					}
 				}
 			}
+		}
 
-			FindClose(hFirstFile);
-		}
-		else
-		{
-			/* The file may not exist if, for example, it was
-			renamed just after a file with the same name was
-			deleted. If this does happen, a modification
-			message will likely be sent out after the file
-			has been renamed, indicating the new items properties.
-			However, the files' size will be subtracted on
-			modification. If the internal structures still hold
-			the old size, the total directory size will become
-			corrupted. */
-			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow = 0;
-			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh = 0;
-		}
+		FindClose(hFirstFile);
 	}
 }
 
