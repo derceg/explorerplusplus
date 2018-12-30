@@ -793,9 +793,9 @@ DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
 							tvItem.cChildren	= 0;
 							TreeView_SetItem(pThreadInfo->hTreeView,&tvItem);
 						}
-
-						pShellFolder->Release();
 					}
+
+					pShellFolder->Release();
 				}
 
 				CoTaskMemFree((LPVOID)pidl);
