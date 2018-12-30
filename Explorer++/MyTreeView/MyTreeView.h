@@ -188,6 +188,4 @@ typedef struct
 	HTREEITEM		hParent;
 	LPITEMIDLIST	pidl;
 	CMyTreeView		*pMyTreeView;
-
-	IShellFolder	*pShellFolder;
 } ThreadInfo_t;
