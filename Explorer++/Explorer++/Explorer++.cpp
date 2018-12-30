@@ -128,8 +128,6 @@ Explorerplusplus::~Explorerplusplus()
 
 	/* Bookmarks teardown. */
 	delete m_pBookmarksToolbar;
-
-	m_pDirMon->Release();
 }
 
 void Explorerplusplus::SetDefaultValues(void)

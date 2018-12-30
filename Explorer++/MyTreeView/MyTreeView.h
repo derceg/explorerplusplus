@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/DropHandler.h"
 
 #define WM_USER_TREEVIEW				WM_APP + 70
@@ -19,7 +18,7 @@ public:
 	ULONG __stdcall		AddRef(void);
 	ULONG __stdcall		Release(void);
 
-	CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon,HANDLE hIconsThread);
+	CMyTreeView(HWND hTreeView,HWND hParent,HANDLE hIconsThread);
 	~CMyTreeView();
 
 	/* Drop source functions. */
@@ -55,8 +54,6 @@ private:
 	LRESULT CALLBACK	OnNotify(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	void		AddDirectoryInternal(IShellFolder *pShellFolder, LPITEMIDLIST pidlDirectory, HTREEITEM hParent);
-	void		DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName);
-	void		DirectoryAltered(void);
 	HTREEITEM	AddRoot(void);
 	void		AddItem(const TCHAR *szFullFileName);
 	void		AddItemInternal(HTREEITEM hParent, const TCHAR *szFullFileName);
@@ -74,12 +71,10 @@ private:
 	HTREEITEM	LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand);
 	HTREEITEM	LocateItemOnDesktopTree(const TCHAR *szFullFileName);
 
-	static void	DirectoryAlteredCallback(const TCHAR *szFileName, DWORD dwAction, void *pData);
-
 	/* Directory modification. */
 	void		DirectoryAlteredAddFile(const TCHAR *szFullFileName);
 	void		DirectoryAlteredRemoveFile(const TCHAR *szFullFileName);
-	void		DirectoryAlteredRenameFile(const TCHAR *szFullFileName);
+	void		DirectoryAlteredRenameFile(const TCHAR *szFullFileName, const TCHAR *szOldFileName);
 
 	/* Icons. */
 	void		AddToIconFinderQueue(TVITEM *plvItem);
@@ -122,33 +117,19 @@ private:
 
 	typedef struct
 	{
-		TCHAR szFileName[MAX_PATH];
-		DWORD dwAction;
-	} AlteredFile_t;
-
-	typedef struct
-	{
 		LPITEMIDLIST	pidl;
 		LPITEMIDLIST	pridl;
 	} ItemInfo_t;
 
 	typedef struct
 	{
-		TCHAR szPath[MAX_PATH];
-		CMyTreeView *pMyTreeView;
-	} DirectoryAltered_t;
-
-	typedef struct
-	{
 		TCHAR	szDrive[MAX_PATH];
 		HANDLE	hDrive;
-		int		iMonitorId;
 	} DriveEvent_t;
 
 	HWND				m_hTreeView;
 	HWND				m_hParent;
 	int					m_iRefCount;
-	IDirectoryMonitor	*m_pDirMon;
 	BOOL				m_bShowHidden;
 
 	/* Subfolder thread. */
@@ -173,12 +154,6 @@ private:
 	BOOL				m_bDragAllowed;
 	BOOL				m_bDataAccept;
 	DragTypes_t			m_DragType;
-
-	/* Directory modification. */
-	std::list<AlteredFile_t>	m_AlteredList;
-	std::list<AlteredFile_t>	m_AlteredTrackingList;
-	CRITICAL_SECTION	m_cs;
-	TCHAR				m_szAlteredOldFileName[MAX_PATH];
 
 	/* Hardware events. */
 	std::list<DriveEvent_t>	m_pDriveList;

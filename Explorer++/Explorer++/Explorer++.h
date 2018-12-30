@@ -745,7 +745,6 @@ private:
 	HWND					m_hTabBacking;
 	HWND					m_hBookmarksToolbar;
 
-	IDirectoryMonitor *		m_pDirMon;
 	CMyTreeView *			m_pMyTreeView;
 	CStatusBar *			m_pStatusBar;
 	HANDLE					m_hTreeViewIconThread;

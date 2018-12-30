@@ -204,7 +204,6 @@
     <ClCompile Include="FolderSize.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="iDataObject.cpp" />
-    <ClCompile Include="iDirectoryMonitor.cpp" />
     <ClCompile Include="iDropSource.cpp" />
     <ClCompile Include="iEnumFormatEtc.cpp" />
     <ClCompile Include="ImageHelper.cpp" />
@@ -255,7 +254,6 @@
     <ClInclude Include="FolderSize.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="iDataObject.h" />
-    <ClInclude Include="iDirectoryMonitor.h" />
     <ClInclude Include="iDropSource.h" />
     <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="ImageHelper.h" />

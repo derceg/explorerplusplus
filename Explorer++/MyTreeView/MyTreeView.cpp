@@ -36,8 +36,7 @@ int g_ntvAPCsQueued = 0;
 
 std::list<TreeViewInfo_t> g_pTreeViewInfoList;
 
-CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon,
-HANDLE hIconsThread) :
+CMyTreeView::CMyTreeView(HWND hTreeView, HWND hParent, HANDLE hIconsThread) :
 m_iRefCount(1),
 m_bDragDropRegistered(FALSE)
 {
@@ -46,13 +45,10 @@ m_bDragDropRegistered(FALSE)
 	
 	SetWindowSubclass(m_hTreeView,TreeViewProcStub,0,(DWORD_PTR)this);
 
-	InitializeCriticalSection(&m_cs);
 	InitializeCriticalSection(&m_csSubFolders);
 	InitializeCriticalSection(&g_tv_icon_cs);
 
 	m_hThread = hIconsThread;
-
-	m_pDirMon = pDirMon;
 
 	m_uItemMap = (int *)malloc(DEFAULT_ITEM_ALLOCATION * sizeof(int));
 	m_pItemInfo = (ItemInfo_t *)malloc(DEFAULT_ITEM_ALLOCATION * sizeof(ItemInfo_t));
@@ -83,7 +79,6 @@ CMyTreeView::~CMyTreeView()
 	free(m_uItemMap);
 	free(m_pItemInfo);
 
-	DeleteCriticalSection(&m_cs);
 	DeleteCriticalSection(&m_csSubFolders);
 	DeleteCriticalSection(&g_tv_icon_cs);
 }
@@ -105,10 +100,6 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 	{
 		case WM_SETFOCUS:
 			SendMessage(m_hParent,WM_USER_TREEVIEW_GAINEDFOCUS,0,0);
-			break;
-
-		case WM_TIMER:
-			DirectoryAltered();
 			break;
 
 		case WM_DEVICECHANGE:
@@ -1387,8 +1378,6 @@ LRESULT CALLBACK CMyTreeView::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 							{
 								if(itr->hDrive == pdbHandle->dbch_handle)
 								{
-									m_pDirMon->StopDirectoryMonitor(itr->iMonitorId);
-
 									/* Log the removal. If a device removal failure message
 									is later received, the last entry logged here will be
 									restored. */
@@ -1539,12 +1528,10 @@ void CMyTreeView::MonitorDrivePublic(const TCHAR *szDrive)
 
 void CMyTreeView::MonitorDrive(const TCHAR *szDrive)
 {
-	DirectoryAltered_t		*pDirectoryAltered = NULL;
 	DEV_BROADCAST_HANDLE	dbv;
 	HANDLE					hDrive;
 	HDEVNOTIFY				hDevNotify;
 	DriveEvent_t			de;
-	int						iMonitorId;
 
 	/* Remote (i.e. network) drives will NOT be monitored. */
 	if(GetDriveType(szDrive) != DRIVE_REMOTE)
@@ -1557,14 +1544,6 @@ void CMyTreeView::MonitorDrive(const TCHAR *szDrive)
 
 		if(hDrive != INVALID_HANDLE_VALUE)
 		{
-			pDirectoryAltered = (DirectoryAltered_t *)malloc(sizeof(DirectoryAltered_t));
-
-			StringCchCopy(pDirectoryAltered->szPath, SIZEOF_ARRAY(pDirectoryAltered->szPath), szDrive);
-			pDirectoryAltered->pMyTreeView	= this;
-
-			iMonitorId = m_pDirMon->WatchDirectory(hDrive,szDrive,FILE_NOTIFY_CHANGE_DIR_NAME,
-				CMyTreeView::DirectoryAlteredCallback,TRUE,(void *)pDirectoryAltered);
-
 			dbv.dbch_size		= sizeof(dbv);
 			dbv.dbch_devicetype	= DBT_DEVTYP_HANDLE;
 			dbv.dbch_handle		= hDrive;
@@ -1580,7 +1559,6 @@ void CMyTreeView::MonitorDrive(const TCHAR *szDrive)
 			{
 				StringCchCopy(de.szDrive,SIZEOF_ARRAY(de.szDrive),szDrive);
 				de.hDrive = hDrive;
-				de.iMonitorId = iMonitorId;
 
 				m_pDriveList.push_back(de);
 			}
