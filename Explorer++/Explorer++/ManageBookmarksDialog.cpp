@@ -178,7 +178,7 @@ void CManageBookmarksDialog::SetupListView()
 
 	int iColumn = 0;
 
-	for each(auto ci in m_pmbdps->m_vectorColumnInfo)
+	for(const auto &ci : m_pmbdps->m_vectorColumnInfo)
 	{
 		if(ci.bActive)
 		{
@@ -205,7 +205,7 @@ void CManageBookmarksDialog::SetupListView()
 	{
 		int iSubItem = 1;
 
-		for each(auto ci in m_pmbdps->m_vectorColumnInfo)
+		for(const auto &ci : m_pmbdps->m_vectorColumnInfo)
 		{
 			/* The name column will always appear first in
 			the set of columns and can be skipped here. */
@@ -470,7 +470,7 @@ void CManageBookmarksDialog::OnListViewHeaderRClick()
 	HMENU hMenu = CreatePopupMenu();
 	int iMenuItem = 0;
 
-	for each(auto ci in m_pmbdps->m_vectorColumnInfo)
+	for(const auto &ci : m_pmbdps->m_vectorColumnInfo)
 	{
 		TCHAR szColumn[128];
 		GetColumnString(ci.ColumnType,szColumn,SIZEOF_ARRAY(szColumn));

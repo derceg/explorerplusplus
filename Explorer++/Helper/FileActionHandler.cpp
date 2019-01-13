@@ -38,7 +38,7 @@ BOOL CFileActionHandler::RenameFiles(const std::list<RenamedItem_t> &ItemList)
 {
 	std::list<RenamedItem_t> *pRenamedItemList = new std::list<RenamedItem_t>;
 
-	for each(auto Item in ItemList)
+	for(const auto &Item : ItemList)
 	{
 		BOOL bRes = NFileOperations::RenameFile(Item.strOldFilename,Item.strNewFilename);
 
@@ -122,7 +122,7 @@ void CFileActionHandler::UndoRenameOperation(const std::list<RenamedItem_t> &Ren
 
 	/* When undoing a rename operation, the new name
 	becomes the old name, and vice versa. */
-	for each(auto RenamedItem in RenamedItemList)
+	for(const auto &RenamedItem : RenamedItemList)
 	{
 		RenamedItem_t UndoItem;
 		UndoItem.strOldFilename = RenamedItem.strNewFilename;

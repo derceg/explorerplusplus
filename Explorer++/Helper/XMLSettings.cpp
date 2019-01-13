@@ -180,7 +180,7 @@ MSXML2::IXMLDOMElement *pParentNode,const TCHAR *szBaseKeyName,
 	TCHAR szNode[64];
 	int i = 0;
 
-	for each(auto str in strList)
+	for(const auto &str : strList)
 	{
 		StringCchPrintf(szNode,SIZEOF_ARRAY(szNode),_T("%s%d"),
 			szBaseKeyName,i++);

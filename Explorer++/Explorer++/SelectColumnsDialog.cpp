@@ -62,7 +62,7 @@ INT_PTR CSelectColumnsDialog::OnInitDialog()
 
 	int iItem = 0;
 
-	for each(auto Column in ActiveColumnList)
+	for(const auto &Column : ActiveColumnList)
 	{
 		TCHAR szText[64];
 		LoadString(GetInstance(),CShellBrowser::LookupColumnNameStringIndex(Column.id),

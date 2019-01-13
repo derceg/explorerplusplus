@@ -111,7 +111,7 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 					{
 						const CBookmarkFolder &bookmarkFolder = boost::get<CBookmarkFolder>(*variantBookmarkItem);
 
-						for each(auto variantBookmarkChild in bookmarkFolder)
+						for(auto variantBookmarkChild : bookmarkFolder)
 						{
 							if (variantBookmarkChild.type() == typeid(CBookmark))
 							{
@@ -248,7 +248,7 @@ void CBookmarksToolbar::InsertBookmarkItems()
 	assert(variantBookmarksToolbar.type() == typeid(CBookmarkFolder));
 	const CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
 
-	for each(auto variantBookmark in BookmarksToolbarFolder)
+	for(const auto &variantBookmark : BookmarksToolbarFolder)
 	{
 		if(variantBookmark.type() == typeid(CBookmarkFolder))
 		{

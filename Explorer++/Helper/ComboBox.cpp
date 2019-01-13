@@ -149,7 +149,7 @@ INT_PTR CComboBox::OnCBNEditChange()
 
 		int Index = 0;
 
-		for each(auto StringEntry in StringEntries)
+		for(const auto &StringEntry : StringEntries)
 		{
 			if(StringEntry.compare(0,CurrentText.length(),CurrentText) == 0)
 			{

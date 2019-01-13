@@ -53,7 +53,7 @@ CEnumFormatEtc::CEnumFormatEtc(const std::list<FORMATETC> &feList)
 	m_lRefCount = 1;
 	m_iIndex = 0;
 
-	for each(auto fe in feList)
+	for(const auto &fe : feList)
 	{
 		FORMATETC ftc = fe;
 
@@ -75,7 +75,7 @@ CEnumFormatEtc::CEnumFormatEtc(const std::list<FORMATETC> &feList)
 
 CEnumFormatEtc::~CEnumFormatEtc()
 {
-	for each(auto fe in m_feList)
+	for(auto fe : m_feList)
 	{
 		if(fe.ptd != NULL)
 		{

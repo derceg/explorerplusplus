@@ -323,7 +323,7 @@ void CSetDefaultColumnsDialog::SetupFolderColumns(FolderType_t FolderType)
 
 	int iItem = 0;
 
-	for each(auto Column in *pColumnList)
+	for(const auto &Column : *pColumnList)
 	{
 		TCHAR szText[64];
 		LoadString(GetInstance(),CShellBrowser::LookupColumnNameStringIndex(Column.id),

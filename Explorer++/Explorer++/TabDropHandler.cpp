@@ -116,7 +116,7 @@ HRESULT __stdcall CTabDropHandler::DragEnter(IDataObject *pDataObject,DWORD grfK
 	std::list<FORMATETC> ftcList;
 	CDropHandler::GetDropFormats(ftcList);
 
-	for each(auto ftc in ftcList)
+	for(auto ftc : ftcList)
 	{
 		if(pDataObject->QueryGetData(&ftc) == S_OK)
 		{

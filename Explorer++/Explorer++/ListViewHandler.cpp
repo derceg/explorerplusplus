@@ -1059,7 +1059,7 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 
 	MENUITEMINFO mii;
 
-	for each(auto ViewMode in m_ViewModes)
+	for(auto ViewMode : m_ViewModes)
 	{
 		TCHAR szTemp[64];
 		LoadString(m_hLanguageModule,GetViewModeMenuStringId(ViewMode),
@@ -1127,7 +1127,7 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 		CoTaskMemFree(pidlDirectory);
 
-		for each(auto pidl in pidlList)
+		for(auto pidl : pidlList)
 		{
 			CoTaskMemFree(pidl);
 		}
@@ -1335,7 +1335,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 		pDragSourceHelper->Release();
 	}
 
-	for each(auto pidl in ItemList)
+	for(auto pidl : ItemList)
 	{
 		CoTaskMemFree(pidl);
 	}

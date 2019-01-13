@@ -605,7 +605,7 @@ void Explorerplusplus::OnDrawClipboard(void)
 		if(OleIsCurrentClipboard(m_pClipboardDataObject) == S_FALSE)
 		{
 			/* Deghost all items that have been 'cut'. */
-			for each(auto strFile in m_CutFileNameList)
+			for(const auto &strFile : m_CutFileNameList)
 			{
 				/* Only deghost the items if the tab they
 				are/were in still exists. */
@@ -1053,7 +1053,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard(void)
 	std::wstring strColumnInfo;
 	int nActiveColumns = 0;
 
-	for each(auto Column in Columns)
+	for(const auto &Column : Columns)
 	{
 		if(Column.bChecked)
 		{
@@ -1418,7 +1418,7 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 
 				/* Loop through each filter. Decide whether to change the font of the
 				current item based on its filename and/or attributes. */
-				for each(auto ColorRule in m_ColorRules)
+				for(const auto &ColorRule : m_ColorRules)
 				{
 					BOOL bMatchFileName = FALSE;
 					BOOL bMatchAttributes = FALSE;
@@ -1648,7 +1648,7 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 {
 	if(m_DirectorySettingsList.size() > 0)
 	{
-		for each(auto ds in m_DirectorySettingsList)
+		for(const auto &ds : m_DirectorySettingsList)
 		{
 			if(CompareIdls(pidlDirectory,ds.pidlDirectory))
 			{

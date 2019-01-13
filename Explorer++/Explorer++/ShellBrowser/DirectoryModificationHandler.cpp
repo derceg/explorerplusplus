@@ -59,7 +59,7 @@ void CShellBrowser::DirectoryAltered(void)
 	other actions for the file will take place before the addition,
 	which will again result in an incorrect state.
 	*/
-	for each(auto af in m_AlteredList)
+	for(const auto &af : m_AlteredList)
 	{
 		/* Only undertake the modification if the unique folder
 		index on the modified item and current folder match up

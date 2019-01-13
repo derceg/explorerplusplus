@@ -43,7 +43,7 @@ void CMyTreeView::DirectoryAltered(void)
 	Renamed
 	In this case, need to remember that the first two
 	notifications referred to files that didn't exist. */
-	for each(auto af in m_AlteredList)
+	for(const auto &af : m_AlteredList)
 	{
 		switch(af.dwAction)
 		{

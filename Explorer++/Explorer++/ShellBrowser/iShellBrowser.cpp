@@ -1514,7 +1514,7 @@ void CShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)
 
 	m_FileSelectionList.clear();
 
-	for each(auto PastedFile in PastedFileList)
+	for(const auto &PastedFile : PastedFileList)
 	{
 		int iIndex = LocateFileItemIndex(PastedFile.c_str());
 

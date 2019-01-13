@@ -88,7 +88,7 @@ INT_PTR CCustomizeColorsDialog::OnInitDialog()
 
 	int iItem = 0;
 
-	for each(auto ColorRule in *m_pColorRuleList)
+	for(const auto &ColorRule : *m_pColorRuleList)
 	{
 		InsertColorRuleIntoListView(hListView,ColorRule,iItem++);
 	}

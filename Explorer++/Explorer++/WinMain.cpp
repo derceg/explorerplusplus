@@ -487,7 +487,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 			{
 				if(!g_TabDirs.empty())
 				{
-					for each(auto strDirectory in g_TabDirs)
+					for(const auto &strDirectory : g_TabDirs)
 					{
 						COPYDATASTRUCT cds;
 						TCHAR szDirectory[MAX_PATH];

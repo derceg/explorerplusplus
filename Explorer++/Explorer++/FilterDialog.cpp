@@ -57,7 +57,7 @@ INT_PTR CFilterDialog::OnInitDialog()
 
 	SetFocus(hComboBox);
 
-	for each(auto strFilter in m_pfdps->m_FilterList)
+	for(const auto &strFilter : m_pfdps->m_FilterList)
 	{
 		SendMessage(hComboBox,CB_ADDSTRING,static_cast<WPARAM>(-1),
 			reinterpret_cast<LPARAM>(strFilter.c_str()));

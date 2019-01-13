@@ -101,7 +101,7 @@ INT_PTR CMassRenameDialog::OnInitDialog()
 	int iItem = 0;
 
 	/* Add each file to the listview, along with its icon. */
-	for each(auto strFilename in m_FullFilenameList)
+	for(const auto &strFilename : m_FullFilenameList)
 	{
 		SHGetFileInfo(strFilename.c_str(),0,&shfi,
 			sizeof(SHFILEINFO),SHGFI_SYSICONINDEX);
@@ -196,7 +196,7 @@ INT_PTR CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 				TCHAR szNewFilename[MAX_PATH];
 				int iItem = 0;
 
-				for each(auto strFilename in m_FullFilenameList)
+				for(const auto &strFilename : m_FullFilenameList)
 				{
 					StringCchCopy(szFilename,SIZEOF_ARRAY(szFilename),
 						strFilename.c_str());
@@ -301,7 +301,7 @@ void CMassRenameDialog::OnOk()
 	std::list<CFileActionHandler::RenamedItem_t> RenamedItemList;
 	int iItem = 0;
 
-	for each (auto strOldFilename in m_FullFilenameList)
+	for(const auto &strOldFilename : m_FullFilenameList)
 	{
 		TCHAR szFilename[MAX_PATH];
 		StringCchCopy(szFilename,SIZEOF_ARRAY(szFilename),

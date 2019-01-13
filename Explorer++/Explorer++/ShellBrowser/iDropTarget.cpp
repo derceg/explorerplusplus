@@ -55,7 +55,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 
 		/* Check whether the drop source has the type of data
 		that is needed for this drag operation. */
-		for each(auto ftc in ftcList)
+		for(auto ftc : ftcList)
 		{
 			if(pDataObject->QueryGetData(&ftc) == S_OK)
 			{
@@ -364,7 +364,7 @@ void CShellBrowser::OnDropFile(const std::list<std::wstring> &PastedFileList, co
 		DroppedFile.DropPoint.x = ptOrigin.x + LocalDropPoint.x;
 		DroppedFile.DropPoint.y = ptOrigin.y + LocalDropPoint.y;
 
-		for each(auto strFilename in PastedFileList)
+		for(const auto &strFilename : PastedFileList)
 		{
 			StringCchCopy(DroppedFile.szFileName,
 				SIZEOF_ARRAY(DroppedFile.szFileName),strFilename.c_str());

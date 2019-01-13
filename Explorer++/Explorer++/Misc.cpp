@@ -471,7 +471,7 @@ BOOL Explorerplusplus::CanPaste(void) const
 
 	/* Check whether the drop source has the type of data
 	that is needed for this drag operation. */
-	for each(auto ftc in ftcList)
+	for(const auto &ftc : ftcList)
 	{
 		if(IsClipboardFormatAvailable(ftc.cfFormat))
 		{

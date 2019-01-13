@@ -29,7 +29,7 @@ CResizableDialog::CResizableDialog(HWND hDlg,
 
 	/* Loop through each of the controls and
 	find the delta's. */
-	for each(auto Control in ControlList)
+	for(const auto &Control : ControlList)
 	{
 		ControlInternal.iID			= Control.iID;
 		ControlInternal.Type		= Control.Type;
@@ -66,7 +66,7 @@ void CResizableDialog::UpdateControls(int iWidth,int iHeight)
 	HWND hCtrl;
 	RECT rc;
 
-	for each(auto Control in m_ControlList)
+	for(const auto &Control : m_ControlList)
 	{
 		hCtrl = GetDlgItem(m_hDlg,Control.iID);
 		GetWindowRect(hCtrl,&rc);

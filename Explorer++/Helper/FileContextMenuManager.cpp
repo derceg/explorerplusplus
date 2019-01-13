@@ -33,7 +33,7 @@ m_pShellContext(NULL)
 	IContextMenu *pContextMenu = NULL;
 	HRESULT hr;
 
-	for each(auto pidl in pidlItemList)
+	for(auto pidl : pidlItemList)
 	{
 		m_pidlItemList.push_back(ILClone(pidl));
 	}
@@ -100,7 +100,7 @@ m_pShellContext(NULL)
 
 CFileContextMenuManager::~CFileContextMenuManager()
 {
-	for each(auto pidl in m_pidlItemList)
+	for(auto pidl : m_pidlItemList)
 	{
 		CoTaskMemFree(pidl);
 	}

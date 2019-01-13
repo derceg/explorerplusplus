@@ -85,7 +85,7 @@ void CStatusBar::HandleStatusBarMenuClose(void)
 
 	delete[] m_pPartWidths;
 
-	for each(auto strText in m_TextList)
+	for(const auto &strText : m_TextList)
 	{
 		/* Restore the text that was present before the menu was opened. */
 		SendMessage(m_hwnd,SB_SETTEXT,(WPARAM)i|0,

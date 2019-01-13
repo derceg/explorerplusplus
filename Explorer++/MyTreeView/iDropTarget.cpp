@@ -45,7 +45,7 @@ DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 
 	/* Check whether the drop source has the type of data
 	that is needed for this drag operation. */
-	for each(auto ftc in ftcList)
+	for(auto ftc : ftcList)
 	{
 		if(pDataObject->QueryGetData(&ftc) == S_OK)
 		{

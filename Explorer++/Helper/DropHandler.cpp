@@ -1172,7 +1172,7 @@ BOOL CopyDroppedFilesInternalAsync(PastedFilesInfo_t *ppfi)
 	{
 		std::list<std::wstring> FilenameList;
 
-		for each(auto FullFilename in ppfi->FullFilenameList)
+		for(const auto &FullFilename : ppfi->FullFilenameList)
 		{
 			TCHAR szFilename[MAX_PATH];
 			StringCchCopy(szFilename,SIZEOF_ARRAY(szFilename),FullFilename.c_str());

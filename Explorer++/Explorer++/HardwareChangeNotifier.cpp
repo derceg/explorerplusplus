@@ -54,7 +54,7 @@ void CHardwareChangeNotifier::NotifyDeviceRemovalComplete(DEV_BROADCAST_HDR *dbh
 
 void CHardwareChangeNotifier::NotifyObservers(NotificationType_t NotificationType,DEV_BROADCAST_HDR *dbh)
 {
-	for each(auto hcn in m_Observers)
+	for(const auto &hcn : m_Observers)
 	{
 		switch(NotificationType)
 		{

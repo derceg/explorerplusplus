@@ -188,7 +188,7 @@ LRESULT CALLBACK CApplicationToolbar::ParentWndProc(HWND hwnd,UINT uMsg,WPARAM w
 
 void CApplicationToolbar::AddButtonsToToolbar()
 {
-	for each(auto Button in m_atps->m_Buttons)
+	for(const auto &Button : m_atps->m_Buttons)
 	{
 		AddButtonToToolbar(Button);
 	}
@@ -530,7 +530,7 @@ void CApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey
 {
 	int index = 0;
 
-	for each(auto Button in m_Buttons)
+	for(const auto &Button : m_Buttons)
 	{
 		TCHAR szKeyName[32];
 		_itow_s(index,szKeyName,SIZEOF_ARRAY(szKeyName),10);
@@ -623,7 +623,7 @@ void CApplicationToolbarPersistentSettings::SaveXMLSettings(MSXML2::IXMLDOMDocum
 {
 	BSTR bstr_wsntt = SysAllocString(L"\n\t\t");
 
-	for each(auto Button in m_Buttons)
+	for(const auto &Button : m_Buttons)
 	{
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 

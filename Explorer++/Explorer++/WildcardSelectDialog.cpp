@@ -51,7 +51,7 @@ INT_PTR CWildcardSelectDialog::OnInitDialog()
 
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_SELECTGROUP_COMBOBOX);
 
-	for each(auto strPattern in m_pwsdps->m_PatternList)
+	for(const auto &strPattern : m_pwsdps->m_PatternList)
 	{
 		ComboBox_InsertString(hComboBox,-1,strPattern.c_str());
 	}

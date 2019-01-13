@@ -96,7 +96,7 @@ LONG NRegistrySettings::SaveStringListToRegistry(HKEY hKey,const TCHAR *szBaseKe
 	LONG lRes;
 	int i = 0;
 
-	for each(auto str in strList)
+	for(const auto &str : strList)
 	{
 		StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),_T("%s%d"),
 			szBaseKeyName,i++);

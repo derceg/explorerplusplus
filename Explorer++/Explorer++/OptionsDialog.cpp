@@ -1102,7 +1102,7 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 				HWND hComboBox = GetDlgItem(hDlg,IDC_OPTIONS_DEFAULT_VIEW);
 				int SelectedIndex = -1;
 
-				for each(auto ViewMode in m_ViewModes)
+				for(auto ViewMode : m_ViewModes)
 				{
 					int StringID = GetViewModeMenuStringId(ViewMode);
 

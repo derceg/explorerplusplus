@@ -69,7 +69,7 @@ void Explorerplusplus::LoadDialogStatesFromRegistry(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		for each(CDialogSettings *ds in DIALOG_SETTINGS)
+		for(CDialogSettings *ds : DIALOG_SETTINGS)
 		{
 			ds->LoadRegistrySettings(hKey);
 		}
@@ -86,7 +86,7 @@ void Explorerplusplus::SaveDialogStatesToRegistry(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		for each(CDialogSettings *ds in DIALOG_SETTINGS)
+		for(CDialogSettings *ds : DIALOG_SETTINGS)
 		{
 			ds->SaveRegistrySettings(hKey);
 		}
@@ -149,7 +149,7 @@ void Explorerplusplus::LoadDialogStatesFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
 						pChildNode->get_nodeName(&bstrName);
 						pChildNode->get_text(&bstrValue);
 
-						for each(CDialogSettings *ds in DIALOG_SETTINGS)
+						for(CDialogSettings *ds : DIALOG_SETTINGS)
 						{
 							TCHAR settingsKey[64];
 							bool success = ds->GetSettingsKey(settingsKey, SIZEOF_ARRAY(settingsKey));
@@ -194,7 +194,7 @@ MSXML2::IXMLDOMElement *pRoot)
 	SysFreeString(bstr);
 	bstr = NULL;
 
-	for each(CDialogSettings *ds in DIALOG_SETTINGS)
+	for(CDialogSettings *ds : DIALOG_SETTINGS)
 	{
 		ds->SaveXMLSettings(pXMLDom, pe);
 	}

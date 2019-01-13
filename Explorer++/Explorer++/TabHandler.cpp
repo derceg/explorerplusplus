@@ -413,7 +413,7 @@ int *pTabObjectIndex)
 
 		/* Check if there are any specific settings saved
 		for the specified directory. */
-		for each(auto ds in m_DirectorySettingsList)
+		for(auto ds : m_DirectorySettingsList)
 		{
 			if(CompareIdls(pidlDirectory,ds.pidlDirectory))
 			{
@@ -559,7 +559,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	if(!g_TabDirs.empty())
 	{
-		for each(auto strDirectory in g_TabDirs)
+		for(const auto &strDirectory : g_TabDirs)
 		{
 			StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),strDirectory.c_str());
 
@@ -1518,7 +1518,7 @@ UINT Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory)
 
 	UINT uSortMode = FSM_NAME;
 
-	for each(auto Column in *pColumns)
+	for(const auto &Column : *pColumns)
 	{
 		if(Column.bChecked)
 		{

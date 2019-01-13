@@ -75,7 +75,7 @@ void CBookmarkTreeView::SetupTreeView(const GUID &guidSelected, const NBookmarkH
 	HTREEITEM hRoot = InsertFolderIntoTreeView(NULL, *m_pAllBookmarks, 0);
 	InsertFoldersIntoTreeViewRecursive(hRoot, *m_pAllBookmarks);
 
-	for each(auto guidExpanded in setExpansion)
+	for(const auto &guidExpanded : setExpansion)
 	{
 		auto itrExpanded = m_mapItem.find(guidExpanded);
 

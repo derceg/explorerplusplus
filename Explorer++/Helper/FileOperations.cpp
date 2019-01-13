@@ -130,7 +130,7 @@ TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &Filenam
 	TCHAR *pszFilenames = NULL;
 	int iTotalSize = 0;
 
-	for each(auto Filename in FilenameList)
+	for(const auto &Filename : FilenameList)
 	{
 		pszFilenames = reinterpret_cast<TCHAR *>(realloc(pszFilenames,
 			(iTotalSize + Filename.size() + 1) * sizeof(TCHAR)));
@@ -308,14 +308,14 @@ BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,cons
 
 	strContents += _T("\r\nFolders\r\n-------\r\n");
 
-	for each(auto Folder in FolderList)
+	for(const auto &Folder : FolderList)
 	{
 		strContents += Folder + _T("\r\n");
 	}
 
 	strContents += _T("\r\nFiles\r\n-----\r\n");
 
-	for each(auto File in FileList)
+	for(const auto &File : FileList)
 	{
 		strContents += File + _T("\r\n");
 	}

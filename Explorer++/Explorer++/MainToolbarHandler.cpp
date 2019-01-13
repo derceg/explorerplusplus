@@ -79,7 +79,7 @@ void Explorerplusplus::SetInitialToolbarButtons()
 
 void Explorerplusplus::AddButtonsToMainToolbar()
 {
-	for each (auto toolbarButton in m_tbInitial)
+	for(const auto &toolbarButton : m_tbInitial)
 	{
 		AddButtonToMainToolbar(toolbarButton.iItemID);
 	}

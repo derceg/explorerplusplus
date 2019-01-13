@@ -86,7 +86,7 @@ INT_PTR CDestroyFilesDialog::OnInitDialog()
 
 	int iItem = 0;
 
-	for each(auto strFullFilename in m_FullFilenameList)
+	for(const auto &strFullFilename : m_FullFilenameList)
 	{
 		TCHAR szFullFilename[MAX_PATH];
 
@@ -304,7 +304,7 @@ void CDestroyFilesDialog::OnConfirmDestroy()
 	}
 
 	/* TODO: Perform in background thread. */
-	for each(auto strFullFilename in m_FullFilenameList)
+	for(const auto &strFullFilename : m_FullFilenameList)
 	{
 		DeleteFileSecurely(strFullFilename,OverwriteMethod);
 	}

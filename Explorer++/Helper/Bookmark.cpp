@@ -274,7 +274,7 @@ void CBookmarkFolder::SerializeToRegistry(const std::wstring &strKey)
 
 		int iItem = 0;
 
-		for each(auto Variant in m_ChildList)
+		for(auto Variant : m_ChildList)
 		{
 			TCHAR szSubKey[256];
 
@@ -476,7 +476,7 @@ void CBookmarkItemNotifier::NotifyObservers(NotificationType_t NotificationType,
 	const CBookmarkFolder *pParentBookmarkFolder,const CBookmarkFolder *pBookmarkFolder,
 	const CBookmark *pBookmark,const GUID *pguid,std::size_t Position)
 {
-	for each(auto pbin in m_listObservers)
+	for(auto pbin : m_listObservers)
 	{
 		switch(NotificationType)
 		{

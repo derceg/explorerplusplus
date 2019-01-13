@@ -75,7 +75,7 @@ INT_PTR CMergeFilesDialog::OnInitDialog()
 
 	/* If the files all match the pattern .*[\\.]?part[0-9]+
 	(e.g. document.txt.part1), order them alphabetically. */
-	for each(auto strFullFilename in m_FullFilenameList)
+	for(const auto &strFullFilename : m_FullFilenameList)
 	{
 		if(!std::regex_match(strFullFilename,rxPattern))
 		{
@@ -148,7 +148,7 @@ INT_PTR CMergeFilesDialog::OnInitDialog()
 
 	int iItem = 0;
 
-	for each(auto strFullFilename in m_FullFilenameList)
+	for(const auto &strFullFilename : m_FullFilenameList)
 	{
 		TCHAR szFullFilename[MAX_PATH];
 
@@ -539,7 +539,7 @@ void CMergeFiles::StartMerging()
 	PostMessage(m_hDlg,NMergeFilesDialog::WM_APP_SETTOTALMERGECOUNT,
 		static_cast<WPARAM>(m_FullFilenameList.size()),0);
 
-	for each(auto strFullFilename in m_FullFilenameList)
+	for(const auto &strFullFilename : m_FullFilenameList)
 	{
 		if(bStop)
 		{

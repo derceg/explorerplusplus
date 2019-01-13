@@ -128,7 +128,7 @@ void NColorRuleHelper::SaveColorRulesToRegistry(const std::vector<NColorRuleHelp
 	{
 		int iCount = 0;
 
-		for each(auto ColorRule in ColorRules)
+		for(const auto &ColorRule : ColorRules)
 		{
 			SaveColorRulesToRegistryInternal(hKey,ColorRule,iCount);
 			iCount++;
@@ -288,7 +288,7 @@ MSXML2::IXMLDOMElement *pRoot,const std::vector<NColorRuleHelper::ColorRule_t> &
 	pXMLDom->createElement(bstr,&pe);
 	SysFreeString(bstr);
 
-	for each(auto ColorRule in ColorRules)
+	for(const auto &ColorRule : ColorRules)
 	{
 		SaveColorRulesToXMLInternal(pXMLDom,pe,ColorRule);
 	}

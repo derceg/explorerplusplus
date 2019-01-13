@@ -86,7 +86,7 @@ BOOL Explorerplusplus::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
 		{
 			LPITEMIDLIST pidlComplete = NULL;
 
-			for each(auto pidl in pidlItemList)
+			for(const auto &pidl : pidlItemList)
 			{
 				pidlComplete = ILCombine(pidlParent,pidl);
 

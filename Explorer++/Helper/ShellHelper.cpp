@@ -552,7 +552,7 @@ HRESULT BuildHDropList(FORMATETC *pftc,STGMEDIUM *pstg,
 
 	uSize = sizeof(DROPFILES);
 
-	for each(auto Filename in FilenameList)
+	for(const auto &Filename : FilenameList)
 	{
 		uSize += static_cast<UINT>((Filename.length() + 1) * sizeof(TCHAR));
 	}
@@ -582,7 +582,7 @@ HRESULT BuildHDropList(FORMATETC *pftc,STGMEDIUM *pstg,
 
 	TCHAR chNull = '\0';
 
-	for each(auto Filename in FilenameList)
+	for(const auto &Filename : FilenameList)
 	{
 		pData = static_cast<LPBYTE>(pcidaData) + sizeof(DROPFILES) + uOffset;
 
@@ -638,7 +638,7 @@ HRESULT BuildShellIDList(FORMATETC *pftc,STGMEDIUM *pstg,
 	uSize += ILGetSize(pidlDirectory);
 
 	/* Add the total size of the child pidl's. */
-	for each(auto pidl in pidlList)
+	for(auto pidl : pidlList)
 	{
 		uSize += ILGetSize(pidl);
 	}
@@ -673,7 +673,7 @@ HRESULT BuildShellIDList(FORMATETC *pftc,STGMEDIUM *pstg,
 	uPreviousSize = ILGetSize(pidlDirectory);
 
 	/* Store each of the pidl's. */
-	for each(auto pidl in pidlList)
+	for(auto pidl : pidlList)
 	{
 		pOffsets[i + 1] = pOffsets[i] + uPreviousSize;
 
@@ -1053,7 +1053,7 @@ HRESULT AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList)
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
 	const std::list<JumpListTaskInformation> &TaskList)
 {
-	for each(auto jtli in TaskList)
+	for(const auto &jtli : TaskList)
 	{
 		AddJumpListTaskInternal(poc,jtli.pszName,
 			jtli.pszPath,jtli.pszArguments,
