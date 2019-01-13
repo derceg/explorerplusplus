@@ -271,7 +271,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(void)
 						break;
 					}
 
-					if (uBitDepth == -1)
+					if (uBitDepth == 0)
 					{
 						LoadString(m_hLanguageModule, IDS_GENERAL_DISPLAYWINDOW_BITDEPTHUNKNOWN, szTemp, SIZEOF_ARRAY(szTemp));
 						StringCchCopy(szOutput, SIZEOF_ARRAY(szOutput), szTemp);
