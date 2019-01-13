@@ -13,6 +13,7 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <comdef.h>
 #include <unordered_map>
 #include "Explorer++_internal.h"
 #include "SplitFileDialog.h"
@@ -674,8 +675,8 @@ void CSplitFileDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 	NRegistrySettings::ReadStringFromRegistry(hKey, SETTING_SIZE_GROUP, m_strSplitGroup);
 }
 
-void CSplitFileDialogPersistentSettings::SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,
-	MSXML2::IXMLDOMElement *pParentNode)
+void CSplitFileDialogPersistentSettings::SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pParentNode)
 {
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE, m_strSplitSize.c_str());
 	NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SIZE_GROUP, m_strSplitGroup.c_str());

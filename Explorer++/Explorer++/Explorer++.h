@@ -1,5 +1,7 @@
 #pragma once
 
+#include <objbase.h>
+#include <MsXml2.h>
 #include <unordered_map>
 #include "Explorer++_internal.h"
 #include "BookmarkHelper.h"
@@ -15,7 +17,6 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/ImageWrappers.h"
-#import <msxml3.dll> raw_interfaces_only
 
 #define MENU_BOOKMARK_STARTID		10000
 #define MENU_BOOKMARK_ENDID			11000
@@ -311,13 +312,13 @@ private:
 		BOOL					m_bLoad;
 
 		/* These are used for saving + loading. */
-		MSXML2::IXMLDOMDocument	*m_pXMLDom;
+		IXMLDOMDocument	*m_pXMLDom;
 
 		/* Used exclusively for loading. */
 		BOOL					m_bLoadedCorrectly;
 
 		/* Used exclusively for saving. */
-		MSXML2::IXMLDOMElement	*m_pRoot;
+		IXMLDOMElement	*m_pRoot;
 	};
 
 	friend CLoadSaveXML;
@@ -709,28 +710,28 @@ private:
 	void					SetFolderSizeWindowState(HWND hDlg);
 
 	/* XML Settings. */
-	void					LoadGenericSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					SaveGenericSettingsToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	int						LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					SaveTabSettingsToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
-	int						LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,std::list<Column_t> *pColumns);
-	void					SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pColumnsNode, std::list<Column_t> *pColumns, const TCHAR *szColumnSet, int iIndent);
-	int						LoadBookmarksFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					SaveBookmarksToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	int						LoadDefaultColumnsFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					SaveDefaultColumnsToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					SaveDefaultColumnsToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pColumnsNode);
-	void					SaveWindowPositionToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					SaveWindowPositionToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pWndPosNode);
-	void					LoadApplicationToolbarFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					SaveApplicationToolbarToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					LoadToolbarInformationFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					SaveToolbarInformationToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					SaveToolbarInformationToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
-	void					LoadDialogStatesFromXML(MSXML2::IXMLDOMDocument *pXMLDom);
-	void					SaveDialogStatesToXML(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pRoot);
-	void					MapAttributeToValue(MSXML2::IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
+	void					LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
+	int						LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
+	void					SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe);
+	int						LoadColumnFromXML(IXMLDOMNode *pNode,std::list<Column_t> *pColumns);
+	void					SaveColumnToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode, std::list<Column_t> *pColumns, const TCHAR *szColumnSet, int iIndent);
+	int						LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveBookmarksToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
+	int						LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
+	void					SaveDefaultColumnsToXMLInternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pColumnsNode);
+	void					SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
+	void					SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pWndPosNode);
+	void					LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
+	void					LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveToolbarInformationToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
+	void					SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe);
+	void					LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
+	void					MapAttributeToValue(IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
 	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,TabInfo_t *pTabInfo);
 
 	/* IExplorerplusplus methods. */

@@ -34,7 +34,7 @@ private:
 	void SaveExtraRegistrySettings(HKEY hKey);
 	void LoadExtraRegistrySettings(HKEY hKey);
 
-	void SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pParentNode);
+	void SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode);
 	void LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	int	m_iColumnWidth1;

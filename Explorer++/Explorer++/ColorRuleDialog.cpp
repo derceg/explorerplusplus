@@ -288,7 +288,7 @@ void CColorRuleDialogPersistentSettings::LoadExtraRegistrySettings(HKEY hKey)
 }
 
 void CColorRuleDialogPersistentSettings::SaveExtraXMLSettings(
-	MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pParentNode)
+	IXMLDOMDocument *pXMLDom,IXMLDOMElement *pParentNode)
 {
 	TCHAR szNode[32];
 

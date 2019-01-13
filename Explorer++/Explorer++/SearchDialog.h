@@ -1,5 +1,7 @@
 #pragma once
 
+#include <objbase.h>
+#include <MsXml2.h>
 #include <list>
 #include <vector>
 #include <string>
@@ -10,8 +12,6 @@
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
 #include "../Helper/FileContextMenuManager.h"
-
-#import <msxml3.dll> raw_interfaces_only
 
 class CSearchDialog;
 
@@ -70,7 +70,7 @@ private:
 	void						SaveExtraRegistrySettings(HKEY hKey);
 	void						LoadExtraRegistrySettings(HKEY hKey);
 
-	void						SaveExtraXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom, MSXML2::IXMLDOMElement *pParentNode);
+	void						SaveExtraXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pParentNode);
 	void						LoadExtraXMLSettings(BSTR bstrName, BSTR bstrValue);
 
 	template <typename T> void	CircularBufferToList(const boost::circular_buffer<T> &cb,std::list<T> &list);

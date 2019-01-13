@@ -552,7 +552,7 @@ void CApplicationToolbarPersistentSettings::SaveRegistrySettings(HKEY hParentKey
 	}
 }
 
-void CApplicationToolbarPersistentSettings::LoadXMLSettings(MSXML2::IXMLDOMNode *pNode)
+void CApplicationToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 {
 	TCHAR szName[512];
 	TCHAR szCommand[512];
@@ -561,7 +561,7 @@ void CApplicationToolbarPersistentSettings::LoadXMLSettings(MSXML2::IXMLDOMNode 
 	BOOL bNameFound = FALSE;
 	BOOL bCommandFound = FALSE;
 
-	MSXML2::IXMLDOMNamedNodeMap *am = NULL;
+	IXMLDOMNamedNodeMap *am = NULL;
 	HRESULT hr = pNode->get_attributes(&am);
 
 	if(FAILED(hr))
@@ -574,7 +574,7 @@ void CApplicationToolbarPersistentSettings::LoadXMLSettings(MSXML2::IXMLDOMNode 
 
 	for(int i = 0;i < lChildNodes;i++)
 	{
-		MSXML2::IXMLDOMNode *pAttributeNode = NULL;
+		IXMLDOMNode *pAttributeNode = NULL;
 		am->get_item(i,&pAttributeNode);
 
 		BSTR bstrName;
@@ -605,7 +605,7 @@ void CApplicationToolbarPersistentSettings::LoadXMLSettings(MSXML2::IXMLDOMNode 
 		AddButton(szName,szCommand,bShowNameOnToolbar,NULL);
 	}
 
-	MSXML2::IXMLDOMNode *pNextSibling = NULL;
+	IXMLDOMNode *pNextSibling = NULL;
 	hr = pNode->get_nextSibling(&pNextSibling);
 
 	if(hr == S_OK)
@@ -619,7 +619,7 @@ void CApplicationToolbarPersistentSettings::LoadXMLSettings(MSXML2::IXMLDOMNode 
 	}
 }
 
-void CApplicationToolbarPersistentSettings::SaveXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe)
+void CApplicationToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe)
 {
 	BSTR bstr_wsntt = SysAllocString(L"\n\t\t");
 
@@ -627,7 +627,7 @@ void CApplicationToolbarPersistentSettings::SaveXMLSettings(MSXML2::IXMLDOMDocum
 	{
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 
-		MSXML2::IXMLDOMElement *pParentNode = NULL;
+		IXMLDOMElement *pParentNode = NULL;
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("ApplicationButton"),Button.Name.c_str());
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_COMMAND, Button.Command.c_str());
 		NXMLSettings::AddAttributeToNode(pXMLDom, pParentNode, SETTING_SHOW_NAME_ON_TOOLBAR, NXMLSettings::EncodeBoolValue(Button.ShowNameOnToolbar));

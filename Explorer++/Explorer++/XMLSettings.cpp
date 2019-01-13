@@ -19,13 +19,13 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include <objbase.h>
+#include <MsXml2.h>
 #include "Explorer++.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/XMLSettings.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/Macros.h"
-
-#import <msxml3.dll> raw_interfaces_only
 
 
 #define COLUMN_TYPE_GENERIC			0
@@ -138,12 +138,12 @@ unsigned long hash_setting(unsigned char *str);
 
 BOOL LoadWindowPositionFromXML(WINDOWPLACEMENT *pwndpl)
 {
-	MSXML2::IXMLDOMDocument *pXMLDom;
+	IXMLDOMDocument *pXMLDom;
 	TCHAR szConfigFile[MAX_PATH];
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
+	IXMLDOMNodeList		*pNodes = NULL;
+	IXMLDOMNode			*pNode = NULL;
+	IXMLDOMNamedNodeMap	*am = NULL;
+	IXMLDOMNode			*pChildNode = NULL;
 	BSTR						bstrName;
 	BSTR						bstrValue;
 	BSTR						bstr = NULL;
@@ -243,7 +243,7 @@ clean:
 
 BOOL LoadAllowMultipleInstancesFromXML(void)
 {
-	MSXML2::IXMLDOMDocument *pXMLDom;
+	IXMLDOMDocument *pXMLDom;
 	TCHAR szConfigFile[MAX_PATH];
 	VARIANT_BOOL status;
 	VARIANT var;
@@ -265,10 +265,10 @@ BOOL LoadAllowMultipleInstancesFromXML(void)
 		goto clean;
 
 	BSTR						bstr = NULL;
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pNodeAttribute = NULL;
+	IXMLDOMNodeList		*pNodes = NULL;
+	IXMLDOMNode			*pNode = NULL;
+	IXMLDOMNamedNodeMap	*am = NULL;
+	IXMLDOMNode			*pNodeAttribute = NULL;
 	BSTR						bstrName;
 	BSTR						bstrValue;
 	HRESULT						hr;
@@ -330,13 +330,13 @@ clean:
 	return bAllowMultipleInstances;
 }
 
-void Explorerplusplus::LoadGenericSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+void Explorerplusplus::LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom)
 {
 	BSTR						bstr = NULL;
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pNodeAttribute = NULL;
+	IXMLDOMNodeList		*pNodes = NULL;
+	IXMLDOMNode			*pNode = NULL;
+	IXMLDOMNamedNodeMap	*am = NULL;
+	IXMLDOMNode			*pNodeAttribute = NULL;
 	BSTR						bstrName;
 	BSTR						bstrValue;
 	HRESULT						hr;
@@ -392,11 +392,11 @@ clean:
 	return;
 }
 
-void Explorerplusplus::SaveGenericSettingsToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
+void Explorerplusplus::SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pRoot)
 {
-	MSXML2::IXMLDOMElement					*pe = NULL;
-	MSXML2::IXMLDOMElement					*pParentNode = NULL;
+	IXMLDOMElement					*pe = NULL;
+	IXMLDOMElement					*pParentNode = NULL;
 	BSTR									bstr = NULL;
 	BSTR									bstr_wsnt= SysAllocString(L"\n\t");
 	BSTR									bstr_wsntt = SysAllocString(L"\n\t\t");
@@ -637,14 +637,14 @@ MSXML2::IXMLDOMElement *pRoot)
 	SaveWindowPositionToXML(pXMLDom,pRoot);
 }
 
-int Explorerplusplus::LoadTabSettingsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 {
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	MSXML2::IXMLDOMNode			*pColumnsNode = NULL;
-	MSXML2::IXMLDOMNode			*pColumnNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
+	IXMLDOMNodeList		*pNodes = NULL;
+	IXMLDOMNode			*pNode = NULL;
+	IXMLDOMNode			*pColumnsNode = NULL;
+	IXMLDOMNode			*pColumnNode = NULL;
+	IXMLDOMNamedNodeMap	*am = NULL;
+	IXMLDOMNode			*pChildNode = NULL;
 	BSTR						bstrName;
 	BSTR						bstrValue;
 	BSTR						bstr = NULL;
@@ -828,10 +828,10 @@ clean:
 	return nTabsCreated;
 }
 
-void Explorerplusplus::SaveTabSettingsToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
+void Explorerplusplus::SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pRoot)
 {
-	MSXML2::IXMLDOMElement	*pe = NULL;
+	IXMLDOMElement	*pe = NULL;
 	BSTR					bstr = NULL;
 	BSTR					bstr_wsnt= SysAllocString(L"\n\t");
 
@@ -851,10 +851,10 @@ MSXML2::IXMLDOMElement *pRoot)
 	pe = NULL;
 }
 
-void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe)
+void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe)
 {
-	MSXML2::IXMLDOMElement	*pParentNode = NULL;
-	MSXML2::IXMLDOMElement	*pColumnsNode = NULL;
+	IXMLDOMElement	*pParentNode = NULL;
+	IXMLDOMElement	*pColumnsNode = NULL;
 	TCITEM					tcItem;
 	BSTR					bstr_wsntt = SysAllocString(L"\n\t\t");
 	BSTR					bstr_wsnttt = SysAllocString(L"\n\t\t\t");
@@ -965,10 +965,10 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(MSXML2::IXMLDOMDocument *pXML
 	SysFreeString(bstr_wsnttt);
 }
 
-int Explorerplusplus::LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,std::list<Column_t> *pColumns)
+int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode,std::list<Column_t> *pColumns)
 {
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pAttributeNode = NULL;
+	IXMLDOMNamedNodeMap	*am = NULL;
+	IXMLDOMNode			*pAttributeNode = NULL;
 	Column_t					Column;
 	BSTR						bstrName;
 	BSTR						bstrValue;
@@ -1049,10 +1049,10 @@ int Explorerplusplus::LoadColumnFromXML(MSXML2::IXMLDOMNode *pNode,std::list<Col
 	return iColumnType;
 }
 
-int Explorerplusplus::LoadBookmarksFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+int Explorerplusplus::LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom)
 {
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
+	IXMLDOMNodeList		*pNodes = NULL;
+	IXMLDOMNode			*pNode = NULL;
 	BSTR						bstr = NULL;
 	HRESULT						hr;
 
@@ -1075,10 +1075,10 @@ clean:
 	return 0;
 }
 
-void Explorerplusplus::SaveBookmarksToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
+void Explorerplusplus::SaveBookmarksToXML(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pRoot)
 {
-	MSXML2::IXMLDOMElement		*pe = NULL;
+	IXMLDOMElement		*pe = NULL;
 	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
 	BSTR						bstr;
 
@@ -1100,10 +1100,10 @@ MSXML2::IXMLDOMElement *pRoot)
 	SysFreeString(bstr_wsnt);
 }
 
-int Explorerplusplus::LoadDefaultColumnsFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+int Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
 {
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
+	IXMLDOMNodeList		*pNodes = NULL;
+	IXMLDOMNode			*pNode = NULL;
 	BSTR						bstr = NULL;
 	std::list<Column_t>			ColumnSet;
 	long						length;
@@ -1173,10 +1173,10 @@ clean:
 	return 0;
 }
 
-void Explorerplusplus::SaveDefaultColumnsToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
+void Explorerplusplus::SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pRoot)
 {
-	MSXML2::IXMLDOMElement	*pColumnsNode = NULL;
+	IXMLDOMElement	*pColumnsNode = NULL;
 	BSTR					bstr_wsnt = SysAllocString(L"\n\t");
 	BSTR					bstr;
 
@@ -1195,8 +1195,8 @@ MSXML2::IXMLDOMElement *pRoot)
 	pColumnsNode = NULL;
 }
 
-void Explorerplusplus::SaveDefaultColumnsToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pColumnsNode)
+void Explorerplusplus::SaveDefaultColumnsToXMLInternal(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pColumnsNode)
 {
 	int DEFAULT_INDENT = 2;
 
@@ -1209,11 +1209,11 @@ MSXML2::IXMLDOMElement *pColumnsNode)
 	SaveColumnToXML(pXMLDom,pColumnsNode,&m_MyNetworkPlacesColumnList,_T("NetworkPlaces"),DEFAULT_INDENT);
 }
 
-void Explorerplusplus::SaveColumnToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pColumnsNode, std::list<Column_t> *pColumns,
+void Explorerplusplus::SaveColumnToXML(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pColumnsNode, std::list<Column_t> *pColumns,
 const TCHAR *szColumnSet, int iIndent)
 {
-	MSXML2::IXMLDOMElement		*pColumnNode = NULL;
+	IXMLDOMElement		*pColumnNode = NULL;
 	std::list<Column_t>::iterator	itr;
 	TCHAR						*pszColumnSaveName = NULL;
 	WCHAR						wszIndent[128];
@@ -1251,10 +1251,10 @@ const TCHAR *szColumnSet, int iIndent)
 	SysFreeString(bstr_indent);
 }
 
-void Explorerplusplus::SaveWindowPositionToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
+void Explorerplusplus::SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pRoot)
 {
-	MSXML2::IXMLDOMElement	*pWndPosNode = NULL;
+	IXMLDOMElement	*pWndPosNode = NULL;
 	BSTR					bstr_wsnt = SysAllocString(L"\n\t");
 	BSTR					bstr;
 
@@ -1273,10 +1273,10 @@ MSXML2::IXMLDOMElement *pRoot)
 	pWndPosNode = NULL;
 }
 
-void Explorerplusplus::SaveWindowPositionToXMLInternal(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pWndPosNode)
+void Explorerplusplus::SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pWndPosNode)
 {
-	MSXML2::IXMLDOMElement	*pParentNode = NULL;
+	IXMLDOMElement	*pParentNode = NULL;
 	WINDOWPLACEMENT			wndpl;
 	BSTR					bstr_wsntt = SysAllocString(L"\n\t\t");
 
@@ -1301,12 +1301,12 @@ MSXML2::IXMLDOMElement *pWndPosNode)
 	pParentNode = NULL;
 }
 
-void Explorerplusplus::LoadToolbarInformationFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+void Explorerplusplus::LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom)
 {
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
+	IXMLDOMNodeList		*pNodes = NULL;
+	IXMLDOMNode			*pNode = NULL;
+	IXMLDOMNamedNodeMap	*am = NULL;
+	IXMLDOMNode			*pChildNode = NULL;
 	BSTR						bstrName;
 	BSTR						bstrValue;
 	BSTR						bstr = NULL;
@@ -1388,10 +1388,10 @@ clean:
 	if (pNode) pNode->Release();
 }
 
-void Explorerplusplus::SaveToolbarInformationToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
+void Explorerplusplus::SaveToolbarInformationToXML(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pRoot)
 {
-	MSXML2::IXMLDOMElement	*pe = NULL;
+	IXMLDOMElement	*pe = NULL;
 	BSTR					bstr = NULL;
 	BSTR					bstr_wsnt = SysAllocString(L"\n\t");
 
@@ -1411,10 +1411,10 @@ MSXML2::IXMLDOMElement *pRoot)
 	pe = NULL;
 }
 
-void Explorerplusplus::SaveToolbarInformationToXMLnternal(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pe)
+void Explorerplusplus::SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pe)
 {
-	MSXML2::IXMLDOMElement	*pParentNode = NULL;
+	IXMLDOMElement	*pParentNode = NULL;
 	BSTR					bstr_wsntt = SysAllocString(L"\n\t\t");
 	BSTR					bstr_wsnttt = SysAllocString(L"\n\t\t\t");
 	REBARBANDINFO			rbi;
@@ -1450,10 +1450,10 @@ MSXML2::IXMLDOMElement *pe)
 	SysFreeString(bstr_wsnttt);
 }
 
-void Explorerplusplus::LoadApplicationToolbarFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+void Explorerplusplus::LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom)
 {
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
+	IXMLDOMNodeList		*pNodes = NULL;
+	IXMLDOMNode			*pNode = NULL;
 	BSTR						bstr = NULL;
 	HRESULT						hr;
 
@@ -1476,10 +1476,10 @@ clean:
 	return;
 }
 
-void Explorerplusplus::SaveApplicationToolbarToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
+void Explorerplusplus::SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pRoot)
 {
-	MSXML2::IXMLDOMElement		*pe = NULL;
+	IXMLDOMElement		*pe = NULL;
 	BSTR						bstr_wsnt = SysAllocString(L"\n\t");
 	BSTR						bstr;
 
@@ -1513,7 +1513,7 @@ unsigned long hash_setting(unsigned char *str)
 }
 
 /* Maps attribute name to their corresponding internal variable. */
-void Explorerplusplus::MapAttributeToValue(MSXML2::IXMLDOMNode *pNode,
+void Explorerplusplus::MapAttributeToValue(IXMLDOMNode *pNode,
 WCHAR *wszName,WCHAR *wszValue)
 {
 	unsigned char	szName[512];
@@ -1762,8 +1762,8 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_TOOLBARSTATE:
 		{
-			MSXML2::IXMLDOMNode	*pChildNode = NULL;
-			MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
+			IXMLDOMNode	*pChildNode = NULL;
+			IXMLDOMNamedNodeMap	*am = NULL;
 			ToolbarButton_t	tb;
 			BSTR		bstrName;
 			BSTR		bstrValue;
@@ -1852,8 +1852,8 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_POSITION:
 		{
-			MSXML2::IXMLDOMNode	*pChildNode = NULL;
-			MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
+			IXMLDOMNode	*pChildNode = NULL;
+			IXMLDOMNamedNodeMap	*am = NULL;
 			WINDOWPLACEMENT wndpl;
 			BSTR		bstrName;
 			BSTR		bstrValue;
@@ -2040,8 +2040,8 @@ void Explorerplusplus::CLoadSaveXML::ReleaseLoadEnvironment()
 
 void Explorerplusplus::CLoadSaveXML::InitializeSaveEnvironment()
 {
-	MSXML2::IXMLDOMProcessingInstruction	*pi = NULL;
-	MSXML2::IXMLDOMComment					*pc = NULL;
+	IXMLDOMProcessingInstruction	*pi = NULL;
+	IXMLDOMComment					*pc = NULL;
 	BSTR									bstr = NULL;
 	BSTR									bstr1 = NULL;
 	BSTR									bstr_wsnt = SysAllocString(L"\n\t");

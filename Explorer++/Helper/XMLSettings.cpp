@@ -22,13 +22,13 @@ static const TCHAR BOOL_YES[] = _T("yes");
 static const TCHAR BOOL_NO[] = _T("no");
 
 /* Helper function to create a DOM instance. */
-MSXML2::IXMLDOMDocument *NXMLSettings::DomFromCOM()
+IXMLDOMDocument *NXMLSettings::DomFromCOM()
 {
 	HRESULT					hr;
-	MSXML2::IXMLDOMDocument	*pxmldoc = NULL;
+	IXMLDOMDocument	*pxmldoc = NULL;
 
-	hr = CoCreateInstance(__uuidof(MSXML2::DOMDocument30),NULL,CLSCTX_INPROC_SERVER,
-		__uuidof(MSXML2::IXMLDOMDocument),reinterpret_cast<LPVOID *>(&pxmldoc));
+	hr = CoCreateInstance(__uuidof(DOMDocument30),NULL,CLSCTX_INPROC_SERVER,
+		__uuidof(IXMLDOMDocument),reinterpret_cast<LPVOID *>(&pxmldoc));
 
 	if(SUCCEEDED(hr))
 	{
@@ -41,13 +41,13 @@ MSXML2::IXMLDOMDocument *NXMLSettings::DomFromCOM()
 	return pxmldoc;
 }
 
-void NXMLSettings::WriteStandardSetting(MSXML2::IXMLDOMDocument *pXMLDom,
-	MSXML2::IXMLDOMElement *pGrandparentNode, const TCHAR *szElementName,
+void NXMLSettings::WriteStandardSetting(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement *pGrandparentNode, const TCHAR *szElementName,
 	const TCHAR *szAttributeName, const TCHAR *szAttributeValue)
 {
-	MSXML2::IXMLDOMElement		*pParentNode = NULL;
-	MSXML2::IXMLDOMAttribute	*pa = NULL;
-	MSXML2::IXMLDOMAttribute	*pa1 = NULL;
+	IXMLDOMElement		*pParentNode = NULL;
+	IXMLDOMAttribute	*pa = NULL;
+	IXMLDOMAttribute	*pa1 = NULL;
 	BSTR						bstr = NULL;
 	BSTR						bstr_wsntt = SysAllocString(L"\n\t\t");
 	VARIANT						var;
@@ -108,11 +108,11 @@ VARIANT NXMLSettings::VariantString(const WCHAR *str)
 
 /* Helper function to append a whitespace text node to a
 specified element. */
-void NXMLSettings::AddWhiteSpaceToNode(MSXML2::IXMLDOMDocument* pDom,
-	BSTR bstrWs, MSXML2::IXMLDOMNode *pNode)
+void NXMLSettings::AddWhiteSpaceToNode(IXMLDOMDocument* pDom,
+	BSTR bstrWs, IXMLDOMNode *pNode)
 {
-	MSXML2::IXMLDOMText	*pws = NULL;
-	MSXML2::IXMLDOMNode	*pBuf = NULL;
+	IXMLDOMText	*pws = NULL;
+	IXMLDOMNode	*pBuf = NULL;
 
 	HRESULT hr = pDom->createTextNode(bstrWs,&pws);
 
@@ -134,19 +134,19 @@ clean:
 }
 
 /* Helper function to append a child to a parent node. */
-void NXMLSettings::AppendChildToParent(MSXML2::IXMLDOMNode *pChild, MSXML2::IXMLDOMNode *pParent)
+void NXMLSettings::AppendChildToParent(IXMLDOMNode *pChild, IXMLDOMNode *pParent)
 {
-	MSXML2::IXMLDOMNode	*pNode = NULL;
+	IXMLDOMNode	*pNode = NULL;
 	pParent->appendChild(pChild, &pNode);
 	SafeRelease(&pNode);
 }
 
-void NXMLSettings::AddAttributeToNode(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pParentNode,const WCHAR *wszAttributeName,
+void NXMLSettings::AddAttributeToNode(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pParentNode,const WCHAR *wszAttributeName,
 const WCHAR *wszAttributeValue)
 {
-	MSXML2::IXMLDOMAttribute	*pa = NULL;
-	MSXML2::IXMLDOMAttribute	*pa1 = NULL;
+	IXMLDOMAttribute	*pa = NULL;
+	IXMLDOMAttribute	*pa1 = NULL;
 	BSTR						bstr = NULL;
 	VARIANT						var;
 
@@ -173,8 +173,8 @@ const WCHAR *wszAttributeValue)
 	VariantClear(&var);
 }
 
-void NXMLSettings::AddStringListToNode(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pParentNode,const TCHAR *szBaseKeyName,
+void NXMLSettings::AddStringListToNode(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pParentNode,const TCHAR *szBaseKeyName,
 	const std::list<std::wstring> &strList)
 {
 	TCHAR szNode[64];
@@ -189,17 +189,17 @@ MSXML2::IXMLDOMElement *pParentNode,const TCHAR *szBaseKeyName,
 	}
 }
 
-void NXMLSettings::CreateElementNode(MSXML2::IXMLDOMDocument *pXMLDom,
-	MSXML2::IXMLDOMElement **pParentNode,
-	MSXML2::IXMLDOMElement *pGrandparentNode, const WCHAR *szElementName,
+void NXMLSettings::CreateElementNode(IXMLDOMDocument *pXMLDom,
+	IXMLDOMElement **pParentNode,
+	IXMLDOMElement *pGrandparentNode, const WCHAR *szElementName,
 	const WCHAR *szAttributeName)
 {
 	BSTR bstrElement = NULL;
 	BSTR bstrName = NULL;
 	VARIANT var;
 	bool varInitialized = false;
-	MSXML2::IXMLDOMAttribute *pa = NULL;
-	MSXML2::IXMLDOMAttribute *pa1 = NULL;
+	IXMLDOMAttribute *pa = NULL;
+	IXMLDOMAttribute *pa1 = NULL;
 	HRESULT hr;
 
 	bstrElement = SysAllocString(szElementName);
@@ -292,10 +292,10 @@ int NXMLSettings::DecodeIntValue(WCHAR *wszValue)
 	return _wtoi(wszValue);
 }
 
-COLORREF NXMLSettings::ReadXMLColorData(MSXML2::IXMLDOMNode *pNode)
+COLORREF NXMLSettings::ReadXMLColorData(IXMLDOMNode *pNode)
 {
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
+	IXMLDOMNode			*pChildNode = NULL;
+	IXMLDOMNamedNodeMap	*am = NULL;
 	BSTR						bstrName;
 	BSTR						bstrValue;
 	long						lChildNodes;
@@ -339,10 +339,10 @@ COLORREF NXMLSettings::ReadXMLColorData(MSXML2::IXMLDOMNode *pNode)
 	return RGB(r,g,b);
 }
 
-Gdiplus::Color NXMLSettings::ReadXMLColorData2(MSXML2::IXMLDOMNode *pNode)
+Gdiplus::Color NXMLSettings::ReadXMLColorData2(IXMLDOMNode *pNode)
 {
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
+	IXMLDOMNode			*pChildNode = NULL;
+	IXMLDOMNamedNodeMap	*am = NULL;
 	Gdiplus::Color				color;
 	BSTR						bstrName;
 	BSTR						bstrValue;
@@ -384,10 +384,10 @@ Gdiplus::Color NXMLSettings::ReadXMLColorData2(MSXML2::IXMLDOMNode *pNode)
 	return color;
 }
 
-HFONT NXMLSettings::ReadXMLFontData(MSXML2::IXMLDOMNode *pNode)
+HFONT NXMLSettings::ReadXMLFontData(IXMLDOMNode *pNode)
 {
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
+	IXMLDOMNode			*pChildNode = NULL;
+	IXMLDOMNamedNodeMap	*am = NULL;
 	LOGFONT						FontInfo;
 	BSTR						bstrName;
 	BSTR						bstrValue;

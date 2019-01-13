@@ -1,11 +1,11 @@
 #pragma once
 
+#include <objbase.h>
+#include <MsXml2.h>
 #include <vector>
 #include "Explorer++_internal.h"
 #include "ApplicationToolbarDropHandler.h"
 #include "../Helper/BaseWindow.h"
-
-#import <msxml3.dll> raw_interfaces_only
 
 class CApplicationToolbar;
 class CApplicationToolbarDropHandler;
@@ -30,8 +30,8 @@ public:
 	void	SaveRegistrySettings(HKEY hParentKey);
 	void	LoadRegistrySettings(HKEY hParentKey);
 
-	void	SaveXMLSettings(MSXML2::IXMLDOMDocument *pXMLDom,MSXML2::IXMLDOMElement *pe);
-	void	LoadXMLSettings(MSXML2::IXMLDOMNode *pNode);
+	void	SaveXMLSettings(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe);
+	void	LoadXMLSettings(IXMLDOMNode *pNode);
 
 private:
 

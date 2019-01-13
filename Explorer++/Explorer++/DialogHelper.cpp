@@ -95,12 +95,12 @@ void Explorerplusplus::SaveDialogStatesToRegistry(void)
 	}
 }
 
-void Explorerplusplus::LoadDialogStatesFromXML(MSXML2::IXMLDOMDocument *pXMLDom)
+void Explorerplusplus::LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom)
 {
-	MSXML2::IXMLDOMNodeList		*pNodes = NULL;
-	MSXML2::IXMLDOMNode			*pNode = NULL;
-	MSXML2::IXMLDOMNamedNodeMap	*am = NULL;
-	MSXML2::IXMLDOMNode			*pChildNode = NULL;
+	IXMLDOMNodeList		*pNodes = NULL;
+	IXMLDOMNode			*pNode = NULL;
+	IXMLDOMNamedNodeMap	*am = NULL;
+	IXMLDOMNode			*pChildNode = NULL;
 	BSTR						bstrName;
 	BSTR						bstrValue;
 	BSTR						bstr = NULL;
@@ -180,10 +180,10 @@ clean:
 	if (pNode) pNode->Release();
 }
 
-void Explorerplusplus::SaveDialogStatesToXML(MSXML2::IXMLDOMDocument *pXMLDom,
-MSXML2::IXMLDOMElement *pRoot)
+void Explorerplusplus::SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom,
+IXMLDOMElement *pRoot)
 {
-	MSXML2::IXMLDOMElement	*pe = NULL;
+	IXMLDOMElement	*pe = NULL;
 	BSTR					bstr = NULL;
 	BSTR					bstr_wsnt = SysAllocString(L"\n\t");
 
