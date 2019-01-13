@@ -32,11 +32,11 @@ const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookma
 
 CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,
 	CBookmarkFolder &AllBookmarks,CBookmark &Bookmark) :
-m_AllBookmarks(AllBookmarks),
-m_Bookmark(Bookmark),
-m_bNewFolderCreated(false),
-m_ErrorBrush(CreateSolidBrush(ERROR_BACKGROUND_COLOR)),
-CBaseDialog(hInstance,iResource,hParent,true)
+	CBaseDialog(hInstance, iResource, hParent, true),
+	m_AllBookmarks(AllBookmarks),
+	m_Bookmark(Bookmark),
+	m_bNewFolderCreated(false),
+	m_ErrorBrush(CreateSolidBrush(ERROR_BACKGROUND_COLOR))
 {
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
 

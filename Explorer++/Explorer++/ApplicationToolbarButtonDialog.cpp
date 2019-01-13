@@ -18,9 +18,9 @@
 
 CApplicationToolbarButtonDialog::CApplicationToolbarButtonDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,ApplicationButton_t *Button,bool IsNew) :
-m_Button(Button),
-m_IsNew(IsNew),
-CBaseDialog(hInstance,iResource,hParent,false)
+	CBaseDialog(hInstance, iResource, hParent, false),
+	m_Button(Button),
+	m_IsNew(IsNew)
 {
 	
 }
