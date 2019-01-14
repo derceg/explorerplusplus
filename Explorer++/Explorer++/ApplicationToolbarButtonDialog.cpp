@@ -104,7 +104,7 @@ INT_PTR CApplicationToolbarButtonDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 void CApplicationToolbarButtonDialog::OnChooseFile()
 {
 	/* TODO: Text needs to be localized. */
-	TCHAR *Filter = _T("Programs (*.exe)\0*.exe\0All Files\0*.*\0\0");
+	const TCHAR *Filter = _T("Programs (*.exe)\0*.exe\0All Files\0*.*\0\0");
 	TCHAR FullFileName[MAX_PATH] = EMPTY_STRING;
 
 	OPENFILENAME ofn;
