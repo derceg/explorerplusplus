@@ -13,7 +13,6 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <vector>
 #include "FileActionHandler.h"
 #include "../Helper/FileOperations.h"
 
@@ -25,61 +24,48 @@ CFileActionHandler::CFileActionHandler()
 
 CFileActionHandler::~CFileActionHandler()
 {
-	while(m_stackFileActions.size() > 0)
-	{
-		UndoItem_t UndoItem = m_stackFileActions.top();
-		m_stackFileActions.pop();
 
-		delete UndoItem.pInfo;
-	}
 }
 
-BOOL CFileActionHandler::RenameFiles(const std::list<RenamedItem_t> &ItemList)
+BOOL CFileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 {
-	std::list<RenamedItem_t> *pRenamedItemList = new std::list<RenamedItem_t>;
+	RenamedItems_t renamedItems;
 
-	for(const auto &Item : ItemList)
+	for(const auto &item : itemList)
 	{
-		BOOL bRes = NFileOperations::RenameFile(Item.strOldFilename,Item.strNewFilename);
+		BOOL bRes = NFileOperations::RenameFile(item.strOldFilename,item.strNewFilename);
 
 		if(bRes)
 		{
-			RenamedItem_t RenamedItem;
-			RenamedItem.strOldFilename = Item.strOldFilename;
-			RenamedItem.strNewFilename = Item.strNewFilename;
-			pRenamedItemList->push_back(RenamedItem);
+			renamedItems.push_back(item);
 		}
 	}
 
 	/* Only store an undo operation if at least one
 	file was actually renamed. */
-	if(pRenamedItemList->size() > 0)
+	if(renamedItems.size() > 0)
 	{
 		UndoItem_t UndoItem;
 		UndoItem.Type = FILE_ACTION_RENAMED;
-		UndoItem.pInfo = reinterpret_cast<void *>(pRenamedItemList);
+		UndoItem.renamedItems = renamedItems;	
 		m_stackFileActions.push(UndoItem);
 
 		return TRUE;
 	}
 
-	delete pRenamedItemList;
-
 	return FALSE;
 }
 
-BOOL CFileActionHandler::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,
+BOOL CFileActionHandler::DeleteFiles(HWND hwnd,const DeletedItems_t &fullFilenameList,
 	BOOL bPermanent,BOOL bSilent)
 {
-	BOOL bRes = NFileOperations::DeleteFiles(hwnd,FullFilenameList,bPermanent,bSilent);
+	BOOL bRes = NFileOperations::DeleteFiles(hwnd,fullFilenameList,bPermanent,bSilent);
 
 	if(bRes)
 	{
-		std::list<std::wstring> *pDeletedItemList = new std::list<std::wstring>(FullFilenameList);
-
 		UndoItem_t UndoItem;
 		UndoItem.Type = FILE_ACTION_DELETED;
-		UndoItem.pInfo = reinterpret_cast<void *>(pDeletedItemList);
+		UndoItem.deletedItems = DeletedItems_t(fullFilenameList);
 		m_stackFileActions.push(UndoItem);
 	}
 
@@ -90,15 +76,12 @@ void CFileActionHandler::Undo()
 {
 	if(!m_stackFileActions.empty())
 	{
-		UndoItem_t UndoItem = m_stackFileActions.top();
-		m_stackFileActions.pop();
+		UndoItem_t &undoItem = m_stackFileActions.top();
 
-		assert(UndoItem.pInfo != NULL);
-
-		switch(UndoItem.Type)
+		switch(undoItem.Type)
 		{
 		case FILE_ACTION_RENAMED:
-			UndoRenameOperation(*(reinterpret_cast<std::list<RenamedItem_t> *>(UndoItem.pInfo)));
+			UndoRenameOperation(undoItem.renamedItems);
 			break;
 
 		case FILE_ACTION_COPIED:
@@ -108,21 +91,21 @@ void CFileActionHandler::Undo()
 			break;
 
 		case FILE_ACTION_DELETED:
-			UndoDeleteOperation(*(reinterpret_cast<std::list<std::wstring> *>(UndoItem.pInfo)));
+			UndoDeleteOperation(undoItem.deletedItems);
 			break;
 		}
 
-		delete UndoItem.pInfo;
+		m_stackFileActions.pop();
 	}
 }
 
-void CFileActionHandler::UndoRenameOperation(const std::list<RenamedItem_t> &RenamedItemList)
+void CFileActionHandler::UndoRenameOperation(const RenamedItems_t &renamedItemList)
 {
-	std::list<RenamedItem_t> UndoList;
+	RenamedItems_t UndoList;
 
 	/* When undoing a rename operation, the new name
 	becomes the old name, and vice versa. */
-	for(const auto &RenamedItem : RenamedItemList)
+	for(const auto &RenamedItem : renamedItemList)
 	{
 		RenamedItem_t UndoItem;
 		UndoItem.strOldFilename = RenamedItem.strNewFilename;
@@ -133,9 +116,9 @@ void CFileActionHandler::UndoRenameOperation(const std::list<RenamedItem_t> &Ren
 	RenameFiles(UndoList);
 }
 
-void CFileActionHandler::UndoDeleteOperation(const std::list<std::wstring> &DeletedItemList)
+void CFileActionHandler::UndoDeleteOperation(const DeletedItems_t &deletedItemList)
 {
-	UNREFERENCED_PARAMETER(DeletedItemList);
+	UNREFERENCED_PARAMETER(deletedItemList);
 
 	/* Move the file back out of the recycle bin,
 	and push a delete action back onto the stack.
