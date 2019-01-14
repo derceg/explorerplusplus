@@ -44,6 +44,8 @@ Bug fixes:
   in the same month/year as the current date. Fixed.
 - When opening the set file attributes dialog, the creation date
   shown was incorrect. Fixed.
+- The set file attributes dialog wasn't correctly handling the
+  case where an attribute checkbox was indeterminate. Fixed.
 - There was an issue that meant that the group sorting direction
   in one tab could affect the group sorting order in other tabs.
   Fixed.

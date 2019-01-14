@@ -285,7 +285,7 @@ void CSetFileAttributesDialog::OnOk()
 	attributes (i.e. those that are active for all files).
 	Any attributes which are indeterminate will not change
 	(note that they are per-file). */
-	for(auto Attribute : m_AttributeList)
+	for(auto &Attribute : m_AttributeList)
 	{
 		Attribute.uChecked = static_cast<UINT>(SendMessage(GetDlgItem(m_hDlg,
 			Attribute.uControlId),BM_GETCHECK,0,0));
