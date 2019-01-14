@@ -1,10 +1,11 @@
 #pragma once
 
-#include <list>
-#include <string>
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
+#include <list>
+#include <string>
+#include <unordered_map>
 
 class CSplitFileDialog;
 

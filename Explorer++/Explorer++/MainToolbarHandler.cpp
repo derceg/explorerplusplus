@@ -13,9 +13,9 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "DefaultToolbarButtons.h"
 #include "Explorer++_internal.h"
 #include "MainImages.h"
-#include "DefaultToolbarButtons.h"
 #include "MainResource.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Macros.h"

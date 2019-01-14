@@ -12,14 +12,14 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
 #include "Explorer++.h"
+#include "MainResource.h"
+#include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
-#include "MainResource.h"
+#include <list>
 
 
 /*

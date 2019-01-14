@@ -1,10 +1,11 @@
 #pragma once
 
+#include "Explorer++_internal.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
-#include <objbase.h>
+#include "../Helper/ResizableDialog.h"
 #include <MsXml2.h>
+#include <objbase.h>
 
 class CFilterDialog;
 

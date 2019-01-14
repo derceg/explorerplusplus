@@ -15,8 +15,9 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <stdexcept>
-#include <vector>
+#include "UpdateCheckDialog.h"
+#include "MainResource.h"
+#include "Version.h"
 #include <boost\algorithm\string.hpp>
 
 #pragma warning(push)
@@ -24,9 +25,8 @@
 #include <boost\lexical_cast.hpp>
 #pragma warning(pop)
 
-#include "UpdateCheckDialog.h"
-#include "MainResource.h"
-#include "Version.h"
+#include <stdexcept>
+#include <vector>
 
 
 const TCHAR CUpdateCheckDialogPersistentSettings::SETTINGS_KEY[] = _T("UpdateCheck");

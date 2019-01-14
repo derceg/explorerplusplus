@@ -12,17 +12,17 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <algorithm>
-#include "Explorer++_internal.h"
 #include "SetDefaultColumnsDialog.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ShellBrowser/iShellView.h"
 #include "../Helper/Helper.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/RegistrySettings.h"
-#include "../Helper/XMLSettings.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/RegistrySettings.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/XMLSettings.h"
+#include <algorithm>
 
 
 const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SetDefaultColumns");

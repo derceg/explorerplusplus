@@ -63,6 +63,7 @@
 #include <sstream>
 #pragma warning(pop)
 
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 #include <memory>
+#include <vector>

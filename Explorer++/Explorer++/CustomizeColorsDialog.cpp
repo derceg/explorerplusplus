@@ -12,15 +12,15 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Explorer++_internal.h"
-#include "MainImages.h"
 #include "CustomizeColorsDialog.h"
 #include "ColorRuleDialog.h"
+#include "Explorer++_internal.h"
+#include "MainImages.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/WindowHelper.h"
 
 
 const TCHAR CCustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("CustomizeColors");

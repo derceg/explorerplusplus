@@ -15,13 +15,13 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/Controls.h"
-#include "../Helper/RegistrySettings.h"
-#include "../Helper/ProcessHelper.h"
-#include "../Helper/WindowHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/Logging.h"
+#include "../Helper/Macros.h"
+#include "../Helper/ProcessHelper.h"
+#include "../Helper/RegistrySettings.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/WindowHelper.h"
 
 
 /* The treeview is offset by a small

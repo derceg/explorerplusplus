@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Explorer++_internal.h"
+#include "HardwareChangeNotifier.h"
+#include "../Helper/BaseWindow.h"
+#include "../Helper/FileContextMenuManager.h"
+#include <boost\serialization\strong_typedef.hpp>
 #include <list>
 #include <unordered_map>
-#include <boost\serialization\strong_typedef.hpp>
-#include "HardwareChangeNotifier.h"
-#include "../Helper/FileContextMenuManager.h"
-#include "../Helper/BaseWindow.h"
 
 class CDrivesToolbar : public CBaseWindow, public IFileContextMenuExternal, public NHardwareChangeNotifier::INotification
 {

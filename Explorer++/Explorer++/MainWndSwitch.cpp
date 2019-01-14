@@ -15,17 +15,17 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AddBookmarkDialog.h"
-#include "ManageBookmarksDialog.h"
-#include "IModelessDialogNotification.h"
-#include "ModelessDialogs.h"
 #include "HolderWindow.h"
+#include "IModelessDialogNotification.h"
 #include "MainResource.h"
+#include "ManageBookmarksDialog.h"
+#include "ModelessDialogs.h"
 #include "../DisplayWindow/DisplayWindow.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/ListViewHelper.h"
 #include "../Helper/Controls.h"
-#include "../Helper/WindowHelper.h"
+#include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/WindowHelper.h"
 
 
 static const int FOLDER_SIZE_LINE_INDEX = 1;

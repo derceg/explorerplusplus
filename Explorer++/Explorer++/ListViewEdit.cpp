@@ -12,8 +12,8 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Explorer++_internal.h"
 #include "ListViewEdit.h"
+#include "Explorer++_internal.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 

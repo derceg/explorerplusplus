@@ -12,10 +12,10 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Explorer++_internal.h"
 #include "IModelessDialogNotification.h"
-#include "ModelessDialogs.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "ModelessDialogs.h"
 
 
 CModelessDialogNotification::CModelessDialogNotification() :

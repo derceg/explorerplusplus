@@ -17,16 +17,16 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
-#include <regex>
-#include <iomanip>
+#include "MassRenameDialog.h"
 #include "Explorer++_internal.h"
 #include "MainImages.h"
-#include "MassRenameDialog.h"
 #include "MainResource.h"
+#include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
-#include "../Helper/Macros.h"
+#include <iomanip>
+#include <list>
+#include <regex>
 
 
 const TCHAR CMassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename");

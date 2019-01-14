@@ -16,9 +16,9 @@
 #include "ColorRuleHelper.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
-#include "../Helper/XMLSettings.h"
-#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/WindowHelper.h"
+#include "../Helper/XMLSettings.h"
 
 
 namespace NColorRuleDialog

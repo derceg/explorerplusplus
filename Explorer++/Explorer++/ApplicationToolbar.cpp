@@ -19,17 +19,17 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <boost\algorithm\string.hpp>
-#include "Explorer++_internal.h"
-#include "ApplicationToolbarDropHandler.h"
-#include "ApplicationToolbarButtonDialog.h"
 #include "ApplicationToolbar.h"
+#include "ApplicationToolbarButtonDialog.h"
+#include "ApplicationToolbarDropHandler.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/RegistrySettings.h"
-#include "../Helper/XMLSettings.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
+#include "../Helper/RegistrySettings.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/XMLSettings.h"
+#include <boost\algorithm\string.hpp>
 
 
 const TCHAR CApplicationToolbarPersistentSettings::SETTING_NAME[] = _T("Name");

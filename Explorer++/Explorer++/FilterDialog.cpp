@@ -12,15 +12,15 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
+#include "FilterDialog.h"
 #include "Explorer++_internal.h"
 #include "MainImages.h"
-#include "FilterDialog.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
+#include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
-#include "../Helper/Macros.h"
+#include <list>
 
 
 const TCHAR CFilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");

@@ -15,13 +15,13 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "HolderWindow.h"
-#include "SetFileAttributesDialog.h"
 #include "MainResource.h"
-#include "../Helper/ShellHelper.h"
+#include "SetFileAttributesDialog.h"
+#include "../Helper/Controls.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
 
 
 #define TREEVIEW_FOLDER_OPEN_DELAY	500

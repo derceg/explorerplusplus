@@ -12,22 +12,22 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <regex>
-#include "Explorer++_internal.h"
-#include "MainImages.h"
 #include "SearchDialog.h"
 #include "DialogHelper.h"
+#include "Explorer++_internal.h"
+#include "MainImages.h"
 #include "MainResource.h"
+#include "../Helper/BaseDialog.h"
+#include "../Helper/ComboBox.h"
+#include "../Helper/Controls.h"
+#include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
+#include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/BaseDialog.h"
-#include "../Helper/FileContextMenuManager.h"
-#include "../Helper/XMLSettings.h"
-#include "../Helper/ComboBox.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/Controls.h"
-#include "../Helper/Macros.h"
+#include "../Helper/XMLSettings.h"
+#include <regex>
 
 
 namespace NSearchDialog

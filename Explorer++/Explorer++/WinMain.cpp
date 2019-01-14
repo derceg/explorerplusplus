@@ -15,16 +15,16 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "Logging.h"
+#include "MainResource.h"
 #include "ModelessDialogs.h"
 #include "RegistrySettings.h"
 #include "Version.h"
 #include "XMLSettings.h"
-#include "MainResource.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/SetDefaultFileManager.h"
-#include "../Helper/ProcessHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/Logging.h"
+#include "../Helper/Macros.h"
+#include "../Helper/ProcessHelper.h"
+#include "../Helper/SetDefaultFileManager.h"
+#include "../Helper/ShellHelper.h"
 
 
 /* Default window size/position. */

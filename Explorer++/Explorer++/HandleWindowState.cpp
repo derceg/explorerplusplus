@@ -13,18 +13,18 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
-#include <shobjidl.h>
 #include "Explorer++.h"
 #include "MainResource.h"
+#include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Controls.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/MenuHelper.h"
-#include "../Helper/TabHelper.h"
-#include "../Helper/ProcessHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/MenuHelper.h"
+#include "../Helper/ProcessHelper.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/TabHelper.h"
+#include <shobjidl.h>
+#include <list>
 
 
 /* Tab icons. */

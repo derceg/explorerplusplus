@@ -1,12 +1,13 @@
 #pragma once
 
-#include <objbase.h>
+#include "Explorer++_internal.h"
+#include "../Helper/BaseDialog.h"
+#include "../Helper/DialogSettings.h"
+#include "../Helper/ResizableDialog.h"
 #include <MsXml2.h>
+#include <objbase.h>
 #include <list>
 #include <string>
-#include "../Helper/BaseDialog.h"
-#include "../Helper/ResizableDialog.h"
-#include "../Helper/DialogSettings.h"
 
 class CWildcardSelectDialog;
 

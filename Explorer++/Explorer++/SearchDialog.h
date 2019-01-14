@@ -1,17 +1,18 @@
 #pragma once
 
-#include <objbase.h>
-#include <MsXml2.h>
-#include <list>
-#include <vector>
-#include <string>
-#include <regex>
-#include <unordered_map>
-#include <boost/circular_buffer.hpp>
+#include "Explorer++_internal.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
-#include "../Helper/ReferenceCount.h"
 #include "../Helper/FileContextMenuManager.h"
+#include "../Helper/ReferenceCount.h"
+#include <boost/circular_buffer.hpp>
+#include <MsXml2.h>
+#include <objbase.h>
+#include <list>
+#include <regex>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 class CSearchDialog;
 

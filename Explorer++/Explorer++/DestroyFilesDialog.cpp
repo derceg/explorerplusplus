@@ -12,12 +12,12 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Explorer++_internal.h"
 #include "DestroyFilesDialog.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
-#include "../Helper/Macros.h"
 
 
 const TCHAR CDestroyFilesDialogPersistentSettings::SETTINGS_KEY[] = _T("DestroyFiles");

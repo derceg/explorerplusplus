@@ -17,10 +17,10 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "MainResource.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/ProcessHelper.h"
-#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ProcessHelper.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/WindowHelper.h"
 
 
 namespace

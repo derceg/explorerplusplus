@@ -15,15 +15,15 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
-#include "Explorer++_internal.h"
 #include "AboutDialog.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "Version.h"
-#include "../Helper/Helper.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/WindowHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/WindowHelper.h"
+#include <list>
 
 
 CAboutDialog::CAboutDialog(HINSTANCE hInstance,int iResource,HWND hParent) :

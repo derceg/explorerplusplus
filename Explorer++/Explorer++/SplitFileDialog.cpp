@@ -13,17 +13,17 @@
  *****************************************************************/
 
 #include "stdafx.h"
+#include "SplitFileDialog.h"
+#include "Explorer++_internal.h"
+#include "MainResource.h"
+#include "../Helper/FileOperations.h"
+#include "../Helper/Helper.h"
+#include "../Helper/Macros.h"
+#include "../Helper/RegistrySettings.h"
+#include "../Helper/WindowHelper.h"
+#include "../Helper/XMLSettings.h"
 #include <comdef.h>
 #include <unordered_map>
-#include "Explorer++_internal.h"
-#include "SplitFileDialog.h"
-#include "MainResource.h"
-#include "../Helper/Helper.h"
-#include "../Helper/RegistrySettings.h"
-#include "../Helper/XMLSettings.h"
-#include "../Helper/FileOperations.h"
-#include "../Helper/WindowHelper.h"
-#include "../Helper/Macros.h"
 
 
 namespace NSplitFileDialog

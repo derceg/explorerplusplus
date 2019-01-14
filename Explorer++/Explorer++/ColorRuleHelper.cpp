@@ -14,14 +14,14 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <comdef.h>
-#include <vector>
-#include "Explorer++_internal.h"
 #include "ColorRuleHelper.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
-#include "../Helper/Macros.h"
+#include <comdef.h>
+#include <vector>
 
 
 namespace

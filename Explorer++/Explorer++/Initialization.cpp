@@ -13,19 +13,19 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
-#include <map>
 #include "Explorer++.h"
-#include "MainImages.h"
-#include "CustomizeColorsDialog.h"
 #include "BookmarkHelper.h"
+#include "CustomizeColorsDialog.h"
+#include "MainImages.h"
+#include "MainResource.h"
 #include "../DisplayWindow/DisplayWindow.h"
+#include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Controls.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
-#include "MainResource.h"
+#include <list>
+#include <map>
 
 
 DWORD WINAPI WorkerThreadProc(LPVOID pParam);

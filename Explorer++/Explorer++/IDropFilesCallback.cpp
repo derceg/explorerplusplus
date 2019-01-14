@@ -13,8 +13,8 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
 #include "IDropFilesCallback.h"
+#include <list>
 
 
 CDropFilesCallback::CDropFilesCallback(IExplorerplusplus *pexpp) :

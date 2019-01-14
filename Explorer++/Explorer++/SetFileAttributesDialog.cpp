@@ -14,11 +14,11 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
 #include "SetFileAttributesDialog.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
 #include "../Helper/TimeHelper.h"
+#include <list>
 
 
 const TCHAR CSetFileAttributesDialogPersistentSettings::SETTINGS_KEY[] = _T("SetFileAttributes");

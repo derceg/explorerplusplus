@@ -14,11 +14,11 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/iDropSource.h"
 #include "../Helper/Controls.h"
 #include "../Helper/iDataObject.h"
+#include "../Helper/iDropSource.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
 
 
 LRESULT CALLBACK EditSubclassStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);

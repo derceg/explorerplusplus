@@ -14,16 +14,16 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "Explorer++_internal.h"
+#include "ApplicationToolbar.h"
 #include "BookmarksToolbar.h"
 #include "DrivesToolbar.h"
-#include "ApplicationToolbar.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Controls.h"
-#include "../Helper/WindowHelper.h"
+#include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/WindowHelper.h"
 
 
 static const int TOOLBAR_BOOKMARK_START = TOOLBAR_ID_START + 1000;

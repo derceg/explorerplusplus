@@ -13,21 +13,21 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
-#include <shobjidl.h>
 #include "Explorer++.h"
-#include "SelectColumnsDialog.h"
 #include "DefaultColumns.h"
 #include "MainResource.h"
+#include "SelectColumnsDialog.h"
+#include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
-#include "../Helper/Controls.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/ProcessHelper.h"
-#include "../Helper/WindowHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/Logging.h"
+#include "../Helper/Macros.h"
+#include "../Helper/ProcessHelper.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/WindowHelper.h"
+#include <shobjidl.h>
+#include <list>
 
 
 void Explorerplusplus::ValidateLoadedSettings(void)

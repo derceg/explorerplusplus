@@ -12,14 +12,14 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <regex>
-#include "Explorer++_internal.h"
 #include "MergeFilesDialog.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/FileOperations.h"
 #include "../Helper/Macros.h"
+#include <regex>
 
 
 namespace NMergeFilesDialog

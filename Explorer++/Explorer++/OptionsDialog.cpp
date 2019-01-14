@@ -20,15 +20,15 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "MainImages.h"
+#include "MainResource.h"
 #include "ModelessDialogs.h"
 #include "SetDefaultColumnsDialog.h"
-#include "MainResource.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/ProcessHelper.h"
-#include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ProcessHelper.h"
+#include "../Helper/SetDefaultFileManager.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/WindowHelper.h"
 
 
 #define NUM_DIALOG_OPTIONS_PAGES	5

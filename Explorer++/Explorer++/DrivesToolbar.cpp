@@ -12,14 +12,14 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Explorer++_internal.h"
 #include "DrivesToolbar.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileContextMenuManager.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
 
 
 CDrivesToolbar *CDrivesToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp)

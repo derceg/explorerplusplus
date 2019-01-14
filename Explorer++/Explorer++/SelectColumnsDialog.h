@@ -1,8 +1,9 @@
 #pragma once
 
+#include "Explorer++_internal.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
+#include "../Helper/ResizableDialog.h"
 
 class CSelectColumnsDialog;
 

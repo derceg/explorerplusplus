@@ -12,11 +12,11 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
 #include "DisplayColoursDialog.h"
 #include "MainResource.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/Macros.h"
+#include <list>
 
 
 const TCHAR CDisplayColoursDialogPersistentSettings::SETTINGS_KEY[] = _T("DisplayColors");
