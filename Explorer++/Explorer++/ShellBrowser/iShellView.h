@@ -736,7 +736,7 @@ private:
 
 	/* Stores a WIN32_FIND_DATA structure for each file.
 	Only valid for 'real' files. */
-	std::unordered_map<int, WIN32_FIND_DATA> m_pwfdFiles;
+	std::unordered_map<int, WIN32_FIND_DATA> m_fileInfoMap;
 
 	/* Stores various extra information on files, such
 	as display name. */

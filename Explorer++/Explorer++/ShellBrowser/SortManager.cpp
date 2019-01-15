@@ -62,8 +62,8 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 {
 	int ComparisonResult = 0;
 
-	bool IsFolder1 = ((m_pwfdFiles.at(InternalIndex1).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
-	bool IsFolder2 = ((m_pwfdFiles.at(InternalIndex2).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder1 = ((m_fileInfoMap.at(InternalIndex1).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder2 = ((m_fileInfoMap.at(InternalIndex2).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	
 	/* Folders will always be sorted separately from files,
 	except in the recycle bin. */
@@ -390,8 +390,8 @@ int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) co
 
 int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) const
 {
-	bool IsFolder1 = ((m_pwfdFiles.at(InternalIndex1).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
-	bool IsFolder2 = ((m_pwfdFiles.at(InternalIndex2).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder1 = ((m_fileInfoMap.at(InternalIndex1).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder2 = ((m_fileInfoMap.at(InternalIndex2).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	
 	if(IsFolder1 && IsFolder2)
 	{
@@ -405,8 +405,8 @@ int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) co
 		}
 	}
 
-	ULARGE_INTEGER FileSize1 = {m_pwfdFiles.at(InternalIndex1).nFileSizeLow,m_pwfdFiles.at(InternalIndex1).nFileSizeHigh};
-	ULARGE_INTEGER FileSize2 = {m_pwfdFiles.at(InternalIndex2).nFileSizeLow,m_pwfdFiles.at(InternalIndex2).nFileSizeHigh};
+	ULARGE_INTEGER FileSize1 = {m_fileInfoMap.at(InternalIndex1).nFileSizeLow,m_fileInfoMap.at(InternalIndex1).nFileSizeHigh};
+	ULARGE_INTEGER FileSize2 = {m_fileInfoMap.at(InternalIndex2).nFileSizeLow,m_fileInfoMap.at(InternalIndex2).nFileSizeHigh};
 
 	if(FileSize1.QuadPart > FileSize2.QuadPart)
 	{
@@ -458,15 +458,15 @@ int CALLBACK CShellBrowser::SortByDate(int InternalIndex1,int InternalIndex2,Dat
 	switch(DateType)
 	{
 	case DATE_TYPE_CREATED:
-		return CompareFileTime(&m_pwfdFiles.at(InternalIndex1).ftCreationTime,&m_pwfdFiles.at(InternalIndex2).ftCreationTime);
+		return CompareFileTime(&m_fileInfoMap.at(InternalIndex1).ftCreationTime,&m_fileInfoMap.at(InternalIndex2).ftCreationTime);
 		break;
 
 	case DATE_TYPE_MODIFIED:
-		return CompareFileTime(&m_pwfdFiles.at(InternalIndex1).ftLastWriteTime,&m_pwfdFiles.at(InternalIndex2).ftLastWriteTime);
+		return CompareFileTime(&m_fileInfoMap.at(InternalIndex1).ftLastWriteTime,&m_fileInfoMap.at(InternalIndex2).ftLastWriteTime);
 		break;
 
 	case DATE_TYPE_ACCESSED:
-		return CompareFileTime(&m_pwfdFiles.at(InternalIndex1).ftLastAccessTime,&m_pwfdFiles.at(InternalIndex2).ftLastAccessTime);
+		return CompareFileTime(&m_fileInfoMap.at(InternalIndex1).ftLastAccessTime,&m_fileInfoMap.at(InternalIndex2).ftLastAccessTime);
 		break;
 
 	default:

@@ -39,11 +39,11 @@ void CShellBrowser::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 	ULARGE_INTEGER	ulFileSize;
 	BOOL			IsFolder;
 
-	IsFolder = (m_pwfdFiles[iCacheIndex].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	IsFolder = (m_fileInfoMap[iCacheIndex].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	== FILE_ATTRIBUTE_DIRECTORY;
 
-	ulFileSize.LowPart = m_pwfdFiles[iCacheIndex].nFileSizeLow;
-	ulFileSize.HighPart = m_pwfdFiles[iCacheIndex].nFileSizeHigh;
+	ulFileSize.LowPart = m_fileInfoMap[iCacheIndex].nFileSizeLow;
+	ulFileSize.HighPart = m_fileInfoMap[iCacheIndex].nFileSizeHigh;
 
 	if(Selected)
 	{
@@ -82,7 +82,7 @@ int CShellBrowser::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) con
 	lvItem.iSubItem	= 0;
 	ListView_GetItem(m_hListView,&lvItem);
 
-	StringCchCopy(Buffer,BufferSize,m_pwfdFiles.at((int)lvItem.lParam).cFileName);
+	StringCchCopy(Buffer,BufferSize,m_fileInfoMap.at((int)lvItem.lParam).cFileName);
 
 	return lstrlen(Buffer);
 }
@@ -254,8 +254,8 @@ int CShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		if((lstrcmp(m_pwfdFiles.at((int)lvItem.lParam).cFileName,szFileName) == 0) ||
-			(lstrcmp(m_pwfdFiles.at((int)lvItem.lParam).cAlternateFileName,szFileName) == 0))
+		if((lstrcmp(m_fileInfoMap.at((int)lvItem.lParam).cFileName,szFileName) == 0) ||
+			(lstrcmp(m_fileInfoMap.at((int)lvItem.lParam).cAlternateFileName,szFileName) == 0))
 		{
 			return (int)lvItem.lParam;
 			break;
@@ -274,7 +274,7 @@ DWORD CShellBrowser::QueryFileAttributes(int iItem) const
 	lvItem.iSubItem	= 0;
 	ListView_GetItem(m_hListView,&lvItem);
 
-	return m_pwfdFiles.at((int)lvItem.lParam).dwFileAttributes;
+	return m_fileInfoMap.at((int)lvItem.lParam).dwFileAttributes;
 }
 
 WIN32_FIND_DATA CShellBrowser::QueryFileFindData(int iItem) const
@@ -286,7 +286,7 @@ WIN32_FIND_DATA CShellBrowser::QueryFileFindData(int iItem) const
 	lvItem.iSubItem	= 0;
 	ListView_GetItem(m_hListView,&lvItem);
 
-	return m_pwfdFiles.at((int)lvItem.lParam);
+	return m_fileInfoMap.at((int)lvItem.lParam);
 }
 
 void CShellBrowser::DragStarted(int iFirstItem,POINT *ptCursor)
@@ -357,7 +357,7 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 
 	if((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
-		if((m_pwfdFiles[static_cast<int>(plvItem->lParam)].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+		if((m_fileInfoMap[static_cast<int>(plvItem->lParam)].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 		{
 			/* File. */
 			plvItem->iImage	= m_iFileIcon;
@@ -900,7 +900,7 @@ BOOL CShellBrowser::GhostItemInternal(int iItem,BOOL bGhost)
 	{
 		/* If the file is hidden, prevent changes to its visibility state (i.e.
 		hidden items will ALWAYS be ghosted). */
-		if(m_pwfdFiles[(int)lvItem.lParam].dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+		if(m_fileInfoMap[(int)lvItem.lParam].dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
 			return FALSE;
 
 		if(bGhost)
@@ -934,7 +934,7 @@ void CShellBrowser::RemoveFilteredItems(void)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		if(!((m_pwfdFiles[(int)lvItem.lParam].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
+		if(!((m_fileInfoMap[(int)lvItem.lParam].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
 		{
 			if(IsFilenameFiltered(m_pExtraItemInfo[(int)lvItem.lParam].szDisplayName))
 			{
@@ -953,16 +953,16 @@ void CShellBrowser::RemoveFilteredItem(int iItem,int iItemInternal)
 	if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
 		== LVIS_SELECTED)
 	{
-		ulFileSize.LowPart = m_pwfdFiles[iItemInternal].nFileSizeLow;
-		ulFileSize.HighPart = m_pwfdFiles[iItemInternal].nFileSizeHigh;
+		ulFileSize.LowPart = m_fileInfoMap[iItemInternal].nFileSizeLow;
+		ulFileSize.HighPart = m_fileInfoMap[iItemInternal].nFileSizeHigh;
 
 		m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 	}
 
 	/* Take the file size of the removed file away from the total
 	directory size. */
-	ulFileSize.LowPart = m_pwfdFiles[iItemInternal].nFileSizeLow;
-	ulFileSize.HighPart = m_pwfdFiles[iItemInternal].nFileSizeHigh;
+	ulFileSize.LowPart = m_fileInfoMap[iItemInternal].nFileSizeLow;
+	ulFileSize.HighPart = m_fileInfoMap[iItemInternal].nFileSizeHigh;
 
 	m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
 
@@ -1281,7 +1281,7 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 
 	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;
 
-	m_pwfdFiles.clear();
+	m_fileInfoMap.clear();
 
 	m_pExtraItemInfo = (CItemObject *)realloc(m_pExtraItemInfo,
 		m_iCurrentAllocation * sizeof(CItemObject));

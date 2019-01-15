@@ -232,7 +232,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			}
 
 			/* If the file is marked as hidden, ghost it out. */
-			if(m_pwfdFiles[itr->iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+			if(m_fileInfoMap[itr->iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
 			{
 				ListView_SetItemState(m_hListView,iItemIndex,LVIS_CUT,LVIS_CUT);
 			}
@@ -240,8 +240,8 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			/* Add the current file's size to the running size of the current directory. */
 			/* A folder may or may not have 0 in its high file size member.
 			It should either be zeroed, or never counted. */
-			ulFileSize.LowPart = m_pwfdFiles[itr->iItemInternal].nFileSizeLow;
-			ulFileSize.HighPart = m_pwfdFiles[itr->iItemInternal].nFileSizeHigh;
+			ulFileSize.LowPart = m_fileInfoMap[itr->iItemInternal].nFileSizeLow;
+			ulFileSize.HighPart = m_fileInfoMap[itr->iItemInternal].nFileSizeHigh;
 
 			m_ulTotalDirSize.QuadPart += ulFileSize.QuadPart;
 
@@ -293,14 +293,14 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 	BOOL bFilenameFiltered	= FALSE;
 
 	if(m_bApplyFilter &&
-		((m_pwfdFiles.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+		((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
 		bFilenameFiltered = IsFilenameFiltered(m_pExtraItemInfo[iItemInternal].szDisplayName);
 	}
 
 	if(m_bHideSystemFiles)
 	{
-		bHideSystemFile = (m_pwfdFiles.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
+		bHideSystemFile = (m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
 			== FILE_ATTRIBUTE_SYSTEM;
 	}
 
@@ -317,7 +317,7 @@ TCHAR *CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	TCHAR *pszDisplay = NULL;
 
 	if(m_bHideLinkExtension &&
-		((m_pwfdFiles.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+		((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
 		pExt = PathFindExtension(m_pExtraItemInfo[iItemInternal].szDisplayName);
 
@@ -333,7 +333,7 @@ TCHAR *CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	a period, and the item is not a directory. */
 	if((!m_bShowExtensions || bHideExtension) &&
 		m_pExtraItemInfo[iItemInternal].szDisplayName[0] != '.' &&
-		(m_pwfdFiles.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+		(m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
 		static TCHAR szDisplayName[MAX_PATH];
 
@@ -368,13 +368,13 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 	CoTaskMemFree(m_pExtraItemInfo[iItemInternal].pridl);
 
 	/* Is this item a folder? */
-	bFolder = (m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+	bFolder = (m_fileInfoMap[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
 	FILE_ATTRIBUTE_DIRECTORY;
 
 	/* Take the file size of the removed file away from the total
 	directory size. */
-	ulFileSize.LowPart = m_pwfdFiles[iItemInternal].nFileSizeLow;
-	ulFileSize.HighPart = m_pwfdFiles[iItemInternal].nFileSizeHigh;
+	ulFileSize.LowPart = m_fileInfoMap[iItemInternal].nFileSizeLow;
+	ulFileSize.HighPart = m_fileInfoMap[iItemInternal].nFileSizeHigh;
 
 	m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
 
@@ -627,7 +627,7 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	if(!PathIsRoot(szPath))
 	{
 		m_pExtraItemInfo[uItemId].bDrive = FALSE;
-		hFirstFile = FindFirstFile(szPath,&m_pwfdFiles[uItemId]);
+		hFirstFile = FindFirstFile(szPath,&m_fileInfoMap[uItemId]);
 	}
 	else
 	{
@@ -648,11 +648,11 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	}
 	else
 	{
-		StringCchCopy(m_pwfdFiles[uItemId].cFileName,
-			SIZEOF_ARRAY(m_pwfdFiles[uItemId].cFileName), szFileName);
-		m_pwfdFiles[uItemId].nFileSizeLow			= 0;
-		m_pwfdFiles[uItemId].nFileSizeHigh			= 0;
-		m_pwfdFiles[uItemId].dwFileAttributes		= FILE_ATTRIBUTE_DIRECTORY;
+		StringCchCopy(m_fileInfoMap[uItemId].cFileName,
+			SIZEOF_ARRAY(m_fileInfoMap[uItemId].cFileName), szFileName);
+		m_fileInfoMap[uItemId].nFileSizeLow			= 0;
+		m_fileInfoMap[uItemId].nFileSizeHigh			= 0;
+		m_fileInfoMap[uItemId].dwFileAttributes		= FILE_ATTRIBUTE_DIRECTORY;
 
 		m_pExtraItemInfo[uItemId].bReal = FALSE;
 	}

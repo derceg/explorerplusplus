@@ -344,7 +344,7 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 
 		for(itr = m_AwaitingAddList.begin();itr!= m_AwaitingAddList.end();itr++)
 		{
-			if(lstrcmp(m_pwfdFiles[itr->iItemInternal].cFileName,FileName) == 0)
+			if(lstrcmp(m_fileInfoMap[itr->iItemInternal].cFileName,FileName) == 0)
 			{
 				iItemInternal = itr->iItemInternal;
 				break;
@@ -389,19 +389,19 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 	if(iItemInternal != -1)
 	{
 		/* Is this item a folder? */
-		bFolder = (m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+		bFolder = (m_fileInfoMap[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
 			FILE_ATTRIBUTE_DIRECTORY;
 
-		ulFileSize.LowPart = m_pwfdFiles[iItemInternal].nFileSizeLow;
-		ulFileSize.HighPart = m_pwfdFiles[iItemInternal].nFileSizeHigh;
+		ulFileSize.LowPart = m_fileInfoMap[iItemInternal].nFileSizeLow;
+		ulFileSize.HighPart = m_fileInfoMap[iItemInternal].nFileSizeHigh;
 
 		m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
 
 		if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
 		== LVIS_SELECTED)
 		{
-			ulFileSize.LowPart = m_pwfdFiles[iItemInternal].nFileSizeLow;
-			ulFileSize.HighPart = m_pwfdFiles[iItemInternal].nFileSizeHigh;
+			ulFileSize.LowPart = m_fileInfoMap[iItemInternal].nFileSizeLow;
+			ulFileSize.HighPart = m_fileInfoMap[iItemInternal].nFileSizeHigh;
 
 			m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 		}
@@ -409,25 +409,25 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 		StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
 		PathAppend(FullFileName,FileName);
 
-		hFirstFile = FindFirstFile(FullFileName,&m_pwfdFiles[iItemInternal]);
+		hFirstFile = FindFirstFile(FullFileName,&m_fileInfoMap[iItemInternal]);
 
 		if(hFirstFile != INVALID_HANDLE_VALUE)
 		{
-			ulFileSize.LowPart = m_pwfdFiles[iItemInternal].nFileSizeLow;
-			ulFileSize.HighPart = m_pwfdFiles[iItemInternal].nFileSizeHigh;
+			ulFileSize.LowPart = m_fileInfoMap[iItemInternal].nFileSizeLow;
+			ulFileSize.HighPart = m_fileInfoMap[iItemInternal].nFileSizeHigh;
 
 			m_ulTotalDirSize.QuadPart += ulFileSize.QuadPart;
 
 			if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
 				== LVIS_SELECTED)
 			{
-				ulFileSize.LowPart = m_pwfdFiles[iItemInternal].nFileSizeLow;
-				ulFileSize.HighPart = m_pwfdFiles[iItemInternal].nFileSizeHigh;
+				ulFileSize.LowPart = m_fileInfoMap[iItemInternal].nFileSizeLow;
+				ulFileSize.HighPart = m_fileInfoMap[iItemInternal].nFileSizeHigh;
 
 				m_ulFileSelectionSize.QuadPart += ulFileSize.QuadPart;
 			}
 
-			if((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) ==
+			if((m_fileInfoMap[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) ==
 				FILE_ATTRIBUTE_HIDDEN)
 			{
 				ListView_SetItemState(m_hListView,iItem,LVIS_CUT,LVIS_CUT);
@@ -465,8 +465,8 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 			modification. If the internal structures still hold
 			the old size, the total directory size will become
 			corrupted. */
-			m_pwfdFiles[iItemInternal].nFileSizeLow		= 0;
-			m_pwfdFiles[iItemInternal].nFileSizeHigh	= 0;
+			m_fileInfoMap[iItemInternal].nFileSizeLow		= 0;
+			m_fileInfoMap[iItemInternal].nFileSizeHigh	= 0;
 		}
 	}
 }
@@ -562,8 +562,8 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 
 				/* Need to update internal storage for the item, since
 				it's name has now changed. */
-				StringCchCopy(m_pwfdFiles[iItemInternal].cFileName,
-					SIZEOF_ARRAY(m_pwfdFiles[iItemInternal].cFileName),
+				StringCchCopy(m_fileInfoMap[iItemInternal].cFileName,
+					SIZEOF_ARRAY(m_fileInfoMap[iItemInternal].cFileName),
 					szNewFileName);
 
 				/* The files' type may have changed, so retrieve the files'
@@ -617,8 +617,8 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 		StringCchCopy(m_pExtraItemInfo[iItemInternal].szDisplayName,
 			SIZEOF_ARRAY(m_pExtraItemInfo[iItemInternal].szDisplayName), szNewFileName);
 
-		StringCchCopy(m_pwfdFiles[iItemInternal].cFileName,
-			SIZEOF_ARRAY(m_pwfdFiles[iItemInternal].cFileName),
+		StringCchCopy(m_fileInfoMap[iItemInternal].cFileName,
+			SIZEOF_ARRAY(m_fileInfoMap[iItemInternal].cFileName),
 			szNewFileName);
 	}
 }
