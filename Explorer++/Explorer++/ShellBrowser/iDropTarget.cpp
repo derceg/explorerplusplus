@@ -525,8 +525,8 @@ int CALLBACK SortTemporaryStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 
 int CALLBACK CShellBrowser::SortTemporary(LPARAM lParam1,LPARAM lParam2)
 {
-	return m_pExtraItemInfo.at(static_cast<int>(lParam1)).iRelativeSort -
-		m_pExtraItemInfo.at(static_cast<int>(lParam2)).iRelativeSort;
+	return m_extraItemInfoMap.at(static_cast<int>(lParam1)).iRelativeSort -
+		m_extraItemInfoMap.at(static_cast<int>(lParam2)).iRelativeSort;
 }
 
 void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
@@ -597,14 +597,14 @@ void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
 					{
 						if(i == iItem)
 						{
-							m_pExtraItemInfo.at((int)lvItem.lParam).iRelativeSort = iInsert;
+							m_extraItemInfoMap.at((int)lvItem.lParam).iRelativeSort = iInsert;
 						}
 						else
 						{
 							if(iSort == iInsert)
 								iSort++;
 
-							m_pExtraItemInfo.at((int)lvItem.lParam).iRelativeSort = iSort;
+							m_extraItemInfoMap.at((int)lvItem.lParam).iRelativeSort = iSort;
 						}
 					}
 

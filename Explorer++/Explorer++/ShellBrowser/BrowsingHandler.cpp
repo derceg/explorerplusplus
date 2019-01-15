@@ -226,7 +226,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			{
 				LPITEMIDLIST pidlComplete = NULL;
 
-				pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at((int)itr->iItemInternal).pridl);
+				pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)itr->iItemInternal).pridl);
 
 				if(CompareIdls(pidlComplete,m_pidlNewItem))
 					m_bNewItemCreated = FALSE;
@@ -300,7 +300,7 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 	if(m_bApplyFilter &&
 		((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
-		bFilenameFiltered = IsFilenameFiltered(m_pExtraItemInfo.at(iItemInternal).szDisplayName);
+		bFilenameFiltered = IsFilenameFiltered(m_extraItemInfoMap.at(iItemInternal).szDisplayName);
 	}
 
 	if(m_bHideSystemFiles)
@@ -323,7 +323,7 @@ std::wstring CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	if(m_bHideLinkExtension &&
 		((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
-		pExt = PathFindExtension(m_pExtraItemInfo.at(iItemInternal).szDisplayName);
+		pExt = PathFindExtension(m_extraItemInfoMap.at(iItemInternal).szDisplayName);
 
 		if(*pExt != '\0')
 		{
@@ -336,13 +336,13 @@ std::wstring CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	to be hidden, and the filename does not begin with
 	a period, and the item is not a directory. */
 	if((!m_bShowExtensions || bHideExtension) &&
-		m_pExtraItemInfo.at(iItemInternal).szDisplayName[0] != '.' &&
+		m_extraItemInfoMap.at(iItemInternal).szDisplayName[0] != '.' &&
 		(m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
 		static TCHAR szDisplayName[MAX_PATH];
 
 		StringCchCopy(szDisplayName,SIZEOF_ARRAY(szDisplayName),
-			m_pExtraItemInfo.at(iItemInternal).szDisplayName);
+			m_extraItemInfoMap.at(iItemInternal).szDisplayName);
 
 		/* Strip the extension. */
 		PathRemoveExtension(szDisplayName);
@@ -351,7 +351,7 @@ std::wstring CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	}
 	else
 	{
-		return m_pExtraItemInfo.at(iItemInternal).szDisplayName;
+		return m_extraItemInfoMap.at(iItemInternal).szDisplayName;
 	}
 }
 
@@ -366,7 +366,7 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 	if(iItemInternal == -1)
 		return;
 
-	CoTaskMemFree(m_pExtraItemInfo.at(iItemInternal).pridl);
+	CoTaskMemFree(m_extraItemInfoMap.at(iItemInternal).pridl);
 
 	/* Is this item a folder? */
 	bFolder = (m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
@@ -603,12 +603,12 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 
 	uItemId = GenerateUniqueItemId();
 
-	m_pExtraItemInfo[uItemId].pridl					= ILClone(pidlRelative);
-	m_pExtraItemInfo[uItemId].bIconRetrieved		= FALSE;
-	m_pExtraItemInfo[uItemId].bThumbnailRetreived	= FALSE;
-	m_pExtraItemInfo[uItemId].bFolderSizeRetrieved	= FALSE;
-	StringCchCopy(m_pExtraItemInfo[uItemId].szDisplayName,
-		SIZEOF_ARRAY(m_pExtraItemInfo[uItemId].szDisplayName), szFileName);
+	m_extraItemInfoMap[uItemId].pridl					= ILClone(pidlRelative);
+	m_extraItemInfoMap[uItemId].bIconRetrieved		= FALSE;
+	m_extraItemInfoMap[uItemId].bThumbnailRetreived	= FALSE;
+	m_extraItemInfoMap[uItemId].bFolderSizeRetrieved	= FALSE;
+	StringCchCopy(m_extraItemInfoMap[uItemId].szDisplayName,
+		SIZEOF_ARRAY(m_extraItemInfoMap[uItemId].szDisplayName), szFileName);
 
 	pidlItem = ILCombine(pidlDirectory,pidlRelative);
 
@@ -621,7 +621,7 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	few seconds. */
 	if(!PathIsRoot(szPath))
 	{
-		m_pExtraItemInfo[uItemId].bDrive = FALSE;
+		m_extraItemInfoMap[uItemId].bDrive = FALSE;
 
 		WIN32_FIND_DATA wfd;
 		hFirstFile = FindFirstFile(szPath,&wfd);
@@ -630,9 +630,9 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	}
 	else
 	{
-		m_pExtraItemInfo[uItemId].bDrive = TRUE;
-		StringCchCopy(m_pExtraItemInfo[uItemId].szDrive,
-			SIZEOF_ARRAY(m_pExtraItemInfo[uItemId].szDrive),
+		m_extraItemInfoMap[uItemId].bDrive = TRUE;
+		StringCchCopy(m_extraItemInfoMap[uItemId].szDrive,
+			SIZEOF_ARRAY(m_extraItemInfoMap[uItemId].szDrive),
 			szPath);
 
 		hFirstFile = INVALID_HANDLE_VALUE;
@@ -642,7 +642,7 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	(such as the recycle bin), but items still exist. */
 	if(hFirstFile != INVALID_HANDLE_VALUE)
 	{
-		m_pExtraItemInfo[uItemId].bReal = TRUE;
+		m_extraItemInfoMap[uItemId].bReal = TRUE;
 		FindClose(hFirstFile);
 	}
 	else
@@ -656,7 +656,7 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 
 		m_fileInfoMap.insert({uItemId, wfd});
 
-		m_pExtraItemInfo[uItemId].bReal = FALSE;
+		m_extraItemInfoMap[uItemId].bReal = FALSE;
 	}
 
 	return uItemId;

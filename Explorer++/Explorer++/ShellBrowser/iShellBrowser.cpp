@@ -111,7 +111,7 @@ void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFil
 {
 	LPITEMIDLIST	pidlComplete = NULL;
 
-	pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at(iItemInternal).pridl);
+	pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl);
 
 	GetDisplayName(pidlComplete,szFullFileName,cchMax,SHGDN_FORPARSING);
 
@@ -383,7 +383,7 @@ void CShellBrowser::AddToIconFinderQueue(const LVITEM *plvItem)
 
 	lvil.hListView	= m_hListView;
 	lvil.iItem		= plvItem->iItem;
-	lvil.pidlFull	= ILCombine(m_pidlDirectory,m_pExtraItemInfo.at((int)plvItem->lParam).pridl);
+	lvil.pidlFull	= ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)plvItem->lParam).pridl);
 	lvil.hEvent		= m_hIconEvent;
 
 	g_pListViewInfoList.push_back(lvil);
@@ -548,7 +548,7 @@ LPITEMIDLIST CShellBrowser::QueryItemRelativeIdl(int iItem) const
 	bRet = ListView_GetItem(m_hListView,&lvItem);
 
 	if(bRet)
-		return ILClone((ITEMIDLIST *)m_pExtraItemInfo.at((int)lvItem.lParam).pridl);
+		return ILClone((ITEMIDLIST *)m_extraItemInfoMap.at((int)lvItem.lParam).pridl);
 
 	return NULL;
 }
@@ -871,7 +871,7 @@ BOOL CShellBrowser::IsFileReal(int iItem) const
 	bRes = ListView_GetItem(m_hListView,&lvItem);
 
 	if(bRes)
-		return m_pExtraItemInfo.at((int)lvItem.lParam).bReal;
+		return m_extraItemInfoMap.at((int)lvItem.lParam).bReal;
 
 	return FALSE;
 }
@@ -936,7 +936,7 @@ void CShellBrowser::RemoveFilteredItems(void)
 
 		if(!((m_fileInfoMap.at((int)lvItem.lParam).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
 		{
-			if(IsFilenameFiltered(m_pExtraItemInfo.at((int)lvItem.lParam).szDisplayName))
+			if(IsFilenameFiltered(m_extraItemInfoMap.at((int)lvItem.lParam).szDisplayName))
 			{
 				RemoveFilteredItem(i,(int)lvItem.lParam);
 			}
@@ -1251,7 +1251,7 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	{
 		if(m_pItemMap[i] == 1)
 		{
-			CoTaskMemFree(m_pExtraItemInfo.at(i).pridl);
+			CoTaskMemFree(m_extraItemInfoMap.at(i).pridl);
 		}
 	}
 
@@ -1282,7 +1282,7 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;
 
 	m_fileInfoMap.clear();
-	m_pExtraItemInfo.clear();
+	m_extraItemInfoMap.clear();
 
 	m_pItemMap = (int *)realloc(m_pItemMap,m_iCurrentAllocation * sizeof(int));
 
@@ -1483,7 +1483,7 @@ void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at((int)lvItem.lParam).pridl);
+		pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)lvItem.lParam).pridl);
 
 		if(CompareIdls(pidlItem,pidlComplete))
 		{
@@ -1676,7 +1676,7 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 			lvItem.iSubItem	= 0;
 			ListView_GetItem(m_hListView,&lvItem);
 
-			pidlItem = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at((int)lvItem.lParam).pridl);
+			pidlItem = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)lvItem.lParam).pridl);
 
 			if(CompareIdls(pidlDrive,pidlItem))
 			{
@@ -1698,8 +1698,8 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 	{
 		SHGetFileInfo(szDrive,0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
 
-		StringCchCopy(m_pExtraItemInfo.at(iItemInternal).szDisplayName,
-			SIZEOF_ARRAY(m_pExtraItemInfo.at(iItemInternal).szDisplayName),
+		StringCchCopy(m_extraItemInfoMap.at(iItemInternal).szDisplayName,
+			SIZEOF_ARRAY(m_extraItemInfoMap.at(iItemInternal).szDisplayName),
 			szDisplayName);
 
 		/* Update the drives icon and display name. */
@@ -1725,9 +1725,9 @@ void CShellBrowser::RemoveDrive(const TCHAR *szDrive)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		if(m_pExtraItemInfo.at((int)lvItem.lParam).bDrive)
+		if(m_extraItemInfoMap.at((int)lvItem.lParam).bDrive)
 		{
-			if(lstrcmp(szDrive,m_pExtraItemInfo.at((int)lvItem.lParam).szDrive) == 0)
+			if(lstrcmp(szDrive,m_extraItemInfoMap.at((int)lvItem.lParam).szDrive) == 0)
 			{
 				iItemInternal = (int)lvItem.lParam;
 				break;

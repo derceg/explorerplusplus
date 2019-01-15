@@ -738,7 +738,7 @@ private:
 
 	/* Stores various extra information on files, such
 	as display name. */
-	std::unordered_map<int, ExtraItemInfo>	m_pExtraItemInfo;
+	std::unordered_map<int, ExtraItemInfo>	m_extraItemInfoMap;
 
 	/* Manages browsing history. */
 	CPathManager *		m_pPathManager;
