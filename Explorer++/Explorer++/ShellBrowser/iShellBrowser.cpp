@@ -39,11 +39,11 @@ void CShellBrowser::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 	ULARGE_INTEGER	ulFileSize;
 	BOOL			IsFolder;
 
-	IsFolder = (m_fileInfoMap[iCacheIndex].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	IsFolder = (m_fileInfoMap.at(iCacheIndex).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	== FILE_ATTRIBUTE_DIRECTORY;
 
-	ulFileSize.LowPart = m_fileInfoMap[iCacheIndex].nFileSizeLow;
-	ulFileSize.HighPart = m_fileInfoMap[iCacheIndex].nFileSizeHigh;
+	ulFileSize.LowPart = m_fileInfoMap.at(iCacheIndex).nFileSizeLow;
+	ulFileSize.HighPart = m_fileInfoMap.at(iCacheIndex).nFileSizeHigh;
 
 	if(Selected)
 	{
@@ -357,7 +357,7 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 
 	if((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
-		if((m_fileInfoMap[static_cast<int>(plvItem->lParam)].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+		if((m_fileInfoMap.at(static_cast<int>(plvItem->lParam)).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 		{
 			/* File. */
 			plvItem->iImage	= m_iFileIcon;
@@ -900,7 +900,7 @@ BOOL CShellBrowser::GhostItemInternal(int iItem,BOOL bGhost)
 	{
 		/* If the file is hidden, prevent changes to its visibility state (i.e.
 		hidden items will ALWAYS be ghosted). */
-		if(m_fileInfoMap[(int)lvItem.lParam].dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+		if(m_fileInfoMap.at((int)lvItem.lParam).dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
 			return FALSE;
 
 		if(bGhost)
@@ -934,7 +934,7 @@ void CShellBrowser::RemoveFilteredItems(void)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		if(!((m_fileInfoMap[(int)lvItem.lParam].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
+		if(!((m_fileInfoMap.at((int)lvItem.lParam).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
 		{
 			if(IsFilenameFiltered(m_pExtraItemInfo[(int)lvItem.lParam].szDisplayName))
 			{
@@ -953,16 +953,16 @@ void CShellBrowser::RemoveFilteredItem(int iItem,int iItemInternal)
 	if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
 		== LVIS_SELECTED)
 	{
-		ulFileSize.LowPart = m_fileInfoMap[iItemInternal].nFileSizeLow;
-		ulFileSize.HighPart = m_fileInfoMap[iItemInternal].nFileSizeHigh;
+		ulFileSize.LowPart = m_fileInfoMap.at(iItemInternal).nFileSizeLow;
+		ulFileSize.HighPart = m_fileInfoMap.at(iItemInternal).nFileSizeHigh;
 
 		m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 	}
 
 	/* Take the file size of the removed file away from the total
 	directory size. */
-	ulFileSize.LowPart = m_fileInfoMap[iItemInternal].nFileSizeLow;
-	ulFileSize.HighPart = m_fileInfoMap[iItemInternal].nFileSizeHigh;
+	ulFileSize.LowPart = m_fileInfoMap.at(iItemInternal).nFileSizeLow;
+	ulFileSize.HighPart = m_fileInfoMap.at(iItemInternal).nFileSizeHigh;
 
 	m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
 

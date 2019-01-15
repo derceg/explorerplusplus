@@ -163,7 +163,7 @@ int CShellBrowser::SetAllFolderSizeColumnData(void)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		if((m_fileInfoMap[(int)lvItem.lParam].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+		if((m_fileInfoMap.at((int)lvItem.lParam).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
 			FILE_ATTRIBUTE_DIRECTORY)
 		{
 			for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
@@ -198,8 +198,8 @@ int CShellBrowser::SetAllFolderSizeColumnData(void)
 						/* TODO: Discard the result if the folder was deleted. */
 						if(m_pItemMap[(int)lvChildItem.lParam] == 1)
 						{
-							m_fileInfoMap[(int)lvChildItem.lParam].nFileSizeLow = lTotalFolderSize.LowPart;
-							m_fileInfoMap[(int)lvChildItem.lParam].nFileSizeHigh = lTotalFolderSize.HighPart;
+							m_fileInfoMap.at((int)lvChildItem.lParam).nFileSizeLow = lTotalFolderSize.LowPart;
+							m_fileInfoMap.at((int)lvChildItem.lParam).nFileSizeHigh = lTotalFolderSize.HighPart;
 							m_pExtraItemInfo[(int)lvChildItem.lParam].bFolderSizeRetrieved = TRUE;
 
 							FormatSizeString(lTotalFolderSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
