@@ -603,46 +603,7 @@ BOOL CShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 
 int CShellBrowser::GenerateUniqueItemId(void)
 {
-	BOOL	bFound = FALSE;
-	int		i = 0;
-
-	/* Cache the last position and start searching
-	from there next time. If no free spot is found,
-	search from 0 up to the cached spot. */
-
-	for(i = m_iCachedPosition;i < m_iCurrentAllocation;i++)
-	{
-		if(m_pItemMap[i] == 0)
-		{
-			m_pItemMap[i] = 1;
-			bFound = TRUE;
-			break;
-		}
-	}
-
-	if(!bFound)
-	{
-		for(i = 0;i < m_iCachedPosition;i++)
-		{
-			if(m_pItemMap[i] == 0)
-			{
-				m_pItemMap[i] = 1;
-				bFound = TRUE;
-				break;
-			}
-		}
-	}
-
-	if(bFound)
-	{
-		m_iCachedPosition = i;
-		return i;
-	}
-	else
-	{
-		m_iCachedPosition = 0;
-		return -1;
-	}
+	return m_itemIDCounter++;
 }
 
 void CShellBrowser::PositionDroppedItems(void)
@@ -1245,15 +1206,6 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	HIMAGELIST himl;
 	HIMAGELIST himlOld;
 	int nItems;
-	int i = 0;
-
-	for(i = 0;i < m_iCurrentAllocation;i++)
-	{
-		if(m_pItemMap[i] == 1)
-		{
-			CoTaskMemFree(m_extraItemInfoMap.at(i).pridl);
-		}
-	}
 
 	/* If we're in thumbnails view, destroy the current
 	imagelist, and create a new one. */
@@ -1279,14 +1231,16 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	m_AlteredList.clear();
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
-	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;
+	m_itemIDCounter = 0;
 
 	m_fileInfoMap.clear();
+
+	for (auto element : m_extraItemInfoMap)
+	{
+		CoTaskMemFree(element.second.pridl);
+	}
+
 	m_extraItemInfoMap.clear();
-
-	m_pItemMap = (int *)realloc(m_pItemMap,m_iCurrentAllocation * sizeof(int));
-
-	InitializeItemMap(0,m_iCurrentAllocation);
 
 	CoTaskMemFree(m_pidlDirectory);
 

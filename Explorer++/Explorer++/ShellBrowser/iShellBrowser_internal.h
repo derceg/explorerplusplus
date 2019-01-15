@@ -4,11 +4,6 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/DropHandler.h"
 
-#define DEFAULT_MEM_ALLOC					250
-
-#define MEM_ALLOCATION_LEVEL_LOW	1000
-#define MEM_ALLOCATION_LEVEL_MEDIUM	5000
-
 #define THUMBNAIL_TYPE_ICON			0
 #define THUMBNAIL_TYPE_EXTRACTED	1
 

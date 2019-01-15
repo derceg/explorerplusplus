@@ -563,12 +563,10 @@ private:
 		HANDLE hFolderSizeThread);
 	~CShellBrowser();
 
-	void				InitializeItemMap(int iStart,int iEnd);
 	int					GenerateUniqueItemId(void);
 	BOOL				GhostItemInternal(int iItem,BOOL bGhost);
 	void				DetermineFolderVirtual(LPITEMIDLIST pidlDirectory);
 	void				VerifySortMode(void);
-	void				AllocateInitialItemMemory(void);
 
 	/* Browsing support. */
 	void				BrowseVirtualFolder(LPITEMIDLIST pidlDirectory);
@@ -732,6 +730,8 @@ private:
 	BOOL				m_bNotifiedOfTermination;
 	HIMAGELIST			m_hListViewImageList;
 
+	int					m_itemIDCounter;
+
 	/* Stores a WIN32_FIND_DATA structure for each file.
 	Only valid for 'real' files. */
 	std::unordered_map<int, WIN32_FIND_DATA> m_fileInfoMap;
@@ -764,12 +764,9 @@ private:
 	int					m_nTotalItems;
 	int					m_NumFilesSelected;
 	int					m_NumFoldersSelected;
-	int					m_iCurrentAllocation;
-	int					m_iCachedPosition;
 	int					m_iDirMonitorId;
 	int					m_iFolderIcon;
 	int					m_iFileIcon;
-	int *				m_pItemMap;
 	int					m_iDropped;
 
 	/* Stores a unique index for each folder.

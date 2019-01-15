@@ -393,11 +393,6 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 		ListView_DeleteItem(m_hListView,iItem);
 	}
 
-	/* Invalidate the items internal data.
-	This will mark it as free, so that it
-	can be used by another item. */
-	m_pItemMap[iItemInternal] = 0;
-
 	m_fileInfoMap.erase(iItemInternal);
 	m_extraItemInfoMap.erase(iItemInternal);
 
@@ -587,22 +582,6 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	int				uItemId;
 
 	m_nAwaitingAdd++;
-
-	if((m_nTotalItems + m_nAwaitingAdd) > (m_iCurrentAllocation - 1))
-	{
-		int PrevSize = m_iCurrentAllocation;
-
-		if(m_iCurrentAllocation > MEM_ALLOCATION_LEVEL_MEDIUM)
-			m_iCurrentAllocation += MEM_ALLOCATION_LEVEL_MEDIUM;
-		else if(m_iCurrentAllocation > MEM_ALLOCATION_LEVEL_LOW)
-			m_iCurrentAllocation += MEM_ALLOCATION_LEVEL_LOW;
-		else
-			m_iCurrentAllocation += DEFAULT_MEM_ALLOC;
-
-		m_pItemMap = (int *)realloc(m_pItemMap,m_iCurrentAllocation * sizeof(int));
-
-		InitializeItemMap(PrevSize,m_iCurrentAllocation);
-	}
 
 	uItemId = GenerateUniqueItemId();
 

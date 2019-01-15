@@ -76,13 +76,12 @@ HANDLE hFolderSizeThread) :
 m_hOwner(hOwner),
 m_hListView(hListView),
 m_hThread(hIconThread),
-m_hFolderSizeThread(hFolderSizeThread)
+m_hFolderSizeThread(hFolderSizeThread),
+m_itemIDCounter(0)
 {
 	m_iRefCount = 1;
 
 	InitializeDragDropHelpers();
-
-	AllocateInitialItemMemory();
 
 	m_pPathManager			= new CPathManager();
 
@@ -127,10 +126,6 @@ m_hFolderSizeThread(hFolderSizeThread)
 	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 
 	m_nAwaitingAdd = 0;
-
-	m_pItemMap = (int *)malloc(m_iCurrentAllocation * sizeof(int));
-
-	InitializeItemMap(0,m_iCurrentAllocation);
 
 	InitializeCriticalSection(&m_csDirectoryAltered);
 	InitializeCriticalSection(&m_column_cs);
@@ -196,8 +191,6 @@ CShellBrowser::~CShellBrowser()
 	CoTaskMemFree(m_pidlDirectory);
 
 	delete m_pPathManager;
-
-	free(m_pItemMap);
 }
 
 BOOL CShellBrowser::GetAutoArrange(void) const
@@ -382,18 +375,6 @@ BOOL CShellBrowser::IsGroupViewEnabled(void) const
 	return m_bShowInGroups;
 }
 
-void CShellBrowser::InitializeItemMap(int iStart,int iEnd)
-{
-	int i = 0;
-
-	for(i = iStart;i < iEnd;i++)
-	{
-		m_pItemMap[i] = 0;
-	}
-
-	m_iCachedPosition = 0;
-}
-
 HRESULT CShellBrowser::InitializeDragDropHelpers(void)
 {
 	HRESULT hr;
@@ -461,11 +442,6 @@ int CShellBrowser::GetId(void) const
 void CShellBrowser::SetId(int ID)
 {
 	m_ID = ID;
-}
-
-void CShellBrowser::AllocateInitialItemMemory(void)
-{
-	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;
 }
 
 void CShellBrowser::ToggleGridlines(void)

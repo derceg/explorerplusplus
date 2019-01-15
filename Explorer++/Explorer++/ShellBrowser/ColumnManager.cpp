@@ -193,20 +193,16 @@ int CShellBrowser::SetAllFolderSizeColumnData(void)
 
 						CalculateFolderSize(FullItemPath,&nFolders,&nFiles,&lTotalFolderSize);
 
-						/* Does the item still exist? */
 						/* TODO: Need to lock this against the main thread. */
 						/* TODO: Discard the result if the folder was deleted. */
-						if(m_pItemMap[(int)lvChildItem.lParam] == 1)
-						{
-							m_fileInfoMap.at((int)lvChildItem.lParam).nFileSizeLow = lTotalFolderSize.LowPart;
-							m_fileInfoMap.at((int)lvChildItem.lParam).nFileSizeHigh = lTotalFolderSize.HighPart;
-							m_extraItemInfoMap.at((int)lvChildItem.lParam).bFolderSizeRetrieved = TRUE;
+						m_fileInfoMap.at((int)lvChildItem.lParam).nFileSizeLow = lTotalFolderSize.LowPart;
+						m_fileInfoMap.at((int)lvChildItem.lParam).nFileSizeHigh = lTotalFolderSize.HighPart;
+						m_extraItemInfoMap.at((int)lvChildItem.lParam).bFolderSizeRetrieved = TRUE;
 
-							FormatSizeString(lTotalFolderSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
-								m_bForceSize,m_SizeDisplayFormat);
+						FormatSizeString(lTotalFolderSize, lpszFileSize, SIZEOF_ARRAY(lpszFileSize),
+							m_bForceSize, m_SizeDisplayFormat);
 
-							ListView_SetItemText(m_hListView,iItem,iColumnIndex,lpszFileSize);
-						}
+						ListView_SetItemText(m_hListView, iItem, iColumnIndex, lpszFileSize);
 					}
 				}
 
