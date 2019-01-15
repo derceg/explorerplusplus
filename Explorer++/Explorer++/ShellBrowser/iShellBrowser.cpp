@@ -141,7 +141,7 @@ IN POINT *pt,IN BOOL bBackOrForward)
 {
 	int iSel;
 
-	iSel = m_pPathManager->CreateHistoryPopupMenu(hParent,pt,bBackOrForward);
+	iSel = m_pathManager.CreateHistoryPopupMenu(hParent,pt,bBackOrForward);
 
 	if(iSel == 0)
 		return E_FAIL;
@@ -149,7 +149,7 @@ IN POINT *pt,IN BOOL bBackOrForward)
 	if(bBackOrForward)
 		iSel = -iSel;
 
-	*pidl = m_pPathManager->RetrievePath(iSel);
+	*pidl = m_pathManager.RetrievePath(iSel);
 
 	return S_OK;
 }
@@ -158,7 +158,7 @@ BOOL CShellBrowser::IsBackHistory(void) const
 {
 	int nBackPathsStored;
 
-	nBackPathsStored = m_pPathManager->GetNumBackPathsStored();
+	nBackPathsStored = m_pathManager.GetNumBackPathsStored();
 
 	if(nBackPathsStored == 0)
 		return FALSE;
@@ -170,7 +170,7 @@ BOOL CShellBrowser::IsForwardHistory(void) const
 {
 	int nForwardPathsStored;
 
-	nForwardPathsStored = m_pPathManager->GetNumForwardPathsStored();
+	nForwardPathsStored = m_pathManager.GetNumForwardPathsStored();
 
 	if(nForwardPathsStored == 0)
 		return FALSE;
@@ -180,22 +180,22 @@ BOOL CShellBrowser::IsForwardHistory(void) const
 
 std::list<LPITEMIDLIST> CShellBrowser::GetBackHistory() const
 {
-	return m_pPathManager->GetBackHistory();
+	return m_pathManager.GetBackHistory();
 }
 
 std::list<LPITEMIDLIST> CShellBrowser::GetForwardHistory() const
 {
-	return m_pPathManager->GetForwardHistory();
+	return m_pathManager.GetForwardHistory();
 }
 
 LPITEMIDLIST CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)
 {
-	return m_pPathManager->RetrievePathWithoutUpdate(iItem);
+	return m_pathManager.RetrievePathWithoutUpdate(iItem);
 }
 
 LPITEMIDLIST CShellBrowser::RetrieveHistoryItem(int iItem)
 {
-	return m_pPathManager->RetrievePath(iItem);
+	return m_pathManager.RetrievePath(iItem);
 }
 
 BOOL CShellBrowser::CanBrowseUp(void) const

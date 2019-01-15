@@ -741,7 +741,7 @@ private:
 	std::unordered_map<int, ExtraItemInfo>	m_extraItemInfoMap;
 
 	/* Manages browsing history. */
-	CPathManager *		m_pPathManager;
+	CPathManager		m_pathManager;
 
 	HANDLE				m_hThread;
 	HANDLE				m_hFolderSizeThread;

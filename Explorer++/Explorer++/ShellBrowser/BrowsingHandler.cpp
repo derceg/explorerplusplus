@@ -83,7 +83,7 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 
 	if(StoreHistory)
 	{
-		m_pPathManager->StoreIdl(pidl);
+		m_pathManager.StoreIdl(pidl);
 	}
 
 	/* Stop the list view from redrawing itself each time is inserted.
@@ -432,7 +432,7 @@ BOOL *bStoreHistory)
 	}
 	else if((uFlags & SBSP_NAVIGATEBACK) == SBSP_NAVIGATEBACK)
 	{
-		if(m_pPathManager->GetNumBackPathsStored() == 0)
+		if(m_pathManager.GetNumBackPathsStored() == 0)
 		{
 			SetFocus(m_hListView);
 			return E_FAIL;
@@ -442,11 +442,11 @@ BOOL *bStoreHistory)
 		Ignores the supplied Path argument.*/
 		*bStoreHistory		= FALSE;
 
-		*pidlDirectory = m_pPathManager->RetrieveAndValidateIdl(-1);
+		*pidlDirectory = m_pathManager.RetrieveAndValidateIdl(-1);
 	}
 	else if((uFlags & SBSP_NAVIGATEFORWARD) == SBSP_NAVIGATEFORWARD)
 	{
-		if(m_pPathManager->GetNumForwardPathsStored() == 0)
+		if(m_pathManager.GetNumForwardPathsStored() == 0)
 		{
 			SetFocus(m_hListView);
 			return E_FAIL;
@@ -456,7 +456,7 @@ BOOL *bStoreHistory)
 		this one. Ignores the supplied Path argument.*/
 		*bStoreHistory		= FALSE;
 
-		*pidlDirectory = m_pPathManager->RetrieveAndValidateIdl(1);
+		*pidlDirectory = m_pathManager.RetrieveAndValidateIdl(1);
 	}
 	else
 	{

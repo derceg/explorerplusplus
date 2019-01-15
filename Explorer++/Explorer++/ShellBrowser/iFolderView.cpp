@@ -83,8 +83,6 @@ m_itemIDCounter(0)
 
 	InitializeDragDropHelpers();
 
-	m_pPathManager			= new CPathManager();
-
 	m_SortMode				= FSM_NAME;
 	m_ViewMode				= VM_ICONS;
 	m_bSortAscending		= TRUE;
@@ -189,8 +187,6 @@ CShellBrowser::~CShellBrowser()
 	}
 
 	CoTaskMemFree(m_pidlDirectory);
-
-	delete m_pPathManager;
 }
 
 BOOL CShellBrowser::GetAutoArrange(void) const
