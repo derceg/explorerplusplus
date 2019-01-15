@@ -398,6 +398,9 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 	can be used by another item. */
 	m_pItemMap[iItemInternal] = 0;
 
+	m_fileInfoMap.erase(iItemInternal);
+	m_extraItemInfoMap.erase(iItemInternal);
+
 	nItems = ListView_GetItemCount(m_hListView);
 
 	m_nTotalItems--;
