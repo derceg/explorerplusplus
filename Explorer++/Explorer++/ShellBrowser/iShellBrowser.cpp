@@ -82,7 +82,7 @@ int CShellBrowser::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) con
 	lvItem.iSubItem	= 0;
 	ListView_GetItem(m_hListView,&lvItem);
 
-	StringCchCopy(Buffer,BufferSize,m_pwfdFiles[(int)lvItem.lParam].cFileName);
+	StringCchCopy(Buffer,BufferSize,m_pwfdFiles.at((int)lvItem.lParam).cFileName);
 
 	return lstrlen(Buffer);
 }
@@ -254,8 +254,8 @@ int CShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		if((lstrcmp(m_pwfdFiles[(int)lvItem.lParam].cFileName,szFileName) == 0) ||
-			(lstrcmp(m_pwfdFiles[(int)lvItem.lParam].cAlternateFileName,szFileName) == 0))
+		if((lstrcmp(m_pwfdFiles.at((int)lvItem.lParam).cFileName,szFileName) == 0) ||
+			(lstrcmp(m_pwfdFiles.at((int)lvItem.lParam).cAlternateFileName,szFileName) == 0))
 		{
 			return (int)lvItem.lParam;
 			break;
@@ -274,10 +274,10 @@ DWORD CShellBrowser::QueryFileAttributes(int iItem) const
 	lvItem.iSubItem	= 0;
 	ListView_GetItem(m_hListView,&lvItem);
 
-	return m_pwfdFiles[(int)lvItem.lParam].dwFileAttributes;
+	return m_pwfdFiles.at((int)lvItem.lParam).dwFileAttributes;
 }
 
-WIN32_FIND_DATA *CShellBrowser::QueryFileFindData(int iItem) const
+WIN32_FIND_DATA CShellBrowser::QueryFileFindData(int iItem) const
 {
 	LVITEM lvItem;
 
@@ -286,7 +286,7 @@ WIN32_FIND_DATA *CShellBrowser::QueryFileFindData(int iItem) const
 	lvItem.iSubItem	= 0;
 	ListView_GetItem(m_hListView,&lvItem);
 
-	return &m_pwfdFiles[(int)lvItem.lParam];
+	return m_pwfdFiles.at((int)lvItem.lParam);
 }
 
 void CShellBrowser::DragStarted(int iFirstItem,POINT *ptCursor)
@@ -357,7 +357,7 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 
 	if((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
-		if((m_pwfdFiles[plvItem->lParam].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+		if((m_pwfdFiles[static_cast<int>(plvItem->lParam)].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 		{
 			/* File. */
 			plvItem->iImage	= m_iFileIcon;
@@ -1281,8 +1281,7 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 
 	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;
 
-	m_pwfdFiles = (WIN32_FIND_DATA *)realloc(m_pwfdFiles,
-		m_iCurrentAllocation * (sizeof(WIN32_FIND_DATA)));
+	m_pwfdFiles.clear();
 
 	m_pExtraItemInfo = (CItemObject *)realloc(m_pExtraItemInfo,
 		m_iCurrentAllocation * sizeof(CItemObject));

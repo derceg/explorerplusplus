@@ -94,7 +94,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(void)
 
 void Explorerplusplus::UpdateDisplayWindowForOneFile(void)
 {
-	WIN32_FIND_DATA	*pwfd = NULL;
+	WIN32_FIND_DATA	wfd;
 	SHFILEINFO		shfi;
 	TCHAR			szFullItemName[MAX_PATH];
 	TCHAR			szFileDate[256];
@@ -121,7 +121,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(void)
 
 			m_pActiveShellBrowser->QueryFullItemName(iSelected, szFullItemName, SIZEOF_ARRAY(szFullItemName));
 
-			pwfd = m_pActiveShellBrowser->QueryFileFindData(iSelected);
+			wfd = m_pActiveShellBrowser->QueryFileFindData(iSelected);
 
 			dwAttributes = GetFileAttributes(szFullItemName);
 
@@ -179,13 +179,13 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(void)
 			}
 			else
 			{
-				SHGetFileInfo(szFullItemName, pwfd->dwFileAttributes,
+				SHGetFileInfo(szFullItemName, wfd.dwFileAttributes,
 					&shfi, sizeof(shfi), SHGFI_TYPENAME | SHGFI_USEFILEATTRIBUTES);
 
 				DisplayWindow_BufferText(m_hDisplayWindow, shfi.szTypeName);
 			}
 
-			CreateFileTimeString(&pwfd->ftLastWriteTime,
+			CreateFileTimeString(&wfd.ftLastWriteTime,
 				szFileDate, SIZEOF_ARRAY(szFileDate),
 				m_bShowFriendlyDatesGlobal);
 

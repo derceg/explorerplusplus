@@ -199,7 +199,6 @@ CShellBrowser::~CShellBrowser()
 
 	free(m_pItemMap);
 	free(m_pExtraItemInfo);
-	free(m_pwfdFiles);
 }
 
 BOOL CShellBrowser::GetAutoArrange(void) const
@@ -467,7 +466,6 @@ void CShellBrowser::SetId(int ID)
 
 void CShellBrowser::AllocateInitialItemMemory(void)
 {
-	m_pwfdFiles			= (WIN32_FIND_DATA *)malloc(DEFAULT_MEM_ALLOC * sizeof(WIN32_FIND_DATA));
 	m_pExtraItemInfo	= (CItemObject *)malloc(DEFAULT_MEM_ALLOC * sizeof(CItemObject));
 
 	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;

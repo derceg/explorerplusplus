@@ -293,14 +293,14 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 	BOOL bFilenameFiltered	= FALSE;
 
 	if(m_bApplyFilter &&
-		((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+		((m_pwfdFiles.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
 		bFilenameFiltered = IsFilenameFiltered(m_pExtraItemInfo[iItemInternal].szDisplayName);
 	}
 
 	if(m_bHideSystemFiles)
 	{
-		bHideSystemFile = (m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
+		bHideSystemFile = (m_pwfdFiles.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
 			== FILE_ATTRIBUTE_SYSTEM;
 	}
 
@@ -317,7 +317,7 @@ TCHAR *CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	TCHAR *pszDisplay = NULL;
 
 	if(m_bHideLinkExtension &&
-		((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+		((m_pwfdFiles.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
 		pExt = PathFindExtension(m_pExtraItemInfo[iItemInternal].szDisplayName);
 
@@ -333,7 +333,7 @@ TCHAR *CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	a period, and the item is not a directory. */
 	if((!m_bShowExtensions || bHideExtension) &&
 		m_pExtraItemInfo[iItemInternal].szDisplayName[0] != '.' &&
-		(m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+		(m_pwfdFiles.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
 		static TCHAR szDisplayName[MAX_PATH];
 
@@ -595,9 +595,6 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 		else
 			m_iCurrentAllocation += DEFAULT_MEM_ALLOC;
 
-		m_pwfdFiles = (WIN32_FIND_DATA *)realloc(m_pwfdFiles,
-			m_iCurrentAllocation * (sizeof(WIN32_FIND_DATA)));
-
 		m_pExtraItemInfo = (CItemObject *)realloc(m_pExtraItemInfo,
 			m_iCurrentAllocation * sizeof(CItemObject));
 
@@ -605,7 +602,7 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 
 		InitializeItemMap(PrevSize,m_iCurrentAllocation);
 
-		if(m_pwfdFiles == NULL || m_pExtraItemInfo == NULL)
+		if(m_pExtraItemInfo == NULL)
 			return E_OUTOFMEMORY;
 	}
 

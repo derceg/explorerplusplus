@@ -946,13 +946,13 @@ void Explorerplusplus::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 	}
 	else
 	{
-		WIN32_FIND_DATA	*pwfd = NULL;
+		WIN32_FIND_DATA wfd;
 		TCHAR			szDate[256];
 		TCHAR			szDateModified[256];
 
-		pwfd = m_pActiveShellBrowser->QueryFileFindData(iItem);
+		wfd = m_pActiveShellBrowser->QueryFileFindData(iItem);
 
-		CreateFileTimeString(&pwfd->ftLastWriteTime,
+		CreateFileTimeString(&wfd.ftLastWriteTime,
 			szDateModified,SIZEOF_ARRAY(szDateModified),m_bShowFriendlyDatesGlobal);
 
 		LoadString(m_hLanguageModule,IDS_GENERAL_DATEMODIFIED,szDate,
@@ -1631,8 +1631,8 @@ void Explorerplusplus::OnListViewSetFileAttributes(void) const
 
 			m_pActiveShellBrowser->QueryFullItemName(iSel,sfai.szFullFileName,SIZEOF_ARRAY(sfai.szFullFileName));
 
-			WIN32_FIND_DATA *pwfd = m_pActiveShellBrowser->QueryFileFindData(iSel);
-			sfai.wfd = *pwfd;
+			WIN32_FIND_DATA wfd = m_pActiveShellBrowser->QueryFileFindData(iSel);
+			sfai.wfd = wfd;
 
 			sfaiList.push_back(sfai);
 		}

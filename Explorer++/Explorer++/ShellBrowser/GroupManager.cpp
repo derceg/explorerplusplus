@@ -488,7 +488,7 @@ void CShellBrowser::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeade
 	int iSize;
 	int i;
 
-	if((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	if((m_pwfdFiles.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	== FILE_ATTRIBUTE_DIRECTORY)
 	{
 		/* This item is a folder. */
@@ -498,8 +498,8 @@ void CShellBrowser::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeade
 	{
 		i = nGroups - 1;
 
-		double FileSize = m_pwfdFiles[iItemInternal].nFileSizeLow +
-		(m_pwfdFiles[iItemInternal].nFileSizeHigh * pow(2.0,32.0));
+		double FileSize = m_pwfdFiles.at(iItemInternal).nFileSizeLow +
+		(m_pwfdFiles.at(iItemInternal).nFileSizeHigh * pow(2.0,32.0));
 
 		/* Check which of the size groups this item belongs to. */
 		while(FileSize < SizeGroupLimits[i]
@@ -608,15 +608,15 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 	switch(iDateType)
 	{
 	case GROUP_BY_DATEMODIFIED:
-		ret = FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftLastWriteTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&m_pwfdFiles.at(iItemInternal).ftLastWriteTime, &stFileTime);
 		break;
 
 	case GROUP_BY_DATECREATED:
-		ret = FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftCreationTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&m_pwfdFiles.at(iItemInternal).ftCreationTime, &stFileTime);
 		break;
 
 	case GROUP_BY_DATEACCESSED:
-		ret = FileTimeToLocalSystemTime(&m_pwfdFiles[iItemInternal].ftLastAccessTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&m_pwfdFiles.at(iItemInternal).ftLastAccessTime, &stFileTime);
 		break;
 
 	default:
@@ -792,7 +792,7 @@ void CShellBrowser::DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroup
 	TCHAR szAttributes[32];
 
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_pwfdFiles[iItemInternal].cFileName);
+	PathAppend(FullFileName,m_pwfdFiles.at(iItemInternal).cFileName);
 
 	BuildFileAttributeString(FullFileName,szAttributes,
 		SIZEOF_ARRAY(szAttributes));
@@ -807,7 +807,7 @@ void CShellBrowser::DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHead
 	TCHAR szOwner[512];
 
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_pwfdFiles[iItemInternal].cFileName);
+	PathAppend(FullFileName,m_pwfdFiles.at(iItemInternal).cFileName);
 
 	BOOL ret = GetFileOwner(FullFileName,szOwner,SIZEOF_ARRAY(szOwner));
 
@@ -828,7 +828,7 @@ void CShellBrowser::DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersion
 	BOOL bVersionInfoObtained;
 
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_pwfdFiles[iItemInternal].cFileName);
+	PathAppend(FullFileName,m_pwfdFiles.at(iItemInternal).cFileName);
 
 	bVersionInfoObtained = GetVersionInfoString(FullFileName,
 		szVersionType,szVersion,SIZEOF_ARRAY(szVersion));
@@ -849,7 +849,7 @@ void CShellBrowser::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID Pr
 	BOOL bRes;
 
 	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
-	PathAppend(szFullFileName,m_pwfdFiles[iItemInternal].cFileName);
+	PathAppend(szFullFileName,m_pwfdFiles.at(iItemInternal).cFileName);
 
 	bRes = ReadImageProperty(szFullFileName,PropertyId,szProperty,
 		SIZEOF_ARRAY(szProperty));
@@ -862,7 +862,7 @@ void CShellBrowser::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID Pr
 
 void CShellBrowser::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
-	if ((m_pwfdFiles[iItemInternal].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	if ((m_pwfdFiles.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		LoadString(m_hResourceModule, IDS_GROUPBY_EXTENSION_FOLDER, szGroupHeader, cchMax);
 		return;
@@ -870,7 +870,7 @@ void CShellBrowser::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroup
 
 	TCHAR FullFileName[MAX_PATH];
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_pwfdFiles[iItemInternal].cFileName);
+	PathAppend(FullFileName,m_pwfdFiles.at(iItemInternal).cFileName);
 
 	TCHAR *pExt = PathFindExtension(FullFileName);
 

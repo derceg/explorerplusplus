@@ -1,11 +1,12 @@
 #pragma once
 
-#include <list>
 #include "iPathManager.h"
-#include "../Helper/Helper.h"
 #include "../Helper/DropHandler.h"
-#include "../Helper/StringHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/StringHelper.h"
+#include <list>
+#include <unordered_map>
 
 #define WM_USER_UPDATEWINDOWS		(WM_APP + 17)
 #define WM_USER_FILESADDED			(WM_APP + 51)
@@ -375,7 +376,7 @@ public:
 	int					GetFolderIndex(void) const;
 
 	/* Item information. */
-	LPWIN32_FIND_DATA	QueryFileFindData(int iItem) const;
+	WIN32_FIND_DATA		QueryFileFindData(int iItem) const;
 	LPITEMIDLIST		QueryItemRelativeIdl(int iItem) const;
 	DWORD				QueryFileAttributes(int iItem) const;
 	int					QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
@@ -735,7 +736,7 @@ private:
 
 	/* Stores a WIN32_FIND_DATA structure for each file.
 	Only valid for 'real' files. */
-	WIN32_FIND_DATA *	m_pwfdFiles;
+	std::unordered_map<int, WIN32_FIND_DATA> m_pwfdFiles;
 
 	/* Stores various extra information on files, such
 	as display name. */

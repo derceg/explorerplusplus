@@ -520,12 +520,12 @@ std::wstring CShellBrowser::GetTypeColumnText(int InternalIndex) const
 
 std::wstring CShellBrowser::GetSizeColumnText(int InternalIndex) const
 {
-	if((m_pwfdFiles[InternalIndex].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	if((m_pwfdFiles.at(InternalIndex).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		return EMPTY_STRING;
 	}
 
-	ULARGE_INTEGER FileSize = {m_pwfdFiles[InternalIndex].nFileSizeLow,m_pwfdFiles[InternalIndex].nFileSizeHigh};
+	ULARGE_INTEGER FileSize = {m_pwfdFiles.at(InternalIndex).nFileSizeLow,m_pwfdFiles.at(InternalIndex).nFileSizeHigh};
 
 	TCHAR FileSizeText[64];
 	FormatSizeString(FileSize,FileSizeText,SIZEOF_ARRAY(FileSizeText),m_bForceSize,m_SizeDisplayFormat);
@@ -541,17 +541,17 @@ std::wstring CShellBrowser::GetTimeColumnText(int InternalIndex,TimeType_t TimeT
 	switch(TimeType)
 	{
 	case COLUMN_TIME_MODIFIED:
-		bRet = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftLastWriteTime,
+		bRet = CreateFileTimeString(&m_pwfdFiles.at(InternalIndex).ftLastWriteTime,
 			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
 		break;
 
 	case COLUMN_TIME_CREATED:
-		bRet = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftCreationTime,
+		bRet = CreateFileTimeString(&m_pwfdFiles.at(InternalIndex).ftCreationTime,
 			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
 		break;
 
 	case COLUMN_TIME_ACCESSED:
-		bRet = CreateFileTimeString(&m_pwfdFiles[InternalIndex].ftLastAccessTime,
+		bRet = CreateFileTimeString(&m_pwfdFiles.at(InternalIndex).ftLastAccessTime,
 			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
 		break;
 
@@ -581,7 +581,7 @@ std::wstring CShellBrowser::GetAttributeColumnText(int InternalIndex) const
 
 bool CShellBrowser::GetRealSizeColumnRawData(int InternalIndex,ULARGE_INTEGER &RealFileSize) const
 {
-	if((m_pwfdFiles[InternalIndex].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	if((m_pwfdFiles.at(InternalIndex).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		return false;
 	}
@@ -598,7 +598,7 @@ bool CShellBrowser::GetRealSizeColumnRawData(int InternalIndex,ULARGE_INTEGER &R
 		return false;
 	}
 
-	ULARGE_INTEGER RealFileSizeTemp = {m_pwfdFiles[InternalIndex].nFileSizeLow,m_pwfdFiles[InternalIndex].nFileSizeHigh};
+	ULARGE_INTEGER RealFileSizeTemp = {m_pwfdFiles.at(InternalIndex).nFileSizeLow,m_pwfdFiles.at(InternalIndex).nFileSizeHigh};
 
 	if(RealFileSizeTemp.QuadPart != 0 && (RealFileSizeTemp.QuadPart % dwClusterSize) != 0)
 	{
@@ -629,12 +629,12 @@ std::wstring CShellBrowser::GetRealSizeColumnText(int InternalIndex) const
 
 std::wstring CShellBrowser::GetShortNameColumnText(int InternalIndex) const
 {
-	if(lstrlen(m_pwfdFiles[InternalIndex].cAlternateFileName) == 0)
+	if(lstrlen(m_pwfdFiles.at(InternalIndex).cAlternateFileName) == 0)
 	{
-		return m_pwfdFiles[InternalIndex].cFileName;
+		return m_pwfdFiles.at(InternalIndex).cFileName;
 	}
 
-	return m_pwfdFiles[InternalIndex].cAlternateFileName;
+	return m_pwfdFiles.at(InternalIndex).cAlternateFileName;
 }
 
 std::wstring CShellBrowser::GetOwnerColumnText(int InternalIndex) const
@@ -741,12 +741,12 @@ std::wstring CShellBrowser::GetHardLinksColumnText(int InternalIndex) const
 
 std::wstring CShellBrowser::GetExtensionColumnText(int InternalIndex) const
 {
-	if((m_pwfdFiles[InternalIndex].dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	if((m_pwfdFiles.at(InternalIndex).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		return EMPTY_STRING;
 	}
 
-	TCHAR *Extension = PathFindExtension(m_pwfdFiles[InternalIndex].cFileName);
+	TCHAR *Extension = PathFindExtension(m_pwfdFiles.at(InternalIndex).cFileName);
 
 	if(*Extension != '.')
 	{
@@ -1029,7 +1029,7 @@ std::wstring CShellBrowser::GetNetworkAdapterColumnText(int InternalIndex) const
 	IP_ADAPTER_ADDRESSES *AdapaterAddress = AdapterAddresses;
 
 	while(AdapaterAddress != NULL &&
-		lstrcmp(AdapaterAddress->FriendlyName,m_pwfdFiles[InternalIndex].cFileName) != 0)
+		lstrcmp(AdapaterAddress->FriendlyName,m_pwfdFiles.at(InternalIndex).cFileName) != 0)
 	{
 		AdapaterAddress = AdapaterAddress->Next;
 	}
