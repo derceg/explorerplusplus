@@ -200,7 +200,7 @@ int CShellBrowser::SetAllFolderSizeColumnData(void)
 						{
 							m_fileInfoMap.at((int)lvChildItem.lParam).nFileSizeLow = lTotalFolderSize.LowPart;
 							m_fileInfoMap.at((int)lvChildItem.lParam).nFileSizeHigh = lTotalFolderSize.HighPart;
-							m_pExtraItemInfo[(int)lvChildItem.lParam].bFolderSizeRetrieved = TRUE;
+							m_pExtraItemInfo.at((int)lvChildItem.lParam).bFolderSizeRetrieved = TRUE;
 
 							FormatSizeString(lTotalFolderSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
 								m_bForceSize,m_SizeDisplayFormat);

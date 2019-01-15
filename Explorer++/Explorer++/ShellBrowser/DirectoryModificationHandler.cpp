@@ -555,9 +555,9 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 
 			if(SUCCEEDED(hr))
 			{
-				m_pExtraItemInfo[iItemInternal].pridl = ILClone(pidlRelative);
-				StringCchCopy(m_pExtraItemInfo[iItemInternal].szDisplayName,
-					SIZEOF_ARRAY(m_pExtraItemInfo[iItemInternal].szDisplayName),
+				m_pExtraItemInfo.at(iItemInternal).pridl = ILClone(pidlRelative);
+				StringCchCopy(m_pExtraItemInfo.at(iItemInternal).szDisplayName,
+					SIZEOF_ARRAY(m_pExtraItemInfo.at(iItemInternal).szDisplayName),
 					szDisplayName);
 
 				/* Need to update internal storage for the item, since
@@ -619,8 +619,8 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 	}
 	else
 	{
-		StringCchCopy(m_pExtraItemInfo[iItemInternal].szDisplayName,
-			SIZEOF_ARRAY(m_pExtraItemInfo[iItemInternal].szDisplayName), szNewFileName);
+		StringCchCopy(m_pExtraItemInfo.at(iItemInternal).szDisplayName,
+			SIZEOF_ARRAY(m_pExtraItemInfo.at(iItemInternal).szDisplayName), szNewFileName);
 
 		StringCchCopy(m_fileInfoMap.at(iItemInternal).cFileName,
 			SIZEOF_ARRAY(m_fileInfoMap.at(iItemInternal).cFileName),

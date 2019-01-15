@@ -226,7 +226,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			{
 				LPITEMIDLIST pidlComplete = NULL;
 
-				pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)itr->iItemInternal].pridl);
+				pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at((int)itr->iItemInternal).pridl);
 
 				if(CompareIdls(pidlComplete,m_pidlNewItem))
 					m_bNewItemCreated = FALSE;
@@ -366,7 +366,7 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 	if(iItemInternal == -1)
 		return;
 
-	CoTaskMemFree(m_pExtraItemInfo[iItemInternal].pridl);
+	CoTaskMemFree(m_pExtraItemInfo.at(iItemInternal).pridl);
 
 	/* Is this item a folder? */
 	bFolder = (m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==

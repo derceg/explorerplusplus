@@ -383,7 +383,7 @@ void CShellBrowser::AddToIconFinderQueue(const LVITEM *plvItem)
 
 	lvil.hListView	= m_hListView;
 	lvil.iItem		= plvItem->iItem;
-	lvil.pidlFull	= ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)plvItem->lParam].pridl);
+	lvil.pidlFull	= ILCombine(m_pidlDirectory,m_pExtraItemInfo.at((int)plvItem->lParam).pridl);
 	lvil.hEvent		= m_hIconEvent;
 
 	g_pListViewInfoList.push_back(lvil);
@@ -936,7 +936,7 @@ void CShellBrowser::RemoveFilteredItems(void)
 
 		if(!((m_fileInfoMap.at((int)lvItem.lParam).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
 		{
-			if(IsFilenameFiltered(m_pExtraItemInfo[(int)lvItem.lParam].szDisplayName))
+			if(IsFilenameFiltered(m_pExtraItemInfo.at((int)lvItem.lParam).szDisplayName))
 			{
 				RemoveFilteredItem(i,(int)lvItem.lParam);
 			}
@@ -1251,7 +1251,7 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	{
 		if(m_pItemMap[i] == 1)
 		{
-			CoTaskMemFree(m_pExtraItemInfo[i].pridl);
+			CoTaskMemFree(m_pExtraItemInfo.at(i).pridl);
 		}
 	}
 
@@ -1483,7 +1483,7 @@ void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lvItem.lParam].pridl);
+		pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at((int)lvItem.lParam).pridl);
 
 		if(CompareIdls(pidlItem,pidlComplete))
 		{
@@ -1676,7 +1676,7 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 			lvItem.iSubItem	= 0;
 			ListView_GetItem(m_hListView,&lvItem);
 
-			pidlItem = ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lvItem.lParam].pridl);
+			pidlItem = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at((int)lvItem.lParam).pridl);
 
 			if(CompareIdls(pidlDrive,pidlItem))
 			{
@@ -1698,8 +1698,8 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 	{
 		SHGetFileInfo(szDrive,0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
 
-		StringCchCopy(m_pExtraItemInfo[iItemInternal].szDisplayName,
-			SIZEOF_ARRAY(m_pExtraItemInfo[iItemInternal].szDisplayName),
+		StringCchCopy(m_pExtraItemInfo.at(iItemInternal).szDisplayName,
+			SIZEOF_ARRAY(m_pExtraItemInfo.at(iItemInternal).szDisplayName),
 			szDisplayName);
 
 		/* Update the drives icon and display name. */
@@ -1707,7 +1707,7 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 		lvItem.iImage	= shfi.iIcon;
 		lvItem.iItem	= iItem;
 		lvItem.iSubItem	= 0;
-		lvItem.pszText	= m_pExtraItemInfo[iItemInternal].szDisplayName;
+		lvItem.pszText	= szDisplayName;
 		ListView_SetItem(m_hListView,&lvItem);
 	}
 }
@@ -1725,9 +1725,9 @@ void CShellBrowser::RemoveDrive(const TCHAR *szDrive)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		if(m_pExtraItemInfo[(int)lvItem.lParam].bDrive)
+		if(m_pExtraItemInfo.at((int)lvItem.lParam).bDrive)
 		{
-			if(lstrcmp(szDrive,m_pExtraItemInfo[(int)lvItem.lParam].szDrive) == 0)
+			if(lstrcmp(szDrive,m_pExtraItemInfo.at((int)lvItem.lParam).szDrive) == 0)
 			{
 				iItemInternal = (int)lvItem.lParam;
 				break;

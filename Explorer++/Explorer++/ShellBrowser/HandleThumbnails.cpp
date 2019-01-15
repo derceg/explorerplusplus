@@ -122,7 +122,7 @@ void CShellBrowser::AddToThumbnailFinderQueue(LPARAM lParam)
 
 	lvil.hListView	= m_hListView;
 	lvil.iItem		= (int)lParam;
-	lvil.pidlFull	= ILCombine(m_pidlDirectory,m_pExtraItemInfo[(int)lParam].pridl);
+	lvil.pidlFull	= ILCombine(m_pidlDirectory,m_pExtraItemInfo.at((int)lParam).pridl);
 	lvil.m_pExtraItemInfo	= &m_pExtraItemInfo[(int)lParam];
 	lvil.hEvent		= m_hIconEvent;
 
@@ -356,7 +356,7 @@ void CShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex)
 	int iIconWidth;
 	int iIconHeight;
 
-	pidlFull = ILCombine(m_pidlDirectory,m_pExtraItemInfo[iInternalIndex].pridl);
+	pidlFull = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at(iInternalIndex).pridl);
 	SHGetFileInfo((LPCTSTR)pidlFull,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
 
 	hIcon = ImageList_GetIcon(m_hListViewImageList,

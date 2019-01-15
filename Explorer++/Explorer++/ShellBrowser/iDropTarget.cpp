@@ -597,14 +597,14 @@ void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
 					{
 						if(i == iItem)
 						{
-							m_pExtraItemInfo[(int)lvItem.lParam].iRelativeSort = iInsert;
+							m_pExtraItemInfo.at((int)lvItem.lParam).iRelativeSort = iInsert;
 						}
 						else
 						{
 							if(iSort == iInsert)
 								iSort++;
 
-							m_pExtraItemInfo[(int)lvItem.lParam].iRelativeSort = iSort;
+							m_pExtraItemInfo.at((int)lvItem.lParam).iRelativeSort = iSort;
 						}
 					}
 
