@@ -466,7 +466,7 @@ void CShellBrowser::SetId(int ID)
 
 void CShellBrowser::AllocateInitialItemMemory(void)
 {
-	m_pExtraItemInfo	= (CItemObject *)malloc(DEFAULT_MEM_ALLOC * sizeof(CItemObject));
+	m_pExtraItemInfo	= (ExtraItemInfo *)malloc(DEFAULT_MEM_ALLOC * sizeof(ExtraItemInfo));
 
 	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;
 }

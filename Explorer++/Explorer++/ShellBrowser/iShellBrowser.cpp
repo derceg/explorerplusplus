@@ -1283,8 +1283,8 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 
 	m_fileInfoMap.clear();
 
-	m_pExtraItemInfo = (CItemObject *)realloc(m_pExtraItemInfo,
-		m_iCurrentAllocation * sizeof(CItemObject));
+	m_pExtraItemInfo = (ExtraItemInfo *)realloc(m_pExtraItemInfo,
+		m_iCurrentAllocation * sizeof(ExtraItemInfo));
 
 	m_pItemMap = (int *)realloc(m_pItemMap,m_iCurrentAllocation * sizeof(int));
 

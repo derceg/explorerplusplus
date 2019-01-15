@@ -258,10 +258,8 @@ typedef enum
 	CM_PRINTERMODEL			= 64
 } COLUMNS;
 
-class CItemObject
+struct ExtraItemInfo
 {
-public:
-
 	LPITEMIDLIST	pridl;
 	TCHAR			szDisplayName[MAX_PATH];
 	BOOL			bReal;
@@ -740,7 +738,7 @@ private:
 
 	/* Stores various extra information on files, such
 	as display name. */
-	CItemObject *		m_pExtraItemInfo;
+	ExtraItemInfo *		m_pExtraItemInfo;
 
 	/* Manages browsing history. */
 	CPathManager *		m_pPathManager;

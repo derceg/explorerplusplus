@@ -17,7 +17,7 @@ typedef struct
 	HWND			hListView;
 	LPITEMIDLIST	pidlFull;
 	int				iItem;
-	CItemObject		*m_pExtraItemInfo;
+	ExtraItemInfo		*m_pExtraItemInfo;
 	HANDLE			hEvent;
 } ListViewInfo_t;
 
