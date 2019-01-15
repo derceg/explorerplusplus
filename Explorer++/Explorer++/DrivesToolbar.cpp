@@ -246,12 +246,12 @@ void CDrivesToolbar::InsertDrives()
 {
 	DWORD dwSize = GetLogicalDriveStrings(0,NULL);
 
-	TCHAR *pDriveStrings = new TCHAR[dwSize];
-	dwSize = GetLogicalDriveStrings(dwSize,pDriveStrings);
+	auto driveStrings = std::make_unique<TCHAR[]>(dwSize);
+	dwSize = GetLogicalDriveStrings(dwSize,driveStrings.get());
 
 	if(dwSize != 0)
 	{
-		TCHAR *pDrive = pDriveStrings;
+		TCHAR *pDrive = driveStrings.get();
 
 		while(*pDrive != '\0')
 		{
@@ -260,8 +260,6 @@ void CDrivesToolbar::InsertDrives()
 			pDrive += (lstrlen(pDrive) + 1);
 		}
 	}
-
-	delete[] pDriveStrings;
 }
 
 void CDrivesToolbar::InsertDrive(const std::wstring &DrivePath)

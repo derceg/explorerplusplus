@@ -17,19 +17,19 @@
 
 std::list<std::wstring> NComboBox::ComboBox_GetStrings(HWND hComboBox)
 {
-	std::list<std::wstring> StringEntries;
+	std::list<std::wstring> entries;
 
-	int NumItems = ComboBox_GetCount(hComboBox);
+	int numItems = ComboBox_GetCount(hComboBox);
 
-	for(int i = 0;i < NumItems;i++)
+	for(int i = 0;i < numItems;i++)
 	{
-		int Length = ComboBox_GetLBTextLen(hComboBox,i);
+		int length = ComboBox_GetLBTextLen(hComboBox,i);
 
-		TCHAR *StringEntry = new TCHAR[Length + 1];
-		ComboBox_GetLBText(hComboBox,i,StringEntry);
-		StringEntries.push_back(StringEntry);
-		delete[] StringEntry;
+		auto entry = std::make_unique<TCHAR[]>(length + 1);
+		ComboBox_GetLBText(hComboBox,i,entry.get());
+
+		entries.push_back(entry.get());
 	}
 
-	return StringEntries;
+	return entries;
 }

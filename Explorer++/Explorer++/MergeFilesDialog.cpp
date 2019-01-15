@@ -555,17 +555,15 @@ void CMergeFiles::StartMerging()
 
 			if(lMergeFileSize.QuadPart != 0)
 			{
-				char *pBuffer = new char[lMergeFileSize.LowPart];
+				auto buffer = std::make_unique<char[]>(lMergeFileSize.LowPart);
 
 				DWORD dwNumberOfBytesRead;
-				ReadFile(hInputFile,reinterpret_cast<LPVOID>(pBuffer),static_cast<DWORD>(lMergeFileSize.LowPart),
+				ReadFile(hInputFile,reinterpret_cast<LPVOID>(buffer.get()),static_cast<DWORD>(lMergeFileSize.LowPart),
 					&dwNumberOfBytesRead,NULL);
 
 				DWORD dwNumberOfBytesWritten;
-				WriteFile(hOutputFile,reinterpret_cast<LPCVOID>(pBuffer),dwNumberOfBytesRead,
+				WriteFile(hOutputFile,reinterpret_cast<LPCVOID>(buffer.get()),dwNumberOfBytesRead,
 					&dwNumberOfBytesWritten,NULL);
-
-				delete[] pBuffer;
 			}
 
 			CloseHandle(hInputFile);

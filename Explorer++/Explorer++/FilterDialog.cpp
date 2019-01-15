@@ -143,10 +143,10 @@ void CFilterDialog::OnOk()
 
 	int iBufSize = GetWindowTextLength(hComboBox);
 
-	TCHAR *pszFilter = new TCHAR[iBufSize + 1];
+	auto filter = std::make_unique<TCHAR[]>(iBufSize + 1);
 
 	SendMessage(hComboBox,WM_GETTEXT,iBufSize + 1,
-		reinterpret_cast<LPARAM>(pszFilter));
+		reinterpret_cast<LPARAM>(filter.get()));
 
 	bool bFound = false;
 
@@ -155,7 +155,7 @@ void CFilterDialog::OnOk()
 	Otherwise, insert it at the start. */
 	for(auto itr = m_pfdps->m_FilterList.begin();itr != m_pfdps->m_FilterList.end();itr++)
 	{
-		if(lstrcmp(pszFilter,itr->c_str()) == 0)
+		if(lstrcmp(filter.get(),itr->c_str()) == 0)
 		{
 			std::iter_swap(itr,m_pfdps->m_FilterList.begin());
 
@@ -166,18 +166,16 @@ void CFilterDialog::OnOk()
 
 	if(!bFound)
 	{
-		m_pfdps->m_FilterList.push_front(pszFilter);
+		m_pfdps->m_FilterList.push_front(filter.get());
 	}
 
 	m_pexpp->GetActiveShellBrowser()->SetFilterCaseSensitive(IsDlgButtonChecked(
 		m_hDlg,IDC_FILTERS_CASESENSITIVE) == BST_CHECKED);
 
-	m_pexpp->GetActiveShellBrowser()->SetFilter(pszFilter);
+	m_pexpp->GetActiveShellBrowser()->SetFilter(filter.get());
 
 	if(!m_pexpp->GetActiveShellBrowser()->GetFilterStatus())
 		m_pexpp->GetActiveShellBrowser()->SetFilterStatus(TRUE);
-
-	delete[] pszFilter;
 
 	EndDialog(m_hDlg,1);
 }
