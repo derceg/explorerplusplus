@@ -111,7 +111,7 @@ void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFil
 {
 	LPITEMIDLIST	pidlComplete = NULL;
 
-	pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[iItemInternal].pridl);
+	pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at(iItemInternal).pridl);
 
 	GetDisplayName(pidlComplete,szFullFileName,cchMax,SHGDN_FORPARSING);
 
@@ -548,7 +548,7 @@ LPITEMIDLIST CShellBrowser::QueryItemRelativeIdl(int iItem) const
 	bRet = ListView_GetItem(m_hListView,&lvItem);
 
 	if(bRet)
-		return ILClone((ITEMIDLIST *)m_pExtraItemInfo[(int)lvItem.lParam].pridl);
+		return ILClone((ITEMIDLIST *)m_pExtraItemInfo.at((int)lvItem.lParam).pridl);
 
 	return NULL;
 }
@@ -871,7 +871,7 @@ BOOL CShellBrowser::IsFileReal(int iItem) const
 	bRes = ListView_GetItem(m_hListView,&lvItem);
 
 	if(bRes)
-		return m_pExtraItemInfo[(int)lvItem.lParam].bReal;
+		return m_pExtraItemInfo.at((int)lvItem.lParam).bReal;
 
 	return FALSE;
 }
@@ -1282,9 +1282,7 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;
 
 	m_fileInfoMap.clear();
-
-	m_pExtraItemInfo = (ExtraItemInfo *)realloc(m_pExtraItemInfo,
-		m_iCurrentAllocation * sizeof(ExtraItemInfo));
+	m_pExtraItemInfo.clear();
 
 	m_pItemMap = (int *)realloc(m_pItemMap,m_iCurrentAllocation * sizeof(int));
 

@@ -460,7 +460,7 @@ void CShellBrowser::DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeade
 
 	/* Take the first character of the item's name,
 	and use it to determine which group it belongs to. */
-	ch = m_pExtraItemInfo[iItemInternal].szDisplayName[0];
+	ch = m_pExtraItemInfo.at(iItemInternal).szDisplayName[0];
 
 	if(iswalpha(ch))
 	{
@@ -545,7 +545,7 @@ void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroup
 
 	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
 
-	pidlComplete = ILCombine(pidlDirectory,m_pExtraItemInfo[iItemInternal].pridl);
+	pidlComplete = ILCombine(pidlDirectory,m_pExtraItemInfo.at(iItemInternal).pridl);
 
 	SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *) &pidlRelative);
 
@@ -587,7 +587,7 @@ void CShellBrowser::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGro
 
 	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
 
-	pidlComplete = ILCombine(pidlDirectory,m_pExtraItemInfo[iItemInternal].pridl);
+	pidlComplete = ILCombine(pidlDirectory,m_pExtraItemInfo.at(iItemInternal).pridl);
 
 	SHGetFileInfo((LPTSTR)pidlComplete,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_TYPENAME);
 
@@ -749,7 +749,7 @@ void CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroup
 	BOOL bRes = FALSE;
 
 	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
-	pidlComplete = ILCombine(pidlDirectory,m_pExtraItemInfo[iItemInternal].pridl);
+	pidlComplete = ILCombine(pidlDirectory,m_pExtraItemInfo.at(iItemInternal).pridl);
 	SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
@@ -895,7 +895,7 @@ void CShellBrowser::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGrou
 	BOOL bRoot;
 	BOOL bRes;
 
-	pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo[iItemInternal].pridl);
+	pidlComplete = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at(iItemInternal).pridl);
 
 	SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
 

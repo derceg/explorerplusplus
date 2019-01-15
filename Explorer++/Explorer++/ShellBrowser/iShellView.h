@@ -575,7 +575,7 @@ private:
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void inline			InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(int iItemInternal) const;
-	TCHAR				*ProcessItemFileName(int iItemInternal) const;
+	std::wstring		ProcessItemFileName(int iItemInternal) const;
 	HRESULT inline		AddItemInternal(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
 	HRESULT inline		AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
 	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName);
@@ -738,7 +738,7 @@ private:
 
 	/* Stores various extra information on files, such
 	as display name. */
-	ExtraItemInfo *		m_pExtraItemInfo;
+	std::unordered_map<int, ExtraItemInfo>	m_pExtraItemInfo;
 
 	/* Manages browsing history. */
 	CPathManager *		m_pPathManager;

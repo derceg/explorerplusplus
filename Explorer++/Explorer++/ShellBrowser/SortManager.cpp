@@ -337,8 +337,8 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	{
 		/* By default, items that are equal will be sub-sorted
 		by their display names. */
-		ComparisonResult = StrCmpLogicalW(m_pExtraItemInfo[InternalIndex1].szDisplayName,
-			m_pExtraItemInfo[InternalIndex2].szDisplayName);
+		ComparisonResult = StrCmpLogicalW(m_pExtraItemInfo.at(InternalIndex1).szDisplayName,
+			m_pExtraItemInfo.at(InternalIndex2).szDisplayName);
 	}
 
 	if(!m_bSortAscending)
@@ -354,12 +354,12 @@ int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) co
 	if(m_bVirtualFolder)
 	{
 		TCHAR FullFileName1[MAX_PATH];
-		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex1].pridl);
+		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at(InternalIndex1).pridl);
 		GetDisplayName(pidlComplete1,FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete1);
 
 		TCHAR FullFileName2[MAX_PATH];
-		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex2].pridl);
+		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at(InternalIndex2).pridl);
 		GetDisplayName(pidlComplete2,FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete2);
 
@@ -395,11 +395,11 @@ int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) co
 	
 	if(IsFolder1 && IsFolder2)
 	{
-		if(m_pExtraItemInfo[InternalIndex1].bFolderSizeRetrieved && !m_pExtraItemInfo[InternalIndex2].bFolderSizeRetrieved)
+		if(m_pExtraItemInfo.at(InternalIndex1).bFolderSizeRetrieved && !m_pExtraItemInfo.at(InternalIndex2).bFolderSizeRetrieved)
 		{
 			return 1;
 		}
-		else if(!m_pExtraItemInfo[InternalIndex1].bFolderSizeRetrieved && m_pExtraItemInfo[InternalIndex2].bFolderSizeRetrieved)
+		else if(!m_pExtraItemInfo.at(InternalIndex1).bFolderSizeRetrieved && m_pExtraItemInfo.at(InternalIndex2).bFolderSizeRetrieved)
 		{
 			return -1;
 		}
@@ -425,12 +425,12 @@ int CALLBACK CShellBrowser::SortByType(int InternalIndex1,int InternalIndex2) co
 	if(m_bVirtualFolder)
 	{
 		TCHAR FullFileName1[MAX_PATH];
-		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex1].pridl);
+		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at(InternalIndex1).pridl);
 		GetDisplayName(pidlComplete1,FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete1);
 
 		TCHAR FullFileName2[MAX_PATH];
-		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo[InternalIndex2].pridl);
+		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_pExtraItemInfo.at(InternalIndex2).pridl);
 		GetDisplayName(pidlComplete2,FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete2);
 

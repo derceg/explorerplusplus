@@ -581,11 +581,16 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 
 					if(iItem != -1)
 					{
+						std::wstring filename = ProcessItemFileName(iItemInternal);
+
+						TCHAR filenameCopy[MAX_PATH];
+						StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());
+
 						lvItem.mask			= LVIF_TEXT|LVIF_IMAGE|LVIF_STATE;
 						lvItem.iItem		= iItem;
 						lvItem.iSubItem		= 0;
 						lvItem.iImage		= shfi.iIcon;
-						lvItem.pszText		= ProcessItemFileName(iItemInternal);
+						lvItem.pszText		= filenameCopy;
 						lvItem.stateMask	= LVIS_OVERLAYMASK;
 
 						/* As well as resetting the items icon, we'll also set

@@ -181,8 +181,13 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	{
 		if(!IsFileFiltered(itr->iItemInternal))
 		{
+			std::wstring filename = ProcessItemFileName(itr->iItemInternal);
+
+			TCHAR filenameCopy[MAX_PATH];
+			StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());
+
 			lv.iItem	= itr->iItem;
-			lv.pszText	= ProcessItemFileName(itr->iItemInternal);
+			lv.pszText	= filenameCopy;
 			lv.iImage	= I_IMAGECALLBACK;
 			lv.lParam	= itr->iItemInternal;
 
@@ -295,7 +300,7 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 	if(m_bApplyFilter &&
 		((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
-		bFilenameFiltered = IsFilenameFiltered(m_pExtraItemInfo[iItemInternal].szDisplayName);
+		bFilenameFiltered = IsFilenameFiltered(m_pExtraItemInfo.at(iItemInternal).szDisplayName);
 	}
 
 	if(m_bHideSystemFiles)
@@ -310,16 +315,15 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 /* Processes an items filename. Essentially checks
 if the extension (if any) needs to be removed, and
 removes it if it does. */
-TCHAR *CShellBrowser::ProcessItemFileName(int iItemInternal) const
+std::wstring CShellBrowser::ProcessItemFileName(int iItemInternal) const
 {
 	BOOL bHideExtension = FALSE;
 	TCHAR *pExt = NULL;
-	TCHAR *pszDisplay = NULL;
 
 	if(m_bHideLinkExtension &&
 		((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
-		pExt = PathFindExtension(m_pExtraItemInfo[iItemInternal].szDisplayName);
+		pExt = PathFindExtension(m_pExtraItemInfo.at(iItemInternal).szDisplayName);
 
 		if(*pExt != '\0')
 		{
@@ -332,26 +336,23 @@ TCHAR *CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	to be hidden, and the filename does not begin with
 	a period, and the item is not a directory. */
 	if((!m_bShowExtensions || bHideExtension) &&
-		m_pExtraItemInfo[iItemInternal].szDisplayName[0] != '.' &&
+		m_pExtraItemInfo.at(iItemInternal).szDisplayName[0] != '.' &&
 		(m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
 		static TCHAR szDisplayName[MAX_PATH];
 
 		StringCchCopy(szDisplayName,SIZEOF_ARRAY(szDisplayName),
-			m_pExtraItemInfo[iItemInternal].szDisplayName);
+			m_pExtraItemInfo.at(iItemInternal).szDisplayName);
 
 		/* Strip the extension. */
 		PathRemoveExtension(szDisplayName);
 
-		/* The item will now be shown without its extension. */
-		pszDisplay = szDisplayName;
+		return szDisplayName;
 	}
 	else
 	{
-		pszDisplay = m_pExtraItemInfo[iItemInternal].szDisplayName;
+		return m_pExtraItemInfo.at(iItemInternal).szDisplayName;
 	}
-
-	return pszDisplay;
 }
 
 void CShellBrowser::RemoveItem(int iItemInternal)
@@ -595,15 +596,9 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 		else
 			m_iCurrentAllocation += DEFAULT_MEM_ALLOC;
 
-		m_pExtraItemInfo = (ExtraItemInfo *)realloc(m_pExtraItemInfo,
-			m_iCurrentAllocation * sizeof(ExtraItemInfo));
-
 		m_pItemMap = (int *)realloc(m_pItemMap,m_iCurrentAllocation * sizeof(int));
 
 		InitializeItemMap(PrevSize,m_iCurrentAllocation);
-
-		if(m_pExtraItemInfo == NULL)
-			return E_OUTOFMEMORY;
 	}
 
 	uItemId = GenerateUniqueItemId();

@@ -188,7 +188,7 @@ CShellBrowser::~CShellBrowser()
 
 		ListView_GetItem(m_hListView,&lvItem);
 
-		CoTaskMemFree(reinterpret_cast<LPVOID>(m_pExtraItemInfo[lvItem.lParam].pridl));
+		CoTaskMemFree(reinterpret_cast<LPVOID>(m_pExtraItemInfo.at(static_cast<int>(lvItem.lParam)).pridl));
 
 		/* Also destroy the thumbnails imagelist... */
 	}
@@ -198,7 +198,6 @@ CShellBrowser::~CShellBrowser()
 	delete m_pPathManager;
 
 	free(m_pItemMap);
-	free(m_pExtraItemInfo);
 }
 
 BOOL CShellBrowser::GetAutoArrange(void) const
@@ -466,8 +465,6 @@ void CShellBrowser::SetId(int ID)
 
 void CShellBrowser::AllocateInitialItemMemory(void)
 {
-	m_pExtraItemInfo	= (ExtraItemInfo *)malloc(DEFAULT_MEM_ALLOC * sizeof(ExtraItemInfo));
-
 	m_iCurrentAllocation = DEFAULT_MEM_ALLOC;
 }
 
