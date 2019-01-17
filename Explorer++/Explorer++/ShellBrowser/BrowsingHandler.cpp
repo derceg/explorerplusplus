@@ -63,10 +63,12 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 
 	EmptyIconFinderQueue();
 	EmptyThumbnailsQueue();
-	EmptyColumnQueue();
 	EmptyFolderQueue();
 
 	/* TODO: Wait for any background threads to finish processing. */
+
+	m_columnThreadPool.clear_queue();
+	m_columnResults.clear();
 
 	EnterCriticalSection(&m_csDirectoryAltered);
 	m_FilesAdded.clear();
@@ -267,8 +269,6 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	{
 		TCHAR szDrive[MAX_PATH];
 		BOOL bNetworkRemovable = FALSE;
-
-		QueueUserAPC(SetAllColumnDataAPC,m_hThread,(ULONG_PTR)this);
 
 		StringCchCopy(szDrive,SIZEOF_ARRAY(szDrive),m_CurDir);
 		PathStripToRoot(szDrive);
@@ -567,7 +567,6 @@ HRESULT inline CShellBrowser::AddItemInternal(int iItemIndex,int iItemId,BOOL bP
 
 	m_AwaitingAddList.push_back(AwaitingAdd);
 
-	AddToColumnQueue(AwaitingAdd.iItem);
 	AddToFolderQueue(AwaitingAdd.iItem);
 
 	return S_OK;

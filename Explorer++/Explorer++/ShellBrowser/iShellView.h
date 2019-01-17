@@ -5,7 +5,11 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/StringHelper.h"
+#include "../ThirdParty/CTPL/cpl_stl.h"
+#include <boost/optional.hpp>
+#include <future>
 #include <list>
+#include <mutex>
 #include <unordered_map>
 
 #define WM_USER_UPDATEWINDOWS		(WM_APP + 17)
@@ -296,7 +300,6 @@ typedef struct
 class CShellBrowser : public IDropTarget, public IDropFilesCallback
 {
 	friend int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-	friend void CALLBACK SetAllColumnDataAPC(ULONG_PTR dwParam);
 
 public:
 
@@ -416,11 +419,6 @@ public:
 	void				EmptyThumbnailsQueue(void);
 	BOOL				InVirtualFolder(void) const;
 	BOOL				CanCreate(void) const;
-
-	/* Column queueing. */
-	void				AddToColumnQueue(int iItem);
-	void				EmptyColumnQueue(void);
-	BOOL				RemoveFromColumnQueue(int *iItem);
 
 	/* Folder size queueing. */
 	void				AddToFolderQueue(int iItem);
@@ -555,8 +553,19 @@ private:
 		TCHAR szFileName[MAX_PATH];
 	};
 
+	struct ColumnResult_t
+	{
+		int itemInternalIndex;
+		int columnID;
+		std::wstring columnText;
+	};
+
 	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
 	static const int THUMBNAIL_ITEM_VERTICAL_SPACING = 20;
+
+	static const UINT_PTR LISTVIEW_SUBCLASS_ID = 0;
+
+	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 
 	CShellBrowser(HWND hOwner, HWND hListView,
 		const InitialSettings_t *pSettings, HANDLE hIconThread,
@@ -579,6 +588,9 @@ private:
 	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName);
 	void				ResetFolderMemoryAllocations(void);
 	void				SetCurrentViewModeInternal(UINT ViewMode);
+
+	static LRESULT CALLBACK	ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK	ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	/* Sorting. */
 	int CALLBACK		Sort(int InternalIndex1,int InternalIndex2) const;
@@ -604,14 +616,18 @@ private:
 	int CALLBACK		SortByMediaMetadata(int InternalIndex1,int InternalIndex2,MediaMetadataType_t MediaMetaDataType) const;
 
 	/* Listview column support. */
-	void				SetAllColumnText(void);
 	void				SetColumnText(UINT ColumnID,int ItemIndex,int ColumnIndex);
 	void				PlaceColumns(void);
+	void				QueueColumnTask(int itemInternalIndex, int columnIndex);
+	CShellBrowser::ColumnResult_t	GetColumnTextAsync(int columnResultId, unsigned int ColumnID, int InternalIndex) const;
 	std::wstring		GetColumnText(UINT ColumnID,int InternalIndex) const;
 	void				InsertColumn(unsigned int ColumnId,int iColumndIndex,int iWidth);
 	void				SetActiveColumnSet(void);
 	void				GetColumnInternal(unsigned int id,Column_t *pci) const;
 	void				SaveColumnWidths(void);
+	void				ProcessColumnResult(int columnResultId);
+	boost::optional<int>	GetColumnIndexById(unsigned int id) const;
+	boost::optional<unsigned int>	GetColumnIdByIndex(int index) const;
 
 	/* Listview columns. */
 	std::wstring		GetNameColumnText(int InternalIndex) const;
@@ -717,6 +733,7 @@ private:
 	/* Miscellaneous. */
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL) const;
 	int					LocateFileItemInternalIndex(const TCHAR *szFileName) const;
+	boost::optional<int>	LocateItemByInternalIndex(int internalIndex) const;
 	void				ApplyHeaderSortArrow(void);
 	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName,UINT cchMax) const;
 
@@ -724,6 +741,7 @@ private:
 	int					m_iRefCount;
 
 	HWND				m_hListView;
+	BOOL				m_ListViewSubclassed;
 	HWND				m_hOwner;
 
 	BOOL				m_bPerformingDrag;
@@ -739,6 +757,10 @@ private:
 	/* Stores various extra information on files, such
 	as display name. */
 	std::unordered_map<int, ExtraItemInfo>	m_extraItemInfoMap;
+
+	ctpl::thread_pool	m_columnThreadPool;
+	std::unordered_map<int, std::future<ColumnResult_t>> m_columnResults;
+	int					m_columnResultIDCounter;
 
 	/* Manages browsing history. */
 	CPathManager		m_pathManager;
@@ -810,11 +832,6 @@ private:
 
 	/* File selection. */
 	std::list<std::wstring>	m_FileSelectionList;
-
-	/* Column gathering information. */
-	std::list<int>		m_pColumnInfoList;
-	CRITICAL_SECTION	m_column_cs;
-	HANDLE				m_hColumnQueueEvent;
 
 	/* Folder size information. */
 	std::list<int>		m_pFolderInfoList;

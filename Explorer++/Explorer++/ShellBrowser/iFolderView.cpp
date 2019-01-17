@@ -77,7 +77,9 @@ m_hOwner(hOwner),
 m_hListView(hListView),
 m_hThread(hIconThread),
 m_hFolderSizeThread(hFolderSizeThread),
-m_itemIDCounter(0)
+m_itemIDCounter(0),
+m_columnThreadPool(1),
+m_columnResultIDCounter(0)
 {
 	m_iRefCount = 1;
 
@@ -126,7 +128,6 @@ m_itemIDCounter(0)
 	m_nAwaitingAdd = 0;
 
 	InitializeCriticalSection(&m_csDirectoryAltered);
-	InitializeCriticalSection(&m_column_cs);
 	InitializeCriticalSection(&m_folder_cs);
 
 	if(!g_bcsThumbnailInitialized)
@@ -148,16 +149,23 @@ m_itemIDCounter(0)
 	}
 
 	m_hIconEvent = CreateEvent(NULL,TRUE,TRUE,NULL);
-	m_hColumnQueueEvent = CreateEvent(NULL,TRUE,TRUE,NULL);
 	m_hFolderQueueEvent = CreateEvent(NULL,TRUE,TRUE,NULL);
+
+	m_ListViewSubclassed = SetWindowSubclass(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 }
 
 CShellBrowser::~CShellBrowser()
 {
+	if (m_ListViewSubclassed)
+	{
+		RemoveWindowSubclass(m_hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID);
+	}
+
 	EmptyIconFinderQueue();
 	EmptyThumbnailsQueue();
-	EmptyColumnQueue();
 	EmptyFolderQueue();
+
+	m_columnThreadPool.clear_queue();
 
 	/* Wait for any current processing to finish. */
 	WaitForSingleObject(m_hIconEvent,INFINITE);
@@ -167,7 +175,6 @@ CShellBrowser::~CShellBrowser()
 	m_pDragSourceHelper->Release();
 
 	DeleteCriticalSection(&m_folder_cs);
-	DeleteCriticalSection(&m_column_cs);
 	DeleteCriticalSection(&m_csDirectoryAltered);
 
 	int nItems = ListView_GetItemCount(m_hListView);
@@ -229,13 +236,6 @@ void CShellBrowser::SetCurrentViewMode(UINT ViewMode)
 	{
 		case VM_DETAILS:
 			{
-				int i = 0;
-
-				for(i = 0;i < m_nTotalItems;i++)
-					AddToColumnQueue(i);
-
-				QueueUserAPC(SetAllColumnDataAPC,m_hThread,(ULONG_PTR)this);
-
 				if(m_bShowFolderSizes)
 					QueueUserAPC(SetAllFolderSizeColumnDataAPC,m_hFolderSizeThread,(ULONG_PTR)this);
 			}

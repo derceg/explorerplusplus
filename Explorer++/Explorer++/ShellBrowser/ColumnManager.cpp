@@ -35,63 +35,6 @@
 
 BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax);
 
-/* Queueing model:
-When first browsing into a folder, all items in queue
-are cleared.
-Then, all new items are added.
-Finally, the APC is queued to the worker thread.
-
-The worker thread will process items, removing items
-from the queue as it does. Interlocking is required
-between queue removal and emptying the queue.
-
-Folder sizes are NOT calculated here. They are done
-within a separate thread called from the main thread. */
-void CShellBrowser::AddToColumnQueue(int iItem)
-{
-	m_pColumnInfoList.push_back(iItem);
-}
-
-void CShellBrowser::EmptyColumnQueue(void)
-{
-	EnterCriticalSection(&m_column_cs);
-
-	m_pColumnInfoList.clear();
-
-	LeaveCriticalSection(&m_column_cs);
-}
-
-BOOL CShellBrowser::RemoveFromColumnQueue(int *iItem)
-{
-	BOOL bQueueNotEmpty;
-
-	EnterCriticalSection(&m_column_cs);
-
-	if(m_pColumnInfoList.empty() == TRUE)
-	{
-		SetEvent(m_hColumnQueueEvent);
-		bQueueNotEmpty = FALSE;
-	}
-	else
-	{
-		std::list<int>::iterator itr;
-
-		itr = m_pColumnInfoList.begin();
-
-		*iItem = *itr;
-
-		ResetEvent(m_hColumnQueueEvent);
-
-		m_pColumnInfoList.erase(itr);
-
-		bQueueNotEmpty = TRUE;
-	}
-
-	LeaveCriticalSection(&m_column_cs);
-
-	return bQueueNotEmpty;
-}
-
 void CShellBrowser::AddToFolderQueue(int iItem)
 {
 	m_pFolderInfoList.push_back(iItem);
@@ -223,33 +166,122 @@ int CShellBrowser::SetAllFolderSizeColumnData(void)
 	return 0;
 }
 
-void CALLBACK SetAllColumnDataAPC(ULONG_PTR dwParam)
+void CShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
 {
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(dwParam);
-	pShellBrowser->SetAllColumnText();
-}
+	auto columnID = GetColumnIdByIndex(columnIndex);
 
-void CShellBrowser::SetAllColumnText(void)
-{
-	int ItemIndex;
-	BOOL QueueNotEmpty = RemoveFromColumnQueue(&ItemIndex);
-
-	while(QueueNotEmpty)
+	if (!columnID)
 	{
-		int iColumnIndex = 0;
-
-		for(auto itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
-		{
-			if(itr->bChecked)
-			{
-				SetColumnText(itr->id,ItemIndex,iColumnIndex++);
-			}
-		}
-
-		QueueNotEmpty = RemoveFromColumnQueue(&ItemIndex);
+		return;
 	}
 
-	ApplyHeaderSortArrow();
+	int columnResultID = m_columnResultIDCounter++;
+
+	auto result = m_columnThreadPool.push([this, columnResultID, columnID, itemInternalIndex](int id) {
+		UNREFERENCED_PARAMETER(id);
+
+		return this->GetColumnTextAsync(columnResultID, *columnID, itemInternalIndex);
+	});
+
+	// The function call above might finish before this line runs,
+	// but that doesn't matter, as the results won't be processed
+	// until a message posted to the main thread has been handled
+	// (which can only occur after this function has returned).
+	m_columnResults.insert({ columnResultID, std::move(result) });
+}
+
+CShellBrowser::ColumnResult_t CShellBrowser::GetColumnTextAsync(int columnResultId, unsigned int ColumnID, int InternalIndex) const
+{
+	std::wstring columnText = GetColumnText(ColumnID, InternalIndex);
+
+	// This message may be delivered before this function has returned.
+	// That doesn't actually matter, since the message handler will
+	// simply wait for the result to be returned.
+	PostMessage(m_hListView, WM_APP_COLUMN_RESULT_READY, columnResultId, 0);
+
+	ColumnResult_t result;
+	result.itemInternalIndex = InternalIndex;
+	result.columnID = ColumnID;
+	result.columnText = columnText;
+
+	return result;
+}
+
+void CShellBrowser::ProcessColumnResult(int columnResultId)
+{
+	auto itr = m_columnResults.find(columnResultId);
+
+	if (itr == m_columnResults.end())
+	{
+		// This result is for a previous folder. It can be ignored.
+		return;
+	}
+
+	auto result = itr->second.get();
+
+	auto index = LocateItemByInternalIndex(result.itemInternalIndex);
+
+	if (!index)
+	{
+		// This is a valid state. The item may simply have been deleted.
+		return;
+	}
+
+	auto columnIndex = GetColumnIndexById(result.columnID);
+
+	if (!columnIndex)
+	{
+		// This is also a valid state. The column may have been removed.
+		return;
+	}
+
+	auto columnText = std::make_unique<TCHAR[]>(result.columnText.size() + 1);
+	StringCchCopy(columnText.get(), result.columnText.size() + 1, result.columnText.c_str());
+	ListView_SetItemText(m_hListView, *index, *columnIndex, columnText.get());
+
+	m_columnResults.erase(itr);
+}
+
+boost::optional<int> CShellBrowser::GetColumnIndexById(unsigned int id) const
+{
+	HWND header = ListView_GetHeader(m_hListView);
+
+	int numItems = Header_GetItemCount(header);
+
+	for (int i = 0; i < numItems; i++)
+	{
+		HDITEM hdItem;
+		hdItem.mask = HDI_LPARAM;
+		BOOL res = Header_GetItem(header, i, &hdItem);
+
+		if (!res)
+		{
+			continue;
+		}
+
+		if (hdItem.lParam == id)
+		{
+			return i;
+		}
+	}
+
+	return boost::none;
+}
+
+boost::optional<unsigned int> CShellBrowser::GetColumnIdByIndex(int index) const
+{
+	HWND hHeader = ListView_GetHeader(m_hListView);
+
+	HDITEM hdItem;
+	hdItem.mask = HDI_LPARAM;
+	BOOL res = Header_GetItem(hHeader, index, &hdItem);
+
+	if (!res)
+	{
+		return boost::none;
+	}
+
+	return hdItem.lParam;
 }
 
 void CShellBrowser::SetColumnText(UINT ColumnID,int ItemIndex,int ColumnIndex)

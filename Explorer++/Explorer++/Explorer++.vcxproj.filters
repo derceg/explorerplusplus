@@ -232,6 +232,9 @@
     <ClCompile Include="ShellBrowser\SortManager.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\ListView.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">

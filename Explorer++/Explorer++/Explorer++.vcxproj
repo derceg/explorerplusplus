@@ -346,6 +346,7 @@
     <ClCompile Include="ShellBrowser\iFolderView.cpp" />
     <ClCompile Include="ShellBrowser\iPathManager.cpp" />
     <ClCompile Include="ShellBrowser\iShellBrowser.cpp" />
+    <ClCompile Include="ShellBrowser\ListView.cpp" />
     <ClCompile Include="ShellBrowser\SortManager.cpp" />
     <ClCompile Include="ShellContextMenuHandler.cpp" />
     <ClCompile Include="SplitFileDialog.cpp" />

@@ -265,6 +265,21 @@ int CShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 	return -1;
 }
 
+boost::optional<int> CShellBrowser::LocateItemByInternalIndex(int internalIndex) const
+{
+	LVFINDINFO lvfi;
+	lvfi.flags = LVFI_PARAM;
+	lvfi.lParam = internalIndex;
+	int item = ListView_FindItem(m_hListView, -1, &lvfi);
+
+	if (item == -1)
+	{
+		return boost::none;
+	}
+
+	return item;
+}
+
 DWORD CShellBrowser::QueryFileAttributes(int iItem) const
 {
 	LVITEM lvItem;
@@ -353,6 +368,11 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 			AddToThumbnailFinderQueue(plvItem->lParam);
 
 		return;
+	}
+
+	if (m_ViewMode == VM_DETAILS && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
+	{
+		QueueColumnTask(static_cast<int>(plvItem->lParam), plvItem->iSubItem);
 	}
 
 	if((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
@@ -1262,7 +1282,6 @@ void CShellBrowser::SetTerminationStatus(void)
 {
 	EmptyIconFinderQueue();
 	EmptyThumbnailsQueue();
-	EmptyColumnQueue();
 	EmptyFolderQueue();
 	m_bNotifiedOfTermination = TRUE;
 }
