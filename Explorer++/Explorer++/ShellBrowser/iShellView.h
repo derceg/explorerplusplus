@@ -576,6 +576,9 @@ private:
 	static LRESULT CALLBACK	ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK	ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+	static LRESULT CALLBACK	ListViewParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK	ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 	/* Sorting. */
 	int CALLBACK		Sort(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByName(int InternalIndex1,int InternalIndex2) const;
@@ -731,7 +734,15 @@ private:
 
 	HWND				m_hListView;
 	BOOL				m_ListViewSubclassed;
+	BOOL				m_ListViewParentSubclassed;
 	HWND				m_hOwner;
+
+	// Each instance of this class will subclass the parent window. As
+	// they'll all use the same static procedure, it's important that
+	// they use different subclass IDs (as the procedure and ID uniquely
+	// identify a subclass).
+	static int listViewParentSubclassIdCounter;
+	int m_listViewParentSubclassId;
 
 	BOOL				m_bPerformingDrag;
 	BOOL				m_bNotifiedOfTermination;

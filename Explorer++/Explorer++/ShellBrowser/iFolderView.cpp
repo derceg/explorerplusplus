@@ -27,6 +27,8 @@
 
 BOOL g_bInitialized = FALSE;
 
+int CShellBrowser::listViewParentSubclassIdCounter = 0;
+
 /* IUnknown interface members. */
 HRESULT __stdcall CShellBrowser::QueryInterface(REFIID iid, void **ppvObject)
 {
@@ -145,6 +147,18 @@ m_thumbnailResultIDCounter(0)
 
 	m_ListViewSubclassed = SetWindowSubclass(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
+	HWND hParent = GetParent(hListView);
+
+	if (hParent != NULL)
+	{
+		m_listViewParentSubclassId = listViewParentSubclassIdCounter++;
+		m_ListViewParentSubclassed = SetWindowSubclass(hParent, ListViewParentProcStub, m_listViewParentSubclassId, reinterpret_cast<DWORD_PTR>(this));
+	}
+	else
+	{
+		m_ListViewParentSubclassed = FALSE;
+	}
+
 	m_thumbnailThreadPool.push([](int id) {
 		UNREFERENCED_PARAMETER(id);
 
@@ -154,6 +168,13 @@ m_thumbnailResultIDCounter(0)
 
 CShellBrowser::~CShellBrowser()
 {
+	HWND hParent = GetParent(m_hListView);
+
+	if (m_ListViewParentSubclassed && hParent != NULL)
+	{
+		RemoveWindowSubclass(hParent, ListViewParentProcStub, m_listViewParentSubclassId);
+	}
+
 	if (m_ListViewSubclassed)
 	{
 		RemoveWindowSubclass(m_hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID);
