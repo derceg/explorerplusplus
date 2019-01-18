@@ -465,7 +465,7 @@ int *pTabObjectIndex)
 	pSettings->sdf			= m_SizeDisplayFormat;
 
 	m_pShellBrowser[iTabId] = CShellBrowser::CreateNew(m_hContainer,m_hListView[iTabId],pSettings,
-		m_hIconThread,m_hFolderSizeThread);
+		m_hIconThread);
 
 	if(pSettings->bApplyFilter)
 		NListView::ListView_SetBackgroundImage(m_hListView[iTabId],IDB_FILTERINGAPPLIED);

@@ -787,7 +787,6 @@ private:
 	CStatusBar *			m_pStatusBar;
 	HANDLE					m_hIconThread;
 	HANDLE					m_hTreeViewIconThread;
-	HANDLE					m_hFolderSizeThread;
 
 	HMODULE					m_hLanguageModule;
 

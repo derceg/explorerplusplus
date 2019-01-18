@@ -65,18 +65,16 @@ ULONG __stdcall CShellBrowser::Release(void)
 }
 
 CShellBrowser *CShellBrowser::CreateNew(HWND hOwner,HWND hListView,
-	const InitialSettings_t *pSettings,HANDLE hIconThread,HANDLE hFolderSizeThread)
+	const InitialSettings_t *pSettings,HANDLE hIconThread)
 {
-	return new CShellBrowser(hOwner,hListView,pSettings,hIconThread,hFolderSizeThread);
+	return new CShellBrowser(hOwner,hListView,pSettings,hIconThread);
 }
 
 CShellBrowser::CShellBrowser(HWND hOwner,HWND hListView,
-const InitialSettings_t *pSettings,HANDLE hIconThread,
-HANDLE hFolderSizeThread) :
+const InitialSettings_t *pSettings,HANDLE hIconThread) :
 m_hOwner(hOwner),
 m_hListView(hListView),
 m_hThread(hIconThread),
-m_hFolderSizeThread(hFolderSizeThread),
 m_itemIDCounter(0),
 m_columnThreadPool(1),
 m_columnResultIDCounter(0)
@@ -128,7 +126,6 @@ m_columnResultIDCounter(0)
 	m_nAwaitingAdd = 0;
 
 	InitializeCriticalSection(&m_csDirectoryAltered);
-	InitializeCriticalSection(&m_folder_cs);
 
 	if(!g_bcsThumbnailInitialized)
 	{
@@ -149,7 +146,6 @@ m_columnResultIDCounter(0)
 	}
 
 	m_hIconEvent = CreateEvent(NULL,TRUE,TRUE,NULL);
-	m_hFolderQueueEvent = CreateEvent(NULL,TRUE,TRUE,NULL);
 
 	m_ListViewSubclassed = SetWindowSubclass(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 }
@@ -163,7 +159,6 @@ CShellBrowser::~CShellBrowser()
 
 	EmptyIconFinderQueue();
 	EmptyThumbnailsQueue();
-	EmptyFolderQueue();
 
 	m_columnThreadPool.clear_queue();
 
@@ -174,7 +169,6 @@ CShellBrowser::~CShellBrowser()
 	m_pDropTargetHelper->Release();
 	m_pDragSourceHelper->Release();
 
-	DeleteCriticalSection(&m_folder_cs);
 	DeleteCriticalSection(&m_csDirectoryAltered);
 
 	int nItems = ListView_GetItemCount(m_hListView);
@@ -234,13 +228,6 @@ void CShellBrowser::SetCurrentViewMode(UINT ViewMode)
 
 	switch(ViewMode)
 	{
-		case VM_DETAILS:
-			{
-				if(m_bShowFolderSizes)
-					QueueUserAPC(SetAllFolderSizeColumnDataAPC,m_hFolderSizeThread,(ULONG_PTR)this);
-			}
-			break;
-
 		case VM_TILES:
 			SetTileViewInfo();
 			break;

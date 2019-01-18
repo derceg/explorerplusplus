@@ -27,7 +27,6 @@ int *nFiles,PULARGE_INTEGER lTotalFolderSize)
 	ULARGE_INTEGER	l_TotalFolderSize;
 	ULARGE_INTEGER	r_TotalFolderSize;
 	ULARGE_INTEGER	lFileSize;
-	BOOL			bTerminated = FALSE;
 	int				l_NumFiles = 0;
 	int				l_NumFolders = 0;
 	int				r_NumFiles = 0;
@@ -86,9 +85,6 @@ int *nFiles,PULARGE_INTEGER lTotalFolderSize)
 			}
 		}
 	}
-
-	if(bTerminated)
-		ExitThread(0);
 
 	*nFolders					= l_NumFolders;
 	*nFiles						= l_NumFiles;

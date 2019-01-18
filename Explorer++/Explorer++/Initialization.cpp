@@ -135,7 +135,6 @@ void Explorerplusplus::OnCreate(void)
 
 	m_hIconThread = CreateWorkerThread();
 	m_hTreeViewIconThread = CreateWorkerThread();
-	m_hFolderSizeThread = CreateWorkerThread();
 
 	/* These need to occur after the language module
 	has been initialized, but before the tabs are

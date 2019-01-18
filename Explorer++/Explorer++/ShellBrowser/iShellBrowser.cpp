@@ -1262,6 +1262,8 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 
 	m_extraItemInfoMap.clear();
 
+	m_cachedFolderSizes.clear();
+
 	CoTaskMemFree(m_pidlDirectory);
 
 	m_FilteredItemsList.clear();
@@ -1282,7 +1284,6 @@ void CShellBrowser::SetTerminationStatus(void)
 {
 	EmptyIconFinderQueue();
 	EmptyThumbnailsQueue();
-	EmptyFolderQueue();
 	m_bNotifiedOfTermination = TRUE;
 }
 

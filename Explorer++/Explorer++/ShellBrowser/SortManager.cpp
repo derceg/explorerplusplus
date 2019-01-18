@@ -392,27 +392,42 @@ int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) co
 {
 	bool IsFolder1 = ((m_fileInfoMap.at(InternalIndex1).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	bool IsFolder2 = ((m_fileInfoMap.at(InternalIndex2).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+
+	ULONGLONG size1;
+	ULONGLONG size2;
 	
 	if(IsFolder1 && IsFolder2)
 	{
-		if(m_extraItemInfoMap.at(InternalIndex1).bFolderSizeRetrieved && !m_extraItemInfoMap.at(InternalIndex2).bFolderSizeRetrieved)
+		auto itr1 = m_cachedFolderSizes.find(InternalIndex1);
+		auto itr2 = m_cachedFolderSizes.find(InternalIndex2);
+
+		if (itr1 != m_cachedFolderSizes.end() && itr2 == m_cachedFolderSizes.end())
 		{
 			return 1;
 		}
-		else if(!m_extraItemInfoMap.at(InternalIndex1).bFolderSizeRetrieved && m_extraItemInfoMap.at(InternalIndex2).bFolderSizeRetrieved)
+		else if (itr1 == m_cachedFolderSizes.end() && itr2 != m_cachedFolderSizes.end())
 		{
 			return -1;
 		}
+
+		size1 = itr1->second;
+		size2 = itr2->second;
+	}
+	else
+	{
+		// Both items are files (as opposed to folders).
+		ULARGE_INTEGER FileSize1 = { m_fileInfoMap.at(InternalIndex1).nFileSizeLow,m_fileInfoMap.at(InternalIndex1).nFileSizeHigh };
+		ULARGE_INTEGER FileSize2 = { m_fileInfoMap.at(InternalIndex2).nFileSizeLow,m_fileInfoMap.at(InternalIndex2).nFileSizeHigh };
+
+		size1 = FileSize1.QuadPart;
+		size2 = FileSize2.QuadPart;
 	}
 
-	ULARGE_INTEGER FileSize1 = {m_fileInfoMap.at(InternalIndex1).nFileSizeLow,m_fileInfoMap.at(InternalIndex1).nFileSizeHigh};
-	ULARGE_INTEGER FileSize2 = {m_fileInfoMap.at(InternalIndex2).nFileSizeLow,m_fileInfoMap.at(InternalIndex2).nFileSizeHigh};
-
-	if(FileSize1.QuadPart > FileSize2.QuadPart)
+	if(size1 > size2)
 	{
 		return 1;
 	}
-	else if(FileSize1.QuadPart < FileSize2.QuadPart)
+	else if(size1 < size2)
 	{
 		return -1;
 	}

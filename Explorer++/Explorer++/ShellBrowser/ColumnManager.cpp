@@ -35,137 +35,6 @@
 
 BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax);
 
-void CShellBrowser::AddToFolderQueue(int iItem)
-{
-	m_pFolderInfoList.push_back(iItem);
-}
-
-void CShellBrowser::EmptyFolderQueue(void)
-{
-	EnterCriticalSection(&m_folder_cs);
-
-	m_pFolderInfoList.clear();
-
-	LeaveCriticalSection(&m_folder_cs);
-}
-
-BOOL CShellBrowser::RemoveFromFolderQueue(int *iItem)
-{
-	BOOL bQueueNotEmpty;
-
-	EnterCriticalSection(&m_folder_cs);
-
-	SetEvent(m_hFolderQueueEvent);
-
-	if(m_pFolderInfoList.empty() == TRUE)
-	{
-		bQueueNotEmpty = FALSE;
-	}
-	else
-	{
-		std::list<int>::iterator itr;
-
-		itr = m_pFolderInfoList.end();
-
-		itr--;
-
-		*iItem = *itr;
-
-		ResetEvent(m_hFolderQueueEvent);
-
-		m_pFolderInfoList.erase(itr);
-
-		bQueueNotEmpty = TRUE;
-	}
-
-	LeaveCriticalSection(&m_folder_cs);
-
-	return bQueueNotEmpty;
-}
-
-void CALLBACK SetAllFolderSizeColumnDataAPC(ULONG_PTR dwParam)
-{
-	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(dwParam);
-	pShellBrowser->SetAllFolderSizeColumnData();
-}
-
-int CShellBrowser::SetAllFolderSizeColumnData(void)
-{
-	std::list<Column_t>::iterator itr;
-	LVITEM lvItem;
-	BOOL bQueueNotEmpty;
-	int iItem;
-	int iColumnIndex = 0;
-
-	bQueueNotEmpty = RemoveFromFolderQueue(&iItem);
-
-	while(bQueueNotEmpty)
-	{
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= iItem;
-		lvItem.iSubItem	= 0;
-		ListView_GetItem(m_hListView,&lvItem);
-
-		if((m_fileInfoMap.at((int)lvItem.lParam).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-			FILE_ATTRIBUTE_DIRECTORY)
-		{
-			for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
-			{
-				if(itr->bChecked && itr->id == CM_SIZE)
-				{
-					TCHAR			FullItemPath[MAX_PATH];
-					TCHAR			lpszFileSize[32];
-					ULARGE_INTEGER	lTotalFolderSize;
-					int				nFolders;
-					int				nFiles;
-
-					LVITEM lvChildItem;
-					int iItemInternal;
-					BOOL bRes;
-
-					lvChildItem.mask		= LVIF_PARAM;
-					lvChildItem.iItem		= iItem;
-					lvChildItem.iSubItem	= 0;
-					bRes = ListView_GetItem(m_hListView,&lvChildItem);
-
-					if(bRes)
-					{
-						iItemInternal = (int)lvChildItem.lParam;
-
-						QueryFullItemName(iItem,FullItemPath,SIZEOF_ARRAY(FullItemPath));
-
-						CalculateFolderSize(FullItemPath,&nFolders,&nFiles,&lTotalFolderSize);
-
-						/* TODO: Need to lock this against the main thread. */
-						/* TODO: Discard the result if the folder was deleted. */
-						m_fileInfoMap.at((int)lvChildItem.lParam).nFileSizeLow = lTotalFolderSize.LowPart;
-						m_fileInfoMap.at((int)lvChildItem.lParam).nFileSizeHigh = lTotalFolderSize.HighPart;
-						m_extraItemInfoMap.at((int)lvChildItem.lParam).bFolderSizeRetrieved = TRUE;
-
-						FormatSizeString(lTotalFolderSize, lpszFileSize, SIZEOF_ARRAY(lpszFileSize),
-							m_bForceSize, m_SizeDisplayFormat);
-
-						ListView_SetItemText(m_hListView, iItem, iColumnIndex, lpszFileSize);
-					}
-				}
-
-				if(itr->bChecked)
-				{
-					iColumnIndex++;
-				}
-			}
-		}
-
-		iColumnIndex = 0;
-
-		bQueueNotEmpty = RemoveFromFolderQueue(&iItem);
-	}
-
-	ApplyHeaderSortArrow();
-
-	return 0;
-}
-
 void CShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
 {
 	auto columnID = GetColumnIdByIndex(columnIndex);
@@ -550,7 +419,29 @@ std::wstring CShellBrowser::GetSizeColumnText(int InternalIndex) const
 {
 	if((m_fileInfoMap.at(InternalIndex).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
-		return EMPTY_STRING;
+		TCHAR fullItemPath[MAX_PATH];
+		QueryFullItemNameInternal(InternalIndex, fullItemPath, SIZEOF_ARRAY(fullItemPath));
+
+		TCHAR drive[MAX_PATH];
+		StringCchCopy(drive, SIZEOF_ARRAY(drive), fullItemPath);
+		PathStripToRoot(drive);
+
+		bool bNetworkRemovable = false;
+
+		if (GetDriveType(drive) == DRIVE_REMOVABLE ||
+			GetDriveType(drive) == DRIVE_REMOTE)
+		{
+			bNetworkRemovable = true;
+		}
+
+		if (m_bShowFolderSizes && !(m_bDisableFolderSizesNetworkRemovable && bNetworkRemovable))
+		{
+			return GetFolderSizeColumnText(InternalIndex);
+		}
+		else
+		{
+			return EMPTY_STRING;
+		}
 	}
 
 	ULARGE_INTEGER FileSize = {m_fileInfoMap.at(InternalIndex).nFileSizeLow,m_fileInfoMap.at(InternalIndex).nFileSizeHigh};
@@ -559,6 +450,25 @@ std::wstring CShellBrowser::GetSizeColumnText(int InternalIndex) const
 	FormatSizeString(FileSize,FileSizeText,SIZEOF_ARRAY(FileSizeText),m_bForceSize,m_SizeDisplayFormat);
 
 	return FileSizeText;
+}
+
+std::wstring CShellBrowser::GetFolderSizeColumnText(int internalIndex) const
+{
+	TCHAR fullItemPath[MAX_PATH];
+	QueryFullItemNameInternal(internalIndex, fullItemPath, SIZEOF_ARRAY(fullItemPath));
+
+	int numFolders;
+	int numFiles;
+	ULARGE_INTEGER totalFolderSize;
+	CalculateFolderSize(fullItemPath, &numFolders, &numFiles, &totalFolderSize);
+
+	m_cachedFolderSizes.insert({internalIndex, totalFolderSize.QuadPart});
+
+	TCHAR fileSizeText[64];
+	FormatSizeString(totalFolderSize, fileSizeText, SIZEOF_ARRAY(fileSizeText),
+		m_bForceSize, m_SizeDisplayFormat);
+
+	return fileSizeText;
 }
 
 std::wstring CShellBrowser::GetTimeColumnText(int InternalIndex,TimeType_t TimeType) const

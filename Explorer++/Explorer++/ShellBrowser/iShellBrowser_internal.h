@@ -62,5 +62,3 @@ extern BOOL g_bcsThumbnailInitialized;
 
 /* Thumbnails. */
 void CALLBACK	FindThumbnailAPC(ULONG_PTR dwParam);
-
-void CALLBACK SetAllFolderSizeColumnDataAPC(ULONG_PTR dwParam);

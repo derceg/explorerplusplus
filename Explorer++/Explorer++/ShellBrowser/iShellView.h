@@ -271,10 +271,6 @@ struct ExtraItemInfo
 	BOOL			bThumbnailRetreived;
 	int				iIcon;
 
-	/* Only used for folders. Records whether
-	the folders size has been retrieved yet. */
-	BOOL			bFolderSizeRetrieved;
-
 	/* These are only used for drives. They are
 	needed for when a drive is removed from the
 	system, in which case the drive name is needed
@@ -307,9 +303,7 @@ public:
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	static CShellBrowser *CreateNew(HWND hOwner, HWND hListView,
-		const InitialSettings_t *pSettings, HANDLE hIconThread,
-		HANDLE hFolderSizeThread);
+	static CShellBrowser *CShellBrowser::CreateNew(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings, HANDLE hIconThread);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
@@ -394,9 +388,6 @@ public:
 	/* Thumbnails view. */
 	int					GetExtractedThumbnail(HBITMAP hThumbnailBitmap);
 
-	/* Folder size support. */
-	int					SetAllFolderSizeColumnData(void);
-
 	/* Filtering. */
 	void				GetFilter(TCHAR *szFilter,int cchMax) const;
 	void				SetFilter(const TCHAR *szFilter);
@@ -419,11 +410,6 @@ public:
 	void				EmptyThumbnailsQueue(void);
 	BOOL				InVirtualFolder(void) const;
 	BOOL				CanCreate(void) const;
-
-	/* Folder size queueing. */
-	void				AddToFolderQueue(int iItem);
-	void				EmptyFolderQueue(void);
-	BOOL				RemoveFromFolderQueue(int *iItem);
 
 	void				ToggleGrouping(void);
 	void				SetGrouping(BOOL bShowInGroups);
@@ -567,9 +553,7 @@ private:
 
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 
-	CShellBrowser(HWND hOwner, HWND hListView,
-		const InitialSettings_t *pSettings, HANDLE hIconThread,
-		HANDLE hFolderSizeThread);
+	CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings, HANDLE hIconThread);
 	~CShellBrowser();
 
 	int					GenerateUniqueItemId(void);
@@ -633,6 +617,7 @@ private:
 	std::wstring		GetNameColumnText(int InternalIndex) const;
 	std::wstring		GetTypeColumnText(int InternalIndex) const;
 	std::wstring		GetSizeColumnText(int InternalIndex) const;
+	std::wstring		GetFolderSizeColumnText(int internalIndex) const;
 	std::wstring		GetTimeColumnText(int InternalIndex,TimeType_t TimeType) const;
 	std::wstring		GetAttributeColumnText(int InternalIndex) const;
 	bool				GetRealSizeColumnRawData(int InternalIndex,ULARGE_INTEGER &RealFileSize) const;
@@ -762,11 +747,13 @@ private:
 	std::unordered_map<int, std::future<ColumnResult_t>> m_columnResults;
 	int					m_columnResultIDCounter;
 
+	/* Cached folder size data. */
+	mutable std::unordered_map<int, ULONGLONG>	m_cachedFolderSizes;
+
 	/* Manages browsing history. */
 	CPathManager		m_pathManager;
 
 	HANDLE				m_hThread;
-	HANDLE				m_hFolderSizeThread;
 
 	/* Internal state. */
 	LPITEMIDLIST		m_pidlDirectory;
@@ -832,11 +819,6 @@ private:
 
 	/* File selection. */
 	std::list<std::wstring>	m_FileSelectionList;
-
-	/* Folder size information. */
-	std::list<int>		m_pFolderInfoList;
-	CRITICAL_SECTION	m_folder_cs;
-	HANDLE				m_hFolderQueueEvent;
 
 	/* Thumbnails. */
 	BOOL				m_bThumbnailsSetup;

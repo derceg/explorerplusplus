@@ -63,7 +63,6 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 
 	EmptyIconFinderQueue();
 	EmptyThumbnailsQueue();
-	EmptyFolderQueue();
 
 	/* TODO: Wait for any background threads to finish processing. */
 
@@ -264,27 +263,6 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 		NListView::ListView_SetAutoArrange(m_hListView,TRUE);
 
 	m_nTotalItems = nPrevItems + nAdded;
-
-	if(m_ViewMode == VM_DETAILS)
-	{
-		TCHAR szDrive[MAX_PATH];
-		BOOL bNetworkRemovable = FALSE;
-
-		StringCchCopy(szDrive,SIZEOF_ARRAY(szDrive),m_CurDir);
-		PathStripToRoot(szDrive);
-
-		if(GetDriveType(szDrive) == DRIVE_REMOVABLE ||
-			GetDriveType(szDrive) == DRIVE_REMOTE)
-		{
-			bNetworkRemovable = TRUE;
-		}
-
-		/* If the user has selected to disable folder sizes
-		on removable drives or networks, and we are currently
-		on such a drive, do not calculate folder sizes. */
-		if(m_bShowFolderSizes && !(m_bDisableFolderSizesNetworkRemovable && bNetworkRemovable))
-			QueueUserAPC(SetAllFolderSizeColumnDataAPC,m_hFolderSizeThread,(ULONG_PTR)this);
-	}
 
 	PositionDroppedItems();
 
@@ -567,8 +545,6 @@ HRESULT inline CShellBrowser::AddItemInternal(int iItemIndex,int iItemId,BOOL bP
 
 	m_AwaitingAddList.push_back(AwaitingAdd);
 
-	AddToFolderQueue(AwaitingAdd.iItem);
-
 	return S_OK;
 }
 
@@ -587,7 +563,6 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	m_extraItemInfoMap[uItemId].pridl					= ILClone(pidlRelative);
 	m_extraItemInfoMap[uItemId].bIconRetrieved		= FALSE;
 	m_extraItemInfoMap[uItemId].bThumbnailRetreived	= FALSE;
-	m_extraItemInfoMap[uItemId].bFolderSizeRetrieved	= FALSE;
 	StringCchCopy(m_extraItemInfoMap[uItemId].szDisplayName,
 		SIZEOF_ARRAY(m_extraItemInfoMap[uItemId].szDisplayName), szFileName);
 
