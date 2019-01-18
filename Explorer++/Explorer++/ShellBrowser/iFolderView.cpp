@@ -77,7 +77,9 @@ m_hListView(hListView),
 m_hThread(hIconThread),
 m_itemIDCounter(0),
 m_columnThreadPool(1),
-m_columnResultIDCounter(0)
+m_columnResultIDCounter(0),
+m_thumbnailThreadPool(1),
+m_thumbnailResultIDCounter(0)
 {
 	m_iRefCount = 1;
 
@@ -127,12 +129,6 @@ m_columnResultIDCounter(0)
 
 	InitializeCriticalSection(&m_csDirectoryAltered);
 
-	if(!g_bcsThumbnailInitialized)
-	{
-		InitializeCriticalSection(&g_csThumbnails);
-		g_bcsThumbnailInitialized = TRUE;
-	}
-
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 	m_iFileIcon = GetDefaultFileIconIndex();
 
@@ -148,6 +144,12 @@ m_columnResultIDCounter(0)
 	m_hIconEvent = CreateEvent(NULL,TRUE,TRUE,NULL);
 
 	m_ListViewSubclassed = SetWindowSubclass(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+
+	m_thumbnailThreadPool.push([](int id) {
+		UNREFERENCED_PARAMETER(id);
+
+		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	});
 }
 
 CShellBrowser::~CShellBrowser()
@@ -158,9 +160,15 @@ CShellBrowser::~CShellBrowser()
 	}
 
 	EmptyIconFinderQueue();
-	EmptyThumbnailsQueue();
 
 	m_columnThreadPool.clear_queue();
+	m_thumbnailThreadPool.clear_queue();
+
+	m_thumbnailThreadPool.push([](int id) {
+		UNREFERENCED_PARAMETER(id);
+
+		CoUninitialize();
+	});
 
 	/* Wait for any current processing to finish. */
 	WaitForSingleObject(m_hIconEvent,INFINITE);

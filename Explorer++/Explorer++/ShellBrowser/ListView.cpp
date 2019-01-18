@@ -27,6 +27,10 @@ LRESULT CALLBACK CShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam
 	case WM_APP_COLUMN_RESULT_READY:
 		ProcessColumnResult(static_cast<int>(wParam));
 		break;
+
+	case WM_APP_THUMBNAIL_RESULT_READY:
+		ProcessThumbnailResult(static_cast<int>(wParam));
+		break;
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);

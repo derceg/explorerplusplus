@@ -268,7 +268,6 @@ struct ExtraItemInfo
 	TCHAR			szDisplayName[MAX_PATH];
 	BOOL			bReal;
 	BOOL			bIconRetrieved;
-	BOOL			bThumbnailRetreived;
 	int				iIcon;
 
 	/* These are only used for drives. They are
@@ -298,10 +297,6 @@ class CShellBrowser : public IDropTarget, public IDropFilesCallback
 	friend int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 
 public:
-
-	/* TODO: Private. */
-	static const int THUMBNAIL_ITEM_WIDTH = 120;
-	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
 	static CShellBrowser *CShellBrowser::CreateNew(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings, HANDLE hIconThread);
 
@@ -385,9 +380,6 @@ public:
 	static int			LookupColumnNameStringIndex(int iColumnId);
 	static int			LookupColumnDescriptionStringIndex(int iColumnId);
 
-	/* Thumbnails view. */
-	int					GetExtractedThumbnail(HBITMAP hThumbnailBitmap);
-
 	/* Filtering. */
 	void				GetFilter(TCHAR *szFilter,int cchMax) const;
 	void				SetFilter(const TCHAR *szFilter);
@@ -406,8 +398,6 @@ public:
 	void				OnListViewGetDisplayInfo(LPARAM lParam);
 	void				AddToIconFinderQueue(const LVITEM *plvItem);
 	void				EmptyIconFinderQueue(void);
-	void				AddToThumbnailFinderQueue(LPARAM lParam);
-	void				EmptyThumbnailsQueue(void);
 	BOOL				InVirtualFolder(void) const;
 	BOOL				CanCreate(void) const;
 
@@ -546,12 +536,22 @@ private:
 		std::wstring columnText;
 	};
 
+	struct ThumbnailResult_t
+	{
+		int itemInternalIndex;
+		int iconIndex;
+	};
+
 	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
 	static const int THUMBNAIL_ITEM_VERTICAL_SPACING = 20;
 
 	static const UINT_PTR LISTVIEW_SUBCLASS_ID = 0;
 
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
+	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
+
+	static const int THUMBNAIL_ITEM_WIDTH = 120;
+	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
 	CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings, HANDLE hIconThread);
 	~CShellBrowser();
@@ -693,12 +693,16 @@ private:
 	void				MoveItemsIntoGroups(void);
 
 	/* Thumbnails view. */
+	void				QueueThumbnailTask(int internalIndex);
+	boost::optional<ThumbnailResult_t>	FindThumbnailAsync(int thumbnailResultId, int internalIndex) const;
+	void				ProcessThumbnailResult(int thumbnailResultId);
 	void				SetupThumbnailsView(void);
 	void				RemoveThumbnailsView(void);
-	int					GetIconThumbnail(int iInternalIndex);
-	int					GetThumbnailInternal(int iType,int iInternalIndex,HBITMAP hThumbnailBitmap);
-	void				DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex);
-	void				DrawThumbnailInternal(HDC hdcBacking,HBITMAP hThumbnailBitmap);
+	int					GetIconThumbnail(int iInternalIndex) const;
+	int					GetExtractedThumbnail(HBITMAP hThumbnailBitmap) const;
+	int					GetThumbnailInternal(int iType, int iInternalIndex, HBITMAP hThumbnailBitmap) const;
+	void				DrawIconThumbnailInternal(HDC hdcBacking, int iInternalIndex) const;
+	void				DrawThumbnailInternal(HDC hdcBacking, HBITMAP hThumbnailBitmap) const;
 
 	/* Tiles view. */
 	void				InsertTileViewColumns(void);
@@ -746,6 +750,10 @@ private:
 	ctpl::thread_pool	m_columnThreadPool;
 	std::unordered_map<int, std::future<ColumnResult_t>> m_columnResults;
 	int					m_columnResultIDCounter;
+
+	ctpl::thread_pool	m_thumbnailThreadPool;
+	std::unordered_map<int, std::future<boost::optional<ThumbnailResult_t>>> m_thumbnailResults;
+	int					m_thumbnailResultIDCounter;
 
 	/* Cached folder size data. */
 	mutable std::unordered_map<int, ULONGLONG>	m_cachedFolderSizes;

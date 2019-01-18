@@ -62,12 +62,14 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	}
 
 	EmptyIconFinderQueue();
-	EmptyThumbnailsQueue();
 
 	/* TODO: Wait for any background threads to finish processing. */
 
 	m_columnThreadPool.clear_queue();
 	m_columnResults.clear();
+
+	m_thumbnailThreadPool.clear_queue();
+	m_thumbnailResults.clear();
 
 	EnterCriticalSection(&m_csDirectoryAltered);
 	m_FilesAdded.clear();
@@ -562,7 +564,6 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 
 	m_extraItemInfoMap[uItemId].pridl					= ILClone(pidlRelative);
 	m_extraItemInfoMap[uItemId].bIconRetrieved		= FALSE;
-	m_extraItemInfoMap[uItemId].bThumbnailRetreived	= FALSE;
 	StringCchCopy(m_extraItemInfoMap[uItemId].szDisplayName,
 		SIZEOF_ARRAY(m_extraItemInfoMap[uItemId].szDisplayName), szFileName);
 

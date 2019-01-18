@@ -56,9 +56,3 @@ FSM_PRINTERCOMMENTS,FSM_PRINTERLOCATION};
 static const UINT NetworkConnectionsSortModes[] =
 {FSM_NAME,FSM_TYPE,FSM_NETWORKADAPTER_STATUS,
 FSM_OWNER};
-
-extern CRITICAL_SECTION g_csThumbnails;
-extern BOOL g_bcsThumbnailInitialized;
-
-/* Thumbnails. */
-void CALLBACK	FindThumbnailAPC(ULONG_PTR dwParam);

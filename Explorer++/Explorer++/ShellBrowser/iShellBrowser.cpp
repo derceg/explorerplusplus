@@ -358,14 +358,12 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	first, or else it may be possible for the
 	thumbnail to be drawn before the initial
 	image. */
-	if(m_ViewMode == VM_THUMBNAILS)
+	if(m_ViewMode == VM_THUMBNAILS && (plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
 		plvItem->iImage = GetIconThumbnail((int)plvItem->lParam);
 		plvItem->mask |= LVIF_DI_SETITEM;
 
-		/* Finally, add this item to the thumbnail queue... */
-		if(!m_bNotifiedOfTermination)
-			AddToThumbnailFinderQueue(plvItem->lParam);
+		QueueThumbnailTask(static_cast<int>(plvItem->lParam));
 
 		return;
 	}
@@ -1231,8 +1229,6 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	imagelist, and create a new one. */
 	if(m_ViewMode == VM_THUMBNAILS)
 	{
-		EnterCriticalSection(&g_csThumbnails);
-
 		himlOld = ListView_GetImageList(m_hListView,LVSIL_NORMAL);
 
 		nItems = ListView_GetItemCount(m_hListView);
@@ -1243,8 +1239,6 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 		ListView_SetImageList(m_hListView,himl,LVSIL_NORMAL);
 
 		ImageList_Destroy(himlOld);
-
-		LeaveCriticalSection(&g_csThumbnails);
 	}
 
 	EnterCriticalSection(&m_csDirectoryAltered);
@@ -1283,7 +1277,6 @@ BOOL CShellBrowser::GetTerminationStatus(void) const
 void CShellBrowser::SetTerminationStatus(void)
 {
 	EmptyIconFinderQueue();
-	EmptyThumbnailsQueue();
 	m_bNotifiedOfTermination = TRUE;
 }
 

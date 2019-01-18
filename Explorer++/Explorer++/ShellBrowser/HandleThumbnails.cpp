@@ -14,24 +14,17 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
-#include "IShellView.h"
+#include "iShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Controls.h"
-#include "../Helper/Helper.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
+#include "../Helper/Helper.h"
+#include "../Helper/ShellHelper.h"
+#include <boost/scope_exit.hpp>
+#include <list>
 
-
-BOOL RemoveFromThumbnailsFinderQueue(ListViewInfo_t *pListViewInfo);
-
-std::list<ListViewInfo_t>	g_ThumbnailQueue;
-CRITICAL_SECTION		g_csThumbnails;
-BOOL					g_bcsThumbnailInitialized = FALSE;
-
-int g_nThumbnailAPCsQueued = 0;
-int g_nThumbnailAPCsRun = 0;
+#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 void CShellBrowser::SetupThumbnailsView(void)
 {
@@ -88,7 +81,8 @@ void CShellBrowser::RemoveThumbnailsView(void)
 
 	nItems = ListView_GetItemCount(m_hListView);
 
-	EmptyThumbnailsQueue();
+	m_thumbnailThreadPool.clear_queue();
+	m_thumbnailResults.clear();
 
 	for(i = 0;i < nItems;i++)
 	{
@@ -107,202 +101,139 @@ void CShellBrowser::RemoveThumbnailsView(void)
 	m_bThumbnailsSetup = FALSE;
 }
 
-void CShellBrowser::EmptyThumbnailsQueue(void)
+void CShellBrowser::QueueThumbnailTask(int internalIndex)
 {
-	EnterCriticalSection(&g_csThumbnails);
-	g_ThumbnailQueue.clear();
-	LeaveCriticalSection(&g_csThumbnails);
+	int thumbnailResultID = m_thumbnailResultIDCounter++;
+
+	auto result = m_thumbnailThreadPool.push([this, thumbnailResultID, internalIndex](int id) {
+		UNREFERENCED_PARAMETER(id);
+
+		return this->FindThumbnailAsync(thumbnailResultID, internalIndex);
+	});
+
+	m_thumbnailResults.insert({ thumbnailResultID, std::move(result) });
 }
 
-void CShellBrowser::AddToThumbnailFinderQueue(LPARAM lParam)
+boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAsync(int thumbnailResultId, int internalIndex) const
 {
-	EnterCriticalSection(&g_csThumbnails);
+	IShellFolder *pShellFolder = nullptr;
+	HRESULT hr = BindToIdl(m_pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
-	ListViewInfo_t lvil;
-
-	lvil.hListView	= m_hListView;
-	lvil.iItem		= (int)lParam;
-	lvil.pidlFull	= ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)lParam).pridl);
-	lvil.m_pExtraItemInfo	= &m_extraItemInfoMap[(int)lParam];
-	lvil.hEvent		= m_hIconEvent;
-
-	g_ThumbnailQueue.push_back(lvil);
-
-	if(g_nThumbnailAPCsRun == g_nThumbnailAPCsQueued)
+	if (FAILED(hr))
 	{
-		g_nThumbnailAPCsQueued++;
-
-		QueueUserAPC(FindThumbnailAPC,m_hThread,(ULONG_PTR)this);
+		return boost::none;
 	}
 
-	LeaveCriticalSection(&g_csThumbnails);
-}
+	BOOST_SCOPE_EXIT(pShellFolder) {
+		pShellFolder->Release();
+	} BOOST_SCOPE_EXIT_END
 
-BOOL RemoveFromThumbnailsFinderQueue(ListViewInfo_t *pListViewInfo)
-{
-	BOOL bQueueNotEmpty;
+	IExtractImage *pExtractImage = nullptr;
+	LPCITEMIDLIST pridl = m_extraItemInfoMap.at(internalIndex).pridl;
+	hr = GetUIObjectOf(pShellFolder, NULL, 1, &pridl, IID_PPV_ARGS(&pExtractImage));
 
-	EnterCriticalSection(&g_csThumbnails);
-
-	if(g_ThumbnailQueue.empty() == TRUE)
+	if (FAILED(hr))
 	{
-		bQueueNotEmpty = FALSE;
-
-		g_nThumbnailAPCsRun++;
-	}
-	else
-	{
-		std::list<ListViewInfo_t>::iterator itr;
-
-		itr = g_ThumbnailQueue.end();
-
-		itr--;
-
-		*pListViewInfo = *itr;
-
-		g_ThumbnailQueue.erase(itr);
-
-		bQueueNotEmpty = TRUE;
+		return boost::none;
 	}
 
-	LeaveCriticalSection(&g_csThumbnails);
+	BOOST_SCOPE_EXIT(pExtractImage) {
+		pExtractImage->Release();
+	} BOOST_SCOPE_EXIT_END
 
-	return bQueueNotEmpty;
-}
-
-/*
-This creates the thumbnail bitmap for a file,
-adds it to the current image list, and then sets
-the index of the new image as the imaage for the
-specified file.
-Bitmap creation occurs as follows:
-1. Thumbnail bitmap is extracted.
-2. A new bitmap is created with the same width
-   and height as the thumbnail box, and has its
-   background set to the same color as the
-   listview background.
-3. The thumbnail bitmap is drawn on top of the
-   new bitmap in a centered position.
-4. The combined bitmap is then added to the
-   imagelist for the listview.
-5. The original item is found using its lParam
-   value.
-6. The image index for the new item is set to
-   be the index of the combined bitmap in the
-   imagelist.
-*/
-void CALLBACK FindThumbnailAPC(ULONG_PTR dwParam)
-{
-	IExtractImage *pExtractImage = NULL;
-	IShellFolder *pShellFolder = NULL;
-	LPITEMIDLIST pidlParent = NULL;
-	LPITEMIDLIST pridl = NULL;
-	HBITMAP hThumbnailBitmap;
 	SIZE size;
+	size.cx = THUMBNAIL_ITEM_WIDTH;
+	size.cy = THUMBNAIL_ITEM_HEIGHT;
+
+	DWORD dwFlags = IEIFLAG_OFFLINE | IEIFLAG_QUALITY;
+
+	// As per the MSDN documentation, GetLocation must be called before
+	// Extract.
 	TCHAR szImage[MAX_PATH];
 	DWORD dwPriority;
-	DWORD dwFlags;
-	HRESULT hr;
-	BOOL bQueueNotEmpty;
-	ListViewInfo_t	pListViewInfo;
-	CShellBrowser *pShellBrowser = NULL;
+	hr = pExtractImage->GetLocation(szImage, SIZEOF_ARRAY(szImage), &dwPriority, &size, 32, &dwFlags);
 
-	pShellBrowser = reinterpret_cast<CShellBrowser *>(dwParam);
-
-	/* If this module is in the process of been
-	shut down, DO NOT load any more thumbnails. */
-	if(pShellBrowser->GetTerminationStatus())
-		return;
-
-	bQueueNotEmpty = RemoveFromThumbnailsFinderQueue(&pListViewInfo);
-
-	while(bQueueNotEmpty)
+	if (FAILED(hr))
 	{
-		pidlParent = ILClone(pListViewInfo.pidlFull);
-		ILRemoveLastID(pidlParent);
-
-		pridl = ILClone(ILFindLastID(pListViewInfo.pidlFull));
-
-		hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
-
-		if(SUCCEEDED(hr))
-		{
-			hr = GetUIObjectOf(pShellFolder, NULL, 1, (LPCITEMIDLIST *) &pridl,
-				IID_PPV_ARGS(&pExtractImage));
-
-			if(SUCCEEDED(hr))
-			{
-				dwFlags = IEIFLAG_OFFLINE|IEIFLAG_QUALITY;
-				size.cx = CShellBrowser::THUMBNAIL_ITEM_WIDTH;
-				size.cy = CShellBrowser::THUMBNAIL_ITEM_HEIGHT;
-
-				/* Note that this may return E_PENDING (on Vista),
-				which seems to indicate the request in pending.
-				Attempting to extract the image appears to succeed
-				regardless (perhaps after some delay). */
-				pExtractImage->GetLocation(szImage,SIZEOF_ARRAY(szImage),
-					&dwPriority,&size,32,&dwFlags);
-
-				hr = pExtractImage->Extract(&hThumbnailBitmap);
-
-				if(SUCCEEDED(hr))
-				{
-					LVFINDINFO lvfi;
-					LVITEM lvItem;
-					int iItem;
-					int iImage;
-
-					iImage = pShellBrowser->GetExtractedThumbnail(hThumbnailBitmap);
-
-					lvfi.flags	= LVFI_PARAM;
-					lvfi.lParam	= pListViewInfo.iItem;
-					iItem = ListView_FindItem(pListViewInfo.hListView,-1,&lvfi);
-
-					/* If the item is still in the listview, set its
-					image to the new image index. */
-					if(iItem != -1)
-					{
-						lvItem.mask		= LVIF_IMAGE;
-						lvItem.iItem	= iItem;
-						lvItem.iSubItem	= 0;
-						lvItem.iImage	= iImage;
-						ListView_SetItem(pListViewInfo.hListView,&lvItem);
-
-						pListViewInfo.m_pExtraItemInfo->bThumbnailRetreived = TRUE;
-					}
-
-					DeleteObject(hThumbnailBitmap);
-				}
-
-				pExtractImage->Release();
-			}
-
-			pShellFolder->Release();
-		}
-
-		CoTaskMemFree(pidlParent);
-		CoTaskMemFree(pridl);
-
-		bQueueNotEmpty = RemoveFromThumbnailsFinderQueue(&pListViewInfo);
+		return boost::none;
 	}
+
+	HBITMAP hThumbnailBitmap;
+	hr = pExtractImage->Extract(&hThumbnailBitmap);
+
+	if (FAILED(hr))
+	{
+		return boost::none;
+	}
+
+	BOOST_SCOPE_EXIT(hThumbnailBitmap) {
+		DeleteObject(hThumbnailBitmap);
+	} BOOST_SCOPE_EXIT_END
+
+	int imageIndex = GetExtractedThumbnail(hThumbnailBitmap);
+
+	PostMessage(m_hListView, WM_APP_THUMBNAIL_RESULT_READY, thumbnailResultId, 0);
+
+	ThumbnailResult_t result;
+	result.itemInternalIndex = internalIndex;
+	result.iconIndex = imageIndex;
+
+	return result;
+}
+
+void CShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
+{
+	auto itr = m_thumbnailResults.find(thumbnailResultId);
+
+	if (itr == m_thumbnailResults.end())
+	{
+		return;
+	}
+
+	if (m_ViewMode != VM_THUMBNAILS)
+	{
+		return;
+	}
+
+	auto result = itr->second.get();
+
+	if (!result)
+	{
+		// Thumbnail lookup failed.
+		return;
+	}
+
+	auto index = LocateItemByInternalIndex(result->itemInternalIndex);
+
+	if (!index)
+	{
+		return;
+	}
+
+	LVITEM lvItem;
+	lvItem.mask = LVIF_IMAGE;
+	lvItem.iItem = *index;
+	lvItem.iSubItem = 0;
+	lvItem.iImage = result->iconIndex;
+	ListView_SetItem(m_hListView, &lvItem);
 }
 
 /* Draws a thumbnail based on an items icon. */
-int CShellBrowser::GetIconThumbnail(int iInternalIndex)
+int CShellBrowser::GetIconThumbnail(int iInternalIndex) const
 {
 	return GetThumbnailInternal(THUMBNAIL_TYPE_ICON,iInternalIndex,
 		NULL);
 }
 
 /* Draws an items extracted thumbnail. */
-int CShellBrowser::GetExtractedThumbnail(HBITMAP hThumbnailBitmap)
+int CShellBrowser::GetExtractedThumbnail(HBITMAP hThumbnailBitmap) const
 {
 	return GetThumbnailInternal(THUMBNAIL_TYPE_EXTRACTED,0,
 		hThumbnailBitmap);
 }
 
 int CShellBrowser::GetThumbnailInternal(int iType,
-int iInternalIndex,HBITMAP hThumbnailBitmap)
+int iInternalIndex,HBITMAP hThumbnailBitmap) const
 {
 	HDC hdc;
 	HDC hdcBacking;
@@ -348,7 +279,7 @@ int iInternalIndex,HBITMAP hThumbnailBitmap)
 	return iImage;
 }
 
-void CShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex)
+void CShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex) const
 {
 	LPITEMIDLIST pidlFull = NULL;
 	HICON hIcon;
@@ -370,7 +301,7 @@ void CShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex)
 	DestroyIcon(hIcon);
 }
 
-void CShellBrowser::DrawThumbnailInternal(HDC hdcBacking,HBITMAP hThumbnailBitmap)
+void CShellBrowser::DrawThumbnailInternal(HDC hdcBacking,HBITMAP hThumbnailBitmap) const
 {
 	HDC hdcThumbnail;
 	HBITMAP hThumbnailBitmapOld;
