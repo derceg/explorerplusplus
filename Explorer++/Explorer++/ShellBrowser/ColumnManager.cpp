@@ -86,6 +86,11 @@ void CShellBrowser::ProcessColumnResult(int columnResultId)
 		return;
 	}
 
+	if (m_ViewMode != VM_DETAILS)
+	{
+		return;
+	}
+
 	auto result = itr->second.get();
 
 	auto index = LocateItemByInternalIndex(result.itemInternalIndex);
