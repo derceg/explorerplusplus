@@ -343,10 +343,17 @@ void CShellBrowser::SetCurrentViewModeInternal(UINT ViewMode)
 
 	m_ViewMode = ViewMode;
 
-	if(ViewMode != VM_DETAILS)
-		NListView::ListView_SetGridlines(m_hListView,FALSE);
+	if (ViewMode != VM_DETAILS)
+	{
+		NListView::ListView_SetGridlines(m_hListView, FALSE);
+
+		m_columnThreadPool.clear_queue();
+		m_columnResults.clear();
+	}
 	else
-		NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
+	{
+		NListView::ListView_SetGridlines(m_hListView, m_bGridlinesActive);
+	}
 
 	SendMessage(m_hListView,LVM_SETVIEW,dwStyle,0);
 }
