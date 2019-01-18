@@ -395,7 +395,6 @@ public:
 	int					LocateFileItemIndex(const TCHAR *szFileName) const;
 	BOOL				DeghostItem(int iItem);
 	BOOL				GhostItem(int iItem);
-	void				OnListViewGetDisplayInfo(LPARAM lParam);
 	void				AddToIconFinderQueue(const LVITEM *plvItem);
 	void				EmptyIconFinderQueue(void);
 	BOOL				InVirtualFolder(void) const;
@@ -420,7 +419,6 @@ public:
 	BOOL				GetTerminationStatus(void) const;
 	void				SetTerminationStatus(void);
 
-	void				ColumnClicked(int iClickedColumn);
 	std::list<int>		QueryCurrentSortModes() const;
 	size_t				QueryNumActiveColumns(void) const;
 	void				ToggleGridlines(void);
@@ -578,6 +576,10 @@ private:
 
 	static LRESULT CALLBACK	ListViewParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK	ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	/* Message handlers. */
+	void				OnListViewGetDisplayInfo(LPARAM lParam);
+	void				ColumnClicked(int iClickedColumn);
 
 	/* Sorting. */
 	int CALLBACK		Sort(int InternalIndex1,int InternalIndex2) const;

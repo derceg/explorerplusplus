@@ -46,5 +46,24 @@ LRESULT CALLBACK CShellBrowser::ListViewParentProcStub(HWND hwnd, UINT uMsg, WPA
 
 LRESULT CALLBACK CShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	switch (uMsg)
+	{
+	case WM_NOTIFY:
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hListView)
+		{
+			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+			{
+			case LVN_GETDISPINFO:
+				OnListViewGetDisplayInfo(lParam);
+				break;
+
+			case LVN_COLUMNCLICK:
+				ColumnClicked(reinterpret_cast<NMLISTVIEW *>(lParam)->iSubItem);
+				break;
+			}
+		}
+		break;
+	}
+
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }

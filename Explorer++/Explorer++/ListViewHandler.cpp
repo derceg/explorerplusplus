@@ -857,48 +857,6 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 }
 
 /*
- * Called when information (icon number, text) is required
- * for an item in one of the listview controls.
- */
-void Explorerplusplus::OnListViewGetDisplayInfo(LPARAM lParam)
-{
-	NMLVDISPINFO *pnmv = (NMLVDISPINFO *)lParam;
-	NMHDR * nmhdr = &pnmv->hdr;
-
-	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-	/* Find the tab associated with this call. */
-	for (int i = 0; i < nTabs; i++)
-	{
-		TCITEM tcItem;
-		tcItem.mask = TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl, i, &tcItem);
-
-		int tabIndex = static_cast<int>(tcItem.lParam);
-
-		if (nmhdr->hwndFrom == m_hListView.at(tabIndex))
-		{
-			m_pShellBrowser[tabIndex]->OnListViewGetDisplayInfo(lParam);
-			break;
-		}
-	}
-}
-
-/*
- * Called when a column is clicked in the main listview.
- */
-void Explorerplusplus::OnListViewColumnClick(LPARAM lParam)
-{
-	NMLISTVIEW *pnmlv = NULL;
-
-	pnmlv = (NMLISTVIEW *)lParam;
-
-	m_pActiveShellBrowser->ColumnClicked(pnmlv->iSubItem);
-
-	return;
-}
-
-/*
  * Called when info tip text is required for an item
  * in the main listview control.
  */

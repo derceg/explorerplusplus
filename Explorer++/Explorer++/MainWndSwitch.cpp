@@ -1507,14 +1507,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 			return OnListViewEndLabelEdit(lParam);
 			break;
 
-		case LVN_GETDISPINFO:
-			OnListViewGetDisplayInfo(lParam);
-			break;
-
-		case LVN_COLUMNCLICK:
-			OnListViewColumnClick(lParam);
-			break;
-
 		case CBEN_DRAGBEGIN:
 			OnAddressBarBeginDrag();
 			break;

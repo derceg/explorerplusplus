@@ -431,14 +431,12 @@ private:
 	void					OnListViewLButtonDown(WPARAM wParam,LPARAM lParam);
 	void					OnListViewDoubleClick(NMHDR *nmhdr);
 	void					OnListViewFileRename(void);
-	void					OnListViewColumnClick(LPARAM lParam);
 	void					OnListViewGetInfoTip(LPARAM lParam);
 	LRESULT					OnListViewKeyDown(LPARAM lParam);
 	void					OnListViewItemChanged(LPARAM lParam);
 	HRESULT					OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType);
 	BOOL					OnListViewBeginLabelEdit(LPARAM lParam);
 	BOOL					OnListViewEndLabelEdit(LPARAM lParam);
-	void					OnListViewGetDisplayInfo(LPARAM lParam);
 	void					OnListViewFileDelete(BOOL bPermanent);
 	void					OnListViewRClick(POINT *pCursorPos);
 	void					OnListViewBackgroundRClick(POINT *pCursorPos);
