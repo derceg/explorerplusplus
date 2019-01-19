@@ -546,7 +546,7 @@ void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroup
 
 	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
 
-	pidlComplete = ILCombine(pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl);
+	pidlComplete = ILCombine(pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl.get());
 
 	SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *) &pidlRelative);
 
@@ -588,7 +588,7 @@ void CShellBrowser::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGro
 
 	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
 
-	pidlComplete = ILCombine(pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl);
+	pidlComplete = ILCombine(pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl.get());
 
 	SHGetFileInfo((LPTSTR)pidlComplete,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_TYPENAME);
 
@@ -750,7 +750,7 @@ void CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroup
 	BOOL bRes = FALSE;
 
 	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
-	pidlComplete = ILCombine(pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl);
+	pidlComplete = ILCombine(pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl.get());
 	SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
@@ -896,7 +896,7 @@ void CShellBrowser::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGrou
 	BOOL bRoot;
 	BOOL bRes;
 
-	pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl);
+	pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl.get());
 
 	SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
 

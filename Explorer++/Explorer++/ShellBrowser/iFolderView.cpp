@@ -198,8 +198,6 @@ CShellBrowser::~CShellBrowser()
 
 		ListView_GetItem(m_hListView,&lvItem);
 
-		CoTaskMemFree(reinterpret_cast<LPVOID>(m_extraItemInfoMap.at(static_cast<int>(lvItem.lParam)).pridl));
-
 		/* Also destroy the thumbnails imagelist... */
 	}
 

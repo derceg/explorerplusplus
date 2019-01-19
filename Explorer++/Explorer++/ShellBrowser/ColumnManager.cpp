@@ -408,7 +408,7 @@ std::wstring CShellBrowser::GetNameColumnText(int InternalIndex) const
 
 std::wstring CShellBrowser::GetTypeColumnText(int InternalIndex) const
 {	
-	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex).pridl);
+	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex).pridl.get());
 
 	SHFILEINFO shfi;
 	DWORD_PTR Res = SHGetFileInfo(reinterpret_cast<LPTSTR>(pidlComplete),0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_TYPENAME);
@@ -723,7 +723,7 @@ HRESULT CShellBrowser::GetItemDetailsRawData(int InternalIndex, const SHCOLUMNID
 
 	if (SUCCEEDED(hr))
 	{
-		hr = pShellFolder->GetDetailsEx(m_extraItemInfoMap.at(InternalIndex).pridl, pscid, vt);
+		hr = pShellFolder->GetDetailsEx(m_extraItemInfoMap.at(InternalIndex).pridl.get(), pscid, vt);
 		pShellFolder->Release();
 	}
 
@@ -762,7 +762,7 @@ std::wstring CShellBrowser::GetImageColumnText(int InternalIndex,PROPID Property
 
 std::wstring CShellBrowser::GetFileSystemColumnText(int InternalIndex) const
 {
-	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex).pridl);
+	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex).pridl.get());
 
 	TCHAR FullFileName[MAX_PATH];
 	GetDisplayName(pidlComplete,FullFileName,SIZEOF_ARRAY(FullFileName),SHGDN_FORPARSING);
@@ -790,7 +790,7 @@ std::wstring CShellBrowser::GetFileSystemColumnText(int InternalIndex) const
 
 BOOL CShellBrowser::GetDriveSpaceColumnRawData(int InternalIndex,bool TotalSize,ULARGE_INTEGER &DriveSpace) const
 {
-	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex).pridl);
+	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex).pridl.get());
 
 	TCHAR FullFileName[MAX_PATH];
 	GetDisplayName(pidlComplete,FullFileName,SIZEOF_ARRAY(FullFileName),SHGDN_FORPARSING);

@@ -4,6 +4,7 @@
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/PIDLWrapper.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/optional.hpp>
@@ -89,7 +90,7 @@ typedef struct
 
 struct ExtraItemInfo
 {
-	LPITEMIDLIST	pridl;
+	PIDLPointer		pridl;
 	TCHAR			szDisplayName[MAX_PATH];
 	BOOL			bReal;
 	BOOL			bIconRetrieved;

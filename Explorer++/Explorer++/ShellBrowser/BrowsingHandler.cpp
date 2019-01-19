@@ -228,7 +228,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			{
 				LPITEMIDLIST pidlComplete = NULL;
 
-				pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)itr->iItemInternal).pridl);
+				pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)itr->iItemInternal).pridl.get());
 
 				if(CompareIdls(pidlComplete,m_pidlNewItem))
 					m_bNewItemCreated = FALSE;
@@ -344,8 +344,6 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 
 	if(iItemInternal == -1)
 		return;
-
-	CoTaskMemFree(m_extraItemInfoMap.at(iItemInternal).pridl);
 
 	/* Is this item a folder? */
 	bFolder = (m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
@@ -561,8 +559,8 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 
 	uItemId = GenerateUniqueItemId();
 
-	m_extraItemInfoMap[uItemId].pridl					= ILClone(pidlRelative);
-	m_extraItemInfoMap[uItemId].bIconRetrieved		= FALSE;
+	m_extraItemInfoMap[uItemId].pridl.reset(ILClone(pidlRelative));
+	m_extraItemInfoMap[uItemId].bIconRetrieved = FALSE;
 	StringCchCopy(m_extraItemInfoMap[uItemId].szDisplayName,
 		SIZEOF_ARRAY(m_extraItemInfoMap[uItemId].szDisplayName), szFileName);
 

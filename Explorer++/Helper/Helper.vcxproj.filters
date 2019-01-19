@@ -243,6 +243,9 @@
     <ClInclude Include="ImageWrappers.h">
       <Filter>Resource Wrappers</Filter>
     </ClInclude>
+    <ClInclude Include="PIDLWrapper.h">
+      <Filter>Resource Wrappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">

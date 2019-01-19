@@ -356,12 +356,12 @@ int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) co
 	if(m_bVirtualFolder)
 	{
 		TCHAR FullFileName1[MAX_PATH];
-		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex1).pridl);
+		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex1).pridl.get());
 		GetDisplayName(pidlComplete1,FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete1);
 
 		TCHAR FullFileName2[MAX_PATH];
-		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex2).pridl);
+		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex2).pridl.get());
 		GetDisplayName(pidlComplete2,FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete2);
 
@@ -442,12 +442,12 @@ int CALLBACK CShellBrowser::SortByType(int InternalIndex1,int InternalIndex2) co
 	if(m_bVirtualFolder)
 	{
 		TCHAR FullFileName1[MAX_PATH];
-		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex1).pridl);
+		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex1).pridl.get());
 		GetDisplayName(pidlComplete1,FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete1);
 
 		TCHAR FullFileName2[MAX_PATH];
-		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex2).pridl);
+		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex2).pridl.get());
 		GetDisplayName(pidlComplete2,FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
 		CoTaskMemFree(pidlComplete2);
 

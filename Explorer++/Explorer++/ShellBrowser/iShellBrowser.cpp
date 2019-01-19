@@ -108,7 +108,7 @@ void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFil
 {
 	LPITEMIDLIST	pidlComplete = NULL;
 
-	pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl);
+	pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl.get());
 
 	GetDisplayName(pidlComplete,szFullFileName,cchMax,SHGDN_FORPARSING);
 
@@ -404,7 +404,7 @@ void CShellBrowser::QueueIconTask(int internalIndex)
 
 boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindIconAsync(int iconResultId, int internalIndex) const
 {
-	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory, m_extraItemInfoMap.at(internalIndex).pridl);
+	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory, m_extraItemInfoMap.at(internalIndex).pridl.get());
 
 	BOOST_SCOPE_EXIT(pidlComplete) {
 		CoTaskMemFree(pidlComplete);
@@ -477,7 +477,7 @@ LPITEMIDLIST CShellBrowser::QueryItemRelativeIdl(int iItem) const
 	bRet = ListView_GetItem(m_hListView,&lvItem);
 
 	if(bRet)
-		return ILClone((ITEMIDLIST *)m_extraItemInfoMap.at((int)lvItem.lParam).pridl);
+		return ILClone((ITEMIDLIST *)m_extraItemInfoMap.at((int)lvItem.lParam).pridl.get());
 
 	return NULL;
 }
@@ -1159,12 +1159,6 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	m_itemIDCounter = 0;
 
 	m_fileInfoMap.clear();
-
-	for (auto element : m_extraItemInfoMap)
-	{
-		CoTaskMemFree(element.second.pridl);
-	}
-
 	m_extraItemInfoMap.clear();
 
 	m_cachedFolderSizes.clear();
@@ -1350,7 +1344,7 @@ void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)lvItem.lParam).pridl);
+		pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)lvItem.lParam).pridl.get());
 
 		if(CompareIdls(pidlItem,pidlComplete))
 		{
@@ -1519,7 +1513,7 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 			lvItem.iSubItem	= 0;
 			ListView_GetItem(m_hListView,&lvItem);
 
-			pidlItem = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)lvItem.lParam).pridl);
+			pidlItem = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)lvItem.lParam).pridl.get());
 
 			if(CompareIdls(pidlDrive,pidlItem))
 			{

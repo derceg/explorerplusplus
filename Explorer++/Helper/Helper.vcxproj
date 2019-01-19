@@ -256,6 +256,7 @@
     <ClInclude Include="Macros.h" />
     <ClInclude Include="MenuHelper.h" />
     <ClInclude Include="MessageForwarder.h" />
+    <ClInclude Include="PIDLWrapper.h" />
     <ClInclude Include="ProcessHelper.h" />
     <ClInclude Include="ReferenceCount.h" />
     <ClInclude Include="RegistrySettings.h" />
