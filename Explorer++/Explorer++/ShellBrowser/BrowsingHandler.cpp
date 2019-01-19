@@ -226,14 +226,14 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 			if(m_bNewItemCreated)
 			{
-				if(CompareIdls(m_extraItemInfoMap.at((int)itr->iItemInternal).pidlComplete.get(),m_pidlNewItem))
+				if(CompareIdls(m_itemInfoMap.at((int)itr->iItemInternal).pidlComplete.get(),m_pidlNewItem))
 					m_bNewItemCreated = FALSE;
 
 				m_iIndexNewItem = iItemIndex;
 			}
 
 			/* If the file is marked as hidden, ghost it out. */
-			if(m_fileInfoMap.at(itr->iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+			if(m_itemInfoMap.at(itr->iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
 			{
 				ListView_SetItemState(m_hListView,iItemIndex,LVIS_CUT,LVIS_CUT);
 			}
@@ -241,8 +241,8 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			/* Add the current file's size to the running size of the current directory. */
 			/* A folder may or may not have 0 in its high file size member.
 			It should either be zeroed, or never counted. */
-			ulFileSize.LowPart = m_fileInfoMap.at(itr->iItemInternal).nFileSizeLow;
-			ulFileSize.HighPart = m_fileInfoMap.at(itr->iItemInternal).nFileSizeHigh;
+			ulFileSize.LowPart = m_itemInfoMap.at(itr->iItemInternal).wfd.nFileSizeLow;
+			ulFileSize.HighPart = m_itemInfoMap.at(itr->iItemInternal).wfd.nFileSizeHigh;
 
 			m_ulTotalDirSize.QuadPart += ulFileSize.QuadPart;
 
@@ -271,14 +271,14 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 	BOOL bFilenameFiltered	= FALSE;
 
 	if(m_bApplyFilter &&
-		((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+		((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
-		bFilenameFiltered = IsFilenameFiltered(m_extraItemInfoMap.at(iItemInternal).szDisplayName);
+		bFilenameFiltered = IsFilenameFiltered(m_itemInfoMap.at(iItemInternal).szDisplayName);
 	}
 
 	if(m_bHideSystemFiles)
 	{
-		bHideSystemFile = (m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
+		bHideSystemFile = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
 			== FILE_ATTRIBUTE_SYSTEM;
 	}
 
@@ -294,9 +294,9 @@ std::wstring CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	TCHAR *pExt = NULL;
 
 	if(m_bHideLinkExtension &&
-		((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+		((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
-		pExt = PathFindExtension(m_extraItemInfoMap.at(iItemInternal).szDisplayName);
+		pExt = PathFindExtension(m_itemInfoMap.at(iItemInternal).szDisplayName);
 
 		if(*pExt != '\0')
 		{
@@ -309,13 +309,13 @@ std::wstring CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	to be hidden, and the filename does not begin with
 	a period, and the item is not a directory. */
 	if((!m_bShowExtensions || bHideExtension) &&
-		m_extraItemInfoMap.at(iItemInternal).szDisplayName[0] != '.' &&
-		(m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+		m_itemInfoMap.at(iItemInternal).szDisplayName[0] != '.' &&
+		(m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
 		static TCHAR szDisplayName[MAX_PATH];
 
 		StringCchCopy(szDisplayName,SIZEOF_ARRAY(szDisplayName),
-			m_extraItemInfoMap.at(iItemInternal).szDisplayName);
+			m_itemInfoMap.at(iItemInternal).szDisplayName);
 
 		/* Strip the extension. */
 		PathRemoveExtension(szDisplayName);
@@ -324,7 +324,7 @@ std::wstring CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	}
 	else
 	{
-		return m_extraItemInfoMap.at(iItemInternal).szDisplayName;
+		return m_itemInfoMap.at(iItemInternal).szDisplayName;
 	}
 }
 
@@ -340,13 +340,13 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 		return;
 
 	/* Is this item a folder? */
-	bFolder = (m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+	bFolder = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
 	FILE_ATTRIBUTE_DIRECTORY;
 
 	/* Take the file size of the removed file away from the total
 	directory size. */
-	ulFileSize.LowPart = m_fileInfoMap.at(iItemInternal).nFileSizeLow;
-	ulFileSize.HighPart = m_fileInfoMap.at(iItemInternal).nFileSizeHigh;
+	ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
+	ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
 	m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
 
@@ -364,8 +364,7 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 		ListView_DeleteItem(m_hListView,iItem);
 	}
 
-	m_fileInfoMap.erase(iItemInternal);
-	m_extraItemInfoMap.erase(iItemInternal);
+	m_itemInfoMap.erase(iItemInternal);
 
 	nItems = ListView_GetItemCount(m_hListView);
 
@@ -555,11 +554,11 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 
 	pidlItem = ILCombine(pidlDirectory, pidlRelative);
 
-	m_extraItemInfoMap[uItemId].pidlComplete.reset(ILClone(pidlItem));
-	m_extraItemInfoMap[uItemId].pridl.reset(ILClone(pidlRelative));
-	m_extraItemInfoMap[uItemId].bIconRetrieved = FALSE;
-	StringCchCopy(m_extraItemInfoMap[uItemId].szDisplayName,
-		SIZEOF_ARRAY(m_extraItemInfoMap[uItemId].szDisplayName), szFileName);
+	m_itemInfoMap[uItemId].pidlComplete.reset(ILClone(pidlItem));
+	m_itemInfoMap[uItemId].pridl.reset(ILClone(pidlRelative));
+	m_itemInfoMap[uItemId].bIconRetrieved = FALSE;
+	StringCchCopy(m_itemInfoMap[uItemId].szDisplayName,
+		SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDisplayName), szFileName);
 
 	SHGetPathFromIDList(pidlItem,szPath);
 
@@ -570,18 +569,18 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	few seconds. */
 	if(!PathIsRoot(szPath))
 	{
-		m_extraItemInfoMap[uItemId].bDrive = FALSE;
+		m_itemInfoMap[uItemId].bDrive = FALSE;
 
 		WIN32_FIND_DATA wfd;
 		hFirstFile = FindFirstFile(szPath,&wfd);
 
-		m_fileInfoMap.insert({uItemId, wfd});
+		m_itemInfoMap[uItemId].wfd = wfd;
 	}
 	else
 	{
-		m_extraItemInfoMap[uItemId].bDrive = TRUE;
-		StringCchCopy(m_extraItemInfoMap[uItemId].szDrive,
-			SIZEOF_ARRAY(m_extraItemInfoMap[uItemId].szDrive),
+		m_itemInfoMap[uItemId].bDrive = TRUE;
+		StringCchCopy(m_itemInfoMap[uItemId].szDrive,
+			SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDrive),
 			szPath);
 
 		hFirstFile = INVALID_HANDLE_VALUE;
@@ -591,7 +590,7 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	(such as the recycle bin), but items still exist. */
 	if(hFirstFile != INVALID_HANDLE_VALUE)
 	{
-		m_extraItemInfoMap[uItemId].bReal = TRUE;
+		m_itemInfoMap[uItemId].bReal = TRUE;
 		FindClose(hFirstFile);
 	}
 	else
@@ -603,9 +602,8 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 		wfd.nFileSizeHigh			= 0;
 		wfd.dwFileAttributes		= FILE_ATTRIBUTE_DIRECTORY;
 
-		m_fileInfoMap.insert({uItemId, wfd});
-
-		m_extraItemInfoMap[uItemId].bReal = FALSE;
+		m_itemInfoMap[uItemId].wfd = wfd;
+		m_itemInfoMap[uItemId].bReal = FALSE;
 	}
 
 	return uItemId;

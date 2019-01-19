@@ -345,7 +345,7 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 
 		for(itr = m_AwaitingAddList.begin();itr!= m_AwaitingAddList.end();itr++)
 		{
-			if(lstrcmp(m_fileInfoMap.at(itr->iItemInternal).cFileName,FileName) == 0)
+			if(lstrcmp(m_itemInfoMap.at(itr->iItemInternal).wfd.cFileName,FileName) == 0)
 			{
 				iItemInternal = itr->iItemInternal;
 				break;
@@ -390,19 +390,19 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 	if(iItemInternal != -1)
 	{
 		/* Is this item a folder? */
-		bFolder = (m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
+		bFolder = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
 			FILE_ATTRIBUTE_DIRECTORY;
 
-		ulFileSize.LowPart = m_fileInfoMap.at(iItemInternal).nFileSizeLow;
-		ulFileSize.HighPart = m_fileInfoMap.at(iItemInternal).nFileSizeHigh;
+		ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
+		ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
 		m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
 
 		if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
 		== LVIS_SELECTED)
 		{
-			ulFileSize.LowPart = m_fileInfoMap.at(iItemInternal).nFileSizeLow;
-			ulFileSize.HighPart = m_fileInfoMap.at(iItemInternal).nFileSizeHigh;
+			ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
+			ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
 			m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 		}
@@ -410,25 +410,25 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 		StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
 		PathAppend(FullFileName,FileName);
 
-		hFirstFile = FindFirstFile(FullFileName,&m_fileInfoMap.at(iItemInternal));
+		hFirstFile = FindFirstFile(FullFileName,&m_itemInfoMap.at(iItemInternal).wfd);
 
 		if(hFirstFile != INVALID_HANDLE_VALUE)
 		{
-			ulFileSize.LowPart = m_fileInfoMap.at(iItemInternal).nFileSizeLow;
-			ulFileSize.HighPart = m_fileInfoMap.at(iItemInternal).nFileSizeHigh;
+			ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
+			ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
 			m_ulTotalDirSize.QuadPart += ulFileSize.QuadPart;
 
 			if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
 				== LVIS_SELECTED)
 			{
-				ulFileSize.LowPart = m_fileInfoMap.at(iItemInternal).nFileSizeLow;
-				ulFileSize.HighPart = m_fileInfoMap.at(iItemInternal).nFileSizeHigh;
+				ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
+				ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
 				m_ulFileSelectionSize.QuadPart += ulFileSize.QuadPart;
 			}
 
-			if((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) ==
+			if((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) ==
 				FILE_ATTRIBUTE_HIDDEN)
 			{
 				ListView_SetItemState(m_hListView,iItem,LVIS_CUT,LVIS_CUT);
@@ -466,8 +466,8 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 			modification. If the internal structures still hold
 			the old size, the total directory size will become
 			corrupted. */
-			m_fileInfoMap.at(iItemInternal).nFileSizeLow		= 0;
-			m_fileInfoMap.at(iItemInternal).nFileSizeHigh	= 0;
+			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow = 0;
+			m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh = 0;
 		}
 	}
 }
@@ -556,16 +556,16 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 
 			if(SUCCEEDED(hr))
 			{
-				m_extraItemInfoMap.at(iItemInternal).pidlComplete.reset(ILClone(pidlFull));
-				m_extraItemInfoMap.at(iItemInternal).pridl.reset(ILClone(pidlRelative));
-				StringCchCopy(m_extraItemInfoMap.at(iItemInternal).szDisplayName,
-					SIZEOF_ARRAY(m_extraItemInfoMap.at(iItemInternal).szDisplayName),
+				m_itemInfoMap.at(iItemInternal).pidlComplete.reset(ILClone(pidlFull));
+				m_itemInfoMap.at(iItemInternal).pridl.reset(ILClone(pidlRelative));
+				StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
+					SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName),
 					szDisplayName);
 
 				/* Need to update internal storage for the item, since
 				it's name has now changed. */
-				StringCchCopy(m_fileInfoMap.at(iItemInternal).cFileName,
-					SIZEOF_ARRAY(m_fileInfoMap.at(iItemInternal).cFileName),
+				StringCchCopy(m_itemInfoMap.at(iItemInternal).wfd.cFileName,
+					SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).wfd.cFileName),
 					szNewFileName);
 
 				/* The files' type may have changed, so retrieve the files'
@@ -621,11 +621,11 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 	}
 	else
 	{
-		StringCchCopy(m_extraItemInfoMap.at(iItemInternal).szDisplayName,
-			SIZEOF_ARRAY(m_extraItemInfoMap.at(iItemInternal).szDisplayName), szNewFileName);
+		StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
+			SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName), szNewFileName);
 
-		StringCchCopy(m_fileInfoMap.at(iItemInternal).cFileName,
-			SIZEOF_ARRAY(m_fileInfoMap.at(iItemInternal).cFileName),
+		StringCchCopy(m_itemInfoMap.at(iItemInternal).wfd.cFileName,
+			SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).wfd.cFileName),
 			szNewFileName);
 	}
 }

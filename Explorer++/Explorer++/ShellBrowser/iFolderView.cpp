@@ -595,14 +595,14 @@ void CShellBrowser::SetTileViewItemInfo(int iItem,int iItemInternal)
 
 	ListView_SetItemText(m_hListView,iItem,1,shfi.szTypeName);
 
-	if((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
+	if((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
 		FILE_ATTRIBUTE_DIRECTORY)
 	{
 		TCHAR			lpszFileSize[32];
 		ULARGE_INTEGER	lFileSize;
 
-		lFileSize.LowPart = m_fileInfoMap.at(iItemInternal).nFileSizeLow;
-		lFileSize.HighPart = m_fileInfoMap.at(iItemInternal).nFileSizeHigh;
+		lFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
+		lFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
 		FormatSizeString(lFileSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
 			m_bForceSize,m_SizeDisplayFormat);

@@ -36,11 +36,11 @@ void CShellBrowser::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 	ULARGE_INTEGER	ulFileSize;
 	BOOL			IsFolder;
 
-	IsFolder = (m_fileInfoMap.at(iCacheIndex).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	IsFolder = (m_itemInfoMap.at(iCacheIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	== FILE_ATTRIBUTE_DIRECTORY;
 
-	ulFileSize.LowPart = m_fileInfoMap.at(iCacheIndex).nFileSizeLow;
-	ulFileSize.HighPart = m_fileInfoMap.at(iCacheIndex).nFileSizeHigh;
+	ulFileSize.LowPart = m_itemInfoMap.at(iCacheIndex).wfd.nFileSizeLow;
+	ulFileSize.HighPart = m_itemInfoMap.at(iCacheIndex).wfd.nFileSizeHigh;
 
 	if(Selected)
 	{
@@ -79,7 +79,7 @@ int CShellBrowser::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) con
 	lvItem.iSubItem	= 0;
 	ListView_GetItem(m_hListView,&lvItem);
 
-	StringCchCopy(Buffer,BufferSize,m_fileInfoMap.at((int)lvItem.lParam).cFileName);
+	StringCchCopy(Buffer,BufferSize,m_itemInfoMap.at((int)lvItem.lParam).wfd.cFileName);
 
 	return lstrlen(Buffer);
 }
@@ -106,7 +106,7 @@ HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath,UINT cch
 
 void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName,UINT cchMax) const
 {
-	GetDisplayName(m_extraItemInfoMap.at(iItemInternal).pidlComplete.get(),szFullFileName,cchMax,SHGDN_FORPARSING);
+	GetDisplayName(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),szFullFileName,cchMax,SHGDN_FORPARSING);
 }
 
 UINT CShellBrowser::QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const
@@ -245,8 +245,8 @@ int CShellBrowser::LocateFileItemInternalIndex(const TCHAR *szFileName) const
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		if((lstrcmp(m_fileInfoMap.at((int)lvItem.lParam).cFileName,szFileName) == 0) ||
-			(lstrcmp(m_fileInfoMap.at((int)lvItem.lParam).cAlternateFileName,szFileName) == 0))
+		if((lstrcmp(m_itemInfoMap.at((int)lvItem.lParam).wfd.cFileName,szFileName) == 0) ||
+			(lstrcmp(m_itemInfoMap.at((int)lvItem.lParam).wfd.cAlternateFileName,szFileName) == 0))
 		{
 			return (int)lvItem.lParam;
 			break;
@@ -280,7 +280,7 @@ DWORD CShellBrowser::QueryFileAttributes(int iItem) const
 	lvItem.iSubItem	= 0;
 	ListView_GetItem(m_hListView,&lvItem);
 
-	return m_fileInfoMap.at((int)lvItem.lParam).dwFileAttributes;
+	return m_itemInfoMap.at((int)lvItem.lParam).wfd.dwFileAttributes;
 }
 
 WIN32_FIND_DATA CShellBrowser::QueryFileFindData(int iItem) const
@@ -292,7 +292,7 @@ WIN32_FIND_DATA CShellBrowser::QueryFileFindData(int iItem) const
 	lvItem.iSubItem	= 0;
 	ListView_GetItem(m_hListView,&lvItem);
 
-	return m_fileInfoMap.at((int)lvItem.lParam);
+	return m_itemInfoMap.at((int)lvItem.lParam).wfd;
 }
 
 void CShellBrowser::DragStarted(int iFirstItem,POINT *ptCursor)
@@ -366,7 +366,7 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 
 	if((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
-		if((m_fileInfoMap.at(static_cast<int>(plvItem->lParam)).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+		if((m_itemInfoMap.at(static_cast<int>(plvItem->lParam)).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 		{
 			/* File. */
 			plvItem->iImage	= m_iFileIcon;
@@ -401,7 +401,7 @@ boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindIconAsync(int i
 	// Must use SHGFI_ICON here, rather than SHGFO_SYSICONINDEX, or else 
 	// icon overlays won't be applied.
 	SHFILEINFO shfi;
-	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(m_extraItemInfoMap.at(internalIndex).pidlComplete.get()),
+	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(m_itemInfoMap.at(internalIndex).pidlComplete.get()),
 		0, &shfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
 
 	if (res == 0)
@@ -465,7 +465,7 @@ LPITEMIDLIST CShellBrowser::QueryItemRelativeIdl(int iItem) const
 	bRet = ListView_GetItem(m_hListView,&lvItem);
 
 	if(bRet)
-		return ILClone((ITEMIDLIST *)m_extraItemInfoMap.at((int)lvItem.lParam).pridl.get());
+		return ILClone((ITEMIDLIST *)m_itemInfoMap.at((int)lvItem.lParam).pridl.get());
 
 	return NULL;
 }
@@ -749,7 +749,7 @@ BOOL CShellBrowser::IsFileReal(int iItem) const
 	bRes = ListView_GetItem(m_hListView,&lvItem);
 
 	if(bRes)
-		return m_extraItemInfoMap.at((int)lvItem.lParam).bReal;
+		return m_itemInfoMap.at((int)lvItem.lParam).bReal;
 
 	return FALSE;
 }
@@ -778,7 +778,7 @@ BOOL CShellBrowser::GhostItemInternal(int iItem,BOOL bGhost)
 	{
 		/* If the file is hidden, prevent changes to its visibility state (i.e.
 		hidden items will ALWAYS be ghosted). */
-		if(m_fileInfoMap.at((int)lvItem.lParam).dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+		if(m_itemInfoMap.at((int)lvItem.lParam).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
 			return FALSE;
 
 		if(bGhost)
@@ -812,9 +812,9 @@ void CShellBrowser::RemoveFilteredItems(void)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		if(!((m_fileInfoMap.at((int)lvItem.lParam).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
+		if(!((m_itemInfoMap.at((int)lvItem.lParam).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
 		{
-			if(IsFilenameFiltered(m_extraItemInfoMap.at((int)lvItem.lParam).szDisplayName))
+			if(IsFilenameFiltered(m_itemInfoMap.at((int)lvItem.lParam).szDisplayName))
 			{
 				RemoveFilteredItem(i,(int)lvItem.lParam);
 			}
@@ -831,16 +831,16 @@ void CShellBrowser::RemoveFilteredItem(int iItem,int iItemInternal)
 	if(ListView_GetItemState(m_hListView,iItem,LVIS_SELECTED)
 		== LVIS_SELECTED)
 	{
-		ulFileSize.LowPart = m_fileInfoMap.at(iItemInternal).nFileSizeLow;
-		ulFileSize.HighPart = m_fileInfoMap.at(iItemInternal).nFileSizeHigh;
+		ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
+		ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
 		m_ulFileSelectionSize.QuadPart -= ulFileSize.QuadPart;
 	}
 
 	/* Take the file size of the removed file away from the total
 	directory size. */
-	ulFileSize.LowPart = m_fileInfoMap.at(iItemInternal).nFileSizeLow;
-	ulFileSize.HighPart = m_fileInfoMap.at(iItemInternal).nFileSizeHigh;
+	ulFileSize.LowPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow;
+	ulFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
 	m_ulTotalDirSize.QuadPart -= ulFileSize.QuadPart;
 
@@ -1146,8 +1146,7 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 
 	m_itemIDCounter = 0;
 
-	m_fileInfoMap.clear();
-	m_extraItemInfoMap.clear();
+	m_itemInfoMap.clear();
 
 	m_cachedFolderSizes.clear();
 
@@ -1331,7 +1330,7 @@ void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		if(CompareIdls(pidlItem, m_extraItemInfoMap.at((int)lvItem.lParam).pidlComplete.get()))
+		if(CompareIdls(pidlItem, m_itemInfoMap.at((int)lvItem.lParam).pidlComplete.get()))
 		{
 			bItemFound = TRUE;
 
@@ -1493,7 +1492,7 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 			lvItem.iSubItem	= 0;
 			ListView_GetItem(m_hListView,&lvItem);
 
-			if(CompareIdls(pidlDrive, m_extraItemInfoMap.at((int)lvItem.lParam).pidlComplete.get()))
+			if(CompareIdls(pidlDrive, m_itemInfoMap.at((int)lvItem.lParam).pidlComplete.get()))
 			{
 				iItem = i;
 				iItemInternal = (int)lvItem.lParam;
@@ -1509,8 +1508,8 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 	{
 		SHGetFileInfo(szDrive,0,&shfi,sizeof(shfi),SHGFI_SYSICONINDEX);
 
-		StringCchCopy(m_extraItemInfoMap.at(iItemInternal).szDisplayName,
-			SIZEOF_ARRAY(m_extraItemInfoMap.at(iItemInternal).szDisplayName),
+		StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
+			SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName),
 			szDisplayName);
 
 		/* Update the drives icon and display name. */
@@ -1536,9 +1535,9 @@ void CShellBrowser::RemoveDrive(const TCHAR *szDrive)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		if(m_extraItemInfoMap.at((int)lvItem.lParam).bDrive)
+		if(m_itemInfoMap.at((int)lvItem.lParam).bDrive)
 		{
-			if(lstrcmp(szDrive,m_extraItemInfoMap.at((int)lvItem.lParam).szDrive) == 0)
+			if(lstrcmp(szDrive,m_itemInfoMap.at((int)lvItem.lParam).szDrive) == 0)
 			{
 				iItemInternal = (int)lvItem.lParam;
 				break;

@@ -88,10 +88,11 @@ typedef struct
 	ULARGE_INTEGER TotalSelectionSize;
 } FolderInfo_t;
 
-struct ExtraItemInfo
+struct ItemInfo_t
 {
 	PIDLPointer		pidlComplete;
 	PIDLPointer		pridl;
+	WIN32_FIND_DATA	wfd;
 	TCHAR			szDisplayName[MAX_PATH];
 	BOOL			bReal;
 	BOOL			bIconRetrieved;
@@ -578,13 +579,9 @@ private:
 
 	int					m_itemIDCounter;
 
-	/* Stores a WIN32_FIND_DATA structure for each file.
-	Only valid for 'real' files. */
-	std::unordered_map<int, WIN32_FIND_DATA> m_fileInfoMap;
-
 	/* Stores various extra information on files, such
 	as display name. */
-	std::unordered_map<int, ExtraItemInfo>	m_extraItemInfoMap;
+	std::unordered_map<int, ItemInfo_t>	m_itemInfoMap;
 
 	ctpl::thread_pool	m_columnThreadPool;
 	std::unordered_map<int, std::future<ColumnResult_t>> m_columnResults;

@@ -286,7 +286,7 @@ void CShellBrowser::HandleDragSelection(const POINT *ppt)
 		if(bOverItem)
 		{
 			/* Check for a clash (only if over a folder). */
-			if((m_fileInfoMap.at(iInternalIndex).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			if((m_itemInfoMap.at(iInternalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				== FILE_ATTRIBUTE_DIRECTORY)
 			{
 				if(m_bDragging)
@@ -435,7 +435,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		PathAppend(szDestDirectory,m_fileInfoMap.at((int)lvItem.lParam).cFileName);
+		PathAppend(szDestDirectory,m_itemInfoMap.at((int)lvItem.lParam).wfd.cFileName);
 	}
 
 	szDestDirectory[lstrlen(szDestDirectory) + 1] = '\0';
@@ -526,8 +526,8 @@ int CALLBACK SortTemporaryStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 
 int CALLBACK CShellBrowser::SortTemporary(LPARAM lParam1,LPARAM lParam2)
 {
-	return m_extraItemInfoMap.at(static_cast<int>(lParam1)).iRelativeSort -
-		m_extraItemInfoMap.at(static_cast<int>(lParam2)).iRelativeSort;
+	return m_itemInfoMap.at(static_cast<int>(lParam1)).iRelativeSort -
+		m_itemInfoMap.at(static_cast<int>(lParam2)).iRelativeSort;
 }
 
 void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
@@ -598,14 +598,14 @@ void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
 					{
 						if(i == iItem)
 						{
-							m_extraItemInfoMap.at((int)lvItem.lParam).iRelativeSort = iInsert;
+							m_itemInfoMap.at((int)lvItem.lParam).iRelativeSort = iInsert;
 						}
 						else
 						{
 							if(iSort == iInsert)
 								iSort++;
 
-							m_extraItemInfoMap.at((int)lvItem.lParam).iRelativeSort = iSort;
+							m_itemInfoMap.at((int)lvItem.lParam).iRelativeSort = iSort;
 						}
 					}
 

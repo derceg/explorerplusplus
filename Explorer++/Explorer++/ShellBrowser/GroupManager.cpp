@@ -461,7 +461,7 @@ void CShellBrowser::DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeade
 
 	/* Take the first character of the item's name,
 	and use it to determine which group it belongs to. */
-	ch = m_extraItemInfoMap.at(iItemInternal).szDisplayName[0];
+	ch = m_itemInfoMap.at(iItemInternal).szDisplayName[0];
 
 	if(iswalpha(ch))
 	{
@@ -489,7 +489,7 @@ void CShellBrowser::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeade
 	int iSize;
 	int i;
 
-	if((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	if((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	== FILE_ATTRIBUTE_DIRECTORY)
 	{
 		/* This item is a folder. */
@@ -499,8 +499,8 @@ void CShellBrowser::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeade
 	{
 		i = nGroups - 1;
 
-		double FileSize = m_fileInfoMap.at(iItemInternal).nFileSizeLow +
-		(m_fileInfoMap.at(iItemInternal).nFileSizeHigh * pow(2.0,32.0));
+		double FileSize = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow +
+		(m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh * pow(2.0,32.0));
 
 		/* Check which of the size groups this item belongs to. */
 		while(FileSize < SizeGroupLimits[i]
@@ -545,7 +545,7 @@ void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroup
 
 	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
 
-	SHBindToParent(m_extraItemInfoMap.at(iItemInternal).pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *) &pidlRelative);
+	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *) &pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
 	StrRetToBuf(&str,pidlRelative,szItem,SIZEOF_ARRAY(szItem));
@@ -580,7 +580,7 @@ void CShellBrowser::DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGro
 	SHFILEINFO shfi;
 	std::list<TypeGroup_t>::iterator itr;
 
-	SHGetFileInfo((LPTSTR)m_extraItemInfoMap.at(iItemInternal).pidlComplete.get(),
+	SHGetFileInfo((LPTSTR)m_itemInfoMap.at(iItemInternal).pidlComplete.get(),
 		0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_TYPENAME);
 
 	StringCchCopy(szGroupHeader,cchMax,shfi.szTypeName);
@@ -597,15 +597,15 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 	switch(iDateType)
 	{
 	case GROUP_BY_DATEMODIFIED:
-		ret = FileTimeToLocalSystemTime(&m_fileInfoMap.at(iItemInternal).ftLastWriteTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&m_itemInfoMap.at(iItemInternal).wfd.ftLastWriteTime, &stFileTime);
 		break;
 
 	case GROUP_BY_DATECREATED:
-		ret = FileTimeToLocalSystemTime(&m_fileInfoMap.at(iItemInternal).ftCreationTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&m_itemInfoMap.at(iItemInternal).wfd.ftCreationTime, &stFileTime);
 		break;
 
 	case GROUP_BY_DATEACCESSED:
-		ret = FileTimeToLocalSystemTime(&m_fileInfoMap.at(iItemInternal).ftLastAccessTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&m_itemInfoMap.at(iItemInternal).wfd.ftLastAccessTime, &stFileTime);
 		break;
 
 	default:
@@ -737,7 +737,7 @@ void CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroup
 	BOOL bRes = FALSE;
 
 	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
-	SHBindToParent(m_extraItemInfoMap.at(iItemInternal).pidlComplete.get(),
+	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),
 		IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
@@ -779,7 +779,7 @@ void CShellBrowser::DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroup
 	TCHAR szAttributes[32];
 
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_fileInfoMap.at(iItemInternal).cFileName);
+	PathAppend(FullFileName,m_itemInfoMap.at(iItemInternal).wfd.cFileName);
 
 	BuildFileAttributeString(FullFileName,szAttributes,
 		SIZEOF_ARRAY(szAttributes));
@@ -794,7 +794,7 @@ void CShellBrowser::DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHead
 	TCHAR szOwner[512];
 
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_fileInfoMap.at(iItemInternal).cFileName);
+	PathAppend(FullFileName,m_itemInfoMap.at(iItemInternal).wfd.cFileName);
 
 	BOOL ret = GetFileOwner(FullFileName,szOwner,SIZEOF_ARRAY(szOwner));
 
@@ -815,7 +815,7 @@ void CShellBrowser::DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersion
 	BOOL bVersionInfoObtained;
 
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_fileInfoMap.at(iItemInternal).cFileName);
+	PathAppend(FullFileName,m_itemInfoMap.at(iItemInternal).wfd.cFileName);
 
 	bVersionInfoObtained = GetVersionInfoString(FullFileName,
 		szVersionType,szVersion,SIZEOF_ARRAY(szVersion));
@@ -836,7 +836,7 @@ void CShellBrowser::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID Pr
 	BOOL bRes;
 
 	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
-	PathAppend(szFullFileName,m_fileInfoMap.at(iItemInternal).cFileName);
+	PathAppend(szFullFileName,m_itemInfoMap.at(iItemInternal).wfd.cFileName);
 
 	bRes = ReadImageProperty(szFullFileName,PropertyId,szProperty,
 		SIZEOF_ARRAY(szProperty));
@@ -849,7 +849,7 @@ void CShellBrowser::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID Pr
 
 void CShellBrowser::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
-	if ((m_fileInfoMap.at(iItemInternal).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	if ((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		LoadString(m_hResourceModule, IDS_GROUPBY_EXTENSION_FOLDER, szGroupHeader, cchMax);
 		return;
@@ -857,7 +857,7 @@ void CShellBrowser::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroup
 
 	TCHAR FullFileName[MAX_PATH];
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_fileInfoMap.at(iItemInternal).cFileName);
+	PathAppend(FullFileName,m_itemInfoMap.at(iItemInternal).wfd.cFileName);
 
 	TCHAR *pExt = PathFindExtension(FullFileName);
 
@@ -881,7 +881,7 @@ void CShellBrowser::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGrou
 	BOOL bRoot;
 	BOOL bRes;
 
-	SHBindToParent(m_extraItemInfoMap.at(iItemInternal).pidlComplete.get(),
+	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),
 		IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);

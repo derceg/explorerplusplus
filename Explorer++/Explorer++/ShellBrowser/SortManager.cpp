@@ -64,8 +64,8 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 {
 	int ComparisonResult = 0;
 
-	bool IsFolder1 = ((m_fileInfoMap.at(InternalIndex1).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
-	bool IsFolder2 = ((m_fileInfoMap.at(InternalIndex2).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder1 = ((m_itemInfoMap.at(InternalIndex1).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder2 = ((m_itemInfoMap.at(InternalIndex2).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	
 	/* Folders will always be sorted separately from files,
 	except in the recycle bin. */
@@ -339,8 +339,8 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	{
 		/* By default, items that are equal will be sub-sorted
 		by their display names. */
-		ComparisonResult = StrCmpLogicalW(m_extraItemInfoMap.at(InternalIndex1).szDisplayName,
-			m_extraItemInfoMap.at(InternalIndex2).szDisplayName);
+		ComparisonResult = StrCmpLogicalW(m_itemInfoMap.at(InternalIndex1).szDisplayName,
+			m_itemInfoMap.at(InternalIndex2).szDisplayName);
 	}
 
 	if(!m_bSortAscending)
@@ -356,10 +356,10 @@ int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) co
 	if(m_bVirtualFolder)
 	{
 		TCHAR FullFileName1[MAX_PATH];
-		GetDisplayName(m_extraItemInfoMap.at(InternalIndex1).pidlComplete.get(),FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
+		GetDisplayName(m_itemInfoMap.at(InternalIndex1).pidlComplete.get(),FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
 
 		TCHAR FullFileName2[MAX_PATH];
-		GetDisplayName(m_extraItemInfoMap.at(InternalIndex2).pidlComplete.get(),FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
+		GetDisplayName(m_itemInfoMap.at(InternalIndex2).pidlComplete.get(),FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
 
 		BOOL IsRoot1 = PathIsRoot(FullFileName1);
 		BOOL IsRoot2 = PathIsRoot(FullFileName2);
@@ -388,8 +388,8 @@ int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) co
 
 int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) const
 {
-	bool IsFolder1 = ((m_fileInfoMap.at(InternalIndex1).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
-	bool IsFolder2 = ((m_fileInfoMap.at(InternalIndex2).dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder1 = ((m_itemInfoMap.at(InternalIndex1).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder2 = ((m_itemInfoMap.at(InternalIndex2).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 
 	ULONGLONG size1;
 	ULONGLONG size2;
@@ -414,8 +414,8 @@ int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) co
 	else
 	{
 		// Both items are files (as opposed to folders).
-		ULARGE_INTEGER FileSize1 = { m_fileInfoMap.at(InternalIndex1).nFileSizeLow,m_fileInfoMap.at(InternalIndex1).nFileSizeHigh };
-		ULARGE_INTEGER FileSize2 = { m_fileInfoMap.at(InternalIndex2).nFileSizeLow,m_fileInfoMap.at(InternalIndex2).nFileSizeHigh };
+		ULARGE_INTEGER FileSize1 = { m_itemInfoMap.at(InternalIndex1).wfd.nFileSizeLow,m_itemInfoMap.at(InternalIndex1).wfd.nFileSizeHigh };
+		ULARGE_INTEGER FileSize2 = { m_itemInfoMap.at(InternalIndex2).wfd.nFileSizeLow,m_itemInfoMap.at(InternalIndex2).wfd.nFileSizeHigh };
 
 		size1 = FileSize1.QuadPart;
 		size2 = FileSize2.QuadPart;
@@ -438,10 +438,10 @@ int CALLBACK CShellBrowser::SortByType(int InternalIndex1,int InternalIndex2) co
 	if(m_bVirtualFolder)
 	{
 		TCHAR FullFileName1[MAX_PATH];
-		GetDisplayName(m_extraItemInfoMap.at(InternalIndex1).pidlComplete.get(),FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
+		GetDisplayName(m_itemInfoMap.at(InternalIndex1).pidlComplete.get(),FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
 
 		TCHAR FullFileName2[MAX_PATH];
-		GetDisplayName(m_extraItemInfoMap.at(InternalIndex2).pidlComplete.get(),FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
+		GetDisplayName(m_itemInfoMap.at(InternalIndex2).pidlComplete.get(),FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
 
 		BOOL IsRoot1 = PathIsRoot(FullFileName1);
 		BOOL IsRoot2 = PathIsRoot(FullFileName2);
@@ -467,15 +467,15 @@ int CALLBACK CShellBrowser::SortByDate(int InternalIndex1,int InternalIndex2,Dat
 	switch(DateType)
 	{
 	case DATE_TYPE_CREATED:
-		return CompareFileTime(&m_fileInfoMap.at(InternalIndex1).ftCreationTime,&m_fileInfoMap.at(InternalIndex2).ftCreationTime);
+		return CompareFileTime(&m_itemInfoMap.at(InternalIndex1).wfd.ftCreationTime,&m_itemInfoMap.at(InternalIndex2).wfd.ftCreationTime);
 		break;
 
 	case DATE_TYPE_MODIFIED:
-		return CompareFileTime(&m_fileInfoMap.at(InternalIndex1).ftLastWriteTime,&m_fileInfoMap.at(InternalIndex2).ftLastWriteTime);
+		return CompareFileTime(&m_itemInfoMap.at(InternalIndex1).wfd.ftLastWriteTime,&m_itemInfoMap.at(InternalIndex2).wfd.ftLastWriteTime);
 		break;
 
 	case DATE_TYPE_ACCESSED:
-		return CompareFileTime(&m_fileInfoMap.at(InternalIndex1).ftLastAccessTime,&m_fileInfoMap.at(InternalIndex2).ftLastAccessTime);
+		return CompareFileTime(&m_itemInfoMap.at(InternalIndex1).wfd.ftLastAccessTime,&m_itemInfoMap.at(InternalIndex2).wfd.ftLastAccessTime);
 		break;
 
 	default:

@@ -130,7 +130,7 @@ boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindThumbnailAsync(
 	} BOOST_SCOPE_EXIT_END
 
 	IExtractImage *pExtractImage = nullptr;
-	LPCITEMIDLIST pridl = m_extraItemInfoMap.at(internalIndex).pridl.get();
+	LPCITEMIDLIST pridl = m_itemInfoMap.at(internalIndex).pridl.get();
 	hr = GetUIObjectOf(pShellFolder, NULL, 1, &pridl, IID_PPV_ARGS(&pExtractImage));
 
 	if (FAILED(hr))
@@ -287,7 +287,7 @@ void CShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex)
 	int iIconWidth;
 	int iIconHeight;
 
-	SHGetFileInfo((LPCTSTR)m_extraItemInfoMap.at(iInternalIndex).pidlComplete.get(),0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
+	SHGetFileInfo((LPCTSTR)m_itemInfoMap.at(iInternalIndex).pidlComplete.get(),0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
 
 	hIcon = ImageList_GetIcon(m_hListViewImageList,
 		shfi.iIcon,ILD_NORMAL);
