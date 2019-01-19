@@ -529,7 +529,7 @@ bool CShellBrowser::GetRealSizeColumnRawData(const ItemInfo_t &itemInfo,ULARGE_I
 	}
 
 	TCHAR Root[MAX_PATH];
-	StringCchCopy(Root,SIZEOF_ARRAY(Root),m_CurDir);
+	StringCchCopy(Root,SIZEOF_ARRAY(Root),itemInfo.getFullPath().c_str());
 	PathStripToRoot(Root);
 
 	DWORD dwClusterSize;
