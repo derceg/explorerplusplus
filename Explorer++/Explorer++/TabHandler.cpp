@@ -233,50 +233,6 @@ void Explorerplusplus::SetTabSelection(int Index)
 	OnTabChangeInternal(TRUE);
 }
 
-void Explorerplusplus::InitializeTabMap(void)
-{
-	int i = 0;
-
-	for(i = 0;i < MAX_TABS;i++)
-	{
-		m_uTabMap[i] = 0;
-	}
-}
-
-void Explorerplusplus::ReleaseTabId(int iTabId)
-{
-	m_uTabMap[iTabId] = 0;
-}
-
-BOOL Explorerplusplus::CheckTabIdStatus(int iTabId)
-{
-	if(m_uTabMap[iTabId] == 0)
-		return FALSE;
-
-	return TRUE;
-}
-
-int Explorerplusplus::GenerateUniqueTabId(void)
-{
-	BOOL	bFound = FALSE;
-	int		i = 0;
-
-	for(i = 0;i < MAX_TABS;i++)
-	{
-		if(m_uTabMap[i] == 0)
-		{
-			m_uTabMap[i] = 1;
-			bFound = TRUE;
-			break;
-		}
-	}
-
-	if(bFound)
-		return i;
-	else
-		return -1;
-}
-
 /*
 * Creates a new tab. If a folder is selected,
 * that folder is opened in a new tab, else
@@ -368,10 +324,7 @@ int *pTabObjectIndex)
 	else
 		iNewTabIndex = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	iTabId = GenerateUniqueTabId();
-
-	if(iTabId == -1)
-		return E_FAIL;
+	iTabId = m_tabIdCounter++;
 
 	if(pTabInfo == NULL)
 	{
@@ -863,10 +816,6 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 
 	RemoveTabFromControl(TabIndex);
 	RemoveTabProxy(iInternalIndex);
-
-	EnterCriticalSection(&g_csDirMonCallback);
-	ReleaseTabId(iInternalIndex);
-	LeaveCriticalSection(&g_csDirMonCallback);
 
 	m_pDirMon->StopDirectoryMonitor(m_pShellBrowser[iInternalIndex]->GetDirMonitorId());
 

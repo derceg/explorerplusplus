@@ -605,11 +605,13 @@ void Explorerplusplus::OnDrawClipboard(void)
 			/* Deghost all items that have been 'cut'. */
 			for(const auto &strFile : m_CutFileNameList)
 			{
+				auto itr = m_pShellBrowser.find(m_iCutTabInternal);
+
 				/* Only deghost the items if the tab they
 				are/were in still exists. */
-				if(CheckTabIdStatus(m_iCutTabInternal))
+				if(itr != m_pShellBrowser.end())
 				{
-					int iItem = m_pShellBrowser[m_iCutTabInternal]->LocateFileItemIndex(strFile.c_str());
+					int iItem = itr->second->LocateFileItemIndex(strFile.c_str());
 
 					/* It is possible that the ghosted file
 					does NOT exist within the current folder.
@@ -617,7 +619,7 @@ void Explorerplusplus::OnDrawClipboard(void)
 					is cut, and the folder is changed, in which
 					case the item is no longer available. */
 					if(iItem != -1)
-						m_pShellBrowser[m_iCutTabInternal]->DeghostItem(iItem);
+						itr->second->DeghostItem(iItem);
 				}
 			}
 

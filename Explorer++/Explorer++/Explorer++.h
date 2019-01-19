@@ -71,8 +71,6 @@ public:
 
 private:
 
-	static const UINT		MAX_TABS = 100;
-
 	static const int		DEFAULT_LISTVIEW_HOVER_TIME = 500;
 
 	static const int		MIN_SHELL_MENU_ID = 1;
@@ -625,12 +623,6 @@ private:
 	/* Windows 7 jumplist tasks. */
 	void					SetupJumplistTasks();
 
-	/* Tab ID's. */
-	void					InitializeTabMap(void);
-	void					ReleaseTabId(int iTabId);
-	int						GenerateUniqueTabId(void);
-	BOOL					CheckTabIdStatus(int iTabId);
-
 	/* Languages. */
 	void					SetLanguageModule(void);
 	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
@@ -827,7 +819,7 @@ private:
 
 	/* Tabs. */
 	std::unordered_map<int, TabInfo_t> m_TabInfo;
-	UINT					m_uTabMap[MAX_TABS];
+	int						m_tabIdCounter;
 	std::unordered_map<int, HWND>	m_hListView;
 	std::unordered_map<int, CShellBrowser *> m_pShellBrowser;
 

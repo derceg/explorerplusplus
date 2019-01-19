@@ -18,8 +18,6 @@
 #include "../Helper/ShellHelper.h"
 
 
-CRITICAL_SECTION	g_csDirMonCallback;
-
 /* These entries correspond to shell
 extensions that are known to be
 incompatible with Explorer++. They
@@ -46,6 +44,7 @@ m_hContainer(hwnd)
 	m_selectedTabIndex				= 0;
 
 	/* Initial state. */
+	m_tabIdCounter					= 0;
 	m_nSelected						= 0;
 	m_nSelectedOnInvert				= 0;
 	m_selectedTabId					= 0;
@@ -96,15 +95,11 @@ m_hContainer(hwnd)
 	SetDefaultValues();
 	SetDefaultColumns();
 
-	InitializeTabMap();
-
 	/* Default folder (i.e. My Computer). */
 	GetCsidlDisplayName(CSIDL_DRIVES,m_DefaultTabDirectoryStatic,SIZEOF_ARRAY(m_DefaultTabDirectoryStatic),SHGDN_FORPARSING);
 	GetCsidlDisplayName(CSIDL_DRIVES,m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory),SHGDN_FORPARSING);
 
 	InitializeMainToolbars();
-
-	InitializeCriticalSection(&g_csDirMonCallback);
 
 	m_iDWFolderSizeUniqueId = 0;
 

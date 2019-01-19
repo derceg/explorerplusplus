@@ -660,24 +660,21 @@ void *pData)
 	DirectoryAltered_t	*pDirectoryAltered = NULL;
 	Explorerplusplus			*pContainer = NULL;
 
-	EnterCriticalSection(&g_csDirMonCallback);
-
 	pDirectoryAltered = (DirectoryAltered_t *)pData;
 	pContainer = (Explorerplusplus *)pDirectoryAltered->pData;
 
-	/* Does this tab still exist? */
-	if(pContainer->m_uTabMap[pDirectoryAltered->iIndex] == 1)
+	auto itr = pContainer->m_pShellBrowser.find(pDirectoryAltered->iIndex);
+
+	if (itr != pContainer->m_pShellBrowser.end())
 	{
 		TCHAR szDirectory[MAX_PATH];
-		pContainer->m_pShellBrowser[pDirectoryAltered->iIndex]->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
+		itr->second->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
 		LOG(debug) << _T("Directory change notification received for \"") << szDirectory << _T("\", Action = ") << dwAction
 			<< _T(", Filename = \"") << szFileName << _T("\"");
 
-		pContainer->m_pShellBrowser[pDirectoryAltered->iIndex]->FilesModified(dwAction,
-			szFileName,pDirectoryAltered->iIndex,pDirectoryAltered->iFolderIndex);
+		itr->second->FilesModified(dwAction,
+			szFileName, pDirectoryAltered->iIndex, pDirectoryAltered->iFolderIndex);
 	}
-
-	LeaveCriticalSection(&g_csDirMonCallback);
 }
 
 void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData)

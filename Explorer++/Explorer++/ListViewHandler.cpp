@@ -683,12 +683,12 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
-	ListViewInfo_t	*plvi = (ListViewInfo_t *)GetWindowLongPtr(hListView,GWLP_USERDATA);
-	assert(plvi != 0);
-
-	if(plvi->iObjectIndex < MAX_TABS && m_uTabMap[plvi->iObjectIndex] == 1)
+	for (auto item : m_hListView)
 	{
-		return plvi->iObjectIndex;
+		if (item.second == hListView)
+		{
+			return item.first;
+		}
 	}
 
 	return -1;
