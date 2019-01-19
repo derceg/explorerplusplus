@@ -5,6 +5,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/PIDLWrapper.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/optional.hpp>
@@ -108,6 +109,13 @@ struct ItemInfo_t
 	/* Used for temporary sorting in details mode (i.e.
 	when items need to be rearranged). */
 	int				iRelativeSort;
+
+	std::wstring getFullPath() const
+	{
+		TCHAR fullPath[MAX_PATH];
+		GetDisplayName(pidlComplete.get(), fullPath, SIZEOF_ARRAY(fullPath), SHGDN_FORPARSING);
+		return fullPath;
+	}
 };
 
 typedef struct
