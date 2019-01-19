@@ -282,14 +282,12 @@ int iInternalIndex,HBITMAP hThumbnailBitmap) const
 
 void CShellBrowser::DrawIconThumbnailInternal(HDC hdcBacking,int iInternalIndex) const
 {
-	LPITEMIDLIST pidlFull = NULL;
 	HICON hIcon;
 	SHFILEINFO shfi;
 	int iIconWidth;
 	int iIconHeight;
 
-	pidlFull = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(iInternalIndex).pridl.get());
-	SHGetFileInfo((LPCTSTR)pidlFull,0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
+	SHGetFileInfo((LPCTSTR)m_extraItemInfoMap.at(iInternalIndex).pidlComplete.get(),0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_SYSICONINDEX);
 
 	hIcon = ImageList_GetIcon(m_hListViewImageList,
 		shfi.iIcon,ILD_NORMAL);

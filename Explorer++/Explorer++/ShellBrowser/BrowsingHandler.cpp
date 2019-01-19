@@ -226,16 +226,10 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 			if(m_bNewItemCreated)
 			{
-				LPITEMIDLIST pidlComplete = NULL;
-
-				pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)itr->iItemInternal).pridl.get());
-
-				if(CompareIdls(pidlComplete,m_pidlNewItem))
+				if(CompareIdls(m_extraItemInfoMap.at((int)itr->iItemInternal).pidlComplete.get(),m_pidlNewItem))
 					m_bNewItemCreated = FALSE;
 
 				m_iIndexNewItem = iItemIndex;
-
-				CoTaskMemFree(pidlComplete);
 			}
 
 			/* If the file is marked as hidden, ghost it out. */

@@ -356,14 +356,10 @@ int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) co
 	if(m_bVirtualFolder)
 	{
 		TCHAR FullFileName1[MAX_PATH];
-		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex1).pridl.get());
-		GetDisplayName(pidlComplete1,FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
-		CoTaskMemFree(pidlComplete1);
+		GetDisplayName(m_extraItemInfoMap.at(InternalIndex1).pidlComplete.get(),FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
 
 		TCHAR FullFileName2[MAX_PATH];
-		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex2).pridl.get());
-		GetDisplayName(pidlComplete2,FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
-		CoTaskMemFree(pidlComplete2);
+		GetDisplayName(m_extraItemInfoMap.at(InternalIndex2).pidlComplete.get(),FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
 
 		BOOL IsRoot1 = PathIsRoot(FullFileName1);
 		BOOL IsRoot2 = PathIsRoot(FullFileName2);
@@ -442,14 +438,10 @@ int CALLBACK CShellBrowser::SortByType(int InternalIndex1,int InternalIndex2) co
 	if(m_bVirtualFolder)
 	{
 		TCHAR FullFileName1[MAX_PATH];
-		LPITEMIDLIST pidlComplete1 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex1).pridl.get());
-		GetDisplayName(pidlComplete1,FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
-		CoTaskMemFree(pidlComplete1);
+		GetDisplayName(m_extraItemInfoMap.at(InternalIndex1).pidlComplete.get(),FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
 
 		TCHAR FullFileName2[MAX_PATH];
-		LPITEMIDLIST pidlComplete2 = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(InternalIndex2).pridl.get());
-		GetDisplayName(pidlComplete2,FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
-		CoTaskMemFree(pidlComplete2);
+		GetDisplayName(m_extraItemInfoMap.at(InternalIndex2).pidlComplete.get(),FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
 
 		BOOL IsRoot1 = PathIsRoot(FullFileName1);
 		BOOL IsRoot2 = PathIsRoot(FullFileName2);

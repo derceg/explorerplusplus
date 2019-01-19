@@ -106,13 +106,7 @@ HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath,UINT cch
 
 void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName,UINT cchMax) const
 {
-	LPITEMIDLIST	pidlComplete = NULL;
-
-	pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at(iItemInternal).pridl.get());
-
-	GetDisplayName(pidlComplete,szFullFileName,cchMax,SHGDN_FORPARSING);
-
-	CoTaskMemFree(pidlComplete);
+	GetDisplayName(m_extraItemInfoMap.at(iItemInternal).pidlComplete.get(),szFullFileName,cchMax,SHGDN_FORPARSING);
 }
 
 UINT CShellBrowser::QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const
@@ -404,17 +398,11 @@ void CShellBrowser::QueueIconTask(int internalIndex)
 
 boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindIconAsync(int iconResultId, int internalIndex) const
 {
-	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory, m_extraItemInfoMap.at(internalIndex).pridl.get());
-
-	BOOST_SCOPE_EXIT(pidlComplete) {
-		CoTaskMemFree(pidlComplete);
-	} BOOST_SCOPE_EXIT_END
-
 	// Must use SHGFI_ICON here, rather than SHGFO_SYSICONINDEX, or else 
 	// icon overlays won't be applied.
 	SHFILEINFO shfi;
-	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidlComplete), 0, &shfi,
-		sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
+	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(m_extraItemInfoMap.at(internalIndex).pidlComplete.get()),
+		0, &shfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
 
 	if (res == 0)
 	{
@@ -1327,7 +1315,6 @@ void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
 	in-place within the listview. */
 
 	TCHAR szItem[MAX_PATH];
-	LPITEMIDLIST pidlComplete = NULL;
 	LVITEM lvItem;
 	BOOL bItemFound = FALSE;
 	int nItems;
@@ -1344,19 +1331,13 @@ void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		pidlComplete = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)lvItem.lParam).pridl.get());
-
-		if(CompareIdls(pidlItem,pidlComplete))
+		if(CompareIdls(pidlItem, m_extraItemInfoMap.at((int)lvItem.lParam).pidlComplete.get()))
 		{
-			CoTaskMemFree(pidlComplete);
-
 			bItemFound = TRUE;
 
 			ListView_EditLabel(m_hListView,i);
 			break;
 		}
-
-		CoTaskMemFree(pidlComplete);
 	}
 
 	if(!bItemFound)
@@ -1489,7 +1470,6 @@ void CShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 {
 	LPITEMIDLIST			pidlDrive = NULL;
-	LPITEMIDLIST			pidlItem = NULL;
 	LVITEM					lvItem;
 	SHFILEINFO				shfi;
 	TCHAR					szDisplayName[MAX_PATH];
@@ -1513,19 +1493,13 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 			lvItem.iSubItem	= 0;
 			ListView_GetItem(m_hListView,&lvItem);
 
-			pidlItem = ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)lvItem.lParam).pridl.get());
-
-			if(CompareIdls(pidlDrive,pidlItem))
+			if(CompareIdls(pidlDrive, m_extraItemInfoMap.at((int)lvItem.lParam).pidlComplete.get()))
 			{
 				iItem = i;
 				iItemInternal = (int)lvItem.lParam;
 
-				CoTaskMemFree(pidlItem);
-
 				break;
 			}
-
-			CoTaskMemFree(pidlItem);
 		}
 
 		CoTaskMemFree(pidlDrive);
