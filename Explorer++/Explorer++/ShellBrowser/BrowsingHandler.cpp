@@ -559,12 +559,13 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 
 	uItemId = GenerateUniqueItemId();
 
+	pidlItem = ILCombine(pidlDirectory, pidlRelative);
+
+	m_extraItemInfoMap[uItemId].pidlComplete.reset(ILClone(pidlItem));
 	m_extraItemInfoMap[uItemId].pridl.reset(ILClone(pidlRelative));
 	m_extraItemInfoMap[uItemId].bIconRetrieved = FALSE;
 	StringCchCopy(m_extraItemInfoMap[uItemId].szDisplayName,
 		SIZEOF_ARRAY(m_extraItemInfoMap[uItemId].szDisplayName), szFileName);
-
-	pidlItem = ILCombine(pidlDirectory,pidlRelative);
 
 	SHGetPathFromIDList(pidlItem,szPath);
 

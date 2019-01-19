@@ -90,6 +90,7 @@ typedef struct
 
 struct ExtraItemInfo
 {
+	PIDLPointer		pidlComplete;
 	PIDLPointer		pridl;
 	TCHAR			szDisplayName[MAX_PATH];
 	BOOL			bReal;
