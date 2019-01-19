@@ -20,7 +20,7 @@ namespace NFileOperations
 	BOOL	SaveDirectoryListing(const std::wstring &strDirectory,const std::wstring &strFilename);
 
 	HRESULT	CreateLinkToFile(const std::wstring &strTargetFilename,const std::wstring &strLinkFilename,const std::wstring &strLinkDescription);
-	HRESULT	ResolveLink(HWND hwnd,DWORD fFlags,TCHAR *szLinkFilename,TCHAR *szResolvedPath,int nBufferSize);
+	HRESULT	ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename, TCHAR *szResolvedPath, int nBufferSize);
 
 	BOOL	CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,std::wstring &strOutputFilename);
 	BOOL	CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,LPITEMIDLIST *ppidl);

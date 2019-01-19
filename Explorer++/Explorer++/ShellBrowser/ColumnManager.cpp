@@ -186,7 +186,7 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 	switch(ColumnID)
 	{
 	case CM_NAME:
-		return GetNameColumnText(InternalIndex);
+		return GetNameColumnText(itemInfo);
 		break;
 
 	case CM_TYPE:
@@ -207,7 +207,7 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_ATTRIBUTES:
-		return GetAttributeColumnText(InternalIndex);
+		return GetAttributeColumnText(itemInfo);
 		break;
 	case CM_REALSIZE:
 		return GetRealSizeColumnText(itemInfo);
@@ -216,66 +216,66 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		return GetShortNameColumnText(itemInfo);
 		break;
 	case CM_OWNER:
-		return GetOwnerColumnText(InternalIndex);
+		return GetOwnerColumnText(itemInfo);
 		break;
 
 	case CM_PRODUCTNAME:
-		return GetVersionColumnText(InternalIndex,VERSION_INFO_PRODUCT_NAME);
+		return GetVersionColumnText(itemInfo,VERSION_INFO_PRODUCT_NAME);
 		break;
 	case CM_COMPANY:
-		return GetVersionColumnText(InternalIndex,VERSION_INFO_COMPANY);
+		return GetVersionColumnText(itemInfo,VERSION_INFO_COMPANY);
 		break;
 	case CM_DESCRIPTION:
-		return GetVersionColumnText(InternalIndex,VERSION_INFO_DESCRIPTION);
+		return GetVersionColumnText(itemInfo,VERSION_INFO_DESCRIPTION);
 		break;
 	case CM_FILEVERSION:
-		return GetVersionColumnText(InternalIndex,VERSION_INFO_FILE_VERSION);
+		return GetVersionColumnText(itemInfo,VERSION_INFO_FILE_VERSION);
 		break;
 	case CM_PRODUCTVERSION:
-		return GetVersionColumnText(InternalIndex,VERSION_INFO_PRODUCT_VERSION);
+		return GetVersionColumnText(itemInfo,VERSION_INFO_PRODUCT_VERSION);
 		break;
 
 	case CM_SHORTCUTTO:
-		return GetShortcutToColumnText(InternalIndex);
+		return GetShortcutToColumnText(itemInfo);
 		break;
 	case CM_HARDLINKS:
-		return GetHardLinksColumnText(InternalIndex);
+		return GetHardLinksColumnText(itemInfo);
 		break;
 	case CM_EXTENSION:
 		return GetExtensionColumnText(itemInfo);
 		break;
 
 	case CM_TITLE:
-		return GetItemDetailsColumnText(InternalIndex, &PKEY_Title);
+		return GetItemDetailsColumnText(itemInfo, &PKEY_Title);
 		break;
 	case CM_SUBJECT:
-		return GetItemDetailsColumnText(InternalIndex, &PKEY_Subject);
+		return GetItemDetailsColumnText(itemInfo, &PKEY_Subject);
 		break;
 	case CM_AUTHORS:
-		return GetItemDetailsColumnText(InternalIndex, &PKEY_Author);
+		return GetItemDetailsColumnText(itemInfo, &PKEY_Author);
 		break;
 	case CM_KEYWORDS:
-		return GetItemDetailsColumnText(InternalIndex, &PKEY_Keywords);
+		return GetItemDetailsColumnText(itemInfo, &PKEY_Keywords);
 		break;
 	case CM_COMMENT:
-		return GetItemDetailsColumnText(InternalIndex, &PKEY_Comment);
+		return GetItemDetailsColumnText(itemInfo, &PKEY_Comment);
 		break;
 
 	case CM_CAMERAMODEL:
-		return GetImageColumnText(InternalIndex,PropertyTagEquipModel);
+		return GetImageColumnText(itemInfo,PropertyTagEquipModel);
 		break;
 	case CM_DATETAKEN:
-		return GetImageColumnText(InternalIndex,PropertyTagDateTime);
+		return GetImageColumnText(itemInfo,PropertyTagDateTime);
 		break;
 	case CM_WIDTH:
-		return GetImageColumnText(InternalIndex,PropertyTagImageWidth);
+		return GetImageColumnText(itemInfo,PropertyTagImageWidth);
 		break;
 	case CM_HEIGHT:
-		return GetImageColumnText(InternalIndex,PropertyTagImageHeight);
+		return GetImageColumnText(itemInfo,PropertyTagImageHeight);
 		break;
 
 	case CM_VIRTUALCOMMENTS:
-		return GetControlPanelCommentsColumnText(InternalIndex);
+		return GetControlPanelCommentsColumnText(itemInfo);
 		break;
 
 	case CM_TOTALSIZE:
@@ -291,11 +291,11 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_ORIGINALLOCATION:
-		return GetItemDetailsColumnText(InternalIndex, &SCID_ORIGINAL_LOCATION);
+		return GetItemDetailsColumnText(itemInfo, &SCID_ORIGINAL_LOCATION);
 		break;
 
 	case CM_DATEDELETED:
-		return GetItemDetailsColumnText(InternalIndex, &SCID_DATE_DELETED);
+		return GetItemDetailsColumnText(itemInfo, &SCID_DATE_DELETED);
 		break;
 
 	case CM_NUMPRINTERDOCUMENTS:
@@ -323,76 +323,76 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_MEDIA_BITRATE:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_BITRATE);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_BITRATE);
 		break;
 	case CM_MEDIA_COPYRIGHT:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_COPYRIGHT);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_COPYRIGHT);
 		break;
 	case CM_MEDIA_DURATION:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_DURATION);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_DURATION);
 		break;
 	case CM_MEDIA_PROTECTED:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PROTECTED);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PROTECTED);
 		break;
 	case CM_MEDIA_RATING:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_RATING);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_RATING);
 		break;
 	case CM_MEDIA_ALBUMARTIST:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_ALBUM_ARTIST);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_ALBUM_ARTIST);
 		break;
 	case CM_MEDIA_ALBUM:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_ALBUM_TITLE);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_ALBUM_TITLE);
 		break;
 	case CM_MEDIA_BEATSPERMINUTE:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_BEATS_PER_MINUTE);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_BEATS_PER_MINUTE);
 		break;
 	case CM_MEDIA_COMPOSER:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_COMPOSER);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_COMPOSER);
 		break;
 	case CM_MEDIA_CONDUCTOR:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_CONDUCTOR);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_CONDUCTOR);
 		break;
 	case CM_MEDIA_DIRECTOR:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_DIRECTOR);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_DIRECTOR);
 		break;
 	case CM_MEDIA_GENRE:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_GENRE);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_GENRE);
 		break;
 	case CM_MEDIA_LANGUAGE:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_LANGUAGE);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_LANGUAGE);
 		break;
 	case CM_MEDIA_BROADCASTDATE:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_BROADCASTDATE);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_BROADCASTDATE);
 		break;
 	case CM_MEDIA_CHANNEL:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_CHANNEL);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_CHANNEL);
 		break;
 	case CM_MEDIA_STATIONNAME:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_STATIONNAME);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_STATIONNAME);
 		break;
 	case CM_MEDIA_MOOD:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_MOOD);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_MOOD);
 		break;
 	case CM_MEDIA_PARENTALRATING:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PARENTALRATING);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PARENTALRATING);
 		break;
 	case CM_MEDIA_PARENTALRATINGREASON:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
 		break;
 	case CM_MEDIA_PERIOD:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PERIOD);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PERIOD);
 		break;
 	case CM_MEDIA_PRODUCER:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PRODUCER);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PRODUCER);
 		break;
 	case CM_MEDIA_PUBLISHER:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_PUBLISHER);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PUBLISHER);
 		break;
 	case CM_MEDIA_WRITER:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_WRITER);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_WRITER);
 		break;
 	case CM_MEDIA_YEAR:
-		return GetMediaMetadataColumnText(InternalIndex,MEDIAMETADATA_TYPE_YEAR);
+		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_YEAR);
 		break;
 
 	default:
@@ -403,9 +403,9 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 	return EMPTY_STRING;
 }
 
-std::wstring CShellBrowser::GetNameColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetNameColumnText(const ItemInfo_t &itemInfo) const
 {
-	return ProcessItemFileName(InternalIndex);
+	return ProcessItemFileName(itemInfo);
 }
 
 std::wstring CShellBrowser::GetTypeColumnText(const ItemInfo_t &itemInfo) const
@@ -513,13 +513,10 @@ std::wstring CShellBrowser::GetTimeColumnText(const ItemInfo_t &itemInfo,TimeTyp
 	return FileTime;
 }
 
-std::wstring CShellBrowser::GetAttributeColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetAttributeColumnText(const ItemInfo_t &itemInfo) const
 {
-	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
-
 	TCHAR AttributeString[32];
-	BuildFileAttributeString(FullFileName,AttributeString,SIZEOF_ARRAY(AttributeString));
+	BuildFileAttributeString(itemInfo.getFullPath().c_str(),AttributeString,SIZEOF_ARRAY(AttributeString));
 
 	return AttributeString;
 }
@@ -582,13 +579,10 @@ std::wstring CShellBrowser::GetShortNameColumnText(const ItemInfo_t &itemInfo) c
 	return itemInfo.wfd.cAlternateFileName;
 }
 
-std::wstring CShellBrowser::GetOwnerColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetOwnerColumnText(const ItemInfo_t &itemInfo) const
 {
-	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
-
 	TCHAR Owner[512];
-	BOOL ret = GetFileOwner(FullFileName,Owner,SIZEOF_ARRAY(Owner));
+	BOOL ret = GetFileOwner(itemInfo.getFullPath().c_str(),Owner,SIZEOF_ARRAY(Owner));
 
 	if(!ret)
 	{
@@ -598,7 +592,7 @@ std::wstring CShellBrowser::GetOwnerColumnText(int InternalIndex) const
 	return Owner;
 }
 
-std::wstring CShellBrowser::GetVersionColumnText(int InternalIndex,VersionInfoType_t VersioninfoType) const
+std::wstring CShellBrowser::GetVersionColumnText(const ItemInfo_t &itemInfo, VersionInfoType_t VersioninfoType) const
 {
 	std::wstring VersionInfoName;
 
@@ -629,11 +623,8 @@ std::wstring CShellBrowser::GetVersionColumnText(int InternalIndex,VersionInfoTy
 		break;
 	}
 
-	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
-
 	TCHAR VersionInfo[512];
-	BOOL VersionInfoObtained = GetVersionInfoString(FullFileName,VersionInfoName.c_str(),
+	BOOL VersionInfoObtained = GetVersionInfoString(itemInfo.getFullPath().c_str(),VersionInfoName.c_str(),
 		VersionInfo,SIZEOF_ARRAY(VersionInfo));
 
 	if(!VersionInfoObtained)
@@ -644,13 +635,10 @@ std::wstring CShellBrowser::GetVersionColumnText(int InternalIndex,VersionInfoTy
 	return VersionInfo;
 }
 
-std::wstring CShellBrowser::GetShortcutToColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetShortcutToColumnText(const ItemInfo_t &itemInfo) const
 {
-	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
-
 	TCHAR ResolvedLinkPath[MAX_PATH];
-	HRESULT hr = NFileOperations::ResolveLink(NULL,SLR_NO_UI,FullFileName,
+	HRESULT hr = NFileOperations::ResolveLink(NULL,SLR_NO_UI,itemInfo.getFullPath().c_str(),
 		ResolvedLinkPath,SIZEOF_ARRAY(ResolvedLinkPath));
 
 	if(FAILED(hr))
@@ -661,17 +649,14 @@ std::wstring CShellBrowser::GetShortcutToColumnText(int InternalIndex) const
 	return ResolvedLinkPath;
 }
 
-DWORD CShellBrowser::GetHardLinksColumnRawData(int InternalIndex) const
+DWORD CShellBrowser::GetHardLinksColumnRawData(const ItemInfo_t &itemInfo) const
 {
-	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
-
-	return GetNumFileHardLinks(FullFileName);
+	return GetNumFileHardLinks(itemInfo.getFullPath().c_str());
 }
 
-std::wstring CShellBrowser::GetHardLinksColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetHardLinksColumnText(const ItemInfo_t &itemInfo) const
 {
-	DWORD NumHardLinks = GetHardLinksColumnRawData(InternalIndex);
+	DWORD NumHardLinks = GetHardLinksColumnRawData(itemInfo);
 
 	if(NumHardLinks == -1)
 	{
@@ -701,10 +686,23 @@ std::wstring CShellBrowser::GetExtensionColumnText(const ItemInfo_t &itemInfo) c
 	return Extension + 1;
 }
 
-HRESULT CShellBrowser::GetItemDetails(int InternalIndex, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const
+std::wstring CShellBrowser::GetItemDetailsColumnText(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid) const
+{
+	TCHAR szDetail[512];
+	HRESULT hr = GetItemDetails(itemInfo, pscid, szDetail, SIZEOF_ARRAY(szDetail));
+
+	if(SUCCEEDED(hr))
+	{
+		return szDetail;
+	}
+
+	return EMPTY_STRING;
+}
+
+HRESULT CShellBrowser::GetItemDetails(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const
 {
 	VARIANT vt;
-	HRESULT hr = GetItemDetailsRawData(InternalIndex, pscid, &vt);
+	HRESULT hr = GetItemDetailsRawData(itemInfo, pscid, &vt);
 
 	if (SUCCEEDED(hr))
 	{
@@ -715,40 +713,24 @@ HRESULT CShellBrowser::GetItemDetails(int InternalIndex, const SHCOLUMNID *pscid
 	return hr;
 }
 
-HRESULT CShellBrowser::GetItemDetailsRawData(int InternalIndex, const SHCOLUMNID *pscid, VARIANT *vt) const
+HRESULT CShellBrowser::GetItemDetailsRawData(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt) const
 {
 	IShellFolder2 *pShellFolder = NULL;
 	HRESULT hr = BindToIdl(m_pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
 	if (SUCCEEDED(hr))
 	{
-		hr = pShellFolder->GetDetailsEx(m_itemInfoMap.at(InternalIndex).pridl.get(), pscid, vt);
+		hr = pShellFolder->GetDetailsEx(itemInfo.pridl.get(), pscid, vt);
 		pShellFolder->Release();
 	}
 
 	return hr;
 }
 
-std::wstring CShellBrowser::GetItemDetailsColumnText(int InternalIndex, const SHCOLUMNID *pscid) const
+std::wstring CShellBrowser::GetImageColumnText(const ItemInfo_t &itemInfo, PROPID PropertyID) const
 {
-	TCHAR szDetail[512];
-	HRESULT hr = GetItemDetails(InternalIndex, pscid, szDetail, SIZEOF_ARRAY(szDetail));
-
-	if(SUCCEEDED(hr))
-	{
-		return szDetail;
-	}
-
-	return EMPTY_STRING;
-}
-
-std::wstring CShellBrowser::GetImageColumnText(int InternalIndex,PROPID PropertyID) const
-{
-	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
-
 	TCHAR ImageProperty[512];
-	BOOL Res = ReadImageProperty(FullFileName,PropertyID,ImageProperty,
+	BOOL Res = ReadImageProperty(itemInfo.getFullPath().c_str(),PropertyID,ImageProperty,
 		SIZEOF_ARRAY(ImageProperty));
 
 	if(!Res)
@@ -828,13 +810,10 @@ std::wstring CShellBrowser::GetDriveSpaceColumnText(const ItemInfo_t &itemInfo,b
 	return SizeText;
 }
 
-std::wstring CShellBrowser::GetControlPanelCommentsColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetControlPanelCommentsColumnText(const ItemInfo_t &itemInfo) const
 {
-	TCHAR szFullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex, szFullFileName, SIZEOF_ARRAY(szFullFileName));
-
 	TCHAR InfoTip[512];
-	HRESULT hr = GetItemInfoTip(szFullFileName, InfoTip, SIZEOF_ARRAY(InfoTip));
+	HRESULT hr = GetItemInfoTip(itemInfo.getFullPath().c_str(), InfoTip, SIZEOF_ARRAY(InfoTip));
 
 	if(FAILED(hr))
 	{
@@ -1014,15 +993,12 @@ std::wstring CShellBrowser::GetNetworkAdapterColumnText(const ItemInfo_t &itemIn
 	return Status;
 }
 
-std::wstring CShellBrowser::GetMediaMetadataColumnText(int InternalIndex,MediaMetadataType_t MediaMetaDataType) const
+std::wstring CShellBrowser::GetMediaMetadataColumnText(const ItemInfo_t &itemInfo, MediaMetadataType_t MediaMetaDataType) const
 {
-	TCHAR FullFileName[MAX_PATH];
-	QueryFullItemNameInternal(InternalIndex,FullFileName,SIZEOF_ARRAY(FullFileName));
-
 	const TCHAR *AttributeName = GetMediaMetadataAttributeName(MediaMetaDataType);
 
 	BYTE *TempBuffer = NULL;
-	HRESULT hr = GetMediaMetadata(FullFileName,AttributeName,&TempBuffer);
+	HRESULT hr = GetMediaMetadata(itemInfo.getFullPath().c_str(),AttributeName,&TempBuffer);
 
 	if(!SUCCEEDED(hr))
 	{

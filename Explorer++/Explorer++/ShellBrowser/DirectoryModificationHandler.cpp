@@ -583,7 +583,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 
 					if(iItem != -1)
 					{
-						std::wstring filename = ProcessItemFileName(iItemInternal);
+						std::wstring filename = ProcessItemFileName(m_itemInfoMap.at(iItemInternal));
 
 						TCHAR filenameCopy[MAX_PATH];
 						StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());

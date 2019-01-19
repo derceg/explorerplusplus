@@ -195,6 +195,8 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 	TCHAR				szGroupHeader[512];
 	int					iGroupId;
 
+	const ItemInfo_t &itemInfo = m_itemInfoMap.at(iItemInternal);
+
 	switch(m_SortMode)
 	{
 		case FSM_NAME:
@@ -231,7 +233,7 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case FSM_ORIGINALLOCATION:
-			DetermineItemSummaryGroup(iItemInternal, &SCID_ORIGINAL_LOCATION, szGroupHeader, SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(itemInfo, &SCID_ORIGINAL_LOCATION, szGroupHeader, SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
@@ -297,27 +299,27 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case FSM_TITLE:
-			DetermineItemSummaryGroup(iItemInternal,&PKEY_Title,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(itemInfo,&PKEY_Title,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_SUBJECT:
-			DetermineItemSummaryGroup(iItemInternal,&PKEY_Subject,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(itemInfo,&PKEY_Subject,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_AUTHORS:
-			DetermineItemSummaryGroup(iItemInternal,&PKEY_Author,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(itemInfo,&PKEY_Author,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_KEYWORDS:
-			DetermineItemSummaryGroup(iItemInternal,&PKEY_Keywords,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(itemInfo,&PKEY_Keywords,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case FSM_COMMENTS:
-			DetermineItemSummaryGroup(iItemInternal,&PKEY_Comment,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
+			DetermineItemSummaryGroup(itemInfo,&PKEY_Comment,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
@@ -706,10 +708,10 @@ void CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR
 	LoadString(m_hResourceModule, IDS_GROUPBY_DATE_LONG_AGO, szGroupHeader, cchMax);
 }
 
-void CShellBrowser::DetermineItemSummaryGroup(int iItemInternal, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax) const
+void CShellBrowser::DetermineItemSummaryGroup(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax) const
 {
 	TCHAR szDetail[512];
-	HRESULT hr = GetItemDetails(iItemInternal, pscid, szDetail, SIZEOF_ARRAY(szDetail));
+	HRESULT hr = GetItemDetails(itemInfo, pscid, szDetail, SIZEOF_ARRAY(szDetail));
 
 	if(SUCCEEDED(hr) && lstrlen(szDetail) > 0)
 	{

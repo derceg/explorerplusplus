@@ -85,7 +85,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 		switch(m_SortMode)
 		{
 		case FSM_NAME:
-			ComparisonResult = SortByName(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByName(itemInfo1, itemInfo2);
 			break;
 
 		case FSM_TYPE:
@@ -109,55 +109,55 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_DATEDELETED:
-			ComparisonResult = SortByItemDetails(InternalIndex1, InternalIndex2, &SCID_DATE_DELETED);
+			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2, &SCID_DATE_DELETED);
 			break;
 
 		case FSM_ORIGINALLOCATION:
-			ComparisonResult = SortByItemDetails(InternalIndex1, InternalIndex2, &SCID_ORIGINAL_LOCATION);
+			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2, &SCID_ORIGINAL_LOCATION);
 			break;
 
 		case FSM_ATTRIBUTES:
-			ComparisonResult = SortByAttributes(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByAttributes(itemInfo1, itemInfo2);
 			break;
 
 		case FSM_REALSIZE:
-			ComparisonResult = SortByRealSize(itemInfo1,itemInfo2);
+			ComparisonResult = SortByRealSize(itemInfo1, itemInfo2);
 			break;
 
 		case FSM_SHORTNAME:
-			ComparisonResult = SortByShortName(itemInfo1,itemInfo2);
+			ComparisonResult = SortByShortName(itemInfo1, itemInfo2);
 			break;
 
 		case FSM_OWNER:
-			ComparisonResult = SortByOwner(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByOwner(itemInfo1, itemInfo2);
 			break;
 
 		case FSM_PRODUCTNAME:
-			ComparisonResult = SortByVersionInfo(InternalIndex1,InternalIndex2,VERSION_INFO_PRODUCT_NAME);
+			ComparisonResult = SortByVersionInfo(itemInfo1, itemInfo2,VERSION_INFO_PRODUCT_NAME);
 			break;
 
 		case FSM_COMPANY:
-			ComparisonResult = SortByVersionInfo(InternalIndex1,InternalIndex2,VERSION_INFO_COMPANY);
+			ComparisonResult = SortByVersionInfo(itemInfo1, itemInfo2,VERSION_INFO_COMPANY);
 			break;
 
 		case FSM_DESCRIPTION:
-			ComparisonResult = SortByVersionInfo(InternalIndex1,InternalIndex2,VERSION_INFO_DESCRIPTION);
+			ComparisonResult = SortByVersionInfo(itemInfo1, itemInfo2,VERSION_INFO_DESCRIPTION);
 			break;
 
 		case FSM_FILEVERSION:
-			ComparisonResult = SortByVersionInfo(InternalIndex1,InternalIndex2,VERSION_INFO_FILE_VERSION);
+			ComparisonResult = SortByVersionInfo(itemInfo1, itemInfo2,VERSION_INFO_FILE_VERSION);
 			break;
 
 		case FSM_PRODUCTVERSION:
-			ComparisonResult = SortByVersionInfo(InternalIndex1,InternalIndex2,VERSION_INFO_PRODUCT_VERSION);
+			ComparisonResult = SortByVersionInfo(itemInfo1, itemInfo2,VERSION_INFO_PRODUCT_VERSION);
 			break;
 
 		case FSM_SHORTCUTTO:
-			ComparisonResult = SortByShortcutTo(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByShortcutTo(itemInfo1, itemInfo2);
 			break;
 
 		case FSM_HARDLINKS:
-			ComparisonResult = SortByHardlinks(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByHardlinks(itemInfo1, itemInfo2);
 			break;
 
 		case FSM_EXTENSION:
@@ -173,43 +173,43 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_TITLE:
-			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Title);
+			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2,&PKEY_Title);
 			break;
 
 		case FSM_SUBJECT:
-			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Subject);
+			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2,&PKEY_Subject);
 			break;
 
 		case FSM_AUTHORS:
-			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Author);
+			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2,&PKEY_Author);
 			break;
 
 		case FSM_KEYWORDS:
-			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Keywords);
+			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2,&PKEY_Keywords);
 			break;
 
 		case FSM_COMMENTS:
-			ComparisonResult = SortByItemDetails(InternalIndex1,InternalIndex2,&PKEY_Comment);
+			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2,&PKEY_Comment);
 			break;
 
 		case FSM_CAMERAMODEL:
-			ComparisonResult = SortByImageProperty(InternalIndex1,InternalIndex2,PropertyTagEquipModel);
+			ComparisonResult = SortByImageProperty(itemInfo1, itemInfo2,PropertyTagEquipModel);
 			break;
 
 		case FSM_DATETAKEN:
-			ComparisonResult = SortByImageProperty(InternalIndex1,InternalIndex2,PropertyTagDateTime);
+			ComparisonResult = SortByImageProperty(itemInfo1, itemInfo2,PropertyTagDateTime);
 			break;
 
 		case FSM_WIDTH:
-			ComparisonResult = SortByImageProperty(InternalIndex1,InternalIndex2,PropertyTagImageWidth);
+			ComparisonResult = SortByImageProperty(itemInfo1, itemInfo2,PropertyTagImageWidth);
 			break;
 
 		case FSM_HEIGHT:
-			ComparisonResult = SortByImageProperty(InternalIndex1,InternalIndex2,PropertyTagImageHeight);
+			ComparisonResult = SortByImageProperty(itemInfo1, itemInfo2,PropertyTagImageHeight);
 			break;
 
 		case FSM_VIRTUALCOMMENTS:
-			ComparisonResult = SortByVirtualComments(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByVirtualComments(itemInfo1, itemInfo2);
 			break;
 
 		case FSM_FILESYSTEM:
@@ -237,99 +237,99 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_MEDIA_BITRATE:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_BITRATE);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_BITRATE);
 			break;
 
 		case FSM_MEDIA_COPYRIGHT:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_COPYRIGHT);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_COPYRIGHT);
 			break;
 
 		case FSM_MEDIA_DURATION:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_DURATION);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_DURATION);
 			break;
 
 		case FSM_MEDIA_PROTECTED:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PROTECTED);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PROTECTED);
 			break;
 
 		case FSM_MEDIA_RATING:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_RATING);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_RATING);
 			break;
 
 		case FSM_MEDIA_ALBUMARTIST:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_ALBUM_ARTIST);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_ALBUM_ARTIST);
 			break;
 
 		case FSM_MEDIA_ALBUM:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_ALBUM_TITLE);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_ALBUM_TITLE);
 			break;
 
 		case FSM_MEDIA_BEATSPERMINUTE:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_BEATS_PER_MINUTE);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_BEATS_PER_MINUTE);
 			break;
 
 		case FSM_MEDIA_COMPOSER:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_COMPOSER);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_COMPOSER);
 			break;
 
 		case FSM_MEDIA_CONDUCTOR:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_CONDUCTOR);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_CONDUCTOR);
 			break;
 
 		case FSM_MEDIA_DIRECTOR:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_DIRECTOR);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_DIRECTOR);
 			break;
 
 		case FSM_MEDIA_GENRE:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_GENRE);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_GENRE);
 			break;
 
 		case FSM_MEDIA_LANGUAGE:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_LANGUAGE);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_LANGUAGE);
 			break;
 
 		case FSM_MEDIA_BROADCASTDATE:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_BROADCASTDATE);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_BROADCASTDATE);
 			break;
 
 		case FSM_MEDIA_CHANNEL:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_CHANNEL);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_CHANNEL);
 			break;
 
 		case FSM_MEDIA_STATIONNAME:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_STATIONNAME);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_STATIONNAME);
 			break;
 
 		case FSM_MEDIA_MOOD:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_MOOD);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_MOOD);
 			break;
 
 		case FSM_MEDIA_PARENTALRATING:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PARENTALRATING);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PARENTALRATING);
 			break;
 
 		case FSM_MEDIA_PARENTALRATINGREASON:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
 			break;
 
 		case FSM_MEDIA_PERIOD:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PERIOD);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PERIOD);
 			break;
 
 		case FSM_MEDIA_PRODUCER:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PRODUCER);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PRODUCER);
 			break;
 
 		case FSM_MEDIA_PUBLISHER:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_PUBLISHER);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PUBLISHER);
 			break;
 
 		case FSM_MEDIA_WRITER:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_WRITER);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_WRITER);
 			break;
 
 		case FSM_MEDIA_YEAR:
-			ComparisonResult = SortByMediaMetadata(InternalIndex1,InternalIndex2,MEDIAMETADATA_TYPE_YEAR);
+			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_YEAR);
 			break;
 
 		default:
@@ -354,18 +354,12 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	return ComparisonResult;
 }
 
-int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
 	if(m_bVirtualFolder)
 	{
-		TCHAR FullFileName1[MAX_PATH];
-		GetDisplayName(m_itemInfoMap.at(InternalIndex1).pidlComplete.get(),FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
-
-		TCHAR FullFileName2[MAX_PATH];
-		GetDisplayName(m_itemInfoMap.at(InternalIndex2).pidlComplete.get(),FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
-
-		BOOL IsRoot1 = PathIsRoot(FullFileName1);
-		BOOL IsRoot2 = PathIsRoot(FullFileName2);
+		BOOL IsRoot1 = PathIsRoot(itemInfo1.getFullPath().c_str());
+		BOOL IsRoot2 = PathIsRoot(itemInfo2.getFullPath().c_str());
 
 		if(IsRoot1 && !IsRoot2)
 		{
@@ -379,12 +373,12 @@ int CALLBACK CShellBrowser::SortByName(int InternalIndex1,int InternalIndex2) co
 		{
 			/* If the items been compared are both drives,
 			sort by drive letter, rather than display name. */
-			return StrCmpLogicalW(FullFileName1,FullFileName2);
+			return StrCmpLogicalW(itemInfo1.getFullPath().c_str(), itemInfo2.getFullPath().c_str());
 		}
 	}
 
-	std::wstring Name1 = GetNameColumnText(InternalIndex1);
-	std::wstring Name2 = GetNameColumnText(InternalIndex2);
+	std::wstring Name1 = GetNameColumnText(itemInfo1);
+	std::wstring Name2 = GetNameColumnText(itemInfo2);
 
 	return StrCmpLogicalW(Name1.c_str(),Name2.c_str());
 }
@@ -522,10 +516,10 @@ int CALLBACK CShellBrowser::SortByTotalSize(const ItemInfo_t &itemInfo1, const I
 	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByAttributes(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByAttributes(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
-	std::wstring AttributeString1 = GetAttributeColumnText(InternalIndex1);
-	std::wstring AttributeString2 = GetAttributeColumnText(InternalIndex2);
+	std::wstring AttributeString1 = GetAttributeColumnText(itemInfo1);
+	std::wstring AttributeString2 = GetAttributeColumnText(itemInfo2);
 
 	return StrCmpLogicalW(AttributeString1.c_str(),AttributeString2.c_str());
 }
@@ -571,34 +565,34 @@ int CALLBACK CShellBrowser::SortByShortName(const ItemInfo_t &itemInfo1, const I
 	return StrCmpLogicalW(ShortName1.c_str(),ShortName2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByOwner(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByOwner(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
-	std::wstring Owner1 = GetOwnerColumnText(InternalIndex1);
-	std::wstring Owner2 = GetOwnerColumnText(InternalIndex2);
+	std::wstring Owner1 = GetOwnerColumnText(itemInfo1);
+	std::wstring Owner2 = GetOwnerColumnText(itemInfo2);
 
 	return StrCmpLogicalW(Owner1.c_str(),Owner2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByVersionInfo(int InternalIndex1,int InternalIndex2,VersionInfoType_t VersioninfoType) const
+int CALLBACK CShellBrowser::SortByVersionInfo(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, VersionInfoType_t VersioninfoType) const
 {
-	std::wstring VersionInfo1 = GetVersionColumnText(InternalIndex1,VersioninfoType);
-	std::wstring VersionInfo2 = GetVersionColumnText(InternalIndex2,VersioninfoType);
+	std::wstring VersionInfo1 = GetVersionColumnText(itemInfo1,VersioninfoType);
+	std::wstring VersionInfo2 = GetVersionColumnText(itemInfo2,VersioninfoType);
 
 	return StrCmpLogicalW(VersionInfo1.c_str(),VersionInfo2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByShortcutTo(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByShortcutTo(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
-	std::wstring ResolvedLinkPath1 = GetShortcutToColumnText(InternalIndex1);
-	std::wstring ResolvedLinkPath2 = GetShortcutToColumnText(InternalIndex2);
+	std::wstring ResolvedLinkPath1 = GetShortcutToColumnText(itemInfo1);
+	std::wstring ResolvedLinkPath2 = GetShortcutToColumnText(itemInfo2);
 
 	return StrCmpLogicalW(ResolvedLinkPath1.c_str(),ResolvedLinkPath2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByHardlinks(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByHardlinks(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
-	DWORD NumHardLinks1 = GetHardLinksColumnRawData(InternalIndex1);
-	DWORD NumHardLinks2 = GetHardLinksColumnRawData(InternalIndex2);
+	DWORD NumHardLinks1 = GetHardLinksColumnRawData(itemInfo1);
+	DWORD NumHardLinks2 = GetHardLinksColumnRawData(itemInfo2);
 
 	return NumHardLinks1 - NumHardLinks2;
 }
@@ -611,13 +605,13 @@ int CALLBACK CShellBrowser::SortByExtension(const ItemInfo_t &itemInfo1, const I
 	return StrCmpLogicalW(Extension1.c_str(),Extension2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByItemDetails(int InternalIndex1, int InternalIndex2, const SHCOLUMNID *pscid) const
+int CALLBACK CShellBrowser::SortByItemDetails(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, const SHCOLUMNID *pscid) const
 {
 	VARIANT vt1;
-	HRESULT hr1 = GetItemDetailsRawData(InternalIndex1, pscid, &vt1);
+	HRESULT hr1 = GetItemDetailsRawData(itemInfo1, pscid, &vt1);
 
 	VARIANT vt2;
-	HRESULT hr2 = GetItemDetailsRawData(InternalIndex2, pscid, &vt2);
+	HRESULT hr2 = GetItemDetailsRawData(itemInfo2, pscid, &vt2);
 
 	int ret = 0;
 
@@ -639,18 +633,18 @@ int CALLBACK CShellBrowser::SortByItemDetails(int InternalIndex1, int InternalIn
 	return ret;
 }
 
-int CALLBACK CShellBrowser::SortByImageProperty(int InternalIndex1,int InternalIndex2,PROPID PropertyId) const
+int CALLBACK CShellBrowser::SortByImageProperty(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, PROPID PropertyId) const
 {
-	std::wstring ImageProperty1 = GetImageColumnText(InternalIndex1,PropertyId);
-	std::wstring ImageProperty2 = GetImageColumnText(InternalIndex2,PropertyId);
+	std::wstring ImageProperty1 = GetImageColumnText(itemInfo1,PropertyId);
+	std::wstring ImageProperty2 = GetImageColumnText(itemInfo2,PropertyId);
 
 	return StrCmpLogicalW(ImageProperty1.c_str(),ImageProperty2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByVirtualComments(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByVirtualComments(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
-	std::wstring Comments1 = GetControlPanelCommentsColumnText(InternalIndex1);
-	std::wstring Comments2 = GetControlPanelCommentsColumnText(InternalIndex2);
+	std::wstring Comments1 = GetControlPanelCommentsColumnText(itemInfo1);
+	std::wstring Comments2 = GetControlPanelCommentsColumnText(itemInfo2);
 
 	return StrCmpLogicalW(Comments1.c_str(),Comments2.c_str());
 }
@@ -679,10 +673,10 @@ int CALLBACK CShellBrowser::SortByNetworkAdapterStatus(const ItemInfo_t &itemInf
 	return StrCmpLogicalW(Status1.c_str(),Status2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByMediaMetadata(int InternalIndex1,int InternalIndex2,MediaMetadataType_t MediaMetaDataType) const
+int CALLBACK CShellBrowser::SortByMediaMetadata(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, MediaMetadataType_t MediaMetaDataType) const
 {
-	std::wstring MediaMetadata1 = GetMediaMetadataColumnText(InternalIndex1,MediaMetaDataType);
-	std::wstring MediaMetadata2 = GetMediaMetadataColumnText(InternalIndex2,MediaMetaDataType);
+	std::wstring MediaMetadata1 = GetMediaMetadataColumnText(itemInfo1,MediaMetaDataType);
+	std::wstring MediaMetadata2 = GetMediaMetadataColumnText(itemInfo2,MediaMetaDataType);
 
 	return StrCmpLogicalW(MediaMetadata1.c_str(),MediaMetadata2.c_str());
 }

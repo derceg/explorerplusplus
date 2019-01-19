@@ -183,7 +183,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	{
 		if(!IsFileFiltered(itr->iItemInternal))
 		{
-			std::wstring filename = ProcessItemFileName(itr->iItemInternal);
+			std::wstring filename = ProcessItemFileName(m_itemInfoMap.at(itr->iItemInternal));
 
 			TCHAR filenameCopy[MAX_PATH];
 			StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());
@@ -288,15 +288,15 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 /* Processes an items filename. Essentially checks
 if the extension (if any) needs to be removed, and
 removes it if it does. */
-std::wstring CShellBrowser::ProcessItemFileName(int iItemInternal) const
+std::wstring CShellBrowser::ProcessItemFileName(const ItemInfo_t &itemInfo) const
 {
 	BOOL bHideExtension = FALSE;
 	TCHAR *pExt = NULL;
 
 	if(m_bHideLinkExtension &&
-		((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+		((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
-		pExt = PathFindExtension(m_itemInfoMap.at(iItemInternal).szDisplayName);
+		pExt = PathFindExtension(itemInfo.szDisplayName);
 
 		if(*pExt != '\0')
 		{
@@ -309,13 +309,13 @@ std::wstring CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	to be hidden, and the filename does not begin with
 	a period, and the item is not a directory. */
 	if((!m_bShowExtensions || bHideExtension) &&
-		m_itemInfoMap.at(iItemInternal).szDisplayName[0] != '.' &&
-		(m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+		itemInfo.szDisplayName[0] != '.' &&
+		(itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
 		static TCHAR szDisplayName[MAX_PATH];
 
 		StringCchCopy(szDisplayName,SIZEOF_ARRAY(szDisplayName),
-			m_itemInfoMap.at(iItemInternal).szDisplayName);
+			itemInfo.szDisplayName);
 
 		/* Strip the extension. */
 		PathRemoveExtension(szDisplayName);
@@ -324,7 +324,7 @@ std::wstring CShellBrowser::ProcessItemFileName(int iItemInternal) const
 	}
 	else
 	{
-		return m_itemInfoMap.at(iItemInternal).szDisplayName;
+		return itemInfo.szDisplayName;
 	}
 }
 

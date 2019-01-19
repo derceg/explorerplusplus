@@ -523,7 +523,7 @@ HRESULT NFileOperations::CreateLinkToFile(const std::wstring &strTargetFilename,
 	return hr;
 }
 
-HRESULT NFileOperations::ResolveLink(HWND hwnd,DWORD fFlags,TCHAR *szLinkFilename,TCHAR *szResolvedPath,int nBufferSize)
+HRESULT NFileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename, TCHAR *szResolvedPath, int nBufferSize)
 {
 	SHFILEINFO shfi;
 	DWORD_PTR dwRet = SHGetFileInfo(szLinkFilename,NULL,&shfi,sizeof(shfi),SHGFI_ATTRIBUTES);
