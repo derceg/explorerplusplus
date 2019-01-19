@@ -193,7 +193,7 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		return GetTypeColumnText(itemInfo);
 		break;
 	case CM_SIZE:
-		return GetSizeColumnText(InternalIndex);
+		return GetSizeColumnText(itemInfo);
 		break;
 
 	case CM_DATEMODIFIED:
@@ -422,15 +422,12 @@ std::wstring CShellBrowser::GetTypeColumnText(const ItemInfo_t &itemInfo) const
 	return shfi.szTypeName;
 }
 
-std::wstring CShellBrowser::GetSizeColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetSizeColumnText(const ItemInfo_t &itemInfo) const
 {
-	if((m_itemInfoMap.at(InternalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	if((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
-		TCHAR fullItemPath[MAX_PATH];
-		QueryFullItemNameInternal(InternalIndex, fullItemPath, SIZEOF_ARRAY(fullItemPath));
-
 		TCHAR drive[MAX_PATH];
-		StringCchCopy(drive, SIZEOF_ARRAY(drive), fullItemPath);
+		StringCchCopy(drive, SIZEOF_ARRAY(drive), itemInfo.getFullPath().c_str());
 		PathStripToRoot(drive);
 
 		bool bNetworkRemovable = false;
@@ -443,7 +440,7 @@ std::wstring CShellBrowser::GetSizeColumnText(int InternalIndex) const
 
 		if (m_bShowFolderSizes && !(m_bDisableFolderSizesNetworkRemovable && bNetworkRemovable))
 		{
-			return GetFolderSizeColumnText(InternalIndex);
+			return GetFolderSizeColumnText(itemInfo);
 		}
 		else
 		{
@@ -451,7 +448,7 @@ std::wstring CShellBrowser::GetSizeColumnText(int InternalIndex) const
 		}
 	}
 
-	ULARGE_INTEGER FileSize = {m_itemInfoMap.at(InternalIndex).wfd.nFileSizeLow,m_itemInfoMap.at(InternalIndex).wfd.nFileSizeHigh};
+	ULARGE_INTEGER FileSize = {itemInfo.wfd.nFileSizeLow,itemInfo.wfd.nFileSizeHigh};
 
 	TCHAR FileSizeText[64];
 	FormatSizeString(FileSize,FileSizeText,SIZEOF_ARRAY(FileSizeText),m_bForceSize,m_SizeDisplayFormat);
@@ -459,17 +456,18 @@ std::wstring CShellBrowser::GetSizeColumnText(int InternalIndex) const
 	return FileSizeText;
 }
 
-std::wstring CShellBrowser::GetFolderSizeColumnText(int internalIndex) const
+std::wstring CShellBrowser::GetFolderSizeColumnText(const ItemInfo_t &itemInfo) const
 {
-	TCHAR fullItemPath[MAX_PATH];
-	QueryFullItemNameInternal(internalIndex, fullItemPath, SIZEOF_ARRAY(fullItemPath));
-
 	int numFolders;
 	int numFiles;
 	ULARGE_INTEGER totalFolderSize;
-	CalculateFolderSize(fullItemPath, &numFolders, &numFiles, &totalFolderSize);
+	CalculateFolderSize(itemInfo.getFullPath().c_str(), &numFolders, &numFiles, &totalFolderSize);
 
-	m_cachedFolderSizes.insert({internalIndex, totalFolderSize.QuadPart});
+	/* TODO: This should
+	be done some other way.
+	Shouldn't depend on
+	the internal index. */
+	//m_cachedFolderSizes.insert({internalIndex, totalFolderSize.QuadPart});
 
 	TCHAR fileSizeText[64];
 	FormatSizeString(totalFolderSize, fileSizeText, SIZEOF_ARRAY(fileSizeText),

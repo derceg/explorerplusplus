@@ -452,8 +452,8 @@ private:
 	/* Listview columns. */
 	std::wstring		GetNameColumnText(const ItemInfo_t &itemInfo) const;
 	std::wstring		GetTypeColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetSizeColumnText(int InternalIndex) const;
-	std::wstring		GetFolderSizeColumnText(int internalIndex) const;
+	std::wstring		GetSizeColumnText(const ItemInfo_t &itemInfo) const;
+	std::wstring		GetFolderSizeColumnText(const ItemInfo_t &itemInfo) const;
 	std::wstring		GetTimeColumnText(const ItemInfo_t &itemInfo,TimeType_t TimeType) const;
 	std::wstring		GetAttributeColumnText(const ItemInfo_t &itemInfo) const;
 	bool				GetRealSizeColumnRawData(const ItemInfo_t &itemInfo,ULARGE_INTEGER &RealFileSize) const;

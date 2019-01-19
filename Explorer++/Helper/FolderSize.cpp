@@ -17,7 +17,7 @@
 #include "Macros.h"
 
 
-HRESULT CalculateFolderSize(TCHAR *szPath,int *nFolders,
+HRESULT CalculateFolderSize(const TCHAR *szPath,int *nFolders,
 int *nFiles,PULARGE_INTEGER lTotalFolderSize)
 {
 	HANDLE			hFirstFile;

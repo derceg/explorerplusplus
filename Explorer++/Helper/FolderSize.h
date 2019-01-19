@@ -9,4 +9,4 @@ typedef struct
 } FolderSize_t;
 
 DWORD WINAPI	Thread_CalculateFolderSize(LPVOID lpParameter);
-HRESULT			CalculateFolderSize(TCHAR *szPath,int *nFolders,int *nFiles,PULARGE_INTEGER lTotalFolderSize);
+HRESULT			CalculateFolderSize(const TCHAR *szPath, int *nFolders, int *nFiles, PULARGE_INTEGER lTotalFolderSize);
