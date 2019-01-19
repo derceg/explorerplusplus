@@ -13,6 +13,23 @@ New features:
   item.
 
 Bug fixes:
+- The way in which column results and file icons/thumbnails are
+  retrieved has been updated. This update brings a number of
+  advantages:
+  - Column details are only retrieved for items that are visible
+    (rather than all items).
+  - The way in which the user interface is updated after a
+    column result/icon/thumbnail has been retrieved has been
+    updated. This may help to reduce the risk of a crash when
+    changing directories while results are being retrieved.
+  - Previously, it was possible for a user interface update to be
+    done after a navigation had occurred. That is, column data
+    for an item in a previous folder would be inserted into the
+    listview for the current folder. This is no longer possible.
+  - Previously, if an item was moved (within the listview) or
+    deleted, it was possible for the wrong item to be updated
+    once a column result/icon/thumbnail had been retrieved. This
+    is no longer possible.
 - When right-clicking on the listview background in Windows 10,
   Explorer++ would crash. To resolve this, the OneDrive shell
   extension is now ignored when showing the menu. See #35.
