@@ -61,14 +61,12 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 		return E_FAIL;
 	}
 
-	EmptyIconFinderQueue();
-
 	/* TODO: Wait for any background threads to finish processing. */
 
 	m_columnThreadPool.clear_queue();
 	m_columnResults.clear();
 
-	m_thumbnailThreadPool.clear_queue();
+	m_itemImageThreadPool.clear_queue();
 	m_thumbnailResults.clear();
 
 	EnterCriticalSection(&m_csDirectoryAltered);

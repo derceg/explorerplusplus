@@ -548,8 +548,6 @@ int Explorerplusplus::OnDestroy(void)
 		SHChangeNotifyDeregister(m_SHChangeNotifyID);
 	}
 
-	QueueUserAPC(UninitializeCOMAPC,m_hIconThread,NULL);
-
 	ImageList_Destroy(m_himlToolbarSmall);
 	ImageList_Destroy(m_himlToolbarLarge);
 
@@ -1311,7 +1309,7 @@ void Explorerplusplus::OnAssocChanged(void)
 
 		iIndex = (int)tcItem.lParam;
 
-		m_pShellBrowser[iIndex]->RefreshAllIcons();
+		m_pShellBrowser[iIndex]->Refresh();
 	}
 
 	/* Now, refresh the treeview. */

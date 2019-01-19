@@ -133,7 +133,6 @@ void Explorerplusplus::OnCreate(void)
 
 	InitializeBookmarks();
 
-	m_hIconThread = CreateWorkerThread();
 	m_hTreeViewIconThread = CreateWorkerThread();
 
 	/* These need to occur after the language module

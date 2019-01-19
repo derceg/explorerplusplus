@@ -298,7 +298,7 @@ class CShellBrowser : public IDropTarget, public IDropFilesCallback
 
 public:
 
-	static CShellBrowser *CShellBrowser::CreateNew(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings, HANDLE hIconThread);
+	static CShellBrowser *CreateNew(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
@@ -395,8 +395,6 @@ public:
 	int					LocateFileItemIndex(const TCHAR *szFileName) const;
 	BOOL				DeghostItem(int iItem);
 	BOOL				GhostItem(int iItem);
-	void				AddToIconFinderQueue(const LVITEM *plvItem);
-	void				EmptyIconFinderQueue(void);
 	BOOL				InVirtualFolder(void) const;
 	BOOL				CanCreate(void) const;
 
@@ -416,9 +414,6 @@ public:
 
 	int CALLBACK		SortTemporary(LPARAM lParam1,LPARAM lParam2);
 
-	BOOL				GetTerminationStatus(void) const;
-	void				SetTerminationStatus(void);
-
 	std::list<int>		QueryCurrentSortModes() const;
 	size_t				QueryNumActiveColumns(void) const;
 	void				ToggleGridlines(void);
@@ -428,7 +423,6 @@ public:
 	void				ExportAllColumns(ColumnExport_t *pce);
 	void				QueueRename(LPCITEMIDLIST pidlItem);
 	void				SelectItems(const std::list<std::wstring> &PastedFileList);
-	void				RefreshAllIcons(void);
 	void				OnDeviceChange(WPARAM wParam,LPARAM lParam);
 
 private:
@@ -534,7 +528,7 @@ private:
 		std::wstring columnText;
 	};
 
-	struct ThumbnailResult_t
+	struct ImageResult_t
 	{
 		int itemInternalIndex;
 		int iconIndex;
@@ -547,11 +541,12 @@ private:
 
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
+	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 152;
 
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings, HANDLE hIconThread);
+	CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings);
 	~CShellBrowser();
 
 	int					GenerateUniqueItemId(void);
@@ -697,9 +692,14 @@ private:
 	void				InsertItemIntoGroup(int iItem,int iGroupId);
 	void				MoveItemsIntoGroups(void);
 
+	/* LIstview icons. */
+	void				QueueIconTask(int internalIndex);
+	boost::optional<ImageResult_t>	FindIconAsync(int iconResultId, int internalIndex) const;
+	void				ProcessIconResult(int iconResultId);
+
 	/* Thumbnails view. */
 	void				QueueThumbnailTask(int internalIndex);
-	boost::optional<ThumbnailResult_t>	FindThumbnailAsync(int thumbnailResultId, int internalIndex) const;
+	boost::optional<ImageResult_t>	FindThumbnailAsync(int thumbnailResultId, int internalIndex) const;
 	void				ProcessThumbnailResult(int thumbnailResultId);
 	void				SetupThumbnailsView(void);
 	void				RemoveThumbnailsView(void);
@@ -747,7 +747,6 @@ private:
 	int m_listViewParentSubclassId;
 
 	BOOL				m_bPerformingDrag;
-	BOOL				m_bNotifiedOfTermination;
 	HIMAGELIST			m_hListViewImageList;
 
 	int					m_itemIDCounter;
@@ -764,8 +763,12 @@ private:
 	std::unordered_map<int, std::future<ColumnResult_t>> m_columnResults;
 	int					m_columnResultIDCounter;
 
-	ctpl::thread_pool	m_thumbnailThreadPool;
-	std::unordered_map<int, std::future<boost::optional<ThumbnailResult_t>>> m_thumbnailResults;
+	ctpl::thread_pool	m_itemImageThreadPool;
+
+	std::unordered_map<int, std::future<boost::optional<ImageResult_t>>> m_iconResults;
+	int					m_iconResultIDCounter;
+
+	std::unordered_map<int, std::future<boost::optional<ImageResult_t>>> m_thumbnailResults;
 	int					m_thumbnailResultIDCounter;
 
 	/* Cached folder size data. */
@@ -773,8 +776,6 @@ private:
 
 	/* Manages browsing history. */
 	CPathManager		m_pathManager;
-
-	HANDLE				m_hThread;
 
 	/* Internal state. */
 	LPITEMIDLIST		m_pidlDirectory;

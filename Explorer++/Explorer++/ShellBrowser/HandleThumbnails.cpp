@@ -81,7 +81,7 @@ void CShellBrowser::RemoveThumbnailsView(void)
 
 	nItems = ListView_GetItemCount(m_hListView);
 
-	m_thumbnailThreadPool.clear_queue();
+	m_itemImageThreadPool.clear_queue();
 	m_thumbnailResults.clear();
 
 	for(i = 0;i < nItems;i++)
@@ -105,7 +105,7 @@ void CShellBrowser::QueueThumbnailTask(int internalIndex)
 {
 	int thumbnailResultID = m_thumbnailResultIDCounter++;
 
-	auto result = m_thumbnailThreadPool.push([this, thumbnailResultID, internalIndex](int id) {
+	auto result = m_itemImageThreadPool.push([this, thumbnailResultID, internalIndex](int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		return this->FindThumbnailAsync(thumbnailResultID, internalIndex);
@@ -114,7 +114,7 @@ void CShellBrowser::QueueThumbnailTask(int internalIndex)
 	m_thumbnailResults.insert({ thumbnailResultID, std::move(result) });
 }
 
-boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAsync(int thumbnailResultId, int internalIndex) const
+boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindThumbnailAsync(int thumbnailResultId, int internalIndex) const
 {
 	IShellFolder *pShellFolder = nullptr;
 	HRESULT hr = BindToIdl(m_pidlDirectory, IID_PPV_ARGS(&pShellFolder));
@@ -174,7 +174,7 @@ boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAs
 
 	PostMessage(m_hListView, WM_APP_THUMBNAIL_RESULT_READY, thumbnailResultId, 0);
 
-	ThumbnailResult_t result;
+	ImageResult_t result;
 	result.itemInternalIndex = internalIndex;
 	result.iconIndex = imageIndex;
 

@@ -12,27 +12,22 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <list>
-#include "IShellView.h"
+#include "iShellView.h"
 #include "iShellBrowser_internal.h"
 #include "../Helper/Controls.h"
-#include "../Helper/Helper.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
-#include "../Helper/ShellHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
+#include <boost/scope_exit.hpp>
+#include <list>
 
+#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 void CALLBACK	TimerProc(HWND hwnd,UINT uMsg,UINT_PTR idEvent,DWORD dwTime);
-void CALLBACK	FindIconAPC(ULONG_PTR dwParam);
-BOOL			RemoveFromIconFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent);
-
-std::list<ListViewInfo_t>	g_pListViewInfoList;
-CRITICAL_SECTION	g_icon_cs;
-int					g_nAPCsRan;
-int					g_nAPCsQueued;
 
 void CShellBrowser::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 {
@@ -386,173 +381,87 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 			plvItem->iImage	= m_iFolderIcon;
 		}
 
-		if(!m_bNotifiedOfTermination)
-			AddToIconFinderQueue(plvItem);
+		QueueIconTask(static_cast<int>(plvItem->lParam));
 	}
 
 	plvItem->mask |= LVIF_DI_SETITEM;
 }
 
-void CShellBrowser::AddToIconFinderQueue(const LVITEM *plvItem)
+void CShellBrowser::QueueIconTask(int internalIndex)
 {
-	EnterCriticalSection(&g_icon_cs);
+	int iconResultID = m_iconResultIDCounter++;
 
-	ListViewInfo_t lvil;
+	auto result = m_itemImageThreadPool.push([this, iconResultID, internalIndex](int id) {
+		UNREFERENCED_PARAMETER(id);
 
-	lvil.hListView	= m_hListView;
-	lvil.iItem		= plvItem->iItem;
-	lvil.pidlFull	= ILCombine(m_pidlDirectory,m_extraItemInfoMap.at((int)plvItem->lParam).pridl);
-	lvil.hEvent		= m_hIconEvent;
+		return this->FindIconAsync(iconResultID, internalIndex);
+	});
 
-	g_pListViewInfoList.push_back(lvil);
-
-	/* This code CANNOT run at the same time as the
-	queue remover code. Therefore, if this runs before
-	the remover code is called, the number of APCs
-	queued/ran will mismatch, and no APC will be queued.
-	If it is run after the remover code is called, the
-	number of APCs queued/ran will be the same. At this
-	point, there is no way to stop the currently running
-	APC from exiting. A new APC will thus be queued (and
-	MUST be queued).
-	The awake/asleep status of the thread therefore does
-	NOT matter. */
-	if(g_nAPCsRan == g_nAPCsQueued)
-	{
-		g_nAPCsQueued++;
-
-		QueueUserAPC(FindIconAPC,m_hThread,NULL);
-	}
-
-	LeaveCriticalSection(&g_icon_cs);
+	m_iconResults.insert({ iconResultID, std::move(result) });
 }
 
-void CShellBrowser::EmptyIconFinderQueue(void)
+boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindIconAsync(int iconResultId, int internalIndex) const
 {
-	EnterCriticalSection(&g_icon_cs);
+	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory, m_extraItemInfoMap.at(internalIndex).pridl);
 
-	std::list<ListViewInfo_t>::iterator last;
-	std::list<ListViewInfo_t>::iterator first;
+	BOOST_SCOPE_EXIT(pidlComplete) {
+		CoTaskMemFree(pidlComplete);
+	} BOOST_SCOPE_EXIT_END
 
-	last = g_pListViewInfoList.end();
+	// Must use SHGFI_ICON here, rather than SHGFO_SYSICONINDEX, or else 
+	// icon overlays won't be applied.
+	SHFILEINFO shfi;
+	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidlComplete), 0, &shfi,
+		sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
 
-	for(first = g_pListViewInfoList.begin();first != g_pListViewInfoList.end();)
+	if (res == 0)
 	{
-		if(first->hListView == m_hListView)
-		{
-			CoTaskMemFree(first->pidlFull);
-			first = g_pListViewInfoList.erase(first);
-		}
-		else
-		{
-			++first;
-		}
+		return boost::none;
 	}
 
-	LeaveCriticalSection(&g_icon_cs);
+	DestroyIcon(shfi.hIcon);
+
+	PostMessage(m_hListView, WM_APP_ICON_RESULT_READY, iconResultId, 0);
+
+	ImageResult_t result;
+	result.itemInternalIndex = internalIndex;
+	result.iconIndex = shfi.iIcon;
+
+	return result;
 }
 
-BOOL RemoveFromIconFinderQueue(ListViewInfo_t *pListViewInfo,HANDLE hStopEvent)
+void CShellBrowser::ProcessIconResult(int iconResultId)
 {
-	BOOL bQueueNotEmpty;
+	auto itr = m_iconResults.find(iconResultId);
 
-	EnterCriticalSection(&g_icon_cs);
-
-	if(hStopEvent != NULL)
+	if (itr == m_iconResults.end())
 	{
-		/* Set the event into the signalled
-		state. */
-		SetEvent(hStopEvent);
+		return;
 	}
 
-	if(g_pListViewInfoList.empty() == TRUE)
+	auto result = itr->second.get();
+
+	if (!result)
 	{
-		bQueueNotEmpty = FALSE;
-
-		g_nAPCsRan++;
-	}
-	else
-	{
-		std::list<ListViewInfo_t>::iterator itr;
-
-		itr = g_pListViewInfoList.end();
-
-		itr--;
-
-		*pListViewInfo = *itr;
-
-		/* Set the event to the non-signalled
-		state. */
-		ResetEvent(pListViewInfo->hEvent);
-
-		g_pListViewInfoList.erase(itr);
-
-		bQueueNotEmpty = TRUE;
+		// Icon lookup failed.
+		return;
 	}
 
-	LeaveCriticalSection(&g_icon_cs);
+	auto index = LocateItemByInternalIndex(result->itemInternalIndex);
 
-	return bQueueNotEmpty;
-}
-
-/* What happens when a FolderView is destroyed in
-the middle of this procedure:
-As this code only relies on the iItem, pidlFull
-and hListView members of the ListViewInfo_t
-structure, there is no inherent danger in deleting
-a FolderView in the middle of this code.
-Since the ListViewInfo_t structure in use CANNOT be
-freed or destroyed outside of this code, there is
-no danger in the pidlFull member becoming corrupted
-whilst this code is running.
-At worst, the iItem, pidlFull and hListView members
-will become invalid when the FolderView object is
-destroyed, however the Win32 API will reject the
-call to ListView_SetItem if the ListView argument
-is invalid, and so this is not expected to be a
-problem. */
-void CALLBACK FindIconAPC(ULONG_PTR dwParam)
-{
-	UNREFERENCED_PARAMETER(dwParam);
-
-	ListViewInfo_t	pListViewInfo;
-	LVITEM			lvItem;
-	SHFILEINFO		shfi;
-	DWORD_PTR		res = FALSE;
-	BOOL			bQueueNotEmpty = TRUE;
-
-	bQueueNotEmpty = RemoveFromIconFinderQueue(&pListViewInfo,NULL);
-
-	while(bQueueNotEmpty)
+	if (!index)
 	{
-		/* This call may cause this thread to sleep. If another APC has been
-		queued, it will be allowed through once this call has been made.
-		Running another APC within the middle of this one will crash the program.
-		Note: MUST use SHGFI_ICON here, rather than SHGFO_SYSICONINDEX, or else
-		icon overlays won't be applied. */
-		res = SHGetFileInfo((LPTSTR)pListViewInfo.pidlFull,0,&shfi,
-			sizeof(SHFILEINFO),SHGFI_PIDL|SHGFI_ICON|SHGFI_OVERLAYINDEX);
-
-		if(res != 0)
-		{
-			lvItem.mask			= LVIF_IMAGE|LVIF_STATE;
-			lvItem.iItem		= pListViewInfo.iItem;
-			lvItem.iSubItem		= 0;
-			lvItem.iImage		= shfi.iIcon;
-			lvItem.stateMask	= LVIS_OVERLAYMASK;
-
-			/* Any icon overlay will be contained in the upper eight
-			bits of shfi.iIcon. */
-			lvItem.state		= INDEXTOOVERLAYMASK(shfi.iIcon >> 24);
-
-			ListView_SetItem(pListViewInfo.hListView,&lvItem);
-
-			DestroyIcon(shfi.hIcon);
-			CoTaskMemFree(pListViewInfo.pidlFull);
-		}
-
-		bQueueNotEmpty = RemoveFromIconFinderQueue(&pListViewInfo,pListViewInfo.hEvent);
+		return;
 	}
+
+	LVITEM lvItem;
+	lvItem.mask = LVIF_IMAGE | LVIF_STATE;
+	lvItem.iItem = *index;
+	lvItem.iSubItem = 0;
+	lvItem.iImage = result->iconIndex;
+	lvItem.stateMask = LVIS_OVERLAYMASK;
+	lvItem.state = INDEXTOOVERLAYMASK(result->iconIndex >> 24);
+	ListView_SetItem(m_hListView, &lvItem);
 }
 
 LPITEMIDLIST CShellBrowser::QueryItemRelativeIdl(int iItem) const
@@ -1269,17 +1178,6 @@ BOOL CShellBrowser::QueryDragging(void) const
 	return m_bPerformingDrag;
 }
 
-BOOL CShellBrowser::GetTerminationStatus(void) const
-{
-	return m_bNotifiedOfTermination;
-}
-
-void CShellBrowser::SetTerminationStatus(void)
-{
-	EmptyIconFinderQueue();
-	m_bNotifiedOfTermination = TRUE;
-}
-
 std::list<int> CShellBrowser::QueryCurrentSortModes() const
 {
 	std::list<int> sortModes;
@@ -1499,30 +1397,6 @@ void CShellBrowser::SelectItems(const std::list<std::wstring> &PastedFileList)
 		{
 			m_FileSelectionList.push_back(PastedFile);
 		}
-	}
-}
-
-/* Refreshes all icons in the current
-window. This may be needed when a file
-association changes, for example. */
-void CShellBrowser::RefreshAllIcons(void)
-{
-	LVITEM lvItem;
-	int i = 0;
-
-	for(i = 0;i < m_nTotalItems;i++)
-	{
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= i;
-		lvItem.iSubItem	= 0;
-		ListView_GetItem(m_hListView,&lvItem);
-
-		/* BUG: If any items' index changes
-		while the icons are been updated, it
-		may not be updated. Need to loop through
-		all active items (in internal structure,
-		find in listview, and update). */
-		AddToIconFinderQueue(&lvItem);
 	}
 }
 

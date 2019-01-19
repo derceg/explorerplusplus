@@ -24,9 +24,6 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 
-
-BOOL g_bInitialized = FALSE;
-
 int CShellBrowser::listViewParentSubclassIdCounter = 0;
 
 /* IUnknown interface members. */
@@ -67,21 +64,21 @@ ULONG __stdcall CShellBrowser::Release(void)
 }
 
 CShellBrowser *CShellBrowser::CreateNew(HWND hOwner,HWND hListView,
-	const InitialSettings_t *pSettings,HANDLE hIconThread)
+	const InitialSettings_t *pSettings)
 {
-	return new CShellBrowser(hOwner,hListView,pSettings,hIconThread);
+	return new CShellBrowser(hOwner,hListView,pSettings);
 }
 
 CShellBrowser::CShellBrowser(HWND hOwner,HWND hListView,
-const InitialSettings_t *pSettings,HANDLE hIconThread) :
+const InitialSettings_t *pSettings) :
 m_hOwner(hOwner),
 m_hListView(hListView),
-m_hThread(hIconThread),
 m_itemIDCounter(0),
 m_columnThreadPool(1),
 m_columnResultIDCounter(0),
-m_thumbnailThreadPool(1),
-m_thumbnailResultIDCounter(0)
+m_itemImageThreadPool(1),
+m_thumbnailResultIDCounter(0),
+m_iconResultIDCounter(0)
 {
 	m_iRefCount = 1;
 
@@ -111,7 +108,6 @@ m_thumbnailResultIDCounter(0)
 	m_iDirMonitorId			= -1;
 	m_pActiveColumnList		= NULL;
 	m_bPerformingDrag		= FALSE;
-	m_bNotifiedOfTermination	= FALSE;
 	m_nActiveColumns		= 0;
 	m_bNewItemCreated		= FALSE;
 	m_iDropped				= -1;
@@ -134,15 +130,6 @@ m_thumbnailResultIDCounter(0)
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 	m_iFileIcon = GetDefaultFileIconIndex();
 
-	if(!g_bInitialized)
-	{
-		g_nAPCsRan = 0;
-		g_nAPCsQueued = 0;
-		InitializeCriticalSection(&g_icon_cs);
-
-		g_bInitialized = TRUE;
-	}
-
 	m_hIconEvent = CreateEvent(NULL,TRUE,TRUE,NULL);
 
 	m_ListViewSubclassed = SetWindowSubclass(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
@@ -159,7 +146,7 @@ m_thumbnailResultIDCounter(0)
 		m_ListViewParentSubclassed = FALSE;
 	}
 
-	m_thumbnailThreadPool.push([](int id) {
+	m_itemImageThreadPool.push([](int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
@@ -180,12 +167,10 @@ CShellBrowser::~CShellBrowser()
 		RemoveWindowSubclass(m_hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID);
 	}
 
-	EmptyIconFinderQueue();
-
 	m_columnThreadPool.clear_queue();
-	m_thumbnailThreadPool.clear_queue();
+	m_itemImageThreadPool.clear_queue();
 
-	m_thumbnailThreadPool.push([](int id) {
+	m_itemImageThreadPool.push([](int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		CoUninitialize();

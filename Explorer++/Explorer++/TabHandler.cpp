@@ -464,8 +464,7 @@ int *pTabObjectIndex)
 	pSettings->bForceSize	= m_bForceSize;
 	pSettings->sdf			= m_SizeDisplayFormat;
 
-	m_pShellBrowser[iTabId] = CShellBrowser::CreateNew(m_hContainer,m_hListView[iTabId],pSettings,
-		m_hIconThread);
+	m_pShellBrowser[iTabId] = CShellBrowser::CreateNew(m_hContainer,m_hListView[iTabId],pSettings);
 
 	if(pSettings->bApplyFilter)
 		NListView::ListView_SetBackgroundImage(m_hListView[iTabId],IDB_FILTERINGAPPLIED);
@@ -871,7 +870,6 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 
 	m_pDirMon->StopDirectoryMonitor(m_pShellBrowser[iInternalIndex]->GetDirMonitorId());
 
-	m_pShellBrowser[iInternalIndex]->SetTerminationStatus();
 	m_pShellBrowser[iInternalIndex]->Release();
 	m_pShellBrowser.erase(iInternalIndex);
 

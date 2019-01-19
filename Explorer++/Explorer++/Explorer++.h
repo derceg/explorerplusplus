@@ -783,7 +783,6 @@ private:
 	IDirectoryMonitor *		m_pDirMon;
 	CMyTreeView *			m_pMyTreeView;
 	CStatusBar *			m_pStatusBar;
-	HANDLE					m_hIconThread;
 	HANDLE					m_hTreeViewIconThread;
 
 	HMODULE					m_hLanguageModule;

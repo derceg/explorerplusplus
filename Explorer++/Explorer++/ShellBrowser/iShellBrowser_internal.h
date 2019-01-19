@@ -7,20 +7,6 @@
 #define THUMBNAIL_TYPE_ICON			0
 #define THUMBNAIL_TYPE_EXTRACTED	1
 
-typedef struct
-{
-	HWND			hListView;
-	LPITEMIDLIST	pidlFull;
-	int				iItem;
-	ExtraItemInfo		*m_pExtraItemInfo;
-	HANDLE			hEvent;
-} ListViewInfo_t;
-
-extern std::list<ListViewInfo_t>	g_pListViewInfoList;
-extern CRITICAL_SECTION	g_icon_cs;
-extern int					g_nAPCsRan;
-extern int					g_nAPCsQueued;
-
 /* Sort Modes. */
 static const UINT RealFolderSortModes[] =
 {FSM_NAME,FSM_SIZE,FSM_TYPE,FSM_DATEMODIFIED,FSM_ATTRIBUTES,
