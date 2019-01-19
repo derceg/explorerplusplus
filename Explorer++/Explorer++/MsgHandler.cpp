@@ -15,6 +15,7 @@
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "ShellBrowser/ViewModes.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"

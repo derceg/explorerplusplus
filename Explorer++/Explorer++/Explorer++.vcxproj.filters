@@ -411,6 +411,15 @@
     <ClInclude Include="ShellBrowser\iShellView.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
+    <ClInclude Include="ShellBrowser\SortModes.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\ViewModes.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\Columns.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

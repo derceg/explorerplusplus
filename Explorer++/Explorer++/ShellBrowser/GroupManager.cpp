@@ -22,6 +22,7 @@
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "MainResource.h"
+#include "SortModes.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"

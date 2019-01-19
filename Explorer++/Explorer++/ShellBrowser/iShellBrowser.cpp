@@ -14,6 +14,8 @@
 #include "stdafx.h"
 #include "iShellView.h"
 #include "iShellBrowser_internal.h"
+#include "SortModes.h"
+#include "ViewModes.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileOperations.h"

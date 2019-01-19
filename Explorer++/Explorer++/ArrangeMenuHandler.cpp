@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "MainResource.h"
+#include "ShellBrowser/SortModes.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"

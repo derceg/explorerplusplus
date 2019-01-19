@@ -21,6 +21,7 @@
 #include "ShellBrowser/iShellView.h"
 #include "TabDropHandler.h"
 #include "MainResource.h"
+#include "ShellBrowser/SortModes.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ShellHelper.h"

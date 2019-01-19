@@ -422,9 +422,12 @@
     <ClInclude Include="SelectColumnsDialog.h" />
     <ClInclude Include="SetDefaultColumnsDialog.h" />
     <ClInclude Include="SetFileAttributesDialog.h" />
+    <ClInclude Include="ShellBrowser\Columns.h" />
     <ClInclude Include="ShellBrowser\iPathManager.h" />
     <ClInclude Include="ShellBrowser\iShellBrowser_internal.h" />
     <ClInclude Include="ShellBrowser\iShellView.h" />
+    <ClInclude Include="ShellBrowser\SortModes.h" />
+    <ClInclude Include="ShellBrowser\ViewModes.h" />
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TabContainer.h" />

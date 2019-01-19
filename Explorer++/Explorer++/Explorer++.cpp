@@ -15,6 +15,7 @@
 #include "Explorer++.h"
 #include "DefaultColumns.h"
 #include "iServiceProvider.h"
+#include "ShellBrowser/ViewModes.h"
 #include "../Helper/ShellHelper.h"
 
 

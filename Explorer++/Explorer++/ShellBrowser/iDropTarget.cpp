@@ -15,6 +15,7 @@
 #include "stdafx.h"
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
+#include "ViewModes.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/FileOperations.h"

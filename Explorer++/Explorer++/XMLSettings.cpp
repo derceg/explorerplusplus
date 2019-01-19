@@ -22,6 +22,7 @@
 #include <objbase.h>
 #include <MsXml2.h>
 #include "Explorer++.h"
+#include "ShellBrowser/Columns.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/XMLSettings.h"
 #include "../Helper/ProcessHelper.h"

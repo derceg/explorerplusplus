@@ -20,6 +20,8 @@
 #include "MainResource.h"
 #include "ManageBookmarksDialog.h"
 #include "ModelessDialogs.h"
+#include "ShellBrowser/SortModes.h"
+#include "ShellBrowser/ViewModes.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"

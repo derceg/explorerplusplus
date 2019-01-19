@@ -23,9 +23,12 @@
 #include <boost\date_time\posix_time\posix_time.hpp>
 #include <iphlpapi.h>
 #include <propkey.h>
+#include "Columns.h"
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "MainResource.h"
+#include "SortModes.h"
+#include "ViewModes.h"
 #include "../Helper/Helper.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/ShellHelper.h"

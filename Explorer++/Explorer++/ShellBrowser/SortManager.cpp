@@ -19,6 +19,8 @@
 #include <propvarutil.h>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
+#include "SortModes.h"
+#include "ViewModes.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ShellHelper.h"

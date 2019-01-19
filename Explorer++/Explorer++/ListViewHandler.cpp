@@ -20,6 +20,8 @@
 #include "MainResource.h"
 #include "MassRenameDialog.h"
 #include "SetFileAttributesDialog.h"
+#include "ShellBrowser/Columns.h"
+#include "ShellBrowser/ViewModes.h"
 #include "../Helper/ContextMenuManager.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DropHandler.h"
