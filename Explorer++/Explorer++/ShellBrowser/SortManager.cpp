@@ -64,8 +64,11 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 {
 	int ComparisonResult = 0;
 
-	bool IsFolder1 = ((m_itemInfoMap.at(InternalIndex1).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
-	bool IsFolder2 = ((m_itemInfoMap.at(InternalIndex2).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	const ItemInfo_t &itemInfo1 = m_itemInfoMap.at(InternalIndex1);
+	const ItemInfo_t &itemInfo2 = m_itemInfoMap.at(InternalIndex2);
+
+	bool IsFolder1 = ((itemInfo1.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder2 = ((itemInfo2.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	
 	/* Folders will always be sorted separately from files,
 	except in the recycle bin. */
@@ -86,7 +89,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_TYPE:
-			ComparisonResult = SortByType(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByType(itemInfo1,itemInfo2);
 			break;
 
 		case FSM_SIZE:
@@ -98,11 +101,11 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_TOTALSIZE:
-			ComparisonResult = SortByTotalSize(InternalIndex1,InternalIndex2,TRUE);
+			ComparisonResult = SortByTotalSize(itemInfo1,itemInfo2,TRUE);
 			break;
 
 		case FSM_FREESPACE:
-			ComparisonResult = SortByTotalSize(InternalIndex1,InternalIndex2,FALSE);
+			ComparisonResult = SortByTotalSize(itemInfo1,itemInfo2,FALSE);
 			break;
 
 		case FSM_DATEDELETED:
@@ -118,11 +121,11 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_REALSIZE:
-			ComparisonResult = SortByRealSize(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByRealSize(itemInfo1,itemInfo2);
 			break;
 
 		case FSM_SHORTNAME:
-			ComparisonResult = SortByShortName(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByShortName(itemInfo1,itemInfo2);
 			break;
 
 		case FSM_OWNER:
@@ -158,7 +161,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_EXTENSION:
-			ComparisonResult = SortByExtension(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByExtension(itemInfo1,itemInfo2);
 			break;
 
 		case FSM_CREATED:
@@ -210,27 +213,27 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_FILESYSTEM:
-			ComparisonResult = SortByFileSystem(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByFileSystem(itemInfo1,itemInfo2);
 			break;
 
 		case FSM_NUMPRINTERDOCUMENTS:
-			ComparisonResult = SortByPrinterProperty(InternalIndex1,InternalIndex2,PRINTER_INFORMATION_TYPE_NUM_JOBS);
+			ComparisonResult = SortByPrinterProperty(itemInfo1,itemInfo2,PRINTER_INFORMATION_TYPE_NUM_JOBS);
 			break;
 
 		case FSM_PRINTERSTATUS:
-			ComparisonResult = SortByPrinterProperty(InternalIndex1,InternalIndex2,PRINTER_INFORMATION_TYPE_STATUS);
+			ComparisonResult = SortByPrinterProperty(itemInfo1,itemInfo2,PRINTER_INFORMATION_TYPE_STATUS);
 			break;
 
 		case FSM_PRINTERCOMMENTS:
-			ComparisonResult = SortByPrinterProperty(InternalIndex1,InternalIndex2,PRINTER_INFORMATION_TYPE_COMMENTS);
+			ComparisonResult = SortByPrinterProperty(itemInfo1,itemInfo2,PRINTER_INFORMATION_TYPE_COMMENTS);
 			break;
 
 		case FSM_PRINTERLOCATION:
-			ComparisonResult = SortByPrinterProperty(InternalIndex1,InternalIndex2,PRINTER_INFORMATION_TYPE_LOCATION);
+			ComparisonResult = SortByPrinterProperty(itemInfo1,itemInfo2,PRINTER_INFORMATION_TYPE_LOCATION);
 			break;
 
 		case FSM_NETWORKADAPTER_STATUS:
-			ComparisonResult = SortByNetworkAdapterStatus(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortByNetworkAdapterStatus(itemInfo1,itemInfo2);
 			break;
 
 		case FSM_MEDIA_BITRATE:
@@ -433,15 +436,15 @@ int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) co
 	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByType(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByType(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
 	if(m_bVirtualFolder)
 	{
 		TCHAR FullFileName1[MAX_PATH];
-		GetDisplayName(m_itemInfoMap.at(InternalIndex1).pidlComplete.get(),FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
+		GetDisplayName(itemInfo1.pidlComplete.get(),FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
 
 		TCHAR FullFileName2[MAX_PATH];
-		GetDisplayName(m_itemInfoMap.at(InternalIndex2).pidlComplete.get(),FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
+		GetDisplayName(itemInfo2.pidlComplete.get(),FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
 
 		BOOL IsRoot1 = PathIsRoot(FullFileName1);
 		BOOL IsRoot2 = PathIsRoot(FullFileName2);
@@ -456,8 +459,8 @@ int CALLBACK CShellBrowser::SortByType(int InternalIndex1,int InternalIndex2) co
 		}
 	}
 
-	std::wstring Type1 = GetTypeColumnText(InternalIndex1);
-	std::wstring Type2 = GetTypeColumnText(InternalIndex2);
+	std::wstring Type1 = GetTypeColumnText(itemInfo1);
+	std::wstring Type2 = GetTypeColumnText(itemInfo2);
 
 	return StrCmpLogicalW(Type1.c_str(),Type2.c_str());
 }
@@ -486,13 +489,13 @@ int CALLBACK CShellBrowser::SortByDate(int InternalIndex1,int InternalIndex2,Dat
 	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByTotalSize(int InternalIndex1,int InternalIndex2,bool TotalSize) const
+int CALLBACK CShellBrowser::SortByTotalSize(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, bool TotalSize) const
 {
 	ULARGE_INTEGER DriveSpace1;
-	BOOL Res1 = GetDriveSpaceColumnRawData(InternalIndex1,TotalSize,DriveSpace1);
+	BOOL Res1 = GetDriveSpaceColumnRawData(itemInfo1,TotalSize,DriveSpace1);
 
 	ULARGE_INTEGER DriveSpace2;
-	BOOL Res2 = GetDriveSpaceColumnRawData(InternalIndex2,TotalSize,DriveSpace2);
+	BOOL Res2 = GetDriveSpaceColumnRawData(itemInfo2,TotalSize,DriveSpace2);
 
 	if(Res1 && !Res2)
 	{
@@ -527,13 +530,13 @@ int CALLBACK CShellBrowser::SortByAttributes(int InternalIndex1,int InternalInde
 	return StrCmpLogicalW(AttributeString1.c_str(),AttributeString2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByRealSize(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByRealSize(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
 	ULARGE_INTEGER RealFileSize1;
-	bool Res1 = GetRealSizeColumnRawData(InternalIndex1,RealFileSize1);
+	bool Res1 = GetRealSizeColumnRawData(itemInfo1,RealFileSize1);
 
 	ULARGE_INTEGER RealFileSize2;
-	bool Res2 = GetRealSizeColumnRawData(InternalIndex2,RealFileSize2);
+	bool Res2 = GetRealSizeColumnRawData(itemInfo2,RealFileSize2);
 
 	if(Res1 && !Res2)
 	{
@@ -560,10 +563,10 @@ int CALLBACK CShellBrowser::SortByRealSize(int InternalIndex1,int InternalIndex2
 	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByShortName(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByShortName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
-	std::wstring ShortName1 = GetShortNameColumnText(InternalIndex1);
-	std::wstring ShortName2 = GetShortNameColumnText(InternalIndex2);
+	std::wstring ShortName1 = GetShortNameColumnText(itemInfo1);
+	std::wstring ShortName2 = GetShortNameColumnText(itemInfo2);
 
 	return StrCmpLogicalW(ShortName1.c_str(),ShortName2.c_str());
 }
@@ -600,10 +603,10 @@ int CALLBACK CShellBrowser::SortByHardlinks(int InternalIndex1,int InternalIndex
 	return NumHardLinks1 - NumHardLinks2;
 }
 
-int CALLBACK CShellBrowser::SortByExtension(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByExtension(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
-	std::wstring Extension1 = GetExtensionColumnText(InternalIndex1);
-	std::wstring Extension2 = GetExtensionColumnText(InternalIndex2);
+	std::wstring Extension1 = GetExtensionColumnText(itemInfo1);
+	std::wstring Extension2 = GetExtensionColumnText(itemInfo2);
 
 	return StrCmpLogicalW(Extension1.c_str(),Extension2.c_str());
 }
@@ -652,26 +655,26 @@ int CALLBACK CShellBrowser::SortByVirtualComments(int InternalIndex1,int Interna
 	return StrCmpLogicalW(Comments1.c_str(),Comments2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByFileSystem(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByFileSystem(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
-	std::wstring FileSystemName1 = GetFileSystemColumnText(InternalIndex1);
-	std::wstring FileSystemName2 = GetFileSystemColumnText(InternalIndex2);
+	std::wstring FileSystemName1 = GetFileSystemColumnText(itemInfo1);
+	std::wstring FileSystemName2 = GetFileSystemColumnText(itemInfo2);
 
 	return StrCmpLogicalW(FileSystemName1.c_str(),FileSystemName2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByPrinterProperty(int InternalIndex1,int InternalIndex2,PrinterInformationType_t PrinterInformationType) const
+int CALLBACK CShellBrowser::SortByPrinterProperty(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, PrinterInformationType_t PrinterInformationType) const
 {
-	std::wstring PrinterInformation1 = GetPrinterColumnText(InternalIndex1,PrinterInformationType);
-	std::wstring PrinterInformation2 = GetPrinterColumnText(InternalIndex2,PrinterInformationType);
+	std::wstring PrinterInformation1 = GetPrinterColumnText(itemInfo1,PrinterInformationType);
+	std::wstring PrinterInformation2 = GetPrinterColumnText(itemInfo2,PrinterInformationType);
 
 	return StrCmpLogicalW(PrinterInformation1.c_str(),PrinterInformation2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByNetworkAdapterStatus(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortByNetworkAdapterStatus(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
 {
-	std::wstring Status1 = GetNetworkAdapterColumnText(InternalIndex1);
-	std::wstring Status2 = GetNetworkAdapterColumnText(InternalIndex2);
+	std::wstring Status1 = GetNetworkAdapterColumnText(itemInfo1);
+	std::wstring Status2 = GetNetworkAdapterColumnText(itemInfo2);
 
 	return StrCmpLogicalW(Status1.c_str(),Status2.c_str());
 }

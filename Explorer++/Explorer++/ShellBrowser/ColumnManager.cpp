@@ -181,6 +181,8 @@ void CShellBrowser::SetColumnText(UINT ColumnID,int ItemIndex,int ColumnIndex)
 
 std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 {
+	const ItemInfo_t &itemInfo = m_itemInfoMap.at(InternalIndex);
+
 	switch(ColumnID)
 	{
 	case CM_NAME:
@@ -188,30 +190,30 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_TYPE:
-		return GetTypeColumnText(InternalIndex);
+		return GetTypeColumnText(itemInfo);
 		break;
 	case CM_SIZE:
 		return GetSizeColumnText(InternalIndex);
 		break;
 
 	case CM_DATEMODIFIED:
-		return GetTimeColumnText(InternalIndex,COLUMN_TIME_MODIFIED);
+		return GetTimeColumnText(itemInfo,COLUMN_TIME_MODIFIED);
 		break;
 	case CM_CREATED:
-		return GetTimeColumnText(InternalIndex,COLUMN_TIME_CREATED);
+		return GetTimeColumnText(itemInfo,COLUMN_TIME_CREATED);
 		break;
 	case CM_ACCESSED:
-		return GetTimeColumnText(InternalIndex,COLUMN_TIME_ACCESSED);
+		return GetTimeColumnText(itemInfo,COLUMN_TIME_ACCESSED);
 		break;
 
 	case CM_ATTRIBUTES:
 		return GetAttributeColumnText(InternalIndex);
 		break;
 	case CM_REALSIZE:
-		return GetRealSizeColumnText(InternalIndex);
+		return GetRealSizeColumnText(itemInfo);
 		break;
 	case CM_SHORTNAME:
-		return GetShortNameColumnText(InternalIndex);
+		return GetShortNameColumnText(itemInfo);
 		break;
 	case CM_OWNER:
 		return GetOwnerColumnText(InternalIndex);
@@ -240,7 +242,7 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		return GetHardLinksColumnText(InternalIndex);
 		break;
 	case CM_EXTENSION:
-		return GetExtensionColumnText(InternalIndex);
+		return GetExtensionColumnText(itemInfo);
 		break;
 
 	case CM_TITLE:
@@ -277,15 +279,15 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_TOTALSIZE:
-		return GetDriveSpaceColumnText(InternalIndex,true);
+		return GetDriveSpaceColumnText(itemInfo,true);
 		break;
 
 	case CM_FREESPACE:
-		return GetDriveSpaceColumnText(InternalIndex,false);
+		return GetDriveSpaceColumnText(itemInfo,false);
 		break;
 
 	case CM_FILESYSTEM:
-		return GetFileSystemColumnText(InternalIndex);
+		return GetFileSystemColumnText(itemInfo);
 		break;
 
 	case CM_ORIGINALLOCATION:
@@ -297,27 +299,27 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_NUMPRINTERDOCUMENTS:
-		return GetPrinterColumnText(InternalIndex,PRINTER_INFORMATION_TYPE_NUM_JOBS);
+		return GetPrinterColumnText(itemInfo,PRINTER_INFORMATION_TYPE_NUM_JOBS);
 		break;
 
 	case CM_PRINTERSTATUS:
-		return GetPrinterColumnText(InternalIndex,PRINTER_INFORMATION_TYPE_STATUS);
+		return GetPrinterColumnText(itemInfo,PRINTER_INFORMATION_TYPE_STATUS);
 		break;
 
 	case CM_PRINTERCOMMENTS:
-		return GetPrinterColumnText(InternalIndex,PRINTER_INFORMATION_TYPE_COMMENTS);
+		return GetPrinterColumnText(itemInfo,PRINTER_INFORMATION_TYPE_COMMENTS);
 		break;
 
 	case CM_PRINTERLOCATION:
-		return GetPrinterColumnText(InternalIndex,PRINTER_INFORMATION_TYPE_LOCATION);
+		return GetPrinterColumnText(itemInfo,PRINTER_INFORMATION_TYPE_LOCATION);
 		break;
 
 	case CM_PRINTERMODEL:
-		return GetPrinterColumnText(InternalIndex,PRINTER_INFORMATION_TYPE_MODEL);
+		return GetPrinterColumnText(itemInfo,PRINTER_INFORMATION_TYPE_MODEL);
 		break;
 
 	case CM_NETWORKADAPTER_STATUS:
-		return GetNetworkAdapterColumnText(InternalIndex);
+		return GetNetworkAdapterColumnText(itemInfo);
 		break;
 
 	case CM_MEDIA_BITRATE:
@@ -406,10 +408,10 @@ std::wstring CShellBrowser::GetNameColumnText(int InternalIndex) const
 	return ProcessItemFileName(InternalIndex);
 }
 
-std::wstring CShellBrowser::GetTypeColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetTypeColumnText(const ItemInfo_t &itemInfo) const
 {
 	SHFILEINFO shfi;
-	DWORD_PTR Res = SHGetFileInfo(reinterpret_cast<LPTSTR>(m_itemInfoMap.at(InternalIndex).pidlComplete.get()),
+	DWORD_PTR Res = SHGetFileInfo(reinterpret_cast<LPTSTR>(itemInfo.pidlComplete.get()),
 		0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_TYPENAME);
 
 	if(Res == 0)
@@ -476,7 +478,7 @@ std::wstring CShellBrowser::GetFolderSizeColumnText(int internalIndex) const
 	return fileSizeText;
 }
 
-std::wstring CShellBrowser::GetTimeColumnText(int InternalIndex,TimeType_t TimeType) const
+std::wstring CShellBrowser::GetTimeColumnText(const ItemInfo_t &itemInfo,TimeType_t TimeType) const
 {
 	TCHAR FileTime[64];
 	BOOL bRet = FALSE;
@@ -484,17 +486,17 @@ std::wstring CShellBrowser::GetTimeColumnText(int InternalIndex,TimeType_t TimeT
 	switch(TimeType)
 	{
 	case COLUMN_TIME_MODIFIED:
-		bRet = CreateFileTimeString(&m_itemInfoMap.at(InternalIndex).wfd.ftLastWriteTime,
+		bRet = CreateFileTimeString(&itemInfo.wfd.ftLastWriteTime,
 			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
 		break;
 
 	case COLUMN_TIME_CREATED:
-		bRet = CreateFileTimeString(&m_itemInfoMap.at(InternalIndex).wfd.ftCreationTime,
+		bRet = CreateFileTimeString(&itemInfo.wfd.ftCreationTime,
 			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
 		break;
 
 	case COLUMN_TIME_ACCESSED:
-		bRet = CreateFileTimeString(&m_itemInfoMap.at(InternalIndex).wfd.ftLastAccessTime,
+		bRet = CreateFileTimeString(&itemInfo.wfd.ftLastAccessTime,
 			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
 		break;
 
@@ -522,9 +524,9 @@ std::wstring CShellBrowser::GetAttributeColumnText(int InternalIndex) const
 	return AttributeString;
 }
 
-bool CShellBrowser::GetRealSizeColumnRawData(int InternalIndex,ULARGE_INTEGER &RealFileSize) const
+bool CShellBrowser::GetRealSizeColumnRawData(const ItemInfo_t &itemInfo,ULARGE_INTEGER &RealFileSize) const
 {
-	if((m_itemInfoMap.at(InternalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	if((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		return false;
 	}
@@ -541,7 +543,7 @@ bool CShellBrowser::GetRealSizeColumnRawData(int InternalIndex,ULARGE_INTEGER &R
 		return false;
 	}
 
-	ULARGE_INTEGER RealFileSizeTemp = {m_itemInfoMap.at(InternalIndex).wfd.nFileSizeLow,m_itemInfoMap.at(InternalIndex).wfd.nFileSizeHigh};
+	ULARGE_INTEGER RealFileSizeTemp = {itemInfo.wfd.nFileSizeLow,itemInfo.wfd.nFileSizeHigh};
 
 	if(RealFileSizeTemp.QuadPart != 0 && (RealFileSizeTemp.QuadPart % dwClusterSize) != 0)
 	{
@@ -553,10 +555,10 @@ bool CShellBrowser::GetRealSizeColumnRawData(int InternalIndex,ULARGE_INTEGER &R
 	return true;
 }
 
-std::wstring CShellBrowser::GetRealSizeColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetRealSizeColumnText(const ItemInfo_t &itemInfo) const
 {
 	ULARGE_INTEGER RealFileSize;
-	bool Res = GetRealSizeColumnRawData(InternalIndex,RealFileSize);
+	bool Res = GetRealSizeColumnRawData(itemInfo,RealFileSize);
 
 	if(!Res)
 	{
@@ -570,14 +572,14 @@ std::wstring CShellBrowser::GetRealSizeColumnText(int InternalIndex) const
 	return RealFileSizeText;
 }
 
-std::wstring CShellBrowser::GetShortNameColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetShortNameColumnText(const ItemInfo_t &itemInfo) const
 {
-	if(lstrlen(m_itemInfoMap.at(InternalIndex).wfd.cAlternateFileName) == 0)
+	if(lstrlen(itemInfo.wfd.cAlternateFileName) == 0)
 	{
-		return m_itemInfoMap.at(InternalIndex).wfd.cFileName;
+		return itemInfo.wfd.cFileName;
 	}
 
-	return m_itemInfoMap.at(InternalIndex).wfd.cAlternateFileName;
+	return itemInfo.wfd.cAlternateFileName;
 }
 
 std::wstring CShellBrowser::GetOwnerColumnText(int InternalIndex) const
@@ -682,14 +684,14 @@ std::wstring CShellBrowser::GetHardLinksColumnText(int InternalIndex) const
 	return NumHardLinksString;
 }
 
-std::wstring CShellBrowser::GetExtensionColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetExtensionColumnText(const ItemInfo_t &itemInfo) const
 {
-	if((m_itemInfoMap.at(InternalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	if((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		return EMPTY_STRING;
 	}
 
-	TCHAR *Extension = PathFindExtension(m_itemInfoMap.at(InternalIndex).wfd.cFileName);
+	TCHAR *Extension = PathFindExtension(itemInfo.wfd.cFileName);
 
 	if(*Extension != '.')
 	{
@@ -757,11 +759,10 @@ std::wstring CShellBrowser::GetImageColumnText(int InternalIndex,PROPID Property
 	return ImageProperty;
 }
 
-std::wstring CShellBrowser::GetFileSystemColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetFileSystemColumnText(const ItemInfo_t &itemInfo) const
 {
 	TCHAR FullFileName[MAX_PATH];
-	GetDisplayName(m_itemInfoMap.at(InternalIndex).pidlComplete.get(),
-		FullFileName,SIZEOF_ARRAY(FullFileName),SHGDN_FORPARSING);
+	GetDisplayName(itemInfo.pidlComplete.get(),FullFileName,SIZEOF_ARRAY(FullFileName),SHGDN_FORPARSING);
 
 	BOOL IsRoot = PathIsRoot(FullFileName);
 
@@ -782,11 +783,11 @@ std::wstring CShellBrowser::GetFileSystemColumnText(int InternalIndex) const
 	return FileSystemName;
 }
 
-BOOL CShellBrowser::GetDriveSpaceColumnRawData(int InternalIndex,bool TotalSize,ULARGE_INTEGER &DriveSpace) const
+BOOL CShellBrowser::GetDriveSpaceColumnRawData(const ItemInfo_t &itemInfo,bool TotalSize,ULARGE_INTEGER &DriveSpace) const
 {
 	TCHAR FullFileName[MAX_PATH];
-	GetDisplayName(m_itemInfoMap.at(InternalIndex).pidlComplete.get(),
-		FullFileName,SIZEOF_ARRAY(FullFileName),SHGDN_FORPARSING);
+	GetDisplayName(itemInfo.pidlComplete.get(),FullFileName,
+		SIZEOF_ARRAY(FullFileName),SHGDN_FORPARSING);
 
 	BOOL IsRoot = PathIsRoot(FullFileName);
 
@@ -811,10 +812,10 @@ BOOL CShellBrowser::GetDriveSpaceColumnRawData(int InternalIndex,bool TotalSize,
 	return Res;
 }
 
-std::wstring CShellBrowser::GetDriveSpaceColumnText(int InternalIndex,bool TotalSize) const
+std::wstring CShellBrowser::GetDriveSpaceColumnText(const ItemInfo_t &itemInfo,bool TotalSize) const
 {
 	ULARGE_INTEGER DriveSpace;
-	BOOL Res = GetDriveSpaceColumnRawData(InternalIndex,TotalSize,DriveSpace);
+	BOOL Res = GetDriveSpaceColumnRawData(itemInfo,TotalSize,DriveSpace);
 
 	if(!Res)
 	{
@@ -845,13 +846,13 @@ std::wstring CShellBrowser::GetControlPanelCommentsColumnText(int InternalIndex)
 	return InfoTip;
 }
 
-std::wstring CShellBrowser::GetPrinterColumnText(int InternalIndex,PrinterInformationType_t PrinterInformationType) const
+std::wstring CShellBrowser::GetPrinterColumnText(const ItemInfo_t &itemInfo,PrinterInformationType_t PrinterInformationType) const
 {
 	TCHAR PrinterInformation[256] = EMPTY_STRING;
 	TCHAR szStatus[256];
 
 	TCHAR itemDisplayName[MAX_PATH];
-	StringCchCopy(itemDisplayName, SIZEOF_ARRAY(itemDisplayName), m_itemInfoMap.at(InternalIndex).szDisplayName);
+	StringCchCopy(itemDisplayName, SIZEOF_ARRAY(itemDisplayName), itemInfo.szDisplayName);
 
 	HANDLE hPrinter;
 	BOOL Res = OpenPrinter(itemDisplayName,&hPrinter,NULL);
@@ -959,7 +960,7 @@ BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax)
 	return bSuccess;
 }
 
-std::wstring CShellBrowser::GetNetworkAdapterColumnText(int InternalIndex) const
+std::wstring CShellBrowser::GetNetworkAdapterColumnText(const ItemInfo_t &itemInfo) const
 {
 	ULONG OutBufLen = 0;
 	GetAdaptersAddresses(AF_UNSPEC,0,NULL,NULL,&OutBufLen);
@@ -969,7 +970,7 @@ std::wstring CShellBrowser::GetNetworkAdapterColumnText(int InternalIndex) const
 	IP_ADAPTER_ADDRESSES *AdapaterAddress = AdapterAddresses;
 
 	while(AdapaterAddress != NULL &&
-		lstrcmp(AdapaterAddress->FriendlyName,m_itemInfoMap.at(InternalIndex).wfd.cFileName) != 0)
+		lstrcmp(AdapaterAddress->FriendlyName,itemInfo.wfd.cFileName) != 0)
 	{
 		AdapaterAddress = AdapaterAddress->Next;
 	}

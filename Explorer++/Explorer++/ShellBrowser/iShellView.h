@@ -408,23 +408,23 @@ private:
 	int CALLBACK		Sort(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByName(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortBySize(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByType(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByType(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
 	int CALLBACK		SortByDate(int InternalIndex1,int InternalIndex2,DateType_t DateType) const;
-	int CALLBACK		SortByTotalSize(int InternalIndex1,int InternalIndex2,bool TotalSize) const;
+	int CALLBACK		SortByTotalSize(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, bool TotalSize) const;
 	int CALLBACK		SortByAttributes(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByRealSize(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByShortName(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByRealSize(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByShortName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
 	int CALLBACK		SortByOwner(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByVersionInfo(int InternalIndex1,int InternalIndex2,VersionInfoType_t VersioninfoType) const;
 	int CALLBACK		SortByShortcutTo(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByHardlinks(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByExtension(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByExtension(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
 	int CALLBACK		SortByItemDetails(int InternalIndex1, int InternalIndex2, const SHCOLUMNID *pscid) const;
 	int CALLBACK		SortByImageProperty(int InternalIndex1,int InternalIndex2,PROPID PropertyId) const;
 	int CALLBACK		SortByVirtualComments(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByFileSystem(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByPrinterProperty(int InternalIndex1,int InternalIndex2,PrinterInformationType_t PrinterInformationType) const;
-	int CALLBACK		SortByNetworkAdapterStatus(int InternalIndex1,int InternalIndex2) const;
+	int CALLBACK		SortByFileSystem(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByPrinterProperty(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, PrinterInformationType_t PrinterInformationType) const;
+	int CALLBACK		SortByNetworkAdapterStatus(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
 	int CALLBACK		SortByMediaMetadata(int InternalIndex1,int InternalIndex2,MediaMetadataType_t MediaMetaDataType) const;
 
 	/* Listview column support. */
@@ -443,30 +443,30 @@ private:
 
 	/* Listview columns. */
 	std::wstring		GetNameColumnText(int InternalIndex) const;
-	std::wstring		GetTypeColumnText(int InternalIndex) const;
+	std::wstring		GetTypeColumnText(const ItemInfo_t &itemInfo) const;
 	std::wstring		GetSizeColumnText(int InternalIndex) const;
 	std::wstring		GetFolderSizeColumnText(int internalIndex) const;
-	std::wstring		GetTimeColumnText(int InternalIndex,TimeType_t TimeType) const;
+	std::wstring		GetTimeColumnText(const ItemInfo_t &itemInfo,TimeType_t TimeType) const;
 	std::wstring		GetAttributeColumnText(int InternalIndex) const;
-	bool				GetRealSizeColumnRawData(int InternalIndex,ULARGE_INTEGER &RealFileSize) const;
-	std::wstring		GetRealSizeColumnText(int InternalIndex) const;
-	std::wstring		GetShortNameColumnText(int InternalIndex) const;
+	bool				GetRealSizeColumnRawData(const ItemInfo_t &itemInfo,ULARGE_INTEGER &RealFileSize) const;
+	std::wstring		GetRealSizeColumnText(const ItemInfo_t &itemInfo) const;
+	std::wstring		GetShortNameColumnText(const ItemInfo_t &itemInfo) const;
 	std::wstring		GetOwnerColumnText(int InternalIndex) const;
 	std::wstring		GetVersionColumnText(int InternalIndex,VersionInfoType_t VersioninfoType) const;
 	std::wstring		GetShortcutToColumnText(int InternalIndex) const;
 	DWORD				GetHardLinksColumnRawData(int InternalIndex) const;
 	std::wstring		GetHardLinksColumnText(int InternalIndex) const;
-	std::wstring		GetExtensionColumnText(int InternalIndex) const;
+	std::wstring		GetExtensionColumnText(const ItemInfo_t &itemInfo) const;
 	HRESULT				GetItemDetails(int InternalIndex, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const;
 	HRESULT				GetItemDetailsRawData(int InternalIndex, const SHCOLUMNID *pscid, VARIANT *vt) const;
 	std::wstring		GetItemDetailsColumnText(int InternalIndex, const SHCOLUMNID *pscid) const;
 	std::wstring		GetImageColumnText(int InternalIndex,PROPID PropertyID) const;
-	std::wstring		GetFileSystemColumnText(int InternalIndex) const;
-	BOOL				GetDriveSpaceColumnRawData(int InternalIndex,bool TotalSize,ULARGE_INTEGER &DriveSpace) const;
-	std::wstring		GetDriveSpaceColumnText(int InternalIndex,bool TotalSize) const;
+	std::wstring		GetFileSystemColumnText(const ItemInfo_t &itemInfo) const;
+	BOOL				GetDriveSpaceColumnRawData(const ItemInfo_t &itemInfo,bool TotalSize,ULARGE_INTEGER &DriveSpace) const;
+	std::wstring		GetDriveSpaceColumnText(const ItemInfo_t &itemInfo,bool TotalSize) const;
 	std::wstring		GetControlPanelCommentsColumnText(int InternalIndex) const;
-	std::wstring		GetPrinterColumnText(int InternalIndex,PrinterInformationType_t PrinterInformationType) const;
-	std::wstring		GetNetworkAdapterColumnText(int InternalIndex) const;
+	std::wstring		GetPrinterColumnText(const ItemInfo_t &itemInfo,PrinterInformationType_t PrinterInformationType) const;
+	std::wstring		GetNetworkAdapterColumnText(const ItemInfo_t &itemInfo) const;
 	std::wstring		GetMediaMetadataColumnText(int InternalIndex,MediaMetadataType_t MediaMetaDataType) const;
 	const TCHAR			*GetMediaMetadataAttributeName(MediaMetadataType_t MediaMetaDataType) const;
 
