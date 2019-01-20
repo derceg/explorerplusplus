@@ -136,7 +136,7 @@ boost::optional<int> CShellBrowser::GetColumnIndexById(unsigned int id) const
 			continue;
 		}
 
-		if (hdItem.lParam == id)
+		if (static_cast<unsigned int>(hdItem.lParam) == id)
 		{
 			return i;
 		}
