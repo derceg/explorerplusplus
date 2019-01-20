@@ -3,6 +3,7 @@
 #include "ColumnDataRetrieval.h"
 #include "iPathManager.h"
 #include "ItemData.h"
+#include "TabPreferences.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
@@ -371,9 +372,6 @@ private:
 
 	/* Listview columns. */
 	std::wstring		GetNameColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetItemDetailsColumnText(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid) const;
-	HRESULT				GetItemDetails(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const;
-	HRESULT				GetItemDetailsRawData(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt) const;
 
 	/* Device change support. */
 	void				UpdateDriveIcon(const TCHAR *szDrive);
@@ -418,7 +416,7 @@ private:
 	void				DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 	void				DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 	void				DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemSummaryGroup(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax) const;
+	void				DetermineItemSummaryGroup(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax, const Preferences_t &preferences) const;
 
 	/* Other grouping support. */
 	int					CheckGroup(const TCHAR *szGroupHeader, PFNLVGROUPCOMPARE pfnGroupCompare);

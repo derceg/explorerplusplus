@@ -64,6 +64,9 @@ bool GetRealSizeColumnRawData(const ItemInfo_t &itemInfo, ULARGE_INTEGER &RealFi
 std::wstring GetAttributeColumnText(const ItemInfo_t &itemInfo);
 std::wstring GetShortNameColumnText(const ItemInfo_t &itemInfo);
 std::wstring GetOwnerColumnText(const ItemInfo_t &itemInfo);
+std::wstring GetItemDetailsColumnText(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, const Preferences_t &preferences);
+HRESULT GetItemDetails(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax, const Preferences_t &preferences);
+HRESULT GetItemDetailsRawData(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt);
 std::wstring GetVersionColumnText(const ItemInfo_t &itemInfo, VersionInfoType_t VersioninfoType);
 std::wstring GetShortcutToColumnText(const ItemInfo_t &itemInfo);
 std::wstring GetHardLinksColumnText(const ItemInfo_t &itemInfo);

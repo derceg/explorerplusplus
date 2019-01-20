@@ -204,6 +204,47 @@ std::wstring GetOwnerColumnText(const ItemInfo_t &itemInfo)
 	return Owner;
 }
 
+std::wstring GetItemDetailsColumnText(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, const Preferences_t &preferences)
+{
+	TCHAR szDetail[512];
+	HRESULT hr = GetItemDetails(itemInfo, pscid, szDetail, SIZEOF_ARRAY(szDetail), preferences);
+
+	if (SUCCEEDED(hr))
+	{
+		return szDetail;
+	}
+
+	return EMPTY_STRING;
+}
+
+HRESULT GetItemDetails(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax, const Preferences_t &preferences)
+{
+	VARIANT vt;
+	HRESULT hr = GetItemDetailsRawData(itemInfo, pscid, &vt);
+
+	if (SUCCEEDED(hr))
+	{
+		hr = ConvertVariantToString(&vt, szDetail, cchMax, preferences.showFriendlyDates);
+		VariantClear(&vt);
+	}
+
+	return hr;
+}
+
+HRESULT GetItemDetailsRawData(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt)
+{
+	IShellFolder2 *pShellFolder = NULL;
+	HRESULT hr = SHBindToParent(itemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pShellFolder->GetDetailsEx(itemInfo.pridl.get(), pscid, vt);
+		pShellFolder->Release();
+	}
+
+	return hr;
+}
+
 std::wstring GetVersionColumnText(const ItemInfo_t &itemInfo, VersionInfoType_t VersioninfoType)
 {
 	std::wstring VersionInfoName;

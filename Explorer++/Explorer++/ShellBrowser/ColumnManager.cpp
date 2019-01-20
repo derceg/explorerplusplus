@@ -242,19 +242,19 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_TITLE:
-		return GetItemDetailsColumnText(itemInfo, &PKEY_Title);
+		return GetItemDetailsColumnText(itemInfo, &PKEY_Title, preferences);
 		break;
 	case CM_SUBJECT:
-		return GetItemDetailsColumnText(itemInfo, &PKEY_Subject);
+		return GetItemDetailsColumnText(itemInfo, &PKEY_Subject, preferences);
 		break;
 	case CM_AUTHORS:
-		return GetItemDetailsColumnText(itemInfo, &PKEY_Author);
+		return GetItemDetailsColumnText(itemInfo, &PKEY_Author, preferences);
 		break;
 	case CM_KEYWORDS:
-		return GetItemDetailsColumnText(itemInfo, &PKEY_Keywords);
+		return GetItemDetailsColumnText(itemInfo, &PKEY_Keywords, preferences);
 		break;
 	case CM_COMMENT:
-		return GetItemDetailsColumnText(itemInfo, &PKEY_Comment);
+		return GetItemDetailsColumnText(itemInfo, &PKEY_Comment, preferences);
 		break;
 
 	case CM_CAMERAMODEL:
@@ -287,11 +287,11 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_ORIGINALLOCATION:
-		return GetItemDetailsColumnText(itemInfo, &SCID_ORIGINAL_LOCATION);
+		return GetItemDetailsColumnText(itemInfo, &SCID_ORIGINAL_LOCATION, preferences);
 		break;
 
 	case CM_DATEDELETED:
-		return GetItemDetailsColumnText(itemInfo, &SCID_DATE_DELETED);
+		return GetItemDetailsColumnText(itemInfo, &SCID_DATE_DELETED, preferences);
 		break;
 
 	case CM_NUMPRINTERDOCUMENTS:
@@ -402,47 +402,6 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 std::wstring CShellBrowser::GetNameColumnText(const ItemInfo_t &itemInfo) const
 {
 	return ProcessItemFileName(itemInfo);
-}
-
-std::wstring CShellBrowser::GetItemDetailsColumnText(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid) const
-{
-	TCHAR szDetail[512];
-	HRESULT hr = GetItemDetails(itemInfo, pscid, szDetail, SIZEOF_ARRAY(szDetail));
-
-	if(SUCCEEDED(hr))
-	{
-		return szDetail;
-	}
-
-	return EMPTY_STRING;
-}
-
-HRESULT CShellBrowser::GetItemDetails(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const
-{
-	VARIANT vt;
-	HRESULT hr = GetItemDetailsRawData(itemInfo, pscid, &vt);
-
-	if (SUCCEEDED(hr))
-	{
-		hr = ConvertVariantToString(&vt, szDetail, cchMax, m_bShowFriendlyDates);
-		VariantClear(&vt);
-	}
-
-	return hr;
-}
-
-HRESULT CShellBrowser::GetItemDetailsRawData(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt) const
-{
-	IShellFolder2 *pShellFolder = NULL;
-	HRESULT hr = SHBindToParent(itemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
-
-	if (SUCCEEDED(hr))
-	{
-		hr = pShellFolder->GetDetailsEx(itemInfo.pridl.get(), pscid, vt);
-		pShellFolder->Release();
-	}
-
-	return hr;
 }
 
 void CShellBrowser::PlaceColumns(void)
