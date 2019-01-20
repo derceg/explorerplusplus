@@ -17,6 +17,7 @@
 #include <cassert>
 #include <propkey.h>
 #include <propvarutil.h>
+#include "ColumnDataRetrieval.h"
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
 #include "SortModes.h"

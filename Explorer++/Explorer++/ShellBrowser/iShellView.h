@@ -1,11 +1,11 @@
 #pragma once
 
+#include "ColumnDataRetrieval.h"
 #include "iPathManager.h"
+#include "ItemData.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
-#include "../Helper/PIDLWrapper.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/optional.hpp>
@@ -88,35 +88,6 @@ typedef struct
 	ULARGE_INTEGER TotalFolderSize;
 	ULARGE_INTEGER TotalSelectionSize;
 } FolderInfo_t;
-
-struct ItemInfo_t
-{
-	PIDLPointer		pidlComplete;
-	PIDLPointer		pridl;
-	WIN32_FIND_DATA	wfd;
-	TCHAR			szDisplayName[MAX_PATH];
-	BOOL			bReal;
-	BOOL			bIconRetrieved;
-	int				iIcon;
-
-	/* These are only used for drives. They are
-	needed for when a drive is removed from the
-	system, in which case the drive name is needed
-	so that the removed drive can be found. */
-	BOOL			bDrive;
-	TCHAR			szDrive[4];
-
-	/* Used for temporary sorting in details mode (i.e.
-	when items need to be rearranged). */
-	int				iRelativeSort;
-
-	std::wstring getFullPath() const
-	{
-		TCHAR fullPath[MAX_PATH];
-		GetDisplayName(pidlComplete.get(), fullPath, SIZEOF_ARRAY(fullPath), SHGDN_FORPARSING);
-		return fullPath;
-	}
-};
 
 typedef struct
 {
@@ -272,57 +243,11 @@ private:
 		DATE_TYPE_ACCESSED
 	};
 
-	enum MediaMetadataType_t
-	{
-		MEDIAMETADATA_TYPE_BITRATE,
-		MEDIAMETADATA_TYPE_COPYRIGHT,
-		MEDIAMETADATA_TYPE_DURATION,
-		MEDIAMETADATA_TYPE_PROTECTED,
-		MEDIAMETADATA_TYPE_RATING,
-		MEDIAMETADATA_TYPE_ALBUM_ARTIST,
-		MEDIAMETADATA_TYPE_ALBUM_TITLE,
-		MEDIAMETADATA_TYPE_BEATS_PER_MINUTE,
-		MEDIAMETADATA_TYPE_COMPOSER,
-		MEDIAMETADATA_TYPE_CONDUCTOR,
-		MEDIAMETADATA_TYPE_DIRECTOR,
-		MEDIAMETADATA_TYPE_GENRE,
-		MEDIAMETADATA_TYPE_LANGUAGE,
-		MEDIAMETADATA_TYPE_BROADCASTDATE,
-		MEDIAMETADATA_TYPE_CHANNEL,
-		MEDIAMETADATA_TYPE_STATIONNAME,
-		MEDIAMETADATA_TYPE_MOOD,
-		MEDIAMETADATA_TYPE_PARENTALRATING,
-		MEDIAMETADATA_TYPE_PARENTALRATINGREASON,
-		MEDIAMETADATA_TYPE_PERIOD,
-		MEDIAMETADATA_TYPE_PRODUCER,
-		MEDIAMETADATA_TYPE_PUBLISHER,
-		MEDIAMETADATA_TYPE_WRITER,
-		MEDIAMETADATA_TYPE_YEAR
-	};
-
 	enum TimeType_t
 	{
 		COLUMN_TIME_MODIFIED,
 		COLUMN_TIME_CREATED,
 		COLUMN_TIME_ACCESSED
-	};
-
-	enum VersionInfoType_t
-	{
-		VERSION_INFO_PRODUCT_NAME,
-		VERSION_INFO_COMPANY,
-		VERSION_INFO_DESCRIPTION,
-		VERSION_INFO_FILE_VERSION,
-		VERSION_INFO_PRODUCT_VERSION
-	};
-
-	enum PrinterInformationType_t
-	{
-		PRINTER_INFORMATION_TYPE_NUM_JOBS,
-		PRINTER_INFORMATION_TYPE_STATUS,
-		PRINTER_INFORMATION_TYPE_COMMENTS,
-		PRINTER_INFORMATION_TYPE_LOCATION,
-		PRINTER_INFORMATION_TYPE_MODEL
 	};
 
 	struct AlteredFile_t
@@ -451,32 +376,16 @@ private:
 
 	/* Listview columns. */
 	std::wstring		GetNameColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetTypeColumnText(const ItemInfo_t &itemInfo) const;
 	std::wstring		GetSizeColumnText(const ItemInfo_t &itemInfo) const;
 	std::wstring		GetFolderSizeColumnText(const ItemInfo_t &itemInfo) const;
 	std::wstring		GetTimeColumnText(const ItemInfo_t &itemInfo,TimeType_t TimeType) const;
-	std::wstring		GetAttributeColumnText(const ItemInfo_t &itemInfo) const;
 	bool				GetRealSizeColumnRawData(const ItemInfo_t &itemInfo,ULARGE_INTEGER &RealFileSize) const;
 	std::wstring		GetRealSizeColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetShortNameColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetOwnerColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetVersionColumnText(const ItemInfo_t &itemInfo, VersionInfoType_t VersioninfoType) const;
-	std::wstring		GetShortcutToColumnText(const ItemInfo_t &itemInfo) const;
-	DWORD				GetHardLinksColumnRawData(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetHardLinksColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetExtensionColumnText(const ItemInfo_t &itemInfo) const;
 	std::wstring		GetItemDetailsColumnText(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid) const;
 	HRESULT				GetItemDetails(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const;
 	HRESULT				GetItemDetailsRawData(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt) const;
-	std::wstring		GetImageColumnText(const ItemInfo_t &itemInfo, PROPID PropertyID) const;
-	std::wstring		GetFileSystemColumnText(const ItemInfo_t &itemInfo) const;
 	BOOL				GetDriveSpaceColumnRawData(const ItemInfo_t &itemInfo,bool TotalSize,ULARGE_INTEGER &DriveSpace) const;
 	std::wstring		GetDriveSpaceColumnText(const ItemInfo_t &itemInfo,bool TotalSize) const;
-	std::wstring		GetControlPanelCommentsColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetPrinterColumnText(const ItemInfo_t &itemInfo,PrinterInformationType_t PrinterInformationType) const;
-	std::wstring		GetNetworkAdapterColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetMediaMetadataColumnText(const ItemInfo_t &itemInfo,MediaMetadataType_t MediaMetaDataType) const;
-	const TCHAR			*GetMediaMetadataAttributeName(MediaMetadataType_t MediaMetaDataType) const;
 
 	/* Device change support. */
 	void				UpdateDriveIcon(const TCHAR *szDrive);
