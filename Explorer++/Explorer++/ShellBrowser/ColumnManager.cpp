@@ -29,9 +29,7 @@
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/Helper.h"
-#include "../Helper/DriveInfo.h"
 #include "../Helper/ShellHelper.h"
-#include "../Helper/FolderSize.h"
 #include "../Helper/Macros.h"
 
 
@@ -179,6 +177,7 @@ void CShellBrowser::SetColumnText(UINT ColumnID,int ItemIndex,int ColumnIndex)
 std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 {
 	const ItemInfo_t &itemInfo = m_itemInfoMap.at(InternalIndex);
+	Preferences_t preferences = CreatePreferencesStructure();
 
 	switch(ColumnID)
 	{
@@ -190,24 +189,24 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		return GetTypeColumnText(itemInfo);
 		break;
 	case CM_SIZE:
-		return GetSizeColumnText(itemInfo);
+		return GetSizeColumnText(itemInfo, preferences);
 		break;
 
 	case CM_DATEMODIFIED:
-		return GetTimeColumnText(itemInfo,COLUMN_TIME_MODIFIED);
+		return GetTimeColumnText(itemInfo, COLUMN_TIME_MODIFIED, preferences);
 		break;
 	case CM_CREATED:
-		return GetTimeColumnText(itemInfo,COLUMN_TIME_CREATED);
+		return GetTimeColumnText(itemInfo, COLUMN_TIME_CREATED, preferences);
 		break;
 	case CM_ACCESSED:
-		return GetTimeColumnText(itemInfo,COLUMN_TIME_ACCESSED);
+		return GetTimeColumnText(itemInfo, COLUMN_TIME_ACCESSED, preferences);
 		break;
 
 	case CM_ATTRIBUTES:
 		return GetAttributeColumnText(itemInfo);
 		break;
 	case CM_REALSIZE:
-		return GetRealSizeColumnText(itemInfo);
+		return GetRealSizeColumnText(itemInfo, preferences);
 		break;
 	case CM_SHORTNAME:
 		return GetShortNameColumnText(itemInfo);
@@ -276,11 +275,11 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 		break;
 
 	case CM_TOTALSIZE:
-		return GetDriveSpaceColumnText(itemInfo,true);
+		return GetDriveSpaceColumnText(itemInfo,true, preferences);
 		break;
 
 	case CM_FREESPACE:
-		return GetDriveSpaceColumnText(itemInfo,false);
+		return GetDriveSpaceColumnText(itemInfo,false, preferences);
 		break;
 
 	case CM_FILESYSTEM:
@@ -405,143 +404,6 @@ std::wstring CShellBrowser::GetNameColumnText(const ItemInfo_t &itemInfo) const
 	return ProcessItemFileName(itemInfo);
 }
 
-std::wstring CShellBrowser::GetSizeColumnText(const ItemInfo_t &itemInfo) const
-{
-	if((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
-	{
-		TCHAR drive[MAX_PATH];
-		StringCchCopy(drive, SIZEOF_ARRAY(drive), itemInfo.getFullPath().c_str());
-		PathStripToRoot(drive);
-
-		bool bNetworkRemovable = false;
-
-		if (GetDriveType(drive) == DRIVE_REMOVABLE ||
-			GetDriveType(drive) == DRIVE_REMOTE)
-		{
-			bNetworkRemovable = true;
-		}
-
-		if (m_bShowFolderSizes && !(m_bDisableFolderSizesNetworkRemovable && bNetworkRemovable))
-		{
-			return GetFolderSizeColumnText(itemInfo);
-		}
-		else
-		{
-			return EMPTY_STRING;
-		}
-	}
-
-	ULARGE_INTEGER FileSize = {itemInfo.wfd.nFileSizeLow,itemInfo.wfd.nFileSizeHigh};
-
-	TCHAR FileSizeText[64];
-	FormatSizeString(FileSize,FileSizeText,SIZEOF_ARRAY(FileSizeText),m_bForceSize,m_SizeDisplayFormat);
-
-	return FileSizeText;
-}
-
-std::wstring CShellBrowser::GetFolderSizeColumnText(const ItemInfo_t &itemInfo) const
-{
-	int numFolders;
-	int numFiles;
-	ULARGE_INTEGER totalFolderSize;
-	CalculateFolderSize(itemInfo.getFullPath().c_str(), &numFolders, &numFiles, &totalFolderSize);
-
-	/* TODO: This should
-	be done some other way.
-	Shouldn't depend on
-	the internal index. */
-	//m_cachedFolderSizes.insert({internalIndex, totalFolderSize.QuadPart});
-
-	TCHAR fileSizeText[64];
-	FormatSizeString(totalFolderSize, fileSizeText, SIZEOF_ARRAY(fileSizeText),
-		m_bForceSize, m_SizeDisplayFormat);
-
-	return fileSizeText;
-}
-
-std::wstring CShellBrowser::GetTimeColumnText(const ItemInfo_t &itemInfo,TimeType_t TimeType) const
-{
-	TCHAR FileTime[64];
-	BOOL bRet = FALSE;
-
-	switch(TimeType)
-	{
-	case COLUMN_TIME_MODIFIED:
-		bRet = CreateFileTimeString(&itemInfo.wfd.ftLastWriteTime,
-			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
-		break;
-
-	case COLUMN_TIME_CREATED:
-		bRet = CreateFileTimeString(&itemInfo.wfd.ftCreationTime,
-			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
-		break;
-
-	case COLUMN_TIME_ACCESSED:
-		bRet = CreateFileTimeString(&itemInfo.wfd.ftLastAccessTime,
-			FileTime,SIZEOF_ARRAY(FileTime),m_bShowFriendlyDates);
-		break;
-
-	default:
-		assert(false);
-		break;
-	}
-
-	if(!bRet)
-	{
-		return EMPTY_STRING;
-	}
-
-	return FileTime;
-}
-
-bool CShellBrowser::GetRealSizeColumnRawData(const ItemInfo_t &itemInfo,ULARGE_INTEGER &RealFileSize) const
-{
-	if((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
-	{
-		return false;
-	}
-
-	TCHAR Root[MAX_PATH];
-	StringCchCopy(Root,SIZEOF_ARRAY(Root),itemInfo.getFullPath().c_str());
-	PathStripToRoot(Root);
-
-	DWORD dwClusterSize;
-	BOOL bRet = GetClusterSize(Root, &dwClusterSize);
-
-	if(!bRet)
-	{
-		return false;
-	}
-
-	ULARGE_INTEGER RealFileSizeTemp = {itemInfo.wfd.nFileSizeLow,itemInfo.wfd.nFileSizeHigh};
-
-	if(RealFileSizeTemp.QuadPart != 0 && (RealFileSizeTemp.QuadPart % dwClusterSize) != 0)
-	{
-		RealFileSizeTemp.QuadPart += dwClusterSize - (RealFileSizeTemp.QuadPart % dwClusterSize);
-	}
-
-	RealFileSize = RealFileSizeTemp;
-
-	return true;
-}
-
-std::wstring CShellBrowser::GetRealSizeColumnText(const ItemInfo_t &itemInfo) const
-{
-	ULARGE_INTEGER RealFileSize;
-	bool Res = GetRealSizeColumnRawData(itemInfo,RealFileSize);
-
-	if(!Res)
-	{
-		return EMPTY_STRING;
-	}
-
-	TCHAR RealFileSizeText[32];
-	FormatSizeString(RealFileSize,RealFileSizeText,SIZEOF_ARRAY(RealFileSizeText),
-		m_bForceSize,m_SizeDisplayFormat);
-
-	return RealFileSizeText;
-}
-
 std::wstring CShellBrowser::GetItemDetailsColumnText(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid) const
 {
 	TCHAR szDetail[512];
@@ -581,51 +443,6 @@ HRESULT CShellBrowser::GetItemDetailsRawData(const ItemInfo_t &itemInfo, const S
 	}
 
 	return hr;
-}
-
-BOOL CShellBrowser::GetDriveSpaceColumnRawData(const ItemInfo_t &itemInfo,bool TotalSize,ULARGE_INTEGER &DriveSpace) const
-{
-	TCHAR FullFileName[MAX_PATH];
-	GetDisplayName(itemInfo.pidlComplete.get(),FullFileName,
-		SIZEOF_ARRAY(FullFileName),SHGDN_FORPARSING);
-
-	BOOL IsRoot = PathIsRoot(FullFileName);
-
-	if(!IsRoot)
-	{
-		return FALSE;
-	}
-
-	ULARGE_INTEGER TotalBytes;
-	ULARGE_INTEGER FreeBytes;
-	BOOL Res = GetDiskFreeSpaceEx(FullFileName,NULL,&TotalBytes,&FreeBytes);
-
-	if(TotalSize)
-	{
-		DriveSpace = TotalBytes;
-	}
-	else
-	{
-		DriveSpace = FreeBytes;
-	}
-
-	return Res;
-}
-
-std::wstring CShellBrowser::GetDriveSpaceColumnText(const ItemInfo_t &itemInfo,bool TotalSize) const
-{
-	ULARGE_INTEGER DriveSpace;
-	BOOL Res = GetDriveSpaceColumnRawData(itemInfo,TotalSize,DriveSpace);
-
-	if(!Res)
-	{
-		return EMPTY_STRING;
-	}
-
-	TCHAR SizeText[32];
-	FormatSizeString(DriveSpace,SizeText,SIZEOF_ARRAY(SizeText),m_bForceSize,m_SizeDisplayFormat);
-
-	return SizeText;
 }
 
 void CShellBrowser::PlaceColumns(void)

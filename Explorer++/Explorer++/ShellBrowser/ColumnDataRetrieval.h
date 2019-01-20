@@ -1,7 +1,15 @@
 #pragma once
 
 #include "ItemData.h"
+#include "TabPreferences.h"
 #include <string>
+
+enum TimeType_t
+{
+	COLUMN_TIME_MODIFIED,
+	COLUMN_TIME_CREATED,
+	COLUMN_TIME_ACCESSED
+};
 
 enum VersionInfoType_t
 {
@@ -50,6 +58,9 @@ enum MediaMetadataType_t
 };
 
 std::wstring GetTypeColumnText(const ItemInfo_t &itemInfo);
+std::wstring GetTimeColumnText(const ItemInfo_t &itemInfo, TimeType_t TimeType, const Preferences_t &preferences);
+std::wstring GetRealSizeColumnText(const ItemInfo_t &itemInfo, const Preferences_t &preferences);
+bool GetRealSizeColumnRawData(const ItemInfo_t &itemInfo, ULARGE_INTEGER &RealFileSize);
 std::wstring GetAttributeColumnText(const ItemInfo_t &itemInfo);
 std::wstring GetShortNameColumnText(const ItemInfo_t &itemInfo);
 std::wstring GetOwnerColumnText(const ItemInfo_t &itemInfo);
@@ -65,3 +76,7 @@ std::wstring GetPrinterColumnText(const ItemInfo_t &itemInfo, PrinterInformation
 std::wstring GetNetworkAdapterColumnText(const ItemInfo_t &itemInfo);
 std::wstring GetMediaMetadataColumnText(const ItemInfo_t &itemInfo, MediaMetadataType_t MediaMetaDataType);
 const TCHAR *GetMediaMetadataAttributeName(MediaMetadataType_t MediaMetaDataType);
+std::wstring GetDriveSpaceColumnText(const ItemInfo_t &itemInfo, bool TotalSize, const Preferences_t &preferences);
+BOOL GetDriveSpaceColumnRawData(const ItemInfo_t &itemInfo, bool TotalSize, ULARGE_INTEGER &DriveSpace);
+std::wstring GetSizeColumnText(const ItemInfo_t &itemInfo, const Preferences_t &preferences);
+std::wstring GetFolderSizeColumnText(const ItemInfo_t &itemInfo, const Preferences_t &preferences);

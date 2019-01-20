@@ -11,7 +11,9 @@
 
 #include "stdafx.h"
 #include "ColumnDataRetrieval.h"
+#include "../Helper/DriveInfo.h"
 #include "../Helper/FileOperations.h"
+#include "../Helper/FolderSize.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/StringHelper.h"
@@ -32,6 +34,143 @@ std::wstring GetTypeColumnText(const ItemInfo_t &itemInfo)
 	}
 
 	return shfi.szTypeName;
+}
+
+std::wstring GetSizeColumnText(const ItemInfo_t &itemInfo, const Preferences_t &preferences)
+{
+	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	{
+		TCHAR drive[MAX_PATH];
+		StringCchCopy(drive, SIZEOF_ARRAY(drive), itemInfo.getFullPath().c_str());
+		PathStripToRoot(drive);
+
+		bool bNetworkRemovable = false;
+
+		if (GetDriveType(drive) == DRIVE_REMOVABLE ||
+			GetDriveType(drive) == DRIVE_REMOTE)
+		{
+			bNetworkRemovable = true;
+		}
+
+		if (preferences.showFolderSizes && !(preferences.disableFolderSizesNetworkRemovable && bNetworkRemovable))
+		{
+			return GetFolderSizeColumnText(itemInfo, preferences);
+		}
+		else
+		{
+			return EMPTY_STRING;
+		}
+	}
+
+	ULARGE_INTEGER FileSize = { itemInfo.wfd.nFileSizeLow,itemInfo.wfd.nFileSizeHigh };
+
+	TCHAR FileSizeText[64];
+	FormatSizeString(FileSize, FileSizeText, SIZEOF_ARRAY(FileSizeText), preferences.forceSize, preferences.sizeDisplayFormat);
+
+	return FileSizeText;
+}
+
+std::wstring GetFolderSizeColumnText(const ItemInfo_t &itemInfo, const Preferences_t &preferences)
+{
+	int numFolders;
+	int numFiles;
+	ULARGE_INTEGER totalFolderSize;
+	CalculateFolderSize(itemInfo.getFullPath().c_str(), &numFolders, &numFiles, &totalFolderSize);
+
+	/* TODO: This should
+	be done some other way.
+	Shouldn't depend on
+	the internal index. */
+	//m_cachedFolderSizes.insert({internalIndex, totalFolderSize.QuadPart});
+
+	TCHAR fileSizeText[64];
+	FormatSizeString(totalFolderSize, fileSizeText, SIZEOF_ARRAY(fileSizeText),
+		preferences.forceSize, preferences.sizeDisplayFormat);
+
+	return fileSizeText;
+}
+
+std::wstring GetTimeColumnText(const ItemInfo_t &itemInfo, TimeType_t TimeType, const Preferences_t &preferences)
+{
+	TCHAR FileTime[64];
+	BOOL bRet = FALSE;
+
+	switch (TimeType)
+	{
+	case COLUMN_TIME_MODIFIED:
+		bRet = CreateFileTimeString(&itemInfo.wfd.ftLastWriteTime,
+			FileTime, SIZEOF_ARRAY(FileTime), preferences.showFriendlyDates);
+		break;
+
+	case COLUMN_TIME_CREATED:
+		bRet = CreateFileTimeString(&itemInfo.wfd.ftCreationTime,
+			FileTime, SIZEOF_ARRAY(FileTime), preferences.showFriendlyDates);
+		break;
+
+	case COLUMN_TIME_ACCESSED:
+		bRet = CreateFileTimeString(&itemInfo.wfd.ftLastAccessTime,
+			FileTime, SIZEOF_ARRAY(FileTime), preferences.showFriendlyDates);
+		break;
+
+	default:
+		assert(false);
+		break;
+	}
+
+	if (!bRet)
+	{
+		return EMPTY_STRING;
+	}
+
+	return FileTime;
+}
+
+std::wstring GetRealSizeColumnText(const ItemInfo_t &itemInfo, const Preferences_t &preferences)
+{
+	ULARGE_INTEGER RealFileSize;
+	bool Res = GetRealSizeColumnRawData(itemInfo, RealFileSize);
+
+	if (!Res)
+	{
+		return EMPTY_STRING;
+	}
+
+	TCHAR RealFileSizeText[32];
+	FormatSizeString(RealFileSize, RealFileSizeText, SIZEOF_ARRAY(RealFileSizeText),
+		preferences.forceSize, preferences.sizeDisplayFormat);
+
+	return RealFileSizeText;
+}
+
+bool GetRealSizeColumnRawData(const ItemInfo_t &itemInfo, ULARGE_INTEGER &RealFileSize)
+{
+	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	{
+		return false;
+	}
+
+	TCHAR Root[MAX_PATH];
+	StringCchCopy(Root, SIZEOF_ARRAY(Root), itemInfo.getFullPath().c_str());
+	PathStripToRoot(Root);
+
+	DWORD dwClusterSize;
+	BOOL bRet = GetClusterSize(Root, &dwClusterSize);
+
+	if (!bRet)
+	{
+		return false;
+	}
+
+	ULARGE_INTEGER RealFileSizeTemp = { itemInfo.wfd.nFileSizeLow,itemInfo.wfd.nFileSizeHigh };
+
+	if (RealFileSizeTemp.QuadPart != 0 && (RealFileSizeTemp.QuadPart % dwClusterSize) != 0)
+	{
+		RealFileSizeTemp.QuadPart += dwClusterSize - (RealFileSizeTemp.QuadPart % dwClusterSize);
+	}
+
+	RealFileSize = RealFileSizeTemp;
+
+	return true;
 }
 
 std::wstring GetAttributeColumnText(const ItemInfo_t &itemInfo)
@@ -576,4 +715,49 @@ const TCHAR *GetMediaMetadataAttributeName(MediaMetadataType_t MediaMetaDataType
 	}
 
 	return NULL;
+}
+
+std::wstring GetDriveSpaceColumnText(const ItemInfo_t &itemInfo, bool TotalSize, const Preferences_t &preferences)
+{
+	ULARGE_INTEGER DriveSpace;
+	BOOL Res = GetDriveSpaceColumnRawData(itemInfo, TotalSize, DriveSpace);
+
+	if (!Res)
+	{
+		return EMPTY_STRING;
+	}
+
+	TCHAR SizeText[32];
+	FormatSizeString(DriveSpace, SizeText, SIZEOF_ARRAY(SizeText), preferences.forceSize, preferences.sizeDisplayFormat);
+
+	return SizeText;
+}
+
+BOOL GetDriveSpaceColumnRawData(const ItemInfo_t &itemInfo, bool TotalSize, ULARGE_INTEGER &DriveSpace)
+{
+	TCHAR FullFileName[MAX_PATH];
+	GetDisplayName(itemInfo.pidlComplete.get(), FullFileName,
+		SIZEOF_ARRAY(FullFileName), SHGDN_FORPARSING);
+
+	BOOL IsRoot = PathIsRoot(FullFileName);
+
+	if (!IsRoot)
+	{
+		return FALSE;
+	}
+
+	ULARGE_INTEGER TotalBytes;
+	ULARGE_INTEGER FreeBytes;
+	BOOL Res = GetDiskFreeSpaceEx(FullFileName, NULL, &TotalBytes, &FreeBytes);
+
+	if (TotalSize)
+	{
+		DriveSpace = TotalBytes;
+	}
+	else
+	{
+		DriveSpace = FreeBytes;
+	}
+
+	return Res;
 }

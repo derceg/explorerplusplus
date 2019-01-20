@@ -243,13 +243,6 @@ private:
 		DATE_TYPE_ACCESSED
 	};
 
-	enum TimeType_t
-	{
-		COLUMN_TIME_MODIFIED,
-		COLUMN_TIME_CREATED,
-		COLUMN_TIME_ACCESSED
-	};
-
 	struct AlteredFile_t
 	{
 		TCHAR	szFileName[MAX_PATH];
@@ -337,6 +330,8 @@ private:
 	void				OnListViewGetDisplayInfo(LPARAM lParam);
 	void				ColumnClicked(int iClickedColumn);
 
+	Preferences_t		CreatePreferencesStructure() const;
+
 	/* Sorting. */
 	int CALLBACK		Sort(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
@@ -376,16 +371,9 @@ private:
 
 	/* Listview columns. */
 	std::wstring		GetNameColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetSizeColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetFolderSizeColumnText(const ItemInfo_t &itemInfo) const;
-	std::wstring		GetTimeColumnText(const ItemInfo_t &itemInfo,TimeType_t TimeType) const;
-	bool				GetRealSizeColumnRawData(const ItemInfo_t &itemInfo,ULARGE_INTEGER &RealFileSize) const;
-	std::wstring		GetRealSizeColumnText(const ItemInfo_t &itemInfo) const;
 	std::wstring		GetItemDetailsColumnText(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid) const;
 	HRESULT				GetItemDetails(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax) const;
 	HRESULT				GetItemDetailsRawData(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt) const;
-	BOOL				GetDriveSpaceColumnRawData(const ItemInfo_t &itemInfo,bool TotalSize,ULARGE_INTEGER &DriveSpace) const;
-	std::wstring		GetDriveSpaceColumnText(const ItemInfo_t &itemInfo,bool TotalSize) const;
 
 	/* Device change support. */
 	void				UpdateDriveIcon(const TCHAR *szDrive);

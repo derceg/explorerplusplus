@@ -430,6 +430,7 @@
     <ClInclude Include="ShellBrowser\iShellView.h" />
     <ClInclude Include="ShellBrowser\ItemData.h" />
     <ClInclude Include="ShellBrowser\SortModes.h" />
+    <ClInclude Include="ShellBrowser\TabPreferences.h" />
     <ClInclude Include="ShellBrowser\ViewModes.h" />
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />
