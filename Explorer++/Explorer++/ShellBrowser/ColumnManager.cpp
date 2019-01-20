@@ -434,7 +434,7 @@ HRESULT CShellBrowser::GetItemDetails(const ItemInfo_t &itemInfo, const SHCOLUMN
 HRESULT CShellBrowser::GetItemDetailsRawData(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt) const
 {
 	IShellFolder2 *pShellFolder = NULL;
-	HRESULT hr = BindToIdl(m_pidlDirectory, IID_PPV_ARGS(&pShellFolder));
+	HRESULT hr = SHBindToParent(itemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
 
 	if (SUCCEEDED(hr))
 	{
