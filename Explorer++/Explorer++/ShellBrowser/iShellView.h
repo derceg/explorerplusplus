@@ -356,7 +356,6 @@ private:
 	int CALLBACK		SortByMediaMetadata(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, MediaMetadataType_t MediaMetaDataType) const;
 
 	/* Listview column support. */
-	void				SetColumnText(UINT ColumnID,int ItemIndex,int ColumnIndex);
 	void				PlaceColumns(void);
 	void				QueueColumnTask(int itemInternalIndex, int columnIndex);
 	CShellBrowser::ColumnResult_t	GetColumnTextAsync(int columnResultId, unsigned int ColumnID, int InternalIndex) const;

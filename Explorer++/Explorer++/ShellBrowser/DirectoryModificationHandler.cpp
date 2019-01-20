@@ -439,7 +439,6 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 			if(m_ViewMode == VM_DETAILS)
 			{
 				std::list<Column_t>::iterator itrColumn;
-				int iColumnIndex = 0;
 
 				if(m_pActiveColumnList != NULL)
 				{
@@ -447,7 +446,7 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 					{
 						if(itrColumn->bChecked)
 						{
-							SetColumnText(itrColumn->id,iItem,iColumnIndex++);
+							QueueColumnTask(iItemInternal, itrColumn->id);
 						}
 					}
 				}

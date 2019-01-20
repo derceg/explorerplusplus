@@ -156,24 +156,6 @@ boost::optional<unsigned int> CShellBrowser::GetColumnIdByIndex(int index) const
 	return static_cast<unsigned int>(hdItem.lParam);
 }
 
-void CShellBrowser::SetColumnText(UINT ColumnID,int ItemIndex,int ColumnIndex)
-{
-	LVITEM lvItem;
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iSubItem	= 0;
-	lvItem.iItem	= ItemIndex;
-	BOOL ItemRetrieved = ListView_GetItem(m_hListView,&lvItem);
-	ItemRetrieved;
-
-	assert(ItemRetrieved);
-
-	std::wstring ColumnText = GetColumnText(ColumnID,static_cast<int>(lvItem.lParam));
-
-	TCHAR ColumnTextTemp[1024];
-	StringCchCopy(ColumnTextTemp,SIZEOF_ARRAY(ColumnTextTemp),ColumnText.c_str());
-	ListView_SetItemText(m_hListView,ItemIndex,ColumnIndex,ColumnTextTemp);
-}
-
 std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 {
 	const ItemInfo_t &itemInfo = m_itemInfoMap.at(InternalIndex);

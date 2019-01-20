@@ -1248,7 +1248,16 @@ void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns)
 
 					for(i = 0;i < m_nTotalItems;i++)
 					{
-						SetColumnText(itr->id,i,iColumn);
+						LVITEM lvItem;
+						lvItem.mask = LVIF_PARAM;
+						lvItem.iItem = i;
+						lvItem.iSubItem = 0;
+						BOOL res = ListView_GetItem(m_hListView, &lvItem);
+
+						if (res)
+						{
+							QueueColumnTask(static_cast<int>(lvItem.lParam), itr->id);
+						}
 					}
 				}
 			}
