@@ -158,7 +158,7 @@ boost::optional<unsigned int> CShellBrowser::GetColumnIdByIndex(int index) const
 		return boost::none;
 	}
 
-	return hdItem.lParam;
+	return static_cast<unsigned int>(hdItem.lParam);
 }
 
 void CShellBrowser::SetColumnText(UINT ColumnID,int ItemIndex,int ColumnIndex)
