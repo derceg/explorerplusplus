@@ -182,7 +182,7 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 	switch(ColumnID)
 	{
 	case CM_NAME:
-		return GetNameColumnText(itemInfo);
+		return GetNameColumnText(itemInfo, preferences);
 		break;
 
 	case CM_TYPE:
@@ -397,11 +397,6 @@ std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 	}
 
 	return EMPTY_STRING;
-}
-
-std::wstring CShellBrowser::GetNameColumnText(const ItemInfo_t &itemInfo) const
-{
-	return ProcessItemFileName(itemInfo);
 }
 
 void CShellBrowser::PlaceColumns(void)

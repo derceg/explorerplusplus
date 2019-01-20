@@ -183,7 +183,8 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	{
 		if(!IsFileFiltered(itr->iItemInternal))
 		{
-			std::wstring filename = ProcessItemFileName(m_itemInfoMap.at(itr->iItemInternal));
+			Preferences_t preferences = CreatePreferencesStructure();
+			std::wstring filename = ProcessItemFileName(m_itemInfoMap.at(itr->iItemInternal), preferences);
 
 			TCHAR filenameCopy[MAX_PATH];
 			StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());
@@ -283,49 +284,6 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 	}
 
 	return bFilenameFiltered || bHideSystemFile;
-}
-
-/* Processes an items filename. Essentially checks
-if the extension (if any) needs to be removed, and
-removes it if it does. */
-std::wstring CShellBrowser::ProcessItemFileName(const ItemInfo_t &itemInfo) const
-{
-	BOOL bHideExtension = FALSE;
-	TCHAR *pExt = NULL;
-
-	if(m_bHideLinkExtension &&
-		((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
-	{
-		pExt = PathFindExtension(itemInfo.szDisplayName);
-
-		if(*pExt != '\0')
-		{
-			if(lstrcmpi(pExt,_T(".lnk")) == 0)
-				bHideExtension = TRUE;
-		}
-	}
-
-	/* We'll hide the extension, provided it is meant
-	to be hidden, and the filename does not begin with
-	a period, and the item is not a directory. */
-	if((!m_bShowExtensions || bHideExtension) &&
-		itemInfo.szDisplayName[0] != '.' &&
-		(itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
-	{
-		static TCHAR szDisplayName[MAX_PATH];
-
-		StringCchCopy(szDisplayName,SIZEOF_ARRAY(szDisplayName),
-			itemInfo.szDisplayName);
-
-		/* Strip the extension. */
-		PathRemoveExtension(szDisplayName);
-
-		return szDisplayName;
-	}
-	else
-	{
-		return itemInfo.szDisplayName;
-	}
 }
 
 void CShellBrowser::RemoveItem(int iItemInternal)

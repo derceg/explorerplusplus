@@ -1562,5 +1562,7 @@ Preferences_t CShellBrowser::CreatePreferencesStructure() const
 	preferences.sizeDisplayFormat = m_SizeDisplayFormat;
 	preferences.showFolderSizes = m_bShowFolderSizes;
 	preferences.disableFolderSizesNetworkRemovable = m_bDisableFolderSizesNetworkRemovable;
+	preferences.hideLinkExtension = m_bHideLinkExtension;
+	preferences.showExtensions = m_bShowExtensions;
 	return preferences;
 }

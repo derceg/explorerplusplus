@@ -67,6 +67,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 
 	const ItemInfo_t &itemInfo1 = m_itemInfoMap.at(InternalIndex1);
 	const ItemInfo_t &itemInfo2 = m_itemInfoMap.at(InternalIndex2);
+	Preferences_t preferences = CreatePreferencesStructure();
 
 	bool IsFolder1 = ((itemInfo1.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	bool IsFolder2 = ((itemInfo2.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
@@ -86,7 +87,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 		switch(m_SortMode)
 		{
 		case FSM_NAME:
-			ComparisonResult = SortByName(itemInfo1, itemInfo2);
+			ComparisonResult = SortByName(itemInfo1, itemInfo2, preferences);
 			break;
 
 		case FSM_TYPE:
@@ -355,7 +356,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	return ComparisonResult;
 }
 
-int CALLBACK CShellBrowser::SortByName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, const Preferences_t &preferences) const
 {
 	if(m_bVirtualFolder)
 	{
@@ -378,8 +379,8 @@ int CALLBACK CShellBrowser::SortByName(const ItemInfo_t &itemInfo1, const ItemIn
 		}
 	}
 
-	std::wstring Name1 = GetNameColumnText(itemInfo1);
-	std::wstring Name2 = GetNameColumnText(itemInfo2);
+	std::wstring Name1 = GetNameColumnText(itemInfo1, preferences);
+	std::wstring Name2 = GetNameColumnText(itemInfo2, preferences);
 
 	return StrCmpLogicalW(Name1.c_str(),Name2.c_str());
 }

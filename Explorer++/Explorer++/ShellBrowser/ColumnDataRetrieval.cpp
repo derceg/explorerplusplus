@@ -22,6 +22,54 @@
 
 BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax);
 
+std::wstring GetNameColumnText(const ItemInfo_t &itemInfo, const Preferences_t &preferences)
+{
+	return ProcessItemFileName(itemInfo, preferences);
+}
+
+/* Processes an items filename. Essentially checks
+if the extension (if any) needs to be removed, and
+removes it if it does. */
+std::wstring ProcessItemFileName(const ItemInfo_t &itemInfo, const Preferences_t &preferences)
+{
+	BOOL bHideExtension = FALSE;
+	TCHAR *pExt = NULL;
+
+	if (preferences.hideLinkExtension &&
+		((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+	{
+		pExt = PathFindExtension(itemInfo.szDisplayName);
+
+		if (*pExt != '\0')
+		{
+			if (lstrcmpi(pExt, _T(".lnk")) == 0)
+				bHideExtension = TRUE;
+		}
+	}
+
+	/* We'll hide the extension, provided it is meant
+	to be hidden, and the filename does not begin with
+	a period, and the item is not a directory. */
+	if ((!preferences.showExtensions || bHideExtension) &&
+		itemInfo.szDisplayName[0] != '.' &&
+		(itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+	{
+		static TCHAR szDisplayName[MAX_PATH];
+
+		StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName),
+			itemInfo.szDisplayName);
+
+		/* Strip the extension. */
+		PathRemoveExtension(szDisplayName);
+
+		return szDisplayName;
+	}
+	else
+	{
+		return itemInfo.szDisplayName;
+	}
+}
+
 std::wstring GetTypeColumnText(const ItemInfo_t &itemInfo)
 {
 	SHFILEINFO shfi;

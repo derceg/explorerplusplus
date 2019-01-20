@@ -9,4 +9,6 @@ struct Preferences_t
 	SizeDisplayFormat_t sizeDisplayFormat;
 	BOOL showFolderSizes;
 	BOOL disableFolderSizesNetworkRemovable;
+	BOOL hideLinkExtension;
+	BOOL showExtensions;
 };

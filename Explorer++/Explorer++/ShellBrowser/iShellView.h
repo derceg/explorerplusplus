@@ -314,7 +314,6 @@ private:
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void inline			InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(int iItemInternal) const;
-	std::wstring		ProcessItemFileName(const ItemInfo_t &itemInfo) const;
 	HRESULT inline		AddItemInternal(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
 	HRESULT inline		AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
 	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName);
@@ -335,7 +334,7 @@ private:
 
 	/* Sorting. */
 	int CALLBACK		Sort(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, const Preferences_t &preferences) const;
 	int CALLBACK		SortBySize(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByType(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
 	int CALLBACK		SortByDate(int InternalIndex1,int InternalIndex2,DateType_t DateType) const;
@@ -369,9 +368,6 @@ private:
 	void				ProcessColumnResult(int columnResultId);
 	boost::optional<int>	GetColumnIndexById(unsigned int id) const;
 	boost::optional<unsigned int>	GetColumnIdByIndex(int index) const;
-
-	/* Listview columns. */
-	std::wstring		GetNameColumnText(const ItemInfo_t &itemInfo) const;
 
 	/* Device change support. */
 	void				UpdateDriveIcon(const TCHAR *szDrive);
