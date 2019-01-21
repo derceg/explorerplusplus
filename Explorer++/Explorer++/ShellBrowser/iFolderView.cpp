@@ -132,8 +132,6 @@ m_iconResultIDCounter(0)
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 	m_iFileIcon = GetDefaultFileIconIndex();
 
-	m_hIconEvent = CreateEvent(NULL,TRUE,TRUE,NULL);
-
 	m_ListViewSubclassed = SetWindowSubclass(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	HWND hParent = GetParent(hListView);
@@ -177,9 +175,6 @@ CShellBrowser::~CShellBrowser()
 
 		CoUninitialize();
 	});
-
-	/* Wait for any current processing to finish. */
-	WaitForSingleObject(m_hIconEvent,INFINITE);
 
 	/* Release the drag and drop helpers. */
 	m_pDropTargetHelper->Release();

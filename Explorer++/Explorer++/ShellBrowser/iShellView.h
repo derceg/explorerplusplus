@@ -531,7 +531,6 @@ private:
 	/* Internal state. */
 	LPITEMIDLIST		m_pidlDirectory;
 	HINSTANCE			m_hResourceModule;
-	HANDLE				m_hIconEvent;
 	TCHAR				m_CurDir[MAX_PATH];
 	ULARGE_INTEGER		m_ulTotalDirSize;
 	ULARGE_INTEGER		m_ulFileSelectionSize;
