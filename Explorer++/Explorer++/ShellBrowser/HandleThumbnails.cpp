@@ -111,14 +111,14 @@ void CShellBrowser::QueueThumbnailTask(int internalIndex)
 	auto result = m_itemImageThreadPool.push([this, thumbnailResultID, internalIndex, basicItemInfo](int id) {
 		UNREFERENCED_PARAMETER(id);
 
-		return this->FindThumbnailAsync(thumbnailResultID, internalIndex, basicItemInfo);
+		return FindThumbnailAsync(m_hListView, thumbnailResultID, internalIndex, basicItemInfo);
 	});
 
 	m_thumbnailResults.insert({ thumbnailResultID, std::move(result) });
 }
 
-boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAsync(int thumbnailResultId,
-	int internalIndex, const BasicItemInfo_t &basicItemInfo) const
+boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAsync(HWND listView,
+	int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo)
 {
 	IShellFolder *pShellFolder = nullptr;
 	HRESULT hr = SHBindToParent(basicItemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
@@ -170,7 +170,7 @@ boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAs
 		return boost::none;
 	}
 
-	PostMessage(m_hListView, WM_APP_THUMBNAIL_RESULT_READY, thumbnailResultId, 0);
+	PostMessage(listView, WM_APP_THUMBNAIL_RESULT_READY, thumbnailResultId, 0);
 
 	ThumbnailResult_t result;
 	result.itemInternalIndex = internalIndex;

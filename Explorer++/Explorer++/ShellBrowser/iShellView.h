@@ -454,7 +454,7 @@ private:
 
 	/* Thumbnails view. */
 	void				QueueThumbnailTask(int internalIndex);
-	boost::optional<ThumbnailResult_t>	FindThumbnailAsync(int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo) const;
+	static boost::optional<ThumbnailResult_t>	FindThumbnailAsync(HWND listView, int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo);
 	void				ProcessThumbnailResult(int thumbnailResultId);
 	void				SetupThumbnailsView(void);
 	void				RemoveThumbnailsView(void);
