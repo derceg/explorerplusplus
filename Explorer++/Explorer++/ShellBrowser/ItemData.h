@@ -6,6 +6,7 @@
 struct BasicItemInfo_t
 {
 	BasicItemInfo_t() = default;
+	BasicItemInfo_t(BasicItemInfo_t &&) = default;
 
 	// Being able to explicitly copy this structure is important. The
 	// structure can be passed to a background thread and that thread
