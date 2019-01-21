@@ -388,21 +388,24 @@ void CShellBrowser::QueueIconTask(int internalIndex)
 {
 	int iconResultID = m_iconResultIDCounter++;
 
-	auto result = m_itemImageThreadPool.push([this, iconResultID, internalIndex](int id) {
+	BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
+
+	auto result = m_itemImageThreadPool.push([this, iconResultID, internalIndex, basicItemInfo](int id) {
 		UNREFERENCED_PARAMETER(id);
 
-		return this->FindIconAsync(iconResultID, internalIndex);
+		return this->FindIconAsync(m_hListView, iconResultID, internalIndex, basicItemInfo);
 	});
 
 	m_iconResults.insert({ iconResultID, std::move(result) });
 }
 
-boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindIconAsync(int iconResultId, int internalIndex) const
+boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindIconAsync(HWND listView, int iconResultId, int internalIndex,
+	const BasicItemInfo_t &basicItemInfo)
 {
 	// Must use SHGFI_ICON here, rather than SHGFO_SYSICONINDEX, or else 
 	// icon overlays won't be applied.
 	SHFILEINFO shfi;
-	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(m_itemInfoMap.at(internalIndex).pidlComplete.get()),
+	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(basicItemInfo.pidlComplete.get()),
 		0, &shfi, sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
 
 	if (res == 0)
@@ -412,7 +415,7 @@ boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindIconAsync(int i
 
 	DestroyIcon(shfi.hIcon);
 
-	PostMessage(m_hListView, WM_APP_ICON_RESULT_READY, iconResultId, 0);
+	PostMessage(listView, WM_APP_ICON_RESULT_READY, iconResultId, 0);
 
 	ImageResult_t result;
 	result.itemInternalIndex = internalIndex;

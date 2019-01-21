@@ -442,7 +442,7 @@ private:
 
 	/* LIstview icons. */
 	void				QueueIconTask(int internalIndex);
-	boost::optional<ImageResult_t>	FindIconAsync(int iconResultId, int internalIndex) const;
+	static boost::optional<ImageResult_t>	FindIconAsync(HWND listView, int iconResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo);
 	void				ProcessIconResult(int iconResultId);
 
 	/* Thumbnails view. */
