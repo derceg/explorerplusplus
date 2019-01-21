@@ -14,6 +14,7 @@
 #include "stdafx.h"
 #include "iShellView.h"
 #include "iShellBrowser_internal.h"
+#include "ItemData.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/Controls.h"
@@ -1574,4 +1575,17 @@ Preferences_t CShellBrowser::CreatePreferencesStructure() const
 	preferences.hideLinkExtension = m_bHideLinkExtension;
 	preferences.showExtensions = m_bShowExtensions;
 	return preferences;
+}
+
+BasicItemInfo_t CShellBrowser::getBasicItemInfo(int internalIndex) const
+{
+	const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
+
+	BasicItemInfo_t basicItemInfo;
+	basicItemInfo.pidlComplete.reset(ILClone(itemInfo.pidlComplete.get()));
+	basicItemInfo.pridl.reset(ILClone(itemInfo.pridl.get()));
+	basicItemInfo.wfd = itemInfo.wfd;
+	StringCchCopy(basicItemInfo.szDisplayName, SIZEOF_ARRAY(basicItemInfo.szDisplayName), itemInfo.szDisplayName);
+
+	return basicItemInfo;
 }

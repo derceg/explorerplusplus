@@ -65,12 +65,12 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 {
 	int ComparisonResult = 0;
 
-	const ItemInfo_t &itemInfo1 = m_itemInfoMap.at(InternalIndex1);
-	const ItemInfo_t &itemInfo2 = m_itemInfoMap.at(InternalIndex2);
+	BasicItemInfo_t basicItemInfo1 = getBasicItemInfo(InternalIndex1);
+	BasicItemInfo_t basicItemInfo2 = getBasicItemInfo(InternalIndex2);
 	Preferences_t preferences = CreatePreferencesStructure();
 
-	bool IsFolder1 = ((itemInfo1.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
-	bool IsFolder2 = ((itemInfo2.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder1 = ((basicItemInfo1.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder2 = ((basicItemInfo2.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	
 	/* Folders will always be sorted separately from files,
 	except in the recycle bin. */
@@ -87,11 +87,11 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 		switch(m_SortMode)
 		{
 		case FSM_NAME:
-			ComparisonResult = SortByName(itemInfo1, itemInfo2, preferences);
+			ComparisonResult = SortByName(basicItemInfo1, basicItemInfo2, preferences);
 			break;
 
 		case FSM_TYPE:
-			ComparisonResult = SortByType(itemInfo1,itemInfo2);
+			ComparisonResult = SortByType(basicItemInfo1,basicItemInfo2);
 			break;
 
 		case FSM_SIZE:
@@ -103,67 +103,67 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_TOTALSIZE:
-			ComparisonResult = SortByTotalSize(itemInfo1,itemInfo2,TRUE);
+			ComparisonResult = SortByTotalSize(basicItemInfo1,basicItemInfo2,TRUE);
 			break;
 
 		case FSM_FREESPACE:
-			ComparisonResult = SortByTotalSize(itemInfo1,itemInfo2,FALSE);
+			ComparisonResult = SortByTotalSize(basicItemInfo1,basicItemInfo2,FALSE);
 			break;
 
 		case FSM_DATEDELETED:
-			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2, &SCID_DATE_DELETED);
+			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2, &SCID_DATE_DELETED);
 			break;
 
 		case FSM_ORIGINALLOCATION:
-			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2, &SCID_ORIGINAL_LOCATION);
+			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2, &SCID_ORIGINAL_LOCATION);
 			break;
 
 		case FSM_ATTRIBUTES:
-			ComparisonResult = SortByAttributes(itemInfo1, itemInfo2);
+			ComparisonResult = SortByAttributes(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case FSM_REALSIZE:
-			ComparisonResult = SortByRealSize(itemInfo1, itemInfo2);
+			ComparisonResult = SortByRealSize(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case FSM_SHORTNAME:
-			ComparisonResult = SortByShortName(itemInfo1, itemInfo2);
+			ComparisonResult = SortByShortName(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case FSM_OWNER:
-			ComparisonResult = SortByOwner(itemInfo1, itemInfo2);
+			ComparisonResult = SortByOwner(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case FSM_PRODUCTNAME:
-			ComparisonResult = SortByVersionInfo(itemInfo1, itemInfo2,VERSION_INFO_PRODUCT_NAME);
+			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VERSION_INFO_PRODUCT_NAME);
 			break;
 
 		case FSM_COMPANY:
-			ComparisonResult = SortByVersionInfo(itemInfo1, itemInfo2,VERSION_INFO_COMPANY);
+			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VERSION_INFO_COMPANY);
 			break;
 
 		case FSM_DESCRIPTION:
-			ComparisonResult = SortByVersionInfo(itemInfo1, itemInfo2,VERSION_INFO_DESCRIPTION);
+			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VERSION_INFO_DESCRIPTION);
 			break;
 
 		case FSM_FILEVERSION:
-			ComparisonResult = SortByVersionInfo(itemInfo1, itemInfo2,VERSION_INFO_FILE_VERSION);
+			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VERSION_INFO_FILE_VERSION);
 			break;
 
 		case FSM_PRODUCTVERSION:
-			ComparisonResult = SortByVersionInfo(itemInfo1, itemInfo2,VERSION_INFO_PRODUCT_VERSION);
+			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VERSION_INFO_PRODUCT_VERSION);
 			break;
 
 		case FSM_SHORTCUTTO:
-			ComparisonResult = SortByShortcutTo(itemInfo1, itemInfo2);
+			ComparisonResult = SortByShortcutTo(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case FSM_HARDLINKS:
-			ComparisonResult = SortByHardlinks(itemInfo1, itemInfo2);
+			ComparisonResult = SortByHardlinks(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case FSM_EXTENSION:
-			ComparisonResult = SortByExtension(itemInfo1,itemInfo2);
+			ComparisonResult = SortByExtension(basicItemInfo1,basicItemInfo2);
 			break;
 
 		case FSM_CREATED:
@@ -175,163 +175,163 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case FSM_TITLE:
-			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2,&PKEY_Title);
+			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Title);
 			break;
 
 		case FSM_SUBJECT:
-			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2,&PKEY_Subject);
+			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Subject);
 			break;
 
 		case FSM_AUTHORS:
-			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2,&PKEY_Author);
+			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Author);
 			break;
 
 		case FSM_KEYWORDS:
-			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2,&PKEY_Keywords);
+			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Keywords);
 			break;
 
 		case FSM_COMMENTS:
-			ComparisonResult = SortByItemDetails(itemInfo1, itemInfo2,&PKEY_Comment);
+			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Comment);
 			break;
 
 		case FSM_CAMERAMODEL:
-			ComparisonResult = SortByImageProperty(itemInfo1, itemInfo2,PropertyTagEquipModel);
+			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagEquipModel);
 			break;
 
 		case FSM_DATETAKEN:
-			ComparisonResult = SortByImageProperty(itemInfo1, itemInfo2,PropertyTagDateTime);
+			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagDateTime);
 			break;
 
 		case FSM_WIDTH:
-			ComparisonResult = SortByImageProperty(itemInfo1, itemInfo2,PropertyTagImageWidth);
+			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagImageWidth);
 			break;
 
 		case FSM_HEIGHT:
-			ComparisonResult = SortByImageProperty(itemInfo1, itemInfo2,PropertyTagImageHeight);
+			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagImageHeight);
 			break;
 
 		case FSM_VIRTUALCOMMENTS:
-			ComparisonResult = SortByVirtualComments(itemInfo1, itemInfo2);
+			ComparisonResult = SortByVirtualComments(basicItemInfo1, basicItemInfo2);
 			break;
 
 		case FSM_FILESYSTEM:
-			ComparisonResult = SortByFileSystem(itemInfo1,itemInfo2);
+			ComparisonResult = SortByFileSystem(basicItemInfo1,basicItemInfo2);
 			break;
 
 		case FSM_NUMPRINTERDOCUMENTS:
-			ComparisonResult = SortByPrinterProperty(itemInfo1,itemInfo2,PRINTER_INFORMATION_TYPE_NUM_JOBS);
+			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PRINTER_INFORMATION_TYPE_NUM_JOBS);
 			break;
 
 		case FSM_PRINTERSTATUS:
-			ComparisonResult = SortByPrinterProperty(itemInfo1,itemInfo2,PRINTER_INFORMATION_TYPE_STATUS);
+			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PRINTER_INFORMATION_TYPE_STATUS);
 			break;
 
 		case FSM_PRINTERCOMMENTS:
-			ComparisonResult = SortByPrinterProperty(itemInfo1,itemInfo2,PRINTER_INFORMATION_TYPE_COMMENTS);
+			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PRINTER_INFORMATION_TYPE_COMMENTS);
 			break;
 
 		case FSM_PRINTERLOCATION:
-			ComparisonResult = SortByPrinterProperty(itemInfo1,itemInfo2,PRINTER_INFORMATION_TYPE_LOCATION);
+			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PRINTER_INFORMATION_TYPE_LOCATION);
 			break;
 
 		case FSM_NETWORKADAPTER_STATUS:
-			ComparisonResult = SortByNetworkAdapterStatus(itemInfo1,itemInfo2);
+			ComparisonResult = SortByNetworkAdapterStatus(basicItemInfo1,basicItemInfo2);
 			break;
 
 		case FSM_MEDIA_BITRATE:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_BITRATE);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_BITRATE);
 			break;
 
 		case FSM_MEDIA_COPYRIGHT:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_COPYRIGHT);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_COPYRIGHT);
 			break;
 
 		case FSM_MEDIA_DURATION:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_DURATION);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_DURATION);
 			break;
 
 		case FSM_MEDIA_PROTECTED:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PROTECTED);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PROTECTED);
 			break;
 
 		case FSM_MEDIA_RATING:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_RATING);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_RATING);
 			break;
 
 		case FSM_MEDIA_ALBUMARTIST:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_ALBUM_ARTIST);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_ALBUM_ARTIST);
 			break;
 
 		case FSM_MEDIA_ALBUM:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_ALBUM_TITLE);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_ALBUM_TITLE);
 			break;
 
 		case FSM_MEDIA_BEATSPERMINUTE:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_BEATS_PER_MINUTE);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_BEATS_PER_MINUTE);
 			break;
 
 		case FSM_MEDIA_COMPOSER:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_COMPOSER);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_COMPOSER);
 			break;
 
 		case FSM_MEDIA_CONDUCTOR:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_CONDUCTOR);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_CONDUCTOR);
 			break;
 
 		case FSM_MEDIA_DIRECTOR:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_DIRECTOR);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_DIRECTOR);
 			break;
 
 		case FSM_MEDIA_GENRE:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_GENRE);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_GENRE);
 			break;
 
 		case FSM_MEDIA_LANGUAGE:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_LANGUAGE);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_LANGUAGE);
 			break;
 
 		case FSM_MEDIA_BROADCASTDATE:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_BROADCASTDATE);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_BROADCASTDATE);
 			break;
 
 		case FSM_MEDIA_CHANNEL:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_CHANNEL);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_CHANNEL);
 			break;
 
 		case FSM_MEDIA_STATIONNAME:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_STATIONNAME);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_STATIONNAME);
 			break;
 
 		case FSM_MEDIA_MOOD:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_MOOD);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_MOOD);
 			break;
 
 		case FSM_MEDIA_PARENTALRATING:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PARENTALRATING);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PARENTALRATING);
 			break;
 
 		case FSM_MEDIA_PARENTALRATINGREASON:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
 			break;
 
 		case FSM_MEDIA_PERIOD:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PERIOD);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PERIOD);
 			break;
 
 		case FSM_MEDIA_PRODUCER:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PRODUCER);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PRODUCER);
 			break;
 
 		case FSM_MEDIA_PUBLISHER:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_PUBLISHER);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PUBLISHER);
 			break;
 
 		case FSM_MEDIA_WRITER:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_WRITER);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_WRITER);
 			break;
 
 		case FSM_MEDIA_YEAR:
-			ComparisonResult = SortByMediaMetadata(itemInfo1, itemInfo2,MEDIAMETADATA_TYPE_YEAR);
+			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_YEAR);
 			break;
 
 		default:
@@ -356,7 +356,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	return ComparisonResult;
 }
 
-int CALLBACK CShellBrowser::SortByName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, const Preferences_t &preferences) const
+int CALLBACK CShellBrowser::SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const Preferences_t &preferences) const
 {
 	if(m_bVirtualFolder)
 	{
@@ -432,7 +432,7 @@ int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) co
 	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByType(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
 	if(m_bVirtualFolder)
 	{
@@ -485,7 +485,7 @@ int CALLBACK CShellBrowser::SortByDate(int InternalIndex1,int InternalIndex2,Dat
 	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByTotalSize(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, bool TotalSize) const
+int CALLBACK CShellBrowser::SortByTotalSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, bool TotalSize) const
 {
 	ULARGE_INTEGER DriveSpace1;
 	BOOL Res1 = GetDriveSpaceColumnRawData(itemInfo1,TotalSize,DriveSpace1);
@@ -518,7 +518,7 @@ int CALLBACK CShellBrowser::SortByTotalSize(const ItemInfo_t &itemInfo1, const I
 	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByAttributes(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByAttributes(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
 	std::wstring AttributeString1 = GetAttributeColumnText(itemInfo1);
 	std::wstring AttributeString2 = GetAttributeColumnText(itemInfo2);
@@ -526,7 +526,7 @@ int CALLBACK CShellBrowser::SortByAttributes(const ItemInfo_t &itemInfo1, const 
 	return StrCmpLogicalW(AttributeString1.c_str(),AttributeString2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByRealSize(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByRealSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
 	ULARGE_INTEGER RealFileSize1;
 	bool Res1 = GetRealSizeColumnRawData(itemInfo1,RealFileSize1);
@@ -559,7 +559,7 @@ int CALLBACK CShellBrowser::SortByRealSize(const ItemInfo_t &itemInfo1, const It
 	return 0;
 }
 
-int CALLBACK CShellBrowser::SortByShortName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByShortName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
 	std::wstring ShortName1 = GetShortNameColumnText(itemInfo1);
 	std::wstring ShortName2 = GetShortNameColumnText(itemInfo2);
@@ -567,7 +567,7 @@ int CALLBACK CShellBrowser::SortByShortName(const ItemInfo_t &itemInfo1, const I
 	return StrCmpLogicalW(ShortName1.c_str(),ShortName2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByOwner(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByOwner(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
 	std::wstring Owner1 = GetOwnerColumnText(itemInfo1);
 	std::wstring Owner2 = GetOwnerColumnText(itemInfo2);
@@ -575,7 +575,7 @@ int CALLBACK CShellBrowser::SortByOwner(const ItemInfo_t &itemInfo1, const ItemI
 	return StrCmpLogicalW(Owner1.c_str(),Owner2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByVersionInfo(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, VersionInfoType_t VersioninfoType) const
+int CALLBACK CShellBrowser::SortByVersionInfo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, VersionInfoType_t VersioninfoType) const
 {
 	std::wstring VersionInfo1 = GetVersionColumnText(itemInfo1,VersioninfoType);
 	std::wstring VersionInfo2 = GetVersionColumnText(itemInfo2,VersioninfoType);
@@ -583,7 +583,7 @@ int CALLBACK CShellBrowser::SortByVersionInfo(const ItemInfo_t &itemInfo1, const
 	return StrCmpLogicalW(VersionInfo1.c_str(),VersionInfo2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByShortcutTo(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByShortcutTo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
 	std::wstring ResolvedLinkPath1 = GetShortcutToColumnText(itemInfo1);
 	std::wstring ResolvedLinkPath2 = GetShortcutToColumnText(itemInfo2);
@@ -591,7 +591,7 @@ int CALLBACK CShellBrowser::SortByShortcutTo(const ItemInfo_t &itemInfo1, const 
 	return StrCmpLogicalW(ResolvedLinkPath1.c_str(),ResolvedLinkPath2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByHardlinks(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByHardlinks(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
 	DWORD NumHardLinks1 = GetHardLinksColumnRawData(itemInfo1);
 	DWORD NumHardLinks2 = GetHardLinksColumnRawData(itemInfo2);
@@ -599,7 +599,7 @@ int CALLBACK CShellBrowser::SortByHardlinks(const ItemInfo_t &itemInfo1, const I
 	return NumHardLinks1 - NumHardLinks2;
 }
 
-int CALLBACK CShellBrowser::SortByExtension(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByExtension(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
 	std::wstring Extension1 = GetExtensionColumnText(itemInfo1);
 	std::wstring Extension2 = GetExtensionColumnText(itemInfo2);
@@ -607,7 +607,7 @@ int CALLBACK CShellBrowser::SortByExtension(const ItemInfo_t &itemInfo1, const I
 	return StrCmpLogicalW(Extension1.c_str(),Extension2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByItemDetails(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, const SHCOLUMNID *pscid) const
+int CALLBACK CShellBrowser::SortByItemDetails(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const SHCOLUMNID *pscid) const
 {
 	VARIANT vt1;
 	HRESULT hr1 = GetItemDetailsRawData(itemInfo1, pscid, &vt1);
@@ -635,7 +635,7 @@ int CALLBACK CShellBrowser::SortByItemDetails(const ItemInfo_t &itemInfo1, const
 	return ret;
 }
 
-int CALLBACK CShellBrowser::SortByImageProperty(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, PROPID PropertyId) const
+int CALLBACK CShellBrowser::SortByImageProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PROPID PropertyId) const
 {
 	std::wstring ImageProperty1 = GetImageColumnText(itemInfo1,PropertyId);
 	std::wstring ImageProperty2 = GetImageColumnText(itemInfo2,PropertyId);
@@ -643,7 +643,7 @@ int CALLBACK CShellBrowser::SortByImageProperty(const ItemInfo_t &itemInfo1, con
 	return StrCmpLogicalW(ImageProperty1.c_str(),ImageProperty2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByVirtualComments(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByVirtualComments(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
 	std::wstring Comments1 = GetControlPanelCommentsColumnText(itemInfo1);
 	std::wstring Comments2 = GetControlPanelCommentsColumnText(itemInfo2);
@@ -651,7 +651,7 @@ int CALLBACK CShellBrowser::SortByVirtualComments(const ItemInfo_t &itemInfo1, c
 	return StrCmpLogicalW(Comments1.c_str(),Comments2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByFileSystem(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByFileSystem(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
 	std::wstring FileSystemName1 = GetFileSystemColumnText(itemInfo1);
 	std::wstring FileSystemName2 = GetFileSystemColumnText(itemInfo2);
@@ -659,7 +659,7 @@ int CALLBACK CShellBrowser::SortByFileSystem(const ItemInfo_t &itemInfo1, const 
 	return StrCmpLogicalW(FileSystemName1.c_str(),FileSystemName2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByPrinterProperty(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, PrinterInformationType_t PrinterInformationType) const
+int CALLBACK CShellBrowser::SortByPrinterProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PrinterInformationType_t PrinterInformationType) const
 {
 	std::wstring PrinterInformation1 = GetPrinterColumnText(itemInfo1,PrinterInformationType);
 	std::wstring PrinterInformation2 = GetPrinterColumnText(itemInfo2,PrinterInformationType);
@@ -667,7 +667,7 @@ int CALLBACK CShellBrowser::SortByPrinterProperty(const ItemInfo_t &itemInfo1, c
 	return StrCmpLogicalW(PrinterInformation1.c_str(),PrinterInformation2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByNetworkAdapterStatus(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const
+int CALLBACK CShellBrowser::SortByNetworkAdapterStatus(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
 	std::wstring Status1 = GetNetworkAdapterColumnText(itemInfo1);
 	std::wstring Status2 = GetNetworkAdapterColumnText(itemInfo2);
@@ -675,7 +675,7 @@ int CALLBACK CShellBrowser::SortByNetworkAdapterStatus(const ItemInfo_t &itemInf
 	return StrCmpLogicalW(Status1.c_str(),Status2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByMediaMetadata(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, MediaMetadataType_t MediaMetaDataType) const
+int CALLBACK CShellBrowser::SortByMediaMetadata(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, MediaMetadataType_t MediaMetaDataType) const
 {
 	std::wstring MediaMetadata1 = GetMediaMetadataColumnText(itemInfo1,MediaMetaDataType);
 	std::wstring MediaMetadata2 = GetMediaMetadataColumnText(itemInfo2,MediaMetaDataType);

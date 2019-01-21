@@ -158,219 +158,219 @@ boost::optional<unsigned int> CShellBrowser::GetColumnIdByIndex(int index) const
 
 std::wstring CShellBrowser::GetColumnText(UINT ColumnID,int InternalIndex) const
 {
-	const ItemInfo_t &itemInfo = m_itemInfoMap.at(InternalIndex);
+	BasicItemInfo_t basicItemInfo = getBasicItemInfo(InternalIndex);
 	Preferences_t preferences = CreatePreferencesStructure();
 
 	switch(ColumnID)
 	{
 	case CM_NAME:
-		return GetNameColumnText(itemInfo, preferences);
+		return GetNameColumnText(basicItemInfo, preferences);
 		break;
 
 	case CM_TYPE:
-		return GetTypeColumnText(itemInfo);
+		return GetTypeColumnText(basicItemInfo);
 		break;
 	case CM_SIZE:
-		return GetSizeColumnText(itemInfo, preferences);
+		return GetSizeColumnText(basicItemInfo, preferences);
 		break;
 
 	case CM_DATEMODIFIED:
-		return GetTimeColumnText(itemInfo, COLUMN_TIME_MODIFIED, preferences);
+		return GetTimeColumnText(basicItemInfo, COLUMN_TIME_MODIFIED, preferences);
 		break;
 	case CM_CREATED:
-		return GetTimeColumnText(itemInfo, COLUMN_TIME_CREATED, preferences);
+		return GetTimeColumnText(basicItemInfo, COLUMN_TIME_CREATED, preferences);
 		break;
 	case CM_ACCESSED:
-		return GetTimeColumnText(itemInfo, COLUMN_TIME_ACCESSED, preferences);
+		return GetTimeColumnText(basicItemInfo, COLUMN_TIME_ACCESSED, preferences);
 		break;
 
 	case CM_ATTRIBUTES:
-		return GetAttributeColumnText(itemInfo);
+		return GetAttributeColumnText(basicItemInfo);
 		break;
 	case CM_REALSIZE:
-		return GetRealSizeColumnText(itemInfo, preferences);
+		return GetRealSizeColumnText(basicItemInfo, preferences);
 		break;
 	case CM_SHORTNAME:
-		return GetShortNameColumnText(itemInfo);
+		return GetShortNameColumnText(basicItemInfo);
 		break;
 	case CM_OWNER:
-		return GetOwnerColumnText(itemInfo);
+		return GetOwnerColumnText(basicItemInfo);
 		break;
 
 	case CM_PRODUCTNAME:
-		return GetVersionColumnText(itemInfo,VERSION_INFO_PRODUCT_NAME);
+		return GetVersionColumnText(basicItemInfo,VERSION_INFO_PRODUCT_NAME);
 		break;
 	case CM_COMPANY:
-		return GetVersionColumnText(itemInfo,VERSION_INFO_COMPANY);
+		return GetVersionColumnText(basicItemInfo,VERSION_INFO_COMPANY);
 		break;
 	case CM_DESCRIPTION:
-		return GetVersionColumnText(itemInfo,VERSION_INFO_DESCRIPTION);
+		return GetVersionColumnText(basicItemInfo,VERSION_INFO_DESCRIPTION);
 		break;
 	case CM_FILEVERSION:
-		return GetVersionColumnText(itemInfo,VERSION_INFO_FILE_VERSION);
+		return GetVersionColumnText(basicItemInfo,VERSION_INFO_FILE_VERSION);
 		break;
 	case CM_PRODUCTVERSION:
-		return GetVersionColumnText(itemInfo,VERSION_INFO_PRODUCT_VERSION);
+		return GetVersionColumnText(basicItemInfo,VERSION_INFO_PRODUCT_VERSION);
 		break;
 
 	case CM_SHORTCUTTO:
-		return GetShortcutToColumnText(itemInfo);
+		return GetShortcutToColumnText(basicItemInfo);
 		break;
 	case CM_HARDLINKS:
-		return GetHardLinksColumnText(itemInfo);
+		return GetHardLinksColumnText(basicItemInfo);
 		break;
 	case CM_EXTENSION:
-		return GetExtensionColumnText(itemInfo);
+		return GetExtensionColumnText(basicItemInfo);
 		break;
 
 	case CM_TITLE:
-		return GetItemDetailsColumnText(itemInfo, &PKEY_Title, preferences);
+		return GetItemDetailsColumnText(basicItemInfo, &PKEY_Title, preferences);
 		break;
 	case CM_SUBJECT:
-		return GetItemDetailsColumnText(itemInfo, &PKEY_Subject, preferences);
+		return GetItemDetailsColumnText(basicItemInfo, &PKEY_Subject, preferences);
 		break;
 	case CM_AUTHORS:
-		return GetItemDetailsColumnText(itemInfo, &PKEY_Author, preferences);
+		return GetItemDetailsColumnText(basicItemInfo, &PKEY_Author, preferences);
 		break;
 	case CM_KEYWORDS:
-		return GetItemDetailsColumnText(itemInfo, &PKEY_Keywords, preferences);
+		return GetItemDetailsColumnText(basicItemInfo, &PKEY_Keywords, preferences);
 		break;
 	case CM_COMMENT:
-		return GetItemDetailsColumnText(itemInfo, &PKEY_Comment, preferences);
+		return GetItemDetailsColumnText(basicItemInfo, &PKEY_Comment, preferences);
 		break;
 
 	case CM_CAMERAMODEL:
-		return GetImageColumnText(itemInfo,PropertyTagEquipModel);
+		return GetImageColumnText(basicItemInfo,PropertyTagEquipModel);
 		break;
 	case CM_DATETAKEN:
-		return GetImageColumnText(itemInfo,PropertyTagDateTime);
+		return GetImageColumnText(basicItemInfo,PropertyTagDateTime);
 		break;
 	case CM_WIDTH:
-		return GetImageColumnText(itemInfo,PropertyTagImageWidth);
+		return GetImageColumnText(basicItemInfo,PropertyTagImageWidth);
 		break;
 	case CM_HEIGHT:
-		return GetImageColumnText(itemInfo,PropertyTagImageHeight);
+		return GetImageColumnText(basicItemInfo,PropertyTagImageHeight);
 		break;
 
 	case CM_VIRTUALCOMMENTS:
-		return GetControlPanelCommentsColumnText(itemInfo);
+		return GetControlPanelCommentsColumnText(basicItemInfo);
 		break;
 
 	case CM_TOTALSIZE:
-		return GetDriveSpaceColumnText(itemInfo,true, preferences);
+		return GetDriveSpaceColumnText(basicItemInfo,true, preferences);
 		break;
 
 	case CM_FREESPACE:
-		return GetDriveSpaceColumnText(itemInfo,false, preferences);
+		return GetDriveSpaceColumnText(basicItemInfo,false, preferences);
 		break;
 
 	case CM_FILESYSTEM:
-		return GetFileSystemColumnText(itemInfo);
+		return GetFileSystemColumnText(basicItemInfo);
 		break;
 
 	case CM_ORIGINALLOCATION:
-		return GetItemDetailsColumnText(itemInfo, &SCID_ORIGINAL_LOCATION, preferences);
+		return GetItemDetailsColumnText(basicItemInfo, &SCID_ORIGINAL_LOCATION, preferences);
 		break;
 
 	case CM_DATEDELETED:
-		return GetItemDetailsColumnText(itemInfo, &SCID_DATE_DELETED, preferences);
+		return GetItemDetailsColumnText(basicItemInfo, &SCID_DATE_DELETED, preferences);
 		break;
 
 	case CM_NUMPRINTERDOCUMENTS:
-		return GetPrinterColumnText(itemInfo,PRINTER_INFORMATION_TYPE_NUM_JOBS);
+		return GetPrinterColumnText(basicItemInfo,PRINTER_INFORMATION_TYPE_NUM_JOBS);
 		break;
 
 	case CM_PRINTERSTATUS:
-		return GetPrinterColumnText(itemInfo,PRINTER_INFORMATION_TYPE_STATUS);
+		return GetPrinterColumnText(basicItemInfo,PRINTER_INFORMATION_TYPE_STATUS);
 		break;
 
 	case CM_PRINTERCOMMENTS:
-		return GetPrinterColumnText(itemInfo,PRINTER_INFORMATION_TYPE_COMMENTS);
+		return GetPrinterColumnText(basicItemInfo,PRINTER_INFORMATION_TYPE_COMMENTS);
 		break;
 
 	case CM_PRINTERLOCATION:
-		return GetPrinterColumnText(itemInfo,PRINTER_INFORMATION_TYPE_LOCATION);
+		return GetPrinterColumnText(basicItemInfo,PRINTER_INFORMATION_TYPE_LOCATION);
 		break;
 
 	case CM_PRINTERMODEL:
-		return GetPrinterColumnText(itemInfo,PRINTER_INFORMATION_TYPE_MODEL);
+		return GetPrinterColumnText(basicItemInfo,PRINTER_INFORMATION_TYPE_MODEL);
 		break;
 
 	case CM_NETWORKADAPTER_STATUS:
-		return GetNetworkAdapterColumnText(itemInfo);
+		return GetNetworkAdapterColumnText(basicItemInfo);
 		break;
 
 	case CM_MEDIA_BITRATE:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_BITRATE);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_BITRATE);
 		break;
 	case CM_MEDIA_COPYRIGHT:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_COPYRIGHT);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_COPYRIGHT);
 		break;
 	case CM_MEDIA_DURATION:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_DURATION);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_DURATION);
 		break;
 	case CM_MEDIA_PROTECTED:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PROTECTED);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_PROTECTED);
 		break;
 	case CM_MEDIA_RATING:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_RATING);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_RATING);
 		break;
 	case CM_MEDIA_ALBUMARTIST:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_ALBUM_ARTIST);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_ALBUM_ARTIST);
 		break;
 	case CM_MEDIA_ALBUM:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_ALBUM_TITLE);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_ALBUM_TITLE);
 		break;
 	case CM_MEDIA_BEATSPERMINUTE:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_BEATS_PER_MINUTE);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_BEATS_PER_MINUTE);
 		break;
 	case CM_MEDIA_COMPOSER:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_COMPOSER);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_COMPOSER);
 		break;
 	case CM_MEDIA_CONDUCTOR:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_CONDUCTOR);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_CONDUCTOR);
 		break;
 	case CM_MEDIA_DIRECTOR:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_DIRECTOR);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_DIRECTOR);
 		break;
 	case CM_MEDIA_GENRE:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_GENRE);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_GENRE);
 		break;
 	case CM_MEDIA_LANGUAGE:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_LANGUAGE);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_LANGUAGE);
 		break;
 	case CM_MEDIA_BROADCASTDATE:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_BROADCASTDATE);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_BROADCASTDATE);
 		break;
 	case CM_MEDIA_CHANNEL:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_CHANNEL);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_CHANNEL);
 		break;
 	case CM_MEDIA_STATIONNAME:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_STATIONNAME);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_STATIONNAME);
 		break;
 	case CM_MEDIA_MOOD:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_MOOD);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_MOOD);
 		break;
 	case CM_MEDIA_PARENTALRATING:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PARENTALRATING);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_PARENTALRATING);
 		break;
 	case CM_MEDIA_PARENTALRATINGREASON:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
 		break;
 	case CM_MEDIA_PERIOD:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PERIOD);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_PERIOD);
 		break;
 	case CM_MEDIA_PRODUCER:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PRODUCER);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_PRODUCER);
 		break;
 	case CM_MEDIA_PUBLISHER:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_PUBLISHER);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_PUBLISHER);
 		break;
 	case CM_MEDIA_WRITER:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_WRITER);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_WRITER);
 		break;
 	case CM_MEDIA_YEAR:
-		return GetMediaMetadataColumnText(itemInfo,MEDIAMETADATA_TYPE_YEAR);
+		return GetMediaMetadataColumnText(basicItemInfo,MEDIAMETADATA_TYPE_YEAR);
 		break;
 
 	default:

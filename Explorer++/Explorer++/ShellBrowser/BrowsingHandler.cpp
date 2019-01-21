@@ -183,8 +183,9 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	{
 		if(!IsFileFiltered(itr->iItemInternal))
 		{
+			BasicItemInfo_t basicItemInfo = getBasicItemInfo(itr->iItemInternal);
 			Preferences_t preferences = CreatePreferencesStructure();
-			std::wstring filename = ProcessItemFileName(m_itemInfoMap.at(itr->iItemInternal), preferences);
+			std::wstring filename = ProcessItemFileName(basicItemInfo, preferences);
 
 			TCHAR filenameCopy[MAX_PATH];
 			StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());

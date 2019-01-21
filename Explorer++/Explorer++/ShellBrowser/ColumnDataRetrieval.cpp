@@ -22,7 +22,7 @@
 
 BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax);
 
-std::wstring GetNameColumnText(const ItemInfo_t &itemInfo, const Preferences_t &preferences)
+std::wstring GetNameColumnText(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences)
 {
 	return ProcessItemFileName(itemInfo, preferences);
 }
@@ -30,7 +30,7 @@ std::wstring GetNameColumnText(const ItemInfo_t &itemInfo, const Preferences_t &
 /* Processes an items filename. Essentially checks
 if the extension (if any) needs to be removed, and
 removes it if it does. */
-std::wstring ProcessItemFileName(const ItemInfo_t &itemInfo, const Preferences_t &preferences)
+std::wstring ProcessItemFileName(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences)
 {
 	BOOL bHideExtension = FALSE;
 	TCHAR *pExt = NULL;
@@ -70,7 +70,7 @@ std::wstring ProcessItemFileName(const ItemInfo_t &itemInfo, const Preferences_t
 	}
 }
 
-std::wstring GetTypeColumnText(const ItemInfo_t &itemInfo)
+std::wstring GetTypeColumnText(const BasicItemInfo_t &itemInfo)
 {
 	SHFILEINFO shfi;
 	DWORD_PTR Res = SHGetFileInfo(reinterpret_cast<LPTSTR>(itemInfo.pidlComplete.get()),
@@ -84,7 +84,7 @@ std::wstring GetTypeColumnText(const ItemInfo_t &itemInfo)
 	return shfi.szTypeName;
 }
 
-std::wstring GetSizeColumnText(const ItemInfo_t &itemInfo, const Preferences_t &preferences)
+std::wstring GetSizeColumnText(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences)
 {
 	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
@@ -118,7 +118,7 @@ std::wstring GetSizeColumnText(const ItemInfo_t &itemInfo, const Preferences_t &
 	return FileSizeText;
 }
 
-std::wstring GetFolderSizeColumnText(const ItemInfo_t &itemInfo, const Preferences_t &preferences)
+std::wstring GetFolderSizeColumnText(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences)
 {
 	int numFolders;
 	int numFiles;
@@ -138,7 +138,7 @@ std::wstring GetFolderSizeColumnText(const ItemInfo_t &itemInfo, const Preferenc
 	return fileSizeText;
 }
 
-std::wstring GetTimeColumnText(const ItemInfo_t &itemInfo, TimeType_t TimeType, const Preferences_t &preferences)
+std::wstring GetTimeColumnText(const BasicItemInfo_t &itemInfo, TimeType_t TimeType, const Preferences_t &preferences)
 {
 	TCHAR FileTime[64];
 	BOOL bRet = FALSE;
@@ -173,7 +173,7 @@ std::wstring GetTimeColumnText(const ItemInfo_t &itemInfo, TimeType_t TimeType, 
 	return FileTime;
 }
 
-std::wstring GetRealSizeColumnText(const ItemInfo_t &itemInfo, const Preferences_t &preferences)
+std::wstring GetRealSizeColumnText(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences)
 {
 	ULARGE_INTEGER RealFileSize;
 	bool Res = GetRealSizeColumnRawData(itemInfo, RealFileSize);
@@ -190,7 +190,7 @@ std::wstring GetRealSizeColumnText(const ItemInfo_t &itemInfo, const Preferences
 	return RealFileSizeText;
 }
 
-bool GetRealSizeColumnRawData(const ItemInfo_t &itemInfo, ULARGE_INTEGER &RealFileSize)
+bool GetRealSizeColumnRawData(const BasicItemInfo_t &itemInfo, ULARGE_INTEGER &RealFileSize)
 {
 	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
@@ -221,7 +221,7 @@ bool GetRealSizeColumnRawData(const ItemInfo_t &itemInfo, ULARGE_INTEGER &RealFi
 	return true;
 }
 
-std::wstring GetAttributeColumnText(const ItemInfo_t &itemInfo)
+std::wstring GetAttributeColumnText(const BasicItemInfo_t &itemInfo)
 {
 	TCHAR AttributeString[32];
 	BuildFileAttributeString(itemInfo.getFullPath().c_str(), AttributeString, SIZEOF_ARRAY(AttributeString));
@@ -229,7 +229,7 @@ std::wstring GetAttributeColumnText(const ItemInfo_t &itemInfo)
 	return AttributeString;
 }
 
-std::wstring GetShortNameColumnText(const ItemInfo_t &itemInfo)
+std::wstring GetShortNameColumnText(const BasicItemInfo_t &itemInfo)
 {
 	if (lstrlen(itemInfo.wfd.cAlternateFileName) == 0)
 	{
@@ -239,7 +239,7 @@ std::wstring GetShortNameColumnText(const ItemInfo_t &itemInfo)
 	return itemInfo.wfd.cAlternateFileName;
 }
 
-std::wstring GetOwnerColumnText(const ItemInfo_t &itemInfo)
+std::wstring GetOwnerColumnText(const BasicItemInfo_t &itemInfo)
 {
 	TCHAR Owner[512];
 	BOOL ret = GetFileOwner(itemInfo.getFullPath().c_str(), Owner, SIZEOF_ARRAY(Owner));
@@ -252,7 +252,7 @@ std::wstring GetOwnerColumnText(const ItemInfo_t &itemInfo)
 	return Owner;
 }
 
-std::wstring GetItemDetailsColumnText(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, const Preferences_t &preferences)
+std::wstring GetItemDetailsColumnText(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, const Preferences_t &preferences)
 {
 	TCHAR szDetail[512];
 	HRESULT hr = GetItemDetails(itemInfo, pscid, szDetail, SIZEOF_ARRAY(szDetail), preferences);
@@ -265,7 +265,7 @@ std::wstring GetItemDetailsColumnText(const ItemInfo_t &itemInfo, const SHCOLUMN
 	return EMPTY_STRING;
 }
 
-HRESULT GetItemDetails(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax, const Preferences_t &preferences)
+HRESULT GetItemDetails(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax, const Preferences_t &preferences)
 {
 	VARIANT vt;
 	HRESULT hr = GetItemDetailsRawData(itemInfo, pscid, &vt);
@@ -279,7 +279,7 @@ HRESULT GetItemDetails(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHA
 	return hr;
 }
 
-HRESULT GetItemDetailsRawData(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt)
+HRESULT GetItemDetailsRawData(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt)
 {
 	IShellFolder2 *pShellFolder = NULL;
 	HRESULT hr = SHBindToParent(itemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
@@ -293,7 +293,7 @@ HRESULT GetItemDetailsRawData(const ItemInfo_t &itemInfo, const SHCOLUMNID *psci
 	return hr;
 }
 
-std::wstring GetVersionColumnText(const ItemInfo_t &itemInfo, VersionInfoType_t VersioninfoType)
+std::wstring GetVersionColumnText(const BasicItemInfo_t &itemInfo, VersionInfoType_t VersioninfoType)
 {
 	std::wstring VersionInfoName;
 
@@ -336,7 +336,7 @@ std::wstring GetVersionColumnText(const ItemInfo_t &itemInfo, VersionInfoType_t 
 	return VersionInfo;
 }
 
-std::wstring GetShortcutToColumnText(const ItemInfo_t &itemInfo)
+std::wstring GetShortcutToColumnText(const BasicItemInfo_t &itemInfo)
 {
 	TCHAR ResolvedLinkPath[MAX_PATH];
 	HRESULT hr = NFileOperations::ResolveLink(NULL, SLR_NO_UI, itemInfo.getFullPath().c_str(),
@@ -350,7 +350,7 @@ std::wstring GetShortcutToColumnText(const ItemInfo_t &itemInfo)
 	return ResolvedLinkPath;
 }
 
-std::wstring GetHardLinksColumnText(const ItemInfo_t &itemInfo)
+std::wstring GetHardLinksColumnText(const BasicItemInfo_t &itemInfo)
 {
 	DWORD NumHardLinks = GetHardLinksColumnRawData(itemInfo);
 
@@ -365,12 +365,12 @@ std::wstring GetHardLinksColumnText(const ItemInfo_t &itemInfo)
 	return NumHardLinksString;
 }
 
-DWORD GetHardLinksColumnRawData(const ItemInfo_t &itemInfo)
+DWORD GetHardLinksColumnRawData(const BasicItemInfo_t &itemInfo)
 {
 	return GetNumFileHardLinks(itemInfo.getFullPath().c_str());
 }
 
-std::wstring GetExtensionColumnText(const ItemInfo_t &itemInfo)
+std::wstring GetExtensionColumnText(const BasicItemInfo_t &itemInfo)
 {
 	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
@@ -387,7 +387,7 @@ std::wstring GetExtensionColumnText(const ItemInfo_t &itemInfo)
 	return Extension + 1;
 }
 
-std::wstring GetImageColumnText(const ItemInfo_t &itemInfo, PROPID PropertyID)
+std::wstring GetImageColumnText(const BasicItemInfo_t &itemInfo, PROPID PropertyID)
 {
 	TCHAR ImageProperty[512];
 	BOOL Res = ReadImageProperty(itemInfo.getFullPath().c_str(), PropertyID, ImageProperty,
@@ -401,7 +401,7 @@ std::wstring GetImageColumnText(const ItemInfo_t &itemInfo, PROPID PropertyID)
 	return ImageProperty;
 }
 
-std::wstring GetFileSystemColumnText(const ItemInfo_t &itemInfo)
+std::wstring GetFileSystemColumnText(const BasicItemInfo_t &itemInfo)
 {
 	TCHAR FullFileName[MAX_PATH];
 	GetDisplayName(itemInfo.pidlComplete.get(), FullFileName, SIZEOF_ARRAY(FullFileName), SHGDN_FORPARSING);
@@ -425,7 +425,7 @@ std::wstring GetFileSystemColumnText(const ItemInfo_t &itemInfo)
 	return FileSystemName;
 }
 
-std::wstring GetControlPanelCommentsColumnText(const ItemInfo_t &itemInfo)
+std::wstring GetControlPanelCommentsColumnText(const BasicItemInfo_t &itemInfo)
 {
 	TCHAR InfoTip[512];
 	HRESULT hr = GetItemInfoTip(itemInfo.getFullPath().c_str(), InfoTip, SIZEOF_ARRAY(InfoTip));
@@ -440,7 +440,7 @@ std::wstring GetControlPanelCommentsColumnText(const ItemInfo_t &itemInfo)
 	return InfoTip;
 }
 
-std::wstring GetPrinterColumnText(const ItemInfo_t &itemInfo, PrinterInformationType_t PrinterInformationType)
+std::wstring GetPrinterColumnText(const BasicItemInfo_t &itemInfo, PrinterInformationType_t PrinterInformationType)
 {
 	TCHAR PrinterInformation[256] = EMPTY_STRING;
 	TCHAR szStatus[256];
@@ -554,7 +554,7 @@ BOOL GetPrinterStatusDescription(DWORD dwStatus, TCHAR *szStatus, size_t cchMax)
 	return bSuccess;
 }
 
-std::wstring GetNetworkAdapterColumnText(const ItemInfo_t &itemInfo)
+std::wstring GetNetworkAdapterColumnText(const BasicItemInfo_t &itemInfo)
 {
 	ULONG OutBufLen = 0;
 	GetAdaptersAddresses(AF_UNSPEC, 0, NULL, NULL, &OutBufLen);
@@ -608,7 +608,7 @@ std::wstring GetNetworkAdapterColumnText(const ItemInfo_t &itemInfo)
 	return Status;
 }
 
-std::wstring GetMediaMetadataColumnText(const ItemInfo_t &itemInfo, MediaMetadataType_t MediaMetaDataType)
+std::wstring GetMediaMetadataColumnText(const BasicItemInfo_t &itemInfo, MediaMetadataType_t MediaMetaDataType)
 {
 	const TCHAR *AttributeName = GetMediaMetadataAttributeName(MediaMetaDataType);
 
@@ -806,7 +806,7 @@ const TCHAR *GetMediaMetadataAttributeName(MediaMetadataType_t MediaMetaDataType
 	return NULL;
 }
 
-std::wstring GetDriveSpaceColumnText(const ItemInfo_t &itemInfo, bool TotalSize, const Preferences_t &preferences)
+std::wstring GetDriveSpaceColumnText(const BasicItemInfo_t &itemInfo, bool TotalSize, const Preferences_t &preferences)
 {
 	ULARGE_INTEGER DriveSpace;
 	BOOL Res = GetDriveSpaceColumnRawData(itemInfo, TotalSize, DriveSpace);
@@ -822,7 +822,7 @@ std::wstring GetDriveSpaceColumnText(const ItemInfo_t &itemInfo, bool TotalSize,
 	return SizeText;
 }
 
-BOOL GetDriveSpaceColumnRawData(const ItemInfo_t &itemInfo, bool TotalSize, ULARGE_INTEGER &DriveSpace)
+BOOL GetDriveSpaceColumnRawData(const BasicItemInfo_t &itemInfo, bool TotalSize, ULARGE_INTEGER &DriveSpace)
 {
 	TCHAR FullFileName[MAX_PATH];
 	GetDisplayName(itemInfo.pidlComplete.get(), FullFileName,

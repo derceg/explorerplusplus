@@ -237,6 +237,28 @@ private:
 
 	DISALLOW_COPY_AND_ASSIGN(CShellBrowser);
 
+	struct ItemInfo_t
+	{
+		PIDLPointer		pidlComplete;
+		PIDLPointer		pridl;
+		WIN32_FIND_DATA	wfd;
+		TCHAR			szDisplayName[MAX_PATH];
+		BOOL			bReal;
+		BOOL			bIconRetrieved;
+		int				iIcon;
+
+		/* These are only used for drives. They are
+		needed for when a drive is removed from the
+		system, in which case the drive name is needed
+		so that the removed drive can be found. */
+		BOOL			bDrive;
+		TCHAR			szDrive[4];
+
+		/* Used for temporary sorting in details mode (i.e.
+		when items need to be rearranged). */
+		int				iRelativeSort;
+	};
+
 	enum DateType_t
 	{
 		DATE_TYPE_CREATED,
@@ -331,29 +353,30 @@ private:
 	void				ColumnClicked(int iClickedColumn);
 
 	Preferences_t		CreatePreferencesStructure() const;
+	BasicItemInfo_t		getBasicItemInfo(int internalIndex) const;
 
 	/* Sorting. */
 	int CALLBACK		Sort(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, const Preferences_t &preferences) const;
+	int CALLBACK		SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const Preferences_t &preferences) const;
 	int CALLBACK		SortBySize(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByType(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
 	int CALLBACK		SortByDate(int InternalIndex1,int InternalIndex2,DateType_t DateType) const;
-	int CALLBACK		SortByTotalSize(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, bool TotalSize) const;
-	int CALLBACK		SortByAttributes(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByRealSize(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByShortName(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByOwner(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByVersionInfo(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, VersionInfoType_t VersioninfoType) const;
-	int CALLBACK		SortByShortcutTo(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByHardlinks(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByExtension(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByItemDetails(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, const SHCOLUMNID *pscid) const;
-	int CALLBACK		SortByImageProperty(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, PROPID PropertyId) const;
-	int CALLBACK		SortByVirtualComments(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByFileSystem(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByPrinterProperty(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, PrinterInformationType_t PrinterInformationType) const;
-	int CALLBACK		SortByNetworkAdapterStatus(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByMediaMetadata(const ItemInfo_t &itemInfo1, const ItemInfo_t &itemInfo2, MediaMetadataType_t MediaMetaDataType) const;
+	int CALLBACK		SortByTotalSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, bool TotalSize) const;
+	int CALLBACK		SortByAttributes(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByRealSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByShortName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByOwner(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByVersionInfo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, VersionInfoType_t VersioninfoType) const;
+	int CALLBACK		SortByShortcutTo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByHardlinks(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByExtension(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByItemDetails(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const SHCOLUMNID *pscid) const;
+	int CALLBACK		SortByImageProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PROPID PropertyId) const;
+	int CALLBACK		SortByVirtualComments(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByFileSystem(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByPrinterProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PrinterInformationType_t PrinterInformationType) const;
+	int CALLBACK		SortByNetworkAdapterStatus(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
+	int CALLBACK		SortByMediaMetadata(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, MediaMetadataType_t MediaMetaDataType) const;
 
 	/* Listview column support. */
 	void				PlaceColumns(void);
@@ -411,7 +434,7 @@ private:
 	void				DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 	void				DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 	void				DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemSummaryGroup(const ItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax, const Preferences_t &preferences) const;
+	void				DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax, const Preferences_t &preferences) const;
 
 	/* Other grouping support. */
 	int					CheckGroup(const TCHAR *szGroupHeader, PFNLVGROUPCOMPARE pfnGroupCompare);
