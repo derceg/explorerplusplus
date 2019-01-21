@@ -106,19 +106,22 @@ void CShellBrowser::QueueThumbnailTask(int internalIndex)
 {
 	int thumbnailResultID = m_thumbnailResultIDCounter++;
 
-	auto result = m_itemImageThreadPool.push([this, thumbnailResultID, internalIndex](int id) {
+	BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
+
+	auto result = m_itemImageThreadPool.push([this, thumbnailResultID, internalIndex, basicItemInfo](int id) {
 		UNREFERENCED_PARAMETER(id);
 
-		return this->FindThumbnailAsync(thumbnailResultID, internalIndex);
+		return this->FindThumbnailAsync(thumbnailResultID, internalIndex, basicItemInfo);
 	});
 
 	m_thumbnailResults.insert({ thumbnailResultID, std::move(result) });
 }
 
-boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindThumbnailAsync(int thumbnailResultId, int internalIndex) const
+boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindThumbnailAsync(int thumbnailResultId,
+	int internalIndex, const BasicItemInfo_t &basicItemInfo) const
 {
 	IShellFolder *pShellFolder = nullptr;
-	HRESULT hr = BindToIdl(m_pidlDirectory, IID_PPV_ARGS(&pShellFolder));
+	HRESULT hr = SHBindToParent(basicItemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
 
 	if (FAILED(hr))
 	{
@@ -130,7 +133,7 @@ boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindThumbnailAsync(
 	} BOOST_SCOPE_EXIT_END
 
 	IExtractImage *pExtractImage = nullptr;
-	LPCITEMIDLIST pridl = m_itemInfoMap.at(internalIndex).pridl.get();
+	LPCITEMIDLIST pridl = basicItemInfo.pridl.get();
 	hr = GetUIObjectOf(pShellFolder, NULL, 1, &pridl, IID_PPV_ARGS(&pExtractImage));
 
 	if (FAILED(hr))
