@@ -6,6 +6,7 @@
 #include "TabPreferences.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ImageWrappers.h"
 #include "../Helper/Macros.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
@@ -305,10 +306,16 @@ private:
 		std::wstring columnText;
 	};
 
-	struct ImageResult_t
+	struct IconResult_t
 	{
 		int itemInternalIndex;
 		int iconIndex;
+	};
+
+	struct ThumbnailResult_t
+	{
+		int itemInternalIndex;
+		HBitmapPtr bitmap;
 	};
 
 	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
@@ -442,12 +449,12 @@ private:
 
 	/* LIstview icons. */
 	void				QueueIconTask(int internalIndex);
-	static boost::optional<ImageResult_t>	FindIconAsync(HWND listView, int iconResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo);
+	static boost::optional<IconResult_t>	FindIconAsync(HWND listView, int iconResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo);
 	void				ProcessIconResult(int iconResultId);
 
 	/* Thumbnails view. */
 	void				QueueThumbnailTask(int internalIndex);
-	boost::optional<ImageResult_t>	FindThumbnailAsync(int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo) const;
+	boost::optional<ThumbnailResult_t>	FindThumbnailAsync(int thumbnailResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo) const;
 	void				ProcessThumbnailResult(int thumbnailResultId);
 	void				SetupThumbnailsView(void);
 	void				RemoveThumbnailsView(void);
@@ -509,10 +516,10 @@ private:
 
 	ctpl::thread_pool	m_itemImageThreadPool;
 
-	std::unordered_map<int, std::future<boost::optional<ImageResult_t>>> m_iconResults;
+	std::unordered_map<int, std::future<boost::optional<IconResult_t>>> m_iconResults;
 	int					m_iconResultIDCounter;
 
-	std::unordered_map<int, std::future<boost::optional<ImageResult_t>>> m_thumbnailResults;
+	std::unordered_map<int, std::future<boost::optional<ThumbnailResult_t>>> m_thumbnailResults;
 	int					m_thumbnailResultIDCounter;
 
 	/* Cached folder size data. */

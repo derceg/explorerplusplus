@@ -117,7 +117,7 @@ void CShellBrowser::QueueThumbnailTask(int internalIndex)
 	m_thumbnailResults.insert({ thumbnailResultID, std::move(result) });
 }
 
-boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindThumbnailAsync(int thumbnailResultId,
+boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAsync(int thumbnailResultId,
 	int internalIndex, const BasicItemInfo_t &basicItemInfo) const
 {
 	IShellFolder *pShellFolder = nullptr;
@@ -170,17 +170,11 @@ boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindThumbnailAsync(
 		return boost::none;
 	}
 
-	BOOST_SCOPE_EXIT(hThumbnailBitmap) {
-		DeleteObject(hThumbnailBitmap);
-	} BOOST_SCOPE_EXIT_END
-
-	int imageIndex = GetExtractedThumbnail(hThumbnailBitmap);
-
 	PostMessage(m_hListView, WM_APP_THUMBNAIL_RESULT_READY, thumbnailResultId, 0);
 
-	ImageResult_t result;
+	ThumbnailResult_t result;
 	result.itemInternalIndex = internalIndex;
-	result.iconIndex = imageIndex;
+	result.bitmap = HBitmapPtr(hThumbnailBitmap);
 
 	return result;
 }
@@ -207,6 +201,8 @@ void CShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
 		return;
 	}
 
+	int imageIndex = GetExtractedThumbnail(result->bitmap.get());
+
 	auto index = LocateItemByInternalIndex(result->itemInternalIndex);
 
 	if (!index)
@@ -218,7 +214,7 @@ void CShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
 	lvItem.mask = LVIF_IMAGE;
 	lvItem.iItem = *index;
 	lvItem.iSubItem = 0;
-	lvItem.iImage = result->iconIndex;
+	lvItem.iImage = imageIndex;
 	ListView_SetItem(m_hListView, &lvItem);
 }
 

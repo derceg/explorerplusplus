@@ -399,7 +399,7 @@ void CShellBrowser::QueueIconTask(int internalIndex)
 	m_iconResults.insert({ iconResultID, std::move(result) });
 }
 
-boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindIconAsync(HWND listView, int iconResultId, int internalIndex,
+boost::optional<CShellBrowser::IconResult_t> CShellBrowser::FindIconAsync(HWND listView, int iconResultId, int internalIndex,
 	const BasicItemInfo_t &basicItemInfo)
 {
 	// Must use SHGFI_ICON here, rather than SHGFO_SYSICONINDEX, or else 
@@ -417,7 +417,7 @@ boost::optional<CShellBrowser::ImageResult_t> CShellBrowser::FindIconAsync(HWND 
 
 	PostMessage(listView, WM_APP_ICON_RESULT_READY, iconResultId, 0);
 
-	ImageResult_t result;
+	IconResult_t result;
 	result.itemInternalIndex = internalIndex;
 	result.iconIndex = shfi.iIcon;
 
