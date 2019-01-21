@@ -5,6 +5,21 @@
 
 struct BasicItemInfo_t
 {
+	BasicItemInfo_t() = default;
+
+	// Being able to explicitly copy this structure is important. The
+	// structure can be passed to a background thread and that thread
+	// needs to be able to hold its own copy of the data. A shallow copy
+	// wouldn't work, as the copies would share the same underlying
+	// PIDLs.
+	BasicItemInfo_t(const BasicItemInfo_t &other)
+	{
+		pidlComplete.reset(ILClone(other.pidlComplete.get()));
+		pridl.reset(ILClone(other.pridl.get()));
+		wfd = other.wfd;
+		StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName), other.szDisplayName);
+	}
+
 	PIDLPointer		pidlComplete;
 	PIDLPointer		pridl;
 	WIN32_FIND_DATA	wfd;

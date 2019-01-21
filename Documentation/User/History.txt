@@ -16,12 +16,13 @@ Bug fixes:
 - The way in which column results and file icons/thumbnails are
   retrieved has been updated. This update brings a number of
   advantages:
+  - Because of the way in which column results were retrieved
+    previously, it was possible for the application to crash if a
+    navigation occurred while a column result was being
+    retrieved. Navigating to a different directory while results
+    are being retrieved should now have no negative effects.
   - Column details are only retrieved for items that are visible
     (rather than all items).
-  - The way in which the user interface is updated after a
-    column result/icon/thumbnail has been retrieved has been
-    updated. This may help to reduce the risk of a crash when
-    changing directories while results are being retrieved.
   - Previously, it was possible for a user interface update to be
     done after a navigation had occurred. That is, column data
     for an item in a previous folder would be inserted into the

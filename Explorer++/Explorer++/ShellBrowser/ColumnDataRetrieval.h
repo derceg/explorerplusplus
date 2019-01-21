@@ -57,6 +57,7 @@ enum MediaMetadataType_t
 	MEDIAMETADATA_TYPE_YEAR
 };
 
+std::wstring GetColumnText(UINT ColumnID, const BasicItemInfo_t &basicItemInfo, const Preferences_t &preferences);
 std::wstring GetNameColumnText(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences);
 std::wstring ProcessItemFileName(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences);
 std::wstring GetTypeColumnText(const BasicItemInfo_t &itemInfo);

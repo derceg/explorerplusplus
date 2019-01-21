@@ -381,8 +381,7 @@ private:
 	/* Listview column support. */
 	void				PlaceColumns(void);
 	void				QueueColumnTask(int itemInternalIndex, int columnIndex);
-	CShellBrowser::ColumnResult_t	GetColumnTextAsync(int columnResultId, unsigned int ColumnID, int InternalIndex) const;
-	std::wstring		GetColumnText(UINT ColumnID,int InternalIndex) const;
+	static ColumnResult_t	GetColumnTextAsync(HWND listView, int columnResultId, unsigned int ColumnID, int InternalIndex, const BasicItemInfo_t &basicItemInfo, const Preferences_t &preferences);
 	void				InsertColumn(unsigned int ColumnId,int iColumndIndex,int iWidth);
 	void				SetActiveColumnSet(void);
 	void				GetColumnInternal(unsigned int id,Column_t *pci) const;
