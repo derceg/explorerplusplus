@@ -432,6 +432,9 @@
     <ClInclude Include="ShellBrowser\TabPreferences.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
+    <ClInclude Include="Config.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

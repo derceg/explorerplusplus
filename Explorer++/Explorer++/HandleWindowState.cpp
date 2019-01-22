@@ -50,7 +50,7 @@ void Explorerplusplus::UpdateWindowStates(void)
 	UpdateTabToolbar();
 	UpdateDisplayWindow();
 
-	if(m_bShowFolders)
+	if(m_config.showFolders)
 		SendMessage(m_hMainToolbar,TB_CHECKBUTTON,(WPARAM)TOOLBAR_FOLDERS,(LPARAM)TRUE);
 }
 
@@ -93,14 +93,14 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_SELECTNONE,m_nSelected);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_RESOLVELINK,m_nSelected);
 
-	lCheckMenuItem(hProgramMenu,IDM_VIEW_STATUSBAR,m_bShowStatusBar);
-	lCheckMenuItem(hProgramMenu,IDM_VIEW_FOLDERS,m_bShowFolders);
-	lCheckMenuItem(hProgramMenu,IDM_VIEW_DISPLAYWINDOW,m_bShowDisplayWindow);
-	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_ADDRESSBAR,m_bShowAddressBar);
-	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_MAINTOOLBAR,m_bShowMainToolbar);
-	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_BOOKMARKSTOOLBAR,m_bShowBookmarksToolbar);
-	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_DRIVES,m_bShowDrivesToolbar);
-	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_APPLICATIONTOOLBAR,m_bShowApplicationToolbar);
+	lCheckMenuItem(hProgramMenu,IDM_VIEW_STATUSBAR,m_config.showStatusBar);
+	lCheckMenuItem(hProgramMenu,IDM_VIEW_FOLDERS, m_config.showFolders);
+	lCheckMenuItem(hProgramMenu,IDM_VIEW_DISPLAYWINDOW,m_config.showDisplayWindow);
+	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_ADDRESSBAR, m_config.showAddressBar);
+	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_MAINTOOLBAR,m_config.showMainToolbar);
+	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_BOOKMARKSTOOLBAR,m_config.showBookmarksToolbar);
+	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_DRIVES,m_config.showDrivesToolbar);
+	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_APPLICATIONTOOLBAR,m_config.showApplicationToolbar);
 	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_LOCKTOOLBARS,m_bLockToolbars);
 	lCheckMenuItem(hProgramMenu,IDM_VIEW_SHOWHIDDENFILES,m_pActiveShellBrowser->GetShowHidden());
 	lCheckMenuItem(hProgramMenu,IDM_FILTER_APPLYFILTER,m_pActiveShellBrowser->GetFilterStatus());

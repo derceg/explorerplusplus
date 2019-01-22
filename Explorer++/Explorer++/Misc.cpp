@@ -172,23 +172,23 @@ void Explorerplusplus::ApplyToolbarSettings(void)
 		switch(m_ToolbarInformation[i].wID)
 		{
 		case ID_MAINTOOLBAR:
-			bVisible = m_bShowMainToolbar;
+			bVisible = m_config.showMainToolbar;
 			break;
 
 		case ID_ADDRESSTOOLBAR:
-			bVisible = m_bShowAddressBar;
+			bVisible = m_config.showAddressBar;
 			break;
 
 		case ID_BOOKMARKSTOOLBAR:
-			bVisible = m_bShowBookmarksToolbar;
+			bVisible = m_config.showBookmarksToolbar;
 			break;
 
 		case ID_DRIVESTOOLBAR:
-			bVisible = m_bShowDrivesToolbar;
+			bVisible = m_config.showDrivesToolbar;
 			break;
 
 		case ID_APPLICATIONSTOOLBAR:
-			bVisible = m_bShowApplicationToolbar;
+			bVisible = m_config.showApplicationToolbar;
 			break;
 		}
 
@@ -224,7 +224,7 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 		IndentTop += RebarRect.bottom - RebarRect.top;
 	}
 
-	if(m_bShowStatusBar)
+	if(m_config.showStatusBar)
 	{
 		RECT m_hStatusBarRect;
 
@@ -233,7 +233,7 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 		IndentBottom += m_hStatusBarRect.bottom - m_hStatusBarRect.top;
 	}
 
-	if(m_bShowDisplayWindow)
+	if(m_config.showDisplayWindow)
 	{
 		RECT rcDisplayWindow;
 
@@ -242,7 +242,7 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 		IndentBottom += rcDisplayWindow.bottom - rcDisplayWindow.top;
 	}
 
-	if(m_bShowFolders)
+	if(m_config.showFolders)
 	{
 		RECT rcHolder;
 		GetClientRect(m_hHolder,&rcHolder);

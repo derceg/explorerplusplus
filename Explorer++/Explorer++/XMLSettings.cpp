@@ -414,7 +414,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysOpenInNewTab"),NXMLSettings::EncodeBoolValue(m_bAlwaysOpenNewTab));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowTabBar"),NXMLSettings::EncodeBoolValue(m_bAlwaysShowTabBar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowTabBar"),NXMLSettings::EncodeBoolValue(m_config.alwaysShowTabBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AutoArrangeGlobal"),NXMLSettings::EncodeBoolValue(m_bAutoArrangeGlobal));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -422,7 +422,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("CloseMainWindowOnTabClose"),NXMLSettings::EncodeBoolValue(m_bCloseMainWindowOnTabClose));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ConfirmCloseTabs"),NXMLSettings::EncodeBoolValue(m_bConfirmCloseTabs));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ConfirmCloseTabs"),NXMLSettings::EncodeBoolValue(m_config.confirmCloseTabs));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisableFolderSizesNetworkRemovable"),NXMLSettings::EncodeBoolValue(m_bDisableFolderSizesNetworkRemovable));
 
@@ -528,21 +528,21 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ReplaceExplorerMode"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowAddressBar"),NXMLSettings::EncodeBoolValue(m_bShowAddressBar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowAddressBar"),NXMLSettings::EncodeBoolValue(m_config.showAddressBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowApplicationToolbar"),NXMLSettings::EncodeBoolValue(m_bShowApplicationToolbar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowApplicationToolbar"),NXMLSettings::EncodeBoolValue(m_config.showApplicationToolbar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowBookmarksToolbar"),NXMLSettings::EncodeBoolValue(m_bShowBookmarksToolbar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowBookmarksToolbar"),NXMLSettings::EncodeBoolValue(m_config.showBookmarksToolbar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowDrivesToolbar"),NXMLSettings::EncodeBoolValue(m_bShowDrivesToolbar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowDrivesToolbar"),NXMLSettings::EncodeBoolValue(m_config.showDrivesToolbar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowDisplayWindow"),NXMLSettings::EncodeBoolValue(m_bShowDisplayWindow));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowDisplayWindow"),NXMLSettings::EncodeBoolValue(m_config.showDisplayWindow));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowExtensions"),NXMLSettings::EncodeBoolValue(m_bShowExtensionsGlobal));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFilePreviews"),NXMLSettings::EncodeBoolValue(m_bShowFilePreviews));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFolders"),NXMLSettings::EncodeBoolValue(m_bShowFolders));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFolders"),NXMLSettings::EncodeBoolValue(m_config.showFolders));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFolderSizes"),NXMLSettings::EncodeBoolValue(m_bShowFolderSizes));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -560,13 +560,13 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowPrivilegeLevelInTitleBar"),NXMLSettings::EncodeBoolValue(m_bShowPrivilegeLevelInTitleBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowStatusBar"),NXMLSettings::EncodeBoolValue(m_bShowStatusBar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowStatusBar"),NXMLSettings::EncodeBoolValue(m_config.showStatusBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowTabBarAtBottom"),NXMLSettings::EncodeBoolValue(m_bShowTabBarAtBottom));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowTaskbarThumbnails"),NXMLSettings::EncodeBoolValue(m_bShowTaskbarThumbnails));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowToolbar"),NXMLSettings::EncodeBoolValue(m_bShowMainToolbar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowToolbar"),NXMLSettings::EncodeBoolValue(m_config.showMainToolbar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowUserNameTitleBar"),NXMLSettings::EncodeBoolValue(m_bShowUserNameInTitleBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -1536,7 +1536,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_ALWAYSSHOWTABBAR:
-		m_bAlwaysShowTabBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config.alwaysShowTabBar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_AUTOARRANGEGLOBAL:
@@ -1552,7 +1552,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_CONFIRMCLOSETABS:
-		m_bConfirmCloseTabs = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config.confirmCloseTabs = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_DISABLEFOLDERSIZENETWORKREMOVABLE:
@@ -1654,23 +1654,23 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWADDRESSBAR:
-		m_bShowAddressBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config.showAddressBar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWAPPLICATIONTOOLBAR:
-		m_bShowApplicationToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config.showApplicationToolbar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWBOOKMARKSTOOLBAR:
-		m_bShowBookmarksToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config.showBookmarksToolbar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWDRIVESTOOLBAR:
-		m_bShowDrivesToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config.showDrivesToolbar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWDISPLAYWINDOW:
-		m_bShowDisplayWindow = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config.showDisplayWindow = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWEXTENSIONS:
@@ -1682,7 +1682,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWFOLDERS:
-		m_bShowFolders = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config.showFolders = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFOLDERSIZES:
@@ -1718,7 +1718,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWSTATUSBAR:
-		m_bShowStatusBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config.showStatusBar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWTABBARATBOTTOM:
@@ -1730,7 +1730,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWTOOLBAR:
-		m_bShowMainToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config.showMainToolbar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWUSERNAMETITLEBAR:

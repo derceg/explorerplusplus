@@ -742,7 +742,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 				CheckDlgButton(hDlg,IDC_OPTION_MULTIPLEINSTANCES,BST_CHECKED);
 			if(m_bLargeToolbarIcons)
 				CheckDlgButton(hDlg,IDC_OPTION_LARGETOOLBARICONS,BST_CHECKED);
-			if(m_bAlwaysShowTabBar)
+			if(m_config.alwaysShowTabBar)
 				CheckDlgButton(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR,BST_CHECKED);
 			if(m_bShowTabBarAtBottom)
 				CheckDlgButton(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM,BST_CHECKED);
@@ -808,7 +808,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					m_bAllowMultipleInstances = (IsDlgButtonChecked(hDlg,IDC_OPTION_MULTIPLEINSTANCES)
 						== BST_CHECKED);
 
-					m_bAlwaysShowTabBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR)
+					m_config.alwaysShowTabBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR)
 						== BST_CHECKED);
 
 					m_bShowTabBarAtBottom = (IsDlgButtonChecked(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM)
@@ -895,7 +895,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					in title bar options change. */
 					UpdateMainWindowText();
 
-					if(!m_bAlwaysShowTabBar)
+					if(!m_config.alwaysShowTabBar)
 					{
 						if(TabCtrl_GetItemCount(m_hTabCtrl) > 1)
 							m_bShowTabBar = TRUE;
@@ -987,7 +987,7 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 					CheckDlgButton(hDlg,IDC_TABS_TASKBARTHUMBNAILS,BST_CHECKED);
 				if(m_bForceSameTabWidth)
 					CheckDlgButton(hDlg,IDC_TABS_SAMEWIDTH,BST_CHECKED);
-				if(m_bConfirmCloseTabs)
+				if(m_config.confirmCloseTabs)
 					CheckDlgButton(hDlg,IDC_TABS_CLOSECONFIRMATION,BST_CHECKED);
 				if(m_bOpenNewTabNextToCurrent)
 					CheckDlgButton(hDlg,IDC_TABS_OPENNEXTTOCURRENT,BST_CHECKED);
@@ -1030,7 +1030,7 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 						m_bForceSameTabWidth = (IsDlgButtonChecked(hDlg,IDC_TABS_SAMEWIDTH)
 							== BST_CHECKED);
 
-						m_bConfirmCloseTabs = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSECONFIRMATION)
+						m_config.confirmCloseTabs = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSECONFIRMATION)
 							== BST_CHECKED);
 
 						m_bOpenNewTabNextToCurrent = (IsDlgButtonChecked(hDlg,IDC_TABS_OPENNEXTTOCURRENT)

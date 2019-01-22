@@ -39,7 +39,7 @@ void Explorerplusplus::CreateFolderControls(void)
 	TCHAR szTemp[32];
 	UINT uStyle = WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
 
-	if(m_bShowFolders)
+	if(m_config.showFolders)
 		uStyle |= WS_VISIBLE;
 
 	LoadString(m_hLanguageModule,IDS_FOLDERS_WINDOW_TEXT,szTemp,SIZEOF_ARRAY(szTemp));

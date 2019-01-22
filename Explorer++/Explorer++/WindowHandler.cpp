@@ -166,7 +166,7 @@ void Explorerplusplus::CreateStatusBar(void)
 {
 	UINT Style = WS_CHILD|WS_CLIPSIBLINGS|SBARS_SIZEGRIP|WS_CLIPCHILDREN;
 
-	if(m_bShowStatusBar)
+	if(m_config.showStatusBar)
 	{
 		Style |= WS_VISIBLE;
 	}
@@ -329,18 +329,18 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 		iIndentRebar += GetRectHeight(&rc);
 	}
 
-	if(m_bShowStatusBar)
+	if(m_config.showStatusBar)
 	{
 		GetWindowRect(m_hStatusBar,&rc);
 		IndentBottom += GetRectHeight(&rc);
 	}
 
-	if(m_bShowDisplayWindow)
+	if(m_config.showDisplayWindow)
 	{
 		IndentBottom += m_DisplayWindowHeight;
 	}
 
-	if(m_bShowFolders)
+	if(m_config.showFolders)
 	{
 		GetClientRect(m_hHolder,&rc);
 		IndentLeft = GetRectWidth(&rc);
@@ -374,11 +374,11 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 
 void Explorerplusplus::ToggleFolders(void)
 {
-	m_bShowFolders = !m_bShowFolders;
-	lShowWindow(m_hHolder,m_bShowFolders);
-	lShowWindow(m_hTreeView,m_bShowFolders);
+	m_config.showFolders = !m_config.showFolders;
+	lShowWindow(m_hHolder, m_config.showFolders);
+	lShowWindow(m_hTreeView, m_config.showFolders);
 
-	SendMessage(m_hMainToolbar,TB_CHECKBUTTON,(WPARAM)TOOLBAR_FOLDERS,(LPARAM)m_bShowFolders);
+	SendMessage(m_hMainToolbar,TB_CHECKBUTTON,(WPARAM)TOOLBAR_FOLDERS,(LPARAM)m_config.showFolders);
 	ResizeWindows();
 }
 

@@ -304,7 +304,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(void)
 			attempt to show a preview if the display window is actually active. */
 			if (((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
 				FILE_ATTRIBUTE_DIRECTORY) && m_bShowFilePreviews
-				&& m_bShowDisplayWindow)
+				&& m_config.showDisplayWindow)
 			{
 				DisplayWindow_SetThumbnailFile(m_hDisplayWindow, szFullItemName, TRUE);
 			}

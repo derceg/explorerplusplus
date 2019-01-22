@@ -622,11 +622,11 @@ void Explorerplusplus::OnMainToolbarRClick()
 	POINT ptCursor;
 	DWORD dwPos;
 
-	lCheckMenuItem(m_hToolbarRightClickMenu, IDM_TOOLBARS_ADDRESSBAR, m_bShowAddressBar);
-	lCheckMenuItem(m_hToolbarRightClickMenu, IDM_TOOLBARS_MAINTOOLBAR, m_bShowMainToolbar);
-	lCheckMenuItem(m_hToolbarRightClickMenu, IDM_TOOLBARS_BOOKMARKSTOOLBAR, m_bShowBookmarksToolbar);
-	lCheckMenuItem(m_hToolbarRightClickMenu, IDM_TOOLBARS_DRIVES, m_bShowDrivesToolbar);
-	lCheckMenuItem(m_hToolbarRightClickMenu, IDM_TOOLBARS_APPLICATIONTOOLBAR, m_bShowApplicationToolbar);
+	lCheckMenuItem(m_hToolbarRightClickMenu, IDM_TOOLBARS_ADDRESSBAR, m_config.showAddressBar);
+	lCheckMenuItem(m_hToolbarRightClickMenu, IDM_TOOLBARS_MAINTOOLBAR, m_config.showMainToolbar);
+	lCheckMenuItem(m_hToolbarRightClickMenu, IDM_TOOLBARS_BOOKMARKSTOOLBAR, m_config.showBookmarksToolbar);
+	lCheckMenuItem(m_hToolbarRightClickMenu, IDM_TOOLBARS_DRIVES, m_config.showDrivesToolbar);
+	lCheckMenuItem(m_hToolbarRightClickMenu, IDM_TOOLBARS_APPLICATIONTOOLBAR, m_config.showApplicationToolbar);
 	lCheckMenuItem(m_hToolbarRightClickMenu, IDM_TOOLBARS_LOCKTOOLBARS, m_bLockToolbars);
 
 	SetFocus(m_hMainToolbar);

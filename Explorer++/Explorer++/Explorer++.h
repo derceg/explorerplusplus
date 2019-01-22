@@ -1,22 +1,23 @@
 #pragma once
 
-#include <objbase.h>
-#include <MsXml2.h>
-#include <unordered_map>
-#include "Explorer++_internal.h"
+#include "ApplicationToolbar.h"
 #include "BookmarkHelper.h"
 #include "BookmarksToolbar.h"
-#include "DrivesToolbar.h"
-#include "ApplicationToolbar.h"
-#include "TabContainer.h"
 #include "ColorRuleHelper.h"
+#include "Config.h"
+#include "DrivesToolbar.h"
+#include "Explorer++_internal.h"
 #include "ShellBrowser/iShellView.h"
-#include "../MyTreeView/MyTreeView.h"
-#include "../Helper/FileContextMenuManager.h"
-#include "../Helper/SetDefaultFileManager.h"
-#include "../Helper/FileActionHandler.h"
+#include "TabContainer.h"
 #include "../Helper/Bookmark.h"
+#include "../Helper/FileActionHandler.h"
+#include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ImageWrappers.h"
+#include "../Helper/SetDefaultFileManager.h"
+#include "../MyTreeView/MyTreeView.h"
+#include <MsXml2.h>
+#include <objbase.h>
+#include <unordered_map>
 
 #define MENU_BOOKMARK_STARTID		10000
 #define MENU_BOOKMARK_ENDID			11000
@@ -830,22 +831,13 @@ private:
 	std::list<DirectorySettings_t>	m_DirectorySettingsList;
 
 	/* User options variables. */
-	BOOL					m_bShowStatusBar;
-	BOOL					m_bShowFolders;
-	BOOL					m_bShowAddressBar;
-	BOOL					m_bShowDisplayWindow;
-	BOOL					m_bShowMainToolbar;
-	BOOL					m_bShowBookmarksToolbar;
-	BOOL					m_bShowDrivesToolbar;
-	BOOL					m_bShowApplicationToolbar;
-	BOOL					m_bAlwaysShowTabBar;
+	Config					m_config;
 	BOOL					m_bShowTabBar;
 	BOOL					m_bShowFullTitlePath;
 	BOOL					m_bAlwaysOpenNewTab;
 	BOOL					m_bShowFolderSizes;
 	BOOL					m_bDisableFolderSizesNetworkRemovable;
 	BOOL					m_bOpenNewTabNextToCurrent;
-	BOOL					m_bConfirmCloseTabs;
 	BOOL					m_bTreeViewDelayEnabled;
 	BOOL					m_bSavePreferencesToXMLFile;
 	BOOL					m_bLockToolbars;

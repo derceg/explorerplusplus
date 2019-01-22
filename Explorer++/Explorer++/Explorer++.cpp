@@ -142,7 +142,6 @@ void Explorerplusplus::SetDefaultValues(void)
 {
 	/* User options. */
 	m_bOpenNewTabNextToCurrent		= FALSE;
-	m_bConfirmCloseTabs				= FALSE;
 	m_bShowFullTitlePath			= FALSE;
 	m_bAlwaysOpenNewTab				= FALSE;
 	m_bShowFolderSizes				= FALSE;
@@ -176,15 +175,6 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_InfoTipType					= INFOTIP_SYSTEM;
 
 	/* Window states. */
-	m_bShowStatusBar				= TRUE;
-	m_bShowFolders					= TRUE;
-	m_bShowAddressBar				= TRUE;
-	m_bShowMainToolbar				= TRUE;
-	m_bShowBookmarksToolbar			= FALSE;
-	m_bShowDisplayWindow			= TRUE;
-	m_bShowDrivesToolbar			= TRUE;
-	m_bShowApplicationToolbar		= FALSE;
-	m_bAlwaysShowTabBar				= TRUE;
 	m_bShowTabBar					= TRUE;
 	m_bLockToolbars					= TRUE;
 	m_DisplayWindowHeight			= DEFAULT_DISPLAYWINDOW_HEIGHT;

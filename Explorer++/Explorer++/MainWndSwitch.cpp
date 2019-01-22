@@ -488,8 +488,8 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_VIEW_STATUSBAR:
-			m_bShowStatusBar = !m_bShowStatusBar;
-			lShowWindow(m_hStatusBar,m_bShowStatusBar);
+			m_config.showStatusBar = !m_config.showStatusBar;
+			lShowWindow(m_hStatusBar, m_config.showStatusBar);
 			ResizeWindows();
 			break;
 
@@ -499,42 +499,42 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_VIEW_DISPLAYWINDOW:
-			m_bShowDisplayWindow = !m_bShowDisplayWindow;
-			lShowWindow(m_hDisplayWindow,m_bShowDisplayWindow);
+			m_config.showDisplayWindow = !m_config.showDisplayWindow;
+			lShowWindow(m_hDisplayWindow,m_config.showDisplayWindow);
 			ResizeWindows();
 			break;
 
 		case IDM_TOOLBARS_ADDRESSBAR:
-			m_bShowAddressBar = !m_bShowAddressBar;
-			ShowMainRebarBand(m_hAddressBar,m_bShowAddressBar);
+			m_config.showAddressBar = !m_config.showAddressBar;
+			ShowMainRebarBand(m_hAddressBar, m_config.showAddressBar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
 
 		case IDM_TOOLBARS_MAINTOOLBAR:
-			m_bShowMainToolbar = !m_bShowMainToolbar;
-			ShowMainRebarBand(m_hMainToolbar,m_bShowMainToolbar);
+			m_config.showMainToolbar = !m_config.showMainToolbar;
+			ShowMainRebarBand(m_hMainToolbar,m_config.showMainToolbar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
 
 		case IDM_TOOLBARS_BOOKMARKSTOOLBAR:
-			m_bShowBookmarksToolbar = !m_bShowBookmarksToolbar;
-			ShowMainRebarBand(m_hBookmarksToolbar,m_bShowBookmarksToolbar);
+			m_config.showBookmarksToolbar = !m_config.showBookmarksToolbar;
+			ShowMainRebarBand(m_hBookmarksToolbar,m_config.showBookmarksToolbar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
 
 		case IDM_TOOLBARS_DRIVES:
-			m_bShowDrivesToolbar = !m_bShowDrivesToolbar;
-			ShowMainRebarBand(m_pDrivesToolbar->GetHWND(),m_bShowDrivesToolbar);
+			m_config.showDrivesToolbar = !m_config.showDrivesToolbar;
+			ShowMainRebarBand(m_pDrivesToolbar->GetHWND(),m_config.showDrivesToolbar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
 
 		case IDM_TOOLBARS_APPLICATIONTOOLBAR:
-			m_bShowApplicationToolbar = !m_bShowApplicationToolbar;
-			ShowMainRebarBand(m_pApplicationToolbar->GetHWND(),m_bShowApplicationToolbar);
+			m_config.showApplicationToolbar = !m_config.showApplicationToolbar;
+			ShowMainRebarBand(m_pApplicationToolbar->GetHWND(),m_config.showApplicationToolbar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
@@ -1427,8 +1427,8 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 		/* Display window menus. */
 		case IDM_DW_HIDEDISPLAYWINDOW:
-			m_bShowDisplayWindow = FALSE;
-			lShowWindow(m_hDisplayWindow,m_bShowDisplayWindow);
+			m_config.showDisplayWindow = FALSE;
+			lShowWindow(m_hDisplayWindow,m_config.showDisplayWindow);
 			ResizeWindows();
 			break;
 	}

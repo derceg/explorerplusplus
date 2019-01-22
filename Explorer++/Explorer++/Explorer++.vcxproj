@@ -416,6 +416,7 @@
     <ClInclude Include="ModelessDialogs.h" />
     <ClInclude Include="NewBookmarkFolderDialog.h" />
     <ClInclude Include="NoTranslationResource.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="RenameTabDialog.h" />
     <ClInclude Include="resource.h" />

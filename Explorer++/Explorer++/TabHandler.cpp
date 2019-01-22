@@ -575,7 +575,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 		HandleDirectoryMonitoring((int)tcItem.lParam);
 	}
 
-	if(!m_bAlwaysShowTabBar)
+	if(!m_config.alwaysShowTabBar)
 	{
 		if(nTabsCreated == 1)
 		{
@@ -828,7 +828,7 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 
 	m_TabInfo.erase(iInternalIndex);
 
-	if(!m_bAlwaysShowTabBar)
+	if(!m_config.alwaysShowTabBar)
 	{
 		if(TabCtrl_GetItemCount(m_hTabCtrl) == 1)
 		{
@@ -1182,7 +1182,7 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 
 	SetTabIcon(iNewTabIndex,iTabId,pidlDirectory);
 
-	if(!m_bAlwaysShowTabBar)
+	if(!m_config.alwaysShowTabBar)
 	{
 		if(TabCtrl_GetItemCount(m_hTabCtrl) > 1)
 		{
