@@ -85,7 +85,7 @@ HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)
 
 	DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
 
-	if(m_bUseFullRowSelect)
+	if(m_config.useFullRowSelect)
 	{
 		dwExtendedStyle |= LVS_EX_FULLROWSELECT;
 	}

@@ -49,7 +49,7 @@ void Explorerplusplus::InitializeTabs(void)
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	if(m_bForceSameTabWidth)
+	if(m_config.forceSameTabWidth)
 	{
 		TabCtrlStyles |= TCS_FIXEDWIDTH;
 	}
@@ -173,7 +173,7 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 
 				ItemNum = TabCtrl_HitTest(m_hTabCtrl,&info);
 
-				if(info.flags != TCHT_NOWHERE && m_bDoubleClickTabClose)
+				if(info.flags != TCHT_NOWHERE && m_config.doubleClickTabClose)
 				{
 					CloseTab(ItemNum);
 				}
@@ -320,7 +320,7 @@ int *pTabObjectIndex)
 	if(!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
 		return E_FAIL;
 
-	if(m_bOpenNewTabNextToCurrent)
+	if(m_config.openNewTabNextToCurrent)
 		iNewTabIndex = m_selectedTabIndex + 1;
 	else
 		iNewTabIndex = TabCtrl_GetItemCount(m_hTabCtrl);
@@ -343,7 +343,7 @@ int *pTabObjectIndex)
 	if(m_hListView[iTabId] == NULL)
 		return E_FAIL;
 
-	NListView::ListView_ActivateOneClickSelect(m_hListView[iTabId],m_bOneClickActivate,m_OneClickActivateHoverTime);
+	NListView::ListView_ActivateOneClickSelect(m_hListView[iTabId],m_config.oneClickActivate,m_config.oneClickActivateHoverTime);
 
 	/* Set the listview to its initial size. */
 	SetListViewInitialPosition(m_hListView[iTabId]);
@@ -360,8 +360,8 @@ int *pTabObjectIndex)
 		is.bShowInGroups		= m_bShowInGroupsGlobal;
 		is.bSortAscending		= m_bSortAscendingGlobal;
 		is.bAutoArrange			= m_bAutoArrangeGlobal;
-		is.bShowFolderSizes		= m_bShowFolderSizes;
-		is.bDisableFolderSizesNetworkRemovable = m_bDisableFolderSizesNetworkRemovable;
+		is.bShowFolderSizes		= m_config.showFolderSizes;
+		is.bDisableFolderSizesNetworkRemovable = m_config.disableFolderSizesNetworkRemovable;
 		is.bHideSystemFiles		= m_bHideSystemFilesGlobal;
 		is.bHideLinkExtension	= m_bHideLinkExtensionGlobal;
 
@@ -436,7 +436,7 @@ int *pTabObjectIndex)
 	m_pShellBrowser[iTabId]->SetHideSystemFiles(m_bHideSystemFilesGlobal);
 	m_pShellBrowser[iTabId]->SetShowExtensions(m_bShowExtensionsGlobal);
 	m_pShellBrowser[iTabId]->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
-	m_pShellBrowser[iTabId]->SetShowFolderSizes(m_bShowFolderSizes);
+	m_pShellBrowser[iTabId]->SetShowFolderSizes(m_config.showFolderSizes);
 	m_pShellBrowser[iTabId]->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
 	m_pShellBrowser[iTabId]->SetInsertSorted(m_bInsertSorted);
 
@@ -1531,7 +1531,7 @@ void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 	/* These settings are global to the whole program. */
 	gs.bShowExtensions		= m_bShowExtensionsGlobal;
 	gs.bShowFriendlyDates	= m_bShowFriendlyDatesGlobal;
-	gs.bShowFolderSizes		= m_bShowFolderSizes;
+	gs.bShowFolderSizes		= m_config.showFolderSizes;
 
 	m_pShellBrowser[iTabId]->SetGlobalSettings(&gs);
 }

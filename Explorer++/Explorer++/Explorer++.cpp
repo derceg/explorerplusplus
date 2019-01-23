@@ -57,7 +57,6 @@ m_hContainer(hwnd)
 	m_bSelectingTreeViewDirectory	= FALSE;
 	m_bTreeViewRightClick			= FALSE;
 	m_bTabBeenDragged				= FALSE;
-	m_bTreeViewDelayEnabled			= FALSE;
 	m_bSavePreferencesToXMLFile		= FALSE;
 	m_bAttemptToolbarRestore		= FALSE;
 	m_bLanguageLoaded				= FALSE;
@@ -141,22 +140,8 @@ Explorerplusplus::~Explorerplusplus()
 void Explorerplusplus::SetDefaultValues(void)
 {
 	/* User options. */
-	m_bOpenNewTabNextToCurrent		= FALSE;
-	m_bShowFullTitlePath			= FALSE;
-	m_bAlwaysOpenNewTab				= FALSE;
-	m_bShowFolderSizes				= FALSE;
-	m_bDisableFolderSizesNetworkRemovable	 = FALSE;
 	m_StartupMode					= STARTUP_PREVIOUSTABS;
-	m_bExtendTabControl				= FALSE;
-	m_bShowUserNameInTitleBar		= FALSE;
-	m_bShowPrivilegeLevelInTitleBar	= FALSE;
-	m_bShowFilePreviews				= TRUE;
 	m_ReplaceExplorerMode			= NDefaultFileManager::REPLACEEXPLORER_NONE;
-	m_bOneClickActivate				= FALSE;
-	m_OneClickActivateHoverTime		= DEFAULT_LISTVIEW_HOVER_TIME;
-	m_bAllowMultipleInstances		= TRUE;
-	m_bForceSameTabWidth			= FALSE;
-	m_bDoubleClickTabClose			= TRUE;
 	m_bHandleZipFiles				= FALSE;
 	m_bInsertSorted					= TRUE;
 	m_bOverwriteExistingFilesConfirmation	= TRUE;
@@ -179,7 +164,6 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_bLockToolbars					= TRUE;
 	m_DisplayWindowHeight			= DEFAULT_DISPLAYWINDOW_HEIGHT;
 	m_TreeViewWidth					= DEFAULT_TREEVIEW_WIDTH;
-	m_bUseFullRowSelect				= FALSE;
 	m_bShowTabBarAtBottom			= FALSE;
 
 	/* Global options. */

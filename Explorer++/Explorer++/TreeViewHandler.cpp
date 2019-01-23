@@ -482,7 +482,7 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 
 			g_NewSelectionItem = tvItem->hItem;
 
-			if(m_bTreeViewDelayEnabled)
+			if(m_config.treeViewDelayEnabled)
 			{
 				/* Schedule a folder change. This adds enough
 				of a delay for the treeview selection to be changed

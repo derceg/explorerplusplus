@@ -72,8 +72,6 @@ public:
 
 private:
 
-	static const int		DEFAULT_LISTVIEW_HOVER_TIME = 500;
-
 	static const int		MIN_SHELL_MENU_ID = 1;
 	static const int		MAX_SHELL_MENU_ID = 1000;
 
@@ -833,24 +831,8 @@ private:
 	/* User options variables. */
 	Config					m_config;
 	BOOL					m_bShowTabBar;
-	BOOL					m_bShowFullTitlePath;
-	BOOL					m_bAlwaysOpenNewTab;
-	BOOL					m_bShowFolderSizes;
-	BOOL					m_bDisableFolderSizesNetworkRemovable;
-	BOOL					m_bOpenNewTabNextToCurrent;
-	BOOL					m_bTreeViewDelayEnabled;
 	BOOL					m_bSavePreferencesToXMLFile;
 	BOOL					m_bLockToolbars;
-	BOOL					m_bExtendTabControl;
-	BOOL					m_bUseFullRowSelect;
-	BOOL					m_bShowUserNameInTitleBar;
-	BOOL					m_bShowPrivilegeLevelInTitleBar;
-	BOOL					m_bShowFilePreviews;
-	BOOL					m_bOneClickActivate;
-	UINT					m_OneClickActivateHoverTime;
-	BOOL					m_bAllowMultipleInstances;
-	BOOL					m_bForceSameTabWidth;
-	BOOL					m_bDoubleClickTabClose;
 	BOOL					m_bHandleZipFiles;
 	BOOL					m_bInsertSorted;
 	BOOL					m_bOverwriteExistingFilesConfirmation;

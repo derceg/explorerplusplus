@@ -277,7 +277,7 @@ void Explorerplusplus::UpdateMainWindowText(void)
 
 	/* Don't show full paths for virtual folders (as only the folders
 	GUID will be shown). */
-	if(m_bShowFullTitlePath && !m_pActiveShellBrowser->InVirtualFolder())
+	if(m_config.showFullTitlePath && !m_pActiveShellBrowser->InVirtualFolder())
 	{
 		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SIZEOF_ARRAY(szFolderDisplayName),SHGDN_FORPARSING);
 	}
@@ -291,17 +291,17 @@ void Explorerplusplus::UpdateMainWindowText(void)
 	StringCchPrintf(szTitle,SIZEOF_ARRAY(szTitle),
 	szTemp,szFolderDisplayName,NExplorerplusplus::APP_NAME);
 
-	if(m_bShowUserNameInTitleBar || m_bShowPrivilegeLevelInTitleBar)
+	if(m_config.showUserNameInTitleBar || m_config.showPrivilegeLevelInTitleBar)
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),_T(" ["));
 
-	if(m_bShowUserNameInTitleBar)
+	if(m_config.showUserNameInTitleBar)
 	{
 		GetProcessOwner(GetCurrentProcessId(),szOwner,SIZEOF_ARRAY(szOwner));
 
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),szOwner);
 	}
 
-	if(m_bShowPrivilegeLevelInTitleBar)
+	if(m_config.showPrivilegeLevelInTitleBar)
 	{
 		TCHAR szPrivilegeAddition[64];
 		TCHAR szPrivilege[64];
@@ -323,7 +323,7 @@ void Explorerplusplus::UpdateMainWindowText(void)
 			LoadString(m_hLanguageModule,IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED,szPrivilege,SIZEOF_ARRAY(szPrivilege));
 		}
 
-		if(m_bShowUserNameInTitleBar)
+		if(m_config.showUserNameInTitleBar)
 			StringCchPrintf(szPrivilegeAddition,SIZEOF_ARRAY(szPrivilegeAddition),
 			_T(" - %s"),szPrivilege);
 		else
@@ -333,7 +333,7 @@ void Explorerplusplus::UpdateMainWindowText(void)
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),szPrivilegeAddition);
 	}
 
-	if(m_bShowUserNameInTitleBar || m_bShowPrivilegeLevelInTitleBar)
+	if(m_config.showUserNameInTitleBar || m_config.showPrivilegeLevelInTitleBar)
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),_T("]"));
 
 	SetWindowText(m_hContainer,szTitle);

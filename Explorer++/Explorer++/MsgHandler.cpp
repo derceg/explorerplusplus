@@ -316,7 +316,7 @@ void Explorerplusplus::OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,
 {
 	if(bOpenInNewWindow)
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,FALSE,FALSE,TRUE);
-	else if(m_bAlwaysOpenNewTab || bOpenInNewTab)
+	else if(m_config.alwaysOpenNewTab || bOpenInNewTab)
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,TRUE,TRUE,FALSE);
 	else
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER);
@@ -395,7 +395,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* <---- Tab control + backing ----> */
 
-	if(m_bExtendTabControl)
+	if(m_config.extendTabControl)
 	{
 		iTabBackingLeft = 0;
 		iTabBackingWidth = MainWindowWidth;
@@ -432,7 +432,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	SetWindowPos(m_hTabWindowToolbar,NULL,iTabBackingWidth + TAB_TOOLBAR_X_OFFSET,
 	TAB_TOOLBAR_Y_OFFSET,TAB_TOOLBAR_WIDTH,TAB_TOOLBAR_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
 
-	if(m_bExtendTabControl &&
+	if(m_config.extendTabControl &&
 		!m_bShowTabBarAtBottom)
 	{
 		iHolderTop = IndentTop;
@@ -444,7 +444,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* <---- Holder window + child windows ----> */
 
-	if(m_bExtendTabControl &&
+	if(m_config.extendTabControl &&
 		m_bShowTabBarAtBottom &&
 		m_bShowTabBar)
 	{
