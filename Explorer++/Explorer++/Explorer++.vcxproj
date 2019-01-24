@@ -110,7 +110,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -163,7 +163,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;_DEBUG;_WINDOWS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
