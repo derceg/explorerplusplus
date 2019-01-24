@@ -28,12 +28,12 @@ private:
 
 	void Initialize(HWND parent);
 	void SetInitialToolbarButtons();
-	void AddButtonsToMainToolbar();
-	void AddButtonToMainToolbar(int iButtonId);
-	TBBUTTON GetMainToolbarButtonDetails(int iButtonId);
-	void AddStringsToMainToolbar();
-	void AddStringToMainToolbar(int iButtonId);
-	void GetMainToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize);
+	void AddButtonsToToolbar();
+	void AddButtonToToolbar(int iButtonId);
+	TBBUTTON GetToolbarButtonDetails(int iButtonId);
+	void AddStringsToToolbar();
+	void AddStringToToolbar(int iButtonId);
+	void GetToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize);
 	int LookupToolbarButtonImage(int iButtonID);
 	BYTE LookupToolbarButtonExtraStyles(int iButtonID);
 	int LookupToolbarButtonTextID(int iButtonID);
@@ -49,9 +49,9 @@ private:
 	IExplorerplusplus *m_pexpp;
 	std::shared_ptr<Config> m_config;
 
-	HIMAGELIST m_himlToolbarSmall;
-	HIMAGELIST m_himlToolbarLarge;
-	std::unordered_map<int, int> m_mainToolbarStringMap;
+	HIMAGELIST m_himlSmall;
+	HIMAGELIST m_himlLarge;
+	std::unordered_map<int, int> m_toolbarStringMap;
 
 	std::list<ToolbarButton_t> m_tbInitial;
 };

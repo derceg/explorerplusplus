@@ -49,8 +49,8 @@ MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pex
 
 MainToolbar::~MainToolbar()
 {
-	ImageList_Destroy(m_himlToolbarSmall);
-	ImageList_Destroy(m_himlToolbarLarge);
+	ImageList_Destroy(m_himlSmall);
+	ImageList_Destroy(m_himlLarge);
 
 	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
 }
@@ -67,14 +67,14 @@ void MainToolbar::Initialize(HWND parent)
 {
 	HBITMAP hb;
 
-	m_himlToolbarSmall = ImageList_Create(TOOLBAR_IMAGE_SIZE_SMALL_X, TOOLBAR_IMAGE_SIZE_SMALL_Y, ILC_COLOR32 | ILC_MASK, 0, 47);
+	m_himlSmall = ImageList_Create(TOOLBAR_IMAGE_SIZE_SMALL_X, TOOLBAR_IMAGE_SIZE_SMALL_Y, ILC_COLOR32 | ILC_MASK, 0, 47);
 	hb = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(m_himlToolbarSmall, hb, NULL);
+	ImageList_Add(m_himlSmall, hb, NULL);
 	DeleteObject(hb);
 
-	m_himlToolbarLarge = ImageList_Create(TOOLBAR_IMAGE_SIZE_LARGE_X, TOOLBAR_IMAGE_SIZE_LARGE_Y, ILC_COLOR32 | ILC_MASK, 0, 47);
+	m_himlLarge = ImageList_Create(TOOLBAR_IMAGE_SIZE_LARGE_X, TOOLBAR_IMAGE_SIZE_LARGE_Y, ILC_COLOR32 | ILC_MASK, 0, 47);
 	hb = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_SHELLIMAGES_LARGE));
-	ImageList_Add(m_himlToolbarLarge, hb, NULL);
+	ImageList_Add(m_himlLarge, hb, NULL);
 	DeleteObject(hb);
 
 	HIMAGELIST *phiml = NULL;
@@ -85,13 +85,13 @@ void MainToolbar::Initialize(HWND parent)
 	{
 		cx = TOOLBAR_IMAGE_SIZE_LARGE_X;
 		cy = TOOLBAR_IMAGE_SIZE_LARGE_Y;
-		phiml = &m_himlToolbarLarge;
+		phiml = &m_himlLarge;
 	}
 	else
 	{
 		cx = TOOLBAR_IMAGE_SIZE_SMALL_X;
 		cy = TOOLBAR_IMAGE_SIZE_SMALL_Y;
-		phiml = &m_himlToolbarSmall;
+		phiml = &m_himlSmall;
 	}
 
 	SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(cx, cy));
@@ -102,8 +102,8 @@ void MainToolbar::Initialize(HWND parent)
 
 	SetInitialToolbarButtons();
 
-	AddStringsToMainToolbar();
-	AddButtonsToMainToolbar();
+	AddStringsToToolbar();
+	AddButtonsToToolbar();
 
 	/* TODO: This needs
 	to be updated. */
@@ -179,21 +179,21 @@ void MainToolbar::SetInitialToolbarButtons()
 		DEFAULT_TOOLBAR_BUTTONS + SIZEOF_ARRAY(DEFAULT_TOOLBAR_BUTTONS));
 }
 
-void MainToolbar::AddButtonsToMainToolbar()
+void MainToolbar::AddButtonsToToolbar()
 {
 	for (const auto &toolbarButton : m_tbInitial)
 	{
-		AddButtonToMainToolbar(toolbarButton.iItemID);
+		AddButtonToToolbar(toolbarButton.iItemID);
 	}
 }
 
-void MainToolbar::AddButtonToMainToolbar(int iButtonId)
+void MainToolbar::AddButtonToToolbar(int iButtonId)
 {
-	TBBUTTON tbButton = GetMainToolbarButtonDetails(iButtonId);
+	TBBUTTON tbButton = GetToolbarButtonDetails(iButtonId);
 	SendMessage(m_hwnd, TB_ADDBUTTONS, 1, reinterpret_cast<LPARAM>(&tbButton));
 }
 
-TBBUTTON MainToolbar::GetMainToolbarButtonDetails(int iButtonId)
+TBBUTTON MainToolbar::GetToolbarButtonDetails(int iButtonId)
 {
 	TBBUTTON tbButton;
 
@@ -213,8 +213,8 @@ TBBUTTON MainToolbar::GetMainToolbarButtonDetails(int iButtonId)
 		/* Standard style that all toolbar buttons will have. */
 		BYTE StandardStyle = BTNS_BUTTON | BTNS_AUTOSIZE;
 
-		auto itr = m_mainToolbarStringMap.find(iButtonId);
-		assert(itr != m_mainToolbarStringMap.end());
+		auto itr = m_toolbarStringMap.find(iButtonId);
+		assert(itr != m_toolbarStringMap.end());
 
 		int stringIndex = itr->second;
 
@@ -229,28 +229,28 @@ TBBUTTON MainToolbar::GetMainToolbarButtonDetails(int iButtonId)
 	return tbButton;
 }
 
-void MainToolbar::AddStringsToMainToolbar()
+void MainToolbar::AddStringsToToolbar()
 {
 	for (int i = 0; i < SIZEOF_ARRAY(TOOLBAR_BUTTON_SET); i++)
 	{
-		AddStringToMainToolbar(TOOLBAR_BUTTON_SET[i]);
+		AddStringToToolbar(TOOLBAR_BUTTON_SET[i]);
 	}
 }
 
-void MainToolbar::AddStringToMainToolbar(int iButtonId)
+void MainToolbar::AddStringToToolbar(int iButtonId)
 {
 	TCHAR szText[64];
 
 	/* The string must be double NULL-terminated. */
-	GetMainToolbarButtonText(iButtonId, szText, SIZEOF_ARRAY(szText));
+	GetToolbarButtonText(iButtonId, szText, SIZEOF_ARRAY(szText));
 	szText[lstrlen(szText) + 1] = '\0';
 
 	int index = static_cast<int>(SendMessage(m_hwnd, TB_ADDSTRING, NULL, reinterpret_cast<LPARAM>(szText)));
 
-	m_mainToolbarStringMap.insert(std::make_pair(iButtonId, index));
+	m_toolbarStringMap.insert(std::make_pair(iButtonId, index));
 }
 
-void MainToolbar::GetMainToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize)
+void MainToolbar::GetToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize)
 {
 	int res = LoadString(m_instance, LookupToolbarButtonTextID(iButtonId), szText, bufSize);
 	assert(res != 0);
@@ -546,13 +546,13 @@ void MainToolbar::UpdateToolbarSize()
 	{
 		cx = TOOLBAR_IMAGE_SIZE_LARGE_X;
 		cy = TOOLBAR_IMAGE_SIZE_LARGE_Y;
-		phiml = &m_himlToolbarLarge;
+		phiml = &m_himlLarge;
 	}
 	else
 	{
 		cx = TOOLBAR_IMAGE_SIZE_SMALL_X;
 		cy = TOOLBAR_IMAGE_SIZE_SMALL_Y;
-		phiml = &m_himlToolbarSmall;
+		phiml = &m_himlSmall;
 	}
 
 	/* Switch the image list. */
@@ -591,10 +591,10 @@ BOOL MainToolbar::OnTBGetButtonInfo(LPARAM lParam)
 	{
 		int iButtonId = TOOLBAR_BUTTON_SET[pnmtb->iItem];
 
-		pnmtb->tbButton = GetMainToolbarButtonDetails(iButtonId);
+		pnmtb->tbButton = GetToolbarButtonDetails(iButtonId);
 
 		TCHAR szText[64];
-		GetMainToolbarButtonText(iButtonId, szText, SIZEOF_ARRAY(szText));
+		GetToolbarButtonText(iButtonId, szText, SIZEOF_ARRAY(szText));
 		StringCchCopy(pnmtb->pszText, pnmtb->cchText, szText);
 
 		return TRUE;
@@ -615,7 +615,7 @@ void MainToolbar::OnTBReset()
 	for (i = nButtons - 1; i >= 0; i--)
 		SendMessage(m_hwnd, TB_DELETEBUTTON, i, 0);
 
-	AddButtonsToMainToolbar();
+	AddButtonsToToolbar();
 	m_pexpp->UpdateMainToolbar();
 }
 
