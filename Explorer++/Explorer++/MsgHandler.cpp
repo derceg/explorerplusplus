@@ -779,21 +779,6 @@ void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 	m_pActiveShellBrowser->SetCurrentViewMode(*itr);
 }
 
-void Explorerplusplus::ShowToolbarViewsDropdown(void)
-{
-	POINT	ptOrigin;
-	RECT	rcButton;
-
-	SendMessage(m_mainToolbar->GetHWND(),TB_GETRECT,(WPARAM)TOOLBAR_VIEWS,(LPARAM)&rcButton);
-
-	ptOrigin.x	= rcButton.left;
-	ptOrigin.y	= rcButton.bottom;
-
-	ClientToScreen(m_mainToolbar->GetHWND(),&ptOrigin);
-
-	CreateViewsMenu(&ptOrigin);
-}
-
 void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)
 {
 	if(bSortAscending != m_pActiveShellBrowser->GetSortAscending())
@@ -1461,86 +1446,6 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 	}
 
 	return 0;
-}
-
-int Explorerplusplus::GetViewModeMenuId(UINT uViewMode)
-{
-	switch(uViewMode)
-	{
-		case VM_THUMBNAILS:
-			return IDM_VIEW_THUMBNAILS;
-			break;
-
-		case VM_TILES:
-			return IDM_VIEW_TILES;
-			break;
-
-		case VM_EXTRALARGEICONS:
-			return IDM_VIEW_EXTRALARGEICONS;
-			break;
-
-		case VM_LARGEICONS:
-			return IDM_VIEW_LARGEICONS;
-			break;
-
-		case VM_ICONS:
-			return IDM_VIEW_ICONS;
-			break;
-
-		case VM_SMALLICONS:
-			return IDM_VIEW_SMALLICONS;
-			break;
-
-		case VM_LIST:
-			return IDM_VIEW_LIST;
-			break;
-
-		case VM_DETAILS:
-			return IDM_VIEW_DETAILS;
-			break;
-	}
-
-	return -1;
-}
-
-int Explorerplusplus::GetViewModeMenuStringId(UINT uViewMode)
-{
-	switch(uViewMode)
-	{
-		case VM_THUMBNAILS:
-			return IDS_VIEW_THUMBNAILS;
-			break;
-
-		case VM_TILES:
-			return IDS_VIEW_TILES;
-			break;
-
-		case VM_EXTRALARGEICONS:
-			return IDS_VIEW_EXTRALARGEICONS;
-			break;
-
-		case VM_LARGEICONS:
-			return IDS_VIEW_LARGEICONS;
-			break;
-
-		case VM_ICONS:
-			return IDS_VIEW_MEDIUMICONS;
-			break;
-
-		case VM_SMALLICONS:
-			return IDS_VIEW_SMALLICONS;
-			break;
-
-		case VM_LIST:
-			return IDS_VIEW_LIST;
-			break;
-
-		case VM_DETAILS:
-			return IDS_VIEW_DETAILS;
-			break;
-	}
-
-	return -1;
 }
 
 void Explorerplusplus::OnSortBy(UINT uSortMode)

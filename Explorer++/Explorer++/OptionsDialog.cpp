@@ -23,6 +23,7 @@
 #include "MainResource.h"
 #include "ModelessDialogs.h"
 #include "SetDefaultColumnsDialog.h"
+#include "ShellBrowser/ViewModes.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"

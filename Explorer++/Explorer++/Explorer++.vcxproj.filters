@@ -241,6 +241,9 @@
     <ClCompile Include="MainToolbar.cpp">
       <Filter>Main Toolbar</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\ViewModes.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">

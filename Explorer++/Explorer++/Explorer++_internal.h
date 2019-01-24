@@ -53,6 +53,8 @@ __interface IExplorerplusplus
 	HRESULT			BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags,BOOL bOpenInNewTab,BOOL bSwitchToNewTab,BOOL bOpenInNewWindow);
 
 	void			OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
+
+	HMENU			BuildViewsMenu();
 };
 
 /* Used when setting Explorer++ as the default

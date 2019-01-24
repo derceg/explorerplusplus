@@ -18,6 +18,7 @@
 #include "CustomizeColorsDialog.h"
 #include "MainImages.h"
 #include "MainResource.h"
+#include "ShellBrowser/ViewModes.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
@@ -145,7 +146,6 @@ void Explorerplusplus::OnCreate(void)
 	m_hGroupBySubMenuRClick = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
 	m_hTabRightClickMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_TAB_RCLICK)), 0);
 	m_hToolbarRightClickMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_TOOLBAR_MENU)), 0);
-	m_hViewsMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_VIEWS_MENU)), 0);
 
 	CreateDirectoryMonitor(&m_pDirMon);
 
@@ -277,27 +277,10 @@ void Explorerplusplus::InitializeMenus(void)
 {
 	HMENU hMenu = GetMenu(m_hContainer);
 
-	/* Insert the view mode (icons, small icons, details, etc) menus in. */
-	MENUITEMINFO mii;
-	TCHAR szText[64];
-
-	for (UINT viewMode : m_ViewModes)
-	{
-		LoadString(m_hLanguageModule,GetViewModeMenuStringId(viewMode),
-			szText,SIZEOF_ARRAY(szText));
-
-		mii.cbSize		= sizeof(mii);
-		mii.fMask		= MIIM_ID|MIIM_STRING;
-		mii.wID			= GetViewModeMenuId(viewMode);
-		mii.dwTypeData	= szText;
-		InsertMenuItem(hMenu,IDM_VIEW_PLACEHOLDER,FALSE,&mii);
-
-		InsertMenuItem(m_hViewsMenu,IDM_VIEW_PLACEHOLDER,FALSE,&mii);
-	}
+	AddViewModesToMenu(hMenu);
 
 	/* Delete the placeholder menu. */
 	DeleteMenu(hMenu,IDM_VIEW_PLACEHOLDER,MF_BYCOMMAND);
-	DeleteMenu(m_hViewsMenu,IDM_VIEW_PLACEHOLDER,MF_BYCOMMAND);
 
 	SetMenuImages();
 
@@ -381,6 +364,34 @@ void Explorerplusplus::SetMenuItemImageFromImageList(HMENU menu, UINT menuItemId
 		is destroyed at the appropriate
 		time. */
 		menuImages.push_back(std::move(bitmapPARGB32));
+	}
+}
+
+HMENU Explorerplusplus::BuildViewsMenu()
+{
+	HMENU viewsMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_VIEWS_MENU)), 0);
+	AddViewModesToMenu(viewsMenu);
+	DeleteMenu(viewsMenu, IDM_VIEW_PLACEHOLDER, MF_BYCOMMAND);
+
+	return viewsMenu;
+}
+
+void Explorerplusplus::AddViewModesToMenu(HMENU menu)
+{
+	/* Insert the view mode (icons, small icons, details, etc) menus in. */
+	MENUITEMINFO mii;
+	TCHAR szText[64];
+
+	for (UINT viewMode : m_ViewModes)
+	{
+		LoadString(m_hLanguageModule, GetViewModeMenuStringId(viewMode),
+			szText, SIZEOF_ARRAY(szText));
+
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_ID | MIIM_STRING;
+		mii.wID = GetViewModeMenuId(viewMode);
+		mii.dwTypeData = szText;
+		InsertMenuItem(menu, IDM_VIEW_PLACEHOLDER, FALSE, &mii);
 	}
 }
 

@@ -357,7 +357,6 @@ private:
 	void					UpdateTabToolbar(void);
 	void					OnAutoSizeColumns(void);
 	void					OnToolbarViews(void);
-	void					ShowToolbarViewsDropdown(void);
 	void					OnApplicationToolbarRClick();
 	void					OnSortByAscending(BOOL bSortAscending);
 	void					OnPreviousWindow(void);
@@ -532,7 +531,6 @@ private:
 	void					AdjustMainToolbarSize(void);
 
 	/* Main toolbar private message handlers. */
-	LRESULT					OnTbnDropDown(LPARAM lParam);
 	void					OnMainToolbarRClick();
 
 	/* Directory specific settings. */
@@ -716,9 +714,10 @@ private:
 	void					InitializeMenus(void);
 	void					SetMenuImages();
 	void					SetMenuItemImageFromImageList(HMENU menu, UINT menuItemId, HIMAGELIST imageList, int bitmapIndex, std::vector<HBitmapPtr> &menuImages);
+	HMENU					BuildViewsMenu();
+	void					AddViewModesToMenu(HMENU menu);
 
 	/* Miscellaneous. */
-	void					CreateViewsMenu(POINT *ptOrigin);
 	void					CreateStatusBar(void);
 	void					InitializeDisplayWindow(void);
 	void					SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl);
@@ -727,8 +726,6 @@ private:
 	void					ShowMainRebarBand(HWND hwnd,BOOL bShow);
 	BOOL					OnMouseWheel(MousewheelSource_t MousewheelSource,WPARAM wParam,LPARAM lParam);
 	void					CycleViewState(BOOL bCycleForward);
-	int						GetViewModeMenuId(UINT uViewMode);
-	int						GetViewModeMenuStringId(UINT uViewMode);
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	CStatusBar				*GetStatusBar();
 	UINT					GetDefaultSortMode(LPCITEMIDLIST pidlDirectory);
@@ -768,7 +765,6 @@ private:
 	HMENU					m_hGroupBySubMenuRClick;
 	HMENU					m_hTabRightClickMenu;
 	HMENU					m_hToolbarRightClickMenu;
-	HMENU					m_hViewsMenu;
 	TCHAR					m_CurrentDirectory[MAX_PATH];
 	TCHAR					m_DefaultTabDirectoryStatic[MAX_PATH];
 	TCHAR					m_DefaultTabDirectory[MAX_PATH];

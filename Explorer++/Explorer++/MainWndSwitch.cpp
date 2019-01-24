@@ -1517,10 +1517,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 			OnAddressBarBeginDrag();
 			break;
 
-		case TBN_DROPDOWN:
-			return OnTbnDropDown(lParam);
-			break;
-
 		case TBN_INITCUSTOMIZE:
 			return TBNRF_HIDEHELP;
 			break;
@@ -1647,35 +1643,8 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 											break;
 
 										case TOOLBAR_VIEWS:
-											{
-												TCHAR szSubMenuText[512];
-												BOOL bRes;
-												int nItems;
-												int j = 0;
-
-												hSubMenu = CreateMenu();
-
-												nItems = GetMenuItemCount(m_hViewsMenu);
-
-												for(j = 0;j < nItems;j++)
-												{
-													mii.cbSize		= sizeof(mii);
-													mii.fMask		= MIIM_ID|MIIM_STRING;
-													mii.dwTypeData	= szSubMenuText;
-													mii.cch			= SIZEOF_ARRAY(szSubMenuText);
-													bRes = GetMenuItemInfo(m_hViewsMenu,j,TRUE,&mii);
-
-													if(bRes)
-													{
-														mii.cbSize		= sizeof(mii);
-														mii.fMask		= MIIM_ID|MIIM_STRING;
-														mii.dwTypeData	= szSubMenuText;
-														InsertMenuItem(hSubMenu,j,TRUE,&mii);
-													}
-												}
-
-												fMask |= MIIM_SUBMENU;
-											}
+											hSubMenu = BuildViewsMenu();
+											fMask |= MIIM_SUBMENU;
 											break;
 										}
 									}

@@ -44,6 +44,9 @@ private:
 	BOOL OnTBGetButtonInfo(LPARAM lParam);
 	void OnTBReset();
 	void OnTBGetInfoTip(LPARAM lParam);
+	LRESULT OnTbnDropDown(LPARAM lParam);
+	void ShowToolbarViewsDropdown();
+	void CreateViewsMenu(POINT *ptOrigin);
 
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_pexpp;

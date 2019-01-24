@@ -14,6 +14,7 @@
 #include "DefaultToolbarButtons.h"
 #include "MainImages.h"
 #include "MainResource.h"
+#include "ShellBrowser/ViewModes.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
 
@@ -164,6 +165,10 @@ LRESULT CALLBACK MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 
 			case TBN_RESET:
 				OnTBReset();
+				break;
+
+			case TBN_DROPDOWN:
+				return OnTbnDropDown(lParam);
 				break;
 			}
 		}
@@ -663,4 +668,88 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
 		}
 	}
+}
+
+LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
+{
+	NMTOOLBAR		*nmTB = NULL;
+	LPITEMIDLIST	pidl = NULL;
+	POINT			ptOrigin;
+	RECT			rc;
+	HRESULT			hr;
+
+	nmTB = (NMTOOLBAR *)lParam;
+
+	GetWindowRect(m_hwnd, &rc);
+
+	ptOrigin.x = rc.left;
+	ptOrigin.y = rc.bottom - 4;
+
+	if (nmTB->iItem == TOOLBAR_BACK)
+	{
+		hr = m_pexpp->GetActiveShellBrowser()->CreateHistoryPopup(m_hwnd, &pidl, &ptOrigin, TRUE);
+
+		if (SUCCEEDED(hr))
+		{
+			m_pexpp->BrowseFolder(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY, FALSE, FALSE, FALSE);
+
+			CoTaskMemFree(pidl);
+		}
+
+		return TBDDRET_DEFAULT;
+	}
+	else if (nmTB->iItem == TOOLBAR_FORWARD)
+	{
+		SendMessage(m_hwnd, TB_GETRECT, (WPARAM)TOOLBAR_BACK, (LPARAM)&rc);
+
+		ptOrigin.x += rc.right;
+
+		hr = m_pexpp->GetActiveShellBrowser()->CreateHistoryPopup(m_hwnd, &pidl, &ptOrigin, FALSE);
+
+		if (SUCCEEDED(hr))
+		{
+			m_pexpp->BrowseFolder(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY, FALSE, FALSE, FALSE);
+
+			CoTaskMemFree(pidl);
+		}
+
+		return TBDDRET_DEFAULT;
+	}
+	else if (nmTB->iItem == TOOLBAR_VIEWS)
+	{
+		ShowToolbarViewsDropdown();
+
+		return TBDDRET_DEFAULT;
+	}
+
+	return TBDDRET_NODEFAULT;
+}
+
+void MainToolbar::ShowToolbarViewsDropdown()
+{
+	POINT	ptOrigin;
+	RECT	rcButton;
+
+	SendMessage(m_hwnd, TB_GETRECT, (WPARAM)TOOLBAR_VIEWS, (LPARAM)&rcButton);
+
+	ptOrigin.x = rcButton.left;
+	ptOrigin.y = rcButton.bottom;
+
+	ClientToScreen(m_hwnd, &ptOrigin);
+
+	CreateViewsMenu(&ptOrigin);
+}
+
+void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
+{
+	UINT uViewMode = m_pexpp->GetActiveShellBrowser()->GetCurrentViewMode();
+
+	HMENU viewsMenu = m_pexpp->BuildViewsMenu();
+
+	int ItemToCheck = GetViewModeMenuId(uViewMode);
+	CheckMenuRadioItem(viewsMenu, IDM_VIEW_THUMBNAILS, IDM_VIEW_EXTRALARGEICONS,
+		ItemToCheck, MF_BYCOMMAND);
+
+	TrackPopupMenu(viewsMenu, TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y,
+		0, m_hwnd, NULL);
 }

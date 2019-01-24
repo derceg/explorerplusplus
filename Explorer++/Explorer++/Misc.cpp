@@ -685,18 +685,6 @@ int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 		(WPARAM)pDWFolderSizeCompletion,0);
 }
 
-void Explorerplusplus::CreateViewsMenu(POINT *ptOrigin)
-{
-	UINT uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
-
-	int ItemToCheck = GetViewModeMenuId(uViewMode);
-	CheckMenuRadioItem(m_hViewsMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,
-		ItemToCheck,MF_BYCOMMAND);
-
-	TrackPopupMenu(m_hViewsMenu,TPM_LEFTALIGN,ptOrigin->x,ptOrigin->y,
-		0,m_hContainer,NULL);
-}
-
 int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer)
 {
 	ULARGE_INTEGER	TotalNumberOfBytes;
