@@ -13,9 +13,9 @@
 #include "ViewModes.h"
 #include "MainResource.h"
 
-int GetViewModeMenuId(UINT uViewMode)
+int GetViewModeMenuId(ViewMode viewMode)
 {
-	switch (uViewMode)
+	switch (viewMode)
 	{
 	case VM_THUMBNAILS:
 		return IDM_VIEW_THUMBNAILS;
@@ -53,9 +53,9 @@ int GetViewModeMenuId(UINT uViewMode)
 	return -1;
 }
 
-int GetViewModeMenuStringId(UINT uViewMode)
+int GetViewModeMenuStringId(ViewMode viewMode)
 {
-	switch (uViewMode)
+	switch (viewMode)
 	{
 	case VM_THUMBNAILS:
 		return IDS_VIEW_THUMBNAILS;

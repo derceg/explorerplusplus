@@ -12,5 +12,5 @@ enum ViewMode
 	VM_LARGEICONS = 8,
 };
 
-int GetViewModeMenuId(UINT uViewMode);
-int GetViewModeMenuStringId(UINT uViewMode);
+int GetViewModeMenuId(ViewMode viewMode);
+int GetViewModeMenuStringId(ViewMode viewMode);

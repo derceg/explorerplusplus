@@ -595,7 +595,9 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 				RegQueryValueEx(hTabKey,_T("Directory"),0,&Type,(LPBYTE)pidlDirectory,&cbData);
 			}
 
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ViewMode"),(LPDWORD)&Settings.ViewMode);
+			DWORD value;
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ViewMode"),&value);
+			Settings.viewMode = static_cast<ViewMode>(value);
 
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortMode"),(LPDWORD)&Settings.SortMode);
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortAscending"),(LPDWORD)&Settings.bSortAscending);

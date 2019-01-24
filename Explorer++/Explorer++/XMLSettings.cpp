@@ -1852,7 +1852,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_VIEWMODEGLOBAL:
-		m_ViewModeGlobal = NXMLSettings::DecodeIntValue(wszValue);
+		m_ViewModeGlobal = static_cast<ViewMode>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_POSITION:
@@ -1957,7 +1957,7 @@ InitialSettings_t *pSettings,TabInfo_t *pTabInfo)
 	}
 	else if(lstrcmp(wszName,L"ViewMode") == 0)
 	{
-		pSettings->ViewMode = NXMLSettings::DecodeIntValue(wszValue);
+		pSettings->viewMode = static_cast<ViewMode>(NXMLSettings::DecodeIntValue(wszValue));
 	}
 	else if(lstrcmp(wszName,L"Locked") == 0)
 	{

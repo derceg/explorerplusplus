@@ -742,11 +742,11 @@ void MainToolbar::ShowToolbarViewsDropdown()
 
 void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 {
-	UINT uViewMode = m_pexpp->GetActiveShellBrowser()->GetCurrentViewMode();
+	ViewMode viewMode = m_pexpp->GetActiveShellBrowser()->GetCurrentViewMode();
 
 	HMENU viewsMenu = m_pexpp->BuildViewsMenu();
 
-	int ItemToCheck = GetViewModeMenuId(uViewMode);
+	int ItemToCheck = GetViewModeMenuId(viewMode);
 	CheckMenuRadioItem(viewsMenu, IDM_VIEW_THUMBNAILS, IDM_VIEW_EXTRALARGEICONS,
 		ItemToCheck, MF_BYCOMMAND);
 

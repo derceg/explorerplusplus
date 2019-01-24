@@ -741,21 +741,19 @@ void Explorerplusplus::OnToolbarViews(void)
 
 void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 {
-	UINT uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
+	ViewMode viewMode = m_pActiveShellBrowser->GetCurrentViewMode();
 
-	std::list<UINT>::iterator itr;
+	std::list<ViewMode>::iterator itr;
 
 	for(itr = m_ViewModes.begin();itr != m_ViewModes.end();itr++)
 	{
-		if(*itr == uViewMode)
+		if(*itr == viewMode)
 			break;
 	}
 
 	if(bCycleForward)
 	{
-		std::list<UINT>::iterator itrEnd;
-
-		itrEnd = m_ViewModes.end();
+		auto itrEnd = m_ViewModes.end();
 		itrEnd--;
 
 		if(itr == itrEnd)

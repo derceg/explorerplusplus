@@ -375,7 +375,7 @@ int *pTabObjectIndex)
 				//bFound = TRUE;
 
 				is.SortMode				= ds.dsi.SortMode;
-				is.ViewMode				= ds.dsi.ViewMode;
+				is.viewMode				= ds.dsi.ViewMode;
 				is.bApplyFilter			= FALSE;
 				is.bFilterCaseSensitive	= FALSE;
 
@@ -397,7 +397,7 @@ int *pTabObjectIndex)
 		else
 		{
 			is.SortMode				= GetDefaultSortMode(pidlDirectory);
-			is.ViewMode				= m_ViewModeGlobal;
+			is.viewMode				= m_ViewModeGlobal;
 			is.bApplyFilter			= FALSE;
 			is.bFilterCaseSensitive	= FALSE;
 

@@ -9,6 +9,7 @@
 #include "Explorer++_internal.h"
 #include "MainToolbar.h"
 #include "ShellBrowser/iShellView.h"
+#include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/FileActionHandler.h"
@@ -159,7 +160,7 @@ private:
 	struct DirectorySettingsInternal_t
 	{
 		UINT	SortMode;
-		UINT	ViewMode;
+		ViewMode	ViewMode;
 
 		std::list<Column_t>	RealFolderColumnList;
 		std::list<Column_t>	MyComputerColumnList;
@@ -784,7 +785,7 @@ private:
 	ULONG					m_SHChangeNotifyID;
 	bool					m_InitializationFinished;
 
-	std::list<UINT>			m_ViewModes;
+	std::list<ViewMode>		m_ViewModes;
 
 	/* Initialization. */
 	BOOL					m_bLoadSettingsFromXML;
@@ -831,7 +832,7 @@ private:
 	InfoTipType_t			m_InfoTipType;
 
 	/* Global options. */
-	DWORD					m_ViewModeGlobal;
+	ViewMode				m_ViewModeGlobal;
 	BOOL					m_bShowHiddenGlobal;
 	BOOL					m_bShowExtensionsGlobal;
 	BOOL					m_bShowInGroupsGlobal;

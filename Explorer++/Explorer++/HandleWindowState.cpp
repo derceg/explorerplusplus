@@ -61,7 +61,7 @@ void Explorerplusplus::UpdateWindowStates(void)
 */
 void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 {
-	UINT uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
+	ViewMode viewMode = m_pActiveShellBrowser->GetCurrentViewMode();
 	BOOL bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYITEMPATH,AnyItemsSelected());
@@ -69,7 +69,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_FILE_SETFILEATTRIBUTES,AnyItemsSelected());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_OPENCOMMANDPROMPT,!bVirtualFolder);
 	lEnableMenuItem(hProgramMenu,IDM_FILE_SAVEDIRECTORYLISTING,!bVirtualFolder);
-	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYCOLUMNTEXT,m_nSelected && (uViewMode == VM_DETAILS));
+	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYCOLUMNTEXT,m_nSelected && (viewMode == VM_DETAILS));
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_RENAME,IsRenamePossible());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_DELETE,IsDeletionPossible());
@@ -111,7 +111,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_MERGEFILES,m_nSelected > 1);
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_DESTROYFILES,m_nSelected);
 
-	UINT ItemToCheck = GetViewModeMenuId(uViewMode);
+	UINT ItemToCheck = GetViewModeMenuId(viewMode);
 	CheckMenuRadioItem(hProgramMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,ItemToCheck,MF_BYCOMMAND);
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_CLOSETAB,TabCtrl_GetItemCount(m_hTabCtrl));
@@ -119,9 +119,9 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_GO_FORWARD,m_pActiveShellBrowser->IsForwardHistory());
 	lEnableMenuItem(hProgramMenu,IDM_GO_UPONELEVEL,m_pActiveShellBrowser->CanBrowseUp());
 
-	lEnableMenuItem(hProgramMenu,IDM_VIEW_AUTOSIZECOLUMNS,uViewMode == VM_DETAILS);
+	lEnableMenuItem(hProgramMenu,IDM_VIEW_AUTOSIZECOLUMNS,viewMode == VM_DETAILS);
 
-	if(uViewMode == VM_DETAILS)
+	if(viewMode == VM_DETAILS)
 	{
 		/* Disable auto arrange menu item. */
 		lEnableMenuItem(hProgramMenu,IDM_ARRANGEICONSBY_AUTOARRANGE,FALSE);
@@ -129,7 +129,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 
 		lEnableMenuItem(hProgramMenu,IDM_VIEW_GROUPBY,TRUE);
 	}
-	else if(uViewMode == VM_LIST)
+	else if(viewMode == VM_LIST)
 	{
 		/* Disable group menu item. */
 		lEnableMenuItem(hProgramMenu,IDM_VIEW_GROUPBY,FALSE);

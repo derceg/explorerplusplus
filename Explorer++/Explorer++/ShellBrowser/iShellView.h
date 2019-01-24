@@ -4,6 +4,7 @@
 #include "iPathManager.h"
 #include "ItemData.h"
 #include "TabPreferences.h"
+#include "ViewModes.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ImageWrappers.h"
@@ -51,7 +52,7 @@ typedef struct
 typedef struct
 {
 	UINT	SortMode;
-	UINT	ViewMode;
+	ViewMode	viewMode;
 	BOOL	bSortAscending;
 	BOOL	bShowInGroups;
 	BOOL	bShowHidden;
@@ -135,8 +136,8 @@ public:
 	UINT				QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const;
 	BOOL				GetAutoArrange(void) const;
 	BOOL				ToggleAutoArrange(void);
-	UINT				GetCurrentViewMode() const;
-	void				SetCurrentViewMode(UINT ViewMode);
+	ViewMode			GetCurrentViewMode() const;
+	void				SetCurrentViewMode(ViewMode viewMode);
 	UINT				GetSortMode() const;
 	void				SetSortMode(UINT SortMode);
 	void				SortFolder(UINT SortMode);
@@ -347,7 +348,7 @@ private:
 	HRESULT inline		AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
 	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName);
 	void				ResetFolderMemoryAllocations(void);
-	void				SetCurrentViewModeInternal(UINT ViewMode);
+	void				SetCurrentViewModeInternal(ViewMode viewMode);
 
 	static LRESULT CALLBACK	ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK	ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -535,7 +536,7 @@ private:
 	ULARGE_INTEGER		m_ulTotalDirSize;
 	ULARGE_INTEGER		m_ulFileSelectionSize;
 	UINT				m_SortMode;
-	UINT				m_ViewMode;
+	ViewMode			m_ViewMode;
 	BOOL				m_bVirtualFolder;
 	BOOL				m_bFolderVisited;
 	BOOL				m_bShowFolderSizes;

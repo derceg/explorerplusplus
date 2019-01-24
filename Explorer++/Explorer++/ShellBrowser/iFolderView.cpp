@@ -213,7 +213,7 @@ BOOL CShellBrowser::ToggleAutoArrange(void)
 	return m_bAutoArrange;
 }
 
-UINT CShellBrowser::GetCurrentViewMode() const
+ViewMode CShellBrowser::GetCurrentViewMode() const
 {
 	return m_ViewMode;
 }
@@ -223,19 +223,19 @@ UINT CShellBrowser::GetCurrentViewMode() const
 not called when a tab is first set up (in which case
 the view mode still needs to be setup), or when entering
 a folder. */
-void CShellBrowser::SetCurrentViewMode(UINT ViewMode)
+void CShellBrowser::SetCurrentViewMode(ViewMode viewMode)
 {
-	if(ViewMode == m_ViewMode)
+	if(viewMode == m_ViewMode)
 	{
 		return;
 	}
 
-	if(m_ViewMode == VM_THUMBNAILS && ViewMode != VM_THUMBNAILS)
+	if(m_ViewMode == VM_THUMBNAILS && viewMode != VM_THUMBNAILS)
 		RemoveThumbnailsView();
 
-	SetCurrentViewModeInternal(ViewMode);
+	SetCurrentViewModeInternal(viewMode);
 
-	switch(ViewMode)
+	switch(viewMode)
 	{
 		case VM_TILES:
 			SetTileViewInfo();
@@ -248,11 +248,11 @@ This function also initializes any items needed to support
 the current view mode. This MUST be done within this
 function, as when a tab is first opened, the view settings
 will need to be initialized. */
-void CShellBrowser::SetCurrentViewModeInternal(UINT ViewMode)
+void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 {
 	DWORD dwStyle;
 
-	switch(ViewMode)
+	switch(viewMode)
 	{
 	case VM_EXTRALARGEICONS:
 		{
@@ -294,10 +294,10 @@ void CShellBrowser::SetCurrentViewModeInternal(UINT ViewMode)
 	}
 
 	/* Delete all the tile view columns. */
-	if(m_ViewMode == VM_TILES && ViewMode != VM_TILES)
+	if(m_ViewMode == VM_TILES && viewMode != VM_TILES)
 		DeleteTileViewColumns();
 
-	switch(ViewMode)
+	switch(viewMode)
 	{
 		case VM_TILES:
 			dwStyle = LV_VIEW_TILE;
@@ -338,13 +338,13 @@ void CShellBrowser::SetCurrentViewModeInternal(UINT ViewMode)
 
 		default:
 			dwStyle = LV_VIEW_ICON;
-			ViewMode = VM_ICONS;
+			viewMode = VM_ICONS;
 			break;
 	}
 
-	m_ViewMode = ViewMode;
+	m_ViewMode = viewMode;
 
-	if (ViewMode != VM_DETAILS)
+	if (viewMode != VM_DETAILS)
 	{
 		NListView::ListView_SetGridlines(m_hListView, FALSE);
 
@@ -403,7 +403,7 @@ void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 	m_bShowInGroups			= is->bShowInGroups;
 	m_bSortAscending		= is->bSortAscending;
 	m_SortMode				= is->SortMode;
-	m_ViewMode				= is->ViewMode;
+	m_ViewMode				= is->viewMode;
 	m_bApplyFilter			= is->bApplyFilter;
 	m_bFilterCaseSensitive	= is->bFilterCaseSensitive;
 	m_bShowFolderSizes		= is->bShowFolderSizes;

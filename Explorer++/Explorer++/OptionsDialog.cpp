@@ -1183,7 +1183,7 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 						HWND hComboBox = GetDlgItem(hDlg,IDC_OPTIONS_DEFAULT_VIEW);
 						int SelectedIndex = static_cast<int>(SendMessage(hComboBox,CB_GETCURSEL,0,0));
-						m_ViewModeGlobal = static_cast<int>(SendMessage(hComboBox,CB_GETITEMDATA,SelectedIndex,0));
+						m_ViewModeGlobal = static_cast<ViewMode>(SendMessage(hComboBox,CB_GETITEMDATA,SelectedIndex,0));
 
 						SaveAllSettings();
 					}
