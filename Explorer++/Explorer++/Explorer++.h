@@ -639,7 +639,8 @@ private:
 	HRESULT					TestListViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 	HRESULT					TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 	HRESULT					GetSelectionAttributes(SFGAOF *pItemAttributes) const;
-	BOOL					CanCutOrCopy(void) const;
+	BOOL					CanCut(void) const;
+	BOOL					CanCopy(void) const;
 	BOOL					CanRename(void) const;
 	BOOL					CanDelete(void) const;
 	BOOL					CanShowFileProperties(void) const;

@@ -33,10 +33,10 @@ void Explorerplusplus::UpdateMainToolbar()
 
 	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,TOOLBAR_FORWARD,m_pActiveShellBrowser->CanBrowseForward());
 
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_COPYTO,CanCutOrCopy() && GetFocus() != m_hTreeView);
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_MOVETO,CanCutOrCopy() && GetFocus() != m_hTreeView);
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_COPY,CanCutOrCopy());
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_CUT,CanCutOrCopy());
+	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_COPYTO,CanCopy() && GetFocus() != m_hTreeView);
+	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_MOVETO,CanCut() && GetFocus() != m_hTreeView);
+	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_COPY,CanCopy());
+	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_CUT,CanCut());
 	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_PASTE,CanPaste());
 	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_PROPERTIES,CanShowFileProperties());
 	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_DELETE,CanDelete());

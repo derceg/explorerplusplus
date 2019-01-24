@@ -1529,7 +1529,7 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 	int				iItem = -1;
 	HRESULT			hr;
 
-	if(!CanCutOrCopy())
+	if(!CanCopy())
 		return E_FAIL;
 
 	SetCursor(LoadCursor(NULL,IDC_WAIT));

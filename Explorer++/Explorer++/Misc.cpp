@@ -358,9 +358,14 @@ HRESULT Explorerplusplus::TestTreeViewSelectionAttributes(SFGAOF *pItemAttribute
 	return hr;
 }
 
-BOOL Explorerplusplus::CanCutOrCopy(void) const
+BOOL Explorerplusplus::CanCut(void) const
 {
-	return TestItemAttributes(SFGAO_CANCOPY | SFGAO_CANMOVE);
+	return TestItemAttributes(SFGAO_CANMOVE);
+}
+
+BOOL Explorerplusplus::CanCopy(void) const
+{
+	return TestItemAttributes(SFGAO_CANCOPY);
 }
 
 BOOL Explorerplusplus::CanRename(void) const

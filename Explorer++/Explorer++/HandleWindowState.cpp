@@ -86,10 +86,10 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	actions, cut/copy, etc). */
 	/* TODO: Split CanCutOrCopySelection() into two, as some
 	items may only be copied/cut (not both). */
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPY,CanCutOrCopy());
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_CUT,CanCutOrCopy());
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPYTOFOLDER,CanCutOrCopy() && GetFocus() != m_hTreeView);
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_MOVETOFOLDER,CanCutOrCopy() && GetFocus() != m_hTreeView);
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPY,CanCopy());
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_CUT,CanCut());
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPYTOFOLDER,CanCopy() && GetFocus() != m_hTreeView);
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_MOVETOFOLDER,CanCut() && GetFocus() != m_hTreeView);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_WILDCARDDESELECT,m_nSelected);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_SELECTNONE,m_nSelected);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_RESOLVELINK,m_nSelected);
