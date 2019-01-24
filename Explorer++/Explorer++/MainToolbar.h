@@ -30,13 +30,13 @@ private:
 	void SetInitialToolbarButtons();
 	void AddButtonsToToolbar();
 	void AddButtonToToolbar(int iButtonId);
-	TBBUTTON GetToolbarButtonDetails(int iButtonId);
+	TBBUTTON GetToolbarButtonDetails(int iButtonId) const;
 	void AddStringsToToolbar();
 	void AddStringToToolbar(int iButtonId);
-	void GetToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize);
-	int LookupToolbarButtonImage(int iButtonID);
-	BYTE LookupToolbarButtonExtraStyles(int iButtonID);
-	int LookupToolbarButtonTextID(int iButtonID);
+	void GetToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize) const;
+	int LookupToolbarButtonImage(int iButtonID) const;
+	BYTE LookupToolbarButtonExtraStyles(int iButtonID) const;
+	int LookupToolbarButtonTextID(int iButtonID) const;
 
 	BOOL OnTBQueryInsert();
 	BOOL OnTBQueryDelete();

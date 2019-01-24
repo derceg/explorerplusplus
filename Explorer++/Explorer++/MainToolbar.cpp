@@ -193,7 +193,7 @@ void MainToolbar::AddButtonToToolbar(int iButtonId)
 	SendMessage(m_hwnd, TB_ADDBUTTONS, 1, reinterpret_cast<LPARAM>(&tbButton));
 }
 
-TBBUTTON MainToolbar::GetToolbarButtonDetails(int iButtonId)
+TBBUTTON MainToolbar::GetToolbarButtonDetails(int iButtonId) const
 {
 	TBBUTTON tbButton;
 
@@ -250,7 +250,7 @@ void MainToolbar::AddStringToToolbar(int iButtonId)
 	m_toolbarStringMap.insert(std::make_pair(iButtonId, index));
 }
 
-void MainToolbar::GetToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize)
+void MainToolbar::GetToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize) const
 {
 	int res = LoadString(m_instance, LookupToolbarButtonTextID(iButtonId), szText, bufSize);
 	assert(res != 0);
@@ -260,7 +260,7 @@ void MainToolbar::GetToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize
 	UNUSED(res);
 }
 
-int MainToolbar::LookupToolbarButtonImage(int iButtonID)
+int MainToolbar::LookupToolbarButtonImage(int iButtonID) const
 {
 	switch (iButtonID)
 	{
@@ -352,7 +352,7 @@ int MainToolbar::LookupToolbarButtonImage(int iButtonID)
 	return -1;
 }
 
-BYTE MainToolbar::LookupToolbarButtonExtraStyles(int iButtonID)
+BYTE MainToolbar::LookupToolbarButtonExtraStyles(int iButtonID) const
 {
 	switch (iButtonID)
 	{
@@ -444,7 +444,7 @@ BYTE MainToolbar::LookupToolbarButtonExtraStyles(int iButtonID)
 	return 0;
 }
 
-int MainToolbar::LookupToolbarButtonTextID(int iButtonID)
+int MainToolbar::LookupToolbarButtonTextID(int iButtonID) const
 {
 	switch (iButtonID)
 	{
