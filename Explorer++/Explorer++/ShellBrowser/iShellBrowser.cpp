@@ -146,7 +146,7 @@ IN POINT *pt,IN BOOL bBackOrForward)
 	return S_OK;
 }
 
-BOOL CShellBrowser::IsBackHistory(void) const
+BOOL CShellBrowser::CanBrowseBack(void) const
 {
 	int nBackPathsStored;
 
@@ -158,7 +158,7 @@ BOOL CShellBrowser::IsBackHistory(void) const
 	return TRUE;
 }
 
-BOOL CShellBrowser::IsForwardHistory(void) const
+BOOL CShellBrowser::CanBrowseForward(void) const
 {
 	int nForwardPathsStored;
 

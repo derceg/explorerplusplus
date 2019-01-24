@@ -632,7 +632,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 	if (ptbgit->iItem == TOOLBAR_BACK)
 	{
-		if (m_pexpp->GetActiveShellBrowser()->IsBackHistory())
+		if (m_pexpp->GetActiveShellBrowser()->CanBrowseBack())
 		{
 			LPITEMIDLIST pidl = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(-1);
 
@@ -651,7 +651,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 	}
 	else if (ptbgit->iItem == TOOLBAR_FORWARD)
 	{
-		if (m_pexpp->GetActiveShellBrowser()->IsForwardHistory())
+		if (m_pexpp->GetActiveShellBrowser()->CanBrowseForward())
 		{
 			LPITEMIDLIST pidl = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(1);
 

@@ -698,7 +698,7 @@ int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 
 BOOL Explorerplusplus::OnListViewBeginLabelEdit(LPARAM lParam)
 {
-	if(!IsRenamePossible())
+	if(!CanRename())
 	{
 		return TRUE;
 	}
@@ -1529,7 +1529,7 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 	int				iItem = -1;
 	HRESULT			hr;
 
-	if(!IsCutOrCopyPossible())
+	if(!CanCutOrCopy())
 		return E_FAIL;
 
 	SetCursor(LoadCursor(NULL,IDC_WAIT));

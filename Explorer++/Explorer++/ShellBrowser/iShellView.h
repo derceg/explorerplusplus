@@ -148,8 +148,8 @@ public:
 	BOOL				GetShowHidden(void) const;
 	BOOL				SetShowHidden(BOOL bShowHidden);
 	BOOL				ToggleShowHidden(void);
-	BOOL				IsBackHistory(void) const;
-	BOOL				IsForwardHistory(void) const;
+	BOOL				CanBrowseBack(void) const;
+	BOOL				CanBrowseForward(void) const;
 	std::list<LPITEMIDLIST>	GetBackHistory() const;
 	std::list<LPITEMIDLIST>	GetForwardHistory() const;
 	LPITEMIDLIST		RetrieveHistoryItemWithoutUpdate(int iItem);

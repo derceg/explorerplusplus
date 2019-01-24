@@ -71,9 +71,9 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_FILE_SAVEDIRECTORYLISTING,!bVirtualFolder);
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYCOLUMNTEXT,m_nSelected && (viewMode == VM_DETAILS));
 
-	lEnableMenuItem(hProgramMenu,IDM_FILE_RENAME,IsRenamePossible());
-	lEnableMenuItem(hProgramMenu,IDM_FILE_DELETE,IsDeletionPossible());
-	lEnableMenuItem(hProgramMenu,IDM_FILE_DELETEPERMANENTLY,IsDeletionPossible());
+	lEnableMenuItem(hProgramMenu,IDM_FILE_RENAME,CanRename());
+	lEnableMenuItem(hProgramMenu,IDM_FILE_DELETE,CanDelete());
+	lEnableMenuItem(hProgramMenu,IDM_FILE_DELETEPERMANENTLY,CanDelete());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_PROPERTIES,CanShowFileProperties());
 
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_UNDO,m_FileActionHandler.CanUndo());
@@ -86,10 +86,10 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	actions, cut/copy, etc). */
 	/* TODO: Split CanCutOrCopySelection() into two, as some
 	items may only be copied/cut (not both). */
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPY,IsCutOrCopyPossible());
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_CUT,IsCutOrCopyPossible());
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPYTOFOLDER,IsCutOrCopyPossible() && GetFocus() != m_hTreeView);
-	lEnableMenuItem(hProgramMenu,IDM_EDIT_MOVETOFOLDER,IsCutOrCopyPossible() && GetFocus() != m_hTreeView);
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPY,CanCutOrCopy());
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_CUT,CanCutOrCopy());
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPYTOFOLDER,CanCutOrCopy() && GetFocus() != m_hTreeView);
+	lEnableMenuItem(hProgramMenu,IDM_EDIT_MOVETOFOLDER,CanCutOrCopy() && GetFocus() != m_hTreeView);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_WILDCARDDESELECT,m_nSelected);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_SELECTNONE,m_nSelected);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_RESOLVELINK,m_nSelected);
@@ -115,8 +115,8 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	CheckMenuRadioItem(hProgramMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,ItemToCheck,MF_BYCOMMAND);
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_CLOSETAB,TabCtrl_GetItemCount(m_hTabCtrl));
-	lEnableMenuItem(hProgramMenu,IDM_GO_BACK,m_pActiveShellBrowser->IsBackHistory());
-	lEnableMenuItem(hProgramMenu,IDM_GO_FORWARD,m_pActiveShellBrowser->IsForwardHistory());
+	lEnableMenuItem(hProgramMenu,IDM_GO_BACK,m_pActiveShellBrowser->CanBrowseBack());
+	lEnableMenuItem(hProgramMenu,IDM_GO_FORWARD,m_pActiveShellBrowser->CanBrowseForward());
 	lEnableMenuItem(hProgramMenu,IDM_GO_UPONELEVEL,m_pActiveShellBrowser->CanBrowseUp());
 
 	lEnableMenuItem(hProgramMenu,IDM_VIEW_AUTOSIZECOLUMNS,viewMode == VM_DETAILS);
