@@ -22,6 +22,7 @@
 #include "ModelessDialogs.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
+#include "ToolbarButtons.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
@@ -488,8 +489,8 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_VIEW_STATUSBAR:
-			m_config.showStatusBar = !m_config.showStatusBar;
-			lShowWindow(m_hStatusBar, m_config.showStatusBar);
+			m_config->showStatusBar = !m_config->showStatusBar;
+			lShowWindow(m_hStatusBar, m_config->showStatusBar);
 			ResizeWindows();
 			break;
 
@@ -499,42 +500,42 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_VIEW_DISPLAYWINDOW:
-			m_config.showDisplayWindow = !m_config.showDisplayWindow;
-			lShowWindow(m_hDisplayWindow,m_config.showDisplayWindow);
+			m_config->showDisplayWindow = !m_config->showDisplayWindow;
+			lShowWindow(m_hDisplayWindow,m_config->showDisplayWindow);
 			ResizeWindows();
 			break;
 
 		case IDM_TOOLBARS_ADDRESSBAR:
-			m_config.showAddressBar = !m_config.showAddressBar;
-			ShowMainRebarBand(m_hAddressBar, m_config.showAddressBar);
+			m_config->showAddressBar = !m_config->showAddressBar;
+			ShowMainRebarBand(m_hAddressBar, m_config->showAddressBar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
 
 		case IDM_TOOLBARS_MAINTOOLBAR:
-			m_config.showMainToolbar = !m_config.showMainToolbar;
-			ShowMainRebarBand(m_hMainToolbar,m_config.showMainToolbar);
+			m_config->showMainToolbar = !m_config->showMainToolbar;
+			ShowMainRebarBand(m_mainToolbar->GetHWND(),m_config->showMainToolbar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
 
 		case IDM_TOOLBARS_BOOKMARKSTOOLBAR:
-			m_config.showBookmarksToolbar = !m_config.showBookmarksToolbar;
-			ShowMainRebarBand(m_hBookmarksToolbar,m_config.showBookmarksToolbar);
+			m_config->showBookmarksToolbar = !m_config->showBookmarksToolbar;
+			ShowMainRebarBand(m_hBookmarksToolbar,m_config->showBookmarksToolbar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
 
 		case IDM_TOOLBARS_DRIVES:
-			m_config.showDrivesToolbar = !m_config.showDrivesToolbar;
-			ShowMainRebarBand(m_pDrivesToolbar->GetHWND(),m_config.showDrivesToolbar);
+			m_config->showDrivesToolbar = !m_config->showDrivesToolbar;
+			ShowMainRebarBand(m_pDrivesToolbar->GetHWND(),m_config->showDrivesToolbar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
 
 		case IDM_TOOLBARS_APPLICATIONTOOLBAR:
-			m_config.showApplicationToolbar = !m_config.showApplicationToolbar;
-			ShowMainRebarBand(m_pApplicationToolbar->GetHWND(),m_config.showApplicationToolbar);
+			m_config->showApplicationToolbar = !m_config->showApplicationToolbar;
+			ShowMainRebarBand(m_pApplicationToolbar->GetHWND(),m_config->showApplicationToolbar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
@@ -544,7 +545,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_TOOLBARS_CUSTOMIZE:
-			SendMessage(m_hMainToolbar,TB_CUSTOMIZE,0,0);
+			SendMessage(m_mainToolbar->GetHWND(),TB_CUSTOMIZE,0,0);
 			break;
 
 		case IDM_VIEW_EXTRALARGEICONS:
@@ -1427,8 +1428,8 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 		/* Display window menus. */
 		case IDM_DW_HIDEDISPLAYWINDOW:
-			m_config.showDisplayWindow = FALSE;
-			lShowWindow(m_hDisplayWindow,m_config.showDisplayWindow);
+			m_config->showDisplayWindow = FALSE;
+			lShowWindow(m_hDisplayWindow,m_config->showDisplayWindow);
 			ResizeWindows();
 			break;
 	}
@@ -1453,7 +1454,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 	switch(nmhdr->code)
 	{
 		case NM_CLICK:
-			if(m_config.oneClickActivate && !m_bSelectionFromNowhere)
+			if(m_config->oneClickActivate && !m_bSelectionFromNowhere)
 			{
 				OnListViewDoubleClick(&((NMITEMACTIVATE *)lParam)->hdr);
 			}
@@ -1524,30 +1525,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 			return TBNRF_HIDEHELP;
 			break;
 
-		case TBN_QUERYINSERT:
-			return OnTBQueryInsert();
-			break;
-
-		case TBN_QUERYDELETE:
-			return OnTBQueryDelete();
-			break;
-
-		case TBN_GETBUTTONINFO:
-			return OnTBGetButtonInfo(lParam);
-			break;
-
-		case TBN_RESTORE:
-			return OnTBRestore();
-			break;
-
-		case TBN_GETINFOTIP:
-			OnTBGetInfoTip(lParam);
-			break;
-
-		case TBN_RESET:
-			OnTBReset();
-			break;
-
 		case TBN_ENDADJUST:
 			UpdateToolbarBandSizing(m_hMainRebar,((NMHDR *)lParam)->hwndFrom);
 			break;
@@ -1594,7 +1571,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 				switch(pnmrc->wID)
 				{
 				case ID_MAINTOOLBAR:
-					hToolbar = m_hMainToolbar;
+					hToolbar = m_mainToolbar->GetHWND();
 					break;
 
 				case ID_BOOKMARKSTOOLBAR:

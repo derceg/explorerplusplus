@@ -39,26 +39,6 @@ void Explorerplusplus::ValidateLoadedSettings(void)
 		m_DisplayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
 
 	ValidateColumns();
-	ValidateToolbarSettings();
-}
-
-void Explorerplusplus::ValidateToolbarSettings(void)
-{
-	BOOL bCorrupted = FALSE;
-
-	for(auto itr = m_tbInitial.begin();itr != m_tbInitial.end();itr++)
-	{
-		if(itr->iItemID < TOOLBAR_ID_START)
-		{
-			bCorrupted = TRUE;
-			break;
-		}
-	}
-
-	if(bCorrupted)
-	{
-		SetInitialToolbarButtons();
-	}
 }
 
 void Explorerplusplus::ValidateColumns(void)
@@ -172,23 +152,23 @@ void Explorerplusplus::ApplyToolbarSettings(void)
 		switch(m_ToolbarInformation[i].wID)
 		{
 		case ID_MAINTOOLBAR:
-			bVisible = m_config.showMainToolbar;
+			bVisible = m_config->showMainToolbar;
 			break;
 
 		case ID_ADDRESSTOOLBAR:
-			bVisible = m_config.showAddressBar;
+			bVisible = m_config->showAddressBar;
 			break;
 
 		case ID_BOOKMARKSTOOLBAR:
-			bVisible = m_config.showBookmarksToolbar;
+			bVisible = m_config->showBookmarksToolbar;
 			break;
 
 		case ID_DRIVESTOOLBAR:
-			bVisible = m_config.showDrivesToolbar;
+			bVisible = m_config->showDrivesToolbar;
 			break;
 
 		case ID_APPLICATIONSTOOLBAR:
-			bVisible = m_config.showApplicationToolbar;
+			bVisible = m_config->showApplicationToolbar;
 			break;
 		}
 
@@ -224,7 +204,7 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 		IndentTop += RebarRect.bottom - RebarRect.top;
 	}
 
-	if(m_config.showStatusBar)
+	if(m_config->showStatusBar)
 	{
 		RECT m_hStatusBarRect;
 
@@ -233,7 +213,7 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 		IndentBottom += m_hStatusBarRect.bottom - m_hStatusBarRect.top;
 	}
 
-	if(m_config.showDisplayWindow)
+	if(m_config->showDisplayWindow)
 	{
 		RECT rcDisplayWindow;
 
@@ -242,7 +222,7 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 		IndentBottom += rcDisplayWindow.bottom - rcDisplayWindow.top;
 	}
 
-	if(m_config.showFolders)
+	if(m_config->showFolders)
 	{
 		RECT rcHolder;
 		GetClientRect(m_hHolder,&rcHolder);

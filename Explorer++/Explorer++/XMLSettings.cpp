@@ -409,12 +409,12 @@ IXMLDOMElement *pRoot)
 	bstr = NULL;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AllowMultipleInstances"),NXMLSettings::EncodeBoolValue(m_config.allowMultipleInstances));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AllowMultipleInstances"),NXMLSettings::EncodeBoolValue(m_config->allowMultipleInstances));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysOpenInNewTab"),NXMLSettings::EncodeBoolValue(m_config.alwaysOpenNewTab));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysOpenInNewTab"),NXMLSettings::EncodeBoolValue(m_config->alwaysOpenNewTab));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowTabBar"),NXMLSettings::EncodeBoolValue(m_config.alwaysShowTabBar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowTabBar"),NXMLSettings::EncodeBoolValue(m_config->alwaysShowTabBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AutoArrangeGlobal"),NXMLSettings::EncodeBoolValue(m_bAutoArrangeGlobal));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -422,9 +422,9 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("CloseMainWindowOnTabClose"),NXMLSettings::EncodeBoolValue(m_bCloseMainWindowOnTabClose));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ConfirmCloseTabs"),NXMLSettings::EncodeBoolValue(m_config.confirmCloseTabs));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ConfirmCloseTabs"),NXMLSettings::EncodeBoolValue(m_config->confirmCloseTabs));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisableFolderSizesNetworkRemovable"),NXMLSettings::EncodeBoolValue(m_config.disableFolderSizesNetworkRemovable));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisableFolderSizesNetworkRemovable"),NXMLSettings::EncodeBoolValue(m_config->disableFolderSizesNetworkRemovable));
 
 	COLORREF CentreColor;
 
@@ -479,11 +479,11 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisplayWindowHeight"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DoubleClickTabClose"),NXMLSettings::EncodeBoolValue(m_config.doubleClickTabClose));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DoubleClickTabClose"),NXMLSettings::EncodeBoolValue(m_config->doubleClickTabClose));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ExtendTabControl"),NXMLSettings::EncodeBoolValue(m_config.extendTabControl));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ExtendTabControl"),NXMLSettings::EncodeBoolValue(m_config->extendTabControl));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ForceSameTabWidth"),NXMLSettings::EncodeBoolValue(m_config.forceSameTabWidth));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ForceSameTabWidth"),NXMLSettings::EncodeBoolValue(m_config->forceSameTabWidth));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ForceSize"),NXMLSettings::EncodeBoolValue(m_bForceSize));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -502,7 +502,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("Language"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("LargeToolbarIcons"),NXMLSettings::EncodeBoolValue(m_bLargeToolbarIcons));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("LargeToolbarIcons"),NXMLSettings::EncodeBoolValue(m_config->useLargeToolbarIcons));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	_itow_s(m_iLastSelectedTab,szValue,SIZEOF_ARRAY(szValue),10);
@@ -511,13 +511,13 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("LockToolbars"),NXMLSettings::EncodeBoolValue(m_bLockToolbars));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("NextToCurrent"),NXMLSettings::EncodeBoolValue(m_config.openNewTabNextToCurrent));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("NextToCurrent"),NXMLSettings::EncodeBoolValue(m_config->openNewTabNextToCurrent));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("NewTabDirectory"),m_DefaultTabDirectory);
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivate"),NXMLSettings::EncodeBoolValue(m_config.oneClickActivate));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivate"),NXMLSettings::EncodeBoolValue(m_config->oneClickActivate));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivateHoverTime"),NXMLSettings::EncodeIntValue(m_config.oneClickActivateHoverTime));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivateHoverTime"),NXMLSettings::EncodeIntValue(m_config->oneClickActivateHoverTime));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OverwriteExistingFilesConfirmation"),NXMLSettings::EncodeBoolValue(m_bOverwriteExistingFilesConfirmation));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -528,27 +528,27 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ReplaceExplorerMode"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowAddressBar"),NXMLSettings::EncodeBoolValue(m_config.showAddressBar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowAddressBar"),NXMLSettings::EncodeBoolValue(m_config->showAddressBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowApplicationToolbar"),NXMLSettings::EncodeBoolValue(m_config.showApplicationToolbar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowApplicationToolbar"),NXMLSettings::EncodeBoolValue(m_config->showApplicationToolbar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowBookmarksToolbar"),NXMLSettings::EncodeBoolValue(m_config.showBookmarksToolbar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowBookmarksToolbar"),NXMLSettings::EncodeBoolValue(m_config->showBookmarksToolbar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowDrivesToolbar"),NXMLSettings::EncodeBoolValue(m_config.showDrivesToolbar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowDrivesToolbar"),NXMLSettings::EncodeBoolValue(m_config->showDrivesToolbar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowDisplayWindow"),NXMLSettings::EncodeBoolValue(m_config.showDisplayWindow));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowDisplayWindow"),NXMLSettings::EncodeBoolValue(m_config->showDisplayWindow));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowExtensions"),NXMLSettings::EncodeBoolValue(m_bShowExtensionsGlobal));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFilePreviews"),NXMLSettings::EncodeBoolValue(m_config.showFilePreviews));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFilePreviews"),NXMLSettings::EncodeBoolValue(m_config->showFilePreviews));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFolders"),NXMLSettings::EncodeBoolValue(m_config.showFolders));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFolders"),NXMLSettings::EncodeBoolValue(m_config->showFolders));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFolderSizes"),NXMLSettings::EncodeBoolValue(m_config.showFolderSizes));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFolderSizes"),NXMLSettings::EncodeBoolValue(m_config->showFolderSizes));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFriendlyDates"),NXMLSettings::EncodeBoolValue(m_bShowFriendlyDatesGlobal));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFullTitlePath"),NXMLSettings::EncodeBoolValue(m_config.showFullTitlePath));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFullTitlePath"),NXMLSettings::EncodeBoolValue(m_config->showFullTitlePath));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowGridlinesGlobal"),NXMLSettings::EncodeBoolValue(m_bShowGridlinesGlobal));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -558,17 +558,17 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInGroupsGlobal"),NXMLSettings::EncodeBoolValue(m_bShowInGroupsGlobal));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowPrivilegeLevelInTitleBar"),NXMLSettings::EncodeBoolValue(m_config.showPrivilegeLevelInTitleBar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowPrivilegeLevelInTitleBar"),NXMLSettings::EncodeBoolValue(m_config->showPrivilegeLevelInTitleBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowStatusBar"),NXMLSettings::EncodeBoolValue(m_config.showStatusBar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowStatusBar"),NXMLSettings::EncodeBoolValue(m_config->showStatusBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowTabBarAtBottom"),NXMLSettings::EncodeBoolValue(m_bShowTabBarAtBottom));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowTaskbarThumbnails"),NXMLSettings::EncodeBoolValue(m_bShowTaskbarThumbnails));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowToolbar"),NXMLSettings::EncodeBoolValue(m_config.showMainToolbar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowToolbar"),NXMLSettings::EncodeBoolValue(m_config->showMainToolbar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowUserNameTitleBar"),NXMLSettings::EncodeBoolValue(m_config.showUserNameInTitleBar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowUserNameTitleBar"),NXMLSettings::EncodeBoolValue(m_config->showUserNameInTitleBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SizeDisplayFormat"),NXMLSettings::EncodeIntValue(m_SizeDisplayFormat));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -583,7 +583,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("TVAutoExpandSelected"),NXMLSettings::EncodeBoolValue(m_bTVAutoExpandSelected));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("UseFullRowSelect"),NXMLSettings::EncodeBoolValue(m_config.useFullRowSelect));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("UseFullRowSelect"),NXMLSettings::EncodeBoolValue(m_config->useFullRowSelect));
 
 	TBBUTTON tbButton;
 	TCHAR szButtonAttributeName[32];
@@ -595,11 +595,13 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Setting"),_T("ToolbarState"));
 
-	nButtons = (int)SendMessage(m_hMainToolbar,TB_BUTTONCOUNT,0,0);
+	/* TODO: Move into
+	main toolbar class. */
+	nButtons = (int)SendMessage(m_mainToolbar->GetHWND(),TB_BUTTONCOUNT,0,0);
 
 	for(i = 0;i < nButtons;i++)
 	{
-		SendMessage(m_hMainToolbar,TB_GETBUTTON,i,(LPARAM)&tbButton);
+		SendMessage(m_mainToolbar->GetHWND(),TB_GETBUTTON,i,(LPARAM)&tbButton);
 
 		StringCchPrintf(szButtonAttributeName,SIZEOF_ARRAY(szButtonAttributeName),_T("Button%d"),i);
 
@@ -609,8 +611,8 @@ IXMLDOMElement *pRoot)
 			idCommand = tbButton.idCommand;
 
 		/* ALL settings are saved in English. */
-		LoadString(GetModuleHandle(0),LookupToolbarButtonTextID(idCommand),
-			szButtonName,SIZEOF_ARRAY(szButtonName));
+		/*LoadString(GetModuleHandle(0),LookupToolbarButtonTextID(idCommand),
+			szButtonName,SIZEOF_ARRAY(szButtonName));*/
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szButtonAttributeName,szButtonName);
 	}
@@ -619,7 +621,7 @@ IXMLDOMElement *pRoot)
 	pParentNode = NULL;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("TreeViewDelayEnabled"),NXMLSettings::EncodeBoolValue(m_config.treeViewDelayEnabled));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("TreeViewDelayEnabled"),NXMLSettings::EncodeBoolValue(m_config->treeViewDelayEnabled));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	_itow_s(m_TreeViewWidth,szValue,SIZEOF_ARRAY(szValue),10);
@@ -728,8 +730,8 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 							MapTabAttributeValue(bstrName,bstrValue,&pSettings[i],&pTabInfo[i]);
 					}
 
-					pSettings[i].bShowFolderSizes = m_config.showFolderSizes;
-					pSettings[i].bDisableFolderSizesNetworkRemovable = m_config.disableFolderSizesNetworkRemovable;
+					pSettings[i].bShowFolderSizes = m_config->showFolderSizes;
+					pSettings[i].bDisableFolderSizesNetworkRemovable = m_config->disableFolderSizesNetworkRemovable;
 
 					hr = pNode->get_firstChild(&pColumnsNode);
 
@@ -1528,15 +1530,15 @@ WCHAR *wszName,WCHAR *wszValue)
 	switch(uNameHash)
 	{
 	case HASH_ALLOWMULTIPLEINSTANCES:
-		m_config.allowMultipleInstances = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->allowMultipleInstances = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_ALWAYSOPENINNEWTAB:
-		m_config.alwaysOpenNewTab = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->alwaysOpenNewTab = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_ALWAYSSHOWTABBAR:
-		m_config.alwaysShowTabBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->alwaysShowTabBar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_AUTOARRANGEGLOBAL:
@@ -1552,11 +1554,11 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_CONFIRMCLOSETABS:
-		m_config.confirmCloseTabs = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->confirmCloseTabs = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_DISABLEFOLDERSIZENETWORKREMOVABLE:
-		m_config.disableFolderSizesNetworkRemovable = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->disableFolderSizesNetworkRemovable = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_DISPLAYCENTRECOLOR:
@@ -1581,15 +1583,15 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_DOUBLECLICKTABCLOSE:
-		m_config.doubleClickTabClose = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->doubleClickTabClose = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_EXTENDTABCONTROL:
-		m_config.extendTabControl = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->extendTabControl = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_FORCESAMETABWIDTH:
-		m_config.forceSameTabWidth = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->forceSameTabWidth = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_FORCESIZE:
@@ -1618,7 +1620,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_LARGETOOLBARICONS:
-		m_bLargeToolbarIcons = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->useLargeToolbarIcons = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_LASTSELECTEDTAB:
@@ -1630,15 +1632,15 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_NEXTTOCURRENT:
-		m_config.openNewTabNextToCurrent = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->openNewTabNextToCurrent = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_ONECLICKACTIVATE:
-		m_config.oneClickActivate = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->oneClickActivate = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_ONECLICKACTIVATEHOVERTIME:
-		m_config.oneClickActivateHoverTime = NXMLSettings::DecodeIntValue(wszValue);
+		m_config->oneClickActivateHoverTime = NXMLSettings::DecodeIntValue(wszValue);
 		break;
 
 	case HASH_OVERWRITEEXISTINGFILESCONFIRMATION:
@@ -1654,23 +1656,23 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWADDRESSBAR:
-		m_config.showAddressBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showAddressBar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWAPPLICATIONTOOLBAR:
-		m_config.showApplicationToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showApplicationToolbar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWBOOKMARKSTOOLBAR:
-		m_config.showBookmarksToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showBookmarksToolbar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWDRIVESTOOLBAR:
-		m_config.showDrivesToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showDrivesToolbar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWDISPLAYWINDOW:
-		m_config.showDisplayWindow = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showDisplayWindow = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWEXTENSIONS:
@@ -1678,15 +1680,15 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWFILEPREVIEWS:
-		m_config.showFilePreviews = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showFilePreviews = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFOLDERS:
-		m_config.showFolders = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showFolders = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFOLDERSIZES:
-		m_config.showFolderSizes = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showFolderSizes = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFRIENDLYDATES:
@@ -1694,7 +1696,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWFULLTITLEPATH:
-		m_config.showFullTitlePath = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showFullTitlePath = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWGRIDLINESGLOBAL:
@@ -1714,11 +1716,11 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWPRIVILEGETITLEBAR:
-		m_config.showPrivilegeLevelInTitleBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showPrivilegeLevelInTitleBar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWSTATUSBAR:
-		m_config.showStatusBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showStatusBar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWTABBARATBOTTOM:
@@ -1730,11 +1732,11 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWTOOLBAR:
-		m_config.showMainToolbar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showMainToolbar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWUSERNAMETITLEBAR:
-		m_config.showUserNameInTitleBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showUserNameInTitleBar = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SIZEDISPLAYFOMRAT:
@@ -1758,7 +1760,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_USEFULLROWSELECT:
-		m_config.useFullRowSelect = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->useFullRowSelect = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_TOOLBARSTATE:
@@ -1769,7 +1771,9 @@ WCHAR *wszName,WCHAR *wszValue)
 			BSTR		bstrName;
 			BSTR		bstrValue;
 
-			m_tbInitial.clear();
+			/* TODO: Move into
+			main toolbar class. */
+			//m_tbInitial.clear();
 
 			pNode->get_attributes(&am);
 
@@ -1834,13 +1838,13 @@ WCHAR *wszName,WCHAR *wszValue)
 				else if(lstrcmpi(bstrValue,L"Open Command Prompt") == 0)
 					tb.iItemID = TOOLBAR_OPENCOMMANDPROMPT;
 
-				m_tbInitial.push_back(tb);
+				//m_tbInitial.push_back(tb);
 			}
 		}
 		break;
 
 	case HASH_TREEVIEWDELAYENABLED:
-		m_config.treeViewDelayEnabled = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->treeViewDelayEnabled = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_TREEVIEWWIDTH:

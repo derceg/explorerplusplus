@@ -16,6 +16,7 @@
 #include "Explorer++.h"
 #include "MainResource.h"
 #include "ShellBrowser/ViewModes.h"
+#include "ToolbarButtons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
@@ -50,8 +51,8 @@ void Explorerplusplus::UpdateWindowStates(void)
 	UpdateTabToolbar();
 	UpdateDisplayWindow();
 
-	if(m_config.showFolders)
-		SendMessage(m_hMainToolbar,TB_CHECKBUTTON,(WPARAM)TOOLBAR_FOLDERS,(LPARAM)TRUE);
+	if(m_config->showFolders)
+		SendMessage(m_mainToolbar->GetHWND(),TB_CHECKBUTTON,(WPARAM)TOOLBAR_FOLDERS,(LPARAM)TRUE);
 }
 
 /*
@@ -93,14 +94,14 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_SELECTNONE,m_nSelected);
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_RESOLVELINK,m_nSelected);
 
-	lCheckMenuItem(hProgramMenu,IDM_VIEW_STATUSBAR,m_config.showStatusBar);
-	lCheckMenuItem(hProgramMenu,IDM_VIEW_FOLDERS, m_config.showFolders);
-	lCheckMenuItem(hProgramMenu,IDM_VIEW_DISPLAYWINDOW,m_config.showDisplayWindow);
-	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_ADDRESSBAR, m_config.showAddressBar);
-	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_MAINTOOLBAR,m_config.showMainToolbar);
-	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_BOOKMARKSTOOLBAR,m_config.showBookmarksToolbar);
-	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_DRIVES,m_config.showDrivesToolbar);
-	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_APPLICATIONTOOLBAR,m_config.showApplicationToolbar);
+	lCheckMenuItem(hProgramMenu,IDM_VIEW_STATUSBAR,m_config->showStatusBar);
+	lCheckMenuItem(hProgramMenu,IDM_VIEW_FOLDERS, m_config->showFolders);
+	lCheckMenuItem(hProgramMenu,IDM_VIEW_DISPLAYWINDOW,m_config->showDisplayWindow);
+	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_ADDRESSBAR, m_config->showAddressBar);
+	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_MAINTOOLBAR,m_config->showMainToolbar);
+	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_BOOKMARKSTOOLBAR,m_config->showBookmarksToolbar);
+	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_DRIVES,m_config->showDrivesToolbar);
+	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_APPLICATIONTOOLBAR,m_config->showApplicationToolbar);
 	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_LOCKTOOLBARS,m_bLockToolbars);
 	lCheckMenuItem(hProgramMenu,IDM_VIEW_SHOWHIDDENFILES,m_pActiveShellBrowser->GetShowHidden());
 	lCheckMenuItem(hProgramMenu,IDM_FILTER_APPLYFILTER,m_pActiveShellBrowser->GetFilterStatus());
@@ -277,7 +278,7 @@ void Explorerplusplus::UpdateMainWindowText(void)
 
 	/* Don't show full paths for virtual folders (as only the folders
 	GUID will be shown). */
-	if(m_config.showFullTitlePath && !m_pActiveShellBrowser->InVirtualFolder())
+	if(m_config->showFullTitlePath && !m_pActiveShellBrowser->InVirtualFolder())
 	{
 		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SIZEOF_ARRAY(szFolderDisplayName),SHGDN_FORPARSING);
 	}
@@ -291,17 +292,17 @@ void Explorerplusplus::UpdateMainWindowText(void)
 	StringCchPrintf(szTitle,SIZEOF_ARRAY(szTitle),
 	szTemp,szFolderDisplayName,NExplorerplusplus::APP_NAME);
 
-	if(m_config.showUserNameInTitleBar || m_config.showPrivilegeLevelInTitleBar)
+	if(m_config->showUserNameInTitleBar || m_config->showPrivilegeLevelInTitleBar)
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),_T(" ["));
 
-	if(m_config.showUserNameInTitleBar)
+	if(m_config->showUserNameInTitleBar)
 	{
 		GetProcessOwner(GetCurrentProcessId(),szOwner,SIZEOF_ARRAY(szOwner));
 
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),szOwner);
 	}
 
-	if(m_config.showPrivilegeLevelInTitleBar)
+	if(m_config->showPrivilegeLevelInTitleBar)
 	{
 		TCHAR szPrivilegeAddition[64];
 		TCHAR szPrivilege[64];
@@ -323,7 +324,7 @@ void Explorerplusplus::UpdateMainWindowText(void)
 			LoadString(m_hLanguageModule,IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED,szPrivilege,SIZEOF_ARRAY(szPrivilege));
 		}
 
-		if(m_config.showUserNameInTitleBar)
+		if(m_config->showUserNameInTitleBar)
 			StringCchPrintf(szPrivilegeAddition,SIZEOF_ARRAY(szPrivilegeAddition),
 			_T(" - %s"),szPrivilege);
 		else
@@ -333,7 +334,7 @@ void Explorerplusplus::UpdateMainWindowText(void)
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),szPrivilegeAddition);
 	}
 
-	if(m_config.showUserNameInTitleBar || m_config.showPrivilegeLevelInTitleBar)
+	if(m_config->showUserNameInTitleBar || m_config->showPrivilegeLevelInTitleBar)
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),_T("]"));
 
 	SetWindowText(m_hContainer,szTitle);

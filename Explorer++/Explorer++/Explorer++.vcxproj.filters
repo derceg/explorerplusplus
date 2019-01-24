@@ -238,6 +238,9 @@
     <ClCompile Include="ShellBrowser\ColumnDataRetrieval.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="MainToolbar.cpp">
+      <Filter>Main Toolbar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -378,9 +381,6 @@
     <ClInclude Include="RegistrySettings.h">
       <Filter>Settings</Filter>
     </ClInclude>
-    <ClInclude Include="DefaultToolbarButtons.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="ListViewEdit.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -434,6 +434,15 @@
     </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="MainToolbar.h">
+      <Filter>Main Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="DefaultToolbarButtons.h">
+      <Filter>Main Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolbarButtons.h">
+      <Filter>Main Toolbar</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -537,6 +546,9 @@
     </Filter>
     <Filter Include="ShellBrowser">
       <UniqueIdentifier>{c4c4c6aa-6087-4b72-bcd0-4a1c19499130}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main Toolbar">
+      <UniqueIdentifier>{2fe51f54-3d26-4449-92f3-ff8ee95f7751}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -16,6 +16,7 @@
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ShellBrowser/ViewModes.h"
+#include "ToolbarButtons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
@@ -316,7 +317,7 @@ void Explorerplusplus::OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,
 {
 	if(bOpenInNewWindow)
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,FALSE,FALSE,TRUE);
-	else if(m_config.alwaysOpenNewTab || bOpenInNewTab)
+	else if(m_config->alwaysOpenNewTab || bOpenInNewTab)
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,TRUE,TRUE,FALSE);
 	else
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER);
@@ -366,18 +367,18 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		iIndentRebar += GetRectHeight(&rc);
 	}
 
-	if(m_config.showStatusBar)
+	if(m_config->showStatusBar)
 	{
 		GetWindowRect(m_hStatusBar,&rc);
 		IndentBottom += GetRectHeight(&rc);
 	}
 
-	if(m_config.showDisplayWindow)
+	if(m_config->showDisplayWindow)
 	{
 		IndentBottom += m_DisplayWindowHeight;
 	}
 
-	if(m_config.showFolders)
+	if(m_config->showFolders)
 	{
 		GetClientRect(m_hHolder,&rc);
 		IndentLeft = GetRectWidth(&rc);
@@ -395,7 +396,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* <---- Tab control + backing ----> */
 
-	if(m_config.extendTabControl)
+	if(m_config->extendTabControl)
 	{
 		iTabBackingLeft = 0;
 		iTabBackingWidth = MainWindowWidth;
@@ -432,7 +433,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	SetWindowPos(m_hTabWindowToolbar,NULL,iTabBackingWidth + TAB_TOOLBAR_X_OFFSET,
 	TAB_TOOLBAR_Y_OFFSET,TAB_TOOLBAR_WIDTH,TAB_TOOLBAR_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
 
-	if(m_config.extendTabControl &&
+	if(m_config->extendTabControl &&
 		!m_bShowTabBarAtBottom)
 	{
 		iHolderTop = IndentTop;
@@ -444,7 +445,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* <---- Holder window + child windows ----> */
 
-	if(m_config.extendTabControl &&
+	if(m_config->extendTabControl &&
 		m_bShowTabBarAtBottom &&
 		m_bShowTabBar)
 	{
@@ -549,9 +550,6 @@ int Explorerplusplus::OnDestroy(void)
 		SHChangeNotifyDeregister(m_SHChangeNotifyID);
 	}
 
-	ImageList_Destroy(m_himlToolbarSmall);
-	ImageList_Destroy(m_himlToolbarLarge);
-
 	delete m_pStatusBar;
 
 	ChangeClipboardChain(m_hContainer,m_hNextClipboardViewer);
@@ -562,7 +560,7 @@ int Explorerplusplus::OnDestroy(void)
 
 int Explorerplusplus::OnClose(void)
 {
-	if(m_config.confirmCloseTabs && (TabCtrl_GetItemCount(m_hTabCtrl) > 1))
+	if(m_config->confirmCloseTabs && (TabCtrl_GetItemCount(m_hTabCtrl) > 1))
 	{
 		TCHAR szTemp[128];
 		LoadString(m_hLanguageModule,IDS_GENERAL_CLOSE_ALL_TABS,szTemp,SIZEOF_ARRAY(szTemp));
@@ -645,7 +643,7 @@ void Explorerplusplus::OnDrawClipboard(void)
 		}
 	}
 
-	SendMessage(m_hMainToolbar,TB_ENABLEBUTTON,(WPARAM)TOOLBAR_PASTE,
+	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_PASTE,
 		!m_pActiveShellBrowser->InVirtualFolder() && IsClipboardFormatAvailable(CF_HDROP));
 
 	if(m_hNextClipboardViewer != NULL)
@@ -786,12 +784,12 @@ void Explorerplusplus::ShowToolbarViewsDropdown(void)
 	POINT	ptOrigin;
 	RECT	rcButton;
 
-	SendMessage(m_hMainToolbar,TB_GETRECT,(WPARAM)TOOLBAR_VIEWS,(LPARAM)&rcButton);
+	SendMessage(m_mainToolbar->GetHWND(),TB_GETRECT,(WPARAM)TOOLBAR_VIEWS,(LPARAM)&rcButton);
 
 	ptOrigin.x	= rcButton.left;
 	ptOrigin.y	= rcButton.bottom;
 
-	ClientToScreen(m_hMainToolbar,&ptOrigin);
+	ClientToScreen(m_mainToolbar->GetHWND(),&ptOrigin);
 
 	CreateViewsMenu(&ptOrigin);
 }
@@ -822,13 +820,13 @@ void Explorerplusplus::OnPreviousWindow(void)
 
 		if(hFocus == m_hActiveListView)
 		{
-			if(m_config.showFolders)
+			if(m_config->showFolders)
 			{
 				SetFocus(m_hTreeView);
 			}
 			else
 			{
-				if(m_config.showAddressBar)
+				if(m_config->showAddressBar)
 				{
 					SetFocus(m_hAddressBar);
 				}
@@ -836,7 +834,7 @@ void Explorerplusplus::OnPreviousWindow(void)
 		}
 		else if(hFocus == m_hTreeView)
 		{
-			if(m_config.showAddressBar)
+			if(m_config->showAddressBar)
 			{
 				SetFocus(m_hAddressBar);
 			}
@@ -874,13 +872,13 @@ void Explorerplusplus::OnNextWindow(void)
 		window in the chain. */
 		if(hFocus == m_hActiveListView)
 		{
-			if(m_config.showAddressBar)
+			if(m_config->showAddressBar)
 			{
 				SetFocus(m_hAddressBar);
 			}
 			else
 			{
-				if(m_config.showFolders)
+				if(m_config->showFolders)
 				{
 					SetFocus(m_hTreeView);
 				}
@@ -893,7 +891,7 @@ void Explorerplusplus::OnNextWindow(void)
 		}
 		else if(hFocus == (HWND)SendMessage(m_hAddressBar,CBEM_GETEDITCONTROL,0,0))
 		{
-			if(m_config.showFolders)
+			if(m_config->showFolders)
 			{
 				SetFocus(m_hTreeView);
 			}

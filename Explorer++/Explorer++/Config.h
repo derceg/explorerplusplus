@@ -31,6 +31,7 @@ struct Config
 		allowMultipleInstances = TRUE;
 		doubleClickTabClose = TRUE;
 		forceSameTabWidth = FALSE;
+		useLargeToolbarIcons = FALSE;
 		confirmCloseTabs = FALSE;
 	}
 
@@ -59,5 +60,6 @@ struct Config
 	BOOL allowMultipleInstances;
 	BOOL doubleClickTabClose;
 	BOOL forceSameTabWidth;
+	BOOL useLargeToolbarIcons;
 	BOOL confirmCloseTabs;
 };

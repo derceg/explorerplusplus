@@ -126,7 +126,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(void)
 			dwAttributes = GetFileAttributes(szFullItemName);
 
 			if (((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) ==
-				FILE_ATTRIBUTE_DIRECTORY) && m_config.showFolderSizes)
+				FILE_ATTRIBUTE_DIRECTORY) && m_config->showFolderSizes)
 			{
 				FolderSize_t	*pfs = NULL;
 				FolderSizeExtraInfo_t	*pfsei = NULL;
@@ -303,8 +303,8 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(void)
 			/* Only attempt to show file previews for files (not folders). Also, only
 			attempt to show a preview if the display window is actually active. */
 			if (((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) !=
-				FILE_ATTRIBUTE_DIRECTORY) && m_config.showFilePreviews
-				&& m_config.showDisplayWindow)
+				FILE_ATTRIBUTE_DIRECTORY) && m_config->showFilePreviews
+				&& m_config->showDisplayWindow)
 			{
 				DisplayWindow_SetThumbnailFile(m_hDisplayWindow, szFullItemName, TRUE);
 			}

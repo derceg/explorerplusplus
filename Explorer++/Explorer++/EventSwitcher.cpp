@@ -160,7 +160,7 @@ void Explorerplusplus::OnRightClick(NMHDR *nmhdr)
 
 		OnListViewHeaderRClick(&CursorPos);
 	}
-	else if(nmhdr->hwndFrom == m_hMainToolbar)
+	else if(nmhdr->hwndFrom == m_mainToolbar->GetHWND())
 	{
 		OnMainToolbarRClick();
 	}

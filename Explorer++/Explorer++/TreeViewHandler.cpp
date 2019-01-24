@@ -39,7 +39,7 @@ void Explorerplusplus::CreateFolderControls(void)
 	TCHAR szTemp[32];
 	UINT uStyle = WS_CHILD|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
 
-	if(m_config.showFolders)
+	if(m_config->showFolders)
 		uStyle |= WS_VISIBLE;
 
 	LoadString(m_hLanguageModule,IDS_FOLDERS_WINDOW_TEXT,szTemp,SIZEOF_ARRAY(szTemp));
@@ -482,7 +482,7 @@ void Explorerplusplus::OnTreeViewSelChanged(LPARAM lParam)
 
 			g_NewSelectionItem = tvItem->hItem;
 
-			if(m_config.treeViewDelayEnabled)
+			if(m_config->treeViewDelayEnabled)
 			{
 				/* Schedule a folder change. This adds enough
 				of a delay for the treeview selection to be changed

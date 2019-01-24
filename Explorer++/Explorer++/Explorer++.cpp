@@ -37,6 +37,8 @@ m_hContainer(hwnd)
 {
 	m_hLanguageModule				= nullptr;
 
+	m_config = std::make_shared<Config>();
+
 	/* When the 'open new tabs next to
 	current' option is activated, the
 	first tab will open at the index
@@ -151,7 +153,6 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_bSynchronizeTreeview			= TRUE;
 	m_bTVAutoExpandSelected			= FALSE;
 	m_bCloseMainWindowOnTabClose	= TRUE;
-	m_bLargeToolbarIcons			= FALSE;
 	m_bShowTaskbarThumbnails		= TRUE;
 	m_bPlayNavigationSound			= TRUE;
 

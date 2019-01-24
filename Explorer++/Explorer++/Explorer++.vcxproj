@@ -321,6 +321,7 @@
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="MainMenuHandler.cpp" />
+    <ClCompile Include="MainToolbar.cpp" />
     <ClCompile Include="MainToolbarHandler.cpp" />
     <ClCompile Include="MainWndSwitch.cpp" />
     <ClCompile Include="ManageBookmarksDialog.cpp" />
@@ -410,6 +411,7 @@
     <ClInclude Include="Logging.h" />
     <ClInclude Include="MainImages.h" />
     <ClInclude Include="MainResource.h" />
+    <ClInclude Include="MainToolbar.h" />
     <ClInclude Include="ManageBookmarksDialog.h" />
     <ClInclude Include="MassRenameDialog.h" />
     <ClInclude Include="MergeFilesDialog.h" />
@@ -437,6 +439,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="TabDropHandler.h" />
+    <ClInclude Include="ToolbarButtons.h" />
     <ClInclude Include="UpdateCheckDialog.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
     <ClInclude Include="XMLSettings.h" />

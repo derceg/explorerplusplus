@@ -499,20 +499,20 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_LINK,BST_CHECKED);
 				if(m_bInsertSorted)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED,BST_CHECKED);
-				if(m_config.oneClickActivate)
+				if(m_config->oneClickActivate)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK,BST_CHECKED);
 				
-				SetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,m_config.oneClickActivateHoverTime,FALSE);
-				EnableWindow(GetDlgItem(hDlg,IDC_OPTIONS_HOVER_TIME),m_config.oneClickActivate);
-				EnableWindow(GetDlgItem(hDlg,IDC_LABEL_HOVER_TIME),m_config.oneClickActivate);
+				SetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,m_config->oneClickActivateHoverTime,FALSE);
+				EnableWindow(GetDlgItem(hDlg,IDC_OPTIONS_HOVER_TIME),m_config->oneClickActivate);
+				EnableWindow(GetDlgItem(hDlg,IDC_LABEL_HOVER_TIME),m_config->oneClickActivate);
 
 				if(m_bOverwriteExistingFilesConfirmation)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,BST_CHECKED);
 				if(m_bPlayNavigationSound)
 					CheckDlgButton(hDlg,IDC_OPTIONS_PLAYNAVIGATIONSOUND,BST_CHECKED);
-				if(m_config.showFolderSizes)
+				if(m_config->showFolderSizes)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES,BST_CHECKED);
-				if(m_config.disableFolderSizesNetworkRemovable)
+				if(m_config->disableFolderSizesNetworkRemovable)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,BST_CHECKED);
 				if(m_bForceSize)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FORCESIZE,BST_CHECKED);
@@ -634,10 +634,10 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						m_bInsertSorted = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED)
 							== BST_CHECKED);
 
-						m_config.oneClickActivate = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK)
+						m_config->oneClickActivate = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK)
 							== BST_CHECKED);
 
-						m_config.oneClickActivateHoverTime = GetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,NULL,FALSE);
+						m_config->oneClickActivateHoverTime = GetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,NULL,FALSE);
 
 						m_bOverwriteExistingFilesConfirmation = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION)
 							== BST_CHECKED);
@@ -645,10 +645,10 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						m_bPlayNavigationSound = (IsDlgButtonChecked(hDlg,IDC_OPTIONS_PLAYNAVIGATIONSOUND)
 							== BST_CHECKED);
 
-						m_config.showFolderSizes = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES)
+						m_config->showFolderSizes = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES)
 							== BST_CHECKED);
 
-						m_config.disableFolderSizesNetworkRemovable = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE)
+						m_config->disableFolderSizesNetworkRemovable = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE)
 							== BST_CHECKED);
 
 						m_bForceSize = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FORCESIZE)
@@ -686,8 +686,8 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 							m_pShellBrowser[(int)tcItem.lParam]->SetHideSystemFiles(m_bHideSystemFilesGlobal);
 							m_pShellBrowser[(int)tcItem.lParam]->SetShowExtensions(m_bShowExtensionsGlobal);
 							m_pShellBrowser[(int)tcItem.lParam]->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
-							m_pShellBrowser[(int)tcItem.lParam]->SetShowFolderSizes(m_config.showFolderSizes);
-							m_pShellBrowser[(int)tcItem.lParam]->SetDisableFolderSizesNetworkRemovable(m_config.disableFolderSizesNetworkRemovable);
+							m_pShellBrowser[(int)tcItem.lParam]->SetShowFolderSizes(m_config->showFolderSizes);
+							m_pShellBrowser[(int)tcItem.lParam]->SetDisableFolderSizesNetworkRemovable(m_config->disableFolderSizesNetworkRemovable);
 							m_pShellBrowser[(int)tcItem.lParam]->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
 							m_pShellBrowser[(int)tcItem.lParam]->SetInsertSorted(m_bInsertSorted);
 							m_pShellBrowser[(int)tcItem.lParam]->SetForceSize(m_bForceSize);
@@ -695,7 +695,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 							RefreshTab((int)tcItem.lParam);
 
-							NListView::ListView_ActivateOneClickSelect(m_hListView.at((int)tcItem.lParam),m_config.oneClickActivate,m_config.oneClickActivateHoverTime);
+							NListView::ListView_ActivateOneClickSelect(m_hListView.at((int)tcItem.lParam),m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
 						}
 
 						SaveAllSettings();
@@ -738,35 +738,35 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 	{
 	case WM_INITDIALOG:
 		{
-			if(m_config.allowMultipleInstances)
+			if(m_config->allowMultipleInstances)
 				CheckDlgButton(hDlg,IDC_OPTION_MULTIPLEINSTANCES,BST_CHECKED);
-			if(m_bLargeToolbarIcons)
+			if(m_config->useLargeToolbarIcons)
 				CheckDlgButton(hDlg,IDC_OPTION_LARGETOOLBARICONS,BST_CHECKED);
-			if(m_config.alwaysShowTabBar)
+			if(m_config->alwaysShowTabBar)
 				CheckDlgButton(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR,BST_CHECKED);
 			if(m_bShowTabBarAtBottom)
 				CheckDlgButton(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM,BST_CHECKED);
-			if(m_config.showFilePreviews)
+			if(m_config->showFilePreviews)
 				CheckDlgButton(hDlg,IDC_OPTION_FILEPREVIEWS,BST_CHECKED);
-			if(m_config.showFullTitlePath)
+			if(m_config->showFullTitlePath)
 				CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_TITLEPATH,BST_CHECKED);
-			if(m_config.showUserNameInTitleBar)
+			if(m_config->showUserNameInTitleBar)
 				CheckDlgButton(hDlg,IDC_OPTION_USERNAMEINTITLEBAR,BST_CHECKED);
-			if(m_config.showPrivilegeLevelInTitleBar)
+			if(m_config->showPrivilegeLevelInTitleBar)
 				CheckDlgButton(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR,BST_CHECKED);
 			if(m_bSynchronizeTreeview)
 				CheckDlgButton(hDlg,IDC_OPTION_SYNCTREEVIEW,BST_CHECKED);
 			if(m_bTVAutoExpandSelected)
 				CheckDlgButton(hDlg,IDC_OPTION_TREEVIEWSELECTIONEXPAND,BST_CHECKED);
-			if(!m_config.treeViewDelayEnabled)
+			if(!m_config->treeViewDelayEnabled)
 				CheckDlgButton(hDlg,IDC_OPTION_TREEVIEWDELAY,BST_CHECKED);
-			if(m_config.extendTabControl)
+			if(m_config->extendTabControl)
 				CheckDlgButton(hDlg,IDC_OPTION_EXTENDTABCONTROL,BST_CHECKED);
 			if(m_bShowGridlinesGlobal)
 				CheckDlgButton(hDlg,IDC_OPTION_GRIDLINES,BST_CHECKED);
 			if(m_bCheckBoxSelection)
 				CheckDlgButton(hDlg,IDC_OPTION_CHECKBOXSELECTION,BST_CHECKED);
-			if(m_config.useFullRowSelect)
+			if(m_config->useFullRowSelect)
 				CheckDlgButton(hDlg,IDC_OPTION_FULLROWSELECT,BST_CHECKED);
 		}
 		break;
@@ -805,25 +805,25 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 				{
 					BOOL bCheckBoxSelection;
 
-					m_config.allowMultipleInstances = (IsDlgButtonChecked(hDlg,IDC_OPTION_MULTIPLEINSTANCES)
+					m_config->allowMultipleInstances = (IsDlgButtonChecked(hDlg,IDC_OPTION_MULTIPLEINSTANCES)
 						== BST_CHECKED);
 
-					m_config.alwaysShowTabBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR)
+					m_config->alwaysShowTabBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR)
 						== BST_CHECKED);
 
 					m_bShowTabBarAtBottom = (IsDlgButtonChecked(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM)
 						== BST_CHECKED);
 
-					m_config.showFilePreviews = (IsDlgButtonChecked(hDlg,IDC_OPTION_FILEPREVIEWS)
+					m_config->showFilePreviews = (IsDlgButtonChecked(hDlg,IDC_OPTION_FILEPREVIEWS)
 						== BST_CHECKED);
 
-					m_config.showFullTitlePath = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_TITLEPATH)
+					m_config->showFullTitlePath = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_TITLEPATH)
 						== BST_CHECKED);
 
-					m_config.showUserNameInTitleBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_USERNAMEINTITLEBAR)
+					m_config->showUserNameInTitleBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_USERNAMEINTITLEBAR)
 						== BST_CHECKED);
 
-					m_config.showPrivilegeLevelInTitleBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR)
+					m_config->showPrivilegeLevelInTitleBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR)
 						== BST_CHECKED);
 
 					m_bSynchronizeTreeview = (IsDlgButtonChecked(hDlg,IDC_OPTION_SYNCTREEVIEW)
@@ -832,10 +832,10 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					m_bTVAutoExpandSelected = (IsDlgButtonChecked(hDlg,IDC_OPTION_TREEVIEWSELECTIONEXPAND)
 						== BST_CHECKED);
 
-					m_config.treeViewDelayEnabled = !(IsDlgButtonChecked(hDlg,IDC_OPTION_TREEVIEWDELAY)
+					m_config->treeViewDelayEnabled = !(IsDlgButtonChecked(hDlg,IDC_OPTION_TREEVIEWDELAY)
 						== BST_CHECKED);
 
-					m_config.extendTabControl = (IsDlgButtonChecked(hDlg,IDC_OPTION_EXTENDTABCONTROL)
+					m_config->extendTabControl = (IsDlgButtonChecked(hDlg,IDC_OPTION_EXTENDTABCONTROL)
 						== BST_CHECKED);
 
 					m_bShowGridlinesGlobal = (IsDlgButtonChecked(hDlg,IDC_OPTION_GRIDLINES)
@@ -877,15 +877,15 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							== BST_CHECKED);
 					}
 
-					m_config.useFullRowSelect = (IsDlgButtonChecked(hDlg,IDC_OPTION_FULLROWSELECT)
+					m_config->useFullRowSelect = (IsDlgButtonChecked(hDlg,IDC_OPTION_FULLROWSELECT)
 						== BST_CHECKED);
 
 					BOOL bLargeToolbarIcons = (IsDlgButtonChecked(hDlg,IDC_OPTION_LARGETOOLBARICONS)
 						== BST_CHECKED);
 
-					if(m_bLargeToolbarIcons != bLargeToolbarIcons)
+					if(m_config->useLargeToolbarIcons != bLargeToolbarIcons)
 					{
-						m_bLargeToolbarIcons = (IsDlgButtonChecked(hDlg,IDC_OPTION_LARGETOOLBARICONS)
+						m_config->useLargeToolbarIcons = (IsDlgButtonChecked(hDlg,IDC_OPTION_LARGETOOLBARICONS)
 							== BST_CHECKED);
 
 						AdjustMainToolbarSize();
@@ -895,7 +895,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					in title bar options change. */
 					UpdateMainWindowText();
 
-					if(!m_config.alwaysShowTabBar)
+					if(!m_config->alwaysShowTabBar)
 					{
 						if(TabCtrl_GetItemCount(m_hTabCtrl) > 1)
 							m_bShowTabBar = TRUE;
@@ -930,7 +930,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 						}
 
 						NListView::ListView_AddRemoveExtendedStyle(m_hListView.at((int)tcItem.lParam),
-							LVS_EX_FULLROWSELECT,m_config.useFullRowSelect);
+							LVS_EX_FULLROWSELECT,m_config->useFullRowSelect);
 					}
 
 					SaveAllSettings();
@@ -985,15 +985,15 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 
 				if(m_bShowTaskbarThumbnailsProvisional)
 					CheckDlgButton(hDlg,IDC_TABS_TASKBARTHUMBNAILS,BST_CHECKED);
-				if(m_config.forceSameTabWidth)
+				if(m_config->forceSameTabWidth)
 					CheckDlgButton(hDlg,IDC_TABS_SAMEWIDTH,BST_CHECKED);
-				if(m_config.confirmCloseTabs)
+				if(m_config->confirmCloseTabs)
 					CheckDlgButton(hDlg,IDC_TABS_CLOSECONFIRMATION,BST_CHECKED);
-				if(m_config.openNewTabNextToCurrent)
+				if(m_config->openNewTabNextToCurrent)
 					CheckDlgButton(hDlg,IDC_TABS_OPENNEXTTOCURRENT,BST_CHECKED);
-				if(m_config.alwaysOpenNewTab)
+				if(m_config->alwaysOpenNewTab)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_ALWAYSNEWTAB,BST_CHECKED);
-				if(m_config.doubleClickTabClose)
+				if(m_config->doubleClickTabClose)
 					CheckDlgButton(hDlg,IDC_TABS_DOUBLECLICKCLOSE,BST_CHECKED);
 				if(m_bCloseMainWindowOnTabClose)
 					CheckDlgButton(hDlg,IDC_TABS_CLOSEMAINWINDOW,BST_CHECKED);
@@ -1027,25 +1027,25 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 						m_bShowTaskbarThumbnailsProvisional = (IsDlgButtonChecked(hDlg,IDC_TABS_TASKBARTHUMBNAILS)
 							== BST_CHECKED);
 
-						m_config.forceSameTabWidth = (IsDlgButtonChecked(hDlg,IDC_TABS_SAMEWIDTH)
+						m_config->forceSameTabWidth = (IsDlgButtonChecked(hDlg,IDC_TABS_SAMEWIDTH)
 							== BST_CHECKED);
 
-						m_config.confirmCloseTabs = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSECONFIRMATION)
+						m_config->confirmCloseTabs = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSECONFIRMATION)
 							== BST_CHECKED);
 
-						m_config.openNewTabNextToCurrent = (IsDlgButtonChecked(hDlg,IDC_TABS_OPENNEXTTOCURRENT)
+						m_config->openNewTabNextToCurrent = (IsDlgButtonChecked(hDlg,IDC_TABS_OPENNEXTTOCURRENT)
 							== BST_CHECKED);
 
-						m_config.alwaysOpenNewTab = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_ALWAYSNEWTAB)
+						m_config->alwaysOpenNewTab = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_ALWAYSNEWTAB)
 							== BST_CHECKED);
 
-						m_config.doubleClickTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_DOUBLECLICKCLOSE)
+						m_config->doubleClickTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_DOUBLECLICKCLOSE)
 							== BST_CHECKED);
 
 						m_bCloseMainWindowOnTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSEMAINWINDOW)
 							== BST_CHECKED);
 
-						AddWindowStyle(m_hTabCtrl,TCS_FIXEDWIDTH,m_config.forceSameTabWidth);
+						AddWindowStyle(m_hTabCtrl,TCS_FIXEDWIDTH,m_config->forceSameTabWidth);
 
 						SaveAllSettings();
 					}

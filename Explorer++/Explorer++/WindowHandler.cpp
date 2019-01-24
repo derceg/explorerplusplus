@@ -19,6 +19,7 @@
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "ToolbarButtons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Macros.h"
@@ -67,17 +68,17 @@ void Explorerplusplus::CreateMainControls(void)
 		{
 		case ID_MAINTOOLBAR:
 			CreateMainToolbar();
-			ToolbarSize = (DWORD)SendMessage(m_hMainToolbar,TB_GETBUTTONSIZE,0,0);
+			ToolbarSize = (DWORD)SendMessage(m_mainToolbar->GetHWND(),TB_GETBUTTONSIZE,0,0);
 			m_ToolbarInformation[i].cyMinChild = HIWORD(ToolbarSize);
 			m_ToolbarInformation[i].cyMaxChild = HIWORD(ToolbarSize);
 			m_ToolbarInformation[i].cyChild = HIWORD(ToolbarSize);
-			SendMessage(m_hMainToolbar,TB_GETMAXSIZE,0,(LPARAM)&sz);
+			SendMessage(m_mainToolbar->GetHWND(),TB_GETMAXSIZE,0,(LPARAM)&sz);
 
 			if(m_ToolbarInformation[i].cx == 0)
 				m_ToolbarInformation[i].cx = sz.cx;
 
 			m_ToolbarInformation[i].cxIdeal = sz.cx;
-			m_ToolbarInformation[i].hwndChild = m_hMainToolbar;
+			m_ToolbarInformation[i].hwndChild = m_mainToolbar->GetHWND();
 			break;
 
 		case ID_ADDRESSTOOLBAR:
@@ -140,6 +141,11 @@ void Explorerplusplus::CreateMainControls(void)
 	}
 }
 
+void Explorerplusplus::CreateMainToolbar()
+{
+	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_hLanguageModule, this, m_config);
+}
+
 void Explorerplusplus::CreateBookmarksToolbar(void)
 {
 	m_hBookmarksToolbar = CreateToolbar(m_hMainRebar,BookmarkToolbarStyles,
@@ -166,7 +172,7 @@ void Explorerplusplus::CreateStatusBar(void)
 {
 	UINT Style = WS_CHILD|WS_CLIPSIBLINGS|SBARS_SIZEGRIP|WS_CLIPCHILDREN;
 
-	if(m_config.showStatusBar)
+	if(m_config->showStatusBar)
 	{
 		Style |= WS_VISIBLE;
 	}
@@ -329,18 +335,18 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 		iIndentRebar += GetRectHeight(&rc);
 	}
 
-	if(m_config.showStatusBar)
+	if(m_config->showStatusBar)
 	{
 		GetWindowRect(m_hStatusBar,&rc);
 		IndentBottom += GetRectHeight(&rc);
 	}
 
-	if(m_config.showDisplayWindow)
+	if(m_config->showDisplayWindow)
 	{
 		IndentBottom += m_DisplayWindowHeight;
 	}
 
-	if(m_config.showFolders)
+	if(m_config->showFolders)
 	{
 		GetClientRect(m_hHolder,&rc);
 		IndentLeft = GetRectWidth(&rc);
@@ -374,42 +380,22 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 
 void Explorerplusplus::ToggleFolders(void)
 {
-	m_config.showFolders = !m_config.showFolders;
-	lShowWindow(m_hHolder, m_config.showFolders);
-	lShowWindow(m_hTreeView, m_config.showFolders);
+	m_config->showFolders = !m_config->showFolders;
+	lShowWindow(m_hHolder, m_config->showFolders);
+	lShowWindow(m_hTreeView, m_config->showFolders);
 
-	SendMessage(m_hMainToolbar,TB_CHECKBUTTON,(WPARAM)TOOLBAR_FOLDERS,(LPARAM)m_config.showFolders);
+	SendMessage(m_mainToolbar->GetHWND(),TB_CHECKBUTTON,(WPARAM)TOOLBAR_FOLDERS,(LPARAM)m_config->showFolders);
 	ResizeWindows();
 }
 
 void Explorerplusplus::AdjustMainToolbarSize(void)
 {
-	HIMAGELIST *phiml = NULL;
-	int cx;
-	int cy;
-
-	if(m_bLargeToolbarIcons)
-	{
-		cx = TOOLBAR_IMAGE_SIZE_LARGE_X;
-		cy = TOOLBAR_IMAGE_SIZE_LARGE_Y;
-		phiml = &m_himlToolbarLarge;
-	}
-	else
-	{
-		cx = TOOLBAR_IMAGE_SIZE_SMALL_X;
-		cy = TOOLBAR_IMAGE_SIZE_SMALL_Y;
-		phiml = &m_himlToolbarSmall;
-	}
-
-	/* Switch the image list. */
-	SendMessage(m_hMainToolbar,TB_SETIMAGELIST,0,(LPARAM)*phiml);
-	SendMessage(m_hMainToolbar,TB_SETBUTTONSIZE,0,MAKELPARAM(cx,cy));
-	SendMessage(m_hMainToolbar,TB_AUTOSIZE,0,0);
+	m_mainToolbar->UpdateToolbarSize();
 
 	REBARBANDINFO rbi;
 	DWORD dwSize;
 
-	dwSize = (DWORD)SendMessage(m_hMainToolbar,TB_GETBUTTONSIZE,0,0);
+	dwSize = (DWORD)SendMessage(m_mainToolbar->GetHWND(),TB_GETBUTTONSIZE,0,0);
 
 	rbi.cbSize		= sizeof(rbi);
 	rbi.fMask		= RBBIM_CHILDSIZE;

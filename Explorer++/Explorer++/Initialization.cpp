@@ -147,19 +147,6 @@ void Explorerplusplus::OnCreate(void)
 	m_hToolbarRightClickMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_TOOLBAR_MENU)), 0);
 	m_hViewsMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_VIEWS_MENU)), 0);
 
-	HBITMAP hb;
-
-	/* Large and small image lists for the main toolbar. */
-	m_himlToolbarSmall = ImageList_Create(TOOLBAR_IMAGE_SIZE_SMALL_X, TOOLBAR_IMAGE_SIZE_SMALL_Y, ILC_COLOR32 | ILC_MASK, 0, 47);
-	hb = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(m_himlToolbarSmall, hb, NULL);
-	DeleteObject(hb);
-
-	m_himlToolbarLarge = ImageList_Create(TOOLBAR_IMAGE_SIZE_LARGE_X, TOOLBAR_IMAGE_SIZE_LARGE_Y, ILC_COLOR32 | ILC_MASK, 0, 47);
-	hb = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_SHELLIMAGES_LARGE));
-	ImageList_Add(m_himlToolbarLarge, hb, NULL);
-	DeleteObject(hb);
-
 	CreateDirectoryMonitor(&m_pDirMon);
 
 	CreateStatusBar();

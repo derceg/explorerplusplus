@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
+#include "MainToolbar.h"
 #include "ShellBrowser/iShellView.h"
 #include "TabContainer.h"
 #include "../Helper/Bookmark.h"
@@ -346,7 +347,6 @@ private:
 	LRESULT					OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	LRESULT					StatusBarMenuSelect(WPARAM wParam,LPARAM lParam);
 	void					HandleDirectoryMonitoring(int iTabId);
-	LRESULT					OnTbnDropDown(LPARAM lParam);
 	void					OnTabCtrlMButtonUp(POINT *pt);
 	void					OnDisplayWindowResized(WPARAM wParam);
 	void					OnStartedBrowsing(int iTabId, const TCHAR *szPath);
@@ -520,6 +520,7 @@ private:
 	HWND					CreateMainListView(HWND hParent,DWORD Style);
 	void					CreateMainControls(void);
 	void					CreateFolderControls(void);
+	void					CreateMainToolbar();
 	void					CreateBookmarksToolbar(void);
 	void					CreateDrivesToolbar(void);
 	void					CreateApplicationToolbar();
@@ -530,26 +531,8 @@ private:
 	void					InitializeMainToolbars(void);
 	void					AdjustMainToolbarSize(void);
 
-	/* Main toolbar. */
-	void					CreateMainToolbar();
-	void					SetInitialToolbarButtons();
-	void					AddButtonsToMainToolbar();
-	void					AddButtonToMainToolbar(int iButtonId);
-	TBBUTTON				GetMainToolbarButtonDetails(int iButtonId);
-	void					AddStringsToMainToolbar();
-	void					AddStringToMainToolbar(int iButtonId);
-	void					GetMainToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize);
-	int						LookupToolbarButtonImage(int iButtonID);
-	BYTE					LookupToolbarButtonExtraStyles(int iButtonID);
-	int						LookupToolbarButtonTextID(int iButtonID);
-
 	/* Main toolbar private message handlers. */
-	BOOL					OnTBQueryInsert();
-	BOOL					OnTBQueryDelete();
-	BOOL					OnTBRestore();
-	BOOL					OnTBGetButtonInfo(LPARAM lParam);
-	void					OnTBReset(void);
-	void					OnTBGetInfoTip(LPARAM lParam);
+	LRESULT					OnTbnDropDown(LPARAM lParam);
 	void					OnMainToolbarRClick();
 
 	/* Directory specific settings. */
@@ -561,7 +544,6 @@ private:
 	LONG					SaveSettings();
 	LONG					LoadSettings();
 	void					ValidateLoadedSettings(void);
-	void					ValidateToolbarSettings(void);
 	void					ValidateColumns(void);
 	void					ValidateSingleColumnSet(int iColumnSet,std::list<Column_t> *pColumnList);
 	void					ApplyLoadedSettings(void);
@@ -602,7 +584,7 @@ private:
 	void					ResizeWindows(void);
 	void					SetListViewInitialPosition(HWND hListView);
 	void					AdjustFolderPanePosition(void);
-	void					UpdateMainToolbar(void);
+	void					UpdateMainToolbar();
 	HRESULT					UpdateStatusBarText(void);
 	void					ToggleFolders(void);
 
@@ -766,7 +748,6 @@ private:
 	HWND					m_hTreeView;
 	HWND					m_hHolder;
 	HWND					m_hAddressBar;
-	HWND					m_hMainToolbar;
 	HWND					m_hFoldersToolbar;
 	HWND					m_hTabBacking;
 	HWND					m_hBookmarksToolbar;
@@ -829,7 +810,7 @@ private:
 	std::list<DirectorySettings_t>	m_DirectorySettingsList;
 
 	/* User options variables. */
-	Config					m_config;
+	std::shared_ptr<Config>	m_config;
 	BOOL					m_bShowTabBar;
 	BOOL					m_bSavePreferencesToXMLFile;
 	BOOL					m_bLockToolbars;
@@ -844,7 +825,6 @@ private:
 	BOOL					m_bShowTaskbarThumbnailsProvisional;
 	BOOL					m_bSynchronizeTreeview;
 	BOOL					m_bTVAutoExpandSelected;
-	BOOL					m_bLargeToolbarIcons;
 	BOOL					m_bPlayNavigationSound;
 	SizeDisplayFormat_t		m_SizeDisplayFormat;
 	StartupMode_t			m_StartupMode;
@@ -889,21 +869,10 @@ private:
 	/* Undo support. */
 	CFileActionHandler		m_FileActionHandler;
 
-	/* Main toolbars. */
+	/* Toolbars. */
 	REBARBANDINFO			m_ToolbarInformation[NUM_MAIN_TOOLBARS];
-
-	/* Main toolbar. */
-	HIMAGELIST				m_himlToolbarSmall;
-	HIMAGELIST				m_himlToolbarLarge;
-	std::unordered_map<int, int>	m_mainToolbarStringMap;
-
-	/* Toolbar buttons. */
-	std::list<ToolbarButton_t>	m_tbInitial;
-
-	/* Drives toolbar. */
+	MainToolbar				*m_mainToolbar;
 	CDrivesToolbar			*m_pDrivesToolbar;
-
-	/* Application toolbar. */
 	CApplicationToolbar		*m_pApplicationToolbar;
 
 	/* Display window folder sizes. */
