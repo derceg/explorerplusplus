@@ -18,10 +18,10 @@
 #include "../Helper/Macros.h"
 
 /* Small/large toolbar image sizes. */
-#define TOOLBAR_IMAGE_SIZE_SMALL_X	16
-#define TOOLBAR_IMAGE_SIZE_SMALL_Y	16
-#define TOOLBAR_IMAGE_SIZE_LARGE_X	24
-#define TOOLBAR_IMAGE_SIZE_LARGE_Y	24
+const int TOOLBAR_IMAGE_SIZE_SMALL_X = 16;
+const int TOOLBAR_IMAGE_SIZE_SMALL_Y = 16;
+const int TOOLBAR_IMAGE_SIZE_LARGE_X = 24;
+const int TOOLBAR_IMAGE_SIZE_LARGE_Y = 24;
 
 MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp, std::shared_ptr<Config> config)
 {
