@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum
+enum SortMode
 {
 	FSM_NAME = 1,
 	FSM_DATEMODIFIED = 2,
@@ -73,7 +73,7 @@ typedef enum
 	FSM_MEDIA_PUBLISHER = 62,
 	FSM_MEDIA_WRITER = 63,
 	FSM_MEDIA_YEAR = 64
-} SORT_MODES;
+};
 
 static const UINT RealFolderSortModes[] =
 { FSM_NAME,FSM_SIZE,FSM_TYPE,FSM_DATEMODIFIED,FSM_ATTRIBUTES,
