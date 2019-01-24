@@ -123,7 +123,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 		case WM_SETFOCUS:
 			m_hLastActiveWindow = ListView;
-			UpdateMainToolbar();
+			m_mainToolbar->UpdateToolbarButtonStates();
 			break;
 
 		case WM_LBUTTONDOWN:
@@ -680,7 +680,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 
 	UpdateDisplayWindow();
 	UpdateStatusBarText();
-	UpdateMainToolbar();
+	m_mainToolbar->UpdateToolbarButtonStates();
 }
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)

@@ -621,7 +621,7 @@ void MainToolbar::OnTBReset()
 		SendMessage(m_hwnd, TB_DELETEBUTTON, i, 0);
 
 	AddButtonsToToolbar();
-	m_pexpp->UpdateMainToolbar();
+	UpdateToolbarButtonStates();
 }
 
 void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
@@ -752,4 +752,27 @@ void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 
 	TrackPopupMenu(viewsMenu, TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y,
 		0, m_hwnd, NULL);
+}
+
+void MainToolbar::UpdateToolbarButtonStates()
+{
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_UP, m_pexpp->GetActiveShellBrowser()->CanBrowseUp());
+
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_BACK, m_pexpp->GetActiveShellBrowser()->CanBrowseBack());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_FORWARD, m_pexpp->GetActiveShellBrowser()->CanBrowseForward());
+
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_COPYTO, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_MOVETO, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_COPY, m_pexpp->CanCopy());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_CUT, m_pexpp->CanCut());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_PASTE, m_pexpp->CanPaste());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_PROPERTIES, m_pexpp->CanShowFileProperties());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_DELETE, m_pexpp->CanDelete());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_DELETEPERMANENTLY, m_pexpp->CanDelete());
+
+	BOOL bVirtualFolder = m_pexpp->GetActiveShellBrowser()->InVirtualFolder();
+
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_OPENCOMMANDPROMPT, !bVirtualFolder);
+
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_NEWFOLDER, !bVirtualFolder);
 }

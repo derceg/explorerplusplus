@@ -23,30 +23,6 @@
 #include "../Helper/ShellHelper.h"
 
 
-void Explorerplusplus::UpdateMainToolbar()
-{
-	BOOL bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
-
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,TOOLBAR_UP,m_pActiveShellBrowser->CanBrowseUp());
-
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,TOOLBAR_BACK,m_pActiveShellBrowser->CanBrowseBack());
-
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,TOOLBAR_FORWARD,m_pActiveShellBrowser->CanBrowseForward());
-
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_COPYTO,CanCopy() && GetFocus() != m_hTreeView);
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_MOVETO,CanCut() && GetFocus() != m_hTreeView);
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_COPY,CanCopy());
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_CUT,CanCut());
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_PASTE,CanPaste());
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_PROPERTIES,CanShowFileProperties());
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_DELETE,CanDelete());
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_DELETEPERMANENTLY,CanDelete());
-
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,(WPARAM)TOOLBAR_OPENCOMMANDPROMPT,!bVirtualFolder);
-
-	SendMessage(m_mainToolbar->GetHWND(),TB_ENABLEBUTTON,TOOLBAR_NEWFOLDER,!bVirtualFolder);
-}
-
 void Explorerplusplus::OnMainToolbarRClick()
 {
 	POINT ptCursor;

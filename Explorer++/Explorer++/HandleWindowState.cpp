@@ -44,7 +44,7 @@ void Explorerplusplus::UpdateWindowStates(void)
 
 	UpdateMainWindowText();
 	UpdateAddressBarText();
-	UpdateMainToolbar();
+	m_mainToolbar->UpdateToolbarButtonStates();
 	UpdateTabText();
 	UpdateTreeViewSelection();
 	UpdateStatusBarText();

@@ -79,7 +79,7 @@ WPARAM wParam,LPARAM lParam)
 	switch(uMsg)
 	{
 	case WM_SETFOCUS:
-		UpdateMainToolbar();
+		m_mainToolbar->UpdateToolbarButtonStates();
 		break;
 
 	case WM_MBUTTONDOWN:

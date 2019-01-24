@@ -310,6 +310,7 @@
     <ClCompile Include="DrivesToolbar.cpp" />
     <ClCompile Include="EventSwitcher.cpp" />
     <ClCompile Include="Explorer++.cpp" />
+    <ClCompile Include="FileSelectionTests.cpp" />
     <ClCompile Include="FilterDialog.cpp" />
     <ClCompile Include="HandleWindowState.cpp" />
     <ClCompile Include="HardwareChangeNotifier.cpp" />

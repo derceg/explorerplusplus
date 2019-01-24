@@ -1594,6 +1594,11 @@ CShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 	return m_pActiveShellBrowser;
 }
 
+HWND Explorerplusplus::GetTreeView() const
+{
+	return m_hTreeView;
+}
+
 void Explorerplusplus::OnShowHiddenFiles(void)
 {
 	m_pActiveShellBrowser->ToggleShowHidden();

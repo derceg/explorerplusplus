@@ -36,6 +36,8 @@ __interface IExplorerplusplus
 	HWND			GetActiveListView() const;
 	CShellBrowser	*GetActiveShellBrowser() const;
 
+	HWND			GetTreeView() const;
+
 	std::wstring	GetTabName(int iTab);
 	void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
 	void			RefreshTab(int iTabId);
@@ -43,7 +45,6 @@ __interface IExplorerplusplus
 
 	/* Temporary. */
 	void			SetTabSelection(int Index);
-	void			UpdateMainToolbar();
 
 	void			OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 
@@ -55,6 +56,13 @@ __interface IExplorerplusplus
 	void			OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
 
 	HMENU			BuildViewsMenu();
+
+	BOOL			CanCut() const;
+	BOOL			CanCopy() const;
+	BOOL			CanRename() const;
+	BOOL			CanDelete() const;
+	BOOL			CanShowFileProperties() const;
+	BOOL			CanPaste() const;
 };
 
 /* Used when setting Explorer++ as the default

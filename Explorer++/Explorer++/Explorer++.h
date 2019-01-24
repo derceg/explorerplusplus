@@ -583,7 +583,6 @@ private:
 	void					ResizeWindows(void);
 	void					SetListViewInitialPosition(HWND hListView);
 	void					AdjustFolderPanePosition(void);
-	void					UpdateMainToolbar();
 	HRESULT					UpdateStatusBarText(void);
 	void					ToggleFolders(void);
 
@@ -639,12 +638,12 @@ private:
 	HRESULT					TestListViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 	HRESULT					TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 	HRESULT					GetSelectionAttributes(SFGAOF *pItemAttributes) const;
-	BOOL					CanCut(void) const;
-	BOOL					CanCopy(void) const;
-	BOOL					CanRename(void) const;
-	BOOL					CanDelete(void) const;
-	BOOL					CanShowFileProperties(void) const;
-	BOOL					CanPaste(void) const;
+	BOOL					CanCut() const;
+	BOOL					CanCopy() const;
+	BOOL					CanRename() const;
+	BOOL					CanDelete() const;
+	BOOL					CanShowFileProperties() const;
+	BOOL					CanPaste() const;
 	BOOL					TestItemAttributes(SFGAOF attributes) const;
 
 	/* Display window file information. */
@@ -707,6 +706,7 @@ private:
 	/* IExplorerplusplus methods. */
 	HWND					GetActiveListView() const;
 	CShellBrowser			*GetActiveShellBrowser() const;
+	HWND					GetTreeView() const;
 
 	/* Helpers. */
 	HANDLE					CreateWorkerThread();

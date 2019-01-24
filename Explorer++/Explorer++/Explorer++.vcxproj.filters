@@ -244,6 +244,9 @@
     <ClCompile Include="ShellBrowser\ViewModes.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="FileSelectionTests.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">

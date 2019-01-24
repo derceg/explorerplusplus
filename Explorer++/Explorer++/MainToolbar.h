@@ -13,6 +13,7 @@ public:
 	static MainToolbar *Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp, std::shared_ptr<Config> config);
 
 	void UpdateToolbarSize();
+	void UpdateToolbarButtonStates();
 
 private:
 
