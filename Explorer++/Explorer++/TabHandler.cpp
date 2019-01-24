@@ -374,8 +374,8 @@ int *pTabObjectIndex)
 				/* TODO: */
 				//bFound = TRUE;
 
-				is.SortMode				= ds.dsi.SortMode;
-				is.viewMode				= ds.dsi.ViewMode;
+				is.sortMode				= ds.dsi.sortMode;
+				is.viewMode				= ds.dsi.viewMode;
 				is.bApplyFilter			= FALSE;
 				is.bFilterCaseSensitive	= FALSE;
 
@@ -396,7 +396,7 @@ int *pTabObjectIndex)
 		}
 		else
 		{
-			is.SortMode				= GetDefaultSortMode(pidlDirectory);
+			is.sortMode				= GetDefaultSortMode(pidlDirectory);
 			is.viewMode				= m_ViewModeGlobal;
 			is.bApplyFilter			= FALSE;
 			is.bFilterCaseSensitive	= FALSE;
@@ -1428,9 +1428,9 @@ int Explorerplusplus::GetCurrentTabId() const
 	return m_selectedTabId;
 }
 
-UINT Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory)
+SortMode Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
 {
-	std::list<Column_t> *pColumns = NULL;
+	const std::list<Column_t> *pColumns = NULL;
 
 	TCHAR szDirectory[MAX_PATH];
 	GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
@@ -1464,18 +1464,18 @@ UINT Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory)
 		pColumns = &m_RealFolderColumnList;
 	}
 
-	UINT uSortMode = FSM_NAME;
+	SortMode sortMode = FSM_NAME;
 
 	for(const auto &Column : *pColumns)
 	{
 		if(Column.bChecked)
 		{
-			uSortMode = CShellBrowser::DetermineColumnSortMode(Column.id);
+			sortMode = CShellBrowser::DetermineColumnSortMode(Column.id);
 			break;
 		}
 	}
 
-	return uSortMode;
+	return sortMode;
 }
 
 void Explorerplusplus::OnTabCtrlMButtonUp(POINT *pt)

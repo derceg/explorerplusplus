@@ -3,6 +3,7 @@
 #include "ColumnDataRetrieval.h"
 #include "iPathManager.h"
 #include "ItemData.h"
+#include "SortModes.h"
 #include "TabPreferences.h"
 #include "ViewModes.h"
 #include "../Helper/DropHandler.h"
@@ -51,7 +52,7 @@ typedef struct
 
 typedef struct
 {
-	UINT	SortMode;
+	SortMode	sortMode;
 	ViewMode	viewMode;
 	BOOL	bSortAscending;
 	BOOL	bShowInGroups;
@@ -138,9 +139,9 @@ public:
 	BOOL				ToggleAutoArrange(void);
 	ViewMode			GetCurrentViewMode() const;
 	void				SetCurrentViewMode(ViewMode viewMode);
-	UINT				GetSortMode() const;
-	void				SetSortMode(UINT SortMode);
-	void				SortFolder(UINT SortMode);
+	SortMode			GetSortMode() const;
+	void				SetSortMode(SortMode sortMode);
+	void				SortFolder(SortMode sortMode);
 	BOOL				IsGroupViewEnabled(void) const;
 	BOOL				GetSortAscending(void) const;
 	BOOL				SetSortAscending(BOOL bAscending);
@@ -185,7 +186,7 @@ public:
 	/* Column support. */
 	void				ExportCurrentColumns(std::list<Column_t> *pColumns);
 	void				ImportColumns(std::list<Column_t> *pColumns);
-	static unsigned int	DetermineColumnSortMode(int iColumnId);
+	static SortMode		DetermineColumnSortMode(int iColumnId);
 	static int			LookupColumnNameStringIndex(int iColumnId);
 	static int			LookupColumnDescriptionStringIndex(int iColumnId);
 
@@ -533,7 +534,7 @@ private:
 	TCHAR				m_CurDir[MAX_PATH];
 	ULARGE_INTEGER		m_ulTotalDirSize;
 	ULARGE_INTEGER		m_ulFileSelectionSize;
-	UINT				m_SortMode;
+	SortMode			m_SortMode;
 	ViewMode			m_ViewMode;
 	BOOL				m_bVirtualFolder;
 	BOOL				m_bFolderVisited;

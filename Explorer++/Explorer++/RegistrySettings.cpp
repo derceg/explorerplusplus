@@ -599,7 +599,9 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ViewMode"),&value);
 			Settings.viewMode = static_cast<ViewMode>(value);
 
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortMode"),(LPDWORD)&Settings.SortMode);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortMode"),&value);
+			Settings.sortMode = static_cast<SortMode>(value);
+
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortAscending"),(LPDWORD)&Settings.bSortAscending);
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowInGroups"),(LPDWORD)&Settings.bShowInGroups);
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ApplyFilter"),(LPDWORD)&Settings.bApplyFilter);

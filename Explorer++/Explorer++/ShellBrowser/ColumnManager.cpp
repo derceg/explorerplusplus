@@ -283,7 +283,7 @@ void CShellBrowser::SetActiveColumnSet(void)
 	}
 }
 
-unsigned int CShellBrowser::DetermineColumnSortMode(int iColumnId)
+SortMode CShellBrowser::DetermineColumnSortMode(int iColumnId)
 {
 	switch(iColumnId)
 	{
@@ -540,7 +540,7 @@ unsigned int CShellBrowser::DetermineColumnSortMode(int iColumnId)
 			break;
 	}
 
-	return 0;
+	return FSM_NAME;
 }
 
 int CShellBrowser::LookupColumnNameStringIndex(int iColumnId)
@@ -967,7 +967,7 @@ void CShellBrowser::ColumnClicked(int iClickedColumn)
 {
 	std::list<Column_t>::iterator itr;
 	int iCurrentColumn = 0;
-	UINT SortMode = 0;
+	SortMode sortMode;
 	UINT iColumnId = 0;
 
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
@@ -977,7 +977,7 @@ void CShellBrowser::ColumnClicked(int iClickedColumn)
 		{
 			if(iCurrentColumn == iClickedColumn)
 			{
-				SortMode = DetermineColumnSortMode(itr->id);
+				sortMode = DetermineColumnSortMode(itr->id);
 				iColumnId = itr->id;
 				break;
 			}
@@ -995,7 +995,7 @@ void CShellBrowser::ColumnClicked(int iClickedColumn)
 		ToggleSortAscending();
 	}
 
-	SortFolder(SortMode);
+	SortFolder(sortMode);
 }
 
 void CShellBrowser::ApplyHeaderSortArrow(void)

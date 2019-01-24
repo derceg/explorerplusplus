@@ -1953,7 +1953,7 @@ InitialSettings_t *pSettings,TabInfo_t *pTabInfo)
 	}
 	else if(lstrcmp(wszName,L"SortMode") == 0)
 	{
-		pSettings->SortMode = NXMLSettings::DecodeIntValue(wszValue);
+		pSettings->sortMode = static_cast<SortMode>(NXMLSettings::DecodeIntValue(wszValue));
 	}
 	else if(lstrcmp(wszName,L"ViewMode") == 0)
 	{

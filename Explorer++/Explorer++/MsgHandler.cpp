@@ -783,10 +783,10 @@ void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)
 	{
 		m_pActiveShellBrowser->SetSortAscending(bSortAscending);
 
-		UINT SortMode = m_pActiveShellBrowser->GetSortMode();
+		SortMode sortMode = m_pActiveShellBrowser->GetSortMode();
 
 		/* It is quicker to re-sort the folder than refresh it. */
-		m_pActiveShellBrowser->SortFolder(SortMode);
+		m_pActiveShellBrowser->SortFolder(sortMode);
 	}
 }
 
@@ -1446,12 +1446,12 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::OnSortBy(UINT uSortMode)
+void Explorerplusplus::OnSortBy(SortMode sortMode)
 {
-	UINT uCurrentSortMode = m_pActiveShellBrowser->GetSortMode();
+	SortMode currentSortMode = m_pActiveShellBrowser->GetSortMode();
 
 	if(!m_pActiveShellBrowser->IsGroupViewEnabled() &&
-		uSortMode == uCurrentSortMode)
+		sortMode == currentSortMode)
 	{
 		m_pActiveShellBrowser->ToggleSortAscending();
 	}
@@ -1460,18 +1460,18 @@ void Explorerplusplus::OnSortBy(UINT uSortMode)
 		m_pActiveShellBrowser->SetGrouping(FALSE);
 	}
 
-	m_pActiveShellBrowser->SortFolder(uSortMode);
+	m_pActiveShellBrowser->SortFolder(sortMode);
 }
 
-void Explorerplusplus::OnGroupBy(UINT uSortMode)
+void Explorerplusplus::OnGroupBy(SortMode sortMode)
 {
-	UINT uCurrentSortMode = m_pActiveShellBrowser->GetSortMode();
+	SortMode currentSortMode = m_pActiveShellBrowser->GetSortMode();
 
 	/* If group view is already enabled, and the current sort
 	mode matches the supplied sort mode, toggle the ascending/
 	descending flag. */
 	if(m_pActiveShellBrowser->IsGroupViewEnabled() &&
-		uSortMode == uCurrentSortMode)
+		sortMode == currentSortMode)
 	{
 		m_pActiveShellBrowser->ToggleSortAscending();
 	}
@@ -1480,7 +1480,7 @@ void Explorerplusplus::OnGroupBy(UINT uSortMode)
 		m_pActiveShellBrowser->SetGroupingFlag(TRUE);
 	}
 
-	m_pActiveShellBrowser->SortFolder(uSortMode);
+	m_pActiveShellBrowser->SortFolder(sortMode);
 }
 
 void Explorerplusplus::SaveAllSettings(void)
@@ -1525,8 +1525,8 @@ void Explorerplusplus::SaveDirectorySpecificSettings(int iTab)
 
 		ds.pidlDirectory = m_pShellBrowser[iIndexInternal]->QueryCurrentDirectoryIdl();
 
-		ds.dsi.SortMode = m_pShellBrowser[iIndexInternal]->GetSortMode();
-		ds.dsi.ViewMode = m_pShellBrowser[iIndexInternal]->GetCurrentViewMode();
+		ds.dsi.sortMode = m_pShellBrowser[iIndexInternal]->GetSortMode();
+		ds.dsi.viewMode = m_pShellBrowser[iIndexInternal]->GetCurrentViewMode();
 
 		ColumnExport_t ce;
 
@@ -1564,8 +1564,8 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 				{
 					int iIndexInternal = (int)tcItem.lParam;
 
-					m_pShellBrowser[iIndexInternal]->SetSortMode(ds.dsi.SortMode);
-					m_pShellBrowser[iIndexInternal]->SetCurrentViewMode(ds.dsi.ViewMode);
+					m_pShellBrowser[iIndexInternal]->SetSortMode(ds.dsi.sortMode);
+					m_pShellBrowser[iIndexInternal]->SetCurrentViewMode(ds.dsi.viewMode);
 
 					ColumnExport_t ce;
 

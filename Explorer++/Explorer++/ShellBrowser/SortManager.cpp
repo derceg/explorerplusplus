@@ -30,9 +30,9 @@
 #include "../Helper/Macros.h"
 
 
-void CShellBrowser::SortFolder(UINT SortMode)
+void CShellBrowser::SortFolder(SortMode sortMode)
 {
-	m_SortMode = SortMode;
+	m_SortMode = sortMode;
 
 	if(m_bShowInGroups)
 	{

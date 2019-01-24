@@ -159,8 +159,8 @@ private:
 	/* Used to store settings for individual directories. */
 	struct DirectorySettingsInternal_t
 	{
-		UINT	SortMode;
-		ViewMode	ViewMode;
+		SortMode	sortMode;
+		ViewMode	viewMode;
 
 		std::list<Column_t>	RealFolderColumnList;
 		std::list<Column_t>	MyComputerColumnList;
@@ -375,8 +375,8 @@ private:
 	void					OnNdwRClick(POINT *pt);
 	void					OnNdwIconRClick(POINT *pt);
 	LRESULT					OnCustomDraw(LPARAM lParam);
-	void					OnSortBy(UINT uSortMode);
-	void					OnGroupBy(UINT uSortMode);
+	void					OnSortBy(SortMode sortMode);
+	void					OnGroupBy(SortMode sortMode);
 	void					OnSelectTabById(int tabId, BOOL setFocus);
 	int						GetTabIndexById(int tabId);
 	int						GetTabIdByIndex(int index);
@@ -729,7 +729,7 @@ private:
 	void					CycleViewState(BOOL bCycleForward);
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	CStatusBar				*GetStatusBar();
-	UINT					GetDefaultSortMode(LPCITEMIDLIST pidlDirectory);
+	SortMode				GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const;
 	void					FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
 
 

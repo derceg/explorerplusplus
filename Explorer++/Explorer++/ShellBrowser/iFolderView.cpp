@@ -359,14 +359,14 @@ void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 	SendMessage(m_hListView,LVM_SETVIEW,dwStyle,0);
 }
 
-UINT CShellBrowser::GetSortMode() const
+SortMode CShellBrowser::GetSortMode() const
 {
 	return m_SortMode;
 }
 
-void CShellBrowser::SetSortMode(UINT SortMode)
+void CShellBrowser::SetSortMode(SortMode sortMode)
 {
-	m_SortMode	= SortMode;
+	m_SortMode	= sortMode;
 }
 
 BOOL CShellBrowser::IsGroupViewEnabled(void) const
@@ -402,7 +402,7 @@ void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 	m_bShowHidden			= is->bShowHidden;
 	m_bShowInGroups			= is->bShowInGroups;
 	m_bSortAscending		= is->bSortAscending;
-	m_SortMode				= is->SortMode;
+	m_SortMode				= is->sortMode;
 	m_ViewMode				= is->viewMode;
 	m_bApplyFilter			= is->bApplyFilter;
 	m_bFilterCaseSensitive	= is->bFilterCaseSensitive;
