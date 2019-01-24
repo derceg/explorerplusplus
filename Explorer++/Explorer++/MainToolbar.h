@@ -6,7 +6,7 @@
 #include <list>
 #include <unordered_map>
 
-/* This represents the TOTAL set off buttons that may be
+/* This represents the TOTAL set of buttons that may be
 placed on the toolbar. */
 static const int TOOLBAR_BUTTON_SET[] =
 { TOOLBAR_BACK, TOOLBAR_FORWARD, TOOLBAR_UP, TOOLBAR_FOLDERS,
