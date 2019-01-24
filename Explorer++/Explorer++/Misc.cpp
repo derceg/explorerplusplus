@@ -317,6 +317,7 @@ HRESULT Explorerplusplus::TestListViewSelectionAttributes(SFGAOF *pItemAttribute
 	HRESULT			hr = E_FAIL;
 	int				iSelected;
 
+	/* TODO: This should probably check all selected files. */
 	iSelected = ListView_GetNextItem(m_hActiveListView,-1,LVNI_SELECTED);
 
 	if(iSelected != -1)
@@ -355,6 +356,11 @@ HRESULT Explorerplusplus::TestTreeViewSelectionAttributes(SFGAOF *pItemAttribute
 	}
 
 	return hr;
+}
+
+BOOL Explorerplusplus::IsCutOrCopyPossible(void) const
+{
+	return TestItemAttributes(SFGAO_CANCOPY | SFGAO_CANMOVE);
 }
 
 BOOL Explorerplusplus::IsRenamePossible(void) const
@@ -399,45 +405,6 @@ HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes) const
 		hr = TestTreeViewSelectionAttributes(pItemAttributes);
 
 	return hr;
-}
-
-BOOL Explorerplusplus::CanCutOrCopySelection(void) const
-{
-	HWND hFocus;
-
-	hFocus = GetFocus();
-
-	if(hFocus == m_hActiveListView)
-	{
-		return m_nSelected && AreAllSelectedFilesReal();
-	}
-	else if(hFocus == m_hTreeView)
-	{
-		HTREEITEM		hItem;
-		LPITEMIDLIST	pidl = NULL;
-		SFGAOF			Attributes;
-		HRESULT			hr;
-
-		hItem = TreeView_GetSelection(m_hTreeView);
-
-		if(hItem != NULL)
-		{
-			pidl = m_pMyTreeView->BuildPath(hItem);
-
-			Attributes = SFGAO_CANCOPY;// | SFGAO_CANMOVE;
-
-			hr = GetItemAttributes(pidl,&Attributes);
-
-			CoTaskMemFree(pidl);
-
-			if(hr == S_OK)
-				return TRUE;
-		}
-
-		return FALSE;
-	}
-
-	return FALSE;
 }
 
 BOOL Explorerplusplus::CanPaste(void) const
@@ -489,22 +456,6 @@ BOOL Explorerplusplus::CanPaste(void) const
 	}
 
 	return FALSE;
-}
-
-BOOL Explorerplusplus::AreAllSelectedFilesReal(void) const
-{
-	int iItem = -1;
-
-	if(m_nSelected == 0)
-		return FALSE;
-
-	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
-	{
-		if(!m_pActiveShellBrowser->IsFileReal(iItem))
-			return FALSE;
-	}
-
-	return TRUE;
 }
 
 HRESULT Explorerplusplus::UpdateStatusBarText(void)

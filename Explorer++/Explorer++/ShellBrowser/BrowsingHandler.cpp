@@ -549,7 +549,6 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	(such as the recycle bin), but items still exist. */
 	if(hFirstFile != INVALID_HANDLE_VALUE)
 	{
-		m_itemInfoMap[uItemId].bReal = TRUE;
 		FindClose(hFirstFile);
 	}
 	else
@@ -562,7 +561,6 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 		wfd.dwFileAttributes		= FILE_ATTRIBUTE_DIRECTORY;
 
 		m_itemInfoMap[uItemId].wfd = wfd;
-		m_itemInfoMap[uItemId].bReal = FALSE;
 	}
 
 	return uItemId;

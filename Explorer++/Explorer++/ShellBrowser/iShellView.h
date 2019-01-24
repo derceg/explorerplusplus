@@ -180,7 +180,6 @@ public:
 	LPITEMIDLIST		QueryItemRelativeIdl(int iItem) const;
 	DWORD				QueryFileAttributes(int iItem) const;
 	int					QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
-	BOOL				IsFileReal(int iItem) const;
 	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;
 	
 	/* Column support. */
@@ -245,7 +244,6 @@ private:
 		PIDLPointer		pridl;
 		WIN32_FIND_DATA	wfd;
 		TCHAR			szDisplayName[MAX_PATH];
-		BOOL			bReal;
 		BOOL			bIconRetrieved;
 		int				iIcon;
 

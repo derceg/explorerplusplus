@@ -742,22 +742,6 @@ int CShellBrowser::DetermineItemSortedPosition(LPARAM lParam) const
 	return i - 1;
 }
 
-BOOL CShellBrowser::IsFileReal(int iItem) const
-{
-	LVITEM	lvItem;
-	BOOL	bRes;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	bRes = ListView_GetItem(m_hListView,&lvItem);
-
-	if(bRes)
-		return m_itemInfoMap.at((int)lvItem.lParam).bReal;
-
-	return FALSE;
-}
-
 BOOL CShellBrowser::GhostItem(int iItem)
 {
 	return GhostItemInternal(iItem,TRUE);
