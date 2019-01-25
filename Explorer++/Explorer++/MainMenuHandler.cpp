@@ -1,16 +1,6 @@
-/******************************************************************
-*
-* Project: Explorer++
-* File: MainMenuHandler.cpp
-* License: GPL - See LICENSE in the top level directory
-*
-* Handles some of the main menu entries (which might also be
-* invoked through other means, such as via keyboard accelerators).
-*
-* Written by David Erceg
-* www.explorerplusplus.com
-*
-******************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include "Explorer++.h"

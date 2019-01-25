@@ -1,16 +1,6 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: BookmarksToolbar.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Initializes the bookmarks toolbar and handles update
- * notifications, window messages, etc.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include "BookmarksToolbar.h"

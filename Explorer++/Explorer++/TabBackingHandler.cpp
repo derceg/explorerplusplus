@@ -1,16 +1,11 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: TabBackingHandler.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Manages the 'tab backing' panel, which sits
  * behind the tab control.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "Explorer++.h"

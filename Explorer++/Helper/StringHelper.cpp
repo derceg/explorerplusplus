@@ -1,15 +1,6 @@
-/******************************************************************
-*
-* Project: Helper
-* File: StringHelper.cpp
-* License: GPL - See LICENSE in the top level directory
-*
-* String-related helper functionality.
-*
-* Written by David Erceg
-* www.explorerplusplus.com
-*
-*****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include "StringHelper.h"

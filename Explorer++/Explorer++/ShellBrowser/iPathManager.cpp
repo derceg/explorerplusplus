@@ -1,18 +1,13 @@
-/******************************************************************
- *
- * Project: ShellBrowser
- * File: iPathManager.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Remembers path history, and
  * includes the ability to browse
  * back/forward through a set
  * of paths.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include <list>

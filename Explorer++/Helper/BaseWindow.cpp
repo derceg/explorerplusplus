@@ -1,15 +1,6 @@
-/******************************************************************
- *
- * Project: Helper
- * File: BaseWindow.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Provides a degree of abstraction off a standard window.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include "BaseWindow.h"

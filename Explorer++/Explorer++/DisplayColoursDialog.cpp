@@ -1,15 +1,6 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: DisplayColoursDialog.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Handles the 'Change Display Colours' dialog and associated messages.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include "DisplayColoursDialog.h"

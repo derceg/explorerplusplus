@@ -1,20 +1,12 @@
-/******************************************************************
- *
- * Project: Helper
- * File: ContextMenuManager.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * This class is designed to show an existing menu, with
  * has been modified to also show menu items inserted
  * by shell extensions.
- *
- * References:
- * http://windowsxp.mvps.org/context_folders.htm
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include <vector>

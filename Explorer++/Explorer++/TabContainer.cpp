@@ -1,15 +1,6 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: TabContainer.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Manages the main tab control.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include <list>

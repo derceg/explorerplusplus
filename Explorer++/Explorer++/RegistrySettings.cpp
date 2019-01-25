@@ -1,15 +1,6 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: Settings.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Saves and loads all main program settings.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include "DefaultColumns.h"

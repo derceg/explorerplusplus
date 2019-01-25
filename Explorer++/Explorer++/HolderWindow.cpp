@@ -1,16 +1,11 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: HolderWindow.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Manages the 'holder window'. This window acts as a generic
  * container for child windows.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "HolderWindow.h"

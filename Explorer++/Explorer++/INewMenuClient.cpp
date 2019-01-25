@@ -1,17 +1,12 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: iNewMenuClient.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Used to support new item creation in Windows Vista and later.
  * That is, when an item is created using the new menu, this
  * class will select the file and place it in edit mode.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "INewMenuClient.h"

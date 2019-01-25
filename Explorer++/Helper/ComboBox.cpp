@@ -1,9 +1,8 @@
-/******************************************************************
- *
- * Project: Helper
- * File: ComboBox.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Wraps a standard combo box control. Provides additional
  * autocomplete functionality.
  *
@@ -21,11 +20,7 @@
  *
  * A better solution might be to use a rich-edit control
  * in combination with a list box.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "Helper.h"

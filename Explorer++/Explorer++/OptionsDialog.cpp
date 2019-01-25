@@ -1,21 +1,14 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: OptionsDialog.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Handles the 'Options' dialog and all associated messages.
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Notes:
  *  - Center dialog. Don't remember previous position.
  *  - The apply button is called for each dialog that
  *    has been initialised (i.e. any dialog that has
  *    had the focus set to itself).
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "Explorer++.h"

@@ -1,17 +1,6 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: ColorRuleHelper.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Provides helper functionality for the color rules (which are
- * used to color files, based on their filename an/or
- * attributes).
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include "ColorRuleHelper.h"

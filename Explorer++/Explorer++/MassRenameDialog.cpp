@@ -1,20 +1,15 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: MassRenameDialog.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Provides support for the mass renaming of files.
  * The following special characters are supported:
  * /N	- Counter
  * /F	- Filename
  * /B	- Basename (filename without extension)
  * /E	- Extension
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "MassRenameDialog.h"

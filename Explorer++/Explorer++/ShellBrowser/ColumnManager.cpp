@@ -1,21 +1,6 @@
-/******************************************************************
- *
- * Project: ShellBrowser
- * File: ColumnManager.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Handles the columns in details view.
- *
- * Notes:
- *  - Column widths need to save when:
- *     - Switching to a different folder type
- *     - Swapping columns (i.e. checking/unchecking columns)
- *     - Exiting the program
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include <list>

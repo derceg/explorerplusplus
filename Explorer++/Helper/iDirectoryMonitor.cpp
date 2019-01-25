@@ -1,17 +1,6 @@
-/******************************************************************
- *
- * Project: Helper
- * File: iDirectoryMonitor.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Class to monitor directories for changes (e.g. file renaming,
- * deleting, creation, etc.). Monitoring is performed
- * asynchronously.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include <list>

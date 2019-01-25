@@ -1,16 +1,6 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: Initialization.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Includes miscellaneous functions related to
- * the top-level GUI component.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include "Explorer++.h"

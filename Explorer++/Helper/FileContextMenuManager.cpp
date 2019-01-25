@@ -1,15 +1,6 @@
-/******************************************************************
- *
- * Project: Helper
- * File: FileContextMenuManager.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Manages the file context menu.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include <vector>

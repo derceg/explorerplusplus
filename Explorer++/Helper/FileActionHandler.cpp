@@ -1,16 +1,11 @@
-/******************************************************************
- *
- * Project: Helper
- * File: FileActionHandler.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Performs file actions and saves information about them.
  * Also allows file actions to be undone.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "FileActionHandler.h"

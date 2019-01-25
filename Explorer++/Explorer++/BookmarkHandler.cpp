@@ -1,17 +1,6 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: BookmarkHandler.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Handles tasks associated with bookmarks,
- * such as creating a bookmarks menu, and
- * adding bookmarks to a toolbar.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include "Explorer++.h"

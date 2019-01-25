@@ -1,9 +1,8 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: ApplicationToolbar.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Handles the application toolbar.
  *
  * Notes:
@@ -12,11 +11,7 @@
  *	<name="App1" command="C:\...">
  *	<name="App2" command="D:\...">
  * </ApplicationToolbar>
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "ApplicationToolbar.h"

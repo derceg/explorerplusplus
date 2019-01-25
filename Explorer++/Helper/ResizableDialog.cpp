@@ -1,16 +1,11 @@
-/******************************************************************
- *
- * Project: Helper
- * File: ResizableDialog.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Updates the size/position of a set of controls within
  * a resizable dialog.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "ResizableDialog.h"

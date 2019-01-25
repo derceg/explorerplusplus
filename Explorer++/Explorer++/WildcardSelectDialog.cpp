@@ -1,16 +1,6 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: WildcardSelectDialog.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Allows items to be selected/deselected based
- * on a wildcard filter.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include "WildcardSelectDialog.h"

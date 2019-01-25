@@ -1,16 +1,11 @@
-/******************************************************************
- *
- * Project: ShellBrowser
- * File: iDropTarget.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Handles the dropping of items onto
  * the main listview.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "IShellView.h"

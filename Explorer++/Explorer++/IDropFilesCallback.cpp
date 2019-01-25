@@ -1,16 +1,11 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: IDropFilesCallback.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Handles the case where a file is dropped onto the
  * active listview.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "IDropFilesCallback.h"

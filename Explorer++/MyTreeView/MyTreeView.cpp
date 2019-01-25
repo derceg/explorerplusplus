@@ -1,9 +1,8 @@
-/******************************************************************
- *
- * Project: MyTreeView
- * File: MyTreeView.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Wraps a treeview control. Specifically handles
  * adding directories to it and selecting directories.
  * Each non-network drive in the system is also
@@ -13,11 +12,7 @@
  *  - All items are sorted alphabetically, except for:
  *     - Items on the desktop
  *     - Items in My Computer
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "MyTreeView.h"

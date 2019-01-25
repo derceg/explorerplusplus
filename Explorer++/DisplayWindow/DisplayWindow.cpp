@@ -1,9 +1,8 @@
-/******************************************************************
- *
- * Project: DisplayWindow
- * File: DisplayWindow.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Creates and manages a 'display window'. This window
  * can be used to show various information (e.g. file
  * information) and is drawn with a gradient background.
@@ -17,11 +16,7 @@
  * Text will be drawn in columns. Text height (and width)
  * is calculated, and once a particular column is full,
  * text will be placed in the next column.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "DisplayWindow.h"

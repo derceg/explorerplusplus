@@ -1,18 +1,13 @@
-/******************************************************************
- *
- * Project: Explorer++
- * File: TaskbarThumbnails.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * The methods in this file manage the tab proxy windows. A tab
  * proxy is created when a taskbar thumbnail needs to be shown.
  * Note that these thumbnails are only shown on Windows 7 and
  * above.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "Explorer++.h"

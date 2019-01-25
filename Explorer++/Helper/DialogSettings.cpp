@@ -1,17 +1,12 @@
-/******************************************************************
- *
- * Project: Helper
- * File: DialogSettings.cpp
- * License: GPL - See LICENSE in the top level directory
- *
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
+
+/*
  * Saves/loads settings for a dialog. Window position
  * is saved automatically (if required); all other
  * settings must be explicitly specified.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+ */
 
 #include "stdafx.h"
 #include "DialogSettings.h"

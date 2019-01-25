@@ -1,17 +1,6 @@
-/******************************************************************
- *
- * Project: ShellBrowser
- * File: iFolderView.cpp
- * License: GPL - See LICENSE in the top level directory
- *
- * Constructs/deconstructs the browser
- * object. Also contains some auxiliary
- * code.
- *
- * Written by David Erceg
- * www.explorerplusplus.com
- *
- *****************************************************************/
+// Copyright (C) Explorer++ Project
+// SPDX-License-Identifier: GPL-3.0-only
+// See LICENSE in the top level directory
 
 #include "stdafx.h"
 #include <string>
