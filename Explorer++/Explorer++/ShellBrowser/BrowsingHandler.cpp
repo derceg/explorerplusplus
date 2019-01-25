@@ -68,6 +68,7 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	m_columnResults.clear();
 
 	m_itemImageThreadPool.clear_queue();
+	m_iconResults.clear();
 	m_thumbnailResults.clear();
 
 	EnterCriticalSection(&m_csDirectoryAltered);
