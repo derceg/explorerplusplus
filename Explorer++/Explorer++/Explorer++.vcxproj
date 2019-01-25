@@ -349,6 +349,7 @@
     <ClCompile Include="ShellBrowser\DirectoryModificationHandler.cpp" />
     <ClCompile Include="ShellBrowser\GroupManager.cpp" />
     <ClCompile Include="ShellBrowser\HandleThumbnails.cpp" />
+    <ClCompile Include="ShellBrowser\IconRetrieval.cpp" />
     <ClCompile Include="ShellBrowser\iDropTarget.cpp" />
     <ClCompile Include="ShellBrowser\iFolderView.cpp" />
     <ClCompile Include="ShellBrowser\iPathManager.cpp" />
