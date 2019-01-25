@@ -170,6 +170,10 @@ LRESULT CALLBACK MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 			case TBN_DROPDOWN:
 				return OnTbnDropDown(lParam);
 				break;
+
+			case TBN_INITCUSTOMIZE:
+				return TBNRF_HIDEHELP;
+				break;
 			}
 		}
 		break;

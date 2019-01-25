@@ -1517,10 +1517,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 			OnAddressBarBeginDrag();
 			break;
 
-		case TBN_INITCUSTOMIZE:
-			return TBNRF_HIDEHELP;
-			break;
-
 		case TBN_ENDADJUST:
 			UpdateToolbarBandSizing(m_hMainRebar,((NMHDR *)lParam)->hwndFrom);
 			break;
