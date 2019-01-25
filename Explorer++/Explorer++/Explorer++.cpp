@@ -144,17 +144,9 @@ void Explorerplusplus::SetDefaultValues(void)
 	/* User options. */
 	m_StartupMode					= STARTUP_PREVIOUSTABS;
 	m_ReplaceExplorerMode			= NDefaultFileManager::REPLACEEXPLORER_NONE;
-	m_bHandleZipFiles				= FALSE;
-	m_bInsertSorted					= TRUE;
-	m_bOverwriteExistingFilesConfirmation	= TRUE;
-	m_bCheckBoxSelection			= FALSE;
-	m_bForceSize					= FALSE;
-	m_SizeDisplayFormat				= SIZE_FORMAT_BYTES;
 	m_bSynchronizeTreeview			= TRUE;
 	m_bTVAutoExpandSelected			= FALSE;
-	m_bCloseMainWindowOnTabClose	= TRUE;
 	m_bShowTaskbarThumbnails		= TRUE;
-	m_bPlayNavigationSound			= TRUE;
 
 	/* Infotips (user options). */
 	m_bShowInfoTips					= TRUE;

@@ -90,7 +90,7 @@ HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)
 		dwExtendedStyle |= LVS_EX_FULLROWSELECT;
 	}
 
-	if(m_bCheckBoxSelection)
+	if(m_config->checkBoxSelection)
 	{
 		dwExtendedStyle |= LVS_EX_CHECKBOXES;
 	}
@@ -1628,7 +1628,7 @@ void Explorerplusplus::OnListViewPaste(void)
 		CDropHandler *pDropHandler = CDropHandler::CreateNew();
 		CDropFilesCallback *DropFilesCallback = new CDropFilesCallback(this);
 		pDropHandler->CopyClipboardData(pClipboardObject,m_hContainer,szDestination,
-			DropFilesCallback,!m_bOverwriteExistingFilesConfirmation);
+			DropFilesCallback,!m_config->overwriteExistingFilesConfirmation);
 		pDropHandler->Release();
 
 		pClipboardObject->Release();

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../Helper/StringHelper.h"
+
 static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
 
 struct Config
@@ -32,6 +34,14 @@ struct Config
 		doubleClickTabClose = TRUE;
 		forceSameTabWidth = FALSE;
 		useLargeToolbarIcons = FALSE;
+		handleZipFiles = FALSE;
+		insertSorted = TRUE;
+		overwriteExistingFilesConfirmation = TRUE;
+		checkBoxSelection = FALSE;
+		closeMainWindowOnTabClose = TRUE;
+		forceSize = FALSE;
+		sizeDisplayFormat = SIZE_FORMAT_BYTES;
+		playNavigationSound = TRUE;
 		confirmCloseTabs = FALSE;
 	}
 
@@ -61,5 +71,13 @@ struct Config
 	BOOL doubleClickTabClose;
 	BOOL forceSameTabWidth;
 	BOOL useLargeToolbarIcons;
+	BOOL handleZipFiles;
+	BOOL insertSorted;
+	BOOL overwriteExistingFilesConfirmation;
+	BOOL checkBoxSelection;
+	BOOL closeMainWindowOnTabClose;
+	BOOL forceSize;
+	SizeDisplayFormat_t sizeDisplayFormat;
+	BOOL playNavigationSound;
 	BOOL confirmCloseTabs;
 };

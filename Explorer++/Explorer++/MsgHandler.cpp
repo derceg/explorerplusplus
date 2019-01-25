@@ -213,7 +213,7 @@ void Explorerplusplus::OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL b
 		if((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM))
 		{
 			/* Zip file. */
-			if(m_bHandleZipFiles)
+			if(m_config->handleZipFiles)
 			{
 				OpenFolderItem(pidlItem,bOpenInNewTab,bOpenInNewWindow);
 			}
@@ -255,7 +255,7 @@ void Explorerplusplus::OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL b
 				{
 					/* Is this a link to a folder or zip file? */
 					if(((uAttributes & SFGAO_FOLDER) && !(uAttributes & SFGAO_STREAM)) ||
-						((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM) && m_bHandleZipFiles))
+						((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM) && m_config->handleZipFiles))
 					{
 						LPITEMIDLIST	pidlTarget = NULL;
 

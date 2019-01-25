@@ -811,19 +811,11 @@ private:
 	BOOL					m_bShowTabBar;
 	BOOL					m_bSavePreferencesToXMLFile;
 	BOOL					m_bLockToolbars;
-	BOOL					m_bHandleZipFiles;
-	BOOL					m_bInsertSorted;
-	BOOL					m_bOverwriteExistingFilesConfirmation;
-	BOOL					m_bCheckBoxSelection;
-	BOOL					m_bForceSize;
-	BOOL					m_bCloseMainWindowOnTabClose;
 	BOOL					m_bShowTabBarAtBottom;
 	BOOL					m_bShowTaskbarThumbnails;
 	BOOL					m_bShowTaskbarThumbnailsProvisional;
 	BOOL					m_bSynchronizeTreeview;
 	BOOL					m_bTVAutoExpandSelected;
-	BOOL					m_bPlayNavigationSound;
-	SizeDisplayFormat_t		m_SizeDisplayFormat;
 	StartupMode_t			m_StartupMode;
 	NDefaultFileManager::ReplaceExplorerModes_t	m_ReplaceExplorerMode;
 

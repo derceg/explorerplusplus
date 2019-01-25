@@ -380,7 +380,7 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(void)
 		m_pActiveShellBrowser->QueryFolderInfo(&FolderInfo);
 
 		FormatSizeString(FolderInfo.TotalSelectionSize, szTotalSizeFragment,
-			SIZEOF_ARRAY(szTotalSizeFragment), m_bForceSize, m_SizeDisplayFormat);
+			SIZEOF_ARRAY(szTotalSizeFragment), m_config->forceSize, m_config->sizeDisplayFormat);
 
 		LoadString(m_hLanguageModule, IDS_GENERAL_TOTALFILESIZE,
 			szTotalSizeString, SIZEOF_ARRAY(szTotalSizeString));

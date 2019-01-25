@@ -498,7 +498,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_EXTENSIONS,BST_CHECKED);
 				if(m_bHideLinkExtensionGlobal)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_LINK,BST_CHECKED);
-				if(m_bInsertSorted)
+				if(m_config->insertSorted)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED,BST_CHECKED);
 				if(m_config->oneClickActivate)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK,BST_CHECKED);
@@ -507,17 +507,17 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 				EnableWindow(GetDlgItem(hDlg,IDC_OPTIONS_HOVER_TIME),m_config->oneClickActivate);
 				EnableWindow(GetDlgItem(hDlg,IDC_LABEL_HOVER_TIME),m_config->oneClickActivate);
 
-				if(m_bOverwriteExistingFilesConfirmation)
+				if(m_config->overwriteExistingFilesConfirmation)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,BST_CHECKED);
-				if(m_bPlayNavigationSound)
+				if(m_config->playNavigationSound)
 					CheckDlgButton(hDlg,IDC_OPTIONS_PLAYNAVIGATIONSOUND,BST_CHECKED);
 				if(m_config->showFolderSizes)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES,BST_CHECKED);
 				if(m_config->disableFolderSizesNetworkRemovable)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,BST_CHECKED);
-				if(m_bForceSize)
+				if(m_config->forceSize)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FORCESIZE,BST_CHECKED);
-				if(m_bHandleZipFiles)
+				if(m_config->handleZipFiles)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_ZIPFILES,BST_CHECKED);
 				if(m_bShowFriendlyDatesGlobal)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FRIENDLYDATES,BST_CHECKED);
@@ -538,13 +538,13 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					SendMessage(hCBSize,CB_ADDSTRING,0,reinterpret_cast<LPARAM>(szTemp));
 					SendMessage(hCBSize,CB_SETITEMDATA,i,FILE_SIZES[i].sdf);
 
-					if(FILE_SIZES[i].sdf == m_SizeDisplayFormat)
+					if(FILE_SIZES[i].sdf == m_config->sizeDisplayFormat)
 					{
 						SendMessage(hCBSize,CB_SETCURSEL,i,0);
 					}
 				}
 
-				EnableWindow(hCBSize,m_bForceSize);
+				EnableWindow(hCBSize,m_config->forceSize);
 
 				SetInfoTipWindowStates(hDlg);
 				SetFolderSizeWindowState(hDlg);
@@ -632,7 +632,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						m_bHideLinkExtensionGlobal = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_LINK)
 							== BST_CHECKED);
 
-						m_bInsertSorted = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED)
+						m_config->insertSorted = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED)
 							== BST_CHECKED);
 
 						m_config->oneClickActivate = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK)
@@ -640,10 +640,10 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 						m_config->oneClickActivateHoverTime = GetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,NULL,FALSE);
 
-						m_bOverwriteExistingFilesConfirmation = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION)
+						m_config->overwriteExistingFilesConfirmation = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION)
 							== BST_CHECKED);
 
-						m_bPlayNavigationSound = (IsDlgButtonChecked(hDlg,IDC_OPTIONS_PLAYNAVIGATIONSOUND)
+						m_config->playNavigationSound = (IsDlgButtonChecked(hDlg,IDC_OPTIONS_PLAYNAVIGATIONSOUND)
 							== BST_CHECKED);
 
 						m_config->showFolderSizes = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES)
@@ -652,10 +652,10 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						m_config->disableFolderSizesNetworkRemovable = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE)
 							== BST_CHECKED);
 
-						m_bForceSize = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FORCESIZE)
+						m_config->forceSize = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FORCESIZE)
 							== BST_CHECKED);
 
-						m_bHandleZipFiles = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_ZIPFILES)
+						m_config->handleZipFiles = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_ZIPFILES)
 							== BST_CHECKED);
 
 						m_bShowFriendlyDatesGlobal = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FRIENDLYDATES)
@@ -672,7 +672,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						hCBSize = GetDlgItem(hDlg,IDC_COMBO_FILESIZES);
 
 						iSel = (int)SendMessage(hCBSize,CB_GETCURSEL,0,0);
-						m_SizeDisplayFormat = (SizeDisplayFormat_t)SendMessage(hCBSize,CB_GETITEMDATA,iSel,0);
+						m_config->sizeDisplayFormat = (SizeDisplayFormat_t)SendMessage(hCBSize,CB_GETITEMDATA,iSel,0);
 
 						nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
@@ -690,9 +690,9 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 							m_pShellBrowser[(int)tcItem.lParam]->SetShowFolderSizes(m_config->showFolderSizes);
 							m_pShellBrowser[(int)tcItem.lParam]->SetDisableFolderSizesNetworkRemovable(m_config->disableFolderSizesNetworkRemovable);
 							m_pShellBrowser[(int)tcItem.lParam]->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
-							m_pShellBrowser[(int)tcItem.lParam]->SetInsertSorted(m_bInsertSorted);
-							m_pShellBrowser[(int)tcItem.lParam]->SetForceSize(m_bForceSize);
-							m_pShellBrowser[(int)tcItem.lParam]->SetSizeDisplayFormat(m_SizeDisplayFormat);
+							m_pShellBrowser[(int)tcItem.lParam]->SetInsertSorted(m_config->insertSorted);
+							m_pShellBrowser[(int)tcItem.lParam]->SetForceSize(m_config->forceSize);
+							m_pShellBrowser[(int)tcItem.lParam]->SetSizeDisplayFormat(m_config->sizeDisplayFormat);
 
 							RefreshTab((int)tcItem.lParam);
 
@@ -765,7 +765,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 				CheckDlgButton(hDlg,IDC_OPTION_EXTENDTABCONTROL,BST_CHECKED);
 			if(m_bShowGridlinesGlobal)
 				CheckDlgButton(hDlg,IDC_OPTION_GRIDLINES,BST_CHECKED);
-			if(m_bCheckBoxSelection)
+			if(m_config->checkBoxSelection)
 				CheckDlgButton(hDlg,IDC_OPTION_CHECKBOXSELECTION,BST_CHECKED);
 			if(m_config->useFullRowSelect)
 				CheckDlgButton(hDlg,IDC_OPTION_FULLROWSELECT,BST_CHECKED);
@@ -845,7 +845,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					bCheckBoxSelection = (IsDlgButtonChecked(hDlg,IDC_OPTION_CHECKBOXSELECTION)
 						== BST_CHECKED);
 
-					if(m_bCheckBoxSelection != bCheckBoxSelection)
+					if(m_config->checkBoxSelection != bCheckBoxSelection)
 					{
 						TCITEM tcItem;
 						DWORD dwExtendedStyle;
@@ -874,7 +874,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 								dwExtendedStyle);
 						}
 
-						m_bCheckBoxSelection = (IsDlgButtonChecked(hDlg,IDC_OPTION_CHECKBOXSELECTION)
+						m_config->checkBoxSelection = (IsDlgButtonChecked(hDlg,IDC_OPTION_CHECKBOXSELECTION)
 							== BST_CHECKED);
 					}
 
@@ -996,7 +996,7 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_ALWAYSNEWTAB,BST_CHECKED);
 				if(m_config->doubleClickTabClose)
 					CheckDlgButton(hDlg,IDC_TABS_DOUBLECLICKCLOSE,BST_CHECKED);
-				if(m_bCloseMainWindowOnTabClose)
+				if(m_config->closeMainWindowOnTabClose)
 					CheckDlgButton(hDlg,IDC_TABS_CLOSEMAINWINDOW,BST_CHECKED);
 			}
 			break;
@@ -1043,7 +1043,7 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 						m_config->doubleClickTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_DOUBLECLICKCLOSE)
 							== BST_CHECKED);
 
-						m_bCloseMainWindowOnTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSEMAINWINDOW)
+						m_config->closeMainWindowOnTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSEMAINWINDOW)
 							== BST_CHECKED);
 
 						AddWindowStyle(m_hTabCtrl,TCS_FIXEDWIDTH,m_config->forceSameTabWidth);

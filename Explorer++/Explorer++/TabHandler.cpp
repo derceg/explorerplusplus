@@ -415,8 +415,8 @@ int *pTabObjectIndex)
 		pSettings = &is;
 	}
 
-	pSettings->bForceSize	= m_bForceSize;
-	pSettings->sdf			= m_SizeDisplayFormat;
+	pSettings->bForceSize	= m_config->forceSize;
+	pSettings->sdf			= m_config->sizeDisplayFormat;
 
 	m_pShellBrowser[iTabId] = CShellBrowser::CreateNew(m_hContainer,m_hListView[iTabId],pSettings);
 
@@ -438,7 +438,7 @@ int *pTabObjectIndex)
 	m_pShellBrowser[iTabId]->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
 	m_pShellBrowser[iTabId]->SetShowFolderSizes(m_config->showFolderSizes);
 	m_pShellBrowser[iTabId]->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
-	m_pShellBrowser[iTabId]->SetInsertSorted(m_bInsertSorted);
+	m_pShellBrowser[iTabId]->SetInsertSorted(m_config->insertSorted);
 
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
@@ -790,7 +790,7 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
 	if(nTabs == 1 &&
-		m_bCloseMainWindowOnTabClose)
+		m_config->closeMainWindowOnTabClose)
 	{
 		OnClose();
 		return true;

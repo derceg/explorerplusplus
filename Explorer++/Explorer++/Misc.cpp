@@ -390,7 +390,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(void)
 		{
 			/* No items(files or folders) selected. */
 			FormatSizeString(FolderInfo.TotalFolderSize,lpszSizeBuffer,
-				SIZEOF_ARRAY(lpszSizeBuffer),m_bForceSize,m_SizeDisplayFormat);
+				SIZEOF_ARRAY(lpszSizeBuffer),m_config->forceSize,m_config->sizeDisplayFormat);
 		}
 		else
 		{
@@ -404,7 +404,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(void)
 				/* Mixture of files and folders selected. Show size of currently
 				selected files. */
 				FormatSizeString(FolderInfo.TotalSelectionSize,lpszSizeBuffer,
-					SIZEOF_ARRAY(lpszSizeBuffer),m_bForceSize,m_SizeDisplayFormat);
+					SIZEOF_ARRAY(lpszSizeBuffer),m_config->forceSize,m_config->sizeDisplayFormat);
 			}
 		}
 	}

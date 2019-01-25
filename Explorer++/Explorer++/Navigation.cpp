@@ -198,7 +198,7 @@ HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags,
 
 void Explorerplusplus::PlayNavigationSound() const
 {
-	if(m_bPlayNavigationSound)
+	if(m_config->playNavigationSound)
 	{
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART), NULL,
 			SND_RESOURCE | SND_ASYNC);

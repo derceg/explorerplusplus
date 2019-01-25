@@ -792,7 +792,7 @@ void Explorerplusplus::OnTreeViewPaste(void)
 
 			pDropHandler->CopyClipboardData(pClipboardObject,
 				m_hTreeView,szFullFileName,NULL,
-				!m_bOverwriteExistingFilesConfirmation);
+				!m_config->overwriteExistingFilesConfirmation);
 
 			CoTaskMemFree(pidl);
 
