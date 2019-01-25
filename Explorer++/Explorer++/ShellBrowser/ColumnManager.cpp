@@ -967,7 +967,7 @@ void CShellBrowser::ColumnClicked(int iClickedColumn)
 {
 	std::list<Column_t>::iterator itr;
 	int iCurrentColumn = 0;
-	SortMode sortMode;
+	SortMode sortMode = FSM_NAME;
 	UINT iColumnId = 0;
 
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
