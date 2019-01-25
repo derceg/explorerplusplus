@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BookmarkHelper.h"
+#include "Explorer++_internal.h"
 #include "../Helper/Bookmark.h"
 #include <boost/optional.hpp>
 

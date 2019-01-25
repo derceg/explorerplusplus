@@ -13,14 +13,13 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include <algorithm>
-#include "Explorer++.h"
-#include "MainImages.h"
 #include "BookmarksToolbar.h"
+#include "MainImages.h"
 #include "MainResource.h"
+#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../Helper/Macros.h"
+#include <algorithm>
 
 
 CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, IExplorerplusplus *pexpp, CBookmarkFolder &AllBookmarks,

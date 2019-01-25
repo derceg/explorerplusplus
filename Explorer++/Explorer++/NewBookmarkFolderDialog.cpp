@@ -12,7 +12,6 @@
  *****************************************************************/
 
 #include "stdafx.h"
-#include "Explorer++.h"
 #include "NewBookmarkFolderDialog.h"
 #include "MainResource.h"
 
