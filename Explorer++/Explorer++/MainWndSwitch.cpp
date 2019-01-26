@@ -504,6 +504,12 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			ResizeWindows();
 			break;
 
+		case IDM_DISPLAYWINDOW_VERTICAL:
+			m_bDisplayWindowVertical = !m_bDisplayWindowVertical;
+			ApplyDisplayWindowPosition();
+			ResizeWindows();
+			break;
+
 		case IDM_TOOLBARS_ADDRESSBAR:
 			m_bShowAddressBar = !m_bShowAddressBar;
 			ShowMainRebarBand(m_hAddressBar,m_bShowAddressBar);

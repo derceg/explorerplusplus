@@ -76,6 +76,9 @@ private:
 	static const int		MIN_SHELL_MENU_ID = 1;
 	static const int		MAX_SHELL_MENU_ID = 1000;
 
+	static const UINT		MINIMUM_DISPLAYWINDOW_WIDTH = 70;
+	static const UINT		DEFAULT_DISPLAYWINDOW_WIDTH = 300;
+
 	static const UINT		MINIMUM_DISPLAYWINDOW_HEIGHT = 70;
 	static const UINT		DEFAULT_DISPLAYWINDOW_HEIGHT = 90;
 
@@ -565,6 +568,7 @@ private:
 	void					ValidateToolbarSettings(void);
 	void					ValidateColumns(void);
 	void					ValidateSingleColumnSet(int iColumnSet,std::list<Column_t> *pColumnList);
+	void					ApplyDisplayWindowPosition();
 	void					ApplyLoadedSettings(void);
 	void					ApplyToolbarSettings(void);
 	void					SetDefaultValues(void);
@@ -794,7 +798,9 @@ private:
 	TCHAR					m_DefaultTabDirectory[MAX_PATH];
 	TCHAR					m_OldTreeViewFileName[MAX_PATH];
 	DWORD					m_Language;
+	LONG					m_DisplayWindowWidth;
 	LONG					m_DisplayWindowHeight;
+	BOOL					m_bDisplayWindowVertical;
 	BOOL					m_bTreeViewRightClick;
 	BOOL					m_bSelectingTreeViewDirectory;
 	BOOL					m_bAttemptToolbarRestore;

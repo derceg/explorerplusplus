@@ -96,6 +96,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lCheckMenuItem(hProgramMenu,IDM_VIEW_STATUSBAR,m_bShowStatusBar);
 	lCheckMenuItem(hProgramMenu,IDM_VIEW_FOLDERS,m_bShowFolders);
 	lCheckMenuItem(hProgramMenu,IDM_VIEW_DISPLAYWINDOW,m_bShowDisplayWindow);
+	lCheckMenuItem(hProgramMenu,IDM_DISPLAYWINDOW_VERTICAL,m_bDisplayWindowVertical);
 	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_ADDRESSBAR,m_bShowAddressBar);
 	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_MAINTOOLBAR,m_bShowMainToolbar);
 	lCheckMenuItem(hProgramMenu,IDM_TOOLBARS_BOOKMARKSTOOLBAR,m_bShowBookmarksToolbar);

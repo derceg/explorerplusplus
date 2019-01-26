@@ -317,6 +317,11 @@ WPARAM wParam,LPARAM lParam)
 		case WM_SIZE:
 			OnSize(LOWORD(lParam), HIWORD(lParam));
 			break;
+
+		case WM_USER_DISPLAYWINDOWMOVED:
+			m_bVertical = (BOOL)wParam;
+			InvalidateRect(m_hDisplayWindow, NULL, TRUE);
+			break;
 	}
 
 	return DefWindowProc(DisplayWindow,msg,wParam,lParam);

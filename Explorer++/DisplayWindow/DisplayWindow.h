@@ -56,6 +56,7 @@ SendMessage(hDisplay,DWM_CLEARTEXTBUFFER,(WPARAM)0,(LPARAM)0)
 #define DisplayWindow_SetLine(hDisplay,iLine,szText) \
 SendMessage(hDisplay,DWM_SETLINE,(WPARAM)iLine,(LPARAM)szText)
 
+#define WM_USER_DISPLAYWINDOWMOVED	(WM_APP + 99)
 #define WM_USER_DISPLAYWINDOWRESIZED	(WM_APP + 100)
 
 #define WM_NDW_ICONRCLICK	(WM_APP + 101)
@@ -135,6 +136,7 @@ private:
 
 	int				m_iImageWidth;
 	int				m_iImageHeight;
+	BOOL			m_bVertical;
 
 	/* Thumbnails. */
 	CRITICAL_SECTION	m_csDWThumbnails;

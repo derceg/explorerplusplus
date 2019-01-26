@@ -26,6 +26,7 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include "../DisplayWindow/DisplayWindow.h"
 #include <shobjidl.h>
 #include <list>
 
@@ -34,6 +35,9 @@ void Explorerplusplus::ValidateLoadedSettings(void)
 {
 	if(m_TreeViewWidth <= 0)
 		m_TreeViewWidth = DEFAULT_TREEVIEW_WIDTH;
+
+	if(m_DisplayWindowWidth < MINIMUM_DISPLAYWINDOW_WIDTH)
+		m_DisplayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
 
 	if(m_DisplayWindowHeight < MINIMUM_DISPLAYWINDOW_HEIGHT)
 		m_DisplayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
@@ -158,6 +162,12 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet,std::list<Column_t
 void Explorerplusplus::ApplyLoadedSettings(void)
 {
 	m_pMyTreeView->SetShowHidden(m_bShowHiddenGlobal);
+	ApplyDisplayWindowPosition();
+}
+
+void Explorerplusplus::ApplyDisplayWindowPosition(void)
+{
+	SendMessage(m_hDisplayWindow, WM_USER_DISPLAYWINDOWMOVED, m_bDisplayWindowVertical, NULL);
 }
 
 void Explorerplusplus::ApplyToolbarSettings(void)
@@ -233,11 +243,10 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 		IndentBottom += m_hStatusBarRect.bottom - m_hStatusBarRect.top;
 	}
 
-	if(m_bShowDisplayWindow)
+	if(m_bShowDisplayWindow && !m_bDisplayWindowVertical)
 	{
 		RECT rcDisplayWindow;
-
-		GetWindowRect(m_hDisplayWindow,&rcDisplayWindow);
+		GetWindowRect(m_hDisplayWindow, &rcDisplayWindow);
 
 		IndentBottom += rcDisplayWindow.bottom - rcDisplayWindow.top;
 	}

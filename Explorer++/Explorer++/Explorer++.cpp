@@ -187,7 +187,9 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_bAlwaysShowTabBar				= TRUE;
 	m_bShowTabBar					= TRUE;
 	m_bLockToolbars					= TRUE;
+	m_DisplayWindowWidth			= DEFAULT_DISPLAYWINDOW_WIDTH;
 	m_DisplayWindowHeight			= DEFAULT_DISPLAYWINDOW_HEIGHT;
+	m_bDisplayWindowVertical		= FALSE;
 	m_TreeViewWidth					= DEFAULT_TREEVIEW_WIDTH;
 	m_bUseFullRowSelect				= FALSE;
 	m_bShowTabBarAtBottom			= FALSE;
