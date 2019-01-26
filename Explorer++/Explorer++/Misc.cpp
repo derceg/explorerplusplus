@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
+#include "DisplayWindow/DisplayWindow.h"
 #include "Explorer++_internal.h"
 #include "HardwareChangeNotifier.h"
 #include "MainResource.h"
@@ -22,6 +23,9 @@ void Explorerplusplus::ValidateLoadedSettings()
 {
 	if(m_config->treeViewWidth <= 0)
 		m_config->treeViewWidth = Config::DEFAULT_TREEVIEW_WIDTH;
+
+	if(m_config->displayWindowWidth < MINIMUM_DISPLAYWINDOW_WIDTH)
+		m_config->displayWindowWidth = Config::DEFAULT_DISPLAYWINDOW_WIDTH;
 
 	if(m_config->displayWindowHeight < MINIMUM_DISPLAYWINDOW_HEIGHT)
 		m_config->displayWindowHeight = Config::DEFAULT_DISPLAYWINDOW_HEIGHT;
@@ -122,6 +126,11 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 	free(pColumnMap);
 }
 
+void Explorerplusplus::ApplyDisplayWindowPosition()
+{
+	SendMessage(m_hDisplayWindow, WM_USER_DISPLAYWINDOWMOVED, m_config->displayWindowVertical, NULL);
+}
+
 void Explorerplusplus::ApplyToolbarSettings(void)
 {
 	BOOL bVisible = FALSE;
@@ -195,11 +204,10 @@ void Explorerplusplus::AdjustFolderPanePosition(void)
 		IndentBottom += m_hStatusBarRect.bottom - m_hStatusBarRect.top;
 	}
 
-	if(m_config->showDisplayWindow)
+	if(m_config->showDisplayWindow && !m_config->displayWindowVertical)
 	{
 		RECT rcDisplayWindow;
-
-		GetWindowRect(m_hDisplayWindow,&rcDisplayWindow);
+		GetWindowRect(m_hDisplayWindow, &rcDisplayWindow);
 
 		IndentBottom += rcDisplayWindow.bottom - rcDisplayWindow.top;
 	}

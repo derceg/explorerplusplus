@@ -107,6 +107,8 @@ void Explorerplusplus::InitializeDisplayWindow()
 		0,0,LR_CREATEDIBSECTION);
 
 	m_hDisplayWindow = CreateDisplayWindow(m_hContainer,&InitialSettings);
+
+	ApplyDisplayWindowPosition();
 }
 
 HMENU Explorerplusplus::BuildViewsMenu()

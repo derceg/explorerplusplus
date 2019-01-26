@@ -67,7 +67,9 @@ struct Config
 		playNavigationSound = TRUE;
 		confirmCloseTabs = FALSE;
 		synchronizeTreeview = TRUE;
+		displayWindowWidth = DEFAULT_DISPLAYWINDOW_WIDTH;
 		displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
+		displayWindowVertical = FALSE;
 		treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
 
 		replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
@@ -121,7 +123,9 @@ struct Config
 		defaultFolderSettings.filterCaseSensitive = FALSE;
 	}
 
+	static const UINT DEFAULT_DISPLAYWINDOW_WIDTH = 300;
 	static const UINT DEFAULT_DISPLAYWINDOW_HEIGHT = 90;
+
 	static const UINT DEFAULT_TREEVIEW_WIDTH = 208;
 
 	DWORD language;
@@ -157,7 +161,9 @@ struct Config
 	BOOL playNavigationSound;
 	BOOL confirmCloseTabs;
 	BOOL synchronizeTreeview;
+	LONG displayWindowWidth;
 	LONG displayWindowHeight;
+	BOOL displayWindowVertical;
 	unsigned int treeViewWidth;
 
 	NDefaultFileManager::ReplaceExplorerModes_t replaceExplorerMode;

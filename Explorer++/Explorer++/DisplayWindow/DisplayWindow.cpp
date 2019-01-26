@@ -78,7 +78,8 @@ DisplayWindow::DisplayWindow(HWND hDisplayWindow,DWInitialSettings_t *pInitialSe
 	m_CentreColor(pInitialSettings->CentreColor),
 	m_SurroundColor(pInitialSettings->SurroundColor),
 	m_hMainIcon(pInitialSettings->hIcon),
-	m_hDisplayFont(pInitialSettings->hFont)
+	m_hDisplayFont(pInitialSettings->hFont),
+	m_bVertical(FALSE)
 {
 	g_ObjectCount++;
 
@@ -305,6 +306,11 @@ WPARAM wParam,LPARAM lParam)
 
 		case WM_SIZE:
 			OnSize(LOWORD(lParam), HIWORD(lParam));
+			break;
+
+		case WM_USER_DISPLAYWINDOWMOVED:
+			m_bVertical = (BOOL)wParam;
+			InvalidateRect(m_hDisplayWindow, NULL, TRUE);
 			break;
 	}
 

@@ -66,6 +66,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 	int				IndentBottom = 0;
 	int				IndentTop = 0;
 	int				IndentLeft = 0;
+	int				IndentRight = 0;
 	int				iIndentRebar = 0;
 
 	GetClientRect(m_hContainer,&rc);
@@ -87,7 +88,14 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 
 	if(m_config->showDisplayWindow)
 	{
-		IndentBottom += m_config->displayWindowHeight;
+		if (m_config->displayWindowVertical)
+		{
+			IndentRight += m_config->displayWindowWidth;
+		}
+		else
+		{
+			IndentBottom += m_config->displayWindowHeight;
+		}
 	}
 
 	if(m_config->showFolders)
@@ -111,20 +119,15 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 		}
 	}
 
-	if(!m_config->showTabBarAtBottom)
+	int width = MainWindowWidth - IndentLeft - IndentRight;
+	int height = MainWindowHeight - IndentTop - IndentBottom;
+
+	if (m_config->showTabBarAtBottom)
 	{
-		SetWindowPos(hListView, nullptr,IndentLeft,IndentTop,
-			MainWindowWidth - IndentLeft,MainWindowHeight -
-			IndentBottom - IndentTop,
-			SWP_HIDEWINDOW|SWP_NOZORDER);
+		height -= tabWindowHeight;
 	}
-	else
-	{
-		SetWindowPos(hListView, nullptr,IndentLeft,IndentTop,
-			MainWindowWidth - IndentLeft,MainWindowHeight -
-			IndentBottom - IndentTop - tabWindowHeight,
-			SWP_HIDEWINDOW|SWP_NOZORDER);
-	}
+
+	SetWindowPos(hListView,NULL,IndentLeft,IndentTop,width,height,SWP_HIDEWINDOW|SWP_NOZORDER);
 }
 
 void Explorerplusplus::ToggleFolders(void)

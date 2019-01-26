@@ -777,6 +777,7 @@
 #define IDM_MB_ORGANIZE_CUT             40539
 #define IDM_MB_ORGANIZE_COPY            40540
 #define IDM_MB_ORGANIZE_PASTE           40541
+#define IDM_DISPLAYWINDOW_VERTICAL      40542
 #define IDM_SORTBY_NAME                 50000
 #define IDM_SORTBY_SIZE                 50001
 #define IDM_SORTBY_TYPE                 50002
@@ -915,7 +916,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        325
-#define _APS_NEXT_COMMAND_VALUE         40542
+#define _APS_NEXT_COMMAND_VALUE         40543
 #define _APS_NEXT_CONTROL_VALUE         1329
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

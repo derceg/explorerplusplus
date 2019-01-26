@@ -491,6 +491,12 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		ResizeWindows();
 		break;
 
+	case IDM_DISPLAYWINDOW_VERTICAL:
+		m_config->displayWindowVertical = !m_config->displayWindowVertical;
+		ApplyDisplayWindowPosition();
+		ResizeWindows();
+		break;
+
 	case IDM_TOOLBARS_ADDRESSBAR:
 		m_config->showAddressBar = !m_config->showAddressBar;
 		ShowMainRebarBand(m_addressBar->GetHWND(), m_config->showAddressBar);

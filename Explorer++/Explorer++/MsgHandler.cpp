@@ -32,6 +32,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/map.hpp>
+#include <algorithm>
 
 /* The treeview is offset by a small
 amount on the left. */
@@ -312,6 +313,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	UINT			uFlags;
 	int				IndentBottom = 0;
 	int				IndentTop = 0;
+	int				IndentRight = 0;
 	int				IndentLeft = 0;
 	int				iIndentRebar = 0;
 	int				iHolderWidth;
@@ -339,7 +341,14 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	if(m_config->showDisplayWindow)
 	{
-		IndentBottom += m_config->displayWindowHeight;
+		if (m_config->displayWindowVertical)
+		{
+			IndentRight += m_config->displayWindowWidth;
+		}
+		else
+		{
+			IndentBottom += m_config->displayWindowHeight;
+		}
 	}
 
 	if(m_config->showFolders)
@@ -373,7 +382,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	else
 	{
 		iTabBackingLeft = IndentLeft;
-		iTabBackingWidth = MainWindowWidth - IndentLeft;
+		iTabBackingWidth = MainWindowWidth - IndentLeft - IndentRight;
 	}
 
 	uFlags = m_bShowTabBar?SWP_SHOWWINDOW:SWP_HIDEWINDOW;
@@ -448,9 +457,16 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* <---- Display window ----> */
 
-	SetWindowPos(m_hDisplayWindow, nullptr,0,MainWindowHeight - IndentBottom,
-		MainWindowWidth, m_config->displayWindowHeight,SWP_SHOWWINDOW|SWP_NOZORDER);
-
+	if (m_config->displayWindowVertical)
+	{
+		SetWindowPos(m_hDisplayWindow,NULL,MainWindowWidth - IndentRight,iIndentRebar,
+			m_config->displayWindowWidth,MainWindowHeight - iIndentRebar - IndentBottom,SWP_SHOWWINDOW|SWP_NOZORDER);
+	}
+	else
+	{
+		SetWindowPos(m_hDisplayWindow, nullptr,0,MainWindowHeight - IndentBottom,
+			MainWindowWidth, m_config->displayWindowHeight,SWP_SHOWWINDOW|SWP_NOZORDER);
+	}
 
 	/* <---- ALL listview windows ----> */
 
@@ -463,27 +479,15 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 			uFlags |= SWP_SHOWWINDOW;
 		}
 
-		if(!m_config->showTabBarAtBottom)
+		int width = MainWindowWidth - IndentLeft - IndentRight;
+		int height = MainWindowHeight - IndentBottom - IndentTop;
+
+		if (m_config->showTabBarAtBottom && m_bShowTabBar)
 		{
-			SetWindowPos(tab->GetShellBrowser()->GetListView(), nullptr,IndentLeft,IndentTop,
-				MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
-				uFlags);
+			height -= tabWindowHeight;
 		}
-		else
-		{
-			if(m_bShowTabBar)
-			{
-				SetWindowPos(tab->GetShellBrowser()->GetListView(), nullptr,IndentLeft,IndentTop,
-					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - tabWindowHeight,
-					uFlags);
-			}
-			else
-			{
-				SetWindowPos(tab->GetShellBrowser()->GetListView(), nullptr,IndentLeft,IndentTop,
-					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
-					uFlags);
-			}
-		}
+
+		SetWindowPos(tab->GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,width,height,uFlags);
 	}
 
 
@@ -690,13 +694,17 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 {
-	RECT	rc;
+	if (m_config->displayWindowVertical)
+	{
+		m_config->displayWindowWidth = max(LOWORD(wParam), MINIMUM_DISPLAYWINDOW_WIDTH);
+	}
+	else
+	{
+		m_config->displayWindowHeight = max(HIWORD(wParam), MINIMUM_DISPLAYWINDOW_HEIGHT);
+	}
 
-	if((int)wParam >= MINIMUM_DISPLAYWINDOW_HEIGHT)
-		m_config->displayWindowHeight = (int)wParam;
-
+	RECT rc;
 	GetClientRect(m_hContainer,&rc);
-
 	SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,(LPARAM)MAKELPARAM(rc.right,rc.bottom));
 }
 

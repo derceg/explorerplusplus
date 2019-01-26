@@ -49,7 +49,9 @@ will need to be changed correspondingly. */
 #define HASH_DISPLAYFONT			362757714
 #define HASH_DISPLAYSURROUNDCOLOR	1807564604
 #define HASH_DISPLAYTEXTCOLOR		4212809823
+#define HASH_DISPLAYWINDOWWIDTH		3332824435
 #define HASH_DISPLAYWINDOWHEIGHT	2017415020
+#define HASH_DISPLAYWINDOWVERTICAL	2262072301
 #define HASH_LANGUAGE				3526403497
 #define HASH_LASTSELECTEDTAB		1712438393
 #define HASH_NEXTTOCURRENT			743165450
@@ -476,8 +478,14 @@ IXMLDOMElement *pRoot)
 	pParentNode = nullptr;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	_itow_s(m_config->displayWindowWidth,szValue,SIZEOF_ARRAY(szValue),10);
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisplayWindowWidth"),szValue);
+
 	_itow_s(m_config->displayWindowHeight,szValue,SIZEOF_ARRAY(szValue),10);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisplayWindowHeight"),szValue);
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisplayWindowVertical"),NXMLSettings::EncodeBoolValue(m_config->displayWindowVertical));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DoubleClickTabClose"),NXMLSettings::EncodeBoolValue(m_config->doubleClickTabClose));
@@ -1474,8 +1482,16 @@ WCHAR *wszName,WCHAR *wszValue)
 		m_config->displayWindowTextColor = NXMLSettings::ReadXMLColorData(pNode);
 		break;
 
+	case HASH_DISPLAYWINDOWWIDTH:
+		m_config->displayWindowWidth = NXMLSettings::DecodeIntValue(wszValue);
+		break;
+
 	case HASH_DISPLAYWINDOWHEIGHT:
 		m_config->displayWindowHeight = NXMLSettings::DecodeIntValue(wszValue);
+		break;
+
+	case HASH_DISPLAYWINDOWVERTICAL:
+		m_config->displayWindowVertical = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_DOUBLECLICKTABCLOSE:

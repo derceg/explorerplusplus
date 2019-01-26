@@ -92,6 +92,7 @@ private:
 	static const int MIN_SHELL_MENU_ID = 1;
 	static const int MAX_SHELL_MENU_ID = 1000;
 
+	static const UINT MINIMUM_DISPLAYWINDOW_WIDTH = 70;
 	static const UINT MINIMUM_DISPLAYWINDOW_HEIGHT = 70;
 
 	/* The number of toolbars that appear in the
@@ -343,6 +344,7 @@ private:
 	void ValidateLoadedSettings();
 	void ValidateColumns(FolderColumns &folderColumns);
 	void ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns);
+	void ApplyDisplayWindowPosition();
 	void ApplyToolbarSettings(void);
 	void TestConfigFile(void);
 

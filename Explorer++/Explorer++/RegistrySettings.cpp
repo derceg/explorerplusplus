@@ -161,7 +161,9 @@ LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("TVAutoExpandSelected"), m_config->treeViewAutoExpandSelected);
 
 		/* Display window settings. */
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("DisplayWindowWidth"), m_config->displayWindowWidth);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("DisplayWindowHeight"), m_config->displayWindowHeight);
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("DisplayWindowVertical"), m_config->displayWindowVertical);
 
 		COLORREF CentreColor;
 		COLORREF SurroundColor;
@@ -318,7 +320,9 @@ LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("HideLinkExtensionGlobal"),(LPDWORD)&m_config->globalFolderSettings.hideLinkExtension);
 
 		/* Display window settings. */
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("DisplayWindowWidth"),(LPDWORD)&m_config->displayWindowWidth);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("DisplayWindowHeight"),(LPDWORD)&m_config->displayWindowHeight);
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("DisplayWindowVertical"),(LPDWORD)&m_config->displayWindowVertical);
 
 		COLORREF CentreColor;
 		COLORREF SurroundColor;
