@@ -3,6 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++", "Explorer++\Explorer++.vcxproj", "{7544A240-2EBF-4DC1-B55B-C8AE32672ED0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0977324A-4826-461A-A3B6-D88AFFD444D2} = {0977324A-4826-461A-A3B6-D88AFFD444D2}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Helper", "Helper\Helper.vcxproj", "{FAADBE00-9376-45F8-AEAC-1BA3A8E58A1D}"
 EndProject
@@ -68,6 +71,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Installer\Inst
 	ProjectSection(ProjectDependencies) = postProject
 		{7544A240-2EBF-4DC1-B55B-C8AE32672ED0} = {7544A240-2EBF-4DC1-B55B-C8AE32672ED0}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua", "Lua\Lua.vcxproj", "{0977324A-4826-461A-A3B6-D88AFFD444D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -313,6 +318,18 @@ Global
 		{3CD109B0-FB57-446C-AE40-CF4FD45793EF}.Release|x64.Build.0 = Release|x64
 		{3CD109B0-FB57-446C-AE40-CF4FD45793EF}.Test|Win32.ActiveCfg = Release|x86
 		{3CD109B0-FB57-446C-AE40-CF4FD45793EF}.Test|x64.ActiveCfg = Release|x86
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Debug|Win32.Build.0 = Debug|Win32
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Debug|x64.ActiveCfg = Debug|x64
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Debug|x64.Build.0 = Debug|x64
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Release|Win32.ActiveCfg = Release|Win32
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Release|Win32.Build.0 = Release|Win32
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Release|x64.ActiveCfg = Release|x64
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Release|x64.Build.0 = Release|x64
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Test|Win32.ActiveCfg = Release|Win32
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Test|Win32.Build.0 = Release|Win32
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Test|x64.ActiveCfg = Release|x64
+		{0977324A-4826-461A-A3B6-D88AFFD444D2}.Test|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -342,7 +359,7 @@ Global
 		{C12096BF-F80B-4ABE-892C-247AF2A5458A} = {F29F24CD-0668-462F-80AE-649CB12F1860}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {504CEF86-1D85-4DF5-84B2-ECA032747EC4}
 		VisualSVNWorkingCopyRoot = 
+		SolutionGuid = {504CEF86-1D85-4DF5-84B2-ECA032747EC4}
 	EndGlobalSection
 EndGlobal
