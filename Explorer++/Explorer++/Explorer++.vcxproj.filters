@@ -250,6 +250,12 @@
     <ClCompile Include="ShellBrowser\IconRetrieval.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="ApiBinding.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="TabsApi.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -453,6 +459,12 @@
     <ClInclude Include="ToolbarButtons.h">
       <Filter>Main Toolbar</Filter>
     </ClInclude>
+    <ClInclude Include="ApiBinding.h">
+      <Filter>Plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="TabsApi.h">
+      <Filter>Plugins</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
@@ -558,6 +570,9 @@
     </Filter>
     <Filter Include="Main Toolbar">
       <UniqueIdentifier>{2fe51f54-3d26-4449-92f3-ff8ee95f7751}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins">
+      <UniqueIdentifier>{09198397-1dae-4619-a80f-5af293a9b949}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

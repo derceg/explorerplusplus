@@ -291,6 +291,7 @@
     </ClCompile>
     <ClCompile Include="AddBookmarkDialog.cpp" />
     <ClCompile Include="AddressBarHandler.cpp" />
+    <ClCompile Include="ApiBinding.cpp" />
     <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="ApplicationToolbarButtonDialog.cpp" />
     <ClCompile Include="ApplicationToolbarDropHandler.cpp" />
@@ -373,6 +374,7 @@
     <ClCompile Include="TabContainer.cpp" />
     <ClCompile Include="TabDropHandler.cpp" />
     <ClCompile Include="TabHandler.cpp" />
+    <ClCompile Include="TabsApi.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
     <ClCompile Include="UpdateCheckDialog.cpp" />
@@ -390,6 +392,7 @@
     <ClInclude Include="..\targetver.h" />
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="AddBookmarkDialog.h" />
+    <ClInclude Include="ApiBinding.h" />
     <ClInclude Include="ApplicationToolbar.h" />
     <ClInclude Include="ApplicationToolbarButtonDialog.h" />
     <ClInclude Include="ApplicationToolbarDropHandler.h" />
@@ -450,6 +453,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="TabDropHandler.h" />
+    <ClInclude Include="TabsApi.h" />
     <ClInclude Include="ToolbarButtons.h" />
     <ClInclude Include="UpdateCheckDialog.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
