@@ -209,13 +209,6 @@ private:
 		int		uId;
 	};
 
-	/* This structure is stored with
-	every listview. */
-	struct ListViewInfo_t
-	{
-		int iObjectIndex;
-	};
-
 	/* Save/load interface. This allows multiple
 	methods of saving/loading data, as long as it
 	conforms to this specification. */

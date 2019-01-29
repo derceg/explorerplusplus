@@ -413,11 +413,6 @@ int *pTabObjectIndex)
 	if(pSettings->bApplyFilter)
 		NListView::ListView_SetBackgroundImage(m_TabInfo[iTabId].listView,IDB_FILTERINGAPPLIED);
 
-	ListViewInfo_t	*plvi = (ListViewInfo_t *)malloc(sizeof(ListViewInfo_t));
-	plvi->iObjectIndex	= iTabId;
-
-	SetWindowLongPtr(m_TabInfo[iTabId].listView,GWLP_USERDATA,(LONG_PTR)plvi);
-
 	/* TODO: This needs to be removed. */
 	SetWindowSubclass(m_TabInfo[iTabId].listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
