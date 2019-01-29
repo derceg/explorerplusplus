@@ -128,6 +128,7 @@ private:
 
 	struct TabInfo_t
 	{
+		HWND	listView;
 		BOOL	bLocked;
 		BOOL	bAddressLocked;
 		BOOL	bUseCustomName;
@@ -802,7 +803,6 @@ private:
 	/* Tabs. */
 	std::unordered_map<int, TabInfo_t> m_TabInfo;
 	int						m_tabIdCounter;
-	std::unordered_map<int, HWND>	m_hListView;
 	std::unordered_map<int, CShellBrowser *> m_pShellBrowser;
 
 	HWND					m_hActiveListView;

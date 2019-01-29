@@ -583,7 +583,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	if(m_pShellBrowser[iObjectIndex]->QueryDragging())
 		return;
 
-	HWND listView = m_hListView.at(iObjectIndex);
+	HWND listView = m_TabInfo.at(iObjectIndex).listView;
 
 	if(ItemChanged->uChanged == LVIF_STATE &&
 		((LVIS_STATEIMAGEMASK & ItemChanged->uNewState) >> 12) != 0 &&
@@ -675,9 +675,9 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
-	for (auto item : m_hListView)
+	for (auto item : m_TabInfo)
 	{
-		if (item.second == hListView)
+		if (item.second.listView == hListView)
 		{
 			return item.first;
 		}

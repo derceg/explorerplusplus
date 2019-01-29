@@ -328,15 +328,15 @@ int *pTabObjectIndex)
 		m_TabInfo[iTabId] = *pTabInfo;
 	}
 
-	m_hListView[iTabId]	= CreateMainListView(m_hContainer,ListViewStyles);
+	m_TabInfo[iTabId].listView	= CreateMainListView(m_hContainer,ListViewStyles);
 
-	if(m_hListView[iTabId] == NULL)
+	if(m_TabInfo[iTabId].listView == NULL)
 		return E_FAIL;
 
-	NListView::ListView_ActivateOneClickSelect(m_hListView[iTabId],m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
+	NListView::ListView_ActivateOneClickSelect(m_TabInfo[iTabId].listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
 
 	/* Set the listview to its initial size. */
-	SetListViewInitialPosition(m_hListView[iTabId]);
+	SetListViewInitialPosition(m_TabInfo[iTabId].listView);
 
 	/* If no explicit settings are specified, use the
 	global ones. */
@@ -408,18 +408,18 @@ int *pTabObjectIndex)
 	pSettings->bForceSize	= m_config->forceSize;
 	pSettings->sdf			= m_config->sizeDisplayFormat;
 
-	m_pShellBrowser[iTabId] = CShellBrowser::CreateNew(m_hContainer,m_hListView[iTabId],pSettings);
+	m_pShellBrowser[iTabId] = CShellBrowser::CreateNew(m_hContainer, m_TabInfo[iTabId].listView,pSettings);
 
 	if(pSettings->bApplyFilter)
-		NListView::ListView_SetBackgroundImage(m_hListView[iTabId],IDB_FILTERINGAPPLIED);
+		NListView::ListView_SetBackgroundImage(m_TabInfo[iTabId].listView,IDB_FILTERINGAPPLIED);
 
 	ListViewInfo_t	*plvi = (ListViewInfo_t *)malloc(sizeof(ListViewInfo_t));
 	plvi->iObjectIndex	= iTabId;
 
-	SetWindowLongPtr(m_hListView[iTabId],GWLP_USERDATA,(LONG_PTR)plvi);
+	SetWindowLongPtr(m_TabInfo[iTabId].listView,GWLP_USERDATA,(LONG_PTR)plvi);
 
 	/* TODO: This needs to be removed. */
-	SetWindowSubclass(m_hListView[iTabId],ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(m_TabInfo[iTabId].listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
 	m_pShellBrowser[iTabId]->SetId(iTabId);
 	m_pShellBrowser[iTabId]->SetResourceModule(m_hLanguageModule);
@@ -448,15 +448,15 @@ int *pTabObjectIndex)
 		/* Hide the previously active tab, and show the
 		newly created one. */
 		ShowWindow(m_hActiveListView,SW_HIDE);
-		ShowWindow(m_hListView[iTabId],SW_SHOW);
+		ShowWindow(m_TabInfo[iTabId].listView,SW_SHOW);
 
 		m_selectedTabId			= iTabId;
 		m_selectedTabIndex		= iNewTabIndex;
 
-		m_hActiveListView		= m_hListView[m_selectedTabId];
+		m_hActiveListView		= m_TabInfo[m_selectedTabId].listView;
 		m_pActiveShellBrowser	= m_pShellBrowser[m_selectedTabId];
 
-		SetFocus(m_hListView[iTabId]);
+		SetFocus(m_TabInfo[iTabId].listView);
 
 		m_iPreviousTabSelectionId = iTabId;
 	}
@@ -607,7 +607,7 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 
 	m_selectedTabId = (int)tcItem.lParam;
 
-	m_hActiveListView		= m_hListView.at(m_selectedTabId);
+	m_hActiveListView		= m_TabInfo.at(m_selectedTabId).listView;
 	m_pActiveShellBrowser	= m_pShellBrowser[m_selectedTabId];
 
 	/* The selected tab has changed, so update the current
@@ -813,8 +813,7 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 	m_pShellBrowser[iInternalIndex]->Release();
 	m_pShellBrowser.erase(iInternalIndex);
 
-	DestroyWindow(m_hListView.at(iInternalIndex));
-	m_hListView.erase(iInternalIndex);
+	DestroyWindow(m_TabInfo.at(iInternalIndex).listView);
 
 	m_TabInfo.erase(iInternalIndex);
 

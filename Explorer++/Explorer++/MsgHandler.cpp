@@ -485,7 +485,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 		if(!m_bShowTabBarAtBottom)
 		{
-			SetWindowPos(m_hListView.at((int)tcItem.lParam),NULL,IndentLeft,IndentTop,
+			SetWindowPos(m_TabInfo.at((int)tcItem.lParam).listView,NULL,IndentLeft,IndentTop,
 				MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
 				uFlags);
 		}
@@ -493,13 +493,13 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		{
 			if(m_bShowTabBar)
 			{
-				SetWindowPos(m_hListView.at((int)tcItem.lParam),NULL,IndentLeft,IndentTop,
+				SetWindowPos(m_TabInfo.at((int)tcItem.lParam).listView,NULL,IndentLeft,IndentTop,
 					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - TAB_WINDOW_HEIGHT,
 					uFlags);
 			}
 			else
 			{
-				SetWindowPos(m_hListView.at((int)tcItem.lParam),NULL,IndentLeft,IndentTop,
+				SetWindowPos(m_TabInfo.at((int)tcItem.lParam).listView,NULL,IndentLeft,IndentTop,
 					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
 					uFlags);
 			}
