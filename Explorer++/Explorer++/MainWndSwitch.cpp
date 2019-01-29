@@ -1295,6 +1295,10 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			OnCustomizeColors();
 			break;
 
+		case IDM_TOOLS_RUNSCRIPT:
+			OnRunScript();
+			break;
+
 		case IDM_TOOLS_OPTIONS:
 			OnShowOptions();
 			break;

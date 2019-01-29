@@ -46,6 +46,10 @@ void CModelessDialogNotification::OnModelessDialogDestroy(int iResource)
 		g_hwndSearch = NULL;
 		break;
 
+	case IDD_SCRIPTING:
+		g_hwndRunScript = NULL;
+		break;
+
 	case IDD_MANAGE_BOOKMARKS:
 		g_hwndManageBookmarks = NULL;
 		break;

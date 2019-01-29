@@ -47,11 +47,14 @@ std::list<std::wstring> g_TabDirs;
 
 /* Modeless dialog handles. */
 HWND g_hwndSearch;
+HWND g_hwndRunScript;
 HWND g_hwndOptions;
 HWND g_hwndManageBookmarks;
 
 TCHAR g_szLang[32];
 BOOL g_bForceLanguageLoad = FALSE;
+
+bool g_enableLuaScripting = false;
 
 /*
  * Processes the specified command line.
@@ -181,6 +184,10 @@ ensure you have administrator privileges."),NExplorerplusplus::APP_NAME,MB_ICONW
 		else if(lstrcmp(szPath,_T("-enable_logging")) == 0)
 		{
 			boost::log::core::get()->set_logging_enabled(true);
+		}
+		else if (lstrcmp(szPath, _T("-enable_lua_scripting")) == 0)
+		{
+			g_enableLuaScripting = true;
 		}
 		else
 		{
@@ -608,6 +615,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	hAccl = LoadAccelerators(hInstance,MAKEINTRESOURCE(IDR_MAINACCELERATORS));
 
 	g_hwndSearch = NULL;
+	g_hwndRunScript = NULL;
 	g_hwndOptions = NULL;
 	g_hwndManageBookmarks = NULL;
 
@@ -619,6 +627,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 		would be taken even when the dialog has focus. */
 		if(!IsDialogMessage(g_hwndSearch,&msg) &&
 			!IsDialogMessage(g_hwndManageBookmarks,&msg) &&
+			!IsDialogMessage(g_hwndRunScript, &msg) &&
 			!PropSheet_IsDialogMessage(g_hwndOptions,&msg))
 		{
 			if(!TranslateAccelerator(hwnd,hAccl,&msg))

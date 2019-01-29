@@ -13,6 +13,7 @@
 #include "IModelessDialogNotification.h"
 #include "MergeFilesDialog.h"
 #include "ModelessDialogs.h"
+#include "ScriptingDialog.h"
 #include "SearchDialog.h"
 #include "SplitFileDialog.h"
 #include "UpdateCheckDialog.h"
@@ -117,6 +118,19 @@ void Explorerplusplus::OnCustomizeColors()
 	/* Causes the active listview to redraw (therefore
 	applying any updated color schemes). */
 	InvalidateRect(m_hActiveListView, NULL, FALSE);
+}
+
+void Explorerplusplus::OnRunScript()
+{
+	if (g_hwndRunScript == NULL)
+	{
+		ScriptingDialog *scriptingDialog = new ScriptingDialog(m_hLanguageModule, IDD_SCRIPTING, m_hContainer, this);
+		g_hwndRunScript = scriptingDialog->ShowModelessDialog(new CModelessDialogNotification());
+	}
+	else
+	{
+		SetFocus(g_hwndRunScript);
+	}
 }
 
 void Explorerplusplus::OnShowOptions()

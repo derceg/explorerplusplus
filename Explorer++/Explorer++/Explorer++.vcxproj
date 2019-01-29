@@ -326,6 +326,7 @@
     <ClCompile Include="ListViewEdit.cpp" />
     <ClCompile Include="ListViewHandler.cpp" />
     <ClCompile Include="Logging.cpp" />
+    <ClCompile Include="LuaPlugin.cpp" />
     <ClCompile Include="MainMenuHandler.cpp" />
     <ClCompile Include="MainToolbar.cpp" />
     <ClCompile Include="MainToolbarHandler.cpp" />
@@ -340,6 +341,7 @@
     <ClCompile Include="OptionsDialog.cpp" />
     <ClCompile Include="RegistrySettings.cpp" />
     <ClCompile Include="RenameTabDialog.cpp" />
+    <ClCompile Include="ScriptingDialog.cpp" />
     <ClCompile Include="SearchDialog.cpp" />
     <ClCompile Include="SelectColumnsDialog.cpp" />
     <ClCompile Include="SetDefaultColumnsDialog.cpp" />
@@ -423,6 +425,7 @@
     <ClInclude Include="iServiceProvider.h" />
     <ClInclude Include="ListViewEdit.h" />
     <ClInclude Include="Logging.h" />
+    <ClInclude Include="LuaPlugin.h" />
     <ClInclude Include="MainImages.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="MainToolbar.h" />
@@ -436,6 +439,7 @@
     <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="RenameTabDialog.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ScriptingDialog.h" />
     <ClInclude Include="SearchDialog.h" />
     <ClInclude Include="SelectColumnsDialog.h" />
     <ClInclude Include="SetDefaultColumnsDialog.h" />

@@ -408,6 +408,7 @@ private:
 	void					OnWildcardSelect(BOOL bSelect);
 	void					OnSearch();
 	void					OnCustomizeColors();
+	void					OnRunScript();
 	void					OnShowOptions();
 	void					OnShowHelp();
 	void					OnCheckForUpdates();

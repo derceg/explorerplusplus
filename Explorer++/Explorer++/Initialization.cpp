@@ -6,6 +6,7 @@
 #include "Explorer++.h"
 #include "BookmarkHelper.h"
 #include "CustomizeColorsDialog.h"
+#include "Explorer++_internal.h"
 #include "MainImages.h"
 #include "MainResource.h"
 #include "ShellBrowser/ViewModes.h"
@@ -129,7 +130,15 @@ void Explorerplusplus::OnCreate(void)
 	/* These need to occur after the language module
 	has been initialized, but before the tabs are
 	restored. */
-	SetMenu(m_hContainer, LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_MAINMENU)));
+	HMENU mainMenu = LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_MAINMENU));
+
+	if (!g_enableLuaScripting)
+	{
+		DeleteMenu(mainMenu, IDM_TOOLS_RUNSCRIPT, MF_BYCOMMAND);
+	}
+
+	SetMenu(m_hContainer, mainMenu);
+
 	m_hArrangeSubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_ARRANGEMENU)), 0);
 	m_hArrangeSubMenuRClick = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_ARRANGEMENU)), 0);
 	m_hGroupBySubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);

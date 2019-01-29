@@ -250,6 +250,12 @@
     <ClCompile Include="ShellBrowser\IconRetrieval.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="ScriptingDialog.cpp">
+      <Filter>General Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaPlugin.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
     <ClCompile Include="ApiBinding.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
@@ -458,6 +464,12 @@
     </ClInclude>
     <ClInclude Include="ToolbarButtons.h">
       <Filter>Main Toolbar</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptingDialog.h">
+      <Filter>General Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaPlugin.h">
+      <Filter>Plugins</Filter>
     </ClInclude>
     <ClInclude Include="ApiBinding.h">
       <Filter>Plugins</Filter>
