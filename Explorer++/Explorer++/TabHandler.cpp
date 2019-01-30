@@ -3,22 +3,22 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
-#include <algorithm>
 #include "Explorer++.h"
 #include "MainImages.h"
+#include "MainResource.h"
 #include "RenameTabDialog.h"
 #include "ShellBrowser/iShellView.h"
-#include "TabDropHandler.h"
-#include "MainResource.h"
 #include "ShellBrowser/SortModes.h"
-#include "../Helper/Helper.h"
+#include "TabDropHandler.h"
 #include "../Helper/Controls.h"
-#include "../Helper/ShellHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/MenuHelper.h"
-#include "../Helper/TabHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/MenuHelper.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/TabHelper.h"
+#include <algorithm>
+#include <list>
 
 
 DWORD ListViewStyles		=	WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|
@@ -1517,4 +1517,16 @@ void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 	gs.bShowFolderSizes		= m_config->showFolderSizes;
 
 	m_TabInfo[iTabId].shellBrower->SetGlobalSettings(&gs);
+}
+
+boost::optional<TabInfo_t> Explorerplusplus::GetTab(int tabId)
+{
+	auto itr = m_TabInfo.find(tabId);
+
+	if (itr == m_TabInfo.end())
+	{
+		return boost::none;
+	}
+
+	return itr->second;
 }

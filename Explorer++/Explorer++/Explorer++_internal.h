@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include <list>
 #include "ShellBrowser/iShellView.h"
+#include "Tab.h"
 #include "../Helper/StatusBar.h"
+#include <boost/optional.hpp>
+#include <list>
 
 /* Used to share global data across the
 classes within the Explorer++ project. */
@@ -42,6 +44,7 @@ __interface IExplorerplusplus
 
 	HWND			GetTreeView() const;
 
+	boost::optional<TabInfo_t>	GetTab(int tabId);
 	std::wstring	GetTabName(int iTab);
 	void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
 	void			RefreshTab(int iTabId);

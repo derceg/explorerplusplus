@@ -23,3 +23,17 @@ void Plugins::TabsApi::create(std::wstring path)
 {
 	m_pexpp->BrowseFolder(path.c_str(), SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
 }
+
+boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
+{
+	auto tabInternal = m_pexpp->GetTab(tabId);
+
+	if (!tabInternal)
+	{
+		return boost::none;
+	}
+
+	Tab tab(*tabInternal);
+
+	return tab;
+}

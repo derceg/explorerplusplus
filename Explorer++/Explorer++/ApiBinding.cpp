@@ -22,6 +22,11 @@ void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp)
 
 	sol::table metaTable = state.create_table();
 	metaTable.set_function("create", &Plugins::TabsApi::create, tabsApi);
+	metaTable.set_function("get", &Plugins::TabsApi::get, tabsApi);
+
+	metaTable.new_usertype<Plugins::TabsApi::Tab>("Tab",
+		"location", &Plugins::TabsApi::Tab::location,
+		"__tostring", &Plugins::TabsApi::Tab::toString);
 
 	metaTable[sol::meta_function::new_index] = deny;
 	metaTable[sol::meta_function::index] = metaTable;

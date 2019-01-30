@@ -22,6 +22,7 @@
 #include "../Helper/ImageWrappers.h"
 #include "../Helper/SetDefaultFileManager.h"
 #include "../MyTreeView/MyTreeView.h"
+#include <boost/optional.hpp>
 #include <MsXml2.h>
 #include <objbase.h>
 #include <unordered_map>
@@ -485,6 +486,7 @@ private:
 	void					SetTabSelection(int Index);
 	void					PushGlobalSettingsToTab(int iTabId);
 	void					DuplicateTab(int iTabInternal);
+	boost::optional<TabInfo_t>	GetTab(int tabId);
 
 	/* Clone Window. */
 	void					OnCloneWindow(void);

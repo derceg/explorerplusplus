@@ -109,7 +109,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;SOL_USE_BOOST;WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -163,7 +163,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;_DEBUG;_WINDOWS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;SOL_USE_BOOST;WIN32;_DEBUG;_WINDOWS;WIN64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -209,7 +209,7 @@
       <Optimization>Full</Optimization>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;SOL_USE_BOOST;WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -253,7 +253,7 @@
       <Optimization>Full</Optimization>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions Condition="'$(APPVEYOR_BUILD_NUMBER)'!=''">ENVIRONMENT_BUILD_NUMBER=$(APPVEYOR_BUILD_NUMBER);%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>BOOST_USE_WINDOWS_H;SOL_USE_BOOST;WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
