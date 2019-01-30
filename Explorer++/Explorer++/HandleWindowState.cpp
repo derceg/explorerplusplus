@@ -394,7 +394,7 @@ void Explorerplusplus::UpdateTabText(int iTab,int iTabId)
 
 	if(!m_TabInfo.at(iTabId).bUseCustomName)
 	{
-		LPITEMIDLIST pidlDirectory = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
+		LPITEMIDLIST pidlDirectory = m_TabInfo[iTabId].shellBrower->QueryCurrentDirectoryIdl();
 
 		TCHAR szTabText[MAX_PATH];
 		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
@@ -438,7 +438,7 @@ void Explorerplusplus::SetTabIcon(int iTabId)
 	int nTabs;
 	int i = 0;
 
-	pidl = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
+	pidl = m_TabInfo[iTabId].shellBrower->QueryCurrentDirectoryIdl();
 
 	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
@@ -461,7 +461,7 @@ void Explorerplusplus::SetTabIcon(int iIndex,int iTabId)
 {
 	LPITEMIDLIST pidl = NULL;
 
-	pidl = m_pShellBrowser[iTabId]->QueryCurrentDirectoryIdl();
+	pidl = m_TabInfo[iTabId].shellBrower->QueryCurrentDirectoryIdl();
 
 	SetTabIcon(iIndex,iTabId,pidl);
 

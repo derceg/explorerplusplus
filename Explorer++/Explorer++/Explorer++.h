@@ -14,6 +14,7 @@
 #include "MainToolbar.h"
 #include "ShellBrowser/iShellView.h"
 #include "ShellBrowser/ViewModes.h"
+#include "Tab.h"
 #include "TabContainer.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/FileActionHandler.h"
@@ -124,22 +125,6 @@ private:
 	{
 		UINT SortById;
 		UINT GroupById;
-	};
-
-	struct TabInfo_t
-	{
-		HWND	listView;
-		BOOL	bLocked;
-		BOOL	bAddressLocked;
-		BOOL	bUseCustomName;
-		TCHAR	szName[MAX_PATH];
-
-		/* Although each tab manages its
-		own columns, it does not know
-		about any column defaults.
-		Therefore, it makes more sense
-		for this setting to remain here. */
-		//BOOL	bUsingDefaultColumns;
 	};
 
 	struct TabProxyInfo_t
@@ -796,7 +781,6 @@ private:
 	/* Tabs. */
 	std::unordered_map<int, TabInfo_t> m_TabInfo;
 	int						m_tabIdCounter;
-	std::unordered_map<int, CShellBrowser *> m_pShellBrowser;
 
 	HWND					m_hActiveListView;
 	CShellBrowser *			m_pActiveShellBrowser;

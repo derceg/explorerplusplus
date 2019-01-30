@@ -3,14 +3,13 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
-#include "Explorer++_internal.h"
 #include "TabContainer.h"
+#include "Explorer++_internal.h"
 
 
-CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, CShellBrowser *> *pShellBrowsers, IExplorerplusplus *pexpp) :
+CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, TabInfo_t> *tabInfo, IExplorerplusplus *pexpp) :
 m_hTabCtrl(hTabCtrl),
-m_pShellBrowsers(pShellBrowsers),
+m_tabInfo(tabInfo),
 m_pexpp(pexpp)
 {
 
@@ -47,5 +46,5 @@ CShellBrowser *CTabContainer::GetBrowserForTab(int Index)
 		return NULL;
 	}
 
-	return (*m_pShellBrowsers)[static_cast<int>(tcItem.lParam)];
+	return m_tabInfo->at(static_cast<int>(tcItem.lParam)).shellBrower;
 }

@@ -595,13 +595,13 @@ void Explorerplusplus::OnDrawClipboard(void)
 			/* Deghost all items that have been 'cut'. */
 			for(const auto &strFile : m_CutFileNameList)
 			{
-				auto itr = m_pShellBrowser.find(m_iCutTabInternal);
+				auto itr = m_TabInfo.find(m_iCutTabInternal);
 
 				/* Only deghost the items if the tab they
 				are/were in still exists. */
-				if(itr != m_pShellBrowser.end())
+				if(itr != m_TabInfo.end())
 				{
-					int iItem = itr->second->LocateFileItemIndex(strFile.c_str());
+					int iItem = itr->second.shellBrower->LocateFileItemIndex(strFile.c_str());
 
 					/* It is possible that the ghosted file
 					does NOT exist within the current folder.
@@ -609,7 +609,7 @@ void Explorerplusplus::OnDrawClipboard(void)
 					is cut, and the folder is changed, in which
 					case the item is no longer available. */
 					if(iItem != -1)
-						itr->second->DeghostItem(iItem);
+						itr->second.shellBrower->DeghostItem(iItem);
 				}
 			}
 
@@ -662,17 +662,17 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 	TCHAR				szDirectoryToWatch[MAX_PATH];
 	int					iDirMonitorId;
 
-	iDirMonitorId		= m_pShellBrowser[iTabId]->GetDirMonitorId();
+	iDirMonitorId		= m_TabInfo[iTabId].shellBrower->GetDirMonitorId();
 			
 	/* Stop monitoring the directory that was browsed from. */
 	m_pDirMon->StopDirectoryMonitor(iDirMonitorId);
 
-	m_pShellBrowser[iTabId]->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectoryToWatch),
+	m_TabInfo[iTabId].shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectoryToWatch),
 		szDirectoryToWatch);
 
 	/* Don't watch virtual folders (the 'recycle bin' may be an
 	exception to this). */
-	if(m_pShellBrowser[iTabId]->InVirtualFolder())
+	if(m_TabInfo[iTabId].shellBrower->InVirtualFolder())
 	{
 		iDirMonitorId = -1;
 	}
@@ -681,7 +681,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 		pDirectoryAltered = (DirectoryAltered_t *)malloc(sizeof(DirectoryAltered_t));
 
 		pDirectoryAltered->iIndex		= iTabId;
-		pDirectoryAltered->iFolderIndex	= m_pShellBrowser[iTabId]->GetFolderIndex();
+		pDirectoryAltered->iFolderIndex	= m_TabInfo[iTabId].shellBrower->GetFolderIndex();
 		pDirectoryAltered->pData		= this;
 
 		/* Start monitoring the directory that was opened. */
@@ -692,7 +692,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 			FILE_NOTIFY_CHANGE_SECURITY,DirectoryAlteredCallback,FALSE,(void *)pDirectoryAltered);
 	}
 
-	m_pShellBrowser[iTabId]->SetDirMonitorId(iDirMonitorId);
+	m_TabInfo[iTabId].shellBrower->SetDirMonitorId(iDirMonitorId);
 }
 
 void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
@@ -1284,7 +1284,7 @@ void Explorerplusplus::OnAssocChanged(void)
 
 		iIndex = (int)tcItem.lParam;
 
-		m_pShellBrowser[iIndex]->Refresh();
+		m_TabInfo[iIndex].shellBrower->Refresh();
 	}
 
 	/* Now, refresh the treeview. */
@@ -1514,14 +1514,14 @@ void Explorerplusplus::SaveDirectorySpecificSettings(int iTab)
 		/* TODO: First check if there are already settings held for this
 		tab. If there are, delete them first. */
 
-		ds.pidlDirectory = m_pShellBrowser[iIndexInternal]->QueryCurrentDirectoryIdl();
+		ds.pidlDirectory = m_TabInfo[iIndexInternal].shellBrower->QueryCurrentDirectoryIdl();
 
-		ds.dsi.sortMode = m_pShellBrowser[iIndexInternal]->GetSortMode();
-		ds.dsi.viewMode = m_pShellBrowser[iIndexInternal]->GetCurrentViewMode();
+		ds.dsi.sortMode = m_TabInfo[iIndexInternal].shellBrower->GetSortMode();
+		ds.dsi.viewMode = m_TabInfo[iIndexInternal].shellBrower->GetCurrentViewMode();
 
 		ColumnExport_t ce;
 
-		m_pShellBrowser[iIndexInternal]->ExportAllColumns(&ce);
+		m_TabInfo[iIndexInternal].shellBrower->ExportAllColumns(&ce);
 
 		ds.dsi.ControlPanelColumnList		= ce.ControlPanelColumnList;
 		ds.dsi.MyComputerColumnList			= ce.MyComputerColumnList;
@@ -1555,8 +1555,8 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 				{
 					int iIndexInternal = (int)tcItem.lParam;
 
-					m_pShellBrowser[iIndexInternal]->SetSortMode(ds.dsi.sortMode);
-					m_pShellBrowser[iIndexInternal]->SetCurrentViewMode(ds.dsi.viewMode);
+					m_TabInfo[iIndexInternal].shellBrower->SetSortMode(ds.dsi.sortMode);
+					m_TabInfo[iIndexInternal].shellBrower->SetCurrentViewMode(ds.dsi.viewMode);
 
 					ColumnExport_t ce;
 
@@ -1568,7 +1568,7 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 					ce.RealFolderColumnList = ds.dsi.RealFolderColumnList;
 					ce.RecycleBinColumnList = ds.dsi.RecycleBinColumnList;
 
-					m_pShellBrowser[iIndexInternal]->ImportAllColumns(&ce);
+					m_TabInfo[iIndexInternal].shellBrower->ImportAllColumns(&ce);
 				}
 			}
 		}

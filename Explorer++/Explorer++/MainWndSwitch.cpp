@@ -94,11 +94,11 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 	case WM_USER_FILESADDED:
 	{
-		auto itr = m_pShellBrowser.find(static_cast<int>(wParam));
+		auto itr = m_TabInfo.find(static_cast<int>(wParam));
 
-		if (itr != m_pShellBrowser.end())
+		if (itr != m_TabInfo.end())
 		{
-			itr->second->DirectoryAltered();
+			itr->second.shellBrower->DirectoryAltered();
 		}
 	}
 		break;

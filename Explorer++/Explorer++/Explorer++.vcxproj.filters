@@ -477,6 +477,9 @@
     <ClInclude Include="TabsApi.h">
       <Filter>Plugins</Filter>
     </ClInclude>
+    <ClInclude Include="Tab.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

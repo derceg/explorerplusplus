@@ -455,6 +455,7 @@
     <ClInclude Include="ShellBrowser\ViewModes.h" />
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Tab.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="TabDropHandler.h" />
     <ClInclude Include="TabsApi.h" />
