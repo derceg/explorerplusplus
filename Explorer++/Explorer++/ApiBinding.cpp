@@ -26,7 +26,18 @@ void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp)
 
 	metaTable.new_usertype<Plugins::TabsApi::Tab>("Tab",
 		"location", &Plugins::TabsApi::Tab::location,
+		"viewMode", &Plugins::TabsApi::Tab::viewMode,
 		"__tostring", &Plugins::TabsApi::Tab::toString);
+
+	metaTable.new_enum("ViewMode",
+		"details", ViewMode::VM_DETAILS,
+		"extraLargeIcons", ViewMode::VM_EXTRALARGEICONS,
+		"icons", ViewMode::VM_ICONS,
+		"largeIcons", ViewMode::VM_LARGEICONS,
+		"list", ViewMode::VM_LIST,
+		"smallIcons", ViewMode::VM_SMALLICONS,
+		"thumbnails", ViewMode::VM_THUMBNAILS,
+		"tiles", ViewMode::VM_TILES);
 
 	metaTable[sol::meta_function::new_index] = deny;
 	metaTable[sol::meta_function::index] = metaTable;

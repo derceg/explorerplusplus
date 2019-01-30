@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Explorer++_internal.h"
+#include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
 
 namespace Plugins
@@ -15,6 +16,7 @@ namespace Plugins
 		struct Tab
 		{
 			std::wstring location;
+			ViewMode viewMode;
 
 			Tab(const TabInfo_t &tabInternal)
 			{
@@ -22,11 +24,12 @@ namespace Plugins
 				tabInternal.shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(path), path);
 
 				location = path;
+				viewMode = tabInternal.shellBrower->GetCurrentViewMode();
 			}
 
 			std::wstring toString()
 			{
-				return _T("location = ") + location;
+				return _T("location = ") + location + _T(", viewMode = ") + std::to_wstring(viewMode);
 			}
 		};
 
