@@ -17,6 +17,8 @@ namespace Plugins
 		{
 			std::wstring location;
 			ViewMode viewMode;
+			bool locked;
+			bool addressLocked;
 
 			Tab(const TabInfo_t &tabInternal)
 			{
@@ -25,11 +27,16 @@ namespace Plugins
 
 				location = path;
 				viewMode = tabInternal.shellBrower->GetCurrentViewMode();
+				locked = tabInternal.bLocked;
+				addressLocked = tabInternal.bAddressLocked;
 			}
 
 			std::wstring toString()
 			{
-				return _T("location = ") + location + _T(", viewMode = ") + std::to_wstring(viewMode);
+				return _T("location = ") + location
+					+ _T(", viewMode = ") + std::to_wstring(viewMode)
+					+ _T(", locked = ") + std::to_wstring(locked)
+					+ _T(", addressLocked = ") + std::to_wstring(addressLocked);
 			}
 		};
 
