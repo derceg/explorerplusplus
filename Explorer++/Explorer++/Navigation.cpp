@@ -108,31 +108,7 @@ pass through this function. This ensures that tabs that
 have their addresses locked will not change directory. */
 HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags)
 {
-	HRESULT hr;
-	int iTabObjectIndex = -1;
-
-	if(!m_TabInfo.at(m_selectedTabId).bAddressLocked)
-	{
-		hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory, wFlags);
-
-		if(SUCCEEDED(hr))
-		{
-			PlayNavigationSound();
-		}
-
-		iTabObjectIndex = m_selectedTabId;
-	}
-	else
-	{
-		hr = CreateNewTab(pidlDirectory, NULL, NULL, TRUE, &iTabObjectIndex);
-	}
-
-	if(SUCCEEDED(hr))
-	{
-		OnDirChanged(iTabObjectIndex);
-	}
-
-	return hr;
+	return BrowseFolder(pidlDirectory, wFlags, FALSE, FALSE, FALSE);
 }
 
 HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags,
