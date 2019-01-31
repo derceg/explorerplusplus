@@ -703,15 +703,20 @@ void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 	OnTabChangeInternal(TRUE);
 }
 
-void Explorerplusplus::OnSelectTabById(int tabId, BOOL setFocus)
+void Explorerplusplus::OnSelectTab(const TabInfo_t &tab, BOOL setFocus)
 {
-	int index = GetTabIndexById(tabId);
-	assert(index != -1);
+	auto index = GetTabIndex(tab);
 
-	OnSelectTabByIndex(index, setFocus);
+	if (!index)
+	{
+		assert(false);
+		return;
+	}
+
+	OnSelectTabByIndex(*index, setFocus);
 }
 
-int Explorerplusplus::GetTabIndexById(int tabId)
+boost::optional<int> Explorerplusplus::GetTabIndex(const TabInfo_t &tab)
 {
 	int numTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
@@ -719,24 +724,29 @@ int Explorerplusplus::GetTabIndexById(int tabId)
 	{
 		TCITEM tcItem;
 		tcItem.mask = TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl, i, &tcItem);
+		BOOL res = TabCtrl_GetItem(m_hTabCtrl, i, &tcItem);
 
-		if (tcItem.lParam == tabId)
+		if (res && (tcItem.lParam == tab.id))
 		{
 			return i;
 		}
 	}
 
-	return -1;
+	return boost::none;
 }
 
-int Explorerplusplus::GetTabIdByIndex(int index)
+boost::optional<TabInfo_t> Explorerplusplus::GetTabByIndex(int index)
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl, index, &tcItem);
+	BOOL res = TabCtrl_GetItem(m_hTabCtrl, index, &tcItem);
 
-	return static_cast<int>(tcItem.lParam);
+	if (!res)
+	{
+		return boost::none;
+	}
+
+	return m_TabInfo.at(static_cast<int>(tcItem.lParam));
 }
 
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
@@ -1071,8 +1081,12 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_REFRESH:
 		{
-			int tabId = GetTabIdByIndex(iTabHit);
-			RefreshTab(tabId);
+			auto tab = GetTabByIndex(iTabHit);
+
+			if (tab)
+			{
+				RefreshTab(tab->id);
+			}
 		}
 			break;
 

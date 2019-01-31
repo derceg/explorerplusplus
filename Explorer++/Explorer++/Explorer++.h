@@ -361,9 +361,9 @@ private:
 	LRESULT					OnCustomDraw(LPARAM lParam);
 	void					OnSortBy(SortMode sortMode);
 	void					OnGroupBy(SortMode sortMode);
-	void					OnSelectTabById(int tabId, BOOL setFocus);
-	int						GetTabIndexById(int tabId);
-	int						GetTabIdByIndex(int index);
+	void					OnSelectTab(const TabInfo_t &tab, BOOL setFocus);
+	boost::optional<int>	GetTabIndex(const TabInfo_t &tab);
+	boost::optional<TabInfo_t>	GetTabByIndex(int index);
 	void					OnSelectTabByIndex(int iTab);
 	void					OnSelectTabByIndex(int iTab,BOOL bSetFocus);
 
