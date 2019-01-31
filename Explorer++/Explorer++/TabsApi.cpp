@@ -5,9 +5,11 @@
 #include "stdafx.h"
 #include "TabsAPI.h"
 
-Plugins::TabsApi::TabsApi(IExplorerplusplus *pexpp)
+Plugins::TabsApi::TabsApi(IExplorerplusplus *pexpp, TabInterface *ti) :
+	m_pexpp(pexpp),
+	m_ti(ti)
 {
-	m_pexpp = pexpp;
+
 }
 
 Plugins::TabsApi::~TabsApi()
@@ -17,7 +19,7 @@ Plugins::TabsApi::~TabsApi()
 
 boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 {
-	auto tabInternal = m_pexpp->GetTab(tabId);
+	auto tabInternal = m_ti->GetTab(tabId);
 
 	if (!tabInternal)
 	{
@@ -40,7 +42,7 @@ void Plugins::TabsApi::create(std::wstring path)
 
 int Plugins::TabsApi::move(int tabId, int newIndex)
 {
-	auto tabInternal = m_pexpp->GetTab(tabId);
+	auto tabInternal = m_ti->GetTab(tabId);
 
 	if (!tabInternal)
 	{
@@ -49,20 +51,20 @@ int Plugins::TabsApi::move(int tabId, int newIndex)
 
 	if (newIndex < 0)
 	{
-		newIndex = m_pexpp->GetNumTabs();
+		newIndex = m_ti->GetNumTabs();
 	}
 
-	return m_pexpp->MoveTab(*tabInternal, newIndex);
+	return m_ti->MoveTab(*tabInternal, newIndex);
 }
 
 bool Plugins::TabsApi::close(int tabId)
 {
-	auto tabInternal = m_pexpp->GetTab(tabId);
+	auto tabInternal = m_ti->GetTab(tabId);
 
 	if (!tabInternal)
 	{
 		return false;
 	}
 
-	return m_pexpp->CloseTab(*tabInternal);
+	return m_ti->CloseTab(*tabInternal);
 }

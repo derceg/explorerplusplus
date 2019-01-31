@@ -44,18 +44,6 @@ __interface IExplorerplusplus
 
 	HWND			GetTreeView() const;
 
-	boost::optional<TabInfo_t>	GetTab(int tabId);
-	std::wstring	GetTabName(int iTab);
-	void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
-	void			RefreshTab(int iTabId);
-	int				GetCurrentTabId() const;
-	int				MoveTab(const TabInfo_t &tab, int newIndex);
-	int				GetNumTabs() const;
-	bool			CloseTab(const TabInfo_t &tab);
-
-	/* Temporary. */
-	void			SetTabSelection(int Index);
-
 	void			OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 
 	CStatusBar		*GetStatusBar();

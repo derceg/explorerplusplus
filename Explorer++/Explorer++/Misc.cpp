@@ -536,7 +536,7 @@ BOOL Explorerplusplus::AnyItemsSelected(void)
 
 void Explorerplusplus::OnSelectColumns()
 {
-	CSelectColumnsDialog SelectColumnsDialog(m_hLanguageModule,IDD_SELECTCOLUMNS,m_hContainer,this);
+	CSelectColumnsDialog SelectColumnsDialog(m_hLanguageModule,IDD_SELECTCOLUMNS,m_hContainer,this,this);
 	SelectColumnsDialog.ShowModalDialog();
 
 	UpdateArrangeMenuItems();

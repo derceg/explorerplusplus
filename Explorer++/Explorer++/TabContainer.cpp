@@ -7,10 +7,10 @@
 #include "Explorer++_internal.h"
 
 
-CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, TabInfo_t> *tabInfo, IExplorerplusplus *pexpp) :
+CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, TabInfo_t> *tabInfo, TabInterface *ti) :
 m_hTabCtrl(hTabCtrl),
 m_tabInfo(tabInfo),
-m_pexpp(pexpp)
+m_ti(ti)
 {
 
 }
@@ -31,7 +31,7 @@ int CTabContainer::GetSelection()
 void CTabContainer::SetSelection(int Index)
 {
 	assert(Index >= 0);
-	m_pexpp->SetTabSelection(Index);
+	m_ti->SetTabSelection(Index);
 }
 
 CShellBrowser *CTabContainer::GetBrowserForTab(int Index)

@@ -458,6 +458,7 @@
     <ClInclude Include="Tab.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="TabDropHandler.h" />
+    <ClInclude Include="TabInterface.h" />
     <ClInclude Include="TabsApi.h" />
     <ClInclude Include="ToolbarButtons.h" />
     <ClInclude Include="UpdateCheckDialog.h" />

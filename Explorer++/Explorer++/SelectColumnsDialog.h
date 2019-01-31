@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Explorer++_internal.h"
+#include "TabInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
@@ -35,7 +36,7 @@ class CSelectColumnsDialog : public CBaseDialog
 {
 public:
 
-	CSelectColumnsDialog(HINSTANCE hInstance,int iResource,HWND hParent,IExplorerplusplus *pexpp);
+	CSelectColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp, TabInterface *ti);
 	~CSelectColumnsDialog();
 
 protected:
@@ -59,6 +60,7 @@ private:
 	void	OnMoveColumn(bool bUp);
 
 	IExplorerplusplus	*m_pexpp;
+	TabInterface	*m_ti;
 	BOOL	m_bColumnsSwapped;
 
 	HICON	m_hDialogIcon;

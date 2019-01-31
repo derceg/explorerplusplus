@@ -1108,7 +1108,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_RENAMETAB:
 			{
-				CRenameTabDialog RenameTabDialog(m_hLanguageModule,IDD_RENAMETAB,m_hContainer,iTabHit,this);
+				CRenameTabDialog RenameTabDialog(m_hLanguageModule,IDD_RENAMETAB,m_hContainer,iTabHit,this,this);
 				RenameTabDialog.ShowModalDialog();
 			}
 			break;

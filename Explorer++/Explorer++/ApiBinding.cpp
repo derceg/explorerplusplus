@@ -6,17 +6,17 @@
 #include "APIBinding.h"
 #include "TabsAPI.h"
 
-void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp);
+void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabInterface *ti);
 int deny(lua_State *state);
 
-void Plugins::BindAllApiMethods(sol::state &state, IExplorerplusplus *pexpp)
+void Plugins::BindAllApiMethods(sol::state &state, IExplorerplusplus *pexpp, TabInterface *ti)
 {
-	BindTabsAPI(state, pexpp);
+	BindTabsAPI(state, pexpp, ti);
 }
 
-void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp)
+void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabInterface *ti)
 {
-	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(pexpp);
+	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(pexpp, ti);
 
 	sol::table tabsTable = state.create_named_table("tabs");
 

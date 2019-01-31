@@ -2,13 +2,14 @@
 
 #include "Explorer++_internal.h"
 #include "LuaPlugin.h"
+#include "TabInterface.h"
 #include "../Helper/BaseDialog.h"
 
 class ScriptingDialog : public CBaseDialog
 {
 public:
 
-	ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp);
+	ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp, TabInterface *ti);
 	~ScriptingDialog();
 
 protected:

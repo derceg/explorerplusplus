@@ -16,6 +16,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
 #include "TabContainer.h"
+#include "TabInterface.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -42,7 +43,7 @@
 #define FROM_LISTVIEW				0
 #define FROM_TREEVIEW				1
 
-class Explorerplusplus : public IExplorerplusplus, public IFileContextMenuExternal
+class Explorerplusplus : public IExplorerplusplus, public TabInterface, public IFileContextMenuExternal
 {
 	friend LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 

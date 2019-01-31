@@ -9,9 +9,10 @@
 #include <boost/algorithm/string.hpp>
 #include <codecvt>
 
-ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp) :
+ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+	IExplorerplusplus *pexpp, TabInterface *ti) :
 	CBaseDialog(hInstance, iResource, hParent, true),
-	m_luaPlugin(pexpp)
+	m_luaPlugin(pexpp, ti)
 {
 
 }

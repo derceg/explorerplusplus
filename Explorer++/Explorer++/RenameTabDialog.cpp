@@ -14,11 +14,13 @@
 const TCHAR CRenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
 CRenameTabDialog::CRenameTabDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,int iTab,IExplorerplusplus *pexpp) :
+	int iResource,HWND hParent,int iTab,IExplorerplusplus *pexpp,
+	TabInterface *ti) :
 CBaseDialog(hInstance,iResource,hParent,false)
 {
 	m_iTab = iTab;
 	m_pexpp = pexpp;
+	m_ti = ti;
 
 	m_prtdps = &CRenameTabDialogPersistentSettings::GetInstance();
 }
@@ -32,7 +34,7 @@ INT_PTR CRenameTabDialog::OnInitDialog()
 {
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
 
-	SetWindowText(hEditName,m_pexpp->GetTabName(m_iTab).c_str());
+	SetWindowText(hEditName,m_ti->GetTabName(m_iTab).c_str());
 
 	/* When this dialog is opened, the 'custom name' option will
 	be selected by default (whether or not that is the actual
@@ -119,7 +121,7 @@ void CRenameTabDialog::OnOk()
 
 	if(lstrlen(szTabText) > 0)
 	{
-		m_pexpp->SetTabName(m_iTab,szTabText,(uCheckStatus != BST_CHECKED));
+		m_ti->SetTabName(m_iTab,szTabText,(uCheckStatus != BST_CHECKED));
 	}
 
 	EndDialog(m_hDlg,1);

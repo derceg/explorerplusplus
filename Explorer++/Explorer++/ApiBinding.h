@@ -5,9 +5,10 @@
 #pragma once
 
 #include "Explorer++_internal.h"
+#include "TabInterface.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 namespace Plugins
 {
-	void BindAllApiMethods(sol::state &state, IExplorerplusplus *pexpp);
+	void BindAllApiMethods(sol::state &state, IExplorerplusplus *pexpp, TabInterface *ti);
 }

@@ -4,16 +4,16 @@
 
 #pragma once
 
-#include "Explorer++_internal.h"
 #include "ShellBrowser/iShellView.h"
 #include "Tab.h"
+#include "TabInterface.h"
 #include <unordered_map>
 
 class CTabContainer
 {
 public:
 
-	CTabContainer(HWND hTabCtrl, std::unordered_map<int, TabInfo_t> *tabInfo, IExplorerplusplus *pexpp);
+	CTabContainer(HWND hTabCtrl, std::unordered_map<int, TabInfo_t> *tabInfo, TabInterface *ti);
 	~CTabContainer();
 
 	void			InsertTab();
@@ -29,5 +29,5 @@ private:
 	HWND				m_hTabCtrl;
 
 	std::unordered_map<int, TabInfo_t> *m_tabInfo;
-	IExplorerplusplus	*m_pexpp;
+	TabInterface		*m_ti;
 };
