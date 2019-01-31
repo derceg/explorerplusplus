@@ -8,6 +8,7 @@
 
 struct TabInfo_t
 {
+	int		id;
 	HWND	listView;
 	CShellBrowser *shellBrower;
 	BOOL	bLocked;

@@ -328,6 +328,8 @@ int *pTabObjectIndex)
 		m_TabInfo[iTabId] = *pTabInfo;
 	}
 
+	m_TabInfo[iTabId].id = iTabId;
+
 	m_TabInfo[iTabId].listView	= CreateMainListView(m_hContainer,ListViewStyles);
 
 	if(m_TabInfo[iTabId].listView == NULL)
