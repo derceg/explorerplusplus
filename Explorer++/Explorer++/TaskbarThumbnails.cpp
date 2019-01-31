@@ -249,13 +249,14 @@ void Explorerplusplus::RemoveTabProxy(int iTabId)
 			{
 				m_pTaskbarList->UnregisterTab(itr->hProxy);
 
+				HICON hIcon = reinterpret_cast<HICON>(GetClassLongPtr(itr->hProxy, GCLP_HICONSM));
+				DestroyIcon(hIcon);
+
 				TabProxy_t *ptp = reinterpret_cast<TabProxy_t *>(GetWindowLongPtr(itr->hProxy,GWLP_USERDATA));
 				DestroyWindow(itr->hProxy);
 				free(ptp);
 
-				HICON hIcon = reinterpret_cast<HICON>(GetClassLongPtr(itr->hProxy,GCLP_HICONSM));
-				UnregisterClass(reinterpret_cast<LPCWSTR>(MAKEWORD(itr->atomClass,0)),GetModuleHandle(0));
-				DestroyIcon(hIcon);
+				UnregisterClass(reinterpret_cast<LPCWSTR>(MAKEWORD(itr->atomClass, 0)), GetModuleHandle(0));
 
 				m_TabProxyList.erase(itr);
 				break;
