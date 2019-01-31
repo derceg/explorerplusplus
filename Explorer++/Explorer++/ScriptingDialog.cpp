@@ -96,7 +96,7 @@ void ScriptingDialog::OnRun()
 		std::string convertedCommand = converter.to_bytes(command);
 		auto protectedResult = m_luaPlugin.GetLuaState().safe_script(convertedCommand);
 
-		result = protectedResult.get<std::wstring>();
+		result = FormatResult(protectedResult);
 	}
 	catch (const sol::error &e)
 	{
@@ -107,6 +107,22 @@ void ScriptingDialog::OnRun()
 	AppendToLog(command, result);
 	
 	SetWindowText(commandControl, _T(""));
+}
+
+std::wstring ScriptingDialog::FormatResult(const sol::protected_function_result &result)
+{
+	switch (result.get_type())
+	{
+	case sol::type::boolean:
+	{
+		bool boolResult = result.get<bool>();
+		return std::to_wstring(boolResult);
+	}
+		break;
+
+	default:
+		return result.get<std::wstring>();
+	}
 }
 
 void ScriptingDialog::AppendToLog(const std::wstring &command, const std::wstring &result)

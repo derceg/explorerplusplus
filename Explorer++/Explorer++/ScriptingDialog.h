@@ -23,6 +23,7 @@ private:
 
 	void GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
 
+	std::wstring FormatResult(const sol::protected_function_result &result);
 	void AppendToLog(const std::wstring &command, const std::wstring &result);
 
 	Plugins::LuaPlugin m_luaPlugin;
