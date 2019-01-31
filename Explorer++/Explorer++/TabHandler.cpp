@@ -165,7 +165,12 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 
 				if(info.flags != TCHT_NOWHERE && m_config->doubleClickTabClose)
 				{
-					CloseTab(ItemNum);
+					auto tab = GetTabByIndex(ItemNum);
+
+					if (tab)
+					{
+						CloseTab(*tab);
+					}
 				}
 			}
 			break;
@@ -668,7 +673,12 @@ void Explorerplusplus::CloseOtherTabs(int iTab)
 	{
 		if(i != iTab)
 		{
-			CloseTab(i);
+			auto tab = GetTabByIndex(i);
+
+			if (tab)
+			{
+				CloseTab(*tab);
+			}
 		}
 	}
 }
@@ -779,10 +789,17 @@ void Explorerplusplus::OnSelectTabByIndex(int iTab,BOOL bSetFocus)
 
 bool Explorerplusplus::OnCloseTab(void)
 {
-	return CloseTab(m_selectedTabIndex);
+	auto tab = GetTabByIndex(m_selectedTabIndex);
+
+	if (!tab)
+	{
+		return false;
+	}
+
+	return CloseTab(*tab);
 }
 
-bool Explorerplusplus::CloseTab(int TabIndex)
+bool Explorerplusplus::CloseTab(const TabInfo_t &tab)
 {
 	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
@@ -793,35 +810,30 @@ bool Explorerplusplus::CloseTab(int TabIndex)
 		return true;
 	}
 
-	TCITEM tcItem;
-	tcItem.mask = TCIF_IMAGE|TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hTabCtrl,TabIndex,&tcItem);
-	assert(res);
-
-	if(!res)
-	{
-		return false;
-	}
-
-	int iInternalIndex = static_cast<int>(tcItem.lParam);
-
 	/* The tab is locked. Don't close it. */
-	if(m_TabInfo.at(iInternalIndex).bLocked ||
-		m_TabInfo.at(iInternalIndex).bAddressLocked)
+	if(tab.bLocked || tab.bAddressLocked)
 	{
 		return false;
 	}
 
-	RemoveTabFromControl(TabIndex);
-	RemoveTabProxy(iInternalIndex);
+	auto index = GetTabIndex(tab);
 
-	m_pDirMon->StopDirectoryMonitor(m_TabInfo[iInternalIndex].shellBrower->GetDirMonitorId());
+	if (!index)
+	{
+		assert(false);
+		return false;
+	}
 
-	m_TabInfo[iInternalIndex].shellBrower->Release();
+	RemoveTabFromControl(*index);
+	RemoveTabProxy(tab.id);
 
-	DestroyWindow(m_TabInfo.at(iInternalIndex).listView);
+	m_pDirMon->StopDirectoryMonitor(tab.shellBrower->GetDirMonitorId());
 
-	m_TabInfo.erase(iInternalIndex);
+	tab.shellBrower->Release();
+
+	DestroyWindow(tab.listView);
+
+	m_TabInfo.erase(tab.id);
 
 	if(!m_config->alwaysShowTabBar)
 	{
@@ -1048,6 +1060,13 @@ void Explorerplusplus::OnTabCtrlRButtonUp(POINT *pt)
 
 void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 {
+	auto tab = GetTabByIndex(iTabHit);
+
+	if (!tab)
+	{
+		return;
+	}
+
 	switch(uMenuID)
 	{
 		case IDM_TAB_DUPLICATETAB:
@@ -1080,14 +1099,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 			break;
 
 		case IDM_TAB_REFRESH:
-		{
-			auto tab = GetTabByIndex(iTabHit);
-
-			if (tab)
-			{
-				RefreshTab(tab->id);
-			}
-		}
+			RefreshTab(tab->id);
 			break;
 
 		case IDM_TAB_REFRESHALL:
@@ -1119,13 +1131,18 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 				for(int i = nTabs - 1;i > iTabHit;i--)
 				{
-					CloseTab(i);
+					auto currentTab = GetTabByIndex(i);
+
+					if (currentTab)
+					{
+						CloseTab(*currentTab);
+					}
 				}
 			}
 			break;
 
 		case IDM_TAB_CLOSETAB:
-			CloseTab(iTabHit);
+			CloseTab(*tab);
 			break;
 
 		default:
@@ -1494,7 +1511,12 @@ void Explorerplusplus::OnTabCtrlMButtonUp(POINT *pt)
 
 		if(iTabHit != -1)
 		{
-			CloseTab(iTabHit);
+			auto tab = GetTabByIndex(iTabHit);
+
+			if (tab)
+			{
+				CloseTab(*tab);
+			}
 		}
 	}
 }

@@ -473,7 +473,7 @@ private:
 	HRESULT					CreateNewTab(const TCHAR *TabDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
 	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
-	bool					CloseTab(int TabIndex);
+	bool					CloseTab(const TabInfo_t &tab);
 	void					RemoveTabFromControl(int iTab);
 	bool					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
