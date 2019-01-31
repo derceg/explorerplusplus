@@ -105,14 +105,14 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 							if (variantBookmarkChild.type() == typeid(CBookmark))
 							{
 								CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkChild);
-								m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, TRUE, FALSE, FALSE);
+								m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, TRUE, FALSE);
 							}
 						}
 					}
 					else
 					{
 						CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-						m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, TRUE, FALSE, FALSE);
+						m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, TRUE, FALSE);
 					}
 				}
 			}
@@ -194,7 +194,7 @@ bool CBookmarksToolbar::OnCommand(WPARAM wParam, LPARAM lParam)
 	if (variantBookmarkItem->type() == typeid(CBookmark))
 	{
 		CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-		m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, FALSE, FALSE, FALSE);
+		m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, FALSE, FALSE);
 	}
 
 	return true;

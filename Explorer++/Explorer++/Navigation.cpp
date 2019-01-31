@@ -81,11 +81,11 @@ The ONLY times an idl should be sent are:
 */
 HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath, UINT wFlags)
 {
-	return BrowseFolder(szPath, wFlags, FALSE, FALSE, FALSE);
+	return BrowseFolder(szPath, wFlags, FALSE, FALSE);
 }
 
 HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath, UINT wFlags,
-	BOOL bOpenInNewTab, BOOL bSwitchToNewTab, BOOL bOpenInNewWindow)
+	BOOL bOpenInNewTab, BOOL bSwitchToNewTab)
 {
 	/* Doesn't matter if we can't get the pidl here,
 	as some paths will be relative, or will be filled
@@ -93,7 +93,7 @@ HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath, UINT wFlags,
 	LPITEMIDLIST pidl = NULL;
 	HRESULT hr = GetIdlFromParsingName(szPath, &pidl);
 
-	BrowseFolder(pidl, wFlags, bOpenInNewTab, bSwitchToNewTab, bOpenInNewWindow);
+	BrowseFolder(pidl, wFlags, bOpenInNewTab, bSwitchToNewTab);
 
 	if(SUCCEEDED(hr))
 	{
@@ -108,59 +108,57 @@ pass through this function. This ensures that tabs that
 have their addresses locked will not change directory. */
 HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags)
 {
-	return BrowseFolder(pidlDirectory, wFlags, FALSE, FALSE, FALSE);
+	return BrowseFolder(pidlDirectory, wFlags, FALSE, FALSE);
 }
 
 HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags,
-	BOOL bOpenInNewTab, BOOL bSwitchToNewTab, BOOL bOpenInNewWindow)
+	BOOL bOpenInNewTab, BOOL bSwitchToNewTab)
 {
 	HRESULT hr = E_FAIL;
 	int iTabObjectIndex = -1;
 
-	if(bOpenInNewWindow)
+	if(!bOpenInNewTab && !m_TabInfo.at(m_selectedTabId).bAddressLocked)
 	{
-		TCHAR szPath[MAX_PATH];
-		TCHAR szParameters[512];
-
-		/* Create a new instance of this program, with the
-		specified path as an argument. */
-		GetDisplayName(pidlDirectory, szPath, SIZEOF_ARRAY(szPath), SHGDN_FORPARSING);
-		StringCchPrintf(szParameters, SIZEOF_ARRAY(szParameters), _T("\"%s\""), szPath);
-
-		ExecuteAndShowCurrentProcess(m_hContainer, szParameters);
-	}
-	else
-	{
-		if(!bOpenInNewTab && !m_TabInfo.at(m_selectedTabId).bAddressLocked)
-		{
-			hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory, wFlags);
-
-			if(SUCCEEDED(hr))
-			{
-				PlayNavigationSound();
-			}
-
-			iTabObjectIndex = m_selectedTabId;
-		}
-		else
-		{
-			if(m_TabInfo.at(m_selectedTabId).bAddressLocked)
-			{
-				hr = CreateNewTab(pidlDirectory, NULL, NULL, TRUE, &iTabObjectIndex);
-			}
-			else
-			{
-				hr = CreateNewTab(pidlDirectory, NULL, NULL, bSwitchToNewTab, &iTabObjectIndex);
-			}
-		}
+		hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory, wFlags);
 
 		if(SUCCEEDED(hr))
 		{
-			OnDirChanged(iTabObjectIndex);
+			PlayNavigationSound();
+		}
+
+		iTabObjectIndex = m_selectedTabId;
+	}
+	else
+	{
+		if(m_TabInfo.at(m_selectedTabId).bAddressLocked)
+		{
+			hr = CreateNewTab(pidlDirectory, NULL, NULL, TRUE, &iTabObjectIndex);
+		}
+		else
+		{
+			hr = CreateNewTab(pidlDirectory, NULL, NULL, bSwitchToNewTab, &iTabObjectIndex);
 		}
 	}
 
+	if(SUCCEEDED(hr))
+	{
+		OnDirChanged(iTabObjectIndex);
+	}
+
 	return hr;
+}
+
+void Explorerplusplus::OpenDirectoryInNewWindow(LPCITEMIDLIST pidlDirectory)
+{
+	TCHAR szPath[MAX_PATH];
+	TCHAR szParameters[512];
+
+	/* Create a new instance of this program, with the
+	specified path as an argument. */
+	GetDisplayName(pidlDirectory, szPath, SIZEOF_ARRAY(szPath), SHGDN_FORPARSING);
+	StringCchPrintf(szParameters, SIZEOF_ARRAY(szParameters), _T("\"%s\""), szPath);
+
+	ExecuteAndShowCurrentProcess(m_hContainer, szParameters);
 }
 
 void Explorerplusplus::PlayNavigationSound() const

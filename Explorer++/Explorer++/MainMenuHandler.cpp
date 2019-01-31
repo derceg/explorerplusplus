@@ -254,7 +254,7 @@ void Explorerplusplus::OnResolveLink()
 			StringCchCopy(szPath, SIZEOF_ARRAY(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			hr = BrowseFolder(szPath, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+			hr = BrowseFolder(szPath, SBSP_ABSOLUTE, TRUE, TRUE);
 
 			if(SUCCEEDED(hr))
 			{

@@ -37,7 +37,7 @@ Probably shouldn't
 return a HRESULT though. */
 void Plugins::TabsApi::create(std::wstring path)
 {
-	m_pexpp->BrowseFolder(path.c_str(), SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+	m_pexpp->BrowseFolder(path.c_str(), SBSP_ABSOLUTE, TRUE, TRUE);
 }
 
 int Plugins::TabsApi::move(int tabId, int newIndex)

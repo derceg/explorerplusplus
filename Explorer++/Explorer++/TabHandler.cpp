@@ -255,7 +255,7 @@ void Explorerplusplus::OnNewTab()
 		if(PathIsDirectory(FullItemPath))
 		{
 			bFolderSelected = TRUE;
-			BrowseFolder(FullItemPath, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+			BrowseFolder(FullItemPath, SBSP_ABSOLUTE, TRUE, TRUE);
 		}
 	}
 
@@ -263,10 +263,10 @@ void Explorerplusplus::OnNewTab()
 	item was not a folder; open the default tab directory. */
 	if(!bFolderSelected)
 	{
-		hr = BrowseFolder(m_DefaultTabDirectory, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+		hr = BrowseFolder(m_DefaultTabDirectory, SBSP_ABSOLUTE, TRUE, TRUE);
 
 		if(FAILED(hr))
-			BrowseFolder(m_DefaultTabDirectoryStatic, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+			BrowseFolder(m_DefaultTabDirectoryStatic, SBSP_ABSOLUTE, TRUE, TRUE);
 	}
 }
 
@@ -1089,7 +1089,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 					if(SUCCEEDED(hr))
 					{
-						BrowseFolder(pidlParent, SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+						BrowseFolder(pidlParent, SBSP_ABSOLUTE, TRUE, TRUE);
 						CoTaskMemFree(pidlParent);
 					}
 
@@ -1436,7 +1436,7 @@ void Explorerplusplus::DuplicateTab(int iTabInternal)
 	m_TabInfo[iTabInternal].shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
-	BrowseFolder(szTabDirectory,SBSP_ABSOLUTE,TRUE,FALSE,FALSE);
+	BrowseFolder(szTabDirectory,SBSP_ABSOLUTE,TRUE,FALSE);
 }
 
 int Explorerplusplus::GetCurrentTabId() const

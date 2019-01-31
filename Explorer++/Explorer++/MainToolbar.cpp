@@ -688,7 +688,7 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 
 		if (SUCCEEDED(hr))
 		{
-			m_pexpp->BrowseFolder(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY, FALSE, FALSE, FALSE);
+			m_pexpp->BrowseFolder(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY, FALSE, FALSE);
 
 			CoTaskMemFree(pidl);
 		}
@@ -705,7 +705,7 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 
 		if (SUCCEEDED(hr))
 		{
-			m_pexpp->BrowseFolder(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY, FALSE, FALSE, FALSE);
+			m_pexpp->BrowseFolder(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY, FALSE, FALSE);
 
 			CoTaskMemFree(pidl);
 		}

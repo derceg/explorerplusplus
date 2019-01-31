@@ -435,7 +435,7 @@ void Explorerplusplus::OnListViewMButtonUp(POINT *pt)
 
 							if(SUCCEEDED(hr))
 							{
-								BrowseFolder(szParsingPath, SBSP_ABSOLUTE, TRUE, FALSE, FALSE);
+								BrowseFolder(szParsingPath, SBSP_ABSOLUTE, TRUE, FALSE);
 							}
 						}
 					}

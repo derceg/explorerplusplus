@@ -307,9 +307,9 @@ void Explorerplusplus::OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL b
 void Explorerplusplus::OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	if(bOpenInNewWindow)
-		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,FALSE,FALSE,TRUE);
+		OpenDirectoryInNewWindow(pidlItem);
 	else if(m_config->alwaysOpenNewTab || bOpenInNewTab)
-		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,TRUE,TRUE,FALSE);
+		BrowseFolder(pidlItem,SBSP_SAMEBROWSER,TRUE,TRUE);
 	else
 		BrowseFolder(pidlItem,SBSP_SAMEBROWSER);
 }

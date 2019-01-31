@@ -908,7 +908,7 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 		else if(variantBookmark.type() == typeid(CBookmark))
 		{
 			CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
-			m_pexpp->BrowseFolder(Bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, FALSE, FALSE, FALSE);
+			m_pexpp->BrowseFolder(Bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, FALSE, FALSE);
 		}
 	}
 }

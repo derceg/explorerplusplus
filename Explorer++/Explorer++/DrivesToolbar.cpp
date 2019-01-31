@@ -76,7 +76,7 @@ INT_PTR CDrivesToolbar::OnMButtonUp(const POINTS *pts)
 		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
 		assert(itr != m_mapID.end());
 
-		m_pexpp->BrowseFolder(itr->second.c_str(), SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+		m_pexpp->BrowseFolder(itr->second.c_str(), SBSP_ABSOLUTE, TRUE, TRUE);
 	}
 
 	return 0;
@@ -164,7 +164,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 			if(iIndex != -1)
 			{
 				std::wstring Path = GetDrivePath(iIndex);
-				m_pexpp->BrowseFolder(Path.c_str(),SBSP_ABSOLUTE,FALSE,FALSE,FALSE);
+				m_pexpp->BrowseFolder(Path.c_str(),SBSP_ABSOLUTE,FALSE,FALSE);
 			}
 
 			return 0;
@@ -412,7 +412,7 @@ void CDrivesToolbar::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	switch(iCmd)
 	{
 	case MENU_ID_OPEN_IN_NEW_TAB:
-		m_pexpp->BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+		m_pexpp->BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE);
 		break;
 	}
 }

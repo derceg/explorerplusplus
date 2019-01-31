@@ -677,7 +677,7 @@ void CSearchDialog::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	{
 	case MENU_ID_OPEN_FILE_LOCATION:
 		{
-			m_pexpp->BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE,FALSE);
+			m_pexpp->BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE);
 
 			TCHAR szFilename[MAX_PATH];
 			LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
