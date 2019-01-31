@@ -38,6 +38,23 @@ void Plugins::TabsApi::create(std::wstring path)
 	m_pexpp->BrowseFolder(path.c_str(), SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
 }
 
+int Plugins::TabsApi::move(int tabId, int newIndex)
+{
+	auto tabInternal = m_pexpp->GetTab(tabId);
+
+	if (!tabInternal)
+	{
+		return -1;
+	}
+
+	if (newIndex < 0)
+	{
+		newIndex = m_pexpp->GetNumTabs();
+	}
+
+	return m_pexpp->MoveTab(*tabInternal, newIndex);
+}
+
 bool Plugins::TabsApi::close(int tabId)
 {
 	auto tabInternal = m_pexpp->GetTab(tabId);

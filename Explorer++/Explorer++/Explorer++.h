@@ -487,6 +487,8 @@ private:
 	void					PushGlobalSettingsToTab(int iTabId);
 	void					DuplicateTab(int iTabInternal);
 	boost::optional<TabInfo_t>	GetTab(int tabId);
+	int						GetNumTabs() const;
+	int						MoveTab(const TabInfo_t &tab, int newIndex);
 
 	/* Clone Window. */
 	void					OnCloneWindow(void);

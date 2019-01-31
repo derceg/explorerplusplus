@@ -68,6 +68,42 @@ BOOL TabCtrl_SwapItems(HWND hTabCtrl, int iItem1, int iItem2)
 	return TRUE;
 }
 
+int TabCtrl_MoveItem(HWND tabCtrl, int currentIndex, int newIndex)
+{
+	if (currentIndex == newIndex)
+	{
+		return currentIndex;
+	}
+
+	TCITEM tcItem;
+	TCHAR szText[512];
+	tcItem.mask = TCIF_TEXT | TCIF_PARAM | TCIF_IMAGE;
+	tcItem.pszText = szText;
+	tcItem.cchTextMax = SIZEOF_ARRAY(szText);
+	BOOL res = TabCtrl_GetItem(tabCtrl, currentIndex, &tcItem);
+
+	if (!res)
+	{
+		return currentIndex;
+	}
+
+	res = TabCtrl_DeleteItem(tabCtrl, currentIndex);
+
+	if (!res)
+	{
+		return currentIndex;
+	}
+
+	int insertedIndex = TabCtrl_InsertItem(tabCtrl, newIndex, &tcItem);
+
+	if (insertedIndex == -1)
+	{
+		return currentIndex;
+	}
+
+	return insertedIndex;
+}
+
 BOOL TabCtrl_SetItemText(HWND hTabCtrl, int iItem, const TCHAR *pszText)
 {
 	/* The const_cast below isn't

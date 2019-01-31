@@ -45,6 +45,7 @@ namespace Plugins
 
 		boost::optional<Tab> get(int tabId);
 		void create(std::wstring path);
+		int move(int tabId, int newIndex);
 		bool close(int tabId);
 
 	private:

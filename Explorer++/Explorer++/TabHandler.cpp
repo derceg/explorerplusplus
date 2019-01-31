@@ -1568,3 +1568,20 @@ boost::optional<TabInfo_t> Explorerplusplus::GetTab(int tabId)
 
 	return itr->second;
 }
+
+int Explorerplusplus::GetNumTabs() const
+{
+	return m_TabInfo.size();
+}
+
+int Explorerplusplus::MoveTab(const TabInfo_t &tab, int newIndex)
+{
+	auto index = GetTabIndex(tab);
+
+	if (!index)
+	{
+		return -1;
+	}
+
+	return TabCtrl_MoveItem(m_hTabCtrl, *index, newIndex);
+}

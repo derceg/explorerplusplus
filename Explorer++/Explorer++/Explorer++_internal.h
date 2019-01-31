@@ -49,6 +49,8 @@ __interface IExplorerplusplus
 	void			SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName);
 	void			RefreshTab(int iTabId);
 	int				GetCurrentTabId() const;
+	int				MoveTab(const TabInfo_t &tab, int newIndex);
+	int				GetNumTabs() const;
 	bool			CloseTab(const TabInfo_t &tab);
 
 	/* Temporary. */
