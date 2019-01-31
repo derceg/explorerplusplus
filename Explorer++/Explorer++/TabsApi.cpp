@@ -15,15 +15,6 @@ Plugins::TabsApi::~TabsApi()
 
 }
 
-/* TODO: This function
-should return a value.
-Probably shouldn't
-return a HRESULT though. */
-void Plugins::TabsApi::create(std::wstring path)
-{
-	m_pexpp->BrowseFolder(path.c_str(), SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
-}
-
 boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 {
 	auto tabInternal = m_pexpp->GetTab(tabId);
@@ -36,4 +27,25 @@ boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 	Tab tab(*tabInternal);
 
 	return tab;
+}
+
+/* TODO: This function
+should return a value.
+Probably shouldn't
+return a HRESULT though. */
+void Plugins::TabsApi::create(std::wstring path)
+{
+	m_pexpp->BrowseFolder(path.c_str(), SBSP_ABSOLUTE, TRUE, TRUE, FALSE);
+}
+
+bool Plugins::TabsApi::close(int tabId)
+{
+	auto tabInternal = m_pexpp->GetTab(tabId);
+
+	if (!tabInternal)
+	{
+		return false;
+	}
+
+	return m_pexpp->CloseTab(*tabInternal);
 }

@@ -43,8 +43,9 @@ namespace Plugins
 		TabsApi(IExplorerplusplus *pexpp);
 		~TabsApi();
 
-		void create(std::wstring path);
 		boost::optional<Tab> get(int tabId);
+		void create(std::wstring path);
+		bool close(int tabId);
 
 	private:
 
