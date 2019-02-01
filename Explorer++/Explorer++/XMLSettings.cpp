@@ -648,7 +648,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 	BSTR						bstr = NULL;
 	HRESULT						hr;
 	InitialSettings_t			*pSettings = NULL;
-	Tab					*pTabInfo = NULL;
+	TabSettings					*pTabSettings = NULL;
 	TCHAR						szDirectory[MAX_PATH];
 	std::list<Column_t>			RealFolderColumnList;
 	std::list<Column_t>			MyComputerColumnList;
@@ -677,7 +677,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 		pNodes->get_length(&length);
 
 		pSettings = (InitialSettings_t *)malloc(sizeof(InitialSettings_t) * length);
-		pTabInfo = (Tab *)malloc(sizeof(Tab) * length);
+		pTabSettings = (TabSettings *)malloc(sizeof(TabSettings) * length);
 
 		for(long i = 0;i < length;i++)
 		{
@@ -704,7 +704,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 					attached to this node. */
 					am->get_length(&lChildNodes);
 
-					SetDefaultTabSettings(&pTabInfo[i]);
+					SetDefaultTabSettings(&pTabSettings[i]);
 
 					/* For each tab, the first attribute will just be
 					a tab number (0,1,2...). This number can be safely
@@ -722,7 +722,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 						if(lstrcmp(bstrName,L"Directory") == 0)
 							StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),bstrValue);
 						else
-							MapTabAttributeValue(bstrName,bstrValue,&pSettings[i],&pTabInfo[i]);
+							MapTabAttributeValue(bstrName,bstrValue,&pSettings[i],&pTabSettings[i]);
 					}
 
 					pSettings[i].bShowFolderSizes = m_config->showFolderSizes;
@@ -805,7 +805,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 				}
 			}
 
-			hr = CreateNewTab(szDirectory,&pSettings[i],&pTabInfo[i],TRUE,NULL);
+			hr = CreateNewTab(szDirectory,&pSettings[i],&pTabSettings[i],TRUE,NULL);
 
 			if(hr == S_OK)
 				nTabsCreated++;
@@ -814,7 +814,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 			pNode = NULL;
 		}
 
-		free(pTabInfo);
+		free(pTabSettings);
 		free(pSettings);
 	}
 
@@ -1911,7 +1911,7 @@ WCHAR *wszName,WCHAR *wszValue)
 }
 
 void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,
-InitialSettings_t *pSettings,Tab *pTabInfo)
+InitialSettings_t *pSettings,TabSettings *pTabSettings)
 {
 	if(lstrcmp(wszName,L"ApplyFilter") == 0)
 	{
@@ -1956,20 +1956,20 @@ InitialSettings_t *pSettings,Tab *pTabInfo)
 	}
 	else if(lstrcmp(wszName,L"Locked") == 0)
 	{
-		pTabInfo->bLocked = NXMLSettings::DecodeBoolValue(wszValue);
+		pTabSettings->bLocked = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"AddressLocked") == 0)
 	{
-		pTabInfo->bAddressLocked = NXMLSettings::DecodeBoolValue(wszValue);
+		pTabSettings->bAddressLocked = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"UseCustomName") == 0)
 	{
-		pTabInfo->bUseCustomName = NXMLSettings::DecodeBoolValue(wszValue);
+		pTabSettings->bUseCustomName = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"CustomName") == 0)
 	{
-		StringCchCopy(pTabInfo->szName,
-			SIZEOF_ARRAY(pTabInfo->szName),wszValue);
+		StringCchCopy(pTabSettings->szName,
+			SIZEOF_ARRAY(pTabSettings->szName),wszValue);
 	}
 }
 

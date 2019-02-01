@@ -557,7 +557,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 	HKEY				hTabKey;
 	HKEY				hColumnsKey;
 	InitialSettings_t	Settings;
-	Tab			TabInfo;
+	TabSettings			TabSettings;
 	TCHAR				szItemKey[128];
 	LPITEMIDLIST		pidlDirectory = NULL;
 	LONG				ReturnValue;
@@ -670,13 +670,13 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			Settings.pRecycleBinColumnList			= &RecycleBinColumnList;
 
 			/* High-level settings. */
-			SetDefaultTabSettings(&TabInfo);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("Locked"),(LPDWORD)&TabInfo.bLocked);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("AddressLocked"),(LPDWORD)&TabInfo.bAddressLocked);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("UseCustomName"),(LPDWORD)&TabInfo.bUseCustomName);
-			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("CustomName"),TabInfo.szName,SIZEOF_ARRAY(TabInfo.szName));
+			SetDefaultTabSettings(&TabSettings);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("Locked"),(LPDWORD)&TabSettings.bLocked);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("AddressLocked"),(LPDWORD)&TabSettings.bAddressLocked);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("UseCustomName"),(LPDWORD)&TabSettings.bUseCustomName);
+			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("CustomName"),TabSettings.szName,SIZEOF_ARRAY(TabSettings.szName));
 
-			hr = CreateNewTab(pidlDirectory,&Settings,&TabInfo,TRUE,NULL);
+			hr = CreateNewTab(pidlDirectory,&Settings,&TabSettings,TRUE,NULL);
 
 			if(hr == S_OK)
 				nTabsCreated++;

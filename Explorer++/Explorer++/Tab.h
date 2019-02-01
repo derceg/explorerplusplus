@@ -6,6 +6,15 @@
 
 #include "ShellBrowser/iShellView.h"
 
+// Used when creating a tab.
+struct TabSettings
+{
+	BOOL	bLocked;
+	BOOL	bAddressLocked;
+	BOOL	bUseCustomName;
+	TCHAR	szName[MAX_PATH];
+};
+
 struct Tab
 {
 	int		id;

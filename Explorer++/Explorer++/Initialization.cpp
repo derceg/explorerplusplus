@@ -394,11 +394,11 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu)
 	}
 }
 
-void Explorerplusplus::SetDefaultTabSettings(Tab *pTabInfo)
+void Explorerplusplus::SetDefaultTabSettings(TabSettings *pTabSettings)
 {
-	pTabInfo->bLocked			= FALSE;
-	pTabInfo->bAddressLocked	= FALSE;
-	pTabInfo->bUseCustomName	= FALSE;
-	StringCchCopy(pTabInfo->szName,
-		SIZEOF_ARRAY(pTabInfo->szName),EMPTY_STRING);
+	pTabSettings->bLocked			= FALSE;
+	pTabSettings->bAddressLocked	= FALSE;
+	pTabSettings->bUseCustomName	= FALSE;
+	StringCchCopy(pTabSettings->szName,
+		SIZEOF_ARRAY(pTabSettings->szName),EMPTY_STRING);
 }

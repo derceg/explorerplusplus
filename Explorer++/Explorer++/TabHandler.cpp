@@ -273,7 +273,7 @@ void Explorerplusplus::OnNewTab()
 }
 
 HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
-InitialSettings_t *pSettings,Tab *pTabInfo,BOOL bSwitchToNewTab,
+InitialSettings_t *pSettings, TabSettings *pTabSettings,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
 	LPITEMIDLIST	pidl = NULL;
@@ -295,7 +295,7 @@ int *pTabObjectIndex)
 	if(!SUCCEEDED(GetIdlFromParsingName(szExpandedPath,&pidl)))
 		return E_FAIL;
 
-	hr = CreateNewTab(pidl,pSettings,pTabInfo,bSwitchToNewTab,pTabObjectIndex);
+	hr = CreateNewTab(pidl,pSettings,pTabSettings,bSwitchToNewTab,pTabObjectIndex);
 
 	CoTaskMemFree(pidl);
 
@@ -305,7 +305,7 @@ int *pTabObjectIndex)
 /* Creates a new tab. If the settings argument is NULL,
 the global settings will be used. */
 HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
-InitialSettings_t *pSettings,Tab *pTabInfo,BOOL bSwitchToNewTab,
+InitialSettings_t *pSettings,TabSettings *pTabSettings,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
 	UINT				uFlags;
@@ -324,7 +324,7 @@ int *pTabObjectIndex)
 
 	iTabId = m_tabIdCounter++;
 
-	if(pTabInfo == NULL)
+	if(pTabSettings == NULL)
 	{
 		m_Tabs[iTabId].bLocked			= FALSE;
 		m_Tabs[iTabId].bAddressLocked	= FALSE;
@@ -332,7 +332,14 @@ int *pTabObjectIndex)
 	}
 	else
 	{
-		m_Tabs[iTabId] = *pTabInfo;
+		m_Tabs[iTabId].bLocked = pTabSettings->bLocked;
+		m_Tabs[iTabId].bAddressLocked = pTabSettings->bAddressLocked;
+		m_Tabs[iTabId].bUseCustomName = pTabSettings->bUseCustomName;
+
+		if (pTabSettings->bUseCustomName)
+		{
+			StringCchCopy(m_Tabs[iTabId].szName, SIZEOF_ARRAY(m_Tabs[iTabId].szName), pTabSettings->szName);
+		}
 	}
 
 	m_Tabs[iTabId].id = iTabId;

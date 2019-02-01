@@ -471,8 +471,8 @@ private:
 	void					InitializeTabs(void);
 	void					AddDefaultTabIcons(HIMAGELIST himlTab);
 	void					SelectAdjacentTab(BOOL bNextTab);
-	HRESULT					CreateNewTab(const TCHAR *TabDirectory,InitialSettings_t *pSettings,Tab *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
-	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory,InitialSettings_t *pSettings,Tab *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
+	HRESULT					CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
+	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
 	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(int iTab);
@@ -596,7 +596,7 @@ private:
 	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
 
 	/* Default settings. */
-	void					SetDefaultTabSettings(Tab *pTabInfo);
+	void					SetDefaultTabSettings(TabSettings *pTabSettings);
 
 	/* Arrange menu. */
 	void					InitializeArrangeMenuItems(void);
@@ -690,7 +690,7 @@ private:
 	void					LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom);
 	void					SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
 	void					MapAttributeToValue(IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
-	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,Tab *pTabInfo);
+	void					MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, InitialSettings_t *pSettings, TabSettings *pTabSettings);
 
 	/* IExplorerplusplus methods. */
 	HWND					GetActiveListView() const;

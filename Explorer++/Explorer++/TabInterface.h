@@ -22,8 +22,8 @@ __interface TabInterface
 	int				GetNumTabs() const;
 	bool			CloseTab(const Tab &tab);
 
-	HRESULT			CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, Tab *pTabInfo, BOOL bSwitchToNewTab, int *pTabObjectIndex);
-	HRESULT			CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, Tab *pTabInfo, BOOL bSwitchToNewTab, int *pTabObjectIndex);
+	HRESULT			CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
+	HRESULT			CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
 
 	/* Temporary. */
 	void			SetTabSelection(int Index);
