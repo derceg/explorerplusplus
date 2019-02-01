@@ -273,7 +273,7 @@ void Explorerplusplus::OnNewTab()
 }
 
 HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
-InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,
+InitialSettings_t *pSettings,Tab *pTabInfo,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
 	LPITEMIDLIST	pidl = NULL;
@@ -305,7 +305,7 @@ int *pTabObjectIndex)
 /* Creates a new tab. If the settings argument is NULL,
 the global settings will be used. */
 HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
-InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,
+InitialSettings_t *pSettings,Tab *pTabInfo,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
 	UINT				uFlags;
@@ -720,7 +720,7 @@ void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 	OnTabChangeInternal(TRUE);
 }
 
-void Explorerplusplus::OnSelectTab(const TabInfo_t &tab, BOOL setFocus)
+void Explorerplusplus::OnSelectTab(const Tab &tab, BOOL setFocus)
 {
 	auto index = GetTabIndex(tab);
 
@@ -733,7 +733,7 @@ void Explorerplusplus::OnSelectTab(const TabInfo_t &tab, BOOL setFocus)
 	OnSelectTabByIndex(*index, setFocus);
 }
 
-boost::optional<int> Explorerplusplus::GetTabIndex(const TabInfo_t &tab)
+boost::optional<int> Explorerplusplus::GetTabIndex(const Tab &tab)
 {
 	int numTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
@@ -752,7 +752,7 @@ boost::optional<int> Explorerplusplus::GetTabIndex(const TabInfo_t &tab)
 	return boost::none;
 }
 
-boost::optional<TabInfo_t> Explorerplusplus::GetTabByIndex(int index)
+boost::optional<Tab> Explorerplusplus::GetTabByIndex(int index)
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
@@ -806,7 +806,7 @@ bool Explorerplusplus::OnCloseTab(void)
 	return CloseTab(*tab);
 }
 
-bool Explorerplusplus::CloseTab(const TabInfo_t &tab)
+bool Explorerplusplus::CloseTab(const Tab &tab)
 {
 	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
@@ -1564,7 +1564,7 @@ void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 	m_Tabs[iTabId].shellBrower->SetGlobalSettings(&gs);
 }
 
-boost::optional<TabInfo_t> Explorerplusplus::GetTab(int tabId)
+boost::optional<Tab> Explorerplusplus::GetTab(int tabId)
 {
 	auto itr = m_Tabs.find(tabId);
 
@@ -1581,7 +1581,7 @@ int Explorerplusplus::GetNumTabs() const
 	return m_Tabs.size();
 }
 
-int Explorerplusplus::MoveTab(const TabInfo_t &tab, int newIndex)
+int Explorerplusplus::MoveTab(const Tab &tab, int newIndex)
 {
 	auto index = GetTabIndex(tab);
 
@@ -1593,7 +1593,7 @@ int Explorerplusplus::MoveTab(const TabInfo_t &tab, int newIndex)
 	return TabCtrl_MoveItem(m_hTabCtrl, *index, newIndex);
 }
 
-const std::unordered_map<int, TabInfo_t> &Explorerplusplus::GetAllTabs() const
+const std::unordered_map<int, Tab> &Explorerplusplus::GetAllTabs() const
 {
 	return m_Tabs;
 }

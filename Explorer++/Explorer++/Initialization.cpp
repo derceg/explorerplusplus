@@ -394,7 +394,7 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu)
 	}
 }
 
-void Explorerplusplus::SetDefaultTabSettings(TabInfo_t *pTabInfo)
+void Explorerplusplus::SetDefaultTabSettings(Tab *pTabInfo)
 {
 	pTabInfo->bLocked			= FALSE;
 	pTabInfo->bAddressLocked	= FALSE;

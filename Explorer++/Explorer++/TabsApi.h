@@ -21,7 +21,7 @@ namespace Plugins
 			bool locked;
 			bool addressLocked;
 
-			Tab(const TabInfo_t &tabInternal)
+			Tab(const ::Tab &tabInternal)
 			{
 				TCHAR path[MAX_PATH];
 				tabInternal.shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(path), path);

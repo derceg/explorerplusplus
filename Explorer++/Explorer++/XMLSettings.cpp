@@ -648,7 +648,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 	BSTR						bstr = NULL;
 	HRESULT						hr;
 	InitialSettings_t			*pSettings = NULL;
-	TabInfo_t					*pTabInfo = NULL;
+	Tab					*pTabInfo = NULL;
 	TCHAR						szDirectory[MAX_PATH];
 	std::list<Column_t>			RealFolderColumnList;
 	std::list<Column_t>			MyComputerColumnList;
@@ -677,7 +677,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 		pNodes->get_length(&length);
 
 		pSettings = (InitialSettings_t *)malloc(sizeof(InitialSettings_t) * length);
-		pTabInfo = (TabInfo_t *)malloc(sizeof(TabInfo_t) * length);
+		pTabInfo = (Tab *)malloc(sizeof(Tab) * length);
 
 		for(long i = 0;i < length;i++)
 		{
@@ -1911,7 +1911,7 @@ WCHAR *wszName,WCHAR *wszValue)
 }
 
 void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,
-InitialSettings_t *pSettings,TabInfo_t *pTabInfo)
+InitialSettings_t *pSettings,Tab *pTabInfo)
 {
 	if(lstrcmp(wszName,L"ApplyFilter") == 0)
 	{

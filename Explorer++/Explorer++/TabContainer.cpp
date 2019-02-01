@@ -7,7 +7,7 @@
 #include "Explorer++_internal.h"
 
 
-CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, TabInfo_t> *tabInfo, TabInterface *ti) :
+CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInfo, TabInterface *ti) :
 m_hTabCtrl(hTabCtrl),
 m_tabInfo(tabInfo),
 m_ti(ti)

@@ -11,19 +11,19 @@ __interface TabInterface
 {
 	/* TODO: Ideally, there would be a method of iterating over the tabs
 	without having access to the underlying container. */
-	const std::unordered_map<int, TabInfo_t>	&GetAllTabs() const;
+	const std::unordered_map<int, Tab>	&GetAllTabs() const;
 
-	boost::optional<TabInfo_t>	GetTab(int tabId);
+	boost::optional<Tab>	GetTab(int tabId);
 	std::wstring	GetTabName(int iTab);
 	void			SetTabName(int iTab, std::wstring strName, BOOL bUseCustomName);
 	void			RefreshTab(int iTabId);
 	int				GetCurrentTabId() const;
-	int				MoveTab(const TabInfo_t &tab, int newIndex);
+	int				MoveTab(const Tab &tab, int newIndex);
 	int				GetNumTabs() const;
-	bool			CloseTab(const TabInfo_t &tab);
+	bool			CloseTab(const Tab &tab);
 
-	HRESULT			CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, TabInfo_t *pTabInfo, BOOL bSwitchToNewTab, int *pTabObjectIndex);
-	HRESULT			CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, TabInfo_t *pTabInfo, BOOL bSwitchToNewTab, int *pTabObjectIndex);
+	HRESULT			CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, Tab *pTabInfo, BOOL bSwitchToNewTab, int *pTabObjectIndex);
+	HRESULT			CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, Tab *pTabInfo, BOOL bSwitchToNewTab, int *pTabObjectIndex);
 
 	/* Temporary. */
 	void			SetTabSelection(int Index);

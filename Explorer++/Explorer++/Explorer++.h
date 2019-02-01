@@ -362,12 +362,12 @@ private:
 	LRESULT					OnCustomDraw(LPARAM lParam);
 	void					OnSortBy(SortMode sortMode);
 	void					OnGroupBy(SortMode sortMode);
-	void					OnSelectTab(const TabInfo_t &tab, BOOL setFocus);
-	boost::optional<int>	GetTabIndex(const TabInfo_t &tab);
-	boost::optional<TabInfo_t>	GetTabByIndex(int index);
+	void					OnSelectTab(const Tab &tab, BOOL setFocus);
+	boost::optional<int>	GetTabIndex(const Tab &tab);
+	boost::optional<Tab>	GetTabByIndex(int index);
 	void					OnSelectTabByIndex(int iTab);
 	void					OnSelectTabByIndex(int iTab,BOOL bSetFocus);
-	const std::unordered_map<int, TabInfo_t>	&GetAllTabs() const;
+	const std::unordered_map<int, Tab>	&GetAllTabs() const;
 
 	/* Navigation. */
 	void					OnBrowseBack();
@@ -471,10 +471,10 @@ private:
 	void					InitializeTabs(void);
 	void					AddDefaultTabIcons(HIMAGELIST himlTab);
 	void					SelectAdjacentTab(BOOL bNextTab);
-	HRESULT					CreateNewTab(const TCHAR *TabDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
-	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory,InitialSettings_t *pSettings,TabInfo_t *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
+	HRESULT					CreateNewTab(const TCHAR *TabDirectory,InitialSettings_t *pSettings,Tab *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
+	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory,InitialSettings_t *pSettings,Tab *pTabInfo,BOOL bSwitchToNewTab,int *pTabObjectIndex);
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
-	bool					CloseTab(const TabInfo_t &tab);
+	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(int iTab);
 	bool					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
@@ -487,9 +487,9 @@ private:
 	void					SetTabSelection(int Index);
 	void					PushGlobalSettingsToTab(int iTabId);
 	void					DuplicateTab(int iTabInternal);
-	boost::optional<TabInfo_t>	GetTab(int tabId);
+	boost::optional<Tab>	GetTab(int tabId);
 	int						GetNumTabs() const;
-	int						MoveTab(const TabInfo_t &tab, int newIndex);
+	int						MoveTab(const Tab &tab, int newIndex);
 
 	/* Clone Window. */
 	void					OnCloneWindow(void);
@@ -596,7 +596,7 @@ private:
 	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
 
 	/* Default settings. */
-	void					SetDefaultTabSettings(TabInfo_t *pTabInfo);
+	void					SetDefaultTabSettings(Tab *pTabInfo);
 
 	/* Arrange menu. */
 	void					InitializeArrangeMenuItems(void);
@@ -690,7 +690,7 @@ private:
 	void					LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom);
 	void					SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
 	void					MapAttributeToValue(IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
-	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,TabInfo_t *pTabInfo);
+	void					MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,InitialSettings_t *pSettings,Tab *pTabInfo);
 
 	/* IExplorerplusplus methods. */
 	HWND					GetActiveListView() const;
@@ -784,7 +784,7 @@ private:
 	HFONT					m_DisplayWindowFont;
 
 	/* Tabs. */
-	std::unordered_map<int, TabInfo_t> m_Tabs;
+	std::unordered_map<int, Tab> m_Tabs;
 	int						m_tabIdCounter;
 
 	HWND					m_hActiveListView;

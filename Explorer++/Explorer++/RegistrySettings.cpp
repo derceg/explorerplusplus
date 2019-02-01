@@ -557,7 +557,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 	HKEY				hTabKey;
 	HKEY				hColumnsKey;
 	InitialSettings_t	Settings;
-	TabInfo_t			TabInfo;
+	Tab			TabInfo;
 	TCHAR				szItemKey[128];
 	LPITEMIDLIST		pidlDirectory = NULL;
 	LONG				ReturnValue;

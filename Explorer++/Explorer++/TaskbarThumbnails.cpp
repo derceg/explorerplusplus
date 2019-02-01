@@ -544,7 +544,7 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 
 					if((int)tcItem.lParam == iTabId)
 					{
-						TabInfo_t tab = m_Tabs.at(iTabId);
+						Tab tab = m_Tabs.at(iTabId);
 						CloseTab(tab);
 						break;
 					}

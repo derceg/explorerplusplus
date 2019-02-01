@@ -6,7 +6,7 @@
 
 #include "ShellBrowser/iShellView.h"
 
-struct TabInfo_t
+struct Tab
 {
 	int		id;
 	HWND	listView;
