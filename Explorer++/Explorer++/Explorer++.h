@@ -367,6 +367,7 @@ private:
 	boost::optional<TabInfo_t>	GetTabByIndex(int index);
 	void					OnSelectTabByIndex(int iTab);
 	void					OnSelectTabByIndex(int iTab,BOOL bSetFocus);
+	const std::unordered_map<int, TabInfo_t>	&GetAllTabs() const;
 
 	/* Navigation. */
 	void					OnBrowseBack();

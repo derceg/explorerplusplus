@@ -9,6 +9,10 @@
 
 __interface TabInterface
 {
+	/* TODO: Ideally, there would be a method of iterating over the tabs
+	without having access to the underlying container. */
+	const std::unordered_map<int, TabInfo_t>	&GetAllTabs() const;
+
 	boost::optional<TabInfo_t>	GetTab(int tabId);
 	std::wstring	GetTabName(int iTab);
 	void			SetTabName(int iTab, std::wstring strName, BOOL bUseCustomName);

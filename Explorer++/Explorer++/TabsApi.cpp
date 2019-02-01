@@ -16,6 +16,19 @@ Plugins::TabsApi::~TabsApi()
 
 }
 
+std::vector<Plugins::TabsApi::Tab> Plugins::TabsApi::getAll()
+{
+	std::vector<Tab> tabs;
+
+	for (auto item : m_ti->GetAllTabs())
+	{
+		Tab tab(item.second);
+		tabs.push_back(tab);
+	}
+
+	return tabs;
+}
+
 boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 {
 	auto tabInternal = m_ti->GetTab(tabId);

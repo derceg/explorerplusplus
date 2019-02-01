@@ -43,6 +43,7 @@ namespace Plugins
 		TabsApi(TabInterface *ti);
 		~TabsApi();
 
+		std::vector<Tab> getAll();
 		boost::optional<Tab> get(int tabId);
 		void create(std::wstring path);
 		int move(int tabId, int newIndex);

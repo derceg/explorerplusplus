@@ -1592,3 +1592,8 @@ int Explorerplusplus::MoveTab(const TabInfo_t &tab, int newIndex)
 
 	return TabCtrl_MoveItem(m_hTabCtrl, *index, newIndex);
 }
+
+const std::unordered_map<int, TabInfo_t> &Explorerplusplus::GetAllTabs() const
+{
+	return m_TabInfo;
+}

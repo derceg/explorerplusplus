@@ -25,6 +25,7 @@ void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabInterface *ti)
 	sol::table tabsTable = state.create_named_table("tabs");
 
 	sol::table metaTable = state.create_table();
+	metaTable.set_function("getAll", &Plugins::TabsApi::getAll, tabsApi);
 	metaTable.set_function("get", &Plugins::TabsApi::get, tabsApi);
 	metaTable.set_function("create", &Plugins::TabsApi::create, tabsApi);
 	metaTable.set_function("move", &Plugins::TabsApi::move, tabsApi);
