@@ -12,10 +12,11 @@
 #include <algorithm>
 
 
-CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, IExplorerplusplus *pexpp, CBookmarkFolder &AllBookmarks,
-	const GUID &guidBookmarksToolbar, UINT uIDStart, UINT uIDEnd) :
+CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, IExplorerplusplus *pexpp, TabInterface *ti,
+	CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar, UINT uIDStart, UINT uIDEnd) :
 m_hToolbar(hToolbar),
 m_pexpp(pexpp),
+m_ti(ti),
 m_AllBookmarks(AllBookmarks),
 m_guidBookmarksToolbar(guidBookmarksToolbar),
 m_uIDStart(uIDStart),
@@ -105,14 +106,14 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 							if (variantBookmarkChild.type() == typeid(CBookmark))
 							{
 								CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkChild);
-								m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, TRUE, FALSE);
+								m_ti->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, nullptr, FALSE, nullptr);
 							}
 						}
 					}
 					else
 					{
 						CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-						m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, TRUE, FALSE);
+						m_ti->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, nullptr, FALSE, nullptr);
 					}
 				}
 			}
@@ -194,7 +195,7 @@ bool CBookmarksToolbar::OnCommand(WPARAM wParam, LPARAM lParam)
 	if (variantBookmarkItem->type() == typeid(CBookmark))
 	{
 		CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-		m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE, FALSE, FALSE);
+		m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 	}
 
 	return true;

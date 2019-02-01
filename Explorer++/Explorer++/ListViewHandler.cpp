@@ -435,7 +435,7 @@ void Explorerplusplus::OnListViewMButtonUp(POINT *pt)
 
 							if(SUCCEEDED(hr))
 							{
-								BrowseFolder(szParsingPath, SBSP_ABSOLUTE, TRUE, FALSE);
+								CreateNewTab(szParsingPath, nullptr, nullptr, FALSE, nullptr);
 							}
 						}
 					}

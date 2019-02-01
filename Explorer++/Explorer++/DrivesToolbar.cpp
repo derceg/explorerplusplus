@@ -13,17 +13,18 @@
 #include "../Helper/ShellHelper.h"
 
 
-CDrivesToolbar *CDrivesToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp)
+CDrivesToolbar *CDrivesToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp, TabInterface *ti)
 {
-	return new CDrivesToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp);
+	return new CDrivesToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp, ti);
 }
 
-CDrivesToolbar::CDrivesToolbar(HWND hParent,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
+CDrivesToolbar::CDrivesToolbar(HWND hParent,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp,TabInterface *ti) :
 CBaseWindow(CreateDrivesToolbar(hParent)),
 m_uIDStart(uIDStart),
 m_uIDEnd(uIDEnd),
 m_hInstance(hInstance),
 m_pexpp(pexpp),
+m_ti(ti),
 m_IDCounter(0)
 {
 	Initialize(hParent);
@@ -76,7 +77,7 @@ INT_PTR CDrivesToolbar::OnMButtonUp(const POINTS *pts)
 		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
 		assert(itr != m_mapID.end());
 
-		m_pexpp->BrowseFolder(itr->second.c_str(), SBSP_ABSOLUTE, TRUE, TRUE);
+		m_ti->CreateNewTab(itr->second.c_str(), nullptr, nullptr, TRUE, nullptr);
 	}
 
 	return 0;
@@ -164,7 +165,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 			if(iIndex != -1)
 			{
 				std::wstring Path = GetDrivePath(iIndex);
-				m_pexpp->BrowseFolder(Path.c_str(),SBSP_ABSOLUTE,FALSE,FALSE);
+				m_pexpp->BrowseFolder(Path.c_str(),SBSP_ABSOLUTE);
 			}
 
 			return 0;
@@ -412,7 +413,7 @@ void CDrivesToolbar::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	switch(iCmd)
 	{
 	case MENU_ID_OPEN_IN_NEW_TAB:
-		m_pexpp->BrowseFolder(pidlParent,SBSP_ABSOLUTE,TRUE,TRUE);
+		m_ti->CreateNewTab(pidlParent, nullptr, nullptr, TRUE, nullptr);
 		break;
 	}
 }

@@ -101,7 +101,7 @@ void Explorerplusplus::OnSearch()
 		TCHAR szCurrentDirectory[MAX_PATH];
 		m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
 
-		CSearchDialog *SearchDialog = new CSearchDialog(m_hLanguageModule, IDD_SEARCH, m_hContainer, szCurrentDirectory, this);
+		CSearchDialog *SearchDialog = new CSearchDialog(m_hLanguageModule, IDD_SEARCH, m_hContainer, szCurrentDirectory, this, this);
 		g_hwndSearch = SearchDialog->ShowModelessDialog(new CModelessDialogNotification());
 	}
 	else
@@ -254,7 +254,7 @@ void Explorerplusplus::OnResolveLink()
 			StringCchCopy(szPath, SIZEOF_ARRAY(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			hr = BrowseFolder(szPath, SBSP_ABSOLUTE, TRUE, TRUE);
+			hr = CreateNewTab(szPath, nullptr, nullptr, TRUE, nullptr);
 
 			if(SUCCEEDED(hr))
 			{

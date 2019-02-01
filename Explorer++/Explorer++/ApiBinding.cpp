@@ -16,7 +16,11 @@ void Plugins::BindAllApiMethods(sol::state &state, IExplorerplusplus *pexpp, Tab
 
 void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabInterface *ti)
 {
-	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(pexpp, ti);
+	// This parameter is likely to be used again when other API methods
+	// are added.
+	UNREFERENCED_PARAMETER(pexpp);
+
+	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(ti);
 
 	sol::table tabsTable = state.create_named_table("tabs");
 

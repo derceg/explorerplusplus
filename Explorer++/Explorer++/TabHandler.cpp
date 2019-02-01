@@ -255,7 +255,7 @@ void Explorerplusplus::OnNewTab()
 		if(PathIsDirectory(FullItemPath))
 		{
 			bFolderSelected = TRUE;
-			BrowseFolder(FullItemPath, SBSP_ABSOLUTE, TRUE, TRUE);
+			CreateNewTab(FullItemPath, nullptr, nullptr, TRUE, nullptr);
 		}
 	}
 
@@ -263,10 +263,12 @@ void Explorerplusplus::OnNewTab()
 	item was not a folder; open the default tab directory. */
 	if(!bFolderSelected)
 	{
-		hr = BrowseFolder(m_DefaultTabDirectory, SBSP_ABSOLUTE, TRUE, TRUE);
+		hr = CreateNewTab(m_DefaultTabDirectory, nullptr, nullptr, TRUE, nullptr);
 
-		if(FAILED(hr))
-			BrowseFolder(m_DefaultTabDirectoryStatic, SBSP_ABSOLUTE, TRUE, TRUE);
+		if (FAILED(hr))
+		{
+			CreateNewTab(m_DefaultTabDirectoryStatic, nullptr, nullptr, TRUE, nullptr);
+		}
 	}
 }
 
@@ -491,6 +493,11 @@ int *pTabObjectIndex)
 	a proxy window for each tab. This proxy window
 	will create the taskbar thumbnail for that tab. */
 	CreateTabProxy(iTabId,bSwitchToNewTab);
+
+	if (bSwitchToNewTab)
+	{
+		OnDirChanged(iTabId);
+	}
 
 	return S_OK;
 }
@@ -1089,7 +1096,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 					if(SUCCEEDED(hr))
 					{
-						BrowseFolder(pidlParent, SBSP_ABSOLUTE, TRUE, TRUE);
+						CreateNewTab(pidlParent, nullptr, nullptr, TRUE, nullptr);
 						CoTaskMemFree(pidlParent);
 					}
 
@@ -1436,7 +1443,7 @@ void Explorerplusplus::DuplicateTab(int iTabInternal)
 	m_TabInfo[iTabInternal].shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
-	BrowseFolder(szTabDirectory,SBSP_ABSOLUTE,TRUE,FALSE);
+	CreateNewTab(szTabDirectory, nullptr, nullptr, FALSE, nullptr);
 }
 
 int Explorerplusplus::GetCurrentTabId() const

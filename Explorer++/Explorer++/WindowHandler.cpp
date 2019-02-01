@@ -142,14 +142,14 @@ void Explorerplusplus::CreateBookmarksToolbar(void)
 		TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DRAWDDARROWS|
 		TBSTYLE_EX_DOUBLEBUFFER|TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
-	m_pBookmarksToolbar = new CBookmarksToolbar(m_hBookmarksToolbar, this,
+	m_pBookmarksToolbar = new CBookmarksToolbar(m_hBookmarksToolbar, this, this,
 		*m_bfAllBookmarks,m_guidBookmarksToolbar,TOOLBAR_BOOKMARK_START,TOOLBAR_BOOKMARK_END);
 }
 
 void Explorerplusplus::CreateDrivesToolbar(void)
 {
 	 m_pDrivesToolbar = CDrivesToolbar::Create(m_hMainRebar, TOOLBAR_DRIVES_ID_START,
-		TOOLBAR_DRIVES_ID_END, m_hLanguageModule, this);
+		TOOLBAR_DRIVES_ID_END, m_hLanguageModule, this, this);
 }
 
 void Explorerplusplus::CreateApplicationToolbar()

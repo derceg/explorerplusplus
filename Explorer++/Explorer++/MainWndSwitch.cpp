@@ -213,15 +213,15 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 			if (pcds->lpData != NULL)
 			{
-				BrowseFolder((TCHAR *)pcds->lpData, SBSP_ABSOLUTE, TRUE, TRUE);
+				CreateNewTab((TCHAR *)pcds->lpData, nullptr, nullptr, TRUE, nullptr);
 			}
 			else
 			{
-				HRESULT hr = BrowseFolder(m_DefaultTabDirectory, SBSP_ABSOLUTE, TRUE, TRUE);
+				HRESULT hr = CreateNewTab(m_DefaultTabDirectory, nullptr, nullptr, TRUE, nullptr);
 
 				if (FAILED(hr))
 				{
-					BrowseFolder(m_DefaultTabDirectoryStatic, SBSP_ABSOLUTE, TRUE, TRUE);
+					CreateNewTab(m_DefaultTabDirectoryStatic, nullptr, nullptr, TRUE, nullptr);
 				}
 			}
 

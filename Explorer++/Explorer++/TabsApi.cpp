@@ -5,8 +5,7 @@
 #include "stdafx.h"
 #include "TabsAPI.h"
 
-Plugins::TabsApi::TabsApi(IExplorerplusplus *pexpp, TabInterface *ti) :
-	m_pexpp(pexpp),
+Plugins::TabsApi::TabsApi(TabInterface *ti) :
 	m_ti(ti)
 {
 
@@ -37,7 +36,7 @@ Probably shouldn't
 return a HRESULT though. */
 void Plugins::TabsApi::create(std::wstring path)
 {
-	m_pexpp->BrowseFolder(path.c_str(), SBSP_ABSOLUTE, TRUE, TRUE);
+	m_ti->CreateNewTab(path.c_str(), nullptr, nullptr, TRUE, nullptr);
 }
 
 int Plugins::TabsApi::move(int tabId, int newIndex)

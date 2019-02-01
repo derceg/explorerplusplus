@@ -81,19 +81,13 @@ The ONLY times an idl should be sent are:
 */
 HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath, UINT wFlags)
 {
-	return BrowseFolder(szPath, wFlags, FALSE, FALSE);
-}
-
-HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath, UINT wFlags,
-	BOOL bOpenInNewTab, BOOL bSwitchToNewTab)
-{
 	/* Doesn't matter if we can't get the pidl here,
 	as some paths will be relative, or will be filled
 	by the shellbrowser (e.g. when browsing back/forward). */
 	LPITEMIDLIST pidl = NULL;
 	HRESULT hr = GetIdlFromParsingName(szPath, &pidl);
 
-	BrowseFolder(pidl, wFlags, bOpenInNewTab, bSwitchToNewTab);
+	BrowseFolder(pidl, wFlags);
 
 	if(SUCCEEDED(hr))
 	{
@@ -108,16 +102,10 @@ pass through this function. This ensures that tabs that
 have their addresses locked will not change directory. */
 HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags)
 {
-	return BrowseFolder(pidlDirectory, wFlags, FALSE, FALSE);
-}
-
-HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags,
-	BOOL bOpenInNewTab, BOOL bSwitchToNewTab)
-{
 	HRESULT hr = E_FAIL;
 	int iTabObjectIndex = -1;
 
-	if(!bOpenInNewTab && !m_TabInfo.at(m_selectedTabId).bAddressLocked)
+	if(!m_TabInfo.at(m_selectedTabId).bAddressLocked)
 	{
 		hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory, wFlags);
 
@@ -130,14 +118,7 @@ HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags,
 	}
 	else
 	{
-		if(m_TabInfo.at(m_selectedTabId).bAddressLocked)
-		{
-			hr = CreateNewTab(pidlDirectory, NULL, NULL, TRUE, &iTabObjectIndex);
-		}
-		else
-		{
-			hr = CreateNewTab(pidlDirectory, NULL, NULL, bSwitchToNewTab, &iTabObjectIndex);
-		}
+		hr = CreateNewTab(pidlDirectory, NULL, NULL, TRUE, &iTabObjectIndex);
 	}
 
 	if(SUCCEEDED(hr))

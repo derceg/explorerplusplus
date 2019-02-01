@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "Explorer++_internal.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
 #include "TabInterface.h"
@@ -41,7 +40,7 @@ namespace Plugins
 			}
 		};
 
-		TabsApi(IExplorerplusplus *pexpp, TabInterface *ti);
+		TabsApi(TabInterface *ti);
 		~TabsApi();
 
 		boost::optional<Tab> get(int tabId);
@@ -51,7 +50,6 @@ namespace Plugins
 
 	private:
 
-		IExplorerplusplus *m_pexpp;
 		TabInterface *m_ti;
 	};
 }

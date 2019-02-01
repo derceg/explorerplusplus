@@ -25,5 +25,10 @@ HRESULT Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInN
 	MyExpandEnvironmentStrings(szPath,
 		szExpandedPath,SIZEOF_ARRAY(szExpandedPath));
 
-	return BrowseFolder(szExpandedPath,SBSP_ABSOLUTE,bOpenInNewTab,bSwitchToNewTab);
+	if (bOpenInNewTab)
+	{
+		return CreateNewTab(szExpandedPath, nullptr, nullptr, bSwitchToNewTab, nullptr);
+	}
+
+	return BrowseFolder(szExpandedPath,SBSP_ABSOLUTE);
 }

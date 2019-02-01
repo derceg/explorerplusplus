@@ -375,9 +375,7 @@ private:
 	void					OnNavigateUp();
 	void					GotoFolder(int FolderCSIDL);
 	HRESULT					BrowseFolder(const TCHAR *szPath, UINT wFlags);
-	HRESULT					BrowseFolder(const TCHAR *szPath, UINT wFlags, BOOL bOpenInNewTab, BOOL bSwitchToNewTab);
 	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags);
-	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags, BOOL bOpenInNewTab, BOOL bSwitchToNewTab);
 	void					OpenDirectoryInNewWindow(LPCITEMIDLIST pidlDirectory);
 	void					PlayNavigationSound() const;
 
