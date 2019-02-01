@@ -15,6 +15,7 @@ namespace Plugins
 	public:
 		struct Tab
 		{
+			int id;
 			std::wstring location;
 			ViewMode viewMode;
 			bool locked;
@@ -25,6 +26,7 @@ namespace Plugins
 				TCHAR path[MAX_PATH];
 				tabInternal.shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(path), path);
 
+				id = tabInternal.id;
 				location = path;
 				viewMode = tabInternal.shellBrower->GetCurrentViewMode();
 				locked = tabInternal.bLocked;

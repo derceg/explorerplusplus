@@ -32,6 +32,7 @@ void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabInterface *ti)
 	metaTable.set_function("close", &Plugins::TabsApi::close, tabsApi);
 
 	metaTable.new_usertype<Plugins::TabsApi::Tab>("Tab",
+		"id", &Plugins::TabsApi::Tab::id,
 		"location", &Plugins::TabsApi::Tab::location,
 		"viewMode", &Plugins::TabsApi::Tab::viewMode,
 		"locked", &Plugins::TabsApi::Tab::locked,
