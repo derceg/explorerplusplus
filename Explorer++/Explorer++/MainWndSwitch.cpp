@@ -94,9 +94,9 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 	case WM_USER_FILESADDED:
 	{
-		auto itr = m_TabInfo.find(static_cast<int>(wParam));
+		auto itr = m_Tabs.find(static_cast<int>(wParam));
 
-		if (itr != m_TabInfo.end())
+		if (itr != m_Tabs.end())
 		{
 			itr->second.shellBrower->DirectoryAltered();
 		}
@@ -122,18 +122,18 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 	case WM_USER_FOLDEREMPTY:
 		{
 			if((BOOL)lParam == TRUE)
-				NListView::ListView_SetBackgroundImage(m_TabInfo.at((int)wParam).listView,IDB_FOLDEREMPTY);
+				NListView::ListView_SetBackgroundImage(m_Tabs.at((int)wParam).listView,IDB_FOLDEREMPTY);
 			else
-				NListView::ListView_SetBackgroundImage(m_TabInfo.at((int)wParam).listView,NULL);
+				NListView::ListView_SetBackgroundImage(m_Tabs.at((int)wParam).listView,NULL);
 		}
 		break;
 
 	case WM_USER_FILTERINGAPPLIED:
 		{
 			if((BOOL)lParam == TRUE)
-				NListView::ListView_SetBackgroundImage(m_TabInfo.at((int)wParam).listView,IDB_FILTERINGAPPLIED);
+				NListView::ListView_SetBackgroundImage(m_Tabs.at((int)wParam).listView,IDB_FILTERINGAPPLIED);
 			else
-				NListView::ListView_SetBackgroundImage(m_TabInfo.at((int)wParam).listView,NULL);
+				NListView::ListView_SetBackgroundImage(m_Tabs.at((int)wParam).listView,NULL);
 		}
 		break;
 

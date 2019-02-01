@@ -278,7 +278,7 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 		tcItem.mask = TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-		m_TabInfo[static_cast<int>(tcItem.lParam)].shellBrower->OnDeviceChange(wParam,lParam);
+		m_Tabs[static_cast<int>(tcItem.lParam)].shellBrower->OnDeviceChange(wParam,lParam);
 	}
 
 	/* Forward the message to the treeview, so that
@@ -435,9 +435,9 @@ void *pData)
 	pDirectoryAltered = (DirectoryAltered_t *)pData;
 	pContainer = (Explorerplusplus *)pDirectoryAltered->pData;
 
-	auto itr = pContainer->m_TabInfo.find(pDirectoryAltered->iIndex);
+	auto itr = pContainer->m_Tabs.find(pDirectoryAltered->iIndex);
 
-	if (itr != pContainer->m_TabInfo.end())
+	if (itr != pContainer->m_Tabs.end())
 	{
 		TCHAR szDirectory[MAX_PATH];
 		itr->second.shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);

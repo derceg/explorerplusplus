@@ -677,19 +677,19 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 							TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
 							/* Each one of the options should also be pushed to new tabs when they are created. */
-							m_TabInfo[(int)tcItem.lParam].shellBrower->SetHideSystemFiles(m_bHideSystemFilesGlobal);
-							m_TabInfo[(int)tcItem.lParam].shellBrower->SetShowExtensions(m_bShowExtensionsGlobal);
-							m_TabInfo[(int)tcItem.lParam].shellBrower->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
-							m_TabInfo[(int)tcItem.lParam].shellBrower->SetShowFolderSizes(m_config->showFolderSizes);
-							m_TabInfo[(int)tcItem.lParam].shellBrower->SetDisableFolderSizesNetworkRemovable(m_config->disableFolderSizesNetworkRemovable);
-							m_TabInfo[(int)tcItem.lParam].shellBrower->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
-							m_TabInfo[(int)tcItem.lParam].shellBrower->SetInsertSorted(m_config->insertSorted);
-							m_TabInfo[(int)tcItem.lParam].shellBrower->SetForceSize(m_config->forceSize);
-							m_TabInfo[(int)tcItem.lParam].shellBrower->SetSizeDisplayFormat(m_config->sizeDisplayFormat);
+							m_Tabs[(int)tcItem.lParam].shellBrower->SetHideSystemFiles(m_bHideSystemFilesGlobal);
+							m_Tabs[(int)tcItem.lParam].shellBrower->SetShowExtensions(m_bShowExtensionsGlobal);
+							m_Tabs[(int)tcItem.lParam].shellBrower->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
+							m_Tabs[(int)tcItem.lParam].shellBrower->SetShowFolderSizes(m_config->showFolderSizes);
+							m_Tabs[(int)tcItem.lParam].shellBrower->SetDisableFolderSizesNetworkRemovable(m_config->disableFolderSizesNetworkRemovable);
+							m_Tabs[(int)tcItem.lParam].shellBrower->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
+							m_Tabs[(int)tcItem.lParam].shellBrower->SetInsertSorted(m_config->insertSorted);
+							m_Tabs[(int)tcItem.lParam].shellBrower->SetForceSize(m_config->forceSize);
+							m_Tabs[(int)tcItem.lParam].shellBrower->SetSizeDisplayFormat(m_config->sizeDisplayFormat);
 
 							RefreshTab((int)tcItem.lParam);
 
-							NListView::ListView_ActivateOneClickSelect(m_TabInfo.at((int)tcItem.lParam).listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
+							NListView::ListView_ActivateOneClickSelect(m_Tabs.at((int)tcItem.lParam).listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
 						}
 
 						SaveAllSettings();
@@ -852,7 +852,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							tcItem.mask	= TCIF_PARAM;
 							TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-							dwExtendedStyle = ListView_GetExtendedListViewStyle(m_TabInfo.at((int)tcItem.lParam).listView);
+							dwExtendedStyle = ListView_GetExtendedListViewStyle(m_Tabs.at((int)tcItem.lParam).listView);
 
 							if(bCheckBoxSelection)
 							{
@@ -863,7 +863,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 								dwExtendedStyle &= ~LVS_EX_CHECKBOXES;
 							}
 
-							ListView_SetExtendedListViewStyle(m_TabInfo.at((int)tcItem.lParam).listView,
+							ListView_SetExtendedListViewStyle(m_Tabs.at((int)tcItem.lParam).listView,
 								dwExtendedStyle);
 						}
 
@@ -918,12 +918,12 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 						tcItem.mask	= TCIF_PARAM;
 						TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-						if(m_TabInfo[(int)tcItem.lParam].shellBrower->QueryGridlinesActive() != m_bShowGridlinesGlobal)
+						if(m_Tabs[(int)tcItem.lParam].shellBrower->QueryGridlinesActive() != m_bShowGridlinesGlobal)
 						{
-							m_TabInfo[(int)tcItem.lParam].shellBrower->ToggleGridlines();
+							m_Tabs[(int)tcItem.lParam].shellBrower->ToggleGridlines();
 						}
 
-						NListView::ListView_AddRemoveExtendedStyle(m_TabInfo.at((int)tcItem.lParam).listView,
+						NListView::ListView_AddRemoveExtendedStyle(m_Tabs.at((int)tcItem.lParam).listView,
 							LVS_EX_FULLROWSELECT,m_config->useFullRowSelect);
 					}
 

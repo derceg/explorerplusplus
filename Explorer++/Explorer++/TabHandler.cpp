@@ -60,7 +60,7 @@ void Explorerplusplus::InitializeTabs(void)
 	AddDefaultTabIcons(m_hTabCtrlImageList);
 	TabCtrl_SetImageList(m_hTabCtrl, m_hTabCtrlImageList);
 
-	m_pTabContainer = new CTabContainer(m_hTabCtrl,&m_TabInfo,this);
+	m_pTabContainer = new CTabContainer(m_hTabCtrl,&m_Tabs,this);
 
 	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hTabCtrl,m_pTabContainer);
 	RegisterDragDrop(m_hTabCtrl,pTabDropHandler);
@@ -195,7 +195,7 @@ std::wstring Explorerplusplus::GetTabName(int iTab)
 		return std::wstring();
 	}
 
-	return std::wstring(m_TabInfo.at(static_cast<int>(tcItem.lParam)).szName);
+	return std::wstring(m_Tabs.at(static_cast<int>(tcItem.lParam)).szName);
 }
 
 void Explorerplusplus::SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName)
@@ -210,9 +210,9 @@ void Explorerplusplus::SetTabName(int iTab,std::wstring strName,BOOL bUseCustomN
 		return;
 	}
 
-	StringCchCopy(m_TabInfo.at(static_cast<int>(tcItem.lParam)).szName,
-		SIZEOF_ARRAY(m_TabInfo.at(static_cast<int>(tcItem.lParam)).szName),strName.c_str());
-	m_TabInfo.at(static_cast<int>(tcItem.lParam)).bUseCustomName = bUseCustomName;
+	StringCchCopy(m_Tabs.at(static_cast<int>(tcItem.lParam)).szName,
+		SIZEOF_ARRAY(m_Tabs.at(static_cast<int>(tcItem.lParam)).szName),strName.c_str());
+	m_Tabs.at(static_cast<int>(tcItem.lParam)).bUseCustomName = bUseCustomName;
 
 	TCHAR szName[256];
 	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());
@@ -326,26 +326,26 @@ int *pTabObjectIndex)
 
 	if(pTabInfo == NULL)
 	{
-		m_TabInfo[iTabId].bLocked			= FALSE;
-		m_TabInfo[iTabId].bAddressLocked	= FALSE;
-		m_TabInfo[iTabId].bUseCustomName	= FALSE;
+		m_Tabs[iTabId].bLocked			= FALSE;
+		m_Tabs[iTabId].bAddressLocked	= FALSE;
+		m_Tabs[iTabId].bUseCustomName	= FALSE;
 	}
 	else
 	{
-		m_TabInfo[iTabId] = *pTabInfo;
+		m_Tabs[iTabId] = *pTabInfo;
 	}
 
-	m_TabInfo[iTabId].id = iTabId;
+	m_Tabs[iTabId].id = iTabId;
 
-	m_TabInfo[iTabId].listView	= CreateMainListView(m_hContainer,ListViewStyles);
+	m_Tabs[iTabId].listView	= CreateMainListView(m_hContainer,ListViewStyles);
 
-	if(m_TabInfo[iTabId].listView == NULL)
+	if(m_Tabs[iTabId].listView == NULL)
 		return E_FAIL;
 
-	NListView::ListView_ActivateOneClickSelect(m_TabInfo[iTabId].listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
+	NListView::ListView_ActivateOneClickSelect(m_Tabs[iTabId].listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
 
 	/* Set the listview to its initial size. */
-	SetListViewInitialPosition(m_TabInfo[iTabId].listView);
+	SetListViewInitialPosition(m_Tabs[iTabId].listView);
 
 	/* If no explicit settings are specified, use the
 	global ones. */
@@ -417,22 +417,22 @@ int *pTabObjectIndex)
 	pSettings->bForceSize	= m_config->forceSize;
 	pSettings->sdf			= m_config->sizeDisplayFormat;
 
-	m_TabInfo[iTabId].shellBrower = CShellBrowser::CreateNew(m_hContainer, m_TabInfo[iTabId].listView,pSettings);
+	m_Tabs[iTabId].shellBrower = CShellBrowser::CreateNew(m_hContainer, m_Tabs[iTabId].listView,pSettings);
 
 	if(pSettings->bApplyFilter)
-		NListView::ListView_SetBackgroundImage(m_TabInfo[iTabId].listView,IDB_FILTERINGAPPLIED);
+		NListView::ListView_SetBackgroundImage(m_Tabs[iTabId].listView,IDB_FILTERINGAPPLIED);
 
 	/* TODO: This needs to be removed. */
-	SetWindowSubclass(m_TabInfo[iTabId].listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(m_Tabs[iTabId].listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
-	m_TabInfo[iTabId].shellBrower->SetId(iTabId);
-	m_TabInfo[iTabId].shellBrower->SetResourceModule(m_hLanguageModule);
-	m_TabInfo[iTabId].shellBrower->SetHideSystemFiles(m_bHideSystemFilesGlobal);
-	m_TabInfo[iTabId].shellBrower->SetShowExtensions(m_bShowExtensionsGlobal);
-	m_TabInfo[iTabId].shellBrower->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
-	m_TabInfo[iTabId].shellBrower->SetShowFolderSizes(m_config->showFolderSizes);
-	m_TabInfo[iTabId].shellBrower->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
-	m_TabInfo[iTabId].shellBrower->SetInsertSorted(m_config->insertSorted);
+	m_Tabs[iTabId].shellBrower->SetId(iTabId);
+	m_Tabs[iTabId].shellBrower->SetResourceModule(m_hLanguageModule);
+	m_Tabs[iTabId].shellBrower->SetHideSystemFiles(m_bHideSystemFilesGlobal);
+	m_Tabs[iTabId].shellBrower->SetShowExtensions(m_bShowExtensionsGlobal);
+	m_Tabs[iTabId].shellBrower->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
+	m_Tabs[iTabId].shellBrower->SetShowFolderSizes(m_config->showFolderSizes);
+	m_Tabs[iTabId].shellBrower->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
+	m_Tabs[iTabId].shellBrower->SetInsertSorted(m_config->insertSorted);
 
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
@@ -452,15 +452,15 @@ int *pTabObjectIndex)
 		/* Hide the previously active tab, and show the
 		newly created one. */
 		ShowWindow(m_hActiveListView,SW_HIDE);
-		ShowWindow(m_TabInfo[iTabId].listView,SW_SHOW);
+		ShowWindow(m_Tabs[iTabId].listView,SW_SHOW);
 
 		m_selectedTabId			= iTabId;
 		m_selectedTabIndex		= iNewTabIndex;
 
-		m_hActiveListView		= m_TabInfo[m_selectedTabId].listView;
-		m_pActiveShellBrowser	= m_TabInfo[m_selectedTabId].shellBrower;
+		m_hActiveListView		= m_Tabs[m_selectedTabId].listView;
+		m_pActiveShellBrowser	= m_Tabs[m_selectedTabId].shellBrower;
 
-		SetFocus(m_TabInfo[iTabId].listView);
+		SetFocus(m_Tabs[iTabId].listView);
 
 		m_iPreviousTabSelectionId = iTabId;
 	}
@@ -474,10 +474,10 @@ int *pTabObjectIndex)
 	regardless of whether it loads its own settings or not. */
 	PushGlobalSettingsToTab(iTabId);
 
-	hr = m_TabInfo[iTabId].shellBrower->BrowseFolder(pidlDirectory,uFlags);
+	hr = m_Tabs[iTabId].shellBrower->BrowseFolder(pidlDirectory,uFlags);
 
 	if(bSwitchToNewTab)
-		m_TabInfo[iTabId].shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory), m_CurrentDirectory);
+		m_Tabs[iTabId].shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory), m_CurrentDirectory);
 
 	if(hr != S_OK)
 	{
@@ -616,8 +616,8 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 
 	m_selectedTabId = (int)tcItem.lParam;
 
-	m_hActiveListView		= m_TabInfo.at(m_selectedTabId).listView;
-	m_pActiveShellBrowser	= m_TabInfo[m_selectedTabId].shellBrower;
+	m_hActiveListView		= m_Tabs.at(m_selectedTabId).listView;
+	m_pActiveShellBrowser	= m_Tabs[m_selectedTabId].shellBrower;
 
 	/* The selected tab has changed, so update the current
 	directory. Although this is not needed internally, context
@@ -763,7 +763,7 @@ boost::optional<TabInfo_t> Explorerplusplus::GetTabByIndex(int index)
 		return boost::none;
 	}
 
-	return m_TabInfo.at(static_cast<int>(tcItem.lParam));
+	return m_Tabs.at(static_cast<int>(tcItem.lParam));
 }
 
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
@@ -840,7 +840,7 @@ bool Explorerplusplus::CloseTab(const TabInfo_t &tab)
 
 	DestroyWindow(tab.listView);
 
-	m_TabInfo.erase(tab.id);
+	m_Tabs.erase(tab.id);
 
 	if(!m_config->alwaysShowTabBar)
 	{
@@ -921,9 +921,9 @@ void Explorerplusplus::RefreshTab(int iTabId)
 	LPITEMIDLIST pidlDirectory = NULL;
 	HRESULT hr;
 
-	pidlDirectory = m_TabInfo[iTabId].shellBrower->QueryCurrentDirectoryIdl();
+	pidlDirectory = m_Tabs[iTabId].shellBrower->QueryCurrentDirectoryIdl();
 
-	hr = m_TabInfo[iTabId].shellBrower->BrowseFolder(pidlDirectory,
+	hr = m_Tabs[iTabId].shellBrower->BrowseFolder(pidlDirectory,
 		SBSP_SAMEBROWSER|SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 
 	if(SUCCEEDED(hr))
@@ -953,10 +953,10 @@ void Explorerplusplus::OnInitTabMenu(HMENU hMenu)
 
 	int internalIndex = static_cast<int>(tcItem.lParam);
 
-	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, m_TabInfo.at(internalIndex).bLocked);
-	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, m_TabInfo.at(internalIndex).bAddressLocked);
+	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, m_Tabs.at(internalIndex).bLocked);
+	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, m_Tabs.at(internalIndex).bAddressLocked);
 	lEnableMenuItem(hMenu, IDM_TAB_CLOSETAB,
-		!(m_TabInfo.at(internalIndex).bLocked || m_TabInfo.at(internalIndex).bAddressLocked));
+		!(m_Tabs.at(internalIndex).bLocked || m_Tabs.at(internalIndex).bAddressLocked));
 }
 
 void Explorerplusplus::OnTabCtrlLButtonDown(POINT *pt)
@@ -1089,7 +1089,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 				if(res)
 				{
-					LPITEMIDLIST pidlCurrent = m_TabInfo[static_cast<int>(tcItem.lParam)].shellBrower->QueryCurrentDirectoryIdl();
+					LPITEMIDLIST pidlCurrent = m_Tabs[static_cast<int>(tcItem.lParam)].shellBrower->QueryCurrentDirectoryIdl();
 
 					LPITEMIDLIST pidlParent = NULL;
 					HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
@@ -1184,15 +1184,15 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 	TCHAR		szExpandedTabText[MAX_PATH];
 
 	/* If no custom name is set, use the folders name. */
-	if(!m_TabInfo.at(iTabId).bUseCustomName)
+	if(!m_Tabs.at(iTabId).bUseCustomName)
 	{
 		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
 
-		StringCchCopy(m_TabInfo.at(iTabId).szName,
-			SIZEOF_ARRAY(m_TabInfo.at(iTabId).szName),szTabText);
+		StringCchCopy(m_Tabs.at(iTabId).szName,
+			SIZEOF_ARRAY(m_Tabs.at(iTabId).szName),szTabText);
 	}
 
-	ReplaceCharacterWithString(m_TabInfo.at(iTabId).szName,szExpandedTabText,
+	ReplaceCharacterWithString(m_Tabs.at(iTabId).szName,szExpandedTabText,
 		SIZEOF_ARRAY(szExpandedTabText),'&',_T("&&"));
 
 	/* Tab control insertion information. The folders name will be used
@@ -1253,13 +1253,13 @@ void Explorerplusplus::OnLockTab(int iTab)
 
 void Explorerplusplus::OnLockTabInternal(int iTab,int iTabId)
 {
-	m_TabInfo.at(iTabId).bLocked = !m_TabInfo.at(iTabId).bLocked;
+	m_Tabs.at(iTabId).bLocked = !m_Tabs.at(iTabId).bLocked;
 
 	/* The "Lock Tab" and "Lock Tab and Address" options
 	are mutually exclusive. */
-	if(m_TabInfo.at(iTabId).bLocked)
+	if(m_Tabs.at(iTabId).bLocked)
 	{
-		m_TabInfo.at(iTabId).bAddressLocked = FALSE;
+		m_Tabs.at(iTabId).bAddressLocked = FALSE;
 	}
 
 	SetTabIcon(iTab,iTabId);
@@ -1285,11 +1285,11 @@ void Explorerplusplus::OnLockTabAndAddress(int iTab)
 
 	int internalIndex = static_cast<int>(tcItem.lParam);
 
-	m_TabInfo.at(internalIndex).bAddressLocked = !m_TabInfo.at(internalIndex).bAddressLocked;
+	m_Tabs.at(internalIndex).bAddressLocked = !m_Tabs.at(internalIndex).bAddressLocked;
 
-	if(m_TabInfo.at(internalIndex).bAddressLocked)
+	if(m_Tabs.at(internalIndex).bAddressLocked)
 	{
-		m_TabInfo.at(internalIndex).bLocked = FALSE;
+		m_Tabs.at(internalIndex).bLocked = FALSE;
 	}
 
 	SetTabIcon(iTab, internalIndex);
@@ -1307,7 +1307,7 @@ void Explorerplusplus::UpdateTabToolbar(void)
 
 	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	if(nTabs > 1 && !(m_TabInfo.at(m_selectedTabId).bLocked || m_TabInfo.at(m_selectedTabId).bAddressLocked))
+	if(nTabs > 1 && !(m_Tabs.at(m_selectedTabId).bLocked || m_Tabs.at(m_selectedTabId).bAddressLocked))
 	{
 		/* Enable the tab close button. */
 		SendMessage(m_hTabWindowToolbar,TB_SETSTATE,
@@ -1440,7 +1440,7 @@ void Explorerplusplus::DuplicateTab(int iTabInternal)
 {
 	TCHAR szTabDirectory[MAX_PATH];
 
-	m_TabInfo[iTabInternal].shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
+	m_Tabs[iTabInternal].shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
 	CreateNewTab(szTabDirectory, nullptr, nullptr, FALSE, nullptr);
@@ -1546,7 +1546,7 @@ void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)
 		tcItem.mask = TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl, nmhdr->idFrom, &tcItem);
 
-		m_TabInfo[(int)tcItem.lParam].shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
+		m_Tabs[(int)tcItem.lParam].shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
 			szTabToolTip);
 		lpnmtdi->lpszText = szTabToolTip;
 	}
@@ -1561,14 +1561,14 @@ void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 	gs.bShowFriendlyDates	= m_bShowFriendlyDatesGlobal;
 	gs.bShowFolderSizes		= m_config->showFolderSizes;
 
-	m_TabInfo[iTabId].shellBrower->SetGlobalSettings(&gs);
+	m_Tabs[iTabId].shellBrower->SetGlobalSettings(&gs);
 }
 
 boost::optional<TabInfo_t> Explorerplusplus::GetTab(int tabId)
 {
-	auto itr = m_TabInfo.find(tabId);
+	auto itr = m_Tabs.find(tabId);
 
-	if (itr == m_TabInfo.end())
+	if (itr == m_Tabs.end())
 	{
 		return boost::none;
 	}
@@ -1578,7 +1578,7 @@ boost::optional<TabInfo_t> Explorerplusplus::GetTab(int tabId)
 
 int Explorerplusplus::GetNumTabs() const
 {
-	return m_TabInfo.size();
+	return m_Tabs.size();
 }
 
 int Explorerplusplus::MoveTab(const TabInfo_t &tab, int newIndex)
@@ -1595,5 +1595,5 @@ int Explorerplusplus::MoveTab(const TabInfo_t &tab, int newIndex)
 
 const std::unordered_map<int, TabInfo_t> &Explorerplusplus::GetAllTabs() const
 {
-	return m_TabInfo;
+	return m_Tabs;
 }

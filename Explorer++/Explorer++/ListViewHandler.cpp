@@ -580,10 +580,10 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	if(iObjectIndex == -1)
 		return;
 
-	if(m_TabInfo[iObjectIndex].shellBrower->QueryDragging())
+	if(m_Tabs[iObjectIndex].shellBrower->QueryDragging())
 		return;
 
-	HWND listView = m_TabInfo.at(iObjectIndex).listView;
+	HWND listView = m_Tabs.at(iObjectIndex).listView;
 
 	if(ItemChanged->uChanged == LVIF_STATE &&
 		((LVIS_STATEIMAGEMASK & ItemChanged->uNewState) >> 12) != 0 &&
@@ -659,7 +659,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 		}
 	}
 
-	m_TabInfo[iObjectIndex].shellBrower->UpdateFileSelectionInfo(
+	m_Tabs[iObjectIndex].shellBrower->UpdateFileSelectionInfo(
 	(int)ItemChanged->lParam,Selected);
 
 	if((ListView_GetItemCount(m_hActiveListView) - m_nSelected) == m_nSelectedOnInvert)
@@ -675,7 +675,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
-	for (auto item : m_TabInfo)
+	for (auto item : m_Tabs)
 	{
 		if (item.second.listView == hListView)
 		{
@@ -1271,7 +1271,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 			object that stops it (i.e. when a file is dragged
 			between tabs). Therefore, need to tell the object
 			that STARTED dragging that dragging has stopped. */
-			m_TabInfo[iDragStartObjectIndex].shellBrower->DragStopped();
+			m_Tabs[iDragStartObjectIndex].shellBrower->DragStopped();
 
 			BOOL bInAsyncOp;
 

@@ -341,12 +341,12 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 			ShowWindow(m_hContainer,SW_RESTORE);
 		}
 
-		OnSelectTab(m_TabInfo.at(iTabId), FALSE);
+		OnSelectTab(m_Tabs.at(iTabId), FALSE);
 		return 0;
 		break;
 
 	case WM_SETFOCUS:
-		SetFocus(m_TabInfo.at(iTabId).listView);
+		SetFocus(m_Tabs.at(iTabId).listView);
 		break;
 
 	case WM_SYSCOMMAND:
@@ -356,7 +356,7 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 			break;
 
 		default:
-			SendMessage(m_TabInfo.at(iTabId).listView,WM_SYSCOMMAND,wParam,lParam);
+			SendMessage(m_Tabs.at(iTabId).listView,WM_SYSCOMMAND,wParam,lParam);
 			break;
 		}
 		break;
@@ -544,7 +544,7 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 
 					if((int)tcItem.lParam == iTabId)
 					{
-						TabInfo_t tab = m_TabInfo.at(iTabId);
+						TabInfo_t tab = m_Tabs.at(iTabId);
 						CloseTab(tab);
 						break;
 					}
@@ -567,7 +567,7 @@ HBITMAP Explorerplusplus::CaptureTabScreenshot(int iTabId)
 	RECT rcMain;
 	RECT rcTab;
 
-	HWND hTab = m_TabInfo.at(iTabId).listView;
+	HWND hTab = m_Tabs.at(iTabId).listView;
 
 	GetClientRect(m_hContainer,&rcMain);
 	GetClientRect(hTab,&rcTab);
@@ -669,7 +669,7 @@ void Explorerplusplus::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi
 	BOOL bVisible;
 	RECT rcTab;
 
-	HWND hTab = m_TabInfo.at(iTabId).listView;
+	HWND hTab = m_Tabs.at(iTabId).listView;
 
 	hdcTab = GetDC(hTab);
 	hdcTabSrc = CreateCompatibleDC(hdcTab);

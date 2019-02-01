@@ -458,29 +458,29 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 
 			if(ReturnValue == ERROR_SUCCESS)
 			{
-				pidlDirectory = m_TabInfo[(int)tcItem.lParam].shellBrower->QueryCurrentDirectoryIdl();
+				pidlDirectory = m_Tabs[(int)tcItem.lParam].shellBrower->QueryCurrentDirectoryIdl();
 				RegSetValueEx(hTabKey,_T("Directory"),0,REG_BINARY,
 					(LPBYTE)pidlDirectory,ILGetSize(pidlDirectory));
 				CoTaskMemFree((LPVOID)pidlDirectory);
 
-				ViewMode = m_TabInfo[(int) tcItem.lParam].shellBrower->GetCurrentViewMode();
+				ViewMode = m_Tabs[(int) tcItem.lParam].shellBrower->GetCurrentViewMode();
 
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ViewMode"),ViewMode);
 
-				SortMode = m_TabInfo[(int) tcItem.lParam].shellBrower->GetSortMode();
+				SortMode = m_Tabs[(int) tcItem.lParam].shellBrower->GetSortMode();
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortMode"),SortMode);
 
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"), m_TabInfo[(int)tcItem.lParam].shellBrower->GetSortAscending());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"), m_TabInfo[(int)tcItem.lParam].shellBrower->IsGroupViewEnabled());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ApplyFilter"), m_TabInfo[(int)tcItem.lParam].shellBrower->GetFilterStatus());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"), m_TabInfo[(int)tcItem.lParam].shellBrower->GetFilterCaseSensitive());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"), m_TabInfo[(int)tcItem.lParam].shellBrower->GetShowHidden());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AutoArrange"), m_TabInfo[(int)tcItem.lParam].shellBrower->GetAutoArrange());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowGridlines"), m_TabInfo[(int)tcItem.lParam].shellBrower->QueryGridlinesActive());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"), m_Tabs[(int)tcItem.lParam].shellBrower->GetSortAscending());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"), m_Tabs[(int)tcItem.lParam].shellBrower->IsGroupViewEnabled());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ApplyFilter"), m_Tabs[(int)tcItem.lParam].shellBrower->GetFilterStatus());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"), m_Tabs[(int)tcItem.lParam].shellBrower->GetFilterCaseSensitive());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"), m_Tabs[(int)tcItem.lParam].shellBrower->GetShowHidden());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AutoArrange"), m_Tabs[(int)tcItem.lParam].shellBrower->GetAutoArrange());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowGridlines"), m_Tabs[(int)tcItem.lParam].shellBrower->QueryGridlinesActive());
 
 				TCHAR szFilter[512];
 
-				m_TabInfo[(int)tcItem.lParam].shellBrower->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
+				m_Tabs[(int)tcItem.lParam].shellBrower->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
 				NRegistrySettings::SaveStringToRegistry(hTabKey,_T("Filter"),szFilter);
 
 				/* Now save the tabs columns. */
@@ -492,7 +492,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				{
 					ColumnExport_t cie;
 
-					m_TabInfo[(int)tcItem.lParam].shellBrower->ExportAllColumns(&cie);
+					m_Tabs[(int)tcItem.lParam].shellBrower->ExportAllColumns(&cie);
 
 					SaveColumnToRegistry(hColumnsKey,_T("ControlPanelColumns"),&cie.ControlPanelColumnList);
 					SaveColumnToRegistry(hColumnsKey,_T("MyComputerColumns"),&cie.MyComputerColumnList);
@@ -516,12 +516,12 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				}
 
 				/* High-level settings. */
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("Locked"),m_TabInfo.at((int)tcItem.lParam).bLocked);
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AddressLocked"),m_TabInfo.at((int)tcItem.lParam).bAddressLocked);
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("UseCustomName"),m_TabInfo.at((int)tcItem.lParam).bUseCustomName);
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("Locked"),m_Tabs.at((int)tcItem.lParam).bLocked);
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AddressLocked"),m_Tabs.at((int)tcItem.lParam).bAddressLocked);
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("UseCustomName"),m_Tabs.at((int)tcItem.lParam).bUseCustomName);
 
-				if(m_TabInfo.at((int)tcItem.lParam).bUseCustomName)
-					NRegistrySettings::SaveStringToRegistry(hTabKey,_T("CustomName"),m_TabInfo.at((int)tcItem.lParam).szName);
+				if(m_Tabs.at((int)tcItem.lParam).bUseCustomName)
+					NRegistrySettings::SaveStringToRegistry(hTabKey,_T("CustomName"),m_Tabs.at((int)tcItem.lParam).szName);
 				else
 					NRegistrySettings::SaveStringToRegistry(hTabKey,_T("CustomName"),EMPTY_STRING);
 

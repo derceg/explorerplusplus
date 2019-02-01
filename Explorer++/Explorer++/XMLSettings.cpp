@@ -876,39 +876,39 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), i);
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Tab"),szNodeName);
 
-		m_TabInfo[(int) tcItem.lParam].shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
+		m_Tabs[(int) tcItem.lParam].shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Directory"),szTabDirectory);
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ApplyFilter"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo[(int)tcItem.lParam].shellBrower->GetFilterStatus()));
+			NXMLSettings::EncodeBoolValue(m_Tabs[(int)tcItem.lParam].shellBrower->GetFilterStatus()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("AutoArrange"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo[(int)tcItem.lParam].shellBrower->GetAutoArrange()));
+			NXMLSettings::EncodeBoolValue(m_Tabs[(int)tcItem.lParam].shellBrower->GetAutoArrange()));
 
 		TCHAR szFilter[512];
 
-		m_TabInfo[(int)tcItem.lParam].shellBrower->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
+		m_Tabs[(int)tcItem.lParam].shellBrower->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Filter"),szFilter);
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("FilterCaseSensitive"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo[(int)tcItem.lParam].shellBrower->GetFilterCaseSensitive()));
+			NXMLSettings::EncodeBoolValue(m_Tabs[(int)tcItem.lParam].shellBrower->GetFilterCaseSensitive()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowGridlines"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo[(int)tcItem.lParam].shellBrower->QueryGridlinesActive()));
+			NXMLSettings::EncodeBoolValue(m_Tabs[(int)tcItem.lParam].shellBrower->QueryGridlinesActive()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowHidden"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo[(int)tcItem.lParam].shellBrower->GetShowHidden()));
+			NXMLSettings::EncodeBoolValue(m_Tabs[(int)tcItem.lParam].shellBrower->GetShowHidden()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowInGroups"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo[(int)tcItem.lParam].shellBrower->IsGroupViewEnabled()));
+			NXMLSettings::EncodeBoolValue(m_Tabs[(int)tcItem.lParam].shellBrower->IsGroupViewEnabled()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortAscending"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo[(int)tcItem.lParam].shellBrower->GetSortAscending()));
+			NXMLSettings::EncodeBoolValue(m_Tabs[(int)tcItem.lParam].shellBrower->GetSortAscending()));
 
-		SortMode = m_TabInfo[(int) tcItem.lParam].shellBrower->GetSortMode();
+		SortMode = m_Tabs[(int) tcItem.lParam].shellBrower->GetSortMode();
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortMode"),NXMLSettings::EncodeIntValue(SortMode));
 
-		ViewMode = m_TabInfo[(int) tcItem.lParam].shellBrower->GetCurrentViewMode();
+		ViewMode = m_Tabs[(int) tcItem.lParam].shellBrower->GetCurrentViewMode();
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ViewMode"),NXMLSettings::EncodeIntValue(ViewMode));
 
 		bstr = SysAllocString(L"Columns");
@@ -918,7 +918,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 
 		ColumnExport_t ce;
 
-		m_TabInfo[(int)tcItem.lParam].shellBrower->ExportAllColumns(&ce);
+		m_Tabs[(int)tcItem.lParam].shellBrower->ExportAllColumns(&ce);
 
 		int TAB_INDENT = 4;
 
@@ -934,15 +934,15 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 
 		/* High-level settings. */
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Locked"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo.at((int)tcItem.lParam).bLocked));
+			NXMLSettings::EncodeBoolValue(m_Tabs.at((int)tcItem.lParam).bLocked));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("AddressLocked"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo.at((int)tcItem.lParam).bAddressLocked));
+			NXMLSettings::EncodeBoolValue(m_Tabs.at((int)tcItem.lParam).bAddressLocked));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("UseCustomName"),
-			NXMLSettings::EncodeBoolValue(m_TabInfo.at((int)tcItem.lParam).bUseCustomName));
+			NXMLSettings::EncodeBoolValue(m_Tabs.at((int)tcItem.lParam).bUseCustomName));
 
-		if(m_TabInfo.at((int)tcItem.lParam).bUseCustomName)
+		if(m_Tabs.at((int)tcItem.lParam).bUseCustomName)
 			NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CustomName"),
-			m_TabInfo.at((int)tcItem.lParam).szName);
+			m_Tabs.at((int)tcItem.lParam).szName);
 		else
 			NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CustomName"),
 			EMPTY_STRING);

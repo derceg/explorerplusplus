@@ -784,7 +784,7 @@ private:
 	HFONT					m_DisplayWindowFont;
 
 	/* Tabs. */
-	std::unordered_map<int, TabInfo_t> m_TabInfo;
+	std::unordered_map<int, TabInfo_t> m_Tabs;
 	int						m_tabIdCounter;
 
 	HWND					m_hActiveListView;

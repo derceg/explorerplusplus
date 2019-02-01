@@ -105,7 +105,7 @@ HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags)
 	HRESULT hr = E_FAIL;
 	int iTabObjectIndex = -1;
 
-	if(!m_TabInfo.at(m_selectedTabId).bAddressLocked)
+	if(!m_Tabs.at(m_selectedTabId).bAddressLocked)
 	{
 		hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory, wFlags);
 
