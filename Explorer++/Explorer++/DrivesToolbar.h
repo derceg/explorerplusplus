@@ -6,7 +6,7 @@
 
 #include "Explorer++_internal.h"
 #include "HardwareChangeNotifier.h"
-#include "TabInterface.h"
+#include "TabContainerInterface.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/FileContextMenuManager.h"
 #include <boost\serialization\strong_typedef.hpp>
@@ -19,7 +19,7 @@ class CDrivesToolbar : public CBaseWindow, public IFileContextMenuExternal, publ
 
 public:
 
-	static CDrivesToolbar *Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp, TabInterface *ti);
+	static CDrivesToolbar	*Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer);
 
 	/* IFileContextMenuExternal methods. */
 	void	AddMenuEntries(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
@@ -49,7 +49,7 @@ private:
 
 	LRESULT CALLBACK DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	CDrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp, TabInterface *ti);
+	CDrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer);
 	~CDrivesToolbar();
 
 	static HWND	CreateDrivesToolbar(HWND hParent);
@@ -75,7 +75,7 @@ private:
 	UINT		m_uIDEnd;
 
 	IExplorerplusplus *m_pexpp;
-	TabInterface	*m_ti;
+	TabContainerInterface	*m_tabContainer;
 
 	struct IDCounterHasher
 	{

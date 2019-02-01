@@ -483,6 +483,9 @@
     <ClInclude Include="TabInterface.h">
       <Filter>Tabs</Filter>
     </ClInclude>
+    <ClInclude Include="TabContainerInterface.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

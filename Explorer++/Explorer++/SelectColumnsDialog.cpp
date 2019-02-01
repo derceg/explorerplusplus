@@ -18,10 +18,11 @@ const TCHAR CSelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectC
 
 CSelectColumnsDialog::CSelectColumnsDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,IExplorerplusplus *pexpp,
-	TabInterface *ti) :
+	TabContainerInterface *tabContainer, TabInterface *ti) :
 CBaseDialog(hInstance,iResource,hParent,true)
 {
 	m_pexpp = pexpp;
+	m_tabContainer = tabContainer;
 	m_ti = ti;
 	m_bColumnsSwapped = FALSE;
 
@@ -273,7 +274,7 @@ void CSelectColumnsDialog::OnOk()
 
 	if(m_bColumnsSwapped)
 	{
-		m_ti->RefreshTab(m_ti->GetCurrentTabId());
+		m_ti->RefreshTab(m_tabContainer->GetCurrentTabId());
 	}
 
 	EndDialog(m_hDlg,1);

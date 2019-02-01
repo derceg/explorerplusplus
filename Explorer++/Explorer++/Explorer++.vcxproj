@@ -457,6 +457,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Tab.h" />
     <ClInclude Include="TabContainer.h" />
+    <ClInclude Include="TabContainerInterface.h" />
     <ClInclude Include="TabDropHandler.h" />
     <ClInclude Include="TabInterface.h" />
     <ClInclude Include="TabsApi.h" />

@@ -6,14 +6,14 @@
 
 #include "ShellBrowser/iShellView.h"
 #include "Tab.h"
-#include "TabInterface.h"
+#include "TabContainerInterface.h"
 #include <unordered_map>
 
 class CTabContainer
 {
 public:
 
-	CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInfo, TabInterface *ti);
+	CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInfo, TabContainerInterface *tabContainer);
 	~CTabContainer();
 
 	void			InsertTab();
@@ -29,5 +29,5 @@ private:
 	HWND				m_hTabCtrl;
 
 	std::unordered_map<int, Tab> *m_tabInfo;
-	TabInterface		*m_ti;
+	TabContainerInterface	*m_tabContainer;
 };

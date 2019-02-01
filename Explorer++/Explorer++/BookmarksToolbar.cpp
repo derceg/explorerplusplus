@@ -12,11 +12,11 @@
 #include <algorithm>
 
 
-CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, IExplorerplusplus *pexpp, TabInterface *ti,
+CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer,
 	CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar, UINT uIDStart, UINT uIDEnd) :
 m_hToolbar(hToolbar),
 m_pexpp(pexpp),
-m_ti(ti),
+m_tabContainer(tabContainer),
 m_AllBookmarks(AllBookmarks),
 m_guidBookmarksToolbar(guidBookmarksToolbar),
 m_uIDStart(uIDStart),
@@ -106,14 +106,14 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 							if (variantBookmarkChild.type() == typeid(CBookmark))
 							{
 								CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkChild);
-								m_ti->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, nullptr, FALSE, nullptr);
+								m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, nullptr, FALSE, nullptr);
 							}
 						}
 					}
 					else
 					{
 						CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-						m_ti->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, nullptr, FALSE, nullptr);
+						m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, nullptr, FALSE, nullptr);
 					}
 				}
 			}

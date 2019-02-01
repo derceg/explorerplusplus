@@ -5,8 +5,8 @@
 #include "stdafx.h"
 #include "TabsAPI.h"
 
-Plugins::TabsApi::TabsApi(TabInterface *ti) :
-	m_ti(ti)
+Plugins::TabsApi::TabsApi(TabContainerInterface *tabContainer) :
+	m_tabContainer(tabContainer)
 {
 
 }
@@ -20,7 +20,7 @@ std::vector<Plugins::TabsApi::Tab> Plugins::TabsApi::getAll()
 {
 	std::vector<Tab> tabs;
 
-	for (auto item : m_ti->GetAllTabs())
+	for (auto item : m_tabContainer->GetAllTabs())
 	{
 		Tab tab(item.second);
 		tabs.push_back(tab);
@@ -31,7 +31,7 @@ std::vector<Plugins::TabsApi::Tab> Plugins::TabsApi::getAll()
 
 boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 {
-	auto tabInternal = m_ti->GetTab(tabId);
+	auto tabInternal = m_tabContainer->GetTab(tabId);
 
 	if (!tabInternal)
 	{
@@ -49,12 +49,12 @@ Probably shouldn't
 return a HRESULT though. */
 void Plugins::TabsApi::create(std::wstring path)
 {
-	m_ti->CreateNewTab(path.c_str(), nullptr, nullptr, TRUE, nullptr);
+	m_tabContainer->CreateNewTab(path.c_str(), nullptr, nullptr, TRUE, nullptr);
 }
 
 int Plugins::TabsApi::move(int tabId, int newIndex)
 {
-	auto tabInternal = m_ti->GetTab(tabId);
+	auto tabInternal = m_tabContainer->GetTab(tabId);
 
 	if (!tabInternal)
 	{
@@ -63,20 +63,20 @@ int Plugins::TabsApi::move(int tabId, int newIndex)
 
 	if (newIndex < 0)
 	{
-		newIndex = m_ti->GetNumTabs();
+		newIndex = m_tabContainer->GetNumTabs();
 	}
 
-	return m_ti->MoveTab(*tabInternal, newIndex);
+	return m_tabContainer->MoveTab(*tabInternal, newIndex);
 }
 
 bool Plugins::TabsApi::close(int tabId)
 {
-	auto tabInternal = m_ti->GetTab(tabId);
+	auto tabInternal = m_tabContainer->GetTab(tabId);
 
 	if (!tabInternal)
 	{
 		return false;
 	}
 
-	return m_ti->CloseTab(*tabInternal);
+	return m_tabContainer->CloseTab(*tabInternal);
 }

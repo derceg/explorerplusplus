@@ -6,7 +6,7 @@
 
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
-#include "TabInterface.h"
+#include "TabContainerInterface.h"
 
 namespace Plugins
 {
@@ -42,7 +42,7 @@ namespace Plugins
 			}
 		};
 
-		TabsApi(TabInterface *ti);
+		TabsApi(TabContainerInterface *tabContainer);
 		~TabsApi();
 
 		std::vector<Tab> getAll();
@@ -53,6 +53,6 @@ namespace Plugins
 
 	private:
 
-		TabInterface *m_ti;
+		TabContainerInterface *m_tabContainer;
 	};
 }

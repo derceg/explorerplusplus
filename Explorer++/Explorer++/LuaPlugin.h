@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Explorer++_internal.h"
-#include "TabInterface.h"
+#include "TabContainerInterface.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 namespace Plugins
@@ -16,7 +16,7 @@ namespace Plugins
 	{
 	public:
 
-		LuaPlugin(IExplorerplusplus *pexpp, TabInterface *ti);
+		LuaPlugin(IExplorerplusplus *pexpp, TabContainerInterface *tabContainer);
 		~LuaPlugin();
 
 		sol::state &GetLuaState();

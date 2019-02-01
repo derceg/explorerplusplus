@@ -6,21 +6,21 @@
 #include "APIBinding.h"
 #include "TabsAPI.h"
 
-void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabInterface *ti);
+void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer);
 int deny(lua_State *state);
 
-void Plugins::BindAllApiMethods(sol::state &state, IExplorerplusplus *pexpp, TabInterface *ti)
+void Plugins::BindAllApiMethods(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer)
 {
-	BindTabsAPI(state, pexpp, ti);
+	BindTabsAPI(state, pexpp, tabContainer);
 }
 
-void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabInterface *ti)
+void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer)
 {
 	// This parameter is likely to be used again when other API methods
 	// are added.
 	UNREFERENCED_PARAMETER(pexpp);
 
-	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(ti);
+	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(tabContainer);
 
 	sol::table tabsTable = state.create_named_table("tabs");
 

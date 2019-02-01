@@ -53,14 +53,14 @@ const TCHAR CSearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Patter
 
 CSearchDialog::CSearchDialog(HINSTANCE hInstance,int iResource,
 	HWND hParent,TCHAR *szSearchDirectory,IExplorerplusplus *pexpp,
-	TabInterface *ti) :
+	TabContainerInterface *tabContainer) :
 CBaseDialog(hInstance,iResource,hParent,true)
 {
 	StringCchCopy(m_szSearchDirectory,SIZEOF_ARRAY(m_szSearchDirectory),
 		szSearchDirectory);
 
 	m_pexpp = pexpp;
-	m_ti = ti;
+	m_tabContainer = tabContainer;
 
 	m_bSearching		= FALSE;
 	m_bStopSearching	= FALSE;
@@ -679,7 +679,7 @@ void CSearchDialog::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	{
 	case MENU_ID_OPEN_FILE_LOCATION:
 		{
-			m_ti->CreateNewTab(pidlParent, nullptr, nullptr, TRUE, nullptr);
+			m_tabContainer->CreateNewTab(pidlParent, nullptr, nullptr, TRUE, nullptr);
 
 			TCHAR szFilename[MAX_PATH];
 			LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
