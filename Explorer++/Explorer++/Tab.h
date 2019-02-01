@@ -15,8 +15,10 @@ struct TabSettings
 	TCHAR	szName[MAX_PATH];
 };
 
-struct Tab
+class Tab
 {
+public:
+
 	int		id;
 	HWND	listView;
 	CShellBrowser *shellBrower;
