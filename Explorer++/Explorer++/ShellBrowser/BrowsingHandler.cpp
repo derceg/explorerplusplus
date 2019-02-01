@@ -3,17 +3,18 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
-#include "IShellView.h"
+#include "iShellView.h"
 #include "iShellBrowser_internal.h"
-#include "ShellBrowser/ViewModes.h"
+#include "MainResource.h"
+#include "ViewModes.h"
 #include "../Helper/Controls.h"
-#include "../Helper/Helper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
-#include "../Helper/ShellHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
+#include <list>
 
 
 HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath,UINT wFlags)
@@ -142,9 +143,9 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	if((nPrevItems + m_nAwaitingAdd) == 0)
 	{
 		if(m_bApplyFilter)
-			SendMessage(m_hOwner,WM_USER_FILTERINGAPPLIED,m_ID,TRUE);
+			ApplyFilteringBackgroundImage(true);
 		else
-			SendMessage(m_hOwner,WM_USER_FOLDEREMPTY,m_ID,TRUE);
+			ApplyFolderEmptyBackgroundImage(true);
 
 		m_nTotalItems = 0;
 
@@ -152,7 +153,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	}
 	else if(!m_bApplyFilter)
 	{
-		SendMessage(m_hOwner,WM_USER_FOLDEREMPTY,m_ID,FALSE);
+		ApplyFolderEmptyBackgroundImage(false);
 	}
 
 	/* Make the listview allocate space (for internal data structures)
@@ -259,6 +260,30 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	m_nAwaitingAdd = 0;
 }
 
+void CShellBrowser::ApplyFolderEmptyBackgroundImage(bool apply)
+{
+	if (apply)
+	{
+		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FOLDEREMPTY);
+	}
+	else
+	{
+		NListView::ListView_SetBackgroundImage(m_hListView, NULL);
+	}
+}
+
+void CShellBrowser::ApplyFilteringBackgroundImage(bool apply)
+{
+	if (apply)
+	{
+		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
+	}
+	else
+	{
+		NListView::ListView_SetBackgroundImage(m_hListView, NULL);
+	}
+}
+
 BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 {
 	BOOL bHideSystemFile	= FALSE;
@@ -323,7 +348,7 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 
 	if(nItems == 0 && !m_bApplyFilter)
 	{
-		SendMessage(m_hOwner,WM_USER_FOLDEREMPTY,m_ID,TRUE);
+		ApplyFolderEmptyBackgroundImage(true);
 	}
 }
 

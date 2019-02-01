@@ -119,24 +119,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		OnShellNewItemCreated(lParam);
 		break;
 
-	case WM_USER_FOLDEREMPTY:
-		{
-			if((BOOL)lParam == TRUE)
-				NListView::ListView_SetBackgroundImage(m_Tabs.at((int)wParam).listView,IDB_FOLDEREMPTY);
-			else
-				NListView::ListView_SetBackgroundImage(m_Tabs.at((int)wParam).listView,NULL);
-		}
-		break;
-
-	case WM_USER_FILTERINGAPPLIED:
-		{
-			if((BOOL)lParam == TRUE)
-				NListView::ListView_SetBackgroundImage(m_Tabs.at((int)wParam).listView,IDB_FILTERINGAPPLIED);
-			else
-				NListView::ListView_SetBackgroundImage(m_Tabs.at((int)wParam).listView,NULL);
-		}
-		break;
-
 	case WM_USER_DIRECTORYMODIFIED:
 		OnDirectoryModified((int)wParam);
 		break;

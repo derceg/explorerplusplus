@@ -845,16 +845,16 @@ void CShellBrowser::UpdateFiltering(void)
 	{
 		RemoveFilteredItems();
 
-		SendMessage(m_hOwner,WM_USER_FILTERINGAPPLIED,m_ID,TRUE);
+		ApplyFilteringBackgroundImage(true);
 	}
 	else
 	{
 		UnfilterAllItems();
 
 		if(m_nTotalItems == 0)
-			SendMessage(m_hOwner,WM_USER_FOLDEREMPTY,m_ID,TRUE);
+			ApplyFolderEmptyBackgroundImage(true);
 		else
-			SendMessage(m_hOwner,WM_USER_FILTERINGAPPLIED,m_ID,FALSE);
+			ApplyFilteringBackgroundImage(false);
 	}
 }
 

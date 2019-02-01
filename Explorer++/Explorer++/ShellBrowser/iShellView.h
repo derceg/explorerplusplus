@@ -26,8 +26,6 @@
 #define WM_USER_FILESADDED			(WM_APP + 51)
 #define WM_USER_STARTEDBROWSING		(WM_APP + 55)
 #define WM_USER_NEWITEMINSERTED		(WM_APP + 200)
-#define WM_USER_FOLDEREMPTY			(WM_APP + 201)
-#define WM_USER_FILTERINGAPPLIED	(WM_APP + 202)
 #define WM_USER_DIRECTORYMODIFIED	(WM_APP + 204)
 
 typedef struct
@@ -352,6 +350,8 @@ private:
 	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName);
 	void				ResetFolderMemoryAllocations(void);
 	void				SetCurrentViewModeInternal(ViewMode viewMode);
+	void				ApplyFolderEmptyBackgroundImage(bool apply);
+	void				ApplyFilteringBackgroundImage(bool apply);
 
 	static LRESULT CALLBACK	ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK	ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
