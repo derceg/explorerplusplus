@@ -451,7 +451,7 @@ void CShellBrowser::SetResourceModule(HINSTANCE hResourceModule)
 
 HRESULT CShellBrowser::Refresh()
 {
-	return BrowseFolder(m_pidlDirectory,SBSP_SAMEBROWSER|SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
+	return BrowseFolder(m_pidlDirectory,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 }
 
 void CShellBrowser::SetHideSystemFiles(BOOL bHideSystemFiles)

@@ -472,8 +472,6 @@ int *pTabObjectIndex)
 		m_iPreviousTabSelectionId = iTabId;
 	}
 
-	/* SBSP_SAMEBROWSER is used internally. Ignored
-	by the shellbrowser. */
 	uFlags = SBSP_ABSOLUTE;
 
 	/* These settings are applied to all tabs (i.e. they
@@ -931,7 +929,7 @@ void Explorerplusplus::RefreshTab(int iTabId)
 	pidlDirectory = m_Tabs[iTabId].shellBrower->QueryCurrentDirectoryIdl();
 
 	hr = m_Tabs[iTabId].shellBrower->BrowseFolder(pidlDirectory,
-		SBSP_SAMEBROWSER|SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
+		SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 
 	if(SUCCEEDED(hr))
 		OnDirChanged(iTabId);

@@ -313,7 +313,7 @@ BOOL Explorerplusplus::OnTreeViewItemExpanding(LPARAM lParam)
 				LPITEMIDLIST pidl	= NULL;
 
 				pidl = m_pMyTreeView->BuildPath(tvItem->hItem);
-				BrowseFolder(pidl,SBSP_SAMEBROWSER);
+				BrowseFolder(pidl,0);
 
 				CoTaskMemFree(pidl);
 			}
@@ -441,7 +441,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 	if(!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick &&
 		!CompareIdls(pidlDirectory,pidlCurrentDirectory))
 	{
-		BrowseFolder(pidlDirectory,SBSP_SAMEBROWSER);
+		BrowseFolder(pidlDirectory,0);
 
 		if(m_bTVAutoExpandSelected)
 		{

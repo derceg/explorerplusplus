@@ -11,14 +11,12 @@
 
 void Explorerplusplus::OnBrowseBack()
 {
-	BrowseFolder(EMPTY_STRING,
-		SBSP_NAVIGATEBACK | SBSP_SAMEBROWSER);
+	BrowseFolder(EMPTY_STRING, SBSP_NAVIGATEBACK);
 }
 
 void Explorerplusplus::OnBrowseForward()
 {
-	BrowseFolder(EMPTY_STRING,
-		SBSP_NAVIGATEFORWARD | SBSP_SAMEBROWSER);
+	BrowseFolder(EMPTY_STRING, SBSP_NAVIGATEFORWARD);
 }
 
 void Explorerplusplus::OnHome()
@@ -39,7 +37,7 @@ void Explorerplusplus::OnNavigateUp()
 
 	PathStripPath(szDirectory);
 
-	HRESULT hr = BrowseFolder(EMPTY_STRING, SBSP_PARENT | SBSP_SAMEBROWSER);
+	HRESULT hr = BrowseFolder(EMPTY_STRING, SBSP_PARENT);
 
 	if(SUCCEEDED(hr))
 	{
@@ -59,7 +57,7 @@ void Explorerplusplus::GotoFolder(int FolderCSIDL)
 	/* Don't use SUCCEEDED(hr). */
 	if(hr == S_OK)
 	{
-		BrowseFolder(pidl, SBSP_SAMEBROWSER | SBSP_ABSOLUTE);
+		BrowseFolder(pidl, SBSP_ABSOLUTE);
 
 		CoTaskMemFree(pidl);
 	}

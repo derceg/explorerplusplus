@@ -501,7 +501,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 					if(bRes)
 					{
 						/* Go to the root of this directory. */
-						BrowseFolder(szRoot, SBSP_ABSOLUTE | SBSP_SAMEBROWSER);
+						BrowseFolder(szRoot, SBSP_ABSOLUTE);
 					}
 				}
 
