@@ -64,6 +64,8 @@ void Explorerplusplus::InitializeTaskbarThumbnails()
 
 	/* Subclass the main window until the above message (TaskbarButtonCreated) is caught. */
 	SetWindowSubclass(m_hContainer,MainWndProcStub,0,reinterpret_cast<DWORD_PTR>(this));
+
+	m_tabCreatedSignal.connect(boost::bind(&Explorerplusplus::CreateTabProxy, this, _1, _2));
 }
 
 namespace

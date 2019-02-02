@@ -494,10 +494,7 @@ int *pTabObjectIndex)
 	if(pTabObjectIndex != NULL)
 		*pTabObjectIndex = iTabId;
 
-	/* If we're running on Windows 7, we'll create
-	a proxy window for each tab. This proxy window
-	will create the taskbar thumbnail for that tab. */
-	CreateTabProxy(iTabId,bSwitchToNewTab);
+	m_tabCreatedSignal(iTabId, bSwitchToNewTab);
 
 	if (bSwitchToNewTab)
 	{

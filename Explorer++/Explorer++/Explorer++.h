@@ -25,6 +25,7 @@
 #include "../Helper/SetDefaultFileManager.h"
 #include "../MyTreeView/MyTreeView.h"
 #include <boost/optional.hpp>
+#include <boost/signals2.hpp>
 #include <MsXml2.h>
 #include <objbase.h>
 #include <unordered_map>
@@ -787,6 +788,9 @@ private:
 	/* Tabs. */
 	std::unordered_map<int, Tab> m_Tabs;
 	int						m_tabIdCounter;
+
+	/* Tab signals. */
+	boost::signals2::signal<void(int, BOOL)>	m_tabCreatedSignal;
 
 	HWND					m_hActiveListView;
 	CShellBrowser *			m_pActiveShellBrowser;
