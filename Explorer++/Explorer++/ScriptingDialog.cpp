@@ -24,7 +24,10 @@ ScriptingDialog::~ScriptingDialog()
 
 INT_PTR ScriptingDialog::OnInitDialog()
 {
-	return TRUE;
+	HWND commandControl = GetDlgItem(m_hDlg, IDC_COMMAND);
+	SendMessage(m_hDlg, WM_NEXTDLGCTL, reinterpret_cast<WPARAM>(commandControl), TRUE);
+
+	return FALSE;
 }
 
 void ScriptingDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,
