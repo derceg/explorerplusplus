@@ -17,6 +17,7 @@ namespace Plugins
 		{
 			int id;
 			std::wstring location;
+			std::wstring name;
 			ViewMode viewMode;
 			bool locked;
 			bool addressLocked;
@@ -28,6 +29,7 @@ namespace Plugins
 
 				id = tabInternal.id;
 				location = path;
+				name = tabInternal.szName;
 				viewMode = tabInternal.shellBrower->GetCurrentViewMode();
 				locked = tabInternal.bLocked;
 				addressLocked = tabInternal.bAddressLocked;
