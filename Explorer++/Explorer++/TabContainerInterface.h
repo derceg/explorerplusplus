@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include "Tab.h"
 #include <boost/optional.hpp>
 #include <boost/signals2.hpp>
+#include <unordered_map>
 
 typedef boost::signals2::signal<void(int, BOOL)> TabCreatedSignal;
 
