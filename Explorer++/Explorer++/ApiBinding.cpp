@@ -7,6 +7,7 @@
 #include "TabsAPI.h"
 
 void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer);
+sol::table MarkTableReadOnly(sol::state &state, sol::table &table);
 int deny(lua_State *state);
 
 void Plugins::BindAllApiMethods(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer)
@@ -23,15 +24,21 @@ void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterf
 	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(tabContainer);
 
 	sol::table tabsTable = state.create_named_table("tabs");
+	sol::table tabsMetaTable = MarkTableReadOnly(state, tabsTable);
 
-	sol::table metaTable = state.create_table();
-	metaTable.set_function("getAll", &Plugins::TabsApi::getAll, tabsApi);
-	metaTable.set_function("get", &Plugins::TabsApi::get, tabsApi);
-	metaTable.set_function("create", &Plugins::TabsApi::create, tabsApi);
-	metaTable.set_function("move", &Plugins::TabsApi::move, tabsApi);
-	metaTable.set_function("close", &Plugins::TabsApi::close, tabsApi);
+	tabsMetaTable.set_function("getAll", &Plugins::TabsApi::getAll, tabsApi);
+	tabsMetaTable.set_function("get", &Plugins::TabsApi::get, tabsApi);
+	tabsMetaTable.set_function("create", &Plugins::TabsApi::create, tabsApi);
+	tabsMetaTable.set_function("move", &Plugins::TabsApi::move, tabsApi);
+	tabsMetaTable.set_function("close", &Plugins::TabsApi::close, tabsApi);
 
-	metaTable.new_usertype<Plugins::TabsApi::Tab>("Tab",
+	sol::table onCreatedTable = tabsMetaTable.create_named("onCreated");
+	sol::table onCreatedMetaTable = MarkTableReadOnly(state, onCreatedTable);
+
+	onCreatedMetaTable.set_function("addListener", &Plugins::TabsApi::addTabCreatedObserver, tabsApi);
+	onCreatedMetaTable.set_function("removeListener", &Plugins::TabsApi::removeTabCreatedObserver, tabsApi);
+
+	tabsMetaTable.new_usertype<Plugins::TabsApi::Tab>("Tab",
 		"id", &Plugins::TabsApi::Tab::id,
 		"location", &Plugins::TabsApi::Tab::location,
 		"name", &Plugins::TabsApi::Tab::name,
@@ -40,7 +47,7 @@ void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterf
 		"addressLocked", &Plugins::TabsApi::Tab::addressLocked,
 		"__tostring", &Plugins::TabsApi::Tab::toString);
 
-	metaTable.new_enum("ViewMode",
+	tabsMetaTable.new_enum("ViewMode",
 		"details", ViewMode::VM_DETAILS,
 		"extraLargeIcons", ViewMode::VM_EXTRALARGEICONS,
 		"icons", ViewMode::VM_ICONS,
@@ -49,11 +56,18 @@ void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterf
 		"smallIcons", ViewMode::VM_SMALLICONS,
 		"thumbnails", ViewMode::VM_THUMBNAILS,
 		"tiles", ViewMode::VM_TILES);
+}
+
+sol::table MarkTableReadOnly(sol::state &state, sol::table &table)
+{
+	sol::table metaTable = state.create_table();
 
 	metaTable[sol::meta_function::new_index] = deny;
 	metaTable[sol::meta_function::index] = metaTable;
 
-	tabsTable[sol::metatable_key] = metaTable;
+	table[sol::metatable_key] = metaTable;
+
+	return metaTable;
 }
 
 int deny(lua_State *state)

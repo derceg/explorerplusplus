@@ -5,6 +5,9 @@
 #pragma once
 
 #include <boost/optional.hpp>
+#include <boost/signals2.hpp>
+
+typedef boost::signals2::signal<void(int, BOOL)> TabCreatedSignal;
 
 // Eventually, this will be driven by a dedicated class, rather than the
 // Explorerplusplus class.
@@ -25,4 +28,6 @@ __interface TabContainerInterface
 
 	/* Temporary. */
 	void			SetTabSelection(int Index);
+
+	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
 };

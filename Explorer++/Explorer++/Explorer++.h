@@ -476,6 +476,7 @@ private:
 	HRESULT					CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
 	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
+	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
 	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(int iTab);
 	bool					OnCloseTab(void);
@@ -790,7 +791,7 @@ private:
 	int						m_tabIdCounter;
 
 	/* Tab signals. */
-	boost::signals2::signal<void(int, BOOL)>	m_tabCreatedSignal;
+	TabCreatedSignal		m_tabCreatedSignal;
 
 	HWND					m_hActiveListView;
 	CShellBrowser *			m_pActiveShellBrowser;

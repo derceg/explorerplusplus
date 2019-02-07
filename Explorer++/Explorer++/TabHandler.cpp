@@ -504,6 +504,11 @@ int *pTabObjectIndex)
 	return S_OK;
 }
 
+boost::signals2::connection Explorerplusplus::AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer)
+{
+	return m_tabCreatedSignal.connect(observer);
+}
+
 HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 {
 	TCHAR							szDirectory[MAX_PATH];

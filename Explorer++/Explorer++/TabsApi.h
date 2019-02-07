@@ -7,6 +7,9 @@
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
+#include "../ThirdParty/Sol/sol.hpp"
+#include <boost/signals2.hpp>
+#include <unordered_map>
 
 namespace Plugins
 {
@@ -53,8 +56,17 @@ namespace Plugins
 		int move(int tabId, int newIndex);
 		bool close(int tabId);
 
+		/* Events. */
+		int addTabCreatedObserver(sol::protected_function observer);
+		void removeTabCreatedObserver(int id);
+
 	private:
 
+		void onTabCreated(int tabId, sol::protected_function observer);
+
 		TabContainerInterface *m_tabContainer;
+
+		int m_observerIdCounter;
+		std::unordered_map<int, boost::signals2::connection> m_tabCreatedConnections;
 	};
 }
