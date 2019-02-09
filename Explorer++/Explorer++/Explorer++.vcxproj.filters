@@ -268,6 +268,9 @@
     <ClCompile Include="PluginMenuManager.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
+    <ClCompile Include="Manifest.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -496,6 +499,9 @@
       <Filter>Plugins</Filter>
     </ClInclude>
     <ClInclude Include="PluginMenuManager.h">
+      <Filter>Plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="Manifest.h">
       <Filter>Plugins</Filter>
     </ClInclude>
   </ItemGroup>

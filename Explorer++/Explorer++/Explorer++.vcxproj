@@ -332,6 +332,7 @@
     <ClCompile Include="MainToolbarHandler.cpp" />
     <ClCompile Include="MainWndSwitch.cpp" />
     <ClCompile Include="ManageBookmarksDialog.cpp" />
+    <ClCompile Include="Manifest.cpp" />
     <ClCompile Include="MassRenameDialog.cpp" />
     <ClCompile Include="MenuApi.cpp" />
     <ClCompile Include="MergeFilesDialog.cpp" />
@@ -432,6 +433,7 @@
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="MainToolbar.h" />
     <ClInclude Include="ManageBookmarksDialog.h" />
+    <ClInclude Include="Manifest.h" />
     <ClInclude Include="MassRenameDialog.h" />
     <ClInclude Include="MenuApi.h" />
     <ClInclude Include="MergeFilesDialog.h" />
@@ -548,6 +550,7 @@
     <Import Project="..\packages\boost_system-vc141.1.67.0.0\build\boost_system-vc141.targets" Condition="Exists('..\packages\boost_system-vc141.1.67.0.0\build\boost_system-vc141.targets')" />
     <Import Project="..\packages\boost_thread-vc140.1.67.0.0\build\boost_thread-vc140.targets" Condition="Exists('..\packages\boost_thread-vc140.1.67.0.0\build\boost_thread-vc140.targets')" />
     <Import Project="..\packages\boost_thread-vc141.1.67.0.0\build\boost_thread-vc141.targets" Condition="Exists('..\packages\boost_thread-vc141.1.67.0.0\build\boost_thread-vc141.targets')" />
+    <Import Project="..\packages\nlohmann.json.3.5.0\build\native\nlohmann.json.targets" Condition="Exists('..\packages\nlohmann.json.3.5.0\build\native\nlohmann.json.targets')" />
   </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
@@ -577,5 +580,6 @@
     <Error Condition="!Exists('..\packages\boost_system-vc141.1.67.0.0\build\boost_system-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_system-vc141.1.67.0.0\build\boost_system-vc141.targets'))" />
     <Error Condition="!Exists('..\packages\boost_thread-vc140.1.67.0.0\build\boost_thread-vc140.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc140.1.67.0.0\build\boost_thread-vc140.targets'))" />
     <Error Condition="!Exists('..\packages\boost_thread-vc141.1.67.0.0\build\boost_thread-vc141.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\boost_thread-vc141.1.67.0.0\build\boost_thread-vc141.targets'))" />
+    <Error Condition="!Exists('..\packages\nlohmann.json.3.5.0\build\native\nlohmann.json.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\nlohmann.json.3.5.0\build\native\nlohmann.json.targets'))" />
   </Target>
 </Project>

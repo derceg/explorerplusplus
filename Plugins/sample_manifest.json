@@ -1,0 +1,8 @@
+{
+  "name": "Test plugin",
+  "description": "Test description",
+  "file": "plugin.lua",
+  "version": "1.0",
+  "author": "John Smith",
+  "homepage": "http://example.com"
+}
