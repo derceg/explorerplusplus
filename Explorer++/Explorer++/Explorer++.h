@@ -12,6 +12,7 @@
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
 #include "MainToolbar.h"
+#include "PluginMenuManager.h"
 #include "ShellBrowser/iShellView.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
@@ -34,6 +35,8 @@
 #define MENU_BOOKMARK_ENDID			11000
 #define MENU_HEADER_STARTID			12000
 #define MENU_HEADER_ENDID			13000
+#define MENU_PLUGIN_STARTID			14000
+#define MENU_PLUGIN_ENDID			15000
 
 #define TOOLBAR_START				5000
 #define TABTOOLBAR_CLOSE			(TOOLBAR_START + 33)
@@ -792,6 +795,9 @@ private:
 
 	/* Tab signals. */
 	TabCreatedSignal		m_tabCreatedSignal;
+
+	/* Plugins. */
+	Plugins::PluginMenuManager	m_pluginMenuManager;
 
 	HWND					m_hActiveListView;
 	CShellBrowser *			m_pActiveShellBrowser;

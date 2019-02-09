@@ -312,6 +312,12 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			m_pActiveShellBrowser->ImportColumns(&m_pActiveColumnList);
 		}
 	}
+	else if (!HIWORD(wParam) && LOWORD(wParam) >= MENU_PLUGIN_STARTID &&
+		LOWORD(wParam) < MENU_PLUGIN_ENDID)
+	{
+		m_pluginMenuManager.OnMenuItemClicked(LOWORD(wParam));
+		return 0;
+	}
 
 	switch(LOWORD(wParam))
 	{

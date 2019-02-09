@@ -10,9 +10,9 @@
 #include <codecvt>
 
 ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-	IExplorerplusplus *pexpp, TabContainerInterface *tabContainer) :
+	TabContainerInterface *tabContainer, Plugins::PluginMenuManager *pluginMenuManager) :
 	CBaseDialog(hInstance, iResource, hParent, true),
-	m_luaPlugin(pexpp, tabContainer)
+	m_luaPlugin(tabContainer, pluginMenuManager)
 {
 
 }

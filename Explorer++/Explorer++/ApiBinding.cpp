@@ -4,23 +4,22 @@
 
 #include "stdafx.h"
 #include "APIBinding.h"
+#include "MenuApi.h"
 #include "TabsAPI.h"
 
-void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer);
+void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer);
+void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table);
 int deny(lua_State *state);
 
-void Plugins::BindAllApiMethods(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer)
+void Plugins::BindAllApiMethods(sol::state &state, TabContainerInterface *tabContainer, Plugins::PluginMenuManager *pluginMenuManager)
 {
-	BindTabsAPI(state, pexpp, tabContainer);
+	BindTabsAPI(state, tabContainer);
+	BindMenuApi(state, pluginMenuManager);
 }
 
-void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer)
+void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer)
 {
-	// This parameter is likely to be used again when other API methods
-	// are added.
-	UNREFERENCED_PARAMETER(pexpp);
-
 	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(tabContainer);
 
 	sol::table tabsTable = state.create_named_table("tabs");
@@ -56,6 +55,17 @@ void BindTabsAPI(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterf
 		"smallIcons", ViewMode::VM_SMALLICONS,
 		"thumbnails", ViewMode::VM_THUMBNAILS,
 		"tiles", ViewMode::VM_TILES);
+}
+
+void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager)
+{
+	std::shared_ptr<Plugins::MenuApi> menuApi = std::make_shared<Plugins::MenuApi>(pluginMenuManager);
+
+	sol::table menuTable = state.create_named_table("menu");
+	sol::table metaTable = MarkTableReadOnly(state, menuTable);
+
+	metaTable.set_function("create", &Plugins::MenuApi::create, menuApi);
+	metaTable.set_function("remove", &Plugins::MenuApi::remove, menuApi);
 }
 
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table)

@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "Explorer++_internal.h"
+#include "PluginMenuManager.h"
 #include "TabContainerInterface.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 namespace Plugins
 {
-	void BindAllApiMethods(sol::state &state, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer);
+	void BindAllApiMethods(sol::state &state, TabContainerInterface *tabContainer, PluginMenuManager *pluginMenuManager);
 }

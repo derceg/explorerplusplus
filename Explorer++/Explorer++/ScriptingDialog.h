@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Explorer++_internal.h"
 #include "LuaPlugin.h"
+#include "PluginMenuManager.h"
 #include "TabContainerInterface.h"
 #include "../Helper/BaseDialog.h"
 
@@ -9,7 +9,8 @@ class ScriptingDialog : public CBaseDialog
 {
 public:
 
-	ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer);
+	ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+		TabContainerInterface *tabContainer, Plugins::PluginMenuManager *pluginMenuManager);
 	~ScriptingDialog();
 
 protected:
