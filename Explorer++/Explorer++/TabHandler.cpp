@@ -1585,7 +1585,7 @@ boost::optional<Tab> Explorerplusplus::GetTab(int tabId)
 
 int Explorerplusplus::GetNumTabs() const
 {
-	return m_Tabs.size();
+	return static_cast<int>(m_Tabs.size());
 }
 
 int Explorerplusplus::MoveTab(const Tab &tab, int newIndex)
