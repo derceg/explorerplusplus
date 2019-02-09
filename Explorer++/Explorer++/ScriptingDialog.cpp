@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "ScriptingDialog.h"
 #include "MainResource.h"
+#include "Manifest.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
 #include <codecvt>
@@ -12,7 +13,7 @@
 ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent,
 	TabContainerInterface *tabContainer, Plugins::PluginMenuManager *pluginMenuManager) :
 	CBaseDialog(hInstance, iResource, hParent, true),
-	m_luaPlugin(tabContainer, pluginMenuManager)
+	m_luaPlugin(L"", Plugins::Manifest(), tabContainer, pluginMenuManager)
 {
 
 }

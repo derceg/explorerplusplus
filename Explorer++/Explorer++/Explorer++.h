@@ -12,6 +12,7 @@
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
 #include "MainToolbar.h"
+#include "PluginManager.h"
 #include "PluginMenuManager.h"
 #include "ShellBrowser/iShellView.h"
 #include "ShellBrowser/ViewModes.h"
@@ -497,6 +498,9 @@ private:
 	int						GetNumTabs() const;
 	int						MoveTab(const Tab &tab, int newIndex);
 
+	/* Plugins. */
+	void					InitializePlugins();
+
 	/* Clone Window. */
 	void					OnCloneWindow(void);
 
@@ -797,6 +801,7 @@ private:
 	TabCreatedSignal		m_tabCreatedSignal;
 
 	/* Plugins. */
+	std::unique_ptr<Plugins::PluginManager>	m_pluginManager;
 	Plugins::PluginMenuManager	m_pluginMenuManager;
 
 	HWND					m_hActiveListView;

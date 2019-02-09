@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Manifest.h"
 #include "PluginMenuManager.h"
 #include "TabContainerInterface.h"
 #include "../ThirdParty/Sol/sol.hpp"
@@ -16,13 +17,29 @@ namespace Plugins
 	{
 	public:
 
-		LuaPlugin(TabContainerInterface *tabContainer, PluginMenuManager *pluginMenuManager);
+		LuaPlugin(const std::wstring &directory, const Manifest &manifest, TabContainerInterface *tabContainer, PluginMenuManager *pluginMenuManager);
 		~LuaPlugin();
 
+		std::wstring GetDirectory();
+		Plugins::Manifest GetManifest();
 		sol::state &GetLuaState();
 
 	private:
 
+		std::wstring m_directory;
+		Manifest m_manifest;
+
 		sol::state m_lua;
+	};
+
+	class LuaPanicException : public std::runtime_error
+	{
+	public:
+
+		LuaPanicException(const std::string &str) :
+			std::runtime_error(str)
+		{
+
+		}
 	};
 }

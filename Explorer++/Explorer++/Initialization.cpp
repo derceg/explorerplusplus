@@ -132,7 +132,7 @@ void Explorerplusplus::OnCreate(void)
 	restored. */
 	HMENU mainMenu = LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_MAINMENU));
 
-	if (!g_enableLuaScripting)
+	if (!g_enablePlugins)
 	{
 		DeleteMenu(mainMenu, IDM_TOOLS_RUNSCRIPT, MF_BYCOMMAND);
 	}
@@ -215,6 +215,8 @@ void Explorerplusplus::OnCreate(void)
 	m_hNextClipboardViewer = SetClipboardViewer(m_hContainer);
 
 	SetFocus(m_hActiveListView);
+
+	InitializePlugins();
 
 	m_InitializationFinished = true;
 }

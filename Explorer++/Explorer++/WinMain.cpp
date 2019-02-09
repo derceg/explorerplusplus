@@ -54,7 +54,7 @@ HWND g_hwndManageBookmarks;
 TCHAR g_szLang[32];
 BOOL g_bForceLanguageLoad = FALSE;
 
-bool g_enableLuaScripting = false;
+bool g_enablePlugins = false;
 
 /*
  * Processes the specified command line.
@@ -185,9 +185,9 @@ ensure you have administrator privileges."),NExplorerplusplus::APP_NAME,MB_ICONW
 		{
 			boost::log::core::get()->set_logging_enabled(true);
 		}
-		else if (lstrcmp(szPath, _T("-enable_lua_scripting")) == 0)
+		else if (lstrcmp(szPath, _T("-enable_plugins")) == 0)
 		{
-			g_enableLuaScripting = true;
+			g_enablePlugins = true;
 		}
 		else
 		{

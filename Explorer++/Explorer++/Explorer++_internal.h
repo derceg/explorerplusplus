@@ -87,6 +87,6 @@ static const TCHAR SHELL_DEFAULT_INTERNAL_COMMAND_NAME[] = _T("openinexplorer++"
 extern BOOL g_bForceLanguageLoad;
 extern TCHAR g_szLang[32];
 
-extern bool g_enableLuaScripting;
+extern bool g_enablePlugins;
 
 BOOL TestConfigFileInternal(void);

@@ -271,6 +271,12 @@
     <ClCompile Include="Manifest.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
+    <ClCompile Include="PluginManager.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="PluginInitialization.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -502,6 +508,9 @@
       <Filter>Plugins</Filter>
     </ClInclude>
     <ClInclude Include="Manifest.h">
+      <Filter>Plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginManager.h">
       <Filter>Plugins</Filter>
     </ClInclude>
   </ItemGroup>
