@@ -36,6 +36,11 @@ void Plugins::from_json(const nlohmann::json &json, Manifest &manifest)
 		auto homepage = json["homepage"].get<std::string>();
 		manifest.homepage = converter.from_bytes(homepage);
 	}
+
+	if (json.count("std_libs_required") != 0)
+	{
+		json["std_libs_required"].get_to<std::vector<sol::lib>>(manifest.libraries);
+	}
 }
 
 boost::optional<Plugins::Manifest> Plugins::parseManifest(const boost::filesystem::path &manifestPath)

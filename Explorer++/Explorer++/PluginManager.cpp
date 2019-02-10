@@ -56,6 +56,19 @@ bool Plugins::PluginManager::registerPlugin(const boost::filesystem::path &direc
 {
 	auto plugin = std::make_unique<LuaPlugin>(directory.wstring(), manifest, m_tabContainer, m_pluginMenuManager);
 
+	for (auto library : manifest.libraries)
+	{
+		// open_libraries takes an rvalue reference. It also checks that
+		// the arguments passed in are all of type sol::lib. If library
+		// is passed in directly, the type T will be "sol::lib &", which
+		// won't match the type sol::lib. To ensure that they do match,
+		// an rvalue reference needs to be passed in (which makes sense,
+		// as this function is designed to be called with enum values
+		// directly (e.g. sol::lib::base), which are rvalues). This is
+		// why std::move is being used here.
+		plugin->GetLuaState().open_libraries(std::move(library));
+	}
+
 	auto pluginFile = directory / manifest.file;
 
 	// There's a potential race issue here. The file could exist at this
