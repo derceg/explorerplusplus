@@ -1,0 +1,8 @@
+{
+  "name": "Sort tabs by name",
+  "description": "Adds a menu entry that sorts tabs by name when clicked",
+  "file": "sort_tabs_by_name.lua",
+  "version": "1.0",
+  "std_libs_required": ["table"],
+  "author": "David Erceg"
+}

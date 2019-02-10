@@ -1,10 +1,8 @@
-This directory contains sample scripts that demonstrate functionality offered by the Explorer++ plugin API. Currently, the plugin system is in development. There is no way to load any of these scripts directly yet.
+This directory contains sample plugins that demonstrate functionality offered by the Explorer++ plugin API. Currently, the plugin system is in development.
 
-You can, however, run the code they contain by going through the following steps:
+To load the plugins here, go through the following steps:
 
-1. Start Explorer++ with scripting enabled:
+1. Copy the desired plugins into a "plugins" folder in the same directory as the Explorer++ executable.
+2. Start Explorer++ with plugin support enabled:
 
-explorer++.exe -enable_lua_scripting
-
-2. Open the scripting dialog by going to Tools > Run Script...
-3. Paste any commands you want to run in the scripting dialog and press enter (or click the "Run" button).
+explorer++.exe -enable_plugins
