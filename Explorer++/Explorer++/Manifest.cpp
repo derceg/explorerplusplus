@@ -11,9 +11,9 @@ void Plugins::from_json(const nlohmann::json &json, Manifest &manifest)
 {
 	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-	auto name = json["name"].get<std::string>();
-	auto file = json["file"].get<std::string>();
-	auto version = json["version"].get<std::string>();
+	auto name = json.at("name").get<std::string>();
+	auto file = json.at("file").get<std::string>();
+	auto version = json.at("version").get<std::string>();
 
 	manifest.name = converter.from_bytes(name);
 	manifest.file = converter.from_bytes(file);
@@ -21,25 +21,25 @@ void Plugins::from_json(const nlohmann::json &json, Manifest &manifest)
 
 	if (json.count("description") != 0)
 	{
-		auto description = json["description"].get<std::string>();
+		auto description = json.at("description").get<std::string>();
 		manifest.description = converter.from_bytes(description);
 	}
 
 	if (json.count("author") != 0)
 	{
-		auto author = json["author"].get<std::string>();
+		auto author = json.at("author").get<std::string>();
 		manifest.author = converter.from_bytes(author);
 	}
 
 	if (json.count("homepage") != 0)
 	{
-		auto homepage = json["homepage"].get<std::string>();
+		auto homepage = json.at("homepage").get<std::string>();
 		manifest.homepage = converter.from_bytes(homepage);
 	}
 
 	if (json.count("std_libs_required") != 0)
 	{
-		json["std_libs_required"].get_to<std::vector<sol::lib>>(manifest.libraries);
+		json.at("std_libs_required").get_to<std::vector<sol::lib>>(manifest.libraries);
 	}
 }
 
