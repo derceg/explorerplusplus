@@ -243,8 +243,8 @@ int CALLBACK CManageBookmarksDialog::SortBookmarks(LPARAM lParam1,LPARAM lParam2
 	HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
 	CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
 
-	NBookmarkHelper::variantBookmark_t variantBookmark1 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam1);
-	NBookmarkHelper::variantBookmark_t variantBookmark2 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam2);
+	const VariantBookmark &variantBookmark1 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam1);
+	const VariantBookmark &variantBookmark2 = m_pBookmarkListView->GetBookmarkItemFromListViewlParam(BookmarkFolder,lParam2);
 
 	int iRes = NBookmarkHelper::Sort(m_pmbdps->m_SortMode,variantBookmark1,variantBookmark2);
 
@@ -557,7 +557,7 @@ BOOL CManageBookmarksDialog::OnLvnEndLabelEdit(NMLVDISPINFO *pnmlvdi)
 		assert(hSelectedItem != NULL);
 
 		CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelectedItem);
-		NBookmarkHelper::variantBookmark_t variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(
+		VariantBookmark &variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(
 			ParentBookmarkFolder,pnmlvdi->item.iItem);
 
 		if(variantBookmark.type() == typeid(CBookmarkFolder))
@@ -657,7 +657,7 @@ void CManageBookmarksDialog::GetColumnString(CManageBookmarksDialogPersistentSet
 	LoadString(GetInstance(),uResourceID,szColumn,cchBuf);
 }
 
-void CManageBookmarksDialog::GetBookmarkItemColumnInfo(const NBookmarkHelper::variantBookmark_t variantBookmark,
+void CManageBookmarksDialog::GetBookmarkItemColumnInfo(const VariantBookmark &variantBookmark,
 	CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf)
 {
 	if(variantBookmark.type() == typeid(CBookmarkFolder))
@@ -897,17 +897,17 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 		HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 		HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
 		CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
-		NBookmarkHelper::variantBookmark_t variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(
+		const VariantBookmark &variantBookmark = m_pBookmarkListView->GetBookmarkItemFromListView(
 			ParentBookmarkFolder,pnmia->iItem);
 
 		if(variantBookmark.type() == typeid(CBookmarkFolder))
 		{
-			CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
+			const CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(variantBookmark);
 			BrowseBookmarkFolder(BookmarkFolder);
 		}
 		else if(variantBookmark.type() == typeid(CBookmark))
 		{
-			CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
+			const CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
 			m_pexpp->BrowseFolder(Bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 		}
 	}

@@ -397,28 +397,28 @@ void CBookmarksToolbar::RemoveBookmarkItem(const GUID &guid)
 	}
 }
 
-boost::optional<NBookmarkHelper::variantBookmark_t> CBookmarksToolbar::GetBookmarkItemFromToolbarIndex(int index)
+VariantBookmark *CBookmarksToolbar::GetBookmarkItemFromToolbarIndex(int index)
 {
 	TBBUTTON tbButton;
 	BOOL ret = static_cast<BOOL>(SendMessage(m_hToolbar, TB_GETBUTTON, index, reinterpret_cast<LPARAM>(&tbButton)));
 
 	if (!ret)
 	{
-		return boost::none;
+		return nullptr;
 	}
 
 	auto itr = m_mapID.find(static_cast<UINT>(tbButton.dwData));
 
 	if (itr == m_mapID.end())
 	{
-		return boost::none;
+		return nullptr;
 	}
 
-	auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks, m_guidBookmarksToolbar);
+	auto &variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks, m_guidBookmarksToolbar);
 	CBookmarkFolder &BookmarksToolbarFolder = boost::get<CBookmarkFolder>(variantBookmarksToolbar);
 
-	auto variantBookmarkItem = NBookmarkHelper::GetBookmarkItem(BookmarksToolbarFolder, itr->second);
-	return variantBookmarkItem;
+	auto &variantBookmarkItem = NBookmarkHelper::GetBookmarkItem(BookmarksToolbarFolder, itr->second);
+	return &variantBookmarkItem;
 }
 
 int CBookmarksToolbar::GetBookmarkItemIndex(const GUID &guid)

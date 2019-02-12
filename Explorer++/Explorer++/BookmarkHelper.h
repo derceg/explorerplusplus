@@ -26,7 +26,6 @@ namespace NBookmarkHelper
 	};
 
 	typedef std::unordered_set<GUID,GuidHash,GuidEq> setExpansion_t;
-	typedef boost::variant<CBookmarkFolder &,CBookmark &> variantBookmark_t;
 
 	enum SortMode_t
 	{
@@ -44,7 +43,7 @@ namespace NBookmarkHelper
 	static TCHAR *TOOLBAR_GUID = _T("00000000-0000-0000-0000-000000000002");
 	static TCHAR *MENU_GUID = _T("00000000-0000-0000-0000-000000000003");
 
-	int CALLBACK		Sort(SortMode_t SortMode,const variantBookmark_t BookmarkItem1,const variantBookmark_t BookmarkItem2);
+	int CALLBACK		Sort(SortMode_t SortMode, const VariantBookmark &BookmarkItem1, const VariantBookmark &BookmarkItem2);
 
-	variantBookmark_t	GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder,const GUID &guid);
+	VariantBookmark		&GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder, const GUID &guid);
 }

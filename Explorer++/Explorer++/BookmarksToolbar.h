@@ -92,7 +92,7 @@ private:
 
 	int		GetBookmarkItemIndex(const GUID &guid);
 
-	boost::optional<NBookmarkHelper::variantBookmark_t>	GetBookmarkItemFromToolbarIndex(int index);
+	VariantBookmark	*GetBookmarkItemFromToolbarIndex(int index);
 
 	HWND							m_hToolbar;
 	HIMAGELIST						m_himl;

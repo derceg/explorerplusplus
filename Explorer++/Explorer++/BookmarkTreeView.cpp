@@ -292,7 +292,7 @@ CBookmarkFolder &CBookmarkTreeView::GetBookmarkFolderFromTreeView(HTREEITEM hIte
 		UINT uID = stackIDs.top();
 		auto itr = m_mapID.find(uID);
 
-		NBookmarkHelper::variantBookmark_t variantBookmark = NBookmarkHelper::GetBookmarkItem(*pBookmarkFolder, itr->second);
+		VariantBookmark &variantBookmark = NBookmarkHelper::GetBookmarkItem(*pBookmarkFolder, itr->second);
 		pBookmarkFolder = boost::get<CBookmarkFolder>(&variantBookmark);
 
 		stackIDs.pop();

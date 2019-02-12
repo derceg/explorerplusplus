@@ -12,14 +12,14 @@
 #include "../Helper/Macros.h"
 
 
-int CALLBACK SortByName(const NBookmarkHelper::variantBookmark_t BookmarkItem1,const NBookmarkHelper::variantBookmark_t BookmarkItem2);
-int CALLBACK SortByLocation(const NBookmarkHelper::variantBookmark_t BookmarkItem1,const NBookmarkHelper::variantBookmark_t BookmarkItem2);
-int CALLBACK SortByVisitDate(const NBookmarkHelper::variantBookmark_t BookmarkItem1,const NBookmarkHelper::variantBookmark_t BookmarkItem2);
-int CALLBACK SortByVisitCount(const NBookmarkHelper::variantBookmark_t BookmarkItem1,const NBookmarkHelper::variantBookmark_t BookmarkItem2);
-int CALLBACK SortByAdded(const NBookmarkHelper::variantBookmark_t BookmarkItem1,const NBookmarkHelper::variantBookmark_t BookmarkItem2);
-int CALLBACK SortByLastModified(const NBookmarkHelper::variantBookmark_t BookmarkItem1,const NBookmarkHelper::variantBookmark_t BookmarkItem2);
+int CALLBACK SortByName(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
+int CALLBACK SortByLocation(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
+int CALLBACK SortByVisitDate(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
+int CALLBACK SortByVisitCount(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
+int CALLBACK SortByAdded(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
+int CALLBACK SortByLastModified(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
 
-NBookmarkHelper::variantBookmark_t NBookmarkHelper::GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder,
+VariantBookmark &NBookmarkHelper::GetBookmarkItem(CBookmarkFolder &ParentBookmarkFolder,
 	const GUID &guid)
 {
 	auto itr = std::find_if(ParentBookmarkFolder.begin(),ParentBookmarkFolder.end(),
@@ -40,20 +40,11 @@ NBookmarkHelper::variantBookmark_t NBookmarkHelper::GetBookmarkItem(CBookmarkFol
 
 	assert(itr != ParentBookmarkFolder.end());
 
-	if(itr->type() == typeid(CBookmarkFolder))
-	{
-		CBookmarkFolder &BookmarkFolder = boost::get<CBookmarkFolder>(*itr);
-		return BookmarkFolder;
-	}
-	else
-	{
-		CBookmark &Bookmark = boost::get<CBookmark>(*itr);
-		return Bookmark;
-	}
+	return *itr;
 }
 
-int CALLBACK NBookmarkHelper::Sort(SortMode_t SortMode,const variantBookmark_t BookmarkItem1,
-	const variantBookmark_t BookmarkItem2)
+int CALLBACK NBookmarkHelper::Sort(SortMode_t SortMode,const VariantBookmark &BookmarkItem1,
+	const VariantBookmark &BookmarkItem2)
 {
 	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
 		BookmarkItem2.type() == typeid(CBookmark))
@@ -104,8 +95,8 @@ int CALLBACK NBookmarkHelper::Sort(SortMode_t SortMode,const variantBookmark_t B
 	}
 }
 
-int CALLBACK SortByName(const NBookmarkHelper::variantBookmark_t BookmarkItem1,
-	const NBookmarkHelper::variantBookmark_t BookmarkItem2)
+int CALLBACK SortByName(const VariantBookmark &BookmarkItem1,
+	const VariantBookmark &BookmarkItem2)
 {
 	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
 		BookmarkItem2.type() == typeid(CBookmarkFolder))
@@ -124,8 +115,8 @@ int CALLBACK SortByName(const NBookmarkHelper::variantBookmark_t BookmarkItem1,
 	}
 }
 
-int CALLBACK SortByLocation(const NBookmarkHelper::variantBookmark_t BookmarkItem1,
-	const NBookmarkHelper::variantBookmark_t BookmarkItem2)
+int CALLBACK SortByLocation(const VariantBookmark &BookmarkItem1,
+	const VariantBookmark &BookmarkItem2)
 {
 	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
 		BookmarkItem2.type() == typeid(CBookmarkFolder))
@@ -141,8 +132,8 @@ int CALLBACK SortByLocation(const NBookmarkHelper::variantBookmark_t BookmarkIte
 	}
 }
 
-int CALLBACK SortByVisitDate(const NBookmarkHelper::variantBookmark_t BookmarkItem1,
-	const NBookmarkHelper::variantBookmark_t BookmarkItem2)
+int CALLBACK SortByVisitDate(const VariantBookmark &BookmarkItem1,
+	const VariantBookmark &BookmarkItem2)
 {
 	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
 		BookmarkItem2.type() == typeid(CBookmarkFolder))
@@ -161,8 +152,8 @@ int CALLBACK SortByVisitDate(const NBookmarkHelper::variantBookmark_t BookmarkIt
 	}
 }
 
-int CALLBACK SortByVisitCount(const NBookmarkHelper::variantBookmark_t BookmarkItem1,
-	const NBookmarkHelper::variantBookmark_t BookmarkItem2)
+int CALLBACK SortByVisitCount(const VariantBookmark &BookmarkItem1,
+	const VariantBookmark &BookmarkItem2)
 {
 	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
 		BookmarkItem2.type() == typeid(CBookmarkFolder))
@@ -178,8 +169,8 @@ int CALLBACK SortByVisitCount(const NBookmarkHelper::variantBookmark_t BookmarkI
 	}
 }
 
-int CALLBACK SortByAdded(const NBookmarkHelper::variantBookmark_t BookmarkItem1,
-	const NBookmarkHelper::variantBookmark_t BookmarkItem2)
+int CALLBACK SortByAdded(const VariantBookmark &BookmarkItem1,
+	const VariantBookmark &BookmarkItem2)
 {
 	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
 		BookmarkItem2.type() == typeid(CBookmarkFolder))
@@ -204,8 +195,8 @@ int CALLBACK SortByAdded(const NBookmarkHelper::variantBookmark_t BookmarkItem1,
 	}
 }
 
-int CALLBACK SortByLastModified(const NBookmarkHelper::variantBookmark_t BookmarkItem1,
-	const NBookmarkHelper::variantBookmark_t BookmarkItem2)
+int CALLBACK SortByLastModified(const VariantBookmark &BookmarkItem1,
+	const VariantBookmark &BookmarkItem2)
 {
 	if(BookmarkItem1.type() == typeid(CBookmarkFolder) &&
 		BookmarkItem2.type() == typeid(CBookmarkFolder))

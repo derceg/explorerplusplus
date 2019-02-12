@@ -109,7 +109,7 @@ private:
 	void		SortListViewItems(NBookmarkHelper::SortMode_t SortMode);
 
 	void		GetColumnString(CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,UINT cchBuf);
-	void		GetBookmarkItemColumnInfo(const NBookmarkHelper::variantBookmark_t variantBookmark,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
+	void		GetBookmarkItemColumnInfo(const VariantBookmark &variantBookmark, CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType, TCHAR *szColumn, size_t cchBuf);
 	void		GetBookmarkColumnInfo(const CBookmark &Bookmark,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
 	void		GetBookmarkFolderColumnInfo(const CBookmarkFolder &BookmarkFolder,CManageBookmarksDialogPersistentSettings::ColumnType_t ColumnType,TCHAR *szColumn,size_t cchBuf);
 
