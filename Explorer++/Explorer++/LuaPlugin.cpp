@@ -9,12 +9,12 @@
 inline int onPanic(lua_State *L);
 
 Plugins::LuaPlugin::LuaPlugin(const std::wstring &directory, const Manifest &manifest,
-	TabContainerInterface *tabContainer, PluginMenuManager *pluginMenuManager) :
+	TabContainerInterface *tabContainer, PluginMenuManager *pluginMenuManager, UiTheming *uiTheming) :
 	m_directory(directory),
 	m_manifest(manifest),
 	m_lua(onPanic)
 {
-	BindAllApiMethods(m_lua, tabContainer, pluginMenuManager);
+	BindAllApiMethods(m_lua, tabContainer, pluginMenuManager, uiTheming);
 }
 
 Plugins::LuaPlugin::~LuaPlugin()
@@ -22,12 +22,12 @@ Plugins::LuaPlugin::~LuaPlugin()
 
 }
 
-std::wstring Plugins::LuaPlugin::GetDirectory()
+std::wstring Plugins::LuaPlugin::GetDirectory() const
 {
 	return m_directory;
 }
 
-Plugins::Manifest Plugins::LuaPlugin::GetManifest()
+Plugins::Manifest Plugins::LuaPlugin::GetManifest() const
 {
 	return m_manifest;
 }

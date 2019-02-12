@@ -115,6 +115,9 @@
     <ClCompile Include="ImageHelper.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="Rgb.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -245,6 +248,9 @@
     </ClInclude>
     <ClInclude Include="PIDLWrapper.h">
       <Filter>Resource Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="Rgb.h">
+      <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

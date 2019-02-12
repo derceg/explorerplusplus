@@ -3,6 +3,7 @@
 #include "LuaPlugin.h"
 #include "PluginMenuManager.h"
 #include "TabContainerInterface.h"
+#include "UiTheming.h"
 #include "../Helper/BaseDialog.h"
 
 class ScriptingDialog : public CBaseDialog
@@ -10,7 +11,8 @@ class ScriptingDialog : public CBaseDialog
 public:
 
 	ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-		TabContainerInterface *tabContainer, Plugins::PluginMenuManager *pluginMenuManager);
+		TabContainerInterface *tabContainer, Plugins::PluginMenuManager *pluginMenuManager,
+		UiTheming *uiTheming);
 	~ScriptingDialog();
 
 protected:

@@ -6,16 +6,20 @@
 #include "APIBinding.h"
 #include "MenuApi.h"
 #include "TabsAPI.h"
+#include "UiApi.h"
 
 void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
+void BindUiApi(sol::state &state, UiTheming *uiTheming);
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table);
 int deny(lua_State *state);
 
-void Plugins::BindAllApiMethods(sol::state &state, TabContainerInterface *tabContainer, Plugins::PluginMenuManager *pluginMenuManager)
+void Plugins::BindAllApiMethods(sol::state &state, TabContainerInterface *tabContainer,
+	Plugins::PluginMenuManager *pluginMenuManager, UiTheming *uiTheming)
 {
 	BindTabsAPI(state, tabContainer);
 	BindMenuApi(state, pluginMenuManager);
+	BindUiApi(state, uiTheming);
 }
 
 void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer)
@@ -66,6 +70,17 @@ void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManage
 
 	metaTable.set_function("create", &Plugins::MenuApi::create, menuApi);
 	metaTable.set_function("remove", &Plugins::MenuApi::remove, menuApi);
+}
+
+void BindUiApi(sol::state &state, UiTheming *uiTheming)
+{
+	std::shared_ptr<Plugins::UiApi> uiApi = std::make_shared<Plugins::UiApi>(uiTheming);
+
+	sol::table uiTable = state.create_named_table("ui");
+	sol::table metaTable = MarkTableReadOnly(state, uiTable);
+
+	metaTable.set_function("setListViewColors", &Plugins::UiApi::setListViewColors, uiApi);
+	metaTable.set_function("setTreeViewColors", &Plugins::UiApi::setTreeViewColors, uiApi);
 }
 
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table)

@@ -11,9 +11,9 @@
 #include <codecvt>
 
 ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-	TabContainerInterface *tabContainer, Plugins::PluginMenuManager *pluginMenuManager) :
+	TabContainerInterface *tabContainer, Plugins::PluginMenuManager *pluginMenuManager, UiTheming *uiTheming) :
 	CBaseDialog(hInstance, iResource, hParent, true),
-	m_luaPlugin(L"", Plugins::Manifest(), tabContainer, pluginMenuManager)
+	m_luaPlugin(L"", Plugins::Manifest(), tabContainer, pluginMenuManager, uiTheming)
 {
 
 }

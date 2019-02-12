@@ -383,7 +383,9 @@
     <ClCompile Include="TabHandler.cpp" />
     <ClCompile Include="TabsApi.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
+    <ClCompile Include="UiTheming.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
+    <ClCompile Include="UiApi.cpp" />
     <ClCompile Include="UpdateCheckDialog.cpp" />
     <ClCompile Include="WildcardSelectDialog.cpp" />
     <ClCompile Include="WindowHandler.cpp" />
@@ -470,7 +472,9 @@
     <ClInclude Include="TabDropHandler.h" />
     <ClInclude Include="TabInterface.h" />
     <ClInclude Include="TabsApi.h" />
+    <ClInclude Include="UiTheming.h" />
     <ClInclude Include="ToolbarButtons.h" />
+    <ClInclude Include="UiApi.h" />
     <ClInclude Include="UpdateCheckDialog.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
     <ClInclude Include="XMLSettings.h" />

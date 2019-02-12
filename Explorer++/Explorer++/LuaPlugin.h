@@ -7,6 +7,7 @@
 #include "Manifest.h"
 #include "PluginMenuManager.h"
 #include "TabContainerInterface.h"
+#include "UiTheming.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 namespace Plugins
@@ -17,11 +18,12 @@ namespace Plugins
 	{
 	public:
 
-		LuaPlugin(const std::wstring &directory, const Manifest &manifest, TabContainerInterface *tabContainer, PluginMenuManager *pluginMenuManager);
+		LuaPlugin(const std::wstring &directory, const Manifest &manifest, TabContainerInterface *tabContainer,
+			PluginMenuManager *pluginMenuManager, UiTheming *uiTheming);
 		~LuaPlugin();
 
-		std::wstring GetDirectory();
-		Plugins::Manifest GetManifest();
+		std::wstring GetDirectory() const;
+		Plugins::Manifest GetManifest() const;
 		sol::state &GetLuaState();
 
 	private:

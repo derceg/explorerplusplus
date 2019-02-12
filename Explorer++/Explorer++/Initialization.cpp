@@ -216,6 +216,8 @@ void Explorerplusplus::OnCreate(void)
 
 	SetFocus(m_hActiveListView);
 
+	m_uiTheming = std::make_unique<UiTheming>(this, this);
+
 	InitializePlugins();
 
 	m_InitializationFinished = true;

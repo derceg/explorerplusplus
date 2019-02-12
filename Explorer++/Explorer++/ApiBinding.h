@@ -6,9 +6,11 @@
 
 #include "PluginMenuManager.h"
 #include "TabContainerInterface.h"
+#include "UiTheming.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 namespace Plugins
 {
-	void BindAllApiMethods(sol::state &state, TabContainerInterface *tabContainer, PluginMenuManager *pluginMenuManager);
+	void BindAllApiMethods(sol::state &state, TabContainerInterface *tabContainer,
+		PluginMenuManager *pluginMenuManager, UiTheming *uiTheming);
 }

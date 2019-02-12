@@ -20,6 +20,7 @@
 #include "TabContainer.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
+#include "UiTheming.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -799,6 +800,9 @@ private:
 
 	/* Tab signals. */
 	TabCreatedSignal		m_tabCreatedSignal;
+
+	/* Theming. */
+	std::unique_ptr<UiTheming>	m_uiTheming;
 
 	/* Plugins. */
 	std::unique_ptr<Plugins::PluginManager>	m_pluginManager;
