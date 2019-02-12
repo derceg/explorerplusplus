@@ -1,0 +1,7 @@
+{
+  "name": "Update theme colors",
+  "description": "Updates the listview and treeview background colors",
+  "file": "update_theme_colors.lua",
+  "version": "1.0",
+  "author": "David Erceg"
+}
