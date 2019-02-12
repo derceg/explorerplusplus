@@ -23,7 +23,7 @@ NBookmarkHelper::variantBookmark_t NBookmarkHelper::GetBookmarkItem(CBookmarkFol
 	const GUID &guid)
 {
 	auto itr = std::find_if(ParentBookmarkFolder.begin(),ParentBookmarkFolder.end(),
-		[guid](boost::variant<CBookmarkFolder,CBookmark> &variantBookmark) -> BOOL
+		[guid](VariantBookmark &variantBookmark) -> BOOL
 		{
 			if(variantBookmark.type() == typeid(CBookmarkFolder))
 			{

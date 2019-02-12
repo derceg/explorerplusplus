@@ -368,22 +368,22 @@ void CBookmarkFolder::InsertBookmarkFolder(const CBookmarkFolder &BookmarkFolder
 	CBookmarkItemNotifier::GetInstance().NotifyObserversBookmarkFolderAdded(*this,BookmarkFolder,Position);
 }
 
-std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator CBookmarkFolder::begin()
+std::list<VariantBookmark>::iterator CBookmarkFolder::begin()
 {
 	return m_ChildList.begin();
 }
 
-std::list<boost::variant<CBookmarkFolder,CBookmark>>::iterator CBookmarkFolder::end()
+std::list<VariantBookmark>::iterator CBookmarkFolder::end()
 {
 	return m_ChildList.end();
 }
 
-std::list<boost::variant<CBookmarkFolder,CBookmark>>::const_iterator CBookmarkFolder::begin() const
+std::list<VariantBookmark>::const_iterator CBookmarkFolder::begin() const
 {
 	return m_ChildList.begin();
 }
 
-std::list<boost::variant<CBookmarkFolder,CBookmark>>::const_iterator CBookmarkFolder::end() const
+std::list<VariantBookmark>::const_iterator CBookmarkFolder::end() const
 {
 	return m_ChildList.end();
 }
