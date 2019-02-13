@@ -21,7 +21,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
-#include <algorithm>
+#include <boost/algorithm/string.hpp>
 #include <iomanip>
 #include <list>
 #include <regex>
@@ -410,13 +410,13 @@ void CMassRenameDialog::ProcessFileName(const std::wstring &strTarget,
 	while((iPos = strOutput.find(_T("/L"))) != std::wstring::npos)
 	{
 		strOutput.replace(iPos,2,strFilename);
-		transform(strOutput.begin(), strOutput.end(), strOutput.begin(), tolower);
+		boost::to_lower(strOutput);
 	}
 
 	while((iPos = strOutput.find(_T("/U"))) != std::wstring::npos)
 	{
 		strOutput.replace(iPos,2,strFilename);
-		transform(strOutput.begin(), strOutput.end(), strOutput.begin(), toupper);
+		boost::to_upper(strOutput);
 	}
 }
 
