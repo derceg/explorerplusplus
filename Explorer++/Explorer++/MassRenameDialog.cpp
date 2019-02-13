@@ -9,6 +9,8 @@
  * /F	- Filename
  * /B	- Basename (filename without extension)
  * /E	- Extension
+ * /L	- Lowercase filename
+ * /U	- Uppercase filename
  */
 
 #include "stdafx.h"
@@ -19,6 +21,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
+#include <boost/algorithm/string.hpp>
 #include <iomanip>
 #include <list>
 #include <regex>
@@ -249,6 +252,16 @@ INT_PTR CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
 						reinterpret_cast<LPARAM>(_T("/N")));
 					break;
+
+				case IDM_MASSRENAME_LCASE:
+					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
+						reinterpret_cast<LPARAM>(_T("/L")));
+					break;
+
+				case IDM_MASSRENAME_UCASE:
+					SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_EDIT,EM_REPLACESEL,TRUE,
+						reinterpret_cast<LPARAM>(_T("/U")));
+					break;
 				}
 			}
 			break;
@@ -393,6 +406,18 @@ void CMassRenameDialog::ProcessFileName(const std::wstring &strTarget,
 	{
 		strOutput.replace(iPos,2,pExt);
 	}
+
+	while((iPos = strOutput.find(_T("/L"))) != std::wstring::npos)
+	{
+		strOutput.replace(iPos,2,strFilename);
+		boost::to_lower(strOutput);
+	}
+
+	while((iPos = strOutput.find(_T("/U"))) != std::wstring::npos)
+	{
+		strOutput.replace(iPos,2,strFilename);
+		boost::to_upper(strOutput);
+	}
 }
 
 CMassRenameDialogPersistentSettings::CMassRenameDialogPersistentSettings() :
@@ -404,7 +429,7 @@ CDialogSettings(SETTINGS_KEY)
 
 CMassRenameDialogPersistentSettings::~CMassRenameDialogPersistentSettings()
 {
-	
+
 }
 
 CMassRenameDialogPersistentSettings& CMassRenameDialogPersistentSettings::GetInstance()
