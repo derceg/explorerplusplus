@@ -118,7 +118,7 @@ int CALLBACK SortByName(const NBookmarkHelper::variantBookmark_t BookmarkItem1,
 	else
 	{
 		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
 
 		return Bookmark1.GetName().compare(Bookmark2.GetName());
 	}
@@ -135,7 +135,7 @@ int CALLBACK SortByLocation(const NBookmarkHelper::variantBookmark_t BookmarkIte
 	else
 	{
 		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
 
 		return Bookmark1.GetLocation().compare(Bookmark2.GetLocation());
 	}
@@ -152,7 +152,7 @@ int CALLBACK SortByVisitDate(const NBookmarkHelper::variantBookmark_t BookmarkIt
 	else
 	{
 		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
 
 		FILETIME ft1 = Bookmark1.GetDateLastVisited();
 		FILETIME ft2 = Bookmark2.GetDateLastVisited();
@@ -172,7 +172,7 @@ int CALLBACK SortByVisitCount(const NBookmarkHelper::variantBookmark_t BookmarkI
 	else
 	{
 		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
 
 		return Bookmark1.GetVisitCount() - Bookmark2.GetVisitCount();
 	}
@@ -195,7 +195,7 @@ int CALLBACK SortByAdded(const NBookmarkHelper::variantBookmark_t BookmarkItem1,
 	else
 	{
 		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
 
 		FILETIME ft1 = Bookmark1.GetDateCreated();
 		FILETIME ft2 = Bookmark2.GetDateCreated();
@@ -221,7 +221,7 @@ int CALLBACK SortByLastModified(const NBookmarkHelper::variantBookmark_t Bookmar
 	else
 	{
 		const CBookmark &Bookmark1 = boost::get<CBookmark>(BookmarkItem1);
-		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem1);
+		const CBookmark &Bookmark2 = boost::get<CBookmark>(BookmarkItem2);
 
 		FILETIME ft1 = Bookmark1.GetDateModified();
 		FILETIME ft2 = Bookmark2.GetDateModified();

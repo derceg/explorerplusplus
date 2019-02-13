@@ -73,6 +73,7 @@ m_pluginMenuManager(hwnd, MENU_PLUGIN_STARTID, MENU_PLUGIN_ENDID)
 	m_hTabFont						= NULL;
 	m_hTabCtrlImageList				= nullptr;
 	m_hNextClipboardViewer			= NULL;
+	m_hLanguageModule				= NULL;
 	m_ListViewMButtonItem			= -1;
 	m_zDeltaTotal					= 0;
 	m_iPreviousTabSelectionId		= -1;
