@@ -1,4 +1,4 @@
-﻿; This script runs Explorer++ on Win+E.
+; This script runs Explorer++ on Win+E.
 ; The Explorer++ executable must be in the same directory as this script file.
 
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
@@ -6,10 +6,22 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
+; preserve maximized window state
+PreserveMaximizedState := false 
+
 #e::
-try {
-    Run %A_ScriptDir%\Explorer++.exe
-} catch e {
-    MsgBox Couldn't run Explorer++.`nPlease make sure it's in the same directory as this script (%A_ScriptDir%).
-}
+
+if PreserveMaximizedState AND WinExist("ahk_exe explorer++.exe")
+  WinActivate
+else
+  Run()
 return
+
+Run()
+{
+  try {
+      Run %A_ScriptDir%\Explorer++.exe
+  } catch e {
+      MsgBox Couldn't run Explorer++.`nPlease make sure it's in the same directory as this script (%A_ScriptDir%).
+  }
+}
