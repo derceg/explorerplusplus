@@ -283,6 +283,9 @@
     <ClCompile Include="UiTheming.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="AcceleratorParser.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -523,6 +526,12 @@
       <Filter>Plugins</Filter>
     </ClInclude>
     <ClInclude Include="UiTheming.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="AcceleratorParser.h">
+      <Filter>Plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="Accelerator.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

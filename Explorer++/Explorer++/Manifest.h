@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "Accelerator.h"
 #include "../ThirdParty/Sol/sol.hpp"
 #include <nlohmann/json.hpp>
 #include <boost/filesystem.hpp>
@@ -11,6 +12,13 @@
 
 namespace Plugins
 {
+	struct Command
+	{
+		std::wstring acceleratorString;
+		boost::optional<Accelerator> accelerator;
+		std::wstring description;
+	};
+
 	struct Manifest
 	{
 		std::wstring name;
@@ -21,6 +29,7 @@ namespace Plugins
 		std::wstring homepage;
 
 		std::vector<sol::lib> libraries;
+		std::vector<Command> commands;
 	};
 
 	NLOHMANN_JSON_SERIALIZE_ENUM(sol::lib, {
@@ -37,6 +46,7 @@ namespace Plugins
 	});
 
 	void from_json(const nlohmann::json &json, Manifest &manifest);
+	void from_json(const nlohmann::json &json, Command &command);
 
 	boost::optional<Manifest> parseManifest(const boost::filesystem::path &manifestPath);
 }

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Manifest.h"
+#include "AcceleratorParser.h"
 #include <codecvt>
 #include <fstream>
 
@@ -40,6 +41,27 @@ void Plugins::from_json(const nlohmann::json &json, Manifest &manifest)
 	if (json.count("std_libs_required") != 0)
 	{
 		json.at("std_libs_required").get_to<std::vector<sol::lib>>(manifest.libraries);
+	}
+
+	if (json.count("commands") != 0)
+	{
+		json.at("commands").get_to(manifest.commands);
+	}
+}
+
+void Plugins::from_json(const nlohmann::json &json, Command &command)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+	auto key = json.at("key").get<std::string>();
+	command.acceleratorString = converter.from_bytes(key);
+
+	command.accelerator = parseAccelerator(command.acceleratorString);
+
+	if (json.count("description") != 0)
+	{
+		auto description = json.at("description").get<std::string>();
+		command.description = converter.from_bytes(description);
 	}
 }
 
