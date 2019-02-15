@@ -388,6 +388,11 @@ std::list<VariantBookmark>::const_iterator CBookmarkFolder::end() const
 	return m_ChildList.end();
 }
 
+bool CBookmarkFolder::HasChildren() const
+{
+	return !m_ChildList.empty();
+}
+
 bool CBookmarkFolder::HasChildFolder() const
 {
 	if(m_nChildFolders > 0)

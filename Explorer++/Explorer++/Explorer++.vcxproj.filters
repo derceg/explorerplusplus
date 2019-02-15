@@ -286,6 +286,9 @@
     <ClCompile Include="AcceleratorParser.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
+    <ClCompile Include="BookmarkMenu.cpp">
+      <Filter>Bookmarks</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -533,6 +536,9 @@
     </ClInclude>
     <ClInclude Include="Accelerator.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="BookmarkMenu.h">
+      <Filter>Bookmarks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

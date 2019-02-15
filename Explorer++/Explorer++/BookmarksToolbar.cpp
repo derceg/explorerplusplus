@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "BookmarksToolbar.h"
+#include "BookmarkMenu.h"
 #include "MainImages.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
@@ -12,9 +13,11 @@
 #include <algorithm>
 
 
-CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer,
-	CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar, UINT uIDStart, UINT uIDEnd) :
+CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
+	TabContainerInterface *tabContainer, CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar,
+	UINT uIDStart, UINT uIDEnd) :
 m_hToolbar(hToolbar),
+m_instance(instance),
 m_pexpp(pexpp),
 m_tabContainer(tabContainer),
 m_AllBookmarks(AllBookmarks),
@@ -192,13 +195,61 @@ bool CBookmarksToolbar::OnCommand(WPARAM wParam, LPARAM lParam)
 		return false;
 	}
 
-	if (variantBookmarkItem->type() == typeid(CBookmark))
+	if (variantBookmarkItem->type() == typeid(CBookmarkFolder))
+	{
+		const CBookmarkFolder &bookmarkFolder = boost::get<CBookmarkFolder>(*variantBookmarkItem);
+		ShowBookmarkFolderMenu(bookmarkFolder, LOWORD(wParam), index);
+	}
+	else
 	{
 		CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
 		m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 	}
 
 	return true;
+}
+
+void CBookmarksToolbar::ShowBookmarkFolderMenu(const CBookmarkFolder &bookmarkFolder, int command, int index)
+{
+	RECT rc;
+	BOOL res = static_cast<BOOL>(SendMessage(m_hToolbar, TB_GETITEMRECT, index, reinterpret_cast<LPARAM>(&rc)));
+
+	if (!res)
+	{
+		return;
+	}
+
+	SetLastError(ERROR_SUCCESS);
+	auto mapRes = MapWindowPoints(m_hToolbar, nullptr, reinterpret_cast<LPPOINT>(&rc), 2);
+
+	if (mapRes == 0 && GetLastError() != ERROR_SUCCESS)
+	{
+		return;
+	}
+
+	auto state = SendMessage(m_hToolbar, TB_GETSTATE, command, 0);
+
+	if (state == -1)
+	{
+		return;
+	}
+
+	SendMessage(m_hToolbar, TB_SETSTATE, command, MAKEWORD(state | TBSTATE_PRESSED, 0));
+
+	BookmarkMenu bookmarkMenu(m_instance);
+
+	POINT pt;
+	pt.x = rc.left;
+	pt.y = rc.bottom;
+	bookmarkMenu.ShowMenu(m_hToolbar, bookmarkFolder, pt ,
+		boost::bind(&CBookmarksToolbar::OnBookmarkMenuItemClicked, this, _1));
+
+	SendMessage(m_hToolbar, TB_SETSTATE, command, MAKEWORD(state & ~TBSTATE_PRESSED, 0));
+}
+
+void CBookmarksToolbar::OnBookmarkMenuItemClicked(const CBookmark &bookmark)
+{
+	m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 }
 
 bool CBookmarksToolbar::OnGetInfoTip(NMTBGETINFOTIP *infoTip)

@@ -50,6 +50,8 @@ public:
 	FILETIME		GetDateCreated() const;
 	FILETIME		GetDateModified() const;
 
+	bool			HasChildren() const;
+
 	/* Returns true if this folder has *at least*
 	one child folder. */
 	bool			HasChildFolder() const;

@@ -53,7 +53,9 @@ class CBookmarksToolbar : public NBookmark::IBookmarkItemNotification
 
 public:
 
-	CBookmarksToolbar(HWND hToolbar, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer, CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar, UINT uIDStart, UINT uIDEnd);
+	CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
+		TabContainerInterface *tabContainer, CBookmarkFolder &AllBookmarks,
+		const GUID &guidBookmarksToolbar, UINT uIDStart, UINT uIDEnd);
 	~CBookmarksToolbar();
 
 	/* IBookmarkItemNotification methods. */
@@ -88,6 +90,8 @@ private:
 	void	RemoveBookmarkItem(const GUID &guid);
 
 	bool	OnCommand(WPARAM wParam, LPARAM lParam);
+	void	ShowBookmarkFolderMenu(const CBookmarkFolder &bookmarkFolder, int command, int index);
+	void	OnBookmarkMenuItemClicked(const CBookmark &bookmark);
 	bool	OnGetInfoTip(NMTBGETINFOTIP *infoTip);
 
 	int		GetBookmarkItemIndex(const GUID &guid);
@@ -96,6 +100,8 @@ private:
 
 	HWND							m_hToolbar;
 	HIMAGELIST						m_himl;
+
+	HINSTANCE						m_instance;
 
 	IExplorerplusplus				*m_pexpp;
 	TabContainerInterface			*m_tabContainer;
