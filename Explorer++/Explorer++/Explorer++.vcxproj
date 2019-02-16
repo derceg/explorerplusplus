@@ -338,8 +338,8 @@
     <ClCompile Include="Logging.cpp" />
     <ClCompile Include="LuaPlugin.cpp" />
     <ClCompile Include="MainMenuHandler.cpp" />
+    <ClCompile Include="MainRebar.cpp" />
     <ClCompile Include="MainToolbar.cpp" />
-    <ClCompile Include="MainToolbarHandler.cpp" />
     <ClCompile Include="MainWndSwitch.cpp" />
     <ClCompile Include="ManageBookmarksDialog.cpp" />
     <ClCompile Include="Manifest.cpp" />
