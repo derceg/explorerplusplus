@@ -350,7 +350,6 @@ private:
 	void					UpdateTabToolbar(void);
 	void					OnAutoSizeColumns(void);
 	void					OnToolbarViews(void);
-	void					OnApplicationToolbarRClick();
 	void					OnSortByAscending(BOOL bSortAscending);
 	void					OnPreviousWindow(void);
 	void					OnNextWindow(void);
@@ -530,9 +529,10 @@ private:
 	/* Main toolbars. */
 	void					InitializeMainToolbars(void);
 	void					AdjustMainToolbarSize(void);
+	boost::signals2::connection	AddToolbarContextMenuObserver(const ToolbarContextMenuSignal::slot_type &observer);
 
 	/* Main toolbar private message handlers. */
-	void					OnMainToolbarRClick();
+	void					OnToolbarRClick(HWND sourceWindow);
 
 	/* Directory specific settings. */
 	void					SaveDirectorySpecificSettings(int iTab);
@@ -765,7 +765,6 @@ private:
 	HMENU					m_hArrangeSubMenuRClick;
 	HMENU					m_hGroupBySubMenuRClick;
 	HMENU					m_hTabRightClickMenu;
-	HMENU					m_hToolbarRightClickMenu;
 	TCHAR					m_CurrentDirectory[MAX_PATH];
 	TCHAR					m_DefaultTabDirectoryStatic[MAX_PATH];
 	TCHAR					m_DefaultTabDirectory[MAX_PATH];
@@ -800,6 +799,8 @@ private:
 
 	/* Tab signals. */
 	TabCreatedSignal		m_tabCreatedSignal;
+
+	ToolbarContextMenuSignal	m_toolbarContextMenuSignal;
 
 	/* Theming. */
 	std::unique_ptr<UiTheming>	m_uiTheming;

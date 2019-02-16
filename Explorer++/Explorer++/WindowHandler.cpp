@@ -203,6 +203,11 @@ HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 	return TabToolbar;
 }
 
+boost::signals2::connection Explorerplusplus::AddToolbarContextMenuObserver(const ToolbarContextMenuSignal::slot_type &observer)
+{
+	return m_toolbarContextMenuSignal.connect(observer);
+}
+
 LRESULT CALLBACK RebarSubclassStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
@@ -230,27 +235,8 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 			{
 				case NM_RCLICK:
 					{
-						LPNMMOUSE	pnmm;
-						LPNMHDR		pnmh;
-
-						pnmm = (LPNMMOUSE)lParam;
-						pnmh = &pnmm->hdr;
-
-						if(pnmh->hwndFrom == m_hBookmarksToolbar)
-						{
-							/* TODO: [Bookmarks] Show bookmarks menu. */
-						}
-						else if(pnmh->hwndFrom == m_pApplicationToolbar->GetHWND())
-						{
-							if(pnmm->dwItemSpec == -1)
-							{
-								OnApplicationToolbarRClick();
-							}
-						}
-						else
-						{
-							OnMainToolbarRClick();
-						}
+						LPNMMOUSE pnmm = reinterpret_cast<LPNMMOUSE>(lParam);
+						OnToolbarRClick(pnmm->hdr.hwndFrom);
 					}
 					return TRUE;
 					break;
@@ -259,28 +245,6 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd,UINT msg,WPARAM wPara
 	}
 
 	return DefSubclassProc(hwnd,msg,wParam,lParam);
-}
-
-void Explorerplusplus::OnApplicationToolbarRClick()
-{
-	MENUITEMINFO mii;
-
-	TCHAR szTemp[64];
-	LoadString(m_hLanguageModule,IDS_APPLICATIONBUTTON_NEW,
-		szTemp,SIZEOF_ARRAY(szTemp));
-
-	mii.cbSize		= sizeof(mii);
-	mii.fMask		= MIIM_ID|MIIM_STRING;
-	mii.dwTypeData	= szTemp;
-	mii.wID			= IDM_APP_NEW;
-
-	/* Add the item to the menu. */
-	InsertMenuItem(m_hToolbarRightClickMenu,7,TRUE,&mii);
-
-	OnMainToolbarRClick();
-
-	/* Now, remove the item from the menu. */
-	DeleteMenu(m_hToolbarRightClickMenu,7,MF_BYPOSITION);
 }
 
 void Explorerplusplus::SetStatusBarParts(int width)

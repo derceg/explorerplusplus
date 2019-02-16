@@ -144,7 +144,6 @@ void Explorerplusplus::OnCreate(void)
 	m_hGroupBySubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
 	m_hGroupBySubMenuRClick = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
 	m_hTabRightClickMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_TAB_RCLICK)), 0);
-	m_hToolbarRightClickMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_TOOLBAR_MENU)), 0);
 
 	CreateDirectoryMonitor(&m_pDirMon);
 

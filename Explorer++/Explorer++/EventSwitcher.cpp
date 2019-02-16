@@ -155,10 +155,6 @@ void Explorerplusplus::OnRightClick(NMHDR *nmhdr)
 
 		OnListViewHeaderRClick(&CursorPos);
 	}
-	else if(nmhdr->hwndFrom == m_mainToolbar->GetHWND())
-	{
-		OnMainToolbarRClick();
-	}
 }
 
 void Explorerplusplus::OnPaste(void)

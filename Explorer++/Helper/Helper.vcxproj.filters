@@ -252,6 +252,9 @@
     <ClInclude Include="Rgb.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
+    <ClInclude Include="MenuWrapper.h">
+      <Filter>Resource Wrappers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dialog Support">

@@ -8,7 +8,10 @@
 #include "Tab.h"
 #include "../Helper/StatusBar.h"
 #include <boost/optional.hpp>
+#include <boost/signals2.hpp>
 #include <list>
+
+typedef boost::signals2::signal<void(HMENU, HWND)> ToolbarContextMenuSignal;
 
 /* Used to share global data across the
 classes within the Explorer++ project. */
@@ -61,6 +64,8 @@ __interface IExplorerplusplus
 	BOOL			CanDelete() const;
 	BOOL			CanShowFileProperties() const;
 	BOOL			CanPaste() const;
+
+	boost::signals2::connection	AddToolbarContextMenuObserver(const ToolbarContextMenuSignal::slot_type &observer);
 };
 
 /* Used when setting Explorer++ as the default

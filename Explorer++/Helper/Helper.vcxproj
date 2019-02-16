@@ -264,6 +264,7 @@
     <ClInclude Include="Logging.h" />
     <ClInclude Include="Macros.h" />
     <ClInclude Include="MenuHelper.h" />
+    <ClInclude Include="MenuWrapper.h" />
     <ClInclude Include="MessageForwarder.h" />
     <ClInclude Include="PIDLWrapper.h" />
     <ClInclude Include="ProcessHelper.h" />

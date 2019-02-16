@@ -94,6 +94,8 @@ private:
 	void				AddButtonToToolbar(const ApplicationButton_t &Button);
 	void				UpdateButton(int iItem);
 
+	void				OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow);
+
 	ApplicationInfo_t	ProcessCommand(const std::wstring &Command);
 	ApplicationButton_t	*MapToolbarButtonToItem(int index);
 
@@ -109,4 +111,6 @@ private:
 	CApplicationToolbarDropHandler	*m_patd;
 
 	CApplicationToolbarPersistentSettings	*m_atps;
+
+	boost::signals2::connection	m_toolbarContextMenuConnection;
 };

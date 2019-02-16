@@ -48,6 +48,8 @@ m_pexpp(pexpp)
 
 CApplicationToolbar::~CApplicationToolbar()
 {
+	m_toolbarContextMenuConnection.disconnect();
+
 	RemoveWindowSubclass(GetParent(m_hwnd),ParentWndProcStub,PARENT_SUBCLASS_ID);
 
 	RevokeDragDrop(m_hwnd);
@@ -81,6 +83,8 @@ void CApplicationToolbar::Initialize(HWND hParent)
 		reinterpret_cast<DWORD_PTR>(this));
 
 	AddButtonsToToolbar();
+
+	m_toolbarContextMenuConnection = m_pexpp->AddToolbarContextMenuObserver(boost::bind(&CApplicationToolbar::OnToolbarContextMenuPreShow, this, _1, _2));
 }
 
 LRESULT CALLBACK ParentWndProcStub(HWND hwnd,UINT uMsg,
@@ -441,6 +445,25 @@ void CApplicationToolbar::DeleteItem(int iItem)
 			}
 		}
 	}
+}
+
+void CApplicationToolbar::OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow)
+{
+	if (sourceWindow != m_hwnd)
+	{
+		return;
+	}
+
+	TCHAR szTemp[64];
+	LoadString(m_hInstance, IDS_APPLICATIONBUTTON_NEW, szTemp, SIZEOF_ARRAY(szTemp));
+
+	MENUITEMINFO mii;
+	mii.cbSize = sizeof(mii);
+	mii.fMask = MIIM_ID | MIIM_STRING;
+	mii.dwTypeData = szTemp;
+	mii.wID = IDM_APP_NEW;
+
+	InsertMenuItem(menu, IDM_TOOLBARS_CUSTOMIZE, FALSE, &mii);
 }
 
 ApplicationButton_t *CApplicationToolbar::MapToolbarButtonToItem(int iIndex)
