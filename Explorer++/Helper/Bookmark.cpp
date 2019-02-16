@@ -12,6 +12,16 @@
 #include "Macros.h"
 
 
+CBookmark CBookmark::Create(const std::wstring &strName, const std::wstring &strLocation, const std::wstring &strDescription)
+{
+	return CBookmark(strName, strLocation, strDescription);
+}
+
+CBookmark CBookmark::UnserializeFromRegistry(const std::wstring &strKey)
+{
+	return CBookmark(strKey);
+}
+
 CBookmark::CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription) :
 	m_strName(strName),
 	m_strLocation(strLocation),
@@ -23,9 +33,49 @@ CBookmark::CBookmark(const std::wstring &strName,const std::wstring &strLocation
 	m_ftModified = m_ftCreated;
 }
 
+CBookmark::CBookmark(const std::wstring &strKey)
+{
+	InitializeFromRegistry(strKey);
+}
+
 CBookmark::~CBookmark()
 {
 
+}
+
+void CBookmark::InitializeFromRegistry(const std::wstring &strKey)
+{
+	HKEY hKey;
+	LONG lRes = RegOpenKeyEx(HKEY_CURRENT_USER, strKey.c_str(), 0, KEY_READ, &hKey);
+
+	if (lRes != ERROR_SUCCESS)
+	{
+		return;
+	}
+
+	std::wstring stringGuid;
+	NRegistrySettings::ReadStringFromRegistry(hKey, _T("GUID"), stringGuid);
+	stringGuid = stringGuid.substr(1, stringGuid.length() - 2);
+
+	TCHAR stringGuidTemp[128];
+	StringCchCopy(stringGuidTemp, SIZEOF_ARRAY(stringGuidTemp), stringGuid.c_str());
+	UuidFromString(reinterpret_cast<RPC_WSTR>(stringGuidTemp), &m_guid);
+
+	NRegistrySettings::ReadStringFromRegistry(hKey, _T("Name"), m_strName);
+	NRegistrySettings::ReadStringFromRegistry(hKey, _T("Location"), m_strLocation);
+	NRegistrySettings::ReadStringFromRegistry(hKey, _T("Description"), m_strDescription);
+
+	DWORD value;
+	NRegistrySettings::ReadDwordFromRegistry(hKey, _T("VisitCount"), &value);
+	m_iVisitCount = value;
+
+	NRegistrySettings::ReadDwordFromRegistry(hKey, _T("DateLastVisitedLow"), &m_ftLastVisited.dwLowDateTime);
+	NRegistrySettings::ReadDwordFromRegistry(hKey, _T("DateLastVisitedHigh"), &m_ftLastVisited.dwHighDateTime);
+
+	NRegistrySettings::ReadDwordFromRegistry(hKey, _T("DateCreatedLow"), &m_ftCreated.dwLowDateTime);
+	NRegistrySettings::ReadDwordFromRegistry(hKey, _T("DateCreatedHigh"), &m_ftCreated.dwHighDateTime);
+	NRegistrySettings::ReadDwordFromRegistry(hKey, _T("DateModifiedLow"), &m_ftModified.dwLowDateTime);
+	NRegistrySettings::ReadDwordFromRegistry(hKey, _T("DateModifiedHigh"), &m_ftModified.dwHighDateTime);
 }
 
 void CBookmark::SerializeToRegistry(const std::wstring &strKey)
@@ -234,7 +284,8 @@ void CBookmarkFolder::InitializeFromRegistry(const std::wstring &strKey)
 			}
 			else if(CheckWildcardMatch(_T("Bookmark_*"),szSubKeyName,FALSE))
 			{
-				/* TODO: Create bookmark. */
+				CBookmark bookmark = CBookmark::UnserializeFromRegistry(szSubKey);
+				m_ChildList.push_back(bookmark);
 			}
 
 			dwSize = SIZEOF_ARRAY(szSubKeyName);

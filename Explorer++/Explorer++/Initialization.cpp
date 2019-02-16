@@ -120,10 +120,10 @@ void Explorerplusplus::OnCreate(void)
 
 	InitializeTaskbarThumbnails();
 
+	InitializeBookmarks();
+
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
-
-	InitializeBookmarks();
 
 	m_hTreeViewIconThread = CreateWorkerThread();
 

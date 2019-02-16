@@ -110,7 +110,9 @@ class CBookmark
 {
 public:
 
-	CBookmark(const std::wstring &strName,const std::wstring &strLocation,const std::wstring &strDescription);
+	static CBookmark Create(const std::wstring &strName, const std::wstring &strLocation, const std::wstring &strDescription);
+	static CBookmark UnserializeFromRegistry(const std::wstring &strKey);
+
 	~CBookmark();
 
 	void			SerializeToRegistry(const std::wstring &strKey);
@@ -134,6 +136,11 @@ public:
 	FILETIME		GetDateModified() const;
 
 private:
+
+	CBookmark(const std::wstring &strKey);
+	CBookmark(const std::wstring &strName, const std::wstring &strLocation, const std::wstring &strDescription);
+
+	void			InitializeFromRegistry(const std::wstring &strKey);
 
 	void			UpdateModificationTime();
 

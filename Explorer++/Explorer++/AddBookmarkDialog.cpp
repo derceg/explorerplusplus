@@ -360,7 +360,7 @@ void CAddBookmarkDialog::OnOk()
 		HTREEITEM hSelected = TreeView_GetSelection(hTreeView);
 		CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelected);
 
-		CBookmark Bookmark(strName,strLocation,_T(""));
+		CBookmark Bookmark = CBookmark::Create(strName,strLocation,_T(""));
 		BookmarkFolder.InsertBookmark(Bookmark);
 	}
 

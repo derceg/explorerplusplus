@@ -714,7 +714,7 @@ HRESULT __stdcall CBookmarksToolbarDropHandler::Drop(IDataObject *pDataObject,
 					TCHAR szDisplayName[MAX_PATH];
 					GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
-					CBookmark Bookmark(szDisplayName,szFullFileName,EMPTY_STRING);
+					CBookmark Bookmark = CBookmark::Create(szDisplayName, szFullFileName, EMPTY_STRING);
 
 					auto variantBookmarksToolbar = NBookmarkHelper::GetBookmarkItem(m_AllBookmarks,m_guidBookmarksToolbar);
 					assert(variantBookmarksToolbar.type() == typeid(CBookmarkFolder));
