@@ -40,7 +40,9 @@ namespace Plugins
 
 			std::wstring toString()
 			{
-				return _T("location = ") + location
+				return _T("id = ") + std::to_wstring(id)
+					+ _T(", location = ") + location
+					+ _T(", name = ") + name
 					+ _T(", viewMode = ") + std::to_wstring(viewMode)
 					+ _T(", locked = ") + std::to_wstring(locked)
 					+ _T(", addressLocked = ") + std::to_wstring(addressLocked);
