@@ -23,29 +23,29 @@ enum PasteType
 int PasteFilesFromClipboardSpecial(const TCHAR *szDestination, PasteType pasteType);
 BOOL GetFileClusterSize(const std::wstring &strFilename, PLARGE_INTEGER lpRealFileSize);
 
-BOOL NFileOperations::RenameFile(const std::wstring &strOldFilename,
-	const std::wstring &strNewFilename)
+HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newName)
 {
-	TCHAR *pszOldFilename = new TCHAR[strOldFilename.size() + 2];
-	TCHAR *pszNewFilename = new TCHAR[strNewFilename.size() + 2];
+	IFileOperation *fo;
+	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
 
-	StringCchCopy(pszOldFilename,strOldFilename.size() + 2,strOldFilename.c_str());
-	pszOldFilename[lstrlen(pszOldFilename) + 1] = '\0';
-	StringCchCopy(pszNewFilename,strNewFilename.size() + 2,strNewFilename.c_str());
-	pszNewFilename[lstrlen(pszNewFilename) + 1] = '\0';
+	if (SUCCEEDED(hr))
+	{
+		hr = fo->SetOperationFlags(FOF_ALLOWUNDO | FOF_SILENT);
 
-	SHFILEOPSTRUCT shfo;
-	shfo.hwnd	= NULL;
-	shfo.wFunc	= FO_RENAME;
-	shfo.pFrom	= pszOldFilename;
-	shfo.pTo	= pszNewFilename;
-	shfo.fFlags	= FOF_ALLOWUNDO | FOF_SILENT;
-	BOOL bRes = (!SHFileOperation(&shfo) && !shfo.fAnyOperationsAborted);
+		if (SUCCEEDED(hr))
+		{
+			hr = fo->RenameItem(item, newName.c_str(), nullptr);
 
-	delete[] pszOldFilename;
-	delete[] pszNewFilename;
+			if (SUCCEEDED(hr))
+			{
+				hr = fo->PerformOperations();
+			}
+		}
 
-	return bRes;
+		fo->Release();
+	}
+
+	return hr;
 }
 
 BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,

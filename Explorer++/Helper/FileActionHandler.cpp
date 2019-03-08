@@ -10,6 +10,7 @@
 #include "stdafx.h"
 #include "FileActionHandler.h"
 #include "../Helper/FileOperations.h"
+#include "../Helper/Macros.h"
 
 
 CFileActionHandler::CFileActionHandler()
@@ -28,11 +29,26 @@ BOOL CFileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 
 	for(const auto &item : itemList)
 	{
-		BOOL bRes = NFileOperations::RenameFile(item.strOldFilename,item.strNewFilename);
+		/* TODO: This should actually be done by the caller. */
+		IShellItem *shellItem = nullptr;
+		HRESULT hr = SHCreateItemFromParsingName(item.strOldFilename.c_str(), nullptr, IID_PPV_ARGS(&shellItem));
 
-		if(bRes)
+		if (SUCCEEDED(hr))
 		{
-			renamedItems.push_back(item);
+			TCHAR newFilename[MAX_PATH];
+			StringCchCopy(newFilename, SIZEOF_ARRAY(newFilename), item.strNewFilename.c_str());
+			PathStripPath(newFilename);
+
+			/* TODO: Could rename all files in the list in a single
+			operation, rather than one by one.*/
+			hr = NFileOperations::RenameFile(shellItem, newFilename);
+
+			if (SUCCEEDED(hr))
+			{
+				renamedItems.push_back(item);
+			}
+
+			shellItem->Release();
 		}
 	}
 
