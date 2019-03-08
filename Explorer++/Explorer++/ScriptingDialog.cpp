@@ -15,7 +15,7 @@ ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParen
 	CBaseDialog(hInstance, iResource, hParent, true),
 	m_luaPlugin(L"", Plugins::Manifest(), tabContainer, pluginMenuManager, uiTheming)
 {
-
+	m_luaPlugin.GetLuaState().open_libraries(sol::lib::base);
 }
 
 ScriptingDialog::~ScriptingDialog()
