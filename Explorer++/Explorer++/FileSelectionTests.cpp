@@ -52,43 +52,56 @@ HRESULT Explorerplusplus::GetSelectionAttributes(SFGAOF *pItemAttributes) const
 	hFocus = GetFocus();
 
 	if (hFocus == m_hActiveListView)
-		hr = TestListViewSelectionAttributes(pItemAttributes);
+		hr = GetListViewSelectionAttributes(pItemAttributes);
 	else if (hFocus == m_hTreeView)
-		hr = TestTreeViewSelectionAttributes(pItemAttributes);
+		hr = GetTreeViewSelectionAttributes(pItemAttributes);
 
 	return hr;
 }
 
-HRESULT Explorerplusplus::TestListViewSelectionAttributes(SFGAOF *pItemAttributes) const
+HRESULT Explorerplusplus::TestListViewItemAttributes(int item, SFGAOF attributes) const
 {
-	LPITEMIDLIST	pidlDirectory = NULL;
-	LPITEMIDLIST	ridl = NULL;
-	LPITEMIDLIST	pidlComplete = NULL;
-	HRESULT			hr = E_FAIL;
-	int				iSelected;
+	SFGAOF commonAttributes = attributes;
+	HRESULT hr = GetListViewItemAttributes(item, &commonAttributes);
+
+	if (SUCCEEDED(hr))
+	{
+		return (commonAttributes & attributes) == attributes;
+	}
+
+	return FALSE;
+}
+
+HRESULT Explorerplusplus::GetListViewSelectionAttributes(SFGAOF *pItemAttributes) const
+{
+	HRESULT hr = E_FAIL;
 
 	/* TODO: This should probably check all selected files. */
-	iSelected = ListView_GetNextItem(m_hActiveListView, -1, LVNI_SELECTED);
+	int iSelected = ListView_GetNextItem(m_hActiveListView, -1, LVNI_SELECTED);
 
 	if (iSelected != -1)
 	{
-		pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-
-		ridl = m_pActiveShellBrowser->QueryItemRelativeIdl(iSelected);
-
-		pidlComplete = ILCombine(pidlDirectory, ridl);
-
-		hr = GetItemAttributes(pidlComplete, pItemAttributes);
-
-		CoTaskMemFree(pidlComplete);
-		CoTaskMemFree(ridl);
-		CoTaskMemFree(pidlDirectory);
+		hr = GetListViewItemAttributes(iSelected, pItemAttributes);
 	}
 
 	return hr;
 }
 
-HRESULT Explorerplusplus::TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const
+HRESULT Explorerplusplus::GetListViewItemAttributes(int item, SFGAOF *pItemAttributes) const
+{
+	PIDLPointer pidlComplete(m_pActiveShellBrowser->QueryItemCompleteIdl(item));
+
+	if (!pidlComplete)
+	{
+		return E_FAIL;
+	}
+
+	HRESULT hr = GetItemAttributes(pidlComplete.get(), pItemAttributes);
+
+	return hr;
+}
+
+HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const
 {
 	HTREEITEM		hItem;
 	LPITEMIDLIST	pidl = NULL;

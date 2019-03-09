@@ -375,6 +375,24 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	plvItem->mask |= LVIF_DI_SETITEM;
 }
 
+LPITEMIDLIST CShellBrowser::QueryItemCompleteIdl(int iItem) const
+{
+	LVITEM lvItem;
+	lvItem.mask = LVIF_PARAM;
+	lvItem.iItem = iItem;
+	lvItem.iSubItem = 0;
+	BOOL bRet = ListView_GetItem(m_hListView, &lvItem);
+
+	if (!bRet)
+	{
+		return nullptr;
+	}
+
+	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory, m_itemInfoMap.at((int)lvItem.lParam).pridl.get());
+
+	return pidlComplete;
+}
+
 LPITEMIDLIST CShellBrowser::QueryItemRelativeIdl(int iItem) const
 {
 	LVITEM lvItem;

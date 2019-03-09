@@ -419,7 +419,9 @@ private:
 	void					OnListViewMButtonUp(POINT *pt);
 	void					OnListViewLButtonDown(WPARAM wParam,LPARAM lParam);
 	void					OnListViewDoubleClick(NMHDR *nmhdr);
-	void					OnListViewFileRename(void);
+	void					OnListViewFileRename();
+	void					OnListViewFileRenameSingle();
+	void					OnListViewFileRenameMultiple();
 	void					OnListViewGetInfoTip(LPARAM lParam);
 	LRESULT					OnListViewKeyDown(LPARAM lParam);
 	void					OnListViewItemChanged(LPARAM lParam);
@@ -635,8 +637,10 @@ private:
 
 	/* Listview selection file tests. */
 	void					BuildListViewFileSelectionList(HWND hListView,std::list<std::wstring> *pFileSelectionList);
-	HRESULT					TestListViewSelectionAttributes(SFGAOF *pItemAttributes) const;
-	HRESULT					TestTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
+	HRESULT					TestListViewItemAttributes(int item, SFGAOF attributes) const;
+	HRESULT					GetListViewSelectionAttributes(SFGAOF *pItemAttributes) const;
+	HRESULT					GetListViewItemAttributes(int item, SFGAOF *pItemAttributes) const;
+	HRESULT					GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 	HRESULT					GetSelectionAttributes(SFGAOF *pItemAttributes) const;
 	BOOL					CanCut() const;
 	BOOL					CanCopy() const;

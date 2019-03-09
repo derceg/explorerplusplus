@@ -180,6 +180,7 @@ public:
 
 	/* Item information. */
 	WIN32_FIND_DATA		QueryFileFindData(int iItem) const;
+	LPITEMIDLIST		QueryItemCompleteIdl(int iItem) const;
 	LPITEMIDLIST		QueryItemRelativeIdl(int iItem) const;
 	DWORD				QueryFileAttributes(int iItem) const;
 	int					QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;

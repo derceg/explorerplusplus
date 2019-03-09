@@ -1366,13 +1366,8 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 	}
 }
 
-void Explorerplusplus::OnListViewFileRename(void)
+void Explorerplusplus::OnListViewFileRename()
 {
-	if(m_pActiveShellBrowser->InVirtualFolder())
-	{
-		return;
-	}
-
 	int nSelected = ListView_GetSelectedCount(m_hActiveListView);
 
 	/* If there is only item selected, start editing
@@ -1380,37 +1375,62 @@ void Explorerplusplus::OnListViewFileRename(void)
 	show the mass rename dialog. */
 	if(nSelected == 1)
 	{
-		int iSelected = ListView_GetNextItem(m_hActiveListView,
-			-1,LVNI_SELECTED|LVNI_FOCUSED);
-
-		if(iSelected != -1)
-		{
-			/* Start editing the label for this item. */
-			ListView_EditLabel(m_hActiveListView,iSelected);
-		}
+		OnListViewFileRenameSingle();
 	}
 	else if(nSelected > 1)
 	{
-		std::list<std::wstring>	FullFilenameList;
-		TCHAR szFullFilename[MAX_PATH];
-		int iIndex = -1;
+		OnListViewFileRenameMultiple();
+	}
+}
 
-		for(int i = 0;i < nSelected;i++)
+void Explorerplusplus::OnListViewFileRenameSingle()
+{
+	int iSelected = ListView_GetNextItem(m_hActiveListView,
+		-1, LVNI_SELECTED | LVNI_FOCUSED);
+
+	if (iSelected == -1)
+	{
+		return;
+	}
+
+	BOOL canRename = TestListViewItemAttributes(iSelected, SFGAO_CANRENAME);
+
+	if (!canRename)
+	{
+		return;
+	}
+
+	ListView_EditLabel(m_hActiveListView, iSelected);
+}
+
+void Explorerplusplus::OnListViewFileRenameMultiple()
+{
+	std::list<std::wstring>	FullFilenameList;
+	TCHAR szFullFilename[MAX_PATH];
+	int iIndex = -1;
+
+	while ((iIndex = ListView_GetNextItem(m_hActiveListView,
+		iIndex, LVNI_SELECTED)) != -1)
+	{
+		BOOL canRename = TestListViewItemAttributes(iIndex, SFGAO_CANRENAME);
+
+		if (!canRename)
 		{
-			iIndex = ListView_GetNextItem(m_hActiveListView,
-				iIndex,LVNI_SELECTED);
-
-			if(iIndex != -1)
-			{
-				m_pActiveShellBrowser->QueryFullItemName(iIndex,szFullFilename,SIZEOF_ARRAY(szFullFilename));
-				FullFilenameList.push_back(szFullFilename);
-			}
+			continue;
 		}
 
-		CMassRenameDialog CMassRenameDialog(m_hLanguageModule,IDD_MASSRENAME,
-			m_hContainer,FullFilenameList,&m_FileActionHandler);
-		CMassRenameDialog.ShowModalDialog();
+		m_pActiveShellBrowser->QueryFullItemName(iIndex, szFullFilename, SIZEOF_ARRAY(szFullFilename));
+		FullFilenameList.push_back(szFullFilename);
 	}
+
+	if (FullFilenameList.empty())
+	{
+		return;
+	}
+
+	CMassRenameDialog CMassRenameDialog(m_hLanguageModule, IDD_MASSRENAME,
+		m_hContainer, FullFilenameList, &m_FileActionHandler);
+	CMassRenameDialog.ShowModalDialog();
 }
 
 void Explorerplusplus::OnListViewShowFileProperties(void) const
