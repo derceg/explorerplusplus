@@ -3,16 +3,18 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
-#include <sstream>
 #include "FileOperations.h"
+#include "DriveInfo.h"
 #include "Helper.h"
 #include "iDataObject.h"
+#include "Macros.h"
 #include "ShellHelper.h"
 #include "StringHelper.h"
-#include "DriveInfo.h"
-#include "Macros.h"
+#include <boost/scope_exit.hpp>
+#include <list>
+#include <sstream>
 
+#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 enum PasteType
 {
@@ -28,22 +30,30 @@ HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newNam
 	IFileOperation *fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
 
-	if (SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		hr = fo->SetOperationFlags(FOF_ALLOWUNDO | FOF_SILENT);
-
-		if (SUCCEEDED(hr))
-		{
-			hr = fo->RenameItem(item, newName.c_str(), nullptr);
-
-			if (SUCCEEDED(hr))
-			{
-				hr = fo->PerformOperations();
-			}
-		}
-
-		fo->Release();
+		return hr;
 	}
+
+	BOOST_SCOPE_EXIT(fo) {
+		fo->Release();
+	} BOOST_SCOPE_EXIT_END
+
+	hr = fo->SetOperationFlags(FOF_ALLOWUNDO | FOF_SILENT);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	hr = fo->RenameItem(item, newName.c_str(), nullptr);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	hr = fo->PerformOperations();
 
 	return hr;
 }
