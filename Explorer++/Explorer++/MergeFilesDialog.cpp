@@ -10,8 +10,10 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include <boost/scope_exit.hpp>
 #include <regex>
 
+#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 namespace NMergeFilesDialog
 {
@@ -424,13 +426,27 @@ void CMergeFilesDialog::OnChangeOutputDirectory()
 	LoadString(GetInstance(),IDS_MERGE_SELECTDESTINATION,
 		szTitle,SIZEOF_ARRAY(szTitle));
 
-	std::wstring strOutputFilename;
-	BOOL bSucceeded = NFileOperations::CreateBrowseDialog(m_hDlg,szTitle,strOutputFilename);
+	LPITEMIDLIST pidl;
+	BOOL bSucceeded = NFileOperations::CreateBrowseDialog(m_hDlg,szTitle,&pidl);
 
-	if(bSucceeded)
+	if (!bSucceeded)
 	{
-		SetDlgItemText(m_hDlg,IDC_MERGE_EDIT_FILENAME,strOutputFilename.c_str());
+		return;
 	}
+
+	BOOST_SCOPE_EXIT(pidl) {
+		CoTaskMemFree(pidl);
+	} BOOST_SCOPE_EXIT_END
+
+	TCHAR parsingName[MAX_PATH];
+	HRESULT hr = GetDisplayName(pidl, parsingName, SIZEOF_ARRAY(parsingName), SHGDN_FORPARSING);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	SetDlgItemText(m_hDlg, IDC_MERGE_EDIT_FILENAME, parsingName);
 }
 
 void CMergeFilesDialog::OnMove(bool bUp)

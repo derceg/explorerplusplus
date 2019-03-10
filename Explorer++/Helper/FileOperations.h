@@ -18,7 +18,8 @@ namespace NFileOperations
 	HRESULT	RenameFile(IShellItem *item, const std::wstring &newName);
 	HRESULT	DeleteFiles(HWND hwnd, std::vector<LPCITEMIDLIST> &pidls, bool permanent, bool silent);
 	void	DeleteFileSecurely(const std::wstring &strFilename,OverwriteMethod_t uOverwriteMethod);
-	BOOL	CopyFilesToFolder(HWND hOwner,const std::wstring &strTitle,const std::list<std::wstring> &FullFilenameList,BOOL bMove);
+	HRESULT	CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle, std::vector<LPCITEMIDLIST> &pidls, bool move);
+	HRESULT	CopyFiles(HWND hwnd, IShellItem *destinationFolder, std::vector<LPCITEMIDLIST> &pidls, bool move);
 
 	TCHAR	*BuildFilenameList(const std::list<std::wstring> &FilenameList);
 
@@ -27,7 +28,6 @@ namespace NFileOperations
 	HRESULT	CreateLinkToFile(const std::wstring &strTargetFilename,const std::wstring &strLinkFilename,const std::wstring &strLinkDescription);
 	HRESULT	ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLinkFilename, TCHAR *szResolvedPath, int nBufferSize);
 
-	BOOL	CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,std::wstring &strOutputFilename);
 	BOOL	CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,LPITEMIDLIST *ppidl);
 };
 

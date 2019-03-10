@@ -142,39 +142,108 @@ HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<LPCITEMIDLIST> &pidl
 	return hr;
 }
 
-BOOL NFileOperations::CopyFilesToFolder(HWND hOwner,const std::wstring &strTitle,
-	const std::list<std::wstring> &FullFilenameList,BOOL bMove)
+HRESULT NFileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle,
+	std::vector<LPCITEMIDLIST> &pidls, bool move)
 {
-	std::wstring strOutputFilename;
-	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner,strTitle.c_str(),strOutputFilename);
+	LPITEMIDLIST pidl;
+	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner,strTitle.c_str(),&pidl);
 
 	if(!bRes)
 	{
-		return FALSE;
+		return E_FAIL;
 	}
 
-	TCHAR *pszFullFilenames = NFileOperations::BuildFilenameList(FullFilenameList);
+	BOOST_SCOPE_EXIT(pidl) {
+		CoTaskMemFree(pidl);
+	} BOOST_SCOPE_EXIT_END
 
-	SHFILEOPSTRUCT shfo;
+	IShellItem *destinationFolder = nullptr;
+	HRESULT hr = SHCreateItemFromIDList(pidl, IID_PPV_ARGS(&destinationFolder));
 
-	if(bMove)
+	if (FAILED(hr))
 	{
-		shfo.wFunc = FO_MOVE;
+		return E_FAIL;
+	}
+
+	BOOST_SCOPE_EXIT(destinationFolder) {
+		destinationFolder->Release();
+	} BOOST_SCOPE_EXIT_END
+
+	hr = CopyFiles(hOwner, destinationFolder, pidls, move);
+
+	return hr;
+}
+
+HRESULT NFileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
+	std::vector<LPCITEMIDLIST> &pidls, bool move)
+{
+	IFileOperation *fo;
+	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	BOOST_SCOPE_EXIT(fo) {
+		fo->Release();
+	} BOOST_SCOPE_EXIT_END
+
+	hr = fo->SetOwnerWindow(hwnd);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	hr = fo->SetOperationFlags(FOF_ALLOWUNDO);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	IShellItemArray *shellItemArray;
+	hr = SHCreateShellItemArrayFromIDLists(static_cast<UINT>(pidls.size()), &pidls[0], &shellItemArray);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	BOOST_SCOPE_EXIT(shellItemArray) {
+		shellItemArray->Release();
+	} BOOST_SCOPE_EXIT_END
+
+	IUnknown *unknown;
+	hr = shellItemArray->QueryInterface(IID_IUnknown, reinterpret_cast<void **>(&unknown));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	BOOST_SCOPE_EXIT(unknown) {
+		unknown->Release();
+	} BOOST_SCOPE_EXIT_END
+
+	if (move)
+	{
+		hr = fo->MoveItems(unknown, destinationFolder);
 	}
 	else
 	{
-		shfo.wFunc = FO_COPY;
+		hr = fo->CopyItems(unknown, destinationFolder);
 	}
 
-	shfo.hwnd	= hOwner;
-	shfo.pFrom	= pszFullFilenames;
-	shfo.pTo	= strOutputFilename.c_str();
-	shfo.fFlags	= FOF_ALLOWUNDO;
-	bRes = (!SHFileOperation(&shfo) && !shfo.fAnyOperationsAborted);
+	if (FAILED(hr))
+	{
+		return hr;
+	}
 
-	free(pszFullFilenames);
+	hr = fo->PerformOperations();
 
-	return bRes;
+	return hr;
 }
 
 TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &FilenameList)
@@ -616,22 +685,6 @@ HRESULT NFileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLin
 	}
 
 	return hr;
-}
-
-BOOL NFileOperations::CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,std::wstring &strOutputFilename)
-{
-	LPITEMIDLIST pidl = NULL;
-	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner,strTitle,&pidl);
-
-	if(bRes)
-	{
-		TCHAR szOutputFilename[MAX_PATH];
-		SHGetPathFromIDList(pidl,szOutputFilename);
-		strOutputFilename = szOutputFilename;
-		CoTaskMemFree(pidl);
-	}
-
-	return bRes;
 }
 
 BOOL NFileOperations::CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,LPITEMIDLIST *ppidl)

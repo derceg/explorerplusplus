@@ -12,9 +12,11 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
+#include <boost/scope_exit.hpp>
 #include <comdef.h>
 #include <unordered_map>
 
+#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 namespace NSplitFileDialog
 {
@@ -469,13 +471,27 @@ void CSplitFileDialog::OnChangeOutputDirectory()
 	LoadString(GetInstance(),IDS_SPLITFILEDIALOG_DIRECTORYTITLE,
 		szTitle,SIZEOF_ARRAY(szTitle));
 
-	std::wstring strOutputFilename;
-	BOOL bSucceeded = NFileOperations::CreateBrowseDialog(m_hDlg,szTitle,strOutputFilename);
+	LPITEMIDLIST pidl;
+	BOOL bSucceeded = NFileOperations::CreateBrowseDialog(m_hDlg,szTitle,&pidl);
 
-	if(bSucceeded)
+	if (!bSucceeded)
 	{
-		SetDlgItemText(m_hDlg,IDC_SPLIT_EDIT_OUTPUT,strOutputFilename.c_str());
+		return;
 	}
+
+	BOOST_SCOPE_EXIT(pidl) {
+		CoTaskMemFree(pidl);
+	} BOOST_SCOPE_EXIT_END
+
+	TCHAR parsingName[MAX_PATH];
+	HRESULT hr = GetDisplayName(pidl, parsingName, SIZEOF_ARRAY(parsingName), SHGDN_FORPARSING);
+
+	if (FAILED(hr))
+	{
+		return;
+	}
+
+	SetDlgItemText(m_hDlg, IDC_SPLIT_EDIT_OUTPUT, parsingName);
 }
 
 void CSplitFileDialog::OnSplitFinished()

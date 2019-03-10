@@ -242,27 +242,33 @@ LRESULT Explorerplusplus::StatusBarMenuSelect(WPARAM wParam,LPARAM lParam)
 	return 0;
 }
 
-void Explorerplusplus::CopyToFolder(BOOL bMove)
+void Explorerplusplus::CopyToFolder(bool move)
 {
 	if(ListView_GetSelectedCount(m_hActiveListView) == 0)
 	{
 		return;
 	}
 
-	std::list<std::wstring> FullFilenameList;
+	std::vector<PIDLPointer> pidlPtrs;
+	std::vector<LPCITEMIDLIST> pidls;
 	int iItem = -1;
 
-	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
+	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
+		PIDLPointer pidlPtr(m_pActiveShellBrowser->QueryItemCompleteIdl(iItem));
 
-		FullFilenameList.push_back(szFullFilename);
+		if (!pidlPtr)
+		{
+			continue;
+		}
+
+		pidls.push_back(pidlPtr.get());
+		pidlPtrs.push_back(std::move(pidlPtr));
 	}
 
 	TCHAR szTemp[128];
 	LoadString(m_hLanguageModule,IDS_GENERAL_COPY_TO_FOLDER_TITLE,szTemp,SIZEOF_ARRAY(szTemp));
-	NFileOperations::CopyFilesToFolder(m_hContainer,szTemp,FullFilenameList,bMove);
+	NFileOperations::CopyFilesToFolder(m_hContainer,szTemp,pidls,move);
 }
 
 LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)

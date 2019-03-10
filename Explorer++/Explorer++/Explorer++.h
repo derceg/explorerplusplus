@@ -621,7 +621,7 @@ private:
 	int						DetermineGroupModeMenuId(int SortMode);
 
 	/* File operations. */
-	void					CopyToFolder(BOOL bMove);
+	void					CopyToFolder(bool move);
 	void					OpenAllSelectedItems(BOOL bOpenInNewTab);
 	void					OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);

@@ -422,12 +422,12 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 		case IDM_EDIT_COPYTOFOLDER:
 		case TOOLBAR_COPYTO:
-			CopyToFolder(FALSE);
+			CopyToFolder(false);
 			break;
 
 		case TOOLBAR_MOVETO:
 		case IDM_EDIT_MOVETOFOLDER:
-			CopyToFolder(TRUE);
+			CopyToFolder(true);
 			break;
 
 		case IDM_EDIT_SELECTALL:
