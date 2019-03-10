@@ -370,12 +370,12 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 		case TOOLBAR_DELETE:
 		case IDM_FILE_DELETE:
-			OnFileDelete(FALSE);
+			OnFileDelete(false);
 			break;
 
 		case TOOLBAR_DELETEPERMANENTLY:
 		case IDM_FILE_DELETEPERMANENTLY:
-			OnFileDelete(TRUE);
+			OnFileDelete(true);
 			break;
 
 		case IDM_FILE_RENAME:

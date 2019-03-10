@@ -5,6 +5,7 @@
 #pragma once
 
 #include <list>
+#include <vector>
 
 namespace NFileOperations
 {
@@ -15,7 +16,7 @@ namespace NFileOperations
 	};
 
 	HRESULT	RenameFile(IShellItem *item, const std::wstring &newName);
-	BOOL	DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,BOOL bPermanent,BOOL bSilent);
+	HRESULT	DeleteFiles(HWND hwnd, std::vector<LPCITEMIDLIST> &pidls, bool permanent, bool silent);
 	void	DeleteFileSecurely(const std::wstring &strFilename,OverwriteMethod_t uOverwriteMethod);
 	BOOL	CopyFilesToFolder(HWND hOwner,const std::wstring &strTitle,const std::list<std::wstring> &FullFilenameList,BOOL bMove);
 

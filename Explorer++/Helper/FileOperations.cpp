@@ -58,37 +58,88 @@ HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newNam
 	return hr;
 }
 
-BOOL NFileOperations::DeleteFiles(HWND hwnd,const std::list<std::wstring> &FullFilenameList,
-	BOOL bPermanent,BOOL bSilent)
+HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<LPCITEMIDLIST> &pidls,
+	bool permanent, bool silent)
 {
-	TCHAR *pszFullFilenames = NFileOperations::BuildFilenameList(FullFilenameList);
+	IFileOperation *fo;
+	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
 
-	FILEOP_FLAGS fFlags = 0;
-
-	if(!bPermanent)
+	if (FAILED(hr))
 	{
-		fFlags = FOF_ALLOWUNDO;
+		return hr;
 	}
 
-	if(bSilent)
+	BOOST_SCOPE_EXIT(fo) {
+		fo->Release();
+	} BOOST_SCOPE_EXIT_END
+
+	hr = fo->SetOwnerWindow(hwnd);
+
+	if (FAILED(hr))
 	{
-		fFlags |= FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;
+		return hr;
 	}
 
-	SHFILEOPSTRUCT shfo;
-	shfo.hwnd					= hwnd;
-	shfo.wFunc					= FO_DELETE;
-	shfo.pFrom					= pszFullFilenames;
-	shfo.pTo					= NULL;
-	shfo.fFlags					= fFlags;
-	shfo.fAnyOperationsAborted	= NULL;
-	shfo.hNameMappings			= NULL;
-	shfo.lpszProgressTitle		= NULL;
-	BOOL bRes = (!SHFileOperation(&shfo) && !shfo.fAnyOperationsAborted);
+	DWORD flags = 0;
 
-	free(pszFullFilenames);
+	if (!permanent)
+	{
+		flags |= FOF_ALLOWUNDO;
+	}
 
-	return bRes;
+	if (silent)
+	{
+		flags |= FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI;
+	}
+	else
+	{
+		flags |= FOF_WANTNUKEWARNING;
+	}
+
+	if (flags != 0)
+	{
+		hr = fo->SetOperationFlags(flags);
+
+		if (FAILED(hr))
+		{
+			return hr;
+		}
+	}
+
+	IShellItemArray *shellItemArray;
+	hr = SHCreateShellItemArrayFromIDLists(static_cast<UINT>(pidls.size()), &pidls[0], &shellItemArray);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	BOOST_SCOPE_EXIT(shellItemArray) {
+		shellItemArray->Release();
+	} BOOST_SCOPE_EXIT_END
+
+	IUnknown *unknown;
+	hr = shellItemArray->QueryInterface(IID_IUnknown, reinterpret_cast<void **>(&unknown));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	BOOST_SCOPE_EXIT(unknown) {
+		unknown->Release();
+	} BOOST_SCOPE_EXIT_END
+
+	hr = fo->DeleteItems(unknown);
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	hr = fo->PerformOperations();
+
+	return hr;
 }
 
 BOOL NFileOperations::CopyFilesToFolder(HWND hOwner,const std::wstring &strTitle,

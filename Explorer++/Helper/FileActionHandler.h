@@ -5,6 +5,7 @@
 #pragma once
 
 #include <list>
+#include <vector>
 #include <stack>
 
 class CFileActionHandler
@@ -18,13 +19,13 @@ public:
 	};
 
 	typedef std::list<RenamedItem_t> RenamedItems_t;
-	typedef std::list<std::wstring> DeletedItems_t;
+	typedef std::vector<LPCITEMIDLIST> DeletedItems_t;
 
 	CFileActionHandler();
 	~CFileActionHandler();
 
 	BOOL	RenameFiles(const RenamedItems_t &itemList);
-	BOOL	DeleteFiles(HWND hwnd, const DeletedItems_t &FullFilenameList, BOOL bPermanent, BOOL bSilent);
+	HRESULT	DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems, bool permanent, bool silent);
 
 	void	Undo();
 	BOOL	CanUndo() const;

@@ -408,7 +408,7 @@ private:
 	void					OnCopyItemPath(void) const;
 	void					OnCopyUniversalPaths(void) const;
 	void					OnSetFileAttributes(void) const;
-	void					OnFileDelete(BOOL bPermanent);
+	void					OnFileDelete(bool permanent);
 	void					OnFileRename(void);
 	void					OnShowFileProperties(void) const;
 	int						HighlightSimilarFiles(HWND ListView) const;
@@ -428,7 +428,7 @@ private:
 	HRESULT					OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType);
 	BOOL					OnListViewBeginLabelEdit(LPARAM lParam);
 	BOOL					OnListViewEndLabelEdit(LPARAM lParam);
-	void					OnListViewFileDelete(BOOL bPermanent);
+	void					OnListViewFileDelete(bool permanent);
 	void					OnListViewRClick(POINT *pCursorPos);
 	void					OnListViewBackgroundRClick(POINT *pCursorPos);
 	void					OnListViewItemRClick(POINT *pCursorPos);

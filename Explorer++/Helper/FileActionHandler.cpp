@@ -67,20 +67,20 @@ BOOL CFileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 	return FALSE;
 }
 
-BOOL CFileActionHandler::DeleteFiles(HWND hwnd,const DeletedItems_t &fullFilenameList,
-	BOOL bPermanent,BOOL bSilent)
+HRESULT CFileActionHandler::DeleteFiles(HWND hwnd, DeletedItems_t &deletedItems,
+	bool permanent, bool silent)
 {
-	BOOL bRes = NFileOperations::DeleteFiles(hwnd,fullFilenameList,bPermanent,bSilent);
+	HRESULT hr = NFileOperations::DeleteFiles(hwnd, deletedItems, permanent, silent);
 
-	if(bRes)
+	if(SUCCEEDED(hr))
 	{
 		UndoItem_t UndoItem;
 		UndoItem.Type = FILE_ACTION_DELETED;
-		UndoItem.deletedItems = DeletedItems_t(fullFilenameList);
+		UndoItem.deletedItems = deletedItems;
 		m_stackFileActions.push(UndoItem);
 	}
 
-	return bRes;
+	return hr;
 }
 
 void CFileActionHandler::Undo()

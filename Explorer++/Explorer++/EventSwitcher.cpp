@@ -82,7 +82,7 @@ void Explorerplusplus::OnFileRename(void)
 	}
 }
 
-void Explorerplusplus::OnFileDelete(BOOL bPermanent)
+void Explorerplusplus::OnFileDelete(bool permanent)
 {
 	HWND hFocus;
 
@@ -90,11 +90,11 @@ void Explorerplusplus::OnFileDelete(BOOL bPermanent)
 
 	if(hFocus == m_hActiveListView)
 	{
-		OnListViewFileDelete(bPermanent);
+		OnListViewFileDelete(permanent);
 	}
 	else if(hFocus == m_hTreeView)
 	{
-		OnTreeViewFileDelete(bPermanent);
+		OnTreeViewFileDelete(permanent);
 	}
 }
 
