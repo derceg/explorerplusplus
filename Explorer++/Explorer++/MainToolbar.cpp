@@ -771,5 +771,5 @@ void MainToolbar::UpdateToolbarButtonStates()
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_OPENCOMMANDPROMPT, !bVirtualFolder);
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_NEWFOLDER, !bVirtualFolder);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_NEWFOLDER, m_pexpp->CanCreate());
 }

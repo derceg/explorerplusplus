@@ -8,6 +8,7 @@
 #include "CustomizeColorsDialog.h"
 #include "DestroyFilesDialog.h"
 #include "DisplayColoursDialog.h"
+#include "FileProgressSink.h"
 #include "FilterDialog.h"
 #include "HelpFileMissingDialog.h"
 #include "IModelessDialogNotification.h"
@@ -22,7 +23,9 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
+#include <boost/scope_exit.hpp>
 
+#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 void Explorerplusplus::OnChangeDisplayColors()
 {
@@ -203,26 +206,37 @@ void Explorerplusplus::OnSaveDirectoryListing() const
 
 void Explorerplusplus::OnCreateNewFolder()
 {
-	TCHAR			szNewFolderName[32768];
-	LPITEMIDLIST	pidlItem = NULL;
-	HRESULT			hr;
+	PIDLPointer pidlDirectory(m_pActiveShellBrowser->QueryCurrentDirectoryIdl());
 
-	hr = CreateNewFolder(m_CurrentDirectory, szNewFolderName, SIZEOF_ARRAY(szNewFolderName));
+	IShellItem *directoryShellItem = nullptr;
+	HRESULT hr = SHCreateItemFromIDList(pidlDirectory.get(), IID_PPV_ARGS(&directoryShellItem));
 
-	if(SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
+		return;
+	}
+
+	BOOST_SCOPE_EXIT(directoryShellItem) {
+		directoryShellItem->Release();
+	} BOOST_SCOPE_EXIT_END
+
+	FileProgressSink *sink = FileProgressSink::CreateNew();
+	sink->SetPostNewItemObserver([this] (PIDLIST_ABSOLUTE pidl) {
 		m_bCountingDown = TRUE;
 		NListView::ListView_SelectAllItems(m_hActiveListView, FALSE);
 		SetFocus(m_hActiveListView);
 
-		GetIdlFromParsingName(szNewFolderName, &pidlItem);
-		m_pActiveShellBrowser->QueueRename((LPITEMIDLIST) pidlItem);
+		m_pActiveShellBrowser->QueueRename(pidl);
+	});
 
-		CoTaskMemFree(pidlItem);
-	}
-	else
+	TCHAR newFolderName[128];
+	LoadString(m_hLanguageModule, IDS_NEW_FOLDER_NAME, newFolderName, SIZEOF_ARRAY(newFolderName));
+	hr = NFileOperations::CreateNewFolder(directoryShellItem, newFolderName, sink);
+	sink->Release();
+
+	if(FAILED(hr))
 	{
-		TCHAR	szTemp[512];
+		TCHAR szTemp[512];
 
 		LoadString(m_hLanguageModule, IDS_NEWFOLDERERROR, szTemp,
 			SIZEOF_ARRAY(szTemp));

@@ -268,72 +268,41 @@ TCHAR *NFileOperations::BuildFilenameList(const std::list<std::wstring> &Filenam
 	return pszFilenames;
 }
 
-HRESULT CreateNewFolder(const TCHAR *Directory,TCHAR *szNewFolderName,int cchMax)
+
+// Creates a new folder. Note that IFileOperation will take care of
+// renaming the folder if one with that name already exists.
+HRESULT NFileOperations::CreateNewFolder(IShellItem *destinationFolder, const std::wstring &newFolderName,
+	IFileOperationProgressSink *progressSink)
 {
-	WIN32_FIND_DATA	wfd;
-	HANDLE			hFirstFile;
-	WCHAR			szLongPath[32768];
-	TCHAR			FolderName[32768];
-	BOOL			res;
-	int				i = 2;
+	IFileOperation *fo;
+	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
 
-	if(Directory == NULL)
-		return E_INVALIDARG;
-
-	if(Directory[lstrlen(Directory) - 1] == '\\')
+	if (FAILED(hr))
 	{
-		/* DON'T add a backslash to a path that already has
-		one. Since it is assumed that ALL paths this function
-		handles may be longer than MAX_PATH, don't use any
-		of the Path* functions. */
-		StringCchPrintf(FolderName,SIZEOF_ARRAY(FolderName),
-			_T("%sNew Folder"),Directory);
-	}
-	else
-	{
-		StringCchPrintf(FolderName,SIZEOF_ARRAY(FolderName),
-			_T("%s\\New Folder"),Directory);
+		return hr;
 	}
 
-	StringCchPrintf(szLongPath,SIZEOF_ARRAY(szLongPath),
-		L"\\\\?\\%s",FolderName);
+	BOOST_SCOPE_EXIT(fo) {
+		fo->Release();
+	} BOOST_SCOPE_EXIT_END
 
-	while((hFirstFile = FindFirstFile(szLongPath,&wfd))
-	!= INVALID_HANDLE_VALUE)
+	hr = fo->SetOperationFlags(FOF_ALLOWUNDO | FOF_SILENT);
+
+	if (FAILED(hr))
 	{
-		FindClose(hFirstFile);
-
-		if(Directory[lstrlen(Directory) - 1] == '\\')
-		{
-			/* DON'T add a backslash to a path that already has
-			one. Since it is assumed that ALL paths this function
-			handles may be longer than MAX_PATH, don't use any
-			of the Path* functions. */
-			StringCchPrintf(FolderName,SIZEOF_ARRAY(FolderName),
-				_T("%sNew Folder (%d)"),Directory,i);
-		}
-		else
-		{
-			StringCchPrintf(FolderName,SIZEOF_ARRAY(FolderName),
-				_T("%s\\New Folder (%d)"),Directory,i);
-		}
-
-		StringCchPrintf(szLongPath,SIZEOF_ARRAY(szLongPath),
-			L"\\\\?\\%s",FolderName);
-
-		i++;
+		return hr;
 	}
 
-	res = CreateDirectory(szLongPath,NULL);
+	hr = fo->NewItem(destinationFolder, FILE_ATTRIBUTE_DIRECTORY, newFolderName.c_str(), nullptr, progressSink);
 
-	if(!res)
+	if (FAILED(hr))
 	{
-		return E_FAIL;
+		return hr;
 	}
 
-	StringCchCopy(szNewFolderName,cchMax,FolderName);
+	hr = fo->PerformOperations();
 
-	return S_OK;
+	return hr;
 }
 
 BOOL NFileOperations::SaveDirectoryListing(const std::wstring &strDirectory,const std::wstring &strFilename)

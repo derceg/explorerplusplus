@@ -21,6 +21,8 @@ namespace NFileOperations
 	HRESULT	CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle, std::vector<LPCITEMIDLIST> &pidls, bool move);
 	HRESULT	CopyFiles(HWND hwnd, IShellItem *destinationFolder, std::vector<LPCITEMIDLIST> &pidls, bool move);
 
+	HRESULT	CreateNewFolder(IShellItem *destinationFolder, const std::wstring &newFolderName, IFileOperationProgressSink *progressSink);
+
 	TCHAR	*BuildFilenameList(const std::list<std::wstring> &FilenameList);
 
 	BOOL	SaveDirectoryListing(const std::wstring &strDirectory,const std::wstring &strFilename);
@@ -30,8 +32,6 @@ namespace NFileOperations
 
 	BOOL	CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,LPITEMIDLIST *ppidl);
 };
-
-HRESULT	CreateNewFolder(const TCHAR *Directory, TCHAR *szNewFolderName, int cchMax);
 
 HRESULT	CopyFiles(const std::list<std::wstring> &FileNameList, IDataObject **pClipboardDataObject);
 HRESULT	CutFiles(const std::list<std::wstring> &FileNameList, IDataObject **pClipboardDataObject);

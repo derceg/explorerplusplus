@@ -58,6 +58,7 @@ __interface IExplorerplusplus
 
 	HMENU			BuildViewsMenu();
 
+	bool			CanCreate() const;
 	BOOL			CanCut() const;
 	BOOL			CanCopy() const;
 	BOOL			CanRename() const;

@@ -5,6 +5,30 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 
+bool Explorerplusplus::CanCreate() const
+{
+	PIDLPointer pidlDirectory(m_pActiveShellBrowser->QueryCurrentDirectoryIdl());
+
+	SFGAOF attributes = SFGAO_FILESYSTEM;
+	HRESULT hr = GetItemAttributes(pidlDirectory.get(), &attributes);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	if ((attributes & SFGAO_FILESYSTEM) == SFGAO_FILESYSTEM)
+	{
+		return true;
+	}
+
+	// Library folders aren't filesystem folders, but they act like them
+	// (e.g. they allow items to be created, copied and moved) and
+	// ultimately they're backed by filesystem folders. If this is a
+	// library folder, file creation will be allowed.
+	return IsChildOfLibrariesFolder(pidlDirectory.get());
+}
+
 BOOL Explorerplusplus::CanCut() const
 {
 	return TestItemAttributes(SFGAO_CANMOVE);

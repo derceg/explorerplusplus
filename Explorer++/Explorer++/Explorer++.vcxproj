@@ -354,6 +354,7 @@
     <ClCompile Include="PluginInitialization.cpp" />
     <ClCompile Include="PluginManager.cpp" />
     <ClCompile Include="PluginMenuManager.cpp" />
+    <ClCompile Include="FileProgressSink.cpp" />
     <ClCompile Include="RegistrySettings.cpp" />
     <ClCompile Include="RenameTabDialog.cpp" />
     <ClCompile Include="ScriptingDialog.cpp" />
@@ -460,6 +461,7 @@
     <ClInclude Include="Config.h" />
     <ClInclude Include="PluginManager.h" />
     <ClInclude Include="PluginMenuManager.h" />
+    <ClInclude Include="FileProgressSink.h" />
     <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="RenameTabDialog.h" />
     <ClInclude Include="resource.h" />

@@ -289,6 +289,7 @@
     <ClCompile Include="MainRebar.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="FileProgressSink.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -540,6 +541,7 @@
     <ClInclude Include="BookmarkMenu.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
+    <ClInclude Include="FileProgressSink.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

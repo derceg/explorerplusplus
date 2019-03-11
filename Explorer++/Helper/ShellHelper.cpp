@@ -3,15 +3,17 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <boost\algorithm\string\join.hpp>
-#include <boost\algorithm\string\predicate.hpp>
+#include "ShellHelper.h"
 #include "FileOperations.h"
 #include "Helper.h"
 #include "Macros.h"
 #include "ProcessHelper.h"
 #include "RegistrySettings.h"
-#include "ShellHelper.h"
+#include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/scope_exit.hpp>
 
+#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
 	const std::list<JumpListTaskInformation> &TaskList);
@@ -1400,4 +1402,21 @@ BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL)
 	}
 
 	return FALSE;
+}
+
+bool IsChildOfLibrariesFolder(PIDLIST_ABSOLUTE pidl)
+{
+	PIDLIST_ABSOLUTE pidlLibraries;
+	HRESULT hr = SHGetKnownFolderIDList(FOLDERID_Libraries, 0, nullptr, &pidlLibraries);
+
+	if (FAILED(hr))
+	{
+		return false;
+	}
+
+	BOOST_SCOPE_EXIT(pidlLibraries) {
+		CoTaskMemFree(pidlLibraries);
+	} BOOST_SCOPE_EXIT_END
+
+	return ILIsParent(pidlLibraries, pidl, FALSE);
 }

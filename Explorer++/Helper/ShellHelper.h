@@ -127,6 +127,7 @@ HRESULT			DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UI
 HRESULT			ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory, LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles);
 HRESULT			ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory, LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask);
 BOOL			CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
+bool			IsChildOfLibrariesFolder(PIDLIST_ABSOLUTE pidl);
 
 /* Drag and drop helpers. */
 DWORD			DetermineDragEffect(DWORD grfKeyState, DWORD dwCurrentEffect, BOOL bDataAccept, BOOL bOnSameDrive);

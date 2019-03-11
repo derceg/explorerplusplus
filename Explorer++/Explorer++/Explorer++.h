@@ -642,6 +642,7 @@ private:
 	HRESULT					GetListViewItemAttributes(int item, SFGAOF *pItemAttributes) const;
 	HRESULT					GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const;
 	HRESULT					GetSelectionAttributes(SFGAOF *pItemAttributes) const;
+	bool					CanCreate() const;
 	BOOL					CanCut() const;
 	BOOL					CanCopy() const;
 	BOOL					CanRename() const;
