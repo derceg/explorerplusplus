@@ -14,6 +14,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ImageWrappers.h"
 #include "../Helper/Macros.h"
+#include "../Helper/PIDLWrapper.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/optional.hpp>
@@ -24,7 +25,6 @@
 
 #define WM_USER_UPDATEWINDOWS		(WM_APP + 17)
 #define WM_USER_STARTEDBROWSING		(WM_APP + 55)
-#define WM_USER_NEWITEMINSERTED		(WM_APP + 200)
 #define WM_USER_DIRECTORYMODIFIED	(WM_APP + 204)
 
 typedef struct
@@ -572,10 +572,9 @@ private:
 	std::list<AwaitingAdd_t>	m_AwaitingAddList;
 	int					m_nAwaitingAdd;
 
-	/* Shell new. */
-	BOOL				m_bNewItemCreated;
-	LPITEMIDLIST		m_pidlNewItem;
-	int					m_iIndexNewItem;
+	/* Rename support. */
+	bool				m_renameQueued;
+	PIDLPointer			m_pidlRenamedItem;
 
 	/* File selection. */
 	std::list<std::wstring>	m_FileSelectionList;

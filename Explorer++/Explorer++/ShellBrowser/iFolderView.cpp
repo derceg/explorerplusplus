@@ -100,7 +100,7 @@ m_shChangeNotifyId(0)
 	m_pActiveColumnList		= NULL;
 	m_bPerformingDrag		= FALSE;
 	m_nActiveColumns		= 0;
-	m_bNewItemCreated		= FALSE;
+	m_renameQueued			= false;
 	m_iDropped				= -1;
 
 	m_iUniqueFolderIndex	= 0;

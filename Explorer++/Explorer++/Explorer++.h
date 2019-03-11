@@ -346,7 +346,6 @@ private:
 	int						DetermineListViewObjectIndex(HWND hListView);
 	void					OnLockToolbars(void);
 	void					LoadAllSettings(ILoadSave **pLoadSave);
-	void					OnShellNewItemCreated(LPARAM lParam);
 	void					OnPaste(void);
 	void					OnAppCommand(UINT cmd);
 	void					OnRefresh(void);

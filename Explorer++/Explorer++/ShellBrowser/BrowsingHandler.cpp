@@ -67,6 +67,9 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 
 	m_FileSelectionList.clear();
 
+	m_renameQueued = false;
+	m_pidlRenamedItem.reset();
+
 	TCHAR szParsingPath[MAX_PATH];
 	GetDisplayName(pidl,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
@@ -218,14 +221,6 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			if(m_ViewMode == VM_TILES)
 			{
 				SetTileViewItemInfo(iItemIndex,itr->iItemInternal);
-			}
-
-			if(m_bNewItemCreated)
-			{
-				if(CompareIdls(m_itemInfoMap.at((int)itr->iItemInternal).pidlComplete.get(),m_pidlNewItem))
-					m_bNewItemCreated = FALSE;
-
-				m_iIndexNewItem = iItemIndex;
 			}
 
 			/* If the file is marked as hidden, ghost it out. */

@@ -1281,8 +1281,8 @@ void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
 
 	if(!bItemFound)
 	{
-		m_bNewItemCreated = TRUE;
-		m_pidlNewItem = ILClone(pidlItem);
+		m_renameQueued = true;
+		m_pidlRenamedItem.reset(ILClone(pidlItem));
 	}
 }
 

@@ -905,20 +905,6 @@ void Explorerplusplus::OnLockToolbars(void)
 	AddWindowStyle(m_hMainRebar,RBS_FIXEDORDER,m_bLockToolbars);
 }
 
-void Explorerplusplus::OnShellNewItemCreated(LPARAM lParam)
-{
-	HWND	hEdit;
-	int		iRenamedItem;
-
-	iRenamedItem = (int)lParam;
-
-	if(iRenamedItem != -1)
-	{
-		/* Start editing the label for this item. */
-		hEdit = ListView_EditLabel(m_hActiveListView,iRenamedItem);
-	}
-}
-
 void Explorerplusplus::OnAppCommand(UINT cmd)
 {
 	switch(cmd)

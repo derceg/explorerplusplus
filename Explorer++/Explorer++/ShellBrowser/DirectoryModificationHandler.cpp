@@ -167,6 +167,24 @@ void CShellBrowser::AddItem(PCIDLIST_ABSOLUTE pidl)
 				
 			InsertAwaitingItems(m_bShowInGroups);
 
+			if (m_renameQueued && CompareIdls(pidl, m_pidlRenamedItem.get()))
+			{
+				int internalIndex = LocateFileItemInternalIndex(pidl);
+
+				if (internalIndex != -1)
+				{
+					auto item = LocateItemByInternalIndex(internalIndex);
+
+					if (item)
+					{
+						ListView_EditLabel(m_hListView, *item);
+					}
+				}
+
+				m_renameQueued = false;
+				m_pidlRenamedItem.reset();
+			}
+
 			bFileAdded = TRUE;
 		}
 
