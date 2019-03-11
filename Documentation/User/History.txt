@@ -35,6 +35,11 @@ Bug fixes:
 - When right-clicking on the listview background in Windows 10,
   Explorer++ would crash. To resolve this, the OneDrive shell
   extension is now ignored when showing the menu. See #35.
+- Items in virtual folders (e.g. library folders) can now be
+  renamed and deleted.
+- Items can now be copied to/moved to virtual folders (using the
+  "Copy To Folder"/"Move To Folder" functionality).
+- New folders can now be created in virtual folders.
 - Fixed issue with date conversion. Previously, dates would be
   converted in the current time zone, rather than the time zone
   in effect at the time being converted.
