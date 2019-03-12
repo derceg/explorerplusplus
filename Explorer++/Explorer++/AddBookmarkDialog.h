@@ -45,8 +45,6 @@ public:
 	CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,CBookmarkFolder &AllBookmarks,CBookmark &Bookmark);
 	~CAddBookmarkDialog();
 
-	LRESULT CALLBACK	TreeViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
-
 	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
 	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
 	void	OnBookmarkModified(const GUID &guid);
@@ -59,7 +57,6 @@ protected:
 	INT_PTR	OnInitDialog();
 	INT_PTR	OnCtlColorEdit(HWND hwnd,HDC hdc);
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
-	INT_PTR	OnNotify(NMHDR *pnmhdr);
 	INT_PTR	OnClose();
 	INT_PTR	OnDestroy();
 	INT_PTR	OnNcDestroy();
@@ -75,15 +72,6 @@ private:
 
 	void		SetDialogIcon();
 
-	void		OnRClick(NMHDR *pnmhdr);
-	void		OnNewFolder();
-
-	void		OnTvnBeginLabelEdit();
-	BOOL		OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi);
-	void		OnTvnKeyDown(NMTVKEYDOWN *pnmtvkd);
-
-	void		OnTreeViewRename();
-
 	void		OnOk();
 	void		OnCancel();
 
@@ -96,9 +84,6 @@ private:
 	CBookmark		&m_Bookmark;
 
 	CBookmarkTreeView	*m_pBookmarkTreeView;
-
-	bool		m_bNewFolderCreated;
-	GUID		m_NewFolderGUID;
 
 	HBRUSH		m_ErrorBrush;
 

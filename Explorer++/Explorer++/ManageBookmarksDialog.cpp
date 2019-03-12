@@ -157,7 +157,7 @@ void CManageBookmarksDialog::SetupTreeView()
 {
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 
-	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView,&m_AllBookmarks,
+	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView,GetInstance(),&m_AllBookmarks,
 		m_pmbdps->m_guidSelected,m_pmbdps->m_setExpansion);
 }
 

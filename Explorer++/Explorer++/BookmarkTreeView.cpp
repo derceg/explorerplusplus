@@ -9,13 +9,19 @@
 #include "../Helper/Macros.h"
 #include <stack>
 
-CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, CBookmarkFolder *pAllBookmarks,
-	const GUID &guidSelected, const NBookmarkHelper::setExpansion_t &setExpansion) :
+CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
+	CBookmarkFolder *pAllBookmarks, const GUID &guidSelected,
+	const NBookmarkHelper::setExpansion_t &setExpansion) :
 	m_hTreeView(hTreeView),
+	m_instance(hInstance),
 	m_pAllBookmarks(pAllBookmarks),
-	m_uIDCounter(0)
+	m_uIDCounter(0),
+	m_bNewFolderCreated(false)
 {
-	SetWindowSubclass(hTreeView, BookmarkTreeViewProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(hTreeView, BookmarkTreeViewProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+
+	SetWindowSubclass(GetParent(hTreeView), BookmarkTreeViewParentProcStub, PARENT_SUBCLASS_ID,
+		reinterpret_cast<DWORD_PTR>(this));
 
 	SetWindowTheme(hTreeView, L"Explorer", NULL);
 
@@ -30,7 +36,8 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, CBookmarkFolder *pAllBookma
 
 CBookmarkTreeView::~CBookmarkTreeView()
 {
-	RemoveWindowSubclass(m_hTreeView, BookmarkTreeViewProcStub, 0);
+	RemoveWindowSubclass(m_hTreeView, BookmarkTreeViewParentProcStub, PARENT_SUBCLASS_ID);
+	RemoveWindowSubclass(m_hTreeView, BookmarkTreeViewProcStub, SUBCLASS_ID);
 	ImageList_Destroy(m_himl);
 }
 
@@ -48,11 +55,97 @@ LRESULT CALLBACK CBookmarkTreeView::TreeViewProc(HWND hwnd, UINT Msg, WPARAM wPa
 {
 	switch (Msg)
 	{
+	case WM_COMMAND:
+		if (HIWORD(wParam) == 0)
+		{
+			switch (LOWORD(wParam))
+			{
+			case IDM_BOOKMARK_TREEVIEW_RLICK_RENAME:
+				OnTreeViewRename();
+				break;
+
+			case IDM_BOOKMARK_TREEVIEW_RLICK_DELETE:
+				/* TODO: Handle menu item. */
+				break;
+
+			case IDM_BOOKMARK_TREEVIEW_RLICK_NEW_FOLDER:
+				CreateNewFolder();
+				break;
+			}
+		}
+		break;
+
 	case WM_NOTIFY:
 		switch (reinterpret_cast<NMHDR *>(lParam)->code)
 		{
 		case TVN_DELETEITEM:
 			OnTvnDeleteItem(reinterpret_cast<NMTREEVIEW *>(lParam));
+			break;
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd, Msg, wParam, lParam);
+}
+
+LRESULT CALLBACK BookmarkTreeViewParentProcStub(HWND hwnd, UINT uMsg,
+	WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+{
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
+	CBookmarkTreeView *pbtv = reinterpret_cast<CBookmarkTreeView *>(dwRefData);
+
+	return pbtv->TreeViewParentProc(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK CBookmarkTreeView::TreeViewParentProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (Msg)
+	{
+	case WM_NOTIFY:
+		switch (reinterpret_cast<NMHDR *>(lParam)->code)
+		{
+		case TVN_KEYDOWN:
+			OnTvnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(lParam));
+			break;
+
+		case TVN_BEGINLABELEDIT:
+			OnTvnBeginLabelEdit();
+			break;
+
+		case TVN_ENDLABELEDIT:
+			return OnTvnEndLabelEdit(reinterpret_cast<NMTVDISPINFO *>(lParam));
+			break;
+
+		case NM_RCLICK:
+			OnRClick(reinterpret_cast<NMHDR *>(lParam));
+			break;
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd, Msg, wParam, lParam);
+}
+
+LRESULT CALLBACK TreeViewEditProcStub(HWND hwnd, UINT uMsg,
+	WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+{
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
+	CBookmarkTreeView *pbtv = reinterpret_cast<CBookmarkTreeView *>(dwRefData);
+
+	return pbtv->TreeViewEditProc(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK CBookmarkTreeView::TreeViewEditProc(HWND hwnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (Msg)
+	{
+	case WM_GETDLGCODE:
+		switch (wParam)
+		{
+		case VK_RETURN:
+			return DLGC_WANTALLKEYS;
 			break;
 		}
 		break;
@@ -200,6 +293,19 @@ HTREEITEM CBookmarkTreeView::BookmarkFolderAdded(const CBookmarkFolder &ParentBo
 		TreeView_SetItem(m_hTreeView, &tvi);
 	}
 
+	if (m_bNewFolderCreated &&
+		IsEqualGUID(BookmarkFolder.GetGUID(), m_NewFolderGUID))
+	{
+		/* If a new folder has been created, it will be selected,
+		as it is assumed that the user intends to place any
+		new bookmark within that folder. */
+		SetFocus(m_hTreeView);
+		TreeView_SelectItem(m_hTreeView, hItem);
+		TreeView_EditLabel(m_hTreeView, hItem);
+
+		m_bNewFolderCreated = false;
+	}
+
 	return hItem;
 }
 
@@ -234,6 +340,73 @@ void CBookmarkTreeView::BookmarkFolderRemoved(const GUID &guid)
 	TreeView_DeleteItem(m_hTreeView, itr->second);
 }
 
+void CBookmarkTreeView::OnTvnKeyDown(NMTVKEYDOWN *pnmtvkd)
+{
+	switch (pnmtvkd->wVKey)
+	{
+	case VK_F2:
+		OnTreeViewRename();
+		break;
+	}
+}
+
+void CBookmarkTreeView::OnTreeViewRename()
+{
+	HTREEITEM hSelectedItem = TreeView_GetSelection(m_hTreeView);
+	TreeView_EditLabel(m_hTreeView, hSelectedItem);
+}
+
+void CBookmarkTreeView::OnTvnBeginLabelEdit()
+{
+	HWND hEdit = TreeView_GetEditControl(m_hTreeView);
+	SetWindowSubclass(hEdit, TreeViewEditProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
+}
+
+BOOL CBookmarkTreeView::OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi)
+{
+	HWND hEdit = TreeView_GetEditControl(m_hTreeView);
+	RemoveWindowSubclass(hEdit, TreeViewEditProcStub, 0);
+
+	if (pnmtvdi->item.pszText != NULL &&
+		lstrlen(pnmtvdi->item.pszText) > 0)
+	{
+		CBookmarkFolder &BookmarkFolder = GetBookmarkFolderFromTreeView(pnmtvdi->item.hItem);
+		BookmarkFolder.SetName(pnmtvdi->item.pszText);
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+void CBookmarkTreeView::OnRClick(NMHDR *pnmhdr)
+{
+	if (pnmhdr->hwndFrom != m_hTreeView)
+	{
+		return;
+	}
+
+	DWORD dwCursorPos = GetMessagePos();
+
+	POINT ptCursor;
+	ptCursor.x = GET_X_LPARAM(dwCursorPos);
+	ptCursor.y = GET_Y_LPARAM(dwCursorPos);
+
+	TVHITTESTINFO tvhti;
+	tvhti.pt = ptCursor;
+	ScreenToClient(m_hTreeView, &tvhti.pt);
+	HTREEITEM hItem = TreeView_HitTest(m_hTreeView, &tvhti);
+
+	if (hItem != NULL)
+	{
+		TreeView_SelectItem(m_hTreeView, hItem);
+
+		HMENU hMenu = LoadMenu(m_instance, MAKEINTRESOURCE(IDR_BOOKMARK_TREEVIEW_RCLICK_MENU));
+		TrackPopupMenu(GetSubMenu(hMenu, 0), TPM_LEFTALIGN, ptCursor.x, ptCursor.y, 0, m_hTreeView, NULL);
+		DestroyMenu(hMenu);
+	}
+}
+
 void CBookmarkTreeView::OnTvnDeleteItem(NMTREEVIEW *pnmtv)
 {
 	auto itrID = m_mapID.find(static_cast<UINT>(pnmtv->itemOld.lParam));
@@ -252,6 +425,23 @@ void CBookmarkTreeView::OnTvnDeleteItem(NMTREEVIEW *pnmtv)
 
 	m_mapItem.erase(itrItem);
 	m_mapID.erase(itrID);
+}
+
+void CBookmarkTreeView::CreateNewFolder()
+{
+	TCHAR szTemp[64];
+	LoadString(m_instance, IDS_BOOKMARKS_NEWBOOKMARKFOLDER, szTemp, SIZEOF_ARRAY(szTemp));
+	CBookmarkFolder NewBookmarkFolder = CBookmarkFolder::Create(szTemp);
+
+	m_bNewFolderCreated = true;
+	m_NewFolderGUID = NewBookmarkFolder.GetGUID();
+
+	HTREEITEM hSelectedItem = TreeView_GetSelection(m_hTreeView);
+
+	assert(hSelectedItem != NULL);
+
+	CBookmarkFolder &ParentBookmarkFolder = GetBookmarkFolderFromTreeView(hSelectedItem);
+	ParentBookmarkFolder.InsertBookmarkFolder(NewBookmarkFolder);
 }
 
 void CBookmarkTreeView::SelectFolder(const GUID &guid)

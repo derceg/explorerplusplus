@@ -12,13 +12,6 @@
 #include "../Helper/WindowHelper.h"
 #include "../Helper/Macros.h"
 
-
-namespace NAddBookmarkDialog
-{
-	LRESULT CALLBACK TreeViewEditProcStub(HWND hwnd,UINT uMsg,
-		WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-}
-
 const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
 CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,
@@ -26,7 +19,6 @@ CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hP
 	CBaseDialog(hInstance, iResource, hParent, true),
 	m_AllBookmarks(AllBookmarks),
 	m_Bookmark(Bookmark),
-	m_bNewFolderCreated(false),
 	m_ErrorBrush(CreateSolidBrush(ERROR_BACKGROUND_COLOR))
 {
 	m_pabdps = &CAddBookmarkDialogPersistentSettings::GetInstance();
@@ -65,7 +57,7 @@ INT_PTR CAddBookmarkDialog::OnInitDialog()
 
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
 
-	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView,&m_AllBookmarks,
+	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView,GetInstance(),&m_AllBookmarks,
 		m_pabdps->m_guidSelected,m_pabdps->m_setExpansion);
 
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_BOOKMARK_NAME);
@@ -179,13 +171,8 @@ INT_PTR CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	{
 		switch(LOWORD(wParam))
 		{
-		case IDM_ADDBOOKMARK_RLICK_RENAME:
-			OnTreeViewRename();
-			break;
-
-		case IDM_ADDBOOKMARK_RLICK_NEWFOLDER:
 		case IDC_BOOKMARK_NEWFOLDER:
-			OnNewFolder();
+			m_pBookmarkTreeView->CreateNewFolder();
 			break;
 
 		case IDOK:
@@ -199,148 +186,6 @@ INT_PTR CAddBookmarkDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	}
 
 	return 0;
-}
-
-INT_PTR CAddBookmarkDialog::OnNotify(NMHDR *pnmhdr)
-{
-	switch(pnmhdr->code)
-	{
-	case NM_RCLICK:
-		OnRClick(pnmhdr);
-		break;
-
-	case TVN_BEGINLABELEDIT:
-		OnTvnBeginLabelEdit();
-		break;
-
-	case TVN_ENDLABELEDIT:
-		return OnTvnEndLabelEdit(reinterpret_cast<NMTVDISPINFO *>(pnmhdr));
-		break;
-
-	case TVN_KEYDOWN:
-		OnTvnKeyDown(reinterpret_cast<NMTVKEYDOWN *>(pnmhdr));
-		break;
-	}
-
-	return 0;
-}
-
-void CAddBookmarkDialog::OnNewFolder()
-{
-	TCHAR szTemp[64];
-	LoadString(GetInstance(),IDS_BOOKMARKS_NEWBOOKMARKFOLDER,szTemp,SIZEOF_ARRAY(szTemp));
-	CBookmarkFolder NewBookmarkFolder = CBookmarkFolder::Create(szTemp);
-
-	m_bNewFolderCreated = true;
-	m_NewFolderGUID = NewBookmarkFolder.GetGUID();
-
-	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
-	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
-
-	assert(hSelectedItem != NULL);
-
-	CBookmarkFolder &ParentBookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(hSelectedItem);
-	ParentBookmarkFolder.InsertBookmarkFolder(NewBookmarkFolder);
-}
-
-void CAddBookmarkDialog::OnRClick(NMHDR *pnmhdr)
-{
-	if(pnmhdr->idFrom == IDC_BOOKMARK_TREEVIEW)
-	{
-		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
-
-		DWORD dwCursorPos = GetMessagePos();
-
-		POINT ptCursor;
-		ptCursor.x = GET_X_LPARAM(dwCursorPos);
-		ptCursor.y = GET_Y_LPARAM(dwCursorPos);
-
-		TVHITTESTINFO tvhti;
-		tvhti.pt = ptCursor;
-		ScreenToClient(hTreeView,&tvhti.pt);
-		HTREEITEM hItem = TreeView_HitTest(hTreeView,&tvhti);
-
-		if(hItem != NULL)
-		{
-			TreeView_SelectItem(hTreeView,hItem);
-
-			HMENU hMenu = LoadMenu(GetInstance(),MAKEINTRESOURCE(IDR_ADDBOOKMARK_RCLICK_MENU));
-			TrackPopupMenu(GetSubMenu(hMenu,0),TPM_LEFTALIGN,ptCursor.x,ptCursor.y,0,m_hDlg,NULL);
-			DestroyMenu(hMenu);
-		}
-	}
-}
-
-void CAddBookmarkDialog::OnTvnBeginLabelEdit()
-{
-	HWND hEdit = reinterpret_cast<HWND>(SendDlgItemMessage(m_hDlg,
-		IDC_BOOKMARK_TREEVIEW,TVM_GETEDITCONTROL,0,0));
-	SetWindowSubclass(hEdit,NAddBookmarkDialog::TreeViewEditProcStub,0,
-		reinterpret_cast<DWORD_PTR>(this));
-}
-
-BOOL CAddBookmarkDialog::OnTvnEndLabelEdit(NMTVDISPINFO *pnmtvdi)
-{
-	HWND hEdit = reinterpret_cast<HWND>(SendDlgItemMessage(m_hDlg,
-		IDC_BOOKMARK_TREEVIEW,TVM_GETEDITCONTROL,0,0));
-	RemoveWindowSubclass(hEdit,NAddBookmarkDialog::TreeViewEditProcStub,0);
-
-	if(pnmtvdi->item.pszText != NULL &&
-		lstrlen(pnmtvdi->item.pszText) > 0)
-	{
-		CBookmarkFolder &BookmarkFolder = m_pBookmarkTreeView->GetBookmarkFolderFromTreeView(pnmtvdi->item.hItem);
-		BookmarkFolder.SetName(pnmtvdi->item.pszText);
-
-		SetWindowLongPtr(m_hDlg,DWLP_MSGRESULT,TRUE);
-		return TRUE;
-	}
-
-	SetWindowLongPtr(m_hDlg,DWLP_MSGRESULT,FALSE);
-	return FALSE;
-}
-
-LRESULT CALLBACK NAddBookmarkDialog::TreeViewEditProcStub(HWND hwnd,UINT uMsg,
-	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	CAddBookmarkDialog *pabd = reinterpret_cast<CAddBookmarkDialog *>(dwRefData);
-
-	return pabd->TreeViewEditProc(hwnd,uMsg,wParam,lParam);
-}
-
-LRESULT CALLBACK CAddBookmarkDialog::TreeViewEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam)
-{
-	switch(Msg)
-	{
-	case WM_GETDLGCODE:
-		switch(wParam)
-		{
-		case VK_RETURN:
-			return DLGC_WANTALLKEYS;
-			break;
-		}
-		break;
-	}
-
-	return DefSubclassProc(hwnd,Msg,wParam,lParam);
-}
-
-void CAddBookmarkDialog::OnTvnKeyDown(NMTVKEYDOWN *pnmtvkd)
-{
-	switch(pnmtvkd->wVKey)
-	{
-	case VK_F2:
-		OnTreeViewRename();
-		break;
-	}
-}
-
-void CAddBookmarkDialog::OnTreeViewRename()
-{
-	HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
-	HTREEITEM hSelectedItem = TreeView_GetSelection(hTreeView);
-	TreeView_EditLabel(hTreeView,hSelectedItem);
 }
 
 void CAddBookmarkDialog::OnOk()
@@ -444,22 +289,7 @@ void CAddBookmarkDialog::OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFo
 void CAddBookmarkDialog::OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,
 	const CBookmarkFolder &BookmarkFolder,std::size_t Position)
 {
-	HTREEITEM hItem = m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder,Position);
-
-	if(m_bNewFolderCreated &&
-		IsEqualGUID(BookmarkFolder.GetGUID(),m_NewFolderGUID))
-	{
-		HWND hTreeView = GetDlgItem(m_hDlg,IDC_BOOKMARK_TREEVIEW);
-
-		/* If a new folder has been created, it will be selected,
-		as it is assumed that the user intends to place any
-		new bookmark within that folder. */
-		SetFocus(hTreeView);
-		TreeView_SelectItem(hTreeView,hItem);
-		TreeView_EditLabel(hTreeView,hItem);
-
-		m_bNewFolderCreated = false;
-	}
+	m_pBookmarkTreeView->BookmarkFolderAdded(ParentBookmarkFolder,BookmarkFolder,Position);
 }
 
 void CAddBookmarkDialog::OnBookmarkModified(const GUID &guid)
