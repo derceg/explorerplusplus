@@ -144,6 +144,7 @@ LRESULT CALLBACK CBookmarkTreeView::TreeViewEditProc(HWND hwnd, UINT Msg, WPARAM
 	case WM_GETDLGCODE:
 		switch (wParam)
 		{
+		case VK_ESCAPE:
 		case VK_RETURN:
 			return DLGC_WANTALLKEYS;
 			break;
