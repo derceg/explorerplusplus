@@ -343,9 +343,6 @@ INT_PTR CManageBookmarksDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 	case IDM_MB_BOOKMARK_OPENINNEWTAB:
 		break;
 
-	case IDM_MB_BOOKMARK_OPENINNEWWINDOW:
-		break;
-
 	case IDM_MB_BOOKMARK_DELETE:
 		//OnDeleteBookmark();
 		break;
