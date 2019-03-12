@@ -9,6 +9,7 @@
 #include "MainImages.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
+#include "../Helper/MenuWrapper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <algorithm>
@@ -105,24 +106,7 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 
 				if (auto variantBookmarkItem = GetBookmarkItemFromToolbarIndex(iIndex))
 				{
-					if (variantBookmarkItem->type() == typeid(CBookmarkFolder))
-					{
-						const CBookmarkFolder &bookmarkFolder = boost::get<CBookmarkFolder>(*variantBookmarkItem);
-
-						for(auto variantBookmarkChild : bookmarkFolder)
-						{
-							if (variantBookmarkChild.type() == typeid(CBookmark))
-							{
-								CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkChild);
-								m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, nullptr, FALSE, nullptr);
-							}
-						}
-					}
-					else
-					{
-						CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-						m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, nullptr, FALSE, nullptr);
-					}
+					OpenBookmarkItemInNewTab(*variantBookmarkItem);
 				}
 			}
 		}
@@ -134,6 +118,31 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProc(HWND hwnd,UINT uMsg,WPA
 	}
 
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+// If the specified item is a bookmark, it will be opened in a new tab.
+// If it's a bookmark folder, each of its children will be opened in new
+// tabs.
+void CBookmarksToolbar::OpenBookmarkItemInNewTab(const VariantBookmark &variantBookmarkItem)
+{
+	if (variantBookmarkItem.type() == typeid(CBookmarkFolder))
+	{
+		const CBookmarkFolder &bookmarkFolder = boost::get<CBookmarkFolder>(variantBookmarkItem);
+
+		for (auto variantBookmarkChild : bookmarkFolder)
+		{
+			if (variantBookmarkChild.type() == typeid(CBookmark))
+			{
+				const CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkChild);
+				m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, nullptr, FALSE, nullptr);
+			}
+		}
+	}
+	else
+	{
+		const CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkItem);
+		m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, nullptr, FALSE, nullptr);
+	}
 }
 
 LRESULT CALLBACK BookmarksToolbarParentProcStub(HWND hwnd,UINT uMsg,
@@ -162,6 +171,13 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd,UINT uM
 		{
 			switch(reinterpret_cast<LPNMHDR>(lParam)->code)
 			{
+			case NM_RCLICK:
+				if (OnRightClick(reinterpret_cast<NMMOUSE *>(lParam)))
+				{
+					return TRUE;
+				}
+				break;
+
 			case TBN_GETINFOTIP:
 				if (OnGetInfoTip(reinterpret_cast<NMTBGETINFOTIP *>(lParam)))
 				{
@@ -174,6 +190,90 @@ LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProc(HWND hwnd,UINT uM
 	}
 
 	return DefSubclassProc(hwnd,uMsg,wParam,lParam);
+}
+
+BOOL CBookmarksToolbar::OnRightClick(const NMMOUSE *nmm)
+{
+	if (nmm->dwItemSpec == -1)
+	{
+		return FALSE;
+	}
+
+	int index = static_cast<int>(SendMessage(m_hToolbar, TB_COMMANDTOINDEX, nmm->dwItemSpec, 0));
+
+	if (index == -1)
+	{
+		return FALSE;
+	}
+
+	auto variantBookmarkItem = GetBookmarkItemFromToolbarIndex(index);
+
+	if (!variantBookmarkItem)
+	{
+		return FALSE;
+	}
+
+	auto parentMenu = MenuPtr(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_BOOKMARKSTOOLBAR_RCLICK_MENU)));
+
+	if (!parentMenu)
+	{
+		return FALSE;
+	}
+
+	HMENU menu = GetSubMenu(parentMenu.get(), 0);
+
+	POINT pt = nmm->pt;
+	BOOL res = ClientToScreen(m_hToolbar, &pt);
+
+	if (!res)
+	{
+		return FALSE;
+	}
+
+	int menuItemId = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RETURNCMD, pt.x, pt.y, 0, GetParent(m_hToolbar), NULL);
+
+	if (menuItemId != 0)
+	{
+		OnRightClickMenuItemSelected(menuItemId, *variantBookmarkItem);
+	}
+
+	return TRUE;
+}
+
+void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, const VariantBookmark &variantBookmark)
+{
+	switch (menuItemId)
+	{
+	case IDM_BT_OPEN:
+	{
+		if (variantBookmark.type() == typeid(CBookmark))
+		{
+			const CBookmark &bookmark = boost::get<CBookmark>(variantBookmark);
+			m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+		}
+	}
+		break;
+
+	case IDM_BT_OPENINNEWTAB:
+		OpenBookmarkItemInNewTab(variantBookmark);
+		break;
+
+	case IDM_BT_NEWBOOKMARK:
+		OnNewBookmark();
+		break;
+
+	case IDM_BT_NEWFOLDER:
+		/* TODO: Handle menu item. */
+		break;
+
+	case IDM_BT_DELETE:
+		/* TODO: Handle menu item. */
+		break;
+
+	case IDM_BT_PROPERTIES:
+		/* TODO: Handle menu item. */
+		break;
+	}
 }
 
 bool CBookmarksToolbar::OnCommand(WPARAM wParam, LPARAM lParam)
@@ -195,7 +295,7 @@ bool CBookmarksToolbar::OnCommand(WPARAM wParam, LPARAM lParam)
 		switch (LOWORD(wParam))
 		{
 		case IDM_BT_NEWBOOKMARK:
-			OnNewBookmarkClick();
+			OnNewBookmark();
 			return true;
 
 		case IDM_BT_NEWFOLDER:
@@ -281,7 +381,7 @@ void CBookmarksToolbar::OnBookmarkMenuItemClicked(const CBookmark &bookmark)
 	m_pexpp->BrowseFolder(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 }
 
-void CBookmarksToolbar::OnNewBookmarkClick()
+void CBookmarksToolbar::OnNewBookmark()
 {
 	TCHAR currentDirectory[MAX_PATH];
 	TCHAR displayName[MAX_PATH];

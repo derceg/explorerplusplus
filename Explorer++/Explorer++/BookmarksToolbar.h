@@ -89,11 +89,15 @@ private:
 
 	void	RemoveBookmarkItem(const GUID &guid);
 
+	void	OpenBookmarkItemInNewTab(const VariantBookmark &variantBookmarkItem);
+
 	bool	OnCommand(WPARAM wParam, LPARAM lParam);
 	bool	OnButtonClick(int command);
+	BOOL	OnRightClick(const NMMOUSE *nmm);
+	void	OnRightClickMenuItemSelected(int menuItemId, const VariantBookmark &variantBookmark);
 	void	ShowBookmarkFolderMenu(const CBookmarkFolder &bookmarkFolder, int command, int index);
 	void	OnBookmarkMenuItemClicked(const CBookmark &bookmark);
-	void	OnNewBookmarkClick();
+	void	OnNewBookmark();
 	bool	OnGetInfoTip(NMTBGETINFOTIP *infoTip);
 
 	void	OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow);
