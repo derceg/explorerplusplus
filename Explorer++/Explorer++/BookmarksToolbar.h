@@ -90,9 +90,13 @@ private:
 	void	RemoveBookmarkItem(const GUID &guid);
 
 	bool	OnCommand(WPARAM wParam, LPARAM lParam);
+	bool	OnButtonClick(int command);
 	void	ShowBookmarkFolderMenu(const CBookmarkFolder &bookmarkFolder, int command, int index);
 	void	OnBookmarkMenuItemClicked(const CBookmark &bookmark);
+	void	OnNewBookmarkClick();
 	bool	OnGetInfoTip(NMTBGETINFOTIP *infoTip);
+
+	void	OnToolbarContextMenuPreShow(HMENU menu, HWND sourceWindow);
 
 	int		GetBookmarkItemIndex(const GUID &guid);
 
@@ -115,4 +119,6 @@ private:
 	UINT							m_uIDCounter;
 
 	CBookmarksToolbarDropHandler	*m_pbtdh;
+
+	boost::signals2::connection		m_toolbarContextMenuConnection;
 };
