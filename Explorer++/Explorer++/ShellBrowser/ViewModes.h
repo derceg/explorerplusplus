@@ -14,6 +14,8 @@ enum ViewMode
 	VM_THUMBNAILS = 6,
 	VM_EXTRALARGEICONS = 7,
 	VM_LARGEICONS = 8,
+	FIRST = VM_ICONS,
+	LAST = VM_LARGEICONS
 };
 
 int GetViewModeMenuId(ViewMode viewMode);

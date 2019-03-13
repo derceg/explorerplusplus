@@ -55,6 +55,7 @@ namespace Plugins
 		std::vector<Tab> getAll();
 		boost::optional<Tab> get(int tabId);
 		void create(std::wstring path);
+		void update(int tabId, sol::table properties);
 		int move(int tabId, int newIndex);
 		bool close(int tabId);
 

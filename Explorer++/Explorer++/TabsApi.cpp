@@ -56,6 +56,28 @@ void Plugins::TabsApi::create(std::wstring path)
 	m_tabContainer->CreateNewTab(path.c_str(), nullptr, nullptr, TRUE, nullptr);
 }
 
+void Plugins::TabsApi::update(int tabId, sol::table properties)
+{
+	auto tabInternal = m_tabContainer->GetTab(tabId);
+
+	if (!tabInternal)
+	{
+		return;
+	}
+
+	boost::optional<int> viewMode = properties["viewMode"];
+
+	if (viewMode)
+	{
+		/* TODO: It would be better if checks like this were done by an
+		enum library. */
+		if (viewMode >= static_cast<int>(ViewMode::FIRST) && viewMode <= static_cast<int>(ViewMode::LAST))
+		{
+			tabInternal->shellBrower->SetCurrentViewMode(static_cast<ViewMode>(*viewMode));
+		}
+	}
+}
+
 int Plugins::TabsApi::move(int tabId, int newIndex)
 {
 	auto tabInternal = m_tabContainer->GetTab(tabId);
