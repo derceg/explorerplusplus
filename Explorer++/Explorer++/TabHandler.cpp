@@ -1571,16 +1571,16 @@ void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 	m_Tabs[iTabId].shellBrower->SetGlobalSettings(&gs);
 }
 
-boost::optional<Tab> Explorerplusplus::GetTab(int tabId)
+Tab *Explorerplusplus::GetTab(int tabId)
 {
 	auto itr = m_Tabs.find(tabId);
 
 	if (itr == m_Tabs.end())
 	{
-		return boost::none;
+		return nullptr;
 	}
 
-	return itr->second;
+	return &itr->second;
 }
 
 int Explorerplusplus::GetNumTabs() const
