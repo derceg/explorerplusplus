@@ -9,11 +9,8 @@
 
 const std::wstring Plugins::PluginManager::MANIFEST_NAME = L"plugin.json";
 
-Plugins::PluginManager::PluginManager(TabContainerInterface *tabContainer,
-	PluginMenuManager *pluginMenuManager, UiTheming *uiTheming) :
-	m_tabContainer(tabContainer),
-	m_pluginMenuManager(pluginMenuManager),
-	m_uiTheming(uiTheming)
+Plugins::PluginManager::PluginManager(PluginInterface *pluginInterface) :
+	m_pluginInterface(pluginInterface)
 {
 
 }
@@ -56,7 +53,7 @@ bool Plugins::PluginManager::attemptToLoadPlugin(const boost::filesystem::path &
 
 bool Plugins::PluginManager::registerPlugin(const boost::filesystem::path &directory, const Manifest &manifest)
 {
-	auto plugin = std::make_unique<LuaPlugin>(directory.wstring(), manifest, m_tabContainer, m_pluginMenuManager, m_uiTheming);
+	auto plugin = std::make_unique<LuaPlugin>(directory.wstring(), manifest, m_pluginInterface);
 
 	for (auto library : manifest.libraries)
 	{
@@ -107,6 +104,8 @@ bool Plugins::PluginManager::registerPlugin(const boost::filesystem::path &direc
 		// destroyed.
 		return false;
 	}
+
+	m_pluginInterface->GetPluginCommandManager()->addCommands(plugin->GetId(), manifest.commands);
 
 	m_plugins.push_back(std::move(plugin));
 

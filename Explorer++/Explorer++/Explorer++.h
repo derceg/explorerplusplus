@@ -12,6 +12,8 @@
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
 #include "MainToolbar.h"
+#include "PluginCommandManager.h"
+#include "PluginInterface.h"
 #include "PluginManager.h"
 #include "PluginMenuManager.h"
 #include "ShellBrowser/iShellView.h"
@@ -33,13 +35,6 @@
 #include <objbase.h>
 #include <unordered_map>
 
-#define MENU_BOOKMARK_STARTID		10000
-#define MENU_BOOKMARK_ENDID			11000
-#define MENU_HEADER_STARTID			12000
-#define MENU_HEADER_ENDID			13000
-#define MENU_PLUGIN_STARTID			14000
-#define MENU_PLUGIN_ENDID			15000
-
 #define TOOLBAR_START				5000
 #define TABTOOLBAR_CLOSE			(TOOLBAR_START + 33)
 
@@ -50,7 +45,8 @@
 #define FROM_LISTVIEW				0
 #define FROM_TREEVIEW				1
 
-class Explorerplusplus : public IExplorerplusplus, public TabContainerInterface, public TabInterface, public IFileContextMenuExternal
+class Explorerplusplus : public IExplorerplusplus, public TabContainerInterface, public TabInterface,
+	public IFileContextMenuExternal, public PluginInterface
 {
 	friend LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
@@ -500,6 +496,12 @@ private:
 	int						GetNumTabs() const;
 	int						MoveTab(const Tab &tab, int newIndex);
 
+	/* PluginInterface. */
+	TabContainerInterface	*GetTabContainer();
+	Plugins::PluginMenuManager	*GetPluginMenuManager();
+	UiTheming				*GetUiTheming();
+	Plugins::PluginCommandManager	*GetPluginCommandManager();
+
 	/* Plugins. */
 	void					InitializePlugins();
 
@@ -813,6 +815,7 @@ private:
 	/* Plugins. */
 	std::unique_ptr<Plugins::PluginManager>	m_pluginManager;
 	Plugins::PluginMenuManager	m_pluginMenuManager;
+	Plugins::PluginCommandManager	m_pluginCommandManager;
 
 	HWND					m_hActiveListView;
 	CShellBrowser *			m_pActiveShellBrowser;

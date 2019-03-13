@@ -56,6 +56,9 @@ void Plugins::from_json(const nlohmann::json &json, Command &command)
 	auto key = json.at("key").get<std::string>();
 	command.acceleratorString = converter.from_bytes(key);
 
+	auto name = json.at("name").get<std::string>();
+	command.name = converter.from_bytes(name);
+
 	command.accelerator = parseAccelerator(command.acceleratorString);
 
 	if (json.count("description") != 0)

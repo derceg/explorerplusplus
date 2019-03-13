@@ -290,6 +290,15 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="FileProgressSink.cpp" />
+    <ClCompile Include="PluginCommandManager.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandApi.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="PluginInterface.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -542,6 +551,18 @@
       <Filter>Bookmarks</Filter>
     </ClInclude>
     <ClInclude Include="FileProgressSink.h" />
+    <ClInclude Include="PluginCommandManager.h">
+      <Filter>Plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuRanges.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginInterface.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandApi.h">
+      <Filter>Plugins</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

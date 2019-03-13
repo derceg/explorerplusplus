@@ -24,6 +24,6 @@ void Explorerplusplus::InitializePlugins()
 	processDirectoryPath.remove_filename();
 	processDirectoryPath.append(PLUGIN_FOLDER_NAME);
 
-	m_pluginManager = std::make_unique<Plugins::PluginManager>(this, &m_pluginMenuManager, m_uiTheming.get());
+	m_pluginManager = std::make_unique<Plugins::PluginManager>(this);
 	m_pluginManager->loadAllPlugins(processDirectoryPath);
 }

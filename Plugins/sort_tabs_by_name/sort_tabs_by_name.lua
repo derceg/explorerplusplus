@@ -1,5 +1,12 @@
-menu.create("Sort tabs", function ()
+menu.create("Sort tabs\tAlt+Shift+S", function ()
     sortTabs()
+  end
+)
+
+commands.onCommand.addListener(function (command)
+    if command == "sort_tabs" then
+      sortTabs()
+    end
   end
 )
 

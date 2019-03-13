@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Manifest.h"
+#include "PluginInterface.h"
 #include "PluginMenuManager.h"
 #include "TabContainerInterface.h"
 #include "UiTheming.h"
@@ -18,20 +19,23 @@ namespace Plugins
 	{
 	public:
 
-		LuaPlugin(const std::wstring &directory, const Manifest &manifest, TabContainerInterface *tabContainer,
-			PluginMenuManager *pluginMenuManager, UiTheming *uiTheming);
+		LuaPlugin(const std::wstring &directory, const Manifest &manifest, PluginInterface *pluginInterface);
 		~LuaPlugin();
 
+		int GetId() const;
 		std::wstring GetDirectory() const;
 		Plugins::Manifest GetManifest() const;
 		sol::state &GetLuaState();
 
 	private:
 
+		static int idCounter;
+
 		std::wstring m_directory;
 		Manifest m_manifest;
 
 		sol::state m_lua;
+		const int m_id;
 	};
 
 	class LuaPanicException : public std::runtime_error

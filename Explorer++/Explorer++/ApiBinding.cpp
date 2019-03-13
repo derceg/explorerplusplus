@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "APIBinding.h"
+#include "CommandApi.h"
 #include "MenuApi.h"
 #include "TabsAPI.h"
 #include "UiApi.h"
@@ -11,15 +12,16 @@
 void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 void BindUiApi(sol::state &state, UiTheming *uiTheming);
+void BindCommandApi(int pluginId, sol::state &state, Plugins::PluginCommandManager *pluginCommandManager);
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table);
 int deny(lua_State *state);
 
-void Plugins::BindAllApiMethods(sol::state &state, TabContainerInterface *tabContainer,
-	Plugins::PluginMenuManager *pluginMenuManager, UiTheming *uiTheming)
+void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface *pluginInterface)
 {
-	BindTabsAPI(state, tabContainer);
-	BindMenuApi(state, pluginMenuManager);
-	BindUiApi(state, uiTheming);
+	BindTabsAPI(state, pluginInterface->GetTabContainer());
+	BindMenuApi(state, pluginInterface->GetPluginMenuManager());
+	BindUiApi(state, pluginInterface->GetUiTheming());
+	BindCommandApi(pluginId, state, pluginInterface->GetPluginCommandManager());
 }
 
 void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer)
@@ -81,6 +83,20 @@ void BindUiApi(sol::state &state, UiTheming *uiTheming)
 
 	metaTable.set_function("setListViewColors", &Plugins::UiApi::setListViewColors, uiApi);
 	metaTable.set_function("setTreeViewColors", &Plugins::UiApi::setTreeViewColors, uiApi);
+}
+
+void BindCommandApi(int pluginId, sol::state &state, Plugins::PluginCommandManager *pluginCommandManager)
+{
+	std::shared_ptr<Plugins::CommandApi> commandApi = std::make_shared<Plugins::CommandApi>(pluginCommandManager, pluginId);
+
+	sol::table commandsTable = state.create_named_table("commands");
+	sol::table commandsMetaTable = MarkTableReadOnly(state, commandsTable);
+
+	sol::table onCommandTable = commandsMetaTable.create_named("onCommand");
+	sol::table onCommandMetaTable = MarkTableReadOnly(state, onCommandTable);
+
+	onCommandMetaTable.set_function("addListener", &Plugins::CommandApi::addCommandInvokedObserver, commandApi);
+	onCommandMetaTable.set_function("removeListener", &Plugins::CommandApi::removeCommandInvokedObserver, commandApi);
 }
 
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table)

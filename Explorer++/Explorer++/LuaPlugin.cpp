@@ -6,20 +6,28 @@
 #include "LuaPlugin.h"
 #include "APIBinding.h"
 
+int Plugins::LuaPlugin::idCounter = 1;
+
 inline int onPanic(lua_State *L);
 
 Plugins::LuaPlugin::LuaPlugin(const std::wstring &directory, const Manifest &manifest,
-	TabContainerInterface *tabContainer, PluginMenuManager *pluginMenuManager, UiTheming *uiTheming) :
+	PluginInterface *pluginInterface) :
 	m_directory(directory),
 	m_manifest(manifest),
-	m_lua(onPanic)
+	m_lua(onPanic),
+	m_id(idCounter++)
 {
-	BindAllApiMethods(m_lua, tabContainer, pluginMenuManager, uiTheming);
+	BindAllApiMethods(m_id, m_lua, pluginInterface);
 }
 
 Plugins::LuaPlugin::~LuaPlugin()
 {
 
+}
+
+int Plugins::LuaPlugin::GetId() const
+{
+	return m_id;
 }
 
 std::wstring Plugins::LuaPlugin::GetDirectory() const

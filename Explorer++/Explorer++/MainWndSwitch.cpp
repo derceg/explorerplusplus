@@ -9,6 +9,7 @@
 #include "IModelessDialogNotification.h"
 #include "MainResource.h"
 #include "ManageBookmarksDialog.h"
+#include "MenuRanges.h"
 #include "ModelessDialogs.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
@@ -316,6 +317,12 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 		LOWORD(wParam) < MENU_PLUGIN_ENDID)
 	{
 		m_pluginMenuManager.OnMenuItemClicked(LOWORD(wParam));
+		return 0;
+	}
+	else if (HIWORD(wParam) && LOWORD(wParam) >= ACCELERATOR_PLUGIN_STARTID &&
+		LOWORD(wParam) < ACCELERATOR_PLUGIN_ENDID)
+	{
+		m_pluginCommandManager.onAcceleratorPressed(LOWORD(wParam));
 		return 0;
 	}
 

@@ -313,6 +313,7 @@
     <ClCompile Include="BookmarkTreeView.cpp" />
     <ClCompile Include="ColorRuleDialog.cpp" />
     <ClCompile Include="ColorRuleHelper.cpp" />
+    <ClCompile Include="CommandApi.cpp" />
     <ClCompile Include="CustomizeColorsDialog.cpp" />
     <ClCompile Include="DestroyFilesDialog.cpp" />
     <ClCompile Include="DialogHelper.cpp" />
@@ -331,6 +332,7 @@
     <ClCompile Include="IModelessDialogNotification.cpp" />
     <ClCompile Include="INewMenuClient.cpp" />
     <ClCompile Include="Initialization.cpp" />
+    <ClCompile Include="PluginInterface.cpp" />
     <ClCompile Include="iServiceProvider.cpp" />
     <ClCompile Include="Language.cpp" />
     <ClCompile Include="ListViewEdit.cpp" />
@@ -351,6 +353,7 @@
     <ClCompile Include="Navigation.cpp" />
     <ClCompile Include="NewBookmarkFolderDialog.cpp" />
     <ClCompile Include="OptionsDialog.cpp" />
+    <ClCompile Include="PluginCommandManager.cpp" />
     <ClCompile Include="PluginInitialization.cpp" />
     <ClCompile Include="PluginManager.cpp" />
     <ClCompile Include="PluginMenuManager.cpp" />
@@ -425,6 +428,7 @@
     <ClInclude Include="BookmarkTreeView.h" />
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="ColorRuleHelper.h" />
+    <ClInclude Include="CommandApi.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />
     <ClInclude Include="DefaultColumns.h" />
     <ClInclude Include="DefaultToolbarButtons.h" />
@@ -454,11 +458,14 @@
     <ClInclude Include="Manifest.h" />
     <ClInclude Include="MassRenameDialog.h" />
     <ClInclude Include="MenuApi.h" />
+    <ClInclude Include="MenuRanges.h" />
     <ClInclude Include="MergeFilesDialog.h" />
     <ClInclude Include="ModelessDialogs.h" />
     <ClInclude Include="NewBookmarkFolderDialog.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="PluginCommandManager.h" />
+    <ClInclude Include="PluginInterface.h" />
     <ClInclude Include="PluginManager.h" />
     <ClInclude Include="PluginMenuManager.h" />
     <ClInclude Include="FileProgressSink.h" />

@@ -54,6 +54,8 @@ HWND g_hwndManageBookmarks;
 TCHAR g_szLang[32];
 BOOL g_bForceLanguageLoad = FALSE;
 
+HACCEL g_hAccl;
+
 bool g_enablePlugins = false;
 
 /*
@@ -321,7 +323,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 	HMODULE			hRichEditLib;
 	HWND			hwnd;
-	HACCEL			hAccl;
 	HANDLE			hMutex = NULL;
 	TCHAR			*pCommandLine	= NULL;
 	MSG				msg;
@@ -536,6 +537,8 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 	SetUnhandledExceptionFilter(MyUnhandledExceptionFilter);
 
+	g_hAccl = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAINACCELERATORS));
+
 	/* Create the main window. This window will act as a
 	container for all child windows created. */
 	hwnd = CreateWindow(
@@ -612,8 +615,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	SetWindowPlacement(hwnd,&wndpl);
 	UpdateWindow(hwnd);
 
-	hAccl = LoadAccelerators(hInstance,MAKEINTRESOURCE(IDR_MAINACCELERATORS));
-
 	g_hwndSearch = NULL;
 	g_hwndRunScript = NULL;
 	g_hwndOptions = NULL;
@@ -630,7 +631,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 			!IsDialogMessage(g_hwndRunScript, &msg) &&
 			!PropSheet_IsDialogMessage(g_hwndOptions,&msg))
 		{
-			if(!TranslateAccelerator(hwnd,hAccl,&msg))
+			if(!TranslateAccelerator(hwnd, g_hAccl,&msg))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);

@@ -9,6 +9,7 @@
 #include "ListViewEdit.h"
 #include "MainResource.h"
 #include "MassRenameDialog.h"
+#include "MenuRanges.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ViewModes.h"

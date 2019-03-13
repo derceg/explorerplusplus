@@ -5,8 +5,7 @@
 #pragma once
 
 #include "LuaPlugin.h"
-#include "PluginMenuManager.h"
-#include "UiTheming.h"
+#include "PluginInterface.h"
 #include <boost/filesystem.hpp>
 
 namespace Plugins
@@ -15,7 +14,7 @@ namespace Plugins
 	{
 	public:
 
-		PluginManager(TabContainerInterface *tabContainer, PluginMenuManager *pluginMenuManager, UiTheming *uiTheming);
+		PluginManager(PluginInterface *pluginInterface);
 		~PluginManager();
 
 		void loadAllPlugins(const boost::filesystem::path &pluginDirectory);
@@ -27,9 +26,7 @@ namespace Plugins
 		bool attemptToLoadPlugin(const boost::filesystem::path &directory);
 		bool registerPlugin(const boost::filesystem::path &directory, const Manifest &manifest);
 
-		TabContainerInterface *m_tabContainer;
-		PluginMenuManager *m_pluginMenuManager;
-		UiTheming *m_uiTheming;
+		PluginInterface *m_pluginInterface;
 
 		std::vector<std::unique_ptr<Plugins::LuaPlugin>> m_plugins;
 	};

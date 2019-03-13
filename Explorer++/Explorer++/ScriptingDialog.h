@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LuaPlugin.h"
+#include "PluginInterface.h"
 #include "PluginMenuManager.h"
 #include "TabContainerInterface.h"
 #include "UiTheming.h"
@@ -10,9 +11,7 @@ class ScriptingDialog : public CBaseDialog
 {
 public:
 
-	ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-		TabContainerInterface *tabContainer, Plugins::PluginMenuManager *pluginMenuManager,
-		UiTheming *uiTheming);
+	ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent, PluginInterface *pluginInterface);
 	~ScriptingDialog();
 
 protected:

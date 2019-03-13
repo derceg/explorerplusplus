@@ -11,9 +11,9 @@
 #include <codecvt>
 
 ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-	TabContainerInterface *tabContainer, Plugins::PluginMenuManager *pluginMenuManager, UiTheming *uiTheming) :
+	PluginInterface *pluginInterface) :
 	CBaseDialog(hInstance, iResource, hParent, true),
-	m_luaPlugin(L"", Plugins::Manifest(), tabContainer, pluginMenuManager, uiTheming)
+	m_luaPlugin(L"", Plugins::Manifest(), pluginInterface)
 {
 	m_luaPlugin.GetLuaState().open_libraries(sol::lib::base);
 }

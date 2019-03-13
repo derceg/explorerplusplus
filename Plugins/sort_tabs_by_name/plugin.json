@@ -1,8 +1,15 @@
 {
   "name": "Sort tabs by name",
-  "description": "Adds a menu entry that sorts tabs by name when clicked",
+  "description": "Adds a menu entry that sorts tabs by name when clicked. A keyboard shortcut is also registered.",
   "file": "sort_tabs_by_name.lua",
-  "version": "1.0",
+  "version": "1.1",
   "std_libs_required": ["table"],
-  "author": "David Erceg"
+  "author": "David Erceg",
+  "commands": [
+    {
+      "key": "Alt+Shift+S",
+      "name": "sort_tabs",
+      "description": "Sorts tabs by name"
+    }
+  ]
 }

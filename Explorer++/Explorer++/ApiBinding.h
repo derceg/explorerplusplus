@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "PluginInterface.h"
 #include "PluginMenuManager.h"
 #include "TabContainerInterface.h"
 #include "UiTheming.h"
@@ -11,6 +12,5 @@
 
 namespace Plugins
 {
-	void BindAllApiMethods(sol::state &state, TabContainerInterface *tabContainer,
-		PluginMenuManager *pluginMenuManager, UiTheming *uiTheming);
+	void BindAllApiMethods(int pluginId, sol::state &state, PluginInterface *pluginInterface);
 }

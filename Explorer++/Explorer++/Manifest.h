@@ -14,6 +14,7 @@ namespace Plugins
 {
 	struct Command
 	{
+		std::wstring name;
 		std::wstring acceleratorString;
 		boost::optional<Accelerator> accelerator;
 		std::wstring description;

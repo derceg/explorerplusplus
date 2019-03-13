@@ -127,7 +127,7 @@ void Explorerplusplus::OnRunScript()
 {
 	if (g_hwndRunScript == NULL)
 	{
-		ScriptingDialog *scriptingDialog = new ScriptingDialog(m_hLanguageModule, IDD_SCRIPTING, m_hContainer, this, &m_pluginMenuManager, m_uiTheming.get());
+		ScriptingDialog *scriptingDialog = new ScriptingDialog(m_hLanguageModule, IDD_SCRIPTING, m_hContainer, this);
 		g_hwndRunScript = scriptingDialog->ShowModelessDialog(new CModelessDialogNotification());
 	}
 	else
