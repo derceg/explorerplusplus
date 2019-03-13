@@ -41,7 +41,7 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	m_selectedTabIndex				= 0;
 
 	/* Initial state. */
-	m_tabIdCounter					= 0;
+	m_tabIdCounter					= 1;
 	m_nSelected						= 0;
 	m_nSelectedOnInvert				= 0;
 	m_selectedTabId					= 0;
