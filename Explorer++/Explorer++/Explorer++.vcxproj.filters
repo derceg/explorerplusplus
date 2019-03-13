@@ -289,7 +289,6 @@
     <ClCompile Include="MainRebar.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="FileProgressSink.cpp" />
     <ClCompile Include="PluginCommandManager.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
@@ -297,6 +296,9 @@
       <Filter>Plugins</Filter>
     </ClCompile>
     <ClCompile Include="PluginInterface.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="FileProgressSink.cpp">
       <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -550,7 +552,6 @@
     <ClInclude Include="BookmarkMenu.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="FileProgressSink.h" />
     <ClInclude Include="PluginCommandManager.h">
       <Filter>Plugins</Filter>
     </ClInclude>
@@ -562,6 +563,9 @@
     </ClInclude>
     <ClInclude Include="CommandApi.h">
       <Filter>Plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="FileProgressSink.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
