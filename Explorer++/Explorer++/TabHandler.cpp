@@ -183,43 +183,38 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 	return DefSubclassProc(hTab,msg,wParam,lParam);
 }
 
-std::wstring Explorerplusplus::GetTabName(int iTab)
+void Explorerplusplus::SetTabName(Tab &tab,const std::wstring strName)
 {
-	TCITEM tcItem;
-	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
-	assert(res);
+	StringCchCopy(tab.szName, SIZEOF_ARRAY(tab.szName),strName.c_str());
+	tab.bUseCustomName = TRUE;
 
-	if(!res)
+	auto index = GetTabIndex(tab);
+
+	if (!index)
 	{
-		return std::wstring();
+		assert(false);
+		return;
 	}
 
-	return std::wstring(m_Tabs.at(static_cast<int>(tcItem.lParam)).szName);
+	TCITEM tcItem;
+	tcItem.mask = TCIF_TEXT;
+	tcItem.pszText = tab.szName;
+	TabCtrl_SetItem(m_hTabCtrl, *index, &tcItem);
 }
 
-void Explorerplusplus::SetTabName(int iTab,std::wstring strName,BOOL bUseCustomName)
+void Explorerplusplus::ClearTabName(Tab &tab)
 {
-	TCITEM tcItem;
-	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
-	assert(res);
+	PIDLPointer pidlDirectory(tab.shellBrower->QueryCurrentDirectoryIdl());
 
-	if(!res)
+	TCHAR name[MAX_PATH];
+	HRESULT hr = GetDisplayName(pidlDirectory.get(), name, SIZEOF_ARRAY(name), SHGDN_INFOLDER);
+
+	if (FAILED(hr))
 	{
 		return;
 	}
 
-	StringCchCopy(m_Tabs.at(static_cast<int>(tcItem.lParam)).szName,
-		SIZEOF_ARRAY(m_Tabs.at(static_cast<int>(tcItem.lParam)).szName),strName.c_str());
-	m_Tabs.at(static_cast<int>(tcItem.lParam)).bUseCustomName = bUseCustomName;
-
-	TCHAR szName[256];
-	StringCchCopy(szName,SIZEOF_ARRAY(szName),strName.c_str());
-
-	tcItem.mask = TCIF_TEXT;
-	tcItem.pszText = szName;
-	TabCtrl_SetItem(m_hTabCtrl,iTab,&tcItem);
+	SetTabName(tab, name);
 }
 
 void Explorerplusplus::SetTabSelection(int Index)
@@ -509,6 +504,11 @@ int *pTabObjectIndex)
 boost::signals2::connection Explorerplusplus::AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer)
 {
 	return m_tabCreatedSignal.connect(observer);
+}
+
+boost::signals2::connection Explorerplusplus::AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer)
+{
+	return m_tabRemovedSignal.connect(observer);
 }
 
 HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
@@ -816,6 +816,11 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 
 	DestroyWindow(tab.listView);
 
+	// This is needed, as the erase() call below will remove the element
+	// from the tabs container (which will invalidate the reference
+	// passed to the function, unless a copy was passed).
+	int tabId = tab.id;
+
 	m_Tabs.erase(tab.id);
 
 	if(!m_config->alwaysShowTabBar)
@@ -831,6 +836,8 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 				MAKELPARAM(rc.right,rc.bottom));
 		}
 	}
+
+	m_tabRemovedSignal(tabId);
 
 	return true;
 }
@@ -1091,7 +1098,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_RENAMETAB:
 			{
-				CRenameTabDialog RenameTabDialog(m_hLanguageModule,IDD_RENAMETAB,m_hContainer,iTabHit,this,this);
+				CRenameTabDialog RenameTabDialog(m_hLanguageModule,IDD_RENAMETAB,m_hContainer,tab->id,this,this,this);
 				RenameTabDialog.ShowModalDialog();
 			}
 			break;

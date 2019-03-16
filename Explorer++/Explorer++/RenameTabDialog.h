@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -34,7 +35,8 @@ class CRenameTabDialog : public CBaseDialog
 {
 public:
 
-	CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hParent, int iTab, IExplorerplusplus *pexpp, TabInterface *ti);
+	CRenameTabDialog::CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+		int iTab, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer, TabInterface *ti);
 	~CRenameTabDialog();
 
 protected:
@@ -52,10 +54,15 @@ private:
 	void	OnOk();
 	void	OnCancel();
 
+	void	OnTabClosed(int tabId);
+
 	CRenameTabDialogPersistentSettings	*m_prtdps;
 
 	IExplorerplusplus	*m_pexpp;
+	TabContainerInterface	*m_tabContainer;
 	TabInterface	*m_ti;
-	int		m_iTab;
+	int		m_tabId;
 	TCHAR	m_szTabName[256];
+
+	boost::signals2::connection	m_tabRemovedConnection;
 };

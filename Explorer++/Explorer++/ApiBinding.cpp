@@ -9,7 +9,7 @@
 #include "TabsAPI.h"
 #include "UiApi.h"
 
-void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer);
+void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInterface *tabInterface);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 void BindUiApi(sol::state &state, UiTheming *uiTheming);
 void BindCommandApi(int pluginId, sol::state &state, Plugins::PluginCommandManager *pluginCommandManager);
@@ -18,15 +18,15 @@ int deny(lua_State *state);
 
 void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface *pluginInterface)
 {
-	BindTabsAPI(state, pluginInterface->GetTabContainer());
+	BindTabsAPI(state, pluginInterface->GetTabContainer(), pluginInterface->GetTabInterface());
 	BindMenuApi(state, pluginInterface->GetPluginMenuManager());
 	BindUiApi(state, pluginInterface->GetUiTheming());
 	BindCommandApi(pluginId, state, pluginInterface->GetPluginCommandManager());
 }
 
-void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer)
+void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInterface *tabInterface)
 {
-	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(tabContainer);
+	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(tabContainer, tabInterface);
 
 	sol::table tabsTable = state.create_named_table("tabs");
 	sol::table tabsMetaTable = MarkTableReadOnly(state, tabsTable);

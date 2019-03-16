@@ -5,8 +5,9 @@
 #include "stdafx.h"
 #include "TabsAPI.h"
 
-Plugins::TabsApi::TabsApi(TabContainerInterface *tabContainer) :
+Plugins::TabsApi::TabsApi(TabContainerInterface *tabContainer, TabInterface *tabInterface) :
 	m_tabContainer(tabContainer),
+	m_tabInterface(tabInterface),
 	m_observerIdCounter(1)
 {
 
@@ -63,6 +64,20 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 	if (!tabInternal)
 	{
 		return;
+	}
+
+	boost::optional<std::wstring> name = properties["name"];
+
+	if (name)
+	{
+		if (name->empty())
+		{
+			m_tabInterface->ClearTabName(*tabInternal);
+		}
+		else
+		{
+			m_tabInterface->SetTabName(*tabInternal, *name);
+		}
 	}
 
 	boost::optional<int> viewMode = properties["viewMode"];

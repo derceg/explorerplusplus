@@ -7,6 +7,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
+#include "TabInterface.h"
 #include "../ThirdParty/Sol/sol.hpp"
 #include <boost/signals2.hpp>
 #include <unordered_map>
@@ -49,7 +50,7 @@ namespace Plugins
 			}
 		};
 
-		TabsApi(TabContainerInterface *tabContainer);
+		TabsApi(TabContainerInterface *tabContainer, TabInterface *tabInterface);
 		~TabsApi();
 
 		std::vector<Tab> getAll();
@@ -68,6 +69,7 @@ namespace Plugins
 		void onTabCreated(int tabId, sol::protected_function observer);
 
 		TabContainerInterface *m_tabContainer;
+		TabInterface *m_tabInterface;
 
 		int m_observerIdCounter;
 		std::unordered_map<int, boost::signals2::connection> m_tabCreatedConnections;

@@ -8,7 +8,7 @@
 
 __interface TabInterface
 {
-	std::wstring	GetTabName(int iTab);
-	void			SetTabName(int iTab, std::wstring strName, BOOL bUseCustomName);
+	void			SetTabName(Tab &tab, const std::wstring strName);
+	void			ClearTabName(Tab &tab);
 	void			RefreshTab(int iTabId);
 };

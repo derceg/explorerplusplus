@@ -476,6 +476,7 @@ private:
 	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
 	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
+	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 	bool					CloseTab(const Tab &tab);
 	void					LockTab(Tab &tab, bool lock);
 	void					LockTabAndAddress(Tab &tab, bool lock);
@@ -486,8 +487,8 @@ private:
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
 	int						GetCurrentTabId() const;
-	std::wstring			GetTabName(int iTab);
-	void					SetTabName(int iTab, std::wstring strName, BOOL bUseCustomName);
+	void					SetTabName(Tab &tab, const std::wstring strName);
+	void					ClearTabName(Tab &tab);
 	void					SetTabSelection(int Index);
 	void					PushGlobalSettingsToTab(int iTabId);
 	void					DuplicateTab(int iTabInternal);
@@ -499,6 +500,7 @@ private:
 
 	/* PluginInterface. */
 	TabContainerInterface	*GetTabContainer();
+	TabInterface			*GetTabInterface();
 	Plugins::PluginMenuManager	*GetPluginMenuManager();
 	UiTheming				*GetUiTheming();
 	Plugins::PluginCommandManager	*GetPluginCommandManager();
@@ -804,6 +806,7 @@ private:
 
 	/* Tab signals. */
 	TabCreatedSignal		m_tabCreatedSignal;
+	TabRemovedSignal		m_tabRemovedSignal;
 
 	ToolbarContextMenuSignal	m_toolbarContextMenuSignal;
 

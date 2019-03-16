@@ -10,6 +10,7 @@
 #include <unordered_map>
 
 typedef boost::signals2::signal<void(int, BOOL)> TabCreatedSignal;
+typedef boost::signals2::signal<void(int)> TabRemovedSignal;
 
 // Eventually, this will be driven by a dedicated class, rather than the
 // Explorerplusplus class.
@@ -34,4 +35,5 @@ __interface TabContainerInterface
 	void			SetTabSelection(int Index);
 
 	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
+	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 };

@@ -7,11 +7,13 @@
 #include "PluginCommandManager.h"
 #include "PluginMenuManager.h"
 #include "TabContainerInterface.h"
+#include "TabInterface.h"
 #include "UiTheming.h"
 
 __interface PluginInterface
 {
 	TabContainerInterface *GetTabContainer();
+	TabInterface *GetTabInterface();
 	Plugins::PluginMenuManager *GetPluginMenuManager();
 	UiTheming *GetUiTheming();
 	Plugins::PluginCommandManager *GetPluginCommandManager();
