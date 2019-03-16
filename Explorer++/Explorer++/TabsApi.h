@@ -64,6 +64,9 @@ namespace Plugins
 		int addTabCreatedObserver(sol::protected_function observer);
 		void removeTabCreatedObserver(int id);
 
+		int addTabRemovedObserver(sol::protected_function observer);
+		void removeTabRemovedObserver(int id);
+
 	private:
 
 		void onTabCreated(int tabId, sol::protected_function observer);
@@ -71,7 +74,10 @@ namespace Plugins
 		TabContainerInterface *m_tabContainer;
 		TabInterface *m_tabInterface;
 
-		int m_observerIdCounter;
+		int m_tabCreatedIdCounter;
 		std::unordered_map<int, boost::signals2::connection> m_tabCreatedConnections;
+
+		int m_tabRemovedIdCounter;
+		std::unordered_map<int, boost::signals2::connection> m_tabRemovedConnections;
 	};
 }

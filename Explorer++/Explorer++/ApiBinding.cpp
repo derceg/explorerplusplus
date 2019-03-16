@@ -44,6 +44,12 @@ void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInte
 	onCreatedMetaTable.set_function("addListener", &Plugins::TabsApi::addTabCreatedObserver, tabsApi);
 	onCreatedMetaTable.set_function("removeListener", &Plugins::TabsApi::removeTabCreatedObserver, tabsApi);
 
+	sol::table onRemovedTable = tabsMetaTable.create_named("onRemoved");
+	sol::table onRemovedMetaTable = MarkTableReadOnly(state, onRemovedTable);
+
+	onRemovedMetaTable.set_function("addListener", &Plugins::TabsApi::addTabRemovedObserver, tabsApi);
+	onRemovedMetaTable.set_function("removeListener", &Plugins::TabsApi::removeTabRemovedObserver, tabsApi);
+
 	tabsMetaTable.new_usertype<Plugins::TabsApi::Tab>("Tab",
 		"id", &Plugins::TabsApi::Tab::id,
 		"location", &Plugins::TabsApi::Tab::location,
