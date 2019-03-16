@@ -102,11 +102,15 @@ LRESULT CALLBACK Explorerplusplus::MainWndTaskbarThumbnailProc(HWND hwnd,UINT uM
 		/* Register each of the tabs. */
 		for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 		{
-			BOOL bActive = (itr->iTabId == m_selectedTabId);
+			auto tab = GetTab(itr->iTabId);
+			assert(tab != nullptr);
+
+			BOOL bActive = (tab->id == m_selectedTabId);
 
 			RegisterTab(itr->hProxy,EMPTY_STRING,bActive);
-			UpdateTabText(itr->iTabId);
-			SetTabIcon(itr->iTabId);
+			UpdateTabText(tab->id);
+
+			SetTabIcon(*tab);
 		}
 
 		RemoveWindowSubclass(hwnd,MainWndProcStub,0);
@@ -783,11 +787,11 @@ void Explorerplusplus::UpdateTaskbarThumbnailTtitle(int tabId, const std::wstrin
 	}
 }
 
-void Explorerplusplus::SetTabProxyIcon(int iTabId, HICON hIcon)
+void Explorerplusplus::SetTabProxyIcon(const Tab &tab, HICON hIcon)
 {
 	for (const TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
 	{
-		if (tabProxyInfo.iTabId == iTabId)
+		if (tabProxyInfo.iTabId == tab.id)
 		{
 			HICON hIconTemp = (HICON)GetClassLongPtr(tabProxyInfo.hProxy, GCLP_HICONSM);
 			DestroyIcon(hIconTemp);

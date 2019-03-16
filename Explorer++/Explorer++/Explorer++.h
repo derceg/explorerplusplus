@@ -341,7 +341,6 @@ private:
 	void					OnStartedBrowsing(int iTabId, const TCHAR *szPath);
 	void					OnDuplicateTab(int iTab);
 	void					OnLockTab(int iTab);
-	void					OnLockTabInternal(int iTab,int iTabId);
 	void					OnLockTabAndAddress(int iTab);
 	void					UpdateTabToolbar(void);
 	void					OnAutoSizeColumns(void);
@@ -365,8 +364,6 @@ private:
 	void					OnSortBy(SortMode sortMode);
 	void					OnGroupBy(SortMode sortMode);
 	void					OnSelectTab(const Tab &tab, BOOL setFocus);
-	boost::optional<int>	GetTabIndex(const Tab &tab);
-	boost::optional<Tab>	GetTabByIndex(int index);
 	void					OnSelectTabByIndex(int iTab);
 	void					OnSelectTabByIndex(int iTab,BOOL bSetFocus);
 	const std::unordered_map<int, Tab>	&GetAllTabs() const;
@@ -480,6 +477,8 @@ private:
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
 	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
 	bool					CloseTab(const Tab &tab);
+	void					LockTab(Tab &tab, bool lock);
+	void					LockTabAndAddress(Tab &tab, bool lock);
 	void					RemoveTabFromControl(int iTab);
 	bool					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
@@ -493,6 +492,8 @@ private:
 	void					PushGlobalSettingsToTab(int iTabId);
 	void					DuplicateTab(int iTabInternal);
 	Tab						*GetTab(int tabId);
+	Tab						*GetTabByIndex(int index);
+	boost::optional<int>	GetTabIndex(const Tab &tab);
 	int						GetNumTabs() const;
 	int						MoveTab(const Tab &tab, int newIndex);
 
@@ -578,10 +579,7 @@ private:
 	void					UpdateTabText(void);
 	void					UpdateTabText(int iTabId);
 	void					UpdateTabText(int iTab,int iTabId);
-	void					SetTabIcon(void);
-	void					SetTabIcon(int iTabId);
-	void					SetTabIcon(int iIndex,int iTabId);
-	void					SetTabIcon(int iIndex,int iTabId,LPCITEMIDLIST pidlDirectory);
+	void					SetTabIcon(const Tab &tab);
 	void					UpdateTreeViewSelection(void);
 	void					SetStatusBarParts(int width);
 	void					ResizeWindows(void);
@@ -601,7 +599,7 @@ private:
 	void					InvalidateTaskbarThumbnailBitmap(int iTabId);
 	void					UpdateTaskbarThumbnailsForTabSelectionChange(int selectedTabId);
 	void					UpdateTaskbarThumbnailTtitle(int tabId, const std::wstring &title);
-	void					SetTabProxyIcon(int iTabId, HICON hIcon);
+	void					SetTabProxyIcon(const Tab &tab, HICON hIcon);
 
 	/* Windows 7 jumplist tasks. */
 	void					SetupJumplistTasks();

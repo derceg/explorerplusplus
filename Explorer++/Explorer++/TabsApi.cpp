@@ -76,6 +76,20 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 			tabInternal->shellBrower->SetCurrentViewMode(static_cast<ViewMode>(*viewMode));
 		}
 	}
+
+	boost::optional<bool> locked = properties["locked"];
+
+	if (locked)
+	{
+		m_tabContainer->LockTab(*tabInternal, *locked);
+	}
+
+	boost::optional<bool> addressLocked = properties["addressLocked"];
+
+	if (addressLocked)
+	{
+		m_tabContainer->LockTabAndAddress(*tabInternal, *addressLocked);
+	}
 }
 
 int Plugins::TabsApi::move(int tabId, int newIndex)

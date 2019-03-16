@@ -151,6 +151,8 @@ void Explorerplusplus::PlayNavigationSound() const
 
 void Explorerplusplus::OnDirChanged(int iTabId)
 {
+	const Tab &tab = m_Tabs.at(iTabId);
+
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
 		m_CurrentDirectory);
 	SetCurrentDirectory(m_CurrentDirectory);
@@ -168,7 +170,7 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 
 	InvalidateTaskbarThumbnailBitmap(iTabId);
 
-	SetTabIcon();
+	SetTabIcon(tab);
 }
 
 void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)

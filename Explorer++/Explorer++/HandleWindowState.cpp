@@ -420,58 +420,10 @@ void Explorerplusplus::UpdateTabText(int iTab,int iTabId)
 	UpdateTaskbarThumbnailTtitle(iTabId, szFinalTabText);
 }
 
-void Explorerplusplus::SetTabIcon(void)
-{
-	LPITEMIDLIST pidl = NULL;
-
-	pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-
-	SetTabIcon(m_selectedTabIndex,m_selectedTabId,pidl);
-
-	CoTaskMemFree(pidl);
-}
-
-void Explorerplusplus::SetTabIcon(int iTabId)
-{
-	LPITEMIDLIST pidl = NULL;
-	TCITEM tcItem;
-	int nTabs;
-	int i = 0;
-
-	pidl = m_Tabs[iTabId].shellBrower->QueryCurrentDirectoryIdl();
-
-	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-	for(i = 0;i < nTabs;i++)
-	{
-		tcItem.mask = TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
-
-		if((int)tcItem.lParam == iTabId)
-		{
-			SetTabIcon(i,iTabId,pidl);
-			break;
-		}
-	}
-
-	CoTaskMemFree(pidl);
-}
-
-void Explorerplusplus::SetTabIcon(int iIndex,int iTabId)
-{
-	LPITEMIDLIST pidl = NULL;
-
-	pidl = m_Tabs[iTabId].shellBrower->QueryCurrentDirectoryIdl();
-
-	SetTabIcon(iIndex,iTabId,pidl);
-
-	CoTaskMemFree(pidl);
-}
-
 /* Sets a tabs icon. Normally, this icon
 is the folders icon, however if the tab
 is locked, the icon will be a lock. */
-void Explorerplusplus::SetTabIcon(int iIndex,int iTabId,LPCITEMIDLIST pidlDirectory)
+void Explorerplusplus::SetTabIcon(const Tab &tab)
 {
 	TCITEM			tcItem;
 	SHFILEINFO		shfi;
@@ -480,18 +432,20 @@ void Explorerplusplus::SetTabIcon(int iIndex,int iTabId,LPCITEMIDLIST pidlDirect
 	int				iRemoveImage;
 
 	/* If the tab is locked, use a lock icon. */
-	if(m_Tabs.at(iTabId).bAddressLocked || m_Tabs.at(iTabId).bLocked)
+	if(tab.bAddressLocked || tab.bLocked)
 	{
 		iImage = TAB_ICON_LOCK_INDEX;
 	}
 	else
 	{
-		SHGetFileInfo((LPCTSTR)pidlDirectory,0,&shfi,sizeof(shfi),
+		PIDLPointer pidlDirectory(tab.shellBrower->QueryCurrentDirectoryIdl());
+
+		SHGetFileInfo((LPCTSTR)pidlDirectory.get(),0,&shfi,sizeof(shfi),
 			SHGFI_PIDL|SHGFI_ICON|SHGFI_SMALLICON);
 
 		/* TODO: The proxy icon may also be the lock icon, if
 		the tab is locked. */
-		SetTabProxyIcon(iTabId,shfi.hIcon);
+		SetTabProxyIcon(tab,shfi.hIcon);
 
 		GetIconInfo(shfi.hIcon,&IconInfo);
 		iImage = ImageList_Add(TabCtrl_GetImageList(m_hTabCtrl),
@@ -502,17 +456,25 @@ void Explorerplusplus::SetTabIcon(int iIndex,int iTabId,LPCITEMIDLIST pidlDirect
 		DestroyIcon(shfi.hIcon);
 	}
 
+	auto index = GetTabIndex(tab);
+
+	if (!index)
+	{
+		assert(false);
+		return;
+	}
+
 	/* Get the index of the current image. This image
 	will be removed after the new image is set. */
 	tcItem.mask		= TCIF_IMAGE;
-	TabCtrl_GetItem(m_hTabCtrl,iIndex,&tcItem);
+	TabCtrl_GetItem(m_hTabCtrl,*index,&tcItem);
 
 	iRemoveImage = tcItem.iImage;
 
 	/* Set the new image. */
 	tcItem.mask		= TCIF_IMAGE;
 	tcItem.iImage	= iImage;
-	TabCtrl_SetItem(m_hTabCtrl,iIndex,&tcItem);
+	TabCtrl_SetItem(m_hTabCtrl,*index,&tcItem);
 
 	if(iRemoveImage != TAB_ICON_LOCK_INDEX)
 	{

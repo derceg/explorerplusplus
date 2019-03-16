@@ -494,6 +494,8 @@ int *pTabObjectIndex)
 	if(pTabObjectIndex != NULL)
 		*pTabObjectIndex = iTabId;
 
+	SetTabIcon(m_Tabs[iTabId]);
+
 	m_tabCreatedSignal(iTabId, bSwitchToNewTab);
 
 	if (bSwitchToNewTab)
@@ -738,39 +740,6 @@ void Explorerplusplus::OnSelectTab(const Tab &tab, BOOL setFocus)
 	}
 
 	OnSelectTabByIndex(*index, setFocus);
-}
-
-boost::optional<int> Explorerplusplus::GetTabIndex(const Tab &tab)
-{
-	int numTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-	for (int i = 0; i < numTabs; i++)
-	{
-		TCITEM tcItem;
-		tcItem.mask = TCIF_PARAM;
-		BOOL res = TabCtrl_GetItem(m_hTabCtrl, i, &tcItem);
-
-		if (res && (tcItem.lParam == tab.id))
-		{
-			return i;
-		}
-	}
-
-	return boost::none;
-}
-
-boost::optional<Tab> Explorerplusplus::GetTabByIndex(int index)
-{
-	TCITEM tcItem;
-	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hTabCtrl, index, &tcItem);
-
-	if (!res)
-	{
-		return boost::none;
-	}
-
-	return m_Tabs.at(static_cast<int>(tcItem.lParam));
 }
 
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
@@ -1210,8 +1179,6 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 
 	SendMessage(m_hTabCtrl,TCM_INSERTITEM,(WPARAM)iNewTabIndex,(LPARAM)&tcItem);
 
-	SetTabIcon(iNewTabIndex,iTabId,pidlDirectory);
-
 	if(!m_config->alwaysShowTabBar)
 	{
 		if(TabCtrl_GetItemCount(m_hTabCtrl) > 1)
@@ -1245,67 +1212,65 @@ void Explorerplusplus::OnDuplicateTab(int iTab)
 
 void Explorerplusplus::OnLockTab(int iTab)
 {
-	TCITEM tcItem;
-	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
-	assert(res);
+	auto tab = GetTabByIndex(iTab);
 
-	if(!res)
+	if (!tab)
 	{
 		return;
 	}
 
-	OnLockTabInternal(iTab,(int)tcItem.lParam);
+	LockTab(*tab, !tab->bLocked);
 }
 
-void Explorerplusplus::OnLockTabInternal(int iTab,int iTabId)
+void Explorerplusplus::LockTab(Tab &tab, bool lock)
 {
-	m_Tabs.at(iTabId).bLocked = !m_Tabs.at(iTabId).bLocked;
+	tab.bLocked = lock;
 
 	/* The "Lock Tab" and "Lock Tab and Address" options
 	are mutually exclusive. */
-	if(m_Tabs.at(iTabId).bLocked)
+	if(lock)
 	{
-		m_Tabs.at(iTabId).bAddressLocked = FALSE;
+		tab.bAddressLocked = FALSE;
 	}
 
-	SetTabIcon(iTab,iTabId);
+	SetTabIcon(tab);
 
 	/* If the tab that was locked/unlocked is the
 	currently selected tab, then the tab close
 	button on the toolbar will need to be updated. */
-	if(iTabId == m_selectedTabId)
+	if (tab.id == m_selectedTabId)
+	{
 		UpdateTabToolbar();
+	}
 }
 
 void Explorerplusplus::OnLockTabAndAddress(int iTab)
 {
-	TCITEM tcItem;
-	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
-	assert(res);
+	auto tab = GetTabByIndex(iTab);
 
-	if(!res)
+	if (!tab)
 	{
 		return;
 	}
 
-	int internalIndex = static_cast<int>(tcItem.lParam);
+	LockTabAndAddress(*tab, !tab->bAddressLocked);
+}
 
-	m_Tabs.at(internalIndex).bAddressLocked = !m_Tabs.at(internalIndex).bAddressLocked;
+void Explorerplusplus::LockTabAndAddress(Tab &tab, bool lock)
+{
+	tab.bAddressLocked = lock;
 
-	if(m_Tabs.at(internalIndex).bAddressLocked)
+	if (tab.bAddressLocked)
 	{
-		m_Tabs.at(internalIndex).bLocked = FALSE;
+		tab.bLocked = FALSE;
 	}
 
-	SetTabIcon(iTab, internalIndex);
+	SetTabIcon(tab);
 
-	/* If the tab that was locked/unlocked is the
-	currently selected tab, then the tab close
-	button on the toolbar will need to be updated. */
-	if(internalIndex == m_selectedTabId)
+	if (tab.id == m_selectedTabId)
+	{
 		UpdateTabToolbar();
+	}
 }
 
 void Explorerplusplus::UpdateTabToolbar(void)
@@ -1581,6 +1546,39 @@ Tab *Explorerplusplus::GetTab(int tabId)
 	}
 
 	return &itr->second;
+}
+
+Tab *Explorerplusplus::GetTabByIndex(int index)
+{
+	TCITEM tcItem;
+	tcItem.mask = TCIF_PARAM;
+	BOOL res = TabCtrl_GetItem(m_hTabCtrl, index, &tcItem);
+
+	if (!res)
+	{
+		return nullptr;
+	}
+
+	return GetTab(static_cast<int>(tcItem.lParam));
+}
+
+boost::optional<int> Explorerplusplus::GetTabIndex(const Tab &tab)
+{
+	int numTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+
+	for (int i = 0; i < numTabs; i++)
+	{
+		TCITEM tcItem;
+		tcItem.mask = TCIF_PARAM;
+		BOOL res = TabCtrl_GetItem(m_hTabCtrl, i, &tcItem);
+
+		if (res && (tcItem.lParam == tab.id))
+		{
+			return i;
+		}
+	}
+
+	return boost::none;
 }
 
 int Explorerplusplus::GetNumTabs() const

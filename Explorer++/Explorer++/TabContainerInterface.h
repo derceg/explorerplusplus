@@ -23,6 +23,8 @@ __interface TabContainerInterface
 	int				GetCurrentTabId() const;
 	int				MoveTab(const Tab &tab, int newIndex);
 	int				GetNumTabs() const;
+	void			LockTab(Tab &tab, bool lock);
+	void			LockTabAndAddress(Tab &tab, bool lock);
 	bool			CloseTab(const Tab &tab);
 
 	HRESULT			CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
