@@ -51,13 +51,17 @@ void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInte
 	onRemovedMetaTable.set_function("addListener", &Plugins::TabsApi::addTabRemovedObserver, tabsApi);
 	onRemovedMetaTable.set_function("removeListener", &Plugins::TabsApi::removeTabRemovedObserver, tabsApi);
 
+	tabsMetaTable.new_usertype<Plugins::TabsApi::FolderSettings>("FolderSettings",
+		"viewMode", &Plugins::TabsApi::FolderSettings::viewMode,
+		"__tostring", &Plugins::TabsApi::FolderSettings::toString);
+
 	tabsMetaTable.new_usertype<Plugins::TabsApi::Tab>("Tab",
 		"id", &Plugins::TabsApi::Tab::id,
 		"location", &Plugins::TabsApi::Tab::location,
 		"name", &Plugins::TabsApi::Tab::name,
-		"viewMode", &Plugins::TabsApi::Tab::viewMode,
 		"locked", &Plugins::TabsApi::Tab::locked,
 		"addressLocked", &Plugins::TabsApi::Tab::addressLocked,
+		"folderSettings", &Plugins::TabsApi::Tab::folderSettings,
 		"__tostring", &Plugins::TabsApi::Tab::toString);
 
 	tabsMetaTable.new_enum("ViewMode",

@@ -17,14 +17,25 @@ namespace Plugins
 	class TabsApi
 	{
 	public:
+		struct FolderSettings
+		{
+			ViewMode viewMode;
+
+			std::wstring toString()
+			{
+				return _T("viewMode = ") + std::to_wstring(viewMode);
+			}
+		};
+
 		struct Tab
 		{
 			int id;
 			std::wstring location;
 			std::wstring name;
-			ViewMode viewMode;
 			bool locked;
 			bool addressLocked;
+
+			FolderSettings folderSettings;
 
 			Tab(const ::Tab &tabInternal)
 			{
@@ -34,9 +45,10 @@ namespace Plugins
 				id = tabInternal.id;
 				location = path;
 				name = tabInternal.szName;
-				viewMode = tabInternal.shellBrower->GetCurrentViewMode();
 				locked = tabInternal.bLocked;
 				addressLocked = tabInternal.bAddressLocked;
+
+				folderSettings.viewMode = tabInternal.shellBrower->GetCurrentViewMode();
 			}
 
 			std::wstring toString()
@@ -44,9 +56,9 @@ namespace Plugins
 				return _T("id = ") + std::to_wstring(id)
 					+ _T(", location = ") + location
 					+ _T(", name = ") + name
-					+ _T(", viewMode = ") + std::to_wstring(viewMode)
 					+ _T(", locked = ") + std::to_wstring(locked)
-					+ _T(", addressLocked = ") + std::to_wstring(addressLocked);
+					+ _T(", addressLocked = ") + std::to_wstring(addressLocked)
+					+ _T(", folderSettings = {") + folderSettings.toString() + _T("}");
 			}
 		};
 
