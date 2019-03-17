@@ -20,10 +20,27 @@ namespace Plugins
 		struct FolderSettings
 		{
 			ViewMode viewMode;
+			bool sortAscending;
+			bool showInGroups;
+			bool showHidden;
+			bool autoArrange;
+
+			FolderSettings(const CShellBrowser &shellBrowser)
+			{
+				viewMode = shellBrowser.GetCurrentViewMode();
+				sortAscending = shellBrowser.GetSortAscending();
+				showInGroups = shellBrowser.IsGroupViewEnabled();
+				showHidden = shellBrowser.GetShowHidden();
+				autoArrange = shellBrowser.GetAutoArrange();
+			}
 
 			std::wstring toString()
 			{
-				return _T("viewMode = ") + std::to_wstring(viewMode);
+				return _T("viewMode = ") + std::to_wstring(viewMode)
+					+ _T(", sortAscending = ") + std::to_wstring(sortAscending)
+					+ _T(", showInGroups = ") + std::to_wstring(showInGroups)
+					+ _T(", showHidden = ") + std::to_wstring(showHidden)
+					+ _T(", autoArrange = ") + std::to_wstring(autoArrange);
 			}
 		};
 
@@ -37,7 +54,8 @@ namespace Plugins
 
 			FolderSettings folderSettings;
 
-			Tab(const ::Tab &tabInternal)
+			Tab(const ::Tab &tabInternal) :
+				folderSettings(*tabInternal.shellBrower)
 			{
 				TCHAR path[MAX_PATH];
 				tabInternal.shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(path), path);
@@ -47,8 +65,6 @@ namespace Plugins
 				name = tabInternal.szName;
 				locked = tabInternal.bLocked;
 				addressLocked = tabInternal.bAddressLocked;
-
-				folderSettings.viewMode = tabInternal.shellBrower->GetCurrentViewMode();
 			}
 
 			std::wstring toString()
