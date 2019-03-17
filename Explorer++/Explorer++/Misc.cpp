@@ -284,7 +284,7 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 		tcItem.mask = TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-		m_Tabs[static_cast<int>(tcItem.lParam)].shellBrower->OnDeviceChange(wParam,lParam);
+		m_Tabs[static_cast<int>(tcItem.lParam)].shellBrowser->OnDeviceChange(wParam,lParam);
 	}
 
 	/* Forward the message to the treeview, so that
@@ -446,11 +446,11 @@ void *pData)
 	if (itr != pContainer->m_Tabs.end())
 	{
 		TCHAR szDirectory[MAX_PATH];
-		itr->second.shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
+		itr->second.shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
 		LOG(debug) << _T("Directory change notification received for \"") << szDirectory << _T("\", Action = ") << dwAction
 			<< _T(", Filename = \"") << szFileName << _T("\"");
 
-		itr->second.shellBrower->FilesModified(dwAction,
+		itr->second.shellBrowser->FilesModified(dwAction,
 			szFileName, pDirectoryAltered->iIndex, pDirectoryAltered->iFolderIndex);
 	}
 }

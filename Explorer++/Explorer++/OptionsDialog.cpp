@@ -679,15 +679,15 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 							Tab &tab = m_Tabs[static_cast<int>(tcItem.lParam)];
 
 							/* Each one of the options should also be pushed to new tabs when they are created. */
-							tab.shellBrower->SetHideSystemFiles(m_bHideSystemFilesGlobal);
-							tab.shellBrower->SetShowExtensions(m_bShowExtensionsGlobal);
-							tab.shellBrower->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
-							tab.shellBrower->SetShowFolderSizes(m_config->showFolderSizes);
-							tab.shellBrower->SetDisableFolderSizesNetworkRemovable(m_config->disableFolderSizesNetworkRemovable);
-							tab.shellBrower->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
-							tab.shellBrower->SetInsertSorted(m_config->insertSorted);
-							tab.shellBrower->SetForceSize(m_config->forceSize);
-							tab.shellBrower->SetSizeDisplayFormat(m_config->sizeDisplayFormat);
+							tab.shellBrowser->SetHideSystemFiles(m_bHideSystemFilesGlobal);
+							tab.shellBrowser->SetShowExtensions(m_bShowExtensionsGlobal);
+							tab.shellBrowser->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
+							tab.shellBrowser->SetShowFolderSizes(m_config->showFolderSizes);
+							tab.shellBrowser->SetDisableFolderSizesNetworkRemovable(m_config->disableFolderSizesNetworkRemovable);
+							tab.shellBrowser->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
+							tab.shellBrowser->SetInsertSorted(m_config->insertSorted);
+							tab.shellBrowser->SetForceSize(m_config->forceSize);
+							tab.shellBrowser->SetSizeDisplayFormat(m_config->sizeDisplayFormat);
 
 							RefreshTab(tab);
 
@@ -920,9 +920,9 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 						tcItem.mask	= TCIF_PARAM;
 						TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-						if(m_Tabs[(int)tcItem.lParam].shellBrower->QueryGridlinesActive() != m_bShowGridlinesGlobal)
+						if(m_Tabs[(int)tcItem.lParam].shellBrowser->QueryGridlinesActive() != m_bShowGridlinesGlobal)
 						{
-							m_Tabs[(int)tcItem.lParam].shellBrower->ToggleGridlines();
+							m_Tabs[(int)tcItem.lParam].shellBrowser->ToggleGridlines();
 						}
 
 						NListView::ListView_AddRemoveExtendedStyle(m_Tabs.at((int)tcItem.lParam).listView,

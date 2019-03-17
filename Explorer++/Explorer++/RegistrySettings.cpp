@@ -458,29 +458,29 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 
 			if(ReturnValue == ERROR_SUCCESS)
 			{
-				pidlDirectory = m_Tabs[(int)tcItem.lParam].shellBrower->QueryCurrentDirectoryIdl();
+				pidlDirectory = m_Tabs[(int)tcItem.lParam].shellBrowser->QueryCurrentDirectoryIdl();
 				RegSetValueEx(hTabKey,_T("Directory"),0,REG_BINARY,
 					(LPBYTE)pidlDirectory,ILGetSize(pidlDirectory));
 				CoTaskMemFree((LPVOID)pidlDirectory);
 
-				ViewMode = m_Tabs[(int) tcItem.lParam].shellBrower->GetCurrentViewMode();
+				ViewMode = m_Tabs[(int) tcItem.lParam].shellBrowser->GetCurrentViewMode();
 
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ViewMode"),ViewMode);
 
-				SortMode = m_Tabs[(int) tcItem.lParam].shellBrower->GetSortMode();
+				SortMode = m_Tabs[(int) tcItem.lParam].shellBrowser->GetSortMode();
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortMode"),SortMode);
 
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"), m_Tabs[(int)tcItem.lParam].shellBrower->GetSortAscending());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"), m_Tabs[(int)tcItem.lParam].shellBrower->IsGroupViewEnabled());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ApplyFilter"), m_Tabs[(int)tcItem.lParam].shellBrower->GetFilterStatus());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"), m_Tabs[(int)tcItem.lParam].shellBrower->GetFilterCaseSensitive());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"), m_Tabs[(int)tcItem.lParam].shellBrower->GetShowHidden());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AutoArrange"), m_Tabs[(int)tcItem.lParam].shellBrower->GetAutoArrange());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowGridlines"), m_Tabs[(int)tcItem.lParam].shellBrower->QueryGridlinesActive());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"), m_Tabs[(int)tcItem.lParam].shellBrowser->GetSortAscending());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"), m_Tabs[(int)tcItem.lParam].shellBrowser->IsGroupViewEnabled());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ApplyFilter"), m_Tabs[(int)tcItem.lParam].shellBrowser->GetFilterStatus());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"), m_Tabs[(int)tcItem.lParam].shellBrowser->GetFilterCaseSensitive());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"), m_Tabs[(int)tcItem.lParam].shellBrowser->GetShowHidden());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AutoArrange"), m_Tabs[(int)tcItem.lParam].shellBrowser->GetAutoArrange());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowGridlines"), m_Tabs[(int)tcItem.lParam].shellBrowser->QueryGridlinesActive());
 
 				TCHAR szFilter[512];
 
-				m_Tabs[(int)tcItem.lParam].shellBrower->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
+				m_Tabs[(int)tcItem.lParam].shellBrowser->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
 				NRegistrySettings::SaveStringToRegistry(hTabKey,_T("Filter"),szFilter);
 
 				/* Now save the tabs columns. */
@@ -492,7 +492,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				{
 					ColumnExport_t cie;
 
-					m_Tabs[(int)tcItem.lParam].shellBrower->ExportAllColumns(&cie);
+					m_Tabs[(int)tcItem.lParam].shellBrowser->ExportAllColumns(&cie);
 
 					SaveColumnToRegistry(hColumnsKey,_T("ControlPanelColumns"),&cie.ControlPanelColumnList);
 					SaveColumnToRegistry(hColumnsKey,_T("MyComputerColumns"),&cie.MyComputerColumnList);

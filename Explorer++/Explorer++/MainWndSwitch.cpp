@@ -99,7 +99,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 		if (itr != m_Tabs.end())
 		{
-			itr->second.shellBrower->DirectoryAltered();
+			itr->second.shellBrowser->DirectoryAltered();
 		}
 	}
 		break;

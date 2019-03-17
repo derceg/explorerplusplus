@@ -40,5 +40,5 @@ CShellBrowser *CTabContainer::GetBrowserForTab(int Index)
 		return NULL;
 	}
 
-	return m_tabInfo->at(static_cast<int>(tcItem.lParam)).shellBrower;
+	return m_tabInfo->at(static_cast<int>(tcItem.lParam)).shellBrowser;
 }

@@ -21,7 +21,7 @@ public:
 
 	int		id;
 	HWND	listView;
-	CShellBrowser *shellBrower;
+	CShellBrowser *shellBrowser;
 	BOOL	bLocked;
 	BOOL	bAddressLocked;
 	BOOL	bUseCustomName;

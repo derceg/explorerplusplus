@@ -55,10 +55,10 @@ namespace Plugins
 			FolderSettings folderSettings;
 
 			Tab(const ::Tab &tabInternal) :
-				folderSettings(*tabInternal.shellBrower)
+				folderSettings(*tabInternal.shellBrowser)
 			{
 				TCHAR path[MAX_PATH];
-				tabInternal.shellBrower->QueryCurrentDirectory(SIZEOF_ARRAY(path), path);
+				tabInternal.shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(path), path);
 
 				id = tabInternal.id;
 				location = path;
