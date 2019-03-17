@@ -306,7 +306,8 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 		{
 			m_pActiveShellBrowser->ImportColumns(&m_pActiveColumnList);
 
-			RefreshTab(m_selectedTabId);
+			Tab &tab = m_Tabs.at(m_selectedTabId);
+			RefreshTab(tab);
 		}
 		else
 		{

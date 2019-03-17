@@ -1026,7 +1026,8 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 
 void Explorerplusplus::OnRefresh(void)
 {
-	RefreshTab(m_selectedTabId);
+	Tab &tab = m_Tabs.at(m_selectedTabId);
+	RefreshTab(tab);
 }
 
 void Explorerplusplus::CopyColumnInfoToClipboard(void)
@@ -1605,5 +1606,6 @@ void Explorerplusplus::OnShowHiddenFiles(void)
 {
 	m_pActiveShellBrowser->ToggleShowHidden();
 
-	RefreshTab(m_selectedTabId);
+	Tab &tab = m_Tabs.at(m_selectedTabId);
+	RefreshTab(tab);
 }

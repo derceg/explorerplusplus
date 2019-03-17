@@ -676,20 +676,22 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 							tcItem.mask	= TCIF_PARAM;
 							TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
+							Tab &tab = m_Tabs[static_cast<int>(tcItem.lParam)];
+
 							/* Each one of the options should also be pushed to new tabs when they are created. */
-							m_Tabs[(int)tcItem.lParam].shellBrower->SetHideSystemFiles(m_bHideSystemFilesGlobal);
-							m_Tabs[(int)tcItem.lParam].shellBrower->SetShowExtensions(m_bShowExtensionsGlobal);
-							m_Tabs[(int)tcItem.lParam].shellBrower->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
-							m_Tabs[(int)tcItem.lParam].shellBrower->SetShowFolderSizes(m_config->showFolderSizes);
-							m_Tabs[(int)tcItem.lParam].shellBrower->SetDisableFolderSizesNetworkRemovable(m_config->disableFolderSizesNetworkRemovable);
-							m_Tabs[(int)tcItem.lParam].shellBrower->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
-							m_Tabs[(int)tcItem.lParam].shellBrower->SetInsertSorted(m_config->insertSorted);
-							m_Tabs[(int)tcItem.lParam].shellBrower->SetForceSize(m_config->forceSize);
-							m_Tabs[(int)tcItem.lParam].shellBrower->SetSizeDisplayFormat(m_config->sizeDisplayFormat);
+							tab.shellBrower->SetHideSystemFiles(m_bHideSystemFilesGlobal);
+							tab.shellBrower->SetShowExtensions(m_bShowExtensionsGlobal);
+							tab.shellBrower->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
+							tab.shellBrower->SetShowFolderSizes(m_config->showFolderSizes);
+							tab.shellBrower->SetDisableFolderSizesNetworkRemovable(m_config->disableFolderSizesNetworkRemovable);
+							tab.shellBrower->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
+							tab.shellBrower->SetInsertSorted(m_config->insertSorted);
+							tab.shellBrower->SetForceSize(m_config->forceSize);
+							tab.shellBrower->SetSizeDisplayFormat(m_config->sizeDisplayFormat);
 
-							RefreshTab((int)tcItem.lParam);
+							RefreshTab(tab);
 
-							NListView::ListView_ActivateOneClickSelect(m_Tabs.at((int)tcItem.lParam).listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
+							NListView::ListView_ActivateOneClickSelect(tab.listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
 						}
 
 						SaveAllSettings();

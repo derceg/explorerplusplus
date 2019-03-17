@@ -483,7 +483,7 @@ private:
 	void					RemoveTabFromControl(int iTab);
 	bool					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
-	void					RefreshTab(int iTabId);
+	HRESULT					RefreshTab(Tab &tab);
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
 	int						GetCurrentTabId() const;

@@ -659,20 +659,9 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 
 void Explorerplusplus::RefreshAllTabs(void)
 {
-	int i = 0;
-	int NumTabs;
-	TCITEM tcItem;
-	int iIndex;
-
-	NumTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-	for(i = 0;i < NumTabs;i++)
+	for (auto &item : m_Tabs)
 	{
-		tcItem.mask = TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
-		iIndex = (int)tcItem.lParam;
-
-		RefreshTab(iIndex);
+		RefreshTab(item.second);
 	}
 }
 
@@ -899,20 +888,18 @@ void Explorerplusplus::RemoveTabFromControl(int iTab)
 		m_TabSelectionHistory.end());
 }
 
-void Explorerplusplus::RefreshTab(int iTabId)
+HRESULT Explorerplusplus::RefreshTab(Tab &tab)
 {
-	LPITEMIDLIST pidlDirectory = NULL;
-	HRESULT hr;
+	PIDLPointer pidlDirectory(tab.shellBrower->QueryCurrentDirectoryIdl());
 
-	pidlDirectory = m_Tabs[iTabId].shellBrower->QueryCurrentDirectoryIdl();
+	HRESULT hr = tab.shellBrower->BrowseFolder(pidlDirectory.get(), SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 
-	hr = m_Tabs[iTabId].shellBrower->BrowseFolder(pidlDirectory,
-		SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
+	if (SUCCEEDED(hr))
+	{
+		OnDirChanged(tab.id);
+	}
 
-	if(SUCCEEDED(hr))
-		OnDirChanged(iTabId);
-
-	CoTaskMemFree(pidlDirectory);
+	return hr;
 }
 
 void Explorerplusplus::OnTabSelectionChange(void)
@@ -1050,7 +1037,7 @@ void Explorerplusplus::OnTabCtrlRButtonUp(POINT *pt)
 
 void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 {
-	auto tab = GetTabByIndex(iTabHit);
+	Tab *tab = GetTabByIndex(iTabHit);
 
 	if (!tab)
 	{
@@ -1089,7 +1076,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 			break;
 
 		case IDM_TAB_REFRESH:
-			RefreshTab(tab->id);
+			RefreshTab(*tab);
 			break;
 
 		case IDM_TAB_REFRESHALL:
