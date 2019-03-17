@@ -108,6 +108,18 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 	}
 }
 
+void Plugins::TabsApi::refresh(int tabId)
+{
+	auto tabInternal = m_tabContainer->GetTab(tabId);
+
+	if (!tabInternal)
+	{
+		return;
+	}
+
+	m_tabInterface->RefreshTab(*tabInternal);
+}
+
 int Plugins::TabsApi::move(int tabId, int newIndex)
 {
 	auto tabInternal = m_tabContainer->GetTab(tabId);

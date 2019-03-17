@@ -57,6 +57,7 @@ namespace Plugins
 		boost::optional<Tab> get(int tabId);
 		void create(std::wstring path);
 		void update(int tabId, sol::table properties);
+		void refresh(int tabId);
 		int move(int tabId, int newIndex);
 		bool close(int tabId);
 

@@ -35,6 +35,7 @@ void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInte
 	tabsMetaTable.set_function("get", &Plugins::TabsApi::get, tabsApi);
 	tabsMetaTable.set_function("create", &Plugins::TabsApi::create, tabsApi);
 	tabsMetaTable.set_function("update", &Plugins::TabsApi::update, tabsApi);
+	tabsMetaTable.set_function("refresh", &Plugins::TabsApi::refresh, tabsApi);
 	tabsMetaTable.set_function("move", &Plugins::TabsApi::move, tabsApi);
 	tabsMetaTable.set_function("close", &Plugins::TabsApi::close, tabsApi);
 
