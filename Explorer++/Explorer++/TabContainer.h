@@ -20,7 +20,6 @@ public:
 	void			RemoveTab();
 
 	int				GetSelection();
-	void			SetSelection(int Index);
 
 	CShellBrowser	*GetBrowserForTab(int Index);
 

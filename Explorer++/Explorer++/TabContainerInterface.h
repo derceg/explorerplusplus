@@ -21,7 +21,10 @@ __interface TabContainerInterface
 	const std::unordered_map<int, Tab>	&GetAllTabs() const;
 
 	Tab				*GetTab(int tabId);
-	int				GetCurrentTabId() const;
+	Tab				*GetTabByIndex(int index);
+	int				GetSelectedTabId() const;
+	int				GetSelectedTabIndex() const;
+	void			SelectTab(const Tab &tab);
 	int				MoveTab(const Tab &tab, int newIndex);
 	int				GetNumTabs() const;
 	void			LockTab(Tab &tab, bool lock);
@@ -30,9 +33,6 @@ __interface TabContainerInterface
 
 	HRESULT			CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
 	HRESULT			CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
-
-	/* Temporary. */
-	void			SetTabSelection(int Index);
 
 	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);

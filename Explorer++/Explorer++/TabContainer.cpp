@@ -28,12 +28,6 @@ int CTabContainer::GetSelection()
 	return Index;
 }
 
-void CTabContainer::SetSelection(int Index)
-{
-	assert(Index >= 0);
-	m_tabContainer->SetTabSelection(Index);
-}
-
 CShellBrowser *CTabContainer::GetBrowserForTab(int Index)
 {
 	TCITEM tcItem;

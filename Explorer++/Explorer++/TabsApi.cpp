@@ -106,6 +106,13 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 	{
 		m_tabContainer->LockTabAndAddress(*tabInternal, *addressLocked);
 	}
+
+	boost::optional<bool> active = properties["active"];
+
+	if (active && *active)
+	{
+		m_tabContainer->SelectTab(*tabInternal);
+	}
 }
 
 void Plugins::TabsApi::refresh(int tabId)

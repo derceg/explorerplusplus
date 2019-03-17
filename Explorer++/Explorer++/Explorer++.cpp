@@ -126,8 +126,6 @@ Explorerplusplus::~Explorerplusplus()
 		ImageList_Destroy(m_hTabCtrlImageList);
 	}
 
-	delete m_pTabContainer;
-
 	/* Bookmarks teardown. */
 	delete m_pBookmarksToolbar;
 

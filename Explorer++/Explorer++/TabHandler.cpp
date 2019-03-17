@@ -60,9 +60,7 @@ void Explorerplusplus::InitializeTabs(void)
 	AddDefaultTabIcons(m_hTabCtrlImageList);
 	TabCtrl_SetImageList(m_hTabCtrl, m_hTabCtrlImageList);
 
-	m_pTabContainer = new CTabContainer(m_hTabCtrl,&m_Tabs,this);
-
-	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hTabCtrl,m_pTabContainer);
+	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hTabCtrl,this);
 	RegisterDragDrop(m_hTabCtrl,pTabDropHandler);
 	pTabDropHandler->Release();
 
@@ -217,9 +215,27 @@ void Explorerplusplus::ClearTabName(Tab &tab)
 	SetTabName(tab, name);
 }
 
-void Explorerplusplus::SetTabSelection(int Index)
+int Explorerplusplus::GetSelectedTabId() const
 {
-	m_selectedTabIndex = Index;
+	return m_selectedTabId;
+}
+
+int Explorerplusplus::GetSelectedTabIndex() const
+{
+	return m_selectedTabIndex;
+}
+
+void Explorerplusplus::SelectTab(const Tab &tab)
+{
+	auto index = GetTabIndex(tab);
+
+	if (!index)
+	{
+		assert(false);
+		return;
+	}
+
+	m_selectedTabIndex = *index;
 	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
 	OnTabChangeInternal(TRUE);
 }
@@ -1410,11 +1426,6 @@ void Explorerplusplus::DuplicateTab(int iTabInternal)
 		szTabDirectory);
 
 	CreateNewTab(szTabDirectory, nullptr, nullptr, FALSE, nullptr);
-}
-
-int Explorerplusplus::GetCurrentTabId() const
-{
-	return m_selectedTabId;
 }
 
 SortMode Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const

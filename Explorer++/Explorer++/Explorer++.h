@@ -486,10 +486,11 @@ private:
 	HRESULT					RefreshTab(Tab &tab);
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
-	int						GetCurrentTabId() const;
 	void					SetTabName(Tab &tab, const std::wstring strName);
 	void					ClearTabName(Tab &tab);
-	void					SetTabSelection(int Index);
+	int						GetSelectedTabId() const;
+	int						GetSelectedTabIndex() const;
+	void					SelectTab(const Tab &tab);
 	void					PushGlobalSettingsToTab(int iTabId);
 	void					DuplicateTab(int iTabInternal);
 	Tab						*GetTab(int tabId);
@@ -860,7 +861,6 @@ private:
 	BOOL					m_bTaskbarInitialised;
 
 	/* Tabs. */
-	CTabContainer			*m_pTabContainer;
 	HFONT					m_hTabFont;
 	HIMAGELIST				m_hTabCtrlImageList;
 
