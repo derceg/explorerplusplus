@@ -1275,7 +1275,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 			object that stops it (i.e. when a file is dragged
 			between tabs). Therefore, need to tell the object
 			that STARTED dragging that dragging has stopped. */
-			m_Tabs[iDragStartObjectIndex].shellBrowser->DragStopped();
+			m_Tabs.at(iDragStartObjectIndex).shellBrowser->DragStopped();
 
 			BOOL bInAsyncOp;
 

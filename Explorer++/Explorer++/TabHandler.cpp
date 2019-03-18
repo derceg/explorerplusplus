@@ -1086,7 +1086,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 				if(res)
 				{
-					LPITEMIDLIST pidlCurrent = m_Tabs[static_cast<int>(tcItem.lParam)].shellBrowser->QueryCurrentDirectoryIdl();
+					LPITEMIDLIST pidlCurrent = m_Tabs.at(static_cast<int>(tcItem.lParam)).shellBrowser->QueryCurrentDirectoryIdl();
 
 					LPITEMIDLIST pidlParent = NULL;
 					HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
@@ -1433,7 +1433,7 @@ void Explorerplusplus::DuplicateTab(int iTabInternal)
 {
 	TCHAR szTabDirectory[MAX_PATH];
 
-	m_Tabs[iTabInternal].shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
+	m_Tabs.at(iTabInternal).shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
 	CreateNewTab(szTabDirectory, nullptr, nullptr, FALSE, nullptr);
@@ -1534,7 +1534,7 @@ void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)
 		tcItem.mask = TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl, nmhdr->idFrom, &tcItem);
 
-		m_Tabs[(int)tcItem.lParam].shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
+		m_Tabs.at((int)tcItem.lParam).shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
 			szTabToolTip);
 		lpnmtdi->lpszText = szTabToolTip;
 	}
@@ -1549,7 +1549,7 @@ void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 	gs.bShowFriendlyDates	= m_bShowFriendlyDatesGlobal;
 	gs.bShowFolderSizes		= m_config->showFolderSizes;
 
-	m_Tabs[iTabId].shellBrowser->SetGlobalSettings(&gs);
+	m_Tabs.at(iTabId).shellBrowser->SetGlobalSettings(&gs);
 }
 
 Tab *Explorerplusplus::GetTab(int tabId)

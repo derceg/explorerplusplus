@@ -1298,7 +1298,7 @@ void Explorerplusplus::OnAssocChanged(void)
 
 		iIndex = (int)tcItem.lParam;
 
-		m_Tabs[iIndex].shellBrowser->Refresh();
+		m_Tabs.at(iIndex).shellBrowser->Refresh();
 	}
 
 	/* Now, refresh the treeview. */

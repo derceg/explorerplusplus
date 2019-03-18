@@ -676,7 +676,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 							tcItem.mask	= TCIF_PARAM;
 							TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-							Tab &tab = m_Tabs[static_cast<int>(tcItem.lParam)];
+							Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
 
 							/* Each one of the options should also be pushed to new tabs when they are created. */
 							tab.shellBrowser->SetHideSystemFiles(m_bHideSystemFilesGlobal);

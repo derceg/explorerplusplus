@@ -284,7 +284,7 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 		tcItem.mask = TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-		m_Tabs[static_cast<int>(tcItem.lParam)].shellBrowser->OnDeviceChange(wParam,lParam);
+		m_Tabs.at(static_cast<int>(tcItem.lParam)).shellBrowser->OnDeviceChange(wParam,lParam);
 	}
 
 	/* Forward the message to the treeview, so that
