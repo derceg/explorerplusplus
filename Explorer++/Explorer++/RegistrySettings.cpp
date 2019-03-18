@@ -460,29 +460,29 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 			{
 				const Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
 
-				pidlDirectory = tab.shellBrowser->QueryCurrentDirectoryIdl();
+				pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
 				RegSetValueEx(hTabKey,_T("Directory"),0,REG_BINARY,
 					(LPBYTE)pidlDirectory,ILGetSize(pidlDirectory));
 				CoTaskMemFree((LPVOID)pidlDirectory);
 
-				ViewMode = tab.shellBrowser->GetCurrentViewMode();
+				ViewMode = tab.GetShellBrowser()->GetCurrentViewMode();
 
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ViewMode"),ViewMode);
 
-				SortMode = tab.shellBrowser->GetSortMode();
+				SortMode = tab.GetShellBrowser()->GetSortMode();
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortMode"),SortMode);
 
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"), tab.shellBrowser->GetSortAscending());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"), tab.shellBrowser->IsGroupViewEnabled());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ApplyFilter"), tab.shellBrowser->GetFilterStatus());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"), tab.shellBrowser->GetFilterCaseSensitive());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"), tab.shellBrowser->GetShowHidden());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AutoArrange"), tab.shellBrowser->GetAutoArrange());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowGridlines"), tab.shellBrowser->QueryGridlinesActive());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"), tab.GetShellBrowser()->GetSortAscending());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"), tab.GetShellBrowser()->IsGroupViewEnabled());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ApplyFilter"), tab.GetShellBrowser()->GetFilterStatus());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"), tab.GetShellBrowser()->GetFilterCaseSensitive());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"), tab.GetShellBrowser()->GetShowHidden());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AutoArrange"), tab.GetShellBrowser()->GetAutoArrange());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowGridlines"), tab.GetShellBrowser()->QueryGridlinesActive());
 
 				TCHAR szFilter[512];
 
-				tab.shellBrowser->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
+				tab.GetShellBrowser()->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
 				NRegistrySettings::SaveStringToRegistry(hTabKey,_T("Filter"),szFilter);
 
 				/* Now save the tabs columns. */
@@ -494,7 +494,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				{
 					ColumnExport_t cie;
 
-					tab.shellBrowser->ExportAllColumns(&cie);
+					tab.GetShellBrowser()->ExportAllColumns(&cie);
 
 					SaveColumnToRegistry(hColumnsKey,_T("ControlPanelColumns"),&cie.ControlPanelColumnList);
 					SaveColumnToRegistry(hColumnsKey,_T("MyComputerColumns"),&cie.MyComputerColumnList);

@@ -118,7 +118,7 @@ HRESULT Explorerplusplus::BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UI
 
 	if(!tab.GetAddressLocked())
 	{
-		hr = tab.shellBrowser->BrowseFolder(pidlDirectory, wFlags);
+		hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory, wFlags);
 
 		if(SUCCEEDED(hr))
 		{
@@ -168,7 +168,7 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 
 	if (tab.id == m_selectedTabId)
 	{
-		tab.shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
+		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
 			m_CurrentDirectory);
 		SetCurrentDirectory(m_CurrentDirectory);
 

@@ -21,6 +21,8 @@ public:
 
 	Tab(int id);
 
+	CShellBrowser *GetShellBrowser() const;
+	void SetShellBrowser(CShellBrowser *shellBrowser);
 	bool GetLocked() const;
 	void SetLocked(bool locked);
 	bool GetAddressLocked() const;
@@ -28,7 +30,6 @@ public:
 
 	const int	id;
 	HWND	listView;
-	CShellBrowser *shellBrowser;
 	BOOL	bUseCustomName;
 	TCHAR	szName[MAX_PATH];
 
@@ -41,6 +42,7 @@ public:
 
 private:
 
+	CShellBrowser *m_shellBrowser;
 	bool m_locked;
 	bool m_addressLocked;
 };

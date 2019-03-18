@@ -367,7 +367,7 @@ void Explorerplusplus::UpdateTabText(Tab &tab)
 
 	if(!tab.bUseCustomName)
 	{
-		LPITEMIDLIST pidlDirectory = tab.shellBrowser->QueryCurrentDirectoryIdl();
+		LPITEMIDLIST pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
 
 		TCHAR szTabText[MAX_PATH];
 		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
@@ -414,7 +414,7 @@ void Explorerplusplus::SetTabIcon(const Tab &tab)
 	}
 	else
 	{
-		PIDLPointer pidlDirectory(tab.shellBrowser->QueryCurrentDirectoryIdl());
+		PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
 
 		SHGetFileInfo((LPCTSTR)pidlDirectory.get(),0,&shfi,sizeof(shfi),
 			SHGFI_PIDL|SHGFI_ICON|SHGFI_SMALLICON);

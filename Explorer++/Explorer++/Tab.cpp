@@ -13,6 +13,18 @@ Tab::Tab(int id) :
 
 }
 
+CShellBrowser *Tab::GetShellBrowser() const
+{
+	return m_shellBrowser;
+}
+
+/* TODO: Ideally, this method wouldn't exist (the value would be set
+during construction of the tab object). */
+void Tab::SetShellBrowser(CShellBrowser *shellBrowser)
+{
+	m_shellBrowser = shellBrowser;
+}
+
 bool Tab::GetLocked() const
 {
 	return m_locked;

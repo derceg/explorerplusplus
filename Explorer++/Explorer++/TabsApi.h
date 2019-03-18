@@ -64,10 +64,10 @@ namespace Plugins
 			FolderSettings folderSettings;
 
 			Tab(const ::Tab &tabInternal) :
-				folderSettings(*tabInternal.shellBrowser)
+				folderSettings(*tabInternal.GetShellBrowser())
 			{
 				TCHAR path[MAX_PATH];
-				tabInternal.shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(path), path);
+				tabInternal.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(path), path);
 
 				id = tabInternal.id;
 				location = path;

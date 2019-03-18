@@ -191,7 +191,7 @@ void Explorerplusplus::SetTabName(Tab &tab,const std::wstring strName)
 
 void Explorerplusplus::ClearTabName(Tab &tab)
 {
-	PIDLPointer pidlDirectory(tab.shellBrowser->QueryCurrentDirectoryIdl());
+	PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
 
 	TCHAR name[MAX_PATH];
 	HRESULT hr = GetDisplayName(pidlDirectory.get(), name, SIZEOF_ARRAY(name), SHGDN_INFOLDER);
@@ -441,7 +441,7 @@ int *pTabObjectIndex)
 	pSettings->bForceSize	= m_config->forceSize;
 	pSettings->sdf			= m_config->sizeDisplayFormat;
 
-	tab.shellBrowser = CShellBrowser::CreateNew(m_hContainer, tab.listView,pSettings);
+	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView,pSettings));
 
 	if(pSettings->bApplyFilter)
 		NListView::ListView_SetBackgroundImage(tab.listView,IDB_FILTERINGAPPLIED);
@@ -449,14 +449,14 @@ int *pTabObjectIndex)
 	/* TODO: This needs to be removed. */
 	SetWindowSubclass(tab.listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
-	tab.shellBrowser->SetId(tab.id);
-	tab.shellBrowser->SetResourceModule(m_hLanguageModule);
-	tab.shellBrowser->SetHideSystemFiles(m_bHideSystemFilesGlobal);
-	tab.shellBrowser->SetShowExtensions(m_bShowExtensionsGlobal);
-	tab.shellBrowser->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
-	tab.shellBrowser->SetShowFolderSizes(m_config->showFolderSizes);
-	tab.shellBrowser->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
-	tab.shellBrowser->SetInsertSorted(m_config->insertSorted);
+	tab.GetShellBrowser()->SetId(tab.id);
+	tab.GetShellBrowser()->SetResourceModule(m_hLanguageModule);
+	tab.GetShellBrowser()->SetHideSystemFiles(m_bHideSystemFilesGlobal);
+	tab.GetShellBrowser()->SetShowExtensions(m_bShowExtensionsGlobal);
+	tab.GetShellBrowser()->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
+	tab.GetShellBrowser()->SetShowFolderSizes(m_config->showFolderSizes);
+	tab.GetShellBrowser()->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
+	tab.GetShellBrowser()->SetInsertSorted(m_config->insertSorted);
 
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
@@ -482,7 +482,7 @@ int *pTabObjectIndex)
 		m_selectedTabIndex		= iNewTabIndex;
 
 		m_hActiveListView		= tab.listView;
-		m_pActiveShellBrowser	= tab.shellBrowser;
+		m_pActiveShellBrowser	= tab.GetShellBrowser();
 
 		SetFocus(tab.listView);
 
@@ -496,10 +496,10 @@ int *pTabObjectIndex)
 	regardless of whether it loads its own settings or not. */
 	PushGlobalSettingsToTab(tab.id);
 
-	hr = tab.shellBrowser->BrowseFolder(pidlDirectory,uFlags);
+	hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory,uFlags);
 
 	if(bSwitchToNewTab)
-		tab.shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory), m_CurrentDirectory);
+		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory), m_CurrentDirectory);
 
 	if(hr != S_OK)
 	{
@@ -650,7 +650,7 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 	const Tab &tab = m_Tabs.at(m_selectedTabId);
 
 	m_hActiveListView		= tab.listView;
-	m_pActiveShellBrowser	= tab.shellBrowser;
+	m_pActiveShellBrowser	= tab.GetShellBrowser();
 
 	/* The selected tab has changed, so update the current
 	directory. Although this is not needed internally, context
@@ -823,9 +823,9 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 	RemoveTabFromControl(*index);
 	RemoveTabProxy(tab.id);
 
-	m_pDirMon->StopDirectoryMonitor(tab.shellBrowser->GetDirMonitorId());
+	m_pDirMon->StopDirectoryMonitor(tab.GetShellBrowser()->GetDirMonitorId());
 
-	tab.shellBrowser->Release();
+	tab.GetShellBrowser()->Release();
 
 	DestroyWindow(tab.listView);
 
@@ -914,9 +914,9 @@ void Explorerplusplus::RemoveTabFromControl(int iTab)
 
 HRESULT Explorerplusplus::RefreshTab(Tab &tab)
 {
-	PIDLPointer pidlDirectory(tab.shellBrowser->QueryCurrentDirectoryIdl());
+	PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
 
-	HRESULT hr = tab.shellBrowser->BrowseFolder(pidlDirectory.get(), SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
+	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory.get(), SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 
 	if (SUCCEEDED(hr))
 	{
@@ -1082,7 +1082,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 				if(res)
 				{
-					LPITEMIDLIST pidlCurrent = m_Tabs.at(static_cast<int>(tcItem.lParam)).shellBrowser->QueryCurrentDirectoryIdl();
+					LPITEMIDLIST pidlCurrent = m_Tabs.at(static_cast<int>(tcItem.lParam)).GetShellBrowser()->QueryCurrentDirectoryIdl();
 
 					LPITEMIDLIST pidlParent = NULL;
 					HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
@@ -1429,7 +1429,7 @@ void Explorerplusplus::DuplicateTab(int iTabInternal)
 {
 	TCHAR szTabDirectory[MAX_PATH];
 
-	m_Tabs.at(iTabInternal).shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
+	m_Tabs.at(iTabInternal).GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
 	CreateNewTab(szTabDirectory, nullptr, nullptr, FALSE, nullptr);
@@ -1530,7 +1530,7 @@ void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)
 		tcItem.mask = TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl, nmhdr->idFrom, &tcItem);
 
-		m_Tabs.at((int)tcItem.lParam).shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
+		m_Tabs.at((int)tcItem.lParam).GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
 			szTabToolTip);
 		lpnmtdi->lpszText = szTabToolTip;
 	}
@@ -1545,7 +1545,7 @@ void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 	gs.bShowFriendlyDates	= m_bShowFriendlyDatesGlobal;
 	gs.bShowFolderSizes		= m_config->showFolderSizes;
 
-	m_Tabs.at(iTabId).shellBrowser->SetGlobalSettings(&gs);
+	m_Tabs.at(iTabId).GetShellBrowser()->SetGlobalSettings(&gs);
 }
 
 Tab *Explorerplusplus::GetTab(int tabId)

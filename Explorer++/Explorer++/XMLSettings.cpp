@@ -878,39 +878,39 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), i);
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Tab"),szNodeName);
 
-		tab.shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
+		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Directory"),szTabDirectory);
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ApplyFilter"),
-			NXMLSettings::EncodeBoolValue(tab.shellBrowser->GetFilterStatus()));
+			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetFilterStatus()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("AutoArrange"),
-			NXMLSettings::EncodeBoolValue(tab.shellBrowser->GetAutoArrange()));
+			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetAutoArrange()));
 
 		TCHAR szFilter[512];
 
-		tab.shellBrowser->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
+		tab.GetShellBrowser()->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Filter"),szFilter);
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("FilterCaseSensitive"),
-			NXMLSettings::EncodeBoolValue(tab.shellBrowser->GetFilterCaseSensitive()));
+			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetFilterCaseSensitive()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowGridlines"),
-			NXMLSettings::EncodeBoolValue(tab.shellBrowser->QueryGridlinesActive()));
+			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->QueryGridlinesActive()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowHidden"),
-			NXMLSettings::EncodeBoolValue(tab.shellBrowser->GetShowHidden()));
+			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetShowHidden()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowInGroups"),
-			NXMLSettings::EncodeBoolValue(tab.shellBrowser->IsGroupViewEnabled()));
+			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->IsGroupViewEnabled()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortAscending"),
-			NXMLSettings::EncodeBoolValue(tab.shellBrowser->GetSortAscending()));
+			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetSortAscending()));
 
-		SortMode = tab.shellBrowser->GetSortMode();
+		SortMode = tab.GetShellBrowser()->GetSortMode();
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortMode"),NXMLSettings::EncodeIntValue(SortMode));
 
-		ViewMode = tab.shellBrowser->GetCurrentViewMode();
+		ViewMode = tab.GetShellBrowser()->GetCurrentViewMode();
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ViewMode"),NXMLSettings::EncodeIntValue(ViewMode));
 
 		bstr = SysAllocString(L"Columns");
@@ -920,7 +920,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 
 		ColumnExport_t ce;
 
-		tab.shellBrowser->ExportAllColumns(&ce);
+		tab.GetShellBrowser()->ExportAllColumns(&ce);
 
 		int TAB_INDENT = 4;
 

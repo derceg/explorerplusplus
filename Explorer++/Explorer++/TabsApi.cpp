@@ -96,7 +96,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 		enum library. */
 		if (viewMode >= static_cast<int>(ViewMode::FIRST) && viewMode <= static_cast<int>(ViewMode::LAST))
 		{
-			tabInternal->shellBrowser->SetCurrentViewMode(static_cast<ViewMode>(*viewMode));
+			tabInternal->GetShellBrowser()->SetCurrentViewMode(static_cast<ViewMode>(*viewMode));
 		}
 	}
 
