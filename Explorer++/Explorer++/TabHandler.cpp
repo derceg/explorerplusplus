@@ -947,12 +947,11 @@ void Explorerplusplus::OnInitTabMenu(HMENU hMenu)
 		return;
 	}
 
-	int internalIndex = static_cast<int>(tcItem.lParam);
+	const Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
 
-	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, m_Tabs.at(internalIndex).bLocked);
-	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, m_Tabs.at(internalIndex).bAddressLocked);
-	lEnableMenuItem(hMenu, IDM_TAB_CLOSETAB,
-		!(m_Tabs.at(internalIndex).bLocked || m_Tabs.at(internalIndex).bAddressLocked));
+	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, tab.bLocked);
+	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, tab.bAddressLocked);
+	lEnableMenuItem(hMenu, IDM_TAB_CLOSETAB, !(tab.bLocked || tab.bAddressLocked));
 }
 
 void Explorerplusplus::OnTabCtrlLButtonDown(POINT *pt)
@@ -1295,11 +1294,11 @@ void Explorerplusplus::LockTabAndAddress(Tab &tab, bool lock)
 
 void Explorerplusplus::UpdateTabToolbar(void)
 {
-	int nTabs;
+	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	const Tab &selectedTab = m_Tabs.at(m_selectedTabId);
 
-	if(nTabs > 1 && !(m_Tabs.at(m_selectedTabId).bLocked || m_Tabs.at(m_selectedTabId).bAddressLocked))
+	if(nTabs > 1 && !(selectedTab.bLocked || selectedTab.bAddressLocked))
 	{
 		/* Enable the tab close button. */
 		SendMessage(m_hTabWindowToolbar,TB_SETSTATE,
