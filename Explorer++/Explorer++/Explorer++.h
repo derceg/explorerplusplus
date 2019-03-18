@@ -490,6 +490,7 @@ private:
 	void					CloseOtherTabs(int iTab);
 	void					SetTabName(Tab &tab, const std::wstring strName);
 	void					ClearTabName(Tab &tab);
+	void					UpdateTabNameInWindow(Tab &tab);
 	int						GetSelectedTabId() const;
 	int						GetSelectedTabIndex() const;
 	void					SelectTab(const Tab &tab);

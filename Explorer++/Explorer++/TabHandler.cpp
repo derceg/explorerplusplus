@@ -183,21 +183,10 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 
 void Explorerplusplus::SetTabName(Tab &tab,const std::wstring strName)
 {
-	StringCchCopy(tab.szName, SIZEOF_ARRAY(tab.szName),strName.c_str());
 	tab.bUseCustomName = TRUE;
+	StringCchCopy(tab.szName, SIZEOF_ARRAY(tab.szName),strName.c_str());
 
-	auto index = GetTabIndex(tab);
-
-	if (!index)
-	{
-		assert(false);
-		return;
-	}
-
-	TCITEM tcItem;
-	tcItem.mask = TCIF_TEXT;
-	tcItem.pszText = tab.szName;
-	TabCtrl_SetItem(m_hTabCtrl, *index, &tcItem);
+	UpdateTabNameInWindow(tab);
 }
 
 void Explorerplusplus::ClearTabName(Tab &tab)
@@ -212,7 +201,26 @@ void Explorerplusplus::ClearTabName(Tab &tab)
 		return;
 	}
 
-	SetTabName(tab, name);
+	tab.bUseCustomName = FALSE;
+	StringCchCopy(tab.szName, SIZEOF_ARRAY(tab.szName), name);
+
+	UpdateTabNameInWindow(tab);
+}
+
+void Explorerplusplus::UpdateTabNameInWindow(Tab &tab)
+{
+	auto index = GetTabIndex(tab);
+
+	if (!index)
+	{
+		assert(false);
+		return;
+	}
+
+	TCITEM tcItem;
+	tcItem.mask = TCIF_TEXT;
+	tcItem.pszText = tab.szName;
+	TabCtrl_SetItem(m_hTabCtrl, *index, &tcItem);
 }
 
 int Explorerplusplus::GetSelectedTabId() const
