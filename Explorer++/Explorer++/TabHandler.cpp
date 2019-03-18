@@ -342,36 +342,37 @@ int *pTabObjectIndex)
 		iNewTabIndex = TabCtrl_GetItemCount(m_hTabCtrl);
 
 	iTabId = m_tabIdCounter++;
+	Tab &tab = m_Tabs[iTabId];
 
 	if(pTabSettings == NULL)
 	{
-		m_Tabs[iTabId].bLocked			= FALSE;
-		m_Tabs[iTabId].bAddressLocked	= FALSE;
-		m_Tabs[iTabId].bUseCustomName	= FALSE;
+		tab.bLocked			= FALSE;
+		tab.bAddressLocked	= FALSE;
+		tab.bUseCustomName	= FALSE;
 	}
 	else
 	{
-		m_Tabs[iTabId].bLocked = pTabSettings->bLocked;
-		m_Tabs[iTabId].bAddressLocked = pTabSettings->bAddressLocked;
-		m_Tabs[iTabId].bUseCustomName = pTabSettings->bUseCustomName;
+		tab.bLocked = pTabSettings->bLocked;
+		tab.bAddressLocked = pTabSettings->bAddressLocked;
+		tab.bUseCustomName = pTabSettings->bUseCustomName;
 
 		if (pTabSettings->bUseCustomName)
 		{
-			StringCchCopy(m_Tabs[iTabId].szName, SIZEOF_ARRAY(m_Tabs[iTabId].szName), pTabSettings->szName);
+			StringCchCopy(tab.szName, SIZEOF_ARRAY(tab.szName), pTabSettings->szName);
 		}
 	}
 
-	m_Tabs[iTabId].id = iTabId;
+	tab.id = iTabId;
 
-	m_Tabs[iTabId].listView	= CreateMainListView(m_hContainer,ListViewStyles);
+	tab.listView	= CreateMainListView(m_hContainer,ListViewStyles);
 
-	if(m_Tabs[iTabId].listView == NULL)
+	if(tab.listView == NULL)
 		return E_FAIL;
 
-	NListView::ListView_ActivateOneClickSelect(m_Tabs[iTabId].listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
+	NListView::ListView_ActivateOneClickSelect(tab.listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
 
 	/* Set the listview to its initial size. */
-	SetListViewInitialPosition(m_Tabs[iTabId].listView);
+	SetListViewInitialPosition(tab.listView);
 
 	/* If no explicit settings are specified, use the
 	global ones. */
@@ -443,22 +444,22 @@ int *pTabObjectIndex)
 	pSettings->bForceSize	= m_config->forceSize;
 	pSettings->sdf			= m_config->sizeDisplayFormat;
 
-	m_Tabs[iTabId].shellBrowser = CShellBrowser::CreateNew(m_hContainer, m_Tabs[iTabId].listView,pSettings);
+	tab.shellBrowser = CShellBrowser::CreateNew(m_hContainer, tab.listView,pSettings);
 
 	if(pSettings->bApplyFilter)
-		NListView::ListView_SetBackgroundImage(m_Tabs[iTabId].listView,IDB_FILTERINGAPPLIED);
+		NListView::ListView_SetBackgroundImage(tab.listView,IDB_FILTERINGAPPLIED);
 
 	/* TODO: This needs to be removed. */
-	SetWindowSubclass(m_Tabs[iTabId].listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(tab.listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
-	m_Tabs[iTabId].shellBrowser->SetId(iTabId);
-	m_Tabs[iTabId].shellBrowser->SetResourceModule(m_hLanguageModule);
-	m_Tabs[iTabId].shellBrowser->SetHideSystemFiles(m_bHideSystemFilesGlobal);
-	m_Tabs[iTabId].shellBrowser->SetShowExtensions(m_bShowExtensionsGlobal);
-	m_Tabs[iTabId].shellBrowser->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
-	m_Tabs[iTabId].shellBrowser->SetShowFolderSizes(m_config->showFolderSizes);
-	m_Tabs[iTabId].shellBrowser->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
-	m_Tabs[iTabId].shellBrowser->SetInsertSorted(m_config->insertSorted);
+	tab.shellBrowser->SetId(iTabId);
+	tab.shellBrowser->SetResourceModule(m_hLanguageModule);
+	tab.shellBrowser->SetHideSystemFiles(m_bHideSystemFilesGlobal);
+	tab.shellBrowser->SetShowExtensions(m_bShowExtensionsGlobal);
+	tab.shellBrowser->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
+	tab.shellBrowser->SetShowFolderSizes(m_config->showFolderSizes);
+	tab.shellBrowser->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
+	tab.shellBrowser->SetInsertSorted(m_config->insertSorted);
 
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
@@ -478,15 +479,15 @@ int *pTabObjectIndex)
 		/* Hide the previously active tab, and show the
 		newly created one. */
 		ShowWindow(m_hActiveListView,SW_HIDE);
-		ShowWindow(m_Tabs[iTabId].listView,SW_SHOW);
+		ShowWindow(tab.listView,SW_SHOW);
 
 		m_selectedTabId			= iTabId;
 		m_selectedTabIndex		= iNewTabIndex;
 
-		m_hActiveListView		= m_Tabs[m_selectedTabId].listView;
-		m_pActiveShellBrowser	= m_Tabs[m_selectedTabId].shellBrowser;
+		m_hActiveListView		= tab.listView;
+		m_pActiveShellBrowser	= tab.shellBrowser;
 
-		SetFocus(m_Tabs[iTabId].listView);
+		SetFocus(tab.listView);
 
 		m_iPreviousTabSelectionId = iTabId;
 	}
@@ -498,10 +499,10 @@ int *pTabObjectIndex)
 	regardless of whether it loads its own settings or not. */
 	PushGlobalSettingsToTab(iTabId);
 
-	hr = m_Tabs[iTabId].shellBrowser->BrowseFolder(pidlDirectory,uFlags);
+	hr = tab.shellBrowser->BrowseFolder(pidlDirectory,uFlags);
 
 	if(bSwitchToNewTab)
-		m_Tabs[iTabId].shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory), m_CurrentDirectory);
+		tab.shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory), m_CurrentDirectory);
 
 	if(hr != S_OK)
 	{
@@ -513,7 +514,7 @@ int *pTabObjectIndex)
 	if(pTabObjectIndex != NULL)
 		*pTabObjectIndex = iTabId;
 
-	SetTabIcon(m_Tabs[iTabId]);
+	SetTabIcon(tab);
 
 	m_tabCreatedSignal(iTabId, bSwitchToNewTab);
 
@@ -649,8 +650,10 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 
 	m_selectedTabId = (int)tcItem.lParam;
 
-	m_hActiveListView		= m_Tabs.at(m_selectedTabId).listView;
-	m_pActiveShellBrowser	= m_Tabs[m_selectedTabId].shellBrowser;
+	const Tab &tab = m_Tabs.at(m_selectedTabId);
+
+	m_hActiveListView		= tab.listView;
+	m_pActiveShellBrowser	= tab.shellBrowser;
 
 	/* The selected tab has changed, so update the current
 	directory. Although this is not needed internally, context

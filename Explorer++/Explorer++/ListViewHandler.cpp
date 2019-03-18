@@ -582,10 +582,12 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	if(iObjectIndex == -1)
 		return;
 
-	if(m_Tabs[iObjectIndex].shellBrowser->QueryDragging())
+	Tab &tab = m_Tabs.at(iObjectIndex);
+
+	if(tab.shellBrowser->QueryDragging())
 		return;
 
-	HWND listView = m_Tabs.at(iObjectIndex).listView;
+	HWND listView = tab.listView;
 
 	if(ItemChanged->uChanged == LVIF_STATE &&
 		((LVIS_STATEIMAGEMASK & ItemChanged->uNewState) >> 12) != 0 &&
@@ -661,7 +663,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 		}
 	}
 
-	m_Tabs[iObjectIndex].shellBrowser->UpdateFileSelectionInfo(
+	tab.shellBrowser->UpdateFileSelectionInfo(
 	(int)ItemChanged->lParam,Selected);
 
 	if((ListView_GetItemCount(m_hActiveListView) - m_nSelected) == m_nSelectedOnInvert)

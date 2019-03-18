@@ -920,9 +920,11 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 						tcItem.mask	= TCIF_PARAM;
 						TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-						if(m_Tabs[(int)tcItem.lParam].shellBrowser->QueryGridlinesActive() != m_bShowGridlinesGlobal)
+						Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
+
+						if(tab.shellBrowser->QueryGridlinesActive() != m_bShowGridlinesGlobal)
 						{
-							m_Tabs[(int)tcItem.lParam].shellBrowser->ToggleGridlines();
+							tab.shellBrowser->ToggleGridlines();
 						}
 
 						NListView::ListView_AddRemoveExtendedStyle(m_Tabs.at((int)tcItem.lParam).listView,
