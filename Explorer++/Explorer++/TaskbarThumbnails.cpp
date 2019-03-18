@@ -105,7 +105,7 @@ LRESULT CALLBACK Explorerplusplus::MainWndTaskbarThumbnailProc(HWND hwnd,UINT uM
 			auto tab = GetTab(itr->iTabId);
 			assert(tab != nullptr);
 
-			BOOL bActive = (tab->id == m_selectedTabId);
+			BOOL bActive = (tab->GetId() == m_selectedTabId);
 
 			RegisterTab(itr->hProxy,EMPTY_STRING,bActive);
 
@@ -791,7 +791,7 @@ void Explorerplusplus::SetTabProxyIcon(const Tab &tab, HICON hIcon)
 {
 	for (const TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
 	{
-		if (tabProxyInfo.iTabId == tab.id)
+		if (tabProxyInfo.iTabId == tab.GetId())
 		{
 			HICON hIconTemp = (HICON)GetClassLongPtr(tabProxyInfo.hProxy, GCLP_HICONSM);
 			DestroyIcon(hIconTemp);

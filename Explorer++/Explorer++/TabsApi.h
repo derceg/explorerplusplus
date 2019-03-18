@@ -69,7 +69,7 @@ namespace Plugins
 				TCHAR path[MAX_PATH];
 				tabInternal.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(path), path);
 
-				id = tabInternal.id;
+				id = tabInternal.GetId();
 				location = path;
 				name = tabInternal.szName;
 				locked = tabInternal.GetLocked();

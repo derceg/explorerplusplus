@@ -6,11 +6,16 @@
 #include "Tab.h"
 
 Tab::Tab(int id) :
-	id(id),
+	m_id(id),
 	m_locked(false),
 	m_addressLocked(false)
 {
 
+}
+
+int Tab::GetId() const
+{
+	return m_id;
 }
 
 CShellBrowser *Tab::GetShellBrowser() const

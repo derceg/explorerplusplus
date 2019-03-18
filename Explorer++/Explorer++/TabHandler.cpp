@@ -449,7 +449,7 @@ int *pTabObjectIndex)
 	/* TODO: This needs to be removed. */
 	SetWindowSubclass(tab.listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
-	tab.GetShellBrowser()->SetId(tab.id);
+	tab.GetShellBrowser()->SetId(tab.GetId());
 	tab.GetShellBrowser()->SetResourceModule(m_hLanguageModule);
 	tab.GetShellBrowser()->SetHideSystemFiles(m_bHideSystemFilesGlobal);
 	tab.GetShellBrowser()->SetShowExtensions(m_bShowExtensionsGlobal);
@@ -461,7 +461,7 @@ int *pTabObjectIndex)
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
 	the folder). */
-	InsertNewTab(pidlDirectory,iNewTabIndex,tab.id);
+	InsertNewTab(pidlDirectory,iNewTabIndex,tab.GetId());
 
 	if(bSwitchToNewTab)
 	{
@@ -478,7 +478,7 @@ int *pTabObjectIndex)
 		ShowWindow(m_hActiveListView,SW_HIDE);
 		ShowWindow(tab.listView,SW_SHOW);
 
-		m_selectedTabId			= tab.id;
+		m_selectedTabId			= tab.GetId();
 		m_selectedTabIndex		= iNewTabIndex;
 
 		m_hActiveListView		= tab.listView;
@@ -486,7 +486,7 @@ int *pTabObjectIndex)
 
 		SetFocus(tab.listView);
 
-		m_iPreviousTabSelectionId = tab.id;
+		m_iPreviousTabSelectionId = tab.GetId();
 	}
 
 	uFlags = SBSP_ABSOLUTE;
@@ -494,7 +494,7 @@ int *pTabObjectIndex)
 	/* These settings are applied to all tabs (i.e. they
 	are not tab specific). Send them to the browser
 	regardless of whether it loads its own settings or not. */
-	PushGlobalSettingsToTab(tab.id);
+	PushGlobalSettingsToTab(tab.GetId());
 
 	hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory,uFlags);
 
@@ -509,15 +509,15 @@ int *pTabObjectIndex)
 	}
 
 	if(pTabObjectIndex != NULL)
-		*pTabObjectIndex = tab.id;
+		*pTabObjectIndex = tab.GetId();
 
 	SetTabIcon(tab);
 
-	m_tabCreatedSignal(tab.id, bSwitchToNewTab);
+	m_tabCreatedSignal(tab.GetId(), bSwitchToNewTab);
 
 	if (bSwitchToNewTab)
 	{
-		OnDirChanged(tab.id);
+		OnDirChanged(tab.GetId());
 	}
 
 	return S_OK;
@@ -821,7 +821,7 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 	}
 
 	RemoveTabFromControl(*index);
-	RemoveTabProxy(tab.id);
+	RemoveTabProxy(tab.GetId());
 
 	m_pDirMon->StopDirectoryMonitor(tab.GetShellBrowser()->GetDirMonitorId());
 
@@ -832,9 +832,9 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 	// This is needed, as the erase() call below will remove the element
 	// from the tabs container (which will invalidate the reference
 	// passed to the function, unless a copy was passed).
-	int tabId = tab.id;
+	int tabId = tab.GetId();
 
-	m_Tabs.erase(tab.id);
+	m_Tabs.erase(tab.GetId());
 
 	if(!m_config->alwaysShowTabBar)
 	{
@@ -920,7 +920,7 @@ HRESULT Explorerplusplus::RefreshTab(Tab &tab)
 
 	if (SUCCEEDED(hr))
 	{
-		OnDirChanged(tab.id);
+		OnDirChanged(tab.GetId());
 	}
 
 	return hr;
@@ -1108,7 +1108,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_RENAMETAB:
 			{
-				CRenameTabDialog RenameTabDialog(m_hLanguageModule,IDD_RENAMETAB,m_hContainer,tab->id,this,this,this);
+				CRenameTabDialog RenameTabDialog(m_hLanguageModule,IDD_RENAMETAB,m_hContainer,tab->GetId(),this,this,this);
 				RenameTabDialog.ShowModalDialog();
 			}
 			break;
@@ -1255,7 +1255,7 @@ void Explorerplusplus::LockTab(Tab &tab, bool lock)
 	/* If the tab that was locked/unlocked is the
 	currently selected tab, then the tab close
 	button on the toolbar will need to be updated. */
-	if (tab.id == m_selectedTabId)
+	if (tab.GetId() == m_selectedTabId)
 	{
 		UpdateTabToolbar();
 	}
@@ -1284,7 +1284,7 @@ void Explorerplusplus::LockTabAndAddress(Tab &tab, bool lock)
 
 	SetTabIcon(tab);
 
-	if (tab.id == m_selectedTabId)
+	if (tab.GetId() == m_selectedTabId)
 	{
 		UpdateTabToolbar();
 	}
@@ -1584,7 +1584,7 @@ boost::optional<int> Explorerplusplus::GetTabIndex(const Tab &tab)
 		tcItem.mask = TCIF_PARAM;
 		BOOL res = TabCtrl_GetItem(m_hTabCtrl, i, &tcItem);
 
-		if (res && (tcItem.lParam == tab.id))
+		if (res && (tcItem.lParam == tab.GetId()))
 		{
 			return i;
 		}

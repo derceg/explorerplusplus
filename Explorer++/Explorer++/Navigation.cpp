@@ -125,7 +125,7 @@ HRESULT Explorerplusplus::BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UI
 			PlayNavigationSound();
 		}
 
-		resultingTabId = tab.id;
+		resultingTabId = tab.GetId();
 	}
 	else
 	{
@@ -166,7 +166,7 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 {
 	Tab &tab = m_Tabs.at(iTabId);
 
-	if (tab.id == m_selectedTabId)
+	if (tab.GetId() == m_selectedTabId)
 	{
 		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
 			m_CurrentDirectory);
@@ -179,12 +179,12 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 		UpdateWindowStates();
 	}
 
-	HandleDirectoryMonitoring(tab.id);
+	HandleDirectoryMonitoring(tab.GetId());
 
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(tab.listView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
-	InvalidateTaskbarThumbnailBitmap(tab.id);
+	InvalidateTaskbarThumbnailBitmap(tab.GetId());
 
 	SetTabIcon(tab);
 	UpdateTabText(tab);

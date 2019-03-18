@@ -393,7 +393,7 @@ void Explorerplusplus::UpdateTabText(Tab &tab)
 	}
 
 	/* Set the tab proxy text. */
-	UpdateTaskbarThumbnailTtitle(tab.id, szFinalTabText);
+	UpdateTaskbarThumbnailTtitle(tab.GetId(), szFinalTabText);
 }
 
 /* Sets a tabs icon. Normally, this icon
