@@ -51,8 +51,10 @@ __interface IExplorerplusplus
 
 	CStatusBar		*GetStatusBar();
 
-	HRESULT			BrowseFolder(const TCHAR *szPath, UINT wFlags);
-	HRESULT			BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags);
+	HRESULT			BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags);
+	HRESULT			BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags);
+	HRESULT			BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags);
+	HRESULT			BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags);
 
 	void			OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
 

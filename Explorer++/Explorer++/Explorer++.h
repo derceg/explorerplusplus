@@ -371,11 +371,13 @@ private:
 	/* Navigation. */
 	void					OnBrowseBack();
 	void					OnBrowseForward();
-	void					OnHome();
+	void					OnNavigateHome();
 	void					OnNavigateUp();
-	void					GotoFolder(int FolderCSIDL);
-	HRESULT					BrowseFolder(const TCHAR *szPath, UINT wFlags);
-	HRESULT					BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags);
+	void					OnGotoFolder(int FolderCSIDL);
+	HRESULT					BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags);
+	HRESULT					BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags);
+	HRESULT					BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags);
+	HRESULT					BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags);
 	void					OpenDirectoryInNewWindow(LPCITEMIDLIST pidlDirectory);
 	void					PlayNavigationSound() const;
 

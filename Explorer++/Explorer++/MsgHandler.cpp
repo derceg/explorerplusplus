@@ -311,7 +311,7 @@ void Explorerplusplus::OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,
 	else if(m_config->alwaysOpenNewTab || bOpenInNewTab)
 		CreateNewTab(pidlItem, nullptr, nullptr, TRUE, nullptr);
 	else
-		BrowseFolder(pidlItem,0);
+		BrowseFolderInCurrentTab(pidlItem,0);
 }
 
 void Explorerplusplus::OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters)
@@ -976,7 +976,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		break;
 
 	case APPCOMMAND_BROWSER_HOME:
-		OnHome();
+		OnNavigateHome();
 		break;
 
 	case APPCOMMAND_BROWSER_FAVORITES:

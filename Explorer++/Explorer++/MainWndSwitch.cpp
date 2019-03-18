@@ -1212,47 +1212,47 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_GO_MYCOMPUTER:
-			GotoFolder(CSIDL_DRIVES);
+			OnGotoFolder(CSIDL_DRIVES);
 			break;
 
 		case IDM_GO_MYDOCUMENTS:
-			GotoFolder(CSIDL_PERSONAL);
+			OnGotoFolder(CSIDL_PERSONAL);
 			break;
 
 		case IDM_GO_MYMUSIC:
-			GotoFolder(CSIDL_MYMUSIC);
+			OnGotoFolder(CSIDL_MYMUSIC);
 			break;
 
 		case IDM_GO_MYPICTURES:
-			GotoFolder(CSIDL_MYPICTURES);
+			OnGotoFolder(CSIDL_MYPICTURES);
 			break;
 
 		case IDM_GO_DESKTOP:
-			GotoFolder(CSIDL_DESKTOP);
+			OnGotoFolder(CSIDL_DESKTOP);
 			break;
 
 		case IDM_GO_RECYCLEBIN:
-			GotoFolder(CSIDL_BITBUCKET);
+			OnGotoFolder(CSIDL_BITBUCKET);
 			break;
 
 		case IDM_GO_CONTROLPANEL:
-			GotoFolder(CSIDL_CONTROLS);
+			OnGotoFolder(CSIDL_CONTROLS);
 			break;
 
 		case IDM_GO_PRINTERS:
-			GotoFolder(CSIDL_PRINTERS);
+			OnGotoFolder(CSIDL_PRINTERS);
 			break;
 
 		case IDM_GO_CDBURNING:
-			GotoFolder(CSIDL_CDBURN_AREA);
+			OnGotoFolder(CSIDL_CDBURN_AREA);
 			break;
 
 		case IDM_GO_MYNETWORKPLACES:
-			GotoFolder(CSIDL_NETWORK);
+			OnGotoFolder(CSIDL_NETWORK);
 			break;
 
 		case IDM_GO_NETWORKCONNECTIONS:
-			GotoFolder(CSIDL_CONNECTIONS);
+			OnGotoFolder(CSIDL_CONNECTIONS);
 			break;
 
 		case TOOLBAR_ADDBOOKMARK:
@@ -1347,7 +1347,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDA_HOME:
-			OnHome();
+			OnNavigateHome();
 			break;
 
 		case IDA_TAB1:
@@ -1695,7 +1695,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 						pidl = m_pActiveShellBrowser->RetrieveHistoryItem(iCmd);
 
-						BrowseFolder(pidl,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
+						BrowseFolderInCurrentTab(pidl,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 
 						CoTaskMemFree(pidl);
 					}

@@ -30,5 +30,5 @@ HRESULT Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInN
 		return CreateNewTab(szExpandedPath, nullptr, nullptr, bSwitchToNewTab, nullptr);
 	}
 
-	return BrowseFolder(szExpandedPath,SBSP_ABSOLUTE);
+	return BrowseFolderInCurrentTab(szExpandedPath,SBSP_ABSOLUTE);
 }

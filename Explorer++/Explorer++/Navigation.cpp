@@ -11,21 +11,21 @@
 
 void Explorerplusplus::OnBrowseBack()
 {
-	BrowseFolder(EMPTY_STRING, SBSP_NAVIGATEBACK);
+	BrowseFolderInCurrentTab(EMPTY_STRING, SBSP_NAVIGATEBACK);
 }
 
 void Explorerplusplus::OnBrowseForward()
 {
-	BrowseFolder(EMPTY_STRING, SBSP_NAVIGATEFORWARD);
+	BrowseFolderInCurrentTab(EMPTY_STRING, SBSP_NAVIGATEFORWARD);
 }
 
-void Explorerplusplus::OnHome()
+void Explorerplusplus::OnNavigateHome()
 {
-	HRESULT hr = BrowseFolder(m_DefaultTabDirectory, SBSP_ABSOLUTE);
+	HRESULT hr = BrowseFolderInCurrentTab(m_DefaultTabDirectory, SBSP_ABSOLUTE);
 
 	if(FAILED(hr))
 	{
-		BrowseFolder(m_DefaultTabDirectoryStatic, SBSP_ABSOLUTE);
+		BrowseFolderInCurrentTab(m_DefaultTabDirectoryStatic, SBSP_ABSOLUTE);
 	}
 }
 
@@ -37,7 +37,7 @@ void Explorerplusplus::OnNavigateUp()
 
 	PathStripPath(szDirectory);
 
-	HRESULT hr = BrowseFolder(EMPTY_STRING, SBSP_PARENT);
+	HRESULT hr = BrowseFolderInCurrentTab(EMPTY_STRING, SBSP_PARENT);
 
 	if(SUCCEEDED(hr))
 	{
@@ -49,7 +49,7 @@ void Explorerplusplus::OnNavigateUp()
 * Navigates to the folder specified by the incoming
 * csidl.
 */
-void Explorerplusplus::GotoFolder(int FolderCSIDL)
+void Explorerplusplus::OnGotoFolder(int FolderCSIDL)
 {
 	LPITEMIDLIST pidl = NULL;
 	HRESULT hr = SHGetFolderLocation(NULL, FolderCSIDL, NULL, 0, &pidl);
@@ -57,10 +57,16 @@ void Explorerplusplus::GotoFolder(int FolderCSIDL)
 	/* Don't use SUCCEEDED(hr). */
 	if(hr == S_OK)
 	{
-		BrowseFolder(pidl, SBSP_ABSOLUTE);
+		BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE);
 
 		CoTaskMemFree(pidl);
 	}
+}
+
+HRESULT Explorerplusplus::BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags)
+{
+	Tab &tab = m_Tabs.at(m_selectedTabId);
+	return BrowseFolder(tab, szPath, wFlags);
 }
 
 /*
@@ -77,7 +83,7 @@ The ONLY times an idl should be sent are:
 - When loading directories on startup
 - When navigating to a folder on the 'Go' menu
 */
-HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath, UINT wFlags)
+HRESULT Explorerplusplus::BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags)
 {
 	/* Doesn't matter if we can't get the pidl here,
 	as some paths will be relative, or will be filled
@@ -85,9 +91,9 @@ HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath, UINT wFlags)
 	LPITEMIDLIST pidl = NULL;
 	HRESULT hr = GetIdlFromParsingName(szPath, &pidl);
 
-	BrowseFolder(pidl, wFlags);
+	BrowseFolder(tab, pidl, wFlags);
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
 		CoTaskMemFree(pidl);
 	}
@@ -95,33 +101,40 @@ HRESULT Explorerplusplus::BrowseFolder(const TCHAR *szPath, UINT wFlags)
 	return hr;
 }
 
-/* ALL calls to browse a folder in the current tab MUST
+HRESULT Explorerplusplus::BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags)
+{
+	Tab &tab = m_Tabs.at(m_selectedTabId);
+	return BrowseFolder(tab, pidlDirectory, wFlags);
+}
+
+/* ALL calls to browse a folder in a particular tab MUST
 pass through this function. This ensures that tabs that
-have their addresses locked will not change directory. */
-HRESULT Explorerplusplus::BrowseFolder(LPCITEMIDLIST pidlDirectory, UINT wFlags)
+have their addresses locked will not change directory (a
+new tab will be created instead). */
+HRESULT Explorerplusplus::BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags)
 {
 	HRESULT hr = E_FAIL;
-	int iTabObjectIndex = -1;
+	int resultingTabId = -1;
 
-	if(!m_Tabs.at(m_selectedTabId).bAddressLocked)
+	if(!tab.bAddressLocked)
 	{
-		hr = m_pActiveShellBrowser->BrowseFolder(pidlDirectory, wFlags);
+		hr = tab.shellBrowser->BrowseFolder(pidlDirectory, wFlags);
 
 		if(SUCCEEDED(hr))
 		{
 			PlayNavigationSound();
 		}
 
-		iTabObjectIndex = m_selectedTabId;
+		resultingTabId = tab.id;
 	}
 	else
 	{
-		hr = CreateNewTab(pidlDirectory, NULL, NULL, TRUE, &iTabObjectIndex);
+		hr = CreateNewTab(pidlDirectory, NULL, NULL, TRUE, &resultingTabId);
 	}
 
 	if(SUCCEEDED(hr))
 	{
-		OnDirChanged(iTabObjectIndex);
+		OnDirChanged(resultingTabId);
 	}
 
 	return hr;
