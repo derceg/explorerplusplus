@@ -301,6 +301,9 @@
     <ClCompile Include="FileProgressSink.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Tab.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">

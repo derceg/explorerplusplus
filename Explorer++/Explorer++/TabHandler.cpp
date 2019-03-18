@@ -331,7 +331,6 @@ int *pTabObjectIndex)
 	HRESULT				hr;
 	InitialSettings_t	is;
 	int					iNewTabIndex;
-	int					iTabId;
 
 	if(!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
 		return E_FAIL;
@@ -341,8 +340,10 @@ int *pTabObjectIndex)
 	else
 		iNewTabIndex = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	iTabId = m_tabIdCounter++;
-	Tab &tab = m_Tabs[iTabId];
+	int tabId = m_tabIdCounter++;
+	m_Tabs.emplace(std::make_pair(tabId, tabId));
+
+	Tab &tab = m_Tabs.at(tabId);
 
 	if(pTabSettings == NULL)
 	{
@@ -361,8 +362,6 @@ int *pTabObjectIndex)
 			StringCchCopy(tab.szName, SIZEOF_ARRAY(tab.szName), pTabSettings->szName);
 		}
 	}
-
-	tab.id = iTabId;
 
 	tab.listView	= CreateMainListView(m_hContainer,ListViewStyles);
 
@@ -452,7 +451,7 @@ int *pTabObjectIndex)
 	/* TODO: This needs to be removed. */
 	SetWindowSubclass(tab.listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
-	tab.shellBrowser->SetId(iTabId);
+	tab.shellBrowser->SetId(tab.id);
 	tab.shellBrowser->SetResourceModule(m_hLanguageModule);
 	tab.shellBrowser->SetHideSystemFiles(m_bHideSystemFilesGlobal);
 	tab.shellBrowser->SetShowExtensions(m_bShowExtensionsGlobal);
@@ -464,7 +463,7 @@ int *pTabObjectIndex)
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
 	the folder). */
-	InsertNewTab(pidlDirectory,iNewTabIndex,iTabId);
+	InsertNewTab(pidlDirectory,iNewTabIndex,tab.id);
 
 	if(bSwitchToNewTab)
 	{
@@ -481,7 +480,7 @@ int *pTabObjectIndex)
 		ShowWindow(m_hActiveListView,SW_HIDE);
 		ShowWindow(tab.listView,SW_SHOW);
 
-		m_selectedTabId			= iTabId;
+		m_selectedTabId			= tab.id;
 		m_selectedTabIndex		= iNewTabIndex;
 
 		m_hActiveListView		= tab.listView;
@@ -489,7 +488,7 @@ int *pTabObjectIndex)
 
 		SetFocus(tab.listView);
 
-		m_iPreviousTabSelectionId = iTabId;
+		m_iPreviousTabSelectionId = tab.id;
 	}
 
 	uFlags = SBSP_ABSOLUTE;
@@ -497,7 +496,7 @@ int *pTabObjectIndex)
 	/* These settings are applied to all tabs (i.e. they
 	are not tab specific). Send them to the browser
 	regardless of whether it loads its own settings or not. */
-	PushGlobalSettingsToTab(iTabId);
+	PushGlobalSettingsToTab(tab.id);
 
 	hr = tab.shellBrowser->BrowseFolder(pidlDirectory,uFlags);
 
@@ -512,15 +511,15 @@ int *pTabObjectIndex)
 	}
 
 	if(pTabObjectIndex != NULL)
-		*pTabObjectIndex = iTabId;
+		*pTabObjectIndex = tab.id;
 
 	SetTabIcon(tab);
 
-	m_tabCreatedSignal(iTabId, bSwitchToNewTab);
+	m_tabCreatedSignal(tab.id, bSwitchToNewTab);
 
 	if (bSwitchToNewTab)
 	{
-		OnDirChanged(iTabId);
+		OnDirChanged(tab.id);
 	}
 
 	return S_OK;

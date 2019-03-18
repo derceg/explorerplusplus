@@ -19,7 +19,9 @@ class Tab
 {
 public:
 
-	int		id;
+	Tab(int id);
+
+	const int	id;
 	HWND	listView;
 	CShellBrowser *shellBrowser;
 	BOOL	bLocked;

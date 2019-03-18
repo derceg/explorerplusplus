@@ -391,6 +391,7 @@
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MultiProcessorCompilation>
       <MultiProcessorCompilation Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</MultiProcessorCompilation>
     </ClCompile>
+    <ClCompile Include="Tab.cpp" />
     <ClCompile Include="TabBackingHandler.cpp" />
     <ClCompile Include="TabContainer.cpp" />
     <ClCompile Include="TabDropHandler.cpp" />
