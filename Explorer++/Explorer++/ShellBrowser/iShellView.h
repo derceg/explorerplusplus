@@ -215,9 +215,12 @@ public:
 	void				SetGrouping(BOOL bShowInGroups);
 	void				SetGroupingFlag(BOOL bShowInGroups);
 
+	BOOL				GetHideSystemFiles() const;
 	void				SetHideSystemFiles(BOOL bHideSystemFiles);
 	void				SetShowExtensions(BOOL bShowExtensions);
+	BOOL				GetHideLinkExtension() const;
 	void				SetHideLinkExtension(BOOL bHideLinkExtension);
+	BOOL				GetShowFolderSizes() const;
 	void				SetShowFolderSizes(BOOL bShowFolderSizes);
 	void				SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable);
 	void				SetShowFriendlyDates(BOOL bShowFriendlyDates);

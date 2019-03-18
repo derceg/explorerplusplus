@@ -24,6 +24,9 @@ namespace Plugins
 			bool showInGroups;
 			bool showHidden;
 			bool autoArrange;
+			bool showFolderSizes;
+			bool hideSystemFiles;
+			bool hideLinkExtension;
 
 			FolderSettings(const CShellBrowser &shellBrowser)
 			{
@@ -32,6 +35,9 @@ namespace Plugins
 				showInGroups = shellBrowser.IsGroupViewEnabled();
 				showHidden = shellBrowser.GetShowHidden();
 				autoArrange = shellBrowser.GetAutoArrange();
+				showFolderSizes = shellBrowser.GetShowFolderSizes();
+				hideSystemFiles = shellBrowser.GetHideSystemFiles();
+				hideLinkExtension = shellBrowser.GetHideLinkExtension();
 			}
 
 			std::wstring toString()
@@ -40,7 +46,10 @@ namespace Plugins
 					+ _T(", sortAscending = ") + std::to_wstring(sortAscending)
 					+ _T(", showInGroups = ") + std::to_wstring(showInGroups)
 					+ _T(", showHidden = ") + std::to_wstring(showHidden)
-					+ _T(", autoArrange = ") + std::to_wstring(autoArrange);
+					+ _T(", autoArrange = ") + std::to_wstring(autoArrange)
+					+ _T(", showFolderSizes = ") + std::to_wstring(showFolderSizes)
+					+ _T(", hideSystemFiles = ") + std::to_wstring(hideSystemFiles);
+					+ _T(", hideLinkExtension = ") + std::to_wstring(hideLinkExtension);
 			}
 		};
 

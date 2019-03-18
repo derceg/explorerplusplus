@@ -454,6 +454,11 @@ HRESULT CShellBrowser::Refresh()
 	return BrowseFolder(m_pidlDirectory,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 }
 
+BOOL CShellBrowser::GetHideSystemFiles() const
+{
+	return m_bHideSystemFiles;
+}
+
 void CShellBrowser::SetHideSystemFiles(BOOL bHideSystemFiles)
 {
 	m_bHideSystemFiles = bHideSystemFiles;
@@ -464,9 +469,19 @@ void CShellBrowser::SetShowExtensions(BOOL bShowExtensions)
 	m_bShowExtensions = bShowExtensions;
 }
 
+BOOL CShellBrowser::GetHideLinkExtension() const
+{
+	return m_bHideLinkExtension;
+}
+
 void CShellBrowser::SetHideLinkExtension(BOOL bHideLinkExtension)
 {
 	m_bHideLinkExtension = bHideLinkExtension;
+}
+
+BOOL CShellBrowser::GetShowFolderSizes() const
+{
+	return m_bShowFolderSizes;
 }
 
 void CShellBrowser::SetShowFolderSizes(BOOL bShowFolderSizes)
