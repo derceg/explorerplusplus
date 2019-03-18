@@ -72,8 +72,8 @@ namespace Plugins
 				id = tabInternal.id;
 				location = path;
 				name = tabInternal.szName;
-				locked = tabInternal.bLocked;
-				addressLocked = tabInternal.bAddressLocked;
+				locked = tabInternal.GetLocked();
+				addressLocked = tabInternal.GetAddressLocked();
 			}
 
 			std::wstring toString()

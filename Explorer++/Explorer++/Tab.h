@@ -21,11 +21,14 @@ public:
 
 	Tab(int id);
 
+	bool GetLocked() const;
+	void SetLocked(bool locked);
+	bool GetAddressLocked() const;
+	void SetAddressLocked(bool addressLocked);
+
 	const int	id;
 	HWND	listView;
 	CShellBrowser *shellBrowser;
-	BOOL	bLocked;
-	BOOL	bAddressLocked;
 	BOOL	bUseCustomName;
 	TCHAR	szName[MAX_PATH];
 
@@ -35,4 +38,9 @@ public:
 	Therefore, it makes more sense
 	for this setting to remain here. */
 	//BOOL	bUsingDefaultColumns;
+
+private:
+
+	bool m_locked;
+	bool m_addressLocked;
 };

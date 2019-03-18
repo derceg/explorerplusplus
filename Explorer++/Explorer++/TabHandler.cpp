@@ -347,14 +347,12 @@ int *pTabObjectIndex)
 
 	if(pTabSettings == NULL)
 	{
-		tab.bLocked			= FALSE;
-		tab.bAddressLocked	= FALSE;
 		tab.bUseCustomName	= FALSE;
 	}
 	else
 	{
-		tab.bLocked = pTabSettings->bLocked;
-		tab.bAddressLocked = pTabSettings->bAddressLocked;
+		tab.SetLocked(pTabSettings->bLocked);
+		tab.SetAddressLocked(pTabSettings->bAddressLocked);
 		tab.bUseCustomName = pTabSettings->bUseCustomName;
 
 		if (pTabSettings->bUseCustomName)
@@ -809,7 +807,7 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 	}
 
 	/* The tab is locked. Don't close it. */
-	if(tab.bLocked || tab.bAddressLocked)
+	if(tab.GetLocked() || tab.GetAddressLocked())
 	{
 		return false;
 	}
@@ -949,9 +947,9 @@ void Explorerplusplus::OnInitTabMenu(HMENU hMenu)
 
 	const Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
 
-	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, tab.bLocked);
-	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, tab.bAddressLocked);
-	lEnableMenuItem(hMenu, IDM_TAB_CLOSETAB, !(tab.bLocked || tab.bAddressLocked));
+	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, tab.GetLocked());
+	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, tab.GetAddressLocked());
+	lEnableMenuItem(hMenu, IDM_TAB_CLOSETAB, !(tab.GetLocked() || tab.GetAddressLocked()));
 }
 
 void Explorerplusplus::OnTabCtrlLButtonDown(POINT *pt)
@@ -1238,18 +1236,18 @@ void Explorerplusplus::OnLockTab(int iTab)
 		return;
 	}
 
-	LockTab(*tab, !tab->bLocked);
+	LockTab(*tab, !tab->GetLocked());
 }
 
 void Explorerplusplus::LockTab(Tab &tab, bool lock)
 {
-	tab.bLocked = lock;
+	tab.SetLocked(lock);
 
 	/* The "Lock Tab" and "Lock Tab and Address" options
 	are mutually exclusive. */
 	if(lock)
 	{
-		tab.bAddressLocked = FALSE;
+		tab.SetAddressLocked(false);
 	}
 
 	SetTabIcon(tab);
@@ -1272,16 +1270,16 @@ void Explorerplusplus::OnLockTabAndAddress(int iTab)
 		return;
 	}
 
-	LockTabAndAddress(*tab, !tab->bAddressLocked);
+	LockTabAndAddress(*tab, !tab->GetAddressLocked());
 }
 
 void Explorerplusplus::LockTabAndAddress(Tab &tab, bool lock)
 {
-	tab.bAddressLocked = lock;
+	tab.SetAddressLocked(lock);
 
-	if (tab.bAddressLocked)
+	if (lock)
 	{
-		tab.bLocked = FALSE;
+		tab.SetLocked(false);
 	}
 
 	SetTabIcon(tab);
@@ -1298,7 +1296,7 @@ void Explorerplusplus::UpdateTabToolbar(void)
 
 	const Tab &selectedTab = m_Tabs.at(m_selectedTabId);
 
-	if(nTabs > 1 && !(selectedTab.bLocked || selectedTab.bAddressLocked))
+	if(nTabs > 1 && !(selectedTab.GetLocked() || selectedTab.GetAddressLocked()))
 	{
 		/* Enable the tab close button. */
 		SendMessage(m_hTabWindowToolbar,TB_SETSTATE,

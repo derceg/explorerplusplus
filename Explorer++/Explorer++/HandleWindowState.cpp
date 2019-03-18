@@ -408,7 +408,7 @@ void Explorerplusplus::SetTabIcon(const Tab &tab)
 	int				iRemoveImage;
 
 	/* If the tab is locked, use a lock icon. */
-	if(tab.bAddressLocked || tab.bLocked)
+	if(tab.GetAddressLocked() || tab.GetLocked())
 	{
 		iImage = TAB_ICON_LOCK_INDEX;
 	}

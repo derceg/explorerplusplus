@@ -936,9 +936,9 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 
 		/* High-level settings. */
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Locked"),
-			NXMLSettings::EncodeBoolValue(tab.bLocked));
+			NXMLSettings::EncodeBoolValue(tab.GetLocked()));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("AddressLocked"),
-			NXMLSettings::EncodeBoolValue(tab.bAddressLocked));
+			NXMLSettings::EncodeBoolValue(tab.GetAddressLocked()));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("UseCustomName"),
 			NXMLSettings::EncodeBoolValue(tab.bUseCustomName));
 

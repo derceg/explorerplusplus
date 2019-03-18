@@ -518,8 +518,8 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				}
 
 				/* High-level settings. */
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("Locked"),tab.bLocked);
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AddressLocked"),tab.bAddressLocked);
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("Locked"),tab.GetLocked());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AddressLocked"),tab.GetAddressLocked());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("UseCustomName"),tab.bUseCustomName);
 
 				if(tab.bUseCustomName)
