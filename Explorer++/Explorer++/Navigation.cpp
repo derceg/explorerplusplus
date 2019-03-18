@@ -164,26 +164,30 @@ void Explorerplusplus::PlayNavigationSound() const
 
 void Explorerplusplus::OnDirChanged(int iTabId)
 {
-	const Tab &tab = m_Tabs.at(iTabId);
+	Tab &tab = m_Tabs.at(iTabId);
 
-	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
-		m_CurrentDirectory);
-	SetCurrentDirectory(m_CurrentDirectory);
+	if (tab.id == m_selectedTabId)
+	{
+		tab.shellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
+			m_CurrentDirectory);
+		SetCurrentDirectory(m_CurrentDirectory);
 
-	HandleDirectoryMonitoring(iTabId);
+		UpdateArrangeMenuItems();
 
-	UpdateArrangeMenuItems();
+		m_nSelected = 0;
 
-	m_nSelected = 0;
+		UpdateWindowStates();
+	}
+
+	HandleDirectoryMonitoring(tab.id);
 
 	/* Set the focus back to the first item. */
-	ListView_SetItemState(m_hActiveListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
+	ListView_SetItemState(tab.listView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
-	UpdateWindowStates();
-
-	InvalidateTaskbarThumbnailBitmap(iTabId);
+	InvalidateTaskbarThumbnailBitmap(tab.id);
 
 	SetTabIcon(tab);
+	UpdateTabText(tab);
 }
 
 void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)

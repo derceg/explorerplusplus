@@ -35,7 +35,6 @@ void Explorerplusplus::UpdateWindowStates(void)
 	UpdateMainWindowText();
 	UpdateAddressBarText();
 	m_mainToolbar->UpdateToolbarButtonStates();
-	UpdateTabText();
 	UpdateTreeViewSelection();
 	UpdateStatusBarText();
 	UpdateTabToolbar();
@@ -362,62 +361,39 @@ void Explorerplusplus::UpdateAddressBarText(void)
 	CoTaskMemFree(pidl);
 }
 
-void Explorerplusplus::UpdateTabText(void)
-{
-	UpdateTabText(m_selectedTabIndex,m_selectedTabId);
-}
-
-void Explorerplusplus::UpdateTabText(int iTabId)
-{
-	TCITEM tcItem;
-	int nTabs;
-	int i = 0;
-
-	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-	for(i = 0;i < nTabs;i++)
-	{
-		tcItem.mask = TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
-
-		if((int)tcItem.lParam == iTabId)
-		{
-			UpdateTabText(i,iTabId);
-			break;
-		}
-	}
-}
-
-void Explorerplusplus::UpdateTabText(int iTab,int iTabId)
+void Explorerplusplus::UpdateTabText(Tab &tab)
 {
 	TCHAR szFinalTabText[MAX_PATH];
 
-	if(!m_Tabs.at(iTabId).bUseCustomName)
+	if(!tab.bUseCustomName)
 	{
-		LPITEMIDLIST pidlDirectory = m_Tabs[iTabId].shellBrowser->QueryCurrentDirectoryIdl();
+		LPITEMIDLIST pidlDirectory = tab.shellBrowser->QueryCurrentDirectoryIdl();
 
 		TCHAR szTabText[MAX_PATH];
 		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
 
-		StringCchCopy(m_Tabs.at(iTabId).szName,
-			SIZEOF_ARRAY(m_Tabs.at(iTabId).szName),szTabText);
+		StringCchCopy(tab.szName, SIZEOF_ARRAY(tab.szName),szTabText);
 
 		TCHAR szExpandedTabText[MAX_PATH];
 		ReplaceCharacterWithString(szTabText,szExpandedTabText,
 			SIZEOF_ARRAY(szExpandedTabText),'&',_T("&&"));
 
-		TabCtrl_SetItemText(m_hTabCtrl,iTab,szExpandedTabText);
+		auto index = GetTabIndex(tab);
+		assert(index);
+
+		TabCtrl_SetItemText(m_hTabCtrl, *index, szExpandedTabText);
+
 		StringCchCopy(szFinalTabText,SIZEOF_ARRAY(szFinalTabText),szExpandedTabText);
 
 		CoTaskMemFree(pidlDirectory);
 	}
 	else
 	{
-		StringCchCopy(szFinalTabText,SIZEOF_ARRAY(szFinalTabText),m_Tabs.at(iTabId).szName);
+		StringCchCopy(szFinalTabText,SIZEOF_ARRAY(szFinalTabText),tab.szName);
 	}
 
 	/* Set the tab proxy text. */
-	UpdateTaskbarThumbnailTtitle(iTabId, szFinalTabText);
+	UpdateTaskbarThumbnailTtitle(tab.id, szFinalTabText);
 }
 
 /* Sets a tabs icon. Normally, this icon

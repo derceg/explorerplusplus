@@ -581,9 +581,7 @@ private:
 	void					UpdateWindowStates(void);
 	void					UpdateMainWindowText(void);
 	void					UpdateAddressBarText(void);
-	void					UpdateTabText(void);
-	void					UpdateTabText(int iTabId);
-	void					UpdateTabText(int iTab,int iTabId);
+	void					UpdateTabText(Tab &tab);
 	void					SetTabIcon(const Tab &tab);
 	void					UpdateTreeViewSelection(void);
 	void					SetStatusBarParts(int width);

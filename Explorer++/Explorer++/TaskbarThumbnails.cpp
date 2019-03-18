@@ -108,8 +108,8 @@ LRESULT CALLBACK Explorerplusplus::MainWndTaskbarThumbnailProc(HWND hwnd,UINT uM
 			BOOL bActive = (tab->id == m_selectedTabId);
 
 			RegisterTab(itr->hProxy,EMPTY_STRING,bActive);
-			UpdateTabText(tab->id);
 
+			UpdateTabText(*tab);
 			SetTabIcon(*tab);
 		}
 
