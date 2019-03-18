@@ -34,6 +34,11 @@ __interface TabContainerInterface
 	HRESULT			CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
 	HRESULT			CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
 
+	HRESULT			BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags);
+	HRESULT			BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags);
+	HRESULT			BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags);
+	HRESULT			BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags);
+
 	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 };

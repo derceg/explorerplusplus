@@ -27,15 +27,18 @@ TOOLBAR_SEARCH, TOOLBAR_PROPERTIES, TOOLBAR_REFRESH,
 TOOLBAR_ADDBOOKMARK, TOOLBAR_NEWTAB, TOOLBAR_OPENCOMMANDPROMPT,
 TOOLBAR_ORGANIZEBOOKMARKS, TOOLBAR_DELETEPERMANENTLY };
 
-MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp, std::shared_ptr<Config> config)
+MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
+	TabContainerInterface *tabContainer, std::shared_ptr<Config> config)
 {
-	return new MainToolbar(parent, instance, pexpp, config);
+	return new MainToolbar(parent, instance, pexpp, tabContainer, config);
 }
 
-MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp, std::shared_ptr<Config> config) :
+MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
+	TabContainerInterface *tabContainer, std::shared_ptr<Config> config) :
 	CBaseWindow(CreateMainToolbar(parent)),
 	m_instance(instance),
 	m_pexpp(pexpp),
+	m_tabContainer(tabContainer),
 	m_config(config)
 {
 	Initialize(parent);
@@ -688,7 +691,7 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 
 		if (SUCCEEDED(hr))
 		{
-			m_pexpp->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+			m_tabContainer->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
 
 			CoTaskMemFree(pidl);
 		}
@@ -705,7 +708,7 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 
 		if (SUCCEEDED(hr))
 		{
-			m_pexpp->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+			m_tabContainer->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
 
 			CoTaskMemFree(pidl);
 		}

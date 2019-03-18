@@ -23,8 +23,9 @@ namespace NManageBookmarksDialog
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-	IExplorerplusplus *pexpp, CBookmarkFolder &AllBookmarks) :
+	IExplorerplusplus *pexpp, TabContainerInterface *tabContainer, CBookmarkFolder &AllBookmarks) :
 m_pexpp(pexpp),
+m_tabContainer(tabContainer),
 m_AllBookmarks(AllBookmarks),
 m_guidCurrentFolder(AllBookmarks.GetGUID()),
 m_bNewFolderAdded(false),
@@ -905,7 +906,7 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 		else if(variantBookmark.type() == typeid(CBookmark))
 		{
 			const CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
-			m_pexpp->BrowseFolderInCurrentTab(Bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+			m_tabContainer->BrowseFolderInCurrentTab(Bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 		}
 	}
 }

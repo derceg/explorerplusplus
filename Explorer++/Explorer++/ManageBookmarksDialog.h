@@ -7,6 +7,7 @@
 #include "BookmarkHelper.h"
 #include "BookmarkListView.h"
 #include "BookmarkTreeView.h"
+#include "TabContainerInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -67,7 +68,8 @@ class CManageBookmarksDialog : public CBaseDialog, public NBookmark::IBookmarkIt
 {
 public:
 
-	CManageBookmarksDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp, CBookmarkFolder &AllBookmarks);
+	CManageBookmarksDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp,
+		TabContainerInterface *tabContainer, CBookmarkFolder &AllBookmarks);
 	~CManageBookmarksDialog();
 
 	int CALLBACK		SortBookmarks(LPARAM lParam1,LPARAM lParam2);
@@ -146,6 +148,7 @@ private:
 	HIMAGELIST					m_himlToolbar;
 
 	IExplorerplusplus			*m_pexpp;
+	TabContainerInterface		*m_tabContainer;
 
 	CBookmarkFolder				&m_AllBookmarks;
 
