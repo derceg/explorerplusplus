@@ -26,7 +26,7 @@ std::vector<Plugins::TabsApi::Tab> Plugins::TabsApi::getAll()
 {
 	std::vector<Tab> tabs;
 
-	for (auto item : m_tabContainer->GetAllTabs())
+	for (auto &item : m_tabContainer->GetAllTabs())
 	{
 		Tab tab(item.second);
 		tabs.push_back(tab);

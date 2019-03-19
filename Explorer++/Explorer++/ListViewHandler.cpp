@@ -679,7 +679,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
-	for (auto item : m_Tabs)
+	for (auto &item : m_Tabs)
 	{
 		if (item.second.listView == hListView)
 		{

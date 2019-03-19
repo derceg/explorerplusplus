@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ShellBrowser/iShellView.h"
+#include "../Helper/Macros.h"
 
 // Used when creating a tab.
 struct TabSettings
@@ -41,6 +42,8 @@ public:
 	//BOOL	bUsingDefaultColumns;
 
 private:
+
+	DISALLOW_COPY_AND_ASSIGN(Tab);
 
 	const int m_id;
 	CShellBrowser *m_shellBrowser;
