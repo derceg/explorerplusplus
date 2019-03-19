@@ -6,6 +6,7 @@
 
 #include "ShellBrowser/iShellView.h"
 #include "../Helper/Macros.h"
+#include <boost/signals2.hpp>
 
 // Used when creating a tab.
 struct TabSettings
@@ -20,6 +21,14 @@ class Tab
 {
 public:
 
+	enum class PropertyType
+	{
+		LOCKED,
+		ADDRESS_LOCKED
+	};
+
+	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)> TabUpdatedSignal;
+
 	Tab(int id);
 
 	int GetId() const;
@@ -29,6 +38,8 @@ public:
 	void SetLocked(bool locked);
 	bool GetAddressLocked() const;
 	void SetAddressLocked(bool addressLocked);
+
+	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 
 	HWND	listView;
 	BOOL	bUseCustomName;
@@ -49,4 +60,6 @@ private:
 	CShellBrowser *m_shellBrowser;
 	bool m_locked;
 	bool m_addressLocked;
+
+	TabUpdatedSignal m_tabUpdatedSignal;
 };

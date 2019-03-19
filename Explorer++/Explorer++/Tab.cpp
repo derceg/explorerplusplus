@@ -37,6 +37,11 @@ bool Tab::GetLocked() const
 
 void Tab::SetLocked(bool locked)
 {
+	if (locked == m_locked)
+	{
+		return;
+	}
+
 	m_locked = locked;
 
 	/* The "Lock Tab" and "Lock Tab and Address" options are mutually
@@ -45,6 +50,8 @@ void Tab::SetLocked(bool locked)
 	{
 		m_addressLocked = false;
 	}
+
+	m_tabUpdatedSignal(*this, PropertyType::LOCKED);
 }
 
 bool Tab::GetAddressLocked() const
@@ -54,10 +61,22 @@ bool Tab::GetAddressLocked() const
 
 void Tab::SetAddressLocked(bool addressLocked)
 {
+	if (addressLocked == m_addressLocked)
+	{
+		return;
+	}
+
 	m_addressLocked = addressLocked;
 
 	if (addressLocked)
 	{
 		m_locked = false;
 	}
+
+	m_tabUpdatedSignal(*this, PropertyType::ADDRESS_LOCKED);
+}
+
+boost::signals2::connection Tab::AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer)
+{
+	return m_tabUpdatedSignal.connect(observer);
 }

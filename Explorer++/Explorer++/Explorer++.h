@@ -480,8 +480,6 @@ private:
 	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 	bool					CloseTab(const Tab &tab);
-	void					LockTab(Tab &tab, bool lock);
-	void					LockTabAndAddress(Tab &tab, bool lock);
 	void					RemoveTabFromControl(int iTab);
 	bool					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
@@ -501,6 +499,7 @@ private:
 	boost::optional<int>	GetTabIndex(const Tab &tab);
 	int						GetNumTabs() const;
 	int						MoveTab(const Tab &tab, int newIndex);
+	void					OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 
 	/* PluginInterface. */
 	TabContainerInterface	*GetTabContainer();

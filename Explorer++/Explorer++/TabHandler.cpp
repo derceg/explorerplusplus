@@ -513,6 +513,11 @@ int *pTabObjectIndex)
 
 	SetTabIcon(tab);
 
+	// There's no need to manually disconnect this. Either it will be
+	// disconnected when the tab is closed and the tab object (and
+	// associated signal) is destroyed or when the tab is destroyed
+	// during application shutdown.
+	tab.AddTabUpdatedObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
 	m_tabCreatedSignal(tab.GetId(), bSwitchToNewTab);
 
 	if (bSwitchToNewTab)
@@ -1236,22 +1241,7 @@ void Explorerplusplus::OnLockTab(int iTab)
 		return;
 	}
 
-	LockTab(*tab, !tab->GetLocked());
-}
-
-void Explorerplusplus::LockTab(Tab &tab, bool lock)
-{
-	tab.SetLocked(lock);
-
-	SetTabIcon(tab);
-
-	/* If the tab that was locked/unlocked is the
-	currently selected tab, then the tab close
-	button on the toolbar will need to be updated. */
-	if (tab.GetId() == m_selectedTabId)
-	{
-		UpdateTabToolbar();
-	}
+	tab->SetLocked(!tab->GetLocked());
 }
 
 void Explorerplusplus::OnLockTabAndAddress(int iTab)
@@ -1263,18 +1253,25 @@ void Explorerplusplus::OnLockTabAndAddress(int iTab)
 		return;
 	}
 
-	LockTabAndAddress(*tab, !tab->GetAddressLocked());
+	tab->SetAddressLocked(!tab->GetAddressLocked());
 }
 
-void Explorerplusplus::LockTabAndAddress(Tab &tab, bool lock)
+void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 {
-	tab.SetAddressLocked(lock);
-
-	SetTabIcon(tab);
-
-	if (tab.GetId() == m_selectedTabId)
+	switch (propertyType)
 	{
-		UpdateTabToolbar();
+	case Tab::PropertyType::LOCKED:
+	case Tab::PropertyType::ADDRESS_LOCKED:
+		SetTabIcon(tab);
+
+		/* If the tab that was locked/unlocked is the
+		currently selected tab, then the tab close
+		button on the toolbar will need to be updated. */
+		if (tab.GetId() == m_selectedTabId)
+		{
+			UpdateTabToolbar();
+		}
+		break;
 	}
 }
 

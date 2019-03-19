@@ -104,14 +104,14 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 	if (locked)
 	{
-		m_tabContainer->LockTab(*tabInternal, *locked);
+		tabInternal->SetLocked(*locked);
 	}
 
 	boost::optional<bool> addressLocked = properties["addressLocked"];
 
 	if (addressLocked)
 	{
-		m_tabContainer->LockTabAndAddress(*tabInternal, *addressLocked);
+		tabInternal->SetAddressLocked(*addressLocked);
 	}
 
 	boost::optional<bool> active = properties["active"];
