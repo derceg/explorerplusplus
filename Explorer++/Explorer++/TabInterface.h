@@ -8,7 +8,5 @@
 
 __interface TabInterface
 {
-	void			SetTabName(Tab &tab, const std::wstring strName);
-	void			ClearTabName(Tab &tab);
 	HRESULT			RefreshTab(Tab &tab);
 };

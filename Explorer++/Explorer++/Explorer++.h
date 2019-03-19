@@ -486,9 +486,7 @@ private:
 	HRESULT					RefreshTab(Tab &tab);
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
-	void					SetTabName(Tab &tab, const std::wstring strName);
-	void					ClearTabName(Tab &tab);
-	void					UpdateTabNameInWindow(Tab &tab);
+	void					UpdateTabNameInWindow(const Tab &tab);
 	int						GetSelectedTabId() const;
 	int						GetSelectedTabIndex() const;
 	void					SelectTab(const Tab &tab);
@@ -581,7 +579,6 @@ private:
 	void					UpdateWindowStates(void);
 	void					UpdateMainWindowText(void);
 	void					UpdateAddressBarText(void);
-	void					UpdateTabText(Tab &tab);
 	void					SetTabIcon(const Tab &tab);
 	void					UpdateTreeViewSelection(void);
 	void					SetStatusBarParts(int width);
@@ -601,7 +598,7 @@ private:
 	void					RemoveTabProxy(int iTabId);
 	void					InvalidateTaskbarThumbnailBitmap(int iTabId);
 	void					UpdateTaskbarThumbnailsForTabSelectionChange(int selectedTabId);
-	void					UpdateTaskbarThumbnailTtitle(int tabId, const std::wstring &title);
+	void					UpdateTaskbarThumbnailTtitle(const Tab &tab);
 	void					SetTabProxyIcon(const Tab &tab, HICON hIcon);
 
 	/* Windows 7 jumplist tasks. */

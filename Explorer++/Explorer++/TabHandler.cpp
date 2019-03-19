@@ -17,6 +17,7 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"
+#include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <list>
 
@@ -181,33 +182,7 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 	return DefSubclassProc(hTab,msg,wParam,lParam);
 }
 
-void Explorerplusplus::SetTabName(Tab &tab,const std::wstring strName)
-{
-	tab.bUseCustomName = TRUE;
-	StringCchCopy(tab.szName, SIZEOF_ARRAY(tab.szName),strName.c_str());
-
-	UpdateTabNameInWindow(tab);
-}
-
-void Explorerplusplus::ClearTabName(Tab &tab)
-{
-	PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
-
-	TCHAR name[MAX_PATH];
-	HRESULT hr = GetDisplayName(pidlDirectory.get(), name, SIZEOF_ARRAY(name), SHGDN_INFOLDER);
-
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	tab.bUseCustomName = FALSE;
-	StringCchCopy(tab.szName, SIZEOF_ARRAY(tab.szName), name);
-
-	UpdateTabNameInWindow(tab);
-}
-
-void Explorerplusplus::UpdateTabNameInWindow(Tab &tab)
+void Explorerplusplus::UpdateTabNameInWindow(const Tab &tab)
 {
 	auto index = GetTabIndex(tab);
 
@@ -217,10 +192,12 @@ void Explorerplusplus::UpdateTabNameInWindow(Tab &tab)
 		return;
 	}
 
-	TCITEM tcItem;
-	tcItem.mask = TCIF_TEXT;
-	tcItem.pszText = tab.szName;
-	TabCtrl_SetItem(m_hTabCtrl, *index, &tcItem);
+	std::wstring name = tab.GetName();
+	boost::replace_all(name, L"&", L"&&");
+
+	TabCtrl_SetItemText(m_hTabCtrl, *index, name.c_str());
+
+	UpdateTaskbarThumbnailTtitle(tab);
 }
 
 int Explorerplusplus::GetSelectedTabId() const
@@ -345,19 +322,14 @@ int *pTabObjectIndex)
 
 	Tab &tab = m_Tabs.at(tabId);
 
-	if(pTabSettings == NULL)
-	{
-		tab.bUseCustomName	= FALSE;
-	}
-	else
+	if(pTabSettings != NULL)
 	{
 		tab.SetLocked(pTabSettings->bLocked);
 		tab.SetAddressLocked(pTabSettings->bAddressLocked);
-		tab.bUseCustomName = pTabSettings->bUseCustomName;
 
 		if (pTabSettings->bUseCustomName)
 		{
-			StringCchCopy(tab.szName, SIZEOF_ARRAY(tab.szName), pTabSettings->szName);
+			tab.SetCustomName(pTabSettings->szName);
 		}
 	}
 
@@ -1177,26 +1149,28 @@ void Explorerplusplus::AddDefaultTabIcons(HIMAGELIST himlTab)
 
 void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId)
 {
-	TCITEM		tcItem;
-	TCHAR		szTabText[MAX_PATH];
-	TCHAR		szExpandedTabText[MAX_PATH];
+	std::wstring name;
 
-	/* If no custom name is set, use the folders name. */
-	if(!m_Tabs.at(iTabId).bUseCustomName)
+	if (m_Tabs.at(iTabId).GetUseCustomName())
 	{
-		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
+		name = m_Tabs.at(iTabId).GetName();
+	}
+	else
+	{
+		TCHAR folderName[MAX_PATH];
+		GetDisplayName(pidlDirectory, folderName, SIZEOF_ARRAY(folderName), SHGDN_INFOLDER);
 
-		StringCchCopy(m_Tabs.at(iTabId).szName,
-			SIZEOF_ARRAY(m_Tabs.at(iTabId).szName),szTabText);
+		name = folderName;
 	}
 
-	ReplaceCharacterWithString(m_Tabs.at(iTabId).szName,szExpandedTabText,
-		SIZEOF_ARRAY(szExpandedTabText),'&',_T("&&"));
+	boost::replace_all(name, L"&", L"&&");
 
-	/* Tab control insertion information. The folders name will be used
-	as the tab text. */
+	TCHAR tabText[MAX_PATH];
+	StringCchCopy(tabText, SIZEOF_ARRAY(tabText), name.c_str());
+
+	TCITEM tcItem;
 	tcItem.mask			= TCIF_TEXT|TCIF_PARAM;
-	tcItem.pszText		= szExpandedTabText;
+	tcItem.pszText		= tabText;
 	tcItem.lParam		= iTabId;
 
 	SendMessage(m_hTabCtrl,TCM_INSERTITEM,(WPARAM)iNewTabIndex,(LPARAM)&tcItem);
@@ -1271,6 +1245,10 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 		{
 			UpdateTabToolbar();
 		}
+		break;
+
+	case Tab::PropertyType::NAME:
+		UpdateTabNameInWindow(tab);
 		break;
 	}
 }

@@ -24,7 +24,8 @@ public:
 	enum class PropertyType
 	{
 		LOCKED,
-		ADDRESS_LOCKED
+		ADDRESS_LOCKED,
+		NAME
 	};
 
 	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)> TabUpdatedSignal;
@@ -32,8 +33,15 @@ public:
 	Tab(int id);
 
 	int GetId() const;
+
 	CShellBrowser *GetShellBrowser() const;
 	void SetShellBrowser(CShellBrowser *shellBrowser);
+
+	std::wstring GetName() const;
+	bool GetUseCustomName() const;
+	void SetCustomName(const std::wstring &name);
+	void ClearCustomName();
+
 	bool GetLocked() const;
 	void SetLocked(bool locked);
 	bool GetAddressLocked() const;
@@ -42,8 +50,6 @@ public:
 	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 
 	HWND	listView;
-	BOOL	bUseCustomName;
-	TCHAR	szName[MAX_PATH];
 
 	/* Although each tab manages its
 	own columns, it does not know
@@ -58,6 +64,8 @@ private:
 
 	const int m_id;
 	CShellBrowser *m_shellBrowser;
+	bool m_useCustomName;
+	std::wstring m_customName;
 	bool m_locked;
 	bool m_addressLocked;
 

@@ -109,7 +109,7 @@ LRESULT CALLBACK Explorerplusplus::MainWndTaskbarThumbnailProc(HWND hwnd,UINT uM
 
 			RegisterTab(itr->hProxy,EMPTY_STRING,bActive);
 
-			UpdateTabText(*tab);
+			UpdateTabNameInWindow(*tab);
 			SetTabIcon(*tab);
 		}
 
@@ -769,7 +769,7 @@ void Explorerplusplus::UpdateTaskbarThumbnailsForTabSelectionChange(int selected
 	}
 }
 
-void Explorerplusplus::UpdateTaskbarThumbnailTtitle(int tabId, const std::wstring &title)
+void Explorerplusplus::UpdateTaskbarThumbnailTtitle(const Tab &tab)
 {
 	if (!m_bTaskbarInitialised)
 	{
@@ -778,10 +778,10 @@ void Explorerplusplus::UpdateTaskbarThumbnailTtitle(int tabId, const std::wstrin
 
 	for (const TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
 	{
-		if (tabProxyInfo.iTabId == tabId)
+		if (tabProxyInfo.iTabId == tab.GetId())
 		{
-			SetWindowText(tabProxyInfo.hProxy, title.c_str());
-			m_pTaskbarList->SetThumbnailTooltip(tabProxyInfo.hProxy, title.c_str());
+			SetWindowText(tabProxyInfo.hProxy, tab.GetName().c_str());
+			m_pTaskbarList->SetThumbnailTooltip(tabProxyInfo.hProxy, tab.GetName().c_str());
 			break;
 		}
 	}

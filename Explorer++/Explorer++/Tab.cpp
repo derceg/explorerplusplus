@@ -7,6 +7,7 @@
 
 Tab::Tab(int id) :
 	m_id(id),
+	m_useCustomName(false),
 	m_locked(false),
 	m_addressLocked(false)
 {
@@ -28,6 +29,49 @@ during construction of the tab object). */
 void Tab::SetShellBrowser(CShellBrowser *shellBrowser)
 {
 	m_shellBrowser = shellBrowser;
+}
+
+// If a custom name has been set, that will be returned. Otherwise, the
+// display name of the current directory will be returned.
+std::wstring Tab::GetName() const
+{
+	if (m_useCustomName)
+	{
+		return m_customName;
+	}
+
+	PIDLPointer pidlDirectory(m_shellBrowser->QueryCurrentDirectoryIdl());
+
+	TCHAR name[MAX_PATH];
+	HRESULT hr = GetDisplayName(pidlDirectory.get(), name, SIZEOF_ARRAY(name), SHGDN_INFOLDER);
+
+	if (FAILED(hr))
+	{
+		return L"(Unknown)";
+	}
+
+	return name;
+}
+
+bool Tab::GetUseCustomName() const
+{
+	return m_useCustomName;
+}
+
+void Tab::SetCustomName(const std::wstring &name)
+{
+	m_useCustomName = true;
+	m_customName = name;
+
+	m_tabUpdatedSignal(*this, PropertyType::NAME);
+}
+
+void Tab::ClearCustomName()
+{
+	m_useCustomName = false;
+	m_customName.erase();
+
+	m_tabUpdatedSignal(*this, PropertyType::NAME);
 }
 
 bool Tab::GetLocked() const

@@ -361,41 +361,6 @@ void Explorerplusplus::UpdateAddressBarText(void)
 	CoTaskMemFree(pidl);
 }
 
-void Explorerplusplus::UpdateTabText(Tab &tab)
-{
-	TCHAR szFinalTabText[MAX_PATH];
-
-	if(!tab.bUseCustomName)
-	{
-		LPITEMIDLIST pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
-
-		TCHAR szTabText[MAX_PATH];
-		GetDisplayName(pidlDirectory,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_INFOLDER);
-
-		StringCchCopy(tab.szName, SIZEOF_ARRAY(tab.szName),szTabText);
-
-		TCHAR szExpandedTabText[MAX_PATH];
-		ReplaceCharacterWithString(szTabText,szExpandedTabText,
-			SIZEOF_ARRAY(szExpandedTabText),'&',_T("&&"));
-
-		auto index = GetTabIndex(tab);
-		assert(index);
-
-		TabCtrl_SetItemText(m_hTabCtrl, *index, szExpandedTabText);
-
-		StringCchCopy(szFinalTabText,SIZEOF_ARRAY(szFinalTabText),szExpandedTabText);
-
-		CoTaskMemFree(pidlDirectory);
-	}
-	else
-	{
-		StringCchCopy(szFinalTabText,SIZEOF_ARRAY(szFinalTabText),tab.szName);
-	}
-
-	/* Set the tab proxy text. */
-	UpdateTaskbarThumbnailTtitle(tab.GetId(), szFinalTabText);
-}
-
 /* Sets a tabs icon. Normally, this icon
 is the folders icon, however if the tab
 is locked, the icon will be a lock. */

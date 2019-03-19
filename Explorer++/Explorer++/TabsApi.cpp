@@ -80,11 +80,11 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 	{
 		if (name->empty())
 		{
-			m_tabInterface->ClearTabName(*tabInternal);
+			tabInternal->ClearCustomName();
 		}
 		else
 		{
-			m_tabInterface->SetTabName(*tabInternal, *name);
+			tabInternal->SetCustomName(*name);
 		}
 	}
 

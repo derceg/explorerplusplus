@@ -71,7 +71,7 @@ namespace Plugins
 
 				id = tabInternal.GetId();
 				location = path;
-				name = tabInternal.szName;
+				name = tabInternal.GetName();
 				locked = tabInternal.GetLocked();
 				addressLocked = tabInternal.GetAddressLocked();
 			}

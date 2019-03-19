@@ -38,7 +38,7 @@ INT_PTR CRenameTabDialog::OnInitDialog()
 
 	Tab *tab = m_tabContainer->GetTab(m_tabId);
 
-	SetWindowText(hEditName, tab->szName);
+	SetWindowText(hEditName, tab->GetName().c_str());
 
 	/* When this dialog is opened, the 'custom name' option will
 	be selected by default (whether or not that is the actual
@@ -111,7 +111,7 @@ void CRenameTabDialog::OnOk()
 
 	if (uCheckStatus == BST_CHECKED)
 	{
-		m_ti->ClearTabName(*tab);
+		tab->ClearCustomName();
 	}
 	else
 	{
@@ -121,7 +121,7 @@ void CRenameTabDialog::OnOk()
 
 		if (lstrlen(szTabText) > 0)
 		{
-			m_ti->SetTabName(*tab, szTabText);
+			tab->SetCustomName(szTabText);
 		}
 	}
 

@@ -940,10 +940,10 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("AddressLocked"),
 			NXMLSettings::EncodeBoolValue(tab.GetAddressLocked()));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("UseCustomName"),
-			NXMLSettings::EncodeBoolValue(tab.bUseCustomName));
+			NXMLSettings::EncodeBoolValue(tab.GetUseCustomName()));
 
-		if(tab.bUseCustomName)
-			NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CustomName"), tab.szName);
+		if(tab.GetUseCustomName())
+			NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CustomName"), tab.GetName().c_str());
 		else
 			NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("CustomName"), EMPTY_STRING);
 

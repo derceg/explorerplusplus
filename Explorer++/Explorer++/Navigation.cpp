@@ -187,7 +187,7 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 	InvalidateTaskbarThumbnailBitmap(tab.GetId());
 
 	SetTabIcon(tab);
-	UpdateTabText(tab);
+	UpdateTabNameInWindow(tab);
 }
 
 void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
