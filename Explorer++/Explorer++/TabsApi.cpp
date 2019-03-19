@@ -37,7 +37,7 @@ std::vector<Plugins::TabsApi::Tab> Plugins::TabsApi::getAll()
 
 boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 {
-	auto tabInternal = m_tabContainer->GetTab(tabId);
+	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{
@@ -60,7 +60,7 @@ void Plugins::TabsApi::create(std::wstring path)
 
 void Plugins::TabsApi::update(int tabId, sol::table properties)
 {
-	auto tabInternal = m_tabContainer->GetTab(tabId);
+	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{
@@ -124,7 +124,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 void Plugins::TabsApi::refresh(int tabId)
 {
-	auto tabInternal = m_tabContainer->GetTab(tabId);
+	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{
@@ -136,7 +136,7 @@ void Plugins::TabsApi::refresh(int tabId)
 
 int Plugins::TabsApi::move(int tabId, int newIndex)
 {
-	auto tabInternal = m_tabContainer->GetTab(tabId);
+	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{
@@ -153,7 +153,7 @@ int Plugins::TabsApi::move(int tabId, int newIndex)
 
 bool Plugins::TabsApi::close(int tabId)
 {
-	auto tabInternal = m_tabContainer->GetTab(tabId);
+	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{
@@ -184,7 +184,7 @@ int Plugins::TabsApi::addTabCreatedObserver(sol::protected_function observer)
 
 void Plugins::TabsApi::onTabCreated(int tabId, sol::protected_function observer)
 {
-	auto tabInternal = m_tabContainer->GetTab(tabId);
+	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tabInternal)
 	{

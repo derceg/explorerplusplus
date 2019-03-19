@@ -274,7 +274,7 @@ void CSelectColumnsDialog::OnOk()
 
 	if(m_bColumnsSwapped)
 	{
-		m_ti->RefreshTab(*m_tabContainer->GetTab(m_tabContainer->GetSelectedTabId()));
+		m_ti->RefreshTab(*m_tabContainer->GetTabOptional(m_tabContainer->GetSelectedTabId()));
 	}
 
 	EndDialog(m_hDlg,1);

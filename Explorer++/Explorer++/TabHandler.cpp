@@ -1396,7 +1396,7 @@ void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 	m_Tabs.at(iTabId).GetShellBrowser()->SetGlobalSettings(&gs);
 }
 
-Tab *Explorerplusplus::GetTab(int tabId)
+Tab *Explorerplusplus::GetTabOptional(int tabId)
 {
 	auto itr = m_Tabs.find(tabId);
 
@@ -1419,7 +1419,7 @@ Tab *Explorerplusplus::GetTabByIndex(int index)
 		return nullptr;
 	}
 
-	return GetTab(static_cast<int>(tcItem.lParam));
+	return GetTabOptional(static_cast<int>(tcItem.lParam));
 }
 
 boost::optional<int> Explorerplusplus::GetTabIndex(const Tab &tab)

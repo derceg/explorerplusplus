@@ -20,7 +20,7 @@ __interface TabContainerInterface
 	without having access to the underlying container. */
 	const std::unordered_map<int, Tab>	&GetAllTabs() const;
 
-	Tab				*GetTab(int tabId);
+	Tab				*GetTabOptional(int tabId);
 	Tab				*GetTabByIndex(int index);
 	int				GetSelectedTabId() const;
 	int				GetSelectedTabIndex() const;

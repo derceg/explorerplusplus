@@ -36,7 +36,7 @@ INT_PTR CRenameTabDialog::OnInitDialog()
 {
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
 
-	Tab *tab = m_tabContainer->GetTab(m_tabId);
+	Tab *tab = m_tabContainer->GetTabOptional(m_tabId);
 
 	SetWindowText(hEditName, tab->GetName().c_str());
 
@@ -107,7 +107,7 @@ void CRenameTabDialog::OnOk()
 
 	UINT uCheckStatus = IsDlgButtonChecked(m_hDlg,IDC_RENAMETAB_USEFOLDERNAME);
 
-	Tab *tab = m_tabContainer->GetTab(m_tabId);
+	Tab *tab = m_tabContainer->GetTabOptional(m_tabId);
 
 	if (uCheckStatus == BST_CHECKED)
 	{

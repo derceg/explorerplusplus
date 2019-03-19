@@ -102,7 +102,7 @@ LRESULT CALLBACK Explorerplusplus::MainWndTaskbarThumbnailProc(HWND hwnd,UINT uM
 		/* Register each of the tabs. */
 		for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 		{
-			auto tab = GetTab(itr->iTabId);
+			auto tab = GetTabOptional(itr->iTabId);
 			assert(tab != nullptr);
 
 			BOOL bActive = (tab->GetId() == m_selectedTabId);

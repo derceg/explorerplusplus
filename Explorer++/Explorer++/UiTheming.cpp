@@ -22,7 +22,7 @@ void UiTheming::OnTabCreated(int tabId, BOOL switchToNewTab)
 {
 	UNREFERENCED_PARAMETER(switchToNewTab);
 
-	auto tab = m_tabContainer->GetTab(tabId);
+	auto tab = m_tabContainer->GetTabOptional(tabId);
 
 	if (!tab)
 	{
