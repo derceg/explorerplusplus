@@ -102,6 +102,9 @@ namespace Plugins
 		int addTabCreatedObserver(sol::protected_function observer);
 		void removeTabCreatedObserver(int id);
 
+		int addTabMovedObserver(sol::protected_function observer);
+		void removeTabMovedObserver(int id);
+
 		int addTabRemovedObserver(sol::protected_function observer);
 		void removeTabRemovedObserver(int id);
 
@@ -114,6 +117,9 @@ namespace Plugins
 
 		int m_tabCreatedIdCounter;
 		std::unordered_map<int, boost::signals2::connection> m_tabCreatedConnections;
+
+		int m_tabMovedIdCounter;
+		std::unordered_map<int, boost::signals2::connection> m_tabMovedConnections;
 
 		int m_tabRemovedIdCounter;
 		std::unordered_map<int, boost::signals2::connection> m_tabRemovedConnections;

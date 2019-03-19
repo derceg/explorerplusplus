@@ -505,6 +505,11 @@ boost::signals2::connection Explorerplusplus::AddTabCreatedObserver(const TabCre
 	return m_tabCreatedSignal.connect(observer);
 }
 
+boost::signals2::connection Explorerplusplus::AddTabMovedObserver(const TabMovedSignal::slot_type &observer)
+{
+	return m_tabMovedSignal.connect(observer);
+}
+
 boost::signals2::connection Explorerplusplus::AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer)
 {
 	return m_tabRemovedSignal.connect(observer);
@@ -945,72 +950,91 @@ void Explorerplusplus::OnTabCtrlLButtonDown(POINT *pt)
 		SetCapture(m_hTabCtrl);
 
 		m_bTabBeenDragged = TRUE;
+		m_draggedTabStartIndex = ItemNum;
+		m_draggedTabEndIndex = ItemNum;
 	}
 }
 
 void Explorerplusplus::OnTabCtrlLButtonUp(void)
 {
-	if(GetCapture() == m_hTabCtrl)
-		ReleaseCapture();
+	if (!m_bTabBeenDragged)
+	{
+		return;
+	}
+
+	ReleaseCapture();
 
 	m_bTabBeenDragged = FALSE;
+
+	if (m_draggedTabEndIndex != m_draggedTabStartIndex)
+	{
+		const Tab *tab = GetTabByIndex(m_draggedTabEndIndex);
+
+		if (tab)
+		{
+			m_tabMovedSignal(*tab, m_draggedTabStartIndex, m_draggedTabEndIndex);
+		}
+	}
 }
 
 void Explorerplusplus::OnTabCtrlMouseMove(POINT *pt)
 {
-	/* Is a tab currently been dragged? */
-	if(m_bTabBeenDragged)
+	if (!m_bTabBeenDragged)
 	{
-		/* Dragged tab. */
-		int iSelected = TabCtrl_GetCurFocus(m_hTabCtrl);
+		return;
+	}
 
-		TCHITTESTINFO HitTestInfo;
-		HitTestInfo.pt = *pt;
-		int iSwap = TabCtrl_HitTest(m_hTabCtrl,&HitTestInfo);
+	/* Dragged tab. */
+	int iSelected = TabCtrl_GetCurFocus(m_hTabCtrl);
 
-		/* Check:
-		- If the cursor is over an item.
-		- If the cursor is not over the dragged item itself.
-		- If the cursor has passed to the left of the dragged tab, or
-		- If the cursor has passed to the right of the dragged tab. */
-		if(HitTestInfo.flags != TCHT_NOWHERE &&
-			iSwap != iSelected &&
-			(pt->x < m_rcDraggedTab.left ||
-			pt->x > m_rcDraggedTab.right))
+	TCHITTESTINFO HitTestInfo;
+	HitTestInfo.pt = *pt;
+	int iSwap = TabCtrl_HitTest(m_hTabCtrl,&HitTestInfo);
+
+	/* Check:
+	- If the cursor is over an item.
+	- If the cursor is not over the dragged item itself.
+	- If the cursor has passed to the left of the dragged tab, or
+	- If the cursor has passed to the right of the dragged tab. */
+	if(HitTestInfo.flags != TCHT_NOWHERE &&
+		iSwap != iSelected &&
+		(pt->x < m_rcDraggedTab.left ||
+		pt->x > m_rcDraggedTab.right))
+	{
+		RECT rcSwap;
+
+		TabCtrl_GetItemRect(m_hTabCtrl,iSwap,&rcSwap);
+
+		/* These values need to be adjusted, since
+		tabs are adjusted whenever the dragged tab
+		passes a boundary, not when the cursor is
+		released. */
+		if(pt->x > m_rcDraggedTab.right)
 		{
-			RECT rcSwap;
-
-			TabCtrl_GetItemRect(m_hTabCtrl,iSwap,&rcSwap);
-
-			/* These values need to be adjusted, since
-			tabs are adjusted whenever the dragged tab
-			passes a boundary, not when the cursor is
-			released. */
-			if(pt->x > m_rcDraggedTab.right)
-			{
-				/* Cursor has gone past the right edge of
-				the dragged tab. */
-				m_rcDraggedTab.left		= m_rcDraggedTab.right;
-				m_rcDraggedTab.right	= rcSwap.right;
-			}
-			else
-			{
-				/* Cursor has gone past the left edge of
-				the dragged tab. */
-				m_rcDraggedTab.right	= m_rcDraggedTab.left;
-				m_rcDraggedTab.left		= rcSwap.left;
-			}
-
-			/* Swap the dragged tab with the tab the cursor
-			finished up on. */
-			TabCtrl_SwapItems(m_hTabCtrl,iSelected,iSwap);
-
-			/* The index of the selected tab has now changed
-			(but the actual tab/browser selected remains the
-			same). */
-			m_selectedTabIndex = iSwap;
-			TabCtrl_SetCurFocus(m_hTabCtrl,iSwap);
+			/* Cursor has gone past the right edge of
+			the dragged tab. */
+			m_rcDraggedTab.left		= m_rcDraggedTab.right;
+			m_rcDraggedTab.right	= rcSwap.right;
 		}
+		else
+		{
+			/* Cursor has gone past the left edge of
+			the dragged tab. */
+			m_rcDraggedTab.right	= m_rcDraggedTab.left;
+			m_rcDraggedTab.left		= rcSwap.left;
+		}
+
+		/* Swap the dragged tab with the tab the cursor
+		finished up on. */
+		TabCtrl_SwapItems(m_hTabCtrl,iSelected,iSwap);
+
+		/* The index of the selected tab has now changed
+		(but the actual tab/browser selected remains the
+		same). */
+		m_selectedTabIndex = iSwap;
+		TabCtrl_SetCurFocus(m_hTabCtrl,iSwap);
+
+		m_draggedTabEndIndex = iSwap;
 	}
 }
 

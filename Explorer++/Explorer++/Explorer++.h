@@ -477,8 +477,6 @@ private:
 	HRESULT					CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
 	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, TabSettings *pTabSettings, BOOL bSwitchToNewTab, int *pTabObjectIndex);
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
-	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
-	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(int iTab);
 	bool					OnCloseTab(void);
@@ -499,6 +497,11 @@ private:
 	int						GetNumTabs() const;
 	int						MoveTab(const Tab &tab, int newIndex);
 	void					OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
+
+	/* Tab events. */
+	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
+	boost::signals2::connection AddTabMovedObserver(const TabMovedSignal::slot_type &observer);
+	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 
 	/* PluginInterface. */
 	TabContainerInterface	*GetTabContainer();
@@ -805,6 +808,7 @@ private:
 
 	/* Tab signals. */
 	TabCreatedSignal		m_tabCreatedSignal;
+	TabMovedSignal			m_tabMovedSignal;
 	TabRemovedSignal		m_tabRemovedSignal;
 
 	ToolbarContextMenuSignal	m_toolbarContextMenuSignal;
@@ -917,9 +921,13 @@ private:
 	/* Tab handler data. */
 	std::vector<int>		m_TabSelectionHistory;
 	int						m_iPreviousTabSelectionId;
-	BOOL					m_bTabBeenDragged;
-	RECT					m_rcDraggedTab;
 	int						m_iTabMenuItem;
+
+	/* Tab dragging. */
+	BOOL					m_bTabBeenDragged;
+	int						m_draggedTabStartIndex;
+	int						m_draggedTabEndIndex;
+	RECT					m_rcDraggedTab;
 	
 	/* Cut items data. */
 	std::list<std::wstring>	m_CutFileNameList;

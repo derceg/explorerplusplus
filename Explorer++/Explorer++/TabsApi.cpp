@@ -9,6 +9,7 @@ Plugins::TabsApi::TabsApi(TabContainerInterface *tabContainer, TabInterface *tab
 	m_tabContainer(tabContainer),
 	m_tabInterface(tabInterface),
 	m_tabCreatedIdCounter(1),
+	m_tabMovedIdCounter(1),
 	m_tabRemovedIdCounter(1)
 {
 
@@ -17,6 +18,16 @@ Plugins::TabsApi::TabsApi(TabContainerInterface *tabContainer, TabInterface *tab
 Plugins::TabsApi::~TabsApi()
 {
 	for (auto item : m_tabCreatedConnections)
+	{
+		item.second.disconnect();
+	}
+
+	for (auto item : m_tabMovedConnections)
+	{
+		item.second.disconnect();
+	}
+
+	for (auto item : m_tabRemovedConnections)
 	{
 		item.second.disconnect();
 	}
@@ -207,6 +218,37 @@ void Plugins::TabsApi::removeTabCreatedObserver(int id)
 	itr->second.disconnect();
 
 	m_tabCreatedConnections.erase(itr);
+}
+
+int Plugins::TabsApi::addTabMovedObserver(sol::protected_function observer)
+{
+	if (!observer)
+	{
+		return -1;
+	}
+
+	auto connection = m_tabContainer->AddTabMovedObserver([observer] (const Tab &tab, int fromIndex, int toIndex) {
+		observer(tab.id, fromIndex, toIndex);
+	});
+
+	int id = m_tabMovedIdCounter++;
+	m_tabMovedConnections.insert(std::make_pair(id, connection));
+
+	return id;
+}
+
+void Plugins::TabsApi::removeTabMovedObserver(int id)
+{
+	auto itr = m_tabMovedConnections.find(id);
+
+	if (itr == m_tabMovedConnections.end())
+	{
+		return;
+	}
+
+	itr->second.disconnect();
+
+	m_tabMovedConnections.erase(itr);
 }
 
 int Plugins::TabsApi::addTabRemovedObserver(sol::protected_function observer)

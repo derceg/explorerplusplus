@@ -9,8 +9,9 @@
 #include <boost/signals2.hpp>
 #include <unordered_map>
 
-typedef boost::signals2::signal<void(int, BOOL)> TabCreatedSignal;
-typedef boost::signals2::signal<void(int)> TabRemovedSignal;
+typedef boost::signals2::signal<void(int tabId, BOOL switchToNewTab)> TabCreatedSignal;
+typedef boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)> TabMovedSignal;
+typedef boost::signals2::signal<void(int tabId)> TabRemovedSignal;
 
 // Eventually, this will be driven by a dedicated class, rather than the
 // Explorerplusplus class.
@@ -38,5 +39,6 @@ __interface TabContainerInterface
 	HRESULT			BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags);
 
 	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
+	boost::signals2::connection	AddTabMovedObserver(const TabMovedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 };
