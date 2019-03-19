@@ -1243,13 +1243,6 @@ void Explorerplusplus::LockTab(Tab &tab, bool lock)
 {
 	tab.SetLocked(lock);
 
-	/* The "Lock Tab" and "Lock Tab and Address" options
-	are mutually exclusive. */
-	if(lock)
-	{
-		tab.SetAddressLocked(false);
-	}
-
 	SetTabIcon(tab);
 
 	/* If the tab that was locked/unlocked is the
@@ -1276,11 +1269,6 @@ void Explorerplusplus::OnLockTabAndAddress(int iTab)
 void Explorerplusplus::LockTabAndAddress(Tab &tab, bool lock)
 {
 	tab.SetAddressLocked(lock);
-
-	if (lock)
-	{
-		tab.SetLocked(false);
-	}
 
 	SetTabIcon(tab);
 

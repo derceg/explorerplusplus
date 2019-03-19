@@ -38,6 +38,13 @@ bool Tab::GetLocked() const
 void Tab::SetLocked(bool locked)
 {
 	m_locked = locked;
+
+	/* The "Lock Tab" and "Lock Tab and Address" options are mutually
+	exclusive. */
+	if (locked)
+	{
+		m_addressLocked = false;
+	}
 }
 
 bool Tab::GetAddressLocked() const
@@ -48,4 +55,9 @@ bool Tab::GetAddressLocked() const
 void Tab::SetAddressLocked(bool addressLocked)
 {
 	m_addressLocked = addressLocked;
+
+	if (addressLocked)
+	{
+		m_locked = false;
+	}
 }
