@@ -95,11 +95,11 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 	case WM_USER_FILESADDED:
 	{
-		auto itr = m_Tabs.find(static_cast<int>(wParam));
+		Tab *tab = GetTabOptional(static_cast<int>(wParam));
 
-		if (itr != m_Tabs.end())
+		if (tab)
 		{
-			itr->second.GetShellBrowser()->DirectoryAltered();
+			tab->GetShellBrowser()->DirectoryAltered();
 		}
 	}
 		break;
@@ -306,7 +306,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 		{
 			m_pActiveShellBrowser->ImportColumns(&m_pActiveColumnList);
 
-			Tab &tab = m_Tabs.at(m_selectedTabId);
+			Tab &tab = GetTab(m_selectedTabId);
 			RefreshTab(tab);
 		}
 		else

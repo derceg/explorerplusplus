@@ -483,7 +483,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		if((int)tcItem.lParam == m_selectedTabId)
 			uFlags |= SWP_SHOWWINDOW;
 
-		const Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
+		const Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
 
 		if(!m_bShowTabBarAtBottom)
 		{
@@ -608,13 +608,13 @@ void Explorerplusplus::OnDrawClipboard(void)
 			/* Deghost all items that have been 'cut'. */
 			for(const auto &strFile : m_CutFileNameList)
 			{
-				auto itr = m_Tabs.find(m_iCutTabInternal);
+				Tab *tab = GetTabOptional(m_iCutTabInternal);
 
 				/* Only deghost the items if the tab they
 				are/were in still exists. */
-				if(itr != m_Tabs.end())
+				if(tab)
 				{
-					int iItem = itr->second.GetShellBrowser()->LocateFileItemIndex(strFile.c_str());
+					int iItem = tab->GetShellBrowser()->LocateFileItemIndex(strFile.c_str());
 
 					/* It is possible that the ghosted file
 					does NOT exist within the current folder.
@@ -622,7 +622,7 @@ void Explorerplusplus::OnDrawClipboard(void)
 					is cut, and the folder is changed, in which
 					case the item is no longer available. */
 					if(iItem != -1)
-						itr->second.GetShellBrowser()->DeghostItem(iItem);
+						tab->GetShellBrowser()->DeghostItem(iItem);
 				}
 			}
 
@@ -675,7 +675,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 	TCHAR				szDirectoryToWatch[MAX_PATH];
 	int					iDirMonitorId;
 
-	Tab &tab = m_Tabs.at(iTabId);
+	Tab &tab = GetTab(iTabId);
 
 	iDirMonitorId		= tab.GetShellBrowser()->GetDirMonitorId();
 			
@@ -1030,7 +1030,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 
 void Explorerplusplus::OnRefresh(void)
 {
-	Tab &tab = m_Tabs.at(m_selectedTabId);
+	Tab &tab = GetTab(m_selectedTabId);
 	RefreshTab(tab);
 }
 
@@ -1300,7 +1300,7 @@ void Explorerplusplus::OnAssocChanged(void)
 
 		iIndex = (int)tcItem.lParam;
 
-		m_Tabs.at(iIndex).GetShellBrowser()->Refresh();
+		GetTab(iIndex).GetShellBrowser()->Refresh();
 	}
 
 	/* Now, refresh the treeview. */
@@ -1530,7 +1530,7 @@ void Explorerplusplus::SaveDirectorySpecificSettings(int iTab)
 		/* TODO: First check if there are already settings held for this
 		tab. If there are, delete them first. */
 
-		Tab &tab = m_Tabs.at(iIndexInternal);
+		Tab &tab = GetTab(iIndexInternal);
 
 		ds.pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
 
@@ -1571,7 +1571,7 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 
 				if(bRet)
 				{
-					Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
+					Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
 
 					tab.GetShellBrowser()->SetSortMode(ds.dsi.sortMode);
 					tab.GetShellBrowser()->SetCurrentViewMode(ds.dsi.viewMode);
@@ -1612,6 +1612,6 @@ void Explorerplusplus::OnShowHiddenFiles(void)
 {
 	m_pActiveShellBrowser->ToggleShowHidden();
 
-	Tab &tab = m_Tabs.at(m_selectedTabId);
+	Tab &tab = GetTab(m_selectedTabId);
 	RefreshTab(tab);
 }

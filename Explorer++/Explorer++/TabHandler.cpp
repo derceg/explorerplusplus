@@ -318,9 +318,9 @@ int *pTabObjectIndex)
 		iNewTabIndex = TabCtrl_GetItemCount(m_hTabCtrl);
 
 	int tabId = m_tabIdCounter++;
-	m_Tabs.emplace(std::make_pair(tabId, tabId));
+	auto item = m_Tabs.emplace(std::make_pair(tabId, tabId));
 
-	Tab &tab = m_Tabs.at(tabId);
+	Tab &tab = item.first->second;
 
 	if(pTabSettings != NULL)
 	{
@@ -624,7 +624,7 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 
 	m_selectedTabId = (int)tcItem.lParam;
 
-	const Tab &tab = m_Tabs.at(m_selectedTabId);
+	const Tab &tab = GetTab(m_selectedTabId);
 
 	m_hActiveListView		= tab.listView;
 	m_pActiveShellBrowser	= tab.GetShellBrowser();
@@ -922,7 +922,7 @@ void Explorerplusplus::OnInitTabMenu(HMENU hMenu)
 		return;
 	}
 
-	const Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
+	const Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
 
 	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, tab.GetLocked());
 	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, tab.GetAddressLocked());
@@ -1059,7 +1059,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 				if(res)
 				{
-					LPITEMIDLIST pidlCurrent = m_Tabs.at(static_cast<int>(tcItem.lParam)).GetShellBrowser()->QueryCurrentDirectoryIdl();
+					LPITEMIDLIST pidlCurrent = GetTab(static_cast<int>(tcItem.lParam)).GetShellBrowser()->QueryCurrentDirectoryIdl();
 
 					LPITEMIDLIST pidlParent = NULL;
 					HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
@@ -1151,9 +1151,9 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 {
 	std::wstring name;
 
-	if (m_Tabs.at(iTabId).GetUseCustomName())
+	if (GetTab(iTabId).GetUseCustomName())
 	{
-		name = m_Tabs.at(iTabId).GetName();
+		name = GetTab(iTabId).GetName();
 	}
 	else
 	{
@@ -1257,7 +1257,7 @@ void Explorerplusplus::UpdateTabToolbar(void)
 {
 	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	const Tab &selectedTab = m_Tabs.at(m_selectedTabId);
+	const Tab &selectedTab = GetTab(m_selectedTabId);
 
 	if(nTabs > 1 && !(selectedTab.GetLocked() || selectedTab.GetAddressLocked()))
 	{
@@ -1277,7 +1277,7 @@ void Explorerplusplus::DuplicateTab(int iTabInternal)
 {
 	TCHAR szTabDirectory[MAX_PATH];
 
-	m_Tabs.at(iTabInternal).GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
+	GetTab(iTabInternal).GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
 	CreateNewTab(szTabDirectory, nullptr, nullptr, FALSE, nullptr);
@@ -1378,7 +1378,7 @@ void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)
 		tcItem.mask = TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl, nmhdr->idFrom, &tcItem);
 
-		m_Tabs.at((int)tcItem.lParam).GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
+		GetTab((int)tcItem.lParam).GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
 			szTabToolTip);
 		lpnmtdi->lpszText = szTabToolTip;
 	}
@@ -1393,7 +1393,12 @@ void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
 	gs.bShowFriendlyDates	= m_bShowFriendlyDatesGlobal;
 	gs.bShowFolderSizes		= m_config->showFolderSizes;
 
-	m_Tabs.at(iTabId).GetShellBrowser()->SetGlobalSettings(&gs);
+	GetTab(iTabId).GetShellBrowser()->SetGlobalSettings(&gs);
+}
+
+Tab &Explorerplusplus::GetTab(int tabId)
+{
+	return m_Tabs.at(tabId);
 }
 
 Tab *Explorerplusplus::GetTabOptional(int tabId)
@@ -1419,7 +1424,7 @@ Tab *Explorerplusplus::GetTabByIndex(int index)
 		return nullptr;
 	}
 
-	return GetTabOptional(static_cast<int>(tcItem.lParam));
+	return &GetTab(static_cast<int>(tcItem.lParam));
 }
 
 boost::optional<int> Explorerplusplus::GetTabIndex(const Tab &tab)

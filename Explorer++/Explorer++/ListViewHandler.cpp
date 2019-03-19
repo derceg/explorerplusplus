@@ -335,7 +335,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 					m_pActiveShellBrowser->ImportColumns(&ActiveColumnList);
 
-					Tab &tab = m_Tabs.at(m_selectedTabId);
+					Tab &tab = GetTab(m_selectedTabId);
 					RefreshTab(tab);
 
 					return TRUE;
@@ -582,7 +582,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	if(iObjectIndex == -1)
 		return;
 
-	Tab &tab = m_Tabs.at(iObjectIndex);
+	Tab &tab = GetTab(iObjectIndex);
 
 	if(tab.GetShellBrowser()->QueryDragging())
 		return;
@@ -679,7 +679,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
-	for (auto &item : m_Tabs)
+	for (auto &item : GetAllTabs())
 	{
 		if (item.second.listView == hListView)
 		{
@@ -1275,7 +1275,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 			object that stops it (i.e. when a file is dragged
 			between tabs). Therefore, need to tell the object
 			that STARTED dragging that dragging has stopped. */
-			m_Tabs.at(iDragStartObjectIndex).GetShellBrowser()->DragStopped();
+			GetTab(iDragStartObjectIndex).GetShellBrowser()->DragStopped();
 
 			BOOL bInAsyncOp;
 

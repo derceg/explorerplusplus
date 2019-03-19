@@ -492,6 +492,7 @@ private:
 	void					SelectTab(const Tab &tab);
 	void					PushGlobalSettingsToTab(int iTabId);
 	void					DuplicateTab(int iTabInternal);
+	Tab						&GetTab(int tabId);
 	Tab						*GetTabOptional(int tabId);
 	Tab						*GetTabByIndex(int index);
 	boost::optional<int>	GetTabIndex(const Tab &tab);

@@ -65,7 +65,7 @@ void Explorerplusplus::OnGotoFolder(int FolderCSIDL)
 
 HRESULT Explorerplusplus::BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags)
 {
-	Tab &tab = m_Tabs.at(m_selectedTabId);
+	Tab &tab = GetTab(m_selectedTabId);
 	return BrowseFolder(tab, szPath, wFlags);
 }
 
@@ -103,7 +103,7 @@ HRESULT Explorerplusplus::BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlag
 
 HRESULT Explorerplusplus::BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags)
 {
-	Tab &tab = m_Tabs.at(m_selectedTabId);
+	Tab &tab = GetTab(m_selectedTabId);
 	return BrowseFolder(tab, pidlDirectory, wFlags);
 }
 
@@ -164,7 +164,7 @@ void Explorerplusplus::PlayNavigationSound() const
 
 void Explorerplusplus::OnDirChanged(int iTabId)
 {
-	Tab &tab = m_Tabs.at(iTabId);
+	Tab &tab = GetTab(iTabId);
 
 	if (tab.GetId() == m_selectedTabId)
 	{

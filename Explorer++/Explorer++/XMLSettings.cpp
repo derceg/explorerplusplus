@@ -873,7 +873,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 		tcItem.mask	= TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-		const Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
+		const Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
 
 		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), i);
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Tab"),szNodeName);

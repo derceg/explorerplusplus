@@ -284,7 +284,7 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 		tcItem.mask = TCIF_PARAM;
 		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-		m_Tabs.at(static_cast<int>(tcItem.lParam)).GetShellBrowser()->OnDeviceChange(wParam,lParam);
+		GetTab(static_cast<int>(tcItem.lParam)).GetShellBrowser()->OnDeviceChange(wParam,lParam);
 	}
 
 	/* Forward the message to the treeview, so that
@@ -441,16 +441,16 @@ void *pData)
 	pDirectoryAltered = (DirectoryAltered_t *)pData;
 	pContainer = (Explorerplusplus *)pDirectoryAltered->pData;
 
-	auto itr = pContainer->m_Tabs.find(pDirectoryAltered->iIndex);
+	Tab *tab = pContainer->GetTabOptional(pDirectoryAltered->iIndex);
 
-	if (itr != pContainer->m_Tabs.end())
+	if (tab)
 	{
 		TCHAR szDirectory[MAX_PATH];
-		itr->second.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
+		tab->GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
 		LOG(debug) << _T("Directory change notification received for \"") << szDirectory << _T("\", Action = ") << dwAction
 			<< _T(", Filename = \"") << szFileName << _T("\"");
 
-		itr->second.GetShellBrowser()->FilesModified(dwAction,
+		tab->GetShellBrowser()->FilesModified(dwAction,
 			szFileName, pDirectoryAltered->iIndex, pDirectoryAltered->iFolderIndex);
 	}
 }

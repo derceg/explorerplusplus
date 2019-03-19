@@ -676,7 +676,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 							tcItem.mask	= TCIF_PARAM;
 							TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-							Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
+							Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
 
 							/* Each one of the options should also be pushed to new tabs when they are created. */
 							tab.GetShellBrowser()->SetHideSystemFiles(m_bHideSystemFilesGlobal);
@@ -854,7 +854,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							tcItem.mask	= TCIF_PARAM;
 							TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-							dwExtendedStyle = ListView_GetExtendedListViewStyle(m_Tabs.at((int)tcItem.lParam).listView);
+							dwExtendedStyle = ListView_GetExtendedListViewStyle(GetTab((int)tcItem.lParam).listView);
 
 							if(bCheckBoxSelection)
 							{
@@ -865,7 +865,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 								dwExtendedStyle &= ~LVS_EX_CHECKBOXES;
 							}
 
-							ListView_SetExtendedListViewStyle(m_Tabs.at((int)tcItem.lParam).listView,
+							ListView_SetExtendedListViewStyle(GetTab((int)tcItem.lParam).listView,
 								dwExtendedStyle);
 						}
 
@@ -920,14 +920,14 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 						tcItem.mask	= TCIF_PARAM;
 						TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
 
-						Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
+						Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
 
 						if(tab.GetShellBrowser()->QueryGridlinesActive() != m_bShowGridlinesGlobal)
 						{
 							tab.GetShellBrowser()->ToggleGridlines();
 						}
 
-						NListView::ListView_AddRemoveExtendedStyle(m_Tabs.at((int)tcItem.lParam).listView,
+						NListView::ListView_AddRemoveExtendedStyle(GetTab((int)tcItem.lParam).listView,
 							LVS_EX_FULLROWSELECT,m_config->useFullRowSelect);
 					}
 

@@ -458,7 +458,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 
 			if(ReturnValue == ERROR_SUCCESS)
 			{
-				const Tab &tab = m_Tabs.at(static_cast<int>(tcItem.lParam));
+				const Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
 
 				pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
 				RegSetValueEx(hTabKey,_T("Directory"),0,REG_BINARY,
