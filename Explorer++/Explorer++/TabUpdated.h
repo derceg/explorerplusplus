@@ -5,16 +5,16 @@
 #pragma once
 
 #include "Event.h"
-#include "PluginCommandManager.h"
+#include "TabContainerInterface.h"
 
 namespace Plugins
 {
-	class CommandInvoked : public Event
+	class TabUpdated : public Event
 	{
 	public:
 
-		CommandInvoked(PluginCommandManager *pluginCommandManager, int pluginId);
-		virtual ~CommandInvoked();
+		TabUpdated(TabContainerInterface *tabContainer);
+		virtual ~TabUpdated();
 
 	protected:
 
@@ -22,9 +22,8 @@ namespace Plugins
 
 	private:
 
-		void onCommandInvoked(int pluginId, const std::wstring &name, sol::protected_function observer);
+		void onTabUpdated(sol::protected_function observer, sol::this_state state, const Tab &tab, Tab::PropertyType propertyType);
 
-		PluginCommandManager *m_pluginCommandManager;
-		int m_pluginId;
+		TabContainerInterface *m_tabContainer;
 	};
 }

@@ -17,12 +17,12 @@ namespace Plugins
 		Event();
 		virtual ~Event();
 
-		int addObserver(sol::protected_function observer);
+		int addObserver(sol::protected_function observer, sol::this_state state);
 		void removeObserver(int id);
 
 	protected:
 
-		virtual boost::signals2::connection connectObserver(sol::protected_function observer) = 0;
+		virtual boost::signals2::connection connectObserver(sol::protected_function observer, sol::this_state state) = 0;
 
 	private:
 

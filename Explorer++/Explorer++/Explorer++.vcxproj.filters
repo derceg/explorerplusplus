@@ -316,6 +316,9 @@
     <ClCompile Include="CommandInvoked.cpp">
       <Filter>Plugins\CommandApi\Events</Filter>
     </ClCompile>
+    <ClCompile Include="TabUpdated.cpp">
+      <Filter>Plugins\TabsApi\Events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -593,6 +596,9 @@
     </ClInclude>
     <ClInclude Include="CommandInvoked.h">
       <Filter>Plugins\CommandApi\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="TabUpdated.h">
+      <Filter>Plugins\TabsApi\Events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

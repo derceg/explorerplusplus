@@ -401,6 +401,7 @@
     <ClCompile Include="TabMoved.cpp" />
     <ClCompile Include="TabRemoved.cpp" />
     <ClCompile Include="TabsApi.cpp" />
+    <ClCompile Include="TabUpdated.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
     <ClCompile Include="UiTheming.cpp" />
     <ClCompile Include="TreeViewHandler.cpp" />
@@ -503,6 +504,7 @@
     <ClInclude Include="TabMoved.h" />
     <ClInclude Include="TabRemoved.h" />
     <ClInclude Include="TabsApi.h" />
+    <ClInclude Include="TabUpdated.h" />
     <ClInclude Include="UiTheming.h" />
     <ClInclude Include="ToolbarButtons.h" />
     <ClInclude Include="UiApi.h" />

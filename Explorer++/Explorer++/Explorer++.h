@@ -501,6 +501,7 @@ private:
 	/* Tab events. */
 	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
 	boost::signals2::connection AddTabMovedObserver(const TabMovedSignal::slot_type &observer);
+	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 
 	/* PluginInterface. */
@@ -809,6 +810,7 @@ private:
 	/* Tab signals. */
 	TabCreatedSignal		m_tabCreatedSignal;
 	TabMovedSignal			m_tabMovedSignal;
+	TabUpdatedSignal		m_tabUpdatedSignal;
 	TabRemovedSignal		m_tabRemovedSignal;
 
 	ToolbarContextMenuSignal	m_toolbarContextMenuSignal;

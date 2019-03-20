@@ -17,8 +17,10 @@ Plugins::TabCreated::~TabCreated()
 
 }
 
-boost::signals2::connection Plugins::TabCreated::connectObserver(sol::protected_function observer)
+boost::signals2::connection Plugins::TabCreated::connectObserver(sol::protected_function observer, sol::this_state state)
 {
+	UNREFERENCED_PARAMETER(state);
+
 	return m_tabContainer->AddTabCreatedObserver([this, observer](int tabId, BOOL switchToNewTab) {
 		UNREFERENCED_PARAMETER(switchToNewTab);
 

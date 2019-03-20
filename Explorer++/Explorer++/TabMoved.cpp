@@ -16,8 +16,10 @@ Plugins::TabMoved::~TabMoved()
 
 }
 
-boost::signals2::connection Plugins::TabMoved::connectObserver(sol::protected_function observer)
+boost::signals2::connection Plugins::TabMoved::connectObserver(sol::protected_function observer, sol::this_state state)
 {
+	UNREFERENCED_PARAMETER(state);
+
 	return m_tabContainer->AddTabMovedObserver([observer] (const Tab &tab, int fromIndex, int toIndex) {
 		observer(tab.GetId(), fromIndex, toIndex);
 	});

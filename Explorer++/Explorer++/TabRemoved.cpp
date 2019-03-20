@@ -16,7 +16,9 @@ Plugins::TabRemoved::~TabRemoved()
 
 }
 
-boost::signals2::connection Plugins::TabRemoved::connectObserver(sol::protected_function observer)
+boost::signals2::connection Plugins::TabRemoved::connectObserver(sol::protected_function observer, sol::this_state state)
 {
+	UNREFERENCED_PARAMETER(state);
+
 	return m_tabContainer->AddTabRemovedObserver(observer);
 }

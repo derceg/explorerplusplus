@@ -19,14 +19,14 @@ Plugins::Event::~Event()
 	}
 }
 
-int Plugins::Event::addObserver(sol::protected_function observer)
+int Plugins::Event::addObserver(sol::protected_function observer, sol::this_state state)
 {
 	if (!observer)
 	{
 		return -1;
 	}
 
-	auto connection = connectObserver(observer);
+	auto connection = connectObserver(observer, state);
 
 	int id = m_connectionIdCounter++;
 	m_connections.insert(std::make_pair(id, connection));

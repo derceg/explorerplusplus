@@ -510,6 +510,11 @@ boost::signals2::connection Explorerplusplus::AddTabMovedObserver(const TabMoved
 	return m_tabMovedSignal.connect(observer);
 }
 
+boost::signals2::connection Explorerplusplus::AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer)
+{
+	return m_tabUpdatedSignal.connect(observer);
+}
+
 boost::signals2::connection Explorerplusplus::AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer)
 {
 	return m_tabRemovedSignal.connect(observer);
@@ -1275,6 +1280,8 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 		UpdateTabNameInWindow(tab);
 		break;
 	}
+
+	m_tabUpdatedSignal(tab, propertyType);
 }
 
 void Explorerplusplus::UpdateTabToolbar(void)

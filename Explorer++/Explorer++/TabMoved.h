@@ -18,7 +18,7 @@ namespace Plugins
 
 	protected:
 
-		virtual boost::signals2::connection connectObserver(sol::protected_function observer);
+		virtual boost::signals2::connection connectObserver(sol::protected_function observer, sol::this_state state);
 
 	private:
 
