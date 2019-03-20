@@ -4,28 +4,27 @@
 
 #pragma once
 
+#include "Event.h"
 #include "PluginCommandManager.h"
-#include "../ThirdParty/Sol/sol.hpp"
 
 namespace Plugins
 {
-	class CommandApi
+	class CommandInvoked : public Event
 	{
 	public:
 
-		CommandApi(PluginCommandManager *pluginCommandManager, int pluginId);
-		~CommandApi();
+		CommandInvoked(PluginCommandManager *pluginCommandManager, int pluginId);
+		virtual ~CommandInvoked();
 
-		int addCommandInvokedObserver(sol::protected_function observer);
-		void removeCommandInvokedObserver(int id);
+	protected:
+
+		virtual boost::signals2::connection connectObserver(sol::protected_function observer);
 
 	private:
 
 		void onCommandInvoked(int pluginId, const std::wstring &name, sol::protected_function observer);
 
 		PluginCommandManager *m_pluginCommandManager;
-		int m_observerIdCounter;
-		std::unordered_map<int, boost::signals2::connection> m_commandInvokedConnections;
 		int m_pluginId;
 	};
 }

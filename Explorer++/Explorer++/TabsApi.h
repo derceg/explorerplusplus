@@ -9,8 +9,6 @@
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "../ThirdParty/Sol/sol.hpp"
-#include <boost/signals2.hpp>
-#include <unordered_map>
 
 namespace Plugins
 {
@@ -98,30 +96,9 @@ namespace Plugins
 		int move(int tabId, int newIndex);
 		bool close(int tabId);
 
-		/* Events. */
-		int addTabCreatedObserver(sol::protected_function observer);
-		void removeTabCreatedObserver(int id);
-
-		int addTabMovedObserver(sol::protected_function observer);
-		void removeTabMovedObserver(int id);
-
-		int addTabRemovedObserver(sol::protected_function observer);
-		void removeTabRemovedObserver(int id);
-
 	private:
-
-		void onTabCreated(int tabId, sol::protected_function observer);
 
 		TabContainerInterface *m_tabContainer;
 		TabInterface *m_tabInterface;
-
-		int m_tabCreatedIdCounter;
-		std::unordered_map<int, boost::signals2::connection> m_tabCreatedConnections;
-
-		int m_tabMovedIdCounter;
-		std::unordered_map<int, boost::signals2::connection> m_tabMovedConnections;
-
-		int m_tabRemovedIdCounter;
-		std::unordered_map<int, boost::signals2::connection> m_tabRemovedConnections;
 	};
 }

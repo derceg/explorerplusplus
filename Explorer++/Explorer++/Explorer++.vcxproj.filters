@@ -256,9 +256,6 @@
     <ClCompile Include="ApiBinding.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
-    <ClCompile Include="TabsApi.cpp">
-      <Filter>Plugins</Filter>
-    </ClCompile>
     <ClCompile Include="MenuApi.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
@@ -292,9 +289,6 @@
     <ClCompile Include="PluginCommandManager.cpp">
       <Filter>Plugins</Filter>
     </ClCompile>
-    <ClCompile Include="CommandApi.cpp">
-      <Filter>Plugins</Filter>
-    </ClCompile>
     <ClCompile Include="PluginInterface.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -303,6 +297,24 @@
     </ClCompile>
     <ClCompile Include="Tab.cpp">
       <Filter>Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>Plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="TabsApi.cpp">
+      <Filter>Plugins\TabsApi</Filter>
+    </ClCompile>
+    <ClCompile Include="TabCreated.cpp">
+      <Filter>Plugins\TabsApi\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="TabMoved.cpp">
+      <Filter>Plugins\TabsApi\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="TabRemoved.cpp">
+      <Filter>Plugins\TabsApi\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandInvoked.cpp">
+      <Filter>Plugins\CommandApi\Events</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -516,9 +528,6 @@
     <ClInclude Include="ApiBinding.h">
       <Filter>Plugins</Filter>
     </ClInclude>
-    <ClInclude Include="TabsApi.h">
-      <Filter>Plugins</Filter>
-    </ClInclude>
     <ClInclude Include="Tab.h">
       <Filter>Tabs</Filter>
     </ClInclude>
@@ -564,11 +573,26 @@
     <ClInclude Include="PluginInterface.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="CommandApi.h">
-      <Filter>Plugins</Filter>
-    </ClInclude>
     <ClInclude Include="FileProgressSink.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="TabsApi.h">
+      <Filter>Plugins\TabsApi</Filter>
+    </ClInclude>
+    <ClInclude Include="TabCreated.h">
+      <Filter>Plugins\TabsApi\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="TabMoved.h">
+      <Filter>Plugins\TabsApi\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="TabRemoved.h">
+      <Filter>Plugins\TabsApi\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandInvoked.h">
+      <Filter>Plugins\CommandApi\Events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -678,6 +702,18 @@
     </Filter>
     <Filter Include="Plugins">
       <UniqueIdentifier>{09198397-1dae-4619-a80f-5af293a9b949}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\TabsApi">
+      <UniqueIdentifier>{973ffc2c-3cf3-423d-abbe-e31ebcd18f81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\TabsApi\Events">
+      <UniqueIdentifier>{d95cc55b-536e-4787-ad7f-0e8f606aaaf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\CommandApi">
+      <UniqueIdentifier>{50af2fb1-0a7d-45b6-9c5f-6acdfebd8efe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Plugins\CommandApi\Events">
+      <UniqueIdentifier>{79e9c559-5c9a-4111-8aba-39fc4208f1fb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

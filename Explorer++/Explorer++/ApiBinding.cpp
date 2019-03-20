@@ -4,15 +4,20 @@
 
 #include "stdafx.h"
 #include "APIBinding.h"
-#include "CommandApi.h"
+#include "CommandInvoked.h"
 #include "MenuApi.h"
 #include "TabsAPI.h"
+#include "TabCreated.h"
+#include "TabMoved.h"
+#include "TabRemoved.h"
 #include "UiApi.h"
 
 void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInterface *tabInterface);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 void BindUiApi(sol::state &state, UiTheming *uiTheming);
 void BindCommandApi(int pluginId, sol::state &state, Plugins::PluginCommandManager *pluginCommandManager);
+template<typename T>
+void BindObserverMethods(sol::state &state, sol::table &parentTable, const std::string &observerTableName, const std::shared_ptr<T> &object);
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table);
 int deny(lua_State *state);
 
@@ -39,23 +44,14 @@ void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInte
 	tabsMetaTable.set_function("move", &Plugins::TabsApi::move, tabsApi);
 	tabsMetaTable.set_function("close", &Plugins::TabsApi::close, tabsApi);
 
-	sol::table onCreatedTable = tabsMetaTable.create_named("onCreated");
-	sol::table onCreatedMetaTable = MarkTableReadOnly(state, onCreatedTable);
+	std::shared_ptr<Plugins::TabCreated> tabCreated = std::make_shared<Plugins::TabCreated>(tabContainer);
+	BindObserverMethods(state, tabsMetaTable, "onCreated", tabCreated);
 
-	onCreatedMetaTable.set_function("addListener", &Plugins::TabsApi::addTabCreatedObserver, tabsApi);
-	onCreatedMetaTable.set_function("removeListener", &Plugins::TabsApi::removeTabCreatedObserver, tabsApi);
+	std::shared_ptr<Plugins::TabMoved> tabMoved = std::make_shared<Plugins::TabMoved>(tabContainer);
+	BindObserverMethods(state, tabsMetaTable, "onMoved", tabMoved);
 
-	sol::table onMovedTable = tabsMetaTable.create_named("onMoved");
-	sol::table onMovedMetaTable = MarkTableReadOnly(state, onMovedTable);
-
-	onMovedMetaTable.set_function("addListener", &Plugins::TabsApi::addTabMovedObserver, tabsApi);
-	onMovedMetaTable.set_function("removeListener", &Plugins::TabsApi::removeTabMovedObserver, tabsApi);
-
-	sol::table onRemovedTable = tabsMetaTable.create_named("onRemoved");
-	sol::table onRemovedMetaTable = MarkTableReadOnly(state, onRemovedTable);
-
-	onRemovedMetaTable.set_function("addListener", &Plugins::TabsApi::addTabRemovedObserver, tabsApi);
-	onRemovedMetaTable.set_function("removeListener", &Plugins::TabsApi::removeTabRemovedObserver, tabsApi);
+	std::shared_ptr<Plugins::TabRemoved> tabRemoved = std::make_shared<Plugins::TabRemoved>(tabContainer);
+	BindObserverMethods(state, tabsMetaTable, "onRemoved", tabRemoved);
 
 	tabsMetaTable.new_usertype<Plugins::TabsApi::FolderSettings>("FolderSettings",
 		"viewMode", &Plugins::TabsApi::FolderSettings::viewMode,
@@ -105,16 +101,23 @@ void BindUiApi(sol::state &state, UiTheming *uiTheming)
 
 void BindCommandApi(int pluginId, sol::state &state, Plugins::PluginCommandManager *pluginCommandManager)
 {
-	std::shared_ptr<Plugins::CommandApi> commandApi = std::make_shared<Plugins::CommandApi>(pluginCommandManager, pluginId);
-
 	sol::table commandsTable = state.create_named_table("commands");
 	sol::table commandsMetaTable = MarkTableReadOnly(state, commandsTable);
 
-	sol::table onCommandTable = commandsMetaTable.create_named("onCommand");
-	sol::table onCommandMetaTable = MarkTableReadOnly(state, onCommandTable);
+	std::shared_ptr<Plugins::CommandInvoked> commandInvoked = std::make_shared<Plugins::CommandInvoked>(pluginCommandManager, pluginId);
+	BindObserverMethods(state, commandsMetaTable, "onCommand", commandInvoked);
+}
 
-	onCommandMetaTable.set_function("addListener", &Plugins::CommandApi::addCommandInvokedObserver, commandApi);
-	onCommandMetaTable.set_function("removeListener", &Plugins::CommandApi::removeCommandInvokedObserver, commandApi);
+template<typename T>
+void BindObserverMethods(sol::state &state, sol::table &parentTable, const std::string &observerTableName, const std::shared_ptr<T> &object)
+{
+	static_assert(std::is_base_of<Plugins::Event, T>::value, "T must inherit from Plugins::Event");
+
+	sol::table observerTable = parentTable.create_named(observerTableName);
+	sol::table observerMetaTable = MarkTableReadOnly(state, observerTable);
+
+	observerMetaTable.set_function("addListener", &T::addObserver, object);
+	observerMetaTable.set_function("removeListener", &T::removeObserver, object);
 }
 
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table)

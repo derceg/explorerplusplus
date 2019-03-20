@@ -313,13 +313,14 @@
     <ClCompile Include="BookmarkTreeView.cpp" />
     <ClCompile Include="ColorRuleDialog.cpp" />
     <ClCompile Include="ColorRuleHelper.cpp" />
-    <ClCompile Include="CommandApi.cpp" />
+    <ClCompile Include="CommandInvoked.cpp" />
     <ClCompile Include="CustomizeColorsDialog.cpp" />
     <ClCompile Include="DestroyFilesDialog.cpp" />
     <ClCompile Include="DialogHelper.cpp" />
     <ClCompile Include="DisplayColoursDialog.cpp" />
     <ClCompile Include="DisplayWindow.cpp" />
     <ClCompile Include="DrivesToolbar.cpp" />
+    <ClCompile Include="Event.cpp" />
     <ClCompile Include="EventSwitcher.cpp" />
     <ClCompile Include="Explorer++.cpp" />
     <ClCompile Include="FileSelectionTests.cpp" />
@@ -394,8 +395,11 @@
     <ClCompile Include="Tab.cpp" />
     <ClCompile Include="TabBackingHandler.cpp" />
     <ClCompile Include="TabContainer.cpp" />
+    <ClCompile Include="TabCreated.cpp" />
     <ClCompile Include="TabDropHandler.cpp" />
     <ClCompile Include="TabHandler.cpp" />
+    <ClCompile Include="TabMoved.cpp" />
+    <ClCompile Include="TabRemoved.cpp" />
     <ClCompile Include="TabsApi.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
     <ClCompile Include="UiTheming.cpp" />
@@ -429,7 +433,7 @@
     <ClInclude Include="BookmarkTreeView.h" />
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="ColorRuleHelper.h" />
-    <ClInclude Include="CommandApi.h" />
+    <ClInclude Include="CommandInvoked.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />
     <ClInclude Include="DefaultColumns.h" />
     <ClInclude Include="DefaultToolbarButtons.h" />
@@ -437,6 +441,7 @@
     <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DisplayColoursDialog.h" />
     <ClInclude Include="DrivesToolbar.h" />
+    <ClInclude Include="Event.h" />
     <ClInclude Include="Explorer++.h" />
     <ClInclude Include="Explorer++VersionInfo.h" />
     <ClInclude Include="Explorer++_internal.h" />
@@ -492,8 +497,11 @@
     <ClInclude Include="Tab.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="TabContainerInterface.h" />
+    <ClInclude Include="TabCreated.h" />
     <ClInclude Include="TabDropHandler.h" />
     <ClInclude Include="TabInterface.h" />
+    <ClInclude Include="TabMoved.h" />
+    <ClInclude Include="TabRemoved.h" />
     <ClInclude Include="TabsApi.h" />
     <ClInclude Include="UiTheming.h" />
     <ClInclude Include="ToolbarButtons.h" />
