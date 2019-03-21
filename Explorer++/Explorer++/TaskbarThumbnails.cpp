@@ -105,7 +105,7 @@ LRESULT CALLBACK Explorerplusplus::MainWndTaskbarThumbnailProc(HWND hwnd,UINT uM
 			auto tab = GetTabOptional(itr->iTabId);
 			assert(tab != nullptr);
 
-			BOOL bActive = (tab->GetId() == m_selectedTabId);
+			BOOL bActive = IsTabSelected(*tab);
 
 			RegisterTab(itr->hProxy,EMPTY_STRING,bActive);
 

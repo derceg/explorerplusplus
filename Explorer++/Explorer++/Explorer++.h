@@ -492,6 +492,7 @@ private:
 	Tab						&GetTab(int tabId);
 	Tab						*GetTabOptional(int tabId);
 	Tab						&GetSelectedTab();
+	bool					IsTabSelected(const Tab &tab);
 	Tab						&GetTabByIndex(int index);
 	int						GetTabIndex(const Tab &tab);
 	int						GetNumTabs() const;

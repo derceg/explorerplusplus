@@ -1189,7 +1189,7 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 		/* If the tab that was locked/unlocked is the
 		currently selected tab, then the tab close
 		button on the toolbar will need to be updated. */
-		if (tab.GetId() == m_selectedTabId)
+		if (IsTabSelected(tab))
 		{
 			UpdateTabToolbar();
 		}
@@ -1369,6 +1369,12 @@ Tab &Explorerplusplus::GetSelectedTab()
 	}
 
 	return GetTabByIndex(index);
+}
+
+bool Explorerplusplus::IsTabSelected(const Tab &tab)
+{
+	const Tab &selectedTab = GetSelectedTab();
+	return tab.GetId() == selectedTab.GetId();
 }
 
 Tab &Explorerplusplus::GetTabByIndex(int index)

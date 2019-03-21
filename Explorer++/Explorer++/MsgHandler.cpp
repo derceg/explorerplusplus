@@ -480,10 +480,12 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 		uFlags = SWP_NOZORDER;
 
-		if((int)tcItem.lParam == m_selectedTabId)
-			uFlags |= SWP_SHOWWINDOW;
-
 		const Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
+
+		if (IsTabSelected(tab))
+		{
+			uFlags |= SWP_SHOWWINDOW;
+		}
 
 		if(!m_bShowTabBarAtBottom)
 		{
