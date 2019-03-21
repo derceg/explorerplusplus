@@ -48,9 +48,39 @@ boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 should return a value.
 Probably shouldn't
 return a HRESULT though. */
-void Plugins::TabsApi::create(std::wstring path)
+void Plugins::TabsApi::create(sol::table createProperties)
 {
-	m_tabContainer->CreateNewTab(path.c_str(), nullptr, {}, TRUE, nullptr);
+	boost::optional<std::wstring> location = createProperties["location"];
+
+	if (!location || location->empty())
+	{
+		return;
+	}
+
+	TabSettings tabSettings;
+
+	boost::optional<std::wstring> name = createProperties["name"];
+
+	if (name && !name->empty())
+	{
+		tabSettings.name = name;
+	}
+
+	boost::optional<bool> locked = createProperties["locked"];
+
+	if (locked)
+	{
+		tabSettings.locked = *locked;
+	}
+
+	boost::optional<bool> addressLocked = createProperties["addressLocked"];
+
+	if (addressLocked)
+	{
+		tabSettings.addressLocked = *addressLocked;
+	}
+
+	m_tabContainer->CreateNewTab(location->c_str(), nullptr, tabSettings, TRUE, nullptr);
 }
 
 void Plugins::TabsApi::update(int tabId, sol::table properties)
