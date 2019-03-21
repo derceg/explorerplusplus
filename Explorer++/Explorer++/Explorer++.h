@@ -492,8 +492,8 @@ private:
 	Tab						&GetTab(int tabId);
 	Tab						*GetTabOptional(int tabId);
 	Tab						&GetSelectedTab();
-	Tab						*GetTabByIndex(int index);
-	boost::optional<int>	GetTabIndex(const Tab &tab);
+	Tab						&GetTabByIndex(int index);
+	int						GetTabIndex(const Tab &tab);
 	int						GetNumTabs() const;
 	int						MoveTab(const Tab &tab, int newIndex);
 	void					OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);

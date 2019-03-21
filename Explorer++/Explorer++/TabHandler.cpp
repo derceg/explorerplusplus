@@ -164,12 +164,8 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 
 				if(info.flags != TCHT_NOWHERE && m_config->doubleClickTabClose)
 				{
-					auto tab = GetTabByIndex(ItemNum);
-
-					if (tab)
-					{
-						CloseTab(*tab);
-					}
+					Tab &tab = GetTabByIndex(ItemNum);
+					CloseTab(tab);
 				}
 			}
 			break;
@@ -184,18 +180,11 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 
 void Explorerplusplus::UpdateTabNameInWindow(const Tab &tab)
 {
-	auto index = GetTabIndex(tab);
-
-	if (!index)
-	{
-		assert(false);
-		return;
-	}
-
 	std::wstring name = tab.GetName();
 	boost::replace_all(name, L"&", L"&&");
 
-	TabCtrl_SetItemText(m_hTabCtrl, *index, name.c_str());
+	int index = GetTabIndex(tab);
+	TabCtrl_SetItemText(m_hTabCtrl, index, name.c_str());
 
 	UpdateTaskbarThumbnailTtitle(tab);
 }
@@ -212,15 +201,9 @@ int Explorerplusplus::GetSelectedTabIndex() const
 
 void Explorerplusplus::SelectTab(const Tab &tab)
 {
-	auto index = GetTabIndex(tab);
+	int index = GetTabIndex(tab);
 
-	if (!index)
-	{
-		assert(false);
-		return;
-	}
-
-	m_selectedTabIndex = *index;
+	m_selectedTabIndex = index;
 	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
 	OnTabChangeInternal(TRUE);
 }
@@ -689,12 +672,8 @@ void Explorerplusplus::CloseOtherTabs(int iTab)
 	{
 		if(i != iTab)
 		{
-			auto tab = GetTabByIndex(i);
-
-			if (tab)
-			{
-				CloseTab(*tab);
-			}
+			const Tab &tab = GetTabByIndex(i);
+			CloseTab(tab);
 		}
 	}
 }
@@ -731,15 +710,8 @@ void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 
 void Explorerplusplus::OnSelectTab(const Tab &tab, BOOL setFocus)
 {
-	auto index = GetTabIndex(tab);
-
-	if (!index)
-	{
-		assert(false);
-		return;
-	}
-
-	OnSelectTabByIndex(*index, setFocus);
+	int index = GetTabIndex(tab);
+	OnSelectTabByIndex(index, setFocus);
 }
 
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
@@ -772,14 +744,8 @@ void Explorerplusplus::OnSelectTabByIndex(int iTab,BOOL bSetFocus)
 
 bool Explorerplusplus::OnCloseTab(void)
 {
-	auto tab = GetTabByIndex(m_selectedTabIndex);
-
-	if (!tab)
-	{
-		return false;
-	}
-
-	return CloseTab(*tab);
+	const Tab &tab = GetTabByIndex(m_selectedTabIndex);
+	return CloseTab(tab);
 }
 
 bool Explorerplusplus::CloseTab(const Tab &tab)
@@ -799,15 +765,8 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 		return false;
 	}
 
-	auto index = GetTabIndex(tab);
-
-	if (!index)
-	{
-		assert(false);
-		return false;
-	}
-
-	RemoveTabFromControl(*index);
+	int index = GetTabIndex(tab);
+	RemoveTabFromControl(index);
 	RemoveTabProxy(tab.GetId());
 
 	m_pDirMon->StopDirectoryMonitor(tab.GetShellBrowser()->GetDirMonitorId());
@@ -973,12 +932,8 @@ void Explorerplusplus::OnTabCtrlLButtonUp(void)
 
 	if (m_draggedTabEndIndex != m_draggedTabStartIndex)
 	{
-		const Tab *tab = GetTabByIndex(m_draggedTabEndIndex);
-
-		if (tab)
-		{
-			m_tabMovedSignal(*tab, m_draggedTabStartIndex, m_draggedTabEndIndex);
-		}
+		const Tab &tab = GetTabByIndex(m_draggedTabEndIndex);
+		m_tabMovedSignal(tab, m_draggedTabStartIndex, m_draggedTabEndIndex);
 	}
 }
 
@@ -1066,17 +1021,12 @@ void Explorerplusplus::OnTabCtrlRButtonUp(POINT *pt)
 
 void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 {
-	Tab *tab = GetTabByIndex(iTabHit);
-
-	if (!tab)
-	{
-		return;
-	}
+	Tab &tab = GetTabByIndex(iTabHit);
 
 	switch(uMenuID)
 	{
 		case IDM_TAB_DUPLICATETAB:
-			DuplicateTab(*tab);
+			DuplicateTab(tab);
 			break;
 
 		case IDM_TAB_OPENPARENTINNEWTAB:
@@ -1105,7 +1055,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 			break;
 
 		case IDM_TAB_REFRESH:
-			RefreshTab(*tab);
+			RefreshTab(tab);
 			break;
 
 		case IDM_TAB_REFRESHALL:
@@ -1114,7 +1064,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_RENAMETAB:
 			{
-				CRenameTabDialog RenameTabDialog(m_hLanguageModule,IDD_RENAMETAB,m_hContainer,tab->GetId(),this,this,this);
+				CRenameTabDialog RenameTabDialog(m_hLanguageModule,IDD_RENAMETAB,m_hContainer,tab.GetId(),this,this,this);
 				RenameTabDialog.ShowModalDialog();
 			}
 			break;
@@ -1137,18 +1087,14 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 				for(int i = nTabs - 1;i > iTabHit;i--)
 				{
-					auto currentTab = GetTabByIndex(i);
-
-					if (currentTab)
-					{
-						CloseTab(*currentTab);
-					}
+					const Tab &currentTab = GetTabByIndex(i);
+					CloseTab(currentTab);
 				}
 			}
 			break;
 
 		case IDM_TAB_CLOSETAB:
-			CloseTab(*tab);
+			CloseTab(tab);
 			break;
 
 		default:
@@ -1222,26 +1168,14 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 
 void Explorerplusplus::OnLockTab(int iTab)
 {
-	auto tab = GetTabByIndex(iTab);
-
-	if (!tab)
-	{
-		return;
-	}
-
-	tab->SetLocked(!tab->GetLocked());
+	Tab &tab = GetTabByIndex(iTab);
+	tab.SetLocked(!tab.GetLocked());
 }
 
 void Explorerplusplus::OnLockTabAndAddress(int iTab)
 {
-	auto tab = GetTabByIndex(iTab);
-
-	if (!tab)
-	{
-		return;
-	}
-
-	tab->SetAddressLocked(!tab->GetAddressLocked());
+	Tab &tab = GetTabByIndex(iTab);
+	tab.SetAddressLocked(!tab.GetAddressLocked());
 }
 
 void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
@@ -1366,12 +1300,8 @@ void Explorerplusplus::OnTabCtrlMButtonUp(POINT *pt)
 
 		if(iTabHit != -1)
 		{
-			auto tab = GetTabByIndex(iTabHit);
-
-			if (tab)
-			{
-				CloseTab(*tab);
-			}
+			const Tab &tab = GetTabByIndex(iTabHit);
+			CloseTab(tab);
 		}
 	}
 }
@@ -1438,17 +1368,10 @@ Tab &Explorerplusplus::GetSelectedTab()
 		throw std::runtime_error("No selected tab");
 	}
 
-	Tab *tab = GetTabByIndex(index);
-
-	if (!tab)
-	{
-		throw std::runtime_error("Selected tab lookup failed");
-	}
-
-	return *tab;
+	return GetTabByIndex(index);
 }
 
-Tab *Explorerplusplus::GetTabByIndex(int index)
+Tab &Explorerplusplus::GetTabByIndex(int index)
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
@@ -1456,13 +1379,13 @@ Tab *Explorerplusplus::GetTabByIndex(int index)
 
 	if (!res)
 	{
-		return nullptr;
+		throw std::runtime_error("Tab lookup failed");
 	}
 
-	return &GetTab(static_cast<int>(tcItem.lParam));
+	return GetTab(static_cast<int>(tcItem.lParam));
 }
 
-boost::optional<int> Explorerplusplus::GetTabIndex(const Tab &tab)
+int Explorerplusplus::GetTabIndex(const Tab &tab)
 {
 	int numTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
@@ -1478,7 +1401,8 @@ boost::optional<int> Explorerplusplus::GetTabIndex(const Tab &tab)
 		}
 	}
 
-	return boost::none;
+	// All internal tab objects should have an index.
+	throw std::runtime_error("Couldn't determine index for tab");
 }
 
 int Explorerplusplus::GetNumTabs() const
@@ -1488,14 +1412,8 @@ int Explorerplusplus::GetNumTabs() const
 
 int Explorerplusplus::MoveTab(const Tab &tab, int newIndex)
 {
-	auto index = GetTabIndex(tab);
-
-	if (!index)
-	{
-		return -1;
-	}
-
-	return TabCtrl_MoveItem(m_hTabCtrl, *index, newIndex);
+	int index = GetTabIndex(tab);
+	return TabCtrl_MoveItem(m_hTabCtrl, index, newIndex);
 }
 
 const std::unordered_map<int, Tab> &Explorerplusplus::GetAllTabs() const

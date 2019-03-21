@@ -397,25 +397,19 @@ void Explorerplusplus::SetTabIcon(const Tab &tab)
 		DestroyIcon(shfi.hIcon);
 	}
 
-	auto index = GetTabIndex(tab);
-
-	if (!index)
-	{
-		assert(false);
-		return;
-	}
+	int index = GetTabIndex(tab);
 
 	/* Get the index of the current image. This image
 	will be removed after the new image is set. */
 	tcItem.mask		= TCIF_IMAGE;
-	TabCtrl_GetItem(m_hTabCtrl,*index,&tcItem);
+	TabCtrl_GetItem(m_hTabCtrl,index,&tcItem);
 
 	iRemoveImage = tcItem.iImage;
 
 	/* Set the new image. */
 	tcItem.mask		= TCIF_IMAGE;
 	tcItem.iImage	= iImage;
-	TabCtrl_SetItem(m_hTabCtrl,*index,&tcItem);
+	TabCtrl_SetItem(m_hTabCtrl,index,&tcItem);
 
 	if(iRemoveImage != TAB_ICON_LOCK_INDEX)
 	{
