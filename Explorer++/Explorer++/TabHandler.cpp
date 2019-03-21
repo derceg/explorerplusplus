@@ -410,10 +410,8 @@ int *pTabObjectIndex)
 
 	tab.GetShellBrowser()->SetId(tab.GetId());
 	tab.GetShellBrowser()->SetResourceModule(m_hLanguageModule);
-	tab.GetShellBrowser()->SetHideSystemFiles(m_bHideSystemFilesGlobal);
+
 	tab.GetShellBrowser()->SetShowExtensions(m_bShowExtensionsGlobal);
-	tab.GetShellBrowser()->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
-	tab.GetShellBrowser()->SetShowFolderSizes(m_config->showFolderSizes);
 	tab.GetShellBrowser()->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
 	tab.GetShellBrowser()->SetInsertSorted(m_config->insertSorted);
 
