@@ -645,7 +645,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	/* Only update internal selection info
 	if the listview that sent the change
 	notification is active. */
-	if(iObjectIndex == m_selectedTabId)
+	if(IsTabSelected(tab))
 	{
 		if(Selected)
 		{

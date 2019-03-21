@@ -166,7 +166,7 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 {
 	Tab &tab = GetTab(iTabId);
 
-	if (tab.GetId() == m_selectedTabId)
+	if (IsTabSelected(tab))
 	{
 		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
 			m_CurrentDirectory);
