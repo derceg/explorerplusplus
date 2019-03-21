@@ -102,15 +102,14 @@ LRESULT CALLBACK Explorerplusplus::MainWndTaskbarThumbnailProc(HWND hwnd,UINT uM
 		/* Register each of the tabs. */
 		for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 		{
-			auto tab = GetTabOptional(itr->iTabId);
-			assert(tab != nullptr);
+			const Tab &tab = GetTab(itr->iTabId);
 
-			BOOL bActive = IsTabSelected(*tab);
+			BOOL bActive = IsTabSelected(tab);
 
 			RegisterTab(itr->hProxy,EMPTY_STRING,bActive);
 
-			UpdateTabNameInWindow(*tab);
-			SetTabIcon(*tab);
+			UpdateTabNameInWindow(tab);
+			SetTabIcon(tab);
 		}
 
 		RemoveWindowSubclass(hwnd,MainWndProcStub,0);

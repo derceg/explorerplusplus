@@ -22,16 +22,11 @@ void UiTheming::OnTabCreated(int tabId, BOOL switchToNewTab)
 {
 	UNREFERENCED_PARAMETER(switchToNewTab);
 
-	auto tab = m_tabContainer->GetTabOptional(tabId);
-
-	if (!tab)
-	{
-		return;
-	}
+	const Tab &tab = m_tabContainer->GetTab(tabId);
 
 	if (m_customListViewColorsApplied)
 	{
-		ApplyListViewColorsForTab(*tab, m_listViewBackgroundColor, m_listViewTextColor);
+		ApplyListViewColorsForTab(tab, m_listViewBackgroundColor, m_listViewTextColor);
 	}
 }
 

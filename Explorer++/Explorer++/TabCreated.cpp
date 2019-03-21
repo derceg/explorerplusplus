@@ -30,13 +30,8 @@ boost::signals2::connection Plugins::TabCreated::connectObserver(sol::protected_
 
 void Plugins::TabCreated::onTabCreated(int tabId, sol::protected_function observer)
 {
-	auto tabInternal = m_tabContainer->GetTabOptional(tabId);
+	const Tab &tabInternal = m_tabContainer->GetTab(tabId);
 
-	if (!tabInternal)
-	{
-		return;
-	}
-
-	TabsApi::Tab tab(*tabInternal);
+	TabsApi::Tab tab(tabInternal);
 	observer(tab);
 }
