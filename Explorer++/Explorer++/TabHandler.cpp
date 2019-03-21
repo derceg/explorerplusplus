@@ -744,7 +744,7 @@ void Explorerplusplus::OnSelectTabByIndex(int iTab,BOOL bSetFocus)
 
 bool Explorerplusplus::OnCloseTab(void)
 {
-	const Tab &tab = GetTabByIndex(m_selectedTabIndex);
+	const Tab &tab = GetSelectedTab();
 	return CloseTab(tab);
 }
 
