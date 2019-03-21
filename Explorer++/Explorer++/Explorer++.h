@@ -339,7 +339,6 @@ private:
 	void					OnTabCtrlMButtonUp(POINT *pt);
 	void					OnDisplayWindowResized(WPARAM wParam);
 	void					OnStartedBrowsing(int iTabId, const TCHAR *szPath);
-	void					OnDuplicateTab(int iTab);
 	void					OnLockTab(int iTab);
 	void					OnLockTabAndAddress(int iTab);
 	void					UpdateTabToolbar(void);
@@ -489,9 +488,10 @@ private:
 	int						GetSelectedTabIndex() const;
 	void					SelectTab(const Tab &tab);
 	void					PushGlobalSettingsToTab(int iTabId);
-	void					DuplicateTab(int iTabInternal);
+	void					DuplicateTab(const Tab &tab);
 	Tab						&GetTab(int tabId);
 	Tab						*GetTabOptional(int tabId);
+	Tab						&GetSelectedTab();
 	Tab						*GetTabByIndex(int index);
 	boost::optional<int>	GetTabIndex(const Tab &tab);
 	int						GetNumTabs() const;

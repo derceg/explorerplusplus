@@ -335,7 +335,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 					m_pActiveShellBrowser->ImportColumns(&ActiveColumnList);
 
-					Tab &tab = GetTab(m_selectedTabId);
+					Tab &tab = GetSelectedTab();
 					RefreshTab(tab);
 
 					return TRUE;

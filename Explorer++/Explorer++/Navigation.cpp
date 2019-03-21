@@ -65,7 +65,7 @@ void Explorerplusplus::OnGotoFolder(int FolderCSIDL)
 
 HRESULT Explorerplusplus::BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags)
 {
-	Tab &tab = GetTab(m_selectedTabId);
+	Tab &tab = GetSelectedTab();
 	return BrowseFolder(tab, szPath, wFlags);
 }
 
@@ -103,7 +103,7 @@ HRESULT Explorerplusplus::BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlag
 
 HRESULT Explorerplusplus::BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags)
 {
-	Tab &tab = GetTab(m_selectedTabId);
+	Tab &tab = GetSelectedTab();
 	return BrowseFolder(tab, pidlDirectory, wFlags);
 }
 

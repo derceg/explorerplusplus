@@ -1076,7 +1076,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 	switch(uMenuID)
 	{
 		case IDM_TAB_DUPLICATETAB:
-			OnDuplicateTab(iTabHit);
+			DuplicateTab(*tab);
 			break;
 
 		case IDM_TAB_OPENPARENTINNEWTAB:
@@ -1220,21 +1220,6 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 	}
 }
 
-void Explorerplusplus::OnDuplicateTab(int iTab)
-{
-	TCITEM tcItem;
-	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
-	assert(res);
-
-	if(!res)
-	{
-		return;
-	}
-
-	DuplicateTab((int)tcItem.lParam);
-}
-
 void Explorerplusplus::OnLockTab(int iTab)
 {
 	auto tab = GetTabByIndex(iTab);
@@ -1288,7 +1273,7 @@ void Explorerplusplus::UpdateTabToolbar(void)
 {
 	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
-	const Tab &selectedTab = GetTab(m_selectedTabId);
+	const Tab &selectedTab = GetSelectedTab();
 
 	if(nTabs > 1 && !(selectedTab.GetLocked() || selectedTab.GetAddressLocked()))
 	{
@@ -1304,11 +1289,11 @@ void Explorerplusplus::UpdateTabToolbar(void)
 	}
 }
 
-void Explorerplusplus::DuplicateTab(int iTabInternal)
+void Explorerplusplus::DuplicateTab(const Tab &tab)
 {
 	TCHAR szTabDirectory[MAX_PATH];
 
-	GetTab(iTabInternal).GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
+	tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
 	CreateNewTab(szTabDirectory, nullptr, nullptr, FALSE, nullptr);
@@ -1442,6 +1427,25 @@ Tab *Explorerplusplus::GetTabOptional(int tabId)
 	}
 
 	return &itr->second;
+}
+
+Tab &Explorerplusplus::GetSelectedTab()
+{
+	int index = TabCtrl_GetCurSel(m_hTabCtrl);
+
+	if (index == -1)
+	{
+		throw std::runtime_error("No selected tab");
+	}
+
+	Tab *tab = GetTabByIndex(index);
+
+	if (!tab)
+	{
+		throw std::runtime_error("Selected tab lookup failed");
+	}
+
+	return *tab;
 }
 
 Tab *Explorerplusplus::GetTabByIndex(int index)

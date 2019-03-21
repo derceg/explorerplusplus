@@ -1030,7 +1030,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 
 void Explorerplusplus::OnRefresh(void)
 {
-	Tab &tab = GetTab(m_selectedTabId);
+	Tab &tab = GetSelectedTab();
 	RefreshTab(tab);
 }
 
@@ -1612,6 +1612,6 @@ void Explorerplusplus::OnShowHiddenFiles(void)
 {
 	m_pActiveShellBrowser->ToggleShowHidden();
 
-	Tab &tab = GetTab(m_selectedTabId);
+	Tab &tab = GetSelectedTab();
 	RefreshTab(tab);
 }
