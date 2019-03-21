@@ -44,17 +44,13 @@ boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 	return tab;
 }
 
-/* TODO: This function
-should return a value.
-Probably shouldn't
-return a HRESULT though. */
-void Plugins::TabsApi::create(sol::table createProperties)
+int Plugins::TabsApi::create(sol::table createProperties)
 {
 	boost::optional<std::wstring> location = createProperties["location"];
 
 	if (!location || location->empty())
 	{
-		return;
+		return -1;
 	}
 
 	TabSettings tabSettings;
@@ -80,7 +76,17 @@ void Plugins::TabsApi::create(sol::table createProperties)
 		tabSettings.addressLocked = *addressLocked;
 	}
 
-	m_tabContainer->CreateNewTab(location->c_str(), nullptr, tabSettings, TRUE, nullptr);
+	int tabId;
+	HRESULT hr = m_tabContainer->CreateNewTab(location->c_str(), nullptr, tabSettings, TRUE, &tabId);
+
+	if (FAILED(hr))
+	{
+		/* TODO: Ideally, an error message would be available in case of
+		failure. */
+		return -1;
+	}
+
+	return tabId;
 }
 
 void Plugins::TabsApi::update(int tabId, sol::table properties)

@@ -90,7 +90,7 @@ namespace Plugins
 
 		std::vector<Tab> getAll();
 		boost::optional<Tab> get(int tabId);
-		void create(sol::table createProperties);
+		int create(sol::table createProperties);
 		void update(int tabId, sol::table properties);
 		void refresh(int tabId);
 		int move(int tabId, int newIndex);
