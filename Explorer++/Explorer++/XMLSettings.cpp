@@ -704,8 +704,6 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 					attached to this node. */
 					am->get_length(&lChildNodes);
 
-					SetDefaultTabSettings(&pTabSettings[i]);
-
 					/* For each tab, the first attribute will just be
 					a tab number (0,1,2...). This number can be safely
 					ignored. */
@@ -722,7 +720,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 						if(lstrcmp(bstrName,L"Directory") == 0)
 							StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),bstrValue);
 						else
-							MapTabAttributeValue(bstrName,bstrValue,&pSettings[i],&pTabSettings[i]);
+							MapTabAttributeValue(bstrName,bstrValue,&pSettings[i],pTabSettings[i]);
 					}
 
 					pSettings[i].bShowFolderSizes = m_config->showFolderSizes;
@@ -805,7 +803,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 				}
 			}
 
-			hr = CreateNewTab(szDirectory,&pSettings[i],&pTabSettings[i],TRUE,NULL);
+			hr = CreateNewTab(szDirectory,&pSettings[i],pTabSettings[i],TRUE,NULL);
 
 			if(hr == S_OK)
 				nTabsCreated++;
@@ -1907,7 +1905,7 @@ WCHAR *wszName,WCHAR *wszValue)
 }
 
 void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,
-InitialSettings_t *pSettings,TabSettings *pTabSettings)
+InitialSettings_t *pSettings,TabSettings &tabSettings)
 {
 	if(lstrcmp(wszName,L"ApplyFilter") == 0)
 	{
@@ -1952,20 +1950,15 @@ InitialSettings_t *pSettings,TabSettings *pTabSettings)
 	}
 	else if(lstrcmp(wszName,L"Locked") == 0)
 	{
-		pTabSettings->bLocked = NXMLSettings::DecodeBoolValue(wszValue);
+		tabSettings.locked = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"AddressLocked") == 0)
 	{
-		pTabSettings->bAddressLocked = NXMLSettings::DecodeBoolValue(wszValue);
-	}
-	else if(lstrcmp(wszName,L"UseCustomName") == 0)
-	{
-		pTabSettings->bUseCustomName = NXMLSettings::DecodeBoolValue(wszValue);
+		tabSettings.addressLocked = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"CustomName") == 0)
 	{
-		StringCchCopy(pTabSettings->szName,
-			SIZEOF_ARRAY(pTabSettings->szName),wszValue);
+		tabSettings.name = wszValue;
 	}
 }
 

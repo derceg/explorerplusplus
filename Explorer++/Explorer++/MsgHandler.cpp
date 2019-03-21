@@ -309,7 +309,7 @@ void Explorerplusplus::OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,
 	if(bOpenInNewWindow)
 		OpenDirectoryInNewWindow(pidlItem);
 	else if(m_config->alwaysOpenNewTab || bOpenInNewTab)
-		CreateNewTab(pidlItem, nullptr, nullptr, TRUE, nullptr);
+		CreateNewTab(pidlItem, nullptr, {}, TRUE, nullptr);
 	else
 		BrowseFolderInCurrentTab(pidlItem,0);
 }

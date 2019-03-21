@@ -27,7 +27,7 @@ HRESULT Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInN
 
 	if (bOpenInNewTab)
 	{
-		return CreateNewTab(szExpandedPath, nullptr, nullptr, bSwitchToNewTab, nullptr);
+		return CreateNewTab(szExpandedPath, nullptr, {}, bSwitchToNewTab, nullptr);
 	}
 
 	return BrowseFolderInCurrentTab(szExpandedPath,SBSP_ABSOLUTE);

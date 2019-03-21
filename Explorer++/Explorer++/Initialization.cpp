@@ -396,12 +396,3 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu)
 		InsertMenuItem(menu, IDM_VIEW_PLACEHOLDER, FALSE, &mii);
 	}
 }
-
-void Explorerplusplus::SetDefaultTabSettings(TabSettings *pTabSettings)
-{
-	pTabSettings->bLocked			= FALSE;
-	pTabSettings->bAddressLocked	= FALSE;
-	pTabSettings->bUseCustomName	= FALSE;
-	StringCchCopy(pTabSettings->szName,
-		SIZEOF_ARRAY(pTabSettings->szName),EMPTY_STRING);
-}

@@ -50,7 +50,7 @@ Probably shouldn't
 return a HRESULT though. */
 void Plugins::TabsApi::create(std::wstring path)
 {
-	m_tabContainer->CreateNewTab(path.c_str(), nullptr, nullptr, TRUE, nullptr);
+	m_tabContainer->CreateNewTab(path.c_str(), nullptr, {}, TRUE, nullptr);
 }
 
 void Plugins::TabsApi::update(int tabId, sol::table properties)

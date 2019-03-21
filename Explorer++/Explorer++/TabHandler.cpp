@@ -234,7 +234,7 @@ void Explorerplusplus::OnNewTab()
 		if(PathIsDirectory(FullItemPath))
 		{
 			bFolderSelected = TRUE;
-			CreateNewTab(FullItemPath, nullptr, nullptr, TRUE, nullptr);
+			CreateNewTab(FullItemPath, nullptr, {}, TRUE, nullptr);
 		}
 	}
 
@@ -242,17 +242,17 @@ void Explorerplusplus::OnNewTab()
 	item was not a folder; open the default tab directory. */
 	if(!bFolderSelected)
 	{
-		hr = CreateNewTab(m_DefaultTabDirectory, nullptr, nullptr, TRUE, nullptr);
+		hr = CreateNewTab(m_DefaultTabDirectory, nullptr, {}, TRUE, nullptr);
 
 		if (FAILED(hr))
 		{
-			CreateNewTab(m_DefaultTabDirectoryStatic, nullptr, nullptr, TRUE, nullptr);
+			CreateNewTab(m_DefaultTabDirectoryStatic, nullptr, {}, TRUE, nullptr);
 		}
 	}
 }
 
 HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
-InitialSettings_t *pSettings, TabSettings *pTabSettings,BOOL bSwitchToNewTab,
+InitialSettings_t *pSettings,const TabSettings &tabSettings,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
 	LPITEMIDLIST	pidl = NULL;
@@ -274,7 +274,7 @@ int *pTabObjectIndex)
 	if(!SUCCEEDED(GetIdlFromParsingName(szExpandedPath,&pidl)))
 		return E_FAIL;
 
-	hr = CreateNewTab(pidl,pSettings,pTabSettings,bSwitchToNewTab,pTabObjectIndex);
+	hr = CreateNewTab(pidl,pSettings,tabSettings,bSwitchToNewTab,pTabObjectIndex);
 
 	CoTaskMemFree(pidl);
 
@@ -284,7 +284,7 @@ int *pTabObjectIndex)
 /* Creates a new tab. If the settings argument is NULL,
 the global settings will be used. */
 HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
-InitialSettings_t *pSettings,TabSettings *pTabSettings,BOOL bSwitchToNewTab,
+InitialSettings_t *pSettings,const TabSettings &tabSettings,BOOL bSwitchToNewTab,
 int *pTabObjectIndex)
 {
 	UINT				uFlags;
@@ -305,15 +305,19 @@ int *pTabObjectIndex)
 
 	Tab &tab = item.first->second;
 
-	if(pTabSettings != NULL)
+	if (tabSettings.locked)
 	{
-		tab.SetLocked(pTabSettings->bLocked);
-		tab.SetAddressLocked(pTabSettings->bAddressLocked);
+		tab.SetLocked(*tabSettings.locked);
+	}
 
-		if (pTabSettings->bUseCustomName)
-		{
-			tab.SetCustomName(pTabSettings->szName);
-		}
+	if (tabSettings.addressLocked)
+	{
+		tab.SetAddressLocked(*tabSettings.addressLocked);
+	}
+
+	if (tabSettings.name && !tabSettings.name->empty())
+	{
+		tab.SetCustomName(*tabSettings.name);
 	}
 
 	tab.listView	= CreateMainListView(m_hContainer,ListViewStyles);
@@ -528,7 +532,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
 			}
 
-			hr = CreateNewTab(szDirectory,NULL,NULL,TRUE,NULL);
+			hr = CreateNewTab(szDirectory,NULL, {},TRUE,NULL);
 
 			if(hr == S_OK)
 				nTabsCreated++;
@@ -542,10 +546,10 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	if(nTabsCreated == 0)
 	{
-		hr = CreateNewTab(m_DefaultTabDirectory,NULL,NULL,TRUE,NULL);
+		hr = CreateNewTab(m_DefaultTabDirectory,NULL, {},TRUE,NULL);
 
 		if(FAILED(hr))
-			hr = CreateNewTab(m_DefaultTabDirectoryStatic,NULL,NULL,TRUE,NULL);
+			hr = CreateNewTab(m_DefaultTabDirectoryStatic,NULL, {},TRUE,NULL);
 
 		if(hr == S_OK)
 		{
@@ -1028,7 +1032,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 				if (SUCCEEDED(hr))
 				{
-					CreateNewTab(pidlParent, nullptr, nullptr, TRUE, nullptr);
+					CreateNewTab(pidlParent, nullptr, {}, TRUE, nullptr);
 					CoTaskMemFree(pidlParent);
 				}
 
@@ -1210,7 +1214,7 @@ void Explorerplusplus::DuplicateTab(const Tab &tab)
 	tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
-	CreateNewTab(szTabDirectory, nullptr, nullptr, FALSE, nullptr);
+	CreateNewTab(szTabDirectory, nullptr, {}, FALSE, nullptr);
 }
 
 SortMode Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const

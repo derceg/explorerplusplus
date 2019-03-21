@@ -77,7 +77,7 @@ INT_PTR CDrivesToolbar::OnMButtonUp(const POINTS *pts)
 		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
 		assert(itr != m_mapID.end());
 
-		m_tabContainer->CreateNewTab(itr->second.c_str(), nullptr, nullptr, TRUE, nullptr);
+		m_tabContainer->CreateNewTab(itr->second.c_str(), nullptr, {}, TRUE, nullptr);
 	}
 
 	return 0;
@@ -413,7 +413,7 @@ void CDrivesToolbar::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	switch(iCmd)
 	{
 	case MENU_ID_OPEN_IN_NEW_TAB:
-		m_tabContainer->CreateNewTab(pidlParent, nullptr, nullptr, TRUE, nullptr);
+		m_tabContainer->CreateNewTab(pidlParent, nullptr, {}, TRUE, nullptr);
 		break;
 	}
 }

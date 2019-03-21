@@ -6,15 +6,15 @@
 
 #include "ShellBrowser/iShellView.h"
 #include "../Helper/Macros.h"
+#include <boost/optional.hpp>
 #include <boost/signals2.hpp>
 
 // Used when creating a tab.
 struct TabSettings
 {
-	BOOL	bLocked;
-	BOOL	bAddressLocked;
-	BOOL	bUseCustomName;
-	TCHAR	szName[MAX_PATH];
+	boost::optional<bool> locked;
+	boost::optional<bool> addressLocked;
+	boost::optional<std::wstring> name;
 };
 
 class Tab

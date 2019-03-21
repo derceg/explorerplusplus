@@ -679,7 +679,7 @@ void CSearchDialog::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	{
 	case MENU_ID_OPEN_FILE_LOCATION:
 		{
-			m_tabContainer->CreateNewTab(pidlParent, nullptr, nullptr, TRUE, nullptr);
+			m_tabContainer->CreateNewTab(pidlParent, nullptr, {}, TRUE, nullptr);
 
 			TCHAR szFilename[MAX_PATH];
 			LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
