@@ -62,6 +62,25 @@ int Plugins::TabsApi::create(sol::table createProperties)
 		tabSettings.name = name;
 	}
 
+	boost::optional<int> index = createProperties["index"];
+
+	if (index)
+	{
+		int finalIndex = *index;
+		int numTabs = m_tabContainer->GetNumTabs();
+
+		if (finalIndex < 0)
+		{
+			finalIndex = 0;
+		}
+		else if (finalIndex > numTabs)
+		{
+			finalIndex = numTabs;
+		}
+
+		tabSettings.index = finalIndex;
+	}
+
 	boost::optional<bool> locked = createProperties["locked"];
 
 	if (locked)

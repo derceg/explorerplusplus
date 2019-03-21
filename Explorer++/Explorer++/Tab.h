@@ -12,9 +12,10 @@
 // Used when creating a tab.
 struct TabSettings
 {
+	boost::optional<std::wstring> name;
+	boost::optional<int> index;
 	boost::optional<bool> locked;
 	boost::optional<bool> addressLocked;
-	boost::optional<std::wstring> name;
 };
 
 class Tab

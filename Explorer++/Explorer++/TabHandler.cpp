@@ -290,15 +290,9 @@ int *pTabObjectIndex)
 	UINT				uFlags;
 	HRESULT				hr;
 	InitialSettings_t	is;
-	int					iNewTabIndex;
 
 	if(!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
 		return E_FAIL;
-
-	if(m_config->openNewTabNextToCurrent)
-		iNewTabIndex = m_selectedTabIndex + 1;
-	else
-		iNewTabIndex = TabCtrl_GetItemCount(m_hTabCtrl);
 
 	int tabId = m_tabIdCounter++;
 	auto item = m_Tabs.emplace(std::make_pair(tabId, tabId));
@@ -415,10 +409,28 @@ int *pTabObjectIndex)
 	tab.GetShellBrowser()->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
 	tab.GetShellBrowser()->SetInsertSorted(m_config->insertSorted);
 
+	int index;
+
+	if (tabSettings.index)
+	{
+		index = *tabSettings.index;
+	}
+	else
+	{
+		if (m_config->openNewTabNextToCurrent)
+		{
+			index = m_selectedTabIndex + 1;
+		}
+		else
+		{
+			index = TabCtrl_GetItemCount(m_hTabCtrl);
+		}
+	}
+
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
 	the folder). */
-	InsertNewTab(pidlDirectory,iNewTabIndex,tab.GetId());
+	InsertNewTab(pidlDirectory,index,tab.GetId());
 
 	if(bSwitchToNewTab)
 	{
@@ -428,7 +440,7 @@ int *pTabObjectIndex)
 		}
 
 		/* Select the newly created tab. */
-		TabCtrl_SetCurSel(m_hTabCtrl,iNewTabIndex);
+		TabCtrl_SetCurSel(m_hTabCtrl,index);
 
 		/* Hide the previously active tab, and show the
 		newly created one. */
@@ -436,7 +448,7 @@ int *pTabObjectIndex)
 		ShowWindow(tab.listView,SW_SHOW);
 
 		m_selectedTabId			= tab.GetId();
-		m_selectedTabIndex		= iNewTabIndex;
+		m_selectedTabIndex		= index;
 
 		m_hActiveListView		= tab.listView;
 		m_pActiveShellBrowser	= tab.GetShellBrowser();
