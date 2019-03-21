@@ -528,11 +528,7 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 
 	case WM_CLOSE:
 		{
-			TCITEM tcItem;
-			int nTabs;
-			int i = 0;
-
-			nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+			int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
 			if(nTabs == 1)
 			{
@@ -542,18 +538,8 @@ LRESULT CALLBACK Explorerplusplus::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wPa
 			}
 			else
 			{
-				for(i = 0;i < nTabs;i++)
-				{
-					tcItem.mask = TCIF_PARAM;
-					TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
-
-					if((int)tcItem.lParam == iTabId)
-					{
-						const Tab &tab = GetTab(iTabId);
-						CloseTab(tab);
-						break;
-					}
-				}
+				const Tab &tab = GetTab(iTabId);
+				CloseTab(tab);
 			}
 		}
 		break;

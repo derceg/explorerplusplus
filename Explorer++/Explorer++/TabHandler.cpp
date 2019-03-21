@@ -881,17 +881,7 @@ void Explorerplusplus::OnTabSelectionChange(void)
 
 void Explorerplusplus::OnInitTabMenu(HMENU hMenu)
 {
-	TCITEM tcItem;
-	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hTabCtrl,m_iTabMenuItem,&tcItem);
-	assert(res);
-
-	if(!res)
-	{
-		return;
-	}
-
-	const Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
+	const Tab &tab = GetTabByIndex(m_iTabMenuItem);
 
 	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, tab.GetLocked());
 	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, tab.GetAddressLocked());
@@ -1031,26 +1021,18 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_OPENPARENTINNEWTAB:
 			{
-				TCITEM tcItem;
-				tcItem.mask = TCIF_PARAM;
-				BOOL res = TabCtrl_GetItem(m_hTabCtrl,iTabHit,&tcItem);
-				assert(res);
+				LPITEMIDLIST pidlCurrent = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
 
-				if(res)
+				LPITEMIDLIST pidlParent = NULL;
+				HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
+
+				if (SUCCEEDED(hr))
 				{
-					LPITEMIDLIST pidlCurrent = GetTab(static_cast<int>(tcItem.lParam)).GetShellBrowser()->QueryCurrentDirectoryIdl();
-
-					LPITEMIDLIST pidlParent = NULL;
-					HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
-
-					if(SUCCEEDED(hr))
-					{
-						CreateNewTab(pidlParent, nullptr, nullptr, TRUE, nullptr);
-						CoTaskMemFree(pidlParent);
-					}
-
-					CoTaskMemFree(pidlCurrent);
+					CreateNewTab(pidlParent, nullptr, nullptr, TRUE, nullptr);
+					CoTaskMemFree(pidlParent);
 				}
+
+				CoTaskMemFree(pidlCurrent);
 			}
 			break;
 
@@ -1070,11 +1052,11 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 			break;
 
 		case IDM_TAB_LOCKTAB:
-			OnLockTab(iTabHit);
+			OnLockTab(tab);
 			break;
 
 		case IDM_TAB_LOCKTABANDADDRESS:
-			OnLockTabAndAddress(iTabHit);
+			OnLockTabAndAddress(tab);
 			break;
 
 		case IDM_TAB_CLOSEOTHERTABS:
@@ -1166,15 +1148,13 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 	}
 }
 
-void Explorerplusplus::OnLockTab(int iTab)
+void Explorerplusplus::OnLockTab(Tab &tab)
 {
-	Tab &tab = GetTabByIndex(iTab);
 	tab.SetLocked(!tab.GetLocked());
 }
 
-void Explorerplusplus::OnLockTabAndAddress(int iTab)
+void Explorerplusplus::OnLockTabAndAddress(Tab &tab)
 {
-	Tab &tab = GetTabByIndex(iTab);
 	tab.SetAddressLocked(!tab.GetAddressLocked());
 }
 
@@ -1312,7 +1292,6 @@ void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)
 	LPNMTTDISPINFO	lpnmtdi;
 	NMHDR			*nmhdr = NULL;
 	static TCHAR	szTabToolTip[512];
-	TCITEM			tcItem;
 
 	lpnmtdi = (LPNMTTDISPINFO)lParam;
 	nmhdr = &lpnmtdi->hdr;
@@ -1321,11 +1300,10 @@ void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)
 
 	if (nmhdr->hwndFrom == ToolTipControl)
 	{
-		tcItem.mask = TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl, nmhdr->idFrom, &tcItem);
-
-		GetTab((int)tcItem.lParam).GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
+		const Tab &tab = GetTabByIndex(static_cast<int>(nmhdr->idFrom));
+		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
 			szTabToolTip);
+
 		lpnmtdi->lpszText = szTabToolTip;
 	}
 }

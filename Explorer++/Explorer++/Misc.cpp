@@ -280,11 +280,8 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 
 	for(int i = 0;i < nTabs;i++)
 	{
-		TCITEM tcItem;
-		tcItem.mask = TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
-
-		GetTab(static_cast<int>(tcItem.lParam)).GetShellBrowser()->OnDeviceChange(wParam,lParam);
+		Tab &tab = GetTabByIndex(i);
+		tab.GetShellBrowser()->OnDeviceChange(wParam,lParam);
 	}
 
 	/* Forward the message to the treeview, so that

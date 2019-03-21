@@ -611,7 +611,6 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 				case PSN_APPLY:
 					{
 						HWND hCBSize;
-						TCITEM tcItem;
 						int iSel;
 						int nTabs;
 						int i = 0;
@@ -673,10 +672,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						individual tabs...*/
 						for(i = 0;i < nTabs;i++)
 						{
-							tcItem.mask	= TCIF_PARAM;
-							TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
-
-							Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
+							Tab &tab = GetTabByIndex(i);
 
 							/* Each one of the options should also be pushed to new tabs when they are created. */
 							tab.GetShellBrowser()->SetHideSystemFiles(m_bHideSystemFilesGlobal);
@@ -842,7 +838,6 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 					if(m_config->checkBoxSelection != bCheckBoxSelection)
 					{
-						TCITEM tcItem;
 						DWORD dwExtendedStyle;
 						int nTabs;
 						int i = 0;
@@ -851,10 +846,9 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 						for(i = 0;i < nTabs;i++)
 						{
-							tcItem.mask	= TCIF_PARAM;
-							TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
+							Tab &tab = GetTabByIndex(i);
 
-							dwExtendedStyle = ListView_GetExtendedListViewStyle(GetTab((int)tcItem.lParam).listView);
+							dwExtendedStyle = ListView_GetExtendedListViewStyle(tab.listView);
 
 							if(bCheckBoxSelection)
 							{
@@ -865,8 +859,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 								dwExtendedStyle &= ~LVS_EX_CHECKBOXES;
 							}
 
-							ListView_SetExtendedListViewStyle(GetTab((int)tcItem.lParam).listView,
-								dwExtendedStyle);
+							ListView_SetExtendedListViewStyle(tab.listView, dwExtendedStyle);
 						}
 
 						m_config->checkBoxSelection = (IsDlgButtonChecked(hDlg,IDC_OPTION_CHECKBOXSELECTION)
@@ -904,7 +897,6 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					}
 
 					RECT	rc;
-					TCITEM tcItem;
 					int nTabs;
 					int i = 0;
 
@@ -917,17 +909,14 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 					for(i = 0;i < nTabs;i++)
 					{
-						tcItem.mask	= TCIF_PARAM;
-						TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
-
-						Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
+						Tab &tab = GetTabByIndex(i);
 
 						if(tab.GetShellBrowser()->QueryGridlinesActive() != m_bShowGridlinesGlobal)
 						{
 							tab.GetShellBrowser()->ToggleGridlines();
 						}
 
-						NListView::ListView_AddRemoveExtendedStyle(GetTab((int)tcItem.lParam).listView,
+						NListView::ListView_AddRemoveExtendedStyle(tab.listView,
 							LVS_EX_FULLROWSELECT,m_config->useFullRowSelect);
 					}
 

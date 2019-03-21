@@ -853,7 +853,6 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 {
 	IXMLDOMElement	*pParentNode = NULL;
 	IXMLDOMElement	*pColumnsNode = NULL;
-	TCITEM					tcItem;
 	BSTR					bstr_wsntt = SysAllocString(L"\n\t\t");
 	BSTR					bstr_wsnttt = SysAllocString(L"\n\t\t\t");
 	BSTR					bstr = NULL;
@@ -870,10 +869,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 	{
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 
-		tcItem.mask	= TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
-
-		const Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
+		const Tab &tab = GetTabByIndex(i);
 
 		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), i);
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Tab"),szNodeName);

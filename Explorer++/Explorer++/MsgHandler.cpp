@@ -333,7 +333,6 @@ void Explorerplusplus::OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParame
 BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 {
 	RECT			rc;
-	TCITEM			tcItem;
 	UINT			uFlags;
 	int				IndentBottom = 0;
 	int				IndentTop = 0;
@@ -475,12 +474,9 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	for(i = 0;i < nTabs;i++)
 	{
-		tcItem.mask = TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
+		const Tab &tab = GetTabByIndex(i);
 
 		uFlags = SWP_NOZORDER;
-
-		const Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
 
 		if (IsTabSelected(tab))
 		{
@@ -1244,7 +1240,6 @@ void Explorerplusplus::OnAssocChanged(void)
 	typedef BOOL (WINAPI *FII_PROC)(BOOL);
 	FII_PROC FileIconInit;
 	HKEY hKey;
-	TCITEM tcItem;
 	HMODULE hShell32;
 	TCHAR szShellIconSize[32];
 	TCHAR szTemp[32];
@@ -1252,7 +1247,6 @@ void Explorerplusplus::OnAssocChanged(void)
 	LONG res;
 	int i = 0;
 	int nTabs;
-	int iIndex;
 
 	hShell32 = LoadLibrary(_T("shell32.dll"));
 
@@ -1297,12 +1291,8 @@ void Explorerplusplus::OnAssocChanged(void)
 	/* Now, go through each tab, and refresh each icon. */
 	for(i = 0;i < nTabs;i++)
 	{
-		tcItem.mask = TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
-
-		iIndex = (int)tcItem.lParam;
-
-		GetTab(iIndex).GetShellBrowser()->Refresh();
+		Tab &tab = GetTabByIndex(i);
+		tab.GetShellBrowser()->Refresh();
 	}
 
 	/* Now, refresh the treeview. */
@@ -1517,42 +1507,29 @@ void Explorerplusplus::SaveAllSettings(void)
 tab. */
 void Explorerplusplus::SaveDirectorySpecificSettings(int iTab)
 {
-	TCITEM tcItem;
-	BOOL bRet;
+	/* TODO: First check if there are already settings held for this
+	tab. If there are, delete them first. */
 
-	tcItem.mask = TCIF_PARAM;
-	bRet = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+	Tab &tab = GetTabByIndex(iTab);
 
-	if(bRet)
-	{
-		int iIndexInternal = (int)tcItem.lParam;
+	DirectorySettings_t ds;
+	ds.pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
+	ds.dsi.sortMode = tab.GetShellBrowser()->GetSortMode();
+	ds.dsi.viewMode = tab.GetShellBrowser()->GetCurrentViewMode();
 
-		DirectorySettings_t ds;
+	ColumnExport_t ce;
 
-		/* TODO: First check if there are already settings held for this
-		tab. If there are, delete them first. */
+	tab.GetShellBrowser()->ExportAllColumns(&ce);
 
-		Tab &tab = GetTab(iIndexInternal);
+	ds.dsi.ControlPanelColumnList		= ce.ControlPanelColumnList;
+	ds.dsi.MyComputerColumnList			= ce.MyComputerColumnList;
+	ds.dsi.MyNetworkPlacesColumnList	= ce.MyNetworkPlacesColumnList;
+	ds.dsi.NetworkConnectionsColumnList	= ce.NetworkConnectionsColumnList;
+	ds.dsi.PrintersColumnList			= ce.PrintersColumnList;
+	ds.dsi.RealFolderColumnList			= ce.RealFolderColumnList;
+	ds.dsi.RecycleBinColumnList			= ce.RecycleBinColumnList;
 
-		ds.pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
-
-		ds.dsi.sortMode = tab.GetShellBrowser()->GetSortMode();
-		ds.dsi.viewMode = tab.GetShellBrowser()->GetCurrentViewMode();
-
-		ColumnExport_t ce;
-
-		tab.GetShellBrowser()->ExportAllColumns(&ce);
-
-		ds.dsi.ControlPanelColumnList		= ce.ControlPanelColumnList;
-		ds.dsi.MyComputerColumnList			= ce.MyComputerColumnList;
-		ds.dsi.MyNetworkPlacesColumnList	= ce.MyNetworkPlacesColumnList;
-		ds.dsi.NetworkConnectionsColumnList	= ce.NetworkConnectionsColumnList;
-		ds.dsi.PrintersColumnList			= ce.PrintersColumnList;
-		ds.dsi.RealFolderColumnList			= ce.RealFolderColumnList;
-		ds.dsi.RecycleBinColumnList			= ce.RecycleBinColumnList;
-
-		m_DirectorySettingsList.push_back(ds);
-	}
+	m_DirectorySettingsList.push_back(ds);
 }
 
 /* TODO: This needs to be moved into the actual shell browser. Can't change
@@ -1565,31 +1542,22 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 		{
 			if(CompareIdls(pidlDirectory,ds.pidlDirectory))
 			{
-				TCITEM tcItem;
-				BOOL bRet;
+				Tab &tab = GetTabByIndex(iTab);
 
-				tcItem.mask = TCIF_PARAM;
-				bRet = TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItem);
+				tab.GetShellBrowser()->SetSortMode(ds.dsi.sortMode);
+				tab.GetShellBrowser()->SetCurrentViewMode(ds.dsi.viewMode);
 
-				if(bRet)
-				{
-					Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
+				ColumnExport_t ce;
 
-					tab.GetShellBrowser()->SetSortMode(ds.dsi.sortMode);
-					tab.GetShellBrowser()->SetCurrentViewMode(ds.dsi.viewMode);
+				ce.ControlPanelColumnList = ds.dsi.ControlPanelColumnList;
+				ce.MyComputerColumnList = ds.dsi.MyComputerColumnList;
+				ce.MyNetworkPlacesColumnList = ds.dsi.MyNetworkPlacesColumnList;
+				ce.NetworkConnectionsColumnList = ds.dsi.NetworkConnectionsColumnList;
+				ce.PrintersColumnList = ds.dsi.PrintersColumnList;
+				ce.RealFolderColumnList = ds.dsi.RealFolderColumnList;
+				ce.RecycleBinColumnList = ds.dsi.RecycleBinColumnList;
 
-					ColumnExport_t ce;
-
-					ce.ControlPanelColumnList = ds.dsi.ControlPanelColumnList;
-					ce.MyComputerColumnList = ds.dsi.MyComputerColumnList;
-					ce.MyNetworkPlacesColumnList = ds.dsi.MyNetworkPlacesColumnList;
-					ce.NetworkConnectionsColumnList = ds.dsi.NetworkConnectionsColumnList;
-					ce.PrintersColumnList = ds.dsi.PrintersColumnList;
-					ce.RealFolderColumnList = ds.dsi.RealFolderColumnList;
-					ce.RecycleBinColumnList = ds.dsi.RecycleBinColumnList;
-
-					tab.GetShellBrowser()->ImportAllColumns(&ce);
-				}
+				tab.GetShellBrowser()->ImportAllColumns(&ce);
 			}
 		}
 	}

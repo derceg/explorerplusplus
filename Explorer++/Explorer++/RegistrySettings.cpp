@@ -419,7 +419,6 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 	HKEY	hKey;
 	HKEY	hTabKey;
 	HKEY	hColumnsKey;
-	TCITEM	tcItem;
 	TCHAR	szItemKey[128];
 	LPITEMIDLIST	pidlDirectory = NULL;
 	UINT	ViewMode;
@@ -443,12 +442,8 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 	{
 		iNumTabs = TabCtrl_GetItemCount(m_hTabCtrl);
 
-		tcItem.mask = TCIF_PARAM;
-
 		for(i = 0;i < iNumTabs;i++)
 		{
-			TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
-
 			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
 				_T("%d"),i);
 
@@ -458,7 +453,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 
 			if(ReturnValue == ERROR_SUCCESS)
 			{
-				const Tab &tab = GetTab(static_cast<int>(tcItem.lParam));
+				const Tab &tab = GetTabByIndex(i);
 
 				pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
 				RegSetValueEx(hTabKey,_T("Directory"),0,REG_BINARY,

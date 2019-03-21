@@ -339,8 +339,8 @@ private:
 	void					OnTabCtrlMButtonUp(POINT *pt);
 	void					OnDisplayWindowResized(WPARAM wParam);
 	void					OnStartedBrowsing(int iTabId, const TCHAR *szPath);
-	void					OnLockTab(int iTab);
-	void					OnLockTabAndAddress(int iTab);
+	void					OnLockTab(Tab &tab);
+	void					OnLockTabAndAddress(Tab &tab);
 	void					UpdateTabToolbar(void);
 	void					OnAutoSizeColumns(void);
 	void					OnToolbarViews(void);
