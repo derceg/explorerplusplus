@@ -473,8 +473,8 @@ private:
 	void					InitializeTabs(void);
 	void					AddDefaultTabIcons(HIMAGELIST himlTab);
 	void					SelectAdjacentTab(BOOL bNextTab);
-	HRESULT					CreateNewTab(const TCHAR *TabDirectory,InitialSettings_t *pSettings, const TabSettings &tabSettings, BOOL bSwitchToNewTab,int *pTabObjectIndex);
-	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, const TabSettings &tabSettings, BOOL bSwitchToNewTab,int *pTabObjectIndex);
+	HRESULT					CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, const TabSettings &tabSettings, int *pTabObjectIndex);
+	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, const TabSettings &tabSettings, int *pTabObjectIndex);
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
 	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(int iTab);

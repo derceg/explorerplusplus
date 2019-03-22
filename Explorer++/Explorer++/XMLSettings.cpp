@@ -700,6 +700,8 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 
 				if(SUCCEEDED(hr))
 				{
+					pTabSettings[i].selected = true;
+
 					/* Retrieve the total number of attributes
 					attached to this node. */
 					am->get_length(&lChildNodes);
@@ -803,7 +805,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 				}
 			}
 
-			hr = CreateNewTab(szDirectory,&pSettings[i],pTabSettings[i],TRUE,NULL);
+			hr = CreateNewTab(szDirectory,&pSettings[i],pTabSettings[i],NULL);
 
 			if(hr == S_OK)
 				nTabsCreated++;

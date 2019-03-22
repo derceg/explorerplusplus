@@ -234,7 +234,7 @@ void Explorerplusplus::OnNewTab()
 		if(PathIsDirectory(FullItemPath))
 		{
 			bFolderSelected = TRUE;
-			CreateNewTab(FullItemPath, nullptr, {}, TRUE, nullptr);
+			CreateNewTab(FullItemPath, nullptr, TabSettings(_selected = true), nullptr);
 		}
 	}
 
@@ -242,18 +242,17 @@ void Explorerplusplus::OnNewTab()
 	item was not a folder; open the default tab directory. */
 	if(!bFolderSelected)
 	{
-		hr = CreateNewTab(m_DefaultTabDirectory, nullptr, {}, TRUE, nullptr);
+		hr = CreateNewTab(m_DefaultTabDirectory, nullptr, TabSettings(_selected = true), nullptr);
 
 		if (FAILED(hr))
 		{
-			CreateNewTab(m_DefaultTabDirectoryStatic, nullptr, {}, TRUE, nullptr);
+			CreateNewTab(m_DefaultTabDirectoryStatic, nullptr, TabSettings(_selected = true), nullptr);
 		}
 	}
 }
 
 HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
-InitialSettings_t *pSettings,const TabSettings &tabSettings,BOOL bSwitchToNewTab,
-int *pTabObjectIndex)
+InitialSettings_t *pSettings,const TabSettings &tabSettings,int *pTabObjectIndex)
 {
 	LPITEMIDLIST	pidl = NULL;
 	TCHAR			szExpandedPath[MAX_PATH];
@@ -274,7 +273,7 @@ int *pTabObjectIndex)
 	if(!SUCCEEDED(GetIdlFromParsingName(szExpandedPath,&pidl)))
 		return E_FAIL;
 
-	hr = CreateNewTab(pidl,pSettings,tabSettings,bSwitchToNewTab,pTabObjectIndex);
+	hr = CreateNewTab(pidl,pSettings,tabSettings,pTabObjectIndex);
 
 	CoTaskMemFree(pidl);
 
@@ -284,8 +283,7 @@ int *pTabObjectIndex)
 /* Creates a new tab. If the settings argument is NULL,
 the global settings will be used. */
 HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
-InitialSettings_t *pSettings,const TabSettings &tabSettings,BOOL bSwitchToNewTab,
-int *pTabObjectIndex)
+InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectIndex)
 {
 	UINT				uFlags;
 	HRESULT				hr;
@@ -432,7 +430,14 @@ int *pTabObjectIndex)
 	the folder). */
 	InsertNewTab(pidlDirectory,index,tab.GetId());
 
-	if(bSwitchToNewTab)
+	bool selected = false;
+
+	if (tabSettings.selected)
+	{
+		selected = *tabSettings.selected;
+	}
+
+	if(selected)
 	{
 		if(m_iPreviousTabSelectionId != -1)
 		{
@@ -467,8 +472,10 @@ int *pTabObjectIndex)
 
 	hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory,uFlags);
 
-	if(bSwitchToNewTab)
+	if (selected)
+	{
 		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory), m_CurrentDirectory);
+	}
 
 	if(hr != S_OK)
 	{
@@ -487,9 +494,9 @@ int *pTabObjectIndex)
 	// associated signal) is destroyed or when the tab is destroyed
 	// during application shutdown.
 	tab.AddTabUpdatedObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
-	m_tabCreatedSignal(tab.GetId(), bSwitchToNewTab);
+	m_tabCreatedSignal(tab.GetId(), selected);
 
-	if (bSwitchToNewTab)
+	if (selected)
 	{
 		OnDirChanged(tab.GetId());
 	}
@@ -542,7 +549,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
 			}
 
-			hr = CreateNewTab(szDirectory,NULL, {},TRUE,NULL);
+			hr = CreateNewTab(szDirectory, NULL, TabSettings(_selected = true), NULL);
 
 			if(hr == S_OK)
 				nTabsCreated++;
@@ -556,10 +563,10 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	if(nTabsCreated == 0)
 	{
-		hr = CreateNewTab(m_DefaultTabDirectory,NULL, {},TRUE,NULL);
+		hr = CreateNewTab(m_DefaultTabDirectory, NULL, TabSettings(_selected = true), NULL);
 
 		if(FAILED(hr))
-			hr = CreateNewTab(m_DefaultTabDirectoryStatic,NULL, {},TRUE,NULL);
+			hr = CreateNewTab(m_DefaultTabDirectoryStatic, NULL, TabSettings(_selected = true), NULL);
 
 		if(hr == S_OK)
 		{
@@ -1042,7 +1049,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 				if (SUCCEEDED(hr))
 				{
-					CreateNewTab(pidlParent, nullptr, {}, TRUE, nullptr);
+					CreateNewTab(pidlParent, nullptr, TabSettings(_selected = true), nullptr);
 					CoTaskMemFree(pidlParent);
 				}
 
@@ -1224,7 +1231,7 @@ void Explorerplusplus::DuplicateTab(const Tab &tab)
 	tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
-	CreateNewTab(szTabDirectory, nullptr, {}, FALSE, nullptr);
+	CreateNewTab(szTabDirectory, nullptr, {}, nullptr);
 }
 
 SortMode Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const

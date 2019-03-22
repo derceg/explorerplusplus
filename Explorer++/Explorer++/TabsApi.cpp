@@ -81,6 +81,13 @@ int Plugins::TabsApi::create(sol::table createProperties)
 		tabSettings.index = finalIndex;
 	}
 
+	boost::optional<bool> active = createProperties["active"];
+
+	if (active)
+	{
+		tabSettings.selected = *active;
+	}
+
 	boost::optional<bool> locked = createProperties["locked"];
 
 	if (locked)
@@ -96,7 +103,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	}
 
 	int tabId;
-	HRESULT hr = m_tabContainer->CreateNewTab(location->c_str(), nullptr, tabSettings, TRUE, &tabId);
+	HRESULT hr = m_tabContainer->CreateNewTab(location->c_str(), nullptr, tabSettings, &tabId);
 
 	if (FAILED(hr))
 	{

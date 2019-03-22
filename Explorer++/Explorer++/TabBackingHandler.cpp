@@ -41,11 +41,11 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 	{
 		case WM_LBUTTONDBLCLK:
 			{
-				HRESULT hr = CreateNewTab(m_DefaultTabDirectory, nullptr, {}, TRUE, nullptr);
+				HRESULT hr = CreateNewTab(m_DefaultTabDirectory, nullptr, TabSettings(_selected = true), nullptr);
 
 				if (FAILED(hr))
 				{
-					CreateNewTab(m_DefaultTabDirectoryStatic, nullptr, {}, TRUE, nullptr);
+					CreateNewTab(m_DefaultTabDirectoryStatic, nullptr, TabSettings(_selected = true), nullptr);
 				}
 			}
 			break;

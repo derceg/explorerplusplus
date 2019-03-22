@@ -196,15 +196,15 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 			if (pcds->lpData != NULL)
 			{
-				CreateNewTab((TCHAR *)pcds->lpData, nullptr, {}, TRUE, nullptr);
+				CreateNewTab((TCHAR *)pcds->lpData, nullptr, TabSettings(_selected = true), nullptr);
 			}
 			else
 			{
-				HRESULT hr = CreateNewTab(m_DefaultTabDirectory, nullptr, {}, TRUE, nullptr);
+				HRESULT hr = CreateNewTab(m_DefaultTabDirectory, nullptr, TabSettings(_selected = true), nullptr);
 
 				if (FAILED(hr))
 				{
-					CreateNewTab(m_DefaultTabDirectoryStatic, nullptr, {}, TRUE, nullptr);
+					CreateNewTab(m_DefaultTabDirectoryStatic, nullptr, TabSettings(_selected = true), nullptr);
 				}
 			}
 

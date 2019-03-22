@@ -7,15 +7,53 @@
 #include "ShellBrowser/iShellView.h"
 #include "../Helper/Macros.h"
 #include <boost/optional.hpp>
+#include <boost/parameter.hpp>
 #include <boost/signals2.hpp>
 
-// Used when creating a tab.
-struct TabSettings
+BOOST_PARAMETER_NAME(name)
+BOOST_PARAMETER_NAME(index)
+BOOST_PARAMETER_NAME(selected)
+BOOST_PARAMETER_NAME(locked)
+BOOST_PARAMETER_NAME(addressLocked)
+
+// The use of Boost Parameter here allows values to be set by name
+// during construction. It would be better (and simpler) for this to be
+// done using designated initializers, but that feature's not due to be
+// introduced until C++20.
+struct TabSettingsImpl
 {
+	template <class ArgumentPack>
+	TabSettingsImpl(const ArgumentPack &args)
+	{
+		name = args[_name | boost::none];
+		index = args[_index | boost::none];
+		selected = args[_selected | boost::none];
+		locked = args[_locked | boost::none];
+		addressLocked = args[_addressLocked | boost::none];
+	}
+
 	boost::optional<std::wstring> name;
 	boost::optional<int> index;
+	boost::optional<bool> selected;
 	boost::optional<bool> locked;
 	boost::optional<bool> addressLocked;
+};
+
+// Used when creating a tab.
+struct TabSettings : TabSettingsImpl
+{
+	BOOST_PARAMETER_CONSTRUCTOR(
+		TabSettings,
+		(TabSettingsImpl),
+		tag,
+		(optional
+			(name, (std::wstring))
+			(index, (int))
+			(selected, (bool))
+			(locked, (bool))
+			(addressLocked, (bool))
+		)
+	)
 };
 
 class Tab

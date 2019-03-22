@@ -554,7 +554,6 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 	HKEY				hTabKey;
 	HKEY				hColumnsKey;
 	InitialSettings_t	Settings;
-	TabSettings			tabSettings;
 	TCHAR				szItemKey[128];
 	LPITEMIDLIST		pidlDirectory = NULL;
 	LONG				ReturnValue;
@@ -666,6 +665,10 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			Settings.pRealFolderColumnList			= &RealFolderColumnList;
 			Settings.pRecycleBinColumnList			= &RecycleBinColumnList;
 
+			TabSettings tabSettings;
+
+			tabSettings.selected = true;
+
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("Locked"),&value);
 			tabSettings.locked = value;
 
@@ -676,7 +679,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("CustomName"),customName,SIZEOF_ARRAY(customName));
 			tabSettings.name = customName;
 
-			hr = CreateNewTab(pidlDirectory,&Settings,tabSettings,TRUE,NULL);
+			hr = CreateNewTab(pidlDirectory,&Settings,tabSettings,NULL);
 
 			if(hr == S_OK)
 				nTabsCreated++;
