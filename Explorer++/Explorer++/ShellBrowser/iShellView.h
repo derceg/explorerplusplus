@@ -84,7 +84,6 @@ typedef struct
 typedef struct
 {
 	BOOL bShowExtensions;
-	BOOL bShowSizesInBytes;
 	BOOL bShowFriendlyDates;
 	BOOL bShowFolderSizes;
 } GlobalSettings_t;

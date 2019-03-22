@@ -38,7 +38,6 @@ on each attribute. If the hash function or any of
 the attribute names change in any way, these values
 will need to be changed correspondingly. */
 #define HASH_ALWAYSOPENINNEWTAB		1123321600
-#define HASH_ALWAYSSHOWSIZESINBYTES	1986148483
 #define HASH_AUTOARRANGEGLOBAL		151507311
 #define HASH_CONFIRMCLOSETABS		2636757395
 #define HASH_DISPLAYCENTRECOLOR		3404143227
