@@ -808,7 +808,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	{
 		BOOL bExtensionHidden = FALSE;
 
-		bExtensionHidden = (!m_bShowExtensionsGlobal) ||
+		bExtensionHidden = (!m_config->globalFolderSettings.showExtensions) ||
 			(m_bHideLinkExtensionGlobal && lstrcmpi(PathFindExtension(OldName),_T(".lnk")) == 0);
 
 		/* If file extensions are turned off, the new filename
@@ -907,7 +907,7 @@ void Explorerplusplus::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 		wfd = m_pActiveShellBrowser->QueryFileFindData(iItem);
 
 		CreateFileTimeString(&wfd.ftLastWriteTime,
-			szDateModified,SIZEOF_ARRAY(szDateModified),m_bShowFriendlyDatesGlobal);
+			szDateModified,SIZEOF_ARRAY(szDateModified), m_config->globalFolderSettings.showFriendlyDates);
 
 		LoadString(m_hLanguageModule,IDS_GENERAL_DATEMODIFIED,szDate,
 				SIZEOF_ARRAY(szDate));

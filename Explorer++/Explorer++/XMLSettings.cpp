@@ -532,15 +532,15 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowDisplayWindow"),NXMLSettings::EncodeBoolValue(m_config->showDisplayWindow));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowExtensions"),NXMLSettings::EncodeBoolValue(m_bShowExtensionsGlobal));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowExtensions"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showExtensions));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFilePreviews"),NXMLSettings::EncodeBoolValue(m_config->showFilePreviews));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFolders"),NXMLSettings::EncodeBoolValue(m_config->showFolders));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFolderSizes"),NXMLSettings::EncodeBoolValue(m_config->showFolderSizes));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFolderSizes"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showFolderSizes));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFriendlyDates"),NXMLSettings::EncodeBoolValue(m_bShowFriendlyDatesGlobal));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFriendlyDates"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showFriendlyDates));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFullTitlePath"),NXMLSettings::EncodeBoolValue(m_config->showFullTitlePath));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -724,7 +724,6 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 							MapTabAttributeValue(bstrName,bstrValue,&pSettings[i],pTabSettings[i]);
 					}
 
-					pSettings[i].bShowFolderSizes = m_config->showFolderSizes;
 					pSettings[i].bDisableFolderSizesNetworkRemovable = m_config->disableFolderSizesNetworkRemovable;
 
 					hr = pNode->get_firstChild(&pColumnsNode);
@@ -1666,7 +1665,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWEXTENSIONS:
-		m_bShowExtensionsGlobal = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.showExtensions = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFILEPREVIEWS:
@@ -1678,11 +1677,11 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWFOLDERSIZES:
-		m_config->showFolderSizes = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.showFolderSizes = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFRIENDLYDATES:
-		m_bShowFriendlyDatesGlobal = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.showFriendlyDates = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWFULLTITLEPATH:

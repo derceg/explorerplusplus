@@ -487,7 +487,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 				if(m_bHideSystemFilesGlobal)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SYSTEMFILES,BST_CHECKED);
-				if(!m_bShowExtensionsGlobal)
+				if(!m_config->globalFolderSettings.showExtensions)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_EXTENSIONS,BST_CHECKED);
 				if(m_bHideLinkExtensionGlobal)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_LINK,BST_CHECKED);
@@ -504,7 +504,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,BST_CHECKED);
 				if(m_config->playNavigationSound)
 					CheckDlgButton(hDlg,IDC_OPTIONS_PLAYNAVIGATIONSOUND,BST_CHECKED);
-				if(m_config->showFolderSizes)
+				if(m_config->globalFolderSettings.showFolderSizes)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES,BST_CHECKED);
 				if(m_config->disableFolderSizesNetworkRemovable)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,BST_CHECKED);
@@ -512,7 +512,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FORCESIZE,BST_CHECKED);
 				if(m_config->handleZipFiles)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_ZIPFILES,BST_CHECKED);
-				if(m_bShowFriendlyDatesGlobal)
+				if(m_config->globalFolderSettings.showFriendlyDates)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FRIENDLYDATES,BST_CHECKED);
 				if(m_bShowInfoTips)
 					CheckDlgButton(hDlg,IDC_OPTIONS_CHECK_SHOWINFOTIPS,BST_CHECKED);
@@ -618,7 +618,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						m_bHideSystemFilesGlobal = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SYSTEMFILES)
 							== BST_CHECKED);
 
-						m_bShowExtensionsGlobal = !(IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_EXTENSIONS)
+						m_config->globalFolderSettings.showExtensions = !(IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_EXTENSIONS)
 							== BST_CHECKED);
 
 						m_bHideLinkExtensionGlobal = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_LINK)
@@ -638,7 +638,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						m_config->playNavigationSound = (IsDlgButtonChecked(hDlg,IDC_OPTIONS_PLAYNAVIGATIONSOUND)
 							== BST_CHECKED);
 
-						m_config->showFolderSizes = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES)
+						m_config->globalFolderSettings.showFolderSizes = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES)
 							== BST_CHECKED);
 
 						m_config->disableFolderSizesNetworkRemovable = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE)
@@ -650,7 +650,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						m_config->handleZipFiles = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_ZIPFILES)
 							== BST_CHECKED);
 
-						m_bShowFriendlyDatesGlobal = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FRIENDLYDATES)
+						m_config->globalFolderSettings.showFriendlyDates = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FRIENDLYDATES)
 							== BST_CHECKED);
 
 						m_bShowInfoTips = (IsDlgButtonChecked(hDlg,IDC_OPTIONS_CHECK_SHOWINFOTIPS)
@@ -676,11 +676,8 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 							/* Each one of the options should also be pushed to new tabs when they are created. */
 							tab.GetShellBrowser()->SetHideSystemFiles(m_bHideSystemFilesGlobal);
-							tab.GetShellBrowser()->SetShowExtensions(m_bShowExtensionsGlobal);
 							tab.GetShellBrowser()->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
-							tab.GetShellBrowser()->SetShowFolderSizes(m_config->showFolderSizes);
 							tab.GetShellBrowser()->SetDisableFolderSizesNetworkRemovable(m_config->disableFolderSizesNetworkRemovable);
-							tab.GetShellBrowser()->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
 							tab.GetShellBrowser()->SetInsertSorted(m_config->insertSorted);
 							tab.GetShellBrowser()->SetForceSize(m_config->forceSize);
 							tab.GetShellBrowser()->SetSizeDisplayFormat(m_config->sizeDisplayFormat);

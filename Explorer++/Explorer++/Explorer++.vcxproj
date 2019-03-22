@@ -486,6 +486,7 @@
     <ClInclude Include="SetFileAttributesDialog.h" />
     <ClInclude Include="ShellBrowser\ColumnDataRetrieval.h" />
     <ClInclude Include="ShellBrowser\Columns.h" />
+    <ClInclude Include="ShellBrowser\FolderSettings.h" />
     <ClInclude Include="ShellBrowser\iPathManager.h" />
     <ClInclude Include="ShellBrowser\iShellBrowser_internal.h" />
     <ClInclude Include="ShellBrowser\iShellView.h" />

@@ -55,15 +55,16 @@ ULONG __stdcall CShellBrowser::Release(void)
 }
 
 CShellBrowser *CShellBrowser::CreateNew(HWND hOwner,HWND hListView,
-	const InitialSettings_t *pSettings)
+	const InitialSettings_t *pSettings, const GlobalFolderSettings *globalFolderSettings)
 {
-	return new CShellBrowser(hOwner,hListView,pSettings);
+	return new CShellBrowser(hOwner, hListView, pSettings, globalFolderSettings);
 }
 
-CShellBrowser::CShellBrowser(HWND hOwner,HWND hListView,
-const InitialSettings_t *pSettings) :
+CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView,
+	const InitialSettings_t *pSettings, const GlobalFolderSettings *globalFolderSettings) :
 m_hOwner(hOwner),
 m_hListView(hListView),
+m_globalFolderSettings(globalFolderSettings),
 m_itemIDCounter(0),
 m_columnThreadPool(1),
 m_columnResultIDCounter(0),
@@ -80,13 +81,11 @@ m_iconResultIDCounter(0)
 	m_bSortAscending		= TRUE;
 	m_bAutoArrange			= TRUE;
 	m_bShowInGroups			= FALSE;
-	m_bShowFriendlyDates	= TRUE;
 	m_bFolderVisited		= FALSE;
 	m_bApplyFilter			= FALSE;
 	m_bFilterCaseSensitive	= FALSE;
 	m_bGridlinesActive		= TRUE;
 	m_bShowHidden			= FALSE;
-	m_bShowExtensions		= TRUE;
 	m_bHideSystemFiles		= FALSE;
 	m_bHideLinkExtension	= FALSE;
 
@@ -395,7 +394,6 @@ void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 	m_ViewMode				= is->viewMode;
 	m_bApplyFilter			= is->bApplyFilter;
 	m_bFilterCaseSensitive	= is->bFilterCaseSensitive;
-	m_bShowFolderSizes		= is->bShowFolderSizes;
 	m_bDisableFolderSizesNetworkRemovable = is->bDisableFolderSizesNetworkRemovable;
 	m_bHideSystemFiles		= is->bHideSystemFiles;
 	m_bHideLinkExtension	= is->bHideLinkExtension;
@@ -413,13 +411,6 @@ void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 	m_RecycleBinColumnList = *is->pRecycleBinColumnList;
 
 	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
-}
-
-void CShellBrowser::SetGlobalSettings(const GlobalSettings_t *gs)
-{
-	m_bShowExtensions		= gs->bShowExtensions;
-	m_bShowFriendlyDates	= gs->bShowFriendlyDates;
-	m_bShowFolderSizes		= gs->bShowFolderSizes;
 }
 
 int CShellBrowser::GetId(void) const
@@ -464,11 +455,6 @@ void CShellBrowser::SetHideSystemFiles(BOOL bHideSystemFiles)
 	m_bHideSystemFiles = bHideSystemFiles;
 }
 
-void CShellBrowser::SetShowExtensions(BOOL bShowExtensions)
-{
-	m_bShowExtensions = bShowExtensions;
-}
-
 BOOL CShellBrowser::GetHideLinkExtension() const
 {
 	return m_bHideLinkExtension;
@@ -479,24 +465,9 @@ void CShellBrowser::SetHideLinkExtension(BOOL bHideLinkExtension)
 	m_bHideLinkExtension = bHideLinkExtension;
 }
 
-BOOL CShellBrowser::GetShowFolderSizes() const
-{
-	return m_bShowFolderSizes;
-}
-
-void CShellBrowser::SetShowFolderSizes(BOOL bShowFolderSizes)
-{
-	m_bShowFolderSizes = bShowFolderSizes;
-}
-
 void CShellBrowser::SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable)
 {
 	m_bDisableFolderSizesNetworkRemovable = bDisableFolderSizesNetworkRemovable;
-}
-
-void CShellBrowser::SetShowFriendlyDates(BOOL bShowFriendlyDates)
-{
-	m_bShowFriendlyDates = bShowFriendlyDates;
 }
 
 void CShellBrowser::SetInsertSorted(BOOL bInsertSorted)

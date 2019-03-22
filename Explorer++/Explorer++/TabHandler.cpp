@@ -336,7 +336,6 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		is.bShowInGroups		= m_bShowInGroupsGlobal;
 		is.bSortAscending		= m_bSortAscendingGlobal;
 		is.bAutoArrange			= m_bAutoArrangeGlobal;
-		is.bShowFolderSizes		= m_config->showFolderSizes;
 		is.bDisableFolderSizesNetworkRemovable = m_config->disableFolderSizesNetworkRemovable;
 		is.bHideSystemFiles		= m_bHideSystemFilesGlobal;
 		is.bHideLinkExtension	= m_bHideLinkExtensionGlobal;
@@ -394,7 +393,7 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 	pSettings->bForceSize	= m_config->forceSize;
 	pSettings->sdf			= m_config->sizeDisplayFormat;
 
-	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView,pSettings));
+	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView, pSettings, &m_config->globalFolderSettings));
 
 	if (pSettings->bApplyFilter)
 	{
@@ -407,8 +406,6 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 	tab.GetShellBrowser()->SetId(tab.GetId());
 	tab.GetShellBrowser()->SetResourceModule(m_hLanguageModule);
 
-	tab.GetShellBrowser()->SetShowExtensions(m_bShowExtensionsGlobal);
-	tab.GetShellBrowser()->SetShowFriendlyDates(m_bShowFriendlyDatesGlobal);
 	tab.GetShellBrowser()->SetInsertSorted(m_config->insertSorted);
 
 	int index;
@@ -466,11 +463,6 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 
 		m_iPreviousTabSelectionId = tab.GetId();
 	}
-
-	/* These settings are applied to all tabs (i.e. they
-	are not tab specific). Send them to the browser
-	regardless of whether it loads its own settings or not. */
-	PushGlobalSettingsToTab(tab.GetId());
 
 	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory, SBSP_ABSOLUTE);
 
@@ -1331,18 +1323,6 @@ void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)
 
 		lpnmtdi->lpszText = szTabToolTip;
 	}
-}
-
-void Explorerplusplus::PushGlobalSettingsToTab(int iTabId)
-{
-	GlobalSettings_t gs;	
-
-	/* These settings are global to the whole program. */
-	gs.bShowExtensions		= m_bShowExtensionsGlobal;
-	gs.bShowFriendlyDates	= m_bShowFriendlyDatesGlobal;
-	gs.bShowFolderSizes		= m_config->showFolderSizes;
-
-	GetTab(iTabId).GetShellBrowser()->SetGlobalSettings(&gs);
 }
 
 Tab &Explorerplusplus::GetTab(int tabId)

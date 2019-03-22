@@ -487,7 +487,6 @@ private:
 	int						GetSelectedTabId() const;
 	int						GetSelectedTabIndex() const;
 	void					SelectTab(const Tab &tab);
-	void					PushGlobalSettingsToTab(int iTabId);
 	void					DuplicateTab(const Tab &tab);
 	Tab						&GetTab(int tabId);
 	Tab						*GetTabOptional(int tabId);
@@ -847,11 +846,9 @@ private:
 	/* Global options. */
 	ViewMode				m_ViewModeGlobal;
 	BOOL					m_bShowHiddenGlobal;
-	BOOL					m_bShowExtensionsGlobal;
 	BOOL					m_bShowInGroupsGlobal;
 	BOOL					m_bAutoArrangeGlobal;
 	BOOL					m_bSortAscendingGlobal;
-	BOOL					m_bShowFriendlyDatesGlobal;
 	BOOL					m_bShowGridlinesGlobal;
 	BOOL					m_bHideSystemFilesGlobal;
 	BOOL					m_bHideLinkExtensionGlobal;

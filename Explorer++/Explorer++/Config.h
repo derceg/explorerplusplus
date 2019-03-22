@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ShellBrowser/FolderSettings.h"
 #include "../Helper/StringHelper.h"
 
 static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
@@ -23,7 +24,6 @@ struct Config
 		alwaysShowTabBar = TRUE;
 		showFullTitlePath = FALSE;
 		alwaysOpenNewTab = FALSE;
-		showFolderSizes = FALSE;
 		disableFolderSizesNetworkRemovable = FALSE;
 		openNewTabNextToCurrent = FALSE;
 		treeViewDelayEnabled = FALSE;
@@ -47,6 +47,10 @@ struct Config
 		sizeDisplayFormat = SIZE_FORMAT_BYTES;
 		playNavigationSound = TRUE;
 		confirmCloseTabs = FALSE;
+
+		globalFolderSettings.showExtensions = TRUE;
+		globalFolderSettings.showFriendlyDates = TRUE;
+		globalFolderSettings.showFolderSizes = FALSE;
 	}
 
 	BOOL showStatusBar;
@@ -60,7 +64,6 @@ struct Config
 	BOOL alwaysShowTabBar;
 	BOOL showFullTitlePath;
 	BOOL alwaysOpenNewTab;
-	BOOL showFolderSizes;
 	BOOL disableFolderSizesNetworkRemovable;
 	BOOL openNewTabNextToCurrent;
 	BOOL treeViewDelayEnabled;
@@ -84,4 +87,8 @@ struct Config
 	SizeDisplayFormat_t sizeDisplayFormat;
 	BOOL playNavigationSound;
 	BOOL confirmCloseTabs;
+
+	// These are settings that are shared between all tabs. It's not
+	// possible to adjust them on a per-tab basis.
+	GlobalFolderSettings globalFolderSettings;
 };

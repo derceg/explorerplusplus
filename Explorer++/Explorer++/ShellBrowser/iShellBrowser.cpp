@@ -1489,13 +1489,15 @@ int CShellBrowser::GetFolderIndex(void) const
 Preferences_t CShellBrowser::CreatePreferencesStructure() const
 {
 	Preferences_t preferences;
-	preferences.showFriendlyDates = m_bShowFriendlyDates;
 	preferences.forceSize = m_bForceSize;
 	preferences.sizeDisplayFormat = m_SizeDisplayFormat;
-	preferences.showFolderSizes = m_bShowFolderSizes;
 	preferences.disableFolderSizesNetworkRemovable = m_bDisableFolderSizesNetworkRemovable;
 	preferences.hideLinkExtension = m_bHideLinkExtension;
-	preferences.showExtensions = m_bShowExtensions;
+
+	preferences.showFriendlyDates = m_globalFolderSettings->showFriendlyDates;
+	preferences.showFolderSizes = m_globalFolderSettings->showFolderSizes;
+	preferences.showExtensions = m_globalFolderSettings->showExtensions;
+
 	return preferences;
 }
 

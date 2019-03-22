@@ -600,6 +600,9 @@
     <ClInclude Include="TabUpdated.h">
       <Filter>Plugins\TabsApi\Events</Filter>
     </ClInclude>
+    <ClInclude Include="ShellBrowser\FolderSettings.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

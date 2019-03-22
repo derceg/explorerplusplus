@@ -56,7 +56,7 @@ void Explorerplusplus::OnMergeFiles()
 	}
 
 	CMergeFilesDialog CMergeFilesDialog(m_hLanguageModule, IDD_MERGEFILES,
-		m_hContainer, szCurrentDirectory, FullFilenameList, m_bShowFriendlyDatesGlobal);
+		m_hContainer, szCurrentDirectory, FullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	CMergeFilesDialog.ShowModalDialog();
 }
 
@@ -87,7 +87,7 @@ void Explorerplusplus::OnDestroyFiles()
 	}
 
 	CDestroyFilesDialog CDestroyFilesDialog(m_hLanguageModule, IDD_DESTROYFILES,
-		m_hContainer, FullFilenameList, m_bShowFriendlyDatesGlobal);
+		m_hContainer, FullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	CDestroyFilesDialog.ShowModalDialog();
 }
 

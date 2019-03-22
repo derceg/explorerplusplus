@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ColumnDataRetrieval.h"
+#include "FolderSettings.h"
 #include "iPathManager.h"
 #include "ItemData.h"
 #include "SortModes.h"
@@ -63,7 +64,6 @@ typedef struct
 	BOOL	bGridlinesActive;
 	BOOL	bApplyFilter;
 	BOOL	bFilterCaseSensitive;
-	BOOL	bShowFolderSizes;
 	BOOL	bDisableFolderSizesNetworkRemovable;
 	BOOL	bHideSystemFiles;
 	BOOL	bHideLinkExtension;
@@ -80,13 +80,6 @@ typedef struct
 	std::list<Column_t>	*pNetworkConnectionsColumnList;
 	std::list<Column_t>	*pMyNetworkPlacesColumnList;
 } InitialSettings_t;
-
-typedef struct
-{
-	BOOL bShowExtensions;
-	BOOL bShowFriendlyDates;
-	BOOL bShowFolderSizes;
-} GlobalSettings_t;
 
 typedef struct
 {
@@ -110,7 +103,7 @@ class CShellBrowser : public IDropTarget, public IDropFilesCallback
 
 public:
 
-	static CShellBrowser *CreateNew(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings);
+	static CShellBrowser	*CreateNew(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings, const GlobalFolderSettings *globalFolderSettings);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
@@ -164,7 +157,6 @@ public:
 
 	/* Settings. */
 	void				SetUserOptions(const InitialSettings_t *is);
-	void				SetGlobalSettings(const GlobalSettings_t *gs);
 
 	/* ID. */
 	int					GetId(void) const;
@@ -216,13 +208,9 @@ public:
 
 	BOOL				GetHideSystemFiles() const;
 	void				SetHideSystemFiles(BOOL bHideSystemFiles);
-	void				SetShowExtensions(BOOL bShowExtensions);
 	BOOL				GetHideLinkExtension() const;
 	void				SetHideLinkExtension(BOOL bHideLinkExtension);
-	BOOL				GetShowFolderSizes() const;
-	void				SetShowFolderSizes(BOOL bShowFolderSizes);
 	void				SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable);
-	void				SetShowFriendlyDates(BOOL bShowFriendlyDates);
 	void				SetInsertSorted(BOOL bInsertSorted);
 	void				SetForceSize(BOOL bForceSize);
 	void				SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
@@ -335,7 +323,7 @@ private:
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings);
+	CShellBrowser(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings, const GlobalFolderSettings *globalFolderSettings);
 	~CShellBrowser();
 
 	int					GenerateUniqueItemId(void);
@@ -545,7 +533,6 @@ private:
 	ViewMode			m_ViewMode;
 	BOOL				m_bVirtualFolder;
 	BOOL				m_bFolderVisited;
-	BOOL				m_bShowFolderSizes;
 	BOOL				m_bDisableFolderSizesNetworkRemovable;
 	BOOL				m_bForceSize;
 	SizeDisplayFormat_t	m_SizeDisplayFormat;
@@ -567,13 +554,13 @@ private:
 	BOOL				m_bAutoArrange;
 	BOOL				m_bShowInGroups;
 	BOOL				m_bSortAscending;
-	BOOL				m_bShowFriendlyDates;
 	BOOL				m_bGridlinesActive;
 	BOOL				m_bShowHidden;
-	BOOL				m_bShowExtensions;
 	BOOL				m_bHideSystemFiles;
 	BOOL				m_bHideLinkExtension;
 	BOOL				m_bInsertSorted;
+
+	const GlobalFolderSettings	*m_globalFolderSettings;
 
 	/* ID. */
 	int					m_ID;
