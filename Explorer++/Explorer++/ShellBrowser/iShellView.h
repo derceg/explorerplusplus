@@ -64,7 +64,6 @@ typedef struct
 	BOOL	bGridlinesActive;
 	BOOL	bApplyFilter;
 	BOOL	bFilterCaseSensitive;
-	BOOL	bDisableFolderSizesNetworkRemovable;
 	BOOL	bHideSystemFiles;
 	BOOL	bHideLinkExtension;
 	BOOL	bForceSize;
@@ -210,7 +209,6 @@ public:
 	void				SetHideSystemFiles(BOOL bHideSystemFiles);
 	BOOL				GetHideLinkExtension() const;
 	void				SetHideLinkExtension(BOOL bHideLinkExtension);
-	void				SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable);
 	void				SetInsertSorted(BOOL bInsertSorted);
 	void				SetForceSize(BOOL bForceSize);
 	void				SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
@@ -533,7 +531,6 @@ private:
 	ViewMode			m_ViewMode;
 	BOOL				m_bVirtualFolder;
 	BOOL				m_bFolderVisited;
-	BOOL				m_bDisableFolderSizesNetworkRemovable;
 	BOOL				m_bForceSize;
 	SizeDisplayFormat_t	m_SizeDisplayFormat;
 	int					m_nTotalItems;

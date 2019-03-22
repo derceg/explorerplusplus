@@ -506,7 +506,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					CheckDlgButton(hDlg,IDC_OPTIONS_PLAYNAVIGATIONSOUND,BST_CHECKED);
 				if(m_config->globalFolderSettings.showFolderSizes)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES,BST_CHECKED);
-				if(m_config->disableFolderSizesNetworkRemovable)
+				if(m_config->globalFolderSettings.disableFolderSizesNetworkRemovable)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE,BST_CHECKED);
 				if(m_config->forceSize)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FORCESIZE,BST_CHECKED);
@@ -641,7 +641,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						m_config->globalFolderSettings.showFolderSizes = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZES)
 							== BST_CHECKED);
 
-						m_config->disableFolderSizesNetworkRemovable = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE)
+						m_config->globalFolderSettings.disableFolderSizesNetworkRemovable = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FOLDERSIZESNETWORKREMOVABLE)
 							== BST_CHECKED);
 
 						m_config->forceSize = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FORCESIZE)
@@ -677,7 +677,6 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 							/* Each one of the options should also be pushed to new tabs when they are created. */
 							tab.GetShellBrowser()->SetHideSystemFiles(m_bHideSystemFilesGlobal);
 							tab.GetShellBrowser()->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
-							tab.GetShellBrowser()->SetDisableFolderSizesNetworkRemovable(m_config->disableFolderSizesNetworkRemovable);
 							tab.GetShellBrowser()->SetInsertSorted(m_config->insertSorted);
 							tab.GetShellBrowser()->SetForceSize(m_config->forceSize);
 							tab.GetShellBrowser()->SetSizeDisplayFormat(m_config->sizeDisplayFormat);

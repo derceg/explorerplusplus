@@ -394,7 +394,6 @@ void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 	m_ViewMode				= is->viewMode;
 	m_bApplyFilter			= is->bApplyFilter;
 	m_bFilterCaseSensitive	= is->bFilterCaseSensitive;
-	m_bDisableFolderSizesNetworkRemovable = is->bDisableFolderSizesNetworkRemovable;
 	m_bHideSystemFiles		= is->bHideSystemFiles;
 	m_bHideLinkExtension	= is->bHideLinkExtension;
 	m_bForceSize			= is->bForceSize;
@@ -463,11 +462,6 @@ BOOL CShellBrowser::GetHideLinkExtension() const
 void CShellBrowser::SetHideLinkExtension(BOOL bHideLinkExtension)
 {
 	m_bHideLinkExtension = bHideLinkExtension;
-}
-
-void CShellBrowser::SetDisableFolderSizesNetworkRemovable(BOOL bDisableFolderSizesNetworkRemovable)
-{
-	m_bDisableFolderSizesNetworkRemovable = bDisableFolderSizesNetworkRemovable;
 }
 
 void CShellBrowser::SetInsertSorted(BOOL bInsertSorted)

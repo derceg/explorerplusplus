@@ -418,7 +418,8 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ConfirmCloseTabs"),NXMLSettings::EncodeBoolValue(m_config->confirmCloseTabs));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisableFolderSizesNetworkRemovable"),NXMLSettings::EncodeBoolValue(m_config->disableFolderSizesNetworkRemovable));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisableFolderSizesNetworkRemovable"),
+		NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.disableFolderSizesNetworkRemovable));
 
 	COLORREF CentreColor;
 
@@ -723,8 +724,6 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 						else
 							MapTabAttributeValue(bstrName,bstrValue,&pSettings[i],pTabSettings[i]);
 					}
-
-					pSettings[i].bDisableFolderSizesNetworkRemovable = m_config->disableFolderSizesNetworkRemovable;
 
 					hr = pNode->get_firstChild(&pColumnsNode);
 
@@ -1547,7 +1546,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_DISABLEFOLDERSIZENETWORKREMOVABLE:
-		m_config->disableFolderSizesNetworkRemovable = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.disableFolderSizesNetworkRemovable = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_DISPLAYCENTRECOLOR:

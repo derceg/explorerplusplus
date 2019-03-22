@@ -24,7 +24,6 @@ struct Config
 		alwaysShowTabBar = TRUE;
 		showFullTitlePath = FALSE;
 		alwaysOpenNewTab = FALSE;
-		disableFolderSizesNetworkRemovable = FALSE;
 		openNewTabNextToCurrent = FALSE;
 		treeViewDelayEnabled = FALSE;
 		oneClickActivate = FALSE;
@@ -51,6 +50,7 @@ struct Config
 		globalFolderSettings.showExtensions = TRUE;
 		globalFolderSettings.showFriendlyDates = TRUE;
 		globalFolderSettings.showFolderSizes = FALSE;
+		globalFolderSettings.disableFolderSizesNetworkRemovable = FALSE;
 	}
 
 	BOOL showStatusBar;
@@ -64,7 +64,6 @@ struct Config
 	BOOL alwaysShowTabBar;
 	BOOL showFullTitlePath;
 	BOOL alwaysOpenNewTab;
-	BOOL disableFolderSizesNetworkRemovable;
 	BOOL openNewTabNextToCurrent;
 	BOOL treeViewDelayEnabled;
 	BOOL oneClickActivate;

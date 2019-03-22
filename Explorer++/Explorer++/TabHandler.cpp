@@ -336,7 +336,6 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		is.bShowInGroups		= m_bShowInGroupsGlobal;
 		is.bSortAscending		= m_bSortAscendingGlobal;
 		is.bAutoArrange			= m_bAutoArrangeGlobal;
-		is.bDisableFolderSizesNetworkRemovable = m_config->disableFolderSizesNetworkRemovable;
 		is.bHideSystemFiles		= m_bHideSystemFilesGlobal;
 		is.bHideLinkExtension	= m_bHideLinkExtensionGlobal;
 
