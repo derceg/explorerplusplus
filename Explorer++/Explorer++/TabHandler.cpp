@@ -285,12 +285,10 @@ the global settings will be used. */
 HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectIndex)
 {
-	UINT				uFlags;
-	HRESULT				hr;
-	InitialSettings_t	is;
-
-	if(!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
+	if (!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
+	{
 		return E_FAIL;
+	}
 
 	int tabId = m_tabIdCounter++;
 	auto item = m_Tabs.emplace(std::make_pair(tabId, tabId));
@@ -312,15 +310,19 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		tab.SetCustomName(*tabSettings.name);
 	}
 
-	tab.listView	= CreateMainListView(m_hContainer,ListViewStyles);
+	tab.listView = CreateMainListView(m_hContainer,ListViewStyles);
 
-	if(tab.listView == NULL)
+	if (tab.listView == NULL)
+	{
 		return E_FAIL;
+	}
 
 	NListView::ListView_ActivateOneClickSelect(tab.listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
 
 	/* Set the listview to its initial size. */
 	SetListViewInitialPosition(tab.listView);
+
+	InitialSettings_t is;
 
 	/* If no explicit settings are specified, use the
 	global ones. */
@@ -394,8 +396,10 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 
 	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView,pSettings));
 
-	if(pSettings->bApplyFilter)
-		NListView::ListView_SetBackgroundImage(tab.listView,IDB_FILTERINGAPPLIED);
+	if (pSettings->bApplyFilter)
+	{
+		NListView::ListView_SetBackgroundImage(tab.listView, IDB_FILTERINGAPPLIED);
+	}
 
 	/* TODO: This needs to be removed. */
 	SetWindowSubclass(tab.listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
@@ -463,14 +467,12 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		m_iPreviousTabSelectionId = tab.GetId();
 	}
 
-	uFlags = SBSP_ABSOLUTE;
-
 	/* These settings are applied to all tabs (i.e. they
 	are not tab specific). Send them to the browser
 	regardless of whether it loads its own settings or not. */
 	PushGlobalSettingsToTab(tab.GetId());
 
-	hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory,uFlags);
+	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory, SBSP_ABSOLUTE);
 
 	if (selected)
 	{
@@ -484,8 +486,10 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		return E_FAIL;
 	}
 
-	if(pTabObjectIndex != NULL)
+	if (pTabObjectIndex != NULL)
+	{
 		*pTabObjectIndex = tab.GetId();
+	}
 
 	SetTabIcon(tab);
 
