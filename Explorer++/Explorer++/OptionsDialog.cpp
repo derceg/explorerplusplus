@@ -485,11 +485,11 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 			{
 				HWND hCBSize;
 
-				if(m_bHideSystemFilesGlobal)
+				if(m_config->globalFolderSettings.hideSystemFiles)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SYSTEMFILES,BST_CHECKED);
 				if(!m_config->globalFolderSettings.showExtensions)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_EXTENSIONS,BST_CHECKED);
-				if(m_bHideLinkExtensionGlobal)
+				if(m_config->globalFolderSettings.hideLinkExtension)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_LINK,BST_CHECKED);
 				if(m_config->insertSorted)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED,BST_CHECKED);
@@ -615,13 +615,13 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						int nTabs;
 						int i = 0;
 
-						m_bHideSystemFilesGlobal = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SYSTEMFILES)
+						m_config->globalFolderSettings.hideSystemFiles = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SYSTEMFILES)
 							== BST_CHECKED);
 
 						m_config->globalFolderSettings.showExtensions = !(IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_EXTENSIONS)
 							== BST_CHECKED);
 
-						m_bHideLinkExtensionGlobal = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_LINK)
+						m_config->globalFolderSettings.hideLinkExtension = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_LINK)
 							== BST_CHECKED);
 
 						m_config->insertSorted = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED)
@@ -675,8 +675,6 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 							Tab &tab = GetTabByIndex(i);
 
 							/* Each one of the options should also be pushed to new tabs when they are created. */
-							tab.GetShellBrowser()->SetHideSystemFiles(m_bHideSystemFilesGlobal);
-							tab.GetShellBrowser()->SetHideLinkExtension(m_bHideLinkExtensionGlobal);
 							tab.GetShellBrowser()->SetInsertSorted(m_config->insertSorted);
 							tab.GetShellBrowser()->SetForceSize(m_config->forceSize);
 							tab.GetShellBrowser()->SetSizeDisplayFormat(m_config->sizeDisplayFormat);

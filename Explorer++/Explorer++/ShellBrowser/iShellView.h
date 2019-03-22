@@ -64,8 +64,6 @@ typedef struct
 	BOOL	bGridlinesActive;
 	BOOL	bApplyFilter;
 	BOOL	bFilterCaseSensitive;
-	BOOL	bHideSystemFiles;
-	BOOL	bHideLinkExtension;
 	BOOL	bForceSize;
 	SizeDisplayFormat_t	sdf;
 	TCHAR	szFilter[512];
@@ -205,10 +203,6 @@ public:
 	void				SetGrouping(BOOL bShowInGroups);
 	void				SetGroupingFlag(BOOL bShowInGroups);
 
-	BOOL				GetHideSystemFiles() const;
-	void				SetHideSystemFiles(BOOL bHideSystemFiles);
-	BOOL				GetHideLinkExtension() const;
-	void				SetHideLinkExtension(BOOL bHideLinkExtension);
 	void				SetInsertSorted(BOOL bInsertSorted);
 	void				SetForceSize(BOOL bForceSize);
 	void				SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
@@ -553,8 +547,6 @@ private:
 	BOOL				m_bSortAscending;
 	BOOL				m_bGridlinesActive;
 	BOOL				m_bShowHidden;
-	BOOL				m_bHideSystemFiles;
-	BOOL				m_bHideLinkExtension;
 	BOOL				m_bInsertSorted;
 
 	const GlobalFolderSettings	*m_globalFolderSettings;

@@ -850,8 +850,6 @@ private:
 	BOOL					m_bAutoArrangeGlobal;
 	BOOL					m_bSortAscendingGlobal;
 	BOOL					m_bShowGridlinesGlobal;
-	BOOL					m_bHideSystemFilesGlobal;
-	BOOL					m_bHideLinkExtensionGlobal;
 	
 	/* Windows 7 taskbar thumbnail previews. */
 	ITaskbarList4			*m_pTaskbarList;

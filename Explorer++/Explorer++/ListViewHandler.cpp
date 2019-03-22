@@ -809,7 +809,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		BOOL bExtensionHidden = FALSE;
 
 		bExtensionHidden = (!m_config->globalFolderSettings.showExtensions) ||
-			(m_bHideLinkExtensionGlobal && lstrcmpi(PathFindExtension(OldName),_T(".lnk")) == 0);
+			(m_config->globalFolderSettings.hideLinkExtension && lstrcmpi(PathFindExtension(OldName),_T(".lnk")) == 0);
 
 		/* If file extensions are turned off, the new filename
 		will be incorrect (i.e. it will be missing the extension).

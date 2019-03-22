@@ -295,7 +295,7 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 		bFilenameFiltered = IsFilenameFiltered(m_itemInfoMap.at(iItemInternal).szDisplayName);
 	}
 
-	if(m_bHideSystemFiles)
+	if(m_globalFolderSettings->hideSystemFiles)
 	{
 		bHideSystemFile = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
 			== FILE_ATTRIBUTE_SYSTEM;

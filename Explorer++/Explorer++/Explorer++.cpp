@@ -159,8 +159,6 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_bAutoArrangeGlobal			= TRUE;
 	m_bSortAscendingGlobal			= TRUE;
 	m_bShowGridlinesGlobal			= TRUE;
-	m_bHideSystemFilesGlobal		= FALSE;
-	m_bHideLinkExtensionGlobal		= FALSE;
 }
 
 void Explorerplusplus::SetDefaultColumns()

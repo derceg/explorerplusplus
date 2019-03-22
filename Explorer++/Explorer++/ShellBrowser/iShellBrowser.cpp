@@ -1491,12 +1491,12 @@ Preferences_t CShellBrowser::CreatePreferencesStructure() const
 	Preferences_t preferences;
 	preferences.forceSize = m_bForceSize;
 	preferences.sizeDisplayFormat = m_SizeDisplayFormat;
-	preferences.hideLinkExtension = m_bHideLinkExtension;
 
 	preferences.showFriendlyDates = m_globalFolderSettings->showFriendlyDates;
 	preferences.showFolderSizes = m_globalFolderSettings->showFolderSizes;
 	preferences.disableFolderSizesNetworkRemovable = m_globalFolderSettings->disableFolderSizesNetworkRemovable;
 	preferences.showExtensions = m_globalFolderSettings->showExtensions;
+	preferences.hideLinkExtension = m_globalFolderSettings->hideLinkExtension;
 
 	return preferences;
 }

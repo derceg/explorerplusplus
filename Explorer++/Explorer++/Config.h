@@ -51,6 +51,8 @@ struct Config
 		globalFolderSettings.showFriendlyDates = TRUE;
 		globalFolderSettings.showFolderSizes = FALSE;
 		globalFolderSettings.disableFolderSizesNetworkRemovable = FALSE;
+		globalFolderSettings.hideSystemFiles = FALSE;
+		globalFolderSettings.hideLinkExtension = FALSE;
 	}
 
 	BOOL showStatusBar;

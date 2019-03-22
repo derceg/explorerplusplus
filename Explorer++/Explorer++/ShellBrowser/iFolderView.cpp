@@ -86,8 +86,6 @@ m_iconResultIDCounter(0)
 	m_bFilterCaseSensitive	= FALSE;
 	m_bGridlinesActive		= TRUE;
 	m_bShowHidden			= FALSE;
-	m_bHideSystemFiles		= FALSE;
-	m_bHideLinkExtension	= FALSE;
 
 	m_bColumnsPlaced		= FALSE;
 	m_bOverFolder			= FALSE;
@@ -394,8 +392,6 @@ void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 	m_ViewMode				= is->viewMode;
 	m_bApplyFilter			= is->bApplyFilter;
 	m_bFilterCaseSensitive	= is->bFilterCaseSensitive;
-	m_bHideSystemFiles		= is->bHideSystemFiles;
-	m_bHideLinkExtension	= is->bHideLinkExtension;
 	m_bForceSize			= is->bForceSize;
 	m_SizeDisplayFormat		= is->sdf;
 
@@ -442,26 +438,6 @@ void CShellBrowser::SetResourceModule(HINSTANCE hResourceModule)
 HRESULT CShellBrowser::Refresh()
 {
 	return BrowseFolder(m_pidlDirectory,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
-}
-
-BOOL CShellBrowser::GetHideSystemFiles() const
-{
-	return m_bHideSystemFiles;
-}
-
-void CShellBrowser::SetHideSystemFiles(BOOL bHideSystemFiles)
-{
-	m_bHideSystemFiles = bHideSystemFiles;
-}
-
-BOOL CShellBrowser::GetHideLinkExtension() const
-{
-	return m_bHideLinkExtension;
-}
-
-void CShellBrowser::SetHideLinkExtension(BOOL bHideLinkExtension)
-{
-	m_bHideLinkExtension = bHideLinkExtension;
 }
 
 void CShellBrowser::SetInsertSorted(BOOL bInsertSorted)

@@ -10,4 +10,6 @@ struct GlobalFolderSettings
 	BOOL showFriendlyDates;
 	BOOL showFolderSizes;
 	BOOL disableFolderSizesNetworkRemovable;
+	BOOL hideSystemFiles;
+	BOOL hideLinkExtension;
 };
