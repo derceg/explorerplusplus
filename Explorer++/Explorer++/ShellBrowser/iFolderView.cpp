@@ -6,6 +6,7 @@
 #include <string>
 #include "IShellView.h"
 #include "iShellBrowser_internal.h"
+#include "MainResource.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/Helper.h"
@@ -386,6 +387,11 @@ void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 	m_bFilterCaseSensitive	= is->folderSettings.filterCaseSensitive;
 
 	StringCchCopy(m_szFilter,SIZEOF_ARRAY(m_szFilter),is->folderSettings.filter.c_str());
+
+	if (is->folderSettings.applyFilter)
+	{
+		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
+	}
 
 	m_ControlPanelColumnList = *is->pControlPanelColumnList;
 	m_MyComputerColumnList = *is->pMyComputerColumnList;

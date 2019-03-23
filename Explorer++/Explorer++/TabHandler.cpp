@@ -377,11 +377,6 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 
 	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView, pSettings, &m_config->globalFolderSettings));
 
-	if (pSettings->folderSettings.applyFilter)
-	{
-		NListView::ListView_SetBackgroundImage(tab.listView, IDB_FILTERINGAPPLIED);
-	}
-
 	/* TODO: This needs to be removed. */
 	SetWindowSubclass(tab.listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
