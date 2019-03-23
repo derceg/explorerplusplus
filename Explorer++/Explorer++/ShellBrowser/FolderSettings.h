@@ -13,3 +13,11 @@ struct GlobalFolderSettings
 	BOOL hideSystemFiles;
 	BOOL hideLinkExtension;
 };
+
+struct FolderSettings
+{
+	BOOL autoArrange;
+	BOOL sortAscending;
+	BOOL showInGroups;
+	BOOL showHidden;
+};

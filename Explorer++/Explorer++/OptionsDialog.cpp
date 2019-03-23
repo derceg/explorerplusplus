@@ -1068,16 +1068,16 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 	{
 		case WM_INITDIALOG:
 			{
-				if(m_bShowHiddenGlobal)
+				if(m_config->defaultFolderSettings.showHidden)
 					CheckDlgButton(hDlg,IDC_SHOWHIDDENGLOBAL,BST_CHECKED);
 
-				if(m_bShowInGroupsGlobal)
+				if(m_config->defaultFolderSettings.showInGroups)
 					CheckDlgButton(hDlg,IDC_SHOWINGROUPSGLOBAL,BST_CHECKED);
 
-				if(m_bAutoArrangeGlobal)
+				if(m_config->defaultFolderSettings.autoArrange)
 					CheckDlgButton(hDlg,IDC_AUTOARRANGEGLOBAL,BST_CHECKED);
 
-				if(m_bSortAscendingGlobal)
+				if(m_config->defaultFolderSettings.sortAscending)
 					CheckDlgButton(hDlg,IDC_SORTASCENDINGGLOBAL,BST_CHECKED);
 
 				HWND hComboBox = GetDlgItem(hDlg,IDC_OPTIONS_DEFAULT_VIEW);
@@ -1149,16 +1149,16 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 				{
 				case PSN_APPLY:
 					{
-						m_bShowHiddenGlobal = (IsDlgButtonChecked(hDlg,IDC_SHOWHIDDENGLOBAL)
+						m_config->defaultFolderSettings.showHidden = (IsDlgButtonChecked(hDlg,IDC_SHOWHIDDENGLOBAL)
 							== BST_CHECKED);
 
-						m_bShowInGroupsGlobal = (IsDlgButtonChecked(hDlg,IDC_SHOWINGROUPSGLOBAL)
+						m_config->defaultFolderSettings.showInGroups = (IsDlgButtonChecked(hDlg,IDC_SHOWINGROUPSGLOBAL)
 							== BST_CHECKED);
 
-						m_bAutoArrangeGlobal = (IsDlgButtonChecked(hDlg,IDC_AUTOARRANGEGLOBAL)
+						m_config->defaultFolderSettings.autoArrange = (IsDlgButtonChecked(hDlg,IDC_AUTOARRANGEGLOBAL)
 							== BST_CHECKED);
 
-						m_bSortAscendingGlobal = (IsDlgButtonChecked(hDlg,IDC_SORTASCENDINGGLOBAL)
+						m_config->defaultFolderSettings.sortAscending = (IsDlgButtonChecked(hDlg,IDC_SORTASCENDINGGLOBAL)
 							== BST_CHECKED);
 
 						HWND hComboBox = GetDlgItem(hDlg,IDC_OPTIONS_DEFAULT_VIEW);

@@ -410,7 +410,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowTabBar"),NXMLSettings::EncodeBoolValue(m_config->alwaysShowTabBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AutoArrangeGlobal"),NXMLSettings::EncodeBoolValue(m_bAutoArrangeGlobal));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AutoArrangeGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.autoArrange));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("CheckBoxSelection"),NXMLSettings::EncodeBoolValue(m_config->checkBoxSelection));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -547,11 +547,11 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowGridlinesGlobal"),NXMLSettings::EncodeBoolValue(m_bShowGridlinesGlobal));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowHiddenGlobal"),NXMLSettings::EncodeBoolValue(m_bShowHiddenGlobal));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowHiddenGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.showHidden));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInfoTips"),NXMLSettings::EncodeBoolValue(m_bShowInfoTips));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInGroupsGlobal"),NXMLSettings::EncodeBoolValue(m_bShowInGroupsGlobal));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInGroupsGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.showInGroups));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowPrivilegeLevelInTitleBar"),NXMLSettings::EncodeBoolValue(m_config->showPrivilegeLevelInTitleBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -567,7 +567,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SizeDisplayFormat"),NXMLSettings::EncodeIntValue(m_config->sizeDisplayFormat));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SortAscendingGlobal"),NXMLSettings::EncodeBoolValue(m_bSortAscendingGlobal));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SortAscendingGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.sortAscending));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	_itow_s(m_StartupMode,szValue,SIZEOF_ARRAY(szValue),10);
@@ -1530,7 +1530,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_AUTOARRANGEGLOBAL:
-		m_bAutoArrangeGlobal = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->defaultFolderSettings.autoArrange = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_CHECKBOXSELECTION:
@@ -1692,7 +1692,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWHIDDENGLOBAL:
-		m_bShowHiddenGlobal = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->defaultFolderSettings.showHidden = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWINFOTIPS:
@@ -1700,7 +1700,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWINGROUPSGLOBAL:
-		m_bShowInGroupsGlobal = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->defaultFolderSettings.showInGroups = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWPRIVILEGETITLEBAR:
@@ -1732,7 +1732,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SORTASCENDINGGLOBAL:
-		m_bSortAscendingGlobal = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->defaultFolderSettings.sortAscending = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_STARTUPMODE:

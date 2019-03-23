@@ -845,10 +845,6 @@ private:
 
 	/* Global options. */
 	ViewMode				m_ViewModeGlobal;
-	BOOL					m_bShowHiddenGlobal;
-	BOOL					m_bShowInGroupsGlobal;
-	BOOL					m_bAutoArrangeGlobal;
-	BOOL					m_bSortAscendingGlobal;
 	BOOL					m_bShowGridlinesGlobal;
 	
 	/* Windows 7 taskbar thumbnail previews. */

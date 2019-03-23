@@ -53,6 +53,11 @@ struct Config
 		globalFolderSettings.disableFolderSizesNetworkRemovable = FALSE;
 		globalFolderSettings.hideSystemFiles = FALSE;
 		globalFolderSettings.hideLinkExtension = FALSE;
+
+		defaultFolderSettings.sortAscending = TRUE;
+		defaultFolderSettings.showInGroups = FALSE;
+		defaultFolderSettings.showHidden = TRUE;
+		defaultFolderSettings.autoArrange = TRUE;
 	}
 
 	BOOL showStatusBar;
@@ -92,4 +97,6 @@ struct Config
 	// These are settings that are shared between all tabs. It's not
 	// possible to adjust them on a per-tab basis.
 	GlobalFolderSettings globalFolderSettings;
+
+	FolderSettings defaultFolderSettings;
 };

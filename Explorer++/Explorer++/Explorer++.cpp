@@ -154,10 +154,6 @@ void Explorerplusplus::SetDefaultValues(void)
 
 	/* Global options. */
 	m_ViewModeGlobal				= VM_ICONS;
-	m_bShowHiddenGlobal				= TRUE;
-	m_bShowInGroupsGlobal			= FALSE;
-	m_bAutoArrangeGlobal			= TRUE;
-	m_bSortAscendingGlobal			= TRUE;
 	m_bShowGridlinesGlobal			= TRUE;
 }
 
