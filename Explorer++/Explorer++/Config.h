@@ -60,6 +60,8 @@ struct Config
 		defaultFolderSettings.showInGroups = FALSE;
 		defaultFolderSettings.showHidden = TRUE;
 		defaultFolderSettings.autoArrange = TRUE;
+		defaultFolderSettings.applyFilter = FALSE;
+		defaultFolderSettings.filterCaseSensitive = FALSE;
 	}
 
 	BOOL showStatusBar;

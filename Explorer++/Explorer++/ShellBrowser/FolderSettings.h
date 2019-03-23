@@ -27,4 +27,8 @@ struct FolderSettings
 	BOOL sortAscending;
 	BOOL showInGroups;
 	BOOL showHidden;
+
+	BOOL applyFilter;
+	BOOL filterCaseSensitive;
+	std::wstring filter;
 };
