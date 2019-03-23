@@ -56,7 +56,7 @@ void CShellBrowser::UpdateFileSelectionInfo(int iCacheIndex,BOOL Selected)
 
 BOOL CShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
 {
-	if(CheckWildcardMatch(m_szFilter,FileName,m_bFilterCaseSensitive))
+	if(CheckWildcardMatch(m_folderSettings.filter.c_str(),FileName,m_folderSettings.filterCaseSensitive))
 		return FALSE;
 
 	return TRUE;
@@ -341,7 +341,7 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	first, or else it may be possible for the
 	thumbnail to be drawn before the initial
 	image. */
-	if(m_ViewMode == VM_THUMBNAILS && (plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
+	if(m_folderSettings.viewMode == VM_THUMBNAILS && (plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
 		plvItem->iImage = GetIconThumbnail((int)plvItem->lParam);
 		plvItem->mask |= LVIF_DI_SETITEM;
@@ -351,7 +351,7 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 		return;
 	}
 
-	if (m_ViewMode == VM_DETAILS && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
+	if (m_folderSettings.viewMode == VM_DETAILS && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
 	{
 		QueueColumnTask(static_cast<int>(plvItem->lParam), plvItem->iSubItem);
 	}
@@ -470,7 +470,7 @@ void CShellBrowser::PositionDroppedItems(void)
 
 	/* LVNI_TOLEFT and LVNI_TORIGHT cause exceptions
 	in details view. */
-	if(m_ViewMode == VM_DETAILS)
+	if(m_folderSettings.viewMode == VM_DETAILS)
 	{
 		m_DroppedFileNameList.clear();
 		return;
@@ -481,7 +481,7 @@ void CShellBrowser::PositionDroppedItems(void)
 		/* The auto arrange style must be off for the items
 		to be moved. Therefore, if the style is on, turn it
 		off, move the items, and the turn it back on. */
-		if(m_bAutoArrange)
+		if(m_folderSettings.autoArrange)
 			NListView::ListView_SetAutoArrange(m_hListView,FALSE);
 
 		for(itr = m_DroppedFileNameList.begin();itr != m_DroppedFileNameList.end();)
@@ -493,7 +493,7 @@ void CShellBrowser::PositionDroppedItems(void)
 				if(!bDropItemSet)
 					m_iDropped = iItem;
 
-				if(m_bAutoArrange)
+				if(m_folderSettings.autoArrange)
 				{
 					/* TODO: Merge this code with RepositionLocalFiles(). */
 					LVFINDINFO lvfi;
@@ -632,7 +632,7 @@ void CShellBrowser::PositionDroppedItems(void)
 			}
 		}
 
-		if(m_bAutoArrange)
+		if(m_folderSettings.autoArrange)
 			NListView::ListView_SetAutoArrange(m_hListView,TRUE);
 	}
 }
@@ -723,7 +723,7 @@ void CShellBrowser::RemoveFilteredItems(void)
 	int				nItems;
 	int				i = 0;
 
-	if(!m_bApplyFilter)
+	if(!m_folderSettings.applyFilter)
 		return;
 
 	nItems = ListView_GetItemCount(m_hListView);
@@ -821,9 +821,9 @@ void CShellBrowser::DetermineFolderVirtual(LPITEMIDLIST pidlDirectory)
 
 void CShellBrowser::SetFilter(const TCHAR *szFilter)
 {
-	StringCchCopy(m_szFilter,SIZEOF_ARRAY(m_szFilter),szFilter);
+	m_folderSettings.filter = szFilter;
 
-	if(m_bApplyFilter)
+	if(m_folderSettings.applyFilter)
 	{
 		UnfilterAllItems();
 		UpdateFiltering();
@@ -832,34 +832,34 @@ void CShellBrowser::SetFilter(const TCHAR *szFilter)
 
 void CShellBrowser::GetFilter(TCHAR *szFilter,int cchMax) const
 {
-	StringCchCopy(szFilter,cchMax,m_szFilter);
+	StringCchCopy(szFilter,cchMax,m_folderSettings.filter.c_str());
 }
 
 void CShellBrowser::SetFilterStatus(BOOL bFilter)
 {
-	m_bApplyFilter = bFilter;
+	m_folderSettings.applyFilter = bFilter;
 
 	UpdateFiltering();
 }
 
 BOOL CShellBrowser::GetFilterStatus(void) const
 {
-	return m_bApplyFilter;
+	return m_folderSettings.applyFilter;
 }
 
 void CShellBrowser::SetFilterCaseSensitive(BOOL bFilterCaseSensitive)
 {
-	m_bFilterCaseSensitive = bFilterCaseSensitive;
+	m_folderSettings.filterCaseSensitive = bFilterCaseSensitive;
 }
 
 BOOL CShellBrowser::GetFilterCaseSensitive(void) const
 {
-	return m_bFilterCaseSensitive;
+	return m_folderSettings.filterCaseSensitive;
 }
 
 void CShellBrowser::UpdateFiltering(void)
 {
-	if(m_bApplyFilter)
+	if(m_folderSettings.applyFilter)
 	{
 		RemoveFilteredItems();
 
@@ -895,7 +895,7 @@ void CShellBrowser::UnfilterAllItems(void)
 
 	m_FilteredItemsList.clear();
 
-	InsertAwaitingItems(m_bShowInGroups);
+	InsertAwaitingItems(m_folderSettings.showInGroups);
 
 	SendMessage(m_hOwner,WM_USER_UPDATEWINDOWS,0,0);
 }
@@ -1005,40 +1005,40 @@ void CShellBrowser::VerifySortMode(void)
 
 BOOL CShellBrowser::GetSortAscending(void) const
 {
-	return m_bSortAscending;
+	return m_folderSettings.sortAscending;
 }
 
 BOOL CShellBrowser::SetSortAscending(BOOL bAscending)
 {
-	m_bSortAscending = bAscending;
+	m_folderSettings.sortAscending = bAscending;
 
-	return m_bSortAscending;
+	return m_folderSettings.sortAscending;
 }
 
 BOOL CShellBrowser::ToggleSortAscending(void)
 {
-	m_bSortAscending = !m_bSortAscending;
+	m_folderSettings.sortAscending = !m_folderSettings.sortAscending;
 
-	return m_bSortAscending;
+	return m_folderSettings.sortAscending;
 }
 
 BOOL CShellBrowser::GetShowHidden(void) const
 {
-	return m_bShowHidden;
+	return m_folderSettings.showHidden;
 }
 
 BOOL CShellBrowser::SetShowHidden(BOOL bShowHidden)
 {
-	m_bShowHidden = bShowHidden;
+	m_folderSettings.showHidden = bShowHidden;
 
-	return m_bShowHidden;
+	return m_folderSettings.showHidden;
 }
 
 BOOL CShellBrowser::ToggleShowHidden(void)
 {
-	m_bShowHidden = !m_bShowHidden;
+	m_folderSettings.showHidden = !m_folderSettings.showHidden;
 
-	return m_bShowHidden;
+	return m_folderSettings.showHidden;
 }
 
 void CShellBrowser::ResetFolderMemoryAllocations(void)
@@ -1049,7 +1049,7 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 
 	/* If we're in thumbnails view, destroy the current
 	imagelist, and create a new one. */
-	if(m_ViewMode == VM_THUMBNAILS)
+	if(m_folderSettings.viewMode == VM_THUMBNAILS)
 	{
 		himlOld = ListView_GetImageList(m_hListView,LVSIL_NORMAL);
 
@@ -1108,7 +1108,7 @@ void CShellBrowser::ExportCurrentColumns(std::list<Column_t> *pColumns)
 
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
 	{
-		if(m_ViewMode == VM_DETAILS && itr->bChecked)
+		if(m_folderSettings.viewMode == VM_DETAILS && itr->bChecked)
 		{
 			itr->iWidth = ListView_GetColumnWidth(m_hListView,iColumn);
 
@@ -1157,7 +1157,7 @@ void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns)
 
 		if(itr->bChecked)
 		{
-			if(m_ViewMode == VM_DETAILS)
+			if(m_folderSettings.viewMode == VM_DETAILS)
 			{
 				for(itr2 = m_pActiveColumnList->begin();itr2 != m_pActiveColumnList->end();itr2++)
 				{

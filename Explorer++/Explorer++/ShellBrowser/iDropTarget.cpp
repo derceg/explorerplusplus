@@ -538,7 +538,7 @@ void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
 	/* The auto arrange style must be off for the items
 	to be moved. Therefore, if the style is on, turn it
 	off, move the items, and the turn it back on. */
-	if(m_bAutoArrange)
+	if(m_folderSettings.autoArrange)
 		NListView::ListView_SetAutoArrange(m_hListView,FALSE);
 
 	for(itr = m_DraggedFilesList.begin();
@@ -548,7 +548,7 @@ void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
 
 		if(iItem != -1)
 		{
-			if(m_ViewMode == VM_DETAILS)
+			if(m_folderSettings.viewMode == VM_DETAILS)
 			{
 				LVITEM lvItem;
 				POINT ptItem;
@@ -615,7 +615,7 @@ void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
 				have to be 'snapped' to the nearest item position.
 				Otherwise, they may simply be placed where they are
 				dropped. */
-				if(m_bAutoArrange)
+				if(m_folderSettings.autoArrange)
 				{
 					LVFINDINFO lvfi;
 					LVHITTESTINFO lvhti;
@@ -742,7 +742,7 @@ void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
 		}
 	}
 
-	if(m_bAutoArrange)
+	if(m_folderSettings.autoArrange)
 		NListView::ListView_SetAutoArrange(m_hListView,TRUE);
 
 	m_bDragging = FALSE;

@@ -107,7 +107,7 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	m_ulFileSelectionSize.QuadPart = 0;
 
 	SetActiveColumnSet();
-	SetCurrentViewModeInternal(m_ViewMode);
+	SetCurrentViewModeInternal(m_folderSettings.viewMode);
 
 	InsertAwaitingItems(FALSE);
 
@@ -142,7 +142,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 	if((nPrevItems + m_nAwaitingAdd) == 0)
 	{
-		if(m_bApplyFilter)
+		if(m_folderSettings.applyFilter)
 			ApplyFilteringBackgroundImage(true);
 		else
 			ApplyFolderEmptyBackgroundImage(true);
@@ -151,7 +151,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 		return;
 	}
-	else if(!m_bApplyFilter)
+	else if(!m_folderSettings.applyFilter)
 	{
 		ApplyFolderEmptyBackgroundImage(false);
 	}
@@ -169,7 +169,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	/* Constant for each item. */
 	lv.iSubItem		= 0;
 
-	if(m_bAutoArrange)
+	if(m_folderSettings.autoArrange)
 		NListView::ListView_SetAutoArrange(m_hListView,FALSE);
 
 	for(auto itr = m_AwaitingAddList.begin();itr != m_AwaitingAddList.end();itr++)
@@ -195,7 +195,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			/* Insert the item into the list view control. */
 			iItemIndex = ListView_InsertItem(m_hListView,&lv);
 
-			if(itr->bPosition && m_ViewMode != VM_DETAILS)
+			if(itr->bPosition && m_folderSettings.viewMode != VM_DETAILS)
 			{
 				POINT ptItem;
 
@@ -213,7 +213,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 				ListView_SetItemPosition32(m_hListView,iItemIndex,ptItem.x,ptItem.y);
 			}
 
-			if(m_ViewMode == VM_TILES)
+			if(m_folderSettings.viewMode == VM_TILES)
 			{
 				SetTileViewItemInfo(iItemIndex,itr->iItemInternal);
 			}
@@ -248,7 +248,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 		}
 	}
 
-	if(m_bAutoArrange)
+	if(m_folderSettings.autoArrange)
 		NListView::ListView_SetAutoArrange(m_hListView,TRUE);
 
 	m_nTotalItems = nPrevItems + nAdded;
@@ -288,7 +288,7 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 	BOOL bHideSystemFile	= FALSE;
 	BOOL bFilenameFiltered	= FALSE;
 
-	if(m_bApplyFilter &&
+	if(m_folderSettings.applyFilter &&
 		((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
 		bFilenameFiltered = IsFilenameFiltered(m_itemInfoMap.at(iItemInternal).szDisplayName);
@@ -345,7 +345,7 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 
 	m_nTotalItems--;
 
-	if(nItems == 0 && !m_bApplyFilter)
+	if(nItems == 0 && !m_folderSettings.applyFilter)
 	{
 		ApplyFolderEmptyBackgroundImage(true);
 	}
@@ -444,7 +444,7 @@ void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 
 		EnumFlags = SHCONTF_FOLDERS|SHCONTF_NONFOLDERS;
 
-		if(m_bShowHidden)
+		if(m_folderSettings.showHidden)
 			EnumFlags |= SHCONTF_INCLUDEHIDDEN;
 
 		hr = pShellFolder->EnumObjects(m_hOwner,EnumFlags,&pEnumIDList);

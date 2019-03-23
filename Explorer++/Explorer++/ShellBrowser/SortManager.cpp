@@ -24,7 +24,7 @@ void CShellBrowser::SortFolder(SortMode sortMode)
 {
 	m_SortMode = sortMode;
 
-	if(m_bShowInGroups)
+	if(m_folderSettings.showInGroups)
 	{
 		ListView_EnableGroupView(m_hListView,FALSE);
 		ListView_RemoveAllGroups(m_hListView);
@@ -38,7 +38,7 @@ void CShellBrowser::SortFolder(SortMode sortMode)
 	/* If in details view, the column sort
 	arrow will need to be changed to reflect
 	the new sorting mode. */
-	if(m_ViewMode == VM_DETAILS)
+	if(m_folderSettings.viewMode == VM_DETAILS)
 	{
 		ApplyHeaderSortArrow();
 	}
@@ -337,7 +337,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			m_itemInfoMap.at(InternalIndex2).szDisplayName);
 	}
 
-	if(!m_bSortAscending)
+	if(!m_folderSettings.sortAscending)
 	{
 		ComparisonResult = -ComparisonResult;
 	}

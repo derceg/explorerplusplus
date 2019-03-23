@@ -39,14 +39,14 @@ namespace
 items into groups. */
 void CShellBrowser::SetGroupingFlag(BOOL bShowInGroups)
 {
-	m_bShowInGroups = bShowInGroups;
+	m_folderSettings.showInGroups = bShowInGroups;
 }
 
 void CShellBrowser::SetGrouping(BOOL bShowInGroups)
 {
-	m_bShowInGroups = bShowInGroups;
+	m_folderSettings.showInGroups = bShowInGroups;
 
-	if(!m_bShowInGroups)
+	if(!m_folderSettings.showInGroups)
 	{
 		ListView_EnableGroupView(m_hListView,FALSE);
 		SortFolder(m_SortMode);
@@ -60,9 +60,9 @@ void CShellBrowser::SetGrouping(BOOL bShowInGroups)
 
 void CShellBrowser::ToggleGrouping(void)
 {
-	m_bShowInGroups = !m_bShowInGroups;
+	m_folderSettings.showInGroups = !m_folderSettings.showInGroups;
 
-	if(!m_bShowInGroups)
+	if(!m_folderSettings.showInGroups)
 	{
 		ListView_EnableGroupView(m_hListView,FALSE);
 		SortFolder(m_SortMode);
@@ -109,7 +109,7 @@ INT CALLBACK CShellBrowser::GroupNameComparison(INT Group1_ID, INT Group2_ID)
 		iReturnValue = StrCmpLogicalW(pszGroupHeader1, pszGroupHeader2);
 	}
 
-	if (!m_bSortAscending)
+	if (!m_folderSettings.sortAscending)
 	{
 		iReturnValue = -iReturnValue;
 	}
@@ -152,7 +152,7 @@ INT CALLBACK CShellBrowser::GroupFreeSpaceComparison(INT Group1_ID, INT Group2_I
 		iReturnValue = StrCmpLogicalW(pszGroupHeader1, pszGroupHeader2);
 	}
 
-	if (!m_bSortAscending)
+	if (!m_folderSettings.sortAscending)
 	{
 		iReturnValue = -iReturnValue;
 	}

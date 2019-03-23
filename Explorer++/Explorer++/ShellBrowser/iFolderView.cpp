@@ -66,6 +66,7 @@ CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView,
 m_hOwner(hOwner),
 m_hListView(hListView),
 m_globalFolderSettings(globalFolderSettings),
+m_folderSettings(pSettings->folderSettings),
 m_itemIDCounter(0),
 m_columnThreadPool(1),
 m_columnResultIDCounter(0),
@@ -78,14 +79,7 @@ m_iconResultIDCounter(0)
 	InitializeDragDropHelpers();
 
 	m_SortMode				= FSM_NAME;
-	m_ViewMode				= VM_ICONS;
-	m_bSortAscending		= TRUE;
-	m_bAutoArrange			= TRUE;
-	m_bShowInGroups			= FALSE;
 	m_bFolderVisited		= FALSE;
-	m_bApplyFilter			= FALSE;
-	m_bFilterCaseSensitive	= FALSE;
-	m_bShowHidden			= FALSE;
 
 	m_bColumnsPlaced		= FALSE;
 	m_bOverFolder			= FALSE;
@@ -108,8 +102,13 @@ m_iconResultIDCounter(0)
 
 	SetUserOptions(pSettings);
 
-	NListView::ListView_SetAutoArrange(m_hListView,m_bAutoArrange);
+	NListView::ListView_SetAutoArrange(m_hListView,m_folderSettings.autoArrange);
 	NListView::ListView_SetGridlines(m_hListView, m_globalFolderSettings->showGridlines);
+
+	if (m_folderSettings.applyFilter)
+	{
+		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
+	}
 
 	m_nAwaitingAdd = 0;
 
@@ -187,21 +186,21 @@ CShellBrowser::~CShellBrowser()
 
 BOOL CShellBrowser::GetAutoArrange(void) const
 {
-	return m_bAutoArrange;
+	return m_folderSettings.autoArrange;
 }
 
 BOOL CShellBrowser::ToggleAutoArrange(void)
 {
-	m_bAutoArrange = !m_bAutoArrange;
+	m_folderSettings.autoArrange = !m_folderSettings.autoArrange;
 
-	NListView::ListView_SetAutoArrange(m_hListView, m_bAutoArrange);
+	NListView::ListView_SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
 
-	return m_bAutoArrange;
+	return m_folderSettings.autoArrange;
 }
 
 ViewMode CShellBrowser::GetCurrentViewMode() const
 {
-	return m_ViewMode;
+	return m_folderSettings.viewMode;
 }
 
 /* This function is only called on 'hard' view changes
@@ -211,12 +210,12 @@ the view mode still needs to be setup), or when entering
 a folder. */
 void CShellBrowser::SetCurrentViewMode(ViewMode viewMode)
 {
-	if(viewMode == m_ViewMode)
+	if(viewMode == m_folderSettings.viewMode)
 	{
 		return;
 	}
 
-	if(m_ViewMode == VM_THUMBNAILS && viewMode != VM_THUMBNAILS)
+	if(m_folderSettings.viewMode == VM_THUMBNAILS && viewMode != VM_THUMBNAILS)
 		RemoveThumbnailsView();
 
 	SetCurrentViewModeInternal(viewMode);
@@ -280,7 +279,7 @@ void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 	}
 
 	/* Delete all the tile view columns. */
-	if(m_ViewMode == VM_TILES && viewMode != VM_TILES)
+	if(m_folderSettings.viewMode == VM_TILES && viewMode != VM_TILES)
 		DeleteTileViewColumns();
 
 	switch(viewMode)
@@ -328,7 +327,7 @@ void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 			break;
 	}
 
-	m_ViewMode = viewMode;
+	m_folderSettings.viewMode = viewMode;
 
 	if (viewMode != VM_DETAILS)
 	{
@@ -351,7 +350,7 @@ void CShellBrowser::SetSortMode(SortMode sortMode)
 
 BOOL CShellBrowser::IsGroupViewEnabled(void) const
 {
-	return m_bShowInGroups;
+	return m_folderSettings.showInGroups;
 }
 
 HRESULT CShellBrowser::InitializeDragDropHelpers(void)
@@ -377,21 +376,7 @@ HRESULT CShellBrowser::InitializeDragDropHelpers(void)
 
 void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 {
-	m_bAutoArrange			= is->folderSettings.autoArrange;
-	m_bShowHidden			= is->folderSettings.showHidden;
-	m_bShowInGroups			= is->folderSettings.showInGroups;
-	m_bSortAscending		= is->folderSettings.sortAscending;
-	m_SortMode				= is->sortMode;
-	m_ViewMode				= is->folderSettings.viewMode;
-	m_bApplyFilter			= is->folderSettings.applyFilter;
-	m_bFilterCaseSensitive	= is->folderSettings.filterCaseSensitive;
-
-	StringCchCopy(m_szFilter,SIZEOF_ARRAY(m_szFilter),is->folderSettings.filter.c_str());
-
-	if (is->folderSettings.applyFilter)
-	{
-		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
-	}
+	m_SortMode = is->sortMode;
 
 	m_ControlPanelColumnList = *is->pControlPanelColumnList;
 	m_MyComputerColumnList = *is->pMyComputerColumnList;

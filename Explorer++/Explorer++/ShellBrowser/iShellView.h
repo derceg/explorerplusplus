@@ -508,7 +508,6 @@ private:
 	ULARGE_INTEGER		m_ulTotalDirSize;
 	ULARGE_INTEGER		m_ulFileSelectionSize;
 	SortMode			m_SortMode;
-	ViewMode			m_ViewMode;
 	BOOL				m_bVirtualFolder;
 	BOOL				m_bFolderVisited;
 	int					m_nTotalItems;
@@ -526,13 +525,10 @@ private:
 	int					m_iUniqueFolderIndex;
 
 	/* User options variables. */
-	BOOL				m_bAutoArrange;
-	BOOL				m_bShowInGroups;
-	BOOL				m_bSortAscending;
-	BOOL				m_bShowHidden;
 	BOOL				m_bInsertSorted;
 
 	const GlobalFolderSettings	*m_globalFolderSettings;
+	FolderSettings		m_folderSettings;
 
 	/* ID. */
 	int					m_ID;
@@ -599,7 +595,4 @@ private:
 
 	/* Filtering related data. */
 	std::list<int>		m_FilteredItemsList;
-	TCHAR				m_szFilter[512];
-	BOOL				m_bApplyFilter;
-	BOOL				m_bFilterCaseSensitive;
 };

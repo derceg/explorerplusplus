@@ -72,7 +72,7 @@ void CShellBrowser::ProcessColumnResult(int columnResultId)
 		return;
 	}
 
-	if (m_ViewMode != VM_DETAILS)
+	if (m_folderSettings.viewMode != VM_DETAILS)
 	{
 		return;
 	}
@@ -1052,7 +1052,7 @@ void CShellBrowser::ApplyHeaderSortArrow(void)
 	hdItem.mask = HDI_FORMAT;
 	Header_GetItem(hHeader,iColumn,&hdItem);
 
-	if(!m_bSortAscending)
+	if(!m_folderSettings.sortAscending)
 		hdItem.fmt |= HDF_SORTDOWN;
 	else
 		hdItem.fmt |= HDF_SORTUP;
@@ -1132,7 +1132,7 @@ void CShellBrowser::SaveColumnWidths(void)
 	/* Only save column widths if the listview is currently in
 	details view. If it's not currently in details view, then
 	column widths have already been saved when the view changed. */
-	if(m_ViewMode == VM_DETAILS)
+	if(m_folderSettings.viewMode == VM_DETAILS)
 	{
 		for(itr = pActiveColumnList->begin();itr != pActiveColumnList->end();itr++)
 		{
