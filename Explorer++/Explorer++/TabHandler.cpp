@@ -328,9 +328,16 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 	global ones. */
 	if(pSettings == NULL)
 	{
-		BOOL bFound = FALSE;
-
+		is.sortMode = GetDefaultSortMode(pidlDirectory);
 		is.folderSettings = m_config->defaultFolderSettings;
+
+		is.pControlPanelColumnList = &m_ControlPanelColumnList;
+		is.pMyComputerColumnList = &m_MyComputerColumnList;
+		is.pMyNetworkPlacesColumnList = &m_MyNetworkPlacesColumnList;
+		is.pNetworkConnectionsColumnList = &m_NetworkConnectionsColumnList;
+		is.pPrintersColumnList = &m_PrintersColumnList;
+		is.pRealFolderColumnList = &m_RealFolderColumnList;
+		is.pRecycleBinColumnList = &m_RecycleBinColumnList;
 
 		/* Check if there are any specific settings saved
 		for the specified directory. */
@@ -338,9 +345,6 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		{
 			if(CompareIdls(pidlDirectory,ds.pidlDirectory))
 			{
-				/* TODO: */
-				//bFound = TRUE;
-
 				is.sortMode = ds.dsi.sortMode;
 				is.folderSettings.viewMode = ds.dsi.viewMode;
 
@@ -351,25 +355,9 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 				is.pPrintersColumnList				= &ds.dsi.PrintersColumnList;
 				is.pRealFolderColumnList			= &ds.dsi.RealFolderColumnList;
 				is.pRecycleBinColumnList			= &ds.dsi.RecycleBinColumnList;
+
+				break;
 			}
-		}
-
-		if(bFound)
-		{
-			/* There are existing settings for this directory,
-			so use those, rather than the defaults. */
-		}
-		else
-		{
-			is.sortMode = GetDefaultSortMode(pidlDirectory);
-
-			is.pControlPanelColumnList			= &m_ControlPanelColumnList;
-			is.pMyComputerColumnList			= &m_MyComputerColumnList;
-			is.pMyNetworkPlacesColumnList		= &m_MyNetworkPlacesColumnList;
-			is.pNetworkConnectionsColumnList	= &m_NetworkConnectionsColumnList;
-			is.pPrintersColumnList				= &m_PrintersColumnList;
-			is.pRealFolderColumnList			= &m_RealFolderColumnList;
-			is.pRecycleBinColumnList			= &m_RecycleBinColumnList;
 		}
 
 		pSettings = &is;
