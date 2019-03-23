@@ -623,7 +623,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("TreeViewWidth"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	_itow_s(m_ViewModeGlobal,szValue,SIZEOF_ARRAY(szValue),10);
+	_itow_s(m_config->defaultFolderSettings.viewMode,szValue,SIZEOF_ARRAY(szValue),10);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ViewModeGlobal"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnt,pe);
@@ -1837,7 +1837,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_VIEWMODEGLOBAL:
-		m_ViewModeGlobal = static_cast<ViewMode>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->defaultFolderSettings.viewMode = static_cast<ViewMode>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_POSITION:

@@ -842,9 +842,6 @@ private:
 	/* Infotips (user options). */
 	BOOL					m_bShowInfoTips;
 	InfoTipType_t			m_InfoTipType;
-
-	/* Global options. */
-	ViewMode				m_ViewModeGlobal;
 	
 	/* Windows 7 taskbar thumbnail previews. */
 	ITaskbarList4			*m_pTaskbarList;

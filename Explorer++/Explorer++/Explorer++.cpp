@@ -151,9 +151,6 @@ void Explorerplusplus::SetDefaultValues(void)
 	m_DisplayWindowHeight			= DEFAULT_DISPLAYWINDOW_HEIGHT;
 	m_TreeViewWidth					= DEFAULT_TREEVIEW_WIDTH;
 	m_bShowTabBarAtBottom			= FALSE;
-
-	/* Global options. */
-	m_ViewModeGlobal				= VM_ICONS;
 }
 
 void Explorerplusplus::SetDefaultColumns()

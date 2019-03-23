@@ -55,6 +55,7 @@ struct Config
 		globalFolderSettings.forceSize = FALSE;
 		globalFolderSettings.sizeDisplayFormat = SIZE_FORMAT_BYTES;
 
+		defaultFolderSettings.viewMode = VM_ICONS;
 		defaultFolderSettings.sortAscending = TRUE;
 		defaultFolderSettings.showInGroups = FALSE;
 		defaultFolderSettings.showHidden = TRUE;

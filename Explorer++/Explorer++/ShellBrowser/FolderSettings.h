@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ViewModes.h"
 #include "../Helper/StringHelper.h"
 
 struct GlobalFolderSettings
@@ -21,6 +22,7 @@ struct GlobalFolderSettings
 
 struct FolderSettings
 {
+	ViewMode viewMode;
 	BOOL autoArrange;
 	BOOL sortAscending;
 	BOOL showInGroups;

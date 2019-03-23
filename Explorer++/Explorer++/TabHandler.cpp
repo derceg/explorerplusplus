@@ -368,7 +368,7 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		else
 		{
 			is.sortMode				= GetDefaultSortMode(pidlDirectory);
-			is.viewMode				= m_ViewModeGlobal;
+			is.viewMode				= m_config->defaultFolderSettings.viewMode;
 			is.bApplyFilter			= FALSE;
 			is.bFilterCaseSensitive	= FALSE;
 
