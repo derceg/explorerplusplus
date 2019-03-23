@@ -26,8 +26,6 @@ struct Config
 		alwaysOpenNewTab = FALSE;
 		openNewTabNextToCurrent = FALSE;
 		treeViewDelayEnabled = FALSE;
-		oneClickActivate = FALSE;
-		oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
 		showUserNameInTitleBar = FALSE;
 		showPrivilegeLevelInTitleBar = FALSE;
 		useFullRowSelect = FALSE;
@@ -54,6 +52,8 @@ struct Config
 		globalFolderSettings.showGridlines = TRUE;
 		globalFolderSettings.forceSize = FALSE;
 		globalFolderSettings.sizeDisplayFormat = SIZE_FORMAT_BYTES;
+		globalFolderSettings.oneClickActivate = FALSE;
+		globalFolderSettings.oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
 
 		defaultFolderSettings.viewMode = VM_ICONS;
 		defaultFolderSettings.sortAscending = TRUE;
@@ -77,8 +77,6 @@ struct Config
 	BOOL alwaysOpenNewTab;
 	BOOL openNewTabNextToCurrent;
 	BOOL treeViewDelayEnabled;
-	BOOL oneClickActivate;
-	UINT oneClickActivateHoverTime;
 	BOOL showUserNameInTitleBar;
 	BOOL showPrivilegeLevelInTitleBar;
 	BOOL useFullRowSelect;

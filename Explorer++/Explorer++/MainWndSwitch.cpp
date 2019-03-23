@@ -1446,7 +1446,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 	switch(nmhdr->code)
 	{
 		case NM_CLICK:
-			if(m_config->oneClickActivate && !m_bSelectionFromNowhere)
+			if(m_config->globalFolderSettings.oneClickActivate && !m_bSelectionFromNowhere)
 			{
 				OnListViewDoubleClick(&((NMITEMACTIVATE *)lParam)->hdr);
 			}

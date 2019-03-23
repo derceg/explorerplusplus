@@ -317,7 +317,8 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		return E_FAIL;
 	}
 
-	NListView::ListView_ActivateOneClickSelect(tab.listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
+	NListView::ListView_ActivateOneClickSelect(tab.listView,m_config->globalFolderSettings.oneClickActivate,
+		m_config->globalFolderSettings.oneClickActivateHoverTime);
 
 	/* Set the listview to its initial size. */
 	SetListViewInitialPosition(tab.listView);

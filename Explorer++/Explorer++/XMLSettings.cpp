@@ -510,9 +510,9 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("NewTabDirectory"),m_DefaultTabDirectory);
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivate"),NXMLSettings::EncodeBoolValue(m_config->oneClickActivate));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivate"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.oneClickActivate));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivateHoverTime"),NXMLSettings::EncodeIntValue(m_config->oneClickActivateHoverTime));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivateHoverTime"),NXMLSettings::EncodeIntValue(m_config->globalFolderSettings.oneClickActivateHoverTime));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OverwriteExistingFilesConfirmation"),NXMLSettings::EncodeBoolValue(m_config->overwriteExistingFilesConfirmation));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -1621,11 +1621,11 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_ONECLICKACTIVATE:
-		m_config->oneClickActivate = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.oneClickActivate = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_ONECLICKACTIVATEHOVERTIME:
-		m_config->oneClickActivateHoverTime = NXMLSettings::DecodeIntValue(wszValue);
+		m_config->globalFolderSettings.oneClickActivateHoverTime = NXMLSettings::DecodeIntValue(wszValue);
 		break;
 
 	case HASH_OVERWRITEEXISTINGFILESCONFIRMATION:

@@ -493,12 +493,12 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_LINK,BST_CHECKED);
 				if(m_config->insertSorted)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED,BST_CHECKED);
-				if(m_config->oneClickActivate)
+				if(m_config->globalFolderSettings.oneClickActivate)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK,BST_CHECKED);
 				
-				SetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,m_config->oneClickActivateHoverTime,FALSE);
-				EnableWindow(GetDlgItem(hDlg,IDC_OPTIONS_HOVER_TIME),m_config->oneClickActivate);
-				EnableWindow(GetDlgItem(hDlg,IDC_LABEL_HOVER_TIME),m_config->oneClickActivate);
+				SetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,m_config->globalFolderSettings.oneClickActivateHoverTime,FALSE);
+				EnableWindow(GetDlgItem(hDlg,IDC_OPTIONS_HOVER_TIME),m_config->globalFolderSettings.oneClickActivate);
+				EnableWindow(GetDlgItem(hDlg,IDC_LABEL_HOVER_TIME),m_config->globalFolderSettings.oneClickActivate);
 
 				if(m_config->overwriteExistingFilesConfirmation)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION,BST_CHECKED);
@@ -627,10 +627,10 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						m_config->insertSorted = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED)
 							== BST_CHECKED);
 
-						m_config->oneClickActivate = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK)
+						m_config->globalFolderSettings.oneClickActivate = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK)
 							== BST_CHECKED);
 
-						m_config->oneClickActivateHoverTime = GetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,NULL,FALSE);
+						m_config->globalFolderSettings.oneClickActivateHoverTime = GetDlgItemInt(hDlg,IDC_OPTIONS_HOVER_TIME,NULL,FALSE);
 
 						m_config->overwriteExistingFilesConfirmation = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_EXISTINGFILESCONFIRMATION)
 							== BST_CHECKED);
@@ -679,7 +679,8 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 							RefreshTab(tab);
 
-							NListView::ListView_ActivateOneClickSelect(tab.listView,m_config->oneClickActivate,m_config->oneClickActivateHoverTime);
+							NListView::ListView_ActivateOneClickSelect(tab.listView,m_config->globalFolderSettings.oneClickActivate,
+								m_config->globalFolderSettings.oneClickActivateHoverTime);
 						}
 
 						SaveAllSettings();

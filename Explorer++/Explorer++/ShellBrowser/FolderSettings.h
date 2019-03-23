@@ -18,6 +18,8 @@ struct GlobalFolderSettings
 	BOOL showGridlines;
 	BOOL forceSize;
 	SizeDisplayFormat_t sizeDisplayFormat;
+	BOOL oneClickActivate;
+	UINT oneClickActivateHoverTime;
 };
 
 struct FolderSettings
