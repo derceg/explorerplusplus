@@ -61,7 +61,6 @@ typedef struct
 	BOOL	bShowInGroups;
 	BOOL	bShowHidden;
 	BOOL	bAutoArrange;
-	BOOL	bGridlinesActive;
 	BOOL	bApplyFilter;
 	BOOL	bFilterCaseSensitive;
 	BOOL	bForceSize;
@@ -211,14 +210,14 @@ public:
 
 	std::list<int>		QueryCurrentSortModes() const;
 	size_t				QueryNumActiveColumns(void) const;
-	void				ToggleGridlines(void);
-	BOOL				QueryGridlinesActive(void) const;
 	void				SetResourceModule(HINSTANCE hResourceModule);
 	void				ImportAllColumns(const ColumnExport_t *pce);
 	void				ExportAllColumns(ColumnExport_t *pce);
 	void				QueueRename(LPCITEMIDLIST pidlItem);
 	void				SelectItems(const std::list<std::wstring> &PastedFileList);
 	void				OnDeviceChange(WPARAM wParam,LPARAM lParam);
+
+	void				OnGridlinesSettingChanged();
 
 private:
 
@@ -545,7 +544,6 @@ private:
 	BOOL				m_bAutoArrange;
 	BOOL				m_bShowInGroups;
 	BOOL				m_bSortAscending;
-	BOOL				m_bGridlinesActive;
 	BOOL				m_bShowHidden;
 	BOOL				m_bInsertSorted;
 

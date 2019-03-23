@@ -144,7 +144,7 @@ LONG Explorerplusplus::SaveSettings(void)
 		/* Global settings. */
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowHiddenGlobal"), m_config->defaultFolderSettings.showHidden);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ViewModeGlobal"),m_ViewModeGlobal);
-		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowGridlinesGlobal"),m_bShowGridlinesGlobal);
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowGridlinesGlobal"), m_config->globalFolderSettings.showGridlines);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowInGroupsGlobal"), m_config->defaultFolderSettings.showInGroups);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("AutoArrangeGlobal"), m_config->defaultFolderSettings.autoArrange);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("SortAscendingGlobal"), m_config->defaultFolderSettings.sortAscending);
@@ -272,7 +272,7 @@ LONG Explorerplusplus::LoadSettings()
 		/* Global settings. */
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowHiddenGlobal"),(LPDWORD)&m_config->defaultFolderSettings.showHidden);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ViewModeGlobal"),(LPDWORD)&m_ViewModeGlobal);
-		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowGridlinesGlobal"),(LPDWORD)&m_bShowGridlinesGlobal);
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowGridlinesGlobal"),(LPDWORD)&m_config->globalFolderSettings.showGridlines);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ShowInGroupsGlobal"),(LPDWORD)&m_config->defaultFolderSettings.showInGroups);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("AutoArrangeGlobal"),(LPDWORD)&m_config->defaultFolderSettings.autoArrange);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("SortAscendingGlobal"),(LPDWORD)&m_config->defaultFolderSettings.sortAscending);
@@ -473,7 +473,6 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"), tab.GetShellBrowser()->GetFilterCaseSensitive());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"), tab.GetShellBrowser()->GetShowHidden());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AutoArrange"), tab.GetShellBrowser()->GetAutoArrange());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowGridlines"), tab.GetShellBrowser()->QueryGridlinesActive());
 
 				TCHAR szFilter[512];
 
@@ -595,7 +594,6 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("FilterCaseSensitive"),(LPDWORD)&Settings.bFilterCaseSensitive);
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowHidden"),(LPDWORD)&Settings.bShowHidden);
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("AutoArrange"),(LPDWORD)&Settings.bAutoArrange);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowGridlines"),(LPDWORD)&Settings.bGridlinesActive);
 			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("Filter"),Settings.szFilter,SIZEOF_ARRAY(Settings.szFilter));
 
 			std::list<Column_t>	RealFolderColumnList;

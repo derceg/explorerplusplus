@@ -748,7 +748,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 				CheckDlgButton(hDlg,IDC_OPTION_TREEVIEWDELAY,BST_CHECKED);
 			if(m_config->extendTabControl)
 				CheckDlgButton(hDlg,IDC_OPTION_EXTENDTABCONTROL,BST_CHECKED);
-			if(m_bShowGridlinesGlobal)
+			if(m_config->globalFolderSettings.showGridlines)
 				CheckDlgButton(hDlg,IDC_OPTION_GRIDLINES,BST_CHECKED);
 			if(m_config->checkBoxSelection)
 				CheckDlgButton(hDlg,IDC_OPTION_CHECKBOXSELECTION,BST_CHECKED);
@@ -824,7 +824,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					m_config->extendTabControl = (IsDlgButtonChecked(hDlg,IDC_OPTION_EXTENDTABCONTROL)
 						== BST_CHECKED);
 
-					m_bShowGridlinesGlobal = (IsDlgButtonChecked(hDlg,IDC_OPTION_GRIDLINES)
+					m_config->globalFolderSettings.showGridlines = (IsDlgButtonChecked(hDlg,IDC_OPTION_GRIDLINES)
 						== BST_CHECKED);
 
 					bCheckBoxSelection = (IsDlgButtonChecked(hDlg,IDC_OPTION_CHECKBOXSELECTION)
@@ -905,10 +905,9 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					{
 						Tab &tab = GetTabByIndex(i);
 
-						if(tab.GetShellBrowser()->QueryGridlinesActive() != m_bShowGridlinesGlobal)
-						{
-							tab.GetShellBrowser()->ToggleGridlines();
-						}
+						/* TODO: The tab should monitor for settings
+						changes itself. */
+						tab.GetShellBrowser()->OnGridlinesSettingChanged();
 
 						NListView::ListView_AddRemoveExtendedStyle(tab.listView,
 							LVS_EX_FULLROWSELECT,m_config->useFullRowSelect);

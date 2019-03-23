@@ -154,7 +154,6 @@ void Explorerplusplus::SetDefaultValues(void)
 
 	/* Global options. */
 	m_ViewModeGlobal				= VM_ICONS;
-	m_bShowGridlinesGlobal			= TRUE;
 }
 
 void Explorerplusplus::SetDefaultColumns()

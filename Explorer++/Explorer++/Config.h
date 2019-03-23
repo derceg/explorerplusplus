@@ -53,6 +53,7 @@ struct Config
 		globalFolderSettings.disableFolderSizesNetworkRemovable = FALSE;
 		globalFolderSettings.hideSystemFiles = FALSE;
 		globalFolderSettings.hideLinkExtension = FALSE;
+		globalFolderSettings.showGridlines = TRUE;
 
 		defaultFolderSettings.sortAscending = TRUE;
 		defaultFolderSettings.showInGroups = FALSE;

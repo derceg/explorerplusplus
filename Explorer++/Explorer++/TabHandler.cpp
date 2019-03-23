@@ -331,7 +331,6 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		BOOL bFound = FALSE;
 
 		/* These settings are program-wide. */
-		is.bGridlinesActive		= m_bShowGridlinesGlobal;
 		is.bShowHidden			= m_config->defaultFolderSettings.showHidden;
 		is.bShowInGroups		= m_config->defaultFolderSettings.showInGroups;
 		is.bSortAscending		= m_config->defaultFolderSettings.sortAscending;

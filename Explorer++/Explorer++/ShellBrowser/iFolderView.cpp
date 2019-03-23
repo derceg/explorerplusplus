@@ -84,7 +84,6 @@ m_iconResultIDCounter(0)
 	m_bFolderVisited		= FALSE;
 	m_bApplyFilter			= FALSE;
 	m_bFilterCaseSensitive	= FALSE;
-	m_bGridlinesActive		= TRUE;
 	m_bShowHidden			= FALSE;
 
 	m_bColumnsPlaced		= FALSE;
@@ -109,7 +108,7 @@ m_iconResultIDCounter(0)
 	SetUserOptions(pSettings);
 
 	NListView::ListView_SetAutoArrange(m_hListView,m_bAutoArrange);
-	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
+	NListView::ListView_SetGridlines(m_hListView, m_globalFolderSettings->showGridlines);
 
 	m_nAwaitingAdd = 0;
 
@@ -332,14 +331,8 @@ void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 
 	if (viewMode != VM_DETAILS)
 	{
-		NListView::ListView_SetGridlines(m_hListView, FALSE);
-
 		m_columnThreadPool.clear_queue();
 		m_columnResults.clear();
-	}
-	else
-	{
-		NListView::ListView_SetGridlines(m_hListView, m_bGridlinesActive);
 	}
 
 	SendMessage(m_hListView,LVM_SETVIEW,dwStyle,0);
@@ -384,7 +377,6 @@ HRESULT CShellBrowser::InitializeDragDropHelpers(void)
 void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 {
 	m_bAutoArrange			= is->bAutoArrange;
-	m_bGridlinesActive		= is->bGridlinesActive;
 	m_bShowHidden			= is->bShowHidden;
 	m_bShowInGroups			= is->bShowInGroups;
 	m_bSortAscending		= is->bSortAscending;
@@ -404,8 +396,6 @@ void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 	m_PrintersColumnList = *is->pPrintersColumnList;
 	m_RealFolderColumnList = *is->pRealFolderColumnList;
 	m_RecycleBinColumnList = *is->pRecycleBinColumnList;
-
-	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
 }
 
 int CShellBrowser::GetId(void) const
@@ -418,16 +408,9 @@ void CShellBrowser::SetId(int ID)
 	m_ID = ID;
 }
 
-void CShellBrowser::ToggleGridlines(void)
+void CShellBrowser::OnGridlinesSettingChanged()
 {
-	m_bGridlinesActive = !m_bGridlinesActive;
-
-	NListView::ListView_SetGridlines(m_hListView,m_bGridlinesActive);
-}
-
-BOOL CShellBrowser::QueryGridlinesActive(void) const
-{
-	return m_bGridlinesActive;
+	NListView::ListView_SetGridlines(m_hListView, m_globalFolderSettings->showGridlines);
 }
 
 void CShellBrowser::SetResourceModule(HINSTANCE hResourceModule)

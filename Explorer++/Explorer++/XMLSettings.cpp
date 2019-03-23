@@ -545,7 +545,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFullTitlePath"),NXMLSettings::EncodeBoolValue(m_config->showFullTitlePath));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowGridlinesGlobal"),NXMLSettings::EncodeBoolValue(m_bShowGridlinesGlobal));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowGridlinesGlobal"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showGridlines));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowHiddenGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.showHidden));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -887,9 +887,6 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("FilterCaseSensitive"),
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetFilterCaseSensitive()));
-
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowGridlines"),
-			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->QueryGridlinesActive()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowHidden"),
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetShowHidden()));
@@ -1688,7 +1685,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWGRIDLINESGLOBAL:
-		m_bShowGridlinesGlobal = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.showGridlines = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWHIDDENGLOBAL:
@@ -1922,10 +1919,6 @@ InitialSettings_t *pSettings,TabSettings &tabSettings)
 	else if(lstrcmp(wszName,L"FilterCaseSensitive") == 0)
 	{
 		pSettings->bFilterCaseSensitive = NXMLSettings::DecodeBoolValue(wszValue);
-	}
-	else if(lstrcmp(wszName,L"ShowGridlines") == 0)
-	{
-		pSettings->bGridlinesActive = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"ShowHidden") == 0)
 	{

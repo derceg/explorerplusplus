@@ -845,7 +845,6 @@ private:
 
 	/* Global options. */
 	ViewMode				m_ViewModeGlobal;
-	BOOL					m_bShowGridlinesGlobal;
 	
 	/* Windows 7 taskbar thumbnail previews. */
 	ITaskbarList4			*m_pTaskbarList;

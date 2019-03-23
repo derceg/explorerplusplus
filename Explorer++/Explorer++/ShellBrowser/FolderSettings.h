@@ -12,6 +12,7 @@ struct GlobalFolderSettings
 	BOOL disableFolderSizesNetworkRemovable;
 	BOOL hideSystemFiles;
 	BOOL hideLinkExtension;
+	BOOL showGridlines;
 };
 
 struct FolderSettings
