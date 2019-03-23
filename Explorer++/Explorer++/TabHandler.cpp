@@ -330,11 +330,7 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 	{
 		BOOL bFound = FALSE;
 
-		/* These settings are program-wide. */
-		is.bShowHidden			= m_config->defaultFolderSettings.showHidden;
-		is.bShowInGroups		= m_config->defaultFolderSettings.showInGroups;
-		is.bSortAscending		= m_config->defaultFolderSettings.sortAscending;
-		is.bAutoArrange			= m_config->defaultFolderSettings.autoArrange;
+		is.folderSettings = m_config->defaultFolderSettings;
 
 		/* Check if there are any specific settings saved
 		for the specified directory. */
@@ -345,10 +341,8 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 				/* TODO: */
 				//bFound = TRUE;
 
-				is.sortMode				= ds.dsi.sortMode;
-				is.viewMode				= ds.dsi.viewMode;
-				is.bApplyFilter			= FALSE;
-				is.bFilterCaseSensitive	= FALSE;
+				is.sortMode = ds.dsi.sortMode;
+				is.folderSettings.viewMode = ds.dsi.viewMode;
 
 				is.pControlPanelColumnList			= &ds.dsi.ControlPanelColumnList;
 				is.pMyComputerColumnList			= &ds.dsi.MyComputerColumnList;
@@ -367,12 +361,7 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		}
 		else
 		{
-			is.sortMode				= GetDefaultSortMode(pidlDirectory);
-			is.viewMode				= m_config->defaultFolderSettings.viewMode;
-			is.bApplyFilter			= FALSE;
-			is.bFilterCaseSensitive	= FALSE;
-
-			StringCchCopy(is.szFilter,SIZEOF_ARRAY(is.szFilter),EMPTY_STRING);
+			is.sortMode = GetDefaultSortMode(pidlDirectory);
 
 			is.pControlPanelColumnList			= &m_ControlPanelColumnList;
 			is.pMyComputerColumnList			= &m_MyComputerColumnList;
@@ -388,7 +377,7 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 
 	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView, pSettings, &m_config->globalFolderSettings));
 
-	if (pSettings->bApplyFilter)
+	if (pSettings->folderSettings.applyFilter)
 	{
 		NListView::ListView_SetBackgroundImage(tab.listView, IDB_FILTERINGAPPLIED);
 	}

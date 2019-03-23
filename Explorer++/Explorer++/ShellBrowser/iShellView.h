@@ -54,24 +54,17 @@ typedef struct
 
 typedef struct
 {
-	SortMode	sortMode;
-	ViewMode	viewMode;
-	BOOL	bSortAscending;
-	BOOL	bShowInGroups;
-	BOOL	bShowHidden;
-	BOOL	bAutoArrange;
-	BOOL	bApplyFilter;
-	BOOL	bFilterCaseSensitive;
-	TCHAR	szFilter[512];
+	SortMode sortMode;
+	FolderSettings folderSettings;
 
 	/* Initial columns. */
-	std::list<Column_t>	*pRealFolderColumnList;
-	std::list<Column_t>	*pMyComputerColumnList;
-	std::list<Column_t>	*pControlPanelColumnList;
-	std::list<Column_t>	*pRecycleBinColumnList;
-	std::list<Column_t>	*pPrintersColumnList;
-	std::list<Column_t>	*pNetworkConnectionsColumnList;
-	std::list<Column_t>	*pMyNetworkPlacesColumnList;
+	std::list<Column_t> *pRealFolderColumnList;
+	std::list<Column_t> *pMyComputerColumnList;
+	std::list<Column_t> *pControlPanelColumnList;
+	std::list<Column_t> *pRecycleBinColumnList;
+	std::list<Column_t> *pPrintersColumnList;
+	std::list<Column_t> *pNetworkConnectionsColumnList;
+	std::list<Column_t> *pMyNetworkPlacesColumnList;
 } InitialSettings_t;
 
 typedef struct

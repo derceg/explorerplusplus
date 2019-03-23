@@ -1905,32 +1905,31 @@ InitialSettings_t *pSettings,TabSettings &tabSettings)
 {
 	if(lstrcmp(wszName,L"ApplyFilter") == 0)
 	{
-		pSettings->bApplyFilter = NXMLSettings::DecodeBoolValue(wszValue);
+		pSettings->folderSettings.applyFilter = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"AutoArrange") == 0)
 	{
-		pSettings->bAutoArrange = NXMLSettings::DecodeBoolValue(wszValue);
+		pSettings->folderSettings.autoArrange = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"Filter") == 0)
 	{
-		StringCchCopy(pSettings->szFilter,SIZEOF_ARRAY(pSettings->szFilter),
-			wszValue);
+		pSettings->folderSettings.filter = wszValue;
 	}
 	else if(lstrcmp(wszName,L"FilterCaseSensitive") == 0)
 	{
-		pSettings->bFilterCaseSensitive = NXMLSettings::DecodeBoolValue(wszValue);
+		pSettings->folderSettings.filterCaseSensitive = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"ShowHidden") == 0)
 	{
-		pSettings->bShowHidden = NXMLSettings::DecodeBoolValue(wszValue);
+		pSettings->folderSettings.showHidden = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"ShowInGroups") == 0)
 	{
-		pSettings->bShowInGroups = NXMLSettings::DecodeBoolValue(wszValue);
+		pSettings->folderSettings.showInGroups = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"SortAscending") == 0)
 	{
-		pSettings->bSortAscending = NXMLSettings::DecodeBoolValue(wszValue);
+		pSettings->folderSettings.sortAscending = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"SortMode") == 0)
 	{
@@ -1938,7 +1937,7 @@ InitialSettings_t *pSettings,TabSettings &tabSettings)
 	}
 	else if(lstrcmp(wszName,L"ViewMode") == 0)
 	{
-		pSettings->viewMode = static_cast<ViewMode>(NXMLSettings::DecodeIntValue(wszValue));
+		pSettings->folderSettings.viewMode = static_cast<ViewMode>(NXMLSettings::DecodeIntValue(wszValue));
 	}
 	else if(lstrcmp(wszName,L"Locked") == 0)
 	{

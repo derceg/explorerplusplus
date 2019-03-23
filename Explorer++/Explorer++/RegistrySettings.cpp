@@ -583,18 +583,21 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 
 			DWORD value;
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ViewMode"),&value);
-			Settings.viewMode = static_cast<ViewMode>(value);
+			Settings.folderSettings.viewMode = static_cast<ViewMode>(value);
 
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortMode"),&value);
 			Settings.sortMode = static_cast<SortMode>(value);
 
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortAscending"),(LPDWORD)&Settings.bSortAscending);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowInGroups"),(LPDWORD)&Settings.bShowInGroups);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ApplyFilter"),(LPDWORD)&Settings.bApplyFilter);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("FilterCaseSensitive"),(LPDWORD)&Settings.bFilterCaseSensitive);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowHidden"),(LPDWORD)&Settings.bShowHidden);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("AutoArrange"),(LPDWORD)&Settings.bAutoArrange);
-			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("Filter"),Settings.szFilter,SIZEOF_ARRAY(Settings.szFilter));
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortAscending"),(LPDWORD)&Settings.folderSettings.sortAscending);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowInGroups"),(LPDWORD)&Settings.folderSettings.showInGroups);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ApplyFilter"),(LPDWORD)&Settings.folderSettings.applyFilter);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("FilterCaseSensitive"),(LPDWORD)&Settings.folderSettings.filterCaseSensitive);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowHidden"),(LPDWORD)&Settings.folderSettings.showHidden);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("AutoArrange"),(LPDWORD)&Settings.folderSettings.autoArrange);
+
+			TCHAR filter[512];
+			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("Filter"),filter,SIZEOF_ARRAY(filter));
+			Settings.folderSettings.filter = filter;
 
 			std::list<Column_t>	RealFolderColumnList;
 			std::list<Column_t>	MyComputerColumnList;

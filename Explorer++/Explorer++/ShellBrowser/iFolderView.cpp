@@ -376,16 +376,16 @@ HRESULT CShellBrowser::InitializeDragDropHelpers(void)
 
 void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 {
-	m_bAutoArrange			= is->bAutoArrange;
-	m_bShowHidden			= is->bShowHidden;
-	m_bShowInGroups			= is->bShowInGroups;
-	m_bSortAscending		= is->bSortAscending;
+	m_bAutoArrange			= is->folderSettings.autoArrange;
+	m_bShowHidden			= is->folderSettings.showHidden;
+	m_bShowInGroups			= is->folderSettings.showInGroups;
+	m_bSortAscending		= is->folderSettings.sortAscending;
 	m_SortMode				= is->sortMode;
-	m_ViewMode				= is->viewMode;
-	m_bApplyFilter			= is->bApplyFilter;
-	m_bFilterCaseSensitive	= is->bFilterCaseSensitive;
+	m_ViewMode				= is->folderSettings.viewMode;
+	m_bApplyFilter			= is->folderSettings.applyFilter;
+	m_bFilterCaseSensitive	= is->folderSettings.filterCaseSensitive;
 
-	StringCchCopy(m_szFilter,SIZEOF_ARRAY(m_szFilter),is->szFilter);
+	StringCchCopy(m_szFilter,SIZEOF_ARRAY(m_szFilter),is->folderSettings.filter.c_str());
 
 	m_ControlPanelColumnList = *is->pControlPanelColumnList;
 	m_MyComputerColumnList = *is->pMyComputerColumnList;
