@@ -9,7 +9,6 @@
 #include "iPathManager.h"
 #include "ItemData.h"
 #include "SortModes.h"
-#include "TabPreferences.h"
 #include "ViewModes.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
@@ -63,8 +62,6 @@ typedef struct
 	BOOL	bAutoArrange;
 	BOOL	bApplyFilter;
 	BOOL	bFilterCaseSensitive;
-	BOOL	bForceSize;
-	SizeDisplayFormat_t	sdf;
 	TCHAR	szFilter[512];
 
 	/* Initial columns. */
@@ -203,8 +200,6 @@ public:
 	void				SetGroupingFlag(BOOL bShowInGroups);
 
 	void				SetInsertSorted(BOOL bInsertSorted);
-	void				SetForceSize(BOOL bForceSize);
-	void				SetSizeDisplayFormat(SizeDisplayFormat_t sdf);
 
 	int CALLBACK		SortTemporary(LPARAM lParam1,LPARAM lParam2);
 
@@ -345,12 +340,11 @@ private:
 	void				OnListViewGetDisplayInfo(LPARAM lParam);
 	void				ColumnClicked(int iClickedColumn);
 
-	Preferences_t		CreatePreferencesStructure() const;
 	BasicItemInfo_t		getBasicItemInfo(int internalIndex) const;
 
 	/* Sorting. */
 	int CALLBACK		Sort(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const Preferences_t &preferences) const;
+	int CALLBACK		SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const GlobalFolderSettings &globalFolderSettings) const;
 	int CALLBACK		SortBySize(int InternalIndex1,int InternalIndex2) const;
 	int CALLBACK		SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
 	int CALLBACK		SortByDate(int InternalIndex1,int InternalIndex2,DateType_t DateType) const;
@@ -374,7 +368,7 @@ private:
 	/* Listview column support. */
 	void				PlaceColumns(void);
 	void				QueueColumnTask(int itemInternalIndex, int columnIndex);
-	static ColumnResult_t	GetColumnTextAsync(HWND listView, int columnResultId, unsigned int ColumnID, int InternalIndex, const BasicItemInfo_t &basicItemInfo, const Preferences_t &preferences);
+	static ColumnResult_t	GetColumnTextAsync(HWND listView, int columnResultId, unsigned int ColumnID, int InternalIndex, const BasicItemInfo_t &basicItemInfo, const GlobalFolderSettings &globalFolderSettings);
 	void				InsertColumn(unsigned int ColumnId,int iColumndIndex,int iWidth);
 	void				SetActiveColumnSet(void);
 	void				GetColumnInternal(unsigned int id,Column_t *pci) const;
@@ -426,7 +420,7 @@ private:
 	void				DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 	void				DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
 	void				DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax, const Preferences_t &preferences) const;
+	void				DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax, const GlobalFolderSettings &globalFolderSettings) const;
 
 	/* Other grouping support. */
 	int					CheckGroup(const TCHAR *szGroupHeader, PFNLVGROUPCOMPARE pfnGroupCompare);
@@ -524,8 +518,6 @@ private:
 	ViewMode			m_ViewMode;
 	BOOL				m_bVirtualFolder;
 	BOOL				m_bFolderVisited;
-	BOOL				m_bForceSize;
-	SizeDisplayFormat_t	m_SizeDisplayFormat;
 	int					m_nTotalItems;
 	int					m_NumFilesSelected;
 	int					m_NumFoldersSelected;

@@ -29,12 +29,12 @@ void CShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
 	int columnResultID = m_columnResultIDCounter++;
 
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(itemInternalIndex);
-	Preferences_t preferences = CreatePreferencesStructure();
+	GlobalFolderSettings globalFolderSettings = *m_globalFolderSettings;
 
-	auto result = m_columnThreadPool.push([this, columnResultID, columnID, itemInternalIndex, basicItemInfo, preferences](int id) {
+	auto result = m_columnThreadPool.push([this, columnResultID, columnID, itemInternalIndex, basicItemInfo, globalFolderSettings](int id) {
 		UNREFERENCED_PARAMETER(id);
 
-		return GetColumnTextAsync(m_hListView, columnResultID, *columnID, itemInternalIndex, basicItemInfo, preferences);
+		return GetColumnTextAsync(m_hListView, columnResultID, *columnID, itemInternalIndex, basicItemInfo, globalFolderSettings);
 	});
 
 	// The function call above might finish before this line runs,
@@ -45,9 +45,9 @@ void CShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
 }
 
 CShellBrowser::ColumnResult_t CShellBrowser::GetColumnTextAsync(HWND listView, int columnResultId, unsigned int ColumnID,
-	int InternalIndex, const BasicItemInfo_t &basicItemInfo, const Preferences_t &preferences)
+	int InternalIndex, const BasicItemInfo_t &basicItemInfo, const GlobalFolderSettings &globalFolderSettings)
 {
-	std::wstring columnText = GetColumnText(ColumnID, basicItemInfo, preferences);
+	std::wstring columnText = GetColumnText(ColumnID, basicItemInfo, globalFolderSettings);
 
 	// This message may be delivered before this function has returned.
 	// That doesn't actually matter, since the message handler will

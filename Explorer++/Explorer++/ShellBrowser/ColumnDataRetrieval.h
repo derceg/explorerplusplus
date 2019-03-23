@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "FolderSettings.h"
 #include "ItemData.h"
-#include "TabPreferences.h"
 #include <string>
 
 enum TimeType_t
@@ -61,18 +61,18 @@ enum MediaMetadataType_t
 	MEDIAMETADATA_TYPE_YEAR
 };
 
-std::wstring GetColumnText(UINT ColumnID, const BasicItemInfo_t &basicItemInfo, const Preferences_t &preferences);
-std::wstring GetNameColumnText(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences);
-std::wstring ProcessItemFileName(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences);
+std::wstring GetColumnText(UINT ColumnID, const BasicItemInfo_t &basicItemInfo, const GlobalFolderSettings &globalFolderSettings);
+std::wstring GetNameColumnText(const BasicItemInfo_t &itemInfo, const GlobalFolderSettings &globalFolderSettings);
+std::wstring ProcessItemFileName(const BasicItemInfo_t &itemInfo, const GlobalFolderSettings &globalFolderSettings);
 std::wstring GetTypeColumnText(const BasicItemInfo_t &itemInfo);
-std::wstring GetTimeColumnText(const BasicItemInfo_t &itemInfo, TimeType_t TimeType, const Preferences_t &preferences);
-std::wstring GetRealSizeColumnText(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences);
+std::wstring GetTimeColumnText(const BasicItemInfo_t &itemInfo, TimeType_t TimeType, const GlobalFolderSettings &globalFolderSettings);
+std::wstring GetRealSizeColumnText(const BasicItemInfo_t &itemInfo, const GlobalFolderSettings &globalFolderSettings);
 bool GetRealSizeColumnRawData(const BasicItemInfo_t &itemInfo, ULARGE_INTEGER &RealFileSize);
 std::wstring GetAttributeColumnText(const BasicItemInfo_t &itemInfo);
 std::wstring GetShortNameColumnText(const BasicItemInfo_t &itemInfo);
 std::wstring GetOwnerColumnText(const BasicItemInfo_t &itemInfo);
-std::wstring GetItemDetailsColumnText(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, const Preferences_t &preferences);
-HRESULT GetItemDetails(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax, const Preferences_t &preferences);
+std::wstring GetItemDetailsColumnText(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, const GlobalFolderSettings &globalFolderSettings);
+HRESULT GetItemDetails(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szDetail, size_t cchMax, const GlobalFolderSettings &globalFolderSettings);
 HRESULT GetItemDetailsRawData(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt);
 std::wstring GetVersionColumnText(const BasicItemInfo_t &itemInfo, VersionInfoType_t VersioninfoType);
 std::wstring GetShortcutToColumnText(const BasicItemInfo_t &itemInfo);
@@ -86,7 +86,7 @@ std::wstring GetPrinterColumnText(const BasicItemInfo_t &itemInfo, PrinterInform
 std::wstring GetNetworkAdapterColumnText(const BasicItemInfo_t &itemInfo);
 std::wstring GetMediaMetadataColumnText(const BasicItemInfo_t &itemInfo, MediaMetadataType_t MediaMetaDataType);
 const TCHAR *GetMediaMetadataAttributeName(MediaMetadataType_t MediaMetaDataType);
-std::wstring GetDriveSpaceColumnText(const BasicItemInfo_t &itemInfo, bool TotalSize, const Preferences_t &preferences);
+std::wstring GetDriveSpaceColumnText(const BasicItemInfo_t &itemInfo, bool TotalSize, const GlobalFolderSettings &globalFolderSettings);
 BOOL GetDriveSpaceColumnRawData(const BasicItemInfo_t &itemInfo, bool TotalSize, ULARGE_INTEGER &DriveSpace);
-std::wstring GetSizeColumnText(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences);
-std::wstring GetFolderSizeColumnText(const BasicItemInfo_t &itemInfo, const Preferences_t &preferences);
+std::wstring GetSizeColumnText(const BasicItemInfo_t &itemInfo, const GlobalFolderSettings &globalFolderSettings);
+std::wstring GetFolderSizeColumnText(const BasicItemInfo_t &itemInfo, const GlobalFolderSettings &globalFolderSettings);

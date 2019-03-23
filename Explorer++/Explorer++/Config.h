@@ -42,8 +42,6 @@ struct Config
 		overwriteExistingFilesConfirmation = TRUE;
 		checkBoxSelection = FALSE;
 		closeMainWindowOnTabClose = TRUE;
-		forceSize = FALSE;
-		sizeDisplayFormat = SIZE_FORMAT_BYTES;
 		playNavigationSound = TRUE;
 		confirmCloseTabs = FALSE;
 
@@ -54,6 +52,8 @@ struct Config
 		globalFolderSettings.hideSystemFiles = FALSE;
 		globalFolderSettings.hideLinkExtension = FALSE;
 		globalFolderSettings.showGridlines = TRUE;
+		globalFolderSettings.forceSize = FALSE;
+		globalFolderSettings.sizeDisplayFormat = SIZE_FORMAT_BYTES;
 
 		defaultFolderSettings.sortAscending = TRUE;
 		defaultFolderSettings.showInGroups = FALSE;
@@ -90,8 +90,6 @@ struct Config
 	BOOL overwriteExistingFilesConfirmation;
 	BOOL checkBoxSelection;
 	BOOL closeMainWindowOnTabClose;
-	BOOL forceSize;
-	SizeDisplayFormat_t sizeDisplayFormat;
 	BOOL playNavigationSound;
 	BOOL confirmCloseTabs;
 

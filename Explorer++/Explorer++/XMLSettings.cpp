@@ -480,7 +480,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ForceSameTabWidth"),NXMLSettings::EncodeBoolValue(m_config->forceSameTabWidth));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ForceSize"),NXMLSettings::EncodeBoolValue(m_config->forceSize));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ForceSize"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.forceSize));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HandleZipFiles"),NXMLSettings::EncodeBoolValue(m_config->handleZipFiles));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -565,7 +565,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowUserNameTitleBar"),NXMLSettings::EncodeBoolValue(m_config->showUserNameInTitleBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SizeDisplayFormat"),NXMLSettings::EncodeIntValue(m_config->sizeDisplayFormat));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SizeDisplayFormat"),NXMLSettings::EncodeIntValue(m_config->globalFolderSettings.sizeDisplayFormat));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SortAscendingGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.sortAscending));
 
@@ -1580,7 +1580,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_FORCESIZE:
-		m_config->forceSize = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.forceSize = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_HANDLEZIPFILES:
@@ -1725,7 +1725,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SIZEDISPLAYFOMRAT:
-		m_config->sizeDisplayFormat = static_cast<SizeDisplayFormat_t>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->globalFolderSettings.sizeDisplayFormat = static_cast<SizeDisplayFormat_t>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SORTASCENDINGGLOBAL:

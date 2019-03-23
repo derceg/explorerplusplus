@@ -507,9 +507,6 @@
     <ClInclude Include="ShellBrowser\ItemData.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowser\TabPreferences.h">
-      <Filter>ShellBrowser</Filter>
-    </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>Core</Filter>
     </ClInclude>

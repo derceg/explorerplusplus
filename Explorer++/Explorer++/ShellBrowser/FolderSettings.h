@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "../Helper/StringHelper.h"
+
 struct GlobalFolderSettings
 {
 	BOOL showExtensions;
@@ -13,6 +15,8 @@ struct GlobalFolderSettings
 	BOOL hideSystemFiles;
 	BOOL hideLinkExtension;
 	BOOL showGridlines;
+	BOOL forceSize;
+	SizeDisplayFormat_t sizeDisplayFormat;
 };
 
 struct FolderSettings

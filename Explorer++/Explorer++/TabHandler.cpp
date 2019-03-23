@@ -386,9 +386,6 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		pSettings = &is;
 	}
 
-	pSettings->bForceSize	= m_config->forceSize;
-	pSettings->sdf			= m_config->sizeDisplayFormat;
-
 	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView, pSettings, &m_config->globalFolderSettings));
 
 	if (pSettings->bApplyFilter)

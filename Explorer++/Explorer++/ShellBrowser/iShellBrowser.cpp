@@ -1486,21 +1486,6 @@ int CShellBrowser::GetFolderIndex(void) const
 	return m_iUniqueFolderIndex;
 }
 
-Preferences_t CShellBrowser::CreatePreferencesStructure() const
-{
-	Preferences_t preferences;
-	preferences.forceSize = m_bForceSize;
-	preferences.sizeDisplayFormat = m_SizeDisplayFormat;
-
-	preferences.showFriendlyDates = m_globalFolderSettings->showFriendlyDates;
-	preferences.showFolderSizes = m_globalFolderSettings->showFolderSizes;
-	preferences.disableFolderSizesNetworkRemovable = m_globalFolderSettings->disableFolderSizesNetworkRemovable;
-	preferences.showExtensions = m_globalFolderSettings->showExtensions;
-	preferences.hideLinkExtension = m_globalFolderSettings->hideLinkExtension;
-
-	return preferences;
-}
-
 BasicItemInfo_t CShellBrowser::getBasicItemInfo(int internalIndex) const
 {
 	const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);

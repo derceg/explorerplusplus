@@ -174,7 +174,8 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 			if(bValid)
 			{
 				FormatSizeString(pDWFolderSizeCompletion->liFolderSize,szFolderSize,
-					SIZEOF_ARRAY(szFolderSize),m_config->forceSize,m_config->sizeDisplayFormat);
+					SIZEOF_ARRAY(szFolderSize),m_config->globalFolderSettings.forceSize,
+					m_config->globalFolderSettings.sizeDisplayFormat);
 
 				LoadString(m_hLanguageModule,IDS_GENERAL_TOTALSIZE,
 					szTotalSize,SIZEOF_ARRAY(szTotalSize));

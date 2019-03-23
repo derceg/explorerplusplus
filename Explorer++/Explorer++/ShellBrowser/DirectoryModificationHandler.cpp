@@ -572,8 +572,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 					if(iItem != -1)
 					{
 						BasicItemInfo_t basicItemInfo = getBasicItemInfo(iItemInternal);
-						Preferences_t preferences = CreatePreferencesStructure();
-						std::wstring filename = ProcessItemFileName(basicItemInfo, preferences);
+						std::wstring filename = ProcessItemFileName(basicItemInfo, *m_globalFolderSettings);
 
 						TCHAR filenameCopy[MAX_PATH];
 						StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());

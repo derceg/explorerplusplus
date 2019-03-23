@@ -384,8 +384,6 @@ void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 	m_ViewMode				= is->viewMode;
 	m_bApplyFilter			= is->bApplyFilter;
 	m_bFilterCaseSensitive	= is->bFilterCaseSensitive;
-	m_bForceSize			= is->bForceSize;
-	m_SizeDisplayFormat		= is->sdf;
 
 	StringCchCopy(m_szFilter,SIZEOF_ARRAY(m_szFilter),is->szFilter);
 
@@ -426,16 +424,6 @@ HRESULT CShellBrowser::Refresh()
 void CShellBrowser::SetInsertSorted(BOOL bInsertSorted)
 {
 	m_bInsertSorted = bInsertSorted;
-}
-
-void CShellBrowser::SetForceSize(BOOL bForceSize)
-{
-	m_bForceSize = bForceSize;
-}
-
-void CShellBrowser::SetSizeDisplayFormat(SizeDisplayFormat_t sdf)
-{
-	m_SizeDisplayFormat = sdf;
 }
 
 void CShellBrowser::InsertTileViewColumns(void)
@@ -528,7 +516,7 @@ void CShellBrowser::SetTileViewItemInfo(int iItem,int iItemInternal)
 		lFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
 		FormatSizeString(lFileSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
-			m_bForceSize,m_SizeDisplayFormat);
+			m_globalFolderSettings->forceSize,m_globalFolderSettings->sizeDisplayFormat);
 
 		ListView_SetItemText(m_hListView,iItem,2,lpszFileSize);
 	}

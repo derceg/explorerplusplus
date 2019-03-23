@@ -57,7 +57,6 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 
 	BasicItemInfo_t basicItemInfo1 = getBasicItemInfo(InternalIndex1);
 	BasicItemInfo_t basicItemInfo2 = getBasicItemInfo(InternalIndex2);
-	Preferences_t preferences = CreatePreferencesStructure();
 
 	bool IsFolder1 = ((basicItemInfo1.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
 	bool IsFolder2 = ((basicItemInfo2.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
@@ -77,7 +76,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 		switch(m_SortMode)
 		{
 		case FSM_NAME:
-			ComparisonResult = SortByName(basicItemInfo1, basicItemInfo2, preferences);
+			ComparisonResult = SortByName(basicItemInfo1, basicItemInfo2, *m_globalFolderSettings);
 			break;
 
 		case FSM_TYPE:
@@ -346,7 +345,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	return ComparisonResult;
 }
 
-int CALLBACK CShellBrowser::SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const Preferences_t &preferences) const
+int CALLBACK CShellBrowser::SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const GlobalFolderSettings &globalFolderSettings) const
 {
 	if(m_bVirtualFolder)
 	{
@@ -369,8 +368,8 @@ int CALLBACK CShellBrowser::SortByName(const BasicItemInfo_t &itemInfo1, const B
 		}
 	}
 
-	std::wstring Name1 = GetNameColumnText(itemInfo1, preferences);
-	std::wstring Name2 = GetNameColumnText(itemInfo2, preferences);
+	std::wstring Name1 = GetNameColumnText(itemInfo1, globalFolderSettings);
+	std::wstring Name2 = GetNameColumnText(itemInfo2, globalFolderSettings);
 
 	return StrCmpLogicalW(Name1.c_str(),Name2.c_str());
 }
