@@ -911,7 +911,7 @@ void CShellBrowser::VerifySortMode(void)
 
 		for(i = 0;i < sizeof(ControlPanelSortModes) / sizeof(int);i++)
 		{
-			if(m_SortMode == ControlPanelSortModes[i])
+			if(m_folderSettings.sortMode == ControlPanelSortModes[i])
 			{
 				bValid = TRUE;
 				break;
@@ -919,7 +919,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_SortMode = FSM_NAME;
+			m_folderSettings.sortMode = FSM_NAME;
 	}
 	else if(CompareVirtualFolders(CSIDL_DRIVES))
 	{
@@ -927,7 +927,7 @@ void CShellBrowser::VerifySortMode(void)
 
 		for(i = 0;i < sizeof(MyComputerSortModes) / sizeof(int);i++)
 		{
-			if(m_SortMode == MyComputerSortModes[i])
+			if(m_folderSettings.sortMode == MyComputerSortModes[i])
 			{
 				bValid = TRUE;
 				break;
@@ -935,7 +935,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_SortMode = FSM_NAME;
+			m_folderSettings.sortMode = FSM_NAME;
 	}
 	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
@@ -943,7 +943,7 @@ void CShellBrowser::VerifySortMode(void)
 
 		for(i = 0;i < sizeof(RecycleBinSortModes) / sizeof(int);i++)
 		{
-			if(m_SortMode == RecycleBinSortModes[i])
+			if(m_folderSettings.sortMode == RecycleBinSortModes[i])
 			{
 				bValid = TRUE;
 				break;
@@ -951,7 +951,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_SortMode = FSM_NAME;
+			m_folderSettings.sortMode = FSM_NAME;
 	}
 	else if(CompareVirtualFolders(CSIDL_PRINTERS))
 	{
@@ -959,7 +959,7 @@ void CShellBrowser::VerifySortMode(void)
 
 		for(i = 0;i < sizeof(PrintersSortModes) / sizeof(int);i++)
 		{
-			if(m_SortMode == PrintersSortModes[i])
+			if(m_folderSettings.sortMode == PrintersSortModes[i])
 			{
 				bValid = TRUE;
 				break;
@@ -967,7 +967,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_SortMode = FSM_NAME;
+			m_folderSettings.sortMode = FSM_NAME;
 	}
 	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
 	{
@@ -975,7 +975,7 @@ void CShellBrowser::VerifySortMode(void)
 
 		for(i = 0;i < sizeof(NetworkConnectionsSortModes) / sizeof(int);i++)
 		{
-			if(m_SortMode == NetworkConnectionsSortModes[i])
+			if(m_folderSettings.sortMode == NetworkConnectionsSortModes[i])
 			{
 				bValid = TRUE;
 				break;
@@ -983,7 +983,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_SortMode = FSM_NAME;
+			m_folderSettings.sortMode = FSM_NAME;
 	}
 	else
 	{
@@ -991,7 +991,7 @@ void CShellBrowser::VerifySortMode(void)
 
 		for(i = 0;i < sizeof(RealFolderSortModes) / sizeof(int);i++)
 		{
-			if(m_SortMode == RealFolderSortModes[i])
+			if(m_folderSettings.sortMode == RealFolderSortModes[i])
 			{
 				bValid = TRUE;
 				break;
@@ -999,7 +999,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_SortMode = FSM_NAME;
+			m_folderSettings.sortMode = FSM_NAME;
 	}
 }
 
@@ -1138,14 +1138,14 @@ void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns)
 		/* Check if this column represents the current sorting mode.
 		If it does, and it is been removed, set the sort mode back
 		to the first checked column. */
-		if(!itr->bChecked && DetermineColumnSortMode(itr->id) == m_SortMode)
+		if(!itr->bChecked && DetermineColumnSortMode(itr->id) == m_folderSettings.sortMode)
 		{
 			/* Find the first checked column. */
 			for(itr2 = pColumns->begin();itr2 != pColumns->end();itr2++)
 			{
 				if(itr2->bChecked)
 				{
-					m_SortMode = DetermineColumnSortMode(itr2->id);
+					m_folderSettings.sortMode = DetermineColumnSortMode(itr2->id);
 
 					bResortFolder = TRUE;
 					break;
@@ -1207,7 +1207,7 @@ void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns)
 	sorting column was removed. */
 	if(bResortFolder)
 	{
-		SortFolder(m_SortMode);
+		SortFolder(m_folderSettings.sortMode);
 	}
 
 	m_bColumnsPlaced = FALSE;

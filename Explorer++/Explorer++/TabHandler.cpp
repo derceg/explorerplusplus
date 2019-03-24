@@ -329,8 +329,8 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 	global ones. */
 	if(pSettings == NULL)
 	{
-		is.sortMode = GetDefaultSortMode(pidlDirectory);
 		is.folderSettings = m_config->defaultFolderSettings;
+		is.folderSettings.sortMode = GetDefaultSortMode(pidlDirectory);
 
 		is.pControlPanelColumnList = &m_ControlPanelColumnList;
 		is.pMyComputerColumnList = &m_MyComputerColumnList;
@@ -346,7 +346,7 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		{
 			if(CompareIdls(pidlDirectory,ds.pidlDirectory))
 			{
-				is.sortMode = ds.dsi.sortMode;
+				is.folderSettings.sortMode = ds.dsi.sortMode;
 				is.folderSettings.viewMode = ds.dsi.viewMode;
 
 				is.pControlPanelColumnList			= &ds.dsi.ControlPanelColumnList;

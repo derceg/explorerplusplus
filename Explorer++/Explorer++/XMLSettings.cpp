@@ -1933,7 +1933,7 @@ InitialSettings_t *pSettings,TabSettings &tabSettings)
 	}
 	else if(lstrcmp(wszName,L"SortMode") == 0)
 	{
-		pSettings->sortMode = static_cast<SortMode>(NXMLSettings::DecodeIntValue(wszValue));
+		pSettings->folderSettings.sortMode = static_cast<SortMode>(NXMLSettings::DecodeIntValue(wszValue));
 	}
 	else if(lstrcmp(wszName,L"ViewMode") == 0)
 	{

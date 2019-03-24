@@ -78,7 +78,6 @@ m_iconResultIDCounter(0)
 
 	InitializeDragDropHelpers();
 
-	m_SortMode				= FSM_NAME;
 	m_bFolderVisited		= FALSE;
 
 	m_bColumnsPlaced		= FALSE;
@@ -340,12 +339,12 @@ void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 
 SortMode CShellBrowser::GetSortMode() const
 {
-	return m_SortMode;
+	return m_folderSettings.sortMode;
 }
 
 void CShellBrowser::SetSortMode(SortMode sortMode)
 {
-	m_SortMode	= sortMode;
+	m_folderSettings.sortMode = sortMode;
 }
 
 BOOL CShellBrowser::IsGroupViewEnabled(void) const
@@ -376,8 +375,6 @@ HRESULT CShellBrowser::InitializeDragDropHelpers(void)
 
 void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
 {
-	m_SortMode = is->sortMode;
-
 	m_ControlPanelColumnList = *is->pControlPanelColumnList;
 	m_MyComputerColumnList = *is->pMyComputerColumnList;
 	m_MyNetworkPlacesColumnList = *is->pMyNetworkPlacesColumnList;

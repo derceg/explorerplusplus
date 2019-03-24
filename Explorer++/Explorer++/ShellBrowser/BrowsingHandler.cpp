@@ -112,7 +112,7 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	InsertAwaitingItems(FALSE);
 
 	VerifySortMode();
-	SortFolder(m_SortMode);
+	SortFolder(m_folderSettings.sortMode);
 
 	ListView_EnsureVisible(m_hListView,0,FALSE);
 

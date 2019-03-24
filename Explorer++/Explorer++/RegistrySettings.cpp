@@ -586,7 +586,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			Settings.folderSettings.viewMode = static_cast<ViewMode>(value);
 
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortMode"),&value);
-			Settings.sortMode = static_cast<SortMode>(value);
+			Settings.folderSettings.sortMode = static_cast<SortMode>(value);
 
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortAscending"),(LPDWORD)&Settings.folderSettings.sortAscending);
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowInGroups"),(LPDWORD)&Settings.folderSettings.showInGroups);

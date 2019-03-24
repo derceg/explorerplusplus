@@ -49,7 +49,7 @@ void CShellBrowser::SetGrouping(BOOL bShowInGroups)
 	if(!m_folderSettings.showInGroups)
 	{
 		ListView_EnableGroupView(m_hListView,FALSE);
-		SortFolder(m_SortMode);
+		SortFolder(m_folderSettings.sortMode);
 		return;
 	}
 	else
@@ -65,7 +65,7 @@ void CShellBrowser::ToggleGrouping(void)
 	if(!m_folderSettings.showInGroups)
 	{
 		ListView_EnableGroupView(m_hListView,FALSE);
-		SortFolder(m_SortMode);
+		SortFolder(m_folderSettings.sortMode);
 		return;
 	}
 	else
@@ -187,7 +187,7 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(iItemInternal);
 
-	switch(m_SortMode)
+	switch(m_folderSettings.sortMode)
 	{
 		case FSM_NAME:
 			DetermineItemNameGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));

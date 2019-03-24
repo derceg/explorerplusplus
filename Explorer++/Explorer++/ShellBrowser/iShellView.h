@@ -54,7 +54,6 @@ typedef struct
 
 typedef struct
 {
-	SortMode sortMode;
 	FolderSettings folderSettings;
 
 	/* Initial columns. */
@@ -507,7 +506,6 @@ private:
 	TCHAR				m_CurDir[MAX_PATH];
 	ULARGE_INTEGER		m_ulTotalDirSize;
 	ULARGE_INTEGER		m_ulFileSelectionSize;
-	SortMode			m_SortMode;
 	BOOL				m_bVirtualFolder;
 	BOOL				m_bFolderVisited;
 	int					m_nTotalItems;

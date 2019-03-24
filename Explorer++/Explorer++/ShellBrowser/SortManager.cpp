@@ -22,7 +22,7 @@
 
 void CShellBrowser::SortFolder(SortMode sortMode)
 {
-	m_SortMode = sortMode;
+	m_folderSettings.sortMode = sortMode;
 
 	if(m_folderSettings.showInGroups)
 	{
@@ -73,7 +73,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	}
 	else
 	{
-		switch(m_SortMode)
+		switch(m_folderSettings.sortMode)
 		{
 		case FSM_NAME:
 			ComparisonResult = SortByName(basicItemInfo1, basicItemInfo2, *m_globalFolderSettings);

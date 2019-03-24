@@ -55,6 +55,7 @@ struct Config
 		globalFolderSettings.oneClickActivate = FALSE;
 		globalFolderSettings.oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
 
+		defaultFolderSettings.sortMode = FSM_NAME;
 		defaultFolderSettings.viewMode = VM_ICONS;
 		defaultFolderSettings.sortAscending = TRUE;
 		defaultFolderSettings.showInGroups = FALSE;

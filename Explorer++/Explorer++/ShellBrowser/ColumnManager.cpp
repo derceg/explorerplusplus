@@ -1039,7 +1039,7 @@ void CShellBrowser::ApplyHeaderSortArrow(void)
 	{
 		if(itr->bChecked)
 		{
-			if(DetermineColumnSortMode(itr->id) == m_SortMode)
+			if(DetermineColumnSortMode(itr->id) == m_folderSettings.sortMode)
 			{
 				iColumnId = itr->id;
 				break;
