@@ -33,8 +33,8 @@ __interface TabContainerInterface
 	int				GetNumTabs() const;
 	bool			CloseTab(const Tab &tab);
 
-	HRESULT			CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, const TabSettings &tabSettings, int *pTabObjectIndex);
-	HRESULT			CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, const TabSettings &tabSettings, int *pTabObjectIndex);
+	HRESULT			CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
+	HRESULT			CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
 
 	HRESULT			BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags);
 	HRESULT			BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags);

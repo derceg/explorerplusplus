@@ -134,14 +134,14 @@ void CBookmarksToolbar::OpenBookmarkItemInNewTab(const VariantBookmark &variantB
 			if (variantBookmarkChild.type() == typeid(CBookmark))
 			{
 				const CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkChild);
-				m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, {}, nullptr);
+				m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str());
 			}
 		}
 	}
 	else
 	{
 		const CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkItem);
-		m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str(), nullptr, {}, nullptr);
+		m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str());
 	}
 }
 

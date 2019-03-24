@@ -34,7 +34,7 @@ HRESULT Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInN
 			tabSettings.selected = true;
 		}
 
-		return CreateNewTab(szExpandedPath, nullptr, tabSettings, nullptr);
+		return CreateNewTab(szExpandedPath, tabSettings);
 	}
 
 	return BrowseFolderInCurrentTab(szExpandedPath,SBSP_ABSOLUTE);

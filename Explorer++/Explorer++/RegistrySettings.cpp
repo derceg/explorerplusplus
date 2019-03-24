@@ -552,7 +552,6 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 	HKEY				hKey;
 	HKEY				hTabKey;
 	HKEY				hColumnsKey;
-	InitialSettings_t	Settings;
 	TCHAR				szItemKey[128];
 	LPITEMIDLIST		pidlDirectory = NULL;
 	LONG				ReturnValue;
@@ -581,23 +580,25 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 				RegQueryValueEx(hTabKey,_T("Directory"),0,&Type,(LPBYTE)pidlDirectory,&cbData);
 			}
 
+			FolderSettings folderSettings;
+
 			DWORD value;
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ViewMode"),&value);
-			Settings.folderSettings.viewMode = static_cast<ViewMode>(value);
+			folderSettings.viewMode = static_cast<ViewMode>(value);
 
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortMode"),&value);
-			Settings.folderSettings.sortMode = static_cast<SortMode>(value);
+			folderSettings.sortMode = static_cast<SortMode>(value);
 
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortAscending"),(LPDWORD)&Settings.folderSettings.sortAscending);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowInGroups"),(LPDWORD)&Settings.folderSettings.showInGroups);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ApplyFilter"),(LPDWORD)&Settings.folderSettings.applyFilter);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("FilterCaseSensitive"),(LPDWORD)&Settings.folderSettings.filterCaseSensitive);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowHidden"),(LPDWORD)&Settings.folderSettings.showHidden);
-			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("AutoArrange"),(LPDWORD)&Settings.folderSettings.autoArrange);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortAscending"),(LPDWORD)&folderSettings.sortAscending);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowInGroups"),(LPDWORD)&folderSettings.showInGroups);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ApplyFilter"),(LPDWORD)&folderSettings.applyFilter);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("FilterCaseSensitive"),(LPDWORD)&folderSettings.filterCaseSensitive);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ShowHidden"),(LPDWORD)&folderSettings.showHidden);
+			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("AutoArrange"),(LPDWORD)&folderSettings.autoArrange);
 
 			TCHAR filter[512];
 			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("Filter"),filter,SIZEOF_ARRAY(filter));
-			Settings.folderSettings.filter = filter;
+			folderSettings.filter = filter;
 
 			std::list<Column_t>	RealFolderColumnList;
 			std::list<Column_t>	MyComputerColumnList;
@@ -655,13 +656,15 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,&NetworkConnectionsColumnList);
 			ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,&MyNetworkPlacesColumnList);
 
-			Settings.pControlPanelColumnList		= &ControlPanelColumnList;
-			Settings.pMyComputerColumnList			= &MyComputerColumnList;
-			Settings.pMyNetworkPlacesColumnList		= &MyNetworkPlacesColumnList;
-			Settings.pNetworkConnectionsColumnList	= &NetworkConnectionsColumnList;
-			Settings.pPrintersColumnList			= &PrintersColumnList;
-			Settings.pRealFolderColumnList			= &RealFolderColumnList;
-			Settings.pRecycleBinColumnList			= &RecycleBinColumnList;
+			InitialColumns initialColumns;
+
+			initialColumns.pControlPanelColumnList			= &ControlPanelColumnList;
+			initialColumns.pMyComputerColumnList			= &MyComputerColumnList;
+			initialColumns.pMyNetworkPlacesColumnList		= &MyNetworkPlacesColumnList;
+			initialColumns.pNetworkConnectionsColumnList	= &NetworkConnectionsColumnList;
+			initialColumns.pPrintersColumnList				= &PrintersColumnList;
+			initialColumns.pRealFolderColumnList			= &RealFolderColumnList;
+			initialColumns.pRecycleBinColumnList			= &RecycleBinColumnList;
 
 			TabSettings tabSettings;
 
@@ -677,7 +680,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("CustomName"),customName,SIZEOF_ARRAY(customName));
 			tabSettings.name = customName;
 
-			hr = CreateNewTab(pidlDirectory,&Settings,tabSettings,NULL);
+			hr = CreateNewTab(pidlDirectory, tabSettings, &folderSettings, &initialColumns);
 
 			if(hr == S_OK)
 				nTabsCreated++;

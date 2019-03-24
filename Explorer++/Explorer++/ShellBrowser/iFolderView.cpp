@@ -56,17 +56,25 @@ ULONG __stdcall CShellBrowser::Release(void)
 }
 
 CShellBrowser *CShellBrowser::CreateNew(HWND hOwner,HWND hListView,
-	const InitialSettings_t *pSettings, const GlobalFolderSettings *globalFolderSettings)
+	const GlobalFolderSettings *globalFolderSettings, const FolderSettings &folderSettings,
+	const InitialColumns &initialColumns)
 {
-	return new CShellBrowser(hOwner, hListView, pSettings, globalFolderSettings);
+	return new CShellBrowser(hOwner, hListView, globalFolderSettings, folderSettings, initialColumns);
 }
 
-CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView,
-	const InitialSettings_t *pSettings, const GlobalFolderSettings *globalFolderSettings) :
+CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView, const GlobalFolderSettings *globalFolderSettings,
+	const FolderSettings &folderSettings, const InitialColumns &initialColumns) :
 m_hOwner(hOwner),
 m_hListView(hListView),
 m_globalFolderSettings(globalFolderSettings),
-m_folderSettings(pSettings->folderSettings),
+m_folderSettings(folderSettings),
+m_ControlPanelColumnList(*initialColumns.pControlPanelColumnList),
+m_MyComputerColumnList(*initialColumns.pMyComputerColumnList),
+m_MyNetworkPlacesColumnList(*initialColumns.pMyNetworkPlacesColumnList),
+m_NetworkConnectionsColumnList(*initialColumns.pNetworkConnectionsColumnList),
+m_PrintersColumnList(*initialColumns.pPrintersColumnList),
+m_RealFolderColumnList(*initialColumns.pRealFolderColumnList),
+m_RecycleBinColumnList(*initialColumns.pRecycleBinColumnList),
 m_itemIDCounter(0),
 m_columnThreadPool(1),
 m_columnResultIDCounter(0),
@@ -98,8 +106,6 @@ m_iconResultIDCounter(0)
 	m_pidlDirectory			= NULL;
 
 	m_PreviousSortColumnExists = false;
-
-	SetUserOptions(pSettings);
 
 	NListView::ListView_SetAutoArrange(m_hListView,m_folderSettings.autoArrange);
 	NListView::ListView_SetGridlines(m_hListView, m_globalFolderSettings->showGridlines);
@@ -371,17 +377,6 @@ HRESULT CShellBrowser::InitializeDragDropHelpers(void)
 	}
 
 	return hr;
-}
-
-void CShellBrowser::SetUserOptions(const InitialSettings_t *is)
-{
-	m_ControlPanelColumnList = *is->pControlPanelColumnList;
-	m_MyComputerColumnList = *is->pMyComputerColumnList;
-	m_MyNetworkPlacesColumnList = *is->pMyNetworkPlacesColumnList;
-	m_NetworkConnectionsColumnList = *is->pNetworkConnectionsColumnList;
-	m_PrintersColumnList = *is->pPrintersColumnList;
-	m_RealFolderColumnList = *is->pRealFolderColumnList;
-	m_RecycleBinColumnList = *is->pRecycleBinColumnList;
 }
 
 int CShellBrowser::GetId(void) const

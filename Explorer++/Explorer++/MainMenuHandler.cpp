@@ -268,7 +268,7 @@ void Explorerplusplus::OnResolveLink()
 			StringCchCopy(szPath, SIZEOF_ARRAY(szPath), szFullFileName);
 			PathRemoveFileSpec(szPath);
 
-			hr = CreateNewTab(szPath, nullptr, TabSettings(_selected = true), nullptr);
+			hr = CreateNewTab(szPath, TabSettings(_selected = true));
 
 			if(SUCCEEDED(hr))
 			{

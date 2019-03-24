@@ -103,7 +103,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	}
 
 	int tabId;
-	HRESULT hr = m_tabContainer->CreateNewTab(location->c_str(), nullptr, tabSettings, &tabId);
+	HRESULT hr = m_tabContainer->CreateNewTab(location->c_str(), tabSettings, nullptr, nullptr, &tabId);
 
 	if (FAILED(hr))
 	{

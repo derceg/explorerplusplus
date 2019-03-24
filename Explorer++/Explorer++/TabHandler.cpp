@@ -234,7 +234,7 @@ void Explorerplusplus::OnNewTab()
 		if(PathIsDirectory(FullItemPath))
 		{
 			bFolderSelected = TRUE;
-			CreateNewTab(FullItemPath, nullptr, TabSettings(_selected = true), nullptr);
+			CreateNewTab(FullItemPath, TabSettings(_selected = true));
 		}
 	}
 
@@ -242,17 +242,18 @@ void Explorerplusplus::OnNewTab()
 	item was not a folder; open the default tab directory. */
 	if(!bFolderSelected)
 	{
-		hr = CreateNewTab(m_DefaultTabDirectory, nullptr, TabSettings(_selected = true), nullptr);
+		hr = CreateNewTab(m_DefaultTabDirectory, TabSettings(_selected = true));
 
 		if (FAILED(hr))
 		{
-			CreateNewTab(m_DefaultTabDirectoryStatic, nullptr, TabSettings(_selected = true), nullptr);
+			CreateNewTab(m_DefaultTabDirectoryStatic, TabSettings(_selected = true));
 		}
 	}
 }
 
 HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
-InitialSettings_t *pSettings,const TabSettings &tabSettings,int *pTabObjectIndex)
+	const TabSettings &tabSettings, const FolderSettings *folderSettings,
+	const InitialColumns *initialColumns, int *newTabId)
 {
 	LPITEMIDLIST	pidl = NULL;
 	TCHAR			szExpandedPath[MAX_PATH];
@@ -273,7 +274,7 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings,int *pTabObjectIndex
 	if(!SUCCEEDED(GetIdlFromParsingName(szExpandedPath,&pidl)))
 		return E_FAIL;
 
-	hr = CreateNewTab(pidl,pSettings,tabSettings,pTabObjectIndex);
+	hr = CreateNewTab(pidl, tabSettings, folderSettings, initialColumns, newTabId);
 
 	CoTaskMemFree(pidl);
 
@@ -283,7 +284,8 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings,int *pTabObjectIndex
 /* Creates a new tab. If the settings argument is NULL,
 the global settings will be used. */
 HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
-InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectIndex)
+	const TabSettings &tabSettings, const FolderSettings *folderSettings,
+	const InitialColumns *initialColumns, int *newTabId)
 {
 	if (!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
 	{
@@ -323,48 +325,37 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 	/* Set the listview to its initial size. */
 	SetListViewInitialPosition(tab.listView);
 
-	InitialSettings_t is;
+	FolderSettings folderSettingsFinal;
 
-	/* If no explicit settings are specified, use the
-	global ones. */
-	if(pSettings == NULL)
+	if (folderSettings)
 	{
-		is.folderSettings = m_config->defaultFolderSettings;
-		is.folderSettings.sortMode = GetDefaultSortMode(pidlDirectory);
-
-		is.pControlPanelColumnList = &m_ControlPanelColumnList;
-		is.pMyComputerColumnList = &m_MyComputerColumnList;
-		is.pMyNetworkPlacesColumnList = &m_MyNetworkPlacesColumnList;
-		is.pNetworkConnectionsColumnList = &m_NetworkConnectionsColumnList;
-		is.pPrintersColumnList = &m_PrintersColumnList;
-		is.pRealFolderColumnList = &m_RealFolderColumnList;
-		is.pRecycleBinColumnList = &m_RecycleBinColumnList;
-
-		/* Check if there are any specific settings saved
-		for the specified directory. */
-		for(auto ds : m_DirectorySettingsList)
-		{
-			if(CompareIdls(pidlDirectory,ds.pidlDirectory))
-			{
-				is.folderSettings.sortMode = ds.dsi.sortMode;
-				is.folderSettings.viewMode = ds.dsi.viewMode;
-
-				is.pControlPanelColumnList			= &ds.dsi.ControlPanelColumnList;
-				is.pMyComputerColumnList			= &ds.dsi.MyComputerColumnList;
-				is.pMyNetworkPlacesColumnList		= &ds.dsi.MyNetworkPlacesColumnList;
-				is.pNetworkConnectionsColumnList	= &ds.dsi.NetworkConnectionsColumnList;
-				is.pPrintersColumnList				= &ds.dsi.PrintersColumnList;
-				is.pRealFolderColumnList			= &ds.dsi.RealFolderColumnList;
-				is.pRecycleBinColumnList			= &ds.dsi.RecycleBinColumnList;
-
-				break;
-			}
-		}
-
-		pSettings = &is;
+		folderSettingsFinal = *folderSettings;
+	}
+	else
+	{
+		folderSettingsFinal = m_config->defaultFolderSettings;
+		folderSettingsFinal.sortMode = GetDefaultSortMode(pidlDirectory);
 	}
 
-	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView, pSettings, &m_config->globalFolderSettings));
+	InitialColumns initialColumnsFinal;
+
+	if (initialColumns)
+	{
+		initialColumnsFinal = *initialColumns;
+	}
+	else
+	{
+		initialColumnsFinal.pControlPanelColumnList = &m_ControlPanelColumnList;
+		initialColumnsFinal.pMyComputerColumnList = &m_MyComputerColumnList;
+		initialColumnsFinal.pMyNetworkPlacesColumnList = &m_MyNetworkPlacesColumnList;
+		initialColumnsFinal.pNetworkConnectionsColumnList = &m_NetworkConnectionsColumnList;
+		initialColumnsFinal.pPrintersColumnList = &m_PrintersColumnList;
+		initialColumnsFinal.pRealFolderColumnList = &m_RealFolderColumnList;
+		initialColumnsFinal.pRecycleBinColumnList = &m_RecycleBinColumnList;
+	}
+
+	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView, &m_config->globalFolderSettings,
+		folderSettingsFinal, initialColumnsFinal));
 
 	/* TODO: This needs to be removed. */
 	SetWindowSubclass(tab.listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
@@ -444,9 +435,9 @@ InitialSettings_t *pSettings,const TabSettings &tabSettings, int *pTabObjectInde
 		return E_FAIL;
 	}
 
-	if (pTabObjectIndex != NULL)
+	if (newTabId)
 	{
-		*pTabObjectIndex = tab.GetId();
+		*newTabId = tab.GetId();
 	}
 
 	SetTabIcon(tab);
@@ -511,7 +502,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
 			}
 
-			hr = CreateNewTab(szDirectory, NULL, TabSettings(_selected = true), NULL);
+			hr = CreateNewTab(szDirectory, TabSettings(_selected = true));
 
 			if(hr == S_OK)
 				nTabsCreated++;
@@ -525,10 +516,10 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	if(nTabsCreated == 0)
 	{
-		hr = CreateNewTab(m_DefaultTabDirectory, NULL, TabSettings(_selected = true), NULL);
+		hr = CreateNewTab(m_DefaultTabDirectory, TabSettings(_selected = true));
 
 		if(FAILED(hr))
-			hr = CreateNewTab(m_DefaultTabDirectoryStatic, NULL, TabSettings(_selected = true), NULL);
+			hr = CreateNewTab(m_DefaultTabDirectoryStatic, TabSettings(_selected = true));
 
 		if(hr == S_OK)
 		{
@@ -1011,7 +1002,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 				if (SUCCEEDED(hr))
 				{
-					CreateNewTab(pidlParent, nullptr, TabSettings(_selected = true), nullptr);
+					CreateNewTab(pidlParent, TabSettings(_selected = true));
 					CoTaskMemFree(pidlParent);
 				}
 
@@ -1193,7 +1184,7 @@ void Explorerplusplus::DuplicateTab(const Tab &tab)
 	tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
-	CreateNewTab(szTabDirectory, nullptr, {}, nullptr);
+	CreateNewTab(szTabDirectory);
 }
 
 SortMode Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const

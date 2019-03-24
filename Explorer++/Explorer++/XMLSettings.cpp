@@ -647,8 +647,6 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 	BSTR						bstrValue;
 	BSTR						bstr = NULL;
 	HRESULT						hr;
-	InitialSettings_t			*pSettings = NULL;
-	TabSettings					*pTabSettings = NULL;
 	TCHAR						szDirectory[MAX_PATH];
 	std::list<Column_t>			RealFolderColumnList;
 	std::list<Column_t>			MyComputerColumnList;
@@ -676,15 +674,16 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 	{
 		pNodes->get_length(&length);
 
-		pSettings = (InitialSettings_t *)malloc(sizeof(InitialSettings_t) * length);
-		pTabSettings = (TabSettings *)malloc(sizeof(TabSettings) * length);
-
 		for(long i = 0;i < length;i++)
 		{
 			/* This should never fail, as the number
 			of nodes has already been counted (so
 			they must exist). */
 			hr = pNodes->get_item(i,&pNode);
+
+			TabSettings tabSettings;
+			FolderSettings folderSettings;
+			InitialColumns initialColumns;
 
 			RealFolderColumnList.clear();
 			MyComputerColumnList.clear();
@@ -700,7 +699,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 
 				if(SUCCEEDED(hr))
 				{
-					pTabSettings[i].selected = true;
+					tabSettings.selected = true;
 
 					/* Retrieve the total number of attributes
 					attached to this node. */
@@ -722,7 +721,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 						if(lstrcmp(bstrName,L"Directory") == 0)
 							StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),bstrValue);
 						else
-							MapTabAttributeValue(bstrName,bstrValue,&pSettings[i],pTabSettings[i]);
+							MapTabAttributeValue(bstrName,bstrValue,tabSettings,folderSettings);
 					}
 
 					hr = pNode->get_firstChild(&pColumnsNode);
@@ -784,25 +783,25 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 						}
 					}
 
-					pSettings[i].pRealFolderColumnList = &RealFolderColumnList;
-					pSettings[i].pMyComputerColumnList = &MyComputerColumnList;
-					pSettings[i].pControlPanelColumnList = &ControlPanelColumnList;
-					pSettings[i].pRecycleBinColumnList = &RecycleBinColumnList;
-					pSettings[i].pPrintersColumnList = &PrintersColumnList;
-					pSettings[i].pNetworkConnectionsColumnList = &NetworkConnectionsColumnList;
-					pSettings[i].pMyNetworkPlacesColumnList = &MyNetworkPlacesColumnList;
+					initialColumns.pRealFolderColumnList = &RealFolderColumnList;
+					initialColumns.pMyComputerColumnList = &MyComputerColumnList;
+					initialColumns.pControlPanelColumnList = &ControlPanelColumnList;
+					initialColumns.pRecycleBinColumnList = &RecycleBinColumnList;
+					initialColumns.pPrintersColumnList = &PrintersColumnList;
+					initialColumns.pNetworkConnectionsColumnList = &NetworkConnectionsColumnList;
+					initialColumns.pMyNetworkPlacesColumnList = &MyNetworkPlacesColumnList;
 
-					ValidateSingleColumnSet(VALIDATE_REALFOLDER_COLUMNS,&(*pSettings[i].pRealFolderColumnList));
-					ValidateSingleColumnSet(VALIDATE_CONTROLPANEL_COLUMNS,&(*pSettings[i].pControlPanelColumnList));
-					ValidateSingleColumnSet(VALIDATE_MYCOMPUTER_COLUMNS,&(*pSettings[i].pMyComputerColumnList));
-					ValidateSingleColumnSet(VALIDATE_RECYCLEBIN_COLUMNS,&(*pSettings[i].pRecycleBinColumnList));
-					ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS,&(*pSettings[i].pPrintersColumnList));
-					ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,&(*pSettings[i].pNetworkConnectionsColumnList));
-					ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,&(*pSettings[i].pMyNetworkPlacesColumnList));
+					ValidateSingleColumnSet(VALIDATE_REALFOLDER_COLUMNS,initialColumns.pRealFolderColumnList);
+					ValidateSingleColumnSet(VALIDATE_CONTROLPANEL_COLUMNS,initialColumns.pControlPanelColumnList);
+					ValidateSingleColumnSet(VALIDATE_MYCOMPUTER_COLUMNS,initialColumns.pMyComputerColumnList);
+					ValidateSingleColumnSet(VALIDATE_RECYCLEBIN_COLUMNS,initialColumns.pRecycleBinColumnList);
+					ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS,initialColumns.pPrintersColumnList);
+					ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,initialColumns.pNetworkConnectionsColumnList);
+					ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,initialColumns.pMyNetworkPlacesColumnList);
 				}
 			}
 
-			hr = CreateNewTab(szDirectory,&pSettings[i],pTabSettings[i],NULL);
+			hr = CreateNewTab(szDirectory, tabSettings, &folderSettings, &initialColumns);
 
 			if(hr == S_OK)
 				nTabsCreated++;
@@ -810,9 +809,6 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 			pNode->Release();
 			pNode = NULL;
 		}
-
-		free(pTabSettings);
-		free(pSettings);
 	}
 
 clean:
@@ -1901,43 +1897,43 @@ WCHAR *wszName,WCHAR *wszValue)
 }
 
 void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,
-InitialSettings_t *pSettings,TabSettings &tabSettings)
+	TabSettings &tabSettings, FolderSettings &folderSettings)
 {
 	if(lstrcmp(wszName,L"ApplyFilter") == 0)
 	{
-		pSettings->folderSettings.applyFilter = NXMLSettings::DecodeBoolValue(wszValue);
+		folderSettings.applyFilter = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"AutoArrange") == 0)
 	{
-		pSettings->folderSettings.autoArrange = NXMLSettings::DecodeBoolValue(wszValue);
+		folderSettings.autoArrange = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"Filter") == 0)
 	{
-		pSettings->folderSettings.filter = wszValue;
+		folderSettings.filter = wszValue;
 	}
 	else if(lstrcmp(wszName,L"FilterCaseSensitive") == 0)
 	{
-		pSettings->folderSettings.filterCaseSensitive = NXMLSettings::DecodeBoolValue(wszValue);
+		folderSettings.filterCaseSensitive = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"ShowHidden") == 0)
 	{
-		pSettings->folderSettings.showHidden = NXMLSettings::DecodeBoolValue(wszValue);
+		folderSettings.showHidden = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"ShowInGroups") == 0)
 	{
-		pSettings->folderSettings.showInGroups = NXMLSettings::DecodeBoolValue(wszValue);
+		folderSettings.showInGroups = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"SortAscending") == 0)
 	{
-		pSettings->folderSettings.sortAscending = NXMLSettings::DecodeBoolValue(wszValue);
+		folderSettings.sortAscending = NXMLSettings::DecodeBoolValue(wszValue);
 	}
 	else if(lstrcmp(wszName,L"SortMode") == 0)
 	{
-		pSettings->folderSettings.sortMode = static_cast<SortMode>(NXMLSettings::DecodeIntValue(wszValue));
+		folderSettings.sortMode = static_cast<SortMode>(NXMLSettings::DecodeIntValue(wszValue));
 	}
 	else if(lstrcmp(wszName,L"ViewMode") == 0)
 	{
-		pSettings->folderSettings.viewMode = static_cast<ViewMode>(NXMLSettings::DecodeIntValue(wszValue));
+		folderSettings.viewMode = static_cast<ViewMode>(NXMLSettings::DecodeIntValue(wszValue));
 	}
 	else if(lstrcmp(wszName,L"Locked") == 0)
 	{

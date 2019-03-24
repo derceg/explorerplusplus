@@ -473,8 +473,8 @@ private:
 	void					InitializeTabs(void);
 	void					AddDefaultTabIcons(HIMAGELIST himlTab);
 	void					SelectAdjacentTab(BOOL bNextTab);
-	HRESULT					CreateNewTab(const TCHAR *TabDirectory, InitialSettings_t *pSettings, const TabSettings &tabSettings, int *pTabObjectIndex);
-	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, InitialSettings_t *pSettings, const TabSettings &tabSettings, int *pTabObjectIndex);
+	HRESULT					CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
+	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
 	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(int iTab);
@@ -708,7 +708,7 @@ private:
 	void					LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom);
 	void					SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
 	void					MapAttributeToValue(IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
-	void					MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, InitialSettings_t *pSettings, TabSettings &tabSettings);
+	void					MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings, FolderSettings &folderSettings);
 
 	/* IExplorerplusplus methods. */
 	HWND					GetActiveListView() const;

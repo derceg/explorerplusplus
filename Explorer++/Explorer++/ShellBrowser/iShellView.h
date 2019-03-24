@@ -52,11 +52,8 @@ typedef struct
 	std::list<Column_t>	MyNetworkPlacesColumnList;
 } ColumnExport_t;
 
-typedef struct
+struct InitialColumns
 {
-	FolderSettings folderSettings;
-
-	/* Initial columns. */
 	std::list<Column_t> *pRealFolderColumnList;
 	std::list<Column_t> *pMyComputerColumnList;
 	std::list<Column_t> *pControlPanelColumnList;
@@ -64,7 +61,7 @@ typedef struct
 	std::list<Column_t> *pPrintersColumnList;
 	std::list<Column_t> *pNetworkConnectionsColumnList;
 	std::list<Column_t> *pMyNetworkPlacesColumnList;
-} InitialSettings_t;
+};
 
 typedef struct
 {
@@ -88,7 +85,8 @@ class CShellBrowser : public IDropTarget, public IDropFilesCallback
 
 public:
 
-	static CShellBrowser	*CreateNew(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings, const GlobalFolderSettings *globalFolderSettings);
+	static CShellBrowser	*CreateNew(HWND hOwner, HWND hListView, const GlobalFolderSettings *globalFolderSettings,
+		const FolderSettings &folderSettings, const InitialColumns &initialColumns);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
@@ -139,9 +137,6 @@ public:
 	int					QueryNumSelectedFiles(void) const;
 	int					QueryNumSelectedFolders(void) const;
 	int					QueryNumSelected(void) const;
-
-	/* Settings. */
-	void				SetUserOptions(const InitialSettings_t *is);
 
 	/* ID. */
 	int					GetId(void) const;
@@ -301,7 +296,8 @@ private:
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	CShellBrowser(HWND hOwner, HWND hListView, const InitialSettings_t *pSettings, const GlobalFolderSettings *globalFolderSettings);
+	CShellBrowser(HWND hOwner, HWND hListView, const GlobalFolderSettings *globalFolderSettings,
+		const FolderSettings &folderSettings, const InitialColumns &initialColumns);
 	~CShellBrowser();
 
 	int					GenerateUniqueItemId(void);

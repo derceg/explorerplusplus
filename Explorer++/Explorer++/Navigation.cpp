@@ -129,7 +129,7 @@ HRESULT Explorerplusplus::BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UI
 	}
 	else
 	{
-		hr = CreateNewTab(pidlDirectory, NULL, TabSettings(_selected = true), &resultingTabId);
+		hr = CreateNewTab(pidlDirectory, TabSettings(_selected = true), nullptr, nullptr, &resultingTabId);
 	}
 
 	if(SUCCEEDED(hr))
