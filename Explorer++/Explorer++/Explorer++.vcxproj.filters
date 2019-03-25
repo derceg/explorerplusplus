@@ -319,6 +319,9 @@
     <ClCompile Include="TabUpdated.cpp">
       <Filter>Plugins\TabsApi\Events</Filter>
     </ClCompile>
+    <ClCompile Include="TabProperties.cpp">
+      <Filter>Plugins\TabsApi</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -599,6 +602,9 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\FolderSettings.h">
       <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="TabProperties.h">
+      <Filter>Plugins\TabsApi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

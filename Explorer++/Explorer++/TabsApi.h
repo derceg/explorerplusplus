@@ -89,6 +89,9 @@ namespace Plugins
 
 	private:
 
+		void extractTabPropertiesForCreation(sol::table createProperties, TabSettings &tabSettings);
+		void extractFolderSettingsForCreation(sol::table folderSettingsTable, ::FolderSettings &folderSettings);
+
 		TabContainerInterface *m_tabContainer;
 		TabInterface *m_tabInterface;
 	};

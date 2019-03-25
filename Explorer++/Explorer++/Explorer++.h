@@ -476,6 +476,7 @@ private:
 	HRESULT					CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
 	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
+	FolderSettings			GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;
 	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(int iTab);
 	bool					OnCloseTab(void);

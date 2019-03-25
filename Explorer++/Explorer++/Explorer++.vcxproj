@@ -399,6 +399,7 @@
     <ClCompile Include="TabDropHandler.cpp" />
     <ClCompile Include="TabHandler.cpp" />
     <ClCompile Include="TabMoved.cpp" />
+    <ClCompile Include="TabProperties.cpp" />
     <ClCompile Include="TabRemoved.cpp" />
     <ClCompile Include="TabsApi.cpp" />
     <ClCompile Include="TabUpdated.cpp" />
@@ -502,6 +503,7 @@
     <ClInclude Include="TabDropHandler.h" />
     <ClInclude Include="TabInterface.h" />
     <ClInclude Include="TabMoved.h" />
+    <ClInclude Include="TabProperties.h" />
     <ClInclude Include="TabRemoved.h" />
     <ClInclude Include="TabsApi.h" />
     <ClInclude Include="TabUpdated.h" />

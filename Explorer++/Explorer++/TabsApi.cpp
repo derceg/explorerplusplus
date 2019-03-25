@@ -4,6 +4,11 @@
 
 #include "stdafx.h"
 #include "TabsAPI.h"
+#include "ShellBrowser/FolderSettings.h"
+#include "TabProperties.h"
+#include <boost/scope_exit.hpp>
+
+#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 Plugins::TabsApi::TabsApi(TabContainerInterface *tabContainer, TabInterface *tabInterface) :
 	m_tabContainer(tabContainer),
@@ -46,7 +51,7 @@ boost::optional<Plugins::TabsApi::Tab> Plugins::TabsApi::get(int tabId)
 
 int Plugins::TabsApi::create(sol::table createProperties)
 {
-	boost::optional<std::wstring> location = createProperties["location"];
+	boost::optional<std::wstring> location = createProperties[TabConstants::LOCATION];
 
 	if (!location || location->empty())
 	{
@@ -54,15 +59,52 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	}
 
 	TabSettings tabSettings;
+	extractTabPropertiesForCreation(createProperties, tabSettings);
 
-	boost::optional<std::wstring> name = createProperties["name"];
+	LPITEMIDLIST pidlDirectory;
+	HRESULT hr = GetIdlFromParsingName(location->c_str(), &pidlDirectory);
+
+	if (FAILED(hr))
+	{
+		return -1;
+	}
+
+	BOOST_SCOPE_EXIT(pidlDirectory) {
+		CoTaskMemFree(pidlDirectory);
+	} BOOST_SCOPE_EXIT_END
+
+	::FolderSettings folderSettings = m_tabContainer->GetDefaultFolderSettings(pidlDirectory);
+
+	boost::optional<sol::table> folderSettingsTable = createProperties[TabConstants::FOLDER_SETTINGS];
+
+	if (folderSettingsTable)
+	{
+		extractFolderSettingsForCreation(*folderSettingsTable, folderSettings);
+	}
+
+	int tabId;
+	hr = m_tabContainer->CreateNewTab(pidlDirectory, tabSettings, &folderSettings, nullptr, &tabId);
+
+	if (FAILED(hr))
+	{
+		/* TODO: Ideally, an error message would be available in case of
+		failure. */
+		return -1;
+	}
+
+	return tabId;
+}
+
+void Plugins::TabsApi::extractTabPropertiesForCreation(sol::table createProperties, TabSettings &tabSettings)
+{
+	boost::optional<std::wstring> name = createProperties[TabConstants::NAME];
 
 	if (name && !name->empty())
 	{
 		tabSettings.name = name;
 	}
 
-	boost::optional<int> index = createProperties["index"];
+	boost::optional<int> index = createProperties[TabConstants::INDEX];
 
 	if (index)
 	{
@@ -81,38 +123,69 @@ int Plugins::TabsApi::create(sol::table createProperties)
 		tabSettings.index = finalIndex;
 	}
 
-	boost::optional<bool> active = createProperties["active"];
+	boost::optional<bool> active = createProperties[TabConstants::ACTIVE];
 
 	if (active)
 	{
 		tabSettings.selected = *active;
 	}
 
-	boost::optional<bool> locked = createProperties["locked"];
+	boost::optional<bool> locked = createProperties[TabConstants::LOCKED];
 
 	if (locked)
 	{
 		tabSettings.locked = *locked;
 	}
 
-	boost::optional<bool> addressLocked = createProperties["addressLocked"];
+	boost::optional<bool> addressLocked = createProperties[TabConstants::ADDRESS_LOCKED];
 
 	if (addressLocked)
 	{
 		tabSettings.addressLocked = *addressLocked;
 	}
+}
 
-	int tabId;
-	HRESULT hr = m_tabContainer->CreateNewTab(location->c_str(), tabSettings, nullptr, nullptr, &tabId);
+void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSettingsTable, ::FolderSettings &folderSettings)
+{
+	boost::optional<int> viewMode = folderSettingsTable[FolderSettingsConstants::VIEW_MODE];
 
-	if (FAILED(hr))
+	if (viewMode)
 	{
-		/* TODO: Ideally, an error message would be available in case of
-		failure. */
-		return -1;
+		/* TODO: It would be better if checks like this were done by an
+		enum library. */
+		if (*viewMode >= static_cast<int>(ViewMode::FIRST) && *viewMode <= static_cast<int>(ViewMode::LAST))
+		{
+			folderSettings.viewMode = static_cast<ViewMode>(*viewMode);
+		}
 	}
 
-	return tabId;
+	boost::optional<bool> autoArrange = folderSettingsTable[FolderSettingsConstants::AUTO_ARRANGE];
+
+	if (autoArrange)
+	{
+		folderSettings.autoArrange = *autoArrange;
+	}
+
+	boost::optional<bool> sortAscending = folderSettingsTable[FolderSettingsConstants::SORT_ASCENDING];
+
+	if (sortAscending)
+	{
+		folderSettings.sortAscending = *sortAscending;
+	}
+
+	boost::optional<bool> showInGroups = folderSettingsTable[FolderSettingsConstants::SHOW_IN_GROUPS];
+
+	if (showInGroups)
+	{
+		folderSettings.showInGroups = *showInGroups;
+	}
+
+	boost::optional<bool> showHidden = folderSettingsTable[FolderSettingsConstants::SHOW_HIDDEN];
+
+	if (showHidden)
+	{
+		folderSettings.showHidden = *showHidden;
+	}
 }
 
 void Plugins::TabsApi::update(int tabId, sol::table properties)
@@ -124,14 +197,14 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 		return;
 	}
 
-	boost::optional<std::wstring> location = properties["location"];
+	boost::optional<std::wstring> location = properties[TabConstants::LOCATION];
 
 	if (location && !location->empty())
 	{
 		m_tabContainer->BrowseFolder(*tabInternal, location->c_str(), SBSP_ABSOLUTE);
 	}
 
-	boost::optional<std::wstring> name = properties["name"];
+	boost::optional<std::wstring> name = properties[TabConstants::NAME];
 
 	if (name)
 	{
@@ -145,33 +218,21 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 		}
 	}
 
-	boost::optional<int> viewMode = properties["viewMode"];
-
-	if (viewMode)
-	{
-		/* TODO: It would be better if checks like this were done by an
-		enum library. */
-		if (viewMode >= static_cast<int>(ViewMode::FIRST) && viewMode <= static_cast<int>(ViewMode::LAST))
-		{
-			tabInternal->GetShellBrowser()->SetCurrentViewMode(static_cast<ViewMode>(*viewMode));
-		}
-	}
-
-	boost::optional<bool> locked = properties["locked"];
+	boost::optional<bool> locked = properties[TabConstants::LOCKED];
 
 	if (locked)
 	{
 		tabInternal->SetLocked(*locked);
 	}
 
-	boost::optional<bool> addressLocked = properties["addressLocked"];
+	boost::optional<bool> addressLocked = properties[TabConstants::ADDRESS_LOCKED];
 
 	if (addressLocked)
 	{
 		tabInternal->SetAddressLocked(*addressLocked);
 	}
 
-	boost::optional<bool> active = properties["active"];
+	boost::optional<bool> active = properties[TabConstants::ACTIVE];
 
 	if (active && *active)
 	{

@@ -333,8 +333,7 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	}
 	else
 	{
-		folderSettingsFinal = m_config->defaultFolderSettings;
-		folderSettingsFinal.sortMode = GetDefaultSortMode(pidlDirectory);
+		folderSettingsFinal = GetDefaultFolderSettings(pidlDirectory);
 	}
 
 	InitialColumns initialColumnsFinal;
@@ -455,6 +454,14 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	}
 
 	return S_OK;
+}
+
+FolderSettings Explorerplusplus::GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const
+{
+	FolderSettings folderSettings = m_config->defaultFolderSettings;
+	folderSettings.sortMode = GetDefaultSortMode(pidlDirectory);
+
+	return folderSettings;
 }
 
 boost::signals2::connection Explorerplusplus::AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer)
