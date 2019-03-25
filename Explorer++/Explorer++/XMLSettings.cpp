@@ -1833,7 +1833,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_VIEWMODEGLOBAL:
-		m_config->defaultFolderSettings.viewMode = static_cast<ViewMode>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->defaultFolderSettings.viewMode = ViewMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_POSITION:
@@ -1933,7 +1933,7 @@ void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,
 	}
 	else if(lstrcmp(wszName,L"ViewMode") == 0)
 	{
-		folderSettings.viewMode = static_cast<ViewMode>(NXMLSettings::DecodeIntValue(wszValue));
+		folderSettings.viewMode = ViewMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
 	}
 	else if(lstrcmp(wszName,L"Locked") == 0)
 	{

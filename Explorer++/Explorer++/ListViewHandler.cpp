@@ -170,7 +170,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 				UINT uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
 
-				if(uViewMode == VM_LIST)
+				if(uViewMode == ViewMode::VM_LIST)
 				{
 					if(!(lvhti.flags & LVHT_NOWHERE) && lvhti.iItem != -1)
 					{
@@ -1040,7 +1040,7 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 
 	UINT uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
 
-	if(uViewMode == VM_LIST)
+	if(uViewMode == ViewMode::VM_LIST)
 	{
 		lEnableMenuItem(hMenu,IDM_POPUP_GROUPBY,FALSE);
 	}

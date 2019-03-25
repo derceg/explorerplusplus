@@ -1175,8 +1175,8 @@ void Explorerplusplus::OnIdaRClick(void)
 
 				uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
 
-				if(uViewMode == VM_SMALLICONS || uViewMode == VM_LIST ||
-					uViewMode == VM_DETAILS)
+				if(uViewMode == ViewMode::VM_SMALLICONS || uViewMode == ViewMode::VM_LIST ||
+					uViewMode == ViewMode::VM_DETAILS)
 					himl = ListView_GetImageList(m_hActiveListView,LVSIL_SMALL);
 				else
 					himl = ListView_GetImageList(m_hActiveListView,LVSIL_NORMAL);

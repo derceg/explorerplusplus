@@ -548,7 +548,7 @@ void CShellBrowser::RepositionLocalFiles(const POINT *ppt)
 
 		if(iItem != -1)
 		{
-			if(m_folderSettings.viewMode == VM_DETAILS)
+			if(m_folderSettings.viewMode == +ViewMode::VM_DETAILS)
 			{
 				LVITEM lvItem;
 				POINT ptItem;

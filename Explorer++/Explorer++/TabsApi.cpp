@@ -149,14 +149,9 @@ void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSetting
 {
 	boost::optional<int> viewMode = folderSettingsTable[FolderSettingsConstants::VIEW_MODE];
 
-	if (viewMode)
+	if (viewMode && ViewMode::_is_valid(*viewMode))
 	{
-		/* TODO: It would be better if checks like this were done by an
-		enum library. */
-		if (*viewMode >= static_cast<int>(ViewMode::FIRST) && *viewMode <= static_cast<int>(ViewMode::LAST))
-		{
-			folderSettings.viewMode = static_cast<ViewMode>(*viewMode);
-		}
+		folderSettings.viewMode = ViewMode::_from_integral(*viewMode);
 	}
 
 	boost::optional<bool> autoArrange = folderSettingsTable[FolderSettingsConstants::AUTO_ARRANGE];

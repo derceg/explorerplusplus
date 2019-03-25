@@ -341,7 +341,7 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	first, or else it may be possible for the
 	thumbnail to be drawn before the initial
 	image. */
-	if(m_folderSettings.viewMode == VM_THUMBNAILS && (plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
+	if(m_folderSettings.viewMode == +ViewMode::VM_THUMBNAILS && (plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
 		plvItem->iImage = GetIconThumbnail((int)plvItem->lParam);
 		plvItem->mask |= LVIF_DI_SETITEM;
@@ -351,7 +351,7 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 		return;
 	}
 
-	if (m_folderSettings.viewMode == VM_DETAILS && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
+	if (m_folderSettings.viewMode == +ViewMode::VM_DETAILS && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
 	{
 		QueueColumnTask(static_cast<int>(plvItem->lParam), plvItem->iSubItem);
 	}
@@ -470,7 +470,7 @@ void CShellBrowser::PositionDroppedItems(void)
 
 	/* LVNI_TOLEFT and LVNI_TORIGHT cause exceptions
 	in details view. */
-	if(m_folderSettings.viewMode == VM_DETAILS)
+	if(m_folderSettings.viewMode == +ViewMode::VM_DETAILS)
 	{
 		m_DroppedFileNameList.clear();
 		return;
@@ -1049,7 +1049,7 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 
 	/* If we're in thumbnails view, destroy the current
 	imagelist, and create a new one. */
-	if(m_folderSettings.viewMode == VM_THUMBNAILS)
+	if(m_folderSettings.viewMode == +ViewMode::VM_THUMBNAILS)
 	{
 		himlOld = ListView_GetImageList(m_hListView,LVSIL_NORMAL);
 
@@ -1108,7 +1108,7 @@ void CShellBrowser::ExportCurrentColumns(std::list<Column_t> *pColumns)
 
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
 	{
-		if(m_folderSettings.viewMode == VM_DETAILS && itr->bChecked)
+		if(m_folderSettings.viewMode == +ViewMode::VM_DETAILS && itr->bChecked)
 		{
 			itr->iWidth = ListView_GetColumnWidth(m_hListView,iColumn);
 
@@ -1157,7 +1157,7 @@ void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns)
 
 		if(itr->bChecked)
 		{
-			if(m_folderSettings.viewMode == VM_DETAILS)
+			if(m_folderSettings.viewMode == +ViewMode::VM_DETAILS)
 			{
 				for(itr2 = m_pActiveColumnList->begin();itr2 != m_pActiveColumnList->end();itr2++)
 				{

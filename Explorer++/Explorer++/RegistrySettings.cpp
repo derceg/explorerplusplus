@@ -584,7 +584,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 
 			DWORD value;
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("ViewMode"),&value);
-			folderSettings.viewMode = static_cast<ViewMode>(value);
+			folderSettings.viewMode = ViewMode::_from_integral(value);
 
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("SortMode"),&value);
 			folderSettings.sortMode = static_cast<SortMode>(value);

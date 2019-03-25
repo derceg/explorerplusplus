@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ShellBrowser/FolderSettings.h"
+#include "ShellBrowser/ViewModes.h"
 #include "../Helper/StringHelper.h"
 
 static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
@@ -56,7 +57,7 @@ struct Config
 		globalFolderSettings.oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
 
 		defaultFolderSettings.sortMode = FSM_NAME;
-		defaultFolderSettings.viewMode = VM_ICONS;
+		defaultFolderSettings.viewMode = ViewMode::VM_ICONS;
 		defaultFolderSettings.sortAscending = TRUE;
 		defaultFolderSettings.showInGroups = FALSE;
 		defaultFolderSettings.showHidden = TRUE;

@@ -38,7 +38,7 @@ void CShellBrowser::SortFolder(SortMode sortMode)
 	/* If in details view, the column sort
 	arrow will need to be changed to reflect
 	the new sorting mode. */
-	if(m_folderSettings.viewMode == VM_DETAILS)
+	if(m_folderSettings.viewMode == +ViewMode::VM_DETAILS)
 	{
 		ApplyHeaderSortArrow();
 	}

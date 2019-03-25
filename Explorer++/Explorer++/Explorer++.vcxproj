@@ -443,6 +443,7 @@
     <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DisplayColoursDialog.h" />
     <ClInclude Include="DrivesToolbar.h" />
+    <ClInclude Include="BetterEnumsWrapper.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="Explorer++.h" />
     <ClInclude Include="Explorer++VersionInfo.h" />

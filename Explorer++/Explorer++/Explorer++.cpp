@@ -104,14 +104,14 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	m_iCutTabInternal		= 0;
 	m_hCutTreeViewItem		= NULL;
 
-	m_ViewModes.push_back(VM_EXTRALARGEICONS);
-	m_ViewModes.push_back(VM_LARGEICONS);
-	m_ViewModes.push_back(VM_ICONS);
-	m_ViewModes.push_back(VM_SMALLICONS);
-	m_ViewModes.push_back(VM_LIST);
-	m_ViewModes.push_back(VM_DETAILS);
-	m_ViewModes.push_back(VM_THUMBNAILS);
-	m_ViewModes.push_back(VM_TILES);
+	m_ViewModes.push_back(ViewMode::VM_EXTRALARGEICONS);
+	m_ViewModes.push_back(ViewMode::VM_LARGEICONS);
+	m_ViewModes.push_back(ViewMode::VM_ICONS);
+	m_ViewModes.push_back(ViewMode::VM_SMALLICONS);
+	m_ViewModes.push_back(ViewMode::VM_LIST);
+	m_ViewModes.push_back(ViewMode::VM_DETAILS);
+	m_ViewModes.push_back(ViewMode::VM_THUMBNAILS);
+	m_ViewModes.push_back(ViewMode::VM_TILES);
 }
 
 Explorerplusplus::~Explorerplusplus()

@@ -1081,9 +1081,9 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 				HWND hComboBox = GetDlgItem(hDlg,IDC_OPTIONS_DEFAULT_VIEW);
 				int SelectedIndex = -1;
 
-				for(auto ViewMode : m_ViewModes)
+				for(auto viewMode : m_ViewModes)
 				{
-					int StringID = GetViewModeMenuStringId(ViewMode);
+					int StringID = GetViewModeMenuStringId(viewMode);
 
 					TCHAR szTemp[64];
 					LoadString(m_hLanguageModule,StringID,szTemp,SIZEOF_ARRAY(szTemp));
@@ -1092,10 +1092,10 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 					if(Index != CB_ERR)
 					{
-						SendMessage(hComboBox,CB_SETITEMDATA,Index,ViewMode);
+						SendMessage(hComboBox,CB_SETITEMDATA,Index,viewMode);
 					}
 
-					if(ViewMode == m_config->defaultFolderSettings.viewMode)
+					if(viewMode == m_config->defaultFolderSettings.viewMode)
 					{
 						SelectedIndex = Index;
 					}
@@ -1161,7 +1161,7 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 						HWND hComboBox = GetDlgItem(hDlg,IDC_OPTIONS_DEFAULT_VIEW);
 						int SelectedIndex = static_cast<int>(SendMessage(hComboBox,CB_GETCURSEL,0,0));
-						m_config->defaultFolderSettings.viewMode = static_cast<ViewMode>(SendMessage(hComboBox,CB_GETITEMDATA,SelectedIndex,0));
+						m_config->defaultFolderSettings.viewMode = ViewMode::_from_integral(static_cast<int>(SendMessage(hComboBox,CB_GETITEMDATA,SelectedIndex,0)));
 
 						SaveAllSettings();
 					}
