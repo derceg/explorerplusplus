@@ -580,499 +580,499 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_SORTBY_NAME:
-			OnSortBy(SortMode::FSM_NAME);
+			OnSortBy(SortMode::Name);
 			break;
 
 		case IDM_SORTBY_SIZE:
-			OnSortBy(SortMode::FSM_SIZE);
+			OnSortBy(SortMode::Size);
 			break;
 
 		case IDM_SORTBY_TYPE:
-			OnSortBy(SortMode::FSM_TYPE);
+			OnSortBy(SortMode::Type);
 			break;
 
 		case IDM_SORTBY_DATEMODIFIED:
-			OnSortBy(SortMode::FSM_DATEMODIFIED);
+			OnSortBy(SortMode::DateModified);
 			break;
 
 		case IDM_SORTBY_TOTALSIZE:
-			OnSortBy(SortMode::FSM_TOTALSIZE);
+			OnSortBy(SortMode::TotalSize);
 			break;
 
 		case IDM_SORTBY_FREESPACE:
-			OnSortBy(SortMode::FSM_FREESPACE);
+			OnSortBy(SortMode::FreeSpace);
 			break;
 
 		case IDM_SORTBY_DATEDELETED:
-			OnSortBy(SortMode::FSM_DATEDELETED);
+			OnSortBy(SortMode::DateDeleted);
 			break;
 
 		case IDM_SORTBY_ORIGINALLOCATION:
-			OnSortBy(SortMode::FSM_ORIGINALLOCATION);
+			OnSortBy(SortMode::OriginalLocation);
 			break;
 
 		case IDM_SORTBY_ATTRIBUTES:
-			OnSortBy(SortMode::FSM_ATTRIBUTES);
+			OnSortBy(SortMode::Attributes);
 			break;
 
 		case IDM_SORTBY_REALSIZE:
-			OnSortBy(SortMode::FSM_REALSIZE);
+			OnSortBy(SortMode::RealSize);
 			break;
 
 		case IDM_SORTBY_SHORTNAME:
-			OnSortBy(SortMode::FSM_SHORTNAME);
+			OnSortBy(SortMode::ShortName);
 			break;
 
 		case IDM_SORTBY_OWNER:
-			OnSortBy(SortMode::FSM_OWNER);
+			OnSortBy(SortMode::Owner);
 			break;
 
 		case IDM_SORTBY_PRODUCTNAME:
-			OnSortBy(SortMode::FSM_PRODUCTNAME);
+			OnSortBy(SortMode::ProductName);
 			break;
 
 		case IDM_SORTBY_COMPANY:
-			OnSortBy(SortMode::FSM_COMPANY);
+			OnSortBy(SortMode::Company);
 			break;
 
 		case IDM_SORTBY_DESCRIPTION:
-			OnSortBy(SortMode::FSM_DESCRIPTION);
+			OnSortBy(SortMode::Description);
 			break;
 
 		case IDM_SORTBY_FILEVERSION:
-			OnSortBy(SortMode::FSM_FILEVERSION);
+			OnSortBy(SortMode::FileVersion);
 			break;
 
 		case IDM_SORTBY_PRODUCTVERSION:
-			OnSortBy(SortMode::FSM_PRODUCTVERSION);
+			OnSortBy(SortMode::ProductVersion);
 			break;
 
 		case IDM_SORTBY_SHORTCUTTO:
-			OnSortBy(SortMode::FSM_SHORTCUTTO);
+			OnSortBy(SortMode::ShortcutTo);
 			break;
 
 		case IDM_SORTBY_HARDLINKS:
-			OnSortBy(SortMode::FSM_HARDLINKS);
+			OnSortBy(SortMode::HardLinks);
 			break;
 
 		case IDM_SORTBY_EXTENSION:
-			OnSortBy(SortMode::FSM_EXTENSION);
+			OnSortBy(SortMode::Extension);
 			break;
 
 		case IDM_SORTBY_CREATED:
-			OnSortBy(SortMode::FSM_CREATED);
+			OnSortBy(SortMode::Created);
 			break;
 
 		case IDM_SORTBY_ACCESSED:
-			OnSortBy(SortMode::FSM_ACCESSED);
+			OnSortBy(SortMode::Accessed);
 			break;
 
 		case IDM_SORTBY_TITLE:
-			OnSortBy(SortMode::FSM_TITLE);
+			OnSortBy(SortMode::Title);
 			break;
 
 		case IDM_SORTBY_SUBJECT:
-			OnSortBy(SortMode::FSM_SUBJECT);
+			OnSortBy(SortMode::Subject);
 			break;
 
 		case IDM_SORTBY_AUTHOR:
-			OnSortBy(SortMode::FSM_AUTHORS);
+			OnSortBy(SortMode::Authors);
 			break;
 
 		case IDM_SORTBY_KEYWORDS:
-			OnSortBy(SortMode::FSM_KEYWORDS);
+			OnSortBy(SortMode::Keywords);
 			break;
 
 		case IDM_SORTBY_COMMENTS:
-			OnSortBy(SortMode::FSM_COMMENTS);
+			OnSortBy(SortMode::Comments);
 			break;
 
 		case IDM_SORTBY_CAMERAMODEL:
-			OnSortBy(SortMode::FSM_CAMERAMODEL);
+			OnSortBy(SortMode::CameraModel);
 			break;
 
 		case IDM_SORTBY_DATETAKEN:
-			OnSortBy(SortMode::FSM_DATETAKEN);
+			OnSortBy(SortMode::DateTaken);
 			break;
 
 		case IDM_SORTBY_WIDTH:
-			OnSortBy(SortMode::FSM_WIDTH);
+			OnSortBy(SortMode::Width);
 			break;
 
 		case IDM_SORTBY_HEIGHT:
-			OnSortBy(SortMode::FSM_HEIGHT);
+			OnSortBy(SortMode::Height);
 			break;
 
 		case IDM_SORTBY_VIRTUALCOMMENTS:
-			OnSortBy(SortMode::FSM_VIRTUALCOMMENTS);
+			OnSortBy(SortMode::VirtualComments);
 			break;
 
 		case IDM_SORTBY_FILESYSTEM:
-			OnSortBy(SortMode::FSM_FILESYSTEM);
+			OnSortBy(SortMode::FileSystem);
 			break;
 
 		case IDM_SORTBY_NUMPRINTERDOCUMENTS:
-			OnSortBy(SortMode::FSM_NUMPRINTERDOCUMENTS);
+			OnSortBy(SortMode::NumPrinterDocuments);
 			break;
 
 		case IDM_SORTBY_PRINTERSTATUS:
-			OnSortBy(SortMode::FSM_PRINTERSTATUS);
+			OnSortBy(SortMode::PrinterStatus);
 			break;
 
 		case IDM_SORTBY_PRINTERCOMMENTS:
-			OnSortBy(SortMode::FSM_PRINTERCOMMENTS);
+			OnSortBy(SortMode::PrinterComments);
 			break;
 
 		case IDM_SORTBY_PRINTERLOCATION:
-			OnSortBy(SortMode::FSM_PRINTERLOCATION);
+			OnSortBy(SortMode::PrinterLocation);
 			break;
 
 		case IDM_SORTBY_NETWORKADAPTER_STATUS:
-			OnSortBy(SortMode::FSM_NETWORKADAPTER_STATUS);
+			OnSortBy(SortMode::NetworkAdapterStatus);
 			break;
 
 		case IDM_SORTBY_MEDIA_BITRATE:
-			OnSortBy(SortMode::FSM_MEDIA_BITRATE);
+			OnSortBy(SortMode::MediaBitrate);
 			break;
 
 		case IDM_SORTBY_MEDIA_COPYRIGHT:
-			OnSortBy(SortMode::FSM_MEDIA_COPYRIGHT);
+			OnSortBy(SortMode::MediaCopyright);
 			break;
 
 		case IDM_SORTBY_MEDIA_DURATION:
-			OnSortBy(SortMode::FSM_MEDIA_DURATION);
+			OnSortBy(SortMode::MediaDuration);
 			break;
 
 		case IDM_SORTBY_MEDIA_PROTECTED:
-			OnSortBy(SortMode::FSM_MEDIA_PROTECTED);
+			OnSortBy(SortMode::MediaProtected);
 			break;
 
 		case IDM_SORTBY_MEDIA_RATING:
-			OnSortBy(SortMode::FSM_MEDIA_RATING);
+			OnSortBy(SortMode::MediaRating);
 			break;
 
 		case IDM_SORTBY_MEDIA_ALBUM_ARTIST:
-			OnSortBy(SortMode::FSM_MEDIA_ALBUMARTIST);
+			OnSortBy(SortMode::MediaAlbumArtist);
 			break;
 
 		case IDM_SORTBY_MEDIA_ALBUM:
-			OnSortBy(SortMode::FSM_MEDIA_ALBUM);
+			OnSortBy(SortMode::MediaAlbum);
 			break;
 
 		case IDM_SORTBY_MEDIA_BEATS_PER_MINUTE:
-			OnSortBy(SortMode::FSM_MEDIA_BEATSPERMINUTE);
+			OnSortBy(SortMode::MediaBeatsPerMinute);
 			break;
 
 		case IDM_SORTBY_MEDIA_COMPOSER:
-			OnSortBy(SortMode::FSM_MEDIA_COMPOSER);
+			OnSortBy(SortMode::MediaComposer);
 			break;
 
 		case IDM_SORTBY_MEDIA_CONDUCTOR:
-			OnSortBy(SortMode::FSM_MEDIA_CONDUCTOR);
+			OnSortBy(SortMode::MediaConductor);
 			break;
 
 		case IDM_SORTBY_MEDIA_DIRECTOR:
-			OnSortBy(SortMode::FSM_MEDIA_DIRECTOR);
+			OnSortBy(SortMode::MediaDirector);
 			break;
 
 		case IDM_SORTBY_MEDIA_GENRE:
-			OnSortBy(SortMode::FSM_MEDIA_GENRE);
+			OnSortBy(SortMode::MediaGenre);
 			break;
 
 		case IDM_SORTBY_MEDIA_LANGUAGE:
-			OnSortBy(SortMode::FSM_MEDIA_LANGUAGE);
+			OnSortBy(SortMode::MediaLanguage);
 			break;
 
 		case IDM_SORTBY_MEDIA_BROADCAST_DATE:
-			OnSortBy(SortMode::FSM_MEDIA_BROADCASTDATE);
+			OnSortBy(SortMode::MediaBroadcastDate);
 			break;
 
 		case IDM_SORTBY_MEDIA_CHANNEL:
-			OnSortBy(SortMode::FSM_MEDIA_CHANNEL);
+			OnSortBy(SortMode::MediaChannel);
 			break;
 
 		case IDM_SORTBY_MEDIA_STATION_NAME:
-			OnSortBy(SortMode::FSM_MEDIA_STATIONNAME);
+			OnSortBy(SortMode::MediaStationName);
 			break;
 
 		case IDM_SORTBY_MEDIA_MOOD:
-			OnSortBy(SortMode::FSM_MEDIA_MOOD);
+			OnSortBy(SortMode::MediaMood);
 			break;
 
 		case IDM_SORTBY_MEDIA_PARENTAL_RATING:
-			OnSortBy(SortMode::FSM_MEDIA_PARENTALRATING);
+			OnSortBy(SortMode::MediaParentalRating);
 			break;
 
 		case IDM_SORTBY_MEDIA_PARENTAL_RATNG_REASON:
-			OnSortBy(SortMode::FSM_MEDIA_PARENTALRATINGREASON);
+			OnSortBy(SortMode::MediaParentalRatingReason);
 			break;
 
 		case IDM_SORTBY_MEDIA_PERIOD:
-			OnSortBy(SortMode::FSM_MEDIA_PERIOD);
+			OnSortBy(SortMode::MediaPeriod);
 			break;
 
 		case IDM_SORTBY_MEDIA_PRODUCER:
-			OnSortBy(SortMode::FSM_MEDIA_PRODUCER);
+			OnSortBy(SortMode::MediaProducer);
 			break;
 
 		case IDM_SORTBY_MEDIA_PUBLISHER:
-			OnSortBy(SortMode::FSM_MEDIA_PUBLISHER);
+			OnSortBy(SortMode::MediaPublisher);
 			break;
 
 		case IDM_SORTBY_MEDIA_WRITER:
-			OnSortBy(SortMode::FSM_MEDIA_WRITER);
+			OnSortBy(SortMode::MediaWriter);
 			break;
 
 		case IDM_SORTBY_MEDIA_YEAR:
-			OnSortBy(SortMode::FSM_MEDIA_YEAR);
+			OnSortBy(SortMode::MediaYear);
 			break;
 
 		case IDM_GROUPBY_NAME:
-			OnGroupBy(SortMode::FSM_NAME);
+			OnGroupBy(SortMode::Name);
 			break;
 
 		case IDM_GROUPBY_SIZE:
-			OnGroupBy(SortMode::FSM_SIZE);
+			OnGroupBy(SortMode::Size);
 			break;
 
 		case IDM_GROUPBY_TYPE:
-			OnGroupBy(SortMode::FSM_TYPE);
+			OnGroupBy(SortMode::Type);
 			break;
 
 		case IDM_GROUPBY_DATEMODIFIED:
-			OnGroupBy(SortMode::FSM_DATEMODIFIED);
+			OnGroupBy(SortMode::DateModified);
 			break;
 
 		case IDM_GROUPBY_TOTALSIZE:
-			OnGroupBy(SortMode::FSM_TOTALSIZE);
+			OnGroupBy(SortMode::TotalSize);
 			break;
 
 		case IDM_GROUPBY_FREESPACE:
-			OnGroupBy(SortMode::FSM_FREESPACE);
+			OnGroupBy(SortMode::FreeSpace);
 			break;
 
 		case IDM_GROUPBY_DATEDELETED:
-			OnGroupBy(SortMode::FSM_DATEDELETED);
+			OnGroupBy(SortMode::DateDeleted);
 			break;
 
 		case IDM_GROUPBY_ORIGINALLOCATION:
-			OnGroupBy(SortMode::FSM_ORIGINALLOCATION);
+			OnGroupBy(SortMode::OriginalLocation);
 			break;
 
 		case IDM_GROUPBY_ATTRIBUTES:
-			OnGroupBy(SortMode::FSM_ATTRIBUTES);
+			OnGroupBy(SortMode::Attributes);
 			break;
 
 		case IDM_GROUPBY_REALSIZE:
-			OnGroupBy(SortMode::FSM_REALSIZE);
+			OnGroupBy(SortMode::RealSize);
 			break;
 
 		case IDM_GROUPBY_SHORTNAME:
-			OnGroupBy(SortMode::FSM_SHORTNAME);
+			OnGroupBy(SortMode::ShortName);
 			break;
 
 		case IDM_GROUPBY_OWNER:
-			OnGroupBy(SortMode::FSM_OWNER);
+			OnGroupBy(SortMode::Owner);
 			break;
 
 		case IDM_GROUPBY_PRODUCTNAME:
-			OnGroupBy(SortMode::FSM_PRODUCTNAME);
+			OnGroupBy(SortMode::ProductName);
 			break;
 
 		case IDM_GROUPBY_COMPANY:
-			OnGroupBy(SortMode::FSM_COMPANY);
+			OnGroupBy(SortMode::Company);
 			break;
 
 		case IDM_GROUPBY_DESCRIPTION:
-			OnGroupBy(SortMode::FSM_DESCRIPTION);
+			OnGroupBy(SortMode::Description);
 			break;
 
 		case IDM_GROUPBY_FILEVERSION:
-			OnGroupBy(SortMode::FSM_FILEVERSION);
+			OnGroupBy(SortMode::FileVersion);
 			break;
 
 		case IDM_GROUPBY_PRODUCTVERSION:
-			OnGroupBy(SortMode::FSM_PRODUCTVERSION);
+			OnGroupBy(SortMode::ProductVersion);
 			break;
 
 		case IDM_GROUPBY_SHORTCUTTO:
-			OnGroupBy(SortMode::FSM_SHORTCUTTO);
+			OnGroupBy(SortMode::ShortcutTo);
 			break;
 
 		case IDM_GROUPBY_HARDLINKS:
-			OnGroupBy(SortMode::FSM_HARDLINKS);
+			OnGroupBy(SortMode::HardLinks);
 			break;
 
 		case IDM_GROUPBY_EXTENSION:
-			OnGroupBy(SortMode::FSM_EXTENSION);
+			OnGroupBy(SortMode::Extension);
 			break;
 
 		case IDM_GROUPBY_CREATED:
-			OnGroupBy(SortMode::FSM_CREATED);
+			OnGroupBy(SortMode::Created);
 			break;
 
 		case IDM_GROUPBY_ACCESSED:
-			OnGroupBy(SortMode::FSM_ACCESSED);
+			OnGroupBy(SortMode::Accessed);
 			break;
 
 		case IDM_GROUPBY_TITLE:
-			OnGroupBy(SortMode::FSM_TITLE);
+			OnGroupBy(SortMode::Title);
 			break;
 
 		case IDM_GROUPBY_SUBJECT:
-			OnGroupBy(SortMode::FSM_SUBJECT);
+			OnGroupBy(SortMode::Subject);
 			break;
 
 		case IDM_GROUPBY_AUTHOR:
-			OnGroupBy(SortMode::FSM_AUTHORS);
+			OnGroupBy(SortMode::Authors);
 			break;
 
 		case IDM_GROUPBY_KEYWORDS:
-			OnGroupBy(SortMode::FSM_KEYWORDS);
+			OnGroupBy(SortMode::Keywords);
 			break;
 
 		case IDM_GROUPBY_COMMENTS:
-			OnGroupBy(SortMode::FSM_COMMENTS);
+			OnGroupBy(SortMode::Comments);
 			break;
 
 		case IDM_GROUPBY_CAMERAMODEL:
-			OnGroupBy(SortMode::FSM_CAMERAMODEL);
+			OnGroupBy(SortMode::CameraModel);
 			break;
 
 		case IDM_GROUPBY_DATETAKEN:
-			OnGroupBy(SortMode::FSM_DATETAKEN);
+			OnGroupBy(SortMode::DateTaken);
 			break;
 
 		case IDM_GROUPBY_WIDTH:
-			OnGroupBy(SortMode::FSM_WIDTH);
+			OnGroupBy(SortMode::Width);
 			break;
 
 		case IDM_GROUPBY_HEIGHT:
-			OnGroupBy(SortMode::FSM_HEIGHT);
+			OnGroupBy(SortMode::Height);
 			break;
 
 		case IDM_GROUPBY_VIRTUALCOMMENTS:
-			OnGroupBy(SortMode::FSM_VIRTUALCOMMENTS);
+			OnGroupBy(SortMode::VirtualComments);
 			break;
 
 		case IDM_GROUPBY_FILESYSTEM:
-			OnGroupBy(SortMode::FSM_FILESYSTEM);
+			OnGroupBy(SortMode::FileSystem);
 			break;
 
 		case IDM_GROUPBY_NUMPRINTERDOCUMENTS:
-			OnGroupBy(SortMode::FSM_NUMPRINTERDOCUMENTS);
+			OnGroupBy(SortMode::NumPrinterDocuments);
 			break;
 
 		case IDM_GROUPBY_PRINTERSTATUS:
-			OnGroupBy(SortMode::FSM_PRINTERSTATUS);
+			OnGroupBy(SortMode::PrinterStatus);
 			break;
 
 		case IDM_GROUPBY_PRINTERCOMMENTS:
-			OnGroupBy(SortMode::FSM_PRINTERCOMMENTS);
+			OnGroupBy(SortMode::PrinterComments);
 			break;
 
 		case IDM_GROUPBY_PRINTERLOCATION:
-			OnGroupBy(SortMode::FSM_PRINTERLOCATION);
+			OnGroupBy(SortMode::PrinterLocation);
 			break;
 
 		case IDM_GROUPBY_NETWORKADAPTER_STATUS:
-			OnGroupBy(SortMode::FSM_NETWORKADAPTER_STATUS);
+			OnGroupBy(SortMode::NetworkAdapterStatus);
 			break;
 
 		case IDM_GROUPBY_MEDIA_BITRATE:
-			OnGroupBy(SortMode::FSM_MEDIA_BITRATE);
+			OnGroupBy(SortMode::MediaBitrate);
 			break;
 
 		case IDM_GROUPBY_MEDIA_COPYRIGHT:
-			OnGroupBy(SortMode::FSM_MEDIA_COPYRIGHT);
+			OnGroupBy(SortMode::MediaCopyright);
 			break;
 
 		case IDM_GROUPBY_MEDIA_DURATION:
-			OnGroupBy(SortMode::FSM_MEDIA_DURATION);
+			OnGroupBy(SortMode::MediaDuration);
 			break;
 
 		case IDM_GROUPBY_MEDIA_PROTECTED:
-			OnGroupBy(SortMode::FSM_MEDIA_PROTECTED);
+			OnGroupBy(SortMode::MediaProtected);
 			break;
 
 		case IDM_GROUPBY_MEDIA_RATING:
-			OnGroupBy(SortMode::FSM_MEDIA_RATING);
+			OnGroupBy(SortMode::MediaRating);
 			break;
 
 		case IDM_GROUPBY_MEDIA_ALBUM_ARTIST:
-			OnGroupBy(SortMode::FSM_MEDIA_ALBUMARTIST);
+			OnGroupBy(SortMode::MediaAlbumArtist);
 			break;
 
 		case IDM_GROUPBY_MEDIA_ALBUM:
-			OnGroupBy(SortMode::FSM_MEDIA_ALBUM);
+			OnGroupBy(SortMode::MediaAlbum);
 			break;
 
 		case IDM_GROUPBY_MEDIA_BEATS_PER_MINUTE:
-			OnGroupBy(SortMode::FSM_MEDIA_BEATSPERMINUTE);
+			OnGroupBy(SortMode::MediaBeatsPerMinute);
 			break;
 
 		case IDM_GROUPBY_MEDIA_COMPOSER:
-			OnGroupBy(SortMode::FSM_MEDIA_COMPOSER);
+			OnGroupBy(SortMode::MediaComposer);
 			break;
 
 		case IDM_GROUPBY_MEDIA_CONDUCTOR:
-			OnGroupBy(SortMode::FSM_MEDIA_CONDUCTOR);
+			OnGroupBy(SortMode::MediaConductor);
 			break;
 
 		case IDM_GROUPBY_MEDIA_DIRECTOR:
-			OnGroupBy(SortMode::FSM_MEDIA_DIRECTOR);
+			OnGroupBy(SortMode::MediaDirector);
 			break;
 
 		case IDM_GROUPBY_MEDIA_GENRE:
-			OnGroupBy(SortMode::FSM_MEDIA_GENRE);
+			OnGroupBy(SortMode::MediaGenre);
 			break;
 
 		case IDM_GROUPBY_MEDIA_LANGUAGE:
-			OnGroupBy(SortMode::FSM_MEDIA_LANGUAGE);
+			OnGroupBy(SortMode::MediaLanguage);
 			break;
 
 		case IDM_GROUPBY_MEDIA_BROADCAST_DATE:
-			OnGroupBy(SortMode::FSM_MEDIA_BROADCASTDATE);
+			OnGroupBy(SortMode::MediaBroadcastDate);
 			break;
 
 		case IDM_GROUPBY_MEDIA_CHANNEL:
-			OnGroupBy(SortMode::FSM_MEDIA_CHANNEL);
+			OnGroupBy(SortMode::MediaChannel);
 			break;
 
 		case IDM_GROUPBY_MEDIA_STATION_NAME:
-			OnGroupBy(SortMode::FSM_MEDIA_STATIONNAME);
+			OnGroupBy(SortMode::MediaStationName);
 			break;
 
 		case IDM_GROUPBY_MEDIA_MOOD:
-			OnGroupBy(SortMode::FSM_MEDIA_MOOD);
+			OnGroupBy(SortMode::MediaMood);
 			break;
 
 		case IDM_GROUPBY_MEDIA_PARENTAL_RATING:
-			OnGroupBy(SortMode::FSM_MEDIA_PARENTALRATING);
+			OnGroupBy(SortMode::MediaParentalRating);
 			break;
 
 		case IDM_GROUPBY_MEDIA_PARENTAL_RATING_REASON:
-			OnGroupBy(SortMode::FSM_MEDIA_PARENTALRATINGREASON);
+			OnGroupBy(SortMode::MediaParentalRatingReason);
 			break;
 
 		case IDM_GROUPBY_MEDIA_PERIOD:
-			OnGroupBy(SortMode::FSM_MEDIA_PERIOD);
+			OnGroupBy(SortMode::MediaPeriod);
 			break;
 
 		case IDM_GROUPBY_MEDIA_PRODUCER:
-			OnGroupBy(SortMode::FSM_MEDIA_PRODUCER);
+			OnGroupBy(SortMode::MediaProducer);
 			break;
 
 		case IDM_GROUPBY_MEDIA_PUBLISHER:
-			OnGroupBy(SortMode::FSM_MEDIA_PUBLISHER);
+			OnGroupBy(SortMode::MediaPublisher);
 			break;
 
 		case IDM_GROUPBY_MEDIA_WRITER:
-			OnGroupBy(SortMode::FSM_MEDIA_WRITER);
+			OnGroupBy(SortMode::MediaWriter);
 			break;
 
 		case IDM_GROUPBY_MEDIA_YEAR:
-			OnGroupBy(SortMode::FSM_MEDIA_YEAR);
+			OnGroupBy(SortMode::MediaYear);
 			break;
 
 		case IDM_ARRANGEICONSBY_ASCENDING:

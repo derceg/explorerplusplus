@@ -75,251 +75,251 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	{
 		switch(m_folderSettings.sortMode)
 		{
-		case SortMode::FSM_NAME:
+		case SortMode::Name:
 			ComparisonResult = SortByName(basicItemInfo1, basicItemInfo2, *m_globalFolderSettings);
 			break;
 
-		case SortMode::FSM_TYPE:
+		case SortMode::Type:
 			ComparisonResult = SortByType(basicItemInfo1,basicItemInfo2);
 			break;
 
-		case SortMode::FSM_SIZE:
+		case SortMode::Size:
 			ComparisonResult = SortBySize(InternalIndex1,InternalIndex2);
 			break;
 
-		case SortMode::FSM_DATEMODIFIED:
+		case SortMode::DateModified:
 			ComparisonResult = SortByDate(InternalIndex1,InternalIndex2,DATE_TYPE_MODIFIED);
 			break;
 
-		case SortMode::FSM_TOTALSIZE:
+		case SortMode::TotalSize:
 			ComparisonResult = SortByTotalSize(basicItemInfo1,basicItemInfo2,TRUE);
 			break;
 
-		case SortMode::FSM_FREESPACE:
+		case SortMode::FreeSpace:
 			ComparisonResult = SortByTotalSize(basicItemInfo1,basicItemInfo2,FALSE);
 			break;
 
-		case SortMode::FSM_DATEDELETED:
+		case SortMode::DateDeleted:
 			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2, &SCID_DATE_DELETED);
 			break;
 
-		case SortMode::FSM_ORIGINALLOCATION:
+		case SortMode::OriginalLocation:
 			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2, &SCID_ORIGINAL_LOCATION);
 			break;
 
-		case SortMode::FSM_ATTRIBUTES:
+		case SortMode::Attributes:
 			ComparisonResult = SortByAttributes(basicItemInfo1, basicItemInfo2);
 			break;
 
-		case SortMode::FSM_REALSIZE:
+		case SortMode::RealSize:
 			ComparisonResult = SortByRealSize(basicItemInfo1, basicItemInfo2);
 			break;
 
-		case SortMode::FSM_SHORTNAME:
+		case SortMode::ShortName:
 			ComparisonResult = SortByShortName(basicItemInfo1, basicItemInfo2);
 			break;
 
-		case SortMode::FSM_OWNER:
+		case SortMode::Owner:
 			ComparisonResult = SortByOwner(basicItemInfo1, basicItemInfo2);
 			break;
 
-		case SortMode::FSM_PRODUCTNAME:
+		case SortMode::ProductName:
 			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VERSION_INFO_PRODUCT_NAME);
 			break;
 
-		case SortMode::FSM_COMPANY:
+		case SortMode::Company:
 			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VERSION_INFO_COMPANY);
 			break;
 
-		case SortMode::FSM_DESCRIPTION:
+		case SortMode::Description:
 			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VERSION_INFO_DESCRIPTION);
 			break;
 
-		case SortMode::FSM_FILEVERSION:
+		case SortMode::FileVersion:
 			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VERSION_INFO_FILE_VERSION);
 			break;
 
-		case SortMode::FSM_PRODUCTVERSION:
+		case SortMode::ProductVersion:
 			ComparisonResult = SortByVersionInfo(basicItemInfo1, basicItemInfo2,VERSION_INFO_PRODUCT_VERSION);
 			break;
 
-		case SortMode::FSM_SHORTCUTTO:
+		case SortMode::ShortcutTo:
 			ComparisonResult = SortByShortcutTo(basicItemInfo1, basicItemInfo2);
 			break;
 
-		case SortMode::FSM_HARDLINKS:
+		case SortMode::HardLinks:
 			ComparisonResult = SortByHardlinks(basicItemInfo1, basicItemInfo2);
 			break;
 
-		case SortMode::FSM_EXTENSION:
+		case SortMode::Extension:
 			ComparisonResult = SortByExtension(basicItemInfo1,basicItemInfo2);
 			break;
 
-		case SortMode::FSM_CREATED:
+		case SortMode::Created:
 			ComparisonResult = SortByDate(InternalIndex1,InternalIndex2,DATE_TYPE_CREATED);
 			break;
 
-		case SortMode::FSM_ACCESSED:
+		case SortMode::Accessed:
 			ComparisonResult = SortByDate(InternalIndex1,InternalIndex2,DATE_TYPE_ACCESSED);
 			break;
 
-		case SortMode::FSM_TITLE:
+		case SortMode::Title:
 			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Title);
 			break;
 
-		case SortMode::FSM_SUBJECT:
+		case SortMode::Subject:
 			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Subject);
 			break;
 
-		case SortMode::FSM_AUTHORS:
+		case SortMode::Authors:
 			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Author);
 			break;
 
-		case SortMode::FSM_KEYWORDS:
+		case SortMode::Keywords:
 			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Keywords);
 			break;
 
-		case SortMode::FSM_COMMENTS:
+		case SortMode::Comments:
 			ComparisonResult = SortByItemDetails(basicItemInfo1, basicItemInfo2,&PKEY_Comment);
 			break;
 
-		case SortMode::FSM_CAMERAMODEL:
+		case SortMode::CameraModel:
 			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagEquipModel);
 			break;
 
-		case SortMode::FSM_DATETAKEN:
+		case SortMode::DateTaken:
 			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagDateTime);
 			break;
 
-		case SortMode::FSM_WIDTH:
+		case SortMode::Width:
 			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagImageWidth);
 			break;
 
-		case SortMode::FSM_HEIGHT:
+		case SortMode::Height:
 			ComparisonResult = SortByImageProperty(basicItemInfo1, basicItemInfo2,PropertyTagImageHeight);
 			break;
 
-		case SortMode::FSM_VIRTUALCOMMENTS:
+		case SortMode::VirtualComments:
 			ComparisonResult = SortByVirtualComments(basicItemInfo1, basicItemInfo2);
 			break;
 
-		case SortMode::FSM_FILESYSTEM:
+		case SortMode::FileSystem:
 			ComparisonResult = SortByFileSystem(basicItemInfo1,basicItemInfo2);
 			break;
 
-		case SortMode::FSM_NUMPRINTERDOCUMENTS:
+		case SortMode::NumPrinterDocuments:
 			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PRINTER_INFORMATION_TYPE_NUM_JOBS);
 			break;
 
-		case SortMode::FSM_PRINTERSTATUS:
+		case SortMode::PrinterStatus:
 			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PRINTER_INFORMATION_TYPE_STATUS);
 			break;
 
-		case SortMode::FSM_PRINTERCOMMENTS:
+		case SortMode::PrinterComments:
 			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PRINTER_INFORMATION_TYPE_COMMENTS);
 			break;
 
-		case SortMode::FSM_PRINTERLOCATION:
+		case SortMode::PrinterLocation:
 			ComparisonResult = SortByPrinterProperty(basicItemInfo1,basicItemInfo2,PRINTER_INFORMATION_TYPE_LOCATION);
 			break;
 
-		case SortMode::FSM_NETWORKADAPTER_STATUS:
+		case SortMode::NetworkAdapterStatus:
 			ComparisonResult = SortByNetworkAdapterStatus(basicItemInfo1,basicItemInfo2);
 			break;
 
-		case SortMode::FSM_MEDIA_BITRATE:
+		case SortMode::MediaBitrate:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_BITRATE);
 			break;
 
-		case SortMode::FSM_MEDIA_COPYRIGHT:
+		case SortMode::MediaCopyright:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_COPYRIGHT);
 			break;
 
-		case SortMode::FSM_MEDIA_DURATION:
+		case SortMode::MediaDuration:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_DURATION);
 			break;
 
-		case SortMode::FSM_MEDIA_PROTECTED:
+		case SortMode::MediaProtected:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PROTECTED);
 			break;
 
-		case SortMode::FSM_MEDIA_RATING:
+		case SortMode::MediaRating:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_RATING);
 			break;
 
-		case SortMode::FSM_MEDIA_ALBUMARTIST:
+		case SortMode::MediaAlbumArtist:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_ALBUM_ARTIST);
 			break;
 
-		case SortMode::FSM_MEDIA_ALBUM:
+		case SortMode::MediaAlbum:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_ALBUM_TITLE);
 			break;
 
-		case SortMode::FSM_MEDIA_BEATSPERMINUTE:
+		case SortMode::MediaBeatsPerMinute:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_BEATS_PER_MINUTE);
 			break;
 
-		case SortMode::FSM_MEDIA_COMPOSER:
+		case SortMode::MediaComposer:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_COMPOSER);
 			break;
 
-		case SortMode::FSM_MEDIA_CONDUCTOR:
+		case SortMode::MediaConductor:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_CONDUCTOR);
 			break;
 
-		case SortMode::FSM_MEDIA_DIRECTOR:
+		case SortMode::MediaDirector:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_DIRECTOR);
 			break;
 
-		case SortMode::FSM_MEDIA_GENRE:
+		case SortMode::MediaGenre:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_GENRE);
 			break;
 
-		case SortMode::FSM_MEDIA_LANGUAGE:
+		case SortMode::MediaLanguage:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_LANGUAGE);
 			break;
 
-		case SortMode::FSM_MEDIA_BROADCASTDATE:
+		case SortMode::MediaBroadcastDate:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_BROADCASTDATE);
 			break;
 
-		case SortMode::FSM_MEDIA_CHANNEL:
+		case SortMode::MediaChannel:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_CHANNEL);
 			break;
 
-		case SortMode::FSM_MEDIA_STATIONNAME:
+		case SortMode::MediaStationName:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_STATIONNAME);
 			break;
 
-		case SortMode::FSM_MEDIA_MOOD:
+		case SortMode::MediaMood:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_MOOD);
 			break;
 
-		case SortMode::FSM_MEDIA_PARENTALRATING:
+		case SortMode::MediaParentalRating:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PARENTALRATING);
 			break;
 
-		case SortMode::FSM_MEDIA_PARENTALRATINGREASON:
+		case SortMode::MediaParentalRatingReason:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PARENTALRATINGREASON);
 			break;
 
-		case SortMode::FSM_MEDIA_PERIOD:
+		case SortMode::MediaPeriod:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PERIOD);
 			break;
 
-		case SortMode::FSM_MEDIA_PRODUCER:
+		case SortMode::MediaProducer:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PRODUCER);
 			break;
 
-		case SortMode::FSM_MEDIA_PUBLISHER:
+		case SortMode::MediaPublisher:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_PUBLISHER);
 			break;
 
-		case SortMode::FSM_MEDIA_WRITER:
+		case SortMode::MediaWriter:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_WRITER);
 			break;
 
-		case SortMode::FSM_MEDIA_YEAR:
+		case SortMode::MediaYear:
 			ComparisonResult = SortByMediaMetadata(basicItemInfo1, basicItemInfo2,MEDIAMETADATA_TYPE_YEAR);
 			break;
 

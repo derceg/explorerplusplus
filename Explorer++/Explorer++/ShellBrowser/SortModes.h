@@ -7,110 +7,110 @@
 #include "BetterEnumsWrapper.h"
 
 BETTER_ENUM(SortMode, int,
-	FSM_NAME = 1,
-	FSM_DATEMODIFIED = 2,
-	FSM_SIZE = 3,
-	FSM_TYPE = 4,
-	FSM_TOTALSIZE = 5,
-	FSM_FREESPACE = 6,
-	FSM_COMMENTS = 7,
-	FSM_DATEDELETED = 8,
-	FSM_ORIGINALLOCATION = 9,
-	FSM_ATTRIBUTES = 10,
-	FSM_REALSIZE = 11,
-	FSM_SHORTNAME = 12,
-	FSM_OWNER = 13,
+	Name = 1,
+	DateModified = 2,
+	Size = 3,
+	Type = 4,
+	TotalSize = 5,
+	FreeSpace = 6,
+	Comments = 7,
+	DateDeleted = 8,
+	OriginalLocation = 9,
+	Attributes = 10,
+	RealSize = 11,
+	ShortName = 12,
+	Owner = 13,
 
-	FSM_PRODUCTNAME = 14,
-	FSM_COMPANY = 15,
-	FSM_DESCRIPTION = 16,
-	FSM_FILEVERSION = 17,
-	FSM_PRODUCTVERSION = 18,
+	ProductName = 14,
+	Company = 15,
+	Description = 16,
+	FileVersion = 17,
+	ProductVersion = 18,
 
-	FSM_SHORTCUTTO = 19,
-	FSM_HARDLINKS = 20,
-	FSM_EXTENSION = 21,
-	FSM_CREATED = 22,
-	FSM_ACCESSED = 23,
+	ShortcutTo = 19,
+	HardLinks = 20,
+	Extension = 21,
+	Created = 22,
+	Accessed = 23,
 
-	FSM_TITLE = 24,
-	FSM_SUBJECT = 25,
-	FSM_AUTHORS = 26,
-	FSM_KEYWORDS = 27,
+	Title = 24,
+	Subject = 25,
+	Authors = 26,
+	Keywords = 27,
 
-	FSM_CAMERAMODEL = 29,
-	FSM_DATETAKEN = 30,
-	FSM_WIDTH = 31,
-	FSM_HEIGHT = 32,
+	CameraModel = 29,
+	DateTaken = 30,
+	Width = 31,
+	Height = 32,
 
-	FSM_VIRTUALCOMMENTS = 33,
+	VirtualComments = 33,
 
-	FSM_FILESYSTEM = 34,
+	FileSystem = 34,
 
-	FSM_NUMPRINTERDOCUMENTS = 36,
-	FSM_PRINTERSTATUS = 37,
-	FSM_PRINTERCOMMENTS = 38,
-	FSM_PRINTERLOCATION = 39,
+	NumPrinterDocuments = 36,
+	PrinterStatus = 37,
+	PrinterComments = 38,
+	PrinterLocation = 39,
 
-	FSM_NETWORKADAPTER_STATUS = 40,
+	NetworkAdapterStatus = 40,
 
-	FSM_MEDIA_BITRATE = 41,
-	FSM_MEDIA_COPYRIGHT = 42,
-	FSM_MEDIA_DURATION = 43,
-	FSM_MEDIA_PROTECTED = 44,
-	FSM_MEDIA_RATING = 45,
-	FSM_MEDIA_ALBUMARTIST = 46,
-	FSM_MEDIA_ALBUM = 47,
-	FSM_MEDIA_BEATSPERMINUTE = 48,
-	FSM_MEDIA_COMPOSER = 49,
-	FSM_MEDIA_CONDUCTOR = 50,
-	FSM_MEDIA_DIRECTOR = 51,
-	FSM_MEDIA_GENRE = 52,
-	FSM_MEDIA_LANGUAGE = 53,
-	FSM_MEDIA_BROADCASTDATE = 54,
-	FSM_MEDIA_CHANNEL = 55,
-	FSM_MEDIA_STATIONNAME = 56,
-	FSM_MEDIA_MOOD = 57,
-	FSM_MEDIA_PARENTALRATING = 58,
-	FSM_MEDIA_PARENTALRATINGREASON = 59,
-	FSM_MEDIA_PERIOD = 60,
-	FSM_MEDIA_PRODUCER = 61,
-	FSM_MEDIA_PUBLISHER = 62,
-	FSM_MEDIA_WRITER = 63,
-	FSM_MEDIA_YEAR = 64
+	MediaBitrate = 41,
+	MediaCopyright = 42,
+	MediaDuration = 43,
+	MediaProtected = 44,
+	MediaRating = 45,
+	MediaAlbumArtist = 46,
+	MediaAlbum = 47,
+	MediaBeatsPerMinute = 48,
+	MediaComposer = 49,
+	MediaConductor = 50,
+	MediaDirector = 51,
+	MediaGenre = 52,
+	MediaLanguage = 53,
+	MediaBroadcastDate = 54,
+	MediaChannel = 55,
+	MediaStationName = 56,
+	MediaMood = 57,
+	MediaParentalRating = 58,
+	MediaParentalRatingReason = 59,
+	MediaPeriod = 60,
+	MediaProducer = 61,
+	MediaPublisher = 62,
+	MediaWriter = 63,
+	MediaYear = 64
 )
 
 static const SortMode RealFolderSortModes[] =
-{ SortMode::FSM_NAME,SortMode::FSM_SIZE,SortMode::FSM_TYPE,SortMode::FSM_DATEMODIFIED,SortMode::FSM_ATTRIBUTES,
-SortMode::FSM_REALSIZE,SortMode::FSM_SHORTNAME,SortMode::FSM_OWNER,SortMode::FSM_PRODUCTNAME,
-SortMode::FSM_COMPANY,SortMode::FSM_DESCRIPTION,SortMode::FSM_FILEVERSION,SortMode::FSM_PRODUCTVERSION,
-SortMode::FSM_SHORTCUTTO,SortMode::FSM_HARDLINKS,SortMode::FSM_EXTENSION,SortMode::FSM_CREATED,
-SortMode::FSM_ACCESSED,SortMode::FSM_TITLE,SortMode::FSM_SUBJECT,SortMode::FSM_AUTHORS,SortMode::FSM_KEYWORDS,
-SortMode::FSM_COMMENTS,SortMode::FSM_CAMERAMODEL,SortMode::FSM_DATETAKEN,SortMode::FSM_WIDTH,SortMode::FSM_HEIGHT,
-SortMode::FSM_MEDIA_BITRATE,SortMode::FSM_MEDIA_COPYRIGHT,SortMode::FSM_MEDIA_DURATION,
-SortMode::FSM_MEDIA_PROTECTED,SortMode::FSM_MEDIA_RATING,SortMode::FSM_MEDIA_ALBUMARTIST,
-SortMode::FSM_MEDIA_ALBUM,SortMode::FSM_MEDIA_BEATSPERMINUTE,SortMode::FSM_MEDIA_COMPOSER,
-SortMode::FSM_MEDIA_CONDUCTOR,SortMode::FSM_MEDIA_DIRECTOR,SortMode::FSM_MEDIA_GENRE,
-SortMode::FSM_MEDIA_LANGUAGE,SortMode::FSM_MEDIA_BROADCASTDATE,SortMode::FSM_MEDIA_CHANNEL,
-SortMode::FSM_MEDIA_STATIONNAME,SortMode::FSM_MEDIA_MOOD,SortMode::FSM_MEDIA_PARENTALRATING,
-SortMode::FSM_MEDIA_PARENTALRATINGREASON,SortMode::FSM_MEDIA_PERIOD,SortMode::FSM_MEDIA_PRODUCER,
-SortMode::FSM_MEDIA_PUBLISHER,SortMode::FSM_MEDIA_WRITER,SortMode::FSM_MEDIA_YEAR };
+{ SortMode::Name,SortMode::Size,SortMode::Type,SortMode::DateModified,SortMode::Attributes,
+SortMode::RealSize,SortMode::ShortName,SortMode::Owner,SortMode::ProductName,
+SortMode::Company,SortMode::Description,SortMode::FileVersion,SortMode::ProductVersion,
+SortMode::ShortcutTo,SortMode::HardLinks,SortMode::Extension,SortMode::Created,
+SortMode::Accessed,SortMode::Title,SortMode::Subject,SortMode::Authors,SortMode::Keywords,
+SortMode::Comments,SortMode::CameraModel,SortMode::DateTaken,SortMode::Width,SortMode::Height,
+SortMode::MediaBitrate,SortMode::MediaCopyright,SortMode::MediaDuration,
+SortMode::MediaProtected,SortMode::MediaRating,SortMode::MediaAlbumArtist,
+SortMode::MediaAlbum,SortMode::MediaBeatsPerMinute,SortMode::MediaComposer,
+SortMode::MediaConductor,SortMode::MediaDirector,SortMode::MediaGenre,
+SortMode::MediaLanguage,SortMode::MediaBroadcastDate,SortMode::MediaChannel,
+SortMode::MediaStationName,SortMode::MediaMood,SortMode::MediaParentalRating,
+SortMode::MediaParentalRatingReason,SortMode::MediaPeriod,SortMode::MediaProducer,
+SortMode::MediaPublisher,SortMode::MediaWriter,SortMode::MediaYear };
 
 static const SortMode ControlPanelSortModes[] =
-{ SortMode::FSM_NAME,SortMode::FSM_VIRTUALCOMMENTS };
+{ SortMode::Name,SortMode::VirtualComments };
 
 static const SortMode MyComputerSortModes[] =
-{ SortMode::FSM_NAME,SortMode::FSM_TYPE,SortMode::FSM_TOTALSIZE,SortMode::FSM_FREESPACE,
-SortMode::FSM_VIRTUALCOMMENTS,SortMode::FSM_FILESYSTEM };
+{ SortMode::Name,SortMode::Type,SortMode::TotalSize,SortMode::FreeSpace,
+SortMode::VirtualComments,SortMode::FileSystem };
 
 static const SortMode RecycleBinSortModes[] =
-{ SortMode::FSM_NAME,SortMode::FSM_ORIGINALLOCATION,SortMode::FSM_DATEDELETED,
-SortMode::FSM_SIZE,SortMode::FSM_TYPE,SortMode::FSM_DATEMODIFIED };
+{ SortMode::Name,SortMode::OriginalLocation,SortMode::DateDeleted,
+SortMode::Size,SortMode::Type,SortMode::DateModified };
 
 static const SortMode PrintersSortModes[] =
-{ SortMode::FSM_NAME,SortMode::FSM_NUMPRINTERDOCUMENTS,SortMode::FSM_PRINTERSTATUS,
-SortMode::FSM_PRINTERCOMMENTS,SortMode::FSM_PRINTERLOCATION };
+{ SortMode::Name,SortMode::NumPrinterDocuments,SortMode::PrinterStatus,
+SortMode::PrinterComments,SortMode::PrinterLocation };
 
 static const SortMode NetworkConnectionsSortModes[] =
-{ SortMode::FSM_NAME,SortMode::FSM_TYPE,SortMode::FSM_NETWORKADAPTER_STATUS,
-SortMode::FSM_OWNER };
+{ SortMode::Name,SortMode::Type,SortMode::NetworkAdapterStatus,
+SortMode::Owner };

@@ -452,251 +452,251 @@ int Explorerplusplus::DetermineSortModeMenuId(int SortMode)
 {
 	switch(SortMode)
 	{
-		case SortMode::FSM_NAME:
+		case SortMode::Name:
 			return IDM_SORTBY_NAME;
 			break;
 
-		case SortMode::FSM_DATEMODIFIED:
+		case SortMode::DateModified:
 			return IDM_SORTBY_DATEMODIFIED;
 			break;
 
-		case SortMode::FSM_SIZE:
+		case SortMode::Size:
 			return IDM_SORTBY_SIZE;
 			break;
 
-		case SortMode::FSM_TYPE:
+		case SortMode::Type:
 			return IDM_SORTBY_TYPE;
 			break;
 
-		case SortMode::FSM_TOTALSIZE:
+		case SortMode::TotalSize:
 			return IDM_SORTBY_TOTALSIZE;
 			break;
 
-		case SortMode::FSM_FREESPACE:
+		case SortMode::FreeSpace:
 			return IDM_SORTBY_FREESPACE;
 			break;
 
-		case SortMode::FSM_COMMENTS:
+		case SortMode::Comments:
 			return IDM_SORTBY_COMMENTS;
 			break;
 
-		case SortMode::FSM_DATEDELETED:
+		case SortMode::DateDeleted:
 			return IDM_SORTBY_DATEDELETED;
 			break;
 
-		case SortMode::FSM_ORIGINALLOCATION:
+		case SortMode::OriginalLocation:
 			return IDM_SORTBY_ORIGINALLOCATION;
 			break;
 
-		case SortMode::FSM_ATTRIBUTES:
+		case SortMode::Attributes:
 			return IDM_SORTBY_ATTRIBUTES;
 			break;
 
-		case SortMode::FSM_REALSIZE:
+		case SortMode::RealSize:
 			return IDM_SORTBY_REALSIZE;
 			break;
 
-		case SortMode::FSM_SHORTNAME:
+		case SortMode::ShortName:
 			return IDM_SORTBY_SHORTNAME;
 			break;
 
-		case SortMode::FSM_OWNER:
+		case SortMode::Owner:
 			return IDM_SORTBY_OWNER;
 			break;
 
-		case SortMode::FSM_PRODUCTNAME:
+		case SortMode::ProductName:
 			return IDM_SORTBY_PRODUCTNAME;
 			break;
 
-		case SortMode::FSM_COMPANY:
+		case SortMode::Company:
 			return IDM_SORTBY_COMPANY;
 			break;
 
-		case SortMode::FSM_DESCRIPTION:
+		case SortMode::Description:
 			return IDM_SORTBY_DESCRIPTION;
 			break;
 
-		case SortMode::FSM_FILEVERSION:
+		case SortMode::FileVersion:
 			return IDM_SORTBY_FILEVERSION;
 			break;
 
-		case SortMode::FSM_PRODUCTVERSION:
+		case SortMode::ProductVersion:
 			return IDM_SORTBY_PRODUCTVERSION;
 			break;
 
-		case SortMode::FSM_SHORTCUTTO:
+		case SortMode::ShortcutTo:
 			return IDM_SORTBY_SHORTCUTTO;
 			break;
 
-		case SortMode::FSM_HARDLINKS:
+		case SortMode::HardLinks:
 			return IDM_SORTBY_HARDLINKS;
 			break;
 
-		case SortMode::FSM_EXTENSION:
+		case SortMode::Extension:
 			return IDM_SORTBY_EXTENSION;
 			break;
 
-		case SortMode::FSM_CREATED:
+		case SortMode::Created:
 			return IDM_SORTBY_CREATED;
 			break;
 
-		case SortMode::FSM_ACCESSED:
+		case SortMode::Accessed:
 			return IDM_SORTBY_ACCESSED;
 			break;
 
-		case SortMode::FSM_TITLE:
+		case SortMode::Title:
 			return IDM_SORTBY_TITLE;
 			break;
 
-		case SortMode::FSM_SUBJECT:
+		case SortMode::Subject:
 			return IDM_SORTBY_SUBJECT;
 			break;
 
-		case SortMode::FSM_AUTHORS:
+		case SortMode::Authors:
 			return IDM_SORTBY_AUTHOR;
 			break;
 
-		case SortMode::FSM_KEYWORDS:
+		case SortMode::Keywords:
 			return IDM_SORTBY_KEYWORDS;
 			break;
 
-		case SortMode::FSM_CAMERAMODEL:
+		case SortMode::CameraModel:
 			return IDM_SORTBY_CAMERAMODEL;
 			break;
 
-		case SortMode::FSM_DATETAKEN:
+		case SortMode::DateTaken:
 			return IDM_SORTBY_DATETAKEN;
 			break;
 
-		case SortMode::FSM_WIDTH:
+		case SortMode::Width:
 			return IDM_SORTBY_WIDTH;
 			break;
 
-		case SortMode::FSM_HEIGHT:
+		case SortMode::Height:
 			return IDM_SORTBY_HEIGHT;
 			break;
 
-		case SortMode::FSM_VIRTUALCOMMENTS:
+		case SortMode::VirtualComments:
 			return IDM_SORTBY_VIRTUALCOMMENTS;
 			break;
 
-		case SortMode::FSM_FILESYSTEM:
+		case SortMode::FileSystem:
 			return IDM_SORTBY_FILESYSTEM;
 			break;
 
-		case SortMode::FSM_NUMPRINTERDOCUMENTS:
+		case SortMode::NumPrinterDocuments:
 			return IDM_SORTBY_NUMPRINTERDOCUMENTS;
 			break;
 
-		case SortMode::FSM_PRINTERSTATUS:
+		case SortMode::PrinterStatus:
 			return IDM_SORTBY_PRINTERSTATUS;
 			break;
 
-		case SortMode::FSM_PRINTERCOMMENTS:
+		case SortMode::PrinterComments:
 			return IDM_SORTBY_PRINTERCOMMENTS;
 			break;
 
-		case SortMode::FSM_PRINTERLOCATION:
+		case SortMode::PrinterLocation:
 			return IDM_SORTBY_PRINTERLOCATION;
 			break;
 
-		case SortMode::FSM_NETWORKADAPTER_STATUS:
+		case SortMode::NetworkAdapterStatus:
 			return IDM_SORTBY_NETWORKADAPTER_STATUS;
 			break;
 
-		case SortMode::FSM_MEDIA_BITRATE:
+		case SortMode::MediaBitrate:
 			return IDM_SORTBY_MEDIA_BITRATE;
 			break;
 
-		case SortMode::FSM_MEDIA_COPYRIGHT:
+		case SortMode::MediaCopyright:
 			return IDM_SORTBY_MEDIA_COPYRIGHT;
 			break;
 
-		case SortMode::FSM_MEDIA_DURATION:
+		case SortMode::MediaDuration:
 			return IDM_SORTBY_MEDIA_DURATION;
 			break;
 
-		case SortMode::FSM_MEDIA_PROTECTED:
+		case SortMode::MediaProtected:
 			return IDM_SORTBY_MEDIA_PROTECTED;
 			break;
 
-		case SortMode::FSM_MEDIA_RATING:
+		case SortMode::MediaRating:
 			return IDM_SORTBY_MEDIA_RATING;
 			break;
 
-		case SortMode::FSM_MEDIA_ALBUMARTIST:
+		case SortMode::MediaAlbumArtist:
 			return IDM_SORTBY_MEDIA_ALBUM_ARTIST;
 			break;
 
-		case SortMode::FSM_MEDIA_ALBUM:
+		case SortMode::MediaAlbum:
 			return IDM_SORTBY_MEDIA_ALBUM;
 			break;
 
-		case SortMode::FSM_MEDIA_BEATSPERMINUTE:
+		case SortMode::MediaBeatsPerMinute:
 			return IDM_SORTBY_MEDIA_BEATS_PER_MINUTE;
 			break;
 
-		case SortMode::FSM_MEDIA_COMPOSER:
+		case SortMode::MediaComposer:
 			return IDM_SORTBY_MEDIA_COMPOSER;
 			break;
 
-		case SortMode::FSM_MEDIA_CONDUCTOR:
+		case SortMode::MediaConductor:
 			return IDM_SORTBY_MEDIA_CONDUCTOR;
 			break;
 
-		case SortMode::FSM_MEDIA_DIRECTOR:
+		case SortMode::MediaDirector:
 			return IDM_SORTBY_MEDIA_DIRECTOR;
 			break;
 
-		case SortMode::FSM_MEDIA_GENRE:
+		case SortMode::MediaGenre:
 			return IDM_SORTBY_MEDIA_GENRE;
 			break;
 
-		case SortMode::FSM_MEDIA_LANGUAGE:
+		case SortMode::MediaLanguage:
 			return IDM_SORTBY_MEDIA_LANGUAGE;
 			break;
 
-		case SortMode::FSM_MEDIA_BROADCASTDATE:
+		case SortMode::MediaBroadcastDate:
 			return IDM_SORTBY_MEDIA_BROADCAST_DATE;
 			break;
 
-		case SortMode::FSM_MEDIA_CHANNEL:
+		case SortMode::MediaChannel:
 			return IDM_SORTBY_MEDIA_CHANNEL;
 			break;
 
-		case SortMode::FSM_MEDIA_STATIONNAME:
+		case SortMode::MediaStationName:
 			return IDM_SORTBY_MEDIA_STATION_NAME;
 			break;
 
-		case SortMode::FSM_MEDIA_MOOD:
+		case SortMode::MediaMood:
 			return IDM_SORTBY_MEDIA_MOOD;
 			break;
 
-		case SortMode::FSM_MEDIA_PARENTALRATING:
+		case SortMode::MediaParentalRating:
 			return IDM_SORTBY_MEDIA_PARENTAL_RATING;
 			break;
 
-		case SortMode::FSM_MEDIA_PARENTALRATINGREASON:
+		case SortMode::MediaParentalRatingReason:
 			return IDM_SORTBY_MEDIA_PARENTAL_RATNG_REASON;
 			break;
 
-		case SortMode::FSM_MEDIA_PERIOD:
+		case SortMode::MediaPeriod:
 			return IDM_SORTBY_MEDIA_PERIOD;
 			break;
 
-		case SortMode::FSM_MEDIA_PRODUCER:
+		case SortMode::MediaProducer:
 			return IDM_SORTBY_MEDIA_PRODUCER;
 			break;
 
-		case SortMode::FSM_MEDIA_PUBLISHER:
+		case SortMode::MediaPublisher:
 			return IDM_SORTBY_MEDIA_PUBLISHER;
 			break;
 
-		case SortMode::FSM_MEDIA_WRITER:
+		case SortMode::MediaWriter:
 			return IDM_SORTBY_MEDIA_WRITER;
 			break;
 
-		case SortMode::FSM_MEDIA_YEAR:
+		case SortMode::MediaYear:
 			return IDM_SORTBY_MEDIA_YEAR;
 			break;
 
@@ -712,251 +712,251 @@ int Explorerplusplus::DetermineGroupModeMenuId(int SortMode)
 {
 	switch(SortMode)
 	{
-		case SortMode::FSM_NAME:
+		case SortMode::Name:
 			return IDM_GROUPBY_NAME;
 			break;
 
-		case SortMode::FSM_DATEMODIFIED:
+		case SortMode::DateModified:
 			return IDM_GROUPBY_DATEMODIFIED;
 			break;
 
-		case SortMode::FSM_SIZE:
+		case SortMode::Size:
 			return IDM_GROUPBY_SIZE;
 			break;
 
-		case SortMode::FSM_TYPE:
+		case SortMode::Type:
 			return IDM_GROUPBY_TYPE;
 			break;
 
-		case SortMode::FSM_TOTALSIZE:
+		case SortMode::TotalSize:
 			return IDM_GROUPBY_TOTALSIZE;
 			break;
 
-		case SortMode::FSM_FREESPACE:
+		case SortMode::FreeSpace:
 			return IDM_GROUPBY_FREESPACE;
 			break;
 
-		case SortMode::FSM_COMMENTS:
+		case SortMode::Comments:
 			return IDM_GROUPBY_COMMENTS;
 			break;
 
-		case SortMode::FSM_DATEDELETED:
+		case SortMode::DateDeleted:
 			return IDM_GROUPBY_DATEDELETED;
 			break;
 
-		case SortMode::FSM_ORIGINALLOCATION:
+		case SortMode::OriginalLocation:
 			return IDM_GROUPBY_ORIGINALLOCATION;
 			break;
 
-		case SortMode::FSM_ATTRIBUTES:
+		case SortMode::Attributes:
 			return IDM_GROUPBY_ATTRIBUTES;
 			break;
 
-		case SortMode::FSM_REALSIZE:
+		case SortMode::RealSize:
 			return IDM_GROUPBY_REALSIZE;
 			break;
 
-		case SortMode::FSM_SHORTNAME:
+		case SortMode::ShortName:
 			return IDM_GROUPBY_SHORTNAME;
 			break;
 
-		case SortMode::FSM_OWNER:
+		case SortMode::Owner:
 			return IDM_GROUPBY_OWNER;
 			break;
 
-		case SortMode::FSM_PRODUCTNAME:
+		case SortMode::ProductName:
 			return IDM_GROUPBY_PRODUCTNAME;
 			break;
 
-		case SortMode::FSM_COMPANY:
+		case SortMode::Company:
 			return IDM_GROUPBY_COMPANY;
 			break;
 
-		case SortMode::FSM_DESCRIPTION:
+		case SortMode::Description:
 			return IDM_GROUPBY_DESCRIPTION;
 			break;
 
-		case SortMode::FSM_FILEVERSION:
+		case SortMode::FileVersion:
 			return IDM_GROUPBY_FILEVERSION;
 			break;
 
-		case SortMode::FSM_PRODUCTVERSION:
+		case SortMode::ProductVersion:
 			return IDM_GROUPBY_PRODUCTVERSION;
 			break;
 
-		case SortMode::FSM_SHORTCUTTO:
+		case SortMode::ShortcutTo:
 			return IDM_GROUPBY_SHORTCUTTO;
 			break;
 
-		case SortMode::FSM_HARDLINKS:
+		case SortMode::HardLinks:
 			return IDM_GROUPBY_HARDLINKS;
 			break;
 
-		case SortMode::FSM_EXTENSION:
+		case SortMode::Extension:
 			return IDM_GROUPBY_EXTENSION;
 			break;
 
-		case SortMode::FSM_CREATED:
+		case SortMode::Created:
 			return IDM_GROUPBY_CREATED;
 			break;
 
-		case SortMode::FSM_ACCESSED:
+		case SortMode::Accessed:
 			return IDM_GROUPBY_ACCESSED;
 			break;
 
-		case SortMode::FSM_TITLE:
+		case SortMode::Title:
 			return IDM_GROUPBY_TITLE;
 			break;
 
-		case SortMode::FSM_SUBJECT:
+		case SortMode::Subject:
 			return IDM_GROUPBY_SUBJECT;
 			break;
 
-		case SortMode::FSM_AUTHORS:
+		case SortMode::Authors:
 			return IDM_GROUPBY_AUTHOR;
 			break;
 
-		case SortMode::FSM_KEYWORDS:
+		case SortMode::Keywords:
 			return IDM_GROUPBY_KEYWORDS;
 			break;
 
-		case SortMode::FSM_CAMERAMODEL:
+		case SortMode::CameraModel:
 			return IDM_GROUPBY_CAMERAMODEL;
 			break;
 
-		case SortMode::FSM_DATETAKEN:
+		case SortMode::DateTaken:
 			return IDM_GROUPBY_DATETAKEN;
 			break;
 
-		case SortMode::FSM_WIDTH:
+		case SortMode::Width:
 			return IDM_GROUPBY_WIDTH;
 			break;
 
-		case SortMode::FSM_HEIGHT:
+		case SortMode::Height:
 			return IDM_GROUPBY_HEIGHT;
 			break;
 
-		case SortMode::FSM_VIRTUALCOMMENTS:
+		case SortMode::VirtualComments:
 			return IDM_GROUPBY_VIRTUALCOMMENTS;
 			break;
 
-		case SortMode::FSM_FILESYSTEM:
+		case SortMode::FileSystem:
 			return IDM_GROUPBY_FILESYSTEM;
 			break;
 
-		case SortMode::FSM_NUMPRINTERDOCUMENTS:
+		case SortMode::NumPrinterDocuments:
 			return IDM_GROUPBY_NUMPRINTERDOCUMENTS;
 			break;
 
-		case SortMode::FSM_PRINTERSTATUS:
+		case SortMode::PrinterStatus:
 			return IDM_GROUPBY_PRINTERSTATUS;
 			break;
 
-		case SortMode::FSM_PRINTERCOMMENTS:
+		case SortMode::PrinterComments:
 			return IDM_GROUPBY_PRINTERCOMMENTS;
 			break;
 
-		case SortMode::FSM_PRINTERLOCATION:
+		case SortMode::PrinterLocation:
 			return IDM_GROUPBY_PRINTERLOCATION;
 			break;
 
-		case SortMode::FSM_NETWORKADAPTER_STATUS:
+		case SortMode::NetworkAdapterStatus:
 			return IDM_GROUPBY_NETWORKADAPTER_STATUS;
 			break;
 
-		case SortMode::FSM_MEDIA_BITRATE:
+		case SortMode::MediaBitrate:
 			return IDM_GROUPBY_MEDIA_BITRATE;
 			break;
 
-		case SortMode::FSM_MEDIA_COPYRIGHT:
+		case SortMode::MediaCopyright:
 			return IDM_GROUPBY_MEDIA_COPYRIGHT;
 			break;
 
-		case SortMode::FSM_MEDIA_DURATION:
+		case SortMode::MediaDuration:
 			return IDM_GROUPBY_MEDIA_DURATION;
 			break;
 
-		case SortMode::FSM_MEDIA_PROTECTED:
+		case SortMode::MediaProtected:
 			return IDM_GROUPBY_MEDIA_PROTECTED;
 			break;
 
-		case SortMode::FSM_MEDIA_RATING:
+		case SortMode::MediaRating:
 			return IDM_GROUPBY_MEDIA_RATING;
 			break;
 
-		case SortMode::FSM_MEDIA_ALBUMARTIST:
+		case SortMode::MediaAlbumArtist:
 			return IDM_GROUPBY_MEDIA_ALBUM_ARTIST;
 			break;
 
-		case SortMode::FSM_MEDIA_ALBUM:
+		case SortMode::MediaAlbum:
 			return IDM_GROUPBY_MEDIA_ALBUM;
 			break;
 
-		case SortMode::FSM_MEDIA_BEATSPERMINUTE:
+		case SortMode::MediaBeatsPerMinute:
 			return IDM_GROUPBY_MEDIA_BEATS_PER_MINUTE;
 			break;
 
-		case SortMode::FSM_MEDIA_COMPOSER:
+		case SortMode::MediaComposer:
 			return IDM_GROUPBY_MEDIA_COMPOSER;
 			break;
 
-		case SortMode::FSM_MEDIA_CONDUCTOR:
+		case SortMode::MediaConductor:
 			return IDM_GROUPBY_MEDIA_CONDUCTOR;
 			break;
 
-		case SortMode::FSM_MEDIA_DIRECTOR:
+		case SortMode::MediaDirector:
 			return IDM_GROUPBY_MEDIA_DIRECTOR;
 			break;
 
-		case SortMode::FSM_MEDIA_GENRE:
+		case SortMode::MediaGenre:
 			return IDM_GROUPBY_MEDIA_GENRE;
 			break;
 
-		case SortMode::FSM_MEDIA_LANGUAGE:
+		case SortMode::MediaLanguage:
 			return IDM_GROUPBY_MEDIA_LANGUAGE;
 			break;
 
-		case SortMode::FSM_MEDIA_BROADCASTDATE:
+		case SortMode::MediaBroadcastDate:
 			return IDM_GROUPBY_MEDIA_BROADCAST_DATE;
 			break;
 
-		case SortMode::FSM_MEDIA_CHANNEL:
+		case SortMode::MediaChannel:
 			return IDM_GROUPBY_MEDIA_CHANNEL;
 			break;
 
-		case SortMode::FSM_MEDIA_STATIONNAME:
+		case SortMode::MediaStationName:
 			return IDM_GROUPBY_MEDIA_STATION_NAME;
 			break;
 
-		case SortMode::FSM_MEDIA_MOOD:
+		case SortMode::MediaMood:
 			return IDM_GROUPBY_MEDIA_MOOD;
 			break;
 
-		case SortMode::FSM_MEDIA_PARENTALRATING:
+		case SortMode::MediaParentalRating:
 			return IDM_GROUPBY_MEDIA_PARENTAL_RATING;
 			break;
 
-		case SortMode::FSM_MEDIA_PARENTALRATINGREASON:
+		case SortMode::MediaParentalRatingReason:
 			return IDM_GROUPBY_MEDIA_PARENTAL_RATING_REASON;
 			break;
 
-		case SortMode::FSM_MEDIA_PERIOD:
+		case SortMode::MediaPeriod:
 			return IDM_GROUPBY_MEDIA_PERIOD;
 			break;
 
-		case SortMode::FSM_MEDIA_PRODUCER:
+		case SortMode::MediaProducer:
 			return IDM_GROUPBY_MEDIA_PRODUCER;
 			break;
 
-		case SortMode::FSM_MEDIA_PUBLISHER:
+		case SortMode::MediaPublisher:
 			return IDM_GROUPBY_MEDIA_PUBLISHER;
 			break;
 
-		case SortMode::FSM_MEDIA_WRITER:
+		case SortMode::MediaWriter:
 			return IDM_GROUPBY_MEDIA_WRITER;
 			break;
 
-		case SortMode::FSM_MEDIA_YEAR:
+		case SortMode::MediaYear:
 			return IDM_GROUPBY_MEDIA_YEAR;
 			break;
 

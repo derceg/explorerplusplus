@@ -1230,7 +1230,7 @@ SortMode Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
 		pColumns = &m_RealFolderColumnList;
 	}
 
-	SortMode sortMode = SortMode::FSM_NAME;
+	SortMode sortMode = SortMode::Name;
 
 	for(const auto &Column : *pColumns)
 	{
