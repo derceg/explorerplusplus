@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
@@ -18,6 +19,7 @@ namespace Plugins
 	public:
 		struct FolderSettings
 		{
+			SortMode sortMode;
 			ViewMode viewMode;
 			bool sortAscending;
 			bool showInGroups;
@@ -26,6 +28,7 @@ namespace Plugins
 
 			FolderSettings(const CShellBrowser &shellBrowser)
 			{
+				sortMode = shellBrowser.GetSortMode();
 				viewMode = shellBrowser.GetCurrentViewMode();
 				sortAscending = shellBrowser.GetSortAscending();
 				showInGroups = shellBrowser.IsGroupViewEnabled();
@@ -37,7 +40,8 @@ namespace Plugins
 			{
 				std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 
-				return _T("viewMode = ") + converter.from_bytes(viewMode._to_string())
+				return _T("sortMode = ") + converter.from_bytes(sortMode._to_string())
+					+ _T(", viewMode = ") + converter.from_bytes(viewMode._to_string())
 					+ _T(", sortAscending = ") + std::to_wstring(sortAscending)
 					+ _T(", showInGroups = ") + std::to_wstring(showInGroups)
 					+ _T(", showHidden = ") + std::to_wstring(showHidden)
