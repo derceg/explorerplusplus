@@ -19,6 +19,8 @@ void BindUiApi(sol::state &state, UiTheming *uiTheming);
 void BindCommandApi(int pluginId, sol::state &state, Plugins::PluginCommandManager *pluginCommandManager);
 template<typename T>
 void BindObserverMethods(sol::state &state, sol::table &parentTable, const std::string &observerTableName, const std::shared_ptr<T> &object);
+template<typename T>
+void AddEnum(sol::state &state, sol::table &parentTable, const std::string &name);
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table);
 int deny(lua_State *state);
 
@@ -70,15 +72,7 @@ void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInte
 		"folderSettings", &Plugins::TabsApi::Tab::folderSettings,
 		"__tostring", &Plugins::TabsApi::Tab::toString);
 
-	tabsMetaTable.new_enum("ViewMode",
-		"details", ViewMode::VM_DETAILS,
-		"extraLargeIcons", ViewMode::VM_EXTRALARGEICONS,
-		"icons", ViewMode::VM_ICONS,
-		"largeIcons", ViewMode::VM_LARGEICONS,
-		"list", ViewMode::VM_LIST,
-		"smallIcons", ViewMode::VM_SMALLICONS,
-		"thumbnails", ViewMode::VM_THUMBNAILS,
-		"tiles", ViewMode::VM_TILES);
+	AddEnum<ViewMode>(state, tabsMetaTable, "ViewMode");
 }
 
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager)
@@ -122,6 +116,27 @@ void BindObserverMethods(sol::state &state, sol::table &parentTable, const std::
 
 	observerMetaTable.set_function("addListener", &T::addObserver, object);
 	observerMetaTable.set_function("removeListener", &T::removeObserver, object);
+}
+
+// This is used instead of the new_enum function provided by Sol, as
+// that function is designed for compile-time enum value lists (there is
+// a variant that accepts std::initializer_list, but that's designed for
+// static lists of items as well). There's no way to specify a list of
+// enum values that are created at runtime.
+// The new_enum function is simple enough to emulate though, as all it
+// does is create a (possibly read-only) table with the specified enum
+// values. Note that this function is only designed to work with Better
+// Enums (though there's currently no static type check).
+template<typename T>
+void AddEnum(sol::state &state, sol::table &parentTable, const std::string &name)
+{
+	sol::table enumTable = parentTable.create_named(name);
+	sol::table enumMetaTable = MarkTableReadOnly(state, enumTable);
+
+	for (auto item : T::_values())
+	{
+		enumMetaTable.set(item._to_string(), item._to_integral());
+	}
 }
 
 sol::table MarkTableReadOnly(sol::state &state, sol::table &table)
