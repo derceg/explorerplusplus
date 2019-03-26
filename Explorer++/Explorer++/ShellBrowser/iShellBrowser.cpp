@@ -919,7 +919,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_folderSettings.sortMode = FSM_NAME;
+			m_folderSettings.sortMode = SortMode::FSM_NAME;
 	}
 	else if(CompareVirtualFolders(CSIDL_DRIVES))
 	{
@@ -935,7 +935,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_folderSettings.sortMode = FSM_NAME;
+			m_folderSettings.sortMode = SortMode::FSM_NAME;
 	}
 	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
@@ -951,7 +951,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_folderSettings.sortMode = FSM_NAME;
+			m_folderSettings.sortMode = SortMode::FSM_NAME;
 	}
 	else if(CompareVirtualFolders(CSIDL_PRINTERS))
 	{
@@ -967,7 +967,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_folderSettings.sortMode = FSM_NAME;
+			m_folderSettings.sortMode = SortMode::FSM_NAME;
 	}
 	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
 	{
@@ -983,7 +983,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_folderSettings.sortMode = FSM_NAME;
+			m_folderSettings.sortMode = SortMode::FSM_NAME;
 	}
 	else
 	{
@@ -999,7 +999,7 @@ void CShellBrowser::VerifySortMode(void)
 		}
 
 		if(!bValid)
-			m_folderSettings.sortMode = FSM_NAME;
+			m_folderSettings.sortMode = SortMode::FSM_NAME;
 	}
 }
 

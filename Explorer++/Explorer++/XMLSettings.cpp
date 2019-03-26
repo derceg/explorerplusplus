@@ -1929,7 +1929,7 @@ void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,
 	}
 	else if(lstrcmp(wszName,L"SortMode") == 0)
 	{
-		folderSettings.sortMode = static_cast<SortMode>(NXMLSettings::DecodeIntValue(wszValue));
+		folderSettings.sortMode = SortMode::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
 	}
 	else if(lstrcmp(wszName,L"ViewMode") == 0)
 	{

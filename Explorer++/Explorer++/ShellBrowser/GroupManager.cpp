@@ -189,173 +189,173 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 
 	switch(m_folderSettings.sortMode)
 	{
-		case FSM_NAME:
+		case SortMode::FSM_NAME:
 			DetermineItemNameGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_TYPE:
+		case SortMode::FSM_TYPE:
 			DetermineItemTypeGroupVirtual(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_SIZE:
+		case SortMode::FSM_SIZE:
 			DetermineItemSizeGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_DATEMODIFIED:
+		case SortMode::FSM_DATEMODIFIED:
 			DetermineItemDateGroup(iItemInternal,GROUP_BY_DATEMODIFIED,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_TOTALSIZE:
+		case SortMode::FSM_TOTALSIZE:
 			DetermineItemTotalSizeGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_FREESPACE:
+		case SortMode::FSM_FREESPACE:
 			DetermineItemFreeSpaceGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupFreeSpaceComparisonStub;
 			break;
 
-		case FSM_DATEDELETED:
+		case SortMode::FSM_DATEDELETED:
 			break;
 
-		case FSM_ORIGINALLOCATION:
+		case SortMode::FSM_ORIGINALLOCATION:
 			DetermineItemSummaryGroup(basicItemInfo, &SCID_ORIGINAL_LOCATION, szGroupHeader, SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_ATTRIBUTES:
+		case SortMode::FSM_ATTRIBUTES:
 			DetermineItemAttributeGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_SHORTNAME:
+		case SortMode::FSM_SHORTNAME:
 			DetermineItemNameGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_OWNER:
+		case SortMode::FSM_OWNER:
 			DetermineItemOwnerGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_PRODUCTNAME:
+		case SortMode::FSM_PRODUCTNAME:
 			DetermineItemVersionGroup(iItemInternal,_T("ProductName"),szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_COMPANY:
+		case SortMode::FSM_COMPANY:
 			DetermineItemVersionGroup(iItemInternal,_T("CompanyName"),szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_DESCRIPTION:
+		case SortMode::FSM_DESCRIPTION:
 			DetermineItemVersionGroup(iItemInternal,_T("FileDescription"),szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_FILEVERSION:
+		case SortMode::FSM_FILEVERSION:
 			DetermineItemVersionGroup(iItemInternal,_T("FileVersion"),szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_PRODUCTVERSION:
+		case SortMode::FSM_PRODUCTVERSION:
 			DetermineItemVersionGroup(iItemInternal,_T("ProductVersion"),szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_SHORTCUTTO:
+		case SortMode::FSM_SHORTCUTTO:
 			break;
 
-		case FSM_HARDLINKS:
+		case SortMode::FSM_HARDLINKS:
 			break;
 
-		case FSM_EXTENSION:
+		case SortMode::FSM_EXTENSION:
 			DetermineItemExtensionGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_CREATED:
+		case SortMode::FSM_CREATED:
 			DetermineItemDateGroup(iItemInternal,GROUP_BY_DATECREATED,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_ACCESSED:
+		case SortMode::FSM_ACCESSED:
 			DetermineItemDateGroup(iItemInternal,GROUP_BY_DATEACCESSED,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_TITLE:
+		case SortMode::FSM_TITLE:
 			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Title,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_SUBJECT:
+		case SortMode::FSM_SUBJECT:
 			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Subject,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_AUTHORS:
+		case SortMode::FSM_AUTHORS:
 			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Author,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_KEYWORDS:
+		case SortMode::FSM_KEYWORDS:
 			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Keywords,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_COMMENTS:
+		case SortMode::FSM_COMMENTS:
 			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Comment,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 
-		case FSM_CAMERAMODEL:
+		case SortMode::FSM_CAMERAMODEL:
 			DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagEquipModel,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_DATETAKEN:
+		case SortMode::FSM_DATETAKEN:
 			DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagDateTime,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_WIDTH:
+		case SortMode::FSM_WIDTH:
 			DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagImageWidth,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_HEIGHT:
+		case SortMode::FSM_HEIGHT:
 			DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagImageHeight,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 
-		case FSM_VIRTUALCOMMENTS:
+		case SortMode::FSM_VIRTUALCOMMENTS:
 			break;
 
-		case FSM_FILESYSTEM:
+		case SortMode::FSM_FILESYSTEM:
 			DetermineItemFileSystemGroup(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
-		case FSM_NUMPRINTERDOCUMENTS:
+		case SortMode::FSM_NUMPRINTERDOCUMENTS:
 			break;
 
-		case FSM_PRINTERSTATUS:
+		case SortMode::FSM_PRINTERSTATUS:
 			break;
 
-		case FSM_PRINTERCOMMENTS:
+		case SortMode::FSM_PRINTERCOMMENTS:
 			break;
 
-		case FSM_PRINTERLOCATION:
+		case SortMode::FSM_PRINTERLOCATION:
 			break;
 
-		case FSM_NETWORKADAPTER_STATUS:
+		case SortMode::FSM_NETWORKADAPTER_STATUS:
 			DetermineItemNetworkStatus(iItemInternal,szGroupHeader,SIZEOF_ARRAY(szGroupHeader));
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;

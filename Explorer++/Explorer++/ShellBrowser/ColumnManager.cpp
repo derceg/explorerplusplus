@@ -273,251 +273,251 @@ SortMode CShellBrowser::DetermineColumnSortMode(int iColumnId)
 	switch(iColumnId)
 	{
 		case CM_NAME:
-			return FSM_NAME;
+			return SortMode::FSM_NAME;
 			break;
 
 		case CM_TYPE:
-			return FSM_TYPE;
+			return SortMode::FSM_TYPE;
 			break;
 
 		case CM_SIZE:
-			return FSM_SIZE;
+			return SortMode::FSM_SIZE;
 			break;
 
 		case CM_DATEMODIFIED:
-			return FSM_DATEMODIFIED;
+			return SortMode::FSM_DATEMODIFIED;
 			break;
 
 		case CM_ATTRIBUTES:
-			return FSM_ATTRIBUTES;
+			return SortMode::FSM_ATTRIBUTES;
 			break;
 
 		case CM_REALSIZE:
-			return FSM_REALSIZE;
+			return SortMode::FSM_REALSIZE;
 			break;
 
 		case CM_SHORTNAME:
-			return FSM_SHORTNAME;
+			return SortMode::FSM_SHORTNAME;
 			break;
 
 		case CM_OWNER:
-			return FSM_OWNER;
+			return SortMode::FSM_OWNER;
 			break;
 
 		case CM_PRODUCTNAME:
-			return FSM_PRODUCTNAME;
+			return SortMode::FSM_PRODUCTNAME;
 			break;
 
 		case CM_COMPANY:
-			return FSM_COMPANY;
+			return SortMode::FSM_COMPANY;
 			break;
 
 		case CM_DESCRIPTION:
-			return FSM_DESCRIPTION;
+			return SortMode::FSM_DESCRIPTION;
 			break;
 
 		case CM_FILEVERSION:
-			return FSM_FILEVERSION;
+			return SortMode::FSM_FILEVERSION;
 			break;
 
 		case CM_PRODUCTVERSION:
-			return FSM_PRODUCTVERSION;
+			return SortMode::FSM_PRODUCTVERSION;
 			break;
 
 		case CM_SHORTCUTTO:
-			return FSM_SHORTCUTTO;
+			return SortMode::FSM_SHORTCUTTO;
 			break;
 
 		case CM_HARDLINKS:
-			return FSM_HARDLINKS;
+			return SortMode::FSM_HARDLINKS;
 			break;
 
 		case CM_EXTENSION:
-			return FSM_EXTENSION;
+			return SortMode::FSM_EXTENSION;
 			break;
 
 		case CM_CREATED:
-			return FSM_CREATED;
+			return SortMode::FSM_CREATED;
 			break;
 
 		case CM_ACCESSED:
-			return FSM_ACCESSED;
+			return SortMode::FSM_ACCESSED;
 			break;
 
 		case CM_TITLE:
-			return FSM_TITLE;
+			return SortMode::FSM_TITLE;
 			break;
 
 		case CM_SUBJECT:
-			return FSM_SUBJECT;
+			return SortMode::FSM_SUBJECT;
 			break;
 
 		case CM_AUTHORS:
-			return FSM_AUTHORS;
+			return SortMode::FSM_AUTHORS;
 			break;
 
 		case CM_KEYWORDS:
-			return FSM_KEYWORDS;
+			return SortMode::FSM_KEYWORDS;
 			break;
 
 		case CM_COMMENT:
-			return FSM_COMMENTS;
+			return SortMode::FSM_COMMENTS;
 			break;
 
 		case CM_CAMERAMODEL:
-			return FSM_CAMERAMODEL;
+			return SortMode::FSM_CAMERAMODEL;
 			break;
 
 		case CM_DATETAKEN:
-			return FSM_DATETAKEN;
+			return SortMode::FSM_DATETAKEN;
 			break;
 
 		case CM_WIDTH:
-			return FSM_WIDTH;
+			return SortMode::FSM_WIDTH;
 			break;
 
 		case CM_HEIGHT:
-			return FSM_HEIGHT;
+			return SortMode::FSM_HEIGHT;
 			break;
 
 		case CM_VIRTUALCOMMENTS:
-			return FSM_VIRTUALCOMMENTS;
+			return SortMode::FSM_VIRTUALCOMMENTS;
 			break;
 
 		case CM_TOTALSIZE:
-			return FSM_TOTALSIZE;
+			return SortMode::FSM_TOTALSIZE;
 			break;
 
 		case CM_FREESPACE:
-			return FSM_FREESPACE;
+			return SortMode::FSM_FREESPACE;
 			break;
 
 		case CM_FILESYSTEM:
-			return FSM_FILESYSTEM;
+			return SortMode::FSM_FILESYSTEM;
 			break;
 
 		case CM_ORIGINALLOCATION:
-			return FSM_ORIGINALLOCATION;
+			return SortMode::FSM_ORIGINALLOCATION;
 			break;
 
 		case CM_DATEDELETED:
-			return FSM_DATEDELETED;
+			return SortMode::FSM_DATEDELETED;
 			break;
 
 		case CM_NUMPRINTERDOCUMENTS:
-			return FSM_NUMPRINTERDOCUMENTS;
+			return SortMode::FSM_NUMPRINTERDOCUMENTS;
 			break;
 
 		case CM_PRINTERSTATUS:
-			return FSM_PRINTERSTATUS;
+			return SortMode::FSM_PRINTERSTATUS;
 			break;
 
 		case CM_PRINTERCOMMENTS:
-			return FSM_PRINTERCOMMENTS;
+			return SortMode::FSM_PRINTERCOMMENTS;
 			break;
 
 		case CM_PRINTERLOCATION:
-			return FSM_PRINTERLOCATION;
+			return SortMode::FSM_PRINTERLOCATION;
 			break;
 
 		case CM_NETWORKADAPTER_STATUS:
-			return FSM_NETWORKADAPTER_STATUS;
+			return SortMode::FSM_NETWORKADAPTER_STATUS;
 			break;
 
 		case CM_MEDIA_BITRATE:
-			return FSM_MEDIA_BITRATE;
+			return SortMode::FSM_MEDIA_BITRATE;
 			break;
 
 		case CM_MEDIA_COPYRIGHT:
-			return FSM_MEDIA_COPYRIGHT;
+			return SortMode::FSM_MEDIA_COPYRIGHT;
 			break;
 
 		case CM_MEDIA_DURATION:
-			return FSM_MEDIA_DURATION;
+			return SortMode::FSM_MEDIA_DURATION;
 			break;
 
 		case CM_MEDIA_PROTECTED:
-			return FSM_MEDIA_PROTECTED;
+			return SortMode::FSM_MEDIA_PROTECTED;
 			break;
 
 		case CM_MEDIA_RATING:
-			return FSM_MEDIA_RATING;
+			return SortMode::FSM_MEDIA_RATING;
 			break;
 
 		case CM_MEDIA_ALBUMARTIST:
-			return FSM_MEDIA_ALBUMARTIST;
+			return SortMode::FSM_MEDIA_ALBUMARTIST;
 			break;
 
 		case CM_MEDIA_ALBUM:
-			return FSM_MEDIA_ALBUM;
+			return SortMode::FSM_MEDIA_ALBUM;
 			break;
 
 		case CM_MEDIA_BEATSPERMINUTE:
-			return FSM_MEDIA_BEATSPERMINUTE;
+			return SortMode::FSM_MEDIA_BEATSPERMINUTE;
 			break;
 
 		case CM_MEDIA_COMPOSER:
-			return FSM_MEDIA_COMPOSER;
+			return SortMode::FSM_MEDIA_COMPOSER;
 			break;
 
 		case CM_MEDIA_CONDUCTOR:
-			return FSM_MEDIA_CONDUCTOR;
+			return SortMode::FSM_MEDIA_CONDUCTOR;
 			break;
 
 		case CM_MEDIA_DIRECTOR:
-			return FSM_MEDIA_DIRECTOR;
+			return SortMode::FSM_MEDIA_DIRECTOR;
 			break;
 
 		case CM_MEDIA_GENRE:
-			return FSM_MEDIA_GENRE;
+			return SortMode::FSM_MEDIA_GENRE;
 			break;
 
 		case CM_MEDIA_LANGUAGE:
-			return FSM_MEDIA_LANGUAGE;
+			return SortMode::FSM_MEDIA_LANGUAGE;
 			break;
 
 		case CM_MEDIA_BROADCASTDATE:
-			return FSM_MEDIA_BROADCASTDATE;
+			return SortMode::FSM_MEDIA_BROADCASTDATE;
 			break;
 
 		case CM_MEDIA_CHANNEL:
-			return FSM_MEDIA_CHANNEL;
+			return SortMode::FSM_MEDIA_CHANNEL;
 			break;
 
 		case CM_MEDIA_STATIONNAME:
-			return FSM_MEDIA_STATIONNAME;
+			return SortMode::FSM_MEDIA_STATIONNAME;
 			break;
 
 		case CM_MEDIA_MOOD:
-			return FSM_MEDIA_MOOD;
+			return SortMode::FSM_MEDIA_MOOD;
 			break;
 
 		case CM_MEDIA_PARENTALRATING:
-			return FSM_MEDIA_PARENTALRATING;
+			return SortMode::FSM_MEDIA_PARENTALRATING;
 			break;
 
 		case CM_MEDIA_PARENTALRATINGREASON:
-			return FSM_MEDIA_PARENTALRATINGREASON;
+			return SortMode::FSM_MEDIA_PARENTALRATINGREASON;
 			break;
 
 		case CM_MEDIA_PERIOD:
-			return FSM_MEDIA_PERIOD;
+			return SortMode::FSM_MEDIA_PERIOD;
 			break;
 
 		case CM_MEDIA_PRODUCER:
-			return FSM_MEDIA_PRODUCER;
+			return SortMode::FSM_MEDIA_PRODUCER;
 			break;
 
 		case CM_MEDIA_PUBLISHER:
-			return FSM_MEDIA_PUBLISHER;
+			return SortMode::FSM_MEDIA_PUBLISHER;
 			break;
 
 		case CM_MEDIA_WRITER:
-			return FSM_MEDIA_WRITER;
+			return SortMode::FSM_MEDIA_WRITER;
 			break;
 
 		case CM_MEDIA_YEAR:
-			return FSM_MEDIA_YEAR;
+			return SortMode::FSM_MEDIA_YEAR;
 			break;
 
 		default:
@@ -525,7 +525,7 @@ SortMode CShellBrowser::DetermineColumnSortMode(int iColumnId)
 			break;
 	}
 
-	return FSM_NAME;
+	return SortMode::FSM_NAME;
 }
 
 int CShellBrowser::LookupColumnNameStringIndex(int iColumnId)
@@ -952,7 +952,7 @@ void CShellBrowser::ColumnClicked(int iClickedColumn)
 {
 	std::list<Column_t>::iterator itr;
 	int iCurrentColumn = 0;
-	SortMode sortMode = FSM_NAME;
+	SortMode sortMode = SortMode::FSM_NAME;
 	UINT iColumnId = 0;
 
 	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
