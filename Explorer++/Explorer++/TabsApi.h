@@ -9,6 +9,7 @@
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "../ThirdParty/Sol/sol.hpp"
+#include <codecvt>
 
 namespace Plugins
 {
@@ -34,7 +35,9 @@ namespace Plugins
 
 			std::wstring toString()
 			{
-				return _T("viewMode = ") + std::to_wstring(viewMode)
+				std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+
+				return _T("viewMode = ") + converter.from_bytes(viewMode._to_string())
 					+ _T(", sortAscending = ") + std::to_wstring(sortAscending)
 					+ _T(", showInGroups = ") + std::to_wstring(showInGroups)
 					+ _T(", showHidden = ") + std::to_wstring(showHidden)
