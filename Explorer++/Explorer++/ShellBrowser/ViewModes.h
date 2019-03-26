@@ -7,14 +7,14 @@
 #include "BetterEnumsWrapper.h"
 
 BETTER_ENUM(ViewMode, int,
-	VM_ICONS = 1,
-	VM_SMALLICONS = 2,
-	VM_LIST = 3,
-	VM_DETAILS = 4,
-	VM_TILES = 5,
-	VM_THUMBNAILS = 6,
-	VM_EXTRALARGEICONS = 7,
-	VM_LARGEICONS = 8
+	Icons = 1,
+	SmallIcons = 2,
+	List = 3,
+	Details = 4,
+	Tiles = 5,
+	Thumbnails = 6,
+	ExtraLargeIcons = 7,
+	LargeIcons = 8
 )
 
 int GetViewModeMenuId(ViewMode viewMode);

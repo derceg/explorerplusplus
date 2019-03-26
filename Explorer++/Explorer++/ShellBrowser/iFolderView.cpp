@@ -220,14 +220,14 @@ void CShellBrowser::SetCurrentViewMode(ViewMode viewMode)
 		return;
 	}
 
-	if(m_folderSettings.viewMode == +ViewMode::VM_THUMBNAILS && viewMode != +ViewMode::VM_THUMBNAILS)
+	if(m_folderSettings.viewMode == +ViewMode::Thumbnails && viewMode != +ViewMode::Thumbnails)
 		RemoveThumbnailsView();
 
 	SetCurrentViewModeInternal(viewMode);
 
 	switch(viewMode)
 	{
-		case ViewMode::VM_TILES:
+		case ViewMode::Tiles:
 			SetTileViewInfo();
 			break;
 	}
@@ -244,7 +244,7 @@ void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 
 	switch(viewMode)
 	{
-	case ViewMode::VM_EXTRALARGEICONS:
+	case ViewMode::ExtraLargeIcons:
 		{
 			IImageList *pImageList = NULL;
 
@@ -254,7 +254,7 @@ void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 		}
 		break;
 
-	case ViewMode::VM_LARGEICONS:
+	case ViewMode::LargeIcons:
 		{
 			IImageList *pImageList = NULL;
 
@@ -265,14 +265,14 @@ void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 		break;
 
 	/* Do nothing. This will setup the listview by itself. */
-	case ViewMode::VM_THUMBNAILS:
+	case ViewMode::Thumbnails:
 		break;
 
-	case ViewMode::VM_TILES:
-	case ViewMode::VM_ICONS:
-	case ViewMode::VM_SMALLICONS:
-	case ViewMode::VM_LIST:
-	case ViewMode::VM_DETAILS:
+	case ViewMode::Tiles:
+	case ViewMode::Icons:
+	case ViewMode::SmallIcons:
+	case ViewMode::List:
+	case ViewMode::Details:
 		{
 			IImageList *pImageList = NULL;
 
@@ -284,32 +284,32 @@ void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 	}
 
 	/* Delete all the tile view columns. */
-	if(m_folderSettings.viewMode == +ViewMode::VM_TILES && viewMode != +ViewMode::VM_TILES)
+	if(m_folderSettings.viewMode == +ViewMode::Tiles && viewMode != +ViewMode::Tiles)
 		DeleteTileViewColumns();
 
 	switch(viewMode)
 	{
-		case ViewMode::VM_TILES:
+		case ViewMode::Tiles:
 			dwStyle = LV_VIEW_TILE;
 
 			InsertTileViewColumns();
 			break;
 
-		case ViewMode::VM_EXTRALARGEICONS:
-		case ViewMode::VM_LARGEICONS:
-		case ViewMode::VM_ICONS:
+		case ViewMode::ExtraLargeIcons:
+		case ViewMode::LargeIcons:
+		case ViewMode::Icons:
 			dwStyle = LV_VIEW_ICON;
 			break;
 
-		case ViewMode::VM_SMALLICONS:
+		case ViewMode::SmallIcons:
 			dwStyle = LV_VIEW_SMALLICON;
 			break;
 
-		case ViewMode::VM_LIST:
+		case ViewMode::List:
 			dwStyle = LV_VIEW_LIST;
 			break;
 
-		case ViewMode::VM_DETAILS:
+		case ViewMode::Details:
 			dwStyle = LV_VIEW_DETAILS;
 
 			if(!m_bColumnsPlaced)
@@ -319,7 +319,7 @@ void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 			}
 			break;
 
-		case ViewMode::VM_THUMBNAILS:
+		case ViewMode::Thumbnails:
 			dwStyle = LV_VIEW_ICON;
 
 			if(!m_bThumbnailsSetup)
@@ -328,13 +328,13 @@ void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
 
 		default:
 			dwStyle = LV_VIEW_ICON;
-			viewMode = ViewMode::VM_ICONS;
+			viewMode = ViewMode::Icons;
 			break;
 	}
 
 	m_folderSettings.viewMode = viewMode;
 
-	if (viewMode != +ViewMode::VM_DETAILS)
+	if (viewMode != +ViewMode::Details)
 	{
 		m_columnThreadPool.clear_queue();
 		m_columnResults.clear();

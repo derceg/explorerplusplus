@@ -10,35 +10,35 @@ int GetViewModeMenuId(ViewMode viewMode)
 {
 	switch (viewMode)
 	{
-	case ViewMode::VM_THUMBNAILS:
+	case ViewMode::Thumbnails:
 		return IDM_VIEW_THUMBNAILS;
 		break;
 
-	case ViewMode::VM_TILES:
+	case ViewMode::Tiles:
 		return IDM_VIEW_TILES;
 		break;
 
-	case ViewMode::VM_EXTRALARGEICONS:
+	case ViewMode::ExtraLargeIcons:
 		return IDM_VIEW_EXTRALARGEICONS;
 		break;
 
-	case ViewMode::VM_LARGEICONS:
+	case ViewMode::LargeIcons:
 		return IDM_VIEW_LARGEICONS;
 		break;
 
-	case ViewMode::VM_ICONS:
+	case ViewMode::Icons:
 		return IDM_VIEW_ICONS;
 		break;
 
-	case ViewMode::VM_SMALLICONS:
+	case ViewMode::SmallIcons:
 		return IDM_VIEW_SMALLICONS;
 		break;
 
-	case ViewMode::VM_LIST:
+	case ViewMode::List:
 		return IDM_VIEW_LIST;
 		break;
 
-	case ViewMode::VM_DETAILS:
+	case ViewMode::Details:
 		return IDM_VIEW_DETAILS;
 		break;
 	}
@@ -50,35 +50,35 @@ int GetViewModeMenuStringId(ViewMode viewMode)
 {
 	switch (viewMode)
 	{
-	case ViewMode::VM_THUMBNAILS:
+	case ViewMode::Thumbnails:
 		return IDS_VIEW_THUMBNAILS;
 		break;
 
-	case ViewMode::VM_TILES:
+	case ViewMode::Tiles:
 		return IDS_VIEW_TILES;
 		break;
 
-	case ViewMode::VM_EXTRALARGEICONS:
+	case ViewMode::ExtraLargeIcons:
 		return IDS_VIEW_EXTRALARGEICONS;
 		break;
 
-	case ViewMode::VM_LARGEICONS:
+	case ViewMode::LargeIcons:
 		return IDS_VIEW_LARGEICONS;
 		break;
 
-	case ViewMode::VM_ICONS:
+	case ViewMode::Icons:
 		return IDS_VIEW_MEDIUMICONS;
 		break;
 
-	case ViewMode::VM_SMALLICONS:
+	case ViewMode::SmallIcons:
 		return IDS_VIEW_SMALLICONS;
 		break;
 
-	case ViewMode::VM_LIST:
+	case ViewMode::List:
 		return IDS_VIEW_LIST;
 		break;
 
-	case ViewMode::VM_DETAILS:
+	case ViewMode::Details:
 		return IDS_VIEW_DETAILS;
 		break;
 	}

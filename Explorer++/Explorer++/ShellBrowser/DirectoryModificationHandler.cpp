@@ -425,7 +425,7 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 			else
 				ListView_SetItemState(m_hListView,iItem,0,LVIS_CUT);
 
-			if(m_folderSettings.viewMode == +ViewMode::VM_DETAILS)
+			if(m_folderSettings.viewMode == +ViewMode::Details)
 			{
 				std::list<Column_t>::iterator itrColumn;
 

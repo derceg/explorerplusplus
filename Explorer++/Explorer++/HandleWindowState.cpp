@@ -58,7 +58,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_FILE_SETFILEATTRIBUTES,AnyItemsSelected());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_OPENCOMMANDPROMPT,!bVirtualFolder);
 	lEnableMenuItem(hProgramMenu,IDM_FILE_SAVEDIRECTORYLISTING,!bVirtualFolder);
-	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYCOLUMNTEXT,m_nSelected && (viewMode == +ViewMode::VM_DETAILS));
+	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYCOLUMNTEXT,m_nSelected && (viewMode == +ViewMode::Details));
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_RENAME,CanRename());
 	lEnableMenuItem(hProgramMenu,IDM_FILE_DELETE,CanDelete());
@@ -108,9 +108,9 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lEnableMenuItem(hProgramMenu,IDM_GO_FORWARD,m_pActiveShellBrowser->CanBrowseForward());
 	lEnableMenuItem(hProgramMenu,IDM_GO_UPONELEVEL,m_pActiveShellBrowser->CanBrowseUp());
 
-	lEnableMenuItem(hProgramMenu,IDM_VIEW_AUTOSIZECOLUMNS,viewMode == +ViewMode::VM_DETAILS);
+	lEnableMenuItem(hProgramMenu,IDM_VIEW_AUTOSIZECOLUMNS,viewMode == +ViewMode::Details);
 
-	if(viewMode == +ViewMode::VM_DETAILS)
+	if(viewMode == +ViewMode::Details)
 	{
 		/* Disable auto arrange menu item. */
 		lEnableMenuItem(hProgramMenu,IDM_ARRANGEICONSBY_AUTOARRANGE,FALSE);
@@ -118,7 +118,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 
 		lEnableMenuItem(hProgramMenu,IDM_VIEW_GROUPBY,TRUE);
 	}
-	else if(viewMode == +ViewMode::VM_LIST)
+	else if(viewMode == +ViewMode::List)
 	{
 		/* Disable group menu item. */
 		lEnableMenuItem(hProgramMenu,IDM_VIEW_GROUPBY,FALSE);

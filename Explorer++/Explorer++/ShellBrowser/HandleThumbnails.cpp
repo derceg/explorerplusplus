@@ -177,7 +177,7 @@ void CShellBrowser::ProcessThumbnailResult(int thumbnailResultId)
 		return;
 	}
 
-	if (m_folderSettings.viewMode != +ViewMode::VM_THUMBNAILS)
+	if (m_folderSettings.viewMode != +ViewMode::Thumbnails)
 	{
 		return;
 	}

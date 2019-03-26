@@ -195,7 +195,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			/* Insert the item into the list view control. */
 			iItemIndex = ListView_InsertItem(m_hListView,&lv);
 
-			if(itr->bPosition && m_folderSettings.viewMode != +ViewMode::VM_DETAILS)
+			if(itr->bPosition && m_folderSettings.viewMode != +ViewMode::Details)
 			{
 				POINT ptItem;
 
@@ -213,7 +213,7 @@ void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 				ListView_SetItemPosition32(m_hListView,iItemIndex,ptItem.x,ptItem.y);
 			}
 
-			if(m_folderSettings.viewMode == +ViewMode::VM_TILES)
+			if(m_folderSettings.viewMode == +ViewMode::Tiles)
 			{
 				SetTileViewItemInfo(iItemIndex,itr->iItemInternal);
 			}

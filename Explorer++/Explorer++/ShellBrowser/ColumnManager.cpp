@@ -72,7 +72,7 @@ void CShellBrowser::ProcessColumnResult(int columnResultId)
 		return;
 	}
 
-	if (m_folderSettings.viewMode != +ViewMode::VM_DETAILS)
+	if (m_folderSettings.viewMode != +ViewMode::Details)
 	{
 		return;
 	}
@@ -1132,7 +1132,7 @@ void CShellBrowser::SaveColumnWidths(void)
 	/* Only save column widths if the listview is currently in
 	details view. If it's not currently in details view, then
 	column widths have already been saved when the view changed. */
-	if(m_folderSettings.viewMode == +ViewMode::VM_DETAILS)
+	if(m_folderSettings.viewMode == +ViewMode::Details)
 	{
 		for(itr = pActiveColumnList->begin();itr != pActiveColumnList->end();itr++)
 		{
