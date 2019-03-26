@@ -13,6 +13,7 @@ const char Plugins::TabConstants::LOCKED[] = "locked";
 const char Plugins::TabConstants::ADDRESS_LOCKED[] = "addressLocked";
 const char Plugins::TabConstants::FOLDER_SETTINGS[] = "folderSettings";
 
+const char Plugins::FolderSettingsConstants::SORT_MODE[] = "sortMode";
 const char Plugins::FolderSettingsConstants::VIEW_MODE[] = "viewMode";
 const char Plugins::FolderSettingsConstants::SORT_ASCENDING[] = "sortAscending";
 const char Plugins::FolderSettingsConstants::SHOW_IN_GROUPS[] = "showInGroups";

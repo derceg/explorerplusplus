@@ -6,6 +6,8 @@
 #include "APIBinding.h"
 #include "CommandInvoked.h"
 #include "MenuApi.h"
+#include "ShellBrowser/SortModes.h"
+#include "ShellBrowser/ViewModes.h"
 #include "TabsAPI.h"
 #include "TabCreated.h"
 #include "TabMoved.h"
@@ -73,6 +75,7 @@ void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInte
 		"__tostring", &Plugins::TabsApi::Tab::toString);
 
 	AddEnum<ViewMode>(state, tabsMetaTable, "ViewMode");
+	AddEnum<SortMode>(state, tabsMetaTable, "SortMode");
 }
 
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager)

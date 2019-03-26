@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "TabsAPI.h"
 #include "ShellBrowser/FolderSettings.h"
+#include "ShellBrowser/SortModes.h"
 #include "TabProperties.h"
 #include <boost/scope_exit.hpp>
 
@@ -147,6 +148,13 @@ void Plugins::TabsApi::extractTabPropertiesForCreation(sol::table createProperti
 
 void Plugins::TabsApi::extractFolderSettingsForCreation(sol::table folderSettingsTable, ::FolderSettings &folderSettings)
 {
+	boost::optional<int> sortMode = folderSettingsTable[FolderSettingsConstants::SORT_MODE];
+
+	if (sortMode && SortMode::_is_valid(*sortMode))
+	{
+		folderSettings.sortMode = SortMode::_from_integral(*sortMode);
+	}
+	
 	boost::optional<int> viewMode = folderSettingsTable[FolderSettingsConstants::VIEW_MODE];
 
 	if (viewMode && ViewMode::_is_valid(*viewMode))

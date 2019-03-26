@@ -19,6 +19,7 @@ namespace Plugins
 
 	namespace FolderSettingsConstants
 	{
+		extern const char SORT_MODE[];
 		extern const char VIEW_MODE[];
 		extern const char SORT_ASCENDING[];
 		extern const char SHOW_IN_GROUPS[];
