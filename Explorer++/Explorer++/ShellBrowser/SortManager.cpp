@@ -30,7 +30,7 @@ void CShellBrowser::SortFolder(SortMode sortMode)
 		ListView_RemoveAllGroups(m_hListView);
 		ListView_EnableGroupView(m_hListView,TRUE);
 
-		SetGrouping(TRUE);
+		SetShowInGroups(TRUE);
 	}
 
 	SendMessage(m_hListView,LVM_SORTITEMS,reinterpret_cast<WPARAM>(this),reinterpret_cast<LPARAM>(SortStub));

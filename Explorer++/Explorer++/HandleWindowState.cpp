@@ -50,7 +50,7 @@ void Explorerplusplus::UpdateWindowStates(void)
 */
 void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 {
-	ViewMode viewMode = m_pActiveShellBrowser->GetCurrentViewMode();
+	ViewMode viewMode = m_pActiveShellBrowser->GetViewMode();
 	BOOL bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
 	lEnableMenuItem(hProgramMenu,IDM_FILE_COPYITEMPATH,AnyItemsSelected());
@@ -96,7 +96,7 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	lCheckMenuItem(hProgramMenu,IDM_FILTER_APPLYFILTER,m_pActiveShellBrowser->GetFilterStatus());
 
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_NEWFOLDER,CanCreate());
-	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_SPLITFILE,(m_pActiveShellBrowser->QueryNumSelectedFiles() == 1) && !bVirtualFolder);
+	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_SPLITFILE,(m_pActiveShellBrowser->GetNumSelectedFiles() == 1) && !bVirtualFolder);
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_MERGEFILES,m_nSelected > 1);
 	lEnableMenuItem(hProgramMenu,IDM_ACTIONS_DESTROYFILES,m_nSelected);
 
@@ -160,7 +160,7 @@ void Explorerplusplus::SetArrangeMenuItemStates()
 
 	SortMode = m_pActiveShellBrowser->GetSortMode();
 
-	bShowInGroups = m_pActiveShellBrowser->IsGroupViewEnabled();
+	bShowInGroups = m_pActiveShellBrowser->GetShowInGroups();
 
 	/* Go through both the sort by and group by menus and
 	remove all the checkmarks. Alternatively, could remember

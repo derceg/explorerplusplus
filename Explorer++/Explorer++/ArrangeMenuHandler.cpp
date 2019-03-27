@@ -995,7 +995,7 @@ void Explorerplusplus::UpdateArrangeMenuItems(void)
 
 	DeletePreviousArrangeMenuItems();
 
-	SortModes = m_pActiveShellBrowser->QueryCurrentSortModes();
+	SortModes = m_pActiveShellBrowser->GetAvailableSortModes();
 
 	m_ArrangeList.clear();
 

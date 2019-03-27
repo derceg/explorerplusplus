@@ -611,7 +611,7 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 		m_CurrentDirectory);
 	SetCurrentDirectory(m_CurrentDirectory);
 
-	m_nSelected = m_pActiveShellBrowser->QueryNumSelected();
+	m_nSelected = m_pActiveShellBrowser->GetNumSelected();
 
 	SetActiveArrangeMenuItems();
 	UpdateArrangeMenuItems();

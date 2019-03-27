@@ -775,27 +775,27 @@ void CShellBrowser::RemoveFilteredItem(int iItem,int iItemInternal)
 	m_FilteredItemsList.push_back(iItemInternal);
 }
 
-int CShellBrowser::QueryNumItems(void) const
+int CShellBrowser::GetNumItems(void) const
 {
 	return m_nTotalItems;
 }
 
-int CShellBrowser::QueryNumSelectedFiles(void) const
+int CShellBrowser::GetNumSelectedFiles(void) const
 {
 	return m_NumFilesSelected;
 }
 
-int CShellBrowser::QueryNumSelectedFolders(void) const
+int CShellBrowser::GetNumSelectedFolders(void) const
 {
 	return m_NumFoldersSelected;
 }
 
-int CShellBrowser::QueryNumSelected(void) const
+int CShellBrowser::GetNumSelected(void) const
 {
 	return m_NumFilesSelected + m_NumFoldersSelected;
 }
 
-void CShellBrowser::QueryFolderInfo(FolderInfo_t *pFolderInfo)
+void CShellBrowser::GetFolderInfo(FolderInfo_t *pFolderInfo)
 {
 	pFolderInfo->TotalFolderSize.QuadPart		= m_ulTotalDirSize.QuadPart;
 	pFolderInfo->TotalSelectionSize.QuadPart	= m_ulFileSelectionSize.QuadPart;
@@ -1084,7 +1084,7 @@ BOOL CShellBrowser::QueryDragging(void) const
 	return m_bPerformingDrag;
 }
 
-std::list<int> CShellBrowser::QueryCurrentSortModes() const
+std::list<int> CShellBrowser::GetAvailableSortModes() const
 {
 	std::list<int> sortModes;
 

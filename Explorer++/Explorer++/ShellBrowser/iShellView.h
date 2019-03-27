@@ -113,13 +113,12 @@ public:
 	LPITEMIDLIST		QueryCurrentDirectoryIdl(void) const;
 	UINT				QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const;
 	BOOL				GetAutoArrange(void) const;
-	BOOL				ToggleAutoArrange(void);
-	ViewMode			GetCurrentViewMode() const;
-	void				SetCurrentViewMode(ViewMode viewMode);
+	void				SetAutoArrange(BOOL autoArrange);
+	ViewMode			GetViewMode() const;
+	void				SetViewMode(ViewMode viewMode);
 	SortMode			GetSortMode() const;
 	void				SetSortMode(SortMode sortMode);
 	void				SortFolder(SortMode sortMode);
-	BOOL				IsGroupViewEnabled(void) const;
 	BOOL				GetSortAscending(void) const;
 	BOOL				SetSortAscending(BOOL bAscending);
 	BOOL				ToggleSortAscending(void);
@@ -133,10 +132,10 @@ public:
 	LPITEMIDLIST		RetrieveHistoryItemWithoutUpdate(int iItem);
 	LPITEMIDLIST		RetrieveHistoryItem(int iItem);
 	BOOL				CanBrowseUp(void) const;
-	int					QueryNumItems(void) const;
-	int					QueryNumSelectedFiles(void) const;
-	int					QueryNumSelectedFolders(void) const;
-	int					QueryNumSelected(void) const;
+	int					GetNumItems(void) const;
+	int					GetNumSelectedFiles(void) const;
+	int					GetNumSelectedFolders(void) const;
+	int					GetNumSelected(void) const;
 
 	/* ID. */
 	int					GetId(void) const;
@@ -175,22 +174,22 @@ public:
 	void				UpdateFileSelectionInfo(int,BOOL);
 	HRESULT				CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,IN POINT *pt,IN BOOL bBackOrForward);
 	int					SelectFiles(const TCHAR *FileNamePattern);
-	void				QueryFolderInfo(FolderInfo_t *pFolderInfo);
+	void				GetFolderInfo(FolderInfo_t *pFolderInfo);
 	int					LocateFileItemIndex(const TCHAR *szFileName) const;
 	BOOL				DeghostItem(int iItem);
 	BOOL				GhostItem(int iItem);
 	BOOL				InVirtualFolder(void) const;
 	BOOL				CanCreate(void) const;
 
-	void				ToggleGrouping(void);
-	void				SetGrouping(BOOL bShowInGroups);
-	void				SetGroupingFlag(BOOL bShowInGroups);
+	BOOL				GetShowInGroups(void) const;
+	void				SetShowInGroups(BOOL bShowInGroups);
+	void				SetShowInGroupsFlag(BOOL bShowInGroups);
 
 	void				SetInsertSorted(BOOL bInsertSorted);
 
 	int CALLBACK		SortTemporary(LPARAM lParam1,LPARAM lParam2);
 
-	std::list<int>		QueryCurrentSortModes() const;
+	std::list<int>		GetAvailableSortModes() const;
 	size_t				QueryNumActiveColumns(void) const;
 	void				SetResourceModule(HINSTANCE hResourceModule);
 	void				ImportAllColumns(const ColumnExport_t *pce);
@@ -314,7 +313,7 @@ private:
 	HRESULT inline		AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
 	int inline			SetItemInformation(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName);
 	void				ResetFolderMemoryAllocations(void);
-	void				SetCurrentViewModeInternal(ViewMode viewMode);
+	void				SetViewModeInternal(ViewMode viewMode);
 	void				ApplyFolderEmptyBackgroundImage(bool apply);
 	void				ApplyFilteringBackgroundImage(bool apply);
 

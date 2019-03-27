@@ -107,7 +107,7 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	m_ulFileSelectionSize.QuadPart = 0;
 
 	SetActiveColumnSet();
-	SetCurrentViewModeInternal(m_folderSettings.viewMode);
+	SetViewModeInternal(m_folderSettings.viewMode);
 
 	InsertAwaitingItems(FALSE);
 

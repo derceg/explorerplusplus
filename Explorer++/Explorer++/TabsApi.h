@@ -29,9 +29,9 @@ namespace Plugins
 			FolderSettings(const CShellBrowser &shellBrowser)
 			{
 				sortMode = shellBrowser.GetSortMode();
-				viewMode = shellBrowser.GetCurrentViewMode();
+				viewMode = shellBrowser.GetViewMode();
 				sortAscending = shellBrowser.GetSortAscending();
-				showInGroups = shellBrowser.IsGroupViewEnabled();
+				showInGroups = shellBrowser.GetShowInGroups();
 				showHidden = shellBrowser.GetShowHidden();
 				autoArrange = shellBrowser.GetAutoArrange();
 			}

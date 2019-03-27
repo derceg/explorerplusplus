@@ -15,7 +15,7 @@ void Explorerplusplus::UpdateDisplayWindow(void)
 
 	DisplayWindow_ClearTextBuffer(m_hDisplayWindow);
 
-	nSelected = m_pActiveShellBrowser->QueryNumSelected();
+	nSelected = m_pActiveShellBrowser->GetNumSelected();
 
 	if (nSelected == 0)
 		UpdateDisplayWindowForZeroFiles();
@@ -358,7 +358,7 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(void)
 
 	DisplayWindow_SetThumbnailFile(m_hDisplayWindow, EMPTY_STRING, FALSE);
 
-	nSelected = m_pActiveShellBrowser->QueryNumSelected();
+	nSelected = m_pActiveShellBrowser->GetNumSelected();
 
 	LoadString(m_hLanguageModule, IDS_GENERAL_SELECTED_MOREITEMS,
 		szMore, SIZEOF_ARRAY(szMore));
@@ -370,7 +370,7 @@ void Explorerplusplus::UpdateDisplayWindowForMultipleFiles(void)
 
 	if (!m_pActiveShellBrowser->InVirtualFolder())
 	{
-		m_pActiveShellBrowser->QueryFolderInfo(&FolderInfo);
+		m_pActiveShellBrowser->GetFolderInfo(&FolderInfo);
 
 		FormatSizeString(FolderInfo.TotalSelectionSize, szTotalSizeFragment,
 			SIZEOF_ARRAY(szTotalSizeFragment), m_config->globalFolderSettings.forceSize,

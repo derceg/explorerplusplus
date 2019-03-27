@@ -888,7 +888,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetShowHidden()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ShowInGroups"),
-			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->IsGroupViewEnabled()));
+			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetShowInGroups()));
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortAscending"),
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetSortAscending()));
@@ -896,7 +896,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 		SortMode = tab.GetShellBrowser()->GetSortMode();
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("SortMode"),NXMLSettings::EncodeIntValue(SortMode));
 
-		ViewMode = tab.GetShellBrowser()->GetCurrentViewMode();
+		ViewMode = tab.GetShellBrowser()->GetViewMode();
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ViewMode"),NXMLSettings::EncodeIntValue(ViewMode));
 
 		bstr = SysAllocString(L"Columns");

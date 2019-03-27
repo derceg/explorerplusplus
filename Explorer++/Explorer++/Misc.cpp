@@ -315,9 +315,9 @@ HRESULT Explorerplusplus::UpdateStatusBarText(void)
 	TCHAR			*szNumSelected = NULL;
 	int				res;
 
-	nTotal				= m_pActiveShellBrowser->QueryNumItems();
-	nFilesSelected		= m_pActiveShellBrowser->QueryNumSelectedFiles();
-	nFoldersSelected	= m_pActiveShellBrowser->QueryNumSelectedFolders();
+	nTotal				= m_pActiveShellBrowser->GetNumItems();
+	nFilesSelected		= m_pActiveShellBrowser->GetNumSelectedFiles();
+	nFoldersSelected	= m_pActiveShellBrowser->GetNumSelectedFolders();
 
 	if((nFilesSelected + nFoldersSelected) != 0)
 	{
@@ -377,7 +377,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(void)
 	}
 	else
 	{
-		m_pActiveShellBrowser->QueryFolderInfo(&FolderInfo);
+		m_pActiveShellBrowser->GetFolderInfo(&FolderInfo);
 
 		if((nFilesSelected + nFoldersSelected) == 0)
 		{

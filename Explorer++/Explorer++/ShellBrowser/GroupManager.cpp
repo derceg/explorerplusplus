@@ -35,32 +35,21 @@ namespace
 
 #define GROUP_OTHER				27
 
+BOOL CShellBrowser::GetShowInGroups(void) const
+{
+	return m_folderSettings.showInGroups;
+}
+
 /* Simply sets the grouping flag, without actually moving
 items into groups. */
-void CShellBrowser::SetGroupingFlag(BOOL bShowInGroups)
+void CShellBrowser::SetShowInGroupsFlag(BOOL bShowInGroups)
 {
 	m_folderSettings.showInGroups = bShowInGroups;
 }
 
-void CShellBrowser::SetGrouping(BOOL bShowInGroups)
+void CShellBrowser::SetShowInGroups(BOOL bShowInGroups)
 {
 	m_folderSettings.showInGroups = bShowInGroups;
-
-	if(!m_folderSettings.showInGroups)
-	{
-		ListView_EnableGroupView(m_hListView,FALSE);
-		SortFolder(m_folderSettings.sortMode);
-		return;
-	}
-	else
-	{
-		MoveItemsIntoGroups();
-	}
-}
-
-void CShellBrowser::ToggleGrouping(void)
-{
-	m_folderSettings.showInGroups = !m_folderSettings.showInGroups;
 
 	if(!m_folderSettings.showInGroups)
 	{

@@ -64,7 +64,7 @@ void CDropFilesCallback::OnDropFile(const std::list<std::wstring> &PastedFileLis
 {
 	UNREFERENCED_PARAMETER(ppt);
 
-	if(m_pexpp->GetActiveShellBrowser()->QueryNumSelected() == 0)
+	if(m_pexpp->GetActiveShellBrowser()->GetNumSelected() == 0)
 	{
 		m_pexpp->GetActiveShellBrowser()->SelectItems(PastedFileList);
 	}

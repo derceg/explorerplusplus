@@ -194,16 +194,14 @@ BOOL CShellBrowser::GetAutoArrange(void) const
 	return m_folderSettings.autoArrange;
 }
 
-BOOL CShellBrowser::ToggleAutoArrange(void)
+void CShellBrowser::SetAutoArrange(BOOL autoArrange)
 {
-	m_folderSettings.autoArrange = !m_folderSettings.autoArrange;
+	m_folderSettings.autoArrange = autoArrange;
 
 	NListView::ListView_SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
-
-	return m_folderSettings.autoArrange;
 }
 
-ViewMode CShellBrowser::GetCurrentViewMode() const
+ViewMode CShellBrowser::GetViewMode() const
 {
 	return m_folderSettings.viewMode;
 }
@@ -213,7 +211,7 @@ ViewMode CShellBrowser::GetCurrentViewMode() const
 not called when a tab is first set up (in which case
 the view mode still needs to be setup), or when entering
 a folder. */
-void CShellBrowser::SetCurrentViewMode(ViewMode viewMode)
+void CShellBrowser::SetViewMode(ViewMode viewMode)
 {
 	if(viewMode == m_folderSettings.viewMode)
 	{
@@ -223,7 +221,7 @@ void CShellBrowser::SetCurrentViewMode(ViewMode viewMode)
 	if(m_folderSettings.viewMode == +ViewMode::Thumbnails && viewMode != +ViewMode::Thumbnails)
 		RemoveThumbnailsView();
 
-	SetCurrentViewModeInternal(viewMode);
+	SetViewModeInternal(viewMode);
 
 	switch(viewMode)
 	{
@@ -238,7 +236,7 @@ This function also initializes any items needed to support
 the current view mode. This MUST be done within this
 function, as when a tab is first opened, the view settings
 will need to be initialized. */
-void CShellBrowser::SetCurrentViewModeInternal(ViewMode viewMode)
+void CShellBrowser::SetViewModeInternal(ViewMode viewMode)
 {
 	DWORD dwStyle;
 
@@ -351,11 +349,6 @@ SortMode CShellBrowser::GetSortMode() const
 void CShellBrowser::SetSortMode(SortMode sortMode)
 {
 	m_folderSettings.sortMode = sortMode;
-}
-
-BOOL CShellBrowser::IsGroupViewEnabled(void) const
-{
-	return m_folderSettings.showInGroups;
 }
 
 HRESULT CShellBrowser::InitializeDragDropHelpers(void)

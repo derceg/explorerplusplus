@@ -745,7 +745,7 @@ void Explorerplusplus::OnToolbarViews(void)
 
 void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 {
-	ViewMode viewMode = m_pActiveShellBrowser->GetCurrentViewMode();
+	ViewMode viewMode = m_pActiveShellBrowser->GetViewMode();
 
 	std::list<ViewMode>::iterator itr;
 
@@ -778,7 +778,7 @@ void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 		}
 	}
 
-	m_pActiveShellBrowser->SetCurrentViewMode(*itr);
+	m_pActiveShellBrowser->SetViewMode(*itr);
 }
 
 void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)
@@ -1173,7 +1173,7 @@ void Explorerplusplus::OnIdaRClick(void)
 
 				ClientToScreen(m_hActiveListView,&ptItem);
 
-				uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
+				uViewMode = m_pActiveShellBrowser->GetViewMode();
 
 				if(uViewMode == ViewMode::SmallIcons || uViewMode == ViewMode::List ||
 					uViewMode == ViewMode::Details)
@@ -1449,14 +1449,14 @@ void Explorerplusplus::OnSortBy(SortMode sortMode)
 {
 	SortMode currentSortMode = m_pActiveShellBrowser->GetSortMode();
 
-	if(!m_pActiveShellBrowser->IsGroupViewEnabled() &&
+	if(!m_pActiveShellBrowser->GetShowInGroups() &&
 		sortMode == currentSortMode)
 	{
 		m_pActiveShellBrowser->ToggleSortAscending();
 	}
-	else if(m_pActiveShellBrowser->IsGroupViewEnabled())
+	else if(m_pActiveShellBrowser->GetShowInGroups())
 	{
-		m_pActiveShellBrowser->SetGrouping(FALSE);
+		m_pActiveShellBrowser->SetShowInGroups(FALSE);
 	}
 
 	m_pActiveShellBrowser->SortFolder(sortMode);
@@ -1469,14 +1469,14 @@ void Explorerplusplus::OnGroupBy(SortMode sortMode)
 	/* If group view is already enabled, and the current sort
 	mode matches the supplied sort mode, toggle the ascending/
 	descending flag. */
-	if(m_pActiveShellBrowser->IsGroupViewEnabled() &&
+	if(m_pActiveShellBrowser->GetShowInGroups() &&
 		sortMode == currentSortMode)
 	{
 		m_pActiveShellBrowser->ToggleSortAscending();
 	}
-	else if(!m_pActiveShellBrowser->IsGroupViewEnabled())
+	else if(!m_pActiveShellBrowser->GetShowInGroups())
 	{
-		m_pActiveShellBrowser->SetGroupingFlag(TRUE);
+		m_pActiveShellBrowser->SetShowInGroupsFlag(TRUE);
 	}
 
 	m_pActiveShellBrowser->SortFolder(sortMode);
@@ -1515,7 +1515,7 @@ void Explorerplusplus::SaveDirectorySpecificSettings(int iTab)
 	DirectorySettings_t ds;
 	ds.pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
 	ds.dsi.sortMode = tab.GetShellBrowser()->GetSortMode();
-	ds.dsi.viewMode = tab.GetShellBrowser()->GetCurrentViewMode();
+	ds.dsi.viewMode = tab.GetShellBrowser()->GetViewMode();
 
 	ColumnExport_t ce;
 
@@ -1545,7 +1545,7 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 				Tab &tab = GetTabByIndex(iTab);
 
 				tab.GetShellBrowser()->SetSortMode(ds.dsi.sortMode);
-				tab.GetShellBrowser()->SetCurrentViewMode(ds.dsi.viewMode);
+				tab.GetShellBrowser()->SetViewMode(ds.dsi.viewMode);
 
 				ColumnExport_t ce;
 

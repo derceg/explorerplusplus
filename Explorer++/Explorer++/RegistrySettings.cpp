@@ -460,7 +460,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 					(LPBYTE)pidlDirectory,ILGetSize(pidlDirectory));
 				CoTaskMemFree((LPVOID)pidlDirectory);
 
-				ViewMode = tab.GetShellBrowser()->GetCurrentViewMode();
+				ViewMode = tab.GetShellBrowser()->GetViewMode();
 
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ViewMode"),ViewMode);
 
@@ -468,7 +468,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortMode"),SortMode);
 
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("SortAscending"), tab.GetShellBrowser()->GetSortAscending());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"), tab.GetShellBrowser()->IsGroupViewEnabled());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowInGroups"), tab.GetShellBrowser()->GetShowInGroups());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ApplyFilter"), tab.GetShellBrowser()->GetFilterStatus());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("FilterCaseSensitive"), tab.GetShellBrowser()->GetFilterCaseSensitive());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"), tab.GetShellBrowser()->GetShowHidden());

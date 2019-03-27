@@ -536,35 +536,35 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_VIEW_EXTRALARGEICONS:
-			m_pActiveShellBrowser->SetCurrentViewMode(ViewMode::ExtraLargeIcons);
+			m_pActiveShellBrowser->SetViewMode(ViewMode::ExtraLargeIcons);
 			break;
 
 		case IDM_VIEW_LARGEICONS:
-			m_pActiveShellBrowser->SetCurrentViewMode(ViewMode::LargeIcons);
+			m_pActiveShellBrowser->SetViewMode(ViewMode::LargeIcons);
 			break;
 
 		case IDM_VIEW_ICONS:
-			m_pActiveShellBrowser->SetCurrentViewMode(ViewMode::Icons);
+			m_pActiveShellBrowser->SetViewMode(ViewMode::Icons);
 			break;
 
 		case IDM_VIEW_SMALLICONS:
-			m_pActiveShellBrowser->SetCurrentViewMode(ViewMode::SmallIcons);
+			m_pActiveShellBrowser->SetViewMode(ViewMode::SmallIcons);
 			break;
 
 		case IDM_VIEW_LIST:
-			m_pActiveShellBrowser->SetCurrentViewMode(ViewMode::List);
+			m_pActiveShellBrowser->SetViewMode(ViewMode::List);
 			break;
 
 		case IDM_VIEW_DETAILS:
-			m_pActiveShellBrowser->SetCurrentViewMode(ViewMode::Details);
+			m_pActiveShellBrowser->SetViewMode(ViewMode::Details);
 			break;
 
 		case IDM_VIEW_THUMBNAILS:
-			m_pActiveShellBrowser->SetCurrentViewMode(ViewMode::Thumbnails);
+			m_pActiveShellBrowser->SetViewMode(ViewMode::Thumbnails);
 			break;
 
 		case IDM_VIEW_TILES:
-			m_pActiveShellBrowser->SetCurrentViewMode(ViewMode::Tiles);
+			m_pActiveShellBrowser->SetViewMode(ViewMode::Tiles);
 			break;
 
 		case IDM_VIEW_CHANGEDISPLAYCOLOURS:
@@ -1084,11 +1084,11 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 			
 		case IDM_ARRANGEICONSBY_AUTOARRANGE:
-			m_pActiveShellBrowser->ToggleAutoArrange();
+			m_pActiveShellBrowser->SetAutoArrange(!m_pActiveShellBrowser->GetAutoArrange());
 			break;
 
 		case IDM_ARRANGEICONSBY_SHOWINGROUPS:
-			m_pActiveShellBrowser->ToggleGrouping();
+			m_pActiveShellBrowser->SetShowInGroups(!m_pActiveShellBrowser->GetShowInGroups());
 			break;
 
 		case IDM_VIEW_SHOWHIDDENFILES:
@@ -1474,7 +1474,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 		case LVN_ITEMCHANGING:
 			{
-				UINT uViewMode = m_pActiveShellBrowser->GetCurrentViewMode();
+				UINT uViewMode = m_pActiveShellBrowser->GetViewMode();
 
 				if(uViewMode == ViewMode::List)
 				{

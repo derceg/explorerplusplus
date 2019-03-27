@@ -742,7 +742,7 @@ void MainToolbar::ShowToolbarViewsDropdown()
 
 void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 {
-	ViewMode viewMode = m_pexpp->GetActiveShellBrowser()->GetCurrentViewMode();
+	ViewMode viewMode = m_pexpp->GetActiveShellBrowser()->GetViewMode();
 
 	HMENU viewsMenu = m_pexpp->BuildViewsMenu();
 
