@@ -121,10 +121,8 @@ public:
 	void				SortFolder(SortMode sortMode);
 	BOOL				GetSortAscending(void) const;
 	BOOL				SetSortAscending(BOOL bAscending);
-	BOOL				ToggleSortAscending(void);
 	BOOL				GetShowHidden(void) const;
 	BOOL				SetShowHidden(BOOL bShowHidden);
-	BOOL				ToggleShowHidden(void);
 	BOOL				CanBrowseBack(void) const;
 	BOOL				CanBrowseForward(void) const;
 	std::list<LPITEMIDLIST>	GetBackHistory() const;

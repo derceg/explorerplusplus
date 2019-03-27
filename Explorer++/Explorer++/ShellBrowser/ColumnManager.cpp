@@ -977,7 +977,7 @@ void CShellBrowser::ColumnClicked(int iClickedColumn)
 	inserted/deleted. */
 	if(m_iPreviousSortedColumnId == iColumnId)
 	{
-		ToggleSortAscending();
+		m_folderSettings.sortAscending = !m_folderSettings.sortAscending;
 	}
 
 	SortFolder(sortMode);

@@ -1452,7 +1452,7 @@ void Explorerplusplus::OnSortBy(SortMode sortMode)
 	if(!m_pActiveShellBrowser->GetShowInGroups() &&
 		sortMode == currentSortMode)
 	{
-		m_pActiveShellBrowser->ToggleSortAscending();
+		m_pActiveShellBrowser->SetSortAscending(!m_pActiveShellBrowser->GetSortAscending());
 	}
 	else if(m_pActiveShellBrowser->GetShowInGroups())
 	{
@@ -1472,7 +1472,7 @@ void Explorerplusplus::OnGroupBy(SortMode sortMode)
 	if(m_pActiveShellBrowser->GetShowInGroups() &&
 		sortMode == currentSortMode)
 	{
-		m_pActiveShellBrowser->ToggleSortAscending();
+		m_pActiveShellBrowser->SetSortAscending(!m_pActiveShellBrowser->GetSortAscending());
 	}
 	else if(!m_pActiveShellBrowser->GetShowInGroups())
 	{
@@ -1580,7 +1580,7 @@ HWND Explorerplusplus::GetTreeView() const
 
 void Explorerplusplus::OnShowHiddenFiles(void)
 {
-	m_pActiveShellBrowser->ToggleShowHidden();
+	m_pActiveShellBrowser->SetShowHidden(!m_pActiveShellBrowser->GetShowHidden());
 
 	Tab &tab = GetSelectedTab();
 	RefreshTab(tab);

@@ -1015,13 +1015,6 @@ BOOL CShellBrowser::SetSortAscending(BOOL bAscending)
 	return m_folderSettings.sortAscending;
 }
 
-BOOL CShellBrowser::ToggleSortAscending(void)
-{
-	m_folderSettings.sortAscending = !m_folderSettings.sortAscending;
-
-	return m_folderSettings.sortAscending;
-}
-
 BOOL CShellBrowser::GetShowHidden(void) const
 {
 	return m_folderSettings.showHidden;
@@ -1030,13 +1023,6 @@ BOOL CShellBrowser::GetShowHidden(void) const
 BOOL CShellBrowser::SetShowHidden(BOOL bShowHidden)
 {
 	m_folderSettings.showHidden = bShowHidden;
-
-	return m_folderSettings.showHidden;
-}
-
-BOOL CShellBrowser::ToggleShowHidden(void)
-{
-	m_folderSettings.showHidden = !m_folderSettings.showHidden;
 
 	return m_folderSettings.showHidden;
 }
