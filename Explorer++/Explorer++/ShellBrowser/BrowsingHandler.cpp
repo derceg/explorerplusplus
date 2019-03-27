@@ -93,6 +93,9 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 		ResetFolderMemoryAllocations();
 	}
 
+	m_iFolderIcon = GetDefaultFolderIconIndex();
+	m_iFileIcon = GetDefaultFileIconIndex();
+
 	m_nTotalItems = 0;
 
 	BrowseVirtualFolder(pidl);
