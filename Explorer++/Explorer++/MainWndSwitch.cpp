@@ -1087,10 +1087,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			m_pActiveShellBrowser->SetAutoArrange(!m_pActiveShellBrowser->GetAutoArrange());
 			break;
 
-		case IDM_ARRANGEICONSBY_SHOWINGROUPS:
-			m_pActiveShellBrowser->SetShowInGroups(!m_pActiveShellBrowser->GetShowInGroups());
-			break;
-
 		case IDM_VIEW_SHOWHIDDENFILES:
 			OnShowHiddenFiles();
 			break;
