@@ -83,6 +83,7 @@ void TaskbarThumbnails::Initialize()
 	SetWindowSubclass(m_expp->GetMainWindow(),MainWndProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
 	m_tabContainer->AddTabCreatedObserver(boost::bind(&TaskbarThumbnails::CreateTabProxy, this, _1, _2));
+	m_tabContainer->AddTabSelectedObserver(boost::bind(&TaskbarThumbnails::OnTabSelectionChanged, this, _1));
 	m_tabContainer->AddTabRemovedObserver(boost::bind(&TaskbarThumbnails::RemoveTabProxy, this, _1));
 }
 
@@ -724,7 +725,7 @@ void TaskbarThumbnails::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptp
 	ReleaseDC(hTab,hdcTab);
 }
 
-void TaskbarThumbnails::UpdateTaskbarThumbnailsForTabSelectionChange(int selectedTabId)
+void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 {
 	if (!m_bTaskbarInitialised)
 	{
@@ -733,9 +734,8 @@ void TaskbarThumbnails::UpdateTaskbarThumbnailsForTabSelectionChange(int selecte
 
 	for (const TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
 	{
-		if (tabProxyInfo.iTabId == selectedTabId)
+		if (tabProxyInfo.iTabId == tab.GetId())
 		{
-			const Tab &tab = m_tabContainer->GetTab(selectedTabId);
 			int index = m_tabContainer->GetTabIndex(tab);
 
 			int nTabs = m_tabContainer->GetNumTabs();

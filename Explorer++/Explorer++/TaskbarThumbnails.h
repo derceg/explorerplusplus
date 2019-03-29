@@ -19,7 +19,6 @@ public:
 
 	void SetTabProxyIcon(const Tab &tab);
 	void InvalidateTaskbarThumbnailBitmap(int iTabId);
-	void UpdateTaskbarThumbnailsForTabSelectionChange(int selectedTabId);
 	void UpdateTaskbarThumbnailTtitle(const Tab &tab);
 
 private:
@@ -57,6 +56,7 @@ private:
 	void RemoveTabProxy(int iTabId);
 	HBITMAP CaptureTabScreenshot(int iTabId);
 	void GetTabLivePreviewBitmap(int iTabId, TabPreviewInfo_t *ptpi);
+	void OnTabSelectionChanged(const Tab &tab);
 
 	IExplorerplusplus *m_expp;
 	TabContainerInterface *m_tabContainer;

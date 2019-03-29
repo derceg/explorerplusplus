@@ -466,6 +466,11 @@ boost::signals2::connection Explorerplusplus::AddTabCreatedObserver(const TabCre
 	return m_tabCreatedSignal.connect(observer);
 }
 
+boost::signals2::connection Explorerplusplus::AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer)
+{
+	return m_tabSelectedSignal.connect(observer);
+}
+
 boost::signals2::connection Explorerplusplus::AddTabMovedObserver(const TabMovedSignal::slot_type &observer)
 {
 	return m_tabMovedSignal.connect(observer);
@@ -638,9 +643,7 @@ void Explorerplusplus::OnTabSelectionChanged()
 	ShowWindow(m_hActiveListView,SW_SHOW);
 	SetFocus(m_hActiveListView);
 
-	/* Inform the taskbar that this tab has become active. */
-	m_taskbarThumbnails->UpdateTaskbarThumbnailsForTabSelectionChange(m_selectedTabId);
-
+	m_tabSelectedSignal(tab);
 
 	m_iPreviousTabSelectionId = m_selectedTabId;
 }

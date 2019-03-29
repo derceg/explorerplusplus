@@ -10,6 +10,7 @@
 #include <unordered_map>
 
 typedef boost::signals2::signal<void(int tabId, BOOL switchToNewTab)> TabCreatedSignal;
+typedef boost::signals2::signal<void(const Tab &tab)> TabSelectedSignal;
 typedef boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)> TabMovedSignal;
 typedef boost::signals2::signal<void(const Tab &tab, Tab::PropertyType propertyType)> TabUpdatedSignal;
 typedef boost::signals2::signal<void(int tabId)> TabRemovedSignal;
@@ -45,6 +46,7 @@ __interface TabContainerInterface
 	HRESULT			BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags);
 
 	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
+	boost::signals2::connection	AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabMovedObserver(const TabMovedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);

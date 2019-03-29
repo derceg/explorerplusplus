@@ -470,6 +470,7 @@ private:
 
 	/* Tab events. */
 	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
+	boost::signals2::connection	AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer);
 	boost::signals2::connection AddTabMovedObserver(const TabMovedSignal::slot_type &observer);
 	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
@@ -762,6 +763,7 @@ private:
 
 	/* Tab signals. */
 	TabCreatedSignal		m_tabCreatedSignal;
+	TabSelectedSignal		m_tabSelectedSignal;
 	TabMovedSignal			m_tabMovedSignal;
 	TabUpdatedSignal		m_tabUpdatedSignal;
 	TabRemovedSignal		m_tabRemovedSignal;
