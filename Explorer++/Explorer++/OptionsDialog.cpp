@@ -956,13 +956,10 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 				{
 					EnableWindow(GetDlgItem(hDlg,IDC_TABS_TASKBARTHUMBNAILS),FALSE);
 
-					if(m_bShowTaskbarThumbnailsProvisional)
-					{
-						m_bShowTaskbarThumbnailsProvisional = FALSE;
-					}
+					m_config->showTaskbarThumbnails = FALSE;
 				}
 
-				if(m_bShowTaskbarThumbnailsProvisional)
+				if(m_config->showTaskbarThumbnails)
 					CheckDlgButton(hDlg,IDC_TABS_TASKBARTHUMBNAILS,BST_CHECKED);
 				if(m_config->forceSameTabWidth)
 					CheckDlgButton(hDlg,IDC_TABS_SAMEWIDTH,BST_CHECKED);
@@ -1003,7 +1000,7 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 				{
 				case PSN_APPLY:
 					{
-						m_bShowTaskbarThumbnailsProvisional = (IsDlgButtonChecked(hDlg,IDC_TABS_TASKBARTHUMBNAILS)
+						m_config->showTaskbarThumbnails = (IsDlgButtonChecked(hDlg,IDC_TABS_TASKBARTHUMBNAILS)
 							== BST_CHECKED);
 
 						m_config->forceSameTabWidth = (IsDlgButtonChecked(hDlg,IDC_TABS_SAMEWIDTH)

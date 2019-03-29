@@ -576,8 +576,6 @@ int Explorerplusplus::OnClose(void)
 
 	m_iLastSelectedTab = m_selectedTabIndex;
 
-	m_config->showTaskbarThumbnails = m_bShowTaskbarThumbnailsProvisional;
-
 	SaveAllSettings();
 
 	RevokeDragDrop(m_hTabCtrl);
@@ -1561,6 +1559,11 @@ void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDi
 			}
 		}
 	}
+}
+
+HWND Explorerplusplus::GetMainWindow() const
+{
+	return m_hContainer;
 }
 
 HWND Explorerplusplus::GetActiveListView() const

@@ -81,8 +81,6 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	m_iPreviousTabSelectionId		= -1;
 	m_InitializationFinished		= false;
 
-	m_pTaskbarList					= NULL;
-
 	m_bBlockNext = FALSE;
 
 	SetLanguageModule();

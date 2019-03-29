@@ -26,8 +26,10 @@ __interface TabContainerInterface
 	Tab				*GetTabOptional(int tabId);
 	Tab				&GetSelectedTab();
 	Tab				&GetTabByIndex(int index);
+	int				GetTabIndex(const Tab &tab);
 	int				GetSelectedTabId() const;
 	int				GetSelectedTabIndex() const;
+	bool			IsTabSelected(const Tab &tab);
 	void			SelectTab(const Tab &tab);
 	int				MoveTab(const Tab &tab, int newIndex);
 	int				GetNumTabs() const;

@@ -22,6 +22,7 @@
 #include "TabContainer.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
+#include "TaskbarThumbnails.h"
 #include "UiTheming.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/FileActionHandler.h"
@@ -64,7 +65,6 @@ public:
 	LRESULT CALLBACK	RebarSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabBackingProc(HWND hTabCtrl,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam);
-	LRESULT CALLBACK	TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,int iTabId);
 
 	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -75,8 +75,6 @@ public:
 	INT_PTR CALLBACK	WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
 	INT_PTR CALLBACK	TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-
-	LRESULT CALLBACK	MainWndTaskbarThumbnailProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	/* Directory modification. */
 	static void			DirectoryAlteredCallback(const TCHAR *szFileName,DWORD dwAction,void *pData);
@@ -117,20 +115,6 @@ private:
 	{
 		UINT SortById;
 		UINT GroupById;
-	};
-
-	struct TabProxyInfo_t
-	{
-		ATOM	atomClass;
-		HWND	hProxy;
-		int		iTabId;
-	};
-
-	struct TabPreviewInfo_t
-	{
-		int		iTabId;
-		HBITMAP	hbm;
-		POINT	ptOrigin;
 	};
 
 	struct FileContextMenuInfo_t
@@ -581,22 +565,6 @@ private:
 	HRESULT					UpdateStatusBarText(void);
 	void					ToggleFolders(void);
 
-	/* Windows 7 taskbar thumbnail previews. */
-	void					InitializeTaskbarThumbnails();
-	ATOM					RegisterTabProxyClass(const TCHAR *szClassName);
-	void					CreateTabProxy(int iTabId,BOOL bSwitchToNewTab);
-	void					RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive);
-	HBITMAP					CaptureTabScreenshot(int iTabId);
-	void					GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi);
-	void					RemoveTabProxy(int iTabId);
-	void					InvalidateTaskbarThumbnailBitmap(int iTabId);
-	void					UpdateTaskbarThumbnailsForTabSelectionChange(int selectedTabId);
-	void					UpdateTaskbarThumbnailTtitle(const Tab &tab);
-	void					SetTabProxyIcon(const Tab &tab, HICON hIcon);
-
-	/* Windows 7 jumplist tasks. */
-	void					SetupJumplistTasks();
-
 	/* Languages. */
 	void					SetLanguageModule(void);
 	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
@@ -699,6 +667,7 @@ private:
 	void					MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings, FolderSettings &folderSettings);
 
 	/* IExplorerplusplus methods. */
+	HWND					GetMainWindow() const;
 	HWND					GetActiveListView() const;
 	CShellBrowser			*GetActiveShellBrowser() const;
 	HWND					GetTreeView() const;
@@ -818,17 +787,12 @@ private:
 	/* User options variables. */
 	std::shared_ptr<Config>	m_config;	
 	BOOL					m_bSavePreferencesToXMLFile;
-	
-	/* Windows 7 taskbar thumbnail previews. */
-	ITaskbarList4			*m_pTaskbarList;
-	std::list<TabProxyInfo_t>	m_TabProxyList;
-	UINT					m_uTaskbarButtonCreatedMessage;
-	BOOL					m_bTaskbarInitialised;
-	BOOL					m_bShowTaskbarThumbnailsProvisional;
 
 	/* Tabs. */
 	HFONT					m_hTabFont;
 	HIMAGELIST				m_hTabCtrlImageList;
+
+	TaskbarThumbnails		*m_taskbarThumbnails;
 
 	/* Bookmarks. */
 	CBookmarkFolder *		m_bfAllBookmarks;

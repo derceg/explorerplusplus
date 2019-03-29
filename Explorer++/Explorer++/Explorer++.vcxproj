@@ -508,6 +508,7 @@
     <ClInclude Include="TabRemoved.h" />
     <ClInclude Include="TabsApi.h" />
     <ClInclude Include="TabUpdated.h" />
+    <ClInclude Include="TaskbarThumbnails.h" />
     <ClInclude Include="UiTheming.h" />
     <ClInclude Include="ToolbarButtons.h" />
     <ClInclude Include="UiApi.h" />

@@ -609,6 +609,9 @@
     <ClInclude Include="BetterEnumsWrapper.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="TaskbarThumbnails.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

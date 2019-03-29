@@ -186,7 +186,7 @@ void Explorerplusplus::UpdateTabNameInWindow(const Tab &tab)
 	int index = GetTabIndex(tab);
 	TabCtrl_SetItemText(m_hTabCtrl, index, name.c_str());
 
-	UpdateTaskbarThumbnailTtitle(tab);
+	m_taskbarThumbnails->UpdateTaskbarThumbnailTtitle(tab);
 }
 
 int Explorerplusplus::GetSelectedTabId() const
@@ -622,7 +622,7 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 	ShowWindow(m_hActiveListView,SW_SHOW);
 
 	/* Inform the taskbar that this tab has become active. */
-	UpdateTaskbarThumbnailsForTabSelectionChange(m_selectedTabId);
+	m_taskbarThumbnails->UpdateTaskbarThumbnailsForTabSelectionChange(m_selectedTabId);
 
 	if(bSetFocus)
 	{
@@ -748,7 +748,7 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 
 	int index = GetTabIndex(tab);
 	RemoveTabFromControl(index);
-	RemoveTabProxy(tab.GetId());
+	m_taskbarThumbnails->RemoveTabProxy(tab.GetId());
 
 	m_pDirMon->StopDirectoryMonitor(tab.GetShellBrowser()->GetDirMonitorId());
 

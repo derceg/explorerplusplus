@@ -384,9 +384,7 @@ void Explorerplusplus::SetTabIcon(const Tab &tab)
 		SHGetFileInfo((LPCTSTR)pidlDirectory.get(),0,&shfi,sizeof(shfi),
 			SHGFI_PIDL|SHGFI_ICON|SHGFI_SMALLICON);
 
-		/* TODO: The proxy icon may also be the lock icon, if
-		the tab is locked. */
-		SetTabProxyIcon(tab,shfi.hIcon);
+		m_taskbarThumbnails->SetTabProxyIcon(tab);
 
 		GetIconInfo(shfi.hIcon,&IconInfo);
 		iImage = ImageList_Add(TabCtrl_GetImageList(m_hTabCtrl),

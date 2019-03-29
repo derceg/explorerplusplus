@@ -118,8 +118,6 @@ void Explorerplusplus::OnCreate(void)
 {
 	ILoadSave *pLoadSave = NULL;
 
-	InitializeTaskbarThumbnails();
-
 	InitializeBookmarks();
 
 	LoadAllSettings(&pLoadSave);
@@ -176,13 +174,7 @@ void Explorerplusplus::OnCreate(void)
 		m_config->showTaskbarThumbnails = FALSE;
 	}
 
-	/* The internal variable that controls whether or not
-	taskbar thumbnails are shown in Windows 7 should only
-	be set once during execution (i.e. when Explorer++
-	starts up).
-	Therefore, we'll only ever show the user a provisional
-	setting, to stop them from changing the actual value. */
-	m_bShowTaskbarThumbnailsProvisional = m_config->showTaskbarThumbnails;
+	m_taskbarThumbnails = TaskbarThumbnails::Create(this, this, m_hLanguageModule, m_config);
 
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;

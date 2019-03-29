@@ -42,6 +42,8 @@ and some of the other components (such as the
 dialogs and toolbars). */
 __interface IExplorerplusplus
 {
+	HWND			GetMainWindow() const;
+
 	HWND			GetActiveListView() const;
 	CShellBrowser	*GetActiveShellBrowser() const;
 

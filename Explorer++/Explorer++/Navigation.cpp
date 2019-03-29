@@ -184,7 +184,7 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(tab.listView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
-	InvalidateTaskbarThumbnailBitmap(tab.GetId());
+	m_taskbarThumbnails->InvalidateTaskbarThumbnailBitmap(tab.GetId());
 
 	SetTabIcon(tab);
 	UpdateTabNameInWindow(tab);
