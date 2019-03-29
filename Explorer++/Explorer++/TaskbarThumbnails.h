@@ -18,7 +18,6 @@ public:
 		HINSTANCE instance, std::shared_ptr<Config> config);
 
 	void SetTabProxyIcon(const Tab &tab);
-	void RemoveTabProxy(int iTabId);
 	void InvalidateTaskbarThumbnailBitmap(int iTabId);
 	void UpdateTaskbarThumbnailsForTabSelectionChange(int selectedTabId);
 	void UpdateTaskbarThumbnailTtitle(const Tab &tab);
@@ -55,6 +54,7 @@ private:
 	ATOM RegisterTabProxyClass(const TCHAR *szClassName);
 	void CreateTabProxy(int iTabId, BOOL bSwitchToNewTab);
 	void RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive);
+	void RemoveTabProxy(int iTabId);
 	HBITMAP CaptureTabScreenshot(int iTabId);
 	void GetTabLivePreviewBitmap(int iTabId, TabPreviewInfo_t *ptpi);
 

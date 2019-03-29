@@ -748,7 +748,6 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 
 	int index = GetTabIndex(tab);
 	RemoveTabFromControl(index);
-	m_taskbarThumbnails->RemoveTabProxy(tab.GetId());
 
 	m_pDirMon->StopDirectoryMonitor(tab.GetShellBrowser()->GetDirMonitorId());
 
