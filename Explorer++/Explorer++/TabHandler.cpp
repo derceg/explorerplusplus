@@ -202,10 +202,7 @@ int Explorerplusplus::GetSelectedTabIndex() const
 void Explorerplusplus::SelectTab(const Tab &tab)
 {
 	int index = GetTabIndex(tab);
-
-	m_selectedTabIndex = index;
-	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
-	OnTabSelectionChanged();
+	SelectTabAtIndex(index);
 }
 
 /*
@@ -572,17 +569,36 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	/* Set the focus back to the tab that had the focus when the program
 	was last closed. */
-	TabCtrl_SetCurSel(m_hTabCtrl,m_iLastSelectedTab);
-
-	m_selectedTabIndex = m_iLastSelectedTab;
-
-	OnTabSelectionChanged();
+	SelectTabAtIndex(m_iLastSelectedTab);
 
 	return S_OK;
 }
 
+void Explorerplusplus::SelectTabAtIndex(int index)
+{
+	assert(index >= 0 && index < GetNumTabs());
+
+	int previousIndex = TabCtrl_SetCurSel(m_hTabCtrl, index);
+
+	if (previousIndex == -1)
+	{
+		return;
+	}
+
+	OnTabSelectionChanged();
+}
+
 void Explorerplusplus::OnTabSelectionChanged()
 {
+	int index = TabCtrl_GetCurSel(m_hTabCtrl);
+
+	if (index == -1)
+	{
+		throw std::runtime_error("No selected tab");
+	}
+
+	m_selectedTabIndex = index;
+
 	if(m_iPreviousTabSelectionId != -1)
 	{
 		m_TabSelectionHistory.push_back(m_iPreviousTabSelectionId);
@@ -658,55 +674,49 @@ void Explorerplusplus::CloseOtherTabs(int iTab)
 
 void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 {
-	int nTabs;
-
-	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	int newIndex = m_selectedTabIndex;
 
 	if(bNextTab)
 	{
 		/* If this is the last tab in the order,
 		wrap the selection back to the start. */
-		if(m_selectedTabIndex == (nTabs - 1))
-			m_selectedTabIndex = 0;
+		if(newIndex == (nTabs - 1))
+			newIndex = 0;
 		else
-			m_selectedTabIndex++;
+			newIndex++;
 	}
 	else
 	{
 		/* If this is the first tab in the order,
 		wrap the selection back to the end. */
-		if(m_selectedTabIndex == 0)
-			m_selectedTabIndex = nTabs - 1;
+		if(newIndex == 0)
+			newIndex = nTabs - 1;
 		else
-			m_selectedTabIndex--;
+			newIndex--;
 	}
 
-	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
-
-	OnTabSelectionChanged();
+	SelectTabAtIndex(newIndex);
 }
 
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
 {
-	int nTabs;
-
-	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	int newIndex;
 
 	if(iTab == -1)
 	{
-		m_selectedTabIndex = nTabs - 1;
+		newIndex = nTabs - 1;
 	}
 	else
 	{
 		if(iTab < nTabs)
-			m_selectedTabIndex = iTab;
+			newIndex = iTab;
 		else
-			m_selectedTabIndex = nTabs - 1;
+			newIndex = nTabs - 1;
 	}
 
-	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
-
-	OnTabSelectionChanged();
+	SelectTabAtIndex(newIndex);
 }
 
 bool Explorerplusplus::OnCloseTab(void)
@@ -837,13 +847,6 @@ HRESULT Explorerplusplus::RefreshTab(Tab &tab)
 	}
 
 	return hr;
-}
-
-void Explorerplusplus::OnTabSelectionChange(void)
-{
-	m_selectedTabIndex = TabCtrl_GetCurSel(m_hTabCtrl);
-
-	OnTabSelectionChanged();
 }
 
 void Explorerplusplus::OnInitTabMenu(HMENU hMenu)

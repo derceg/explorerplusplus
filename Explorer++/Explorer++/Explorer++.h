@@ -297,7 +297,6 @@ private:
 	int						OnDestroy(void);
 	void					OnCopy(BOOL bCopy);
 	void					OnRightClick(NMHDR *nmhdr);
-	void					OnTabSelectionChange(void);
 	void					OnCreate(void);
 	void					OnDirChanged(int iTabId);
 	void					OnTabCtrlGetDispInfo(LPARAM lParam);
@@ -442,6 +441,7 @@ private:
 	void					InitializeTabs(void);
 	void					AddDefaultTabIcons(HIMAGELIST himlTab);
 	void					SelectAdjacentTab(BOOL bNextTab);
+	void					SelectTabAtIndex(int index);
 	HRESULT					CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
 	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);

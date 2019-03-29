@@ -63,7 +63,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			switch(((LPNMHDR)lParam)->code)
 			{
 				case TCN_SELCHANGE:
-					OnTabSelectionChange();
+					OnTabSelectionChanged();
 					break;
 
 				case TTN_GETDISPINFO:
