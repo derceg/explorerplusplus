@@ -776,6 +776,8 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 		}
 	}
 
+	OnTabChangeInternal(TRUE);
+
 	m_tabRemovedSignal(tabId);
 
 	return true;
@@ -828,7 +830,6 @@ void Explorerplusplus::RemoveTabFromControl(int iTab)
 	m_selectedTabIndex = iNewTabSelection;
 
 	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
-	OnTabChangeInternal(TRUE);
 
 	m_TabSelectionHistory.erase(std::remove_if(m_TabSelectionHistory.begin(),m_TabSelectionHistory.end(),
 		[iRemovedInternalIndex](int iHistoryInternalIndex) -> bool
