@@ -298,7 +298,6 @@ private:
 	void					OnCopy(BOOL bCopy);
 	void					OnRightClick(NMHDR *nmhdr);
 	void					OnCreate(void);
-	void					OnDirChanged(int iTabId);
 	void					OnTabCtrlGetDispInfo(LPARAM lParam);
 	void					OnDrawClipboard(void);
 	void					OnChangeCBChain(WPARAM wParam,LPARAM lParam);
@@ -474,6 +473,9 @@ private:
 	boost::signals2::connection AddTabMovedObserver(const TabMovedSignal::slot_type &observer);
 	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
+
+	void					OnNavigationCompleted(const Tab &tab);
+	boost::signals2::connection	AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer);
 
 	/* PluginInterface. */
 	TabContainerInterface	*GetTabContainer();
@@ -767,6 +769,8 @@ private:
 	TabMovedSignal			m_tabMovedSignal;
 	TabUpdatedSignal		m_tabUpdatedSignal;
 	TabRemovedSignal		m_tabRemovedSignal;
+
+	NavigationCompletedSignal	m_navigationCompletedSignal;
 
 	ToolbarContextMenuSignal	m_toolbarContextMenuSignal;
 

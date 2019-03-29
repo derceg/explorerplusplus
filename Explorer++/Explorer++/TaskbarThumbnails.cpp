@@ -85,6 +85,8 @@ void TaskbarThumbnails::Initialize()
 	m_tabContainer->AddTabCreatedObserver(boost::bind(&TaskbarThumbnails::CreateTabProxy, this, _1, _2));
 	m_tabContainer->AddTabSelectedObserver(boost::bind(&TaskbarThumbnails::OnTabSelectionChanged, this, _1));
 	m_tabContainer->AddTabRemovedObserver(boost::bind(&TaskbarThumbnails::RemoveTabProxy, this, _1));
+
+	m_tabContainer->AddNavigationCompletedObserver(boost::bind(&TaskbarThumbnails::OnNavigationCompleted, this, _1));
 }
 
 LRESULT CALLBACK TaskbarThumbnails::MainWndProcStub(HWND hwnd, UINT uMsg,
@@ -286,7 +288,7 @@ void TaskbarThumbnails::RemoveTabProxy(int iTabId)
 	}
 }
 
-void TaskbarThumbnails::InvalidateTaskbarThumbnailBitmap(int iTabId)
+void TaskbarThumbnails::InvalidateTaskbarThumbnailBitmap(const Tab &tab)
 {
 	HMODULE hDwmapi = LoadLibrary(_T("dwmapi.dll"));
 
@@ -299,7 +301,7 @@ void TaskbarThumbnails::InvalidateTaskbarThumbnailBitmap(int iTabId)
 		{
 			for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 			{
-				if(itr->iTabId == iTabId)
+				if(itr->iTabId == tab.GetId())
 				{
 					DwmInvalidateIconicBitmaps(itr->hProxy);
 					break;
@@ -764,6 +766,13 @@ void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)
 			break;
 		}
 	}
+}
+
+void TaskbarThumbnails::OnNavigationCompleted(const Tab &tab)
+{
+	InvalidateTaskbarThumbnailBitmap(tab);
+	SetTabProxyIcon(tab);
+	UpdateTaskbarThumbnailTtitle(tab);
 }
 
 void TaskbarThumbnails::UpdateTaskbarThumbnailTtitle(const Tab &tab)

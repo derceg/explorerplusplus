@@ -134,7 +134,8 @@ HRESULT Explorerplusplus::BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UI
 
 	if(SUCCEEDED(hr))
 	{
-		OnDirChanged(resultingTabId);
+		const Tab &resultingTab = GetTab(resultingTabId);
+		OnNavigationCompleted(resultingTab);
 	}
 
 	return hr;
@@ -162,10 +163,8 @@ void Explorerplusplus::PlayNavigationSound() const
 	}
 }
 
-void Explorerplusplus::OnDirChanged(int iTabId)
+void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 {
-	Tab &tab = GetTab(iTabId);
-
 	if (IsTabSelected(tab))
 	{
 		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
@@ -184,10 +183,15 @@ void Explorerplusplus::OnDirChanged(int iTabId)
 	/* Set the focus back to the first item. */
 	ListView_SetItemState(tab.listView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
 
-	m_taskbarThumbnails->InvalidateTaskbarThumbnailBitmap(tab.GetId());
-
 	SetTabIcon(tab);
 	UpdateTabNameInWindow(tab);
+
+	m_navigationCompletedSignal(tab);
+}
+
+boost::signals2::connection Explorerplusplus::AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer)
+{
+	return m_navigationCompletedSignal.connect(observer);
 }
 
 void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)

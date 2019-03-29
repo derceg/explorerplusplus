@@ -185,8 +185,6 @@ void Explorerplusplus::UpdateTabNameInWindow(const Tab &tab)
 
 	int index = GetTabIndex(tab);
 	TabCtrl_SetItemText(m_hTabCtrl, index, name.c_str());
-
-	m_taskbarThumbnails->UpdateTaskbarThumbnailTtitle(tab);
 }
 
 int Explorerplusplus::GetSelectedTabId() const
@@ -445,10 +443,7 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	tab.AddTabUpdatedObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
 	m_tabCreatedSignal(tab.GetId(), selected);
 
-	if (selected)
-	{
-		OnDirChanged(tab.GetId());
-	}
+	OnNavigationCompleted(tab);
 
 	return S_OK;
 }
@@ -846,7 +841,7 @@ HRESULT Explorerplusplus::RefreshTab(Tab &tab)
 
 	if (SUCCEEDED(hr))
 	{
-		OnDirChanged(tab.GetId());
+		OnNavigationCompleted(tab);
 	}
 
 	return hr;

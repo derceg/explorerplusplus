@@ -17,10 +17,6 @@ public:
 	static TaskbarThumbnails *Create(IExplorerplusplus *expp, TabContainerInterface *tabContainer,
 		HINSTANCE instance, std::shared_ptr<Config> config);
 
-	void SetTabProxyIcon(const Tab &tab);
-	void InvalidateTaskbarThumbnailBitmap(int iTabId);
-	void UpdateTaskbarThumbnailTtitle(const Tab &tab);
-
 private:
 
 	DISALLOW_COPY_AND_ASSIGN(TaskbarThumbnails);
@@ -57,6 +53,10 @@ private:
 	HBITMAP CaptureTabScreenshot(int iTabId);
 	void GetTabLivePreviewBitmap(int iTabId, TabPreviewInfo_t *ptpi);
 	void OnTabSelectionChanged(const Tab &tab);
+	void OnNavigationCompleted(const Tab &tab);
+	void SetTabProxyIcon(const Tab &tab);
+	void InvalidateTaskbarThumbnailBitmap(const Tab &tab);
+	void UpdateTaskbarThumbnailTtitle(const Tab &tab);
 
 	IExplorerplusplus *m_expp;
 	TabContainerInterface *m_tabContainer;

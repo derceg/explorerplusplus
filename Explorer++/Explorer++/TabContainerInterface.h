@@ -15,6 +15,8 @@ typedef boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)
 typedef boost::signals2::signal<void(const Tab &tab, Tab::PropertyType propertyType)> TabUpdatedSignal;
 typedef boost::signals2::signal<void(int tabId)> TabRemovedSignal;
 
+typedef boost::signals2::signal<void(const Tab &tab)> NavigationCompletedSignal;
+
 // Eventually, this will be driven by a dedicated class, rather than the
 // Explorerplusplus class.
 __interface TabContainerInterface
@@ -50,4 +52,6 @@ __interface TabContainerInterface
 	boost::signals2::connection	AddTabMovedObserver(const TabMovedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
+
+	boost::signals2::connection	AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer);
 };
