@@ -122,6 +122,9 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	/* Allow the listview to redraw itself once again. */
 	SendMessage(m_hListView,WM_SETREDRAW,TRUE,NULL);
 
+	/* Set the focus back to the first item. */
+	ListView_SetItemState(m_hListView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
+
 	m_bFolderVisited = TRUE;
 
 	SetCursor(LoadCursor(NULL,IDC_ARROW));

@@ -180,9 +180,6 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 
 	HandleDirectoryMonitoring(tab.GetId());
 
-	/* Set the focus back to the first item. */
-	ListView_SetItemState(tab.listView, 0, LVIS_FOCUSED, LVIS_FOCUSED);
-
 	SetTabIcon(tab);
 	UpdateTabNameInWindow(tab);
 
