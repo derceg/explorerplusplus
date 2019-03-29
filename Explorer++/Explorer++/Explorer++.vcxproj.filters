@@ -148,9 +148,6 @@
     <ClCompile Include="TreeViewHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="AddressBarHandler.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ArrangeMenuHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -321,6 +318,9 @@
     </ClCompile>
     <ClCompile Include="TabProperties.cpp">
       <Filter>Plugins\TabsApi</Filter>
+    </ClCompile>
+    <ClCompile Include="AddressBar.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -610,6 +610,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="TaskbarThumbnails.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="AddressBar.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

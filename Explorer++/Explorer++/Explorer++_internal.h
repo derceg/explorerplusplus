@@ -37,6 +37,13 @@ namespace NExplorerplusplus
 	const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[]	= _T("-open_new_tab");
 }
 
+enum MousewheelSource_t
+{
+	MOUSEWHEEL_SOURCE_LISTVIEW,
+	MOUSEWHEEL_SOURCE_TREEVIEW,
+	MOUSEWHEEL_SOURCE_OTHER
+};
+
 /* Basic interface between Explorerplusplus
 and some of the other components (such as the
 dialogs and toolbars). */
@@ -49,6 +56,7 @@ __interface IExplorerplusplus
 
 	HWND			GetTreeView() const;
 
+	void			OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
 	void			OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 
 	CStatusBar		*GetStatusBar();
@@ -64,6 +72,8 @@ __interface IExplorerplusplus
 	BOOL			CanDelete() const;
 	BOOL			CanShowFileProperties() const;
 	BOOL			CanPaste() const;
+
+	BOOL			OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM wParam, LPARAM lParam);
 
 	boost::signals2::connection	AddToolbarContextMenuObserver(const ToolbarContextMenuSignal::slot_type &observer);
 };

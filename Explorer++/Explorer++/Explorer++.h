@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "AddressBar.h"
 #include "ApplicationToolbar.h"
 #include "BookmarkHelper.h"
 #include "BookmarksToolbar.h"
@@ -59,9 +60,6 @@ public:
 
 	LRESULT CALLBACK	ListViewSubclassProc(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
 
-	/* Address bar edit control. */
-	LRESULT CALLBACK	EditSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
-
 	LRESULT CALLBACK	RebarSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabBackingProc(HWND hTabCtrl,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -103,13 +101,6 @@ private:
 	static const int ID_APPLICATIONSTOOLBAR = 4;
 
 	static const std::vector<std::wstring> BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES;
-
-	enum MousewheelSource_t
-	{
-		MOUSEWHEEL_SOURCE_LISTVIEW,
-		MOUSEWHEEL_SOURCE_TREEVIEW,
-		MOUSEWHEEL_SOURCE_OTHER
-	};
 
 	struct ArrangeMenuItem_t
 	{
@@ -425,12 +416,6 @@ private:
 	void					OnTabCtrlRButtonUp(POINT *pt);
 	void					ProcessTabCommand(UINT uMenuID,int iTabHit);
 
-	/* Address bar. */
-	void					CreateAddressBar(void);
-	void					OnAddressBarGo(void);
-	void					OnAddressBarBeginDrag(void);
-	void					SetAddressBarText(LPITEMIDLIST pidl, const TCHAR *szDisplayText);
-
 	/* Holder window private message handlers. */
 	LRESULT CALLBACK		TreeViewHolderWindowCommandHandler(WPARAM wParam);
 	LRESULT CALLBACK		TreeViewHolderWindowNotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -505,6 +490,7 @@ private:
 	HWND					CreateMainListView(HWND hParent,DWORD Style);
 	void					CreateMainControls(void);
 	void					CreateFolderControls(void);
+	void					CreateAddressBar();
 	void					CreateMainToolbar();
 	void					CreateBookmarksToolbar(void);
 	void					CreateDrivesToolbar(void);
@@ -710,7 +696,6 @@ private:
 	HWND					m_hTabWindowToolbar;
 	HWND					m_hTreeView;
 	HWND					m_hHolder;
-	HWND					m_hAddressBar;
 	HWND					m_hFoldersToolbar;
 	HWND					m_hTabBacking;
 	HWND					m_hBookmarksToolbar;
@@ -758,6 +743,8 @@ private:
 	Gdiplus::Color			m_DisplayWindowSurroundColor;
 	COLORREF				m_DisplayWindowTextColor;
 	HFONT					m_DisplayWindowFont;
+
+	AddressBar				*m_addressBar;
 
 	/* Tabs. */
 	std::unordered_map<int, Tab> m_Tabs;

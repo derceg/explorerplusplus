@@ -299,7 +299,7 @@
     </ClCompile>
     <ClCompile Include="AcceleratorParser.cpp" />
     <ClCompile Include="AddBookmarkDialog.cpp" />
-    <ClCompile Include="AddressBarHandler.cpp" />
+    <ClCompile Include="AddressBar.cpp" />
     <ClCompile Include="ApiBinding.cpp" />
     <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="ApplicationToolbarButtonDialog.cpp" />
@@ -424,6 +424,7 @@
     <ClInclude Include="Accelerator.h" />
     <ClInclude Include="AcceleratorParser.h" />
     <ClInclude Include="AddBookmarkDialog.h" />
+    <ClInclude Include="AddressBar.h" />
     <ClInclude Include="ApiBinding.h" />
     <ClInclude Include="ApplicationToolbar.h" />
     <ClInclude Include="ApplicationToolbarButtonDialog.h" />

@@ -356,7 +356,7 @@ void Explorerplusplus::UpdateAddressBarText(void)
 			szParsingPath);
 	}
 
-	SetAddressBarText(pidl,szAddressBarTitle);
+	m_addressBar->SetText(pidl,szAddressBarTitle);
 
 	CoTaskMemFree(pidl);
 }

@@ -123,10 +123,10 @@ void Explorerplusplus::CreateMainControls(void)
 		case ID_ADDRESSTOOLBAR:
 			CreateAddressBar();
 			LoadString(m_hLanguageModule, IDS_ADDRESSBAR, szBandText, SIZEOF_ARRAY(szBandText));
-			GetWindowRect(m_hAddressBar, &rc);
+			GetWindowRect(m_addressBar->GetHWND(), &rc);
 			m_ToolbarInformation[i].cyMinChild = GetRectHeight(&rc);
 			m_ToolbarInformation[i].lpText = szBandText;
-			m_ToolbarInformation[i].hwndChild = m_hAddressBar;
+			m_ToolbarInformation[i].hwndChild = m_addressBar->GetHWND();
 			break;
 
 		case ID_BOOKMARKSTOOLBAR:
@@ -252,6 +252,11 @@ void Explorerplusplus::OnToolbarRClick(HWND sourceWindow)
 boost::signals2::connection Explorerplusplus::AddToolbarContextMenuObserver(const ToolbarContextMenuSignal::slot_type &observer)
 {
 	return m_toolbarContextMenuSignal.connect(observer);
+}
+
+void Explorerplusplus::CreateAddressBar()
+{
+	m_addressBar = AddressBar::Create(m_hMainRebar, this, this, m_mainToolbar);
 }
 
 void Explorerplusplus::CreateMainToolbar()

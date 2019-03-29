@@ -494,7 +494,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 		case IDM_TOOLBARS_ADDRESSBAR:
 			m_config->showAddressBar = !m_config->showAddressBar;
-			ShowMainRebarBand(m_hAddressBar, m_config->showAddressBar);
+			ShowMainRebarBand(m_addressBar->GetHWND(), m_config->showAddressBar);
 			AdjustFolderPanePosition();
 			ResizeWindows();
 			break;
@@ -1320,12 +1320,12 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDA_ADDRESSBAR:
-			SetFocus(m_hAddressBar);
+			SetFocus(m_addressBar->GetHWND());
 			break;
 
 		case IDA_COMBODROPDOWN:
-			SetFocus(m_hAddressBar);
-			SendMessage(m_hAddressBar,CB_SHOWDROPDOWN,TRUE,0);
+			SetFocus(m_addressBar->GetHWND());
+			SendMessage(m_addressBar->GetHWND(),CB_SHOWDROPDOWN,TRUE,0);
 			break;
 
 		case IDA_PREVIOUSWINDOW:
@@ -1425,7 +1425,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 	switch(HIWORD(wParam))
 	{
 		case CBN_DROPDOWN:
-			AddPathsToComboBoxEx(m_hAddressBar,m_CurrentDirectory);
+			AddPathsToComboBoxEx(m_addressBar->GetHWND(),m_CurrentDirectory);
 			break;
 	}
 
@@ -1499,10 +1499,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 		case LVN_ENDLABELEDIT:
 			return OnListViewEndLabelEdit(lParam);
-			break;
-
-		case CBEN_DRAGBEGIN:
-			OnAddressBarBeginDrag();
 			break;
 
 		case TBN_ENDADJUST:

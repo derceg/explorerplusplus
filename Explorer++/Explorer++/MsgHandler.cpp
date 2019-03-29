@@ -813,7 +813,7 @@ void Explorerplusplus::OnPreviousWindow(void)
 			{
 				if(m_config->showAddressBar)
 				{
-					SetFocus(m_hAddressBar);
+					SetFocus(m_addressBar->GetHWND());
 				}
 			}
 		}
@@ -821,7 +821,7 @@ void Explorerplusplus::OnPreviousWindow(void)
 		{
 			if(m_config->showAddressBar)
 			{
-				SetFocus(m_hAddressBar);
+				SetFocus(m_addressBar->GetHWND());
 			}
 			else
 			{
@@ -829,7 +829,7 @@ void Explorerplusplus::OnPreviousWindow(void)
 				SetFocus(m_hActiveListView);
 			}
 		}
-		else if(hFocus == (HWND) SendMessage(m_hAddressBar, CBEM_GETEDITCONTROL, 0, 0))
+		else if(hFocus == (HWND) SendMessage(m_addressBar->GetHWND(), CBEM_GETEDITCONTROL, 0, 0))
 		{
 			/* Always shown. */
 			SetFocus(m_hActiveListView);
@@ -859,7 +859,7 @@ void Explorerplusplus::OnNextWindow(void)
 		{
 			if(m_config->showAddressBar)
 			{
-				SetFocus(m_hAddressBar);
+				SetFocus(m_addressBar->GetHWND());
 			}
 			else
 			{
@@ -874,7 +874,7 @@ void Explorerplusplus::OnNextWindow(void)
 			/* Always shown. */
 			SetFocus(m_hActiveListView);
 		}
-		else if(hFocus == (HWND)SendMessage(m_hAddressBar,CBEM_GETEDITCONTROL,0,0))
+		else if(hFocus == (HWND)SendMessage(m_addressBar->GetHWND(),CBEM_GETEDITCONTROL,0,0))
 		{
 			if(m_config->showFolders)
 			{
