@@ -134,23 +134,10 @@ Explorerplusplus::~Explorerplusplus()
 
 void Explorerplusplus::SetDefaultValues(void)
 {
-	/* User options. */
-	m_StartupMode					= STARTUP_PREVIOUSTABS;
-	m_ReplaceExplorerMode			= NDefaultFileManager::REPLACEEXPLORER_NONE;
-	m_bSynchronizeTreeview			= TRUE;
-	m_bTVAutoExpandSelected			= FALSE;
-	m_bShowTaskbarThumbnails		= TRUE;
-
-	/* Infotips (user options). */
-	m_bShowInfoTips					= TRUE;
-	m_InfoTipType					= INFOTIP_SYSTEM;
-
 	/* Window states. */
 	m_bShowTabBar					= TRUE;
-	m_bLockToolbars					= TRUE;
 	m_DisplayWindowHeight			= DEFAULT_DISPLAYWINDOW_HEIGHT;
 	m_TreeViewWidth					= DEFAULT_TREEVIEW_WIDTH;
-	m_bShowTabBarAtBottom			= FALSE;
 }
 
 void Explorerplusplus::SetDefaultColumns()

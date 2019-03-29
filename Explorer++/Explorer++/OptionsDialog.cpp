@@ -198,7 +198,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 				HWND hEdit;
 				int nIDButton;
 
-				switch(m_StartupMode)
+				switch(m_config->startupMode)
 				{
 				case STARTUP_PREVIOUSTABS:
 					nIDButton = IDC_STARTUP_PREVIOUSTABS;
@@ -210,12 +210,12 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 				default:
 					nIDButton = IDC_STARTUP_PREVIOUSTABS;
-					m_StartupMode = STARTUP_PREVIOUSTABS;
+					m_config->startupMode = STARTUP_PREVIOUSTABS;
 					break;
 				}
 				CheckDlgButton(hDlg,nIDButton,BST_CHECKED);
 
-				switch(m_ReplaceExplorerMode)
+				switch(m_config->replaceExplorerMode)
 				{
 				case NDefaultFileManager::REPLACEEXPLORER_NONE:
 					nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
@@ -304,9 +304,9 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 						int iSel;
 
 						if(IsDlgButtonChecked(hDlg,IDC_STARTUP_PREVIOUSTABS) == BST_CHECKED)
-							m_StartupMode = STARTUP_PREVIOUSTABS;
+							m_config->startupMode = STARTUP_PREVIOUSTABS;
 						else if(IsDlgButtonChecked(hDlg,IDC_STARTUP_DEFAULTFOLDER) == BST_CHECKED)
-							m_StartupMode = STARTUP_DEFAULTFOLDER;
+							m_config->startupMode = STARTUP_DEFAULTFOLDER;
 
 						if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_NONE) == BST_CHECKED)
 							ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
@@ -315,7 +315,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 						else if(IsDlgButtonChecked(hDlg,IDC_OPTION_REPLACEEXPLORER_ALL) == BST_CHECKED)
 							ReplaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_ALL;
 
-						if(m_ReplaceExplorerMode != ReplaceExplorerMode)
+						if(m_config->replaceExplorerMode != ReplaceExplorerMode)
 						{
 							bSuccess = TRUE;
 
@@ -327,7 +327,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 							{
 							case NDefaultFileManager::REPLACEEXPLORER_NONE:
 								{
-									switch(m_ReplaceExplorerMode)
+									switch(m_config->replaceExplorerMode)
 									{
 									case NDefaultFileManager::REPLACEEXPLORER_FILESYSTEM:
 										bSuccess = NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
@@ -361,7 +361,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 							if(bSuccess)
 							{
-								m_ReplaceExplorerMode = ReplaceExplorerMode;
+								m_config->replaceExplorerMode = ReplaceExplorerMode;
 							}
 							else
 							{
@@ -394,7 +394,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 								/* The default file manager setting was not changed, so
 								reset the state of the file manager radio buttons. */
-								switch(m_ReplaceExplorerMode)
+								switch(m_config->replaceExplorerMode)
 								{
 								case NDefaultFileManager::REPLACEEXPLORER_NONE:
 									nIDButton = IDC_OPTION_REPLACEEXPLORER_NONE;
@@ -514,10 +514,10 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_ZIPFILES,BST_CHECKED);
 				if(m_config->globalFolderSettings.showFriendlyDates)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_FRIENDLYDATES,BST_CHECKED);
-				if(m_bShowInfoTips)
+				if(m_config->showInfoTips)
 					CheckDlgButton(hDlg,IDC_OPTIONS_CHECK_SHOWINFOTIPS,BST_CHECKED);
 
-				if(m_InfoTipType == INFOTIP_SYSTEM)
+				if(m_config->infoTipType == INFOTIP_SYSTEM)
 					CheckDlgButton(hDlg,IDC_OPTIONS_RADIO_SYSTEMINFOTIPS,BST_CHECKED);
 				else
 					CheckDlgButton(hDlg,IDC_OPTIONS_RADIO_CUSTOMINFOTIPS,BST_CHECKED);
@@ -653,13 +653,13 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						m_config->globalFolderSettings.showFriendlyDates = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_FRIENDLYDATES)
 							== BST_CHECKED);
 
-						m_bShowInfoTips = (IsDlgButtonChecked(hDlg,IDC_OPTIONS_CHECK_SHOWINFOTIPS)
+						m_config->showInfoTips = (IsDlgButtonChecked(hDlg,IDC_OPTIONS_CHECK_SHOWINFOTIPS)
 							== BST_CHECKED);
 
 						if(IsDlgButtonChecked(hDlg,IDC_OPTIONS_RADIO_SYSTEMINFOTIPS) == BST_CHECKED)
-							m_InfoTipType = INFOTIP_SYSTEM;
+							m_config->infoTipType = INFOTIP_SYSTEM;
 						else
-							m_InfoTipType = INFOTIP_CUSTOM;
+							m_config->infoTipType = INFOTIP_CUSTOM;
 
 						hCBSize = GetDlgItem(hDlg,IDC_COMBO_FILESIZES);
 
@@ -729,7 +729,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 				CheckDlgButton(hDlg,IDC_OPTION_LARGETOOLBARICONS,BST_CHECKED);
 			if(m_config->alwaysShowTabBar)
 				CheckDlgButton(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR,BST_CHECKED);
-			if(m_bShowTabBarAtBottom)
+			if(m_config->showTabBarAtBottom)
 				CheckDlgButton(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM,BST_CHECKED);
 			if(m_config->showFilePreviews)
 				CheckDlgButton(hDlg,IDC_OPTION_FILEPREVIEWS,BST_CHECKED);
@@ -739,9 +739,9 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 				CheckDlgButton(hDlg,IDC_OPTION_USERNAMEINTITLEBAR,BST_CHECKED);
 			if(m_config->showPrivilegeLevelInTitleBar)
 				CheckDlgButton(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR,BST_CHECKED);
-			if(m_bSynchronizeTreeview)
+			if(m_config->synchronizeTreeview)
 				CheckDlgButton(hDlg,IDC_OPTION_SYNCTREEVIEW,BST_CHECKED);
-			if(m_bTVAutoExpandSelected)
+			if(m_config->treeViewAutoExpandSelected)
 				CheckDlgButton(hDlg,IDC_OPTION_TREEVIEWSELECTIONEXPAND,BST_CHECKED);
 			if(!m_config->treeViewDelayEnabled)
 				CheckDlgButton(hDlg,IDC_OPTION_TREEVIEWDELAY,BST_CHECKED);
@@ -796,7 +796,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					m_config->alwaysShowTabBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR)
 						== BST_CHECKED);
 
-					m_bShowTabBarAtBottom = (IsDlgButtonChecked(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM)
+					m_config->showTabBarAtBottom = (IsDlgButtonChecked(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM)
 						== BST_CHECKED);
 
 					m_config->showFilePreviews = (IsDlgButtonChecked(hDlg,IDC_OPTION_FILEPREVIEWS)
@@ -811,10 +811,10 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					m_config->showPrivilegeLevelInTitleBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR)
 						== BST_CHECKED);
 
-					m_bSynchronizeTreeview = (IsDlgButtonChecked(hDlg,IDC_OPTION_SYNCTREEVIEW)
+					m_config->synchronizeTreeview = (IsDlgButtonChecked(hDlg,IDC_OPTION_SYNCTREEVIEW)
 						== BST_CHECKED);
 
-					m_bTVAutoExpandSelected = (IsDlgButtonChecked(hDlg,IDC_OPTION_TREEVIEWSELECTIONEXPAND)
+					m_config->treeViewAutoExpandSelected = (IsDlgButtonChecked(hDlg,IDC_OPTION_TREEVIEWSELECTIONEXPAND)
 						== BST_CHECKED);
 
 					m_config->treeViewDelayEnabled = !(IsDlgButtonChecked(hDlg,IDC_OPTION_TREEVIEWDELAY)

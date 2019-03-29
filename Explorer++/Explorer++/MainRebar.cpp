@@ -93,7 +93,7 @@ void Explorerplusplus::CreateMainControls(void)
 
 	/* If the rebar is locked, prevent bands from
 	been rearranged. */
-	if (m_bLockToolbars)
+	if (m_config->lockToolbars)
 		RebarStyles |= RBS_FIXEDORDER;
 
 	/* Create and subclass the main rebar control. */
@@ -235,7 +235,7 @@ void Explorerplusplus::OnToolbarRClick(HWND sourceWindow)
 	lCheckMenuItem(menu, IDM_TOOLBARS_BOOKMARKSTOOLBAR, m_config->showBookmarksToolbar);
 	lCheckMenuItem(menu, IDM_TOOLBARS_DRIVES, m_config->showDrivesToolbar);
 	lCheckMenuItem(menu, IDM_TOOLBARS_APPLICATIONTOOLBAR, m_config->showApplicationToolbar);
-	lCheckMenuItem(menu, IDM_TOOLBARS_LOCKTOOLBARS, m_bLockToolbars);
+	lCheckMenuItem(menu, IDM_TOOLBARS_LOCKTOOLBARS, m_config->lockToolbars);
 
 	DWORD dwPos = GetMessagePos();
 

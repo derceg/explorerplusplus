@@ -6,14 +6,28 @@
 
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ViewModes.h"
+#include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/StringHelper.h"
 
 static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
+
+enum StartupMode_t
+{
+	STARTUP_PREVIOUSTABS = 1,
+	STARTUP_DEFAULTFOLDER = 2
+};
+
+enum InfoTipType_t
+{
+	INFOTIP_SYSTEM = 0,
+	INFOTIP_CUSTOM = 1
+};
 
 struct Config
 {
 	Config()
 	{
+		startupMode = STARTUP_PREVIOUSTABS;
 		showStatusBar = TRUE;
 		showFolders = TRUE;
 		showAddressBar = TRUE;
@@ -23,12 +37,16 @@ struct Config
 		showDrivesToolbar = TRUE;
 		showApplicationToolbar = FALSE;
 		alwaysShowTabBar = TRUE;
+		showTabBarAtBottom = FALSE;
 		showFullTitlePath = FALSE;
 		alwaysOpenNewTab = FALSE;
 		openNewTabNextToCurrent = FALSE;
+		lockToolbars = TRUE;
 		treeViewDelayEnabled = FALSE;
+		treeViewAutoExpandSelected = FALSE;
 		showUserNameInTitleBar = FALSE;
 		showPrivilegeLevelInTitleBar = FALSE;
+		showTaskbarThumbnails = TRUE;
 		useFullRowSelect = FALSE;
 		showFilePreviews = TRUE;
 		extendTabControl = FALSE;
@@ -43,6 +61,12 @@ struct Config
 		closeMainWindowOnTabClose = TRUE;
 		playNavigationSound = TRUE;
 		confirmCloseTabs = FALSE;
+		synchronizeTreeview = TRUE;
+
+		replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
+
+		showInfoTips = TRUE;
+		infoTipType = INFOTIP_SYSTEM;
 
 		globalFolderSettings.showExtensions = TRUE;
 		globalFolderSettings.showFriendlyDates = TRUE;
@@ -66,6 +90,7 @@ struct Config
 		defaultFolderSettings.filterCaseSensitive = FALSE;
 	}
 
+	StartupMode_t startupMode;
 	BOOL showStatusBar;
 	BOOL showFolders;
 	BOOL showAddressBar;
@@ -75,12 +100,16 @@ struct Config
 	BOOL showDrivesToolbar;
 	BOOL showApplicationToolbar;
 	BOOL alwaysShowTabBar;
+	BOOL showTabBarAtBottom;
 	BOOL showFullTitlePath;
 	BOOL alwaysOpenNewTab;
 	BOOL openNewTabNextToCurrent;
+	BOOL lockToolbars;
 	BOOL treeViewDelayEnabled;
+	BOOL treeViewAutoExpandSelected;
 	BOOL showUserNameInTitleBar;
 	BOOL showPrivilegeLevelInTitleBar;
+	BOOL showTaskbarThumbnails;
 	BOOL useFullRowSelect;
 	BOOL showFilePreviews;
 	BOOL extendTabControl;
@@ -95,6 +124,12 @@ struct Config
 	BOOL closeMainWindowOnTabClose;
 	BOOL playNavigationSound;
 	BOOL confirmCloseTabs;
+	BOOL synchronizeTreeview;
+
+	NDefaultFileManager::ReplaceExplorerModes_t replaceExplorerMode;
+
+	BOOL showInfoTips;
+	InfoTipType_t infoTipType;
 
 	// These are settings that are shared between all tabs. It's not
 	// possible to adjust them on a per-tab basis.

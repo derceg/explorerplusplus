@@ -378,7 +378,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	if(m_bShowTabBar)
 	{
-		if(!m_bShowTabBarAtBottom)
+		if(!m_config->showTabBarAtBottom)
 		{
 			IndentTop += TAB_WINDOW_HEIGHT;
 		}
@@ -401,7 +401,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	int iTabTop;
 
-	if(!m_bShowTabBarAtBottom)
+	if(!m_config->showTabBarAtBottom)
 	{
 		iTabTop = iIndentRebar;
 	}
@@ -424,7 +424,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	TAB_TOOLBAR_Y_OFFSET,TAB_TOOLBAR_WIDTH,TAB_TOOLBAR_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
 
 	if(m_config->extendTabControl &&
-		!m_bShowTabBarAtBottom)
+		!m_config->showTabBarAtBottom)
 	{
 		iHolderTop = IndentTop;
 	}
@@ -436,7 +436,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	/* <---- Holder window + child windows ----> */
 
 	if(m_config->extendTabControl &&
-		m_bShowTabBarAtBottom &&
+		m_config->showTabBarAtBottom &&
 		m_bShowTabBar)
 	{
 		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop - TAB_WINDOW_HEIGHT;
@@ -483,7 +483,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 			uFlags |= SWP_SHOWWINDOW;
 		}
 
-		if(!m_bShowTabBarAtBottom)
+		if(!m_config->showTabBarAtBottom)
 		{
 			SetWindowPos(tab.listView,NULL,IndentLeft,IndentTop,
 				MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
@@ -576,7 +576,7 @@ int Explorerplusplus::OnClose(void)
 
 	m_iLastSelectedTab = m_selectedTabIndex;
 
-	m_bShowTaskbarThumbnails = m_bShowTaskbarThumbnailsProvisional;
+	m_config->showTaskbarThumbnails = m_bShowTaskbarThumbnailsProvisional;
 
 	SaveAllSettings();
 
@@ -923,7 +923,7 @@ void Explorerplusplus::OnLockToolbars(void)
 	UINT			nBands;
 	UINT			i = 0;
 
-	m_bLockToolbars = !m_bLockToolbars;
+	m_config->lockToolbars = !m_config->lockToolbars;
 
 	nBands = (UINT)SendMessage(m_hMainRebar,RB_GETBANDCOUNT,0,0);
 
@@ -935,7 +935,7 @@ void Explorerplusplus::OnLockToolbars(void)
 		SendMessage(m_hMainRebar,RB_GETBANDINFO,i,(LPARAM)&rbbi);
 
 		/* Add the gripper style. */
-		AddGripperStyle(&rbbi.fStyle,!m_bLockToolbars);
+		AddGripperStyle(&rbbi.fStyle,!m_config->lockToolbars);
 
 		/* Now, set the new style. */
 		SendMessage(m_hMainRebar,RB_SETBANDINFO,i,(LPARAM)&rbbi);
@@ -943,7 +943,7 @@ void Explorerplusplus::OnLockToolbars(void)
 
 	/* If the rebar is locked, prevent items from
 	been rearranged. */
-	AddWindowStyle(m_hMainRebar,RBS_FIXEDORDER,m_bLockToolbars);
+	AddWindowStyle(m_hMainRebar,RBS_FIXEDORDER, m_config->lockToolbars);
 }
 
 void Explorerplusplus::OnShellNewItemCreated(LPARAM lParam)

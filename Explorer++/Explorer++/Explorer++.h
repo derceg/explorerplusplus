@@ -27,7 +27,6 @@
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ImageWrappers.h"
-#include "../Helper/SetDefaultFileManager.h"
 #include "../MyTreeView/MyTreeView.h"
 #include <boost/optional.hpp>
 #include <boost/signals2.hpp>
@@ -112,18 +111,6 @@ private:
 		MOUSEWHEEL_SOURCE_LISTVIEW,
 		MOUSEWHEEL_SOURCE_TREEVIEW,
 		MOUSEWHEEL_SOURCE_OTHER
-	};
-
-	enum StartupMode_t
-	{
-		STARTUP_PREVIOUSTABS	= 1,
-		STARTUP_DEFAULTFOLDER	= 2
-	};
-
-	enum InfoTipType_t
-	{
-		INFOTIP_SYSTEM	= 0,
-		INFOTIP_CUSTOM	= 1
 	};
 
 	struct ArrangeMenuItem_t
@@ -784,6 +771,7 @@ private:
 	BOOL					m_bAttemptToolbarRestore;
 	BOOL					m_bLanguageLoaded;
 	BOOL					m_bTreeViewOpenInNewTab;
+	BOOL					m_bShowTabBar;
 	unsigned int			m_TreeViewWidth;
 	int						m_selectedTabIndex;
 	int						m_selectedTabId;
@@ -828,27 +816,15 @@ private:
 	std::list<DirectorySettings_t>	m_DirectorySettingsList;
 
 	/* User options variables. */
-	std::shared_ptr<Config>	m_config;
-	BOOL					m_bShowTabBar;
+	std::shared_ptr<Config>	m_config;	
 	BOOL					m_bSavePreferencesToXMLFile;
-	BOOL					m_bLockToolbars;
-	BOOL					m_bShowTabBarAtBottom;
-	BOOL					m_bShowTaskbarThumbnails;
-	BOOL					m_bShowTaskbarThumbnailsProvisional;
-	BOOL					m_bSynchronizeTreeview;
-	BOOL					m_bTVAutoExpandSelected;
-	StartupMode_t			m_StartupMode;
-	NDefaultFileManager::ReplaceExplorerModes_t	m_ReplaceExplorerMode;
-
-	/* Infotips (user options). */
-	BOOL					m_bShowInfoTips;
-	InfoTipType_t			m_InfoTipType;
 	
 	/* Windows 7 taskbar thumbnail previews. */
 	ITaskbarList4			*m_pTaskbarList;
 	std::list<TabProxyInfo_t>	m_TabProxyList;
 	UINT					m_uTaskbarButtonCreatedMessage;
 	BOOL					m_bTaskbarInitialised;
+	BOOL					m_bShowTaskbarThumbnailsProvisional;
 
 	/* Tabs. */
 	HFONT					m_hTabFont;

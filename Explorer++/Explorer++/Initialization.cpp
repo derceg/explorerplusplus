@@ -173,7 +173,7 @@ void Explorerplusplus::OnCreate(void)
 	of Windows. */
 	if(!IsWindows7OrGreater())
 	{
-		m_bShowTaskbarThumbnails = FALSE;
+		m_config->showTaskbarThumbnails = FALSE;
 	}
 
 	/* The internal variable that controls whether or not
@@ -182,7 +182,7 @@ void Explorerplusplus::OnCreate(void)
 	starts up).
 	Therefore, we'll only ever show the user a provisional
 	setting, to stop them from changing the actual value. */
-	m_bShowTaskbarThumbnailsProvisional = m_bShowTaskbarThumbnails;
+	m_bShowTaskbarThumbnailsProvisional = m_config->showTaskbarThumbnails;
 
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;

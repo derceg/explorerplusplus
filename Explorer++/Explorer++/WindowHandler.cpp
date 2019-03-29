@@ -125,13 +125,13 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 
 	if(m_bShowTabBar)
 	{
-		if(!m_bShowTabBarAtBottom)
+		if(!m_config->showTabBarAtBottom)
 		{
 			IndentTop += TAB_WINDOW_HEIGHT;
 		}
 	}
 
-	if(!m_bShowTabBarAtBottom)
+	if(!m_config->showTabBarAtBottom)
 	{
 		SetWindowPos(hListView,NULL,IndentLeft,IndentTop,
 			MainWindowWidth - IndentLeft,MainWindowHeight -

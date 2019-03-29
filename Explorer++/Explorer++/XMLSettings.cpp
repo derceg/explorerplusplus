@@ -488,7 +488,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("HideSystemFilesGlobal"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.hideSystemFiles));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InfoTipType"),NXMLSettings::EncodeIntValue(m_InfoTipType));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InfoTipType"),NXMLSettings::EncodeIntValue(m_config->infoTipType));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InsertSorted"),NXMLSettings::EncodeBoolValue(m_config->insertSorted));
 
@@ -504,7 +504,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("LastSelectedTab"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("LockToolbars"),NXMLSettings::EncodeBoolValue(m_bLockToolbars));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("LockToolbars"),NXMLSettings::EncodeBoolValue(m_config->lockToolbars));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("NextToCurrent"),NXMLSettings::EncodeBoolValue(m_config->openNewTabNextToCurrent));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -519,7 +519,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("PlayNavigationSound"),NXMLSettings::EncodeBoolValue(m_config->playNavigationSound));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	_itow_s(m_ReplaceExplorerMode,szValue,SIZEOF_ARRAY(szValue),10);
+	_itow_s(m_config->replaceExplorerMode,szValue,SIZEOF_ARRAY(szValue),10);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ReplaceExplorerMode"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -549,7 +549,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowHiddenGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.showHidden));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInfoTips"),NXMLSettings::EncodeBoolValue(m_bShowInfoTips));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInfoTips"),NXMLSettings::EncodeBoolValue(m_config->showInfoTips));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInGroupsGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.showInGroups));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -557,9 +557,9 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowStatusBar"),NXMLSettings::EncodeBoolValue(m_config->showStatusBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowTabBarAtBottom"),NXMLSettings::EncodeBoolValue(m_bShowTabBarAtBottom));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowTabBarAtBottom"),NXMLSettings::EncodeBoolValue(m_config->showTabBarAtBottom));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowTaskbarThumbnails"),NXMLSettings::EncodeBoolValue(m_bShowTaskbarThumbnails));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowTaskbarThumbnails"),NXMLSettings::EncodeBoolValue(m_config->showTaskbarThumbnails));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowToolbar"),NXMLSettings::EncodeBoolValue(m_config->showMainToolbar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -570,13 +570,13 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SortAscendingGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.sortAscending));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	_itow_s(m_StartupMode,szValue,SIZEOF_ARRAY(szValue),10);
+	_itow_s(m_config->startupMode,szValue,SIZEOF_ARRAY(szValue),10);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("StartupMode"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SynchronizeTreeview"),NXMLSettings::EncodeBoolValue(m_bSynchronizeTreeview));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SynchronizeTreeview"),NXMLSettings::EncodeBoolValue(m_config->synchronizeTreeview));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("TVAutoExpandSelected"),NXMLSettings::EncodeBoolValue(m_bTVAutoExpandSelected));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("TVAutoExpandSelected"),NXMLSettings::EncodeBoolValue(m_config->treeViewAutoExpandSelected));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("UseFullRowSelect"),NXMLSettings::EncodeBoolValue(m_config->useFullRowSelect));
 
@@ -1609,7 +1609,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_LOCKTOOLBARS:
-		m_bLockToolbars = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->lockToolbars = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_NEXTTOCURRENT:
@@ -1633,7 +1633,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_REPLACEEXPLORERMODE:
-		m_ReplaceExplorerMode = static_cast<NDefaultFileManager::ReplaceExplorerModes_t>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->replaceExplorerMode = static_cast<NDefaultFileManager::ReplaceExplorerModes_t>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SHOWADDRESSBAR:
@@ -1689,7 +1689,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWINFOTIPS:
-		m_bShowInfoTips = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showInfoTips = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWINGROUPSGLOBAL:
@@ -1705,11 +1705,11 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWTABBARATBOTTOM:
-		m_bShowTabBarAtBottom = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showTabBarAtBottom = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWTASKBARTHUMBNAILS:
-		m_bShowTaskbarThumbnails = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showTaskbarThumbnails = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_SHOWTOOLBAR:
@@ -1729,15 +1729,15 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_STARTUPMODE:
-		m_StartupMode = static_cast<StartupMode_t>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->startupMode = static_cast<StartupMode_t>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 
 	case HASH_SYNCHRONIZETREEVIEW:
-		m_bSynchronizeTreeview = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->synchronizeTreeview = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_TVAUTOEXPAND:
-		m_bTVAutoExpandSelected = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->treeViewAutoExpandSelected = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_USEFULLROWSELECT:
@@ -1891,7 +1891,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_INFOTIPTYPE:
-		m_InfoTipType = static_cast<InfoTipType_t>(NXMLSettings::DecodeIntValue(wszValue));
+		m_config->infoTipType = static_cast<InfoTipType_t>(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 	}
 }

@@ -866,7 +866,7 @@ void Explorerplusplus::OnListViewGetInfoTip(LPARAM lParam)
 	/* The pszText member of pGetInfoTip will contain the text of the
 	item if its name is truncated in the listview. Always concatenate
 	the rest of the info tip onto the name if it is there. */
-	if(m_bShowInfoTips)
+	if(m_config->showInfoTips)
 	{
 		CreateFileInfoTip(pGetInfoTip->iItem,szInfoTip,SIZEOF_ARRAY(szInfoTip));
 
@@ -889,7 +889,7 @@ void Explorerplusplus::CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax)
 
 	/* Use Explorer infotips if the option is selected, or this is a
 	virtual folder. Otherwise, show the modified date. */
-	if((m_InfoTipType == INFOTIP_SYSTEM) || m_pActiveShellBrowser->InVirtualFolder())
+	if((m_config->infoTipType == INFOTIP_SYSTEM) || m_pActiveShellBrowser->InVirtualFolder())
 	{
 		TCHAR szFullFileName[MAX_PATH];
 		m_pActiveShellBrowser->QueryFullItemName(iItem, szFullFileName, SIZEOF_ARRAY(szFullFileName));

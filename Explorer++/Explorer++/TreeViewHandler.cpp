@@ -443,7 +443,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 	{
 		BrowseFolderInCurrentTab(pidlDirectory,0);
 
-		if(m_bTVAutoExpandSelected)
+		if(m_config->treeViewAutoExpandSelected)
 		{
 			TreeView_Expand(m_hTreeView,g_NewSelectionItem,TVE_EXPAND);
 		}
@@ -801,7 +801,7 @@ void Explorerplusplus::UpdateTreeViewSelection(void)
 	UINT			uDriveType;
 	BOOL			bNetworkPath = FALSE;
 
-	if(!m_bSynchronizeTreeview)
+	if(!m_config->synchronizeTreeview)
 	{
 		return;
 	}

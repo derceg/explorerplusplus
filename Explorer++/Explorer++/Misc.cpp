@@ -166,7 +166,7 @@ void Explorerplusplus::ApplyToolbarSettings(void)
 			AddStyleToToolbar(&m_ToolbarInformation[i].fStyle,RBBS_HIDDEN);
 	}
 
-	if(m_bLockToolbars)
+	if(m_config->lockToolbars)
 	{
 		for(i = 0;i < NUM_MAIN_TOOLBARS;i++)
 		{

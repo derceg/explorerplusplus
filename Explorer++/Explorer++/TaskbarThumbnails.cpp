@@ -51,7 +51,7 @@ void Explorerplusplus::InitializeTaskbarThumbnails()
 		return;
 	}
 
-	if(!m_bShowTaskbarThumbnails)
+	if(!m_config->showTaskbarThumbnails)
 	{
 		return;
 	}
@@ -184,7 +184,7 @@ void Explorerplusplus::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 		return;
 	}
 
-	if(!m_bShowTaskbarThumbnails)
+	if(!m_config->showTaskbarThumbnails)
 	{
 		return;
 	}
