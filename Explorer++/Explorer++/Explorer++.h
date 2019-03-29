@@ -284,7 +284,7 @@ private:
 	LRESULT CALLBACK		WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	/* Internal private functions. */
-	void					OnTabChangeInternal(BOOL bSetFocus);
+	void					OnTabSelectionChanged();
 	void					UpdateArrangeMenuItems(void);
 
 	/* <----Private message handlers.----> */
@@ -333,9 +333,7 @@ private:
 	LRESULT					OnCustomDraw(LPARAM lParam);
 	void					OnSortBy(SortMode sortMode);
 	void					OnGroupBy(SortMode sortMode);
-	void					OnSelectTab(const Tab &tab, BOOL setFocus);
 	void					OnSelectTabByIndex(int iTab);
-	void					OnSelectTabByIndex(int iTab,BOOL bSetFocus);
 	const std::unordered_map<int, Tab>	&GetAllTabs() const;
 
 	/* Navigation. */

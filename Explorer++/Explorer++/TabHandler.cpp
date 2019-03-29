@@ -205,7 +205,7 @@ void Explorerplusplus::SelectTab(const Tab &tab)
 
 	m_selectedTabIndex = index;
 	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
-	OnTabChangeInternal(TRUE);
+	OnTabSelectionChanged();
 }
 
 /*
@@ -576,12 +576,12 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	m_selectedTabIndex = m_iLastSelectedTab;
 
-	OnTabChangeInternal(TRUE);
+	OnTabSelectionChanged();
 
 	return S_OK;
 }
 
-void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
+void Explorerplusplus::OnTabSelectionChanged()
 {
 	if(m_iPreviousTabSelectionId != -1)
 	{
@@ -620,14 +620,11 @@ void Explorerplusplus::OnTabChangeInternal(BOOL bSetFocus)
 
 	/* Show the new listview. */
 	ShowWindow(m_hActiveListView,SW_SHOW);
+	SetFocus(m_hActiveListView);
 
 	/* Inform the taskbar that this tab has become active. */
 	m_taskbarThumbnails->UpdateTaskbarThumbnailsForTabSelectionChange(m_selectedTabId);
 
-	if(bSetFocus)
-	{
-		SetFocus(m_hActiveListView);
-	}
 
 	m_iPreviousTabSelectionId = m_selectedTabId;
 }
@@ -686,21 +683,10 @@ void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 
 	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
 
-	OnTabChangeInternal(TRUE);
-}
-
-void Explorerplusplus::OnSelectTab(const Tab &tab, BOOL setFocus)
-{
-	int index = GetTabIndex(tab);
-	OnSelectTabByIndex(index, setFocus);
+	OnTabSelectionChanged();
 }
 
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
-{
-	return OnSelectTabByIndex(iTab,TRUE);
-}
-
-void Explorerplusplus::OnSelectTabByIndex(int iTab,BOOL bSetFocus)
 {
 	int nTabs;
 
@@ -720,7 +706,7 @@ void Explorerplusplus::OnSelectTabByIndex(int iTab,BOOL bSetFocus)
 
 	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
 
-	OnTabChangeInternal(bSetFocus);
+	OnTabSelectionChanged();
 }
 
 bool Explorerplusplus::OnCloseTab(void)
@@ -776,7 +762,7 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 		}
 	}
 
-	OnTabChangeInternal(TRUE);
+	OnTabSelectionChanged();
 
 	m_tabRemovedSignal(tabId);
 
@@ -857,7 +843,7 @@ void Explorerplusplus::OnTabSelectionChange(void)
 {
 	m_selectedTabIndex = TabCtrl_GetCurSel(m_hTabCtrl);
 
-	OnTabChangeInternal(TRUE);
+	OnTabSelectionChanged();
 }
 
 void Explorerplusplus::OnInitTabMenu(HMENU hMenu)
