@@ -89,6 +89,11 @@ Misc:
   the date and time were separated by a comma. Now, they're
   separated by a space.
 - Dates are now displayed without seconds.
+- Listview icons are now cached. This helps to avoid the
+  flickering that can occur when refreshing a directory or going
+  back/forward (the apparent flickering occurs as the default
+  file/folder icons are replaced with the actual file/folder
+  icons).
 - The way in which the document summary fields (e.g. title,
   subject) are retrieved has been updated. This means that the
   fields should now be displayed for more file types (e.g. Word

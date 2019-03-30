@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "CachedIcons.h"
 #include "ColumnDataRetrieval.h"
 #include "FolderSettings.h"
 #include "iPathManager.h"
@@ -290,6 +291,8 @@ private:
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 152;
 
+	static const int MAX_CACHED_ICONS = 200;
+
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
@@ -412,10 +415,12 @@ private:
 	void				InsertItemIntoGroup(int iItem,int iGroupId);
 	void				MoveItemsIntoGroups(void);
 
-	/* LIstview icons. */
+	/* Listview icons. */
 	void				QueueIconTask(int internalIndex);
 	static boost::optional<IconResult_t>	FindIconAsync(HWND listView, int iconResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo);
 	void				ProcessIconResult(int iconResultId);
+	void				UpdateIconCache(const ItemInfo_t &itemInfo, int iconIndex);
+	boost::optional<int>	GetCachedIconIndex(const ItemInfo_t &itemInfo);
 
 	/* Thumbnails view. */
 	void				QueueThumbnailTask(int internalIndex);
@@ -483,6 +488,7 @@ private:
 
 	std::unordered_map<int, std::future<boost::optional<IconResult_t>>> m_iconResults;
 	int					m_iconResultIDCounter;
+	CachedIcons			m_cachedIcons;
 
 	std::unordered_map<int, std::future<boost::optional<ThumbnailResult_t>>> m_thumbnailResults;
 	int					m_thumbnailResultIDCounter;

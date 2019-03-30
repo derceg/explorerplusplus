@@ -322,6 +322,9 @@
     <ClCompile Include="AddressBar.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\CachedIcons.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -614,6 +617,9 @@
     </ClInclude>
     <ClInclude Include="AddressBar.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\CachedIcons.h">
+      <Filter>ShellBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

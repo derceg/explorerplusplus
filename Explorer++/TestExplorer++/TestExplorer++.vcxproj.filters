@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="TestAcceleratorParser.cpp" />
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="TestManifest.cpp" />
+    <ClCompile Include="TestCachedIcons.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ShellBrowser">
+      <UniqueIdentifier>{5008b879-90f9-4547-b71c-247c2a2f174a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

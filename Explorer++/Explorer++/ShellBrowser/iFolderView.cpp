@@ -80,7 +80,8 @@ m_columnThreadPool(1),
 m_columnResultIDCounter(0),
 m_itemImageThreadPool(1),
 m_thumbnailResultIDCounter(0),
-m_iconResultIDCounter(0)
+m_iconResultIDCounter(0),
+m_cachedIcons(MAX_CACHED_ICONS)
 {
 	m_iRefCount = 1;
 

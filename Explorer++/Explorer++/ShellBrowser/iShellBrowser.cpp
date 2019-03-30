@@ -358,21 +358,65 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 
 	if((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
-		if((m_itemInfoMap.at(static_cast<int>(plvItem->lParam)).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
+		const ItemInfo_t &itemInfo = m_itemInfoMap.at(static_cast<int>(plvItem->lParam));
+		auto cachedIconIndex = GetCachedIconIndex(itemInfo);
+
+		if (cachedIconIndex)
 		{
-			/* File. */
-			plvItem->iImage	= m_iFileIcon;
+			// The icon retrieval method specifies the
+			// SHGFI_OVERLAYINDEX value. That means that cached icons
+			// will have an overlay index stored in the upper eight bits
+			// of the icon value. While setting the icon and
+			// stateMask/state values in one go with ListView_SetItem()
+			// works, there's no direct way to specify the
+			// stateMask/state values here.
+			// If you don't mask out the upper eight bits here, no icon
+			// will be shown. You can call ListView_SetItem() at this
+			// point, but that seemingly doesn't repaint the item
+			// correctly (you have to call ListView_Update() to force
+			// the item to be redrawn).
+			// Rather than doing that, only the icon is set here. Any
+			// overlay will be added by the icon retrieval task
+			// (scheduled below).
+			plvItem->iImage = (*cachedIconIndex & 0x0FFF);
 		}
 		else
 		{
-			/* Folder. */
-			plvItem->iImage	= m_iFolderIcon;
+			if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+			{
+				plvItem->iImage = m_iFolderIcon;
+			}
+			else
+			{
+				plvItem->iImage = m_iFileIcon;
+			}
 		}
 
 		QueueIconTask(static_cast<int>(plvItem->lParam));
 	}
 
 	plvItem->mask |= LVIF_DI_SETITEM;
+}
+
+boost::optional<int> CShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInfo)
+{
+	TCHAR filePath[MAX_PATH];
+	HRESULT hr = GetDisplayName(itemInfo.pidlComplete.get(),
+		filePath, SIZEOF_ARRAY(filePath), SHGDN_FORPARSING);
+
+	if (FAILED(hr))
+	{
+		return boost::none;
+	}
+
+	auto cachedItr = m_cachedIcons.findByPath(filePath);
+
+	if (cachedItr == m_cachedIcons.end())
+	{
+		return boost::none;
+	}
+
+	return cachedItr->iconIndex;
 }
 
 LPITEMIDLIST CShellBrowser::QueryItemCompleteIdl(int iItem) const
