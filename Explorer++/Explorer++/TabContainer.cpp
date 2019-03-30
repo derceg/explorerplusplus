@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "TabContainer.h"
 #include "Explorer++_internal.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"
 #include <boost/algorithm/string.hpp>
 
@@ -55,18 +56,28 @@ LRESULT CALLBACK CTabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wPara
 
 void CTabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 {
-	static TCHAR szTabToolTip[512];
-
 	HWND toolTipControl = TabCtrl_GetToolTips(m_hTabCtrl);
 
-	if (dispInfo->hdr.hwndFrom == toolTipControl)
+	if (dispInfo->hdr.hwndFrom != toolTipControl)
 	{
-		const Tab &tab = m_tabContainer->GetTabByIndex(static_cast<int>(dispInfo->hdr.idFrom));
-		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
-			szTabToolTip);
-
-		dispInfo->lpszText = szTabToolTip;
+		return;
 	}
+
+	static TCHAR tabToolTip[512];
+
+	const Tab &tab = m_tabContainer->GetTabByIndex(static_cast<int>(dispInfo->hdr.idFrom));
+
+	PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
+	auto path = GetFolderPathForDisplay(pidlDirectory.get());
+
+	if (!path)
+	{
+		return;
+	}
+
+	StringCchCopy(tabToolTip, SIZEOF_ARRAY(tabToolTip), path->c_str());
+
+	dispInfo->lpszText = tabToolTip;
 }
 
 int CTabContainer::GetSelection()

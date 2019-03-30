@@ -38,7 +38,6 @@ private:
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCompleted(const Tab &tab);
 	void UpdateTextAndIcon(const Tab &tab);
-	boost::optional<std::wstring> GetTextToDisplay(LPCITEMIDLIST pidl);
 
 	IExplorerplusplus *m_expp;
 	TabContainerInterface *m_tabContainer;

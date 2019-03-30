@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <boost/optional.hpp>
 #include <list>
 #include <vector>
 
@@ -113,6 +114,7 @@ HRESULT			ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchM
 HRESULT			ConvertVariantStringArrayToString(SAFEARRAY *array, TCHAR *szDetail, size_t cchMax);
 HRESULT			ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax);
 HRESULT			ConvertDateVariantToString(DATE date, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
+boost::optional<std::wstring>	GetFolderPathForDisplay(LPCITEMIDLIST pidl);
 BOOL			IsPathGUID(const TCHAR *szPath);
 BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
 HRESULT			AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList);

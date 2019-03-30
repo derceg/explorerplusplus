@@ -8,7 +8,6 @@
 #include "../Helper/iDataObject.h"
 #include "../Helper/iDropSource.h"
 #include "../Helper/ShellHelper.h"
-#include <boost/optional.hpp>
 
 AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp, TabContainerInterface *tabContainer,
 	MainToolbar *mainToolbar)
@@ -286,7 +285,7 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 {
 	PIDLPointer pidl(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
 
-	auto text = GetTextToDisplay(pidl.get());
+	auto text = GetFolderPathForDisplay(pidl.get());
 
 	if (!text)
 	{
@@ -316,33 +315,4 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 	cbItem.iOverlay = 1;
 	cbItem.pszText = displayText;
 	SendMessage(m_hwnd, CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
-}
-
-boost::optional<std::wstring> AddressBar::GetTextToDisplay(LPCITEMIDLIST pidl)
-{
-	TCHAR parsingPath[MAX_PATH];
-	HRESULT hr = GetDisplayName(pidl, parsingPath, SIZEOF_ARRAY(parsingPath), SHGDN_FORPARSING);
-
-	if (FAILED(hr))
-	{
-		return boost::none;
-	}
-
-	/* If the path is a GUID (i.e. of the form
-	::{20D04FE0-3AEA-1069-A2D8-08002B30309D}), we'll
-	switch to showing the in folder name.
-	Otherwise, we'll show the full path.
-	Driven by the principle that GUID's should NOT
-	be shown directly to users. */
-	if (IsPathGUID(parsingPath))
-	{
-		hr = GetDisplayName(pidl, parsingPath, SIZEOF_ARRAY(parsingPath), SHGDN_INFOLDER);
-
-		if (FAILED(hr))
-		{
-			return boost::none;
-		}
-	}
-
-	return parsingPath;
 }
