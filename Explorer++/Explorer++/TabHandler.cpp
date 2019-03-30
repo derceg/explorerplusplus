@@ -602,20 +602,14 @@ void Explorerplusplus::OnTabSelectionChanged()
 		m_TabSelectionHistory.push_back(m_iPreviousTabSelectionId);
 	}
 
-	TCITEM tcItem;
-
-	tcItem.mask = TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,m_selectedTabIndex,&tcItem);
-
 	/* Hide the old listview. */
 	ShowWindow(m_hActiveListView,SW_HIDE);
 
-	m_selectedTabId = (int)tcItem.lParam;
+	const Tab &tab = GetTabByIndex(index);
 
-	const Tab &tab = GetTab(m_selectedTabId);
-
-	m_hActiveListView		= tab.listView;
-	m_pActiveShellBrowser	= tab.GetShellBrowser();
+	m_selectedTabId = tab.GetId();
+	m_hActiveListView = tab.listView;
+	m_pActiveShellBrowser = tab.GetShellBrowser();
 
 	/* The selected tab has changed, so update the current
 	directory. Although this is not needed internally, context
@@ -636,9 +630,9 @@ void Explorerplusplus::OnTabSelectionChanged()
 	ShowWindow(m_hActiveListView,SW_SHOW);
 	SetFocus(m_hActiveListView);
 
-	m_tabSelectedSignal(tab);
-
 	m_iPreviousTabSelectionId = m_selectedTabId;
+
+	m_tabSelectedSignal(tab);
 }
 
 void Explorerplusplus::RefreshAllTabs(void)
