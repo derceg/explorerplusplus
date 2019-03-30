@@ -25,9 +25,12 @@ public:
 
 private:
 
-	void UpdateTabNameInWindow(const Tab &tab);
+	static const int TAB_ICON_LOCK_INDEX = 0;
+
 	void OnNavigationCompleted(const Tab &tab);
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
+	void UpdateTabNameInWindow(const Tab &tab);
+	void SetTabIcon(const Tab &tab);
 
 	HWND m_hTabCtrl;
 

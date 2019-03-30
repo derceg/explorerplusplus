@@ -1124,8 +1124,6 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 	{
 	case Tab::PropertyType::LOCKED:
 	case Tab::PropertyType::ADDRESS_LOCKED:
-		SetTabIcon(tab);
-
 		/* If the tab that was locked/unlocked is the
 		currently selected tab, then the tab close
 		button on the toolbar will need to be updated. */

@@ -18,10 +18,6 @@
 #include <shobjidl.h>
 #include <list>
 
-
-/* Tab icons. */
-#define TAB_ICON_LOCK_INDEX			0
-
 #define SORTBY_BASE	50000
 #define SORTBY_END	50099
 
@@ -322,57 +318,4 @@ void Explorerplusplus::UpdateMainWindowText(void)
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),_T("]"));
 
 	SetWindowText(m_hContainer,szTitle);
-}
-
-/* Sets a tabs icon. Normally, this icon
-is the folders icon, however if the tab
-is locked, the icon will be a lock. */
-void Explorerplusplus::SetTabIcon(const Tab &tab)
-{
-	TCITEM			tcItem;
-	SHFILEINFO		shfi;
-	ICONINFO		IconInfo;
-	int				iImage;
-	int				iRemoveImage;
-
-	/* If the tab is locked, use a lock icon. */
-	if(tab.GetAddressLocked() || tab.GetLocked())
-	{
-		iImage = TAB_ICON_LOCK_INDEX;
-	}
-	else
-	{
-		PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
-
-		SHGetFileInfo((LPCTSTR)pidlDirectory.get(),0,&shfi,sizeof(shfi),
-			SHGFI_PIDL|SHGFI_ICON|SHGFI_SMALLICON);
-
-		GetIconInfo(shfi.hIcon,&IconInfo);
-		iImage = ImageList_Add(TabCtrl_GetImageList(m_hTabCtrl),
-			IconInfo.hbmColor,IconInfo.hbmMask);
-
-		DeleteObject(IconInfo.hbmColor);
-		DeleteObject(IconInfo.hbmMask);
-		DestroyIcon(shfi.hIcon);
-	}
-
-	int index = GetTabIndex(tab);
-
-	/* Get the index of the current image. This image
-	will be removed after the new image is set. */
-	tcItem.mask		= TCIF_IMAGE;
-	TabCtrl_GetItem(m_hTabCtrl,index,&tcItem);
-
-	iRemoveImage = tcItem.iImage;
-
-	/* Set the new image. */
-	tcItem.mask		= TCIF_IMAGE;
-	tcItem.iImage	= iImage;
-	TabCtrl_SetItem(m_hTabCtrl,index,&tcItem);
-
-	if(iRemoveImage != TAB_ICON_LOCK_INDEX)
-	{
-		/* Remove the old image. */
-		TabCtrl_RemoveImage(m_hTabCtrl,iRemoveImage);
-	}
 }

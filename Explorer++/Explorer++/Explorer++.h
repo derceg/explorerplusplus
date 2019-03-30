@@ -541,7 +541,6 @@ private:
 	/* Window state update. */
 	void					UpdateWindowStates(void);
 	void					UpdateMainWindowText(void);
-	void					SetTabIcon(const Tab &tab);
 	void					UpdateTreeViewSelection(void);
 	void					SetStatusBarParts(int width);
 	void					ResizeWindows(void);
@@ -680,9 +679,6 @@ private:
 	CStatusBar				*GetStatusBar();
 	SortMode				GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const;
 	void					FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
-
-
-
 
 	/* ------ Internal state. ------ */
 
