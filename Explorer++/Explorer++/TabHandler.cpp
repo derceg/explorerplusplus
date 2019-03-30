@@ -725,6 +725,8 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 		return false;
 	}
 
+	bool closedTabSelected = IsTabSelected(tab);
+
 	int index = GetTabIndex(tab);
 	RemoveTabFromControl(index);
 
@@ -755,7 +757,12 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 		}
 	}
 
-	OnTabSelectionChanged();
+	// The tab selection will have only changed to a different tab if
+	// the closed tab was selected.
+	if (closedTabSelected)
+	{
+		OnTabSelectionChanged();
+	}
 
 	m_tabRemovedSignal(tabId);
 
