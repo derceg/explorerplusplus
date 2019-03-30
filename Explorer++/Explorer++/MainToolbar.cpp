@@ -105,6 +105,11 @@ void MainToolbar::Initialize(HWND parent)
 	AddStringsToToolbar();
 	AddButtonsToToolbar();
 
+	if (m_config->showFolders)
+	{
+		SendMessage(m_hwnd, TB_CHECKBUTTON, TOOLBAR_FOLDERS, TRUE);
+	}
+
 	/* TODO: This needs
 	to be updated. */
 	/*if (!m_bLoadSettingsFromXML)

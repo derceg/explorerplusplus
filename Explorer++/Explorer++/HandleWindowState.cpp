@@ -37,9 +37,6 @@ void Explorerplusplus::UpdateWindowStates(void)
 	UpdateStatusBarText();
 	UpdateTabToolbar();
 	UpdateDisplayWindow();
-
-	if(m_config->showFolders)
-		SendMessage(m_mainToolbar->GetHWND(),TB_CHECKBUTTON,(WPARAM)TOOLBAR_FOLDERS,(LPARAM)TRUE);
 }
 
 /*
