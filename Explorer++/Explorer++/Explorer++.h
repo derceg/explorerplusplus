@@ -437,7 +437,6 @@ private:
 	HRESULT					RefreshTab(Tab &tab);
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
-	void					UpdateTabNameInWindow(const Tab &tab);
 	int						GetSelectedTabId() const;
 	int						GetSelectedTabIndex() const;
 	void					SelectTab(const Tab &tab);
@@ -748,6 +747,7 @@ private:
 	/* Tabs. */
 	std::unordered_map<int, Tab> m_Tabs;
 	int						m_tabIdCounter;
+	CTabContainer			*m_tabContainer;
 
 	/* Tab signals. */
 	TabCreatedSignal		m_tabCreatedSignal;

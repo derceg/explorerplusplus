@@ -67,6 +67,8 @@ void Explorerplusplus::InitializeTabs(void)
 
 	SetWindowSubclass(m_hTabCtrl,TabSubclassProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
+	m_tabContainer = new CTabContainer(m_hTabCtrl, &m_Tabs, this);
+
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
 	TCHAR szTabCloseTip[64];
@@ -176,15 +178,6 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 	}
 
 	return DefSubclassProc(hTab,msg,wParam,lParam);
-}
-
-void Explorerplusplus::UpdateTabNameInWindow(const Tab &tab)
-{
-	std::wstring name = tab.GetName();
-	boost::replace_all(name, L"&", L"&&");
-
-	int index = GetTabIndex(tab);
-	TabCtrl_SetItemText(m_hTabCtrl, index, name.c_str());
 }
 
 int Explorerplusplus::GetSelectedTabId() const
@@ -1133,10 +1126,6 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 		{
 			UpdateTabToolbar();
 		}
-		break;
-
-	case Tab::PropertyType::NAME:
-		UpdateTabNameInWindow(tab);
 		break;
 	}
 

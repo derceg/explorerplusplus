@@ -16,17 +16,24 @@ public:
 	CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInfo, TabContainerInterface *tabContainer);
 	~CTabContainer();
 
-	void			InsertTab();
-	void			RemoveTab();
+	void InsertTab();
+	void RemoveTab();
 
-	int				GetSelection();
+	int GetSelection();
 
-	CShellBrowser	*GetBrowserForTab(int Index);
+	CShellBrowser *GetBrowserForTab(int Index);
 
 private:
 
-	HWND				m_hTabCtrl;
+	void UpdateTabNameInWindow(const Tab &tab);
+	void OnNavigationCompleted(const Tab &tab);
+	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
+
+	HWND m_hTabCtrl;
 
 	std::unordered_map<int, Tab> *m_tabInfo;
-	TabContainerInterface	*m_tabContainer;
+	TabContainerInterface *m_tabContainer;
+
+	boost::signals2::connection m_navigationCompletedConnection;
+	boost::signals2::connection m_tabUpdatedConnection;
 };

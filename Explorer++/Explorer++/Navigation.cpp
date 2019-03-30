@@ -181,7 +181,6 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 	HandleDirectoryMonitoring(tab.GetId());
 
 	SetTabIcon(tab);
-	UpdateTabNameInWindow(tab);
 
 	m_navigationCompletedSignal(tab);
 }
