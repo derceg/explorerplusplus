@@ -56,6 +56,9 @@ private:
 	void ShowToolbarViewsDropdown();
 	void CreateViewsMenu(POINT *ptOrigin);
 
+	void OnTabSelected(const Tab &tab);
+	void OnNavigationCompleted(const Tab &tab);
+
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_pexpp;
 	TabContainerInterface *m_tabContainer;
@@ -66,4 +69,7 @@ private:
 	std::unordered_map<int, int> m_toolbarStringMap;
 
 	std::list<ToolbarButton_t> m_tbInitial;
+
+	boost::signals2::connection m_tabSelectedConnection;
+	boost::signals2::connection m_navigationCompletedConnection;
 };

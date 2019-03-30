@@ -33,7 +33,6 @@ void Explorerplusplus::UpdateWindowStates(void)
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),m_CurrentDirectory);
 
 	UpdateMainWindowText();
-	m_mainToolbar->UpdateToolbarButtonStates();
 	UpdateTreeViewSelection();
 	UpdateStatusBarText();
 	UpdateTabToolbar();

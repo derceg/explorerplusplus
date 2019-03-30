@@ -50,6 +50,9 @@ MainToolbar::~MainToolbar()
 	ImageList_Destroy(m_himlLarge);
 
 	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
+
+	m_tabSelectedConnection.disconnect();
+	m_navigationCompletedConnection.disconnect();
 }
 
 HWND MainToolbar::CreateMainToolbar(HWND parent)
@@ -120,6 +123,9 @@ void MainToolbar::Initialize(HWND parent)
 
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
+
+	m_tabSelectedConnection = m_tabContainer->AddTabSelectedObserver(boost::bind(&MainToolbar::OnTabSelected, this, _1));
+	m_navigationCompletedConnection = m_tabContainer->AddNavigationCompletedObserver(boost::bind(&MainToolbar::OnNavigationCompleted, this, _1));
 }
 
 LRESULT CALLBACK MainToolbar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -775,4 +781,18 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_OPENCOMMANDPROMPT, !bVirtualFolder);
 
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_NEWFOLDER, m_pexpp->CanCreate());
+}
+
+void MainToolbar::OnTabSelected(const Tab &tab)
+{
+	UNREFERENCED_PARAMETER(tab);
+
+	UpdateToolbarButtonStates();
+}
+
+void MainToolbar::OnNavigationCompleted(const Tab &tab)
+{
+	UNREFERENCED_PARAMETER(tab);
+
+	UpdateToolbarButtonStates();
 }
