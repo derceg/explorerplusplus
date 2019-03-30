@@ -33,7 +33,6 @@ void Explorerplusplus::UpdateWindowStates(void)
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),m_CurrentDirectory);
 
 	UpdateMainWindowText();
-	UpdateAddressBarText();
 	m_mainToolbar->UpdateToolbarButtonStates();
 	UpdateTreeViewSelection();
 	UpdateStatusBarText();
@@ -327,38 +326,6 @@ void Explorerplusplus::UpdateMainWindowText(void)
 		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),_T("]"));
 
 	SetWindowText(m_hContainer,szTitle);
-}
-
-void Explorerplusplus::UpdateAddressBarText(void)
-{
-	LPITEMIDLIST pidl = NULL;
-	TCHAR szAddressBarTitle[MAX_PATH];
-
-	pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-
-	TCHAR szParsingPath[MAX_PATH];
-
-	GetDisplayName(pidl,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
-
-	/* If the path is a GUID (i.e. of the form
-	::{20D04FE0-3AEA-1069-A2D8-08002B30309D}), we'll
-	switch to showing the in folder name.
-	Otherwise, we'll show the full path.
-	Driven by the principle that GUID's should NOT
-	be shown directly to users. */
-	if(IsPathGUID(szParsingPath))
-	{
-		GetDisplayName(pidl,szAddressBarTitle,SIZEOF_ARRAY(szAddressBarTitle),SHGDN_INFOLDER);
-	}
-	else
-	{
-		StringCchCopy(szAddressBarTitle,SIZEOF_ARRAY(szAddressBarTitle),
-			szParsingPath);
-	}
-
-	m_addressBar->SetText(pidl,szAddressBarTitle);
-
-	CoTaskMemFree(pidl);
 }
 
 /* Sets a tabs icon. Normally, this icon

@@ -16,8 +16,6 @@ public:
 
 	static AddressBar *Create(HWND parent, IExplorerplusplus *expp, TabContainerInterface *tabContainer, MainToolbar *mainToolbar);
 
-	void SetText(LPITEMIDLIST pidl, const TCHAR *szDisplayText);
-
 private:
 
 	static const UINT_PTR SUBCLASS_ID = 0;
@@ -37,8 +35,15 @@ private:
 	void Initialize(HWND parent);
 	void OnGo();
 	void OnBeginDrag();
+	void OnTabSelected(const Tab &tab);
+	void OnNavigationCompleted(const Tab &tab);
+	void UpdateTextAndIcon(const Tab &tab);
+	boost::optional<std::wstring> GetTextToDisplay(LPCITEMIDLIST pidl);
 
 	IExplorerplusplus *m_expp;
 	TabContainerInterface *m_tabContainer;
 	MainToolbar *m_mainToolbar;
+
+	boost::signals2::connection m_tabSelectedConnection;
+	boost::signals2::connection m_navigationCompletedConnection;
 };

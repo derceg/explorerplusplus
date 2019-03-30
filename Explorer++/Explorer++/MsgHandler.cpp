@@ -1296,8 +1296,7 @@ void Explorerplusplus::OnAssocChanged(void)
 	/* Now, refresh the treeview. */
 	m_pMyTreeView->RefreshAllIcons();
 
-	/* Address bar. */
-	UpdateAddressBarText();
+	/* TODO: Update the address bar. */
 }
 
 void Explorerplusplus::OnCloneWindow(void)

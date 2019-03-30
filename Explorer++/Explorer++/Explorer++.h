@@ -542,7 +542,6 @@ private:
 	/* Window state update. */
 	void					UpdateWindowStates(void);
 	void					UpdateMainWindowText(void);
-	void					UpdateAddressBarText(void);
 	void					SetTabIcon(const Tab &tab);
 	void					UpdateTreeViewSelection(void);
 	void					SetStatusBarParts(int width);

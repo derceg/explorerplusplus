@@ -8,6 +8,7 @@
 #include "../Helper/iDataObject.h"
 #include "../Helper/iDropSource.h"
 #include "../Helper/ShellHelper.h"
+#include <boost/optional.hpp>
 
 AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp, TabContainerInterface *tabContainer,
 	MainToolbar *mainToolbar)
@@ -28,6 +29,9 @@ AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp, TabContainerInterfa
 AddressBar::~AddressBar()
 {
 	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
+
+	m_tabSelectedConnection.disconnect();
+	m_navigationCompletedConnection.disconnect();
 }
 
 HWND AddressBar::CreateAddressBar(HWND parent)
@@ -51,6 +55,9 @@ void AddressBar::Initialize(HWND parent)
 
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
+
+	m_tabSelectedConnection = m_tabContainer->AddTabSelectedObserver(boost::bind(&AddressBar::OnTabSelected, this, _1));
+	m_navigationCompletedConnection = m_tabContainer->AddNavigationCompletedObserver(boost::bind(&AddressBar::OnNavigationCompleted, this, _1));
 }
 
 LRESULT CALLBACK AddressBar::EditSubclassStub(HWND hwnd, UINT uMsg,
@@ -262,10 +269,29 @@ void AddressBar::OnBeginDrag()
 	}
 }
 
-void AddressBar::SetText(LPITEMIDLIST pidl, const TCHAR *szDisplayText)
+void AddressBar::OnTabSelected(const Tab &tab)
 {
+	UpdateTextAndIcon(tab);
+}
+
+void AddressBar::OnNavigationCompleted(const Tab &tab)
+{
+	UpdateTextAndIcon(tab);
+}
+
+void AddressBar::UpdateTextAndIcon(const Tab &tab)
+{
+	PIDLPointer pidl(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
+
+	auto text = GetTextToDisplay(pidl.get());
+
+	if (!text)
+	{
+		return;
+	}
+
 	SHFILEINFO shfi;
-	DWORD_PTR dwRet = SHGetFileInfo(reinterpret_cast<LPTSTR>(pidl), NULL, &shfi,
+	DWORD_PTR dwRet = SHGetFileInfo(reinterpret_cast<LPTSTR>(pidl.get()), NULL, &shfi,
 		NULL, SHGFI_PIDL | SHGFI_SYSICONINDEX);
 
 	if (dwRet == 0)
@@ -275,6 +301,9 @@ void AddressBar::SetText(LPITEMIDLIST pidl, const TCHAR *szDisplayText)
 
 	SendMessage(m_hwnd, CB_RESETCONTENT, 0, 0);
 
+	TCHAR displayText[MAX_PATH];
+	StringCchCopy(displayText, SIZEOF_ARRAY(displayText), text->c_str());
+
 	COMBOBOXEXITEM cbItem;
 	cbItem.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
 	cbItem.iItem = -1;
@@ -282,6 +311,35 @@ void AddressBar::SetText(LPITEMIDLIST pidl, const TCHAR *szDisplayText)
 	cbItem.iSelectedImage = shfi.iIcon;
 	cbItem.iIndent = 1;
 	cbItem.iOverlay = 1;
-	cbItem.pszText = const_cast<LPTSTR>(szDisplayText);
+	cbItem.pszText = displayText;
 	SendMessage(m_hwnd, CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
+}
+
+boost::optional<std::wstring> AddressBar::GetTextToDisplay(LPCITEMIDLIST pidl)
+{
+	TCHAR parsingPath[MAX_PATH];
+	HRESULT hr = GetDisplayName(pidl, parsingPath, SIZEOF_ARRAY(parsingPath), SHGDN_FORPARSING);
+
+	if (FAILED(hr))
+	{
+		return boost::none;
+	}
+
+	/* If the path is a GUID (i.e. of the form
+	::{20D04FE0-3AEA-1069-A2D8-08002B30309D}), we'll
+	switch to showing the in folder name.
+	Otherwise, we'll show the full path.
+	Driven by the principle that GUID's should NOT
+	be shown directly to users. */
+	if (IsPathGUID(parsingPath))
+	{
+		hr = GetDisplayName(pidl, parsingPath, SIZEOF_ARRAY(parsingPath), SHGDN_INFOLDER);
+
+		if (FAILED(hr))
+		{
+			return boost::none;
+		}
+	}
+
+	return parsingPath;
 }
