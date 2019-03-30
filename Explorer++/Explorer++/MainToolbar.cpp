@@ -797,7 +797,8 @@ void MainToolbar::OnTabSelected(const Tab &tab)
 
 void MainToolbar::OnNavigationCompleted(const Tab &tab)
 {
-	UNREFERENCED_PARAMETER(tab);
-
-	UpdateToolbarButtonStates();
+	if (m_tabContainer->IsTabSelected(tab))
+	{
+		UpdateToolbarButtonStates();
+	}
 }

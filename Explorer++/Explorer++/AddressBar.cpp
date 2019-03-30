@@ -276,7 +276,10 @@ void AddressBar::OnTabSelected(const Tab &tab)
 
 void AddressBar::OnNavigationCompleted(const Tab &tab)
 {
-	UpdateTextAndIcon(tab);
+	if (m_tabContainer->IsTabSelected(tab))
+	{
+		UpdateTextAndIcon(tab);
+	}
 }
 
 void AddressBar::UpdateTextAndIcon(const Tab &tab)
