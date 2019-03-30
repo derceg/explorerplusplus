@@ -13,14 +13,60 @@ CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInf
 	m_tabInfo(tabInfo),
 	m_tabContainer(tabContainer)
 {
+	SetWindowSubclass(GetParent(hTabCtrl), ParentWndProcStub, PARENT_SUBCLASS_ID,
+		reinterpret_cast<DWORD_PTR>(this));
+
 	m_navigationCompletedConnection = m_tabContainer->AddNavigationCompletedObserver(boost::bind(&CTabContainer::OnNavigationCompleted, this, _1));
 	m_tabUpdatedConnection = m_tabContainer->AddTabUpdatedObserver(boost::bind(&CTabContainer::OnTabUpdated, this, _1, _2));
 }
 
 CTabContainer::~CTabContainer()
 {
+	RemoveWindowSubclass(GetParent(m_hTabCtrl), ParentWndProcStub, PARENT_SUBCLASS_ID);
+
 	m_navigationCompletedConnection.disconnect();
 	m_tabUpdatedConnection.disconnect();
+}
+
+LRESULT CALLBACK CTabContainer::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+{
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
+	CTabContainer *tabContainer = reinterpret_cast<CTabContainer *>(dwRefData);
+	return tabContainer->ParentWndProc(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK CTabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+	case WM_NOTIFY:
+		switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+		{
+		case TTN_GETDISPINFO:
+			OnGetDispInfo(reinterpret_cast<NMTTDISPINFO *>(lParam));
+			break;
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
+void CTabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
+{
+	static TCHAR szTabToolTip[512];
+
+	HWND toolTipControl = TabCtrl_GetToolTips(m_hTabCtrl);
+
+	if (dispInfo->hdr.hwndFrom == toolTipControl)
+	{
+		const Tab &tab = m_tabContainer->GetTabByIndex(static_cast<int>(dispInfo->hdr.idFrom));
+		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
+			szTabToolTip);
+
+		dispInfo->lpszText = szTabToolTip;
+	}
 }
 
 int CTabContainer::GetSelection()

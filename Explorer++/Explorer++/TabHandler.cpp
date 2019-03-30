@@ -1240,28 +1240,6 @@ void Explorerplusplus::OnTabCtrlMButtonUp(POINT *pt)
 	}
 }
 
-void Explorerplusplus::OnTabCtrlGetDispInfo(LPARAM lParam)
-{
-	HWND			ToolTipControl;
-	LPNMTTDISPINFO	lpnmtdi;
-	NMHDR			*nmhdr = NULL;
-	static TCHAR	szTabToolTip[512];
-
-	lpnmtdi = (LPNMTTDISPINFO)lParam;
-	nmhdr = &lpnmtdi->hdr;
-
-	ToolTipControl = (HWND)SendMessage(m_hTabCtrl, TCM_GETTOOLTIPS, 0, 0);
-
-	if (nmhdr->hwndFrom == ToolTipControl)
-	{
-		const Tab &tab = GetTabByIndex(static_cast<int>(nmhdr->idFrom));
-		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabToolTip),
-			szTabToolTip);
-
-		lpnmtdi->lpszText = szTabToolTip;
-	}
-}
-
 Tab &Explorerplusplus::GetTab(int tabId)
 {
 	return m_Tabs.at(tabId);

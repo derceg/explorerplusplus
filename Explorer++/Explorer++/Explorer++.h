@@ -289,7 +289,6 @@ private:
 	void					OnCopy(BOOL bCopy);
 	void					OnRightClick(NMHDR *nmhdr);
 	void					OnCreate(void);
-	void					OnTabCtrlGetDispInfo(LPARAM lParam);
 	void					OnDrawClipboard(void);
 	void					OnChangeCBChain(WPARAM wParam,LPARAM lParam);
 	void					OnSetFocus(void);

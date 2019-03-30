@@ -65,10 +65,6 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 				case TCN_SELCHANGE:
 					OnTabSelectionChanged();
 					break;
-
-				case TTN_GETDISPINFO:
-					OnTabCtrlGetDispInfo(lParam);
-					break;
 			}
 			break;
 	}

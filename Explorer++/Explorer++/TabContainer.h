@@ -25,7 +25,14 @@ public:
 
 private:
 
+	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
+
 	static const int TAB_ICON_LOCK_INDEX = 0;
+
+	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 
 	void OnNavigationCompleted(const Tab &tab);
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
