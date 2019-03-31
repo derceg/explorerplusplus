@@ -31,7 +31,7 @@ public:
 	typedef CachedIconSet::nth_index<1>::type CachedIconSetByPath;
 	typedef CachedIconSetByPath::iterator iterator;
 
-	CachedIcons(int maxItems);
+	CachedIcons(std::size_t maxItems);
 	~CachedIcons();
 
 	iterator end();
@@ -43,5 +43,5 @@ public:
 private:
 
 	CachedIconSet m_cachedIconSet;
-	int m_maxItems;
+	std::size_t m_maxItems;
 };
