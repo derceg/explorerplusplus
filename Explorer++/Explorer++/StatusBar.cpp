@@ -6,6 +6,7 @@
 #include "Explorer++.h"
 #include "MainResource.h"
 #include "../Helper/Controls.h"
+#include "../Helper/WindowHelper.h"
 
 void Explorerplusplus::CreateStatusBar(void)
 {
@@ -18,6 +19,18 @@ void Explorerplusplus::CreateStatusBar(void)
 
 	m_hStatusBar = ::CreateStatusBar(m_hContainer, Style);
 	m_pStatusBar = new CStatusBar(m_hStatusBar);
+
+	int width = 0;
+
+	RECT rc;
+	BOOL res = GetWindowRect(m_hContainer, &rc);
+
+	if (res)
+	{
+		width = GetRectWidth(&rc);
+	}
+
+	SetStatusBarParts(width);
 }
 
 void Explorerplusplus::SetStatusBarParts(int width)
