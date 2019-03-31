@@ -16,20 +16,6 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 
-
-void Explorerplusplus::CreateStatusBar(void)
-{
-	UINT Style = WS_CHILD|WS_CLIPSIBLINGS|SBARS_SIZEGRIP|WS_CLIPCHILDREN;
-
-	if(m_config->showStatusBar)
-	{
-		Style |= WS_VISIBLE;
-	}
-
-	m_hStatusBar = ::CreateStatusBar(m_hContainer,Style);
-	m_pStatusBar = new CStatusBar(m_hStatusBar);
-}
-
 HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 {
 	HWND TabToolbar = CreateToolbar(hParent,WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|
@@ -60,17 +46,6 @@ HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 	SendMessage(TabToolbar,TB_AUTOSIZE,0,0);
 
 	return TabToolbar;
-}
-
-void Explorerplusplus::SetStatusBarParts(int width)
-{
-	int Parts[3];
-
-	Parts[0] = (int)(0.50 * width);
-	Parts[1] = (int)(0.75 * width);
-	Parts[2] = width;
-
-	SendMessage(m_hStatusBar,SB_SETPARTS,3,(LPARAM)Parts);
 }
 
 void Explorerplusplus::ResizeWindows(void)
