@@ -14,7 +14,7 @@ void CShellBrowser::QueueIconTask(int internalIndex)
 	auto result = m_itemImageThreadPool.push([this, iconResultID, internalIndex, basicItemInfo](int id) {
 		UNREFERENCED_PARAMETER(id);
 
-		return this->FindIconAsync(m_hListView, iconResultID, internalIndex, basicItemInfo);
+		return FindIconAsync(m_hListView, iconResultID, internalIndex, basicItemInfo);
 	});
 
 	m_iconResults.insert({ iconResultID, std::move(result) });

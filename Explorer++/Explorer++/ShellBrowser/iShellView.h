@@ -284,6 +284,12 @@ private:
 		HBitmapPtr bitmap;
 	};
 
+	struct InfoTipResult
+	{
+		int itemInternalIndex;
+		std::wstring infoTip;
+	};
+
 	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
 	static const int THUMBNAIL_ITEM_VERTICAL_SPACING = 20;
 
@@ -292,6 +298,7 @@ private:
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 152;
+	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 153;
 
 	static const int MAX_CACHED_ICONS = 200;
 
@@ -332,8 +339,11 @@ private:
 
 	/* Listview. */
 	void				OnListViewGetDisplayInfo(LPARAM lParam);
-	void				OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
-	void				CreateFileInfoTip(int iItem, TCHAR *szInfoTip, UINT cchMax);
+	LRESULT				OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
+	void				QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip);
+	static boost::optional<InfoTipResult>	GetInfoTipAsync(HWND listView, int infoTipResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config, HINSTANCE instance, bool virtualFolder);
+	void				ProcessInfoTipResult(int infoTipResultId);
+	int					GetItemInternalIndex(int item) const;
 
 	BasicItemInfo_t		getBasicItemInfo(int internalIndex) const;
 
@@ -499,6 +509,10 @@ private:
 
 	std::unordered_map<int, std::future<boost::optional<ThumbnailResult_t>>> m_thumbnailResults;
 	int					m_thumbnailResultIDCounter;
+
+	ctpl::thread_pool	m_infoTipsThreadPool;
+	std::unordered_map<int, std::future<boost::optional<InfoTipResult>>> m_infoTipResults;
+	int					m_infoTipResultIDCounter;
 
 	/* Cached folder size data. */
 	mutable std::unordered_map<int, ULONGLONG>	m_cachedFolderSizes;

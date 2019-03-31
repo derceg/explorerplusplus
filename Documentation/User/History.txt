@@ -89,6 +89,9 @@ Misc:
   the date and time were separated by a comma. Now, they're
   separated by a space.
 - Dates are now displayed without seconds.
+- Infotips for files/folders are now retrieved on a background
+  thread. This stops the application from hanging when
+  retrieving the infotip for a large folder.
 - Listview icons are now cached. This helps to avoid the
   flickering that can occur when refreshing a directory or going
   back/forward (the apparent flickering occurs as the default

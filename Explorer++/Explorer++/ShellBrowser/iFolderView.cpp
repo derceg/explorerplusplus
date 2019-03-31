@@ -83,7 +83,9 @@ m_columnResultIDCounter(0),
 m_itemImageThreadPool(1),
 m_thumbnailResultIDCounter(0),
 m_iconResultIDCounter(0),
-m_cachedIcons(MAX_CACHED_ICONS)
+m_cachedIcons(MAX_CACHED_ICONS),
+m_infoTipsThreadPool(1),
+m_infoTipResultIDCounter(0)
 {
 	m_iRefCount = 1;
 
@@ -159,6 +161,7 @@ CShellBrowser::~CShellBrowser()
 
 	m_columnThreadPool.clear_queue();
 	m_itemImageThreadPool.clear_queue();
+	m_infoTipsThreadPool.clear_queue();
 
 	m_itemImageThreadPool.push([](int id) {
 		UNREFERENCED_PARAMETER(id);

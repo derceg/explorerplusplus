@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "iShellView.h"
 #include "MainResource.h"
+#include <boost/format.hpp>
 
 LRESULT CALLBACK CShellBrowser::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
@@ -28,6 +29,10 @@ LRESULT CALLBACK CShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam
 
 	case WM_APP_ICON_RESULT_READY:
 		ProcessIconResult(static_cast<int>(wParam));
+		break;
+
+	case WM_APP_INFO_TIP_READY:
+		ProcessInfoTipResult(static_cast<int>(wParam));
 		break;
 	}
 
@@ -56,7 +61,7 @@ LRESULT CALLBACK CShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM 
 				break;
 
 			case LVN_GETINFOTIP:
-				OnListViewGetInfoTip(reinterpret_cast<NMLVGETINFOTIP *>(lParam));
+				return OnListViewGetInfoTip(reinterpret_cast<NMLVGETINFOTIP *>(lParam));
 				break;
 
 			case LVN_COLUMNCLICK:
@@ -146,60 +151,142 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	plvItem->mask |= LVIF_DI_SETITEM;
 }
 
-void CShellBrowser::OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip)
+LRESULT CShellBrowser::OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip)
 {
-	TCHAR szInfoTip[512];
-
-	/* The pszText member of pGetInfoTip will contain the text of the
-	item if its name is truncated in the listview. Always concatenate
-	the rest of the info tip onto the name if it is there. */
 	if (m_config->showInfoTips)
 	{
-		CreateFileInfoTip(getInfoTip->iItem, szInfoTip, SIZEOF_ARRAY(szInfoTip));
-
-		if (lstrlen(getInfoTip->pszText) > 0)
-		{
-			StringCchCat(getInfoTip->pszText, getInfoTip->cchTextMax, _T("\n"));
-		}
-
-		StringCchCat(getInfoTip->pszText, getInfoTip->cchTextMax, szInfoTip);
+		int internalIndex = GetItemInternalIndex(getInfoTip->iItem);
+		QueueInfoTipTask(internalIndex, getInfoTip->pszText);
 	}
-	else
-	{
-		StringCchCopy(getInfoTip->pszText, getInfoTip->cchTextMax, EMPTY_STRING);
-	}
+
+	StringCchCopy(getInfoTip->pszText, getInfoTip->cchTextMax, EMPTY_STRING);
+
+	return 0;
 }
 
-void CShellBrowser::CreateFileInfoTip(int iItem, TCHAR *szInfoTip, UINT cchMax)
+void CShellBrowser::QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip)
 {
-	HRESULT	hr;
+	int infoTipResultId = m_infoTipResultIDCounter++;
+
+	BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
+	Config configCopy = *m_config;
+	bool virtualFolder = InVirtualFolder();
+
+	auto result = m_infoTipsThreadPool.push([this, infoTipResultId, internalIndex,
+		basicItemInfo, configCopy, virtualFolder, existingInfoTip](int id) {
+		UNREFERENCED_PARAMETER(id);
+
+		auto result = GetInfoTipAsync(m_hListView, infoTipResultId, internalIndex, basicItemInfo, configCopy,
+			m_hResourceModule, virtualFolder);
+
+		// If the item name is truncated in the listview,
+		// existingInfoTip will contain that value. Therefore, it's
+		// important that the rest of the infotip is concatenated onto
+		// that value if it's there.
+		if (result && !existingInfoTip.empty())
+		{
+			result->infoTip = existingInfoTip + L"\n" + result->infoTip;
+		}
+
+		return result;
+	});
+
+	m_infoTipResults.insert({ infoTipResultId, std::move(result) });
+}
+
+boost::optional<CShellBrowser::InfoTipResult> CShellBrowser::GetInfoTipAsync(HWND listView, int infoTipResultId,
+	int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config, HINSTANCE instance, bool virtualFolder)
+{
+	std::wstring infoTip;
 
 	/* Use Explorer infotips if the option is selected, or this is a
 	virtual folder. Otherwise, show the modified date. */
-	if ((m_config->infoTipType == INFOTIP_SYSTEM) || InVirtualFolder())
+	if ((config.infoTipType == INFOTIP_SYSTEM) || virtualFolder)
 	{
-		TCHAR szFullFileName[MAX_PATH];
-		QueryFullItemName(iItem, szFullFileName, SIZEOF_ARRAY(szFullFileName));
-		hr = GetItemInfoTip(szFullFileName, szInfoTip, cchMax);
+		TCHAR infoTipText[256];
+		HRESULT hr = GetItemInfoTip(basicItemInfo.pidlComplete.get(), infoTipText, SIZEOF_ARRAY(infoTipText));
 
-		if (!SUCCEEDED(hr))
-			StringCchCopy(szInfoTip, cchMax, EMPTY_STRING);
+		if (FAILED(hr))
+		{
+			return boost::none;
+		}
+
+		infoTip = infoTipText;
 	}
 	else
 	{
-		WIN32_FIND_DATA wfd;
-		TCHAR			szDate[256];
-		TCHAR			szDateModified[256];
+		TCHAR dateModified[64];
+		LoadString(instance, IDS_GENERAL_DATEMODIFIED, dateModified, SIZEOF_ARRAY(dateModified));
 
-		wfd = QueryFileFindData(iItem);
+		TCHAR fileModificationText[256];
+		BOOL fileTimeResult = CreateFileTimeString(&basicItemInfo.wfd.ftLastWriteTime, fileModificationText,
+			SIZEOF_ARRAY(fileModificationText), config.globalFolderSettings.showFriendlyDates);
 
-		CreateFileTimeString(&wfd.ftLastWriteTime,
-			szDateModified, SIZEOF_ARRAY(szDateModified), m_config->globalFolderSettings.showFriendlyDates);
+		if (!fileTimeResult)
+		{
+			return boost::none;
+		}
 
-		LoadString(m_hResourceModule, IDS_GENERAL_DATEMODIFIED, szDate,
-			SIZEOF_ARRAY(szDate));
-
-		StringCchPrintf(szInfoTip, cchMax, _T("%s: %s"),
-			szDate, szDateModified);
+		infoTip = str(boost::wformat(_T("%s: %s")) % dateModified % fileModificationText);
 	}
+
+	PostMessage(listView, WM_APP_INFO_TIP_READY, infoTipResultId, 0);
+
+	InfoTipResult result;
+	result.itemInternalIndex = internalIndex;
+	result.infoTip = infoTip;
+
+	return result;
+}
+
+void CShellBrowser::ProcessInfoTipResult(int infoTipResultId)
+{
+	auto itr = m_infoTipResults.find(infoTipResultId);
+
+	if (itr == m_infoTipResults.end())
+	{
+		return;
+	}
+
+	auto result = itr->second.get();
+	m_infoTipResults.erase(itr);
+
+	if (!result)
+	{
+		return;
+	}
+
+	auto index = LocateItemByInternalIndex(result->itemInternalIndex);
+
+	if (!index)
+	{
+		return;
+	}
+
+	TCHAR infoTipText[256];
+	StringCchCopy(infoTipText, SIZEOF_ARRAY(infoTipText), result->infoTip.c_str());
+
+	LVSETINFOTIP infoTip;
+	infoTip.cbSize = sizeof(infoTip);
+	infoTip.dwFlags = 0;
+	infoTip.iItem = *index;
+	infoTip.iSubItem = 0;
+	infoTip.pszText = infoTipText;
+	ListView_SetInfoTip(m_hListView, &infoTip);
+}
+
+int CShellBrowser::GetItemInternalIndex(int item) const
+{
+	LVITEM lvItem;
+	lvItem.mask = LVIF_PARAM;
+	lvItem.iItem = item;
+	lvItem.iSubItem = 0;
+	BOOL res = ListView_GetItem(m_hListView, &lvItem);
+
+	if (!res)
+	{
+		throw std::runtime_error("Item lookup failed");
+	}
+
+	return static_cast<int>(lvItem.lParam);
 }
