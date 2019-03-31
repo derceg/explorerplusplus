@@ -6,6 +6,7 @@
 
 #include "CachedIcons.h"
 #include "ColumnDataRetrieval.h"
+#include "Config.h"
 #include "FolderSettings.h"
 #include "iPathManager.h"
 #include "ItemData.h"
@@ -86,8 +87,9 @@ class CShellBrowser : public IDropTarget, public IDropFilesCallback
 
 public:
 
-	static CShellBrowser	*CreateNew(HWND hOwner, HWND hListView, const GlobalFolderSettings *globalFolderSettings,
-		const FolderSettings &folderSettings, const InitialColumns &initialColumns);
+	static CShellBrowser	*CreateNew(HWND hOwner, HWND hListView, std::shared_ptr<Config> config,
+		const GlobalFolderSettings *globalFolderSettings, const FolderSettings &folderSettings,
+		const InitialColumns &initialColumns);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
@@ -296,8 +298,9 @@ private:
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	CShellBrowser(HWND hOwner, HWND hListView, const GlobalFolderSettings *globalFolderSettings,
-		const FolderSettings &folderSettings, const InitialColumns &initialColumns);
+	CShellBrowser(HWND hOwner, HWND hListView, std::shared_ptr<Config> config,
+		const GlobalFolderSettings *globalFolderSettings, const FolderSettings &folderSettings,
+		const InitialColumns &initialColumns);
 	~CShellBrowser();
 
 	int					GenerateUniqueItemId(void);
@@ -325,8 +328,12 @@ private:
 	LRESULT CALLBACK	ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	/* Message handlers. */
-	void				OnListViewGetDisplayInfo(LPARAM lParam);
 	void				ColumnClicked(int iClickedColumn);
+
+	/* Listview. */
+	void				OnListViewGetDisplayInfo(LPARAM lParam);
+	void				OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
+	void				CreateFileInfoTip(int iItem, TCHAR *szInfoTip, UINT cchMax);
 
 	BasicItemInfo_t		getBasicItemInfo(int internalIndex) const;
 
@@ -524,6 +531,7 @@ private:
 	/* User options variables. */
 	BOOL				m_bInsertSorted;
 
+	std::shared_ptr<Config>	m_config;
 	const GlobalFolderSettings	*m_globalFolderSettings;
 	FolderSettings		m_folderSettings;
 

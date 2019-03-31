@@ -1460,10 +1460,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 			return OnCustomDraw(lParam);
 			break;
 
-		case LVN_GETINFOTIP:
-			OnListViewGetInfoTip(lParam);
-			break;
-
 		case LVN_KEYDOWN:
 			return OnListViewKeyDown(lParam);
 			break;

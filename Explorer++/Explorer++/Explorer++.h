@@ -373,7 +373,6 @@ private:
 	void					OnListViewFileRename();
 	void					OnListViewFileRenameSingle();
 	void					OnListViewFileRenameMultiple();
-	void					OnListViewGetInfoTip(LPARAM lParam);
 	LRESULT					OnListViewKeyDown(LPARAM lParam);
 	void					OnListViewItemChanged(LPARAM lParam);
 	HRESULT					OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType);
@@ -480,9 +479,6 @@ private:
 
 	/* Columns. */
 	void					SetDefaultColumns();
-
-	/* File infotips. */
-	void					CreateFileInfoTip(int iItem,TCHAR *szInfoTip,UINT cchMax);
 
 	/* Control creation. */
 	HWND					CreateMainListView(HWND hParent,DWORD Style);

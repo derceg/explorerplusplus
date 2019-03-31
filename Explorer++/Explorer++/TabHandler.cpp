@@ -341,8 +341,8 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 		initialColumnsFinal.pRecycleBinColumnList = &m_RecycleBinColumnList;
 	}
 
-	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView, &m_config->globalFolderSettings,
-		folderSettingsFinal, initialColumnsFinal));
+	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView, m_config,
+		&m_config->globalFolderSettings, folderSettingsFinal, initialColumnsFinal));
 
 	/* TODO: This needs to be removed. */
 	SetWindowSubclass(tab.listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
