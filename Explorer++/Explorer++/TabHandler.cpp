@@ -230,11 +230,11 @@ void Explorerplusplus::OnNewTab()
 	item was not a folder; open the default tab directory. */
 	if(!bFolderSelected)
 	{
-		hr = CreateNewTab(m_DefaultTabDirectory, TabSettings(_selected = true));
+		hr = CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
 
 		if (FAILED(hr))
 		{
-			CreateNewTab(m_DefaultTabDirectoryStatic, TabSettings(_selected = true));
+			CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
 		}
 	}
 }
@@ -511,10 +511,10 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	if(nTabsCreated == 0)
 	{
-		hr = CreateNewTab(m_DefaultTabDirectory, TabSettings(_selected = true));
+		hr = CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
 
 		if(FAILED(hr))
-			hr = CreateNewTab(m_DefaultTabDirectoryStatic, TabSettings(_selected = true));
+			hr = CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
 
 		if(hr == S_OK)
 		{

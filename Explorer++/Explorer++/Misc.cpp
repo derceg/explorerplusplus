@@ -22,11 +22,11 @@
 
 void Explorerplusplus::ValidateLoadedSettings(void)
 {
-	if(m_TreeViewWidth <= 0)
-		m_TreeViewWidth = DEFAULT_TREEVIEW_WIDTH;
+	if(m_config->treeViewWidth <= 0)
+		m_config->treeViewWidth = Config::DEFAULT_TREEVIEW_WIDTH;
 
-	if(m_DisplayWindowHeight < MINIMUM_DISPLAYWINDOW_HEIGHT)
-		m_DisplayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
+	if(m_config->displayWindowHeight < MINIMUM_DISPLAYWINDOW_HEIGHT)
+		m_config->displayWindowHeight = Config::DEFAULT_DISPLAYWINDOW_HEIGHT;
 
 	ValidateColumns();
 }

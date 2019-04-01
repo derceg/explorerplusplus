@@ -21,11 +21,11 @@ void Explorerplusplus::OnBrowseForward()
 
 void Explorerplusplus::OnNavigateHome()
 {
-	HRESULT hr = BrowseFolderInCurrentTab(m_DefaultTabDirectory, SBSP_ABSOLUTE);
+	HRESULT hr = BrowseFolderInCurrentTab(m_config->defaultTabDirectory.c_str(), SBSP_ABSOLUTE);
 
 	if(FAILED(hr))
 	{
-		BrowseFolderInCurrentTab(m_DefaultTabDirectoryStatic, SBSP_ABSOLUTE);
+		BrowseFolderInCurrentTab(m_config->defaultTabDirectoryStatic.c_str(), SBSP_ABSOLUTE);
 	}
 }
 

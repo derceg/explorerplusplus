@@ -470,7 +470,7 @@ IXMLDOMElement *pRoot)
 	pParentNode = NULL;
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	_itow_s(m_DisplayWindowHeight,szValue,SIZEOF_ARRAY(szValue),10);
+	_itow_s(m_config->displayWindowHeight,szValue,SIZEOF_ARRAY(szValue),10);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("DisplayWindowHeight"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -508,7 +508,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("NextToCurrent"),NXMLSettings::EncodeBoolValue(m_config->openNewTabNextToCurrent));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("NewTabDirectory"),m_DefaultTabDirectory);
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("NewTabDirectory"),m_config->defaultTabDirectory.c_str());
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("OneClickActivate"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.oneClickActivate));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -619,7 +619,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("TreeViewDelayEnabled"),NXMLSettings::EncodeBoolValue(m_config->treeViewDelayEnabled));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	_itow_s(m_TreeViewWidth,szValue,SIZEOF_ARRAY(szValue),10);
+	_itow_s(m_config->treeViewWidth,szValue,SIZEOF_ARRAY(szValue),10);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("TreeViewWidth"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -1560,7 +1560,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_DISPLAYWINDOWHEIGHT:
-		m_DisplayWindowHeight = NXMLSettings::DecodeIntValue(wszValue);
+		m_config->displayWindowHeight = NXMLSettings::DecodeIntValue(wszValue);
 		break;
 
 	case HASH_DOUBLECLICKTABCLOSE:
@@ -1829,7 +1829,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_TREEVIEWWIDTH:
-		m_TreeViewWidth = NXMLSettings::DecodeIntValue(wszValue);
+		m_config->treeViewWidth = NXMLSettings::DecodeIntValue(wszValue);
 		break;
 
 	case HASH_VIEWMODEGLOBAL:
@@ -1887,7 +1887,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_NEWTABDIRECTORY:
-		StringCchCopy(m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory),wszValue);
+		m_config->defaultTabDirectory = wszValue;
 		break;
 
 	case HASH_INFOTIPTYPE:

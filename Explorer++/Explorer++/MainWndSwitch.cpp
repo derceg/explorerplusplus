@@ -132,7 +132,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		{
 			RECT	rc;
 
-			m_TreeViewWidth = (int)lParam + TREEVIEW_DRAG_OFFSET;
+			m_config->treeViewWidth = (int)lParam + TREEVIEW_DRAG_OFFSET;
 
 			GetClientRect(m_hContainer,&rc);
 
@@ -201,11 +201,11 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 			}
 			else
 			{
-				HRESULT hr = CreateNewTab(m_DefaultTabDirectory, TabSettings(_selected = true));
+				HRESULT hr = CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
 
 				if (FAILED(hr))
 				{
-					CreateNewTab(m_DefaultTabDirectoryStatic, TabSettings(_selected = true));
+					CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
 				}
 			}
 

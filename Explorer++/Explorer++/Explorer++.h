@@ -83,9 +83,6 @@ private:
 	static const int		MAX_SHELL_MENU_ID = 1000;
 
 	static const UINT		MINIMUM_DISPLAYWINDOW_HEIGHT = 70;
-	static const UINT		DEFAULT_DISPLAYWINDOW_HEIGHT = 90;
-
-	static const UINT		DEFAULT_TREEVIEW_WIDTH = 208;
 
 	static const UINT		TAB_WINDOW_HEIGHT = 24;
 
@@ -705,18 +702,14 @@ private:
 	HMENU					m_hGroupBySubMenuRClick;
 	HMENU					m_hTabRightClickMenu;
 	TCHAR					m_CurrentDirectory[MAX_PATH];
-	TCHAR					m_DefaultTabDirectoryStatic[MAX_PATH];
-	TCHAR					m_DefaultTabDirectory[MAX_PATH];
 	TCHAR					m_OldTreeViewFileName[MAX_PATH];
 	DWORD					m_Language;
-	LONG					m_DisplayWindowHeight;
 	BOOL					m_bTreeViewRightClick;
 	BOOL					m_bSelectingTreeViewDirectory;
 	BOOL					m_bAttemptToolbarRestore;
 	BOOL					m_bLanguageLoaded;
 	BOOL					m_bTreeViewOpenInNewTab;
 	BOOL					m_bShowTabBar;
-	unsigned int			m_TreeViewWidth;
 	int						m_selectedTabIndex;
 	int						m_selectedTabId;
 	int						m_iMaxArrangeMenuItem;

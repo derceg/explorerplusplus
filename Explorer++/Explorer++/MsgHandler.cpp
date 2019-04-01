@@ -365,7 +365,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	if(m_config->showDisplayWindow)
 	{
-		IndentBottom += m_DisplayWindowHeight;
+		IndentBottom += m_config->displayWindowHeight;
 	}
 
 	if(m_config->showFolders)
@@ -446,7 +446,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop;
 	}
 
-	iHolderWidth = m_TreeViewWidth;
+	iHolderWidth = m_config->treeViewWidth;
 
 	SetWindowPos(m_hHolder,NULL,0,iHolderTop,
 		iHolderWidth,iHolderHeight,SWP_NOZORDER);
@@ -465,7 +465,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	/* <---- Display window ----> */
 
 	SetWindowPos(m_hDisplayWindow,NULL,0,MainWindowHeight - IndentBottom,
-		MainWindowWidth,m_DisplayWindowHeight,SWP_SHOWWINDOW|SWP_NOZORDER);
+		MainWindowWidth, m_config->displayWindowHeight,SWP_SHOWWINDOW|SWP_NOZORDER);
 
 
 	/* <---- ALL listview windows ----> */
@@ -711,7 +711,7 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
 	RECT	rc;
 
 	if((int)wParam >= MINIMUM_DISPLAYWINDOW_HEIGHT)
-		m_DisplayWindowHeight = (int)wParam;
+		m_config->displayWindowHeight = (int)wParam;
 
 	GetClientRect(m_hContainer,&rc);
 

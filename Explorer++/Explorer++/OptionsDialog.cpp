@@ -242,7 +242,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 				SendMessage(hButton,BM_SETIMAGE,IMAGE_ICON,(LPARAM)g_hNewTabDirIcon);
 
 				hEdit = GetDlgItem(hDlg,IDC_DEFAULT_NEWTABDIR_EDIT);
-				DefaultSettingsSetNewTabDir(hEdit,m_DefaultTabDirectory);
+				DefaultSettingsSetNewTabDir(hEdit,m_config->defaultTabDirectory.c_str());
 
 				AddLanguages(hDlg);
 
@@ -428,12 +428,14 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 						to be decoded. */
 						hr = DecodeFriendlyPath(szNewTabDir,szVirtualParsingPath,SIZEOF_ARRAY(szVirtualParsingPath));
 
-						if(SUCCEEDED(hr))
-							StringCchCopy(m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory),
-							szVirtualParsingPath);
+						if (SUCCEEDED(hr))
+						{
+							m_config->defaultTabDirectory = szVirtualParsingPath;
+						}
 						else
-							StringCchCopy(m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory),
-							szNewTabDir);
+						{
+							m_config->defaultTabDirectory = szNewTabDir;
+						}
 
 						iSel = (int)SendMessage(GetDlgItem(hDlg,IDC_OPTIONS_LANGUAGE),CB_GETCURSEL,0,0);
 

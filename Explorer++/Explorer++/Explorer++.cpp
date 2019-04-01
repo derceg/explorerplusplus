@@ -90,10 +90,6 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	SetDefaultValues();
 	SetDefaultColumns();
 
-	/* Default folder (i.e. My Computer). */
-	GetCsidlDisplayName(CSIDL_DRIVES,m_DefaultTabDirectoryStatic,SIZEOF_ARRAY(m_DefaultTabDirectoryStatic),SHGDN_FORPARSING);
-	GetCsidlDisplayName(CSIDL_DRIVES,m_DefaultTabDirectory,SIZEOF_ARRAY(m_DefaultTabDirectory),SHGDN_FORPARSING);
-
 	InitializeMainToolbars();
 
 	m_iDWFolderSizeUniqueId = 0;
@@ -134,8 +130,6 @@ void Explorerplusplus::SetDefaultValues(void)
 {
 	/* Window states. */
 	m_bShowTabBar					= TRUE;
-	m_DisplayWindowHeight			= DEFAULT_DISPLAYWINDOW_HEIGHT;
-	m_TreeViewWidth					= DEFAULT_TREEVIEW_WIDTH;
 }
 
 void Explorerplusplus::SetDefaultColumns()

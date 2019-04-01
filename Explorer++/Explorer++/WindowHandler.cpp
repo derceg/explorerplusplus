@@ -87,7 +87,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 
 	if(m_config->showDisplayWindow)
 	{
-		IndentBottom += m_DisplayWindowHeight;
+		IndentBottom += m_config->displayWindowHeight;
 	}
 
 	if(m_config->showFolders)

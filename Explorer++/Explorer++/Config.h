@@ -6,7 +6,9 @@
 
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ViewModes.h"
+#include "../Helper/Macros.h"
 #include "../Helper/SetDefaultFileManager.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 
 static const int DEFAULT_LISTVIEW_HOVER_TIME = 500;
@@ -25,9 +27,11 @@ enum InfoTipType_t
 
 struct Config
 {
-	Config()
+	Config() :
+		defaultTabDirectoryStatic(GetComputerFolderPath())
 	{
 		startupMode = STARTUP_PREVIOUSTABS;
+		defaultTabDirectory = GetComputerFolderPath();
 		showStatusBar = TRUE;
 		showFolders = TRUE;
 		showAddressBar = TRUE;
@@ -62,6 +66,8 @@ struct Config
 		playNavigationSound = TRUE;
 		confirmCloseTabs = FALSE;
 		synchronizeTreeview = TRUE;
+		displayWindowHeight = DEFAULT_DISPLAYWINDOW_HEIGHT;
+		treeViewWidth = DEFAULT_TREEVIEW_WIDTH;
 
 		replaceExplorerMode = NDefaultFileManager::REPLACEEXPLORER_NONE;
 
@@ -90,7 +96,12 @@ struct Config
 		defaultFolderSettings.filterCaseSensitive = FALSE;
 	}
 
+	static const UINT DEFAULT_DISPLAYWINDOW_HEIGHT = 90;
+	static const UINT DEFAULT_TREEVIEW_WIDTH = 208;
+
 	StartupMode_t startupMode;
+	std::wstring defaultTabDirectory;
+	const std::wstring defaultTabDirectoryStatic;
 	BOOL showStatusBar;
 	BOOL showFolders;
 	BOOL showAddressBar;
@@ -125,6 +136,8 @@ struct Config
 	BOOL playNavigationSound;
 	BOOL confirmCloseTabs;
 	BOOL synchronizeTreeview;
+	LONG displayWindowHeight;
+	unsigned int treeViewWidth;
 
 	NDefaultFileManager::ReplaceExplorerModes_t replaceExplorerMode;
 
@@ -136,4 +149,14 @@ struct Config
 	GlobalFolderSettings globalFolderSettings;
 
 	FolderSettings defaultFolderSettings;
+
+private:
+
+	static std::wstring GetComputerFolderPath()
+	{
+		// It's assumed here that this won't fail.
+		TCHAR computerPath[MAX_PATH];
+		GetCsidlDisplayName(CSIDL_DRIVES, computerPath, SIZEOF_ARRAY(computerPath), SHGDN_FORPARSING);
+		return computerPath;
+	}
 };
