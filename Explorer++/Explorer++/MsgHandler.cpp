@@ -1060,7 +1060,7 @@ void Explorerplusplus::CopyColumnInfoToClipboard(void)
 	CopyTextToClipboard(strColumnInfo);
 }
 
-void Explorerplusplus::SetFilterStatus(void)
+void Explorerplusplus::ToggleFilterStatus()
 {
 	m_pActiveShellBrowser->SetFilterStatus(!m_pActiveShellBrowser->GetFilterStatus());
 }

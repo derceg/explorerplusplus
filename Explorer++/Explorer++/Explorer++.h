@@ -575,7 +575,7 @@ private:
 	HRESULT					ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInNewTab, BOOL bSwitchToNewTab);
 
 	/* Filtering. */
-	void					SetFilterStatus(void);
+	void					ToggleFilterStatus();
 
 	/* Options dialog. */
 	void					ShowOptions(void);

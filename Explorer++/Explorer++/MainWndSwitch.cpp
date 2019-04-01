@@ -576,7 +576,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDM_FILTER_APPLYFILTER:
-			SetFilterStatus();
+			ToggleFilterStatus();
 			break;
 
 		case IDM_SORTBY_NAME:
