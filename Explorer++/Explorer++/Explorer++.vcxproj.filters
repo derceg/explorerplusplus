@@ -624,6 +624,9 @@
     <ClInclude Include="ShellBrowser\CachedIcons.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
+    <ClInclude Include="ViewModeHelper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

@@ -45,6 +45,7 @@
     </ClCompile>
     <ClCompile Include="TestCachedIcons.cpp" />
     <ClCompile Include="TestManifest.cpp" />
+    <ClCompile Include="TestViewModeHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Explorer++\Explorer++.vcxproj">

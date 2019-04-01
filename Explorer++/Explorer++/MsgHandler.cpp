@@ -8,6 +8,7 @@
 #include "MainResource.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ToolbarButtons.h"
+#include "ViewModeHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
@@ -744,39 +745,18 @@ void Explorerplusplus::OnToolbarViews(void)
 void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 {
 	ViewMode viewMode = m_pActiveShellBrowser->GetViewMode();
-
-	std::array<ViewMode, 8>::const_iterator itr;
-
-	for(itr = m_viewModes.begin();itr != m_viewModes.end();itr++)
-	{
-		if(*itr == viewMode)
-			break;
-	}
+	ViewMode newViewMode;
 
 	if(bCycleForward)
 	{
-		auto itrEnd = m_viewModes.end();
-		itrEnd--;
-
-		if(itr == itrEnd)
-			itr = m_viewModes.begin();
-		else
-			itr++;
+		newViewMode = GetNextViewMode(m_viewModes, viewMode);
 	}
 	else
 	{
-		if(itr == m_viewModes.begin())
-		{
-			itr = m_viewModes.end();
-			itr--;
-		}
-		else
-		{
-			itr--;
-		}
+		newViewMode = GetPreviousViewMode(m_viewModes, viewMode);
 	}
 
-	m_pActiveShellBrowser->SetViewMode(*itr);
+	m_pActiveShellBrowser->SetViewMode(newViewMode);
 }
 
 void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)

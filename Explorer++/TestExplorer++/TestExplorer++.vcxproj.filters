@@ -7,6 +7,7 @@
     <ClCompile Include="TestCachedIcons.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="TestViewModeHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
