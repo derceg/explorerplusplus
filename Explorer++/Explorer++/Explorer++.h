@@ -510,7 +510,6 @@ private:
 	void					ValidateSingleColumnSet(int iColumnSet,std::list<Column_t> *pColumnList);
 	void					ApplyLoadedSettings(void);
 	void					ApplyToolbarSettings(void);
-	void					SetDefaultValues(void);
 	void					TestConfigFile(void);
 	void					SaveTabSettingsToRegistry(void);
 	int						LoadTabSettingsFromRegistry(void);

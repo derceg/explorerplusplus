@@ -60,6 +60,7 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	m_bDragging						= FALSE;
 	m_bDragCancelled				= FALSE;
 	m_bDragAllowed					= FALSE;
+	m_bShowTabBar					= TRUE;
 	m_pActiveShellBrowser			= NULL;
 	m_hMainRebar					= NULL;
 	m_hStatusBar					= NULL;
@@ -87,7 +88,6 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 
 	m_ColorRules = NColorRuleHelper::GetDefaultColorRules(m_hLanguageModule);
 
-	SetDefaultValues();
 	SetDefaultColumns();
 
 	InitializeMainToolbars();
@@ -124,12 +124,6 @@ Explorerplusplus::~Explorerplusplus()
 	delete m_pBookmarksToolbar;
 
 	m_pDirMon->Release();
-}
-
-void Explorerplusplus::SetDefaultValues(void)
-{
-	/* Window states. */
-	m_bShowTabBar					= TRUE;
 }
 
 void Explorerplusplus::SetDefaultColumns()
