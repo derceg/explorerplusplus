@@ -948,7 +948,7 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 
 	MENUITEMINFO mii;
 
-	for(auto ViewMode : m_ViewModes)
+	for(auto ViewMode : m_viewModes)
 	{
 		TCHAR szTemp[64];
 		LoadString(m_hLanguageModule,GetViewModeMenuStringId(ViewMode),

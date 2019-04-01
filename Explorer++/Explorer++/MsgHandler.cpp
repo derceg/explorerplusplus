@@ -745,9 +745,9 @@ void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 {
 	ViewMode viewMode = m_pActiveShellBrowser->GetViewMode();
 
-	std::list<ViewMode>::iterator itr;
+	std::array<ViewMode, 8>::const_iterator itr;
 
-	for(itr = m_ViewModes.begin();itr != m_ViewModes.end();itr++)
+	for(itr = m_viewModes.begin();itr != m_viewModes.end();itr++)
 	{
 		if(*itr == viewMode)
 			break;
@@ -755,19 +755,19 @@ void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 
 	if(bCycleForward)
 	{
-		auto itrEnd = m_ViewModes.end();
+		auto itrEnd = m_viewModes.end();
 		itrEnd--;
 
 		if(itr == itrEnd)
-			itr = m_ViewModes.begin();
+			itr = m_viewModes.begin();
 		else
 			itr++;
 	}
 	else
 	{
-		if(itr == m_ViewModes.begin())
+		if(itr == m_viewModes.begin())
 		{
-			itr = m_ViewModes.end();
+			itr = m_viewModes.end();
 			itr--;
 		}
 		else

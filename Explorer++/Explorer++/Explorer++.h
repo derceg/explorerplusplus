@@ -34,6 +34,7 @@
 #include <boost/signals2.hpp>
 #include <MsXml2.h>
 #include <objbase.h>
+#include <array>
 #include <unordered_map>
 
 #define TOOLBAR_START				5000
@@ -716,7 +717,7 @@ private:
 	ULONG					m_SHChangeNotifyID;
 	bool					m_InitializationFinished;
 
-	std::list<ViewMode>		m_ViewModes;
+	static const std::array<ViewMode, 8>	m_viewModes;
 
 	/* Initialization. */
 	BOOL					m_bLoadSettingsFromXML;

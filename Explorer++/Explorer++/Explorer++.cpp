@@ -24,6 +24,17 @@ const std::vector<std::wstring> Explorerplusplus::BLACKLISTED_BACKGROUND_MENU_CL
 	_T("{CB3D0F55-BC2C-4C1A-85ED-23ED75B5106B}")
 };
 
+const std::array<ViewMode, 8> Explorerplusplus::m_viewModes = {
+	ViewMode::ExtraLargeIcons,
+	ViewMode::LargeIcons,
+	ViewMode::Icons,
+	ViewMode::SmallIcons,
+	ViewMode::List,
+	ViewMode::Details,
+	ViewMode::Thumbnails,
+	ViewMode::Tiles
+};
+
 Explorerplusplus::Explorerplusplus(HWND hwnd) :
 m_hContainer(hwnd),
 m_pluginMenuManager(hwnd, MENU_PLUGIN_STARTID, MENU_PLUGIN_ENDID),
@@ -97,15 +108,6 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	m_pClipboardDataObject	= NULL;
 	m_iCutTabInternal		= 0;
 	m_hCutTreeViewItem		= NULL;
-
-	m_ViewModes.push_back(ViewMode::ExtraLargeIcons);
-	m_ViewModes.push_back(ViewMode::LargeIcons);
-	m_ViewModes.push_back(ViewMode::Icons);
-	m_ViewModes.push_back(ViewMode::SmallIcons);
-	m_ViewModes.push_back(ViewMode::List);
-	m_ViewModes.push_back(ViewMode::Details);
-	m_ViewModes.push_back(ViewMode::Thumbnails);
-	m_ViewModes.push_back(ViewMode::Tiles);
 }
 
 Explorerplusplus::~Explorerplusplus()

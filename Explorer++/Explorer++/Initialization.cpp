@@ -376,7 +376,7 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu)
 	MENUITEMINFO mii;
 	TCHAR szText[64];
 
-	for (auto viewMode : m_ViewModes)
+	for (auto viewMode : m_viewModes)
 	{
 		LoadString(m_hLanguageModule, GetViewModeMenuStringId(viewMode),
 			szText, SIZEOF_ARRAY(szText));
