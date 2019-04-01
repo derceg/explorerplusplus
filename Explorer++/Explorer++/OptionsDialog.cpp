@@ -23,7 +23,7 @@
 #include "../Helper/SetDefaultFileManager.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
-
+#include <boost/range/adaptor/map.hpp>
 
 #define NUM_DIALOG_OPTIONS_PAGES	5
 #define LANG_SINHALA				1115
@@ -614,8 +614,6 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					{
 						HWND hCBSize;
 						int iSel;
-						int nTabs;
-						int i = 0;
 
 						m_config->globalFolderSettings.hideSystemFiles = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SYSTEMFILES)
 							== BST_CHECKED);
@@ -668,20 +666,14 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						iSel = (int)SendMessage(hCBSize,CB_GETCURSEL,0,0);
 						m_config->globalFolderSettings.sizeDisplayFormat = (SizeDisplayFormat_t)SendMessage(hCBSize,CB_GETITEMDATA,iSel,0);
 
-						nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-						/* Now, push each of the required settings to the
-						individual tabs...*/
-						for(i = 0;i < nTabs;i++)
+						for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 						{
-							Tab &tab = GetTabByIndex(i);
-
 							/* Each one of the options should also be pushed to new tabs when they are created. */
 							tab.GetShellBrowser()->SetInsertSorted(m_config->insertSorted);
 
 							RefreshTab(tab);
 
-							NListView::ListView_ActivateOneClickSelect(tab.listView,m_config->globalFolderSettings.oneClickActivate,
+							NListView::ListView_ActivateOneClickSelect(tab.listView, m_config->globalFolderSettings.oneClickActivate,
 								m_config->globalFolderSettings.oneClickActivateHoverTime);
 						}
 
@@ -833,17 +825,9 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 					if(m_config->checkBoxSelection != bCheckBoxSelection)
 					{
-						DWORD dwExtendedStyle;
-						int nTabs;
-						int i = 0;
-
-						nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-						for(i = 0;i < nTabs;i++)
+						for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 						{
-							Tab &tab = GetTabByIndex(i);
-
-							dwExtendedStyle = ListView_GetExtendedListViewStyle(tab.listView);
+							DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(tab.listView);
 
 							if(bCheckBoxSelection)
 							{
@@ -881,7 +865,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 					if(!m_config->alwaysShowTabBar)
 					{
-						if(TabCtrl_GetItemCount(m_hTabCtrl) > 1)
+						if(GetNumTabs() > 1)
 							m_bShowTabBar = TRUE;
 						else
 							m_bShowTabBar = FALSE;
@@ -891,21 +875,14 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 						m_bShowTabBar = TRUE;
 					}
 
-					RECT	rc;
-					int nTabs;
-					int i = 0;
-
+					RECT rc;
 					GetClientRect(m_hContainer,&rc);
 
 					SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,
 						(LPARAM)MAKELPARAM(rc.right,rc.bottom));
 
-					nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-					for(i = 0;i < nTabs;i++)
+					for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 					{
-						Tab &tab = GetTabByIndex(i);
-
 						/* TODO: The tab should monitor for settings
 						changes itself. */
 						tab.GetShellBrowser()->OnGridlinesSettingChanged();

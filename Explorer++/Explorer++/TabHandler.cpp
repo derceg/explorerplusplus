@@ -657,7 +657,7 @@ void Explorerplusplus::CloseOtherTabs(int iTab)
 
 void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 {
-	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	int nTabs = GetNumTabs();
 	int newIndex = m_selectedTabIndex;
 
 	if(bNextTab)
@@ -684,7 +684,7 @@ void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
 {
-	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	int nTabs = GetNumTabs();
 	int newIndex;
 
 	if(iTab == -1)
@@ -825,7 +825,7 @@ void Explorerplusplus::RemoveTabFromControl(int iTab)
 		m_TabSelectionHistory.end());
 }
 
-HRESULT Explorerplusplus::RefreshTab(Tab &tab)
+HRESULT Explorerplusplus::RefreshTab(const Tab &tab)
 {
 	PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
 
@@ -1025,7 +1025,7 @@ void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
 
 		case IDM_TAB_CLOSETABSTORIGHT:
 			{
-				int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+				int nTabs = GetNumTabs();
 
 				for(int i = nTabs - 1;i > iTabHit;i--)
 				{

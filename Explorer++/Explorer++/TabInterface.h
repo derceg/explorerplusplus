@@ -8,5 +8,5 @@
 
 __interface TabInterface
 {
-	HRESULT			RefreshTab(Tab &tab);
+	HRESULT RefreshTab(const Tab &tab);
 };

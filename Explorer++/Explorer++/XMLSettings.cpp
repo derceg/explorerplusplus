@@ -14,15 +14,15 @@
  */
 
 #include "stdafx.h"
-#include <objbase.h>
-#include <MsXml2.h>
 #include "Explorer++.h"
 #include "ShellBrowser/Columns.h"
 #include "../DisplayWindow/DisplayWindow.h"
-#include "../Helper/XMLSettings.h"
-#include "../Helper/ProcessHelper.h"
 #include "../Helper/Macros.h"
-
+#include "../Helper/ProcessHelper.h"
+#include "../Helper/XMLSettings.h"
+#include <boost/range/adaptor/map.hpp>
+#include <MsXml2.h>
+#include <objbase.h>
 
 #define COLUMN_TYPE_GENERIC			0
 #define COLUMN_TYPE_MYCOMPUTER		1
@@ -853,18 +853,13 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 	TCHAR					szTabDirectory[MAX_PATH];
 	UINT					SortMode;
 	UINT					ViewMode;
-	int						nTabs;
-	int						i = 0;
+	int						tabNum = 0;
 
-	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-	for(i = 0;i < nTabs;i++)
+	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 	{
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 
-		const Tab &tab = GetTabByIndex(i);
-
-		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), i);
+		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), tabNum);
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Tab"),szNodeName);
 
 		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
@@ -943,6 +938,8 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 
 		pParentNode->Release();
 		pParentNode = NULL;
+
+		tabNum++;
 	}
 
 	SysFreeString(bstr_wsntt);

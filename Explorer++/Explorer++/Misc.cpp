@@ -16,9 +16,9 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include <boost/range/adaptor/map.hpp>
 #include <shobjidl.h>
 #include <list>
-
 
 void Explorerplusplus::ValidateLoadedSettings(void)
 {
@@ -256,11 +256,8 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 	/* Forward this notification out to all tabs (if a
 	tab is currently in my computer, it will need to
 	update its contents). */
-	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-	for(int i = 0;i < nTabs;i++)
+	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 	{
-		Tab &tab = GetTabByIndex(i);
 		tab.GetShellBrowser()->OnDeviceChange(wParam,lParam);
 	}
 

@@ -94,7 +94,6 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	UINT ItemToCheck = GetViewModeMenuId(viewMode);
 	CheckMenuRadioItem(hProgramMenu,IDM_VIEW_THUMBNAILS,IDM_VIEW_EXTRALARGEICONS,ItemToCheck,MF_BYCOMMAND);
 
-	lEnableMenuItem(hProgramMenu,IDM_FILE_CLOSETAB,TabCtrl_GetItemCount(m_hTabCtrl));
 	lEnableMenuItem(hProgramMenu,IDM_GO_BACK,m_pActiveShellBrowser->CanBrowseBack());
 	lEnableMenuItem(hProgramMenu,IDM_GO_FORWARD,m_pActiveShellBrowser->CanBrowseForward());
 	lEnableMenuItem(hProgramMenu,IDM_GO_UPONELEVEL,m_pActiveShellBrowser->CanBrowseUp());

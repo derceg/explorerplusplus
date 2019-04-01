@@ -9,7 +9,7 @@
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
-
+#include <boost/range/adaptor/map.hpp>
 
 namespace
 {
@@ -427,8 +427,6 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 	UINT	SortMode;
 	DWORD	Disposition;
 	LONG	ReturnValue;
-	int		iNumTabs;
-	int		i = 0;
 
 	/* First, delete all current tab keys. If these keys
 	are not deleted beforehand, then they may be opened
@@ -442,12 +440,12 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		iNumTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+		int tabNum = 0;
 
-		for(i = 0;i < iNumTabs;i++)
+		for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 		{
 			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
-				_T("%d"),i);
+				_T("%d"),tabNum);
 
 			ReturnValue = RegCreateKeyEx(hKey,szItemKey,0,NULL,
 				REG_OPTION_NON_VOLATILE,KEY_WRITE,
@@ -455,8 +453,6 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 
 			if(ReturnValue == ERROR_SUCCESS)
 			{
-				const Tab &tab = GetTabByIndex(i);
-
 				pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
 				RegSetValueEx(hTabKey,_T("Directory"),0,REG_BINARY,
 					(LPBYTE)pidlDirectory,ILGetSize(pidlDirectory));
@@ -525,6 +521,8 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 
 				RegCloseKey(hTabKey);
 			}
+
+			tabNum++;
 		}
 
 		RegCloseKey(hKey);

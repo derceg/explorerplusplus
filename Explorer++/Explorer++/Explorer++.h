@@ -409,7 +409,7 @@ private:
 	void					RemoveTabFromControl(int iTab);
 	bool					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
-	HRESULT					RefreshTab(Tab &tab);
+	HRESULT					RefreshTab(const Tab &tab);
 	void					RefreshAllTabs(void);
 	void					CloseOtherTabs(int iTab);
 	int						GetSelectedTabId() const;

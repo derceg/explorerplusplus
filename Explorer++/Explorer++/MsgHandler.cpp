@@ -16,7 +16,7 @@
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
-
+#include <boost/range/adaptor/map.hpp>
 
 /* The treeview is offset by a small
 amount on the left. */
@@ -344,8 +344,6 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	int				iHolderTop;
 	int				iTabBackingWidth;
 	int				iTabBackingLeft;
-	int				nTabs;
-	int				i = 0;
 
 	if (!m_InitializationFinished)
 	{
@@ -471,12 +469,8 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* <---- ALL listview windows ----> */
 
-	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
-	for(i = 0;i < nTabs;i++)
+	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 	{
-		const Tab &tab = GetTabByIndex(i);
-
 		uFlags = SWP_NOZORDER;
 
 		if (IsTabSelected(tab))
@@ -552,7 +546,7 @@ int Explorerplusplus::OnDestroy(void)
 
 int Explorerplusplus::OnClose(void)
 {
-	if(m_config->confirmCloseTabs && (TabCtrl_GetItemCount(m_hTabCtrl) > 1))
+	if(m_config->confirmCloseTabs && (GetNumTabs() > 1))
 	{
 		TCHAR szTemp[128];
 		LoadString(m_hLanguageModule,IDS_GENERAL_CLOSE_ALL_TABS,szTemp,SIZEOF_ARRAY(szTemp));
@@ -1223,8 +1217,6 @@ void Explorerplusplus::OnAssocChanged(void)
 	TCHAR szTemp[32];
 	DWORD dwShellIconSize;
 	LONG res;
-	int i = 0;
-	int nTabs;
 
 	hShell32 = LoadLibrary(_T("shell32.dll"));
 
@@ -1260,16 +1252,13 @@ void Explorerplusplus::OnAssocChanged(void)
 	/* DO NOT free shell32.dll. Doing so will release
 	the image lists (among other things). */
 
-	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-
 	/* When the system image list is refresh, ALL previous
 	icons will be discarded. This means that SHGetFileInfo()
 	needs to be called to get each files icon again. */
 
 	/* Now, go through each tab, and refresh each icon. */
-	for(i = 0;i < nTabs;i++)
+	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 	{
-		Tab &tab = GetTabByIndex(i);
 		tab.GetShellBrowser()->Refresh();
 	}
 
