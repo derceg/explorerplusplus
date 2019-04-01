@@ -1480,66 +1480,6 @@ void Explorerplusplus::SaveAllSettings(void)
 	delete pLoadSave;
 }
 
-/* Saves directory settings for a particular
-tab. */
-void Explorerplusplus::SaveDirectorySpecificSettings(int iTab)
-{
-	/* TODO: First check if there are already settings held for this
-	tab. If there are, delete them first. */
-
-	Tab &tab = GetTabByIndex(iTab);
-
-	DirectorySettings_t ds;
-	ds.pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
-	ds.dsi.sortMode = tab.GetShellBrowser()->GetSortMode();
-	ds.dsi.viewMode = tab.GetShellBrowser()->GetViewMode();
-
-	ColumnExport_t ce;
-
-	tab.GetShellBrowser()->ExportAllColumns(&ce);
-
-	ds.dsi.ControlPanelColumnList		= ce.ControlPanelColumnList;
-	ds.dsi.MyComputerColumnList			= ce.MyComputerColumnList;
-	ds.dsi.MyNetworkPlacesColumnList	= ce.MyNetworkPlacesColumnList;
-	ds.dsi.NetworkConnectionsColumnList	= ce.NetworkConnectionsColumnList;
-	ds.dsi.PrintersColumnList			= ce.PrintersColumnList;
-	ds.dsi.RealFolderColumnList			= ce.RealFolderColumnList;
-	ds.dsi.RecycleBinColumnList			= ce.RecycleBinColumnList;
-
-	m_DirectorySettingsList.push_back(ds);
-}
-
-/* TODO: This needs to be moved into the actual shell browser. Can't change
-settings until it's known that the folder has successfully changed. */
-void Explorerplusplus::SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDirectory)
-{
-	if(m_DirectorySettingsList.size() > 0)
-	{
-		for(const auto &ds : m_DirectorySettingsList)
-		{
-			if(CompareIdls(pidlDirectory,ds.pidlDirectory))
-			{
-				Tab &tab = GetTabByIndex(iTab);
-
-				tab.GetShellBrowser()->SetSortMode(ds.dsi.sortMode);
-				tab.GetShellBrowser()->SetViewMode(ds.dsi.viewMode);
-
-				ColumnExport_t ce;
-
-				ce.ControlPanelColumnList = ds.dsi.ControlPanelColumnList;
-				ce.MyComputerColumnList = ds.dsi.MyComputerColumnList;
-				ce.MyNetworkPlacesColumnList = ds.dsi.MyNetworkPlacesColumnList;
-				ce.NetworkConnectionsColumnList = ds.dsi.NetworkConnectionsColumnList;
-				ce.PrintersColumnList = ds.dsi.PrintersColumnList;
-				ce.RealFolderColumnList = ds.dsi.RealFolderColumnList;
-				ce.RecycleBinColumnList = ds.dsi.RecycleBinColumnList;
-
-				tab.GetShellBrowser()->ImportAllColumns(&ce);
-			}
-		}
-	}
-}
-
 HWND Explorerplusplus::GetMainWindow() const
 {
 	return m_hContainer;

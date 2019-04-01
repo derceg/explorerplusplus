@@ -111,27 +111,6 @@ private:
 		UINT uFrom;
 	};
 
-	/* Used to store settings for individual directories. */
-	struct DirectorySettingsInternal_t
-	{
-		SortMode	sortMode;
-		ViewMode	viewMode;
-
-		std::list<Column_t>	RealFolderColumnList;
-		std::list<Column_t>	MyComputerColumnList;
-		std::list<Column_t>	ControlPanelColumnList;
-		std::list<Column_t>	RecycleBinColumnList;
-		std::list<Column_t>	PrintersColumnList;
-		std::list<Column_t>	NetworkConnectionsColumnList;
-		std::list<Column_t>	MyNetworkPlacesColumnList;
-	};
-
-	struct DirectorySettings_t
-	{
-		LPITEMIDLIST				pidlDirectory;
-		DirectorySettingsInternal_t	dsi;
-	};
-
 	struct DirectoryAltered_t
 	{
 		int		iIndex;
@@ -498,10 +477,6 @@ private:
 	/* Main toolbar private message handlers. */
 	void					OnToolbarRClick(HWND sourceWindow);
 
-	/* Directory specific settings. */
-	void					SaveDirectorySpecificSettings(int iTab);
-	void					SetDirectorySpecificSettings(int iTab,LPITEMIDLIST pidlDirectory);
-
 	/* Settings. */
 	void					SaveAllSettings(void);
 	LONG					SaveSettings();
@@ -754,9 +729,6 @@ private:
 
 	HWND					m_hActiveListView;
 	CShellBrowser *			m_pActiveShellBrowser;
-
-	/* Directory-specific settings. */
-	std::list<DirectorySettings_t>	m_DirectorySettingsList;
 
 	/* User options variables. */
 	std::shared_ptr<Config>	m_config;	
