@@ -35,7 +35,7 @@ class CRenameTabDialog : public CBaseDialog
 {
 public:
 
-	CRenameTabDialog::CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+	CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hParent,
 		int iTab, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer, TabInterface *ti);
 	~CRenameTabDialog();
 
