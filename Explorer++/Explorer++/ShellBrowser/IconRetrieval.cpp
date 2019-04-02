@@ -95,19 +95,19 @@ void CShellBrowser::UpdateIconCache(const ItemInfo_t &itemInfo, int iconIndex)
 		return;
 	}
 
-	auto cachedItr = m_cachedIcons.findByPath(filePath);
+	auto cachedItr = m_cachedIcons->findByPath(filePath);
 
-	if (cachedItr != m_cachedIcons.end())
+	if (cachedItr != m_cachedIcons->end())
 	{
 		CachedIcon existingCachedIcon = *cachedItr;
 		existingCachedIcon.iconIndex = iconIndex;
-		m_cachedIcons.replace(cachedItr, existingCachedIcon);
+		m_cachedIcons->replace(cachedItr, existingCachedIcon);
 	}
 	else
 	{
 		CachedIcon cachedIcon;
 		cachedIcon.file = filePath;
 		cachedIcon.iconIndex = iconIndex;
-		m_cachedIcons.insert(cachedIcon);
+		m_cachedIcons->insert(cachedIcon);
 	}
 }

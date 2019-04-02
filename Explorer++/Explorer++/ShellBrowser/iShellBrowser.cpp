@@ -333,9 +333,9 @@ boost::optional<int> CShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInf
 		return boost::none;
 	}
 
-	auto cachedItr = m_cachedIcons.findByPath(filePath);
+	auto cachedItr = m_cachedIcons->findByPath(filePath);
 
-	if (cachedItr == m_cachedIcons.end())
+	if (cachedItr == m_cachedIcons->end())
 	{
 		return boost::none;
 	}

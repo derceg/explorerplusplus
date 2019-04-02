@@ -55,18 +55,20 @@ ULONG __stdcall CShellBrowser::Release(void)
 	return m_iRefCount;
 }
 
-CShellBrowser *CShellBrowser::CreateNew(HWND hOwner, HWND hListView, std::shared_ptr<Config> config,
-	const GlobalFolderSettings *globalFolderSettings, const FolderSettings &folderSettings,
-	const InitialColumns &initialColumns)
+CShellBrowser *CShellBrowser::CreateNew(HWND hOwner, HWND hListView, CachedIcons *cachedIcons,
+	std::shared_ptr<Config> config, const GlobalFolderSettings *globalFolderSettings,
+	const FolderSettings &folderSettings, const InitialColumns &initialColumns)
 {
-	return new CShellBrowser(hOwner, hListView, config, globalFolderSettings, folderSettings, initialColumns);
+	return new CShellBrowser(hOwner, hListView, cachedIcons, config, globalFolderSettings,
+		folderSettings, initialColumns);
 }
 
-CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView, std::shared_ptr<Config> config,
-	const GlobalFolderSettings *globalFolderSettings, const FolderSettings &folderSettings,
-	const InitialColumns &initialColumns) :
+CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView, CachedIcons *cachedIcons,
+	std::shared_ptr<Config> config, const GlobalFolderSettings *globalFolderSettings,
+	const FolderSettings &folderSettings, const InitialColumns &initialColumns) :
 m_hOwner(hOwner),
 m_hListView(hListView),
+m_cachedIcons(cachedIcons),
 m_config(config),
 m_globalFolderSettings(globalFolderSettings),
 m_folderSettings(folderSettings),
@@ -83,7 +85,6 @@ m_columnResultIDCounter(0),
 m_itemImageThreadPool(1),
 m_thumbnailResultIDCounter(0),
 m_iconResultIDCounter(0),
-m_cachedIcons(MAX_CACHED_ICONS),
 m_infoTipsThreadPool(1),
 m_infoTipResultIDCounter(0)
 {

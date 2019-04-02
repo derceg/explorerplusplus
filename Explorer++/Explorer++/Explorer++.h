@@ -103,6 +103,10 @@ private:
 	static const UINT_PTR AUTOSAVE_TIMER_ID = 100000;
 	static const UINT AUTOSAVE_TIMEOUT = 30000;
 
+	// Represents the maximum number of icons that can be cached across
+	// all tabs (as the icon cache is shared between tabs).
+	static const int MAX_CACHED_ICONS = 1000;
+
 	struct ArrangeMenuItem_t
 	{
 		UINT SortById;
@@ -710,6 +714,7 @@ private:
 	std::unordered_map<int, Tab> m_Tabs;
 	int						m_tabIdCounter;
 	CTabContainer			*m_tabContainer;
+	CachedIcons				m_cachedIcons;
 
 	/* Tab signals. */
 	TabCreatedSignal		m_tabCreatedSignal;

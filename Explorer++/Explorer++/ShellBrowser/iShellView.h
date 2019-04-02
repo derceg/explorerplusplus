@@ -87,9 +87,9 @@ class CShellBrowser : public IDropTarget, public IDropFilesCallback
 
 public:
 
-	static CShellBrowser	*CreateNew(HWND hOwner, HWND hListView, std::shared_ptr<Config> config,
-		const GlobalFolderSettings *globalFolderSettings, const FolderSettings &folderSettings,
-		const InitialColumns &initialColumns);
+	static CShellBrowser *CreateNew(HWND hOwner, HWND hListView, CachedIcons *cachedIcons,
+		std::shared_ptr<Config> config, const GlobalFolderSettings *globalFolderSettings,
+		const FolderSettings &folderSettings, const InitialColumns &initialColumns);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
@@ -300,12 +300,10 @@ private:
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 152;
 	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 153;
 
-	static const int MAX_CACHED_ICONS = 200;
-
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	CShellBrowser(HWND hOwner, HWND hListView, std::shared_ptr<Config> config,
+	CShellBrowser(HWND hOwner, HWND hListView, CachedIcons *cachedIcons, std::shared_ptr<Config> config,
 		const GlobalFolderSettings *globalFolderSettings, const FolderSettings &folderSettings,
 		const InitialColumns &initialColumns);
 	~CShellBrowser();
@@ -505,7 +503,7 @@ private:
 
 	std::unordered_map<int, std::future<boost::optional<IconResult_t>>> m_iconResults;
 	int					m_iconResultIDCounter;
-	CachedIcons			m_cachedIcons;
+	CachedIcons			*m_cachedIcons;
 
 	std::unordered_map<int, std::future<boost::optional<ThumbnailResult_t>>> m_thumbnailResults;
 	int					m_thumbnailResultIDCounter;
