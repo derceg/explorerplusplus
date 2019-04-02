@@ -89,6 +89,13 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		OnDeviceChange(wParam,lParam);
 		break;
 
+	case WM_TIMER:
+		if (wParam == AUTOSAVE_TIMER_ID)
+		{
+			SaveAllSettings();
+		}
+		break;
+
 	case WM_USER_UPDATEWINDOWS:
 		UpdateWindowStates();
 		break;

@@ -100,6 +100,9 @@ private:
 
 	static const std::vector<std::wstring> BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES;
 
+	static const UINT_PTR AUTOSAVE_TIMER_ID = 100000;
+	static const UINT AUTOSAVE_TIMEOUT = 30000;
+
 	struct ArrangeMenuItem_t
 	{
 		UINT SortById;

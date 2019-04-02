@@ -179,9 +179,6 @@ void Explorerplusplus::OnCreate(void)
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;
 
-
-
-
 	SHChangeNotifyEntry shcne;
 
 	/* Don't need to specify any file for this notification. */
@@ -192,9 +189,6 @@ void Explorerplusplus::OnCreate(void)
 	be done after the tabs have been created. */
 	m_SHChangeNotifyID = SHChangeNotifyRegister(m_hContainer, SHCNRF_ShellLevel,
 		SHCNE_ASSOCCHANGED, WM_APP_ASSOCCHANGED, 1, &shcne);
-
-
-
 
 	InitializeMenus();
 
@@ -210,6 +204,8 @@ void Explorerplusplus::OnCreate(void)
 	m_uiTheming = std::make_unique<UiTheming>(this, this);
 
 	InitializePlugins();
+
+	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 
 	m_InitializationFinished = true;
 }

@@ -569,7 +569,7 @@ int Explorerplusplus::OnClose(void)
 	// being destroyed in the wrong order.
 	m_pluginManager.reset();
 
-	m_iLastSelectedTab = m_selectedTabIndex;
+	KillTimer(m_hContainer, AUTOSAVE_TIMER_ID);
 
 	SaveAllSettings();
 
@@ -1450,6 +1450,8 @@ void Explorerplusplus::OnGroupBy(SortMode sortMode)
 
 void Explorerplusplus::SaveAllSettings(void)
 {
+	m_iLastSelectedTab = m_selectedTabIndex;
+
 	ILoadSave *pLoadSave = NULL;
 
 	if(m_bSavePreferencesToXMLFile)
