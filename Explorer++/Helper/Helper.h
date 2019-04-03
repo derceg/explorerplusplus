@@ -4,10 +4,11 @@
 
 #pragma once
 
+#include <ShObjIdl.h>
 #include <windows.h>
 #include <winioctl.h>
 #include <list>
-#include <ShObjIdl.h>
+#include <string>
 
 struct LangAndCodePage
 {
