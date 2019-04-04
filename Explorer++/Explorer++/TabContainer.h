@@ -21,8 +21,6 @@ public:
 
 	int GetSelection();
 
-	CShellBrowser *GetBrowserForTab(int Index);
-
 private:
 
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;

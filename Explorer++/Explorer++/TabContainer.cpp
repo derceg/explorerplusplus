@@ -88,21 +88,6 @@ int CTabContainer::GetSelection()
 	return Index;
 }
 
-CShellBrowser *CTabContainer::GetBrowserForTab(int Index)
-{
-	TCITEM tcItem;
-	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hTabCtrl,Index,&tcItem);
-	assert(res);
-
-	if(!res)
-	{
-		return NULL;
-	}
-
-	return m_tabInfo->at(static_cast<int>(tcItem.lParam)).GetShellBrowser();
-}
-
 void CTabContainer::OnNavigationCompleted(const Tab &tab)
 {
 	UpdateTabNameInWindow(tab);
