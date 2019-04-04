@@ -75,6 +75,9 @@ __interface IExplorerplusplus
 
 	BOOL			OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM wParam, LPARAM lParam);
 
+	void			ShowTabBar();
+	void			HideTabBar();
+
 	boost::signals2::connection	AddToolbarContextMenuObserver(const ToolbarContextMenuSignal::slot_type &observer);
 };
 

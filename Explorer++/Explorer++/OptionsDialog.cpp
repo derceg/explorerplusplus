@@ -865,21 +865,19 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 					if(!m_config->alwaysShowTabBar)
 					{
-						if(GetNumTabs() > 1)
-							m_bShowTabBar = TRUE;
+						if (GetNumTabs() > 1)
+						{
+							ShowTabBar();
+						}
 						else
-							m_bShowTabBar = FALSE;
+						{
+							HideTabBar();
+						}
 					}
 					else
 					{
-						m_bShowTabBar = TRUE;
+						ShowTabBar();
 					}
-
-					RECT rc;
-					GetClientRect(m_hContainer,&rc);
-
-					SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,
-						(LPARAM)MAKELPARAM(rc.right,rc.bottom));
 
 					for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 					{

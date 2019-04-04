@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Config.h"
+#include "Explorer++_internal.h"
 #include "ShellBrowser/iShellView.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
@@ -13,7 +15,8 @@ class CTabContainer
 {
 public:
 
-	CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInfo, TabContainerInterface *tabContainer);
+	CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab>* tabInfo, TabContainerInterface* tabContainer,
+		IExplorerplusplus* expp, std::shared_ptr<Config> config);
 	~CTabContainer();
 
 	void InsertTab();
@@ -32,6 +35,9 @@ private:
 
 	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 
+	void OnTabCreated(int tabId, BOOL switchToNewTab);
+	void OnTabRemoved(int tabId);
+
 	void OnNavigationCompleted(const Tab &tab);
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 	void UpdateTabNameInWindow(const Tab &tab);
@@ -41,6 +47,12 @@ private:
 
 	std::unordered_map<int, Tab> *m_tabInfo;
 	TabContainerInterface *m_tabContainer;
+	IExplorerplusplus *m_expp;
+
+	std::shared_ptr<Config> m_config;
+
+	boost::signals2::connection m_tabCreatedConnection;
+	boost::signals2::connection m_tabRemovedConnection;
 
 	boost::signals2::connection m_navigationCompletedConnection;
 	boost::signals2::connection m_tabUpdatedConnection;

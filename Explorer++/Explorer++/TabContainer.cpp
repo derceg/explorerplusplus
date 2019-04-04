@@ -9,13 +9,19 @@
 #include "../Helper/TabHelper.h"
 #include <boost/algorithm/string.hpp>
 
-CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInfo, TabContainerInterface *tabContainer) :
+CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInfo, TabContainerInterface *tabContainer,
+	IExplorerplusplus *expp, std::shared_ptr<Config> config) :
 	m_hTabCtrl(hTabCtrl),
 	m_tabInfo(tabInfo),
-	m_tabContainer(tabContainer)
+	m_tabContainer(tabContainer),
+	m_expp(expp),
+	m_config(config)
 {
 	SetWindowSubclass(GetParent(hTabCtrl), ParentWndProcStub, PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
+
+	m_tabCreatedConnection = m_tabContainer->AddTabCreatedObserver(boost::bind(&CTabContainer::OnTabCreated, this, _1, _2));
+	m_tabRemovedConnection = m_tabContainer->AddTabRemovedObserver(boost::bind(&CTabContainer::OnTabRemoved, this, _1));
 
 	m_navigationCompletedConnection = m_tabContainer->AddNavigationCompletedObserver(boost::bind(&CTabContainer::OnNavigationCompleted, this, _1));
 	m_tabUpdatedConnection = m_tabContainer->AddTabUpdatedObserver(boost::bind(&CTabContainer::OnTabUpdated, this, _1, _2));
@@ -24,6 +30,9 @@ CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInf
 CTabContainer::~CTabContainer()
 {
 	RemoveWindowSubclass(GetParent(m_hTabCtrl), ParentWndProcStub, PARENT_SUBCLASS_ID);
+
+	m_tabCreatedConnection.disconnect();
+	m_tabRemovedConnection.disconnect();
 
 	m_navigationCompletedConnection.disconnect();
 	m_tabUpdatedConnection.disconnect();
@@ -86,6 +95,29 @@ int CTabContainer::GetSelection()
 	assert(Index != -1);
 
 	return Index;
+}
+
+void CTabContainer::OnTabCreated(int tabId, BOOL switchToNewTab)
+{
+	UNREFERENCED_PARAMETER(tabId);
+	UNREFERENCED_PARAMETER(switchToNewTab);
+
+	if (!m_config->alwaysShowTabBar &&
+		(m_tabContainer->GetNumTabs() > 1))
+	{
+		m_expp->ShowTabBar();
+	}
+}
+
+void CTabContainer::OnTabRemoved(int tabId)
+{
+	UNREFERENCED_PARAMETER(tabId);
+
+	if (!m_config->alwaysShowTabBar &&
+		(m_tabContainer->GetNumTabs() == 1))
+	{
+		m_expp->HideTabBar();
+	}
 }
 
 void CTabContainer::OnNavigationCompleted(const Tab &tab)

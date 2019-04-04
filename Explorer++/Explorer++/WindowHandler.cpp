@@ -131,3 +131,11 @@ void Explorerplusplus::ToggleFolders(void)
 	SendMessage(m_mainToolbar->GetHWND(),TB_CHECKBUTTON,(WPARAM)TOOLBAR_FOLDERS,(LPARAM)m_config->showFolders);
 	ResizeWindows();
 }
+
+void Explorerplusplus::UpdateLayout()
+{
+	RECT rc;
+	GetClientRect(m_hContainer, &rc);
+	SendMessage(m_hContainer, WM_SIZE, SIZE_RESTORED,
+		MAKELPARAM(rc.right, rc.bottom));
+}

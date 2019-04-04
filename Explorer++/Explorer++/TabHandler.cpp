@@ -68,7 +68,7 @@ void Explorerplusplus::InitializeTabs(void)
 
 	SetWindowSubclass(m_hTabCtrl,TabSubclassProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabContainer = new CTabContainer(m_hTabCtrl, &m_Tabs, this);
+	m_tabContainer = new CTabContainer(m_hTabCtrl, &m_Tabs, this, this, m_config);
 
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
@@ -734,20 +734,6 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 
 	m_Tabs.erase(tab.GetId());
 
-	if(!m_config->alwaysShowTabBar)
-	{
-		if(TabCtrl_GetItemCount(m_hTabCtrl) == 1)
-		{
-			m_bShowTabBar = FALSE;
-
-			RECT rc;
-			GetClientRect(m_hContainer,&rc);
-
-			SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,
-				MAKELPARAM(rc.right,rc.bottom));
-		}
-	}
-
 	m_tabRemovedSignal(tabId);
 
 	return true;
@@ -806,6 +792,18 @@ void Explorerplusplus::RemoveTabFromControl(const Tab &tab)
 	{
 		m_selectedTabIndex--;
 	}
+}
+
+void Explorerplusplus::ShowTabBar()
+{
+	m_bShowTabBar = TRUE;
+	UpdateLayout();
+}
+
+void Explorerplusplus::HideTabBar()
+{
+	m_bShowTabBar = FALSE;
+	UpdateLayout();
 }
 
 HRESULT Explorerplusplus::RefreshTab(const Tab &tab)
@@ -1072,21 +1070,6 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 	tcItem.lParam		= iTabId;
 
 	SendMessage(m_hTabCtrl,TCM_INSERTITEM,(WPARAM)iNewTabIndex,(LPARAM)&tcItem);
-
-	if(!m_config->alwaysShowTabBar)
-	{
-		if(TabCtrl_GetItemCount(m_hTabCtrl) > 1)
-		{
-			RECT rc;
-
-			m_bShowTabBar = TRUE;
-
-			GetClientRect(m_hContainer,&rc);
-
-			SendMessage(m_hContainer,WM_SIZE,SIZE_RESTORED,
-				(LPARAM)MAKELPARAM(rc.right,rc.bottom));
-		}
-	}
 }
 
 void Explorerplusplus::OnLockTab(Tab &tab)

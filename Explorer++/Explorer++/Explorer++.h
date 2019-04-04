@@ -414,6 +414,8 @@ private:
 	FolderSettings			GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;
 	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(const Tab &tab);
+	void					ShowTabBar();
+	void					HideTabBar();
 	bool					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	HRESULT					RefreshTab(const Tab &tab);
@@ -522,6 +524,7 @@ private:
 	void					AdjustFolderPanePosition(void);
 	HRESULT					UpdateStatusBarText(void);
 	void					ToggleFolders(void);
+	void					UpdateLayout();
 
 	/* Languages. */
 	void					SetLanguageModule(void);
