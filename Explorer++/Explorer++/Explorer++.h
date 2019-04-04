@@ -413,7 +413,7 @@ private:
 	void					InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId);
 	FolderSettings			GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;
 	bool					CloseTab(const Tab &tab);
-	void					RemoveTabFromControl(int iTab);
+	void					RemoveTabFromControl(const Tab &tab);
 	bool					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	HRESULT					RefreshTab(const Tab &tab);
@@ -801,7 +801,7 @@ private:
 	BOOL					m_bListViewRenaming;
 
 	/* Tab handler data. */
-	std::vector<int>		m_TabSelectionHistory;
+	std::vector<int>		m_tabSelectionHistory;
 	int						m_iPreviousTabSelectionId;
 	int						m_iTabMenuItem;
 

@@ -386,7 +386,7 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	{
 		if(m_iPreviousTabSelectionId != -1)
 		{
-			m_TabSelectionHistory.push_back(m_iPreviousTabSelectionId);
+			m_tabSelectionHistory.push_back(m_iPreviousTabSelectionId);
 		}
 
 		/* Select the newly created tab. */
@@ -592,7 +592,7 @@ void Explorerplusplus::OnTabSelectionChanged()
 
 	if(m_iPreviousTabSelectionId != -1)
 	{
-		m_TabSelectionHistory.push_back(m_iPreviousTabSelectionId);
+		m_tabSelectionHistory.push_back(m_iPreviousTabSelectionId);
 	}
 
 	/* Hide the old listview. */
@@ -725,10 +725,7 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 		return false;
 	}
 
-	bool closedTabSelected = IsTabSelected(tab);
-
-	int index = GetTabIndex(tab);
-	RemoveTabFromControl(index);
+	RemoveTabFromControl(tab);
 
 	m_pDirMon->StopDirectoryMonitor(tab.GetShellBrowser()->GetDirMonitorId());
 
@@ -757,72 +754,64 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 		}
 	}
 
-	// The tab selection will have only changed to a different tab if
-	// the closed tab was selected.
-	if (closedTabSelected)
-	{
-		OnTabSelectionChanged();
-	}
-
 	m_tabRemovedSignal(tabId);
 
 	return true;
 }
 
-void Explorerplusplus::RemoveTabFromControl(int iTab)
+void Explorerplusplus::RemoveTabFromControl(const Tab &tab)
 {
-	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
-	int iNewTabSelection = m_selectedTabIndex;
+	m_tabSelectionHistory.erase(std::remove(m_tabSelectionHistory.begin(), m_tabSelectionHistory.end(), tab.GetId()), m_tabSelectionHistory.end());
 
-	/* If there was a previously active tab, the focus
-	should be switched back to it. */
-	if(iTab == m_selectedTabIndex &&
-		!m_TabSelectionHistory.empty())
+	const int index = GetTabIndex(tab);
+
+	if(IsTabSelected(tab))
 	{
-		for(int i = 0;i < nTabs;i++)
-		{
-			TCITEM tcItem;
-			tcItem.mask = TCIF_PARAM;
-			TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
+		int newIndex;
 
-			if(static_cast<int>(tcItem.lParam) == m_TabSelectionHistory.back())
+		/* If there was a previously active tab, the focus
+		should be switched back to it. */
+		if (!m_tabSelectionHistory.empty())
+		{
+			const int lastTabId = m_tabSelectionHistory.back();
+			m_tabSelectionHistory.pop_back();
+
+			const Tab& lastTab = GetTab(lastTabId);
+			newIndex = GetTabIndex(lastTab);
+		}
+		else
+		{
+			newIndex = index;
+
+			// If the last tab in the control is what's being closed,
+			// the tab before it will be selected.
+			if (newIndex == (GetNumTabs() - 1))
 			{
-				iNewTabSelection = i;
-				m_TabSelectionHistory.pop_back();
-				break;
+				newIndex--;
 			}
 		}
 
-		/* Tabs are removed from the selection history when they
-		are closed, so any previous tab must exist. */
-		assert(iNewTabSelection != -1);
+		SelectTabAtIndex(newIndex);
+
+		// This is somewhat hacky. Switching the tab will cause the
+		// previously selected tab (i.e. the tab that's about to be
+		// closed) to be added to the history list. That's not
+		// desirable, so the last entry will be removed here.
+		m_tabSelectionHistory.pop_back();
 	}
 
 	TCITEM tcItemRemoved;
-	tcItemRemoved.mask = TCIF_IMAGE|TCIF_PARAM;
-	TabCtrl_GetItem(m_hTabCtrl,iTab,&tcItemRemoved);
+	tcItemRemoved.mask = TCIF_IMAGE;
+	TabCtrl_GetItem(m_hTabCtrl, index, &tcItemRemoved);
 
-	int iRemovedInternalIndex = static_cast<int>(tcItemRemoved.lParam);
+	TabCtrl_DeleteItem(m_hTabCtrl,index);
 
-	TabCtrl_DeleteItem(m_hTabCtrl,iTab);
 	TabCtrl_RemoveImage(m_hTabCtrl,tcItemRemoved.iImage);
 
-	if(iNewTabSelection > iTab ||
-		iNewTabSelection == (nTabs - 1))
+	if (m_selectedTabIndex > index)
 	{
-		iNewTabSelection--;
+		m_selectedTabIndex--;
 	}
-
-	m_selectedTabIndex = iNewTabSelection;
-
-	TabCtrl_SetCurSel(m_hTabCtrl,m_selectedTabIndex);
-
-	m_TabSelectionHistory.erase(std::remove_if(m_TabSelectionHistory.begin(),m_TabSelectionHistory.end(),
-		[iRemovedInternalIndex](int iHistoryInternalIndex) -> bool
-		{
-			return iHistoryInternalIndex == iRemovedInternalIndex;
-		}),
-		m_TabSelectionHistory.end());
 }
 
 HRESULT Explorerplusplus::RefreshTab(const Tab &tab)

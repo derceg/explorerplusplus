@@ -69,7 +69,7 @@ public:
 
 	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)> TabUpdatedSignal;
 
-	Tab(int id);
+	explicit Tab(int id);
 
 	int GetId() const;
 
