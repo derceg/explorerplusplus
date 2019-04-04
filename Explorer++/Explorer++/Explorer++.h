@@ -418,7 +418,7 @@ private:
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	HRESULT					RefreshTab(const Tab &tab);
 	void					RefreshAllTabs(void);
-	void					CloseOtherTabs(int iTab);
+	void					CloseOtherTabs(int index);
 	int						GetSelectedTabId() const;
 	int						GetSelectedTabIndex() const;
 	void					SelectTab(const Tab &tab);

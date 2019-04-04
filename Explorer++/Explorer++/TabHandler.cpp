@@ -18,6 +18,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"
 #include <boost/algorithm/string.hpp>
+#include <boost/range/adaptor/map.hpp>
 #include <algorithm>
 #include <list>
 
@@ -477,7 +478,6 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	TCHAR							szDirectory[MAX_PATH];
 	HRESULT							hr;
 	int								nTabsCreated = 0;
-	int								i = 0;
 
 	if(!g_TabDirs.empty())
 	{
@@ -534,14 +534,9 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	directory. The tab that is finally switched
 	to will have an associated update of window
 	states. */
-	for(i = 0;i < nTabsCreated;i++)
+	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 	{
-		TC_ITEM tcItem;
-
-		tcItem.mask	= TCIF_PARAM;
-		TabCtrl_GetItem(m_hTabCtrl,i,&tcItem);
-
-		HandleDirectoryMonitoring((int)tcItem.lParam);
+		HandleDirectoryMonitoring(tab.GetId());
 	}
 
 	if(!m_config->alwaysShowTabBar)
@@ -554,9 +549,11 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	/* m_iLastSelectedTab is the tab that was selected when the
 	program was last closed. */
-	if(m_iLastSelectedTab >= TabCtrl_GetItemCount(m_hTabCtrl) ||
+	if(m_iLastSelectedTab >= GetNumTabs() ||
 		m_iLastSelectedTab < 0)
+	{
 		m_iLastSelectedTab = 0;
+	}
 
 	/* Set the focus back to the tab that had the focus when the program
 	was last closed. */
@@ -636,18 +633,15 @@ void Explorerplusplus::RefreshAllTabs(void)
 	}
 }
 
-void Explorerplusplus::CloseOtherTabs(int iTab)
+void Explorerplusplus::CloseOtherTabs(int index)
 {
-	int nTabs;
-	int i = 0;
-
-	nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	const int nTabs = GetNumTabs();
 
 	/* Close all tabs except the
 	specified one. */
-	for(i = nTabs - 1;i >= 0; i--)
+	for(int i = nTabs - 1;i >= 0; i--)
 	{
-		if(i != iTab)
+		if(i != index)
 		{
 			const Tab &tab = GetTabByIndex(i);
 			CloseTab(tab);
@@ -710,7 +704,7 @@ bool Explorerplusplus::OnCloseTab(void)
 
 bool Explorerplusplus::CloseTab(const Tab &tab)
 {
-	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	const int nTabs = GetNumTabs();
 
 	if(nTabs == 1 &&
 		m_config->closeMainWindowOnTabClose)
@@ -1128,7 +1122,7 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 
 void Explorerplusplus::UpdateTabToolbar(void)
 {
-	int nTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	const int nTabs = GetNumTabs();
 
 	const Tab &selectedTab = GetSelectedTab();
 
