@@ -810,9 +810,7 @@ void Explorerplusplus::RemoveTabFromControl(const Tab &tab)
 
 HRESULT Explorerplusplus::RefreshTab(const Tab &tab)
 {
-	PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
-
-	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory.get(), SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
+	HRESULT hr = tab.GetShellBrowser()->Refresh();
 
 	if (SUCCEEDED(hr))
 	{
