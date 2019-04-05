@@ -65,8 +65,6 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	/* The following menu items are only enabled when one
 	or more files are selected (they represent file
 	actions, cut/copy, etc). */
-	/* TODO: Split CanCutOrCopySelection() into two, as some
-	items may only be copied/cut (not both). */
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPY,CanCopy());
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_CUT,CanCut());
 	lEnableMenuItem(hProgramMenu,IDM_EDIT_COPYTOFOLDER,CanCopy() && GetFocus() != m_hTreeView);
