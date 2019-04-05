@@ -6,6 +6,7 @@
 #include "LoadSaveXml.h"
 #include "ColorRuleHelper.h"
 #include "Explorer++.h"
+#include "Explorer++_internal.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/XMLSettings.h"
 

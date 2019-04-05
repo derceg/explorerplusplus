@@ -9,6 +9,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Explorer++_internal.h"
 
 void Explorerplusplus::OnCopyItemPath(void) const
 {

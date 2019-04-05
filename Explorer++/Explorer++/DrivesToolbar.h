@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Explorer++_internal.h"
+#include "CoreInterface.h"
 #include "HardwareChangeNotifier.h"
 #include "TabContainerInterface.h"
 #include "../Helper/BaseWindow.h"

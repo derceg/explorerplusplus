@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ShellBrowser/ViewModes.h"
 #include "SortModeHelper.h"

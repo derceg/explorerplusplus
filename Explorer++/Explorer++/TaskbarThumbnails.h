@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Config.h"
-#include "Explorer++_internal.h"
+#include "CoreInterface.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
 #include "../Helper/Macros.h"

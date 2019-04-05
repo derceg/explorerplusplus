@@ -648,6 +648,9 @@
     <ClInclude Include="SortModeHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="CoreInterface.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

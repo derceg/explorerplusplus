@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Explorer++_internal.h"
 #include "DefaultColumns.h"
 #include "HardwareChangeNotifier.h"
 #include "MainResource.h"

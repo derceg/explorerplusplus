@@ -10,6 +10,8 @@
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
+#include "../Helper/StringHelper.h"
 #include <boost/scope_exit.hpp>
 #include <regex>
 

@@ -11,6 +11,7 @@
 
 #include "stdafx.h"
 #include "TaskbarThumbnails.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"

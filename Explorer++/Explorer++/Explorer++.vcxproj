@@ -447,6 +447,7 @@
     <ClInclude Include="ColorRuleDialog.h" />
     <ClInclude Include="ColorRuleHelper.h" />
     <ClInclude Include="CommandInvoked.h" />
+    <ClInclude Include="CoreInterface.h" />
     <ClInclude Include="CustomizeColorsDialog.h" />
     <ClInclude Include="DefaultColumns.h" />
     <ClInclude Include="DefaultToolbarButtons.h" />

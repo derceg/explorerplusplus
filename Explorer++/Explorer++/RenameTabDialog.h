@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "CoreInterface.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "../Helper/BaseDialog.h"

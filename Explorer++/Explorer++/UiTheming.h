@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Explorer++_internal.h"
+#include "CoreInterface.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
 #include <boost/signals2.hpp>

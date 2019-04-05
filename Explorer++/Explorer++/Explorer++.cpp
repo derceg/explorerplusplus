@@ -7,6 +7,7 @@
 #include "BookmarksToolbar.h"
 #include "ColorRuleHelper.h"
 #include "DefaultColumns.h"
+#include "Explorer++_internal.h"
 #include "iServiceProvider.h"
 #include "MenuRanges.h"
 #include "PluginManager.h"

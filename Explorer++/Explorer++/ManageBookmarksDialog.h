@@ -7,6 +7,7 @@
 #include "BookmarkHelper.h"
 #include "BookmarkListView.h"
 #include "BookmarkTreeView.h"
+#include "CoreInterface.h"
 #include "TabContainerInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"

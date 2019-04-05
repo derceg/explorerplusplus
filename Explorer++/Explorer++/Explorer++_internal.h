@@ -4,15 +4,6 @@
 
 #pragma once
 
-#include "ShellBrowser/iShellView.h"
-#include "Tab.h"
-#include "../Helper/StatusBar.h"
-#include <boost/optional.hpp>
-#include <boost/signals2.hpp>
-#include <list>
-
-typedef boost::signals2::signal<void(HMENU, HWND)> ToolbarContextMenuSignal;
-
 /* Used to share global data across the
 classes within the Explorer++ project. */
 namespace NExplorerplusplus
@@ -36,50 +27,6 @@ namespace NExplorerplusplus
 	for each jump list task. */
 	const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[]	= _T("-open_new_tab");
 }
-
-enum MousewheelSource_t
-{
-	MOUSEWHEEL_SOURCE_LISTVIEW,
-	MOUSEWHEEL_SOURCE_TREEVIEW,
-	MOUSEWHEEL_SOURCE_OTHER
-};
-
-/* Basic interface between Explorerplusplus
-and some of the other components (such as the
-dialogs and toolbars). */
-__interface IExplorerplusplus
-{
-	HWND			GetMainWindow() const;
-
-	HWND			GetActiveListView() const;
-	CShellBrowser	*GetActiveShellBrowser() const;
-
-	HWND			GetTreeView() const;
-
-	void			OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
-	void			OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
-
-	CStatusBar		*GetStatusBar();
-
-	void			OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
-
-	HMENU			BuildViewsMenu();
-
-	bool			CanCreate() const;
-	BOOL			CanCut() const;
-	BOOL			CanCopy() const;
-	BOOL			CanRename() const;
-	BOOL			CanDelete() const;
-	BOOL			CanShowFileProperties() const;
-	BOOL			CanPaste() const;
-
-	BOOL			OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM wParam, LPARAM lParam);
-
-	void			ShowTabBar();
-	void			HideTabBar();
-
-	boost::signals2::connection	AddToolbarContextMenuObserver(const ToolbarContextMenuSignal::slot_type &observer);
-};
 
 /* Used when setting Explorer++ as the default
 file manager. */

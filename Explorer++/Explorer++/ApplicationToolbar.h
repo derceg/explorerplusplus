@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <objbase.h>
-#include <MsXml2.h>
-#include <vector>
-#include "Explorer++_internal.h"
 #include "ApplicationToolbarDropHandler.h"
+#include "CoreInterface.h"
 #include "../Helper/BaseWindow.h"
+#include <MsXml2.h>
+#include <objbase.h>
+#include <vector>
 
 class CApplicationToolbar;
 class CApplicationToolbarDropHandler;

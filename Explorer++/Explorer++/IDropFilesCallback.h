@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Explorer++_internal.h"
+#include "CoreInterface.h"
 #include "../Helper/DropHandler.h"
 
 class CDropFilesCallback : public IDropFilesCallback

@@ -12,6 +12,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Explorer++_internal.h"
 #include "MainImages.h"
 #include "MainResource.h"
 #include "ModelessDialogs.h"
