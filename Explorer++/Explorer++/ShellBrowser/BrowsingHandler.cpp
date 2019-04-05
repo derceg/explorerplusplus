@@ -137,7 +137,7 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	return S_OK;
 }
 
-void inline CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
+void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 {
 	LVITEM lv;
 	ULARGE_INTEGER ulFileSize;
@@ -496,7 +496,7 @@ void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 	}
 }
 
-HRESULT inline CShellBrowser::AddItemInternal(LPITEMIDLIST pidlDirectory,
+HRESULT CShellBrowser::AddItemInternal(LPITEMIDLIST pidlDirectory,
 LPITEMIDLIST pidlRelative,const TCHAR *szFileName,int iItemIndex,BOOL bPosition)
 {
 	int uItemId;
@@ -506,7 +506,7 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName,int iItemIndex,BOOL bPosition)
 	return AddItemInternal(iItemIndex,uItemId,bPosition);
 }
 
-HRESULT inline CShellBrowser::AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition)
+HRESULT CShellBrowser::AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition)
 {
 	AwaitingAdd_t	AwaitingAdd;
 
@@ -524,7 +524,7 @@ HRESULT inline CShellBrowser::AddItemInternal(int iItemIndex,int iItemId,BOOL bP
 	return S_OK;
 }
 
-int inline CShellBrowser::SetItemInformation(LPITEMIDLIST pidlDirectory,
+int CShellBrowser::SetItemInformation(LPITEMIDLIST pidlDirectory,
 LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 {
 	LPITEMIDLIST	pidlItem = NULL;
