@@ -7,6 +7,7 @@
 #include "BookmarkHelper.h"
 #include "CustomizeColorsDialog.h"
 #include "Explorer++_internal.h"
+#include "LoadSaveInterface.h"
 #include "MainImages.h"
 #include "MainResource.h"
 #include "ShellBrowser/ViewModes.h"

@@ -338,6 +338,8 @@
     <ClCompile Include="IModelessDialogNotification.cpp" />
     <ClCompile Include="INewMenuClient.cpp" />
     <ClCompile Include="Initialization.cpp" />
+    <ClCompile Include="LoadSaveRegistry.cpp" />
+    <ClCompile Include="LoadSaveXml.cpp" />
     <ClCompile Include="PluginInterface.cpp" />
     <ClCompile Include="iServiceProvider.cpp" />
     <ClCompile Include="Language.cpp" />
@@ -466,6 +468,9 @@
     <ClInclude Include="INewMenuClient.h" />
     <ClInclude Include="iServiceProvider.h" />
     <ClInclude Include="ListViewEdit.h" />
+    <ClInclude Include="LoadSaveInterface.h" />
+    <ClInclude Include="LoadSaveRegistry.h" />
+    <ClInclude Include="LoadSaveXml.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="LuaPlugin.h" />
     <ClInclude Include="MainImages.h" />

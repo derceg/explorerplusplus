@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "LoadSaveInterface.h"
 #include "MainImages.h"
 #include "MainResource.h"
 #include "RenameTabDialog.h"

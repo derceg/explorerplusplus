@@ -328,6 +328,12 @@
     <ClCompile Include="StatusBar.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="LoadSaveRegistry.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="LoadSaveXml.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -625,6 +631,15 @@
       <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="ViewModeHelper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadSaveInterface.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadSaveRegistry.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadSaveXml.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

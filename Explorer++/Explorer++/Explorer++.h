@@ -17,8 +17,6 @@
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ImageWrappers.h"
 #include <boost/signals2.hpp>
-#include <MsXml2.h>
-#include <objbase.h>
 #include <unordered_map>
 
 #define TOOLBAR_START				5000
@@ -44,6 +42,9 @@ namespace NColorRuleHelper
 struct Config;
 
 class CDrivesToolbar;
+class ILoadSave;
+class CLoadSaveRegistry;
+class CLoadSaveXML;
 class MainToolbar;
 
 namespace Plugins
@@ -64,6 +65,9 @@ class CMyTreeView;
 class Explorerplusplus : public IExplorerplusplus, public TabContainerInterface, public TabInterface,
 	public IFileContextMenuExternal, public PluginInterface
 {
+	friend CLoadSaveRegistry;
+	friend CLoadSaveXML;
+
 	friend LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	friend void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
@@ -158,117 +162,6 @@ private:
 		void	*pContainer;
 		int		uId;
 	};
-
-	/* Save/load interface. This allows multiple
-	methods of saving/loading data, as long as it
-	conforms to this specification. */
-	class ILoadSave
-	{
-	public:
-
-		virtual ~ILoadSave(){};
-
-		/* Loading functions. */
-		virtual void	LoadGenericSettings() = 0;
-		virtual void	LoadBookmarks() = 0;
-		virtual int		LoadPreviousTabs() = 0;
-		virtual void	LoadDefaultColumns() = 0;
-		virtual void	LoadApplicationToolbar() = 0;
-		virtual void	LoadToolbarInformation() = 0;
-		virtual void	LoadColorRules() = 0;
-		virtual void	LoadDialogStates() = 0;
-
-		/* Saving functions. */
-		virtual void	SaveGenericSettings() = 0;
-		virtual void	SaveBookmarks() = 0;
-		virtual void	SaveTabs() = 0;
-		virtual void	SaveDefaultColumns() = 0;
-		virtual void	SaveApplicationToolbar() = 0;
-		virtual void	SaveToolbarInformation() = 0;
-		virtual void	SaveColorRules() = 0;
-		virtual void	SaveDialogStates() = 0;
-	};
-
-	class CLoadSaveRegistry : public ILoadSave
-	{
-	public:
-
-		CLoadSaveRegistry(Explorerplusplus *pContainer);
-		~CLoadSaveRegistry();
-
-		/* Loading functions. */
-		void	LoadGenericSettings();
-		void	LoadBookmarks();
-		int		LoadPreviousTabs();
-		void	LoadDefaultColumns();
-		void	LoadApplicationToolbar();
-		void	LoadToolbarInformation();
-		void	LoadColorRules();
-		void	LoadDialogStates();
-
-		/* Saving functions. */
-		void	SaveGenericSettings();
-		void	SaveBookmarks();
-		void	SaveTabs();
-		void	SaveDefaultColumns();
-		void	SaveApplicationToolbar();
-		void	SaveToolbarInformation();
-		void	SaveColorRules();
-		void	SaveDialogStates();
-
-	private:
-
-		Explorerplusplus *m_pContainer;
-	};
-
-	class CLoadSaveXML : public ILoadSave
-	{
-	public:
-
-		CLoadSaveXML(Explorerplusplus *pContainer,BOOL bLoad);
-		~CLoadSaveXML();
-
-		/* Loading functions. */
-		void	LoadGenericSettings();
-		void	LoadBookmarks();
-		int		LoadPreviousTabs();
-		void	LoadDefaultColumns();
-		void	LoadApplicationToolbar();
-		void	LoadToolbarInformation();
-		void	LoadColorRules();
-		void	LoadDialogStates();
-
-		/* Saving functions. */
-		void	SaveGenericSettings();
-		void	SaveBookmarks();
-		void	SaveTabs();
-		void	SaveDefaultColumns();
-		void	SaveApplicationToolbar();
-		void	SaveToolbarInformation();
-		void	SaveColorRules();
-		void	SaveDialogStates();
-
-	private:
-
-		void	InitializeLoadEnvironment();
-		void	ReleaseLoadEnvironment();
-		void	InitializeSaveEnvironment();
-		void	ReleaseSaveEnvironment();
-
-		Explorerplusplus		*m_pContainer;
-		BOOL					m_bLoad;
-
-		/* These are used for saving + loading. */
-		IXMLDOMDocument	*m_pXMLDom;
-
-		/* Used exclusively for loading. */
-		BOOL					m_bLoadedCorrectly;
-
-		/* Used exclusively for saving. */
-		IXMLDOMElement	*m_pRoot;
-	};
-
-	friend CLoadSaveXML;
 
 	LRESULT CALLBACK		WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 

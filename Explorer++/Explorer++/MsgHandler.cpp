@@ -7,6 +7,8 @@
 #include "AddressBar.h"
 #include "ColorRuleHelper.h"
 #include "Explorer++_internal.h"
+#include "LoadSaveRegistry.h"
+#include "LoadSaveXml.h"
 #include "MainResource.h"
 #include "PluginManager.h"
 #include "ShellBrowser/ViewModes.h"
