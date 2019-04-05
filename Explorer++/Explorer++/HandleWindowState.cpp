@@ -6,6 +6,7 @@
 #include "Explorer++.h"
 #include "MainResource.h"
 #include "ShellBrowser/ViewModes.h"
+#include "SortModeHelper.h"
 #include "ToolbarButtons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
@@ -136,7 +137,6 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 void Explorerplusplus::SetArrangeMenuItemStates()
 {
 	UINT ItemToCheck;
-	UINT SortMode;
 	BOOL bShowInGroups;
 	BOOL bVirtualFolder;
 	UINT uFirst;
@@ -148,7 +148,7 @@ void Explorerplusplus::SetArrangeMenuItemStates()
 
 	bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
 
-	SortMode = m_pActiveShellBrowser->GetSortMode();
+	const SortMode sortMode = m_pActiveShellBrowser->GetSortMode();
 
 	bShowInGroups = m_pActiveShellBrowser->GetShowInGroups();
 
@@ -176,7 +176,7 @@ void Explorerplusplus::SetArrangeMenuItemStates()
 		hMenu = m_hGroupBySubMenu;
 		hMenuRClick = m_hGroupBySubMenuRClick;
 
-		ItemToCheck = DetermineGroupModeMenuId(SortMode);
+		ItemToCheck = DetermineGroupModeMenuId(sortMode);
 
 		if(ItemToCheck == -1)
 		{
@@ -210,7 +210,7 @@ void Explorerplusplus::SetArrangeMenuItemStates()
 		hMenu = m_hArrangeSubMenu;
 		hMenuRClick = m_hArrangeSubMenuRClick;
 
-		ItemToCheck = DetermineSortModeMenuId(SortMode);
+		ItemToCheck = DetermineSortModeMenuId(sortMode);
 
 		if(ItemToCheck == -1)
 		{

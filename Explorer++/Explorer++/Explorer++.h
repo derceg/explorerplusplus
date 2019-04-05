@@ -441,10 +441,7 @@ private:
 	void					InitializeArrangeMenuItems(void);
 	void					SetActiveArrangeMenuItems(void);
 	int						InsertArrangeMenuItems(HMENU hMenu);
-	UINT					GetArrangeMenuItemStringIndex(UINT uItemId);
 	void					DeletePreviousArrangeMenuItems(void);
-	int						DetermineSortModeMenuId(int SortMode);
-	int						DetermineGroupModeMenuId(int SortMode);
 
 	/* File operations. */
 	void					CopyToFolder(bool move);
