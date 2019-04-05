@@ -4,6 +4,10 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "AddressBar.h"
+#include "ApplicationToolbar.h"
+#include "BookmarksToolbar.h"
+#include "DrivesToolbar.h"
 #include "MainResource.h"
 #include "../Helper/Controls.h"
 #include "../Helper/MenuHelper.h"

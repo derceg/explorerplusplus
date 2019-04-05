@@ -5,6 +5,9 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "AddBookmarkDialog.h"
+#include "AddressBar.h"
+#include "ApplicationToolbar.h"
+#include "DrivesToolbar.h"
 #include "HolderWindow.h"
 #include "IModelessDialogNotification.h"
 #include "MainResource.h"
@@ -20,6 +23,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include "../MyTreeView/MyTreeView.h"
 
 
 static const int FOLDER_SIZE_LINE_INDEX = 1;

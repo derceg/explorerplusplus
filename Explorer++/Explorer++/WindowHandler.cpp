@@ -9,6 +9,7 @@
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "MainToolbar.h"
 #include "ToolbarButtons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileContextMenuManager.h"

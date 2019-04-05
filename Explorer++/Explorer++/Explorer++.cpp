@@ -4,10 +4,14 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "BookmarksToolbar.h"
+#include "ColorRuleHelper.h"
 #include "DefaultColumns.h"
 #include "iServiceProvider.h"
 #include "MenuRanges.h"
+#include "PluginManager.h"
 #include "ShellBrowser/ViewModes.h"
+#include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ShellHelper.h"
 
 

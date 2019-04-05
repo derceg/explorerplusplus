@@ -15,7 +15,11 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "ApplicationToolbar.h"
+#include "ColorRuleHelper.h"
+#include "MainToolbar.h"
 #include "ShellBrowser/Columns.h"
+#include "ToolbarButtons.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"

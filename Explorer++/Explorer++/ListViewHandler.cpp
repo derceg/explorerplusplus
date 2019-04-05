@@ -8,6 +8,7 @@
 #include "iServiceProvider.h"
 #include "ListViewEdit.h"
 #include "MainResource.h"
+#include "MainToolbar.h"
 #include "MassRenameDialog.h"
 #include "MenuRanges.h"
 #include "SetFileAttributesDialog.h"

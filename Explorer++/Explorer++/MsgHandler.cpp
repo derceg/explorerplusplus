@@ -4,18 +4,23 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "AddressBar.h"
+#include "ColorRuleHelper.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "PluginManager.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ToolbarButtons.h"
 #include "ViewModeHelper.h"
 #include "../Helper/Controls.h"
+#include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include "../MyTreeView/MyTreeView.h"
 #include <boost/range/adaptor/map.hpp>
 
 /* The treeview is offset by a small

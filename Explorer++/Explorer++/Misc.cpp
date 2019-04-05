@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "DefaultColumns.h"
+#include "HardwareChangeNotifier.h"
 #include "MainResource.h"
 #include "SelectColumnsDialog.h"
 #include "../Helper/Controls.h"
@@ -16,6 +17,7 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include "../MyTreeView/MyTreeView.h"
 #include <boost/range/adaptor/map.hpp>
 #include <shobjidl.h>
 #include <list>

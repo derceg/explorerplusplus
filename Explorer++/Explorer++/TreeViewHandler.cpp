@@ -6,12 +6,14 @@
 #include "Explorer++.h"
 #include "HolderWindow.h"
 #include "MainResource.h"
+#include "MainToolbar.h"
 #include "SetFileAttributesDialog.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
+#include "../MyTreeView/MyTreeView.h"
 
 
 #define TREEVIEW_FOLDER_OPEN_DELAY	500

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "../MyTreeView/MyTreeView.h"
 
 bool Explorerplusplus::CanCreate() const
 {

@@ -3,10 +3,14 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "DefaultColumns.h"
 #include "Explorer++.h"
+#include "ApplicationToolbar.h"
+#include "ColorRuleHelper.h"
+#include "DefaultColumns.h"
 #include "Explorer++_internal.h"
+#include "MainToolbar.h"
 #include "../DisplayWindow/DisplayWindow.h"
+#include "../Helper/Bookmark.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/Macros.h"
 #include <boost/range/adaptor/map.hpp>

@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
+#include "PluginManager.h"
 #include "../Helper/ProcessHelper.h"
 #include <boost/filesystem.hpp>
 

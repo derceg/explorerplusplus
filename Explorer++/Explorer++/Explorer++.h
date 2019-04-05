@@ -4,37 +4,21 @@
 
 #pragma once
 
-#include "AddressBar.h"
-#include "ApplicationToolbar.h"
-#include "BookmarkHelper.h"
-#include "BookmarksToolbar.h"
-#include "ColorRuleHelper.h"
-#include "Config.h"
-#include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
-#include "MainToolbar.h"
 #include "PluginCommandManager.h"
 #include "PluginInterface.h"
-#include "PluginManager.h"
 #include "PluginMenuManager.h"
-#include "ShellBrowser/iShellView.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
-#include "TabContainer.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
-#include "TaskbarThumbnails.h"
 #include "UiTheming.h"
-#include "../Helper/Bookmark.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ImageWrappers.h"
-#include "../MyTreeView/MyTreeView.h"
-#include <boost/optional.hpp>
 #include <boost/signals2.hpp>
 #include <MsXml2.h>
 #include <objbase.h>
-#include <array>
 #include <unordered_map>
 
 #define TOOLBAR_START				5000
@@ -46,6 +30,36 @@
 /* Private definitions. */
 #define FROM_LISTVIEW				0
 #define FROM_TREEVIEW				1
+
+// Forward declarations.
+class AddressBar;
+class CApplicationToolbar;
+class CBookmarksToolbar;
+
+namespace NColorRuleHelper
+{
+	struct ColorRule_t;
+}
+
+struct Config;
+
+class CDrivesToolbar;
+class MainToolbar;
+
+namespace Plugins
+{
+	class PluginManager;
+}
+
+class CShellBrowser;
+class CTabContainer;
+class TaskbarThumbnails;
+
+class CBookmarkFolder;
+
+__interface IDirectoryMonitor;
+
+class CMyTreeView;
 
 class Explorerplusplus : public IExplorerplusplus, public TabContainerInterface, public TabInterface,
 	public IFileContextMenuExternal, public PluginInterface

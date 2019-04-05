@@ -10,10 +10,12 @@
 #include "MainImages.h"
 #include "MainResource.h"
 #include "ShellBrowser/ViewModes.h"
+#include "TaskbarThumbnails.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
+#include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include <list>
