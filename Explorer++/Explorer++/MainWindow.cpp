@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "MainWindow.h"
+#include "Config.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/PIDLWrapper.h"

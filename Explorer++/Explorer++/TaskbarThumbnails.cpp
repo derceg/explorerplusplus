@@ -11,6 +11,7 @@
 
 #include "stdafx.h"
 #include "TaskbarThumbnails.h"
+#include "Config.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"

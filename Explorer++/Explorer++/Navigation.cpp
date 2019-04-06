@@ -4,10 +4,10 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Config.h"
 #include "MainResource.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
-
 
 void Explorerplusplus::OnBrowseBack()
 {

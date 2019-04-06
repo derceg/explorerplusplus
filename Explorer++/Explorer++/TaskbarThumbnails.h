@@ -4,11 +4,12 @@
 
 #pragma once
 
-#include "Config.h"
 #include "CoreInterface.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
 #include "../Helper/Macros.h"
+
+struct Config;
 
 class TaskbarThumbnails
 {

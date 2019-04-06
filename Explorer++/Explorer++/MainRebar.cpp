@@ -7,6 +7,7 @@
 #include "AddressBar.h"
 #include "ApplicationToolbar.h"
 #include "BookmarksToolbar.h"
+#include "Config.h"
 #include "DrivesToolbar.h"
 #include "MainResource.h"
 #include "../Helper/Controls.h"

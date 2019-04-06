@@ -4,8 +4,9 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "Explorer++_internal.h"
+#include "Config.h"
 #include "DefaultColumns.h"
+#include "Explorer++_internal.h"
 #include "HardwareChangeNotifier.h"
 #include "MainResource.h"
 #include "SelectColumnsDialog.h"

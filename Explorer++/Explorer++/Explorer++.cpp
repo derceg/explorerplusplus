@@ -6,6 +6,7 @@
 #include "Explorer++.h"
 #include "BookmarksToolbar.h"
 #include "ColorRuleHelper.h"
+#include "Config.h"
 #include "DefaultColumns.h"
 #include "Explorer++_internal.h"
 #include "iServiceProvider.h"
@@ -14,7 +15,6 @@
 #include "ShellBrowser/ViewModes.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ShellHelper.h"
-
 
 /* These entries correspond to shell
 extensions that are known to be

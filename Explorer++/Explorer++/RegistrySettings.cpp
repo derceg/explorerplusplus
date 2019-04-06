@@ -6,6 +6,7 @@
 #include "Explorer++.h"
 #include "ApplicationToolbar.h"
 #include "ColorRuleHelper.h"
+#include "Config.h"
 #include "DefaultColumns.h"
 #include "Explorer++_internal.h"
 #include "MainToolbar.h"

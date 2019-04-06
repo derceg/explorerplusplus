@@ -5,9 +5,10 @@
 #include "stdafx.h"
 #include "ListViewEdit.h"
 #include "Explorer++_internal.h"
+#include "ShellBrowser/iShellView.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
-
 
 CListViewEdit *CListViewEdit::CreateNew(HWND hwnd,int ItemIndex,IExplorerplusplus *pexpp)
 {

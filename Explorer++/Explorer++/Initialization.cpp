@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "BookmarkHelper.h"
+#include "Config.h"
 #include "CustomizeColorsDialog.h"
 #include "Explorer++_internal.h"
 #include "LoadSaveInterface.h"

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Config.h"
 #include "LoadSaveInterface.h"
 #include "MainImages.h"
 #include "MainResource.h"
@@ -24,7 +25,6 @@
 #include <boost/range/adaptor/map.hpp>
 #include <algorithm>
 #include <list>
-
 
 DWORD ListViewStyles		=	WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|
 								LVS_ICON|LVS_EDITLABELS|LVS_SHOWSELALWAYS|LVS_SHAREIMAGELISTS|

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
+#include "ShellBrowser/iShellView.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"

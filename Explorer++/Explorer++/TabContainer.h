@@ -4,12 +4,13 @@
 
 #pragma once
 
-#include "Config.h"
 #include "CoreInterface.h"
 #include "ShellBrowser/iShellView.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
 #include <unordered_map>
+
+struct Config;
 
 class CTabContainer
 {

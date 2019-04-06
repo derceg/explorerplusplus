@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "MainToolbar.h"
+#include "Config.h"
 #include "DefaultToolbarButtons.h"
 #include "MainImages.h"
 #include "MainResource.h"

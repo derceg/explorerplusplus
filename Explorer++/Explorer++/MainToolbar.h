@@ -4,13 +4,14 @@
 
 #pragma once
 
-#include "Config.h"
 #include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
 #include "TabContainerInterface.h"
 #include "../Helper/BaseWindow.h"
 #include <list>
 #include <unordered_map>
+
+struct Config;
 
 class MainToolbar : public CBaseWindow
 {

@@ -10,8 +10,8 @@
 
 #include "stdafx.h"
 #include "INewMenuClient.h"
+#include "ShellBrowser/iShellView.h"
 #include "../Helper/Logging.h"
-
 
 CNewMenuClient::CNewMenuClient(IExplorerplusplus *pexpp) :
 m_pexpp(pexpp),

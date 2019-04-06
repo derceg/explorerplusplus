@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TabContainer.h"
+#include "Config.h"
 #include "Explorer++_internal.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "iShellView.h"
+#include "CachedIcons.h"
 #include "iShellBrowser_internal.h"
 #include "ItemData.h"
 #include "SortModes.h"

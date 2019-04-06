@@ -4,12 +4,9 @@
 
 #pragma once
 
-#include "CachedIcons.h"
 #include "ColumnDataRetrieval.h"
-#include "Config.h"
 #include "FolderSettings.h"
 #include "iPathManager.h"
-#include "ItemData.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/DropHandler.h"
@@ -21,7 +18,6 @@
 #include <boost/optional.hpp>
 #include <future>
 #include <list>
-#include <mutex>
 #include <unordered_map>
 
 #define WM_USER_UPDATEWINDOWS		(WM_APP + 17)
@@ -80,6 +76,10 @@ typedef struct
 	Mimics the feature available in Windows Vista and later. */
 	int nItems;
 } TypeGroup_t;
+
+struct BasicItemInfo_t;
+class CachedIcons;
+struct Config;
 
 class CShellBrowser : public IDropTarget, public IDropFilesCallback
 {

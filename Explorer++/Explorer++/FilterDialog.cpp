@@ -7,6 +7,7 @@
 #include "Explorer++_internal.h"
 #include "MainImages.h"
 #include "MainResource.h"
+#include "ShellBrowser/iShellView.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"

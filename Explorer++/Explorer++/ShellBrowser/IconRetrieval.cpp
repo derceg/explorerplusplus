@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "iShellView.h"
+#include "CachedIcons.h"
 
 void CShellBrowser::QueueIconTask(int internalIndex)
 {

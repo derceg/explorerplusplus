@@ -9,8 +9,8 @@
 
 #include "stdafx.h"
 #include "IDropFilesCallback.h"
+#include "ShellBrowser/iShellView.h"
 #include <list>
-
 
 CDropFilesCallback::CDropFilesCallback(IExplorerplusplus *pexpp) :
 m_pexpp(pexpp),

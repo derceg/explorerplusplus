@@ -7,6 +7,7 @@
 #include "AddBookmarkDialog.h"
 #include "AddressBar.h"
 #include "ApplicationToolbar.h"
+#include "Config.h"
 #include "DrivesToolbar.h"
 #include "HolderWindow.h"
 #include "IModelessDialogNotification.h"

@@ -6,13 +6,13 @@
 #include "WildcardSelectDialog.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "ShellBrowser/iShellView.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
-
 
 const TCHAR CWildcardSelectDialogPersistentSettings::SETTINGS_KEY[] = _T("WildcardSelect");
 

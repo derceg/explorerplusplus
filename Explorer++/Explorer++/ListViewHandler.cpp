@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Config.h"
 #include "IDropFilesCallback.h"
 #include "iServiceProvider.h"
 #include "ListViewEdit.h"

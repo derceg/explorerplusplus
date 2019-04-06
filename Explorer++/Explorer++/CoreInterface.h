@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "ShellBrowser/iShellView.h"
 #include "../Helper/StatusBar.h"
 #include <boost/signals2.hpp>
 
@@ -16,6 +15,8 @@ enum MousewheelSource_t
 	MOUSEWHEEL_SOURCE_TREEVIEW,
 	MOUSEWHEEL_SOURCE_OTHER
 };
+
+class CShellBrowser;
 
 /* Basic interface between Explorerplusplus
 and some of the other components (such as the

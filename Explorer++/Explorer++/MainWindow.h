@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include "Config.h"
 #include "TabContainerInterface.h"
 #include "../Helper/BaseWindow.h"
+
+struct Config;
 
 class MainWindow : CBaseWindow
 {
