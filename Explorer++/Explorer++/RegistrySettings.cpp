@@ -132,7 +132,7 @@ LONG Explorerplusplus::SaveSettings(void)
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("HandleZipFiles"),m_config->handleZipFiles);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("InsertSorted"),m_config->insertSorted);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowPrivilegeLevelInTitleBar"),m_config->showPrivilegeLevelInTitleBar.get());
-		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("AlwaysShowTabBar"),m_config->alwaysShowTabBar);
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("AlwaysShowTabBar"),m_config->alwaysShowTabBar.get());
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("CheckBoxSelection"),m_config->checkBoxSelection);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ForceSize"),m_config->globalFolderSettings.forceSize);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("SizeDisplayFormat"),m_config->globalFolderSettings.sizeDisplayFormat);
@@ -255,6 +255,9 @@ LONG Explorerplusplus::LoadSettings()
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("ShowPrivilegeLevelInTitleBar"), &numericValue);
 		m_config->showPrivilegeLevelInTitleBar.set(numericValue);
 
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("AlwaysShowTabBar"), &numericValue);
+		m_config->alwaysShowTabBar.set(numericValue);
+
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("AllowMultipleInstances"),(LPDWORD)&m_config->allowMultipleInstances);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("OneClickActivate"),(LPDWORD)&m_config->globalFolderSettings.oneClickActivate);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("OneClickActivateHoverTime"),(LPDWORD)&m_config->globalFolderSettings.oneClickActivateHoverTime);
@@ -262,7 +265,6 @@ LONG Explorerplusplus::LoadSettings()
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("DoubleClickTabClose"),(LPDWORD)&m_config->doubleClickTabClose);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("HandleZipFiles"),(LPDWORD)&m_config->handleZipFiles);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("InsertSorted"),(LPDWORD)&m_config->insertSorted);
-		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("AlwaysShowTabBar"),(LPDWORD)&m_config->alwaysShowTabBar);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("CheckBoxSelection"),(LPDWORD)&m_config->checkBoxSelection);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("ForceSize"),(LPDWORD)&m_config->globalFolderSettings.forceSize);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("SizeDisplayFormat"),(LPDWORD)&m_config->globalFolderSettings.sizeDisplayFormat);

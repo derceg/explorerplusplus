@@ -542,7 +542,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 		HandleDirectoryMonitoring(tab.GetId());
 	}
 
-	if(!m_config->alwaysShowTabBar)
+	if(!m_config->alwaysShowTabBar.get())
 	{
 		if(nTabsCreated == 1)
 		{

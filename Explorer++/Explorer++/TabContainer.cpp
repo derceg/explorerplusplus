@@ -26,6 +26,8 @@ CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInf
 
 	m_navigationCompletedConnection = m_tabContainer->AddNavigationCompletedObserver(boost::bind(&CTabContainer::OnNavigationCompleted, this, _1));
 	m_tabUpdatedConnection = m_tabContainer->AddTabUpdatedObserver(boost::bind(&CTabContainer::OnTabUpdated, this, _1, _2));
+
+	m_alwaysShowTabBarConnection = m_config->alwaysShowTabBar.addObserver(boost::bind(&CTabContainer::OnAlwaysShowTabBarUpdated, this, _1));
 }
 
 CTabContainer::~CTabContainer()
@@ -37,6 +39,8 @@ CTabContainer::~CTabContainer()
 
 	m_navigationCompletedConnection.disconnect();
 	m_tabUpdatedConnection.disconnect();
+
+	m_alwaysShowTabBarConnection.disconnect();
 }
 
 LRESULT CALLBACK CTabContainer::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -103,7 +107,7 @@ void CTabContainer::OnTabCreated(int tabId, BOOL switchToNewTab)
 	UNREFERENCED_PARAMETER(tabId);
 	UNREFERENCED_PARAMETER(switchToNewTab);
 
-	if (!m_config->alwaysShowTabBar &&
+	if (!m_config->alwaysShowTabBar.get() &&
 		(m_tabContainer->GetNumTabs() > 1))
 	{
 		m_expp->ShowTabBar();
@@ -114,10 +118,29 @@ void CTabContainer::OnTabRemoved(int tabId)
 {
 	UNREFERENCED_PARAMETER(tabId);
 
-	if (!m_config->alwaysShowTabBar &&
+	if (!m_config->alwaysShowTabBar.get() &&
 		(m_tabContainer->GetNumTabs() == 1))
 	{
 		m_expp->HideTabBar();
+	}
+}
+
+void CTabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
+{
+	if (newValue)
+	{
+		m_expp->ShowTabBar();
+	}
+	else
+	{
+		if (m_tabContainer->GetNumTabs() > 1)
+		{
+			m_expp->ShowTabBar();
+		}
+		else
+		{
+			m_expp->HideTabBar();
+		}
 	}
 }
 

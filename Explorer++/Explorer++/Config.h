@@ -94,7 +94,6 @@ struct Config
 		showBookmarksToolbar = FALSE;
 		showDrivesToolbar = TRUE;
 		showApplicationToolbar = FALSE;
-		alwaysShowTabBar = TRUE;
 		showTabBarAtBottom = FALSE;
 		alwaysOpenNewTab = FALSE;
 		openNewTabNextToCurrent = FALSE;
@@ -128,6 +127,8 @@ struct Config
 		showFullTitlePath.set(FALSE);
 		showUserNameInTitleBar.set(FALSE);
 		showPrivilegeLevelInTitleBar.set(FALSE);
+
+		alwaysShowTabBar.set(TRUE);
 
 		globalFolderSettings.showExtensions = TRUE;
 		globalFolderSettings.showFriendlyDates = TRUE;
@@ -165,7 +166,6 @@ struct Config
 	BOOL showBookmarksToolbar;
 	BOOL showDrivesToolbar;
 	BOOL showApplicationToolbar;
-	BOOL alwaysShowTabBar;
 	BOOL showTabBarAtBottom;
 	BOOL alwaysOpenNewTab;
 	BOOL openNewTabNextToCurrent;
@@ -200,6 +200,9 @@ struct Config
 	ValueWrapper<BOOL> showFullTitlePath;
 	ValueWrapper<BOOL> showUserNameInTitleBar;
 	ValueWrapper<BOOL> showPrivilegeLevelInTitleBar;
+
+	// Tabs
+	ValueWrapper<BOOL> alwaysShowTabBar;
 
 	// These are settings that are shared between all tabs. It's not
 	// possible to adjust them on a per-tab basis.

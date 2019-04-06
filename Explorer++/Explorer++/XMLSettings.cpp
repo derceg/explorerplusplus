@@ -413,7 +413,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysOpenInNewTab"),NXMLSettings::EncodeBoolValue(m_config->alwaysOpenNewTab));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowTabBar"),NXMLSettings::EncodeBoolValue(m_config->alwaysShowTabBar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AlwaysShowTabBar"),NXMLSettings::EncodeBoolValue(m_config->alwaysShowTabBar.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("AutoArrangeGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.autoArrange));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -1521,7 +1521,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_ALWAYSSHOWTABBAR:
-		m_config->alwaysShowTabBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->alwaysShowTabBar.set(NXMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_AUTOARRANGEGLOBAL:

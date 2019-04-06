@@ -723,7 +723,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 				CheckDlgButton(hDlg,IDC_OPTION_MULTIPLEINSTANCES,BST_CHECKED);
 			if(m_config->useLargeToolbarIcons)
 				CheckDlgButton(hDlg,IDC_OPTION_LARGETOOLBARICONS,BST_CHECKED);
-			if(m_config->alwaysShowTabBar)
+			if(m_config->alwaysShowTabBar.get())
 				CheckDlgButton(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR,BST_CHECKED);
 			if(m_config->showTabBarAtBottom)
 				CheckDlgButton(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM,BST_CHECKED);
@@ -789,7 +789,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					m_config->allowMultipleInstances = (IsDlgButtonChecked(hDlg,IDC_OPTION_MULTIPLEINSTANCES)
 						== BST_CHECKED);
 
-					m_config->alwaysShowTabBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR)
+					m_config->alwaysShowTabBar.set(IsDlgButtonChecked(hDlg,IDC_OPTION_ALWAYSSHOWTABBAR)
 						== BST_CHECKED);
 
 					m_config->showTabBarAtBottom = (IsDlgButtonChecked(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM)
@@ -859,22 +859,6 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 							== BST_CHECKED);
 
 						AdjustMainToolbarSize();
-					}
-
-					if(!m_config->alwaysShowTabBar)
-					{
-						if (GetNumTabs() > 1)
-						{
-							ShowTabBar();
-						}
-						else
-						{
-							HideTabBar();
-						}
-					}
-					else
-					{
-						ShowTabBar();
 					}
 
 					for (auto &tab : GetAllTabs() | boost::adaptors::map_values)

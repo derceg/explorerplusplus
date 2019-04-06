@@ -39,6 +39,8 @@ private:
 	void OnTabCreated(int tabId, BOOL switchToNewTab);
 	void OnTabRemoved(int tabId);
 
+	void OnAlwaysShowTabBarUpdated(BOOL newValue);
+
 	void OnNavigationCompleted(const Tab &tab);
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 	void UpdateTabNameInWindow(const Tab &tab);
@@ -57,4 +59,6 @@ private:
 
 	boost::signals2::connection m_navigationCompletedConnection;
 	boost::signals2::connection m_tabUpdatedConnection;
+
+	boost::signals2::connection m_alwaysShowTabBarConnection;
 };
