@@ -10,6 +10,7 @@
 #include "LoadSaveInterface.h"
 #include "MainImages.h"
 #include "MainResource.h"
+#include "MainWindow.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TaskbarThumbnails.h"
 #include "../DisplayWindow/DisplayWindow.h"
@@ -119,12 +120,13 @@ void CALLBACK InitializeCOMAPC(ULONG_PTR dwParam)
 */
 void Explorerplusplus::OnCreate(void)
 {
-	ILoadSave *pLoadSave = NULL;
-
 	InitializeBookmarks();
 
+	ILoadSave *pLoadSave = NULL;
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
+
+	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this);
 
 	m_hTreeViewIconThread = CreateWorkerThread();
 

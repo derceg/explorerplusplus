@@ -547,7 +547,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFriendlyDates"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showFriendlyDates));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFullTitlePath"),NXMLSettings::EncodeBoolValue(m_config->showFullTitlePath));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowFullTitlePath"),NXMLSettings::EncodeBoolValue(m_config->showFullTitlePath.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowGridlinesGlobal"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.showGridlines));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -557,7 +557,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowInGroupsGlobal"),NXMLSettings::EncodeBoolValue(m_config->defaultFolderSettings.showInGroups));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowPrivilegeLevelInTitleBar"),NXMLSettings::EncodeBoolValue(m_config->showPrivilegeLevelInTitleBar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowPrivilegeLevelInTitleBar"),NXMLSettings::EncodeBoolValue(m_config->showPrivilegeLevelInTitleBar.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowStatusBar"),NXMLSettings::EncodeBoolValue(m_config->showStatusBar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -567,7 +567,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowToolbar"),NXMLSettings::EncodeBoolValue(m_config->showMainToolbar));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowUserNameTitleBar"),NXMLSettings::EncodeBoolValue(m_config->showUserNameInTitleBar));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ShowUserNameTitleBar"),NXMLSettings::EncodeBoolValue(m_config->showUserNameInTitleBar.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("SizeDisplayFormat"),NXMLSettings::EncodeIntValue(m_config->globalFolderSettings.sizeDisplayFormat));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -1678,7 +1678,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWFULLTITLEPATH:
-		m_config->showFullTitlePath = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showFullTitlePath.set(NXMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_SHOWGRIDLINESGLOBAL:
@@ -1698,7 +1698,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWPRIVILEGETITLEBAR:
-		m_config->showPrivilegeLevelInTitleBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showPrivilegeLevelInTitleBar.set(NXMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_SHOWSTATUSBAR:
@@ -1718,7 +1718,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_SHOWUSERNAMETITLEBAR:
-		m_config->showUserNameInTitleBar = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->showUserNameInTitleBar.set(NXMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_SIZEDISPLAYFOMRAT:

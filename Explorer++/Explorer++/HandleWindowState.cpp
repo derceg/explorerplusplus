@@ -30,7 +30,6 @@ void Explorerplusplus::UpdateWindowStates(void)
 {
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),m_CurrentDirectory);
 
-	UpdateMainWindowText();
 	UpdateTreeViewSelection();
 	UpdateStatusBarText();
 	UpdateTabToolbar();
@@ -246,74 +245,4 @@ void Explorerplusplus::SetArrangeMenuItemStates()
 		ItemToCheck,MF_BYCOMMAND);
 	CheckMenuRadioItem(hMenuRClick,IDM_ARRANGEICONSBY_ASCENDING,IDM_ARRANGEICONSBY_DESCENDING,
 		ItemToCheck,MF_BYCOMMAND);
-}
-
-void Explorerplusplus::UpdateMainWindowText(void)
-{
-	TCHAR	szTitle[512];
-	TCHAR	szFolderDisplayName[MAX_PATH];
-	TCHAR	szOwner[512];
-
-	/* Don't show full paths for virtual folders (as only the folders
-	GUID will be shown). */
-	if(m_config->showFullTitlePath && !m_pActiveShellBrowser->InVirtualFolder())
-	{
-		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SIZEOF_ARRAY(szFolderDisplayName),SHGDN_FORPARSING);
-	}
-	else
-	{
-		GetDisplayName(m_CurrentDirectory,szFolderDisplayName,SIZEOF_ARRAY(szFolderDisplayName),SHGDN_NORMAL);
-	}
-
-	TCHAR szTemp[64];
-	LoadString(m_hLanguageModule, IDS_MAIN_WINDOW_TITLE, szTemp, SIZEOF_ARRAY(szTemp));
-	StringCchPrintf(szTitle,SIZEOF_ARRAY(szTitle),
-	szTemp,szFolderDisplayName,NExplorerplusplus::APP_NAME);
-
-	if(m_config->showUserNameInTitleBar || m_config->showPrivilegeLevelInTitleBar)
-		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),_T(" ["));
-
-	if(m_config->showUserNameInTitleBar)
-	{
-		GetProcessOwner(GetCurrentProcessId(),szOwner,SIZEOF_ARRAY(szOwner));
-
-		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),szOwner);
-	}
-
-	if(m_config->showPrivilegeLevelInTitleBar)
-	{
-		TCHAR szPrivilegeAddition[64];
-		TCHAR szPrivilege[64];
-
-		if(CheckGroupMembership(GROUP_ADMINISTRATORS))
-		{
-			LoadString(m_hLanguageModule,IDS_PRIVILEGE_LEVEL_ADMINISTRATORS,szPrivilege,SIZEOF_ARRAY(szPrivilege));
-		}
-		else if(CheckGroupMembership(GROUP_POWERUSERS))
-		{
-			LoadString(m_hLanguageModule,IDS_PRIVILEGE_LEVEL_POWER_USERS,szPrivilege,SIZEOF_ARRAY(szPrivilege));
-		}
-		else if(CheckGroupMembership(GROUP_USERS))
-		{
-			LoadString(m_hLanguageModule,IDS_PRIVILEGE_LEVEL_USERS,szPrivilege,SIZEOF_ARRAY(szPrivilege));
-		}
-		else if(CheckGroupMembership(GROUP_USERSRESTRICTED))
-		{
-			LoadString(m_hLanguageModule,IDS_PRIVILEGE_LEVEL_USERS_RESTRICTED,szPrivilege,SIZEOF_ARRAY(szPrivilege));
-		}
-
-		if(m_config->showUserNameInTitleBar)
-			StringCchPrintf(szPrivilegeAddition,SIZEOF_ARRAY(szPrivilegeAddition),
-			_T(" - %s"),szPrivilege);
-		else
-			StringCchPrintf(szPrivilegeAddition,SIZEOF_ARRAY(szPrivilegeAddition),
-			_T("%s"),szPrivilege);
-
-		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),szPrivilegeAddition);
-	}
-
-	if(m_config->showUserNameInTitleBar || m_config->showPrivilegeLevelInTitleBar)
-		StringCchCat(szTitle,SIZEOF_ARRAY(szTitle),_T("]"));
-
-	SetWindowText(m_hContainer,szTitle);
 }

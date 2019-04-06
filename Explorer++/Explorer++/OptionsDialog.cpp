@@ -728,11 +728,11 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 				CheckDlgButton(hDlg,IDC_OPTION_SHOWTABBARATBOTTOM,BST_CHECKED);
 			if(m_config->showFilePreviews)
 				CheckDlgButton(hDlg,IDC_OPTION_FILEPREVIEWS,BST_CHECKED);
-			if(m_config->showFullTitlePath)
+			if(m_config->showFullTitlePath.get())
 				CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_TITLEPATH,BST_CHECKED);
-			if(m_config->showUserNameInTitleBar)
+			if(m_config->showUserNameInTitleBar.get())
 				CheckDlgButton(hDlg,IDC_OPTION_USERNAMEINTITLEBAR,BST_CHECKED);
-			if(m_config->showPrivilegeLevelInTitleBar)
+			if(m_config->showPrivilegeLevelInTitleBar.get())
 				CheckDlgButton(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR,BST_CHECKED);
 			if(m_config->synchronizeTreeview)
 				CheckDlgButton(hDlg,IDC_OPTION_SYNCTREEVIEW,BST_CHECKED);
@@ -797,13 +797,13 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 					m_config->showFilePreviews = (IsDlgButtonChecked(hDlg,IDC_OPTION_FILEPREVIEWS)
 						== BST_CHECKED);
 
-					m_config->showFullTitlePath = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_TITLEPATH)
+					m_config->showFullTitlePath.set(IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_TITLEPATH)
 						== BST_CHECKED);
 
-					m_config->showUserNameInTitleBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_USERNAMEINTITLEBAR)
+					m_config->showUserNameInTitleBar.set(IsDlgButtonChecked(hDlg,IDC_OPTION_USERNAMEINTITLEBAR)
 						== BST_CHECKED);
 
-					m_config->showPrivilegeLevelInTitleBar = (IsDlgButtonChecked(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR)
+					m_config->showPrivilegeLevelInTitleBar.set(IsDlgButtonChecked(hDlg,IDC_OPTION_PRIVILEGELEVELINTITLEBAR)
 						== BST_CHECKED);
 
 					m_config->synchronizeTreeview = (IsDlgButtonChecked(hDlg,IDC_OPTION_SYNCTREEVIEW)
@@ -859,10 +859,6 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 						AdjustMainToolbarSize();
 					}
-
-					/* Required if show full title path or show username/privilege level
-					in title bar options change. */
-					UpdateMainWindowText();
 
 					if(!m_config->alwaysShowTabBar)
 					{

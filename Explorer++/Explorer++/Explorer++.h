@@ -46,6 +46,7 @@ class ILoadSave;
 class CLoadSaveRegistry;
 class CLoadSaveXML;
 class MainToolbar;
+class MainWindow;
 
 namespace Plugins
 {
@@ -423,7 +424,6 @@ private:
 
 	/* Window state update. */
 	void					UpdateWindowStates(void);
-	void					UpdateMainWindowText(void);
 	void					UpdateTreeViewSelection(void);
 	void					SetStatusBarParts(int width);
 	void					ResizeWindows(void);
@@ -614,6 +614,8 @@ private:
 	Gdiplus::Color			m_DisplayWindowSurroundColor;
 	COLORREF				m_DisplayWindowTextColor;
 	HFONT					m_DisplayWindowFont;
+
+	MainWindow				*m_mainWindow;
 
 	AddressBar				*m_addressBar;
 

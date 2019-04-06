@@ -340,6 +340,7 @@
     <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="LoadSaveRegistry.cpp" />
     <ClCompile Include="LoadSaveXml.cpp" />
+    <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="PluginInterface.cpp" />
     <ClCompile Include="iServiceProvider.cpp" />
     <ClCompile Include="Language.cpp" />
@@ -478,6 +479,7 @@
     <ClInclude Include="MainImages.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="MainToolbar.h" />
+    <ClInclude Include="MainWindow.h" />
     <ClInclude Include="ManageBookmarksDialog.h" />
     <ClInclude Include="Manifest.h" />
     <ClInclude Include="MassRenameDialog.h" />
