@@ -77,6 +77,14 @@ LRESULT CALLBACK CTabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		}
 		break;
 
+		case WM_MBUTTONUP:
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+			OnTabCtrlMButtonUp(&pt);
+		}
+		break;
+
 		case WM_CAPTURECHANGED:
 		{
 			if ((HWND)lParam != hwnd)
@@ -188,6 +196,21 @@ void CTabContainer::OnTabCtrlMouseMove(POINT *pt)
 		TabCtrl_SetCurFocus(m_hTabCtrl, iSwap);
 
 		m_draggedTabEndIndex = iSwap;
+	}
+}
+
+void CTabContainer::OnTabCtrlMButtonUp(POINT *pt)
+{
+	TCHITTESTINFO htInfo;
+	htInfo.pt = *pt;
+
+	/* Find the tab that the click occurred over. */
+	int iTabHit = TabCtrl_HitTest(m_hTabCtrl, &htInfo);
+
+	if (iTabHit != -1)
+	{
+		const Tab &tab = m_tabContainer->GetTabByIndex(iTabHit);
+		m_tabContainer->CloseTab(tab);
 	}
 }
 

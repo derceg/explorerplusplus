@@ -104,14 +104,6 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 			SendMessage(m_hContainer,WM_MENUSELECT,wParam,lParam);
 			break;
 
-		case WM_MBUTTONUP:
-			{
-				POINT pt;
-				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-				OnTabCtrlMButtonUp(&pt);
-			}
-			break;
-
 		case WM_RBUTTONUP:
 			{
 				POINT pt;
@@ -1048,29 +1040,6 @@ SortMode Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
 	}
 
 	return sortMode;
-}
-
-void Explorerplusplus::OnTabCtrlMButtonUp(POINT *pt)
-{
-	/* Only close a tab if the tab control
-	actually has focused (i.e. if the middle mouse
-	button was clicked on the control, then the
-	tab control will have focus; if it was clicked
-	somewhere else, it won't). */
-	if(GetFocus() == m_hTabCtrl)
-	{
-		TCHITTESTINFO htInfo;
-		htInfo.pt = *pt;
-
-		/* Find the tab that the click occurred over. */
-		int iTabHit = TabCtrl_HitTest(m_hTabCtrl,&htInfo);
-
-		if(iTabHit != -1)
-		{
-			const Tab &tab = GetTabByIndex(iTabHit);
-			CloseTab(tab);
-		}
-	}
 }
 
 Tab &Explorerplusplus::GetTab(int tabId)

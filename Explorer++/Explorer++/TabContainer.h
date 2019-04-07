@@ -46,6 +46,7 @@ private:
 	void OnTabCtrlLButtonDown(POINT *pt);
 	void OnTabCtrlLButtonUp(void);
 	void OnTabCtrlMouseMove(POINT *pt);
+	void OnTabCtrlMButtonUp(POINT *pt);
 
 	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 
