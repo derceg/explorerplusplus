@@ -48,6 +48,8 @@ private:
 	void OnTabCtrlLButtonUp(void);
 	void OnTabCtrlMouseMove(POINT *pt);
 
+	void OnLButtonDoubleClick(const POINT &pt);
+
 	void OnTabCtrlMButtonUp(POINT *pt);
 
 	void OnTabCtrlRButtonUp(POINT *pt);

@@ -33,8 +33,6 @@ DWORD ListViewStyles		=	WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|
 UINT TabCtrlStyles			=	WS_VISIBLE|WS_CHILD|TCS_FOCUSNEVER|TCS_SINGLELINE|
 								TCS_TOOLTIPS|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
 
-LRESULT CALLBACK TabSubclassProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-
 extern LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 extern std::list<std::wstring> g_TabDirs;
@@ -69,8 +67,6 @@ void Explorerplusplus::InitializeTabs(void)
 	RegisterDragDrop(m_hTabCtrl,pTabDropHandler);
 	pTabDropHandler->Release();
 
-	SetWindowSubclass(m_hTabCtrl,TabSubclassProcStub,0,reinterpret_cast<DWORD_PTR>(this));
-
 	m_tabContainer = new CTabContainer(m_hTabCtrl, &m_Tabs, this, this, this, m_hLanguageModule, m_config);
 
 	/* Create the toolbar that will appear on the tab control.
@@ -78,61 +74,6 @@ void Explorerplusplus::InitializeTabs(void)
 	TCHAR szTabCloseTip[64];
 	LoadString(m_hLanguageModule,IDS_TAB_CLOSE_TIP,szTabCloseTip,SIZEOF_ARRAY(szTabCloseTip));
 	m_hTabWindowToolbar	= CreateTabToolbar(m_hTabBacking,TABTOOLBAR_CLOSE,szTabCloseTip);
-}
-
-LRESULT CALLBACK TabSubclassProcStub(HWND hwnd,UINT uMsg,
-WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
-{
-	UNREFERENCED_PARAMETER(uIdSubclass);
-
-	Explorerplusplus *pContainer = (Explorerplusplus *)dwRefData;
-
-	return pContainer->TabSubclassProc(hwnd,uMsg,wParam,lParam);
-}
-
-LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wParam,LPARAM lParam)
-{
-	switch(msg)
-	{
-		case WM_MENUSELECT:
-			/* Forward the message to the main window so it can
-			handle menu help. */
-			SendMessage(m_hContainer,WM_MENUSELECT,wParam,lParam);
-			break;
-
-		case WM_LBUTTONDBLCLK:
-			{
-				TCHITTESTINFO info;
-				int ItemNum;
-				DWORD dwPos;
-				POINT MousePos;
-
-				dwPos = GetMessagePos();
-				MousePos.x = GET_X_LPARAM(dwPos);
-				MousePos.y = GET_Y_LPARAM(dwPos);
-				ScreenToClient(hTab,&MousePos);
-
-				/* The cursor position will be tested to see if
-				there is a tab beneath it. */
-				info.pt.x	= LOWORD(lParam);
-				info.pt.y	= HIWORD(lParam);
-
-				ItemNum = TabCtrl_HitTest(m_hTabCtrl,&info);
-
-				if(info.flags != TCHT_NOWHERE && m_config->doubleClickTabClose)
-				{
-					Tab &tab = GetTabByIndex(ItemNum);
-					CloseTab(tab);
-				}
-			}
-			break;
-
-		case WM_NCDESTROY:
-			RemoveWindowSubclass(m_hTabCtrl,TabSubclassProcStub,0);
-			break;
-	}
-
-	return DefSubclassProc(hTab,msg,wParam,lParam);
 }
 
 int Explorerplusplus::GetSelectedTabId() const

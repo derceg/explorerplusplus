@@ -91,6 +91,14 @@ LRESULT CALLBACK CTabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		}
 		break;
 
+		case WM_LBUTTONDBLCLK:
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+			OnLButtonDoubleClick(pt);
+		}
+			break;
+
 		case WM_MBUTTONUP:
 		{
 			POINT pt;
@@ -106,6 +114,12 @@ LRESULT CALLBACK CTabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			OnTabCtrlRButtonUp(&pt);
 		}
 		break;
+
+		case WM_MENUSELECT:
+			/* Forward the message to the main window so it can
+			handle menu help. */
+			SendMessage(m_expp->GetMainWindow(), WM_MENUSELECT, wParam, lParam);
+			break;
 
 		case WM_CAPTURECHANGED:
 		{
@@ -218,6 +232,19 @@ void CTabContainer::OnTabCtrlMouseMove(POINT *pt)
 		TabCtrl_SetCurFocus(m_hTabCtrl, iSwap);
 
 		m_draggedTabEndIndex = iSwap;
+	}
+}
+
+void CTabContainer::OnLButtonDoubleClick(const POINT &pt)
+{
+	TCHITTESTINFO info;
+	info.pt = pt;
+	const int index = TabCtrl_HitTest(m_hTabCtrl, &info);
+
+	if (info.flags != TCHT_NOWHERE && m_config->doubleClickTabClose)
+	{
+		const Tab &tab = m_tabContainer->GetTabByIndex(index);
+		m_tabContainer->CloseTab(tab);
 	}
 }
 
