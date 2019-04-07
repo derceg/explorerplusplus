@@ -69,7 +69,6 @@ m_cachedIcons(MAX_CACHED_ICONS)
 	m_bSelectionFromNowhere			= FALSE;
 	m_bSelectingTreeViewDirectory	= FALSE;
 	m_bTreeViewRightClick			= FALSE;
-	m_bTabBeenDragged				= FALSE;
 	m_bSavePreferencesToXMLFile		= FALSE;
 	m_bAttemptToolbarRestore		= FALSE;
 	m_bLanguageLoaded				= FALSE;

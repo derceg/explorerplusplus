@@ -104,26 +104,6 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 			SendMessage(m_hContainer,WM_MENUSELECT,wParam,lParam);
 			break;
 
-		case WM_LBUTTONDOWN:
-			{
-				POINT pt;
-				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-				OnTabCtrlLButtonDown(&pt);
-			}
-			break;
-
-		case WM_LBUTTONUP:
-			OnTabCtrlLButtonUp();
-			break;
-
-		case WM_MOUSEMOVE:
-			{
-				POINT pt;
-				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-				OnTabCtrlMouseMove(&pt);
-			}
-			break;
-
 		case WM_MBUTTONUP:
 			{
 				POINT pt;
@@ -137,15 +117,6 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 				POINT pt;
 				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
 				OnTabCtrlRButtonUp(&pt);
-			}
-			break;
-
-		case WM_CAPTURECHANGED:
-			{
-				if((HWND)lParam != hTab)
-					ReleaseCapture();
-
-				m_bTabBeenDragged = FALSE;
 			}
 			break;
 
@@ -459,11 +430,6 @@ boost::signals2::connection Explorerplusplus::AddTabCreatedObserver(const TabCre
 boost::signals2::connection Explorerplusplus::AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer)
 {
 	return m_tabSelectedSignal.connect(observer);
-}
-
-boost::signals2::connection Explorerplusplus::AddTabMovedObserver(const TabMovedSignal::slot_type &observer)
-{
-	return m_tabMovedSignal.connect(observer);
 }
 
 boost::signals2::connection Explorerplusplus::AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer)
@@ -828,106 +794,6 @@ void Explorerplusplus::OnInitTabMenu(HMENU hMenu)
 	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, tab.GetLocked());
 	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, tab.GetAddressLocked());
 	lEnableMenuItem(hMenu, IDM_TAB_CLOSETAB, !(tab.GetLocked() || tab.GetAddressLocked()));
-}
-
-void Explorerplusplus::OnTabCtrlLButtonDown(POINT *pt)
-{
-	TCHITTESTINFO info;
-	info.pt = *pt;
-	int ItemNum = TabCtrl_HitTest(m_hTabCtrl,&info);
-
-	if(info.flags != TCHT_NOWHERE)
-	{
-		/* Save the bounds of the dragged tab. */
-		TabCtrl_GetItemRect(m_hTabCtrl,ItemNum,&m_rcDraggedTab);
-
-		/* Capture mouse movement exclusively until
-		the mouse button is released. */
-		SetCapture(m_hTabCtrl);
-
-		m_bTabBeenDragged = TRUE;
-		m_draggedTabStartIndex = ItemNum;
-		m_draggedTabEndIndex = ItemNum;
-	}
-}
-
-void Explorerplusplus::OnTabCtrlLButtonUp(void)
-{
-	if (!m_bTabBeenDragged)
-	{
-		return;
-	}
-
-	ReleaseCapture();
-
-	m_bTabBeenDragged = FALSE;
-
-	if (m_draggedTabEndIndex != m_draggedTabStartIndex)
-	{
-		const Tab &tab = GetTabByIndex(m_draggedTabEndIndex);
-		m_tabMovedSignal(tab, m_draggedTabStartIndex, m_draggedTabEndIndex);
-	}
-}
-
-void Explorerplusplus::OnTabCtrlMouseMove(POINT *pt)
-{
-	if (!m_bTabBeenDragged)
-	{
-		return;
-	}
-
-	/* Dragged tab. */
-	int iSelected = TabCtrl_GetCurFocus(m_hTabCtrl);
-
-	TCHITTESTINFO HitTestInfo;
-	HitTestInfo.pt = *pt;
-	int iSwap = TabCtrl_HitTest(m_hTabCtrl,&HitTestInfo);
-
-	/* Check:
-	- If the cursor is over an item.
-	- If the cursor is not over the dragged item itself.
-	- If the cursor has passed to the left of the dragged tab, or
-	- If the cursor has passed to the right of the dragged tab. */
-	if(HitTestInfo.flags != TCHT_NOWHERE &&
-		iSwap != iSelected &&
-		(pt->x < m_rcDraggedTab.left ||
-		pt->x > m_rcDraggedTab.right))
-	{
-		RECT rcSwap;
-
-		TabCtrl_GetItemRect(m_hTabCtrl,iSwap,&rcSwap);
-
-		/* These values need to be adjusted, since
-		tabs are adjusted whenever the dragged tab
-		passes a boundary, not when the cursor is
-		released. */
-		if(pt->x > m_rcDraggedTab.right)
-		{
-			/* Cursor has gone past the right edge of
-			the dragged tab. */
-			m_rcDraggedTab.left		= m_rcDraggedTab.right;
-			m_rcDraggedTab.right	= rcSwap.right;
-		}
-		else
-		{
-			/* Cursor has gone past the left edge of
-			the dragged tab. */
-			m_rcDraggedTab.right	= m_rcDraggedTab.left;
-			m_rcDraggedTab.left		= rcSwap.left;
-		}
-
-		/* Swap the dragged tab with the tab the cursor
-		finished up on. */
-		TabCtrl_SwapItems(m_hTabCtrl,iSelected,iSwap);
-
-		/* The index of the selected tab has now changed
-		(but the actual tab/browser selected remains the
-		same). */
-		m_selectedTabIndex = iSwap;
-		TabCtrl_SetCurFocus(m_hTabCtrl,iSwap);
-
-		m_draggedTabEndIndex = iSwap;
-	}
 }
 
 void Explorerplusplus::OnTabCtrlRButtonUp(POINT *pt)

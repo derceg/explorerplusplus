@@ -303,9 +303,6 @@ private:
 
 	/* Tab control private message handlers. */
 	void					OnInitTabMenu(HMENU hMenu);
-	void					OnTabCtrlLButtonDown(POINT *pt);
-	void					OnTabCtrlLButtonUp(void);
-	void					OnTabCtrlMouseMove(POINT *pt);
 	void					OnTabCtrlRButtonUp(POINT *pt);
 	void					ProcessTabCommand(UINT uMenuID,int iTabHit);
 
@@ -349,7 +346,6 @@ private:
 	/* Tab events. */
 	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer);
-	boost::signals2::connection AddTabMovedObserver(const TabMovedSignal::slot_type &observer);
 	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 
@@ -357,7 +353,8 @@ private:
 	boost::signals2::connection	AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer);
 
 	/* PluginInterface. */
-	TabContainerInterface	*GetTabContainer();
+	TabContainerInterface	*GetTabContainerInterface();
+	CTabContainer			*GetTabContainer();
 	TabInterface			*GetTabInterface();
 	Plugins::PluginMenuManager	*GetPluginMenuManager();
 	UiTheming				*GetUiTheming();
@@ -631,7 +628,6 @@ private:
 	/* Tab signals. */
 	TabCreatedSignal		m_tabCreatedSignal;
 	TabSelectedSignal		m_tabSelectedSignal;
-	TabMovedSignal			m_tabMovedSignal;
 	TabUpdatedSignal		m_tabUpdatedSignal;
 	TabRemovedSignal		m_tabRemovedSignal;
 
@@ -716,12 +712,6 @@ private:
 	std::vector<int>		m_tabSelectionHistory;
 	int						m_iPreviousTabSelectionId;
 	int						m_iTabMenuItem;
-
-	/* Tab dragging. */
-	BOOL					m_bTabBeenDragged;
-	int						m_draggedTabStartIndex;
-	int						m_draggedTabEndIndex;
-	RECT					m_rcDraggedTab;
 	
 	/* Cut items data. */
 	std::list<std::wstring>	m_CutFileNameList;

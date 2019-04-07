@@ -8,14 +8,16 @@
 #include "MenuApi.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
-#include "TabsAPI.h"
+#include "TabContainer.h"
+#include "TabContainerInterface.h"
 #include "TabCreated.h"
 #include "TabMoved.h"
 #include "TabRemoved.h"
+#include "TabsAPI.h"
 #include "TabUpdated.h"
 #include "UiApi.h"
 
-void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInterface *tabInterface);
+void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainerInterface, CTabContainer *tabContainer, TabInterface *tabInterface);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 void BindUiApi(sol::state &state, UiTheming *uiTheming);
 void BindCommandApi(int pluginId, sol::state &state, Plugins::PluginCommandManager *pluginCommandManager);
@@ -28,15 +30,15 @@ int deny(lua_State *state);
 
 void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface *pluginInterface)
 {
-	BindTabsAPI(state, pluginInterface->GetTabContainer(), pluginInterface->GetTabInterface());
+	BindTabsAPI(state, pluginInterface->GetTabContainerInterface(), pluginInterface->GetTabContainer(), pluginInterface->GetTabInterface());
 	BindMenuApi(state, pluginInterface->GetPluginMenuManager());
 	BindUiApi(state, pluginInterface->GetUiTheming());
 	BindCommandApi(pluginId, state, pluginInterface->GetPluginCommandManager());
 }
 
-void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInterface *tabInterface)
+void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainerInterface, CTabContainer *tabContainer, TabInterface *tabInterface)
 {
-	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(tabContainer, tabInterface);
+	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(tabContainerInterface, tabInterface);
 
 	sol::table tabsTable = state.create_named_table("tabs");
 	sol::table tabsMetaTable = MarkTableReadOnly(state, tabsTable);
@@ -49,16 +51,16 @@ void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainer, TabInte
 	tabsMetaTable.set_function("move", &Plugins::TabsApi::move, tabsApi);
 	tabsMetaTable.set_function("close", &Plugins::TabsApi::close, tabsApi);
 
-	std::shared_ptr<Plugins::TabCreated> tabCreated = std::make_shared<Plugins::TabCreated>(tabContainer);
+	std::shared_ptr<Plugins::TabCreated> tabCreated = std::make_shared<Plugins::TabCreated>(tabContainerInterface);
 	BindObserverMethods(state, tabsMetaTable, "onCreated", tabCreated);
 
 	std::shared_ptr<Plugins::TabMoved> tabMoved = std::make_shared<Plugins::TabMoved>(tabContainer);
 	BindObserverMethods(state, tabsMetaTable, "onMoved", tabMoved);
 
-	std::shared_ptr<Plugins::TabUpdated> tabUpdated = std::make_shared<Plugins::TabUpdated>(tabContainer);
+	std::shared_ptr<Plugins::TabUpdated> tabUpdated = std::make_shared<Plugins::TabUpdated>(tabContainerInterface);
 	BindObserverMethods(state, tabsMetaTable, "onUpdated", tabUpdated);
 
-	std::shared_ptr<Plugins::TabRemoved> tabRemoved = std::make_shared<Plugins::TabRemoved>(tabContainer);
+	std::shared_ptr<Plugins::TabRemoved> tabRemoved = std::make_shared<Plugins::TabRemoved>(tabContainerInterface);
 	BindObserverMethods(state, tabsMetaTable, "onRemoved", tabRemoved);
 
 	tabsMetaTable.new_usertype<Plugins::TabsApi::FolderSettings>("FolderSettings",

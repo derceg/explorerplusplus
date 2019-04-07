@@ -16,10 +16,11 @@ CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInf
 	m_tabInfo(tabInfo),
 	m_tabContainer(tabContainer),
 	m_expp(expp),
-	m_config(config)
+	m_config(config),
+	m_bTabBeenDragged(FALSE)
 {
-	SetWindowSubclass(GetParent(hTabCtrl), ParentWndProcStub, PARENT_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(hTabCtrl, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(GetParent(hTabCtrl), ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	m_tabCreatedConnection = m_tabContainer->AddTabCreatedObserver(boost::bind(&CTabContainer::OnTabCreated, this, _1, _2));
 	m_tabRemovedConnection = m_tabContainer->AddTabRemovedObserver(boost::bind(&CTabContainer::OnTabRemoved, this, _1));
@@ -32,6 +33,7 @@ CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInf
 
 CTabContainer::~CTabContainer()
 {
+	RemoveWindowSubclass(m_hTabCtrl, WndProcStub, SUBCLASS_ID);
 	RemoveWindowSubclass(GetParent(m_hTabCtrl), ParentWndProcStub, PARENT_SUBCLASS_ID);
 
 	m_tabCreatedConnection.disconnect();
@@ -41,6 +43,157 @@ CTabContainer::~CTabContainer()
 	m_tabUpdatedConnection.disconnect();
 
 	m_alwaysShowTabBarConnection.disconnect();
+}
+
+LRESULT CALLBACK CTabContainer::WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+{
+	UNREFERENCED_PARAMETER(uIdSubclass);
+
+	CTabContainer *tabContainer = reinterpret_cast<CTabContainer *>(dwRefData);
+	return tabContainer->WndProc(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK CTabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
+	{
+		case WM_LBUTTONDOWN:
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+			OnTabCtrlLButtonDown(&pt);
+		}
+		break;
+
+		case WM_LBUTTONUP:
+			OnTabCtrlLButtonUp();
+			break;
+
+		case WM_MOUSEMOVE:
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+			OnTabCtrlMouseMove(&pt);
+		}
+		break;
+
+		case WM_CAPTURECHANGED:
+		{
+			if ((HWND)lParam != hwnd)
+			{
+				ReleaseCapture();
+			}
+
+			m_bTabBeenDragged = FALSE;
+		}
+		break;
+	}
+
+	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
+void CTabContainer::OnTabCtrlLButtonDown(POINT *pt)
+{
+	TCHITTESTINFO info;
+	info.pt = *pt;
+	int ItemNum = TabCtrl_HitTest(m_hTabCtrl, &info);
+
+	if (info.flags != TCHT_NOWHERE)
+	{
+		/* Save the bounds of the dragged tab. */
+		TabCtrl_GetItemRect(m_hTabCtrl, ItemNum, &m_rcDraggedTab);
+
+		/* Capture mouse movement exclusively until
+		the mouse button is released. */
+		SetCapture(m_hTabCtrl);
+
+		m_bTabBeenDragged = TRUE;
+		m_draggedTabStartIndex = ItemNum;
+		m_draggedTabEndIndex = ItemNum;
+	}
+}
+
+void CTabContainer::OnTabCtrlLButtonUp(void)
+{
+	if (!m_bTabBeenDragged)
+	{
+		return;
+	}
+
+	ReleaseCapture();
+
+	m_bTabBeenDragged = FALSE;
+
+	if (m_draggedTabEndIndex != m_draggedTabStartIndex)
+	{
+		const Tab &tab = m_tabContainer->GetTabByIndex(m_draggedTabEndIndex);
+		m_tabMovedSignal(tab, m_draggedTabStartIndex, m_draggedTabEndIndex);
+	}
+}
+
+void CTabContainer::OnTabCtrlMouseMove(POINT *pt)
+{
+	if (!m_bTabBeenDragged)
+	{
+		return;
+	}
+
+	/* Dragged tab. */
+	int iSelected = TabCtrl_GetCurFocus(m_hTabCtrl);
+
+	TCHITTESTINFO HitTestInfo;
+	HitTestInfo.pt = *pt;
+	int iSwap = TabCtrl_HitTest(m_hTabCtrl, &HitTestInfo);
+
+	/* Check:
+	- If the cursor is over an item.
+	- If the cursor is not over the dragged item itself.
+	- If the cursor has passed to the left of the dragged tab, or
+	- If the cursor has passed to the right of the dragged tab. */
+	if (HitTestInfo.flags != TCHT_NOWHERE &&
+		iSwap != iSelected &&
+		(pt->x < m_rcDraggedTab.left ||
+			pt->x > m_rcDraggedTab.right))
+	{
+		RECT rcSwap;
+
+		TabCtrl_GetItemRect(m_hTabCtrl, iSwap, &rcSwap);
+
+		/* These values need to be adjusted, since
+		tabs are adjusted whenever the dragged tab
+		passes a boundary, not when the cursor is
+		released. */
+		if (pt->x > m_rcDraggedTab.right)
+		{
+			/* Cursor has gone past the right edge of
+			the dragged tab. */
+			m_rcDraggedTab.left = m_rcDraggedTab.right;
+			m_rcDraggedTab.right = rcSwap.right;
+		}
+		else
+		{
+			/* Cursor has gone past the left edge of
+			the dragged tab. */
+			m_rcDraggedTab.right = m_rcDraggedTab.left;
+			m_rcDraggedTab.left = rcSwap.left;
+		}
+
+		/* Swap the dragged tab with the tab the cursor
+		finished up on. */
+		TabCtrl_SwapItems(m_hTabCtrl, iSelected, iSwap);
+
+		/* The index of the selected tab has now changed
+		(but the actual tab/browser selected remains the
+		same). */
+		TabCtrl_SetCurFocus(m_hTabCtrl, iSwap);
+
+		m_draggedTabEndIndex = iSwap;
+	}
+}
+
+boost::signals2::connection CTabContainer::AddTabMovedObserver(const TabMovedSignal::slot_type &observer)
+{
+	return m_tabMovedSignal.connect(observer);
 }
 
 LRESULT CALLBACK CTabContainer::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)

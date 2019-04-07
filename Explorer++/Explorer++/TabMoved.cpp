@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "TabMoved.h"
 
-Plugins::TabMoved::TabMoved(TabContainerInterface *tabContainer) :
+Plugins::TabMoved::TabMoved(CTabContainer *tabContainer) :
 	m_tabContainer(tabContainer)
 {
 

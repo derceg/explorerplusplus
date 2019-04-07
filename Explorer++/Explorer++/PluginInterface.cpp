@@ -4,12 +4,18 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "TabContainer.h"
 #include "TabContainerInterface.h"
 #include "UiTheming.h"
 
-TabContainerInterface *Explorerplusplus::GetTabContainer()
+TabContainerInterface *Explorerplusplus::GetTabContainerInterface()
 {
 	return this;
+}
+
+CTabContainer *Explorerplusplus::GetTabContainer()
+{
+	return m_tabContainer;
 }
 
 TabInterface *Explorerplusplus::GetTabInterface()
