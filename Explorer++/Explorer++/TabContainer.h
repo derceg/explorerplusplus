@@ -8,6 +8,7 @@
 #include "ShellBrowser/iShellView.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
+#include "TabInterface.h"
 #include "boost/signals2.hpp"
 #include <unordered_map>
 
@@ -19,8 +20,8 @@ public:
 
 	typedef boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)> TabMovedSignal;
 
-	CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab>* tabInfo, TabContainerInterface* tabContainer,
-		IExplorerplusplus* expp, std::shared_ptr<Config> config);
+	CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInfo, TabContainerInterface *tabContainer,
+		TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config);
 	~CTabContainer();
 
 	void InsertTab();
@@ -46,7 +47,20 @@ private:
 	void OnTabCtrlLButtonDown(POINT *pt);
 	void OnTabCtrlLButtonUp(void);
 	void OnTabCtrlMouseMove(POINT *pt);
+
 	void OnTabCtrlMButtonUp(POINT *pt);
+
+	void OnTabCtrlRButtonUp(POINT *pt);
+	void CreateTabContextMenu(Tab &tab, const POINT &pt);
+	void AddImagesToTabContextMenu(HMENU menu, std::vector<HBitmapPtr> &menuImages);
+	void ProcessTabCommand(UINT uMenuID, Tab &tab);
+	void OnOpenParentInNewTab(const Tab &tab);
+	void OnRefreshAllTabs();
+	void OnRenameTab(const Tab &tab);
+	void OnLockTab(Tab &tab);
+	void OnLockTabAndAddress(Tab &tab);
+	void OnCloseOtherTabs(int index);
+	void OnCloseTabsToRight(int index);
 
 	void OnGetDispInfo(NMTTDISPINFO *dispInfo);
 
@@ -64,8 +78,9 @@ private:
 
 	std::unordered_map<int, Tab> *m_tabInfo;
 	TabContainerInterface *m_tabContainer;
+	TabInterface *m_tabInterface;
 	IExplorerplusplus *m_expp;
-
+	HINSTANCE m_instance;
 	std::shared_ptr<Config> m_config;
 
 	boost::signals2::connection m_tabCreatedConnection;

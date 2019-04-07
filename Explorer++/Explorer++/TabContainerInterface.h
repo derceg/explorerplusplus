@@ -33,6 +33,7 @@ __interface TabContainerInterface
 	bool			IsTabSelected(const Tab &tab);
 	void			SelectTab(const Tab &tab);
 	int				MoveTab(const Tab &tab, int newIndex);
+	void			DuplicateTab(const Tab &tab);
 	int				GetNumTabs() const;
 	bool			CloseTab(const Tab &tab);
 

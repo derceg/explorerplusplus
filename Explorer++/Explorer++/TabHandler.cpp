@@ -71,7 +71,7 @@ void Explorerplusplus::InitializeTabs(void)
 
 	SetWindowSubclass(m_hTabCtrl,TabSubclassProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabContainer = new CTabContainer(m_hTabCtrl, &m_Tabs, this, this, m_config);
+	m_tabContainer = new CTabContainer(m_hTabCtrl, &m_Tabs, this, this, this, m_hLanguageModule, m_config);
 
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
@@ -94,22 +94,10 @@ LRESULT CALLBACK Explorerplusplus::TabSubclassProc(HWND hTab,UINT msg,WPARAM wPa
 {
 	switch(msg)
 	{
-		case WM_INITMENU:
-			OnInitTabMenu(reinterpret_cast<HMENU>(wParam));
-			break;
-
 		case WM_MENUSELECT:
 			/* Forward the message to the main window so it can
 			handle menu help. */
 			SendMessage(m_hContainer,WM_MENUSELECT,wParam,lParam);
-			break;
-
-		case WM_RBUTTONUP:
-			{
-				POINT pt;
-				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-				OnTabCtrlRButtonUp(&pt);
-			}
 			break;
 
 		case WM_LBUTTONDBLCLK:
@@ -586,30 +574,6 @@ void Explorerplusplus::OnTabSelectionChanged()
 	m_tabSelectedSignal(tab);
 }
 
-void Explorerplusplus::RefreshAllTabs(void)
-{
-	for (auto &item : m_Tabs)
-	{
-		RefreshTab(item.second);
-	}
-}
-
-void Explorerplusplus::CloseOtherTabs(int index)
-{
-	const int nTabs = GetNumTabs();
-
-	/* Close all tabs except the
-	specified one. */
-	for(int i = nTabs - 1;i >= 0; i--)
-	{
-		if(i != index)
-		{
-			const Tab &tab = GetTabByIndex(i);
-			CloseTab(tab);
-		}
-	}
-}
-
 void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 {
 	int nTabs = GetNumTabs();
@@ -779,113 +743,6 @@ HRESULT Explorerplusplus::RefreshTab(const Tab &tab)
 	return hr;
 }
 
-void Explorerplusplus::OnInitTabMenu(HMENU hMenu)
-{
-	const Tab &tab = GetTabByIndex(m_iTabMenuItem);
-
-	lCheckMenuItem(hMenu, IDM_TAB_LOCKTAB, tab.GetLocked());
-	lCheckMenuItem(hMenu, IDM_TAB_LOCKTABANDADDRESS, tab.GetAddressLocked());
-	lEnableMenuItem(hMenu, IDM_TAB_CLOSETAB, !(tab.GetLocked() || tab.GetAddressLocked()));
-}
-
-void Explorerplusplus::OnTabCtrlRButtonUp(POINT *pt)
-{
-	TCHITTESTINFO tcHitTest;
-	tcHitTest.pt = *pt;
-	int iTabHit = TabCtrl_HitTest(m_hTabCtrl,&tcHitTest);
-
-	if(tcHitTest.flags != TCHT_NOWHERE)
-	{
-		POINT ptCopy = *pt;
-		ClientToScreen(m_hTabCtrl,&ptCopy);
-
-		m_iTabMenuItem = iTabHit;
-
-		UINT Command = TrackPopupMenu(m_hTabRightClickMenu,
-		TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
-		ptCopy.x,ptCopy.y,0,m_hTabCtrl,NULL);
-
-		ProcessTabCommand(Command,iTabHit);
-	}
-}
-
-void Explorerplusplus::ProcessTabCommand(UINT uMenuID,int iTabHit)
-{
-	Tab &tab = GetTabByIndex(iTabHit);
-
-	switch(uMenuID)
-	{
-		case IDM_TAB_DUPLICATETAB:
-			DuplicateTab(tab);
-			break;
-
-		case IDM_TAB_OPENPARENTINNEWTAB:
-			{
-				LPITEMIDLIST pidlCurrent = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
-
-				LPITEMIDLIST pidlParent = NULL;
-				HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
-
-				if (SUCCEEDED(hr))
-				{
-					CreateNewTab(pidlParent, TabSettings(_selected = true));
-					CoTaskMemFree(pidlParent);
-				}
-
-				CoTaskMemFree(pidlCurrent);
-			}
-			break;
-
-		case IDM_TAB_REFRESH:
-			RefreshTab(tab);
-			break;
-
-		case IDM_TAB_REFRESHALL:
-			RefreshAllTabs();
-			break;
-
-		case IDM_TAB_RENAMETAB:
-			{
-				CRenameTabDialog RenameTabDialog(m_hLanguageModule,IDD_RENAMETAB,m_hContainer,tab.GetId(),this,this,this);
-				RenameTabDialog.ShowModalDialog();
-			}
-			break;
-
-		case IDM_TAB_LOCKTAB:
-			OnLockTab(tab);
-			break;
-
-		case IDM_TAB_LOCKTABANDADDRESS:
-			OnLockTabAndAddress(tab);
-			break;
-
-		case IDM_TAB_CLOSEOTHERTABS:
-			CloseOtherTabs(iTabHit);
-			break;
-
-		case IDM_TAB_CLOSETABSTORIGHT:
-			{
-				int nTabs = GetNumTabs();
-
-				for(int i = nTabs - 1;i > iTabHit;i--)
-				{
-					const Tab &currentTab = GetTabByIndex(i);
-					CloseTab(currentTab);
-				}
-			}
-			break;
-
-		case IDM_TAB_CLOSETAB:
-			CloseTab(tab);
-			break;
-
-		default:
-			/* Send the resulting command back to the main window for processing. */
-			SendMessage(m_hContainer,WM_COMMAND,MAKEWPARAM(uMenuID,iTabHit),0);
-			break;
-	}
-}
-
 void Explorerplusplus::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
 	HIMAGELIST himlTemp = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48);
@@ -931,16 +788,6 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 	tcItem.lParam		= iTabId;
 
 	SendMessage(m_hTabCtrl,TCM_INSERTITEM,(WPARAM)iNewTabIndex,(LPARAM)&tcItem);
-}
-
-void Explorerplusplus::OnLockTab(Tab &tab)
-{
-	tab.SetLocked(!tab.GetLocked());
-}
-
-void Explorerplusplus::OnLockTabAndAddress(Tab &tab)
-{
-	tab.SetAddressLocked(!tab.GetAddressLocked());
 }
 
 void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)

@@ -340,6 +340,9 @@
     <ClCompile Include="MainWindow.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -655,6 +658,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="MainWindow.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

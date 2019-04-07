@@ -369,6 +369,7 @@
     <ClCompile Include="FileProgressSink.cpp" />
     <ClCompile Include="RegistrySettings.cpp" />
     <ClCompile Include="RenameTabDialog.cpp" />
+    <ClCompile Include="ResourceHelper.cpp" />
     <ClCompile Include="ScriptingDialog.cpp" />
     <ClCompile Include="SearchDialog.cpp" />
     <ClCompile Include="SelectColumnsDialog.cpp" />
@@ -498,6 +499,7 @@
     <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="RenameTabDialog.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourceHelper.h" />
     <ClInclude Include="ScriptingDialog.h" />
     <ClInclude Include="SearchDialog.h" />
     <ClInclude Include="SelectColumnsDialog.h" />

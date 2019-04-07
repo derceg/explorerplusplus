@@ -12,6 +12,7 @@
 #include "MainImages.h"
 #include "MainResource.h"
 #include "MainWindow.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TaskbarThumbnails.h"
 #include "../DisplayWindow/DisplayWindow.h"
@@ -19,7 +20,6 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/iDirectoryMonitor.h"
-#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include <list>
 #include <map>
@@ -63,11 +63,6 @@ const std::map<UINT, int> MAIN_MENU_IMAGE_MAPPINGS = {
 	{ IDM_TOOLS_OPTIONS, SHELLIMAGES_OPTIONS },
 
 	{ IDM_HELP_HELP, SHELLIMAGES_HELP }
-};
-
-const std::map<UINT, int> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
-	{ IDM_FILE_NEWTAB, SHELLIMAGES_NEWTAB },
-	{ IDM_TAB_REFRESH, SHELLIMAGES_REFRESH }
 };
 
 DWORD WINAPI WorkerThreadProc(LPVOID pParam)
@@ -147,7 +142,6 @@ void Explorerplusplus::OnCreate(void)
 	m_hArrangeSubMenuRClick = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_ARRANGEMENU)), 0);
 	m_hGroupBySubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
 	m_hGroupBySubMenuRClick = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
-	m_hTabRightClickMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_TAB_RCLICK)), 0);
 
 	CreateDirectoryMonitor(&m_pDirMon);
 
@@ -278,7 +272,7 @@ void Explorerplusplus::InitializeMenus(void)
 	/* Delete the placeholder menu. */
 	DeleteMenu(hMenu,IDM_VIEW_PLACEHOLDER,MF_BYCOMMAND);
 
-	SetMenuImages();
+	SetMainMenuImages();
 
 	SetGoMenuName(hMenu,IDM_GO_MYCOMPUTER,CSIDL_DRIVES);
 	SetGoMenuName(hMenu,IDM_GO_MYDOCUMENTS,CSIDL_PERSONAL);
@@ -293,25 +287,11 @@ void Explorerplusplus::InitializeMenus(void)
 	SetGoMenuName(hMenu,IDM_GO_NETWORKCONNECTIONS,CSIDL_CONNECTIONS);
 }
 
-void Explorerplusplus::SetMenuImages()
+void Explorerplusplus::SetMainMenuImages()
 {
-	HImageListPtr imageList = HImageListPtr(ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48));
+	HImageListPtr imageList = GetShellImageList();
 
 	if (!imageList)
-	{
-		return;
-	}
-
-	HBitmapPtr bitmap = HBitmapPtr(static_cast<HBITMAP>(LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDB_SHELLIMAGES), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION)));
-
-	if (!bitmap)
-	{
-		return;
-	}
-
-	int res = ImageList_Add(imageList.get(), bitmap.get(), nullptr);
-
-	if (res == -1)
 	{
 		return;
 	}
@@ -321,45 +301,6 @@ void Explorerplusplus::SetMenuImages()
 	for (auto mapping : MAIN_MENU_IMAGE_MAPPINGS)
 	{
 		SetMenuItemImageFromImageList(mainMenu, mapping.first, imageList.get(), mapping.second, m_menuImages);
-	}
-
-	for (auto mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
-	{
-		SetMenuItemImageFromImageList(m_hTabRightClickMenu, mapping.first, imageList.get(), mapping.second, m_menuImages);
-	}
-}
-
-void Explorerplusplus::SetMenuItemImageFromImageList(HMENU menu, UINT menuItemId, HIMAGELIST imageList, int bitmapIndex, std::vector<HBitmapPtr> &menuImages)
-{
-	HIconPtr icon = HIconPtr(ImageList_GetIcon(imageList, bitmapIndex, ILD_NORMAL));
-
-	if (!icon)
-	{
-		return;
-	}
-
-	HBitmapPtr bitmapPARGB32 = HBitmapPtr(ImageHelper::IconToBitmapPARGB32(icon.get(), 16, 16));
-
-	if (!bitmapPARGB32)
-	{
-		return;
-	}
-
-	MENUITEMINFO mii;
-	mii.cbSize = sizeof(mii);
-	mii.fMask = MIIM_BITMAP;
-	mii.hbmpItem = bitmapPARGB32.get();
-	BOOL res = SetMenuItemInfo(menu, menuItemId, FALSE, &mii);
-
-	if (res)
-	{
-		/* The bitmap needs to live
-		for as long as the menu
-		does. It's up to the caller
-		to ensure that the bitmap
-		is destroyed at the appropriate
-		time. */
-		menuImages.push_back(std::move(bitmapPARGB32));
 	}
 }
 

@@ -192,8 +192,6 @@ private:
 	void					HandleDirectoryMonitoring(int iTabId);
 	void					OnDisplayWindowResized(WPARAM wParam);
 	void					OnStartedBrowsing(int iTabId, const TCHAR *szPath);
-	void					OnLockTab(Tab &tab);
-	void					OnLockTabAndAddress(Tab &tab);
 	void					UpdateTabToolbar(void);
 	void					OnAutoSizeColumns(void);
 	void					OnToolbarViews(void);
@@ -300,11 +298,6 @@ private:
 	void					OnTreeViewCopyUniversalPaths(void) const;
 	void					OnTreeViewPaste(void);
 
-	/* Tab control private message handlers. */
-	void					OnInitTabMenu(HMENU hMenu);
-	void					OnTabCtrlRButtonUp(POINT *pt);
-	void					ProcessTabCommand(UINT uMenuID,int iTabHit);
-
 	/* Holder window private message handlers. */
 	LRESULT CALLBACK		TreeViewHolderWindowCommandHandler(WPARAM wParam);
 	LRESULT CALLBACK		TreeViewHolderWindowNotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -326,8 +319,6 @@ private:
 	bool					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	HRESULT					RefreshTab(const Tab &tab);
-	void					RefreshAllTabs(void);
-	void					CloseOtherTabs(int index);
 	int						GetSelectedTabId() const;
 	int						GetSelectedTabIndex() const;
 	void					SelectTab(const Tab &tab);
@@ -541,8 +532,7 @@ private:
 
 	/* Menus. */
 	void					InitializeMenus(void);
-	void					SetMenuImages();
-	void					SetMenuItemImageFromImageList(HMENU menu, UINT menuItemId, HIMAGELIST imageList, int bitmapIndex, std::vector<HBitmapPtr> &menuImages);
+	void					SetMainMenuImages();
 	HMENU					BuildViewsMenu();
 	void					AddViewModesToMenu(HMENU menu);
 
@@ -588,7 +578,6 @@ private:
 	HMENU					m_hGroupBySubMenu;
 	HMENU					m_hArrangeSubMenuRClick;
 	HMENU					m_hGroupBySubMenuRClick;
-	HMENU					m_hTabRightClickMenu;
 	TCHAR					m_CurrentDirectory[MAX_PATH];
 	TCHAR					m_OldTreeViewFileName[MAX_PATH];
 	DWORD					m_Language;
@@ -710,7 +699,6 @@ private:
 	/* Tab handler data. */
 	std::vector<int>		m_tabSelectionHistory;
 	int						m_iPreviousTabSelectionId;
-	int						m_iTabMenuItem;
 	
 	/* Cut items data. */
 	std::list<std::wstring>	m_CutFileNameList;

@@ -6,16 +6,30 @@
 #include "TabContainer.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
+#include "MainImages.h"
+#include "MainResource.h"
+#include "RenameTabDialog.h"
+#include "ResourceHelper.h"
+#include "../Helper/MenuHelper.h"
+#include "../Helper/MenuWrapper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"
 #include <boost/algorithm/string.hpp>
+#include <boost/range/adaptor/map.hpp>
+
+const std::map<UINT, int> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
+	{ IDM_FILE_NEWTAB, SHELLIMAGES_NEWTAB },
+	{ IDM_TAB_REFRESH, SHELLIMAGES_REFRESH }
+};
 
 CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInfo, TabContainerInterface *tabContainer,
-	IExplorerplusplus *expp, std::shared_ptr<Config> config) :
+	TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config) :
 	m_hTabCtrl(hTabCtrl),
 	m_tabInfo(tabInfo),
 	m_tabContainer(tabContainer),
+	m_tabInterface(tabInterface),
 	m_expp(expp),
+	m_instance(instance),
 	m_config(config),
 	m_bTabBeenDragged(FALSE)
 {
@@ -82,6 +96,14 @@ LRESULT CALLBACK CTabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			POINT pt;
 			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
 			OnTabCtrlMButtonUp(&pt);
+		}
+		break;
+
+		case WM_RBUTTONUP:
+		{
+			POINT pt;
+			POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+			OnTabCtrlRButtonUp(&pt);
 		}
 		break;
 
@@ -211,6 +233,187 @@ void CTabContainer::OnTabCtrlMButtonUp(POINT *pt)
 	{
 		const Tab &tab = m_tabContainer->GetTabByIndex(iTabHit);
 		m_tabContainer->CloseTab(tab);
+	}
+}
+
+void CTabContainer::OnTabCtrlRButtonUp(POINT *pt)
+{
+	TCHITTESTINFO tcHitTest;
+	tcHitTest.pt = *pt;
+	const int tabHitIndex = TabCtrl_HitTest(m_hTabCtrl, &tcHitTest);
+
+	if (tcHitTest.flags == TCHT_NOWHERE)
+	{
+		return;
+	}
+
+	POINT ptCopy = *pt;
+	BOOL res = ClientToScreen(m_hTabCtrl, &ptCopy);
+
+	if (!res)
+	{
+		return;
+	}
+
+	Tab &tab = m_tabContainer->GetTabByIndex(tabHitIndex);
+
+	CreateTabContextMenu(tab, ptCopy);
+}
+
+void CTabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
+{
+	auto parentMenu = MenuPtr(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_TAB_RCLICK)));
+
+	if (!parentMenu)
+	{
+		return;
+	}
+
+	HMENU menu = GetSubMenu(parentMenu.get(), 0);
+
+	std::vector<HBitmapPtr> menuImages;
+	AddImagesToTabContextMenu(menu, menuImages);
+
+	lCheckMenuItem(menu, IDM_TAB_LOCKTAB, tab.GetLocked());
+	lCheckMenuItem(menu, IDM_TAB_LOCKTABANDADDRESS, tab.GetAddressLocked());
+	lEnableMenuItem(menu, IDM_TAB_CLOSETAB, !(tab.GetLocked() || tab.GetAddressLocked()));
+
+	UINT Command = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
+		pt.x, pt.y, 0, m_hTabCtrl, nullptr);
+
+	ProcessTabCommand(Command, tab);
+}
+
+void CTabContainer::AddImagesToTabContextMenu(HMENU menu, std::vector<HBitmapPtr> &menuImages)
+{
+	HImageListPtr imageList = GetShellImageList();
+
+	if (!imageList)
+	{
+		return;
+	}
+
+	for (auto mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
+	{
+		SetMenuItemImageFromImageList(menu, mapping.first, imageList.get(), mapping.second, menuImages);
+	}
+}
+
+void CTabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
+{
+	switch (uMenuID)
+	{
+		case IDM_FILE_NEWTAB:
+			/* Send the resulting command back to the main window for processing. */
+			SendMessage(m_expp->GetMainWindow(), WM_COMMAND, MAKEWPARAM(uMenuID, 0), 0);
+			break;
+
+		case IDM_TAB_DUPLICATETAB:
+			m_tabContainer->DuplicateTab(tab);
+			break;
+
+		case IDM_TAB_OPENPARENTINNEWTAB:
+			OnOpenParentInNewTab(tab);
+			break;
+
+		case IDM_TAB_REFRESH:
+			m_tabInterface->RefreshTab(tab);
+			break;
+
+		case IDM_TAB_REFRESHALL:
+			OnRefreshAllTabs();
+			break;
+
+		case IDM_TAB_RENAMETAB:
+			OnRenameTab(tab);
+			break;
+
+		case IDM_TAB_LOCKTAB:
+			OnLockTab(tab);
+			break;
+
+		case IDM_TAB_LOCKTABANDADDRESS:
+			OnLockTabAndAddress(tab);
+			break;
+
+		case IDM_TAB_CLOSETAB:
+			m_tabContainer->CloseTab(tab);
+			break;
+
+		case IDM_TAB_CLOSEOTHERTABS:
+			OnCloseOtherTabs(m_tabContainer->GetTabIndex(tab));
+			break;
+
+		case IDM_TAB_CLOSETABSTORIGHT:
+			OnCloseTabsToRight(m_tabContainer->GetTabIndex(tab));
+			break;
+	}
+}
+
+void CTabContainer::OnOpenParentInNewTab(const Tab &tab)
+{
+	LPITEMIDLIST pidlCurrent = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
+
+	LPITEMIDLIST pidlParent = NULL;
+	HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
+
+	if (SUCCEEDED(hr))
+	{
+		m_tabContainer->CreateNewTab(pidlParent, TabSettings(_selected = true));
+		CoTaskMemFree(pidlParent);
+	}
+
+	CoTaskMemFree(pidlCurrent);
+}
+
+void CTabContainer::OnRefreshAllTabs()
+{
+	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
+	{
+		m_tabInterface->RefreshTab(tab);
+	}
+}
+
+void CTabContainer::OnRenameTab(const Tab &tab)
+{
+	CRenameTabDialog RenameTabDialog(m_instance, IDD_RENAMETAB, m_expp->GetMainWindow(), tab.GetId(), m_expp, m_tabContainer, m_tabInterface);
+	RenameTabDialog.ShowModalDialog();
+}
+
+void CTabContainer::OnLockTab(Tab &tab)
+{
+	tab.SetLocked(!tab.GetLocked());
+}
+
+void CTabContainer::OnLockTabAndAddress(Tab &tab)
+{
+	tab.SetAddressLocked(!tab.GetAddressLocked());
+}
+
+void CTabContainer::OnCloseOtherTabs(int index)
+{
+	const int nTabs = m_tabContainer->GetNumTabs();
+
+	/* Close all tabs except the
+	specified one. */
+	for (int i = nTabs - 1; i >= 0; i--)
+	{
+		if (i != index)
+		{
+			const Tab &tab = m_tabContainer->GetTabByIndex(i);
+			m_tabContainer->CloseTab(tab);
+		}
+	}
+}
+
+void CTabContainer::OnCloseTabsToRight(int index)
+{
+	int nTabs = m_tabContainer->GetNumTabs();
+
+	for (int i = nTabs - 1; i > index; i--)
+	{
+		const Tab &currentTab = m_tabContainer->GetTabByIndex(i);
+		m_tabContainer->CloseTab(currentTab);
 	}
 }
 
