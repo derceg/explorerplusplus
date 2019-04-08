@@ -14,6 +14,7 @@
 #include "../Helper/MenuWrapper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"
+#include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/map.hpp>
 
@@ -43,6 +44,7 @@ CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInf
 	m_tabUpdatedConnection = m_tabContainer->AddTabUpdatedObserver(boost::bind(&CTabContainer::OnTabUpdated, this, _1, _2));
 
 	m_alwaysShowTabBarConnection = m_config->alwaysShowTabBar.addObserver(boost::bind(&CTabContainer::OnAlwaysShowTabBarUpdated, this, _1));
+	m_forceSameTabWidthConnection = m_config->forceSameTabWidth.addObserver(boost::bind(&CTabContainer::OnForceSameTabWidthUpdated, this, _1));
 }
 
 CTabContainer::~CTabContainer()
@@ -57,6 +59,7 @@ CTabContainer::~CTabContainer()
 	m_tabUpdatedConnection.disconnect();
 
 	m_alwaysShowTabBarConnection.disconnect();
+	m_forceSameTabWidthConnection.disconnect();
 }
 
 LRESULT CALLBACK CTabContainer::WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -548,6 +551,11 @@ void CTabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
 			m_expp->HideTabBar();
 		}
 	}
+}
+
+void CTabContainer::OnForceSameTabWidthUpdated(BOOL newValue)
+{
+	AddWindowStyle(m_hTabCtrl, TCS_FIXEDWIDTH, newValue);
 }
 
 void CTabContainer::OnNavigationCompleted(const Tab &tab)

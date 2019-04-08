@@ -42,7 +42,7 @@ void Explorerplusplus::InitializeTabs(void)
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	if(m_config->forceSameTabWidth)
+	if(m_config->forceSameTabWidth.get())
 	{
 		TabCtrlStyles |= TCS_FIXEDWIDTH;
 	}

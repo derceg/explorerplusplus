@@ -920,7 +920,7 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 
 				if(m_config->showTaskbarThumbnails)
 					CheckDlgButton(hDlg,IDC_TABS_TASKBARTHUMBNAILS,BST_CHECKED);
-				if(m_config->forceSameTabWidth)
+				if(m_config->forceSameTabWidth.get())
 					CheckDlgButton(hDlg,IDC_TABS_SAMEWIDTH,BST_CHECKED);
 				if(m_config->confirmCloseTabs)
 					CheckDlgButton(hDlg,IDC_TABS_CLOSECONFIRMATION,BST_CHECKED);
@@ -962,7 +962,7 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 						m_config->showTaskbarThumbnails = (IsDlgButtonChecked(hDlg,IDC_TABS_TASKBARTHUMBNAILS)
 							== BST_CHECKED);
 
-						m_config->forceSameTabWidth = (IsDlgButtonChecked(hDlg,IDC_TABS_SAMEWIDTH)
+						m_config->forceSameTabWidth.set(IsDlgButtonChecked(hDlg,IDC_TABS_SAMEWIDTH)
 							== BST_CHECKED);
 
 						m_config->confirmCloseTabs = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSECONFIRMATION)
@@ -979,8 +979,6 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 
 						m_config->closeMainWindowOnTabClose = (IsDlgButtonChecked(hDlg,IDC_TABS_CLOSEMAINWINDOW)
 							== BST_CHECKED);
-
-						AddWindowStyle(m_hTabCtrl,TCS_FIXEDWIDTH,m_config->forceSameTabWidth);
 
 						SaveAllSettings();
 					}

@@ -106,7 +106,6 @@ struct Config
 		extendTabControl = FALSE;
 		allowMultipleInstances = TRUE;
 		doubleClickTabClose = TRUE;
-		forceSameTabWidth = FALSE;
 		useLargeToolbarIcons = FALSE;
 		handleZipFiles = FALSE;
 		insertSorted = TRUE;
@@ -129,6 +128,7 @@ struct Config
 		showPrivilegeLevelInTitleBar.set(FALSE);
 
 		alwaysShowTabBar.set(TRUE);
+		forceSameTabWidth.set(FALSE);
 
 		globalFolderSettings.showExtensions = TRUE;
 		globalFolderSettings.showFriendlyDates = TRUE;
@@ -178,7 +178,6 @@ struct Config
 	BOOL extendTabControl;
 	BOOL allowMultipleInstances;
 	BOOL doubleClickTabClose;
-	BOOL forceSameTabWidth;
 	BOOL useLargeToolbarIcons;
 	BOOL handleZipFiles;
 	BOOL insertSorted;
@@ -203,6 +202,7 @@ struct Config
 
 	// Tabs
 	ValueWrapper<BOOL> alwaysShowTabBar;
+	ValueWrapper<BOOL> forceSameTabWidth;
 
 	// These are settings that are shared between all tabs. It's not
 	// possible to adjust them on a per-tab basis.

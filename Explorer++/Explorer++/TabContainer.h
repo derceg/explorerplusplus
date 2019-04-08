@@ -70,6 +70,7 @@ private:
 	void OnTabRemoved(int tabId);
 
 	void OnAlwaysShowTabBarUpdated(BOOL newValue);
+	void OnForceSameTabWidthUpdated(BOOL newValue);
 
 	void OnNavigationCompleted(const Tab &tab);
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
@@ -92,6 +93,7 @@ private:
 	boost::signals2::connection m_tabUpdatedConnection;
 
 	boost::signals2::connection m_alwaysShowTabBarConnection;
+	boost::signals2::connection m_forceSameTabWidthConnection;
 
 	// Tab dragging
 	BOOL m_bTabBeenDragged;

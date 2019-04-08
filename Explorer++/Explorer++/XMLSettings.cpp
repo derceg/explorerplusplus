@@ -483,7 +483,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ExtendTabControl"),NXMLSettings::EncodeBoolValue(m_config->extendTabControl));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ForceSameTabWidth"),NXMLSettings::EncodeBoolValue(m_config->forceSameTabWidth));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ForceSameTabWidth"),NXMLSettings::EncodeBoolValue(m_config->forceSameTabWidth.get()));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("ForceSize"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.forceSize));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
@@ -1574,7 +1574,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_FORCESAMETABWIDTH:
-		m_config->forceSameTabWidth = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->forceSameTabWidth.set(NXMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_FORCESIZE:
