@@ -35,7 +35,7 @@ UINT TabCtrlStyles			=	WS_VISIBLE|WS_CHILD|TCS_FOCUSNEVER|TCS_SINGLELINE|
 
 extern LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
-extern std::list<std::wstring> g_TabDirs;
+extern std::vector<std::wstring> g_TabDirs;
 
 void Explorerplusplus::InitializeTabs(void)
 {

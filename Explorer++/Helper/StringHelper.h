@@ -24,7 +24,8 @@ BOOL CheckWildcardMatch(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCa
 void ReplaceCharacter(TCHAR *str, TCHAR ch, TCHAR chReplacement);
 void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput,
 	UINT cchMax, TCHAR chToReplace, const TCHAR *szReplacement);
-TCHAR *GetToken(TCHAR *ptr, TCHAR *Buffer);
 void TrimStringLeft(std::wstring &str, const std::wstring &strWhitespace);
 void TrimStringRight(std::wstring &str, const std::wstring &strWhitespace);
 void TrimString(std::wstring &str, const std::wstring &strWhitespace);
+std::string wstrToStr(std::wstring source);
+std::wstring strToWstr(std::string source);

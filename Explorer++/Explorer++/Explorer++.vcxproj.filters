@@ -343,6 +343,12 @@
     <ClCompile Include="ResourceHelper.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="CommandLine.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -661,6 +667,12 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ResourceHelper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandLine.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

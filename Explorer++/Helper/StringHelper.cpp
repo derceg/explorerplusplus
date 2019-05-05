@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "StringHelper.h"
 #include "Macros.h"
-
+#include <codecvt>
 
 BOOL CheckWildcardMatchInternal(const TCHAR *szWildcard, const TCHAR *szString, BOOL bCaseSensitive);
 
@@ -321,49 +321,6 @@ void ReplaceCharacterWithString(const TCHAR *szBaseString, TCHAR *szOutput,
 	StringCchCopy(szOutput, cchMax, szNewString);
 }
 
-TCHAR *GetToken(TCHAR *ptr, TCHAR *Buffer)
-{
-	TCHAR *p;
-	int i = 0;
-
-	if(ptr == NULL || *ptr == '\0')
-	{
-		*Buffer = NULL;
-		return NULL;
-	}
-
-	p = ptr;
-
-	while(*p == ' ' || *p == '\t')
-		p++;
-
-	if(*p == '\"')
-	{
-		p++;
-		while(*p != '\0' && *p != '\"')
-		{
-			Buffer[i++] = *p;
-			p++;
-		}
-		p++;
-	}
-	else
-	{
-		while(*p != '\0' && *p != ' ' && *p != '\t')
-		{
-			Buffer[i++] = *p;
-			p++;
-		}
-	}
-
-	Buffer[i] = '\0';
-
-	while(*p == ' ' || *p == '\t')
-		p++;
-
-	return p;
-}
-
 void TrimStringLeft(std::wstring &str, const std::wstring &strWhitespace)
 {
 	size_t pos = str.find_first_not_of(strWhitespace);
@@ -380,4 +337,16 @@ void TrimString(std::wstring &str, const std::wstring &strWhitespace)
 {
 	TrimStringLeft(str, strWhitespace);
 	TrimStringRight(str, strWhitespace);
+}
+
+std::string wstrToStr(std::wstring source)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.to_bytes(source);
+}
+
+std::wstring strToWstr(std::string source)
+{
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	return converter.from_bytes(source);
 }

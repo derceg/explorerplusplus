@@ -8,6 +8,8 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "CommandLine.h"
+#include "Console.h"
 #include "Explorer++_internal.h"
 #include "Logging.h"
 #include "MainResource.h"
@@ -18,9 +20,10 @@
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
-#include "../Helper/SetDefaultFileManager.h"
-#include "../Helper/ShellHelper.h"
+#include "../ThirdParty/CLI11/CLI11.hpp"
+#include <boost/scope_exit.hpp>
 
+#pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
 /* Default window size/position. */
 #define DEFAULT_WINDOWPOS_LEFT_PERCENTAGE	0.02
@@ -34,16 +37,13 @@ typedef BOOL (WINAPI *MINIDUMPWRITEDUMP)(
 	PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
 	PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 
-BOOL ProcessCommandLine(TCHAR *pCommandLine);
-void ShowUsage(void);
-void ClearRegistrySettings(void);
 ATOM RegisterMainWindowClass(HINSTANCE hInstance);
 LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInfo);
 
 DWORD dwControlClasses = ICC_BAR_CLASSES|ICC_COOL_CLASSES|
 	ICC_LISTVIEW_CLASSES|ICC_USEREX_CLASSES|ICC_STANDARD_CLASSES|
 	ICC_LINK_CLASS;
-std::list<std::wstring> g_TabDirs;
+std::vector<std::wstring> g_TabDirs;
 
 /* Modeless dialog handles. */
 HWND g_hwndSearch;
@@ -57,187 +57,6 @@ BOOL g_bForceLanguageLoad = FALSE;
 HACCEL g_hAccl;
 
 bool g_enablePlugins = false;
-
-/*
- * Processes the specified command line.
- *
- * Command line options:
- * -l	Specifies the language for Explorer++ to use.
- * /?	Causes Explorer++ to show a small help message and exit.
- *
- * Directories can also be passed at any point (no preceding
- * arguments needed).
- *
- * Paths on the command line are automatically expanded by
- * the shell.
- */
-BOOL ProcessCommandLine(TCHAR *pCommandLine)
-{
-	TCHAR szPath[MAX_PATH];
-	TCHAR *pszCommandLine = NULL;
-	BOOL bExit = FALSE;
-
-	g_TabDirs.clear();
-
-	/* The first token will just be the executable name,
-	and can be ignored. */
-	pszCommandLine = GetToken(pCommandLine,szPath);
-
-	while((pszCommandLine = GetToken(pszCommandLine,szPath)) != NULL)
-	{
-		/* Check to see if the user has requested the help page. */
-		if(StrCmp(szPath,_T("/?")) == 0)
-		{
-			/* Show program usage information and then exit. */
-			ShowUsage();
-
-			bExit = TRUE;
-		}
-
-		if(lstrcmp(szPath,_T("-l")) == 0)
-		{
-			pszCommandLine = GetToken(pszCommandLine,szPath);
-
-			if(pszCommandLine != NULL)
-			{
-				g_bForceLanguageLoad = TRUE;
-
-				StringCchCopy(g_szLang,SIZEOF_ARRAY(g_szLang),szPath);
-			}
-		}
-		else if(lstrcmp(szPath,_T("-clear_settings")) == 0)
-		{
-			ClearRegistrySettings();
-		}
-		else if(lstrcmp(szPath,_T("-remove_as_default")) == 0)
-		{
-			BOOL bSuccess;
-
-			bSuccess = NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
-
-			/* Language hasn't been fully specified at this point, so
-			can't load success/error message from language dll. Simply show
-			a hardcoded success/error message. */
-			if(bSuccess)
-			{
-				MessageBox(NULL,_T("Explorer++ successfully removed as default file manager."),
-					NExplorerplusplus::APP_NAME,MB_OK);
-			}
-			else
-			{
-				MessageBox(NULL,_T("Could not remove Explorer++ as default file manager. Please \
-ensure you have administrator privileges."),NExplorerplusplus::APP_NAME,MB_ICONWARNING|MB_OK);
-			}
-		}
-		else if(lstrcmp(szPath,_T("-set_as_default")) == 0)
-		{
-			TCHAR menuText[256];
-			LoadString(GetModuleHandle(0), IDS_OPEN_IN_EXPLORERPLUSPLUS,
-				menuText, SIZEOF_ARRAY(menuText));
-
-			BOOL bSuccess = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
-				SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText);
-
-			if(bSuccess)
-			{
-				MessageBox(NULL,_T("Explorer++ successfully set as default file manager."),
-					NExplorerplusplus::APP_NAME,MB_OK);
-			}
-			else
-			{
-				MessageBox(NULL,_T("Could not set Explorer++ as default file manager. Please \
-ensure you have administrator privileges."),NExplorerplusplus::APP_NAME,MB_ICONWARNING|MB_OK);
-			}
-		}
-		else if(lstrcmp(szPath,NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT) == 0)
-		{
-			/* This will be called when the user clicks the
-			'New Tab' item on the tasks menu in Windows 7.
-			Find the already opened version of Explorer++,
-			and tell it to open a new tab. */
-			HANDLE hMutex;
-
-			hMutex = CreateMutex(NULL,TRUE,_T("Explorer++"));
-
-			if(GetLastError() == ERROR_ALREADY_EXISTS)
-			{
-				HWND hPrev;
-
-				hPrev = FindWindow(NExplorerplusplus::CLASS_NAME,NULL);
-
-				if(hPrev != NULL)
-				{
-					COPYDATASTRUCT cds;
-
-					cds.cbData	= 0;
-					cds.lpData	= NULL;
-					SendMessage(hPrev,WM_COPYDATA,NULL,(LPARAM)&cds);
-
-					SetForegroundWindow(hPrev);
-					ShowWindow(hPrev,SW_SHOW);
-				}
-			}
-
-			if(hMutex != NULL)
-				CloseHandle(hMutex);
-
-			bExit = TRUE;
-		}
-		else if(lstrcmp(szPath,_T("-enable_logging")) == 0)
-		{
-			boost::log::core::get()->set_logging_enabled(true);
-		}
-		else if (lstrcmp(szPath, _T("-enable_plugins")) == 0)
-		{
-			g_enablePlugins = true;
-		}
-		else
-		{
-			TCHAR szParsingPath[MAX_PATH];
-			TCHAR szCurrentDirectory[MAX_PATH];
-
-			GetProcessImageName(GetCurrentProcessId(),szCurrentDirectory,
-				SIZEOF_ARRAY(szCurrentDirectory));
-			PathRemoveFileSpec(szCurrentDirectory);
-
-			DecodePath(szPath,szCurrentDirectory,szParsingPath,SIZEOF_ARRAY(szParsingPath));
-			g_TabDirs.push_back(szParsingPath);
-		}
-	}
-
-	return bExit;
-}
-
-/*
- * Shows a brief message explaining the
- * command line parameters Explorer++
- * uses.
- */
-void ShowUsage(void)
-{
-	TCHAR UsageString[] = _T("Usage:\nexplorer++.exe dir1 dir2 ... dirN\n \
-where dir1 to dirN are the directories to \
-open.\n\ne.g. explorer++.exe C:\\ D:\\\nwill open the \
-directories C:\\ and D:\\, each in their own tabs\n\n\
-Virtual folders can be opened simply by \
-supplying their name:\n\
-e.g. explorer++.exe \"control panel\"\nwill open the \
-Control Panel\n");
-
-	MessageBox(NULL,UsageString,NExplorerplusplus::APP_NAME,MB_OK);
-}
-
-void ClearRegistrySettings(void)
-{
-	LSTATUS lStatus;
-
-	lStatus = SHDeleteKey(HKEY_CURRENT_USER, NExplorerplusplus::REG_MAIN_KEY);
-
-	if(lStatus == ERROR_SUCCESS)
-		MessageBox(NULL,_T("Settings cleared successfully."),NExplorerplusplus::APP_NAME,MB_OK);
-	else
-		MessageBox(NULL,_T("Settings could not be cleared."),NExplorerplusplus::APP_NAME,MB_ICONWARNING);
-}
 
 ATOM RegisterMainWindowClass(HINSTANCE hInstance)
 {
@@ -324,7 +143,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	HMODULE			hRichEditLib;
 	HWND			hwnd;
 	HANDLE			hMutex = NULL;
-	TCHAR			*pCommandLine	= NULL;
 	MSG				msg;
 	LONG			res;
 	BOOL			bExit = FALSE;
@@ -356,9 +174,21 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 	OleInitialize(NULL);
 
-	pCommandLine = GetCommandLine();
+	bool consoleAttached = Console::AttachParentConsole();
 
-	bExit = ProcessCommandLine(pCommandLine);
+	BOOST_SCOPE_EXIT(consoleAttached) {
+		if (consoleAttached)
+		{
+			Console::ReleaseConsole();
+		}
+	} BOOST_SCOPE_EXIT_END
+
+	auto exitInfo = CommandLine::ProcessCommandLine();
+
+	if (exitInfo)
+	{
+		return exitInfo->exitCode;
+	}
 
 	InitializeLogging(NExplorerplusplus::LOG_FILENAME);
 
