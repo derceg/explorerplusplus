@@ -121,6 +121,9 @@ m_infoTipResultIDCounter(0)
 		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
 	}
 
+	NListView::ListView_ActivateOneClickSelect(m_hListView, m_globalFolderSettings->oneClickActivate,
+		m_globalFolderSettings->oneClickActivateHoverTime);
+
 	m_nAwaitingAdd = 0;
 
 	InitializeCriticalSection(&m_csDirectoryAltered);

@@ -173,9 +173,6 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 		return E_FAIL;
 	}
 
-	NListView::ListView_ActivateOneClickSelect(tab.listView,m_config->globalFolderSettings.oneClickActivate,
-		m_config->globalFolderSettings.oneClickActivateHoverTime);
-
 	/* Set the listview to its initial size. */
 	SetListViewInitialPosition(tab.listView);
 
