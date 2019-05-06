@@ -9,20 +9,21 @@
 #include "Tab.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
-#include "boost/signals2.hpp"
+#include "../Helper/BaseWindow.h"
+#include <boost/signals2.hpp>
 #include <unordered_map>
 
 struct Config;
 
-class CTabContainer
+class CTabContainer : public CBaseWindow
 {
 public:
 
 	typedef boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)> TabMovedSignal;
 
-	CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInfo, TabContainerInterface *tabContainer,
-		TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config);
-	~CTabContainer();
+	static CTabContainer *Create(HWND parent, std::unordered_map<int, Tab>* tabInfo,
+		TabContainerInterface* tabContainer, TabInterface* tabInterface, IExplorerplusplus* expp,
+		HINSTANCE instance, std::shared_ptr<Config> config);
 
 	void InsertTab();
 	void RemoveTab();
@@ -38,11 +39,20 @@ private:
 
 	static const int TAB_ICON_LOCK_INDEX = 0;
 
+	CTabContainer(HWND parent, std::unordered_map<int, Tab>* tabInfo, TabContainerInterface* tabContainer,
+		TabInterface* tabInterface, IExplorerplusplus* expp, HINSTANCE instance, std::shared_ptr<Config> config);
+	~CTabContainer();
+
+	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
+
 	static LRESULT CALLBACK WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	void Initialize(HWND parent);
+	void AddDefaultTabIcons(HIMAGELIST himlTab);
 
 	void OnTabCtrlLButtonDown(POINT *pt);
 	void OnTabCtrlLButtonUp(void);
@@ -77,7 +87,8 @@ private:
 	void UpdateTabNameInWindow(const Tab &tab);
 	void SetTabIcon(const Tab &tab);
 
-	HWND m_hTabCtrl;
+	HFONT m_hTabFont;
+	HIMAGELIST m_hTabCtrlImageList;
 
 	std::unordered_map<int, Tab> *m_tabInfo;
 	TabContainerInterface *m_tabContainer;

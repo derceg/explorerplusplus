@@ -10,6 +10,8 @@
 #include "MainResource.h"
 #include "RenameTabDialog.h"
 #include "ResourceHelper.h"
+#include "TabDropHandler.h"
+#include "../Helper/Controls.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/MenuWrapper.h"
 #include "../Helper/ShellHelper.h"
@@ -18,14 +20,26 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/map.hpp>
 
+const UINT TAB_CONTROL_STYLES = WS_VISIBLE | WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE
+| TCS_TOOLTIPS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
+
 const std::map<UINT, int> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 	{ IDM_FILE_NEWTAB, SHELLIMAGES_NEWTAB },
 	{ IDM_TAB_REFRESH, SHELLIMAGES_REFRESH }
 };
 
-CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInfo, TabContainerInterface *tabContainer,
+CTabContainer *CTabContainer::Create(HWND parent, std::unordered_map<int, Tab>* tabInfo,
+	TabContainerInterface* tabContainer, TabInterface* tabInterface, IExplorerplusplus* expp, HINSTANCE instance,
+	std::shared_ptr<Config> config)
+{
+	return new CTabContainer(parent, tabInfo, tabContainer, tabInterface, expp, instance, config);
+}
+
+CTabContainer::CTabContainer(HWND parent, std::unordered_map<int, Tab> *tabInfo, TabContainerInterface *tabContainer,
 	TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config) :
-	m_hTabCtrl(hTabCtrl),
+	CBaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
+	m_hTabFont(nullptr),
+	m_hTabCtrlImageList(nullptr),
 	m_tabInfo(tabInfo),
 	m_tabContainer(tabContainer),
 	m_tabInterface(tabInterface),
@@ -34,8 +48,43 @@ CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInf
 	m_config(config),
 	m_bTabBeenDragged(FALSE)
 {
-	SetWindowSubclass(hTabCtrl, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
-	SetWindowSubclass(GetParent(hTabCtrl), ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	Initialize(parent);
+}
+
+HWND CTabContainer::CreateTabControl(HWND parent, BOOL forceSameTabWidth)
+{
+	UINT styles = TAB_CONTROL_STYLES;
+
+	if (forceSameTabWidth)
+	{
+		styles |= TCS_FIXEDWIDTH;
+	}
+
+	return ::CreateTabControl(parent, styles);
+}
+
+void CTabContainer::Initialize(HWND parent)
+{
+	NONCLIENTMETRICS ncm;
+	ncm.cbSize = sizeof(ncm);
+	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
+	m_hTabFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
+
+	if (m_hTabFont != NULL)
+	{
+		SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(m_hTabFont), MAKELPARAM(TRUE, 0));
+	}
+
+	m_hTabCtrlImageList = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 100);
+	AddDefaultTabIcons(m_hTabCtrlImageList);
+	TabCtrl_SetImageList(m_hwnd, m_hTabCtrlImageList);
+
+	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hwnd, m_tabContainer);
+	RegisterDragDrop(m_hwnd, pTabDropHandler);
+	pTabDropHandler->Release();
+
+	SetWindowSubclass(m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	m_tabCreatedConnection = m_tabContainer->AddTabCreatedObserver(boost::bind(&CTabContainer::OnTabCreated, this, _1, _2));
 	m_tabRemovedConnection = m_tabContainer->AddTabRemovedObserver(boost::bind(&CTabContainer::OnTabRemoved, this, _1));
@@ -47,10 +96,40 @@ CTabContainer::CTabContainer(HWND hTabCtrl, std::unordered_map<int, Tab> *tabInf
 	m_forceSameTabWidthConnection = m_config->forceSameTabWidth.addObserver(boost::bind(&CTabContainer::OnForceSameTabWidthUpdated, this, _1));
 }
 
+void CTabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
+{
+	HIMAGELIST himlTemp = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48);
+
+	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_SHELLIMAGES));
+	ImageList_Add(himlTemp, hBitmap, NULL);
+	DeleteObject(hBitmap);
+
+	ICONINFO IconInfo;
+	GetIconInfo(ImageList_GetIcon(himlTemp, SHELLIMAGES_LOCK,
+		ILD_TRANSPARENT), &IconInfo);
+	ImageList_Add(himlTab, IconInfo.hbmColor, IconInfo.hbmMask);
+	DeleteObject(IconInfo.hbmColor);
+	DeleteObject(IconInfo.hbmMask);
+
+	ImageList_Destroy(himlTemp);
+}
+
 CTabContainer::~CTabContainer()
 {
-	RemoveWindowSubclass(m_hTabCtrl, WndProcStub, SUBCLASS_ID);
-	RemoveWindowSubclass(GetParent(m_hTabCtrl), ParentWndProcStub, PARENT_SUBCLASS_ID);
+	if (m_hTabFont != nullptr)
+	{
+		DeleteObject(m_hTabFont);
+	}
+
+	if (m_hTabCtrlImageList != nullptr)
+	{
+		ImageList_Destroy(m_hTabCtrlImageList);
+	}
+
+	RevokeDragDrop(m_hwnd);
+
+	RemoveWindowSubclass(m_hwnd, WndProcStub, SUBCLASS_ID);
+	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
 
 	m_tabCreatedConnection.disconnect();
 	m_tabRemovedConnection.disconnect();
@@ -143,16 +222,16 @@ void CTabContainer::OnTabCtrlLButtonDown(POINT *pt)
 {
 	TCHITTESTINFO info;
 	info.pt = *pt;
-	int ItemNum = TabCtrl_HitTest(m_hTabCtrl, &info);
+	int ItemNum = TabCtrl_HitTest(m_hwnd, &info);
 
 	if (info.flags != TCHT_NOWHERE)
 	{
 		/* Save the bounds of the dragged tab. */
-		TabCtrl_GetItemRect(m_hTabCtrl, ItemNum, &m_rcDraggedTab);
+		TabCtrl_GetItemRect(m_hwnd, ItemNum, &m_rcDraggedTab);
 
 		/* Capture mouse movement exclusively until
 		the mouse button is released. */
-		SetCapture(m_hTabCtrl);
+		SetCapture(m_hwnd);
 
 		m_bTabBeenDragged = TRUE;
 		m_draggedTabStartIndex = ItemNum;
@@ -186,11 +265,11 @@ void CTabContainer::OnTabCtrlMouseMove(POINT *pt)
 	}
 
 	/* Dragged tab. */
-	int iSelected = TabCtrl_GetCurFocus(m_hTabCtrl);
+	int iSelected = TabCtrl_GetCurFocus(m_hwnd);
 
 	TCHITTESTINFO HitTestInfo;
 	HitTestInfo.pt = *pt;
-	int iSwap = TabCtrl_HitTest(m_hTabCtrl, &HitTestInfo);
+	int iSwap = TabCtrl_HitTest(m_hwnd, &HitTestInfo);
 
 	/* Check:
 	- If the cursor is over an item.
@@ -204,7 +283,7 @@ void CTabContainer::OnTabCtrlMouseMove(POINT *pt)
 	{
 		RECT rcSwap;
 
-		TabCtrl_GetItemRect(m_hTabCtrl, iSwap, &rcSwap);
+		TabCtrl_GetItemRect(m_hwnd, iSwap, &rcSwap);
 
 		/* These values need to be adjusted, since
 		tabs are adjusted whenever the dragged tab
@@ -227,12 +306,12 @@ void CTabContainer::OnTabCtrlMouseMove(POINT *pt)
 
 		/* Swap the dragged tab with the tab the cursor
 		finished up on. */
-		TabCtrl_SwapItems(m_hTabCtrl, iSelected, iSwap);
+		TabCtrl_SwapItems(m_hwnd, iSelected, iSwap);
 
 		/* The index of the selected tab has now changed
 		(but the actual tab/browser selected remains the
 		same). */
-		TabCtrl_SetCurFocus(m_hTabCtrl, iSwap);
+		TabCtrl_SetCurFocus(m_hwnd, iSwap);
 
 		m_draggedTabEndIndex = iSwap;
 	}
@@ -242,7 +321,7 @@ void CTabContainer::OnLButtonDoubleClick(const POINT &pt)
 {
 	TCHITTESTINFO info;
 	info.pt = pt;
-	const int index = TabCtrl_HitTest(m_hTabCtrl, &info);
+	const int index = TabCtrl_HitTest(m_hwnd, &info);
 
 	if (info.flags != TCHT_NOWHERE && m_config->doubleClickTabClose)
 	{
@@ -257,7 +336,7 @@ void CTabContainer::OnTabCtrlMButtonUp(POINT *pt)
 	htInfo.pt = *pt;
 
 	/* Find the tab that the click occurred over. */
-	int iTabHit = TabCtrl_HitTest(m_hTabCtrl, &htInfo);
+	int iTabHit = TabCtrl_HitTest(m_hwnd, &htInfo);
 
 	if (iTabHit != -1)
 	{
@@ -270,7 +349,7 @@ void CTabContainer::OnTabCtrlRButtonUp(POINT *pt)
 {
 	TCHITTESTINFO tcHitTest;
 	tcHitTest.pt = *pt;
-	const int tabHitIndex = TabCtrl_HitTest(m_hTabCtrl, &tcHitTest);
+	const int tabHitIndex = TabCtrl_HitTest(m_hwnd, &tcHitTest);
 
 	if (tcHitTest.flags == TCHT_NOWHERE)
 	{
@@ -278,7 +357,7 @@ void CTabContainer::OnTabCtrlRButtonUp(POINT *pt)
 	}
 
 	POINT ptCopy = *pt;
-	BOOL res = ClientToScreen(m_hTabCtrl, &ptCopy);
+	BOOL res = ClientToScreen(m_hwnd, &ptCopy);
 
 	if (!res)
 	{
@@ -309,7 +388,7 @@ void CTabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 	lEnableMenuItem(menu, IDM_TAB_CLOSETAB, !(tab.GetLocked() || tab.GetAddressLocked()));
 
 	UINT Command = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
-		pt.x, pt.y, 0, m_hTabCtrl, nullptr);
+		pt.x, pt.y, 0, m_hwnd, nullptr);
 
 	ProcessTabCommand(Command, tab);
 }
@@ -479,7 +558,7 @@ LRESULT CALLBACK CTabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wPara
 
 void CTabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 {
-	HWND toolTipControl = TabCtrl_GetToolTips(m_hTabCtrl);
+	HWND toolTipControl = TabCtrl_GetToolTips(m_hwnd);
 
 	if (dispInfo->hdr.hwndFrom != toolTipControl)
 	{
@@ -505,7 +584,7 @@ void CTabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 
 int CTabContainer::GetSelection()
 {
-	int Index = TabCtrl_GetCurSel(m_hTabCtrl);
+	int Index = TabCtrl_GetCurSel(m_hwnd);
 	assert(Index != -1);
 
 	return Index;
@@ -555,7 +634,7 @@ void CTabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
 
 void CTabContainer::OnForceSameTabWidthUpdated(BOOL newValue)
 {
-	AddWindowStyle(m_hTabCtrl, TCS_FIXEDWIDTH, newValue);
+	AddWindowStyle(m_hwnd, TCS_FIXEDWIDTH, newValue);
 }
 
 void CTabContainer::OnNavigationCompleted(const Tab &tab)
@@ -585,7 +664,7 @@ void CTabContainer::UpdateTabNameInWindow(const Tab &tab)
 	boost::replace_all(name, L"&", L"&&");
 
 	int index = m_tabContainer->GetTabIndex(tab);
-	TabCtrl_SetItemText(m_hTabCtrl, index, name.c_str());
+	TabCtrl_SetItemText(m_hwnd, index, name.c_str());
 }
 
 /* Sets a tabs icon. Normally, this icon
@@ -612,7 +691,7 @@ void CTabContainer::SetTabIcon(const Tab &tab)
 			SHGFI_PIDL | SHGFI_ICON | SHGFI_SMALLICON);
 
 		GetIconInfo(shfi.hIcon, &IconInfo);
-		iImage = ImageList_Add(TabCtrl_GetImageList(m_hTabCtrl),
+		iImage = ImageList_Add(TabCtrl_GetImageList(m_hwnd),
 			IconInfo.hbmColor, IconInfo.hbmMask);
 
 		DeleteObject(IconInfo.hbmColor);
@@ -625,18 +704,18 @@ void CTabContainer::SetTabIcon(const Tab &tab)
 	/* Get the index of the current image. This image
 	will be removed after the new image is set. */
 	tcItem.mask = TCIF_IMAGE;
-	TabCtrl_GetItem(m_hTabCtrl, index, &tcItem);
+	TabCtrl_GetItem(m_hwnd, index, &tcItem);
 
 	iRemoveImage = tcItem.iImage;
 
 	/* Set the new image. */
 	tcItem.mask = TCIF_IMAGE;
 	tcItem.iImage = iImage;
-	TabCtrl_SetItem(m_hTabCtrl, index, &tcItem);
+	TabCtrl_SetItem(m_hwnd, index, &tcItem);
 
 	if (iRemoveImage != TAB_ICON_LOCK_INDEX)
 	{
 		/* Remove the old image. */
-		TabCtrl_RemoveImage(m_hTabCtrl, iRemoveImage);
+		TabCtrl_RemoveImage(m_hwnd, iRemoveImage);
 	}
 }

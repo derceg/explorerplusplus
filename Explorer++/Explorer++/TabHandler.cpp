@@ -12,8 +12,6 @@
 #include "ShellBrowser/iShellView.h"
 #include "ShellBrowser/SortModes.h"
 #include "TabContainer.h"
-#include "TabDropHandler.h"
-#include "../Helper/Controls.h"
 #include "../Helper/Helper.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ListViewHelper.h"
@@ -30,44 +28,16 @@ DWORD ListViewStyles		=	WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|
 								LVS_ICON|LVS_EDITLABELS|LVS_SHOWSELALWAYS|LVS_SHAREIMAGELISTS|
 								LVS_AUTOARRANGE|WS_TABSTOP|LVS_ALIGNTOP;
 
-UINT TabCtrlStyles			=	WS_VISIBLE|WS_CHILD|TCS_FOCUSNEVER|TCS_SINGLELINE|
-								TCS_TOOLTIPS|WS_CLIPSIBLINGS|WS_CLIPCHILDREN;
-
 extern LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 extern std::vector<std::wstring> g_TabDirs;
 
-void Explorerplusplus::InitializeTabs(void)
+void Explorerplusplus::InitializeTabs()
 {
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	if(m_config->forceSameTabWidth.get())
-	{
-		TabCtrlStyles |= TCS_FIXEDWIDTH;
-	}
-
-	m_hTabCtrl = CreateTabControl(m_hTabBacking,TabCtrlStyles);
-
-	NONCLIENTMETRICS ncm;
-	ncm.cbSize = sizeof(ncm);
-	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
-	m_hTabFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
-
-	if(m_hTabFont != NULL)
-	{
-		SendMessage(m_hTabCtrl, WM_SETFONT, reinterpret_cast<WPARAM>(m_hTabFont), MAKELPARAM(TRUE, 0));
-	}
-
-	m_hTabCtrlImageList = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,100);
-	AddDefaultTabIcons(m_hTabCtrlImageList);
-	TabCtrl_SetImageList(m_hTabCtrl, m_hTabCtrlImageList);
-
-	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hTabCtrl,this);
-	RegisterDragDrop(m_hTabCtrl,pTabDropHandler);
-	pTabDropHandler->Release();
-
-	m_tabContainer = new CTabContainer(m_hTabCtrl, &m_Tabs, this, this, this, m_hLanguageModule, m_config);
+	m_tabContainer = CTabContainer::Create(m_hTabBacking, &m_Tabs, this, this, this, m_hLanguageModule, m_config);
 
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
@@ -262,7 +232,7 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 		}
 		else
 		{
-			index = TabCtrl_GetItemCount(m_hTabCtrl);
+			index = TabCtrl_GetItemCount(m_tabContainer->GetHWND());
 		}
 	}
 
@@ -286,7 +256,7 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 		}
 
 		/* Select the newly created tab. */
-		TabCtrl_SetCurSel(m_hTabCtrl,index);
+		TabCtrl_SetCurSel(m_tabContainer->GetHWND(),index);
 
 		/* Hide the previously active tab, and show the
 		newly created one. */
@@ -456,7 +426,7 @@ void Explorerplusplus::SelectTabAtIndex(int index)
 {
 	assert(index >= 0 && index < GetNumTabs());
 
-	int previousIndex = TabCtrl_SetCurSel(m_hTabCtrl, index);
+	int previousIndex = TabCtrl_SetCurSel(m_tabContainer->GetHWND(), index);
 
 	if (previousIndex == -1)
 	{
@@ -468,7 +438,7 @@ void Explorerplusplus::SelectTabAtIndex(int index)
 
 void Explorerplusplus::OnTabSelectionChanged()
 {
-	int index = TabCtrl_GetCurSel(m_hTabCtrl);
+	int index = TabCtrl_GetCurSel(m_tabContainer->GetHWND());
 
 	if (index == -1)
 	{
@@ -648,11 +618,11 @@ void Explorerplusplus::RemoveTabFromControl(const Tab &tab)
 
 	TCITEM tcItemRemoved;
 	tcItemRemoved.mask = TCIF_IMAGE;
-	TabCtrl_GetItem(m_hTabCtrl, index, &tcItemRemoved);
+	TabCtrl_GetItem(m_tabContainer->GetHWND(), index, &tcItemRemoved);
 
-	TabCtrl_DeleteItem(m_hTabCtrl,index);
+	TabCtrl_DeleteItem(m_tabContainer->GetHWND(),index);
 
-	TabCtrl_RemoveImage(m_hTabCtrl,tcItemRemoved.iImage);
+	TabCtrl_RemoveImage(m_tabContainer->GetHWND(),tcItemRemoved.iImage);
 
 	if (m_selectedTabIndex > index)
 	{
@@ -684,24 +654,6 @@ HRESULT Explorerplusplus::RefreshTab(const Tab &tab)
 	return hr;
 }
 
-void Explorerplusplus::AddDefaultTabIcons(HIMAGELIST himlTab)
-{
-	HIMAGELIST himlTemp = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48);
-
-	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(himlTemp,hBitmap,NULL);
-	DeleteObject(hBitmap);
-
-	ICONINFO IconInfo;
-	GetIconInfo(ImageList_GetIcon(himlTemp,SHELLIMAGES_LOCK,
-		ILD_TRANSPARENT),&IconInfo);
-	ImageList_Add(himlTab,IconInfo.hbmColor,IconInfo.hbmMask);
-	DeleteObject(IconInfo.hbmColor);
-	DeleteObject(IconInfo.hbmMask);
-
-	ImageList_Destroy(himlTemp);
-}
-
 void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId)
 {
 	std::wstring name;
@@ -728,7 +680,7 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 	tcItem.pszText		= tabText;
 	tcItem.lParam		= iTabId;
 
-	SendMessage(m_hTabCtrl,TCM_INSERTITEM,(WPARAM)iNewTabIndex,(LPARAM)&tcItem);
+	SendMessage(m_tabContainer->GetHWND(),TCM_INSERTITEM,(WPARAM)iNewTabIndex,(LPARAM)&tcItem);
 }
 
 void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
@@ -849,7 +801,7 @@ Tab *Explorerplusplus::GetTabOptional(int tabId)
 
 Tab &Explorerplusplus::GetSelectedTab()
 {
-	int index = TabCtrl_GetCurSel(m_hTabCtrl);
+	int index = TabCtrl_GetCurSel(m_tabContainer->GetHWND());
 
 	if (index == -1)
 	{
@@ -869,7 +821,7 @@ Tab &Explorerplusplus::GetTabByIndex(int index)
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_hTabCtrl, index, &tcItem);
+	BOOL res = TabCtrl_GetItem(m_tabContainer->GetHWND(), index, &tcItem);
 
 	if (!res)
 	{
@@ -881,13 +833,13 @@ Tab &Explorerplusplus::GetTabByIndex(int index)
 
 int Explorerplusplus::GetTabIndex(const Tab &tab)
 {
-	int numTabs = TabCtrl_GetItemCount(m_hTabCtrl);
+	int numTabs = TabCtrl_GetItemCount(m_tabContainer->GetHWND());
 
 	for (int i = 0; i < numTabs; i++)
 	{
 		TCITEM tcItem;
 		tcItem.mask = TCIF_PARAM;
-		BOOL res = TabCtrl_GetItem(m_hTabCtrl, i, &tcItem);
+		BOOL res = TabCtrl_GetItem(m_tabContainer->GetHWND(), i, &tcItem);
 
 		if (res && (tcItem.lParam == tab.GetId()))
 		{
@@ -907,7 +859,7 @@ int Explorerplusplus::GetNumTabs() const
 int Explorerplusplus::MoveTab(const Tab &tab, int newIndex)
 {
 	int index = GetTabIndex(tab);
-	return TabCtrl_MoveItem(m_hTabCtrl, index, newIndex);
+	return TabCtrl_MoveItem(m_tabContainer->GetHWND(), index, newIndex);
 }
 
 const std::unordered_map<int, Tab> &Explorerplusplus::GetAllTabs() const

@@ -423,7 +423,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		iTabTop,iTabBackingWidth,
 		TAB_WINDOW_HEIGHT,uFlags);
 
-	SetWindowPos(m_hTabCtrl,NULL,0,0,iTabBackingWidth - 25,
+	SetWindowPos(m_tabContainer->GetHWND(),NULL,0,0,iTabBackingWidth - 25,
 		TAB_WINDOW_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
 
 	/* Tab close button. */
@@ -580,8 +580,6 @@ int Explorerplusplus::OnClose(void)
 	KillTimer(m_hContainer, AUTOSAVE_TIMER_ID);
 
 	SaveAllSettings();
-
-	RevokeDragDrop(m_hTabCtrl);
 
 	DestroyWindow(m_hContainer);
 

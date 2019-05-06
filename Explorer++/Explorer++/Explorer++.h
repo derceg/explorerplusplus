@@ -303,8 +303,7 @@ private:
 	void					OnTreeViewHolderWindowTimer(void);
 
 	/* Tabs. */
-	void					InitializeTabs(void);
-	void					AddDefaultTabIcons(HIMAGELIST himlTab);
+	void					InitializeTabs();
 	void					SelectAdjacentTab(BOOL bNextTab);
 	void					SelectTabAtIndex(int index);
 	HRESULT					CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
@@ -555,7 +554,6 @@ private:
 	HWND					m_hStatusBar;
 	HWND					m_hMainRebar;
 	HWND					m_hDisplayWindow;
-	HWND					m_hTabCtrl;
 	HWND					m_hTabWindowToolbar;
 	HWND					m_hTreeView;
 	HWND					m_hHolder;
@@ -636,10 +634,6 @@ private:
 	/* User options variables. */
 	std::shared_ptr<Config>	m_config;	
 	BOOL					m_bSavePreferencesToXMLFile;
-
-	/* Tabs. */
-	HFONT					m_hTabFont;
-	HIMAGELIST				m_hTabCtrlImageList;
 
 	TaskbarThumbnails		*m_taskbarThumbnails;
 

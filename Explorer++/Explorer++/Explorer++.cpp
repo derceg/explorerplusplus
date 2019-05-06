@@ -82,15 +82,12 @@ m_cachedIcons(MAX_CACHED_ICONS)
 	m_hStatusBar					= NULL;
 	m_hHolder						= NULL;
 	m_hTabBacking					= NULL;
-	m_hTabCtrl						= NULL;
 	m_hTabWindowToolbar				= NULL;
 	m_hDisplayWindow				= NULL;
 	m_hTreeView						= NULL;
 	m_hFoldersToolbar				= NULL;
 	m_hLastActiveWindow				= NULL;
 	m_hActiveListView				= NULL;
-	m_hTabFont						= NULL;
-	m_hTabCtrlImageList				= nullptr;
 	m_hNextClipboardViewer			= NULL;
 	m_hLanguageModule				= NULL;
 	m_ListViewMButtonItem			= -1;
@@ -117,16 +114,6 @@ m_cachedIcons(MAX_CACHED_ICONS)
 
 Explorerplusplus::~Explorerplusplus()
 {
-	if(m_hTabFont != NULL)
-	{
-		DeleteObject(m_hTabFont);
-	}
-
-	if (m_hTabCtrlImageList != nullptr)
-	{
-		ImageList_Destroy(m_hTabCtrlImageList);
-	}
-
 	/* Bookmarks teardown. */
 	delete m_pBookmarksToolbar;
 

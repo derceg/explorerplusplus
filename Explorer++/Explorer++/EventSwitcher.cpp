@@ -242,11 +242,11 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM 
 			SendMessage(m_hTreeView, WM_MOUSEWHEEL, wParam, lParam);
 		}
 	}
-	else if (hwnd == m_hTabCtrl)
+	else if (hwnd == m_tabContainer->GetHWND())
 	{
 		bMessageHandled = TRUE;
 
-		HWND hUpDown = FindWindowEx(m_hTabCtrl, NULL, UPDOWN_CLASS, NULL);
+		HWND hUpDown = FindWindowEx(m_tabContainer->GetHWND(), NULL, UPDOWN_CLASS, NULL);
 
 		if (hUpDown != NULL)
 		{
@@ -276,7 +276,7 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM 
 					}
 				}
 
-				SendMessage(m_hTabCtrl, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, iScrollPos), NULL);
+				SendMessage(m_tabContainer->GetHWND(), WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, iScrollPos), NULL);
 			}
 		}
 	}
