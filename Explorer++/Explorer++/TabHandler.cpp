@@ -239,7 +239,7 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
 	the folder). */
-	InsertNewTab(pidlDirectory,index,tab.GetId());
+	InsertNewTab(index, tab.GetId(), pidlDirectory, tabSettings.name);
 
 	bool selected = false;
 
@@ -654,13 +654,13 @@ HRESULT Explorerplusplus::RefreshTab(const Tab &tab)
 	return hr;
 }
 
-void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex,int iTabId)
+void Explorerplusplus::InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName)
 {
 	std::wstring name;
 
-	if (GetTab(iTabId).GetUseCustomName())
+	if (customName && !customName->empty())
 	{
-		name = GetTab(iTabId).GetName();
+		name = *customName;
 	}
 	else
 	{
@@ -672,15 +672,11 @@ void Explorerplusplus::InsertNewTab(LPCITEMIDLIST pidlDirectory,int iNewTabIndex
 
 	boost::replace_all(name, L"&", L"&&");
 
-	TCHAR tabText[MAX_PATH];
-	StringCchCopy(tabText, SIZEOF_ARRAY(tabText), name.c_str());
-
 	TCITEM tcItem;
 	tcItem.mask			= TCIF_TEXT|TCIF_PARAM;
-	tcItem.pszText		= tabText;
-	tcItem.lParam		= iTabId;
-
-	SendMessage(m_tabContainer->GetHWND(),TCM_INSERTITEM,(WPARAM)iNewTabIndex,(LPARAM)&tcItem);
+	tcItem.pszText		= name.data();
+	tcItem.lParam		= tabId;
+	TabCtrl_InsertItem(m_tabContainer->GetHWND(), index, &tcItem);
 }
 
 void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
