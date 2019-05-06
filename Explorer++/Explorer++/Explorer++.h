@@ -20,6 +20,7 @@
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ImageWrappers.h"
 #include <boost/signals2.hpp>
+#include <functional>
 #include <unordered_map>
 
 #define TOOLBAR_START				5000
@@ -214,6 +215,7 @@ private:
 	void					OnGroupBy(SortMode sortMode);
 	void					OnSelectTabByIndex(int iTab);
 	const std::unordered_map<int, Tab>	&GetAllTabs() const;
+	std::vector<std::reference_wrapper<const Tab>>	GetAllTabsInOrder() const;
 
 	/* Navigation. */
 	void					OnBrowseBack();
@@ -326,7 +328,7 @@ private:
 	Tab						&GetSelectedTab();
 	bool					IsTabSelected(const Tab &tab);
 	Tab						&GetTabByIndex(int index);
-	int						GetTabIndex(const Tab &tab);
+	int						GetTabIndex(const Tab &tab) const;
 	int						GetNumTabs() const;
 	int						MoveTab(const Tab &tab, int newIndex);
 	void					OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);

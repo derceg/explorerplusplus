@@ -26,11 +26,11 @@ __interface TabContainerInterface
 	Tab				&GetTab(int tabId);
 	Tab				*GetTabOptional(int tabId);
 	Tab				&GetSelectedTab();
+	bool			IsTabSelected(const Tab &tab);
 	Tab				&GetTabByIndex(int index);
-	int				GetTabIndex(const Tab &tab);
+	int				GetTabIndex(const Tab &tab) const;
 	int				GetSelectedTabId() const;
 	int				GetSelectedTabIndex() const;
-	bool			IsTabSelected(const Tab &tab);
 	void			SelectTab(const Tab &tab);
 	int				MoveTab(const Tab &tab, int newIndex);
 	void			DuplicateTab(const Tab &tab);

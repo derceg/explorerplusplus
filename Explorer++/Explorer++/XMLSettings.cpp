@@ -860,8 +860,10 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 	UINT					ViewMode;
 	int						tabNum = 0;
 
-	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
+	for (auto tabRef : GetAllTabsInOrder())
 	{
+		auto &tab = tabRef.get();
+
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 
 		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), tabNum);

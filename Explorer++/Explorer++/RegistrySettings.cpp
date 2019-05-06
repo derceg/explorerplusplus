@@ -459,8 +459,10 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 	{
 		int tabNum = 0;
 
-		for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
+		for (auto tabRef : GetAllTabsInOrder())
 		{
+			auto &tab = tabRef.get();
+
 			StringCchPrintf(szItemKey,SIZEOF_ARRAY(szItemKey),
 				_T("%d"),tabNum);
 

@@ -831,7 +831,7 @@ Tab &Explorerplusplus::GetTabByIndex(int index)
 	return GetTab(static_cast<int>(tcItem.lParam));
 }
 
-int Explorerplusplus::GetTabIndex(const Tab &tab)
+int Explorerplusplus::GetTabIndex(const Tab &tab) const
 {
 	int numTabs = TabCtrl_GetItemCount(m_tabContainer->GetHWND());
 
@@ -865,4 +865,32 @@ int Explorerplusplus::MoveTab(const Tab &tab, int newIndex)
 const std::unordered_map<int, Tab> &Explorerplusplus::GetAllTabs() const
 {
 	return m_Tabs;
+}
+
+std::vector<std::reference_wrapper<const Tab>> Explorerplusplus::GetAllTabsInOrder() const
+{
+	std::vector<std::reference_wrapper<const Tab>> sortedTabs;
+
+	for (const auto &tab : m_Tabs | boost::adaptors::map_values)
+	{
+		sortedTabs.push_back(tab);
+	}
+
+	// The Tab class is non-copyable, so there are essentially two ways of
+	// retrieving a sorted list of tabs, as far as I can tell:
+	// 
+	// 1. The first is to maintain a sorted list of tabs while the program is
+	// running. I generally don't think that's a good idea, since it would be
+	// redundant (the tab control already stores that information) and it risks
+	// possible issues (if the two sets get out of sync).
+	// 
+	// 2. The second is to sort the tabs when needed. Because they're
+	// non-copyable, that can't be done directly. std::reference_wrapper allows
+	// it to be done relatively easily, though. Sorting a set of pointers would
+	// accomplish the same thing.
+	std::sort(sortedTabs.begin(), sortedTabs.end(), [this](const auto &tab1, const auto &tab2) {
+		return GetTabIndex(tab1.get()) < GetTabIndex(tab2.get());
+	});
+
+	return sortedTabs;
 }
