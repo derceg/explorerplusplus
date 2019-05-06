@@ -311,7 +311,6 @@ private:
 	void					SelectTabAtIndex(int index);
 	HRESULT					CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
 	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
-	void					InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName);
 	FolderSettings			GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;
 	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(const Tab &tab);

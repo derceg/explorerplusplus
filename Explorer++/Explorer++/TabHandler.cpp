@@ -239,7 +239,7 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	/* Browse folder sends a message back to the main window, which
 	attempts to contact the new tab (needs to be created before browsing
 	the folder). */
-	InsertNewTab(index, tab.GetId(), pidlDirectory, tabSettings.name);
+	m_tabContainer->InsertNewTab(index, tab.GetId(), pidlDirectory, tabSettings.name);
 
 	bool selected = false;
 
@@ -652,31 +652,6 @@ HRESULT Explorerplusplus::RefreshTab(const Tab &tab)
 	}
 
 	return hr;
-}
-
-void Explorerplusplus::InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName)
-{
-	std::wstring name;
-
-	if (customName && !customName->empty())
-	{
-		name = *customName;
-	}
-	else
-	{
-		TCHAR folderName[MAX_PATH];
-		GetDisplayName(pidlDirectory, folderName, SIZEOF_ARRAY(folderName), SHGDN_INFOLDER);
-
-		name = folderName;
-	}
-
-	boost::replace_all(name, L"&", L"&&");
-
-	TCITEM tcItem;
-	tcItem.mask			= TCIF_TEXT|TCIF_PARAM;
-	tcItem.pszText		= name.data();
-	tcItem.lParam		= tabId;
-	TabCtrl_InsertItem(m_tabContainer->GetHWND(), index, &tcItem);
 }
 
 void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)

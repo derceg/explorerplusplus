@@ -25,8 +25,7 @@ public:
 		TabContainerInterface* tabContainer, TabInterface* tabInterface, IExplorerplusplus* expp,
 		HINSTANCE instance, std::shared_ptr<Config> config);
 
-	void InsertTab();
-	void RemoveTab();
+	void InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName);
 
 	int GetSelection();
 

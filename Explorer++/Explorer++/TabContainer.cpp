@@ -719,3 +719,28 @@ void CTabContainer::SetTabIcon(const Tab &tab)
 		TabCtrl_RemoveImage(m_hwnd, iRemoveImage);
 	}
 }
+
+void CTabContainer::InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName)
+{
+	std::wstring name;
+
+	if (customName && !customName->empty())
+	{
+		name = *customName;
+	}
+	else
+	{
+		TCHAR folderName[MAX_PATH];
+		GetDisplayName(pidlDirectory, folderName, SIZEOF_ARRAY(folderName), SHGDN_INFOLDER);
+
+		name = folderName;
+	}
+
+	boost::replace_all(name, L"&", L"&&");
+
+	TCITEM tcItem;
+	tcItem.mask = TCIF_TEXT | TCIF_PARAM;
+	tcItem.pszText = name.data();
+	tcItem.lParam = tabId;
+	TabCtrl_InsertItem(m_hwnd, index, &tcItem);
+}
