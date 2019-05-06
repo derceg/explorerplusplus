@@ -6,9 +6,9 @@
 #include "ScriptingDialog.h"
 #include "MainResource.h"
 #include "Manifest.h"
+#include "../Helper/StringHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <boost/algorithm/string.hpp>
-#include <codecvt>
 
 ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParent,
 	PluginInterface *pluginInterface) :
@@ -93,19 +93,18 @@ void ScriptingDialog::OnRun()
 	std::wstring command;
 	GetWindowString(commandControl, command);
 
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	std::wstring result;
 
 	try
 	{
-		std::string convertedCommand = converter.to_bytes(command);
+		std::string convertedCommand = wstrToStr(command);
 		auto protectedResult = m_luaPlugin.GetLuaState().safe_script(convertedCommand);
 
 		result = FormatResult(protectedResult);
 	}
 	catch (const sol::error &e)
 	{
-		result = converter.from_bytes(e.what());
+		result = strToWstr(e.what());
 	}
 
 	boost::replace_all(result, _T("\n"), _T("\r\n"));

@@ -9,8 +9,8 @@
 #include "Tab.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
+#include "../Helper/StringHelper.h"
 #include "../ThirdParty/Sol/sol.hpp"
-#include <codecvt>
 
 namespace Plugins
 {
@@ -38,10 +38,8 @@ namespace Plugins
 
 			std::wstring toString()
 			{
-				std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-
-				return _T("sortMode = ") + converter.from_bytes(sortMode._to_string())
-					+ _T(", viewMode = ") + converter.from_bytes(viewMode._to_string())
+				return _T("sortMode = ") + strToWstr(sortMode._to_string())
+					+ _T(", viewMode = ") + strToWstr(viewMode._to_string())
 					+ _T(", sortAscending = ") + std::to_wstring(sortAscending)
 					+ _T(", showInGroups = ") + std::to_wstring(showInGroups)
 					+ _T(", showHidden = ") + std::to_wstring(showHidden)

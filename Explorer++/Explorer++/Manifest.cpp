@@ -5,37 +5,35 @@
 #include "stdafx.h"
 #include "Manifest.h"
 #include "AcceleratorParser.h"
-#include <codecvt>
+#include "../Helper/StringHelper.h"
 #include <fstream>
 
 void Plugins::from_json(const nlohmann::json &json, Manifest &manifest)
 {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-
 	auto name = json.at("name").get<std::string>();
 	auto file = json.at("file").get<std::string>();
 	auto version = json.at("version").get<std::string>();
 
-	manifest.name = converter.from_bytes(name);
-	manifest.file = converter.from_bytes(file);
-	manifest.version = converter.from_bytes(version);
+	manifest.name = strToWstr(name);
+	manifest.file = strToWstr(file);
+	manifest.version = strToWstr(version);
 
 	if (json.count("description") != 0)
 	{
 		auto description = json.at("description").get<std::string>();
-		manifest.description = converter.from_bytes(description);
+		manifest.description = strToWstr(description);
 	}
 
 	if (json.count("author") != 0)
 	{
 		auto author = json.at("author").get<std::string>();
-		manifest.author = converter.from_bytes(author);
+		manifest.author = strToWstr(author);
 	}
 
 	if (json.count("homepage") != 0)
 	{
 		auto homepage = json.at("homepage").get<std::string>();
-		manifest.homepage = converter.from_bytes(homepage);
+		manifest.homepage = strToWstr(homepage);
 	}
 
 	if (json.count("std_libs_required") != 0)
@@ -51,20 +49,18 @@ void Plugins::from_json(const nlohmann::json &json, Manifest &manifest)
 
 void Plugins::from_json(const nlohmann::json &json, Command &command)
 {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-
 	auto key = json.at("key").get<std::string>();
-	command.acceleratorString = converter.from_bytes(key);
+	command.acceleratorString = strToWstr(key);
 
 	auto name = json.at("name").get<std::string>();
-	command.name = converter.from_bytes(name);
+	command.name = strToWstr(name);
 
 	command.accelerator = parseAccelerator(command.acceleratorString);
 
 	if (json.count("description") != 0)
 	{
 		auto description = json.at("description").get<std::string>();
-		command.description = converter.from_bytes(description);
+		command.description = strToWstr(description);
 	}
 }
 

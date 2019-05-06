@@ -26,6 +26,11 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES	1
 #define STRICT
 
+// While wstring_convert is deprecated in C++17, it won't be removed from the
+// language until a replacement is added. Therefore, it should be safe to keep
+// using it for now and the deprecation warning can be ignored.
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
+
 // Windows Header Files:
 #include <winsock2.h>
 #include <windows.h>
