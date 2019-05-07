@@ -3,19 +3,19 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
 #include "IShellView.h"
+#include "Config.h"
 #include "iShellBrowser_internal.h"
 #include "ViewModes.h"
 #include "../Helper/Controls.h"
-#include "../Helper/Helper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
-#include "../Helper/ShellHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
-#include "../Helper/Macros.h"
 #include "../Helper/Logging.h"
-
+#include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
+#include <list>
 
 BOOL g_bNewFileRenamed = FALSE;
 static int iRenamedItem;
@@ -227,7 +227,7 @@ void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 
 				/* Only insert the item in its sorted position if it
 				wasn't dropped in. */
-				if(m_globalFolderSettings->insertSorted && !bDropped)
+				if(m_config->globalFolderSettings.insertSorted && !bDropped)
 				{
 					int iItemId;
 					int iSorted;
@@ -572,7 +572,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 					if(iItem != -1)
 					{
 						BasicItemInfo_t basicItemInfo = getBasicItemInfo(iItemInternal);
-						std::wstring filename = ProcessItemFileName(basicItemInfo, *m_globalFolderSettings);
+						std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
 
 						TCHAR filenameCopy[MAX_PATH];
 						StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());

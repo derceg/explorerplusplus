@@ -3,19 +3,19 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
-#include <cassert>
+#include "IShellView.h"
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
-#include "IShellView.h"
+#include "Config.h"
 #include "iShellBrowser_internal.h"
 #include "MainResource.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/Helper.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
-
+#include "../Helper/ShellHelper.h"
+#include <cassert>
+#include <list>
 
 void CShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
 {
@@ -29,7 +29,7 @@ void CShellBrowser::QueueColumnTask(int itemInternalIndex, int columnIndex)
 	int columnResultID = m_columnResultIDCounter++;
 
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(itemInternalIndex);
-	GlobalFolderSettings globalFolderSettings = *m_globalFolderSettings;
+	GlobalFolderSettings globalFolderSettings = m_config->globalFolderSettings;
 
 	auto result = m_columnThreadPool.push([this, columnResultID, columnID, itemInternalIndex, basicItemInfo, globalFolderSettings](int id) {
 		UNREFERENCED_PARAMETER(id);

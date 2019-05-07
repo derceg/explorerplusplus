@@ -3,18 +3,19 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <string>
 #include "IShellView.h"
+#include "Config.h"
 #include "iShellBrowser_internal.h"
 #include "MainResource.h"
 #include "SortModes.h"
 #include "ViewModes.h"
-#include "../Helper/Helper.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/Controls.h"
-#include "../Helper/RegistrySettings.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/RegistrySettings.h"
+#include "../Helper/ShellHelper.h"
+#include <string>
 
 int CShellBrowser::listViewParentSubclassIdCounter = 0;
 
@@ -56,37 +57,36 @@ ULONG __stdcall CShellBrowser::Release(void)
 }
 
 CShellBrowser *CShellBrowser::CreateNew(HWND hOwner, HWND hListView, CachedIcons *cachedIcons,
-	std::shared_ptr<Config> config, const GlobalFolderSettings *globalFolderSettings,
-	const FolderSettings &folderSettings, const InitialColumns &initialColumns)
+	std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+	const InitialColumns &initialColumns)
 {
-	return new CShellBrowser(hOwner, hListView, cachedIcons, config, globalFolderSettings,
+	return new CShellBrowser(hOwner, hListView, cachedIcons, config,
 		folderSettings, initialColumns);
 }
 
 CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView, CachedIcons *cachedIcons,
-	std::shared_ptr<Config> config, const GlobalFolderSettings *globalFolderSettings,
-	const FolderSettings &folderSettings, const InitialColumns &initialColumns) :
-m_hOwner(hOwner),
-m_hListView(hListView),
-m_cachedIcons(cachedIcons),
-m_config(config),
-m_globalFolderSettings(globalFolderSettings),
-m_folderSettings(folderSettings),
-m_ControlPanelColumnList(*initialColumns.pControlPanelColumnList),
-m_MyComputerColumnList(*initialColumns.pMyComputerColumnList),
-m_MyNetworkPlacesColumnList(*initialColumns.pMyNetworkPlacesColumnList),
-m_NetworkConnectionsColumnList(*initialColumns.pNetworkConnectionsColumnList),
-m_PrintersColumnList(*initialColumns.pPrintersColumnList),
-m_RealFolderColumnList(*initialColumns.pRealFolderColumnList),
-m_RecycleBinColumnList(*initialColumns.pRecycleBinColumnList),
-m_itemIDCounter(0),
-m_columnThreadPool(1),
-m_columnResultIDCounter(0),
-m_itemImageThreadPool(1),
-m_thumbnailResultIDCounter(0),
-m_iconResultIDCounter(0),
-m_infoTipsThreadPool(1),
-m_infoTipResultIDCounter(0)
+	std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+	const InitialColumns &initialColumns) :
+	m_hOwner(hOwner),
+	m_hListView(hListView),
+	m_cachedIcons(cachedIcons),
+	m_config(config),
+	m_folderSettings(folderSettings),
+	m_ControlPanelColumnList(*initialColumns.pControlPanelColumnList),
+	m_MyComputerColumnList(*initialColumns.pMyComputerColumnList),
+	m_MyNetworkPlacesColumnList(*initialColumns.pMyNetworkPlacesColumnList),
+	m_NetworkConnectionsColumnList(*initialColumns.pNetworkConnectionsColumnList),
+	m_PrintersColumnList(*initialColumns.pPrintersColumnList),
+	m_RealFolderColumnList(*initialColumns.pRealFolderColumnList),
+	m_RecycleBinColumnList(*initialColumns.pRecycleBinColumnList),
+	m_itemIDCounter(0),
+	m_columnThreadPool(1),
+	m_columnResultIDCounter(0),
+	m_itemImageThreadPool(1),
+	m_thumbnailResultIDCounter(0),
+	m_iconResultIDCounter(0),
+	m_infoTipsThreadPool(1),
+	m_infoTipResultIDCounter(0)
 {
 	m_iRefCount = 1;
 
@@ -114,15 +114,15 @@ m_infoTipResultIDCounter(0)
 	m_PreviousSortColumnExists = false;
 
 	NListView::ListView_SetAutoArrange(m_hListView,m_folderSettings.autoArrange);
-	NListView::ListView_SetGridlines(m_hListView, m_globalFolderSettings->showGridlines);
+	NListView::ListView_SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
 
 	if (m_folderSettings.applyFilter)
 	{
 		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
 	}
 
-	NListView::ListView_ActivateOneClickSelect(m_hListView, m_globalFolderSettings->oneClickActivate,
-		m_globalFolderSettings->oneClickActivateHoverTime);
+	NListView::ListView_ActivateOneClickSelect(m_hListView, m_config->globalFolderSettings.oneClickActivate,
+		m_config->globalFolderSettings.oneClickActivateHoverTime);
 
 	m_nAwaitingAdd = 0;
 
@@ -391,7 +391,7 @@ void CShellBrowser::SetId(int ID)
 
 void CShellBrowser::OnGridlinesSettingChanged()
 {
-	NListView::ListView_SetGridlines(m_hListView, m_globalFolderSettings->showGridlines);
+	NListView::ListView_SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
 }
 
 void CShellBrowser::SetResourceModule(HINSTANCE hResourceModule)
@@ -494,7 +494,7 @@ void CShellBrowser::SetTileViewItemInfo(int iItem,int iItemInternal)
 		lFileSize.HighPart = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh;
 
 		FormatSizeString(lFileSize,lpszFileSize,SIZEOF_ARRAY(lpszFileSize),
-			m_globalFolderSettings->forceSize,m_globalFolderSettings->sizeDisplayFormat);
+			m_config->globalFolderSettings.forceSize, m_config->globalFolderSettings.sizeDisplayFormat);
 
 		ListView_SetItemText(m_hListView,iItem,2,lpszFileSize);
 	}

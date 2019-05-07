@@ -199,7 +199,7 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	}
 
 	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView, &m_cachedIcons,
-		m_config, &m_config->globalFolderSettings, folderSettingsFinal, initialColumnsFinal));
+		m_config, folderSettingsFinal, initialColumnsFinal));
 
 	tab.GetShellBrowser()->SetId(tab.GetId());
 	tab.GetShellBrowser()->SetResourceModule(m_hLanguageModule);

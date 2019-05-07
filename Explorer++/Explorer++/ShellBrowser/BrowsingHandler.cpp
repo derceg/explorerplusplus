@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "iShellView.h"
+#include "Config.h"
 #include "iShellBrowser_internal.h"
 #include "MainResource.h"
 #include "ViewModes.h"
@@ -186,7 +187,7 @@ void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 		if(!IsFileFiltered(itr->iItemInternal))
 		{
 			BasicItemInfo_t basicItemInfo = getBasicItemInfo(itr->iItemInternal);
-			std::wstring filename = ProcessItemFileName(basicItemInfo, *m_globalFolderSettings);
+			std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
 
 			TCHAR filenameCopy[MAX_PATH];
 			StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());
@@ -303,7 +304,7 @@ BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
 		bFilenameFiltered = IsFilenameFiltered(m_itemInfoMap.at(iItemInternal).szDisplayName);
 	}
 
-	if(m_globalFolderSettings->hideSystemFiles)
+	if(m_config->globalFolderSettings.hideSystemFiles)
 	{
 		bHideSystemFile = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
 			== FILE_ATTRIBUTE_SYSTEM;

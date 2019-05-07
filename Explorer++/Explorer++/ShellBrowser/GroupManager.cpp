@@ -3,21 +3,21 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
-#include <cassert>
-#include <boost/date_time/gregorian/gregorian.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include <iphlpapi.h>
-#include <propkey.h>
 #include "IShellView.h"
+#include "Config.h"
 #include "iShellBrowser_internal.h"
 #include "MainResource.h"
 #include "SortModes.h"
 #include "../Helper/Helper.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/TimeHelper.h"
-
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <iphlpapi.h>
+#include <propkey.h>
+#include <cassert>
+#include <list>
 
 namespace
 {
@@ -212,7 +212,7 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case SortMode::OriginalLocation:
-			DetermineItemSummaryGroup(basicItemInfo, &SCID_ORIGINAL_LOCATION, szGroupHeader, SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
+			DetermineItemSummaryGroup(basicItemInfo, &SCID_ORIGINAL_LOCATION, szGroupHeader, SIZEOF_ARRAY(szGroupHeader), m_config->globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
@@ -278,27 +278,27 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case SortMode::Title:
-			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Title,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
+			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Title,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), m_config->globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Subject:
-			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Subject,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
+			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Subject,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), m_config->globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Authors:
-			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Author,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
+			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Author,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), m_config->globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Keywords:
-			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Keywords,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
+			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Keywords,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), m_config->globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Comments:
-			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Comment,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), *m_globalFolderSettings);
+			DetermineItemSummaryGroup(basicItemInfo,&PKEY_Comment,szGroupHeader,SIZEOF_ARRAY(szGroupHeader), m_config->globalFolderSettings);
 			pfnGroupCompare = GroupNameComparisonStub;
 			break;
 

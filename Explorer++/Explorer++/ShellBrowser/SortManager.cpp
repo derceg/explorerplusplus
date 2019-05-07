@@ -3,22 +3,22 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <list>
-#include <cassert>
-#include <propkey.h>
-#include <propvarutil.h>
-#include "ColumnDataRetrieval.h"
 #include "IShellView.h"
+#include "ColumnDataRetrieval.h"
+#include "Config.h"
 #include "iShellBrowser_internal.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/Controls.h"
-#include "../Helper/Helper.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/FolderSize.h"
+#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
-
+#include "../Helper/ShellHelper.h"
+#include <propkey.h>
+#include <propvarutil.h>
+#include <cassert>
+#include <list>
 
 void CShellBrowser::SortFolder(SortMode sortMode)
 {
@@ -76,7 +76,7 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 		switch(m_folderSettings.sortMode)
 		{
 		case SortMode::Name:
-			ComparisonResult = SortByName(basicItemInfo1, basicItemInfo2, *m_globalFolderSettings);
+			ComparisonResult = SortByName(basicItemInfo1, basicItemInfo2, m_config->globalFolderSettings);
 			break;
 
 		case SortMode::Type:

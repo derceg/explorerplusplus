@@ -88,8 +88,8 @@ class CShellBrowser : public IDropTarget, public IDropFilesCallback
 public:
 
 	static CShellBrowser *CreateNew(HWND hOwner, HWND hListView, CachedIcons *cachedIcons,
-		std::shared_ptr<Config> config, const GlobalFolderSettings *globalFolderSettings,
-		const FolderSettings &folderSettings, const InitialColumns &initialColumns);
+		std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+		const InitialColumns &initialColumns);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
@@ -301,8 +301,8 @@ private:
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	CShellBrowser(HWND hOwner, HWND hListView, CachedIcons *cachedIcons, std::shared_ptr<Config> config,
-		const GlobalFolderSettings *globalFolderSettings, const FolderSettings &folderSettings,
+	CShellBrowser(HWND hOwner, HWND hListView, CachedIcons *cachedIcons,
+		std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
 		const InitialColumns &initialColumns);
 	~CShellBrowser();
 
@@ -538,8 +538,7 @@ private:
 	modification. */
 	int					m_iUniqueFolderIndex;
 
-	std::shared_ptr<Config>	m_config;
-	const GlobalFolderSettings	*m_globalFolderSettings;
+	std::shared_ptr<const Config>	m_config;
 	FolderSettings		m_folderSettings;
 
 	/* ID. */
