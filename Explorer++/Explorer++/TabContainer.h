@@ -22,9 +22,9 @@ public:
 
 	typedef boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)> TabMovedSignal;
 
-	static CTabContainer *Create(HWND parent, std::unordered_map<int, Tab> *tabs,
-		TabContainerInterface* tabContainer, TabInterface* tabInterface, IExplorerplusplus* expp,
-		HINSTANCE instance, std::shared_ptr<Config> config);
+	static CTabContainer *Create(HWND parent, TabContainerInterface *tabContainer,
+		TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance,
+		std::shared_ptr<Config> config);
 
 	void InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName);
 
@@ -36,6 +36,9 @@ public:
 	int GetTabIndex(const Tab &tab) const;
 	int GetNumTabs() const;
 	int MoveTab(const Tab &tab, int newIndex);
+
+	// Eventually, this should be removed.
+	std::unordered_map<int, Tab> &GetTabs();
 
 	/* TODO: Ideally, there would be a method of iterating over the tabs without
 	having access to the underlying container. */
@@ -53,8 +56,8 @@ private:
 
 	static const int TAB_ICON_LOCK_INDEX = 0;
 
-	CTabContainer(HWND parent, std::unordered_map<int, Tab> *tabs, TabContainerInterface *tabContainer,
-		TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config);
+	CTabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
+		IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config);
 	~CTabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
@@ -104,7 +107,7 @@ private:
 	HFONT m_hTabFont;
 	HIMAGELIST m_hTabCtrlImageList;
 
-	std::unordered_map<int, Tab> *m_tabs;
+	std::unordered_map<int, Tab> m_tabs;
 	TabContainerInterface *m_tabContainerInterface;
 	TabInterface *m_tabInterface;
 	IExplorerplusplus *m_expp;

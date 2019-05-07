@@ -37,7 +37,7 @@ void Explorerplusplus::InitializeTabs()
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	m_tabContainer = CTabContainer::Create(m_hTabBacking, &m_Tabs, this, this, this, m_hLanguageModule, m_config);
+	m_tabContainer = CTabContainer::Create(m_hTabBacking, this, this, this, m_hLanguageModule, m_config);
 
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
@@ -147,7 +147,7 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	}
 
 	int tabId = m_tabIdCounter++;
-	auto item = m_Tabs.emplace(std::make_pair(tabId, tabId));
+	auto item = m_tabContainer->GetTabs().emplace(std::make_pair(tabId, tabId));
 
 	Tab &tab = item.first->second;
 
@@ -565,7 +565,7 @@ bool Explorerplusplus::CloseTab(const Tab &tab)
 	// passed to the function).
 	int tabId = tab.GetId();
 
-	m_Tabs.erase(tab.GetId());
+	m_tabContainer->GetTabs().erase(tab.GetId());
 
 	m_tabRemovedSignal(tabId);
 

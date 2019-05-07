@@ -28,19 +28,18 @@ const std::map<UINT, int> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 	{ IDM_TAB_REFRESH, SHELLIMAGES_REFRESH }
 };
 
-CTabContainer *CTabContainer::Create(HWND parent, std::unordered_map<int, Tab> *tabs,
-	TabContainerInterface *tabContainer, TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance,
+CTabContainer *CTabContainer::Create(HWND parent, TabContainerInterface *tabContainer,
+	TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance,
 	std::shared_ptr<Config> config)
 {
-	return new CTabContainer(parent, tabs, tabContainer, tabInterface, expp, instance, config);
+	return new CTabContainer(parent, tabContainer, tabInterface, expp, instance, config);
 }
 
-CTabContainer::CTabContainer(HWND parent, std::unordered_map<int, Tab> *tabs, TabContainerInterface *tabContainer,
-	TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config) :
+CTabContainer::CTabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
+	IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config) :
 	CBaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_hTabFont(nullptr),
 	m_hTabCtrlImageList(nullptr),
-	m_tabs(tabs),
 	m_tabContainerInterface(tabContainer),
 	m_tabInterface(tabInterface),
 	m_expp(expp),
@@ -748,14 +747,14 @@ void CTabContainer::InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirecto
 
 Tab &CTabContainer::GetTab(int tabId)
 {
-	return m_tabs->at(tabId);
+	return m_tabs.at(tabId);
 }
 
 Tab *CTabContainer::GetTabOptional(int tabId)
 {
-	auto itr = m_tabs->find(tabId);
+	auto itr = m_tabs.find(tabId);
 
-	if (itr == m_tabs->end())
+	if (itr == m_tabs.end())
 	{
 		return nullptr;
 	}
@@ -817,7 +816,7 @@ int CTabContainer::GetTabIndex(const Tab &tab) const
 
 int CTabContainer::GetNumTabs() const
 {
-	return static_cast<int>(m_tabs->size());
+	return static_cast<int>(m_tabs.size());
 }
 
 int CTabContainer::MoveTab(const Tab &tab, int newIndex)
@@ -826,16 +825,21 @@ int CTabContainer::MoveTab(const Tab &tab, int newIndex)
 	return TabCtrl_MoveItem(m_hwnd, index, newIndex);
 }
 
+std::unordered_map<int, Tab> &CTabContainer::GetTabs()
+{
+	return m_tabs;
+}
+
 const std::unordered_map<int, Tab> &CTabContainer::GetAllTabs() const
 {
-	return *m_tabs;
+	return m_tabs;
 }
 
 std::vector<std::reference_wrapper<const Tab>> CTabContainer::GetAllTabsInOrder() const
 {
 	std::vector<std::reference_wrapper<const Tab>> sortedTabs;
 
-	for (const auto &tab : *m_tabs | boost::adaptors::map_values)
+	for (const auto &tab : m_tabs | boost::adaptors::map_values)
 	{
 		sortedTabs.push_back(tab);
 	}

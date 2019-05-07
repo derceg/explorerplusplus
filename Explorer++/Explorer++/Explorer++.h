@@ -597,7 +597,6 @@ private:
 	AddressBar				*m_addressBar;
 
 	/* Tabs. */
-	std::unordered_map<int, Tab> m_Tabs;
 	int						m_tabIdCounter;
 	CTabContainer			*m_tabContainer;
 	CachedIcons				m_cachedIcons;
