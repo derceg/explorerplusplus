@@ -495,7 +495,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_EXTENSIONS,BST_CHECKED);
 				if(m_config->globalFolderSettings.hideLinkExtension)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_LINK,BST_CHECKED);
-				if(m_config->insertSorted)
+				if(m_config->globalFolderSettings.insertSorted)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED,BST_CHECKED);
 				if(m_config->globalFolderSettings.oneClickActivate)
 					CheckDlgButton(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK,BST_CHECKED);
@@ -626,7 +626,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						m_config->globalFolderSettings.hideLinkExtension = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_LINK)
 							== BST_CHECKED);
 
-						m_config->insertSorted = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED)
+						m_config->globalFolderSettings.insertSorted = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_INSERTSORTED)
 							== BST_CHECKED);
 
 						m_config->globalFolderSettings.oneClickActivate = (IsDlgButtonChecked(hDlg,IDC_SETTINGS_CHECK_SINGLECLICK)
@@ -670,9 +670,6 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 
 						for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 						{
-							/* Each one of the options should also be pushed to new tabs when they are created. */
-							tab.GetShellBrowser()->SetInsertSorted(m_config->insertSorted);
-
 							RefreshTab(tab);
 
 							NListView::ListView_ActivateOneClickSelect(tab.listView, m_config->globalFolderSettings.oneClickActivate,

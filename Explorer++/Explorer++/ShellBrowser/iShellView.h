@@ -186,8 +186,6 @@ public:
 	void				SetShowInGroups(BOOL bShowInGroups);
 	void				SetShowInGroupsFlag(BOOL bShowInGroups);
 
-	void				SetInsertSorted(BOOL bInsertSorted);
-
 	int CALLBACK		SortTemporary(LPARAM lParam1,LPARAM lParam2);
 
 	std::list<int>		GetAvailableSortModes() const;
@@ -539,9 +537,6 @@ private:
 	told apart when adding files from directory
 	modification. */
 	int					m_iUniqueFolderIndex;
-
-	/* User options variables. */
-	BOOL				m_bInsertSorted;
 
 	std::shared_ptr<Config>	m_config;
 	const GlobalFolderSettings	*m_globalFolderSettings;

@@ -227,7 +227,7 @@ void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 
 				/* Only insert the item in its sorted position if it
 				wasn't dropped in. */
-				if(m_bInsertSorted && !bDropped)
+				if(m_globalFolderSettings->insertSorted && !bDropped)
 				{
 					int iItemId;
 					int iSorted;

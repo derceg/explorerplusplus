@@ -108,7 +108,6 @@ struct Config
 		doubleClickTabClose = TRUE;
 		useLargeToolbarIcons = FALSE;
 		handleZipFiles = FALSE;
-		insertSorted = TRUE;
 		overwriteExistingFilesConfirmation = TRUE;
 		checkBoxSelection = FALSE;
 		closeMainWindowOnTabClose = TRUE;
@@ -136,6 +135,7 @@ struct Config
 		globalFolderSettings.disableFolderSizesNetworkRemovable = FALSE;
 		globalFolderSettings.hideSystemFiles = FALSE;
 		globalFolderSettings.hideLinkExtension = FALSE;
+		globalFolderSettings.insertSorted = TRUE;
 		globalFolderSettings.showGridlines = TRUE;
 		globalFolderSettings.forceSize = FALSE;
 		globalFolderSettings.sizeDisplayFormat = SIZE_FORMAT_BYTES;
@@ -180,7 +180,6 @@ struct Config
 	BOOL doubleClickTabClose;
 	BOOL useLargeToolbarIcons;
 	BOOL handleZipFiles;
-	BOOL insertSorted;
 	BOOL overwriteExistingFilesConfirmation;
 	BOOL checkBoxSelection;
 	BOOL closeMainWindowOnTabClose;

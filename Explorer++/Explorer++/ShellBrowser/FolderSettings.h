@@ -16,6 +16,7 @@ struct GlobalFolderSettings
 	BOOL disableFolderSizesNetworkRemovable;
 	BOOL hideSystemFiles;
 	BOOL hideLinkExtension;
+	BOOL insertSorted;
 	BOOL showGridlines;
 	BOOL forceSize;
 	SizeDisplayFormat_t sizeDisplayFormat;

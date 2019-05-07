@@ -204,8 +204,6 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	tab.GetShellBrowser()->SetId(tab.GetId());
 	tab.GetShellBrowser()->SetResourceModule(m_hLanguageModule);
 
-	tab.GetShellBrowser()->SetInsertSorted(m_config->insertSorted);
-
 	int index;
 
 	if (tabSettings.index)

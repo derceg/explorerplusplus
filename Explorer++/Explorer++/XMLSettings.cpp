@@ -495,7 +495,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InfoTipType"),NXMLSettings::EncodeIntValue(m_config->infoTipType));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InsertSorted"),NXMLSettings::EncodeBoolValue(m_config->insertSorted));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("InsertSorted"),NXMLSettings::EncodeBoolValue(m_config->globalFolderSettings.insertSorted));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	_itow_s(m_Language,szValue,SIZEOF_ARRAY(szValue),10);
@@ -1596,7 +1596,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_INSERTSORTED:
-		m_config->insertSorted = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->globalFolderSettings.insertSorted = NXMLSettings::DecodeBoolValue(wszValue);
 		break;
 
 	case HASH_LANGUAGE:

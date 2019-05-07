@@ -404,11 +404,6 @@ HRESULT CShellBrowser::Refresh()
 	return BrowseFolder(m_pidlDirectory,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 }
 
-void CShellBrowser::SetInsertSorted(BOOL bInsertSorted)
-{
-	m_bInsertSorted = bInsertSorted;
-}
-
 void CShellBrowser::InsertTileViewColumns(void)
 {
 	LVTILEVIEWINFO lvtvi;
