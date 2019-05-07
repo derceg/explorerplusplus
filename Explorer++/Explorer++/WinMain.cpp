@@ -43,7 +43,7 @@ LONG WINAPI MyUnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInf
 DWORD dwControlClasses = ICC_BAR_CLASSES|ICC_COOL_CLASSES|
 	ICC_LISTVIEW_CLASSES|ICC_USEREX_CLASSES|ICC_STANDARD_CLASSES|
 	ICC_LINK_CLASS;
-std::vector<std::wstring> g_TabDirs;
+std::vector<std::wstring> g_commandLineDirectories;
 
 /* Modeless dialog handles. */
 HWND g_hwndSearch;
@@ -196,7 +196,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	control panel. If the command line only refers
 	to folders that are children of the control panel,
 	pass those folders to Windows Explorer, then exit. */
-	if(g_TabDirs.size() > 0)
+	if(g_commandLineDirectories.size() > 0)
 	{
 		LPITEMIDLIST pidlControlPanel = NULL;
 		LPITEMIDLIST pidl = NULL;
@@ -206,11 +206,11 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 		if(SUCCEEDED(hr))
 		{
-			auto itr = g_TabDirs.begin();
+			auto itr = g_commandLineDirectories.begin();
 
 			BOOL bControlPanelChild = FALSE;
 
-			while(itr != g_TabDirs.end())
+			while(itr != g_commandLineDirectories.end())
 			{
 				/* This could fail on a 64-bit version of
 				Vista or Windows 7 if the executable is 32-bit,
@@ -260,7 +260,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 						ShellExecute(NULL,_T("open"),szExplorerPath,
 							itr->c_str(),NULL,SW_SHOWNORMAL);
 
-						itr = g_TabDirs.erase(itr);
+						itr = g_commandLineDirectories.erase(itr);
 					}
 
 					CoTaskMemFree(pidl);
@@ -273,7 +273,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 				}
 			}
 
-			if(g_TabDirs.size() == 0)
+			if(g_commandLineDirectories.size() == 0)
 			{
 				bExit = TRUE;
 			}
@@ -318,9 +318,9 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 			if(hPrev != NULL)
 			{
-				if(!g_TabDirs.empty())
+				if(!g_commandLineDirectories.empty())
 				{
-					for(const auto &strDirectory : g_TabDirs)
+					for(const auto &strDirectory : g_commandLineDirectories)
 					{
 						COPYDATASTRUCT cds;
 						TCHAR szDirectory[MAX_PATH];

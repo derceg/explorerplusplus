@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <list>
 
-extern std::vector<std::wstring> g_TabDirs;
+extern std::vector<std::wstring> g_commandLineDirectories;
 
 void Explorerplusplus::InitializeTabs()
 {
@@ -327,9 +327,9 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	HRESULT							hr;
 	int								nTabsCreated = 0;
 
-	if(!g_TabDirs.empty())
+	if(!g_commandLineDirectories.empty())
 	{
-		for(const auto &strDirectory : g_TabDirs)
+		for(const auto &strDirectory : g_commandLineDirectories)
 		{
 			StringCchCopy(szDirectory,SIZEOF_ARRAY(szDirectory),strDirectory.c_str());
 

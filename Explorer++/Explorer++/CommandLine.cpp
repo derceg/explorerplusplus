@@ -15,7 +15,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/log/core.hpp>
 
-extern std::vector<std::wstring> g_TabDirs;
+extern std::vector<std::wstring> g_commandLineDirectories;
 
 struct CommandLineSettings
 {
@@ -132,7 +132,7 @@ boost::optional<CommandLine::ExitInfo> ProcessCommandLineSettings(const CommandL
 		TCHAR szParsingPath[MAX_PATH];
 		DecodePath(strToWstr(directory).c_str(), processDirectoryPath.wstring().c_str(), szParsingPath, SIZEOF_ARRAY(szParsingPath));
 
-		g_TabDirs.push_back(szParsingPath);
+		g_commandLineDirectories.push_back(szParsingPath);
 	}
 
 	return boost::none;
