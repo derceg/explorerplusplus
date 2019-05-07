@@ -1478,7 +1478,16 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 		case LVN_ITEMCHANGING:
 			{
-				UINT uViewMode = m_pActiveShellBrowser->GetViewMode();
+				int tabId = DetermineListViewObjectIndex(hwnd);
+
+				if (tabId == -1)
+				{
+					return FALSE;
+				}
+
+				Tab &tab = m_tabContainer->GetTab(tabId);
+
+				UINT uViewMode = tab.GetShellBrowser()->GetViewMode();
 
 				if(uViewMode == ViewMode::List)
 				{
