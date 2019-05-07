@@ -170,7 +170,6 @@ private:
 	LRESULT CALLBACK		WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
 	/* Internal private functions. */
-	void					OnTabSelectionChanged();
 	void					UpdateArrangeMenuItems(void);
 
 	/* <----Private message handlers.----> */
@@ -306,6 +305,7 @@ private:
 	void					InitializeTabs();
 	void					SelectAdjacentTab(BOOL bNextTab);
 	void					SelectTabAtIndex(int index);
+	void					OnTabSelectionChanged(bool broadcastEvent = true);
 	HRESULT					CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
 	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
 	FolderSettings			GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;

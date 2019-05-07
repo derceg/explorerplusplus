@@ -243,29 +243,12 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 
 	if (selected)
 	{
-		if (m_iPreviousTabSelectionId != -1)
+		int previousIndex = TabCtrl_SetCurSel(m_tabContainer->GetHWND(), index);
+
+		if (previousIndex != -1)
 		{
-			m_tabSelectionHistory.push_back(m_iPreviousTabSelectionId);
+			OnTabSelectionChanged(false);
 		}
-
-		/* Select the newly created tab. */
-		TabCtrl_SetCurSel(m_tabContainer->GetHWND(), index);
-
-		/* Hide the previously active tab, and show the
-		newly created one. */
-		ShowWindow(m_hActiveListView, SW_HIDE);
-		ShowWindow(tab.listView, SW_SHOW);
-
-		m_selectedTabId = tab.GetId();
-		m_selectedTabIndex = index;
-
-		m_hActiveListView = tab.listView;
-		m_pActiveShellBrowser = tab.GetShellBrowser();
-		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory), m_CurrentDirectory);
-
-		SetFocus(tab.listView);
-
-		m_iPreviousTabSelectionId = tab.GetId();
 	}
 
 	if (newTabId)
@@ -416,7 +399,7 @@ void Explorerplusplus::SelectTabAtIndex(int index)
 	OnTabSelectionChanged();
 }
 
-void Explorerplusplus::OnTabSelectionChanged()
+void Explorerplusplus::OnTabSelectionChanged(bool broadcastEvent)
 {
 	int index = TabCtrl_GetCurSel(m_tabContainer->GetHWND());
 
@@ -462,7 +445,10 @@ void Explorerplusplus::OnTabSelectionChanged()
 
 	m_iPreviousTabSelectionId = m_selectedTabId;
 
-	m_tabSelectedSignal(tab);
+	if (broadcastEvent)
+	{
+		m_tabSelectedSignal(tab);
+	}
 }
 
 void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
