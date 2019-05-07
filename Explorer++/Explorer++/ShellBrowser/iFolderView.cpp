@@ -56,17 +56,19 @@ ULONG __stdcall CShellBrowser::Release(void)
 	return m_iRefCount;
 }
 
-CShellBrowser *CShellBrowser::CreateNew(HWND hOwner, HWND hListView, CachedIcons *cachedIcons,
-	std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+CShellBrowser *CShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
+	CachedIcons *cachedIcons, std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
 	const InitialColumns &initialColumns)
 {
-	return new CShellBrowser(hOwner, hListView, cachedIcons, config,
+	return new CShellBrowser(id, resourceInstance, hOwner, hListView, cachedIcons, config,
 		folderSettings, initialColumns);
 }
 
-CShellBrowser::CShellBrowser(HWND hOwner, HWND hListView, CachedIcons *cachedIcons,
-	std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
+	CachedIcons *cachedIcons, std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
 	const InitialColumns &initialColumns) :
+	m_ID(id),
+	m_hResourceModule(resourceInstance),
 	m_hOwner(hOwner),
 	m_hListView(hListView),
 	m_cachedIcons(cachedIcons),
@@ -379,24 +381,14 @@ HRESULT CShellBrowser::InitializeDragDropHelpers(void)
 	return hr;
 }
 
-int CShellBrowser::GetId(void) const
+int CShellBrowser::GetId() const
 {
 	return m_ID;
-}
-
-void CShellBrowser::SetId(int ID)
-{
-	m_ID = ID;
 }
 
 void CShellBrowser::OnGridlinesSettingChanged()
 {
 	NListView::ListView_SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
-}
-
-void CShellBrowser::SetResourceModule(HINSTANCE hResourceModule)
-{
-	m_hResourceModule = hResourceModule;
 }
 
 HRESULT CShellBrowser::Refresh()

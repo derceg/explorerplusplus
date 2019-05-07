@@ -87,8 +87,8 @@ class CShellBrowser : public IDropTarget, public IDropFilesCallback
 
 public:
 
-	static CShellBrowser *CreateNew(HWND hOwner, HWND hListView, CachedIcons *cachedIcons,
-		std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+	static CShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
+		CachedIcons *cachedIcons, std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
 		const InitialColumns &initialColumns);
 
 	/* IUnknown methods. */
@@ -139,8 +139,7 @@ public:
 	int					GetNumSelected(void) const;
 
 	/* ID. */
-	int					GetId(void) const;
-	void				SetId(int ID);
+	int					GetId() const;
 
 	/* Directory modification support. */
 	void				FilesModified(DWORD Action, const TCHAR *FileName, int EventId, int iFolderIndex);
@@ -190,7 +189,6 @@ public:
 
 	std::list<int>		GetAvailableSortModes() const;
 	size_t				QueryNumActiveColumns(void) const;
-	void				SetResourceModule(HINSTANCE hResourceModule);
 	void				ImportAllColumns(const ColumnExport_t *pce);
 	void				ExportAllColumns(ColumnExport_t *pce);
 	void				QueueRename(LPCITEMIDLIST pidlItem);
@@ -301,9 +299,9 @@ private:
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	CShellBrowser(HWND hOwner, HWND hListView, CachedIcons *cachedIcons,
-		std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
-		const InitialColumns &initialColumns);
+	CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
+		CachedIcons *cachedIcons, std::shared_ptr<const Config> config,
+		const FolderSettings &folderSettings, const InitialColumns &initialColumns);
 	~CShellBrowser();
 
 	int					GenerateUniqueItemId(void);
@@ -518,7 +516,7 @@ private:
 
 	/* Internal state. */
 	LPITEMIDLIST		m_pidlDirectory;
-	HINSTANCE			m_hResourceModule;
+	const HINSTANCE		m_hResourceModule;
 	TCHAR				m_CurDir[MAX_PATH];
 	ULARGE_INTEGER		m_ulTotalDirSize;
 	ULARGE_INTEGER		m_ulFileSelectionSize;
@@ -542,7 +540,7 @@ private:
 	FolderSettings		m_folderSettings;
 
 	/* ID. */
-	int					m_ID;
+	const int			m_ID;
 
 	/* Stores information on files that
 	have been modified (i.e. created, deleted,

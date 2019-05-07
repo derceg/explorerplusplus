@@ -198,11 +198,9 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 		initialColumnsFinal.pRecycleBinColumnList = &m_RecycleBinColumnList;
 	}
 
-	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView, &m_cachedIcons,
-		m_config, folderSettingsFinal, initialColumnsFinal));
-
-	tab.GetShellBrowser()->SetId(tab.GetId());
-	tab.GetShellBrowser()->SetResourceModule(m_hLanguageModule);
+	tab.SetShellBrowser(CShellBrowser::CreateNew(tab.GetId(), m_hLanguageModule,
+		m_hContainer, tab.listView, &m_cachedIcons, m_config, folderSettingsFinal,
+		initialColumnsFinal));
 
 	int index;
 
