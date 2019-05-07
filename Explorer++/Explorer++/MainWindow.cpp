@@ -7,23 +7,27 @@
 #include "Config.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "TabContainer.h"
 #include "../Helper/PIDLWrapper.h"
 #include "../Helper/ProcessHelper.h"
 
-MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance, TabContainerInterface *tabContainer)
+MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
+	IExplorerplusplus *expp, TabContainerInterface *tabContainer)
 {
-	return new MainWindow(hwnd, config, instance, tabContainer);
+	return new MainWindow(hwnd, config, instance, expp, tabContainer);
 }
 
-MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance, TabContainerInterface *tabContainer) :
+MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
+	IExplorerplusplus *expp, TabContainerInterface *tabContainerInterface) :
 	CBaseWindow(hwnd),
 	m_hwnd(hwnd),
 	m_config(config),
 	m_instance(instance),
-	m_tabContainer(tabContainer)
+	m_expp(expp),
+	m_tabContainerInterface(tabContainerInterface)
 {
-	m_navigationCompletedConnection = m_tabContainer->AddNavigationCompletedObserver(boost::bind(&MainWindow::OnNavigationCompleted, this, _1));
-	m_tabSelectedConnection = m_tabContainer->AddTabSelectedObserver(boost::bind(&MainWindow::OnTabSelected, this, _1));
+	m_navigationCompletedConnection = m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&MainWindow::OnNavigationCompleted, this, _1));
+	m_tabSelectedConnection = m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&MainWindow::OnTabSelected, this, _1));
 
 	m_showFillTitlePathConnection = m_config->showFullTitlePath.addObserver(boost::bind(&MainWindow::OnShowFullTitlePathUpdated, this, _1));
 	m_showUserNameInTitleBarConnection = m_config->showUserNameInTitleBar.addObserver(boost::bind(&MainWindow::OnShowUserNameInTitleBarUpdated, this, _1));
@@ -42,7 +46,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::OnNavigationCompleted(const Tab &tab)
 {
-	if (m_tabContainer->IsTabSelected(tab))
+	if (m_expp->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateWindowText();
 	}
@@ -78,7 +82,7 @@ void MainWindow::OnShowPrivilegeLevelInTitleBarUpdated(BOOL newValue)
 
 void MainWindow::UpdateWindowText()
 {
-	const Tab &tab = m_tabContainer->GetSelectedTab();
+	const Tab &tab = m_expp->GetTabContainer()->GetSelectedTab();
 	PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
 
 	TCHAR szFolderDisplayName[MAX_PATH];

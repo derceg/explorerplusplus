@@ -6,6 +6,7 @@
 
 #include "CoreInterface.h"
 #include "Tab.h"
+#include "TabContainer.h"
 #include "TabContainerInterface.h"
 #include "../Helper/Macros.h"
 
@@ -15,8 +16,9 @@ class TaskbarThumbnails
 {
 public:
 
-	static TaskbarThumbnails *Create(IExplorerplusplus *expp, TabContainerInterface *tabContainer,
-		HINSTANCE instance, std::shared_ptr<Config> config);
+	static TaskbarThumbnails *Create(IExplorerplusplus *expp, CTabContainer *tabContainer,
+		TabContainerInterface *tabContainerInterface, HINSTANCE instance,
+		std::shared_ptr<Config> config);
 
 private:
 
@@ -36,7 +38,8 @@ private:
 		POINT ptOrigin;
 	};
 
-	TaskbarThumbnails(IExplorerplusplus *expp, TabContainerInterface *tabContainer, HINSTANCE instance, std::shared_ptr<Config> config);
+	TaskbarThumbnails(IExplorerplusplus *expp, CTabContainer *tabContainer, TabContainerInterface *tabContainerInterface,
+		HINSTANCE instance, std::shared_ptr<Config> config);
 	~TaskbarThumbnails();
 
 	static LRESULT CALLBACK MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
@@ -60,7 +63,8 @@ private:
 	void UpdateTaskbarThumbnailTtitle(const Tab &tab);
 
 	IExplorerplusplus *m_expp;
-	TabContainerInterface *m_tabContainer;
+	CTabContainer *m_tabContainer;
+	TabContainerInterface *m_tabContainerInterface;
 	HINSTANCE m_instance;
 
 	ITaskbarList4 *m_pTaskbarList;

@@ -4,22 +4,23 @@
 
 #include "stdafx.h"
 #include "AddressBar.h"
+#include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/iDataObject.h"
 #include "../Helper/iDropSource.h"
 #include "../Helper/ShellHelper.h"
 
-AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp, TabContainerInterface *tabContainer,
-	MainToolbar *mainToolbar)
+AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp,
+	TabContainerInterface *tabContainerInterface, MainToolbar *mainToolbar)
 {
-	return new AddressBar(parent, expp, tabContainer, mainToolbar);
+	return new AddressBar(parent, expp, tabContainerInterface, mainToolbar);
 }
 
-AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp, TabContainerInterface *tabContainer,
-	MainToolbar *mainToolbar) :
+AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp,
+	TabContainerInterface *tabContainerInterface, MainToolbar *mainToolbar) :
 	CBaseWindow(CreateAddressBar(parent)),
 	m_expp(expp),
-	m_tabContainer(tabContainer),
+	m_tabContainerInterface(tabContainerInterface),
 	m_mainToolbar(mainToolbar)
 {
 	Initialize(parent);
@@ -55,8 +56,8 @@ void AddressBar::Initialize(HWND parent)
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabSelectedConnection = m_tabContainer->AddTabSelectedObserver(boost::bind(&AddressBar::OnTabSelected, this, _1));
-	m_navigationCompletedConnection = m_tabContainer->AddNavigationCompletedObserver(boost::bind(&AddressBar::OnNavigationCompleted, this, _1));
+	m_tabSelectedConnection = m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&AddressBar::OnTabSelected, this, _1));
+	m_navigationCompletedConnection = m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&AddressBar::OnNavigationCompleted, this, _1));
 }
 
 LRESULT CALLBACK AddressBar::EditSubclassStub(HWND hwnd, UINT uMsg,
@@ -149,7 +150,7 @@ void AddressBar::OnGo()
 	valid path. */
 	SendMessage(m_hwnd, WM_GETTEXT, SIZEOF_ARRAY(szPath), (LPARAM)szPath);
 
-	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
 	selectedTab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
 	DecodePath(szPath, szCurrentDirectory, szFullFilePath, SIZEOF_ARRAY(szFullFilePath));
 
@@ -171,7 +172,7 @@ void AddressBar::OnBeginDrag()
 
 		if (SUCCEEDED(hr))
 		{
-			const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+			const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
 			LPITEMIDLIST pidlDirectory = selectedTab.GetShellBrowser()->QueryCurrentDirectoryIdl();
 
 			FORMATETC ftc[2];
@@ -275,7 +276,7 @@ void AddressBar::OnTabSelected(const Tab &tab)
 
 void AddressBar::OnNavigationCompleted(const Tab &tab)
 {
-	if (m_tabContainer->IsTabSelected(tab))
+	if (m_expp->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateTextAndIcon(tab);
 	}

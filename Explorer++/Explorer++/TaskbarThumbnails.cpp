@@ -40,16 +40,17 @@ namespace
 	static const UINT WM_DWMSENDICONICLIVEPREVIEWBITMAP = 0x0326;
 }
 
-TaskbarThumbnails *TaskbarThumbnails::Create(IExplorerplusplus *expp, TabContainerInterface *tabContainer,
-	HINSTANCE instance, std::shared_ptr<Config> config)
+TaskbarThumbnails *TaskbarThumbnails::Create(IExplorerplusplus *expp, CTabContainer *tabContainer,
+	TabContainerInterface *tabContainerInterface, HINSTANCE instance, std::shared_ptr<Config> config)
 {
-	return new TaskbarThumbnails(expp, tabContainer, instance, config);
+	return new TaskbarThumbnails(expp, tabContainer, tabContainerInterface, instance, config);
 }
 
-TaskbarThumbnails::TaskbarThumbnails(IExplorerplusplus *expp, TabContainerInterface *tabContainer,
-	HINSTANCE instance, std::shared_ptr<Config> config) :
+TaskbarThumbnails::TaskbarThumbnails(IExplorerplusplus *expp, CTabContainer *tabContainer,
+	TabContainerInterface *tabContainerInterface, HINSTANCE instance, std::shared_ptr<Config> config) :
 	m_expp(expp),
 	m_tabContainer(tabContainer),
+	m_tabContainerInterface(tabContainerInterface),
 	m_instance(instance),
 	m_bTaskbarInitialised(false),
 	m_enabled(config->showTaskbarThumbnails),
@@ -84,11 +85,11 @@ void TaskbarThumbnails::Initialize()
 	/* Subclass the main window until the above message (TaskbarButtonCreated) is caught. */
 	SetWindowSubclass(m_expp->GetMainWindow(),MainWndProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabContainer->AddTabCreatedObserver(boost::bind(&TaskbarThumbnails::CreateTabProxy, this, _1, _2));
-	m_tabContainer->AddTabSelectedObserver(boost::bind(&TaskbarThumbnails::OnTabSelectionChanged, this, _1));
-	m_tabContainer->AddTabRemovedObserver(boost::bind(&TaskbarThumbnails::RemoveTabProxy, this, _1));
+	m_tabContainerInterface->AddTabCreatedObserver(boost::bind(&TaskbarThumbnails::CreateTabProxy, this, _1, _2));
+	m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&TaskbarThumbnails::OnTabSelectionChanged, this, _1));
+	m_tabContainerInterface->AddTabRemovedObserver(boost::bind(&TaskbarThumbnails::RemoveTabProxy, this, _1));
 
-	m_tabContainer->AddNavigationCompletedObserver(boost::bind(&TaskbarThumbnails::OnNavigationCompleted, this, _1));
+	m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&TaskbarThumbnails::OnNavigationCompleted, this, _1));
 }
 
 LRESULT CALLBACK TaskbarThumbnails::MainWndProcStub(HWND hwnd, UINT uMsg,
@@ -363,7 +364,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			ShowWindow(m_expp->GetMainWindow(),SW_RESTORE);
 		}
 
-		m_tabContainer->SelectTab(m_tabContainer->GetTab(iTabId));
+		m_tabContainerInterface->SelectTab(m_tabContainer->GetTab(iTabId));
 		return 0;
 		break;
 
@@ -556,7 +557,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			else
 			{
 				const Tab &tab = m_tabContainer->GetTab(iTabId);
-				m_tabContainer->CloseTab(tab);
+				m_tabContainerInterface->CloseTab(tab);
 			}
 		}
 		break;

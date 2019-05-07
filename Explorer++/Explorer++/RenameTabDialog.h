@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
+#include "TabContainer.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "../Helper/BaseDialog.h"
@@ -37,7 +38,8 @@ class CRenameTabDialog : public CBaseDialog
 public:
 
 	CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-		int iTab, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer, TabInterface *ti);
+		int tabId, IExplorerplusplus *pexpp, CTabContainer *tabContainer,
+		TabContainerInterface *tabContainerInterface, TabInterface *ti);
 	~CRenameTabDialog();
 
 protected:
@@ -60,7 +62,8 @@ private:
 	CRenameTabDialogPersistentSettings	*m_prtdps;
 
 	IExplorerplusplus	*m_pexpp;
-	TabContainerInterface	*m_tabContainer;
+	CTabContainer	*m_tabContainer;
+	TabContainerInterface	*m_tabContainerInterface;
 	TabInterface	*m_ti;
 	int		m_tabId;
 	TCHAR	m_szTabName[256];

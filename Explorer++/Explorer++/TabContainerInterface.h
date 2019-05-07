@@ -19,22 +19,10 @@ typedef boost::signals2::signal<void(const Tab &tab)> NavigationCompletedSignal;
 // Explorerplusplus class.
 __interface TabContainerInterface
 {
-	/* TODO: Ideally, there would be a method of iterating over the tabs
-	without having access to the underlying container. */
-	const std::unordered_map<int, Tab>	&GetAllTabs() const;
-
-	Tab				&GetTab(int tabId);
-	Tab				*GetTabOptional(int tabId);
-	Tab				&GetSelectedTab();
-	bool			IsTabSelected(const Tab &tab);
-	Tab				&GetTabByIndex(int index);
-	int				GetTabIndex(const Tab &tab) const;
 	int				GetSelectedTabId() const;
 	int				GetSelectedTabIndex() const;
 	void			SelectTab(const Tab &tab);
-	int				MoveTab(const Tab &tab, int newIndex);
 	void			DuplicateTab(const Tab &tab);
-	int				GetNumTabs() const;
 	bool			CloseTab(const Tab &tab);
 
 	HRESULT			CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);

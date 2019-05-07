@@ -103,8 +103,6 @@ m_cachedIcons(MAX_CACHED_ICONS)
 
 	SetDefaultColumns();
 
-	InitializeMainToolbars();
-
 	m_iDWFolderSizeUniqueId = 0;
 
 	m_pClipboardDataObject	= NULL;

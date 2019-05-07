@@ -6,8 +6,9 @@
 #include "TabCreated.h"
 #include "TabsApi.h"
 
-Plugins::TabCreated::TabCreated(TabContainerInterface *tabContainer) :
-	m_tabContainer(tabContainer)
+Plugins::TabCreated::TabCreated(CTabContainer *tabContainer, TabContainerInterface *tabContainerInterface) :
+	m_tabContainer(tabContainer),
+	m_tabContainerInterface(tabContainerInterface)
 {
 
 }
@@ -21,7 +22,7 @@ boost::signals2::connection Plugins::TabCreated::connectObserver(sol::protected_
 {
 	UNREFERENCED_PARAMETER(state);
 
-	return m_tabContainer->AddTabCreatedObserver([this, observer](int tabId, BOOL switchToNewTab) {
+	return m_tabContainerInterface->AddTabCreatedObserver([this, observer](int tabId, BOOL switchToNewTab) {
 		UNREFERENCED_PARAMETER(switchToNewTab);
 
 		onTabCreated(tabId, observer);

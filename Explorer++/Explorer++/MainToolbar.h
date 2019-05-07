@@ -18,7 +18,7 @@ class MainToolbar : public CBaseWindow
 public:
 
 	static MainToolbar *Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-		TabContainerInterface *tabContainer, std::shared_ptr<Config> config);
+		TabContainerInterface *tabContainerInterface, std::shared_ptr<Config> config);
 
 	void UpdateToolbarSize();
 	void UpdateToolbarButtonStates();
@@ -28,7 +28,7 @@ private:
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-		TabContainerInterface *tabContainer, std::shared_ptr<Config> config);
+		TabContainerInterface *tabContainerInterface, std::shared_ptr<Config> config);
 	~MainToolbar();
 
 	static HWND CreateMainToolbar(HWND parent);
@@ -63,7 +63,7 @@ private:
 
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_pexpp;
-	TabContainerInterface *m_tabContainer;
+	TabContainerInterface *m_tabContainerInterface;
 	std::shared_ptr<Config> m_config;
 
 	HIMAGELIST m_himlSmall;

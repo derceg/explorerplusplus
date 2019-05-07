@@ -459,7 +459,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 	{
 		int tabNum = 0;
 
-		for (auto tabRef : GetAllTabsInOrder())
+		for (auto tabRef : m_tabContainer->GetAllTabsInOrder())
 		{
 			auto &tab = tabRef.get();
 

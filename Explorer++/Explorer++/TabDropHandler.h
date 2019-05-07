@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "TabContainer.h"
 #include "TabContainerInterface.h"
 #include "../Helper/DropHandler.h"
 
@@ -13,7 +14,7 @@ class CTabDropHandler : public IDropTarget
 
 public:
 
-	CTabDropHandler(HWND hTabCtrl, TabContainerInterface *tabContainer);
+	CTabDropHandler(HWND hTabCtrl, CTabContainer *tabContainer, TabContainerInterface *tabContainerInterface);
 	~CTabDropHandler();
 
 	/* IUnknown methods. */
@@ -43,7 +44,8 @@ private:
 	HWND				m_hTabCtrl;
 	ULONG				m_RefCount;
 
-	TabContainerInterface	*m_tabContainer;
+	CTabContainer		*m_tabContainer;
+	TabContainerInterface	*m_tabContainerInterface;
 
 	IDragSourceHelper	*m_pDragSourceHelper;
 	IDropTargetHelper	*m_pDropTargetHelper;

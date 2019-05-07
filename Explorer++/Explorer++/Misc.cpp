@@ -260,7 +260,7 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 	/* Forward this notification out to all tabs (if a
 	tab is currently in my computer, it will need to
 	update its contents). */
-	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
+	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 	{
 		tab.GetShellBrowser()->OnDeviceChange(wParam,lParam);
 	}
@@ -307,7 +307,7 @@ void *pData)
 	pDirectoryAltered = (DirectoryAltered_t *)pData;
 	pContainer = (Explorerplusplus *)pDirectoryAltered->pData;
 
-	Tab *tab = pContainer->GetTabOptional(pDirectoryAltered->iIndex);
+	Tab *tab = pContainer->m_tabContainer->GetTabOptional(pDirectoryAltered->iIndex);
 
 	if (tab)
 	{
@@ -408,7 +408,7 @@ BOOL Explorerplusplus::AnyItemsSelected(void)
 
 void Explorerplusplus::OnSelectColumns()
 {
-	CSelectColumnsDialog SelectColumnsDialog(m_hLanguageModule,IDD_SELECTCOLUMNS,m_hContainer,this,this,this);
+	CSelectColumnsDialog SelectColumnsDialog(m_hLanguageModule,IDD_SELECTCOLUMNS,m_hContainer,this,m_tabContainer,this);
 	SelectColumnsDialog.ShowModalDialog();
 
 	UpdateArrangeMenuItems();

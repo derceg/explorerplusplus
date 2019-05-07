@@ -58,7 +58,7 @@ int Explorerplusplus::GetSelectedTabIndex() const
 
 void Explorerplusplus::SelectTab(const Tab &tab)
 {
-	int index = GetTabIndex(tab);
+	int index = m_tabContainer->GetTabIndex(tab);
 	SelectTabAtIndex(index);
 }
 
@@ -391,7 +391,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	directory. The tab that is finally switched
 	to will have an associated update of window
 	states. */
-	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
+	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 	{
 		HandleDirectoryMonitoring(tab.GetId());
 	}
@@ -406,7 +406,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	/* m_iLastSelectedTab is the tab that was selected when the
 	program was last closed. */
-	if(m_iLastSelectedTab >= GetNumTabs() ||
+	if(m_iLastSelectedTab >= m_tabContainer->GetNumTabs() ||
 		m_iLastSelectedTab < 0)
 	{
 		m_iLastSelectedTab = 0;
@@ -421,7 +421,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 void Explorerplusplus::SelectTabAtIndex(int index)
 {
-	assert(index >= 0 && index < GetNumTabs());
+	assert(index >= 0 && index < m_tabContainer->GetNumTabs());
 
 	int previousIndex = TabCtrl_SetCurSel(m_tabContainer->GetHWND(), index);
 
@@ -452,7 +452,7 @@ void Explorerplusplus::OnTabSelectionChanged()
 	/* Hide the old listview. */
 	ShowWindow(m_hActiveListView,SW_HIDE);
 
-	const Tab &tab = GetTabByIndex(index);
+	const Tab &tab = m_tabContainer->GetTabByIndex(index);
 
 	m_selectedTabId = tab.GetId();
 	m_hActiveListView = tab.listView;
@@ -484,7 +484,7 @@ void Explorerplusplus::OnTabSelectionChanged()
 
 void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 {
-	int nTabs = GetNumTabs();
+	int nTabs = m_tabContainer->GetNumTabs();
 	int newIndex = m_selectedTabIndex;
 
 	if(bNextTab)
@@ -511,7 +511,7 @@ void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
 
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
 {
-	int nTabs = GetNumTabs();
+	int nTabs = m_tabContainer->GetNumTabs();
 	int newIndex;
 
 	if(iTab == -1)
@@ -531,13 +531,13 @@ void Explorerplusplus::OnSelectTabByIndex(int iTab)
 
 bool Explorerplusplus::OnCloseTab(void)
 {
-	const Tab &tab = GetSelectedTab();
+	const Tab &tab = m_tabContainer->GetSelectedTab();
 	return CloseTab(tab);
 }
 
 bool Explorerplusplus::CloseTab(const Tab &tab)
 {
-	const int nTabs = GetNumTabs();
+	const int nTabs = m_tabContainer->GetNumTabs();
 
 	if(nTabs == 1 &&
 		m_config->closeMainWindowOnTabClose)
@@ -576,9 +576,9 @@ void Explorerplusplus::RemoveTabFromControl(const Tab &tab)
 {
 	m_tabSelectionHistory.erase(std::remove(m_tabSelectionHistory.begin(), m_tabSelectionHistory.end(), tab.GetId()), m_tabSelectionHistory.end());
 
-	const int index = GetTabIndex(tab);
+	const int index = m_tabContainer->GetTabIndex(tab);
 
-	if(IsTabSelected(tab))
+	if(m_tabContainer->IsTabSelected(tab))
 	{
 		int newIndex;
 
@@ -589,8 +589,8 @@ void Explorerplusplus::RemoveTabFromControl(const Tab &tab)
 			const int lastTabId = m_tabSelectionHistory.back();
 			m_tabSelectionHistory.pop_back();
 
-			const Tab& lastTab = GetTab(lastTabId);
-			newIndex = GetTabIndex(lastTab);
+			const Tab& lastTab = m_tabContainer->GetTab(lastTabId);
+			newIndex = m_tabContainer->GetTabIndex(lastTab);
 		}
 		else
 		{
@@ -598,7 +598,7 @@ void Explorerplusplus::RemoveTabFromControl(const Tab &tab)
 
 			// If the last tab in the control is what's being closed,
 			// the tab before it will be selected.
-			if (newIndex == (GetNumTabs() - 1))
+			if (newIndex == (m_tabContainer->GetNumTabs() - 1))
 			{
 				newIndex--;
 			}
@@ -660,7 +660,7 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 		/* If the tab that was locked/unlocked is the
 		currently selected tab, then the tab close
 		button on the toolbar will need to be updated. */
-		if (IsTabSelected(tab))
+		if (m_tabContainer->IsTabSelected(tab))
 		{
 			UpdateTabToolbar();
 		}
@@ -672,9 +672,9 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 
 void Explorerplusplus::UpdateTabToolbar(void)
 {
-	const int nTabs = GetNumTabs();
+	const int nTabs = m_tabContainer->GetNumTabs();
 
-	const Tab &selectedTab = GetSelectedTab();
+	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
 
 	if(nTabs > 1 && !(selectedTab.GetLocked() || selectedTab.GetAddressLocked()))
 	{
@@ -748,117 +748,4 @@ SortMode Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
 	}
 
 	return sortMode;
-}
-
-Tab &Explorerplusplus::GetTab(int tabId)
-{
-	return m_Tabs.at(tabId);
-}
-
-Tab *Explorerplusplus::GetTabOptional(int tabId)
-{
-	auto itr = m_Tabs.find(tabId);
-
-	if (itr == m_Tabs.end())
-	{
-		return nullptr;
-	}
-
-	return &itr->second;
-}
-
-Tab &Explorerplusplus::GetSelectedTab()
-{
-	int index = TabCtrl_GetCurSel(m_tabContainer->GetHWND());
-
-	if (index == -1)
-	{
-		throw std::runtime_error("No selected tab");
-	}
-
-	return GetTabByIndex(index);
-}
-
-bool Explorerplusplus::IsTabSelected(const Tab &tab)
-{
-	const Tab &selectedTab = GetSelectedTab();
-	return tab.GetId() == selectedTab.GetId();
-}
-
-Tab &Explorerplusplus::GetTabByIndex(int index)
-{
-	TCITEM tcItem;
-	tcItem.mask = TCIF_PARAM;
-	BOOL res = TabCtrl_GetItem(m_tabContainer->GetHWND(), index, &tcItem);
-
-	if (!res)
-	{
-		throw std::runtime_error("Tab lookup failed");
-	}
-
-	return GetTab(static_cast<int>(tcItem.lParam));
-}
-
-int Explorerplusplus::GetTabIndex(const Tab &tab) const
-{
-	int numTabs = TabCtrl_GetItemCount(m_tabContainer->GetHWND());
-
-	for (int i = 0; i < numTabs; i++)
-	{
-		TCITEM tcItem;
-		tcItem.mask = TCIF_PARAM;
-		BOOL res = TabCtrl_GetItem(m_tabContainer->GetHWND(), i, &tcItem);
-
-		if (res && (tcItem.lParam == tab.GetId()))
-		{
-			return i;
-		}
-	}
-
-	// All internal tab objects should have an index.
-	throw std::runtime_error("Couldn't determine index for tab");
-}
-
-int Explorerplusplus::GetNumTabs() const
-{
-	return static_cast<int>(m_Tabs.size());
-}
-
-int Explorerplusplus::MoveTab(const Tab &tab, int newIndex)
-{
-	int index = GetTabIndex(tab);
-	return TabCtrl_MoveItem(m_tabContainer->GetHWND(), index, newIndex);
-}
-
-const std::unordered_map<int, Tab> &Explorerplusplus::GetAllTabs() const
-{
-	return m_Tabs;
-}
-
-std::vector<std::reference_wrapper<const Tab>> Explorerplusplus::GetAllTabsInOrder() const
-{
-	std::vector<std::reference_wrapper<const Tab>> sortedTabs;
-
-	for (const auto &tab : m_Tabs | boost::adaptors::map_values)
-	{
-		sortedTabs.push_back(tab);
-	}
-
-	// The Tab class is non-copyable, so there are essentially two ways of
-	// retrieving a sorted list of tabs, as far as I can tell:
-	// 
-	// 1. The first is to maintain a sorted list of tabs while the program is
-	// running. I generally don't think that's a good idea, since it would be
-	// redundant (the tab control already stores that information) and it risks
-	// possible issues (if the two sets get out of sync).
-	// 
-	// 2. The second is to sort the tabs when needed. Because they're
-	// non-copyable, that can't be done directly. std::reference_wrapper allows
-	// it to be done relatively easily, though. Sorting a set of pointers would
-	// accomplish the same thing.
-	std::sort(sortedTabs.begin(), sortedTabs.end(), [this](const auto &tab1, const auto &tab2) {
-		return GetTabIndex(tab1.get()) < GetTabIndex(tab2.get());
-	});
-
-	return sortedTabs;
 }

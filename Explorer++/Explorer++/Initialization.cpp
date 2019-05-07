@@ -116,13 +116,14 @@ void CALLBACK InitializeCOMAPC(ULONG_PTR dwParam)
 */
 void Explorerplusplus::OnCreate(void)
 {
+	InitializeMainToolbars();
 	InitializeBookmarks();
 
 	ILoadSave *pLoadSave = NULL;
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 
-	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this);
+	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this, this);
 
 	m_hTreeViewIconThread = CreateWorkerThread();
 
@@ -174,7 +175,7 @@ void Explorerplusplus::OnCreate(void)
 		m_config->showTaskbarThumbnails = FALSE;
 	}
 
-	m_taskbarThumbnails = TaskbarThumbnails::Create(this, this, m_hLanguageModule, m_config);
+	m_taskbarThumbnails = TaskbarThumbnails::Create(this, m_tabContainer, this, m_hLanguageModule, m_config);
 
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;
@@ -201,7 +202,7 @@ void Explorerplusplus::OnCreate(void)
 
 	SetFocus(m_hActiveListView);
 
-	m_uiTheming = std::make_unique<UiTheming>(this, this);
+	m_uiTheming = std::make_unique<UiTheming>(this, m_tabContainer, this);
 
 	InitializePlugins();
 

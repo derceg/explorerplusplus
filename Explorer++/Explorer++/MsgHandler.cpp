@@ -477,11 +477,11 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* <---- ALL listview windows ----> */
 
-	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
+	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 	{
 		uFlags = SWP_NOZORDER;
 
-		if (IsTabSelected(tab))
+		if (m_tabContainer->IsTabSelected(tab))
 		{
 			uFlags |= SWP_SHOWWINDOW;
 		}
@@ -554,7 +554,7 @@ int Explorerplusplus::OnDestroy(void)
 
 int Explorerplusplus::OnClose(void)
 {
-	if(m_config->confirmCloseTabs && (GetNumTabs() > 1))
+	if(m_config->confirmCloseTabs && (m_tabContainer->GetNumTabs() > 1))
 	{
 		TCHAR szTemp[128];
 		LoadString(m_hLanguageModule,IDS_GENERAL_CLOSE_ALL_TABS,szTemp,SIZEOF_ARRAY(szTemp));
@@ -605,7 +605,7 @@ void Explorerplusplus::OnDrawClipboard(void)
 			/* Deghost all items that have been 'cut'. */
 			for(const auto &strFile : m_CutFileNameList)
 			{
-				Tab *tab = GetTabOptional(m_iCutTabInternal);
+				Tab *tab = m_tabContainer->GetTabOptional(m_iCutTabInternal);
 
 				/* Only deghost the items if the tab they
 				are/were in still exists. */
@@ -672,7 +672,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 	TCHAR				szDirectoryToWatch[MAX_PATH];
 	int					iDirMonitorId;
 
-	Tab &tab = GetTab(iTabId);
+	Tab &tab = m_tabContainer->GetTab(iTabId);
 
 	iDirMonitorId		= tab.GetShellBrowser()->GetDirMonitorId();
 			
@@ -1006,7 +1006,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 
 void Explorerplusplus::OnRefresh(void)
 {
-	Tab &tab = GetSelectedTab();
+	Tab &tab = m_tabContainer->GetSelectedTab();
 	RefreshTab(tab);
 }
 
@@ -1263,7 +1263,7 @@ void Explorerplusplus::OnAssocChanged(void)
 	needs to be called to get each files icon again. */
 
 	/* Now, go through each tab, and refresh each icon. */
-	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
+	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 	{
 		tab.GetShellBrowser()->Refresh();
 	}
@@ -1492,6 +1492,11 @@ CShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 	return m_pActiveShellBrowser;
 }
 
+CTabContainer *Explorerplusplus::GetTabContainer() const
+{
+	return m_tabContainer;
+}
+
 HWND Explorerplusplus::GetTreeView() const
 {
 	return m_hTreeView;
@@ -1501,6 +1506,6 @@ void Explorerplusplus::OnShowHiddenFiles(void)
 {
 	m_pActiveShellBrowser->SetShowHidden(!m_pActiveShellBrowser->GetShowHidden());
 
-	Tab &tab = GetSelectedTab();
+	Tab &tab = m_tabContainer->GetSelectedTab();
 	RefreshTab(tab);
 }

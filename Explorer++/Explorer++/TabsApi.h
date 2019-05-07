@@ -7,6 +7,7 @@
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
+#include "TabContainer.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "../Helper/StringHelper.h"
@@ -81,7 +82,8 @@ namespace Plugins
 			}
 		};
 
-		TabsApi(TabContainerInterface *tabContainer, TabInterface *tabInterface);
+		TabsApi(CTabContainer *m_tabContainer, TabContainerInterface *tabContainerInterface,
+			TabInterface *tabInterface);
 		~TabsApi();
 
 		std::vector<Tab> getAll();
@@ -97,7 +99,8 @@ namespace Plugins
 		void extractTabPropertiesForCreation(sol::table createProperties, TabSettings &tabSettings);
 		void extractFolderSettingsForCreation(sol::table folderSettingsTable, ::FolderSettings &folderSettings);
 
-		TabContainerInterface *m_tabContainer;
+		CTabContainer *m_tabContainer;
+		TabContainerInterface *m_tabContainerInterface;
 		TabInterface *m_tabInterface;
 	};
 }

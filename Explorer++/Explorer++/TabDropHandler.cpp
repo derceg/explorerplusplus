@@ -8,11 +8,12 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
 
-
-CTabDropHandler::CTabDropHandler(HWND hTabCtrl,TabContainerInterface *tabContainer) :
-m_hTabCtrl(hTabCtrl),
-m_RefCount(1),
-m_tabContainer(tabContainer)
+CTabDropHandler::CTabDropHandler(HWND hTabCtrl, CTabContainer *tabContainer,
+	TabContainerInterface *tabContainerInterface) :
+	m_hTabCtrl(hTabCtrl),
+	m_RefCount(1),
+	m_tabContainer(tabContainer),
+	m_tabContainerInterface(tabContainerInterface)
 {
 	SetWindowSubclass(m_hTabCtrl,TabCtrlProcStub,SUBCLASS_ID,reinterpret_cast<DWORD_PTR>(this));
 
@@ -86,7 +87,7 @@ LRESULT CALLBACK CTabDropHandler::TabCtrlProc(HWND hwnd,UINT uMsg,WPARAM wParam,
 		if(wParam == TIMER_ID)
 		{
 			const Tab &tab = m_tabContainer->GetTabByIndex(m_TabHoverIndex);
-			m_tabContainer->SelectTab(tab);
+			m_tabContainerInterface->SelectTab(tab);
 
 			return 0;
 		}
@@ -103,7 +104,7 @@ LRESULT CALLBACK CTabDropHandler::TabCtrlProc(HWND hwnd,UINT uMsg,WPARAM wParam,
 HRESULT __stdcall CTabDropHandler::DragEnter(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect)
 {
 	m_AcceptData = false;
-	m_TabHoverIndex = m_tabContainer->GetSelectedTabIndex();
+	m_TabHoverIndex = m_tabContainerInterface->GetSelectedTabIndex();
 
 	std::list<FORMATETC> ftcList;
 	CDropHandler::GetDropFormats(ftcList);
@@ -220,7 +221,7 @@ HRESULT __stdcall CTabDropHandler::DragOver(DWORD grfKeyState,POINTL pt,DWORD *p
 	and the item is still been dragged, switch
 	focus to this tab. */
 	if(iTab != -1 &&
-		iTab != m_tabContainer->GetSelectedTabIndex() &&
+		iTab != m_tabContainerInterface->GetSelectedTabIndex() &&
 		iTab != m_TabHoverIndex)
 	{
 		SetTimer(m_hTabCtrl,TIMER_ID,TIMEOUT_VALUE,NULL);

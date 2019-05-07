@@ -9,6 +9,7 @@
 #include "MainImages.h"
 #include "MainResource.h"
 #include "ShellBrowser/ViewModes.h"
+#include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
 
@@ -29,17 +30,17 @@ TOOLBAR_ADDBOOKMARK, TOOLBAR_NEWTAB, TOOLBAR_OPENCOMMANDPROMPT,
 TOOLBAR_ORGANIZEBOOKMARKS, TOOLBAR_DELETEPERMANENTLY };
 
 MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-	TabContainerInterface *tabContainer, std::shared_ptr<Config> config)
+	TabContainerInterface *tabContainerInterface, std::shared_ptr<Config> config)
 {
-	return new MainToolbar(parent, instance, pexpp, tabContainer, config);
+	return new MainToolbar(parent, instance, pexpp, tabContainerInterface, config);
 }
 
 MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-	TabContainerInterface *tabContainer, std::shared_ptr<Config> config) :
+	TabContainerInterface *tabContainerInterface, std::shared_ptr<Config> config) :
 	CBaseWindow(CreateMainToolbar(parent)),
 	m_instance(instance),
 	m_pexpp(pexpp),
-	m_tabContainer(tabContainer),
+	m_tabContainerInterface(tabContainerInterface),
 	m_config(config)
 {
 	Initialize(parent);
@@ -130,8 +131,8 @@ void MainToolbar::Initialize(HWND parent)
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabSelectedConnection = m_tabContainer->AddTabSelectedObserver(boost::bind(&MainToolbar::OnTabSelected, this, _1));
-	m_navigationCompletedConnection = m_tabContainer->AddNavigationCompletedObserver(boost::bind(&MainToolbar::OnNavigationCompleted, this, _1));
+	m_tabSelectedConnection = m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&MainToolbar::OnTabSelected, this, _1));
+	m_navigationCompletedConnection = m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&MainToolbar::OnNavigationCompleted, this, _1));
 }
 
 LRESULT CALLBACK MainToolbar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -703,7 +704,7 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 
 		if (SUCCEEDED(hr))
 		{
-			m_tabContainer->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+			m_tabContainerInterface->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
 
 			CoTaskMemFree(pidl);
 		}
@@ -720,7 +721,7 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 
 		if (SUCCEEDED(hr))
 		{
-			m_tabContainer->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+			m_tabContainerInterface->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
 
 			CoTaskMemFree(pidl);
 		}
@@ -798,7 +799,7 @@ void MainToolbar::OnTabSelected(const Tab &tab)
 
 void MainToolbar::OnNavigationCompleted(const Tab &tab)
 {
-	if (m_tabContainer->IsTabSelected(tab))
+	if (m_pexpp->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateToolbarButtonStates();
 	}

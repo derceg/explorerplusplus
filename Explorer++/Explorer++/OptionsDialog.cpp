@@ -668,7 +668,7 @@ INT_PTR CALLBACK Explorerplusplus::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM w
 						iSel = (int)SendMessage(hCBSize,CB_GETCURSEL,0,0);
 						m_config->globalFolderSettings.sizeDisplayFormat = (SizeDisplayFormat_t)SendMessage(hCBSize,CB_GETITEMDATA,iSel,0);
 
-						for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
+						for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 						{
 							/* Each one of the options should also be pushed to new tabs when they are created. */
 							tab.GetShellBrowser()->SetInsertSorted(m_config->insertSorted);
@@ -827,7 +827,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 
 					if(m_config->checkBoxSelection != bCheckBoxSelection)
 					{
-						for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
+						for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 						{
 							DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(tab.listView);
 
@@ -861,7 +861,7 @@ INT_PTR CALLBACK Explorerplusplus::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,
 						AdjustMainToolbarSize();
 					}
 
-					for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
+					for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 					{
 						/* TODO: The tab should monitor for settings
 						changes itself. */

@@ -17,6 +17,7 @@ enum MousewheelSource_t
 };
 
 class CShellBrowser;
+class CTabContainer;
 
 /* Basic interface between Explorerplusplus
 and some of the other components (such as the
@@ -26,7 +27,9 @@ __interface IExplorerplusplus
 	HWND			GetMainWindow() const;
 
 	HWND			GetActiveListView() const;
-	CShellBrowser *GetActiveShellBrowser() const;
+	CShellBrowser	*GetActiveShellBrowser() const;
+
+	CTabContainer	*GetTabContainer() const;
 
 	HWND			GetTreeView() const;
 

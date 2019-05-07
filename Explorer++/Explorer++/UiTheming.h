@@ -6,6 +6,7 @@
 
 #include "CoreInterface.h"
 #include "Tab.h"
+#include "TabContainer.h"
 #include "TabContainerInterface.h"
 #include <boost/signals2.hpp>
 
@@ -13,7 +14,7 @@ class UiTheming
 {
 public:
 
-	UiTheming(IExplorerplusplus *expp, TabContainerInterface *tabContainer);
+	UiTheming(IExplorerplusplus *expp, CTabContainer *tabContainer, TabContainerInterface *tabContainerInterface);
 	~UiTheming();
 
 	bool SetListViewColors(COLORREF backgroundColor, COLORREF textColor);
@@ -27,7 +28,8 @@ private:
 	bool ApplyListViewColorsForTab(const Tab &tab, COLORREF backgroundColor, COLORREF textColor);
 
 	IExplorerplusplus *m_expp;
-	TabContainerInterface *m_tabContainer;
+	CTabContainer *m_tabContainer;
+	TabContainerInterface *m_tabContainerInterface;
 
 	boost::signals2::connection m_tabCreatedConnection;
 

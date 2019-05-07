@@ -11,8 +11,10 @@
 
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
-Plugins::TabsApi::TabsApi(TabContainerInterface *tabContainer, TabInterface *tabInterface) :
+Plugins::TabsApi::TabsApi(CTabContainer *tabContainer, TabContainerInterface *tabContainerInterface,
+	TabInterface *tabInterface) :
 	m_tabContainer(tabContainer),
+	m_tabContainerInterface(tabContainerInterface),
 	m_tabInterface(tabInterface)
 {
 
@@ -74,7 +76,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 		CoTaskMemFree(pidlDirectory);
 	} BOOST_SCOPE_EXIT_END
 
-	::FolderSettings folderSettings = m_tabContainer->GetDefaultFolderSettings(pidlDirectory);
+	::FolderSettings folderSettings = m_tabContainerInterface->GetDefaultFolderSettings(pidlDirectory);
 
 	boost::optional<sol::table> folderSettingsTable = createProperties[TabConstants::FOLDER_SETTINGS];
 
@@ -84,7 +86,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	}
 
 	int tabId;
-	hr = m_tabContainer->CreateNewTab(pidlDirectory, tabSettings, &folderSettings, nullptr, &tabId);
+	hr = m_tabContainerInterface->CreateNewTab(pidlDirectory, tabSettings, &folderSettings, nullptr, &tabId);
 
 	if (FAILED(hr))
 	{
@@ -204,7 +206,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 	if (location && !location->empty())
 	{
-		m_tabContainer->BrowseFolder(*tabInternal, location->c_str(), SBSP_ABSOLUTE);
+		m_tabContainerInterface->BrowseFolder(*tabInternal, location->c_str(), SBSP_ABSOLUTE);
 	}
 
 	boost::optional<std::wstring> name = properties[TabConstants::NAME];
@@ -239,7 +241,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 	if (active && *active)
 	{
-		m_tabContainer->SelectTab(*tabInternal);
+		m_tabContainerInterface->SelectTab(*tabInternal);
 	}
 }
 
@@ -281,5 +283,5 @@ bool Plugins::TabsApi::close(int tabId)
 		return false;
 	}
 
-	return m_tabContainer->CloseTab(*tabInternal);
+	return m_tabContainerInterface->CloseTab(*tabInternal);
 }

@@ -21,7 +21,6 @@
 #include "../Helper/ImageWrappers.h"
 #include <boost/optional.hpp>
 #include <boost/signals2.hpp>
-#include <functional>
 #include <unordered_map>
 
 #define TOOLBAR_START				5000
@@ -215,8 +214,6 @@ private:
 	void					OnSortBy(SortMode sortMode);
 	void					OnGroupBy(SortMode sortMode);
 	void					OnSelectTabByIndex(int iTab);
-	const std::unordered_map<int, Tab>	&GetAllTabs() const;
-	std::vector<std::reference_wrapper<const Tab>>	GetAllTabsInOrder() const;
 
 	/* Navigation. */
 	void					OnBrowseBack();
@@ -323,14 +320,6 @@ private:
 	int						GetSelectedTabIndex() const;
 	void					SelectTab(const Tab &tab);
 	void					DuplicateTab(const Tab &tab);
-	Tab						&GetTab(int tabId);
-	Tab						*GetTabOptional(int tabId);
-	Tab						&GetSelectedTab();
-	bool					IsTabSelected(const Tab &tab);
-	Tab						&GetTabByIndex(int index);
-	int						GetTabIndex(const Tab &tab) const;
-	int						GetNumTabs() const;
-	int						MoveTab(const Tab &tab, int newIndex);
 	void					OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 
 	/* Tab events. */
@@ -525,6 +514,7 @@ private:
 	HWND					GetMainWindow() const;
 	HWND					GetActiveListView() const;
 	CShellBrowser			*GetActiveShellBrowser() const;
+	CTabContainer			*GetTabContainer() const;
 	HWND					GetTreeView() const;
 
 	/* Helpers. */

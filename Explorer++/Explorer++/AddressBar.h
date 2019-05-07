@@ -14,14 +14,15 @@ class AddressBar : public CBaseWindow
 {
 public:
 
-	static AddressBar *Create(HWND parent, IExplorerplusplus *expp, TabContainerInterface *tabContainer, MainToolbar *mainToolbar);
+	static AddressBar *Create(HWND parent, IExplorerplusplus *expp,
+		TabContainerInterface *tabContainerInterface, MainToolbar *mainToolbar);
 
 private:
 
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
-	AddressBar(HWND parent, IExplorerplusplus *expp, TabContainerInterface *tabContainer, MainToolbar *mainToolbar);
+	AddressBar(HWND parent, IExplorerplusplus *expp, TabContainerInterface *tabContainerInterface, MainToolbar *mainToolbar);
 	~AddressBar();
 
 	static HWND CreateAddressBar(HWND parent);
@@ -40,7 +41,7 @@ private:
 	void UpdateTextAndIcon(const Tab &tab);
 
 	IExplorerplusplus *m_expp;
-	TabContainerInterface *m_tabContainer;
+	TabContainerInterface *m_tabContainerInterface;
 	MainToolbar *m_mainToolbar;
 
 	boost::signals2::connection m_tabSelectedConnection;

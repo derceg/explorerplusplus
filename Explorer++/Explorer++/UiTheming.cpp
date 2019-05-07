@@ -5,12 +5,13 @@
 #include "stdafx.h"
 #include "UiTheming.h"
 
-UiTheming::UiTheming(IExplorerplusplus *expp, TabContainerInterface *tabContainer) :
+UiTheming::UiTheming(IExplorerplusplus *expp, CTabContainer *tabContainer, TabContainerInterface *tabContainerInterface) :
 	m_expp(expp),
 	m_tabContainer(tabContainer),
+	m_tabContainerInterface(tabContainerInterface),
 	m_customListViewColorsApplied(false)
 {
-	m_tabCreatedConnection = m_tabContainer->AddTabCreatedObserver(boost::bind(&UiTheming::OnTabCreated, this, _1, _2));
+	m_tabCreatedConnection = m_tabContainerInterface->AddTabCreatedObserver(boost::bind(&UiTheming::OnTabCreated, this, _1, _2));
 }
 
 UiTheming::~UiTheming()

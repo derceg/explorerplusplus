@@ -11,6 +11,7 @@
 #include "TabInterface.h"
 #include "../Helper/BaseWindow.h"
 #include <boost/signals2.hpp>
+#include <functional>
 #include <unordered_map>
 
 struct Config;
@@ -21,11 +22,25 @@ public:
 
 	typedef boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)> TabMovedSignal;
 
-	static CTabContainer *Create(HWND parent, std::unordered_map<int, Tab>* tabInfo,
+	static CTabContainer *Create(HWND parent, std::unordered_map<int, Tab> *tabs,
 		TabContainerInterface* tabContainer, TabInterface* tabInterface, IExplorerplusplus* expp,
 		HINSTANCE instance, std::shared_ptr<Config> config);
 
 	void InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName);
+
+	Tab &CTabContainer::GetTab(int tabId);
+	Tab *GetTabOptional(int tabId);
+	Tab &GetSelectedTab();
+	bool IsTabSelected(const Tab &tab);
+	Tab &GetTabByIndex(int index);
+	int GetTabIndex(const Tab &tab) const;
+	int GetNumTabs() const;
+	int MoveTab(const Tab &tab, int newIndex);
+
+	/* TODO: Ideally, there would be a method of iterating over the tabs without
+	having access to the underlying container. */
+	const std::unordered_map<int, Tab> &GetAllTabs() const;
+	std::vector<std::reference_wrapper<const Tab>> GetAllTabsInOrder() const;
 
 	int GetSelection();
 
@@ -38,8 +53,8 @@ private:
 
 	static const int TAB_ICON_LOCK_INDEX = 0;
 
-	CTabContainer(HWND parent, std::unordered_map<int, Tab>* tabInfo, TabContainerInterface* tabContainer,
-		TabInterface* tabInterface, IExplorerplusplus* expp, HINSTANCE instance, std::shared_ptr<Config> config);
+	CTabContainer(HWND parent, std::unordered_map<int, Tab> *tabs, TabContainerInterface *tabContainer,
+		TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config);
 	~CTabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
@@ -89,8 +104,8 @@ private:
 	HFONT m_hTabFont;
 	HIMAGELIST m_hTabCtrlImageList;
 
-	std::unordered_map<int, Tab> *m_tabInfo;
-	TabContainerInterface *m_tabContainer;
+	std::unordered_map<int, Tab> *m_tabs;
+	TabContainerInterface *m_tabContainerInterface;
 	TabInterface *m_tabInterface;
 	IExplorerplusplus *m_expp;
 	HINSTANCE m_instance;

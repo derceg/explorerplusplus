@@ -6,7 +6,7 @@
 
 #include "CoreInterface.h"
 #include "TabInterface.h"
-#include "TabContainerInterface.h"
+#include "TabContainer.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
@@ -37,7 +37,8 @@ class CSelectColumnsDialog : public CBaseDialog
 {
 public:
 
-	CSelectColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer, TabInterface *ti);
+	CSelectColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp,
+		CTabContainer *tabContainer, TabInterface *ti);
 	~CSelectColumnsDialog();
 
 protected:
@@ -61,7 +62,7 @@ private:
 	void	OnMoveColumn(bool bUp);
 
 	IExplorerplusplus	*m_pexpp;
-	TabContainerInterface	*m_tabContainer;
+	CTabContainer	*m_tabContainer;
 	TabInterface	*m_ti;
 	BOOL	m_bColumnsSwapped;
 

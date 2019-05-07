@@ -337,7 +337,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 					m_pActiveShellBrowser->ImportColumns(&ActiveColumnList);
 
-					Tab &tab = GetSelectedTab();
+					Tab &tab = m_tabContainer->GetSelectedTab();
 					RefreshTab(tab);
 
 					return TRUE;
@@ -584,7 +584,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	if(iObjectIndex == -1)
 		return;
 
-	Tab &tab = GetTab(iObjectIndex);
+	Tab &tab = m_tabContainer->GetTab(iObjectIndex);
 
 	if(tab.GetShellBrowser()->QueryDragging())
 		return;
@@ -647,7 +647,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	/* Only update internal selection info
 	if the listview that sent the change
 	notification is active. */
-	if(IsTabSelected(tab))
+	if(m_tabContainer->IsTabSelected(tab))
 	{
 		if(Selected)
 		{
@@ -681,7 +681,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 
 int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
-	for (auto &item : GetAllTabs())
+	for (auto &item : m_tabContainer->GetAllTabs())
 	{
 		if (item.second.listView == hListView)
 		{
@@ -1212,7 +1212,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 			object that stops it (i.e. when a file is dragged
 			between tabs). Therefore, need to tell the object
 			that STARTED dragging that dragging has stopped. */
-			GetTab(iDragStartObjectIndex).GetShellBrowser()->DragStopped();
+			m_tabContainer->GetTab(iDragStartObjectIndex).GetShellBrowser()->DragStopped();
 
 			BOOL bInAsyncOp;
 

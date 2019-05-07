@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Event.h"
+#include "TabContainer.h"
 #include "TabContainerInterface.h"
 
 namespace Plugins
@@ -13,7 +14,7 @@ namespace Plugins
 	{
 	public:
 
-		TabCreated(TabContainerInterface *tabContainer);
+		TabCreated(CTabContainer *tabContainer, TabContainerInterface *tabContainerInterface);
 		virtual ~TabCreated();
 
 	protected:
@@ -24,6 +25,7 @@ namespace Plugins
 
 		void onTabCreated(int tabId, sol::protected_function observer);
 
-		TabContainerInterface *m_tabContainer;
+		CTabContainer *m_tabContainer;
+		TabContainerInterface *m_tabContainerInterface;
 	};
 }

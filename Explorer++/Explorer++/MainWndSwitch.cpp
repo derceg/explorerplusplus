@@ -107,7 +107,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 	case WM_USER_FILESADDED:
 	{
-		Tab *tab = GetTabOptional(static_cast<int>(wParam));
+		Tab *tab = m_tabContainer->GetTabOptional(static_cast<int>(wParam));
 
 		if (tab)
 		{
@@ -319,7 +319,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 		{
 			m_pActiveShellBrowser->ImportColumns(&m_pActiveColumnList);
 
-			Tab &tab = GetTab(m_selectedTabId);
+			Tab &tab = m_tabContainer->GetTab(m_selectedTabId);
 			RefreshTab(tab);
 		}
 		else
@@ -1353,7 +1353,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDA_TAB_DUPLICATETAB:
-			DuplicateTab(GetSelectedTab());
+			DuplicateTab(m_tabContainer->GetSelectedTab());
 			break;
 
 		case IDA_HOME:
