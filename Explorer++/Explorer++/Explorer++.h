@@ -354,7 +354,7 @@ private:
 	void					SetDefaultColumns();
 
 	/* Control creation. */
-	HWND					CreateMainListView(HWND hParent,DWORD Style);
+	HWND					CreateMainListView(HWND hParent);
 	void					CreateMainControls(void);
 	void					CreateFolderControls(void);
 	void					CreateAddressBar();

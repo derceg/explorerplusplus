@@ -28,6 +28,9 @@
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 
+const DWORD MAIN_LISTVIEW_STYLES = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |
+WS_CLIPCHILDREN | LVS_ICON | LVS_EDITLABELS | LVS_SHOWSELALWAYS |
+LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | WS_TABSTOP | LVS_ALIGNTOP;
 
 static unsigned int g_RealFolderHeaderList[] =
 {CM_NAME, CM_TYPE, CM_SIZE, CM_DATEMODIFIED,
@@ -58,9 +61,9 @@ CM_SIZE, CM_TYPE, CM_DATEMODIFIED};
 
 LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
-HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)
+HWND Explorerplusplus::CreateMainListView(HWND hParent)
 {
-	HWND hListView = CreateListView(hParent,Style);
+	HWND hListView = CreateListView(hParent, MAIN_LISTVIEW_STYLES);
 
 	if(hListView == NULL)
 	{
@@ -89,6 +92,9 @@ HWND Explorerplusplus::CreateMainListView(HWND hParent,DWORD Style)
 	}
 
 	ListView_SetExtendedListViewStyle(hListView,dwExtendedStyle);
+
+	/* TODO: This subclass needs to be removed. */
+	SetWindowSubclass(hListView, ListViewProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
 
 	SetWindowTheme(hListView,L"Explorer",NULL);
 

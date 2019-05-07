@@ -24,12 +24,6 @@
 #include <algorithm>
 #include <list>
 
-DWORD ListViewStyles		=	WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|WS_CLIPCHILDREN|
-								LVS_ICON|LVS_EDITLABELS|LVS_SHOWSELALWAYS|LVS_SHAREIMAGELISTS|
-								LVS_AUTOARRANGE|WS_TABSTOP|LVS_ALIGNTOP;
-
-extern LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-
 extern std::vector<std::wstring> g_TabDirs;
 
 void Explorerplusplus::InitializeTabs()
@@ -166,7 +160,7 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 		tab.SetCustomName(*tabSettings.name);
 	}
 
-	tab.listView = CreateMainListView(m_hContainer,ListViewStyles);
+	tab.listView = CreateMainListView(m_hContainer);
 
 	if (tab.listView == NULL)
 	{
@@ -206,9 +200,6 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 
 	tab.SetShellBrowser(CShellBrowser::CreateNew(m_hContainer, tab.listView, &m_cachedIcons,
 		m_config, &m_config->globalFolderSettings, folderSettingsFinal, initialColumnsFinal));
-
-	/* TODO: This needs to be removed. */
-	SetWindowSubclass(tab.listView,ListViewProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
 	tab.GetShellBrowser()->SetId(tab.GetId());
 	tab.GetShellBrowser()->SetResourceModule(m_hLanguageModule);
