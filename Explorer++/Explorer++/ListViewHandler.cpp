@@ -98,6 +98,8 @@ HWND Explorerplusplus::CreateMainListView(HWND hParent)
 
 	SetWindowTheme(hListView,L"Explorer",NULL);
 
+	SetListViewInitialPosition(hListView);
+
 	return hListView;
 }
 

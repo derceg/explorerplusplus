@@ -129,8 +129,6 @@ HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
 	return hr;
 }
 
-/* Creates a new tab. If the settings argument is NULL,
-the global settings will be used. */
 HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	const TabSettings &tabSettings, const FolderSettings *folderSettings,
 	const InitialColumns *initialColumns, int *newTabId)
@@ -166,9 +164,6 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	{
 		return E_FAIL;
 	}
-
-	/* Set the listview to its initial size. */
-	SetListViewInitialPosition(tab.listView);
 
 	FolderSettings folderSettingsFinal;
 
