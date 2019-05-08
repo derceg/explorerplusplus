@@ -20,23 +20,12 @@ const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("Set
 
 const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _T("Folder");
 
-CSetDefaultColumnsDialog::CSetDefaultColumnsDialog(HINSTANCE hInstance,int iResource,HWND hParent,
-	IExplorerplusplus *pexpp,std::list<Column_t> *pRealFolderColumnList,std::list<Column_t> *pMyComputerColumnList,
-	std::list<Column_t> *pControlPanelColumnList,std::list<Column_t> *pRecycleBinColumnList,
-	std::list<Column_t> *pPrintersColumnList,std::list<Column_t> *pNetworkConnectionsColumnList,
-	std::list<Column_t> *pMyNetworkPlacesColumnList) :
-CBaseDialog(hInstance,iResource,hParent,true)
+CSetDefaultColumnsDialog::CSetDefaultColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+	IExplorerplusplus *pexpp, FolderColumns &folderColumns) :
+	CBaseDialog(hInstance,iResource,hParent,true),
+	m_pexpp(pexpp),
+	m_folderColumns(folderColumns)
 {
-	m_pexpp = pexpp;
-
-	m_pRealFolderColumnList			= pRealFolderColumnList;
-	m_pMyComputerColumnList			= pMyComputerColumnList;
-	m_pControlPanelColumnList		= pControlPanelColumnList;
-	m_pRecycleBinColumnList			= pRecycleBinColumnList;
-	m_pPrintersColumnList			= pPrintersColumnList;
-	m_pNetworkConnectionsColumnList	= pNetworkConnectionsColumnList;
-	m_pMyNetworkPlacesColumnList	= pMyNetworkPlacesColumnList;
-
 	m_psdcdps = &CSetDefaultColumnsDialogPersistentSettings::GetInstance();
 }
 
@@ -278,8 +267,8 @@ void CSetDefaultColumnsDialog::SaveCurrentColumnState(FolderType_t FolderType)
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
 
-	std::list<Column_t> *pColumnList = GetCurrentColumnList(FolderType);
-	std::list<Column_t> TempColumnList;
+	auto currentColumns = GetCurrentColumnList(FolderType);
+	std::vector<Column_t> tempColumns;
 
 	for(int i = 0;i < ListView_GetItemCount(hListView);i++)
 	{
@@ -292,32 +281,32 @@ void CSetDefaultColumnsDialog::SaveCurrentColumnState(FolderType_t FolderType)
 		/* Since the column list will be rebuilt, find this column
 		in the current list, and reuse its width. */
 		UINT id = static_cast<int>(lvItem.lParam);
-		auto itr = std::find_if(pColumnList->begin(),pColumnList->end(),
+		auto itr = std::find_if(currentColumns.begin(),currentColumns.end(),
 			[id](const Column_t &Column){return Column.id == id;});
 
 		Column_t Column;
 		Column.id		= id;
 		Column.iWidth	= itr->iWidth;
 		Column.bChecked	= ListView_GetCheckState(hListView,i);
-		TempColumnList.push_back(Column);
+		tempColumns.push_back(Column);
 	}
 
-	*pColumnList = TempColumnList;
+	currentColumns = tempColumns;
 }
 
 void CSetDefaultColumnsDialog::SetupFolderColumns(FolderType_t FolderType)
 {
-	std::list<Column_t> *pColumnList = GetCurrentColumnList(FolderType);
+	auto columns = GetCurrentColumnList(FolderType);
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DEFAULTCOLUMNS_LISTVIEW);
 	ListView_DeleteAllItems(hListView);
 
 	int iItem = 0;
 
-	for(const auto &Column : *pColumnList)
+	for(const auto &column : columns)
 	{
 		TCHAR szText[64];
-		LoadString(GetInstance(),CShellBrowser::LookupColumnNameStringIndex(Column.id),
+		LoadString(GetInstance(),CShellBrowser::LookupColumnNameStringIndex(column.id),
 			szText,SIZEOF_ARRAY(szText));
 
 		LVITEM lvItem;
@@ -325,10 +314,10 @@ void CSetDefaultColumnsDialog::SetupFolderColumns(FolderType_t FolderType)
 		lvItem.iItem	= iItem;
 		lvItem.iSubItem	= 0;
 		lvItem.pszText	= szText;
-		lvItem.lParam	= Column.id;
+		lvItem.lParam	= column.id;
 		ListView_InsertItem(hListView,&lvItem);
 
-		ListView_SetCheckState(hListView,iItem,Column.bChecked);
+		ListView_SetCheckState(hListView,iItem,column.bChecked);
 
 		iItem++;
 	}
@@ -336,40 +325,40 @@ void CSetDefaultColumnsDialog::SetupFolderColumns(FolderType_t FolderType)
 	NListView::ListView_SelectItem(hListView,0,TRUE);
 }
 
-std::list<Column_t> *CSetDefaultColumnsDialog::GetCurrentColumnList(FolderType_t FolderType)
+std::vector<Column_t> &CSetDefaultColumnsDialog::GetCurrentColumnList(FolderType_t FolderType)
 {
 	switch(FolderType)
 	{
 	case FOLDER_TYPE_GENERAL:
-		return m_pRealFolderColumnList;
+		return m_folderColumns.realFolderColumns;
 		break;
 
 	case FOLDER_TYPE_COMPUTER:
-		return m_pMyComputerColumnList;
+		return m_folderColumns.myComputerColumns;
 		break;
 
 	case FOLDER_TYPE_CONTROL_PANEL:
-		return m_pControlPanelColumnList;
+		return m_folderColumns.controlPanelColumns;
 		break;
 
 	case FOLDER_TYPE_NETWORK:
-		return m_pNetworkConnectionsColumnList;
+		return m_folderColumns.networkConnectionsColumns;
 		break;
 
 	case FOLDER_TYPE_NETWORK_PLACES:
-		return m_pMyNetworkPlacesColumnList;
+		return m_folderColumns.myNetworkPlacesColumns;
 		break;
 
 	case FOLDER_TYPE_PRINTERS:
-		return m_pPrintersColumnList;
+		return m_folderColumns.printersColumns;
 		break;
 
 	case FOLDER_TYPE_RECYCLE_BIN:
-		return m_pRecycleBinColumnList;
+		return m_folderColumns.recycleBinColumns;
 		break;
 	}
 
-	return NULL;
+	throw std::runtime_error("Unknown folder type selected");
 }
 
 void CSetDefaultColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)

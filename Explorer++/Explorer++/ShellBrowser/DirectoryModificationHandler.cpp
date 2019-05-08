@@ -427,11 +427,9 @@ void CShellBrowser::ModifyItemInternal(const TCHAR *FileName)
 
 			if(m_folderSettings.viewMode == +ViewMode::Details)
 			{
-				std::list<Column_t>::iterator itrColumn;
-
-				if(m_pActiveColumnList != NULL)
+				if(m_pActiveColumns != NULL)
 				{
-					for(itrColumn = m_pActiveColumnList->begin();itrColumn != m_pActiveColumnList->end();itrColumn++)
+					for(auto itrColumn = m_pActiveColumns->begin();itrColumn != m_pActiveColumns->end();itrColumn++)
 					{
 						if(itrColumn->bChecked)
 						{

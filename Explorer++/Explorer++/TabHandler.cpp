@@ -101,7 +101,7 @@ void Explorerplusplus::OnNewTab()
 
 HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
 	const TabSettings &tabSettings, const FolderSettings *folderSettings,
-	const InitialColumns *initialColumns, int *newTabId)
+	boost::optional<FolderColumns> initialColumns, int *newTabId)
 {
 	LPITEMIDLIST	pidl = NULL;
 	TCHAR			szExpandedPath[MAX_PATH];
@@ -131,7 +131,7 @@ HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
 
 HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	const TabSettings &tabSettings, const FolderSettings *folderSettings,
-	const InitialColumns *initialColumns, int *newTabId)
+	boost::optional<FolderColumns> initialColumns, int *newTabId)
 {
 	if (!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
 	{
@@ -176,26 +176,9 @@ HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 		folderSettingsFinal = GetDefaultFolderSettings(pidlDirectory);
 	}
 
-	InitialColumns initialColumnsFinal;
-
-	if (initialColumns)
-	{
-		initialColumnsFinal = *initialColumns;
-	}
-	else
-	{
-		initialColumnsFinal.pControlPanelColumnList = &m_ControlPanelColumnList;
-		initialColumnsFinal.pMyComputerColumnList = &m_MyComputerColumnList;
-		initialColumnsFinal.pMyNetworkPlacesColumnList = &m_MyNetworkPlacesColumnList;
-		initialColumnsFinal.pNetworkConnectionsColumnList = &m_NetworkConnectionsColumnList;
-		initialColumnsFinal.pPrintersColumnList = &m_PrintersColumnList;
-		initialColumnsFinal.pRealFolderColumnList = &m_RealFolderColumnList;
-		initialColumnsFinal.pRecycleBinColumnList = &m_RecycleBinColumnList;
-	}
-
 	tab.SetShellBrowser(CShellBrowser::CreateNew(tab.GetId(), m_hLanguageModule,
 		m_hContainer, tab.listView, &m_cachedIcons, m_config, folderSettingsFinal,
-		initialColumnsFinal));
+		initialColumns));
 
 	int index;
 
@@ -666,38 +649,40 @@ void Explorerplusplus::DuplicateTab(const Tab &tab)
 
 SortMode Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
 {
-	const std::list<Column_t> *pColumns = NULL;
+	const std::vector<Column_t> *pColumns = nullptr;
 
 	TCHAR szDirectory[MAX_PATH];
 	GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
 
+	const auto &defaultFolderColumns = m_config->globalFolderSettings.folderColumns;
+
 	if(CompareVirtualFolders(szDirectory,CSIDL_CONTROLS))
 	{
-		pColumns = &m_ControlPanelColumnList;
+		pColumns = &defaultFolderColumns.controlPanelColumns;
 	}
 	else if(CompareVirtualFolders(szDirectory,CSIDL_DRIVES))
 	{
-		pColumns = &m_MyComputerColumnList;
+		pColumns = &defaultFolderColumns.myComputerColumns;
 	}
 	else if(CompareVirtualFolders(szDirectory,CSIDL_BITBUCKET))
 	{
-		pColumns = &m_RecycleBinColumnList;
+		pColumns = &defaultFolderColumns.recycleBinColumns;
 	}
 	else if(CompareVirtualFolders(szDirectory,CSIDL_PRINTERS))
 	{
-		pColumns = &m_PrintersColumnList;
+		pColumns = &defaultFolderColumns.printersColumns;
 	}
 	else if(CompareVirtualFolders(szDirectory,CSIDL_CONNECTIONS))
 	{
-		pColumns = &m_NetworkConnectionsColumnList;
+		pColumns = &defaultFolderColumns.networkConnectionsColumns;
 	}
 	else if(CompareVirtualFolders(szDirectory,CSIDL_NETWORK))
 	{
-		pColumns = &m_MyNetworkPlacesColumnList;
+		pColumns = &defaultFolderColumns.myNetworkPlacesColumns;
 	}
 	else
 	{
-		pColumns = &m_RealFolderColumnList;
+		pColumns = &defaultFolderColumns.realFolderColumns;
 	}
 
 	SortMode sortMode = SortMode::Name;

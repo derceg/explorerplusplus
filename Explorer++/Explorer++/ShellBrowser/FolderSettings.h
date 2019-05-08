@@ -4,9 +4,21 @@
 
 #pragma once
 
+#include "Columns.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/StringHelper.h"
+
+struct FolderColumns
+{
+	std::vector<Column_t> realFolderColumns;
+	std::vector<Column_t> myComputerColumns;
+	std::vector<Column_t> controlPanelColumns;
+	std::vector<Column_t> recycleBinColumns;
+	std::vector<Column_t> printersColumns;
+	std::vector<Column_t> networkConnectionsColumns;
+	std::vector<Column_t> myNetworkPlacesColumns;
+};
 
 struct GlobalFolderSettings
 {
@@ -22,6 +34,8 @@ struct GlobalFolderSettings
 	SizeDisplayFormat_t sizeDisplayFormat;
 	BOOL oneClickActivate;
 	UINT oneClickActivateHoverTime;
+
+	FolderColumns folderColumns;
 };
 
 struct FolderSettings

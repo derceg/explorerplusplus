@@ -1043,7 +1043,7 @@ std::list<int> CShellBrowser::GetAvailableSortModes() const
 {
 	std::list<int> sortModes;
 
-	for(auto itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
+	for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
 	{
 		if(itr->bChecked)
 		{
@@ -1055,13 +1055,12 @@ std::list<int> CShellBrowser::GetAvailableSortModes() const
 	return sortModes;
 }
 
-void CShellBrowser::ExportCurrentColumns(std::list<Column_t> *pColumns)
+std::vector<Column_t> CShellBrowser::ExportCurrentColumns()
 {
-	std::list<Column_t>::iterator itr;
-	Column_t Column;
+	std::vector<Column_t> columns;
 	int iColumn = 0;
 
-	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
+	for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
 	{
 		if(m_folderSettings.viewMode == +ViewMode::Details && itr->bChecked)
 		{
@@ -1070,25 +1069,24 @@ void CShellBrowser::ExportCurrentColumns(std::list<Column_t> *pColumns)
 			iColumn++;
 		}
 
+		Column_t Column;
 		Column.id		= itr->id;
 		Column.bChecked	= itr->bChecked;
 		Column.iWidth	= itr->iWidth;
-
-		pColumns->push_back(Column);
+		columns.push_back(Column);
 	}
+
+	return columns;
 }
 
-void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns)
+void CShellBrowser::ImportColumns(const std::vector<Column_t> &columns)
 {
-	std::list<Column_t>::iterator itr;
-	std::list<Column_t>::iterator itr2;
-	std::list<Column_t>::iterator itr3;
 	Column_t ci;
 	BOOL bResortFolder = FALSE;
 	int iColumn = 0;
 	int i = 0;
 
-	for(itr = pColumns->begin();itr != pColumns->end();itr++)
+	for(auto itr = columns.begin();itr != columns.end();itr++)
 	{
 		/* Check if this column represents the current sorting mode.
 		If it does, and it is been removed, set the sort mode back
@@ -1096,7 +1094,7 @@ void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns)
 		if(!itr->bChecked && DetermineColumnSortMode(itr->id) == m_folderSettings.sortMode)
 		{
 			/* Find the first checked column. */
-			for(itr2 = pColumns->begin();itr2 != pColumns->end();itr2++)
+			for(auto itr2 = columns.begin();itr2 != columns.end();itr2++)
 			{
 				if(itr2->bChecked)
 				{
@@ -1114,28 +1112,28 @@ void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns)
 		{
 			if(m_folderSettings.viewMode == +ViewMode::Details)
 			{
-				for(itr2 = m_pActiveColumnList->begin();itr2 != m_pActiveColumnList->end();itr2++)
+				for(auto itr2 = m_pActiveColumns->begin();itr2 != m_pActiveColumns->end();itr2++)
 				{
-					if(itr2->id == itr->id)
-						break;
-				}
-
-				if(!itr2->bChecked)
-				{
-					InsertColumn(itr->id,iColumn,itr->iWidth);
-
-					for(i = 0;i < m_nTotalItems;i++)
+					if (itr2->id == itr->id &&
+						!itr2->bChecked)
 					{
-						LVITEM lvItem;
-						lvItem.mask = LVIF_PARAM;
-						lvItem.iItem = i;
-						lvItem.iSubItem = 0;
-						BOOL res = ListView_GetItem(m_hListView, &lvItem);
+						InsertColumn(itr->id, iColumn, itr->iWidth);
 
-						if (res)
+						for (i = 0; i < m_nTotalItems; i++)
 						{
-							QueueColumnTask(static_cast<int>(lvItem.lParam), itr->id);
+							LVITEM lvItem;
+							lvItem.mask = LVIF_PARAM;
+							lvItem.iItem = i;
+							lvItem.iSubItem = 0;
+							BOOL res = ListView_GetItem(m_hListView, &lvItem);
+
+							if (res)
+							{
+								QueueColumnTask(static_cast<int>(lvItem.lParam), itr->id);
+							}
 						}
+
+						break;
 					}
 				}
 			}
@@ -1144,19 +1142,21 @@ void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns)
 		}
 		else
 		{
-			for(itr2 = m_pActiveColumnList->begin();itr2 != m_pActiveColumnList->end();itr2++)
+			for(auto itr2 = m_pActiveColumns->begin();itr2 != m_pActiveColumns->end();itr2++)
 			{
-				if(itr2->id == itr->id)
-					break;
-			}
+				if (itr2->id == itr->id &&
+					itr2->bChecked)
 
-			if(itr2->bChecked)
-				ListView_DeleteColumn(m_hListView,iColumn);
+				{
+					ListView_DeleteColumn(m_hListView, iColumn);
+					break;
+				}
+			}
 		}
 	}
 
 	/* Copy the new columns. */
-	*m_pActiveColumnList = *pColumns;
+	*m_pActiveColumns = columns;
 
 	/* The folder will need to be resorted if the
 	sorting column was removed. */
@@ -1170,9 +1170,7 @@ void CShellBrowser::ImportColumns(std::list<Column_t> *pColumns)
 
 void CShellBrowser::GetColumnInternal(unsigned int id,Column_t *pci) const
 {
-	std::list<Column_t>::iterator itr;
-
-	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
+	for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
 	{
 		if(itr->id == id)
 		{

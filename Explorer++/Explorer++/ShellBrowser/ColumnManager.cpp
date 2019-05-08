@@ -144,17 +144,16 @@ boost::optional<unsigned int> CShellBrowser::GetColumnIdByIndex(int index) const
 	return static_cast<unsigned int>(hdItem.lParam);
 }
 
-void CShellBrowser::PlaceColumns(void)
+void CShellBrowser::PlaceColumns()
 {
-	std::list<Column_t>::iterator	itr;
 	int							iColumnIndex = 0;
 	int							i = 0;
 
 	m_nActiveColumns = 0;
 
-	if(m_pActiveColumnList != NULL)
+	if(m_pActiveColumns != NULL)
 	{
-		for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
+		for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
 		{
 			if(itr->bChecked)
 			{
@@ -216,44 +215,37 @@ void CShellBrowser::InsertColumn(unsigned int ColumnId,int iColumnIndex,int iWid
 	Header_SetItem(hHeader,iActualColumnIndex,&hdItem);
 }
 
-void CShellBrowser::SetActiveColumnSet(void)
+void CShellBrowser::SetActiveColumnSet()
 {
-	std::list<Column_t> *pActiveColumnList = NULL;
+	std::vector<Column_t> *pActiveColumns = nullptr;
 
 	if(CompareVirtualFolders(CSIDL_CONTROLS))
 	{
-		/* Control panel. */
-		pActiveColumnList = &m_ControlPanelColumnList;
+		pActiveColumns = &m_folderColumns.controlPanelColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_DRIVES))
 	{
-		/* My Computer. */
-		pActiveColumnList = &m_MyComputerColumnList;
+		pActiveColumns = &m_folderColumns.myComputerColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
-		/* Recycle Bin. */
-		pActiveColumnList = &m_RecycleBinColumnList;
+		pActiveColumns = &m_folderColumns.recycleBinColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_PRINTERS))
 	{
-		/* Printers virtual folder. */
-		pActiveColumnList = &m_PrintersColumnList;
+		pActiveColumns = &m_folderColumns.printersColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
 	{
-		/* Network connections virtual folder. */
-		pActiveColumnList = &m_NetworkConnectionsColumnList;
+		pActiveColumns = &m_folderColumns.networkConnectionsColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_NETWORK))
 	{
-		/* My Network Places (Network on Vista) virtual folder. */
-		pActiveColumnList = &m_MyNetworkPlacesColumnList;
+		pActiveColumns = &m_folderColumns.myNetworkPlacesColumns;
 	}
 	else
 	{
-		/* Real folder. */
-		pActiveColumnList = &m_RealFolderColumnList;
+		pActiveColumns = &m_folderColumns.realFolderColumns;
 	}
 
 	/* If the current set of columns are different
@@ -261,9 +253,9 @@ void CShellBrowser::SetActiveColumnSet(void)
 	current folder and previous folder are of a
 	different 'type'), set the new columns, and
 	place them (else do nothing). */
-	if(m_pActiveColumnList != pActiveColumnList)
+	if(m_pActiveColumns != pActiveColumns)
 	{
-		m_pActiveColumnList = pActiveColumnList;
+		m_pActiveColumns = pActiveColumns;
 		m_bColumnsPlaced = FALSE;
 	}
 }
@@ -950,12 +942,11 @@ int CShellBrowser::LookupColumnDescriptionStringIndex(int iColumnId)
 
 void CShellBrowser::ColumnClicked(int iClickedColumn)
 {
-	std::list<Column_t>::iterator itr;
 	int iCurrentColumn = 0;
 	SortMode sortMode = SortMode::Name;
 	UINT iColumnId = 0;
 
-	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
+	for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
 	{
 		/* Only increment if this column is actually been shown. */
 		if(itr->bChecked)
@@ -983,11 +974,10 @@ void CShellBrowser::ColumnClicked(int iClickedColumn)
 	SortFolder(sortMode);
 }
 
-void CShellBrowser::ApplyHeaderSortArrow(void)
+void CShellBrowser::ApplyHeaderSortArrow()
 {
 	HWND hHeader;
 	HDITEM hdItem;
-	std::list<Column_t>::iterator itr;
 	BOOL previousColumnFound = FALSE;
 	int iColumn = 0;
 	int iPreviousSortedColumn = 0;
@@ -999,7 +989,7 @@ void CShellBrowser::ApplyHeaderSortArrow(void)
 	{
 		/* Search through the currently active columns to find the column that previously
 		had the up/down arrow. */
-		for (itr = m_pActiveColumnList->begin(); itr != m_pActiveColumnList->end(); itr++)
+		for (auto itr = m_pActiveColumns->begin(); itr != m_pActiveColumns->end(); itr++)
 		{
 			/* Only increment if this column is actually been shown. */
 			if (itr->bChecked)
@@ -1035,7 +1025,7 @@ void CShellBrowser::ApplyHeaderSortArrow(void)
 	}
 
 	/* Find the index of the column representing the current sort mode. */
-	for(itr = m_pActiveColumnList->begin();itr != m_pActiveColumnList->end();itr++)
+	for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
 	{
 		if(itr->bChecked)
 		{
@@ -1067,66 +1057,53 @@ void CShellBrowser::ApplyHeaderSortArrow(void)
 
 size_t CShellBrowser::QueryNumActiveColumns(void) const
 {
-	return m_pActiveColumnList->size();
+	return m_pActiveColumns->size();
 }
 
-void CShellBrowser::ImportAllColumns(const ColumnExport_t *pce)
+void CShellBrowser::ImportAllColumns(const FolderColumns &folderColumns)
 {
-	m_ControlPanelColumnList = pce->ControlPanelColumnList;
-	m_MyComputerColumnList = pce->MyComputerColumnList;
-	m_MyNetworkPlacesColumnList = pce->MyNetworkPlacesColumnList;
-	m_NetworkConnectionsColumnList = pce->NetworkConnectionsColumnList;
-	m_PrintersColumnList = pce->PrintersColumnList;
-	m_RealFolderColumnList = pce->RealFolderColumnList;
-	m_RecycleBinColumnList = pce->RecycleBinColumnList;
+	m_folderColumns = folderColumns;
 }
 
-void CShellBrowser::ExportAllColumns(ColumnExport_t *pce)
+FolderColumns CShellBrowser::ExportAllColumns()
 {
 	SaveColumnWidths();
 
-	pce->ControlPanelColumnList			= m_ControlPanelColumnList;
-	pce->MyComputerColumnList			= m_MyComputerColumnList;
-	pce->MyNetworkPlacesColumnList		= m_MyNetworkPlacesColumnList;
-	pce->NetworkConnectionsColumnList	= m_NetworkConnectionsColumnList;
-	pce->PrintersColumnList				= m_PrintersColumnList;
-	pce->RealFolderColumnList			= m_RealFolderColumnList;
-	pce->RecycleBinColumnList			= m_RecycleBinColumnList;
+	return m_folderColumns;
 }
 
-void CShellBrowser::SaveColumnWidths(void)
+void CShellBrowser::SaveColumnWidths()
 {
-	std::list<Column_t> *pActiveColumnList = NULL;
-	std::list<Column_t>::iterator itr;
+	std::vector<Column_t> *pActiveColumns = nullptr;
 	int iColumn = 0;
 
 	if(CompareVirtualFolders(CSIDL_CONTROLS))
 	{
-		pActiveColumnList = &m_ControlPanelColumnList;
+		pActiveColumns = &m_folderColumns.controlPanelColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_DRIVES))
 	{
-		pActiveColumnList = &m_MyComputerColumnList;
+		pActiveColumns = &m_folderColumns.myComputerColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
-		pActiveColumnList = &m_RecycleBinColumnList;
+		pActiveColumns = &m_folderColumns.recycleBinColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_PRINTERS))
 	{
-		pActiveColumnList = &m_PrintersColumnList;
+		pActiveColumns = &m_folderColumns.printersColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
 	{
-		pActiveColumnList = &m_NetworkConnectionsColumnList;
+		pActiveColumns = &m_folderColumns.networkConnectionsColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_NETWORK))
 	{
-		pActiveColumnList = &m_MyNetworkPlacesColumnList;
+		pActiveColumns = &m_folderColumns.myNetworkPlacesColumns;
 	}
 	else
 	{
-		pActiveColumnList = &m_RealFolderColumnList;
+		pActiveColumns = &m_folderColumns.realFolderColumns;
 	}
 
 	/* Only save column widths if the listview is currently in
@@ -1134,7 +1111,7 @@ void CShellBrowser::SaveColumnWidths(void)
 	column widths have already been saved when the view changed. */
 	if(m_folderSettings.viewMode == +ViewMode::Details)
 	{
-		for(itr = pActiveColumnList->begin();itr != pActiveColumnList->end();itr++)
+		for(auto itr = pActiveColumns->begin();itr != pActiveColumns->end();itr++)
 		{
 			if(itr->bChecked)
 			{

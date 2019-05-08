@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ColumnDataRetrieval.h"
+#include "Columns.h"
 #include "FolderSettings.h"
 #include "iPathManager.h"
 #include "SortModes.h"
@@ -25,41 +26,6 @@
 #define WM_USER_STARTEDBROWSING		(WM_APP + 55)
 #define WM_USER_NEWITEMINSERTED		(WM_APP + 200)
 #define WM_USER_DIRECTORYMODIFIED	(WM_APP + 204)
-
-typedef struct
-{
-	unsigned int id;
-	BOOL bChecked;
-	int iWidth;
-} Column_t;
-
-typedef struct
-{
-	unsigned int id;
-	BOOL bChecked;
-} ColumnOld_t;
-
-typedef struct
-{
-	std::list<Column_t>	RealFolderColumnList;
-	std::list<Column_t>	MyComputerColumnList;
-	std::list<Column_t>	ControlPanelColumnList;
-	std::list<Column_t>	RecycleBinColumnList;
-	std::list<Column_t>	PrintersColumnList;
-	std::list<Column_t>	NetworkConnectionsColumnList;
-	std::list<Column_t>	MyNetworkPlacesColumnList;
-} ColumnExport_t;
-
-struct InitialColumns
-{
-	std::list<Column_t> *pRealFolderColumnList;
-	std::list<Column_t> *pMyComputerColumnList;
-	std::list<Column_t> *pControlPanelColumnList;
-	std::list<Column_t> *pRecycleBinColumnList;
-	std::list<Column_t> *pPrintersColumnList;
-	std::list<Column_t> *pNetworkConnectionsColumnList;
-	std::list<Column_t> *pMyNetworkPlacesColumnList;
-};
 
 typedef struct
 {
@@ -89,7 +55,7 @@ public:
 
 	static CShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
 		CachedIcons *cachedIcons, std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
-		const InitialColumns &initialColumns);
+		boost::optional<FolderColumns> initialColumns);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
@@ -157,8 +123,8 @@ public:
 	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;
 	
 	/* Column support. */
-	void				ExportCurrentColumns(std::list<Column_t> *pColumns);
-	void				ImportColumns(std::list<Column_t> *pColumns);
+	std::vector<Column_t>	ExportCurrentColumns();
+	void				ImportColumns(const std::vector<Column_t> &columns);
 	static SortMode		DetermineColumnSortMode(int iColumnId);
 	static int			LookupColumnNameStringIndex(int iColumnId);
 	static int			LookupColumnDescriptionStringIndex(int iColumnId);
@@ -189,8 +155,8 @@ public:
 
 	std::list<int>		GetAvailableSortModes() const;
 	size_t				QueryNumActiveColumns(void) const;
-	void				ImportAllColumns(const ColumnExport_t *pce);
-	void				ExportAllColumns(ColumnExport_t *pce);
+	void				ImportAllColumns(const FolderColumns &folderColumns);
+	FolderColumns		ExportAllColumns();
 	void				QueueRename(LPCITEMIDLIST pidlItem);
 	void				SelectItems(const std::list<std::wstring> &PastedFileList);
 	void				OnDeviceChange(WPARAM wParam,LPARAM lParam);
@@ -301,7 +267,7 @@ private:
 
 	CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
 		CachedIcons *cachedIcons, std::shared_ptr<const Config> config,
-		const FolderSettings &folderSettings, const InitialColumns &initialColumns);
+		const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns);
 	~CShellBrowser();
 
 	int					GenerateUniqueItemId(void);
@@ -365,13 +331,13 @@ private:
 	int CALLBACK		SortByMediaMetadata(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, MediaMetadataType_t MediaMetaDataType) const;
 
 	/* Listview column support. */
-	void				PlaceColumns(void);
+	void				PlaceColumns();
 	void				QueueColumnTask(int itemInternalIndex, int columnIndex);
 	static ColumnResult_t	GetColumnTextAsync(HWND listView, int columnResultId, unsigned int ColumnID, int InternalIndex, const BasicItemInfo_t &basicItemInfo, const GlobalFolderSettings &globalFolderSettings);
 	void				InsertColumn(unsigned int ColumnId,int iColumndIndex,int iWidth);
-	void				SetActiveColumnSet(void);
+	void				SetActiveColumnSet();
 	void				GetColumnInternal(unsigned int id,Column_t *pci) const;
-	void				SaveColumnWidths(void);
+	void				SaveColumnWidths();
 	void				ProcessColumnResult(int columnResultId);
 	boost::optional<int>	GetColumnIndexById(unsigned int id) const;
 	boost::optional<unsigned int>	GetColumnIdByIndex(int index) const;
@@ -464,7 +430,7 @@ private:
 	BOOL				CompareVirtualFolders(UINT uFolderCSIDL) const;
 	int					LocateFileItemInternalIndex(const TCHAR *szFileName) const;
 	boost::optional<int>	LocateItemByInternalIndex(int internalIndex) const;
-	void				ApplyHeaderSortArrow(void);
+	void				ApplyHeaderSortArrow();
 	void				QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFileName,UINT cchMax) const;
 
 
@@ -567,14 +533,8 @@ private:
 	BOOL				m_bThumbnailsSetup;
 
 	/* Column related data. */
-	std::list<Column_t> *m_pActiveColumnList;
-	std::list<Column_t>	m_RealFolderColumnList;
-	std::list<Column_t>	m_MyComputerColumnList;
-	std::list<Column_t>	m_ControlPanelColumnList;
-	std::list<Column_t>	m_RecycleBinColumnList;
-	std::list<Column_t>	m_PrintersColumnList;
-	std::list<Column_t>	m_NetworkConnectionsColumnList;
-	std::list<Column_t>	m_MyNetworkPlacesColumnList;
+	std::vector<Column_t>	*m_pActiveColumns;
+	FolderColumns		m_folderColumns;
 	BOOL				m_bColumnsPlaced;
 	int					m_nCurrentColumns;
 	int					m_nActiveColumns;

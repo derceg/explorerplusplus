@@ -1079,9 +1079,7 @@ INT_PTR CALLBACK Explorerplusplus::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 				case IDC_BUTTON_DEFAULTCOLUMNS:
 					{
-						CSetDefaultColumnsDialog SetDefaultColumnsDialog(m_hLanguageModule,IDD_SETDEFAULTCOLUMNS,hDlg,this,&m_RealFolderColumnList,
-							&m_MyComputerColumnList,&m_ControlPanelColumnList,&m_RecycleBinColumnList,&m_PrintersColumnList,&m_NetworkConnectionsColumnList,
-							&m_MyNetworkPlacesColumnList);
+						CSetDefaultColumnsDialog SetDefaultColumnsDialog(m_hLanguageModule,IDD_SETDEFAULTCOLUMNS,hDlg,this,m_config->globalFolderSettings.folderColumns);
 						SetDefaultColumnsDialog.ShowModalDialog();
 					}
 					break;

@@ -291,18 +291,16 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 		iOffset = LOWORD(wParam) - MENU_HEADER_STARTID;
 
-		std::list<Column_t>			m_pActiveColumnList;
-		std::list<Column_t>::iterator	itr;
 		int							iItem = 0;
 		unsigned int				*pHeaderList = NULL;
 
-		m_pActiveShellBrowser->ExportCurrentColumns(&m_pActiveColumnList);
+		auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
 
 		GetColumnHeaderMenuList(&pHeaderList);
 
 		/* Loop through all current items to find the item that was clicked, and
 		flip its active state. */
-		for(itr = m_pActiveColumnList.begin();itr != m_pActiveColumnList.end();itr++)
+		for(auto itr = currentColumns.begin();itr != currentColumns.end();itr++)
 		{
 			if(itr->id == pHeaderList[iOffset])
 			{
@@ -317,14 +315,14 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 		all columns. */
 		if(iOffset == 0)
 		{
-			m_pActiveShellBrowser->ImportColumns(&m_pActiveColumnList);
+			m_pActiveShellBrowser->ImportColumns(currentColumns);
 
 			Tab &tab = m_tabContainer->GetTab(m_selectedTabId);
 			RefreshTab(tab);
 		}
 		else
 		{
-			m_pActiveShellBrowser->ImportColumns(&m_pActiveColumnList);
+			m_pActiveShellBrowser->ImportColumns(currentColumns);
 		}
 	}
 	else if (!HIWORD(wParam) && LOWORD(wParam) >= MENU_PLUGIN_STARTID &&
@@ -1123,7 +1121,6 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 				them as the default columns for the appropriate folder
 				type.. */
 				IShellFolder *pShellFolder = NULL;
-				std::list<Column_t> pActiveColumnList;
 				LPITEMIDLIST pidl = NULL;
 				LPITEMIDLIST pidlDrives = NULL;
 				LPITEMIDLIST pidlControls = NULL;
@@ -1132,7 +1129,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 				LPITEMIDLIST pidlConnections = NULL;
 				LPITEMIDLIST pidlNetwork = NULL;
 
-				m_pActiveShellBrowser->ExportCurrentColumns(&pActiveColumnList);
+				auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
 
 				pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
@@ -1147,34 +1144,32 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 				if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlDrives) == 0)
 				{
-					m_MyComputerColumnList = pActiveColumnList;
+					m_config->globalFolderSettings.folderColumns.myComputerColumns = currentColumns;
 				}
 				else if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlControls) == 0)
 				{
-					m_ControlPanelColumnList = pActiveColumnList;
+					m_config->globalFolderSettings.folderColumns.controlPanelColumns = currentColumns;
 				}
 				else if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlBitBucket) == 0)
 				{
-					m_RecycleBinColumnList = pActiveColumnList;
+					m_config->globalFolderSettings.folderColumns.recycleBinColumns = currentColumns;
 				}
 				else if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlPrinters) == 0)
 				{
-					m_PrintersColumnList = pActiveColumnList;
+					m_config->globalFolderSettings.folderColumns.printersColumns = currentColumns;
 				}
 				else if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlConnections) == 0)
 				{
-					m_NetworkConnectionsColumnList = pActiveColumnList;
+					m_config->globalFolderSettings.folderColumns.networkConnectionsColumns = currentColumns;
 				}
 				else if(pShellFolder->CompareIDs(SHCIDS_CANONICALONLY,pidl,pidlNetwork) == 0)
 				{
-					m_MyNetworkPlacesColumnList = pActiveColumnList;
+					m_config->globalFolderSettings.folderColumns.myNetworkPlacesColumns = currentColumns;
 				}
 				else
 				{
-					m_RealFolderColumnList = pActiveColumnList;
+					m_config->globalFolderSettings.folderColumns.realFolderColumns = currentColumns;
 				}
-
-				pActiveColumnList.clear();
 
 				pShellFolder->Release();
 

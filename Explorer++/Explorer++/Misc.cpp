@@ -24,7 +24,7 @@
 #include <shobjidl.h>
 #include <list>
 
-void Explorerplusplus::ValidateLoadedSettings(void)
+void Explorerplusplus::ValidateLoadedSettings()
 {
 	if(m_config->treeViewWidth <= 0)
 		m_config->treeViewWidth = Config::DEFAULT_TREEVIEW_WIDTH;
@@ -32,23 +32,22 @@ void Explorerplusplus::ValidateLoadedSettings(void)
 	if(m_config->displayWindowHeight < MINIMUM_DISPLAYWINDOW_HEIGHT)
 		m_config->displayWindowHeight = Config::DEFAULT_DISPLAYWINDOW_HEIGHT;
 
-	ValidateColumns();
+	ValidateColumns(m_config->globalFolderSettings.folderColumns);
 }
 
-void Explorerplusplus::ValidateColumns(void)
+void Explorerplusplus::ValidateColumns(FolderColumns &folderColumns)
 {
-	ValidateSingleColumnSet(VALIDATE_REALFOLDER_COLUMNS,&m_RealFolderColumnList);
-	ValidateSingleColumnSet(VALIDATE_CONTROLPANEL_COLUMNS,&m_ControlPanelColumnList);
-	ValidateSingleColumnSet(VALIDATE_MYCOMPUTER_COLUMNS,&m_MyComputerColumnList);
-	ValidateSingleColumnSet(VALIDATE_RECYCLEBIN_COLUMNS,&m_RecycleBinColumnList);
-	ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS,&m_PrintersColumnList);
-	ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,&m_NetworkConnectionsColumnList);
-	ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,&m_MyNetworkPlacesColumnList);
+	ValidateSingleColumnSet(VALIDATE_REALFOLDER_COLUMNS,folderColumns.realFolderColumns);
+	ValidateSingleColumnSet(VALIDATE_CONTROLPANEL_COLUMNS,folderColumns.controlPanelColumns);
+	ValidateSingleColumnSet(VALIDATE_MYCOMPUTER_COLUMNS,folderColumns.myComputerColumns);
+	ValidateSingleColumnSet(VALIDATE_RECYCLEBIN_COLUMNS,folderColumns.recycleBinColumns);
+	ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS,folderColumns.printersColumns);
+	ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,folderColumns.networkConnectionsColumns);
+	ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,folderColumns.myNetworkPlacesColumns);
 }
 
-void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet,std::list<Column_t> *pColumnList)
+void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns)
 {
-	std::list<Column_t>::iterator	itr;
 	Column_t					Column;
 	int							*pColumnMap = NULL;
 	BOOL						bFound = FALSE;
@@ -107,7 +106,7 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet,std::list<Column_t
 	{
 		bFound = FALSE;
 
-		for(itr = pColumnList->begin();itr != pColumnList->end();itr++)
+		for(auto itr = columns.begin();itr != columns.end();itr++)
 		{
 			if(itr->id == pColumns[i].id)
 			{
@@ -122,7 +121,7 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet,std::list<Column_t
 			Column.id		= pColumns[i].id;
 			Column.bChecked	= pColumns[i].bChecked;
 			Column.iWidth	= DEFAULT_COLUMN_WIDTH;
-			pColumnList->push_back(Column);
+			columns.push_back(Column);
 		}
 	}
 

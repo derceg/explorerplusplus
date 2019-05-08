@@ -43,9 +43,9 @@ namespace NColorRuleHelper
 	struct ColorRule_t;
 }
 
-struct Config;
-
 class CDrivesToolbar;
+struct Config;
+struct ColumnWidth_t;
 class ILoadSave;
 class CLoadSaveRegistry;
 class CLoadSaveXML;
@@ -306,8 +306,8 @@ private:
 	void					SelectAdjacentTab(BOOL bNextTab);
 	void					SelectTabAtIndex(int index);
 	void					OnTabSelectionChanged(bool broadcastEvent = true);
-	HRESULT					CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
-	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, const InitialColumns *initialColumns = nullptr, int *newTabId = nullptr);
+	HRESULT					CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
+	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
 	FolderSettings			GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;
 	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(const Tab &tab);
@@ -350,9 +350,6 @@ private:
 	void					SetProgramMenuItemStates(HMENU hProgramMenu);
 	void					SetArrangeMenuItemStates();
 
-	/* Columns. */
-	void					SetDefaultColumns();
-
 	/* Control creation. */
 	HWND					CreateMainListView(HWND hParent);
 	void					CreateMainControls(void);
@@ -377,20 +374,20 @@ private:
 	void					SaveAllSettings(void);
 	LONG					SaveSettings();
 	LONG					LoadSettings();
-	void					ValidateLoadedSettings(void);
-	void					ValidateColumns(void);
-	void					ValidateSingleColumnSet(int iColumnSet,std::list<Column_t> *pColumnList);
+	void					ValidateLoadedSettings();
+	void					ValidateColumns(FolderColumns &folderColumns);
+	void					ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns);
 	void					ApplyLoadedSettings(void);
 	void					ApplyToolbarSettings(void);
 	void					TestConfigFile(void);
 	void					SaveTabSettingsToRegistry(void);
-	int						LoadTabSettingsFromRegistry(void);
-	void					LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns);
-	void					SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns);
-	void					LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns);
-	void					SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns);
-	void					LoadDefaultColumnsFromRegistry(void);
-	void					SaveDefaultColumnsToRegistry(void);
+	int						LoadTabSettingsFromRegistry();
+	std::vector<Column_t>	LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName);
+	void					SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns);
+	std::vector<ColumnWidth_t>	LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName);
+	void					SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns);
+	void					LoadDefaultColumnsFromRegistry();
+	void					SaveDefaultColumnsToRegistry();
 	void					InitializeBookmarks(void);
 	void					SaveBookmarksToRegistry(void);
 	void					LoadBookmarksFromRegistry(void);
@@ -491,8 +488,8 @@ private:
 	int						LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom);
 	void					SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
 	void					SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe);
-	int						LoadColumnFromXML(IXMLDOMNode *pNode,std::list<Column_t> *pColumns);
-	void					SaveColumnToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode, std::list<Column_t> *pColumns, const TCHAR *szColumnSet, int iIndent);
+	int						LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t> &outputColumns);
+	void					SaveColumnToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode, const std::vector<Column_t> &columns, const TCHAR *szColumnSet, int iIndent);
 	int						LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom);
 	void					SaveBookmarksToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
 	int						LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom);
@@ -649,15 +646,6 @@ private:
 	/* Display window folder sizes. */
 	std::list<DWFolderSize_t>	m_DWFolderSizes;
 	int						m_iDWFolderSizeUniqueId;
-
-	/* Default columns. */
-	std::list<Column_t>		m_RealFolderColumnList;
-	std::list<Column_t>		m_MyComputerColumnList;
-	std::list<Column_t>		m_ControlPanelColumnList;
-	std::list<Column_t>		m_RecycleBinColumnList;
-	std::list<Column_t>		m_PrintersColumnList;
-	std::list<Column_t>		m_NetworkConnectionsColumnList;
-	std::list<Column_t>		m_MyNetworkPlacesColumnList;
 
 	/* ListView selection. */
 	BOOL					m_bCountingUp;

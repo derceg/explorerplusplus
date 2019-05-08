@@ -1012,18 +1012,17 @@ void Explorerplusplus::OnRefresh(void)
 
 void Explorerplusplus::CopyColumnInfoToClipboard(void)
 {
-	std::list<Column_t> Columns;
-	m_pActiveShellBrowser->ExportCurrentColumns(&Columns);
+	auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
 
 	std::wstring strColumnInfo;
 	int nActiveColumns = 0;
 
-	for(const auto &Column : Columns)
+	for(const auto &column : currentColumns)
 	{
-		if(Column.bChecked)
+		if(column.bChecked)
 		{
 			TCHAR szText[64];
-			LoadString(m_hLanguageModule,CShellBrowser::LookupColumnNameStringIndex(Column.id),szText,SIZEOF_ARRAY(szText));
+			LoadString(m_hLanguageModule,CShellBrowser::LookupColumnNameStringIndex(column.id),szText,SIZEOF_ARRAY(szText));
 
 			strColumnInfo += std::wstring(szText) + _T("\t");
 

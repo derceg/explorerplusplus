@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "DefaultColumns.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ViewModes.h"
 #include "../Helper/Macros.h"
@@ -141,6 +142,14 @@ struct Config
 		globalFolderSettings.sizeDisplayFormat = SIZE_FORMAT_BYTES;
 		globalFolderSettings.oneClickActivate = FALSE;
 		globalFolderSettings.oneClickActivateHoverTime = DEFAULT_LISTVIEW_HOVER_TIME;
+
+		globalFolderSettings.folderColumns.realFolderColumns = std::vector<Column_t>(std::begin(REAL_FOLDER_DEFAULT_COLUMNS), std::end(REAL_FOLDER_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.myComputerColumns = std::vector<Column_t>(std::begin(MY_COMPUTER_DEFAULT_COLUMNS), std::end(MY_COMPUTER_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.controlPanelColumns = std::vector<Column_t>(std::begin(CONTROL_PANEL_DEFAULT_COLUMNS), std::end(CONTROL_PANEL_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.recycleBinColumns = std::vector<Column_t>(std::begin(RECYCLE_BIN_DEFAULT_COLUMNS), std::end(RECYCLE_BIN_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.printersColumns = std::vector<Column_t>(std::begin(PRINTERS_DEFAULT_COLUMNS), std::end(PRINTERS_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.networkConnectionsColumns = std::vector<Column_t>(std::begin(NETWORK_CONNECTIONS_DEFAULT_COLUMNS), std::end(NETWORK_CONNECTIONS_DEFAULT_COLUMNS));
+		globalFolderSettings.folderColumns.myNetworkPlacesColumns = std::vector<Column_t>(std::begin(MY_NETWORK_PLACES_DEFAULT_COLUMNS), std::end(MY_NETWORK_PLACES_DEFAULT_COLUMNS));
 
 		defaultFolderSettings.sortMode = SortMode::Name;
 		defaultFolderSettings.viewMode = ViewMode::Icons;

@@ -58,7 +58,7 @@ ULONG __stdcall CShellBrowser::Release(void)
 
 CShellBrowser *CShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
 	CachedIcons *cachedIcons, std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
-	const InitialColumns &initialColumns)
+	boost::optional<FolderColumns> initialColumns)
 {
 	return new CShellBrowser(id, resourceInstance, hOwner, hListView, cachedIcons, config,
 		folderSettings, initialColumns);
@@ -66,7 +66,7 @@ CShellBrowser *CShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND
 
 CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
 	CachedIcons *cachedIcons, std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
-	const InitialColumns &initialColumns) :
+	boost::optional<FolderColumns> initialColumns) :
 	m_ID(id),
 	m_hResourceModule(resourceInstance),
 	m_hOwner(hOwner),
@@ -74,13 +74,7 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 	m_cachedIcons(cachedIcons),
 	m_config(config),
 	m_folderSettings(folderSettings),
-	m_ControlPanelColumnList(*initialColumns.pControlPanelColumnList),
-	m_MyComputerColumnList(*initialColumns.pMyComputerColumnList),
-	m_MyNetworkPlacesColumnList(*initialColumns.pMyNetworkPlacesColumnList),
-	m_NetworkConnectionsColumnList(*initialColumns.pNetworkConnectionsColumnList),
-	m_PrintersColumnList(*initialColumns.pPrintersColumnList),
-	m_RealFolderColumnList(*initialColumns.pRealFolderColumnList),
-	m_RecycleBinColumnList(*initialColumns.pRecycleBinColumnList),
+	m_folderColumns(initialColumns ? *initialColumns : config->globalFolderSettings.folderColumns),
 	m_itemIDCounter(0),
 	m_columnThreadPool(1),
 	m_columnResultIDCounter(0),
@@ -103,7 +97,7 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 	m_bThumbnailsSetup		= FALSE;
 	m_nCurrentColumns		= 0;
 	m_iDirMonitorId			= -1;
-	m_pActiveColumnList		= NULL;
+	m_pActiveColumns		= NULL;
 	m_bPerformingDrag		= FALSE;
 	m_nActiveColumns		= 0;
 	m_bNewItemCreated		= FALSE;

@@ -28,6 +28,8 @@ namespace
 #define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Gdiplus::Color(255,255,255)
 #define DEFAULT_DISPLAYWINDOW_SURROUND_COLOR	Gdiplus::Color(0,94,138)
 
+void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<ColumnWidth_t> &columnWidths);
+
 BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
 {
 	HKEY hSettingsKey;
@@ -503,27 +505,25 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 
 				if(ReturnValue == ERROR_SUCCESS)
 				{
-					ColumnExport_t cie;
+					FolderColumns folderColumns = tab.GetShellBrowser()->ExportAllColumns();
 
-					tab.GetShellBrowser()->ExportAllColumns(&cie);
-
-					SaveColumnToRegistry(hColumnsKey,_T("ControlPanelColumns"),&cie.ControlPanelColumnList);
-					SaveColumnToRegistry(hColumnsKey,_T("MyComputerColumns"),&cie.MyComputerColumnList);
-					SaveColumnToRegistry(hColumnsKey,_T("RealFolderColumns"),&cie.RealFolderColumnList);
-					SaveColumnToRegistry(hColumnsKey,_T("RecycleBinColumns"),&cie.RecycleBinColumnList);
-					SaveColumnToRegistry(hColumnsKey,_T("PrinterColumns"),&cie.PrintersColumnList);
-					SaveColumnToRegistry(hColumnsKey,_T("NetworkColumns"),&cie.NetworkConnectionsColumnList);
-					SaveColumnToRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&cie.MyNetworkPlacesColumnList);
+					SaveColumnToRegistry(hColumnsKey,_T("ControlPanelColumns"),&folderColumns.controlPanelColumns);
+					SaveColumnToRegistry(hColumnsKey,_T("MyComputerColumns"),&folderColumns.myComputerColumns);
+					SaveColumnToRegistry(hColumnsKey,_T("RealFolderColumns"),&folderColumns.realFolderColumns);
+					SaveColumnToRegistry(hColumnsKey,_T("RecycleBinColumns"),&folderColumns.recycleBinColumns);
+					SaveColumnToRegistry(hColumnsKey,_T("PrinterColumns"),&folderColumns.printersColumns);
+					SaveColumnToRegistry(hColumnsKey,_T("NetworkColumns"),&folderColumns.networkConnectionsColumns);
+					SaveColumnToRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&folderColumns.myNetworkPlacesColumns);
 
 					/* Now save column widths. In the future, these keys may be merged with
 					the column keys above. */
-					SaveColumnWidthsToRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&cie.ControlPanelColumnList);
-					SaveColumnWidthsToRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&cie.MyComputerColumnList);
-					SaveColumnWidthsToRegistry(hColumnsKey,_T("RealFolderColumnWidths"),&cie.RealFolderColumnList);
-					SaveColumnWidthsToRegistry(hColumnsKey,_T("RecycleBinColumnWidths"),&cie.RecycleBinColumnList);
-					SaveColumnWidthsToRegistry(hColumnsKey,_T("PrinterColumnWidths"),&cie.PrintersColumnList);
-					SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkColumnWidths"),&cie.NetworkConnectionsColumnList);
-					SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"),&cie.MyNetworkPlacesColumnList);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&folderColumns.controlPanelColumns);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&folderColumns.myComputerColumns);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("RealFolderColumnWidths"),&folderColumns.realFolderColumns);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("RecycleBinColumnWidths"),&folderColumns.recycleBinColumns);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("PrinterColumnWidths"),&folderColumns.printersColumns);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkColumnWidths"),&folderColumns.networkConnectionsColumns);
+					SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"),&folderColumns.myNetworkPlacesColumns);
 
 					RegCloseKey(hColumnsKey);
 				}
@@ -548,14 +548,11 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 	}
 }
 
-void UpdateColumnWidths(std::list<Column_t> *pColumnList,std::list<Column_t> *pColumnWidthList)
+void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<ColumnWidth_t> &columnWidths)
 {
-	std::list<Column_t>::iterator itr1;
-	std::list<Column_t>::iterator itr2;
-
-	for(itr1 = pColumnWidthList->begin();itr1 != pColumnWidthList->end();itr1++)
+	for(auto itr1 = columnWidths.begin();itr1 != columnWidths.end();itr1++)
 	{
-		for(itr2 = pColumnList->begin();itr2 != pColumnList->end();itr2++)
+		for(auto itr2 = columns.begin();itr2 != columns.end();itr2++)
 		{
 			if(itr2->id == itr1->id)
 			{
@@ -566,7 +563,7 @@ void UpdateColumnWidths(std::list<Column_t> *pColumnList,std::list<Column_t> *pC
 	}
 }
 
-int Explorerplusplus::LoadTabSettingsFromRegistry(void)
+int Explorerplusplus::LoadTabSettingsFromRegistry()
 {
 	HKEY				hKey;
 	HKEY				hTabKey;
@@ -619,71 +616,41 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("Filter"),filter,SIZEOF_ARRAY(filter));
 			folderSettings.filter = filter;
 
-			std::list<Column_t>	RealFolderColumnList;
-			std::list<Column_t>	MyComputerColumnList;
-			std::list<Column_t>	ControlPanelColumnList;
-			std::list<Column_t>	RecycleBinColumnList;
-			std::list<Column_t>	PrintersColumnList;
-			std::list<Column_t>	NetworkConnectionsColumnList;
-			std::list<Column_t>	MyNetworkPlacesColumnList;
-
 			/* Now load this tabs columns. */
 			ReturnValue = RegOpenKeyEx(hTabKey,_T("Columns"),0,KEY_READ,&hColumnsKey);
 
+			FolderColumns initialColumns;
+
 			if(ReturnValue == ERROR_SUCCESS)
 			{
-				LoadColumnFromRegistry(hColumnsKey,_T("ControlPanelColumns"),&ControlPanelColumnList);
-				LoadColumnFromRegistry(hColumnsKey,_T("MyComputerColumns"),&MyComputerColumnList);
-				LoadColumnFromRegistry(hColumnsKey,_T("RealFolderColumns"),&RealFolderColumnList);
-				LoadColumnFromRegistry(hColumnsKey,_T("RecycleBinColumns"),&RecycleBinColumnList);
-				LoadColumnFromRegistry(hColumnsKey,_T("PrinterColumns"),&PrintersColumnList);
-				LoadColumnFromRegistry(hColumnsKey,_T("NetworkColumns"),&NetworkConnectionsColumnList);
-				LoadColumnFromRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&MyNetworkPlacesColumnList);
+				initialColumns.controlPanelColumns = LoadColumnFromRegistry(hColumnsKey,_T("ControlPanelColumns"));
+				initialColumns.myComputerColumns = LoadColumnFromRegistry(hColumnsKey,_T("MyComputerColumns"));
+				initialColumns.realFolderColumns = LoadColumnFromRegistry(hColumnsKey,_T("RealFolderColumns"));
+				initialColumns.recycleBinColumns = LoadColumnFromRegistry(hColumnsKey,_T("RecycleBinColumns"));
+				initialColumns.printersColumns = LoadColumnFromRegistry(hColumnsKey,_T("PrinterColumns"));
+				initialColumns.networkConnectionsColumns = LoadColumnFromRegistry(hColumnsKey,_T("NetworkColumns"));
+				initialColumns.myNetworkPlacesColumns = LoadColumnFromRegistry(hColumnsKey,_T("NetworkPlacesColumns"));
 
-				std::list<Column_t>	RealFolderColumnListTemp;
-				std::list<Column_t>	MyComputerColumnListTemp;
-				std::list<Column_t>	ControlPanelColumnListTemp;
-				std::list<Column_t>	RecycleBinColumnListTemp;
-				std::list<Column_t>	PrintersColumnListTemp;
-				std::list<Column_t>	NetworkConnectionsColumnListTemp;
-				std::list<Column_t>	MyNetworkPlacesColumnListTemp;
+				auto controlPanelWidths = LoadColumnWidthsFromRegistry(hColumnsKey,_T("ControlPanelColumnWidths"));
+				auto myComputerWidths = LoadColumnWidthsFromRegistry(hColumnsKey,_T("MyComputerColumnWidths"));
+				auto realFolderWidths = LoadColumnWidthsFromRegistry(hColumnsKey,_T("RealFolderColumnWidths"));
+				auto recycleBinWidths = LoadColumnWidthsFromRegistry(hColumnsKey,_T("RecycleBinColumnWidths"));
+				auto printersWidths = LoadColumnWidthsFromRegistry(hColumnsKey,_T("PrinterColumnWidths"));
+				auto networkConnectionsWidths = LoadColumnWidthsFromRegistry(hColumnsKey,_T("NetworkColumnWidths"));
+				auto myNetworkPlacesWidths = LoadColumnWidthsFromRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"));
 
-				LoadColumnWidthsFromRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&ControlPanelColumnListTemp);
-				LoadColumnWidthsFromRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&MyComputerColumnListTemp);
-				LoadColumnWidthsFromRegistry(hColumnsKey,_T("RealFolderColumnWidths"),&RealFolderColumnListTemp);
-				LoadColumnWidthsFromRegistry(hColumnsKey,_T("RecycleBinColumnWidths"),&RecycleBinColumnListTemp);
-				LoadColumnWidthsFromRegistry(hColumnsKey,_T("PrinterColumnWidths"),&PrintersColumnListTemp);
-				LoadColumnWidthsFromRegistry(hColumnsKey,_T("NetworkColumnWidths"),&NetworkConnectionsColumnListTemp);
-				LoadColumnWidthsFromRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"),&MyNetworkPlacesColumnListTemp);
-
-				UpdateColumnWidths(&ControlPanelColumnList,&ControlPanelColumnListTemp);
-				UpdateColumnWidths(&MyComputerColumnList,&MyComputerColumnListTemp);
-				UpdateColumnWidths(&RealFolderColumnList,&RealFolderColumnListTemp);
-				UpdateColumnWidths(&RecycleBinColumnList,&RecycleBinColumnListTemp);
-				UpdateColumnWidths(&PrintersColumnList,&PrintersColumnListTemp);
-				UpdateColumnWidths(&NetworkConnectionsColumnList,&NetworkConnectionsColumnListTemp);
-				UpdateColumnWidths(&MyNetworkPlacesColumnList,&MyNetworkPlacesColumnListTemp);
+				UpdateColumnWidths(initialColumns.controlPanelColumns, controlPanelWidths);
+				UpdateColumnWidths(initialColumns.myComputerColumns, myComputerWidths);
+				UpdateColumnWidths(initialColumns.realFolderColumns, realFolderWidths);
+				UpdateColumnWidths(initialColumns.recycleBinColumns,recycleBinWidths);
+				UpdateColumnWidths(initialColumns.printersColumns, printersWidths);
+				UpdateColumnWidths(initialColumns.networkConnectionsColumns, networkConnectionsWidths);
+				UpdateColumnWidths(initialColumns.myNetworkPlacesColumns, myNetworkPlacesWidths);
 
 				RegCloseKey(hColumnsKey);
 			}
 
-			ValidateSingleColumnSet(VALIDATE_REALFOLDER_COLUMNS,&RealFolderColumnList);
-			ValidateSingleColumnSet(VALIDATE_CONTROLPANEL_COLUMNS,&ControlPanelColumnList);
-			ValidateSingleColumnSet(VALIDATE_MYCOMPUTER_COLUMNS,&MyComputerColumnList);
-			ValidateSingleColumnSet(VALIDATE_RECYCLEBIN_COLUMNS,&RecycleBinColumnList);
-			ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS,&PrintersColumnList);
-			ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,&NetworkConnectionsColumnList);
-			ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,&MyNetworkPlacesColumnList);
-
-			InitialColumns initialColumns;
-
-			initialColumns.pControlPanelColumnList			= &ControlPanelColumnList;
-			initialColumns.pMyComputerColumnList			= &MyComputerColumnList;
-			initialColumns.pMyNetworkPlacesColumnList		= &MyNetworkPlacesColumnList;
-			initialColumns.pNetworkConnectionsColumnList	= &NetworkConnectionsColumnList;
-			initialColumns.pPrintersColumnList				= &PrintersColumnList;
-			initialColumns.pRealFolderColumnList			= &RealFolderColumnList;
-			initialColumns.pRecycleBinColumnList			= &RecycleBinColumnList;
+			ValidateColumns(initialColumns);
 
 			TabSettings tabSettings;
 
@@ -699,7 +666,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("CustomName"),customName,SIZEOF_ARRAY(customName));
 			tabSettings.name = customName;
 
-			hr = CreateNewTab(pidlDirectory, tabSettings, &folderSettings, &initialColumns);
+			hr = CreateNewTab(pidlDirectory, tabSettings, &folderSettings, initialColumns);
 
 			if(hr == S_OK)
 				nTabsCreated++;
@@ -721,7 +688,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry(void)
 	return nTabsCreated;
 }
 
-void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns)
+void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns)
 {
 	typedef struct
 	{
@@ -729,13 +696,12 @@ void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR 
 		int iWidth;
 	} ColumnWidth_t;
 
-	std::list<Column_t>::iterator	itr;
 	ColumnWidth_t				*pColumnList = NULL;
 	int							iColumn = 0;
 
 	pColumnList = (ColumnWidth_t *)malloc(pColumns->size() * sizeof(ColumnWidth_t));
 
-	for(itr = pColumns->begin();itr != pColumns->end();itr++)
+	for(auto itr = pColumns->begin();itr != pColumns->end();itr++)
 	{
 		pColumnList[iColumn].id			= itr->id;
 		pColumnList[iColumn].iWidth		= itr->iWidth;
@@ -749,48 +715,39 @@ void Explorerplusplus::SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR 
 	free(pColumnList);
 }
 
-void Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns)
+std::vector<ColumnWidth_t> Explorerplusplus::LoadColumnWidthsFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName)
 {
-	typedef struct
-	{
-		unsigned int id;
-		int iWidth;
-	} ColumnWidth_t;
+	ColumnWidth_t columnWidthData[64];
+	DWORD dwType = REG_BINARY;
+	DWORD dwSize = sizeof(columnWidthData);
 
-	ColumnWidth_t	ColumnList[64];
-	Column_t		Column;
-	DWORD			dwSize;
-	DWORD			dwType;
-	LONG			ret;
-	unsigned int	i = 0;
+	LONG ret = RegQueryValueEx(hColumnsKey,szKeyName,0,&dwType,(LPBYTE)columnWidthData, &dwSize);
 
-	dwType = REG_BINARY;
-	dwSize = sizeof(ColumnList);
-
-	ret = RegQueryValueEx(hColumnsKey,szKeyName,0,&dwType,(LPBYTE)ColumnList,
-		&dwSize);
+	std::vector<ColumnWidth_t> columnWidths;
 
 	if(ret == ERROR_SUCCESS)
 	{
-		for(i = 0;i < dwSize / sizeof(ColumnWidth_t);i++)
+		for(unsigned int i = 0;i < dwSize / sizeof(ColumnWidth_t);i++)
 		{
-			Column.id = ColumnList[i].id;
-			Column.iWidth = ColumnList[i].iWidth;
+			ColumnWidth_t columnWidth;
+			columnWidth.id = columnWidthData[i].id;
+			columnWidth.iWidth = columnWidthData[i].iWidth;
 
-			pColumns->push_back(Column);
+			columnWidths.push_back(columnWidth);
 		}
 	}
+
+	return columnWidths;
 }
 
-void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns)
+void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns)
 {
-	std::list<Column_t>::iterator	itr;
 	ColumnOld_t					*pColumnList = NULL;
 	int							iColumn = 0;
 
 	pColumnList = (ColumnOld_t *)malloc(pColumns->size() * sizeof(ColumnOld_t));
 
-	for(itr = pColumns->begin();itr != pColumns->end();itr++)
+	for(auto itr = pColumns->begin();itr != pColumns->end();itr++)
 	{
 		pColumnList[iColumn].id			= itr->id;
 		pColumnList[iColumn].bChecked	= itr->bChecked;
@@ -804,7 +761,7 @@ void Explorerplusplus::SaveColumnToRegistry(HKEY hColumnsKey, const TCHAR *szKey
 	free(pColumnList);
 }
 
-void Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::list<Column_t> *pColumns)
+std::vector<Column_t> Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName)
 {
 	ColumnOld_t		ColumnList[64];
 	Column_t		Column;
@@ -818,17 +775,21 @@ void Explorerplusplus::LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szK
 	RegQueryValueEx(hColumnsKey,szKeyName,0,&dwType,(LPBYTE)ColumnList,
 		&dwSize);
 
+	std::vector<Column_t> columns;
+
 	for(i = 0;i < dwSize / sizeof(ColumnOld_t);i++)
 	{
 		Column.id = ColumnList[i].id;
 		Column.bChecked = ColumnList[i].bChecked;
 		Column.iWidth = DEFAULT_COLUMN_WIDTH;
 
-		pColumns->push_back(Column);
+		columns.push_back(Column);
 	}
+
+	return columns;
 }
 
-void Explorerplusplus::SaveDefaultColumnsToRegistry(void)
+void Explorerplusplus::SaveDefaultColumnsToRegistry()
 {
 	HKEY			hColumnsKey;
 	DWORD			Disposition;
@@ -840,32 +801,32 @@ void Explorerplusplus::SaveDefaultColumnsToRegistry(void)
 
 	if(ReturnValue == ERROR_SUCCESS)
 	{
-		SaveColumnToRegistry(hColumnsKey,_T("ControlPanelColumns"),&m_ControlPanelColumnList);
-		SaveColumnWidthsToRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&m_ControlPanelColumnList);
+		SaveColumnToRegistry(hColumnsKey,_T("ControlPanelColumns"),&m_config->globalFolderSettings.folderColumns.controlPanelColumns);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&m_config->globalFolderSettings.folderColumns.controlPanelColumns);
 
-		SaveColumnToRegistry(hColumnsKey,_T("MyComputerColumns"),&m_MyComputerColumnList);
-		SaveColumnWidthsToRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&m_MyComputerColumnList);
+		SaveColumnToRegistry(hColumnsKey,_T("MyComputerColumns"),&m_config->globalFolderSettings.folderColumns.myComputerColumns);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&m_config->globalFolderSettings.folderColumns.myComputerColumns);
 
-		SaveColumnToRegistry(hColumnsKey,_T("RealFolderColumns"),&m_RealFolderColumnList);
-		SaveColumnWidthsToRegistry(hColumnsKey,_T("RealFolderColumnWidths"),&m_RealFolderColumnList);
+		SaveColumnToRegistry(hColumnsKey,_T("RealFolderColumns"),&m_config->globalFolderSettings.folderColumns.realFolderColumns);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("RealFolderColumnWidths"),&m_config->globalFolderSettings.folderColumns.realFolderColumns);
 
-		SaveColumnToRegistry(hColumnsKey,_T("RecycleBinColumns"),&m_RecycleBinColumnList);
-		SaveColumnWidthsToRegistry(hColumnsKey,_T("RecycleBinColumnWidths"),&m_RecycleBinColumnList);
+		SaveColumnToRegistry(hColumnsKey,_T("RecycleBinColumns"),&m_config->globalFolderSettings.folderColumns.recycleBinColumns);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("RecycleBinColumnWidths"),&m_config->globalFolderSettings.folderColumns.recycleBinColumns);
 
-		SaveColumnToRegistry(hColumnsKey,_T("PrinterColumns"),&m_PrintersColumnList);
-		SaveColumnWidthsToRegistry(hColumnsKey,_T("PrinterColumnWidths"),&m_PrintersColumnList);
+		SaveColumnToRegistry(hColumnsKey,_T("PrinterColumns"),&m_config->globalFolderSettings.folderColumns.printersColumns);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("PrinterColumnWidths"),&m_config->globalFolderSettings.folderColumns.printersColumns);
 
-		SaveColumnToRegistry(hColumnsKey,_T("NetworkColumns"),&m_NetworkConnectionsColumnList);
-		SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkColumnWidths"),&m_NetworkConnectionsColumnList);
+		SaveColumnToRegistry(hColumnsKey,_T("NetworkColumns"),&m_config->globalFolderSettings.folderColumns.networkConnectionsColumns);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkColumnWidths"),&m_config->globalFolderSettings.folderColumns.networkConnectionsColumns);
 
-		SaveColumnToRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&m_MyNetworkPlacesColumnList);
-		SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"),&m_MyNetworkPlacesColumnList);
+		SaveColumnToRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&m_config->globalFolderSettings.folderColumns.myNetworkPlacesColumns);
+		SaveColumnWidthsToRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"),&m_config->globalFolderSettings.folderColumns.myNetworkPlacesColumns);
 
 		RegCloseKey(hColumnsKey);
 	}
 }
 
-void Explorerplusplus::LoadDefaultColumnsFromRegistry(void)
+void Explorerplusplus::LoadDefaultColumnsFromRegistry()
 {
 	HKEY	hColumnsKey;
 	LONG	res;
@@ -875,47 +836,33 @@ void Explorerplusplus::LoadDefaultColumnsFromRegistry(void)
 
 	if(res == ERROR_SUCCESS)
 	{
-		m_ControlPanelColumnList.clear();
-		m_MyComputerColumnList.clear();
-		m_RealFolderColumnList.clear();
-		m_RecycleBinColumnList.clear();
-		m_PrintersColumnList.clear();
-		m_NetworkConnectionsColumnList.clear();
-		m_MyNetworkPlacesColumnList.clear();
+		auto &defaultFolderColumns = m_config->globalFolderSettings.folderColumns;
 
-		LoadColumnFromRegistry(hColumnsKey,_T("ControlPanelColumns"),&m_ControlPanelColumnList);
-		LoadColumnFromRegistry(hColumnsKey,_T("MyComputerColumns"),&m_MyComputerColumnList);
-		LoadColumnFromRegistry(hColumnsKey,_T("RealFolderColumns"),&m_RealFolderColumnList);
-		LoadColumnFromRegistry(hColumnsKey,_T("RecycleBinColumns"),&m_RecycleBinColumnList);
-		LoadColumnFromRegistry(hColumnsKey,_T("PrinterColumns"),&m_PrintersColumnList);
-		LoadColumnFromRegistry(hColumnsKey,_T("NetworkColumns"),&m_NetworkConnectionsColumnList);
-		LoadColumnFromRegistry(hColumnsKey,_T("NetworkPlacesColumns"),&m_MyNetworkPlacesColumnList);
+		defaultFolderColumns.controlPanelColumns = LoadColumnFromRegistry(hColumnsKey,_T("ControlPanelColumns"));
+		defaultFolderColumns.myComputerColumns = LoadColumnFromRegistry(hColumnsKey,_T("MyComputerColumns"));
+		defaultFolderColumns.realFolderColumns = LoadColumnFromRegistry(hColumnsKey,_T("RealFolderColumns"));
+		defaultFolderColumns.recycleBinColumns = LoadColumnFromRegistry(hColumnsKey,_T("RecycleBinColumns"));
+		defaultFolderColumns.printersColumns = LoadColumnFromRegistry(hColumnsKey,_T("PrinterColumns"));
+		defaultFolderColumns.networkConnectionsColumns = LoadColumnFromRegistry(hColumnsKey,_T("NetworkColumns"));
+		defaultFolderColumns.myNetworkPlacesColumns = LoadColumnFromRegistry(hColumnsKey,_T("NetworkPlacesColumns"));
 
-		std::list<Column_t>	RealFolderColumnListTemp;
-		std::list<Column_t>	MyComputerColumnListTemp;
-		std::list<Column_t>	ControlPanelColumnListTemp;
-		std::list<Column_t>	RecycleBinColumnListTemp;
-		std::list<Column_t>	PrintersColumnListTemp;
-		std::list<Column_t>	NetworkConnectionsColumnListTemp;
-		std::list<Column_t>	MyNetworkPlacesColumnListTemp;
+		auto controlPanelWidths = LoadColumnWidthsFromRegistry(hColumnsKey, _T("ControlPanelColumnWidths"));
+		auto myComputerWidths = LoadColumnWidthsFromRegistry(hColumnsKey, _T("MyComputerColumnWidths"));
+		auto realFolderWidths = LoadColumnWidthsFromRegistry(hColumnsKey, _T("RealFolderColumnWidths"));
+		auto recycleBinWidths = LoadColumnWidthsFromRegistry(hColumnsKey, _T("RecycleBinColumnWidths"));
+		auto printersWidths = LoadColumnWidthsFromRegistry(hColumnsKey, _T("PrinterColumnWidths"));
+		auto networkConnectionsWidths = LoadColumnWidthsFromRegistry(hColumnsKey, _T("NetworkColumnWidths"));
+		auto myNetworkPlacesWidths = LoadColumnWidthsFromRegistry(hColumnsKey, _T("NetworkPlacesColumnWidths"));
 
-		LoadColumnWidthsFromRegistry(hColumnsKey,_T("ControlPanelColumnWidths"),&ControlPanelColumnListTemp);
-		LoadColumnWidthsFromRegistry(hColumnsKey,_T("MyComputerColumnWidths"),&MyComputerColumnListTemp);
-		LoadColumnWidthsFromRegistry(hColumnsKey,_T("RealFolderColumnWidths"),&RealFolderColumnListTemp);
-		LoadColumnWidthsFromRegistry(hColumnsKey,_T("RecycleBinColumnWidths"),&RecycleBinColumnListTemp);
-		LoadColumnWidthsFromRegistry(hColumnsKey,_T("PrinterColumnWidths"),&PrintersColumnListTemp);
-		LoadColumnWidthsFromRegistry(hColumnsKey,_T("NetworkColumnWidths"),&NetworkConnectionsColumnListTemp);
-		LoadColumnWidthsFromRegistry(hColumnsKey,_T("NetworkPlacesColumnWidths"),&MyNetworkPlacesColumnListTemp);
+		UpdateColumnWidths(defaultFolderColumns.controlPanelColumns, controlPanelWidths);
+		UpdateColumnWidths(defaultFolderColumns.myComputerColumns, myComputerWidths);
+		UpdateColumnWidths(defaultFolderColumns.realFolderColumns, realFolderWidths);
+		UpdateColumnWidths(defaultFolderColumns.recycleBinColumns, recycleBinWidths);
+		UpdateColumnWidths(defaultFolderColumns.printersColumns, printersWidths);
+		UpdateColumnWidths(defaultFolderColumns.networkConnectionsColumns, networkConnectionsWidths);
+		UpdateColumnWidths(defaultFolderColumns.myNetworkPlacesColumns, myNetworkPlacesWidths);
 
-		UpdateColumnWidths(&m_ControlPanelColumnList,&ControlPanelColumnListTemp);
-		UpdateColumnWidths(&m_MyComputerColumnList,&MyComputerColumnListTemp);
-		UpdateColumnWidths(&m_RealFolderColumnList,&RealFolderColumnListTemp);
-		UpdateColumnWidths(&m_RecycleBinColumnList,&RecycleBinColumnListTemp);
-		UpdateColumnWidths(&m_PrintersColumnList,&PrintersColumnListTemp);
-		UpdateColumnWidths(&m_NetworkConnectionsColumnList,&NetworkConnectionsColumnListTemp);
-		UpdateColumnWidths(&m_MyNetworkPlacesColumnList,&MyNetworkPlacesColumnListTemp);
-
-		ValidateColumns();
+		ValidateColumns(defaultFolderColumns);
 
 		RegCloseKey(hColumnsKey);
 	}

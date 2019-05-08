@@ -4,6 +4,19 @@
 
 #pragma once
 
+typedef struct
+{
+	unsigned int id;
+	BOOL bChecked;
+	int iWidth;
+} Column_t;
+
+typedef struct
+{
+	unsigned int id;
+	BOOL bChecked;
+} ColumnOld_t;
+
 typedef enum
 {
 	CM_NAME = 1,

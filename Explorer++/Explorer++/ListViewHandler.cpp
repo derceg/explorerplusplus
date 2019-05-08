@@ -299,18 +299,16 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 					take the item out of its position in the
 					list, and move it into its new position. */
 					NMHEADER *pnmHeader = NULL;
-					std::list<Column_t> ActiveColumnList;
-					std::list<Column_t>::iterator itr;
 					Column_t Column;
 					int i = 0;
 
 					pnmHeader = (NMHEADER *)lParam;
 
-					m_pActiveShellBrowser->ExportCurrentColumns(&ActiveColumnList);
+					auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
 
 					i = 0;
-					itr = ActiveColumnList.begin();
-					while(i < (pnmHeader->iItem + 1) && itr != ActiveColumnList.end())
+					auto itr = currentColumns.begin();
+					while(i < (pnmHeader->iItem + 1) && itr != currentColumns.end())
 					{
 						if(itr->bChecked)
 						{
@@ -320,15 +318,15 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 						itr++;
 					}
 
-					if(itr != ActiveColumnList.begin())
+					if(itr != currentColumns.begin())
 						itr--;
 
 					Column = *itr;
-					ActiveColumnList.erase(itr);
+					currentColumns.erase(itr);
 
 					i = 0;
-					itr = ActiveColumnList.begin();
-					while(i < (pnmHeader->pitem->iOrder + 1) && itr != ActiveColumnList.end())
+					itr = currentColumns.begin();
+					while(i < (pnmHeader->pitem->iOrder + 1) && itr != currentColumns.end())
 					{
 						if(itr->bChecked)
 						{
@@ -338,12 +336,12 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 						itr++;
 					}
 
-					if(itr != ActiveColumnList.begin())
+					if(itr != currentColumns.begin())
 						itr--;
 
-					ActiveColumnList.insert(itr,Column);
+					currentColumns.insert(itr,Column);
 
-					m_pActiveShellBrowser->ImportColumns(&ActiveColumnList);
+					m_pActiveShellBrowser->ImportColumns(currentColumns);
 
 					Tab &tab = m_tabContainer->GetSelectedTab();
 					RefreshTab(tab);
@@ -1038,8 +1036,6 @@ void Explorerplusplus::OnListViewHeaderRClick(POINT *pCursorPos)
 	HMENU						hHeaderPopupMenu;
 	HMENU						hMenu;
 	MENUITEMINFO				mii;
-	std::list<Column_t>			m_pActiveColumnList;
-	std::list<Column_t>::iterator	itr;
 	TCHAR						szColumnText[256];
 	unsigned int				*pHeaderList = NULL;
 	int							nItems = 0;
@@ -1050,13 +1046,13 @@ void Explorerplusplus::OnListViewHeaderRClick(POINT *pCursorPos)
 
 	hMenu = GetSubMenu(hHeaderPopupMenu,0);
 
-	m_pActiveShellBrowser->ExportCurrentColumns(&m_pActiveColumnList);
+	auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
 
 	nItems = GetColumnHeaderMenuList(&pHeaderList);
 
 	for(i = 0;i < nItems;i++)
 	{
-		for(itr = m_pActiveColumnList.begin();itr != m_pActiveColumnList.end();itr++)
+		for(auto itr = currentColumns.begin();itr != currentColumns.end();itr++)
 		{
 			if(itr->id == pHeaderList[i])
 			{

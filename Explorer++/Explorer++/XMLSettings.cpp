@@ -648,22 +648,16 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 	IXMLDOMNode			*pColumnNode = NULL;
 	IXMLDOMNamedNodeMap	*am = NULL;
 	IXMLDOMNode			*pChildNode = NULL;
-	BSTR						bstrName;
-	BSTR						bstrValue;
-	BSTR						bstr = NULL;
-	HRESULT						hr;
-	TCHAR						szDirectory[MAX_PATH];
-	std::list<Column_t>			RealFolderColumnList;
-	std::list<Column_t>			MyComputerColumnList;
-	std::list<Column_t>			ControlPanelColumnList;
-	std::list<Column_t>			RecycleBinColumnList;
-	std::list<Column_t>			PrintersColumnList;
-	std::list<Column_t>			NetworkConnectionsColumnList;
-	std::list<Column_t>			MyNetworkPlacesColumnList;
-	long						length;
-	long						lChildNodes;
-	long						j = 0;
-	int							nTabsCreated = 0;
+	BSTR				bstrName;
+	BSTR				bstrValue;
+	BSTR				bstr = NULL;
+	HRESULT				hr;
+	TCHAR				szDirectory[MAX_PATH];
+	FolderColumns		initialColumns;
+	long				length;
+	long				lChildNodes;
+	long				j = 0;
+	int					nTabsCreated = 0;
 
 	if(pXMLDom == NULL)
 		goto clean;
@@ -688,15 +682,8 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 
 			TabSettings tabSettings;
 			FolderSettings folderSettings;
-			InitialColumns initialColumns;
 
-			RealFolderColumnList.clear();
-			MyComputerColumnList.clear();
-			ControlPanelColumnList.clear();
-			RecycleBinColumnList.clear();
-			PrintersColumnList.clear();
-			NetworkConnectionsColumnList.clear();
-			MyNetworkPlacesColumnList.clear();
+			initialColumns = {};
 
 			if(SUCCEEDED(hr))
 			{
@@ -743,41 +730,41 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 							{
 								pColumnNode->get_nextSibling(&pColumnNode);
 
-								std::list<Column_t> Column;
+								std::vector<Column_t> Column;
 								int iColumnType;
 
 								while(pColumnNode != NULL)
 								{
-									iColumnType = LoadColumnFromXML(pColumnNode,&Column);
+									iColumnType = LoadColumnFromXML(pColumnNode,Column);
 
 									switch(iColumnType)
 									{
 									case COLUMN_TYPE_GENERIC:
-										RealFolderColumnList = Column;
+										initialColumns.realFolderColumns = Column;
 										break;
 
 									case COLUMN_TYPE_MYCOMPUTER:
-										MyComputerColumnList = Column;
+										initialColumns.myComputerColumns = Column;
 										break;
 
 									case COLUMN_TYPE_CONTROLPANEL:
-										ControlPanelColumnList = Column;
+										initialColumns.controlPanelColumns = Column;
 										break;
 
 									case COLUMN_TYPE_RECYCLEBIN:
-										RecycleBinColumnList = Column;
+										initialColumns.recycleBinColumns = Column;
 										break;
 
 									case COLUMN_TYPE_PRINTERS:
-										PrintersColumnList = Column;
+										initialColumns.printersColumns = Column;
 										break;
 
 									case COLUMN_TYPE_NETWORK:
-										NetworkConnectionsColumnList = Column;
+										initialColumns.networkConnectionsColumns = Column;
 										break;
 
 									case COLUMN_TYPE_NETWORKPLACES:
-										MyNetworkPlacesColumnList = Column;
+										initialColumns.myNetworkPlacesColumns = Column;
 										break;
 									}
 
@@ -788,25 +775,17 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 						}
 					}
 
-					initialColumns.pRealFolderColumnList = &RealFolderColumnList;
-					initialColumns.pMyComputerColumnList = &MyComputerColumnList;
-					initialColumns.pControlPanelColumnList = &ControlPanelColumnList;
-					initialColumns.pRecycleBinColumnList = &RecycleBinColumnList;
-					initialColumns.pPrintersColumnList = &PrintersColumnList;
-					initialColumns.pNetworkConnectionsColumnList = &NetworkConnectionsColumnList;
-					initialColumns.pMyNetworkPlacesColumnList = &MyNetworkPlacesColumnList;
-
-					ValidateSingleColumnSet(VALIDATE_REALFOLDER_COLUMNS,initialColumns.pRealFolderColumnList);
-					ValidateSingleColumnSet(VALIDATE_CONTROLPANEL_COLUMNS,initialColumns.pControlPanelColumnList);
-					ValidateSingleColumnSet(VALIDATE_MYCOMPUTER_COLUMNS,initialColumns.pMyComputerColumnList);
-					ValidateSingleColumnSet(VALIDATE_RECYCLEBIN_COLUMNS,initialColumns.pRecycleBinColumnList);
-					ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS,initialColumns.pPrintersColumnList);
-					ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS,initialColumns.pNetworkConnectionsColumnList);
-					ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS,initialColumns.pMyNetworkPlacesColumnList);
+					ValidateSingleColumnSet(VALIDATE_REALFOLDER_COLUMNS, initialColumns.realFolderColumns);
+					ValidateSingleColumnSet(VALIDATE_CONTROLPANEL_COLUMNS, initialColumns.controlPanelColumns);
+					ValidateSingleColumnSet(VALIDATE_MYCOMPUTER_COLUMNS, initialColumns.myComputerColumns);
+					ValidateSingleColumnSet(VALIDATE_RECYCLEBIN_COLUMNS, initialColumns.recycleBinColumns);
+					ValidateSingleColumnSet(VALIDATE_PRINTERS_COLUMNS, initialColumns.printersColumns);
+					ValidateSingleColumnSet(VALIDATE_NETWORKCONNECTIONS_COLUMNS, initialColumns.networkConnectionsColumns);
+					ValidateSingleColumnSet(VALIDATE_MYNETWORKPLACES_COLUMNS, initialColumns.myNetworkPlacesColumns);
 				}
 			}
 
-			hr = CreateNewTab(szDirectory, tabSettings, &folderSettings, &initialColumns);
+			hr = CreateNewTab(szDirectory, tabSettings, &folderSettings, initialColumns);
 
 			if(hr == S_OK)
 				nTabsCreated++;
@@ -906,19 +885,17 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 		SysFreeString(bstr);
 		bstr = NULL;
 
-		ColumnExport_t ce;
-
-		tab.GetShellBrowser()->ExportAllColumns(&ce);
+		auto folderColumns = tab.GetShellBrowser()->ExportAllColumns();
 
 		int TAB_INDENT = 4;
 
-		SaveColumnToXML(pXMLDom,pColumnsNode,&ce.RealFolderColumnList,_T("Generic"),TAB_INDENT);
-		SaveColumnToXML(pXMLDom,pColumnsNode,&ce.MyComputerColumnList,_T("MyComputer"),TAB_INDENT);
-		SaveColumnToXML(pXMLDom,pColumnsNode,&ce.ControlPanelColumnList,_T("ControlPanel"),TAB_INDENT);
-		SaveColumnToXML(pXMLDom,pColumnsNode,&ce.RecycleBinColumnList,_T("RecycleBin"),TAB_INDENT);
-		SaveColumnToXML(pXMLDom,pColumnsNode,&ce.PrintersColumnList,_T("Printers"),TAB_INDENT);
-		SaveColumnToXML(pXMLDom,pColumnsNode,&ce.NetworkConnectionsColumnList,_T("Network"),TAB_INDENT);
-		SaveColumnToXML(pXMLDom,pColumnsNode,&ce.MyNetworkPlacesColumnList,_T("NetworkPlaces"),TAB_INDENT);
+		SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.realFolderColumns, _T("Generic"), TAB_INDENT);
+		SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.myComputerColumns, _T("MyComputer"), TAB_INDENT);
+		SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.controlPanelColumns, _T("ControlPanel"), TAB_INDENT);
+		SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.recycleBinColumns, _T("RecycleBin"), TAB_INDENT);
+		SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.printersColumns, _T("Printers"), TAB_INDENT);
+		SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.networkConnectionsColumns, _T("Network"), TAB_INDENT);
+		SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.myNetworkPlacesColumns, _T("NetworkPlaces"), TAB_INDENT);
 
 		NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsnttt,pColumnsNode);
 
@@ -953,7 +930,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 	SysFreeString(bstr_wsnttt);
 }
 
-int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode,std::list<Column_t> *pColumns)
+int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t> &outputColumns)
 {
 	IXMLDOMNamedNodeMap	*am = NULL;
 	IXMLDOMNode			*pAttributeNode = NULL;
@@ -966,7 +943,7 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode,std::list<Column_t> *
 	int							iColumnType = -1;
 	long						i = 0;
 
-	pColumns->clear();
+	outputColumns.clear();
 
 	hr = pNode->get_attributes(&am);
 
@@ -1018,14 +995,14 @@ int Explorerplusplus::LoadColumnFromXML(IXMLDOMNode *pNode,std::list<Column_t> *
 
 					Column.bChecked	= NXMLSettings::DecodeBoolValue(bstrValue);
 
-					pColumns->push_back(Column);
+					outputColumns.push_back(Column);
 					break;
 				}
 				else if(lstrcmp(bstrName,szWidth) == 0)
 				{
-					if(pColumns->size() > 0)
+					if(outputColumns.size() > 0)
 					{
-						pColumns->back().iWidth = NXMLSettings::DecodeIntValue(bstrValue);
+						outputColumns.back().iWidth = NXMLSettings::DecodeIntValue(bstrValue);
 					}
 
 					break;
@@ -1090,12 +1067,12 @@ IXMLDOMElement *pRoot)
 
 int Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
 {
-	IXMLDOMNodeList		*pNodes = NULL;
-	IXMLDOMNode			*pNode = NULL;
-	BSTR						bstr = NULL;
-	std::list<Column_t>			ColumnSet;
-	long						length;
-	int							iColumnType;
+	IXMLDOMNodeList	*pNodes = NULL;
+	IXMLDOMNode		*pNode = NULL;
+	BSTR			bstr = NULL;
+	std::vector<Column_t>	ColumnSet;
+	long			length;
+	int				iColumnType;
 
 	if(!pXMLDom)
 		goto clean;
@@ -1111,40 +1088,42 @@ int Explorerplusplus::LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom)
 	{
 		pNodes->get_length(&length);
 
+		auto &folderColumns = m_config->globalFolderSettings.folderColumns;
+
 		for(long i = 0; i < length; i++)
 		{
 			pNodes->get_item(i, &pNode);
 
-			iColumnType = LoadColumnFromXML(pNode,&ColumnSet);
+			iColumnType = LoadColumnFromXML(pNode,ColumnSet);
 
 			switch(iColumnType)
 			{
 			case COLUMN_TYPE_GENERIC:
-				m_RealFolderColumnList = ColumnSet;
+				folderColumns.realFolderColumns = ColumnSet;
 				break;
 
 			case COLUMN_TYPE_MYCOMPUTER:
-				m_MyComputerColumnList = ColumnSet;
+				folderColumns.myComputerColumns = ColumnSet;
 				break;
 
 			case COLUMN_TYPE_CONTROLPANEL:
-				m_ControlPanelColumnList = ColumnSet;
+				folderColumns.controlPanelColumns = ColumnSet;
 				break;
 
 			case COLUMN_TYPE_RECYCLEBIN:
-				m_RecycleBinColumnList = ColumnSet;
+				folderColumns.recycleBinColumns = ColumnSet;
 				break;
 
 			case COLUMN_TYPE_PRINTERS:
-				m_PrintersColumnList = ColumnSet;
+				folderColumns.printersColumns = ColumnSet;
 				break;
 
 			case COLUMN_TYPE_NETWORK:
-				m_NetworkConnectionsColumnList = ColumnSet;
+				folderColumns.networkConnectionsColumns = ColumnSet;
 				break;
 
 			case COLUMN_TYPE_NETWORKPLACES:
-				m_MyNetworkPlacesColumnList = ColumnSet;
+				folderColumns.myNetworkPlacesColumns = ColumnSet;
 				break;
 			}
 
@@ -1188,26 +1167,27 @@ IXMLDOMElement *pColumnsNode)
 {
 	int DEFAULT_INDENT = 2;
 
-	SaveColumnToXML(pXMLDom,pColumnsNode,&m_RealFolderColumnList,_T("Generic"),DEFAULT_INDENT);
-	SaveColumnToXML(pXMLDom,pColumnsNode,&m_MyComputerColumnList,_T("MyComputer"),DEFAULT_INDENT);
-	SaveColumnToXML(pXMLDom,pColumnsNode,&m_ControlPanelColumnList,_T("ControlPanel"),DEFAULT_INDENT);
-	SaveColumnToXML(pXMLDom,pColumnsNode,&m_RecycleBinColumnList,_T("RecycleBin"),DEFAULT_INDENT);
-	SaveColumnToXML(pXMLDom,pColumnsNode,&m_PrintersColumnList,_T("Printers"),DEFAULT_INDENT);
-	SaveColumnToXML(pXMLDom,pColumnsNode,&m_NetworkConnectionsColumnList,_T("Network"),DEFAULT_INDENT);
-	SaveColumnToXML(pXMLDom,pColumnsNode,&m_MyNetworkPlacesColumnList,_T("NetworkPlaces"),DEFAULT_INDENT);
+	const auto &folderColumns = m_config->globalFolderSettings.folderColumns;
+
+	SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.realFolderColumns, _T("Generic"), DEFAULT_INDENT);
+	SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.myComputerColumns, _T("MyComputer"), DEFAULT_INDENT);
+	SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.controlPanelColumns, _T("ControlPanel"), DEFAULT_INDENT);
+	SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.recycleBinColumns, _T("RecycleBin"), DEFAULT_INDENT);
+	SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.printersColumns, _T("Printers"), DEFAULT_INDENT);
+	SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.networkConnectionsColumns, _T("Network"), DEFAULT_INDENT);
+	SaveColumnToXML(pXMLDom,pColumnsNode, folderColumns.myNetworkPlacesColumns, _T("NetworkPlaces"), DEFAULT_INDENT);
 }
 
 void Explorerplusplus::SaveColumnToXML(IXMLDOMDocument *pXMLDom,
-IXMLDOMElement *pColumnsNode, std::list<Column_t> *pColumns,
-const TCHAR *szColumnSet, int iIndent)
+	IXMLDOMElement *pColumnsNode, const std::vector<Column_t> &columns,
+	const TCHAR *szColumnSet, int iIndent)
 {
-	IXMLDOMElement		*pColumnNode = NULL;
-	std::list<Column_t>::iterator	itr;
-	TCHAR						*pszColumnSaveName = NULL;
-	WCHAR						wszIndent[128];
-	TCHAR						szWidth[32];
-	BSTR						bstr_indent = SysAllocString(L"\n\t\t\t\t");
-	int							i = 0;
+	IXMLDOMElement	*pColumnNode = NULL;
+	TCHAR			*pszColumnSaveName = NULL;
+	WCHAR			wszIndent[128];
+	TCHAR			szWidth[32];
+	BSTR			bstr_indent = SysAllocString(L"\n\t\t\t\t");
+	int				i = 0;
 
 	StringCchPrintf(wszIndent,SIZEOF_ARRAY(wszIndent),L"\n");
 
@@ -1219,7 +1199,7 @@ const TCHAR *szColumnSet, int iIndent)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_indent,pColumnsNode);
 	NXMLSettings::CreateElementNode(pXMLDom,&pColumnNode,pColumnsNode,_T("Column"),szColumnSet);
 
-	for(itr = pColumns->begin();itr != pColumns->end();itr++)
+	for(auto itr = columns.begin();itr != columns.end();itr++)
 	{
 		for(i = 0;i < sizeof(ColumnData) / sizeof(ColumnData[0]);i++)
 		{

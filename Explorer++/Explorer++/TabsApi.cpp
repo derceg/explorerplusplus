@@ -86,7 +86,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	}
 
 	int tabId;
-	hr = m_tabContainerInterface->CreateNewTab(pidlDirectory, tabSettings, &folderSettings, nullptr, &tabId);
+	hr = m_tabContainerInterface->CreateNewTab(pidlDirectory, tabSettings, &folderSettings, boost::none, &tabId);
 
 	if (FAILED(hr))
 	{

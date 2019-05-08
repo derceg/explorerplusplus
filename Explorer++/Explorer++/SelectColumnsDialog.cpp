@@ -48,17 +48,17 @@ INT_PTR CSelectColumnsDialog::OnInitDialog()
 	lvColumn.mask = 0;
 	ListView_InsertColumn(hListView,0,&lvColumn);
 
-	std::list<Column_t> ActiveColumnList;
-	m_pexpp->GetActiveShellBrowser()->ExportCurrentColumns(&ActiveColumnList);
+	auto currentColumns = m_pexpp->GetActiveShellBrowser()->ExportCurrentColumns();
 
-	ActiveColumnList.sort(std::bind(&CSelectColumnsDialog::CompareColumns, this, std::placeholders::_1, std::placeholders::_2));
+	std::sort(currentColumns.begin(), currentColumns.end(),
+		std::bind(&CSelectColumnsDialog::CompareColumns, this, std::placeholders::_1, std::placeholders::_2));
 
 	int iItem = 0;
 
-	for(const auto &Column : ActiveColumnList)
+	for(const auto &column : currentColumns)
 	{
 		TCHAR szText[64];
-		LoadString(GetInstance(),CShellBrowser::LookupColumnNameStringIndex(Column.id),
+		LoadString(GetInstance(),CShellBrowser::LookupColumnNameStringIndex(column.id),
 			szText,SIZEOF_ARRAY(szText));
 
 		LVITEM lvItem;
@@ -66,10 +66,10 @@ INT_PTR CSelectColumnsDialog::OnInitDialog()
 		lvItem.iItem	= iItem;
 		lvItem.iSubItem	= 0;
 		lvItem.pszText	= szText;
-		lvItem.lParam	= Column.id;
+		lvItem.lParam	= column.id;
 		ListView_InsertItem(hListView,&lvItem);
 
-		ListView_SetCheckState(hListView,iItem,Column.bChecked);
+		ListView_SetCheckState(hListView,iItem,column.bChecked);
 
 		iItem++;
 	}
@@ -245,10 +245,9 @@ void CSelectColumnsDialog::SaveState()
 void CSelectColumnsDialog::OnOk()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
-	std::list<Column_t> ColumnTempList;
+	std::vector<Column_t> updatedColumns;
 
-	std::list<Column_t> ActiveColumnList;
-	m_pexpp->GetActiveShellBrowser()->ExportCurrentColumns(&ActiveColumnList);
+	auto currentColumns = m_pexpp->GetActiveShellBrowser()->ExportCurrentColumns();
 
 	for(int i = 0;i < ListView_GetItemCount(hListView);i++)
 	{
@@ -259,17 +258,17 @@ void CSelectColumnsDialog::OnOk()
 		ListView_GetItem(hListView,&lvItem);
 
 		UINT id = static_cast<int>(lvItem.lParam);
-		auto itr = std::find_if(ActiveColumnList.begin(),ActiveColumnList.end(),
+		auto itr = std::find_if(currentColumns.begin(),currentColumns.end(),
 			[id](const Column_t &Column){return Column.id == id;});
 
 		Column_t Column;
 		Column.id		= id;
 		Column.iWidth	= itr->iWidth;
 		Column.bChecked	= ListView_GetCheckState(hListView,i);
-		ColumnTempList.push_back(Column);
+		updatedColumns.push_back(Column);
 	}
 
-	m_pexpp->GetActiveShellBrowser()->ImportColumns(&ColumnTempList);
+	m_pexpp->GetActiveShellBrowser()->ImportColumns(updatedColumns);
 
 	if(m_bColumnsSwapped)
 	{

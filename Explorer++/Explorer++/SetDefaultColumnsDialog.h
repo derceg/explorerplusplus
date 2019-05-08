@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
+#include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/iShellView.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -58,9 +59,8 @@ class CSetDefaultColumnsDialog : public CBaseDialog
 {
 public:
 
-	CSetDefaultColumnsDialog(HINSTANCE hInstance,int iResource,HWND hParent,IExplorerplusplus *pexpp,std::list<Column_t> *pRealFolderColumnList,std::list<Column_t> *pMyComputerColumnList,
-		std::list<Column_t> *pControlPanelColumnList,std::list<Column_t> *pRecycleBinColumnList,std::list<Column_t> *pPrintersColumnList,std::list<Column_t> *pNetworkConnectionsColumnList,
-		std::list<Column_t> *pMyNetworkPlacesColumnList);
+	CSetDefaultColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+		IExplorerplusplus *pexpp, FolderColumns &folderColumns);
 	~CSetDefaultColumnsDialog();
 
 protected:
@@ -85,17 +85,11 @@ private:
 	void	SaveCurrentColumnState(FolderType_t FolderType);
 	void	SetupFolderColumns(FolderType_t FolderType);
 
-	std::list<Column_t>	*GetCurrentColumnList(FolderType_t FolderType);
+	std::vector<Column_t>	&GetCurrentColumnList(FolderType_t FolderType);
 
 	IExplorerplusplus	*m_pexpp;
 
-	std::list<Column_t>	*m_pRealFolderColumnList;
-	std::list<Column_t>	*m_pMyComputerColumnList;
-	std::list<Column_t>	*m_pControlPanelColumnList;
-	std::list<Column_t>	*m_pRecycleBinColumnList;
-	std::list<Column_t>	*m_pPrintersColumnList;
-	std::list<Column_t>	*m_pNetworkConnectionsColumnList;
-	std::list<Column_t>	*m_pMyNetworkPlacesColumnList;
+	FolderColumns		&m_folderColumns;
 
 	std::unordered_map<int,FolderType_t>	m_FolderMap;
 	FolderType_t		m_PreviousFolderType;
