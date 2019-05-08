@@ -18,14 +18,14 @@
 
 struct Config;
 
-class CTabContainer : public CBaseWindow
+class TabContainer : public CBaseWindow
 {
 public:
 
 	typedef boost::signals2::signal<void(int tabId, BOOL switchToNewTab)> TabCreatedSignal;
 	typedef boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)> TabMovedSignal;
 
-	static CTabContainer *Create(HWND parent, TabContainerInterface *tabContainer,
+	static TabContainer *Create(HWND parent, TabContainerInterface *tabContainer,
 		TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance,
 		std::shared_ptr<Config> config);
 
@@ -33,7 +33,7 @@ public:
 	HRESULT CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
 	FolderSettings GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;
 
-	Tab &CTabContainer::GetTab(int tabId);
+	Tab &TabContainer::GetTab(int tabId);
 	Tab *GetTabOptional(int tabId);
 	Tab &GetSelectedTab();
 	bool IsTabSelected(const Tab &tab);
@@ -67,9 +67,9 @@ private:
 	// all tabs (as the icon cache is shared between tabs).
 	static const int MAX_CACHED_ICONS = 1000;
 
-	CTabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
+	TabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
 		IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config);
-	~CTabContainer();
+	~TabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
 

@@ -82,7 +82,7 @@ namespace Plugins
 			}
 		};
 
-		TabsApi(CTabContainer *m_tabContainer, TabContainerInterface *tabContainerInterface,
+		TabsApi(TabContainer *m_tabContainer, TabContainerInterface *tabContainerInterface,
 			TabInterface *tabInterface);
 		~TabsApi();
 
@@ -99,7 +99,7 @@ namespace Plugins
 		void extractTabPropertiesForCreation(sol::table createProperties, TabSettings &tabSettings);
 		void extractFolderSettingsForCreation(sol::table folderSettingsTable, ::FolderSettings &folderSettings);
 
-		CTabContainer *m_tabContainer;
+		TabContainer *m_tabContainer;
 		TabContainerInterface *m_tabContainerInterface;
 		TabInterface *m_tabInterface;
 	};

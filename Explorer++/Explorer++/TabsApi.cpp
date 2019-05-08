@@ -11,7 +11,7 @@
 
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
-Plugins::TabsApi::TabsApi(CTabContainer *tabContainer, TabContainerInterface *tabContainerInterface,
+Plugins::TabsApi::TabsApi(TabContainer *tabContainer, TabContainerInterface *tabContainerInterface,
 	TabInterface *tabInterface) :
 	m_tabContainer(tabContainer),
 	m_tabContainerInterface(tabContainerInterface),

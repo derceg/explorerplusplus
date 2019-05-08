@@ -13,7 +13,7 @@ TabContainerInterface *Explorerplusplus::GetTabContainerInterface()
 	return this;
 }
 
-CTabContainer *Explorerplusplus::GetTabContainer()
+TabContainer *Explorerplusplus::GetTabContainer()
 {
 	return m_tabContainer;
 }

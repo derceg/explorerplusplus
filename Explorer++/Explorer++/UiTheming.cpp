@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "UiTheming.h"
 
-UiTheming::UiTheming(IExplorerplusplus *expp, CTabContainer *tabContainer) :
+UiTheming::UiTheming(IExplorerplusplus *expp, TabContainer *tabContainer) :
 	m_expp(expp),
 	m_tabContainer(tabContainer),
 	m_customListViewColorsApplied(false)

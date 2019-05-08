@@ -31,7 +31,7 @@ void Explorerplusplus::InitializeTabs()
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	m_tabContainer = CTabContainer::Create(m_hTabBacking, this, this, this, m_hLanguageModule, m_config);
+	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, this, m_hLanguageModule, m_config);
 	m_tabContainer->AddTabCreatedObserver(boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
 
 	/* Create the toolbar that will appear on the tab control.

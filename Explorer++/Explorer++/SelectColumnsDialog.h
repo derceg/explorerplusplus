@@ -38,7 +38,7 @@ class CSelectColumnsDialog : public CBaseDialog
 public:
 
 	CSelectColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp,
-		CTabContainer *tabContainer, TabInterface *ti);
+		TabContainer *tabContainer, TabInterface *ti);
 	~CSelectColumnsDialog();
 
 protected:
@@ -62,7 +62,7 @@ private:
 	void	OnMoveColumn(bool bUp);
 
 	IExplorerplusplus	*m_pexpp;
-	CTabContainer	*m_tabContainer;
+	TabContainer	*m_tabContainer;
 	TabInterface	*m_ti;
 	BOOL	m_bColumnsSwapped;
 

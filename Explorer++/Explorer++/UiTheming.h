@@ -13,7 +13,7 @@ class UiTheming
 {
 public:
 
-	UiTheming(IExplorerplusplus *expp, CTabContainer *tabContainer);
+	UiTheming(IExplorerplusplus *expp, TabContainer *tabContainer);
 	~UiTheming();
 
 	bool SetListViewColors(COLORREF backgroundColor, COLORREF textColor);
@@ -27,7 +27,7 @@ private:
 	bool ApplyListViewColorsForTab(const Tab &tab, COLORREF backgroundColor, COLORREF textColor);
 
 	IExplorerplusplus *m_expp;
-	CTabContainer *m_tabContainer;
+	TabContainer *m_tabContainer;
 
 	boost::signals2::connection m_tabCreatedConnection;
 

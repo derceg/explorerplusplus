@@ -139,7 +139,7 @@ class CSearchDialog : public CBaseDialog, public IFileContextMenuExternal
 public:
 
 	CSearchDialog(HINSTANCE hInstance, int iResource, HWND hParent, TCHAR *szSearchDirectory,
-		IExplorerplusplus *pexpp, CTabContainer *tabContainer);
+		IExplorerplusplus *pexpp, TabContainer *tabContainer);
 	~CSearchDialog();
 
 	/* IFileContextMenuExternal methods. */
@@ -201,7 +201,7 @@ private:
 	BOOL						m_bSetSearchTimer;
 
 	IExplorerplusplus			*m_pexpp;
-	CTabContainer				*m_tabContainer;
+	TabContainer				*m_tabContainer;
 
 	CSearchDialogPersistentSettings	*m_sdps;
 };

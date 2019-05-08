@@ -57,7 +57,7 @@ namespace Plugins
 }
 
 class CShellBrowser;
-class CTabContainer;
+class TabContainer;
 class TaskbarThumbnails;
 
 class CBookmarkFolder;
@@ -325,7 +325,7 @@ private:
 
 	/* PluginInterface. */
 	TabContainerInterface	*GetTabContainerInterface();
-	CTabContainer			*GetTabContainer();
+	TabContainer			*GetTabContainer();
 	TabInterface			*GetTabInterface();
 	Plugins::PluginMenuManager	*GetPluginMenuManager();
 	UiTheming				*GetUiTheming();
@@ -503,7 +503,7 @@ private:
 	HWND					GetMainWindow() const;
 	HWND					GetActiveListView() const;
 	CShellBrowser			*GetActiveShellBrowser() const;
-	CTabContainer			*GetTabContainer() const;
+	TabContainer			*GetTabContainer() const;
 	HWND					GetTreeView() const;
 
 	/* Helpers. */
@@ -585,7 +585,7 @@ private:
 	AddressBar				*m_addressBar;
 
 	/* Tabs. */
-	CTabContainer			*m_tabContainer;
+	TabContainer			*m_tabContainer;
 
 	/* Tab signals. */
 	TabSelectedSignal		m_tabSelectedSignal;

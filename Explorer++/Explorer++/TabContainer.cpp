@@ -28,14 +28,14 @@ const std::map<UINT, int> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 	{ IDM_TAB_REFRESH, SHELLIMAGES_REFRESH }
 };
 
-CTabContainer *CTabContainer::Create(HWND parent, TabContainerInterface *tabContainer,
+TabContainer *TabContainer::Create(HWND parent, TabContainerInterface *tabContainer,
 	TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance,
 	std::shared_ptr<Config> config)
 {
-	return new CTabContainer(parent, tabContainer, tabInterface, expp, instance, config);
+	return new TabContainer(parent, tabContainer, tabInterface, expp, instance, config);
 }
 
-CTabContainer::CTabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
+TabContainer::TabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
 	IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config) :
 	CBaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_hTabFont(nullptr),
@@ -52,7 +52,7 @@ CTabContainer::CTabContainer(HWND parent, TabContainerInterface *tabContainer, T
 	Initialize(parent);
 }
 
-HWND CTabContainer::CreateTabControl(HWND parent, BOOL forceSameTabWidth)
+HWND TabContainer::CreateTabControl(HWND parent, BOOL forceSameTabWidth)
 {
 	UINT styles = TAB_CONTROL_STYLES;
 
@@ -64,7 +64,7 @@ HWND CTabContainer::CreateTabControl(HWND parent, BOOL forceSameTabWidth)
 	return ::CreateTabControl(parent, styles);
 }
 
-void CTabContainer::Initialize(HWND parent)
+void TabContainer::Initialize(HWND parent)
 {
 	NONCLIENTMETRICS ncm;
 	ncm.cbSize = sizeof(ncm);
@@ -87,17 +87,17 @@ void CTabContainer::Initialize(HWND parent)
 	SetWindowSubclass(m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabCreatedConnection = AddTabCreatedObserver(boost::bind(&CTabContainer::OnTabCreated, this, _1, _2));
-	m_tabRemovedConnection = m_tabContainerInterface->AddTabRemovedObserver(boost::bind(&CTabContainer::OnTabRemoved, this, _1));
+	m_tabCreatedConnection = AddTabCreatedObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2));
+	m_tabRemovedConnection = m_tabContainerInterface->AddTabRemovedObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1));
 
-	m_navigationCompletedConnection = m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&CTabContainer::OnNavigationCompleted, this, _1));
-	m_tabUpdatedConnection = m_tabContainerInterface->AddTabUpdatedObserver(boost::bind(&CTabContainer::OnTabUpdated, this, _1, _2));
+	m_navigationCompletedConnection = m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1));
+	m_tabUpdatedConnection = m_tabContainerInterface->AddTabUpdatedObserver(boost::bind(&TabContainer::OnTabUpdated, this, _1, _2));
 
-	m_alwaysShowTabBarConnection = m_config->alwaysShowTabBar.addObserver(boost::bind(&CTabContainer::OnAlwaysShowTabBarUpdated, this, _1));
-	m_forceSameTabWidthConnection = m_config->forceSameTabWidth.addObserver(boost::bind(&CTabContainer::OnForceSameTabWidthUpdated, this, _1));
+	m_alwaysShowTabBarConnection = m_config->alwaysShowTabBar.addObserver(boost::bind(&TabContainer::OnAlwaysShowTabBarUpdated, this, _1));
+	m_forceSameTabWidthConnection = m_config->forceSameTabWidth.addObserver(boost::bind(&TabContainer::OnForceSameTabWidthUpdated, this, _1));
 }
 
-void CTabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
+void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
 	HIMAGELIST himlTemp = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48);
 
@@ -115,7 +115,7 @@ void CTabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 	ImageList_Destroy(himlTemp);
 }
 
-CTabContainer::~CTabContainer()
+TabContainer::~TabContainer()
 {
 	if (m_hTabFont != nullptr)
 	{
@@ -142,15 +142,15 @@ CTabContainer::~CTabContainer()
 	m_forceSameTabWidthConnection.disconnect();
 }
 
-LRESULT CALLBACK CTabContainer::WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK TabContainer::WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CTabContainer *tabContainer = reinterpret_cast<CTabContainer *>(dwRefData);
+	TabContainer *tabContainer = reinterpret_cast<TabContainer *>(dwRefData);
 	return tabContainer->WndProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK CTabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK TabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -219,7 +219,7 @@ LRESULT CALLBACK CTabContainer::WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void CTabContainer::OnTabCtrlLButtonDown(POINT *pt)
+void TabContainer::OnTabCtrlLButtonDown(POINT *pt)
 {
 	TCHITTESTINFO info;
 	info.pt = *pt;
@@ -240,7 +240,7 @@ void CTabContainer::OnTabCtrlLButtonDown(POINT *pt)
 	}
 }
 
-void CTabContainer::OnTabCtrlLButtonUp(void)
+void TabContainer::OnTabCtrlLButtonUp(void)
 {
 	if (!m_bTabBeenDragged)
 	{
@@ -258,7 +258,7 @@ void CTabContainer::OnTabCtrlLButtonUp(void)
 	}
 }
 
-void CTabContainer::OnTabCtrlMouseMove(POINT *pt)
+void TabContainer::OnTabCtrlMouseMove(POINT *pt)
 {
 	if (!m_bTabBeenDragged)
 	{
@@ -318,7 +318,7 @@ void CTabContainer::OnTabCtrlMouseMove(POINT *pt)
 	}
 }
 
-void CTabContainer::OnLButtonDoubleClick(const POINT &pt)
+void TabContainer::OnLButtonDoubleClick(const POINT &pt)
 {
 	TCHITTESTINFO info;
 	info.pt = pt;
@@ -331,7 +331,7 @@ void CTabContainer::OnLButtonDoubleClick(const POINT &pt)
 	}
 }
 
-void CTabContainer::OnTabCtrlMButtonUp(POINT *pt)
+void TabContainer::OnTabCtrlMButtonUp(POINT *pt)
 {
 	TCHITTESTINFO htInfo;
 	htInfo.pt = *pt;
@@ -346,7 +346,7 @@ void CTabContainer::OnTabCtrlMButtonUp(POINT *pt)
 	}
 }
 
-void CTabContainer::OnTabCtrlRButtonUp(POINT *pt)
+void TabContainer::OnTabCtrlRButtonUp(POINT *pt)
 {
 	TCHITTESTINFO tcHitTest;
 	tcHitTest.pt = *pt;
@@ -370,7 +370,7 @@ void CTabContainer::OnTabCtrlRButtonUp(POINT *pt)
 	CreateTabContextMenu(tab, ptCopy);
 }
 
-void CTabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
+void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 {
 	auto parentMenu = MenuPtr(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_TAB_RCLICK)));
 
@@ -394,7 +394,7 @@ void CTabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 	ProcessTabCommand(Command, tab);
 }
 
-void CTabContainer::AddImagesToTabContextMenu(HMENU menu, std::vector<HBitmapPtr> &menuImages)
+void TabContainer::AddImagesToTabContextMenu(HMENU menu, std::vector<HBitmapPtr> &menuImages)
 {
 	HImageListPtr imageList = GetShellImageList();
 
@@ -409,7 +409,7 @@ void CTabContainer::AddImagesToTabContextMenu(HMENU menu, std::vector<HBitmapPtr
 	}
 }
 
-void CTabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
+void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 {
 	switch (uMenuID)
 	{
@@ -460,7 +460,7 @@ void CTabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 	}
 }
 
-void CTabContainer::OnOpenParentInNewTab(const Tab &tab)
+void TabContainer::OnOpenParentInNewTab(const Tab &tab)
 {
 	LPITEMIDLIST pidlCurrent = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
 
@@ -476,7 +476,7 @@ void CTabContainer::OnOpenParentInNewTab(const Tab &tab)
 	CoTaskMemFree(pidlCurrent);
 }
 
-void CTabContainer::OnRefreshAllTabs()
+void TabContainer::OnRefreshAllTabs()
 {
 	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 	{
@@ -484,24 +484,24 @@ void CTabContainer::OnRefreshAllTabs()
 	}
 }
 
-void CTabContainer::OnRenameTab(const Tab &tab)
+void TabContainer::OnRenameTab(const Tab &tab)
 {
 	CRenameTabDialog RenameTabDialog(m_instance, IDD_RENAMETAB, m_expp->GetMainWindow(),
 		tab.GetId(), m_expp, this, m_tabContainerInterface, m_tabInterface);
 	RenameTabDialog.ShowModalDialog();
 }
 
-void CTabContainer::OnLockTab(Tab &tab)
+void TabContainer::OnLockTab(Tab &tab)
 {
 	tab.SetLocked(!tab.GetLocked());
 }
 
-void CTabContainer::OnLockTabAndAddress(Tab &tab)
+void TabContainer::OnLockTabAndAddress(Tab &tab)
 {
 	tab.SetAddressLocked(!tab.GetAddressLocked());
 }
 
-void CTabContainer::OnCloseOtherTabs(int index)
+void TabContainer::OnCloseOtherTabs(int index)
 {
 	const int nTabs = GetNumTabs();
 
@@ -517,7 +517,7 @@ void CTabContainer::OnCloseOtherTabs(int index)
 	}
 }
 
-void CTabContainer::OnCloseTabsToRight(int index)
+void TabContainer::OnCloseTabsToRight(int index)
 {
 	int nTabs = GetNumTabs();
 
@@ -528,26 +528,26 @@ void CTabContainer::OnCloseTabsToRight(int index)
 	}
 }
 
-boost::signals2::connection CTabContainer::AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer,
+boost::signals2::connection TabContainer::AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer,
 	boost::signals2::connect_position position)
 {
 	return m_tabCreatedSignal.connect(observer, position);
 }
 
-boost::signals2::connection CTabContainer::AddTabMovedObserver(const TabMovedSignal::slot_type &observer)
+boost::signals2::connection TabContainer::AddTabMovedObserver(const TabMovedSignal::slot_type &observer)
 {
 	return m_tabMovedSignal.connect(observer);
 }
 
-LRESULT CALLBACK CTabContainer::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
+LRESULT CALLBACK TabContainer::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CTabContainer *tabContainer = reinterpret_cast<CTabContainer *>(dwRefData);
+	TabContainer *tabContainer = reinterpret_cast<TabContainer *>(dwRefData);
 	return tabContainer->ParentWndProc(hwnd, uMsg, wParam, lParam);
 }
 
-LRESULT CALLBACK CTabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -564,7 +564,7 @@ LRESULT CALLBACK CTabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wPara
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void CTabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
+void TabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 {
 	HWND toolTipControl = TabCtrl_GetToolTips(m_hwnd);
 
@@ -590,7 +590,7 @@ void CTabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 	dispInfo->lpszText = tabToolTip;
 }
 
-int CTabContainer::GetSelection()
+int TabContainer::GetSelection()
 {
 	int Index = TabCtrl_GetCurSel(m_hwnd);
 	assert(Index != -1);
@@ -598,7 +598,7 @@ int CTabContainer::GetSelection()
 	return Index;
 }
 
-void CTabContainer::OnTabCreated(int tabId, BOOL switchToNewTab)
+void TabContainer::OnTabCreated(int tabId, BOOL switchToNewTab)
 {
 	UNREFERENCED_PARAMETER(tabId);
 	UNREFERENCED_PARAMETER(switchToNewTab);
@@ -610,7 +610,7 @@ void CTabContainer::OnTabCreated(int tabId, BOOL switchToNewTab)
 	}
 }
 
-void CTabContainer::OnTabRemoved(int tabId)
+void TabContainer::OnTabRemoved(int tabId)
 {
 	UNREFERENCED_PARAMETER(tabId);
 
@@ -621,7 +621,7 @@ void CTabContainer::OnTabRemoved(int tabId)
 	}
 }
 
-void CTabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
+void TabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
 {
 	if (newValue)
 	{
@@ -640,18 +640,18 @@ void CTabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
 	}
 }
 
-void CTabContainer::OnForceSameTabWidthUpdated(BOOL newValue)
+void TabContainer::OnForceSameTabWidthUpdated(BOOL newValue)
 {
 	AddWindowStyle(m_hwnd, TCS_FIXEDWIDTH, newValue);
 }
 
-void CTabContainer::OnNavigationCompleted(const Tab &tab)
+void TabContainer::OnNavigationCompleted(const Tab &tab)
 {
 	UpdateTabNameInWindow(tab);
 	SetTabIcon(tab);
 }
 
-void CTabContainer::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
+void TabContainer::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 {
 	switch (propertyType)
 	{
@@ -666,7 +666,7 @@ void CTabContainer::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 	}
 }
 
-void CTabContainer::UpdateTabNameInWindow(const Tab &tab)
+void TabContainer::UpdateTabNameInWindow(const Tab &tab)
 {
 	std::wstring name = tab.GetName();
 	boost::replace_all(name, L"&", L"&&");
@@ -678,7 +678,7 @@ void CTabContainer::UpdateTabNameInWindow(const Tab &tab)
 /* Sets a tabs icon. Normally, this icon
 is the folders icon, however if the tab
 is locked, the icon will be a lock. */
-void CTabContainer::SetTabIcon(const Tab &tab)
+void TabContainer::SetTabIcon(const Tab &tab)
 {
 	TCITEM			tcItem;
 	SHFILEINFO		shfi;
@@ -728,7 +728,7 @@ void CTabContainer::SetTabIcon(const Tab &tab)
 	}
 }
 
-HRESULT CTabContainer::CreateNewTab(const TCHAR *TabDirectory,
+HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory,
 	const TabSettings &tabSettings, const FolderSettings *folderSettings,
 	boost::optional<FolderColumns> initialColumns, int *newTabId)
 {
@@ -758,7 +758,7 @@ HRESULT CTabContainer::CreateNewTab(const TCHAR *TabDirectory,
 	return hr;
 }
 
-HRESULT CTabContainer::CreateNewTab(LPCITEMIDLIST pidlDirectory,
+HRESULT TabContainer::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	const TabSettings &tabSettings, const FolderSettings *folderSettings,
 	boost::optional<FolderColumns> initialColumns, int *newTabId)
 {
@@ -875,7 +875,7 @@ HRESULT CTabContainer::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	return S_OK;
 }
 
-FolderSettings CTabContainer::GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const
+FolderSettings TabContainer::GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const
 {
 	FolderSettings folderSettings = m_config->defaultFolderSettings;
 	folderSettings.sortMode = GetDefaultSortMode(pidlDirectory);
@@ -883,7 +883,7 @@ FolderSettings CTabContainer::GetDefaultFolderSettings(LPCITEMIDLIST pidlDirecto
 	return folderSettings;
 }
 
-SortMode CTabContainer::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
+SortMode TabContainer::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
 {
 	const std::vector<Column_t> *pColumns = nullptr;
 
@@ -935,7 +935,7 @@ SortMode CTabContainer::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
 	return sortMode;
 }
 
-void CTabContainer::InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName)
+void TabContainer::InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName)
 {
 	std::wstring name;
 
@@ -960,12 +960,12 @@ void CTabContainer::InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirecto
 	TabCtrl_InsertItem(m_hwnd, index, &tcItem);
 }
 
-Tab &CTabContainer::GetTab(int tabId)
+Tab &TabContainer::GetTab(int tabId)
 {
 	return m_tabs.at(tabId);
 }
 
-Tab *CTabContainer::GetTabOptional(int tabId)
+Tab *TabContainer::GetTabOptional(int tabId)
 {
 	auto itr = m_tabs.find(tabId);
 
@@ -977,7 +977,7 @@ Tab *CTabContainer::GetTabOptional(int tabId)
 	return &itr->second;
 }
 
-Tab &CTabContainer::GetSelectedTab()
+Tab &TabContainer::GetSelectedTab()
 {
 	int index = TabCtrl_GetCurSel(m_hwnd);
 
@@ -989,13 +989,13 @@ Tab &CTabContainer::GetSelectedTab()
 	return GetTabByIndex(index);
 }
 
-bool CTabContainer::IsTabSelected(const Tab &tab)
+bool TabContainer::IsTabSelected(const Tab &tab)
 {
 	const Tab &selectedTab = GetSelectedTab();
 	return tab.GetId() == selectedTab.GetId();
 }
 
-Tab &CTabContainer::GetTabByIndex(int index)
+Tab &TabContainer::GetTabByIndex(int index)
 {
 	TCITEM tcItem;
 	tcItem.mask = TCIF_PARAM;
@@ -1009,7 +1009,7 @@ Tab &CTabContainer::GetTabByIndex(int index)
 	return GetTab(static_cast<int>(tcItem.lParam));
 }
 
-int CTabContainer::GetTabIndex(const Tab &tab) const
+int TabContainer::GetTabIndex(const Tab &tab) const
 {
 	int numTabs = TabCtrl_GetItemCount(m_hwnd);
 
@@ -1029,28 +1029,28 @@ int CTabContainer::GetTabIndex(const Tab &tab) const
 	throw std::runtime_error("Couldn't determine index for tab");
 }
 
-int CTabContainer::GetNumTabs() const
+int TabContainer::GetNumTabs() const
 {
 	return static_cast<int>(m_tabs.size());
 }
 
-int CTabContainer::MoveTab(const Tab &tab, int newIndex)
+int TabContainer::MoveTab(const Tab &tab, int newIndex)
 {
 	int index = GetTabIndex(tab);
 	return TabCtrl_MoveItem(m_hwnd, index, newIndex);
 }
 
-std::unordered_map<int, Tab> &CTabContainer::GetTabs()
+std::unordered_map<int, Tab> &TabContainer::GetTabs()
 {
 	return m_tabs;
 }
 
-const std::unordered_map<int, Tab> &CTabContainer::GetAllTabs() const
+const std::unordered_map<int, Tab> &TabContainer::GetAllTabs() const
 {
 	return m_tabs;
 }
 
-std::vector<std::reference_wrapper<const Tab>> CTabContainer::GetAllTabsInOrder() const
+std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder() const
 {
 	std::vector<std::reference_wrapper<const Tab>> sortedTabs;
 

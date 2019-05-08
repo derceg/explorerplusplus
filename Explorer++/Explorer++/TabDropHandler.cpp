@@ -8,7 +8,7 @@
 #include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
 
-CTabDropHandler::CTabDropHandler(HWND hTabCtrl, CTabContainer *tabContainer,
+CTabDropHandler::CTabDropHandler(HWND hTabCtrl, TabContainer *tabContainer,
 	TabContainerInterface *tabContainerInterface) :
 	m_hTabCtrl(hTabCtrl),
 	m_RefCount(1),

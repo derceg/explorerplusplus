@@ -6,7 +6,7 @@
 #include "TabCreated.h"
 #include "TabsApi.h"
 
-Plugins::TabCreated::TabCreated(CTabContainer *tabContainer) :
+Plugins::TabCreated::TabCreated(TabContainer *tabContainer) :
 	m_tabContainer(tabContainer)
 {
 

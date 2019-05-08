@@ -13,7 +13,7 @@ namespace Plugins
 	{
 	public:
 
-		TabCreated(CTabContainer *tabContainer);
+		TabCreated(TabContainer *tabContainer);
 		virtual ~TabCreated();
 
 	protected:
@@ -24,6 +24,6 @@ namespace Plugins
 
 		void onTabCreated(int tabId, sol::protected_function observer);
 
-		CTabContainer *m_tabContainer;
+		TabContainer *m_tabContainer;
 	};
 }

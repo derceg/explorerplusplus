@@ -17,7 +17,7 @@
 #include "TabUpdated.h"
 #include "UiApi.h"
 
-void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainerInterface, CTabContainer *tabContainer, TabInterface *tabInterface);
+void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainerInterface, TabContainer *tabContainer, TabInterface *tabInterface);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 void BindUiApi(sol::state &state, UiTheming *uiTheming);
 void BindCommandApi(int pluginId, sol::state &state, Plugins::PluginCommandManager *pluginCommandManager);
@@ -36,7 +36,7 @@ void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface
 	BindCommandApi(pluginId, state, pluginInterface->GetPluginCommandManager());
 }
 
-void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainerInterface, CTabContainer *tabContainer, TabInterface *tabInterface)
+void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainerInterface, TabContainer *tabContainer, TabInterface *tabInterface)
 {
 	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(tabContainer, tabContainerInterface, tabInterface);
 

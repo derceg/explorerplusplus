@@ -40,13 +40,13 @@ namespace
 	static const UINT WM_DWMSENDICONICLIVEPREVIEWBITMAP = 0x0326;
 }
 
-TaskbarThumbnails *TaskbarThumbnails::Create(IExplorerplusplus *expp, CTabContainer *tabContainer,
+TaskbarThumbnails *TaskbarThumbnails::Create(IExplorerplusplus *expp, TabContainer *tabContainer,
 	TabContainerInterface *tabContainerInterface, HINSTANCE instance, std::shared_ptr<Config> config)
 {
 	return new TaskbarThumbnails(expp, tabContainer, tabContainerInterface, instance, config);
 }
 
-TaskbarThumbnails::TaskbarThumbnails(IExplorerplusplus *expp, CTabContainer *tabContainer,
+TaskbarThumbnails::TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer,
 	TabContainerInterface *tabContainerInterface, HINSTANCE instance, std::shared_ptr<Config> config) :
 	m_expp(expp),
 	m_tabContainer(tabContainer),

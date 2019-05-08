@@ -1491,7 +1491,7 @@ CShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 	return m_pActiveShellBrowser;
 }
 
-CTabContainer *Explorerplusplus::GetTabContainer() const
+TabContainer *Explorerplusplus::GetTabContainer() const
 {
 	return m_tabContainer;
 }

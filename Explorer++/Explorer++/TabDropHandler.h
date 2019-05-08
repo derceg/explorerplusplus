@@ -14,7 +14,7 @@ class CTabDropHandler : public IDropTarget
 
 public:
 
-	CTabDropHandler(HWND hTabCtrl, CTabContainer *tabContainer, TabContainerInterface *tabContainerInterface);
+	CTabDropHandler(HWND hTabCtrl, TabContainer *tabContainer, TabContainerInterface *tabContainerInterface);
 	~CTabDropHandler();
 
 	/* IUnknown methods. */
@@ -44,7 +44,7 @@ private:
 	HWND				m_hTabCtrl;
 	ULONG				m_RefCount;
 
-	CTabContainer		*m_tabContainer;
+	TabContainer		*m_tabContainer;
 	TabContainerInterface	*m_tabContainerInterface;
 
 	IDragSourceHelper	*m_pDragSourceHelper;

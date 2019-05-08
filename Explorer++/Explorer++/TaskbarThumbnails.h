@@ -16,7 +16,7 @@ class TaskbarThumbnails
 {
 public:
 
-	static TaskbarThumbnails *Create(IExplorerplusplus *expp, CTabContainer *tabContainer,
+	static TaskbarThumbnails *Create(IExplorerplusplus *expp, TabContainer *tabContainer,
 		TabContainerInterface *tabContainerInterface, HINSTANCE instance,
 		std::shared_ptr<Config> config);
 
@@ -38,7 +38,7 @@ private:
 		POINT ptOrigin;
 	};
 
-	TaskbarThumbnails(IExplorerplusplus *expp, CTabContainer *tabContainer, TabContainerInterface *tabContainerInterface,
+	TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer, TabContainerInterface *tabContainerInterface,
 		HINSTANCE instance, std::shared_ptr<Config> config);
 	~TaskbarThumbnails();
 
@@ -63,7 +63,7 @@ private:
 	void UpdateTaskbarThumbnailTtitle(const Tab &tab);
 
 	IExplorerplusplus *m_expp;
-	CTabContainer *m_tabContainer;
+	TabContainer *m_tabContainer;
 	TabContainerInterface *m_tabContainerInterface;
 	HINSTANCE m_instance;
 

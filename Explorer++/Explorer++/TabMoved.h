@@ -13,7 +13,7 @@ namespace Plugins
 	{
 	public:
 
-		TabMoved(CTabContainer *tabContainer);
+		TabMoved(TabContainer *tabContainer);
 		virtual ~TabMoved();
 
 	protected:
@@ -22,6 +22,6 @@ namespace Plugins
 
 	private:
 
-		CTabContainer *m_tabContainer;
+		TabContainer *m_tabContainer;
 	};
 }

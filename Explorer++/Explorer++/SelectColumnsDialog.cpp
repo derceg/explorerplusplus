@@ -18,7 +18,7 @@ const TCHAR CSelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectC
 
 CSelectColumnsDialog::CSelectColumnsDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,IExplorerplusplus *pexpp,
-	CTabContainer *tabContainer, TabInterface *ti) :
+	TabContainer *tabContainer, TabInterface *ti) :
 	CBaseDialog(hInstance,iResource,hParent,true),
 	m_pexpp(pexpp),
 	m_tabContainer(tabContainer),

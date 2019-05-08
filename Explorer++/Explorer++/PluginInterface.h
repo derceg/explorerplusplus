@@ -14,7 +14,7 @@
 __interface PluginInterface
 {
 	TabContainerInterface *GetTabContainerInterface();
-	CTabContainer *GetTabContainer();
+	TabContainer *GetTabContainer();
 	TabInterface *GetTabInterface();
 	Plugins::PluginMenuManager *GetPluginMenuManager();
 	UiTheming *GetUiTheming();

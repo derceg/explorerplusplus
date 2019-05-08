@@ -53,7 +53,7 @@ const TCHAR CSearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Patter
 
 CSearchDialog::CSearchDialog(HINSTANCE hInstance,int iResource,
 	HWND hParent,TCHAR *szSearchDirectory,IExplorerplusplus *pexpp,
-	CTabContainer *tabContainer) :
+	TabContainer *tabContainer) :
 CBaseDialog(hInstance,iResource,hParent,true)
 {
 	StringCchCopy(m_szSearchDirectory,SIZEOF_ARRAY(m_szSearchDirectory),
