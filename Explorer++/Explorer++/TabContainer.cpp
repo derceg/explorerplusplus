@@ -80,7 +80,7 @@ void TabContainer::Initialize(HWND parent)
 	AddDefaultTabIcons(m_hTabCtrlImageList);
 	TabCtrl_SetImageList(m_hwnd, m_hTabCtrlImageList);
 
-	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hwnd, this, m_tabContainerInterface);
+	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hwnd, this);
 	RegisterDragDrop(m_hwnd, pTabDropHandler);
 	pTabDropHandler->Release();
 
@@ -419,7 +419,7 @@ void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 			break;
 
 		case IDM_TAB_DUPLICATETAB:
-			m_tabContainerInterface->DuplicateTab(tab);
+			DuplicateTab(tab);
 			break;
 
 		case IDM_TAB_OPENPARENTINNEWTAB:
@@ -588,14 +588,6 @@ void TabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 	StringCchCopy(tabToolTip, SIZEOF_ARRAY(tabToolTip), path->c_str());
 
 	dispInfo->lpszText = tabToolTip;
-}
-
-int TabContainer::GetSelection()
-{
-	int Index = TabCtrl_GetCurSel(m_hwnd);
-	assert(Index != -1);
-
-	return Index;
 }
 
 void TabContainer::OnTabCreated(int tabId, BOOL switchToNewTab)
@@ -819,7 +811,7 @@ HRESULT TabContainer::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	{
 		if (m_config->openNewTabNextToCurrent)
 		{
-			int currentSelection = TabCtrl_GetCurSel(m_hwnd);
+			int currentSelection = GetSelectedTabIndex();
 
 			if (currentSelection == -1)
 			{
@@ -977,7 +969,60 @@ Tab *TabContainer::GetTabOptional(int tabId)
 	return &itr->second;
 }
 
+void TabContainer::SelectTab(const Tab &tab)
+{
+	int index = GetTabIndex(tab);
+	SelectTabAtIndex(index);
+}
+
+void TabContainer::SelectAdjacentTab(BOOL bNextTab)
+{
+	int nTabs = GetNumTabs();
+	int newIndex = GetSelectedTabIndex();
+
+	if (bNextTab)
+	{
+		/* If this is the last tab in the order,
+		wrap the selection back to the start. */
+		if (newIndex == (nTabs - 1))
+			newIndex = 0;
+		else
+			newIndex++;
+	}
+	else
+	{
+		/* If this is the first tab in the order,
+		wrap the selection back to the end. */
+		if (newIndex == 0)
+			newIndex = nTabs - 1;
+		else
+			newIndex--;
+	}
+
+	SelectTabAtIndex(newIndex);
+}
+
+void TabContainer::SelectTabAtIndex(int index)
+{
+	assert(index >= 0 && index < GetNumTabs());
+
+	int previousIndex = TabCtrl_SetCurSel(m_hwnd, index);
+
+	if (previousIndex == -1)
+	{
+		return;
+	}
+
+	m_tabContainerInterface->OnTabSelectionChanged();
+}
+
 Tab &TabContainer::GetSelectedTab()
+{
+	int index = GetSelectedTabIndex();
+	return GetTabByIndex(index);
+}
+
+int TabContainer::GetSelectedTabIndex() const
 {
 	int index = TabCtrl_GetCurSel(m_hwnd);
 
@@ -986,7 +1031,7 @@ Tab &TabContainer::GetSelectedTab()
 		throw std::runtime_error("No selected tab");
 	}
 
-	return GetTabByIndex(index);
+	return index;
 }
 
 bool TabContainer::IsTabSelected(const Tab &tab)
@@ -1076,4 +1121,12 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 	});
 
 	return sortedTabs;
+}
+
+void TabContainer::DuplicateTab(const Tab &tab)
+{
+	TCHAR szTabDirectory[MAX_PATH];
+	tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
+
+	CreateNewTab(szTabDirectory);
 }

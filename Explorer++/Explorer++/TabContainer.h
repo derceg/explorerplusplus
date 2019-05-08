@@ -35,12 +35,17 @@ public:
 
 	Tab &TabContainer::GetTab(int tabId);
 	Tab *GetTabOptional(int tabId);
+	void SelectTab(const Tab &tab);
+	void SelectAdjacentTab(BOOL bNextTab);
+	void SelectTabAtIndex(int index);
 	Tab &GetSelectedTab();
+	int GetSelectedTabIndex() const;
 	bool IsTabSelected(const Tab &tab);
 	Tab &GetTabByIndex(int index);
 	int GetTabIndex(const Tab &tab) const;
 	int GetNumTabs() const;
 	int MoveTab(const Tab &tab, int newIndex);
+	void DuplicateTab(const Tab &tab);
 
 	// Eventually, this should be removed.
 	std::unordered_map<int, Tab> &GetTabs();
@@ -49,8 +54,6 @@ public:
 	having access to the underlying container. */
 	const std::unordered_map<int, Tab> &GetAllTabs() const;
 	std::vector<std::reference_wrapper<const Tab>> GetAllTabsInOrder() const;
-
-	int GetSelection();
 
 	boost::signals2::connection AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back);

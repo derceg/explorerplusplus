@@ -299,8 +299,6 @@ private:
 	/* Tabs. */
 	void					InitializeTabs();
 	void					OnTabCreated(int tabId, BOOL switchToNewTab);
-	void					SelectAdjacentTab(BOOL bNextTab);
-	void					SelectTabAtIndex(int index);
 	void					OnTabSelectionChanged(bool broadcastEvent = true);
 	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(const Tab &tab);
@@ -309,10 +307,6 @@ private:
 	bool					OnCloseTab(void);
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	HRESULT					RefreshTab(const Tab &tab);
-	int						GetSelectedTabId() const;
-	int						GetSelectedTabIndex() const;
-	void					SelectTab(const Tab &tab);
-	void					DuplicateTab(const Tab &tab);
 	void					OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 
 	/* Tab events. */
@@ -363,7 +357,7 @@ private:
 	void					OnToolbarRClick(HWND sourceWindow);
 
 	/* Settings. */
-	void					SaveAllSettings(void);
+	void					SaveAllSettings();
 	LONG					SaveSettings();
 	LONG					LoadSettings();
 	void					ValidateLoadedSettings();
@@ -564,8 +558,6 @@ private:
 	BOOL					m_bLanguageLoaded;
 	BOOL					m_bTreeViewOpenInNewTab;
 	BOOL					m_bShowTabBar;
-	int						m_selectedTabIndex;
-	int						m_selectedTabId;
 	int						m_iMaxArrangeMenuItem;
 	int						m_iLastSelectedTab;
 	ULONG					m_SHChangeNotifyID;

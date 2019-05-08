@@ -18,10 +18,6 @@ typedef boost::signals2::signal<void(const Tab &tab)> NavigationCompletedSignal;
 // Explorerplusplus class.
 __interface TabContainerInterface
 {
-	int				GetSelectedTabId() const;
-	int				GetSelectedTabIndex() const;
-	void			SelectTab(const Tab &tab);
-	void			DuplicateTab(const Tab &tab);
 	bool			CloseTab(const Tab &tab);
 
 	void			OnTabSelectionChanged(bool broadcastEvent = true);

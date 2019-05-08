@@ -156,7 +156,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(void)
 
 						/* Maintain a global list of folder size operations. */
 						DWFolderSize.uId = m_iDWFolderSizeUniqueId;
-						DWFolderSize.iTabId = m_selectedTabId;
+						DWFolderSize.iTabId = m_tabContainer->GetSelectedTab().GetId();
 						DWFolderSize.bValid = TRUE;
 						m_DWFolderSizes.push_back(DWFolderSize);
 

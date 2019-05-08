@@ -364,7 +364,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			ShowWindow(m_expp->GetMainWindow(),SW_RESTORE);
 		}
 
-		m_tabContainerInterface->SelectTab(m_tabContainer->GetTab(iTabId));
+		m_tabContainer->SelectTab(m_tabContainer->GetTab(iTabId));
 		return 0;
 		break;
 

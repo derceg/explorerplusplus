@@ -49,17 +49,9 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 
 	m_config = std::make_shared<Config>();
 
-	/* When the 'open new tabs next to
-	current' option is activated, the
-	first tab will open at the index
-	m_iTabSelectedItem + 1 - therefore
-	this variable must be initialized. */
-	m_selectedTabIndex				= 0;
-
 	/* Initial state. */
 	m_nSelected						= 0;
 	m_nSelectedOnInvert				= 0;
-	m_selectedTabId					= 0;
 	m_iMaxArrangeMenuItem			= 0;
 	m_bCountingUp					= FALSE;
 	m_bCountingDown					= FALSE;

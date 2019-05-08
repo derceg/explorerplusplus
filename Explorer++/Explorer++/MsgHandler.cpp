@@ -1089,7 +1089,7 @@ void Explorerplusplus::OnDirectoryModified(int iTabId)
 	   the display window)
 	*/
 
-	if(iTabId == m_selectedTabId)
+	if(iTabId == m_tabContainer->GetSelectedTab().GetId())
 	{
 		UpdateStatusBarText();
 		UpdateDisplayWindow();
@@ -1453,9 +1453,9 @@ void Explorerplusplus::OnGroupBy(SortMode sortMode)
 	m_pActiveShellBrowser->SortFolder(sortMode);
 }
 
-void Explorerplusplus::SaveAllSettings(void)
+void Explorerplusplus::SaveAllSettings()
 {
-	m_iLastSelectedTab = m_selectedTabIndex;
+	m_iLastSelectedTab = m_tabContainer->GetSelectedTabIndex();
 
 	ILoadSave *pLoadSave = NULL;
 

@@ -413,7 +413,7 @@ void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 			if(SUCCEEDED(hr))
 			{
 				m_hCutTreeViewItem = hItem;
-				m_iCutTabInternal = m_selectedTabId;
+				m_iCutTabInternal = m_tabContainer->GetSelectedTab().GetId();
 
 				tvItem.mask			= TVIF_HANDLE|TVIF_STATE;
 				tvItem.hItem		= hItem;

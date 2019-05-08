@@ -56,22 +56,6 @@ void Explorerplusplus::OnTabCreated(int tabId, BOOL switchToNewTab)
 	OnNavigationCompleted(tab);
 }
 
-int Explorerplusplus::GetSelectedTabId() const
-{
-	return m_selectedTabId;
-}
-
-int Explorerplusplus::GetSelectedTabIndex() const
-{
-	return m_selectedTabIndex;
-}
-
-void Explorerplusplus::SelectTab(const Tab &tab)
-{
-	int index = m_tabContainer->GetTabIndex(tab);
-	SelectTabAtIndex(index);
-}
-
 /*
 * Creates a new tab. If a folder is selected,
 * that folder is opened in a new tab, else
@@ -214,23 +198,9 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	/* Set the focus back to the tab that had the focus when the program
 	was last closed. */
-	SelectTabAtIndex(m_iLastSelectedTab);
+	m_tabContainer->SelectTabAtIndex(m_iLastSelectedTab);
 
 	return S_OK;
-}
-
-void Explorerplusplus::SelectTabAtIndex(int index)
-{
-	assert(index >= 0 && index < m_tabContainer->GetNumTabs());
-
-	int previousIndex = TabCtrl_SetCurSel(m_tabContainer->GetHWND(), index);
-
-	if (previousIndex == -1)
-	{
-		return;
-	}
-
-	OnTabSelectionChanged();
 }
 
 void Explorerplusplus::OnTabSelectionChanged(bool broadcastEvent)
@@ -242,8 +212,6 @@ void Explorerplusplus::OnTabSelectionChanged(bool broadcastEvent)
 		throw std::runtime_error("No selected tab");
 	}
 
-	m_selectedTabIndex = index;
-
 	if(m_iPreviousTabSelectionId != -1)
 	{
 		m_tabSelectionHistory.push_back(m_iPreviousTabSelectionId);
@@ -254,7 +222,6 @@ void Explorerplusplus::OnTabSelectionChanged(bool broadcastEvent)
 
 	const Tab &tab = m_tabContainer->GetTabByIndex(index);
 
-	m_selectedTabId = tab.GetId();
 	m_hActiveListView = tab.listView;
 	m_pActiveShellBrowser = tab.GetShellBrowser();
 
@@ -277,39 +244,12 @@ void Explorerplusplus::OnTabSelectionChanged(bool broadcastEvent)
 	ShowWindow(m_hActiveListView,SW_SHOW);
 	SetFocus(m_hActiveListView);
 
-	m_iPreviousTabSelectionId = m_selectedTabId;
+	m_iPreviousTabSelectionId = tab.GetId();
 
 	if (broadcastEvent)
 	{
 		m_tabSelectedSignal(tab);
 	}
-}
-
-void Explorerplusplus::SelectAdjacentTab(BOOL bNextTab)
-{
-	int nTabs = m_tabContainer->GetNumTabs();
-	int newIndex = m_selectedTabIndex;
-
-	if(bNextTab)
-	{
-		/* If this is the last tab in the order,
-		wrap the selection back to the start. */
-		if(newIndex == (nTabs - 1))
-			newIndex = 0;
-		else
-			newIndex++;
-	}
-	else
-	{
-		/* If this is the first tab in the order,
-		wrap the selection back to the end. */
-		if(newIndex == 0)
-			newIndex = nTabs - 1;
-		else
-			newIndex--;
-	}
-
-	SelectTabAtIndex(newIndex);
 }
 
 void Explorerplusplus::OnSelectTabByIndex(int iTab)
@@ -329,7 +269,7 @@ void Explorerplusplus::OnSelectTabByIndex(int iTab)
 			newIndex = nTabs - 1;
 	}
 
-	SelectTabAtIndex(newIndex);
+	m_tabContainer->SelectTabAtIndex(newIndex);
 }
 
 bool Explorerplusplus::OnCloseTab(void)
@@ -407,7 +347,7 @@ void Explorerplusplus::RemoveTabFromControl(const Tab &tab)
 			}
 		}
 
-		SelectTabAtIndex(newIndex);
+		m_tabContainer->SelectTabAtIndex(newIndex);
 
 		// This is somewhat hacky. Switching the tab will cause the
 		// previously selected tab (i.e. the tab that's about to be
@@ -423,11 +363,6 @@ void Explorerplusplus::RemoveTabFromControl(const Tab &tab)
 	TabCtrl_DeleteItem(m_tabContainer->GetHWND(),index);
 
 	TabCtrl_RemoveImage(m_tabContainer->GetHWND(),tcItemRemoved.iImage);
-
-	if (m_selectedTabIndex > index)
-	{
-		m_selectedTabIndex--;
-	}
 }
 
 void Explorerplusplus::ShowTabBar()
@@ -491,14 +426,4 @@ void Explorerplusplus::UpdateTabToolbar(void)
 		SendMessage(m_hTabWindowToolbar,TB_SETSTATE,
 		TABTOOLBAR_CLOSE,TBSTATE_INDETERMINATE);
 	}
-}
-
-void Explorerplusplus::DuplicateTab(const Tab &tab)
-{
-	TCHAR szTabDirectory[MAX_PATH];
-
-	tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
-		szTabDirectory);
-
-	m_tabContainer->CreateNewTab(szTabDirectory);
 }

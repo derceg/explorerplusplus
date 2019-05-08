@@ -1203,7 +1203,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 			/* Need to remember which tab started the drag (as
 			it may be different from the tab in which the drag
 			finishes). */
-			iDragStartObjectIndex = m_selectedTabId;
+			iDragStartObjectIndex = m_tabContainer->GetSelectedTab().GetId();
 
 			DWORD dwEffect;
 
@@ -1525,7 +1525,7 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 		if(SUCCEEDED(hr))
 		{
 			m_pClipboardDataObject = pClipboardDataObject;
-			m_iCutTabInternal = m_selectedTabId;
+			m_iCutTabInternal = m_tabContainer->GetSelectedTab().GetId();
 
 			TCHAR szFilename[MAX_PATH];
 

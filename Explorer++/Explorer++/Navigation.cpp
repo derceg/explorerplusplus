@@ -192,7 +192,7 @@ void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
 {
 	TCHAR	szLoadingText[512];
 
-	if (iTabId == m_selectedTabId)
+	if (iTabId == m_tabContainer->GetSelectedTab().GetId())
 	{
 		TCHAR szTemp[64];
 		LoadString(m_hLanguageModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));

@@ -241,7 +241,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 	if (active && *active)
 	{
-		m_tabContainerInterface->SelectTab(*tabInternal);
+		m_tabContainer->SelectTab(*tabInternal);
 	}
 }
 

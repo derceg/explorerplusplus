@@ -172,7 +172,7 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 			{
 				if(itr->uId == pDWFolderSizeCompletion->uId)
 				{
-					if(itr->iTabId == m_selectedTabId)
+					if(itr->iTabId == m_tabContainer->GetSelectedTab().GetId())
 					{
 						bValid = itr->bValid;
 					}
@@ -317,7 +317,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 		{
 			m_pActiveShellBrowser->ImportColumns(currentColumns);
 
-			Tab &tab = m_tabContainer->GetTab(m_selectedTabId);
+			Tab &tab = m_tabContainer->GetSelectedTab();
 			RefreshTab(tab);
 		}
 		else
@@ -1319,11 +1319,11 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 
 		case IDA_NEXTTAB:
-			SelectAdjacentTab(TRUE);
+			m_tabContainer->SelectAdjacentTab(TRUE);
 			break;
 
 		case IDA_PREVIOUSTAB:
-			SelectAdjacentTab(FALSE);
+			m_tabContainer->SelectAdjacentTab(FALSE);
 			break;
 
 		case IDA_ADDRESSBAR:
@@ -1348,7 +1348,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDA_TAB_DUPLICATETAB:
-			DuplicateTab(m_tabContainer->GetSelectedTab());
+			m_tabContainer->DuplicateTab(m_tabContainer->GetSelectedTab());
 			break;
 
 		case IDA_HOME:
