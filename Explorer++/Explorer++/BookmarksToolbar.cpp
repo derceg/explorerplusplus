@@ -8,25 +8,25 @@
 #include "BookmarkMenu.h"
 #include "MainImages.h"
 #include "MainResource.h"
+#include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuWrapper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <algorithm>
 
-
 CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
-	TabContainerInterface *tabContainer, CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar,
+	TabContainerInterface *tabContainerInterface, CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar,
 	UINT uIDStart, UINT uIDEnd) :
-m_hToolbar(hToolbar),
-m_instance(instance),
-m_pexpp(pexpp),
-m_tabContainer(tabContainer),
-m_AllBookmarks(AllBookmarks),
-m_guidBookmarksToolbar(guidBookmarksToolbar),
-m_uIDStart(uIDStart),
-m_uIDEnd(uIDEnd),
-m_uIDCounter(0)
+	m_hToolbar(hToolbar),
+	m_instance(instance),
+	m_pexpp(pexpp),
+	m_tabContainerInterface(tabContainerInterface),
+	m_AllBookmarks(AllBookmarks),
+	m_guidBookmarksToolbar(guidBookmarksToolbar),
+	m_uIDStart(uIDStart),
+	m_uIDEnd(uIDEnd),
+	m_uIDCounter(0)
 {
 	InitializeToolbar();
 
@@ -134,14 +134,14 @@ void CBookmarksToolbar::OpenBookmarkItemInNewTab(const VariantBookmark &variantB
 			if (variantBookmarkChild.type() == typeid(CBookmark))
 			{
 				const CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkChild);
-				m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str());
+				m_pexpp->GetTabContainer()->CreateNewTab(bookmark.GetLocation().c_str());
 			}
 		}
 	}
 	else
 	{
 		const CBookmark &bookmark = boost::get<CBookmark>(variantBookmarkItem);
-		m_tabContainer->CreateNewTab(bookmark.GetLocation().c_str());
+		m_pexpp->GetTabContainer()->CreateNewTab(bookmark.GetLocation().c_str());
 	}
 }
 
@@ -249,7 +249,7 @@ void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, const Varia
 		if (variantBookmark.type() == typeid(CBookmark))
 		{
 			const CBookmark &bookmark = boost::get<CBookmark>(variantBookmark);
-			m_tabContainer->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+			m_tabContainerInterface->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 		}
 	}
 		break;
@@ -332,7 +332,7 @@ bool CBookmarksToolbar::OnButtonClick(int command)
 	else
 	{
 		CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-		m_tabContainer->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+		m_tabContainerInterface->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 	}
 
 	return true;
@@ -378,7 +378,7 @@ void CBookmarksToolbar::ShowBookmarkFolderMenu(const CBookmarkFolder &bookmarkFo
 
 void CBookmarksToolbar::OnBookmarkMenuItemClicked(const CBookmark &bookmark)
 {
-	m_tabContainer->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+	m_tabContainerInterface->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 }
 
 void CBookmarksToolbar::OnNewBookmark()

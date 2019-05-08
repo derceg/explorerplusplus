@@ -666,7 +666,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("CustomName"),customName,SIZEOF_ARRAY(customName));
 			tabSettings.name = customName;
 
-			hr = CreateNewTab(pidlDirectory, tabSettings, &folderSettings, initialColumns);
+			hr = m_tabContainer->CreateNewTab(pidlDirectory, tabSettings, &folderSettings, initialColumns);
 
 			if(hr == S_OK)
 				nTabsCreated++;

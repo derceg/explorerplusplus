@@ -43,8 +43,7 @@ const std::array<ViewMode, 8> Explorerplusplus::m_viewModes = {
 Explorerplusplus::Explorerplusplus(HWND hwnd) :
 m_hContainer(hwnd),
 m_pluginMenuManager(hwnd, MENU_PLUGIN_STARTID, MENU_PLUGIN_ENDID),
-m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_ENDID),
-m_cachedIcons(MAX_CACHED_ICONS)
+m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_ENDID)
 {
 	m_hLanguageModule				= nullptr;
 
@@ -58,7 +57,6 @@ m_cachedIcons(MAX_CACHED_ICONS)
 	m_selectedTabIndex				= 0;
 
 	/* Initial state. */
-	m_tabIdCounter					= 1;
 	m_nSelected						= 0;
 	m_nSelectedOnInvert				= 0;
 	m_selectedTabId					= 0;

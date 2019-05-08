@@ -51,7 +51,7 @@ void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainerInterface
 	tabsMetaTable.set_function("move", &Plugins::TabsApi::move, tabsApi);
 	tabsMetaTable.set_function("close", &Plugins::TabsApi::close, tabsApi);
 
-	std::shared_ptr<Plugins::TabCreated> tabCreated = std::make_shared<Plugins::TabCreated>(tabContainer, tabContainerInterface);
+	std::shared_ptr<Plugins::TabCreated> tabCreated = std::make_shared<Plugins::TabCreated>(tabContainer);
 	BindObserverMethods(state, tabsMetaTable, "onCreated", tabCreated);
 
 	std::shared_ptr<Plugins::TabMoved> tabMoved = std::make_shared<Plugins::TabMoved>(tabContainer);

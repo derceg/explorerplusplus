@@ -19,7 +19,8 @@ class CDrivesToolbar : public CBaseWindow, public IFileContextMenuExternal, publ
 
 public:
 
-	static CDrivesToolbar	*Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer);
+	static CDrivesToolbar	*Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
+		IExplorerplusplus *pexpp, TabContainerInterface *tabContainerInterface);
 
 	/* IFileContextMenuExternal methods. */
 	void	AddMenuEntries(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
@@ -49,7 +50,8 @@ private:
 
 	LRESULT CALLBACK DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	CDrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer);
+	CDrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
+		IExplorerplusplus *pexpp, TabContainerInterface *tabContainerInterface);
 	~CDrivesToolbar();
 
 	static HWND	CreateDrivesToolbar(HWND hParent);
@@ -75,7 +77,7 @@ private:
 	UINT		m_uIDEnd;
 
 	IExplorerplusplus *m_pexpp;
-	TabContainerInterface	*m_tabContainer;
+	TabContainerInterface	*m_tabContainerInterface;
 
 	struct IDCounterHasher
 	{

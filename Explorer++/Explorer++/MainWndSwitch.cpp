@@ -209,15 +209,15 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 
 			if (pcds->lpData != NULL)
 			{
-				CreateNewTab((TCHAR *)pcds->lpData, TabSettings(_selected = true));
+				m_tabContainer->CreateNewTab((TCHAR *)pcds->lpData, TabSettings(_selected = true));
 			}
 			else
 			{
-				HRESULT hr = CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
+				HRESULT hr = m_tabContainer->CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
 
 				if (FAILED(hr))
 				{
-					CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
+					m_tabContainer->CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
 				}
 			}
 

@@ -318,7 +318,7 @@ void Explorerplusplus::OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,
 	if(bOpenInNewWindow)
 		OpenDirectoryInNewWindow(pidlItem);
 	else if(m_config->alwaysOpenNewTab || bOpenInNewTab)
-		CreateNewTab(pidlItem, TabSettings(_selected = true));
+		m_tabContainer->CreateNewTab(pidlItem, TabSettings(_selected = true));
 	else
 		BrowseFolderInCurrentTab(pidlItem,0);
 }

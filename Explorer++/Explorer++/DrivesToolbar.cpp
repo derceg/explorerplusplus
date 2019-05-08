@@ -6,26 +6,28 @@
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 
-
-CDrivesToolbar *CDrivesToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer)
+CDrivesToolbar *CDrivesToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd,
+	HINSTANCE hInstance, IExplorerplusplus *pexpp, TabContainerInterface *tabContainerInterface)
 {
-	return new CDrivesToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp, tabContainer);
+	return new CDrivesToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp, tabContainerInterface);
 }
 
-CDrivesToolbar::CDrivesToolbar(HWND hParent,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp,TabContainerInterface *tabContainer) :
-CBaseWindow(CreateDrivesToolbar(hParent)),
-m_uIDStart(uIDStart),
-m_uIDEnd(uIDEnd),
-m_hInstance(hInstance),
-m_pexpp(pexpp),
-m_tabContainer(tabContainer),
-m_IDCounter(0)
+CDrivesToolbar::CDrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
+	IExplorerplusplus *pexpp, TabContainerInterface *tabContainerInterface) :
+	CBaseWindow(CreateDrivesToolbar(hParent)),
+	m_uIDStart(uIDStart),
+	m_uIDEnd(uIDEnd),
+	m_hInstance(hInstance),
+	m_pexpp(pexpp),
+	m_tabContainerInterface(tabContainerInterface),
+	m_IDCounter(0)
 {
 	Initialize(hParent);
 
@@ -77,7 +79,7 @@ INT_PTR CDrivesToolbar::OnMButtonUp(const POINTS *pts)
 		auto itr = m_mapID.find(static_cast<IDCounter>(static_cast<UINT>(tbButton.dwData)));
 		assert(itr != m_mapID.end());
 
-		m_tabContainer->CreateNewTab(itr->second.c_str(), TabSettings(_selected = true));
+		m_pexpp->GetTabContainer()->CreateNewTab(itr->second.c_str(), TabSettings(_selected = true));
 	}
 
 	return 0;
@@ -165,7 +167,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 			if(iIndex != -1)
 			{
 				std::wstring Path = GetDrivePath(iIndex);
-				m_tabContainer->BrowseFolderInCurrentTab(Path.c_str(),SBSP_ABSOLUTE);
+				m_tabContainerInterface->BrowseFolderInCurrentTab(Path.c_str(),SBSP_ABSOLUTE);
 			}
 
 			return 0;
@@ -413,7 +415,7 @@ void CDrivesToolbar::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 	switch(iCmd)
 	{
 	case MENU_ID_OPEN_IN_NEW_TAB:
-		m_tabContainer->CreateNewTab(pidlParent, TabSettings(_selected = true));
+		m_pexpp->GetTabContainer()->CreateNewTab(pidlParent, TabSettings(_selected = true));
 		break;
 	}
 }

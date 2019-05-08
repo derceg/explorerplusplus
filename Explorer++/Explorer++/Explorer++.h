@@ -8,7 +8,6 @@
 #include "PluginCommandManager.h"
 #include "PluginInterface.h"
 #include "PluginMenuManager.h"
-#include "ShellBrowser/CachedIcons.h"
 #include "ShellBrowser/iShellView.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
@@ -124,10 +123,6 @@ private:
 
 	static const UINT_PTR AUTOSAVE_TIMER_ID = 100000;
 	static const UINT AUTOSAVE_TIMEOUT = 30000;
-
-	// Represents the maximum number of icons that can be cached across
-	// all tabs (as the icon cache is shared between tabs).
-	static const int MAX_CACHED_ICONS = 1000;
 
 	struct ArrangeMenuItem_t
 	{
@@ -303,12 +298,10 @@ private:
 
 	/* Tabs. */
 	void					InitializeTabs();
+	void					OnTabCreated(int tabId, BOOL switchToNewTab);
 	void					SelectAdjacentTab(BOOL bNextTab);
 	void					SelectTabAtIndex(int index);
 	void					OnTabSelectionChanged(bool broadcastEvent = true);
-	HRESULT					CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
-	HRESULT					CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
-	FolderSettings			GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;
 	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(const Tab &tab);
 	void					ShowTabBar();
@@ -323,7 +316,6 @@ private:
 	void					OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 
 	/* Tab events. */
-	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer);
 	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
@@ -534,7 +526,6 @@ private:
 	void					CycleViewState(BOOL bCycleForward);
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	CStatusBar				*GetStatusBar();
-	SortMode				GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const;
 	void					FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
 
 	/* ------ Internal state. ------ */
@@ -594,12 +585,9 @@ private:
 	AddressBar				*m_addressBar;
 
 	/* Tabs. */
-	int						m_tabIdCounter;
 	CTabContainer			*m_tabContainer;
-	CachedIcons				m_cachedIcons;
 
 	/* Tab signals. */
-	TabCreatedSignal		m_tabCreatedSignal;
 	TabSelectedSignal		m_tabSelectedSignal;
 	TabUpdatedSignal		m_tabUpdatedSignal;
 	TabRemovedSignal		m_tabRemovedSignal;

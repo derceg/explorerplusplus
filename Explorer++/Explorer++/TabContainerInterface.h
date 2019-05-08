@@ -8,7 +8,6 @@
 #include <boost/signals2.hpp>
 #include <unordered_map>
 
-typedef boost::signals2::signal<void(int tabId, BOOL switchToNewTab)> TabCreatedSignal;
 typedef boost::signals2::signal<void(const Tab &tab)> TabSelectedSignal;
 typedef boost::signals2::signal<void(const Tab &tab, Tab::PropertyType propertyType)> TabUpdatedSignal;
 typedef boost::signals2::signal<void(int tabId)> TabRemovedSignal;
@@ -25,16 +24,13 @@ __interface TabContainerInterface
 	void			DuplicateTab(const Tab &tab);
 	bool			CloseTab(const Tab &tab);
 
-	HRESULT			CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
-	HRESULT			CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
-	FolderSettings	GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;
+	void			OnTabSelectionChanged(bool broadcastEvent = true);
 
 	HRESULT			BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags);
 	HRESULT			BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags);
 	HRESULT			BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags);
 	HRESULT			BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags);
 
-	boost::signals2::connection	AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);

@@ -445,7 +445,7 @@ void Explorerplusplus::OnListViewMButtonUp(POINT *pt)
 
 							if(SUCCEEDED(hr))
 							{
-								CreateNewTab(szParsingPath);
+								m_tabContainer->CreateNewTab(szParsingPath);
 							}
 						}
 					}

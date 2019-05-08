@@ -5,11 +5,13 @@
 #pragma once
 
 #include "CoreInterface.h"
+#include "ShellBrowser/CachedIcons.h"
 #include "ShellBrowser/iShellView.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "../Helper/BaseWindow.h"
+#include <boost/optional.hpp>
 #include <boost/signals2.hpp>
 #include <functional>
 #include <unordered_map>
@@ -20,13 +22,16 @@ class CTabContainer : public CBaseWindow
 {
 public:
 
+	typedef boost::signals2::signal<void(int tabId, BOOL switchToNewTab)> TabCreatedSignal;
 	typedef boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)> TabMovedSignal;
 
 	static CTabContainer *Create(HWND parent, TabContainerInterface *tabContainer,
 		TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance,
 		std::shared_ptr<Config> config);
 
-	void InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName);
+	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
+	HRESULT CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
+	FolderSettings GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;
 
 	Tab &CTabContainer::GetTab(int tabId);
 	Tab *GetTabOptional(int tabId);
@@ -47,6 +52,8 @@ public:
 
 	int GetSelection();
 
+	boost::signals2::connection AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer,
+		boost::signals2::connect_position position = boost::signals2::at_back);
 	boost::signals2::connection AddTabMovedObserver(const TabMovedSignal::slot_type &observer);
 
 private:
@@ -55,6 +62,10 @@ private:
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	static const int TAB_ICON_LOCK_INDEX = 0;
+
+	// Represents the maximum number of icons that can be cached across
+	// all tabs (as the icon cache is shared between tabs).
+	static const int MAX_CACHED_ICONS = 1000;
 
 	CTabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
 		IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config);
@@ -104,13 +115,20 @@ private:
 	void UpdateTabNameInWindow(const Tab &tab);
 	void SetTabIcon(const Tab &tab);
 
+	SortMode GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const;
+	void InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName);
+
 	HFONT m_hTabFont;
 	HIMAGELIST m_hTabCtrlImageList;
 
 	std::unordered_map<int, Tab> m_tabs;
+	int m_tabIdCounter;
+	CachedIcons m_cachedIcons;
+
 	TabContainerInterface *m_tabContainerInterface;
 	TabInterface *m_tabInterface;
 	IExplorerplusplus *m_expp;
+
 	HINSTANCE m_instance;
 	std::shared_ptr<Config> m_config;
 
@@ -129,5 +147,7 @@ private:
 	int m_draggedTabEndIndex;
 	RECT m_rcDraggedTab;
 
+	// Signals
+	TabCreatedSignal m_tabCreatedSignal;
 	TabMovedSignal m_tabMovedSignal;
 };

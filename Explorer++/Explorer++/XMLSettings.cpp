@@ -785,7 +785,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 				}
 			}
 
-			hr = CreateNewTab(szDirectory, tabSettings, &folderSettings, initialColumns);
+			hr = m_tabContainer->CreateNewTab(szDirectory, tabSettings, &folderSettings, initialColumns);
 
 			if(hr == S_OK)
 				nTabsCreated++;

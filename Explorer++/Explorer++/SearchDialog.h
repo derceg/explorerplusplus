@@ -5,7 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
-#include "TabContainerInterface.h"
+#include "TabContainer.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -138,7 +138,8 @@ class CSearchDialog : public CBaseDialog, public IFileContextMenuExternal
 {
 public:
 
-	CSearchDialog(HINSTANCE hInstance, int iResource, HWND hParent, TCHAR *szSearchDirectory, IExplorerplusplus *pexpp, TabContainerInterface *tabContainer);
+	CSearchDialog(HINSTANCE hInstance, int iResource, HWND hParent, TCHAR *szSearchDirectory,
+		IExplorerplusplus *pexpp, CTabContainer *tabContainer);
 	~CSearchDialog();
 
 	/* IFileContextMenuExternal methods. */
@@ -200,7 +201,7 @@ private:
 	BOOL						m_bSetSearchTimer;
 
 	IExplorerplusplus			*m_pexpp;
-	TabContainerInterface		*m_tabContainer;
+	CTabContainer				*m_tabContainer;
 
 	CSearchDialogPersistentSettings	*m_sdps;
 };

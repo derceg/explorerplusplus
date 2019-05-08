@@ -164,7 +164,7 @@ void Explorerplusplus::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 				}
 
 				GetDisplayName(pidlComplete,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
-				CreateNewTab(szParsingPath, TabSettings(_selected = true));
+				m_tabContainer->CreateNewTab(szParsingPath, TabSettings(_selected = true));
 
 				m_bTreeViewOpenInNewTab = TRUE;
 

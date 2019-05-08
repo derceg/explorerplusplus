@@ -112,7 +112,7 @@ WPARAM wParam,LPARAM lParam)
 				if(tvhi.hItem == m_hTVMButtonItem)
 				{
 					pidl = m_pMyTreeView->BuildPath(tvhi.hItem);
-					CreateNewTab(pidl);
+					m_tabContainer->CreateNewTab(pidl);
 
 					CoTaskMemFree(pidl);
 				}

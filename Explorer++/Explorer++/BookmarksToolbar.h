@@ -54,7 +54,7 @@ class CBookmarksToolbar : public NBookmark::IBookmarkItemNotification
 public:
 
 	CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
-		TabContainerInterface *tabContainer, CBookmarkFolder &AllBookmarks,
+		TabContainerInterface *tabContainerInterface, CBookmarkFolder &AllBookmarks,
 		const GUID &guidBookmarksToolbar, UINT uIDStart, UINT uIDEnd);
 	~CBookmarksToolbar();
 
@@ -112,7 +112,7 @@ private:
 	HINSTANCE						m_instance;
 
 	IExplorerplusplus				*m_pexpp;
-	TabContainerInterface			*m_tabContainer;
+	TabContainerInterface			*m_tabContainerInterface;
 
 	CBookmarkFolder					&m_AllBookmarks;
 	GUID							m_guidBookmarksToolbar;

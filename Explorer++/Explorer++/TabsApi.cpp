@@ -76,7 +76,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 		CoTaskMemFree(pidlDirectory);
 	} BOOST_SCOPE_EXIT_END
 
-	::FolderSettings folderSettings = m_tabContainerInterface->GetDefaultFolderSettings(pidlDirectory);
+	::FolderSettings folderSettings = m_tabContainer->GetDefaultFolderSettings(pidlDirectory);
 
 	boost::optional<sol::table> folderSettingsTable = createProperties[TabConstants::FOLDER_SETTINGS];
 
@@ -86,7 +86,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	}
 
 	int tabId;
-	hr = m_tabContainerInterface->CreateNewTab(pidlDirectory, tabSettings, &folderSettings, boost::none, &tabId);
+	hr = m_tabContainer->CreateNewTab(pidlDirectory, tabSettings, &folderSettings, boost::none, &tabId);
 
 	if (FAILED(hr))
 	{

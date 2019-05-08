@@ -32,12 +32,28 @@ void Explorerplusplus::InitializeTabs()
 	CreateTabBacking();
 
 	m_tabContainer = CTabContainer::Create(m_hTabBacking, this, this, this, m_hLanguageModule, m_config);
+	m_tabContainer->AddTabCreatedObserver(boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
 
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
 	TCHAR szTabCloseTip[64];
 	LoadString(m_hLanguageModule,IDS_TAB_CLOSE_TIP,szTabCloseTip,SIZEOF_ARRAY(szTabCloseTip));
 	m_hTabWindowToolbar	= CreateTabToolbar(m_hTabBacking,TABTOOLBAR_CLOSE,szTabCloseTip);
+}
+
+void Explorerplusplus::OnTabCreated(int tabId, BOOL switchToNewTab)
+{
+	UNREFERENCED_PARAMETER(switchToNewTab);
+
+	Tab &tab = m_tabContainer->GetTab(tabId);
+
+	// There's no need to manually disconnect this. Either it will be
+	// disconnected when the tab is closed and the tab object (and
+	// associated signal) is destroyed or when the tab is destroyed
+	// during application shutdown.
+	tab.AddTabUpdatedObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
+
+	OnNavigationCompleted(tab);
 }
 
 int Explorerplusplus::GetSelectedTabId() const
@@ -82,7 +98,7 @@ void Explorerplusplus::OnNewTab()
 		if(PathIsDirectory(FullItemPath))
 		{
 			bFolderSelected = TRUE;
-			CreateNewTab(FullItemPath, TabSettings(_selected = true));
+			m_tabContainer->CreateNewTab(FullItemPath, TabSettings(_selected = true));
 		}
 	}
 
@@ -90,173 +106,13 @@ void Explorerplusplus::OnNewTab()
 	item was not a folder; open the default tab directory. */
 	if(!bFolderSelected)
 	{
-		hr = CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
+		hr = m_tabContainer->CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
 
 		if (FAILED(hr))
 		{
-			CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
+			m_tabContainer->CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
 		}
 	}
-}
-
-HRESULT Explorerplusplus::CreateNewTab(const TCHAR *TabDirectory,
-	const TabSettings &tabSettings, const FolderSettings *folderSettings,
-	boost::optional<FolderColumns> initialColumns, int *newTabId)
-{
-	LPITEMIDLIST	pidl = NULL;
-	TCHAR			szExpandedPath[MAX_PATH];
-	HRESULT			hr;
-	BOOL			bRet;
-
-	/* Attempt to expand the path (in the event that
-	it contains embedded environment variables). */
-	bRet = MyExpandEnvironmentStrings(TabDirectory,
-		szExpandedPath,SIZEOF_ARRAY(szExpandedPath));
-
-	if(!bRet)
-	{
-		StringCchCopy(szExpandedPath,
-			SIZEOF_ARRAY(szExpandedPath),TabDirectory);
-	}
-
-	if(!SUCCEEDED(GetIdlFromParsingName(szExpandedPath,&pidl)))
-		return E_FAIL;
-
-	hr = CreateNewTab(pidl, tabSettings, folderSettings, initialColumns, newTabId);
-
-	CoTaskMemFree(pidl);
-
-	return hr;
-}
-
-HRESULT Explorerplusplus::CreateNewTab(LPCITEMIDLIST pidlDirectory,
-	const TabSettings &tabSettings, const FolderSettings *folderSettings,
-	boost::optional<FolderColumns> initialColumns, int *newTabId)
-{
-	if (!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
-	{
-		return E_FAIL;
-	}
-
-	int tabId = m_tabIdCounter++;
-	auto item = m_tabContainer->GetTabs().emplace(std::make_pair(tabId, tabId));
-
-	Tab &tab = item.first->second;
-
-	if (tabSettings.locked)
-	{
-		tab.SetLocked(*tabSettings.locked);
-	}
-
-	if (tabSettings.addressLocked)
-	{
-		tab.SetAddressLocked(*tabSettings.addressLocked);
-	}
-
-	if (tabSettings.name && !tabSettings.name->empty())
-	{
-		tab.SetCustomName(*tabSettings.name);
-	}
-
-	tab.listView = CreateMainListView(m_hContainer);
-
-	if (tab.listView == NULL)
-	{
-		return E_FAIL;
-	}
-
-	FolderSettings folderSettingsFinal;
-
-	if (folderSettings)
-	{
-		folderSettingsFinal = *folderSettings;
-	}
-	else
-	{
-		folderSettingsFinal = GetDefaultFolderSettings(pidlDirectory);
-	}
-
-	tab.SetShellBrowser(CShellBrowser::CreateNew(tab.GetId(), m_hLanguageModule,
-		m_hContainer, tab.listView, &m_cachedIcons, m_config, folderSettingsFinal,
-		initialColumns));
-
-	int index;
-
-	if (tabSettings.index)
-	{
-		index = *tabSettings.index;
-	}
-	else
-	{
-		if (m_config->openNewTabNextToCurrent)
-		{
-			index = m_selectedTabIndex + 1;
-		}
-		else
-		{
-			index = TabCtrl_GetItemCount(m_tabContainer->GetHWND());
-		}
-	}
-
-	/* Browse folder sends a message back to the main window, which
-	attempts to contact the new tab (needs to be created before browsing
-	the folder). */
-	m_tabContainer->InsertNewTab(index, tab.GetId(), pidlDirectory, tabSettings.name);
-
-	bool selected = false;
-
-	if (tabSettings.selected)
-	{
-		selected = *tabSettings.selected;
-	}
-
-	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory, SBSP_ABSOLUTE);
-
-	if(hr != S_OK)
-	{
-		/* Folder was not browsed. Likely that the path does not exist
-		(or is locked, cannot be found, etc). */
-		return E_FAIL;
-	}
-
-	if (selected)
-	{
-		int previousIndex = TabCtrl_SetCurSel(m_tabContainer->GetHWND(), index);
-
-		if (previousIndex != -1)
-		{
-			OnTabSelectionChanged(false);
-		}
-	}
-
-	if (newTabId)
-	{
-		*newTabId = tab.GetId();
-	}
-
-	// There's no need to manually disconnect this. Either it will be
-	// disconnected when the tab is closed and the tab object (and
-	// associated signal) is destroyed or when the tab is destroyed
-	// during application shutdown.
-	tab.AddTabUpdatedObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
-	m_tabCreatedSignal(tab.GetId(), selected);
-
-	OnNavigationCompleted(tab);
-
-	return S_OK;
-}
-
-FolderSettings Explorerplusplus::GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const
-{
-	FolderSettings folderSettings = m_config->defaultFolderSettings;
-	folderSettings.sortMode = GetDefaultSortMode(pidlDirectory);
-
-	return folderSettings;
-}
-
-boost::signals2::connection Explorerplusplus::AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer)
-{
-	return m_tabCreatedSignal.connect(observer);
 }
 
 boost::signals2::connection Explorerplusplus::AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer)
@@ -298,7 +154,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 				GetCurrentDirectory(SIZEOF_ARRAY(szDirectory),szDirectory);
 			}
 
-			hr = CreateNewTab(szDirectory, TabSettings(_selected = true));
+			hr = m_tabContainer->CreateNewTab(szDirectory, TabSettings(_selected = true));
 
 			if(hr == S_OK)
 				nTabsCreated++;
@@ -312,10 +168,10 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 
 	if(nTabsCreated == 0)
 	{
-		hr = CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
+		hr = m_tabContainer->CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
 
 		if(FAILED(hr))
-			hr = CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
+			hr = m_tabContainer->CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
 
 		if(hr == S_OK)
 		{
@@ -644,57 +500,5 @@ void Explorerplusplus::DuplicateTab(const Tab &tab)
 	tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory),
 		szTabDirectory);
 
-	CreateNewTab(szTabDirectory);
-}
-
-SortMode Explorerplusplus::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
-{
-	const std::vector<Column_t> *pColumns = nullptr;
-
-	TCHAR szDirectory[MAX_PATH];
-	GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
-
-	const auto &defaultFolderColumns = m_config->globalFolderSettings.folderColumns;
-
-	if(CompareVirtualFolders(szDirectory,CSIDL_CONTROLS))
-	{
-		pColumns = &defaultFolderColumns.controlPanelColumns;
-	}
-	else if(CompareVirtualFolders(szDirectory,CSIDL_DRIVES))
-	{
-		pColumns = &defaultFolderColumns.myComputerColumns;
-	}
-	else if(CompareVirtualFolders(szDirectory,CSIDL_BITBUCKET))
-	{
-		pColumns = &defaultFolderColumns.recycleBinColumns;
-	}
-	else if(CompareVirtualFolders(szDirectory,CSIDL_PRINTERS))
-	{
-		pColumns = &defaultFolderColumns.printersColumns;
-	}
-	else if(CompareVirtualFolders(szDirectory,CSIDL_CONNECTIONS))
-	{
-		pColumns = &defaultFolderColumns.networkConnectionsColumns;
-	}
-	else if(CompareVirtualFolders(szDirectory,CSIDL_NETWORK))
-	{
-		pColumns = &defaultFolderColumns.myNetworkPlacesColumns;
-	}
-	else
-	{
-		pColumns = &defaultFolderColumns.realFolderColumns;
-	}
-
-	SortMode sortMode = SortMode::Name;
-
-	for(const auto &Column : *pColumns)
-	{
-		if(Column.bChecked)
-		{
-			sortMode = CShellBrowser::DetermineColumnSortMode(Column.id);
-			break;
-		}
-	}
-
-	return sortMode;
+	m_tabContainer->CreateNewTab(szTabDirectory);
 }

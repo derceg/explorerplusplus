@@ -40,6 +40,8 @@ CTabContainer::CTabContainer(HWND parent, TabContainerInterface *tabContainer, T
 	CBaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_hTabFont(nullptr),
 	m_hTabCtrlImageList(nullptr),
+	m_tabIdCounter(1),
+	m_cachedIcons(MAX_CACHED_ICONS),
 	m_tabContainerInterface(tabContainer),
 	m_tabInterface(tabInterface),
 	m_expp(expp),
@@ -85,7 +87,7 @@ void CTabContainer::Initialize(HWND parent)
 	SetWindowSubclass(m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabCreatedConnection = m_tabContainerInterface->AddTabCreatedObserver(boost::bind(&CTabContainer::OnTabCreated, this, _1, _2));
+	m_tabCreatedConnection = AddTabCreatedObserver(boost::bind(&CTabContainer::OnTabCreated, this, _1, _2));
 	m_tabRemovedConnection = m_tabContainerInterface->AddTabRemovedObserver(boost::bind(&CTabContainer::OnTabRemoved, this, _1));
 
 	m_navigationCompletedConnection = m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&CTabContainer::OnNavigationCompleted, this, _1));
@@ -467,7 +469,7 @@ void CTabContainer::OnOpenParentInNewTab(const Tab &tab)
 
 	if (SUCCEEDED(hr))
 	{
-		m_tabContainerInterface->CreateNewTab(pidlParent, TabSettings(_selected = true));
+		CreateNewTab(pidlParent, TabSettings(_selected = true));
 		CoTaskMemFree(pidlParent);
 	}
 
@@ -524,6 +526,12 @@ void CTabContainer::OnCloseTabsToRight(int index)
 		const Tab &currentTab = GetTabByIndex(i);
 		m_tabContainerInterface->CloseTab(currentTab);
 	}
+}
+
+boost::signals2::connection CTabContainer::AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer,
+	boost::signals2::connect_position position)
+{
+	return m_tabCreatedSignal.connect(observer, position);
 }
 
 boost::signals2::connection CTabContainer::AddTabMovedObserver(const TabMovedSignal::slot_type &observer)
@@ -718,6 +726,213 @@ void CTabContainer::SetTabIcon(const Tab &tab)
 		/* Remove the old image. */
 		TabCtrl_RemoveImage(m_hwnd, iRemoveImage);
 	}
+}
+
+HRESULT CTabContainer::CreateNewTab(const TCHAR *TabDirectory,
+	const TabSettings &tabSettings, const FolderSettings *folderSettings,
+	boost::optional<FolderColumns> initialColumns, int *newTabId)
+{
+	LPITEMIDLIST	pidl = NULL;
+	TCHAR			szExpandedPath[MAX_PATH];
+	HRESULT			hr;
+	BOOL			bRet;
+
+	/* Attempt to expand the path (in the event that
+	it contains embedded environment variables). */
+	bRet = MyExpandEnvironmentStrings(TabDirectory,
+		szExpandedPath, SIZEOF_ARRAY(szExpandedPath));
+
+	if (!bRet)
+	{
+		StringCchCopy(szExpandedPath,
+			SIZEOF_ARRAY(szExpandedPath), TabDirectory);
+	}
+
+	if (!SUCCEEDED(GetIdlFromParsingName(szExpandedPath, &pidl)))
+		return E_FAIL;
+
+	hr = CreateNewTab(pidl, tabSettings, folderSettings, initialColumns, newTabId);
+
+	CoTaskMemFree(pidl);
+
+	return hr;
+}
+
+HRESULT CTabContainer::CreateNewTab(LPCITEMIDLIST pidlDirectory,
+	const TabSettings &tabSettings, const FolderSettings *folderSettings,
+	boost::optional<FolderColumns> initialColumns, int *newTabId)
+{
+	if (!CheckIdl(pidlDirectory) || !IsIdlDirectory(pidlDirectory))
+	{
+		return E_FAIL;
+	}
+
+	int tabId = m_tabIdCounter++;
+	auto item = m_tabs.emplace(std::make_pair(tabId, tabId));
+
+	Tab &tab = item.first->second;
+
+	if (tabSettings.locked)
+	{
+		tab.SetLocked(*tabSettings.locked);
+	}
+
+	if (tabSettings.addressLocked)
+	{
+		tab.SetAddressLocked(*tabSettings.addressLocked);
+	}
+
+	if (tabSettings.name && !tabSettings.name->empty())
+	{
+		tab.SetCustomName(*tabSettings.name);
+	}
+
+	tab.listView = m_expp->CreateMainListView(m_expp->GetMainWindow());
+
+	if (tab.listView == NULL)
+	{
+		return E_FAIL;
+	}
+
+	FolderSettings folderSettingsFinal;
+
+	if (folderSettings)
+	{
+		folderSettingsFinal = *folderSettings;
+	}
+	else
+	{
+		folderSettingsFinal = GetDefaultFolderSettings(pidlDirectory);
+	}
+
+	tab.SetShellBrowser(CShellBrowser::CreateNew(tab.GetId(), m_instance,
+		m_expp->GetMainWindow(), tab.listView, &m_cachedIcons, m_config,
+		folderSettingsFinal, initialColumns));
+
+	int index;
+
+	if (tabSettings.index)
+	{
+		index = *tabSettings.index;
+	}
+	else
+	{
+		if (m_config->openNewTabNextToCurrent)
+		{
+			int currentSelection = TabCtrl_GetCurSel(m_hwnd);
+
+			if (currentSelection == -1)
+			{
+				throw std::runtime_error("No selected tab");
+			}
+
+			index = currentSelection + 1;
+		}
+		else
+		{
+			index = TabCtrl_GetItemCount(m_hwnd);
+		}
+	}
+
+	/* Browse folder sends a message back to the main window, which
+	attempts to contact the new tab (needs to be created before browsing
+	the folder). */
+	InsertNewTab(index, tab.GetId(), pidlDirectory, tabSettings.name);
+
+	bool selected = false;
+
+	if (tabSettings.selected)
+	{
+		selected = *tabSettings.selected;
+	}
+
+	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory, SBSP_ABSOLUTE);
+
+	if (hr != S_OK)
+	{
+		/* Folder was not browsed. Likely that the path does not exist
+		(or is locked, cannot be found, etc). */
+		return E_FAIL;
+	}
+
+	if (selected)
+	{
+		int previousIndex = TabCtrl_SetCurSel(m_hwnd, index);
+
+		if (previousIndex != -1)
+		{
+			m_tabContainerInterface->OnTabSelectionChanged(false);
+		}
+	}
+
+	if (newTabId)
+	{
+		*newTabId = tab.GetId();
+	}
+
+	m_tabCreatedSignal(tab.GetId(), selected);
+
+	return S_OK;
+}
+
+FolderSettings CTabContainer::GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const
+{
+	FolderSettings folderSettings = m_config->defaultFolderSettings;
+	folderSettings.sortMode = GetDefaultSortMode(pidlDirectory);
+
+	return folderSettings;
+}
+
+SortMode CTabContainer::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
+{
+	const std::vector<Column_t> *pColumns = nullptr;
+
+	TCHAR szDirectory[MAX_PATH];
+	GetDisplayName(pidlDirectory, szDirectory, SIZEOF_ARRAY(szDirectory), SHGDN_FORPARSING);
+
+	const auto &defaultFolderColumns = m_config->globalFolderSettings.folderColumns;
+
+	if (CompareVirtualFolders(szDirectory, CSIDL_CONTROLS))
+	{
+		pColumns = &defaultFolderColumns.controlPanelColumns;
+	}
+	else if (CompareVirtualFolders(szDirectory, CSIDL_DRIVES))
+	{
+		pColumns = &defaultFolderColumns.myComputerColumns;
+	}
+	else if (CompareVirtualFolders(szDirectory, CSIDL_BITBUCKET))
+	{
+		pColumns = &defaultFolderColumns.recycleBinColumns;
+	}
+	else if (CompareVirtualFolders(szDirectory, CSIDL_PRINTERS))
+	{
+		pColumns = &defaultFolderColumns.printersColumns;
+	}
+	else if (CompareVirtualFolders(szDirectory, CSIDL_CONNECTIONS))
+	{
+		pColumns = &defaultFolderColumns.networkConnectionsColumns;
+	}
+	else if (CompareVirtualFolders(szDirectory, CSIDL_NETWORK))
+	{
+		pColumns = &defaultFolderColumns.myNetworkPlacesColumns;
+	}
+	else
+	{
+		pColumns = &defaultFolderColumns.realFolderColumns;
+	}
+
+	SortMode sortMode = SortMode::Name;
+
+	for (const auto &Column : *pColumns)
+	{
+		if (Column.bChecked)
+		{
+			sortMode = CShellBrowser::DetermineColumnSortMode(Column.id);
+			break;
+		}
+	}
+
+	return sortMode;
 }
 
 void CTabContainer::InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName)
