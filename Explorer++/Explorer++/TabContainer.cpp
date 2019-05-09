@@ -87,7 +87,7 @@ void TabContainer::Initialize(HWND parent)
 	SetWindowSubclass(m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabCreatedConnection = AddTabCreatedObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2));
+	m_tabCreatedConnection = tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2));
 	m_tabRemovedConnection = m_tabContainerInterface->AddTabRemovedObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1));
 
 	m_navigationCompletedConnection = m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1));
@@ -252,7 +252,7 @@ void TabContainer::OnTabCtrlLButtonUp(void)
 	if (m_draggedTabEndIndex != m_draggedTabStartIndex)
 	{
 		const Tab &tab = GetTabByIndex(m_draggedTabEndIndex);
-		m_tabMovedSignal(tab, m_draggedTabStartIndex, m_draggedTabEndIndex);
+		tabMovedSignal.m_signal(tab, m_draggedTabStartIndex, m_draggedTabEndIndex);
 	}
 }
 
@@ -526,22 +526,6 @@ void TabContainer::OnCloseTabsToRight(int index)
 	}
 }
 
-boost::signals2::connection TabContainer::AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer,
-	boost::signals2::connect_position position)
-{
-	return m_tabCreatedSignal.connect(observer, position);
-}
-
-boost::signals2::connection TabContainer::AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer)
-{
-	return m_tabUpdatedSignal.connect(observer);
-}
-
-boost::signals2::connection TabContainer::AddTabMovedObserver(const TabMovedSignal::slot_type &observer)
-{
-	return m_tabMovedSignal.connect(observer);
-}
-
 LRESULT CALLBACK TabContainer::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
@@ -660,7 +644,7 @@ void TabContainer::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 		break;
 	}
 
-	m_tabUpdatedSignal(tab, propertyType);
+	tabUpdatedSignal.m_signal(tab, propertyType);
 }
 
 void TabContainer::UpdateTabNameInWindow(const Tab &tab)
@@ -873,7 +857,7 @@ HRESULT TabContainer::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	// during application shutdown.
 	tab.AddTabUpdatedObserver(boost::bind(&TabContainer::OnTabUpdated, this, _1, _2));
 
-	m_tabCreatedSignal(tab.GetId(), selected);
+	tabCreatedSignal.m_signal(tab.GetId(), selected);
 
 	return S_OK;
 }

@@ -7,6 +7,7 @@
 #include "CoreInterface.h"
 #include "ShellBrowser/CachedIcons.h"
 #include "ShellBrowser/iShellView.h"
+#include "SignalWrapper.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
@@ -21,10 +22,6 @@ struct Config;
 class TabContainer : public CBaseWindow
 {
 public:
-
-	typedef boost::signals2::signal<void(int tabId, BOOL switchToNewTab)> TabCreatedSignal;
-	typedef boost::signals2::signal<void(const Tab &tab, Tab::PropertyType propertyType)> TabUpdatedSignal;
-	typedef boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)> TabMovedSignal;
 
 	static TabContainer *Create(HWND parent, TabContainerInterface *tabContainer,
 		TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance,
@@ -56,10 +53,10 @@ public:
 	const std::unordered_map<int, Tab> &GetAllTabs() const;
 	std::vector<std::reference_wrapper<const Tab>> GetAllTabsInOrder() const;
 
-	boost::signals2::connection AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer,
-		boost::signals2::connect_position position = boost::signals2::at_back);
-	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
-	boost::signals2::connection AddTabMovedObserver(const TabMovedSignal::slot_type &observer);
+	// Signals
+	SignalWrapper<TabContainer, void(int tabId, BOOL switchToNewTab)> tabCreatedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)> tabUpdatedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab, int fromIndex, int toIndex)> tabMovedSignal;
 
 private:
 
@@ -150,9 +147,4 @@ private:
 	int m_draggedTabStartIndex;
 	int m_draggedTabEndIndex;
 	RECT m_rcDraggedTab;
-
-	// Signals
-	TabCreatedSignal m_tabCreatedSignal;
-	TabUpdatedSignal m_tabUpdatedSignal;
-	TabMovedSignal m_tabMovedSignal;
 };

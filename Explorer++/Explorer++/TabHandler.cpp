@@ -32,8 +32,8 @@ void Explorerplusplus::InitializeTabs()
 	CreateTabBacking();
 
 	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, this, m_hLanguageModule, m_config);
-	m_tabContainer->AddTabCreatedObserver(boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
-	m_tabContainer->AddTabUpdatedObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
+	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
+	m_tabContainer->tabUpdatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
 
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */

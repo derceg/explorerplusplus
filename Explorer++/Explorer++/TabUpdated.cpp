@@ -19,7 +19,7 @@ Plugins::TabUpdated::~TabUpdated()
 
 boost::signals2::connection Plugins::TabUpdated::connectObserver(sol::protected_function observer, sol::this_state state)
 {
-	return m_tabContainer->AddTabUpdatedObserver([this, observer, state] (const Tab &tab, Tab::PropertyType propertyType) {
+	return m_tabContainer->tabUpdatedSignal.AddObserver([this, observer, state] (const Tab &tab, Tab::PropertyType propertyType) {
 		onTabUpdated(observer, state, tab, propertyType);
 	});
 }

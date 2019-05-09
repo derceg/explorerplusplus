@@ -675,6 +675,9 @@
     <ClInclude Include="Console.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="SignalWrapper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

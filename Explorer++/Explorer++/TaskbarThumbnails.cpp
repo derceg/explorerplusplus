@@ -85,7 +85,7 @@ void TaskbarThumbnails::Initialize()
 	/* Subclass the main window until the above message (TaskbarButtonCreated) is caught. */
 	SetWindowSubclass(m_expp->GetMainWindow(),MainWndProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabContainer->AddTabCreatedObserver(boost::bind(&TaskbarThumbnails::CreateTabProxy, this, _1, _2));
+	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&TaskbarThumbnails::CreateTabProxy, this, _1, _2));
 	m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&TaskbarThumbnails::OnTabSelectionChanged, this, _1));
 	m_tabContainerInterface->AddTabRemovedObserver(boost::bind(&TaskbarThumbnails::RemoveTabProxy, this, _1));
 

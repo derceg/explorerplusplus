@@ -20,7 +20,7 @@ boost::signals2::connection Plugins::TabMoved::connectObserver(sol::protected_fu
 {
 	UNREFERENCED_PARAMETER(state);
 
-	return m_tabContainer->AddTabMovedObserver([observer] (const Tab &tab, int fromIndex, int toIndex) {
+	return m_tabContainer->tabMovedSignal.AddObserver([observer] (const Tab &tab, int fromIndex, int toIndex) {
 		observer(tab.GetId(), fromIndex, toIndex);
 	});
 }

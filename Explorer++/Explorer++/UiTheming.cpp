@@ -10,7 +10,7 @@ UiTheming::UiTheming(IExplorerplusplus *expp, TabContainer *tabContainer) :
 	m_tabContainer(tabContainer),
 	m_customListViewColorsApplied(false)
 {
-	m_tabCreatedConnection = m_tabContainer->AddTabCreatedObserver(boost::bind(&UiTheming::OnTabCreated, this, _1, _2));
+	m_tabCreatedConnection = m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&UiTheming::OnTabCreated, this, _1, _2));
 }
 
 UiTheming::~UiTheming()

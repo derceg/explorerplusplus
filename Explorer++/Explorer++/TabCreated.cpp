@@ -21,7 +21,7 @@ boost::signals2::connection Plugins::TabCreated::connectObserver(sol::protected_
 {
 	UNREFERENCED_PARAMETER(state);
 
-	return m_tabContainer->AddTabCreatedObserver([this, observer](int tabId, BOOL switchToNewTab) {
+	return m_tabContainer->tabCreatedSignal.AddObserver([this, observer](int tabId, BOOL switchToNewTab) {
 		UNREFERENCED_PARAMETER(switchToNewTab);
 
 		onTabCreated(tabId, observer);
