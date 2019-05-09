@@ -6,7 +6,7 @@
 #include "TabUpdated.h"
 #include "TabsApi.h"
 
-Plugins::TabUpdated::TabUpdated(TabContainerInterface *tabContainer) :
+Plugins::TabUpdated::TabUpdated(TabContainer *tabContainer) :
 	m_tabContainer(tabContainer)
 {
 

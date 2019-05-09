@@ -33,6 +33,7 @@ void Explorerplusplus::InitializeTabs()
 
 	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, this, m_hLanguageModule, m_config);
 	m_tabContainer->AddTabCreatedObserver(boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
+	m_tabContainer->AddTabUpdatedObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
 
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
@@ -46,14 +47,24 @@ void Explorerplusplus::OnTabCreated(int tabId, BOOL switchToNewTab)
 	UNREFERENCED_PARAMETER(switchToNewTab);
 
 	Tab &tab = m_tabContainer->GetTab(tabId);
-
-	// There's no need to manually disconnect this. Either it will be
-	// disconnected when the tab is closed and the tab object (and
-	// associated signal) is destroyed or when the tab is destroyed
-	// during application shutdown.
-	tab.AddTabUpdatedObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
-
 	OnNavigationCompleted(tab);
+}
+
+void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
+{
+	switch (propertyType)
+	{
+	case Tab::PropertyType::LOCKED:
+	case Tab::PropertyType::ADDRESS_LOCKED:
+		/* If the tab that was locked/unlocked is the
+		currently selected tab, then the tab close
+		button on the toolbar will need to be updated. */
+		if (m_tabContainer->IsTabSelected(tab))
+		{
+			UpdateTabToolbar();
+		}
+		break;
+	}
 }
 
 /*
@@ -102,11 +113,6 @@ void Explorerplusplus::OnNewTab()
 boost::signals2::connection Explorerplusplus::AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer)
 {
 	return m_tabSelectedSignal.connect(observer);
-}
-
-boost::signals2::connection Explorerplusplus::AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer)
-{
-	return m_tabUpdatedSignal.connect(observer);
 }
 
 boost::signals2::connection Explorerplusplus::AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer)
@@ -387,25 +393,6 @@ HRESULT Explorerplusplus::RefreshTab(const Tab &tab)
 	}
 
 	return hr;
-}
-
-void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
-{
-	switch (propertyType)
-	{
-	case Tab::PropertyType::LOCKED:
-	case Tab::PropertyType::ADDRESS_LOCKED:
-		/* If the tab that was locked/unlocked is the
-		currently selected tab, then the tab close
-		button on the toolbar will need to be updated. */
-		if (m_tabContainer->IsTabSelected(tab))
-		{
-			UpdateTabToolbar();
-		}
-		break;
-	}
-
-	m_tabUpdatedSignal(tab, propertyType);
 }
 
 void Explorerplusplus::UpdateTabToolbar(void)

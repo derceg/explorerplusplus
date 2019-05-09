@@ -23,6 +23,7 @@ class TabContainer : public CBaseWindow
 public:
 
 	typedef boost::signals2::signal<void(int tabId, BOOL switchToNewTab)> TabCreatedSignal;
+	typedef boost::signals2::signal<void(const Tab &tab, Tab::PropertyType propertyType)> TabUpdatedSignal;
 	typedef boost::signals2::signal<void(const Tab &tab, int fromIndex, int toIndex)> TabMovedSignal;
 
 	static TabContainer *Create(HWND parent, TabContainerInterface *tabContainer,
@@ -57,6 +58,7 @@ public:
 
 	boost::signals2::connection AddTabCreatedObserver(const TabCreatedSignal::slot_type &observer,
 		boost::signals2::connect_position position = boost::signals2::at_back);
+	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 	boost::signals2::connection AddTabMovedObserver(const TabMovedSignal::slot_type &observer);
 
 private:
@@ -139,7 +141,6 @@ private:
 	boost::signals2::connection m_tabRemovedConnection;
 
 	boost::signals2::connection m_navigationCompletedConnection;
-	boost::signals2::connection m_tabUpdatedConnection;
 
 	boost::signals2::connection m_alwaysShowTabBarConnection;
 	boost::signals2::connection m_forceSameTabWidthConnection;
@@ -152,5 +153,6 @@ private:
 
 	// Signals
 	TabCreatedSignal m_tabCreatedSignal;
+	TabUpdatedSignal m_tabUpdatedSignal;
 	TabMovedSignal m_tabMovedSignal;
 };

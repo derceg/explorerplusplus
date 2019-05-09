@@ -311,7 +311,6 @@ private:
 
 	/* Tab events. */
 	boost::signals2::connection	AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer);
-	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 
 	void					OnNavigationCompleted(const Tab &tab);
@@ -581,7 +580,6 @@ private:
 
 	/* Tab signals. */
 	TabSelectedSignal		m_tabSelectedSignal;
-	TabUpdatedSignal		m_tabUpdatedSignal;
 	TabRemovedSignal		m_tabRemovedSignal;
 
 	NavigationCompletedSignal	m_navigationCompletedSignal;

@@ -9,7 +9,6 @@
 #include <unordered_map>
 
 typedef boost::signals2::signal<void(const Tab &tab)> TabSelectedSignal;
-typedef boost::signals2::signal<void(const Tab &tab, Tab::PropertyType propertyType)> TabUpdatedSignal;
 typedef boost::signals2::signal<void(int tabId)> TabRemovedSignal;
 
 typedef boost::signals2::signal<void(const Tab &tab)> NavigationCompletedSignal;
@@ -28,7 +27,6 @@ __interface TabContainerInterface
 	HRESULT			BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags);
 
 	boost::signals2::connection	AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer);
-	boost::signals2::connection	AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
 	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 
 	boost::signals2::connection	AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer);

@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Event.h"
-#include "TabContainerInterface.h"
+#include "TabContainer.h"
 
 namespace Plugins
 {
@@ -13,7 +13,7 @@ namespace Plugins
 	{
 	public:
 
-		TabUpdated(TabContainerInterface *tabContainer);
+		TabUpdated(TabContainer *tabContainer);
 		virtual ~TabUpdated();
 
 	protected:
@@ -24,6 +24,6 @@ namespace Plugins
 
 		void onTabUpdated(sol::protected_function observer, sol::this_state state, const Tab &tab, Tab::PropertyType propertyType);
 
-		TabContainerInterface *m_tabContainer;
+		TabContainer *m_tabContainer;
 	};
 }
