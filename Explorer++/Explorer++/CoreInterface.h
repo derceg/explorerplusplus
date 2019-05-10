@@ -17,6 +17,7 @@ enum MousewheelSource_t
 };
 
 class CShellBrowser;
+__interface IDirectoryMonitor;
 class TabContainer;
 
 /* Basic interface between Explorerplusplus
@@ -32,6 +33,7 @@ __interface IExplorerplusplus
 	CShellBrowser	*GetActiveShellBrowser() const;
 
 	TabContainer	*GetTabContainer() const;
+	IDirectoryMonitor	*GetDirectoryMonitor() const;
 
 	HWND			GetTreeView() const;
 

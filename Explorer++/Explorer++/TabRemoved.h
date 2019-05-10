@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Event.h"
-#include "TabContainerInterface.h"
+#include "TabContainer.h"
 
 namespace Plugins
 {
@@ -13,7 +13,7 @@ namespace Plugins
 	{
 	public:
 
-		TabRemoved(TabContainerInterface *tabContainer);
+		TabRemoved(TabContainer *tabContainer);
 		virtual ~TabRemoved();
 
 	protected:
@@ -22,6 +22,6 @@ namespace Plugins
 
 	private:
 
-		TabContainerInterface *m_tabContainer;
+		TabContainer *m_tabContainer;
 	};
 }

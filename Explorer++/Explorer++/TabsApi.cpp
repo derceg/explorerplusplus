@@ -283,5 +283,5 @@ bool Plugins::TabsApi::close(int tabId)
 		return false;
 	}
 
-	return m_tabContainerInterface->CloseTab(*tabInternal);
+	return m_tabContainer->CloseTab(*tabInternal);
 }

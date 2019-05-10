@@ -15,17 +15,16 @@ const TCHAR CRenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab")
 
 CRenameTabDialog::CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hParent,
 	int tabId, IExplorerplusplus *pexpp, TabContainer *tabContainer,
-	TabContainerInterface *tabContainerInterface,TabInterface *ti) :
+	TabInterface *ti) :
 	CBaseDialog(hInstance,iResource,hParent,false),
 	m_tabId(tabId),
 	m_pexpp(pexpp),
 	m_tabContainer(tabContainer),
-	m_tabContainerInterface(tabContainerInterface),
 	m_ti(ti)
 {
 	m_prtdps = &CRenameTabDialogPersistentSettings::GetInstance();
 
-	m_tabRemovedConnection = m_tabContainerInterface->AddTabRemovedObserver(boost::bind(&CRenameTabDialog::OnTabClosed, this, _1));
+	m_tabRemovedConnection = m_tabContainer->tabRemovedSignal.AddObserver(boost::bind(&CRenameTabDialog::OnTabClosed, this, _1));
 }
 
 CRenameTabDialog::~CRenameTabDialog()

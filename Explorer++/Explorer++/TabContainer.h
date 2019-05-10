@@ -44,6 +44,7 @@ public:
 	int GetNumTabs() const;
 	int MoveTab(const Tab &tab, int newIndex);
 	void DuplicateTab(const Tab &tab);
+	bool CloseTab(const Tab &tab);
 
 	// Eventually, this should be removed.
 	std::unordered_map<int, Tab> &GetTabs();
@@ -57,6 +58,7 @@ public:
 	SignalWrapper<TabContainer, void(int tabId, BOOL switchToNewTab)> tabCreatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)> tabUpdatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, int fromIndex, int toIndex)> tabMovedSignal;
+	SignalWrapper<TabContainer, void(int tabId)> tabRemovedSignal;
 
 private:
 

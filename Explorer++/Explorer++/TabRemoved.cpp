@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "TabRemoved.h"
 
-Plugins::TabRemoved::TabRemoved(TabContainerInterface *tabContainer) :
+Plugins::TabRemoved::TabRemoved(TabContainer *tabContainer) :
 	m_tabContainer(tabContainer)
 {
 
@@ -20,5 +20,5 @@ boost::signals2::connection Plugins::TabRemoved::connectObserver(sol::protected_
 {
 	UNREFERENCED_PARAMETER(state);
 
-	return m_tabContainer->AddTabRemovedObserver(observer);
+	return m_tabContainer->tabRemovedSignal.AddObserver(observer);
 }

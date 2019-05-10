@@ -60,7 +60,7 @@ void BindTabsAPI(sol::state &state, TabContainerInterface *tabContainerInterface
 	std::shared_ptr<Plugins::TabUpdated> tabUpdated = std::make_shared<Plugins::TabUpdated>(tabContainer);
 	BindObserverMethods(state, tabsMetaTable, "onUpdated", tabUpdated);
 
-	std::shared_ptr<Plugins::TabRemoved> tabRemoved = std::make_shared<Plugins::TabRemoved>(tabContainerInterface);
+	std::shared_ptr<Plugins::TabRemoved> tabRemoved = std::make_shared<Plugins::TabRemoved>(tabContainer);
 	BindObserverMethods(state, tabsMetaTable, "onRemoved", tabRemoved);
 
 	tabsMetaTable.new_usertype<Plugins::TabsApi::FolderSettings>("FolderSettings",

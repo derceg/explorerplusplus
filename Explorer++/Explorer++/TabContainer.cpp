@@ -12,6 +12,7 @@
 #include "ResourceHelper.h"
 #include "TabDropHandler.h"
 #include "../Helper/Controls.h"
+#include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/MenuWrapper.h"
 #include "../Helper/ShellHelper.h"
@@ -88,7 +89,7 @@ void TabContainer::Initialize(HWND parent)
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	m_tabCreatedConnection = tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2));
-	m_tabRemovedConnection = m_tabContainerInterface->AddTabRemovedObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1));
+	m_tabRemovedConnection = tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1));
 
 	m_navigationCompletedConnection = m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1));
 
@@ -325,7 +326,7 @@ void TabContainer::OnLButtonDoubleClick(const POINT &pt)
 	if (info.flags != TCHT_NOWHERE && m_config->doubleClickTabClose)
 	{
 		const Tab &tab = GetTabByIndex(index);
-		m_tabContainerInterface->CloseTab(tab);
+		CloseTab(tab);
 	}
 }
 
@@ -340,7 +341,7 @@ void TabContainer::OnTabCtrlMButtonUp(POINT *pt)
 	if (iTabHit != -1)
 	{
 		const Tab &tab = GetTabByIndex(iTabHit);
-		m_tabContainerInterface->CloseTab(tab);
+		CloseTab(tab);
 	}
 }
 
@@ -445,7 +446,7 @@ void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 			break;
 
 		case IDM_TAB_CLOSETAB:
-			m_tabContainerInterface->CloseTab(tab);
+			CloseTab(tab);
 			break;
 
 		case IDM_TAB_CLOSEOTHERTABS:
@@ -485,7 +486,7 @@ void TabContainer::OnRefreshAllTabs()
 void TabContainer::OnRenameTab(const Tab &tab)
 {
 	CRenameTabDialog RenameTabDialog(m_instance, IDD_RENAMETAB, m_expp->GetMainWindow(),
-		tab.GetId(), m_expp, this, m_tabContainerInterface, m_tabInterface);
+		tab.GetId(), m_expp, this, m_tabInterface);
 	RenameTabDialog.ShowModalDialog();
 }
 
@@ -510,7 +511,7 @@ void TabContainer::OnCloseOtherTabs(int index)
 		if (i != index)
 		{
 			const Tab &tab = GetTabByIndex(i);
-			m_tabContainerInterface->CloseTab(tab);
+			CloseTab(tab);
 		}
 	}
 }
@@ -522,7 +523,7 @@ void TabContainer::OnCloseTabsToRight(int index)
 	for (int i = nTabs - 1; i > index; i--)
 	{
 		const Tab &currentTab = GetTabByIndex(i);
-		m_tabContainerInterface->CloseTab(currentTab);
+		CloseTab(currentTab);
 	}
 }
 
@@ -945,6 +946,43 @@ void TabContainer::InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirector
 	tcItem.pszText = name.data();
 	tcItem.lParam = tabId;
 	TabCtrl_InsertItem(m_hwnd, index, &tcItem);
+}
+
+bool TabContainer::CloseTab(const Tab &tab)
+{
+	const int nTabs = GetNumTabs();
+
+	if (nTabs == 1 &&
+		m_config->closeMainWindowOnTabClose)
+	{
+		OnClose();
+		return true;
+	}
+
+	/* The tab is locked. Don't close it. */
+	if (tab.GetLocked() || tab.GetAddressLocked())
+	{
+		return false;
+	}
+
+	m_tabContainerInterface->RemoveTabFromControl(tab);
+
+	m_expp->GetDirectoryMonitor()->StopDirectoryMonitor(tab.GetShellBrowser()->GetDirMonitorId());
+
+	tab.GetShellBrowser()->Release();
+
+	DestroyWindow(tab.listView);
+
+	// This is needed, as the erase() call below will remove the element
+	// from the tabs container (which will invalidate the reference
+	// passed to the function).
+	int tabId = tab.GetId();
+
+	m_tabs.erase(tab.GetId());
+
+	tabRemovedSignal.m_signal(tabId);
+
+	return true;
 }
 
 Tab &TabContainer::GetTab(int tabId)

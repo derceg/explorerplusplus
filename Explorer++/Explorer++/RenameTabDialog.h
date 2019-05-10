@@ -6,7 +6,6 @@
 
 #include "CoreInterface.h"
 #include "TabContainer.h"
-#include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -39,7 +38,7 @@ public:
 
 	CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hParent,
 		int tabId, IExplorerplusplus *pexpp, TabContainer *tabContainer,
-		TabContainerInterface *tabContainerInterface, TabInterface *ti);
+		TabInterface *ti);
 	~CRenameTabDialog();
 
 protected:
@@ -63,7 +62,6 @@ private:
 
 	IExplorerplusplus	*m_pexpp;
 	TabContainer	*m_tabContainer;
-	TabContainerInterface	*m_tabContainerInterface;
 	TabInterface	*m_ti;
 	int		m_tabId;
 	TCHAR	m_szTabName[256];

@@ -300,18 +300,16 @@ private:
 	void					InitializeTabs();
 	void					OnTabCreated(int tabId, BOOL switchToNewTab);
 	void					OnTabSelectionChanged(bool broadcastEvent = true);
-	bool					CloseTab(const Tab &tab);
 	void					RemoveTabFromControl(const Tab &tab);
 	void					ShowTabBar();
 	void					HideTabBar();
-	bool					OnCloseTab(void);
+	bool					OnCloseTab();
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	HRESULT					RefreshTab(const Tab &tab);
 	void					OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 
 	/* Tab events. */
 	boost::signals2::connection	AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer);
-	boost::signals2::connection	AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer);
 
 	void					OnNavigationCompleted(const Tab &tab);
 	boost::signals2::connection	AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer);
@@ -498,6 +496,7 @@ private:
 	CShellBrowser			*GetActiveShellBrowser() const;
 	TabContainer			*GetTabContainer() const;
 	HWND					GetTreeView() const;
+	IDirectoryMonitor		*GetDirectoryMonitor() const;
 
 	/* Helpers. */
 	HANDLE					CreateWorkerThread();
@@ -580,7 +579,6 @@ private:
 
 	/* Tab signals. */
 	TabSelectedSignal		m_tabSelectedSignal;
-	TabRemovedSignal		m_tabRemovedSignal;
 
 	NavigationCompletedSignal	m_navigationCompletedSignal;
 

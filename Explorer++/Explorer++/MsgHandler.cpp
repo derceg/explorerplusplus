@@ -1501,6 +1501,11 @@ HWND Explorerplusplus::GetTreeView() const
 	return m_hTreeView;
 }
 
+IDirectoryMonitor *Explorerplusplus::GetDirectoryMonitor() const
+{
+	return m_pDirMon;
+}
+
 void Explorerplusplus::OnShowHiddenFiles(void)
 {
 	m_pActiveShellBrowser->SetShowHidden(!m_pActiveShellBrowser->GetShowHidden());

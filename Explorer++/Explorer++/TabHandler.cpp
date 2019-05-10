@@ -115,11 +115,6 @@ boost::signals2::connection Explorerplusplus::AddTabSelectedObserver(const TabSe
 	return m_tabSelectedSignal.connect(observer);
 }
 
-boost::signals2::connection Explorerplusplus::AddTabRemovedObserver(const TabRemovedSignal::slot_type &observer)
-{
-	return m_tabRemovedSignal.connect(observer);
-}
-
 HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 {
 	TCHAR							szDirectory[MAX_PATH];
@@ -278,47 +273,10 @@ void Explorerplusplus::OnSelectTabByIndex(int iTab)
 	m_tabContainer->SelectTabAtIndex(newIndex);
 }
 
-bool Explorerplusplus::OnCloseTab(void)
+bool Explorerplusplus::OnCloseTab()
 {
 	const Tab &tab = m_tabContainer->GetSelectedTab();
-	return CloseTab(tab);
-}
-
-bool Explorerplusplus::CloseTab(const Tab &tab)
-{
-	const int nTabs = m_tabContainer->GetNumTabs();
-
-	if(nTabs == 1 &&
-		m_config->closeMainWindowOnTabClose)
-	{
-		OnClose();
-		return true;
-	}
-
-	/* The tab is locked. Don't close it. */
-	if(tab.GetLocked() || tab.GetAddressLocked())
-	{
-		return false;
-	}
-
-	RemoveTabFromControl(tab);
-
-	m_pDirMon->StopDirectoryMonitor(tab.GetShellBrowser()->GetDirMonitorId());
-
-	tab.GetShellBrowser()->Release();
-
-	DestroyWindow(tab.listView);
-
-	// This is needed, as the erase() call below will remove the element
-	// from the tabs container (which will invalidate the reference
-	// passed to the function).
-	int tabId = tab.GetId();
-
-	m_tabContainer->GetTabs().erase(tab.GetId());
-
-	m_tabRemovedSignal(tabId);
-
-	return true;
+	return m_tabContainer->CloseTab(tab);
 }
 
 void Explorerplusplus::RemoveTabFromControl(const Tab &tab)

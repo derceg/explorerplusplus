@@ -87,7 +87,7 @@ void TaskbarThumbnails::Initialize()
 
 	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&TaskbarThumbnails::CreateTabProxy, this, _1, _2));
 	m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&TaskbarThumbnails::OnTabSelectionChanged, this, _1));
-	m_tabContainerInterface->AddTabRemovedObserver(boost::bind(&TaskbarThumbnails::RemoveTabProxy, this, _1));
+	m_tabContainer->tabRemovedSignal.AddObserver(boost::bind(&TaskbarThumbnails::RemoveTabProxy, this, _1));
 
 	m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&TaskbarThumbnails::OnNavigationCompleted, this, _1));
 }
@@ -557,7 +557,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			else
 			{
 				const Tab &tab = m_tabContainer->GetTab(iTabId);
-				m_tabContainerInterface->CloseTab(tab);
+				m_tabContainer->CloseTab(tab);
 			}
 		}
 		break;
