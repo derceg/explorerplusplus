@@ -529,6 +529,7 @@
     <ClInclude Include="SplitFileDialog.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Tab.h" />
+    <ClInclude Include="TabBacking.h" />
     <ClInclude Include="TabContainer.h" />
     <ClInclude Include="TabContainerInterface.h" />
     <ClInclude Include="TabCreated.h" />

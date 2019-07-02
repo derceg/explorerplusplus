@@ -35,12 +35,6 @@ void Explorerplusplus::InitializeTabs()
 	m_tabContainer->tabUpdatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
 
 	m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
-
-	/* Create the toolbar that will appear on the tab control.
-	Only contains the close button used to close tabs. */
-	TCHAR szTabCloseTip[64];
-	LoadString(m_hLanguageModule,IDS_TAB_CLOSE_TIP,szTabCloseTip,SIZEOF_ARRAY(szTabCloseTip));
-	m_hTabWindowToolbar	= CreateTabToolbar(m_hTabBacking,TABTOOLBAR_CLOSE,szTabCloseTip);
 }
 
 void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
@@ -325,24 +319,4 @@ HRESULT Explorerplusplus::RefreshTab(const Tab &tab)
 	}
 
 	return hr;
-}
-
-void Explorerplusplus::UpdateTabToolbar(void)
-{
-	const int nTabs = m_tabContainer->GetNumTabs();
-
-	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
-
-	if(nTabs > 1 && !(selectedTab.GetLocked() || selectedTab.GetAddressLocked()))
-	{
-		/* Enable the tab close button. */
-		SendMessage(m_hTabWindowToolbar,TB_SETSTATE,
-		TABTOOLBAR_CLOSE,TBSTATE_ENABLED);
-	}
-	else
-	{
-		/* Disable the tab close toolbar button. */
-		SendMessage(m_hTabWindowToolbar,TB_SETSTATE,
-		TABTOOLBAR_CLOSE,TBSTATE_INDETERMINATE);
-	}
 }

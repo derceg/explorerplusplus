@@ -22,9 +22,6 @@
 #include <boost/signals2.hpp>
 #include <unordered_map>
 
-#define TOOLBAR_START				5000
-#define TABTOOLBAR_CLOSE			(TOOLBAR_START + 33)
-
 /* Sent when a folder size calculation has finished. */
 #define WM_APP_FOLDERSIZECOMPLETED	WM_APP + 3
 
@@ -85,7 +82,6 @@ public:
 	LRESULT CALLBACK	ListViewSubclassProc(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
 
 	LRESULT CALLBACK	RebarSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
-	LRESULT CALLBACK	TabBackingProc(HWND hTabCtrl,UINT msg,WPARAM wParam,LPARAM lParam);
 
 	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
@@ -187,7 +183,7 @@ private:
 	void					HandleDirectoryMonitoring(int iTabId);
 	void					OnDisplayWindowResized(WPARAM wParam);
 	void					OnStartedBrowsing(int iTabId, const TCHAR *szPath);
-	void					UpdateTabToolbar(void);
+	void					UpdateTabToolbar();
 	void					OnAutoSizeColumns(void);
 	void					OnToolbarViews(void);
 	void					OnSortByAscending(BOOL bSortAscending);
@@ -328,7 +324,7 @@ private:
 	void					CreateDrivesToolbar(void);
 	void					CreateApplicationToolbar();
 	HWND					CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip);
-	void					CreateTabBacking(void);
+	void					CreateTabBacking();
 
 	/* Main toolbars. */
 	void					InitializeMainToolbars(void);

@@ -11,6 +11,7 @@
 #include "Navigation.h"
 #include "RenameTabDialog.h"
 #include "ResourceHelper.h"
+#include "TabBacking.h"
 #include "TabDropHandler.h"
 #include "../Helper/Controls.h"
 #include "../Helper/iDirectoryMonitor.h"
@@ -546,11 +547,35 @@ LRESULT CALLBACK TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
 {
 	switch (uMsg)
 	{
+	case WM_LBUTTONDBLCLK:
+	{
+		HRESULT hr = CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
+
+		if (FAILED(hr))
+		{
+			CreateNewTab(m_config->defaultTabDirectoryStatic.c_str(), TabSettings(_selected = true));
+		}
+	}
+	break;
+
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case TABTOOLBAR_CLOSE:
+			CloseTab(GetSelectedTab());
+			break;
+		}
+		break;
+
 	case WM_NOTIFY:
 		switch (reinterpret_cast<LPNMHDR>(lParam)->code)
 		{
 		case TTN_GETDISPINFO:
 			OnGetDispInfo(reinterpret_cast<NMTTDISPINFO *>(lParam));
+			break;
+
+		case TCN_SELCHANGE:
+			m_tabContainerInterface->OnTabSelectionChanged();
 			break;
 		}
 		break;

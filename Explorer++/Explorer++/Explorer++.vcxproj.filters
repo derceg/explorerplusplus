@@ -681,6 +681,9 @@
     <ClInclude Include="Navigation.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="TabBacking.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

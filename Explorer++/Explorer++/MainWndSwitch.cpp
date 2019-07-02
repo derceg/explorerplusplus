@@ -18,6 +18,7 @@
 #include "Navigation.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
+#include "TabBacking.h"
 #include "ToolbarButtons.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/Controls.h"
