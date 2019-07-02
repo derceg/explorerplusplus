@@ -287,7 +287,6 @@ private:
 	/* Tabs. */
 	void					InitializeTabs();
 	void					OnTabSelectionChanged(bool broadcastEvent = true);
-	void					RemoveTabFromControl(const Tab &tab);
 	void					ShowTabBar();
 	void					HideTabBar();
 	bool					OnCloseTab();
@@ -628,10 +627,6 @@ private:
 
 	/* Rename support. */
 	BOOL					m_bListViewRenaming;
-
-	/* Tab handler data. */
-	std::vector<int>		m_tabSelectionHistory;
-	int						m_iPreviousTabSelectionId;
 	
 	/* Cut items data. */
 	std::list<std::wstring>	m_CutFileNameList;

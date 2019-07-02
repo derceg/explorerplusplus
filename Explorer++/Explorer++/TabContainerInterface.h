@@ -14,8 +14,6 @@ typedef boost::signals2::signal<void(const Tab &tab)> TabSelectedSignal;
 // Explorerplusplus class.
 __interface TabContainerInterface
 {
-	void			RemoveTabFromControl(const Tab &tab);
-
 	void			OnTabSelectionChanged(bool broadcastEvent = true);
 
 	boost::signals2::connection	AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer);

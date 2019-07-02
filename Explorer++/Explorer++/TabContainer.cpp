@@ -50,7 +50,8 @@ TabContainer::TabContainer(HWND parent, TabContainerInterface *tabContainer, Tab
 	m_expp(expp),
 	m_instance(instance),
 	m_config(config),
-	m_bTabBeenDragged(FALSE)
+	m_bTabBeenDragged(FALSE),
+	m_iPreviousTabSelectionId(-1)
 {
 	Initialize(parent);
 }
@@ -92,6 +93,8 @@ void TabContainer::Initialize(HWND parent)
 
 	m_tabCreatedConnection = tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2));
 	m_tabRemovedConnection = tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1));
+
+	m_tabSelectedConnection = m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&TabContainer::OnTabSelected, this, _1));
 
 	m_navigationCompletedConnection = m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1));
 
@@ -136,6 +139,8 @@ TabContainer::~TabContainer()
 
 	m_tabCreatedConnection.disconnect();
 	m_tabRemovedConnection.disconnect();
+
+	m_tabSelectedConnection.disconnect();
 
 	m_navigationCompletedConnection.disconnect();
 
@@ -603,6 +608,16 @@ void TabContainer::OnTabRemoved(int tabId)
 	}
 }
 
+void TabContainer::OnTabSelected(const Tab &tab)
+{
+	if (m_iPreviousTabSelectionId != -1)
+	{
+		m_tabSelectionHistory.push_back(m_iPreviousTabSelectionId);
+	}
+
+	m_iPreviousTabSelectionId = tab.GetId();
+}
+
 void TabContainer::OnAlwaysShowTabBarUpdated(BOOL newValue)
 {
 	if (newValue)
@@ -846,6 +861,8 @@ HRESULT TabContainer::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 		if (previousIndex != -1)
 		{
 			m_tabContainerInterface->OnTabSelectionChanged(false);
+
+			OnTabSelected(tab);
 		}
 	}
 
@@ -967,7 +984,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 		return false;
 	}
 
-	m_tabContainerInterface->RemoveTabFromControl(tab);
+	RemoveTabFromControl(tab);
 
 	m_expp->GetDirectoryMonitor()->StopDirectoryMonitor(tab.GetShellBrowser()->GetDirMonitorId());
 
@@ -985,6 +1002,56 @@ bool TabContainer::CloseTab(const Tab &tab)
 	tabRemovedSignal.m_signal(tabId);
 
 	return true;
+}
+
+void TabContainer::RemoveTabFromControl(const Tab &tab)
+{
+	m_tabSelectionHistory.erase(std::remove(m_tabSelectionHistory.begin(), m_tabSelectionHistory.end(), tab.GetId()), m_tabSelectionHistory.end());
+
+	const int index = GetTabIndex(tab);
+
+	if (IsTabSelected(tab))
+	{
+		int newIndex;
+
+		/* If there was a previously active tab, the focus
+		should be switched back to it. */
+		if (!m_tabSelectionHistory.empty())
+		{
+			const int lastTabId = m_tabSelectionHistory.back();
+			m_tabSelectionHistory.pop_back();
+
+			const Tab &lastTab = GetTab(lastTabId);
+			newIndex = GetTabIndex(lastTab);
+		}
+		else
+		{
+			newIndex = index;
+
+			// If the last tab in the control is what's being closed,
+			// the tab before it will be selected.
+			if (newIndex == (GetNumTabs() - 1))
+			{
+				newIndex--;
+			}
+		}
+
+		SelectTabAtIndex(newIndex);
+
+		// This is somewhat hacky. Switching the tab will cause the
+		// previously selected tab (i.e. the tab that's about to be
+		// closed) to be added to the history list. That's not
+		// desirable, so the last entry will be removed here.
+		m_tabSelectionHistory.pop_back();
+	}
+
+	TCITEM tcItemRemoved;
+	tcItemRemoved.mask = TCIF_IMAGE;
+	TabCtrl_GetItem(m_hwnd, index, &tcItemRemoved);
+
+	TabCtrl_DeleteItem(m_hwnd, index);
+
+	TabCtrl_RemoveImage(m_hwnd, tcItemRemoved.iImage);
 }
 
 Tab &TabContainer::GetTab(int tabId)

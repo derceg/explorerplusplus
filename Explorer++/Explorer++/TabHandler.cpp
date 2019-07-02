@@ -244,11 +244,6 @@ void Explorerplusplus::OnTabSelectionChanged(bool broadcastEvent)
 		throw std::runtime_error("No selected tab");
 	}
 
-	if(m_iPreviousTabSelectionId != -1)
-	{
-		m_tabSelectionHistory.push_back(m_iPreviousTabSelectionId);
-	}
-
 	/* Hide the old listview. */
 	ShowWindow(m_hActiveListView,SW_HIDE);
 
@@ -275,8 +270,6 @@ void Explorerplusplus::OnTabSelectionChanged(bool broadcastEvent)
 	/* Show the new listview. */
 	ShowWindow(m_hActiveListView,SW_SHOW);
 	SetFocus(m_hActiveListView);
-
-	m_iPreviousTabSelectionId = tab.GetId();
 
 	if (broadcastEvent)
 	{
@@ -308,56 +301,6 @@ bool Explorerplusplus::OnCloseTab()
 {
 	const Tab &tab = m_tabContainer->GetSelectedTab();
 	return m_tabContainer->CloseTab(tab);
-}
-
-void Explorerplusplus::RemoveTabFromControl(const Tab &tab)
-{
-	m_tabSelectionHistory.erase(std::remove(m_tabSelectionHistory.begin(), m_tabSelectionHistory.end(), tab.GetId()), m_tabSelectionHistory.end());
-
-	const int index = m_tabContainer->GetTabIndex(tab);
-
-	if(m_tabContainer->IsTabSelected(tab))
-	{
-		int newIndex;
-
-		/* If there was a previously active tab, the focus
-		should be switched back to it. */
-		if (!m_tabSelectionHistory.empty())
-		{
-			const int lastTabId = m_tabSelectionHistory.back();
-			m_tabSelectionHistory.pop_back();
-
-			const Tab& lastTab = m_tabContainer->GetTab(lastTabId);
-			newIndex = m_tabContainer->GetTabIndex(lastTab);
-		}
-		else
-		{
-			newIndex = index;
-
-			// If the last tab in the control is what's being closed,
-			// the tab before it will be selected.
-			if (newIndex == (m_tabContainer->GetNumTabs() - 1))
-			{
-				newIndex--;
-			}
-		}
-
-		m_tabContainer->SelectTabAtIndex(newIndex);
-
-		// This is somewhat hacky. Switching the tab will cause the
-		// previously selected tab (i.e. the tab that's about to be
-		// closed) to be added to the history list. That's not
-		// desirable, so the last entry will be removed here.
-		m_tabSelectionHistory.pop_back();
-	}
-
-	TCITEM tcItemRemoved;
-	tcItemRemoved.mask = TCIF_IMAGE;
-	TabCtrl_GetItem(m_tabContainer->GetHWND(), index, &tcItemRemoved);
-
-	TabCtrl_DeleteItem(m_tabContainer->GetHWND(),index);
-
-	TabCtrl_RemoveImage(m_tabContainer->GetHWND(),tcItemRemoved.iImage);
 }
 
 void Explorerplusplus::ShowTabBar()

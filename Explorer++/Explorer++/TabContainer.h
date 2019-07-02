@@ -113,6 +113,8 @@ private:
 	void OnTabCreated(int tabId, BOOL switchToNewTab);
 	void OnTabRemoved(int tabId);
 
+	void OnTabSelected(const Tab &tab);
+
 	void OnAlwaysShowTabBarUpdated(BOOL newValue);
 	void OnForceSameTabWidthUpdated(BOOL newValue);
 
@@ -123,6 +125,8 @@ private:
 
 	SortMode GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const;
 	void InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName);
+
+	void RemoveTabFromControl(const Tab &tab);
 
 	HFONT m_hTabFont;
 	HIMAGELIST m_hTabCtrlImageList;
@@ -142,10 +146,15 @@ private:
 	boost::signals2::connection m_tabCreatedConnection;
 	boost::signals2::connection m_tabRemovedConnection;
 
+	boost::signals2::connection m_tabSelectedConnection;
+
 	boost::signals2::connection m_navigationCompletedConnection;
 
 	boost::signals2::connection m_alwaysShowTabBarConnection;
 	boost::signals2::connection m_forceSameTabWidthConnection;
+
+	std::vector<int> m_tabSelectionHistory;
+	int m_iPreviousTabSelectionId;
 
 	// Tab dragging
 	BOOL m_bTabBeenDragged;
