@@ -16,12 +16,12 @@
 #include <algorithm>
 
 CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
-	TabContainerInterface *tabContainerInterface, CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar,
+	Navigation *navigation, CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar,
 	UINT uIDStart, UINT uIDEnd) :
 	m_hToolbar(hToolbar),
 	m_instance(instance),
 	m_pexpp(pexpp),
-	m_tabContainerInterface(tabContainerInterface),
+	m_navigation(navigation),
 	m_AllBookmarks(AllBookmarks),
 	m_guidBookmarksToolbar(guidBookmarksToolbar),
 	m_uIDStart(uIDStart),
@@ -249,7 +249,7 @@ void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, const Varia
 		if (variantBookmark.type() == typeid(CBookmark))
 		{
 			const CBookmark &bookmark = boost::get<CBookmark>(variantBookmark);
-			m_tabContainerInterface->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+			m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 		}
 	}
 		break;
@@ -332,7 +332,7 @@ bool CBookmarksToolbar::OnButtonClick(int command)
 	else
 	{
 		CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-		m_tabContainerInterface->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+		m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 	}
 
 	return true;
@@ -378,7 +378,7 @@ void CBookmarksToolbar::ShowBookmarkFolderMenu(const CBookmarkFolder &bookmarkFo
 
 void CBookmarksToolbar::OnBookmarkMenuItemClicked(const CBookmark &bookmark)
 {
-	m_tabContainerInterface->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+	m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 }
 
 void CBookmarksToolbar::OnNewBookmark()

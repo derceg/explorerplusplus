@@ -4,11 +4,9 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
-#include "AddBookmarkDialog.h"
-#include "NewBookmarkFolderDialog.h"
-#include "../Helper/ShellHelper.h"
+#include "Navigation.h"
 #include "../Helper/Macros.h"
-
+#include "../Helper/ShellHelper.h"
 
 HRESULT Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath)
 {
@@ -37,5 +35,5 @@ HRESULT Explorerplusplus::ExpandAndBrowsePath(const TCHAR *szPath, BOOL bOpenInN
 		return m_tabContainer->CreateNewTab(szExpandedPath, tabSettings);
 	}
 
-	return BrowseFolderInCurrentTab(szExpandedPath,SBSP_ABSOLUTE);
+	return m_navigation->BrowseFolderInCurrentTab(szExpandedPath,SBSP_ABSOLUTE);
 }

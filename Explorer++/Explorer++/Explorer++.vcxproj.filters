@@ -678,6 +678,9 @@
     <ClInclude Include="SignalWrapper.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Navigation.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

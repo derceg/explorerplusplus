@@ -12,6 +12,7 @@
 #include "MainToolbar.h"
 #include "MassRenameDialog.h"
 #include "MenuRanges.h"
+#include "Navigation.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ViewModes.h"
@@ -154,7 +155,7 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 				{
 					/* The user has double clicked in the whitespace
 					area for this tab, so go up one folder... */
-					OnNavigateUp();
+					m_navigation->OnNavigateUp();
 					return 0;
 				}
 			}
@@ -511,7 +512,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 					if(bRes)
 					{
 						/* Go to the root of this directory. */
-						BrowseFolderInCurrentTab(szRoot, SBSP_ABSOLUTE);
+						m_navigation->BrowseFolderInCurrentTab(szRoot, SBSP_ABSOLUTE);
 					}
 				}
 
@@ -519,7 +520,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 			}
 			else
 			{
-				OnNavigateUp();
+				m_navigation->OnNavigateUp();
 			}
 			break;
 

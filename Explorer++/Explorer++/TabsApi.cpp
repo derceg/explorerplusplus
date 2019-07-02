@@ -11,11 +11,10 @@
 
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
-Plugins::TabsApi::TabsApi(TabContainer *tabContainer, TabContainerInterface *tabContainerInterface,
-	TabInterface *tabInterface) :
+Plugins::TabsApi::TabsApi(TabContainer *tabContainer, TabInterface *tabInterface, Navigation *navigation) :
 	m_tabContainer(tabContainer),
-	m_tabContainerInterface(tabContainerInterface),
-	m_tabInterface(tabInterface)
+	m_tabInterface(tabInterface),
+	m_navigation(navigation)
 {
 
 }
@@ -206,7 +205,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 	if (location && !location->empty())
 	{
-		m_tabContainerInterface->BrowseFolder(*tabInternal, location->c_str(), SBSP_ABSOLUTE);
+		m_navigation->BrowseFolder(*tabInternal, location->c_str(), SBSP_ABSOLUTE);
 	}
 
 	boost::optional<std::wstring> name = properties[TabConstants::NAME];

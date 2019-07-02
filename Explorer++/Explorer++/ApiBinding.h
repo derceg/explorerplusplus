@@ -5,9 +5,6 @@
 #pragma once
 
 #include "PluginInterface.h"
-#include "PluginMenuManager.h"
-#include "TabContainerInterface.h"
-#include "UiTheming.h"
 #include "../ThirdParty/Sol/sol.hpp"
 
 namespace Plugins

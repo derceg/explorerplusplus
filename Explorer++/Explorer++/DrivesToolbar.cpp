@@ -14,19 +14,19 @@
 #include "../Helper/ShellHelper.h"
 
 CDrivesToolbar *CDrivesToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd,
-	HINSTANCE hInstance, IExplorerplusplus *pexpp, TabContainerInterface *tabContainerInterface)
+	HINSTANCE hInstance, IExplorerplusplus *pexpp, Navigation *navigation)
 {
-	return new CDrivesToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp, tabContainerInterface);
+	return new CDrivesToolbar(hParent, uIDStart, uIDEnd, hInstance, pexpp, navigation);
 }
 
 CDrivesToolbar::CDrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
-	IExplorerplusplus *pexpp, TabContainerInterface *tabContainerInterface) :
+	IExplorerplusplus *pexpp, Navigation *navigation) :
 	CBaseWindow(CreateDrivesToolbar(hParent)),
 	m_uIDStart(uIDStart),
 	m_uIDEnd(uIDEnd),
 	m_hInstance(hInstance),
 	m_pexpp(pexpp),
-	m_tabContainerInterface(tabContainerInterface),
+	m_navigation(navigation),
 	m_IDCounter(0)
 {
 	Initialize(hParent);
@@ -167,7 +167,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 			if(iIndex != -1)
 			{
 				std::wstring Path = GetDrivePath(iIndex);
-				m_tabContainerInterface->BrowseFolderInCurrentTab(Path.c_str(),SBSP_ABSOLUTE);
+				m_navigation->BrowseFolderInCurrentTab(Path.c_str(),SBSP_ABSOLUTE);
 			}
 
 			return 0;

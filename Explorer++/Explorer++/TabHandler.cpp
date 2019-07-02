@@ -31,23 +31,16 @@ void Explorerplusplus::InitializeTabs()
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, this, m_hLanguageModule, m_config);
-	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
+	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, m_navigation, this, m_hLanguageModule, m_config);
 	m_tabContainer->tabUpdatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
+
+	m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
 
 	/* Create the toolbar that will appear on the tab control.
 	Only contains the close button used to close tabs. */
 	TCHAR szTabCloseTip[64];
 	LoadString(m_hLanguageModule,IDS_TAB_CLOSE_TIP,szTabCloseTip,SIZEOF_ARRAY(szTabCloseTip));
 	m_hTabWindowToolbar	= CreateTabToolbar(m_hTabBacking,TABTOOLBAR_CLOSE,szTabCloseTip);
-}
-
-void Explorerplusplus::OnTabCreated(int tabId, BOOL switchToNewTab)
-{
-	UNREFERENCED_PARAMETER(switchToNewTab);
-
-	Tab &tab = m_tabContainer->GetTab(tabId);
-	OnNavigationCompleted(tab);
 }
 
 void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
@@ -65,6 +58,44 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 		}
 		break;
 	}
+}
+
+void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
+{
+	TCHAR	szLoadingText[512];
+
+	if (iTabId == m_tabContainer->GetSelectedTab().GetId())
+	{
+		TCHAR szTemp[64];
+		LoadString(m_hLanguageModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
+		StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, szFolderPath);
+
+		/* Browsing of a folder has started. Set the status bar text to indicate that
+		the folder is been loaded. */
+		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)0 | 0, (LPARAM)szLoadingText);
+
+		/* Clear the text in all other parts of the status bar. */
+		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)1 | 0, (LPARAM)EMPTY_STRING);
+		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)2 | 0, (LPARAM)EMPTY_STRING);
+	}
+}
+
+void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
+{
+	if (m_tabContainer->IsTabSelected(tab))
+	{
+		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
+			m_CurrentDirectory);
+		SetCurrentDirectory(m_CurrentDirectory);
+
+		UpdateArrangeMenuItems();
+
+		m_nSelected = 0;
+
+		UpdateWindowStates();
+	}
+
+	HandleDirectoryMonitoring(tab.GetId());
 }
 
 /*

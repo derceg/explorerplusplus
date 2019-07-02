@@ -15,6 +15,7 @@
 #include "ManageBookmarksDialog.h"
 #include "MenuRanges.h"
 #include "ModelessDialogs.h"
+#include "Navigation.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ToolbarButtons.h"
@@ -1202,61 +1203,61 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 
 		case IDM_GO_BACK:
 		case TOOLBAR_BACK:
-			OnBrowseBack();
+			m_navigation->OnBrowseBack();
 			break;
 
 		case IDM_GO_FORWARD:
 		case TOOLBAR_FORWARD:
-			OnBrowseForward();
+			m_navigation->OnBrowseForward();
 			break;
 
 		case IDM_GO_UPONELEVEL:
 		case TOOLBAR_UP:
-			OnNavigateUp();
+			m_navigation->OnNavigateUp();
 			break;
 
 		case IDM_GO_MYCOMPUTER:
-			OnGotoFolder(CSIDL_DRIVES);
+			m_navigation->OnGotoFolder(CSIDL_DRIVES);
 			break;
 
 		case IDM_GO_MYDOCUMENTS:
-			OnGotoFolder(CSIDL_PERSONAL);
+			m_navigation->OnGotoFolder(CSIDL_PERSONAL);
 			break;
 
 		case IDM_GO_MYMUSIC:
-			OnGotoFolder(CSIDL_MYMUSIC);
+			m_navigation->OnGotoFolder(CSIDL_MYMUSIC);
 			break;
 
 		case IDM_GO_MYPICTURES:
-			OnGotoFolder(CSIDL_MYPICTURES);
+			m_navigation->OnGotoFolder(CSIDL_MYPICTURES);
 			break;
 
 		case IDM_GO_DESKTOP:
-			OnGotoFolder(CSIDL_DESKTOP);
+			m_navigation->OnGotoFolder(CSIDL_DESKTOP);
 			break;
 
 		case IDM_GO_RECYCLEBIN:
-			OnGotoFolder(CSIDL_BITBUCKET);
+			m_navigation->OnGotoFolder(CSIDL_BITBUCKET);
 			break;
 
 		case IDM_GO_CONTROLPANEL:
-			OnGotoFolder(CSIDL_CONTROLS);
+			m_navigation->OnGotoFolder(CSIDL_CONTROLS);
 			break;
 
 		case IDM_GO_PRINTERS:
-			OnGotoFolder(CSIDL_PRINTERS);
+			m_navigation->OnGotoFolder(CSIDL_PRINTERS);
 			break;
 
 		case IDM_GO_CDBURNING:
-			OnGotoFolder(CSIDL_CDBURN_AREA);
+			m_navigation->OnGotoFolder(CSIDL_CDBURN_AREA);
 			break;
 
 		case IDM_GO_MYNETWORKPLACES:
-			OnGotoFolder(CSIDL_NETWORK);
+			m_navigation->OnGotoFolder(CSIDL_NETWORK);
 			break;
 
 		case IDM_GO_NETWORKCONNECTIONS:
-			OnGotoFolder(CSIDL_CONNECTIONS);
+			m_navigation->OnGotoFolder(CSIDL_CONNECTIONS);
 			break;
 
 		case TOOLBAR_ADDBOOKMARK:
@@ -1278,7 +1279,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			if(g_hwndManageBookmarks == NULL)
 			{
 				CManageBookmarksDialog *pManageBookmarksDialog = new CManageBookmarksDialog(m_hLanguageModule,IDD_MANAGE_BOOKMARKS,
-					hwnd,this,this,*m_bfAllBookmarks);
+					hwnd,this,m_navigation,*m_bfAllBookmarks);
 				g_hwndManageBookmarks = pManageBookmarksDialog->ShowModelessDialog(new CModelessDialogNotification());
 			}
 			else
@@ -1352,7 +1353,7 @@ LRESULT CALLBACK Explorerplusplus::CommandHandler(HWND hwnd,WPARAM wParam)
 			break;
 
 		case IDA_HOME:
-			OnNavigateHome();
+			m_navigation->OnNavigateHome();
 			break;
 
 		case IDA_TAB1:
@@ -1701,7 +1702,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 						pidl = m_pActiveShellBrowser->RetrieveHistoryItem(iCmd);
 
-						BrowseFolderInCurrentTab(pidl,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
+						m_navigation->BrowseFolderInCurrentTab(pidl,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 
 						CoTaskMemFree(pidl);
 					}

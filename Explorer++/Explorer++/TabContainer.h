@@ -18,14 +18,15 @@
 #include <unordered_map>
 
 struct Config;
+class Navigation;
 
 class TabContainer : public CBaseWindow
 {
 public:
 
 	static TabContainer *Create(HWND parent, TabContainerInterface *tabContainer,
-		TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance,
-		std::shared_ptr<Config> config);
+		TabInterface *tabInterface, Navigation *navigation, IExplorerplusplus *expp,
+		HINSTANCE instance, std::shared_ptr<Config> config);
 
 	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
 	HRESULT CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
@@ -72,7 +73,8 @@ private:
 	static const int MAX_CACHED_ICONS = 1000;
 
 	TabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
-		IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config);
+		Navigation *navigation, IExplorerplusplus *expp, HINSTANCE instance,
+		std::shared_ptr<Config> config);
 	~TabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
@@ -131,6 +133,7 @@ private:
 
 	TabContainerInterface *m_tabContainerInterface;
 	TabInterface *m_tabInterface;
+	Navigation *m_navigation;
 	IExplorerplusplus *m_expp;
 
 	HINSTANCE m_instance;

@@ -4,18 +4,18 @@
 
 #pragma once
 
+#include "Navigation.h"
 #include "PluginCommandManager.h"
 #include "PluginMenuManager.h"
 #include "TabContainer.h"
-#include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "UiTheming.h"
 
 __interface PluginInterface
 {
-	TabContainerInterface *GetTabContainerInterface();
 	TabContainer *GetTabContainer();
 	TabInterface *GetTabInterface();
+	Navigation *GetNavigation();
 	Plugins::PluginMenuManager *GetPluginMenuManager();
 	UiTheming *GetUiTheming();
 	Plugins::PluginCommandManager *GetPluginCommandManager();

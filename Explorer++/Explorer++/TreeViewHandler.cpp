@@ -8,6 +8,7 @@
 #include "HolderWindow.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
+#include "Navigation.h"
 #include "SetFileAttributesDialog.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -315,7 +316,7 @@ BOOL Explorerplusplus::OnTreeViewItemExpanding(LPARAM lParam)
 				LPITEMIDLIST pidl	= NULL;
 
 				pidl = m_pMyTreeView->BuildPath(tvItem->hItem);
-				BrowseFolderInCurrentTab(pidl,0);
+				m_navigation->BrowseFolderInCurrentTab(pidl,0);
 
 				CoTaskMemFree(pidl);
 			}
@@ -443,7 +444,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 	if(!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick &&
 		!CompareIdls(pidlDirectory,pidlCurrentDirectory))
 	{
-		BrowseFolderInCurrentTab(pidlDirectory,0);
+		m_navigation->BrowseFolderInCurrentTab(pidlDirectory,0);
 
 		if(m_config->treeViewAutoExpandSelected)
 		{

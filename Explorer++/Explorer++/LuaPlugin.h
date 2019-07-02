@@ -7,7 +7,6 @@
 #include "Manifest.h"
 #include "PluginInterface.h"
 #include "PluginMenuManager.h"
-#include "TabContainerInterface.h"
 #include "UiTheming.h"
 #include "../ThirdParty/Sol/sol.hpp"
 

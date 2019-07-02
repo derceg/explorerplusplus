@@ -261,12 +261,12 @@ boost::signals2::connection Explorerplusplus::AddToolbarContextMenuObserver(cons
 
 void Explorerplusplus::CreateAddressBar()
 {
-	m_addressBar = AddressBar::Create(m_hMainRebar, this, this, m_mainToolbar);
+	m_addressBar = AddressBar::Create(m_hMainRebar, this, this, m_navigation, m_mainToolbar);
 }
 
 void Explorerplusplus::CreateMainToolbar()
 {
-	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_hLanguageModule, this, this, m_config);
+	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_hLanguageModule, this, this, m_navigation, m_config);
 }
 
 void Explorerplusplus::CreateBookmarksToolbar(void)
@@ -276,13 +276,13 @@ void Explorerplusplus::CreateBookmarksToolbar(void)
 		TBSTYLE_EX_DOUBLEBUFFER | TBSTYLE_EX_HIDECLIPPEDBUTTONS);
 
 	m_pBookmarksToolbar = new CBookmarksToolbar(m_hBookmarksToolbar, m_hLanguageModule, this,
-		this, *m_bfAllBookmarks, m_guidBookmarksToolbar, TOOLBAR_BOOKMARK_START, TOOLBAR_BOOKMARK_END);
+		m_navigation, *m_bfAllBookmarks, m_guidBookmarksToolbar, TOOLBAR_BOOKMARK_START, TOOLBAR_BOOKMARK_END);
 }
 
 void Explorerplusplus::CreateDrivesToolbar(void)
 {
 	m_pDrivesToolbar = CDrivesToolbar::Create(m_hMainRebar, TOOLBAR_DRIVES_ID_START,
-		TOOLBAR_DRIVES_ID_END, m_hLanguageModule, this, this);
+		TOOLBAR_DRIVES_ID_END, m_hLanguageModule, this, m_navigation);
 }
 
 void Explorerplusplus::CreateApplicationToolbar()

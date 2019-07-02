@@ -6,6 +6,7 @@
 
 #include "CoreInterface.h"
 #include "MainToolbar.h"
+#include "Navigation.h"
 #include "TabContainerInterface.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/Macros.h"
@@ -14,15 +15,16 @@ class AddressBar : public CBaseWindow
 {
 public:
 
-	static AddressBar *Create(HWND parent, IExplorerplusplus *expp,
-		TabContainerInterface *tabContainerInterface, MainToolbar *mainToolbar);
+	static AddressBar *Create(HWND parent, IExplorerplusplus *expp, TabContainerInterface *tabContainerInterface,
+		Navigation *navigation, MainToolbar *mainToolbar);
 
 private:
 
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
-	AddressBar(HWND parent, IExplorerplusplus *expp, TabContainerInterface *tabContainerInterface, MainToolbar *mainToolbar);
+	AddressBar(HWND parent, IExplorerplusplus *expp, TabContainerInterface *tabContainerInterface,
+		Navigation *navigation, MainToolbar *mainToolbar);
 	~AddressBar();
 
 	static HWND CreateAddressBar(HWND parent);
@@ -42,6 +44,7 @@ private:
 
 	IExplorerplusplus *m_expp;
 	TabContainerInterface *m_tabContainerInterface;
+	Navigation *m_navigation;
 	MainToolbar *m_mainToolbar;
 
 	boost::signals2::connection m_tabSelectedConnection;

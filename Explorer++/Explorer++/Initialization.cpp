@@ -123,7 +123,9 @@ void Explorerplusplus::OnCreate(void)
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 
-	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this, this);
+	m_navigation = new Navigation(m_config, this);
+
+	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this, this, m_navigation);
 
 	m_hTreeViewIconThread = CreateWorkerThread();
 
@@ -152,6 +154,8 @@ void Explorerplusplus::OnCreate(void)
 	InitializeTabs();
 	CreateFolderControls();
 
+	m_navigation->SetTabContainer(m_tabContainer);
+
 	/* All child windows MUST be resized before
 	any listview changes take place. If auto arrange
 	is turned off in the listview, when it is
@@ -175,7 +179,7 @@ void Explorerplusplus::OnCreate(void)
 		m_config->showTaskbarThumbnails = FALSE;
 	}
 
-	m_taskbarThumbnails = TaskbarThumbnails::Create(this, m_tabContainer, this, m_hLanguageModule, m_config);
+	m_taskbarThumbnails = TaskbarThumbnails::Create(this, m_tabContainer, this, m_navigation, m_hLanguageModule, m_config);
 
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;

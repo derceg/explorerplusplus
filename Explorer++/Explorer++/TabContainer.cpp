@@ -8,6 +8,7 @@
 #include "Explorer++_internal.h"
 #include "MainImages.h"
 #include "MainResource.h"
+#include "Navigation.h"
 #include "RenameTabDialog.h"
 #include "ResourceHelper.h"
 #include "TabDropHandler.h"
@@ -30,14 +31,14 @@ const std::map<UINT, int> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 };
 
 TabContainer *TabContainer::Create(HWND parent, TabContainerInterface *tabContainer,
-	TabInterface *tabInterface, IExplorerplusplus *expp, HINSTANCE instance,
+	TabInterface *tabInterface, Navigation *navigation, IExplorerplusplus *expp, HINSTANCE instance,
 	std::shared_ptr<Config> config)
 {
-	return new TabContainer(parent, tabContainer, tabInterface, expp, instance, config);
+	return new TabContainer(parent, tabContainer, tabInterface, navigation, expp, instance, config);
 }
 
 TabContainer::TabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
-	IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config) :
+	Navigation *navigation, IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config) :
 	CBaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_hTabFont(nullptr),
 	m_hTabCtrlImageList(nullptr),
@@ -45,6 +46,7 @@ TabContainer::TabContainer(HWND parent, TabContainerInterface *tabContainer, Tab
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_tabContainerInterface(tabContainer),
 	m_tabInterface(tabInterface),
+	m_navigation(navigation),
 	m_expp(expp),
 	m_instance(instance),
 	m_config(config),
@@ -91,7 +93,7 @@ void TabContainer::Initialize(HWND parent)
 	m_tabCreatedConnection = tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2));
 	m_tabRemovedConnection = tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1));
 
-	m_navigationCompletedConnection = m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1));
+	m_navigationCompletedConnection = m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1));
 
 	m_alwaysShowTabBarConnection = m_config->alwaysShowTabBar.addObserver(boost::bind(&TabContainer::OnAlwaysShowTabBarUpdated, this, _1));
 	m_forceSameTabWidthConnection = m_config->forceSameTabWidth.addObserver(boost::bind(&TabContainer::OnForceSameTabWidthUpdated, this, _1));

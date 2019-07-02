@@ -3,23 +3,49 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "Explorer++.h"
-#include "Config.h"
+#include "Navigation.h"
 #include "MainResource.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 
-void Explorerplusplus::OnBrowseBack()
+Navigation::Navigation(std::shared_ptr<Config> config, IExplorerplusplus *expp) :
+	m_config(config),
+	m_expp(expp),
+	m_tabContainer(nullptr)
+{
+
+}
+
+Navigation::~Navigation()
+{
+
+}
+
+void Navigation::SetTabContainer(TabContainer *tabContainer)
+{
+	m_tabContainer = tabContainer;
+	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&Navigation::OnTabCreated, this, _1, _2), boost::signals2::at_front);
+}
+
+void Navigation::OnTabCreated(int tabId, BOOL switchToNewTab)
+{
+	UNREFERENCED_PARAMETER(switchToNewTab);
+
+	const Tab &tab = m_tabContainer->GetTab(tabId);
+	navigationCompletedSignal.m_signal(tab);
+}
+
+void Navigation::OnBrowseBack()
 {
 	BrowseFolderInCurrentTab(EMPTY_STRING, SBSP_NAVIGATEBACK);
 }
 
-void Explorerplusplus::OnBrowseForward()
+void Navigation::OnBrowseForward()
 {
 	BrowseFolderInCurrentTab(EMPTY_STRING, SBSP_NAVIGATEFORWARD);
 }
 
-void Explorerplusplus::OnNavigateHome()
+void Navigation::OnNavigateHome()
 {
 	HRESULT hr = BrowseFolderInCurrentTab(m_config->defaultTabDirectory.c_str(), SBSP_ABSOLUTE);
 
@@ -29,11 +55,12 @@ void Explorerplusplus::OnNavigateHome()
 	}
 }
 
-void Explorerplusplus::OnNavigateUp()
+void Navigation::OnNavigateUp()
 {
+	Tab &tab = m_tabContainer->GetSelectedTab();
+
 	TCHAR szDirectory[MAX_PATH];
-	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory),
-		szDirectory);
+	tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
 
 	PathStripPath(szDirectory);
 
@@ -41,7 +68,7 @@ void Explorerplusplus::OnNavigateUp()
 
 	if(SUCCEEDED(hr))
 	{
-		m_pActiveShellBrowser->SelectFiles(szDirectory);
+		tab.GetShellBrowser()->SelectFiles(szDirectory);
 	}
 }
 
@@ -49,7 +76,7 @@ void Explorerplusplus::OnNavigateUp()
 * Navigates to the folder specified by the incoming
 * csidl.
 */
-void Explorerplusplus::OnGotoFolder(int FolderCSIDL)
+void Navigation::OnGotoFolder(int FolderCSIDL)
 {
 	LPITEMIDLIST pidl = NULL;
 	HRESULT hr = SHGetFolderLocation(NULL, FolderCSIDL, NULL, 0, &pidl);
@@ -63,7 +90,7 @@ void Explorerplusplus::OnGotoFolder(int FolderCSIDL)
 	}
 }
 
-HRESULT Explorerplusplus::BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags)
+HRESULT Navigation::BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags)
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
 	return BrowseFolder(tab, szPath, wFlags);
@@ -83,7 +110,7 @@ The ONLY times an idl should be sent are:
 - When loading directories on startup
 - When navigating to a folder on the 'Go' menu
 */
-HRESULT Explorerplusplus::BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags)
+HRESULT Navigation::BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags)
 {
 	/* Doesn't matter if we can't get the pidl here,
 	as some paths will be relative, or will be filled
@@ -101,7 +128,7 @@ HRESULT Explorerplusplus::BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlag
 	return hr;
 }
 
-HRESULT Explorerplusplus::BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags)
+HRESULT Navigation::BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags)
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
 	return BrowseFolder(tab, pidlDirectory, wFlags);
@@ -111,7 +138,7 @@ HRESULT Explorerplusplus::BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, 
 pass through this function. This ensures that tabs that
 have their addresses locked will not change directory (a
 new tab will be created instead). */
-HRESULT Explorerplusplus::BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags)
+HRESULT Navigation::BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags)
 {
 	HRESULT hr = E_FAIL;
 	int resultingTabId = -1;
@@ -135,13 +162,13 @@ HRESULT Explorerplusplus::BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UI
 	if(SUCCEEDED(hr))
 	{
 		const Tab &resultingTab = m_tabContainer->GetTab(resultingTabId);
-		OnNavigationCompleted(resultingTab);
+		navigationCompletedSignal.m_signal(resultingTab);
 	}
 
 	return hr;
 }
 
-void Explorerplusplus::OpenDirectoryInNewWindow(LPCITEMIDLIST pidlDirectory)
+void Navigation::OpenDirectoryInNewWindow(LPCITEMIDLIST pidlDirectory)
 {
 	TCHAR szPath[MAX_PATH];
 	TCHAR szParameters[512];
@@ -151,59 +178,14 @@ void Explorerplusplus::OpenDirectoryInNewWindow(LPCITEMIDLIST pidlDirectory)
 	GetDisplayName(pidlDirectory, szPath, SIZEOF_ARRAY(szPath), SHGDN_FORPARSING);
 	StringCchPrintf(szParameters, SIZEOF_ARRAY(szParameters), _T("\"%s\""), szPath);
 
-	ExecuteAndShowCurrentProcess(m_hContainer, szParameters);
+	ExecuteAndShowCurrentProcess(m_expp->GetMainWindow(), szParameters);
 }
 
-void Explorerplusplus::PlayNavigationSound() const
+void Navigation::PlayNavigationSound() const
 {
 	if(m_config->playNavigationSound)
 	{
 		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART), NULL,
 			SND_RESOURCE | SND_ASYNC);
-	}
-}
-
-void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
-{
-	if (m_tabContainer->IsTabSelected(tab))
-	{
-		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
-			m_CurrentDirectory);
-		SetCurrentDirectory(m_CurrentDirectory);
-
-		UpdateArrangeMenuItems();
-
-		m_nSelected = 0;
-
-		UpdateWindowStates();
-	}
-
-	HandleDirectoryMonitoring(tab.GetId());
-
-	m_navigationCompletedSignal(tab);
-}
-
-boost::signals2::connection Explorerplusplus::AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer)
-{
-	return m_navigationCompletedSignal.connect(observer);
-}
-
-void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
-{
-	TCHAR	szLoadingText[512];
-
-	if (iTabId == m_tabContainer->GetSelectedTab().GetId())
-	{
-		TCHAR szTemp[64];
-		LoadString(m_hLanguageModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, szFolderPath);
-
-		/* Browsing of a folder has started. Set the status bar text to indicate that
-		the folder is been loaded. */
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)0 | 0, (LPARAM)szLoadingText);
-
-		/* Clear the text in all other parts of the status bar. */
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)1 | 0, (LPARAM)EMPTY_STRING);
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)2 | 0, (LPARAM)EMPTY_STRING);
 	}
 }

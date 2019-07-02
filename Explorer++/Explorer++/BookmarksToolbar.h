@@ -6,7 +6,7 @@
 
 #include "BookmarkHelper.h"
 #include "CoreInterface.h"
-#include "TabContainerInterface.h"
+#include "Navigation.h"
 #include "../Helper/Bookmark.h"
 #include <boost/optional.hpp>
 
@@ -54,8 +54,8 @@ class CBookmarksToolbar : public NBookmark::IBookmarkItemNotification
 public:
 
 	CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplorerplusplus *pexpp,
-		TabContainerInterface *tabContainerInterface, CBookmarkFolder &AllBookmarks,
-		const GUID &guidBookmarksToolbar, UINT uIDStart, UINT uIDEnd);
+		Navigation *navigation, CBookmarkFolder &AllBookmarks, const GUID &guidBookmarksToolbar,
+		UINT uIDStart, UINT uIDEnd);
 	~CBookmarksToolbar();
 
 	/* IBookmarkItemNotification methods. */
@@ -112,7 +112,7 @@ private:
 	HINSTANCE						m_instance;
 
 	IExplorerplusplus				*m_pexpp;
-	TabContainerInterface			*m_tabContainerInterface;
+	Navigation						*m_navigation;
 
 	CBookmarkFolder					&m_AllBookmarks;
 	GUID							m_guidBookmarksToolbar;

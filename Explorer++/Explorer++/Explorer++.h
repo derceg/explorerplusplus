@@ -50,6 +50,7 @@ class CLoadSaveRegistry;
 class CLoadSaveXML;
 class MainToolbar;
 class MainWindow;
+class Navigation;
 
 namespace Plugins
 {
@@ -209,19 +210,6 @@ private:
 	void					OnGroupBy(SortMode sortMode);
 	void					OnSelectTabByIndex(int iTab);
 
-	/* Navigation. */
-	void					OnBrowseBack();
-	void					OnBrowseForward();
-	void					OnNavigateHome();
-	void					OnNavigateUp();
-	void					OnGotoFolder(int FolderCSIDL);
-	HRESULT					BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags);
-	HRESULT					BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags);
-	HRESULT					BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags);
-	HRESULT					BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags);
-	void					OpenDirectoryInNewWindow(LPCITEMIDLIST pidlDirectory);
-	void					PlayNavigationSound() const;
-
 	/* Main menu handlers. */
 	void					OnChangeDisplayColors();
 	void					OnFilterResults();
@@ -298,7 +286,6 @@ private:
 
 	/* Tabs. */
 	void					InitializeTabs();
-	void					OnTabCreated(int tabId, BOOL switchToNewTab);
 	void					OnTabSelectionChanged(bool broadcastEvent = true);
 	void					RemoveTabFromControl(const Tab &tab);
 	void					ShowTabBar();
@@ -312,12 +299,11 @@ private:
 	boost::signals2::connection	AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer);
 
 	void					OnNavigationCompleted(const Tab &tab);
-	boost::signals2::connection	AddNavigationCompletedObserver(const NavigationCompletedSignal::slot_type &observer);
 
 	/* PluginInterface. */
-	TabContainerInterface	*GetTabContainerInterface();
 	TabContainer			*GetTabContainer();
 	TabInterface			*GetTabInterface();
+	Navigation				*GetNavigation();
 	Plugins::PluginMenuManager	*GetPluginMenuManager();
 	UiTheming				*GetUiTheming();
 	Plugins::PluginCommandManager	*GetPluginCommandManager();
@@ -571,16 +557,15 @@ private:
 	HFONT					m_DisplayWindowFont;
 
 	MainWindow				*m_mainWindow;
-
 	AddressBar				*m_addressBar;
+
+	Navigation				*m_navigation;
 
 	/* Tabs. */
 	TabContainer			*m_tabContainer;
 
 	/* Tab signals. */
 	TabSelectedSignal		m_tabSelectedSignal;
-
-	NavigationCompletedSignal	m_navigationCompletedSignal;
 
 	ToolbarContextMenuSignal	m_toolbarContextMenuSignal;
 

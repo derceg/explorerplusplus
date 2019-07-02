@@ -5,13 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "TabContainer.h"
-#include "TabContainerInterface.h"
 #include "UiTheming.h"
-
-TabContainerInterface *Explorerplusplus::GetTabContainerInterface()
-{
-	return this;
-}
 
 TabContainer *Explorerplusplus::GetTabContainer()
 {
@@ -21,6 +15,11 @@ TabContainer *Explorerplusplus::GetTabContainer()
 TabInterface *Explorerplusplus::GetTabInterface()
 {
 	return this;
+}
+
+Navigation *Explorerplusplus::GetNavigation()
+{
+	return m_navigation;
 }
 
 Plugins::PluginMenuManager *Explorerplusplus::GetPluginMenuManager()

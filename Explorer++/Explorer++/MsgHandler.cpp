@@ -11,6 +11,7 @@
 #include "LoadSaveRegistry.h"
 #include "LoadSaveXml.h"
 #include "MainResource.h"
+#include "Navigation.h"
 #include "PluginManager.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ToolbarButtons.h"
@@ -316,11 +317,11 @@ void Explorerplusplus::OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL b
 void Explorerplusplus::OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
 	if(bOpenInNewWindow)
-		OpenDirectoryInNewWindow(pidlItem);
+		m_navigation->OpenDirectoryInNewWindow(pidlItem);
 	else if(m_config->alwaysOpenNewTab || bOpenInNewTab)
 		m_tabContainer->CreateNewTab(pidlItem, TabSettings(_selected = true));
 	else
-		BrowseFolderInCurrentTab(pidlItem,0);
+		m_navigation->BrowseFolderInCurrentTab(pidlItem,0);
 }
 
 void Explorerplusplus::OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters)
@@ -947,16 +948,16 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 		at the moment. */
 		SendMessage(m_hContainer,WM_CANCELMODE,0,0);
 
-		OnBrowseBack();
+		m_navigation->OnBrowseBack();
 		break;
 
 	case APPCOMMAND_BROWSER_FORWARD:
 		SendMessage(m_hContainer,WM_CANCELMODE,0,0);
-		OnBrowseForward();
+		m_navigation->OnBrowseForward();
 		break;
 
 	case APPCOMMAND_BROWSER_HOME:
-		OnNavigateHome();
+		m_navigation->OnNavigateHome();
 		break;
 
 	case APPCOMMAND_BROWSER_FAVORITES:

@@ -10,6 +10,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Explorer++_internal.h"
+#include "Navigation.h"
 
 void Explorerplusplus::OnCopyItemPath(void) const
 {
@@ -214,14 +215,14 @@ BOOL Explorerplusplus::OnMouseWheel(MousewheelSource_t MousewheelSource, WPARAM 
 			{
 				for (int i = 0; i < abs(m_zDeltaTotal / WHEEL_DELTA); i++)
 				{
-					OnBrowseBack();
+					m_navigation->OnBrowseBack();
 				}
 			}
 			else
 			{
 				for (int i = 0; i < abs(m_zDeltaTotal / WHEEL_DELTA); i++)
 				{
-					OnBrowseForward();
+					m_navigation->OnBrowseForward();
 				}
 			}
 		}

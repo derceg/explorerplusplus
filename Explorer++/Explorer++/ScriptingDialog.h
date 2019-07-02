@@ -3,7 +3,6 @@
 #include "LuaPlugin.h"
 #include "PluginInterface.h"
 #include "PluginMenuManager.h"
-#include "TabContainerInterface.h"
 #include "UiTheming.h"
 #include "../Helper/BaseDialog.h"
 

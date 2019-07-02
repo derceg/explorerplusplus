@@ -11,16 +11,18 @@
 #include "../Helper/ShellHelper.h"
 
 AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp,
-	TabContainerInterface *tabContainerInterface, MainToolbar *mainToolbar)
+	TabContainerInterface *tabContainerInterface, Navigation *navigation, MainToolbar *mainToolbar)
 {
-	return new AddressBar(parent, expp, tabContainerInterface, mainToolbar);
+	return new AddressBar(parent, expp, tabContainerInterface, navigation, mainToolbar);
 }
 
 AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp,
-	TabContainerInterface *tabContainerInterface, MainToolbar *mainToolbar) :
+	TabContainerInterface *tabContainerInterface, Navigation *navigation,
+	MainToolbar *mainToolbar) :
 	CBaseWindow(CreateAddressBar(parent)),
 	m_expp(expp),
 	m_tabContainerInterface(tabContainerInterface),
+	m_navigation(navigation),
 	m_mainToolbar(mainToolbar)
 {
 	Initialize(parent);
@@ -57,7 +59,7 @@ void AddressBar::Initialize(HWND parent)
 		reinterpret_cast<DWORD_PTR>(this));
 
 	m_tabSelectedConnection = m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&AddressBar::OnTabSelected, this, _1));
-	m_navigationCompletedConnection = m_tabContainerInterface->AddNavigationCompletedObserver(boost::bind(&AddressBar::OnNavigationCompleted, this, _1));
+	m_navigationCompletedConnection = m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&AddressBar::OnNavigationCompleted, this, _1));
 }
 
 LRESULT CALLBACK AddressBar::EditSubclassStub(HWND hwnd, UINT uMsg,

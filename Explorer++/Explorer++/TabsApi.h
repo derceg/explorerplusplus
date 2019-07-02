@@ -4,11 +4,11 @@
 
 #pragma once
 
+#include "Navigation.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"
 #include "TabContainer.h"
-#include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/Sol/sol.hpp"
@@ -82,8 +82,7 @@ namespace Plugins
 			}
 		};
 
-		TabsApi(TabContainer *m_tabContainer, TabContainerInterface *tabContainerInterface,
-			TabInterface *tabInterface);
+		TabsApi(TabContainer *tabContainer, TabInterface *tabInterface, Navigation *navigation);
 		~TabsApi();
 
 		std::vector<Tab> getAll();
@@ -100,7 +99,7 @@ namespace Plugins
 		void extractFolderSettingsForCreation(sol::table folderSettingsTable, ::FolderSettings &folderSettings);
 
 		TabContainer *m_tabContainer;
-		TabContainerInterface *m_tabContainerInterface;
 		TabInterface *m_tabInterface;
+		Navigation *m_navigation;
 	};
 }

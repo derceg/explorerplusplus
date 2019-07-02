@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
+#include "Navigation.h"
 #include "Tab.h"
 #include "TabContainer.h"
 #include "TabContainerInterface.h"
@@ -17,7 +18,7 @@ class TaskbarThumbnails
 public:
 
 	static TaskbarThumbnails *Create(IExplorerplusplus *expp, TabContainer *tabContainer,
-		TabContainerInterface *tabContainerInterface, HINSTANCE instance,
+		TabContainerInterface *tabContainerInterface, Navigation *navigation, HINSTANCE instance,
 		std::shared_ptr<Config> config);
 
 private:
@@ -38,7 +39,8 @@ private:
 		POINT ptOrigin;
 	};
 
-	TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer, TabContainerInterface *tabContainerInterface,
+	TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer,
+		TabContainerInterface *tabContainerInterface, Navigation *navigation,
 		HINSTANCE instance, std::shared_ptr<Config> config);
 	~TaskbarThumbnails();
 
@@ -65,6 +67,7 @@ private:
 	IExplorerplusplus *m_expp;
 	TabContainer *m_tabContainer;
 	TabContainerInterface *m_tabContainerInterface;
+	Navigation *m_navigation;
 	HINSTANCE m_instance;
 
 	ITaskbarList4 *m_pTaskbarList;

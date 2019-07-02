@@ -23,15 +23,15 @@ namespace NManageBookmarksDialog
 const TCHAR CManageBookmarksDialogPersistentSettings::SETTINGS_KEY[] = _T("ManageBookmarks");
 
 CManageBookmarksDialog::CManageBookmarksDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-	IExplorerplusplus *pexpp, TabContainerInterface *tabContainer, CBookmarkFolder &AllBookmarks) :
-m_pexpp(pexpp),
-m_tabContainer(tabContainer),
-m_AllBookmarks(AllBookmarks),
-m_guidCurrentFolder(AllBookmarks.GetGUID()),
-m_bNewFolderAdded(false),
-m_bListViewInitialized(false),
-m_bSaveHistory(true),
-CBaseDialog(hInstance,iResource,hParent,true)
+	IExplorerplusplus *pexpp, Navigation *navigation, CBookmarkFolder &AllBookmarks) :
+	CBaseDialog(hInstance, iResource, hParent, true),
+	m_pexpp(pexpp),
+	m_navigation(navigation),
+	m_AllBookmarks(AllBookmarks),
+	m_guidCurrentFolder(AllBookmarks.GetGUID()),
+	m_bNewFolderAdded(false),
+	m_bListViewInitialized(false),
+	m_bSaveHistory(true)
 {
 	m_pmbdps = &CManageBookmarksDialogPersistentSettings::GetInstance();
 
@@ -906,7 +906,7 @@ void CManageBookmarksDialog::OnDblClk(NMHDR *pnmhdr)
 		else if(variantBookmark.type() == typeid(CBookmark))
 		{
 			const CBookmark &Bookmark = boost::get<CBookmark>(variantBookmark);
-			m_tabContainer->BrowseFolderInCurrentTab(Bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+			m_navigation->BrowseFolderInCurrentTab(Bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
 		}
 	}
 }
