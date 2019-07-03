@@ -387,7 +387,11 @@ int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) co
 		auto itr1 = m_cachedFolderSizes.find(InternalIndex1);
 		auto itr2 = m_cachedFolderSizes.find(InternalIndex2);
 
-		if (itr1 != m_cachedFolderSizes.end() && itr2 == m_cachedFolderSizes.end())
+		if (itr1 == m_cachedFolderSizes.end() && itr2 == m_cachedFolderSizes.end())
+		{
+			return 0;
+		}
+		else if (itr1 != m_cachedFolderSizes.end() && itr2 == m_cachedFolderSizes.end())
 		{
 			return 1;
 		}
