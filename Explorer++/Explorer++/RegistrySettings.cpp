@@ -25,9 +25,6 @@ namespace
 	const TCHAR REG_APPLICATIONS_KEY[] = _T("Software\\Explorer++\\ApplicationToolbar");
 }
 
-#define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Gdiplus::Color(255,255,255)
-#define DEFAULT_DISPLAYWINDOW_SURROUND_COLOR	Gdiplus::Color(0,94,138)
-
 void UpdateColumnWidths(std::vector<Column_t> &columns, const std::vector<ColumnWidth_t> &columnWidths);
 
 BOOL LoadWindowPositionFromRegistry(WINDOWPLACEMENT *pwndpl)
@@ -317,11 +314,21 @@ LONG Explorerplusplus::LoadSettings()
 		SurroundColorStatus = RegQueryValueEx(hSettingsKey,_T("DisplaySurroundColor"),0,&dwType,(LPBYTE)&SurroundColor,
 			&dwSize);
 
+		if (SurroundColorStatus == ERROR_SUCCESS)
+		{
+			m_DisplayWindowSurroundColor.SetFromCOLORREF(SurroundColor);
+		}
+
 		dwType = REG_BINARY;
 		dwSize = sizeof(CentreColor);
 
 		CentreColorStatus = RegQueryValueEx(hSettingsKey,_T("DisplayCentreColor"),0,&dwType,(LPBYTE)&CentreColor,
 			&dwSize);
+
+		if (CentreColorStatus == ERROR_SUCCESS)
+		{
+			m_DisplayWindowCentreColor.SetFromCOLORREF(CentreColor);
+		}
 
 		dwType = REG_BINARY;
 		dwSize = sizeof(TextColor);
@@ -329,37 +336,28 @@ LONG Explorerplusplus::LoadSettings()
 		TextColorStatus = RegQueryValueEx(hSettingsKey,_T("DisplayTextColor"),0,&dwType,(LPBYTE)&TextColor,
 			&dwSize);
 
+		if (TextColorStatus == ERROR_SUCCESS)
+		{
+			m_DisplayWindowTextColor = TextColor;
+		}
+
 		dwType = REG_BINARY;
 		dwSize = sizeof(LOGFONT);
 
 		FontStatus = RegQueryValueEx(hSettingsKey,_T("DisplayFont"),0,&dwType,(LPBYTE)&LogFont,
 			&dwSize);
-		hFont = CreateFontIndirect(&LogFont);
 
-		m_DisplayWindowCentreColor.SetFromCOLORREF(CentreColor);
-		m_DisplayWindowSurroundColor.SetFromCOLORREF(SurroundColor);
-		m_DisplayWindowTextColor = TextColor;
-		m_DisplayWindowFont = hFont;
+		if (FontStatus == ERROR_SUCCESS)
+		{
+			hFont = CreateFontIndirect(&LogFont);
+
+			m_DisplayWindowFont = hFont;
+		}
 
 		m_bAttemptToolbarRestore = TRUE;
 
 		RegCloseKey(hSettingsKey);
 	}
-
-	if(SurroundColorStatus != ERROR_SUCCESS)
-		m_DisplayWindowSurroundColor	= DEFAULT_DISPLAYWINDOW_SURROUND_COLOR;
-
-	if(CentreColorStatus != ERROR_SUCCESS)
-		m_DisplayWindowCentreColor	= DEFAULT_DISPLAYWINDOW_CENTRE_COLOR;
-
-	if(TextColorStatus != ERROR_SUCCESS)
-		m_DisplayWindowTextColor		= RGB(0,0,0);
-
-	if(FontStatus != ERROR_SUCCESS)
-		m_DisplayWindowFont	= CreateFont(-13,0,0,0,FW_MEDIUM,FALSE,
-			FALSE,FALSE,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,
-			CLIP_DEFAULT_PRECIS,PROOF_QUALITY,FIXED_PITCH|FF_MODERN,
-			_T("Segoe UI"));
 
 	return ReturnValue;
 }
