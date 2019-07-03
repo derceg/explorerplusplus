@@ -261,12 +261,12 @@ boost::signals2::connection Explorerplusplus::AddToolbarContextMenuObserver(cons
 
 void Explorerplusplus::CreateAddressBar()
 {
-	m_addressBar = AddressBar::Create(m_hMainRebar, this, this, m_navigation, m_mainToolbar);
+	m_addressBar = AddressBar::Create(m_hMainRebar, this, m_navigation, m_mainToolbar);
 }
 
 void Explorerplusplus::CreateMainToolbar()
 {
-	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_hLanguageModule, this, this, m_navigation, m_config);
+	m_mainToolbar = MainToolbar::Create(m_hMainRebar, m_hLanguageModule, this, m_navigation, m_config);
 }
 
 void Explorerplusplus::CreateBookmarksToolbar(void)

@@ -30,17 +30,16 @@ TOOLBAR_ADDBOOKMARK, TOOLBAR_NEWTAB, TOOLBAR_OPENCOMMANDPROMPT,
 TOOLBAR_ORGANIZEBOOKMARKS, TOOLBAR_DELETEPERMANENTLY };
 
 MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-	TabContainerInterface *tabContainerInterface, Navigation *navigation, std::shared_ptr<Config> config)
+	Navigation *navigation, std::shared_ptr<Config> config)
 {
-	return new MainToolbar(parent, instance, pexpp, tabContainerInterface, navigation, config);
+	return new MainToolbar(parent, instance, pexpp, navigation, config);
 }
 
 MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
-	TabContainerInterface *tabContainerInterface, Navigation *navigation, std::shared_ptr<Config> config) :
+	Navigation *navigation, std::shared_ptr<Config> config) :
 	CBaseWindow(CreateMainToolbar(parent)),
 	m_instance(instance),
 	m_pexpp(pexpp),
-	m_tabContainerInterface(tabContainerInterface),
 	m_navigation(navigation),
 	m_config(config)
 {
@@ -132,7 +131,10 @@ void MainToolbar::Initialize(HWND parent)
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabSelectedConnection = m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&MainToolbar::OnTabSelected, this, _1));
+	m_pexpp->AddTabsInitializedObserver([this] {
+		m_tabSelectedConnection = m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(boost::bind(&MainToolbar::OnTabSelected, this, _1));
+	});
+
 	m_navigationCompletedConnection = m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&MainToolbar::OnNavigationCompleted, this, _1));
 }
 

@@ -6,7 +6,6 @@
 
 #include "CoreInterface.h"
 #include "Navigation.h"
-#include "TabContainerInterface.h"
 #include "../Helper/BaseWindow.h"
 
 struct Config;
@@ -15,14 +14,13 @@ class MainWindow : CBaseWindow
 {
 public:
 
-	static MainWindow *Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-		IExplorerplusplus *expp, TabContainerInterface *tabContainerInterface, Navigation *navigation);
+	static MainWindow *Create(HWND hwnd, std::shared_ptr<Config> config,
+		HINSTANCE instance, IExplorerplusplus *expp, Navigation *navigation);
 
 private:
 
 	MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-		IExplorerplusplus *expp, TabContainerInterface *tabContainerInterface,
-		Navigation *navigation);
+		IExplorerplusplus *expp, Navigation *navigation);
 	~MainWindow();
 
 	void OnNavigationCompleted(const Tab &tab);
@@ -38,7 +36,6 @@ private:
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_expp;
-	TabContainerInterface *m_tabContainerInterface;
 	Navigation *m_navigation;
 
 	boost::signals2::connection m_navigationCompletedConnection;

@@ -13,18 +13,15 @@ Navigation::Navigation(std::shared_ptr<Config> config, IExplorerplusplus *expp) 
 	m_expp(expp),
 	m_tabContainer(nullptr)
 {
-
+	m_expp->AddTabsInitializedObserver([this] {
+		m_tabContainer = m_expp->GetTabContainer();
+		m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&Navigation::OnTabCreated, this, _1, _2), boost::signals2::at_front);
+	});
 }
 
 Navigation::~Navigation()
 {
 
-}
-
-void Navigation::SetTabContainer(TabContainer *tabContainer)
-{
-	m_tabContainer = tabContainer;
-	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&Navigation::OnTabCreated, this, _1, _2), boost::signals2::at_front);
 }
 
 void Navigation::OnTabCreated(int tabId, BOOL switchToNewTab)

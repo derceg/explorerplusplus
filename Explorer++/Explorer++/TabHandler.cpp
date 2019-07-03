@@ -33,8 +33,16 @@ void Explorerplusplus::InitializeTabs()
 
 	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, m_navigation, this, m_hLanguageModule, m_config);
 	m_tabContainer->tabUpdatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
+	m_tabContainer->tabSelectedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
 
 	m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
+
+	m_tabsInitializedSignal();
+}
+
+boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer)
+{
+	return m_tabsInitializedSignal.connect(observer);
 }
 
 void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
@@ -135,11 +143,6 @@ void Explorerplusplus::OnNewTab()
 	}
 }
 
-boost::signals2::connection Explorerplusplus::AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer)
-{
-	return m_tabSelectedSignal.connect(observer);
-}
-
 HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 {
 	TCHAR							szDirectory[MAX_PATH];
@@ -229,19 +232,10 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	return S_OK;
 }
 
-void Explorerplusplus::OnTabSelectionChanged(bool broadcastEvent)
+void Explorerplusplus::OnTabSelected(const Tab &tab)
 {
-	int index = TabCtrl_GetCurSel(m_tabContainer->GetHWND());
-
-	if (index == -1)
-	{
-		throw std::runtime_error("No selected tab");
-	}
-
 	/* Hide the old listview. */
 	ShowWindow(m_hActiveListView,SW_HIDE);
-
-	const Tab &tab = m_tabContainer->GetTabByIndex(index);
 
 	m_hActiveListView = tab.listView;
 	m_pActiveShellBrowser = tab.GetShellBrowser();
@@ -264,11 +258,6 @@ void Explorerplusplus::OnTabSelectionChanged(bool broadcastEvent)
 	/* Show the new listview. */
 	ShowWindow(m_hActiveListView,SW_SHOW);
 	SetFocus(m_hActiveListView);
-
-	if (broadcastEvent)
-	{
-		m_tabSelectedSignal(tab);
-	}
 }
 
 void Explorerplusplus::OnSelectTabByIndex(int iTab)

@@ -16,8 +16,6 @@ public:
 	Navigation(std::shared_ptr<Config> config, IExplorerplusplus *expp);
 	~Navigation();
 
-	void SetTabContainer(TabContainer *tabContainer);
-
 	void OnBrowseBack();
 	void OnBrowseForward();
 	void OnNavigateHome();

@@ -94,8 +94,7 @@ void TabContainer::Initialize(HWND parent)
 
 	m_tabCreatedConnection = tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2));
 	m_tabRemovedConnection = tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1));
-
-	m_tabSelectedConnection = m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&TabContainer::OnTabSelected, this, _1));
+	m_tabSelectedConnection = tabSelectedSignal.AddObserver(boost::bind(&TabContainer::OnTabSelected, this, _1));
 
 	m_navigationCompletedConnection = m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1));
 
@@ -575,7 +574,7 @@ LRESULT CALLBACK TabContainer::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam
 			break;
 
 		case TCN_SELCHANGE:
-			m_tabContainerInterface->OnTabSelectionChanged();
+			tabSelectedSignal.m_signal(GetSelectedTab());
 			break;
 		}
 		break;
@@ -885,7 +884,7 @@ HRESULT TabContainer::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 
 		if (previousIndex != -1)
 		{
-			m_tabContainerInterface->OnTabSelectionChanged(false);
+			m_tabContainerInterface->OnTabSelected(tab);
 
 			OnTabSelected(tab);
 		}
@@ -1140,7 +1139,7 @@ void TabContainer::SelectTabAtIndex(int index)
 		return;
 	}
 
-	m_tabContainerInterface->OnTabSelectionChanged();
+	tabSelectedSignal.m_signal(GetTabByIndex(index));
 }
 
 Tab &TabContainer::GetSelectedTab()

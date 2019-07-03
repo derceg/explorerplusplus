@@ -12,23 +12,25 @@
 #include "../Helper/ProcessHelper.h"
 
 MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-	IExplorerplusplus *expp, TabContainerInterface *tabContainerInterface, Navigation *navigation)
+	IExplorerplusplus *expp, Navigation *navigation)
 {
-	return new MainWindow(hwnd, config, instance, expp, tabContainerInterface, navigation);
+	return new MainWindow(hwnd, config, instance, expp, navigation);
 }
 
 MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
-	IExplorerplusplus *expp, TabContainerInterface *tabContainerInterface, Navigation *navigation) :
+	IExplorerplusplus *expp, Navigation *navigation) :
 	CBaseWindow(hwnd),
 	m_hwnd(hwnd),
 	m_config(config),
 	m_instance(instance),
 	m_expp(expp),
-	m_tabContainerInterface(tabContainerInterface),
 	m_navigation(navigation)
 {
+	m_expp->AddTabsInitializedObserver([this] {
+		m_tabSelectedConnection = m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(boost::bind(&MainWindow::OnTabSelected, this, _1));
+	});
+
 	m_navigationCompletedConnection = m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&MainWindow::OnNavigationCompleted, this, _1));
-	m_tabSelectedConnection = m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&MainWindow::OnTabSelected, this, _1));
 
 	m_showFillTitlePathConnection = m_config->showFullTitlePath.addObserver(boost::bind(&MainWindow::OnShowFullTitlePathUpdated, this, _1));
 	m_showUserNameInTitleBarConnection = m_config->showUserNameInTitleBar.addObserver(boost::bind(&MainWindow::OnShowUserNameInTitleBarUpdated, this, _1));

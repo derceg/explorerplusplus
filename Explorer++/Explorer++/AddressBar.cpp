@@ -11,17 +11,15 @@
 #include "../Helper/ShellHelper.h"
 
 AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp,
-	TabContainerInterface *tabContainerInterface, Navigation *navigation, MainToolbar *mainToolbar)
+	Navigation *navigation, MainToolbar *mainToolbar)
 {
-	return new AddressBar(parent, expp, tabContainerInterface, navigation, mainToolbar);
+	return new AddressBar(parent, expp, navigation, mainToolbar);
 }
 
-AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp,
-	TabContainerInterface *tabContainerInterface, Navigation *navigation,
+AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp, Navigation *navigation,
 	MainToolbar *mainToolbar) :
 	CBaseWindow(CreateAddressBar(parent)),
 	m_expp(expp),
-	m_tabContainerInterface(tabContainerInterface),
 	m_navigation(navigation),
 	m_mainToolbar(mainToolbar)
 {
@@ -58,7 +56,10 @@ void AddressBar::Initialize(HWND parent)
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabSelectedConnection = m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&AddressBar::OnTabSelected, this, _1));
+	m_expp->AddTabsInitializedObserver([this] {
+		m_tabSelectedConnection = m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(boost::bind(&AddressBar::OnTabSelected, this, _1));
+	});
+
 	m_navigationCompletedConnection = m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&AddressBar::OnNavigationCompleted, this, _1));
 }
 

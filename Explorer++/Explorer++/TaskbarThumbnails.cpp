@@ -41,18 +41,15 @@ namespace
 }
 
 TaskbarThumbnails *TaskbarThumbnails::Create(IExplorerplusplus *expp, TabContainer *tabContainer,
-	TabContainerInterface *tabContainerInterface, Navigation *navigation, HINSTANCE instance,
-	std::shared_ptr<Config> config)
+	Navigation *navigation, HINSTANCE instance, std::shared_ptr<Config> config)
 {
-	return new TaskbarThumbnails(expp, tabContainer, tabContainerInterface, navigation, instance, config);
+	return new TaskbarThumbnails(expp, tabContainer, navigation, instance, config);
 }
 
 TaskbarThumbnails::TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer,
-	TabContainerInterface *tabContainerInterface, Navigation *navigation, HINSTANCE instance,
-	std::shared_ptr<Config> config) :
+	Navigation *navigation, HINSTANCE instance, std::shared_ptr<Config> config) :
 	m_expp(expp),
 	m_tabContainer(tabContainer),
-	m_tabContainerInterface(tabContainerInterface),
 	m_navigation(navigation),
 	m_instance(instance),
 	m_bTaskbarInitialised(false),
@@ -89,7 +86,7 @@ void TaskbarThumbnails::Initialize()
 	SetWindowSubclass(m_expp->GetMainWindow(),MainWndProcStub,0,reinterpret_cast<DWORD_PTR>(this));
 
 	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&TaskbarThumbnails::CreateTabProxy, this, _1, _2));
-	m_tabContainerInterface->AddTabSelectedObserver(boost::bind(&TaskbarThumbnails::OnTabSelectionChanged, this, _1));
+	m_tabContainer->tabSelectedSignal.AddObserver(boost::bind(&TaskbarThumbnails::OnTabSelectionChanged, this, _1));
 	m_tabContainer->tabRemovedSignal.AddObserver(boost::bind(&TaskbarThumbnails::RemoveTabProxy, this, _1));
 
 	m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&TaskbarThumbnails::OnNavigationCompleted, this, _1));

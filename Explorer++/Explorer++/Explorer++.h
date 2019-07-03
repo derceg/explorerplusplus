@@ -282,16 +282,14 @@ private:
 
 	/* Tabs. */
 	void					InitializeTabs();
-	void					OnTabSelectionChanged(bool broadcastEvent = true);
+	boost::signals2::connection	AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer);
+	void					OnTabSelected(const Tab &tab);
 	void					ShowTabBar();
 	void					HideTabBar();
 	bool					OnCloseTab();
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	HRESULT					RefreshTab(const Tab &tab);
 	void					OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
-
-	/* Tab events. */
-	boost::signals2::connection	AddTabSelectedObserver(const TabSelectedSignal::slot_type &observer);
 
 	void					OnNavigationCompleted(const Tab &tab);
 
@@ -558,9 +556,7 @@ private:
 
 	/* Tabs. */
 	TabContainer			*m_tabContainer;
-
-	/* Tab signals. */
-	TabSelectedSignal		m_tabSelectedSignal;
+	TabsInitializedSignal	m_tabsInitializedSignal;
 
 	ToolbarContextMenuSignal	m_toolbarContextMenuSignal;
 
