@@ -488,7 +488,7 @@ private:
 
 	/* Miscellaneous. */
 	void					CreateStatusBar(void);
-	void					InitializeDisplayWindow(void);
+	void					InitializeDisplayWindow();
 	void					SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl);
 	int						CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
 	BOOL					AnyItemsSelected(void);
@@ -544,10 +544,6 @@ private:
 
 	/* Initialization. */
 	BOOL					m_bLoadSettingsFromXML;
-	Gdiplus::Color			m_DisplayWindowCentreColor;
-	Gdiplus::Color			m_DisplayWindowSurroundColor;
-	COLORREF				m_DisplayWindowTextColor;
-	HFONT					m_DisplayWindowFont;
 
 	MainWindow				*m_mainWindow;
 	AddressBar				*m_addressBar;

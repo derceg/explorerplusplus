@@ -31,7 +31,8 @@
 void Explorerplusplus::OnChangeDisplayColors()
 {
 	CDisplayColoursDialog DisplayColoursDialog(m_hLanguageModule, IDD_DISPLAYCOLOURS, m_hContainer,
-		m_hDisplayWindow, m_DisplayWindowCentreColor.ToCOLORREF(), m_DisplayWindowSurroundColor.ToCOLORREF());
+		m_hDisplayWindow, m_config->displayWindowCentreColor.ToCOLORREF(),
+		m_config->displayWindowSurroundColor.ToCOLORREF());
 	DisplayColoursDialog.ShowModalDialog();
 }
 

@@ -1527,20 +1527,19 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_DISPLAYCENTRECOLOR:
-		m_DisplayWindowCentreColor = NXMLSettings::ReadXMLColorData2(pNode);
-		m_DisplayWindowCentreColor = NXMLSettings::ReadXMLColorData2(pNode);
+		m_config->displayWindowCentreColor = NXMLSettings::ReadXMLColorData2(pNode);
 		break;
 
 	case HASH_DISPLAYFONT:
-		m_DisplayWindowFont = NXMLSettings::ReadXMLFontData(pNode);
+		m_config->displayWindowFont = NXMLSettings::ReadXMLFontData(pNode);
 		break;
 
 	case HASH_DISPLAYSURROUNDCOLOR:
-		m_DisplayWindowSurroundColor = NXMLSettings::ReadXMLColorData2(pNode);
+		m_config->displayWindowSurroundColor = NXMLSettings::ReadXMLColorData2(pNode);
 		break;
 
 	case HASH_DISPLAYTEXTCOLOR:
-		m_DisplayWindowTextColor = NXMLSettings::ReadXMLColorData(pNode);
+		m_config->displayWindowTextColor = NXMLSettings::ReadXMLColorData(pNode);
 		break;
 
 	case HASH_DISPLAYWINDOWHEIGHT:

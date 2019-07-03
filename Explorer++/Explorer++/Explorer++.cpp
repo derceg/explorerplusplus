@@ -16,9 +16,6 @@
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ShellHelper.h"
 
-#define DEFAULT_DISPLAYWINDOW_CENTRE_COLOR		Gdiplus::Color(255,255,255)
-#define DEFAULT_DISPLAYWINDOW_SURROUND_COLOR	Gdiplus::Color(0,94,138)
-
 /* These entries correspond to shell
 extensions that are known to be
 incompatible with Explorer++. They
@@ -88,14 +85,6 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	m_InitializationFinished		= false;
 
 	m_bBlockNext = FALSE;
-
-	m_DisplayWindowSurroundColor = DEFAULT_DISPLAYWINDOW_SURROUND_COLOR;
-	m_DisplayWindowCentreColor = DEFAULT_DISPLAYWINDOW_CENTRE_COLOR;
-	m_DisplayWindowTextColor = RGB(0, 0, 0);
-	m_DisplayWindowFont = CreateFont(-13, 0, 0, 0, FW_MEDIUM, FALSE,
-		FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-		CLIP_DEFAULT_PRECIS, PROOF_QUALITY, FIXED_PITCH | FF_MODERN,
-		_T("Segoe UI"));
 
 	SetLanguageModule();
 

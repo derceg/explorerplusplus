@@ -130,6 +130,14 @@ struct Config
 		alwaysShowTabBar.set(TRUE);
 		forceSameTabWidth.set(FALSE);
 
+		displayWindowSurroundColor = Gdiplus::Color(0, 94, 138);
+		displayWindowCentreColor = Gdiplus::Color(255, 255, 255);
+		displayWindowTextColor = RGB(0, 0, 0);
+		displayWindowFont = CreateFont(-13, 0, 0, 0, FW_MEDIUM, FALSE,
+			FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+			CLIP_DEFAULT_PRECIS, PROOF_QUALITY, FIXED_PITCH | FF_MODERN,
+			_T("Segoe UI"));
+
 		globalFolderSettings.showExtensions = TRUE;
 		globalFolderSettings.showFriendlyDates = TRUE;
 		globalFolderSettings.showFolderSizes = FALSE;
@@ -211,6 +219,12 @@ struct Config
 	// Tabs
 	ValueWrapper<BOOL> alwaysShowTabBar;
 	ValueWrapper<BOOL> forceSameTabWidth;
+
+	// Display window
+	Gdiplus::Color displayWindowCentreColor;
+	Gdiplus::Color displayWindowSurroundColor;
+	COLORREF displayWindowTextColor;
+	HFONT displayWindowFont;
 
 	// These are settings that are shared between all tabs. It's not
 	// possible to adjust them on a per-tab basis.

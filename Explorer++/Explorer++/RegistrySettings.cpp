@@ -316,7 +316,7 @@ LONG Explorerplusplus::LoadSettings()
 
 		if (SurroundColorStatus == ERROR_SUCCESS)
 		{
-			m_DisplayWindowSurroundColor.SetFromCOLORREF(SurroundColor);
+			m_config->displayWindowSurroundColor.SetFromCOLORREF(SurroundColor);
 		}
 
 		dwType = REG_BINARY;
@@ -327,7 +327,7 @@ LONG Explorerplusplus::LoadSettings()
 
 		if (CentreColorStatus == ERROR_SUCCESS)
 		{
-			m_DisplayWindowCentreColor.SetFromCOLORREF(CentreColor);
+			m_config->displayWindowCentreColor.SetFromCOLORREF(CentreColor);
 		}
 
 		dwType = REG_BINARY;
@@ -338,7 +338,7 @@ LONG Explorerplusplus::LoadSettings()
 
 		if (TextColorStatus == ERROR_SUCCESS)
 		{
-			m_DisplayWindowTextColor = TextColor;
+			m_config->displayWindowTextColor = TextColor;
 		}
 
 		dwType = REG_BINARY;
@@ -351,7 +351,7 @@ LONG Explorerplusplus::LoadSettings()
 		{
 			hFont = CreateFontIndirect(&LogFont);
 
-			m_DisplayWindowFont = hFont;
+			m_config->displayWindowFont = hFont;
 		}
 
 		m_bAttemptToolbarRestore = TRUE;

@@ -251,14 +251,13 @@ void Explorerplusplus::InitializeBookmarks(void)
 	m_guidBookmarksMenu = bfBookmarksMenu.GetGUID();
 }
 
-void Explorerplusplus::InitializeDisplayWindow(void)
+void Explorerplusplus::InitializeDisplayWindow()
 {
-	DWInitialSettings_t	InitialSettings;
-
-	InitialSettings.CentreColor		= m_DisplayWindowCentreColor;
-	InitialSettings.SurroundColor	= m_DisplayWindowSurroundColor;
-	InitialSettings.TextColor		= m_DisplayWindowTextColor;
-	InitialSettings.hFont			= m_DisplayWindowFont;
+	DWInitialSettings_t InitialSettings;
+	InitialSettings.CentreColor		= m_config->displayWindowCentreColor;
+	InitialSettings.SurroundColor	= m_config->displayWindowSurroundColor;
+	InitialSettings.TextColor		= m_config->displayWindowTextColor;
+	InitialSettings.hFont			= m_config->displayWindowFont;
 	InitialSettings.hIcon			= (HICON)LoadImage(GetModuleHandle(0),
 		MAKEINTRESOURCE(IDI_DISPLAYWINDOW),IMAGE_ICON,
 		0,0,LR_CREATEDIBSECTION);
