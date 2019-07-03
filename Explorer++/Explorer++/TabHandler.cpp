@@ -62,26 +62,6 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 	}
 }
 
-void Explorerplusplus::OnStartedBrowsing(int iTabId, const TCHAR *szFolderPath)
-{
-	TCHAR	szLoadingText[512];
-
-	if (iTabId == m_tabContainer->GetSelectedTab().GetId())
-	{
-		TCHAR szTemp[64];
-		LoadString(m_hLanguageModule, IDS_GENERAL_LOADING, szTemp, SIZEOF_ARRAY(szTemp));
-		StringCchPrintf(szLoadingText, SIZEOF_ARRAY(szLoadingText), szTemp, szFolderPath);
-
-		/* Browsing of a folder has started. Set the status bar text to indicate that
-		the folder is been loaded. */
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)0 | 0, (LPARAM)szLoadingText);
-
-		/* Clear the text in all other parts of the status bar. */
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)1 | 0, (LPARAM)EMPTY_STRING);
-		SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)2 | 0, (LPARAM)EMPTY_STRING);
-	}
-}
-
 void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 {
 	if (m_tabContainer->IsTabSelected(tab))
