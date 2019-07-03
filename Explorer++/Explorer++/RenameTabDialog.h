@@ -66,5 +66,5 @@ private:
 	int		m_tabId;
 	TCHAR	m_szTabName[256];
 
-	boost::signals2::connection	m_tabRemovedConnection;
+	std::vector<boost::signals2::scoped_connection>	m_connections;
 };

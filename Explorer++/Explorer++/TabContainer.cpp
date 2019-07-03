@@ -92,14 +92,14 @@ void TabContainer::Initialize(HWND parent)
 	SetWindowSubclass(m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
-	m_tabCreatedConnection = tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2));
-	m_tabRemovedConnection = tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1));
-	m_tabSelectedConnection = tabSelectedSignal.AddObserver(boost::bind(&TabContainer::OnTabSelected, this, _1));
+	m_connections.push_back(tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2)));
+	m_connections.push_back(tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1)));
+	m_connections.push_back(tabSelectedSignal.AddObserver(boost::bind(&TabContainer::OnTabSelected, this, _1)));
 
-	m_navigationCompletedConnection = m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1));
+	m_connections.push_back(m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&TabContainer::OnNavigationCompleted, this, _1)));
 
-	m_alwaysShowTabBarConnection = m_config->alwaysShowTabBar.addObserver(boost::bind(&TabContainer::OnAlwaysShowTabBarUpdated, this, _1));
-	m_forceSameTabWidthConnection = m_config->forceSameTabWidth.addObserver(boost::bind(&TabContainer::OnForceSameTabWidthUpdated, this, _1));
+	m_connections.push_back(m_config->alwaysShowTabBar.addObserver(boost::bind(&TabContainer::OnAlwaysShowTabBarUpdated, this, _1)));
+	m_connections.push_back(m_config->forceSameTabWidth.addObserver(boost::bind(&TabContainer::OnForceSameTabWidthUpdated, this, _1)));
 }
 
 void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
@@ -136,16 +136,6 @@ TabContainer::~TabContainer()
 
 	RemoveWindowSubclass(m_hwnd, WndProcStub, SUBCLASS_ID);
 	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
-
-	m_tabCreatedConnection.disconnect();
-	m_tabRemovedConnection.disconnect();
-
-	m_tabSelectedConnection.disconnect();
-
-	m_navigationCompletedConnection.disconnect();
-
-	m_alwaysShowTabBarConnection.disconnect();
-	m_forceSameTabWidthConnection.disconnect();
 }
 
 LRESULT CALLBACK TabContainer::WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)

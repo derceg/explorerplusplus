@@ -38,10 +38,5 @@ private:
 	IExplorerplusplus *m_expp;
 	Navigation *m_navigation;
 
-	boost::signals2::connection m_navigationCompletedConnection;
-	boost::signals2::connection m_tabSelectedConnection;
-
-	boost::signals2::connection m_showFillTitlePathConnection;
-	boost::signals2::connection m_showUserNameInTitleBarConnection;
-	boost::signals2::connection m_showPrivilegeLevelInTitleBarConnection;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 };

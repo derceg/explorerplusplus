@@ -45,6 +45,5 @@ private:
 	Navigation *m_navigation;
 	MainToolbar *m_mainToolbar;
 
-	boost::signals2::connection m_tabSelectedConnection;
-	boost::signals2::connection m_navigationCompletedConnection;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 };

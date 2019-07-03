@@ -8,7 +8,7 @@
 Plugins::MenuApi::MenuApi(PluginMenuManager *pluginMenuManager) :
 	m_pluginMenuManager(pluginMenuManager)
 {
-	m_menuClickedConnection = m_pluginMenuManager->AddMenuClickedObserver(boost::bind(&Plugins::MenuApi::onMenuItemClicked, this, _1));
+	m_connections.push_back(m_pluginMenuManager->AddMenuClickedObserver(boost::bind(&Plugins::MenuApi::onMenuItemClicked, this, _1)));
 }
 
 Plugins::MenuApi::~MenuApi()
@@ -17,8 +17,6 @@ Plugins::MenuApi::~MenuApi()
 	{
 		m_pluginMenuManager->RemoveItemFromMainMenu(item.first);
 	}
-
-	m_menuClickedConnection.disconnect();
 }
 
 boost::optional<int> Plugins::MenuApi::create(const std::wstring &text, sol::protected_function callback)

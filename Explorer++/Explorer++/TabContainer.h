@@ -144,15 +144,7 @@ private:
 	HINSTANCE m_instance;
 	std::shared_ptr<Config> m_config;
 
-	boost::signals2::connection m_tabCreatedConnection;
-	boost::signals2::connection m_tabRemovedConnection;
-
-	boost::signals2::connection m_tabSelectedConnection;
-
-	boost::signals2::connection m_navigationCompletedConnection;
-
-	boost::signals2::connection m_alwaysShowTabBarConnection;
-	boost::signals2::connection m_forceSameTabWidthConnection;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	std::vector<int> m_tabSelectionHistory;
 	int m_iPreviousTabSelectionId;

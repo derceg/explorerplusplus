@@ -33,20 +33,6 @@ CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplore
 	CBookmarkItemNotifier::GetInstance().AddObserver(this);
 }
 
-CBookmarksToolbar::~CBookmarksToolbar()
-{
-	m_toolbarContextMenuConnection.disconnect();
-
-	ImageList_Destroy(m_himl);
-
-	m_pbtdh->Release();
-
-	RemoveWindowSubclass(m_hToolbar,BookmarksToolbarProcStub,SUBCLASS_ID);
-	RemoveWindowSubclass(GetParent(m_hToolbar),BookmarksToolbarParentProcStub,PARENT_SUBCLASS_ID);
-
-	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
-}
-
 void CBookmarksToolbar::InitializeToolbar()
 {
 	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
@@ -70,7 +56,19 @@ void CBookmarksToolbar::InitializeToolbar()
 
 	InsertBookmarkItems();
 
-	m_toolbarContextMenuConnection = m_pexpp->AddToolbarContextMenuObserver(boost::bind(&CBookmarksToolbar::OnToolbarContextMenuPreShow, this, _1, _2));
+	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(boost::bind(&CBookmarksToolbar::OnToolbarContextMenuPreShow, this, _1, _2)));
+}
+
+CBookmarksToolbar::~CBookmarksToolbar()
+{
+	ImageList_Destroy(m_himl);
+
+	m_pbtdh->Release();
+
+	RemoveWindowSubclass(m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID);
+	RemoveWindowSubclass(GetParent(m_hToolbar), BookmarksToolbarParentProcStub, PARENT_SUBCLASS_ID);
+
+	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
 }
 
 LRESULT CALLBACK BookmarksToolbarProcStub(HWND hwnd,UINT uMsg,

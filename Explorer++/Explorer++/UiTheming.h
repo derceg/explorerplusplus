@@ -29,7 +29,7 @@ private:
 	IExplorerplusplus *m_expp;
 	TabContainer *m_tabContainer;
 
-	boost::signals2::connection m_tabCreatedConnection;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	bool m_customListViewColorsApplied;
 	COLORREF m_listViewBackgroundColor;

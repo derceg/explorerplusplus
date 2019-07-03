@@ -27,7 +27,8 @@ namespace Plugins
 
 		PluginMenuManager *m_pluginMenuManager;
 
-		boost::signals2::connection m_menuClickedConnection;
+		std::vector<boost::signals2::scoped_connection> m_connections;
+
 		std::unordered_map<int, sol::protected_function> m_pluginMenuItems;
 	};
 }

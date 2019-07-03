@@ -124,5 +124,5 @@ private:
 
 	CBookmarksToolbarDropHandler	*m_pbtdh;
 
-	boost::signals2::connection		m_toolbarContextMenuConnection;
+	std::vector<boost::signals2::scoped_connection>	m_connections;
 };

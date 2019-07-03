@@ -72,6 +72,5 @@ private:
 
 	std::list<ToolbarButton_t> m_tbInitial;
 
-	boost::signals2::connection m_tabSelectedConnection;
-	boost::signals2::connection m_navigationCompletedConnection;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 };

@@ -46,17 +46,6 @@ MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pex
 	Initialize(parent);
 }
 
-MainToolbar::~MainToolbar()
-{
-	ImageList_Destroy(m_himlSmall);
-	ImageList_Destroy(m_himlLarge);
-
-	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
-
-	m_tabSelectedConnection.disconnect();
-	m_navigationCompletedConnection.disconnect();
-}
-
 HWND MainToolbar::CreateMainToolbar(HWND parent)
 {
 	return CreateToolbar(parent, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |
@@ -132,10 +121,18 @@ void MainToolbar::Initialize(HWND parent)
 		reinterpret_cast<DWORD_PTR>(this));
 
 	m_pexpp->AddTabsInitializedObserver([this] {
-		m_tabSelectedConnection = m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(boost::bind(&MainToolbar::OnTabSelected, this, _1));
+		m_connections.push_back(m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(boost::bind(&MainToolbar::OnTabSelected, this, _1)));
 	});
 
-	m_navigationCompletedConnection = m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&MainToolbar::OnNavigationCompleted, this, _1));
+	m_connections.push_back(m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&MainToolbar::OnNavigationCompleted, this, _1)));
+}
+
+MainToolbar::~MainToolbar()
+{
+	ImageList_Destroy(m_himlSmall);
+	ImageList_Destroy(m_himlLarge);
+
+	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
 }
 
 LRESULT CALLBACK MainToolbar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)

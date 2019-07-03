@@ -24,12 +24,12 @@ CRenameTabDialog::CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hPar
 {
 	m_prtdps = &CRenameTabDialogPersistentSettings::GetInstance();
 
-	m_tabRemovedConnection = m_tabContainer->tabRemovedSignal.AddObserver(boost::bind(&CRenameTabDialog::OnTabClosed, this, _1));
+	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(boost::bind(&CRenameTabDialog::OnTabClosed, this, _1)));
 }
 
 CRenameTabDialog::~CRenameTabDialog()
 {
-	m_tabRemovedConnection.disconnect();
+
 }
 
 INT_PTR CRenameTabDialog::OnInitDialog()

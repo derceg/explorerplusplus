@@ -46,16 +46,6 @@ m_pexpp(pexpp)
 	Initialize(hParent);
 }
 
-CApplicationToolbar::~CApplicationToolbar()
-{
-	m_toolbarContextMenuConnection.disconnect();
-
-	RemoveWindowSubclass(GetParent(m_hwnd),ParentWndProcStub,PARENT_SUBCLASS_ID);
-
-	RevokeDragDrop(m_hwnd);
-	m_patd->Release();
-}
-
 HWND CApplicationToolbar::CreateApplicationToolbar(HWND hParent)
 {
 	return CreateToolbar(hParent, WS_CHILD | WS_VISIBLE |
@@ -84,7 +74,15 @@ void CApplicationToolbar::Initialize(HWND hParent)
 
 	AddButtonsToToolbar();
 
-	m_toolbarContextMenuConnection = m_pexpp->AddToolbarContextMenuObserver(boost::bind(&CApplicationToolbar::OnToolbarContextMenuPreShow, this, _1, _2));
+	m_connections.push_back(m_pexpp->AddToolbarContextMenuObserver(boost::bind(&CApplicationToolbar::OnToolbarContextMenuPreShow, this, _1, _2)));
+}
+
+CApplicationToolbar::~CApplicationToolbar()
+{
+	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
+
+	RevokeDragDrop(m_hwnd);
+	m_patd->Release();
 }
 
 LRESULT CALLBACK ParentWndProcStub(HWND hwnd,UINT uMsg,

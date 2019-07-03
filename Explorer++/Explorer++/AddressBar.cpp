@@ -26,14 +26,6 @@ AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp, Navigation *navigat
 	Initialize(parent);
 }
 
-AddressBar::~AddressBar()
-{
-	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
-
-	m_tabSelectedConnection.disconnect();
-	m_navigationCompletedConnection.disconnect();
-}
-
 HWND AddressBar::CreateAddressBar(HWND parent)
 {
 	return CreateComboBox(parent, WS_CHILD | WS_VISIBLE | WS_TABSTOP |
@@ -57,10 +49,15 @@ void AddressBar::Initialize(HWND parent)
 		reinterpret_cast<DWORD_PTR>(this));
 
 	m_expp->AddTabsInitializedObserver([this] {
-		m_tabSelectedConnection = m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(boost::bind(&AddressBar::OnTabSelected, this, _1));
+		m_connections.push_back(m_expp->GetTabContainer()->tabSelectedSignal.AddObserver(boost::bind(&AddressBar::OnTabSelected, this, _1)));
 	});
 
-	m_navigationCompletedConnection = m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&AddressBar::OnNavigationCompleted, this, _1));
+	m_connections.push_back(m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&AddressBar::OnNavigationCompleted, this, _1)));
+}
+
+AddressBar::~AddressBar()
+{
+	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
 }
 
 LRESULT CALLBACK AddressBar::EditSubclassStub(HWND hwnd, UINT uMsg,
