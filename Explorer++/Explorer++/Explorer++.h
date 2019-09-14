@@ -299,6 +299,7 @@ private:
 	Navigation				*GetNavigation();
 	Plugins::PluginMenuManager	*GetPluginMenuManager();
 	UiTheming				*GetUiTheming();
+	AcceleratorUpdater		*GetAccleratorUpdater();
 	Plugins::PluginCommandManager	*GetPluginCommandManager();
 
 	/* Plugins. */
@@ -562,6 +563,7 @@ private:
 	/* Plugins. */
 	std::unique_ptr<Plugins::PluginManager>	m_pluginManager;
 	Plugins::PluginMenuManager	m_pluginMenuManager;
+	AcceleratorUpdater		m_acceleratorUpdater;
 	Plugins::PluginCommandManager	m_pluginCommandManager;
 
 	HWND					m_hActiveListView;

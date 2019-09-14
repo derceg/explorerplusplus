@@ -9,6 +9,8 @@
 
 const std::wstring Plugins::PluginManager::MANIFEST_NAME = L"plugin.json";
 
+std::vector<ShortcutKey> convertPluginShortcutKeys(const std::vector<Plugins::PluginShortcutKey> &pluginShortcutKeys);
+
 Plugins::PluginManager::PluginManager(PluginInterface *pluginInterface) :
 	m_pluginInterface(pluginInterface)
 {
@@ -105,9 +107,40 @@ bool Plugins::PluginManager::registerPlugin(const boost::filesystem::path &direc
 		return false;
 	}
 
+	m_pluginInterface->GetAccleratorUpdater()->update(convertPluginShortcutKeys(manifest.shortcutKeys));
 	m_pluginInterface->GetPluginCommandManager()->addCommands(plugin->GetId(), manifest.commands);
 
 	m_plugins.push_back(std::move(plugin));
 
 	return true;
+}
+
+std::vector<ShortcutKey> convertPluginShortcutKeys(const std::vector<Plugins::PluginShortcutKey> &pluginShortcutKeys)
+{
+	std::vector<ShortcutKey> shortcutKeys;
+
+	for (auto &pluginShortcutKey : pluginShortcutKeys)
+	{
+		if (!pluginShortcutKey.command)
+		{
+			continue;
+		}
+
+		ShortcutKey shortcutKey;
+		shortcutKey.command = *pluginShortcutKey.command;
+
+		for (auto &pluginAccelerator : pluginShortcutKey.pluginAccelerators)
+		{
+			if (!pluginAccelerator.accelerator)
+			{
+				continue;
+			}
+
+			shortcutKey.accelerators.push_back(*pluginAccelerator.accelerator);
+		}
+
+		shortcutKeys.push_back(shortcutKey);
+	}
+
+	return shortcutKeys;
 }

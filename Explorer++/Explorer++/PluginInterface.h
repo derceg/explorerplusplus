@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "AcceleratorUpdater.h"
 #include "Navigation.h"
 #include "PluginCommandManager.h"
 #include "PluginMenuManager.h"
@@ -18,5 +19,6 @@ __interface PluginInterface
 	Navigation *GetNavigation();
 	Plugins::PluginMenuManager *GetPluginMenuManager();
 	UiTheming *GetUiTheming();
+	AcceleratorUpdater *GetAccleratorUpdater();
 	Plugins::PluginCommandManager *GetPluginCommandManager();
 };

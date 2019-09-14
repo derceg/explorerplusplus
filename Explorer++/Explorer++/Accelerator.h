@@ -12,3 +12,9 @@ struct Accelerator
 	BYTE modifiers;
 	WORD key;
 };
+
+struct ShortcutKey
+{
+	int command;
+	std::vector<Accelerator> accelerators;
+};

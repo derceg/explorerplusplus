@@ -32,6 +32,11 @@ UiTheming *Explorerplusplus::GetUiTheming()
 	return m_uiTheming.get();
 }
 
+AcceleratorUpdater *Explorerplusplus::GetAccleratorUpdater()
+{
+	return &m_acceleratorUpdater;
+}
+
 Plugins::PluginCommandManager *Explorerplusplus::GetPluginCommandManager()
 {
 	return &m_pluginCommandManager;

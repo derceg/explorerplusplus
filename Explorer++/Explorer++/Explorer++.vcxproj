@@ -307,6 +307,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="AcceleratorParser.cpp" />
+    <ClCompile Include="AcceleratorUpdater.cpp" />
     <ClCompile Include="AddBookmarkDialog.cpp" />
     <ClCompile Include="AddressBar.cpp" />
     <ClCompile Include="ApiBinding.cpp" />
@@ -440,7 +441,9 @@
     <ClInclude Include="..\targetver.h" />
     <ClInclude Include="AboutDialog.h" />
     <ClInclude Include="Accelerator.h" />
+    <ClInclude Include="AcceleratorMappings.h" />
     <ClInclude Include="AcceleratorParser.h" />
+    <ClInclude Include="AcceleratorUpdater.h" />
     <ClInclude Include="AddBookmarkDialog.h" />
     <ClInclude Include="AddressBar.h" />
     <ClInclude Include="ApiBinding.h" />

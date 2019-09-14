@@ -43,8 +43,8 @@ void Plugins::PluginCommandManager::addCommands(int pluginId, const std::vector<
 
 		if (itr != accelerators.end())
 		{
-			// At the moment, it's not possible to override existing
-			// accelerators.
+			// Accelerators are overridden using a different mechanism, so it's
+			// not possible to change them here.
 			continue;
 		}
 

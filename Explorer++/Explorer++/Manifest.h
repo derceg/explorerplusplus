@@ -12,6 +12,18 @@
 
 namespace Plugins
 {
+	struct PluginAccelerator
+	{
+		std::wstring acceleratorString;
+		boost::optional<Accelerator> accelerator;
+	};
+
+	struct PluginShortcutKey
+	{
+		boost::optional<int> command;
+		std::vector<PluginAccelerator> pluginAccelerators;
+	};
+
 	struct Command
 	{
 		std::wstring name;
@@ -31,6 +43,7 @@ namespace Plugins
 
 		std::vector<sol::lib> libraries;
 		std::vector<Command> commands;
+		std::vector<PluginShortcutKey> shortcutKeys;
 	};
 
 	NLOHMANN_JSON_SERIALIZE_ENUM(sol::lib, {
@@ -48,6 +61,8 @@ namespace Plugins
 
 	void from_json(const nlohmann::json &json, Manifest &manifest);
 	void from_json(const nlohmann::json &json, Command &command);
+	void from_json(const nlohmann::json &json, PluginShortcutKey &shortcutKey);
+	void from_json(const nlohmann::json &json, PluginAccelerator &pluginAccelerator);
 
 	boost::optional<Manifest> parseManifest(const boost::filesystem::path &manifestPath);
 }
