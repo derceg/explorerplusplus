@@ -1,0 +1,16 @@
+{
+  "name": "Remap rename accelerator",
+  "description": "Remaps the rename command accelerator.",
+  "file": "empty.lua",
+  "version": "1.0",
+  "std_libs_required": [],
+  "author": "David Erceg",
+  "shortcut_keys": [
+    {
+      "command": "rename",
+      "keys": [
+        "Alt+Shift+R"
+      ]
+    }
+  ]
+}
