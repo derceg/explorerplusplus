@@ -183,7 +183,6 @@ private:
 	void					HandleDirectoryMonitoring(int iTabId);
 	void					OnDisplayWindowResized(WPARAM wParam);
 	void					OnStartedBrowsing(int iTabId, const TCHAR *szPath);
-	void					UpdateTabToolbar();
 	void					OnAutoSizeColumns(void);
 	void					OnToolbarViews(void);
 	void					OnSortByAscending(BOOL bSortAscending);
@@ -280,6 +279,12 @@ private:
 	LRESULT CALLBACK		TreeViewHolderWindowNotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	void					OnTreeViewHolderWindowTimer(void);
 
+	/* Tab backing. */
+	void					CreateTabBacking();
+	void					OnTabsInitialized();
+	void					OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
+	void					UpdateTabToolbar();
+
 	/* Tabs. */
 	void					InitializeTabs();
 	boost::signals2::connection	AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer);
@@ -289,7 +294,6 @@ private:
 	bool					OnCloseTab();
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	HRESULT					RefreshTab(const Tab &tab);
-	void					OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 
 	void					OnNavigationCompleted(const Tab &tab);
 
@@ -323,7 +327,6 @@ private:
 	void					CreateDrivesToolbar(void);
 	void					CreateApplicationToolbar();
 	HWND					CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip);
-	void					CreateTabBacking();
 
 	/* Main toolbars. */
 	void					InitializeMainToolbars(void);

@@ -24,6 +24,49 @@ void Explorerplusplus::CreateTabBacking()
 	TCHAR szTabCloseTip[64];
 	LoadString(m_hLanguageModule, IDS_TAB_CLOSE_TIP, szTabCloseTip, SIZEOF_ARRAY(szTabCloseTip));
 	m_hTabWindowToolbar = CreateTabToolbar(m_hTabBacking, TABTOOLBAR_CLOSE, szTabCloseTip);
+
+	AddTabsInitializedObserver(boost::bind(&Explorerplusplus::OnTabsInitialized, this));
+}
+
+void Explorerplusplus::OnTabsInitialized()
+{
+	m_tabContainer->tabCreatedSignal.AddObserver([this](int tabId, BOOL switchToNewTab) {
+		UNREFERENCED_PARAMETER(tabId);
+		UNREFERENCED_PARAMETER(switchToNewTab);
+
+		UpdateTabToolbar();
+	});
+
+	m_tabContainer->tabUpdatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
+
+	m_tabContainer->tabSelectedSignal.AddObserver([this](const Tab &tab) {
+		UNREFERENCED_PARAMETER(tab);
+
+		UpdateTabToolbar();
+	});
+
+	m_tabContainer->tabRemovedSignal.AddObserver([this](int tabId) {
+		UNREFERENCED_PARAMETER(tabId);
+
+		UpdateTabToolbar();
+	});
+}
+
+void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
+{
+	switch (propertyType)
+	{
+	case Tab::PropertyType::LOCKED:
+	case Tab::PropertyType::ADDRESS_LOCKED:
+		/* If the tab that was locked/unlocked is the
+		currently selected tab, then the tab close
+		button on the toolbar will need to be updated. */
+		if (m_tabContainer->IsTabSelected(tab))
+		{
+			UpdateTabToolbar();
+		}
+		break;
+	}
 }
 
 void Explorerplusplus::UpdateTabToolbar()

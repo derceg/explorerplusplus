@@ -33,7 +33,6 @@ void Explorerplusplus::UpdateWindowStates(void)
 
 	UpdateTreeViewSelection();
 	UpdateStatusBarText();
-	UpdateTabToolbar();
 	UpdateDisplayWindow();
 }
 

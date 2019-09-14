@@ -32,7 +32,6 @@ void Explorerplusplus::InitializeTabs()
 	CreateTabBacking();
 
 	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, m_navigation, this, m_hLanguageModule, m_config);
-	m_tabContainer->tabUpdatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabUpdated, this, _1, _2));
 	m_tabContainer->tabSelectedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
 
 	m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
@@ -43,23 +42,6 @@ void Explorerplusplus::InitializeTabs()
 boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer)
 {
 	return m_tabsInitializedSignal.connect(observer);
-}
-
-void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
-{
-	switch (propertyType)
-	{
-	case Tab::PropertyType::LOCKED:
-	case Tab::PropertyType::ADDRESS_LOCKED:
-		/* If the tab that was locked/unlocked is the
-		currently selected tab, then the tab close
-		button on the toolbar will need to be updated. */
-		if (m_tabContainer->IsTabSelected(tab))
-		{
-			UpdateTabToolbar();
-		}
-		break;
-	}
 }
 
 void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
