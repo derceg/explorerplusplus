@@ -168,6 +168,8 @@ private:
 
 	/* Main window private message handlers. */
 	LRESULT CALLBACK		CommandHandler(HWND hwnd, WPARAM wParam);
+	LRESULT					HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam);
+	LRESULT					HandleControlNotification(HWND hwnd, WPARAM wParam);
 	LRESULT CALLBACK		NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	BOOL					OnSize(int MainWindowWidth,int MainWindowHeight);
 	int						OnClose(void);
