@@ -1,0 +1,22 @@
+{
+  "name": "Update accelerators",
+  "description": "Remaps the rename command accelerator and adds a new accelerator to toggle the display window.",
+  "file": "empty.lua",
+  "version": "1.0",
+  "std_libs_required": [],
+  "author": "David Erceg",
+  "shortcut_keys": [
+    {
+      "command": "rename",
+      "keys": [
+        "Alt+Shift+R"
+      ]
+    },
+    {
+      "command": "view_mode_icons",
+      "keys": [
+        "Alt+Shift+I"
+      ]
+    }
+  ]
+}
