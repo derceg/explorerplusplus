@@ -32,9 +32,6 @@ build:
 # Sign and package the executable.
 after_build:
 - cmd: >-
-    @REM IF DEFINED PFX_PASS ("C:\Program Files (x86)\Windows Kits\8.1\bin\x64\signtool.exe" sign /tr http://timestamp.digicert.com /td sha256 /fd sha256 /f %APPVEYOR_BUILD_FOLDER%\authenticode.pfx /p %PFX_PASS% %APPVEYOR_BUILD_FOLDER%\Explorer++\Explorer++\%PLATFORM%\%CONFIGURATION%\Explorer++.exe)
-
-
     cd %APPVEYOR_BUILD_FOLDER%
 
 
