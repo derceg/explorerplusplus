@@ -1,6 +1,6 @@
 {
   "name": "Update accelerators",
-  "description": "Remaps the rename command accelerator and adds a new accelerator to toggle the display window.",
+  "description": "Remaps the rename command accelerator and adds a new accelerator to switch the view mode to icons.",
   "file": "empty.lua",
   "version": "1.0",
   "std_libs_required": [],
