@@ -1,1 +1,1 @@
-#include "..\resource.h"
+#include "..\..\Explorer++\Explorer++\resource.h"
