@@ -1,6 +1,6 @@
 files:
   - source: /Explorer++/Explorer++/Explorer++.rc
-    translation: /Translations/Explorer++%two_letters_code%/Explorer++%two_letters_code%.rc
+    translation: /Translations/Explorer++%two_letters_code%/Explorer++.rc
     languages_mapping:
       two_letters_code:
         ca: CA
