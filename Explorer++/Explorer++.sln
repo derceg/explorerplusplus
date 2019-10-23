@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29418.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++", "Explorer++\Explorer++.vcxproj", "{7544A240-2EBF-4DC1-B55B-C8AE32672ED0}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -75,6 +75,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua", "Lua\Lua.vcxproj", "{0977324A-4826-461A-A3B6-D88AFFD444D2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestExplorer++", "TestExplorer++\TestExplorer++.vcxproj", "{1964E0F5-1A0F-4CB1-BAB5-B793F130F0FB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++HE", "..\Translations\Explorer++HE\Explorer++HE.vcxproj", "{AD497D19-0B88-4E37-95B9-991C6514B156}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -338,6 +340,14 @@ Global
 		{1964E0F5-1A0F-4CB1-BAB5-B793F130F0FB}.Release|x64.ActiveCfg = Release|x64
 		{1964E0F5-1A0F-4CB1-BAB5-B793F130F0FB}.Test|Win32.ActiveCfg = Release|Win32
 		{1964E0F5-1A0F-4CB1-BAB5-B793F130F0FB}.Test|x64.ActiveCfg = Release|x64
+		{AD497D19-0B88-4E37-95B9-991C6514B156}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AD497D19-0B88-4E37-95B9-991C6514B156}.Debug|x64.ActiveCfg = Debug|Win32
+		{AD497D19-0B88-4E37-95B9-991C6514B156}.Release|Win32.ActiveCfg = Release|Win32
+		{AD497D19-0B88-4E37-95B9-991C6514B156}.Release|Win32.Build.0 = Release|Win32
+		{AD497D19-0B88-4E37-95B9-991C6514B156}.Release|x64.ActiveCfg = Release|Win32
+		{AD497D19-0B88-4E37-95B9-991C6514B156}.Release|x64.Build.0 = Release|Win32
+		{AD497D19-0B88-4E37-95B9-991C6514B156}.Test|Win32.ActiveCfg = Release|Win32
+		{AD497D19-0B88-4E37-95B9-991C6514B156}.Test|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -365,9 +375,9 @@ Global
 		{E885F322-0EE6-4BD3-A35D-B262EFA94639} = {F29F24CD-0668-462F-80AE-649CB12F1860}
 		{B31026C5-6BAF-4C69-BB4C-9C811B1BEEC7} = {F29F24CD-0668-462F-80AE-649CB12F1860}
 		{C12096BF-F80B-4ABE-892C-247AF2A5458A} = {F29F24CD-0668-462F-80AE-649CB12F1860}
+		{AD497D19-0B88-4E37-95B9-991C6514B156} = {F29F24CD-0668-462F-80AE-649CB12F1860}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {504CEF86-1D85-4DF5-84B2-ECA032747EC4}
-		VisualSVNWorkingCopyRoot = 
 	EndGlobalSection
 EndGlobal
