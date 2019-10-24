@@ -15,7 +15,7 @@ files:
         ja: JA
         ko: KO
         nl: NL
-        no: NO
+        'no': 'NO'
         pl: PL
         pt-PT: PT
         ro: RO
