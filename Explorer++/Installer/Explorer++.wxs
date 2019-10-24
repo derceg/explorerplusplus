@@ -84,8 +84,14 @@
 			<Component Id="PersianTranslation" Guid="6E06E678-6E38-40CD-88EA-D73B639DD64C">
 				<File Id="PersianDLL" Source="$(var.Explorer++FA.TargetPath)" KeyPath="yes" />
 			</Component>
+			<Component Id="FinnishTranslation" Guid="BA70C501-2865-4B59-A257-C23E0A7D68AD">
+				<File Id="FinnishDLL" Source="$(var.Explorer++FI.TargetPath)" KeyPath="yes" />
+			</Component>
 			<Component Id="FrenchTranslation" Guid="C89702B5-8DF8-40D8-BDC4-D51AA845907C">
 				<File Id="FrenchDLL" Source="$(var.Explorer++FR.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="HebrewTranslation" Guid="0035482C-7253-41CA-9FDD-849B954FD452">
+				<File Id="HebrewDLL" Source="$(var.Explorer++HE.TargetPath)" KeyPath="yes" />
 			</Component>
 			<Component Id="HungarianTranslation" Guid="194FB780-6CF3-485E-A782-2B7FE21DEAC7">
 				<File Id="HungarianDLL" Source="$(var.Explorer++HU.TargetPath)" KeyPath="yes" />
@@ -129,8 +135,14 @@
 			<Component Id="UkrainianTranslation" Guid="343C6FDF-FE50-476E-9BC2-FCD89E108631">
 				<File Id="UkrainianDLL" Source="$(var.Explorer++UK.TargetPath)" KeyPath="yes" />
 			</Component>
-			<Component Id="ChineseTranslation" Guid="06FB3620-50FD-46E3-BF77-C5C4546C0A75">
-				<File Id="ChineseDLL" Source="$(var.Explorer++ZH.TargetPath)" KeyPath="yes" />
+			<Component Id="VietnameseTranslation" Guid="540EBC40-9950-4FC7-840B-0E2242006818">
+				<File Id="VietnameseDLL" Source="$(var.Explorer++VI.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="ChineseSimplifiedTranslation" Guid="06FB3620-50FD-46E3-BF77-C5C4546C0A75">
+				<File Id="ChineseSimplifiedDLL" Source="$(var.Explorer++ZH_CN.TargetPath)" KeyPath="yes" />
+			</Component>
+			<Component Id="ChineseTraditionalTranslation" Guid="C3D6AF88-F6BC-4E62-BC01-7FA08CC8C32C">
+				<File Id="ChineseTraditionalDLL" Source="$(var.Explorer++ZH_TW.TargetPath)" KeyPath="yes" />
 			</Component>
 		</ComponentGroup>
 	</Fragment>
