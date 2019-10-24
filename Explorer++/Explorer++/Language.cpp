@@ -32,7 +32,7 @@ void Explorerplusplus::SetLanguageModule(void)
 		corresponding DLL. */
 		GetProcessImageName(GetCurrentProcessId(), szLanguageModule, SIZEOF_ARRAY(szLanguageModule));
 		PathRemoveFileSpec(szLanguageModule);
-		StringCchPrintf(szName, SIZEOF_ARRAY(szName), _T("Explorer++%2s.dll"), g_szLang);
+		StringCchPrintf(szName, SIZEOF_ARRAY(szName), _T("Explorer++%s.dll"), g_szLang);
 		PathAppend(szLanguageModule, szName);
 
 		bRet = GetFileLanguage(szLanguageModule, &wLanguage);
@@ -68,7 +68,7 @@ void Explorerplusplus::SetLanguageModule(void)
 		PathRemoveFileSpec(szLanguageModule);
 
 		StringCchCopy(szNamePattern, SIZEOF_ARRAY(szNamePattern), szLanguageModule);
-		PathAppend(szNamePattern, _T("Explorer++??.dll"));
+		PathAppend(szNamePattern, NExplorerplusplus::LANGUAGE_DLL_FILENAME_PATTERN);
 
 		hFindFile = FindFirstFile(szNamePattern, &wfd);
 

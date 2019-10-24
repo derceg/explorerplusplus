@@ -26,6 +26,8 @@ namespace NExplorerplusplus
 	/* Command line arguments supplied to the program
 	for each jump list task. */
 	const TCHAR JUMPLIST_TASK_NEWTAB_ARGUMENT[]	= _T("--open-new-tab");
+
+	const TCHAR LANGUAGE_DLL_FILENAME_PATTERN[] = _T("Explorer++*.dll");
 }
 
 /* Used when setting Explorer++ as the default

@@ -1249,7 +1249,7 @@ void Explorerplusplus::AddLanguages(HWND hDlg)
 	GetProcessImageName(GetCurrentProcessId(),szImageDirectory,SIZEOF_ARRAY(szImageDirectory));
 	PathRemoveFileSpec(szImageDirectory);
 	StringCchCopy(szNamePattern,SIZEOF_ARRAY(szNamePattern),szImageDirectory);
-	PathAppend(szNamePattern,_T("Explorer++??.dll"));
+	PathAppend(szNamePattern, NExplorerplusplus::LANGUAGE_DLL_FILENAME_PATTERN);
 
 	hFindFile = FindFirstFile(szNamePattern,&wfd);
 
