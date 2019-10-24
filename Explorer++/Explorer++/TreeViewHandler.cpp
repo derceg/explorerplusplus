@@ -54,6 +54,31 @@ void Explorerplusplus::CreateFolderControls(void)
 
 	LoadString(m_hLanguageModule,IDS_HIDEFOLDERSPANE,szTemp,SIZEOF_ARRAY(szTemp));
 	m_hFoldersToolbar = CreateTabToolbar(m_hHolder,FOLDERS_TOOLBAR_CLOSE,szTemp);
+
+	m_tabContainer->tabCreatedSignal.AddObserver([this] (int tabId, BOOL switchToNewTab) {
+		UNREFERENCED_PARAMETER(tabId);
+		UNREFERENCED_PARAMETER(switchToNewTab);
+
+		UpdateTreeViewSelection();
+	});
+
+	m_navigation->navigationCompletedSignal.AddObserver([this] (const Tab &tab) {
+		UNREFERENCED_PARAMETER(tab);
+
+		UpdateTreeViewSelection();
+	});
+
+	m_tabContainer->tabSelectedSignal.AddObserver([this] (const Tab &tab) {
+		UNREFERENCED_PARAMETER(tab);
+
+		UpdateTreeViewSelection();
+	});
+
+	m_tabContainer->tabRemovedSignal.AddObserver([this] (int tabId) {
+		UNREFERENCED_PARAMETER(tabId);
+
+		UpdateTreeViewSelection();
+	});
 }
 
 LRESULT CALLBACK TreeViewSubclassStub(HWND hwnd,UINT uMsg,
