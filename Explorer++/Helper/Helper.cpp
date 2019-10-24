@@ -572,7 +572,7 @@ BOOL GetFileVersionValue(const TCHAR *szFullFileName, VersionSubBlockType_t subB
 					}
 					else if(subBlockType == TRANSLATION)
 					{
-						*pwLanguage = PRIMARYLANGID(plcp[0].wLanguage);
+						*pwLanguage = plcp[0].wLanguage;
 					}
 					else if(subBlockType == STRING_TABLE_VALUE)
 					{
