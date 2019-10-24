@@ -123,6 +123,8 @@ void Explorerplusplus::OnCreate(void)
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 
+	SetLanguageModule();
+
 	m_navigation = new Navigation(m_config, this);
 
 	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this, m_navigation);

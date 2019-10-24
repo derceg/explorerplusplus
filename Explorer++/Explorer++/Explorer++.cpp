@@ -87,9 +87,7 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 
 	m_bBlockNext = FALSE;
 
-	SetLanguageModule();
-
-	m_ColorRules = NColorRuleHelper::GetDefaultColorRules(m_hLanguageModule);
+	m_ColorRules = NColorRuleHelper::GetDefaultColorRules();
 
 	m_iDWFolderSizeUniqueId = 0;
 
