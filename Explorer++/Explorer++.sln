@@ -82,6 +82,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++FI", "..\Translat
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++VI", "..\Translations\Explorer++VI\Explorer++VI.vcxproj", "{D480B32C-BDF2-4364-92C9-2A0E446AE9CD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++ZH_TW", "..\Translations\Explorer++ZH_TW\Explorer++ZH_TW.vcxproj", "{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -368,6 +370,14 @@ Global
 		{D480B32C-BDF2-4364-92C9-2A0E446AE9CD}.Release|x64.Build.0 = Release|Win32
 		{D480B32C-BDF2-4364-92C9-2A0E446AE9CD}.Test|Win32.ActiveCfg = Release|Win32
 		{D480B32C-BDF2-4364-92C9-2A0E446AE9CD}.Test|x64.ActiveCfg = Release|Win32
+		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}.Debug|x64.ActiveCfg = Debug|Win32
+		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}.Release|Win32.ActiveCfg = Release|Win32
+		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}.Release|Win32.Build.0 = Release|Win32
+		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}.Release|x64.ActiveCfg = Release|Win32
+		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}.Release|x64.Build.0 = Release|Win32
+		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}.Test|Win32.ActiveCfg = Release|Win32
+		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B}.Test|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -398,6 +408,7 @@ Global
 		{AD497D19-0B88-4E37-95B9-991C6514B156} = {F29F24CD-0668-462F-80AE-649CB12F1860}
 		{41047779-715C-4018-B21C-2AEAD581E54D} = {F29F24CD-0668-462F-80AE-649CB12F1860}
 		{D480B32C-BDF2-4364-92C9-2A0E446AE9CD} = {F29F24CD-0668-462F-80AE-649CB12F1860}
+		{C76E8EF4-B0BD-4B8A-87BF-09F4CD129D7B} = {F29F24CD-0668-462F-80AE-649CB12F1860}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {504CEF86-1D85-4DF5-84B2-ECA032747EC4}
