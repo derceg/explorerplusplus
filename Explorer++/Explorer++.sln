@@ -65,7 +65,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++TR", "..\Translat
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++UK", "..\Translations\Explorer++UK\Explorer++UK.vcxproj", "{B31026C5-6BAF-4C69-BB4C-9C811B1BEEC7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++ZH", "..\Translations\Explorer++ZH\Explorer++ZH.vcxproj", "{C12096BF-F80B-4ABE-892C-247AF2A5458A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Explorer++ZH_CN", "..\Translations\Explorer++ZH_CN\Explorer++ZH_CN.vcxproj", "{C12096BF-F80B-4ABE-892C-247AF2A5458A}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Installer", "Installer\Installer.wixproj", "{3CD109B0-FB57-446C-AE40-CF4FD45793EF}"
 	ProjectSection(ProjectDependencies) = postProject
