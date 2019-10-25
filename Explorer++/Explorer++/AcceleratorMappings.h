@@ -8,12 +8,9 @@
 #include <unordered_map>
 
 const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
-	// Default accelerator items. These are all defined in the accelerator
-	// resource table.
+	// Accelerators.
 	{L"address_bar", IDA_ADDRESSBAR},
 	{L"address_bar_dropdown", IDA_COMBODROPDOWN},
-	{L"rename", IDA_FILE_RENAME},
-	{L"help", IDA_HELP_HELP},
 	{L"home", IDA_HOME},
 	{L"select_last_tab", IDA_LASTTAB},
 	{L"select_next_tab", IDA_NEXTTAB},
@@ -29,48 +26,38 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{L"select_tab_7", IDA_TAB7},
 	{L"select_tab_8", IDA_TAB8},
 	{L"duplicate_tab", IDA_TAB_DUPLICATETAB},
-	{L"new_folder", IDM_ACTIONS_NEWFOLDER},
-	{L"bookmark_tab", IDM_BOOKMARKS_BOOKMARKTHISTAB},
-	{L"manage_bookmarks", IDM_BOOKMARKS_MANAGEBOOKMARKS},
-	{L"copy_to_folder", IDM_EDIT_COPYTOFOLDER},
-	{L"move_to_folder", IDM_EDIT_MOVETOFOLDER},
-	{L"paste_shortcut", IDM_EDIT_PASTESHORTCUT},
-	{L"select_none", IDM_EDIT_SELECTNONE},
-	{L"undo", IDM_EDIT_UNDO},
-	{L"wildcard_deselect", IDM_EDIT_WILDCARDDESELECT},
-	{L"wildcard_select", IDM_EDIT_WILDCARDSELECTION},
-	{L"close_tab", IDM_FILE_CLOSETAB},
-	{L"copy_folder_path", IDM_FILE_COPYFOLDERPATH},
-	{L"delete_permanently", IDM_FILE_DELETEPERMANENTLY},
-	{L"new_tab", IDM_FILE_NEWTAB},
-	{L"properties", IDM_FILE_PROPERTIES},
-	{L"apply_filter", IDM_FILTER_APPLYFILTER},
-	{L"set_filter", IDM_FILTER_FILTERRESULTS},
-	{L"back", IDM_GO_BACK},
-	{L"forward", IDM_GO_FORWARD},
-	{L"up", IDM_GO_UPONELEVEL},
-	{L"search", IDM_TOOLS_SEARCH},
-	{L"refresh", IDM_VIEW_REFRESH},
-	{L"toggle_hidden_files", IDM_VIEW_SHOWHIDDENFILES},
 
 	// The accelerators below are specifically excluded from customization.
 	// {L"right_click", IDA_RCLICK}
 
 	// Main menu items.
+	{L"new_tab", IDM_FILE_NEWTAB},
+	{L"close_tab", IDM_FILE_CLOSETAB},
 	{L"clone_window", IDM_FILE_CLONEWINDOW},
 	{L"save_directory_listing", IDM_FILE_SAVEDIRECTORYLISTING},
 	{L"open_command_prompt", IDM_FILE_OPENCOMMANDPROMPT},
 	{L"open_command_prompt_as_administrator", IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR},
+	{L"copy_folder_path", IDM_FILE_COPYFOLDERPATH},
 	{L"copy_file_paths", IDM_FILE_COPYITEMPATH},
 	{L"copy_universal_file_paths", IDM_FILE_COPYUNIVERSALFILEPATHS},
 	{L"copy_column_text", IDM_FILE_COPYCOLUMNTEXT},
 	{L"set_file_attributes", IDM_FILE_SETFILEATTRIBUTES},
+	{L"delete_permanently", IDM_FILE_DELETEPERMANENTLY},
+	{L"rename", IDM_FILE_RENAME},
+	{L"properties", IDM_FILE_PROPERTIES},
 	{L"exit", IDM_FILE_EXIT},
 
+	{L"undo", IDM_EDIT_UNDO},
+	{L"paste_shortcut", IDM_EDIT_PASTESHORTCUT},
 	{L"paste_hard_link", IDM_EDIT_PASTEHARDLINK},
+	{L"copy_to_folder", IDM_EDIT_COPYTOFOLDER},
+	{L"move_to_folder", IDM_EDIT_MOVETOFOLDER},
 	{L"resolve_link", IDM_EDIT_RESOLVELINK},
 
 	{L"select_all_of_same_type", IDM_EDIT_SELECTALLFOLDERS},
+	{L"select_none", IDM_EDIT_SELECTNONE},
+	{L"wildcard_deselect", IDM_EDIT_WILDCARDDESELECT},
+	{L"wildcard_select", IDM_EDIT_WILDCARDSELECTION},
 
 	{L"toggle_status_bar", IDM_VIEW_STATUSBAR},
 	{L"toggle_folders", IDM_VIEW_FOLDERS},
@@ -93,6 +80,8 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{L"view_mode_details", IDM_VIEW_DETAILS},
 
 	{L"auto_arrange", IDM_ARRANGEICONSBY_AUTOARRANGE},
+	{L"toggle_hidden_files", IDM_VIEW_SHOWHIDDENFILES},
+	{L"refresh", IDM_VIEW_REFRESH},
 
 	{L"sort_by_name", IDM_SORTBY_NAME},
 	{L"sort_by_size", IDM_SORTBY_SIZE},
@@ -225,10 +214,17 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{L"save_column_layout_as_default", IDM_VIEW_SAVECOLUMNLAYOUTASDEFAULT},
 	{L"change_display_window_colors", IDM_VIEW_CHANGEDISPLAYCOLOURS},
 
+	{L"set_filter", IDM_FILTER_FILTERRESULTS},
+	{L"apply_filter", IDM_FILTER_APPLYFILTER},
+
+	{L"new_folder", IDM_ACTIONS_NEWFOLDER},
 	{L"split_file", IDM_ACTIONS_SPLITFILE},
 	{L"merge_files", IDM_ACTIONS_MERGEFILES},
 	{L"destroy_files", IDM_ACTIONS_DESTROYFILES},
 
+	{L"back", IDM_GO_BACK},
+	{L"forward", IDM_GO_FORWARD},
+	{L"up", IDM_GO_UPONELEVEL},
 	{L"go_computer", IDM_GO_MYCOMPUTER},
 	{L"go_documents", IDM_GO_MYDOCUMENTS},
 	{L"go_music", IDM_GO_MYMUSIC},
@@ -241,10 +237,15 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{L"go_network_places", IDM_GO_MYNETWORKPLACES},
 	{L"go_network_connections", IDM_GO_NETWORKCONNECTIONS},
 
+	{L"bookmark_tab", IDM_BOOKMARKS_BOOKMARKTHISTAB},
+	{L"manage_bookmarks", IDM_BOOKMARKS_MANAGEBOOKMARKS},
+
+	{L"search", IDM_TOOLS_SEARCH},
 	{L"customize_colors", IDM_TOOLS_CUSTOMIZECOLORS},
 	{L"run_script", IDM_TOOLS_RUNSCRIPT},
 	{L"options", IDM_TOOLS_OPTIONS},
 
+	{L"help", IDM_HELP_HELP},
 	{L"check_for_updates", IDM_HELP_CHECKFORUPDATES},
 	{L"about", IDM_HELP_ABOUT}
 };

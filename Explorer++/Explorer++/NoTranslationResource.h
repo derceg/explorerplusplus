@@ -1,7 +1,3 @@
-// Copyright (C) Explorer++ Project
-// SPDX-License-Identifier: GPL-3.0-only
-// See LICENSE in the top level directory
-
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by Explorer++_NoTranslation.rc
@@ -18,38 +14,14 @@
 #define IDR_WAVE_NAVIGATIONSTART        235
 #define IDB_NOPREVIEWAVAILABLE          236
 #define IDB_SHELLIMAGES_LARGE           237
-#define IDM_FILE_NEWTAB                 40056
-#define IDM_FILE_CLOSETAB               40057
-#define IDM_FILE_COPYFOLDERPATH         40060
-#define IDM_FILE_PROPERTIES             40065
-#define IDM_EDIT_PASTESHORTCUT          40071
-#define IDM_EDIT_COPYTOFOLDER           40072
-#define IDM_EDIT_MOVETOFOLDER           40073
-#define IDM_EDIT_SELECTNONE             40076
-#define IDM_GO_BACK                     40093
-#define IDM_GO_FORWARD                  40094
-#define IDM_GO_UPONELEVEL               40095
-#define IDM_VIEW_SHOWHIDDENFILES        40104
-#define IDM_VIEW_REFRESH                40105
 #define IDA_NEXTTAB                     40123
 #define IDA_PREVIOUSTAB                 40125
-#define IDM_FILE_DELETEPERMANENTLY      40145
-#define IDM_BOOKMARKS_BOOKMARKTHISTAB   40174
-#define IDM_EDIT_WILDCARDSELECTION      40195
-#define IDM_BOOKMARKS_MANAGEBOOKMARKS   40197
-#define IDM_EDIT_WILDCARDDESELECT       40204
-#define IDM_FILTER_APPLYFILTER          40229
-#define IDM_FILTER_FILTERRESULTS        40230
 #define IDA_TAB_DUPLICATETAB            40247
-#define IDM_ACTIONS_NEWFOLDER           40263
 #define IDA_ADDRESSBAR                  40286
 #define IDA_COMBODROPDOWN               40287
 #define IDA_NEXTWINDOW                  40289
-#define IDM_EDIT_UNDO                   40325
 #define IDA_PREVIOUSWINDOW              40350
 #define IDA_RCLICK                      40352
-#define IDA_FILE_RENAME                 40377
-#define IDM_TOOLS_SEARCH                40417
 #define IDA_HOME                        40420
 #define IDA_TAB1                        40423
 #define IDA_TAB2                        40424
@@ -60,7 +32,6 @@
 #define IDA_TAB7                        40429
 #define IDA_TAB8                        40430
 #define IDA_LASTTAB                     40431
-#define IDA_HELP_HELP                   40433
 
 // Next default values for new objects
 // 

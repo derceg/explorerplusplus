@@ -413,7 +413,6 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_FILE_RENAME:
-	case IDA_FILE_RENAME:
 		OnFileRename();
 		break;
 
@@ -1319,7 +1318,6 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnShowOptions();
 		break;
 
-	case IDA_HELP_HELP:
 	case IDM_HELP_HELP:
 		OnShowHelp();
 		break;

@@ -7,6 +7,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
+#include "resource.h"
 #include "WinRes.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -71,7 +72,7 @@ BEGIN
     "D",            IDA_ADDRESSBAR,         VIRTKEY, ALT, NOINVERT
     "L",            IDA_ADDRESSBAR,         VIRTKEY, CONTROL, NOINVERT
     VK_F4,          IDA_COMBODROPDOWN,      VIRTKEY, NOINVERT
-    VK_F2,          IDA_FILE_RENAME,        VIRTKEY, NOINVERT
+    VK_F2,          IDM_FILE_RENAME,        VIRTKEY, NOINVERT
     VK_HOME,        IDA_HOME,               VIRTKEY, ALT, NOINVERT
     "9",            IDA_LASTTAB,            VIRTKEY, CONTROL, NOINVERT
     VK_NEXT,        IDA_NEXTTAB,            VIRTKEY, CONTROL, NOINVERT
@@ -116,7 +117,7 @@ BEGIN
     VK_LEFT,        IDM_GO_BACK,            VIRTKEY, ALT, NOINVERT
     VK_RIGHT,       IDM_GO_FORWARD,         VIRTKEY, ALT, NOINVERT
     VK_UP,          IDM_GO_UPONELEVEL,      VIRTKEY, ALT, NOINVERT
-    VK_F1,          IDA_HELP_HELP,          VIRTKEY, NOINVERT
+    VK_F1,          IDM_HELP_HELP,          VIRTKEY, NOINVERT
     "F",            IDM_TOOLS_SEARCH,       VIRTKEY, CONTROL, NOINVERT
     VK_F3,          IDM_TOOLS_SEARCH,       VIRTKEY, NOINVERT
     "R",            IDM_VIEW_REFRESH,       VIRTKEY, CONTROL, NOINVERT
@@ -138,6 +139,7 @@ END
 
 2 TEXTINCLUDE 
 BEGIN
+    "#include ""resource.h""\r\n"
     "#include ""WinRes.h""\r\n"
     "\0"
 END
