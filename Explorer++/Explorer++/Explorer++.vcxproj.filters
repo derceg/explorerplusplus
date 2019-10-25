@@ -352,6 +352,9 @@
     <ClCompile Include="AcceleratorUpdater.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="MenuHelper.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -691,6 +694,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="AcceleratorUpdater.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuHelper.h">
       <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>

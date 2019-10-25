@@ -348,6 +348,7 @@
     <ClCompile Include="LoadSaveRegistry.cpp" />
     <ClCompile Include="LoadSaveXml.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+    <ClCompile Include="MenuHelper.cpp" />
     <ClCompile Include="PluginInterface.cpp" />
     <ClCompile Include="iServiceProvider.cpp" />
     <ClCompile Include="Language.cpp" />
@@ -496,6 +497,7 @@
     <ClInclude Include="Manifest.h" />
     <ClInclude Include="MassRenameDialog.h" />
     <ClInclude Include="MenuApi.h" />
+    <ClInclude Include="MenuHelper.h" />
     <ClInclude Include="MenuRanges.h" />
     <ClInclude Include="MergeFilesDialog.h" />
     <ClInclude Include="ModelessDialogs.h" />
