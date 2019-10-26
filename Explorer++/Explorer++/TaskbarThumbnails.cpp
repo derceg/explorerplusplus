@@ -18,14 +18,10 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
+#include <dwmapi.h>
 
 namespace
 {
-	typedef HRESULT (STDAPICALLTYPE *DwmSetWindowAttributeProc)(HWND hwnd,DWORD dwAttribute,LPCVOID pvAttribute,DWORD cbAttribute);
-	typedef HRESULT (STDAPICALLTYPE *DwmSetIconicThumbnailProc)(HWND hwnd,HBITMAP hbmp,DWORD dwSITFlags);
-	typedef HRESULT (STDAPICALLTYPE *DwmSetIconicLivePreviewBitmapProc)(HWND hwnd,HBITMAP hbmp,POINT *pptClient,DWORD dwSITFlags);
-	typedef HRESULT (STDAPICALLTYPE *DwmInvalidateIconicBitmapsProc)(HWND hwnd);
-
 	struct TabProxy_t
 	{
 		TaskbarThumbnails *taskbarThumbnails;
@@ -223,37 +219,22 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 
 		if(hTabProxy != NULL)
 		{
-			HMODULE hDwmapi;
-			DwmSetWindowAttributeProc DwmSetWindowAttribute;
+			DwmSetWindowAttribute(hTabProxy,DWMWA_FORCE_ICONIC_REPRESENTATION,
+				&bValue,sizeof(BOOL));
 
-			hDwmapi = LoadLibrary(_T("dwmapi.dll"));
+			DwmSetWindowAttribute(hTabProxy,DWMWA_HAS_ICONIC_BITMAP,
+				&bValue,sizeof(BOOL));
 
-			if(hDwmapi != NULL)
+			if(m_bTaskbarInitialised)
 			{
-				DwmSetWindowAttribute = (DwmSetWindowAttributeProc)GetProcAddress(hDwmapi,"DwmSetWindowAttribute");
-
-				if(DwmSetWindowAttribute != NULL)
-				{
-					DwmSetWindowAttribute(hTabProxy,DWMWA_FORCE_ICONIC_REPRESENTATION,
-						&bValue,sizeof(BOOL));
-
-					DwmSetWindowAttribute(hTabProxy,DWMWA_HAS_ICONIC_BITMAP,
-						&bValue,sizeof(BOOL));
-
-					if(m_bTaskbarInitialised)
-					{
-						RegisterTab(hTabProxy,EMPTY_STRING,bSwitchToNewTab);
-					}
-
-					tpi.hProxy		= hTabProxy;
-					tpi.iTabId		= iTabId;
-					tpi.atomClass	= aRet;
-
-					m_TabProxyList.push_back(tpi);
-				}
-
-				FreeLibrary(hDwmapi);
+				RegisterTab(hTabProxy,EMPTY_STRING,bSwitchToNewTab);
 			}
+
+			tpi.hProxy		= hTabProxy;
+			tpi.iTabId		= iTabId;
+			tpi.atomClass	= aRet;
+
+			m_TabProxyList.push_back(tpi);
 		}
 	}
 }
@@ -286,26 +267,13 @@ void TaskbarThumbnails::RemoveTabProxy(int iTabId)
 
 void TaskbarThumbnails::InvalidateTaskbarThumbnailBitmap(const Tab &tab)
 {
-	HMODULE hDwmapi = LoadLibrary(_T("dwmapi.dll"));
-
-	if(hDwmapi != NULL)
+	for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
 	{
-		DwmInvalidateIconicBitmapsProc DwmInvalidateIconicBitmaps = reinterpret_cast<DwmInvalidateIconicBitmapsProc>(
-			GetProcAddress(hDwmapi,"DwmInvalidateIconicBitmaps"));
-
-		if(DwmInvalidateIconicBitmaps != NULL)
+		if(itr->iTabId == tab.GetId())
 		{
-			for(auto itr = m_TabProxyList.begin();itr != m_TabProxyList.end();itr++)
-			{
-				if(itr->iTabId == tab.GetId())
-				{
-					DwmInvalidateIconicBitmaps(itr->hProxy);
-					break;
-				}
-			}
+			DwmInvalidateIconicBitmaps(itr->hProxy);
+			break;
 		}
-
-		FreeLibrary(hDwmapi);
 	}
 }
 
@@ -468,22 +436,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			SelectObject(hdcThumbnailSrc,hPrevBitmap);
 			DeleteDC(hdcThumbnailSrc);
 
-			HMODULE hDwmapi;
-			DwmSetIconicThumbnailProc DwmSetIconicThumbnail;
-
-			hDwmapi = LoadLibrary(_T("dwmapi.dll"));
-
-			if(hDwmapi != NULL)
-			{
-				DwmSetIconicThumbnail = (DwmSetIconicThumbnailProc)GetProcAddress(hDwmapi,"DwmSetIconicThumbnail");
-
-				if(DwmSetIconicThumbnail != NULL)
-				{
-					hr = DwmSetIconicThumbnail(hwnd,hbmThumbnail,0);
-				}
-
-				FreeLibrary(hDwmapi);
-			}
+			hr = DwmSetIconicThumbnail(hwnd,hbmThumbnail,0);
 
 			/* Delete the thumbnail bitmap. */
 			DeleteObject(hbmTab);
@@ -498,10 +451,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 
 	case WM_DWMSENDICONICLIVEPREVIEWBITMAP:
 		{
-			HMODULE hDwmapi;
 			TabPreviewInfo_t tpi;
-
-			DwmSetIconicLivePreviewBitmapProc DwmSetIconicLivePreviewBitmap;
 
 			tpi.hbm = NULL;
 
@@ -514,19 +464,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 				GetTabLivePreviewBitmap(iTabId,&tpi);
 			}
 
-			hDwmapi = LoadLibrary(_T("dwmapi.dll"));
-
-			if(hDwmapi != NULL)
-			{
-				DwmSetIconicLivePreviewBitmap = (DwmSetIconicLivePreviewBitmapProc)GetProcAddress(hDwmapi,"DwmSetIconicLivePreviewBitmap");
-
-				if(DwmSetIconicLivePreviewBitmap != NULL)
-				{
-					DwmSetIconicLivePreviewBitmap(hwnd,tpi.hbm,&tpi.ptOrigin,0);
-				}
-
-				FreeLibrary(hDwmapi);
-			}
+			DwmSetIconicLivePreviewBitmap(hwnd,tpi.hbm,&tpi.ptOrigin,0);
 
 			if(tpi.hbm != NULL)
 			{
