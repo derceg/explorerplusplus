@@ -14,7 +14,7 @@
     <ProjectGuid>{F7E8D901-B316-447D-95F7-7FC45A34E2B0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ExplorerDA</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(VisualStudioVersion)' == '14.0'">
     <PlatformToolset>v140</PlatformToolset>

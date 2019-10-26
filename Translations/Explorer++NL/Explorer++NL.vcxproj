@@ -14,7 +14,7 @@
     <ProjectGuid>{36663C1C-AFC5-4AE6-A3E0-DF35FD0A529E}</ProjectGuid>
     <RootNamespace>ExplorerNL</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(VisualStudioVersion)' == '14.0'">
     <PlatformToolset>v140</PlatformToolset>

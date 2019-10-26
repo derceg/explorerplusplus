@@ -86,7 +86,7 @@
     <ProjectGuid>{0977324A-4826-461A-A3B6-D88AFFD444D2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Lua</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(VisualStudioVersion)' == '14.0'">
     <PlatformToolset>v140</PlatformToolset>

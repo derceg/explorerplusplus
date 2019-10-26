@@ -22,7 +22,7 @@
     <ProjectGuid>{FAADBE00-9376-45F8-AEAC-1BA3A8E58A1D}</ProjectGuid>
     <RootNamespace>Helper</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(VisualStudioVersion)' == '14.0'">
     <PlatformToolset>v140</PlatformToolset>
