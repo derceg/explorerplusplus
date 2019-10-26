@@ -147,15 +147,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	LONG			res;
 	BOOL			bExit = FALSE;
 
-	if (!IsWindows7OrGreater())
-	{
-		MessageBox(NULL,
-			_T("This application needs at least Windows 7 or above to run properly."),
-			NExplorerplusplus::APP_NAME, MB_ICONERROR | MB_OK);
-
-		return 0;
-	}
-
 	bool enableLogging =
 #ifdef _DEBUG
 		true;
