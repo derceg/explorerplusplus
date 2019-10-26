@@ -55,11 +55,6 @@ TaskbarThumbnails::~TaskbarThumbnails()
 
 void TaskbarThumbnails::Initialize()
 {
-	if(!IsWindows7OrGreater())
-	{
-		return;
-	}
-
 	if(!m_enabled)
 	{
 		return;
@@ -186,13 +181,6 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 	TCHAR szClassName[512];
 	ATOM aRet;
 	BOOL bValue = TRUE;
-
-	/* If we're not running on Windows 7 or later, return without
-	doing anything. */
-	if(!IsWindows7OrGreater())
-	{
-		return;
-	}
 
 	if(!m_enabled)
 	{

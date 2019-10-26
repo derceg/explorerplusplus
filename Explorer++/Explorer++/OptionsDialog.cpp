@@ -908,13 +908,6 @@ INT_PTR CALLBACK Explorerplusplus::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wP
 	{
 		case WM_INITDIALOG:
 			{
-				if(!IsWindows7OrGreater())
-				{
-					EnableWindow(GetDlgItem(hDlg,IDC_TABS_TASKBARTHUMBNAILS),FALSE);
-
-					m_config->showTaskbarThumbnails = FALSE;
-				}
-
 				if(m_config->showTaskbarThumbnails)
 					CheckDlgButton(hDlg,IDC_TABS_TASKBARTHUMBNAILS,BST_CHECKED);
 				if(m_config->forceSameTabWidth.get())

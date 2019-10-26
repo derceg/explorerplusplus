@@ -170,15 +170,6 @@ void Explorerplusplus::OnCreate(void)
 	all child windows have been created. */
 	ApplyLoadedSettings();
 
-	/* Taskbar thumbnails can only be shown in
-	Windows 7, so we'll set the internal setting to
-	false if we're running on an earlier version
-	of Windows. */
-	if(!IsWindows7OrGreater())
-	{
-		m_config->showTaskbarThumbnails = FALSE;
-	}
-
 	m_taskbarThumbnails = TaskbarThumbnails::Create(this, m_tabContainer, m_navigation, m_hLanguageModule, m_config);
 
 	RestoreTabs(pLoadSave);
