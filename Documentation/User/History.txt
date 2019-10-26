@@ -83,8 +83,8 @@ Bug fixes:
 - Fixed a number of memory leaks.
 
 Misc:
-- Windows XP is no longer supported. Windows Vista is now the
-  minimum supported version.
+- Windows XP and Vista are no longer supported. Windows 7 is now
+  the minimum supported version.
 - Builds are now digitally signed.
 - All menus are now drawn in the standard system style, rather
   than a custom style.

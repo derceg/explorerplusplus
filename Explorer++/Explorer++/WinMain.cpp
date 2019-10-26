@@ -147,10 +147,10 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	LONG			res;
 	BOOL			bExit = FALSE;
 
-	if (!IsWindowsVistaOrGreater())
+	if (!IsWindows7OrGreater())
 	{
 		MessageBox(NULL,
-			_T("This application needs at least Windows Vista or above to run properly."),
+			_T("This application needs at least Windows 7 or above to run properly."),
 			NExplorerplusplus::APP_NAME, MB_ICONERROR | MB_OK);
 
 		return 0;
@@ -212,11 +212,9 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 			while(itr != g_commandLineDirectories.end())
 			{
-				/* This could fail on a 64-bit version of
-				Vista or Windows 7 if the executable is 32-bit,
-				and the folder is 64-bit specific (as is the
-				case with some of the folders under the control
-				panel). */
+				/* This could fail on a 64-bit version of Windows if the
+				executable is 32-bit, and the folder is 64-bit specific (as is
+				the case with some of the folders under the control panel). */
 				hr = GetIdlFromParsingName(itr->c_str(),&pidl);
 
 				bControlPanelChild = FALSE;

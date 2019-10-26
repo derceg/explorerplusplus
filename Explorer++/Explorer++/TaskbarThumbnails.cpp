@@ -31,13 +31,6 @@ namespace
 		TaskbarThumbnails *taskbarThumbnails;
 		int iTabId;
 	};
-
-	/* These definitions are needed to target
-	Windows 7 specific features, while remaining
-	compliant with Vista. They are copied directly
-	from the appropriate header file. */
-	static const UINT WM_DWMSENDICONICTHUMBNAIL = 0x0323;
-	static const UINT WM_DWMSENDICONICLIVEPREVIEWBITMAP = 0x0326;
 }
 
 TaskbarThumbnails *TaskbarThumbnails::Create(IExplorerplusplus *expp, TabContainer *tabContainer,
