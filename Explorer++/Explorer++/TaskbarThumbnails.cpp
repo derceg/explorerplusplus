@@ -5,8 +5,6 @@
 /*
  * The methods in this file manage the tab proxy windows. A tab
  * proxy is created when a taskbar thumbnail needs to be shown.
- * Note that these thumbnails are only shown on Windows 7 and
- * above.
  */
 
 #include "stdafx.h"
