@@ -22,6 +22,7 @@
 #include "../Helper/ProcessHelper.h"
 #include "../ThirdParty/CLI11/CLI11.hpp"
 #include <boost/scope_exit.hpp>
+#include <wil/resource.h>
 
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
@@ -140,13 +141,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	version. */
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	HMODULE			hRichEditLib;
-	HWND			hwnd;
-	HANDLE			hMutex = NULL;
-	MSG				msg;
-	LONG			res;
-	BOOL			bExit = FALSE;
-
 	bool enableLogging =
 #ifdef _DEBUG
 		true;
@@ -163,7 +157,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	ccEx.dwICC	= dwControlClasses;
 	InitCommonControlsEx(&ccEx);
 
-	OleInitialize(NULL);
+	auto oleCleanup = wil::OleInitialize_failfast();
 
 	bool consoleAttached = Console::AttachParentConsole();
 
@@ -182,6 +176,8 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	}
 
 	InitializeLogging(NExplorerplusplus::LOG_FILENAME);
+
+	bool shouldExit = false;
 
 	/* Can't open folders that are children of the
 	control panel. If the command line only refers
@@ -264,14 +260,14 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 			if(g_commandLineDirectories.size() == 0)
 			{
-				bExit = TRUE;
+				shouldExit = true;
 			}
 
 			CoTaskMemFree(pidlControlPanel);
 		}
 	}
 
-	if(bExit)
+	if(shouldExit)
 	{
 		return 0;
 	}
@@ -295,7 +291,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	if the first instance is run, and multiple instances are allowed,
 	and then disallowed, still need to be able to load back to the
 	original instance. */
-	hMutex = CreateMutex(NULL,TRUE,_T("Explorer++"));
+	wil::unique_mutex applicationMutex(CreateMutex(NULL,TRUE,_T("Explorer++")));
 
 	if(!bAllowMultipleInstances)
 	{
@@ -332,24 +328,20 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 				SetForegroundWindow(hPrev);
 				ShowWindow(hPrev,SW_RESTORE);
-				CloseHandle(hMutex);
 				return 0;
 			}
 		}
 	}
 
 	/* This dll is needed to create a richedit control. */
-	hRichEditLib = LoadLibrary(_T("Riched20.dll"));
+	wil::unique_hmodule richEditLib(LoadLibrary(_T("Riched20.dll")));
 
-	res = RegisterMainWindowClass(hInstance);
+	LONG res = RegisterMainWindowClass(hInstance);
 
 	if(res == 0)
 	{
 		MessageBox(NULL,_T("Could not register class"),NExplorerplusplus::APP_NAME,
 			MB_OK|MB_ICONERROR);
-
-		FreeLibrary(hRichEditLib);
-		OleUninitialize();
 
 		return 0;
 	}
@@ -360,7 +352,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
 	/* Create the main window. This window will act as a
 	container for all child windows created. */
-	hwnd = CreateWindow(
+	HWND hwnd = CreateWindow(
 	NExplorerplusplus::CLASS_NAME,
 	NExplorerplusplus::APP_NAME,
 	WS_OVERLAPPEDWINDOW,
@@ -377,9 +369,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	{
 		MessageBox(NULL,_T("Could not create main window."),NExplorerplusplus::APP_NAME,
 			MB_OK|MB_ICONERROR);
-
-		FreeLibrary(hRichEditLib);
-		OleUninitialize();
 
 		return 0;
 	}
@@ -439,6 +428,8 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	g_hwndOptions = NULL;
 	g_hwndManageBookmarks = NULL;
 
+	MSG msg;
+
 	/* Enter the message loop... */
 	while(GetMessage(&msg,NULL,0,0) > 0)
 	{
@@ -463,12 +454,6 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 			g_hwndOptions = NULL;
 		}
 	}
-
-	FreeLibrary(hRichEditLib);
-	OleUninitialize();
-
-	if(hMutex != NULL)
-		CloseHandle(hMutex);
 
 	return (int)msg.wParam;
 }
