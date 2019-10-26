@@ -42,33 +42,64 @@ boost::optional<CommandLine::ExitInfo> CommandLine::ProcessCommandLine()
 	CommandLineSettings commandLineSettings;
 
 	commandLineSettings.clearRegistrySettings = false;
-	app.add_flag("--clear-registry-settings", commandLineSettings.clearRegistrySettings, "Clear existing registry settings");
+	app.add_flag(
+		"--clear-registry-settings",
+		commandLineSettings.clearRegistrySettings,
+		"Clear existing registry settings"
+	);
 
 	commandLineSettings.enableLogging = false;
-	app.add_flag("--enable-logging", commandLineSettings.enableLogging, "Enable logging");
+	app.add_flag(
+		"--enable-logging",
+		commandLineSettings.enableLogging,
+		"Enable logging"
+	);
 
 	commandLineSettings.enablePlugins = false;
-	app.add_flag("--enable-plugins", commandLineSettings.enablePlugins, "Enable the Lua plugin system");
+	app.add_flag(
+		"--enable-plugins",
+		commandLineSettings.enablePlugins,
+		"Enable the Lua plugin system"
+	);
 
 	commandLineSettings.removeAsDefault = false;
-	auto removeAsDefaultOption = app.add_flag("--remove-as-default", commandLineSettings.removeAsDefault, "Remove Explorer++ as the default file manager (requires administrator privileges)");
+	auto removeAsDefaultOption = app.add_flag(
+		"--remove-as-default",
+		commandLineSettings.removeAsDefault,
+		"Remove Explorer++ as the default file manager (requires administrator privileges)"
+	);
 
 	commandLineSettings.setAsDefault = false;
-	auto setAsDefaultOption = app.add_flag("--set-as-default", commandLineSettings.setAsDefault, "Set Explorer++ as the default file manager (requires administrator privileges)");
+	auto setAsDefaultOption = app.add_flag(
+		"--set-as-default",
+		commandLineSettings.setAsDefault,
+		"Set Explorer++ as the default file manager (requires administrator privileges)"
+	);
 
 	removeAsDefaultOption->excludes(setAsDefaultOption);
 	setAsDefaultOption->excludes(removeAsDefaultOption);
 
-	app.add_option("--language", commandLineSettings.language, "Allows you to select your desired language. Should be a two-letter language code (e.g. FR, RU, etc).");
+	app.add_option(
+		"--language",
+		commandLineSettings.language,
+		"Allows you to select your desired language. Should be a two-letter language code (e.g. FR, RU, etc)."
+	);
 
-	app.add_option("directories", commandLineSettings.directories, "Directories to open");
+	app.add_option(
+		"directories",
+		commandLineSettings.directories,
+		"Directories to open"
+	);
 
 	// The options in this group are only used internally by the
 	// application. They're not directly exposed to users.
 	CLI::App *privateCommands = app.add_subcommand("private");
 	privateCommands->group("");
 
-	privateCommands->add_flag(wstrToStr(NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT), commandLineSettings.jumplistNewTab);
+	privateCommands->add_flag(
+		wstrToStr(NExplorerplusplus::JUMPLIST_TASK_NEWTAB_ARGUMENT),
+		commandLineSettings.jumplistNewTab
+	);
 
 	try
 	{
