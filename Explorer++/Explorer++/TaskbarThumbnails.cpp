@@ -437,24 +437,33 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 
 	case WM_DWMSENDICONICLIVEPREVIEWBITMAP:
 		{
-			TabPreviewInfo_t tpi;
-
-			tpi.hbm = NULL;
-
 			if(IsIconic(m_expp->GetMainWindow()))
 			{
 				/* TODO: Show an image here... */
 			}
 			else
 			{
-				GetTabLivePreviewBitmap(iTabId,&tpi);
-			}
+				const Tab &tab = m_tabContainer->GetTab(iTabId);
+				wil::unique_hbitmap bitmap = GetTabLivePreviewBitmap(tab);
 
-			DwmSetIconicLivePreviewBitmap(hwnd,tpi.hbm,&tpi.ptOrigin,0);
+				RECT rcTab;
+				GetClientRect(tab.listView, &rcTab);
+				MapWindowPoints(tab.listView, m_expp->GetMainWindow(), reinterpret_cast<LPPOINT>(&rcTab), 2);
 
-			if(tpi.hbm != NULL)
-			{
-				DeleteObject(tpi.hbm);
+				MENUBARINFO mbi;
+				mbi.cbSize = sizeof(mbi);
+				GetMenuBarInfo(m_expp->GetMainWindow(), OBJID_MENU, 0, &mbi);
+
+				POINT ptOrigin;
+
+				/* The operating system will automatically draw the main window. Therefore,
+				we'll just shift the tab into it's proper position. */
+				ptOrigin.x = rcTab.left;
+
+				/* Need to include the menu bar in the offset. */
+				ptOrigin.y = rcTab.top + mbi.rcBar.bottom - mbi.rcBar.top;
+
+				DwmSetIconicLivePreviewBitmap(hwnd, bitmap.get(), &ptOrigin, 0);
 			}
 
 			return 0;
@@ -551,69 +560,41 @@ wil::unique_hbitmap TaskbarThumbnails::CaptureTabScreenshot(const Tab &tab)
 	return hbmThumbnail;
 }
 
-/* It is up to the caller to delete the bitmap returned by this method. */
-void TaskbarThumbnails::GetTabLivePreviewBitmap(int iTabId,TabPreviewInfo_t *ptpi)
+wil::unique_hbitmap TaskbarThumbnails::GetTabLivePreviewBitmap(const Tab &tab)
 {
-	HDC hdcTab;
-	HDC hdcTabSrc;
-	HBITMAP hbmTab;
-	HBITMAP hbmTabPrev;
-	Gdiplus::Color color(0,0,0);
-	MENUBARINFO mbi;
-	POINT pt;
-	BOOL bVisible;
+	wil::unique_hdc_window hdcTab = wil::GetDC(tab.listView);
+	wil::unique_hdc hdcTabSrc(CreateCompatibleDC(hdcTab.get()));
+
 	RECT rcTab;
+	GetClientRect(tab.listView, &rcTab);
 
-	HWND hTab = m_tabContainer->GetTab(iTabId).listView;
+	wil::unique_hbitmap hbmTab;
+	Gdiplus::Color color(0, 0, 0);
+	Gdiplus::Bitmap bi(GetRectWidth(&rcTab), GetRectHeight(&rcTab), PixelFormat32bppARGB);
+	bi.GetHBITMAP(color, &hbmTab);
 
-	hdcTab = GetDC(hTab);
-	hdcTabSrc = CreateCompatibleDC(hdcTab);
+	auto tabPreviousBitmap = wil::SelectObject(hdcTabSrc.get(), hbmTab.get());
 
-	GetClientRect(hTab,&rcTab);
+	BOOL bVisible = IsWindowVisible(tab.listView);
 
-	Gdiplus::Bitmap bi(GetRectWidth(&rcTab),GetRectHeight(&rcTab),PixelFormat32bppARGB);
-	bi.GetHBITMAP(color,&hbmTab);
-
-	hbmTabPrev = (HBITMAP)SelectObject(hdcTabSrc,hbmTab);
-
-	bVisible = IsWindowVisible(hTab);
-
-	if(!bVisible)
+	if (!bVisible)
 	{
-		ShowWindow(hTab,SW_SHOW);
+		ShowWindow(tab.listView, SW_SHOW);
 	}
 
-	PrintWindow(hTab,hdcTabSrc,PW_CLIENTONLY);
+	PrintWindow(tab.listView, hdcTabSrc.get(), PW_CLIENTONLY);
 
-	if(!bVisible)
+	if (!bVisible)
 	{
-		ShowWindow(hTab,SW_HIDE);
+		ShowWindow(tab.listView, SW_HIDE);
 	}
 
-	SetStretchBltMode(hdcTabSrc,HALFTONE);
-	SetBrushOrgEx(hdcTabSrc,0,0,&pt);
-	StretchBlt(hdcTabSrc,0,0,GetRectWidth(&rcTab),GetRectHeight(&rcTab),hdcTabSrc,
-		0,0,GetRectWidth(&rcTab),GetRectHeight(&rcTab),SRCCOPY);
+	SetStretchBltMode(hdcTabSrc.get(), HALFTONE);
+	SetBrushOrgEx(hdcTabSrc.get(), 0, 0, nullptr);
+	StretchBlt(hdcTabSrc.get(), 0, 0, GetRectWidth(&rcTab), GetRectHeight(&rcTab), hdcTabSrc.get(),
+		0, 0, GetRectWidth(&rcTab), GetRectHeight(&rcTab), SRCCOPY);
 
-	MapWindowPoints(hTab, m_expp->GetMainWindow(),(LPPOINT)&rcTab,2);
-
-	mbi.cbSize	 = sizeof(mbi);
-	GetMenuBarInfo(m_expp->GetMainWindow(),OBJID_MENU,0,&mbi);
-
-	/* The operating system will automatically
-	draw the main window. Therefore, we'll just shift
-	the tab into it's proper position. */
-	ptpi->ptOrigin.x = rcTab.left;
-
-	/* Need to include the menu bar in the offset. */
-	ptpi->ptOrigin.y = rcTab.top + mbi.rcBar.bottom - mbi.rcBar.top;
-
-	ptpi->hbm = hbmTab;
-	ptpi->iTabId = iTabId;
-
-	SelectObject(hdcTabSrc,hbmTabPrev);
-	DeleteDC(hdcTabSrc);
-	ReleaseDC(hTab,hdcTab);
+	return hbmTab;
 }
 
 void TaskbarThumbnails::OnTabSelectionChanged(const Tab &tab)

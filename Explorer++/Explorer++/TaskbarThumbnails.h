@@ -31,13 +31,6 @@ private:
 		int iTabId;
 	};
 
-	struct TabPreviewInfo_t
-	{
-		int iTabId;
-		HBITMAP hbm;
-		POINT ptOrigin;
-	};
-
 	TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer,
 		Navigation *navigation, HINSTANCE instance, std::shared_ptr<Config> config);
 	~TaskbarThumbnails();
@@ -55,7 +48,7 @@ private:
 	void RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive);
 	void RemoveTabProxy(int iTabId);
 	wil::unique_hbitmap CaptureTabScreenshot(const Tab &tab);
-	void GetTabLivePreviewBitmap(int iTabId, TabPreviewInfo_t *ptpi);
+	wil::unique_hbitmap GetTabLivePreviewBitmap(const Tab &tab);
 	void OnTabSelectionChanged(const Tab &tab);
 	void OnNavigationCompleted(const Tab &tab);
 	void SetTabProxyIcon(const Tab &tab);
