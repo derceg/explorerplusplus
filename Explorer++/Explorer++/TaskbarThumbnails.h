@@ -9,6 +9,7 @@
 #include "Tab.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
+#include <wil/resource.h>
 
 struct Config;
 
@@ -53,7 +54,7 @@ private:
 	void CreateTabProxy(int iTabId, BOOL bSwitchToNewTab);
 	void RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive);
 	void RemoveTabProxy(int iTabId);
-	HBITMAP CaptureTabScreenshot(int iTabId);
+	wil::unique_hbitmap CaptureTabScreenshot(const Tab &tab);
 	void GetTabLivePreviewBitmap(int iTabId, TabPreviewInfo_t *ptpi);
 	void OnTabSelectionChanged(const Tab &tab);
 	void OnNavigationCompleted(const Tab &tab);

@@ -345,7 +345,6 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 		{
 			HDC hdc;
 			HDC hdcSrc;
-			HBITMAP hbmTab = NULL;
 			HBITMAP hPrevBitmap;
 			Gdiplus::Color color(0,0,0);
 			HRESULT hr;
@@ -359,23 +358,25 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			iMaxWidth = HIWORD(lParam);
 			iMaxHeight = LOWORD(lParam);
 
+			wil::unique_hbitmap hbmTab;
+
 			/* If the main window is minimized, it won't be possible
 			to generate a thumbnail for any of the tabs. In that
 			case, use a static 'No Preview Available' bitmap. */
 			if(IsIconic(m_expp->GetMainWindow()))
 			{
-				hbmTab = (HBITMAP)LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDB_NOPREVIEWAVAILABLE),IMAGE_BITMAP,0,0,0);
+				hbmTab.reset(static_cast<HBITMAP>(LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDB_NOPREVIEWAVAILABLE),IMAGE_BITMAP,0,0,0)));
 
-				SetBitmapDimensionEx(hbmTab,223,130,NULL);
+				SetBitmapDimensionEx(hbmTab.get(),223,130,NULL);
 			}
 			else
 			{
-				hbmTab = CaptureTabScreenshot(iTabId);
+				hbmTab = CaptureTabScreenshot(m_tabContainer->GetTab(iTabId));
 			}
 
 			SIZE sz;
 
-			GetBitmapDimensionEx(hbmTab,&sz);
+			GetBitmapDimensionEx(hbmTab.get(),&sz);
 
 			iBitmapWidth = sz.cx;
 			iBitmapHeight = sz.cy;
@@ -389,7 +390,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			hdc = GetDC(m_expp->GetMainWindow());
 			hdcSrc = CreateCompatibleDC(hdc);
 
-			SelectObject(hdcSrc,hbmTab);
+			SelectObject(hdcSrc,hbmTab.get());
 
 			hdcThumbnailSrc = CreateCompatibleDC(hdc);
 
@@ -425,7 +426,6 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			hr = DwmSetIconicThumbnail(hwnd,hbmThumbnail,0);
 
 			/* Delete the thumbnail bitmap. */
-			DeleteObject(hbmTab);
 			SelectObject(hdcSrc,hPrevBitmap);
 			DeleteObject(hbmThumbnail);
 			DeleteDC(hdcSrc);
@@ -483,101 +483,70 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 	return DefWindowProc(hwnd,Msg,wParam,lParam);
 }
 
-HBITMAP TaskbarThumbnails::CaptureTabScreenshot(int iTabId)
+wil::unique_hbitmap TaskbarThumbnails::CaptureTabScreenshot(const Tab &tab)
 {
-	HDC hdc;
-	HDC hdcSrc;
-	HBITMAP hBitmap;
-	HBITMAP hPrevBitmap;
-	Gdiplus::Color color(0,0,0);
+	wil::unique_hdc_window hdc = wil::GetDC(m_expp->GetMainWindow());
+	wil::unique_hdc hdcSrc(CreateCompatibleDC(hdc.get()));
+
 	RECT rcMain;
-	RECT rcTab;
-
-	HWND hTab = m_tabContainer->GetTab(iTabId).listView;
-
-	GetClientRect(m_expp->GetMainWindow(),&rcMain);
-	GetClientRect(hTab,&rcTab);
-
-	/* Main window BitBlt. */
-	hdc = GetDC(m_expp->GetMainWindow());
-	hdcSrc = CreateCompatibleDC(hdc);
+	GetClientRect(m_expp->GetMainWindow(), &rcMain);
 
 	/* Any bitmap sent back to the operating system will need to be in 32-bit
 	ARGB format. */
-	Gdiplus::Bitmap bi(GetRectWidth(&rcMain),GetRectHeight(&rcMain),PixelFormat32bppARGB);
-	bi.GetHBITMAP(color,&hBitmap);
+	wil::unique_hbitmap hBitmap;
+	Gdiplus::Color color(0, 0, 0);
+	Gdiplus::Bitmap bi(GetRectWidth(&rcMain), GetRectHeight(&rcMain), PixelFormat32bppARGB);
+	bi.GetHBITMAP(color, &hBitmap);
 
-	/* BitBlt the main window into the bitmap. */
-	hPrevBitmap = (HBITMAP)SelectObject(hdcSrc,hBitmap);
-	BitBlt(hdcSrc,0,0,GetRectWidth(&rcMain),GetRectHeight(&rcMain),hdc,0,0,SRCCOPY);
+	/* Draw the main window into the bitmap. */
+	auto mainWindowPreviousBitmap = wil::SelectObject(hdcSrc.get(), hBitmap.get());
+	BitBlt(hdcSrc.get(), 0, 0, GetRectWidth(&rcMain), GetRectHeight(&rcMain), hdc.get(), 0, 0, SRCCOPY);
 
 
-	/* Now BitBlt the tab onto the main window. */
-	HDC hdcTab;
-	HDC hdcTabSrc;
-	HBITMAP hbmTab;
-	HBITMAP hbmTabPrev;
-	BOOL bVisible;
+	/* Now draw the tab onto the main window. */
+	RECT rcTab;
+	GetClientRect(tab.listView, &rcTab);
 
-	hdcTab = GetDC(hTab);
-	hdcTabSrc = CreateCompatibleDC(hdcTab);
-	hbmTab = CreateCompatibleBitmap(hdcTab,GetRectWidth(&rcTab),GetRectHeight(&rcTab));
+	wil::unique_hdc_window hdcTab = wil::GetDC(tab.listView);
+	wil::unique_hdc hdcTabSrc(CreateCompatibleDC(hdcTab.get()));
+	wil::unique_hbitmap hbmTab(CreateCompatibleBitmap(hdcTab.get(), GetRectWidth(&rcTab), GetRectHeight(&rcTab)));
 
-	hbmTabPrev = (HBITMAP)SelectObject(hdcTabSrc,hbmTab);
+	auto tabPreviousBitmap = wil::SelectObject(hdcTabSrc.get(), hbmTab.get());
 
-	bVisible = IsWindowVisible(hTab);
+	BOOL bVisible = IsWindowVisible(tab.listView);
 
-	if(!bVisible)
+	if (!bVisible)
 	{
-		ShowWindow(hTab,SW_SHOW);
+		ShowWindow(tab.listView, SW_SHOW);
 	}
 
-	PrintWindow(hTab,hdcTabSrc,PW_CLIENTONLY);
+	PrintWindow(tab.listView, hdcTabSrc.get(), PW_CLIENTONLY);
 
-	if(!bVisible)
+	if (!bVisible)
 	{
-		ShowWindow(hTab,SW_HIDE);
+		ShowWindow(tab.listView, SW_HIDE);
 	}
 
-	MapWindowPoints(hTab, m_expp->GetMainWindow(),(LPPOINT)&rcTab,2);
-	BitBlt(hdcSrc,rcTab.left,rcTab.top,GetRectWidth(&rcTab),GetRectHeight(&rcTab),hdcTabSrc,0,0,SRCCOPY);
-
-	SelectObject(hdcTabSrc,hbmTabPrev);
-	DeleteObject(hbmTab);
-	DeleteDC(hdcTabSrc);
-	ReleaseDC(hTab,hdcTab);
+	MapWindowPoints(tab.listView, m_expp->GetMainWindow(), reinterpret_cast<LPPOINT>(&rcTab), 2);
+	BitBlt(hdcSrc.get(), rcTab.left, rcTab.top, GetRectWidth(&rcTab), GetRectHeight(&rcTab), hdcTabSrc.get(), 0, 0, SRCCOPY);
 
 
 	/* Shrink the bitmap. */
-	HDC hdcThumbnailSrc;
-	HBITMAP hbmThumbnail;
-	POINT pt;
+	wil::unique_hdc hdcThumbnailSrc(CreateCompatibleDC(hdc.get()));
 
-	hdcThumbnailSrc = CreateCompatibleDC(hdc);
+	wil::unique_hbitmap hbmThumbnail;
+	Gdiplus::Bitmap bmpThumbnail(GetRectWidth(&rcMain), GetRectHeight(&rcMain), PixelFormat32bppARGB);
+	bmpThumbnail.GetHBITMAP(color, &hbmThumbnail);
 
-	/* Thumbnail bitmap. */
-	Gdiplus::Bitmap bmpThumbnail(GetRectWidth(&rcMain),GetRectHeight(&rcMain),PixelFormat32bppARGB);
-
-	bmpThumbnail.GetHBITMAP(color,&hbmThumbnail);
-
-	hPrevBitmap = (HBITMAP)SelectObject(hdcThumbnailSrc,hbmThumbnail);
+	auto thumbnailPreviousBitmap = wil::SelectObject(hdcThumbnailSrc.get(), hbmThumbnail.get());
 
 	/* Finally, shrink the full-scale bitmap down into a thumbnail. */
-	SetStretchBltMode(hdcThumbnailSrc,HALFTONE);
-	SetBrushOrgEx(hdcThumbnailSrc,0,0,&pt);
-	BitBlt(hdcThumbnailSrc,0,0,GetRectWidth(&rcMain),GetRectHeight(&rcMain),hdcSrc,0,0,SRCCOPY);
+	POINT pt;
+	SetStretchBltMode(hdcThumbnailSrc.get(), HALFTONE);
+	SetBrushOrgEx(hdcThumbnailSrc.get(), 0, 0, &pt);
+	BitBlt(hdcThumbnailSrc.get(), 0, 0, GetRectWidth(&rcMain), GetRectHeight(&rcMain), hdcSrc.get(), 0, 0, SRCCOPY);
 
-	SetBitmapDimensionEx(hbmThumbnail,GetRectWidth(&rcMain),GetRectHeight(&rcMain),NULL);
-
-	SelectObject(hdcThumbnailSrc,hPrevBitmap);
-	DeleteDC(hdcThumbnailSrc);
-
-	DeleteObject(hBitmap);
-
-	SelectObject(hdcSrc,hPrevBitmap);
-
-	DeleteDC(hdcSrc);
-	ReleaseDC(m_expp->GetMainWindow(),hdc);
+	SetBitmapDimensionEx(hbmThumbnail.get(), GetRectWidth(&rcMain), GetRectHeight(&rcMain), nullptr);
 
 	return hbmThumbnail;
 }
