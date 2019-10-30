@@ -22,7 +22,7 @@ namespace Plugins
 		boost::optional<int> AddItemToMainMenu(const std::wstring &text);
 		void RemoveItemFromMainMenu(int menuItemId);
 
-		boost::signals2::connection PluginMenuManager::AddMenuClickedObserver(const PluginMenuClickedSignal::slot_type &observer);
+		boost::signals2::connection AddMenuClickedObserver(const PluginMenuClickedSignal::slot_type &observer);
 
 		void OnMenuItemClicked(int menuItemId);
 

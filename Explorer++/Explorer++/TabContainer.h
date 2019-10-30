@@ -32,7 +32,7 @@ public:
 	HRESULT CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
 	FolderSettings GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;
 
-	Tab &TabContainer::GetTab(int tabId);
+	Tab &GetTab(int tabId);
 	Tab *GetTabOptional(int tabId);
 	void SelectTab(const Tab &tab);
 	void SelectAdjacentTab(BOOL bNextTab);

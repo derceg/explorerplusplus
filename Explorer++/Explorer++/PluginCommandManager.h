@@ -18,7 +18,7 @@ namespace Plugins
 
 		typedef boost::signals2::signal<void(int, const std::wstring &)> CommandInvokedSignal;
 
-		PluginCommandManager::PluginCommandManager(HACCEL *acceleratorTable, int startId, int endId);
+		PluginCommandManager(HACCEL *acceleratorTable, int startId, int endId);
 		~PluginCommandManager();
 
 		void addCommands(int pluginId, const std::vector<Command> &commands);
