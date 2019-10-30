@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "LuaPlugin.h"
-#include "APIBinding.h"
+#include "ApiBinding.h"
 
 int Plugins::LuaPlugin::idCounter = 1;
 

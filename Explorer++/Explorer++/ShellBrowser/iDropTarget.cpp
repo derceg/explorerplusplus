@@ -8,7 +8,7 @@
  */
 
 #include "stdafx.h"
-#include "IShellView.h"
+#include "iShellView.h"
 #include "iShellBrowser_internal.h"
 #include "ViewModes.h"
 #include "../Helper/Helper.h"

@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "APIBinding.h"
+#include "ApiBinding.h"
 #include "CommandInvoked.h"
 #include "MenuApi.h"
 #include "Navigation.h"
@@ -14,7 +14,7 @@
 #include "TabCreated.h"
 #include "TabMoved.h"
 #include "TabRemoved.h"
-#include "TabsAPI.h"
+#include "TabsApi.h"
 #include "TabUpdated.h"
 #include "UiApi.h"
 #include "UiTheming.h"

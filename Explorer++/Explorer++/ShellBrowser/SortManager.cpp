@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "IShellView.h"
+#include "iShellView.h"
 #include "ColumnDataRetrieval.h"
 #include "Config.h"
 #include "iShellBrowser_internal.h"
