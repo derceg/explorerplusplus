@@ -58,7 +58,7 @@ BOOL BookmarkMenu::BuildBookmarksMenu(HMENU menu, const CBookmarkFolder &parent,
 		return AddEmptyBookmarkFolderToMenu(menu, position);
 	}
 
-	for each(const auto &variantBookmark in parent)
+	for (const auto &variantBookmark : parent)
 	{
 		BOOL res;
 
