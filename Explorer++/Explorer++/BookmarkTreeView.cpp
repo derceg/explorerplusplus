@@ -41,7 +41,7 @@ CBookmarkTreeView::~CBookmarkTreeView()
 	ImageList_Destroy(m_himl);
 }
 
-LRESULT CALLBACK BookmarkTreeViewProcStub(HWND hwnd, UINT uMsg,
+LRESULT CALLBACK CBookmarkTreeView::BookmarkTreeViewProcStub(HWND hwnd, UINT uMsg,
 	WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
@@ -88,7 +88,7 @@ LRESULT CALLBACK CBookmarkTreeView::TreeViewProc(HWND hwnd, UINT Msg, WPARAM wPa
 	return DefSubclassProc(hwnd, Msg, wParam, lParam);
 }
 
-LRESULT CALLBACK BookmarkTreeViewParentProcStub(HWND hwnd, UINT uMsg,
+LRESULT CALLBACK CBookmarkTreeView::BookmarkTreeViewParentProcStub(HWND hwnd, UINT uMsg,
 	WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
@@ -127,7 +127,7 @@ LRESULT CALLBACK CBookmarkTreeView::TreeViewParentProc(HWND hwnd, UINT Msg, WPAR
 	return DefSubclassProc(hwnd, Msg, wParam, lParam);
 }
 
-LRESULT CALLBACK TreeViewEditProcStub(HWND hwnd, UINT uMsg,
+LRESULT CALLBACK CBookmarkTreeView::TreeViewEditProcStub(HWND hwnd, UINT uMsg,
 	WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);

@@ -85,7 +85,7 @@ CApplicationToolbar::~CApplicationToolbar()
 	m_patd->Release();
 }
 
-LRESULT CALLBACK ParentWndProcStub(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK CApplicationToolbar::ParentWndProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);

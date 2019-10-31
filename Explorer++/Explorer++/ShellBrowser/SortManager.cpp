@@ -44,7 +44,7 @@ void CShellBrowser::SortFolder(SortMode sortMode)
 	}
 }
 
-int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
+int CALLBACK CShellBrowser::SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort)
 {
 	CShellBrowser *pShellBrowser = reinterpret_cast<CShellBrowser *>(lParamSort);
 	return pShellBrowser->Sort(static_cast<int>(lParam1),static_cast<int>(lParam2));

@@ -67,7 +67,7 @@ ULONG __stdcall CTabDropHandler::Release(void)
 	return m_RefCount;
 }
 
-LRESULT CALLBACK TabCtrlProcStub(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK CTabDropHandler::TabCtrlProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);

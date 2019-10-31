@@ -9,8 +9,6 @@
 
 class CTabDropHandler : public IDropTarget
 {
-	friend LRESULT CALLBACK TabCtrlProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-
 public:
 
 	CTabDropHandler(HWND hTabCtrl, TabContainer *tabContainer);
@@ -34,6 +32,7 @@ private:
 	HRESULT __stdcall	DragLeave(void);
 	HRESULT __stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL pt,DWORD *pdwEffect);
 
+	static LRESULT CALLBACK	TabCtrlProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK	TabCtrlProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
 	void				GetRepresentativeSourceDrive(IDataObject *pDataObject,CLIPFORMAT Format);

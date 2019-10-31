@@ -61,7 +61,7 @@ INT_PTR CUpdateCheckDialog::OnInitDialog()
 	return 0;
 }
 
-DWORD WINAPI UpdateCheckThread(LPVOID pParam)
+DWORD WINAPI CUpdateCheckDialog::UpdateCheckThread(LPVOID pParam)
 {
 	assert(pParam != NULL);
 
@@ -70,7 +70,7 @@ DWORD WINAPI UpdateCheckThread(LPVOID pParam)
 	return 0;
 }
 
-void PerformUpdateCheck(HWND hDlg)
+void CUpdateCheckDialog::PerformUpdateCheck(HWND hDlg)
 {
 	TCHAR TempPath[MAX_PATH];
 	DWORD PathRes = GetTempPath(SIZEOF_ARRAY(TempPath),TempPath);

@@ -49,8 +49,6 @@ struct Config;
 
 class CShellBrowser : public IDropTarget, public IDropFilesCallback
 {
-	friend int CALLBACK SortStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-
 public:
 
 	static CShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
@@ -293,6 +291,8 @@ private:
 
 	static LRESULT CALLBACK	ListViewParentProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK	ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	static int CALLBACK	SortStub(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort);
 
 	/* Message handlers. */
 	void				ColumnClicked(int iClickedColumn);

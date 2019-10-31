@@ -31,9 +31,6 @@ private:
 
 class CUpdateCheckDialog : public CBaseDialog
 {
-	friend DWORD WINAPI	UpdateCheckThread(LPVOID pParam);
-	friend void			PerformUpdateCheck(HWND hDlg);
-
 public:
 
 	CUpdateCheckDialog(HINSTANCE hInstance,int iResource,HWND hParent);
@@ -70,6 +67,9 @@ private:
 	static const int STATUS_TIMER_ELAPSED = 800;
 
 	static const TCHAR VERSION_FILE_URL[];
+
+	static DWORD WINAPI	UpdateCheckThread(LPVOID pParam);
+	static void			PerformUpdateCheck(HWND hDlg);
 
 	void OnUpdateCheckError();
 	void OnUpdateCheckSuccess(Version_t *Version);

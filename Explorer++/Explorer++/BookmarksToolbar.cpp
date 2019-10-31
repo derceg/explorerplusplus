@@ -71,7 +71,7 @@ CBookmarksToolbar::~CBookmarksToolbar()
 	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
 }
 
-LRESULT CALLBACK BookmarksToolbarProcStub(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarProcStub(HWND hwnd,UINT uMsg,
 WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
@@ -143,7 +143,7 @@ void CBookmarksToolbar::OpenBookmarkItemInNewTab(const VariantBookmark &variantB
 	}
 }
 
-LRESULT CALLBACK BookmarksToolbarParentProcStub(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK CBookmarksToolbar::BookmarksToolbarParentProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);

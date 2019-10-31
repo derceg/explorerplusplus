@@ -72,8 +72,6 @@ class Explorerplusplus : public IExplorerplusplus, public TabContainerInterface,
 
 	friend LRESULT CALLBACK WndProcStub(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
-	friend void FolderSizeCallbackStub(int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize,LPVOID pData);
-
 public:
 
 	Explorerplusplus(HWND);
@@ -503,6 +501,8 @@ private:
 	void					CycleViewState(BOOL bCycleForward);
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	CStatusBar				*GetStatusBar();
+
+	static void				FolderSizeCallbackStub(int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize, LPVOID pData);
 	void					FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
 
 	/* ------ Internal state. ------ */
