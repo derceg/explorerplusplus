@@ -301,6 +301,8 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARA
 
 LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,int iTabId)
 {
+	const Tab &tab = m_tabContainer->GetTab(iTabId);
+
 	switch(Msg)
 	{
 	case WM_ACTIVATE:
@@ -311,12 +313,12 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			ShowWindow(m_expp->GetMainWindow(),SW_RESTORE);
 		}
 
-		m_tabContainer->SelectTab(m_tabContainer->GetTab(iTabId));
+		m_tabContainer->SelectTab(tab);
 		return 0;
 		break;
 
 	case WM_SETFOCUS:
-		SetFocus(m_tabContainer->GetTab(iTabId).listView);
+		SetFocus(tab.listView);
 		break;
 
 	case WM_SYSCOMMAND:
@@ -326,7 +328,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			break;
 
 		default:
-			SendMessage(m_tabContainer->GetTab(iTabId).listView,WM_SYSCOMMAND,wParam,lParam);
+			SendMessage(tab.listView,WM_SYSCOMMAND,wParam,lParam);
 			break;
 		}
 		break;
@@ -338,101 +340,12 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 	3. Shrink the resulting bitmap down to the correct thumbnail size.
 	
 	A thumbnail will be dynamically generated, provided the main window
-	is not currently minimized (as we won't be able to grap a screenshot
+	is not currently minimized (as we won't be able to grab a screenshot
 	of it). If the main window is minimized, we'll use a cached screenshot
 	of the tab (taken before the main window was minimized). */
 	case WM_DWMSENDICONICTHUMBNAIL:
-		{
-			HDC hdc;
-			HDC hdcSrc;
-			HBITMAP hPrevBitmap;
-			Gdiplus::Color color(0,0,0);
-			HRESULT hr;
-			int iBitmapWidth;
-			int iBitmapHeight;
-			int iWidth;
-			int iHeight;
-			int iMaxWidth;
-			int iMaxHeight;
-
-			iMaxWidth = HIWORD(lParam);
-			iMaxHeight = LOWORD(lParam);
-
-			wil::unique_hbitmap hbmTab;
-
-			/* If the main window is minimized, it won't be possible
-			to generate a thumbnail for any of the tabs. In that
-			case, use a static 'No Preview Available' bitmap. */
-			if(IsIconic(m_expp->GetMainWindow()))
-			{
-				hbmTab.reset(static_cast<HBITMAP>(LoadImage(GetModuleHandle(0),MAKEINTRESOURCE(IDB_NOPREVIEWAVAILABLE),IMAGE_BITMAP,0,0,0)));
-
-				SetBitmapDimensionEx(hbmTab.get(),223,130,NULL);
-			}
-			else
-			{
-				hbmTab = CaptureTabScreenshot(m_tabContainer->GetTab(iTabId));
-			}
-
-			SIZE sz;
-
-			GetBitmapDimensionEx(hbmTab.get(),&sz);
-
-			iBitmapWidth = sz.cx;
-			iBitmapHeight = sz.cy;
-
-
-			/* Shrink the bitmap. */
-			HDC hdcThumbnailSrc;
-			HBITMAP hbmThumbnail;
-			POINT pt;
-
-			hdc = GetDC(m_expp->GetMainWindow());
-			hdcSrc = CreateCompatibleDC(hdc);
-
-			SelectObject(hdcSrc,hbmTab.get());
-
-			hdcThumbnailSrc = CreateCompatibleDC(hdc);
-
-			/* If the current height of the main window
-			is less than the width, we'll create a thumbnail
-			of maximum width; else maximum height. */
-			if(((double) iBitmapWidth / (double) iMaxWidth) > ((double) iBitmapHeight / (double) iMaxHeight))
-			{
-				iWidth = iMaxWidth;
-				iHeight = (int) ceil(iMaxWidth * ((double)iBitmapHeight / (double)iBitmapWidth));
-			}
-			else
-			{
-				iHeight = iMaxHeight;
-				iWidth = (int) ceil(iMaxHeight * ((double) iBitmapWidth / (double) iBitmapHeight));
-			}
-
-			/* Thumbnail bitmap. */
-			Gdiplus::Bitmap bmpThumbnail(iWidth,iHeight,PixelFormat32bppARGB);
-
-			bmpThumbnail.GetHBITMAP(color,&hbmThumbnail);
-
-			hPrevBitmap = (HBITMAP)SelectObject(hdcThumbnailSrc,hbmThumbnail);
-
-			/* Finally, shrink the full-scale bitmap down into a thumbnail. */
-			SetStretchBltMode(hdcThumbnailSrc,HALFTONE);
-			SetBrushOrgEx(hdcThumbnailSrc,0,0,&pt);
-			StretchBlt(hdcThumbnailSrc,0,0,iWidth,iHeight,hdcSrc,0,0,iBitmapWidth,iBitmapHeight,SRCCOPY);
-
-			SelectObject(hdcThumbnailSrc,hPrevBitmap);
-			DeleteDC(hdcThumbnailSrc);
-
-			hr = DwmSetIconicThumbnail(hwnd,hbmThumbnail,0);
-
-			/* Delete the thumbnail bitmap. */
-			SelectObject(hdcSrc,hPrevBitmap);
-			DeleteObject(hbmThumbnail);
-			DeleteDC(hdcSrc);
-			ReleaseDC(m_expp->GetMainWindow(),hdc);
-
-			return 0;
-		}
+		OnDwmSendIconicThumbnail(hwnd, tab, HIWORD(lParam), LOWORD(lParam));
+		return 0;
 		break;
 
 	case WM_DWMSENDICONICLIVEPREVIEWBITMAP:
@@ -443,7 +356,6 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			}
 			else
 			{
-				const Tab &tab = m_tabContainer->GetTab(iTabId);
 				wil::unique_hbitmap bitmap = GetTabLivePreviewBitmap(tab);
 
 				RECT rcTab;
@@ -482,7 +394,6 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			}
 			else
 			{
-				const Tab &tab = m_tabContainer->GetTab(iTabId);
 				m_tabContainer->CloseTab(tab);
 			}
 		}
@@ -490,6 +401,69 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 	}
 
 	return DefWindowProc(hwnd,Msg,wParam,lParam);
+}
+
+void TaskbarThumbnails::OnDwmSendIconicThumbnail(HWND tabProxy, const Tab &tab, int maxWidth, int maxHeight)
+{
+	wil::unique_hbitmap hbmTab;
+
+	/* If the main window is minimized, it won't be possible
+	to generate a thumbnail for any of the tabs. In that
+	case, use a static 'No Preview Available' bitmap. */
+	if (IsIconic(m_expp->GetMainWindow()))
+	{
+		hbmTab.reset(static_cast<HBITMAP>(LoadImage(GetModuleHandle(0), MAKEINTRESOURCE(IDB_NOPREVIEWAVAILABLE), IMAGE_BITMAP, 0, 0, 0)));
+
+		SetBitmapDimensionEx(hbmTab.get(), 223, 130, NULL);
+	}
+	else
+	{
+		hbmTab = CaptureTabScreenshot(tab);
+	}
+
+	SIZE currentSize;
+	GetBitmapDimensionEx(hbmTab.get(), &currentSize);
+
+
+	/* Shrink the bitmap. */
+	wil::unique_hdc_window hdc = wil::GetDC(m_expp->GetMainWindow());
+	wil::unique_hdc hdcSrc(CreateCompatibleDC(hdc.get()));
+
+	auto previousTabBitmap = wil::SelectObject(hdcSrc.get(), hbmTab.get());
+
+	wil::unique_hdc hdcThumbnailSrc(CreateCompatibleDC(hdc.get()));
+
+	int finalWidth;
+	int finalHeight;
+
+	/* If the current height of the main window
+	is less than the width, we'll create a thumbnail
+	of maximum width; else maximum height. */
+	if (((double)currentSize.cx / (double)maxWidth) > ((double)currentSize.cy / (double)maxHeight))
+	{
+		finalWidth = maxWidth;
+		finalHeight = (int)ceil(maxWidth * ((double)currentSize.cy / (double)currentSize.cx));
+	}
+	else
+	{
+		finalHeight = maxHeight;
+		finalWidth = (int)ceil(maxHeight * ((double)currentSize.cx / (double)currentSize.cy));
+	}
+
+	wil::unique_hbitmap hbmThumbnail;
+	Gdiplus::Color color(0, 0, 0);
+	Gdiplus::Bitmap bmpThumbnail(finalWidth, finalHeight, PixelFormat32bppARGB);
+	bmpThumbnail.GetHBITMAP(color, &hbmThumbnail);
+
+	auto previousThumbnailBitmap = wil::SelectObject(hdcThumbnailSrc.get(), hbmThumbnail.get());
+
+	/* Finally, shrink the full-scale bitmap down into a thumbnail. */
+	POINT pt;
+	SetStretchBltMode(hdcThumbnailSrc.get(), HALFTONE);
+	SetBrushOrgEx(hdcThumbnailSrc.get(), 0, 0, &pt);
+	StretchBlt(hdcThumbnailSrc.get(), 0, 0, finalWidth, finalHeight, hdcSrc.get(), 0, 0, currentSize.cx, currentSize.cy, SRCCOPY);
+
+	DwmSetIconicThumbnail(tabProxy, hbmThumbnail.get(), 0);
 }
 
 wil::unique_hbitmap TaskbarThumbnails::CaptureTabScreenshot(const Tab &tab)

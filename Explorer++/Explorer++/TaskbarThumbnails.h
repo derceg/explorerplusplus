@@ -47,6 +47,7 @@ private:
 	void CreateTabProxy(int iTabId, BOOL bSwitchToNewTab);
 	void RegisterTab(HWND hTabProxy, const TCHAR *szDisplayName, BOOL bTabActive);
 	void RemoveTabProxy(int iTabId);
+	void OnDwmSendIconicThumbnail(HWND tabProxy, const Tab &tab, int maxWidth, int maxHeight);
 	wil::unique_hbitmap CaptureTabScreenshot(const Tab &tab);
 	wil::unique_hbitmap GetTabLivePreviewBitmap(const Tab &tab);
 	void OnTabSelectionChanged(const Tab &tab);
