@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "PluginManager.h"
 #include "Manifest.h"
-#include "../ThirdParty/Sol/sol.hpp"
+#include "../ThirdParty/Sol/forward.hpp"
 
 const std::wstring Plugins::PluginManager::MANIFEST_NAME = L"plugin.json";
 

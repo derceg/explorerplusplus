@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "TabRemoved.h"
+#include "../ThirdParty/Sol/sol.hpp"
 
 Plugins::TabRemoved::TabRemoved(TabContainer *tabContainer) :
 	m_tabContainer(tabContainer)

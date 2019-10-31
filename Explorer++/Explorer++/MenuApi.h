@@ -5,7 +5,7 @@
 #pragma once
 
 #include "PluginMenuManager.h"
-#include "../ThirdParty/Sol/sol.hpp"
+#include "../ThirdParty/Sol/forward.hpp"
 #include <boost/signals2.hpp>
 #include <unordered_map>
 

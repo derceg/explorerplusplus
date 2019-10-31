@@ -8,7 +8,7 @@
 #include "PluginInterface.h"
 #include "PluginMenuManager.h"
 #include "UiTheming.h"
-#include "../ThirdParty/Sol/sol.hpp"
+#include "../ThirdParty/Sol/forward.hpp"
 
 namespace Plugins
 {

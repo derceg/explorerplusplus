@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "TabCreated.h"
 #include "TabsApi.h"
+#include "../ThirdParty/Sol/sol.hpp"
 
 Plugins::TabCreated::TabCreated(TabContainer *tabContainer) :
 	m_tabContainer(tabContainer)

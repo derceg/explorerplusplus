@@ -7,6 +7,7 @@
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/SortModes.h"
 #include "TabProperties.h"
+#include "../ThirdParty/Sol/sol.hpp"
 #include <boost/scope_exit.hpp>
 
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration

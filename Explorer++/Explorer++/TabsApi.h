@@ -11,7 +11,7 @@
 #include "TabContainer.h"
 #include "TabInterface.h"
 #include "../Helper/StringHelper.h"
-#include "../ThirdParty/Sol/sol.hpp"
+#include "../ThirdParty/Sol/forward.hpp"
 
 namespace Plugins
 {
