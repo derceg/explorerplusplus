@@ -8,6 +8,7 @@
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileActionHandler.h"
+#include <wil/resource.h>
 
 class CMassRenameDialog;
 
@@ -57,7 +58,6 @@ protected:
 	INT_PTR	OnInitDialog();
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnClose();
-	INT_PTR	OnDestroy();
 
 private:
 
@@ -70,8 +70,8 @@ private:
 	void	ProcessFileName(const std::wstring &strTarget,const std::wstring &strFilename,int iFileIndex,std::wstring &strOutput);
 
 	std::list<std::wstring>	m_FullFilenameList;
-	HICON					m_hDialogIcon;
-	HICON					m_hMoreIcon;
+	wil::unique_hicon		m_icon;
+	wil::unique_hicon		m_moreIcon;
 	CFileActionHandler		*m_pFileActionHandler;
 
 	CMassRenameDialogPersistentSettings	*m_pmrdps;

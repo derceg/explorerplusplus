@@ -27,11 +27,11 @@ CAboutDialog::~CAboutDialog()
 
 INT_PTR CAboutDialog::OnInitDialog()
 {
-	m_hIcon = reinterpret_cast<HICON>(LoadImage(GetModuleHandle(0),
+	m_icon.reset(reinterpret_cast<HICON>(LoadImage(GetModuleHandle(0),
 		MAKEINTRESOURCE(IDI_MAIN),IMAGE_ICON,
-		32,32,LR_VGACOLOR));
+		32,32,LR_VGACOLOR)));
 
-	SendMessage(m_hDlg,WM_SETICON,ICON_SMALL,reinterpret_cast<LPARAM>(m_hIcon));
+	SendMessage(m_hDlg,WM_SETICON,ICON_SMALL,reinterpret_cast<LPARAM>(m_icon.get()));
 
 	/* If the dialog has been loaded from a resource other than
 	the one in the executable (which will be the case, for example,
@@ -122,8 +122,6 @@ INT_PTR CAboutDialog::OnNotify(NMHDR *pnmhdr)
 
 INT_PTR CAboutDialog::OnClose()
 {
-	DestroyIcon(m_hIcon);
-
 	EndDialog(m_hDlg,0);
 	return 0;
 }

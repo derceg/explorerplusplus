@@ -54,12 +54,12 @@ INT_PTR CMassRenameDialog::OnInitDialog()
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
 	ImageList_Add(himl,hBitmap,NULL);
 
-	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_RENAME,ILD_NORMAL);
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+	m_icon.reset(ImageList_GetIcon(himl,SHELLIMAGES_RENAME,ILD_NORMAL));
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
-	m_hMoreIcon = ImageList_GetIcon(himl,SHELLIMAGES_RIGHTARROW,ILD_NORMAL);
+	m_moreIcon.reset(ImageList_GetIcon(himl,SHELLIMAGES_RIGHTARROW,ILD_NORMAL));
 	SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_MORE,BM_SETIMAGE,IMAGE_ICON,
-		reinterpret_cast<LPARAM>(m_hMoreIcon));
+		reinterpret_cast<LPARAM>(m_moreIcon.get()));
 
 	DeleteObject(hBitmap);
 	ImageList_Destroy(himl);
@@ -282,14 +282,6 @@ INT_PTR CMassRenameDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 INT_PTR CMassRenameDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
-	return 0;
-}
-
-INT_PTR CMassRenameDialog::OnDestroy()
-{
-	DestroyIcon(m_hMoreIcon);
-	DestroyIcon(m_hDialogIcon);
-
 	return 0;
 }
 

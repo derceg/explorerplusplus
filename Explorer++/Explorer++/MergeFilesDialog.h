@@ -8,6 +8,7 @@
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
+#include <wil/resource.h>
 
 class CMergeFilesDialog;
 
@@ -64,7 +65,6 @@ protected:
 	INT_PTR	OnInitDialog();
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnClose();
-	INT_PTR	OnDestroy();
 
 	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
@@ -88,7 +88,7 @@ private:
 	bool					m_bStopMerging;
 	TCHAR					m_szOk[32];
 
-	HICON					m_hDialogIcon;
+	wil::unique_hicon		m_icon;
 
 	CMergeFilesDialogPersistentSettings	*m_pmfdps;
 };

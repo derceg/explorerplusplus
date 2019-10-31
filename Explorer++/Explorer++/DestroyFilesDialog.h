@@ -8,6 +8,7 @@
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileOperations.h"
+#include <wil/resource.h>
 
 class CDestroyFilesDialog;
 
@@ -54,7 +55,6 @@ protected:
 	INT_PTR	OnCtlColorStatic(HWND hwnd,HDC hdc);
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnClose();
-	INT_PTR	OnDestroy();
 
 private:
 
@@ -67,7 +67,7 @@ private:
 
 	std::list<std::wstring>	m_FullFilenameList;
 
-	HICON	m_hDialogIcon;
+	wil::unique_hicon	m_icon;
 
 	CDestroyFilesDialogPersistentSettings	*m_pdfdps;
 

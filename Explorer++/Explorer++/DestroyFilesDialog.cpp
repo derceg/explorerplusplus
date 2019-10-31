@@ -34,8 +34,8 @@ CDestroyFilesDialog::~CDestroyFilesDialog()
 
 INT_PTR CDestroyFilesDialog::OnInitDialog()
 {
-	m_hDialogIcon = LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN));
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+	m_icon.reset(LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN)));
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_DESTROYFILES_LISTVIEW);
 
@@ -228,13 +228,6 @@ INT_PTR CDestroyFilesDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 INT_PTR CDestroyFilesDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
-	return 0;
-}
-
-INT_PTR CDestroyFilesDialog::OnDestroy()
-{
-	DestroyIcon(m_hDialogIcon);
-
 	return 0;
 }
 

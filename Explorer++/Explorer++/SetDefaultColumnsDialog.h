@@ -10,6 +10,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
+#include <wil/resource.h>
 #include <unordered_map>
 
 enum FolderType_t
@@ -69,7 +70,6 @@ protected:
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnNotify(NMHDR *pnmhdr);
 	INT_PTR	OnClose();
-	INT_PTR	OnDestroy();
 
 private:
 
@@ -92,7 +92,7 @@ private:
 	std::unordered_map<int,FolderType_t>	m_FolderMap;
 	FolderType_t		m_PreviousFolderType;
 
-	HICON				m_hDialogIcon;
+	wil::unique_hicon	m_icon;
 
 	CSetDefaultColumnsDialogPersistentSettings	*m_psdcdps;
 };

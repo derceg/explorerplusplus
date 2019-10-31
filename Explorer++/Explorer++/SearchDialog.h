@@ -11,6 +11,7 @@
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ReferenceCount.h"
 #include <boost/circular_buffer.hpp>
+#include <wil/resource.h>
 #include <MsXml2.h>
 #include <objbase.h>
 #include <list>
@@ -184,8 +185,8 @@ private:
 	void						UpdateListViewHeader();
 
 	TCHAR						m_szSearchDirectory[MAX_PATH];
-	HICON						m_hDialogIcon;
-	HICON						m_hDirectoryIcon;
+	wil::unique_hicon			m_icon;
+	wil::unique_hicon			m_directoryIcon;
 	BOOL						m_bSearching;
 	BOOL						m_bStopSearching;
 	TCHAR						m_szSearchButton[32];

@@ -220,7 +220,7 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 			tpi.iTabId		= iTabId;
 			tpi.atomClass	= aRet;
 
-			m_TabProxyList.push_back(tpi);
+			m_TabProxyList.push_back(std::move(tpi));
 		}
 	}
 }
@@ -234,9 +234,6 @@ void TaskbarThumbnails::RemoveTabProxy(int iTabId)
 			if(itr->iTabId == iTabId)
 			{
 				m_pTaskbarList->UnregisterTab(itr->hProxy);
-
-				HICON hIcon = reinterpret_cast<HICON>(GetClassLongPtr(itr->hProxy, GCLP_HICONSM));
-				DestroyIcon(hIcon);
 
 				TabProxy_t *ptp = reinterpret_cast<TabProxy_t *>(GetWindowLongPtr(itr->hProxy,GWLP_USERDATA));
 				DestroyWindow(itr->hProxy);
@@ -639,7 +636,7 @@ void TaskbarThumbnails::UpdateTaskbarThumbnailTtitle(const Tab &tab)
 
 void TaskbarThumbnails::SetTabProxyIcon(const Tab &tab)
 {
-	for (const TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
+	for (TabProxyInfo_t &tabProxyInfo : m_TabProxyList)
 	{
 		if (tabProxyInfo.iTabId == tab.GetId())
 		{
@@ -656,13 +653,9 @@ void TaskbarThumbnails::SetTabProxyIcon(const Tab &tab)
 				return;
 			}
 
-			HICON hIconTemp = (HICON)GetClassLongPtr(tabProxyInfo.hProxy, GCLP_HICONSM);
-			DestroyIcon(hIconTemp);
+			tabProxyInfo.icon.reset(shfi.hIcon);
 
-			hIconTemp = CopyIcon(shfi.hIcon);
-			DestroyIcon(shfi.hIcon);
-
-			SetClassLongPtr(tabProxyInfo.hProxy, GCLP_HICONSM, (LONG_PTR)hIconTemp);
+			SetClassLongPtr(tabProxyInfo.hProxy, GCLP_HICONSM, (LONG_PTR)tabProxyInfo.icon.get());
 			break;
 		}
 	}

@@ -10,6 +10,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
+#include <wil/resource.h>
 
 class CCustomizeColorsDialog;
 
@@ -46,7 +47,6 @@ protected:
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnNotify(NMHDR *pnmhdr);
 	INT_PTR	OnClose();
-	INT_PTR	OnDestroy();
 
 private:
 
@@ -63,7 +63,8 @@ private:
 	void	OnOk();
 	void	OnCancel();
 
-	HICON	m_hDialogIcon;
+	wil::unique_hicon	m_icon;
+
 	std::vector<NColorRuleHelper::ColorRule_t>	*m_pColorRuleList;
 
 	CCustomizeColorsDialogPersistentSettings	*m_pccdps;

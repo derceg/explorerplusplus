@@ -5,6 +5,7 @@
 #pragma once
 
 #include "../Helper/BaseDialog.h"
+#include <wil/resource.h>
 
 class CAboutDialog : public CBaseDialog
 {
@@ -22,5 +23,5 @@ protected:
 
 private:
 
-	HICON	m_hIcon;
+	wil::unique_hicon m_icon;
 };

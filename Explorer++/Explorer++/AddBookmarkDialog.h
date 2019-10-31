@@ -11,6 +11,7 @@
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/Bookmark.h"
+#include <wil/resource.h>
 
 class CAddBookmarkDialog;
 
@@ -78,7 +79,7 @@ private:
 	void		SaveTreeViewState();
 	void		SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hItem);
 
-	HICON			m_hDialogIcon;
+	wil::unique_hicon	m_icon;
 
 	CBookmarkFolder	&m_AllBookmarks;
 	CBookmark		&m_Bookmark;

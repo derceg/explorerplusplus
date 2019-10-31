@@ -39,8 +39,8 @@ INT_PTR CFilterDialog::OnInitDialog()
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
 	ImageList_Add(himl,hBitmap,NULL);
 
-	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_FILTER,ILD_NORMAL);
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+	m_icon.reset(ImageList_GetIcon(himl,SHELLIMAGES_FILTER,ILD_NORMAL));
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	DeleteObject(hBitmap);
 	ImageList_Destroy(himl);
@@ -119,13 +119,6 @@ INT_PTR CFilterDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 INT_PTR CFilterDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
-	return 0;
-}
-
-INT_PTR CFilterDialog::OnDestroy()
-{
-	DestroyIcon(m_hDialogIcon);
-
 	return 0;
 }
 

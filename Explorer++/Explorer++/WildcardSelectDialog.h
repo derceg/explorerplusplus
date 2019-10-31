@@ -8,6 +8,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
+#include <wil/resource.h>
 #include <MsXml2.h>
 #include <objbase.h>
 #include <list>
@@ -59,7 +60,6 @@ protected:
 	INT_PTR	OnInitDialog();
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnClose();
-	INT_PTR	OnDestroy();
 
 private:
 
@@ -73,7 +73,7 @@ private:
 	IExplorerplusplus	*m_pexpp;
 	BOOL				m_bSelect;
 
-	HICON				m_hDialogIcon;
+	wil::unique_hicon	m_icon;
 
 	CWildcardSelectDialogPersistentSettings	*m_pwsdps;
 };

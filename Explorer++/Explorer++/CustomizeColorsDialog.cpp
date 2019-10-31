@@ -36,8 +36,8 @@ INT_PTR CCustomizeColorsDialog::OnInitDialog()
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
 	ImageList_Add(himl,hBitmap,NULL);
 
-	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_CUSTOMIZECOLORS,ILD_NORMAL);
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+	m_icon.reset(ImageList_GetIcon(himl,SHELLIMAGES_CUSTOMIZECOLORS,ILD_NORMAL));
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	DeleteObject(hBitmap);
 	ImageList_Destroy(himl);
@@ -229,13 +229,6 @@ INT_PTR CCustomizeColorsDialog::OnNotify(NMHDR *pnmhdr)
 INT_PTR CCustomizeColorsDialog::OnClose()
 {
 	EndDialog(m_hDlg,0);
-	return 0;
-}
-
-INT_PTR CCustomizeColorsDialog::OnDestroy()
-{
-	DestroyIcon(m_hDialogIcon);
-
 	return 0;
 }
 

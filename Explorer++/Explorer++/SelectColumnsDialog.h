@@ -10,6 +10,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
+#include <wil/resource.h>
 
 class CSelectColumnsDialog;
 
@@ -47,7 +48,6 @@ protected:
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnNotify(NMHDR *pnmhdr);
 	INT_PTR	OnClose();
-	INT_PTR	OnDestroy();
 
 private:
 
@@ -66,7 +66,7 @@ private:
 	TabInterface	*m_ti;
 	BOOL	m_bColumnsSwapped;
 
-	HICON	m_hDialogIcon;
+	wil::unique_hicon	m_icon;
 
 	CSelectColumnsDialogPersistentSettings	*m_pscdps;
 };

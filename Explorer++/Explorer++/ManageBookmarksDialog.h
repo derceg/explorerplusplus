@@ -13,6 +13,7 @@
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/Bookmark.h"
+#include <wil/resource.h>
 
 class CManageBookmarksDialog;
 
@@ -143,7 +144,7 @@ private:
 	void		OnOk();
 	void		OnCancel();
 
-	HICON						m_hDialogIcon;
+	wil::unique_hicon			m_icon;
 
 	HWND						m_hToolbar;
 	HIMAGELIST					m_himlToolbar;

@@ -29,6 +29,7 @@ private:
 		ATOM atomClass;
 		HWND hProxy;
 		int iTabId;
+		wil::unique_hicon icon;
 	};
 
 	TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer,

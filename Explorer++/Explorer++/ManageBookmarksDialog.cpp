@@ -73,8 +73,8 @@ void CManageBookmarksDialog::SetDialogIcon()
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL),MAKEINTRESOURCE(IDB_SHELLIMAGES));
 	ImageList_Add(himl,hBitmap,NULL);
 
-	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_FAV,ILD_NORMAL);
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+	m_icon.reset(ImageList_GetIcon(himl,SHELLIMAGES_FAV,ILD_NORMAL));
+	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	DeleteObject(hBitmap);
 	ImageList_Destroy(himl);
@@ -1061,7 +1061,6 @@ INT_PTR CManageBookmarksDialog::OnClose()
 INT_PTR CManageBookmarksDialog::OnDestroy()
 {
 	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
-	DestroyIcon(m_hDialogIcon);
 	ImageList_Destroy(m_himlToolbar);
 
 	return 0;

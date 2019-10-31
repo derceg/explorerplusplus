@@ -74,9 +74,6 @@ CBaseDialog(hInstance,iResource,hParent,true)
 
 CSearchDialog::~CSearchDialog()
 {
-	DestroyIcon(m_hDialogIcon);
-	DestroyIcon(m_hDirectoryIcon);
-
 	if(m_pSearch != NULL)
 	{
 		m_pSearch->StopSearching();
@@ -90,13 +87,12 @@ INT_PTR CSearchDialog::OnInitDialog()
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
 	ImageList_Add(himl,hBitmap,NULL);
 
-	m_hDirectoryIcon = ImageList_GetIcon(himl,SHELLIMAGES_NEWTAB,ILD_NORMAL);
-	m_hDialogIcon = ImageList_GetIcon(himl,SHELLIMAGES_SEARCH,ILD_NORMAL);
+	m_icon.reset(ImageList_GetIcon(himl, SHELLIMAGES_SEARCH, ILD_NORMAL));
+	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 
+	m_directoryIcon.reset(ImageList_GetIcon(himl,SHELLIMAGES_NEWTAB,ILD_NORMAL));
 	SendMessage(GetDlgItem(m_hDlg,IDC_BUTTON_DIRECTORY),BM_SETIMAGE,
-		IMAGE_ICON,reinterpret_cast<LPARAM>(m_hDirectoryIcon));
-
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_hDialogIcon));
+		IMAGE_ICON,reinterpret_cast<LPARAM>(m_directoryIcon.get()));
 
 	DeleteObject(hBitmap);
 	ImageList_Destroy(himl);
