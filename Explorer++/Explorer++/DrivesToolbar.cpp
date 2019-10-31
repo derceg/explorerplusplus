@@ -22,9 +22,9 @@ CDrivesToolbar *CDrivesToolbar::Create(HWND hParent, UINT uIDStart, UINT uIDEnd,
 CDrivesToolbar::CDrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTANCE hInstance,
 	IExplorerplusplus *pexpp, Navigation *navigation) :
 	CBaseWindow(CreateDrivesToolbar(hParent)),
+	m_hInstance(hInstance),
 	m_uIDStart(uIDStart),
 	m_uIDEnd(uIDEnd),
-	m_hInstance(hInstance),
 	m_pexpp(pexpp),
 	m_navigation(navigation),
 	m_IDCounter(0)

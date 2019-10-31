@@ -38,9 +38,9 @@ CApplicationToolbar *CApplicationToolbar::Create(HWND hParent, UINT uIDStart, UI
 
 CApplicationToolbar::CApplicationToolbar(HWND hParent,UINT uIDStart,UINT uIDEnd,HINSTANCE hInstance,IExplorerplusplus *pexpp) :
 CBaseWindow(CreateApplicationToolbar(hParent)),
+m_hInstance(hInstance),
 m_uIDStart(uIDStart),
 m_uIDEnd(uIDEnd),
-m_hInstance(hInstance),
 m_pexpp(pexpp)
 {
 	Initialize(hParent);

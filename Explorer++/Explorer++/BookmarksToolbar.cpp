@@ -664,10 +664,10 @@ int CBookmarksToolbar::GetBookmarkItemIndex(const GUID &guid)
 
 CBookmarksToolbarDropHandler::CBookmarksToolbarDropHandler(HWND hToolbar,
 	CBookmarkFolder &AllBookmarks,const GUID &guidBookmarksToolbar) :
+m_ulRefCount(1),
 m_hToolbar(hToolbar),
 m_AllBookmarks(AllBookmarks),
-m_guidBookmarksToolbar(guidBookmarksToolbar),
-m_ulRefCount(1)
+m_guidBookmarksToolbar(guidBookmarksToolbar)
 {
 	CoCreateInstance(CLSID_DragDropHelper,NULL,CLSCTX_INPROC_SERVER,
 		IID_PPV_ARGS(&m_pDragSourceHelper));

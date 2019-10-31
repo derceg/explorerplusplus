@@ -9,8 +9,8 @@
 
 CApplicationToolbarDropHandler::CApplicationToolbarDropHandler(HWND hToolbar, CApplicationToolbar *toolbar) :
 m_RefCount(1),
-m_hToolbar(hToolbar),
-m_toolbar(toolbar)
+m_toolbar(toolbar),
+m_hToolbar(hToolbar)
 {
 	HRESULT hr = CoCreateInstance(CLSID_DragDropHelper, NULL, CLSCTX_INPROC_SERVER,
 		IID_PPV_ARGS(&m_pDragSourceHelper));
