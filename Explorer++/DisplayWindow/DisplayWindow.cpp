@@ -74,10 +74,10 @@ HWND CreateDisplayWindow(HWND Parent,DWInitialSettings_t *pSettings)
 
 CDisplayWindow::CDisplayWindow(HWND hDisplayWindow,DWInitialSettings_t *pInitialSettings) :
 	m_hDisplayWindow(hDisplayWindow),
-	m_hMainIcon(pInitialSettings->hIcon),
+	m_TextColor(pInitialSettings->TextColor),
 	m_CentreColor(pInitialSettings->CentreColor),
 	m_SurroundColor(pInitialSettings->SurroundColor),
-	m_TextColor(pInitialSettings->TextColor),
+	m_hMainIcon(pInitialSettings->hIcon),
 	m_hDisplayFont(pInitialSettings->hFont)
 {
 	g_ObjectCount++;
