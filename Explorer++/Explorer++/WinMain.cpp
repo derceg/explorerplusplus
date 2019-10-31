@@ -146,7 +146,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 		true;
 #else
 		false;
-#endif;
+#endif
 
 	boost::log::core::get()->set_logging_enabled(enableLogging);
 
