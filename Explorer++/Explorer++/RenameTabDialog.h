@@ -37,8 +37,7 @@ class CRenameTabDialog : public CBaseDialog
 public:
 
 	CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-		int tabId, IExplorerplusplus *pexpp, TabContainer *tabContainer,
-		TabInterface *ti);
+		int tabId, TabContainer *tabContainer);
 	~CRenameTabDialog();
 
 protected:
@@ -60,11 +59,8 @@ private:
 
 	CRenameTabDialogPersistentSettings	*m_prtdps;
 
-	IExplorerplusplus	*m_pexpp;
 	TabContainer	*m_tabContainer;
-	TabInterface	*m_ti;
 	int		m_tabId;
-	TCHAR	m_szTabName[256];
 
 	std::vector<boost::signals2::scoped_connection>	m_connections;
 };

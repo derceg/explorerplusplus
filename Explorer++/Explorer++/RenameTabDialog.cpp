@@ -14,13 +14,10 @@
 const TCHAR CRenameTabDialogPersistentSettings::SETTINGS_KEY[] = _T("RenameTab");
 
 CRenameTabDialog::CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-	int tabId, IExplorerplusplus *pexpp, TabContainer *tabContainer,
-	TabInterface *ti) :
+	int tabId, TabContainer *tabContainer) :
 	CBaseDialog(hInstance,iResource,hParent,false),
 	m_tabId(tabId),
-	m_pexpp(pexpp),
-	m_tabContainer(tabContainer),
-	m_ti(ti)
+	m_tabContainer(tabContainer)
 {
 	m_prtdps = &CRenameTabDialogPersistentSettings::GetInstance();
 

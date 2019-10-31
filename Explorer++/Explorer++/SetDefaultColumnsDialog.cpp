@@ -20,10 +20,9 @@ const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("Set
 
 const TCHAR CSetDefaultColumnsDialogPersistentSettings::SETTING_FOLDER_TYPE[] = _T("Folder");
 
-CSetDefaultColumnsDialog::CSetDefaultColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-	IExplorerplusplus *pexpp, FolderColumns &folderColumns) :
+CSetDefaultColumnsDialog::CSetDefaultColumnsDialog(HINSTANCE hInstance, int iResource,
+	HWND hParent, FolderColumns &folderColumns) :
 	CBaseDialog(hInstance,iResource,hParent,true),
-	m_pexpp(pexpp),
 	m_folderColumns(folderColumns)
 {
 	m_psdcdps = &CSetDefaultColumnsDialogPersistentSettings::GetInstance();

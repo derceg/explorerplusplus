@@ -60,7 +60,7 @@ class CSetDefaultColumnsDialog : public CBaseDialog
 public:
 
 	CSetDefaultColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent,
-		IExplorerplusplus *pexpp, FolderColumns &folderColumns);
+		FolderColumns &folderColumns);
 	~CSetDefaultColumnsDialog();
 
 protected:
@@ -86,8 +86,6 @@ private:
 	void	SetupFolderColumns(FolderType_t FolderType);
 
 	std::vector<Column_t>	&GetCurrentColumnList(FolderType_t FolderType);
-
-	IExplorerplusplus	*m_pexpp;
 
 	FolderColumns		&m_folderColumns;
 
