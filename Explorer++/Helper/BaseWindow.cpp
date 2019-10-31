@@ -23,7 +23,7 @@ HWND CBaseWindow::GetHWND() const
 	return m_hwnd;
 }
 
-LRESULT CALLBACK BaseWindowProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,
+LRESULT CALLBACK CBaseWindow::BaseWindowProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,
 	UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);

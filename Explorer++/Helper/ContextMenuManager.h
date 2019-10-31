@@ -11,9 +11,6 @@
 
 class CContextMenuManager
 {
-	friend LRESULT CALLBACK ContextMenuHookProc(HWND hwnd,UINT Msg,WPARAM wParam,
-	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-
 public:
 
 	enum ContextMenuType_t
@@ -67,6 +64,9 @@ private:
 	static const TCHAR CMH_DIRECTORY_BACKGROUND[];
 	static const TCHAR CMH_DIRECTORY_DRAG_AND_DROP[];
 	static const TCHAR CMH_FOLDER_DRAG_AND_DROP[];
+
+	static LRESULT CALLBACK ContextMenuHookProc(HWND hwnd, UINT Msg, WPARAM wParam,
+		LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
 	void	AddMenuEntries(HMENU hMenu,UINT uIDPrevious,int iMinID,int iMaxID);
 	HRESULT	HandleMenuMessage(UINT uMsg,WPARAM wParam,LPARAM lParam,LRESULT &lRes);

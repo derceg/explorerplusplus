@@ -68,7 +68,7 @@ INT_PTR CComboBox::OnDestroy()
 	return 0;
 }
 
-LRESULT CALLBACK ComboBoxEditProcStub(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK CComboBox::ComboBoxEditProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
@@ -94,7 +94,7 @@ LRESULT CALLBACK CComboBox::ComboBoxEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LP
 	return DefSubclassProc(hwnd,Msg,wParam,lParam);
 }
 
-LRESULT CALLBACK ComboBoxParentProcStub(HWND hwnd,UINT uMsg,
+LRESULT CALLBACK CComboBox::ComboBoxParentProcStub(HWND hwnd,UINT uMsg,
 	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);

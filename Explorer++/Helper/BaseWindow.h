@@ -17,8 +17,6 @@ also safely delete the object
 before the window is destroyed. */
 class CBaseWindow : public CMessageForwarder
 {
-	friend LRESULT CALLBACK BaseWindowProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-
 public:
 
 	/* Ideally private, and the
@@ -43,5 +41,6 @@ private:
 
 	static const UINT_PTR SUBCLASS_ID = 0;
 
+	static LRESULT CALLBACK BaseWindowProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK BaseWindowProc(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 };
