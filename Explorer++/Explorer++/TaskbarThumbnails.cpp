@@ -298,7 +298,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProcStub(HWND hwnd,UINT Msg,WPARA
 
 LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam,int iTabId)
 {
-	const Tab &tab = m_tabContainer->GetTab(iTabId);
+	const Tab *tab = m_tabContainer->GetTabOptional(iTabId);
 
 	switch(Msg)
 	{
@@ -310,12 +310,12 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			ShowWindow(m_expp->GetMainWindow(),SW_RESTORE);
 		}
 
-		m_tabContainer->SelectTab(tab);
+		m_tabContainer->SelectTab(*tab);
 		return 0;
 		break;
 
 	case WM_SETFOCUS:
-		SetFocus(tab.listView);
+		SetFocus(tab->listView);
 		break;
 
 	case WM_SYSCOMMAND:
@@ -325,7 +325,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			break;
 
 		default:
-			SendMessage(tab.listView,WM_SYSCOMMAND,wParam,lParam);
+			SendMessage(tab->listView,WM_SYSCOMMAND,wParam,lParam);
 			break;
 		}
 		break;
@@ -341,7 +341,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 	of it). If the main window is minimized, we'll use a cached screenshot
 	of the tab (taken before the main window was minimized). */
 	case WM_DWMSENDICONICTHUMBNAIL:
-		OnDwmSendIconicThumbnail(hwnd, tab, HIWORD(lParam), LOWORD(lParam));
+		OnDwmSendIconicThumbnail(hwnd, *tab, HIWORD(lParam), LOWORD(lParam));
 		return 0;
 		break;
 
@@ -353,11 +353,11 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			}
 			else
 			{
-				wil::unique_hbitmap bitmap = GetTabLivePreviewBitmap(tab);
+				wil::unique_hbitmap bitmap = GetTabLivePreviewBitmap(*tab);
 
 				RECT rcTab;
-				GetClientRect(tab.listView, &rcTab);
-				MapWindowPoints(tab.listView, m_expp->GetMainWindow(), reinterpret_cast<LPPOINT>(&rcTab), 2);
+				GetClientRect(tab->listView, &rcTab);
+				MapWindowPoints(tab->listView, m_expp->GetMainWindow(), reinterpret_cast<LPPOINT>(&rcTab), 2);
 
 				MENUBARINFO mbi;
 				mbi.cbSize = sizeof(mbi);
@@ -391,7 +391,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			}
 			else
 			{
-				m_tabContainer->CloseTab(tab);
+				m_tabContainer->CloseTab(*tab);
 			}
 		}
 		break;
