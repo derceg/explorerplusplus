@@ -83,7 +83,9 @@ void TabContainer::Initialize(HWND parent)
 		SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(m_hTabFont), MAKELPARAM(TRUE, 0));
 	}
 
-	m_hTabCtrlImageList = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 100);
+	int dpiScaledWidth = MulDiv(ICON_WIDTH_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
+	int dpiScaledHeight = MulDiv(ICON_HEIGHT_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
+	m_hTabCtrlImageList = ImageList_Create(dpiScaledWidth, dpiScaledHeight, ILC_COLOR32 | ILC_MASK, 0, 100);
 	AddDefaultTabIcons(m_hTabCtrlImageList);
 	TabCtrl_SetImageList(m_hwnd, m_hTabCtrlImageList);
 

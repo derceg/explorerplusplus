@@ -74,6 +74,9 @@ private:
 	// all tabs (as the icon cache is shared between tabs).
 	static const int MAX_CACHED_ICONS = 1000;
 
+	static const int ICON_WIDTH_96DPI = 16;
+	static const int ICON_HEIGHT_96DPI = 16;
+
 	TabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
 		Navigation *navigation, IExplorerplusplus *expp, HINSTANCE instance,
 		std::shared_ptr<Config> config);
