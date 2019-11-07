@@ -71,9 +71,11 @@ HWND TabContainer::CreateTabControl(HWND parent, BOOL forceSameTabWidth)
 
 void TabContainer::Initialize(HWND parent)
 {
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
+
 	NONCLIENTMETRICS ncm;
 	ncm.cbSize = sizeof(ncm);
-	SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
+	m_dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0, dpi);
 	m_hTabFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
 
 	if (m_hTabFont != NULL)

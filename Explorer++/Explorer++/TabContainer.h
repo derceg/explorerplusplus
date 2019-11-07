@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
+#include "DpiCompatibility.h"
 #include "ShellBrowser/CachedIcons.h"
 #include "ShellBrowser/iShellView.h"
 #include "SignalWrapper.h"
@@ -145,6 +146,8 @@ private:
 	std::shared_ptr<Config> m_config;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
+
+	DpiCompatibility m_dpiCompat;
 
 	std::vector<int> m_tabSelectionHistory;
 	int m_iPreviousTabSelectionId;

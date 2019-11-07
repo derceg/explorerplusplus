@@ -126,8 +126,10 @@ void CHolderWindow::OnHolderWindowPaint(HWND hwnd)
 
 	hdc = BeginPaint(hwnd,&ps);
 
+	UINT dpi = m_dpiCompat.GetDpiForWindow(hwnd);
+
 	ncm.cbSize = sizeof(ncm);
-	SystemParametersInfo(SPI_GETNONCLIENTMETRICS,sizeof(NONCLIENTMETRICS),(PVOID)&ncm,0);
+	m_dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0, dpi);
 	ncm.lfSmCaptionFont.lfWeight = FW_NORMAL;
 	hFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
 

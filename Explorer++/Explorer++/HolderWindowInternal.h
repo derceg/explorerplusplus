@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "DpiCompatibility.h"
+
 class CHolderWindow
 {
 public:
@@ -23,4 +25,6 @@ private:
 
 	HWND	m_hHolder;
 	BOOL	m_bHolderResizing;
+
+	DpiCompatibility m_dpiCompat;
 };
