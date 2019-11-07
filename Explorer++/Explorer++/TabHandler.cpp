@@ -24,6 +24,8 @@
 #include <algorithm>
 #include <list>
 
+static const UINT TAB_WINDOW_HEIGHT_96DPI = 24;
+
 extern std::vector<std::wstring> g_commandLineDirectories;
 
 void Explorerplusplus::InitializeTabs()
@@ -35,6 +37,10 @@ void Explorerplusplus::InitializeTabs()
 	m_tabContainer->tabSelectedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
 
 	m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
+
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_tabContainer->GetHWND());
+	int tabWindowHeight = MulDiv(TAB_WINDOW_HEIGHT_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
+	SetWindowPos(m_tabContainer->GetHWND(), nullptr, 0, 0, 0, tabWindowHeight, SWP_NOMOVE | SWP_NOZORDER);
 
 	m_tabsInitializedSignal();
 }

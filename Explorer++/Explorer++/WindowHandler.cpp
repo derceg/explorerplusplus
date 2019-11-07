@@ -100,11 +100,16 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 
 	IndentTop = iIndentRebar;
 
+	RECT tabWindowRect;
+	GetClientRect(m_tabContainer->GetHWND(), &tabWindowRect);
+
+	int tabWindowHeight = GetRectHeight(&tabWindowRect);
+
 	if(m_bShowTabBar)
 	{
 		if(!m_config->showTabBarAtBottom)
 		{
-			IndentTop += TAB_WINDOW_HEIGHT;
+			IndentTop += tabWindowHeight;
 		}
 	}
 
@@ -119,7 +124,7 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 	{
 		SetWindowPos(hListView,NULL,IndentLeft,IndentTop,
 			MainWindowWidth - IndentLeft,MainWindowHeight -
-			IndentBottom - IndentTop - TAB_WINDOW_HEIGHT,
+			IndentBottom - IndentTop - tabWindowHeight,
 			SWP_HIDEWINDOW|SWP_NOZORDER);
 	}
 }

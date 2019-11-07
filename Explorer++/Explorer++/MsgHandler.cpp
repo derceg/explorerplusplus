@@ -382,13 +382,18 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		IndentLeft = GetRectWidth(&rc);
 	}
 
+	RECT tabWindowRect;
+	GetClientRect(m_tabContainer->GetHWND(), &tabWindowRect);
+
+	int tabWindowHeight = GetRectHeight(&tabWindowRect);
+
 	IndentTop = iIndentRebar;
 
 	if(m_bShowTabBar)
 	{
 		if(!m_config->showTabBarAtBottom)
 		{
-			IndentTop += TAB_WINDOW_HEIGHT;
+			IndentTop += tabWindowHeight;
 		}
 	}
 
@@ -415,17 +420,16 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	}
 	else
 	{
-		iTabTop = MainWindowHeight - IndentBottom - TAB_WINDOW_HEIGHT;
+		iTabTop = MainWindowHeight - IndentBottom - tabWindowHeight;
 	}
 
 	/* If we're showing the tab bar at the bottom of the listview,
 	the only thing that will change is the top coordinate. */
 	SetWindowPos(m_hTabBacking,m_hDisplayWindow,iTabBackingLeft,
-		iTabTop,iTabBackingWidth,
-		TAB_WINDOW_HEIGHT,uFlags);
+		iTabTop,iTabBackingWidth,tabWindowHeight,uFlags);
 
 	SetWindowPos(m_tabContainer->GetHWND(),NULL,0,0,iTabBackingWidth - 25,
-		TAB_WINDOW_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
+		tabWindowHeight,SWP_SHOWWINDOW|SWP_NOZORDER);
 
 	/* Tab close button. */
 	SetWindowPos(m_hTabWindowToolbar,NULL,iTabBackingWidth + TAB_TOOLBAR_X_OFFSET,
@@ -447,7 +451,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		m_config->showTabBarAtBottom &&
 		m_bShowTabBar)
 	{
-		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop - TAB_WINDOW_HEIGHT;
+		iHolderHeight = MainWindowHeight - IndentBottom - iHolderTop - tabWindowHeight;
 	}
 	else
 	{
@@ -498,7 +502,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 			if(m_bShowTabBar)
 			{
 				SetWindowPos(tab.listView,NULL,IndentLeft,IndentTop,
-					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - TAB_WINDOW_HEIGHT,
+					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - tabWindowHeight,
 					uFlags);
 			}
 			else

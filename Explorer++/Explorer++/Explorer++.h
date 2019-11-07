@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
+#include "DpiCompatibility.h"
 #include "PluginCommandManager.h"
 #include "PluginInterface.h"
 #include "PluginMenuManager.h"
@@ -100,8 +101,6 @@ private:
 	static const int		MAX_SHELL_MENU_ID = 1000;
 
 	static const UINT		MINIMUM_DISPLAYWINDOW_HEIGHT = 70;
-
-	static const UINT		TAB_WINDOW_HEIGHT = 24;
 
 	/* The number of toolbars that appear in the
 	main rebar. */
@@ -555,6 +554,8 @@ private:
 	AddressBar				*m_addressBar;
 
 	Navigation				*m_navigation;
+
+	DpiCompatibility		m_dpiCompat;
 
 	/* Tabs. */
 	TabContainer			*m_tabContainer;
