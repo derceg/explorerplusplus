@@ -58,17 +58,18 @@ void MainToolbar::Initialize(HWND parent)
 {
 	HBITMAP hb;
 
-	m_himlSmall = ImageList_Create(TOOLBAR_IMAGE_SIZE_SMALL_X, TOOLBAR_IMAGE_SIZE_SMALL_Y, ILC_COLOR32 | ILC_MASK, 0, 47);
+	m_imageListSmall.reset(ImageList_Create(TOOLBAR_IMAGE_SIZE_SMALL_X, TOOLBAR_IMAGE_SIZE_SMALL_Y, ILC_COLOR32 | ILC_MASK, 0, 47));
 	hb = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(m_himlSmall, hb, NULL);
+	ImageList_Add(m_imageListSmall.get(), hb, NULL);
+
 	DeleteObject(hb);
 
-	m_himlLarge = ImageList_Create(TOOLBAR_IMAGE_SIZE_LARGE_X, TOOLBAR_IMAGE_SIZE_LARGE_Y, ILC_COLOR32 | ILC_MASK, 0, 47);
+	m_imageListLarge.reset(ImageList_Create(TOOLBAR_IMAGE_SIZE_LARGE_X, TOOLBAR_IMAGE_SIZE_LARGE_Y, ILC_COLOR32 | ILC_MASK, 0, 47));
 	hb = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_SHELLIMAGES_LARGE));
-	ImageList_Add(m_himlLarge, hb, NULL);
+	ImageList_Add(m_imageListLarge.get(), hb, NULL);
 	DeleteObject(hb);
 
-	HIMAGELIST *phiml = NULL;
+	HIMAGELIST himl;
 	int cx;
 	int cy;
 
@@ -76,20 +77,20 @@ void MainToolbar::Initialize(HWND parent)
 	{
 		cx = TOOLBAR_IMAGE_SIZE_LARGE_X;
 		cy = TOOLBAR_IMAGE_SIZE_LARGE_Y;
-		phiml = &m_himlLarge;
+		himl = m_imageListLarge.get();
 	}
 	else
 	{
 		cx = TOOLBAR_IMAGE_SIZE_SMALL_X;
 		cy = TOOLBAR_IMAGE_SIZE_SMALL_Y;
-		phiml = &m_himlSmall;
+		himl = m_imageListSmall.get();
 	}
 
 	SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(cx, cy));
 	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
 
 	/* Add the custom buttons to the toolbars image list. */
-	SendMessage(m_hwnd, TB_SETIMAGELIST, 0, (LPARAM)*phiml);
+	SendMessage(m_hwnd, TB_SETIMAGELIST, 0, (LPARAM)himl);
 
 	SetInitialToolbarButtons();
 
@@ -129,9 +130,6 @@ void MainToolbar::Initialize(HWND parent)
 
 MainToolbar::~MainToolbar()
 {
-	ImageList_Destroy(m_himlSmall);
-	ImageList_Destroy(m_himlLarge);
-
 	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
 }
 
@@ -556,7 +554,7 @@ int MainToolbar::LookupToolbarButtonTextID(int iButtonID) const
 
 void MainToolbar::UpdateToolbarSize()
 {
-	HIMAGELIST *phiml = NULL;
+	HIMAGELIST himl;
 	int cx;
 	int cy;
 
@@ -564,17 +562,17 @@ void MainToolbar::UpdateToolbarSize()
 	{
 		cx = TOOLBAR_IMAGE_SIZE_LARGE_X;
 		cy = TOOLBAR_IMAGE_SIZE_LARGE_Y;
-		phiml = &m_himlLarge;
+		himl = m_imageListLarge.get();
 	}
 	else
 	{
 		cx = TOOLBAR_IMAGE_SIZE_SMALL_X;
 		cy = TOOLBAR_IMAGE_SIZE_SMALL_Y;
-		phiml = &m_himlSmall;
+		himl = m_imageListSmall.get();
 	}
 
 	/* Switch the image list. */
-	SendMessage(m_hwnd, TB_SETIMAGELIST, 0, (LPARAM)*phiml);
+	SendMessage(m_hwnd, TB_SETIMAGELIST, 0, (LPARAM)himl);
 	SendMessage(m_hwnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(cx, cy));
 	SendMessage(m_hwnd, TB_AUTOSIZE, 0, 0);
 }

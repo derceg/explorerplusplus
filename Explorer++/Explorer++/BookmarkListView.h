@@ -6,6 +6,7 @@
 
 #include "BookmarkHelper.h"
 #include "../Helper/Bookmark.h"
+#include <wil/resource.h>
 #include <unordered_map>
 
 class CBookmarkListView
@@ -13,7 +14,6 @@ class CBookmarkListView
 public:
 
 	CBookmarkListView(HWND hListView);
-	~CBookmarkListView();
 
 	void							InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder);
 	int								InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder, int iPosition);
@@ -26,7 +26,7 @@ private:
 	int								InsertBookmarkItemIntoListView(const std::wstring &strName, const GUID &guid, bool bFolder, int iPosition);
 
 	HWND							m_hListView;
-	HIMAGELIST						m_himl;
+	wil::unique_himagelist			m_imageList;
 
 	std::unordered_map<UINT, GUID>	m_mapID;
 	UINT							m_uIDCounter;

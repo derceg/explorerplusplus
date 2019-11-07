@@ -38,10 +38,10 @@ void CBookmarksToolbar::InitializeToolbar()
 	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
 	SendMessage(m_hToolbar,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 
-	m_himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
+	m_imageList.reset(ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48));
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(m_himl,hBitmap,NULL);
-	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_himl));
+	ImageList_Add(m_imageList.get(),hBitmap,NULL);
+	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageList.get()));
 	DeleteObject(hBitmap);
 
 	m_pbtdh = new CBookmarksToolbarDropHandler(m_hToolbar,m_AllBookmarks,m_guidBookmarksToolbar);
@@ -61,8 +61,6 @@ void CBookmarksToolbar::InitializeToolbar()
 
 CBookmarksToolbar::~CBookmarksToolbar()
 {
-	ImageList_Destroy(m_himl);
-
 	m_pbtdh->Release();
 
 	RemoveWindowSubclass(m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID);

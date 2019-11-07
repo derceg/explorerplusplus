@@ -9,6 +9,7 @@
 #include "Navigation.h"
 #include "../Helper/Bookmark.h"
 #include <boost/optional.hpp>
+#include <wil/resource.h>
 
 class CBookmarksToolbarDropHandler : public IDropTarget
 {
@@ -107,7 +108,7 @@ private:
 	VariantBookmark	*GetBookmarkItemFromToolbarIndex(int index);
 
 	HWND							m_hToolbar;
-	HIMAGELIST						m_himl;
+	wil::unique_himagelist			m_imageList;
 
 	HINSTANCE						m_instance;
 

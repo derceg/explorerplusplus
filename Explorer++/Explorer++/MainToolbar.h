@@ -8,6 +8,7 @@
 #include "DefaultToolbarButtons.h"
 #include "Navigation.h"
 #include "../Helper/BaseWindow.h"
+#include <wil/resource.h>
 #include <list>
 #include <unordered_map>
 
@@ -66,8 +67,8 @@ private:
 	Navigation *m_navigation;
 	std::shared_ptr<Config> m_config;
 
-	HIMAGELIST m_himlSmall;
-	HIMAGELIST m_himlLarge;
+	wil::unique_himagelist m_imageListSmall;
+	wil::unique_himagelist m_imageListLarge;
 	std::unordered_map<int, int> m_toolbarStringMap;
 
 	std::list<ToolbarButton_t> m_tbInitial;

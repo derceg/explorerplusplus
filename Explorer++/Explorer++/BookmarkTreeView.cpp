@@ -25,10 +25,10 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
 
 	SetWindowTheme(hTreeView, L"Explorer", NULL);
 
-	m_himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48);
+	m_imageList.reset(ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48));
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(m_himl, hBitmap, NULL);
-	TreeView_SetImageList(hTreeView, m_himl, TVSIL_NORMAL);
+	ImageList_Add(m_imageList.get(), hBitmap, NULL);
+	TreeView_SetImageList(hTreeView, m_imageList.get(), TVSIL_NORMAL);
 	DeleteObject(hBitmap);
 
 	SetupTreeView(guidSelected, setExpansion);
@@ -38,7 +38,6 @@ CBookmarkTreeView::~CBookmarkTreeView()
 {
 	RemoveWindowSubclass(m_hTreeView, BookmarkTreeViewParentProcStub, PARENT_SUBCLASS_ID);
 	RemoveWindowSubclass(m_hTreeView, BookmarkTreeViewProcStub, SUBCLASS_ID);
-	ImageList_Destroy(m_himl);
 }
 
 LRESULT CALLBACK CBookmarkTreeView::BookmarkTreeViewProcStub(HWND hwnd, UINT uMsg,

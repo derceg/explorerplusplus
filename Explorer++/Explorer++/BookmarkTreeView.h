@@ -6,6 +6,7 @@
 
 #include "BookmarkHelper.h"
 #include "../Helper/Bookmark.h"
+#include <wil/resource.h>
 #include <unordered_map>
 
 class CBookmarkTreeView
@@ -56,7 +57,7 @@ private:
 	void							OnRClick(NMHDR *pnmhdr);
 
 	HWND							m_hTreeView;
-	HIMAGELIST						m_himl;
+	wil::unique_himagelist			m_imageList;
 
 	HINSTANCE						m_instance;
 

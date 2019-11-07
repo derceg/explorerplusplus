@@ -17,16 +17,11 @@ CBookmarkListView::CBookmarkListView(HWND hListView) :
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
 
-	m_himl = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48);
+	m_imageList.reset(ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48));
 	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(m_himl, hBitmap, NULL);
-	ListView_SetImageList(hListView, m_himl, LVSIL_SMALL);
+	ImageList_Add(m_imageList.get(), hBitmap, NULL);
+	ListView_SetImageList(hListView, m_imageList.get(), LVSIL_SMALL);
 	DeleteObject(hBitmap);
-}
-
-CBookmarkListView::~CBookmarkListView()
-{
-	ImageList_Destroy(m_himl);
 }
 
 void CBookmarkListView::InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder)
