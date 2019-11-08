@@ -18,9 +18,9 @@
 #include "UiTheming.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
-#include "../Helper/ImageWrappers.h"
 #include <boost/optional.hpp>
 #include <boost/signals2.hpp>
+#include <wil/resource.h>
 #include <unordered_map>
 
 /* Sent when a folder size calculation has finished. */
@@ -629,7 +629,7 @@ private:
 	int						m_iCutTabInternal;
 
 	/* Menu images. */
-	std::vector<HBitmapPtr>	m_menuImages;
+	std::vector<wil::unique_hbitmap>	m_menuImages;
 
 	/* Arrange menu related data. */
 	std::list<ArrangeMenuItem_t>	m_ArrangeList;

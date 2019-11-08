@@ -20,6 +20,7 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/iDirectoryMonitor.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include <list>
 #include <map>
@@ -28,41 +29,42 @@
 DWORD WINAPI WorkerThreadProc(LPVOID pParam);
 void CALLBACK InitializeCOMAPC(ULONG_PTR dwParam);
 
-const std::map<UINT, int> MAIN_MENU_IMAGE_MAPPINGS = {
-	{ IDM_FILE_NEWTAB, SHELLIMAGES_NEWTAB },
-	{ IDM_FILE_OPENCOMMANDPROMPT, SHELLIMAGES_CMD },
-	{ IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR, SHELLIMAGES_CMDADMIN },
-	{ IDM_FILE_DELETE, SHELLIMAGES_DELETE },
-	{ IDM_FILE_DELETEPERMANENTLY, SHELLIMAGES_DELETEPERMANENTLY },
-	{ IDM_FILE_RENAME, SHELLIMAGES_RENAME },
-	{ IDM_FILE_PROPERTIES, SHELLIMAGES_PROPERTIES },
+const std::map<UINT, UINT> MAIN_MENU_IMAGE_MAPPINGS = {
+	{ IDM_FILE_NEWTAB, IDB_NEW_TAB_16 },
+	{ IDM_FILE_OPENCOMMANDPROMPT, IDB_COMMAND_LINE_16 },
+	{ IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR, IDB_COMMAND_LINE_ADMIN_16 },
+	{ IDM_FILE_DELETE, IDB_DELETE_16 },
+	{ IDM_FILE_DELETEPERMANENTLY, IDB_DELETE_PERMANENTLY_16 },
+	{ IDM_FILE_RENAME, IDB_RENAME_16 },
+	{ IDM_FILE_PROPERTIES, IDB_PROPERTIES_16 },
 
-	{ IDM_EDIT_UNDO, SHELLIMAGES_UNDO },
-	{ IDM_EDIT_COPY, SHELLIMAGES_COPY },
-	{ IDM_EDIT_CUT, SHELLIMAGES_CUT },
-	{ IDM_EDIT_PASTE, SHELLIMAGES_PASTE },
-	{ IDM_EDIT_PASTESHORTCUT, SHELLIMAGES_PASTESHORTCUT },
-	{ IDM_EDIT_COPYTOFOLDER, SHELLIMAGES_COPYTO },
-	{ IDM_EDIT_MOVETOFOLDER, SHELLIMAGES_MOVETO },
+	{ IDM_EDIT_UNDO, IDB_UNDO_16 },
+	{ IDM_EDIT_COPY, IDB_COPY_16 },
+	{ IDM_EDIT_CUT, IDB_CUT_16 },
+	{ IDM_EDIT_PASTE, IDB_PASTE_16 },
+	{ IDM_EDIT_PASTESHORTCUT, IDB_PASTE_SHORTCUT_16 },
 
-	{ IDM_ACTIONS_NEWFOLDER, SHELLIMAGES_NEWFOLDER },
+	{ IDM_EDIT_COPYTOFOLDER, IDB_COPY_TO_16 },
+	{ IDM_EDIT_MOVETOFOLDER, IDB_MOVE_TO_16 },
 
-	{ IDM_VIEW_REFRESH, SHELLIMAGES_REFRESH },
+	{ IDM_ACTIONS_NEWFOLDER, IDB_NEW_FOLDER_16 },
 
-	{ IDM_FILTER_FILTERRESULTS, SHELLIMAGES_FILTER },
+	{ IDM_VIEW_REFRESH, IDB_REFRESH_16 },
 
-	{ IDM_GO_BACK, SHELLIMAGES_BACK },
-	{ IDM_GO_FORWARD, SHELLIMAGES_FORWARD },
-	{ IDM_GO_UPONELEVEL, SHELLIMAGES_UP },
+	{ IDM_FILTER_FILTERRESULTS, IDB_FILTER_16 },
 
-	{ IDM_BOOKMARKS_BOOKMARKTHISTAB, SHELLIMAGES_ADDFAV },
-	{ IDM_BOOKMARKS_MANAGEBOOKMARKS, SHELLIMAGES_FAV },
+	{ IDM_GO_BACK, IDB_BACK_16 },
+	{ IDM_GO_FORWARD, IDB_FORWARD_16 },
+	{ IDM_GO_UPONELEVEL, IDB_UP_16 },
 
-	{ IDM_TOOLS_SEARCH, SHELLIMAGES_SEARCH },
-	{ IDM_TOOLS_CUSTOMIZECOLORS, SHELLIMAGES_CUSTOMIZECOLORS },
-	{ IDM_TOOLS_OPTIONS, SHELLIMAGES_OPTIONS },
+	{ IDM_BOOKMARKS_BOOKMARKTHISTAB, IDB_ADD_BOOKMARK_16 },
+	{ IDM_BOOKMARKS_MANAGEBOOKMARKS, IDB_BOOKMARKS_16 },
 
-	{ IDM_HELP_HELP, SHELLIMAGES_HELP }
+	{ IDM_TOOLS_SEARCH, IDB_SEARCH_16 },
+	{ IDM_TOOLS_CUSTOMIZECOLORS, IDB_CUSTOMIZE_COLORS_16 },
+	{ IDM_TOOLS_OPTIONS, IDB_OPTIONS_16 },
+
+	{ IDM_HELP_HELP, IDB_HELP_16 }
 };
 
 DWORD WINAPI WorkerThreadProc(LPVOID pParam)
@@ -284,18 +286,37 @@ void Explorerplusplus::InitializeMenus(void)
 
 void Explorerplusplus::SetMainMenuImages()
 {
-	HImageListPtr imageList = GetShellImageList();
-
-	if (!imageList)
-	{
-		return;
-	}
-
 	HMENU mainMenu = GetMenu(m_hContainer);
 
-	for (auto mapping : MAIN_MENU_IMAGE_MAPPINGS)
+	for (const auto &item : MAIN_MENU_IMAGE_MAPPINGS)
 	{
-		SetMenuItemImageFromImageList(mainMenu, mapping.first, imageList.get(), mapping.second, m_menuImages);
+		auto gdiplusBitmap = ImageHelper::LoadBitmapFromPNG(item.second, GetModuleHandle(nullptr));
+
+		if (!gdiplusBitmap)
+		{
+			continue;
+		}
+
+		wil::unique_hbitmap bitmap;
+		Gdiplus::Color color(0, 0, 0);
+		Gdiplus::Status status = gdiplusBitmap->GetHBITMAP(color, &bitmap);
+
+		if (status != Gdiplus::Status::Ok)
+		{
+			continue;
+		}
+
+		MENUITEMINFO mii;
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_BITMAP;
+		mii.hbmpItem = bitmap.get();
+		const BOOL res = SetMenuItemInfo(mainMenu, item.first, false, &mii);
+
+		if (res)
+		{
+			/* The bitmap needs to live for as long as the menu does. */
+			m_menuImages.push_back(std::move(bitmap));
+		}
 	}
 }
 
