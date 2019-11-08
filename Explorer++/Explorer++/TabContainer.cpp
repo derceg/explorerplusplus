@@ -26,9 +26,9 @@
 const UINT TAB_CONTROL_STYLES = WS_VISIBLE | WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE
 | TCS_TOOLTIPS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
-const std::map<UINT, int> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
-	{ IDM_FILE_NEWTAB, SHELLIMAGES_NEWTAB },
-	{ IDM_TAB_REFRESH, SHELLIMAGES_REFRESH }
+const std::map<UINT, UINT> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
+	{ IDM_FILE_NEWTAB, IDB_NEW_TAB_16 },
+	{ IDM_TAB_REFRESH, IDB_REFRESH_16 }
 };
 
 TabContainer *TabContainer::Create(HWND parent, TabContainerInterface *tabContainer,
@@ -381,7 +381,7 @@ void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 
 	HMENU menu = GetSubMenu(parentMenu.get(), 0);
 
-	std::vector<HBitmapPtr> menuImages;
+	std::vector<wil::unique_hbitmap> menuImages;
 	AddImagesToTabContextMenu(menu, menuImages);
 
 	lCheckMenuItem(menu, IDM_TAB_LOCKTAB, tab.GetLocked());
@@ -394,18 +394,11 @@ void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 	ProcessTabCommand(Command, tab);
 }
 
-void TabContainer::AddImagesToTabContextMenu(HMENU menu, std::vector<HBitmapPtr> &menuImages)
+void TabContainer::AddImagesToTabContextMenu(HMENU menu, std::vector<wil::unique_hbitmap> &menuImages)
 {
-	HImageListPtr imageList = GetShellImageList();
-
-	if (!imageList)
+	for (const auto &mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
 	{
-		return;
-	}
-
-	for (auto mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
-	{
-		SetMenuItemImageFromImageList(menu, mapping.first, imageList.get(), mapping.second, menuImages);
+		SetMenuItemImage(menu, mapping.first, mapping.second, menuImages);
 	}
 }
 

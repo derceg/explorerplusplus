@@ -288,35 +288,9 @@ void Explorerplusplus::SetMainMenuImages()
 {
 	HMENU mainMenu = GetMenu(m_hContainer);
 
-	for (const auto &item : MAIN_MENU_IMAGE_MAPPINGS)
+	for (const auto &mapping : MAIN_MENU_IMAGE_MAPPINGS)
 	{
-		auto gdiplusBitmap = ImageHelper::LoadBitmapFromPNG(item.second, GetModuleHandle(nullptr));
-
-		if (!gdiplusBitmap)
-		{
-			continue;
-		}
-
-		wil::unique_hbitmap bitmap;
-		Gdiplus::Color color(0, 0, 0);
-		Gdiplus::Status status = gdiplusBitmap->GetHBITMAP(color, &bitmap);
-
-		if (status != Gdiplus::Status::Ok)
-		{
-			continue;
-		}
-
-		MENUITEMINFO mii;
-		mii.cbSize = sizeof(mii);
-		mii.fMask = MIIM_BITMAP;
-		mii.hbmpItem = bitmap.get();
-		const BOOL res = SetMenuItemInfo(mainMenu, item.first, false, &mii);
-
-		if (res)
-		{
-			/* The bitmap needs to live for as long as the menu does. */
-			m_menuImages.push_back(std::move(bitmap));
-		}
+		SetMenuItemImage(mainMenu, mapping.first, mapping.second, m_menuImages);
 	}
 }
 

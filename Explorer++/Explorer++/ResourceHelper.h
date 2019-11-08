@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "../Helper/ImageWrappers.h"
+#include <wil/resource.h>
 
-HImageListPtr GetShellImageList();
-void SetMenuItemImageFromImageList(HMENU menu, UINT menuItemId, HIMAGELIST imageList, int bitmapIndex, std::vector<HBitmapPtr> &menuImages);
+void SetMenuItemImage(HMENU menu, UINT menuItemId, UINT imageResourceId, std::vector<wil::unique_hbitmap> &menuImages);

@@ -15,6 +15,7 @@
 #include "../Helper/BaseWindow.h"
 #include <boost/optional.hpp>
 #include <boost/signals2.hpp>
+#include <wil/resource.h>
 #include <functional>
 #include <unordered_map>
 
@@ -103,7 +104,7 @@ private:
 
 	void OnTabCtrlRButtonUp(POINT *pt);
 	void CreateTabContextMenu(Tab &tab, const POINT &pt);
-	void AddImagesToTabContextMenu(HMENU menu, std::vector<HBitmapPtr> &menuImages);
+	void AddImagesToTabContextMenu(HMENU menu, std::vector<wil::unique_hbitmap> &menuImages);
 	void ProcessTabCommand(UINT uMenuID, Tab &tab);
 	void OnOpenParentInNewTab(const Tab &tab);
 	void OnRefreshAllTabs();
