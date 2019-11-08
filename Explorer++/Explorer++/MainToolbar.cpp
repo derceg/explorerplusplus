@@ -11,7 +11,9 @@
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
+#include <gdiplus.h>
 
 /* Small/large toolbar image sizes. */
 const int TOOLBAR_IMAGE_SIZE_SMALL_X = 16;
@@ -19,15 +21,51 @@ const int TOOLBAR_IMAGE_SIZE_SMALL_Y = 16;
 const int TOOLBAR_IMAGE_SIZE_LARGE_X = 24;
 const int TOOLBAR_IMAGE_SIZE_LARGE_Y = 24;
 
-/* This represents the TOTAL set of buttons that may be
-placed on the toolbar. */
-static const int TOOLBAR_BUTTON_SET[] =
-{ TOOLBAR_BACK, TOOLBAR_FORWARD, TOOLBAR_UP, TOOLBAR_FOLDERS,
-TOOLBAR_COPYTO, TOOLBAR_MOVETO, TOOLBAR_NEWFOLDER, TOOLBAR_COPY,
-TOOLBAR_CUT, TOOLBAR_PASTE, TOOLBAR_DELETE, TOOLBAR_VIEWS,
-TOOLBAR_SEARCH, TOOLBAR_PROPERTIES, TOOLBAR_REFRESH,
-TOOLBAR_ADDBOOKMARK, TOOLBAR_NEWTAB, TOOLBAR_OPENCOMMANDPROMPT,
-TOOLBAR_ORGANIZEBOOKMARKS, TOOLBAR_DELETEPERMANENTLY };
+static const std::unordered_map<int, UINT> TOOLBAR_BUTTON_IMAGE_MAPPINGS_16 = {
+	{TOOLBAR_BACK, IDB_BACK_16},
+	{TOOLBAR_FORWARD, IDB_FORWARD_16},
+	{TOOLBAR_UP, IDB_UP_16},
+	{TOOLBAR_FOLDERS, IDB_FOLDERS_16},
+	{TOOLBAR_COPYTO, IDB_COPY_TO_16},
+	{TOOLBAR_MOVETO, IDB_MOVE_TO_16},
+	{TOOLBAR_NEWFOLDER, IDB_NEW_FOLDER_16},
+	{TOOLBAR_COPY, IDB_COPY_16},
+	{TOOLBAR_CUT, IDB_CUT_16},
+	{TOOLBAR_PASTE, IDB_PASTE_16},
+	{TOOLBAR_DELETE, IDB_DELETE_16},
+	{TOOLBAR_VIEWS, IDB_VIEWS_16},
+	{TOOLBAR_SEARCH, IDB_SEARCH_16},
+	{TOOLBAR_PROPERTIES, IDB_PROPERTIES_16},
+	{TOOLBAR_REFRESH, IDB_REFRESH_16},
+	{TOOLBAR_ADDBOOKMARK, IDB_ADD_BOOKMARK_16},
+	{TOOLBAR_NEWTAB, IDB_NEW_TAB_16},
+	{TOOLBAR_OPENCOMMANDPROMPT, IDB_COMMAND_LINE_16},
+	{TOOLBAR_ORGANIZEBOOKMARKS, IDB_BOOKMARKS_16},
+	{TOOLBAR_DELETEPERMANENTLY, IDB_DELETE_PERMANENTLY_16}
+};
+
+static const std::unordered_map<int, UINT> TOOLBAR_BUTTON_IMAGE_MAPPINGS_24 = {
+	{TOOLBAR_BACK, IDB_BACK_24},
+	{TOOLBAR_FORWARD, IDB_FORWARD_24},
+	{TOOLBAR_UP, IDB_UP_24},
+	{TOOLBAR_FOLDERS, IDB_FOLDERS_24},
+	{TOOLBAR_COPYTO, IDB_COPY_TO_24},
+	{TOOLBAR_MOVETO, IDB_MOVE_TO_24},
+	{TOOLBAR_NEWFOLDER, IDB_NEW_FOLDER_24},
+	{TOOLBAR_COPY, IDB_COPY_24},
+	{TOOLBAR_CUT, IDB_CUT_24},
+	{TOOLBAR_PASTE, IDB_PASTE_24},
+	{TOOLBAR_DELETE, IDB_DELETE_24},
+	{TOOLBAR_VIEWS, IDB_VIEWS_24},
+	{TOOLBAR_SEARCH, IDB_SEARCH_24},
+	{TOOLBAR_PROPERTIES, IDB_PROPERTIES_24},
+	{TOOLBAR_REFRESH, IDB_REFRESH_24},
+	{TOOLBAR_ADDBOOKMARK, IDB_ADD_BOOKMARK_24},
+	{TOOLBAR_NEWTAB, IDB_NEW_TAB_24},
+	{TOOLBAR_OPENCOMMANDPROMPT, IDB_COMMAND_LINE_24},
+	{TOOLBAR_ORGANIZEBOOKMARKS, IDB_BOOKMARKS_24},
+	{TOOLBAR_DELETEPERMANENTLY, IDB_DELETE_PERMANENTLY_24}
+};
 
 MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
 	Navigation *navigation, std::shared_ptr<Config> config)
@@ -56,18 +94,13 @@ HWND MainToolbar::CreateMainToolbar(HWND parent)
 
 void MainToolbar::Initialize(HWND parent)
 {
-	HBITMAP hb;
+	m_imageListSmall.reset(ImageList_Create(TOOLBAR_IMAGE_SIZE_SMALL_X, TOOLBAR_IMAGE_SIZE_SMALL_Y,
+		ILC_COLOR32 | ILC_MASK, 0, SIZEOF_ARRAY(TOOLBAR_BUTTON_SET)));
+	m_imageListLarge.reset(ImageList_Create(TOOLBAR_IMAGE_SIZE_LARGE_X, TOOLBAR_IMAGE_SIZE_LARGE_Y,
+		ILC_COLOR32 | ILC_MASK, 0, SIZEOF_ARRAY(TOOLBAR_BUTTON_SET)));
 
-	m_imageListSmall.reset(ImageList_Create(TOOLBAR_IMAGE_SIZE_SMALL_X, TOOLBAR_IMAGE_SIZE_SMALL_Y, ILC_COLOR32 | ILC_MASK, 0, 47));
-	hb = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(m_imageListSmall.get(), hb, NULL);
-
-	DeleteObject(hb);
-
-	m_imageListLarge.reset(ImageList_Create(TOOLBAR_IMAGE_SIZE_LARGE_X, TOOLBAR_IMAGE_SIZE_LARGE_Y, ILC_COLOR32 | ILC_MASK, 0, 47));
-	hb = LoadBitmap(GetModuleHandle(0), MAKEINTRESOURCE(IDB_SHELLIMAGES_LARGE));
-	ImageList_Add(m_imageListLarge.get(), hb, NULL);
-	DeleteObject(hb);
+	m_toolbarImageMap16 = SetUpToolbarImageList(TOOLBAR_BUTTON_IMAGE_MAPPINGS_16, m_imageListSmall.get());
+	m_toolbarImageMap24 = SetUpToolbarImageList(TOOLBAR_BUTTON_IMAGE_MAPPINGS_24, m_imageListLarge.get());
 
 	HIMAGELIST himl;
 	int cx;
@@ -126,6 +159,41 @@ void MainToolbar::Initialize(HWND parent)
 	});
 
 	m_connections.push_back(m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&MainToolbar::OnNavigationCompleted, this, _1)));
+}
+
+std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(const std::unordered_map<int, UINT> &buttonImageMappings, HIMAGELIST imageList)
+{
+	std::unordered_map<int, int> imageListMappings;
+
+	for (const auto &item : buttonImageMappings)
+	{
+		auto gdiplusBitmap = ImageHelper::LoadBitmapFromPNG(item.second, GetModuleHandle(nullptr));
+
+		if (!gdiplusBitmap)
+		{
+			continue;
+		}
+
+		wil::unique_hbitmap bitmap;
+		Gdiplus::Color color(0, 0, 0);
+		Gdiplus::Status status = gdiplusBitmap->GetHBITMAP(color, &bitmap);
+
+		if (status != Gdiplus::Status::Ok)
+		{
+			continue;
+		}
+
+		int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
+
+		if (imagePosition == -1)
+		{
+			continue;
+		}
+
+		imageListMappings.insert({ item.first, imagePosition });
+	}
+
+	return imageListMappings;
 }
 
 MainToolbar::~MainToolbar()
@@ -232,9 +300,20 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(int iButtonId) const
 		auto itr = m_toolbarStringMap.find(iButtonId);
 		assert(itr != m_toolbarStringMap.end());
 
+		int imagePosition;
+
+		if (m_config->useLargeToolbarIcons)
+		{
+			imagePosition = m_toolbarImageMap24.at(iButtonId);
+		}
+		else
+		{
+			imagePosition = m_toolbarImageMap16.at(iButtonId);
+		}
+
 		int stringIndex = itr->second;
 
-		tbButton.iBitmap = LookupToolbarButtonImage(iButtonId);
+		tbButton.iBitmap = imagePosition;
 		tbButton.idCommand = iButtonId;
 		tbButton.fsState = TBSTATE_ENABLED;
 		tbButton.fsStyle = StandardStyle | LookupToolbarButtonExtraStyles(iButtonId);
@@ -274,98 +353,6 @@ void MainToolbar::GetToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize
 	/* It doesn't really make sense to return this. If the string isn't in the
 	string table, there's a bug somewhere in the program. */
 	UNUSED(res);
-}
-
-int MainToolbar::LookupToolbarButtonImage(int iButtonID) const
-{
-	switch (iButtonID)
-	{
-	case TOOLBAR_SEPARATOR:
-		return -1;
-		break;
-
-	case TOOLBAR_BACK:
-		return SHELLIMAGES_BACK;
-		break;
-
-	case TOOLBAR_FORWARD:
-		return SHELLIMAGES_FORWARD;
-		break;
-
-	case TOOLBAR_UP:
-		return SHELLIMAGES_UP;
-		break;
-
-	case TOOLBAR_FOLDERS:
-		return SHELLIMAGES_FOLDERS;
-		break;
-
-	case TOOLBAR_COPYTO:
-		return SHELLIMAGES_COPYTO;
-		break;
-
-	case TOOLBAR_MOVETO:
-		return SHELLIMAGES_MOVETO;
-		break;
-
-	case TOOLBAR_NEWFOLDER:
-		return SHELLIMAGES_NEWFOLDER;
-		break;
-
-	case TOOLBAR_COPY:
-		return SHELLIMAGES_COPY;
-		break;
-
-	case TOOLBAR_CUT:
-		return SHELLIMAGES_CUT;
-		break;
-
-	case TOOLBAR_PASTE:
-		return SHELLIMAGES_PASTE;
-		break;
-
-	case TOOLBAR_DELETE:
-		return SHELLIMAGES_DELETE;
-		break;
-
-	case TOOLBAR_DELETEPERMANENTLY:
-		return SHELLIMAGES_DELETEPERMANENTLY;
-		break;
-
-	case TOOLBAR_VIEWS:
-		return SHELLIMAGES_VIEWS;
-		break;
-
-	case TOOLBAR_SEARCH:
-		return SHELLIMAGES_SEARCH;
-		break;
-
-	case TOOLBAR_PROPERTIES:
-		return SHELLIMAGES_PROPERTIES;
-		break;
-
-	case TOOLBAR_REFRESH:
-		return SHELLIMAGES_REFRESH;
-		break;
-
-	case TOOLBAR_ADDBOOKMARK:
-		return SHELLIMAGES_ADDFAV;
-		break;
-
-	case TOOLBAR_ORGANIZEBOOKMARKS:
-		return SHELLIMAGES_FAV;
-		break;
-
-	case TOOLBAR_NEWTAB:
-		return SHELLIMAGES_NEWTAB;
-		break;
-
-	case TOOLBAR_OPENCOMMANDPROMPT:
-		return SHELLIMAGES_CMD;
-		break;
-	}
-
-	return -1;
 }
 
 BYTE MainToolbar::LookupToolbarButtonExtraStyles(int iButtonID) const
@@ -574,7 +561,43 @@ void MainToolbar::UpdateToolbarSize()
 	/* Switch the image list. */
 	SendMessage(m_hwnd, TB_SETIMAGELIST, 0, (LPARAM)himl);
 	SendMessage(m_hwnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(cx, cy));
+	UpdateToolbarButtonImages();
 	SendMessage(m_hwnd, TB_AUTOSIZE, 0, 0);
+}
+
+void MainToolbar::UpdateToolbarButtonImages()
+{
+	int numButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
+
+	for (int i = 0; i < numButtons; i++)
+	{
+		TBBUTTON tbButton;
+		BOOL res = static_cast<BOOL>(SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton)));
+
+		if (!res)
+		{
+			continue;
+		}
+
+		if (tbButton.idCommand == 0)
+		{
+			// Separator.
+			continue;
+		}
+
+		int imagePosition;
+
+		if (m_config->useLargeToolbarIcons)
+		{
+			imagePosition = m_toolbarImageMap24.at(tbButton.idCommand);
+		}
+		else
+		{
+			imagePosition = m_toolbarImageMap16.at(tbButton.idCommand);
+		}
+
+		SendMessage(m_hwnd, TB_CHANGEBITMAP, 0, imagePosition);
+	}
 }
 
 BOOL MainToolbar::OnTBQueryInsert()

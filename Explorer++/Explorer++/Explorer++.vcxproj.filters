@@ -757,9 +757,6 @@
     <None Include="res\No Preview Available.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\Shell Images Large.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="Version.h">
       <Filter>Core</Filter>
     </None>

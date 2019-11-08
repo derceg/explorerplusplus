@@ -38,6 +38,7 @@ private:
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Initialize(HWND parent);
+	static std::unordered_map<int, int> SetUpToolbarImageList(const std::unordered_map<int, UINT> &buttonImageMappings, HIMAGELIST imageList);
 	void SetInitialToolbarButtons();
 	void AddButtonsToToolbar();
 	void AddButtonToToolbar(int iButtonId);
@@ -45,7 +46,6 @@ private:
 	void AddStringsToToolbar();
 	void AddStringToToolbar(int iButtonId);
 	void GetToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize) const;
-	int LookupToolbarButtonImage(int iButtonID) const;
 	BYTE LookupToolbarButtonExtraStyles(int iButtonID) const;
 	int LookupToolbarButtonTextID(int iButtonID) const;
 
@@ -62,6 +62,8 @@ private:
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCompleted(const Tab &tab);
 
+	void UpdateToolbarButtonImages();
+
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_pexpp;
 	Navigation *m_navigation;
@@ -70,6 +72,8 @@ private:
 	wil::unique_himagelist m_imageListSmall;
 	wil::unique_himagelist m_imageListLarge;
 	std::unordered_map<int, int> m_toolbarStringMap;
+	std::unordered_map<int, int> m_toolbarImageMap16;
+	std::unordered_map<int, int> m_toolbarImageMap24;
 
 	std::list<ToolbarButton_t> m_tbInitial;
 

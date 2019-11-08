@@ -4,6 +4,8 @@
 
 #include "stdafx.h"
 #include "ImageHelper.h"
+#include <wil/com.h>
+#include <wil/resource.h>
 
 void ImageHelper::InitBitmapInfo(__out_bcount(cbInfo) BITMAPINFO *pbmi, ULONG cbInfo, LONG cx, LONG cy, WORD bpp)
 {
@@ -183,4 +185,66 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 	}
 
 	return hbmp;
+}
+
+// See https://stackoverflow.com/a/24571173.
+std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadBitmapFromPNG(UINT resourceId, HINSTANCE instance)
+{
+	HRSRC resourceHandle = FindResource(instance, MAKEINTRESOURCE(resourceId), L"PNG");
+
+	if (!resourceHandle)
+	{
+		return nullptr;
+	}
+
+	DWORD resourceSize = SizeofResource(instance, resourceHandle);
+
+	if (resourceSize == 0)
+	{
+		return nullptr;
+	}
+
+	HGLOBAL resourceInstance = LoadResource(instance, resourceHandle);
+
+	if (!resourceInstance)
+	{
+		return nullptr;
+	}
+
+	const void *resourceData = LockResource(resourceInstance);
+
+	if (!resourceData)
+	{
+		return nullptr;
+	}
+
+	wil::unique_hglobal global(GlobalAlloc(GMEM_MOVEABLE, resourceSize));
+
+	if (!global)
+	{
+		return nullptr;
+	}
+
+	void *buffer = GlobalLock(global.get());
+
+	if (!buffer)
+	{
+		return nullptr;
+	}
+
+	CopyMemory(buffer, resourceData, resourceSize);
+
+	std::unique_ptr<Gdiplus::Bitmap> bitmap;
+
+	wil::com_ptr<IStream> stream;
+	HRESULT hr = CreateStreamOnHGlobal(global.get(), false, &stream);
+
+	if (SUCCEEDED(hr))
+	{
+		bitmap = std::make_unique<Gdiplus::Bitmap>(stream.get());
+	}
+
+	GlobalUnlock(global.get());
+
+	return bitmap;
 }

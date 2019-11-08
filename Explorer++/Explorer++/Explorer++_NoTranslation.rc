@@ -59,8 +59,6 @@ IDB_ABOUT               BITMAP                  "res\\About Image.bmp"
 
 IDB_NOPREVIEWAVAILABLE  BITMAP                  "res\\No Preview Available.bmp"
 
-IDB_SHELLIMAGES_LARGE   BITMAP                  "res\\Shell Images Large.bmp"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -159,6 +157,136 @@ END
 //
 
 IDR_WAVE_NAVIGATIONSTART WAVE                    "res\\Navigation Start.wav"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// PNG
+//
+
+IDB_CUT_16              PNG                     "res\\icons\\16x16\\cut.png"
+
+IDB_CUT_24              PNG                     "res\\icons\\24x24\\cut.png"
+
+IDB_BACK_16             PNG                     "res\\icons\\16x16\\back.png"
+
+IDB_BACK_24             PNG                     "res\\icons\\24x24\\back.png"
+
+IDB_FORWARD_16          PNG                     "res\\icons\\16x16\\forward.png"
+
+IDB_FORWARD_24          PNG                     "res\\icons\\24x24\\forward.png"
+
+IDB_COPY_16             PNG                     "res\\icons\\16x16\\copy.png"
+
+IDB_COPY_24             PNG                     "res\\icons\\24x24\\copy.png"
+
+IDB_PASTE_16            PNG                     "res\\icons\\16x16\\paste.png"
+
+IDB_PASTE_24            PNG                     "res\\icons\\24x24\\paste.png"
+
+IDB_DELETE_16           PNG                     "res\\icons\\16x16\\delete.png"
+
+IDB_DELETE_24           PNG                     "res\\icons\\24x24\\delete.png"
+
+IDB_PROPERTIES_16       PNG                     "res\\icons\\16x16\\properties.png"
+
+IDB_PROPERTIES_24       PNG                     "res\\icons\\24x24\\properties.png"
+
+IDB_REFRESH_16          PNG                     "res\\icons\\16x16\\refresh.png"
+
+IDB_REFRESH_24          PNG                     "res\\icons\\24x24\\refresh.png"
+
+IDB_NEW_FOLDER_16       PNG                     "res\\icons\\16x16\\new-folder.png"
+
+IDB_NEW_FOLDER_24       PNG                     "res\\icons\\24x24\\new-folder.png"
+
+IDB_UP_16               PNG                     "res\\icons\\16x16\\up.png"
+
+IDB_UP_24               PNG                     "res\\icons\\24x24\\up.png"
+
+IDB_VIEWS_16            PNG                     "res\\icons\\16x16\\views.png"
+
+IDB_VIEWS_24            PNG                     "res\\icons\\24x24\\views.png"
+
+IDB_BOOKMARKS_16        PNG                     "res\\icons\\16x16\\bookmarks.png"
+
+IDB_BOOKMARKS_24        PNG                     "res\\icons\\24x24\\bookmarks.png"
+
+IDB_ADD_BOOKMARK_16     PNG                     "res\\icons\\16x16\\add-bookmark.png"
+
+IDB_ADD_BOOKMARK_24     PNG                     "res\\icons\\24x24\\add-bookmark.png"
+
+IDB_COMMAND_LINE_16     PNG                     "res\\icons\\16x16\\command-line.png"
+
+IDB_COMMAND_LINE_24     PNG                     "res\\icons\\24x24\\command-line.png"
+
+IDB_SEARCH_16           PNG                     "res\\icons\\16x16\\search.png"
+
+IDB_SEARCH_24           PNG                     "res\\icons\\24x24\\search.png"
+
+IDB_NEW_TAB_16          PNG                     "res\\icons\\16x16\\new-tab.png"
+
+IDB_NEW_TAB_24          PNG                     "res\\icons\\24x24\\new-tab.png"
+
+IDB_FOLDERS_16          PNG                     "res\\icons\\16x16\\folders.png"
+
+IDB_FOLDERS_24          PNG                     "res\\icons\\24x24\\folders.png"
+
+IDB_DELETE_PERMANENTLY_16 PNG                   "res\\icons\\16x16\\delete-permanently.png"
+
+IDB_DELETE_PERMANENTLY_24 PNG                   "res\\icons\\24x24\\delete-permanently.png"
+
+IDB_FILTER_16           PNG                    "res\\icons\\16x16\\filter.png"
+
+IDB_FILTER_24           PNG                    "res\\icons\\24x24\\filter.png"
+
+IDB_HELP_16             PNG                    "res\\icons\\16x16\\help.png"
+
+IDB_HELP_24             PNG                    "res\\icons\\24x24\\help.png"
+
+IDB_RENAME_16           PNG                    "res\\icons\\16x16\\rename.png"
+
+IDB_RENAME_24           PNG                    "res\\icons\\24x24\\rename.png"
+
+IDB_OPTIONS_16          PNG                    "res\\icons\\16x16\\options.png"
+
+IDB_OPTIONS_24          PNG                    "res\\icons\\24x24\\options.png"
+
+IDB_UNDO_16             PNG                    "res\\icons\\16x16\\undo.png"
+
+IDB_UNDO_24             PNG                    "res\\icons\\24x24\\undo.png"
+
+IDB_CUSTOMIZE_COLORS_16 PNG                    "res\\icons\\16x16\\customize-colors.png"
+
+IDB_CUSTOMIZE_COLORS_24 PNG                    "res\\icons\\24x24\\customize-colors.png"
+
+IDB_LOCK_16             PNG                    "res\\icons\\16x16\\lock.png"
+
+IDB_LOCK_24             PNG                    "res\\icons\\24x24\\lock.png"
+
+IDB_COMMAND_LINE_ADMIN_16 PNG                  "res\\icons\\16x16\\command-line-admin.png"
+
+IDB_COMMAND_LINE_ADMIN_24 PNG                  "res\\icons\\24x24\\command-line-admin.png"
+
+IDB_PASTE_SHORTCUT_16   PNG                    "res\\icons\\16x16\\paste-shortcut.png"
+
+IDB_PASTE_SHORTCUT_24   PNG                    "res\\icons\\24x24\\paste-shortcut.png"
+
+IDB_FOLDER_16           PNG                    "res\\icons\\16x16\\folder.png"
+
+IDB_FOLDER_24           PNG                    "res\\icons\\24x24\\folder.png"
+
+IDB_ARROW_RIGHT_16      PNG                    "res\\icons\\16x16\\arrow-right.png"
+
+IDB_ARROW_RIGHT_24      PNG                    "res\\icons\\24x24\\arrow-right.png"
+
+IDB_COPY_TO_16          PNG                    "res\\icons\\16x16\\copy-to.png"
+
+IDB_COPY_TO_24          PNG                    "res\\icons\\24x24\\copy-to.png"
+
+IDB_MOVE_TO_16          PNG                    "res\\icons\\16x16\\move-to.png"
+
+IDB_MOVE_TO_24          PNG                    "res\\icons\\24x24\\move-to.png"
 
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
