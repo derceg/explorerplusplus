@@ -359,10 +359,6 @@ BYTE MainToolbar::LookupToolbarButtonExtraStyles(int iButtonID) const
 {
 	switch (iButtonID)
 	{
-	case TOOLBAR_SEPARATOR:
-		return 0;
-		break;
-
 	case TOOLBAR_BACK:
 		return BTNS_DROPDOWN;
 		break;
@@ -371,76 +367,12 @@ BYTE MainToolbar::LookupToolbarButtonExtraStyles(int iButtonID) const
 		return BTNS_DROPDOWN;
 		break;
 
-	case TOOLBAR_UP:
-		return 0;
-		break;
-
 	case TOOLBAR_FOLDERS:
 		return BTNS_SHOWTEXT | BTNS_CHECK;
 		break;
 
-	case TOOLBAR_COPYTO:
-		return 0;
-		break;
-
-	case TOOLBAR_MOVETO:
-		return 0;
-		break;
-
-	case TOOLBAR_NEWFOLDER:
-		return 0;
-		break;
-
-	case TOOLBAR_COPY:
-		return 0;
-		break;
-
-	case TOOLBAR_CUT:
-		return 0;
-		break;
-
-	case TOOLBAR_PASTE:
-		return 0;
-		break;
-
-	case TOOLBAR_DELETE:
-		return 0;
-		break;
-
-	case TOOLBAR_DELETEPERMANENTLY:
-		return 0;
-		break;
-
 	case TOOLBAR_VIEWS:
 		return BTNS_DROPDOWN;
-		break;
-
-	case TOOLBAR_SEARCH:
-		return 0;
-		break;
-
-	case TOOLBAR_PROPERTIES:
-		return 0;
-		break;
-
-	case TOOLBAR_REFRESH:
-		return 0;
-		break;
-
-	case TOOLBAR_ADDBOOKMARK:
-		return 0;
-		break;
-
-	case TOOLBAR_ORGANIZEBOOKMARKS:
-		return 0;
-		break;
-
-	case TOOLBAR_NEWTAB:
-		return 0;
-		break;
-
-	case TOOLBAR_OPENCOMMANDPROMPT:
-		return 0;
 		break;
 	}
 
