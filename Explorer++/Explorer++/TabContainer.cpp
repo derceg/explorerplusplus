@@ -15,6 +15,7 @@
 #include "TabDropHandler.h"
 #include "../Helper/Controls.h"
 #include "../Helper/iDirectoryMonitor.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/MenuWrapper.h"
 #include "../Helper/ShellHelper.h"
@@ -108,20 +109,24 @@ void TabContainer::Initialize(HWND parent)
 
 void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
-	HIMAGELIST himlTemp = ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48);
+	/* TODO: Should scale with DPI. */
+	auto gdiplusBitmap = ImageHelper::LoadBitmapFromPNG(IDB_LOCK_16, GetModuleHandle(nullptr));
 
-	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(himlTemp, hBitmap, NULL);
-	DeleteObject(hBitmap);
+	if (!gdiplusBitmap)
+	{
+		return;
+	}
 
-	ICONINFO IconInfo;
-	GetIconInfo(ImageList_GetIcon(himlTemp, SHELLIMAGES_LOCK,
-		ILD_TRANSPARENT), &IconInfo);
-	ImageList_Add(himlTab, IconInfo.hbmColor, IconInfo.hbmMask);
-	DeleteObject(IconInfo.hbmColor);
-	DeleteObject(IconInfo.hbmMask);
+	wil::unique_hbitmap bitmap;
+	Gdiplus::Color color(0, 0, 0);
+	Gdiplus::Status status = gdiplusBitmap->GetHBITMAP(color, &bitmap);
 
-	ImageList_Destroy(himlTemp);
+	if (status != Gdiplus::Status::Ok)
+	{
+		return;
+	}
+
+	m_tabIconLockIndex = ImageList_Add(himlTab, bitmap.get(), nullptr);
 }
 
 TabContainer::~TabContainer()
@@ -699,7 +704,7 @@ void TabContainer::SetTabIcon(const Tab &tab)
 	/* If the tab is locked, use a lock icon. */
 	if (tab.GetAddressLocked() || tab.GetLocked())
 	{
-		iImage = TAB_ICON_LOCK_INDEX;
+		iImage = m_tabIconLockIndex;
 	}
 	else
 	{
@@ -731,7 +736,7 @@ void TabContainer::SetTabIcon(const Tab &tab)
 	tcItem.iImage = iImage;
 	TabCtrl_SetItem(m_hwnd, index, &tcItem);
 
-	if (iRemoveImage != TAB_ICON_LOCK_INDEX)
+	if (iRemoveImage != m_tabIconLockIndex)
 	{
 		/* Remove the old image. */
 		TabCtrl_RemoveImage(m_hwnd, iRemoveImage);

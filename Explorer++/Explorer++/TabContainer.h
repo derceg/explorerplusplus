@@ -69,8 +69,6 @@ private:
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
-	static const int TAB_ICON_LOCK_INDEX = 0;
-
 	// Represents the maximum number of icons that can be cached across
 	// all tabs (as the icon cache is shared between tabs).
 	static const int MAX_CACHED_ICONS = 1000;
@@ -140,6 +138,7 @@ private:
 	std::unordered_map<int, Tab> m_tabs;
 	int m_tabIdCounter;
 	CachedIcons m_cachedIcons;
+	int m_tabIconLockIndex;
 
 	TabContainerInterface *m_tabContainerInterface;
 	TabInterface *m_tabInterface;
