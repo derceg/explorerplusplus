@@ -484,7 +484,7 @@ private:
 	HANDLE					CreateWorkerThread();
 
 	/* Menus. */
-	void					InitializeMenus(void);
+	void					InitializeMainMenu();
 	void					SetMainMenuImages();
 	HMENU					BuildViewsMenu();
 	void					AddViewModesToMenu(HMENU menu);

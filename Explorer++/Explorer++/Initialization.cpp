@@ -22,53 +22,9 @@
 #include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include <list>
-#include <map>
-
 
 DWORD WINAPI WorkerThreadProc(LPVOID pParam);
 void CALLBACK InitializeCOMAPC(ULONG_PTR dwParam);
-
-const std::map<UINT, UINT> MAIN_MENU_IMAGE_MAPPINGS = {
-	{ IDM_FILE_NEWTAB, IDB_NEW_TAB_16 },
-	{ IDM_FILE_CLOSETAB, IDB_CLOSE_TAB_16 },
-	{ IDM_FILE_OPENCOMMANDPROMPT, IDB_COMMAND_LINE_16 },
-	{ IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR, IDB_COMMAND_LINE_ADMIN_16 },
-	{ IDM_FILE_DELETE, IDB_DELETE_16 },
-	{ IDM_FILE_DELETEPERMANENTLY, IDB_DELETE_PERMANENTLY_16 },
-	{ IDM_FILE_RENAME, IDB_RENAME_16 },
-	{ IDM_FILE_PROPERTIES, IDB_PROPERTIES_16 },
-
-	{ IDM_EDIT_UNDO, IDB_UNDO_16 },
-	{ IDM_EDIT_COPY, IDB_COPY_16 },
-	{ IDM_EDIT_CUT, IDB_CUT_16 },
-	{ IDM_EDIT_PASTE, IDB_PASTE_16 },
-	{ IDM_EDIT_PASTESHORTCUT, IDB_PASTE_SHORTCUT_16 },
-
-	{ IDM_EDIT_COPYTOFOLDER, IDB_COPY_TO_16 },
-	{ IDM_EDIT_MOVETOFOLDER, IDB_MOVE_TO_16 },
-
-	{ IDM_ACTIONS_NEWFOLDER, IDB_NEW_FOLDER_16 },
-	{ IDM_ACTIONS_SPLITFILE, IDB_SPLIT_FILES_16 },
-	{ IDM_ACTIONS_MERGEFILES, IDB_MERGE_FILES_16 },
-
-	{ IDM_VIEW_REFRESH, IDB_REFRESH_16 },
-	{ IDM_VIEW_SELECTCOLUMNS, IDB_SELECT_COLUMNS_16 },
-
-	{ IDM_FILTER_FILTERRESULTS, IDB_FILTER_16 },
-
-	{ IDM_GO_BACK, IDB_BACK_16 },
-	{ IDM_GO_FORWARD, IDB_FORWARD_16 },
-	{ IDM_GO_UPONELEVEL, IDB_UP_16 },
-
-	{ IDM_BOOKMARKS_BOOKMARKTHISTAB, IDB_ADD_BOOKMARK_16 },
-	{ IDM_BOOKMARKS_MANAGEBOOKMARKS, IDB_BOOKMARKS_16 },
-
-	{ IDM_TOOLS_SEARCH, IDB_SEARCH_16 },
-	{ IDM_TOOLS_CUSTOMIZECOLORS, IDB_CUSTOMIZE_COLORS_16 },
-	{ IDM_TOOLS_OPTIONS, IDB_OPTIONS_16 },
-
-	{ IDM_HELP_HELP, IDB_HELP_16 }
-};
 
 DWORD WINAPI WorkerThreadProc(LPVOID pParam)
 {
@@ -191,7 +147,7 @@ void Explorerplusplus::OnCreate(void)
 	m_SHChangeNotifyID = SHChangeNotifyRegister(m_hContainer, SHCNRF_ShellLevel,
 		SHCNE_ASSOCCHANGED, WM_APP_ASSOCCHANGED, 1, &shcne);
 
-	InitializeMenus();
+	InitializeMainMenu();
 
 	InitializeArrangeMenuItems();
 
@@ -261,40 +217,6 @@ void Explorerplusplus::InitializeDisplayWindow()
 		0,0,LR_CREATEDIBSECTION);
 
 	m_hDisplayWindow = CreateDisplayWindow(m_hContainer,&InitialSettings);
-}
-
-void Explorerplusplus::InitializeMenus(void)
-{
-	HMENU hMenu = GetMenu(m_hContainer);
-
-	AddViewModesToMenu(hMenu);
-
-	/* Delete the placeholder menu. */
-	DeleteMenu(hMenu,IDM_VIEW_PLACEHOLDER,MF_BYCOMMAND);
-
-	SetMainMenuImages();
-
-	SetGoMenuName(hMenu,IDM_GO_MYCOMPUTER,CSIDL_DRIVES);
-	SetGoMenuName(hMenu,IDM_GO_MYDOCUMENTS,CSIDL_PERSONAL);
-	SetGoMenuName(hMenu,IDM_GO_MYMUSIC,CSIDL_MYMUSIC);
-	SetGoMenuName(hMenu,IDM_GO_MYPICTURES,CSIDL_MYPICTURES);
-	SetGoMenuName(hMenu,IDM_GO_DESKTOP,CSIDL_DESKTOP);
-	SetGoMenuName(hMenu,IDM_GO_RECYCLEBIN,CSIDL_BITBUCKET);
-	SetGoMenuName(hMenu,IDM_GO_CONTROLPANEL,CSIDL_CONTROLS);
-	SetGoMenuName(hMenu,IDM_GO_PRINTERS,CSIDL_PRINTERS);
-	SetGoMenuName(hMenu,IDM_GO_CDBURNING,CSIDL_CDBURN_AREA);
-	SetGoMenuName(hMenu,IDM_GO_MYNETWORKPLACES,CSIDL_NETWORK);
-	SetGoMenuName(hMenu,IDM_GO_NETWORKCONNECTIONS,CSIDL_CONNECTIONS);
-}
-
-void Explorerplusplus::SetMainMenuImages()
-{
-	HMENU mainMenu = GetMenu(m_hContainer);
-
-	for (const auto &mapping : MAIN_MENU_IMAGE_MAPPINGS)
-	{
-		SetMenuItemImage(mainMenu, mapping.first, mapping.second, m_menuImages);
-	}
 }
 
 HMENU Explorerplusplus::BuildViewsMenu()

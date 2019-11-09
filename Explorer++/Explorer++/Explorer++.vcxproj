@@ -493,6 +493,7 @@
     <ClCompile Include="Initialization.cpp" />
     <ClCompile Include="LoadSaveRegistry.cpp" />
     <ClCompile Include="LoadSaveXml.cpp" />
+    <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="MenuHelper.cpp" />
     <ClCompile Include="PluginInterface.cpp" />

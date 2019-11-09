@@ -358,6 +358,9 @@
     <ClCompile Include="DpiCompatibility.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="MainMenu.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
