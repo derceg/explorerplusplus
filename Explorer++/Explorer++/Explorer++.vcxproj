@@ -635,7 +635,6 @@
     <ClInclude Include="LoadSaveXml.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="LuaPlugin.h" />
-    <ClInclude Include="MainImages.h" />
     <ClInclude Include="MainResource.h" />
     <ClInclude Include="MainToolbar.h" />
     <ClInclude Include="MainWindow.h" />
@@ -712,7 +711,6 @@
     <None Include="res\Folder Locked.bmp" />
     <None Include="res\Navigation Start.wav" />
     <None Include="res\No Preview Available.bmp" />
-    <None Include="res\Shell Images.bmp" />
     <None Include="res\Tab Close.bmp" />
     <None Include="Version.h" />
   </ItemGroup>

@@ -6,7 +6,6 @@
 #include "Explorer++.h"
 #include "Config.h"
 #include "LoadSaveInterface.h"
-#include "MainImages.h"
 #include "MainResource.h"
 #include "RenameTabDialog.h"
 #include "ShellBrowser/iShellView.h"

@@ -16,8 +16,8 @@
 #include "stdafx.h"
 #include "MassRenameDialog.h"
 #include "Explorer++_internal.h"
-#include "MainImages.h"
 #include "MainResource.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
@@ -25,7 +25,6 @@
 #include <iomanip>
 #include <list>
 #include <regex>
-
 
 const TCHAR CMassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename");
 
@@ -50,19 +49,12 @@ CMassRenameDialog::~CMassRenameDialog()
 
 INT_PTR CMassRenameDialog::OnInitDialog()
 {
-	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
-	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(himl,hBitmap,NULL);
-
-	m_icon.reset(ImageList_GetIcon(himl,SHELLIMAGES_RENAME,ILD_NORMAL));
+	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_RENAME_16);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
-	m_moreIcon.reset(ImageList_GetIcon(himl,SHELLIMAGES_RIGHTARROW,ILD_NORMAL));
+	m_moreIcon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_ARROW_RIGHT_16);
 	SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_MORE,BM_SETIMAGE,IMAGE_ICON,
 		reinterpret_cast<LPARAM>(m_moreIcon.get()));
-
-	DeleteObject(hBitmap);
-	ImageList_Destroy(himl);
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MASSRENAME_FILELISTVIEW);
 

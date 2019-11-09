@@ -27,6 +27,7 @@ private:
 
 	HWND							m_hListView;
 	wil::unique_himagelist			m_imageList;
+	std::unordered_map<UINT, int>	m_imageListMappings;
 
 	std::unordered_map<UINT, GUID>	m_mapID;
 	UINT							m_uIDCounter;

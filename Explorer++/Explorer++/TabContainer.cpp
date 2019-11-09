@@ -6,7 +6,6 @@
 #include "TabContainer.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
-#include "MainImages.h"
 #include "MainResource.h"
 #include "Navigation.h"
 #include "RenameTabDialog.h"
@@ -110,22 +109,7 @@ void TabContainer::Initialize(HWND parent)
 void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
 	/* TODO: Should scale with DPI. */
-	auto gdiplusBitmap = ImageHelper::LoadBitmapFromPNG(IDB_LOCK_16, GetModuleHandle(nullptr));
-
-	if (!gdiplusBitmap)
-	{
-		return;
-	}
-
-	wil::unique_hbitmap bitmap;
-	Gdiplus::Color color(0, 0, 0);
-	Gdiplus::Status status = gdiplusBitmap->GetHBITMAP(color, &bitmap);
-
-	if (status != Gdiplus::Status::Ok)
-	{
-		return;
-	}
-
+	wil::unique_hbitmap bitmap = ImageHelper::LoadBitmapFromPNG(GetModuleHandle(nullptr), IDB_LOCK_16);
 	m_tabIconLockIndex = ImageList_Add(himlTab, bitmap.get(), nullptr);
 }
 

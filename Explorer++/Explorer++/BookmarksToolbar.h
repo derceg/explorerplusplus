@@ -10,6 +10,7 @@
 #include "../Helper/Bookmark.h"
 #include <boost/optional.hpp>
 #include <wil/resource.h>
+#include <unordered_map>
 
 class CBookmarksToolbarDropHandler : public IDropTarget
 {
@@ -109,6 +110,7 @@ private:
 
 	HWND							m_hToolbar;
 	wil::unique_himagelist			m_imageList;
+	std::unordered_map<UINT, int>	m_imageListMappings;
 
 	HINSTANCE						m_instance;
 

@@ -14,7 +14,6 @@
 #include "Explorer++.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
-#include "MainImages.h"
 #include "MainResource.h"
 #include "ModelessDialogs.h"
 #include "SetDefaultColumnsDialog.h"
@@ -55,7 +54,6 @@ static const FileSize_t FILE_SIZES[] =
 
 static HWND g_hOptionsPropertyDialog	= NULL;
 
-HICON g_hNewTabDirIcon;
 TCHAR g_szNewTabDirectory[MAX_PATH];
 
 void Explorerplusplus::ShowOptions(void)
@@ -63,19 +61,8 @@ void Explorerplusplus::ShowOptions(void)
 	PROPSHEETPAGE	psp[NUM_DIALOG_OPTIONS_PAGES];
 	HPROPSHEETPAGE	hpsp[NUM_DIALOG_OPTIONS_PAGES];
 	PROPSHEETHEADER	psh;
-	HIMAGELIST		himl;
-	HBITMAP			hBitmap;
 	TCHAR			szTitle[64];
 	unsigned int	nSheet = 0;
-
-	himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
-
-	/* Contains all images used on the menus. */
-	hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-
-	ImageList_Add(himl,hBitmap,NULL);
-
-	g_hNewTabDirIcon = ImageList_GetIcon(himl,SHELLIMAGES_NEWTAB,ILD_NORMAL);
 
 	/* General options page. */
 	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
@@ -143,14 +130,11 @@ void Explorerplusplus::ShowOptions(void)
 	psh.nPages		= nSheet;
 	psh.nStartPage	= 0;
 
-	psh.hIcon		= ImageList_GetIcon(himl,SHELLIMAGES_OPTIONS,ILD_TRANSPARENT);
+	psh.hIcon		= m_optionsDialogIcon.get();
 
 	psh.ppsp		= psp;
 	psh.phpage		= hpsp;
 	psh.pfnCallback	= PropSheetProcStub;
-
-	DeleteObject(hBitmap);
-	ImageList_Destroy(himl);
 
 	/* Create the property dialog itself, which
 	will hold each of the above property pages. */
@@ -241,7 +225,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 					CheckDlgButton(hDlg,IDC_OPTION_XML,BST_CHECKED);
 
 				hButton = GetDlgItem(hDlg,IDC_DEFAULT_NEWTABDIR_BUTTON);
-				SendMessage(hButton,BM_SETIMAGE,IMAGE_ICON,(LPARAM)g_hNewTabDirIcon);
+				SendMessage(hButton,BM_SETIMAGE,IMAGE_ICON,(LPARAM)m_newTabDirectoryIcon.get());
 
 				hEdit = GetDlgItem(hDlg,IDC_DEFAULT_NEWTABDIR_EDIT);
 				DefaultSettingsSetNewTabDir(hEdit,m_config->defaultTabDirectory.c_str());
@@ -452,10 +436,6 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 
 		case WM_CLOSE:
 			EndDialog(hDlg,0);
-			break;
-
-		case WM_DESTROY:
-			DestroyIcon(g_hNewTabDirIcon);
 			break;
 	}
 

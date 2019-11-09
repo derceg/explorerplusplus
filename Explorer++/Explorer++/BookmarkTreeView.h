@@ -58,6 +58,7 @@ private:
 
 	HWND							m_hTreeView;
 	wil::unique_himagelist			m_imageList;
+	std::unordered_map<UINT, int>	m_imageListMappings;
 
 	HINSTANCE						m_instance;
 

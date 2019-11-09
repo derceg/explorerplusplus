@@ -3,14 +3,12 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <stack>
-#include <algorithm>
-#include "Explorer++_internal.h"
-#include "MainImages.h"
 #include "BookmarkHelper.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/Macros.h"
-
+#include <algorithm>
+#include <stack>
 
 int CALLBACK SortByName(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);
 int CALLBACK SortByLocation(const VariantBookmark &BookmarkItem1,const VariantBookmark &BookmarkItem2);

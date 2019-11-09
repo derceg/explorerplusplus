@@ -3,17 +3,16 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <stack>
-#include "Explorer++_internal.h"
-#include "MainImages.h"
 #include "ManageBookmarksDialog.h"
 #include "BookmarkHelper.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
-#include "../Helper/ListViewHelper.h"
+#include "ResourceHelper.h"
 #include "../Helper/Controls.h"
-#include "../Helper/WindowHelper.h"
+#include "../Helper/ImageHelper.h"
+#include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
-
+#include "../Helper/WindowHelper.h"
 
 namespace NManageBookmarksDialog
 {
@@ -69,15 +68,8 @@ INT_PTR CManageBookmarksDialog::OnInitDialog()
 
 void CManageBookmarksDialog::SetDialogIcon()
 {
-	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
-	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(himl,hBitmap,NULL);
-
-	m_icon.reset(ImageList_GetIcon(himl,SHELLIMAGES_FAV,ILD_NORMAL));
+	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_BOOKMARKS_16);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
-
-	DeleteObject(hBitmap);
-	ImageList_Destroy(himl);
 }
 
 void CManageBookmarksDialog::SetupToolbar()
@@ -92,18 +84,15 @@ void CManageBookmarksDialog::SetupToolbar()
 	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
 	SendMessage(m_hToolbar,TB_BUTTONSTRUCTSIZE,static_cast<WPARAM>(sizeof(TBBUTTON)),0);
 
-	m_himlToolbar = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
-	HBITMAP hBitmap = LoadBitmap(GetInstance(),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(m_himlToolbar,hBitmap,NULL);
-	DeleteObject(hBitmap);
-	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_himlToolbar));
+	std::tie(m_imageListToolbar, m_imageListToolbarMappings) = CreateIconImageList(16, { IDB_BACK_16, IDB_FORWARD_16, IDB_COPY_16, IDB_VIEWS_16 });
+	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageListToolbar.get()));
 
 	TBBUTTON tbb;
 	TCHAR szTemp[64];
 
 	LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_BACK, szTemp, SIZEOF_ARRAY(szTemp));
 
-	tbb.iBitmap		= SHELLIMAGES_BACK;
+	tbb.iBitmap		= m_imageListToolbarMappings.at(IDB_BACK_16);
 	tbb.idCommand	= TOOLBAR_ID_BACK;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE;
@@ -113,7 +102,7 @@ void CManageBookmarksDialog::SetupToolbar()
 
 	LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_FORWARD, szTemp, SIZEOF_ARRAY(szTemp));
 
-	tbb.iBitmap		= SHELLIMAGES_FORWARD;
+	tbb.iBitmap		= m_imageListToolbarMappings.at(IDB_FORWARD_16);
 	tbb.idCommand	= TOOLBAR_ID_FORWARD;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE;
@@ -123,7 +112,7 @@ void CManageBookmarksDialog::SetupToolbar()
 
 	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_TOOLBAR_ORGANIZE,szTemp,SIZEOF_ARRAY(szTemp));
 
-	tbb.iBitmap		= SHELLIMAGES_COPY;
+	tbb.iBitmap		= m_imageListToolbarMappings.at(IDB_COPY_16);
 	tbb.idCommand	= TOOLBAR_ID_ORGANIZE;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_DROPDOWN;
@@ -133,7 +122,7 @@ void CManageBookmarksDialog::SetupToolbar()
 
 	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_TOOLBAR_VIEWS,szTemp,SIZEOF_ARRAY(szTemp));
 
-	tbb.iBitmap		= SHELLIMAGES_VIEWS;
+	tbb.iBitmap		= m_imageListToolbarMappings.at(IDB_VIEWS_16);
 	tbb.idCommand	= TOOLBAR_ID_VIEWS;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_DROPDOWN;
@@ -1061,7 +1050,6 @@ INT_PTR CManageBookmarksDialog::OnClose()
 INT_PTR CManageBookmarksDialog::OnDestroy()
 {
 	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
-	ImageList_Destroy(m_himlToolbar);
 
 	return 0;
 }

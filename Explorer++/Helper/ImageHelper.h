@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <wil/resource.h>
 #include <gdiplus.h>
 #include <Uxtheme.h>
 
@@ -17,5 +18,8 @@ namespace ImageHelper
 	bool HasAlpha(__in ARGB *pargb, SIZE& sizImage, int cxRow);
 	HRESULT ConvertBufferToPARGB32(HPAINTBUFFER hPaintBuffer, HDC hdc, HICON hicon, SIZE& sizIcon);
 	HBITMAP IconToBitmapPARGB32(HICON hicon, int width, int height);
-	std::unique_ptr<Gdiplus::Bitmap> LoadBitmapFromPNG(UINT resourceId, HINSTANCE instance);
+
+	wil::unique_hbitmap LoadBitmapFromPNG(HINSTANCE instance, UINT resourceId);
+	wil::unique_hicon LoadIconFromPNG(HINSTANCE instance, UINT resourceId);
+	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE instance, UINT resourceId);
 }

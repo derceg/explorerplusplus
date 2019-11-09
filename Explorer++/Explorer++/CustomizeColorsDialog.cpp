@@ -6,13 +6,12 @@
 #include "CustomizeColorsDialog.h"
 #include "ColorRuleDialog.h"
 #include "Explorer++_internal.h"
-#include "MainImages.h"
 #include "MainResource.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
-
 
 const TCHAR CCustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("CustomizeColors");
 
@@ -32,15 +31,8 @@ CCustomizeColorsDialog::~CCustomizeColorsDialog()
 
 INT_PTR CCustomizeColorsDialog::OnInitDialog()
 {
-	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
-	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(himl,hBitmap,NULL);
-
-	m_icon.reset(ImageList_GetIcon(himl,SHELLIMAGES_CUSTOMIZECOLORS,ILD_NORMAL));
+	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_CUSTOMIZE_COLORS_16);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
-
-	DeleteObject(hBitmap);
-	ImageList_Destroy(himl);
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
 

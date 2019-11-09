@@ -5,15 +5,14 @@
 #include "stdafx.h"
 #include "FilterDialog.h"
 #include "Explorer++_internal.h"
-#include "MainImages.h"
 #include "MainResource.h"
 #include "ShellBrowser/iShellView.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
 #include <list>
-
 
 const TCHAR CFilterDialogPersistentSettings::SETTINGS_KEY[] = _T("Filter");
 
@@ -35,15 +34,8 @@ CFilterDialog::~CFilterDialog()
 
 INT_PTR CFilterDialog::OnInitDialog()
 {
-	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
-	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(himl,hBitmap,NULL);
-
-	m_icon.reset(ImageList_GetIcon(himl,SHELLIMAGES_FILTER,ILD_NORMAL));
+	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_FILTER_16);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
-
-	DeleteObject(hBitmap);
-	ImageList_Destroy(himl);
 
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_FILTER_COMBOBOX);
 

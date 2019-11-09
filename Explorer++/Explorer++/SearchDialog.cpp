@@ -6,13 +6,13 @@
 #include "SearchDialog.h"
 #include "DialogHelper.h"
 #include "Explorer++_internal.h"
-#include "MainImages.h"
 #include "MainResource.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ComboBox.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
@@ -83,19 +83,12 @@ CSearchDialog::~CSearchDialog()
 
 INT_PTR CSearchDialog::OnInitDialog()
 {
-	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
-	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(himl,hBitmap,NULL);
-
-	m_icon.reset(ImageList_GetIcon(himl, SHELLIMAGES_SEARCH, ILD_NORMAL));
+	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_SEARCH_16);
 	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 
-	m_directoryIcon.reset(ImageList_GetIcon(himl,SHELLIMAGES_NEWTAB,ILD_NORMAL));
+	m_directoryIcon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_FOLDER_16);
 	SendMessage(GetDlgItem(m_hDlg,IDC_BUTTON_DIRECTORY),BM_SETIMAGE,
 		IMAGE_ICON,reinterpret_cast<LPARAM>(m_directoryIcon.get()));
-
-	DeleteObject(hBitmap);
-	ImageList_Destroy(himl);
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_SEARCHRESULTS);
 

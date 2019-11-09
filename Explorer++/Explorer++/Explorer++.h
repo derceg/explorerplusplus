@@ -581,6 +581,10 @@ private:
 
 	TaskbarThumbnails		*m_taskbarThumbnails;
 
+	/* Options dialog. */
+	wil::unique_hicon		m_optionsDialogIcon;
+	wil::unique_hicon		m_newTabDirectoryIcon;
+
 	/* Bookmarks. */
 	CBookmarkFolder *		m_bfAllBookmarks;
 	GUID					m_guidBookmarksToolbar;

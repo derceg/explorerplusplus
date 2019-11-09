@@ -8,21 +8,7 @@
 
 void SetMenuItemImage(HMENU menu, UINT menuItemId, UINT imageResourceId, std::vector<wil::unique_hbitmap> &menuImages)
 {
-	auto gdiplusBitmap = ImageHelper::LoadBitmapFromPNG(imageResourceId, GetModuleHandle(nullptr));
-
-	if (!gdiplusBitmap)
-	{
-		return;
-	}
-
-	wil::unique_hbitmap bitmap;
-	Gdiplus::Color color(0, 0, 0);
-	Gdiplus::Status status = gdiplusBitmap->GetHBITMAP(color, &bitmap);
-
-	if (status != Gdiplus::Status::Ok)
-	{
-		return;
-	}
+	wil::unique_hbitmap bitmap = ImageHelper::LoadBitmapFromPNG(GetModuleHandle(nullptr), imageResourceId);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -35,4 +21,30 @@ void SetMenuItemImage(HMENU menu, UINT menuItemId, UINT imageResourceId, std::ve
 		/* The bitmap needs to live for as long as the menu does. */
 		menuImages.push_back(std::move(bitmap));
 	}
+}
+
+std::tuple<wil::unique_himagelist, std::unordered_map<UINT, int>> CreateIconImageList(int iconSize, const std::initializer_list<UINT> &resourceIds)
+{
+	wil::unique_himagelist imageList(ImageList_Create(iconSize, iconSize, ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(resourceIds.size())));
+	std::unordered_map<UINT, int> imageListMappings;
+
+	for (auto resourceId : resourceIds)
+	{
+		AddIconToImageList(imageList.get(), resourceId, imageListMappings);
+	}
+
+	return { std::move(imageList), imageListMappings };
+}
+
+void AddIconToImageList(HIMAGELIST imageList, UINT resourceId, std::unordered_map<UINT, int> &imageListMappings)
+{
+	wil::unique_hbitmap bitmap = ImageHelper::LoadBitmapFromPNG(GetModuleHandle(nullptr), resourceId);
+	int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
+
+	if (imagePosition == -1)
+	{
+		return;
+	}
+
+	imageListMappings.insert({ resourceId, imagePosition });
 }

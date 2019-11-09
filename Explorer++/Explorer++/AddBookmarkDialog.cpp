@@ -3,14 +3,14 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include <stack>
-#include "Explorer++_internal.h"
 #include "AddBookmarkDialog.h"
-#include "MainImages.h"
 #include "BookmarkHelper.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
-#include "../Helper/WindowHelper.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/WindowHelper.h"
+#include <stack>
 
 const TCHAR CAddBookmarkDialogPersistentSettings::SETTINGS_KEY[] = _T("AddBookmark");
 
@@ -73,15 +73,8 @@ INT_PTR CAddBookmarkDialog::OnInitDialog()
 
 void CAddBookmarkDialog::SetDialogIcon()
 {
-	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,48);
-	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL),MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(himl,hBitmap,NULL);
-
-	m_icon.reset(ImageList_GetIcon(himl,SHELLIMAGES_ADDFAV,ILD_NORMAL));
+	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_ADD_BOOKMARK_16);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
-
-	DeleteObject(hBitmap);
-	ImageList_Destroy(himl);
 }
 
 void CAddBookmarkDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,

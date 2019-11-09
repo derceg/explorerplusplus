@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "ImageHelper.h"
 #include <wil/com.h>
-#include <wil/resource.h>
 
 void ImageHelper::InitBitmapInfo(__out_bcount(cbInfo) BITMAPINFO *pbmi, ULONG cbInfo, LONG cx, LONG cy, WORD bpp)
 {
@@ -187,8 +186,49 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 	return hbmp;
 }
 
+wil::unique_hbitmap ImageHelper::LoadBitmapFromPNG(HINSTANCE instance, UINT resourceId)
+{
+	auto gdiplusBitmap = LoadGdiplusBitmapFromPNG(instance, resourceId);
+
+	if (!gdiplusBitmap)
+	{
+		return nullptr;
+	}
+
+	wil::unique_hbitmap bitmap;
+	Gdiplus::Color color(0, 0, 0);
+	Gdiplus::Status status = gdiplusBitmap->GetHBITMAP(color, &bitmap);
+
+	if (status != Gdiplus::Status::Ok)
+	{
+		return nullptr;
+	}
+
+	return bitmap;
+}
+
+wil::unique_hicon ImageHelper::LoadIconFromPNG(HINSTANCE instance, UINT resourceId)
+{
+	auto gdiplusBitmap = LoadGdiplusBitmapFromPNG(instance, resourceId);
+
+	if (!gdiplusBitmap)
+	{
+		return nullptr;
+	}
+
+	wil::unique_hicon icon;
+	Gdiplus::Status status = gdiplusBitmap->GetHICON(&icon);
+
+	if (status != Gdiplus::Status::Ok)
+	{
+		return nullptr;
+	}
+
+	return icon;
+}
+
 // See https://stackoverflow.com/a/24571173.
-std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadBitmapFromPNG(UINT resourceId, HINSTANCE instance)
+std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE instance, UINT resourceId)
 {
 	HRSRC resourceHandle = FindResource(instance, MAKEINTRESOURCE(resourceId), L"PNG");
 

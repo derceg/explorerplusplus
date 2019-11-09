@@ -4,8 +4,8 @@
 
 #include "stdafx.h"
 #include "BookmarkTreeView.h"
-#include "MainImages.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/Macros.h"
 #include <stack>
 
@@ -25,11 +25,8 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
 
 	SetWindowTheme(hTreeView, L"Explorer", NULL);
 
-	m_imageList.reset(ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48));
-	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(m_imageList.get(), hBitmap, NULL);
+	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(16, { IDB_FOLDER_16 });
 	TreeView_SetImageList(hTreeView, m_imageList.get(), TVSIL_NORMAL);
-	DeleteObject(hBitmap);
 
 	SetupTreeView(guidSelected, setExpansion);
 }
@@ -222,8 +219,8 @@ HTREEITEM CBookmarkTreeView::InsertFolderIntoTreeView(HTREEITEM hParent, const C
 	TVITEMEX tviex;
 	tviex.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_CHILDREN | TVIF_SELECTEDIMAGE | TVIF_PARAM;
 	tviex.pszText = szText;
-	tviex.iImage = SHELLIMAGES_NEWTAB;
-	tviex.iSelectedImage = SHELLIMAGES_NEWTAB;
+	tviex.iImage = m_imageListMappings.at(IDB_FOLDER_16);
+	tviex.iSelectedImage = m_imageListMappings.at(IDB_FOLDER_16);
 	tviex.cChildren = nChildren;
 	tviex.lParam = m_uIDCounter;
 

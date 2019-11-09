@@ -10,10 +10,12 @@
 #include "DefaultColumns.h"
 #include "Explorer++_internal.h"
 #include "iServiceProvider.h"
+#include "MainResource.h"
 #include "MenuRanges.h"
 #include "PluginManager.h"
 #include "ShellBrowser/ViewModes.h"
 #include "../Helper/iDirectoryMonitor.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/ShellHelper.h"
 
 /* These entries correspond to shell
@@ -94,6 +96,9 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	m_pClipboardDataObject	= NULL;
 	m_iCutTabInternal		= 0;
 	m_hCutTreeViewItem		= NULL;
+
+	m_optionsDialogIcon		= ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_OPTIONS_16);
+	m_newTabDirectoryIcon	= ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_FOLDER_16);
 }
 
 Explorerplusplus::~Explorerplusplus()

@@ -10,10 +10,11 @@
 #include "CoreInterface.h"
 #include "Navigation.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/ResizableDialog.h"
-#include "../Helper/DialogSettings.h"
 #include "../Helper/Bookmark.h"
+#include "../Helper/DialogSettings.h"
+#include "../Helper/ResizableDialog.h"
 #include <wil/resource.h>
+#include <stack>
 
 class CManageBookmarksDialog;
 
@@ -147,7 +148,8 @@ private:
 	wil::unique_hicon			m_icon;
 
 	HWND						m_hToolbar;
-	HIMAGELIST					m_himlToolbar;
+	wil::unique_himagelist		m_imageListToolbar;
+	std::unordered_map<UINT, int>	m_imageListToolbarMappings;
 
 	IExplorerplusplus			*m_pexpp;
 	Navigation					*m_navigation;

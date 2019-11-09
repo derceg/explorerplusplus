@@ -4,8 +4,9 @@
 
 #include "stdafx.h"
 #include "BookmarkListView.h"
-#include "MainImages.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 
 CBookmarkListView::CBookmarkListView(HWND hListView) :
@@ -17,11 +18,8 @@ CBookmarkListView::CBookmarkListView(HWND hListView) :
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
 
-	m_imageList.reset(ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 0, 48));
-	HBITMAP hBitmap = LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_SHELLIMAGES));
-	ImageList_Add(m_imageList.get(), hBitmap, NULL);
+	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(16, {IDB_FOLDER_16, IDB_BOOKMARKS_16});
 	ListView_SetImageList(hListView, m_imageList.get(), LVSIL_SMALL);
-	DeleteObject(hBitmap);
 }
 
 void CBookmarkListView::InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder)
@@ -73,11 +71,11 @@ int CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strNam
 
 	if (bFolder)
 	{
-		iImage = SHELLIMAGES_NEWTAB;
+		iImage = m_imageListMappings.at(IDB_FOLDER_16);
 	}
 	else
 	{
-		iImage = SHELLIMAGES_FAV;
+		iImage = m_imageListMappings.at(IDB_BOOKMARKS_16);
 	}
 
 	LVITEM lvi;

@@ -6,7 +6,6 @@
 #include "MainToolbar.h"
 #include "Config.h"
 #include "DefaultToolbarButtons.h"
-#include "MainImages.h"
 #include "MainResource.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
@@ -165,24 +164,9 @@ std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(const std::unord
 {
 	std::unordered_map<int, int> imageListMappings;
 
-	for (const auto &item : buttonImageMappings)
+	for (const auto &mapping : buttonImageMappings)
 	{
-		auto gdiplusBitmap = ImageHelper::LoadBitmapFromPNG(item.second, GetModuleHandle(nullptr));
-
-		if (!gdiplusBitmap)
-		{
-			continue;
-		}
-
-		wil::unique_hbitmap bitmap;
-		Gdiplus::Color color(0, 0, 0);
-		Gdiplus::Status status = gdiplusBitmap->GetHBITMAP(color, &bitmap);
-
-		if (status != Gdiplus::Status::Ok)
-		{
-			continue;
-		}
-
+		wil::unique_hbitmap bitmap = ImageHelper::LoadBitmapFromPNG(GetModuleHandle(nullptr), mapping.second);
 		int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
 
 		if (imagePosition == -1)
@@ -190,7 +174,7 @@ std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(const std::unord
 			continue;
 		}
 
-		imageListMappings.insert({ item.first, imagePosition });
+		imageListMappings.insert({ mapping.first, imagePosition });
 	}
 
 	return imageListMappings;
