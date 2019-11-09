@@ -453,13 +453,7 @@
     <ClInclude Include="NewBookmarkFolderDialog.h">
       <Filter>Bookmarks</Filter>
     </ClInclude>
-    <ClInclude Include="NoTranslationResource.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="DefaultColumns.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="SearchDialog.h">
@@ -704,6 +698,12 @@
     </ClInclude>
     <ClInclude Include="WinUserBackwardsCompatibility.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="NoTranslationResource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
