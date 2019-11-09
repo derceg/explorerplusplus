@@ -49,7 +49,7 @@ CMassRenameDialog::~CMassRenameDialog()
 
 INT_PTR CMassRenameDialog::OnInitDialog()
 {
-	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_RENAME_16);
+	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_MASS_RENAME_16);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	m_moreIcon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_ARROW_RIGHT_16);

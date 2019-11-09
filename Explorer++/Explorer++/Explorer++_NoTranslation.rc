@@ -226,10 +226,6 @@ IDB_NEW_TAB_16          PNG                     "res\\icons\\16x16\\new-tab.png"
 
 IDB_NEW_TAB_24          PNG                     "res\\icons\\24x24\\new-tab.png"
 
-IDB_FOLDERS_16          PNG                     "res\\icons\\16x16\\folders.png"
-
-IDB_FOLDERS_24          PNG                     "res\\icons\\24x24\\folders.png"
-
 IDB_DELETE_PERMANENTLY_16 PNG                   "res\\icons\\16x16\\delete-permanently.png"
 
 IDB_DELETE_PERMANENTLY_24 PNG                   "res\\icons\\24x24\\delete-permanently.png"
@@ -285,6 +281,14 @@ IDB_COPY_TO_24          PNG                    "res\\icons\\24x24\\copy-to.png"
 IDB_MOVE_TO_16          PNG                    "res\\icons\\16x16\\move-to.png"
 
 IDB_MOVE_TO_24          PNG                    "res\\icons\\24x24\\move-to.png"
+
+IDB_MASS_RENAME_16      PNG                    "res\\icons\\16x16\\mass-rename.png"
+
+IDB_MASS_RENAME_24      PNG                    "res\\icons\\24x24\\mass-rename.png"
+
+IDB_FOLDER_TREE_16      PNG                    "res\\icons\\16x16\\folder-tree.png"
+
+IDB_FOLDER_TREE_24      PNG                    "res\\icons\\24x24\\folder-tree.png"
 
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////

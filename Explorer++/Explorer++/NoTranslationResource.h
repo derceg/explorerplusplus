@@ -28,7 +28,6 @@
 #define IDB_COMMAND_LINE_16             263
 #define IDB_SEARCH_16                   264
 #define IDB_NEW_TAB_16                  265
-#define IDB_FOLDERS_16                  266
 #define IDB_DELETE_PERMANENTLY_16       267
 #define IDB_CUT_24                      268
 #define IDB_BACK_24                     269
@@ -46,7 +45,6 @@
 #define IDB_COMMAND_LINE_24             281
 #define IDB_SEARCH_24                   282
 #define IDB_NEW_TAB_24                  283
-#define IDB_FOLDERS_24                  284
 #define IDB_DELETE_PERMANENTLY_24       285
 #define IDB_FILTER_16                   286
 #define IDB_FILTER_24                   287
@@ -74,6 +72,10 @@
 #define IDB_COPY_TO_24                  309
 #define IDB_MOVE_TO_16                  310
 #define IDB_MOVE_TO_24                  311
+#define IDB_MASS_RENAME_16              312
+#define IDB_MASS_RENAME_24              313
+#define IDB_FOLDER_TREE_16              314
+#define IDB_FOLDER_TREE_24              315
 #define IDA_NEXTTAB                     40123
 #define IDA_PREVIOUSTAB                 40125
 #define IDA_TAB_DUPLICATETAB            40247
@@ -97,7 +99,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        312
+#define _APS_NEXT_RESOURCE_VALUE        316
 #define _APS_NEXT_COMMAND_VALUE         40434
 #define _APS_NEXT_CONTROL_VALUE         1255
 #define _APS_NEXT_SYMED_VALUE           101
