@@ -302,6 +302,10 @@ IDB_MERGE_FILES_16      PNG                    "res\\icons\\16x16\\merge-files.p
 
 IDB_MERGE_FILES_24      PNG                    "res\\icons\\24x24\\merge-files.png"
 
+IDB_SELECT_COLUMNS_16   PNG                    "res\\icons\\16x16\\select-columns.png"
+
+IDB_SELECT_COLUMNS_24   PNG                    "res\\icons\\24x24\\select-columns.png"
+
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 

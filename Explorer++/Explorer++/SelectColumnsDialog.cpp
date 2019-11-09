@@ -8,11 +8,11 @@
 #include "MainResource.h"
 #include "ShellBrowser/iShellView.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include <algorithm>
 #include <functional>
-
 
 const TCHAR CSelectColumnsDialogPersistentSettings::SETTINGS_KEY[] = _T("SelectColumns");
 
@@ -35,7 +35,7 @@ CSelectColumnsDialog::~CSelectColumnsDialog()
 
 INT_PTR CSelectColumnsDialog::OnInitDialog()
 {
-	m_icon.reset(LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN)));
+	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_SELECT_COLUMNS_16);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
