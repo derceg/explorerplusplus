@@ -76,6 +76,12 @@
 #define IDB_MASS_RENAME_24              313
 #define IDB_FOLDER_TREE_16              314
 #define IDB_FOLDER_TREE_24              315
+#define IDB_CLOSE_TAB_16                316
+#define IDB_CLOSE_TAB_24                317
+#define IDB_SPLIT_FILES_16              318
+#define IDB_SPLIT_FILES_24              319
+#define IDB_MERGE_FILES_16              320
+#define IDB_MERGE_FILES_24              321
 #define IDA_NEXTTAB                     40123
 #define IDA_PREVIOUSTAB                 40125
 #define IDA_TAB_DUPLICATETAB            40247
@@ -99,7 +105,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        316
+#define _APS_NEXT_RESOURCE_VALUE        322
 #define _APS_NEXT_COMMAND_VALUE         40434
 #define _APS_NEXT_CONTROL_VALUE         1255
 #define _APS_NEXT_SYMED_VALUE           101

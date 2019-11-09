@@ -7,6 +7,7 @@
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
+#include <wil/resource.h>
 #include <list>
 #include <string>
 #include <unordered_map>
@@ -123,6 +124,8 @@ private:
 	void	OnCancel();
 	void	OnChangeOutputDirectory();
 	void	OnSplitFinished();
+
+	wil::unique_hicon m_icon;
 
 	std::wstring	m_strFullFilename;
 	bool			m_bSplittingFile;

@@ -8,6 +8,7 @@
 #include "MainResource.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
@@ -61,6 +62,9 @@ CSplitFileDialog::~CSplitFileDialog()
 
 INT_PTR CSplitFileDialog::OnInitDialog()
 {
+	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_SPLIT_FILES_16);
+	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
+
 	SHFILEINFO shfi;
 	DWORD_PTR dwRes = SHGetFileInfo(m_strFullFilename.c_str(),0,&shfi,sizeof(shfi),SHGFI_ICON);
 

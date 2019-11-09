@@ -290,6 +290,18 @@ IDB_FOLDER_TREE_16      PNG                    "res\\icons\\16x16\\folder-tree.p
 
 IDB_FOLDER_TREE_24      PNG                    "res\\icons\\24x24\\folder-tree.png"
 
+IDB_CLOSE_TAB_16        PNG                    "res\\icons\\16x16\\close-tab.png"
+
+IDB_CLOSE_TAB_24        PNG                    "res\\icons\\24x24\\close-tab.png"
+
+IDB_SPLIT_FILES_16      PNG                    "res\\icons\\16x16\\split-files.png"
+
+IDB_SPLIT_FILES_24      PNG                    "res\\icons\\24x24\\split-files.png"
+
+IDB_MERGE_FILES_16      PNG                    "res\\icons\\16x16\\merge-files.png"
+
+IDB_MERGE_FILES_24      PNG                    "res\\icons\\24x24\\merge-files.png"
+
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////
 
