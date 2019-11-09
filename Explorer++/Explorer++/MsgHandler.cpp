@@ -31,10 +31,6 @@
 amount on the left. */
 static const int TREEVIEW_X_CLEARANCE = 1;
 
-/* The offset from the top of the parent
-window to the treeview. */
-static const int TREEVIEW_Y_CLEARANCE = 20;
-
 /* The spacing between the right edge of
 the treeview and the holder window. */
 static const int TREEVIEW_HOLDER_CLEARANCE = 4;
@@ -465,9 +461,9 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 	/* The treeview is only slightly smaller than the holder
 	window, in both the x and y-directions. */
-	SetWindowPos(m_hTreeView,NULL,TREEVIEW_X_CLEARANCE,TREEVIEW_Y_CLEARANCE,
+	SetWindowPos(m_hTreeView,NULL,TREEVIEW_X_CLEARANCE,tabWindowHeight,
 		iHolderWidth - TREEVIEW_HOLDER_CLEARANCE - TREEVIEW_X_CLEARANCE,
-		iHolderHeight - TREEVIEW_Y_CLEARANCE,SWP_NOZORDER);
+		iHolderHeight - tabWindowHeight,SWP_NOZORDER);
 
 	SetWindowPos(m_hFoldersToolbar,NULL,
 		iHolderWidth + FOLDERS_TOOLBAR_X_OFFSET,FOLDERS_TOOLBAR_Y_OFFSET,
