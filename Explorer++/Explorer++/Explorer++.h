@@ -169,6 +169,7 @@ private:
 	LRESULT					HandleControlNotification(HWND hwnd, WPARAM wParam);
 	LRESULT CALLBACK		NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	BOOL					OnSize(int MainWindowWidth,int MainWindowHeight);
+	void					OnDpiChanged(const RECT *updatedWindowRect);
 	int						OnClose(void);
 	int						OnDestroy(void);
 	void					OnCopy(BOOL bCopy);

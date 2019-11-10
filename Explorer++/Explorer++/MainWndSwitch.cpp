@@ -268,6 +268,11 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		return OnSize(LOWORD(lParam),HIWORD(lParam));
 		break;
 
+	case WM_DPICHANGED:
+		OnDpiChanged(reinterpret_cast<RECT *>(lParam));
+		return 0;
+		break;
+
 	case WM_CLOSE:
 		return OnClose();
 		break;

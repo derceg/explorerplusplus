@@ -528,6 +528,13 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	return TRUE;
 }
 
+void Explorerplusplus::OnDpiChanged(const RECT *updatedWindowRect)
+{
+	SetWindowPos(m_hContainer, nullptr, updatedWindowRect->left, updatedWindowRect->top,
+		GetRectWidth(updatedWindowRect), GetRectHeight(updatedWindowRect),
+		SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
 int Explorerplusplus::OnDestroy(void)
 {
 	if(m_pClipboardDataObject != NULL)
