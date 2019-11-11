@@ -35,21 +35,10 @@ static const int TREEVIEW_X_CLEARANCE = 1;
 the treeview and the holder window. */
 static const int TREEVIEW_HOLDER_CLEARANCE = 4;
 
-/* Width and height of the toolbar on
-the folders pane. */
-static const int FOLDERS_TOOLBAR_WIDTH = 16;
-static const int FOLDERS_TOOLBAR_HEIGHT = 16;
-
-static const int FOLDERS_TOOLBAR_X_OFFSET = -20;
-static const int FOLDERS_TOOLBAR_Y_OFFSET = 3;
-
-static const int TAB_TOOLBAR_X_OFFSET = -20;
-static const int TAB_TOOLBAR_Y_OFFSET = 5;
-
-/* Width and height of the toolbar that
-appears on the tab control. */
-static const int TAB_TOOLBAR_WIDTH = 20;
-static const int TAB_TOOLBAR_HEIGHT = 20;
+const int CLOSE_TOOLBAR_WIDTH = 24;
+const int CLOSE_TOOLBAR_HEIGHT = 24;
+const int CLOSE_TOOLBAR_X_OFFSET = 4;
+const int CLOSE_TOOLBAR_Y_OFFSET = 1;
 
 void CALLBACK UninitializeCOMAPC(ULONG_PTR dwParam);
 
@@ -428,8 +417,8 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		tabWindowHeight,SWP_SHOWWINDOW|SWP_NOZORDER);
 
 	/* Tab close button. */
-	SetWindowPos(m_hTabWindowToolbar,NULL,iTabBackingWidth + TAB_TOOLBAR_X_OFFSET,
-	TAB_TOOLBAR_Y_OFFSET,TAB_TOOLBAR_WIDTH,TAB_TOOLBAR_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
+	SetWindowPos(m_hTabWindowToolbar, NULL, iTabBackingWidth - CLOSE_TOOLBAR_WIDTH - CLOSE_TOOLBAR_X_OFFSET,
+		CLOSE_TOOLBAR_Y_OFFSET, CLOSE_TOOLBAR_WIDTH, CLOSE_TOOLBAR_HEIGHT, SWP_SHOWWINDOW | SWP_NOZORDER);
 
 	if(m_config->extendTabControl &&
 		!m_config->showTabBarAtBottom)
@@ -465,9 +454,8 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		iHolderWidth - TREEVIEW_HOLDER_CLEARANCE - TREEVIEW_X_CLEARANCE,
 		iHolderHeight - tabWindowHeight,SWP_NOZORDER);
 
-	SetWindowPos(m_hFoldersToolbar,NULL,
-		iHolderWidth + FOLDERS_TOOLBAR_X_OFFSET,FOLDERS_TOOLBAR_Y_OFFSET,
-		FOLDERS_TOOLBAR_WIDTH,FOLDERS_TOOLBAR_HEIGHT,SWP_SHOWWINDOW|SWP_NOZORDER);
+	SetWindowPos(m_hFoldersToolbar, NULL, iHolderWidth - CLOSE_TOOLBAR_WIDTH - CLOSE_TOOLBAR_X_OFFSET,
+		CLOSE_TOOLBAR_Y_OFFSET, CLOSE_TOOLBAR_WIDTH, CLOSE_TOOLBAR_HEIGHT, SWP_SHOWWINDOW | SWP_NOZORDER);
 
 
 	/* <---- Display window ----> */

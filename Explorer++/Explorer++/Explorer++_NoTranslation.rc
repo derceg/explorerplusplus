@@ -45,8 +45,6 @@ IDI_DISPLAYWINDOW       ICON                    "res\\Display Window.ico"
 // Bitmap
 //
 
-IDB_TABTOOLBAR_CLOSE    BITMAP                  "res\\Tab Close.bmp"
-
 IDB_FILTERINGAPPLIED    BITMAP                  "res\\Filtering Applied.bmp"
 
 IDB_FOLDEREMPTY         BITMAP                  "res\\Folder Empty.bmp"
@@ -305,6 +303,10 @@ IDB_MERGE_FILES_24      PNG                    "res\\icons\\24x24\\merge-files.p
 IDB_SELECT_COLUMNS_16   PNG                    "res\\icons\\16x16\\select-columns.png"
 
 IDB_SELECT_COLUMNS_24   PNG                    "res\\icons\\24x24\\select-columns.png"
+
+IDB_CLOSE_BUTTON_16     PNG                    "res\\icons\\16x16\\close-button.png"
+
+IDB_CLOSE_BUTTON_24     PNG                    "res\\icons\\24x24\\close-button.png"
 
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////

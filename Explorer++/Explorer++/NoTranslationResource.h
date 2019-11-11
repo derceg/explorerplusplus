@@ -3,7 +3,6 @@
 // Used by Explorer++_NoTranslation.rc
 //
 #define IDB_FOLDERLOCKED                101
-#define IDB_TABTOOLBAR_CLOSE            102
 #define IDB_FILTERINGAPPLIED            104
 #define IDI_MAIN                        105
 #define IDI_DISPLAYWINDOW               106
@@ -84,6 +83,8 @@
 #define IDB_MERGE_FILES_24              321
 #define IDB_SELECT_COLUMNS_16           322
 #define IDB_SELECT_COLUMNS_24           323
+#define IDB_CLOSE_BUTTON_16             324
+#define IDB_CLOSE_BUTTON_24             325
 #define IDA_NEXTTAB                     40123
 #define IDA_PREVIOUSTAB                 40125
 #define IDA_TAB_DUPLICATETAB            40247
@@ -107,7 +108,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        324
+#define _APS_NEXT_RESOURCE_VALUE        326
 #define _APS_NEXT_COMMAND_VALUE         40434
 #define _APS_NEXT_CONTROL_VALUE         1255
 #define _APS_NEXT_SYMED_VALUE           101

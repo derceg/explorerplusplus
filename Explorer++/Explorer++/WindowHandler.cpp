@@ -14,6 +14,7 @@
 #include "ToolbarButtons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileContextMenuManager.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -24,16 +25,15 @@ HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 		TBSTYLE_TOOLTIPS|TBSTYLE_LIST|TBSTYLE_TRANSPARENT|TBSTYLE_FLAT|CCS_NODIVIDER|
 		CCS_NOPARENTALIGN|CCS_NORESIZE,TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DOUBLEBUFFER);
 	
-	SendMessage(TabToolbar,TB_SETBITMAPSIZE,0,MAKELONG(7,7));
+	SendMessage(TabToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
 	SendMessage(TabToolbar,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 	SendMessage(TabToolbar,TB_SETBUTTONSIZE,0,MAKELPARAM(16,16));
 
 	/* TODO: The image list is been leaked. */
-	HIMAGELIST himl = ImageList_Create(7,7,ILC_COLOR32|ILC_MASK,0,2);
-	HBITMAP hb = LoadBitmap(GetModuleHandle(0),MAKEINTRESOURCE(IDB_TABTOOLBAR_CLOSE));
-	int iIndex = ImageList_Add(himl,hb,NULL);
+	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,1);
+	wil::unique_hbitmap bitmap = ImageHelper::LoadBitmapFromPNG(GetModuleHandle(nullptr), IDB_CLOSE_BUTTON_16);
+	int iIndex = ImageList_Add(himl, bitmap.get(), nullptr);
 	SendMessage(TabToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himl));
-	DeleteObject(hb);
 
 	/* Add the close button, used to close tabs. */
 	TBBUTTON tbButton;
