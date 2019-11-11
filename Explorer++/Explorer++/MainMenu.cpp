@@ -4,50 +4,51 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Icon.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include <map>
 
-const std::map<UINT, UINT> MAIN_MENU_IMAGE_MAPPINGS = {
-	{ IDM_FILE_NEWTAB, IDB_NEW_TAB_16 },
-	{ IDM_FILE_CLOSETAB, IDB_CLOSE_TAB_16 },
-	{ IDM_FILE_OPENCOMMANDPROMPT, IDB_COMMAND_LINE_16 },
-	{ IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR, IDB_COMMAND_LINE_ADMIN_16 },
-	{ IDM_FILE_DELETE, IDB_DELETE_16 },
-	{ IDM_FILE_DELETEPERMANENTLY, IDB_DELETE_PERMANENTLY_16 },
-	{ IDM_FILE_RENAME, IDB_RENAME_16 },
-	{ IDM_FILE_PROPERTIES, IDB_PROPERTIES_16 },
+const std::map<UINT, Icon> MAIN_MENU_IMAGE_MAPPINGS = {
+	{ IDM_FILE_NEWTAB, Icon::NewTab},
+	{ IDM_FILE_CLOSETAB, Icon::CloseTab },
+	{ IDM_FILE_OPENCOMMANDPROMPT, Icon::CommandLine },
+	{ IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR, Icon::CommandLineAdmin },
+	{ IDM_FILE_DELETE, Icon::Delete },
+	{ IDM_FILE_DELETEPERMANENTLY, Icon::DeletePermanently },
+	{ IDM_FILE_RENAME, Icon::Rename },
+	{ IDM_FILE_PROPERTIES, Icon::Properties },
 
-	{ IDM_EDIT_UNDO, IDB_UNDO_16 },
-	{ IDM_EDIT_COPY, IDB_COPY_16 },
-	{ IDM_EDIT_CUT, IDB_CUT_16 },
-	{ IDM_EDIT_PASTE, IDB_PASTE_16 },
-	{ IDM_EDIT_PASTESHORTCUT, IDB_PASTE_SHORTCUT_16 },
+	{ IDM_EDIT_UNDO, Icon::Undo },
+	{ IDM_EDIT_COPY, Icon::Copy },
+	{ IDM_EDIT_CUT, Icon::Cut },
+	{ IDM_EDIT_PASTE, Icon::Paste },
+	{ IDM_EDIT_PASTESHORTCUT, Icon::PasteShortcut },
 
-	{ IDM_EDIT_COPYTOFOLDER, IDB_COPY_TO_16 },
-	{ IDM_EDIT_MOVETOFOLDER, IDB_MOVE_TO_16 },
+	{ IDM_EDIT_COPYTOFOLDER, Icon::CopyTo },
+	{ IDM_EDIT_MOVETOFOLDER, Icon::MoveTo },
 
-	{ IDM_ACTIONS_NEWFOLDER, IDB_NEW_FOLDER_16 },
-	{ IDM_ACTIONS_SPLITFILE, IDB_SPLIT_FILES_16 },
-	{ IDM_ACTIONS_MERGEFILES, IDB_MERGE_FILES_16 },
+	{ IDM_ACTIONS_NEWFOLDER, Icon::NewFolder },
+	{ IDM_ACTIONS_SPLITFILE, Icon::SplitFiles },
+	{ IDM_ACTIONS_MERGEFILES, Icon::MergeFiles },
 
-	{ IDM_VIEW_REFRESH, IDB_REFRESH_16 },
-	{ IDM_VIEW_SELECTCOLUMNS, IDB_SELECT_COLUMNS_16 },
+	{ IDM_VIEW_REFRESH, Icon::Refresh },
+	{ IDM_VIEW_SELECTCOLUMNS, Icon::SelectColumns },
 
-	{ IDM_FILTER_FILTERRESULTS, IDB_FILTER_16 },
+	{ IDM_FILTER_FILTERRESULTS, Icon::Filter },
 
-	{ IDM_GO_BACK, IDB_BACK_16 },
-	{ IDM_GO_FORWARD, IDB_FORWARD_16 },
-	{ IDM_GO_UPONELEVEL, IDB_UP_16 },
+	{ IDM_GO_BACK, Icon::Back },
+	{ IDM_GO_FORWARD, Icon::Forward },
+	{ IDM_GO_UPONELEVEL, Icon::Up },
 
-	{ IDM_BOOKMARKS_BOOKMARKTHISTAB, IDB_ADD_BOOKMARK_16 },
-	{ IDM_BOOKMARKS_MANAGEBOOKMARKS, IDB_BOOKMARKS_16 },
+	{ IDM_BOOKMARKS_BOOKMARKTHISTAB, Icon::AddBookmark },
+	{ IDM_BOOKMARKS_MANAGEBOOKMARKS, Icon::Bookmarks },
 
-	{ IDM_TOOLS_SEARCH, IDB_SEARCH_16 },
-	{ IDM_TOOLS_CUSTOMIZECOLORS, IDB_CUSTOMIZE_COLORS_16 },
-	{ IDM_TOOLS_OPTIONS, IDB_OPTIONS_16 },
+	{ IDM_TOOLS_SEARCH, Icon::Search },
+	{ IDM_TOOLS_CUSTOMIZECOLORS, Icon::CustomizeColors },
+	{ IDM_TOOLS_OPTIONS, Icon::Options },
 
-	{ IDM_HELP_HELP, IDB_HELP_16 }
+	{ IDM_HELP_HELP, Icon::Help }
 };
 
 void Explorerplusplus::InitializeMainMenu()
@@ -77,9 +78,10 @@ void Explorerplusplus::InitializeMainMenu()
 void Explorerplusplus::SetMainMenuImages()
 {
 	HMENU mainMenu = GetMenu(m_hContainer);
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hContainer);
 
 	for (const auto &mapping : MAIN_MENU_IMAGE_MAPPINGS)
 	{
-		SetMenuItemImage(mainMenu, mapping.first, mapping.second, m_menuImages);
+		SetMenuItemImage(mainMenu, mapping.first, mapping.second, dpi, m_menuImages);
 	}
 }

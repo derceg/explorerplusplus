@@ -361,6 +361,9 @@
     <ClCompile Include="MainMenu.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="IconResourceLoader.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -707,6 +710,12 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Icon.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="IconResourceLoader.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

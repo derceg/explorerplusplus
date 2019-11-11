@@ -6,6 +6,7 @@
 #include "TabContainer.h"
 #include "Config.h"
 #include "Explorer++_internal.h"
+#include "Icon.h"
 #include "MainResource.h"
 #include "Navigation.h"
 #include "RenameTabDialog.h"
@@ -26,9 +27,9 @@
 const UINT TAB_CONTROL_STYLES = WS_VISIBLE | WS_CHILD | TCS_FOCUSNEVER | TCS_SINGLELINE
 | TCS_TOOLTIPS | WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
-const std::map<UINT, UINT> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
-	{ IDM_FILE_NEWTAB, IDB_NEW_TAB_16 },
-	{ IDM_TAB_REFRESH, IDB_REFRESH_16 }
+const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
+	{ IDM_FILE_NEWTAB, Icon::NewTab },
+	{ IDM_TAB_REFRESH, Icon::Refresh }
 };
 
 TabContainer *TabContainer::Create(HWND parent, TabContainerInterface *tabContainer,
@@ -385,9 +386,11 @@ void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 
 void TabContainer::AddImagesToTabContextMenu(HMENU menu, std::vector<wil::unique_hbitmap> &menuImages)
 {
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
+
 	for (const auto &mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
 	{
-		SetMenuItemImage(menu, mapping.first, mapping.second, menuImages);
+		SetMenuItemImage(menu, mapping.first, mapping.second, dpi, menuImages);
 	}
 }
 

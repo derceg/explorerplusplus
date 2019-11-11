@@ -488,6 +488,7 @@
     <ClCompile Include="HelpFileMissingDialog.cpp" />
     <ClCompile Include="HolderWindow.cpp" />
     <ClCompile Include="IDropFilesCallback.cpp" />
+    <ClCompile Include="IconResourceLoader.cpp" />
     <ClCompile Include="IModelessDialogNotification.cpp" />
     <ClCompile Include="INewMenuClient.cpp" />
     <ClCompile Include="Initialization.cpp" />
@@ -626,6 +627,8 @@
     <ClInclude Include="HelpFileMissingDialog.h" />
     <ClInclude Include="HolderWindow.h" />
     <ClInclude Include="HolderWindowInternal.h" />
+    <ClInclude Include="Icon.h" />
+    <ClInclude Include="IconResourceLoader.h" />
     <ClInclude Include="IDropFilesCallback.h" />
     <ClInclude Include="IModelessDialogNotification.h" />
     <ClInclude Include="INewMenuClient.h" />

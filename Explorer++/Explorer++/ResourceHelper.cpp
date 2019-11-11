@@ -4,11 +4,14 @@
 
 #include "stdafx.h"
 #include "ResourceHelper.h"
+#include "IconResourceLoader.h"
 #include "../Helper/ImageHelper.h"
 
-void SetMenuItemImage(HMENU menu, UINT menuItemId, UINT imageResourceId, std::vector<wil::unique_hbitmap> &menuImages)
+const int MENU_IMAGE_SIZE_96DPI = 16;
+
+void SetMenuItemImage(HMENU menu, UINT menuItemId, Icon icon, int dpi, std::vector<wil::unique_hbitmap> &menuImages)
 {
-	wil::unique_hbitmap bitmap = ImageHelper::LoadBitmapFromPNG(GetModuleHandle(nullptr), imageResourceId);
+	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(icon, MENU_IMAGE_SIZE_96DPI, dpi);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
