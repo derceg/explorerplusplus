@@ -29,7 +29,8 @@ const UINT TAB_CONTROL_STYLES = WS_VISIBLE | WS_CHILD | TCS_FOCUSNEVER | TCS_SIN
 
 const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 	{ IDM_FILE_NEWTAB, Icon::NewTab },
-	{ IDM_TAB_REFRESH, Icon::Refresh }
+	{ IDM_TAB_REFRESH, Icon::Refresh },
+	{ IDM_TAB_CLOSETAB, Icon::CloseTab }
 };
 
 TabContainer *TabContainer::Create(HWND parent, TabContainerInterface *tabContainer,
