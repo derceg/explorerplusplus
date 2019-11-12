@@ -6,8 +6,9 @@
 #include "AddBookmarkDialog.h"
 #include "BookmarkHelper.h"
 #include "Explorer++_internal.h"
+#include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "../Helper/ImageHelper.h"
+#include "ResourceHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
 #include <stack>
@@ -73,7 +74,8 @@ INT_PTR CAddBookmarkDialog::OnInitDialog()
 
 void CAddBookmarkDialog::SetDialogIcon()
 {
-	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_ADD_BOOKMARK_16);
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
+	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::AddBookmark, DIALOG_ICON_SIZE_96DPI, dpi);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 }
 

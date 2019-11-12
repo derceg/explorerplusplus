@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "DpiCompatibility.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -69,10 +70,11 @@ private:
 
 	void	ProcessFileName(const std::wstring &strTarget,const std::wstring &strFilename,int iFileIndex,std::wstring &strOutput);
 
-	std::list<std::wstring>	m_FullFilenameList;
-	wil::unique_hicon		m_icon;
-	wil::unique_hicon		m_moreIcon;
-	CFileActionHandler		*m_pFileActionHandler;
+	std::list<std::wstring> m_FullFilenameList;
+	DpiCompatibility m_dpiCompat;
+	wil::unique_hicon m_icon;
+	wil::unique_hicon m_moreIcon;
+	CFileActionHandler *m_pFileActionHandler;
 
-	CMassRenameDialogPersistentSettings	*m_pmrdps;
+	CMassRenameDialogPersistentSettings *m_pmrdps;
 };

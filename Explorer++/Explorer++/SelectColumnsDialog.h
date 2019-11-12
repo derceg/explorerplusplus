@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
+#include "DpiCompatibility.h"
 #include "TabInterface.h"
 #include "TabContainer.h"
 #include "../Helper/BaseDialog.h"
@@ -61,12 +62,13 @@ private:
 	void	OnLvnItemChanged(NMLISTVIEW *pnmlv);
 	void	OnMoveColumn(bool bUp);
 
-	IExplorerplusplus	*m_pexpp;
-	TabContainer	*m_tabContainer;
-	TabInterface	*m_ti;
-	BOOL	m_bColumnsSwapped;
+	IExplorerplusplus *m_pexpp;
+	TabContainer *m_tabContainer;
+	TabInterface *m_ti;
+	BOOL m_bColumnsSwapped;
 
-	wil::unique_hicon	m_icon;
+	DpiCompatibility m_dpiCompat;
+	wil::unique_hicon m_icon;
 
-	CSelectColumnsDialogPersistentSettings	*m_pscdps;
+	CSelectColumnsDialogPersistentSettings *m_pscdps;
 };

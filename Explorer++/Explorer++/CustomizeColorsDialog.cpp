@@ -6,9 +6,10 @@
 #include "CustomizeColorsDialog.h"
 #include "ColorRuleDialog.h"
 #include "Explorer++_internal.h"
+#include "IconResourceLoader.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/Helper.h"
-#include "../Helper/ImageHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowHelper.h"
@@ -31,7 +32,8 @@ CCustomizeColorsDialog::~CCustomizeColorsDialog()
 
 INT_PTR CCustomizeColorsDialog::OnInitDialog()
 {
-	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_CUSTOMIZE_COLORS_16);
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
+	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::CustomizeColors, DIALOG_ICON_SIZE_96DPI, dpi);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);

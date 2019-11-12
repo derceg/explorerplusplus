@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
+#include "DpiCompatibility.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
@@ -65,8 +66,9 @@ private:
 	void				OnOk();
 	void				OnCancel();
 
-	IExplorerplusplus	*m_pexpp;
-	wil::unique_hicon	m_icon;
+	IExplorerplusplus *m_pexpp;
+	DpiCompatibility m_dpiCompat;
+	wil::unique_hicon m_icon;
 
-	CFilterDialogPersistentSettings	*m_pfdps;
+	CFilterDialogPersistentSettings *m_pfdps;
 };

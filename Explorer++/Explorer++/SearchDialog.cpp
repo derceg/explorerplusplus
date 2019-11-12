@@ -6,20 +6,20 @@
 #include "SearchDialog.h"
 #include "DialogHelper.h"
 #include "Explorer++_internal.h"
+#include "IconResourceLoader.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ComboBox.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/Helper.h"
-#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
 #include <regex>
-
 
 namespace NSearchDialog
 {
@@ -83,10 +83,11 @@ CSearchDialog::~CSearchDialog()
 
 INT_PTR CSearchDialog::OnInitDialog()
 {
-	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_SEARCH_16);
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
+	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Search, DIALOG_ICON_SIZE_96DPI, dpi);
 	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 
-	m_directoryIcon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_FOLDER_16);
+	m_directoryIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Folder, 16, dpi);
 	SendMessage(GetDlgItem(m_hDlg,IDC_BUTTON_DIRECTORY),BM_SETIMAGE,
 		IMAGE_ICON,reinterpret_cast<LPARAM>(m_directoryIcon.get()));
 

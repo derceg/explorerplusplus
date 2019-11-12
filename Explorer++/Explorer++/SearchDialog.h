@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
+#include "DpiCompatibility.h"
 #include "TabContainer.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -184,25 +185,26 @@ private:
 	void						SaveEntry(int comboBoxId, boost::circular_buffer<std::wstring> &buffer);
 	void						UpdateListViewHeader();
 
-	TCHAR						m_szSearchDirectory[MAX_PATH];
-	wil::unique_hicon			m_icon;
-	wil::unique_hicon			m_directoryIcon;
-	BOOL						m_bSearching;
-	BOOL						m_bStopSearching;
-	TCHAR						m_szSearchButton[32];
+	TCHAR m_szSearchDirectory[MAX_PATH];
+	DpiCompatibility m_dpiCompat;
+	wil::unique_hicon m_icon;
+	wil::unique_hicon m_directoryIcon;
+	BOOL m_bSearching;
+	BOOL m_bStopSearching;
+	TCHAR m_szSearchButton[32];
 
-	CSearch						*m_pSearch;
+	CSearch *m_pSearch;
 
 	/* Listview item information. */
-	std::list<LPITEMIDLIST>		m_AwaitingSearchItems;
-	std::unordered_map<int,std::wstring>	m_SearchItemsMapInternal;
-	int							m_iInternalIndex;
-	int							m_iPreviousSelectedColumn;
+	std::list<LPITEMIDLIST> m_AwaitingSearchItems;
+	std::unordered_map<int,std::wstring> m_SearchItemsMapInternal;
+	int m_iInternalIndex;
+	int m_iPreviousSelectedColumn;
 
-	BOOL						m_bSetSearchTimer;
+	BOOL m_bSetSearchTimer;
 
-	IExplorerplusplus			*m_pexpp;
-	TabContainer				*m_tabContainer;
+	IExplorerplusplus *m_pexpp;
+	TabContainer *m_tabContainer;
 
-	CSearchDialogPersistentSettings	*m_sdps;
+	CSearchDialogPersistentSettings *m_sdps;
 };

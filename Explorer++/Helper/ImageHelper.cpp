@@ -207,26 +207,6 @@ wil::unique_hbitmap ImageHelper::LoadBitmapFromPNG(HINSTANCE instance, UINT reso
 	return bitmap;
 }
 
-wil::unique_hicon ImageHelper::LoadIconFromPNG(HINSTANCE instance, UINT resourceId)
-{
-	auto gdiplusBitmap = LoadGdiplusBitmapFromPNG(instance, resourceId);
-
-	if (!gdiplusBitmap)
-	{
-		return nullptr;
-	}
-
-	wil::unique_hicon icon;
-	Gdiplus::Status status = gdiplusBitmap->GetHICON(&icon);
-
-	if (status != Gdiplus::Status::Ok)
-	{
-		return nullptr;
-	}
-
-	return icon;
-}
-
 // See https://stackoverflow.com/a/24571173.
 std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE instance, UINT resourceId)
 {

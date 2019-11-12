@@ -20,6 +20,5 @@ namespace ImageHelper
 	HBITMAP IconToBitmapPARGB32(HICON hicon, int width, int height);
 
 	wil::unique_hbitmap LoadBitmapFromPNG(HINSTANCE instance, UINT resourceId);
-	wil::unique_hicon LoadIconFromPNG(HINSTANCE instance, UINT resourceId);
 	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE instance, UINT resourceId);
 }

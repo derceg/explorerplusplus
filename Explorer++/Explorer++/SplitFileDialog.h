@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "DpiCompatibility.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
@@ -125,21 +126,22 @@ private:
 	void	OnChangeOutputDirectory();
 	void	OnSplitFinished();
 
+	DpiCompatibility m_dpiCompat;
 	wil::unique_hicon m_icon;
 
-	std::wstring	m_strFullFilename;
-	bool			m_bSplittingFile;
-	bool			m_bStopSplitting;
+	std::wstring m_strFullFilename;
+	bool m_bSplittingFile;
+	bool m_bStopSplitting;
 
-	std::unordered_map<int,SizeType_t>	m_SizeMap;
+	std::unordered_map<int,SizeType_t> m_SizeMap;
 
-	CSplitFile		*m_pSplitFile;
-	HFONT			m_hHelperTextFont;
+	CSplitFile *m_pSplitFile;
+	HFONT m_hHelperTextFont;
 
-	TCHAR			m_szOk[32];
-	UINT			m_uElapsedTime;
+	TCHAR m_szOk[32];
+	UINT m_uElapsedTime;
 
-	ErrorType_t		m_CurrentError;
+	ErrorType_t m_CurrentError;
 
-	CSplitFileDialogPersistentSettings	*m_psfdps;
+	CSplitFileDialogPersistentSettings *m_psfdps;
 };

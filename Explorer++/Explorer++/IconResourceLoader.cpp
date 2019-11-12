@@ -285,6 +285,26 @@ wil::unique_hbitmap IconResourceLoader::LoadBitmapFromPNGForDpi(Icon icon, int i
 	return bitmap;
 }
 
+wil::unique_hicon IconResourceLoader::LoadIconFromPNGForDpi(Icon icon, int iconSize, int dpi)
+{
+	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGForDpi(icon, iconSize, dpi);
+
+	if (!gdiplusBitmap)
+	{
+		return nullptr;
+	}
+
+	wil::unique_hicon hicon;
+	Gdiplus::Status status = gdiplusBitmap->GetHICON(&hicon);
+
+	if (status != Gdiplus::Status::Ok)
+	{
+		return nullptr;
+	}
+
+	return hicon;
+}
+
 // This function is based on the steps performed by https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric
 // when loading an icon (see the remarks section on that page for details).
 std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGForDpi(Icon icon, int iconSize, int dpi)

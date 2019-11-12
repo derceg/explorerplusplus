@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "DpiCompatibility.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -79,16 +80,17 @@ private:
 	void	OnMove(bool bUp);
 	void	OnFinished();
 
-	std::wstring			m_strOutputDirectory;
-	std::list<std::wstring>	m_FullFilenameList;
-	BOOL					m_bShowFriendlyDates;
+	std::wstring m_strOutputDirectory;
+	std::list<std::wstring> m_FullFilenameList;
+	BOOL m_bShowFriendlyDates;
 
-	CMergeFiles				*m_pMergeFiles;
-	bool					m_bMergingFiles;
-	bool					m_bStopMerging;
-	TCHAR					m_szOk[32];
+	CMergeFiles *m_pMergeFiles;
+	bool m_bMergingFiles;
+	bool m_bStopMerging;
+	TCHAR m_szOk[32];
 
-	wil::unique_hicon		m_icon;
+	DpiCompatibility m_dpiCompat;
+	wil::unique_hicon m_icon;
 
-	CMergeFilesDialogPersistentSettings	*m_pmfdps;
+	CMergeFilesDialogPersistentSettings *m_pmfdps;
 };

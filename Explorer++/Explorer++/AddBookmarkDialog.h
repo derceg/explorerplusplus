@@ -4,14 +4,15 @@
 
 #pragma once
 
-#include <unordered_set>
 #include "BookmarkHelper.h"
 #include "BookmarkTreeView.h"
+#include "DpiCompatibility.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/ResizableDialog.h"
-#include "../Helper/DialogSettings.h"
 #include "../Helper/Bookmark.h"
+#include "../Helper/DialogSettings.h"
+#include "../Helper/ResizableDialog.h"
 #include <wil/resource.h>
+#include <unordered_set>
 
 class CAddBookmarkDialog;
 
@@ -79,14 +80,15 @@ private:
 	void		SaveTreeViewState();
 	void		SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hItem);
 
-	wil::unique_hicon	m_icon;
+	DpiCompatibility m_dpiCompat;
+	wil::unique_hicon m_icon;
 
-	CBookmarkFolder	&m_AllBookmarks;
-	CBookmark		&m_Bookmark;
+	CBookmarkFolder &m_AllBookmarks;
+	CBookmark &m_Bookmark;
 
-	CBookmarkTreeView	*m_pBookmarkTreeView;
+	CBookmarkTreeView *m_pBookmarkTreeView;
 
-	HBRUSH		m_ErrorBrush;
+	HBRUSH m_ErrorBrush;
 
-	CAddBookmarkDialogPersistentSettings	*m_pabdps;
+	CAddBookmarkDialogPersistentSettings *m_pabdps;
 };

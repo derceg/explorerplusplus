@@ -8,6 +8,7 @@
 #include "BookmarkListView.h"
 #include "BookmarkTreeView.h"
 #include "CoreInterface.h"
+#include "DpiCompatibility.h"
 #include "Navigation.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/Bookmark.h"
@@ -145,30 +146,31 @@ private:
 	void		OnOk();
 	void		OnCancel();
 
-	wil::unique_hicon			m_icon;
+	DpiCompatibility m_dpiCompat;
+	wil::unique_hicon m_icon;
 
-	HWND						m_hToolbar;
-	wil::unique_himagelist		m_imageListToolbar;
-	std::unordered_map<UINT, int>	m_imageListToolbarMappings;
+	HWND m_hToolbar;
+	wil::unique_himagelist m_imageListToolbar;
+	std::unordered_map<UINT, int> m_imageListToolbarMappings;
 
-	IExplorerplusplus			*m_pexpp;
-	Navigation					*m_navigation;
+	IExplorerplusplus *m_pexpp;
+	Navigation *m_navigation;
 
-	CBookmarkFolder				&m_AllBookmarks;
+	CBookmarkFolder &m_AllBookmarks;
 
-	GUID						m_guidCurrentFolder;
+	GUID m_guidCurrentFolder;
 
-	bool						m_bNewFolderAdded;
-	GUID						m_guidNewFolder;
+	bool m_bNewFolderAdded;
+	GUID m_guidNewFolder;
 
-	std::stack<GUID>			m_stackBack;
-	std::stack<GUID>			m_stackForward;
-	bool						m_bSaveHistory;
+	std::stack<GUID> m_stackBack;
+	std::stack<GUID> m_stackForward;
+	bool m_bSaveHistory;
 
-	CBookmarkTreeView			*m_pBookmarkTreeView;
+	CBookmarkTreeView *m_pBookmarkTreeView;
 
-	bool						m_bListViewInitialized;
-	CBookmarkListView			*m_pBookmarkListView;
+	bool m_bListViewInitialized;
+	CBookmarkListView *m_pBookmarkListView;
 
-	CManageBookmarksDialogPersistentSettings	*m_pmbdps;
+	CManageBookmarksDialogPersistentSettings *m_pmbdps;
 };

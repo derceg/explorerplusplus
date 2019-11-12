@@ -5,10 +5,11 @@
 #include "stdafx.h"
 #include "FilterDialog.h"
 #include "Explorer++_internal.h"
+#include "IconResourceLoader.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/iShellView.h"
 #include "../Helper/Helper.h"
-#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
@@ -34,7 +35,8 @@ CFilterDialog::~CFilterDialog()
 
 INT_PTR CFilterDialog::OnInitDialog()
 {
-	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_FILTER_16);
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
+	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Filter, DIALOG_ICON_SIZE_96DPI, dpi);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_FILTER_COMBOBOX);

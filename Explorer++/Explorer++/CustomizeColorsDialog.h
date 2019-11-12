@@ -7,6 +7,7 @@
 #include <vector>
 #include "Explorer++_internal.h"
 #include "ColorRuleHelper.h"
+#include "DpiCompatibility.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -63,9 +64,10 @@ private:
 	void	OnOk();
 	void	OnCancel();
 
-	wil::unique_hicon	m_icon;
+	DpiCompatibility m_dpiCompat;
+	wil::unique_hicon m_icon;
 
-	std::vector<NColorRuleHelper::ColorRule_t>	*m_pColorRuleList;
+	std::vector<NColorRuleHelper::ColorRule_t> *m_pColorRuleList;
 
-	CCustomizeColorsDialogPersistentSettings	*m_pccdps;
+	CCustomizeColorsDialogPersistentSettings *m_pccdps;
 };

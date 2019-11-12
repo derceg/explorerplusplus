@@ -5,10 +5,11 @@
 #include "stdafx.h"
 #include "SplitFileDialog.h"
 #include "Explorer++_internal.h"
+#include "IconResourceLoader.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
-#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/ShellHelper.h"
@@ -62,7 +63,8 @@ CSplitFileDialog::~CSplitFileDialog()
 
 INT_PTR CSplitFileDialog::OnInitDialog()
 {
-	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_SPLIT_FILES_16);
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
+	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::SplitFiles, DIALOG_ICON_SIZE_96DPI, dpi);
 	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	SHFILEINFO shfi;

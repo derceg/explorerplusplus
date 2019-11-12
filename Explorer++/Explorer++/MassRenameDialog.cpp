@@ -16,8 +16,9 @@
 #include "stdafx.h"
 #include "MassRenameDialog.h"
 #include "Explorer++_internal.h"
+#include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "../Helper/ImageHelper.h"
+#include "ResourceHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"
 #include "../Helper/XMLSettings.h"
@@ -49,10 +50,11 @@ CMassRenameDialog::~CMassRenameDialog()
 
 INT_PTR CMassRenameDialog::OnInitDialog()
 {
-	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_MASS_RENAME_16);
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
+	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::MassRename, DIALOG_ICON_SIZE_96DPI, dpi);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
-	m_moreIcon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_ARROW_RIGHT_16);
+	m_moreIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::ArrowRight, 16, dpi);
 	SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_MORE,BM_SETIMAGE,IMAGE_ICON,
 		reinterpret_cast<LPARAM>(m_moreIcon.get()));
 

@@ -5,10 +5,11 @@
 #include "stdafx.h"
 #include "MergeFilesDialog.h"
 #include "Explorer++_internal.h"
+#include "IconResourceLoader.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
-#include "../Helper/ImageHelper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
@@ -61,7 +62,8 @@ bool CompareFilenames(std::wstring strFirst,std::wstring strSecond)
 
 INT_PTR CMergeFilesDialog::OnInitDialog()
 {
-	m_icon = ImageHelper::LoadIconFromPNG(GetModuleHandle(nullptr), IDB_MERGE_FILES_16);
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
+	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::MergeFiles, DIALOG_ICON_SIZE_96DPI, dpi);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	std::wregex rxPattern;
