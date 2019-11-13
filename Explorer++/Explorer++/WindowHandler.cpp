@@ -9,12 +9,12 @@
 #include "Config.h"
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
+#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "MainToolbar.h"
 #include "ToolbarButtons.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileContextMenuManager.h"
-#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -24,14 +24,17 @@ HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 	HWND TabToolbar = CreateToolbar(hParent,WS_CHILD|WS_VISIBLE|WS_CLIPSIBLINGS|
 		TBSTYLE_TOOLTIPS|TBSTYLE_LIST|TBSTYLE_TRANSPARENT|TBSTYLE_FLAT|CCS_NODIVIDER|
 		CCS_NOPARENTALIGN|CCS_NORESIZE,TBSTYLE_EX_MIXEDBUTTONS|TBSTYLE_EX_DOUBLEBUFFER);
+
+	UINT dpi = m_dpiCompat.GetDpiForWindow(TabToolbar);
+	int scaledIconSize = MulDiv(16, dpi, USER_DEFAULT_SCREEN_DPI);
 	
-	SendMessage(TabToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
+	SendMessage(TabToolbar,TB_SETBITMAPSIZE,0,MAKELONG(scaledIconSize,scaledIconSize));
 	SendMessage(TabToolbar,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
-	SendMessage(TabToolbar,TB_SETBUTTONSIZE,0,MAKELPARAM(16,16));
+	SendMessage(TabToolbar,TB_SETBUTTONSIZE,0,MAKELPARAM(scaledIconSize,scaledIconSize));
 
 	/* TODO: The image list is been leaked. */
-	HIMAGELIST himl = ImageList_Create(16,16,ILC_COLOR32|ILC_MASK,0,1);
-	wil::unique_hbitmap bitmap = ImageHelper::LoadBitmapFromPNG(GetModuleHandle(nullptr), IDB_CLOSE_BUTTON_16);
+	HIMAGELIST himl = ImageList_Create(scaledIconSize,scaledIconSize,ILC_COLOR32|ILC_MASK,0,1);
+	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(Icon::CloseButton, 16, dpi);
 	int iIndex = ImageList_Add(himl, bitmap.get(), nullptr);
 	SendMessage(TabToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himl));
 

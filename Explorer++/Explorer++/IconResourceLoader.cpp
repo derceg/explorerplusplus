@@ -39,6 +39,13 @@ const std::unordered_map<Icon, std::map<int, UINT>> ICON_RESOURCE_MAPPINGS = {
 		}
 	},
 	{
+		Icon::CloseButton,
+		{
+			{16, IDB_CLOSE_BUTTON_16},
+			{24, IDB_CLOSE_BUTTON_24}
+		}
+	},
+	{
 		Icon::CloseTab,
 		{
 			{16, IDB_CLOSE_TAB_16},

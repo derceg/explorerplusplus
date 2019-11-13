@@ -19,6 +19,5 @@ namespace ImageHelper
 	HRESULT ConvertBufferToPARGB32(HPAINTBUFFER hPaintBuffer, HDC hdc, HICON hicon, SIZE& sizIcon);
 	HBITMAP IconToBitmapPARGB32(HICON hicon, int width, int height);
 
-	wil::unique_hbitmap LoadBitmapFromPNG(HINSTANCE instance, UINT resourceId);
 	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNG(HINSTANCE instance, UINT resourceId);
 }

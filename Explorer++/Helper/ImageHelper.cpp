@@ -186,27 +186,6 @@ HBITMAP ImageHelper::IconToBitmapPARGB32(HICON hicon, int width, int height)
 	return hbmp;
 }
 
-wil::unique_hbitmap ImageHelper::LoadBitmapFromPNG(HINSTANCE instance, UINT resourceId)
-{
-	auto gdiplusBitmap = LoadGdiplusBitmapFromPNG(instance, resourceId);
-
-	if (!gdiplusBitmap)
-	{
-		return nullptr;
-	}
-
-	wil::unique_hbitmap bitmap;
-	Gdiplus::Color color(0, 0, 0);
-	Gdiplus::Status status = gdiplusBitmap->GetHBITMAP(color, &bitmap);
-
-	if (status != Gdiplus::Status::Ok)
-	{
-		return nullptr;
-	}
-
-	return bitmap;
-}
-
 // See https://stackoverflow.com/a/24571173.
 std::unique_ptr<Gdiplus::Bitmap> ImageHelper::LoadGdiplusBitmapFromPNG(HINSTANCE instance, UINT resourceId)
 {

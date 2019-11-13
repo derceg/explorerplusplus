@@ -10,6 +10,7 @@ enum class Icon
 	ArrowRight,
 	Back,
 	Bookmarks,
+	CloseButton,
 	CloseTab,
 	CommandLine,
 	CommandLineAdmin,

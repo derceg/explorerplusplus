@@ -416,9 +416,16 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	SetWindowPos(m_tabContainer->GetHWND(),NULL,0,0,iTabBackingWidth - 25,
 		tabWindowHeight,SWP_SHOWWINDOW|SWP_NOZORDER);
 
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hContainer);
+
 	/* Tab close button. */
-	SetWindowPos(m_hTabWindowToolbar, NULL, iTabBackingWidth - CLOSE_TOOLBAR_WIDTH - CLOSE_TOOLBAR_X_OFFSET,
-		CLOSE_TOOLBAR_Y_OFFSET, CLOSE_TOOLBAR_WIDTH, CLOSE_TOOLBAR_HEIGHT, SWP_SHOWWINDOW | SWP_NOZORDER);
+	int scaledCloseToolbarWidth = MulDiv(CLOSE_TOOLBAR_WIDTH, dpi, USER_DEFAULT_SCREEN_DPI);
+	int scaledCloseToolbarHeight = MulDiv(CLOSE_TOOLBAR_HEIGHT, dpi, USER_DEFAULT_SCREEN_DPI);
+	int scaledCloseToolbarXOffset = MulDiv(CLOSE_TOOLBAR_X_OFFSET, dpi, USER_DEFAULT_SCREEN_DPI);
+	int scaledCloseToolbarYOffset = MulDiv(CLOSE_TOOLBAR_Y_OFFSET, dpi, USER_DEFAULT_SCREEN_DPI);
+
+	SetWindowPos(m_hTabWindowToolbar, NULL, iTabBackingWidth - scaledCloseToolbarWidth - scaledCloseToolbarXOffset,
+		scaledCloseToolbarYOffset, scaledCloseToolbarWidth, scaledCloseToolbarHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 
 	if(m_config->extendTabControl &&
 		!m_config->showTabBarAtBottom)
@@ -454,8 +461,8 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		iHolderWidth - TREEVIEW_HOLDER_CLEARANCE - TREEVIEW_X_CLEARANCE,
 		iHolderHeight - tabWindowHeight,SWP_NOZORDER);
 
-	SetWindowPos(m_hFoldersToolbar, NULL, iHolderWidth - CLOSE_TOOLBAR_WIDTH - CLOSE_TOOLBAR_X_OFFSET,
-		CLOSE_TOOLBAR_Y_OFFSET, CLOSE_TOOLBAR_WIDTH, CLOSE_TOOLBAR_HEIGHT, SWP_SHOWWINDOW | SWP_NOZORDER);
+	SetWindowPos(m_hFoldersToolbar, NULL, iHolderWidth - scaledCloseToolbarWidth - scaledCloseToolbarXOffset,
+		scaledCloseToolbarYOffset, scaledCloseToolbarWidth, scaledCloseToolbarHeight, SWP_SHOWWINDOW | SWP_NOZORDER);
 
 
 	/* <---- Display window ----> */
