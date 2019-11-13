@@ -5,6 +5,8 @@
 #pragma once
 
 #include "BookmarkHelper.h"
+#include "DpiCompatibility.h"
+#include "ResourceHelper.h"
 #include "../Helper/Bookmark.h"
 #include <wil/resource.h>
 #include <unordered_map>
@@ -56,18 +58,19 @@ private:
 
 	void							OnRClick(NMHDR *pnmhdr);
 
-	HWND							m_hTreeView;
-	wil::unique_himagelist			m_imageList;
-	std::unordered_map<UINT, int>	m_imageListMappings;
+	HWND m_hTreeView;
+	DpiCompatibility m_dpiCompat;
+	wil::unique_himagelist m_imageList;
+	IconImageListMapping m_imageListMappings;
 
-	HINSTANCE						m_instance;
+	HINSTANCE m_instance;
 
-	CBookmarkFolder					*m_pAllBookmarks;
+	CBookmarkFolder *m_pAllBookmarks;
 
-	std::unordered_map<UINT, GUID>	m_mapID;
-	ItemMap_t						m_mapItem;
-	UINT							m_uIDCounter;
+	std::unordered_map<UINT, GUID> m_mapID;
+	ItemMap_t m_mapItem;
+	UINT m_uIDCounter;
 
-	bool							m_bNewFolderCreated;
-	GUID							m_NewFolderGUID;
+	bool m_bNewFolderCreated;
+	GUID m_NewFolderGUID;
 };

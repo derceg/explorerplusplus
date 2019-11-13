@@ -6,7 +6,9 @@
 
 #include "BookmarkHelper.h"
 #include "CoreInterface.h"
+#include "DpiCompatibility.h"
 #include "Navigation.h"
+#include "ResourceHelper.h"
 #include "../Helper/Bookmark.h"
 #include <boost/optional.hpp>
 #include <wil/resource.h>
@@ -108,24 +110,25 @@ private:
 
 	VariantBookmark	*GetBookmarkItemFromToolbarIndex(int index);
 
-	HWND							m_hToolbar;
-	wil::unique_himagelist			m_imageList;
-	std::unordered_map<UINT, int>	m_imageListMappings;
+	HWND m_hToolbar;
+	DpiCompatibility m_dpiCompat;
+	wil::unique_himagelist m_imageList;
+	IconImageListMapping m_imageListMappings;
 
-	HINSTANCE						m_instance;
+	HINSTANCE m_instance;
 
-	IExplorerplusplus				*m_pexpp;
-	Navigation						*m_navigation;
+	IExplorerplusplus *m_pexpp;
+	Navigation *m_navigation;
 
-	CBookmarkFolder					&m_AllBookmarks;
-	GUID							m_guidBookmarksToolbar;
+	CBookmarkFolder &m_AllBookmarks;
+	GUID m_guidBookmarksToolbar;
 
-	std::unordered_map<UINT,GUID>	m_mapID;
-	UINT							m_uIDStart;
-	UINT							m_uIDEnd;
-	UINT							m_uIDCounter;
+	std::unordered_map<UINT,GUID> m_mapID;
+	UINT m_uIDStart;
+	UINT m_uIDEnd;
+	UINT m_uIDCounter;
 
-	CBookmarksToolbarDropHandler	*m_pbtdh;
+	CBookmarksToolbarDropHandler *m_pbtdh;
 
-	std::vector<boost::signals2::scoped_connection>	m_connections;
+	std::vector<boost::signals2::scoped_connection> m_connections;
 };

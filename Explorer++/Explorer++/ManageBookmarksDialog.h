@@ -10,6 +10,7 @@
 #include "CoreInterface.h"
 #include "DpiCompatibility.h"
 #include "Navigation.h"
+#include "ResourceHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/DialogSettings.h"
@@ -151,7 +152,7 @@ private:
 
 	HWND m_hToolbar;
 	wil::unique_himagelist m_imageListToolbar;
-	std::unordered_map<UINT, int> m_imageListToolbarMappings;
+	IconImageListMapping m_imageListToolbarMappings;
 
 	IExplorerplusplus *m_pexpp;
 	Navigation *m_navigation;

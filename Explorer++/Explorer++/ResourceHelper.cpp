@@ -26,22 +26,23 @@ void SetMenuItemImage(HMENU menu, UINT menuItemId, Icon icon, int dpi, std::vect
 	}
 }
 
-std::tuple<wil::unique_himagelist, std::unordered_map<UINT, int>> CreateIconImageList(int iconSize, const std::initializer_list<UINT> &resourceIds)
+std::tuple<wil::unique_himagelist, IconImageListMapping> CreateIconImageList(int iconSize, int dpi, const std::initializer_list<Icon> &icons)
 {
-	wil::unique_himagelist imageList(ImageList_Create(iconSize, iconSize, ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(resourceIds.size())));
-	std::unordered_map<UINT, int> imageListMappings;
+	int scaledIconSize = MulDiv(iconSize, dpi, USER_DEFAULT_SCREEN_DPI);
+	wil::unique_himagelist imageList(ImageList_Create(scaledIconSize, scaledIconSize, ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(icons.size())));
+	IconImageListMapping imageListMappings;
 
-	for (auto resourceId : resourceIds)
+	for (auto icon : icons)
 	{
-		AddIconToImageList(imageList.get(), resourceId, imageListMappings);
+		AddIconToImageList(imageList.get(), icon, iconSize, dpi, imageListMappings);
 	}
 
 	return { std::move(imageList), imageListMappings };
 }
 
-void AddIconToImageList(HIMAGELIST imageList, UINT resourceId, std::unordered_map<UINT, int> &imageListMappings)
+void AddIconToImageList(HIMAGELIST imageList, Icon icon, int iconSize, int dpi, IconImageListMapping &imageListMappings)
 {
-	wil::unique_hbitmap bitmap = ImageHelper::LoadBitmapFromPNG(GetModuleHandle(nullptr), resourceId);
+	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(icon, iconSize, dpi);
 	int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
 
 	if (imagePosition == -1)
@@ -49,5 +50,5 @@ void AddIconToImageList(HIMAGELIST imageList, UINT resourceId, std::unordered_ma
 		return;
 	}
 
-	imageListMappings.insert({ resourceId, imagePosition });
+	imageListMappings.insert({ icon, imagePosition });
 }

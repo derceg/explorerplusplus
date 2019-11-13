@@ -5,6 +5,8 @@
 #pragma once
 
 #include "BookmarkHelper.h"
+#include "DpiCompatibility.h"
+#include "ResourceHelper.h"
 #include "../Helper/Bookmark.h"
 #include <wil/resource.h>
 #include <unordered_map>
@@ -25,10 +27,11 @@ private:
 
 	int								InsertBookmarkItemIntoListView(const std::wstring &strName, const GUID &guid, bool bFolder, int iPosition);
 
-	HWND							m_hListView;
-	wil::unique_himagelist			m_imageList;
-	std::unordered_map<UINT, int>	m_imageListMappings;
+	HWND m_hListView;
+	DpiCompatibility m_dpiCompat;
+	wil::unique_himagelist m_imageList;
+	IconImageListMapping m_imageListMappings;
 
-	std::unordered_map<UINT, GUID>	m_mapID;
-	UINT							m_uIDCounter;
+	std::unordered_map<UINT, GUID> m_mapID;
+	UINT m_uIDCounter;
 };

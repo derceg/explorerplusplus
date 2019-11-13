@@ -8,7 +8,6 @@
 #include "Explorer++_internal.h"
 #include "IconResourceLoader.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
 #include "../Helper/Controls.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
@@ -85,7 +84,8 @@ void CManageBookmarksDialog::SetupToolbar()
 	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
 	SendMessage(m_hToolbar,TB_BUTTONSTRUCTSIZE,static_cast<WPARAM>(sizeof(TBBUTTON)),0);
 
-	std::tie(m_imageListToolbar, m_imageListToolbarMappings) = CreateIconImageList(16, { IDB_BACK_16, IDB_FORWARD_16, IDB_COPY_16, IDB_VIEWS_16 });
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hToolbar);
+	std::tie(m_imageListToolbar, m_imageListToolbarMappings) = CreateIconImageList(16, dpi, { Icon::Back, Icon::Forward, Icon::Copy, Icon::Views});
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageListToolbar.get()));
 
 	TBBUTTON tbb;
@@ -93,7 +93,7 @@ void CManageBookmarksDialog::SetupToolbar()
 
 	LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_BACK, szTemp, SIZEOF_ARRAY(szTemp));
 
-	tbb.iBitmap		= m_imageListToolbarMappings.at(IDB_BACK_16);
+	tbb.iBitmap		= m_imageListToolbarMappings.at(Icon::Back);
 	tbb.idCommand	= TOOLBAR_ID_BACK;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE;
@@ -103,7 +103,7 @@ void CManageBookmarksDialog::SetupToolbar()
 
 	LoadString(GetInstance(), IDS_MANAGE_BOOKMARKS_TOOLBAR_FORWARD, szTemp, SIZEOF_ARRAY(szTemp));
 
-	tbb.iBitmap		= m_imageListToolbarMappings.at(IDB_FORWARD_16);
+	tbb.iBitmap		= m_imageListToolbarMappings.at(Icon::Forward);
 	tbb.idCommand	= TOOLBAR_ID_FORWARD;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE;
@@ -113,7 +113,7 @@ void CManageBookmarksDialog::SetupToolbar()
 
 	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_TOOLBAR_ORGANIZE,szTemp,SIZEOF_ARRAY(szTemp));
 
-	tbb.iBitmap		= m_imageListToolbarMappings.at(IDB_COPY_16);
+	tbb.iBitmap		= m_imageListToolbarMappings.at(Icon::Copy);
 	tbb.idCommand	= TOOLBAR_ID_ORGANIZE;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_DROPDOWN;
@@ -123,7 +123,7 @@ void CManageBookmarksDialog::SetupToolbar()
 
 	LoadString(GetInstance(),IDS_MANAGE_BOOKMARKS_TOOLBAR_VIEWS,szTemp,SIZEOF_ARRAY(szTemp));
 
-	tbb.iBitmap		= m_imageListToolbarMappings.at(IDB_VIEWS_16);
+	tbb.iBitmap		= m_imageListToolbarMappings.at(Icon::Views);
 	tbb.idCommand	= TOOLBAR_ID_VIEWS;
 	tbb.fsState		= TBSTATE_ENABLED;
 	tbb.fsStyle		= BTNS_BUTTON|BTNS_AUTOSIZE|BTNS_SHOWTEXT|BTNS_DROPDOWN;

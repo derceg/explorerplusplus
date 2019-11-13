@@ -7,7 +7,6 @@
 #include "AddBookmarkDialog.h"
 #include "BookmarkMenu.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
 #include "../Helper/MenuWrapper.h"
@@ -38,7 +37,8 @@ void CBookmarksToolbar::InitializeToolbar()
 	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
 	SendMessage(m_hToolbar,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 
-	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(16, { IDB_FOLDER_16, IDB_BOOKMARKS_16 });
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hToolbar);
+	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(16, dpi, { Icon::Folder, Icon::Bookmarks});
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageList.get()));
 
 	m_pbtdh = new CBookmarksToolbarDropHandler(m_hToolbar,m_AllBookmarks,m_guidBookmarksToolbar);
@@ -472,11 +472,11 @@ void CBookmarksToolbar::InsertBookmarkItem(const std::wstring &strName,
 
 	if(bFolder)
 	{
-		iImage = m_imageListMappings.at(IDB_FOLDER_16);
+		iImage = m_imageListMappings.at(Icon::Folder);
 	}
 	else
 	{
-		iImage = m_imageListMappings.at(IDB_BOOKMARKS_16);
+		iImage = m_imageListMappings.at(Icon::Bookmarks);
 	}
 
 	TBBUTTON tbb;

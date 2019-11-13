@@ -5,8 +5,6 @@
 #include "stdafx.h"
 #include "BookmarkListView.h"
 #include "MainResource.h"
-#include "ResourceHelper.h"
-#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 
 CBookmarkListView::CBookmarkListView(HWND hListView) :
@@ -18,7 +16,8 @@ CBookmarkListView::CBookmarkListView(HWND hListView) :
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT,
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
 
-	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(16, {IDB_FOLDER_16, IDB_BOOKMARKS_16});
+	UINT dpi = m_dpiCompat.GetDpiForWindow(hListView);
+	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(16, dpi, {Icon::Folder, Icon::Bookmarks});
 	ListView_SetImageList(hListView, m_imageList.get(), LVSIL_SMALL);
 }
 
@@ -71,11 +70,11 @@ int CBookmarkListView::InsertBookmarkItemIntoListView(const std::wstring &strNam
 
 	if (bFolder)
 	{
-		iImage = m_imageListMappings.at(IDB_FOLDER_16);
+		iImage = m_imageListMappings.at(Icon::Folder);
 	}
 	else
 	{
-		iImage = m_imageListMappings.at(IDB_BOOKMARKS_16);
+		iImage = m_imageListMappings.at(Icon::Bookmarks);
 	}
 
 	LVITEM lvi;
