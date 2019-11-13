@@ -6,6 +6,7 @@
 
 #include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
+#include "DpiCompatibility.h"
 #include "Navigation.h"
 #include "../Helper/BaseWindow.h"
 #include <wil/resource.h>
@@ -38,7 +39,8 @@ private:
 	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void Initialize(HWND parent);
-	static std::unordered_map<int, int> SetUpToolbarImageList(const std::unordered_map<int, UINT> &buttonImageMappings, HIMAGELIST imageList);
+	void SetTooolbarImageList();
+	static std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList, int iconSize, UINT dpi);
 	void SetInitialToolbarButtons();
 	void AddButtonsToToolbar();
 	void AddButtonToToolbar(int iButtonId);
@@ -62,18 +64,19 @@ private:
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCompleted(const Tab &tab);
 
-	void UpdateToolbarButtonImages();
+	void UpdateToolbarButtonImageIndexes();
 
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_pexpp;
 	Navigation *m_navigation;
 	std::shared_ptr<Config> m_config;
 
+	DpiCompatibility m_dpiCompat;
 	wil::unique_himagelist m_imageListSmall;
 	wil::unique_himagelist m_imageListLarge;
+	std::unordered_map<int, int> m_toolbarImageMapSmall;
+	std::unordered_map<int, int> m_toolbarImageMapLarge;
 	std::unordered_map<int, int> m_toolbarStringMap;
-	std::unordered_map<int, int> m_toolbarImageMap16;
-	std::unordered_map<int, int> m_toolbarImageMap24;
 
 	std::list<ToolbarButton_t> m_tbInitial;
 

@@ -335,7 +335,7 @@ std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGFor
 	auto scaledBitmap = std::make_unique<Gdiplus::Bitmap>(scaledIconSize, scaledIconSize);
 	Gdiplus::Graphics graphics(scaledBitmap.get());
 
-	float scalingFactor = static_cast<float>(USER_DEFAULT_SCREEN_DPI) / static_cast<float>(dpi);
+	float scalingFactor = static_cast<float>(scaledIconSize) / static_cast<float>(match->first);
 	graphics.ScaleTransform(scalingFactor, scalingFactor);
 	graphics.DrawImage(bitmap.get(), 0, 0);
 
