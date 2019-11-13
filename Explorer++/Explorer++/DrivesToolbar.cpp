@@ -52,11 +52,16 @@ HWND CDrivesToolbar::CreateDrivesToolbar(HWND hParent)
 
 void CDrivesToolbar::Initialize(HWND hParent)
 {
-	SendMessage(m_hwnd,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
 	SendMessage(m_hwnd,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 
 	HIMAGELIST himlSmall;
 	Shell_GetImageLists(NULL,&himlSmall);
+
+	int iconWidth;
+	int iconHeight;
+	ImageList_GetIconSize(himlSmall, &iconWidth, &iconHeight);
+	SendMessage(m_hwnd, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
+
 	SendMessage(m_hwnd,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himlSmall));
 
 	SetWindowSubclass(hParent,DrivesToolbarParentProcStub,PARENT_SUBCLASS_ID,
