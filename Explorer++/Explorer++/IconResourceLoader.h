@@ -10,7 +10,10 @@
 
 namespace IconResourceLoader
 {
-	wil::unique_hbitmap LoadBitmapFromPNGForDpi(Icon icon, int iconSize, int dpi);
-	wil::unique_hicon LoadIconFromPNGForDpi(Icon icon, int iconSize, int dpi);
-	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNGForDpi(Icon icon, int iconSize, int dpi);
+	wil::unique_hbitmap LoadBitmapFromPNGForDpi(Icon icon, int iconWidth, int iconHeight, int dpi);
+	wil::unique_hbitmap LoadBitmapFromPNGAndScale(Icon icon, int iconWidth, int iconHeight);
+	wil::unique_hicon LoadIconFromPNGForDpi(Icon icon, int iconWidth, int iconHeight, int dpi);
+	wil::unique_hicon LoadIconFromPNGAndScale(Icon icon, int iconWidth, int iconHeight);
+	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNGForDpi(Icon icon, int iconWidth, int iconHeight, int dpi);
+	std::unique_ptr<Gdiplus::Bitmap> LoadGdiplusBitmapFromPNGAndScale(Icon icon, int iconWidth, int iconHeight);
 }

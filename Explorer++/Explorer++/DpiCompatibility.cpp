@@ -8,6 +8,7 @@
 
 DpiCompatibility::DpiCompatibility() :
 	m_SystemParametersInfoForDpi(nullptr),
+	m_GetSystemMetricsForDpi(nullptr),
 	m_GetDpiForWindow(nullptr)
 {
 	m_user32.reset(LoadLibrary(L"user32.dll"));
@@ -15,6 +16,7 @@ DpiCompatibility::DpiCompatibility() :
 	if (m_user32)
 	{
 		m_SystemParametersInfoForDpi = GetProcAddressByFunctionDeclaration(m_user32.get(), SystemParametersInfoForDpi);
+		m_GetSystemMetricsForDpi = GetProcAddressByFunctionDeclaration(m_user32.get(), GetSystemMetricsForDpi);
 		m_GetDpiForWindow = GetProcAddressByFunctionDeclaration(m_user32.get(), GetDpiForWindow);
 	}
 }
@@ -29,7 +31,17 @@ BOOL DpiCompatibility::SystemParametersInfoForDpi(UINT uiAction, UINT uiParam, P
 	return SystemParametersInfo(uiAction, uiParam, pvParam, fWinIni);
 }
 
-UINT WINAPI DpiCompatibility::GetDpiForWindow(HWND hwnd)
+int DpiCompatibility::GetSystemMetricsForDpi(int nIndex, UINT dpi)
+{
+	if (m_GetSystemMetricsForDpi)
+	{
+		return m_GetSystemMetricsForDpi(nIndex, dpi);
+	}
+
+	return GetSystemMetrics(nIndex);
+}
+
+UINT DpiCompatibility::GetDpiForWindow(HWND hwnd)
 {
 	if (m_GetDpiForWindow)
 	{

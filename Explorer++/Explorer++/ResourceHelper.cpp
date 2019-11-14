@@ -11,7 +11,7 @@ const int MENU_IMAGE_SIZE_96DPI = 16;
 
 void SetMenuItemImage(HMENU menu, UINT menuItemId, Icon icon, int dpi, std::vector<wil::unique_hbitmap> &menuImages)
 {
-	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(icon, MENU_IMAGE_SIZE_96DPI, dpi);
+	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(icon, MENU_IMAGE_SIZE_96DPI, MENU_IMAGE_SIZE_96DPI, dpi);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
@@ -26,23 +26,24 @@ void SetMenuItemImage(HMENU menu, UINT menuItemId, Icon icon, int dpi, std::vect
 	}
 }
 
-std::tuple<wil::unique_himagelist, IconImageListMapping> CreateIconImageList(int iconSize, int dpi, const std::initializer_list<Icon> &icons)
+std::tuple<wil::unique_himagelist, IconImageListMapping> CreateIconImageList(int iconWidth,
+	int iconHeight, const std::initializer_list<Icon> &icons)
 {
-	int scaledIconSize = MulDiv(iconSize, dpi, USER_DEFAULT_SCREEN_DPI);
-	wil::unique_himagelist imageList(ImageList_Create(scaledIconSize, scaledIconSize, ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(icons.size())));
+	wil::unique_himagelist imageList(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(icons.size())));
 	IconImageListMapping imageListMappings;
 
 	for (auto icon : icons)
 	{
-		AddIconToImageList(imageList.get(), icon, iconSize, dpi, imageListMappings);
+		AddIconToImageList(imageList.get(), icon, iconWidth, iconHeight, imageListMappings);
 	}
 
 	return { std::move(imageList), imageListMappings };
 }
 
-void AddIconToImageList(HIMAGELIST imageList, Icon icon, int iconSize, int dpi, IconImageListMapping &imageListMappings)
+void AddIconToImageList(HIMAGELIST imageList, Icon icon, int iconWidth, int iconHeight,
+	IconImageListMapping &imageListMappings)
 {
-	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(icon, iconSize, dpi);
+	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 	int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
 
 	if (imagePosition == -1)

@@ -111,7 +111,7 @@ void TabContainer::Initialize(HWND parent)
 void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
-	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(Icon::Lock, ICON_SIZE_96DPI, dpi);
+	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(Icon::Lock, ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
 	m_tabIconLockIndex = ImageList_Add(himlTab, bitmap.get(), nullptr);
 }
 

@@ -84,10 +84,10 @@ CSearchDialog::~CSearchDialog()
 INT_PTR CSearchDialog::OnInitDialog()
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Search, DIALOG_ICON_SIZE_96DPI, dpi);
+	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Search, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
 	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 
-	m_directoryIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Folder, 16, dpi);
+	m_directoryIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
 	SendMessage(GetDlgItem(m_hDlg,IDC_BUTTON_DIRECTORY),BM_SETIMAGE,
 		IMAGE_ICON,reinterpret_cast<LPARAM>(m_directoryIcon.get()));
 

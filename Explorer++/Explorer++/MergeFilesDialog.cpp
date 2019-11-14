@@ -63,7 +63,7 @@ bool CompareFilenames(std::wstring strFirst,std::wstring strSecond)
 INT_PTR CMergeFilesDialog::OnInitDialog()
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::MergeFiles, DIALOG_ICON_SIZE_96DPI, dpi);
+	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::MergeFiles, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	std::wregex rxPattern;

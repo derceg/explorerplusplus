@@ -64,7 +64,7 @@ CSplitFileDialog::~CSplitFileDialog()
 INT_PTR CSplitFileDialog::OnInitDialog()
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::SplitFiles, DIALOG_ICON_SIZE_96DPI, dpi);
+	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::SplitFiles, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
 	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	SHFILEINFO shfi;

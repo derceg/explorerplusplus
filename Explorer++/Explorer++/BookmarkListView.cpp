@@ -17,7 +17,10 @@ CBookmarkListView::CBookmarkListView(HWND hListView) :
 		LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(hListView);
-	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(16, dpi, {Icon::Folder, Icon::Bookmarks});
+	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(iconWidth, iconHeight,
+		{Icon::Folder, Icon::Bookmarks});
 	ListView_SetImageList(hListView, m_imageList.get(), LVSIL_SMALL);
 }
 

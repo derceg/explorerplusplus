@@ -14,6 +14,7 @@ public:
 	DpiCompatibility();
 
 	BOOL WINAPI SystemParametersInfoForDpi(UINT uiAction, UINT uiParam, PVOID pvParam, UINT fWinIni, UINT dpi);
+	int WINAPI GetSystemMetricsForDpi(int nIndex, UINT dpi);
 	UINT WINAPI GetDpiForWindow(HWND hwnd);
 
 private:
@@ -21,5 +22,6 @@ private:
 	wil::unique_hmodule m_user32;
 
 	decltype(&::SystemParametersInfoForDpi) m_SystemParametersInfoForDpi;
+	decltype(&::GetSystemMetricsForDpi) m_GetSystemMetricsForDpi;
 	decltype(&::GetDpiForWindow) m_GetDpiForWindow;
 };

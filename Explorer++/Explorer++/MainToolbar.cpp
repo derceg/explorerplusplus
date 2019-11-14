@@ -148,7 +148,7 @@ std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST image
 
 	for (const auto &mapping : TOOLBAR_BUTTON_ICON_MAPPINGS)
 	{
-		wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(mapping.second, iconSize, dpi);
+		wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(mapping.second, iconSize, iconSize, dpi);
 
 		int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
 

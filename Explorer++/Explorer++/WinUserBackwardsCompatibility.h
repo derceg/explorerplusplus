@@ -25,6 +25,12 @@ SystemParametersInfoForDpi(
 	_In_ UINT fWinIni,
 	_In_ UINT dpi);
 
+int
+WINAPI
+GetSystemMetricsForDpi(
+	_In_ int nIndex,
+	_In_ UINT dpi);
+
 UINT
 WINAPI
 GetDpiForWindow(

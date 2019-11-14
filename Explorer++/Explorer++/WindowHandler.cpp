@@ -34,7 +34,7 @@ HWND Explorerplusplus::CreateTabToolbar(HWND hParent,int idCommand,TCHAR *szTip)
 
 	/* TODO: The image list is been leaked. */
 	HIMAGELIST himl = ImageList_Create(scaledIconSize,scaledIconSize,ILC_COLOR32|ILC_MASK,0,1);
-	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(Icon::CloseButton, 16, dpi);
+	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(Icon::CloseButton, 16, 16, dpi);
 	int iIndex = ImageList_Add(himl, bitmap.get(), nullptr);
 	SendMessage(TabToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himl));
 

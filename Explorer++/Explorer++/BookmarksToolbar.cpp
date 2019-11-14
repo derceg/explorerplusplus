@@ -34,11 +34,14 @@ CBookmarksToolbar::CBookmarksToolbar(HWND hToolbar, HINSTANCE instance, IExplore
 
 void CBookmarksToolbar::InitializeToolbar()
 {
-	SendMessage(m_hToolbar,TB_SETBITMAPSIZE,0,MAKELONG(16,16));
 	SendMessage(m_hToolbar,TB_BUTTONSTRUCTSIZE,sizeof(TBBUTTON),0);
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hToolbar);
-	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(16, dpi, { Icon::Folder, Icon::Bookmarks});
+	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+	SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
+
+	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(iconWidth, iconHeight, { Icon::Folder, Icon::Bookmarks});
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageList.get()));
 
 	m_pbtdh = new CBookmarksToolbarDropHandler(m_hToolbar,m_AllBookmarks,m_guidBookmarksToolbar);

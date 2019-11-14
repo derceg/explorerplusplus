@@ -99,8 +99,8 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	m_hCutTreeViewItem		= NULL;
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(hwnd);
-	m_optionsDialogIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Options, DIALOG_ICON_SIZE_96DPI, dpi);
-	m_newTabDirectoryIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Folder, 16, dpi);
+	m_optionsDialogIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Options, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
+	m_newTabDirectoryIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
 }
 
 Explorerplusplus::~Explorerplusplus()

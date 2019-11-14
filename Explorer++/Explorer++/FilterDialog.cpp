@@ -36,7 +36,7 @@ CFilterDialog::~CFilterDialog()
 INT_PTR CFilterDialog::OnInitDialog()
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Filter, DIALOG_ICON_SIZE_96DPI, dpi);
+	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Filter, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
 	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
 
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_FILTER_COMBOBOX);

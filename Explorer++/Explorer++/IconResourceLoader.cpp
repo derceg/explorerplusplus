@@ -9,6 +9,9 @@
 #include <map>
 #include <unordered_map>
 
+wil::unique_hbitmap RetrieveBitmapFromGdiplusBitmap(Gdiplus::Bitmap *gdiplusBitmap);
+wil::unique_hicon RetrieveIconFromGdiplusBitmap(Gdiplus::Bitmap *gdiplusBitmap);
+
 const std::unordered_map<Icon, std::map<int, UINT>> ICON_RESOURCE_MAPPINGS = {
 	{
 		Icon::AddBookmark,
@@ -271,10 +274,20 @@ const std::unordered_map<Icon, std::map<int, UINT>> ICON_RESOURCE_MAPPINGS = {
 	}
 };
 
-wil::unique_hbitmap IconResourceLoader::LoadBitmapFromPNGForDpi(Icon icon, int iconSize, int dpi)
+wil::unique_hbitmap IconResourceLoader::LoadBitmapFromPNGForDpi(Icon icon, int iconWidth, int iconHeight, int dpi)
 {
-	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGForDpi(icon, iconSize, dpi);
+	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGForDpi(icon, iconWidth, iconHeight, dpi);
+	return RetrieveBitmapFromGdiplusBitmap(gdiplusBitmap.get());
+}
 
+wil::unique_hbitmap IconResourceLoader::LoadBitmapFromPNGAndScale(Icon icon, int iconWidth, int iconHeight)
+{
+	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
+	return RetrieveBitmapFromGdiplusBitmap(gdiplusBitmap.get());
+}
+
+wil::unique_hbitmap RetrieveBitmapFromGdiplusBitmap(Gdiplus::Bitmap *gdiplusBitmap)
+{
 	if (!gdiplusBitmap)
 	{
 		return nullptr;
@@ -292,10 +305,20 @@ wil::unique_hbitmap IconResourceLoader::LoadBitmapFromPNGForDpi(Icon icon, int i
 	return bitmap;
 }
 
-wil::unique_hicon IconResourceLoader::LoadIconFromPNGForDpi(Icon icon, int iconSize, int dpi)
+wil::unique_hicon IconResourceLoader::LoadIconFromPNGForDpi(Icon icon, int iconWidth, int iconHeight, int dpi)
 {
-	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGForDpi(icon, iconSize, dpi);
+	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGForDpi(icon, iconWidth, iconHeight, dpi);
+	return RetrieveIconFromGdiplusBitmap(gdiplusBitmap.get());
+}
 
+wil::unique_hicon IconResourceLoader::LoadIconFromPNGAndScale(Icon icon, int iconWidth, int iconHeight)
+{
+	auto gdiplusBitmap = LoadGdiplusBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
+	return RetrieveIconFromGdiplusBitmap(gdiplusBitmap.get());
+}
+
+wil::unique_hicon RetrieveIconFromGdiplusBitmap(Gdiplus::Bitmap *gdiplusBitmap)
+{
 	if (!gdiplusBitmap)
 	{
 		return nullptr;
@@ -312,16 +335,22 @@ wil::unique_hicon IconResourceLoader::LoadIconFromPNGForDpi(Icon icon, int iconS
 	return hicon;
 }
 
+std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGForDpi(Icon icon, int iconWidth, int iconHeight, int dpi)
+{
+	int scaledIconWidth = MulDiv(iconWidth, dpi, USER_DEFAULT_SCREEN_DPI);
+	int scaledIconHeight = MulDiv(iconHeight, dpi, USER_DEFAULT_SCREEN_DPI);
+	return LoadGdiplusBitmapFromPNGAndScale(icon, scaledIconWidth, scaledIconHeight);
+}
+
 // This function is based on the steps performed by https://docs.microsoft.com/en-us/windows/win32/api/commctrl/nf-commctrl-loadiconmetric
 // when loading an icon (see the remarks section on that page for details).
-std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGForDpi(Icon icon, int iconSize, int dpi)
+std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGAndScale(Icon icon, int iconWidth, int iconHeight)
 {
 	const auto &iconSizeMappins = ICON_RESOURCE_MAPPINGS.at(icon);
-	int scaledIconSize = MulDiv(iconSize, dpi, USER_DEFAULT_SCREEN_DPI);
 
 	auto match = std::find_if(iconSizeMappins.begin(), iconSizeMappins.end(),
-		[scaledIconSize] (auto entry) {
-			return scaledIconSize <= entry.first;
+		[iconWidth, iconHeight] (auto entry) {
+			return iconWidth <= entry.first && iconHeight <= entry.first;
 		}
 	);
 
@@ -334,16 +363,18 @@ std::unique_ptr<Gdiplus::Bitmap> IconResourceLoader::LoadGdiplusBitmapFromPNGFor
 
 	// If the icon size matches exactly, it doesn't need to be scaled, so can be
 	// returned immediately.
-	if (match->first == scaledIconSize)
+	if (match->first == iconWidth
+		&& match->first == iconHeight)
 	{
 		return bitmap;
 	}
 
-	auto scaledBitmap = std::make_unique<Gdiplus::Bitmap>(scaledIconSize, scaledIconSize);
+	auto scaledBitmap = std::make_unique<Gdiplus::Bitmap>(iconWidth, iconHeight);
 	Gdiplus::Graphics graphics(scaledBitmap.get());
 
-	float scalingFactor = static_cast<float>(scaledIconSize) / static_cast<float>(match->first);
-	graphics.ScaleTransform(scalingFactor, scalingFactor);
+	float scalingFactorX = static_cast<float>(iconWidth) / static_cast<float>(match->first);
+	float scalingFactorY = static_cast<float>(iconHeight) / static_cast<float>(match->first);
+	graphics.ScaleTransform(scalingFactorX, scalingFactorY);
 	graphics.DrawImage(bitmap.get(), 0, 0);
 
 	return scaledBitmap;
