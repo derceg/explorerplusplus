@@ -3,9 +3,9 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "DpiCompatibility.h"
 #include "ResourceHelper.h"
 #include "IconResourceLoader.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
 
 void SetMenuItemImage(HMENU menu, UINT menuItemId, Icon icon, int dpi, std::vector<wil::unique_hbitmap> &menuImages)
