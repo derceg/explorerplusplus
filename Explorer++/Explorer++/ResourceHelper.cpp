@@ -3,15 +3,17 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
+#include "DpiCompatibility.h"
 #include "ResourceHelper.h"
 #include "IconResourceLoader.h"
 #include "../Helper/ImageHelper.h"
 
-const int MENU_IMAGE_SIZE_96DPI = 16;
-
 void SetMenuItemImage(HMENU menu, UINT menuItemId, Icon icon, int dpi, std::vector<wil::unique_hbitmap> &menuImages)
 {
-	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(icon, MENU_IMAGE_SIZE_96DPI, MENU_IMAGE_SIZE_96DPI, dpi);
+	DpiCompatibility dpiCompat;
+	int iconWidth = dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+	wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);
 
 	MENUITEMINFO mii;
 	mii.cbSize = sizeof(mii);
