@@ -5,7 +5,6 @@
 #pragma once
 
 #include "CoreInterface.h"
-#include "DpiCompatibility.h"
 #include "PluginCommandManager.h"
 #include "PluginInterface.h"
 #include "PluginMenuManager.h"
@@ -16,6 +15,7 @@
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "UiTheming.h"
+#include "../Helper/DpiCompatibility.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
 #include <boost/optional.hpp>

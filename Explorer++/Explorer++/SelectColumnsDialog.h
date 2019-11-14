@@ -5,13 +5,11 @@
 #pragma once
 
 #include "CoreInterface.h"
-#include "DpiCompatibility.h"
-#include "TabInterface.h"
 #include "TabContainer.h"
+#include "TabInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
-#include <wil/resource.h>
 
 class CSelectColumnsDialog;
 
@@ -50,6 +48,8 @@ protected:
 	INT_PTR	OnNotify(NMHDR *pnmhdr);
 	INT_PTR	OnClose();
 
+	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
+
 private:
 
 	bool	CompareColumns(const Column_t &column1, const Column_t &column2);
@@ -66,9 +66,6 @@ private:
 	TabContainer *m_tabContainer;
 	TabInterface *m_ti;
 	BOOL m_bColumnsSwapped;
-
-	DpiCompatibility m_dpiCompat;
-	wil::unique_hicon m_icon;
 
 	CSelectColumnsDialogPersistentSettings *m_pscdps;
 };

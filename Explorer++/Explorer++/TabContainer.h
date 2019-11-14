@@ -5,7 +5,6 @@
 #pragma once
 
 #include "CoreInterface.h"
-#include "DpiCompatibility.h"
 #include "ShellBrowser/CachedIcons.h"
 #include "ShellBrowser/iShellView.h"
 #include "SignalWrapper.h"
@@ -13,6 +12,7 @@
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "../Helper/BaseWindow.h"
+#include "../Helper/DpiCompatibility.h"
 #include <boost/optional.hpp>
 #include <boost/signals2.hpp>
 #include <wil/resource.h>

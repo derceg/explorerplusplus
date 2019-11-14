@@ -9,8 +9,6 @@
 #include <tuple>
 #include <unordered_map>
 
-static const int DIALOG_ICON_SIZE_96DPI = 16;
-
 using IconImageListMapping = std::unordered_map<Icon, int>;
 
 void SetMenuItemImage(HMENU menu, UINT menuItemId, Icon icon, int dpi, std::vector<wil::unique_hbitmap> &menuImages);

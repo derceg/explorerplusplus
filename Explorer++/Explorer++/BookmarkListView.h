@@ -5,9 +5,9 @@
 #pragma once
 
 #include "BookmarkHelper.h"
-#include "DpiCompatibility.h"
 #include "ResourceHelper.h"
 #include "../Helper/Bookmark.h"
+#include "../Helper/DpiCompatibility.h"
 #include <wil/resource.h>
 #include <unordered_map>
 

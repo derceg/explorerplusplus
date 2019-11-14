@@ -6,9 +6,9 @@
 
 #include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
-#include "DpiCompatibility.h"
 #include "Navigation.h"
 #include "../Helper/BaseWindow.h"
+#include "../Helper/DpiCompatibility.h"
 #include <wil/resource.h>
 #include <list>
 #include <unordered_map>

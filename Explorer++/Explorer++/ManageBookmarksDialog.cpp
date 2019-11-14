@@ -51,7 +51,6 @@ CManageBookmarksDialog::~CManageBookmarksDialog()
 INT_PTR CManageBookmarksDialog::OnInitDialog()
 {
 	/* TODO: Enable drag and drop for listview and treeview. */
-	SetDialogIcon();
 	SetupToolbar();
 	SetupTreeView();
 	SetupListView();
@@ -65,11 +64,9 @@ INT_PTR CManageBookmarksDialog::OnInitDialog()
 	return 0;
 }
 
-void CManageBookmarksDialog::SetDialogIcon()
+wil::unique_hicon CManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Bookmarks, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
+	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::Bookmarks, iconWidth, iconHeight);
 }
 
 void CManageBookmarksDialog::SetupToolbar()

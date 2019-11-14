@@ -84,9 +84,6 @@ CSearchDialog::~CSearchDialog()
 INT_PTR CSearchDialog::OnInitDialog()
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Search, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
-	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
-
 	m_directoryIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
 	SendMessage(GetDlgItem(m_hDlg,IDC_BUTTON_DIRECTORY),BM_SETIMAGE,
 		IMAGE_ICON,reinterpret_cast<LPARAM>(m_directoryIcon.get()));
@@ -167,6 +164,11 @@ INT_PTR CSearchDialog::OnInitDialog()
 	SetFocus(GetDlgItem(m_hDlg,IDC_COMBO_NAME));
 
 	return FALSE;
+}
+
+wil::unique_hicon CSearchDialog::GetDialogIcon(int iconWidth, int iconHeight) const
+{
+	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::Search, iconWidth, iconHeight);
 }
 
 void CSearchDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,

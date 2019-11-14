@@ -63,10 +63,6 @@ CSplitFileDialog::~CSplitFileDialog()
 
 INT_PTR CSplitFileDialog::OnInitDialog()
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::SplitFiles, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
-	SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
-
 	SHFILEINFO shfi;
 	DWORD_PTR dwRes = SHGetFileInfo(m_strFullFilename.c_str(),0,&shfi,sizeof(shfi),SHGFI_ICON);
 
@@ -156,6 +152,11 @@ INT_PTR CSplitFileDialog::OnInitDialog()
 	m_psfdps->RestoreDialogPosition(m_hDlg,false);
 
 	return 0;
+}
+
+wil::unique_hicon CSplitFileDialog::GetDialogIcon(int iconWidth, int iconHeight) const
+{
+	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::SplitFiles, iconWidth, iconHeight);
 }
 
 INT_PTR CSplitFileDialog::OnTimer(int iTimerID)

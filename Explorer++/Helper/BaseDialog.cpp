@@ -54,26 +54,38 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 	switch(uMsg)
 	{
 	case WM_INITDIALOG:
-		m_hDlg = hDlg;
-
-		if(m_bResizable)
 		{
-			RECT rcMain;
-			GetWindowRect(m_hDlg,&rcMain);
+			m_hDlg = hDlg;
 
-			/* Assume that the current width and height of
-			the dialog are the minimum width and height.
-			Note that at this point, the dialog has NOT
-			been initialized in any way, so it will not
-			have had a chance to be resized yet. */
-			m_iMinWidth = GetRectWidth(&rcMain);
-			m_iMinHeight = GetRectHeight(&rcMain);
+			if (m_bResizable)
+			{
+				RECT rcMain;
+				GetWindowRect(m_hDlg, &rcMain);
 
-			std::list<CResizableDialog::Control_t> ControlList;
-			m_dsc = DIALOG_SIZE_CONSTRAINT_NONE;
-			GetResizableControlInformation(m_dsc,ControlList);
+				/* Assume that the current width and height of
+				the dialog are the minimum width and height.
+				Note that at this point, the dialog has NOT
+				been initialized in any way, so it will not
+				have had a chance to be resized yet. */
+				m_iMinWidth = GetRectWidth(&rcMain);
+				m_iMinHeight = GetRectHeight(&rcMain);
 
-			m_prd = std::unique_ptr<CResizableDialog>(new CResizableDialog(m_hDlg, ControlList));
+				std::list<CResizableDialog::Control_t> ControlList;
+				m_dsc = DIALOG_SIZE_CONSTRAINT_NONE;
+				GetResizableControlInformation(m_dsc, ControlList);
+
+				m_prd = std::unique_ptr<CResizableDialog>(new CResizableDialog(m_hDlg, ControlList));
+			}
+
+			UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
+			int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+			int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+			m_icon = GetDialogIcon(iconWidth, iconHeight);
+
+			if (m_icon)
+			{
+				SetClassLongPtr(m_hDlg, GCLP_HICONSM, reinterpret_cast<LONG_PTR>(m_icon.get()));
+			}
 		}
 		break;
 
@@ -132,6 +144,14 @@ INT_PTR CALLBACK CBaseDialog::BaseDialogProc(HWND hDlg,UINT uMsg,
 	}
 
 	return ForwardMessage(hDlg,uMsg,wParam,lParam);
+}
+
+wil::unique_hicon CBaseDialog::GetDialogIcon(int iconWidth, int iconHeight) const
+{
+	UNREFERENCED_PARAMETER(iconWidth);
+	UNREFERENCED_PARAMETER(iconHeight);
+
+	return nullptr;
 }
 
 INT_PTR CBaseDialog::GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)

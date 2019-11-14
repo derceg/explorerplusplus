@@ -4,10 +4,12 @@
 
 #pragma once
 
-#include "ResizableDialog.h"
+#include "DpiCompatibility.h"
+#include "Macros.h"
 #include "MessageForwarder.h"
 #include "ReferenceCount.h"
-#include "Macros.h"
+#include "ResizableDialog.h"
+#include <wil/resource.h>
 
 __interface IModelessDialogNotification : public IReferenceCount
 {
@@ -40,10 +42,12 @@ public:
 protected:
 
 	HINSTANCE		GetInstance() const;
+	virtual wil::unique_hicon	GetDialogIcon(int iconWidth, int iconHeight) const;
 
 	INT_PTR			GetDefaultReturnValue(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	HWND			m_hDlg;
+	HWND m_hDlg;
+	DpiCompatibility m_dpiCompat;
 
 private:
 
@@ -54,17 +58,19 @@ private:
 	virtual void	GetResizableControlInformation(DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
 	virtual void	SaveState();
 
-	const HINSTANCE	m_hInstance;
-	const int		m_iResource;
-	const HWND		m_hParent;
-	IModelessDialogNotification	*m_pmdn;
+	const HINSTANCE m_hInstance;
+	const int m_iResource;
+	const HWND m_hParent;
+	IModelessDialogNotification *m_pmdn;
 
-	BOOL			m_bShowingModelessDialog;
+	wil::unique_hicon m_icon;
+
+	BOOL m_bShowingModelessDialog;
 
 	/* Used only with resizable dialogs. */
-	const bool		m_bResizable;
-	DialogSizeConstraint	m_dsc;
-	int				m_iMinWidth;
-	int				m_iMinHeight;
+	const bool m_bResizable;
+	DialogSizeConstraint m_dsc;
+	int m_iMinWidth;
+	int m_iMinHeight;
 	std::unique_ptr<CResizableDialog> m_prd;
 };

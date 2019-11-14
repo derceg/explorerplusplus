@@ -4,11 +4,9 @@
 
 #pragma once
 
-#include "DpiCompatibility.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
-#include <wil/resource.h>
 #include <list>
 #include <string>
 #include <unordered_map>
@@ -93,6 +91,8 @@ protected:
 
 	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
+	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
+
 private:
 
 	enum SizeType_t
@@ -125,9 +125,6 @@ private:
 	void	OnCancel();
 	void	OnChangeOutputDirectory();
 	void	OnSplitFinished();
-
-	DpiCompatibility m_dpiCompat;
-	wil::unique_hicon m_icon;
 
 	std::wstring m_strFullFilename;
 	bool m_bSplittingFile;

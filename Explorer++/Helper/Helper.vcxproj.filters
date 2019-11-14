@@ -118,6 +118,9 @@
     <ClCompile Include="Rgb.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="DpiCompatibility.cpp">
+      <Filter>Miscellaneous</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -254,6 +257,12 @@
     </ClInclude>
     <ClInclude Include="MenuWrapper.h">
       <Filter>Resource Wrappers</Filter>
+    </ClInclude>
+    <ClInclude Include="DpiCompatibility.h">
+      <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="WinUserBackwardsCompatibility.h">
+      <Filter>Miscellaneous</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

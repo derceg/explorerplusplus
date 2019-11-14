@@ -6,12 +6,10 @@
 
 #include "BookmarkHelper.h"
 #include "BookmarkTreeView.h"
-#include "DpiCompatibility.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
-#include <wil/resource.h>
 #include <unordered_set>
 
 class CAddBookmarkDialog;
@@ -63,6 +61,8 @@ protected:
 	INT_PTR	OnDestroy();
 	INT_PTR	OnNcDestroy();
 
+	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
+
 private:
 
 	static const COLORREF ERROR_BACKGROUND_COLOR = RGB(255,188,188);
@@ -72,16 +72,11 @@ private:
 	void		GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
 	void		SaveState();
 
-	void		SetDialogIcon();
-
 	void		OnOk();
 	void		OnCancel();
 
 	void		SaveTreeViewState();
 	void		SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hItem);
-
-	DpiCompatibility m_dpiCompat;
-	wil::unique_hicon m_icon;
 
 	CBookmarkFolder &m_AllBookmarks;
 	CBookmark &m_Bookmark;

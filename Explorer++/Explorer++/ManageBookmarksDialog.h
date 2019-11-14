@@ -8,14 +8,12 @@
 #include "BookmarkListView.h"
 #include "BookmarkTreeView.h"
 #include "CoreInterface.h"
-#include "DpiCompatibility.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
-#include <wil/resource.h>
 #include <stack>
 
 class CManageBookmarksDialog;
@@ -98,6 +96,8 @@ protected:
 
 	void	SaveState();
 
+	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
+
 private:
 
 	static const int TOOLBAR_ID_BACK			= 10000;
@@ -106,8 +106,6 @@ private:
 	static const int TOOLBAR_ID_VIEWS			= 10003;
 
 	CManageBookmarksDialog & operator = (const CManageBookmarksDialog &mbd);
-
-	void		SetDialogIcon();
 
 	void		SetupToolbar();
 	void		SetupTreeView();
@@ -146,9 +144,6 @@ private:
 
 	void		OnOk();
 	void		OnCancel();
-
-	DpiCompatibility m_dpiCompat;
-	wil::unique_hicon m_icon;
 
 	HWND m_hToolbar;
 	wil::unique_himagelist m_imageListToolbar;

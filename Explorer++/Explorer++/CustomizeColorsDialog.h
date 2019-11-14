@@ -4,14 +4,12 @@
 
 #pragma once
 
-#include <vector>
-#include "Explorer++_internal.h"
 #include "ColorRuleHelper.h"
-#include "DpiCompatibility.h"
+#include "Explorer++_internal.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
-#include <wil/resource.h>
+#include "../Helper/ResizableDialog.h"
+#include <vector>
 
 class CCustomizeColorsDialog;
 
@@ -49,6 +47,8 @@ protected:
 	INT_PTR	OnNotify(NMHDR *pnmhdr);
 	INT_PTR	OnClose();
 
+	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
+
 private:
 
 	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
@@ -63,9 +63,6 @@ private:
 
 	void	OnOk();
 	void	OnCancel();
-
-	DpiCompatibility m_dpiCompat;
-	wil::unique_hicon m_icon;
 
 	std::vector<NColorRuleHelper::ColorRule_t> *m_pColorRuleList;
 

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "DpiCompatibility.h"
+#include "../Helper/DpiCompatibility.h"
 
 class CHolderWindow
 {

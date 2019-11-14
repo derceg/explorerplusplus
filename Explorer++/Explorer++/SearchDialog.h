@@ -5,14 +5,12 @@
 #pragma once
 
 #include "CoreInterface.h"
-#include "DpiCompatibility.h"
 #include "TabContainer.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileContextMenuManager.h"
 #include "../Helper/ReferenceCount.h"
 #include <boost/circular_buffer.hpp>
-#include <wil/resource.h>
 #include <MsXml2.h>
 #include <objbase.h>
 #include <list>
@@ -165,6 +163,8 @@ protected:
 
 	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
+	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
+
 private:
 
 	static const int SEARCH_PROCESSITEMS_TIMER_ID = 0;
@@ -186,8 +186,6 @@ private:
 	void						UpdateListViewHeader();
 
 	TCHAR m_szSearchDirectory[MAX_PATH];
-	DpiCompatibility m_dpiCompat;
-	wil::unique_hicon m_icon;
 	wil::unique_hicon m_directoryIcon;
 	BOOL m_bSearching;
 	BOOL m_bStopSearching;

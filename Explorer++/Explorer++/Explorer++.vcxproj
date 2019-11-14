@@ -476,7 +476,6 @@
     <ClCompile Include="DialogHelper.cpp" />
     <ClCompile Include="DisplayColoursDialog.cpp" />
     <ClCompile Include="DisplayWindow.cpp" />
-    <ClCompile Include="DpiCompatibility.cpp" />
     <ClCompile Include="DrivesToolbar.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="EventSwitcher.cpp" />
@@ -615,7 +614,6 @@
     <ClInclude Include="DestroyFilesDialog.h" />
     <ClInclude Include="DialogHelper.h" />
     <ClInclude Include="DisplayColoursDialog.h" />
-    <ClInclude Include="DpiCompatibility.h" />
     <ClInclude Include="DrivesToolbar.h" />
     <ClInclude Include="BetterEnumsWrapper.h" />
     <ClInclude Include="Event.h" />
@@ -701,7 +699,6 @@
     <ClInclude Include="UpdateCheckDialog.h" />
     <ClInclude Include="ViewModeHelper.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
-    <ClInclude Include="WinUserBackwardsCompatibility.h" />
     <ClInclude Include="XMLSettings.h" />
   </ItemGroup>
   <ItemGroup>

@@ -4,12 +4,10 @@
 
 #pragma once
 
-#include "DpiCompatibility.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileActionHandler.h"
-#include <wil/resource.h>
+#include "../Helper/ResizableDialog.h"
 
 class CMassRenameDialog;
 
@@ -60,6 +58,8 @@ protected:
 	INT_PTR	OnCommand(WPARAM wParam,LPARAM lParam);
 	INT_PTR	OnClose();
 
+	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
+
 private:
 
 	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
@@ -71,8 +71,6 @@ private:
 	void	ProcessFileName(const std::wstring &strTarget,const std::wstring &strFilename,int iFileIndex,std::wstring &strOutput);
 
 	std::list<std::wstring> m_FullFilenameList;
-	DpiCompatibility m_dpiCompat;
-	wil::unique_hicon m_icon;
 	wil::unique_hicon m_moreIcon;
 	CFileActionHandler *m_pFileActionHandler;
 

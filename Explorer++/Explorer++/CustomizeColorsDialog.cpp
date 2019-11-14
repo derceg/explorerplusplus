@@ -32,10 +32,6 @@ CCustomizeColorsDialog::~CCustomizeColorsDialog()
 
 INT_PTR CCustomizeColorsDialog::OnInitDialog()
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::CustomizeColors, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
-
 	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
 
 	SetWindowTheme(hListView,L"Explorer",NULL);
@@ -83,6 +79,11 @@ INT_PTR CCustomizeColorsDialog::OnInitDialog()
 	m_pccdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
+}
+
+wil::unique_hicon CCustomizeColorsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
+{
+	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::CustomizeColors, iconWidth, iconHeight);
 }
 
 void CCustomizeColorsDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,

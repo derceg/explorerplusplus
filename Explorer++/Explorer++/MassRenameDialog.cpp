@@ -51,9 +51,6 @@ CMassRenameDialog::~CMassRenameDialog()
 INT_PTR CMassRenameDialog::OnInitDialog()
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::MassRename, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
-
 	m_moreIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::ArrowRight, 16, 16, dpi);
 	SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_MORE,BM_SETIMAGE,IMAGE_ICON,
 		reinterpret_cast<LPARAM>(m_moreIcon.get()));
@@ -126,6 +123,11 @@ INT_PTR CMassRenameDialog::OnInitDialog()
 	m_pmrdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
+}
+
+wil::unique_hicon CMassRenameDialog::GetDialogIcon(int iconWidth, int iconHeight) const
+{
+	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::MassRename, iconWidth, iconHeight);
 }
 
 void CMassRenameDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,

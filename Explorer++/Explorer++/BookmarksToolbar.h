@@ -6,10 +6,10 @@
 
 #include "BookmarkHelper.h"
 #include "CoreInterface.h"
-#include "DpiCompatibility.h"
 #include "Navigation.h"
 #include "ResourceHelper.h"
 #include "../Helper/Bookmark.h"
+#include "../Helper/DpiCompatibility.h"
 #include <boost/optional.hpp>
 #include <wil/resource.h>
 #include <unordered_map>

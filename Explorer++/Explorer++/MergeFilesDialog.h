@@ -4,12 +4,10 @@
 
 #pragma once
 
-#include "DpiCompatibility.h"
 #include "../Helper/BaseDialog.h"
-#include "../Helper/ResizableDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
-#include <wil/resource.h>
+#include "../Helper/ResizableDialog.h"
 
 class CMergeFilesDialog;
 
@@ -69,6 +67,8 @@ protected:
 
 	INT_PTR	OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
+	virtual wil::unique_hicon GetDialogIcon(int iconWidth, int iconHeight) const override;
+
 private:
 
 	void	GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc, std::list<CResizableDialog::Control_t> &ControlList);
@@ -88,9 +88,6 @@ private:
 	bool m_bMergingFiles;
 	bool m_bStopMerging;
 	TCHAR m_szOk[32];
-
-	DpiCompatibility m_dpiCompat;
-	wil::unique_hicon m_icon;
 
 	CMergeFilesDialogPersistentSettings *m_pmfdps;
 };

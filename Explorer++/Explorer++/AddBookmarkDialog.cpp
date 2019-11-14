@@ -45,8 +45,6 @@ CAddBookmarkDialog::~CAddBookmarkDialog()
 
 INT_PTR CAddBookmarkDialog::OnInitDialog()
 {
-	SetDialogIcon();
-
 	SetDlgItemText(m_hDlg,IDC_BOOKMARK_NAME,m_Bookmark.GetName().c_str());
 	SetDlgItemText(m_hDlg,IDC_BOOKMARK_LOCATION,m_Bookmark.GetLocation().c_str());
 
@@ -72,11 +70,9 @@ INT_PTR CAddBookmarkDialog::OnInitDialog()
 	return 0;
 }
 
-void CAddBookmarkDialog::SetDialogIcon()
+wil::unique_hicon CAddBookmarkDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::AddBookmark, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
+	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::AddBookmark, iconWidth, iconHeight);
 }
 
 void CAddBookmarkDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,

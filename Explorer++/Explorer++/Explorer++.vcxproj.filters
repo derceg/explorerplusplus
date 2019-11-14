@@ -355,9 +355,6 @@
     <ClCompile Include="MenuHelper.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="DpiCompatibility.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="MainMenu.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -697,12 +694,6 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="MenuHelper.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="DpiCompatibility.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="WinUserBackwardsCompatibility.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="NoTranslationResource.h">

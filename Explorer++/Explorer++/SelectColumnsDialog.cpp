@@ -36,10 +36,6 @@ CSelectColumnsDialog::~CSelectColumnsDialog()
 
 INT_PTR CSelectColumnsDialog::OnInitDialog()
 {
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_icon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::SelectColumns, DIALOG_ICON_SIZE_96DPI, DIALOG_ICON_SIZE_96DPI, dpi);
-	SetClassLongPtr(m_hDlg,GCLP_HICONSM,reinterpret_cast<LONG_PTR>(m_icon.get()));
-
 	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
 	SetWindowTheme(hListView,L"Explorer",NULL);
 
@@ -84,6 +80,11 @@ INT_PTR CSelectColumnsDialog::OnInitDialog()
 	m_pscdps->RestoreDialogPosition(m_hDlg,true);
 
 	return 0;
+}
+
+wil::unique_hicon CSelectColumnsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
+{
+	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::SelectColumns, iconWidth, iconHeight);
 }
 
 bool CSelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t &column2)
