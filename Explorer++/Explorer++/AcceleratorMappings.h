@@ -54,7 +54,7 @@ const std::unordered_map<std::wstring, int> ACCELERATOR_MAPPINGS = {
 	{L"move_to_folder", IDM_EDIT_MOVETOFOLDER},
 	{L"resolve_link", IDM_EDIT_RESOLVELINK},
 
-	{L"select_all_of_same_type", IDM_EDIT_SELECTALLFOLDERS},
+	{L"select_all_of_same_type", IDM_EDIT_SELECTALLOFSAMETYPE},
 	{L"select_none", IDM_EDIT_SELECTNONE},
 	{L"wildcard_deselect", IDM_EDIT_WILDCARDDESELECT},
 	{L"wildcard_select", IDM_EDIT_WILDCARDSELECTION},

@@ -481,7 +481,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		SetFocus(m_hActiveListView);
 		break;
 
-	case IDM_EDIT_SELECTALLFOLDERS:
+	case IDM_EDIT_SELECTALLOFSAMETYPE:
 		HighlightSimilarFiles(m_hActiveListView);
 		SetFocus(m_hActiveListView);
 		break;
