@@ -1509,6 +1509,11 @@ IDirectoryMonitor *Explorerplusplus::GetDirectoryMonitor() const
 	return m_pDirMon;
 }
 
+IconResourceLoader *Explorerplusplus::GetIconResourceLoader() const
+{
+	return m_iconResourceLoader.get();
+}
+
 void Explorerplusplus::OnShowHiddenFiles(void)
 {
 	m_pActiveShellBrowser->SetShowHidden(!m_pActiveShellBrowser->GetShowHidden());

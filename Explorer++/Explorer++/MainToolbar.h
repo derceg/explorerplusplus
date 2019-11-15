@@ -6,6 +6,7 @@
 
 #include "CoreInterface.h"
 #include "DefaultToolbarButtons.h"
+#include "IconResourceLoader.h"
 #include "Navigation.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/DpiCompatibility.h"
@@ -40,7 +41,8 @@ private:
 
 	void Initialize(HWND parent);
 	void SetTooolbarImageList();
-	static std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList, int iconSize, UINT dpi);
+	static std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList,
+		IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi);
 	void SetInitialToolbarButtons();
 	void AddButtonsToToolbar();
 	void AddButtonToToolbar(int iButtonId);

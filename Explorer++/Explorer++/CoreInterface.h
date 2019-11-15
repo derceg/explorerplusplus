@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "IconResourceLoader.h"
 #include "../Helper/StatusBar.h"
 #include <boost/signals2.hpp>
 
@@ -35,6 +36,8 @@ __interface IExplorerplusplus
 
 	TabContainer	*GetTabContainer() const;
 	IDirectoryMonitor	*GetDirectoryMonitor() const;
+
+	IconResourceLoader	*GetIconResourceLoader() const;
 
 	HWND			GetTreeView() const;
 

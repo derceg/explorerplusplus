@@ -5,6 +5,7 @@
 #pragma once
 
 #include "CoreInterface.h"
+#include "IconResourceLoader.h"
 #include "PluginCommandManager.h"
 #include "PluginInterface.h"
 #include "PluginMenuManager.h"
@@ -480,6 +481,7 @@ private:
 	TabContainer			*GetTabContainer() const;
 	HWND					GetTreeView() const;
 	IDirectoryMonitor		*GetDirectoryMonitor() const;
+	IconResourceLoader		*GetIconResourceLoader() const;
 
 	/* Helpers. */
 	HANDLE					CreateWorkerThread();
@@ -556,6 +558,7 @@ private:
 
 	Navigation				*m_navigation;
 
+	std::unique_ptr<IconResourceLoader>	m_iconResourceLoader;
 	DpiCompatibility		m_dpiCompat;
 
 	/* Tabs. */

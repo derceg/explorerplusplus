@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ColorRuleHelper.h"
+#include "CoreInterface.h"
 #include "Explorer++_internal.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
@@ -37,7 +38,8 @@ class CCustomizeColorsDialog : public CBaseDialog
 {
 public:
 
-	CCustomizeColorsDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList);
+	CCustomizeColorsDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+		IExplorerplusplus *expp, std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList);
 	~CCustomizeColorsDialog();
 
 protected:
@@ -63,6 +65,8 @@ private:
 
 	void	OnOk();
 	void	OnCancel();
+
+	IExplorerplusplus *m_expp;
 
 	std::vector<NColorRuleHelper::ColorRule_t> *m_pColorRuleList;
 

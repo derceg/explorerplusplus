@@ -7,7 +7,6 @@
 #include "Config.h"
 #include "DefaultToolbarButtons.h"
 #include "Icon.h"
-#include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
 #include "ShellBrowser/ViewModes.h"
@@ -81,8 +80,8 @@ void MainToolbar::Initialize(HWND parent)
 	m_imageListLarge.reset(ImageList_Create(dpiScaledSizeLarge, dpiScaledSizeLarge,
 		ILC_COLOR32 | ILC_MASK, 0, SIZEOF_ARRAY(TOOLBAR_BUTTON_SET)));
 
-	m_toolbarImageMapSmall = SetUpToolbarImageList(m_imageListSmall.get(), TOOLBAR_IMAGE_SIZE_SMALL, dpi);
-	m_toolbarImageMapLarge = SetUpToolbarImageList(m_imageListLarge.get(), TOOLBAR_IMAGE_SIZE_LARGE, dpi);
+	m_toolbarImageMapSmall = SetUpToolbarImageList(m_imageListSmall.get(), m_pexpp->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_SMALL, dpi);
+	m_toolbarImageMapLarge = SetUpToolbarImageList(m_imageListLarge.get(), m_pexpp->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_LARGE, dpi);
 
 	SetTooolbarImageList();
 	SetInitialToolbarButtons();
@@ -142,13 +141,14 @@ void MainToolbar::SetTooolbarImageList()
 	SendMessage(m_hwnd, TB_SETBUTTONSIZE, 0, MAKELPARAM(cx, cy));
 }
 
-std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST imageList, int iconSize, UINT dpi)
+std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST imageList,
+	IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi)
 {
 	std::unordered_map<int, int> imageListMappings;
 
 	for (const auto &mapping : TOOLBAR_BUTTON_ICON_MAPPINGS)
 	{
-		wil::unique_hbitmap bitmap = IconResourceLoader::LoadBitmapFromPNGForDpi(mapping.second, iconSize, iconSize, dpi);
+		wil::unique_hbitmap bitmap = iconResourceLoader->LoadBitmapFromPNGForDpi(mapping.second, iconSize, iconSize, dpi);
 
 		int imagePosition = ImageList_Add(imageList, bitmap.get(), nullptr);
 

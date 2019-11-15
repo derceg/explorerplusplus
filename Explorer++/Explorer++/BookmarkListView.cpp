@@ -7,7 +7,7 @@
 #include "MainResource.h"
 #include "../Helper/Macros.h"
 
-CBookmarkListView::CBookmarkListView(HWND hListView) :
+CBookmarkListView::CBookmarkListView(HWND hListView, IExplorerplusplus *expp) :
 	m_hListView(hListView),
 	m_uIDCounter(0)
 {
@@ -19,8 +19,8 @@ CBookmarkListView::CBookmarkListView(HWND hListView) :
 	UINT dpi = m_dpiCompat.GetDpiForWindow(hListView);
 	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(iconWidth, iconHeight,
-		{Icon::Folder, Icon::Bookmarks});
+	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(expp->GetIconResourceLoader(),
+		iconWidth, iconHeight, {Icon::Folder, Icon::Bookmarks});
 	ListView_SetImageList(hListView, m_imageList.get(), LVSIL_SMALL);
 }
 

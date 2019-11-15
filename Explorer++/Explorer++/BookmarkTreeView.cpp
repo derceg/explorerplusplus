@@ -9,7 +9,7 @@
 #include <stack>
 
 CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
-	CBookmarkFolder *pAllBookmarks, const GUID &guidSelected,
+	IExplorerplusplus *expp, CBookmarkFolder *pAllBookmarks, const GUID &guidSelected,
 	const NBookmarkHelper::setExpansion_t &setExpansion) :
 	m_hTreeView(hTreeView),
 	m_instance(hInstance),
@@ -27,7 +27,8 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
 	UINT dpi = m_dpiCompat.GetDpiForWindow(hTreeView);
 	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(iconWidth, iconHeight, { Icon::Folder});
+	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(expp->GetIconResourceLoader(),
+		iconWidth, iconHeight, { Icon::Folder});
 	TreeView_SetImageList(hTreeView, m_imageList.get(), TVSIL_NORMAL);
 
 	SetupTreeView(guidSelected, setExpansion);

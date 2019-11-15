@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "CoreInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ReferenceCount.h"
@@ -56,7 +57,9 @@ class CMergeFilesDialog : public CBaseDialog
 {
 public:
 
-	CMergeFilesDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::wstring strOutputDirectory,std::list<std::wstring> FullFilenameList,BOOL bShowFriendlyDates);
+	CMergeFilesDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+		IExplorerplusplus *expp, std::wstring strOutputDirectory,
+		std::list<std::wstring> FullFilenameList, BOOL bShowFriendlyDates);
 	~CMergeFilesDialog();
 
 protected:
@@ -79,6 +82,8 @@ private:
 	void	OnChangeOutputDirectory();
 	void	OnMove(bool bUp);
 	void	OnFinished();
+
+	IExplorerplusplus *m_expp;
 
 	std::wstring m_strOutputDirectory;
 	std::list<std::wstring> m_FullFilenameList;

@@ -6,6 +6,7 @@
 
 #include "BookmarkHelper.h"
 #include "BookmarkTreeView.h"
+#include "CoreInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/DialogSettings.h"
@@ -42,7 +43,8 @@ class CAddBookmarkDialog : public CBaseDialog, public NBookmark::IBookmarkItemNo
 {
 public:
 
-	CAddBookmarkDialog(HINSTANCE hInstance,int iResource,HWND hParent,CBookmarkFolder &AllBookmarks,CBookmark &Bookmark);
+	CAddBookmarkDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+		IExplorerplusplus *expp, CBookmarkFolder &AllBookmarks, CBookmark &Bookmark);
 	~CAddBookmarkDialog();
 
 	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
@@ -77,6 +79,8 @@ private:
 
 	void		SaveTreeViewState();
 	void		SaveTreeViewExpansionState(HWND hTreeView,HTREEITEM hItem);
+
+	IExplorerplusplus *m_expp;
 
 	CBookmarkFolder &m_AllBookmarks;
 	CBookmark &m_Bookmark;

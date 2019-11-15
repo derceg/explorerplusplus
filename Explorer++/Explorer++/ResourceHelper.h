@@ -5,12 +5,16 @@
 #pragma once
 
 #include "Icon.h"
+#include "IconResourceLoader.h"
 #include <wil/resource.h>
 #include <tuple>
 #include <unordered_map>
 
 using IconImageListMapping = std::unordered_map<Icon, int>;
 
-void SetMenuItemImage(HMENU menu, UINT menuItemId, Icon icon, int dpi, std::vector<wil::unique_hbitmap> &menuImages);
-std::tuple<wil::unique_himagelist, IconImageListMapping> CreateIconImageList(int iconWidth, int iconHeight, const std::initializer_list<Icon> &icons);
-void AddIconToImageList(HIMAGELIST imageList, Icon icon, int iconWidth, int iconHeight, IconImageListMapping &imageListMappings);
+void SetMenuItemImage(HMENU menu, UINT menuItemId, IconResourceLoader *iconResourceLoader,
+	Icon icon, int dpi, std::vector<wil::unique_hbitmap> &menuImages);
+std::tuple<wil::unique_himagelist, IconImageListMapping> CreateIconImageList(IconResourceLoader *iconResourceLoader,
+	int iconWidth, int iconHeight, const std::initializer_list<Icon> &icons);
+void AddIconToImageList(HIMAGELIST imageList, IconResourceLoader *iconResourceLoader, Icon icon,
+	int iconWidth, int iconHeight, IconImageListMapping &imageListMappings);

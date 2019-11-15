@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "CoreInterface.h"
 #include "../Helper/BaseDialog.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/FileActionHandler.h"
@@ -49,7 +50,8 @@ class CMassRenameDialog : public CBaseDialog
 {
 public:
 
-	CMassRenameDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::list<std::wstring> FullFilenameList,CFileActionHandler *pFileActionHandler);
+	CMassRenameDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *expp,
+		std::list<std::wstring> FullFilenameList, CFileActionHandler *pFileActionHandler);
 	~CMassRenameDialog();
 
 protected:
@@ -70,6 +72,7 @@ private:
 
 	void	ProcessFileName(const std::wstring &strTarget,const std::wstring &strFilename,int iFileIndex,std::wstring &strOutput);
 
+	IExplorerplusplus *m_expp;
 	std::list<std::wstring> m_FullFilenameList;
 	wil::unique_hicon m_moreIcon;
 	CFileActionHandler *m_pFileActionHandler;

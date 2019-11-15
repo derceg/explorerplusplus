@@ -16,12 +16,12 @@
 
 const TCHAR CCustomizeColorsDialogPersistentSettings::SETTINGS_KEY[] = _T("CustomizeColors");
 
-CCustomizeColorsDialog::CCustomizeColorsDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList) :
-CBaseDialog(hInstance,iResource,hParent,true)
+CCustomizeColorsDialog::CCustomizeColorsDialog(HINSTANCE hInstance, int iResource,
+	HWND hParent, IExplorerplusplus *expp, std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList) :
+	CBaseDialog(hInstance, iResource, hParent, true),
+	m_expp(expp),
+	m_pColorRuleList(pColorRuleList)
 {
-	m_pColorRuleList = pColorRuleList;
-
 	m_pccdps = &CCustomizeColorsDialogPersistentSettings::GetInstance();
 }
 
@@ -83,7 +83,7 @@ INT_PTR CCustomizeColorsDialog::OnInitDialog()
 
 wil::unique_hicon CCustomizeColorsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::CustomizeColors, iconWidth, iconHeight);
+	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::CustomizeColors, iconWidth, iconHeight);
 }
 
 void CCustomizeColorsDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,

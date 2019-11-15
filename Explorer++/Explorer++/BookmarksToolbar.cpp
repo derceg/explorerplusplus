@@ -41,7 +41,8 @@ void CBookmarksToolbar::InitializeToolbar()
 	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
 
-	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(iconWidth, iconHeight, { Icon::Folder, Icon::Bookmarks});
+	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(m_pexpp->GetIconResourceLoader(),
+		iconWidth, iconHeight, { Icon::Folder, Icon::Bookmarks});
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageList.get()));
 
 	m_pbtdh = new CBookmarksToolbarDropHandler(m_hToolbar,m_AllBookmarks,m_guidBookmarksToolbar);
@@ -385,7 +386,7 @@ void CBookmarksToolbar::OnNewBookmark()
 	GetDisplayName(currentDirectory, displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
 	CBookmark Bookmark = CBookmark::Create(displayName, currentDirectory, EMPTY_STRING);
 
-	CAddBookmarkDialog AddBookmarkDialog(m_instance, IDD_ADD_BOOKMARK, m_hToolbar, m_AllBookmarks, Bookmark);
+	CAddBookmarkDialog AddBookmarkDialog(m_instance, IDD_ADD_BOOKMARK, m_hToolbar, m_pexpp, m_AllBookmarks, Bookmark);
 	AddBookmarkDialog.ShowModalDialog();
 }
 

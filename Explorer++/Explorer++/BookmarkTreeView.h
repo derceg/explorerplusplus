@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BookmarkHelper.h"
+#include "CoreInterface.h"
 #include "ResourceHelper.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/DpiCompatibility.h"
@@ -15,7 +16,7 @@ class CBookmarkTreeView
 {
 public:
 
-	CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
+	CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplorerplusplus *expp,
 		CBookmarkFolder *pAllBookmarks, const GUID &guidSelected,
 		const NBookmarkHelper::setExpansion_t &setExpansion);
 	~CBookmarkTreeView();

@@ -1287,7 +1287,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		GetDisplayName(szCurrentDirectory, szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
 		CBookmark Bookmark = CBookmark::Create(szDisplayName, szCurrentDirectory, EMPTY_STRING);
 
-		CAddBookmarkDialog AddBookmarkDialog(m_hLanguageModule, IDD_ADD_BOOKMARK, hwnd, *m_bfAllBookmarks, Bookmark);
+		CAddBookmarkDialog AddBookmarkDialog(m_hLanguageModule, IDD_ADD_BOOKMARK, hwnd, this, *m_bfAllBookmarks, Bookmark);
 		AddBookmarkDialog.ShowModalDialog();
 	}
 	break;

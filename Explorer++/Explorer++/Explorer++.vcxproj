@@ -626,6 +626,9 @@
     <ClInclude Include="HolderWindow.h" />
     <ClInclude Include="HolderWindowInternal.h" />
     <ClInclude Include="Icon.h" />
+    <ClInclude Include="IconMapping.h" />
+    <ClInclude Include="IconMappingsColor.h" />
+    <ClInclude Include="IconMappingsWindows10.h" />
     <ClInclude Include="IconResourceLoader.h" />
     <ClInclude Include="IDropFilesCallback.h" />
     <ClInclude Include="IModelessDialogNotification.h" />

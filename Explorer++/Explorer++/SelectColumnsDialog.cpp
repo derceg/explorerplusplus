@@ -84,7 +84,7 @@ INT_PTR CSelectColumnsDialog::OnInitDialog()
 
 wil::unique_hicon CSelectColumnsDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::SelectColumns, iconWidth, iconHeight);
+	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::SelectColumns, iconWidth, iconHeight);
 }
 
 bool CSelectColumnsDialog::CompareColumns(const Column_t &column1, const Column_t &column2)

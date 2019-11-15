@@ -5,6 +5,7 @@
 #pragma once
 
 #include "DefaultColumns.h"
+#include "IconResourceLoader.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ViewModes.h"
 #include "../Helper/Macros.h"
@@ -85,6 +86,7 @@ struct Config
 	Config() :
 		defaultTabDirectoryStatic(GetComputerFolderPath())
 	{
+		iconTheme = IconTheme::Color;
 		startupMode = STARTUP_PREVIOUSTABS;
 		defaultTabDirectory = GetComputerFolderPath();
 		showStatusBar = TRUE;
@@ -172,6 +174,7 @@ struct Config
 	static const UINT DEFAULT_DISPLAYWINDOW_HEIGHT = 90;
 	static const UINT DEFAULT_TREEVIEW_WIDTH = 208;
 
+	IconTheme iconTheme;
 	StartupMode_t startupMode;
 	std::wstring defaultTabDirectory;
 	const std::wstring defaultTabDirectoryStatic;

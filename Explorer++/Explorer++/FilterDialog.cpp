@@ -62,7 +62,7 @@ INT_PTR CFilterDialog::OnInitDialog()
 
 wil::unique_hicon CFilterDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::Filter, iconWidth, iconHeight);
+	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Filter, iconWidth, iconHeight);
 }
 
 void CFilterDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,

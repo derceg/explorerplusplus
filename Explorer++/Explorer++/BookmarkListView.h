@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BookmarkHelper.h"
+#include "CoreInterface.h"
 #include "ResourceHelper.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/DpiCompatibility.h"
@@ -15,7 +16,7 @@ class CBookmarkListView
 {
 public:
 
-	CBookmarkListView(HWND hListView);
+	CBookmarkListView(HWND hListView, IExplorerplusplus *expp);
 
 	void							InsertBookmarksIntoListView(const CBookmarkFolder &BookmarkFolder);
 	int								InsertBookmarkFolderIntoListView(const CBookmarkFolder &BookmarkFolder, int iPosition);

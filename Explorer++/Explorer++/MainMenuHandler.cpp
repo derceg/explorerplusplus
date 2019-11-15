@@ -57,8 +57,8 @@ void Explorerplusplus::OnMergeFiles()
 		FullFilenameList.push_back(szFullFilename);
 	}
 
-	CMergeFilesDialog CMergeFilesDialog(m_hLanguageModule, IDD_MERGEFILES,
-		m_hContainer, szCurrentDirectory, FullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
+	CMergeFilesDialog CMergeFilesDialog(m_hLanguageModule, IDD_MERGEFILES, m_hContainer,
+		this, szCurrentDirectory, FullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	CMergeFilesDialog.ShowModalDialog();
 }
 
@@ -71,7 +71,7 @@ void Explorerplusplus::OnSplitFile()
 		TCHAR szFullFilename[MAX_PATH];
 		m_pActiveShellBrowser->QueryFullItemName(iSelected, szFullFilename, SIZEOF_ARRAY(szFullFilename));
 
-		CSplitFileDialog SplitFileDialog(m_hLanguageModule, IDD_SPLITFILE, m_hContainer, szFullFilename);
+		CSplitFileDialog SplitFileDialog(m_hLanguageModule, IDD_SPLITFILE, m_hContainer, this, szFullFilename);
 		SplitFileDialog.ShowModalDialog();
 	}
 }
@@ -117,7 +117,7 @@ void Explorerplusplus::OnSearch()
 
 void Explorerplusplus::OnCustomizeColors()
 {
-	CCustomizeColorsDialog CustomizeColorsDialog(m_hLanguageModule, IDD_CUSTOMIZECOLORS, m_hContainer, &m_ColorRules);
+	CCustomizeColorsDialog CustomizeColorsDialog(m_hLanguageModule, IDD_CUSTOMIZECOLORS, m_hContainer, this, &m_ColorRules);
 	CustomizeColorsDialog.ShowModalDialog();
 
 	/* Causes the active listview to redraw (therefore

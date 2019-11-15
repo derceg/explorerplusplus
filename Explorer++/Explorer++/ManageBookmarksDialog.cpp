@@ -66,7 +66,7 @@ INT_PTR CManageBookmarksDialog::OnInitDialog()
 
 wil::unique_hicon CManageBookmarksDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::Bookmarks, iconWidth, iconHeight);
+	return m_pexpp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::Bookmarks, iconWidth, iconHeight);
 }
 
 void CManageBookmarksDialog::SetupToolbar()
@@ -85,8 +85,8 @@ void CManageBookmarksDialog::SetupToolbar()
 	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
 
-	std::tie(m_imageListToolbar, m_imageListToolbarMappings) = CreateIconImageList(iconWidth, iconHeight,
-		{ Icon::Back, Icon::Forward, Icon::Copy, Icon::Views});
+	std::tie(m_imageListToolbar, m_imageListToolbarMappings) = CreateIconImageList(m_pexpp->GetIconResourceLoader(),
+		iconWidth, iconHeight, { Icon::Back, Icon::Forward, Icon::Copy, Icon::Views});
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageListToolbar.get()));
 
 	TBBUTTON tbb;
@@ -149,7 +149,7 @@ void CManageBookmarksDialog::SetupTreeView()
 {
 	HWND hTreeView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_TREEVIEW);
 
-	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView,GetInstance(),&m_AllBookmarks,
+	m_pBookmarkTreeView = new CBookmarkTreeView(hTreeView,GetInstance(),m_pexpp,&m_AllBookmarks,
 		m_pmbdps->m_guidSelected,m_pmbdps->m_setExpansion);
 }
 
@@ -157,7 +157,7 @@ void CManageBookmarksDialog::SetupListView()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_MANAGEBOOKMARKS_LISTVIEW);
 
-	m_pBookmarkListView = new CBookmarkListView(hListView);
+	m_pBookmarkListView = new CBookmarkListView(hListView, m_pexpp);
 
 	int iColumn = 0;
 

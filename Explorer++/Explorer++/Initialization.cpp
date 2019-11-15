@@ -84,6 +84,14 @@ void Explorerplusplus::OnCreate(void)
 	LoadAllSettings(&pLoadSave);
 	ApplyToolbarSettings();
 
+	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config->iconTheme);
+
+	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hContainer);
+	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
+	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
+	m_optionsDialogIcon = m_iconResourceLoader->LoadIconFromPNGForDpi(Icon::Options, iconWidth, iconHeight, dpi);
+	m_newTabDirectoryIcon = m_iconResourceLoader->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
+
 	SetLanguageModule();
 
 	m_navigation = new Navigation(m_config, this);

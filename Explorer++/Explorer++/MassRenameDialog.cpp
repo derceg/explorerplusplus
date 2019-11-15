@@ -32,14 +32,14 @@ const TCHAR CMassRenameDialogPersistentSettings::SETTINGS_KEY[] = _T("MassRename
 const TCHAR CMassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_1[] = _T("ColumnWidth1");
 const TCHAR CMassRenameDialogPersistentSettings::SETTING_COLUMN_WIDTH_2[] = _T("ColumnWidth2");
 
-CMassRenameDialog::CMassRenameDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,std::list<std::wstring> FullFilenameList,
+CMassRenameDialog::CMassRenameDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+	IExplorerplusplus *expp, std::list<std::wstring> FullFilenameList,
 	CFileActionHandler *pFileActionHandler) :
-CBaseDialog(hInstance,iResource,hParent,true)
+	CBaseDialog(hInstance, iResource, hParent, true),
+	m_expp(expp),
+	m_FullFilenameList(FullFilenameList),
+	m_pFileActionHandler(pFileActionHandler)
 {
-	m_FullFilenameList = FullFilenameList;
-	m_pFileActionHandler = pFileActionHandler;
-
 	m_pmrdps = &CMassRenameDialogPersistentSettings::GetInstance();
 }
 
@@ -51,7 +51,7 @@ CMassRenameDialog::~CMassRenameDialog()
 INT_PTR CMassRenameDialog::OnInitDialog()
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
-	m_moreIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::ArrowRight, 16, 16, dpi);
+	m_moreIcon = m_expp->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::ArrowRight, 16, 16, dpi);
 	SendDlgItemMessage(m_hDlg,IDC_MASSRENAME_MORE,BM_SETIMAGE,IMAGE_ICON,
 		reinterpret_cast<LPARAM>(m_moreIcon.get()));
 
@@ -127,7 +127,7 @@ INT_PTR CMassRenameDialog::OnInitDialog()
 
 wil::unique_hicon CMassRenameDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::MassRename, iconWidth, iconHeight);
+	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::MassRename, iconWidth, iconHeight);
 }
 
 void CMassRenameDialog::GetResizableControlInformation(CBaseDialog::DialogSizeConstraint &dsc,

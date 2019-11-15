@@ -39,16 +39,16 @@ const TCHAR CSplitFileDialogPersistentSettings::SETTINGS_KEY[] = _T("SplitFile")
 const TCHAR CSplitFileDialogPersistentSettings::SETTING_SIZE[] = _T("Size");
 const TCHAR CSplitFileDialogPersistentSettings::SETTING_SIZE_GROUP[] = _T("SizeGroup");
 
-CSplitFileDialog::CSplitFileDialog(HINSTANCE hInstance,
-	int iResource,HWND hParent,std::wstring strFullFilename) :
-CBaseDialog(hInstance,iResource,hParent,false)
+CSplitFileDialog::CSplitFileDialog(HINSTANCE hInstance, int iResource, HWND hParent,
+	IExplorerplusplus *expp, std::wstring strFullFilename) :
+	CBaseDialog(hInstance, iResource, hParent, false),
+	m_expp(expp),
+	m_strFullFilename(strFullFilename),
+	m_bSplittingFile(false),
+	m_bStopSplitting(false),
+	m_CurrentError(ERROR_NONE),
+	m_pSplitFile(nullptr)
 {
-	m_strFullFilename	= strFullFilename;
-	m_bSplittingFile	= false;
-	m_bStopSplitting	= false;
-	m_CurrentError		= ERROR_NONE;
-	m_pSplitFile		= NULL;
-
 	m_psfdps = &CSplitFileDialogPersistentSettings::GetInstance();
 }
 
@@ -156,7 +156,7 @@ INT_PTR CSplitFileDialog::OnInitDialog()
 
 wil::unique_hicon CSplitFileDialog::GetDialogIcon(int iconWidth, int iconHeight) const
 {
-	return IconResourceLoader::LoadIconFromPNGAndScale(Icon::SplitFiles, iconWidth, iconHeight);
+	return m_expp->GetIconResourceLoader()->LoadIconFromPNGAndScale(Icon::SplitFiles, iconWidth, iconHeight);
 }
 
 INT_PTR CSplitFileDialog::OnTimer(int iTimerID)

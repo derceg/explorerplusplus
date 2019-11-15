@@ -97,12 +97,6 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	m_pClipboardDataObject	= NULL;
 	m_iCutTabInternal		= 0;
 	m_hCutTreeViewItem		= NULL;
-
-	UINT dpi = m_dpiCompat.GetDpiForWindow(hwnd);
-	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	m_optionsDialogIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Options, iconWidth, iconHeight, dpi);
-	m_newTabDirectoryIcon = IconResourceLoader::LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
 }
 
 Explorerplusplus::~Explorerplusplus()

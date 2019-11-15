@@ -708,6 +708,15 @@
     <ClInclude Include="IconResourceLoader.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="IconMappingsWindows10.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="IconMappingsColor.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="IconMapping.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">
