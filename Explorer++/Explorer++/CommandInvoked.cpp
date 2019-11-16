@@ -13,11 +13,6 @@ Plugins::CommandInvoked::CommandInvoked(PluginCommandManager *pluginCommandManag
 
 }
 
-Plugins::CommandInvoked::~CommandInvoked()
-{
-
-}
-
 boost::signals2::connection Plugins::CommandInvoked::connectObserver(sol::protected_function observer, sol::this_state state)
 {
 	UNREFERENCED_PARAMETER(state);

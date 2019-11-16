@@ -15,8 +15,6 @@ class CNewBookmarkFolderDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CNewBookmarkFolderDialogPersistentSettings();
-
 	static CNewBookmarkFolderDialogPersistentSettings &GetInstance();
 
 private:
@@ -36,7 +34,6 @@ class CNewBookmarkFolderDialog : public CBaseDialog
 public:
 
 	CNewBookmarkFolderDialog(HINSTANCE hInstance,int iResource,HWND hParent);
-	~CNewBookmarkFolderDialog();
 
 protected:
 

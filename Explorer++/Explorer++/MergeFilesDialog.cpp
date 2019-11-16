@@ -605,11 +605,6 @@ CDialogSettings(SETTINGS_KEY)
 
 }
 
-CMergeFilesDialogPersistentSettings::~CMergeFilesDialogPersistentSettings()
-{
-	
-}
-
 CMergeFilesDialogPersistentSettings& CMergeFilesDialogPersistentSettings::GetInstance()
 {
 	static CMergeFilesDialogPersistentSettings mfdps;

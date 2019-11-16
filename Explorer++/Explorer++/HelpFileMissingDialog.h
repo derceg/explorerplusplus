@@ -11,7 +11,6 @@ class CHelpFileMissingDialog : public CBaseDialog
 public:
 
 	CHelpFileMissingDialog(HINSTANCE hInstance,int iResource,HWND hParent);
-	~CHelpFileMissingDialog();
 
 protected:
 

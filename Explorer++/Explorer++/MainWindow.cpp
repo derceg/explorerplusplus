@@ -37,11 +37,6 @@ MainWindow::MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE inst
 	m_connections.push_back(m_config->showPrivilegeLevelInTitleBar.addObserver(boost::bind(&MainWindow::OnShowPrivilegeLevelInTitleBarUpdated, this, _1)));
 }
 
-MainWindow::~MainWindow()
-{
-
-}
-
 void MainWindow::OnNavigationCompleted(const Tab &tab)
 {
 	if (m_expp->GetTabContainer()->IsTabSelected(tab))

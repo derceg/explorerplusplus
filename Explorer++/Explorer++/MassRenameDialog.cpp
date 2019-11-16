@@ -43,11 +43,6 @@ CMassRenameDialog::CMassRenameDialog(HINSTANCE hInstance, int iResource, HWND hP
 	m_pmrdps = &CMassRenameDialogPersistentSettings::GetInstance();
 }
 
-CMassRenameDialog::~CMassRenameDialog()
-{
-
-}
-
 INT_PTR CMassRenameDialog::OnInitDialog()
 {
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hDlg);
@@ -413,11 +408,6 @@ CDialogSettings(SETTINGS_KEY)
 {
 	m_iColumnWidth1 = DEFAULT_MASS_RENAME_COLUMN_WIDTH;
 	m_iColumnWidth2 = DEFAULT_MASS_RENAME_COLUMN_WIDTH;
-}
-
-CMassRenameDialogPersistentSettings::~CMassRenameDialogPersistentSettings()
-{
-
 }
 
 CMassRenameDialogPersistentSettings& CMassRenameDialogPersistentSettings::GetInstance()

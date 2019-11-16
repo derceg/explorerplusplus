@@ -16,8 +16,6 @@ class CDestroyFilesDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CDestroyFilesDialogPersistentSettings();
-
 	static CDestroyFilesDialogPersistentSettings &GetInstance();
 
 private:
@@ -47,7 +45,6 @@ class CDestroyFilesDialog : public CBaseDialog
 public:
 
 	CDestroyFilesDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::list<std::wstring> FullFilenameList,BOOL bShowFriendlyDates);
-	~CDestroyFilesDialog();
 
 protected:
 

@@ -32,7 +32,6 @@ public:
 	typedef CachedIconSetByPath::iterator iterator;
 
 	CachedIcons(std::size_t maxItems);
-	~CachedIcons();
 
 	iterator end();
 

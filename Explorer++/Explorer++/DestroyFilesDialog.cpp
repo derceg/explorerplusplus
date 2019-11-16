@@ -27,11 +27,6 @@ CBaseDialog(hInstance,iResource,hParent,true)
 	m_pdfdps = &CDestroyFilesDialogPersistentSettings::GetInstance();
 }
 
-CDestroyFilesDialog::~CDestroyFilesDialog()
-{
-
-}
-
 INT_PTR CDestroyFilesDialog::OnInitDialog()
 {
 	m_icon.reset(LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN)));
@@ -301,11 +296,6 @@ CDestroyFilesDialogPersistentSettings::CDestroyFilesDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
 {
 	m_uOverwriteMethod = NFileOperations::OVERWRITE_ONEPASS;
-}
-
-CDestroyFilesDialogPersistentSettings::~CDestroyFilesDialogPersistentSettings()
-{
-	
 }
 
 CDestroyFilesDialogPersistentSettings& CDestroyFilesDialogPersistentSettings::GetInstance()

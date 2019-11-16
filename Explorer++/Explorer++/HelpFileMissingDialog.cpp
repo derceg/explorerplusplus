@@ -14,11 +14,6 @@ CBaseDialog(hInstance,iResource,hParent,false)
 	
 }
 
-CHelpFileMissingDialog::~CHelpFileMissingDialog()
-{
-
-}
-
 INT_PTR CHelpFileMissingDialog::OnInitDialog()
 {
 	CenterWindow(GetParent(m_hDlg),m_hDlg);

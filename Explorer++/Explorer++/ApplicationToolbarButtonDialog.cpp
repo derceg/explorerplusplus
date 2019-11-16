@@ -16,11 +16,6 @@ CApplicationToolbarButtonDialog::CApplicationToolbarButtonDialog(HINSTANCE hInst
 	
 }
 
-CApplicationToolbarButtonDialog::~CApplicationToolbarButtonDialog()
-{
-
-}
-
 INT_PTR CApplicationToolbarButtonDialog::OnInitDialog()
 {
 	if(m_IsNew)

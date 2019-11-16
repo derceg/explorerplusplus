@@ -12,11 +12,6 @@ AcceleratorUpdater::AcceleratorUpdater(HACCEL *acceleratorTable) :
 
 }
 
-AcceleratorUpdater::~AcceleratorUpdater()
-{
-
-}
-
 void AcceleratorUpdater::update(std::vector<ShortcutKey> shortcutKeys)
 {
 	int numAccelerators = CopyAcceleratorTable(*m_acceleratorTable, nullptr, 0);

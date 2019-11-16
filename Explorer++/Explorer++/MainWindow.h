@@ -21,7 +21,7 @@ private:
 
 	MainWindow(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
 		IExplorerplusplus *expp, Navigation *navigation);
-	~MainWindow();
+	~MainWindow() = default;
 
 	void OnNavigationCompleted(const Tab &tab);
 	void OnTabSelected(const Tab &tab);

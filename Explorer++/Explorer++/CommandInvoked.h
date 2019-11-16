@@ -14,7 +14,6 @@ namespace Plugins
 	public:
 
 		CommandInvoked(PluginCommandManager *pluginCommandManager, int pluginId);
-		virtual ~CommandInvoked();
 
 	protected:
 

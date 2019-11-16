@@ -34,7 +34,7 @@ private:
 
 	TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabContainer,
 		Navigation *navigation, HINSTANCE instance, std::shared_ptr<Config> config);
-	~TaskbarThumbnails();
+	~TaskbarThumbnails() = default;
 
 	static LRESULT CALLBACK MainWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK MainWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

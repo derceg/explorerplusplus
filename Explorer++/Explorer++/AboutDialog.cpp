@@ -20,11 +20,6 @@ CBaseDialog(hInstance,iResource,hParent,false)
 	
 }
 
-CAboutDialog::~CAboutDialog()
-{
-
-}
-
 INT_PTR CAboutDialog::OnInitDialog()
 {
 	m_icon.reset(reinterpret_cast<HICON>(LoadImage(GetModuleHandle(0),

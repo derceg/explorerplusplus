@@ -500,11 +500,6 @@ m_IDCounter(0)
 
 }
 
-CApplicationToolbarPersistentSettings::~CApplicationToolbarPersistentSettings()
-{
-	
-}
-
 CApplicationToolbarPersistentSettings& CApplicationToolbarPersistentSettings::GetInstance()
 {
 	static CApplicationToolbarPersistentSettings atps;

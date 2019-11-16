@@ -13,11 +13,6 @@ Plugins::TabCreated::TabCreated(TabContainer *tabContainer) :
 
 }
 
-Plugins::TabCreated::~TabCreated()
-{
-
-}
-
 boost::signals2::connection Plugins::TabCreated::connectObserver(sol::protected_function observer, sol::this_state state)
 {
 	UNREFERENCED_PARAMETER(state);

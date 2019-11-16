@@ -19,11 +19,6 @@ Navigation::Navigation(std::shared_ptr<Config> config, IExplorerplusplus *expp) 
 	});
 }
 
-Navigation::~Navigation()
-{
-
-}
-
 void Navigation::OnTabCreated(int tabId, BOOL switchToNewTab)
 {
 	UNREFERENCED_PARAMETER(switchToNewTab);

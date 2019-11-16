@@ -24,11 +24,6 @@ CBaseDialog(hInstance,iResource,hParent,false)
 	m_psfadps = &CSetFileAttributesDialogPersistentSettings::GetInstance();
 }
 
-CSetFileAttributesDialog::~CSetFileAttributesDialog()
-{
-
-}
-
 INT_PTR CSetFileAttributesDialog::OnInitDialog()
 {
 	InitializeAttributesStructure();
@@ -380,11 +375,6 @@ CSetFileAttributesDialogPersistentSettings::CSetFileAttributesDialogPersistentSe
 CDialogSettings(SETTINGS_KEY)
 {
 
-}
-
-CSetFileAttributesDialogPersistentSettings::~CSetFileAttributesDialogPersistentSettings()
-{
-	
 }
 
 CSetFileAttributesDialogPersistentSettings& CSetFileAttributesDialogPersistentSettings::GetInstance()

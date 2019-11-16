@@ -13,11 +13,6 @@ UiTheming::UiTheming(IExplorerplusplus *expp, TabContainer *tabContainer) :
 	m_connections.push_back(m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&UiTheming::OnTabCreated, this, _1, _2)));
 }
 
-UiTheming::~UiTheming()
-{
-
-}
-
 void UiTheming::OnTabCreated(int tabId, BOOL switchToNewTab)
 {
 	UNREFERENCED_PARAMETER(switchToNewTab);

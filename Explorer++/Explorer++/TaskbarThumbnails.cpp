@@ -46,11 +46,6 @@ TaskbarThumbnails::TaskbarThumbnails(IExplorerplusplus *expp, TabContainer *tabC
 	Initialize();
 }
 
-TaskbarThumbnails::~TaskbarThumbnails()
-{
-
-}
-
 void TaskbarThumbnails::Initialize()
 {
 	if(!m_enabled)

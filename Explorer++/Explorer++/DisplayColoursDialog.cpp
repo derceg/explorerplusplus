@@ -22,11 +22,6 @@ CDisplayColoursDialog::CDisplayColoursDialog(HINSTANCE hInstance,int iResource,
 	m_pdcdps = &CDisplayColoursDialogPersistentSettings::GetInstance();
 }
 
-CDisplayColoursDialog::~CDisplayColoursDialog()
-{
-
-}
-
 INT_PTR CDisplayColoursDialog::OnInitDialog()
 {
 	InitializeColorGroups();
@@ -398,11 +393,6 @@ void CDisplayColoursDialog::SaveState()
 
 CDisplayColoursDialogPersistentSettings::CDisplayColoursDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
-{
-	
-}
-
-CDisplayColoursDialogPersistentSettings::~CDisplayColoursDialogPersistentSettings()
 {
 	
 }

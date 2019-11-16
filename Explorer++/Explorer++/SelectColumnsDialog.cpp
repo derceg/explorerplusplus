@@ -29,11 +29,6 @@ CSelectColumnsDialog::CSelectColumnsDialog(HINSTANCE hInstance,
 	m_pscdps = &CSelectColumnsDialogPersistentSettings::GetInstance();
 }
 
-CSelectColumnsDialog::~CSelectColumnsDialog()
-{
-
-}
-
 INT_PTR CSelectColumnsDialog::OnInitDialog()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_COLUMNS_LISTVIEW);
@@ -327,11 +322,6 @@ CSelectColumnsDialogPersistentSettings::CSelectColumnsDialogPersistentSettings()
 CDialogSettings(SETTINGS_KEY)
 {
 
-}
-
-CSelectColumnsDialogPersistentSettings::~CSelectColumnsDialogPersistentSettings()
-{
-	
 }
 
 CSelectColumnsDialogPersistentSettings& CSelectColumnsDialogPersistentSettings::GetInstance()

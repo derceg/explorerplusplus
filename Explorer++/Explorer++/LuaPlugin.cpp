@@ -21,11 +21,6 @@ Plugins::LuaPlugin::LuaPlugin(const std::wstring &directory, const Manifest &man
 	BindAllApiMethods(m_id, m_lua, pluginInterface);
 }
 
-Plugins::LuaPlugin::~LuaPlugin()
-{
-
-}
-
 int Plugins::LuaPlugin::GetId() const
 {
 	return m_id;

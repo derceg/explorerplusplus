@@ -12,11 +12,6 @@ Plugins::UiApi::UiApi(UiTheming *uiTheming) :
 
 }
 
-Plugins::UiApi::~UiApi()
-{
-
-}
-
 bool Plugins::UiApi::setListViewColors(const std::wstring &backgroundColorString, const std::wstring &textColorString)
 {
 	auto backgroundColor = parseRGBString(backgroundColorString);

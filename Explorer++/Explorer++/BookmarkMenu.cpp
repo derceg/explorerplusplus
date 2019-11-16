@@ -13,11 +13,6 @@ BookmarkMenu::BookmarkMenu(HINSTANCE instance) :
 
 }
 
-BookmarkMenu::~BookmarkMenu()
-{
-
-}
-
 BOOL BookmarkMenu::ShowMenu(HWND parentWindow, const CBookmarkFolder &parentBookmark, const POINT &pt,
 	const std::function<void(const CBookmark &)> &callback)
 {

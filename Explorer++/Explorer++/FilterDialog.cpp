@@ -28,11 +28,6 @@ CBaseDialog(hInstance,iResource,hParent,true)
 	m_pfdps = &CFilterDialogPersistentSettings::GetInstance();
 }
 
-CFilterDialog::~CFilterDialog()
-{
-
-}
-
 INT_PTR CFilterDialog::OnInitDialog()
 {
 	HWND hComboBox = GetDlgItem(m_hDlg,IDC_FILTER_COMBOBOX);
@@ -176,11 +171,6 @@ CFilterDialogPersistentSettings::CFilterDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
 {
 
-}
-
-CFilterDialogPersistentSettings::~CFilterDialogPersistentSettings()
-{
-	
 }
 
 CFilterDialogPersistentSettings& CFilterDialogPersistentSettings::GetInstance()

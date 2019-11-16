@@ -14,7 +14,6 @@ namespace Plugins
 	public:
 
 		TabCreated(TabContainer *tabContainer);
-		virtual ~TabCreated();
 
 	protected:
 

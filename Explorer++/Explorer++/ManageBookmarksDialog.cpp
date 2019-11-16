@@ -1093,11 +1093,6 @@ CDialogSettings(SETTINGS_KEY)
 	/* TODO: Save listview selection information. */
 }
 
-CManageBookmarksDialogPersistentSettings::~CManageBookmarksDialogPersistentSettings()
-{
-	
-}
-
 CManageBookmarksDialogPersistentSettings& CManageBookmarksDialogPersistentSettings::GetInstance()
 {
 	static CManageBookmarksDialogPersistentSettings mbdps;

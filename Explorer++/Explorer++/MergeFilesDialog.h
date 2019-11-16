@@ -16,8 +16,6 @@ class CMergeFilesDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CMergeFilesDialogPersistentSettings();
-
 	static CMergeFilesDialogPersistentSettings &GetInstance();
 
 private:

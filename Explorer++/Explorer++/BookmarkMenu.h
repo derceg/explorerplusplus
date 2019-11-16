@@ -13,7 +13,6 @@ class BookmarkMenu
 public:
 
 	BookmarkMenu(HINSTANCE instance);
-	~BookmarkMenu();
 
 	BOOL ShowMenu(HWND parentWindow, const CBookmarkFolder &parentBookmark, const POINT &pt,
 		const std::function<void(const CBookmark &)> &callback = nullptr);

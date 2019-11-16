@@ -304,11 +304,6 @@ CDialogSettings(SETTINGS_KEY)
 	m_bInitialized = false;
 }
 
-CAddBookmarkDialogPersistentSettings::~CAddBookmarkDialogPersistentSettings()
-{
-	
-}
-
 CAddBookmarkDialogPersistentSettings& CAddBookmarkDialogPersistentSettings::GetInstance()
 {
 	static CAddBookmarkDialogPersistentSettings abdps;

@@ -14,7 +14,6 @@ class UiTheming
 public:
 
 	UiTheming(IExplorerplusplus *expp, TabContainer *tabContainer);
-	~UiTheming();
 
 	bool SetListViewColors(COLORREF backgroundColor, COLORREF textColor);
 	void SetTreeViewColors(COLORREF backgroundColor, COLORREF textColor);

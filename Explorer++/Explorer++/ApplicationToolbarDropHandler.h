@@ -13,7 +13,6 @@ class CApplicationToolbarDropHandler : public IDropTarget
 public:
 
 	CApplicationToolbarDropHandler(HWND hToolbar, CApplicationToolbar *toolbar);
-	~CApplicationToolbarDropHandler();
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);

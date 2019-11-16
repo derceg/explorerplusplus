@@ -667,11 +667,6 @@ CDialogSettings(SETTINGS_KEY)
 	m_strSplitGroup = _T("KB");
 }
 
-CSplitFileDialogPersistentSettings::~CSplitFileDialogPersistentSettings()
-{
-	
-}
-
 CSplitFileDialogPersistentSettings& CSplitFileDialogPersistentSettings::GetInstance()
 {
 	static CSplitFileDialogPersistentSettings sfadps;

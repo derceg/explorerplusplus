@@ -13,8 +13,6 @@ class CDisplayColoursDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CDisplayColoursDialogPersistentSettings();
-
 	static CDisplayColoursDialogPersistentSettings &GetInstance();
 
 private:
@@ -34,7 +32,6 @@ class CDisplayColoursDialog : public CBaseDialog
 public:
 
 	CDisplayColoursDialog(HINSTANCE hInstance,int iResource,HWND hParent,HWND hDisplayWindow,COLORREF DefaultCenterColor,COLORREF DefaultSurroundingColor);
-	~CDisplayColoursDialog();
 
 protected:
 

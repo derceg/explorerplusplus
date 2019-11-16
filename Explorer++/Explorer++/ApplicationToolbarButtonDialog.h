@@ -13,7 +13,6 @@ class CApplicationToolbarButtonDialog : public CBaseDialog
 public:
 
 	CApplicationToolbarButtonDialog(HINSTANCE hInstance,int iResource,HWND hParent,ApplicationButton_t *Button,bool IsNew);
-	~CApplicationToolbarButtonDialog();
 
 protected:
 

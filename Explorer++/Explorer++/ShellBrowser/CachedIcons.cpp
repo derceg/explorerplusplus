@@ -11,11 +11,6 @@ CachedIcons::CachedIcons(std::size_t maxItems) :
 
 }
 
-CachedIcons::~CachedIcons()
-{
-
-}
-
 CachedIcons::iterator CachedIcons::end()
 {
 	CachedIconSetByPath &pathIndex = m_cachedIconSet.get<1>();

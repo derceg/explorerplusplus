@@ -14,7 +14,6 @@ namespace Plugins
 	public:
 
 		TabRemoved(TabContainer *tabContainer);
-		virtual ~TabRemoved();
 
 	protected:
 

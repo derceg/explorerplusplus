@@ -34,11 +34,6 @@ m_UpdateCheckComplete(false)
 	m_pucdps = &CUpdateCheckDialogPersistentSettings::GetInstance();
 }
 
-CUpdateCheckDialog::~CUpdateCheckDialog()
-{
-
-}
-
 INT_PTR CUpdateCheckDialog::OnInitDialog()
 {
 	SetDlgItemText(m_hDlg,IDC_STATIC_CURRENT_VERSION,VERSION_STRING_W);
@@ -290,11 +285,6 @@ void CUpdateCheckDialog::SaveState()
 
 CUpdateCheckDialogPersistentSettings::CUpdateCheckDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
-{
-	
-}
-
-CUpdateCheckDialogPersistentSettings::~CUpdateCheckDialogPersistentSettings()
 {
 	
 }

@@ -20,11 +20,6 @@ Plugins::TabsApi::TabsApi(TabContainer *tabContainer, TabInterface *tabInterface
 
 }
 
-Plugins::TabsApi::~TabsApi()
-{
-
-}
-
 std::vector<Plugins::TabsApi::Tab> Plugins::TabsApi::getAll()
 {
 	std::vector<Tab> tabs;

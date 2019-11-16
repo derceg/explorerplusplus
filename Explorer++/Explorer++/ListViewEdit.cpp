@@ -25,11 +25,6 @@ m_BeginRename(true)
 	
 }
 
-CListViewEdit::~CListViewEdit()
-{
-	
-}
-
 void CListViewEdit::OnEMSetSel(WPARAM &wParam,LPARAM &lParam)
 {
 	/* When editing an item, the listview control

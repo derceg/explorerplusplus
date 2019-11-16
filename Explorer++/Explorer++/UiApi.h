@@ -13,7 +13,6 @@ namespace Plugins
 	public:
 
 		UiApi(UiTheming *uiTheming);
-		~UiApi();
 
 		bool setListViewColors(const std::wstring &backgroundColorString, const std::wstring &textColorString);
 		bool setTreeViewColors(const std::wstring &backgroundColorString, const std::wstring &textColorString);

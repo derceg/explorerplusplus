@@ -24,11 +24,6 @@ CRenameTabDialog::CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hPar
 	m_connections.push_back(m_tabContainer->tabRemovedSignal.AddObserver(boost::bind(&CRenameTabDialog::OnTabClosed, this, _1)));
 }
 
-CRenameTabDialog::~CRenameTabDialog()
-{
-
-}
-
 INT_PTR CRenameTabDialog::OnInitDialog()
 {
 	HWND hEditName = GetDlgItem(m_hDlg,IDC_RENAMETAB_NEWTABNAME);
@@ -153,11 +148,6 @@ CRenameTabDialogPersistentSettings::CRenameTabDialogPersistentSettings() :
 CDialogSettings(SETTINGS_KEY)
 {
 
-}
-
-CRenameTabDialogPersistentSettings::~CRenameTabDialogPersistentSettings()
-{
-	
 }
 
 CRenameTabDialogPersistentSettings& CRenameTabDialogPersistentSettings::GetInstance()

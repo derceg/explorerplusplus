@@ -17,11 +17,6 @@ Plugins::PluginManager::PluginManager(PluginInterface *pluginInterface) :
 
 }
 
-Plugins::PluginManager::~PluginManager()
-{
-
-}
-
 void Plugins::PluginManager::loadAllPlugins(const boost::filesystem::path &pluginDirectory)
 {
 	boost::system::error_code error;

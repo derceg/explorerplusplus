@@ -20,8 +20,6 @@ class CWildcardSelectDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CWildcardSelectDialogPersistentSettings();
-
 	static			CWildcardSelectDialogPersistentSettings &GetInstance();
 
 private:
@@ -53,7 +51,6 @@ class CWildcardSelectDialog : public CBaseDialog
 public:
 
 	CWildcardSelectDialog(HINSTANCE hInstance,int iResource,HWND hParent,BOOL bSelect,IExplorerplusplus *pexpp);
-	~CWildcardSelectDialog();
 
 protected:
 

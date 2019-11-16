@@ -18,11 +18,6 @@ ScriptingDialog::ScriptingDialog(HINSTANCE hInstance, int iResource, HWND hParen
 	m_luaPlugin.GetLuaState().open_libraries(sol::lib::base);
 }
 
-ScriptingDialog::~ScriptingDialog()
-{
-
-}
-
 INT_PTR ScriptingDialog::OnInitDialog()
 {
 	HWND commandControl = GetDlgItem(m_hDlg, IDC_COMMAND);

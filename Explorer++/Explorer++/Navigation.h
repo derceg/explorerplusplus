@@ -14,7 +14,6 @@ class Navigation
 public:
 
 	Navigation(std::shared_ptr<Config> config, IExplorerplusplus *expp);
-	~Navigation();
 
 	void OnBrowseBack();
 	void OnBrowseForward();

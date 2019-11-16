@@ -16,8 +16,6 @@ class CRenameTabDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CRenameTabDialogPersistentSettings();
-
 	static CRenameTabDialogPersistentSettings &GetInstance();
 
 private:
@@ -38,7 +36,6 @@ public:
 
 	CRenameTabDialog(HINSTANCE hInstance, int iResource, HWND hParent,
 		int tabId, TabContainer *tabContainer);
-	~CRenameTabDialog();
 
 protected:
 

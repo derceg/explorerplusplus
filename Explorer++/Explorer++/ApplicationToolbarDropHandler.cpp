@@ -21,11 +21,6 @@ m_hToolbar(hToolbar)
 	}
 }
 
-CApplicationToolbarDropHandler::~CApplicationToolbarDropHandler()
-{
-
-}
-
 HRESULT __stdcall CApplicationToolbarDropHandler::QueryInterface(REFIID iid, void **ppvObject)
 {
 	if(ppvObject == NULL)

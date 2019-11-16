@@ -13,8 +13,6 @@ public:
 
 	static CListViewEdit *CreateNew(HWND hwnd,int ItemIndex,IExplorerplusplus *pexpp);
 
-	~CListViewEdit();
-
 protected:
 
 	void				OnEMSetSel(WPARAM &wParam,LPARAM &lParam);

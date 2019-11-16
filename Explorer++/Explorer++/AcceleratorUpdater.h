@@ -12,7 +12,6 @@ class AcceleratorUpdater
 public:
 
 	AcceleratorUpdater(HACCEL *acceleratorTable);
-	~AcceleratorUpdater();
 
 	void update(std::vector<ShortcutKey> shortcutKeys);
 

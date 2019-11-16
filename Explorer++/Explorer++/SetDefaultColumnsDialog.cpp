@@ -28,11 +28,6 @@ CSetDefaultColumnsDialog::CSetDefaultColumnsDialog(HINSTANCE hInstance, int iRes
 	m_psdcdps = &CSetDefaultColumnsDialogPersistentSettings::GetInstance();
 }
 
-CSetDefaultColumnsDialog::~CSetDefaultColumnsDialog()
-{
-
-}
-
 INT_PTR CSetDefaultColumnsDialog::OnInitDialog()
 {
 	m_icon.reset(LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN)));
@@ -399,11 +394,6 @@ CSetDefaultColumnsDialogPersistentSettings::CSetDefaultColumnsDialogPersistentSe
 CDialogSettings(SETTINGS_KEY)
 {
 	m_FolderType = FOLDER_TYPE_GENERAL;
-}
-
-CSetDefaultColumnsDialogPersistentSettings::~CSetDefaultColumnsDialogPersistentSettings()
-{
-	
 }
 
 CSetDefaultColumnsDialogPersistentSettings& CSetDefaultColumnsDialogPersistentSettings::GetInstance()

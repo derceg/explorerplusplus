@@ -18,8 +18,6 @@ class CCustomizeColorsDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CCustomizeColorsDialogPersistentSettings();
-
 	static CCustomizeColorsDialogPersistentSettings &GetInstance();
 
 private:
@@ -40,7 +38,6 @@ public:
 
 	CCustomizeColorsDialog(HINSTANCE hInstance, int iResource, HWND hParent,
 		IExplorerplusplus *expp, std::vector<NColorRuleHelper::ColorRule_t> *pColorRuleList);
-	~CCustomizeColorsDialog();
 
 protected:
 

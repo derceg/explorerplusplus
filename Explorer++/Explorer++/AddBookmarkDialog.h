@@ -20,8 +20,6 @@ class CAddBookmarkDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CAddBookmarkDialogPersistentSettings();
-
 	static CAddBookmarkDialogPersistentSettings &GetInstance();
 
 private:

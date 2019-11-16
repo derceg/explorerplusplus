@@ -19,7 +19,6 @@ namespace Plugins
 	public:
 
 		LuaPlugin(const std::wstring &directory, const Manifest &manifest, PluginInterface *pluginInterface);
-		~LuaPlugin();
 
 		int GetId() const;
 		std::wstring GetDirectory() const;

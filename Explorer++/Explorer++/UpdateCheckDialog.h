@@ -14,8 +14,6 @@ class CUpdateCheckDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CUpdateCheckDialogPersistentSettings();
-
 	static CUpdateCheckDialogPersistentSettings &GetInstance();
 
 private:
@@ -34,7 +32,6 @@ class CUpdateCheckDialog : public CBaseDialog
 public:
 
 	CUpdateCheckDialog(HINSTANCE hInstance,int iResource,HWND hParent);
-	~CUpdateCheckDialog();
 
 protected:
 

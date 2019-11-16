@@ -12,11 +12,6 @@ Plugins::TabMoved::TabMoved(TabContainer *tabContainer) :
 
 }
 
-Plugins::TabMoved::~TabMoved()
-{
-
-}
-
 boost::signals2::connection Plugins::TabMoved::connectObserver(sol::protected_function observer, sol::this_state state)
 {
 	UNREFERENCED_PARAMETER(state);

@@ -35,11 +35,6 @@ CBaseDialog(hInstance,iResource,hParent,false)
 	m_pcrdps = &CColorRuleDialogPersistentSettings::GetInstance();
 }
 
-CColorRuleDialog::~CColorRuleDialog()
-{
-
-}
-
 INT_PTR CColorRuleDialog::OnInitDialog()
 {
 	if(m_bEdit)
@@ -243,11 +238,6 @@ CDialogSettings(SETTINGS_KEY)
 	{
 		m_cfCustomColors[i] = RGB(255,255,255);
 	}
-}
-
-CColorRuleDialogPersistentSettings::~CColorRuleDialogPersistentSettings()
-{
-	
 }
 
 CColorRuleDialogPersistentSettings& CColorRuleDialogPersistentSettings::GetInstance()

@@ -17,7 +17,6 @@ namespace Plugins
 		typedef boost::signals2::signal<void(int)> PluginMenuClickedSignal;
 
 		PluginMenuManager(HWND mainWindow, int startId, int endId);
-		~PluginMenuManager();
 
 		boost::optional<int> AddItemToMainMenu(const std::wstring &text);
 		void RemoveItemFromMainMenu(int menuItemId);

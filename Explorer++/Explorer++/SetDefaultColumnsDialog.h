@@ -30,8 +30,6 @@ class CSetDefaultColumnsDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CSetDefaultColumnsDialogPersistentSettings();
-
 	static CSetDefaultColumnsDialogPersistentSettings &GetInstance();
 
 private:
@@ -62,7 +60,6 @@ public:
 
 	CSetDefaultColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent,
 		FolderColumns &folderColumns);
-	~CSetDefaultColumnsDialog();
 
 protected:
 

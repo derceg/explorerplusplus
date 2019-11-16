@@ -17,8 +17,6 @@ class CSelectColumnsDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CSelectColumnsDialogPersistentSettings();
-
 	static CSelectColumnsDialogPersistentSettings &GetInstance();
 
 private:
@@ -39,7 +37,6 @@ public:
 
 	CSelectColumnsDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *pexpp,
 		TabContainer *tabContainer, TabInterface *ti);
-	~CSelectColumnsDialog();
 
 protected:
 

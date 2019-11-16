@@ -16,8 +16,6 @@ class CMassRenameDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CMassRenameDialogPersistentSettings();
-
 	static CMassRenameDialogPersistentSettings &GetInstance();
 
 private:
@@ -52,7 +50,6 @@ public:
 
 	CMassRenameDialog(HINSTANCE hInstance, int iResource, HWND hParent, IExplorerplusplus *expp,
 		std::list<std::wstring> FullFilenameList, CFileActionHandler *pFileActionHandler);
-	~CMassRenameDialog();
 
 protected:
 

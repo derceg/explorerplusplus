@@ -14,8 +14,6 @@ class CColorRuleDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CColorRuleDialogPersistentSettings();
-
 	static CColorRuleDialogPersistentSettings &GetInstance();
 
 private:
@@ -48,7 +46,6 @@ class CColorRuleDialog : public CBaseDialog
 public:
 
 	CColorRuleDialog(HINSTANCE hInstance,int iResource,HWND hParent,NColorRuleHelper::ColorRule_t *pColorRule,BOOL bEdit);
-	~CColorRuleDialog();
 
 	LRESULT CALLBACK	StaticColorProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 

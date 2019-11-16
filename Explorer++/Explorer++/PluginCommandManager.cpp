@@ -15,11 +15,6 @@ Plugins::PluginCommandManager::PluginCommandManager(HACCEL *acceleratorTable, in
 
 }
 
-Plugins::PluginCommandManager::~PluginCommandManager()
-{
-
-}
-
 void Plugins::PluginCommandManager::addCommands(int pluginId, const std::vector<Command> &commands)
 {
 	int numAccelerators = CopyAcceleratorTable(*m_acceleratorTable, nullptr, 0);

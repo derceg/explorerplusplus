@@ -83,7 +83,6 @@ namespace Plugins
 		};
 
 		TabsApi(TabContainer *tabContainer, TabInterface *tabInterface, Navigation *navigation);
-		~TabsApi();
 
 		std::vector<Tab> getAll();
 		boost::optional<Tab> get(int tabId);

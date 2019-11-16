@@ -18,8 +18,6 @@ class CSplitFileDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CSplitFileDialogPersistentSettings();
-
 	static CSplitFileDialogPersistentSettings &GetInstance();
 
 private:

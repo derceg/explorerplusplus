@@ -29,11 +29,6 @@ CBaseDialog(hInstance,iResource,hParent,true)
 	m_pwsdps = &CWildcardSelectDialogPersistentSettings::GetInstance();
 }
 
-CWildcardSelectDialog::~CWildcardSelectDialog()
-{
-
-}
-
 INT_PTR CWildcardSelectDialog::OnInitDialog()
 {
 	m_icon.reset(LoadIcon(GetModuleHandle(0),MAKEINTRESOURCE(IDI_MAIN)));
@@ -187,11 +182,6 @@ CWildcardSelectDialogPersistentSettings::CWildcardSelectDialogPersistentSettings
 CDialogSettings(SETTINGS_KEY)
 {
 	StringCchCopy(m_szPattern,SIZEOF_ARRAY(m_szPattern),EMPTY_STRING);
-}
-
-CWildcardSelectDialogPersistentSettings::~CWildcardSelectDialogPersistentSettings()
-{
-	
 }
 
 CWildcardSelectDialogPersistentSettings& CWildcardSelectDialogPersistentSettings::GetInstance()

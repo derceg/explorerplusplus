@@ -17,11 +17,6 @@ Plugins::PluginMenuManager::PluginMenuManager(HWND mainWindow, int startId, int 
 	m_freeMenuItemIds.insert(boost::counting_iterator<int>(startId), boost::counting_iterator<int>(endId));
 }
 
-Plugins::PluginMenuManager::~PluginMenuManager()
-{
-
-}
-
 boost::optional<int> Plugins::PluginMenuManager::AddItemToMainMenu(const std::wstring &text)
 {
 	HMENU menu = GetMenu(m_mainWindow);

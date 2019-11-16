@@ -22,8 +22,6 @@ class CManageBookmarksDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CManageBookmarksDialogPersistentSettings();
-
 	static CManageBookmarksDialogPersistentSettings &GetInstance();
 
 private:

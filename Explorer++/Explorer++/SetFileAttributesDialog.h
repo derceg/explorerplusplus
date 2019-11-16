@@ -23,8 +23,6 @@ class CSetFileAttributesDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CSetFileAttributesDialogPersistentSettings();
-
 	static CSetFileAttributesDialogPersistentSettings &GetInstance();
 
 private:
@@ -44,7 +42,6 @@ class CSetFileAttributesDialog : public CBaseDialog
 public:
 
 	CSetFileAttributesDialog(HINSTANCE hInstance,int iResource,HWND hParent,std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList);
-	~CSetFileAttributesDialog();
 
 protected:
 

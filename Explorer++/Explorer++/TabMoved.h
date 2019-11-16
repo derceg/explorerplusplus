@@ -14,7 +14,6 @@ namespace Plugins
 	public:
 
 		TabMoved(TabContainer *tabContainer);
-		virtual ~TabMoved();
 
 	protected:
 

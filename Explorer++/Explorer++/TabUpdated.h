@@ -14,7 +14,6 @@ namespace Plugins
 	public:
 
 		TabUpdated(TabContainer *tabContainer);
-		virtual ~TabUpdated();
 
 	protected:
 

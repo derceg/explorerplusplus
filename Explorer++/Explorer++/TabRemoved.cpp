@@ -12,11 +12,6 @@ Plugins::TabRemoved::TabRemoved(TabContainer *tabContainer) :
 
 }
 
-Plugins::TabRemoved::~TabRemoved()
-{
-
-}
-
 boost::signals2::connection Plugins::TabRemoved::connectObserver(sol::protected_function observer, sol::this_state state)
 {
 	UNREFERENCED_PARAMETER(state);

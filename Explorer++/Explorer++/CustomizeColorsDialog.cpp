@@ -25,11 +25,6 @@ CCustomizeColorsDialog::CCustomizeColorsDialog(HINSTANCE hInstance, int iResourc
 	m_pccdps = &CCustomizeColorsDialogPersistentSettings::GetInstance();
 }
 
-CCustomizeColorsDialog::~CCustomizeColorsDialog()
-{
-
-}
-
 INT_PTR CCustomizeColorsDialog::OnInitDialog()
 {
 	HWND hListView = GetDlgItem(m_hDlg,IDC_LISTVIEW_COLORRULES);
@@ -379,11 +374,6 @@ CCustomizeColorsDialogPersistentSettings::CCustomizeColorsDialogPersistentSettin
 CDialogSettings(SETTINGS_KEY)
 {
 
-}
-
-CCustomizeColorsDialogPersistentSettings::~CCustomizeColorsDialogPersistentSettings()
-{
-	
 }
 
 CCustomizeColorsDialogPersistentSettings& CCustomizeColorsDialogPersistentSettings::GetInstance()

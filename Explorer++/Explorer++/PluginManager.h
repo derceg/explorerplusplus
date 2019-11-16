@@ -15,7 +15,6 @@ namespace Plugins
 	public:
 
 		PluginManager(PluginInterface *pluginInterface);
-		~PluginManager();
 
 		void loadAllPlugins(const boost::filesystem::path &pluginDirectory);
 

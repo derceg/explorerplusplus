@@ -16,11 +16,6 @@ CBaseDialog(hInstance,iResource,hParent,true)
 	m_pnbfdps = &CNewBookmarkFolderDialogPersistentSettings::GetInstance();
 }
 
-CNewBookmarkFolderDialog::~CNewBookmarkFolderDialog()
-{
-
-}
-
 INT_PTR CNewBookmarkFolderDialog::OnInitDialog()
 {
 	return 0;
@@ -64,11 +59,6 @@ CNewBookmarkFolderDialogPersistentSettings::CNewBookmarkFolderDialogPersistentSe
 CDialogSettings(SETTINGS_KEY)
 {
 
-}
-
-CNewBookmarkFolderDialogPersistentSettings::~CNewBookmarkFolderDialogPersistentSettings()
-{
-	
 }
 
 CNewBookmarkFolderDialogPersistentSettings& CNewBookmarkFolderDialogPersistentSettings::GetInstance()

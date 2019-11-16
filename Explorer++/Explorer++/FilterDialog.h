@@ -17,8 +17,6 @@ class CFilterDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CFilterDialogPersistentSettings();
-
 	static CFilterDialogPersistentSettings &GetInstance();
 
 private:
@@ -48,7 +46,6 @@ class CFilterDialog : public CBaseDialog
 public:
 
 	CFilterDialog(HINSTANCE hInstance,int iResource,HWND hParent,IExplorerplusplus *pexpp);
-	~CFilterDialog();
 
 protected:
 

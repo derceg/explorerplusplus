@@ -27,8 +27,6 @@ class CApplicationToolbarPersistentSettings
 {
 public:
 
-	~CApplicationToolbarPersistentSettings();
-
 	static CApplicationToolbarPersistentSettings &GetInstance();
 
 	void	SaveRegistrySettings(HKEY hParentKey);
