@@ -10,3 +10,9 @@
 #include <unordered_map>
 
 using IconMapping = std::unordered_map<Icon, std::map<int, UINT>>;
+
+#define ICON_SIZE_MAPPINGS(BaseResourceId) \
+	{ 16, BaseResourceId##_16 }, \
+	{ 24, BaseResourceId##_24 }, \
+	{ 32, BaseResourceId##_32 }, \
+	{ 48, BaseResourceId##_48 }
