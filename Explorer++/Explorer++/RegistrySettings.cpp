@@ -143,6 +143,8 @@ LONG Explorerplusplus::SaveSettings(void)
 
 		NRegistrySettings::SaveStringToRegistry(hSettingsKey,_T("NewTabDirectory"), m_config->defaultTabDirectory.c_str());
 
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey, _T("IconTheme"), m_config->iconTheme);
+
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("Language"),m_Language);
 
 		/* Global settings. */
@@ -281,6 +283,14 @@ LONG Explorerplusplus::LoadSettings()
 		TCHAR value[MAX_PATH];
 		NRegistrySettings::ReadStringFromRegistry(hSettingsKey,_T("NewTabDirectory"),value,SIZEOF_ARRAY(value));
 		m_config->defaultTabDirectory = value;
+
+		DWORD dwordValue;
+		lStatus = NRegistrySettings::ReadDwordFromRegistry(hSettingsKey, _T("IconTheme"), &dwordValue);
+
+		if (lStatus == ERROR_SUCCESS)
+		{
+			m_config->iconTheme = IconTheme::_from_integral(dwordValue);
+		}
 
 		lStatus = NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("Language"),(LPDWORD)&m_Language);
 

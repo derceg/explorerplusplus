@@ -38,6 +38,8 @@ INT_PTR CALLBACK	TabSettingsProcStub(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lP
 int CALLBACK PropSheetProcStub(HWND hDlg,UINT msg,LPARAM lParam);
 int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
 
+UINT GetIconThemeStringResourceId(IconTheme iconTheme);
+
 struct FileSize_t
 {
 	SizeDisplayFormat_t sdf;
@@ -230,6 +232,7 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 				hEdit = GetDlgItem(hDlg,IDC_DEFAULT_NEWTABDIR_EDIT);
 				DefaultSettingsSetNewTabDir(hEdit,m_config->defaultTabDirectory.c_str());
 
+				AddIconThemes(hDlg);
 				AddLanguages(hDlg);
 
 				CenterWindow(m_hContainer,g_hOptionsPropertyDialog);
@@ -423,7 +426,11 @@ INT_PTR CALLBACK Explorerplusplus::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARA
 							m_config->defaultTabDirectory = szNewTabDir;
 						}
 
-						iSel = (int)SendMessage(GetDlgItem(hDlg,IDC_OPTIONS_LANGUAGE),CB_GETCURSEL,0,0);
+						iSel = static_cast<int>(SendDlgItemMessage(hDlg, IDC_OPTIONS_ICON_THEME, CB_GETCURSEL, 0, 0));
+						int iconThemeItemData = static_cast<int>(SendDlgItemMessage(hDlg, IDC_OPTIONS_ICON_THEME, CB_GETITEMDATA, iSel, 0));
+						m_config->iconTheme = IconTheme::_from_integral(iconThemeItemData);
+
+						iSel = static_cast<int>(SendDlgItemMessage(hDlg,IDC_OPTIONS_LANGUAGE,CB_GETCURSEL,0,0));
 
 						m_Language = GetLanguageIDFromIndex(hDlg,iSel);
 
@@ -1200,6 +1207,53 @@ void Explorerplusplus::DefaultSettingsSetNewTabDir(HWND hEdit,LPITEMIDLIST pidl)
 	GetDisplayName(pidl,szNewTabDir,SIZEOF_ARRAY(szNewTabDir),uNameFlags);
 
 	SendMessage(hEdit,WM_SETTEXT,0,(LPARAM)szNewTabDir);
+}
+
+void Explorerplusplus::AddIconThemes(HWND dlg)
+{
+	HWND iconThemeControl = GetDlgItem(dlg, IDC_OPTIONS_ICON_THEME);
+	int currentThemeIndex = 0;
+
+	for (auto theme : IconTheme::_values())
+	{
+		TCHAR string[64];
+		UINT stringResourceId = GetIconThemeStringResourceId(theme);
+		LoadString(m_hLanguageModule, stringResourceId, string, static_cast<int>(std::size(string)));
+
+		int index = static_cast<int>(SendMessage(iconThemeControl, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(string)));
+
+		if (index == CB_ERR)
+		{
+			continue;
+		}
+
+		SendMessage(iconThemeControl, CB_SETITEMDATA, index, theme);
+
+		if (theme == m_config->iconTheme)
+		{
+			currentThemeIndex = index;
+		}
+	}
+
+	SendMessage(iconThemeControl, CB_SETCURSEL, currentThemeIndex, 0);
+}
+
+UINT GetIconThemeStringResourceId(IconTheme iconTheme)
+{
+	switch (iconTheme)
+	{
+	case IconTheme::Color:
+		return IDS_ICON_THEME_COLOR;
+		break;
+
+	case IconTheme::Windows10:
+		return IDS_ICON_THEME_WINDOWS_10;
+		break;
+
+	default:
+		throw std::runtime_error("IconTheme value not found");
+		break;
+	}
 }
 
 void Explorerplusplus::AddLanguages(HWND hDlg)

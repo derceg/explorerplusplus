@@ -436,6 +436,7 @@ private:
 
 	/* Options dialog. */
 	void					ShowOptions(void);
+	void					AddIconThemes(HWND dlg);
 	void					AddLanguages(HWND hDlg);
 	BOOL					AddLanguageToComboBox(HWND hComboBox, const TCHAR *szImageDirectory, const TCHAR *szFileName, WORD *pdwLanguage);
 	int						GetLanguageIDFromIndex(HWND hDlg,int iIndex);

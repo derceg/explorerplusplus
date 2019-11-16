@@ -107,6 +107,7 @@ will need to be changed correspondingly. */
 #define HASH_OVERWRITEEXISTINGFILESCONFIRMATION	1625342835
 #define HASH_LARGETOOLBARICONS		10895007
 #define HASH_PLAYNAVIGATIONSOUND	1987363412
+#define HASH_ICON_THEME				3998265761
 
 struct ColumnXMLSaveData
 {
@@ -584,6 +585,9 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("TVAutoExpandSelected"),NXMLSettings::EncodeBoolValue(m_config->treeViewAutoExpandSelected));
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("UseFullRowSelect"),NXMLSettings::EncodeBoolValue(m_config->useFullRowSelect));
+
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt, pe);
+	NXMLSettings::WriteStandardSetting(pXMLDom, pe, _T("Setting"), _T("IconTheme"), NXMLSettings::EncodeIntValue(m_config->iconTheme));
 
 	TBBUTTON tbButton;
 	TCHAR szButtonAttributeName[32];
@@ -1875,6 +1879,10 @@ WCHAR *wszName,WCHAR *wszValue)
 
 	case HASH_INFOTIPTYPE:
 		m_config->infoTipType = static_cast<InfoTipType_t>(NXMLSettings::DecodeIntValue(wszValue));
+		break;
+
+	case HASH_ICON_THEME:
+		m_config->iconTheme = IconTheme::_from_integral(NXMLSettings::DecodeIntValue(wszValue));
 		break;
 	}
 }

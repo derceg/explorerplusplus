@@ -4,15 +4,15 @@
 
 #pragma once
 
+#include "BetterEnumsWrapper.h"
 #include "Icon.h"
 #include <wil/resource.h>
 #include <gdiplus.h>
 
-enum class IconTheme
-{
-	Color,
-	Windows10
-};
+BETTER_ENUM(IconTheme, int,
+	Color = 0,
+	Windows10 = 1
+)
 
 class IconResourceLoader
 {
