@@ -44,8 +44,6 @@ TabContainer *TabContainer::Create(HWND parent, TabContainerInterface *tabContai
 TabContainer::TabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
 	Navigation *navigation, IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config) :
 	CBaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
-	m_hTabFont(nullptr),
-	m_hTabCtrlImageList(nullptr),
 	m_tabIdCounter(1),
 	m_cachedIcons(MAX_CACHED_ICONS),
 	m_tabContainerInterface(tabContainer),
@@ -79,17 +77,17 @@ void TabContainer::Initialize(HWND parent)
 	NONCLIENTMETRICS ncm;
 	ncm.cbSize = sizeof(ncm);
 	m_dpiCompat.SystemParametersInfoForDpi(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0, dpi);
-	m_hTabFont = CreateFontIndirect(&ncm.lfSmCaptionFont);
+	m_tabFont.reset(CreateFontIndirect(&ncm.lfSmCaptionFont));
 
-	if (m_hTabFont != NULL)
+	if (m_tabFont)
 	{
-		SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(m_hTabFont), MAKELPARAM(TRUE, 0));
+		SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(m_tabFont.get()), MAKELPARAM(TRUE, 0));
 	}
 
 	int dpiScaledSize = MulDiv(ICON_SIZE_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
-	m_hTabCtrlImageList = ImageList_Create(dpiScaledSize, dpiScaledSize, ILC_COLOR32 | ILC_MASK, 0, 100);
-	AddDefaultTabIcons(m_hTabCtrlImageList);
-	TabCtrl_SetImageList(m_hwnd, m_hTabCtrlImageList);
+	m_tabCtrlImageList.reset(ImageList_Create(dpiScaledSize, dpiScaledSize, ILC_COLOR32 | ILC_MASK, 0, 100));
+	AddDefaultTabIcons(m_tabCtrlImageList.get());
+	TabCtrl_SetImageList(m_hwnd, m_tabCtrlImageList.get());
 
 	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hwnd, this);
 	RegisterDragDrop(m_hwnd, pTabDropHandler);
@@ -117,16 +115,6 @@ void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 
 TabContainer::~TabContainer()
 {
-	if (m_hTabFont != nullptr)
-	{
-		DeleteObject(m_hTabFont);
-	}
-
-	if (m_hTabCtrlImageList != nullptr)
-	{
-		ImageList_Destroy(m_hTabCtrlImageList);
-	}
-
 	RevokeDragDrop(m_hwnd);
 
 	RemoveWindowSubclass(m_hwnd, WndProcStub, SUBCLASS_ID);

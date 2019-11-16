@@ -131,8 +131,8 @@ private:
 
 	void RemoveTabFromControl(const Tab &tab);
 
-	HFONT m_hTabFont;
-	HIMAGELIST m_hTabCtrlImageList;
+	wil::unique_hfont m_tabFont;
+	wil::unique_himagelist m_tabCtrlImageList;
 
 	std::unordered_map<int, Tab> m_tabs;
 	int m_tabIdCounter;
