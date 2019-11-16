@@ -23,4 +23,5 @@ protected:
 private:
 
 	wil::unique_hicon m_icon;
+	wil::unique_hicon m_mainIcon;
 };

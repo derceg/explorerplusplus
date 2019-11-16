@@ -51,8 +51,6 @@ IDB_FOLDEREMPTY         BITMAP                  "res\\Folder Empty.bmp"
 
 IDB_FOLDERLOCKED        BITMAP                  "res\\Folder Locked.bmp"
 
-IDB_ABOUT               BITMAP                  "res\\About Image.bmp"
-
 IDB_NOPREVIEWAVAILABLE  BITMAP                  "res\\No Preview Available.bmp"
 
 

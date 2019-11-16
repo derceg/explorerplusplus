@@ -8,7 +8,6 @@
 #define IDI_DISPLAYWINDOW               106
 #define IDB_FOLDEREMPTY                 149
 #define IDR_MAINACCELERATORS            152
-#define IDB_ABOUT                       231
 #define IDR_WAVE_NAVIGATIONSTART        235
 #define IDB_NOPREVIEWAVAILABLE          236
 #define IDB_CUT_16                      250
