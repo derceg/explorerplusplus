@@ -39,11 +39,6 @@ CAddBookmarkDialog::CAddBookmarkDialog(HINSTANCE hInstance, int iResource, HWND 
 	}
 }
 
-CAddBookmarkDialog::~CAddBookmarkDialog()
-{
-	DeleteObject(m_ErrorBrush);
-}
-
 INT_PTR CAddBookmarkDialog::OnInitDialog()
 {
 	SetDlgItemText(m_hDlg,IDC_BOOKMARK_NAME,m_Bookmark.GetName().c_str());
@@ -127,7 +122,7 @@ INT_PTR CAddBookmarkDialog::OnCtlColorEdit(HWND hwnd,HDC hdc)
 		if(GetWindowTextLength(hwnd) == 0)
 		{
 			SetBkMode(hdc,TRANSPARENT);
-			return reinterpret_cast<INT_PTR>(m_ErrorBrush);
+			return reinterpret_cast<INT_PTR>(m_ErrorBrush.get());
 		}
 	}
 

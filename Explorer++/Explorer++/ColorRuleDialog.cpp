@@ -11,7 +11,7 @@
 #include "../Helper/StringHelper.h"
 #include "../Helper/WindowHelper.h"
 #include "../Helper/XMLSettings.h"
-
+#include <wil/resource.h>
 
 namespace NColorRuleDialog
 {
@@ -223,9 +223,8 @@ LRESULT CALLBACK CColorRuleDialog::StaticColorProc(HWND hwnd,UINT Msg,WPARAM wPa
 			RECT rc;
 			GetClientRect(hwnd,&rc);
 
-			HBRUSH hBrush = CreateSolidBrush(m_cfCurrentColor);
-			FillRect(hdc,&rc,hBrush);
-			DeleteObject(hBrush);
+			wil::unique_hbrush hBrush(CreateSolidBrush(m_cfCurrentColor));
+			FillRect(hdc,&rc,hBrush.get());
 
 			return 1;
 		}

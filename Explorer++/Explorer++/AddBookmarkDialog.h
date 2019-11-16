@@ -11,6 +11,7 @@
 #include "../Helper/Bookmark.h"
 #include "../Helper/DialogSettings.h"
 #include "../Helper/ResizableDialog.h"
+#include <wil/resource.h>
 #include <unordered_set>
 
 class CAddBookmarkDialog;
@@ -45,7 +46,6 @@ public:
 
 	CAddBookmarkDialog(HINSTANCE hInstance, int iResource, HWND hParent,
 		IExplorerplusplus *expp, CBookmarkFolder &AllBookmarks, CBookmark &Bookmark);
-	~CAddBookmarkDialog();
 
 	void	OnBookmarkAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmark &Bookmark,std::size_t Position);
 	void	OnBookmarkFolderAdded(const CBookmarkFolder &ParentBookmarkFolder,const CBookmarkFolder &BookmarkFolder,std::size_t Position);
@@ -87,7 +87,7 @@ private:
 
 	CBookmarkTreeView *m_pBookmarkTreeView;
 
-	HBRUSH m_ErrorBrush;
+	wil::unique_hbrush m_ErrorBrush;
 
 	CAddBookmarkDialogPersistentSettings *m_pabdps;
 };
