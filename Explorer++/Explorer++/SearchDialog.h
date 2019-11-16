@@ -26,8 +26,6 @@ class CSearchDialogPersistentSettings : public CDialogSettings
 {
 public:
 
-	~CSearchDialogPersistentSettings();
-
 	static CSearchDialogPersistentSettings &GetInstance();
 
 private:
@@ -83,8 +81,8 @@ private:
 	template <typename T> void	ListToCircularBuffer(const std::list<T> &list,boost::circular_buffer<T> &cb);
 
 	TCHAR						m_szSearchPattern[MAX_PATH];
-	boost::circular_buffer<std::wstring>	*m_pSearchPatterns;
-	boost::circular_buffer<std::wstring>	*m_pSearchDirectories;
+	boost::circular_buffer<std::wstring>	m_searchPatterns;
+	boost::circular_buffer<std::wstring>	m_searchDirectories;
 	BOOL						m_bSearchSubFolders;
 	BOOL						m_bUseRegularExpressions;
 	BOOL						m_bCaseInsensitive;
