@@ -216,6 +216,10 @@ void TaskbarThumbnails::CreateTabProxy(int iTabId,BOOL bSwitchToNewTab)
 			tpi.atomClass	= aRet;
 
 			m_TabProxyList.push_back(std::move(tpi));
+
+			const Tab &tab = m_tabContainer->GetTab(iTabId);
+			SetTabProxyIcon(tab);
+			UpdateTaskbarThumbnailTtitle(tab);
 		}
 	}
 }
