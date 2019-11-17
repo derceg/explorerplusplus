@@ -13,6 +13,8 @@
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/Macros.h"
+#include "../Helper/XMLSettings.h"
+#include <boost/bimap.hpp>
 #include <gdiplus.h>
 
 const int TOOLBAR_IMAGE_SIZE_SMALL = 16;
@@ -41,6 +43,45 @@ const std::unordered_map<int, Icon> TOOLBAR_BUTTON_ICON_MAPPINGS = {
 	{TOOLBAR_DELETEPERMANENTLY, Icon::DeletePermanently}
 };
 
+template <typename L, typename R>
+boost::bimap<L, R>
+MakeBimap(std::initializer_list<typename boost::bimap<L, R>::value_type> list)
+{
+	return boost::bimap<L, R>(list.begin(), list.end());
+}
+
+#pragma warning(push)
+#pragma warning(disable:4996) //warning STL4010: Various members of std::allocator are deprecated in C++17.
+
+// Ideally, toolbar button IDs would be saved in the XML config file, rather
+// than button strings, but that's not especially easy to change now.
+const boost::bimap<int, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS = MakeBimap<int, std::wstring>({
+	{TOOLBAR_BACK, L"Back"},
+	{TOOLBAR_FORWARD, L"Forward"},
+	{TOOLBAR_UP, L"Up"},
+	{TOOLBAR_FOLDERS, L"Folders"},
+	{TOOLBAR_COPYTO, L"Copy To"},
+	{TOOLBAR_MOVETO, L"Move To"},
+	{TOOLBAR_NEWFOLDER, L"New Folder"},
+	{TOOLBAR_COPY, L"Copy"},
+	{TOOLBAR_CUT, L"Cut"},
+	{TOOLBAR_PASTE, L"Paste"},
+	{TOOLBAR_DELETE, L"Delete"},
+	{TOOLBAR_VIEWS, L"Views"},
+	{TOOLBAR_SEARCH, L"Search"},
+	{TOOLBAR_PROPERTIES, L"Properties"},
+	{TOOLBAR_REFRESH, L"Refresh"},
+	{TOOLBAR_ADDBOOKMARK, L"Bookmark the current tab"},
+	{TOOLBAR_NEWTAB, L"Create a new tab"},
+	{TOOLBAR_OPENCOMMANDPROMPT, L"Open Command Prompt"},
+	{TOOLBAR_ORGANIZEBOOKMARKS, L"Organize Bookmarks"},
+	{TOOLBAR_DELETEPERMANENTLY, L"Delete Permanently"},
+
+	{TOOLBAR_SEPARATOR, L"Separator"}
+});
+
+#pragma warning(pop)
+
 MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
 	Navigation *navigation, std::shared_ptr<Config> config)
 {
@@ -50,11 +91,11 @@ MainToolbar *MainToolbar::Create(HWND parent, HINSTANCE instance, IExplorerplusp
 MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
 	Navigation *navigation, std::shared_ptr<Config> config) :
 	CBaseWindow(CreateMainToolbar(parent)),
+	m_persistentSettings(&MainToolbarPersistentSettings::GetInstance()),
 	m_instance(instance),
 	m_pexpp(pexpp),
 	m_navigation(navigation),
-	m_config(config),
-	m_toolbarButtons(DEFAULT_TOOLBAR_BUTTONS, std::end(DEFAULT_TOOLBAR_BUTTONS))
+	m_config(config)
 {
 	Initialize(parent);
 }
@@ -86,7 +127,7 @@ void MainToolbar::Initialize(HWND parent)
 
 	SetTooolbarImageList();
 	AddStringsToToolbar();
-	AddButtonsToToolbar(m_toolbarButtons);
+	AddButtonsToToolbar(m_persistentSettings->m_toolbarButtons);
 
 	if (m_config->showFolders)
 	{
@@ -530,9 +571,9 @@ void MainToolbar::OnTBReset()
 		SendMessage(m_hwnd, TB_DELETEBUTTON, i, 0);
 	}
 
-	m_toolbarButtons = { DEFAULT_TOOLBAR_BUTTONS, std::end(DEFAULT_TOOLBAR_BUTTONS) };
+	m_persistentSettings->m_toolbarButtons = { DEFAULT_TOOLBAR_BUTTONS, std::end(DEFAULT_TOOLBAR_BUTTONS) };
 
-	AddButtonsToToolbar(m_toolbarButtons);
+	AddButtonsToToolbar(m_persistentSettings->m_toolbarButtons);
 	UpdateToolbarButtonStates();
 }
 
@@ -544,7 +585,7 @@ void MainToolbar::OnTBChange()
 	for (int i = 0; i < numButtons; i++)
 	{
 		TBBUTTON tbButton;
-		BOOL res = SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton));
+		BOOL res = static_cast<BOOL>(SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton)));
 
 		if (!res)
 		{
@@ -565,7 +606,7 @@ void MainToolbar::OnTBChange()
 		toolbarButtons.push_back({ id });
 	}
 
-	m_toolbarButtons = toolbarButtons;
+	m_persistentSettings->m_toolbarButtons = toolbarButtons;
 }
 
 void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
@@ -733,5 +774,76 @@ void MainToolbar::OnNavigationCompleted(const Tab &tab)
 	if (m_pexpp->GetTabContainer()->IsTabSelected(tab))
 	{
 		UpdateToolbarButtonStates();
+	}
+}
+
+MainToolbarPersistentSettings::MainToolbarPersistentSettings() :
+	m_toolbarButtons(DEFAULT_TOOLBAR_BUTTONS, std::end(DEFAULT_TOOLBAR_BUTTONS))
+{
+	// Ideally, this constraint would be checked at compile-time, but the size
+	// of TOOLBAR_BUTTON_XML_NAME_MAPPINGS isn't known at compile-time. Note
+	// that the mappings set contains one additional item - for the separator.
+	assert(TOOLBAR_BUTTON_XML_NAME_MAPPINGS.size() == (std::size(TOOLBAR_BUTTON_SET) + 1));
+}
+
+MainToolbarPersistentSettings &MainToolbarPersistentSettings::GetInstance()
+{
+	static MainToolbarPersistentSettings persistentSettings;
+	return persistentSettings;
+}
+
+void MainToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
+{
+	IXMLDOMNode *pChildNode = NULL;
+	IXMLDOMNamedNodeMap *am = NULL;
+	BSTR bstrValue;
+
+	std::vector<ToolbarButton_t> toolbarButtons;
+
+	pNode->get_attributes(&am);
+
+	long lChildNodes;
+	long j = 0;
+
+	/* Retrieve the total number of attributes
+	attached to this node. */
+	am->get_length(&lChildNodes);
+
+	for (j = 1; j < lChildNodes; j++)
+	{
+		am->get_item(j, &pChildNode);
+
+		/* Element value. */
+		pChildNode->get_text(&bstrValue);
+
+		auto itr = TOOLBAR_BUTTON_XML_NAME_MAPPINGS.right.find(bstrValue);
+
+		if (itr == TOOLBAR_BUTTON_XML_NAME_MAPPINGS.right.end())
+		{
+			continue;
+		}
+
+		ToolbarButton_t tb;
+		tb.iItemID = itr->second;
+		toolbarButtons.push_back(tb);
+	}
+
+	m_toolbarButtons = toolbarButtons;
+}
+
+void MainToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe)
+{
+	int index = 0;
+
+	for (auto &button : m_toolbarButtons)
+	{
+		TCHAR szButtonAttributeName[32];
+		StringCchPrintf(szButtonAttributeName, SIZEOF_ARRAY(szButtonAttributeName), _T("Button%d"), index);
+
+		std::wstring buttonName = TOOLBAR_BUTTON_XML_NAME_MAPPINGS.left.at(button.iItemID);
+
+		NXMLSettings::AddAttributeToNode(pXMLDom, pe, szButtonAttributeName, buttonName.c_str());
+
+		index++;
 	}
 }

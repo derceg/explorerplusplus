@@ -589,37 +589,10 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt, pe);
 	NXMLSettings::WriteStandardSetting(pXMLDom, pe, _T("Setting"), _T("IconTheme"), NXMLSettings::EncodeIntValue(m_config->iconTheme));
 
-	TBBUTTON tbButton;
-	TCHAR szButtonAttributeName[32];
-	TCHAR szButtonName[256];
-	int nButtons;
-	int idCommand;
-	int i = 0;
+	NXMLSettings::AddWhiteSpaceToNode(pXMLDom, bstr_wsntt, pe);
+	NXMLSettings::CreateElementNode(pXMLDom, &pParentNode, pe, _T("Setting"), _T("ToolbarState"));
 
-	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Setting"),_T("ToolbarState"));
-
-	/* TODO: Move into
-	main toolbar class. */
-	nButtons = (int)SendMessage(m_mainToolbar->GetHWND(),TB_BUTTONCOUNT,0,0);
-
-	for(i = 0;i < nButtons;i++)
-	{
-		SendMessage(m_mainToolbar->GetHWND(),TB_GETBUTTON,i,(LPARAM)&tbButton);
-
-		StringCchPrintf(szButtonAttributeName,SIZEOF_ARRAY(szButtonAttributeName),_T("Button%d"),i);
-
-		if(tbButton.idCommand == 0)
-			idCommand = TOOLBAR_SEPARATOR;
-		else
-			idCommand = tbButton.idCommand;
-
-		/* ALL settings are saved in English. */
-		/*LoadString(GetModuleHandle(0),LookupToolbarButtonTextID(idCommand),
-			szButtonName,SIZEOF_ARRAY(szButtonName));*/
-
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,szButtonAttributeName,szButtonName);
-	}
+	MainToolbarPersistentSettings::GetInstance().SaveXMLSettings(pXMLDom, pParentNode);
 
 	pParentNode->Release();
 	pParentNode = NULL;
@@ -1732,83 +1705,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_TOOLBARSTATE:
-		{
-			IXMLDOMNode	*pChildNode = NULL;
-			IXMLDOMNamedNodeMap	*am = NULL;
-			ToolbarButton_t	tb;
-			BSTR		bstrName;
-			BSTR		bstrValue;
-
-			/* TODO: Move into
-			main toolbar class. */
-			//m_tbInitial.clear();
-
-			pNode->get_attributes(&am);
-
-			long lChildNodes;
-			long j = 0;
-
-			/* Retrieve the total number of attributes
-			attached to this node. */
-			am->get_length(&lChildNodes);
-
-			for(j = 1;j < lChildNodes;j++)
-			{
-				am->get_item(j, &pChildNode);
-
-				/* Element name. */
-				pChildNode->get_nodeName(&bstrName);
-
-				/* Element value. */
-				pChildNode->get_text(&bstrValue);
-
-				/* TODO: Replace hardcoded strings. */
-				if(lstrcmpi(bstrValue,L"Separator") == 0)
-					tb.iItemID = TOOLBAR_SEPARATOR;
-				else if(lstrcmpi(bstrValue,L"Back") == 0)
-					tb.iItemID = TOOLBAR_BACK;
-				else if(lstrcmpi(bstrValue,L"Forward") == 0)
-					tb.iItemID = TOOLBAR_FORWARD;
-				else if(lstrcmpi(bstrValue,L"Up") == 0)
-					tb.iItemID = TOOLBAR_UP;
-				else if(lstrcmpi(bstrValue,L"Folders") == 0)
-					tb.iItemID = TOOLBAR_FOLDERS;
-				else if(lstrcmpi(bstrValue,L"Copy To") == 0)
-					tb.iItemID = TOOLBAR_COPYTO;
-				else if(lstrcmpi(bstrValue,L"Move To") == 0)
-					tb.iItemID = TOOLBAR_MOVETO;
-				else if(lstrcmpi(bstrValue,L"New Folder") == 0)
-					tb.iItemID = TOOLBAR_NEWFOLDER;
-				else if(lstrcmpi(bstrValue,L"Copy") == 0)
-					tb.iItemID = TOOLBAR_COPY;
-				else if(lstrcmpi(bstrValue,L"Cut") == 0)
-					tb.iItemID = TOOLBAR_CUT;
-				else if(lstrcmpi(bstrValue,L"Paste") == 0)
-					tb.iItemID = TOOLBAR_PASTE;
-				else if(lstrcmpi(bstrValue,L"Delete") == 0)
-					tb.iItemID = TOOLBAR_DELETE;
-				else if(lstrcmpi(bstrValue,L"Delete Permanently") == 0)
-					tb.iItemID = TOOLBAR_DELETEPERMANENTLY;
-				else if(lstrcmpi(bstrValue,L"Views") == 0)
-					tb.iItemID = TOOLBAR_VIEWS;
-				else if(lstrcmpi(bstrValue,L"Search") == 0)
-					tb.iItemID = TOOLBAR_SEARCH;
-				else if(lstrcmpi(bstrValue,L"Properties") == 0)
-					tb.iItemID = TOOLBAR_PROPERTIES;
-				else if(lstrcmpi(bstrValue,L"Refresh") == 0)
-					tb.iItemID = TOOLBAR_REFRESH;
-				else if(lstrcmpi(bstrValue,L"Bookmark the current tab") == 0)
-					tb.iItemID = TOOLBAR_ADDBOOKMARK;
-				else if(lstrcmpi(bstrValue,L"Organize Bookmarks") == 0)
-					tb.iItemID = TOOLBAR_ORGANIZEBOOKMARKS;
-				else if(lstrcmpi(bstrValue,L"Create a new tab") == 0)
-					tb.iItemID = TOOLBAR_NEWTAB;
-				else if(lstrcmpi(bstrValue,L"Open Command Prompt") == 0)
-					tb.iItemID = TOOLBAR_OPENCOMMANDPROMPT;
-
-				//m_tbInitial.push_back(tb);
-			}
-		}
+		MainToolbarPersistentSettings::GetInstance().LoadXMLSettings(pNode);
 		break;
 
 	case HASH_TREEVIEWDELAYENABLED:

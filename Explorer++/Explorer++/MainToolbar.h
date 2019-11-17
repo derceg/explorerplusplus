@@ -14,6 +14,29 @@
 #include <unordered_map>
 
 struct Config;
+class MainToolbar;
+
+class MainToolbarPersistentSettings
+{
+public:
+
+	static MainToolbarPersistentSettings &GetInstance();
+
+	void LoadXMLSettings(IXMLDOMNode *pNode);
+	void SaveXMLSettings(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
+
+private:
+
+	friend MainToolbar;
+
+	MainToolbarPersistentSettings();
+
+	MainToolbarPersistentSettings(const MainToolbarPersistentSettings &);
+	MainToolbarPersistentSettings &operator=(const MainToolbarPersistentSettings &);
+
+	// The current set of toolbar buttons.
+	std::vector<ToolbarButton_t> m_toolbarButtons;
+};
 
 class MainToolbar : public CBaseWindow
 {
@@ -67,6 +90,8 @@ private:
 
 	void UpdateToolbarButtonImageIndexes();
 
+	MainToolbarPersistentSettings *m_persistentSettings;
+
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_pexpp;
 	Navigation *m_navigation;
@@ -78,9 +103,6 @@ private:
 	std::unordered_map<int, int> m_toolbarImageMapSmall;
 	std::unordered_map<int, int> m_toolbarImageMapLarge;
 	std::unordered_map<int, int> m_toolbarStringMap;
-
-	// The current set of toolbar buttons.
-	std::vector<ToolbarButton_t> m_toolbarButtons;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };
