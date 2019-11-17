@@ -11,7 +11,6 @@
 #include "../Helper/BaseWindow.h"
 #include "../Helper/DpiCompatibility.h"
 #include <wil/resource.h>
-#include <list>
 #include <unordered_map>
 
 struct Config;
@@ -43,8 +42,7 @@ private:
 	void SetTooolbarImageList();
 	static std::unordered_map<int, int> SetUpToolbarImageList(HIMAGELIST imageList,
 		IconResourceLoader *iconResourceLoader, int iconSize, UINT dpi);
-	void SetInitialToolbarButtons();
-	void AddButtonsToToolbar();
+	void AddButtonsToToolbar(const std::vector<ToolbarButton_t> &buttons);
 	void AddButtonToToolbar(int iButtonId);
 	TBBUTTON GetToolbarButtonDetails(int iButtonId) const;
 	void AddStringsToToolbar();
@@ -58,6 +56,7 @@ private:
 	BOOL OnTBRestore();
 	BOOL OnTBGetButtonInfo(LPARAM lParam);
 	void OnTBReset();
+	void OnTBChange();
 	void OnTBGetInfoTip(LPARAM lParam);
 	LRESULT OnTbnDropDown(LPARAM lParam);
 	void ShowToolbarViewsDropdown();
@@ -80,7 +79,8 @@ private:
 	std::unordered_map<int, int> m_toolbarImageMapLarge;
 	std::unordered_map<int, int> m_toolbarStringMap;
 
-	std::list<ToolbarButton_t> m_tbInitial;
+	// The current set of toolbar buttons.
+	std::vector<ToolbarButton_t> m_toolbarButtons;
 
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

@@ -53,7 +53,8 @@ MainToolbar::MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pex
 	m_instance(instance),
 	m_pexpp(pexpp),
 	m_navigation(navigation),
-	m_config(config)
+	m_config(config),
+	m_toolbarButtons(DEFAULT_TOOLBAR_BUTTONS, std::end(DEFAULT_TOOLBAR_BUTTONS))
 {
 	Initialize(parent);
 }
@@ -84,10 +85,8 @@ void MainToolbar::Initialize(HWND parent)
 	m_toolbarImageMapLarge = SetUpToolbarImageList(m_imageListLarge.get(), m_pexpp->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_LARGE, dpi);
 
 	SetTooolbarImageList();
-	SetInitialToolbarButtons();
-
 	AddStringsToToolbar();
-	AddButtonsToToolbar();
+	AddButtonsToToolbar(m_toolbarButtons);
 
 	if (m_config->showFolders)
 	{
@@ -209,6 +208,10 @@ LRESULT CALLBACK MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 				OnTBReset();
 				break;
 
+			case TBN_TOOLBARCHANGE:
+				OnTBChange();
+				break;
+
 			case TBN_DROPDOWN:
 				return OnTbnDropDown(lParam);
 				break;
@@ -224,17 +227,11 @@ LRESULT CALLBACK MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void MainToolbar::SetInitialToolbarButtons()
+void MainToolbar::AddButtonsToToolbar(const std::vector<ToolbarButton_t> &buttons)
 {
-	m_tbInitial = std::list<ToolbarButton_t>(DEFAULT_TOOLBAR_BUTTONS,
-		DEFAULT_TOOLBAR_BUTTONS + SIZEOF_ARRAY(DEFAULT_TOOLBAR_BUTTONS));
-}
-
-void MainToolbar::AddButtonsToToolbar()
-{
-	for (const auto &toolbarButton : m_tbInitial)
+	for (const auto &button : buttons)
 	{
-		AddButtonToToolbar(toolbarButton.iItemID);
+		AddButtonToToolbar(button.iItemID);
 	}
 }
 
@@ -526,16 +523,49 @@ BOOL MainToolbar::OnTBGetButtonInfo(LPARAM lParam)
 
 void MainToolbar::OnTBReset()
 {
-	int nButtons;
-	int i = 0;
+	int numButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
 
-	nButtons = (int)SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0);
-
-	for (i = nButtons - 1; i >= 0; i--)
+	for (int i = numButtons - 1; i >= 0; i--)
+	{
 		SendMessage(m_hwnd, TB_DELETEBUTTON, i, 0);
+	}
 
-	AddButtonsToToolbar();
+	m_toolbarButtons = { DEFAULT_TOOLBAR_BUTTONS, std::end(DEFAULT_TOOLBAR_BUTTONS) };
+
+	AddButtonsToToolbar(m_toolbarButtons);
 	UpdateToolbarButtonStates();
+}
+
+void MainToolbar::OnTBChange()
+{
+	std::vector<ToolbarButton_t> toolbarButtons;
+	int numButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
+
+	for (int i = 0; i < numButtons; i++)
+	{
+		TBBUTTON tbButton;
+		BOOL res = SendMessage(m_hwnd, TB_GETBUTTON, i, reinterpret_cast<LPARAM>(&tbButton));
+
+		if (!res)
+		{
+			continue;
+		}
+
+		int id;
+
+		if (tbButton.idCommand == 0)
+		{
+			id = TOOLBAR_SEPARATOR;
+		}
+		else
+		{
+			id = tbButton.idCommand;
+		}
+
+		toolbarButtons.push_back({ id });
+	}
+
+	m_toolbarButtons = toolbarButtons;
 }
 
 void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
