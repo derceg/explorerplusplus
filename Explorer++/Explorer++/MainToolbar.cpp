@@ -134,22 +134,6 @@ void MainToolbar::Initialize(HWND parent)
 		SendMessage(m_hwnd, TB_CHECKBUTTON, TOOLBAR_FOLDERS, TRUE);
 	}
 
-	/* TODO: This needs
-	to be updated. */
-	/*if (!m_bLoadSettingsFromXML)
-	{
-		if (m_bAttemptToolbarRestore)
-		{
-			TBSAVEPARAMS	tbSave;
-
-			tbSave.hkr = HKEY_CURRENT_USER;
-			tbSave.pszSubKey = NExplorerplusplus::REG_SETTINGS_KEY;
-			tbSave.pszValueName = _T("ToolbarState");
-
-			SendMessage(m_hMainToolbar, TB_SAVERESTORE, FALSE, (LPARAM)&tbSave);
-		}
-	}*/
-
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
 
