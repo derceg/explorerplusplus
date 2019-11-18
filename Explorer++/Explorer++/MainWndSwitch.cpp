@@ -360,7 +360,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 
 	switch (LOWORD(wParam))
 	{
-	case TOOLBAR_NEWTAB:
+	case TOOLBAR_NEW_TAB:
 	case IDM_FILE_NEWTAB:
 		OnNewTab();
 		break;
@@ -378,7 +378,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnSaveDirectoryListing();
 		break;
 
-	case TOOLBAR_OPENCOMMANDPROMPT:
+	case TOOLBAR_OPEN_COMMAND_PROMPT:
 	case IDM_FILE_OPENCOMMANDPROMPT:
 		StartCommandPrompt(m_CurrentDirectory, false);
 		break;
@@ -412,7 +412,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnFileDelete(false);
 		break;
 
-	case TOOLBAR_DELETEPERMANENTLY:
+	case TOOLBAR_DELETE_PERMANENTLY:
 	case IDM_FILE_DELETEPERMANENTLY:
 		OnFileDelete(true);
 		break;
@@ -459,11 +459,11 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_EDIT_COPYTOFOLDER:
-	case TOOLBAR_COPYTO:
+	case TOOLBAR_COPY_TO:
 		CopyToFolder(false);
 		break;
 
-	case TOOLBAR_MOVETO:
+	case TOOLBAR_MOVE_TO:
 	case IDM_EDIT_MOVETOFOLDER:
 		CopyToFolder(true);
 		break;
@@ -1202,7 +1202,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	}
 	break;
 
-	case TOOLBAR_NEWFOLDER:
+	case TOOLBAR_NEW_FOLDER:
 	case IDM_ACTIONS_NEWFOLDER:
 		OnCreateNewFolder();
 		break;
@@ -1280,7 +1280,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		m_navigation->OnGotoFolder(CSIDL_CONNECTIONS);
 		break;
 
-	case TOOLBAR_ADDBOOKMARK:
+	case TOOLBAR_ADD_BOOKMARK:
 	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
 	{
 		TCHAR szCurrentDirectory[MAX_PATH];
@@ -1294,7 +1294,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	}
 	break;
 
-	case TOOLBAR_ORGANIZEBOOKMARKS:
+	case TOOLBAR_ORGANIZE_BOOKMARKS:
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 		if (g_hwndManageBookmarks == NULL)
 		{

@@ -25,9 +25,9 @@ const std::unordered_map<int, Icon> TOOLBAR_BUTTON_ICON_MAPPINGS = {
 	{TOOLBAR_FORWARD, Icon::Forward},
 	{TOOLBAR_UP, Icon::Up},
 	{TOOLBAR_FOLDERS, Icon::FolderTree},
-	{TOOLBAR_COPYTO, Icon::CopyTo},
-	{TOOLBAR_MOVETO, Icon::MoveTo},
-	{TOOLBAR_NEWFOLDER, Icon::NewFolder},
+	{TOOLBAR_COPY_TO, Icon::CopyTo},
+	{TOOLBAR_MOVE_TO, Icon::MoveTo},
+	{TOOLBAR_NEW_FOLDER, Icon::NewFolder},
 	{TOOLBAR_COPY, Icon::Copy},
 	{TOOLBAR_CUT, Icon::Cut},
 	{TOOLBAR_PASTE, Icon::Paste},
@@ -36,11 +36,11 @@ const std::unordered_map<int, Icon> TOOLBAR_BUTTON_ICON_MAPPINGS = {
 	{TOOLBAR_SEARCH, Icon::Search},
 	{TOOLBAR_PROPERTIES, Icon::Properties},
 	{TOOLBAR_REFRESH, Icon::Refresh},
-	{TOOLBAR_ADDBOOKMARK, Icon::AddBookmark},
-	{TOOLBAR_NEWTAB, Icon::NewTab},
-	{TOOLBAR_OPENCOMMANDPROMPT, Icon::CommandLine},
-	{TOOLBAR_ORGANIZEBOOKMARKS, Icon::Bookmarks},
-	{TOOLBAR_DELETEPERMANENTLY, Icon::DeletePermanently},
+	{TOOLBAR_ADD_BOOKMARK, Icon::AddBookmark},
+	{TOOLBAR_NEW_TAB, Icon::NewTab},
+	{TOOLBAR_OPEN_COMMAND_PROMPT, Icon::CommandLine},
+	{TOOLBAR_ORGANIZE_BOOKMARKS, Icon::Bookmarks},
+	{TOOLBAR_DELETE_PERMANENTLY, Icon::DeletePermanently},
 	{TOOLBAR_SPLIT_FILE, Icon::SplitFiles},
 	{TOOLBAR_MERGE_FILES, Icon::MergeFiles}
 };
@@ -62,9 +62,9 @@ const boost::bimap<int, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS = MakeBim
 	{TOOLBAR_FORWARD, L"Forward"},
 	{TOOLBAR_UP, L"Up"},
 	{TOOLBAR_FOLDERS, L"Folders"},
-	{TOOLBAR_COPYTO, L"Copy To"},
-	{TOOLBAR_MOVETO, L"Move To"},
-	{TOOLBAR_NEWFOLDER, L"New Folder"},
+	{TOOLBAR_COPY_TO, L"Copy To"},
+	{TOOLBAR_MOVE_TO, L"Move To"},
+	{TOOLBAR_NEW_FOLDER, L"New Folder"},
 	{TOOLBAR_COPY, L"Copy"},
 	{TOOLBAR_CUT, L"Cut"},
 	{TOOLBAR_PASTE, L"Paste"},
@@ -73,11 +73,11 @@ const boost::bimap<int, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS = MakeBim
 	{TOOLBAR_SEARCH, L"Search"},
 	{TOOLBAR_PROPERTIES, L"Properties"},
 	{TOOLBAR_REFRESH, L"Refresh"},
-	{TOOLBAR_ADDBOOKMARK, L"Bookmark the current tab"},
-	{TOOLBAR_NEWTAB, L"Create a new tab"},
-	{TOOLBAR_OPENCOMMANDPROMPT, L"Open Command Prompt"},
-	{TOOLBAR_ORGANIZEBOOKMARKS, L"Organize Bookmarks"},
-	{TOOLBAR_DELETEPERMANENTLY, L"Delete Permanently"},
+	{TOOLBAR_ADD_BOOKMARK, L"Bookmark the current tab"},
+	{TOOLBAR_NEW_TAB, L"Create a new tab"},
+	{TOOLBAR_OPEN_COMMAND_PROMPT, L"Open Command Prompt"},
+	{TOOLBAR_ORGANIZE_BOOKMARKS, L"Organize Bookmarks"},
+	{TOOLBAR_DELETE_PERMANENTLY, L"Delete Permanently"},
 	{TOOLBAR_SPLIT_FILE, L"Split File"},
 	{TOOLBAR_MERGE_FILES, L"Merge Files"},
 
@@ -396,15 +396,15 @@ int MainToolbar::LookupToolbarButtonTextID(int iButtonID) const
 		return IDS_TOOLBAR_FOLDERS;
 		break;
 
-	case TOOLBAR_COPYTO:
+	case TOOLBAR_COPY_TO:
 		return IDS_TOOLBAR_COPYTO;
 		break;
 
-	case TOOLBAR_MOVETO:
+	case TOOLBAR_MOVE_TO:
 		return IDS_TOOLBAR_MOVETO;
 		break;
 
-	case TOOLBAR_NEWFOLDER:
+	case TOOLBAR_NEW_FOLDER:
 		return IDS_TOOLBAR_NEWFOLDER;
 		break;
 
@@ -424,7 +424,7 @@ int MainToolbar::LookupToolbarButtonTextID(int iButtonID) const
 		return IDS_TOOLBAR_DELETE;
 		break;
 
-	case TOOLBAR_DELETEPERMANENTLY:
+	case TOOLBAR_DELETE_PERMANENTLY:
 		return IDS_TOOLBAR_DELETEPERMANENTLY;
 		break;
 
@@ -444,19 +444,19 @@ int MainToolbar::LookupToolbarButtonTextID(int iButtonID) const
 		return IDS_TOOLBAR_REFRESH;
 		break;
 
-	case TOOLBAR_ADDBOOKMARK:
+	case TOOLBAR_ADD_BOOKMARK:
 		return IDS_TOOLBAR_ADDBOOKMARK;
 		break;
 
-	case TOOLBAR_ORGANIZEBOOKMARKS:
+	case TOOLBAR_ORGANIZE_BOOKMARKS:
 		return IDS_TOOLBAR_MANAGEBOOKMARKS;
 		break;
 
-	case TOOLBAR_NEWTAB:
+	case TOOLBAR_NEW_TAB:
 		return IDS_TOOLBAR_NEWTAB;
 		break;
 
-	case TOOLBAR_OPENCOMMANDPROMPT:
+	case TOOLBAR_OPEN_COMMAND_PROMPT:
 		return IDS_TOOLBAR_OPENCOMMANDPROMPT;
 		break;
 
@@ -744,18 +744,18 @@ void MainToolbar::UpdateToolbarButtonStates()
 
 	BOOL bVirtualFolder = m_pexpp->GetActiveShellBrowser()->InVirtualFolder();
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_COPYTO, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_MOVETO, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_COPY_TO, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_MOVE_TO, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_COPY, m_pexpp->CanCopy());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_CUT, m_pexpp->CanCut());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_PASTE, m_pexpp->CanPaste());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_PROPERTIES, m_pexpp->CanShowFileProperties());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_DELETE, m_pexpp->CanDelete());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_DELETEPERMANENTLY, m_pexpp->CanDelete());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_DELETE_PERMANENTLY, m_pexpp->CanDelete());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_SPLIT_FILE, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() == 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_MERGE_FILES, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() > 1);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_OPENCOMMANDPROMPT, !bVirtualFolder);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_NEWFOLDER, m_pexpp->CanCreate());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_OPEN_COMMAND_PROMPT, !bVirtualFolder);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_NEW_FOLDER, m_pexpp->CanCreate());
 }
 
 void MainToolbar::OnTabSelected(const Tab &tab)
