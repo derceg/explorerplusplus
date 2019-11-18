@@ -1207,10 +1207,12 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnCreateNewFolder();
 		break;
 
+	case TOOLBAR_MERGE_FILES:
 	case IDM_ACTIONS_MERGEFILES:
 		OnMergeFiles();
 		break;
 
+	case TOOLBAR_SPLIT_FILE:
 	case IDM_ACTIONS_SPLITFILE:
 		OnSplitFile();
 		break;

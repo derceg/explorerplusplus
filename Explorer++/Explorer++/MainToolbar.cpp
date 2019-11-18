@@ -40,7 +40,9 @@ const std::unordered_map<int, Icon> TOOLBAR_BUTTON_ICON_MAPPINGS = {
 	{TOOLBAR_NEWTAB, Icon::NewTab},
 	{TOOLBAR_OPENCOMMANDPROMPT, Icon::CommandLine},
 	{TOOLBAR_ORGANIZEBOOKMARKS, Icon::Bookmarks},
-	{TOOLBAR_DELETEPERMANENTLY, Icon::DeletePermanently}
+	{TOOLBAR_DELETEPERMANENTLY, Icon::DeletePermanently},
+	{TOOLBAR_SPLIT_FILE, Icon::SplitFiles},
+	{TOOLBAR_MERGE_FILES, Icon::MergeFiles}
 };
 
 template <typename L, typename R>
@@ -76,6 +78,8 @@ const boost::bimap<int, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS = MakeBim
 	{TOOLBAR_OPENCOMMANDPROMPT, L"Open Command Prompt"},
 	{TOOLBAR_ORGANIZEBOOKMARKS, L"Organize Bookmarks"},
 	{TOOLBAR_DELETEPERMANENTLY, L"Delete Permanently"},
+	{TOOLBAR_SPLIT_FILE, L"Split File"},
+	{TOOLBAR_MERGE_FILES, L"Merge Files"},
 
 	{TOOLBAR_SEPARATOR, L"Separator"}
 });
@@ -455,6 +459,14 @@ int MainToolbar::LookupToolbarButtonTextID(int iButtonID) const
 	case TOOLBAR_OPENCOMMANDPROMPT:
 		return IDS_TOOLBAR_OPENCOMMANDPROMPT;
 		break;
+
+	case TOOLBAR_SPLIT_FILE:
+		return IDS_TOOLBAR_SPLIT_FILE;
+		break;
+
+	case TOOLBAR_MERGE_FILES:
+		return IDS_TOOLBAR_MERGE_FILES;
+		break;
 	}
 
 	return 0;
@@ -730,6 +742,8 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_BACK, m_pexpp->GetActiveShellBrowser()->CanBrowseBack());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_FORWARD, m_pexpp->GetActiveShellBrowser()->CanBrowseForward());
 
+	BOOL bVirtualFolder = m_pexpp->GetActiveShellBrowser()->InVirtualFolder();
+
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_COPYTO, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_MOVETO, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_COPY, m_pexpp->CanCopy());
@@ -738,11 +752,9 @@ void MainToolbar::UpdateToolbarButtonStates()
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_PROPERTIES, m_pexpp->CanShowFileProperties());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_DELETE, m_pexpp->CanDelete());
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_DELETEPERMANENTLY, m_pexpp->CanDelete());
-
-	BOOL bVirtualFolder = m_pexpp->GetActiveShellBrowser()->InVirtualFolder();
-
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_SPLIT_FILE, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() == 1);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_MERGE_FILES, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() > 1);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_OPENCOMMANDPROMPT, !bVirtualFolder);
-
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_NEWFOLDER, m_pexpp->CanCreate());
 }
 
