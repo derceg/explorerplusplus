@@ -31,5 +31,6 @@ BETTER_ENUM(ToolbarButton, int,
 	Bookmarks = 45021,
 	DeletePermanently = 45022,
 	SplitFile = 45023,
-	MergeFiles = 45024
+	MergeFiles = 45024,
+	CloseTab = 45025
 )

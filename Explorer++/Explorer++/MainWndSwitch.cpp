@@ -366,6 +366,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnNewTab();
 		break;
 
+	case ToolbarButton::CloseTab:
 	case TABTOOLBAR_CLOSE:
 	case IDM_FILE_CLOSETAB:
 		OnCloseTab();

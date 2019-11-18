@@ -54,7 +54,8 @@ const std::unordered_map<ToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUTTON_
 	{ToolbarButton::Bookmarks, Icon::Bookmarks},
 	{ToolbarButton::DeletePermanently, Icon::DeletePermanently},
 	{ToolbarButton::SplitFile, Icon::SplitFiles},
-	{ToolbarButton::MergeFiles, Icon::MergeFiles}
+	{ToolbarButton::MergeFiles, Icon::MergeFiles},
+	{ToolbarButton::CloseTab, Icon::CloseTab}
 };
 
 template <typename L, typename R>
@@ -92,6 +93,7 @@ const boost::bimap<ToolbarButton, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS
 	{ToolbarButton::DeletePermanently, L"Delete Permanently"},
 	{ToolbarButton::SplitFile, L"Split File"},
 	{ToolbarButton::MergeFiles, L"Merge Files"},
+	{ToolbarButton::CloseTab, L"Close Tab"},
 
 	{ToolbarButton::Separator, L"Separator"}
 });
@@ -484,6 +486,10 @@ int MainToolbar::LookupToolbarButtonTextID(ToolbarButton button) const
 	case ToolbarButton::MergeFiles:
 		return IDS_TOOLBAR_MERGE_FILES;
 		break;
+
+	case ToolbarButton::CloseTab:
+		return IDS_TOOLBAR_CLOSE_TAB;
+		break;
 	}
 
 	return 0;
@@ -772,17 +778,17 @@ void MainToolbar::UpdateToolbarButtonStates()
 
 	BOOL bVirtualFolder = m_pexpp->GetActiveShellBrowser()->InVirtualFolder();
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::CopyTo, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::MoveTo, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::Copy, m_pexpp->CanCopy());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::Cut, m_pexpp->CanCut());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::Paste, m_pexpp->CanPaste());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::Properties, m_pexpp->CanShowFileProperties());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::Delete, m_pexpp->CanDelete());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::DeletePermanently, m_pexpp->CanDelete());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::SplitFile, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() == 1);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::MergeFiles, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() > 1);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::OpenCommandPrompt, !bVirtualFolder);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::CopyTo, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MoveTo, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Copy, m_pexpp->CanCopy());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Cut, m_pexpp->CanCut());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Paste, m_pexpp->CanPaste());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Properties, m_pexpp->CanShowFileProperties());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Delete, m_pexpp->CanDelete());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::DeletePermanently, m_pexpp->CanDelete());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::SplitFile, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() == 1);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::MergeFiles, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() > 1);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::OpenCommandPrompt, !bVirtualFolder);
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::NewFolder, m_pexpp->CanCreate());
 }
 
