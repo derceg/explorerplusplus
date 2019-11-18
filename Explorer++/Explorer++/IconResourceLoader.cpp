@@ -11,7 +11,7 @@
 IconResourceLoader::IconResourceLoader(IconTheme iconTheme) :
 	m_iconTheme(iconTheme)
 {
-
+	assert(ICON_RESOURCE_MAPPINGS_COLOR.size() == ICON_RESOURCE_MAPPINGS_WINDOWS_10.size());
 }
 
 wil::unique_hbitmap IconResourceLoader::LoadBitmapFromPNGForDpi(Icon icon, int iconWidth, int iconHeight, int dpi) const
