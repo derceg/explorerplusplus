@@ -2,7 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by Explorer++_NoTranslation.rc
 //
-#define IDB_FOLDERLOCKED                101
 #define IDB_FILTERINGAPPLIED            104
 #define IDI_MAIN                        105
 #define IDI_DISPLAYWINDOW               106

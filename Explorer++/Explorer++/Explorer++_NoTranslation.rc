@@ -49,8 +49,6 @@ IDB_FILTERINGAPPLIED    BITMAP                  "res\\Filtering Applied.bmp"
 
 IDB_FOLDEREMPTY         BITMAP                  "res\\Folder Empty.bmp"
 
-IDB_FOLDERLOCKED        BITMAP                  "res\\Folder Locked.bmp"
-
 IDB_NOPREVIEWAVAILABLE  BITMAP                  "res\\No Preview Available.bmp"
 
 
