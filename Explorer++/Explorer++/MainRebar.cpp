@@ -291,6 +291,10 @@ void Explorerplusplus::CreateMainToolbar()
 			tbSave.pszSubKey = NExplorerplusplus::REG_SETTINGS_KEY;
 			tbSave.pszValueName = _T("ToolbarState");
 			SendMessage(m_mainToolbar->GetHWND(), TB_SAVERESTORE, FALSE, reinterpret_cast<LPARAM>(&tbSave));
+
+			// As part of restoring the toolbar, the state of some items may be
+			// lost, so set their state again here.
+			m_mainToolbar->UpdateConfigDependentButtonStates();
 		}
 	}
 }

@@ -149,11 +149,7 @@ void MainToolbar::Initialize(HWND parent)
 	SetTooolbarImageList();
 	AddStringsToToolbar();
 	AddButtonsToToolbar(m_persistentSettings->m_toolbarButtons);
-
-	if (m_config->showFolders)
-	{
-		SendMessage(m_hwnd, TB_CHECKBUTTON, ToolbarButton::Folders, TRUE);
-	}
+	UpdateConfigDependentButtonStates();
 
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
 		reinterpret_cast<DWORD_PTR>(this));
@@ -591,6 +587,7 @@ void MainToolbar::OnTBReset()
 	m_persistentSettings->m_toolbarButtons = { DEFAULT_TOOLBAR_BUTTONS, std::end(DEFAULT_TOOLBAR_BUTTONS) };
 
 	AddButtonsToToolbar(m_persistentSettings->m_toolbarButtons);
+	UpdateConfigDependentButtonStates();
 	UpdateToolbarButtonStates();
 }
 
@@ -624,6 +621,8 @@ void MainToolbar::OnTBChange()
 	}
 
 	m_persistentSettings->m_toolbarButtons = toolbarButtons;
+
+	UpdateConfigDependentButtonStates();
 }
 
 void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
@@ -754,6 +753,14 @@ void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 
 	TrackPopupMenu(viewsMenu, TPM_LEFTALIGN, ptOrigin->x, ptOrigin->y,
 		0, m_hwnd, NULL);
+}
+
+// For some of the buttons on the toolbar, their state depends on an item from
+// the application configuration, rather than the properties of the current tab
+// or file selection.
+void MainToolbar::UpdateConfigDependentButtonStates()
+{
+	SendMessage(m_hwnd, TB_CHECKBUTTON, ToolbarButton::Folders, m_config->showFolders);
 }
 
 void MainToolbar::UpdateToolbarButtonStates()

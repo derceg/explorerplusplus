@@ -46,6 +46,7 @@ public:
 		Navigation *navigation, std::shared_ptr<Config> config);
 
 	void UpdateToolbarSize();
+	void UpdateConfigDependentButtonStates();
 	void UpdateToolbarButtonStates();
 
 private:
