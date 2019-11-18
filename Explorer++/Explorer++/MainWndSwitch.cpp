@@ -9,6 +9,7 @@
 #include "ApplicationToolbar.h"
 #include "Config.h"
 #include "DrivesToolbar.h"
+#include "Explorer++_internal.h"
 #include "HolderWindow.h"
 #include "IModelessDialogNotification.h"
 #include "MainResource.h"
@@ -360,7 +361,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 
 	switch (LOWORD(wParam))
 	{
-	case TOOLBAR_NEW_TAB:
+	case ToolbarButton::TOOLBAR_NEW_TAB:
 	case IDM_FILE_NEWTAB:
 		OnNewTab();
 		break;
@@ -378,7 +379,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnSaveDirectoryListing();
 		break;
 
-	case TOOLBAR_OPEN_COMMAND_PROMPT:
+	case ToolbarButton::TOOLBAR_OPEN_COMMAND_PROMPT:
 	case IDM_FILE_OPENCOMMANDPROMPT:
 		StartCommandPrompt(m_CurrentDirectory, false);
 		break;
@@ -407,12 +408,12 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnSetFileAttributes();
 		break;
 
-	case TOOLBAR_DELETE:
+	case ToolbarButton::TOOLBAR_DELETE:
 	case IDM_FILE_DELETE:
 		OnFileDelete(false);
 		break;
 
-	case TOOLBAR_DELETE_PERMANENTLY:
+	case ToolbarButton::TOOLBAR_DELETE_PERMANENTLY:
 	case IDM_FILE_DELETEPERMANENTLY:
 		OnFileDelete(true);
 		break;
@@ -421,7 +422,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnFileRename();
 		break;
 
-	case TOOLBAR_PROPERTIES:
+	case ToolbarButton::TOOLBAR_PROPERTIES:
 	case IDM_FILE_PROPERTIES:
 	case IDM_RCLICK_PROPERTIES:
 		OnShowFileProperties();
@@ -435,17 +436,17 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		m_FileActionHandler.Undo();
 		break;
 
-	case TOOLBAR_COPY:
+	case ToolbarButton::TOOLBAR_COPY:
 	case IDM_EDIT_COPY:
 		OnCopy(TRUE);
 		break;
 
-	case TOOLBAR_CUT:
+	case ToolbarButton::TOOLBAR_CUT:
 	case IDM_EDIT_CUT:
 		OnCopy(FALSE);
 		break;
 
-	case TOOLBAR_PASTE:
+	case ToolbarButton::TOOLBAR_PASTE:
 	case IDM_EDIT_PASTE:
 		OnPaste();
 		break;
@@ -459,11 +460,11 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_EDIT_COPYTOFOLDER:
-	case TOOLBAR_COPY_TO:
+	case ToolbarButton::TOOLBAR_COPY_TO:
 		CopyToFolder(false);
 		break;
 
-	case TOOLBAR_MOVE_TO:
+	case ToolbarButton::TOOLBAR_MOVE_TO:
 	case IDM_EDIT_MOVETOFOLDER:
 		CopyToFolder(true);
 		break;
@@ -510,8 +511,8 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		ResizeWindows();
 		break;
 
+	case ToolbarButton::TOOLBAR_FOLDERS:
 	case IDM_VIEW_FOLDERS:
-	case TOOLBAR_FOLDERS:
 		ToggleFolders();
 		break;
 
@@ -1120,7 +1121,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnShowHiddenFiles();
 		break;
 
-	case TOOLBAR_REFRESH:
+	case ToolbarButton::TOOLBAR_REFRESH:
 	case IDM_VIEW_REFRESH:
 		OnRefresh();
 		break;
@@ -1202,17 +1203,17 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	}
 	break;
 
-	case TOOLBAR_NEW_FOLDER:
+	case ToolbarButton::TOOLBAR_NEW_FOLDER:
 	case IDM_ACTIONS_NEWFOLDER:
 		OnCreateNewFolder();
 		break;
 
-	case TOOLBAR_MERGE_FILES:
+	case ToolbarButton::TOOLBAR_MERGE_FILES:
 	case IDM_ACTIONS_MERGEFILES:
 		OnMergeFiles();
 		break;
 
-	case TOOLBAR_SPLIT_FILE:
+	case ToolbarButton::TOOLBAR_SPLIT_FILE:
 	case IDM_ACTIONS_SPLITFILE:
 		OnSplitFile();
 		break;
@@ -1221,18 +1222,18 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnDestroyFiles();
 		break;
 
+	case ToolbarButton::TOOLBAR_BACK:
 	case IDM_GO_BACK:
-	case TOOLBAR_BACK:
 		m_navigation->OnBrowseBack();
 		break;
 
+	case ToolbarButton::TOOLBAR_FORWARD:
 	case IDM_GO_FORWARD:
-	case TOOLBAR_FORWARD:
 		m_navigation->OnBrowseForward();
 		break;
 
+	case ToolbarButton::TOOLBAR_UP:
 	case IDM_GO_UPONELEVEL:
-	case TOOLBAR_UP:
 		m_navigation->OnNavigateUp();
 		break;
 
@@ -1280,7 +1281,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		m_navigation->OnGotoFolder(CSIDL_CONNECTIONS);
 		break;
 
-	case TOOLBAR_ADD_BOOKMARK:
+	case ToolbarButton::TOOLBAR_ADD_BOOKMARK:
 	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
 	{
 		TCHAR szCurrentDirectory[MAX_PATH];
@@ -1294,7 +1295,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	}
 	break;
 
-	case TOOLBAR_ORGANIZE_BOOKMARKS:
+	case ToolbarButton::TOOLBAR_ORGANIZE_BOOKMARKS:
 	case IDM_BOOKMARKS_MANAGEBOOKMARKS:
 		if (g_hwndManageBookmarks == NULL)
 		{
@@ -1308,7 +1309,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		}
 		break;
 
-	case TOOLBAR_SEARCH:
+	case ToolbarButton::TOOLBAR_SEARCH:
 	case IDM_TOOLS_SEARCH:
 		OnSearch();
 		break;
@@ -1411,7 +1412,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnSelectTabByIndex(-1);
 		break;
 
-	case TOOLBAR_VIEWS:
+	case ToolbarButton::TOOLBAR_VIEWS:
 		OnToolbarViews();
 		break;
 
@@ -1651,17 +1652,17 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 									{
 										switch(tbButton.idCommand)
 										{
-										case TOOLBAR_BACK:
+										case ToolbarButton::TOOLBAR_BACK:
 											hSubMenu = CreateRebarHistoryMenu(TRUE);
 											fMask |= MIIM_SUBMENU;
 											break;
 
-										case TOOLBAR_FORWARD:
+										case ToolbarButton::TOOLBAR_FORWARD:
 											hSubMenu = CreateRebarHistoryMenu(FALSE);
 											fMask |= MIIM_SUBMENU;
 											break;
 
-										case TOOLBAR_VIEWS:
+										case ToolbarButton::TOOLBAR_VIEWS:
 											hSubMenu = BuildViewsMenu();
 											fMask |= MIIM_SUBMENU;
 											break;

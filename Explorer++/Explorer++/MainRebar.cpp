@@ -9,6 +9,7 @@
 #include "BookmarksToolbar.h"
 #include "Config.h"
 #include "DrivesToolbar.h"
+#include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "../Helper/Controls.h"
 #include "../Helper/MenuHelper.h"
@@ -17,7 +18,7 @@
 
 LRESULT CALLBACK RebarSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
-static const int TOOLBAR_BOOKMARK_START = TOOLBAR_ID_START + 1000;
+static const int TOOLBAR_BOOKMARK_START = 46000;
 static const int TOOLBAR_BOOKMARK_END = TOOLBAR_BOOKMARK_START + 1000;
 static const int TOOLBAR_DRIVES_ID_START = TOOLBAR_BOOKMARK_END + 1;
 static const int TOOLBAR_DRIVES_ID_END = TOOLBAR_DRIVES_ID_START + 1000;

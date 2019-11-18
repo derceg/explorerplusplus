@@ -20,29 +20,38 @@
 const int TOOLBAR_IMAGE_SIZE_SMALL = 16;
 const int TOOLBAR_IMAGE_SIZE_LARGE = 24;
 
-const std::unordered_map<int, Icon> TOOLBAR_BUTTON_ICON_MAPPINGS = {
-	{TOOLBAR_BACK, Icon::Back},
-	{TOOLBAR_FORWARD, Icon::Forward},
-	{TOOLBAR_UP, Icon::Up},
-	{TOOLBAR_FOLDERS, Icon::FolderTree},
-	{TOOLBAR_COPY_TO, Icon::CopyTo},
-	{TOOLBAR_MOVE_TO, Icon::MoveTo},
-	{TOOLBAR_NEW_FOLDER, Icon::NewFolder},
-	{TOOLBAR_COPY, Icon::Copy},
-	{TOOLBAR_CUT, Icon::Cut},
-	{TOOLBAR_PASTE, Icon::Paste},
-	{TOOLBAR_DELETE, Icon::Delete},
-	{TOOLBAR_VIEWS, Icon::Views},
-	{TOOLBAR_SEARCH, Icon::Search},
-	{TOOLBAR_PROPERTIES, Icon::Properties},
-	{TOOLBAR_REFRESH, Icon::Refresh},
-	{TOOLBAR_ADD_BOOKMARK, Icon::AddBookmark},
-	{TOOLBAR_NEW_TAB, Icon::NewTab},
-	{TOOLBAR_OPEN_COMMAND_PROMPT, Icon::CommandLine},
-	{TOOLBAR_ORGANIZE_BOOKMARKS, Icon::Bookmarks},
-	{TOOLBAR_DELETE_PERMANENTLY, Icon::DeletePermanently},
-	{TOOLBAR_SPLIT_FILE, Icon::SplitFiles},
-	{TOOLBAR_MERGE_FILES, Icon::MergeFiles}
+struct ToolbarButtonHash
+{
+	template <typename T>
+	std::size_t operator()(T t) const
+	{
+		return t._to_integral();
+	}
+};
+
+const std::unordered_map<ToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUTTON_ICON_MAPPINGS = {
+	{ToolbarButton::TOOLBAR_BACK, Icon::Back},
+	{ToolbarButton::TOOLBAR_FORWARD, Icon::Forward},
+	{ToolbarButton::TOOLBAR_UP, Icon::Up},
+	{ToolbarButton::TOOLBAR_FOLDERS, Icon::FolderTree},
+	{ToolbarButton::TOOLBAR_COPY_TO, Icon::CopyTo},
+	{ToolbarButton::TOOLBAR_MOVE_TO, Icon::MoveTo},
+	{ToolbarButton::TOOLBAR_NEW_FOLDER, Icon::NewFolder},
+	{ToolbarButton::TOOLBAR_COPY, Icon::Copy},
+	{ToolbarButton::TOOLBAR_CUT, Icon::Cut},
+	{ToolbarButton::TOOLBAR_PASTE, Icon::Paste},
+	{ToolbarButton::TOOLBAR_DELETE, Icon::Delete},
+	{ToolbarButton::TOOLBAR_VIEWS, Icon::Views},
+	{ToolbarButton::TOOLBAR_SEARCH, Icon::Search},
+	{ToolbarButton::TOOLBAR_PROPERTIES, Icon::Properties},
+	{ToolbarButton::TOOLBAR_REFRESH, Icon::Refresh},
+	{ToolbarButton::TOOLBAR_ADD_BOOKMARK, Icon::AddBookmark},
+	{ToolbarButton::TOOLBAR_NEW_TAB, Icon::NewTab},
+	{ToolbarButton::TOOLBAR_OPEN_COMMAND_PROMPT, Icon::CommandLine},
+	{ToolbarButton::TOOLBAR_ORGANIZE_BOOKMARKS, Icon::Bookmarks},
+	{ToolbarButton::TOOLBAR_DELETE_PERMANENTLY, Icon::DeletePermanently},
+	{ToolbarButton::TOOLBAR_SPLIT_FILE, Icon::SplitFiles},
+	{ToolbarButton::TOOLBAR_MERGE_FILES, Icon::MergeFiles}
 };
 
 template <typename L, typename R>
@@ -57,31 +66,31 @@ MakeBimap(std::initializer_list<typename boost::bimap<L, R>::value_type> list)
 
 // Ideally, toolbar button IDs would be saved in the XML config file, rather
 // than button strings, but that's not especially easy to change now.
-const boost::bimap<int, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS = MakeBimap<int, std::wstring>({
-	{TOOLBAR_BACK, L"Back"},
-	{TOOLBAR_FORWARD, L"Forward"},
-	{TOOLBAR_UP, L"Up"},
-	{TOOLBAR_FOLDERS, L"Folders"},
-	{TOOLBAR_COPY_TO, L"Copy To"},
-	{TOOLBAR_MOVE_TO, L"Move To"},
-	{TOOLBAR_NEW_FOLDER, L"New Folder"},
-	{TOOLBAR_COPY, L"Copy"},
-	{TOOLBAR_CUT, L"Cut"},
-	{TOOLBAR_PASTE, L"Paste"},
-	{TOOLBAR_DELETE, L"Delete"},
-	{TOOLBAR_VIEWS, L"Views"},
-	{TOOLBAR_SEARCH, L"Search"},
-	{TOOLBAR_PROPERTIES, L"Properties"},
-	{TOOLBAR_REFRESH, L"Refresh"},
-	{TOOLBAR_ADD_BOOKMARK, L"Bookmark the current tab"},
-	{TOOLBAR_NEW_TAB, L"Create a new tab"},
-	{TOOLBAR_OPEN_COMMAND_PROMPT, L"Open Command Prompt"},
-	{TOOLBAR_ORGANIZE_BOOKMARKS, L"Organize Bookmarks"},
-	{TOOLBAR_DELETE_PERMANENTLY, L"Delete Permanently"},
-	{TOOLBAR_SPLIT_FILE, L"Split File"},
-	{TOOLBAR_MERGE_FILES, L"Merge Files"},
+const boost::bimap<ToolbarButton, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS = MakeBimap<ToolbarButton, std::wstring>({
+	{ToolbarButton::TOOLBAR_BACK, L"Back"},
+	{ToolbarButton::TOOLBAR_FORWARD, L"Forward"},
+	{ToolbarButton::TOOLBAR_UP, L"Up"},
+	{ToolbarButton::TOOLBAR_FOLDERS, L"Folders"},
+	{ToolbarButton::TOOLBAR_COPY_TO, L"Copy To"},
+	{ToolbarButton::TOOLBAR_MOVE_TO, L"Move To"},
+	{ToolbarButton::TOOLBAR_NEW_FOLDER, L"New Folder"},
+	{ToolbarButton::TOOLBAR_COPY, L"Copy"},
+	{ToolbarButton::TOOLBAR_CUT, L"Cut"},
+	{ToolbarButton::TOOLBAR_PASTE, L"Paste"},
+	{ToolbarButton::TOOLBAR_DELETE, L"Delete"},
+	{ToolbarButton::TOOLBAR_VIEWS, L"Views"},
+	{ToolbarButton::TOOLBAR_SEARCH, L"Search"},
+	{ToolbarButton::TOOLBAR_PROPERTIES, L"Properties"},
+	{ToolbarButton::TOOLBAR_REFRESH, L"Refresh"},
+	{ToolbarButton::TOOLBAR_ADD_BOOKMARK, L"Bookmark the current tab"},
+	{ToolbarButton::TOOLBAR_NEW_TAB, L"Create a new tab"},
+	{ToolbarButton::TOOLBAR_OPEN_COMMAND_PROMPT, L"Open Command Prompt"},
+	{ToolbarButton::TOOLBAR_ORGANIZE_BOOKMARKS, L"Organize Bookmarks"},
+	{ToolbarButton::TOOLBAR_DELETE_PERMANENTLY, L"Delete Permanently"},
+	{ToolbarButton::TOOLBAR_SPLIT_FILE, L"Split File"},
+	{ToolbarButton::TOOLBAR_MERGE_FILES, L"Merge Files"},
 
-	{TOOLBAR_SEPARATOR, L"Separator"}
+	{ToolbarButton::TOOLBAR_SEPARATOR, L"Separator"}
 });
 
 #pragma warning(pop)
@@ -114,6 +123,11 @@ HWND MainToolbar::CreateMainToolbar(HWND parent)
 
 void MainToolbar::Initialize(HWND parent)
 {
+	// Ideally, this constraint would be checked at compile-time, but the size
+	// of TOOLBAR_BUTTON_ICON_MAPPINGS isn't known at compile-time. Note that
+	// the ToolbarButton enum contains one additional item - for the separator.
+	assert(TOOLBAR_BUTTON_ICON_MAPPINGS.size() == (ToolbarButton::_size() - 1));
+
 	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
@@ -122,9 +136,9 @@ void MainToolbar::Initialize(HWND parent)
 	int dpiScaledSizeLarge = MulDiv(TOOLBAR_IMAGE_SIZE_LARGE, dpi, USER_DEFAULT_SCREEN_DPI);
 
 	m_imageListSmall.reset(ImageList_Create(dpiScaledSizeSmall, dpiScaledSizeSmall,
-		ILC_COLOR32 | ILC_MASK, 0, SIZEOF_ARRAY(TOOLBAR_BUTTON_SET)));
+		ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(ToolbarButton::_size() - 1)));
 	m_imageListLarge.reset(ImageList_Create(dpiScaledSizeLarge, dpiScaledSizeLarge,
-		ILC_COLOR32 | ILC_MASK, 0, SIZEOF_ARRAY(TOOLBAR_BUTTON_SET)));
+		ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(ToolbarButton::_size() - 1)));
 
 	m_toolbarImageMapSmall = SetUpToolbarImageList(m_imageListSmall.get(), m_pexpp->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_SMALL, dpi);
 	m_toolbarImageMapLarge = SetUpToolbarImageList(m_imageListLarge.get(), m_pexpp->GetIconResourceLoader(), TOOLBAR_IMAGE_SIZE_LARGE, dpi);
@@ -135,7 +149,7 @@ void MainToolbar::Initialize(HWND parent)
 
 	if (m_config->showFolders)
 	{
-		SendMessage(m_hwnd, TB_CHECKBUTTON, TOOLBAR_FOLDERS, TRUE);
+		SendMessage(m_hwnd, TB_CHECKBUTTON, ToolbarButton::TOOLBAR_FOLDERS, TRUE);
 	}
 
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
@@ -256,27 +270,27 @@ LRESULT CALLBACK MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
-void MainToolbar::AddButtonsToToolbar(const std::vector<ToolbarButton_t> &buttons)
+void MainToolbar::AddButtonsToToolbar(const std::vector<ToolbarButton> &buttons)
 {
-	for (const auto &button : buttons)
+	for (auto button : buttons)
 	{
-		AddButtonToToolbar(button.iItemID);
+		AddButtonToToolbar(button);
 	}
 }
 
-void MainToolbar::AddButtonToToolbar(int iButtonId)
+void MainToolbar::AddButtonToToolbar(ToolbarButton button)
 {
-	TBBUTTON tbButton = GetToolbarButtonDetails(iButtonId);
+	TBBUTTON tbButton = GetToolbarButtonDetails(button);
 	SendMessage(m_hwnd, TB_ADDBUTTONS, 1, reinterpret_cast<LPARAM>(&tbButton));
 }
 
-TBBUTTON MainToolbar::GetToolbarButtonDetails(int iButtonId) const
+TBBUTTON MainToolbar::GetToolbarButtonDetails(ToolbarButton button) const
 {
 	TBBUTTON tbButton;
 
 	ZeroMemory(&tbButton, sizeof(tbButton));
 
-	if (iButtonId == TOOLBAR_SEPARATOR)
+	if (button == +ToolbarButton::TOOLBAR_SEPARATOR)
 	{
 		tbButton.iBitmap = 0;
 		tbButton.idCommand = 0;
@@ -290,26 +304,23 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(int iButtonId) const
 		/* Standard style that all toolbar buttons will have. */
 		BYTE StandardStyle = BTNS_BUTTON | BTNS_AUTOSIZE;
 
-		auto itr = m_toolbarStringMap.find(iButtonId);
-		assert(itr != m_toolbarStringMap.end());
+		auto stringIndex = m_toolbarStringMap.at(button);
 
 		int imagePosition;
 
 		if (m_config->useLargeToolbarIcons)
 		{
-			imagePosition = m_toolbarImageMapLarge.at(iButtonId);
+			imagePosition = m_toolbarImageMapLarge.at(button);
 		}
 		else
 		{
-			imagePosition = m_toolbarImageMapSmall.at(iButtonId);
+			imagePosition = m_toolbarImageMapSmall.at(button);
 		}
 
-		int stringIndex = itr->second;
-
 		tbButton.iBitmap = imagePosition;
-		tbButton.idCommand = iButtonId;
+		tbButton.idCommand = button;
 		tbButton.fsState = TBSTATE_ENABLED;
-		tbButton.fsStyle = StandardStyle | LookupToolbarButtonExtraStyles(iButtonId);
+		tbButton.fsStyle = StandardStyle | LookupToolbarButtonExtraStyles(button);
 		tbButton.dwData = 0;
 		tbButton.iString = stringIndex;
 	}
@@ -319,28 +330,33 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(int iButtonId) const
 
 void MainToolbar::AddStringsToToolbar()
 {
-	for (int i = 0; i < SIZEOF_ARRAY(TOOLBAR_BUTTON_SET); i++)
+	for (auto button : ToolbarButton::_values())
 	{
-		AddStringToToolbar(TOOLBAR_BUTTON_SET[i]);
+		if (button == +ToolbarButton::TOOLBAR_SEPARATOR)
+		{
+			continue;
+		}
+
+		AddStringToToolbar(button);
 	}
 }
 
-void MainToolbar::AddStringToToolbar(int iButtonId)
+void MainToolbar::AddStringToToolbar(ToolbarButton button)
 {
 	TCHAR szText[64];
 
 	/* The string must be double NULL-terminated. */
-	GetToolbarButtonText(iButtonId, szText, SIZEOF_ARRAY(szText));
+	GetToolbarButtonText(button, szText, SIZEOF_ARRAY(szText));
 	szText[lstrlen(szText) + 1] = '\0';
 
 	int index = static_cast<int>(SendMessage(m_hwnd, TB_ADDSTRING, NULL, reinterpret_cast<LPARAM>(szText)));
 
-	m_toolbarStringMap.insert(std::make_pair(iButtonId, index));
+	m_toolbarStringMap.insert(std::make_pair(button, index));
 }
 
-void MainToolbar::GetToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize) const
+void MainToolbar::GetToolbarButtonText(ToolbarButton button, TCHAR *szText, int bufSize) const
 {
-	int res = LoadString(m_instance, LookupToolbarButtonTextID(iButtonId), szText, bufSize);
+	int res = LoadString(m_instance, LookupToolbarButtonTextID(button), szText, bufSize);
 	assert(res != 0);
 
 	/* It doesn't really make sense to return this. If the string isn't in the
@@ -348,23 +364,23 @@ void MainToolbar::GetToolbarButtonText(int iButtonId, TCHAR *szText, int bufSize
 	UNUSED(res);
 }
 
-BYTE MainToolbar::LookupToolbarButtonExtraStyles(int iButtonID) const
+BYTE MainToolbar::LookupToolbarButtonExtraStyles(ToolbarButton button) const
 {
-	switch (iButtonID)
+	switch (button)
 	{
-	case TOOLBAR_BACK:
+	case ToolbarButton::TOOLBAR_BACK:
 		return BTNS_DROPDOWN;
 		break;
 
-	case TOOLBAR_FORWARD:
+	case ToolbarButton::TOOLBAR_FORWARD:
 		return BTNS_DROPDOWN;
 		break;
 
-	case TOOLBAR_FOLDERS:
+	case ToolbarButton::TOOLBAR_FOLDERS:
 		return BTNS_SHOWTEXT | BTNS_CHECK;
 		break;
 
-	case TOOLBAR_VIEWS:
+	case ToolbarButton::TOOLBAR_VIEWS:
 		return BTNS_DROPDOWN;
 		break;
 	}
@@ -372,99 +388,99 @@ BYTE MainToolbar::LookupToolbarButtonExtraStyles(int iButtonID) const
 	return 0;
 }
 
-int MainToolbar::LookupToolbarButtonTextID(int iButtonID) const
+int MainToolbar::LookupToolbarButtonTextID(ToolbarButton button) const
 {
-	switch (iButtonID)
+	switch (button)
 	{
-	case TOOLBAR_SEPARATOR:
+	case ToolbarButton::TOOLBAR_SEPARATOR:
 		return IDS_SEPARATOR;
 		break;
 
-	case TOOLBAR_BACK:
+	case ToolbarButton::TOOLBAR_BACK:
 		return IDS_TOOLBAR_BACK;
 		break;
 
-	case TOOLBAR_FORWARD:
+	case ToolbarButton::TOOLBAR_FORWARD:
 		return IDS_TOOLBAR_FORWARD;
 		break;
 
-	case TOOLBAR_UP:
+	case ToolbarButton::TOOLBAR_UP:
 		return IDS_TOOLBAR_UP;
 		break;
 
-	case TOOLBAR_FOLDERS:
+	case ToolbarButton::TOOLBAR_FOLDERS:
 		return IDS_TOOLBAR_FOLDERS;
 		break;
 
-	case TOOLBAR_COPY_TO:
+	case ToolbarButton::TOOLBAR_COPY_TO:
 		return IDS_TOOLBAR_COPYTO;
 		break;
 
-	case TOOLBAR_MOVE_TO:
+	case ToolbarButton::TOOLBAR_MOVE_TO:
 		return IDS_TOOLBAR_MOVETO;
 		break;
 
-	case TOOLBAR_NEW_FOLDER:
+	case ToolbarButton::TOOLBAR_NEW_FOLDER:
 		return IDS_TOOLBAR_NEWFOLDER;
 		break;
 
-	case TOOLBAR_COPY:
+	case ToolbarButton::TOOLBAR_COPY:
 		return IDS_TOOLBAR_COPY;
 		break;
 
-	case TOOLBAR_CUT:
+	case ToolbarButton::TOOLBAR_CUT:
 		return IDS_TOOLBAR_CUT;
 		break;
 
-	case TOOLBAR_PASTE:
+	case ToolbarButton::TOOLBAR_PASTE:
 		return IDS_TOOLBAR_PASTE;
 		break;
 
-	case TOOLBAR_DELETE:
+	case ToolbarButton::TOOLBAR_DELETE:
 		return IDS_TOOLBAR_DELETE;
 		break;
 
-	case TOOLBAR_DELETE_PERMANENTLY:
+	case ToolbarButton::TOOLBAR_DELETE_PERMANENTLY:
 		return IDS_TOOLBAR_DELETEPERMANENTLY;
 		break;
 
-	case TOOLBAR_VIEWS:
+	case ToolbarButton::TOOLBAR_VIEWS:
 		return IDS_TOOLBAR_VIEWS;
 		break;
 
-	case TOOLBAR_SEARCH:
+	case ToolbarButton::TOOLBAR_SEARCH:
 		return IDS_TOOLBAR_SEARCH;
 		break;
 
-	case TOOLBAR_PROPERTIES:
+	case ToolbarButton::TOOLBAR_PROPERTIES:
 		return IDS_TOOLBAR_PROPERTIES;
 		break;
 
-	case TOOLBAR_REFRESH:
+	case ToolbarButton::TOOLBAR_REFRESH:
 		return IDS_TOOLBAR_REFRESH;
 		break;
 
-	case TOOLBAR_ADD_BOOKMARK:
+	case ToolbarButton::TOOLBAR_ADD_BOOKMARK:
 		return IDS_TOOLBAR_ADDBOOKMARK;
 		break;
 
-	case TOOLBAR_ORGANIZE_BOOKMARKS:
+	case ToolbarButton::TOOLBAR_ORGANIZE_BOOKMARKS:
 		return IDS_TOOLBAR_MANAGEBOOKMARKS;
 		break;
 
-	case TOOLBAR_NEW_TAB:
+	case ToolbarButton::TOOLBAR_NEW_TAB:
 		return IDS_TOOLBAR_NEWTAB;
 		break;
 
-	case TOOLBAR_OPEN_COMMAND_PROMPT:
+	case ToolbarButton::TOOLBAR_OPEN_COMMAND_PROMPT:
 		return IDS_TOOLBAR_OPENCOMMANDPROMPT;
 		break;
 
-	case TOOLBAR_SPLIT_FILE:
+	case ToolbarButton::TOOLBAR_SPLIT_FILE:
 		return IDS_TOOLBAR_SPLIT_FILE;
 		break;
 
-	case TOOLBAR_MERGE_FILES:
+	case ToolbarButton::TOOLBAR_MERGE_FILES:
 		return IDS_TOOLBAR_MERGE_FILES;
 		break;
 	}
@@ -539,15 +555,15 @@ BOOL MainToolbar::OnTBGetButtonInfo(LPARAM lParam)
 {
 	NMTOOLBAR *pnmtb = reinterpret_cast<NMTOOLBAR *>(lParam);
 
-	/* The cast below is to fix C4018 (signed/unsigned mismatch). */
-	if ((pnmtb->iItem >= 0) && ((unsigned int)pnmtb->iItem < SIZEOF_ARRAY(TOOLBAR_BUTTON_SET)))
+	if ((pnmtb->iItem >= 0) && (pnmtb->iItem < (ToolbarButton::_size() - 1)))
 	{
-		int iButtonId = TOOLBAR_BUTTON_SET[pnmtb->iItem];
-
-		pnmtb->tbButton = GetToolbarButtonDetails(iButtonId);
+		// Note that the separator (which is the first item in the enumeration)
+		// is skipped.
+		ToolbarButton button = ToolbarButton::_values()[pnmtb->iItem + 1];
+		pnmtb->tbButton = GetToolbarButtonDetails(button);
 
 		TCHAR szText[64];
-		GetToolbarButtonText(iButtonId, szText, SIZEOF_ARRAY(szText));
+		GetToolbarButtonText(button, szText, SIZEOF_ARRAY(szText));
 		StringCchCopy(pnmtb->pszText, pnmtb->cchText, szText);
 
 		return TRUE;
@@ -575,7 +591,7 @@ void MainToolbar::OnTBReset()
 
 void MainToolbar::OnTBChange()
 {
-	std::vector<ToolbarButton_t> toolbarButtons;
+	std::vector<ToolbarButton> toolbarButtons;
 	int numButtons = static_cast<int>(SendMessage(m_hwnd, TB_BUTTONCOUNT, 0, 0));
 
 	for (int i = 0; i < numButtons; i++)
@@ -592,14 +608,14 @@ void MainToolbar::OnTBChange()
 
 		if (tbButton.idCommand == 0)
 		{
-			id = TOOLBAR_SEPARATOR;
+			id = ToolbarButton::TOOLBAR_SEPARATOR;
 		}
 		else
 		{
 			id = tbButton.idCommand;
 		}
 
-		toolbarButtons.push_back({ id });
+		toolbarButtons.push_back(ToolbarButton::_from_integral(id));
 	}
 
 	m_persistentSettings->m_toolbarButtons = toolbarButtons;
@@ -611,7 +627,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, EMPTY_STRING);
 
-	if (ptbgit->iItem == TOOLBAR_BACK)
+	if (ptbgit->iItem == ToolbarButton::TOOLBAR_BACK)
 	{
 		if (m_pexpp->GetActiveShellBrowser()->CanBrowseBack())
 		{
@@ -630,7 +646,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
 		}
 	}
-	else if (ptbgit->iItem == TOOLBAR_FORWARD)
+	else if (ptbgit->iItem == ToolbarButton::TOOLBAR_FORWARD)
 	{
 		if (m_pexpp->GetActiveShellBrowser()->CanBrowseForward())
 		{
@@ -666,7 +682,7 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 	ptOrigin.x = rc.left;
 	ptOrigin.y = rc.bottom - 4;
 
-	if (nmTB->iItem == TOOLBAR_BACK)
+	if (nmTB->iItem == ToolbarButton::TOOLBAR_BACK)
 	{
 		hr = m_pexpp->GetActiveShellBrowser()->CreateHistoryPopup(m_hwnd, &pidl, &ptOrigin, TRUE);
 
@@ -679,9 +695,9 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 
 		return TBDDRET_DEFAULT;
 	}
-	else if (nmTB->iItem == TOOLBAR_FORWARD)
+	else if (nmTB->iItem == ToolbarButton::TOOLBAR_FORWARD)
 	{
-		SendMessage(m_hwnd, TB_GETRECT, (WPARAM)TOOLBAR_BACK, (LPARAM)&rc);
+		SendMessage(m_hwnd, TB_GETRECT, (WPARAM)ToolbarButton::TOOLBAR_BACK, (LPARAM)&rc);
 
 		ptOrigin.x += rc.right;
 
@@ -696,7 +712,7 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 
 		return TBDDRET_DEFAULT;
 	}
-	else if (nmTB->iItem == TOOLBAR_VIEWS)
+	else if (nmTB->iItem == ToolbarButton::TOOLBAR_VIEWS)
 	{
 		ShowToolbarViewsDropdown();
 
@@ -711,7 +727,7 @@ void MainToolbar::ShowToolbarViewsDropdown()
 	POINT	ptOrigin;
 	RECT	rcButton;
 
-	SendMessage(m_hwnd, TB_GETRECT, (WPARAM)TOOLBAR_VIEWS, (LPARAM)&rcButton);
+	SendMessage(m_hwnd, TB_GETRECT, (WPARAM)ToolbarButton::TOOLBAR_VIEWS, (LPARAM)&rcButton);
 
 	ptOrigin.x = rcButton.left;
 	ptOrigin.y = rcButton.bottom;
@@ -737,25 +753,25 @@ void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 
 void MainToolbar::UpdateToolbarButtonStates()
 {
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_UP, m_pexpp->GetActiveShellBrowser()->CanBrowseUp());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::TOOLBAR_UP, m_pexpp->GetActiveShellBrowser()->CanBrowseUp());
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_BACK, m_pexpp->GetActiveShellBrowser()->CanBrowseBack());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_FORWARD, m_pexpp->GetActiveShellBrowser()->CanBrowseForward());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::TOOLBAR_BACK, m_pexpp->GetActiveShellBrowser()->CanBrowseBack());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::TOOLBAR_FORWARD, m_pexpp->GetActiveShellBrowser()->CanBrowseForward());
 
 	BOOL bVirtualFolder = m_pexpp->GetActiveShellBrowser()->InVirtualFolder();
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_COPY_TO, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_MOVE_TO, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_COPY, m_pexpp->CanCopy());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_CUT, m_pexpp->CanCut());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_PASTE, m_pexpp->CanPaste());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_PROPERTIES, m_pexpp->CanShowFileProperties());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_DELETE, m_pexpp->CanDelete());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_DELETE_PERMANENTLY, m_pexpp->CanDelete());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_SPLIT_FILE, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() == 1);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_MERGE_FILES, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() > 1);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)TOOLBAR_OPEN_COMMAND_PROMPT, !bVirtualFolder);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, TOOLBAR_NEW_FOLDER, m_pexpp->CanCreate());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_COPY_TO, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_MOVE_TO, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_COPY, m_pexpp->CanCopy());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_CUT, m_pexpp->CanCut());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_PASTE, m_pexpp->CanPaste());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_PROPERTIES, m_pexpp->CanShowFileProperties());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_DELETE, m_pexpp->CanDelete());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_DELETE_PERMANENTLY, m_pexpp->CanDelete());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_SPLIT_FILE, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() == 1);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_MERGE_FILES, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() > 1);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_OPEN_COMMAND_PROMPT, !bVirtualFolder);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::TOOLBAR_NEW_FOLDER, m_pexpp->CanCreate());
 }
 
 void MainToolbar::OnTabSelected(const Tab &tab)
@@ -776,10 +792,7 @@ void MainToolbar::OnNavigationCompleted(const Tab &tab)
 MainToolbarPersistentSettings::MainToolbarPersistentSettings() :
 	m_toolbarButtons(DEFAULT_TOOLBAR_BUTTONS, std::end(DEFAULT_TOOLBAR_BUTTONS))
 {
-	// Ideally, this constraint would be checked at compile-time, but the size
-	// of TOOLBAR_BUTTON_XML_NAME_MAPPINGS isn't known at compile-time. Note
-	// that the mappings set contains one additional item - for the separator.
-	assert(TOOLBAR_BUTTON_XML_NAME_MAPPINGS.size() == (std::size(TOOLBAR_BUTTON_SET) + 1));
+	assert(TOOLBAR_BUTTON_XML_NAME_MAPPINGS.size() == ToolbarButton::_size());
 }
 
 MainToolbarPersistentSettings &MainToolbarPersistentSettings::GetInstance()
@@ -794,7 +807,7 @@ void MainToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 	IXMLDOMNamedNodeMap *am = NULL;
 	BSTR bstrValue;
 
-	std::vector<ToolbarButton_t> toolbarButtons;
+	std::vector<ToolbarButton> toolbarButtons;
 
 	pNode->get_attributes(&am);
 
@@ -819,9 +832,7 @@ void MainToolbarPersistentSettings::LoadXMLSettings(IXMLDOMNode *pNode)
 			continue;
 		}
 
-		ToolbarButton_t tb;
-		tb.iItemID = itr->second;
-		toolbarButtons.push_back(tb);
+		toolbarButtons.push_back(itr->second);
 	}
 
 	m_toolbarButtons = toolbarButtons;
@@ -831,12 +842,12 @@ void MainToolbarPersistentSettings::SaveXMLSettings(IXMLDOMDocument *pXMLDom, IX
 {
 	int index = 0;
 
-	for (auto &button : m_toolbarButtons)
+	for (auto button : m_toolbarButtons)
 	{
 		TCHAR szButtonAttributeName[32];
 		StringCchPrintf(szButtonAttributeName, SIZEOF_ARRAY(szButtonAttributeName), _T("Button%d"), index);
 
-		std::wstring buttonName = TOOLBAR_BUTTON_XML_NAME_MAPPINGS.left.at(button.iItemID);
+		std::wstring buttonName = TOOLBAR_BUTTON_XML_NAME_MAPPINGS.left.at(button);
 
 		NXMLSettings::AddAttributeToNode(pXMLDom, pe, szButtonAttributeName, buttonName.c_str());
 

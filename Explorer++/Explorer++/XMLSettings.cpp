@@ -18,6 +18,7 @@
 #include "ApplicationToolbar.h"
 #include "ColorRuleHelper.h"
 #include "Config.h"
+#include "Explorer++_internal.h"
 #include "MainToolbar.h"
 #include "ShellBrowser/Columns.h"
 #include "ToolbarButtons.h"
