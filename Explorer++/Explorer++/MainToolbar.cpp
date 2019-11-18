@@ -566,6 +566,7 @@ BOOL MainToolbar::OnTBGetButtonInfo(LPARAM lParam)
 	{
 		// Note that the separator (which is the first item in the enumeration)
 		// is skipped.
+		assert(ToolbarButton::_values()[0] == +ToolbarButton::Separator);
 		ToolbarButton button = ToolbarButton::_values()[pnmtb->iItem + 1];
 		pnmtb->tbButton = GetToolbarButtonDetails(button);
 
