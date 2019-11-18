@@ -662,6 +662,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 
 			TabSettings tabSettings;
 
+			tabSettings.index = i;
 			tabSettings.selected = true;
 
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("Locked"),&value);

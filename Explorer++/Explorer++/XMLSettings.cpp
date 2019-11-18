@@ -669,6 +669,7 @@ int Explorerplusplus::LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom)
 
 				if(SUCCEEDED(hr))
 				{
+					tabSettings.index = i;
 					tabSettings.selected = true;
 
 					/* Retrieve the total number of attributes
