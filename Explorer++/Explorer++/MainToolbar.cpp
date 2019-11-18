@@ -17,6 +17,9 @@
 #include <boost/bimap.hpp>
 #include <gdiplus.h>
 
+// Enable C4062: enumerator 'identifier' in switch of enum 'enumeration' is not handled
+#pragma warning(default:4062)
+
 const int TOOLBAR_IMAGE_SIZE_SMALL = 16;
 const int TOOLBAR_IMAGE_SIZE_LARGE = 24;
 
@@ -383,9 +386,11 @@ BYTE MainToolbar::LookupToolbarButtonExtraStyles(ToolbarButton button) const
 	case ToolbarButton::TOOLBAR_VIEWS:
 		return BTNS_DROPDOWN;
 		break;
-	}
 
-	return 0;
+	default:
+		return 0;
+		break;
+	}
 }
 
 int MainToolbar::LookupToolbarButtonTextID(ToolbarButton button) const
