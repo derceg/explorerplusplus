@@ -562,7 +562,7 @@ BOOL MainToolbar::OnTBGetButtonInfo(LPARAM lParam)
 {
 	NMTOOLBAR *pnmtb = reinterpret_cast<NMTOOLBAR *>(lParam);
 
-	if ((pnmtb->iItem >= 0) && (pnmtb->iItem < (ToolbarButton::_size() - 1)))
+	if ((pnmtb->iItem >= 0) && (static_cast<std::size_t>(pnmtb->iItem) < (ToolbarButton::_size() - 1)))
 	{
 		// Note that the separator (which is the first item in the enumeration)
 		// is skipped.
