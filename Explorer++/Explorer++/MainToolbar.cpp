@@ -33,28 +33,28 @@ struct ToolbarButtonHash
 };
 
 const std::unordered_map<ToolbarButton, Icon, ToolbarButtonHash> TOOLBAR_BUTTON_ICON_MAPPINGS = {
-	{ToolbarButton::TOOLBAR_BACK, Icon::Back},
-	{ToolbarButton::TOOLBAR_FORWARD, Icon::Forward},
-	{ToolbarButton::TOOLBAR_UP, Icon::Up},
-	{ToolbarButton::TOOLBAR_FOLDERS, Icon::FolderTree},
-	{ToolbarButton::TOOLBAR_COPY_TO, Icon::CopyTo},
-	{ToolbarButton::TOOLBAR_MOVE_TO, Icon::MoveTo},
-	{ToolbarButton::TOOLBAR_NEW_FOLDER, Icon::NewFolder},
-	{ToolbarButton::TOOLBAR_COPY, Icon::Copy},
-	{ToolbarButton::TOOLBAR_CUT, Icon::Cut},
-	{ToolbarButton::TOOLBAR_PASTE, Icon::Paste},
-	{ToolbarButton::TOOLBAR_DELETE, Icon::Delete},
-	{ToolbarButton::TOOLBAR_VIEWS, Icon::Views},
-	{ToolbarButton::TOOLBAR_SEARCH, Icon::Search},
-	{ToolbarButton::TOOLBAR_PROPERTIES, Icon::Properties},
-	{ToolbarButton::TOOLBAR_REFRESH, Icon::Refresh},
-	{ToolbarButton::TOOLBAR_ADD_BOOKMARK, Icon::AddBookmark},
-	{ToolbarButton::TOOLBAR_NEW_TAB, Icon::NewTab},
-	{ToolbarButton::TOOLBAR_OPEN_COMMAND_PROMPT, Icon::CommandLine},
-	{ToolbarButton::TOOLBAR_ORGANIZE_BOOKMARKS, Icon::Bookmarks},
-	{ToolbarButton::TOOLBAR_DELETE_PERMANENTLY, Icon::DeletePermanently},
-	{ToolbarButton::TOOLBAR_SPLIT_FILE, Icon::SplitFiles},
-	{ToolbarButton::TOOLBAR_MERGE_FILES, Icon::MergeFiles}
+	{ToolbarButton::Back, Icon::Back},
+	{ToolbarButton::Forward, Icon::Forward},
+	{ToolbarButton::Up, Icon::Up},
+	{ToolbarButton::Folders, Icon::FolderTree},
+	{ToolbarButton::CopyTo, Icon::CopyTo},
+	{ToolbarButton::MoveTo, Icon::MoveTo},
+	{ToolbarButton::NewFolder, Icon::NewFolder},
+	{ToolbarButton::Copy, Icon::Copy},
+	{ToolbarButton::Cut, Icon::Cut},
+	{ToolbarButton::Paste, Icon::Paste},
+	{ToolbarButton::Delete, Icon::Delete},
+	{ToolbarButton::Views, Icon::Views},
+	{ToolbarButton::Search, Icon::Search},
+	{ToolbarButton::Properties, Icon::Properties},
+	{ToolbarButton::Refresh, Icon::Refresh},
+	{ToolbarButton::AddBookmark, Icon::AddBookmark},
+	{ToolbarButton::NewTab, Icon::NewTab},
+	{ToolbarButton::OpenCommandPrompt, Icon::CommandLine},
+	{ToolbarButton::Bookmarks, Icon::Bookmarks},
+	{ToolbarButton::DeletePermanently, Icon::DeletePermanently},
+	{ToolbarButton::SplitFile, Icon::SplitFiles},
+	{ToolbarButton::MergeFiles, Icon::MergeFiles}
 };
 
 template <typename L, typename R>
@@ -70,30 +70,30 @@ MakeBimap(std::initializer_list<typename boost::bimap<L, R>::value_type> list)
 // Ideally, toolbar button IDs would be saved in the XML config file, rather
 // than button strings, but that's not especially easy to change now.
 const boost::bimap<ToolbarButton, std::wstring> TOOLBAR_BUTTON_XML_NAME_MAPPINGS = MakeBimap<ToolbarButton, std::wstring>({
-	{ToolbarButton::TOOLBAR_BACK, L"Back"},
-	{ToolbarButton::TOOLBAR_FORWARD, L"Forward"},
-	{ToolbarButton::TOOLBAR_UP, L"Up"},
-	{ToolbarButton::TOOLBAR_FOLDERS, L"Folders"},
-	{ToolbarButton::TOOLBAR_COPY_TO, L"Copy To"},
-	{ToolbarButton::TOOLBAR_MOVE_TO, L"Move To"},
-	{ToolbarButton::TOOLBAR_NEW_FOLDER, L"New Folder"},
-	{ToolbarButton::TOOLBAR_COPY, L"Copy"},
-	{ToolbarButton::TOOLBAR_CUT, L"Cut"},
-	{ToolbarButton::TOOLBAR_PASTE, L"Paste"},
-	{ToolbarButton::TOOLBAR_DELETE, L"Delete"},
-	{ToolbarButton::TOOLBAR_VIEWS, L"Views"},
-	{ToolbarButton::TOOLBAR_SEARCH, L"Search"},
-	{ToolbarButton::TOOLBAR_PROPERTIES, L"Properties"},
-	{ToolbarButton::TOOLBAR_REFRESH, L"Refresh"},
-	{ToolbarButton::TOOLBAR_ADD_BOOKMARK, L"Bookmark the current tab"},
-	{ToolbarButton::TOOLBAR_NEW_TAB, L"Create a new tab"},
-	{ToolbarButton::TOOLBAR_OPEN_COMMAND_PROMPT, L"Open Command Prompt"},
-	{ToolbarButton::TOOLBAR_ORGANIZE_BOOKMARKS, L"Organize Bookmarks"},
-	{ToolbarButton::TOOLBAR_DELETE_PERMANENTLY, L"Delete Permanently"},
-	{ToolbarButton::TOOLBAR_SPLIT_FILE, L"Split File"},
-	{ToolbarButton::TOOLBAR_MERGE_FILES, L"Merge Files"},
+	{ToolbarButton::Back, L"Back"},
+	{ToolbarButton::Forward, L"Forward"},
+	{ToolbarButton::Up, L"Up"},
+	{ToolbarButton::Folders, L"Folders"},
+	{ToolbarButton::CopyTo, L"Copy To"},
+	{ToolbarButton::MoveTo, L"Move To"},
+	{ToolbarButton::NewFolder, L"New Folder"},
+	{ToolbarButton::Copy, L"Copy"},
+	{ToolbarButton::Cut, L"Cut"},
+	{ToolbarButton::Paste, L"Paste"},
+	{ToolbarButton::Delete, L"Delete"},
+	{ToolbarButton::Views, L"Views"},
+	{ToolbarButton::Search, L"Search"},
+	{ToolbarButton::Properties, L"Properties"},
+	{ToolbarButton::Refresh, L"Refresh"},
+	{ToolbarButton::AddBookmark, L"Bookmark the current tab"},
+	{ToolbarButton::NewTab, L"Create a new tab"},
+	{ToolbarButton::OpenCommandPrompt, L"Open Command Prompt"},
+	{ToolbarButton::Bookmarks, L"Organize Bookmarks"},
+	{ToolbarButton::DeletePermanently, L"Delete Permanently"},
+	{ToolbarButton::SplitFile, L"Split File"},
+	{ToolbarButton::MergeFiles, L"Merge Files"},
 
-	{ToolbarButton::TOOLBAR_SEPARATOR, L"Separator"}
+	{ToolbarButton::Separator, L"Separator"}
 });
 
 #pragma warning(pop)
@@ -152,7 +152,7 @@ void MainToolbar::Initialize(HWND parent)
 
 	if (m_config->showFolders)
 	{
-		SendMessage(m_hwnd, TB_CHECKBUTTON, ToolbarButton::TOOLBAR_FOLDERS, TRUE);
+		SendMessage(m_hwnd, TB_CHECKBUTTON, ToolbarButton::Folders, TRUE);
 	}
 
 	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
@@ -293,7 +293,7 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(ToolbarButton button) const
 
 	ZeroMemory(&tbButton, sizeof(tbButton));
 
-	if (button == +ToolbarButton::TOOLBAR_SEPARATOR)
+	if (button == +ToolbarButton::Separator)
 	{
 		tbButton.iBitmap = 0;
 		tbButton.idCommand = 0;
@@ -335,7 +335,7 @@ void MainToolbar::AddStringsToToolbar()
 {
 	for (auto button : ToolbarButton::_values())
 	{
-		if (button == +ToolbarButton::TOOLBAR_SEPARATOR)
+		if (button == +ToolbarButton::Separator)
 		{
 			continue;
 		}
@@ -371,19 +371,19 @@ BYTE MainToolbar::LookupToolbarButtonExtraStyles(ToolbarButton button) const
 {
 	switch (button)
 	{
-	case ToolbarButton::TOOLBAR_BACK:
+	case ToolbarButton::Back:
 		return BTNS_DROPDOWN;
 		break;
 
-	case ToolbarButton::TOOLBAR_FORWARD:
+	case ToolbarButton::Forward:
 		return BTNS_DROPDOWN;
 		break;
 
-	case ToolbarButton::TOOLBAR_FOLDERS:
+	case ToolbarButton::Folders:
 		return BTNS_SHOWTEXT | BTNS_CHECK;
 		break;
 
-	case ToolbarButton::TOOLBAR_VIEWS:
+	case ToolbarButton::Views:
 		return BTNS_DROPDOWN;
 		break;
 
@@ -397,95 +397,95 @@ int MainToolbar::LookupToolbarButtonTextID(ToolbarButton button) const
 {
 	switch (button)
 	{
-	case ToolbarButton::TOOLBAR_SEPARATOR:
+	case ToolbarButton::Separator:
 		return IDS_SEPARATOR;
 		break;
 
-	case ToolbarButton::TOOLBAR_BACK:
+	case ToolbarButton::Back:
 		return IDS_TOOLBAR_BACK;
 		break;
 
-	case ToolbarButton::TOOLBAR_FORWARD:
+	case ToolbarButton::Forward:
 		return IDS_TOOLBAR_FORWARD;
 		break;
 
-	case ToolbarButton::TOOLBAR_UP:
+	case ToolbarButton::Up:
 		return IDS_TOOLBAR_UP;
 		break;
 
-	case ToolbarButton::TOOLBAR_FOLDERS:
+	case ToolbarButton::Folders:
 		return IDS_TOOLBAR_FOLDERS;
 		break;
 
-	case ToolbarButton::TOOLBAR_COPY_TO:
+	case ToolbarButton::CopyTo:
 		return IDS_TOOLBAR_COPYTO;
 		break;
 
-	case ToolbarButton::TOOLBAR_MOVE_TO:
+	case ToolbarButton::MoveTo:
 		return IDS_TOOLBAR_MOVETO;
 		break;
 
-	case ToolbarButton::TOOLBAR_NEW_FOLDER:
+	case ToolbarButton::NewFolder:
 		return IDS_TOOLBAR_NEWFOLDER;
 		break;
 
-	case ToolbarButton::TOOLBAR_COPY:
+	case ToolbarButton::Copy:
 		return IDS_TOOLBAR_COPY;
 		break;
 
-	case ToolbarButton::TOOLBAR_CUT:
+	case ToolbarButton::Cut:
 		return IDS_TOOLBAR_CUT;
 		break;
 
-	case ToolbarButton::TOOLBAR_PASTE:
+	case ToolbarButton::Paste:
 		return IDS_TOOLBAR_PASTE;
 		break;
 
-	case ToolbarButton::TOOLBAR_DELETE:
+	case ToolbarButton::Delete:
 		return IDS_TOOLBAR_DELETE;
 		break;
 
-	case ToolbarButton::TOOLBAR_DELETE_PERMANENTLY:
+	case ToolbarButton::DeletePermanently:
 		return IDS_TOOLBAR_DELETEPERMANENTLY;
 		break;
 
-	case ToolbarButton::TOOLBAR_VIEWS:
+	case ToolbarButton::Views:
 		return IDS_TOOLBAR_VIEWS;
 		break;
 
-	case ToolbarButton::TOOLBAR_SEARCH:
+	case ToolbarButton::Search:
 		return IDS_TOOLBAR_SEARCH;
 		break;
 
-	case ToolbarButton::TOOLBAR_PROPERTIES:
+	case ToolbarButton::Properties:
 		return IDS_TOOLBAR_PROPERTIES;
 		break;
 
-	case ToolbarButton::TOOLBAR_REFRESH:
+	case ToolbarButton::Refresh:
 		return IDS_TOOLBAR_REFRESH;
 		break;
 
-	case ToolbarButton::TOOLBAR_ADD_BOOKMARK:
+	case ToolbarButton::AddBookmark:
 		return IDS_TOOLBAR_ADDBOOKMARK;
 		break;
 
-	case ToolbarButton::TOOLBAR_ORGANIZE_BOOKMARKS:
+	case ToolbarButton::Bookmarks:
 		return IDS_TOOLBAR_MANAGEBOOKMARKS;
 		break;
 
-	case ToolbarButton::TOOLBAR_NEW_TAB:
+	case ToolbarButton::NewTab:
 		return IDS_TOOLBAR_NEWTAB;
 		break;
 
-	case ToolbarButton::TOOLBAR_OPEN_COMMAND_PROMPT:
+	case ToolbarButton::OpenCommandPrompt:
 		return IDS_TOOLBAR_OPENCOMMANDPROMPT;
 		break;
 
-	case ToolbarButton::TOOLBAR_SPLIT_FILE:
+	case ToolbarButton::SplitFile:
 		return IDS_TOOLBAR_SPLIT_FILE;
 		break;
 
-	case ToolbarButton::TOOLBAR_MERGE_FILES:
+	case ToolbarButton::MergeFiles:
 		return IDS_TOOLBAR_MERGE_FILES;
 		break;
 	}
@@ -613,7 +613,7 @@ void MainToolbar::OnTBChange()
 
 		if (tbButton.idCommand == 0)
 		{
-			id = ToolbarButton::TOOLBAR_SEPARATOR;
+			id = ToolbarButton::Separator;
 		}
 		else
 		{
@@ -632,7 +632,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, EMPTY_STRING);
 
-	if (ptbgit->iItem == ToolbarButton::TOOLBAR_BACK)
+	if (ptbgit->iItem == ToolbarButton::Back)
 	{
 		if (m_pexpp->GetActiveShellBrowser()->CanBrowseBack())
 		{
@@ -651,7 +651,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
 		}
 	}
-	else if (ptbgit->iItem == ToolbarButton::TOOLBAR_FORWARD)
+	else if (ptbgit->iItem == ToolbarButton::Forward)
 	{
 		if (m_pexpp->GetActiveShellBrowser()->CanBrowseForward())
 		{
@@ -687,7 +687,7 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 	ptOrigin.x = rc.left;
 	ptOrigin.y = rc.bottom - 4;
 
-	if (nmTB->iItem == ToolbarButton::TOOLBAR_BACK)
+	if (nmTB->iItem == ToolbarButton::Back)
 	{
 		hr = m_pexpp->GetActiveShellBrowser()->CreateHistoryPopup(m_hwnd, &pidl, &ptOrigin, TRUE);
 
@@ -700,9 +700,9 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 
 		return TBDDRET_DEFAULT;
 	}
-	else if (nmTB->iItem == ToolbarButton::TOOLBAR_FORWARD)
+	else if (nmTB->iItem == ToolbarButton::Forward)
 	{
-		SendMessage(m_hwnd, TB_GETRECT, (WPARAM)ToolbarButton::TOOLBAR_BACK, (LPARAM)&rc);
+		SendMessage(m_hwnd, TB_GETRECT, (WPARAM)ToolbarButton::Back, (LPARAM)&rc);
 
 		ptOrigin.x += rc.right;
 
@@ -717,7 +717,7 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 
 		return TBDDRET_DEFAULT;
 	}
-	else if (nmTB->iItem == ToolbarButton::TOOLBAR_VIEWS)
+	else if (nmTB->iItem == ToolbarButton::Views)
 	{
 		ShowToolbarViewsDropdown();
 
@@ -732,7 +732,7 @@ void MainToolbar::ShowToolbarViewsDropdown()
 	POINT	ptOrigin;
 	RECT	rcButton;
 
-	SendMessage(m_hwnd, TB_GETRECT, (WPARAM)ToolbarButton::TOOLBAR_VIEWS, (LPARAM)&rcButton);
+	SendMessage(m_hwnd, TB_GETRECT, (WPARAM)ToolbarButton::Views, (LPARAM)&rcButton);
 
 	ptOrigin.x = rcButton.left;
 	ptOrigin.y = rcButton.bottom;
@@ -758,25 +758,25 @@ void MainToolbar::CreateViewsMenu(POINT *ptOrigin)
 
 void MainToolbar::UpdateToolbarButtonStates()
 {
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::TOOLBAR_UP, m_pexpp->GetActiveShellBrowser()->CanBrowseUp());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Up, m_pexpp->GetActiveShellBrowser()->CanBrowseUp());
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::TOOLBAR_BACK, m_pexpp->GetActiveShellBrowser()->CanBrowseBack());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::TOOLBAR_FORWARD, m_pexpp->GetActiveShellBrowser()->CanBrowseForward());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Back, m_pexpp->GetActiveShellBrowser()->CanBrowseBack());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Forward, m_pexpp->GetActiveShellBrowser()->CanBrowseForward());
 
 	BOOL bVirtualFolder = m_pexpp->GetActiveShellBrowser()->InVirtualFolder();
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_COPY_TO, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_MOVE_TO, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_COPY, m_pexpp->CanCopy());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_CUT, m_pexpp->CanCut());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_PASTE, m_pexpp->CanPaste());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_PROPERTIES, m_pexpp->CanShowFileProperties());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_DELETE, m_pexpp->CanDelete());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_DELETE_PERMANENTLY, m_pexpp->CanDelete());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_SPLIT_FILE, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() == 1);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_MERGE_FILES, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() > 1);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::TOOLBAR_OPEN_COMMAND_PROMPT, !bVirtualFolder);
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::TOOLBAR_NEW_FOLDER, m_pexpp->CanCreate());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::CopyTo, m_pexpp->CanCopy() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::MoveTo, m_pexpp->CanCut() && GetFocus() != m_pexpp->GetTreeView());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::Copy, m_pexpp->CanCopy());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::Cut, m_pexpp->CanCut());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::Paste, m_pexpp->CanPaste());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::Properties, m_pexpp->CanShowFileProperties());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::Delete, m_pexpp->CanDelete());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::DeletePermanently, m_pexpp->CanDelete());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::SplitFile, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() == 1);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::MergeFiles, m_pexpp->GetActiveShellBrowser()->GetNumSelectedFiles() > 1);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, (WPARAM)ToolbarButton::OpenCommandPrompt, !bVirtualFolder);
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::NewFolder, m_pexpp->CanCreate());
 }
 
 void MainToolbar::OnTabSelected(const Tab &tab)
