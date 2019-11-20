@@ -21,11 +21,21 @@ public:
 
 private:
 
+	struct OptionsDialogSheetInfo
+	{
+		UINT resourceId;
+		DLGPROC dlgProc;
+	};
+
+	static const OptionsDialogSheetInfo OPTIONS_DIALOG_SHEETS[];
+
 	static const UINT_PTR PROP_SHEET_SUBCLASS_ID = 0;
 
 	OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp,
 		TabContainer *tabContainer, TabInterface *tabInterface);
 	~OptionsDialog();
+
+	PROPSHEETPAGE GeneratePropertySheetDefinition(const OptionsDialogSheetInfo &sheetInfo);
 
 	static LRESULT CALLBACK PropSheetProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
 		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);

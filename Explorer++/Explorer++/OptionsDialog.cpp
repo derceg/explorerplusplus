@@ -27,12 +27,17 @@
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/map.hpp>
 
-#define NUM_DIALOG_OPTIONS_PAGES	5
-
 int CALLBACK PropSheetCallback(HWND hDlg,UINT msg,LPARAM lParam);
 int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
-
 UINT GetIconThemeStringResourceId(IconTheme iconTheme);
+
+const OptionsDialog::OptionsDialogSheetInfo OptionsDialog::OPTIONS_DIALOG_SHEETS[] = {
+	{IDD_OPTIONS_GENERAL, GeneralSettingsProcStub},
+	{IDD_OPTIONS_FILESFOLDERS, FilesFoldersProcStub},
+	{IDD_OPTIONS_WINDOW, WindowProcStub},
+	{IDD_OPTIONS_TABS, TabSettingsProcStub},
+	{IDD_OPTIONS_DEFAULT, DefaultSettingsProcStub}
+};
 
 struct FileSize_t
 {
@@ -77,94 +82,50 @@ OptionsDialog::~OptionsDialog()
 
 HWND OptionsDialog::Show(HWND parentWindow)
 {
-	PROPSHEETPAGE	psp[NUM_DIALOG_OPTIONS_PAGES];
-	HPROPSHEETPAGE	hpsp[NUM_DIALOG_OPTIONS_PAGES];
-	PROPSHEETHEADER	psh;
-	TCHAR			szTitle[64];
-	unsigned int	nSheet = 0;
+	std::vector<HPROPSHEETPAGE> sheetHandles;
 
-	/* General options page. */
-	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
-	psp[nSheet].dwFlags		= PSP_DEFAULT;
-	psp[nSheet].hInstance	= m_instance;
-	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_GENERAL);
-	psp[nSheet].lParam		= (LPARAM)this;
-	psp[nSheet].pfnDlgProc	= GeneralSettingsProcStub;
+	for (const auto &optionDialogSheet : OPTIONS_DIALOG_SHEETS)
+	{
+		PROPSHEETPAGE sheet = GeneratePropertySheetDefinition(optionDialogSheet);
+		sheetHandles.push_back(CreatePropertySheetPage(&sheet));
+	}
 
-	hpsp[nSheet] = CreatePropertySheetPage(&psp[nSheet]);
-	nSheet++;
-
-	/* Files and Folders options page. */
-	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
-	psp[nSheet].dwFlags		= PSP_DEFAULT;
-	psp[nSheet].hInstance	= m_instance;
-	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_FILESFOLDERS);
-	psp[nSheet].lParam		= (LPARAM)this;
-	psp[nSheet].pfnDlgProc	= FilesFoldersProcStub;
-
-	hpsp[nSheet] = CreatePropertySheetPage(&psp[nSheet]);
-	nSheet++;
-
-	/* Window options page. */
-	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
-	psp[nSheet].dwFlags		= PSP_DEFAULT;
-	psp[nSheet].hInstance	= m_instance;
-	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_WINDOW);
-	psp[nSheet].lParam		= (LPARAM)this;
-	psp[nSheet].pfnDlgProc	= WindowProcStub;
-
-	hpsp[nSheet] = CreatePropertySheetPage(&psp[nSheet]);
-	nSheet++;
-
-	/* Tab settings options page. */
-	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
-	psp[nSheet].dwFlags		= PSP_DEFAULT;
-	psp[nSheet].hInstance	= m_instance;
-	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_TABS);
-	psp[nSheet].lParam		= (LPARAM)this;
-	psp[nSheet].pfnDlgProc	= TabSettingsProcStub;
-
-	hpsp[nSheet] = CreatePropertySheetPage(&psp[nSheet]);
-	nSheet++;
-
-	/* Default settings options page. */
-	psp[nSheet].dwSize		= sizeof(PROPSHEETPAGE);
-	psp[nSheet].dwFlags		= PSP_DEFAULT;
-	psp[nSheet].hInstance	= m_instance;
-	psp[nSheet].pszTemplate	= MAKEINTRESOURCE(IDD_OPTIONS_DEFAULT);
-	psp[nSheet].lParam		= (LPARAM)this;
-	psp[nSheet].pfnDlgProc	= DefaultSettingsProcStub;
-
-	hpsp[nSheet] = CreatePropertySheetPage(&psp[nSheet]);
-	nSheet++;
-
-	/* Load the main dialog title. */
-	LoadString(m_instance,IDS_OPTIONSDIALOG_TITLE,
-		szTitle,SIZEOF_ARRAY(szTitle));
+	TCHAR szTitle[64];
+	LoadString(m_instance,IDS_OPTIONSDIALOG_TITLE, szTitle,SIZEOF_ARRAY(szTitle));
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(parentWindow);
 	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	m_optionsDialogIcon = m_expp->GetIconResourceLoader()->LoadIconFromPNGForDpi(Icon::Options, iconWidth, iconHeight, dpi);
 
+	PROPSHEETHEADER psh;
 	psh.dwSize		= sizeof(PROPSHEETHEADER);
 	psh.dwFlags		= PSH_DEFAULT|PSH_USECALLBACK|PSH_NOCONTEXTHELP|PSH_USEHICON|PSH_MODELESS;
 	psh.hwndParent	= parentWindow;
 	psh.pszCaption	= szTitle;
-	psh.nPages		= nSheet;
+	psh.nPages		= static_cast<UINT>(sheetHandles.size());
 	psh.nStartPage	= 0;
 	psh.hIcon		= m_optionsDialogIcon.get();
-	psh.ppsp		= psp;
-	psh.phpage		= hpsp;
+	psh.ppsp		= nullptr;
+	psh.phpage		= sheetHandles.data();
 	psh.pfnCallback	= PropSheetCallback;
-
-	/* Create the property dialog itself, which
-	will hold each of the above property pages. */
 	HWND propertySheet = reinterpret_cast<HWND>(PropertySheet(&psh));
 
 	SetWindowSubclass(propertySheet, PropSheetProcStub, PROP_SHEET_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	return propertySheet;
+}
+
+PROPSHEETPAGE OptionsDialog::GeneratePropertySheetDefinition(const OptionsDialogSheetInfo &sheetInfo)
+{
+	PROPSHEETPAGE sheet;
+	sheet.dwSize = sizeof(PROPSHEETPAGE);
+	sheet.dwFlags = PSP_DEFAULT;
+	sheet.hInstance = m_instance;
+	sheet.pszTemplate = MAKEINTRESOURCE(sheetInfo.resourceId);
+	sheet.lParam = reinterpret_cast<LPARAM>(this);
+	sheet.pfnDlgProc = sheetInfo.dlgProc;
+	return sheet;
 }
 
 int CALLBACK PropSheetCallback(HWND hDlg,UINT msg,LPARAM lParam)
