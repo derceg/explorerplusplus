@@ -752,11 +752,11 @@ void Explorerplusplus::CycleViewState(BOOL bCycleForward)
 
 	if(bCycleForward)
 	{
-		newViewMode = GetNextViewMode(m_viewModes, viewMode);
+		newViewMode = GetNextViewMode(VIEW_MODES, viewMode);
 	}
 	else
 	{
-		newViewMode = GetPreviousViewMode(m_viewModes, viewMode);
+		newViewMode = GetPreviousViewMode(VIEW_MODES, viewMode);
 	}
 
 	m_pActiveShellBrowser->SetViewMode(newViewMode);
@@ -1512,6 +1512,26 @@ IDirectoryMonitor *Explorerplusplus::GetDirectoryMonitor() const
 IconResourceLoader *Explorerplusplus::GetIconResourceLoader() const
 {
 	return m_iconResourceLoader.get();
+}
+
+BOOL Explorerplusplus::GetSavePreferencesToXmlFile() const
+{
+	return m_bSavePreferencesToXMLFile;
+}
+
+void Explorerplusplus::SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile)
+{
+	m_bSavePreferencesToXMLFile = savePreferencesToXmlFile;
+}
+
+DWORD Explorerplusplus::GetLanguage() const
+{
+	return m_Language;
+}
+
+void Explorerplusplus::SetLanguage(DWORD language)
+{
+	m_Language = language;
 }
 
 void Explorerplusplus::OnShowHiddenFiles(void)

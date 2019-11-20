@@ -655,6 +655,7 @@
     <ClInclude Include="NewBookmarkFolderDialog.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="Config.h" />
+    <ClInclude Include="OptionsDialog.h" />
     <ClInclude Include="PluginCommandManager.h" />
     <ClInclude Include="PluginInterface.h" />
     <ClInclude Include="PluginManager.h" />

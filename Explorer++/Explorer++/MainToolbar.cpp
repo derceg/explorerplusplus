@@ -160,6 +160,7 @@ void MainToolbar::Initialize(HWND parent)
 		m_connections.push_back(m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(boost::bind(&MainToolbar::OnTabSelected, this, _1)));
 	});
 
+	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(boost::bind(&MainToolbar::OnUseLargeToolbarIconsUpdated, this, _1)));
 	m_connections.push_back(m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&MainToolbar::OnNavigationCompleted, this, _1)));
 }
 
@@ -167,7 +168,7 @@ void MainToolbar::SetTooolbarImageList()
 {
 	HIMAGELIST himl;
 
-	if (m_config->useLargeToolbarIcons)
+	if (m_config->useLargeToolbarIcons.get())
 	{
 		himl = m_imageListLarge.get();
 	}
@@ -309,7 +310,7 @@ TBBUTTON MainToolbar::GetToolbarButtonDetails(ToolbarButton button) const
 
 		int imagePosition;
 
-		if (m_config->useLargeToolbarIcons)
+		if (m_config->useLargeToolbarIcons.get())
 		{
 			imagePosition = m_toolbarImageMapLarge.at(button);
 		}
@@ -495,8 +496,10 @@ int MainToolbar::LookupToolbarButtonTextID(ToolbarButton button) const
 	return 0;
 }
 
-void MainToolbar::UpdateToolbarSize()
+void MainToolbar::OnUseLargeToolbarIconsUpdated(BOOL newValue)
 {
+	UNREFERENCED_PARAMETER(newValue);
+
 	SetTooolbarImageList();
 	UpdateToolbarButtonImageIndexes();
 	SendMessage(m_hwnd, TB_AUTOSIZE, 0, 0);
@@ -524,7 +527,7 @@ void MainToolbar::UpdateToolbarButtonImageIndexes()
 
 		int imagePosition;
 
-		if (m_config->useLargeToolbarIcons)
+		if (m_config->useLargeToolbarIcons.get())
 		{
 			imagePosition = m_toolbarImageMapLarge.at(tbButton.idCommand);
 		}

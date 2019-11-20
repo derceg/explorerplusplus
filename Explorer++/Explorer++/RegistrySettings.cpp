@@ -138,7 +138,7 @@ LONG Explorerplusplus::SaveSettings(void)
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("CloseMainWindowOnTabClose"),m_config->closeMainWindowOnTabClose);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("ShowTabBarAtBottom"), m_config->showTabBarAtBottom);
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("OverwriteExistingFilesConfirmation"),m_config->overwriteExistingFilesConfirmation);
-		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("LargeToolbarIcons"),m_config->useLargeToolbarIcons);
+		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("LargeToolbarIcons"),m_config->useLargeToolbarIcons.get());
 		NRegistrySettings::SaveDwordToRegistry(hSettingsKey,_T("PlayNavigationSound"),m_config->playNavigationSound);
 
 		NRegistrySettings::SaveStringToRegistry(hSettingsKey,_T("NewTabDirectory"), m_config->defaultTabDirectory.c_str());
@@ -277,7 +277,10 @@ LONG Explorerplusplus::LoadSettings()
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("SynchronizeTreeview"),(LPDWORD)&m_config->synchronizeTreeview);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("TVAutoExpandSelected"),(LPDWORD)&m_config->treeViewAutoExpandSelected);
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("OverwriteExistingFilesConfirmation"),(LPDWORD)&m_config->overwriteExistingFilesConfirmation);
-		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("LargeToolbarIcons"),(LPDWORD)&m_config->useLargeToolbarIcons);
+
+		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("LargeToolbarIcons"),&numericValue);
+		m_config->useLargeToolbarIcons.set(numericValue);
+
 		NRegistrySettings::ReadDwordFromRegistry(hSettingsKey,_T("PlayNavigationSound"),(LPDWORD)&m_config->playNavigationSound);
 
 		TCHAR value[MAX_PATH];

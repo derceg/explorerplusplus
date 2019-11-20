@@ -15,6 +15,7 @@
 #include "IModelessDialogNotification.h"
 #include "MergeFilesDialog.h"
 #include "ModelessDialogs.h"
+#include "OptionsDialog.h"
 #include "ScriptingDialog.h"
 #include "SearchDialog.h"
 #include "SplitFileDialog.h"
@@ -142,7 +143,8 @@ void Explorerplusplus::OnShowOptions()
 {
 	if(g_hwndOptions == NULL)
 	{
-		ShowOptions();
+		OptionsDialog *optionsDialog = OptionsDialog::Create(m_config, m_hLanguageModule, this, m_tabContainer, this);
+		g_hwndOptions = optionsDialog->Show(m_hContainer);
 	}
 	else
 	{

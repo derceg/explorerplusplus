@@ -14,6 +14,7 @@
 #include "ResourceHelper.h"
 #include "ShellBrowser/ViewModes.h"
 #include "TaskbarThumbnails.h"
+#include "ViewModeHelper.h"
 #include "../DisplayWindow/DisplayWindow.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
@@ -85,12 +86,6 @@ void Explorerplusplus::OnCreate(void)
 	ApplyToolbarSettings();
 
 	m_iconResourceLoader = std::make_unique<IconResourceLoader>(m_config->iconTheme);
-
-	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hContainer);
-	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
-	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	m_optionsDialogIcon = m_iconResourceLoader->LoadIconFromPNGForDpi(Icon::Options, iconWidth, iconHeight, dpi);
-	m_newTabDirectoryIcon = m_iconResourceLoader->LoadIconFromPNGForDpi(Icon::Folder, 16, 16, dpi);
 
 	SetLanguageModule();
 
@@ -242,7 +237,7 @@ void Explorerplusplus::AddViewModesToMenu(HMENU menu)
 	MENUITEMINFO mii;
 	TCHAR szText[64];
 
-	for (auto viewMode : m_viewModes)
+	for (auto viewMode : VIEW_MODES)
 	{
 		LoadString(m_hLanguageModule, GetViewModeMenuStringId(viewMode),
 			szText, SIZEOF_ARRAY(szText));

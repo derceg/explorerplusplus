@@ -45,7 +45,6 @@ public:
 	static MainToolbar *Create(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
 		Navigation *navigation, std::shared_ptr<Config> config);
 
-	void UpdateToolbarSize();
 	void UpdateConfigDependentButtonStates();
 	void UpdateToolbarButtonStates();
 
@@ -90,6 +89,8 @@ private:
 	void OnNavigationCompleted(const Tab &tab);
 
 	void UpdateToolbarButtonImageIndexes();
+
+	void OnUseLargeToolbarIconsUpdated(BOOL newValue);
 
 	MainToolbarPersistentSettings *m_persistentSettings;
 

@@ -70,9 +70,10 @@ public:
 		}
 	}
 
-	boost::signals2::connection addObserver(const typename ValueUpdatedSignal::slot_type &observer)
+	template <typename... Args>
+	boost::signals2::connection addObserver(Args &&... args)
 	{
-		return m_valueUpdatedSignal.connect(observer);
+		return m_valueUpdatedSignal.connect(std::forward<Args>(args)...);
 	}
 
 private:
@@ -109,7 +110,7 @@ struct Config
 		extendTabControl = FALSE;
 		allowMultipleInstances = TRUE;
 		doubleClickTabClose = TRUE;
-		useLargeToolbarIcons = FALSE;
+		useLargeToolbarIcons.set(FALSE);
 		handleZipFiles = FALSE;
 		overwriteExistingFilesConfirmation = TRUE;
 		checkBoxSelection = FALSE;
@@ -198,7 +199,7 @@ struct Config
 	BOOL extendTabControl;
 	BOOL allowMultipleInstances;
 	BOOL doubleClickTabClose;
-	BOOL useLargeToolbarIcons;
+	ValueWrapper<BOOL> useLargeToolbarIcons;
 	BOOL handleZipFiles;
 	BOOL overwriteExistingFilesConfirmation;
 	BOOL checkBoxSelection;

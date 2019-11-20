@@ -86,13 +86,6 @@ public:
 	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 	LRESULT CALLBACK	TreeViewSubclass(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam);
 
-	/* Options dialog. */
-	INT_PTR CALLBACK	GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-	INT_PTR CALLBACK	TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPARAM lParam);
-
 	/* Directory modification. */
 	static void			DirectoryAlteredCallback(const TCHAR *szFileName,DWORD dwAction,void *pData);
 
@@ -331,7 +324,7 @@ private:
 
 	/* Main toolbars. */
 	void					InitializeMainToolbars(void);
-	void					AdjustMainToolbarSize(void);
+	void					OnUseLargeToolbarIconsUpdated(BOOL newValue);
 	boost::signals2::connection	AddToolbarContextMenuObserver(const ToolbarContextMenuSignal::slot_type &observer);
 
 	/* Main toolbar private message handlers. */
@@ -434,22 +427,6 @@ private:
 	/* Filtering. */
 	void					ToggleFilterStatus();
 
-	/* Options dialog. */
-	void					ShowOptions(void);
-	void					AddIconThemes(HWND dlg);
-	void					AddLanguages(HWND hDlg);
-	BOOL					AddLanguageToComboBox(HWND hComboBox, const TCHAR *szImageDirectory, const TCHAR *szFileName, WORD *pdwLanguage);
-	int						GetLanguageIDFromIndex(HWND hDlg,int iIndex);
-
-	/* Default settings dialog. */
-	void					OnDefaultSettingsNewTabDir(HWND hDlg);
-	void					DefaultSettingsSetNewTabDir(HWND hEdit,LPITEMIDLIST pidl);
-	void					DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath);
-
-	/* Files and folders dialog. */
-	void					SetInfoTipWindowStates(HWND hDlg);
-	void					SetFolderSizeWindowState(HWND hDlg);
-
 	/* XML Settings. */
 	void					LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom);
 	void					SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
@@ -483,6 +460,10 @@ private:
 	HWND					GetTreeView() const;
 	IDirectoryMonitor		*GetDirectoryMonitor() const;
 	IconResourceLoader		*GetIconResourceLoader() const;
+	BOOL					GetSavePreferencesToXmlFile() const;
+	void					SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile);
+	DWORD					GetLanguage() const;
+	void					SetLanguage(DWORD language);
 
 	/* Helpers. */
 	HANDLE					CreateWorkerThread();
@@ -549,8 +530,6 @@ private:
 	ULONG					m_SHChangeNotifyID;
 	bool					m_InitializationFinished;
 
-	static const std::array<ViewMode, 8>	m_viewModes;
-
 	/* Initialization. */
 	BOOL					m_bLoadSettingsFromXML;
 
@@ -586,9 +565,7 @@ private:
 
 	TaskbarThumbnails		*m_taskbarThumbnails;
 
-	/* Options dialog. */
-	wil::unique_hicon		m_optionsDialogIcon;
-	wil::unique_hicon		m_newTabDirectoryIcon;
+	std::vector<boost::signals2::scoped_connection>	m_connections;
 
 	/* Bookmarks. */
 	CBookmarkFolder *		m_bfAllBookmarks;

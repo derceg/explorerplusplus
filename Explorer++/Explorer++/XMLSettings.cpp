@@ -504,7 +504,7 @@ IXMLDOMElement *pRoot)
 	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("Language"),szValue);
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
-	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("LargeToolbarIcons"),NXMLSettings::EncodeBoolValue(m_config->useLargeToolbarIcons));
+	NXMLSettings::WriteStandardSetting(pXMLDom,pe,_T("Setting"),_T("LargeToolbarIcons"),NXMLSettings::EncodeBoolValue(m_config->useLargeToolbarIcons.get()));
 
 	NXMLSettings::AddWhiteSpaceToNode(pXMLDom,bstr_wsntt,pe);
 	_itow_s(m_iLastSelectedTab,szValue,SIZEOF_ARRAY(szValue),10);
@@ -1563,7 +1563,7 @@ WCHAR *wszName,WCHAR *wszValue)
 		break;
 
 	case HASH_LARGETOOLBARICONS:
-		m_config->useLargeToolbarIcons = NXMLSettings::DecodeBoolValue(wszValue);
+		m_config->useLargeToolbarIcons.set(NXMLSettings::DecodeBoolValue(wszValue));
 		break;
 
 	case HASH_LASTSELECTEDTAB:

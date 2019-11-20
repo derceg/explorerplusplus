@@ -297,6 +297,15 @@ void Explorerplusplus::CreateMainToolbar()
 			m_mainToolbar->UpdateConfigDependentButtonStates();
 		}
 	}
+
+	// The main toolbar will update its size when the useLargeToolbarIcons
+	// option changes. The rebar also needs to be updated, though only after the
+	// toolbar has updated itself. It's possible this would be better done by
+	// having the main toolbar send out a custom event once it's updated its own
+	// size, rather than relying on the observer here running after the one set
+	// up by the main toolbar.
+	m_connections.push_back(m_config->useLargeToolbarIcons.addObserver(
+		boost::bind(&Explorerplusplus::OnUseLargeToolbarIconsUpdated, this, _1), boost::signals2::at_back));
 }
 
 void Explorerplusplus::CreateBookmarksToolbar(void)
@@ -321,23 +330,20 @@ void Explorerplusplus::CreateApplicationToolbar()
 		TOOLBAR_APPLICATIONS_ID_END, m_hLanguageModule, this);
 }
 
-void Explorerplusplus::AdjustMainToolbarSize(void)
+void Explorerplusplus::OnUseLargeToolbarIconsUpdated(BOOL newValue)
 {
-	m_mainToolbar->UpdateToolbarSize();
+	UNREFERENCED_PARAMETER(newValue);
 
-	REBARBANDINFO rbi;
-	DWORD dwSize;
+	DWORD buttonSize = static_cast<DWORD>(SendMessage(m_mainToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0));
 
-	dwSize = (DWORD)SendMessage(m_mainToolbar->GetHWND(), TB_GETBUTTONSIZE, 0, 0);
-
-	rbi.cbSize = sizeof(rbi);
-	rbi.fMask = RBBIM_CHILDSIZE;
-	rbi.cxMinChild = 0;
-	rbi.cyMinChild = HIWORD(dwSize);
-	rbi.cyChild = HIWORD(dwSize);
-	rbi.cyMaxChild = HIWORD(dwSize);
-
-	SendMessage(m_hMainRebar, RB_SETBANDINFO, 0, (LPARAM)&rbi);
+	REBARBANDINFO bandInfo;
+	bandInfo.cbSize = sizeof(bandInfo);
+	bandInfo.fMask = RBBIM_CHILDSIZE;
+	bandInfo.cxMinChild = 0;
+	bandInfo.cyMinChild = HIWORD(buttonSize);
+	bandInfo.cyChild = HIWORD(buttonSize);
+	bandInfo.cyMaxChild = HIWORD(buttonSize);
+	SendMessage(m_hMainRebar, RB_SETBANDINFO, 0, reinterpret_cast<LPARAM>(&bandInfo));
 }
 
 HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)

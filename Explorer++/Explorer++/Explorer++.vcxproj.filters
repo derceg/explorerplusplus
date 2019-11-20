@@ -717,6 +717,9 @@
     <ClInclude Include="IconMapping.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="OptionsDialog.h">
+      <Filter>General Dialogs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

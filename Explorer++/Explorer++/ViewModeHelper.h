@@ -5,6 +5,18 @@
 #pragma once
 
 #include "ShellBrowser/ViewModes.h"
+#include <array>
+
+const std::array<ViewMode, 8> VIEW_MODES = {
+	ViewMode::ExtraLargeIcons,
+	ViewMode::LargeIcons,
+	ViewMode::Icons,
+	ViewMode::SmallIcons,
+	ViewMode::List,
+	ViewMode::Details,
+	ViewMode::Thumbnails,
+	ViewMode::Tiles
+};
 
 template<std::size_t N>
 ViewMode GetNextViewMode(const std::array<ViewMode, N> &viewModes, ViewMode viewMode)

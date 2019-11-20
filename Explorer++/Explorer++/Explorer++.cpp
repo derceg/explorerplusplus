@@ -32,17 +32,6 @@ const std::vector<std::wstring> Explorerplusplus::BLACKLISTED_BACKGROUND_MENU_CL
 	_T("{CB3D0F55-BC2C-4C1A-85ED-23ED75B5106B}")
 };
 
-const std::array<ViewMode, 8> Explorerplusplus::m_viewModes = {
-	ViewMode::ExtraLargeIcons,
-	ViewMode::LargeIcons,
-	ViewMode::Icons,
-	ViewMode::SmallIcons,
-	ViewMode::List,
-	ViewMode::Details,
-	ViewMode::Thumbnails,
-	ViewMode::Tiles
-};
-
 Explorerplusplus::Explorerplusplus(HWND hwnd) :
 m_hContainer(hwnd),
 m_pluginMenuManager(hwnd, MENU_PLUGIN_STARTID, MENU_PLUGIN_ENDID),
