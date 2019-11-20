@@ -470,6 +470,7 @@ private:
 
 	/* Menus. */
 	void					InitializeMainMenu();
+	void					SetGoMenuName(HMENU hMenu, UINT uMenuID, UINT csidl);
 	void					SetMainMenuImages();
 	HMENU					BuildViewsMenu();
 	void					AddViewModesToMenu(HMENU menu);
@@ -477,7 +478,6 @@ private:
 	/* Miscellaneous. */
 	void					CreateStatusBar(void);
 	void					InitializeDisplayWindow();
-	void					SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl);
 	int						CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer);
 	BOOL					AnyItemsSelected(void);
 	void					ShowMainRebarBand(HWND hwnd,BOOL bShow);

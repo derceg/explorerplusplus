@@ -871,33 +871,6 @@ void Explorerplusplus::OnNextWindow(void)
 	}
 }
 
-void Explorerplusplus::SetGoMenuName(HMENU hMenu,UINT uMenuID,UINT csidl)
-{
-	MENUITEMINFO	mii;
-	LPITEMIDLIST	pidl = NULL;
-	TCHAR			szFolderName[MAX_PATH];
-	HRESULT			hr;
-
-	hr = SHGetFolderLocation(NULL,csidl,NULL,0,&pidl);
-
-	/* Don't use SUCCEEDED(hr). */
-	if(hr == S_OK)
-	{
-		GetDisplayName(pidl,szFolderName,SIZEOF_ARRAY(szFolderName),SHGDN_INFOLDER);
-
-		mii.cbSize		= sizeof(mii);
-		mii.fMask		= MIIM_STRING;
-		mii.dwTypeData	= szFolderName;
-		SetMenuItemInfo(hMenu,uMenuID,FALSE,&mii);
-
-		CoTaskMemFree(pidl);
-	}
-	else
-	{
-		DeleteMenu(hMenu,uMenuID,MF_BYCOMMAND);
-	}
-}
-
 void Explorerplusplus::OnLockToolbars(void)
 {
 	REBARBANDINFO	rbbi;

@@ -7,6 +7,7 @@
 #include "Icon.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include <wil/resource.h>
 #include <map>
 
 const std::map<UINT, Icon> MAIN_MENU_IMAGE_MAPPINGS = {
@@ -84,4 +85,30 @@ void Explorerplusplus::SetMainMenuImages()
 	{
 		SetMenuItemImage(mainMenu, mapping.first, m_iconResourceLoader.get(), mapping.second, dpi, m_menuImages);
 	}
+}
+
+void Explorerplusplus::SetGoMenuName(HMENU hMenu, UINT uMenuID, UINT csidl)
+{
+	wil::unique_cotaskmem_ptr<ITEMIDLIST> pidl;
+	HRESULT hr = SHGetFolderLocation(NULL, csidl, NULL, 0, wil::out_param(pidl));
+
+	/* Don't use SUCCEEDED(hr). */
+	if (hr == S_OK)
+	{
+		TCHAR szFolderName[MAX_PATH];
+		hr = GetDisplayName(pidl.get(), szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
+
+		if (SUCCEEDED(hr))
+		{
+			MENUITEMINFO mii;
+			mii.cbSize = sizeof(mii);
+			mii.fMask = MIIM_STRING;
+			mii.dwTypeData = szFolderName;
+			SetMenuItemInfo(hMenu, uMenuID, FALSE, &mii);
+
+			return;
+		}
+	}
+
+	DeleteMenu(hMenu, uMenuID, MF_BYCOMMAND);
 }
