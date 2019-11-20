@@ -66,6 +66,8 @@ private:
 	BOOL AddLanguageToComboBox(HWND hComboBox, const TCHAR *szImageDirectory, const TCHAR *szFileName, WORD *pdwLanguage);
 	int GetLanguageIDFromIndex(HWND hDlg, int iIndex);
 
+	HWND m_propertySheet;
+
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_expp;

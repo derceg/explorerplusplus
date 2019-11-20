@@ -27,7 +27,6 @@
 #include "../Helper/WindowHelper.h"
 #include <boost/range/adaptor/map.hpp>
 
-int CALLBACK PropSheetCallback(HWND hDlg,UINT msg,LPARAM lParam);
 int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam,LPARAM lpData);
 UINT GetIconThemeStringResourceId(IconTheme iconTheme);
 
@@ -54,8 +53,6 @@ static const FileSize_t FILE_SIZES[] = {
 	{SIZE_FORMAT_PBYTES, IDS_OPTIONS_DIALOG_FILE_SIZE_PB}
 };
 
-static HWND g_hOptionsPropertyDialog = NULL;
-
 TCHAR g_szNewTabDirectory[MAX_PATH];
 
 OptionsDialog *OptionsDialog::Create(std::shared_ptr<Config> config, HINSTANCE instance,
@@ -77,7 +74,7 @@ OptionsDialog::OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance,
 
 OptionsDialog::~OptionsDialog()
 {
-	RemoveWindowSubclass(g_hOptionsPropertyDialog, PropSheetProcStub, PROP_SHEET_SUBCLASS_ID);
+	RemoveWindowSubclass(m_propertySheet, PropSheetProcStub, PROP_SHEET_SUBCLASS_ID);
 }
 
 HWND OptionsDialog::Show(HWND parentWindow)
@@ -108,12 +105,14 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	psh.hIcon		= m_optionsDialogIcon.get();
 	psh.ppsp		= nullptr;
 	psh.phpage		= sheetHandles.data();
-	psh.pfnCallback	= PropSheetCallback;
-	HWND propertySheet = reinterpret_cast<HWND>(PropertySheet(&psh));
+	psh.pfnCallback	= nullptr;
+	m_propertySheet = reinterpret_cast<HWND>(PropertySheet(&psh));
 
-	SetWindowSubclass(propertySheet, PropSheetProcStub, PROP_SHEET_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	SetWindowSubclass(m_propertySheet, PropSheetProcStub, PROP_SHEET_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
-	return propertySheet;
+	CenterWindow(parentWindow, m_propertySheet);
+
+	return m_propertySheet;
 }
 
 PROPSHEETPAGE OptionsDialog::GeneratePropertySheetDefinition(const OptionsDialogSheetInfo &sheetInfo)
@@ -126,20 +125,6 @@ PROPSHEETPAGE OptionsDialog::GeneratePropertySheetDefinition(const OptionsDialog
 	sheet.lParam = reinterpret_cast<LPARAM>(this);
 	sheet.pfnDlgProc = sheetInfo.dlgProc;
 	return sheet;
-}
-
-int CALLBACK PropSheetCallback(HWND hDlg,UINT msg,LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-
-	switch(msg)
-	{
-	case PSCB_INITIALIZED:
-		g_hOptionsPropertyDialog = hDlg;
-		break;
-	}
-
-	return 0;
 }
 
 LRESULT CALLBACK OptionsDialog::PropSheetProcStub(HWND hwnd, UINT uMsg,
@@ -244,8 +229,6 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 
 				AddIconThemes(hDlg);
 				AddLanguages(hDlg);
-
-				CenterWindow(GetParent(g_hOptionsPropertyDialog),g_hOptionsPropertyDialog);
 			}
 			break;
 
@@ -256,7 +239,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 				{
 				case EN_CHANGE:
 				case CBN_SELCHANGE:
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 				}
 			}
@@ -267,19 +250,19 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 				case IDC_STARTUP_PREVIOUSTABS:
 				case IDC_STARTUP_DEFAULTFOLDER:
 					if(IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED)
-						PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+						PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 
 				case IDC_OPTION_REPLACEEXPLORER_NONE:
 				case IDC_OPTION_REPLACEEXPLORER_FILESYSTEM:
 				case IDC_OPTION_REPLACEEXPLORER_ALL:
 				case IDC_OPTION_XML:
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 
 				case IDC_DEFAULT_NEWTABDIR_BUTTON:
 					OnDefaultSettingsNewTabDir(hDlg);
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 				}
 			}
@@ -550,7 +533,7 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wPar
 				switch(HIWORD(wParam))
 				{
 				case CBN_SELCHANGE:
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 				}
 			}
@@ -568,34 +551,34 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wPar
 				case IDC_SETTINGS_CHECK_ZIPFILES:
 				case IDC_SETTINGS_CHECK_FRIENDLYDATES:
 				case IDC_OPTIONS_HOVER_TIME:
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 
 				case IDC_SETTINGS_CHECK_FORCESIZE:
 					EnableWindow(GetDlgItem(hDlg,IDC_COMBO_FILESIZES),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 
 				case IDC_OPTIONS_RADIO_SYSTEMINFOTIPS:
 				case IDC_OPTIONS_RADIO_CUSTOMINFOTIPS:
 					if(IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED)
-						PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+						PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 
 				case IDC_OPTIONS_CHECK_SHOWINFOTIPS:
 					SetInfoTipWindowStates(hDlg);
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 
 				case IDC_SETTINGS_CHECK_FOLDERSIZES:
 					SetFolderSizeWindowState(hDlg);
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 
 				case IDC_SETTINGS_CHECK_SINGLECLICK:
 					EnableWindow(GetDlgItem(hDlg,IDC_OPTIONS_HOVER_TIME),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
 					EnableWindow(GetDlgItem(hDlg,IDC_LABEL_HOVER_TIME),IsDlgButtonChecked(hDlg,LOWORD(wParam)) == BST_CHECKED);
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 				}
 			}
@@ -762,7 +745,7 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 		case IDC_OPTION_GRIDLINES:
 		case IDC_OPTION_CHECKBOXSELECTION:
 		case IDC_OPTION_FULLROWSELECT:
-			PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+			PropSheet_Changed(GetParent(hDlg),hDlg);
 			break;
 		}
 		break;
@@ -920,7 +903,7 @@ INT_PTR CALLBACK OptionsDialog::TabSettingsProc(HWND hDlg,UINT uMsg,WPARAM wPara
 			case IDC_SETTINGS_CHECK_ALWAYSNEWTAB:
 			case IDC_TABS_DOUBLECLICKCLOSE:
 			case IDC_TABS_CLOSEMAINWINDOW:
-				PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+				PropSheet_Changed(GetParent(hDlg),hDlg);
 				break;
 			}
 			break;
@@ -1038,7 +1021,7 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 				switch(HIWORD(wParam))
 				{
 				case CBN_SELCHANGE:
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 				}
 			}
@@ -1050,7 +1033,7 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 				case IDC_AUTOARRANGEGLOBAL:
 				case IDC_SORTASCENDINGGLOBAL:
 				case IDC_SHOWINGROUPSGLOBAL:
-					PropSheet_Changed(g_hOptionsPropertyDialog,hDlg);
+					PropSheet_Changed(GetParent(hDlg),hDlg);
 					break;
 
 				case IDC_BUTTON_DEFAULTCOLUMNS:
