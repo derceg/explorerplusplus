@@ -214,13 +214,7 @@
     <ClCompile Include="ShellBrowser\iDropTarget.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowser\iFolderView.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowser\iPathManager.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="ShellBrowser\iShellBrowser.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
     <ClCompile Include="ShellBrowser\SortManager.cpp">
@@ -362,6 +356,12 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="ShellBrowser\SortHelper.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\ShellBrowser.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\TileView.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
   </ItemGroup>

@@ -137,6 +137,44 @@ HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
 	return S_OK;
 }
 
+void CShellBrowser::ResetFolderMemoryAllocations(void)
+{
+	HIMAGELIST himl;
+	HIMAGELIST himlOld;
+	int nItems;
+
+	/* If we're in thumbnails view, destroy the current
+	imagelist, and create a new one. */
+	if (m_folderSettings.viewMode == +ViewMode::Thumbnails)
+	{
+		himlOld = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
+
+		nItems = ListView_GetItemCount(m_hListView);
+
+		/* Create and set the new imagelist. */
+		himl = ImageList_Create(THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT,
+			ILC_COLOR32, nItems, nItems + 100);
+		ListView_SetImageList(m_hListView, himl, LVSIL_NORMAL);
+
+		ImageList_Destroy(himlOld);
+	}
+
+	EnterCriticalSection(&m_csDirectoryAltered);
+	m_AlteredList.clear();
+	LeaveCriticalSection(&m_csDirectoryAltered);
+
+	m_itemIDCounter = 0;
+
+	m_itemInfoMap.clear();
+
+	m_cachedFolderSizes.clear();
+
+	CoTaskMemFree(m_pidlDirectory);
+
+	m_FilteredItemsList.clear();
+	m_AwaitingAddList.clear();
+}
+
 void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 {
 	LVITEM lv;
@@ -589,4 +627,9 @@ LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 	}
 
 	return uItemId;
+}
+
+HRESULT CShellBrowser::Refresh()
+{
+	return BrowseFolder(m_pidlDirectory, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
 }

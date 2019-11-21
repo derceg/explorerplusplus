@@ -539,12 +539,12 @@
     <ClCompile Include="ShellBrowser\HandleThumbnails.cpp" />
     <ClCompile Include="ShellBrowser\IconRetrieval.cpp" />
     <ClCompile Include="ShellBrowser\iDropTarget.cpp" />
-    <ClCompile Include="ShellBrowser\iFolderView.cpp" />
     <ClCompile Include="ShellBrowser\iPathManager.cpp" />
-    <ClCompile Include="ShellBrowser\iShellBrowser.cpp" />
+    <ClCompile Include="ShellBrowser\ShellBrowser.cpp" />
     <ClCompile Include="ShellBrowser\ListView.cpp" />
     <ClCompile Include="ShellBrowser\SortHelper.cpp" />
     <ClCompile Include="ShellBrowser\SortManager.cpp" />
+    <ClCompile Include="ShellBrowser\TileView.cpp" />
     <ClCompile Include="ShellBrowser\ViewModes.cpp" />
     <ClCompile Include="ShellContextMenuHandler.cpp" />
     <ClCompile Include="SortModeHelper.cpp" />

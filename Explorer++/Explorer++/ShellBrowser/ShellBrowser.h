@@ -385,9 +385,9 @@ private:
 	void				DrawThumbnailInternal(HDC hdcBacking, HBITMAP hThumbnailBitmap) const;
 
 	/* Tiles view. */
-	void				InsertTileViewColumns(void);
-	void				DeleteTileViewColumns(void);
-	void				SetTileViewInfo(void);
+	void				InsertTileViewColumns();
+	void				DeleteTileViewColumns();
+	void				SetTileViewInfo();
 	void				SetTileViewItemInfo(int iItem,int iItemInternal);
 
 	/* Drag and Drop support. */

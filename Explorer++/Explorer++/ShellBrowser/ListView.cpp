@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellBrowser.h"
+#include "CachedIcons.h"
 #include "Config.h"
 #include "MainResource.h"
 #include <boost/format.hpp>
@@ -152,6 +153,27 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	plvItem->mask |= LVIF_DI_SETITEM;
 }
 
+boost::optional<int> CShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInfo)
+{
+	TCHAR filePath[MAX_PATH];
+	HRESULT hr = GetDisplayName(itemInfo.pidlComplete.get(),
+		filePath, SIZEOF_ARRAY(filePath), SHGDN_FORPARSING);
+
+	if (FAILED(hr))
+	{
+		return boost::none;
+	}
+
+	auto cachedItr = m_cachedIcons->findByPath(filePath);
+
+	if (cachedItr == m_cachedIcons->end())
+	{
+		return boost::none;
+	}
+
+	return cachedItr->iconIndex;
+}
+
 LRESULT CShellBrowser::OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip)
 {
 	if (m_config->showInfoTips)
@@ -290,4 +312,44 @@ int CShellBrowser::GetItemInternalIndex(int item) const
 	}
 
 	return static_cast<int>(lvItem.lParam);
+}
+
+BOOL CShellBrowser::GhostItem(int iItem)
+{
+	return GhostItemInternal(iItem, TRUE);
+}
+
+BOOL CShellBrowser::DeghostItem(int iItem)
+{
+	return GhostItemInternal(iItem, FALSE);
+}
+
+BOOL CShellBrowser::GhostItemInternal(int iItem, BOOL bGhost)
+{
+	LVITEM	lvItem;
+	BOOL	bRet;
+
+	lvItem.mask = LVIF_PARAM;
+	lvItem.iItem = iItem;
+	lvItem.iSubItem = 0;
+	bRet = ListView_GetItem(m_hListView, &lvItem);
+
+	if (bRet)
+	{
+		/* If the file is hidden, prevent changes to its visibility state (i.e.
+		hidden items will ALWAYS be ghosted). */
+		if (m_itemInfoMap.at((int)lvItem.lParam).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+			return FALSE;
+
+		if (bGhost)
+		{
+			ListView_SetItemState(m_hListView, iItem, LVIS_CUT, LVIS_CUT);
+		}
+		else
+		{
+			ListView_SetItemState(m_hListView, iItem, 0, LVIS_CUT);
+		}
+	}
+
+	return TRUE;
 }
