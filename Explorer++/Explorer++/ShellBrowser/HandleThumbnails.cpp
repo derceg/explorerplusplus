@@ -4,7 +4,6 @@
 
 #include "stdafx.h"
 #include "iShellView.h"
-#include "iShellBrowser_internal.h"
 #include "ViewModes.h"
 #include "../Helper/Controls.h"
 #include "../Helper/FileOperations.h"
@@ -15,6 +14,9 @@
 #include <list>
 
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
+
+#define THUMBNAIL_TYPE_ICON			0
+#define THUMBNAIL_TYPE_EXTRACTED	1
 
 void CShellBrowser::SetupThumbnailsView(void)
 {

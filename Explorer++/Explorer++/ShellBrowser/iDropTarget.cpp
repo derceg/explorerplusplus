@@ -9,14 +9,13 @@
 
 #include "stdafx.h"
 #include "iShellView.h"
-#include "iShellBrowser_internal.h"
 #include "ViewModes.h"
-#include "../Helper/Helper.h"
-#include "../Helper/ShellHelper.h"
-#include "../Helper/FileOperations.h"
 #include "../Helper/DropHandler.h"
+#include "../Helper/FileOperations.h"
+#include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
 
 
 /* Scroll definitions. */

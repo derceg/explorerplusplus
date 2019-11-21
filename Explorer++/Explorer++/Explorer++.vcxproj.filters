@@ -522,9 +522,6 @@
     <ClInclude Include="ShellBrowser\iPathManager.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowser\iShellBrowser_internal.h">
-      <Filter>ShellBrowser</Filter>
-    </ClInclude>
     <ClInclude Include="ShellBrowser\iShellView.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>

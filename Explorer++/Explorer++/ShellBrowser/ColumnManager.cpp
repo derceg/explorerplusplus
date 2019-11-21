@@ -7,7 +7,6 @@
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
 #include "Config.h"
-#include "iShellBrowser_internal.h"
 #include "MainResource.h"
 #include "SortModes.h"
 #include "ViewModes.h"
