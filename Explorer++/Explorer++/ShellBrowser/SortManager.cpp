@@ -348,25 +348,22 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 
 int CALLBACK CShellBrowser::SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const GlobalFolderSettings &globalFolderSettings) const
 {
-	if(m_bVirtualFolder)
-	{
-		BOOL IsRoot1 = PathIsRoot(itemInfo1.getFullPath().c_str());
-		BOOL IsRoot2 = PathIsRoot(itemInfo2.getFullPath().c_str());
+	BOOL IsRoot1 = PathIsRoot(itemInfo1.getFullPath().c_str());
+	BOOL IsRoot2 = PathIsRoot(itemInfo2.getFullPath().c_str());
 
-		if(IsRoot1 && !IsRoot2)
-		{
-			return -1;
-		}
-		else if(!IsRoot1 && IsRoot2)
-		{
-			return 1;
-		}
-		else if(IsRoot1 && IsRoot2)
-		{
-			/* If the items been compared are both drives,
-			sort by drive letter, rather than display name. */
-			return StrCmpLogicalW(itemInfo1.getFullPath().c_str(), itemInfo2.getFullPath().c_str());
-		}
+	if (IsRoot1 && !IsRoot2)
+	{
+		return -1;
+	}
+	else if (!IsRoot1 && IsRoot2)
+	{
+		return 1;
+	}
+	else if (IsRoot1 && IsRoot2)
+	{
+		/* If the items been compared are both drives,
+		sort by drive letter, rather than display name. */
+		return StrCmpLogicalW(itemInfo1.getFullPath().c_str(), itemInfo2.getFullPath().c_str());
 	}
 
 	std::wstring Name1 = GetNameColumnText(itemInfo1, globalFolderSettings);
@@ -432,25 +429,16 @@ int CALLBACK CShellBrowser::SortBySize(const BasicItemInfo_t &itemInfo1, const B
 
 int CALLBACK CShellBrowser::SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
-	if(m_bVirtualFolder)
+	BOOL IsRoot1 = PathIsRoot(itemInfo1.getFullPath().c_str());
+	BOOL IsRoot2 = PathIsRoot(itemInfo2.getFullPath().c_str());
+
+	if (IsRoot1 && !IsRoot2)
 	{
-		TCHAR FullFileName1[MAX_PATH];
-		GetDisplayName(itemInfo1.pidlComplete.get(),FullFileName1,SIZEOF_ARRAY(FullFileName1),SHGDN_FORPARSING);
-
-		TCHAR FullFileName2[MAX_PATH];
-		GetDisplayName(itemInfo2.pidlComplete.get(),FullFileName2,SIZEOF_ARRAY(FullFileName2),SHGDN_FORPARSING);
-
-		BOOL IsRoot1 = PathIsRoot(FullFileName1);
-		BOOL IsRoot2 = PathIsRoot(FullFileName2);
-
-		if(IsRoot1 && !IsRoot2)
-		{
-			return -1;
-		}
-		else if(!IsRoot1 && IsRoot2)
-		{
-			return 1;
-		}
+		return -1;
+	}
+	else if (!IsRoot1 && IsRoot2)
+	{
+		return 1;
 	}
 
 	std::wstring Type1 = GetTypeColumnText(itemInfo1);
