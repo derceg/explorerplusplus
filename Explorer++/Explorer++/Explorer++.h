@@ -330,7 +330,6 @@ private:
 	void					ValidateLoadedSettings();
 	void					ValidateColumns(FolderColumns &folderColumns);
 	void					ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns);
-	void					ApplyLoadedSettings(void);
 	void					ApplyToolbarSettings(void);
 	void					TestConfigFile(void);
 	void					InitializeBookmarks(void);

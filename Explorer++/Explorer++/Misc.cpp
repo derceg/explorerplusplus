@@ -128,11 +128,6 @@ void Explorerplusplus::ValidateSingleColumnSet(int iColumnSet, std::vector<Colum
 	free(pColumnMap);
 }
 
-void Explorerplusplus::ApplyLoadedSettings(void)
-{
-	m_pMyTreeView->SetShowHidden(m_config->defaultFolderSettings.showHidden);
-}
-
 void Explorerplusplus::ApplyToolbarSettings(void)
 {
 	BOOL bVisible = FALSE;

@@ -130,10 +130,6 @@ void Explorerplusplus::OnCreate()
 	size initially. */
 	ResizeWindows();
 
-	/* Settings cannot be applied until
-	all child windows have been created. */
-	ApplyLoadedSettings();
-
 	m_taskbarThumbnails = TaskbarThumbnails::Create(this, m_tabContainer, m_navigation, m_hLanguageModule, m_config);
 
 	RestoreTabs(pLoadSave);
