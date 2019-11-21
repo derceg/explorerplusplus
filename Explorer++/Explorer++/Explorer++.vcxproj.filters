@@ -361,6 +361,9 @@
     <ClCompile Include="IconResourceLoader.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\SortHelper.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -719,6 +722,9 @@
     </ClInclude>
     <ClInclude Include="OptionsDialog.h">
       <Filter>General Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\SortHelper.h">
+      <Filter>ShellBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -543,6 +543,7 @@
     <ClCompile Include="ShellBrowser\iPathManager.cpp" />
     <ClCompile Include="ShellBrowser\iShellBrowser.cpp" />
     <ClCompile Include="ShellBrowser\ListView.cpp" />
+    <ClCompile Include="ShellBrowser\SortHelper.cpp" />
     <ClCompile Include="ShellBrowser\SortManager.cpp" />
     <ClCompile Include="ShellBrowser\ViewModes.cpp" />
     <ClCompile Include="ShellContextMenuHandler.cpp" />
@@ -678,6 +679,7 @@
     <ClInclude Include="ShellBrowser\iShellBrowser_internal.h" />
     <ClInclude Include="ShellBrowser\iShellView.h" />
     <ClInclude Include="ShellBrowser\ItemData.h" />
+    <ClInclude Include="ShellBrowser\SortHelper.h" />
     <ClInclude Include="ShellBrowser\SortModes.h" />
     <ClInclude Include="ShellBrowser\ViewModes.h" />
     <ClInclude Include="SignalWrapper.h" />

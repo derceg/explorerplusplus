@@ -186,13 +186,6 @@ private:
 		int				iRelativeSort;
 	};
 
-	enum DateType_t
-	{
-		DATE_TYPE_CREATED,
-		DATE_TYPE_MODIFIED,
-		DATE_TYPE_ACCESSED
-	};
-
 	struct AlteredFile_t
 	{
 		TCHAR	szFileName[MAX_PATH];
@@ -309,26 +302,6 @@ private:
 
 	/* Sorting. */
 	int CALLBACK		Sort(int InternalIndex1,int InternalIndex2) const;
-	int CALLBACK		SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const GlobalFolderSettings &globalFolderSettings) const;
-	int CALLBACK		SortBySize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByDate(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, DateType_t DateType) const;
-	int CALLBACK		SortByTotalSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, bool TotalSize) const;
-	int CALLBACK		SortByAttributes(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByRealSize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByShortName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByOwner(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByVersionInfo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, VersionInfoType_t VersioninfoType) const;
-	int CALLBACK		SortByShortcutTo(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByHardlinks(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByExtension(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByItemDetails(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const SHCOLUMNID *pscid) const;
-	int CALLBACK		SortByImageProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PROPID PropertyId) const;
-	int CALLBACK		SortByVirtualComments(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByFileSystem(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByPrinterProperty(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, PrinterInformationType_t PrinterInformationType) const;
-	int CALLBACK		SortByNetworkAdapterStatus(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const;
-	int CALLBACK		SortByMediaMetadata(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, MediaMetadataType_t MediaMetaDataType) const;
 
 	/* Listview column support. */
 	void				PlaceColumns();
