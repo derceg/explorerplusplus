@@ -13,6 +13,7 @@
 #include "TabInterface.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include <boost/optional.hpp>
 #include <boost/signals2.hpp>
 #include <wil/resource.h>
@@ -147,6 +148,7 @@ private:
 	HINSTANCE m_instance;
 	std::shared_ptr<Config> m_config;
 
+	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 
 	DpiCompatibility m_dpiCompat;

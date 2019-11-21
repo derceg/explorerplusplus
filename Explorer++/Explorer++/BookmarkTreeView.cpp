@@ -17,10 +17,10 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
 	m_uIDCounter(0),
 	m_bNewFolderCreated(false)
 {
-	SetWindowSubclass(hTreeView, BookmarkTreeViewProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
-
-	SetWindowSubclass(GetParent(hTreeView), BookmarkTreeViewParentProcStub, PARENT_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(hTreeView, BookmarkTreeViewProcStub,
+		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(GetParent(hTreeView), BookmarkTreeViewParentProcStub,
+		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	SetWindowTheme(hTreeView, L"Explorer", NULL);
 
@@ -32,12 +32,6 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
 	TreeView_SetImageList(hTreeView, m_imageList.get(), TVSIL_NORMAL);
 
 	SetupTreeView(guidSelected, setExpansion);
-}
-
-CBookmarkTreeView::~CBookmarkTreeView()
-{
-	RemoveWindowSubclass(m_hTreeView, BookmarkTreeViewParentProcStub, PARENT_SUBCLASS_ID);
-	RemoveWindowSubclass(m_hTreeView, BookmarkTreeViewProcStub, SUBCLASS_ID);
 }
 
 LRESULT CALLBACK CBookmarkTreeView::BookmarkTreeViewProcStub(HWND hwnd, UINT uMsg,

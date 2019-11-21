@@ -10,6 +10,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include <boost/optional.hpp>
 #include <wil/resource.h>
 #include <unordered_map>
@@ -130,5 +131,6 @@ private:
 
 	CBookmarksToolbarDropHandler *m_pbtdh;
 
+	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

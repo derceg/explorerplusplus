@@ -153,8 +153,8 @@ void MainToolbar::Initialize(HWND parent)
 	AddButtonsToToolbar(m_persistentSettings->m_toolbarButtons);
 	UpdateConfigDependentButtonStates();
 
-	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(parent, ParentWndProcStub,
+		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_pexpp->AddTabsInitializedObserver([this] {
 		m_connections.push_back(m_pexpp->GetTabContainer()->tabSelectedSignal.AddObserver(boost::bind(&MainToolbar::OnTabSelected, this, _1)));
@@ -205,11 +205,6 @@ std::unordered_map<int, int> MainToolbar::SetUpToolbarImageList(HIMAGELIST image
 	}
 
 	return imageListMappings;
-}
-
-MainToolbar::~MainToolbar()
-{
-	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
 }
 
 LRESULT CALLBACK MainToolbar::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)

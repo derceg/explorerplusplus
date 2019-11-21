@@ -9,6 +9,7 @@
 #include "Navigation.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/Macros.h"
+#include "../Helper/WindowSubclassWrapper.h"
 
 class AddressBar : public CBaseWindow
 {
@@ -24,7 +25,7 @@ private:
 
 	AddressBar(HWND parent, IExplorerplusplus *expp, Navigation *navigation,
 		MainToolbar *mainToolbar);
-	~AddressBar();
+	~AddressBar() = default;
 
 	static HWND CreateAddressBar(HWND parent);
 
@@ -45,5 +46,6 @@ private:
 	Navigation *m_navigation;
 	MainToolbar *m_mainToolbar;
 
+	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

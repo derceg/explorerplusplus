@@ -9,7 +9,8 @@
 #include "Navigation.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/FileContextMenuManager.h"
-#include <boost\serialization\strong_typedef.hpp>
+#include "../Helper/WindowSubclassWrapper.h"
+#include <boost/serialization/strong_typedef.hpp>
 #include <list>
 #include <unordered_map>
 
@@ -70,10 +71,10 @@ private:
 	void		OnDeviceArrival(DEV_BROADCAST_HDR *dbh);
 	void		OnDeviceRemoveComplete(DEV_BROADCAST_HDR *dbh);
 
-	HINSTANCE	m_hInstance;
+	HINSTANCE m_hInstance;
 
-	UINT		m_uIDStart;
-	UINT		m_uIDEnd;
+	UINT m_uIDStart;
+	UINT m_uIDEnd;
 
 	IExplorerplusplus *m_pexpp;
 	Navigation *m_navigation;
@@ -88,5 +89,7 @@ private:
 
 	std::unordered_map<IDCounter,std::wstring,IDCounterHasher> m_mapID;
 
-	IDCounter	m_IDCounter;
+	IDCounter m_IDCounter;
+
+	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 };

@@ -36,8 +36,6 @@ CDrivesToolbar::CDrivesToolbar(HWND hParent, UINT uIDStart, UINT uIDEnd, HINSTAN
 
 CDrivesToolbar::~CDrivesToolbar()
 {
-	RemoveWindowSubclass(GetParent(m_hwnd),DrivesToolbarParentProcStub,PARENT_SUBCLASS_ID);
-
 	CHardwareChangeNotifier::GetInstance().RemoveObserver(this);
 }
 
@@ -64,8 +62,8 @@ void CDrivesToolbar::Initialize(HWND hParent)
 
 	SendMessage(m_hwnd,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(himlSmall));
 
-	SetWindowSubclass(hParent,DrivesToolbarParentProcStub,PARENT_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(hParent, DrivesToolbarParentProcStub,
+		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	InsertDrives();
 }

@@ -121,6 +121,9 @@
     <ClCompile Include="DpiCompatibility.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
+    <ClCompile Include="WindowSubclassWrapper.cpp">
+      <Filter>Control Support</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -263,6 +266,9 @@
     </ClInclude>
     <ClInclude Include="WinUserBackwardsCompatibility.h">
       <Filter>Miscellaneous</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowSubclassWrapper.h">
+      <Filter>Control Support</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

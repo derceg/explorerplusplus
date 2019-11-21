@@ -338,6 +338,7 @@
     <ClCompile Include="TabHelper.cpp" />
     <ClCompile Include="TimeHelper.cpp" />
     <ClCompile Include="WindowHelper.cpp" />
+    <ClCompile Include="WindowSubclassWrapper.cpp" />
     <ClCompile Include="XMLSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -386,6 +387,7 @@
     <ClInclude Include="TimeHelper.h" />
     <ClInclude Include="UniqueHandle.h" />
     <ClInclude Include="WindowHelper.h" />
+    <ClInclude Include="WindowSubclassWrapper.h" />
     <ClInclude Include="WinUserBackwardsCompatibility.h" />
     <ClInclude Include="XMLSettings.h" />
   </ItemGroup>

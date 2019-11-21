@@ -93,8 +93,8 @@ void TabContainer::Initialize(HWND parent)
 	RegisterDragDrop(m_hwnd, pTabDropHandler);
 	pTabDropHandler->Release();
 
-	SetWindowSubclass(m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
-	SetWindowSubclass(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(m_hwnd, WndProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(parent, ParentWndProcStub, PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	m_connections.push_back(tabCreatedSignal.AddObserver(boost::bind(&TabContainer::OnTabCreated, this, _1, _2)));
 	m_connections.push_back(tabRemovedSignal.AddObserver(boost::bind(&TabContainer::OnTabRemoved, this, _1)));
@@ -116,9 +116,6 @@ void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 TabContainer::~TabContainer()
 {
 	RevokeDragDrop(m_hwnd);
-
-	RemoveWindowSubclass(m_hwnd, WndProcStub, SUBCLASS_ID);
-	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
 }
 
 LRESULT CALLBACK TabContainer::WndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)

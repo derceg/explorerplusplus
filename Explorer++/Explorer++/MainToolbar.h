@@ -10,6 +10,7 @@
 #include "Navigation.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 #include <unordered_map>
 
@@ -54,7 +55,7 @@ private:
 
 	MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
 		Navigation *navigation, std::shared_ptr<Config> config);
-	~MainToolbar();
+	~MainToolbar() = default;
 
 	static HWND CreateMainToolbar(HWND parent);
 
@@ -106,5 +107,6 @@ private:
 	std::unordered_map<int, int> m_toolbarImageMapLarge;
 	std::unordered_map<int, int> m_toolbarStringMap;
 
+	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;
 };

@@ -72,11 +72,6 @@ OptionsDialog::OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance,
 
 }
 
-OptionsDialog::~OptionsDialog()
-{
-	RemoveWindowSubclass(m_propertySheet, PropSheetProcStub, PROP_SHEET_SUBCLASS_ID);
-}
-
 HWND OptionsDialog::Show(HWND parentWindow)
 {
 	std::vector<HPROPSHEETPAGE> sheetHandles;
@@ -106,13 +101,14 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	psh.ppsp		= nullptr;
 	psh.phpage		= sheetHandles.data();
 	psh.pfnCallback	= nullptr;
-	m_propertySheet = reinterpret_cast<HWND>(PropertySheet(&psh));
+	HWND propertySheet = reinterpret_cast<HWND>(PropertySheet(&psh));
 
-	SetWindowSubclass(m_propertySheet, PropSheetProcStub, PROP_SHEET_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(propertySheet, PropSheetProcStub,
+		PROP_SHEET_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
-	CenterWindow(parentWindow, m_propertySheet);
+	CenterWindow(parentWindow, propertySheet);
 
-	return m_propertySheet;
+	return propertySheet;
 }
 
 PROPSHEETPAGE OptionsDialog::GeneratePropertySheetDefinition(const OptionsDialogSheetInfo &sheetInfo)

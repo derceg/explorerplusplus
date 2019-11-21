@@ -48,12 +48,12 @@ void CBookmarksToolbar::InitializeToolbar()
 	m_pbtdh = new CBookmarksToolbarDropHandler(m_hToolbar,m_AllBookmarks,m_guidBookmarksToolbar);
 	RegisterDragDrop(m_hToolbar,m_pbtdh);
 
-	SetWindowSubclass(m_hToolbar,BookmarksToolbarProcStub,SUBCLASS_ID,reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	/* Also subclass the parent window, so that WM_COMMAND/WM_NOTIFY messages
 	can be caught. */
-	SetWindowSubclass(GetParent(m_hToolbar),BookmarksToolbarParentProcStub,PARENT_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(GetParent(m_hToolbar), BookmarksToolbarParentProcStub, PARENT_SUBCLASS_ID,
+		reinterpret_cast<DWORD_PTR>(this)));
 
 	InsertBookmarkItems();
 
@@ -63,9 +63,6 @@ void CBookmarksToolbar::InitializeToolbar()
 CBookmarksToolbar::~CBookmarksToolbar()
 {
 	m_pbtdh->Release();
-
-	RemoveWindowSubclass(m_hToolbar, BookmarksToolbarProcStub, SUBCLASS_ID);
-	RemoveWindowSubclass(GetParent(m_hToolbar), BookmarksToolbarParentProcStub, PARENT_SUBCLASS_ID);
 
 	CBookmarkItemNotifier::GetInstance().RemoveObserver(this);
 }

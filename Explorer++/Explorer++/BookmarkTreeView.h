@@ -9,6 +9,7 @@
 #include "ResourceHelper.h"
 #include "../Helper/Bookmark.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 #include <unordered_map>
 
@@ -19,7 +20,6 @@ public:
 	CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance, IExplorerplusplus *expp,
 		CBookmarkFolder *pAllBookmarks, const GUID &guidSelected,
 		const NBookmarkHelper::setExpansion_t &setExpansion);
-	~CBookmarkTreeView();
 
 	CBookmarkFolder					&GetBookmarkFolderFromTreeView(HTREEITEM hItem);
 
@@ -74,4 +74,6 @@ private:
 
 	bool m_bNewFolderCreated;
 	GUID m_NewFolderGUID;
+
+	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 };

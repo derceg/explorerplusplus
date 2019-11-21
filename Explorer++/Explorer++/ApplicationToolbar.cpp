@@ -74,8 +74,8 @@ void CApplicationToolbar::Initialize(HWND hParent)
 	m_patd = new CApplicationToolbarDropHandler(m_hwnd, this);
 	RegisterDragDrop(m_hwnd,m_patd);
 
-	SetWindowSubclass(hParent,ParentWndProcStub,PARENT_SUBCLASS_ID,
-		reinterpret_cast<DWORD_PTR>(this));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(hParent, ParentWndProcStub,
+		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	AddButtonsToToolbar();
 
@@ -84,8 +84,6 @@ void CApplicationToolbar::Initialize(HWND hParent)
 
 CApplicationToolbar::~CApplicationToolbar()
 {
-	RemoveWindowSubclass(GetParent(m_hwnd), ParentWndProcStub, PARENT_SUBCLASS_ID);
-
 	RevokeDragDrop(m_hwnd);
 	m_patd->Release();
 }

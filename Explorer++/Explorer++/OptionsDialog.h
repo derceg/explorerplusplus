@@ -8,6 +8,7 @@
 #include "CoreInterface.h"
 #include "TabContainer.h"
 #include "../Helper/DpiCompatibility.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include <wil/resource.h>
 
 class OptionsDialog
@@ -33,7 +34,7 @@ private:
 
 	OptionsDialog(std::shared_ptr<Config> config, HINSTANCE instance, IExplorerplusplus *expp,
 		TabContainer *tabContainer, TabInterface *tabInterface);
-	~OptionsDialog();
+	~OptionsDialog() = default;
 
 	PROPSHEETPAGE GeneratePropertySheetDefinition(const OptionsDialogSheetInfo &sheetInfo);
 
@@ -66,8 +67,6 @@ private:
 	BOOL AddLanguageToComboBox(HWND hComboBox, const TCHAR *szImageDirectory, const TCHAR *szFileName, WORD *pdwLanguage);
 	int GetLanguageIDFromIndex(HWND hDlg, int iIndex);
 
-	HWND m_propertySheet;
-
 	std::shared_ptr<Config> m_config;
 	HINSTANCE m_instance;
 	IExplorerplusplus *m_expp;
@@ -78,4 +77,6 @@ private:
 
 	wil::unique_hicon m_optionsDialogIcon;
 	wil::unique_hicon m_newTabDirectoryIcon;
+
+	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 };
