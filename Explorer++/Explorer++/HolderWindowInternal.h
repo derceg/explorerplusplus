@@ -11,7 +11,6 @@ class CHolderWindow
 public:
 
 	CHolderWindow(HWND hHolder);
-	~CHolderWindow();
 
 	LRESULT CALLBACK	HolderWndProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 

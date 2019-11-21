@@ -27,11 +27,6 @@ CHolderWindow::CHolderWindow(HWND hHolder)
 	m_bHolderResizing	= FALSE;
 }
 
-CHolderWindow::~CHolderWindow()
-{
-	m_bHolderResizing	= FALSE;
-}
-
 ATOM RegisterHolderWindowClass(void)
 {
 	WNDCLASS wc;
@@ -76,7 +71,7 @@ LRESULT CALLBACK HolderWndProcStub(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lPara
 			}
 			break;
 
-		case WM_DESTROY:
+		case WM_NCDESTROY:
 			delete pHolderWindow;
 			return 0;
 			break;
