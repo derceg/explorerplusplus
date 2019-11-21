@@ -15,6 +15,7 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
+#include <wil/common.h>
 #include <propkey.h>
 #include <propvarutil.h>
 #include <cassert>
@@ -84,11 +85,11 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case SortMode::Size:
-			ComparisonResult = SortBySize(InternalIndex1,InternalIndex2);
+			ComparisonResult = SortBySize(basicItemInfo1,basicItemInfo2);
 			break;
 
 		case SortMode::DateModified:
-			ComparisonResult = SortByDate(InternalIndex1,InternalIndex2,DATE_TYPE_MODIFIED);
+			ComparisonResult = SortByDate(basicItemInfo1,basicItemInfo2,DATE_TYPE_MODIFIED);
 			break;
 
 		case SortMode::TotalSize:
@@ -156,11 +157,11 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 			break;
 
 		case SortMode::Created:
-			ComparisonResult = SortByDate(InternalIndex1,InternalIndex2,DATE_TYPE_CREATED);
+			ComparisonResult = SortByDate(basicItemInfo1,basicItemInfo2,DATE_TYPE_CREATED);
 			break;
 
 		case SortMode::Accessed:
-			ComparisonResult = SortByDate(InternalIndex1,InternalIndex2,DATE_TYPE_ACCESSED);
+			ComparisonResult = SortByDate(basicItemInfo1,basicItemInfo2,DATE_TYPE_ACCESSED);
 			break;
 
 		case SortMode::Title:
@@ -333,8 +334,8 @@ int CALLBACK CShellBrowser::Sort(int InternalIndex1,int InternalIndex2) const
 	{
 		/* By default, items that are equal will be sub-sorted
 		by their display names. */
-		ComparisonResult = StrCmpLogicalW(m_itemInfoMap.at(InternalIndex1).szDisplayName,
-			m_itemInfoMap.at(InternalIndex2).szDisplayName);
+		ComparisonResult = StrCmpLogicalW(basicItemInfo1.szDisplayName,
+			basicItemInfo2.szDisplayName);
 	}
 
 	if(!m_folderSettings.sortAscending)
@@ -374,17 +375,18 @@ int CALLBACK CShellBrowser::SortByName(const BasicItemInfo_t &itemInfo1, const B
 	return StrCmpLogicalW(Name1.c_str(),Name2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) const
+int CALLBACK CShellBrowser::SortBySize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2) const
 {
-	bool IsFolder1 = ((m_itemInfoMap.at(InternalIndex1).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
-	bool IsFolder2 = ((m_itemInfoMap.at(InternalIndex2).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY) ? true : false;
+	bool IsFolder1 = WI_IsFlagSet(itemInfo1.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
+	bool IsFolder2 = WI_IsFlagSet(itemInfo2.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
 
 	ULONGLONG size1;
 	ULONGLONG size2;
 	
 	if(IsFolder1 && IsFolder2)
 	{
-		auto itr1 = m_cachedFolderSizes.find(InternalIndex1);
+		// Temporarily disabled.
+		/*auto itr1 = m_cachedFolderSizes.find(InternalIndex1);
 		auto itr2 = m_cachedFolderSizes.find(InternalIndex2);
 
 		if (itr1 == m_cachedFolderSizes.end() && itr2 == m_cachedFolderSizes.end())
@@ -401,13 +403,16 @@ int CALLBACK CShellBrowser::SortBySize(int InternalIndex1,int InternalIndex2) co
 		}
 
 		size1 = itr1->second;
-		size2 = itr2->second;
+		size2 = itr2->second;*/
+
+		size1 = 0;
+		size2 = 0;
 	}
 	else
 	{
 		// Both items are files (as opposed to folders).
-		ULARGE_INTEGER FileSize1 = { m_itemInfoMap.at(InternalIndex1).wfd.nFileSizeLow,m_itemInfoMap.at(InternalIndex1).wfd.nFileSizeHigh };
-		ULARGE_INTEGER FileSize2 = { m_itemInfoMap.at(InternalIndex2).wfd.nFileSizeLow,m_itemInfoMap.at(InternalIndex2).wfd.nFileSizeHigh };
+		ULARGE_INTEGER FileSize1 = { itemInfo1.wfd.nFileSizeLow, itemInfo1.wfd.nFileSizeHigh };
+		ULARGE_INTEGER FileSize2 = { itemInfo2.wfd.nFileSizeLow, itemInfo2.wfd.nFileSizeHigh };
 
 		size1 = FileSize1.QuadPart;
 		size2 = FileSize2.QuadPart;
@@ -454,20 +459,20 @@ int CALLBACK CShellBrowser::SortByType(const BasicItemInfo_t &itemInfo1, const B
 	return StrCmpLogicalW(Type1.c_str(),Type2.c_str());
 }
 
-int CALLBACK CShellBrowser::SortByDate(int InternalIndex1,int InternalIndex2,DateType_t DateType) const
+int CALLBACK CShellBrowser::SortByDate(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, DateType_t DateType) const
 {
 	switch(DateType)
 	{
 	case DATE_TYPE_CREATED:
-		return CompareFileTime(&m_itemInfoMap.at(InternalIndex1).wfd.ftCreationTime,&m_itemInfoMap.at(InternalIndex2).wfd.ftCreationTime);
+		return CompareFileTime(&itemInfo1.wfd.ftCreationTime, &itemInfo2.wfd.ftCreationTime);
 		break;
 
 	case DATE_TYPE_MODIFIED:
-		return CompareFileTime(&m_itemInfoMap.at(InternalIndex1).wfd.ftLastWriteTime,&m_itemInfoMap.at(InternalIndex2).wfd.ftLastWriteTime);
+		return CompareFileTime(&itemInfo1.wfd.ftLastWriteTime, &itemInfo2.wfd.ftLastWriteTime);
 		break;
 
 	case DATE_TYPE_ACCESSED:
-		return CompareFileTime(&m_itemInfoMap.at(InternalIndex1).wfd.ftLastAccessTime,&m_itemInfoMap.at(InternalIndex2).wfd.ftLastAccessTime);
+		return CompareFileTime(&itemInfo1.wfd.ftLastAccessTime, &itemInfo2.wfd.ftLastAccessTime);
 		break;
 
 	default:
