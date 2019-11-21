@@ -12,7 +12,6 @@ class CModelessDialogNotification : public CReferenceCount, public IModelessDial
 public:
 
 	CModelessDialogNotification();
-	~CModelessDialogNotification();
 
 	ULONG AddRef();
 	ULONG Release();

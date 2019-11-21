@@ -9,8 +9,8 @@
 class CPathManager
 {
 public:
+
 	CPathManager();
-	~CPathManager();
 
 	int				GetNumBackPathsStored(void) const;
 	int				GetNumForwardPathsStored(void) const;
@@ -24,6 +24,7 @@ public:
 	LPITEMIDLIST	RetrieveAndValidateIdl(int iIndex);
 
 private:
+
 	#define DEFAULT_ALLOCATION	10
 
 	/* Points one past the "current" path. */

@@ -13,11 +13,6 @@ CLoadSaveRegistry::CLoadSaveRegistry(Explorerplusplus *pContainer) :
 
 }
 
-CLoadSaveRegistry::~CLoadSaveRegistry()
-{
-
-}
-
 void CLoadSaveRegistry::LoadGenericSettings()
 {
 	m_pContainer->LoadSettings();

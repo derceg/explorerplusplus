@@ -11,7 +11,6 @@ class CNewMenuClient : public INewMenuClient
 public:
 
 	CNewMenuClient(IExplorerplusplus *pexpp);
-	~CNewMenuClient();
 
 private:
 

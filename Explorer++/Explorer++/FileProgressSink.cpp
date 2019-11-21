@@ -19,11 +19,6 @@ FileProgressSink::FileProgressSink() :
 
 }
 
-FileProgressSink::~FileProgressSink()
-{
-
-}
-
 HRESULT STDMETHODCALLTYPE FileProgressSink::QueryInterface(REFIID riid, void **ppvObject)
 {
 	#pragma warning(push)

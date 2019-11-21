@@ -11,7 +11,6 @@ class CServiceProvider : public IServiceProvider
 public:
 
 	CServiceProvider(IExplorerplusplus *pexpp);
-	~CServiceProvider();
 
 private:
 

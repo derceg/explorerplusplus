@@ -18,11 +18,6 @@ m_RefCount(1)
 
 }
 
-CServiceProvider::~CServiceProvider()
-{
-
-}
-
 HRESULT __stdcall CServiceProvider::QueryInterface(REFIID iid,void **ppvObject)
 {
 	*ppvObject = NULL;

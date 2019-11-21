@@ -19,11 +19,6 @@ m_RefCount(1)
 
 }
 
-CDropFilesCallback::~CDropFilesCallback()
-{
-	
-}
-
 HRESULT __stdcall CDropFilesCallback::QueryInterface(REFIID iid,void **ppvObject)
 {
 	*ppvObject = NULL;

@@ -13,7 +13,6 @@ class CLoadSaveRegistry : public ILoadSave
 public:
 
 	CLoadSaveRegistry(Explorerplusplus *pContainer);
-	~CLoadSaveRegistry();
 
 	/* Loading functions. */
 	void	LoadGenericSettings();

@@ -27,10 +27,6 @@ CPathManager::CPathManager()
 	m_nTotal = 0;
 }
 
-CPathManager::~CPathManager()
-{
-}
-
 void CPathManager::StoreIdl(LPITEMIDLIST pidl)
 {
 	/* Check if the number of idl's stored has reached the number of

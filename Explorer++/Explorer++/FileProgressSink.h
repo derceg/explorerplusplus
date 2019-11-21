@@ -38,7 +38,7 @@ public:
 private:
 
 	FileProgressSink();
-	virtual ~FileProgressSink();
+	virtual ~FileProgressSink() = default;
 
 	ULONG m_refCount;
 

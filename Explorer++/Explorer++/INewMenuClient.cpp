@@ -20,11 +20,6 @@ m_RefCount(1)
 
 }
 
-CNewMenuClient::~CNewMenuClient()
-{
-
-}
-
 HRESULT __stdcall CNewMenuClient::QueryInterface(REFIID iid,void **ppvObject)
 {
 	*ppvObject = NULL;

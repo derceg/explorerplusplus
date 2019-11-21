@@ -12,7 +12,6 @@ class CDropFilesCallback : public IDropFilesCallback
 public:
 
 	CDropFilesCallback(IExplorerplusplus *pexpp);
-	~CDropFilesCallback();
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);

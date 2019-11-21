@@ -15,11 +15,6 @@ m_RefCount(1)
 
 }
 
-CModelessDialogNotification::~CModelessDialogNotification()
-{
-
-}
-
 ULONG CModelessDialogNotification::AddRef(void)
 {
 	return ++m_RefCount;
