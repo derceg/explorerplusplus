@@ -12,7 +12,7 @@
 #include "Explorer++_internal.h"
 #include "Navigation.h"
 
-void Explorerplusplus::OnCopyItemPath(void) const
+void Explorerplusplus::OnCopyItemPath() const
 {
 	HWND hFocus;
 
@@ -28,7 +28,7 @@ void Explorerplusplus::OnCopyItemPath(void) const
 	}
 }
 
-void Explorerplusplus::OnCopyUniversalPaths(void) const
+void Explorerplusplus::OnCopyUniversalPaths() const
 {
 	HWND hFocus;
 
@@ -60,7 +60,7 @@ void Explorerplusplus::OnCopy(BOOL bCopy)
 	}
 }
 
-void Explorerplusplus::OnFileRename(void)
+void Explorerplusplus::OnFileRename()
 {
 	HWND	hFocus;
 
@@ -100,7 +100,7 @@ void Explorerplusplus::OnFileDelete(bool permanent)
 	}
 }
 
-void Explorerplusplus::OnSetFileAttributes(void) const
+void Explorerplusplus::OnSetFileAttributes() const
 {
 	HWND hFocus;
 
@@ -116,7 +116,7 @@ void Explorerplusplus::OnSetFileAttributes(void) const
 	}
 }
 
-void Explorerplusplus::OnShowFileProperties(void) const
+void Explorerplusplus::OnShowFileProperties() const
 {
 	HWND hFocus;
 
@@ -159,7 +159,7 @@ void Explorerplusplus::OnRightClick(NMHDR *nmhdr)
 	}
 }
 
-void Explorerplusplus::OnPaste(void)
+void Explorerplusplus::OnPaste()
 {
 	HWND hFocus;
 

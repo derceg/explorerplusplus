@@ -530,7 +530,7 @@ void Explorerplusplus::OnDpiChanged(const RECT *updatedWindowRect)
 		SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
-int Explorerplusplus::OnDestroy(void)
+int Explorerplusplus::OnDestroy()
 {
 	if(m_pClipboardDataObject != NULL)
 	{
@@ -555,7 +555,7 @@ int Explorerplusplus::OnDestroy(void)
 	return 0;
 }
 
-int Explorerplusplus::OnClose(void)
+int Explorerplusplus::OnClose()
 {
 	if(m_config->confirmCloseTabs && (m_tabContainer->GetNumTabs() > 1))
 	{
@@ -589,7 +589,7 @@ int Explorerplusplus::OnClose(void)
 	return 0;
 }
 
-void Explorerplusplus::OnSetFocus(void)
+void Explorerplusplus::OnSetFocus()
 {
 	SetFocus(m_hLastActiveWindow);
 }
@@ -599,7 +599,7 @@ void Explorerplusplus::OnSetFocus(void)
  * All cut items are deghosted, and the 'Paste' button
  * is enabled/disabled.
  */
-void Explorerplusplus::OnDrawClipboard(void)
+void Explorerplusplus::OnDrawClipboard()
 {
 	if(m_pClipboardDataObject != NULL)
 	{
@@ -726,7 +726,7 @@ void Explorerplusplus::OnDisplayWindowResized(WPARAM wParam)
  * Sizes all columns in the active listview
  * based on their text.
  */
-void Explorerplusplus::OnAutoSizeColumns(void)
+void Explorerplusplus::OnAutoSizeColumns()
 {
 	size_t	nColumns;
 	UINT	iCol = 0;
@@ -740,7 +740,7 @@ void Explorerplusplus::OnAutoSizeColumns(void)
 }
 
 /* Cycle through the current views. */
-void Explorerplusplus::OnToolbarViews(void)
+void Explorerplusplus::OnToolbarViews()
 {
 	CycleViewState(TRUE);
 }
@@ -775,7 +775,7 @@ void Explorerplusplus::OnSortByAscending(BOOL bSortAscending)
 	}
 }
 
-void Explorerplusplus::OnPreviousWindow(void)
+void Explorerplusplus::OnPreviousWindow()
 {
 	if(m_bListViewRenaming)
 	{
@@ -824,7 +824,7 @@ void Explorerplusplus::OnPreviousWindow(void)
  * Shifts focus to the next internal
  * window in the chain.
  */
-void Explorerplusplus::OnNextWindow(void)
+void Explorerplusplus::OnNextWindow()
 {
 	if(m_bListViewRenaming)
 	{
@@ -871,7 +871,7 @@ void Explorerplusplus::OnNextWindow(void)
 	}
 }
 
-void Explorerplusplus::OnLockToolbars(void)
+void Explorerplusplus::OnLockToolbars()
 {
 	REBARBANDINFO	rbbi;
 	UINT			nBands;
@@ -980,7 +980,7 @@ void Explorerplusplus::OnAppCommand(UINT cmd)
 	}
 }
 
-void Explorerplusplus::OnRefresh(void)
+void Explorerplusplus::OnRefresh()
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
 	RefreshTab(tab);
@@ -1072,7 +1072,7 @@ void Explorerplusplus::OnDirectoryModified(int iTabId)
 	}
 }
 
-void Explorerplusplus::OnIdaRClick(void)
+void Explorerplusplus::OnIdaRClick()
 {
 	/* Show the context menu (if any)
 	for the window that currently has
@@ -1188,7 +1188,7 @@ References:
 http://tech.groups.yahoo.com/group/wtl/message/13911
 http://www.eggheadcafe.com/forumarchives/platformsdkshell/Nov2005/post24294253.asp
 */
-void Explorerplusplus::OnAssocChanged(void)
+void Explorerplusplus::OnAssocChanged()
 {
 	typedef BOOL (WINAPI *FII_PROC)(BOOL);
 	FII_PROC FileIconInit;
@@ -1249,7 +1249,7 @@ void Explorerplusplus::OnAssocChanged(void)
 	/* TODO: Update the address bar. */
 }
 
-void Explorerplusplus::OnCloneWindow(void)
+void Explorerplusplus::OnCloneWindow()
 {
 	TCHAR szCurrentDirectory[MAX_PATH];
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),
@@ -1507,7 +1507,7 @@ void Explorerplusplus::SetLanguage(DWORD language)
 	m_Language = language;
 }
 
-void Explorerplusplus::OnShowHiddenFiles(void)
+void Explorerplusplus::OnShowHiddenFiles()
 {
 	m_pActiveShellBrowser->SetShowHidden(!m_pActiveShellBrowser->GetShowHidden());
 

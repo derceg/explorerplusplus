@@ -197,7 +197,7 @@ void Explorerplusplus::DeletePreviousArrangeMenuItems(void)
 /*
  * Updates the arrange menu with the new items.
  */
-void Explorerplusplus::UpdateArrangeMenuItems(void)
+void Explorerplusplus::UpdateArrangeMenuItems()
 {
 	std::list<int>			SortModes;
 	std::list<int>::iterator	itr;

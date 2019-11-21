@@ -152,60 +152,65 @@ private:
 
 	LRESULT CALLBACK		WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
 
-	/* Internal private functions. */
-	void					UpdateArrangeMenuItems(void);
-
-	/* <----Private message handlers.----> */
-
-	/* Main window private message handlers. */
+	/* Main window message handlers. */
 	LRESULT CALLBACK		CommandHandler(HWND hwnd, WPARAM wParam);
 	LRESULT					HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam);
 	LRESULT					HandleControlNotification(HWND hwnd, WPARAM wParam);
 	LRESULT CALLBACK		NotifyHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	void					OnCreate();
 	BOOL					OnSize(int MainWindowWidth,int MainWindowHeight);
 	void					OnDpiChanged(const RECT *updatedWindowRect);
-	int						OnClose(void);
-	int						OnDestroy(void);
-	void					OnCopy(BOOL bCopy);
+	int						OnClose();
+	int						OnDestroy();
 	void					OnRightClick(NMHDR *nmhdr);
-	void					OnCreate(void);
-	void					OnDrawClipboard(void);
+	void					OnDrawClipboard();
 	void					OnChangeCBChain(WPARAM wParam,LPARAM lParam);
-	void					OnSetFocus(void);
+	void					OnSetFocus();
 	LRESULT					OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	LRESULT					StatusBarMenuSelect(WPARAM wParam,LPARAM lParam);
-	void					HandleDirectoryMonitoring(int iTabId);
 	void					OnDisplayWindowResized(WPARAM wParam);
 	void					OnStartedBrowsing(int iTabId, const TCHAR *szPath);
-	void					OnAutoSizeColumns(void);
-	void					OnToolbarViews(void);
-	void					OnSortByAscending(BOOL bSortAscending);
-	void					OnPreviousWindow(void);
-	void					OnNextWindow(void);
-	int						DetermineListViewObjectIndex(HWND hListView);
-	void					OnLockToolbars(void);
-	void					LoadAllSettings(ILoadSave **pLoadSave);
+	void					OnPreviousWindow();
+	void					OnNextWindow();
 	void					OnShellNewItemCreated(LPARAM lParam);
-	void					OnPaste(void);
 	void					OnAppCommand(UINT cmd);
-	void					OnRefresh(void);
 	void					OnDirectoryModified(int iTabId);
-	void					OnIdaRClick(void);
-	void					OnAssocChanged(void);
+	void					OnIdaRClick();
+	void					OnAssocChanged();
 	void					OnNdwRClick(POINT *pt);
 	void					OnNdwIconRClick(POINT *pt);
 	LRESULT					OnCustomDraw(LPARAM lParam);
-	void					OnSortBy(SortMode sortMode);
-	void					OnGroupBy(SortMode sortMode);
 	void					OnSelectTabByIndex(int iTab);
 
 	/* Main menu handlers. */
+	void					OnNewTab();
+	bool					OnCloseTab();
+	void					OnSaveDirectoryListing() const;
+	void					OnCloneWindow();
+	void					OnCopyItemPath() const;
+	void					OnCopyUniversalPaths() const;
+	void					OnSetFileAttributes() const;
+	void					OnFileDelete(bool permanent);
+	void					OnFileRename();
+	void					OnShowFileProperties() const;
+	void					OnCopy(BOOL bCopy);
+	void					OnPaste();
+	void					OnWildcardSelect(BOOL bSelect);
+	void					OnResolveLink();
+	void					OnLockToolbars();
 	void					OnChangeDisplayColors();
 	void					OnFilterResults();
+	void					OnSortBy(SortMode sortMode);
+	void					OnGroupBy(SortMode sortMode);
+	void					OnSortByAscending(BOOL bSortAscending);
+	void					OnShowHiddenFiles();
+	void					OnRefresh();
+	void					OnSelectColumns();
+	void					OnAutoSizeColumns();
+	void					OnCreateNewFolder();
 	void					OnMergeFiles();
 	void					OnSplitFile();
 	void					OnDestroyFiles();
-	void					OnWildcardSelect(BOOL bSelect);
 	void					OnSearch();
 	void					OnCustomizeColors();
 	void					OnRunScript();
@@ -213,19 +218,11 @@ private:
 	void					OnShowHelp();
 	void					OnCheckForUpdates();
 	void					OnAbout();
-	void					OnSaveDirectoryListing() const;
-	void					OnCreateNewFolder();
-	void					OnResolveLink();
 
-	void					OnNewTab();
-	void					OnCopyItemPath(void) const;
-	void					OnCopyUniversalPaths(void) const;
-	void					OnSetFileAttributes(void) const;
-	void					OnFileDelete(bool permanent);
-	void					OnFileRename(void);
-	void					OnShowFileProperties(void) const;
 	int						HighlightSimilarFiles(HWND ListView) const;
-	void					OnShowHiddenFiles(void);
+
+	/* Main toolbar-specific handlers. */
+	void					OnToolbarViews();
 
 	/* ListView private message handlers. */
 	void					OnListViewMButtonDown(POINT *pt);
@@ -285,7 +282,6 @@ private:
 	void					OnTabSelected(const Tab &tab);
 	void					ShowTabBar();
 	void					HideTabBar();
-	bool					OnCloseTab();
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	HRESULT					RefreshTab(const Tab &tab);
 
@@ -303,12 +299,10 @@ private:
 	/* Plugins. */
 	void					InitializePlugins();
 
-	/* Clone Window. */
-	void					OnCloneWindow(void);
-
 	/* Menus. */
 	HMENU					InitializeRightClickMenu(void);
 	void					SetProgramMenuItemStates(HMENU hProgramMenu);
+	void					UpdateArrangeMenuItems();
 	void					SetArrangeMenuItemStates();
 
 	/* Control creation. */
@@ -332,14 +326,18 @@ private:
 
 	/* Settings. */
 	void					SaveAllSettings();
-	LONG					SaveSettings();
-	LONG					LoadSettings();
+	void					LoadAllSettings(ILoadSave **pLoadSave);
 	void					ValidateLoadedSettings();
 	void					ValidateColumns(FolderColumns &folderColumns);
 	void					ValidateSingleColumnSet(int iColumnSet, std::vector<Column_t> &columns);
 	void					ApplyLoadedSettings(void);
 	void					ApplyToolbarSettings(void);
 	void					TestConfigFile(void);
+	void					InitializeBookmarks(void);
+
+	/* Registry settings. */
+	LONG					LoadGenericSettingsFromRegistry();
+	LONG					SaveGenericSettingsToRegistry();
 	void					SaveTabSettingsToRegistry(void);
 	int						LoadTabSettingsFromRegistry();
 	std::vector<Column_t>	LoadColumnFromRegistry(HKEY hColumnsKey, const TCHAR *szKeyName);
@@ -348,7 +346,6 @@ private:
 	void					SaveColumnWidthsToRegistry(HKEY hColumnsKey, const TCHAR *szKeyName, std::vector<Column_t> *pColumns);
 	void					LoadDefaultColumnsFromRegistry();
 	void					SaveDefaultColumnsToRegistry();
-	void					InitializeBookmarks(void);
 	void					SaveBookmarksToRegistry(void);
 	void					LoadBookmarksFromRegistry(void);
 	void					LoadApplicationToolbarFromRegistry();
@@ -357,6 +354,31 @@ private:
 	void					LoadToolbarInformationFromRegistry(void);
 	void					SaveDialogStatesToRegistry(void);
 	void					LoadDialogStatesFromRegistry(void);
+
+	/* XML Settings. */
+	void					LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
+	int						LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
+	void					SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
+	int						LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t> &outputColumns);
+	void					SaveColumnToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode, const std::vector<Column_t> &columns, const TCHAR *szColumnSet, int iIndent);
+	int						LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveBookmarksToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
+	int						LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
+	void					SaveDefaultColumnsToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode);
+	void					SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
+	void					SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pWndPosNode);
+	void					LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
+	void					LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveToolbarInformationToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
+	void					SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pe);
+	void					LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom);
+	void					SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pRoot);
+	void					MapAttributeToValue(IXMLDOMNode *pNode, WCHAR *wszName, WCHAR *wszValue);
+	void					MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings, FolderSettings &folderSettings);
 
 	/* Window state update. */
 	void					UpdateWindowStates(void);
@@ -417,7 +439,6 @@ private:
 	void					UpdateDisplayWindowForMultipleFiles(void);
 
 	/* Columns. */
-	void					OnSelectColumns();
 	void					CopyColumnInfoToClipboard(void);
 
 	/* Bookmark handling. */
@@ -426,31 +447,6 @@ private:
 
 	/* Filtering. */
 	void					ToggleFilterStatus();
-
-	/* XML Settings. */
-	void					LoadGenericSettingsFromXML(IXMLDOMDocument *pXMLDom);
-	void					SaveGenericSettingsToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
-	int						LoadTabSettingsFromXML(IXMLDOMDocument *pXMLDom);
-	void					SaveTabSettingsToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
-	void					SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe);
-	int						LoadColumnFromXML(IXMLDOMNode *pNode, std::vector<Column_t> &outputColumns);
-	void					SaveColumnToXML(IXMLDOMDocument *pXMLDom, IXMLDOMElement *pColumnsNode, const std::vector<Column_t> &columns, const TCHAR *szColumnSet, int iIndent);
-	int						LoadBookmarksFromXML(IXMLDOMDocument *pXMLDom);
-	void					SaveBookmarksToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
-	int						LoadDefaultColumnsFromXML(IXMLDOMDocument *pXMLDom);
-	void					SaveDefaultColumnsToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
-	void					SaveDefaultColumnsToXMLInternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pColumnsNode);
-	void					SaveWindowPositionToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
-	void					SaveWindowPositionToXMLInternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pWndPosNode);
-	void					LoadApplicationToolbarFromXML(IXMLDOMDocument *pXMLDom);
-	void					SaveApplicationToolbarToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
-	void					LoadToolbarInformationFromXML(IXMLDOMDocument *pXMLDom);
-	void					SaveToolbarInformationToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
-	void					SaveToolbarInformationToXMLnternal(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pe);
-	void					LoadDialogStatesFromXML(IXMLDOMDocument *pXMLDom);
-	void					SaveDialogStatesToXML(IXMLDOMDocument *pXMLDom,IXMLDOMElement *pRoot);
-	void					MapAttributeToValue(IXMLDOMNode *pNode,WCHAR *wszName,WCHAR *wszValue);
-	void					MapTabAttributeValue(WCHAR *wszName, WCHAR *wszValue, TabSettings &tabSettings, FolderSettings &folderSettings);
 
 	/* IExplorerplusplus methods. */
 	HWND					GetMainWindow() const;
@@ -485,11 +481,11 @@ private:
 	void					CycleViewState(BOOL bCycleForward);
 	HMENU					CreateRebarHistoryMenu(BOOL bBack);
 	CStatusBar				*GetStatusBar();
+	void					HandleDirectoryMonitoring(int iTabId);
+	int						DetermineListViewObjectIndex(HWND hListView);
 
 	static void				FolderSizeCallbackStub(int nFolders, int nFiles, PULARGE_INTEGER lTotalFolderSize, LPVOID pData);
 	void					FolderSizeCallback(FolderSizeExtraInfo_t *pfsei,int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize);
-
-	/* ------ Internal state. ------ */
 
 	HWND					m_hContainer;
 	HWND					m_hStatusBar;

@@ -76,7 +76,7 @@ void CALLBACK InitializeCOMAPC(ULONG_PTR dwParam)
 * initial settings must be in place before
 * this.
 */
-void Explorerplusplus::OnCreate(void)
+void Explorerplusplus::OnCreate()
 {
 	InitializeMainToolbars();
 	InitializeBookmarks();

@@ -72,7 +72,7 @@ BOOL LoadAllowMultipleInstancesFromRegistry(void)
 	return bAllowMultipleInstances;
 }
 
-LONG Explorerplusplus::SaveSettings(void)
+LONG Explorerplusplus::SaveGenericSettingsToRegistry()
 {
 	HKEY			hSettingsKey;
 	DWORD			Disposition;
@@ -203,7 +203,7 @@ LONG Explorerplusplus::SaveSettings(void)
 	return ReturnValue;
 }
 
-LONG Explorerplusplus::LoadSettings()
+LONG Explorerplusplus::LoadGenericSettingsFromRegistry()
 {
 	HKEY			hSettingsKey;
 	LONG			ReturnValue;
