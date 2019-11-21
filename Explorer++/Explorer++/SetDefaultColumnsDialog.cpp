@@ -6,7 +6,7 @@
 #include "SetDefaultColumnsDialog.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
-#include "ShellBrowser/iShellView.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"

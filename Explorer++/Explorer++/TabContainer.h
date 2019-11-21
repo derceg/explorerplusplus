@@ -6,7 +6,7 @@
 
 #include "CoreInterface.h"
 #include "ShellBrowser/CachedIcons.h"
-#include "ShellBrowser/iShellView.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "SignalWrapper.h"
 #include "Tab.h"
 #include "TabContainerInterface.h"

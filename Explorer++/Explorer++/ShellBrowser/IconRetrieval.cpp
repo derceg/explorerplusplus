@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "iShellView.h"
+#include "ShellBrowser.h"
 #include "CachedIcons.h"
 
 void CShellBrowser::QueueIconTask(int internalIndex)

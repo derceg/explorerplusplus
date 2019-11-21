@@ -3,7 +3,7 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
-#include "iShellView.h"
+#include "ShellBrowser.h"
 #include "Config.h"
 #include "MainResource.h"
 #include "ViewModes.h"

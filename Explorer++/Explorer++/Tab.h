@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ShellBrowser/iShellView.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Macros.h"
 #include <boost/optional.hpp>
 #include <boost/parameter.hpp>

@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "ListViewEdit.h"
 #include "Explorer++_internal.h"
-#include "ShellBrowser/iShellView.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Helper.h"
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"

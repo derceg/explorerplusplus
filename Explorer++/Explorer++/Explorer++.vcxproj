@@ -676,7 +676,7 @@
     <ClInclude Include="ShellBrowser\Columns.h" />
     <ClInclude Include="ShellBrowser\FolderSettings.h" />
     <ClInclude Include="ShellBrowser\iPathManager.h" />
-    <ClInclude Include="ShellBrowser\iShellView.h" />
+    <ClInclude Include="ShellBrowser\ShellBrowser.h" />
     <ClInclude Include="ShellBrowser\ItemData.h" />
     <ClInclude Include="ShellBrowser\SortHelper.h" />
     <ClInclude Include="ShellBrowser\SortModes.h" />

@@ -9,7 +9,7 @@
 #include "PluginCommandManager.h"
 #include "PluginInterface.h"
 #include "PluginMenuManager.h"
-#include "ShellBrowser/iShellView.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
 #include "Tab.h"

@@ -3,8 +3,8 @@
 // See LICENSE in the top level directory
 
 #include "stdafx.h"
+#include "ShellBrowser.h"
 #include "Config.h"
-#include "iShellView.h"
 #include "MainResource.h"
 #include <boost/format.hpp>
 

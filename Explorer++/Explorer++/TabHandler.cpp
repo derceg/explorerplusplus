@@ -8,7 +8,7 @@
 #include "LoadSaveInterface.h"
 #include "MainResource.h"
 #include "RenameTabDialog.h"
-#include "ShellBrowser/iShellView.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/SortModes.h"
 #include "TabContainer.h"
 #include "../Helper/Helper.h"

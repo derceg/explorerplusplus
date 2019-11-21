@@ -8,7 +8,7 @@
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
-#include "ShellBrowser/iShellView.h"
+#include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/RegistrySettings.h"

@@ -522,9 +522,6 @@
     <ClInclude Include="ShellBrowser\iPathManager.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowser\iShellView.h">
-      <Filter>ShellBrowser</Filter>
-    </ClInclude>
     <ClInclude Include="ShellBrowser\SortModes.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
@@ -721,6 +718,9 @@
       <Filter>General Dialogs</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\SortHelper.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\ShellBrowser.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
   </ItemGroup>
