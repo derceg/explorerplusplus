@@ -504,10 +504,8 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("ShowHidden"), tab.GetShellBrowser()->GetShowHidden());
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AutoArrange"), tab.GetShellBrowser()->GetAutoArrange());
 
-				TCHAR szFilter[512];
-
-				tab.GetShellBrowser()->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
-				NRegistrySettings::SaveStringToRegistry(hTabKey,_T("Filter"),szFilter);
+				std::wstring filter = tab.GetShellBrowser()->GetFilter();
+				NRegistrySettings::SaveStringToRegistry(hTabKey,_T("Filter"),filter.c_str());
 
 				/* Now save the tabs columns. */
 				ReturnValue = RegCreateKeyEx(hTabKey,_T("Columns"),

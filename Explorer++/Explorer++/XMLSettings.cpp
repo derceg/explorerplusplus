@@ -836,10 +836,8 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("AutoArrange"),
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetAutoArrange()));
 
-		TCHAR szFilter[512];
-
-		tab.GetShellBrowser()->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Filter"),szFilter);
+		std::wstring filter = tab.GetShellBrowser()->GetFilter();
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Filter"),filter.c_str());
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("FilterCaseSensitive"),
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetFilterCaseSensitive()));

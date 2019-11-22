@@ -128,8 +128,8 @@ public:
 	static int			LookupColumnDescriptionStringIndex(int iColumnId);
 
 	/* Filtering. */
-	void				GetFilter(TCHAR *szFilter,int cchMax) const;
-	void				SetFilter(const TCHAR *szFilter);
+	std::wstring		GetFilter() const;
+	void				SetFilter(std::wstring_view filter);
 	BOOL				GetFilterStatus(void) const;
 	void				SetFilterStatus(BOOL bFilter);
 	BOOL				GetFilterCaseSensitive(void) const;

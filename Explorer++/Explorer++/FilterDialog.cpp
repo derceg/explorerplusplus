@@ -40,10 +40,9 @@ INT_PTR CFilterDialog::OnInitDialog()
 			reinterpret_cast<LPARAM>(strFilter.c_str()));
 	}
 
-	TCHAR szFilter[512];
-	m_pexpp->GetActiveShellBrowser()->GetFilter(szFilter,SIZEOF_ARRAY(szFilter));
+	std::wstring filter = m_pexpp->GetActiveShellBrowser()->GetFilter();
 
-	ComboBox_SelectString(hComboBox,-1,szFilter);
+	ComboBox_SelectString(hComboBox,-1,filter.c_str());
 
 	SendMessage(hComboBox,CB_SETEDITSEL,0,MAKELPARAM(0,-1));
 

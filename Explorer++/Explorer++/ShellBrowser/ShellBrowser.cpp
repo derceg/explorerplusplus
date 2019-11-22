@@ -1095,20 +1095,20 @@ void CShellBrowser::DetermineFolderVirtual(LPITEMIDLIST pidlDirectory)
 	}
 }
 
-void CShellBrowser::SetFilter(const TCHAR *szFilter)
+std::wstring CShellBrowser::GetFilter() const
 {
-	m_folderSettings.filter = szFilter;
+	return m_folderSettings.filter;
+}
+
+void CShellBrowser::SetFilter(std::wstring_view filter)
+{
+	m_folderSettings.filter = filter;
 
 	if(m_folderSettings.applyFilter)
 	{
 		UnfilterAllItems();
 		UpdateFiltering();
 	}
-}
-
-void CShellBrowser::GetFilter(TCHAR *szFilter,int cchMax) const
-{
-	StringCchCopy(szFilter,cchMax,m_folderSettings.filter.c_str());
 }
 
 void CShellBrowser::SetFilterStatus(BOOL bFilter)
