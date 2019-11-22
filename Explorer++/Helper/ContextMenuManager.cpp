@@ -27,7 +27,7 @@ extensions on an existing menu:
 3. Pass selection to shell extension (if necessary).
 4. Release shell extensions (also free the DLL's they reside in). */
 CContextMenuManager::CContextMenuManager(ContextMenuType_t ContextMenuType,
-	LPCITEMIDLIST pidlDirectory,IDataObject *pDataObject,IUnknown *pUnkSite,
+	PCIDLIST_ABSOLUTE pidlDirectory,IDataObject *pDataObject,IUnknown *pUnkSite,
 	const std::vector<std::wstring> &blacklistedCLSIDEntries)
 {
 	ItemType_t ItemType = GetItemType(pidlDirectory);

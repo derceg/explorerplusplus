@@ -134,12 +134,10 @@ void Explorerplusplus::OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpe
 
 void Explorerplusplus::OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
-	SFGAOF uAttributes = SFGAO_FOLDER|SFGAO_STREAM|SFGAO_LINK;
-	LPITEMIDLIST pidlControlPanel = NULL;
-	HRESULT	hr;
 	BOOL bControlPanelParent = FALSE;
 
-	hr = SHGetFolderLocation(NULL,CSIDL_CONTROLS,NULL,0,&pidlControlPanel);
+	PIDLIST_ABSOLUTE pidlControlPanel = NULL;
+	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_CONTROLS,NULL,0,&pidlControlPanel);
 
 	if(SUCCEEDED(hr))
 	{
@@ -192,6 +190,7 @@ void Explorerplusplus::OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL b
 		}
 	}
 
+	SFGAOF uAttributes = SFGAO_FOLDER | SFGAO_STREAM | SFGAO_LINK;
 	hr = GetItemAttributes(pidlItem,&uAttributes);
 
 	if(SUCCEEDED(hr))

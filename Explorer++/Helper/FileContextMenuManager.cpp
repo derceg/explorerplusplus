@@ -14,12 +14,12 @@ LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
 	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
-	LPCITEMIDLIST pidlParent, const std::list<LPITEMIDLIST> &pidlItemList) :
+	PCIDLIST_ABSOLUTE pidlParent, const std::list<LPITEMIDLIST> &pidlItemList) :
 	m_pShellContext3(NULL),
 	m_pShellContext2(NULL),
 	m_pShellContext(NULL),
 	m_hwnd(hwnd),
-	m_pidlParent(ILClone(pidlParent))
+	m_pidlParent(ILCloneFull(pidlParent))
 {
 	IContextMenu *pContextMenu = NULL;
 	HRESULT hr;
@@ -34,7 +34,7 @@ CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
 	if(pidlItemList.size() == 0)
 	{
 		IShellFolder *pShellParentFolder = NULL;
-		LPCITEMIDLIST pidlRelative = NULL;
+		PCUITEMID_CHILD pidlRelative = NULL;
 
 		hr = SHBindToParent(pidlParent, IID_PPV_ARGS(&pShellParentFolder),
 			&pidlRelative);

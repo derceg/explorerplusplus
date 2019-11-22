@@ -73,7 +73,7 @@ HRESULT GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cchM
 	return hr;
 }
 
-HRESULT GetDisplayName(LPCITEMIDLIST pidl,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags)
+HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags)
 {
 	if(pidl == NULL ||
 		szDisplayName == NULL)
@@ -82,12 +82,11 @@ HRESULT GetDisplayName(LPCITEMIDLIST pidl,TCHAR *szDisplayName,UINT cchMax,DWORD
 	}
 
 	IShellFolder *pShellFolder = NULL;
-	LPITEMIDLIST pidlRelative = NULL;
+	PCUITEMID_CHILD pidlRelative = NULL;
 	STRRET str;
 	HRESULT hr;
 
-	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder),
-	(LPCITEMIDLIST *)&pidlRelative);
+	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	if(SUCCEEDED(hr))
 	{
@@ -106,7 +105,7 @@ HRESULT GetDisplayName(LPCITEMIDLIST pidl,TCHAR *szDisplayName,UINT cchMax,DWORD
 
 HRESULT GetCsidlDisplayName(int csidl, TCHAR *szFolderName, UINT cchMax, DWORD uParsingFlags)
 {
-	LPITEMIDLIST pidl = NULL;
+	PIDLIST_ABSOLUTE pidl = NULL;
 	HRESULT hr = SHGetFolderLocation(NULL, csidl, NULL, 0, &pidl);
 
 	if(SUCCEEDED(hr))
@@ -141,7 +140,7 @@ HRESULT GetItemAttributes(const TCHAR *szItemParsingPath,SFGAOF *pItemAttributes
 	return hr;
 }
 
-HRESULT GetItemAttributes(LPCITEMIDLIST pidl,SFGAOF *pItemAttributes)
+HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl,SFGAOF *pItemAttributes)
 {
 	if(pidl == NULL ||
 		pItemAttributes == NULL)
@@ -150,11 +149,10 @@ HRESULT GetItemAttributes(LPCITEMIDLIST pidl,SFGAOF *pItemAttributes)
 	}
 
 	IShellFolder	*pShellFolder = NULL;
-	LPITEMIDLIST	pidlRelative = NULL;
+	PCUITEMID_CHILD	pidlRelative = NULL;
 	HRESULT			hr;
 
-	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder),
-	(LPCITEMIDLIST *)&pidlRelative);
+	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	if(SUCCEEDED(hr))
 	{
@@ -225,7 +223,7 @@ HRESULT GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent
 
 BOOL IsNamespaceRoot(LPCITEMIDLIST pidl)
 {
-	LPITEMIDLIST pidlDesktop	= NULL;
+	PIDLIST_ABSOLUTE pidlDesktop	= NULL;
 	BOOL bNamespaceRoot			= FALSE;
 	HRESULT hr;
 
@@ -273,7 +271,7 @@ BOOL IsIdlDirectory(LPCITEMIDLIST pidl)
 
 HRESULT DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT cchMax)
 {
-	LPITEMIDLIST pidl = NULL;
+	PIDLIST_ABSOLUTE pidl = NULL;
 	TCHAR szName[MAX_PATH];
 
 	SHGetFolderLocation(NULL,CSIDL_CONTROLS,NULL,0,&pidl);
@@ -1352,7 +1350,7 @@ HRESULT ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory, LPCITEMIDLIST *pp
 	return ExecuteActionFromContextMenu(pidlDirectory, ppidl, hwndOwner, nFiles, _T("properties"), 0);
 }
 
-HRESULT ExecuteActionFromContextMenu(LPITEMIDLIST pidlDirectory,
+HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 	LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask)
 {
 	IShellFolder		*pShellParentFolder = NULL;
@@ -1430,7 +1428,7 @@ BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL)
 	return FALSE;
 }
 
-bool IsChildOfLibrariesFolder(PIDLIST_ABSOLUTE pidl)
+bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl)
 {
 	PIDLIST_ABSOLUTE pidlLibraries;
 	HRESULT hr = SHGetKnownFolderIDList(FOLDERID_Libraries, 0, nullptr, &pidlLibraries);

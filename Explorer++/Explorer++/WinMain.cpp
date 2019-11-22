@@ -198,9 +198,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 	pass those folders to Windows Explorer, then exit. */
 	if(g_commandLineDirectories.size() > 0)
 	{
-		LPITEMIDLIST pidlControlPanel = NULL;
-		LPITEMIDLIST pidl = NULL;
-
+		PIDLIST_ABSOLUTE pidlControlPanel = NULL;
 		HRESULT hr = SHGetFolderLocation(NULL,
 			CSIDL_CONTROLS,NULL,0,&pidlControlPanel);
 
@@ -215,6 +213,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 				/* This could fail on a 64-bit version of Windows if the
 				executable is 32-bit, and the folder is 64-bit specific (as is
 				the case with some of the folders under the control panel). */
+				LPITEMIDLIST pidl = NULL;
 				hr = GetIdlFromParsingName(itr->c_str(),&pidl);
 
 				bControlPanelChild = FALSE;

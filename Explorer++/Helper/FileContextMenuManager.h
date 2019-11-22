@@ -30,7 +30,7 @@ class CFileContextMenuManager
 {
 public:
 
-	CFileContextMenuManager(HWND hwnd, LPCITEMIDLIST pidlParent, const std::list<LPITEMIDLIST> &pidlItemList);
+	CFileContextMenuManager(HWND hwnd, PCIDLIST_ABSOLUTE pidlParent, const std::list<LPITEMIDLIST> &pidlItemList);
 	~CFileContextMenuManager();
 
 	/* Shows the context menu. */

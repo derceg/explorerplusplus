@@ -145,7 +145,7 @@ HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<LPCITEMIDLIST> &pidl
 HRESULT NFileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle,
 	std::vector<LPCITEMIDLIST> &pidls, bool move)
 {
-	LPITEMIDLIST pidl;
+	PIDLIST_ABSOLUTE pidl;
 	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner,strTitle.c_str(),&pidl);
 
 	if(!bRes)
@@ -656,7 +656,7 @@ HRESULT NFileOperations::ResolveLink(HWND hwnd, DWORD fFlags, const TCHAR *szLin
 	return hr;
 }
 
-BOOL NFileOperations::CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,LPITEMIDLIST *ppidl)
+BOOL NFileOperations::CreateBrowseDialog(HWND hOwner,const std::wstring &strTitle,PIDLIST_ABSOLUTE *ppidl)
 {
 	CoInitializeEx(NULL,COINIT_APARTMENTTHREADED);
 

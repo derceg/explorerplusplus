@@ -565,7 +565,7 @@ HRESULT CShellBrowser::AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition
 int CShellBrowser::SetItemInformation(LPITEMIDLIST pidlDirectory,
 LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
 {
-	LPITEMIDLIST	pidlItem = NULL;
+	PIDLIST_ABSOLUTE	pidlItem = NULL;
 	HANDLE			hFirstFile;
 	TCHAR			szPath[MAX_PATH];
 	int				uItemId;

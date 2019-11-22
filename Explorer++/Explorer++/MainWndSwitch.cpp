@@ -1142,13 +1142,13 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		them as the default columns for the appropriate folder
 		type.. */
 		IShellFolder *pShellFolder = NULL;
-		LPITEMIDLIST pidl = NULL;
-		LPITEMIDLIST pidlDrives = NULL;
-		LPITEMIDLIST pidlControls = NULL;
-		LPITEMIDLIST pidlBitBucket = NULL;
-		LPITEMIDLIST pidlPrinters = NULL;
-		LPITEMIDLIST pidlConnections = NULL;
-		LPITEMIDLIST pidlNetwork = NULL;
+		PIDLIST_ABSOLUTE pidl = NULL;
+		PIDLIST_ABSOLUTE pidlDrives = NULL;
+		PIDLIST_ABSOLUTE pidlControls = NULL;
+		PIDLIST_ABSOLUTE pidlBitBucket = NULL;
+		PIDLIST_ABSOLUTE pidlPrinters = NULL;
+		PIDLIST_ABSOLUTE pidlConnections = NULL;
+		PIDLIST_ABSOLUTE pidlNetwork = NULL;
 
 		auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
 

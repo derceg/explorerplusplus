@@ -77,7 +77,7 @@ public:
 	BOOL				QueryDragging(void) const;
 
 	/* Get/Set current state. */
-	LPITEMIDLIST		QueryCurrentDirectoryIdl(void) const;
+	PIDLIST_ABSOLUTE	QueryCurrentDirectoryIdl() const;
 	UINT				QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const;
 	BOOL				GetAutoArrange(void) const;
 	void				SetAutoArrange(BOOL autoArrange);
@@ -454,7 +454,7 @@ private:
 	CPathManager		m_pathManager;
 
 	/* Internal state. */
-	LPITEMIDLIST		m_pidlDirectory;
+	PIDLIST_ABSOLUTE	m_pidlDirectory;
 	const HINSTANCE		m_hResourceModule;
 	TCHAR				m_CurDir[MAX_PATH];
 	ULARGE_INTEGER		m_ulTotalDirSize;

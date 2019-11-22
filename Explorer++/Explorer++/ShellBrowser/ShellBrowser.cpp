@@ -483,9 +483,9 @@ UINT CShellBrowser::QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const
 	return lstrlen(m_CurDir);
 }
 
-LPITEMIDLIST CShellBrowser::QueryCurrentDirectoryIdl(void) const
+PIDLIST_ABSOLUTE CShellBrowser::QueryCurrentDirectoryIdl() const
 {
-	return ILClone(m_pidlDirectory);
+	return ILCloneFull(m_pidlDirectory);
 }
 
 HRESULT CShellBrowser::CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,

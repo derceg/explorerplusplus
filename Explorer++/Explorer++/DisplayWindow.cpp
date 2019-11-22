@@ -36,7 +36,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(void)
 	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
 	LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
 
-	LPITEMIDLIST pidlComputer = NULL;
+	PIDLIST_ABSOLUTE pidlComputer = NULL;
 	SHGetFolderLocation(NULL, CSIDL_DRIVES, NULL, 0, &pidlComputer);
 
 	if (CompareIdls(pidlDirectory, pidlComputer))

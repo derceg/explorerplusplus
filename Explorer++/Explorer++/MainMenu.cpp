@@ -89,7 +89,7 @@ void Explorerplusplus::SetMainMenuImages()
 
 void Explorerplusplus::SetGoMenuName(HMENU hMenu, UINT uMenuID, UINT csidl)
 {
-	wil::unique_cotaskmem_ptr<ITEMIDLIST> pidl;
+	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidl;
 	HRESULT hr = SHGetFolderLocation(NULL, csidl, NULL, 0, wil::out_param(pidl));
 
 	/* Don't use SUCCEEDED(hr). */

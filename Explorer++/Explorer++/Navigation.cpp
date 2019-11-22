@@ -70,7 +70,7 @@ void Navigation::OnNavigateUp()
 */
 void Navigation::OnGotoFolder(int FolderCSIDL)
 {
-	LPITEMIDLIST pidl = NULL;
+	PIDLIST_ABSOLUTE pidl = NULL;
 	HRESULT hr = SHGetFolderLocation(NULL, FolderCSIDL, NULL, 0, &pidl);
 
 	/* Don't use SUCCEEDED(hr). */
