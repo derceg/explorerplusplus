@@ -51,24 +51,20 @@ const TCHAR CSearchDialogPersistentSettings::SETTING_SORT_ASCENDING[] = _T("Sort
 const TCHAR CSearchDialogPersistentSettings::SETTING_DIRECTORY_LIST[] = _T("Directory");
 const TCHAR CSearchDialogPersistentSettings::SETTING_PATTERN_LIST[] = _T("Pattern");
 
-CSearchDialog::CSearchDialog(HINSTANCE hInstance,int iResource,
-	HWND hParent,TCHAR *szSearchDirectory,IExplorerplusplus *pexpp,
+CSearchDialog::CSearchDialog(HINSTANCE hInstance, int iResource,
+	HWND hParent, std::wstring_view searchDirectory, IExplorerplusplus *pexpp,
 	TabContainer *tabContainer) :
-CBaseDialog(hInstance,iResource,hParent,true)
+	CBaseDialog(hInstance, iResource, hParent, true),
+	m_searchDirectory(searchDirectory),
+	m_pexpp(pexpp),
+	m_tabContainer(tabContainer),
+	m_bSearching(FALSE),
+	m_bStopSearching(FALSE),
+	m_bSetSearchTimer(TRUE),
+	m_iInternalIndex(0),
+	m_iPreviousSelectedColumn(-1),
+	m_pSearch(nullptr)
 {
-	StringCchCopy(m_szSearchDirectory,SIZEOF_ARRAY(m_szSearchDirectory),
-		szSearchDirectory);
-
-	m_pexpp = pexpp;
-	m_tabContainer = tabContainer;
-
-	m_bSearching		= FALSE;
-	m_bStopSearching	= FALSE;
-	m_bSetSearchTimer	= TRUE;
-	m_iInternalIndex	= 0;
-	m_iPreviousSelectedColumn	= -1;
-	m_pSearch			= NULL;
-
 	m_sdps = &CSearchDialogPersistentSettings::GetInstance();
 }
 
@@ -143,7 +139,7 @@ INT_PTR CSearchDialog::OnInitDialog()
 	}
 
 	SetDlgItemText(m_hDlg,IDC_COMBO_NAME,m_sdps->m_szSearchPattern);
-	SetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,m_szSearchDirectory);
+	SetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,m_searchDirectory.c_str());
 
 	CComboBox::CreateNew(GetDlgItem(m_hDlg,IDC_COMBO_NAME));
 	CComboBox::CreateNew(GetDlgItem(m_hDlg,IDC_COMBO_DIRECTORY));

@@ -671,7 +671,6 @@ void Explorerplusplus::OnChangeCBChain(WPARAM wParam,LPARAM lParam)
 void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 {
 	DirectoryAltered_t	*pDirectoryAltered = NULL;
-	TCHAR				szDirectoryToWatch[MAX_PATH];
 	int					iDirMonitorId;
 
 	Tab &tab = m_tabContainer->GetTab(iTabId);
@@ -681,8 +680,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 	/* Stop monitoring the directory that was browsed from. */
 	m_pDirMon->StopDirectoryMonitor(iDirMonitorId);
 
-	tab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szDirectoryToWatch),
-		szDirectoryToWatch);
+	std::wstring directoryToWatch = tab.GetShellBrowser()->GetDirectory();
 
 	/* Don't watch virtual folders (the 'recycle bin' may be an
 	exception to this). */
@@ -699,8 +697,8 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 		pDirectoryAltered->pData		= this;
 
 		/* Start monitoring the directory that was opened. */
-		LOG(debug) << _T("Starting directory monitoring for \"") << szDirectoryToWatch << _T("\"");
-		iDirMonitorId = m_pDirMon->WatchDirectory(szDirectoryToWatch,FILE_NOTIFY_CHANGE_FILE_NAME|
+		LOG(debug) << _T("Starting directory monitoring for \"") << directoryToWatch << _T("\"");
+		iDirMonitorId = m_pDirMon->WatchDirectory(directoryToWatch.c_str(),FILE_NOTIFY_CHANGE_FILE_NAME|
 			FILE_NOTIFY_CHANGE_SIZE|FILE_NOTIFY_CHANGE_DIR_NAME|FILE_NOTIFY_CHANGE_ATTRIBUTES|
 			FILE_NOTIFY_CHANGE_LAST_WRITE|FILE_NOTIFY_CHANGE_LAST_ACCESS|FILE_NOTIFY_CHANGE_CREATION|
 			FILE_NOTIFY_CHANGE_SECURITY,DirectoryAlteredCallback,FALSE,(void *)pDirectoryAltered);
@@ -1250,13 +1248,11 @@ void Explorerplusplus::OnAssocChanged()
 
 void Explorerplusplus::OnCloneWindow()
 {
-	TCHAR szCurrentDirectory[MAX_PATH];
-	m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory),
-		szCurrentDirectory);
+	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
 
 	TCHAR szQuotedCurrentDirectory[MAX_PATH];
 	StringCchPrintf(szQuotedCurrentDirectory, SIZEOF_ARRAY(szQuotedCurrentDirectory),
-		_T("\"%s\""),szCurrentDirectory);
+		_T("\"%s\""), currentDirectory.c_str());
 
 	ExecuteAndShowCurrentProcess(m_hContainer, szQuotedCurrentDirectory);
 }

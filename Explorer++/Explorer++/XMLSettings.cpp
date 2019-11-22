@@ -813,7 +813,6 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 	BSTR					bstr_wsnttt = SysAllocString(L"\n\t\t\t");
 	BSTR					bstr = NULL;
 	TCHAR					szNodeName[32];
-	TCHAR					szTabDirectory[MAX_PATH];
 	UINT					SortMode;
 	UINT					ViewMode;
 	int						tabNum = 0;
@@ -827,8 +826,8 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), tabNum);
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Tab"),szNodeName);
 
-		tab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
-		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Directory"),szTabDirectory);
+		std::wstring tabDirectory = tab.GetShellBrowser()->GetDirectory();
+		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Directory"), tabDirectory.c_str());
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ApplyFilter"),
 			NXMLSettings::EncodeBoolValue(tab.GetShellBrowser()->GetFilterStatus()));

@@ -382,11 +382,11 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 
 	case ToolbarButton::OpenCommandPrompt:
 	case IDM_FILE_OPENCOMMANDPROMPT:
-		StartCommandPrompt(m_CurrentDirectory, false);
+		StartCommandPrompt(m_CurrentDirectory.c_str(), false);
 		break;
 
 	case IDM_FILE_OPENCOMMANDPROMPTADMINISTRATOR:
-		StartCommandPrompt(m_CurrentDirectory, true);
+		StartCommandPrompt(m_CurrentDirectory.c_str(), true);
 		break;
 
 	case IDM_FILE_COPYFOLDERPATH:
@@ -453,11 +453,11 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDM_EDIT_PASTESHORTCUT:
-		PasteLinksToClipboardFiles(m_CurrentDirectory);
+		PasteLinksToClipboardFiles(m_CurrentDirectory.c_str());
 		break;
 
 	case IDM_EDIT_PASTEHARDLINK:
-		PasteHardLinks(m_CurrentDirectory);
+		PasteHardLinks(m_CurrentDirectory.c_str());
 		break;
 
 	case IDM_EDIT_COPYTOFOLDER:
@@ -1285,11 +1285,10 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	case ToolbarButton::AddBookmark:
 	case IDM_BOOKMARKS_BOOKMARKTHISTAB:
 	{
-		TCHAR szCurrentDirectory[MAX_PATH];
 		TCHAR szDisplayName[MAX_PATH];
-		m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
-		GetDisplayName(szCurrentDirectory, szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
-		CBookmark Bookmark = CBookmark::Create(szDisplayName, szCurrentDirectory, EMPTY_STRING);
+		std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
+		GetDisplayName(currentDirectory.c_str(), szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
+		CBookmark Bookmark = CBookmark::Create(szDisplayName, currentDirectory, EMPTY_STRING);
 
 		CAddBookmarkDialog AddBookmarkDialog(m_hLanguageModule, IDD_ADD_BOOKMARK, hwnd, this, *m_bfAllBookmarks, Bookmark);
 		AddBookmarkDialog.ShowModalDialog();
@@ -1461,7 +1460,7 @@ LRESULT Explorerplusplus::HandleControlNotification(HWND hwnd, WPARAM wParam)
 	switch (HIWORD(wParam))
 	{
 	case CBN_DROPDOWN:
-		AddPathsToComboBoxEx(m_addressBar->GetHWND(), m_CurrentDirectory);
+		AddPathsToComboBoxEx(m_addressBar->GetHWND(), m_CurrentDirectory.c_str());
 		break;
 	}
 

@@ -305,13 +305,12 @@ void *pData)
 
 	if (tab)
 	{
-		TCHAR szDirectory[MAX_PATH];
-		tab->GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
-		LOG(debug) << _T("Directory change notification received for \"") << szDirectory << _T("\", Action = ") << dwAction
+		std::wstring directory = tab->GetShellBrowser()->GetDirectory();
+		LOG(debug) << _T("Directory change notification received for \"") << directory << _T("\", Action = ") << dwAction
 			<< _T(", Filename = \"") << szFileName << _T("\"");
 
-		tab->GetShellBrowser()->FilesModified(dwAction,
-			szFileName, pDirectoryAltered->iIndex, pDirectoryAltered->iFolderIndex);
+		tab->GetShellBrowser()->FilesModified(dwAction, szFileName,
+			pDirectoryAltered->iIndex, pDirectoryAltered->iFolderIndex);
 	}
 }
 

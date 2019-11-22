@@ -511,7 +511,7 @@ private:
 	HMENU					m_hGroupBySubMenu;
 	HMENU					m_hArrangeSubMenuRClick;
 	HMENU					m_hGroupBySubMenuRClick;
-	TCHAR					m_CurrentDirectory[MAX_PATH];
+	std::wstring			m_CurrentDirectory;
 	TCHAR					m_OldTreeViewFileName[MAX_PATH];
 	DWORD					m_Language;
 	BOOL					m_bTreeViewRightClick;

@@ -78,7 +78,7 @@ public:
 
 	/* Get/Set current state. */
 	PIDLIST_ABSOLUTE	GetDirectoryIdl() const;
-	UINT				GetDirectory(int BufferSize,TCHAR *Buffer) const;
+	std::wstring		GetDirectory() const;
 	BOOL				GetAutoArrange(void) const;
 	void				SetAutoArrange(BOOL autoArrange);
 	ViewMode			GetViewMode() const;

@@ -140,7 +140,6 @@ DWORD CShellBrowser::CheckItemLocations(IDataObject *pDataObject,int iDroppedIte
 	STGMEDIUM	stg;
 	DROPFILES	*pdf = NULL;
 	TCHAR		szFullFileName[MAX_PATH];
-	TCHAR		szDestDirectory[MAX_PATH];
 	HRESULT		hr;
 	BOOL		bOnSameDrive = FALSE;
 	int			nDroppedFiles;
@@ -171,13 +170,16 @@ DWORD CShellBrowser::CheckItemLocations(IDataObject *pDataObject,int iDroppedIte
 				/* TODO: Compare against sub-folders? (i.e. path may
 				need to be adjusted if the dragged item is currently
 				over a folder). */
-				GetDirectory(SIZEOF_ARRAY(szDestDirectory),
-					szDestDirectory);
+				std::wstring destDirectory = GetDirectory();
 
-				if(PathIsSameRoot(szDestDirectory,szFullFileName))
+				if (PathIsSameRoot(destDirectory.c_str(), szFullFileName))
+				{
 					bOnSameDrive = TRUE;
+				}
 				else
+				{
 					bOnSameDrive = FALSE;
+				}
 			}
 
 			GlobalUnlock(stg.hGlobal);
@@ -393,7 +395,6 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	STGMEDIUM		stg;
 	DROPFILES		*pdf = NULL;
 	POINT			pt;
-	TCHAR			szDestDirectory[MAX_PATH + 1];
 	HRESULT			hr;
 	DWORD			dwEffect;
 	int				nDroppedFiles;
@@ -415,8 +416,10 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	pt.x = ptl.x;
 	pt.y = ptl.y;
 
-	GetDirectory(SIZEOF_ARRAY(szDestDirectory),
-		szDestDirectory);
+	std::wstring destDirectory = GetDirectory();
+
+	TCHAR finalDestDirectory[MAX_PATH];
+	StringCchCopy(finalDestDirectory, std::size(finalDestDirectory), destDirectory.c_str());
 
 	/* If the item(s) have been dropped over a folder in the
 	listview, append the folders name onto the destination path. */
@@ -429,10 +432,8 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 		lvItem.iSubItem	= 0;
 		ListView_GetItem(m_hListView,&lvItem);
 
-		PathAppend(szDestDirectory,m_itemInfoMap.at((int)lvItem.lParam).wfd.cFileName);
+		PathAppend(finalDestDirectory, m_itemInfoMap.at((int)lvItem.lParam).wfd.cFileName);
 	}
-
-	szDestDirectory[lstrlen(szDestDirectory) + 1] = '\0';
 
 	if(m_bDataAccept)
 	{
@@ -480,7 +481,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 
 			pDropHandler->Drop(pDataObject,
 				grfKeyState,ptl,pdwEffect,m_hListView,
-				m_DragType,szDestDirectory,this,FALSE);
+				m_DragType,finalDestDirectory,this,FALSE);
 
 			/* When dragging and dropping, any dropped items
 			will be selected, while any previously selected

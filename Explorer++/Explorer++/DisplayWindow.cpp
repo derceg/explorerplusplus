@@ -32,8 +32,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(void)
 	DisplayWindow_ClearTextBuffer(m_hDisplayWindow);
 	DisplayWindow_SetThumbnailFile(m_hDisplayWindow, EMPTY_STRING, FALSE);
 
-	TCHAR szCurrentDirectory[MAX_PATH];
-	m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
+	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
 	LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	PIDLIST_ABSOLUTE pidlComputer = NULL;
@@ -73,7 +72,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(void)
 	{
 		/* Folder name. */
 		TCHAR szFolderName[MAX_PATH];
-		GetDisplayName(szCurrentDirectory, szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
+		GetDisplayName(currentDirectory.c_str(), szFolderName, SIZEOF_ARRAY(szFolderName), SHGDN_INFOLDER);
 		DisplayWindow_BufferText(m_hDisplayWindow, szFolderName);
 
 		/* Folder type. */

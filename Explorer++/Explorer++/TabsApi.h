@@ -61,11 +61,8 @@ namespace Plugins
 			Tab(const ::Tab &tabInternal) :
 				folderSettings(*tabInternal.GetShellBrowser())
 			{
-				TCHAR path[MAX_PATH];
-				tabInternal.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(path), path);
-
 				id = tabInternal.GetId();
-				location = path;
+				location = tabInternal.GetShellBrowser()->GetDirectory();
 				name = tabInternal.GetName();
 				locked = tabInternal.GetLocked();
 				addressLocked = tabInternal.GetAddressLocked();

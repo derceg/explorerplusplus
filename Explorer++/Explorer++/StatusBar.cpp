@@ -188,7 +188,7 @@ HRESULT Explorerplusplus::UpdateStatusBarText(void)
 
 	SendMessage(m_hStatusBar, SB_SETTEXT, (WPARAM)1 | 0, (LPARAM)lpszSizeBuffer);
 
-	res = CreateDriveFreeSpaceString(m_CurrentDirectory, szBuffer, SIZEOF_ARRAY(szBuffer));
+	res = CreateDriveFreeSpaceString(m_CurrentDirectory.c_str(), szBuffer, SIZEOF_ARRAY(szBuffer));
 
 	if (res == -1)
 		StringCchCopy(szBuffer, SIZEOF_ARRAY(szBuffer), EMPTY_STRING);

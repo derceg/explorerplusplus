@@ -49,18 +49,17 @@ void Navigation::OnNavigateHome()
 
 void Navigation::OnNavigateUp()
 {
-	Tab &tab = m_tabContainer->GetSelectedTab();
-
-	TCHAR szDirectory[MAX_PATH];
-	tab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
-
-	PathStripPath(szDirectory);
-
 	HRESULT hr = BrowseFolderInCurrentTab(EMPTY_STRING, SBSP_PARENT);
 
 	if(SUCCEEDED(hr))
 	{
-		tab.GetShellBrowser()->SelectFiles(szDirectory);
+		Tab &tab = m_tabContainer->GetSelectedTab();
+		std::wstring directory = tab.GetShellBrowser()->GetDirectory();
+
+		TCHAR directoryFileName[MAX_PATH];
+		StringCchCopy(directoryFileName, std::size(directoryFileName), directory.c_str());
+		PathStripPath(directoryFileName);
+		tab.GetShellBrowser()->SelectFiles(directoryFileName);
 	}
 }
 

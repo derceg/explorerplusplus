@@ -139,15 +139,14 @@ void AddressBar::OnGo()
 {
 	TCHAR szPath[MAX_PATH];
 	TCHAR szFullFilePath[MAX_PATH];
-	TCHAR szCurrentDirectory[MAX_PATH];
 
 	/* Retrieve the combobox text, and determine if it is a
 	valid path. */
 	SendMessage(m_hwnd, WM_GETTEXT, SIZEOF_ARRAY(szPath), (LPARAM)szPath);
 
 	const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
-	DecodePath(szPath, szCurrentDirectory, szFullFilePath, SIZEOF_ARRAY(szFullFilePath));
+	std::wstring currentDirectory = selectedTab.GetShellBrowser()->GetDirectory();
+	DecodePath(szPath, currentDirectory.c_str(), szFullFilePath, SIZEOF_ARRAY(szFullFilePath));
 
 	m_expp->OpenItem(szFullFilePath, FALSE, FALSE);
 }

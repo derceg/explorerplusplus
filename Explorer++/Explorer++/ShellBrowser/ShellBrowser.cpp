@@ -470,17 +470,9 @@ void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFil
 	GetDisplayName(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),szFullFileName,cchMax,SHGDN_FORPARSING);
 }
 
-UINT CShellBrowser::GetDirectory(int BufferSize,TCHAR *Buffer) const
+std::wstring CShellBrowser::GetDirectory() const
 {
-	if(BufferSize < (lstrlen(m_CurDir) + 1))
-	{
-		Buffer = NULL;
-		return lstrlen(m_CurDir);
-	}
-
-	StringCchCopy(Buffer,BufferSize,m_CurDir);
-
-	return lstrlen(m_CurDir);
+	return m_CurDir;
 }
 
 PIDLIST_ABSOLUTE CShellBrowser::GetDirectoryIdl() const

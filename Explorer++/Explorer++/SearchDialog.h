@@ -136,7 +136,7 @@ class CSearchDialog : public CBaseDialog, public IFileContextMenuExternal
 {
 public:
 
-	CSearchDialog(HINSTANCE hInstance, int iResource, HWND hParent, TCHAR *szSearchDirectory,
+	CSearchDialog(HINSTANCE hInstance, int iResource, HWND hParent, std::wstring_view searchDirectory,
 		IExplorerplusplus *pexpp, TabContainer *tabContainer);
 	~CSearchDialog();
 
@@ -183,7 +183,7 @@ private:
 	void						SaveEntry(int comboBoxId, boost::circular_buffer<std::wstring> &buffer);
 	void						UpdateListViewHeader();
 
-	TCHAR m_szSearchDirectory[MAX_PATH];
+	std::wstring m_searchDirectory;
 	wil::unique_hicon m_directoryIcon;
 	BOOL m_bSearching;
 	BOOL m_bStopSearching;

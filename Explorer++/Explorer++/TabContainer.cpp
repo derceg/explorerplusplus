@@ -1216,8 +1216,6 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 
 void TabContainer::DuplicateTab(const Tab &tab)
 {
-	TCHAR szTabDirectory[MAX_PATH];
-	tab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
-
-	CreateNewTab(szTabDirectory);
+	std::wstring currentDirectory = tab.GetShellBrowser()->GetDirectory();
+	CreateNewTab(currentDirectory.c_str());
 }

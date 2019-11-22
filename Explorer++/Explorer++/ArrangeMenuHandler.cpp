@@ -124,15 +124,15 @@ void Explorerplusplus::InitializeArrangeMenuItems(void)
  */
 void Explorerplusplus::SetActiveArrangeMenuItems(void)
 {
-	if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_DRIVES))
+	if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_DRIVES))
 	{
 		m_pActiveArrangeMenuItems = &m_ArrangeMenuMyComputer;
 	}
-	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_CONTROLS))
+	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_CONTROLS))
 	{
 		m_pActiveArrangeMenuItems = &m_ArrangeMenuControlPanel;
 	}
-	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_BITBUCKET))
+	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_BITBUCKET))
 	{
 		m_pActiveArrangeMenuItems = &m_ArrangeMenuRecycleBin;
 	}

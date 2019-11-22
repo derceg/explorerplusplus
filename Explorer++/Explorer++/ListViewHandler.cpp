@@ -734,7 +734,6 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 	LVITEM			*pItem = NULL;
 	TCHAR			NewFileName[MAX_PATH + 1];
 	TCHAR			OldFileName[MAX_PATH + 1];
-	TCHAR			CurrentDirectory[MAX_PATH];
 	TCHAR			OldName[MAX_PATH];
 	TCHAR			szTemp[128];
 	TCHAR			szError[256];
@@ -799,9 +798,9 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		return 0;
 	}
 
-	m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(CurrentDirectory), CurrentDirectory);
-	StringCchCopy(NewFileName,SIZEOF_ARRAY(NewFileName),CurrentDirectory);
-	StringCchCopy(OldFileName,SIZEOF_ARRAY(OldFileName),CurrentDirectory);
+	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
+	StringCchCopy(NewFileName, SIZEOF_ARRAY(NewFileName), currentDirectory.c_str());
+	StringCchCopy(OldFileName, SIZEOF_ARRAY(OldFileName), currentDirectory.c_str());
 
 	m_pActiveShellBrowser->GetItemDisplayName(pItem->iItem,SIZEOF_ARRAY(OldName),OldName);
 	PathAppend(OldFileName,OldName);
@@ -1091,32 +1090,32 @@ int Explorerplusplus::GetColumnHeaderMenuList(unsigned int **pHeaderList)
 {
 	int nItems;
 
-	if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_DRIVES))
+	if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_DRIVES))
 	{
 		*pHeaderList = g_MyComputerHeaderList;
 		nItems = sizeof(g_MyComputerHeaderList) / sizeof(g_MyComputerHeaderList[0]);
 	}
-	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_CONTROLS))
+	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_CONTROLS))
 	{
 		*pHeaderList = g_ControlPanelHeaderList;
 		nItems = sizeof(g_ControlPanelHeaderList) / sizeof(g_ControlPanelHeaderList[0]);
 	}
-	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_BITBUCKET))
+	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_BITBUCKET))
 	{
 		*pHeaderList = g_RecycleBinHeaderList;
 		nItems = sizeof(g_RecycleBinHeaderList) / sizeof(g_RecycleBinHeaderList[0]);
 	}
-	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_CONNECTIONS))
+	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_CONNECTIONS))
 	{
 		*pHeaderList = g_NetworkConnectionsHeaderList;
 		nItems = sizeof(g_NetworkConnectionsHeaderList) / sizeof(g_NetworkConnectionsHeaderList[0]);
 	}
-	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_NETWORK))
+	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_NETWORK))
 	{
 		*pHeaderList = g_NetworkHeaderList;
 		nItems = sizeof(g_NetworkHeaderList) / sizeof(g_NetworkHeaderList[0]);
 	}
-	else if(CompareVirtualFolders(m_CurrentDirectory, CSIDL_PRINTERS))
+	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_PRINTERS))
 	{
 		*pHeaderList = g_PrintersHeaderList;
 		nItems = sizeof(g_PrintersHeaderList) / sizeof(g_PrintersHeaderList[0]);
@@ -1594,7 +1593,7 @@ void Explorerplusplus::OnListViewPaste(void)
 		will cause the destination directory to change in the
 		middle of the copy operation. */
 		StringCchCopy(szDestination,SIZEOF_ARRAY(szDestination),
-			m_CurrentDirectory);
+			m_CurrentDirectory.c_str());
 
 		/* Also, the string must be double NULL terminated. */
 		szDestination[lstrlen(szDestination) + 1] = '\0';

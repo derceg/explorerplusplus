@@ -377,10 +377,9 @@ void CBookmarksToolbar::OnBookmarkMenuItemClicked(const CBookmark &bookmark)
 
 void CBookmarksToolbar::OnNewBookmark()
 {
-	TCHAR currentDirectory[MAX_PATH];
 	TCHAR displayName[MAX_PATH];
-	m_pexpp->GetActiveShellBrowser()->GetDirectory(SIZEOF_ARRAY(currentDirectory), currentDirectory);
-	GetDisplayName(currentDirectory, displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
+	std::wstring currentDirectory = m_pexpp->GetActiveShellBrowser()->GetDirectory();
+	GetDisplayName(currentDirectory.c_str(), displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
 	CBookmark Bookmark = CBookmark::Create(displayName, currentDirectory, EMPTY_STRING);
 
 	CAddBookmarkDialog AddBookmarkDialog(m_instance, IDD_ADD_BOOKMARK, m_hToolbar, m_pexpp, m_AllBookmarks, Bookmark);

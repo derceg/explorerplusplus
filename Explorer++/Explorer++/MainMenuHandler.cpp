@@ -45,8 +45,7 @@ void Explorerplusplus::OnFilterResults()
 
 void Explorerplusplus::OnMergeFiles()
 {
-	TCHAR szCurrentDirectory[MAX_PATH];
-	m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
+	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
 
 	std::list<std::wstring>	FullFilenameList;
 	int iItem = -1;
@@ -59,7 +58,7 @@ void Explorerplusplus::OnMergeFiles()
 	}
 
 	CMergeFilesDialog CMergeFilesDialog(m_hLanguageModule, IDD_MERGEFILES, m_hContainer,
-		this, szCurrentDirectory, FullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
+		this, currentDirectory, FullFilenameList, m_config->globalFolderSettings.showFriendlyDates);
 	CMergeFilesDialog.ShowModalDialog();
 }
 
@@ -104,10 +103,10 @@ void Explorerplusplus::OnSearch()
 {
 	if(g_hwndSearch == NULL)
 	{
-		TCHAR szCurrentDirectory[MAX_PATH];
-		m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
+		std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
 
-		CSearchDialog *SearchDialog = new CSearchDialog(m_hLanguageModule, IDD_SEARCH, m_hContainer, szCurrentDirectory, this, m_tabContainer);
+		CSearchDialog *SearchDialog = new CSearchDialog(m_hLanguageModule, IDD_SEARCH, m_hContainer,
+			currentDirectory, this, m_tabContainer);
 		g_hwndSearch = SearchDialog->ShowModelessDialog(new CModelessDialogNotification());
 	}
 	else
@@ -200,7 +199,7 @@ void Explorerplusplus::OnSaveDirectoryListing() const
 	TCHAR FileName[MAX_PATH];
 	LoadString(m_hLanguageModule, IDS_GENERAL_DIRECTORY_LISTING_FILENAME, FileName, SIZEOF_ARRAY(FileName));
 	StringCchCat(FileName, SIZEOF_ARRAY(FileName), _T(".txt"));
-	BOOL bSaveNameRetrieved = GetFileNameFromUser(m_hContainer, FileName, SIZEOF_ARRAY(FileName), m_CurrentDirectory);
+	BOOL bSaveNameRetrieved = GetFileNameFromUser(m_hContainer, FileName, SIZEOF_ARRAY(FileName), m_CurrentDirectory.c_str());
 
 	if(bSaveNameRetrieved)
 	{

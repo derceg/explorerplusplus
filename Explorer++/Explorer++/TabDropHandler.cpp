@@ -195,10 +195,8 @@ DWORD CTabDropHandler::DetermineCurrentDragEffect(int iTab,DWORD grfKeyState,DWO
 
 		if(tab.GetShellBrowser()->CanCreate())
 		{
-			TCHAR szDestDirectory[MAX_PATH];
-			tab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szDestDirectory),szDestDirectory);
-
-			BOOL bOnSameDrive = PathIsSameRoot(szDestDirectory,m_RepresentativeDrive.c_str());
+			std::wstring destDirectory = tab.GetShellBrowser()->GetDirectory();
+			BOOL bOnSameDrive = PathIsSameRoot(destDirectory.c_str(),m_RepresentativeDrive.c_str());
 			DropEffect = ::DetermineDragEffect(grfKeyState,CurrentDropEffect,m_AcceptData,bOnSameDrive);
 		}
 	}
@@ -262,13 +260,11 @@ HRESULT __stdcall CTabDropHandler::Drop(IDataObject *pDataObject,DWORD grfKeySta
 	{
 		const Tab &tab = m_tabContainer->GetTabByIndex(iTab);
 
-		TCHAR szDestDirectory[MAX_PATH];
-		tab.GetShellBrowser()->GetDirectory(
-			SIZEOF_ARRAY(szDestDirectory),szDestDirectory);
+		std::wstring destDirectory = tab.GetShellBrowser()->GetDirectory();
 
 		CDropHandler *pDropHandler = CDropHandler::CreateNew();
-		pDropHandler->Drop(pDataObject,grfKeyState,pt,pdwEffect,m_hTabCtrl,
-			m_DragType,szDestDirectory,NULL,FALSE);
+		pDropHandler->Drop(pDataObject, grfKeyState, pt, pdwEffect, m_hTabCtrl,
+			m_DragType, destDirectory.data(), NULL, FALSE);
 		pDropHandler->Release();
 	}
 
