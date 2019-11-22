@@ -513,7 +513,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
 	LPITEMIDLIST	pidlFull = NULL;
-	LPITEMIDLIST	pidlRelative = NULL;
+	PCITEMID_CHILD	pidlRelative = NULL;
 	SHFILEINFO		shfi;
 	LVFINDINFO		lvfi;
 	TCHAR			szDisplayName[MAX_PATH];
@@ -533,7 +533,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 
 	if(SUCCEEDED(hr))
 	{
-		hr = SHBindToParent(pidlFull, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *) &pidlRelative);
+		hr = SHBindToParent(pidlFull, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 		if(SUCCEEDED(hr))
 		{

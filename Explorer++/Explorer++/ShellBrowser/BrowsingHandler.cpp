@@ -32,11 +32,11 @@ HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath,UINT wFlags)
 	return hr;
 }
 
-HRESULT CShellBrowser::BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags)
+HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags)
 {
 	SetCursor(LoadCursor(NULL,IDC_WAIT));
 
-	LPITEMIDLIST pidl = ILClone(pidlDirectory);
+	PIDLIST_ABSOLUTE pidl = ILCloneFull(pidlDirectory);
 
 	if(m_bFolderVisited)
 	{
@@ -403,14 +403,12 @@ BOOL *bStoreHistory)
 {
 	if((uFlags & SBSP_RELATIVE) == SBSP_RELATIVE)
 	{
-		LPITEMIDLIST	pidlComplete;
-
 		if(pidlDirectory == NULL)
 			return E_INVALIDARG;
 
 		/* This is a relative path. Add it on to the end of the current directory
 		name to get a fully qualified path. */
-		pidlComplete = ILCombine(m_pidlDirectory,*pidlDirectory);
+		PIDLIST_ABSOLUTE pidlComplete = ILCombine(m_pidlDirectory,*pidlDirectory);
 
 		*pidlDirectory = ILClone(pidlComplete);
 
@@ -470,11 +468,11 @@ BOOL *bStoreHistory)
 	return S_OK;
 }
 
-void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
+void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	IShellFolder	*pShellFolder = NULL;
 	IEnumIDList		*pEnumIDList = NULL;
-	LPITEMIDLIST	rgelt = NULL;
+	PITEMID_CHILD	rgelt = NULL;
 	STRRET			str;
 	SHCONTF			EnumFlags;
 	TCHAR			szFileName[MAX_PATH];
@@ -487,7 +485,7 @@ void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 
 	if(SUCCEEDED(hr))
 	{
-		m_pidlDirectory = ILClone(pidlDirectory);
+		m_pidlDirectory = ILCloneFull(pidlDirectory);
 
 		EnumFlags = SHCONTF_FOLDERS|SHCONTF_NONFOLDERS;
 
@@ -503,7 +501,7 @@ void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 			{
 				ULONG uAttributes = SFGAO_FOLDER;
 
-				pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&rgelt,&uAttributes);
+				pShellFolder->GetAttributesOf(1,const_cast<PCITEMID_CHILD *>(&rgelt),&uAttributes);
 
 				/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
 				a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
@@ -534,8 +532,8 @@ void CShellBrowser::BrowseVirtualFolder(LPITEMIDLIST pidlDirectory)
 	}
 }
 
-HRESULT CShellBrowser::AddItemInternal(LPITEMIDLIST pidlDirectory,
-LPITEMIDLIST pidlRelative,const TCHAR *szFileName,int iItemIndex,BOOL bPosition)
+HRESULT CShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
+	LPITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
 {
 	int uItemId;
 
@@ -562,8 +560,8 @@ HRESULT CShellBrowser::AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition
 	return S_OK;
 }
 
-int CShellBrowser::SetItemInformation(LPITEMIDLIST pidlDirectory,
-LPITEMIDLIST pidlRelative,const TCHAR *szFileName)
+int CShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
+	PCIDLIST_RELATIVE pidlRelative, const TCHAR *szFileName)
 {
 	PIDLIST_ABSOLUTE	pidlItem = NULL;
 	HANDLE			hFirstFile;

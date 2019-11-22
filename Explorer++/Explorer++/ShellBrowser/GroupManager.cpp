@@ -504,7 +504,7 @@ void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroup
 {
 	IShellFolder *pShellFolder	= NULL;
 	LPITEMIDLIST pidlDirectory	= NULL;
-	LPITEMIDLIST pidlRelative	= NULL;
+	PCITEMID_CHILD pidlRelative	= NULL;
 	TCHAR *SizeGroups[] = {_T("Unspecified"),_T("Small"),_T("Medium"),_T("Huge"),_T("Gigantic")};
 	TCHAR szItem[MAX_PATH];
 	STRRET str;
@@ -525,7 +525,7 @@ void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroup
 
 	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
 
-	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *) &pidlRelative);
+	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
 	StrRetToBuf(&str,pidlRelative,szItem,SIZEOF_ARRAY(szItem));
@@ -855,7 +855,7 @@ void CShellBrowser::DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroup
 void CShellBrowser::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	IShellFolder *pShellFolder	= NULL;
-	LPITEMIDLIST pidlRelative	= NULL;
+	PCITEMID_CHILD pidlRelative	= NULL;
 	TCHAR szFileSystemName[MAX_PATH];
 	TCHAR szItem[MAX_PATH];
 	STRRET str;
@@ -863,7 +863,7 @@ void CShellBrowser::DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGrou
 	BOOL bRes;
 
 	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),
-		IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
+		IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
 	StrRetToBuf(&str,pidlRelative,szItem,SIZEOF_ARRAY(szItem));

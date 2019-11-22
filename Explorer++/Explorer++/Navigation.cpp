@@ -119,7 +119,7 @@ HRESULT Navigation::BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags)
 	return hr;
 }
 
-HRESULT Navigation::BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags)
+HRESULT Navigation::BrowseFolderInCurrentTab(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags)
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
 	return BrowseFolder(tab, pidlDirectory, wFlags);
@@ -129,7 +129,7 @@ HRESULT Navigation::BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT w
 pass through this function. This ensures that tabs that
 have their addresses locked will not change directory (a
 new tab will be created instead). */
-HRESULT Navigation::BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags)
+HRESULT Navigation::BrowseFolder(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags)
 {
 	HRESULT hr = E_FAIL;
 	int resultingTabId = -1;
@@ -159,7 +159,7 @@ HRESULT Navigation::BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFl
 	return hr;
 }
 
-void Navigation::OpenDirectoryInNewWindow(LPCITEMIDLIST pidlDirectory)
+void Navigation::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	TCHAR szPath[MAX_PATH];
 	TCHAR szParameters[512];

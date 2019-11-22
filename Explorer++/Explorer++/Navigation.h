@@ -23,11 +23,11 @@ public:
 
 	HRESULT BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags);
 	HRESULT BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags);
-	HRESULT BrowseFolderInCurrentTab(LPCITEMIDLIST pidlDirectory, UINT wFlags);
-	HRESULT BrowseFolder(Tab &tab, LPCITEMIDLIST pidlDirectory, UINT wFlags);
+	HRESULT BrowseFolderInCurrentTab(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags);
+	HRESULT BrowseFolder(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags);
 	void PlayNavigationSound() const;
 
-	void OpenDirectoryInNewWindow(LPCITEMIDLIST pidlDirectory);
+	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
 
 	SignalWrapper<Navigation, void(const Tab &tab)> navigationCompletedSignal;
 

@@ -148,15 +148,13 @@ HRESULT GetItemAttributes(PCIDLIST_ABSOLUTE pidl,SFGAOF *pItemAttributes)
 		return E_FAIL;
 	}
 
-	IShellFolder	*pShellFolder = NULL;
-	PCUITEMID_CHILD	pidlRelative = NULL;
-	HRESULT			hr;
-
-	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
+	IShellFolder *pShellFolder = NULL;
+	PCUITEMID_CHILD pidlRelative = NULL;
+	HRESULT hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&pidlRelative,pItemAttributes);
+		hr = pShellFolder->GetAttributesOf(1,&pidlRelative,pItemAttributes);
 
 		pShellFolder->Release();
 	}
@@ -255,16 +253,16 @@ BOOL CheckIdl(LPCITEMIDLIST pidl)
 	return TRUE;
 }
 
-BOOL IsIdlDirectory(LPCITEMIDLIST pidl)
+BOOL IsIdlDirectory(PCIDLIST_ABSOLUTE pidl)
 {
-	SFGAOF Attributes;
+	SFGAOF attributes = SFGAO_FOLDER;
 
-	Attributes = SFGAO_FOLDER;
+	GetItemAttributes(pidl, &attributes);
 
-	GetItemAttributes(pidl,&Attributes);
-
-	if(Attributes & SFGAO_FOLDER)
+	if (attributes & SFGAO_FOLDER)
+	{
 		return TRUE;
+	}
 
 	return FALSE;
 }
@@ -853,7 +851,7 @@ HRESULT ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t
 // Returns either the parsing path for the specified item, or its in
 // folder name. The in folder name will be returned when the parsing
 // path is a GUID (which typically shouldn't be displayed to the user).
-boost::optional<std::wstring> GetFolderPathForDisplay(LPCITEMIDLIST pidl)
+boost::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl)
 {
 	TCHAR parsingPath[MAX_PATH];
 	HRESULT hr = GetDisplayName(pidl, parsingPath, SIZEOF_ARRAY(parsingPath), SHGDN_FORPARSING);
@@ -1311,11 +1309,11 @@ HRESULT GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax)
 	return hr;
 }
 
-HRESULT GetItemInfoTip(LPCITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchMax)
+HRESULT GetItemInfoTip(PCIDLIST_ABSOLUTE pidlComplete, TCHAR *szInfoTip, size_t cchMax)
 {
 	IShellFolder	*pShellFolder = NULL;
 	IQueryInfo		*pQueryInfo = NULL;
-	LPCITEMIDLIST	pidlRelative = NULL;
+	PCITEMID_CHILD	pidlRelative = NULL;
 	LPWSTR			ppwszTip = NULL;
 	HRESULT			hr;
 
@@ -1344,19 +1342,19 @@ HRESULT GetItemInfoTip(LPCITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchM
 	return hr;
 }
 
-HRESULT ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory, LPCITEMIDLIST *ppidl,
+HRESULT ShowMultipleFileProperties(PCIDLIST_ABSOLUTE pidlDirectory, LPCITEMIDLIST *ppidl,
 	HWND hwndOwner, int nFiles)
 {
 	return ExecuteActionFromContextMenu(pidlDirectory, ppidl, hwndOwner, nFiles, _T("properties"), 0);
 }
 
 HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
-	LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask)
+	PCITEMID_CHILD *ppidl, HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask)
 {
 	IShellFolder		*pShellParentFolder = NULL;
 	IShellFolder		*pShellFolder = NULL;
 	IContextMenu		*pContext = NULL;
-	LPITEMIDLIST		pidlRelative = NULL;
+	PCITEMID_CHILD		pidlRelative = NULL;
 	CMINVOKECOMMANDINFO	cmici;
 	HRESULT				hr = S_FALSE;
 	char				szActionA[32];
@@ -1364,12 +1362,12 @@ HRESULT ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory,
 	if(nFiles == 0)
 	{
 		hr = SHBindToParent(pidlDirectory, IID_PPV_ARGS(&pShellParentFolder),
-			(LPCITEMIDLIST *) &pidlRelative);
+			&pidlRelative);
 
 		if(SUCCEEDED(hr))
 		{
 			hr = GetUIObjectOf(pShellParentFolder, hwndOwner, 1,
-				(LPCITEMIDLIST *) &pidlRelative, IID_PPV_ARGS(&pContext));
+				&pidlRelative, IID_PPV_ARGS(&pContext));
 
 			pShellParentFolder->Release();
 			pShellParentFolder = NULL;

@@ -19,7 +19,7 @@ public:
 	};
 
 	typedef std::list<RenamedItem_t> RenamedItems_t;
-	typedef std::vector<LPCITEMIDLIST> DeletedItems_t;
+	typedef std::vector<PCIDLIST_ABSOLUTE> DeletedItems_t;
 
 	CFileActionHandler();
 	~CFileActionHandler();

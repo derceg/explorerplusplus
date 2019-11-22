@@ -480,7 +480,7 @@ void CSplitFileDialog::OnChangeOutputDirectory()
 	LoadString(GetInstance(),IDS_SPLITFILEDIALOG_DIRECTORYTITLE,
 		szTitle,SIZEOF_ARRAY(szTitle));
 
-	LPITEMIDLIST pidl;
+	PIDLIST_ABSOLUTE pidl;
 	BOOL bSucceeded = NFileOperations::CreateBrowseDialog(m_hDlg,szTitle,&pidl);
 
 	if (!bSucceeded)

@@ -16,10 +16,10 @@ namespace NFileOperations
 	};
 
 	HRESULT	RenameFile(IShellItem *item, const std::wstring &newName);
-	HRESULT	DeleteFiles(HWND hwnd, std::vector<LPCITEMIDLIST> &pidls, bool permanent, bool silent);
+	HRESULT	DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool permanent, bool silent);
 	void	DeleteFileSecurely(const std::wstring &strFilename,OverwriteMethod_t uOverwriteMethod);
-	HRESULT	CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle, std::vector<LPCITEMIDLIST> &pidls, bool move);
-	HRESULT	CopyFiles(HWND hwnd, IShellItem *destinationFolder, std::vector<LPCITEMIDLIST> &pidls, bool move);
+	HRESULT	CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move);
+	HRESULT	CopyFiles(HWND hwnd, IShellItem *destinationFolder, std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move);
 
 	HRESULT	CreateNewFolder(IShellItem *destinationFolder, const std::wstring &newFolderName, IFileOperationProgressSink *progressSink);
 

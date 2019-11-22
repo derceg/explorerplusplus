@@ -22,12 +22,12 @@ CPathManager::CPathManager()
 	m_iCurrent = 0;
 
 	m_nAllocated = DEFAULT_ALLOCATION;
-	ppidlList = (LPITEMIDLIST *)malloc(m_nAllocated * sizeof(LPITEMIDLIST));
+	ppidlList = (PIDLIST_ABSOLUTE *)malloc(m_nAllocated * sizeof(PIDLIST_ABSOLUTE));
 
 	m_nTotal = 0;
 }
 
-void CPathManager::StoreIdl(LPITEMIDLIST pidl)
+void CPathManager::StoreIdl(PCIDLIST_ABSOLUTE pidl)
 {
 	/* Check if the number of idl's stored has reached the number of
 	spaces allocated. If so, allocate a new block. */
@@ -35,11 +35,11 @@ void CPathManager::StoreIdl(LPITEMIDLIST pidl)
 	{
 		m_nAllocated += DEFAULT_ALLOCATION;
 
-		ppidlList = (LPITEMIDLIST *)realloc(ppidlList,
-		m_nAllocated * sizeof(LPITEMIDLIST));
+		ppidlList = (PIDLIST_ABSOLUTE *)realloc(ppidlList,
+		m_nAllocated * sizeof(PIDLIST_ABSOLUTE));
 	}
 
-	ppidlList[m_iCurrent++] = ILClone(pidl);
+	ppidlList[m_iCurrent++] = ILCloneFull(pidl);
 
 	/* "Erases" idl's forward of the current one. */
 	m_nTotal = m_iCurrent;
@@ -122,31 +122,31 @@ int CPathManager::GetNumForwardPathsStored(void) const
 	return m_nTotal - m_iCurrent;
 }
 
-std::list<LPITEMIDLIST> CPathManager::GetBackHistory() const
+std::list<PIDLIST_ABSOLUTE> CPathManager::GetBackHistory() const
 {
-	std::list<LPITEMIDLIST> history;
+	std::list<PIDLIST_ABSOLUTE> history;
 
 	int iStartIndex = m_iCurrent > 10 ? m_iCurrent - 10 : 0;
 	int iEndIndex = m_iCurrent - 1;
 
 	for(int i = iEndIndex - 1;i >= iStartIndex;i--)
 	{
-		history.push_back(ILClone(ppidlList[i]));
+		history.push_back(ILCloneFull(ppidlList[i]));
 	}
 
 	return history;
 }
 
-std::list<LPITEMIDLIST> CPathManager::GetForwardHistory() const
+std::list<PIDLIST_ABSOLUTE> CPathManager::GetForwardHistory() const
 {
-	std::list<LPITEMIDLIST> history;
+	std::list<PIDLIST_ABSOLUTE> history;
 
 	int iStartIndex = m_iCurrent;
 	int iEndIndex = (m_nTotal - m_iCurrent) > 10 ? m_iCurrent + 10 : m_nTotal;
 
 	for(int i = iStartIndex;i < iEndIndex;i++)
 	{
-		history.push_back(ILClone(ppidlList[i]));
+		history.push_back(ILCloneFull(ppidlList[i]));
 	}
 
 	return history;

@@ -609,12 +609,12 @@ int CALLBACK CSearchDialog::SortResultsByPath(LPARAM lParam1,LPARAM lParam2)
 	return StrCmpLogicalW(szPath1,szPath2);
 }
 
-void CSearchDialog::AddMenuEntries(LPCITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
+void CSearchDialog::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+	const std::list<PIDLIST_RELATIVE> &pidlItemList, DWORD_PTR dwData, HMENU hMenu)
 {
 	UNREFERENCED_PARAMETER(dwData);
 
-	LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
+	PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItemList.front());
 	SFGAOF ItemAttributes = SFGAO_FOLDER;
 	GetItemAttributes(pidlComplete,&ItemAttributes);
 	CoTaskMemFree(pidlComplete);
@@ -640,8 +640,8 @@ void CSearchDialog::AddMenuEntries(LPCITEMIDLIST pidlParent,
 	InsertMenuItem(hMenu,1,TRUE,&mii);
 }
 
-BOOL CSearchDialog::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
+BOOL CSearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::list<PIDLIST_RELATIVE> &pidlItemList, DWORD_PTR dwData, const TCHAR *szCmd)
 {
 	UNREFERENCED_PARAMETER(dwData);
 
@@ -649,8 +649,8 @@ BOOL CSearchDialog::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
 	{
 		for(auto pidlItem : pidlItemList)
 		{
-			LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItem);
-			m_pexpp->OpenItem(pidlComplete,FALSE,FALSE);
+			PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItem);
+			m_pexpp->OpenItem(pidlComplete, FALSE, FALSE);
 			CoTaskMemFree(pidlComplete);
 		}
 
@@ -660,8 +660,8 @@ BOOL CSearchDialog::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
 	return FALSE;
 }
 
-void CSearchDialog::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,int iCmd)
+void CSearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::list<PIDLIST_RELATIVE> &pidlItemList, int iCmd)
 {
 	switch(iCmd)
 	{
@@ -670,8 +670,8 @@ void CSearchDialog::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
 			m_tabContainer->CreateNewTab(pidlParent, TabSettings(_selected = true));
 
 			TCHAR szFilename[MAX_PATH];
-			LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
-			GetDisplayName(pidlComplete,szFilename,SIZEOF_ARRAY(szFilename),SHGDN_INFOLDER|SHGDN_FORPARSING);
+			PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItemList.front());
+			GetDisplayName(pidlComplete, szFilename, SIZEOF_ARRAY(szFilename), SHGDN_INFOLDER | SHGDN_FORPARSING);
 			CoTaskMemFree(pidlComplete);
 
 			m_pexpp->GetActiveShellBrowser()->SelectFiles(szFilename);

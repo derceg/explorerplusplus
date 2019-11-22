@@ -22,9 +22,9 @@ public:
 		HINSTANCE hInstance, IExplorerplusplus *pexpp, Navigation *navigation);
 
 	/* IFileContextMenuExternal methods. */
-	void	AddMenuEntries(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
-	BOOL	HandleShellMenuItem(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd);
-	void	HandleCustomMenuItem(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,int iCmd);
+	void	AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,const std::list<PIDLIST_RELATIVE> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
+	BOOL	HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,const std::list<PIDLIST_RELATIVE> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd);
+	void	HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,const std::list<PIDLIST_RELATIVE> &pidlItemList,int iCmd);
 
 protected:
 

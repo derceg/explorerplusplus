@@ -425,7 +425,7 @@ void CMergeFilesDialog::OnChangeOutputDirectory()
 	LoadString(GetInstance(),IDS_MERGE_SELECTDESTINATION,
 		szTitle,SIZEOF_ARRAY(szTitle));
 
-	LPITEMIDLIST pidl;
+	PIDLIST_ABSOLUTE pidl;
 	BOOL bSucceeded = NFileOperations::CreateBrowseDialog(m_hDlg,szTitle,&pidl);
 
 	if (!bSucceeded)

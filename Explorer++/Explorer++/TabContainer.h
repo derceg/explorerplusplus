@@ -128,7 +128,7 @@ private:
 	void SetTabIcon(const Tab &tab);
 
 	SortMode GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const;
-	void InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName);
+	void InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, boost::optional<std::wstring> customName);
 
 	void RemoveTabFromControl(const Tab &tab);
 

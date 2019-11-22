@@ -462,7 +462,7 @@ void CContextMenuManager::InvokeMenuEntry(HWND hwnd,UINT uCmd)
 	}
 }
 
-CContextMenuManager::ItemType_t CContextMenuManager::GetItemType(LPCITEMIDLIST pidl)
+CContextMenuManager::ItemType_t CContextMenuManager::GetItemType(PCIDLIST_ABSOLUTE pidl)
 {
 	SFGAOF Attributes = SFGAO_FOLDER|SFGAO_FILESYSTEM;
 	GetItemAttributes(pidl,&Attributes);

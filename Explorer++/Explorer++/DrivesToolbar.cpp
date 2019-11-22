@@ -377,8 +377,8 @@ std::wstring CDrivesToolbar::GetDrivePath(int iIndex)
 	return itr->second;
 }
 
-void CDrivesToolbar::AddMenuEntries(LPCITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
+void CDrivesToolbar::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+	const std::list<PIDLIST_RELATIVE> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
 {
 	UNREFERENCED_PARAMETER(pidlParent);
 	UNREFERENCED_PARAMETER(pidlItemList);
@@ -395,8 +395,8 @@ void CDrivesToolbar::AddMenuEntries(LPCITEMIDLIST pidlParent,
 	InsertMenuItem(hMenu,1,TRUE,&mii);
 }
 
-BOOL CDrivesToolbar::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
+BOOL CDrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::list<PIDLIST_RELATIVE> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
 {
 	UNREFERENCED_PARAMETER(pidlItemList);
 	UNREFERENCED_PARAMETER(dwData);
@@ -410,8 +410,8 @@ BOOL CDrivesToolbar::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
 	return FALSE;
 }
 
-void CDrivesToolbar::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,int iCmd)
+void CDrivesToolbar::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::list<PIDLIST_RELATIVE> &pidlItemList,int iCmd)
 {
 	UNREFERENCED_PARAMETER(pidlItemList);
 

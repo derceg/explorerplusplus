@@ -56,7 +56,7 @@ private:
 	/* Default settings dialog. */
 	void OnDefaultSettingsNewTabDir(HWND hDlg);
 	void DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath);
-	void DefaultSettingsSetNewTabDir(HWND hEdit, LPITEMIDLIST pidl);
+	void DefaultSettingsSetNewTabDir(HWND hEdit, PCIDLIST_ABSOLUTE pidl);
 
 	/* Files and folders dialog. */
 	void SetInfoTipWindowStates(HWND hDlg);

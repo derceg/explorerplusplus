@@ -522,12 +522,12 @@ BOOL CShellBrowser::CanBrowseForward(void) const
 	return TRUE;
 }
 
-std::list<LPITEMIDLIST> CShellBrowser::GetBackHistory() const
+std::list<PIDLIST_ABSOLUTE> CShellBrowser::GetBackHistory() const
 {
 	return m_pathManager.GetBackHistory();
 }
 
-std::list<LPITEMIDLIST> CShellBrowser::GetForwardHistory() const
+std::list<PIDLIST_ABSOLUTE> CShellBrowser::GetForwardHistory() const
 {
 	return m_pathManager.GetForwardHistory();
 }
@@ -683,7 +683,7 @@ void CShellBrowser::DragStopped(void)
 	m_bDragging = FALSE;
 }
 
-LPITEMIDLIST CShellBrowser::GetItemCompleteIdl(int iItem) const
+PIDLIST_ABSOLUTE CShellBrowser::GetItemCompleteIdl(int iItem) const
 {
 	LVITEM lvItem;
 	lvItem.mask = LVIF_PARAM;
@@ -696,12 +696,12 @@ LPITEMIDLIST CShellBrowser::GetItemCompleteIdl(int iItem) const
 		return nullptr;
 	}
 
-	LPITEMIDLIST pidlComplete = ILCombine(m_pidlDirectory, m_itemInfoMap.at((int)lvItem.lParam).pridl.get());
+	PIDLIST_ABSOLUTE pidlComplete = ILCombine(m_pidlDirectory, m_itemInfoMap.at((int)lvItem.lParam).pridl.get());
 
 	return pidlComplete;
 }
 
-LPITEMIDLIST CShellBrowser::GetItemRelativeIdl(int iItem) const
+PIDLIST_RELATIVE CShellBrowser::GetItemRelativeIdl(int iItem) const
 {
 	LVITEM lvItem;
 	BOOL bRet;
@@ -727,7 +727,7 @@ part of the filesystem, or if it is the root of
 the namespace (i.e. the desktop). */
 BOOL CShellBrowser::CanCreate(void) const
 {
-	LPITEMIDLIST	pidl = NULL;
+	PIDLIST_ABSOLUTE	pidl = NULL;
 	HRESULT			hr;
 	BOOL			bCanCreate = FALSE;
 
@@ -1069,7 +1069,7 @@ void CShellBrowser::GetFolderInfo(FolderInfo_t *pFolderInfo)
 	pFolderInfo->TotalSelectionSize.QuadPart	= m_ulFileSelectionSize.QuadPart;
 }
 
-void CShellBrowser::DetermineFolderVirtual(LPITEMIDLIST pidlDirectory)
+void CShellBrowser::DetermineFolderVirtual(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	TCHAR szParsingPath[MAX_PATH];
 
@@ -1446,7 +1446,7 @@ This method is used when a file is created
 using the shell new menu, and the item
 may or may not have been inserted into
 the listview yet. */
-void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
+void CShellBrowser::QueueRename(PCIDLIST_ABSOLUTE pidlItem)
 {
 	/* Items are inserted within the context
 	of this thread. Therefore, either pending
@@ -1488,7 +1488,7 @@ void CShellBrowser::QueueRename(LPCITEMIDLIST pidlItem)
 	if(!bItemFound)
 	{
 		m_bNewItemCreated = TRUE;
-		m_pidlNewItem = ILClone(pidlItem);
+		m_pidlNewItem = ILCloneFull(pidlItem);
 	}
 }
 

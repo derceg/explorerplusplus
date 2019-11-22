@@ -50,7 +50,7 @@ HRESULT			GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cc
 HRESULT			GetDisplayName(PCIDLIST_ABSOLUTE pidl,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags);
 HRESULT			GetCsidlDisplayName(int csidl, TCHAR *szFolderName, UINT cchMax, DWORD uParsingFlags);
 BOOL			CheckIdl(LPCITEMIDLIST pidl);
-BOOL			IsIdlDirectory(LPCITEMIDLIST pidl);
+BOOL			IsIdlDirectory(PCIDLIST_ABSOLUTE pidl);
 HRESULT			GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent);
 BOOL			IsNamespaceRoot(LPCITEMIDLIST pidl);
 BOOL			MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize);
@@ -63,7 +63,7 @@ HRESULT			ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchM
 HRESULT			ConvertVariantStringArrayToString(SAFEARRAY *array, TCHAR *szDetail, size_t cchMax);
 HRESULT			ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax);
 HRESULT			ConvertDateVariantToString(DATE date, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
-boost::optional<std::wstring>	GetFolderPathForDisplay(LPCITEMIDLIST pidl);
+boost::optional<std::wstring>	GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl);
 BOOL			IsPathGUID(const TCHAR *szPath);
 BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
 HRESULT			AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList);
@@ -75,8 +75,8 @@ BOOL			ExecuteFileAction(HWND hwnd, const TCHAR *szVerb, const TCHAR *szParamete
 BOOL			ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters);
 BOOL			ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters);
 HRESULT			DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT cchMax);
-HRESULT			ShowMultipleFileProperties(LPITEMIDLIST pidlDirectory, LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles);
-HRESULT			ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory, LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask);
+HRESULT			ShowMultipleFileProperties(PCIDLIST_ABSOLUTE pidlDirectory, LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles);
+HRESULT			ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD *ppidl, HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask);
 BOOL			CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 bool			IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl);
 
@@ -90,4 +90,4 @@ int				GetDefaultIcon(DefaultIconType defaultIconType);
 
 /* Infotips. */
 HRESULT			GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax);
-HRESULT			GetItemInfoTip(LPCITEMIDLIST pidlComplete, TCHAR *szInfoTip, size_t cchMax);
+HRESULT			GetItemInfoTip(PCIDLIST_ABSOLUTE pidlComplete, TCHAR *szInfoTip, size_t cchMax);

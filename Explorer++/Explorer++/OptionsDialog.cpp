@@ -1164,7 +1164,7 @@ void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath)
 	}
 }
 
-void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit,LPITEMIDLIST pidl)
+void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, PCIDLIST_ABSOLUTE pidl)
 {
 	SFGAOF			Attributes;
 	DWORD			uNameFlags;

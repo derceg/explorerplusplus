@@ -405,15 +405,15 @@ private:
 	void					OpenAllSelectedItems(BOOL bOpenInNewTab);
 	void					OpenListViewItem(int iItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
-	void					OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
-	void					OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
+	void					OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
+	void					OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
 	void					OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
 	HRESULT					OnListViewCopy(BOOL bCopy);
 
 	/* File context menu. */
-	void					AddMenuEntries(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu);
-	BOOL					HandleShellMenuItem(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd);
-	void					HandleCustomMenuItem(LPCITEMIDLIST pidlParent,const std::list<LPITEMIDLIST> &pidlItemList,int iCmd);
+	void					AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::list<PIDLIST_RELATIVE> &pidlItemList, DWORD_PTR dwData, HMENU hMenu);
+	BOOL					HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::list<PIDLIST_RELATIVE> &pidlItemList, DWORD_PTR dwData, const TCHAR *szCmd);
+	void					HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::list<PIDLIST_RELATIVE> &pidlItemList, int iCmd);
 
 	/* Listview selection file tests. */
 	void					BuildListViewFileSelectionList(HWND hListView,std::list<std::wstring> *pFileSelectionList);

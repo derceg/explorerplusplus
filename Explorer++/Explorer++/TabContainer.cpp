@@ -433,7 +433,7 @@ void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 
 void TabContainer::OnOpenParentInNewTab(const Tab &tab)
 {
-	LPITEMIDLIST pidlCurrent = tab.GetShellBrowser()->GetDirectoryIdl();
+	PIDLIST_ABSOLUTE pidlCurrent = tab.GetShellBrowser()->GetDirectoryIdl();
 
 	LPITEMIDLIST pidlParent = NULL;
 	HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
@@ -931,7 +931,7 @@ SortMode TabContainer::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
 	return sortMode;
 }
 
-void TabContainer::InsertNewTab(int index, int tabId, LPCITEMIDLIST pidlDirectory, boost::optional<std::wstring> customName)
+void TabContainer::InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, boost::optional<std::wstring> customName)
 {
 	std::wstring name;
 

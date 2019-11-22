@@ -33,7 +33,7 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(void)
 	DisplayWindow_SetThumbnailFile(m_hDisplayWindow, EMPTY_STRING, FALSE);
 
 	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
-	LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
+	PIDLIST_ABSOLUTE pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	PIDLIST_ABSOLUTE pidlComputer = NULL;
 	SHGetFolderLocation(NULL, CSIDL_DRIVES, NULL, 0, &pidlComputer);

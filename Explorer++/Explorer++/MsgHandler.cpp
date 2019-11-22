@@ -132,7 +132,7 @@ void Explorerplusplus::OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpe
 	}
 }
 
-void Explorerplusplus::OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
 {
 	BOOL bControlPanelParent = FALSE;
 
@@ -298,7 +298,7 @@ void Explorerplusplus::OpenItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL b
 	}
 }
 
-void Explorerplusplus::OpenFolderItem(LPCITEMIDLIST pidlItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
+void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
 {
 	if(bOpenInNewWindow)
 		m_navigation->OpenDirectoryInNewWindow(pidlItem);

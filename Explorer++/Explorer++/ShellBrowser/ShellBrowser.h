@@ -62,7 +62,7 @@ public:
 
 	/* Navigation. */
 	HRESULT				BrowseFolder(const TCHAR *szPath,UINT wFlags);
-	HRESULT				BrowseFolder(LPCITEMIDLIST pidlDirectory,UINT wFlags);
+	HRESULT				BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags);
 	HRESULT				Refresh(void);
 
 	/* Drag and Drop. */
@@ -92,8 +92,8 @@ public:
 	BOOL				SetShowHidden(BOOL bShowHidden);
 	BOOL				CanBrowseBack(void) const;
 	BOOL				CanBrowseForward(void) const;
-	std::list<LPITEMIDLIST>	GetBackHistory() const;
-	std::list<LPITEMIDLIST>	GetForwardHistory() const;
+	std::list<PIDLIST_ABSOLUTE>	GetBackHistory() const;
+	std::list<PIDLIST_ABSOLUTE>	GetForwardHistory() const;
 	LPITEMIDLIST		RetrieveHistoryItemWithoutUpdate(int iItem);
 	LPITEMIDLIST		RetrieveHistoryItem(int iItem);
 	BOOL				CanBrowseUp(void) const;
@@ -114,8 +114,8 @@ public:
 
 	/* Item information. */
 	WIN32_FIND_DATA		GetItemFileFindData(int iItem) const;
-	LPITEMIDLIST		GetItemCompleteIdl(int iItem) const;
-	LPITEMIDLIST		GetItemRelativeIdl(int iItem) const;
+	PIDLIST_ABSOLUTE	GetItemCompleteIdl(int iItem) const;
+	PIDLIST_RELATIVE	GetItemRelativeIdl(int iItem) const;
 	DWORD				GetItemAttributes(int iItem) const;
 	int					GetItemDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
 	HRESULT				GetItemFullName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;
@@ -155,7 +155,7 @@ public:
 	size_t				GetNumActiveColumns(void) const;
 	void				ImportAllColumns(const FolderColumns &folderColumns);
 	FolderColumns		ExportAllColumns();
-	void				QueueRename(LPCITEMIDLIST pidlItem);
+	void				QueueRename(PCIDLIST_ABSOLUTE pidlItem);
 	void				SelectItems(const std::list<std::wstring> &PastedFileList);
 	void				OnDeviceChange(WPARAM wParam,LPARAM lParam);
 
@@ -263,17 +263,17 @@ private:
 
 	int					GenerateUniqueItemId(void);
 	BOOL				GhostItemInternal(int iItem,BOOL bGhost);
-	void				DetermineFolderVirtual(LPITEMIDLIST pidlDirectory);
+	void				DetermineFolderVirtual(PCIDLIST_ABSOLUTE pidlDirectory);
 	void				VerifySortMode(void);
 
 	/* Browsing support. */
-	void				BrowseVirtualFolder(LPITEMIDLIST pidlDirectory);
+	void				BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory);
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void				InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(int iItemInternal) const;
-	HRESULT				AddItemInternal(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
+	HRESULT				AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
 	HRESULT				AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
-	int					SetItemInformation(LPITEMIDLIST pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName);
+	int					SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCIDLIST_RELATIVE pidlRelative, const TCHAR *szFileName);
 	void				ResetFolderMemoryAllocations(void);
 	void				SetViewModeInternal(ViewMode viewMode);
 	void				ApplyFolderEmptyBackgroundImage(bool apply);
@@ -496,7 +496,7 @@ private:
 
 	/* Shell new. */
 	BOOL				m_bNewItemCreated;
-	LPITEMIDLIST		m_pidlNewItem;
+	PCIDLIST_ABSOLUTE	m_pidlNewItem;
 	int					m_iIndexNewItem;
 
 	/* File selection. */

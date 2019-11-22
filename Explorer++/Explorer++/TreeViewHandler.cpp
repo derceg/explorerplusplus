@@ -460,11 +460,8 @@ void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 
 void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 {
-	LPITEMIDLIST	pidlDirectory = NULL;
-	LPITEMIDLIST	pidlCurrentDirectory = NULL;
-
-	pidlDirectory = m_pMyTreeView->BuildPath(g_NewSelectionItem);
-	pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
+	LPITEMIDLIST pidlDirectory = m_pMyTreeView->BuildPath(g_NewSelectionItem);
+	PIDLIST_ABSOLUTE pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	if(!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick &&
 		!CompareIdls(pidlDirectory,pidlCurrentDirectory))

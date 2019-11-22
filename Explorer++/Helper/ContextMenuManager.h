@@ -76,7 +76,7 @@ private:
 	static int GetMenuItemPos(HMENU hMenu,UINT uID);
 	static void RemoveDuplicateSeperators(HMENU hMenu);
 
-	static ItemType_t GetItemType(LPCITEMIDLIST pidl);
+	static ItemType_t GetItemType(PCIDLIST_ABSOLUTE pidl);
 
 	std::list<ContextMenuHandler_t>	m_ContextMenuHandlers;
 	std::list<MenuHandler_t>		m_MenuHandlers;

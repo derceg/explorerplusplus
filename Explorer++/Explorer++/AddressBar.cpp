@@ -167,7 +167,7 @@ void AddressBar::OnBeginDrag()
 		if (SUCCEEDED(hr))
 		{
 			const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
-			LPITEMIDLIST pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
+			PIDLIST_ABSOLUTE pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
 			FORMATETC ftc[2];
 			STGMEDIUM stg[2];

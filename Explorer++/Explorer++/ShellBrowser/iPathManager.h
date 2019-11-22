@@ -15,10 +15,10 @@ public:
 	int				GetNumBackPathsStored(void) const;
 	int				GetNumForwardPathsStored(void) const;
 	UINT			CreateHistoryPopupMenu(HWND,POINT *,BOOL);
-	std::list<LPITEMIDLIST>	GetBackHistory() const;
-	std::list<LPITEMIDLIST>	GetForwardHistory() const;
+	std::list<PIDLIST_ABSOLUTE>	GetBackHistory() const;
+	std::list<PIDLIST_ABSOLUTE>	GetForwardHistory() const;
 
-	void			StoreIdl(LPITEMIDLIST pidl);
+	void			StoreIdl(PCIDLIST_ABSOLUTE pidl);
 	LPITEMIDLIST	RetrievePath(int iIndex);
 	LPITEMIDLIST	RetrievePathWithoutUpdate(int iIndex);
 	LPITEMIDLIST	RetrieveAndValidateIdl(int iIndex);
@@ -39,5 +39,5 @@ private:
 
 	void ShiftIdlArray(int iStart);
 
-	LPITEMIDLIST *ppidlList;
+	PIDLIST_ABSOLUTE *ppidlList;
 };

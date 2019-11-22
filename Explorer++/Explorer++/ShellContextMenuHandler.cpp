@@ -16,8 +16,8 @@
 
 #define MENU_OPEN_IN_NEW_TAB	(MAX_SHELL_MENU_ID + 1)
 
-void Explorerplusplus::AddMenuEntries(LPCITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
+void Explorerplusplus::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
+	const std::list<PIDLIST_RELATIVE> &pidlItemList, DWORD_PTR dwData, HMENU hMenu)
 {
 	assert(dwData != NULL);
 
@@ -31,8 +31,8 @@ void Explorerplusplus::AddMenuEntries(LPCITEMIDLIST pidlParent,
 		{
 			SFGAOF FileAttributes = SFGAO_FOLDER;
 
-			LPITEMIDLIST pidlComplete = ILCombine(pidlParent,pidlItemList.front());
-			GetItemAttributes(pidlComplete,&FileAttributes);
+			PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItemList.front());
+			GetItemAttributes(pidlComplete, &FileAttributes);
 			CoTaskMemFree(pidlComplete);
 
 			if(FileAttributes & SFGAO_FOLDER)
@@ -63,8 +63,8 @@ void Explorerplusplus::AddMenuEntries(LPCITEMIDLIST pidlParent,
 	}
 }
 
-BOOL Explorerplusplus::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
+BOOL Explorerplusplus::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::list<PIDLIST_RELATIVE> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
 {
 	FileContextMenuInfo_t *pfcmi = reinterpret_cast<FileContextMenuInfo_t *>(dwData);
 
@@ -79,14 +79,10 @@ BOOL Explorerplusplus::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
 		}
 		else
 		{
-			LPITEMIDLIST pidlComplete = NULL;
-
 			for(const auto &pidl : pidlItemList)
 			{
-				pidlComplete = ILCombine(pidlParent,pidl);
-
-				OpenItem(pidlComplete,FALSE,FALSE);
-
+				PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidl);
+				OpenItem(pidlComplete, FALSE, FALSE);
 				CoTaskMemFree(pidlComplete);
 			}
 		}
@@ -138,27 +134,27 @@ BOOL Explorerplusplus::HandleShellMenuItem(LPCITEMIDLIST pidlParent,
 	return FALSE;
 }
 
-void Explorerplusplus::HandleCustomMenuItem(LPCITEMIDLIST pidlParent,
-	const std::list<LPITEMIDLIST> &pidlItemList,int iCmd)
+void Explorerplusplus::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
+	const std::list<PIDLIST_RELATIVE> &pidlItemList, int iCmd)
 {
 	switch(iCmd)
 	{
 		case MENU_OPEN_IN_NEW_TAB:
 			{
-				LPITEMIDLIST pidlComplete;
+				PIDLIST_ABSOLUTE pidlComplete;
 				TCHAR szParsingPath[MAX_PATH];
 				BOOL bOpenInNewTab;
 
 				if(pidlItemList.size() != 0)
 				{
-					std::vector<LPITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
+					std::vector<PIDLIST_RELATIVE> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
 					pidlComplete = ILCombine(pidlParent,pidlItemVector[0]);
 
 					bOpenInNewTab = FALSE;
 				}
 				else
 				{
-					pidlComplete = ILClone(pidlParent);
+					pidlComplete = ILCloneFull(pidlParent);
 
 					bOpenInNewTab = TRUE;
 				}

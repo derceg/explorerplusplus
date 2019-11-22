@@ -452,7 +452,6 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 	HKEY	hTabKey;
 	HKEY	hColumnsKey;
 	TCHAR	szItemKey[128];
-	LPITEMIDLIST	pidlDirectory = NULL;
 	UINT	ViewMode;
 	UINT	SortMode;
 	DWORD	Disposition;
@@ -485,7 +484,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 
 			if(ReturnValue == ERROR_SUCCESS)
 			{
-				pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
+				PIDLIST_ABSOLUTE pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 				RegSetValueEx(hTabKey,_T("Directory"),0,REG_BINARY,
 					(LPBYTE)pidlDirectory,ILGetSize(pidlDirectory));
 				CoTaskMemFree((LPVOID)pidlDirectory);

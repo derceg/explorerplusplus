@@ -58,7 +58,7 @@ HRESULT NFileOperations::RenameFile(IShellItem *item, const std::wstring &newNam
 	return hr;
 }
 
-HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<LPCITEMIDLIST> &pidls,
+HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<PCIDLIST_ABSOLUTE> &pidls,
 	bool permanent, bool silent)
 {
 	IFileOperation *fo;
@@ -143,7 +143,7 @@ HRESULT NFileOperations::DeleteFiles(HWND hwnd, std::vector<LPCITEMIDLIST> &pidl
 }
 
 HRESULT NFileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strTitle,
-	std::vector<LPCITEMIDLIST> &pidls, bool move)
+	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
 {
 	PIDLIST_ABSOLUTE pidl;
 	BOOL bRes = NFileOperations::CreateBrowseDialog(hOwner,strTitle.c_str(),&pidl);
@@ -175,7 +175,7 @@ HRESULT NFileOperations::CopyFilesToFolder(HWND hOwner, const std::wstring &strT
 }
 
 HRESULT NFileOperations::CopyFiles(HWND hwnd, IShellItem *destinationFolder,
-	std::vector<LPCITEMIDLIST> &pidls, bool move)
+	std::vector<PCIDLIST_ABSOLUTE> &pidls, bool move)
 {
 	IFileOperation *fo;
 	HRESULT hr = CoCreateInstance(CLSID_FileOperation, nullptr, CLSCTX_ALL, IID_PPV_ARGS(&fo));
