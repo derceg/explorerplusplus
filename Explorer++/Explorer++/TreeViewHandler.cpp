@@ -464,7 +464,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 	LPITEMIDLIST	pidlCurrentDirectory = NULL;
 
 	pidlDirectory = m_pMyTreeView->BuildPath(g_NewSelectionItem);
-	pidlCurrentDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+	pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	if(!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick &&
 		!CompareIdls(pidlDirectory,pidlCurrentDirectory))
@@ -834,7 +834,7 @@ void Explorerplusplus::UpdateTreeViewSelection(void)
 		return;
 	}
 
-	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+	pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
 

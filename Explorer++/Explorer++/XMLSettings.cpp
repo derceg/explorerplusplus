@@ -827,7 +827,7 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 		StringCchPrintf(szNodeName, SIZEOF_ARRAY(szNodeName), _T("%d"), tabNum);
 		NXMLSettings::CreateElementNode(pXMLDom,&pParentNode,pe,_T("Tab"),szNodeName);
 
-		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
+		tab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Directory"),szTabDirectory);
 
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("ApplyFilter"),

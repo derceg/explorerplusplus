@@ -79,7 +79,7 @@ void CShellBrowser::SetTileViewItemInfo(int iItem, int iItemInternal)
 	lvti.piColFmt = columnFormats;
 	ListView_SetTileInfo(m_hListView, &lvti);
 
-	QueryFullItemName(iItem, FullFileName, SIZEOF_ARRAY(FullFileName));
+	GetItemFullName(iItem, FullFileName, SIZEOF_ARRAY(FullFileName));
 
 	SHGetFileInfo(FullFileName, 0,
 		&shfi, sizeof(SHFILEINFO), SHGFI_TYPENAME);

@@ -138,7 +138,7 @@ int CListViewEdit::GetExtensionIndex()
 	TCHAR szFileName[MAX_PATH];
 	GetWindowText(m_hwnd,szFileName,SIZEOF_ARRAY(szFileName));
 
-	DWORD dwAttributes = m_pexpp->GetActiveShellBrowser()->QueryFileAttributes(m_ItemIndex);
+	DWORD dwAttributes = m_pexpp->GetActiveShellBrowser()->GetItemAttributes(m_ItemIndex);
 
 	int Index = -1;
 

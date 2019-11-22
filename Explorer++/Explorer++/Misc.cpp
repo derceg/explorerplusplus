@@ -233,7 +233,7 @@ void Explorerplusplus::CopyToFolder(bool move)
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		PIDLPointer pidlPtr(m_pActiveShellBrowser->QueryItemCompleteIdl(iItem));
+		PIDLPointer pidlPtr(m_pActiveShellBrowser->GetItemCompleteIdl(iItem));
 
 		if (!pidlPtr)
 		{
@@ -306,7 +306,7 @@ void *pData)
 	if (tab)
 	{
 		TCHAR szDirectory[MAX_PATH];
-		tab->GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
+		tab->GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
 		LOG(debug) << _T("Directory change notification received for \"") << szDirectory << _T("\", Action = ") << dwAction
 			<< _T(", Filename = \"") << szFileName << _T("\"");
 

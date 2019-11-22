@@ -1054,7 +1054,7 @@ void CShellBrowser::ApplyHeaderSortArrow()
 	m_PreviousSortColumnExists = true;
 }
 
-size_t CShellBrowser::QueryNumActiveColumns(void) const
+size_t CShellBrowser::GetNumActiveColumns(void) const
 {
 	return m_pActiveColumns->size();
 }

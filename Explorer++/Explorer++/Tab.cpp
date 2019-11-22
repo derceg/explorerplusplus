@@ -40,7 +40,7 @@ std::wstring Tab::GetName() const
 		return m_customName;
 	}
 
-	PIDLPointer pidlDirectory(m_shellBrowser->QueryCurrentDirectoryIdl());
+	PIDLPointer pidlDirectory(m_shellBrowser->GetDirectoryIdl());
 
 	TCHAR name[MAX_PATH];
 	HRESULT hr = GetDisplayName(pidlDirectory.get(), name, SIZEOF_ARRAY(name), SHGDN_INFOLDER);

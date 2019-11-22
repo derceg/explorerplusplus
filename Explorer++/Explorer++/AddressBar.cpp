@@ -146,7 +146,7 @@ void AddressBar::OnGo()
 	SendMessage(m_hwnd, WM_GETTEXT, SIZEOF_ARRAY(szPath), (LPARAM)szPath);
 
 	const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
-	selectedTab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
+	selectedTab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
 	DecodePath(szPath, szCurrentDirectory, szFullFilePath, SIZEOF_ARRAY(szFullFilePath));
 
 	m_expp->OpenItem(szFullFilePath, FALSE, FALSE);
@@ -168,7 +168,7 @@ void AddressBar::OnBeginDrag()
 		if (SUCCEEDED(hr))
 		{
 			const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
-			LPITEMIDLIST pidlDirectory = selectedTab.GetShellBrowser()->QueryCurrentDirectoryIdl();
+			LPITEMIDLIST pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
 			FORMATETC ftc[2];
 			STGMEDIUM stg[2];
@@ -279,7 +279,7 @@ void AddressBar::OnNavigationCompleted(const Tab &tab)
 
 void AddressBar::UpdateTextAndIcon(const Tab &tab)
 {
-	PIDLPointer pidl(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
+	PIDLPointer pidl(tab.GetShellBrowser()->GetDirectoryIdl());
 
 	auto text = GetFolderPathForDisplay(pidl.get());
 

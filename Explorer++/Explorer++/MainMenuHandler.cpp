@@ -46,7 +46,7 @@ void Explorerplusplus::OnFilterResults()
 void Explorerplusplus::OnMergeFiles()
 {
 	TCHAR szCurrentDirectory[MAX_PATH];
-	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
+	m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
 
 	std::list<std::wstring>	FullFilenameList;
 	int iItem = -1;
@@ -54,7 +54,7 @@ void Explorerplusplus::OnMergeFiles()
 	while((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
+		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
 		FullFilenameList.push_back(szFullFilename);
 	}
 
@@ -70,7 +70,7 @@ void Explorerplusplus::OnSplitFile()
 	if(iSelected != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iSelected, szFullFilename, SIZEOF_ARRAY(szFullFilename));
+		m_pActiveShellBrowser->GetItemFullName(iSelected, szFullFilename, SIZEOF_ARRAY(szFullFilename));
 
 		CSplitFileDialog SplitFileDialog(m_hLanguageModule, IDD_SPLITFILE, m_hContainer, this, szFullFilename);
 		SplitFileDialog.ShowModalDialog();
@@ -85,7 +85,7 @@ void Explorerplusplus::OnDestroyFiles()
 	while((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
+		m_pActiveShellBrowser->GetItemFullName(iItem, szFullFilename, SIZEOF_ARRAY(szFullFilename));
 		FullFilenameList.push_back(szFullFilename);
 	}
 
@@ -105,7 +105,7 @@ void Explorerplusplus::OnSearch()
 	if(g_hwndSearch == NULL)
 	{
 		TCHAR szCurrentDirectory[MAX_PATH];
-		m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
+		m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
 
 		CSearchDialog *SearchDialog = new CSearchDialog(m_hLanguageModule, IDD_SEARCH, m_hContainer, szCurrentDirectory, this, m_tabContainer);
 		g_hwndSearch = SearchDialog->ShowModelessDialog(new CModelessDialogNotification());
@@ -210,7 +210,7 @@ void Explorerplusplus::OnSaveDirectoryListing() const
 
 void Explorerplusplus::OnCreateNewFolder()
 {
-	PIDLPointer pidlDirectory(m_pActiveShellBrowser->QueryCurrentDirectoryIdl());
+	PIDLPointer pidlDirectory(m_pActiveShellBrowser->GetDirectoryIdl());
 
 	IShellItem *directoryShellItem = nullptr;
 	HRESULT hr = SHCreateItemFromIDList(pidlDirectory.get(), IID_PPV_ARGS(&directoryShellItem));
@@ -262,7 +262,7 @@ void Explorerplusplus::OnResolveLink()
 
 	if(iItem != -1)
 	{
-		m_pActiveShellBrowser->QueryFullItemName(iItem, ShortcutFileName, SIZEOF_ARRAY(ShortcutFileName));
+		m_pActiveShellBrowser->GetItemFullName(iItem, ShortcutFileName, SIZEOF_ARRAY(ShortcutFileName));
 
 		hr = NFileOperations::ResolveLink(m_hContainer, 0, ShortcutFileName, szFullFileName, SIZEOF_ARRAY(szFullFileName));
 

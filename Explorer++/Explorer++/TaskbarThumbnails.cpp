@@ -639,7 +639,7 @@ void TaskbarThumbnails::SetTabProxyIcon(const Tab &tab)
 	{
 		if (tabProxyInfo.iTabId == tab.GetId())
 		{
-			PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
+			PIDLPointer pidlDirectory(tab.GetShellBrowser()->GetDirectoryIdl());
 
 			/* TODO: The proxy icon may also be the lock icon, if
 			the tab is locked. */

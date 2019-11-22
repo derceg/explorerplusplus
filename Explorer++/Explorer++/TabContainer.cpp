@@ -433,7 +433,7 @@ void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 
 void TabContainer::OnOpenParentInNewTab(const Tab &tab)
 {
-	LPITEMIDLIST pidlCurrent = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
+	LPITEMIDLIST pidlCurrent = tab.GetShellBrowser()->GetDirectoryIdl();
 
 	LPITEMIDLIST pidlParent = NULL;
 	HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
@@ -561,7 +561,7 @@ void TabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 
 	const Tab &tab = GetTabByIndex(static_cast<int>(dispInfo->hdr.idFrom));
 
-	PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
+	PIDLPointer pidlDirectory(tab.GetShellBrowser()->GetDirectoryIdl());
 	auto path = GetFolderPathForDisplay(pidlDirectory.get());
 
 	if (!path)
@@ -681,7 +681,7 @@ void TabContainer::SetTabIcon(const Tab &tab)
 	}
 	else
 	{
-		PIDLPointer pidlDirectory(tab.GetShellBrowser()->QueryCurrentDirectoryIdl());
+		PIDLPointer pidlDirectory(tab.GetShellBrowser()->GetDirectoryIdl());
 
 		SHGetFileInfo((LPCTSTR)pidlDirectory.get(), 0, &shfi, sizeof(shfi),
 			SHGFI_PIDL | SHGFI_ICON | SHGFI_SMALLICON);
@@ -1217,7 +1217,7 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 void TabContainer::DuplicateTab(const Tab &tab)
 {
 	TCHAR szTabDirectory[MAX_PATH];
-	tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
+	tab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szTabDirectory), szTabDirectory);
 
 	CreateNewTab(szTabDirectory);
 }

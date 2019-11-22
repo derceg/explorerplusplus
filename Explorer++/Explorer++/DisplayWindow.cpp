@@ -33,8 +33,8 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(void)
 	DisplayWindow_SetThumbnailFile(m_hDisplayWindow, EMPTY_STRING, FALSE);
 
 	TCHAR szCurrentDirectory[MAX_PATH];
-	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
-	LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+	m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
+	LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	PIDLIST_ABSOLUTE pidlComputer = NULL;
 	SHGetFolderLocation(NULL, CSIDL_DRIVES, NULL, 0, &pidlComputer);
@@ -101,21 +101,21 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(void)
 
 	if (iSelected != -1)
 	{
-		m_pActiveShellBrowser->QueryDisplayName(iSelected,
+		m_pActiveShellBrowser->GetItemDisplayName(iSelected,
 			SIZEOF_ARRAY(szDisplayName), szDisplayName);
 
 		/* File name. */
 		DisplayWindow_BufferText(m_hDisplayWindow, szDisplayName);
 
-		m_pActiveShellBrowser->QueryFullItemName(iSelected, szFullItemName, SIZEOF_ARRAY(szFullItemName));
+		m_pActiveShellBrowser->GetItemFullName(iSelected, szFullItemName, SIZEOF_ARRAY(szFullItemName));
 
 		if (!m_pActiveShellBrowser->InVirtualFolder())
 		{
 			DWORD dwAttributes;
 
-			m_pActiveShellBrowser->QueryFullItemName(iSelected, szFullItemName, SIZEOF_ARRAY(szFullItemName));
+			m_pActiveShellBrowser->GetItemFullName(iSelected, szFullItemName, SIZEOF_ARRAY(szFullItemName));
 
-			wfd = m_pActiveShellBrowser->QueryFileFindData(iSelected);
+			wfd = m_pActiveShellBrowser->GetItemFileFindData(iSelected);
 
 			dwAttributes = GetFileAttributes(szFullItemName);
 
@@ -309,7 +309,7 @@ void Explorerplusplus::UpdateDisplayWindowForOneFile(void)
 		}
 		else
 		{
-			m_pActiveShellBrowser->QueryFullItemName(iSelected, szFullItemName, SIZEOF_ARRAY(szFullItemName));
+			m_pActiveShellBrowser->GetItemFullName(iSelected, szFullItemName, SIZEOF_ARRAY(szFullItemName));
 
 			if (PathIsRoot(szFullItemName))
 			{

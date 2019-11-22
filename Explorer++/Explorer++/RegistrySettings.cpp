@@ -485,7 +485,7 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 
 			if(ReturnValue == ERROR_SUCCESS)
 			{
-				pidlDirectory = tab.GetShellBrowser()->QueryCurrentDirectoryIdl();
+				pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 				RegSetValueEx(hTabKey,_T("Directory"),0,REG_BINARY,
 					(LPBYTE)pidlDirectory,ILGetSize(pidlDirectory));
 				CoTaskMemFree((LPVOID)pidlDirectory);

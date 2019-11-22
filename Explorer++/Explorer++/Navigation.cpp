@@ -52,7 +52,7 @@ void Navigation::OnNavigateUp()
 	Tab &tab = m_tabContainer->GetSelectedTab();
 
 	TCHAR szDirectory[MAX_PATH];
-	tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
+	tab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szDirectory), szDirectory);
 
 	PathStripPath(szDirectory);
 

@@ -431,7 +431,7 @@ BOOL CShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
 	return TRUE;
 }
 
-int CShellBrowser::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const
+int CShellBrowser::GetItemDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const
 {
 	LVITEM lvItem;
 
@@ -445,7 +445,7 @@ int CShellBrowser::QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) con
 	return lstrlen(Buffer);
 }
 
-HRESULT CShellBrowser::QueryFullItemName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const
+HRESULT CShellBrowser::GetItemFullName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const
 {
 	LVITEM			lvItem;
 	BOOL			bRes;
@@ -470,7 +470,7 @@ void CShellBrowser::QueryFullItemNameInternal(int iItemInternal,TCHAR *szFullFil
 	GetDisplayName(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),szFullFileName,cchMax,SHGDN_FORPARSING);
 }
 
-UINT CShellBrowser::QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const
+UINT CShellBrowser::GetDirectory(int BufferSize,TCHAR *Buffer) const
 {
 	if(BufferSize < (lstrlen(m_CurDir) + 1))
 	{
@@ -483,7 +483,7 @@ UINT CShellBrowser::QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const
 	return lstrlen(m_CurDir);
 }
 
-PIDLIST_ABSOLUTE CShellBrowser::QueryCurrentDirectoryIdl() const
+PIDLIST_ABSOLUTE CShellBrowser::GetDirectoryIdl() const
 {
 	return ILCloneFull(m_pidlDirectory);
 }
@@ -632,7 +632,7 @@ boost::optional<int> CShellBrowser::LocateItemByInternalIndex(int internalIndex)
 	return item;
 }
 
-DWORD CShellBrowser::QueryFileAttributes(int iItem) const
+DWORD CShellBrowser::GetItemAttributes(int iItem) const
 {
 	LVITEM lvItem;
 
@@ -644,7 +644,7 @@ DWORD CShellBrowser::QueryFileAttributes(int iItem) const
 	return m_itemInfoMap.at((int)lvItem.lParam).wfd.dwFileAttributes;
 }
 
-WIN32_FIND_DATA CShellBrowser::QueryFileFindData(int iItem) const
+WIN32_FIND_DATA CShellBrowser::GetItemFileFindData(int iItem) const
 {
 	LVITEM lvItem;
 
@@ -676,7 +676,7 @@ void CShellBrowser::DragStarted(int iFirstItem,POINT *ptCursor)
 
 	while((iSelected = ListView_GetNextItem(m_hListView,iSelected,LVNI_SELECTED)) != -1)
 	{
-		QueryDisplayName(iSelected, SIZEOF_ARRAY(df.szFileName), df.szFileName);
+		GetItemDisplayName(iSelected, SIZEOF_ARRAY(df.szFileName), df.szFileName);
 
 		m_DraggedFilesList.push_back(df);
 	}
@@ -691,7 +691,7 @@ void CShellBrowser::DragStopped(void)
 	m_bDragging = FALSE;
 }
 
-LPITEMIDLIST CShellBrowser::QueryItemCompleteIdl(int iItem) const
+LPITEMIDLIST CShellBrowser::GetItemCompleteIdl(int iItem) const
 {
 	LVITEM lvItem;
 	lvItem.mask = LVIF_PARAM;
@@ -709,7 +709,7 @@ LPITEMIDLIST CShellBrowser::QueryItemCompleteIdl(int iItem) const
 	return pidlComplete;
 }
 
-LPITEMIDLIST CShellBrowser::QueryItemRelativeIdl(int iItem) const
+LPITEMIDLIST CShellBrowser::GetItemRelativeIdl(int iItem) const
 {
 	LVITEM lvItem;
 	BOOL bRet;
@@ -1303,7 +1303,7 @@ BOOL CShellBrowser::SetShowHidden(BOOL bShowHidden)
 	return m_folderSettings.showHidden;
 }
 
-BOOL CShellBrowser::QueryDragging(void) const
+BOOL CShellBrowser::IsDragging() const
 {
 	return m_bPerformingDrag;
 }

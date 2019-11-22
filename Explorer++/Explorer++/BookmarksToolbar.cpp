@@ -379,7 +379,7 @@ void CBookmarksToolbar::OnNewBookmark()
 {
 	TCHAR currentDirectory[MAX_PATH];
 	TCHAR displayName[MAX_PATH];
-	m_pexpp->GetActiveShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(currentDirectory), currentDirectory);
+	m_pexpp->GetActiveShellBrowser()->GetDirectory(SIZEOF_ARRAY(currentDirectory), currentDirectory);
 	GetDisplayName(currentDirectory, displayName, SIZEOF_ARRAY(displayName), SHGDN_INFOLDER);
 	CBookmark Bookmark = CBookmark::Create(displayName, currentDirectory, EMPTY_STRING);
 

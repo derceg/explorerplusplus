@@ -171,7 +171,7 @@ DWORD CShellBrowser::CheckItemLocations(IDataObject *pDataObject,int iDroppedIte
 				/* TODO: Compare against sub-folders? (i.e. path may
 				need to be adjusted if the dragged item is currently
 				over a folder). */
-				QueryCurrentDirectory(SIZEOF_ARRAY(szDestDirectory),
+				GetDirectory(SIZEOF_ARRAY(szDestDirectory),
 					szDestDirectory);
 
 				if(PathIsSameRoot(szDestDirectory,szFullFileName))
@@ -415,7 +415,7 @@ DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect)
 	pt.x = ptl.x;
 	pt.y = ptl.y;
 
-	QueryCurrentDirectory(SIZEOF_ARRAY(szDestDirectory),
+	GetDirectory(SIZEOF_ARRAY(szDestDirectory),
 		szDestDirectory);
 
 	/* If the item(s) have been dropped over a folder in the

@@ -1152,7 +1152,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 
 		auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
 
-		pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+		pidl = m_pActiveShellBrowser->GetDirectoryIdl();
 
 		SHGetFolderLocation(NULL, CSIDL_DRIVES, NULL, 0, &pidlDrives);
 		SHGetFolderLocation(NULL, CSIDL_CONTROLS, NULL, 0, &pidlControls);
@@ -1287,7 +1287,7 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	{
 		TCHAR szCurrentDirectory[MAX_PATH];
 		TCHAR szDisplayName[MAX_PATH];
-		m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
+		m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory), szCurrentDirectory);
 		GetDisplayName(szCurrentDirectory, szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
 		CBookmark Bookmark = CBookmark::Create(szDisplayName, szCurrentDirectory, EMPTY_STRING);
 

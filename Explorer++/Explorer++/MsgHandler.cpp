@@ -681,7 +681,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 	/* Stop monitoring the directory that was browsed from. */
 	m_pDirMon->StopDirectoryMonitor(iDirMonitorId);
 
-	tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(szDirectoryToWatch),
+	tab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(szDirectoryToWatch),
 		szDirectoryToWatch);
 
 	/* Don't watch virtual folders (the 'recycle bin' may be an
@@ -730,7 +730,7 @@ void Explorerplusplus::OnAutoSizeColumns()
 	size_t	nColumns;
 	UINT	iCol = 0;
 
-	nColumns = m_pActiveShellBrowser->QueryNumActiveColumns();
+	nColumns = m_pActiveShellBrowser->GetNumActiveColumns();
 
 	for(iCol = 0;iCol < nColumns;iCol++)
 	{
@@ -1251,7 +1251,7 @@ void Explorerplusplus::OnAssocChanged()
 void Explorerplusplus::OnCloneWindow()
 {
 	TCHAR szCurrentDirectory[MAX_PATH];
-	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(szCurrentDirectory),
+	m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(szCurrentDirectory),
 		szCurrentDirectory);
 
 	TCHAR szQuotedCurrentDirectory[MAX_PATH];
@@ -1337,10 +1337,10 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 
 		case CDDS_ITEMPREPAINT:
 			{
-				DWORD dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(static_cast<int>(pnmcd->dwItemSpec));
+				DWORD dwAttributes = m_pActiveShellBrowser->GetItemAttributes(static_cast<int>(pnmcd->dwItemSpec));
 
 				TCHAR szFileName[MAX_PATH];
-				m_pActiveShellBrowser->QueryFullItemName(static_cast<int>(pnmcd->dwItemSpec),szFileName,SIZEOF_ARRAY(szFileName));
+				m_pActiveShellBrowser->GetItemFullName(static_cast<int>(pnmcd->dwItemSpec),szFileName,SIZEOF_ARRAY(szFileName));
 				PathStripPath(szFileName);
 
 				/* Loop through each filter. Decide whether to change the font of the

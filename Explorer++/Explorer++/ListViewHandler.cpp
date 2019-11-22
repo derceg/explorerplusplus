@@ -425,12 +425,12 @@ void Explorerplusplus::OnListViewMButtonUp(POINT *pt)
 			STRRET str;
 			HRESULT hr;
 
-			pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+			pidl = m_pActiveShellBrowser->GetDirectoryIdl();
 			hr = BindToIdl(pidl, IID_PPV_ARGS(&pShellFolder));
 
 			if(SUCCEEDED(hr))
 			{
-				ridl = m_pActiveShellBrowser->QueryItemRelativeIdl(ht.iItem);
+				ridl = m_pActiveShellBrowser->GetItemRelativeIdl(ht.iItem);
 
 				hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&ridl,&uAttributes);
 
@@ -502,7 +502,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 				!IsKeyDown(VK_SHIFT) &&
 				!IsKeyDown(VK_MENU))
 			{
-				LPITEMIDLIST pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+				LPITEMIDLIST pidl = m_pActiveShellBrowser->GetDirectoryIdl();
 
 				TCHAR szRoot[MAX_PATH];
 				HRESULT hr = GetDisplayName(pidl,szRoot,SIZEOF_ARRAY(szRoot),SHGDN_FORPARSING);
@@ -595,7 +595,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 
 	Tab &tab = m_tabContainer->GetTab(iObjectIndex);
 
-	if(tab.GetShellBrowser()->QueryDragging())
+	if(tab.GetShellBrowser()->IsDragging())
 		return;
 
 	HWND listView = tab.listView;
@@ -799,11 +799,11 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		return 0;
 	}
 
-	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(CurrentDirectory), CurrentDirectory);
+	m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(CurrentDirectory), CurrentDirectory);
 	StringCchCopy(NewFileName,SIZEOF_ARRAY(NewFileName),CurrentDirectory);
 	StringCchCopy(OldFileName,SIZEOF_ARRAY(OldFileName),CurrentDirectory);
 
-	m_pActiveShellBrowser->QueryDisplayName(pItem->iItem,SIZEOF_ARRAY(OldName),OldName);
+	m_pActiveShellBrowser->GetItemDisplayName(pItem->iItem,SIZEOF_ARRAY(OldName),OldName);
 	PathAppend(OldFileName,OldName);
 
 	BOOL bRes = PathAppend(NewFileName,pItem->pszText);
@@ -813,7 +813,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		return 0;
 	}
 
-	dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(pItem->iItem);
+	dwAttributes = m_pActiveShellBrowser->GetItemAttributes(pItem->iItem);
 
 	if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
@@ -917,7 +917,7 @@ void Explorerplusplus::OnListViewRClick(POINT *pCursorPos)
 void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 {
 	HMENU hMenu = InitializeRightClickMenu();
-	LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+	LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	LPITEMIDLIST pidlParent = ILClone(pidlDirectory);
 	ILRemoveLastID(pidlParent);
@@ -1009,10 +1009,10 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 		{
-			pidlList.push_back(m_pActiveShellBrowser->QueryItemRelativeIdl(iItem));
+			pidlList.push_back(m_pActiveShellBrowser->GetItemRelativeIdl(iItem));
 		}
 
-		LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+		LPITEMIDLIST pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 		CFileContextMenuManager fcmm(m_hActiveListView,pidlDirectory,
 			pidlList);
@@ -1153,15 +1153,15 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 
 	/* Store the pidl of the current folder, as well as the relative
 	pidl's of the dragged items. */
-	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+	pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
-		ItemList.push_back(m_pActiveShellBrowser->QueryItemRelativeIdl(iItem));
+		ItemList.push_back(m_pActiveShellBrowser->GetItemRelativeIdl(iItem));
 
 		TCHAR szFullFilename[MAX_PATH];
 
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
+		m_pActiveShellBrowser->GetItemFullName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 		std::wstring stringFilename(szFullFilename);
 
@@ -1262,7 +1262,7 @@ void Explorerplusplus::OnListViewFileDelete(bool permanent)
 
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
-		PIDLPointer pidlPtr(m_pActiveShellBrowser->QueryItemCompleteIdl(iItem));
+		PIDLPointer pidlPtr(m_pActiveShellBrowser->GetItemCompleteIdl(iItem));
 
 		if (!pidlPtr)
 		{
@@ -1304,8 +1304,8 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 				LPITEMIDLIST pidlDirectory = NULL;
 				LPITEMIDLIST pidl = NULL;
 
-				pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-				pidl = m_pActiveShellBrowser->QueryItemRelativeIdl(ht.iItem);
+				pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
+				pidl = m_pActiveShellBrowser->GetItemRelativeIdl(ht.iItem);
 
 				ShowMultipleFileProperties(pidlDirectory, (LPCITEMIDLIST *)&pidl, m_hContainer, 1);
 
@@ -1383,7 +1383,7 @@ void Explorerplusplus::OnListViewFileRenameMultiple()
 			continue;
 		}
 
-		m_pActiveShellBrowser->QueryFullItemName(iIndex, szFullFilename, SIZEOF_ARRAY(szFullFilename));
+		m_pActiveShellBrowser->GetItemFullName(iIndex, szFullFilename, SIZEOF_ARRAY(szFullFilename));
 		FullFilenameList.push_back(szFullFilename);
 	}
 
@@ -1419,13 +1419,13 @@ void Explorerplusplus::OnListViewShowFileProperties(void) const
 
 		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 		{
-			ppidl[i] = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+			ppidl[i] = m_pActiveShellBrowser->GetItemRelativeIdl(iItem);
 
 			i++;
 		}
 	}
 
-	pidlDirectory = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
+	pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 	ShowMultipleFileProperties(pidlDirectory, (LPCITEMIDLIST *)ppidl, m_hContainer, nSelected);
 	CoTaskMemFree(pidlDirectory);
 
@@ -1450,7 +1450,7 @@ void Explorerplusplus::OnListViewCopyItemPath(void) const
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
+		m_pActiveShellBrowser->GetItemFullName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 		strItemPaths += szFullFilename + std::wstring(_T("\r\n"));
 	}
@@ -1473,7 +1473,7 @@ void Explorerplusplus::OnListViewCopyUniversalPaths(void) const
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
 		TCHAR szFullFilename[MAX_PATH];
-		m_pActiveShellBrowser->QueryFullItemName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
+		m_pActiveShellBrowser->GetItemFullName(iItem,szFullFilename,SIZEOF_ARRAY(szFullFilename));
 
 		TCHAR szBuffer[1024];
 
@@ -1536,7 +1536,7 @@ HRESULT Explorerplusplus::OnListViewCopy(BOOL bCopy)
 			while((iItem = ListView_GetNextItem(m_hActiveListView,
 				iItem,LVNI_SELECTED)) != -1)
 			{
-				m_pActiveShellBrowser->QueryDisplayName(iItem,SIZEOF_ARRAY(szFilename),
+				m_pActiveShellBrowser->GetItemDisplayName(iItem,SIZEOF_ARRAY(szFilename),
 					szFilename);
 				m_CutFileNameList.push_back(szFilename);
 
@@ -1563,9 +1563,9 @@ void Explorerplusplus::OnListViewSetFileAttributes(void) const
 		{
 			NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
 
-			m_pActiveShellBrowser->QueryFullItemName(iSel,sfai.szFullFileName,SIZEOF_ARRAY(sfai.szFullFileName));
+			m_pActiveShellBrowser->GetItemFullName(iSel,sfai.szFullFileName,SIZEOF_ARRAY(sfai.szFullFileName));
 
-			WIN32_FIND_DATA wfd = m_pActiveShellBrowser->QueryFileFindData(iSel);
+			WIN32_FIND_DATA wfd = m_pActiveShellBrowser->GetItemFileFindData(iSel);
 			sfai.wfd = wfd;
 
 			sfaiList.push_back(sfai);
@@ -1625,7 +1625,7 @@ void Explorerplusplus::BuildListViewFileSelectionList(HWND hListView,
 	{
 		TCHAR szFullFileName[MAX_PATH];
 
-		m_pActiveShellBrowser->QueryFullItemName(iItem,
+		m_pActiveShellBrowser->GetItemFullName(iItem,
 			szFullFileName,SIZEOF_ARRAY(szFullFileName));
 
 		std::wstring stringFileName(szFullFileName);
@@ -1653,7 +1653,7 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 	if(iSelected == -1)
 		return -1;
 
-	hr = m_pActiveShellBrowser->QueryFullItemName(iSelected,TestFile,SIZEOF_ARRAY(TestFile));
+	hr = m_pActiveShellBrowser->GetItemFullName(iSelected,TestFile,SIZEOF_ARRAY(TestFile));
 
 	if(SUCCEEDED(hr))
 	{
@@ -1661,7 +1661,7 @@ int Explorerplusplus::HighlightSimilarFiles(HWND ListView) const
 
 		for(i = 0;i < nItems;i++)
 		{
-			m_pActiveShellBrowser->QueryFullItemName(i,FullFileName,SIZEOF_ARRAY(FullFileName));
+			m_pActiveShellBrowser->GetItemFullName(i,FullFileName,SIZEOF_ARRAY(FullFileName));
 
 			bSimilarTypes = CompareFileTypes(FullFileName,TestFile);
 
@@ -1689,7 +1689,7 @@ void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
 
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVIS_SELECTED)) != -1)
 	{
-		dwAttributes = m_pActiveShellBrowser->QueryFileAttributes(iItem);
+		dwAttributes = m_pActiveShellBrowser->GetItemAttributes(iItem);
 
 		if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 		{
@@ -1712,8 +1712,8 @@ void Explorerplusplus::OpenListViewItem(int iItem, BOOL bOpenInNewTab, BOOL bOpe
 	LPITEMIDLIST	pidl = NULL;
 	LPITEMIDLIST	ridl = NULL;
 
-	pidl = m_pActiveShellBrowser->QueryCurrentDirectoryIdl();
-	ridl = m_pActiveShellBrowser->QueryItemRelativeIdl(iItem);
+	pidl = m_pActiveShellBrowser->GetDirectoryIdl();
+	ridl = m_pActiveShellBrowser->GetItemRelativeIdl(iItem);
 
 	if(ridl != NULL)
 	{

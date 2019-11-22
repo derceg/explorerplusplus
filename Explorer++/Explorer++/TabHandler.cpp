@@ -53,7 +53,7 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 {
 	if (m_tabContainer->IsTabSelected(tab))
 	{
-		tab.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
+		tab.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
 			m_CurrentDirectory);
 		SetCurrentDirectory(m_CurrentDirectory);
 
@@ -86,7 +86,7 @@ void Explorerplusplus::OnNewTab()
 		TCHAR FullItemPath[MAX_PATH];
 
 		/* An item is selected, so get its full pathname. */
-		m_pActiveShellBrowser->QueryFullItemName(iSelected, FullItemPath, SIZEOF_ARRAY(FullItemPath));
+		m_pActiveShellBrowser->GetItemFullName(iSelected, FullItemPath, SIZEOF_ARRAY(FullItemPath));
 
 		/* If the selected item is a folder, open that folder
 		in a new tab, else just use the default new tab directory. */
@@ -211,7 +211,7 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	directory. Although this is not needed internally, context
 	menu extensions may need the current directory to be
 	set correctly. */
-	m_pActiveShellBrowser->QueryCurrentDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
+	m_pActiveShellBrowser->GetDirectory(SIZEOF_ARRAY(m_CurrentDirectory),
 		m_CurrentDirectory);
 	SetCurrentDirectory(m_CurrentDirectory);
 

@@ -62,7 +62,7 @@ namespace Plugins
 				folderSettings(*tabInternal.GetShellBrowser())
 			{
 				TCHAR path[MAX_PATH];
-				tabInternal.GetShellBrowser()->QueryCurrentDirectory(SIZEOF_ARRAY(path), path);
+				tabInternal.GetShellBrowser()->GetDirectory(SIZEOF_ARRAY(path), path);
 
 				id = tabInternal.GetId();
 				location = path;

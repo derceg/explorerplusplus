@@ -74,11 +74,11 @@ public:
 	HRESULT _stdcall	Drop(IDataObject *pDataObject,DWORD grfKeyState,POINTL ptl,DWORD *pdwEffect);
 
 	/* Drag and Drop support. */
-	BOOL				QueryDragging(void) const;
+	BOOL				IsDragging() const;
 
 	/* Get/Set current state. */
-	PIDLIST_ABSOLUTE	QueryCurrentDirectoryIdl() const;
-	UINT				QueryCurrentDirectory(int BufferSize,TCHAR *Buffer) const;
+	PIDLIST_ABSOLUTE	GetDirectoryIdl() const;
+	UINT				GetDirectory(int BufferSize,TCHAR *Buffer) const;
 	BOOL				GetAutoArrange(void) const;
 	void				SetAutoArrange(BOOL autoArrange);
 	ViewMode			GetViewMode() const;
@@ -113,12 +113,12 @@ public:
 	int					GetFolderIndex(void) const;
 
 	/* Item information. */
-	WIN32_FIND_DATA		QueryFileFindData(int iItem) const;
-	LPITEMIDLIST		QueryItemCompleteIdl(int iItem) const;
-	LPITEMIDLIST		QueryItemRelativeIdl(int iItem) const;
-	DWORD				QueryFileAttributes(int iItem) const;
-	int					QueryDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
-	HRESULT				QueryFullItemName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;
+	WIN32_FIND_DATA		GetItemFileFindData(int iItem) const;
+	LPITEMIDLIST		GetItemCompleteIdl(int iItem) const;
+	LPITEMIDLIST		GetItemRelativeIdl(int iItem) const;
+	DWORD				GetItemAttributes(int iItem) const;
+	int					GetItemDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
+	HRESULT				GetItemFullName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;
 	
 	/* Column support. */
 	std::vector<Column_t>	ExportCurrentColumns();
@@ -152,7 +152,7 @@ public:
 	int CALLBACK		SortTemporary(LPARAM lParam1,LPARAM lParam2);
 
 	std::list<int>		GetAvailableSortModes() const;
-	size_t				QueryNumActiveColumns(void) const;
+	size_t				GetNumActiveColumns(void) const;
 	void				ImportAllColumns(const FolderColumns &folderColumns);
 	FolderColumns		ExportAllColumns();
 	void				QueueRename(LPCITEMIDLIST pidlItem);
