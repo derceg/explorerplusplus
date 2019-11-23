@@ -300,7 +300,6 @@
     <ClCompile Include="FileActionHandler.cpp" />
     <ClCompile Include="FileContextMenuManager.cpp" />
     <ClCompile Include="FileOperations.cpp" />
-    <ClCompile Include="FileWrappers.cpp" />
     <ClCompile Include="FolderSize.cpp" />
     <ClCompile Include="Helper.cpp" />
     <ClCompile Include="iDataObject.cpp" />
@@ -357,7 +356,6 @@
     <ClInclude Include="FileActionHandler.h" />
     <ClInclude Include="FileContextMenuManager.h" />
     <ClInclude Include="FileOperations.h" />
-    <ClInclude Include="FileWrappers.h" />
     <ClInclude Include="FolderSize.h" />
     <ClInclude Include="Helper.h" />
     <ClInclude Include="iDataObject.h" />

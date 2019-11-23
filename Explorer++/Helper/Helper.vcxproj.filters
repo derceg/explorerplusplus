@@ -106,9 +106,6 @@
     <ClCompile Include="StringHelper.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
-    <ClCompile Include="FileWrappers.cpp">
-      <Filter>Resource Wrappers</Filter>
-    </ClCompile>
     <ClCompile Include="Logging.cpp">
       <Filter>Miscellaneous</Filter>
     </ClCompile>
@@ -233,9 +230,6 @@
     </ClInclude>
     <ClInclude Include="StringHelper.h">
       <Filter>Miscellaneous</Filter>
-    </ClInclude>
-    <ClInclude Include="FileWrappers.h">
-      <Filter>Resource Wrappers</Filter>
     </ClInclude>
     <ClInclude Include="UniqueHandle.h">
       <Filter>Resource Wrappers</Filter>
