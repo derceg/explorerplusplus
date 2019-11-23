@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Tab.h"
+#include <wil/resource.h>
 
 Tab::Tab(int id) :
 	m_id(id),
@@ -40,7 +41,7 @@ std::wstring Tab::GetName() const
 		return m_customName;
 	}
 
-	PIDLPointer pidlDirectory(m_shellBrowser->GetDirectoryIdl());
+	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlDirectory(m_shellBrowser->GetDirectoryIdl());
 
 	TCHAR name[MAX_PATH];
 	HRESULT hr = GetDisplayName(pidlDirectory.get(), name, SIZEOF_ARRAY(name), SHGDN_INFOLDER);

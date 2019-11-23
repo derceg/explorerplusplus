@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "../Helper/PIDLWrapper.h"
+#include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
+#include <wil/resource.h>
 
 struct BasicItemInfo_t
 {
@@ -25,10 +26,10 @@ struct BasicItemInfo_t
 		StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName), other.szDisplayName);
 	}
 
-	PIDLPointer		pidlComplete;
-	PIDLPointer		pridl;
-	WIN32_FIND_DATA	wfd;
-	TCHAR			szDisplayName[MAX_PATH];
+	wil::unique_cotaskmem_ptr<ITEMIDLIST> pidlComplete;
+	wil::unique_cotaskmem_ptr<ITEMIDLIST> pridl;
+	WIN32_FIND_DATA wfd;
+	TCHAR szDisplayName[MAX_PATH];
 
 	std::wstring getFullPath() const
 	{

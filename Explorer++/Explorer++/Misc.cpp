@@ -227,13 +227,13 @@ void Explorerplusplus::CopyToFolder(bool move)
 		return;
 	}
 
-	std::vector<PIDLPointer> pidlPtrs;
+	std::vector<wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE>> pidlPtrs;
 	std::vector<PCIDLIST_ABSOLUTE> pidls;
 	int iItem = -1;
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		PIDLPointer pidlPtr(m_pActiveShellBrowser->GetItemCompleteIdl(iItem));
+		wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlPtr(m_pActiveShellBrowser->GetItemCompleteIdl(iItem));
 
 		if (!pidlPtr)
 		{

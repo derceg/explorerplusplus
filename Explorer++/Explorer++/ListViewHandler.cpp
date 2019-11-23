@@ -1001,13 +1001,13 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 	if(nSelected > 0)
 	{
-		std::vector<PIDLPointer> pidlPtrs;
+		std::vector<wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE>> pidlPtrs;
 		std::list<PCIDLIST_RELATIVE> pidlList;
 		int iItem = -1;
 
 		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 		{
-			PIDLPointer pidlPtr(m_pActiveShellBrowser->GetItemRelativeIdl(iItem));
+			wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE> pidlPtr(m_pActiveShellBrowser->GetItemRelativeIdl(iItem));
 
 			pidlList.push_back(pidlPtr.get());
 			pidlPtrs.push_back(std::move(pidlPtr));
@@ -1249,14 +1249,14 @@ void Explorerplusplus::OnListViewFileDelete(bool permanent)
 	// PIDLPointer is analogous to a unique_ptr. This vector exists only
 	// so that the underlying PIDLs will be freed on scope exit (i.e.
 	// when this function returns).
-	std::vector<PIDLPointer> pidlPtrs;
+	std::vector<wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE>> pidlPtrs;
 
 	std::vector<PCIDLIST_ABSOLUTE> pidls;
 	int iItem = -1;
 
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 	{
-		PIDLPointer pidlPtr(m_pActiveShellBrowser->GetItemCompleteIdl(iItem));
+		wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlPtr(m_pActiveShellBrowser->GetItemCompleteIdl(iItem));
 
 		if (!pidlPtr)
 		{

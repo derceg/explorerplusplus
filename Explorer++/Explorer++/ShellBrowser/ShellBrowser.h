@@ -167,8 +167,8 @@ private:
 
 	struct ItemInfo_t
 	{
-		PIDLPointer		pidlComplete;
-		PIDLPointer		pridl;
+		wil::unique_cotaskmem_ptr<ITEMIDLIST>	pidlComplete;
+		wil::unique_cotaskmem_ptr<ITEMIDLIST>	pridl;
 		WIN32_FIND_DATA	wfd;
 		TCHAR			szDisplayName[MAX_PATH];
 		BOOL			bIconRetrieved;

@@ -9,6 +9,7 @@
 #include "../Helper/iDataObject.h"
 #include "../Helper/iDropSource.h"
 #include "../Helper/ShellHelper.h"
+#include <wil/resource.h>
 
 AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp,
 	Navigation *navigation, MainToolbar *mainToolbar)
@@ -278,7 +279,7 @@ void AddressBar::OnNavigationCompleted(const Tab &tab)
 
 void AddressBar::UpdateTextAndIcon(const Tab &tab)
 {
-	PIDLPointer pidl(tab.GetShellBrowser()->GetDirectoryIdl());
+	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidl(tab.GetShellBrowser()->GetDirectoryIdl());
 
 	auto text = GetFolderPathForDisplay(pidl.get());
 

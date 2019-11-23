@@ -8,8 +8,8 @@
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "TabContainer.h"
-#include "../Helper/PIDLWrapper.h"
 #include "../Helper/ProcessHelper.h"
+#include <wil/resource.h>
 
 MainWindow *MainWindow::Create(HWND hwnd, std::shared_ptr<Config> config, HINSTANCE instance,
 	IExplorerplusplus *expp, Navigation *navigation)
@@ -76,7 +76,7 @@ void MainWindow::OnShowPrivilegeLevelInTitleBarUpdated(BOOL newValue)
 void MainWindow::UpdateWindowText()
 {
 	const Tab &tab = m_expp->GetTabContainer()->GetSelectedTab();
-	PIDLPointer pidlDirectory(tab.GetShellBrowser()->GetDirectoryIdl());
+	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlDirectory(tab.GetShellBrowser()->GetDirectoryIdl());
 
 	TCHAR szFolderDisplayName[MAX_PATH];
 

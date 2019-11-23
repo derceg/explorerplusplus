@@ -368,7 +368,6 @@
     <ClInclude Include="Macros.h" />
     <ClInclude Include="MenuHelper.h" />
     <ClInclude Include="MessageForwarder.h" />
-    <ClInclude Include="PIDLWrapper.h" />
     <ClInclude Include="ProcessHelper.h" />
     <ClInclude Include="ReferenceCount.h" />
     <ClInclude Include="RegistrySettings.h" />
@@ -381,7 +380,6 @@
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="TabHelper.h" />
     <ClInclude Include="TimeHelper.h" />
-    <ClInclude Include="UniqueHandle.h" />
     <ClInclude Include="WindowHelper.h" />
     <ClInclude Include="WindowSubclassWrapper.h" />
     <ClInclude Include="WinUserBackwardsCompatibility.h" />
