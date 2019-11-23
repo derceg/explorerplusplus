@@ -159,7 +159,7 @@ void Explorerplusplus::OnShowHelp()
 	PathAppend(szHelpFile, NExplorerplusplus::HELP_FILE_NAME);
 
 	LPITEMIDLIST pidl = NULL;
-	HRESULT hr = GetIdlFromParsingName(szHelpFile, &pidl);
+	HRESULT hr = SHParseDisplayName(szHelpFile, nullptr, &pidl, 0, nullptr);
 
 	bool bOpenedHelpFile = false;
 

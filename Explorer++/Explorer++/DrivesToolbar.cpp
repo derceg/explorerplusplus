@@ -195,7 +195,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 							std::wstring Path = GetDrivePath(iIndex);
 
 							LPITEMIDLIST pidlItem = NULL;
-							HRESULT hr = GetIdlFromParsingName(Path.c_str(),&pidlItem);
+							HRESULT hr = SHParseDisplayName(Path.c_str(), nullptr, &pidlItem, 0, nullptr);
 
 							if(SUCCEEDED(hr))
 							{

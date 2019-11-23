@@ -214,7 +214,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 				executable is 32-bit, and the folder is 64-bit specific (as is
 				the case with some of the folders under the control panel). */
 				LPITEMIDLIST pidl = NULL;
-				hr = GetIdlFromParsingName(itr->c_str(),&pidl);
+				hr = SHParseDisplayName(itr->c_str(), nullptr, &pidl, 0, nullptr);
 
 				bControlPanelChild = FALSE;
 
@@ -229,8 +229,8 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 					{
 						LPITEMIDLIST pidlControlPanelCategory = NULL;
 
-						hr = GetIdlFromParsingName(CONTROL_PANEL_CATEGORY_VIEW,
-							&pidlControlPanelCategory);
+						hr = SHParseDisplayName(CONTROL_PANEL_CATEGORY_VIEW, nullptr,
+							&pidlControlPanelCategory, 0, nullptr);
 
 						if (SUCCEEDED(hr))
 						{

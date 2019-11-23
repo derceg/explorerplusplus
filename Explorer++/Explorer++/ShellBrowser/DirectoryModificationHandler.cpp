@@ -184,7 +184,7 @@ void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
 	PathAppend(FullFileName,szFileName);
 
-	hr = GetIdlFromParsingName(FullFileName,&pidlFull);
+	hr = SHParseDisplayName(FullFileName, nullptr, &pidlFull, 0, nullptr);
 
 	/* It is possible that by the time a file is registered here,
 	it will have already been renamed. In this the following
@@ -529,7 +529,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
 	PathAppend(szFullFileName,szNewFileName);
 
-	hr = GetIdlFromParsingName(szFullFileName,&pidlFull);
+	hr = SHParseDisplayName(szFullFileName, nullptr, &pidlFull, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{

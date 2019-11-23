@@ -122,7 +122,7 @@ void Explorerplusplus::OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpe
 	LPITEMIDLIST	pidlItem = NULL;
 	HRESULT			hr;
 
-	hr = GetIdlFromParsingName(szItem,&pidlItem);
+	hr = SHParseDisplayName(szItem, nullptr, &pidlItem, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
@@ -173,7 +173,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 	*/
 	if (!bControlPanelParent)
 	{
-		hr = GetIdlFromParsingName(CONTROL_PANEL_CATEGORY_VIEW, &pidlControlPanel);
+		hr = SHParseDisplayName(CONTROL_PANEL_CATEGORY_VIEW, nullptr, &pidlControlPanel, 0, nullptr);
 
 		if (SUCCEEDED(hr))
 		{
@@ -244,7 +244,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 					{
 						LPITEMIDLIST	pidlTarget = NULL;
 
-						hr = GetIdlFromParsingName(szTargetPath,&pidlTarget);
+						hr = SHParseDisplayName(szTargetPath, nullptr, &pidlTarget, 0, nullptr);
 
 						if(SUCCEEDED(hr))
 						{

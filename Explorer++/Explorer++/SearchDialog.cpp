@@ -709,7 +709,7 @@ INT_PTR CSearchDialog::OnNotify(NMHDR *pnmhdr)
 
 					LPITEMIDLIST pidlFull = NULL;
 
-					HRESULT hr = GetIdlFromParsingName(itr->second.c_str(),&pidlFull);
+					HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr, &pidlFull, 0, nullptr);
 
 					if(hr == S_OK)
 					{
@@ -756,7 +756,7 @@ INT_PTR CSearchDialog::OnNotify(NMHDR *pnmhdr)
 
 						LPITEMIDLIST pidlFull = NULL;
 
-						HRESULT hr = GetIdlFromParsingName(itr->second.c_str(),&pidlFull);
+						HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr, &pidlFull, 0, nullptr);
 
 						if(hr == S_OK)
 						{
@@ -1171,7 +1171,7 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 					TCHAR szFullFileName[MAX_PATH];
 
 					PathCombine(szFullFileName,szSearchDirectory,wfd.cFileName);
-					GetIdlFromParsingName(szFullFileName,&pidl);
+					SHParseDisplayName(szFullFileName, nullptr, &pidl, 0, nullptr);
 
 					PostMessage(m_hDlg,NSearchDialog::WM_APP_SEARCHITEMFOUND,
 						reinterpret_cast<WPARAM>(ILClone(pidl)),0);

@@ -176,7 +176,7 @@ void CDisplayWindow::ExtractThumbnailImageInternal(ThumbnailEntry_t *pte)
 	m_bThumbnailExtracted = TRUE;
 	m_bThumbnailExtractionFailed = TRUE;
 
-	hr = GetIdlFromParsingName(m_ImageFile,&pidlFull);
+	hr = SHParseDisplayName(m_ImageFile, nullptr, &pidlFull, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{

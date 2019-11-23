@@ -20,7 +20,7 @@
 HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath,UINT wFlags)
 {
 	LPITEMIDLIST pidlDirectory = NULL;
-	HRESULT hr = GetIdlFromParsingName(szPath,&pidlDirectory);
+	HRESULT hr = SHParseDisplayName(szPath, nullptr, &pidlDirectory, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{

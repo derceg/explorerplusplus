@@ -1154,7 +1154,7 @@ void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath)
 	LPITEMIDLIST	pidl = NULL;
 	HRESULT			hr;
 
-	hr = GetIdlFromParsingName(szPath,&pidl);
+	hr = SHParseDisplayName(szPath, nullptr, &pidl, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{

@@ -963,7 +963,7 @@ HTREEITEM CMyTreeView::LocateDeletedItem(const TCHAR *szFullFileName)
 
 	StringCchCopy(szParent,SIZEOF_ARRAY(szParent),szFullFileName);
 	PathRemoveFileSpec(szParent);
-	hr = GetIdlFromParsingName(szParent,&pidl);
+	hr = SHParseDisplayName(szParent, nullptr, &pidl, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
@@ -1017,7 +1017,7 @@ HTREEITEM CMyTreeView::LocateExistingItem(const TCHAR *szParsingPath)
 	HTREEITEM		hItem;
 	HRESULT			hr;
 
-	hr = GetIdlFromParsingName(szParsingPath,&pidl);
+	hr = SHParseDisplayName(szParsingPath, nullptr, &pidl, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{

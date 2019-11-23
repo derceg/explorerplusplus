@@ -523,7 +523,7 @@ void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroup
 	TotalSizeGroupLimits[3].QuadPart	= 20 * TotalSizeGroupLimits[2].QuadPart;
 	TotalSizeGroupLimits[4].QuadPart	= 100 * TotalSizeGroupLimits[2].QuadPart;
 
-	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
+	SHParseDisplayName(m_CurDir, nullptr, &pidlDirectory, 0, nullptr);
 
 	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
@@ -717,7 +717,7 @@ void CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroup
 	BOOL bRoot;
 	BOOL bRes = FALSE;
 
-	GetIdlFromParsingName(m_CurDir,&pidlDirectory);
+	SHParseDisplayName(m_CurDir, nullptr, &pidlDirectory, 0, nullptr);
 	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),
 		IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
 

@@ -82,7 +82,7 @@ void CMyTreeView::DirectoryAlteredAddFile(const TCHAR *szFullFileName)
 
 	/* We'll use this as a litmus test to check whether or not
 	the file actually exists. */
-	hr = GetIdlFromParsingName(szFullFileName,&pidlComplete);
+	hr = SHParseDisplayName(szFullFileName, nullptr, &pidlComplete, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
@@ -383,7 +383,7 @@ void CMyTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
 	int				iItemId;
 	int				nChildren = 0;
 
-	hr = GetIdlFromParsingName(szFullFileName,&pidlComplete);
+	hr = SHParseDisplayName(szFullFileName, nullptr, &pidlComplete, 0, nullptr);
 
 	if(!SUCCEEDED(hr))
 		return;
@@ -489,7 +489,7 @@ void CMyTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 		StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
 		PathStripPath(szFileName);
 
-		hr = GetIdlFromParsingName(szFullFileName,&pItemInfo->pidl);
+		hr = SHParseDisplayName(szFullFileName, nullptr, &pItemInfo->pidl, 0, nullptr);
 
 		pidlParent = pItemInfo->pidl;
 

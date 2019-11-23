@@ -865,7 +865,7 @@ void CDropHandler::HandleRightClickDrop(void)
 	DWORD dwe;
 	HRESULT hr;
 
-	hr = GetIdlFromParsingName(m_szDestDirectory,&pidlDirectory);
+	hr = SHParseDisplayName(m_szDestDirectory, nullptr, &pidlDirectory, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{

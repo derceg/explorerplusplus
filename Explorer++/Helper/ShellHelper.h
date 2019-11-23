@@ -45,7 +45,6 @@ struct ContextMenuHandler_t
 };
 
 void			DecodePath(const TCHAR *szInitialPath,const TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest);
-HRESULT			GetIdlFromParsingName(const TCHAR *szParsingName,LPITEMIDLIST *pidl);
 HRESULT			GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags);
 HRESULT			GetDisplayName(PCIDLIST_ABSOLUTE pidl,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags);
 HRESULT			GetCsidlDisplayName(int csidl, TCHAR *szFolderName, UINT cchMax, DWORD uParsingFlags);

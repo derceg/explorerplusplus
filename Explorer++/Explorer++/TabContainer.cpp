@@ -736,7 +736,7 @@ HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory,
 			SIZEOF_ARRAY(szExpandedPath), TabDirectory);
 	}
 
-	if (!SUCCEEDED(GetIdlFromParsingName(szExpandedPath, &pidl)))
+	if (!SUCCEEDED(SHParseDisplayName(szExpandedPath, nullptr, &pidl, 0, nullptr)))
 		return E_FAIL;
 
 	hr = CreateNewTab(pidl, tabSettings, folderSettings, initialColumns, newTabId);

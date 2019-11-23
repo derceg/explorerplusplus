@@ -1627,7 +1627,7 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 	its drive letter/name. */
 	GetDisplayName(szDrive,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
-	hr = GetIdlFromParsingName(szDrive,&pidlDrive);
+	hr = SHParseDisplayName(szDrive, nullptr, &pidlDrive, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{

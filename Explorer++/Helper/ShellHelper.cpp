@@ -20,36 +20,6 @@ HRESULT AddJumpListTasksInternal(IObjectCollection *poc,
 HRESULT AddJumpListTaskInternal(IObjectCollection *poc,const TCHAR *pszName,
 	const TCHAR *pszPath,const TCHAR *pszArguments,const TCHAR *pszIconPath,int iIcon);
 
-HRESULT GetIdlFromParsingName(const TCHAR *szParsingName,LPITEMIDLIST *pidl)
-{
-	if(szParsingName == NULL ||
-		pidl == NULL)
-	{
-		return E_FAIL;
-	}
-
-	IShellFolder *pDesktopFolder = NULL;
-	HRESULT hr;
-
-	hr = SHGetDesktopFolder(&pDesktopFolder);
-
-	if(SUCCEEDED(hr))
-	{
-		/* For some reason, ParseDisplayName
-		takes a pointer to a non-constant
-		string, so copy the incoming string. */
-		TCHAR szParsingNameTemp[MAX_PATH];
-		StringCchCopy(szParsingNameTemp, SIZEOF_ARRAY(szParsingNameTemp), szParsingName);
-
-		hr = pDesktopFolder->ParseDisplayName(NULL,NULL,
-			szParsingNameTemp,NULL,pidl,NULL);
-
-		pDesktopFolder->Release();
-	}
-
-	return hr;
-}
-
 HRESULT GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags)
 {
 	if(szParsingPath == NULL ||
@@ -61,7 +31,7 @@ HRESULT GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cchM
 	LPITEMIDLIST pidl = NULL;
 	HRESULT hr;
 
-	hr = GetIdlFromParsingName(szParsingPath,&pidl);
+	hr = SHParseDisplayName(szParsingPath, nullptr, &pidl, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
@@ -128,7 +98,7 @@ HRESULT GetItemAttributes(const TCHAR *szItemParsingPath,SFGAOF *pItemAttributes
 	LPITEMIDLIST pidl = NULL;
 	HRESULT hr;
 
-	hr = GetIdlFromParsingName(szItemParsingPath,&pidl);
+	hr = SHParseDisplayName(szItemParsingPath, nullptr, &pidl, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
@@ -245,7 +215,7 @@ BOOL CheckIdl(LPCITEMIDLIST pidl)
 	if(!SUCCEEDED(GetDisplayName(pidl,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_FORPARSING)))
 		return FALSE;
 
-	if(!SUCCEEDED(GetIdlFromParsingName(szTabText,&pidlCheck)))
+	if(!SUCCEEDED(SHParseDisplayName(szTabText, nullptr, &pidlCheck, 0, nullptr)))
 		return FALSE;
 
 	CoTaskMemFree(pidlCheck);
@@ -1297,7 +1267,7 @@ HRESULT GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax)
 	LPITEMIDLIST	pidlItem = NULL;
 	HRESULT			hr;
 
-	hr = GetIdlFromParsingName(szItemPath, &pidlItem);
+	hr = SHParseDisplayName(szItemPath, nullptr, &pidlItem, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
