@@ -8,7 +8,7 @@
 
 bool Explorerplusplus::CanCreate() const
 {
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlDirectory(m_pActiveShellBrowser->GetDirectoryIdl());
+	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	SFGAOF attributes = SFGAO_FILESYSTEM;
 	HRESULT hr = GetItemAttributes(pidlDirectory.get(), &attributes);
@@ -114,7 +114,7 @@ HRESULT Explorerplusplus::GetListViewSelectionAttributes(SFGAOF *pItemAttributes
 
 HRESULT Explorerplusplus::GetListViewItemAttributes(int item, SFGAOF *pItemAttributes) const
 {
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlComplete(m_pActiveShellBrowser->GetItemCompleteIdl(item));
+	auto pidlComplete = m_pActiveShellBrowser->GetItemCompleteIdl(item);
 
 	if (!pidlComplete)
 	{

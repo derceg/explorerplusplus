@@ -432,18 +432,16 @@ void TabContainer::ProcessTabCommand(UINT uMenuID, Tab &tab)
 
 void TabContainer::OnOpenParentInNewTab(const Tab &tab)
 {
-	PIDLIST_ABSOLUTE pidlCurrent = tab.GetShellBrowser()->GetDirectoryIdl();
+	auto pidlCurrent = tab.GetShellBrowser()->GetDirectoryIdl();
 
 	LPITEMIDLIST pidlParent = NULL;
-	HRESULT hr = GetVirtualParentPath(pidlCurrent, &pidlParent);
+	HRESULT hr = GetVirtualParentPath(pidlCurrent.get(), &pidlParent);
 
 	if (SUCCEEDED(hr))
 	{
 		CreateNewTab(pidlParent, TabSettings(_selected = true));
 		CoTaskMemFree(pidlParent);
 	}
-
-	CoTaskMemFree(pidlCurrent);
 }
 
 void TabContainer::OnRefreshAllTabs()
@@ -560,7 +558,7 @@ void TabContainer::OnGetDispInfo(NMTTDISPINFO *dispInfo)
 
 	const Tab &tab = GetTabByIndex(static_cast<int>(dispInfo->hdr.idFrom));
 
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlDirectory(tab.GetShellBrowser()->GetDirectoryIdl());
+	auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 	auto path = GetFolderPathForDisplay(pidlDirectory.get());
 
 	if (!path)
@@ -680,7 +678,7 @@ void TabContainer::SetTabIcon(const Tab &tab)
 	}
 	else
 	{
-		wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlDirectory(tab.GetShellBrowser()->GetDirectoryIdl());
+		auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 
 		SHGetFileInfo((LPCTSTR)pidlDirectory.get(), 0, &shfi, sizeof(shfi),
 			SHGFI_PIDL | SHGFI_ICON | SHGFI_SMALLICON);

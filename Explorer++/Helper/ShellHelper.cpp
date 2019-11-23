@@ -564,7 +564,7 @@ via arguments.
 Returns S_OK on success; E_FAIL on failure. */
 HRESULT BuildShellIDList(FORMATETC *pftc,STGMEDIUM *pstg,
 	LPCITEMIDLIST pidlDirectory,
-	const std::list<LPITEMIDLIST> &pidlList)
+	const std::vector<LPCITEMIDLIST> &pidlList)
 {
 	if(pftc == NULL ||
 		pstg == NULL ||

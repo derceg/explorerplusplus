@@ -460,10 +460,10 @@ void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 {
 	LPITEMIDLIST pidlDirectory = m_pMyTreeView->BuildPath(g_NewSelectionItem);
-	PIDLIST_ABSOLUTE pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
+	auto pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	if(!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick &&
-		!CompareIdls(pidlDirectory,pidlCurrentDirectory))
+		!CompareIdls(pidlDirectory,pidlCurrentDirectory.get()))
 	{
 		m_navigation->BrowseFolderInCurrentTab(pidlDirectory,0);
 
@@ -473,7 +473,6 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 		}
 	}
 
-	CoTaskMemFree(pidlCurrentDirectory);
 	CoTaskMemFree(pidlDirectory);
 
 	KillTimer(m_hHolder,0);
@@ -819,7 +818,6 @@ void Explorerplusplus::OnTreeViewPaste(void)
 void Explorerplusplus::UpdateTreeViewSelection(void)
 {
 	HTREEITEM		hItem;
-	PIDLIST_ABSOLUTE	pidlDirectory = NULL;
 	TCHAR			szDirectory[MAX_PATH];
 	TCHAR			szRoot[MAX_PATH];
 	UINT			uDriveType;
@@ -830,9 +828,9 @@ void Explorerplusplus::UpdateTreeViewSelection(void)
 		return;
 	}
 
-	pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
+	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-	GetDisplayName(pidlDirectory,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
+	GetDisplayName(pidlDirectory.get(),szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
 
 	if(PathIsUNC(szDirectory))
 	{
@@ -851,7 +849,7 @@ void Explorerplusplus::UpdateTreeViewSelection(void)
 	treeview with network or UNC paths. */
 	if(!bNetworkPath)
 	{
-		hItem = m_pMyTreeView->LocateItem(pidlDirectory);
+		hItem = m_pMyTreeView->LocateItem(pidlDirectory.get());
 
 		if(hItem != NULL)
 		{
@@ -866,6 +864,4 @@ void Explorerplusplus::UpdateTreeViewSelection(void)
 			SendMessage(m_hTreeView,TVM_SELECTITEM,(WPARAM)TVGN_CARET,(LPARAM)hItem);
 		}
 	}
-
-	CoTaskMemFree(pidlDirectory);
 }

@@ -77,7 +77,7 @@ public:
 	BOOL				IsDragging() const;
 
 	/* Get/Set current state. */
-	PIDLIST_ABSOLUTE	GetDirectoryIdl() const;
+	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE>	GetDirectoryIdl() const;
 	std::wstring		GetDirectory() const;
 	BOOL				GetAutoArrange(void) const;
 	void				SetAutoArrange(BOOL autoArrange);
@@ -114,8 +114,8 @@ public:
 
 	/* Item information. */
 	WIN32_FIND_DATA		GetItemFileFindData(int iItem) const;
-	PIDLIST_ABSOLUTE	GetItemCompleteIdl(int iItem) const;
-	PIDLIST_RELATIVE	GetItemRelativeIdl(int iItem) const;
+	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE>	GetItemCompleteIdl(int iItem) const;
+	wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE>	GetItemRelativeIdl(int iItem) const;
 	DWORD				GetItemAttributes(int iItem) const;
 	int					GetItemDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
 	HRESULT				GetItemFullName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;

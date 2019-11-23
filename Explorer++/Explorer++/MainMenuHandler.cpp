@@ -209,7 +209,7 @@ void Explorerplusplus::OnSaveDirectoryListing() const
 
 void Explorerplusplus::OnCreateNewFolder()
 {
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlDirectory(m_pActiveShellBrowser->GetDirectoryIdl());
+	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	IShellItem *directoryShellItem = nullptr;
 	HRESULT hr = SHCreateItemFromIDList(pidlDirectory.get(), IID_PPV_ARGS(&directoryShellItem));

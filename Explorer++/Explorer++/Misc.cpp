@@ -233,7 +233,7 @@ void Explorerplusplus::CopyToFolder(bool move)
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)
 	{
-		wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlPtr(m_pActiveShellBrowser->GetItemCompleteIdl(iItem));
+		auto pidlPtr = m_pActiveShellBrowser->GetItemCompleteIdl(iItem);
 
 		if (!pidlPtr)
 		{

@@ -41,7 +41,7 @@ std::wstring Tab::GetName() const
 		return m_customName;
 	}
 
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlDirectory(m_shellBrowser->GetDirectoryIdl());
+	auto pidlDirectory = m_shellBrowser->GetDirectoryIdl();
 
 	TCHAR name[MAX_PATH];
 	HRESULT hr = GetDisplayName(pidlDirectory.get(), name, SIZEOF_ARRAY(name), SHGDN_INFOLDER);

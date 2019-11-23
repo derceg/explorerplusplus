@@ -76,7 +76,7 @@ void MainWindow::OnShowPrivilegeLevelInTitleBarUpdated(BOOL newValue)
 void MainWindow::UpdateWindowText()
 {
 	const Tab &tab = m_expp->GetTabContainer()->GetSelectedTab();
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlDirectory(tab.GetShellBrowser()->GetDirectoryIdl());
+	auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 
 	TCHAR szFolderDisplayName[MAX_PATH];
 

@@ -168,7 +168,7 @@ void AddressBar::OnBeginDrag()
 		if (SUCCEEDED(hr))
 		{
 			const Tab &selectedTab = m_expp->GetTabContainer()->GetSelectedTab();
-			PIDLIST_ABSOLUTE pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
+			auto pidlDirectory = selectedTab.GetShellBrowser()->GetDirectoryIdl();
 
 			FORMATETC ftc[2];
 			STGMEDIUM stg[2];
@@ -192,7 +192,7 @@ void AddressBar::OnBeginDrag()
 
 			/* The name of the file will be the folder name, followed by .lnk. */
 			TCHAR szDisplayName[MAX_PATH];
-			GetDisplayName(pidlDirectory, szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
+			GetDisplayName(pidlDirectory.get(), szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
 			StringCchCat(szDisplayName, SIZEOF_ARRAY(szDisplayName), _T(".lnk"));
 			StringCchCopy(pfd[0].cFileName, SIZEOF_ARRAY(pfd[0].cFileName), szDisplayName);
 
@@ -218,7 +218,7 @@ void AddressBar::OnBeginDrag()
 			{
 				TCHAR szPath[MAX_PATH];
 
-				GetDisplayName(pidlDirectory, szPath, SIZEOF_ARRAY(szPath), SHGDN_FORPARSING);
+				GetDisplayName(pidlDirectory.get(), szPath, SIZEOF_ARRAY(szPath), SHGDN_FORPARSING);
 
 				pShellLink->SetPath(szPath);
 
@@ -254,8 +254,6 @@ void AddressBar::OnBeginDrag()
 
 			DoDragDrop(pDataObject, pDropSource, DROPEFFECT_LINK, &dwEffect);
 
-			CoTaskMemFree(pidlDirectory);
-
 			pDataObject->Release();
 			pDropSource->Release();
 		}
@@ -279,8 +277,7 @@ void AddressBar::OnNavigationCompleted(const Tab &tab)
 
 void AddressBar::UpdateTextAndIcon(const Tab &tab)
 {
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidl(tab.GetShellBrowser()->GetDirectoryIdl());
-
+	auto pidl = tab.GetShellBrowser()->GetDirectoryIdl();
 	auto text = GetFolderPathForDisplay(pidl.get());
 
 	if (!text)
