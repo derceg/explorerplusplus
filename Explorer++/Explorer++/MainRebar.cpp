@@ -13,7 +13,6 @@
 #include "MainResource.h"
 #include "../Helper/Controls.h"
 #include "../Helper/MenuHelper.h"
-#include "../Helper/MenuWrapper.h"
 #include "../Helper/WindowHelper.h"
 
 LRESULT CALLBACK RebarSubclassStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
@@ -227,7 +226,7 @@ LRESULT CALLBACK Explorerplusplus::RebarSubclass(HWND hwnd, UINT msg, WPARAM wPa
 
 void Explorerplusplus::OnToolbarRClick(HWND sourceWindow)
 {
-	auto parentMenu = MenuPtr(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_TOOLBAR_MENU)));
+	auto parentMenu = wil::unique_hmenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_TOOLBAR_MENU)));
 
 	if (!parentMenu)
 	{

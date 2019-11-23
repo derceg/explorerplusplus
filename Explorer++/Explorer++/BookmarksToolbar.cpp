@@ -9,7 +9,6 @@
 #include "MainResource.h"
 #include "TabContainer.h"
 #include "../Helper/Macros.h"
-#include "../Helper/MenuWrapper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
 #include <algorithm>
@@ -207,7 +206,7 @@ BOOL CBookmarksToolbar::OnRightClick(const NMMOUSE *nmm)
 		return FALSE;
 	}
 
-	auto parentMenu = MenuPtr(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_BOOKMARKSTOOLBAR_RCLICK_MENU)));
+	auto parentMenu = wil::unique_hmenu(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_BOOKMARKSTOOLBAR_RCLICK_MENU)));
 
 	if (!parentMenu)
 	{

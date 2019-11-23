@@ -258,9 +258,6 @@
     <ClInclude Include="Rgb.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="MenuWrapper.h">
-      <Filter>Resource Wrappers</Filter>
-    </ClInclude>
     <ClInclude Include="DpiCompatibility.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>

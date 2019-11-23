@@ -18,7 +18,6 @@
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/MenuHelper.h"
-#include "../Helper/MenuWrapper.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/TabHelper.h"
 #include "../Helper/WindowHelper.h"
@@ -348,7 +347,7 @@ void TabContainer::OnTabCtrlRButtonUp(POINT *pt)
 
 void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 {
-	auto parentMenu = MenuPtr(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_TAB_RCLICK)));
+	auto parentMenu = wil::unique_hmenu(LoadMenu(m_instance, MAKEINTRESOURCE(IDR_TAB_RCLICK)));
 
 	if (!parentMenu)
 	{
