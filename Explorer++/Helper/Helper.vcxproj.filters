@@ -249,9 +249,6 @@
     <ClInclude Include="ImageHelper.h">
       <Filter>Miscellaneous</Filter>
     </ClInclude>
-    <ClInclude Include="ImageWrappers.h">
-      <Filter>Resource Wrappers</Filter>
-    </ClInclude>
     <ClInclude Include="PIDLWrapper.h">
       <Filter>Resource Wrappers</Filter>
     </ClInclude>

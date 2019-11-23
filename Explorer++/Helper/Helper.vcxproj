@@ -365,7 +365,6 @@
     <ClInclude Include="iDropSource.h" />
     <ClInclude Include="iEnumFormatEtc.h" />
     <ClInclude Include="ImageHelper.h" />
-    <ClInclude Include="ImageWrappers.h" />
     <ClInclude Include="ListViewHelper.h" />
     <ClInclude Include="Logging.h" />
     <ClInclude Include="Macros.h" />

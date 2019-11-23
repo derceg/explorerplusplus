@@ -153,8 +153,8 @@ boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAs
 		return boost::none;
 	}
 
-	HBITMAP hThumbnailBitmap;
-	hr = pExtractImage->Extract(&hThumbnailBitmap);
+	wil::unique_hbitmap thumbnailBitmap;
+	hr = pExtractImage->Extract(&thumbnailBitmap);
 
 	if (FAILED(hr))
 	{
@@ -165,7 +165,7 @@ boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAs
 
 	ThumbnailResult_t result;
 	result.itemInternalIndex = internalIndex;
-	result.bitmap = HBitmapPtr(hThumbnailBitmap);
+	result.bitmap = std::move(thumbnailBitmap);
 
 	return result;
 }

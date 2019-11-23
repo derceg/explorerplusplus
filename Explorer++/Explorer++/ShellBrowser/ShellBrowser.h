@@ -12,11 +12,11 @@
 #include "ViewModes.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
-#include "../Helper/ImageWrappers.h"
 #include "../Helper/Macros.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/optional.hpp>
+#include <wil/resource.h>
 #include <future>
 #include <list>
 #include <unordered_map>
@@ -234,7 +234,7 @@ private:
 	struct ThumbnailResult_t
 	{
 		int itemInternalIndex;
-		HBitmapPtr bitmap;
+		wil::unique_hbitmap bitmap;
 	};
 
 	struct InfoTipResult
