@@ -172,8 +172,8 @@ int EventId,int iFolderIndex)
 void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
-	LPITEMIDLIST	pidlFull = NULL;
-	LPITEMIDLIST	pidlRelative = NULL;
+	PIDLIST_ABSOLUTE	pidlFull = NULL;
+	PCITEMID_CHILD	pidlRelative = NULL;
 	Added_t			Added;
 	TCHAR			FullFileName[MAX_PATH];
 	TCHAR			szDisplayName[MAX_PATH];
@@ -192,7 +192,7 @@ void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 	If the file is not added, store its filename. */
 	if(SUCCEEDED(hr))
 	{
-		hr = SHBindToParent(pidlFull, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
+		hr = SHBindToParent(pidlFull, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 		if(SUCCEEDED(hr))
 		{
@@ -512,7 +512,7 @@ should go through a central function. */
 void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
-	LPITEMIDLIST	pidlFull = NULL;
+	PIDLIST_ABSOLUTE	pidlFull = NULL;
 	PCITEMID_CHILD	pidlRelative = NULL;
 	SHFILEINFO		shfi;
 	LVFINDINFO		lvfi;

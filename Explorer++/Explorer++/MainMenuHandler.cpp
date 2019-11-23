@@ -158,7 +158,7 @@ void Explorerplusplus::OnShowHelp()
 	PathRemoveFileSpec(szHelpFile);
 	PathAppend(szHelpFile, NExplorerplusplus::HELP_FILE_NAME);
 
-	LPITEMIDLIST pidl = NULL;
+	PIDLIST_ABSOLUTE pidl = NULL;
 	HRESULT hr = SHParseDisplayName(szHelpFile, nullptr, &pidl, 0, nullptr);
 
 	bool bOpenedHelpFile = false;

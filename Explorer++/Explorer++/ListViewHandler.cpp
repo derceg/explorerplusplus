@@ -1001,12 +1001,16 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 	if(nSelected > 0)
 	{
-		std::list<PIDLIST_RELATIVE> pidlList;
+		std::vector<PIDLPointer> pidlPtrs;
+		std::list<PCIDLIST_RELATIVE> pidlList;
 		int iItem = -1;
 
 		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 		{
-			pidlList.push_back(m_pActiveShellBrowser->GetItemRelativeIdl(iItem));
+			PIDLPointer pidlPtr(m_pActiveShellBrowser->GetItemRelativeIdl(iItem));
+
+			pidlList.push_back(pidlPtr.get());
+			pidlPtrs.push_back(std::move(pidlPtr));
 		}
 
 		PIDLIST_ABSOLUTE pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
@@ -1022,11 +1026,6 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 			reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,IsKeyDown(VK_SHIFT));
 
 		CoTaskMemFree(pidlDirectory);
-
-		for(auto pidl : pidlList)
-		{
-			CoTaskMemFree(pidl);
-		}
 	}
 }
 
@@ -1252,7 +1251,7 @@ void Explorerplusplus::OnListViewFileDelete(bool permanent)
 	// when this function returns).
 	std::vector<PIDLPointer> pidlPtrs;
 
-	std::vector<LPCITEMIDLIST> pidls;
+	std::vector<PCIDLIST_ABSOLUTE> pidls;
 	int iItem = -1;
 
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)

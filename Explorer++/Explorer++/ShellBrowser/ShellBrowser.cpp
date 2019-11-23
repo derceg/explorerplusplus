@@ -480,8 +480,8 @@ PIDLIST_ABSOLUTE CShellBrowser::GetDirectoryIdl() const
 	return ILCloneFull(m_pidlDirectory);
 }
 
-HRESULT CShellBrowser::CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,
-IN POINT *pt,IN BOOL bBackOrForward)
+HRESULT CShellBrowser::CreateHistoryPopup(HWND hParent, PIDLIST_ABSOLUTE *pidl,
+	POINT *pt, BOOL bBackOrForward)
 {
 	int iSel;
 
@@ -532,12 +532,12 @@ std::list<PIDLIST_ABSOLUTE> CShellBrowser::GetForwardHistory() const
 	return m_pathManager.GetForwardHistory();
 }
 
-LPITEMIDLIST CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)
+PIDLIST_ABSOLUTE CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)
 {
 	return m_pathManager.RetrievePathWithoutUpdate(iItem);
 }
 
-LPITEMIDLIST CShellBrowser::RetrieveHistoryItem(int iItem)
+PIDLIST_ABSOLUTE CShellBrowser::RetrieveHistoryItem(int iItem)
 {
 	return m_pathManager.RetrievePath(iItem);
 }
@@ -1614,7 +1614,7 @@ void CShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 
 void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 {
-	LPITEMIDLIST			pidlDrive = NULL;
+	PIDLIST_ABSOLUTE		pidlDrive = NULL;
 	LVITEM					lvItem;
 	SHFILEINFO				shfi;
 	TCHAR					szDisplayName[MAX_PATH];

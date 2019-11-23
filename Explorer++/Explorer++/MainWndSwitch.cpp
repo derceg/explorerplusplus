@@ -1715,8 +1715,6 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 						(iCmd >= ID_REBAR_MENU_FORWARD_START &&
 						iCmd <= ID_REBAR_MENU_FORWARD_END))
 					{
-						LPITEMIDLIST pidl = NULL;
-
 						if(iCmd >= ID_REBAR_MENU_BACK_START &&
 							iCmd <= ID_REBAR_MENU_BACK_END)
 						{
@@ -1727,7 +1725,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 							iCmd = iCmd - ID_REBAR_MENU_FORWARD_START;
 						}
 
-						pidl = m_pActiveShellBrowser->RetrieveHistoryItem(iCmd);
+						PIDLIST_ABSOLUTE pidl = m_pActiveShellBrowser->RetrieveHistoryItem(iCmd);
 
 						m_navigation->BrowseFolderInCurrentTab(pidl,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
 

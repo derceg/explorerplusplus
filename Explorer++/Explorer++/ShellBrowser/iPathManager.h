@@ -19,9 +19,9 @@ public:
 	std::list<PIDLIST_ABSOLUTE>	GetForwardHistory() const;
 
 	void			StoreIdl(PCIDLIST_ABSOLUTE pidl);
-	LPITEMIDLIST	RetrievePath(int iIndex);
-	LPITEMIDLIST	RetrievePathWithoutUpdate(int iIndex);
-	LPITEMIDLIST	RetrieveAndValidateIdl(int iIndex);
+	PIDLIST_ABSOLUTE	RetrievePath(int iIndex);
+	PIDLIST_ABSOLUTE	RetrievePathWithoutUpdate(int iIndex);
+	PIDLIST_ABSOLUTE	RetrieveAndValidateIdl(int iIndex);
 
 private:
 

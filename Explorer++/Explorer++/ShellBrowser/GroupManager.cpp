@@ -503,7 +503,7 @@ void CShellBrowser::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeade
 void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	IShellFolder *pShellFolder	= NULL;
-	LPITEMIDLIST pidlDirectory	= NULL;
+	PIDLIST_ABSOLUTE pidlDirectory	= NULL;
 	PCITEMID_CHILD pidlRelative	= NULL;
 	TCHAR *SizeGroups[] = {_T("Unspecified"),_T("Small"),_T("Medium"),_T("Huge"),_T("Gigantic")};
 	TCHAR szItem[MAX_PATH];
@@ -706,10 +706,10 @@ void CShellBrowser::DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo, c
 void CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	std::list<TypeGroup_t>::iterator itr;
-	LPITEMIDLIST pidlDirectory	= NULL;
+	PIDLIST_ABSOLUTE pidlDirectory	= NULL;
 	TCHAR szFreeSpace[MAX_PATH];
 	IShellFolder *pShellFolder	= NULL;
-	LPITEMIDLIST pidlRelative	= NULL;
+	PCITEMID_CHILD pidlRelative	= NULL;
 	STRRET str;
 	TCHAR szItem[MAX_PATH];
 	ULARGE_INTEGER nTotalBytes;
@@ -719,7 +719,7 @@ void CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroup
 
 	SHParseDisplayName(m_CurDir, nullptr, &pidlDirectory, 0, nullptr);
 	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),
-		IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
+		IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
 	StrRetToBuf(&str,pidlRelative,szItem,SIZEOF_ARRAY(szItem));

@@ -119,10 +119,8 @@ void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 
 void Explorerplusplus::OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
-	LPITEMIDLIST	pidlItem = NULL;
-	HRESULT			hr;
-
-	hr = SHParseDisplayName(szItem, nullptr, &pidlItem, 0, nullptr);
+	PIDLIST_ABSOLUTE pidlItem = NULL;
+	HRESULT hr = SHParseDisplayName(szItem, nullptr, &pidlItem, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
@@ -242,8 +240,7 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 					if(((uAttributes & SFGAO_FOLDER) && !(uAttributes & SFGAO_STREAM)) ||
 						((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM) && m_config->handleZipFiles))
 					{
-						LPITEMIDLIST	pidlTarget = NULL;
-
+						PIDLIST_ABSOLUTE pidlTarget = NULL;
 						hr = SHParseDisplayName(szTargetPath, nullptr, &pidlTarget, 0, nullptr);
 
 						if(SUCCEEDED(hr))

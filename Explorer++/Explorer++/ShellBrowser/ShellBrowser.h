@@ -94,8 +94,8 @@ public:
 	BOOL				CanBrowseForward(void) const;
 	std::list<PIDLIST_ABSOLUTE>	GetBackHistory() const;
 	std::list<PIDLIST_ABSOLUTE>	GetForwardHistory() const;
-	LPITEMIDLIST		RetrieveHistoryItemWithoutUpdate(int iItem);
-	LPITEMIDLIST		RetrieveHistoryItem(int iItem);
+	PIDLIST_ABSOLUTE	RetrieveHistoryItemWithoutUpdate(int iItem);
+	PIDLIST_ABSOLUTE	RetrieveHistoryItem(int iItem);
 	BOOL				CanBrowseUp(void) const;
 	int					GetNumItems(void) const;
 	int					GetNumSelectedFiles(void) const;
@@ -136,7 +136,7 @@ public:
 	void				SetFilterCaseSensitive(BOOL bCaseSensitive);
 
 	void				UpdateFileSelectionInfo(int,BOOL);
-	HRESULT				CreateHistoryPopup(IN HWND hParent,OUT LPITEMIDLIST *pidl,IN POINT *pt,IN BOOL bBackOrForward);
+	HRESULT				CreateHistoryPopup(HWND hParent, PIDLIST_ABSOLUTE *pidl, POINT *pt, BOOL bBackOrForward);
 	int					SelectFiles(const TCHAR *FileNamePattern);
 	void				GetFolderInfo(FolderInfo_t *pFolderInfo);
 	int					LocateFileItemIndex(const TCHAR *szFileName) const;
@@ -271,7 +271,7 @@ private:
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void				InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(int iItemInternal) const;
-	HRESULT				AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, LPITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
+	HRESULT				AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, LPCITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
 	HRESULT				AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
 	int					SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCIDLIST_RELATIVE pidlRelative, const TCHAR *szFileName);
 	void				ResetFolderMemoryAllocations(void);

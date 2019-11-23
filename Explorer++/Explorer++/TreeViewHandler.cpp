@@ -201,7 +201,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	HTREEITEM hItem;
 	HTREEITEM hPrevItem;
 	IShellFolder *pShellParentFolder = NULL;
-	LPITEMIDLIST pidlRelative = NULL;
+	PCITEMID_CHILD pidlRelative = NULL;
 	HRESULT hr;
 
 	hItem	= (HTREEITEM)wParam;
@@ -213,8 +213,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 	TreeView_SelectItem(m_hTreeView,hItem);
 	pidl = m_pMyTreeView->BuildPath(hItem);
 
-	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellParentFolder),
-	(LPCITEMIDLIST *)&pidlRelative);
+	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellParentFolder), &pidlRelative);
 
 	if(SUCCEEDED(hr))
 	{
@@ -239,7 +238,7 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 			{
 				m_bTreeViewOpenInNewTab = FALSE;
 
-				std::list<LPITEMIDLIST> pidlList;
+				std::list<LPCITEMIDLIST> pidlList;
 
 				pidlList.push_back(pidlRelative);
 
@@ -820,7 +819,7 @@ void Explorerplusplus::OnTreeViewPaste(void)
 void Explorerplusplus::UpdateTreeViewSelection(void)
 {
 	HTREEITEM		hItem;
-	LPITEMIDLIST	pidlDirectory = NULL;
+	PIDLIST_ABSOLUTE	pidlDirectory = NULL;
 	TCHAR			szDirectory[MAX_PATH];
 	TCHAR			szRoot[MAX_PATH];
 	UINT			uDriveType;

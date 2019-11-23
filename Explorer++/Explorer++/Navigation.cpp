@@ -106,7 +106,7 @@ HRESULT Navigation::BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags)
 	/* Doesn't matter if we can't get the pidl here,
 	as some paths will be relative, or will be filled
 	by the shellbrowser (e.g. when browsing back/forward). */
-	LPITEMIDLIST pidl = NULL;
+	PIDLIST_ABSOLUTE pidl = NULL;
 	HRESULT hr = SHParseDisplayName(szPath, nullptr, &pidl, 0, nullptr);
 
 	BrowseFolder(tab, pidl, wFlags);

@@ -308,7 +308,7 @@ void CApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 	{
 		ApplicationInfo_t ai = ProcessCommand(Button->Command);
 
-		LPITEMIDLIST pidl = NULL;
+		PIDLIST_ABSOLUTE pidl = NULL;
 		HRESULT hr = SHParseDisplayName(ai.Application.c_str(), nullptr, &pidl, 0, nullptr);
 
 		if(SUCCEEDED(hr))

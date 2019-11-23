@@ -349,7 +349,7 @@ void Explorerplusplus::OnUseLargeToolbarIconsUpdated(BOOL newValue)
 HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 {
 	HMENU hSubMenu = NULL;
-	std::list<LPITEMIDLIST> history;
+	std::list<PIDLIST_ABSOLUTE> history;
 	int iBase;
 
 	if (bBack)

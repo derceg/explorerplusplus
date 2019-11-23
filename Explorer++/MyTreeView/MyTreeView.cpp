@@ -956,7 +956,7 @@ match against that. */
 HTREEITEM CMyTreeView::LocateDeletedItem(const TCHAR *szFullFileName)
 {
 	HTREEITEM hItem = NULL;
-	LPITEMIDLIST pidl = NULL;
+	PIDLIST_ABSOLUTE pidl = NULL;
 	TCHAR szParent[MAX_PATH];
 	BOOL bFound = FALSE;
 	HRESULT hr;
@@ -1013,15 +1013,12 @@ HTREEITEM CMyTreeView::LocateDeletedItem(const TCHAR *szFullFileName)
 
 HTREEITEM CMyTreeView::LocateExistingItem(const TCHAR *szParsingPath)
 {
-	LPITEMIDLIST	pidl = NULL;
-	HTREEITEM		hItem;
-	HRESULT			hr;
-
-	hr = SHParseDisplayName(szParsingPath, nullptr, &pidl, 0, nullptr);
+	PIDLIST_ABSOLUTE pidl = NULL;
+	HRESULT hr = SHParseDisplayName(szParsingPath, nullptr, &pidl, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		hItem = LocateExistingItem(pidl);
+		HTREEITEM hItem = LocateExistingItem(pidl);
 
 		CoTaskMemFree(pidl);
 

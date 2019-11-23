@@ -31,9 +31,13 @@ public:
 		TabInterface *tabInterface, Navigation *navigation, IExplorerplusplus *expp,
 		HINSTANCE instance, std::shared_ptr<Config> config);
 
-	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
-	HRESULT CreateNewTab(LPCITEMIDLIST pidlDirectory, const TabSettings &tabSettings = {}, const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none, int *newTabId = nullptr);
-	FolderSettings GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const;
+	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
+		const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none,
+		int *newTabId = nullptr);
+	HRESULT CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings = {},
+		const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none,
+		int *newTabId = nullptr);
+	FolderSettings GetDefaultFolderSettings(PCIDLIST_ABSOLUTE pidlDirectory) const;
 
 	Tab &GetTab(int tabId);
 	Tab *GetTabOptional(int tabId);
@@ -127,7 +131,7 @@ private:
 	void UpdateTabNameInWindow(const Tab &tab);
 	void SetTabIcon(const Tab &tab);
 
-	SortMode GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const;
+	SortMode GetDefaultSortMode(PCIDLIST_ABSOLUTE pidlDirectory) const;
 	void InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, boost::optional<std::wstring> customName);
 
 	void RemoveTabFromControl(const Tab &tab);

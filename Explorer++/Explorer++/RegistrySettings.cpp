@@ -680,7 +680,7 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			if(hr == S_OK)
 				nTabsCreated++;
 
-			CoTaskMemFree((LPVOID)pidlDirectory);
+			CoTaskMemFree(pidlDirectory);
 			RegCloseKey(hTabKey);
 
 			i++;

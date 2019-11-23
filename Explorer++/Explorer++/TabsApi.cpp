@@ -59,7 +59,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 	TabSettings tabSettings;
 	extractTabPropertiesForCreation(createProperties, tabSettings);
 
-	LPITEMIDLIST pidlDirectory;
+	PIDLIST_ABSOLUTE pidlDirectory;
 	HRESULT hr = SHParseDisplayName(location->c_str(), nullptr, &pidlDirectory, 0, nullptr);
 
 	if (FAILED(hr))

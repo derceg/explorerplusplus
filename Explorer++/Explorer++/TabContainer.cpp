@@ -720,7 +720,7 @@ HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory,
 	const TabSettings &tabSettings, const FolderSettings *folderSettings,
 	boost::optional<FolderColumns> initialColumns, int *newTabId)
 {
-	LPITEMIDLIST	pidl = NULL;
+	PIDLIST_ABSOLUTE	pidl = NULL;
 	TCHAR			szExpandedPath[MAX_PATH];
 	HRESULT			hr;
 	BOOL			bRet;
@@ -746,7 +746,7 @@ HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory,
 	return hr;
 }
 
-HRESULT TabContainer::CreateNewTab(LPCITEMIDLIST pidlDirectory,
+HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 	const TabSettings &tabSettings, const FolderSettings *folderSettings,
 	boost::optional<FolderColumns> initialColumns, int *newTabId)
 {
@@ -871,7 +871,7 @@ HRESULT TabContainer::CreateNewTab(LPCITEMIDLIST pidlDirectory,
 	return S_OK;
 }
 
-FolderSettings TabContainer::GetDefaultFolderSettings(LPCITEMIDLIST pidlDirectory) const
+FolderSettings TabContainer::GetDefaultFolderSettings(PCIDLIST_ABSOLUTE pidlDirectory) const
 {
 	FolderSettings folderSettings = m_config->defaultFolderSettings;
 	folderSettings.sortMode = GetDefaultSortMode(pidlDirectory);
@@ -879,7 +879,7 @@ FolderSettings TabContainer::GetDefaultFolderSettings(LPCITEMIDLIST pidlDirector
 	return folderSettings;
 }
 
-SortMode TabContainer::GetDefaultSortMode(LPCITEMIDLIST pidlDirectory) const
+SortMode TabContainer::GetDefaultSortMode(PCIDLIST_ABSOLUTE pidlDirectory) const
 {
 	const std::vector<Column_t> *pColumns = nullptr;
 

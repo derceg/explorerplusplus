@@ -1151,10 +1151,8 @@ int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam
 
 void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath)
 {
-	LPITEMIDLIST	pidl = NULL;
-	HRESULT			hr;
-
-	hr = SHParseDisplayName(szPath, nullptr, &pidl, 0, nullptr);
+	PIDLIST_ABSOLUTE pidl = NULL;
+	HRESULT hr = SHParseDisplayName(szPath, nullptr, &pidl, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{

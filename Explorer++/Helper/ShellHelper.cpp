@@ -28,10 +28,8 @@ HRESULT GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cchM
 		return E_FAIL;
 	}
 
-	LPITEMIDLIST pidl = NULL;
-	HRESULT hr;
-
-	hr = SHParseDisplayName(szParsingPath, nullptr, &pidl, 0, nullptr);
+	PIDLIST_ABSOLUTE pidl = NULL;
+	HRESULT hr = SHParseDisplayName(szParsingPath, nullptr, &pidl, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
@@ -95,10 +93,8 @@ HRESULT GetItemAttributes(const TCHAR *szItemParsingPath,SFGAOF *pItemAttributes
 		return E_FAIL;
 	}
 
-	LPITEMIDLIST pidl = NULL;
-	HRESULT hr;
-
-	hr = SHParseDisplayName(szItemParsingPath, nullptr, &pidl, 0, nullptr);
+	PIDLIST_ABSOLUTE pidl = NULL;
+	HRESULT hr = SHParseDisplayName(szItemParsingPath, nullptr, &pidl, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
@@ -174,7 +170,7 @@ BOOL ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szPar
 	return ShellExecuteEx(&sei);
 }
 
-HRESULT GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent)
+HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, LPITEMIDLIST *pidlParent)
 {
 	if(IsNamespaceRoot(pidlDirectory))
 	{
@@ -182,8 +178,8 @@ HRESULT GetVirtualParentPath(LPITEMIDLIST pidlDirectory,LPITEMIDLIST *pidlParent
 	}
 	else
 	{
-		ILRemoveLastID(pidlDirectory);
 		*pidlParent = ILClone(pidlDirectory);
+		ILRemoveLastID(*pidlParent);
 	}
 
 	return S_OK;
@@ -209,11 +205,12 @@ BOOL IsNamespaceRoot(LPCITEMIDLIST pidl)
 
 BOOL CheckIdl(LPCITEMIDLIST pidl)
 {
-	LPITEMIDLIST	pidlCheck = NULL;
-	TCHAR			szTabText[MAX_PATH];
+	TCHAR szTabText[MAX_PATH];
 
 	if(!SUCCEEDED(GetDisplayName(pidl,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_FORPARSING)))
 		return FALSE;
+
+	PIDLIST_ABSOLUTE pidlCheck = NULL;
 
 	if(!SUCCEEDED(SHParseDisplayName(szTabText, nullptr, &pidlCheck, 0, nullptr)))
 		return FALSE;
@@ -1264,10 +1261,8 @@ BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID,
 
 HRESULT GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax)
 {
-	LPITEMIDLIST	pidlItem = NULL;
-	HRESULT			hr;
-
-	hr = SHParseDisplayName(szItemPath, nullptr, &pidlItem, 0, nullptr);
+	PIDLIST_ABSOLUTE pidlItem = NULL;
+	HRESULT hr = SHParseDisplayName(szItemPath, nullptr, &pidlItem, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{

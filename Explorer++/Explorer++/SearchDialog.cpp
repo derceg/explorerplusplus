@@ -707,8 +707,7 @@ INT_PTR CSearchDialog::OnNotify(NMHDR *pnmhdr)
 					/* Item should always exist. */
 					assert(itr != m_SearchItemsMapInternal.end());
 
-					LPITEMIDLIST pidlFull = NULL;
-
+					PIDLIST_ABSOLUTE pidlFull = NULL;
 					HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr, &pidlFull, 0, nullptr);
 
 					if(hr == S_OK)
@@ -754,16 +753,15 @@ INT_PTR CSearchDialog::OnNotify(NMHDR *pnmhdr)
 						auto itr = m_SearchItemsMapInternal.find(static_cast<int>(lvItem.lParam));
 						assert(itr != m_SearchItemsMapInternal.end());
 
-						LPITEMIDLIST pidlFull = NULL;
-
+						PIDLIST_ABSOLUTE pidlFull = NULL;
 						HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr, &pidlFull, 0, nullptr);
 
 						if(hr == S_OK)
 						{
-							std::list<LPITEMIDLIST> pidlList;
+							std::list<LPCITEMIDLIST> pidlList;
 							pidlList.push_back(ILFindLastID(pidlFull));
 
-							LPITEMIDLIST pidlDirectory = ILClone(pidlFull);
+							PIDLIST_ABSOLUTE pidlDirectory = ILCloneFull(pidlFull);
 							ILRemoveLastID(pidlDirectory);
 
 							CFileContextMenuManager fcmm(m_hDlg,pidlDirectory,
@@ -1167,7 +1165,7 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 					else
 						m_iFilesFound++;
 
-					LPITEMIDLIST pidl = NULL;
+					PIDLIST_ABSOLUTE pidl = NULL;
 					TCHAR szFullFileName[MAX_PATH];
 
 					PathCombine(szFullFileName,szSearchDirectory,wfd.cFileName);

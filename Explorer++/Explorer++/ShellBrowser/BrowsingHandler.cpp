@@ -19,7 +19,7 @@
 
 HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath,UINT wFlags)
 {
-	LPITEMIDLIST pidlDirectory = NULL;
+	PIDLIST_ABSOLUTE pidlDirectory = NULL;
 	HRESULT hr = SHParseDisplayName(szPath, nullptr, &pidlDirectory, 0, nullptr);
 
 	if(SUCCEEDED(hr))
@@ -533,7 +533,7 @@ void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 }
 
 HRESULT CShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
-	LPITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
+	LPCITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
 {
 	int uItemId;
 

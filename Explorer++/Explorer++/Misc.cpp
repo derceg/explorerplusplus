@@ -228,7 +228,7 @@ void Explorerplusplus::CopyToFolder(bool move)
 	}
 
 	std::vector<PIDLPointer> pidlPtrs;
-	std::vector<LPCITEMIDLIST> pidls;
+	std::vector<PCIDLIST_ABSOLUTE> pidls;
 	int iItem = -1;
 
 	while ((iItem = ListView_GetNextItem(m_hActiveListView, iItem, LVNI_SELECTED)) != -1)

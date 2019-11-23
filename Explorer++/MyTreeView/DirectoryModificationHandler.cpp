@@ -77,12 +77,10 @@ void CMyTreeView::DirectoryAltered(void)
 reason, then add the item to the tracking list. */
 void CMyTreeView::DirectoryAlteredAddFile(const TCHAR *szFullFileName)
 {
-	LPITEMIDLIST pidlComplete = NULL;
-	HRESULT hr;
-
 	/* We'll use this as a litmus test to check whether or not
 	the file actually exists. */
-	hr = SHParseDisplayName(szFullFileName, nullptr, &pidlComplete, 0, nullptr);
+	PIDLIST_ABSOLUTE pidlComplete = NULL;
+	HRESULT hr = SHParseDisplayName(szFullFileName, nullptr, &pidlComplete, 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
@@ -370,7 +368,7 @@ void CMyTreeView::AddItem(const TCHAR *szFullFileName)
 void CMyTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
-	LPITEMIDLIST	pidlComplete = NULL;
+	PIDLIST_ABSOLUTE	pidlComplete = NULL;
 	LPITEMIDLIST	pidlRelative = NULL;
 	HTREEITEM		hItem;
 	TVITEMEX		tvItem;

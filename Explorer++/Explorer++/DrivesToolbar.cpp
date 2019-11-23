@@ -194,14 +194,14 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 						{
 							std::wstring Path = GetDrivePath(iIndex);
 
-							LPITEMIDLIST pidlItem = NULL;
+							PIDLIST_ABSOLUTE pidlItem = NULL;
 							HRESULT hr = SHParseDisplayName(Path.c_str(), nullptr, &pidlItem, 0, nullptr);
 
 							if(SUCCEEDED(hr))
 							{
 								ClientToScreen(m_hwnd,&pnmm->pt);
 
-								std::list<LPITEMIDLIST> pidlItemList;
+								std::list<LPCITEMIDLIST> pidlItemList;
 								CFileContextMenuManager fcmm(m_hwnd,pidlItem,pidlItemList);
 
 								fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,m_pexpp->GetStatusBar(),

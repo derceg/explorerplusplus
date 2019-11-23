@@ -128,8 +128,8 @@ private:
 
 	typedef struct
 	{
-		LPITEMIDLIST	pidl;
-		LPITEMIDLIST	pridl;
+		PIDLIST_ABSOLUTE pidl;
+		LPITEMIDLIST pridl;
 	} ItemInfo_t;
 
 	typedef struct

@@ -861,7 +861,7 @@ void CDropHandler::HandleRightClickDrop(void)
 {
 	IShellFolder *pShellFolder = NULL;
 	IDropTarget *pDrop = NULL;
-	LPITEMIDLIST pidlDirectory = NULL;
+	PIDLIST_ABSOLUTE pidlDirectory = NULL;
 	DWORD dwe;
 	HRESULT hr;
 

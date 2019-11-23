@@ -14,7 +14,7 @@ LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
 	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
-	PCIDLIST_ABSOLUTE pidlParent, const std::list<LPITEMIDLIST> &pidlItemList) :
+	PCIDLIST_ABSOLUTE pidlParent, const std::list<LPCITEMIDLIST> &pidlItemList) :
 	m_pShellContext3(NULL),
 	m_pShellContext2(NULL),
 	m_pShellContext(NULL),
@@ -54,10 +54,10 @@ CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
 
 		if(SUCCEEDED(hr))
 		{
-			std::vector<LPITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
+			std::vector<LPCITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
 
 			hr = GetUIObjectOf(pShellFolder, hwnd, static_cast<UINT>(pidlItemList.size()),
-				const_cast<LPCITEMIDLIST *>(&pidlItemVector[0]), IID_PPV_ARGS(&pContextMenu));
+				&pidlItemVector[0], IID_PPV_ARGS(&pContextMenu));
 
 			pShellFolder->Release();
 		}

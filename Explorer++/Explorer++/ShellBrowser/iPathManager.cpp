@@ -57,7 +57,7 @@ void CPathManager::ShiftIdlArray(int iStart)
 	m_nTotal--;
 }
 
-LPITEMIDLIST CPathManager::RetrievePath(int iIndex)
+PIDLIST_ABSOLUTE CPathManager::RetrievePath(int iIndex)
 {
 	if((m_iCurrent + iIndex) < 0 ||
 	(m_iCurrent + iIndex) > m_nTotal)
@@ -69,10 +69,10 @@ LPITEMIDLIST CPathManager::RetrievePath(int iIndex)
 	folder that was selected. */
 	m_iCurrent += iIndex;
 
-	return ILClone(ppidlList[m_iCurrent - 1]);
+	return ILCloneFull(ppidlList[m_iCurrent - 1]);
 }
 
-LPITEMIDLIST CPathManager::RetrievePathWithoutUpdate(int iIndex)
+PIDLIST_ABSOLUTE CPathManager::RetrievePathWithoutUpdate(int iIndex)
 {
 	if((m_iCurrent + iIndex) < 0 ||
 	(m_iCurrent + iIndex) > m_nTotal)
@@ -80,10 +80,10 @@ LPITEMIDLIST CPathManager::RetrievePathWithoutUpdate(int iIndex)
 		return NULL;
 	}
 
-	return ILClone(ppidlList[m_iCurrent + iIndex - 1]);
+	return ILCloneFull(ppidlList[m_iCurrent + iIndex - 1]);
 }
 
-LPITEMIDLIST CPathManager::RetrieveAndValidateIdl(int iIndex)
+PIDLIST_ABSOLUTE CPathManager::RetrieveAndValidateIdl(int iIndex)
 {
 	if((m_iCurrent + iIndex) < 0 ||
 	(m_iCurrent + iIndex) > m_nTotal)
@@ -103,7 +103,7 @@ LPITEMIDLIST CPathManager::RetrieveAndValidateIdl(int iIndex)
 	folder that was selected. */
 	m_iCurrent += iIndex;
 
-	return ILClone(ppidlList[m_iCurrent - 1]);
+	return ILCloneFull(ppidlList[m_iCurrent - 1]);
 }
 
 int CPathManager::GetNumBackPathsStored(void) const

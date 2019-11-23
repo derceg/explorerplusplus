@@ -640,7 +640,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 	{
 		if (m_pexpp->GetActiveShellBrowser()->CanBrowseBack())
 		{
-			LPITEMIDLIST pidl = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(-1);
+			PIDLIST_ABSOLUTE pidl = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(-1);
 
 			TCHAR szPath[MAX_PATH];
 			GetDisplayName(pidl, szPath, SIZEOF_ARRAY(szPath), SHGDN_INFOLDER);
@@ -659,7 +659,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 	{
 		if (m_pexpp->GetActiveShellBrowser()->CanBrowseForward())
 		{
-			LPITEMIDLIST pidl = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(1);
+			PIDLIST_ABSOLUTE pidl = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(1);
 
 			TCHAR szPath[MAX_PATH];
 			GetDisplayName(pidl, szPath, SIZEOF_ARRAY(szPath), SHGDN_INFOLDER);
@@ -679,7 +679,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 {
 	NMTOOLBAR		*nmTB = NULL;
-	LPITEMIDLIST	pidl = NULL;
+	PIDLIST_ABSOLUTE	pidl = NULL;
 	POINT			ptOrigin;
 	RECT			rc;
 	HRESULT			hr;
