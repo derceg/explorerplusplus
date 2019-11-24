@@ -167,8 +167,8 @@ private:
 
 	struct ItemInfo_t
 	{
-		wil::unique_cotaskmem_ptr<ITEMIDLIST>	pidlComplete;
-		wil::unique_cotaskmem_ptr<ITEMIDLIST>	pridl;
+		wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE>	pidlComplete;
+		wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE>	pridl;
 		WIN32_FIND_DATA	wfd;
 		TCHAR			szDisplayName[MAX_PATH];
 		BOOL			bIconRetrieved;
@@ -271,7 +271,7 @@ private:
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void				InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(int iItemInternal) const;
-	HRESULT				AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, LPCITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
+	HRESULT				AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCIDLIST_RELATIVE pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
 	HRESULT				AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
 	int					SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCIDLIST_RELATIVE pidlRelative, const TCHAR *szFileName);
 	void				ResetFolderMemoryAllocations(void);

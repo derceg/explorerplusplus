@@ -717,7 +717,7 @@ wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE> CShellBrowser::GetItemRelativeIdl
 		return nullptr;
 	}
 
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE> pidlRelative(ILClone((ITEMIDLIST *)m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
+	wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE> pidlRelative(ILClone(m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
 
 	return pidlRelative;
 }
@@ -1710,7 +1710,7 @@ BasicItemInfo_t CShellBrowser::getBasicItemInfo(int internalIndex) const
 	const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
 
 	BasicItemInfo_t basicItemInfo;
-	basicItemInfo.pidlComplete.reset(ILClone(itemInfo.pidlComplete.get()));
+	basicItemInfo.pidlComplete.reset(ILCloneFull(itemInfo.pidlComplete.get()));
 	basicItemInfo.pridl.reset(ILClone(itemInfo.pridl.get()));
 	basicItemInfo.wfd = itemInfo.wfd;
 	StringCchCopy(basicItemInfo.szDisplayName, SIZEOF_ARRAY(basicItemInfo.szDisplayName), itemInfo.szDisplayName);

@@ -170,7 +170,7 @@ BOOL ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szPar
 	return ShellExecuteEx(&sei);
 }
 
-HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, LPITEMIDLIST *pidlParent)
+HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *pidlParent)
 {
 	if(IsNamespaceRoot(pidlDirectory))
 	{
@@ -178,7 +178,7 @@ HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, LPITEMIDLIST *pidl
 	}
 	else
 	{
-		*pidlParent = ILClone(pidlDirectory);
+		*pidlParent = ILCloneFull(pidlDirectory);
 		ILRemoveLastID(*pidlParent);
 	}
 
@@ -203,7 +203,7 @@ BOOL IsNamespaceRoot(LPCITEMIDLIST pidl)
 	return bNamespaceRoot;
 }
 
-BOOL CheckIdl(LPCITEMIDLIST pidl)
+BOOL CheckIdl(PCIDLIST_ABSOLUTE pidl)
 {
 	TCHAR szTabText[MAX_PATH];
 

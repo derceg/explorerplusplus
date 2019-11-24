@@ -29,9 +29,9 @@ public:
 	LRESULT CALLBACK	TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	/* User functions. */
-	HRESULT				AddDirectory(HTREEITEM hParent,LPITEMIDLIST pidlDirectory);
-	LPITEMIDLIST		BuildPath(HTREEITEM hTreeItem);
-	HTREEITEM			LocateItem(LPITEMIDLIST pidlDirectory);
+	HRESULT				AddDirectory(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlDirectory);
+	PIDLIST_ABSOLUTE	BuildPath(HTREEITEM hTreeItem);
+	HTREEITEM			LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	void				EraseItems(HTREEITEM hParent);
 	BOOL				QueryDragging(void);
 	DWORD WINAPI		Thread_SubFolders(LPVOID pParam);
@@ -54,7 +54,7 @@ private:
 	/* Message handlers. */
 	LRESULT CALLBACK	OnNotify(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	void		AddDirectoryInternal(IShellFolder *pShellFolder, LPITEMIDLIST pidlDirectory, HTREEITEM hParent);
+	void		AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory, HTREEITEM hParent);
 	void		DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName);
 	void		DirectoryAltered(void);
 	HTREEITEM	AddRoot(void);
@@ -99,8 +99,8 @@ private:
 	void		RefreshAllIconsInternal(HTREEITEM hFirstSibling);
 
 	HTREEITEM	LocateExistingItem(const TCHAR *szParsingPath);
-	HTREEITEM	LocateExistingItem(LPITEMIDLIST pidlDirectory);
-	HTREEITEM	LocateItemInternal(LPITEMIDLIST pidlDirectory,BOOL bOnlyLocateExistingItem);
+	HTREEITEM	LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory);
+	HTREEITEM	LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, BOOL bOnlyLocateExistingItem);
 	void		MonitorAllDrives(void);
 	void		MonitorDrive(const TCHAR *szDrive);
 	HTREEITEM	DetermineDriveSortedPosition(HTREEITEM hParent, const TCHAR *szItemName);

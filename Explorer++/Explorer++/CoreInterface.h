@@ -42,11 +42,11 @@ __interface IExplorerplusplus
 	HWND			GetTreeView() const;
 
 	void			OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
-	void			OpenItem(LPCITEMIDLIST pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
+	void			OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
 
 	CStatusBar *GetStatusBar();
 
-	void			OpenFileItem(LPCITEMIDLIST pidlItem, const TCHAR *szParameters);
+	void			OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters);
 
 	HMENU			BuildViewsMenu();
 

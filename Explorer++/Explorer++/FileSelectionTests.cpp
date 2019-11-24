@@ -128,18 +128,13 @@ HRESULT Explorerplusplus::GetListViewItemAttributes(int item, SFGAOF *pItemAttri
 
 HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes) const
 {
-	HTREEITEM		hItem;
-	LPITEMIDLIST	pidl = NULL;
-	HRESULT			hr = E_FAIL;
-
-	hItem = TreeView_GetSelection(m_hTreeView);
+	HRESULT hr = E_FAIL;
+	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
 
 	if (hItem != NULL)
 	{
-		pidl = m_pMyTreeView->BuildPath(hItem);
-
+		PIDLIST_ABSOLUTE pidl = m_pMyTreeView->BuildPath(hItem);
 		hr = GetItemAttributes(pidl, pItemAttributes);
-
 		CoTaskMemFree(pidl);
 	}
 
@@ -173,7 +168,7 @@ BOOL Explorerplusplus::CanPaste() const
 	else if (hFocus == m_hTreeView)
 	{
 		HTREEITEM		hItem;
-		LPITEMIDLIST	pidl = NULL;
+		PIDLIST_ABSOLUTE	pidl = NULL;
 		SFGAOF			Attributes;
 		HRESULT			hr;
 

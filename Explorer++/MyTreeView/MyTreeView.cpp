@@ -227,7 +227,7 @@ LRESULT CALLBACK CMyTreeView::OnNotify(HWND hwnd,
 HTREEITEM CMyTreeView::AddRoot(void)
 {
 	IShellFolder	*pDesktopFolder = NULL;
-	LPITEMIDLIST	pidl = NULL;
+	PIDLIST_ABSOLUTE	pidl = NULL;
 	TCHAR			szDesktopParsingPath[MAX_PATH];
 	TCHAR			szDesktopDisplayName[MAX_PATH];
 	SHFILEINFO		shfi;
@@ -249,7 +249,7 @@ HTREEITEM CMyTreeView::AddRoot(void)
 		SHGetFileInfo((LPTSTR)pidl,NULL,&shfi,NULL,SHGFI_PIDL|SHGFI_SYSICONINDEX);
 
 		iItemId = GenerateUniqueItemId();
-		m_pItemInfo[iItemId].pidl = ILClone(pidl);
+		m_pItemInfo[iItemId].pidl = ILCloneFull(pidl);
 		m_uItemMap[iItemId] = 1;
 
 		tvItem.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_CHILDREN|TVIF_SELECTEDIMAGE|TVIF_PARAM;
@@ -287,7 +287,7 @@ HTREEITEM CMyTreeView::AddRoot(void)
 	return hDesktop;
 }
 
-HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent,LPITEMIDLIST pidlDirectory)
+HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	IShellFolder	*pShellFolder = NULL;
 	HRESULT			hr;
@@ -494,11 +494,11 @@ int CALLBACK CMyTreeView::CompareItems(LPARAM lParam1,LPARAM lParam2)
 	}
 }
 
-void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder,LPITEMIDLIST pidlDirectory,
-HTREEITEM hParent)
+void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
+	HTREEITEM hParent)
 {
 	IEnumIDList		*pEnumIDList = NULL;
-	LPITEMIDLIST	rgelt = NULL;
+	PITEMID_CHILD	rgelt = NULL;
 	ThreadInfo_t	*pThreadInfo = NULL;
 	SHCONTF			EnumFlags;
 	TCHAR			szDirectory[MAX_PATH];
@@ -545,7 +545,7 @@ HTREEITEM hParent)
 				SFGAO_FOLDER). */
 				if((Attributes & SFGAO_FOLDER))
 				{
-					LPITEMIDLIST	pidlComplete = NULL;
+					PIDLIST_ABSOLUTE	pidlComplete = NULL;
 					STRRET			str;
 					TCHAR			ItemName[MAX_PATH];
 					int				iItemId;
@@ -559,7 +559,7 @@ HTREEITEM hParent)
 						pidlComplete = ILCombine(pidlDirectory,rgelt);
 
 						iItemId = GenerateUniqueItemId();
-						m_pItemInfo[iItemId].pidl = ILClone(pidlComplete);
+						m_pItemInfo[iItemId].pidl = ILCloneFull(pidlComplete);
 						m_pItemInfo[iItemId].pridl = ILClone(rgelt);
 
 						ItemStore.iItemId = iItemId;
@@ -725,8 +725,8 @@ DWORD WINAPI Thread_SubFoldersStub(LPVOID pParam)
 DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
 {
 	IShellFolder	*pShellFolder = NULL;
-	LPITEMIDLIST	pidl = NULL;
-	LPITEMIDLIST	pidlRelative = NULL;
+	PCIDLIST_ABSOLUTE	pidl = NULL;
+	PCITEMID_CHILD	pidlRelative = NULL;
 	HTREEITEM		hItem;
 	TVITEM			tvItem;
 	ThreadInfo_t	*pThreadInfo = NULL;
@@ -763,7 +763,7 @@ DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
 			{
 				if(m_uItemMap[iItemID] == 1)
 				{
-					pidl = ILClone(m_pItemInfo[(int)tvItem.lParam].pidl);
+					pidl = ILCloneFull(m_pItemInfo[(int)tvItem.lParam].pidl);
 
 					bValid = TRUE;
 				}
@@ -773,12 +773,12 @@ DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
 
 			if(bValid)
 			{
-				hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *) &pidlRelative);
+				hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 				if(SUCCEEDED(hr))
 				{
 					/* Only retrieve the attributes for this item. */
-					hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&pidlRelative,&Attributes);
+					hr = pShellFolder->GetAttributesOf(1,&pidlRelative,&Attributes);
 
 					if(SUCCEEDED(hr))
 					{
@@ -918,7 +918,7 @@ HTREEITEM CMyTreeView::DetermineDriveSortedPosition(HTREEITEM hParent, const TCH
 	return htItem;
 }
 
-LPITEMIDLIST CMyTreeView::BuildPath(HTREEITEM hTreeItem)
+PIDLIST_ABSOLUTE CMyTreeView::BuildPath(HTREEITEM hTreeItem)
 {
 	TVITEMEX	Item;
 	ItemInfo_t	*pItemInfo = NULL;
@@ -929,10 +929,10 @@ LPITEMIDLIST CMyTreeView::BuildPath(HTREEITEM hTreeItem)
 
 	pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
-	return ILClone(pItemInfo->pidl);
+	return ILCloneFull(pItemInfo->pidl);
 }
 
-HTREEITEM CMyTreeView::LocateItem(LPITEMIDLIST pidlDirectory)
+HTREEITEM CMyTreeView::LocateItem(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	return LocateItemInternal(pidlDirectory,FALSE);
 }
@@ -1028,12 +1028,12 @@ HTREEITEM CMyTreeView::LocateExistingItem(const TCHAR *szParsingPath)
 	return NULL;
 }
 
-HTREEITEM CMyTreeView::LocateExistingItem(LPITEMIDLIST pidlDirectory)
+HTREEITEM CMyTreeView::LocateExistingItem(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	return LocateItemInternal(pidlDirectory,TRUE);
 }
 
-HTREEITEM CMyTreeView::LocateItemInternal(LPITEMIDLIST pidlDirectory,BOOL bOnlyLocateExistingItem)
+HTREEITEM CMyTreeView::LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, BOOL bOnlyLocateExistingItem)
 {
 	HTREEITEM	hRoot;
 	HTREEITEM	hItem;
@@ -1067,7 +1067,7 @@ HTREEITEM CMyTreeView::LocateItemInternal(LPITEMIDLIST pidlDirectory,BOOL bOnlyL
 			break;
 		}
 
-		if(ILIsParent((LPCITEMIDLIST)pItemInfo->pidl,pidlDirectory,FALSE))
+		if(ILIsParent(pItemInfo->pidl,pidlDirectory,FALSE))
 		{
 			if((TreeView_GetChild(m_hTreeView,hItem)) == NULL)
 			{
@@ -1099,7 +1099,7 @@ HTREEITEM CMyTreeView::LocateItemInternal(LPITEMIDLIST pidlDirectory,BOOL bOnlyL
 
 HTREEITEM CMyTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 {
-	LPITEMIDLIST	pidlMyComputer	= NULL;
+	PIDLIST_ABSOLUTE	pidlMyComputer	= NULL;
 	HTREEITEM		hMyComputer;
 	HTREEITEM		hItem;
 	HTREEITEM		hNextItem;
@@ -1762,7 +1762,7 @@ HRESULT CMyTreeView::OnBeginDrag(int iItemId,DragTypes_t DragType)
 	IDataObject			*pDataObject = NULL;
 	IDragSourceHelper	*pDragSourceHelper = NULL;
 	IShellFolder		*pShellFolder = NULL;
-	LPITEMIDLIST		ridl = NULL;
+	PCITEMID_CHILD		ridl = NULL;
 	ItemInfo_t			*pItemInfo = NULL;
 	DWORD				Effect;
 	POINT				pt = {0,0};
@@ -1775,15 +1775,14 @@ HRESULT CMyTreeView::OnBeginDrag(int iItemId,DragTypes_t DragType)
 	{
 		pItemInfo = &m_pItemInfo[iItemId];
 
-		hr = SHBindToParent(pItemInfo->pidl, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&ridl);
+		hr = SHBindToParent(pItemInfo->pidl, IID_PPV_ARGS(&pShellFolder), &ridl);
 
 		if(SUCCEEDED(hr))
 		{
 			/* Needs to be done from the parent folder for the drag/dop to work correctly.
 			If done from the desktop folder, only links to files are created. They are
 			not copied/moved. */
-			GetUIObjectOf(pShellFolder, m_hTreeView, 1, (LPCITEMIDLIST *) &ridl,
-				IID_PPV_ARGS(&pDataObject));
+			GetUIObjectOf(pShellFolder, m_hTreeView, 1, &ridl, IID_PPV_ARGS(&pDataObject));
 
 			pDragSourceHelper->InitializeFromWindow(m_hTreeView,&pt,pDataObject);
 

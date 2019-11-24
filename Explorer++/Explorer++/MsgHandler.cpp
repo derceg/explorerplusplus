@@ -305,15 +305,12 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNe
 		m_navigation->BrowseFolderInCurrentTab(pidlItem,0);
 }
 
-void Explorerplusplus::OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters)
+void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem,const TCHAR *szParameters)
 {
-	TCHAR			szItemDirectory[MAX_PATH];
-	LPITEMIDLIST	pidlParent = NULL;
-
-	pidlParent = ILClone(pidlItem);
-
+	PIDLIST_ABSOLUTE pidlParent = ILCloneFull(pidlItem);
 	ILRemoveLastID(pidlParent);
 
+	TCHAR szItemDirectory[MAX_PATH];
 	GetDisplayName(pidlParent,szItemDirectory,SIZEOF_ARRAY(szItemDirectory),SHGDN_FORPARSING);
 
 	ExecuteFileAction(m_hContainer,EMPTY_STRING,szParameters,szItemDirectory,pidlItem);

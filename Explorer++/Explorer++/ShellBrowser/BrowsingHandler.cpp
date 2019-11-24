@@ -533,12 +533,9 @@ void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 }
 
 HRESULT CShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
-	LPCITEMIDLIST pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
+	PCIDLIST_RELATIVE pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
 {
-	int uItemId;
-
-	uItemId = SetItemInformation(pidlDirectory,pidlRelative,szFileName);
-
+	int uItemId = SetItemInformation(pidlDirectory,pidlRelative,szFileName);
 	return AddItemInternal(iItemIndex,uItemId,bPosition);
 }
 
@@ -574,7 +571,7 @@ int CShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
 
 	pidlItem = ILCombine(pidlDirectory, pidlRelative);
 
-	m_itemInfoMap[uItemId].pidlComplete.reset(ILClone(pidlItem));
+	m_itemInfoMap[uItemId].pidlComplete.reset(ILCloneFull(pidlItem));
 	m_itemInfoMap[uItemId].pridl.reset(ILClone(pidlRelative));
 	m_itemInfoMap[uItemId].bIconRetrieved = FALSE;
 	StringCchCopy(m_itemInfoMap[uItemId].szDisplayName,

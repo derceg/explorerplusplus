@@ -541,7 +541,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 
 			if(SUCCEEDED(hr))
 			{
-				m_itemInfoMap.at(iItemInternal).pidlComplete.reset(ILClone(pidlFull));
+				m_itemInfoMap.at(iItemInternal).pidlComplete.reset(ILCloneFull(pidlFull));
 				m_itemInfoMap.at(iItemInternal).pridl.reset(ILClone(pidlRelative));
 				StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
 					SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName),

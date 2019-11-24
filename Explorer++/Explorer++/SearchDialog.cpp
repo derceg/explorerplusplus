@@ -824,7 +824,7 @@ INT_PTR CSearchDialog::OnPrivateMessage(UINT uMsg,WPARAM wParam,LPARAM lParam)
 		main GUI (also see http://www.flounder.com/iocompletion.htm). */
 		case NSearchDialog::WM_APP_SEARCHITEMFOUND:
 			{
-				m_AwaitingSearchItems.push_back(reinterpret_cast<LPITEMIDLIST>(wParam));
+				m_AwaitingSearchItems.push_back(reinterpret_cast<PIDLIST_ABSOLUTE>(wParam));
 
 				if(m_bSetSearchTimer)
 				{
@@ -942,7 +942,7 @@ INT_PTR CSearchDialog::OnTimer(int iTimerID)
 		SHFILEINFO shfi;
 		int iIndex;
 
-		LPITEMIDLIST pidl = *itr;
+		PIDLIST_ABSOLUTE pidl = *itr;
 
 		GetDisplayName(pidl,szDirectory,SIZEOF_ARRAY(szDirectory),SHGDN_FORPARSING);
 		PathRemoveFileSpec(szDirectory);
@@ -1172,7 +1172,7 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 					SHParseDisplayName(szFullFileName, nullptr, &pidl, 0, nullptr);
 
 					PostMessage(m_hDlg,NSearchDialog::WM_APP_SEARCHITEMFOUND,
-						reinterpret_cast<WPARAM>(ILClone(pidl)),0);
+						reinterpret_cast<WPARAM>(ILCloneFull(pidl)),0);
 
 					CoTaskMemFree(pidl);
 				}

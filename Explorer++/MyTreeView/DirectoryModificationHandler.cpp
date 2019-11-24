@@ -304,15 +304,12 @@ void CMyTreeView::DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName)
 
 void CMyTreeView::AddDrive(const TCHAR *szDrive)
 {
-	LPITEMIDLIST	pidlMyComputer = NULL;
-	HTREEITEM		hMyComputer;
-	HRESULT			hr;
-
-	hr = SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidlMyComputer);
+	PIDLIST_ABSOLUTE pidlMyComputer = NULL;
+	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,0,&pidlMyComputer);
 
 	if(hr == S_OK)
 	{
-		hMyComputer = LocateExistingItem(pidlMyComputer);
+		HTREEITEM hMyComputer = LocateExistingItem(pidlMyComputer);
 
 		if(hMyComputer != NULL)
 		{
@@ -369,7 +366,7 @@ void CMyTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
 	PIDLIST_ABSOLUTE	pidlComplete = NULL;
-	LPITEMIDLIST	pidlRelative = NULL;
+	PCITEMID_CHILD	pidlRelative = NULL;
 	HTREEITEM		hItem;
 	TVITEMEX		tvItem;
 	TVINSERTSTRUCT	tvis;
@@ -408,15 +405,14 @@ void CMyTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
 			SHGetFileInfo(szFullFileName,NULL,&shfi,
 				sizeof(shfi),SHGFI_SYSICONINDEX);
 
-			hr = SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), (LPCITEMIDLIST *)&pidlRelative);
+			hr = SHBindToParent(pidlComplete, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 			if(SUCCEEDED(hr))
 			{
 				Attributes = SFGAO_HASSUBFOLDER;
 
 				/* Only retrieve the attributes for this item. */
-				hr = pShellFolder->GetAttributesOf(1,
-					(LPCITEMIDLIST *)&pidlRelative,&Attributes);
+				hr = pShellFolder->GetAttributesOf(1,&pidlRelative,&Attributes);
 
 				if(SUCCEEDED(hr))
 				{
@@ -427,7 +423,7 @@ void CMyTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
 
 					iItemId = GenerateUniqueItemId();
 
-					m_pItemInfo[iItemId].pidl = ILClone(pidlComplete);
+					m_pItemInfo[iItemId].pidl = ILCloneFull(pidlComplete);
 					m_pItemInfo[iItemId].pridl = ILClone(pidlRelative);
 
 					GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_NORMAL);

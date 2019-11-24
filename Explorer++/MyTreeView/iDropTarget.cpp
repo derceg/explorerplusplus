@@ -189,7 +189,7 @@ int iDroppedItem)
 	FORMATETC	ftc;
 	STGMEDIUM	stg;
 	DROPFILES	*pdf = NULL;
-	LPITEMIDLIST	pidlDest = NULL;
+	PIDLIST_ABSOLUTE	pidlDest = NULL;
 	TCHAR		szDestDirectory[MAX_PATH];
 	TCHAR		szFullFileName[MAX_PATH];
 	HRESULT		hr;
@@ -252,14 +252,11 @@ HRESULT _stdcall CMyTreeView::DragLeave(void)
 HRESULT _stdcall CMyTreeView::Drop(IDataObject *pDataObject,DWORD grfKeyState,
 POINTL pt,DWORD *pdwEffect)
 {
-	TVHITTESTINFO	tvht;
-	LPITEMIDLIST	pidlDirectory = NULL;
-	TCHAR			szDestDirectory[MAX_PATH + 1];
-
 	KillTimer(m_hTreeView,DRAGEXPAND_TIMER_ID);
 
-	tvht.pt.x	= pt.x;
-	tvht.pt.y	= pt.y;
+	TVHITTESTINFO tvht;
+	tvht.pt.x = pt.x;
+	tvht.pt.y = pt.y;
 
 	ScreenToClient(m_hTreeView,(LPPOINT)&tvht.pt);
 	TreeView_HitTest(m_hTreeView,&tvht);
@@ -267,8 +264,9 @@ POINTL pt,DWORD *pdwEffect)
 	/* Is the mouse actually over an item? */
 	if(!(tvht.flags & LVHT_NOWHERE) && (tvht.hItem != NULL) && m_bDataAccept)
 	{
-		pidlDirectory = BuildPath(tvht.hItem);
+		PIDLIST_ABSOLUTE pidlDirectory = BuildPath(tvht.hItem);
 
+		TCHAR szDestDirectory[MAX_PATH];
 		GetDisplayName(pidlDirectory,szDestDirectory,SIZEOF_ARRAY(szDestDirectory),SHGDN_FORPARSING);
 
 		CDropHandler *pDropHandler = CDropHandler::CreateNew();

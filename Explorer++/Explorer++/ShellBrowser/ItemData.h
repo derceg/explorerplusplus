@@ -20,14 +20,14 @@ struct BasicItemInfo_t
 	// PIDLs.
 	BasicItemInfo_t(const BasicItemInfo_t &other)
 	{
-		pidlComplete.reset(ILClone(other.pidlComplete.get()));
+		pidlComplete.reset(ILCloneFull(other.pidlComplete.get()));
 		pridl.reset(ILClone(other.pridl.get()));
 		wfd = other.wfd;
 		StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName), other.szDisplayName);
 	}
 
-	wil::unique_cotaskmem_ptr<ITEMIDLIST> pidlComplete;
-	wil::unique_cotaskmem_ptr<ITEMIDLIST> pridl;
+	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlComplete;
+	wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE> pridl;
 	WIN32_FIND_DATA wfd;
 	TCHAR szDisplayName[MAX_PATH];
 

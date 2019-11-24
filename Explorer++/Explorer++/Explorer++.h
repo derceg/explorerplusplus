@@ -407,7 +407,7 @@ private:
 	void					OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow);
 	void					OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
 	void					OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
-	void					OpenFileItem(LPCITEMIDLIST pidlItem,const TCHAR *szParameters);
+	void					OpenFileItem(PCIDLIST_ABSOLUTE pidlItem,const TCHAR *szParameters);
 	HRESULT					OnListViewCopy(BOOL bCopy);
 
 	/* File context menu. */
