@@ -12,17 +12,6 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/Macros.h"
 
-
-CFileActionHandler::CFileActionHandler()
-{
-
-}
-
-CFileActionHandler::~CFileActionHandler()
-{
-
-}
-
 BOOL CFileActionHandler::RenameFiles(const RenamedItems_t &itemList)
 {
 	RenamedItems_t renamedItems;

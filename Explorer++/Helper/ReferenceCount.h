@@ -15,7 +15,7 @@ class CReferenceCount : public IReferenceCount
 public:
 
 	CReferenceCount();
-	virtual ~CReferenceCount();
+	virtual ~CReferenceCount() = default;
 
 	ULONG	AddRef();
 	ULONG	Release();

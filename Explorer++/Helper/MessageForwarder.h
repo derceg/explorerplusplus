@@ -8,8 +8,7 @@ class CMessageForwarder
 {
 public:
 
-	CMessageForwarder();
-	virtual ~CMessageForwarder();
+	virtual ~CMessageForwarder() = default;
 
 protected:
 

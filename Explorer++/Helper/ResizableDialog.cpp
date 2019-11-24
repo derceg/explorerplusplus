@@ -51,11 +51,6 @@ CResizableDialog::CResizableDialog(HWND hDlg,
 	}
 }
 
-CResizableDialog::~CResizableDialog()
-{
-
-}
-
 void CResizableDialog::UpdateControls(int iWidth,int iHeight)
 {
 	HWND hCtrl;

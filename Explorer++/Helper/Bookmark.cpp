@@ -38,11 +38,6 @@ CBookmark::CBookmark(const std::wstring &strKey)
 	InitializeFromRegistry(strKey);
 }
 
-CBookmark::~CBookmark()
-{
-
-}
-
 void CBookmark::InitializeFromRegistry(const std::wstring &strKey)
 {
 	HKEY hKey;
@@ -221,11 +216,6 @@ CBookmarkFolder::CBookmarkFolder(const std::wstring &str,InitializationType_t In
 		Initialize(str,guid);
 		break;
 	}
-}
-
-CBookmarkFolder::~CBookmarkFolder()
-{
-
 }
 
 void CBookmarkFolder::Initialize(const std::wstring &strName,GUID *guid)
@@ -452,16 +442,6 @@ bool CBookmarkFolder::HasChildFolder() const
 	}
 
 	return false;
-}
-
-CBookmarkItemNotifier::CBookmarkItemNotifier()
-{
-
-}
-
-CBookmarkItemNotifier::~CBookmarkItemNotifier()
-{
-
 }
 
 CBookmarkItemNotifier& CBookmarkItemNotifier::GetInstance()

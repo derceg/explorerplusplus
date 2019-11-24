@@ -14,11 +14,6 @@ m_hwnd(hwnd)
 	m_nParts = 0;
 }
 
-CStatusBar::~CStatusBar()
-{
-
-}
-
 void CStatusBar::SetPartText(int iPart, const TCHAR *szText)
 {
 	SendMessage(m_hwnd,SB_SETTEXT,MAKEWORD(iPart,0),

@@ -38,8 +38,8 @@ public:
 
 private:
 
-	CDropHandler();
-	~CDropHandler();
+	CDropHandler() = default;
+	~CDropHandler() = default;
 
 	void	HandleLeftClickDrop(IDataObject *pDataObject,POINTL *pptl);
 	void	HandleRightClickDrop(void);

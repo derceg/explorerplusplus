@@ -5,17 +5,6 @@
 #include "stdafx.h"
 #include "MessageForwarder.h"
 
-
-CMessageForwarder::CMessageForwarder()
-{
-	
-}
-
-CMessageForwarder::~CMessageForwarder()
-{
-	
-}
-
 INT_PTR CMessageForwarder::ForwardMessage(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam)
 {
 	m_hwnd = hwnd;

@@ -21,7 +21,7 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(CComboBox);
 
 	CComboBox(HWND hComboBox);
-	~CComboBox();
+	~CComboBox() = default;
 
 	static LRESULT CALLBACK ComboBoxEditProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 	LRESULT CALLBACK ComboBoxEditProc(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);

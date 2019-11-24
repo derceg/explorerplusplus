@@ -34,7 +34,7 @@ public:
 	};
 
 	CBaseDialog(HINSTANCE hInstance,int iResource,HWND hParent,bool bResizable);
-	virtual ~CBaseDialog();
+	virtual ~CBaseDialog() = default;
 
 	INT_PTR			ShowModalDialog();
 	HWND			ShowModelessDialog(IModelessDialogNotification *pmdn = NULL);

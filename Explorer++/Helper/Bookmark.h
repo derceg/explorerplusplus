@@ -38,8 +38,6 @@ public:
 	static CBookmarkFolder	*CreateNew(const std::wstring &strName);
 	static CBookmarkFolder	UnserializeFromRegistry(const std::wstring &strKey);
 
-	~CBookmarkFolder();
-
 	void			SerializeToRegistry(const std::wstring &strKey);
 
 	GUID			GetGUID() const;
@@ -113,8 +111,6 @@ public:
 	static CBookmark Create(const std::wstring &strName, const std::wstring &strLocation, const std::wstring &strDescription);
 	static CBookmark UnserializeFromRegistry(const std::wstring &strKey);
 
-	~CBookmark();
-
 	void			SerializeToRegistry(const std::wstring &strKey);
 
 	GUID			GetGUID() const;
@@ -161,8 +157,6 @@ class CBookmarkItemNotifier
 {
 public:
 
-	~CBookmarkItemNotifier();
-
 	static CBookmarkItemNotifier &GetInstance();
 
 	void	AddObserver(NBookmark::IBookmarkItemNotification *pbin);
@@ -187,7 +181,7 @@ private:
 		NOTIFY_BOOMARK_FOLDER_REMOVED
 	};
 
-	CBookmarkItemNotifier();
+	CBookmarkItemNotifier() = default;
 
 	CBookmarkItemNotifier(const CBookmarkItemNotifier &);
 	CBookmarkItemNotifier & operator=(const CBookmarkItemNotifier &);

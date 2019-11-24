@@ -30,11 +30,6 @@ m_bSavePosition(bSavePosition)
 	m_bStateSaved = FALSE;
 }
 
-CDialogSettings::~CDialogSettings()
-{
-
-}
-
 void CDialogSettings::SaveRegistrySettings(HKEY hParentKey)
 {
 	if(!m_bStateSaved)

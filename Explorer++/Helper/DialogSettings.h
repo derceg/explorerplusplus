@@ -15,7 +15,7 @@ class CDialogSettings
 public:
 
 	CDialogSettings(const TCHAR *szSettingsKey,bool bSavePosition = true);
-	virtual ~CDialogSettings();
+	virtual ~CDialogSettings() = default;
 
 	void			SaveRegistrySettings(HKEY hParentKey);
 	void			LoadRegistrySettings(HKEY hParentKey);

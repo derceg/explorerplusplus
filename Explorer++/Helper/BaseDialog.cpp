@@ -176,11 +176,6 @@ m_bResizable(bResizable)
 	m_bShowingModelessDialog = FALSE;
 }
 
-CBaseDialog::~CBaseDialog()
-{
-
-}
-
 HINSTANCE CBaseDialog::GetInstance() const
 {
 	return m_hInstance;

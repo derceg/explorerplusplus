@@ -13,7 +13,6 @@ class CStatusBar
 public:
 
 	CStatusBar(HWND hwnd);
-	~CStatusBar();
 
 	void			SetPartText(int iPart, const TCHAR *szText);
 

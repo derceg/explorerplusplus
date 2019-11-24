@@ -12,11 +12,6 @@ m_RefCount(1)
 	
 }
 
-CReferenceCount::~CReferenceCount()
-{
-
-}
-
 ULONG CReferenceCount::AddRef()
 {
 	return InterlockedIncrement(&m_RefCount);

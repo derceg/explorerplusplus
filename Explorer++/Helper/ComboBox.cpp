@@ -51,11 +51,6 @@ m_SuppressAutocomplete(false)
 	SetWindowSubclass(GetParent(m_hwnd),ComboBoxParentProcStub,m_SubclassCounter,reinterpret_cast<DWORD_PTR>(this));
 }
 
-CComboBox::~CComboBox()
-{
-
-}
-
 INT_PTR CComboBox::OnDestroy()
 {
 	COMBOBOXINFO cbi;

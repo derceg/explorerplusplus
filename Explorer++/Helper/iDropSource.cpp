@@ -15,7 +15,6 @@ class CDropSource : public IDropSource
 public:
 
 	CDropSource(DragTypes_t DragType);
-	~CDropSource();
 
 	HRESULT		__stdcall	QueryInterface(REFIID iid, void **ppvObject);
 	ULONG		__stdcall	AddRef(void);
@@ -46,11 +45,6 @@ CDropSource::CDropSource(DragTypes_t DragType)
 {
 	m_lRefCount = 1;
 	m_DragType = DragType;
-}
-
-CDropSource::~CDropSource()
-{
-
 }
 
 /* IUnknown interface members. */

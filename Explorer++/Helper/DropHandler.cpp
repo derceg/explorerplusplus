@@ -63,16 +63,6 @@ FORMATETC	CDropHandler::m_ftcText = {CF_TEXT,NULL,DVASPECT_CONTENT,-1,TYMED_HGLO
 FORMATETC	CDropHandler::m_ftcUnicodeText = {CF_UNICODETEXT,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 FORMATETC	CDropHandler::m_ftcDIBV5 = {CF_DIBV5,NULL,DVASPECT_CONTENT,-1,TYMED_HGLOBAL};
 
-CDropHandler::CDropHandler()
-{
-	
-}
-
-CDropHandler::~CDropHandler()
-{
-	
-}
-
 CDropHandler *CDropHandler::CreateNew()
 {
 	return new CDropHandler();
