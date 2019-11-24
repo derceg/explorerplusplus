@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include <list>
-#include "StatusBar.h"
 #include "Macros.h"
+#include "ShellHelper.h"
+#include "StatusBar.h"
+#include <wil/com.h>
+#include <list>
 
 __interface IFileContextMenuExternal
 {
@@ -42,19 +44,19 @@ private:
 
 	DISALLOW_COPY_AND_ASSIGN(CFileContextMenuManager);
 
-	static const int	CONTEXT_MENU_SUBCLASS_ID = 1;
+	static const int CONTEXT_MENU_SUBCLASS_ID = 1;
 
-	IContextMenu3		*m_pShellContext3;
-	IContextMenu2		*m_pShellContext2;
-	IContextMenu		*m_pShellContext;
-	IContextMenu		*m_pActualContext;
+	wil::com_ptr<IContextMenu3> m_pShellContext3;
+	wil::com_ptr<IContextMenu2> m_pShellContext2;
+	wil::com_ptr<IContextMenu> m_pShellContext;
+	IContextMenu *m_pActualContext;
 
-	const HWND			m_hwnd;
-	int					m_iMinID;
-	int					m_iMaxID;
+	const HWND m_hwnd;
+	int m_iMinID;
+	int m_iMaxID;
 
-	CStatusBar			*m_pStatusBar;
+	CStatusBar *m_pStatusBar;
 
-	PIDLIST_ABSOLUTE	m_pidlParent;
-	std::vector<PITEMID_CHILD>	m_pidlItems;
+	const unique_pidl_absolute m_pidlParent;
+	std::vector<PITEMID_CHILD> m_pidlItems;
 };
