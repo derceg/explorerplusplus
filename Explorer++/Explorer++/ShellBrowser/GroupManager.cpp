@@ -503,7 +503,6 @@ void CShellBrowser::DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeade
 void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	IShellFolder *pShellFolder	= NULL;
-	PIDLIST_ABSOLUTE pidlDirectory	= NULL;
 	PCITEMID_CHILD pidlRelative	= NULL;
 	TCHAR *SizeGroups[] = {_T("Unspecified"),_T("Small"),_T("Medium"),_T("Huge"),_T("Gigantic")};
 	TCHAR szItem[MAX_PATH];
@@ -523,8 +522,6 @@ void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroup
 	TotalSizeGroupLimits[3].QuadPart	= 20 * TotalSizeGroupLimits[2].QuadPart;
 	TotalSizeGroupLimits[4].QuadPart	= 100 * TotalSizeGroupLimits[2].QuadPart;
 
-	SHParseDisplayName(m_CurDir, nullptr, &pidlDirectory, 0, nullptr);
-
 	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
@@ -536,7 +533,6 @@ void CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroup
 	{
 		bRes = GetDiskFreeSpaceEx(szItem,NULL,&nTotalBytes,&nFreeBytes);
 
-		CoTaskMemFree(pidlDirectory);
 		pShellFolder->Release();
 
 		i = nGroups - 1;
@@ -706,7 +702,6 @@ void CShellBrowser::DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo, c
 void CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const
 {
 	std::list<TypeGroup_t>::iterator itr;
-	PIDLIST_ABSOLUTE pidlDirectory	= NULL;
 	TCHAR szFreeSpace[MAX_PATH];
 	IShellFolder *pShellFolder	= NULL;
 	PCITEMID_CHILD pidlRelative	= NULL;
@@ -717,14 +712,12 @@ void CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroup
 	BOOL bRoot;
 	BOOL bRes = FALSE;
 
-	SHParseDisplayName(m_CurDir, nullptr, &pidlDirectory, 0, nullptr);
 	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),
 		IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
 	StrRetToBuf(&str,pidlRelative,szItem,SIZEOF_ARRAY(szItem));
 
-	CoTaskMemFree(pidlDirectory);
 	pShellFolder->Release();
 
 	bRoot = PathIsRoot(szItem);

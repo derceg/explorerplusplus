@@ -172,7 +172,6 @@ int EventId,int iFolderIndex)
 void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
-	PIDLIST_ABSOLUTE	pidlFull = NULL;
 	PCITEMID_CHILD	pidlRelative = NULL;
 	Added_t			Added;
 	TCHAR			FullFileName[MAX_PATH];
@@ -184,7 +183,8 @@ void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
 	PathAppend(FullFileName,szFileName);
 
-	hr = SHParseDisplayName(FullFileName, nullptr, &pidlFull, 0, nullptr);
+	unique_pidl_absolute pidlFull;
+	hr = SHParseDisplayName(FullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
 
 	/* It is possible that by the time a file is registered here,
 	it will have already been renamed. In this the following
@@ -192,7 +192,7 @@ void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 	If the file is not added, store its filename. */
 	if(SUCCEEDED(hr))
 	{
-		hr = SHBindToParent(pidlFull, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
+		hr = SHBindToParent(pidlFull.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 		if(SUCCEEDED(hr))
 		{
@@ -250,8 +250,6 @@ void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 
 			pShellFolder->Release();
 		}
-
-		CoTaskMemFree(pidlFull);
 	}
 	
 	if(!bFileAdded)
@@ -512,7 +510,6 @@ should go through a central function. */
 void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 {
 	IShellFolder	*pShellFolder = NULL;
-	PIDLIST_ABSOLUTE	pidlFull = NULL;
 	PCITEMID_CHILD	pidlRelative = NULL;
 	SHFILEINFO		shfi;
 	LVFINDINFO		lvfi;
@@ -529,11 +526,12 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
 	PathAppend(szFullFileName,szNewFileName);
 
-	hr = SHParseDisplayName(szFullFileName, nullptr, &pidlFull, 0, nullptr);
+	unique_pidl_absolute pidlFull;
+	hr = SHParseDisplayName(szFullFileName, nullptr, wil::out_param(pidlFull), 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = SHBindToParent(pidlFull, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
+		hr = SHBindToParent(pidlFull.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 		if(SUCCEEDED(hr))
 		{
@@ -541,7 +539,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 
 			if(SUCCEEDED(hr))
 			{
-				m_itemInfoMap.at(iItemInternal).pidlComplete.reset(ILCloneFull(pidlFull));
+				m_itemInfoMap.at(iItemInternal).pidlComplete.reset(ILCloneFull(pidlFull.get()));
 				m_itemInfoMap.at(iItemInternal).pridl.reset(ILCloneChild(pidlRelative));
 				StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
 					SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName),
@@ -555,7 +553,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 
 				/* The files' type may have changed, so retrieve the files'
 				icon again. */
-				res = SHGetFileInfo((LPTSTR)pidlFull,0,&shfi,
+				res = SHGetFileInfo((LPTSTR)pidlFull.get(),0,&shfi,
 					sizeof(SHFILEINFO),SHGFI_PIDL|SHGFI_ICON|
 					SHGFI_OVERLAYINDEX);
 
@@ -602,8 +600,6 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 
 			pShellFolder->Release();
 		}
-
-		CoTaskMemFree(pidlFull);
 	}
 	else
 	{

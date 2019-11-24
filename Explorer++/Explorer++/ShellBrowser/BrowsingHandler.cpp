@@ -558,7 +558,6 @@ HRESULT CShellBrowser::AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition
 int CShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
 	PCITEMID_CHILD pidlChild, const TCHAR *szFileName)
 {
-	PIDLIST_ABSOLUTE	pidlItem = NULL;
 	HANDLE			hFirstFile;
 	TCHAR			szPath[MAX_PATH];
 	int				uItemId;
@@ -567,17 +566,15 @@ int CShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
 
 	uItemId = GenerateUniqueItemId();
 
-	pidlItem = ILCombine(pidlDirectory, pidlChild);
+	unique_pidl_absolute pidlItem(ILCombine(pidlDirectory, pidlChild));
 
-	m_itemInfoMap[uItemId].pidlComplete.reset(ILCloneFull(pidlItem));
+	m_itemInfoMap[uItemId].pidlComplete.reset(ILCloneFull(pidlItem.get()));
 	m_itemInfoMap[uItemId].pridl.reset(ILCloneChild(pidlChild));
 	m_itemInfoMap[uItemId].bIconRetrieved = FALSE;
 	StringCchCopy(m_itemInfoMap[uItemId].szDisplayName,
 		SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDisplayName), szFileName);
 
-	SHGetPathFromIDList(pidlItem,szPath);
-
-	CoTaskMemFree(pidlItem);
+	SHGetPathFromIDList(pidlItem.get(),szPath);
 
 	/* DO NOT call FindFirstFile() on root drives (especially
 	floppy drives). Doing so may cause a delay of up to a

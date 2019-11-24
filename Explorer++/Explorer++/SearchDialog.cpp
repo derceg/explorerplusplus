@@ -274,14 +274,12 @@ INT_PTR CSearchDialog::OnCommand(WPARAM wParam,LPARAM lParam)
 			bi.ulFlags			= BIF_RETURNONLYFSDIRS|BIF_NEWDIALOGSTYLE;
 			bi.lpfn				= NSearchDialog::BrowseCallbackProc;
 			bi.lParam			= reinterpret_cast<LPARAM>(szDirectory);
-			PIDLIST_ABSOLUTE pidl = SHBrowseForFolder(&bi);
+			unique_pidl_absolute pidl(SHBrowseForFolder(&bi));
 
 			if(pidl != NULL)
 			{
-				GetDisplayName(pidl,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
+				GetDisplayName(pidl.get(),szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 				SetDlgItemText(m_hDlg,IDC_COMBO_DIRECTORY,szParsingPath);
-
-				CoTaskMemFree(pidl);
 			}
 		}
 		break;
@@ -614,10 +612,9 @@ void CSearchDialog::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 {
 	UNREFERENCED_PARAMETER(dwData);
 
-	PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItems.front());
+	unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
 	SFGAOF ItemAttributes = SFGAO_FOLDER;
-	GetItemAttributes(pidlComplete,&ItemAttributes);
-	CoTaskMemFree(pidlComplete);
+	GetItemAttributes(pidlComplete.get(),&ItemAttributes);
 
 	TCHAR szTemp[64];
 
@@ -649,9 +646,8 @@ BOOL CSearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 	{
 		for(auto pidlItem : pidlItems)
 		{
-			PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItem);
-			m_pexpp->OpenItem(pidlComplete, FALSE, FALSE);
-			CoTaskMemFree(pidlComplete);
+			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItem));
+			m_pexpp->OpenItem(pidlComplete.get(), FALSE, FALSE);
 		}
 
 		return TRUE;
@@ -670,9 +666,8 @@ void CSearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 			m_tabContainer->CreateNewTab(pidlParent, TabSettings(_selected = true));
 
 			TCHAR szFilename[MAX_PATH];
-			PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItems.front());
-			GetDisplayName(pidlComplete, szFilename, SIZEOF_ARRAY(szFilename), SHGDN_INFOLDER | SHGDN_FORPARSING);
-			CoTaskMemFree(pidlComplete);
+			unique_pidl_absolute pidlComplete(ILCombine(pidlParent, pidlItems.front()));
+			GetDisplayName(pidlComplete.get(), szFilename, SIZEOF_ARRAY(szFilename), SHGDN_INFOLDER | SHGDN_FORPARSING);
 
 			m_pexpp->GetActiveShellBrowser()->SelectFiles(szFilename);
 		}
@@ -707,14 +702,12 @@ INT_PTR CSearchDialog::OnNotify(NMHDR *pnmhdr)
 					/* Item should always exist. */
 					assert(itr != m_SearchItemsMapInternal.end());
 
-					PIDLIST_ABSOLUTE pidlFull = NULL;
-					HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr, &pidlFull, 0, nullptr);
+					unique_pidl_absolute pidlFull;
+					HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr, wil::out_param(pidlFull), 0, nullptr);
 
 					if(hr == S_OK)
 					{
-						m_pexpp->OpenItem(pidlFull,FALSE,FALSE);
-
-						CoTaskMemFree(pidlFull);
+						m_pexpp->OpenItem(pidlFull.get(),FALSE,FALSE);
 					}
 				}
 			}
@@ -753,18 +746,18 @@ INT_PTR CSearchDialog::OnNotify(NMHDR *pnmhdr)
 						auto itr = m_SearchItemsMapInternal.find(static_cast<int>(lvItem.lParam));
 						assert(itr != m_SearchItemsMapInternal.end());
 
-						PIDLIST_ABSOLUTE pidlFull = NULL;
-						HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr, &pidlFull, 0, nullptr);
+						unique_pidl_absolute pidlFull;
+						HRESULT hr = SHParseDisplayName(itr->second.c_str(), nullptr, wil::out_param(pidlFull), 0, nullptr);
 
 						if(hr == S_OK)
 						{
 							std::vector<PCITEMID_CHILD> pidlItems;
-							pidlItems.push_back(ILFindLastID(pidlFull));
+							pidlItems.push_back(ILFindLastID(pidlFull.get()));
 
-							PIDLIST_ABSOLUTE pidlDirectory = ILCloneFull(pidlFull);
-							ILRemoveLastID(pidlDirectory);
+							unique_pidl_absolute pidlDirectory(ILCloneFull(pidlFull.get()));
+							ILRemoveLastID(pidlDirectory.get());
 
-							CFileContextMenuManager fcmm(m_hDlg,pidlDirectory, pidlItems);
+							CFileContextMenuManager fcmm(m_hDlg, pidlDirectory.get(), pidlItems);
 
 							DWORD dwCursorPos = GetMessagePos();
 
@@ -774,9 +767,6 @@ INT_PTR CSearchDialog::OnNotify(NMHDR *pnmhdr)
 
 							fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&ptCursor,m_pexpp->GetStatusBar(),
 								NULL,FALSE,IsKeyDown(VK_SHIFT));
-
-							CoTaskMemFree(pidlDirectory);
-							CoTaskMemFree(pidlFull);
 						}
 					}
 				}
@@ -1164,16 +1154,14 @@ void CSearch::SearchDirectoryInternal(const TCHAR *szSearchDirectory,
 					else
 						m_iFilesFound++;
 
-					PIDLIST_ABSOLUTE pidl = NULL;
 					TCHAR szFullFileName[MAX_PATH];
-
 					PathCombine(szFullFileName,szSearchDirectory,wfd.cFileName);
-					SHParseDisplayName(szFullFileName, nullptr, &pidl, 0, nullptr);
+
+					unique_pidl_absolute pidl;
+					SHParseDisplayName(szFullFileName, nullptr, wil::out_param(pidl), 0, nullptr);
 
 					PostMessage(m_hDlg,NSearchDialog::WM_APP_SEARCHITEMFOUND,
-						reinterpret_cast<WPARAM>(ILCloneFull(pidl)),0);
-
-					CoTaskMemFree(pidl);
+						reinterpret_cast<WPARAM>(ILCloneFull(pidl.get())),0);
 				}
 
 				if((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ==

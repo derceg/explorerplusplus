@@ -300,15 +300,13 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNe
 
 void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem,const TCHAR *szParameters)
 {
-	PIDLIST_ABSOLUTE pidlParent = ILCloneFull(pidlItem);
-	ILRemoveLastID(pidlParent);
+	unique_pidl_absolute pidlParent(ILCloneFull(pidlItem));
+	ILRemoveLastID(pidlParent.get());
 
 	TCHAR szItemDirectory[MAX_PATH];
-	GetDisplayName(pidlParent,szItemDirectory,SIZEOF_ARRAY(szItemDirectory),SHGDN_FORPARSING);
+	GetDisplayName(pidlParent.get(),szItemDirectory,SIZEOF_ARRAY(szItemDirectory),SHGDN_FORPARSING);
 
 	ExecuteFileAction(m_hContainer,EMPTY_STRING,szParameters,szItemDirectory,pidlItem);
-
-	CoTaskMemFree(pidlParent);
 }
 
 BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)

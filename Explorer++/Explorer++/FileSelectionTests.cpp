@@ -133,9 +133,8 @@ HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes
 
 	if (hItem != NULL)
 	{
-		PIDLIST_ABSOLUTE pidl = m_pMyTreeView->BuildPath(hItem);
-		hr = GetItemAttributes(pidl, pItemAttributes);
-		CoTaskMemFree(pidl);
+		auto pidl = m_pMyTreeView->BuildPath(hItem);
+		hr = GetItemAttributes(pidl.get(), pItemAttributes);
 	}
 
 	return hr;
@@ -167,25 +166,19 @@ BOOL Explorerplusplus::CanPaste() const
 	}
 	else if (hFocus == m_hTreeView)
 	{
-		HTREEITEM		hItem;
-		PIDLIST_ABSOLUTE	pidl = NULL;
-		SFGAOF			Attributes;
-		HRESULT			hr;
-
-		hItem = TreeView_GetSelection(m_hTreeView);
+		HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
 
 		if (hItem != NULL)
 		{
-			pidl = m_pMyTreeView->BuildPath(hItem);
+			auto pidl = m_pMyTreeView->BuildPath(hItem);
 
-			Attributes = SFGAO_FILESYSTEM;
-
-			hr = GetItemAttributes(pidl, &Attributes);
-
-			CoTaskMemFree(pidl);
+			SFGAOF attributes = SFGAO_FILESYSTEM;
+			HRESULT hr = GetItemAttributes(pidl.get(), &attributes);
 
 			if (hr == S_OK)
+			{
 				return bDataAvailable;
+			}
 		}
 	}
 

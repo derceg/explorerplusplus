@@ -135,9 +135,8 @@ WPARAM wParam,LPARAM lParam)
 				initially clicked on. */
 				if(tvhi.hItem == m_hTVMButtonItem)
 				{
-					PIDLIST_ABSOLUTE pidl = m_pMyTreeView->BuildPath(tvhi.hItem);
-					m_tabContainer->CreateNewTab(pidl);
-					CoTaskMemFree(pidl);
+					auto pidl = m_pMyTreeView->BuildPath(tvhi.hItem);
+					m_tabContainer->CreateNewTab(pidl.get());
 				}
 			}
 		}
@@ -177,22 +176,19 @@ void Explorerplusplus::OnTreeViewFileDelete(BOOL bPermanent)
 
 	if(hItem != NULL)
 	{
-		PIDLIST_ABSOLUTE pidl = m_pMyTreeView->BuildPath(hItem);
+		auto pidl = m_pMyTreeView->BuildPath(hItem);
 
 		if(bPermanent)
 		{
 			fMask = CMIC_MASK_SHIFT_DOWN;
 		}
 
-		hr = ExecuteActionFromContextMenu(pidl,NULL,m_hContainer,0,_T("delete"),fMask);
-
-		CoTaskMemFree(pidl);
+		hr = ExecuteActionFromContextMenu(pidl.get(),NULL,m_hContainer,0,_T("delete"),fMask);
 	}
 }
 
 void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 {
-	PIDLIST_ABSOLUTE pidl = NULL;
 	POINT *ppt = NULL;
 	HTREEITEM hItem;
 	HTREEITEM hPrevItem;
@@ -207,14 +203,13 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 
 	hPrevItem = TreeView_GetSelection(m_hTreeView);
 	TreeView_SelectItem(m_hTreeView,hItem);
-	pidl = m_pMyTreeView->BuildPath(hItem);
+	auto pidl = m_pMyTreeView->BuildPath(hItem);
 
-	hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellParentFolder), &pidlRelative);
+	hr = SHBindToParent(pidl.get(), IID_PPV_ARGS(&pShellParentFolder), &pidlRelative);
 
 	if(SUCCEEDED(hr))
 	{
 		HTREEITEM hParent;
-		PIDLIST_ABSOLUTE pidlParent	= NULL;
 
 		hParent = TreeView_GetParent(m_hTreeView,hItem);
 
@@ -228,16 +223,16 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 
 		if(hParent != NULL)
 		{
-			pidlParent = m_pMyTreeView->BuildPath(hParent);
+			auto pidlParent = m_pMyTreeView->BuildPath(hParent);
 
-			if(pidlParent != NULL)
+			if(pidlParent)
 			{
 				m_bTreeViewOpenInNewTab = FALSE;
 
 				std::vector<PCITEMID_CHILD> pidlItems;
 				pidlItems.push_back(pidlRelative);
 
-				CFileContextMenuManager fcmm(m_hContainer,pidlParent, pidlItems);
+				CFileContextMenuManager fcmm(m_hContainer, pidlParent.get(), pidlItems);
 
 				FileContextMenuInfo_t fcmi;
 				fcmi.uFrom = FROM_TREEVIEW;
@@ -246,8 +241,6 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 
 				fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,ppt,&StatusBar,
 					reinterpret_cast<DWORD_PTR>(&fcmi),TRUE,IsKeyDown(VK_SHIFT));
-
-				CoTaskMemFree(pidlParent);
 			}
 		}
 
@@ -262,8 +255,6 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 		TreeView_SelectItem(m_hTreeView,hPrevItem);
 
 	m_bTreeViewRightClick = FALSE;
-
-	CoTaskMemFree(pidl);
 }
 
 /*
@@ -275,9 +266,8 @@ void Explorerplusplus::OnTreeViewShowFileProperties(void) const
 	HTREEITEM hItem = TreeView_GetSelection(m_hTreeView);
 
 	/* Get the path of the currently selected item. */
-	PIDLIST_ABSOLUTE pidlDirectory = m_pMyTreeView->BuildPath(hItem);
-	ShowMultipleFileProperties(pidlDirectory,NULL, m_hContainer,0);
-	CoTaskMemFree(pidlDirectory);
+	auto pidlDirectory = m_pMyTreeView->BuildPath(hItem);
+	ShowMultipleFileProperties(pidlDirectory.get(), NULL, m_hContainer, 0);
 }
 
 BOOL Explorerplusplus::OnTreeViewItemExpanding(LPARAM lParam)
@@ -302,9 +292,8 @@ BOOL Explorerplusplus::OnTreeViewItemExpanding(LPARAM lParam)
 
 	if(pnmtv->action == TVE_EXPAND)
 	{
-		PIDLIST_ABSOLUTE pidl = m_pMyTreeView->BuildPath(tvItem->hItem);
-		m_pMyTreeView->AddDirectory(tvItem->hItem,pidl);
-		CoTaskMemFree(pidl);
+		auto pidl = m_pMyTreeView->BuildPath(tvItem->hItem);
+		m_pMyTreeView->AddDirectory(tvItem->hItem, pidl.get());
 	}
 	else
 	{
@@ -323,9 +312,8 @@ BOOL Explorerplusplus::OnTreeViewItemExpanding(LPARAM lParam)
 
 			if(hItem == tvItem->hItem)
 			{
-				PIDLIST_ABSOLUTE pidl = m_pMyTreeView->BuildPath(tvItem->hItem);
-				m_navigation->BrowseFolderInCurrentTab(pidl,0);
-				CoTaskMemFree(pidl);
+				auto pidl = m_pMyTreeView->BuildPath(tvItem->hItem);
+				m_navigation->BrowseFolderInCurrentTab(pidl.get(),0);
 			}
 		}
 
@@ -345,20 +333,17 @@ void Explorerplusplus::OnTreeViewCopyItemPath(void) const
 
 	if(hItem != NULL)
 	{
-		PIDLIST_ABSOLUTE pidl = m_pMyTreeView->BuildPath(hItem);
+		auto pidl = m_pMyTreeView->BuildPath(hItem);
 
 		TCHAR szFullFileName[MAX_PATH];
-		GetDisplayName(pidl,szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
+		GetDisplayName(pidl.get(),szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
 		CopyTextToClipboard(szFullFileName);
-
-		CoTaskMemFree(pidl);
 	}
 }
 
 void Explorerplusplus::OnTreeViewCopyUniversalPaths(void) const
 {
 	HTREEITEM		hItem;
-	PIDLIST_ABSOLUTE	pidl;
 	TCHAR			szFullFileName[MAX_PATH];
 	UNIVERSAL_NAME_INFO	uni;
 	DWORD			dwBufferSize;
@@ -368,9 +353,9 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths(void) const
 
 	if(hItem != NULL)
 	{
-		pidl = m_pMyTreeView->BuildPath(hItem);
+		auto pidl = m_pMyTreeView->BuildPath(hItem);
 
-		GetDisplayName(pidl,szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
+		GetDisplayName(pidl.get(),szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
 
 		dwBufferSize = sizeof(uni);
 		dwRet = WNetGetUniversalName(szFullFileName,UNIVERSAL_NAME_INFO_LEVEL,
@@ -380,8 +365,6 @@ void Explorerplusplus::OnTreeViewCopyUniversalPaths(void) const
 			CopyTextToClipboard(uni.lpUniversalName);
 		else
 			CopyTextToClipboard(szFullFileName);
-
-		CoTaskMemFree(pidl);
 	}
 }
 
@@ -396,12 +379,12 @@ void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 
 	if(hItem != NULL)
 	{
-		PIDLIST_ABSOLUTE pidl = m_pMyTreeView->BuildPath(hItem);
+		auto pidl = m_pMyTreeView->BuildPath(hItem);
 
 		std::list<std::wstring> FileNameList;
 		TCHAR szFullFileName[MAX_PATH];
 
-		GetDisplayName(pidl,szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
+		GetDisplayName(pidl.get(),szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
 
 		std::wstring stringFileName(szFullFileName);
 		FileNameList.push_back(stringFileName);
@@ -431,28 +414,24 @@ void Explorerplusplus::OnTreeViewCopy(BOOL bCopy)
 		{
 			m_pClipboardDataObject = pClipboardDataObject;
 		}
-
-		CoTaskMemFree(pidl);
 	}
 }
 
 void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 {
-	PIDLIST_ABSOLUTE pidlDirectory = m_pMyTreeView->BuildPath(g_NewSelectionItem);
+	auto pidlDirectory = m_pMyTreeView->BuildPath(g_NewSelectionItem);
 	auto pidlCurrentDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
 	if(!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick &&
-		!CompareIdls(pidlDirectory,pidlCurrentDirectory.get()))
+		!CompareIdls(pidlDirectory.get(),pidlCurrentDirectory.get()))
 	{
-		m_navigation->BrowseFolderInCurrentTab(pidlDirectory,0);
+		m_navigation->BrowseFolderInCurrentTab(pidlDirectory.get(),0);
 
 		if(m_config->treeViewAutoExpandSelected)
 		{
 			TreeView_Expand(m_hTreeView,g_NewSelectionItem,TVE_EXPAND);
 		}
 	}
-
-	CoTaskMemFree(pidlDirectory);
 
 	KillTimer(m_hHolder,0);
 }
@@ -498,13 +477,11 @@ int Explorerplusplus::OnTreeViewBeginLabelEdit(LPARAM lParam)
 {
 	NMTVDISPINFO *pdi = reinterpret_cast<NMTVDISPINFO *>(lParam);
 
-	PIDLIST_ABSOLUTE pidl = m_pMyTreeView->BuildPath(pdi->item.hItem);
+	auto pidl = m_pMyTreeView->BuildPath(pdi->item.hItem);
 
 	/* Save the old filename, in the case that the file
 	needs to be renamed. */
-	GetDisplayName(pidl,m_OldTreeViewFileName,SIZEOF_ARRAY(m_OldTreeViewFileName),SHGDN_FORPARSING);
-
-	CoTaskMemFree(pidl);
+	GetDisplayName(pidl.get(),m_OldTreeViewFileName,SIZEOF_ARRAY(m_OldTreeViewFileName),SHGDN_FORPARSING);
 
 	return FALSE;
 }
@@ -730,9 +707,8 @@ void Explorerplusplus::OnTreeViewSetFileAttributes(void) const
 	std::list<NSetFileAttributesDialogExternal::SetFileAttributesInfo_t> sfaiList;
 	NSetFileAttributesDialogExternal::SetFileAttributesInfo_t sfai;
 
-	PIDLIST_ABSOLUTE pidlItem = m_pMyTreeView->BuildPath(hItem);
-	HRESULT hr = GetDisplayName(pidlItem,sfai.szFullFileName,SIZEOF_ARRAY(sfai.szFullFileName),SHGDN_FORPARSING);
-	CoTaskMemFree(pidlItem);
+	auto pidlItem = m_pMyTreeView->BuildPath(hItem);
+	HRESULT hr = GetDisplayName(pidlItem.get(),sfai.szFullFileName,SIZEOF_ARRAY(sfai.szFullFileName),SHGDN_FORPARSING);
 
 	if(hr == S_OK)
 	{
@@ -755,7 +731,6 @@ void Explorerplusplus::OnTreeViewSetFileAttributes(void) const
 void Explorerplusplus::OnTreeViewPaste(void)
 {
 	HTREEITEM hItem;
-	PIDLIST_ABSOLUTE pidl = NULL;
 	TCHAR szFullFileName[MAX_PATH + 1];
 
 	hItem = TreeView_GetSelection(m_hTreeView);
@@ -770,11 +745,9 @@ void Explorerplusplus::OnTreeViewPaste(void)
 		{
 			CDropHandler *pDropHandler = CDropHandler::CreateNew();
 
-			pidl = m_pMyTreeView->BuildPath(hItem);
+			auto pidl = m_pMyTreeView->BuildPath(hItem);
 
-			assert(pidl != NULL);
-
-			GetDisplayName(pidl,szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
+			GetDisplayName(pidl.get(),szFullFileName,SIZEOF_ARRAY(szFullFileName),SHGDN_FORPARSING);
 
 			/* Name must be double NULL terminated. */
 			szFullFileName[lstrlen(szFullFileName) + 1] = '\0';
@@ -782,8 +755,6 @@ void Explorerplusplus::OnTreeViewPaste(void)
 			pDropHandler->CopyClipboardData(pClipboardObject,
 				m_hTreeView,szFullFileName,NULL,
 				!m_config->overwriteExistingFilesConfirmation);
-
-			CoTaskMemFree(pidl);
 
 			pDropHandler->Release();
 			pClipboardObject->Release();

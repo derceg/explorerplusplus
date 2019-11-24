@@ -732,17 +732,13 @@ part of the filesystem, or if it is the root of
 the namespace (i.e. the desktop). */
 BOOL CShellBrowser::CanCreate(void) const
 {
-	PIDLIST_ABSOLUTE	pidl = NULL;
-	HRESULT			hr;
-	BOOL			bCanCreate = FALSE;
-
-	hr = SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,&pidl);
+	BOOL bCanCreate = FALSE;
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,wil::out_param(pidl));
 
 	if(SUCCEEDED(hr))
 	{
-		bCanCreate = !InVirtualFolder() || CompareIdls(m_pidlDirectory,pidl);
-
-		CoTaskMemFree(pidl);
+		bCanCreate = !InVirtualFolder() || CompareIdls(m_pidlDirectory,pidl.get());
 	}
 
 	return bCanCreate;
@@ -1619,7 +1615,6 @@ void CShellBrowser::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 
 void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 {
-	PIDLIST_ABSOLUTE		pidlDrive = NULL;
 	LVITEM					lvItem;
 	SHFILEINFO				shfi;
 	TCHAR					szDisplayName[MAX_PATH];
@@ -1632,7 +1627,8 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 	its drive letter/name. */
 	GetDisplayName(szDrive,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_INFOLDER);
 
-	hr = SHParseDisplayName(szDrive, nullptr, &pidlDrive, 0, nullptr);
+	unique_pidl_absolute pidlDrive;
+	hr = SHParseDisplayName(szDrive, nullptr, wil::out_param(pidlDrive), 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
@@ -1643,7 +1639,7 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 			lvItem.iSubItem	= 0;
 			ListView_GetItem(m_hListView,&lvItem);
 
-			if(CompareIdls(pidlDrive, m_itemInfoMap.at((int)lvItem.lParam).pidlComplete.get()))
+			if(CompareIdls(pidlDrive.get(), m_itemInfoMap.at((int)lvItem.lParam).pidlComplete.get()))
 			{
 				iItem = i;
 				iItemInternal = (int)lvItem.lParam;
@@ -1651,8 +1647,6 @@ void CShellBrowser::UpdateDriveIcon(const TCHAR *szDrive)
 				break;
 			}
 		}
-
-		CoTaskMemFree(pidlDrive);
 	}
 
 	if(iItem != -1)

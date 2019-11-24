@@ -189,7 +189,6 @@ int iDroppedItem)
 	FORMATETC	ftc;
 	STGMEDIUM	stg;
 	DROPFILES	*pdf = NULL;
-	PIDLIST_ABSOLUTE	pidlDest = NULL;
 	TCHAR		szDestDirectory[MAX_PATH];
 	TCHAR		szFullFileName[MAX_PATH];
 	HRESULT		hr;
@@ -215,19 +214,17 @@ int iDroppedItem)
 
 			if(iDroppedItem < nDroppedFiles)
 			{
-				pidlDest = BuildPath(hItem);
+				auto pidlDest = BuildPath(hItem);
 
-				if(pidlDest != NULL)
+				if(pidlDest)
 				{
 					/* Determine the name of the first dropped file. */
 					DragQueryFile((HDROP)pdf,iDroppedItem,szFullFileName,
 						SIZEOF_ARRAY(szFullFileName));
 
-					GetDisplayName(pidlDest,szDestDirectory,SIZEOF_ARRAY(szDestDirectory),SHGDN_FORPARSING);
+					GetDisplayName(pidlDest.get(),szDestDirectory,SIZEOF_ARRAY(szDestDirectory),SHGDN_FORPARSING);
 
 					bOnSameDrive = PathIsSameRoot(szDestDirectory,szFullFileName);
-
-					CoTaskMemFree(pidlDest);
 				}
 			}
 
@@ -264,18 +261,16 @@ POINTL pt,DWORD *pdwEffect)
 	/* Is the mouse actually over an item? */
 	if(!(tvht.flags & LVHT_NOWHERE) && (tvht.hItem != NULL) && m_bDataAccept)
 	{
-		PIDLIST_ABSOLUTE pidlDirectory = BuildPath(tvht.hItem);
+		auto pidlDirectory = BuildPath(tvht.hItem);
 
 		TCHAR szDestDirectory[MAX_PATH];
-		GetDisplayName(pidlDirectory,szDestDirectory,SIZEOF_ARRAY(szDestDirectory),SHGDN_FORPARSING);
+		GetDisplayName(pidlDirectory.get(),szDestDirectory,SIZEOF_ARRAY(szDestDirectory),SHGDN_FORPARSING);
 
 		CDropHandler *pDropHandler = CDropHandler::CreateNew();
 		pDropHandler->Drop(pDataObject,
 			grfKeyState,pt,pdwEffect,m_hTreeView,
 			m_DragType,szDestDirectory,NULL,FALSE);
 		pDropHandler->Release();
-
-		CoTaskMemFree(pidlDirectory);
 	}
 
 	RestoreState();

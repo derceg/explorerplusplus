@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/DropHandler.h"
+#include "../Helper/iDirectoryMonitor.h"
+#include "../Helper/ShellHelper.h"
 
 #define WM_USER_TREEVIEW				WM_APP + 70
 #define WM_USER_TREEVIEW_GAINEDFOCUS	(WM_USER_TREEVIEW + 2)
@@ -30,7 +31,7 @@ public:
 
 	/* User functions. */
 	HRESULT				AddDirectory(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlDirectory);
-	PIDLIST_ABSOLUTE	BuildPath(HTREEITEM hTreeItem);
+	unique_pidl_absolute	BuildPath(HTREEITEM hTreeItem);
 	HTREEITEM			LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	void				EraseItems(HTREEITEM hParent);
 	BOOL				QueryDragging(void);

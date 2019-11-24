@@ -35,10 +35,10 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(void)
 	std::wstring currentDirectory = m_pActiveShellBrowser->GetDirectory();
 	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-	PIDLIST_ABSOLUTE pidlComputer = NULL;
-	SHGetFolderLocation(NULL, CSIDL_DRIVES, NULL, 0, &pidlComputer);
+	unique_pidl_absolute pidlComputer;
+	SHGetFolderLocation(NULL, CSIDL_DRIVES, NULL, 0, wil::out_param(pidlComputer));
 
-	if (CompareIdls(pidlDirectory.get(), pidlComputer))
+	if (CompareIdls(pidlDirectory.get(), pidlComputer.get()))
 	{
 		TCHAR szDisplay[512];
 		DWORD dwSize = SIZEOF_ARRAY(szDisplay);
@@ -80,8 +80,6 @@ void Explorerplusplus::UpdateDisplayWindowForZeroFiles(void)
 		SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidlDirectory.get()), NULL, &shfi, sizeof(shfi), SHGFI_PIDL | SHGFI_TYPENAME);
 		DisplayWindow_BufferText(m_hDisplayWindow, shfi.szTypeName);
 	}
-
-	CoTaskMemFree(pidlComputer);
 }
 
 void Explorerplusplus::UpdateDisplayWindowForOneFile(void)

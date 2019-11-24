@@ -859,22 +859,19 @@ HRESULT CDropHandler::CopyDIBV5Data(IDataObject *pDataObject,
 
 void CDropHandler::HandleRightClickDrop(void)
 {
-	IShellFolder *pShellFolder = NULL;
-	IDropTarget *pDrop = NULL;
-	PIDLIST_ABSOLUTE pidlDirectory = NULL;
-	DWORD dwe;
-	HRESULT hr;
-
-	hr = SHParseDisplayName(m_szDestDirectory, nullptr, &pidlDirectory, 0, nullptr);
+	unique_pidl_absolute pidlDirectory;
+	HRESULT hr = SHParseDisplayName(m_szDestDirectory, nullptr, wil::out_param(pidlDirectory), 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
+		IShellFolder *pShellFolder = NULL;
+		hr = BindToIdl(pidlDirectory.get(), IID_PPV_ARGS(&pShellFolder));
 
 		if(SUCCEEDED(hr))
 		{
-			dwe = m_dwEffect;
+			DWORD dwe = m_dwEffect;
 
+			IDropTarget *pDrop = NULL;
 			hr = pShellFolder->CreateViewObject(m_hwndDrop, IID_PPV_ARGS(&pDrop));
 
 			if(SUCCEEDED(hr))
@@ -891,8 +888,6 @@ void CDropHandler::HandleRightClickDrop(void)
 
 			pShellFolder->Release();
 		}
-
-		CoTaskMemFree(pidlDirectory);
 	}
 }
 

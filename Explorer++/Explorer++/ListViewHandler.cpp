@@ -912,13 +912,13 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	HMENU hMenu = InitializeRightClickMenu();
 	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-	PIDLIST_ABSOLUTE pidlParent = ILCloneFull(pidlDirectory.get());
-	ILRemoveLastID(pidlParent);
+	unique_pidl_absolute pidlParent(ILCloneFull(pidlDirectory.get()));
+	ILRemoveLastID(pidlParent.get());
 
 	PCUITEMID_CHILD pidlChildFolder = ILFindLastID(pidlDirectory.get());
 
 	IShellFolder *pShellFolder = NULL;
-	HRESULT hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
+	HRESULT hr = BindToIdl(pidlParent.get(), IID_PPV_ARGS(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{
@@ -940,7 +940,6 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 		pShellFolder->Release();
 	}
 
-	CoTaskMemFree(pidlParent);
 	DestroyMenu(hMenu);
 }
 
@@ -1672,8 +1671,7 @@ void Explorerplusplus::OpenListViewItem(int iItem, BOOL bOpenInNewTab, BOOL bOpe
 
 	if(ridl != NULL)
 	{
-		PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidl.get(), ridl.get());
-		OpenItem(pidlComplete, bOpenInNewTab, bOpenInNewWindow);
-		CoTaskMemFree(pidlComplete);
+		unique_pidl_absolute pidlComplete(ILCombine(pidl.get(), ridl.get()));
+		OpenItem(pidlComplete.get(), bOpenInNewTab, bOpenInNewWindow);
 	}
 }

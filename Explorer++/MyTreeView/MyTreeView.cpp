@@ -320,11 +320,12 @@ void CMyTreeView::AddToIconFinderQueue(TVITEM *plvItem)
 {
 	EnterCriticalSection(&g_tv_icon_cs);
 
-	TreeViewInfo_t tvi;
+	auto pidl = BuildPath(plvItem->hItem);
 
+	TreeViewInfo_t tvi;
 	tvi.hTreeView	= m_hTreeView;
 	tvi.hItem		= plvItem->hItem;
-	tvi.pidlFull	= BuildPath(plvItem->hItem);
+	tvi.pidlFull	= pidl.release();
 
 	g_pTreeViewInfoList.push_back(tvi);
 
@@ -543,7 +544,6 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 				SFGAO_FOLDER). */
 				if((Attributes & SFGAO_FOLDER))
 				{
-					PIDLIST_ABSOLUTE	pidlComplete = NULL;
 					STRRET			str;
 					TCHAR			ItemName[MAX_PATH];
 					int				iItemId;
@@ -554,10 +554,10 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 					{
 						StrRetToBuf(&str,rgelt,ItemName,SIZEOF_ARRAY(ItemName));
 
-						pidlComplete = ILCombine(pidlDirectory,rgelt);
+						unique_pidl_absolute pidlComplete(ILCombine(pidlDirectory,rgelt));
 
 						iItemId = GenerateUniqueItemId();
-						m_pItemInfo[iItemId].pidl = ILCloneFull(pidlComplete);
+						m_pItemInfo[iItemId].pidl = ILCloneFull(pidlComplete.get());
 						m_pItemInfo[iItemId].pridl = ILCloneChild(rgelt);
 
 						ItemStore.iItemId = iItemId;
@@ -596,8 +596,6 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 
 							vItems.insert(itr,ItemStore);
 						}
-
-						CoTaskMemFree(pidlComplete);
 					}
 				}
 			}
@@ -723,7 +721,7 @@ DWORD WINAPI Thread_SubFoldersStub(LPVOID pParam)
 DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
 {
 	IShellFolder	*pShellFolder = NULL;
-	PCIDLIST_ABSOLUTE	pidl = NULL;
+	PIDLIST_ABSOLUTE	pidl = NULL;
 	PCITEMID_CHILD	pidlRelative = NULL;
 	HTREEITEM		hItem;
 	TVITEM			tvItem;
@@ -791,7 +789,7 @@ DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
 					pShellFolder->Release();
 				}
 
-				CoTaskMemFree((LPVOID)pidl);
+				CoTaskMemFree(pidl);
 			}
 		}
 
@@ -916,7 +914,7 @@ HTREEITEM CMyTreeView::DetermineDriveSortedPosition(HTREEITEM hParent, const TCH
 	return htItem;
 }
 
-PIDLIST_ABSOLUTE CMyTreeView::BuildPath(HTREEITEM hTreeItem)
+unique_pidl_absolute CMyTreeView::BuildPath(HTREEITEM hTreeItem)
 {
 	TVITEMEX	Item;
 	ItemInfo_t	*pItemInfo = NULL;
@@ -927,7 +925,9 @@ PIDLIST_ABSOLUTE CMyTreeView::BuildPath(HTREEITEM hTreeItem)
 
 	pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
-	return ILCloneFull(pItemInfo->pidl);
+	unique_pidl_absolute pidl(ILCloneFull(pItemInfo->pidl));
+
+	return pidl;
 }
 
 HTREEITEM CMyTreeView::LocateItem(PCIDLIST_ABSOLUTE pidlDirectory)
@@ -1011,16 +1011,12 @@ HTREEITEM CMyTreeView::LocateDeletedItem(const TCHAR *szFullFileName)
 
 HTREEITEM CMyTreeView::LocateExistingItem(const TCHAR *szParsingPath)
 {
-	PIDLIST_ABSOLUTE pidl = NULL;
-	HRESULT hr = SHParseDisplayName(szParsingPath, nullptr, &pidl, 0, nullptr);
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHParseDisplayName(szParsingPath, nullptr, wil::out_param(pidl), 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		HTREEITEM hItem = LocateExistingItem(pidl);
-
-		CoTaskMemFree(pidl);
-
-		return hItem;
+		return LocateExistingItem(pidl.get());
 	}
 
 	return NULL;
@@ -1097,7 +1093,6 @@ HTREEITEM CMyTreeView::LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, BOOL 
 
 HTREEITEM CMyTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 {
-	PIDLIST_ABSOLUTE	pidlMyComputer	= NULL;
 	HTREEITEM		hMyComputer;
 	HTREEITEM		hItem;
 	HTREEITEM		hNextItem;
@@ -1114,11 +1109,10 @@ HTREEITEM CMyTreeView::LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand)
 
 	PathRemoveBackslash(FullItemPathCopy);
 
-	SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,NULL,&pidlMyComputer);
+	unique_pidl_absolute pidlMyComputer;
+	SHGetFolderLocation(NULL,CSIDL_DRIVES,NULL,NULL,wil::out_param(pidlMyComputer));
 
-	hMyComputer = LocateItem(pidlMyComputer);
-
-	CoTaskMemFree(pidlMyComputer);
+	hMyComputer = LocateItem(pidlMyComputer.get());
 
 	/* First of drives in system. */
 	hItem = TreeView_GetChild(m_hTreeView,hMyComputer);
@@ -1287,8 +1281,8 @@ void CMyTreeView::EraseItems(HTREEITEM hParent)
 
 		pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
-		CoTaskMemFree((LPVOID)pItemInfo->pidl);
-		CoTaskMemFree((LPVOID)pItemInfo->pridl);
+		CoTaskMemFree(pItemInfo->pidl);
+		CoTaskMemFree(pItemInfo->pridl);
 
 		/* Free up this items id. */
 		m_uItemMap[(int)Item.lParam] = 0;

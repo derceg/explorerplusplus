@@ -1087,7 +1087,6 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 {
 	BROWSEINFO bi;
-	PIDLIST_ABSOLUTE pidl = NULL;
 	HWND hEdit;
 	TCHAR szDisplayName[MAX_PATH];
 	TCHAR szHelper[256];
@@ -1120,7 +1119,7 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 	bi.ulFlags			= BIF_NEWDIALOGSTYLE;
 	bi.lpfn				= NewTabDirectoryBrowseCallbackProc;
 
-	pidl = SHBrowseForFolder(&bi);
+	unique_pidl_absolute pidl(SHBrowseForFolder(&bi));
 
 	CoUninitialize();
 
@@ -1128,9 +1127,7 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 	{
 		hEdit = GetDlgItem(hDlg,IDC_DEFAULT_NEWTABDIR_EDIT);
 
-		DefaultSettingsSetNewTabDir(hEdit,pidl);
-
-		CoTaskMemFree(pidl);
+		DefaultSettingsSetNewTabDir(hEdit,pidl.get());
 	}
 }
 
