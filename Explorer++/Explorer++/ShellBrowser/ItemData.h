@@ -26,8 +26,8 @@ struct BasicItemInfo_t
 		StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName), other.szDisplayName);
 	}
 
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlComplete;
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE> pridl;
+	unique_pidl_absolute pidlComplete;
+	unique_pidl_relative pridl;
 	WIN32_FIND_DATA wfd;
 	TCHAR szDisplayName[MAX_PATH];
 

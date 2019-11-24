@@ -13,6 +13,7 @@
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/optional.hpp>
@@ -77,7 +78,7 @@ public:
 	BOOL				IsDragging() const;
 
 	/* Get/Set current state. */
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE>	GetDirectoryIdl() const;
+	unique_pidl_absolute	GetDirectoryIdl() const;
 	std::wstring		GetDirectory() const;
 	BOOL				GetAutoArrange(void) const;
 	void				SetAutoArrange(BOOL autoArrange);
@@ -114,8 +115,8 @@ public:
 
 	/* Item information. */
 	WIN32_FIND_DATA		GetItemFileFindData(int iItem) const;
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE>	GetItemCompleteIdl(int iItem) const;
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE>	GetItemRelativeIdl(int iItem) const;
+	unique_pidl_absolute	GetItemCompleteIdl(int iItem) const;
+	unique_pidl_relative	GetItemRelativeIdl(int iItem) const;
 	DWORD				GetItemAttributes(int iItem) const;
 	int					GetItemDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
 	HRESULT				GetItemFullName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;
@@ -167,8 +168,8 @@ private:
 
 	struct ItemInfo_t
 	{
-		wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE>	pidlComplete;
-		wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE>	pridl;
+		unique_pidl_absolute	pidlComplete;
+		unique_pidl_relative	pridl;
 		WIN32_FIND_DATA	wfd;
 		TCHAR			szDisplayName[MAX_PATH];
 		BOOL			bIconRetrieved;

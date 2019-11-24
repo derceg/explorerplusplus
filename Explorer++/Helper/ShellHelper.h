@@ -5,6 +5,7 @@
 #pragma once
 
 #include <boost/optional.hpp>
+#include <wil/resource.h>
 #include <list>
 #include <vector>
 
@@ -43,6 +44,9 @@ struct ContextMenuHandler_t
 	HMODULE		hDLL;
 	IUnknown	*pUnknown;
 };
+
+using unique_pidl_absolute = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PIDLIST_ABSOLUTE>>;
+using unique_pidl_relative = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PIDLIST_RELATIVE>>;
 
 void			DecodePath(const TCHAR *szInitialPath,const TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest);
 HRESULT			GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags);

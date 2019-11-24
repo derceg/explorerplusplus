@@ -7,6 +7,7 @@
 #include "Icon.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
+#include "../Helper/ShellHelper.h"
 #include <wil/resource.h>
 #include <map>
 
@@ -89,7 +90,7 @@ void Explorerplusplus::SetMainMenuImages()
 
 void Explorerplusplus::SetGoMenuName(HMENU hMenu, UINT uMenuID, UINT csidl)
 {
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidl;
+	unique_pidl_absolute pidl;
 	HRESULT hr = SHGetFolderLocation(NULL, csidl, NULL, 0, wil::out_param(pidl));
 
 	/* Don't use SUCCEEDED(hr). */

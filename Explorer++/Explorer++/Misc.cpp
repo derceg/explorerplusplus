@@ -227,7 +227,7 @@ void Explorerplusplus::CopyToFolder(bool move)
 		return;
 	}
 
-	std::vector<wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE>> pidlPtrs;
+	std::vector<unique_pidl_absolute> pidlPtrs;
 	std::vector<PCIDLIST_ABSOLUTE> pidls;
 	int iItem = -1;
 

@@ -475,9 +475,9 @@ std::wstring CShellBrowser::GetDirectory() const
 	return m_CurDir;
 }
 
-wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> CShellBrowser::GetDirectoryIdl() const
+unique_pidl_absolute CShellBrowser::GetDirectoryIdl() const
 {
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlDirectory(ILCloneFull(m_pidlDirectory));
+	unique_pidl_absolute pidlDirectory(ILCloneFull(m_pidlDirectory));
 	return pidlDirectory;
 }
 
@@ -684,7 +684,7 @@ void CShellBrowser::DragStopped(void)
 	m_bDragging = FALSE;
 }
 
-wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> CShellBrowser::GetItemCompleteIdl(int iItem) const
+unique_pidl_absolute CShellBrowser::GetItemCompleteIdl(int iItem) const
 {
 	LVITEM lvItem;
 	lvItem.mask = LVIF_PARAM;
@@ -697,12 +697,12 @@ wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> CShellBrowser::GetItemCompleteIdl
 		return nullptr;
 	}
 
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE> pidlComplete(ILCombine(m_pidlDirectory, m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
+	unique_pidl_absolute pidlComplete(ILCombine(m_pidlDirectory, m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
 
 	return pidlComplete;
 }
 
-wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE> CShellBrowser::GetItemRelativeIdl(int iItem) const
+unique_pidl_relative CShellBrowser::GetItemRelativeIdl(int iItem) const
 {
 	LVITEM lvItem;
 	BOOL bRet;
@@ -717,7 +717,7 @@ wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE> CShellBrowser::GetItemRelativeIdl
 		return nullptr;
 	}
 
-	wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE> pidlRelative(ILClone(m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
+	unique_pidl_relative pidlRelative(ILClone(m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
 
 	return pidlRelative;
 }

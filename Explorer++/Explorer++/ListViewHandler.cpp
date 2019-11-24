@@ -995,7 +995,7 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 	if(nSelected > 0)
 	{
-		std::vector<wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE>> pidlPtrs;
+		std::vector<unique_pidl_relative> pidlPtrs;
 		std::list<PCIDLIST_RELATIVE> pidlList;
 		int iItem = -1;
 
@@ -1133,7 +1133,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 		return E_FAIL;
 	}
 
-	std::vector<wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE>> pidls;
+	std::vector<unique_pidl_relative> pidls;
 	std::vector<LPCITEMIDLIST> rawPidls;
 	std::list<std::wstring> FilenameList;
 
@@ -1239,7 +1239,7 @@ void Explorerplusplus::OnListViewFileDelete(bool permanent)
 	// PIDLPointer is analogous to a unique_ptr. This vector exists only
 	// so that the underlying PIDLs will be freed on scope exit (i.e.
 	// when this function returns).
-	std::vector<wil::unique_cotaskmem_ptr<ITEMIDLIST_ABSOLUTE>> pidlPtrs;
+	std::vector<unique_pidl_absolute> pidlPtrs;
 
 	std::vector<PCIDLIST_ABSOLUTE> pidls;
 	int iItem = -1;
@@ -1378,7 +1378,7 @@ void Explorerplusplus::OnListViewFileRenameMultiple()
 
 void Explorerplusplus::OnListViewShowFileProperties(void) const
 {
-	std::vector<wil::unique_cotaskmem_ptr<ITEMIDLIST_RELATIVE>> pidls;
+	std::vector<unique_pidl_relative> pidls;
 	std::vector<LPCITEMIDLIST> rawPidls;
 
 	int item = -1;
