@@ -570,7 +570,7 @@ int CShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
 	pidlItem = ILCombine(pidlDirectory, pidlChild);
 
 	m_itemInfoMap[uItemId].pidlComplete.reset(ILCloneFull(pidlItem));
-	m_itemInfoMap[uItemId].pridl.reset(ILClone(pidlChild));
+	m_itemInfoMap[uItemId].pridl.reset(ILCloneChild(pidlChild));
 	m_itemInfoMap[uItemId].bIconRetrieved = FALSE;
 	StringCchCopy(m_itemInfoMap[uItemId].szDisplayName,
 		SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDisplayName), szFileName);

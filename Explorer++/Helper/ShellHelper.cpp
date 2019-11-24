@@ -555,9 +555,8 @@ HRESULT BuildHDropList(FORMATETC *pftc,STGMEDIUM *pstg,
 /* Builds a CIDA structure. Returns the structure and its size
 via arguments.
 Returns S_OK on success; E_FAIL on failure. */
-HRESULT BuildShellIDList(FORMATETC *pftc,STGMEDIUM *pstg,
-	LPCITEMIDLIST pidlDirectory,
-	const std::vector<LPCITEMIDLIST> &pidlList)
+HRESULT BuildShellIDList(FORMATETC *pftc, STGMEDIUM *pstg, PCIDLIST_ABSOLUTE pidlDirectory,
+	const std::vector<PCITEMID_CHILD> &pidlList)
 {
 	if(pftc == NULL ||
 		pstg == NULL ||
@@ -645,7 +644,7 @@ HRESULT BuildShellIDList(FORMATETC *pftc,STGMEDIUM *pstg,
 	return S_OK;
 }
 
-HRESULT BindToIdl(LPCITEMIDLIST pidl, REFIID riid, void **ppv)
+HRESULT BindToIdl(PCIDLIST_ABSOLUTE pidl, REFIID riid, void **ppv)
 {
 	IShellFolder *pDesktop = NULL;
 	HRESULT hr = SHGetDesktopFolder(&pDesktop);

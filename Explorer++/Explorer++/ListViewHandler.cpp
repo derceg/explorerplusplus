@@ -1135,7 +1135,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 	}
 
 	std::vector<unique_pidl_child> pidls;
-	std::vector<LPCITEMIDLIST> rawPidls;
+	std::vector<PCITEMID_CHILD> rawPidls;
 	std::list<std::wstring> FilenameList;
 
 	int item = -1;

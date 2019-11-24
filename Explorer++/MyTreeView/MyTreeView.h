@@ -129,7 +129,7 @@ private:
 	typedef struct
 	{
 		PIDLIST_ABSOLUTE pidl;
-		LPITEMIDLIST pridl;
+		PITEMID_CHILD pridl;
 	} ItemInfo_t;
 
 	typedef struct

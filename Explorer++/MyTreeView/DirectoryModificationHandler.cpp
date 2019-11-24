@@ -424,7 +424,7 @@ void CMyTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
 					iItemId = GenerateUniqueItemId();
 
 					m_pItemInfo[iItemId].pidl = ILCloneFull(pidlComplete);
-					m_pItemInfo[iItemId].pridl = ILClone(pidlRelative);
+					m_pItemInfo[iItemId].pridl = ILCloneChild(pidlRelative);
 
 					GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_NORMAL);
 

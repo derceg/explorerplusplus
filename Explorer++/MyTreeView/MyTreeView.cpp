@@ -558,7 +558,7 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 
 						iItemId = GenerateUniqueItemId();
 						m_pItemInfo[iItemId].pidl = ILCloneFull(pidlComplete);
-						m_pItemInfo[iItemId].pridl = ILClone(rgelt);
+						m_pItemInfo[iItemId].pridl = ILCloneChild(rgelt);
 
 						ItemStore.iItemId = iItemId;
 						StringCchCopy(ItemStore.ItemName,SIZEOF_ARRAY(ItemStore.ItemName),ItemName);

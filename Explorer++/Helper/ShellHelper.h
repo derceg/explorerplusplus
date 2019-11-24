@@ -58,8 +58,8 @@ HRESULT			GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE
 BOOL			IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl);
 BOOL			MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize);
 HRESULT			BuildHDropList(FORMATETC *pftc, STGMEDIUM *pstg, const std::list<std::wstring> &FilenameList);
-HRESULT			BuildShellIDList(FORMATETC *pftc, STGMEDIUM *pstg, LPCITEMIDLIST pidlDirectory, const std::vector<LPCITEMIDLIST> &pidlList);
-HRESULT			BindToIdl(LPCITEMIDLIST pidl, REFIID riid, void **ppv);
+HRESULT			BuildShellIDList(FORMATETC *pftc, STGMEDIUM *pstg, PCIDLIST_ABSOLUTE pidlDirectory, const std::vector<PCITEMID_CHILD> &pidlList);
+HRESULT			BindToIdl(PCIDLIST_ABSOLUTE pidl, REFIID riid, void **ppv);
 HRESULT			GetUIObjectOf(IShellFolder *pShellFolder, HWND hwndOwner, UINT cidl, PCUITEMID_CHILD_ARRAY apidl, REFIID riid, void **ppv);
 HRESULT			GetShellItemDetailsEx(IShellFolder2 *pShellFolder, const SHCOLUMNID *pscid, PCUITEMID_CHILD pidl, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
 HRESULT			ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
