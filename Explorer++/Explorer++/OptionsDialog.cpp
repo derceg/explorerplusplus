@@ -1151,14 +1151,12 @@ int CALLBACK NewTabDirectoryBrowseCallbackProc(HWND hwnd,UINT uMsg,LPARAM lParam
 
 void OptionsDialog::DefaultSettingsSetNewTabDir(HWND hEdit, const TCHAR *szPath)
 {
-	PIDLIST_ABSOLUTE pidl = NULL;
-	HRESULT hr = SHParseDisplayName(szPath, nullptr, &pidl, 0, nullptr);
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHParseDisplayName(szPath, nullptr, wil::out_param(pidl), 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		DefaultSettingsSetNewTabDir(hEdit,pidl);
-
-		CoTaskMemFree(pidl);
+		DefaultSettingsSetNewTabDir(hEdit,pidl.get());
 	}
 }
 

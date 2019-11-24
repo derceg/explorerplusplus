@@ -158,21 +158,19 @@ void Explorerplusplus::OnShowHelp()
 	PathRemoveFileSpec(szHelpFile);
 	PathAppend(szHelpFile, NExplorerplusplus::HELP_FILE_NAME);
 
-	PIDLIST_ABSOLUTE pidl = NULL;
-	HRESULT hr = SHParseDisplayName(szHelpFile, nullptr, &pidl, 0, nullptr);
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHParseDisplayName(szHelpFile, nullptr, wil::out_param(pidl), 0, nullptr);
 
 	bool bOpenedHelpFile = false;
 
 	if(SUCCEEDED(hr))
 	{
-		BOOL bRes = ExecuteFileAction(m_hContainer, NULL, NULL, NULL, pidl);
+		BOOL bRes = ExecuteFileAction(m_hContainer, NULL, NULL, NULL, pidl.get());
 
 		if(bRes)
 		{
 			bOpenedHelpFile = true;
 		}
-
-		CoTaskMemFree(pidl);
 	}
 
 	if(!bOpenedHelpFile)

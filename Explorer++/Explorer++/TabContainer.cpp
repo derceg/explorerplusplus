@@ -717,15 +717,10 @@ HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory,
 	const TabSettings &tabSettings, const FolderSettings *folderSettings,
 	boost::optional<FolderColumns> initialColumns, int *newTabId)
 {
-	PIDLIST_ABSOLUTE	pidl = NULL;
-	TCHAR			szExpandedPath[MAX_PATH];
-	HRESULT			hr;
-	BOOL			bRet;
-
 	/* Attempt to expand the path (in the event that
 	it contains embedded environment variables). */
-	bRet = MyExpandEnvironmentStrings(TabDirectory,
-		szExpandedPath, SIZEOF_ARRAY(szExpandedPath));
+	TCHAR szExpandedPath[MAX_PATH];
+	BOOL bRet = MyExpandEnvironmentStrings(TabDirectory, szExpandedPath, SIZEOF_ARRAY(szExpandedPath));
 
 	if (!bRet)
 	{
@@ -733,12 +728,14 @@ HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory,
 			SIZEOF_ARRAY(szExpandedPath), TabDirectory);
 	}
 
-	if (!SUCCEEDED(SHParseDisplayName(szExpandedPath, nullptr, &pidl, 0, nullptr)))
+	unique_pidl_absolute pidl;
+
+	if (!SUCCEEDED(SHParseDisplayName(szExpandedPath, nullptr, wil::out_param(pidl), 0, nullptr)))
+	{
 		return E_FAIL;
+	}
 
-	hr = CreateNewTab(pidl, tabSettings, folderSettings, initialColumns, newTabId);
-
-	CoTaskMemFree(pidl);
+	HRESULT hr = CreateNewTab(pidl.get(), tabSettings, folderSettings, initialColumns, newTabId);
 
 	return hr;
 }

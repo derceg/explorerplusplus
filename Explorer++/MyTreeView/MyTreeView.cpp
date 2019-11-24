@@ -227,7 +227,6 @@ LRESULT CALLBACK CMyTreeView::OnNotify(HWND hwnd,
 HTREEITEM CMyTreeView::AddRoot(void)
 {
 	IShellFolder	*pDesktopFolder = NULL;
-	PIDLIST_ABSOLUTE	pidl = NULL;
 	TCHAR			szDesktopParsingPath[MAX_PATH];
 	TCHAR			szDesktopDisplayName[MAX_PATH];
 	SHFILEINFO		shfi;
@@ -239,17 +238,18 @@ HTREEITEM CMyTreeView::AddRoot(void)
 
 	TreeView_DeleteAllItems(m_hTreeView);
 
-	hr = SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,&pidl);
+	unique_pidl_absolute pidl;
+	hr = SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,wil::out_param(pidl));
 
 	if(SUCCEEDED(hr))
 	{
 		GetCsidlDisplayName(CSIDL_DESKTOP,szDesktopParsingPath,SIZEOF_ARRAY(szDesktopParsingPath),SHGDN_FORPARSING);
 		GetDisplayName(szDesktopParsingPath,szDesktopDisplayName,SIZEOF_ARRAY(szDesktopDisplayName),SHGDN_INFOLDER);
 
-		SHGetFileInfo((LPTSTR)pidl,NULL,&shfi,NULL,SHGFI_PIDL|SHGFI_SYSICONINDEX);
+		SHGetFileInfo((LPTSTR)pidl.get(),NULL,&shfi,NULL,SHGFI_PIDL|SHGFI_SYSICONINDEX);
 
 		iItemId = GenerateUniqueItemId();
-		m_pItemInfo[iItemId].pidl = ILCloneFull(pidl);
+		m_pItemInfo[iItemId].pidl = ILCloneFull(pidl.get());
 		m_uItemMap[iItemId] = 1;
 
 		tvItem.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_CHILDREN|TVIF_SELECTEDIMAGE|TVIF_PARAM;
@@ -272,7 +272,7 @@ HTREEITEM CMyTreeView::AddRoot(void)
 
 			if(SUCCEEDED(hr))
 			{
-				AddDirectoryInternal(pDesktopFolder,pidl,hDesktop);
+				AddDirectoryInternal(pDesktopFolder,pidl.get(),hDesktop);
 
 				SendMessage(m_hTreeView,TVM_EXPAND,(WPARAM)TVE_EXPAND,
 					(LPARAM)hDesktop);
@@ -280,8 +280,6 @@ HTREEITEM CMyTreeView::AddRoot(void)
 				pDesktopFolder->Release();
 			}
 		}
-
-		CoTaskMemFree(pidl);
 	}
 
 	return hDesktop;

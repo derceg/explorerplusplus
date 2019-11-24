@@ -1141,48 +1141,51 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		/* Dump the columns from the current tab, and save
 		them as the default columns for the appropriate folder
 		type.. */
-		IShellFolder *pShellFolder = NULL;
-		PIDLIST_ABSOLUTE pidlDrives = NULL;
-		PIDLIST_ABSOLUTE pidlControls = NULL;
-		PIDLIST_ABSOLUTE pidlBitBucket = NULL;
-		PIDLIST_ABSOLUTE pidlPrinters = NULL;
-		PIDLIST_ABSOLUTE pidlConnections = NULL;
-		PIDLIST_ABSOLUTE pidlNetwork = NULL;
-
 		auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
-
 		auto pidl = m_pActiveShellBrowser->GetDirectoryIdl();
 
-		SHGetFolderLocation(NULL, CSIDL_DRIVES, NULL, 0, &pidlDrives);
-		SHGetFolderLocation(NULL, CSIDL_CONTROLS, NULL, 0, &pidlControls);
-		SHGetFolderLocation(NULL, CSIDL_BITBUCKET, NULL, 0, &pidlBitBucket);
-		SHGetFolderLocation(NULL, CSIDL_PRINTERS, NULL, 0, &pidlPrinters);
-		SHGetFolderLocation(NULL, CSIDL_CONNECTIONS, NULL, 0, &pidlConnections);
-		SHGetFolderLocation(NULL, CSIDL_NETWORK, NULL, 0, &pidlNetwork);
+		unique_pidl_absolute pidlDrives;
+		SHGetFolderLocation(NULL, CSIDL_DRIVES, NULL, 0, wil::out_param(pidlDrives));
 
+		unique_pidl_absolute pidlControls;
+		SHGetFolderLocation(NULL, CSIDL_CONTROLS, NULL, 0, wil::out_param(pidlControls));
+
+		unique_pidl_absolute pidlBitBucket;
+		SHGetFolderLocation(NULL, CSIDL_BITBUCKET, NULL, 0, wil::out_param(pidlBitBucket));
+
+		unique_pidl_absolute pidlPrinters;
+		SHGetFolderLocation(NULL, CSIDL_PRINTERS, NULL, 0, wil::out_param(pidlPrinters));
+
+		unique_pidl_absolute pidlConnections;
+		SHGetFolderLocation(NULL, CSIDL_CONNECTIONS, NULL, 0, wil::out_param(pidlConnections));
+
+		unique_pidl_absolute pidlNetwork;
+		SHGetFolderLocation(NULL, CSIDL_NETWORK, NULL, 0, wil::out_param(pidlNetwork));
+
+		IShellFolder *pShellFolder;
 		SHGetDesktopFolder(&pShellFolder);
 
-		if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlDrives) == 0)
+		if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlDrives.get()) == 0)
 		{
 			m_config->globalFolderSettings.folderColumns.myComputerColumns = currentColumns;
 		}
-		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlControls) == 0)
+		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlControls.get()) == 0)
 		{
 			m_config->globalFolderSettings.folderColumns.controlPanelColumns = currentColumns;
 		}
-		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlBitBucket) == 0)
+		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlBitBucket.get()) == 0)
 		{
 			m_config->globalFolderSettings.folderColumns.recycleBinColumns = currentColumns;
 		}
-		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlPrinters) == 0)
+		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlPrinters.get()) == 0)
 		{
 			m_config->globalFolderSettings.folderColumns.printersColumns = currentColumns;
 		}
-		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlConnections) == 0)
+		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlConnections.get()) == 0)
 		{
 			m_config->globalFolderSettings.folderColumns.networkConnectionsColumns = currentColumns;
 		}
-		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlNetwork) == 0)
+		else if (pShellFolder->CompareIDs(SHCIDS_CANONICALONLY, pidl.get(), pidlNetwork.get()) == 0)
 		{
 			m_config->globalFolderSettings.folderColumns.myNetworkPlacesColumns = currentColumns;
 		}
@@ -1192,13 +1195,6 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		}
 
 		pShellFolder->Release();
-
-		CoTaskMemFree(pidlNetwork);
-		CoTaskMemFree(pidlConnections);
-		CoTaskMemFree(pidlPrinters);
-		CoTaskMemFree(pidlBitBucket);
-		CoTaskMemFree(pidlControls);
-		CoTaskMemFree(pidlDrives);
 	}
 	break;
 

@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "FileProgressSink.h"
+#include "../Helper/ShellHelper.h"
 #include <boost/scope_exit.hpp>
 
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
@@ -192,19 +193,15 @@ HRESULT STDMETHODCALLTYPE FileProgressSink::PostNewItem(DWORD dwFlags, IShellIte
 		unknown->Release();
 	} BOOST_SCOPE_EXIT_END
 
-	PIDLIST_ABSOLUTE pidl;
-	hr = SHGetIDListFromObject(unknown, &pidl);
+	unique_pidl_absolute pidl;
+	hr = SHGetIDListFromObject(unknown, wil::out_param(pidl));
 
 	if (FAILED(hr))
 	{
 		return S_OK;
 	}
 
-	BOOST_SCOPE_EXIT(pidl) {
-		CoTaskMemFree(pidl);
-	} BOOST_SCOPE_EXIT_END
-
-	m_postNewItemObserver(pidl);
+	m_postNewItemObserver(pidl.get());
 
 	return S_OK;
 }

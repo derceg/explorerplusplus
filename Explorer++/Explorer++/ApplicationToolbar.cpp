@@ -308,8 +308,8 @@ void CApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 	{
 		ApplicationInfo_t ai = ProcessCommand(Button->Command);
 
-		PIDLIST_ABSOLUTE pidl = NULL;
-		HRESULT hr = SHParseDisplayName(ai.Application.c_str(), nullptr, &pidl, 0, nullptr);
+		unique_pidl_absolute pidl;
+		HRESULT hr = SHParseDisplayName(ai.Application.c_str(), nullptr, wil::out_param(pidl), 0, nullptr);
 
 		if(SUCCEEDED(hr))
 		{
@@ -321,8 +321,7 @@ void CApplicationToolbar::OpenItem(int iItem, std::wstring *parameters)
 				combinedParameters.append(*parameters);
 			}
 
-			m_pexpp->OpenFileItem(pidl, combinedParameters.c_str());
-			CoTaskMemFree(pidl);
+			m_pexpp->OpenFileItem(pidl.get(), combinedParameters.c_str());
 		}
 	}
 }

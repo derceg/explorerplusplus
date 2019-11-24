@@ -28,14 +28,12 @@ HRESULT GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cchM
 		return E_FAIL;
 	}
 
-	PIDLIST_ABSOLUTE pidl = NULL;
-	HRESULT hr = SHParseDisplayName(szParsingPath, nullptr, &pidl, 0, nullptr);
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHParseDisplayName(szParsingPath, nullptr, wil::out_param(pidl), 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = GetDisplayName(pidl,szDisplayName,cchMax,uFlags);
-
-		CoTaskMemFree(pidl);
+		hr = GetDisplayName(pidl.get(),szDisplayName,cchMax,uFlags);
 	}
 
 	return hr;
@@ -73,13 +71,12 @@ HRESULT GetDisplayName(PCIDLIST_ABSOLUTE pidl,TCHAR *szDisplayName,UINT cchMax,D
 
 HRESULT GetCsidlDisplayName(int csidl, TCHAR *szFolderName, UINT cchMax, DWORD uParsingFlags)
 {
-	PIDLIST_ABSOLUTE pidl = NULL;
-	HRESULT hr = SHGetFolderLocation(NULL, csidl, NULL, 0, &pidl);
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHGetFolderLocation(NULL, csidl, NULL, 0, wil::out_param(pidl));
 
 	if(SUCCEEDED(hr))
 	{
-		hr = GetDisplayName(pidl, szFolderName, cchMax, uParsingFlags);
-		CoTaskMemFree(pidl);
+		hr = GetDisplayName(pidl.get(), szFolderName, cchMax, uParsingFlags);
 	}
 
 	return hr;
@@ -93,14 +90,12 @@ HRESULT GetItemAttributes(const TCHAR *szItemParsingPath,SFGAOF *pItemAttributes
 		return E_FAIL;
 	}
 
-	PIDLIST_ABSOLUTE pidl = NULL;
-	HRESULT hr = SHParseDisplayName(szItemParsingPath, nullptr, &pidl, 0, nullptr);
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHParseDisplayName(szItemParsingPath, nullptr, wil::out_param(pidl), 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = GetItemAttributes(pidl,pItemAttributes);
-
-		CoTaskMemFree(pidl);
+		hr = GetItemAttributes(pidl.get(),pItemAttributes);
 	}
 
 	return hr;
@@ -187,17 +182,13 @@ HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *
 
 BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl)
 {
-	PIDLIST_ABSOLUTE pidlDesktop	= NULL;
-	BOOL bNamespaceRoot			= FALSE;
-	HRESULT hr;
-
-	hr = SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,&pidlDesktop);
+	BOOL bNamespaceRoot = FALSE;
+	unique_pidl_absolute pidlDesktop;
+	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,wil::out_param(pidlDesktop));
 
 	if(SUCCEEDED(hr))
 	{
-		bNamespaceRoot = CompareIdls(pidl,pidlDesktop);
-
-		CoTaskMemFree(pidlDesktop);
+		bNamespaceRoot = CompareIdls(pidl,pidlDesktop.get());
 	}
 
 	return bNamespaceRoot;
@@ -207,15 +198,17 @@ BOOL CheckIdl(PCIDLIST_ABSOLUTE pidl)
 {
 	TCHAR szTabText[MAX_PATH];
 
-	if(!SUCCEEDED(GetDisplayName(pidl,szTabText,SIZEOF_ARRAY(szTabText),SHGDN_FORPARSING)))
+	if (!SUCCEEDED(GetDisplayName(pidl, szTabText, SIZEOF_ARRAY(szTabText), SHGDN_FORPARSING)))
+	{
 		return FALSE;
+	}
 
-	PIDLIST_ABSOLUTE pidlCheck = NULL;
+	unique_pidl_absolute pidlCheck;
 
-	if(!SUCCEEDED(SHParseDisplayName(szTabText, nullptr, &pidlCheck, 0, nullptr)))
+	if (!SUCCEEDED(SHParseDisplayName(szTabText, nullptr, wil::out_param(pidlCheck), 0, nullptr)))
+	{
 		return FALSE;
-
-	CoTaskMemFree(pidlCheck);
+	}
 
 	return TRUE;
 }
@@ -1261,14 +1254,12 @@ BOOL LoadIUnknownFromCLSID(const TCHAR *szCLSID,
 
 HRESULT GetItemInfoTip(const TCHAR *szItemPath, TCHAR *szInfoTip, size_t cchMax)
 {
-	PIDLIST_ABSOLUTE pidlItem = NULL;
-	HRESULT hr = SHParseDisplayName(szItemPath, nullptr, &pidlItem, 0, nullptr);
+	unique_pidl_absolute pidlItem;
+	HRESULT hr = SHParseDisplayName(szItemPath, nullptr, wil::out_param(pidlItem), 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = GetItemInfoTip(pidlItem, szInfoTip, cchMax);
-
-		CoTaskMemFree(pidlItem);
+		hr = GetItemInfoTip(pidlItem.get(), szInfoTip, cchMax);
 	}
 
 	return hr;
@@ -1393,17 +1384,13 @@ BOOL CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL)
 
 bool IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl)
 {
-	PIDLIST_ABSOLUTE pidlLibraries;
-	HRESULT hr = SHGetKnownFolderIDList(FOLDERID_Libraries, 0, nullptr, &pidlLibraries);
+	unique_pidl_absolute pidlLibraries;
+	HRESULT hr = SHGetKnownFolderIDList(FOLDERID_Libraries, 0, nullptr, wil::out_param(pidlLibraries));
 
 	if (FAILED(hr))
 	{
 		return false;
 	}
 
-	BOOST_SCOPE_EXIT(pidlLibraries) {
-		CoTaskMemFree(pidlLibraries);
-	} BOOST_SCOPE_EXIT_END
-
-	return ILIsParent(pidlLibraries, pidl, FALSE);
+	return ILIsParent(pidlLibraries.get(), pidl, FALSE);
 }

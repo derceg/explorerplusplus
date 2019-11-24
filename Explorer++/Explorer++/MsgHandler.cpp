@@ -119,14 +119,12 @@ void Explorerplusplus::LoadAllSettings(ILoadSave **pLoadSave)
 
 void Explorerplusplus::OpenItem(const TCHAR *szItem,BOOL bOpenInNewTab,BOOL bOpenInNewWindow)
 {
-	PIDLIST_ABSOLUTE pidlItem = NULL;
-	HRESULT hr = SHParseDisplayName(szItem, nullptr, &pidlItem, 0, nullptr);
+	unique_pidl_absolute pidlItem;
+	HRESULT hr = SHParseDisplayName(szItem, nullptr, wil::out_param(pidlItem), 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		OpenItem(pidlItem,bOpenInNewTab,bOpenInNewWindow);
-
-		CoTaskMemFree(pidlItem);
+		OpenItem(pidlItem.get(),bOpenInNewTab,bOpenInNewWindow);
 	}
 }
 
@@ -134,21 +132,19 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 {
 	BOOL bControlPanelParent = FALSE;
 
-	PIDLIST_ABSOLUTE pidlControlPanel = NULL;
-	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_CONTROLS,NULL,0,&pidlControlPanel);
+	unique_pidl_absolute pidlControlPanel;
+	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_CONTROLS,NULL,0,wil::out_param(pidlControlPanel));
 
 	if(SUCCEEDED(hr))
 	{
 		/* Check if the parent of the item is the control panel.
 		If it is, pass it to the shell to open, rather than
 		opening it in-place. */
-		if(ILIsParent(pidlControlPanel,pidlItem,FALSE) &&
-			!CompareIdls(pidlControlPanel,pidlItem))
+		if(ILIsParent(pidlControlPanel.get(),pidlItem,FALSE) &&
+			!CompareIdls(pidlControlPanel.get(),pidlItem))
 		{
 			bControlPanelParent = TRUE;
 		}
-
-		CoTaskMemFree(pidlControlPanel);
 	}
 
 	/* On Vista and later, the Control Panel was split into
@@ -171,20 +167,19 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 	*/
 	if (!bControlPanelParent)
 	{
-		hr = SHParseDisplayName(CONTROL_PANEL_CATEGORY_VIEW, nullptr, &pidlControlPanel, 0, nullptr);
+		unique_pidl_absolute pidlControlPanelCategoryView;
+		hr = SHParseDisplayName(CONTROL_PANEL_CATEGORY_VIEW, nullptr, wil::out_param(pidlControlPanelCategoryView), 0, nullptr);
 
 		if (SUCCEEDED(hr))
 		{
 			/* Check if the parent of the item is the control panel.
 			If it is, pass it to the shell to open, rather than
 			opening it in-place. */
-			if (ILIsParent(pidlControlPanel, pidlItem, FALSE) &&
-				!CompareIdls(pidlControlPanel, pidlItem))
+			if (ILIsParent(pidlControlPanelCategoryView.get(), pidlItem, FALSE) &&
+				!CompareIdls(pidlControlPanelCategoryView.get(), pidlItem))
 			{
 				bControlPanelParent = TRUE;
 			}
-
-			CoTaskMemFree(pidlControlPanel);
 		}
 	}
 
@@ -240,14 +235,12 @@ void Explorerplusplus::OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, 
 					if(((uAttributes & SFGAO_FOLDER) && !(uAttributes & SFGAO_STREAM)) ||
 						((uAttributes & SFGAO_FOLDER) && (uAttributes & SFGAO_STREAM) && m_config->handleZipFiles))
 					{
-						PIDLIST_ABSOLUTE pidlTarget = NULL;
-						hr = SHParseDisplayName(szTargetPath, nullptr, &pidlTarget, 0, nullptr);
+						unique_pidl_absolute pidlTarget;
+						hr = SHParseDisplayName(szTargetPath, nullptr, wil::out_param(pidlTarget), 0, nullptr);
 
 						if(SUCCEEDED(hr))
 						{
-							OpenFolderItem(pidlTarget,bOpenInNewTab,bOpenInNewWindow);
-
-							CoTaskMemFree(pidlTarget);
+							OpenFolderItem(pidlTarget.get(),bOpenInNewTab,bOpenInNewWindow);
 						}
 					}
 					else

@@ -69,15 +69,13 @@ void Navigation::OnNavigateUp()
 */
 void Navigation::OnGotoFolder(int FolderCSIDL)
 {
-	PIDLIST_ABSOLUTE pidl = NULL;
-	HRESULT hr = SHGetFolderLocation(NULL, FolderCSIDL, NULL, 0, &pidl);
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHGetFolderLocation(NULL, FolderCSIDL, NULL, 0, wil::out_param(pidl));
 
 	/* Don't use SUCCEEDED(hr). */
 	if(hr == S_OK)
 	{
-		BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE);
-
-		CoTaskMemFree(pidl);
+		BrowseFolderInCurrentTab(pidl.get(), SBSP_ABSOLUTE);
 	}
 }
 
@@ -106,15 +104,10 @@ HRESULT Navigation::BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags)
 	/* Doesn't matter if we can't get the pidl here,
 	as some paths will be relative, or will be filled
 	by the shellbrowser (e.g. when browsing back/forward). */
-	PIDLIST_ABSOLUTE pidl = NULL;
-	HRESULT hr = SHParseDisplayName(szPath, nullptr, &pidl, 0, nullptr);
+	unique_pidl_absolute pidl;
+	HRESULT hr = SHParseDisplayName(szPath, nullptr, wil::out_param(pidl), 0, nullptr);
 
-	BrowseFolder(tab, pidl, wFlags);
-
-	if (SUCCEEDED(hr))
-	{
-		CoTaskMemFree(pidl);
-	}
+	BrowseFolder(tab, pidl.get(), wFlags);
 
 	return hr;
 }

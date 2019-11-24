@@ -19,14 +19,12 @@
 
 HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath,UINT wFlags)
 {
-	PIDLIST_ABSOLUTE pidlDirectory = NULL;
-	HRESULT hr = SHParseDisplayName(szPath, nullptr, &pidlDirectory, 0, nullptr);
+	unique_pidl_absolute pidlDirectory;
+	HRESULT hr = SHParseDisplayName(szPath, nullptr, wil::out_param(pidlDirectory), 0, nullptr);
 
 	if(SUCCEEDED(hr))
 	{
-		hr = BrowseFolder(pidlDirectory,wFlags);
-
-		CoTaskMemFree(pidlDirectory);
+		hr = BrowseFolder(pidlDirectory.get(),wFlags);
 	}
 
 	return hr;
@@ -522,7 +520,7 @@ void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 					AddItemInternal(pidlDirectory,rgelt,szFileName,-1,FALSE);
 				}
 
-				CoTaskMemFree((LPVOID)rgelt);
+				CoTaskMemFree(rgelt);
 			}
 
 			pEnumIDList->Release();
