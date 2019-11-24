@@ -429,8 +429,9 @@ void Explorerplusplus::OnListViewMButtonUp(POINT *pt)
 			if(SUCCEEDED(hr))
 			{
 				auto ridl = m_pActiveShellBrowser->GetItemRelativeIdl(ht.iItem);
+				PCITEMID_CHILD items[] = { const_cast<PCUITEMID_CHILD>(ridl.get()) };
 
-				hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&ridl,&uAttributes);
+				hr = pShellFolder->GetAttributesOf(1,items,&uAttributes);
 
 				if(SUCCEEDED(hr))
 				{
@@ -914,7 +915,7 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 	PIDLIST_ABSOLUTE pidlParent = ILCloneFull(pidlDirectory.get());
 	ILRemoveLastID(pidlParent);
 
-	LPCITEMIDLIST pidlChildFolder = ILFindLastID(pidlDirectory.get());
+	PCUITEMID_CHILD pidlChildFolder = ILFindLastID(pidlDirectory.get());
 
 	IShellFolder *pShellFolder = NULL;
 	HRESULT hr = BindToIdl(pidlParent, IID_PPV_ARGS(&pShellFolder));
@@ -995,21 +996,21 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 	if(nSelected > 0)
 	{
-		std::vector<unique_pidl_relative> pidlPtrs;
-		std::list<PCIDLIST_RELATIVE> pidlList;
+		std::vector<unique_pidl_child> pidlPtrs;
+		std::vector<PCITEMID_CHILD> pidlItems;
 		int iItem = -1;
 
 		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 		{
 			auto pidlPtr = m_pActiveShellBrowser->GetItemRelativeIdl(iItem);
 
-			pidlList.push_back(pidlPtr.get());
+			pidlItems.push_back(pidlPtr.get());
 			pidlPtrs.push_back(std::move(pidlPtr));
 		}
 
 		auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-		CFileContextMenuManager fcmm(m_hActiveListView, pidlDirectory.get(), pidlList);
+		CFileContextMenuManager fcmm(m_hActiveListView, pidlDirectory.get(), pidlItems);
 
 		FileContextMenuInfo_t fcmi;
 		fcmi.uFrom = FROM_LISTVIEW;
@@ -1133,7 +1134,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 		return E_FAIL;
 	}
 
-	std::vector<unique_pidl_relative> pidls;
+	std::vector<unique_pidl_child> pidls;
 	std::vector<LPCITEMIDLIST> rawPidls;
 	std::list<std::wstring> FilenameList;
 
@@ -1287,7 +1288,7 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 			{
 				auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 				auto pidl = m_pActiveShellBrowser->GetItemRelativeIdl(ht.iItem);
-				std::vector<LPCITEMIDLIST> items = { pidl.get() };
+				std::vector<PCITEMID_CHILD> items = { pidl.get() };
 
 				ShowMultipleFileProperties(pidlDirectory.get(), items.data(), m_hContainer, 1);
 			}
@@ -1378,8 +1379,8 @@ void Explorerplusplus::OnListViewFileRenameMultiple()
 
 void Explorerplusplus::OnListViewShowFileProperties(void) const
 {
-	std::vector<unique_pidl_relative> pidls;
-	std::vector<LPCITEMIDLIST> rawPidls;
+	std::vector<unique_pidl_child> pidls;
+	std::vector<PCITEMID_CHILD> rawPidls;
 
 	int item = -1;
 

@@ -434,7 +434,7 @@ void TabContainer::OnOpenParentInNewTab(const Tab &tab)
 {
 	auto pidlCurrent = tab.GetShellBrowser()->GetDirectoryIdl();
 
-	LPITEMIDLIST pidlParent = NULL;
+	PIDLIST_ABSOLUTE pidlParent = NULL;
 	HRESULT hr = GetVirtualParentPath(pidlCurrent.get(), &pidlParent);
 
 	if (SUCCEEDED(hr))

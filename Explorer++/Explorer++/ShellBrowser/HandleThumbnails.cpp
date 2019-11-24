@@ -124,8 +124,8 @@ boost::optional<CShellBrowser::ThumbnailResult_t> CShellBrowser::FindThumbnailAs
 	} BOOST_SCOPE_EXIT_END
 
 	IExtractImage *pExtractImage = nullptr;
-	LPCITEMIDLIST pridl = basicItemInfo.pridl.get();
-	hr = GetUIObjectOf(pShellFolder, NULL, 1, &pridl, IID_PPV_ARGS(&pExtractImage));
+	auto pridl = basicItemInfo.pridl.get();
+	hr = GetUIObjectOf(pShellFolder, NULL, 1, const_cast<PCUITEMID_CHILD *>(&pridl), IID_PPV_ARGS(&pExtractImage));
 
 	if (FAILED(hr))
 	{

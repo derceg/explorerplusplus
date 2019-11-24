@@ -21,13 +21,13 @@ struct BasicItemInfo_t
 	BasicItemInfo_t(const BasicItemInfo_t &other)
 	{
 		pidlComplete.reset(ILCloneFull(other.pidlComplete.get()));
-		pridl.reset(ILClone(other.pridl.get()));
+		pridl.reset(ILCloneChild(other.pridl.get()));
 		wfd = other.wfd;
 		StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName), other.szDisplayName);
 	}
 
 	unique_pidl_absolute pidlComplete;
-	unique_pidl_relative pridl;
+	unique_pidl_child pridl;
 	WIN32_FIND_DATA wfd;
 	TCHAR szDisplayName[MAX_PATH];
 

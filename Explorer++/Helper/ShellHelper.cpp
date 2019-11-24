@@ -185,7 +185,7 @@ HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *
 	return S_OK;
 }
 
-BOOL IsNamespaceRoot(LPCITEMIDLIST pidl)
+BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl)
 {
 	PIDLIST_ABSOLUTE pidlDesktop	= NULL;
 	BOOL bNamespaceRoot			= FALSE;
@@ -956,7 +956,7 @@ void DecodePath(const TCHAR *szInitialPath,const TCHAR *szCurrentDirectory,TCHAR
 	}
 }
 
-BOOL CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2)
+BOOL CompareIdls(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2)
 {
 	IShellFolder *pDesktopFolder = NULL;
 	HRESULT hr;
@@ -1307,7 +1307,7 @@ HRESULT GetItemInfoTip(PCIDLIST_ABSOLUTE pidlComplete, TCHAR *szInfoTip, size_t 
 	return hr;
 }
 
-HRESULT ShowMultipleFileProperties(PCIDLIST_ABSOLUTE pidlDirectory, LPCITEMIDLIST *ppidl,
+HRESULT ShowMultipleFileProperties(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD *ppidl,
 	HWND hwndOwner, int nFiles)
 {
 	return ExecuteActionFromContextMenu(pidlDirectory, ppidl, hwndOwner, nFiles, _T("properties"), 0);

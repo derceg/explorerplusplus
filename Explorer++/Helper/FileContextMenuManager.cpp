@@ -14,7 +14,7 @@ LRESULT CALLBACK ShellMenuHookProcStub(HWND hwnd,UINT Msg,WPARAM wParam,
 	LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 
 CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
-	PCIDLIST_ABSOLUTE pidlParent, const std::list<LPCITEMIDLIST> &pidlItemList) :
+	PCIDLIST_ABSOLUTE pidlParent, const std::vector<PCITEMID_CHILD> &pidlItems) :
 	m_pShellContext3(NULL),
 	m_pShellContext2(NULL),
 	m_pShellContext(NULL),
@@ -24,14 +24,14 @@ CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
 	IContextMenu *pContextMenu = NULL;
 	HRESULT hr;
 
-	for(auto pidl : pidlItemList)
+	for(auto pidl : pidlItems)
 	{
-		m_pidlItemList.push_back(ILClone(pidl));
+		m_pidlItems.push_back(ILCloneChild(pidl));
 	}
 
 	m_pActualContext = NULL;
 
-	if(pidlItemList.size() == 0)
+	if(pidlItems.size() == 0)
 	{
 		IShellFolder *pShellParentFolder = NULL;
 		PCUITEMID_CHILD pidlRelative = NULL;
@@ -54,10 +54,9 @@ CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
 
 		if(SUCCEEDED(hr))
 		{
-			std::vector<LPCITEMIDLIST> pidlItemVector(pidlItemList.begin(),pidlItemList.end());
-
-			hr = GetUIObjectOf(pShellFolder, hwnd, static_cast<UINT>(pidlItemList.size()),
-				&pidlItemVector[0], IID_PPV_ARGS(&pContextMenu));
+			std::vector<PCITEMID_CHILD> pidlItemsTemp(pidlItems);
+			hr = GetUIObjectOf(pShellFolder, hwnd, static_cast<UINT>(pidlItems.size()),
+				pidlItemsTemp.data(), IID_PPV_ARGS(&pContextMenu));
 
 			pShellFolder->Release();
 		}
@@ -91,7 +90,7 @@ CFileContextMenuManager::CFileContextMenuManager(HWND hwnd,
 
 CFileContextMenuManager::~CFileContextMenuManager()
 {
-	for(auto pidl : m_pidlItemList)
+	for(auto pidl : m_pidlItems)
 	{
 		CoTaskMemFree(pidl);
 	}
@@ -161,7 +160,7 @@ HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 	}
 
 	/* Allow the caller to add custom entries to the menu. */
-	pfcme->AddMenuEntries(m_pidlParent,m_pidlItemList,dwData,hMenu);
+	pfcme->AddMenuEntries(m_pidlParent,m_pidlItems,dwData,hMenu);
 
 	BOOL bWindowSubclassed = FALSE;
 
@@ -196,7 +195,7 @@ HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 		it the chance to handle it. */
 		if(SUCCEEDED(hr))
 		{
-			bHandled = pfcme->HandleShellMenuItem(m_pidlParent,m_pidlItemList,dwData,szCmd);
+			bHandled = pfcme->HandleShellMenuItem(m_pidlParent,m_pidlItems,dwData,szCmd);
 		}
 
 		if(!bHandled)
@@ -218,7 +217,7 @@ HRESULT CFileContextMenuManager::ShowMenu(IFileContextMenuExternal *pfcme,
 	{
 		/* Custom menu entry, so pass back
 		to caller. */
-		pfcme->HandleCustomMenuItem(m_pidlParent,m_pidlItemList,iCmd);
+		pfcme->HandleCustomMenuItem(m_pidlParent,m_pidlItems,iCmd);
 	}
 
 	/* Do NOT destroy the menu until AFTER

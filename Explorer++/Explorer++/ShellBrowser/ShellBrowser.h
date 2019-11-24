@@ -116,7 +116,7 @@ public:
 	/* Item information. */
 	WIN32_FIND_DATA		GetItemFileFindData(int iItem) const;
 	unique_pidl_absolute	GetItemCompleteIdl(int iItem) const;
-	unique_pidl_relative	GetItemRelativeIdl(int iItem) const;
+	unique_pidl_child	GetItemRelativeIdl(int iItem) const;
 	DWORD				GetItemAttributes(int iItem) const;
 	int					GetItemDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
 	HRESULT				GetItemFullName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;
@@ -169,7 +169,7 @@ private:
 	struct ItemInfo_t
 	{
 		unique_pidl_absolute	pidlComplete;
-		unique_pidl_relative	pridl;
+		unique_pidl_child	pridl;
 		WIN32_FIND_DATA	wfd;
 		TCHAR			szDisplayName[MAX_PATH];
 		BOOL			bIconRetrieved;
@@ -272,9 +272,9 @@ private:
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void				InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(int iItemInternal) const;
-	HRESULT				AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCIDLIST_RELATIVE pidlRelative, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
+	HRESULT				AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
 	HRESULT				AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
-	int					SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCIDLIST_RELATIVE pidlRelative, const TCHAR *szFileName);
+	int					SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName);
 	void				ResetFolderMemoryAllocations(void);
 	void				SetViewModeInternal(ViewMode viewMode);
 	void				ApplyFolderEmptyBackgroundImage(bool apply);

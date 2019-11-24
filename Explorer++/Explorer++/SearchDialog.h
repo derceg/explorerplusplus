@@ -141,9 +141,9 @@ public:
 	~CSearchDialog();
 
 	/* IFileContextMenuExternal methods. */
-	void			AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::list<PIDLIST_RELATIVE> &pidlItemList, DWORD_PTR dwData, HMENU hMenu);
-	BOOL			HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::list<PIDLIST_RELATIVE> &pidlItemList, DWORD_PTR dwData, const TCHAR *szCmd);
-	void			HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,const std::list<PIDLIST_RELATIVE> &pidlItemList,int iCmd);
+	void			AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu);
+	BOOL			HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd);
+	void			HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent, const std::vector<PITEMID_CHILD> &pidlItems, int iCmd);
 
 	/* Sorting methods. */
 	int CALLBACK	SortResults(LPARAM lParam1,LPARAM lParam2);

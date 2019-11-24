@@ -537,7 +537,7 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 			ULONG Attributes = SFGAO_FOLDER|SFGAO_FILESYSTEM;
 
 			/* Only retrieve the attributes for this item. */
-			hr = pShellFolder->GetAttributesOf(1,(LPCITEMIDLIST *)&rgelt,&Attributes);
+			hr = pShellFolder->GetAttributesOf(1,const_cast<PCITEMID_CHILD *>(&rgelt),&Attributes);
 
 			if(SUCCEEDED(hr))
 			{
@@ -1060,7 +1060,7 @@ HTREEITEM CMyTreeView::LocateItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, BOOL 
 
 		pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
-		if(CompareIdls((LPCITEMIDLIST)pItemInfo->pidl,pidlDirectory))
+		if(CompareIdls(pItemInfo->pidl,pidlDirectory))
 		{
 			bFound = TRUE;
 

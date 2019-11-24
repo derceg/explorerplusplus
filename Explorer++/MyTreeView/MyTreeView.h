@@ -68,8 +68,8 @@ private:
 	void		UpdateParent(HTREEITEM hParent);
 	LRESULT CALLBACK	OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	void		OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
-	void		UpdateChildren(HTREEITEM hParent,LPITEMIDLIST pidlParent);
-	LPITEMIDLIST	UpdateItemInfo(LPITEMIDLIST pidlParent,int iItemId);
+	void		UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlParent);
+	PCIDLIST_ABSOLUTE UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent, int iItemId);
 	HTREEITEM	LocateDeletedItem(const TCHAR *szFullFileName);
 	HTREEITEM	LocateItemByPath(const TCHAR *szItemPath, BOOL bExpand);
 	HTREEITEM	LocateItemOnDesktopTree(const TCHAR *szFullFileName);

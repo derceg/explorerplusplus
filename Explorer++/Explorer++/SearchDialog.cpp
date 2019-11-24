@@ -610,11 +610,11 @@ int CALLBACK CSearchDialog::SortResultsByPath(LPARAM lParam1,LPARAM lParam2)
 }
 
 void CSearchDialog::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::list<PIDLIST_RELATIVE> &pidlItemList, DWORD_PTR dwData, HMENU hMenu)
+	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu)
 {
 	UNREFERENCED_PARAMETER(dwData);
 
-	PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItemList.front());
+	PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItems.front());
 	SFGAOF ItemAttributes = SFGAO_FOLDER;
 	GetItemAttributes(pidlComplete,&ItemAttributes);
 	CoTaskMemFree(pidlComplete);
@@ -641,13 +641,13 @@ void CSearchDialog::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 }
 
 BOOL CSearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::list<PIDLIST_RELATIVE> &pidlItemList, DWORD_PTR dwData, const TCHAR *szCmd)
+	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd)
 {
 	UNREFERENCED_PARAMETER(dwData);
 
 	if(StrCmpI(szCmd,_T("open")) == 0)
 	{
-		for(auto pidlItem : pidlItemList)
+		for(auto pidlItem : pidlItems)
 		{
 			PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItem);
 			m_pexpp->OpenItem(pidlComplete, FALSE, FALSE);
@@ -661,7 +661,7 @@ BOOL CSearchDialog::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 }
 
 void CSearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::list<PIDLIST_RELATIVE> &pidlItemList, int iCmd)
+	const std::vector<PITEMID_CHILD> &pidlItems, int iCmd)
 {
 	switch(iCmd)
 	{
@@ -670,7 +670,7 @@ void CSearchDialog::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 			m_tabContainer->CreateNewTab(pidlParent, TabSettings(_selected = true));
 
 			TCHAR szFilename[MAX_PATH];
-			PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItemList.front());
+			PIDLIST_ABSOLUTE pidlComplete = ILCombine(pidlParent, pidlItems.front());
 			GetDisplayName(pidlComplete, szFilename, SIZEOF_ARRAY(szFilename), SHGDN_INFOLDER | SHGDN_FORPARSING);
 			CoTaskMemFree(pidlComplete);
 
@@ -758,14 +758,13 @@ INT_PTR CSearchDialog::OnNotify(NMHDR *pnmhdr)
 
 						if(hr == S_OK)
 						{
-							std::list<LPCITEMIDLIST> pidlList;
-							pidlList.push_back(ILFindLastID(pidlFull));
+							std::vector<PCITEMID_CHILD> pidlItems;
+							pidlItems.push_back(ILFindLastID(pidlFull));
 
 							PIDLIST_ABSOLUTE pidlDirectory = ILCloneFull(pidlFull);
 							ILRemoveLastID(pidlDirectory);
 
-							CFileContextMenuManager fcmm(m_hDlg,pidlDirectory,
-								pidlList);
+							CFileContextMenuManager fcmm(m_hDlg,pidlDirectory, pidlItems);
 
 							DWORD dwCursorPos = GetMessagePos();
 

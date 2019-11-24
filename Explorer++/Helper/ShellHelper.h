@@ -46,7 +46,7 @@ struct ContextMenuHandler_t
 };
 
 using unique_pidl_absolute = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PIDLIST_ABSOLUTE>>;
-using unique_pidl_relative = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PIDLIST_RELATIVE>>;
+using unique_pidl_child = wil::unique_cotaskmem_ptr<std::remove_pointer_t<PITEMID_CHILD>>;
 
 void			DecodePath(const TCHAR *szInitialPath,const TCHAR *szCurrentDirectory,TCHAR *szParsingPath,size_t cchDest);
 HRESULT			GetDisplayName(const TCHAR *szParsingPath,TCHAR *szDisplayName,UINT cchMax,DWORD uFlags);
@@ -55,7 +55,7 @@ HRESULT			GetCsidlDisplayName(int csidl, TCHAR *szFolderName, UINT cchMax, DWORD
 BOOL			CheckIdl(PCIDLIST_ABSOLUTE pidl);
 BOOL			IsIdlDirectory(PCIDLIST_ABSOLUTE pidl);
 HRESULT			GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *pidlParent);
-BOOL			IsNamespaceRoot(LPCITEMIDLIST pidl);
+BOOL			IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl);
 BOOL			MyExpandEnvironmentStrings(const TCHAR *szSrc,TCHAR *szExpandedPath,DWORD nSize);
 HRESULT			BuildHDropList(FORMATETC *pftc, STGMEDIUM *pstg, const std::list<std::wstring> &FilenameList);
 HRESULT			BuildShellIDList(FORMATETC *pftc, STGMEDIUM *pstg, LPCITEMIDLIST pidlDirectory, const std::vector<LPCITEMIDLIST> &pidlList);
@@ -68,7 +68,7 @@ HRESULT			ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size
 HRESULT			ConvertDateVariantToString(DATE date, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
 boost::optional<std::wstring>	GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl);
 BOOL			IsPathGUID(const TCHAR *szPath);
-BOOL			CompareIdls(LPCITEMIDLIST pidl1,LPCITEMIDLIST pidl2);
+BOOL			CompareIdls(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2);
 HRESULT			AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList);
 BOOL			LoadContextMenuHandlers(const TCHAR *szRegKey, std::list<ContextMenuHandler_t> &ContextMenuHandlers, const std::vector<std::wstring> &blacklistedCLSIDEntries);
 BOOL			LoadIUnknownFromCLSID(const TCHAR *szCLSID, ContextMenuHandler_t *pContextMenuHandler);
@@ -78,7 +78,7 @@ BOOL			ExecuteFileAction(HWND hwnd, const TCHAR *szVerb, const TCHAR *szParamete
 BOOL			ExecuteAndShowCurrentProcess(HWND hwnd, const TCHAR *szParameters);
 BOOL			ExecuteAndShowProcess(HWND hwnd, const TCHAR *szProcess, const TCHAR *szParameters);
 HRESULT			DecodeFriendlyPath(const TCHAR *szFriendlyPath,TCHAR *szParsingPath,UINT cchMax);
-HRESULT			ShowMultipleFileProperties(PCIDLIST_ABSOLUTE pidlDirectory, LPCITEMIDLIST *ppidl, HWND hwndOwner, int nFiles);
+HRESULT			ShowMultipleFileProperties(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD *ppidl, HWND hwndOwner, int nFiles);
 HRESULT			ExecuteActionFromContextMenu(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD *ppidl, HWND hwndOwner, int nFiles, const TCHAR *szAction, DWORD fMask);
 BOOL			CompareVirtualFolders(const TCHAR *szDirectory, UINT uFolderCSIDL);
 bool			IsChildOfLibrariesFolder(PCIDLIST_ABSOLUTE pidl);

@@ -461,7 +461,7 @@ void CMyTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 {
 	TVITEMEX	tvItem;
 	ItemInfo_t	*pItemInfo = NULL;
-	LPITEMIDLIST	pidlParent;
+	PIDLIST_ABSOLUTE	pidlParent;
 	SHFILEINFO	shfi;
 	TCHAR		szFileName[MAX_PATH];
 	HRESULT		hr;
@@ -505,11 +505,11 @@ void CMyTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 	}
 }
 
-void CMyTreeView::UpdateChildren(HTREEITEM hParent,LPITEMIDLIST pidlParent)
+void CMyTreeView::UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlParent)
 {
 	HTREEITEM hChild;
 	TVITEMEX tvItem;
-	LPITEMIDLIST pidl = NULL;
+	PCIDLIST_ABSOLUTE pidl = NULL;
 	BOOL bRes;
 
 	hChild = TreeView_GetChild(m_hTreeView,hParent);
@@ -543,8 +543,7 @@ void CMyTreeView::UpdateChildren(HTREEITEM hParent,LPITEMIDLIST pidlParent)
 	}
 }
 
-/* Updates an items pidl, returning a pointer to the new idl. */
-LPITEMIDLIST CMyTreeView::UpdateItemInfo(LPITEMIDLIST pidlParent,int iItemId)
+PCIDLIST_ABSOLUTE CMyTreeView::UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent,int iItemId)
 {
 	ItemInfo_t *pItemInfo = NULL;
 

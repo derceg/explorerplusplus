@@ -201,8 +201,8 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 							{
 								ClientToScreen(m_hwnd,&pnmm->pt);
 
-								std::list<LPCITEMIDLIST> pidlItemList;
-								CFileContextMenuManager fcmm(m_hwnd,pidlItem,pidlItemList);
+								std::vector<PCITEMID_CHILD> pidlItems;
+								CFileContextMenuManager fcmm(m_hwnd,pidlItem,pidlItems);
 
 								fcmm.ShowMenu(this,MIN_SHELL_MENU_ID,MAX_SHELL_MENU_ID,&pnmm->pt,m_pexpp->GetStatusBar(),
 									NULL,FALSE,IsKeyDown(VK_SHIFT));
@@ -378,10 +378,10 @@ std::wstring CDrivesToolbar::GetDrivePath(int iIndex)
 }
 
 void CDrivesToolbar::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
-	const std::list<PIDLIST_RELATIVE> &pidlItemList,DWORD_PTR dwData,HMENU hMenu)
+	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, HMENU hMenu)
 {
 	UNREFERENCED_PARAMETER(pidlParent);
-	UNREFERENCED_PARAMETER(pidlItemList);
+	UNREFERENCED_PARAMETER(pidlItems);
 	UNREFERENCED_PARAMETER(dwData);
 
 	TCHAR szTemp[64];
@@ -396,9 +396,9 @@ void CDrivesToolbar::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 }
 
 BOOL CDrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::list<PIDLIST_RELATIVE> &pidlItemList,DWORD_PTR dwData,const TCHAR *szCmd)
+	const std::vector<PITEMID_CHILD> &pidlItems, DWORD_PTR dwData, const TCHAR *szCmd)
 {
-	UNREFERENCED_PARAMETER(pidlItemList);
+	UNREFERENCED_PARAMETER(pidlItems);
 	UNREFERENCED_PARAMETER(dwData);
 
 	if(StrCmpI(szCmd,_T("open")) == 0)
@@ -411,9 +411,9 @@ BOOL CDrivesToolbar::HandleShellMenuItem(PCIDLIST_ABSOLUTE pidlParent,
 }
 
 void CDrivesToolbar::HandleCustomMenuItem(PCIDLIST_ABSOLUTE pidlParent,
-	const std::list<PIDLIST_RELATIVE> &pidlItemList,int iCmd)
+	const std::vector<PITEMID_CHILD> &pidlItems, int iCmd)
 {
-	UNREFERENCED_PARAMETER(pidlItemList);
+	UNREFERENCED_PARAMETER(pidlItems);
 
 	switch(iCmd)
 	{

@@ -234,12 +234,10 @@ void Explorerplusplus::OnTreeViewRightClick(WPARAM wParam,LPARAM lParam)
 			{
 				m_bTreeViewOpenInNewTab = FALSE;
 
-				std::list<LPCITEMIDLIST> pidlList;
+				std::vector<PCITEMID_CHILD> pidlItems;
+				pidlItems.push_back(pidlRelative);
 
-				pidlList.push_back(pidlRelative);
-
-				CFileContextMenuManager fcmm(m_hContainer,pidlParent,
-					pidlList);
+				CFileContextMenuManager fcmm(m_hContainer,pidlParent, pidlItems);
 
 				FileContextMenuInfo_t fcmi;
 				fcmi.uFrom = FROM_TREEVIEW;

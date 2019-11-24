@@ -702,7 +702,7 @@ unique_pidl_absolute CShellBrowser::GetItemCompleteIdl(int iItem) const
 	return pidlComplete;
 }
 
-unique_pidl_relative CShellBrowser::GetItemRelativeIdl(int iItem) const
+unique_pidl_child CShellBrowser::GetItemRelativeIdl(int iItem) const
 {
 	LVITEM lvItem;
 	BOOL bRet;
@@ -717,7 +717,7 @@ unique_pidl_relative CShellBrowser::GetItemRelativeIdl(int iItem) const
 		return nullptr;
 	}
 
-	unique_pidl_relative pidlRelative(ILClone(m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
+	unique_pidl_child pidlRelative(ILCloneChild(m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
 
 	return pidlRelative;
 }
@@ -1711,7 +1711,7 @@ BasicItemInfo_t CShellBrowser::getBasicItemInfo(int internalIndex) const
 
 	BasicItemInfo_t basicItemInfo;
 	basicItemInfo.pidlComplete.reset(ILCloneFull(itemInfo.pidlComplete.get()));
-	basicItemInfo.pridl.reset(ILClone(itemInfo.pridl.get()));
+	basicItemInfo.pridl.reset(ILCloneChild(itemInfo.pridl.get()));
 	basicItemInfo.wfd = itemInfo.wfd;
 	StringCchCopy(basicItemInfo.szDisplayName, SIZEOF_ARRAY(basicItemInfo.szDisplayName), itemInfo.szDisplayName);
 
