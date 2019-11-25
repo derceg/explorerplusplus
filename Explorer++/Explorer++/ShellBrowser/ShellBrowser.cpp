@@ -414,14 +414,8 @@ BOOL CShellBrowser::IsFilenameFiltered(const TCHAR *FileName) const
 
 int CShellBrowser::GetItemDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const
 {
-	LVITEM lvItem;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	ListView_GetItem(m_hListView,&lvItem);
-
-	StringCchCopy(Buffer,BufferSize,m_itemInfoMap.at((int)lvItem.lParam).wfd.cFileName);
+	int internalIndex = GetItemInternalIndex(iItem);
+	StringCchCopy(Buffer,BufferSize,m_itemInfoMap.at(internalIndex).wfd.cFileName);
 
 	return lstrlen(Buffer);
 }
@@ -608,26 +602,14 @@ boost::optional<int> CShellBrowser::LocateItemByInternalIndex(int internalIndex)
 
 DWORD CShellBrowser::GetItemAttributes(int iItem) const
 {
-	LVITEM lvItem;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	ListView_GetItem(m_hListView,&lvItem);
-
-	return m_itemInfoMap.at((int)lvItem.lParam).wfd.dwFileAttributes;
+	int internalIndex = GetItemInternalIndex(iItem);
+	return m_itemInfoMap.at(internalIndex).wfd.dwFileAttributes;
 }
 
 WIN32_FIND_DATA CShellBrowser::GetItemFileFindData(int iItem) const
 {
-	LVITEM lvItem;
-
-	lvItem.mask		= LVIF_PARAM;
-	lvItem.iItem	= iItem;
-	lvItem.iSubItem	= 0;
-	ListView_GetItem(m_hListView,&lvItem);
-
-	return m_itemInfoMap.at((int)lvItem.lParam).wfd;
+	int internalIndex = GetItemInternalIndex(iItem);
+	return m_itemInfoMap.at(internalIndex).wfd;
 }
 
 void CShellBrowser::DragStarted(int iFirstItem,POINT *ptCursor)
@@ -969,27 +951,22 @@ int CShellBrowser::DetermineItemSortedPosition(LPARAM lParam) const
 
 void CShellBrowser::RemoveFilteredItems(void)
 {
-	LVITEM			lvItem;
-	int				nItems;
-	int				i = 0;
-
-	if(!m_folderSettings.applyFilter)
-		return;
-
-	nItems = ListView_GetItemCount(m_hListView);
-
-	for(i = nItems - 1;i >= 0;i--)
+	if (!m_folderSettings.applyFilter)
 	{
-		lvItem.mask		= LVIF_PARAM;
-		lvItem.iItem	= i;
-		lvItem.iSubItem	= 0;
-		ListView_GetItem(m_hListView,&lvItem);
+		return;
+	}
 
-		if(!((m_itemInfoMap.at((int)lvItem.lParam).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
+	int nItems = ListView_GetItemCount(m_hListView);
+
+	for(int i = nItems - 1;i >= 0;i--)
+	{
+		int internalIndex = GetItemInternalIndex(i);
+
+		if(!((m_itemInfoMap.at(internalIndex).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY))
 		{
-			if(IsFilenameFiltered(m_itemInfoMap.at((int)lvItem.lParam).szDisplayName))
+			if(IsFilenameFiltered(m_itemInfoMap.at(internalIndex).szDisplayName))
 			{
-				RemoveFilteredItem(i,(int)lvItem.lParam);
+				RemoveFilteredItem(i, internalIndex);
 			}
 		}
 	}
