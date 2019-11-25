@@ -14,8 +14,8 @@
 #include "../Helper/ListViewHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
+#include <wil/com.h>
 #include <list>
-
 
 HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath,UINT wFlags)
 {
@@ -468,40 +468,37 @@ BOOL *bStoreHistory)
 
 void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 {
-	IShellFolder	*pShellFolder = NULL;
-	IEnumIDList		*pEnumIDList = NULL;
-	PITEMID_CHILD	rgelt = NULL;
-	STRRET			str;
-	SHCONTF			EnumFlags;
-	TCHAR			szFileName[MAX_PATH];
-	ULONG			uFetched;
-	HRESULT			hr;
-
 	DetermineFolderVirtual(pidlDirectory);
 
-	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
+	wil::com_ptr<IShellFolder> pShellFolder;
+	HRESULT hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{
 		m_pidlDirectory = ILCloneFull(pidlDirectory);
 
-		EnumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
+		SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
 
 		if (m_folderSettings.showHidden)
 		{
-			EnumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
+			enumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
 		}
 
-		hr = pShellFolder->EnumObjects(m_hOwner,EnumFlags,&pEnumIDList);
+		wil::com_ptr<IEnumIDList> pEnumIDList;
+		hr = pShellFolder->EnumObjects(m_hOwner,enumFlags,&pEnumIDList);
 
-		if(SUCCEEDED(hr) && pEnumIDList != NULL)
+		if(SUCCEEDED(hr) && pEnumIDList)
 		{
-			uFetched = 1;
+			ULONG uFetched = 1;
+			PITEMID_CHILD rgelt;
+
 			while(pEnumIDList->Next(1,&rgelt,&uFetched) == S_OK && (uFetched == 1))
 			{
 				ULONG uAttributes = SFGAO_FOLDER;
 
 				pShellFolder->GetAttributesOf(1,const_cast<PCITEMID_CHILD *>(&rgelt),&uAttributes);
+
+				STRRET str;
 
 				/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
 				a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
@@ -510,13 +507,18 @@ void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 				Also use only SHGDN_INFOLDER if this item is a folder. This is to ensure
 				that specific folders in Windows 7 (those under C:\Users\Username) appear
 				correctly. */
-				if(m_bVirtualFolder || (uAttributes & SFGAO_FOLDER))
-					hr = pShellFolder->GetDisplayNameOf(rgelt,SHGDN_INFOLDER,&str);
+				if (m_bVirtualFolder || (uAttributes & SFGAO_FOLDER))
+				{
+					hr = pShellFolder->GetDisplayNameOf(rgelt, SHGDN_INFOLDER, &str);
+				}
 				else
-					hr = pShellFolder->GetDisplayNameOf(rgelt,SHGDN_INFOLDER|SHGDN_FORPARSING,&str);
+				{
+					hr = pShellFolder->GetDisplayNameOf(rgelt, SHGDN_INFOLDER | SHGDN_FORPARSING, &str);
+				}
 
 				if(SUCCEEDED(hr))
 				{
+					TCHAR szFileName[MAX_PATH];
 					StrRetToBuf(&str, rgelt, szFileName, SIZEOF_ARRAY(szFileName));
 
 					AddItemInternal(pidlDirectory,rgelt,szFileName,-1,FALSE);
@@ -524,11 +526,7 @@ void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 
 				CoTaskMemFree(rgelt);
 			}
-
-			pEnumIDList->Release();
 		}
-
-		pShellFolder->Release();
 	}
 }
 
