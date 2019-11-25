@@ -428,7 +428,7 @@ void Explorerplusplus::OnListViewMButtonUp(POINT *pt)
 
 			if(SUCCEEDED(hr))
 			{
-				auto ridl = m_pActiveShellBrowser->GetItemRelativeIdl(ht.iItem);
+				auto ridl = m_pActiveShellBrowser->GetItemChildIdl(ht.iItem);
 				PCITEMID_CHILD items[] = { const_cast<PCUITEMID_CHILD>(ridl.get()) };
 
 				hr = pShellFolder->GetAttributesOf(1,items,&uAttributes);
@@ -1001,7 +1001,7 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 
 		while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVNI_SELECTED)) != -1)
 		{
-			auto pidlPtr = m_pActiveShellBrowser->GetItemRelativeIdl(iItem);
+			auto pidlPtr = m_pActiveShellBrowser->GetItemChildIdl(iItem);
 
 			pidlItems.push_back(pidlPtr.get());
 			pidlPtrs.push_back(std::move(pidlPtr));
@@ -1145,7 +1145,7 @@ HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType
 
 	while((item = ListView_GetNextItem(m_hActiveListView,item,LVNI_SELECTED)) != -1)
 	{
-		auto pidl = m_pActiveShellBrowser->GetItemRelativeIdl(item);
+		auto pidl = m_pActiveShellBrowser->GetItemChildIdl(item);
 
 		rawPidls.push_back(pidl.get());
 		pidls.push_back(std::move(pidl));
@@ -1286,7 +1286,7 @@ void Explorerplusplus::OnListViewDoubleClick(NMHDR *nmhdr)
 			if(IsKeyDown(VK_MENU))
 			{
 				auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
-				auto pidl = m_pActiveShellBrowser->GetItemRelativeIdl(ht.iItem);
+				auto pidl = m_pActiveShellBrowser->GetItemChildIdl(ht.iItem);
 				std::vector<PCITEMID_CHILD> items = { pidl.get() };
 
 				ShowMultipleFileProperties(pidlDirectory.get(), items.data(), m_hContainer, 1);
@@ -1385,7 +1385,7 @@ void Explorerplusplus::OnListViewShowFileProperties(void) const
 
 	while ((item = ListView_GetNextItem(m_hActiveListView, item, LVNI_SELECTED)) != -1)
 	{
-		auto pidl = m_pActiveShellBrowser->GetItemRelativeIdl(item);
+		auto pidl = m_pActiveShellBrowser->GetItemChildIdl(item);
 
 		rawPidls.push_back(pidl.get());
 		pidls.push_back(std::move(pidl));
@@ -1667,7 +1667,7 @@ void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
 void Explorerplusplus::OpenListViewItem(int iItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow)
 {
 	auto pidl = m_pActiveShellBrowser->GetDirectoryIdl();
-	auto ridl = m_pActiveShellBrowser->GetItemRelativeIdl(iItem);
+	auto ridl = m_pActiveShellBrowser->GetItemChildIdl(iItem);
 
 	if(ridl != NULL)
 	{

@@ -702,7 +702,7 @@ unique_pidl_absolute CShellBrowser::GetItemCompleteIdl(int iItem) const
 	return pidlComplete;
 }
 
-unique_pidl_child CShellBrowser::GetItemRelativeIdl(int iItem) const
+unique_pidl_child CShellBrowser::GetItemChildIdl(int iItem) const
 {
 	LVITEM lvItem;
 	BOOL bRet;
