@@ -283,7 +283,7 @@ private:
 	void				BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory);
 	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void				InsertAwaitingItems(BOOL bInsertIntoGroup);
-	BOOL				IsFileFiltered(int iItemInternal) const;
+	BOOL				IsFileFiltered(const ItemInfo_t &itemInfo) const;
 	HRESULT				AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
 	HRESULT				AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
 	int					SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName);

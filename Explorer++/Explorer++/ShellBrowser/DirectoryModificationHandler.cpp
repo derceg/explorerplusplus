@@ -523,6 +523,8 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 	if(iItemInternal == -1)
 		return;
 
+	auto &itemInfo = m_itemInfoMap.at(iItemInternal);
+
 	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
 	PathAppend(szFullFileName,szNewFileName);
 
@@ -539,17 +541,10 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 
 			if(SUCCEEDED(hr))
 			{
-				m_itemInfoMap.at(iItemInternal).pidlComplete.reset(ILCloneFull(pidlFull.get()));
-				m_itemInfoMap.at(iItemInternal).pridl.reset(ILCloneChild(pidlRelative));
-				StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
-					SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName),
-					szDisplayName);
-
-				/* Need to update internal storage for the item, since
-				it's name has now changed. */
-				StringCchCopy(m_itemInfoMap.at(iItemInternal).wfd.cFileName,
-					SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).wfd.cFileName),
-					szNewFileName);
+				itemInfo.pidlComplete.reset(ILCloneFull(pidlFull.get()));
+				itemInfo.pridl.reset(ILCloneChild(pidlRelative));
+				StringCchCopy(itemInfo.szDisplayName, SIZEOF_ARRAY(itemInfo.szDisplayName), szDisplayName);
+				StringCchCopy(itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName), szNewFileName);
 
 				/* The files' type may have changed, so retrieve the files'
 				icon again. */
@@ -588,7 +583,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 						ListView_SetItem(m_hListView,&lvItem);
 
 						/* TODO: Does the file need to be filtered out? */
-						if(IsFileFiltered(iItemInternal))
+						if(IsFileFiltered(itemInfo))
 						{
 							RemoveFilteredItem(iItem,iItemInternal);
 						}
@@ -603,11 +598,7 @@ void CShellBrowser::RenameItem(int iItemInternal,const TCHAR *szNewFileName)
 	}
 	else
 	{
-		StringCchCopy(m_itemInfoMap.at(iItemInternal).szDisplayName,
-			SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).szDisplayName), szNewFileName);
-
-		StringCchCopy(m_itemInfoMap.at(iItemInternal).wfd.cFileName,
-			SIZEOF_ARRAY(m_itemInfoMap.at(iItemInternal).wfd.cFileName),
-			szNewFileName);
+		StringCchCopy(itemInfo.szDisplayName, SIZEOF_ARRAY(itemInfo.szDisplayName), szNewFileName);
+		StringCchCopy(itemInfo.wfd.cFileName, SIZEOF_ARRAY(itemInfo.wfd.cFileName), szNewFileName);
 	}
 }

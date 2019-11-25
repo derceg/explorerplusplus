@@ -356,86 +356,84 @@ void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 	int nAdded = 0;
 
-	for (const auto &item : m_AwaitingAddList)
+	for (const auto &awaitingItem : m_AwaitingAddList)
 	{
-		if(!IsFileFiltered(item.iItemInternal))
+		const auto &itemInfo = m_itemInfoMap.at(awaitingItem.iItemInternal);
+
+		if (IsFileFiltered(itemInfo))
 		{
-			BasicItemInfo_t basicItemInfo = getBasicItemInfo(item.iItemInternal);
-			std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
+			m_FilteredItemsList.push_back(awaitingItem.iItemInternal);
+			continue;
+		}
 
-			TCHAR filenameCopy[MAX_PATH];
-			StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());
+		BasicItemInfo_t basicItemInfo = getBasicItemInfo(awaitingItem.iItemInternal);
+		std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
 
-			LVITEM lv;
-			lv.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
+		LVITEM lv;
+		lv.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
 
-			if (bInsertIntoGroup)
+		if (bInsertIntoGroup)
+		{
+			lv.mask |= LVIF_GROUPID;
+			lv.iGroupId = DetermineItemGroup(awaitingItem.iItemInternal);
+		}
+
+		lv.iItem = awaitingItem.iItem;
+		lv.iSubItem = 0;
+		lv.pszText = filename.data();
+		lv.iImage = I_IMAGECALLBACK;
+		lv.lParam = awaitingItem.iItemInternal;
+
+		/* Insert the item into the list view control. */
+		int iItemIndex = ListView_InsertItem(m_hListView,&lv);
+
+		if(awaitingItem.bPosition && m_folderSettings.viewMode != +ViewMode::Details)
+		{
+			POINT ptItem;
+
+			if(awaitingItem.iAfter != -1)
 			{
-				lv.mask |= LVIF_GROUPID;
-				lv.iGroupId = DetermineItemGroup(item.iItemInternal);
+				ListView_GetItemPosition(m_hListView, awaitingItem.iAfter,&ptItem);
+			}
+			else
+			{
+				ptItem.x = 0;
+				ptItem.y = 0;
 			}
 
-			lv.iItem = item.iItem;
-			lv.iSubItem = 0;
-			lv.pszText = filenameCopy;
-			lv.iImage = I_IMAGECALLBACK;
-			lv.lParam = item.iItemInternal;
+			/* The item will end up in the position AFTER iAfter. */
+			ListView_SetItemPosition32(m_hListView,iItemIndex,ptItem.x,ptItem.y);
+		}
 
-			/* Insert the item into the list view control. */
-			int iItemIndex = ListView_InsertItem(m_hListView,&lv);
+		if(m_folderSettings.viewMode == +ViewMode::Tiles)
+		{
+			SetTileViewItemInfo(iItemIndex, awaitingItem.iItemInternal);
+		}
 
-			if(item.bPosition && m_folderSettings.viewMode != +ViewMode::Details)
-			{
-				POINT ptItem;
+		if(m_bNewItemCreated)
+		{
+			if(CompareIdls(itemInfo.pidlComplete.get(),m_pidlNewItem))
+				m_bNewItemCreated = FALSE;
 
-				if(item.iAfter != -1)
-				{
-					ListView_GetItemPosition(m_hListView, item.iAfter,&ptItem);
-				}
-				else
-				{
-					ptItem.x = 0;
-					ptItem.y = 0;
-				}
+			m_iIndexNewItem = iItemIndex;
+		}
 
-				/* The item will end up in the position AFTER iAfter. */
-				ListView_SetItemPosition32(m_hListView,iItemIndex,ptItem.x,ptItem.y);
-			}
-
-			if(m_folderSettings.viewMode == +ViewMode::Tiles)
-			{
-				SetTileViewItemInfo(iItemIndex, item.iItemInternal);
-			}
-
-			if(m_bNewItemCreated)
-			{
-				if(CompareIdls(m_itemInfoMap.at((int)item.iItemInternal).pidlComplete.get(),m_pidlNewItem))
-					m_bNewItemCreated = FALSE;
-
-				m_iIndexNewItem = iItemIndex;
-			}
-
-			/* If the file is marked as hidden, ghost it out. */
-			if(m_itemInfoMap.at(item.iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
-			{
-				ListView_SetItemState(m_hListView,iItemIndex,LVIS_CUT,LVIS_CUT);
-			}
+		/* If the file is marked as hidden, ghost it out. */
+		if(itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+		{
+			ListView_SetItemState(m_hListView,iItemIndex,LVIS_CUT,LVIS_CUT);
+		}
 			
-			/* Add the current file's size to the running size of the current directory. */
-			/* A folder may or may not have 0 in its high file size member.
-			It should either be zeroed, or never counted. */
-			ULARGE_INTEGER ulFileSize;
-			ulFileSize.LowPart = m_itemInfoMap.at(item.iItemInternal).wfd.nFileSizeLow;
-			ulFileSize.HighPart = m_itemInfoMap.at(item.iItemInternal).wfd.nFileSizeHigh;
+		/* Add the current file's size to the running size of the current directory. */
+		/* A folder may or may not have 0 in its high file size member.
+		It should either be zeroed, or never counted. */
+		ULARGE_INTEGER ulFileSize;
+		ulFileSize.LowPart = itemInfo.wfd.nFileSizeLow;
+		ulFileSize.HighPart = itemInfo.wfd.nFileSizeHigh;
 
-			m_ulTotalDirSize.QuadPart += ulFileSize.QuadPart;
+		m_ulTotalDirSize.QuadPart += ulFileSize.QuadPart;
 
-			nAdded++;
-		}
-		else
-		{
-			m_FilteredItemsList.push_back(item.iItemInternal);
-		}
+		nAdded++;
 	}
 
 	if (m_folderSettings.autoArrange)
@@ -474,20 +472,20 @@ void CShellBrowser::ApplyFilteringBackgroundImage(bool apply)
 	}
 }
 
-BOOL CShellBrowser::IsFileFiltered(int iItemInternal) const
+BOOL CShellBrowser::IsFileFiltered(const ItemInfo_t &itemInfo) const
 {
 	BOOL bHideSystemFile	= FALSE;
 	BOOL bFilenameFiltered	= FALSE;
 
 	if(m_folderSettings.applyFilter &&
-		((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
+		((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY))
 	{
-		bFilenameFiltered = IsFilenameFiltered(m_itemInfoMap.at(iItemInternal).szDisplayName);
+		bFilenameFiltered = IsFilenameFiltered(itemInfo.szDisplayName);
 	}
 
 	if(m_config->globalFolderSettings.hideSystemFiles)
 	{
-		bHideSystemFile = (m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
+		bHideSystemFile = (itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
 			== FILE_ATTRIBUTE_SYSTEM;
 	}
 
