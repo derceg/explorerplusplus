@@ -177,19 +177,7 @@ CShellBrowser::~CShellBrowser()
 
 	DeleteCriticalSection(&m_csDirectoryAltered);
 
-	int nItems = ListView_GetItemCount(m_hListView);
-
-	for (int i = 0; i < nItems; i++)
-	{
-		LVITEM lvItem;
-		lvItem.mask = LVIF_PARAM;
-		lvItem.iItem = i;
-		lvItem.iSubItem = 0;
-
-		ListView_GetItem(m_hListView, &lvItem);
-
-		/* Also destroy the thumbnails imagelist... */
-	}
+	/* TODO: Also destroy the thumbnails imagelist. */
 }
 
 BOOL CShellBrowser::GetAutoArrange(void) const
