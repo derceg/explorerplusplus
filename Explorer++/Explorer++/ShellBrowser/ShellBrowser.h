@@ -166,6 +166,18 @@ private:
 
 	DISALLOW_COPY_AND_ASSIGN(CShellBrowser);
 
+	struct DirectoryState
+	{
+		unique_pidl_absolute pidlDirectory;
+		int itemIDCounter;
+
+		DirectoryState() :
+			itemIDCounter(0)
+		{
+
+		}
+	};
+
 	struct ItemInfo_t
 	{
 		unique_pidl_absolute	pidlComplete;
@@ -262,7 +274,7 @@ private:
 		const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns);
 	~CShellBrowser();
 
-	int					GenerateUniqueItemId(void);
+	int					GenerateUniqueItemId();
 	BOOL				GhostItemInternal(int iItem,BOOL bGhost);
 	void				DetermineFolderVirtual(PCIDLIST_ABSOLUTE pidlDirectory);
 	void				VerifySortMode(void);
@@ -425,7 +437,7 @@ private:
 	BOOL				m_bPerformingDrag;
 	HIMAGELIST			m_hListViewImageList;
 
-	int					m_itemIDCounter;
+	DirectoryState		m_directoryState;
 
 	/* Stores various extra information on files, such
 	as display name. */
@@ -455,7 +467,6 @@ private:
 	CPathManager		m_pathManager;
 
 	/* Internal state. */
-	PIDLIST_ABSOLUTE	m_pidlDirectory;
 	const HINSTANCE		m_hResourceModule;
 	TCHAR				m_CurDir[MAX_PATH];
 	ULARGE_INTEGER		m_ulTotalDirSize;

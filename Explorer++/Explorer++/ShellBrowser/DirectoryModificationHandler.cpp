@@ -231,7 +231,7 @@ void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 					int iItemId;
 					int iSorted;
 
-					iItemId = SetItemInformation(m_pidlDirectory,pidlRelative,szDisplayName);
+					iItemId = SetItemInformation(m_directoryState.pidlDirectory.get(),pidlRelative,szDisplayName);
 
 					iSorted = DetermineItemSortedPosition(iItemId);
 
@@ -240,7 +240,7 @@ void CShellBrowser::OnFileActionAdded(const TCHAR *szFileName)
 				else
 				{
 					/* Just add the item to the end of the list. */
-					AddItemInternal(m_pidlDirectory,pidlRelative,szDisplayName,-1,FALSE);
+					AddItemInternal(m_directoryState.pidlDirectory.get(),pidlRelative,szDisplayName,-1,FALSE);
 				}
 				
 				InsertAwaitingItems(m_folderSettings.showInGroups);

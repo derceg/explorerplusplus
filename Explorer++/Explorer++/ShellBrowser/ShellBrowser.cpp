@@ -82,7 +82,6 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 	m_config(config),
 	m_folderSettings(folderSettings),
 	m_folderColumns(initialColumns ? *initialColumns : config->globalFolderSettings.folderColumns),
-	m_itemIDCounter(0),
 	m_columnThreadPool(1),
 	m_columnResultIDCounter(0),
 	m_itemImageThreadPool(1),
@@ -111,8 +110,6 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 	m_iDropped = -1;
 
 	m_iUniqueFolderIndex = 0;
-
-	m_pidlDirectory = NULL;
 
 	m_PreviousSortColumnExists = false;
 
@@ -193,8 +190,6 @@ CShellBrowser::~CShellBrowser()
 
 		/* Also destroy the thumbnails imagelist... */
 	}
-
-	CoTaskMemFree(m_pidlDirectory);
 }
 
 BOOL CShellBrowser::GetAutoArrange(void) const
@@ -475,7 +470,7 @@ std::wstring CShellBrowser::GetDirectory() const
 
 unique_pidl_absolute CShellBrowser::GetDirectoryIdl() const
 {
-	unique_pidl_absolute pidlDirectory(ILCloneFull(m_pidlDirectory));
+	unique_pidl_absolute pidlDirectory(ILCloneFull(m_directoryState.pidlDirectory.get()));
 	return pidlDirectory;
 }
 
@@ -543,7 +538,7 @@ PIDLIST_ABSOLUTE CShellBrowser::RetrieveHistoryItem(int iItem)
 
 BOOL CShellBrowser::CanBrowseUp(void) const
 {
-	return !IsNamespaceRoot(m_pidlDirectory);
+	return !IsNamespaceRoot(m_directoryState.pidlDirectory.get());
 }
 
 /* TODO: Convert to using pidl's here, rather than
@@ -695,7 +690,7 @@ unique_pidl_absolute CShellBrowser::GetItemCompleteIdl(int iItem) const
 		return nullptr;
 	}
 
-	unique_pidl_absolute pidlComplete(ILCombine(m_pidlDirectory, m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
+	unique_pidl_absolute pidlComplete(ILCombine(m_directoryState.pidlDirectory.get(), m_itemInfoMap.at((int)lvItem.lParam).pridl.get()));
 
 	return pidlComplete;
 }
@@ -736,7 +731,7 @@ BOOL CShellBrowser::CanCreate(void) const
 
 	if(SUCCEEDED(hr))
 	{
-		bCanCreate = !InVirtualFolder() || CompareIdls(m_pidlDirectory,pidl.get());
+		bCanCreate = !InVirtualFolder() || CompareIdls(m_directoryState.pidlDirectory.get(),pidl.get());
 	}
 
 	return bCanCreate;
@@ -766,7 +761,7 @@ BOOL CShellBrowser::CompareVirtualFolders(UINT uFolderCSIDL) const
 
 int CShellBrowser::GenerateUniqueItemId(void)
 {
-	return m_itemIDCounter++;
+	return m_directoryState.itemIDCounter++;
 }
 
 void CShellBrowser::PositionDroppedItems(void)

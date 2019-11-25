@@ -141,6 +141,8 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	HIMAGELIST himlOld;
 	int nItems;
 
+	m_directoryState = DirectoryState();
+
 	/* If we're in thumbnails view, destroy the current
 	imagelist, and create a new one. */
 	if (m_folderSettings.viewMode == +ViewMode::Thumbnails)
@@ -161,14 +163,8 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	m_AlteredList.clear();
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
-	m_itemIDCounter = 0;
-
 	m_itemInfoMap.clear();
-
 	m_cachedFolderSizes.clear();
-
-	CoTaskMemFree(m_pidlDirectory);
-
 	m_FilteredItemsList.clear();
 	m_AwaitingAddList.clear();
 }
@@ -182,7 +178,7 @@ void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 
 	if (SUCCEEDED(hr))
 	{
-		m_pidlDirectory = ILCloneFull(pidlDirectory);
+		m_directoryState.pidlDirectory.reset(ILCloneFull(pidlDirectory));
 
 		SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
 
@@ -556,7 +552,7 @@ BOOL *bStoreHistory)
 
 		/* This is a relative path. Add it on to the end of the current directory
 		name to get a fully qualified path. */
-		PIDLIST_ABSOLUTE pidlComplete = ILCombine(m_pidlDirectory,*pidlDirectory);
+		PIDLIST_ABSOLUTE pidlComplete = ILCombine(m_directoryState.pidlDirectory.get(),*pidlDirectory);
 
 		*pidlDirectory = ILClone(pidlComplete);
 
@@ -566,7 +562,7 @@ BOOL *bStoreHistory)
 	{
 		HRESULT hr;
 
-		hr = GetVirtualParentPath(m_pidlDirectory,pidlDirectory);
+		hr = GetVirtualParentPath(m_directoryState.pidlDirectory.get(),pidlDirectory);
 	}
 	else if((uFlags & SBSP_NAVIGATEBACK) == SBSP_NAVIGATEBACK)
 	{
@@ -618,5 +614,5 @@ BOOL *bStoreHistory)
 
 HRESULT CShellBrowser::Refresh()
 {
-	return BrowseFolder(m_pidlDirectory, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+	return BrowseFolder(m_directoryState.pidlDirectory.get(), SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
 }
