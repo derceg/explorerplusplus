@@ -246,12 +246,16 @@ HRESULT CShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
 
 HRESULT CShellBrowser::AddItemInternal(int iItemIndex, int iItemId, BOOL bPosition)
 {
-	AwaitingAdd_t	AwaitingAdd;
+	AwaitingAdd_t AwaitingAdd;
 
 	if (iItemIndex == -1)
-		AwaitingAdd.iItem = m_nTotalItems + m_nAwaitingAdd - 1;
+	{
+		AwaitingAdd.iItem = m_nTotalItems + static_cast<int>(m_AwaitingAddList.size());
+	}
 	else
+	{
 		AwaitingAdd.iItem = iItemIndex;
+	}
 
 	AwaitingAdd.iItemInternal = iItemId;
 	AwaitingAdd.bPosition = bPosition;
@@ -268,8 +272,6 @@ int CShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
 	HANDLE			hFirstFile;
 	TCHAR			szPath[MAX_PATH];
 	int				uItemId;
-
-	m_nAwaitingAdd++;
 
 	uItemId = GenerateUniqueItemId();
 
@@ -328,17 +330,9 @@ int CShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
 
 void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 {
-	LVITEM lv;
-	ULARGE_INTEGER ulFileSize;
-	unsigned int nPrevItems;
-	int nAdded = 0;
-	int iItemIndex;
+	int nPrevItems = ListView_GetItemCount(m_hListView);
 
-	nPrevItems = ListView_GetItemCount(m_hListView);
-
-	m_nAwaitingAdd = (int)m_AwaitingAddList.size();
-
-	if((nPrevItems + m_nAwaitingAdd) == 0)
+	if(nPrevItems == 0 && m_AwaitingAddList.empty())
 	{
 		if(m_folderSettings.applyFilter)
 			ApplyFilteringBackgroundImage(true);
@@ -357,49 +351,50 @@ void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 	/* Make the listview allocate space (for internal data structures)
 	for all the items at once, rather than individually.
 	Acts as a speed optimization. */
-	ListView_SetItemCount(m_hListView,m_nAwaitingAdd + nPrevItems);
+	ListView_SetItemCount(m_hListView,m_AwaitingAddList.size() + nPrevItems);
 
-	lv.mask			= LVIF_TEXT|LVIF_IMAGE|LVIF_PARAM;
-
-	if(bInsertIntoGroup)
-		lv.mask		|= LVIF_GROUPID;
-
-	/* Constant for each item. */
-	lv.iSubItem		= 0;
-
-	if(m_folderSettings.autoArrange)
-		NListView::ListView_SetAutoArrange(m_hListView,FALSE);
-
-	for(auto itr = m_AwaitingAddList.begin();itr != m_AwaitingAddList.end();itr++)
+	if (m_folderSettings.autoArrange)
 	{
-		if(!IsFileFiltered(itr->iItemInternal))
+		NListView::ListView_SetAutoArrange(m_hListView, FALSE);
+	}
+
+	int nAdded = 0;
+
+	for (const auto &item : m_AwaitingAddList)
+	{
+		if(!IsFileFiltered(item.iItemInternal))
 		{
-			BasicItemInfo_t basicItemInfo = getBasicItemInfo(itr->iItemInternal);
+			BasicItemInfo_t basicItemInfo = getBasicItemInfo(item.iItemInternal);
 			std::wstring filename = ProcessItemFileName(basicItemInfo, m_config->globalFolderSettings);
 
 			TCHAR filenameCopy[MAX_PATH];
 			StringCchCopy(filenameCopy, SIZEOF_ARRAY(filenameCopy), filename.c_str());
 
-			lv.iItem	= itr->iItem;
-			lv.pszText	= filenameCopy;
-			lv.iImage	= I_IMAGECALLBACK;
-			lv.lParam	= itr->iItemInternal;
+			LVITEM lv;
+			lv.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_PARAM;
 
-			if(bInsertIntoGroup)
+			if (bInsertIntoGroup)
 			{
-				lv.iGroupId	= DetermineItemGroup(itr->iItemInternal);
+				lv.mask |= LVIF_GROUPID;
+				lv.iGroupId = DetermineItemGroup(item.iItemInternal);
 			}
 
-			/* Insert the item into the list view control. */
-			iItemIndex = ListView_InsertItem(m_hListView,&lv);
+			lv.iItem = item.iItem;
+			lv.iSubItem = 0;
+			lv.pszText = filenameCopy;
+			lv.iImage = I_IMAGECALLBACK;
+			lv.lParam = item.iItemInternal;
 
-			if(itr->bPosition && m_folderSettings.viewMode != +ViewMode::Details)
+			/* Insert the item into the list view control. */
+			int iItemIndex = ListView_InsertItem(m_hListView,&lv);
+
+			if(item.bPosition && m_folderSettings.viewMode != +ViewMode::Details)
 			{
 				POINT ptItem;
 
-				if(itr->iAfter != -1)
+				if(item.iAfter != -1)
 				{
-					ListView_GetItemPosition(m_hListView,itr->iAfter,&ptItem);
+					ListView_GetItemPosition(m_hListView, item.iAfter,&ptItem);
 				}
 				else
 				{
@@ -413,19 +408,19 @@ void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 
 			if(m_folderSettings.viewMode == +ViewMode::Tiles)
 			{
-				SetTileViewItemInfo(iItemIndex,itr->iItemInternal);
+				SetTileViewItemInfo(iItemIndex, item.iItemInternal);
 			}
 
 			if(m_bNewItemCreated)
 			{
-				if(CompareIdls(m_itemInfoMap.at((int)itr->iItemInternal).pidlComplete.get(),m_pidlNewItem))
+				if(CompareIdls(m_itemInfoMap.at((int)item.iItemInternal).pidlComplete.get(),m_pidlNewItem))
 					m_bNewItemCreated = FALSE;
 
 				m_iIndexNewItem = iItemIndex;
 			}
 
 			/* If the file is marked as hidden, ghost it out. */
-			if(m_itemInfoMap.at(itr->iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
+			if(m_itemInfoMap.at(item.iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN)
 			{
 				ListView_SetItemState(m_hListView,iItemIndex,LVIS_CUT,LVIS_CUT);
 			}
@@ -433,8 +428,9 @@ void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 			/* Add the current file's size to the running size of the current directory. */
 			/* A folder may or may not have 0 in its high file size member.
 			It should either be zeroed, or never counted. */
-			ulFileSize.LowPart = m_itemInfoMap.at(itr->iItemInternal).wfd.nFileSizeLow;
-			ulFileSize.HighPart = m_itemInfoMap.at(itr->iItemInternal).wfd.nFileSizeHigh;
+			ULARGE_INTEGER ulFileSize;
+			ulFileSize.LowPart = m_itemInfoMap.at(item.iItemInternal).wfd.nFileSizeLow;
+			ulFileSize.HighPart = m_itemInfoMap.at(item.iItemInternal).wfd.nFileSizeHigh;
 
 			m_ulTotalDirSize.QuadPart += ulFileSize.QuadPart;
 
@@ -442,19 +438,20 @@ void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 		}
 		else
 		{
-			m_FilteredItemsList.push_back(itr->iItemInternal);
+			m_FilteredItemsList.push_back(item.iItemInternal);
 		}
 	}
 
-	if(m_folderSettings.autoArrange)
-		NListView::ListView_SetAutoArrange(m_hListView,TRUE);
+	if (m_folderSettings.autoArrange)
+	{
+		NListView::ListView_SetAutoArrange(m_hListView, TRUE);
+	}
 
 	m_nTotalItems = nPrevItems + nAdded;
 
 	PositionDroppedItems();
 
 	m_AwaitingAddList.clear();
-	m_nAwaitingAdd = 0;
 }
 
 void CShellBrowser::ApplyFolderEmptyBackgroundImage(bool apply)

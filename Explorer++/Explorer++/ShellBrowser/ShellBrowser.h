@@ -493,7 +493,6 @@ private:
 	been created and are awaiting insertion
 	into the listview. */
 	std::list<AwaitingAdd_t>	m_AwaitingAddList;
-	int					m_nAwaitingAdd;
 
 	/* Shell new. */
 	BOOL				m_bNewItemCreated;
