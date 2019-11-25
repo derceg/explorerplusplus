@@ -762,7 +762,7 @@ void Explorerplusplus::OnTreeViewPaste(void)
 	}
 }
 
-void Explorerplusplus::UpdateTreeViewSelection(void)
+void Explorerplusplus::UpdateTreeViewSelection()
 {
 	HTREEITEM		hItem;
 	TCHAR			szDirectory[MAX_PATH];
@@ -770,7 +770,7 @@ void Explorerplusplus::UpdateTreeViewSelection(void)
 	UINT			uDriveType;
 	BOOL			bNetworkPath = FALSE;
 
-	if(!m_config->synchronizeTreeview)
+	if (!m_config->synchronizeTreeview || !m_config->showFolders)
 	{
 		return;
 	}

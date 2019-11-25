@@ -381,7 +381,7 @@ private:
 
 	/* Window state update. */
 	void					UpdateWindowStates(void);
-	void					UpdateTreeViewSelection(void);
+	void					UpdateTreeViewSelection();
 	void					SetStatusBarParts(int width);
 	void					ResizeWindows(void);
 	void					SetListViewInitialPosition(HWND hListView);

@@ -135,6 +135,12 @@ void Explorerplusplus::SetListViewInitialPosition(HWND hListView)
 void Explorerplusplus::ToggleFolders(void)
 {
 	m_config->showFolders = !m_config->showFolders;
+
+	if (m_config->showFolders)
+	{
+		UpdateTreeViewSelection();
+	}
+
 	lShowWindow(m_hHolder, m_config->showFolders);
 	lShowWindow(m_hTreeView, m_config->showFolders);
 
