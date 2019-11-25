@@ -237,19 +237,16 @@ HTREEITEM CMyTreeView::AddRoot()
 		TCHAR szDesktopDisplayName[MAX_PATH];
 		GetDisplayName(pidl.get(),szDesktopDisplayName,SIZEOF_ARRAY(szDesktopDisplayName),SHGDN_INFOLDER);
 
-		SHFILEINFO shfi;
-		SHGetFileInfo((LPTSTR)pidl.get(),NULL,&shfi,NULL,SHGFI_PIDL|SHGFI_SYSICONINDEX);
-
 		int iItemId = GenerateUniqueItemId();
 		m_pItemInfo[iItemId].pidl = ILCloneFull(pidl.get());
 		m_uItemMap[iItemId] = 1;
 
 		TVITEMEX tvItem;
-		tvItem.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_CHILDREN|TVIF_SELECTEDIMAGE|TVIF_PARAM;
+		tvItem.mask				= TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
 		tvItem.pszText			= szDesktopDisplayName;
 		tvItem.cchTextMax		= lstrlen(szDesktopDisplayName);
-		tvItem.iImage			= shfi.iIcon;
-		tvItem.iSelectedImage	= shfi.iIcon;
+		tvItem.iImage			= I_IMAGECALLBACK;
+		tvItem.iSelectedImage	= I_IMAGECALLBACK;
 		tvItem.cChildren		= 1;
 		tvItem.lParam			= (LPARAM)iItemId;
 
