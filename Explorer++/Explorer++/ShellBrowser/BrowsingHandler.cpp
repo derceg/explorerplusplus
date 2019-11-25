@@ -173,6 +173,159 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	m_AwaitingAddList.clear();
 }
 
+void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
+{
+	DetermineFolderVirtual(pidlDirectory);
+
+	wil::com_ptr<IShellFolder> pShellFolder;
+	HRESULT hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
+
+	if (SUCCEEDED(hr))
+	{
+		m_pidlDirectory = ILCloneFull(pidlDirectory);
+
+		SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
+
+		if (m_folderSettings.showHidden)
+		{
+			enumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
+		}
+
+		wil::com_ptr<IEnumIDList> pEnumIDList;
+		hr = pShellFolder->EnumObjects(m_hOwner, enumFlags, &pEnumIDList);
+
+		if (SUCCEEDED(hr) && pEnumIDList)
+		{
+			ULONG uFetched = 1;
+			PITEMID_CHILD rgelt;
+
+			while (pEnumIDList->Next(1, &rgelt, &uFetched) == S_OK && (uFetched == 1))
+			{
+				ULONG uAttributes = SFGAO_FOLDER;
+
+				pShellFolder->GetAttributesOf(1, const_cast<PCITEMID_CHILD *>(&rgelt), &uAttributes);
+
+				STRRET str;
+
+				/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
+				a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
+				so that items in real folders can still be shown with extensions, even
+				if the global, Explorer option is disabled.
+				Also use only SHGDN_INFOLDER if this item is a folder. This is to ensure
+				that specific folders in Windows 7 (those under C:\Users\Username) appear
+				correctly. */
+				if (m_bVirtualFolder || (uAttributes & SFGAO_FOLDER))
+				{
+					hr = pShellFolder->GetDisplayNameOf(rgelt, SHGDN_INFOLDER, &str);
+				}
+				else
+				{
+					hr = pShellFolder->GetDisplayNameOf(rgelt, SHGDN_INFOLDER | SHGDN_FORPARSING, &str);
+				}
+
+				if (SUCCEEDED(hr))
+				{
+					TCHAR szFileName[MAX_PATH];
+					StrRetToBuf(&str, rgelt, szFileName, SIZEOF_ARRAY(szFileName));
+
+					AddItemInternal(pidlDirectory, rgelt, szFileName, -1, FALSE);
+				}
+
+				CoTaskMemFree(rgelt);
+			}
+		}
+	}
+}
+
+HRESULT CShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
+	PCITEMID_CHILD pidlChild, const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
+{
+	int uItemId = SetItemInformation(pidlDirectory, pidlChild, szFileName);
+	return AddItemInternal(iItemIndex, uItemId, bPosition);
+}
+
+HRESULT CShellBrowser::AddItemInternal(int iItemIndex, int iItemId, BOOL bPosition)
+{
+	AwaitingAdd_t	AwaitingAdd;
+
+	if (iItemIndex == -1)
+		AwaitingAdd.iItem = m_nTotalItems + m_nAwaitingAdd - 1;
+	else
+		AwaitingAdd.iItem = iItemIndex;
+
+	AwaitingAdd.iItemInternal = iItemId;
+	AwaitingAdd.bPosition = bPosition;
+	AwaitingAdd.iAfter = iItemIndex - 1;
+
+	m_AwaitingAddList.push_back(AwaitingAdd);
+
+	return S_OK;
+}
+
+int CShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
+	PCITEMID_CHILD pidlChild, const TCHAR *szFileName)
+{
+	HANDLE			hFirstFile;
+	TCHAR			szPath[MAX_PATH];
+	int				uItemId;
+
+	m_nAwaitingAdd++;
+
+	uItemId = GenerateUniqueItemId();
+
+	unique_pidl_absolute pidlItem(ILCombine(pidlDirectory, pidlChild));
+
+	m_itemInfoMap[uItemId].pidlComplete.reset(ILCloneFull(pidlItem.get()));
+	m_itemInfoMap[uItemId].pridl.reset(ILCloneChild(pidlChild));
+	m_itemInfoMap[uItemId].bIconRetrieved = FALSE;
+	StringCchCopy(m_itemInfoMap[uItemId].szDisplayName,
+		SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDisplayName), szFileName);
+
+	SHGetPathFromIDList(pidlItem.get(), szPath);
+
+	/* DO NOT call FindFirstFile() on root drives (especially
+	floppy drives). Doing so may cause a delay of up to a
+	few seconds. */
+	if (!PathIsRoot(szPath))
+	{
+		m_itemInfoMap[uItemId].bDrive = FALSE;
+
+		WIN32_FIND_DATA wfd;
+		hFirstFile = FindFirstFile(szPath, &wfd);
+
+		m_itemInfoMap[uItemId].wfd = wfd;
+	}
+	else
+	{
+		m_itemInfoMap[uItemId].bDrive = TRUE;
+		StringCchCopy(m_itemInfoMap[uItemId].szDrive,
+			SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDrive),
+			szPath);
+
+		hFirstFile = INVALID_HANDLE_VALUE;
+	}
+
+	/* Need to use this, since may be in a virtual folder
+	(such as the recycle bin), but items still exist. */
+	if (hFirstFile != INVALID_HANDLE_VALUE)
+	{
+		FindClose(hFirstFile);
+	}
+	else
+	{
+		WIN32_FIND_DATA wfd;
+
+		StringCchCopy(wfd.cFileName, SIZEOF_ARRAY(wfd.cFileName), szFileName);
+		wfd.nFileSizeLow = 0;
+		wfd.nFileSizeHigh = 0;
+		wfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+
+		m_itemInfoMap[uItemId].wfd = wfd;
+	}
+
+	return uItemId;
+}
+
 void CShellBrowser::InsertAwaitingItems(BOOL bInsertIntoGroup)
 {
 	LVITEM lv;
@@ -464,159 +617,6 @@ BOOL *bStoreHistory)
 		return E_FAIL;
 
 	return S_OK;
-}
-
-void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
-{
-	DetermineFolderVirtual(pidlDirectory);
-
-	wil::com_ptr<IShellFolder> pShellFolder;
-	HRESULT hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
-
-	if(SUCCEEDED(hr))
-	{
-		m_pidlDirectory = ILCloneFull(pidlDirectory);
-
-		SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
-
-		if (m_folderSettings.showHidden)
-		{
-			enumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
-		}
-
-		wil::com_ptr<IEnumIDList> pEnumIDList;
-		hr = pShellFolder->EnumObjects(m_hOwner,enumFlags,&pEnumIDList);
-
-		if(SUCCEEDED(hr) && pEnumIDList)
-		{
-			ULONG uFetched = 1;
-			PITEMID_CHILD rgelt;
-
-			while(pEnumIDList->Next(1,&rgelt,&uFetched) == S_OK && (uFetched == 1))
-			{
-				ULONG uAttributes = SFGAO_FOLDER;
-
-				pShellFolder->GetAttributesOf(1,const_cast<PCITEMID_CHILD *>(&rgelt),&uAttributes);
-
-				STRRET str;
-
-				/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
-				a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
-				so that items in real folders can still be shown with extensions, even
-				if the global, Explorer option is disabled.
-				Also use only SHGDN_INFOLDER if this item is a folder. This is to ensure
-				that specific folders in Windows 7 (those under C:\Users\Username) appear
-				correctly. */
-				if (m_bVirtualFolder || (uAttributes & SFGAO_FOLDER))
-				{
-					hr = pShellFolder->GetDisplayNameOf(rgelt, SHGDN_INFOLDER, &str);
-				}
-				else
-				{
-					hr = pShellFolder->GetDisplayNameOf(rgelt, SHGDN_INFOLDER | SHGDN_FORPARSING, &str);
-				}
-
-				if(SUCCEEDED(hr))
-				{
-					TCHAR szFileName[MAX_PATH];
-					StrRetToBuf(&str, rgelt, szFileName, SIZEOF_ARRAY(szFileName));
-
-					AddItemInternal(pidlDirectory,rgelt,szFileName,-1,FALSE);
-				}
-
-				CoTaskMemFree(rgelt);
-			}
-		}
-	}
-}
-
-HRESULT CShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,
-	PCITEMID_CHILD pidlChild, const TCHAR *szFileName, int iItemIndex, BOOL bPosition)
-{
-	int uItemId = SetItemInformation(pidlDirectory,pidlChild,szFileName);
-	return AddItemInternal(iItemIndex,uItemId,bPosition);
-}
-
-HRESULT CShellBrowser::AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition)
-{
-	AwaitingAdd_t	AwaitingAdd;
-
-	if(iItemIndex == -1)
-		AwaitingAdd.iItem = m_nTotalItems + m_nAwaitingAdd - 1;
-	else
-		AwaitingAdd.iItem = iItemIndex;
-
-	AwaitingAdd.iItemInternal = iItemId;
-	AwaitingAdd.bPosition = bPosition;
-	AwaitingAdd.iAfter = iItemIndex - 1;
-
-	m_AwaitingAddList.push_back(AwaitingAdd);
-
-	return S_OK;
-}
-
-int CShellBrowser::SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory,
-	PCITEMID_CHILD pidlChild, const TCHAR *szFileName)
-{
-	HANDLE			hFirstFile;
-	TCHAR			szPath[MAX_PATH];
-	int				uItemId;
-
-	m_nAwaitingAdd++;
-
-	uItemId = GenerateUniqueItemId();
-
-	unique_pidl_absolute pidlItem(ILCombine(pidlDirectory, pidlChild));
-
-	m_itemInfoMap[uItemId].pidlComplete.reset(ILCloneFull(pidlItem.get()));
-	m_itemInfoMap[uItemId].pridl.reset(ILCloneChild(pidlChild));
-	m_itemInfoMap[uItemId].bIconRetrieved = FALSE;
-	StringCchCopy(m_itemInfoMap[uItemId].szDisplayName,
-		SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDisplayName), szFileName);
-
-	SHGetPathFromIDList(pidlItem.get(),szPath);
-
-	/* DO NOT call FindFirstFile() on root drives (especially
-	floppy drives). Doing so may cause a delay of up to a
-	few seconds. */
-	if(!PathIsRoot(szPath))
-	{
-		m_itemInfoMap[uItemId].bDrive = FALSE;
-
-		WIN32_FIND_DATA wfd;
-		hFirstFile = FindFirstFile(szPath,&wfd);
-
-		m_itemInfoMap[uItemId].wfd = wfd;
-	}
-	else
-	{
-		m_itemInfoMap[uItemId].bDrive = TRUE;
-		StringCchCopy(m_itemInfoMap[uItemId].szDrive,
-			SIZEOF_ARRAY(m_itemInfoMap[uItemId].szDrive),
-			szPath);
-
-		hFirstFile = INVALID_HANDLE_VALUE;
-	}
-
-	/* Need to use this, since may be in a virtual folder
-	(such as the recycle bin), but items still exist. */
-	if(hFirstFile != INVALID_HANDLE_VALUE)
-	{
-		FindClose(hFirstFile);
-	}
-	else
-	{
-		WIN32_FIND_DATA wfd;
-
-		StringCchCopy(wfd.cFileName, SIZEOF_ARRAY(wfd.cFileName), szFileName);
-		wfd.nFileSizeLow			= 0;
-		wfd.nFileSizeHigh			= 0;
-		wfd.dwFileAttributes		= FILE_ATTRIBUTE_DIRECTORY;
-
-		m_itemInfoMap[uItemId].wfd = wfd;
-	}
-
-	return uItemId;
 }
 
 HRESULT CShellBrowser::Refresh()
