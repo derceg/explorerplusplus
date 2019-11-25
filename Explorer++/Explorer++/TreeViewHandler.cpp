@@ -55,6 +55,17 @@ void Explorerplusplus::CreateFolderControls(void)
 	LoadString(m_hLanguageModule,IDS_HIDEFOLDERSPANE,szTemp,SIZEOF_ARRAY(szTemp));
 	m_hFoldersToolbar = CreateTabToolbar(m_hHolder,FOLDERS_TOOLBAR_CLOSE,szTemp);
 
+	m_InitializationFinished.addObserver([this] (bool newValue) {
+		if (newValue)
+		{
+			// Updating the treeview selection is relatively expensive, so it's
+			// not done at all during startup. Therefore, the selection will be
+			// set a single time, once the application initialization is
+			// complete and all tabs have been restored.
+			UpdateTreeViewSelection();
+		}
+	});
+
 	m_tabContainer->tabCreatedSignal.AddObserver([this] (int tabId, BOOL switchToNewTab) {
 		UNREFERENCED_PARAMETER(tabId);
 		UNREFERENCED_PARAMETER(switchToNewTab);
@@ -770,7 +781,7 @@ void Explorerplusplus::UpdateTreeViewSelection()
 	UINT			uDriveType;
 	BOOL			bNetworkPath = FALSE;
 
-	if (!m_config->synchronizeTreeview || !m_config->showFolders)
+	if (!m_InitializationFinished.get() || !m_config->synchronizeTreeview || !m_config->showFolders)
 	{
 		return;
 	}

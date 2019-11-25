@@ -163,7 +163,7 @@ void Explorerplusplus::OnCreate()
 
 	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 
-	m_InitializationFinished = true;
+	m_InitializationFinished.set(true);
 }
 
 /* Creates a low priority worker thread, and initializes COM on that thread. */

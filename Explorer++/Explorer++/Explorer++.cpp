@@ -74,7 +74,7 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	m_hNextClipboardViewer			= NULL;
 	m_ListViewMButtonItem			= -1;
 	m_zDeltaTotal					= 0;
-	m_InitializationFinished		= false;
+	m_InitializationFinished.set(false);
 
 	m_bBlockNext = FALSE;
 

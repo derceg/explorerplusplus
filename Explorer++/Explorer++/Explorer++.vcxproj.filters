@@ -723,6 +723,9 @@
     <ClInclude Include="ShellBrowser\ShellBrowser.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
+    <ClInclude Include="ValueWrapper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

@@ -323,7 +323,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	int				iTabBackingWidth;
 	int				iTabBackingLeft;
 
-	if (!m_InitializationFinished)
+	if (!m_InitializationFinished.get())
 	{
 		return TRUE;
 	}

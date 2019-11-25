@@ -16,6 +16,7 @@
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "UiTheming.h"
+#include "ValueWrapper.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -523,7 +524,7 @@ private:
 	int						m_iMaxArrangeMenuItem;
 	int						m_iLastSelectedTab;
 	ULONG					m_SHChangeNotifyID;
-	bool					m_InitializationFinished;
+	ValueWrapper<bool>		m_InitializationFinished;
 
 	/* Initialization. */
 	BOOL					m_bLoadSettingsFromXML;

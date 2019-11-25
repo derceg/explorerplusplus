@@ -702,6 +702,7 @@
     <ClInclude Include="ToolbarButtons.h" />
     <ClInclude Include="UiApi.h" />
     <ClInclude Include="UpdateCheckDialog.h" />
+    <ClInclude Include="ValueWrapper.h" />
     <ClInclude Include="ViewModeHelper.h" />
     <ClInclude Include="WildcardSelectDialog.h" />
     <ClInclude Include="XMLSettings.h" />
