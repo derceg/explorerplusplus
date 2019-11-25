@@ -485,10 +485,12 @@ void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 	{
 		m_pidlDirectory = ILCloneFull(pidlDirectory);
 
-		EnumFlags = SHCONTF_FOLDERS|SHCONTF_NONFOLDERS;
+		EnumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
 
-		if(m_folderSettings.showHidden)
-			EnumFlags |= SHCONTF_INCLUDEHIDDEN;
+		if (m_folderSettings.showHidden)
+		{
+			EnumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
+		}
 
 		hr = pShellFolder->EnumObjects(m_hOwner,EnumFlags,&pEnumIDList);
 

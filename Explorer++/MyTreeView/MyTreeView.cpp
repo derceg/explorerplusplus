@@ -518,8 +518,10 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 
 	EnumFlags = SHCONTF_FOLDERS;
 
-	if(m_bShowHidden)
-		EnumFlags |= SHCONTF_INCLUDEHIDDEN;
+	if (m_bShowHidden)
+	{
+		EnumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
+	}
 
 	hr = pShellFolder->EnumObjects(NULL,EnumFlags,&pEnumIDList);
 
