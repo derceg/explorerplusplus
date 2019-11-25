@@ -58,7 +58,7 @@ private:
 	void		AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory, HTREEITEM hParent);
 	void		DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName);
 	void		DirectoryAltered(void);
-	HTREEITEM	AddRoot(void);
+	HTREEITEM	AddRoot();
 	void		AddItem(const TCHAR *szFullFileName);
 	void		AddItemInternal(HTREEITEM hParent, const TCHAR *szFullFileName);
 	void		AddDrive(const TCHAR *szDrive);

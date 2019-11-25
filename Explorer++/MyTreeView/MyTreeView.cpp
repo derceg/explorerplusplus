@@ -224,34 +224,27 @@ LRESULT CALLBACK CMyTreeView::OnNotify(HWND hwnd,
 	return DefSubclassProc(hwnd, msg, wParam, lParam);
 }
 
-HTREEITEM CMyTreeView::AddRoot(void)
+HTREEITEM CMyTreeView::AddRoot()
 {
-	IShellFolder	*pDesktopFolder = NULL;
-	TCHAR			szDesktopParsingPath[MAX_PATH];
-	TCHAR			szDesktopDisplayName[MAX_PATH];
-	SHFILEINFO		shfi;
-	HRESULT			hr;
-	TVINSERTSTRUCT	tvis;
-	TVITEMEX		tvItem;
-	HTREEITEM		hDesktop = NULL;
-	int				iItemId;
-
+	HTREEITEM hDesktop = nullptr;
 	TreeView_DeleteAllItems(m_hTreeView);
 
 	unique_pidl_absolute pidl;
-	hr = SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,wil::out_param(pidl));
+	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,wil::out_param(pidl));
 
 	if(SUCCEEDED(hr))
 	{
-		GetCsidlDisplayName(CSIDL_DESKTOP,szDesktopParsingPath,SIZEOF_ARRAY(szDesktopParsingPath),SHGDN_FORPARSING);
-		GetDisplayName(szDesktopParsingPath,szDesktopDisplayName,SIZEOF_ARRAY(szDesktopDisplayName),SHGDN_INFOLDER);
+		TCHAR szDesktopDisplayName[MAX_PATH];
+		GetDisplayName(pidl.get(),szDesktopDisplayName,SIZEOF_ARRAY(szDesktopDisplayName),SHGDN_INFOLDER);
 
+		SHFILEINFO shfi;
 		SHGetFileInfo((LPTSTR)pidl.get(),NULL,&shfi,NULL,SHGFI_PIDL|SHGFI_SYSICONINDEX);
 
-		iItemId = GenerateUniqueItemId();
+		int iItemId = GenerateUniqueItemId();
 		m_pItemInfo[iItemId].pidl = ILCloneFull(pidl.get());
 		m_uItemMap[iItemId] = 1;
 
+		TVITEMEX tvItem;
 		tvItem.mask				= TVIF_TEXT|TVIF_IMAGE|TVIF_CHILDREN|TVIF_SELECTEDIMAGE|TVIF_PARAM;
 		tvItem.pszText			= szDesktopDisplayName;
 		tvItem.cchTextMax		= lstrlen(szDesktopDisplayName);
@@ -260,6 +253,7 @@ HTREEITEM CMyTreeView::AddRoot(void)
 		tvItem.cChildren		= 1;
 		tvItem.lParam			= (LPARAM)iItemId;
 
+		TVINSERTSTRUCT tvis;
 		tvis.hParent			= NULL;
 		tvis.hInsertAfter		= TVI_LAST;
 		tvis.itemex				= tvItem;
@@ -268,6 +262,7 @@ HTREEITEM CMyTreeView::AddRoot(void)
 
 		if(hDesktop != NULL)
 		{
+			IShellFolder *pDesktopFolder = NULL;
 			hr = SHGetDesktopFolder(&pDesktopFolder);
 
 			if(SUCCEEDED(hr))
