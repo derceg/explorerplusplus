@@ -152,32 +152,32 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 	switch(m_folderSettings.sortMode)
 	{
 		case SortMode::Name:
-			groupHeader = DetermineItemNameGroup(iItemInternal);
+			groupHeader = DetermineItemNameGroup(basicItemInfo);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Type:
-			groupHeader = DetermineItemTypeGroupVirtual(iItemInternal);
+			groupHeader = DetermineItemTypeGroupVirtual(basicItemInfo);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Size:
-			groupHeader = DetermineItemSizeGroup(iItemInternal);
+			groupHeader = DetermineItemSizeGroup(basicItemInfo);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::DateModified:
-			groupHeader = DetermineItemDateGroup(iItemInternal, GroupByDateType::Modified);
+			groupHeader = DetermineItemDateGroup(basicItemInfo, GroupByDateType::Modified);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::TotalSize:
-			groupHeader = DetermineItemTotalSizeGroup(iItemInternal);
+			groupHeader = DetermineItemTotalSizeGroup(basicItemInfo);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::FreeSpace:
-			groupHeader = DetermineItemFreeSpaceGroup(iItemInternal);
+			groupHeader = DetermineItemFreeSpaceGroup(basicItemInfo);
 			groupComparison = GroupFreeSpaceComparisonStub;
 			break;
 
@@ -190,42 +190,42 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case SortMode::Attributes:
-			groupHeader = DetermineItemAttributeGroup(iItemInternal);
+			groupHeader = DetermineItemAttributeGroup(basicItemInfo);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::ShortName:
-			groupHeader = DetermineItemNameGroup(iItemInternal);
+			groupHeader = DetermineItemNameGroup(basicItemInfo);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Owner:
-			groupHeader = DetermineItemOwnerGroup(iItemInternal);
+			groupHeader = DetermineItemOwnerGroup(basicItemInfo);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::ProductName:
-			groupHeader = DetermineItemVersionGroup(iItemInternal,_T("ProductName"));
+			groupHeader = DetermineItemVersionGroup(basicItemInfo,_T("ProductName"));
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Company:
-			groupHeader = DetermineItemVersionGroup(iItemInternal,_T("CompanyName"));
+			groupHeader = DetermineItemVersionGroup(basicItemInfo,_T("CompanyName"));
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Description:
-			groupHeader = DetermineItemVersionGroup(iItemInternal,_T("FileDescription"));
+			groupHeader = DetermineItemVersionGroup(basicItemInfo,_T("FileDescription"));
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::FileVersion:
-			groupHeader = DetermineItemVersionGroup(iItemInternal,_T("FileVersion"));
+			groupHeader = DetermineItemVersionGroup(basicItemInfo,_T("FileVersion"));
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::ProductVersion:
-			groupHeader = DetermineItemVersionGroup(iItemInternal,_T("ProductVersion"));
+			groupHeader = DetermineItemVersionGroup(basicItemInfo,_T("ProductVersion"));
 			groupComparison = GroupNameComparisonStub;
 			break;
 
@@ -236,17 +236,17 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case SortMode::Extension:
-			groupHeader = DetermineItemExtensionGroup(iItemInternal);
+			groupHeader = DetermineItemExtensionGroup(basicItemInfo);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Created:
-			groupHeader = DetermineItemDateGroup(iItemInternal, GroupByDateType::Created);
+			groupHeader = DetermineItemDateGroup(basicItemInfo, GroupByDateType::Created);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Accessed:
-			groupHeader = DetermineItemDateGroup(iItemInternal, GroupByDateType::Accessed);
+			groupHeader = DetermineItemDateGroup(basicItemInfo, GroupByDateType::Accessed);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
@@ -277,22 +277,22 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 
 
 		case SortMode::CameraModel:
-			groupHeader = DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagEquipModel);
+			groupHeader = DetermineItemCameraPropertyGroup(basicItemInfo,PropertyTagEquipModel);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::DateTaken:
-			groupHeader = DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagDateTime);
+			groupHeader = DetermineItemCameraPropertyGroup(basicItemInfo,PropertyTagDateTime);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Width:
-			groupHeader = DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagImageWidth);
+			groupHeader = DetermineItemCameraPropertyGroup(basicItemInfo,PropertyTagImageWidth);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Height:
-			groupHeader = DetermineItemCameraPropertyGroup(iItemInternal,PropertyTagImageHeight);
+			groupHeader = DetermineItemCameraPropertyGroup(basicItemInfo,PropertyTagImageHeight);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
@@ -301,7 +301,7 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case SortMode::FileSystem:
-			groupHeader = DetermineItemFileSystemGroup(iItemInternal);
+			groupHeader = DetermineItemFileSystemGroup(basicItemInfo);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
@@ -318,7 +318,7 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case SortMode::NetworkAdapterStatus:
-			groupHeader = DetermineItemNetworkStatus(iItemInternal);
+			groupHeader = DetermineItemNetworkStatus(basicItemInfo);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
@@ -392,11 +392,11 @@ int CShellBrowser::CheckGroup(std::wstring_view groupHeader, PFNLVGROUPCOMPARE g
  * is non-NULL.
  */
 /* TODO: These groups have changed as of Windows Visa.*/
-std::wstring CShellBrowser::DetermineItemNameGroup(int iItemInternal) const
+std::wstring CShellBrowser::DetermineItemNameGroup(const BasicItemInfo_t &itemInfo) const
 {
 	/* Take the first character of the item's name,
 	and use it to determine which group it belongs to. */
-	TCHAR ch = m_itemInfoMap.at(iItemInternal).szDisplayName[0];
+	TCHAR ch = itemInfo.szDisplayName[0];
 
 	if(iswalpha(ch))
 	{
@@ -414,7 +414,7 @@ std::wstring CShellBrowser::DetermineItemNameGroup(int iItemInternal) const
  * Also returns the text header for the group when szGroupHeader
  * is non-NULL.
  */
-std::wstring CShellBrowser::DetermineItemSizeGroup(int iItemInternal) const
+std::wstring CShellBrowser::DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const
 {
 	TCHAR *SizeGroups[] = {_T("Folders"),_T("Tiny"),_T("Small"),_T("Medium"),_T("Large"),_T("Huge")};
 	int SizeGroupLimits[] = {0,0,32 * KBYTE,100 * KBYTE,MBYTE,10 * MBYTE};
@@ -422,7 +422,7 @@ std::wstring CShellBrowser::DetermineItemSizeGroup(int iItemInternal) const
 	int iSize;
 	int i;
 
-	if((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	if((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	== FILE_ATTRIBUTE_DIRECTORY)
 	{
 		/* This item is a folder. */
@@ -432,8 +432,7 @@ std::wstring CShellBrowser::DetermineItemSizeGroup(int iItemInternal) const
 	{
 		i = nGroups - 1;
 
-		double FileSize = m_itemInfoMap.at(iItemInternal).wfd.nFileSizeLow +
-		(m_itemInfoMap.at(iItemInternal).wfd.nFileSizeHigh * pow(2.0,32.0));
+		double FileSize = itemInfo.wfd.nFileSizeLow + (itemInfo.wfd.nFileSizeHigh * pow(2.0,32.0));
 
 		/* Check which of the size groups this item belongs to. */
 		while(FileSize < SizeGroupLimits[i]
@@ -453,7 +452,7 @@ std::wstring CShellBrowser::DetermineItemSizeGroup(int iItemInternal) const
  * is non-NULL.
  */
 /* TODO: These groups have changed as of Windows Vista. */
-std::wstring CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal) const
+std::wstring CShellBrowser::DetermineItemTotalSizeGroup(const BasicItemInfo_t &itemInfo) const
 {
 	IShellFolder *pShellFolder	= NULL;
 	PCITEMID_CHILD pidlRelative	= NULL;
@@ -475,7 +474,7 @@ std::wstring CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal) const
 	TotalSizeGroupLimits[3].QuadPart	= 20 * TotalSizeGroupLimits[2].QuadPart;
 	TotalSizeGroupLimits[4].QuadPart	= 100 * TotalSizeGroupLimits[2].QuadPart;
 
-	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
+	SHBindToParent(itemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
 	StrRetToBuf(&str,pidlRelative,szItem,SIZEOF_ARRAY(szItem));
@@ -504,18 +503,18 @@ std::wstring CShellBrowser::DetermineItemTotalSizeGroup(int iItemInternal) const
 	return SizeGroups[iSize];
 }
 
-std::wstring CShellBrowser::DetermineItemTypeGroupVirtual(int iItemInternal) const
+std::wstring CShellBrowser::DetermineItemTypeGroupVirtual(const BasicItemInfo_t &itemInfo) const
 {
 	SHFILEINFO shfi;
 	std::list<TypeGroup_t>::iterator itr;
 
-	SHGetFileInfo((LPTSTR)m_itemInfoMap.at(iItemInternal).pidlComplete.get(),
-		0,&shfi,sizeof(shfi),SHGFI_PIDL|SHGFI_TYPENAME);
+	SHGetFileInfo((LPTSTR)itemInfo.pidlComplete.get(), 0, &shfi, sizeof(shfi),
+		SHGFI_PIDL | SHGFI_TYPENAME);
 
 	return shfi.szTypeName;
 }
 
-std::wstring CShellBrowser::DetermineItemDateGroup(int iItemInternal, GroupByDateType dateType) const
+std::wstring CShellBrowser::DetermineItemDateGroup(const BasicItemInfo_t &itemInfo, GroupByDateType dateType) const
 {
 	using namespace boost::gregorian;
 	using namespace boost::posix_time;
@@ -526,15 +525,15 @@ std::wstring CShellBrowser::DetermineItemDateGroup(int iItemInternal, GroupByDat
 	switch(dateType)
 	{
 	case GroupByDateType::Modified:
-		ret = FileTimeToLocalSystemTime(&m_itemInfoMap.at(iItemInternal).wfd.ftLastWriteTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&itemInfo.wfd.ftLastWriteTime, &stFileTime);
 		break;
 
 	case GroupByDateType::Created:
-		ret = FileTimeToLocalSystemTime(&m_itemInfoMap.at(iItemInternal).wfd.ftCreationTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&itemInfo.wfd.ftCreationTime, &stFileTime);
 		break;
 
 	case GroupByDateType::Accessed:
-		ret = FileTimeToLocalSystemTime(&m_itemInfoMap.at(iItemInternal).wfd.ftLastAccessTime, &stFileTime);
+		ret = FileTimeToLocalSystemTime(&itemInfo.wfd.ftLastAccessTime, &stFileTime);
 		break;
 
 	default:
@@ -640,7 +639,7 @@ std::wstring CShellBrowser::DetermineItemSummaryGroup(const BasicItemInfo_t &ite
 }
 
 /* TODO: Need to sort based on percentage free. */
-std::wstring CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal) const
+std::wstring CShellBrowser::DetermineItemFreeSpaceGroup(const BasicItemInfo_t &itemInfo) const
 {
 	std::list<TypeGroup_t>::iterator itr;
 	TCHAR szFreeSpace[MAX_PATH];
@@ -653,7 +652,7 @@ std::wstring CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal) const
 	BOOL bRoot;
 	BOOL bRes = FALSE;
 
-	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),
+	SHBindToParent(itemInfo.pidlComplete.get(),
 		IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
@@ -687,14 +686,14 @@ std::wstring CShellBrowser::DetermineItemFreeSpaceGroup(int iItemInternal) const
 	return szFreeSpace;
 }
 
-std::wstring CShellBrowser::DetermineItemAttributeGroup(int iItemInternal) const
+std::wstring CShellBrowser::DetermineItemAttributeGroup(const BasicItemInfo_t &itemInfo) const
 {
 	TCHAR FullFileName[MAX_PATH];
 	std::list<TypeGroup_t>::iterator itr;
 	TCHAR szAttributes[32];
 
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_itemInfoMap.at(iItemInternal).wfd.cFileName);
+	PathAppend(FullFileName,itemInfo.wfd.cFileName);
 
 	BuildFileAttributeString(FullFileName,szAttributes,
 		SIZEOF_ARRAY(szAttributes));
@@ -702,14 +701,14 @@ std::wstring CShellBrowser::DetermineItemAttributeGroup(int iItemInternal) const
 	return szAttributes;
 }
 
-std::wstring CShellBrowser::DetermineItemOwnerGroup(int iItemInternal) const
+std::wstring CShellBrowser::DetermineItemOwnerGroup(const BasicItemInfo_t &itemInfo) const
 {
 	TCHAR FullFileName[MAX_PATH];
 	std::list<TypeGroup_t>::iterator itr;
 	TCHAR szOwner[512];
 
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_itemInfoMap.at(iItemInternal).wfd.cFileName);
+	PathAppend(FullFileName,itemInfo.wfd.cFileName);
 
 	BOOL ret = GetFileOwner(FullFileName,szOwner,SIZEOF_ARRAY(szOwner));
 
@@ -721,7 +720,7 @@ std::wstring CShellBrowser::DetermineItemOwnerGroup(int iItemInternal) const
 	return szOwner;
 }
 
-std::wstring CShellBrowser::DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionType) const
+std::wstring CShellBrowser::DetermineItemVersionGroup(const BasicItemInfo_t &itemInfo, const TCHAR *szVersionType) const
 {
 	BOOL bGroupFound = FALSE;
 	TCHAR FullFileName[MAX_PATH];
@@ -730,7 +729,7 @@ std::wstring CShellBrowser::DetermineItemVersionGroup(int iItemInternal,TCHAR *s
 	BOOL bVersionInfoObtained;
 
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_itemInfoMap.at(iItemInternal).wfd.cFileName);
+	PathAppend(FullFileName,itemInfo.wfd.cFileName);
 
 	bVersionInfoObtained = GetVersionInfoString(FullFileName,
 		szVersionType,szVersion,SIZEOF_ARRAY(szVersion));
@@ -743,7 +742,7 @@ std::wstring CShellBrowser::DetermineItemVersionGroup(int iItemInternal,TCHAR *s
 	return szVersion;
 }
 
-std::wstring CShellBrowser::DetermineItemCameraPropertyGroup(int iItemInternal,PROPID PropertyId) const
+std::wstring CShellBrowser::DetermineItemCameraPropertyGroup(const BasicItemInfo_t &itemInfo, PROPID PropertyId) const
 {
 	TCHAR szFullFileName[MAX_PATH];
 	std::list<TypeGroup_t>::iterator itr;
@@ -751,7 +750,7 @@ std::wstring CShellBrowser::DetermineItemCameraPropertyGroup(int iItemInternal,P
 	BOOL bRes;
 
 	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
-	PathAppend(szFullFileName,m_itemInfoMap.at(iItemInternal).wfd.cFileName);
+	PathAppend(szFullFileName,itemInfo.wfd.cFileName);
 
 	bRes = ReadImageProperty(szFullFileName,PropertyId,szProperty,
 		SIZEOF_ARRAY(szProperty));
@@ -762,16 +761,16 @@ std::wstring CShellBrowser::DetermineItemCameraPropertyGroup(int iItemInternal,P
 	return szProperty;
 }
 
-std::wstring CShellBrowser::DetermineItemExtensionGroup(int iItemInternal) const
+std::wstring CShellBrowser::DetermineItemExtensionGroup(const BasicItemInfo_t &itemInfo) const
 {
-	if ((m_itemInfoMap.at(iItemInternal).wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 	{
 		return ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_EXTENSION_FOLDER);
 	}
 
 	TCHAR FullFileName[MAX_PATH];
 	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,m_itemInfoMap.at(iItemInternal).wfd.cFileName);
+	PathAppend(FullFileName,itemInfo.wfd.cFileName);
 
 	TCHAR *pExt = PathFindExtension(FullFileName);
 
@@ -785,7 +784,7 @@ std::wstring CShellBrowser::DetermineItemExtensionGroup(int iItemInternal) const
 	}
 }
 
-std::wstring CShellBrowser::DetermineItemFileSystemGroup(int iItemInternal) const
+std::wstring CShellBrowser::DetermineItemFileSystemGroup(const BasicItemInfo_t &itemInfo) const
 {
 	IShellFolder *pShellFolder	= NULL;
 	PCITEMID_CHILD pidlRelative	= NULL;
@@ -795,7 +794,7 @@ std::wstring CShellBrowser::DetermineItemFileSystemGroup(int iItemInternal) cons
 	BOOL bRoot;
 	BOOL bRes;
 
-	SHBindToParent(m_itemInfoMap.at(iItemInternal).pidlComplete.get(),
+	SHBindToParent(itemInfo.pidlComplete.get(),
 		IID_PPV_ARGS(&pShellFolder), &pidlRelative);
 
 	pShellFolder->GetDisplayNameOf(pidlRelative,SHGDN_FORPARSING,&str);
@@ -824,12 +823,12 @@ std::wstring CShellBrowser::DetermineItemFileSystemGroup(int iItemInternal) cons
 }
 
 /* TODO: Fix. Need to check for each adapter. */
-std::wstring CShellBrowser::DetermineItemNetworkStatus(int iItemInternal) const
+std::wstring CShellBrowser::DetermineItemNetworkStatus(const BasicItemInfo_t &itemInfo) const
 {
 	/* When this function is
 	properly implemented, this
 	can be removed. */
-	UNREFERENCED_PARAMETER(iItemInternal);
+	UNREFERENCED_PARAMETER(itemInfo);
 
 	std::list<TypeGroup_t>::iterator itr;
 

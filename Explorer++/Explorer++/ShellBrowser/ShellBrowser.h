@@ -362,21 +362,21 @@ private:
 	INT CALLBACK		GroupFreeSpaceComparison(INT Group1_ID, INT Group2_ID);
 	std::wstring		RetrieveGroupHeader(int groupId);
 	int					DetermineItemGroup(int iItemInternal);
-	std::wstring		DetermineItemNameGroup(int iItemInternal) const;
-	std::wstring		DetermineItemSizeGroup(int iItemInternal) const;
-	std::wstring		DetermineItemTotalSizeGroup(int iItemInternal) const;
-	std::wstring		DetermineItemTypeGroupVirtual(int iItemInternal) const;
-	std::wstring		DetermineItemDateGroup(int iItemInternal, GroupByDateType dateType) const;
+	std::wstring		DetermineItemNameGroup(const BasicItemInfo_t &itemInfo) const;
+	std::wstring		DetermineItemSizeGroup(const BasicItemInfo_t &itemInfo) const;
+	std::wstring		DetermineItemTotalSizeGroup(const BasicItemInfo_t &itemInfo) const;
+	std::wstring		DetermineItemTypeGroupVirtual(const BasicItemInfo_t &itemInfo) const;
+	std::wstring		DetermineItemDateGroup(const BasicItemInfo_t &itemInfo, GroupByDateType dateType) const;
 	std::wstring		DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid,
 		const GlobalFolderSettings &globalFolderSettings) const;
-	std::wstring		DetermineItemFreeSpaceGroup(int iItemInternal) const;
-	std::wstring		DetermineItemAttributeGroup(int iItemInternal) const;
-	std::wstring		DetermineItemOwnerGroup(int iItemInternal) const;
-	std::wstring		DetermineItemVersionGroup(int iItemInternal, TCHAR *szVersionType) const;
-	std::wstring		DetermineItemCameraPropertyGroup(int iItemInternal, PROPID PropertyId) const;
-	std::wstring		DetermineItemExtensionGroup(int iItemInternal) const;
-	std::wstring		DetermineItemFileSystemGroup(int iItemInternal) const;
-	std::wstring		DetermineItemNetworkStatus(int iItemInternal) const;
+	std::wstring		DetermineItemFreeSpaceGroup(const BasicItemInfo_t &itemInfo) const;
+	std::wstring		DetermineItemAttributeGroup(const BasicItemInfo_t &itemInfo) const;
+	std::wstring		DetermineItemOwnerGroup(const BasicItemInfo_t &itemInfo) const;
+	std::wstring		DetermineItemVersionGroup(const BasicItemInfo_t &itemInfo, const TCHAR *szVersionType) const;
+	std::wstring		DetermineItemCameraPropertyGroup(const BasicItemInfo_t &itemInfo, PROPID PropertyId) const;
+	std::wstring		DetermineItemExtensionGroup(const BasicItemInfo_t &itemInfo) const;
+	std::wstring		DetermineItemFileSystemGroup(const BasicItemInfo_t &itemInfo) const;
+	std::wstring		DetermineItemNetworkStatus(const BasicItemInfo_t &itemInfo) const;
 
 	/* Other grouping support. */
 	int					CheckGroup(std::wstring_view groupHeader, PFNLVGROUPCOMPARE groupComparison);
