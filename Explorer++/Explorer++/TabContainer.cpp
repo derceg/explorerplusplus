@@ -375,7 +375,7 @@ void TabContainer::AddImagesToTabContextMenu(HMENU menu, std::vector<wil::unique
 
 	for (const auto &mapping : TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS)
 	{
-		SetMenuItemImage(menu, mapping.first, m_expp->GetIconResourceLoader(), mapping.second, dpi, menuImages);
+		ResourceHelper::SetMenuItemImage(menu, mapping.first, m_expp->GetIconResourceLoader(), mapping.second, dpi, menuImages);
 	}
 }
 

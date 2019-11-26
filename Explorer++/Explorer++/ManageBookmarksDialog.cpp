@@ -85,8 +85,9 @@ void CManageBookmarksDialog::SetupToolbar()
 	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
 	SendMessage(m_hToolbar, TB_SETBITMAPSIZE, 0, MAKELONG(iconWidth, iconHeight));
 
-	std::tie(m_imageListToolbar, m_imageListToolbarMappings) = CreateIconImageList(m_pexpp->GetIconResourceLoader(),
-		iconWidth, iconHeight, { Icon::Back, Icon::Forward, Icon::Copy, Icon::Views});
+	std::tie(m_imageListToolbar, m_imageListToolbarMappings) = ResourceHelper::CreateIconImageList(
+		m_pexpp->GetIconResourceLoader(), iconWidth, iconHeight, { Icon::Back, Icon::Forward,
+		Icon::Copy, Icon::Views});
 	SendMessage(m_hToolbar,TB_SETIMAGELIST,0,reinterpret_cast<LPARAM>(m_imageListToolbar.get()));
 
 	TBBUTTON tbb;

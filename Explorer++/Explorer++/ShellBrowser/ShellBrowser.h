@@ -36,7 +36,7 @@ typedef struct
 
 typedef struct
 {
-	TCHAR szHeader[512];
+	std::wstring header;
 	int iGroupId;
 
 	/* Used to record the number of items in this group.
@@ -353,27 +353,26 @@ private:
 	INT CALLBACK		GroupNameComparison(INT Group1_ID, INT Group2_ID);
 	static INT CALLBACK	GroupFreeSpaceComparisonStub(INT Group1_ID, INT Group2_ID, void *pvData);
 	INT CALLBACK		GroupFreeSpaceComparison(INT Group1_ID, INT Group2_ID);
-	TCHAR				*RetrieveGroupHeader(int iGroupId);
+	std::wstring		RetrieveGroupHeader(int groupId);
 	int					DetermineItemGroup(int iItemInternal);
-	void				DetermineItemNameGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemDateGroup(int iItemInternal,int iDateType,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemAttributeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemOwnerGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemVersionGroup(int iItemInternal,TCHAR *szVersionType,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemCameraPropertyGroup(int iItemInternal,PROPID PropertyId,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemExtensionGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemFileSystemGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemNetworkStatus(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-
-	/* Listview group support (virtual files). */
-	void				DetermineItemTypeGroupVirtual(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemTotalSizeGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemFreeSpaceGroup(int iItemInternal,TCHAR *szGroupHeader,int cchMax) const;
-	void				DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, TCHAR *szGroupHeader, size_t cchMax, const GlobalFolderSettings &globalFolderSettings) const;
+	std::wstring		DetermineItemNameGroup(int iItemInternal) const;
+	std::wstring		DetermineItemSizeGroup(int iItemInternal) const;
+	std::wstring		DetermineItemTotalSizeGroup(int iItemInternal) const;
+	std::wstring		DetermineItemTypeGroupVirtual(int iItemInternal) const;
+	std::wstring		DetermineItemDateGroup(int iItemInternal, int iDateType) const;
+	std::wstring		DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid,
+		const GlobalFolderSettings &globalFolderSettings) const;
+	std::wstring		DetermineItemFreeSpaceGroup(int iItemInternal) const;
+	std::wstring		DetermineItemAttributeGroup(int iItemInternal) const;
+	std::wstring		DetermineItemOwnerGroup(int iItemInternal) const;
+	std::wstring		DetermineItemVersionGroup(int iItemInternal, TCHAR *szVersionType) const;
+	std::wstring		DetermineItemCameraPropertyGroup(int iItemInternal, PROPID PropertyId) const;
+	std::wstring		DetermineItemExtensionGroup(int iItemInternal) const;
+	std::wstring		DetermineItemFileSystemGroup(int iItemInternal) const;
+	std::wstring		DetermineItemNetworkStatus(int iItemInternal) const;
 
 	/* Other grouping support. */
-	int					CheckGroup(const TCHAR *szGroupHeader, PFNLVGROUPCOMPARE pfnGroupCompare);
+	int					CheckGroup(std::wstring_view groupHeader, PFNLVGROUPCOMPARE groupComparison);
 	void				InsertItemIntoGroup(int iItem,int iGroupId);
 	void				MoveItemsIntoGroups(void);
 

@@ -7,7 +7,20 @@
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/ImageHelper.h"
 
-void SetMenuItemImage(HMENU menu, UINT menuItemId, IconResourceLoader *iconResourceLoader,
+std::wstring ResourceHelper::LoadString(HINSTANCE instance, UINT stringId)
+{
+	WCHAR *string;
+	int numCharacters = LoadString(instance, stringId, reinterpret_cast<LPWSTR>(&string), 0);
+
+	if (numCharacters == 0)
+	{
+		throw std::runtime_error("String resource not found");
+	}
+
+	return std::wstring(string, numCharacters);
+}
+
+void ResourceHelper::SetMenuItemImage(HMENU menu, UINT menuItemId, IconResourceLoader *iconResourceLoader,
 	Icon icon, int dpi, std::vector<wil::unique_hbitmap> &menuImages)
 {
 	DpiCompatibility dpiCompat;
@@ -28,7 +41,7 @@ void SetMenuItemImage(HMENU menu, UINT menuItemId, IconResourceLoader *iconResou
 	}
 }
 
-std::tuple<wil::unique_himagelist, IconImageListMapping> CreateIconImageList(IconResourceLoader *iconResourceLoader,
+std::tuple<wil::unique_himagelist, IconImageListMapping> ResourceHelper::CreateIconImageList(IconResourceLoader *iconResourceLoader,
 	int iconWidth, int iconHeight, const std::initializer_list<Icon> &icons)
 {
 	wil::unique_himagelist imageList(ImageList_Create(iconWidth, iconHeight, ILC_COLOR32 | ILC_MASK, 0, static_cast<int>(icons.size())));
@@ -42,7 +55,7 @@ std::tuple<wil::unique_himagelist, IconImageListMapping> CreateIconImageList(Ico
 	return { std::move(imageList), imageListMappings };
 }
 
-void AddIconToImageList(HIMAGELIST imageList, IconResourceLoader *iconResourceLoader, Icon icon,
+void ResourceHelper::AddIconToImageList(HIMAGELIST imageList, IconResourceLoader *iconResourceLoader, Icon icon,
 	int iconWidth, int iconHeight, IconImageListMapping &imageListMappings)
 {
 	wil::unique_hbitmap bitmap = iconResourceLoader->LoadBitmapFromPNGAndScale(icon, iconWidth, iconHeight);

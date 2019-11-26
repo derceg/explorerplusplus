@@ -27,7 +27,7 @@ CBookmarkTreeView::CBookmarkTreeView(HWND hTreeView, HINSTANCE hInstance,
 	UINT dpi = m_dpiCompat.GetDpiForWindow(hTreeView);
 	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
 	int iconHeight = m_dpiCompat.GetSystemMetricsForDpi(SM_CYSMICON, dpi);
-	std::tie(m_imageList, m_imageListMappings) = CreateIconImageList(expp->GetIconResourceLoader(),
+	std::tie(m_imageList, m_imageListMappings) = ResourceHelper::CreateIconImageList(expp->GetIconResourceLoader(),
 		iconWidth, iconHeight, { Icon::Folder});
 	TreeView_SetImageList(hTreeView, m_imageList.get(), TVSIL_NORMAL);
 
