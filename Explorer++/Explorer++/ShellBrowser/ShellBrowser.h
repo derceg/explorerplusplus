@@ -117,7 +117,6 @@ public:
 	WIN32_FIND_DATA		GetItemFileFindData(int iItem) const;
 	unique_pidl_absolute	GetItemCompleteIdl(int iItem) const;
 	unique_pidl_child	GetItemChildIdl(int iItem) const;
-	DWORD				GetItemAttributes(int iItem) const;
 	int					GetItemDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
 	HRESULT				GetItemFullName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;
 	

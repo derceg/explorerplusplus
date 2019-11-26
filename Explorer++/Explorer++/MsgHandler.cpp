@@ -1318,7 +1318,7 @@ LRESULT Explorerplusplus::OnCustomDraw(LPARAM lParam)
 
 		case CDDS_ITEMPREPAINT:
 			{
-				DWORD dwAttributes = m_pActiveShellBrowser->GetItemAttributes(static_cast<int>(pnmcd->dwItemSpec));
+				DWORD dwAttributes = m_pActiveShellBrowser->GetItemFileFindData(static_cast<int>(pnmcd->dwItemSpec)).dwFileAttributes;
 
 				TCHAR szFileName[MAX_PATH];
 				m_pActiveShellBrowser->GetItemFullName(static_cast<int>(pnmcd->dwItemSpec),szFileName,SIZEOF_ARRAY(szFileName));

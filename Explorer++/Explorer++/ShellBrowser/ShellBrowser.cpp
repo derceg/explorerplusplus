@@ -600,12 +600,6 @@ boost::optional<int> CShellBrowser::LocateItemByInternalIndex(int internalIndex)
 	return item;
 }
 
-DWORD CShellBrowser::GetItemAttributes(int iItem) const
-{
-	int internalIndex = GetItemInternalIndex(iItem);
-	return m_itemInfoMap.at(internalIndex).wfd.dwFileAttributes;
-}
-
 WIN32_FIND_DATA CShellBrowser::GetItemFileFindData(int iItem) const
 {
 	int internalIndex = GetItemInternalIndex(iItem);

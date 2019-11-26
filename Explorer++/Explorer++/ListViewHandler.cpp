@@ -806,7 +806,7 @@ BOOL Explorerplusplus::OnListViewEndLabelEdit(LPARAM lParam)
 		return 0;
 	}
 
-	dwAttributes = m_pActiveShellBrowser->GetItemAttributes(pItem->iItem);
+	dwAttributes = m_pActiveShellBrowser->GetItemFileFindData(pItem->iItem).dwFileAttributes;
 
 	if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) != FILE_ATTRIBUTE_DIRECTORY)
 	{
@@ -1647,7 +1647,7 @@ void Explorerplusplus::OpenAllSelectedItems(BOOL bOpenInNewTab)
 
 	while((iItem = ListView_GetNextItem(m_hActiveListView,iItem,LVIS_SELECTED)) != -1)
 	{
-		dwAttributes = m_pActiveShellBrowser->GetItemAttributes(iItem);
+		dwAttributes = m_pActiveShellBrowser->GetItemFileFindData(iItem).dwFileAttributes;
 
 		if((dwAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
 		{
