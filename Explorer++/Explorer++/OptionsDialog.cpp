@@ -16,6 +16,7 @@
 #include "Explorer++_internal.h"
 #include "MainResource.h"
 #include "ModelessDialogs.h"
+#include "ResourceHelper.h"
 #include "SetDefaultColumnsDialog.h"
 #include "ShellBrowser/ViewModes.h"
 #include "ViewModeHelper.h"
@@ -82,8 +83,7 @@ HWND OptionsDialog::Show(HWND parentWindow)
 		sheetHandles.push_back(CreatePropertySheetPage(&sheet));
 	}
 
-	TCHAR szTitle[64];
-	LoadString(m_instance,IDS_OPTIONSDIALOG_TITLE, szTitle,SIZEOF_ARRAY(szTitle));
+	std::wstring title = ResourceHelper::LoadString(m_instance, IDS_OPTIONSDIALOG_TITLE);
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(parentWindow);
 	int iconWidth = m_dpiCompat.GetSystemMetricsForDpi(SM_CXSMICON, dpi);
@@ -94,7 +94,7 @@ HWND OptionsDialog::Show(HWND parentWindow)
 	psh.dwSize		= sizeof(PROPSHEETHEADER);
 	psh.dwFlags		= PSH_DEFAULT|PSH_USECALLBACK|PSH_NOCONTEXTHELP|PSH_USEHICON|PSH_MODELESS;
 	psh.hwndParent	= parentWindow;
-	psh.pszCaption	= szTitle;
+	psh.pszCaption	= title.c_str();
 	psh.nPages		= static_cast<UINT>(sheetHandles.size());
 	psh.nStartPage	= 0;
 	psh.hIcon		= m_optionsDialogIcon.get();
@@ -297,9 +297,7 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 						{
 							bSuccess = TRUE;
 
-							TCHAR menuText[256];
-							LoadString(m_instance, IDS_OPEN_IN_EXPLORERPLUSPLUS,
-								menuText, SIZEOF_ARRAY(menuText));
+							std::wstring menuText = ResourceHelper::LoadString(m_instance, IDS_OPEN_IN_EXPLORERPLUSPLUS);
 
 							switch(ReplaceExplorerMode)
 							{
@@ -326,14 +324,14 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 								NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 								NDefaultFileManager::RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 								bSuccess = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
-									SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText);
+									SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
 								break;
 
 							case NDefaultFileManager::REPLACEEXPLORER_ALL:
 								NDefaultFileManager::RemoveAsDefaultFileManagerFileSystem(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 								NDefaultFileManager::RemoveAsDefaultFileManagerAll(SHELL_DEFAULT_INTERNAL_COMMAND_NAME);
 								bSuccess = NDefaultFileManager::SetAsDefaultFileManagerAll(
-									SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText);
+									SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
 								break;
 							}
 
@@ -343,10 +341,8 @@ INT_PTR CALLBACK OptionsDialog::GeneralSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 							}
 							else
 							{
-								TCHAR szErrorMsg[256];
-								LoadString(m_instance,IDS_ERR_FILEMANAGERSETTING,
-									szErrorMsg,SIZEOF_ARRAY(szErrorMsg));
-								MessageBox(hDlg,szErrorMsg,NExplorerplusplus::APP_NAME,MB_ICONWARNING);
+								std::wstring errorMessage = ResourceHelper::LoadString(m_instance, IDS_ERR_FILEMANAGERSETTING);
+								MessageBox(hDlg, errorMessage.c_str(), NExplorerplusplus::APP_NAME, MB_ICONWARNING);
 
 								int nIDButton;
 
@@ -505,9 +501,8 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wPar
 
 				for(int i = 0;i < SIZEOF_ARRAY(FILE_SIZES);i++)
 				{
-					TCHAR szTemp[32];
-					LoadString(m_instance,FILE_SIZES[i].StringID,szTemp,SIZEOF_ARRAY(szTemp));
-					SendMessage(hCBSize,CB_ADDSTRING,0,reinterpret_cast<LPARAM>(szTemp));
+					std::wstring fileSizeText = ResourceHelper::LoadString(m_instance,FILE_SIZES[i].StringID);
+					SendMessage(hCBSize,CB_ADDSTRING,0,reinterpret_cast<LPARAM>(fileSizeText.c_str()));
 					SendMessage(hCBSize,CB_SETITEMDATA,i,FILE_SIZES[i].sdf);
 
 					if(FILE_SIZES[i].sdf == m_config->globalFolderSettings.sizeDisplayFormat)
@@ -991,10 +986,9 @@ INT_PTR CALLBACK OptionsDialog::DefaultSettingsProc(HWND hDlg,UINT uMsg,WPARAM w
 				{
 					int StringID = GetViewModeMenuStringId(viewMode);
 
-					TCHAR szTemp[64];
-					LoadString(m_instance,StringID,szTemp,SIZEOF_ARRAY(szTemp));
+					std::wstring viewModeText = ResourceHelper::LoadString(m_instance, StringID);
 
-					int Index = static_cast<int>(SendMessage(hComboBox,CB_ADDSTRING,0,reinterpret_cast<LPARAM>(szTemp)));
+					int Index = static_cast<int>(SendMessage(hComboBox, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(viewModeText.c_str())));
 
 					if(Index != CB_ERR)
 					{
@@ -1089,14 +1083,12 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 	BROWSEINFO bi;
 	HWND hEdit;
 	TCHAR szDisplayName[MAX_PATH];
-	TCHAR szHelper[256];
 	TCHAR szNewTabDir[MAX_PATH];
 	TCHAR szVirtualParsingPath[MAX_PATH];
 	HRESULT hr;
 
 	/* Load the dialog helper message. */
-	LoadString(m_instance,IDS_DEFAULTSETTINGS_NEWTAB,
-		szHelper,SIZEOF_ARRAY(szHelper));
+	std::wstring helperText = ResourceHelper::LoadString(m_instance,IDS_DEFAULTSETTINGS_NEWTAB);
 
 	GetDlgItemText(hDlg,IDC_DEFAULT_NEWTABDIR_EDIT,szNewTabDir,
 		SIZEOF_ARRAY(szNewTabDir));
@@ -1115,7 +1107,7 @@ void OptionsDialog::OnDefaultSettingsNewTabDir(HWND hDlg)
 	bi.hwndOwner		= hDlg;
 	bi.pidlRoot			= NULL;
 	bi.pszDisplayName	= szDisplayName;
-	bi.lpszTitle		= szHelper;
+	bi.lpszTitle		= helperText.c_str();
 	bi.ulFlags			= BIF_NEWDIALOGSTYLE;
 	bi.lpfn				= NewTabDirectoryBrowseCallbackProc;
 
@@ -1185,11 +1177,10 @@ void OptionsDialog::AddIconThemes(HWND dlg)
 
 	for (auto theme : IconTheme::_values())
 	{
-		TCHAR string[64];
 		UINT stringResourceId = GetIconThemeStringResourceId(theme);
-		LoadString(m_instance, stringResourceId, string, static_cast<int>(std::size(string)));
+		std::wstring iconThemeName = ResourceHelper::LoadString(m_instance, stringResourceId);
 
-		int index = static_cast<int>(SendMessage(iconThemeControl, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(string)));
+		int index = static_cast<int>(SendMessage(iconThemeControl, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(iconThemeName.c_str())));
 
 		if (index == CB_ERR)
 		{

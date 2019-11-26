@@ -6,6 +6,7 @@
 #include "DrivesToolbar.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
 #include "../Helper/DriveInfo.h"
@@ -382,14 +383,13 @@ void CDrivesToolbar::AddMenuEntries(PCIDLIST_ABSOLUTE pidlParent,
 	UNREFERENCED_PARAMETER(pidlItems);
 	UNREFERENCED_PARAMETER(dwData);
 
-	TCHAR szTemp[64];
-	LoadString(m_hInstance,IDS_GENERAL_OPEN_IN_NEW_TAB,szTemp,SIZEOF_ARRAY(szTemp));
+	std::wstring openInNewTabText = ResourceHelper::LoadString(m_hInstance,IDS_GENERAL_OPEN_IN_NEW_TAB);
 
 	MENUITEMINFO mii;
 	mii.cbSize		= sizeof(mii);
 	mii.fMask		= MIIM_STRING|MIIM_ID;
 	mii.wID			= MENU_ID_OPEN_IN_NEW_TAB;
-	mii.dwTypeData	= szTemp;
+	mii.dwTypeData	= openInNewTabText.data();
 	InsertMenuItem(hMenu,1,TRUE,&mii);
 }
 

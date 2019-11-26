@@ -62,18 +62,15 @@ INT_PTR CMassRenameDialog::OnInitDialog()
 	ListView_SetImageList(hListView,himlSmall,LVSIL_SMALL);
 
 	LVCOLUMN lvCol;
-	TCHAR szTemp[64];
 
-	LoadString(GetInstance(),IDS_MASS_RENAME_CURRENT_NAME,
-		szTemp,SIZEOF_ARRAY(szTemp));
+	std::wstring currentNameText = ResourceHelper::LoadString(GetInstance(),IDS_MASS_RENAME_CURRENT_NAME);
 	lvCol.mask		= LVCF_TEXT;
-	lvCol.pszText	= szTemp;
+	lvCol.pszText	= currentNameText.data();
 	ListView_InsertColumn(hListView,1,&lvCol);
 
-	LoadString(GetInstance(),IDS_MASS_RENAME_PREVIEW_NAME,
-		szTemp,SIZEOF_ARRAY(szTemp));
+	std::wstring previewNameText = ResourceHelper::LoadString(GetInstance(),IDS_MASS_RENAME_PREVIEW_NAME);
 	lvCol.mask		= LVCF_TEXT;
-	lvCol.pszText	= szTemp;
+	lvCol.pszText	= previewNameText.data();
 	ListView_InsertColumn(hListView,2,&lvCol);
 
 	SendMessage(hListView,LVM_SETCOLUMNWIDTH,0,m_pmrdps->m_iColumnWidth1);

@@ -6,6 +6,7 @@
 #include "CommandLine.h"
 #include "Explorer++_internal.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/SetDefaultFileManager.h"
@@ -202,12 +203,10 @@ ensure you have administrator privileges."), NExplorerplusplus::APP_NAME, MB_ICO
 
 void OnSetAsDefault()
 {
-	TCHAR menuText[256];
-	LoadString(GetModuleHandle(0), IDS_OPEN_IN_EXPLORERPLUSPLUS,
-		menuText, SIZEOF_ARRAY(menuText));
+	std::wstring menuText = ResourceHelper::LoadString(GetModuleHandle(0), IDS_OPEN_IN_EXPLORERPLUSPLUS);
 
 	BOOL bSuccess = NDefaultFileManager::SetAsDefaultFileManagerFileSystem(
-		SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText);
+		SHELL_DEFAULT_INTERNAL_COMMAND_NAME, menuText.c_str());
 
 	if (bSuccess)
 	{

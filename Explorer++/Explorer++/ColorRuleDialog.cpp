@@ -6,6 +6,7 @@
 #include "ColorRuleDialog.h"
 #include "ColorRuleHelper.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/StringHelper.h"
@@ -68,10 +69,8 @@ INT_PTR CColorRuleDialog::OnInitDialog()
 		if(m_pColorRule->dwFilterAttributes & FILE_ATTRIBUTE_SYSTEM)
 			CheckDlgButton(m_hDlg,IDC_CHECK_SYSTEM,BST_CHECKED);
 
-		TCHAR szTemp[64];
-		LoadString(GetInstance(),IDS_EDITCOLORRULE,
-			szTemp,SIZEOF_ARRAY(szTemp));
-		SetWindowText(m_hDlg,szTemp);
+		std::wstring editText = ResourceHelper::LoadString(GetInstance(), IDS_EDITCOLORRULE);
+		SetWindowText(m_hDlg, editText.c_str());
 	}
 	else
 	{

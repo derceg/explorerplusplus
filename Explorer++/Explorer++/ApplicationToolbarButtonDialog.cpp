@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "ApplicationToolbarButtonDialog.h"
 #include "MainResource.h"
-
+#include "ResourceHelper.h"
 
 CApplicationToolbarButtonDialog::CApplicationToolbarButtonDialog(HINSTANCE hInstance,
 	int iResource,HWND hParent,ApplicationButton_t *Button,bool IsNew) :
@@ -20,10 +20,8 @@ INT_PTR CApplicationToolbarButtonDialog::OnInitDialog()
 {
 	if(m_IsNew)
 	{
-		TCHAR szTemp[64];
-		LoadString(GetInstance(),IDS_GENERAL_NEWAPPLICATIONBUTTON,
-			szTemp,SIZEOF_ARRAY(szTemp));
-		SetWindowText(m_hDlg,szTemp);
+		std::wstring newText = ResourceHelper::LoadString(GetInstance(), IDS_GENERAL_NEWAPPLICATIONBUTTON);
+		SetWindowText(m_hDlg, newText.c_str());
 	}
 
 	SetDlgItemText(m_hDlg,IDC_APP_EDIT_NAME,m_Button->Name.c_str());
