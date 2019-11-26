@@ -14,6 +14,7 @@
 #include "../Helper/TimeHelper.h"
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <wil/common.h>
 #include <iphlpapi.h>
 #include <propkey.h>
 #include <cassert>
@@ -688,100 +689,78 @@ std::wstring CShellBrowser::DetermineItemFreeSpaceGroup(const BasicItemInfo_t &i
 
 std::wstring CShellBrowser::DetermineItemAttributeGroup(const BasicItemInfo_t &itemInfo) const
 {
-	TCHAR FullFileName[MAX_PATH];
-	std::list<TypeGroup_t>::iterator itr;
+	std::wstring fullFileName = itemInfo.getFullPath();
+
 	TCHAR szAttributes[32];
-
-	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,itemInfo.wfd.cFileName);
-
-	BuildFileAttributeString(FullFileName,szAttributes,
-		SIZEOF_ARRAY(szAttributes));
+	BuildFileAttributeString(fullFileName.c_str(), szAttributes, std::size(szAttributes));
 
 	return szAttributes;
 }
 
 std::wstring CShellBrowser::DetermineItemOwnerGroup(const BasicItemInfo_t &itemInfo) const
 {
-	TCHAR FullFileName[MAX_PATH];
-	std::list<TypeGroup_t>::iterator itr;
+	std::wstring fullFileName = itemInfo.getFullPath();
+
 	TCHAR szOwner[512];
+	BOOL ret = GetFileOwner(fullFileName.c_str(), szOwner, std::size(szOwner));
 
-	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,itemInfo.wfd.cFileName);
-
-	BOOL ret = GetFileOwner(FullFileName,szOwner,SIZEOF_ARRAY(szOwner));
-
-	if(!ret)
+	if(ret)
 	{
-		StringCchCopy(szOwner,SIZEOF_ARRAY(szOwner),EMPTY_STRING);
+		return szOwner;
 	}
 
-	return szOwner;
+	return std::wstring();
 }
 
 std::wstring CShellBrowser::DetermineItemVersionGroup(const BasicItemInfo_t &itemInfo, const TCHAR *szVersionType) const
 {
-	BOOL bGroupFound = FALSE;
-	TCHAR FullFileName[MAX_PATH];
-	std::list<TypeGroup_t>::iterator itr;
+	std::wstring fullFileName = itemInfo.getFullPath();
+
 	TCHAR szVersion[512];
-	BOOL bVersionInfoObtained;
+	BOOL bVersionInfoObtained = GetVersionInfoString(fullFileName.c_str(),
+		szVersionType, szVersion, static_cast<UINT>(std::size(szVersion)));
 
-	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,itemInfo.wfd.cFileName);
+	if (bVersionInfoObtained)
+	{
+		return szVersion;
+	}
 
-	bVersionInfoObtained = GetVersionInfoString(FullFileName,
-		szVersionType,szVersion,SIZEOF_ARRAY(szVersion));
-
-	bGroupFound = FALSE;
-
-	if(!bVersionInfoObtained)
-		StringCchCopy(szVersion,SIZEOF_ARRAY(szVersion),_T("Unspecified"));
-
-	return szVersion;
+	return L"Unspecified";
 }
 
 std::wstring CShellBrowser::DetermineItemCameraPropertyGroup(const BasicItemInfo_t &itemInfo, PROPID PropertyId) const
 {
-	TCHAR szFullFileName[MAX_PATH];
-	std::list<TypeGroup_t>::iterator itr;
+	std::wstring fullFileName = itemInfo.getFullPath();
+
 	TCHAR szProperty[512];
-	BOOL bRes;
+	BOOL bRes = ReadImageProperty(fullFileName.c_str(), PropertyId, szProperty,
+		static_cast<int>(std::size(szProperty)));
 
-	StringCchCopy(szFullFileName,SIZEOF_ARRAY(szFullFileName),m_CurDir);
-	PathAppend(szFullFileName,itemInfo.wfd.cFileName);
+	if (bRes)
+	{
+		return szProperty;
+	}
 
-	bRes = ReadImageProperty(szFullFileName,PropertyId,szProperty,
-		SIZEOF_ARRAY(szProperty));
-
-	if(!bRes)
-		StringCchCopy(szProperty,SIZEOF_ARRAY(szProperty),_T("Other"));
-
-	return szProperty;
+	return L"Other";
 }
 
 std::wstring CShellBrowser::DetermineItemExtensionGroup(const BasicItemInfo_t &itemInfo) const
 {
-	if ((itemInfo.wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == FILE_ATTRIBUTE_DIRECTORY)
+	if (WI_IsFlagSet(itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 	{
 		return ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_EXTENSION_FOLDER);
 	}
 
-	TCHAR FullFileName[MAX_PATH];
-	StringCchCopy(FullFileName,SIZEOF_ARRAY(FullFileName),m_CurDir);
-	PathAppend(FullFileName,itemInfo.wfd.cFileName);
+	std::wstring fullFileName = itemInfo.getFullPath();
+	TCHAR *pExt = PathFindExtension(fullFileName.c_str());
 
-	TCHAR *pExt = PathFindExtension(FullFileName);
-
-	if(*pExt == '\0')
-	{
-		return ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_EXTENSION_NONE);
-	}
-	else
+	if(*pExt != '\0')
 	{
 		return pExt;
+		
 	}
+
+	return ResourceHelper::LoadString(m_hResourceModule, IDS_GROUPBY_EXTENSION_NONE);
 }
 
 std::wstring CShellBrowser::DetermineItemFileSystemGroup(const BasicItemInfo_t &itemInfo) const

@@ -191,7 +191,7 @@ BOOL CompareFileTypes(const TCHAR *pszFile1,const TCHAR *pszFile2)
 	return FALSE;
 }
 
-HRESULT BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, DWORD cchMax)
+HRESULT BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, size_t cchMax)
 {
 	/* FindFirstFile is used instead of GetFileAttributes() or
 	GetFileAttributesEx() because of its behaviour
@@ -211,7 +211,7 @@ HRESULT BuildFileAttributeString(const TCHAR *lpszFileName, TCHAR *szOutput, DWO
 	return hr;
 }
 
-HRESULT BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, DWORD cchMax)
+HRESULT BuildFileAttributeString(DWORD dwFileAttributes, TCHAR *szOutput, size_t cchMax)
 {
 	TCHAR szAttributes[8];
 	int i = 0;
