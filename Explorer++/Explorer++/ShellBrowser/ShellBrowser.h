@@ -255,6 +255,13 @@ private:
 		std::wstring infoTip;
 	};
 
+	enum class GroupByDateType
+	{
+		Created,
+		Modified,
+		Accessed
+	};
+
 	static const int THUMBNAIL_ITEM_HORIZONTAL_SPACING = 20;
 	static const int THUMBNAIL_ITEM_VERTICAL_SPACING = 20;
 
@@ -359,7 +366,7 @@ private:
 	std::wstring		DetermineItemSizeGroup(int iItemInternal) const;
 	std::wstring		DetermineItemTotalSizeGroup(int iItemInternal) const;
 	std::wstring		DetermineItemTypeGroupVirtual(int iItemInternal) const;
-	std::wstring		DetermineItemDateGroup(int iItemInternal, int iDateType) const;
+	std::wstring		DetermineItemDateGroup(int iItemInternal, GroupByDateType dateType) const;
 	std::wstring		DetermineItemSummaryGroup(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid,
 		const GlobalFolderSettings &globalFolderSettings) const;
 	std::wstring		DetermineItemFreeSpaceGroup(int iItemInternal) const;

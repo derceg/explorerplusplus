@@ -26,13 +26,6 @@ namespace
 	static const UINT GBYTE = 1024 * 1024 *1024;
 }
 
-#define GROUP_BY_DATECREATED	0
-#define GROUP_BY_DATEMODIFIED	1
-#define GROUP_BY_DATEACCESSED	2
-
-#define GROUP_BY_SIZE			0
-#define GROUP_BY_TOTALSIZE		1
-
 BOOL CShellBrowser::GetShowInGroups(void) const
 {
 	return m_folderSettings.showInGroups;
@@ -174,7 +167,7 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case SortMode::DateModified:
-			groupHeader = DetermineItemDateGroup(iItemInternal,GROUP_BY_DATEMODIFIED);
+			groupHeader = DetermineItemDateGroup(iItemInternal, GroupByDateType::Modified);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
@@ -248,12 +241,12 @@ int CShellBrowser::DetermineItemGroup(int iItemInternal)
 			break;
 
 		case SortMode::Created:
-			groupHeader = DetermineItemDateGroup(iItemInternal,GROUP_BY_DATECREATED);
+			groupHeader = DetermineItemDateGroup(iItemInternal, GroupByDateType::Created);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
 		case SortMode::Accessed:
-			groupHeader = DetermineItemDateGroup(iItemInternal,GROUP_BY_DATEACCESSED);
+			groupHeader = DetermineItemDateGroup(iItemInternal, GroupByDateType::Accessed);
 			groupComparison = GroupNameComparisonStub;
 			break;
 
@@ -522,7 +515,7 @@ std::wstring CShellBrowser::DetermineItemTypeGroupVirtual(int iItemInternal) con
 	return shfi.szTypeName;
 }
 
-std::wstring CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateType) const
+std::wstring CShellBrowser::DetermineItemDateGroup(int iItemInternal, GroupByDateType dateType) const
 {
 	using namespace boost::gregorian;
 	using namespace boost::posix_time;
@@ -530,17 +523,17 @@ std::wstring CShellBrowser::DetermineItemDateGroup(int iItemInternal,int iDateTy
 	SYSTEMTIME stFileTime;
 	BOOL ret = FALSE;
 
-	switch(iDateType)
+	switch(dateType)
 	{
-	case GROUP_BY_DATEMODIFIED:
+	case GroupByDateType::Modified:
 		ret = FileTimeToLocalSystemTime(&m_itemInfoMap.at(iItemInternal).wfd.ftLastWriteTime, &stFileTime);
 		break;
 
-	case GROUP_BY_DATECREATED:
+	case GroupByDateType::Created:
 		ret = FileTimeToLocalSystemTime(&m_itemInfoMap.at(iItemInternal).wfd.ftCreationTime, &stFileTime);
 		break;
 
-	case GROUP_BY_DATEACCESSED:
+	case GroupByDateType::Accessed:
 		ret = FileTimeToLocalSystemTime(&m_itemInfoMap.at(iItemInternal).wfd.ftLastAccessTime, &stFileTime);
 		break;
 
