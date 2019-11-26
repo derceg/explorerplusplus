@@ -507,8 +507,6 @@ std::wstring CShellBrowser::DetermineItemTotalSizeGroup(const BasicItemInfo_t &i
 std::wstring CShellBrowser::DetermineItemTypeGroupVirtual(const BasicItemInfo_t &itemInfo) const
 {
 	SHFILEINFO shfi;
-	std::list<TypeGroup_t>::iterator itr;
-
 	SHGetFileInfo((LPTSTR)itemInfo.pidlComplete.get(), 0, &shfi, sizeof(shfi),
 		SHGFI_PIDL | SHGFI_TYPENAME);
 
@@ -642,7 +640,6 @@ std::wstring CShellBrowser::DetermineItemSummaryGroup(const BasicItemInfo_t &ite
 /* TODO: Need to sort based on percentage free. */
 std::wstring CShellBrowser::DetermineItemFreeSpaceGroup(const BasicItemInfo_t &itemInfo) const
 {
-	std::list<TypeGroup_t>::iterator itr;
 	TCHAR szFreeSpace[MAX_PATH];
 	IShellFolder *pShellFolder	= NULL;
 	PCITEMID_CHILD pidlRelative	= NULL;
@@ -808,8 +805,6 @@ std::wstring CShellBrowser::DetermineItemNetworkStatus(const BasicItemInfo_t &it
 	properly implemented, this
 	can be removed. */
 	UNREFERENCED_PARAMETER(itemInfo);
-
-	std::list<TypeGroup_t>::iterator itr;
 
 	TCHAR szStatus[32] = EMPTY_STRING;
 	IP_ADAPTER_ADDRESSES *pAdapterAddresses = NULL;
