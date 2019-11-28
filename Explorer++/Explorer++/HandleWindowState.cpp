@@ -134,7 +134,6 @@ void Explorerplusplus::SetSortMenuItemStates()
 	UINT uFirst;
 	UINT uLast;
 	HMENU hMenu;
-	HMENU hMenuRClick;
 	int nItems;
 	int i = 0;
 
@@ -152,7 +151,6 @@ void Explorerplusplus::SetSortMenuItemStates()
 	for(i = 0;i < nItems;i++)
 	{
 		CheckMenuItem(m_hSortSubMenu,i,MF_BYPOSITION|MF_UNCHECKED);
-		CheckMenuItem(m_hSortSubMenuRClick,i,MF_BYPOSITION|MF_UNCHECKED);
 	}
 
 	nItems = GetMenuItemCount(m_hGroupBySubMenu);
@@ -160,13 +158,11 @@ void Explorerplusplus::SetSortMenuItemStates()
 	for(i = 0;i < nItems;i++)
 	{
 		CheckMenuItem(m_hGroupBySubMenu,i,MF_BYPOSITION|MF_UNCHECKED);
-		CheckMenuItem(m_hGroupBySubMenuRClick,i,MF_BYPOSITION|MF_UNCHECKED);
 	}
 
 	if(bShowInGroups)
 	{
 		hMenu = m_hGroupBySubMenu;
-		hMenuRClick = m_hGroupBySubMenuRClick;
 
 		ItemToCheck = DetermineGroupModeMenuId(sortMode);
 
@@ -182,25 +178,18 @@ void Explorerplusplus::SetSortMenuItemStates()
 
 		lEnableMenuItem(m_hSortSubMenu,IDM_SORT_ASCENDING,FALSE);
 		lEnableMenuItem(m_hSortSubMenu,IDM_SORT_DESCENDING,FALSE);
-		lEnableMenuItem(m_hSortSubMenuRClick,IDM_SORT_ASCENDING,FALSE);
-		lEnableMenuItem(m_hSortSubMenuRClick,IDM_SORT_DESCENDING,FALSE);
 
 		lEnableMenuItem(m_hGroupBySubMenu,IDM_SORT_ASCENDING,TRUE);
 		lEnableMenuItem(m_hGroupBySubMenu,IDM_SORT_DESCENDING,TRUE);
-		lEnableMenuItem(m_hGroupBySubMenuRClick,IDM_SORT_ASCENDING,TRUE);
-		lEnableMenuItem(m_hGroupBySubMenuRClick,IDM_SORT_DESCENDING,TRUE);
 
 		/* May need to change this (i.e. uncheck each menu item
 		individually). */
 		CheckMenuRadioItem(m_hSortSubMenu,SORTBY_BASE,SORTBY_END,
 			0,MF_BYCOMMAND);
-		CheckMenuRadioItem(m_hSortSubMenuRClick,SORTBY_BASE,SORTBY_END,
-			0,MF_BYCOMMAND);
 	}
 	else
 	{
 		hMenu = m_hSortSubMenu;
-		hMenuRClick = m_hSortSubMenuRClick;
 
 		ItemToCheck = DetermineSortModeMenuId(sortMode);
 
@@ -216,18 +205,12 @@ void Explorerplusplus::SetSortMenuItemStates()
 
 		lEnableMenuItem(m_hGroupBySubMenu,IDM_SORT_ASCENDING,FALSE);
 		lEnableMenuItem(m_hGroupBySubMenu,IDM_SORT_DESCENDING,FALSE);
-		lEnableMenuItem(m_hGroupBySubMenuRClick,IDM_SORT_ASCENDING,FALSE);
-		lEnableMenuItem(m_hGroupBySubMenuRClick,IDM_SORT_DESCENDING,FALSE);
 
 		lEnableMenuItem(m_hSortSubMenu,IDM_SORT_ASCENDING,TRUE);
 		lEnableMenuItem(m_hSortSubMenu,IDM_SORT_DESCENDING,TRUE);
-		lEnableMenuItem(m_hSortSubMenuRClick,IDM_SORT_ASCENDING,TRUE);
-		lEnableMenuItem(m_hSortSubMenuRClick,IDM_SORT_DESCENDING,TRUE);
 	}
 
 	CheckMenuRadioItem(hMenu,uFirst,uLast,
-		ItemToCheck,MF_BYCOMMAND);
-	CheckMenuRadioItem(hMenuRClick,uFirst,uLast,
 		ItemToCheck,MF_BYCOMMAND);
 
 	if(m_pActiveShellBrowser->GetSortAscending())
@@ -236,7 +219,5 @@ void Explorerplusplus::SetSortMenuItemStates()
 		ItemToCheck = IDM_SORT_DESCENDING;
 
 	CheckMenuRadioItem(hMenu,IDM_SORT_ASCENDING,IDM_SORT_DESCENDING,
-		ItemToCheck,MF_BYCOMMAND);
-	CheckMenuRadioItem(hMenuRClick,IDM_SORT_ASCENDING,IDM_SORT_DESCENDING,
 		ItemToCheck,MF_BYCOMMAND);
 }

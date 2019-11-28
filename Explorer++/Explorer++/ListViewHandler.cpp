@@ -967,12 +967,12 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 
 	mii.cbSize		= sizeof(mii);
 	mii.fMask		= MIIM_SUBMENU;
-	mii.hSubMenu	= m_hSortSubMenuRClick;
+	mii.hSubMenu	= m_hSortSubMenu;
 	SetMenuItemInfo(hMenu,IDM_POPUP_SORTBY,FALSE,&mii);
 
 	mii.cbSize		= sizeof(mii);
 	mii.fMask		= MIIM_SUBMENU;
-	mii.hSubMenu	= m_hGroupBySubMenuRClick;
+	mii.hSubMenu	= m_hGroupBySubMenu;
 	SetMenuItemInfo(hMenu,IDM_POPUP_GROUPBY,FALSE,&mii);
 
 	UINT uViewMode = m_pActiveShellBrowser->GetViewMode();

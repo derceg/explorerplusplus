@@ -15,24 +15,6 @@
 #include "../Helper/ShellHelper.h"
 #include <list>
 
-void Explorerplusplus::InitializeSortMenuItems()
-{
-	HMENU hMainMenu = GetMenu(m_hContainer);
-
-	// Insert the default sort sub menu. This menu will not contain any sort
-	// menu items.
-	MENUITEMINFO mi;
-	mi.cbSize	= sizeof(mi);
-	mi.fMask	= MIIM_SUBMENU;
-	mi.hSubMenu	= m_hSortSubMenu;
-	SetMenuItemInfo(hMainMenu,IDM_VIEW_SORTBY,FALSE,&mi);
-
-	mi.cbSize	= sizeof(mi);
-	mi.fMask	= MIIM_SUBMENU;
-	mi.hSubMenu	= m_hGroupBySubMenu;
-	SetMenuItemInfo(hMainMenu,IDM_VIEW_GROUPBY,FALSE,&mi);
-}
-
 void Explorerplusplus::InsertSortMenuItems(HMENU hMenu)
 {
 	int index = 0;
@@ -49,7 +31,6 @@ void Explorerplusplus::InsertSortMenuItems(HMENU hMenu)
 		mi.dwTypeData	= menuText.data();
 		mi.wID			= menuItem.SortById;
 		InsertMenuItem(hMenu,index,TRUE,&mi);
-		InsertMenuItem(m_hSortSubMenuRClick,index,TRUE,&mi);
 
 		ZeroMemory(&mi,sizeof(mi));
 		mi.cbSize		= sizeof(mi);
@@ -57,7 +38,6 @@ void Explorerplusplus::InsertSortMenuItems(HMENU hMenu)
 		mi.dwTypeData	= menuText.data();
 		mi.wID			= menuItem.GroupById;
 		InsertMenuItem(m_hGroupBySubMenu,index,TRUE,&mi);
-		InsertMenuItem(m_hGroupBySubMenuRClick,index,TRUE,&mi);
 
 		index++;
 	}
@@ -68,9 +48,7 @@ void Explorerplusplus::DeleteSortMenuItems()
 	for (const SortMenuItem &menuItem : m_sortMenuItems)
 	{
 		DeleteMenu(m_hSortSubMenu, menuItem.SortById, MF_BYCOMMAND);
-		DeleteMenu(m_hSortSubMenuRClick, menuItem.SortById, MF_BYCOMMAND);
 		DeleteMenu(m_hGroupBySubMenu, menuItem.GroupById, MF_BYCOMMAND);
-		DeleteMenu(m_hGroupBySubMenuRClick, menuItem.GroupById, MF_BYCOMMAND);
 	}
 }
 

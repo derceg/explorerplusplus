@@ -95,22 +95,7 @@ void Explorerplusplus::OnCreate()
 
 	m_hTreeViewIconThread = CreateWorkerThread();
 
-	/* These need to occur after the language module
-	has been initialized, but before the tabs are
-	restored. */
-	HMENU mainMenu = LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_MAINMENU));
-
-	if (!g_enablePlugins)
-	{
-		DeleteMenu(mainMenu, IDM_TOOLS_RUNSCRIPT, MF_BYCOMMAND);
-	}
-
-	SetMenu(m_hContainer, mainMenu);
-
-	m_hSortSubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_SORT_MENU)), 0);
-	m_hSortSubMenuRClick = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_SORT_MENU)), 0);
-	m_hGroupBySubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
-	m_hGroupBySubMenuRClick = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
+	InitializeMainMenu();
 
 	CreateDirectoryMonitor(&m_pDirMon);
 
@@ -135,19 +120,13 @@ void Explorerplusplus::OnCreate()
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;
 
+	// Register for any shell changes. This should be done after the tabs have
+	// been created.
 	SHChangeNotifyEntry shcne;
-
-	/* Don't need to specify any file for this notification. */
 	shcne.fRecursive = TRUE;
 	shcne.pidl = NULL;
-
-	/* Register for any shell changes. This should
-	be done after the tabs have been created. */
 	m_SHChangeNotifyID = SHChangeNotifyRegister(m_hContainer, SHCNRF_ShellLevel,
 		SHCNE_ASSOCCHANGED, WM_APP_ASSOCCHANGED, 1, &shcne);
-
-	InitializeMainMenu();
-	InitializeSortMenuItems();
 
 	/* Place the main window in the clipboard chain. This
 	will allow the 'Paste' button to be enabled/disabled

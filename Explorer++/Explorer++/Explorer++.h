@@ -395,7 +395,6 @@ private:
 	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
 
 	/* Sort menu. */
-	void					InitializeSortMenuItems();
 	void					InsertSortMenuItems(HMENU hMenu);
 	void					DeleteSortMenuItems();
 	void					UpdateSortMenuItems();
@@ -509,8 +508,6 @@ private:
 	HWND					m_hNextClipboardViewer;
 	HMENU					m_hSortSubMenu;
 	HMENU					m_hGroupBySubMenu;
-	HMENU					m_hSortSubMenuRClick;
-	HMENU					m_hGroupBySubMenuRClick;
 	std::wstring			m_CurrentDirectory;
 	TCHAR					m_OldTreeViewFileName[MAX_PATH];
 	DWORD					m_Language;

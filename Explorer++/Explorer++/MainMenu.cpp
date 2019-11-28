@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "Explorer++.h"
+#include "Explorer++_internal.h"
 #include "Icon.h"
 #include "MainResource.h"
 #include "ResourceHelper.h"
@@ -55,26 +56,50 @@ const std::map<UINT, Icon> MAIN_MENU_IMAGE_MAPPINGS = {
 
 void Explorerplusplus::InitializeMainMenu()
 {
-	HMENU hMenu = GetMenu(m_hContainer);
+	// These need to occur after the language module has been initialized, but
+	// before the tabs are restored.
+	HMENU mainMenu = LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_MAINMENU));
 
-	AddViewModesToMenu(hMenu);
+	if (!g_enablePlugins)
+	{
+		DeleteMenu(mainMenu, IDM_TOOLS_RUNSCRIPT, MF_BYCOMMAND);
+	}
 
-	/* Delete the placeholder menu. */
-	DeleteMenu(hMenu, IDM_VIEW_PLACEHOLDER, MF_BYCOMMAND);
+	SetMenu(m_hContainer, mainMenu);
+
+	AddViewModesToMenu(mainMenu);
+
+	DeleteMenu(mainMenu, IDM_VIEW_PLACEHOLDER, MF_BYCOMMAND);
+
+	m_hSortSubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_SORT_MENU)), 0);
+	m_hGroupBySubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
+
+	// Insert the default sort sub menu. This menu will not contain any sort
+	// menu items.
+	MENUITEMINFO mi;
+	mi.cbSize = sizeof(mi);
+	mi.fMask = MIIM_SUBMENU;
+	mi.hSubMenu = m_hSortSubMenu;
+	SetMenuItemInfo(mainMenu, IDM_VIEW_SORTBY, FALSE, &mi);
+
+	mi.cbSize = sizeof(mi);
+	mi.fMask = MIIM_SUBMENU;
+	mi.hSubMenu = m_hGroupBySubMenu;
+	SetMenuItemInfo(mainMenu, IDM_VIEW_GROUPBY, FALSE, &mi);
 
 	SetMainMenuImages();
 
-	SetGoMenuName(hMenu, IDM_GO_MYCOMPUTER, CSIDL_DRIVES);
-	SetGoMenuName(hMenu, IDM_GO_MYDOCUMENTS, CSIDL_PERSONAL);
-	SetGoMenuName(hMenu, IDM_GO_MYMUSIC, CSIDL_MYMUSIC);
-	SetGoMenuName(hMenu, IDM_GO_MYPICTURES, CSIDL_MYPICTURES);
-	SetGoMenuName(hMenu, IDM_GO_DESKTOP, CSIDL_DESKTOP);
-	SetGoMenuName(hMenu, IDM_GO_RECYCLEBIN, CSIDL_BITBUCKET);
-	SetGoMenuName(hMenu, IDM_GO_CONTROLPANEL, CSIDL_CONTROLS);
-	SetGoMenuName(hMenu, IDM_GO_PRINTERS, CSIDL_PRINTERS);
-	SetGoMenuName(hMenu, IDM_GO_CDBURNING, CSIDL_CDBURN_AREA);
-	SetGoMenuName(hMenu, IDM_GO_MYNETWORKPLACES, CSIDL_NETWORK);
-	SetGoMenuName(hMenu, IDM_GO_NETWORKCONNECTIONS, CSIDL_CONNECTIONS);
+	SetGoMenuName(mainMenu, IDM_GO_MYCOMPUTER, CSIDL_DRIVES);
+	SetGoMenuName(mainMenu, IDM_GO_MYDOCUMENTS, CSIDL_PERSONAL);
+	SetGoMenuName(mainMenu, IDM_GO_MYMUSIC, CSIDL_MYMUSIC);
+	SetGoMenuName(mainMenu, IDM_GO_MYPICTURES, CSIDL_MYPICTURES);
+	SetGoMenuName(mainMenu, IDM_GO_DESKTOP, CSIDL_DESKTOP);
+	SetGoMenuName(mainMenu, IDM_GO_RECYCLEBIN, CSIDL_BITBUCKET);
+	SetGoMenuName(mainMenu, IDM_GO_CONTROLPANEL, CSIDL_CONTROLS);
+	SetGoMenuName(mainMenu, IDM_GO_PRINTERS, CSIDL_PRINTERS);
+	SetGoMenuName(mainMenu, IDM_GO_CDBURNING, CSIDL_CDBURN_AREA);
+	SetGoMenuName(mainMenu, IDM_GO_MYNETWORKPLACES, CSIDL_NETWORK);
+	SetGoMenuName(mainMenu, IDM_GO_NETWORKCONNECTIONS, CSIDL_CONNECTIONS);
 }
 
 void Explorerplusplus::SetMainMenuImages()
