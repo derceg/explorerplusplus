@@ -128,96 +128,70 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 
 void Explorerplusplus::SetSortMenuItemStates()
 {
-	UINT ItemToCheck;
-	BOOL bShowInGroups;
-	BOOL bVirtualFolder;
-	UINT uFirst;
-	UINT uLast;
-	HMENU hMenu;
-	int nItems;
-	int i = 0;
-
-	bVirtualFolder = m_pActiveShellBrowser->InVirtualFolder();
-
 	const SortMode sortMode = m_pActiveShellBrowser->GetSortMode();
-
-	bShowInGroups = m_pActiveShellBrowser->GetShowInGroups();
+	BOOL bShowInGroups = m_pActiveShellBrowser->GetShowInGroups();
 
 	/* Go through both the sort by and group by menus and
 	remove all the checkmarks. Alternatively, could remember
 	which items have checkmarks, and just uncheck those. */
-	nItems = GetMenuItemCount(m_hSortSubMenu);
+	int nItems = GetMenuItemCount(m_hSortSubMenu);
 
-	for(i = 0;i < nItems;i++)
+	for(int i = 0;i < nItems;i++)
 	{
 		CheckMenuItem(m_hSortSubMenu,i,MF_BYPOSITION|MF_UNCHECKED);
 	}
 
 	nItems = GetMenuItemCount(m_hGroupBySubMenu);
 
-	for(i = 0;i < nItems;i++)
+	for(int i = 0;i < nItems;i++)
 	{
 		CheckMenuItem(m_hGroupBySubMenu,i,MF_BYPOSITION|MF_UNCHECKED);
 	}
 
+	HMENU activeMenu;
+	HMENU inactiveMenu;
+	UINT itemToCheck;
+	UINT firstItem;
+	UINT lastItem;
+
 	if(bShowInGroups)
 	{
-		hMenu = m_hGroupBySubMenu;
+		activeMenu = m_hGroupBySubMenu;
+		inactiveMenu = m_hSortSubMenu;
 
-		ItemToCheck = DetermineGroupModeMenuId(sortMode);
+		itemToCheck = DetermineGroupModeMenuId(sortMode);
 
-		if(ItemToCheck == -1)
-		{
-			/* Sort mode is invalid. Set it back to the default
-			(i.e. sort by name). */
-			ItemToCheck = IDM_GROUPBY_NAME;
-		}
-
-		uFirst = GROUPBY_BASE;
-		uLast = GROUPBY_END;
-
-		lEnableMenuItem(m_hSortSubMenu,IDM_SORT_ASCENDING,FALSE);
-		lEnableMenuItem(m_hSortSubMenu,IDM_SORT_DESCENDING,FALSE);
-
-		lEnableMenuItem(m_hGroupBySubMenu,IDM_SORT_ASCENDING,TRUE);
-		lEnableMenuItem(m_hGroupBySubMenu,IDM_SORT_DESCENDING,TRUE);
-
-		/* May need to change this (i.e. uncheck each menu item
-		individually). */
-		CheckMenuRadioItem(m_hSortSubMenu,SORTBY_BASE,SORTBY_END,
-			0,MF_BYCOMMAND);
+		firstItem = GROUPBY_BASE;
+		lastItem = GROUPBY_END;
 	}
 	else
 	{
-		hMenu = m_hSortSubMenu;
+		activeMenu = m_hSortSubMenu;
+		inactiveMenu = m_hGroupBySubMenu;
 
-		ItemToCheck = DetermineSortModeMenuId(sortMode);
+		itemToCheck = DetermineSortModeMenuId(sortMode);
 
-		if(ItemToCheck == -1)
-		{
-			/* Sort mode is invalid. Set it back to the default
-			(i.e. sort by name). */
-			ItemToCheck = IDM_SORTBY_NAME;
-		}
-
-		uFirst = SORTBY_BASE;
-		uLast = SORTBY_END;
-
-		lEnableMenuItem(m_hGroupBySubMenu,IDM_SORT_ASCENDING,FALSE);
-		lEnableMenuItem(m_hGroupBySubMenu,IDM_SORT_DESCENDING,FALSE);
-
-		lEnableMenuItem(m_hSortSubMenu,IDM_SORT_ASCENDING,TRUE);
-		lEnableMenuItem(m_hSortSubMenu,IDM_SORT_DESCENDING,TRUE);
+		firstItem = SORTBY_BASE;
+		lastItem = SORTBY_END;
 	}
 
-	CheckMenuRadioItem(hMenu,uFirst,uLast,
-		ItemToCheck,MF_BYCOMMAND);
+	lEnableMenuItem(inactiveMenu, IDM_SORT_ASCENDING, FALSE);
+	lEnableMenuItem(inactiveMenu, IDM_SORT_DESCENDING, FALSE);
 
-	if(m_pActiveShellBrowser->GetSortAscending())
-		ItemToCheck = IDM_SORT_ASCENDING;
+	lEnableMenuItem(activeMenu, IDM_SORT_ASCENDING, TRUE);
+	lEnableMenuItem(activeMenu, IDM_SORT_DESCENDING, TRUE);
+
+	CheckMenuRadioItem(activeMenu, firstItem, lastItem, itemToCheck, MF_BYCOMMAND);
+
+	if (m_pActiveShellBrowser->GetSortAscending())
+	{
+		itemToCheck = IDM_SORT_ASCENDING;
+	}
 	else
-		ItemToCheck = IDM_SORT_DESCENDING;
+	{
+		itemToCheck = IDM_SORT_DESCENDING;
+	}
 
-	CheckMenuRadioItem(hMenu,IDM_SORT_ASCENDING,IDM_SORT_DESCENDING,
-		ItemToCheck,MF_BYCOMMAND);
+	CheckMenuRadioItem(activeMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING,
+		itemToCheck, MF_BYCOMMAND);
 }
