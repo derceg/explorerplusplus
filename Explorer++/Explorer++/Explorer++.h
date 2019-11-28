@@ -525,7 +525,7 @@ private:
 	MainWindow				*m_mainWindow;
 	AddressBar				*m_addressBar;
 
-	Navigation				*m_navigation;
+	std::unique_ptr<Navigation>	m_navigation;
 
 	std::unique_ptr<IconResourceLoader>	m_iconResourceLoader;
 	DpiCompatibility		m_dpiCompat;

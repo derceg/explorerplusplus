@@ -89,9 +89,9 @@ void Explorerplusplus::OnCreate()
 
 	SetLanguageModule();
 
-	m_navigation = new Navigation(m_config, this);
+	m_navigation = std::make_unique<Navigation>(m_config, this);
 
-	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this, m_navigation);
+	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this, m_navigation.get());
 
 	m_hTreeViewIconThread = CreateWorkerThread();
 
@@ -115,7 +115,7 @@ void Explorerplusplus::OnCreate()
 	size initially. */
 	ResizeWindows();
 
-	m_taskbarThumbnails = TaskbarThumbnails::Create(this, m_tabContainer, m_navigation, m_hLanguageModule, m_config);
+	m_taskbarThumbnails = TaskbarThumbnails::Create(this, m_tabContainer, m_navigation.get(), m_hLanguageModule, m_config);
 
 	RestoreTabs(pLoadSave);
 	delete pLoadSave;

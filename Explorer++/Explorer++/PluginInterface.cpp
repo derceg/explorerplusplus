@@ -19,7 +19,7 @@ TabInterface *Explorerplusplus::GetTabInterface()
 
 Navigation *Explorerplusplus::GetNavigation()
 {
-	return m_navigation;
+	return m_navigation.get();
 }
 
 Plugins::PluginMenuManager *Explorerplusplus::GetPluginMenuManager()
