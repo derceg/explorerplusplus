@@ -24,51 +24,6 @@
 #include "../Helper/Macros.h"
 #include <list>
 
-DWORD WINAPI WorkerThreadProc(LPVOID pParam);
-void CALLBACK InitializeCOMAPC(ULONG_PTR dwParam);
-
-DWORD WINAPI WorkerThreadProc(LPVOID pParam)
-{
-	UNREFERENCED_PARAMETER(pParam);
-
-	/* OLE initialization is no longer done from within
-	this function. This is because of the fact that the
-	first APC may run BEFORE this thread initialization
-	function. If this occurs, OLE will not be initialized,
-	and possible errors may occur.
-	OLE is now initialized using an APC that is queued
-	immediately after this thread is created. As APC's
-	are run sequentially, it is guaranteed that the
-	initialization APC will run before any other APC,
-	thus acting like this initialization function. */
-
-	/* WARNING: Warning C4127 (conditional expression is
-	constant) temporarily disabled for this function. */
-	#pragma warning(push)
-	#pragma warning(disable:4127)
-	while(TRUE)
-	{
-		SleepEx(INFINITE, TRUE);
-	}
-	#pragma warning(pop)
-
-	return 0;
-}
-
-void CALLBACK InitializeCOMAPC(ULONG_PTR dwParam)
-{
-	UNREFERENCED_PARAMETER(dwParam);
-
-	/* This will be balanced out by a corresponding
-	CoUninitialize() when the thread is ended.
-	It must be apartment threaded, or some icons (such
-	as those used for XML files) may not load properly.
-	It *may* be due to the fact that one or more of
-	the other threads in use do not initialize COM/
-	use the same threading model. */
-	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-}
-
 /*
 * Main window creation.
 *
@@ -92,8 +47,6 @@ void Explorerplusplus::OnCreate()
 	m_navigation = std::make_unique<Navigation>(m_config, this);
 
 	m_mainWindow = MainWindow::Create(m_hContainer, m_config, m_hLanguageModule, this, m_navigation.get());
-
-	m_hTreeViewIconThread = CreateWorkerThread();
 
 	InitializeMainMenu();
 
@@ -142,16 +95,6 @@ void Explorerplusplus::OnCreate()
 	SetTimer(m_hContainer, AUTOSAVE_TIMER_ID, AUTOSAVE_TIMEOUT, nullptr);
 
 	m_InitializationFinished.set(true);
-}
-
-/* Creates a low priority worker thread, and initializes COM on that thread. */
-HANDLE Explorerplusplus::CreateWorkerThread()
-{
-	HANDLE hThread = CreateThread(NULL, 0, WorkerThreadProc, NULL, 0, NULL);
-	SetThreadPriority(hThread, THREAD_PRIORITY_BELOW_NORMAL);
-	QueueUserAPC(InitializeCOMAPC, hThread, NULL);
-
-	return hThread;
 }
 
 void Explorerplusplus::InitializeBookmarks(void)

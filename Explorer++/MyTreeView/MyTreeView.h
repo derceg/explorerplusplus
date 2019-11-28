@@ -7,6 +7,8 @@
 #include "../Helper/DropHandler.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ShellHelper.h"
+#include "../ThirdParty/CTPL/cpl_stl.h"
+#include <optional>
 
 #define WM_USER_TREEVIEW				WM_APP + 70
 #define WM_USER_TREEVIEW_GAINEDFOCUS	(WM_USER_TREEVIEW + 2)
@@ -20,7 +22,7 @@ public:
 	ULONG __stdcall		AddRef(void);
 	ULONG __stdcall		Release(void);
 
-	CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon,HANDLE hIconsThread);
+	CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon);
 	~CMyTreeView();
 
 	/* Drop source functions. */
@@ -51,6 +53,58 @@ public:
 	void				MonitorDrivePublic(const TCHAR *szDrive);
 
 private:
+
+	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
+
+	/* Used to store the tree items as you enumerate them ready for sorting. */
+	typedef struct
+	{
+		TCHAR		ItemName[MAX_PATH];
+		int			iItemId;
+	} ItemStore_t;
+
+	typedef struct
+	{
+		TCHAR szFileName[MAX_PATH];
+		DWORD dwAction;
+	} AlteredFile_t;
+
+	typedef struct
+	{
+		PIDLIST_ABSOLUTE pidl;
+		PITEMID_CHILD pridl;
+	} ItemInfo_t;
+
+	struct IconRetrievalItemInfo
+	{
+		IconRetrievalItemInfo() = default;
+
+		IconRetrievalItemInfo(const IconRetrievalItemInfo &other)
+		{
+			pidl.reset(ILCloneFull(other.pidl.get()));
+		}
+
+		unique_pidl_absolute pidl;
+	};
+
+	struct IconResult
+	{
+		HTREEITEM item;
+		int iconIndex;
+	};
+
+	typedef struct
+	{
+		TCHAR szPath[MAX_PATH];
+		CMyTreeView *pMyTreeView;
+	} DirectoryAltered_t;
+
+	typedef struct
+	{
+		TCHAR	szDrive[MAX_PATH];
+		HANDLE	hDrive;
+		int		iMonitorId;
+	} DriveEvent_t;
 
 	/* Message handlers. */
 	LRESULT CALLBACK	OnNotify(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -83,8 +137,9 @@ private:
 	void		DirectoryAlteredRenameFile(const TCHAR *szFullFileName);
 
 	/* Icons. */
-	void		AddToIconFinderQueue(TVITEM *plvItem);
-	void		EmptyIconFinderQueue(void);
+	void		QueueIconTask(HTREEITEM item);
+	static std::optional<IconResult>	FindIconAsync(HWND treeView, int iconResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl);
+	void		ProcessIconResult(int iconResultId);
 
 	/* Item id's. */
 	int			GenerateUniqueItemId(void);
@@ -109,54 +164,18 @@ private:
 	BOOL		IsDesktop(const TCHAR *szPath);
 	BOOL		IsDesktopSubChild(const TCHAR *szFullFileName);
 
-
-
-
-	/* ------ Internal state. ------ */
-
-	/* Used to store the tree items as you enumerate them ready for sorting. */
-	typedef struct
-	{
-		TCHAR		ItemName[MAX_PATH];
-		int			iItemId;
-	} ItemStore_t;
-
-	typedef struct
-	{
-		TCHAR szFileName[MAX_PATH];
-		DWORD dwAction;
-	} AlteredFile_t;
-
-	typedef struct
-	{
-		PIDLIST_ABSOLUTE pidl;
-		PITEMID_CHILD pridl;
-	} ItemInfo_t;
-
-	typedef struct
-	{
-		TCHAR szPath[MAX_PATH];
-		CMyTreeView *pMyTreeView;
-	} DirectoryAltered_t;
-
-	typedef struct
-	{
-		TCHAR	szDrive[MAX_PATH];
-		HANDLE	hDrive;
-		int		iMonitorId;
-	} DriveEvent_t;
-
 	HWND				m_hTreeView;
 	HWND				m_hParent;
 	int					m_iRefCount;
 	IDirectoryMonitor	*m_pDirMon;
 	BOOL				m_bShowHidden;
 
+	ctpl::thread_pool	m_iconThreadPool;
+	std::unordered_map<int, std::future<std::optional<IconResult>>>	m_iconResults;
+	int					m_iconResultIDCounter;
+
 	/* Subfolder thread. */
 	CRITICAL_SECTION	m_csSubFolders;
-
-	/* Icon thread. */
-	HANDLE				m_hThread;
 
 	/* Item id's and info. */
 	int					*m_uItemMap;

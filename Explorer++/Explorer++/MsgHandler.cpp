@@ -40,15 +40,6 @@ const int CLOSE_TOOLBAR_HEIGHT = 24;
 const int CLOSE_TOOLBAR_X_OFFSET = 4;
 const int CLOSE_TOOLBAR_Y_OFFSET = 1;
 
-void CALLBACK UninitializeCOMAPC(ULONG_PTR dwParam);
-
-void CALLBACK UninitializeCOMAPC(ULONG_PTR dwParam)
-{
-	UNREFERENCED_PARAMETER(dwParam);
-
-	CoUninitialize();
-}
-
 void Explorerplusplus::TestConfigFile(void)
 {
 	m_bLoadSettingsFromXML = TestConfigFileInternal();

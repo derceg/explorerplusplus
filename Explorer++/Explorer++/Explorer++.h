@@ -459,9 +459,6 @@ private:
 	DWORD					GetLanguage() const;
 	void					SetLanguage(DWORD language);
 
-	/* Helpers. */
-	HANDLE					CreateWorkerThread();
-
 	/* Menus. */
 	void					InitializeMainMenu();
 	void					SetGoMenuName(HMENU hMenu, UINT uMenuID, UINT csidl);
@@ -499,7 +496,6 @@ private:
 	IDirectoryMonitor *		m_pDirMon;
 	CMyTreeView *			m_pMyTreeView;
 	CStatusBar *			m_pStatusBar;
-	HANDLE					m_hTreeViewIconThread;
 
 	HMODULE					m_hLanguageModule;
 

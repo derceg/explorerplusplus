@@ -15,10 +15,3 @@
 
 #define DRAGSCROLL_TIMER_ID		2
 #define DRAGSCROLL_TIMER_ELAPSE	1000
-
-typedef struct
-{
-	HWND			hTreeView;
-	LPITEMIDLIST	pidlFull;
-	HTREEITEM		hItem;
-} TreeViewInfo_t;

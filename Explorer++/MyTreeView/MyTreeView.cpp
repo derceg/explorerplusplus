@@ -17,42 +17,30 @@
 #include "stdafx.h"
 #include "MyTreeView.h"
 #include "MyTreeViewInternal.h"
-#include "../Helper/Helper.h"
 #include "../Helper/DriveInfo.h"
-#include "../Helper/ShellHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
-
+#include "../Helper/ShellHelper.h"
+#include <wil/common.h>
 
 LRESULT CALLBACK	TreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 DWORD WINAPI		Thread_SubFoldersStub(LPVOID pVoid);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
-void CALLBACK		TVFindIconAPC(ULONG_PTR dwParam);
-BOOL				RemoveFromIconFinderQueue(TreeViewInfo_t *pListViewInfo);
 
-CRITICAL_SECTION g_tv_icon_cs;
-int g_ntvAPCsRan = 0;
-int g_ntvAPCsQueued = 0;
-
-std::list<TreeViewInfo_t> g_pTreeViewInfoList;
-
-CMyTreeView::CMyTreeView(HWND hTreeView,HWND hParent,IDirectoryMonitor *pDirMon,
-HANDLE hIconsThread) :
-m_iRefCount(1),
-m_bDragDropRegistered(FALSE)
+CMyTreeView::CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon) :
+	m_hTreeView(hTreeView),
+	m_hParent(hParent),
+	m_pDirMon(pDirMon),
+	m_iRefCount(1),
+	m_bDragDropRegistered(FALSE),
+	m_iconThreadPool(1),
+	m_iconResultIDCounter(0)
 {
-	m_hTreeView = hTreeView;
-	m_hParent = hParent;
-	
 	SetWindowSubclass(m_hTreeView,TreeViewProcStub,0,(DWORD_PTR)this);
 
 	InitializeCriticalSection(&m_cs);
 	InitializeCriticalSection(&m_csSubFolders);
-	InitializeCriticalSection(&g_tv_icon_cs);
-
-	m_hThread = hIconsThread;
-
-	m_pDirMon = pDirMon;
 
 	m_uItemMap = (int *)malloc(DEFAULT_ITEM_ALLOCATION * sizeof(int));
 	m_pItemInfo = (ItemInfo_t *)malloc(DEFAULT_ITEM_ALLOCATION * sizeof(ItemInfo_t));
@@ -66,8 +54,13 @@ m_bDragDropRegistered(FALSE)
 	m_bDragging			= FALSE;
 	m_bDragCancelled	= FALSE;
 	m_bDragAllowed		= FALSE;
-
 	m_bShowHidden		= TRUE;
+
+	m_iconThreadPool.push([] (int id) {
+		UNREFERENCED_PARAMETER(id);
+
+		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+	});
 
 	AddRoot();
 
@@ -85,7 +78,14 @@ CMyTreeView::~CMyTreeView()
 
 	DeleteCriticalSection(&m_cs);
 	DeleteCriticalSection(&m_csSubFolders);
-	DeleteCriticalSection(&g_tv_icon_cs);
+
+	m_iconThreadPool.clear_queue();
+
+	m_iconThreadPool.push([] (int id) {
+		UNREFERENCED_PARAMETER(id);
+
+		CoUninitialize();
+	});
 }
 
 LRESULT CALLBACK TreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,
@@ -188,6 +188,10 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 		case WM_NOTIFY:
 			return OnNotify(hwnd, msg, wParam, lParam);
+			break;
+
+		case WM_APP_ICON_RESULT_READY:
+			ProcessIconResult(static_cast<int>(wParam));
 			break;
 
 		case WM_DESTROY:
@@ -297,132 +301,84 @@ void CMyTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 {
 	TVITEM *ptvItem = &pnmtvdi->item;
 
-	if((ptvItem->mask & TVIF_IMAGE) == TVIF_IMAGE)
+	if (WI_IsFlagSet(ptvItem->mask, TVIF_IMAGE))
 	{
 		ptvItem->iImage	= m_iFolderIcon;
 		ptvItem->iSelectedImage	= m_iFolderIcon;
 
-		AddToIconFinderQueue(ptvItem);
+		QueueIconTask(ptvItem->hItem);
 	}
 
 	ptvItem->mask |= TVIF_DI_SETITEM;
 }
 
-void CMyTreeView::AddToIconFinderQueue(TVITEM *plvItem)
+void CMyTreeView::QueueIconTask(HTREEITEM item)
 {
-	EnterCriticalSection(&g_tv_icon_cs);
+	IconRetrievalItemInfo itemInfo;
+	itemInfo.pidl = BuildPath(item);
 
-	auto pidl = BuildPath(plvItem->hItem);
+	int iconResultID = m_iconResultIDCounter++;
 
-	TreeViewInfo_t tvi;
-	tvi.hTreeView	= m_hTreeView;
-	tvi.hItem		= plvItem->hItem;
-	tvi.pidlFull	= pidl.release();
+	auto result = m_iconThreadPool.push([this, iconResultID, item, itemInfo](int id) {
+		UNREFERENCED_PARAMETER(id);
 
-	g_pTreeViewInfoList.push_back(tvi);
+		return FindIconAsync(m_hTreeView, iconResultID, item, itemInfo.pidl.get());
+	});
 
-	if(g_ntvAPCsRan == g_ntvAPCsQueued)
-	{
-		g_ntvAPCsQueued++;
-
-		QueueUserAPC(TVFindIconAPC,m_hThread,NULL);
-	}
-
-	LeaveCriticalSection(&g_tv_icon_cs);
+	m_iconResults.insert({ iconResultID, std::move(result) });
 }
 
-void CMyTreeView::EmptyIconFinderQueue(void)
+std::optional<CMyTreeView::IconResult> CMyTreeView::FindIconAsync(HWND treeView, int iconResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl)
 {
-	EnterCriticalSection(&g_tv_icon_cs);
+	SHFILEINFO shfi;
+	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidl), 0, &shfi,
+		sizeof(SHFILEINFO), SHGFI_PIDL | SHGFI_ICON | SHGFI_OVERLAYINDEX);
 
-	std::list<TreeViewInfo_t>::iterator last;
-	std::list<TreeViewInfo_t>::iterator first;
-
-	last = g_pTreeViewInfoList.end();
-
-	for(first = g_pTreeViewInfoList.begin();first != g_pTreeViewInfoList.end();)
+	if (res == 0)
 	{
-		CoTaskMemFree(first->pidlFull);
-		first = g_pTreeViewInfoList.erase(first);
+		return std::nullopt;
 	}
 
-	LeaveCriticalSection(&g_tv_icon_cs);
+	DestroyIcon(shfi.hIcon);
+
+	PostMessage(treeView, WM_APP_ICON_RESULT_READY, iconResultId, 0);
+
+	IconResult result;
+	result.item = item;
+	result.iconIndex = shfi.iIcon;
+
+	return result;
 }
 
-BOOL RemoveFromIconFinderQueue(TreeViewInfo_t *pTreeViewInfo)
+void CMyTreeView::ProcessIconResult(int iconResultId)
 {
-	BOOL bQueueNotEmpty;
+	auto itr = m_iconResults.find(iconResultId);
 
-	EnterCriticalSection(&g_tv_icon_cs);
-
-	if(g_pTreeViewInfoList.empty() == TRUE)
+	if (itr == m_iconResults.end())
 	{
-		bQueueNotEmpty = FALSE;
-
-		g_ntvAPCsRan++;
-	}
-	else
-	{
-		std::list<TreeViewInfo_t>::iterator itr;
-
-		itr = g_pTreeViewInfoList.end();
-
-		itr--;
-
-		*pTreeViewInfo = *itr;
-
-		g_pTreeViewInfoList.erase(itr);
-
-		bQueueNotEmpty = TRUE;
+		return;
 	}
 
-	LeaveCriticalSection(&g_tv_icon_cs);
+	auto cleanup = wil::scope_exit([this, itr] () {
+		m_iconResults.erase(itr);
+	});
 
-	return bQueueNotEmpty;
-}
+	auto result = itr->second.get();
 
-void CALLBACK TVFindIconAPC(ULONG_PTR dwParam)
-{
-	UNREFERENCED_PARAMETER(dwParam);
-
-	TreeViewInfo_t	pTreeViewInfo;
-	TVITEM			tvItem;
-	SHFILEINFO		shfi;
-	DWORD_PTR		res = FALSE;
-	BOOL			bQueueNotEmpty = TRUE;
-	int				iOverlay;
-
-	bQueueNotEmpty = RemoveFromIconFinderQueue(&pTreeViewInfo);
-
-	while(bQueueNotEmpty)
+	if (!result)
 	{
-		res = SHGetFileInfo((LPTSTR)pTreeViewInfo.pidlFull,0,&shfi,
-			sizeof(SHFILEINFO),SHGFI_PIDL|SHGFI_ICON|SHGFI_OVERLAYINDEX);
-
-		if(res != 0)
-		{
-			tvItem.mask				= TVIF_HANDLE|TVIF_IMAGE|TVIF_SELECTEDIMAGE;
-			tvItem.hItem			= pTreeViewInfo.hItem;
-			tvItem.iImage			= shfi.iIcon;
-			tvItem.iSelectedImage	= shfi.iIcon;
-
-			iOverlay = (shfi.iIcon >> 24);
-
-			if(iOverlay)
-			{
-				tvItem.mask			|= TVIF_STATE;
-				tvItem.state		= INDEXTOOVERLAYMASK(iOverlay);
-				tvItem.stateMask	= TVIS_OVERLAYMASK;
-			}
-
-			TreeView_SetItem(pTreeViewInfo.hTreeView,&tvItem);
-
-			DestroyIcon(shfi.hIcon);
-			CoTaskMemFree(pTreeViewInfo.pidlFull);
-		}
-
-		bQueueNotEmpty = RemoveFromIconFinderQueue(&pTreeViewInfo);
+		return;
 	}
+
+	TVITEM tvItem;
+	tvItem.mask = TVIF_HANDLE | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_STATE;
+	tvItem.hItem = result->item;
+	tvItem.iImage = result->iconIndex;
+	tvItem.iSelectedImage = result->iconIndex;
+	tvItem.stateMask = TVIS_OVERLAYMASK;
+	tvItem.state = INDEXTOOVERLAYMASK(result->iconIndex >> 24);
+
+	TreeView_SetItem(m_hTreeView, &tvItem);
 }
 
 /* Sorts items in the following order:
