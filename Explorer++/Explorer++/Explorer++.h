@@ -395,9 +395,9 @@ private:
 	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
 
 	/* Sort menu. */
-	void					InsertSortMenuItems(HMENU hMenu);
-	void					DeleteSortMenuItems();
 	void					UpdateSortMenuItems();
+	void					InsertSortMenuItems();
+	void					DeleteSortMenuItems();
 
 	/* File operations. */
 	void					CopyToFolder(bool move);
@@ -506,8 +506,6 @@ private:
 	/** Internal state. **/
 	HWND					m_hLastActiveWindow;
 	HWND					m_hNextClipboardViewer;
-	HMENU					m_hSortSubMenu;
-	HMENU					m_hGroupBySubMenu;
 	std::wstring			m_CurrentDirectory;
 	TCHAR					m_OldTreeViewFileName[MAX_PATH];
 	DWORD					m_Language;
@@ -609,7 +607,9 @@ private:
 	std::vector<wil::unique_hbitmap>	m_menuImages;
 
 	/* Sort menu. */
-	std::list<SortMenuItem>	m_sortMenuItems;
+	HMENU					m_hSortSubMenu;
+	HMENU					m_hGroupBySubMenu;
+	std::vector<SortMenuItem>	m_sortMenuItems;
 
 	/* Mousewheel. */
 	int						m_zDeltaTotal;

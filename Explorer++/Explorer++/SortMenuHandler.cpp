@@ -15,7 +15,33 @@
 #include "../Helper/ShellHelper.h"
 #include <list>
 
-void Explorerplusplus::InsertSortMenuItems(HMENU hMenu)
+void Explorerplusplus::UpdateSortMenuItems()
+{
+	DeleteSortMenuItems();
+
+	auto sortModes = m_pActiveShellBrowser->GetAvailableSortModes();
+	std::vector<SortMenuItem> newSortMenuItems;
+
+	for (SortMode sortMode : sortModes)
+	{
+		int SortById = DetermineSortModeMenuId(sortMode);
+		int GroupById = DetermineGroupModeMenuId(sortMode);
+
+		if (SortById != -1 && GroupById != -1)
+		{
+			SortMenuItem am;
+			am.SortById = SortById;
+			am.GroupById = GroupById;
+			newSortMenuItems.push_back(am);
+		}
+	}
+
+	m_sortMenuItems = newSortMenuItems;
+
+	InsertSortMenuItems();
+}
+
+void Explorerplusplus::InsertSortMenuItems()
 {
 	int index = 0;
 
@@ -30,7 +56,7 @@ void Explorerplusplus::InsertSortMenuItems(HMENU hMenu)
 		mi.fMask		= MIIM_ID|MIIM_STRING;
 		mi.dwTypeData	= menuText.data();
 		mi.wID			= menuItem.SortById;
-		InsertMenuItem(hMenu,index,TRUE,&mi);
+		InsertMenuItem(m_hSortSubMenu,index,TRUE,&mi);
 
 		ZeroMemory(&mi,sizeof(mi));
 		mi.cbSize		= sizeof(mi);
@@ -50,29 +76,4 @@ void Explorerplusplus::DeleteSortMenuItems()
 		DeleteMenu(m_hSortSubMenu, menuItem.SortById, MF_BYCOMMAND);
 		DeleteMenu(m_hGroupBySubMenu, menuItem.GroupById, MF_BYCOMMAND);
 	}
-}
-
-void Explorerplusplus::UpdateSortMenuItems()
-{
-	DeleteSortMenuItems();
-
-	auto sortModes = m_pActiveShellBrowser->GetAvailableSortModes();
-
-	m_sortMenuItems.clear();
-
-	for(SortMode sortMode : sortModes)
-	{
-		int SortById = DetermineSortModeMenuId(sortMode);
-		int GroupById = DetermineGroupModeMenuId(sortMode);
-
-		if(SortById != -1 && GroupById != -1)
-		{
-			SortMenuItem am;
-			am.SortById = SortById;
-			am.GroupById = GroupById;
-			m_sortMenuItems.push_back(am);
-		}
-	}
-
-	InsertSortMenuItems(m_hSortSubMenu);
 }
