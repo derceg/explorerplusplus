@@ -12,8 +12,11 @@
 #include "../Helper/FileOperations.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <list>
+
+const int SORT_MENU_RESOURCE_BLOCK_SIZE = 1000;
 
 void Explorerplusplus::UpdateSortMenuItems()
 {
@@ -76,4 +79,74 @@ void Explorerplusplus::DeleteSortMenuItems()
 		DeleteMenu(m_hSortSubMenu, menuItem.SortById, MF_BYCOMMAND);
 		DeleteMenu(m_hGroupBySubMenu, menuItem.GroupById, MF_BYCOMMAND);
 	}
+}
+
+void Explorerplusplus::SetSortMenuItemStates()
+{
+	const SortMode sortMode = m_pActiveShellBrowser->GetSortMode();
+	BOOL bShowInGroups = m_pActiveShellBrowser->GetShowInGroups();
+
+	/* Go through both the sort by and group by menus and
+	remove all the checkmarks. Alternatively, could remember
+	which items have checkmarks, and just uncheck those. */
+	int nItems = GetMenuItemCount(m_hSortSubMenu);
+
+	for (int i = 0; i < nItems; i++)
+	{
+		CheckMenuItem(m_hSortSubMenu, i, MF_BYPOSITION | MF_UNCHECKED);
+	}
+
+	nItems = GetMenuItemCount(m_hGroupBySubMenu);
+
+	for (int i = 0; i < nItems; i++)
+	{
+		CheckMenuItem(m_hGroupBySubMenu, i, MF_BYPOSITION | MF_UNCHECKED);
+	}
+
+	HMENU activeMenu;
+	HMENU inactiveMenu;
+	UINT itemToCheck;
+	UINT firstItem;
+	UINT lastItem;
+
+	if (bShowInGroups)
+	{
+		activeMenu = m_hGroupBySubMenu;
+		inactiveMenu = m_hSortSubMenu;
+
+		itemToCheck = DetermineGroupModeMenuId(sortMode);
+
+		firstItem = IDM_GROUPBY_NAME;
+		lastItem = IDM_GROUPBY_NAME + (SORT_MENU_RESOURCE_BLOCK_SIZE - 1);
+	}
+	else
+	{
+		activeMenu = m_hSortSubMenu;
+		inactiveMenu = m_hGroupBySubMenu;
+
+		itemToCheck = DetermineSortModeMenuId(sortMode);
+
+		firstItem = IDM_SORTBY_NAME;
+		lastItem = IDM_SORTBY_NAME + (SORT_MENU_RESOURCE_BLOCK_SIZE - 1);
+	}
+
+	lEnableMenuItem(inactiveMenu, IDM_SORT_ASCENDING, FALSE);
+	lEnableMenuItem(inactiveMenu, IDM_SORT_DESCENDING, FALSE);
+
+	lEnableMenuItem(activeMenu, IDM_SORT_ASCENDING, TRUE);
+	lEnableMenuItem(activeMenu, IDM_SORT_DESCENDING, TRUE);
+
+	CheckMenuRadioItem(activeMenu, firstItem, lastItem, itemToCheck, MF_BYCOMMAND);
+
+	if (m_pActiveShellBrowser->GetSortAscending())
+	{
+		itemToCheck = IDM_SORT_ASCENDING;
+	}
+	else
+	{
+		itemToCheck = IDM_SORT_DESCENDING;
+	}
+
+	CheckMenuRadioItem(activeMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING,
+		itemToCheck, MF_BYCOMMAND);
 }

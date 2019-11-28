@@ -21,12 +21,6 @@
 #include <shobjidl.h>
 #include <list>
 
-#define SORTBY_BASE	50000
-#define SORTBY_END	50099
-
-#define GROUPBY_BASE	50100
-#define GROUPBY_END		50199
-
 void Explorerplusplus::UpdateWindowStates(void)
 {
 	m_CurrentDirectory = m_pActiveShellBrowser->GetDirectory();
@@ -124,74 +118,4 @@ void Explorerplusplus::SetProgramMenuItemStates(HMENU hProgramMenu)
 	}
 
 	SetSortMenuItemStates();
-}
-
-void Explorerplusplus::SetSortMenuItemStates()
-{
-	const SortMode sortMode = m_pActiveShellBrowser->GetSortMode();
-	BOOL bShowInGroups = m_pActiveShellBrowser->GetShowInGroups();
-
-	/* Go through both the sort by and group by menus and
-	remove all the checkmarks. Alternatively, could remember
-	which items have checkmarks, and just uncheck those. */
-	int nItems = GetMenuItemCount(m_hSortSubMenu);
-
-	for(int i = 0;i < nItems;i++)
-	{
-		CheckMenuItem(m_hSortSubMenu,i,MF_BYPOSITION|MF_UNCHECKED);
-	}
-
-	nItems = GetMenuItemCount(m_hGroupBySubMenu);
-
-	for(int i = 0;i < nItems;i++)
-	{
-		CheckMenuItem(m_hGroupBySubMenu,i,MF_BYPOSITION|MF_UNCHECKED);
-	}
-
-	HMENU activeMenu;
-	HMENU inactiveMenu;
-	UINT itemToCheck;
-	UINT firstItem;
-	UINT lastItem;
-
-	if(bShowInGroups)
-	{
-		activeMenu = m_hGroupBySubMenu;
-		inactiveMenu = m_hSortSubMenu;
-
-		itemToCheck = DetermineGroupModeMenuId(sortMode);
-
-		firstItem = GROUPBY_BASE;
-		lastItem = GROUPBY_END;
-	}
-	else
-	{
-		activeMenu = m_hSortSubMenu;
-		inactiveMenu = m_hGroupBySubMenu;
-
-		itemToCheck = DetermineSortModeMenuId(sortMode);
-
-		firstItem = SORTBY_BASE;
-		lastItem = SORTBY_END;
-	}
-
-	lEnableMenuItem(inactiveMenu, IDM_SORT_ASCENDING, FALSE);
-	lEnableMenuItem(inactiveMenu, IDM_SORT_DESCENDING, FALSE);
-
-	lEnableMenuItem(activeMenu, IDM_SORT_ASCENDING, TRUE);
-	lEnableMenuItem(activeMenu, IDM_SORT_DESCENDING, TRUE);
-
-	CheckMenuRadioItem(activeMenu, firstItem, lastItem, itemToCheck, MF_BYCOMMAND);
-
-	if (m_pActiveShellBrowser->GetSortAscending())
-	{
-		itemToCheck = IDM_SORT_ASCENDING;
-	}
-	else
-	{
-		itemToCheck = IDM_SORT_DESCENDING;
-	}
-
-	CheckMenuRadioItem(activeMenu, IDM_SORT_ASCENDING, IDM_SORT_DESCENDING,
-		itemToCheck, MF_BYCOMMAND);
 }

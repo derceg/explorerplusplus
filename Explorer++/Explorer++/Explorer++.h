@@ -303,7 +303,6 @@ private:
 	/* Menus. */
 	HMENU					InitializeRightClickMenu(void);
 	void					SetProgramMenuItemStates(HMENU hProgramMenu);
-	void					SetSortMenuItemStates();
 
 	/* Control creation. */
 	HWND					CreateMainListView(HWND hParent);
@@ -398,6 +397,7 @@ private:
 	void					UpdateSortMenuItems();
 	void					InsertSortMenuItems();
 	void					DeleteSortMenuItems();
+	void					SetSortMenuItemStates();
 
 	/* File operations. */
 	void					CopyToFolder(bool move);
