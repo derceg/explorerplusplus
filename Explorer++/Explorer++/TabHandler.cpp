@@ -215,7 +215,6 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 
 	m_nSelected = m_pActiveShellBrowser->GetNumSelected();
 
-	SetActiveArrangeMenuItems();
 	UpdateArrangeMenuItems();
 
 	UpdateWindowStates();

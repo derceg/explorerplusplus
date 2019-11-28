@@ -213,6 +213,14 @@ INT_PTR CSelectColumnsDialog::OnNotify(NMHDR *pnmhdr)
 {
 	switch(pnmhdr->code)
 	{
+	case LVN_ITEMCHANGING:
+	{
+		BOOL res = OnLvnItemChanging(reinterpret_cast<NMLISTVIEW *>(pnmhdr));
+		SetWindowLongPtr(m_hDlg, DWLP_MSGRESULT, res);
+		return TRUE;
+	}
+		break;
+
 	case LVN_ITEMCHANGED:
 		OnLvnItemChanged(reinterpret_cast<NMLISTVIEW *>(pnmhdr));
 		break;
@@ -274,7 +282,48 @@ void CSelectColumnsDialog::OnCancel()
 	EndDialog(m_hDlg,0);
 }
 
-void CSelectColumnsDialog::OnLvnItemChanged(NMLISTVIEW *pnmlv)
+BOOL CSelectColumnsDialog::OnLvnItemChanging(const NMLISTVIEW *nmlv)
+{
+	if (nmlv->uChanged != LVIF_STATE || (nmlv->uNewState & LVIS_STATEIMAGEMASK) == 0)
+	{
+		return FALSE;
+	}
+
+	BOOL checked = ((nmlv->uNewState & LVIS_STATEIMAGEMASK) >> 12) == 2;
+
+	if (checked)
+	{
+		return FALSE;
+	}
+
+	HWND listView = GetDlgItem(m_hDlg, IDC_COLUMNS_LISTVIEW);
+	int numItems = ListView_GetItemCount(listView);
+	bool anyOtherItemsChecked = false;
+
+	for (int i = 0; i < numItems; i++)
+	{
+		if (i == nmlv->iItem)
+		{
+			continue;
+		}
+
+		if (ListView_GetCheckState(listView, i))
+		{
+			anyOtherItemsChecked = true;
+			break;
+		}
+	}
+
+	if (!anyOtherItemsChecked)
+	{
+		// There should always be at least one column that's checked.
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+void CSelectColumnsDialog::OnLvnItemChanged(const NMLISTVIEW *pnmlv)
 {
 	if(pnmlv->uNewState & LVIS_SELECTED)
 	{

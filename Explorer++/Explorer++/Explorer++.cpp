@@ -45,7 +45,6 @@ m_pluginCommandManager(&g_hAccl, ACCELERATOR_PLUGIN_STARTID, ACCELERATOR_PLUGIN_
 	/* Initial state. */
 	m_nSelected						= 0;
 	m_nSelectedOnInvert				= 0;
-	m_iMaxArrangeMenuItem			= 0;
 	m_bCountingUp					= FALSE;
 	m_bCountingDown					= FALSE;
 	m_bInverted						= FALSE;

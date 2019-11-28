@@ -56,7 +56,8 @@ private:
 
 	void	OnOk();
 	void	OnCancel();
-	void	OnLvnItemChanged(NMLISTVIEW *pnmlv);
+	BOOL	OnLvnItemChanging(const NMLISTVIEW *nmlv);
+	void	OnLvnItemChanged(const NMLISTVIEW *pnmlv);
 	void	OnMoveColumn(bool bUp);
 
 	IExplorerplusplus *m_pexpp;

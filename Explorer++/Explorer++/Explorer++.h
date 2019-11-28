@@ -303,7 +303,6 @@ private:
 	/* Menus. */
 	HMENU					InitializeRightClickMenu(void);
 	void					SetProgramMenuItemStates(HMENU hProgramMenu);
-	void					UpdateArrangeMenuItems();
 	void					SetArrangeMenuItemStates();
 
 	/* Control creation. */
@@ -396,10 +395,10 @@ private:
 	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
 
 	/* Arrange menu. */
-	void					InitializeArrangeMenuItems(void);
-	void					SetActiveArrangeMenuItems(void);
-	int						InsertArrangeMenuItems(HMENU hMenu);
-	void					DeletePreviousArrangeMenuItems(void);
+	void					InitializeArrangeMenuItems();
+	void					InsertArrangeMenuItems(HMENU hMenu);
+	void					DeleteArrangeMenuItems();
+	void					UpdateArrangeMenuItems();
 
 	/* File operations. */
 	void					CopyToFolder(bool move);
@@ -521,7 +520,6 @@ private:
 	BOOL					m_bLanguageLoaded;
 	BOOL					m_bTreeViewOpenInNewTab;
 	BOOL					m_bShowTabBar;
-	int						m_iMaxArrangeMenuItem;
 	int						m_iLastSelectedTab;
 	ULONG					m_SHChangeNotifyID;
 	ValueWrapper<bool>		m_InitializationFinished;
@@ -614,12 +612,7 @@ private:
 	std::vector<wil::unique_hbitmap>	m_menuImages;
 
 	/* Arrange menu related data. */
-	std::list<ArrangeMenuItem_t>	m_ArrangeList;
-	std::list<ArrangeMenuItem_t>	*m_pActiveArrangeMenuItems;
-	std::list<ArrangeMenuItem_t>	m_ArrangeMenuRealFolder;
-	std::list<ArrangeMenuItem_t>	m_ArrangeMenuMyComputer;
-	std::list<ArrangeMenuItem_t>	m_ArrangeMenuControlPanel;
-	std::list<ArrangeMenuItem_t>	m_ArrangeMenuRecycleBin;
+	std::list<ArrangeMenuItem_t>	m_ArrangeMenuItems;
 
 	/* Mousewheel. */
 	int						m_zDeltaTotal;

@@ -151,7 +151,7 @@ public:
 
 	int CALLBACK		SortTemporary(LPARAM lParam1,LPARAM lParam2);
 
-	std::list<int>		GetAvailableSortModes() const;
+	std::vector<SortMode>	GetAvailableSortModes() const;
 	size_t				GetNumActiveColumns(void) const;
 	void				ImportAllColumns(const FolderColumns &folderColumns);
 	FolderColumns		ExportAllColumns();

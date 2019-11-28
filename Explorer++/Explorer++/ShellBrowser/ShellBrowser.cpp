@@ -1253,16 +1253,15 @@ BOOL CShellBrowser::IsDragging() const
 	return m_bPerformingDrag;
 }
 
-std::list<int> CShellBrowser::GetAvailableSortModes() const
+std::vector<SortMode> CShellBrowser::GetAvailableSortModes() const
 {
-	std::list<int> sortModes;
+	std::vector<SortMode> sortModes;
 
-	for(auto itr = m_pActiveColumns->begin();itr != m_pActiveColumns->end();itr++)
+	for (const auto &column : *m_pActiveColumns)
 	{
-		if(itr->bChecked)
+		if(column.bChecked)
 		{
-			int ColumnSortMode = DetermineColumnSortMode(itr->id);
-			sortModes.push_back(ColumnSortMode);
+			sortModes.push_back(DetermineColumnSortMode(column.id));
 		}
 	}
 

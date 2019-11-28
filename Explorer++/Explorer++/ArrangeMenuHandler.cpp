@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "MainResource.h"
+#include "ResourceHelper.h"
 #include "ShellBrowser/SortModes.h"
 #include "SortModeHelper.h"
 #include "../Helper/Controls.h"
@@ -14,229 +15,86 @@
 #include "../Helper/ShellHelper.h"
 #include <list>
 
-/*
- * Sets the arrange menu items that will be shown
- * for each folder.
- */
-void Explorerplusplus::InitializeArrangeMenuItems(void)
+void Explorerplusplus::InitializeArrangeMenuItems()
 {
-	HMENU				hMainMenu;
-	HMENU				hArrangeMenu;
-	MENUITEMINFO		mi;
-	ArrangeMenuItem_t	ArrangeMenuItem;
+	HMENU hMainMenu = GetMenu(m_hContainer);
 
-	hMainMenu = GetMenu(m_hContainer);
-	hArrangeMenu = GetSubMenu(hMainMenu,3);
-
+	// Insert the default arrange sub menu. This menu will not contain any sort
+	// menu items.
+	MENUITEMINFO mi;
 	mi.cbSize	= sizeof(mi);
 	mi.fMask	= MIIM_SUBMENU;
 	mi.hSubMenu	= m_hArrangeSubMenu;
-
-	/* Insert the default arrange sub menu. This
-	menu will not contain any sort menu items. */
-	SetMenuItemInfo(hArrangeMenu,IDM_VIEW_SORTBY,FALSE,&mi);
+	SetMenuItemInfo(hMainMenu,IDM_VIEW_SORTBY,FALSE,&mi);
 
 	mi.cbSize	= sizeof(mi);
 	mi.fMask	= MIIM_SUBMENU;
 	mi.hSubMenu	= m_hGroupBySubMenu;
-	SetMenuItemInfo(hArrangeMenu,IDM_VIEW_GROUPBY,FALSE,&mi);
-
-	/* <----Real Folder----> */
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_NAME;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_NAME;
-	m_ArrangeMenuRealFolder.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_SIZE;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_SIZE;
-	m_ArrangeMenuRealFolder.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_TYPE;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_TYPE;
-	m_ArrangeMenuRealFolder.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_DATEMODIFIED;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_DATEMODIFIED;
-	m_ArrangeMenuRealFolder.push_back(ArrangeMenuItem);
-
-	/* <----My Computer----> */
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_NAME;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_NAME;
-	m_ArrangeMenuMyComputer.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_TYPE;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_TYPE;
-	m_ArrangeMenuMyComputer.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_TOTALSIZE;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_TOTALSIZE;
-	m_ArrangeMenuMyComputer.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_FREESPACE;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_FREESPACE;
-	m_ArrangeMenuMyComputer.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_COMMENTS;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_COMMENTS;
-	m_ArrangeMenuMyComputer.push_back(ArrangeMenuItem);
-
-	/* <----Control Panel----> */
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_NAME;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_NAME;
-	m_ArrangeMenuControlPanel.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_COMMENTS;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_COMMENTS;
-	m_ArrangeMenuControlPanel.push_back(ArrangeMenuItem);
-
-	/* <----Recycle Bin----> */
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_NAME;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_NAME;
-	m_ArrangeMenuRecycleBin.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_ORIGINALLOCATION;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_ORIGINALLOCATION;
-	m_ArrangeMenuRecycleBin.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_DATEDELETED;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_DATEDELETED;
-	m_ArrangeMenuRecycleBin.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_SIZE;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_SIZE;
-	m_ArrangeMenuRecycleBin.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_TYPE;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_TYPE;
-	m_ArrangeMenuRecycleBin.push_back(ArrangeMenuItem);
-
-	ArrangeMenuItem.SortById = IDM_SORTBY_DATEMODIFIED;
-	ArrangeMenuItem.GroupById = IDM_GROUPBY_DATEMODIFIED;
-	m_ArrangeMenuRecycleBin.push_back(ArrangeMenuItem);
+	SetMenuItemInfo(hMainMenu,IDM_VIEW_GROUPBY,FALSE,&mi);
 }
 
-/*
- * Sets the current arrange menu used based on
- * the current folder.
- */
-void Explorerplusplus::SetActiveArrangeMenuItems(void)
+void Explorerplusplus::InsertArrangeMenuItems(HMENU hMenu)
 {
-	if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_DRIVES))
-	{
-		m_pActiveArrangeMenuItems = &m_ArrangeMenuMyComputer;
-	}
-	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_CONTROLS))
-	{
-		m_pActiveArrangeMenuItems = &m_ArrangeMenuControlPanel;
-	}
-	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_BITBUCKET))
-	{
-		m_pActiveArrangeMenuItems = &m_ArrangeMenuRecycleBin;
-	}
-	else
-	{
-		m_pActiveArrangeMenuItems = &m_ArrangeMenuRealFolder;
-	}
-}
+	int index = 0;
 
-/*
- * Inserts the current arrange menu items onto the
- * specified menu.
- */
-int Explorerplusplus::InsertArrangeMenuItems(HMENU hMenu)
-{
-	MENUITEMINFO						mi;
-	std::list<ArrangeMenuItem_t>::iterator	itr;
-	TCHAR								szStringTemp[32];
-	UINT								uStringIndex;
-	int									i = 0;
-
-	for(itr = m_pActiveArrangeMenuItems->begin();itr != m_pActiveArrangeMenuItems->end();itr++)
+	for(const ArrangeMenuItem_t &menuItem : m_ArrangeMenuItems)
 	{
-		uStringIndex = GetArrangeMenuItemStringIndex(itr->SortById);
-		LoadString(m_hLanguageModule,uStringIndex,szStringTemp,SIZEOF_ARRAY(szStringTemp));
+		MENUITEMINFO mi;
+
+		UINT uStringIndex = GetArrangeMenuItemStringIndex(menuItem.SortById);
+		std::wstring menuText = ResourceHelper::LoadString(m_hLanguageModule,uStringIndex);
 
 		mi.cbSize		= sizeof(mi);
 		mi.fMask		= MIIM_ID|MIIM_STRING;
-		mi.dwTypeData	= szStringTemp;
-		mi.wID			= itr->SortById;
-		InsertMenuItem(hMenu,i,TRUE,&mi);
-		InsertMenuItem(m_hArrangeSubMenuRClick,i,TRUE,&mi);
+		mi.dwTypeData	= menuText.data();
+		mi.wID			= menuItem.SortById;
+		InsertMenuItem(hMenu,index,TRUE,&mi);
+		InsertMenuItem(m_hArrangeSubMenuRClick,index,TRUE,&mi);
 
 		ZeroMemory(&mi,sizeof(mi));
 		mi.cbSize		= sizeof(mi);
 		mi.fMask		= MIIM_ID|MIIM_STRING;
-		mi.dwTypeData	= szStringTemp;
-		mi.wID			= itr->GroupById;
-		InsertMenuItem(m_hGroupBySubMenu,i,TRUE,&mi);
-		InsertMenuItem(m_hGroupBySubMenuRClick,i,TRUE,&mi);
+		mi.dwTypeData	= menuText.data();
+		mi.wID			= menuItem.GroupById;
+		InsertMenuItem(m_hGroupBySubMenu,index,TRUE,&mi);
+		InsertMenuItem(m_hGroupBySubMenuRClick,index,TRUE,&mi);
 
-		i++;
+		index++;
 	}
-
-	return i;
 }
 
-/*
- * Removes the previous arrange menu items from the menu.
- */
-void Explorerplusplus::DeletePreviousArrangeMenuItems(void)
+void Explorerplusplus::DeleteArrangeMenuItems()
 {
-	for(int i = m_iMaxArrangeMenuItem - 1;i >= 0;i--)
+	for (const ArrangeMenuItem_t &menuItem : m_ArrangeMenuItems)
 	{
-		DeleteMenu(m_hArrangeSubMenu,i,MF_BYPOSITION);
-		DeleteMenu(m_hArrangeSubMenuRClick,i,MF_BYPOSITION);
-		DeleteMenu(m_hGroupBySubMenu,i,MF_BYPOSITION);
-		DeleteMenu(m_hGroupBySubMenuRClick,i,MF_BYPOSITION);
+		DeleteMenu(m_hArrangeSubMenu, menuItem.SortById, MF_BYCOMMAND);
+		DeleteMenu(m_hArrangeSubMenuRClick, menuItem.SortById, MF_BYCOMMAND);
+		DeleteMenu(m_hGroupBySubMenu, menuItem.GroupById, MF_BYCOMMAND);
+		DeleteMenu(m_hGroupBySubMenuRClick, menuItem.GroupById, MF_BYCOMMAND);
 	}
 }
 
-/*
- * Updates the arrange menu with the new items.
- */
 void Explorerplusplus::UpdateArrangeMenuItems()
 {
-	std::list<int>			SortModes;
-	std::list<int>::iterator	itr;
-	ArrangeMenuItem_t		am;
-	int						SortById;
-	int						GroupById;
+	DeleteArrangeMenuItems();
 
-	DeletePreviousArrangeMenuItems();
+	auto sortModes = m_pActiveShellBrowser->GetAvailableSortModes();
 
-	SortModes = m_pActiveShellBrowser->GetAvailableSortModes();
+	m_ArrangeMenuItems.clear();
 
-	m_ArrangeList.clear();
-
-	if(SortModes.size() != 0)
+	for(SortMode sortMode : sortModes)
 	{
-		for(itr = SortModes.begin();itr != SortModes.end();itr++)
+		int SortById = DetermineSortModeMenuId(sortMode);
+		int GroupById = DetermineGroupModeMenuId(sortMode);
+
+		if(SortById != -1 && GroupById != -1)
 		{
-			SortMode sortMode = SortMode::_from_integral(*itr);
-
-			SortById = DetermineSortModeMenuId(sortMode);
-			GroupById = DetermineGroupModeMenuId(sortMode);
-
-			if(SortById != -1 && GroupById != -1)
-			{
-				am.SortById		= SortById;
-				am.GroupById	= GroupById;
-
-				m_ArrangeList.push_back(am);
-			}
+			ArrangeMenuItem_t am;
+			am.SortById = SortById;
+			am.GroupById = GroupById;
+			m_ArrangeMenuItems.push_back(am);
 		}
-
-		m_pActiveArrangeMenuItems = &m_ArrangeList;
-	}
-	else
-	{
-		SetActiveArrangeMenuItems();
 	}
 
-	SortModes.clear();
-
-	m_iMaxArrangeMenuItem = InsertArrangeMenuItems(m_hArrangeSubMenu);
+	InsertArrangeMenuItems(m_hArrangeSubMenu);
 }
