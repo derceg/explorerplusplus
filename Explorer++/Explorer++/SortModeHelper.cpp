@@ -6,11 +6,7 @@
 #include "SortModeHelper.h"
 #include "MainResource.h"
 
-/*
- * Returns the index in the string table of the text
- * for the specified arrange menu item.
- */
-UINT GetArrangeMenuItemStringIndex(UINT uItemId)
+UINT GetSortMenuItemStringIndex(UINT uItemId)
 {
 	switch (uItemId)
 	{
@@ -270,10 +266,6 @@ UINT GetArrangeMenuItemStringIndex(UINT uItemId)
 	return 0;
 }
 
-/*
- * Translates the specified sort mode into its
- * associated menu id.
- */
 int DetermineSortModeMenuId(SortMode sortMode)
 {
 	switch (sortMode)

@@ -113,7 +113,7 @@ private:
 	static const UINT_PTR AUTOSAVE_TIMER_ID = 100000;
 	static const UINT AUTOSAVE_TIMEOUT = 30000;
 
-	struct ArrangeMenuItem_t
+	struct SortMenuItem
 	{
 		UINT SortById;
 		UINT GroupById;
@@ -303,7 +303,7 @@ private:
 	/* Menus. */
 	HMENU					InitializeRightClickMenu(void);
 	void					SetProgramMenuItemStates(HMENU hProgramMenu);
-	void					SetArrangeMenuItemStates();
+	void					SetSortMenuItemStates();
 
 	/* Control creation. */
 	HWND					CreateMainListView(HWND hParent);
@@ -394,11 +394,11 @@ private:
 	void					SetLanguageModule(void);
 	BOOL					VerifyLanguageVersion(const TCHAR *szLanguageModule) const;
 
-	/* Arrange menu. */
-	void					InitializeArrangeMenuItems();
-	void					InsertArrangeMenuItems(HMENU hMenu);
-	void					DeleteArrangeMenuItems();
-	void					UpdateArrangeMenuItems();
+	/* Sort menu. */
+	void					InitializeSortMenuItems();
+	void					InsertSortMenuItems(HMENU hMenu);
+	void					DeleteSortMenuItems();
+	void					UpdateSortMenuItems();
 
 	/* File operations. */
 	void					CopyToFolder(bool move);
@@ -507,9 +507,9 @@ private:
 	/** Internal state. **/
 	HWND					m_hLastActiveWindow;
 	HWND					m_hNextClipboardViewer;
-	HMENU					m_hArrangeSubMenu;
+	HMENU					m_hSortSubMenu;
 	HMENU					m_hGroupBySubMenu;
-	HMENU					m_hArrangeSubMenuRClick;
+	HMENU					m_hSortSubMenuRClick;
 	HMENU					m_hGroupBySubMenuRClick;
 	std::wstring			m_CurrentDirectory;
 	TCHAR					m_OldTreeViewFileName[MAX_PATH];
@@ -611,8 +611,8 @@ private:
 	/* Menu images. */
 	std::vector<wil::unique_hbitmap>	m_menuImages;
 
-	/* Arrange menu related data. */
-	std::list<ArrangeMenuItem_t>	m_ArrangeMenuItems;
+	/* Sort menu. */
+	std::list<SortMenuItem>	m_sortMenuItems;
 
 	/* Mousewheel. */
 	int						m_zDeltaTotal;

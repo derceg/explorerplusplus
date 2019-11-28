@@ -1106,15 +1106,15 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnGroupBy(SortMode::MediaYear);
 		break;
 
-	case IDM_ARRANGEICONSBY_ASCENDING:
+	case IDM_SORT_ASCENDING:
 		OnSortByAscending(TRUE);
 		break;
 
-	case IDM_ARRANGEICONSBY_DESCENDING:
+	case IDM_SORT_DESCENDING:
 		OnSortByAscending(FALSE);
 		break;
 
-	case IDM_ARRANGEICONSBY_AUTOARRANGE:
+	case IDM_VIEW_AUTOARRANGE:
 		m_pActiveShellBrowser->SetAutoArrange(!m_pActiveShellBrowser->GetAutoArrange());
 		break;
 

@@ -148,9 +148,6 @@
     <ClCompile Include="TreeViewHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ArrangeMenuHandler.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="ShellContextMenuHandler.cpp">
       <Filter>Context Menu Support</Filter>
     </ClCompile>
@@ -363,6 +360,9 @@
     </ClCompile>
     <ClCompile Include="ShellBrowser\TileView.cpp">
       <Filter>ShellBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="SortMenuHandler.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

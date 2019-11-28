@@ -459,7 +459,7 @@
     <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="ApplicationToolbarButtonDialog.cpp" />
     <ClCompile Include="ApplicationToolbarDropHandler.cpp" />
-    <ClCompile Include="ArrangeMenuHandler.cpp" />
+    <ClCompile Include="SortMenuHandler.cpp" />
     <ClCompile Include="BookmarkHandler.cpp" />
     <ClCompile Include="BookmarkHelper.cpp" />
     <ClCompile Include="BookmarkListView.cpp" />

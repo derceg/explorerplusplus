@@ -6,6 +6,6 @@
 
 #include "ShellBrowser/SortModes.h"
 
-UINT GetArrangeMenuItemStringIndex(UINT uItemId);
+UINT GetSortMenuItemStringIndex(UINT uItemId);
 int DetermineSortModeMenuId(SortMode sortMode);
 int DetermineGroupModeMenuId(SortMode sortMode);

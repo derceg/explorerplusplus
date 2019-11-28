@@ -15,16 +15,16 @@
 #include "../Helper/ShellHelper.h"
 #include <list>
 
-void Explorerplusplus::InitializeArrangeMenuItems()
+void Explorerplusplus::InitializeSortMenuItems()
 {
 	HMENU hMainMenu = GetMenu(m_hContainer);
 
-	// Insert the default arrange sub menu. This menu will not contain any sort
+	// Insert the default sort sub menu. This menu will not contain any sort
 	// menu items.
 	MENUITEMINFO mi;
 	mi.cbSize	= sizeof(mi);
 	mi.fMask	= MIIM_SUBMENU;
-	mi.hSubMenu	= m_hArrangeSubMenu;
+	mi.hSubMenu	= m_hSortSubMenu;
 	SetMenuItemInfo(hMainMenu,IDM_VIEW_SORTBY,FALSE,&mi);
 
 	mi.cbSize	= sizeof(mi);
@@ -33,15 +33,15 @@ void Explorerplusplus::InitializeArrangeMenuItems()
 	SetMenuItemInfo(hMainMenu,IDM_VIEW_GROUPBY,FALSE,&mi);
 }
 
-void Explorerplusplus::InsertArrangeMenuItems(HMENU hMenu)
+void Explorerplusplus::InsertSortMenuItems(HMENU hMenu)
 {
 	int index = 0;
 
-	for(const ArrangeMenuItem_t &menuItem : m_ArrangeMenuItems)
+	for(const SortMenuItem &menuItem : m_sortMenuItems)
 	{
 		MENUITEMINFO mi;
 
-		UINT uStringIndex = GetArrangeMenuItemStringIndex(menuItem.SortById);
+		UINT uStringIndex = GetSortMenuItemStringIndex(menuItem.SortById);
 		std::wstring menuText = ResourceHelper::LoadString(m_hLanguageModule,uStringIndex);
 
 		mi.cbSize		= sizeof(mi);
@@ -49,7 +49,7 @@ void Explorerplusplus::InsertArrangeMenuItems(HMENU hMenu)
 		mi.dwTypeData	= menuText.data();
 		mi.wID			= menuItem.SortById;
 		InsertMenuItem(hMenu,index,TRUE,&mi);
-		InsertMenuItem(m_hArrangeSubMenuRClick,index,TRUE,&mi);
+		InsertMenuItem(m_hSortSubMenuRClick,index,TRUE,&mi);
 
 		ZeroMemory(&mi,sizeof(mi));
 		mi.cbSize		= sizeof(mi);
@@ -63,24 +63,24 @@ void Explorerplusplus::InsertArrangeMenuItems(HMENU hMenu)
 	}
 }
 
-void Explorerplusplus::DeleteArrangeMenuItems()
+void Explorerplusplus::DeleteSortMenuItems()
 {
-	for (const ArrangeMenuItem_t &menuItem : m_ArrangeMenuItems)
+	for (const SortMenuItem &menuItem : m_sortMenuItems)
 	{
-		DeleteMenu(m_hArrangeSubMenu, menuItem.SortById, MF_BYCOMMAND);
-		DeleteMenu(m_hArrangeSubMenuRClick, menuItem.SortById, MF_BYCOMMAND);
+		DeleteMenu(m_hSortSubMenu, menuItem.SortById, MF_BYCOMMAND);
+		DeleteMenu(m_hSortSubMenuRClick, menuItem.SortById, MF_BYCOMMAND);
 		DeleteMenu(m_hGroupBySubMenu, menuItem.GroupById, MF_BYCOMMAND);
 		DeleteMenu(m_hGroupBySubMenuRClick, menuItem.GroupById, MF_BYCOMMAND);
 	}
 }
 
-void Explorerplusplus::UpdateArrangeMenuItems()
+void Explorerplusplus::UpdateSortMenuItems()
 {
-	DeleteArrangeMenuItems();
+	DeleteSortMenuItems();
 
 	auto sortModes = m_pActiveShellBrowser->GetAvailableSortModes();
 
-	m_ArrangeMenuItems.clear();
+	m_sortMenuItems.clear();
 
 	for(SortMode sortMode : sortModes)
 	{
@@ -89,12 +89,12 @@ void Explorerplusplus::UpdateArrangeMenuItems()
 
 		if(SortById != -1 && GroupById != -1)
 		{
-			ArrangeMenuItem_t am;
+			SortMenuItem am;
 			am.SortById = SortById;
 			am.GroupById = GroupById;
-			m_ArrangeMenuItems.push_back(am);
+			m_sortMenuItems.push_back(am);
 		}
 	}
 
-	InsertArrangeMenuItems(m_hArrangeSubMenu);
+	InsertSortMenuItems(m_hSortSubMenu);
 }

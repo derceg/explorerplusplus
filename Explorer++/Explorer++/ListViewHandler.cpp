@@ -967,7 +967,7 @@ HMENU Explorerplusplus::InitializeRightClickMenu(void)
 
 	mii.cbSize		= sizeof(mii);
 	mii.fMask		= MIIM_SUBMENU;
-	mii.hSubMenu	= m_hArrangeSubMenuRClick;
+	mii.hSubMenu	= m_hSortSubMenuRClick;
 	SetMenuItemInfo(hMenu,IDM_POPUP_SORTBY,FALSE,&mii);
 
 	mii.cbSize		= sizeof(mii);

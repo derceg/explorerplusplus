@@ -107,8 +107,8 @@ void Explorerplusplus::OnCreate()
 
 	SetMenu(m_hContainer, mainMenu);
 
-	m_hArrangeSubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_ARRANGEMENU)), 0);
-	m_hArrangeSubMenuRClick = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_ARRANGEMENU)), 0);
+	m_hSortSubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_SORT_MENU)), 0);
+	m_hSortSubMenuRClick = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_SORT_MENU)), 0);
 	m_hGroupBySubMenu = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
 	m_hGroupBySubMenuRClick = GetSubMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_GROUPBY_MENU)), 0);
 
@@ -147,8 +147,7 @@ void Explorerplusplus::OnCreate()
 		SHCNE_ASSOCCHANGED, WM_APP_ASSOCCHANGED, 1, &shcne);
 
 	InitializeMainMenu();
-
-	InitializeArrangeMenuItems();
+	InitializeSortMenuItems();
 
 	/* Place the main window in the clipboard chain. This
 	will allow the 'Paste' button to be enabled/disabled

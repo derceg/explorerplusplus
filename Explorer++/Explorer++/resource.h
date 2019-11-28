@@ -17,7 +17,7 @@
 #define IDD_FILTER                      139
 #define IDR_MAINMENU                    151
 #define IDR_MAINMENU_RCLICK             155
-#define IDR_ARRANGEMENU                 156
+#define IDR_SORT_MENU                   156
 #define IDR_TAB_RCLICK                  164
 #define IDD_OPTIONS_TABS                166
 #define IDD_SETFILEATTRIBUTES           167
@@ -592,13 +592,9 @@
 #define IDM_VIEW_STATUSBAR              40077
 #define IDM_VIEW_FOLDERS                40078
 #define IDM_VIEW_ADDRESSBAR             40079
-#define IDM_ARRANGEICONSBY_NAME         40085
-#define IDM_ARRANGEICONSBY_SIZE         40086
-#define IDM_ARRANGEICONSBY_TYPE         40087
-#define IDM_ARRANGEICONSBY_DATEMODIFIED 40088
-#define IDM_ARRANGEICONSBY_ASCENDING    40089
-#define IDM_ARRANGEICONSBY_DESCENDING   40090
-#define IDM_ARRANGEICONSBY_AUTOARRANGE  40092
+#define IDM_SORT_ASCENDING              40089
+#define IDM_SORT_DESCENDING             40090
+#define IDM_VIEW_AUTOARRANGE            40092
 #define IDM_GO_BACK                     40093
 #define IDM_GO_FORWARD                  40094
 #define IDM_GO_UPONELEVEL               40095
