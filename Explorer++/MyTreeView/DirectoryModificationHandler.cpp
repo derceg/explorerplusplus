@@ -4,11 +4,12 @@
 
 #include "stdafx.h"
 #include "MyTreeView.h"
-#include "MyTreeViewInternal.h"
 #include "../Helper/Helper.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
 
+const UINT DIRECTORYMODIFIED_TIMER_ID = 0;
+const UINT DIRECTORYMODIFIED_TIMER_ELAPSE = 500;
 
 void CMyTreeView::DirectoryAltered(void)
 {

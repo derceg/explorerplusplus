@@ -4,15 +4,19 @@
 
 #include "stdafx.h"
 #include "MyTreeView.h"
-#include "MyTreeViewInternal.h"
-#include "../Helper/Helper.h"
 #include "../Helper/DropHandler.h"
-#include "../Helper/ShellHelper.h"
+#include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
 
+const LONG MIN_X_POS = 10;
+const LONG MIN_Y_POS = 10;
 
-#define MIN_X_POS	10
-#define MIN_Y_POS	10
+const UINT DRAGEXPAND_TIMER_ID = 1;
+const UINT DRAGEXPAND_TIMER_ELAPSE = 800;
+
+const UINT DRAGSCROLL_TIMER_ID = 2;
+const UINT DRAGSCROLL_TIMER_ELAPSE = 1000;
 
 void CALLBACK DragExpandTimerProc(HWND hwnd,UINT uMsg,
 UINT_PTR idEvent,DWORD dwTime);

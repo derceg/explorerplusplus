@@ -16,7 +16,6 @@
 
 #include "stdafx.h"
 #include "MyTreeView.h"
-#include "MyTreeViewInternal.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"

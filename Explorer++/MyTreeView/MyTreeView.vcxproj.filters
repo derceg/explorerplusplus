@@ -21,9 +21,6 @@
     <ClInclude Include="MyTreeView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MyTreeViewInternal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
