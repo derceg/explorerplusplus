@@ -21,11 +21,11 @@
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
+#include <wil/com.h>
 #include <wil/common.h>
 
 LRESULT CALLBACK	TreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
-DWORD WINAPI		Thread_SubFoldersStub(LPVOID pVoid);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 
 CMyTreeView::CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon) :
@@ -35,12 +35,13 @@ CMyTreeView::CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMo
 	m_iRefCount(1),
 	m_bDragDropRegistered(FALSE),
 	m_iconThreadPool(1),
-	m_iconResultIDCounter(0)
+	m_iconResultIDCounter(0),
+	m_subfoldersThreadPool(1),
+	m_subfoldersResultIDCounter(0)
 {
 	SetWindowSubclass(m_hTreeView,TreeViewProcStub,0,(DWORD_PTR)this);
 
 	InitializeCriticalSection(&m_cs);
-	InitializeCriticalSection(&m_csSubFolders);
 
 	m_uItemMap = (int *)malloc(DEFAULT_ITEM_ALLOCATION * sizeof(int));
 	m_pItemInfo = (ItemInfo_t *)malloc(DEFAULT_ITEM_ALLOCATION * sizeof(ItemInfo_t));
@@ -56,11 +57,14 @@ CMyTreeView::CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMo
 	m_bDragAllowed		= FALSE;
 	m_bShowHidden		= TRUE;
 
-	m_iconThreadPool.push([] (int id) {
+	auto initializeComTask = [] (int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-	});
+	};
+
+	m_iconThreadPool.push(initializeComTask);
+	m_subfoldersThreadPool.push(initializeComTask);
 
 	AddRoot();
 
@@ -77,15 +81,17 @@ CMyTreeView::~CMyTreeView()
 	free(m_pItemInfo);
 
 	DeleteCriticalSection(&m_cs);
-	DeleteCriticalSection(&m_csSubFolders);
 
 	m_iconThreadPool.clear_queue();
 
-	m_iconThreadPool.push([] (int id) {
+	auto uninitializeComTask = [] (int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		CoUninitialize();
-	});
+	};
+
+	m_iconThreadPool.push(uninitializeComTask);
+	m_subfoldersThreadPool.push(uninitializeComTask);
 }
 
 LRESULT CALLBACK TreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,
@@ -192,6 +198,10 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 
 		case WM_APP_ICON_RESULT_READY:
 			ProcessIconResult(static_cast<int>(wParam));
+			break;
+
+		case WM_APP_SUBFOLDERS_RESULT_READY:
+			ProcessSubfoldersResult(static_cast<int>(wParam));
 			break;
 
 		case WM_DESTROY:
@@ -309,26 +319,34 @@ void CMyTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 		QueueIconTask(ptvItem->hItem);
 	}
 
+	if (WI_IsFlagSet(ptvItem->mask, TVIF_CHILDREN))
+	{
+		ptvItem->cChildren = 1;
+
+		QueueSubfoldersTask(ptvItem->hItem);
+	}
+
 	ptvItem->mask |= TVIF_DI_SETITEM;
 }
 
 void CMyTreeView::QueueIconTask(HTREEITEM item)
 {
-	IconRetrievalItemInfo itemInfo;
-	itemInfo.pidl = BuildPath(item);
+	BasicItemInfo basicItemInfo;
+	basicItemInfo.pidl = BuildPath(item);
 
 	int iconResultID = m_iconResultIDCounter++;
 
-	auto result = m_iconThreadPool.push([this, iconResultID, item, itemInfo](int id) {
+	auto result = m_iconThreadPool.push([this, iconResultID, item, basicItemInfo](int id) {
 		UNREFERENCED_PARAMETER(id);
 
-		return FindIconAsync(m_hTreeView, iconResultID, item, itemInfo.pidl.get());
+		return FindIconAsync(m_hTreeView, iconResultID, item, basicItemInfo.pidl.get());
 	});
 
 	m_iconResults.insert({ iconResultID, std::move(result) });
 }
 
-std::optional<CMyTreeView::IconResult> CMyTreeView::FindIconAsync(HWND treeView, int iconResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl)
+std::optional<CMyTreeView::IconResult> CMyTreeView::FindIconAsync(HWND treeView,
+	int iconResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl)
 {
 	SHFILEINFO shfi;
 	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidl), 0, &shfi,
@@ -377,7 +395,85 @@ void CMyTreeView::ProcessIconResult(int iconResultId)
 	tvItem.iSelectedImage = result->iconIndex;
 	tvItem.stateMask = TVIS_OVERLAYMASK;
 	tvItem.state = INDEXTOOVERLAYMASK(result->iconIndex >> 24);
+	TreeView_SetItem(m_hTreeView, &tvItem);
+}
 
+void CMyTreeView::QueueSubfoldersTask(HTREEITEM item)
+{
+	BasicItemInfo basicItemInfo;
+	basicItemInfo.pidl = BuildPath(item);
+
+	int subfoldersResultID = m_subfoldersResultIDCounter++;
+
+	auto result = m_subfoldersThreadPool.push([this, subfoldersResultID, item, basicItemInfo] (int id) {
+		UNREFERENCED_PARAMETER(id);
+
+		return CheckSubfoldersAsync(m_hTreeView, subfoldersResultID, item, basicItemInfo.pidl.get());
+	});
+
+	m_subfoldersResults.insert({ subfoldersResultID, std::move(result) });
+}
+
+std::optional<CMyTreeView::SubfoldersResult> CMyTreeView::CheckSubfoldersAsync(HWND treeView,
+	int subfoldersResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl)
+{
+	wil::com_ptr<IShellFolder> pShellFolder;
+	PCITEMID_CHILD pidlRelative;
+	HRESULT hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	ULONG attributes = SFGAO_HASSUBFOLDER;
+	hr = pShellFolder->GetAttributesOf(1, &pidlRelative, &attributes);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	PostMessage(treeView, WM_APP_SUBFOLDERS_RESULT_READY, subfoldersResultId, 0);
+
+	SubfoldersResult result;
+	result.item = item;
+	result.hasSubfolder = WI_IsFlagSet(attributes, SFGAO_HASSUBFOLDER);
+
+	return result;
+}
+
+void CMyTreeView::ProcessSubfoldersResult(int subfoldersResultId)
+{
+	auto itr = m_subfoldersResults.find(subfoldersResultId);
+
+	if (itr == m_subfoldersResults.end())
+	{
+		return;
+	}
+
+	auto cleanup = wil::scope_exit([this, itr] () {
+		m_subfoldersResults.erase(itr);
+	});
+
+	auto result = itr->second.get();
+
+	if (!result)
+	{
+		return;
+	}
+
+	if (result->hasSubfolder)
+	{
+		// By default it's assumed that an item has subfolders, so if it does
+		// actually have subfolders, there's nothing else that needs to be done.
+		return;
+	}
+
+	TVITEM tvItem;
+	tvItem.mask = TVIF_HANDLE | TVIF_CHILDREN;
+	tvItem.hItem = result->item;
+	tvItem.cChildren = 0;
 	TreeView_SetItem(m_hTreeView, &tvItem);
 }
 
@@ -446,7 +542,6 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 {
 	IEnumIDList		*pEnumIDList = NULL;
 	PITEMID_CHILD	rgelt = NULL;
-	ThreadInfo_t	*pThreadInfo = NULL;
 	SHCONTF			EnumFlags;
 	TCHAR			szDirectory[MAX_PATH];
 	ULONG			uFetched;
@@ -565,7 +660,7 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 			tvItem.iImage			= I_IMAGECALLBACK;
 			tvItem.iSelectedImage	= I_IMAGECALLBACK;
 			tvItem.lParam			= (LPARAM)itr->iItemId;
-			tvItem.cChildren		= 1;
+			tvItem.cChildren		= I_CHILDRENCALLBACK;
 
 			tvis.hInsertAfter		= TVI_LAST;
 			tvis.hParent			= hParent;
@@ -587,19 +682,6 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 	}
 
 	SendMessage(m_hTreeView,WM_SETREDRAW,(WPARAM)TRUE,(LPARAM)NULL);
-
-	pThreadInfo = (ThreadInfo_t *)malloc(sizeof(ThreadInfo_t));
-
-	if(pThreadInfo != NULL)
-	{
-		pThreadInfo->hTreeView		= m_hTreeView;
-		pThreadInfo->pidl			= ILClone(pidlDirectory);
-		pThreadInfo->hParent		= hParent;
-		pThreadInfo->pMyTreeView	= this;
-
-		HANDLE hThread = CreateThread(NULL,0,Thread_SubFoldersStub,pThreadInfo,0,NULL);
-		CloseHandle(hThread);
-	}
 }
 
 int CMyTreeView::GenerateUniqueItemId(void)
@@ -648,109 +730,6 @@ int CMyTreeView::GenerateUniqueItemId(void)
 			return -1;
 		}
 	}
-}
-
-DWORD WINAPI Thread_SubFoldersStub(LPVOID pParam)
-{
-	CMyTreeView		*pMyTreeView = NULL;
-	ThreadInfo_t	*pThreadInfo = NULL;
-
-	pThreadInfo = (ThreadInfo_t *)pParam;
-
-	pMyTreeView = pThreadInfo->pMyTreeView;
-
-	CoInitializeEx(NULL,COINIT_APARTMENTTHREADED);
-
-	pMyTreeView->Thread_SubFolders(pParam);
-
-	CoUninitialize();
-
-	return 0;
-}
-
-DWORD WINAPI CMyTreeView::Thread_SubFolders(LPVOID pParam)
-{
-	IShellFolder	*pShellFolder = NULL;
-	PIDLIST_ABSOLUTE	pidl = NULL;
-	PCITEMID_CHILD	pidlRelative = NULL;
-	HTREEITEM		hItem;
-	TVITEM			tvItem;
-	ThreadInfo_t	*pThreadInfo = NULL;
-	ULONG			Attributes;
-	HRESULT			hr;
-	BOOL			res;
-
-	pThreadInfo = (ThreadInfo_t *)pParam;
-
-	hItem = TreeView_GetChild(pThreadInfo->hTreeView,pThreadInfo->hParent);
-
-	while(hItem != NULL)
-	{
-		Attributes = SFGAO_HASSUBFOLDER;
-
-		tvItem.mask	= TVIF_PARAM|TVIF_HANDLE;
-		tvItem.hItem	= hItem;
-
-		res = TreeView_GetItem(pThreadInfo->hTreeView,&tvItem);
-
-		if(res != FALSE)
-		{
-			int iItemID;
-			BOOL bValid = FALSE;
-
-			iItemID = (int)tvItem.lParam;
-
-			EnterCriticalSection(&m_csSubFolders);
-
-			/* If the item is valid at this point, we'll
-			clone it's pidl, and use it to check whether
-			the item has any subfolders. */
-			if(iItemID < m_iCurrentItemAllocation)
-			{
-				if(m_uItemMap[iItemID] == 1)
-				{
-					pidl = ILCloneFull(m_pItemInfo[(int)tvItem.lParam].pidl);
-
-					bValid = TRUE;
-				}
-			}
-
-			LeaveCriticalSection(&m_csSubFolders);
-
-			if(bValid)
-			{
-				hr = SHBindToParent(pidl, IID_PPV_ARGS(&pShellFolder), &pidlRelative);
-
-				if(SUCCEEDED(hr))
-				{
-					/* Only retrieve the attributes for this item. */
-					hr = pShellFolder->GetAttributesOf(1,&pidlRelative,&Attributes);
-
-					if(SUCCEEDED(hr))
-					{
-						if((Attributes & SFGAO_HASSUBFOLDER) != SFGAO_HASSUBFOLDER)
-						{
-							tvItem.mask			= TVIF_CHILDREN;
-							tvItem.cChildren	= 0;
-							TreeView_SetItem(pThreadInfo->hTreeView,&tvItem);
-						}
-					}
-
-					pShellFolder->Release();
-				}
-
-				CoTaskMemFree(pidl);
-			}
-		}
-
-		hItem = TreeView_GetNextSibling(pThreadInfo->hTreeView,hItem);
-	}
-
-	CoTaskMemFree(pThreadInfo->pidl);
-
-	free(pThreadInfo);
-
-	return 0;
 }
 
 HTREEITEM CMyTreeView::DetermineItemSortedPosition(HTREEITEM hParent, const TCHAR *szItem)
@@ -1227,8 +1206,6 @@ void CMyTreeView::EraseItems(HTREEITEM hParent)
 		if(Item.cChildren != 0)
 			EraseItems(hItem);
 
-		EnterCriticalSection(&m_csSubFolders);
-
 		pItemInfo = &m_pItemInfo[(int)Item.lParam];
 
 		CoTaskMemFree(pItemInfo->pidl);
@@ -1236,8 +1213,6 @@ void CMyTreeView::EraseItems(HTREEITEM hParent)
 
 		/* Free up this items id. */
 		m_uItemMap[(int)Item.lParam] = 0;
-
-		LeaveCriticalSection(&m_csSubFolders);
 
 		hItem = TreeView_GetNextSibling(m_hTreeView,hItem);
 	}

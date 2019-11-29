@@ -37,7 +37,6 @@ public:
 	HTREEITEM			LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	void				EraseItems(HTREEITEM hParent);
 	BOOL				QueryDragging(void);
-	DWORD WINAPI		Thread_SubFolders(LPVOID pParam);
 	void				SetShowHidden(BOOL bShowHidden);
 	void				RefreshAllIcons(void);
 
@@ -55,6 +54,7 @@ public:
 private:
 
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
+	static const UINT WM_APP_SUBFOLDERS_RESULT_READY = WM_APP + 2;
 
 	/* Used to store the tree items as you enumerate them ready for sorting. */
 	typedef struct
@@ -75,11 +75,11 @@ private:
 		PITEMID_CHILD pridl;
 	} ItemInfo_t;
 
-	struct IconRetrievalItemInfo
+	struct BasicItemInfo
 	{
-		IconRetrievalItemInfo() = default;
+		BasicItemInfo() = default;
 
-		IconRetrievalItemInfo(const IconRetrievalItemInfo &other)
+		BasicItemInfo(const BasicItemInfo &other)
 		{
 			pidl.reset(ILCloneFull(other.pidl.get()));
 		}
@@ -91,6 +91,12 @@ private:
 	{
 		HTREEITEM item;
 		int iconIndex;
+	};
+
+	struct SubfoldersResult
+	{
+		HTREEITEM item;
+		bool hasSubfolder;
 	};
 
 	typedef struct
@@ -141,6 +147,10 @@ private:
 	static std::optional<IconResult>	FindIconAsync(HWND treeView, int iconResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl);
 	void		ProcessIconResult(int iconResultId);
 
+	void		QueueSubfoldersTask(HTREEITEM item);
+	static std::optional<SubfoldersResult> CheckSubfoldersAsync(HWND treeView, int subfoldersResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl);
+	void		ProcessSubfoldersResult(int subfoldersResultId);
+
 	/* Item id's. */
 	int			GenerateUniqueItemId(void);
 
@@ -174,8 +184,9 @@ private:
 	std::unordered_map<int, std::future<std::optional<IconResult>>>	m_iconResults;
 	int					m_iconResultIDCounter;
 
-	/* Subfolder thread. */
-	CRITICAL_SECTION	m_csSubFolders;
+	ctpl::thread_pool	m_subfoldersThreadPool;
+	std::unordered_map<int, std::future<std::optional<SubfoldersResult>>>	m_subfoldersResults;
+	int					m_subfoldersResultIDCounter;
 
 	/* Item id's and info. */
 	int					*m_uItemMap;
@@ -205,11 +216,3 @@ private:
 	BOOL				m_bQueryRemoveCompleted;
 	TCHAR				m_szQueryRemove[MAX_PATH];
 };
-
-typedef struct
-{
-	HWND			hTreeView;
-	HTREEITEM		hParent;
-	LPITEMIDLIST	pidl;
-	CMyTreeView		*pMyTreeView;
-} ThreadInfo_t;
