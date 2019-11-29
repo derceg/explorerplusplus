@@ -4,8 +4,6 @@
 
 #pragma once
 
-#define DEFAULT_ITEM_ALLOCATION		100
-
 /* Timer information. */
 #define DIRECTORYMODIFIED_TIMER_ID		0
 #define DIRECTORYMODIFIED_TIMER_ELAPSE	500

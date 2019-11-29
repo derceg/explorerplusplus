@@ -423,8 +423,8 @@ void CMyTreeView::AddItemInternal(HTREEITEM hParent,const TCHAR *szFullFileName)
 
 					iItemId = GenerateUniqueItemId();
 
-					m_pItemInfo[iItemId].pidl = ILCloneFull(pidlComplete);
-					m_pItemInfo[iItemId].pridl = ILCloneChild(pidlRelative);
+					m_itemInfoMap[iItemId].pidl.reset(ILCloneFull(pidlComplete));
+					m_itemInfoMap[iItemId].pridl.reset(ILCloneChild(pidlRelative));
 
 					GetDisplayName(szFullFileName,szDisplayName,SIZEOF_ARRAY(szDisplayName),SHGDN_NORMAL);
 
@@ -460,7 +460,6 @@ change. */
 void CMyTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 {
 	TVITEMEX	tvItem;
-	ItemInfo_t	*pItemInfo = NULL;
 	PIDLIST_ABSOLUTE	pidlParent;
 	SHFILEINFO	shfi;
 	TCHAR		szFileName[MAX_PATH];
@@ -476,16 +475,13 @@ void CMyTreeView::RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName)
 
 	if(res)
 	{
-		pItemInfo = &m_pItemInfo[(int)tvItem.lParam];
-
-		CoTaskMemFree(pItemInfo->pidl);
-
 		StringCchCopy(szFileName, SIZEOF_ARRAY(szFileName), szFullFileName);
 		PathStripPath(szFileName);
 
-		hr = SHParseDisplayName(szFullFileName, nullptr, &pItemInfo->pidl, 0, nullptr);
+		ItemInfo_t &iteminfo = m_itemInfoMap.at(static_cast<int>(tvItem.lParam));
+		hr = SHParseDisplayName(szFullFileName, nullptr, wil::out_param(iteminfo.pidl), 0, nullptr);
 
-		pidlParent = pItemInfo->pidl;
+		pidlParent = iteminfo.pidl.get();
 
 		if(SUCCEEDED(hr))
 		{
@@ -543,17 +539,12 @@ void CMyTreeView::UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlParent
 	}
 }
 
-PCIDLIST_ABSOLUTE CMyTreeView::UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent,int iItemId)
+PCIDLIST_ABSOLUTE CMyTreeView::UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent, int iItemId)
 {
-	ItemInfo_t *pItemInfo = NULL;
+	ItemInfo_t &itemInfo = m_itemInfoMap.at(iItemId);
+	itemInfo.pidl.reset(ILCombine(pidlParent, itemInfo.pridl.get()));
 
-	pItemInfo = &m_pItemInfo[iItemId];
-
-	CoTaskMemFree(pItemInfo->pidl);
-
-	m_pItemInfo[iItemId].pidl = ILCombine(pidlParent,m_pItemInfo[iItemId].pridl);
-
-	return m_pItemInfo[iItemId].pidl;
+	return itemInfo.pidl.get();
 }
 
 void CMyTreeView::RemoveItem(const TCHAR *szFullFileName)
@@ -598,7 +589,7 @@ void CMyTreeView::UpdateParent(HTREEITEM hParent)
 
 		if(bRes)
 		{
-			hr = GetItemAttributes(m_pItemInfo[static_cast<int>(tvItem.lParam)].pidl,
+			hr = GetItemAttributes(m_itemInfoMap.at(static_cast<int>(tvItem.lParam)).pidl.get(),
 				&Attributes);
 
 			if(SUCCEEDED(hr))

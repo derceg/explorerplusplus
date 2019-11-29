@@ -56,6 +56,12 @@ private:
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
 	static const UINT WM_APP_SUBFOLDERS_RESULT_READY = WM_APP + 2;
 
+	typedef struct
+	{
+		unique_pidl_absolute pidl;
+		unique_pidl_child pridl;
+	} ItemInfo_t;
+
 	/* Used to store the tree items as you enumerate them ready for sorting. */
 	typedef struct
 	{
@@ -68,12 +74,6 @@ private:
 		TCHAR szFileName[MAX_PATH];
 		DWORD dwAction;
 	} AlteredFile_t;
-
-	typedef struct
-	{
-		PIDLIST_ABSOLUTE pidl;
-		PITEMID_CHILD pridl;
-	} ItemInfo_t;
 
 	struct BasicItemInfo
 	{
@@ -152,7 +152,7 @@ private:
 	void		ProcessSubfoldersResult(int subfoldersResultId);
 
 	/* Item id's. */
-	int			GenerateUniqueItemId(void);
+	int			GenerateUniqueItemId();
 
 	/* Drag and drop. */
 	HRESULT		InitializeDragDropHelpers(void);
@@ -189,9 +189,9 @@ private:
 	int					m_subfoldersResultIDCounter;
 
 	/* Item id's and info. */
-	int					*m_uItemMap;
-	ItemInfo_t			*m_pItemInfo;
-	int					m_iCurrentItemAllocation;
+	std::unordered_map<int, ItemInfo_t>	m_itemInfoMap;
+	int					m_itemIDCounter;
+
 	int					m_iFolderIcon;
 
 	/* Drag and drop. */
