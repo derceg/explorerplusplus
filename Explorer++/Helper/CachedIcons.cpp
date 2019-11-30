@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "CachedIcons.h"
+#include "ShellHelper.h"
 
 CachedIcons::CachedIcons(std::size_t maxItems) :
 	m_maxItems(maxItems)
@@ -15,6 +16,25 @@ CachedIcons::iterator CachedIcons::end()
 {
 	CachedIconSetByPath &pathIndex = m_cachedIconSet.get<1>();
 	return pathIndex.end();
+}
+
+void CachedIcons::addOrUpdateFileIcon(const std::wstring &filePath, int iconIndex)
+{
+	auto cachedItr = findByPath(filePath);
+
+	if (cachedItr != end())
+	{
+		CachedIcon existingCachedIcon = *cachedItr;
+		existingCachedIcon.iconIndex = iconIndex;
+		replace(cachedItr, existingCachedIcon);
+	}
+	else
+	{
+		CachedIcon cachedIcon;
+		cachedIcon.filePath = filePath;
+		cachedIcon.iconIndex = iconIndex;
+		insert(cachedIcon);
+	}
 }
 
 void CachedIcons::insert(const CachedIcon &cachedIcon)
@@ -40,8 +60,8 @@ void CachedIcons::replace(CachedIconSetByPath::iterator itr, const CachedIcon &c
 	m_cachedIconSet.relocate(m_cachedIconSet.begin(), sequenceItr);
 }
 
-CachedIcons::iterator CachedIcons::findByPath(const std::wstring &path)
+CachedIcons::iterator CachedIcons::findByPath(const std::wstring &filePath)
 {
 	CachedIconSetByPath &pathIndex = m_cachedIconSet.get<1>();
-	return pathIndex.find(path);
+	return pathIndex.find(filePath);
 }

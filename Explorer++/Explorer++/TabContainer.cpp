@@ -34,21 +34,22 @@ const std::map<UINT, Icon> TAB_RIGHT_CLICK_MENU_IMAGE_MAPPINGS = {
 };
 
 TabContainer *TabContainer::Create(HWND parent, TabContainerInterface *tabContainer,
-	TabInterface *tabInterface, Navigation *navigation, IExplorerplusplus *expp, HINSTANCE instance,
-	std::shared_ptr<Config> config)
+	TabInterface *tabInterface, Navigation *navigation, IExplorerplusplus *expp,
+	CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config)
 {
-	return new TabContainer(parent, tabContainer, tabInterface, navigation, expp, instance, config);
+	return new TabContainer(parent, tabContainer, tabInterface, navigation, expp, cachedIcons, instance, config);
 }
 
 TabContainer::TabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
-	Navigation *navigation, IExplorerplusplus *expp, HINSTANCE instance, std::shared_ptr<Config> config) :
+	Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons, HINSTANCE instance,
+	std::shared_ptr<Config> config) :
 	CBaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
 	m_tabIdCounter(1),
-	m_cachedIcons(MAX_CACHED_ICONS),
 	m_tabContainerInterface(tabContainer),
 	m_tabInterface(tabInterface),
 	m_navigation(navigation),
 	m_expp(expp),
+	m_cachedIcons(cachedIcons),
 	m_instance(instance),
 	m_config(config),
 	m_bTabBeenDragged(FALSE),
@@ -788,7 +789,7 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 	}
 
 	tab.SetShellBrowser(CShellBrowser::CreateNew(tab.GetId(), m_instance,
-		m_expp->GetMainWindow(), tab.listView, &m_cachedIcons, m_config,
+		m_expp->GetMainWindow(), tab.listView, m_cachedIcons, m_config,
 		folderSettingsFinal, initialColumns));
 
 	int index;

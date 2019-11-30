@@ -5,7 +5,6 @@
 #pragma once
 
 #include "CoreInterface.h"
-#include "ShellBrowser/CachedIcons.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "SignalWrapper.h"
 #include "Tab.h"
@@ -20,6 +19,7 @@
 #include <functional>
 #include <unordered_map>
 
+class CachedIcons;
 struct Config;
 class Navigation;
 
@@ -29,7 +29,7 @@ public:
 
 	static TabContainer *Create(HWND parent, TabContainerInterface *tabContainer,
 		TabInterface *tabInterface, Navigation *navigation, IExplorerplusplus *expp,
-		HINSTANCE instance, std::shared_ptr<Config> config);
+		CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config);
 
 	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none,
@@ -74,15 +74,11 @@ private:
 	static const UINT_PTR SUBCLASS_ID = 0;
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
-	// Represents the maximum number of icons that can be cached across
-	// all tabs (as the icon cache is shared between tabs).
-	static const int MAX_CACHED_ICONS = 1000;
-
 	static const int ICON_SIZE_96DPI = 16;
 
 	TabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
-		Navigation *navigation, IExplorerplusplus *expp, HINSTANCE instance,
-		std::shared_ptr<Config> config);
+		Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
+		HINSTANCE instance, std::shared_ptr<Config> config);
 	~TabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
@@ -141,7 +137,7 @@ private:
 
 	std::unordered_map<int, Tab> m_tabs;
 	int m_tabIdCounter;
-	CachedIcons m_cachedIcons;
+	CachedIcons *m_cachedIcons;
 	int m_tabIconLockIndex;
 
 	TabContainerInterface *m_tabContainerInterface;

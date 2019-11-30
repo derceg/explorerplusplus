@@ -16,6 +16,7 @@
 
 #include "stdafx.h"
 #include "MyTreeView.h"
+#include "../Helper/CachedIcons.h"
 #include "../Helper/DriveInfo.h"
 #include "../Helper/Helper.h"
 #include "../Helper/Macros.h"
@@ -27,10 +28,11 @@ LRESULT CALLBACK	TreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lPara
 int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 
-CMyTreeView::CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon) :
+CMyTreeView::CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons) :
 	m_hTreeView(hTreeView),
 	m_hParent(hParent),
 	m_pDirMon(pDirMon),
+	m_cachedIcons(cachedIcons),
 	m_iRefCount(1),
 	m_itemIDCounter(0),
 	m_bDragDropRegistered(FALSE),
@@ -302,10 +304,21 @@ void CMyTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 
 	if (WI_IsFlagSet(ptvItem->mask, TVIF_IMAGE))
 	{
-		ptvItem->iImage	= m_iFolderIcon;
-		ptvItem->iSelectedImage	= m_iFolderIcon;
+		const ItemInfo_t &itemInfo = m_itemInfoMap.at(static_cast<int>(ptvItem->lParam));
+		auto cachedIconIndex = GetCachedIconIndex(itemInfo);
 
-		QueueIconTask(ptvItem->hItem);
+		if (cachedIconIndex)
+		{
+			ptvItem->iImage = (*cachedIconIndex & 0x0FFF);
+			ptvItem->iSelectedImage = (*cachedIconIndex & 0x0FFF);
+		}
+		else
+		{
+			ptvItem->iImage = m_iFolderIcon;
+			ptvItem->iSelectedImage = m_iFolderIcon;
+		}
+
+		QueueIconTask(ptvItem->hItem, static_cast<int>(ptvItem->lParam));
 	}
 
 	if (WI_IsFlagSet(ptvItem->mask, TVIF_CHILDREN))
@@ -318,24 +331,46 @@ void CMyTreeView::OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi)
 	ptvItem->mask |= TVIF_DI_SETITEM;
 }
 
-void CMyTreeView::QueueIconTask(HTREEITEM item)
+std::optional<int> CMyTreeView::GetCachedIconIndex(const ItemInfo_t &itemInfo)
 {
+	TCHAR filePath[MAX_PATH];
+	HRESULT hr = GetDisplayName(itemInfo.pidl.get(), filePath, SIZEOF_ARRAY(filePath), SHGDN_FORPARSING);
+
+	if (FAILED(hr))
+	{
+		return std::nullopt;
+	}
+
+	auto cachedItr = m_cachedIcons->findByPath(filePath);
+
+	if (cachedItr == m_cachedIcons->end())
+	{
+		return std::nullopt;
+	}
+
+	return cachedItr->iconIndex;
+}
+
+void CMyTreeView::QueueIconTask(HTREEITEM item, int internalIndex)
+{
+	const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
+
 	BasicItemInfo basicItemInfo;
-	basicItemInfo.pidl = BuildPath(item);
+	basicItemInfo.pidl.reset(ILCloneFull(itemInfo.pidl.get()));
 
 	int iconResultID = m_iconResultIDCounter++;
 
-	auto result = m_iconThreadPool.push([this, iconResultID, item, basicItemInfo](int id) {
+	auto result = m_iconThreadPool.push([this, iconResultID, item, internalIndex, basicItemInfo](int id) {
 		UNREFERENCED_PARAMETER(id);
 
-		return FindIconAsync(m_hTreeView, iconResultID, item, basicItemInfo.pidl.get());
+		return FindIconAsync(m_hTreeView, iconResultID, item, internalIndex, basicItemInfo.pidl.get());
 	});
 
 	m_iconResults.insert({ iconResultID, std::move(result) });
 }
 
 std::optional<CMyTreeView::IconResult> CMyTreeView::FindIconAsync(HWND treeView,
-	int iconResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl)
+	int iconResultId, HTREEITEM item, int internalIndex, PCIDLIST_ABSOLUTE pidl)
 {
 	SHFILEINFO shfi;
 	DWORD_PTR res = SHGetFileInfo(reinterpret_cast<LPCTSTR>(pidl), 0, &shfi,
@@ -352,6 +387,7 @@ std::optional<CMyTreeView::IconResult> CMyTreeView::FindIconAsync(HWND treeView,
 
 	IconResult result;
 	result.item = item;
+	result.internalIndex = internalIndex;
 	result.iconIndex = shfi.iIcon;
 
 	return result;
@@ -375,6 +411,16 @@ void CMyTreeView::ProcessIconResult(int iconResultId)
 	if (!result)
 	{
 		return;
+	}
+
+	const ItemInfo_t &itemInfo = m_itemInfoMap.at(result->internalIndex);
+
+	TCHAR filePath[MAX_PATH];
+	HRESULT hr = GetDisplayName(itemInfo.pidl.get(), filePath, static_cast<UINT>(std::size(filePath)), SHGDN_FORPARSING);
+
+	if (SUCCEEDED(hr))
+	{
+		m_cachedIcons->addOrUpdateFileIcon(filePath, result->iconIndex);
 	}
 
 	TVITEM tvItem;

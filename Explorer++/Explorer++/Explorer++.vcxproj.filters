@@ -313,9 +313,6 @@
     <ClCompile Include="AddressBar.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowser\CachedIcons.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="StatusBar.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -641,9 +638,6 @@
     </ClInclude>
     <ClInclude Include="AddressBar.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellBrowser\CachedIcons.h">
-      <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="ViewModeHelper.h">
       <Filter>Core</Filter>

@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "ShellBrowser.h"
-#include "CachedIcons.h"
+#include "../Helper/CachedIcons.h"
 
 void CShellBrowser::QueueIconTask(int internalIndex)
 {
@@ -71,7 +71,14 @@ void CShellBrowser::ProcessIconResult(int iconResultId)
 	}
 
 	const ItemInfo_t &itemInfo = m_itemInfoMap.at(result->itemInternalIndex);
-	UpdateIconCache(itemInfo, result->iconIndex);
+
+	TCHAR filePath[MAX_PATH];
+	HRESULT hr = GetDisplayName(itemInfo.pidlComplete.get(), filePath, static_cast<UINT>(std::size(filePath)), SHGDN_FORPARSING);
+
+	if (SUCCEEDED(hr))
+	{
+		m_cachedIcons->addOrUpdateFileIcon(filePath, result->iconIndex);
+	}
 
 	LVITEM lvItem;
 	lvItem.mask = LVIF_IMAGE | LVIF_STATE;
@@ -81,34 +88,4 @@ void CShellBrowser::ProcessIconResult(int iconResultId)
 	lvItem.stateMask = LVIS_OVERLAYMASK;
 	lvItem.state = INDEXTOOVERLAYMASK(result->iconIndex >> 24);
 	ListView_SetItem(m_hListView, &lvItem);
-}
-
-void CShellBrowser::UpdateIconCache(const ItemInfo_t &itemInfo, int iconIndex)
-{
-	TCHAR filePath[MAX_PATH];
-	HRESULT hr = GetDisplayName(itemInfo.pidlComplete.get(),
-		filePath, SIZEOF_ARRAY(filePath), SHGDN_FORPARSING);
-
-	if (FAILED(hr))
-	{
-		// There's no way to update the cached icon without the file
-		// path.
-		return;
-	}
-
-	auto cachedItr = m_cachedIcons->findByPath(filePath);
-
-	if (cachedItr != m_cachedIcons->end())
-	{
-		CachedIcon existingCachedIcon = *cachedItr;
-		existingCachedIcon.iconIndex = iconIndex;
-		m_cachedIcons->replace(cachedItr, existingCachedIcon);
-	}
-	else
-	{
-		CachedIcon cachedIcon;
-		cachedIcon.file = filePath;
-		cachedIcon.iconIndex = iconIndex;
-		m_cachedIcons->insert(cachedIcon);
-	}
 }

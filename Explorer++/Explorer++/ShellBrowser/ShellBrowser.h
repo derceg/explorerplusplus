@@ -387,7 +387,6 @@ private:
 	void				QueueIconTask(int internalIndex);
 	static boost::optional<IconResult_t>	FindIconAsync(HWND listView, int iconResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo);
 	void				ProcessIconResult(int iconResultId);
-	void				UpdateIconCache(const ItemInfo_t &itemInfo, int iconIndex);
 	boost::optional<int>	GetCachedIconIndex(const ItemInfo_t &itemInfo);
 
 	/* Thumbnails view. */

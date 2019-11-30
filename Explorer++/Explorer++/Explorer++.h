@@ -17,6 +17,7 @@
 #include "TabInterface.h"
 #include "UiTheming.h"
 #include "ValueWrapper.h"
+#include "../Helper/CachedIcons.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/FileActionHandler.h"
 #include "../Helper/FileContextMenuManager.h"
@@ -112,6 +113,10 @@ private:
 
 	static const UINT_PTR AUTOSAVE_TIMER_ID = 100000;
 	static const UINT AUTOSAVE_TIMEOUT = 30000;
+
+	// Represents the maximum number of icons that can be cached. This cache is
+	// shared between various components in the application.
+	static const int MAX_CACHED_ICONS = 1000;
 
 	struct SortMenuItem
 	{
@@ -525,6 +530,8 @@ private:
 
 	std::unique_ptr<IconResourceLoader>	m_iconResourceLoader;
 	DpiCompatibility		m_dpiCompat;
+
+	CachedIcons				m_cachedIcons;
 
 	/* Tabs. */
 	TabContainer			*m_tabContainer;

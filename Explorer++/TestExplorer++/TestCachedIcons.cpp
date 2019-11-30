@@ -10,18 +10,18 @@ TEST(TestCachedIcons, TestMaxSize)
 	CachedIcons cachedIcons(2);
 
 	CachedIcon cachedIcon;
-	cachedIcon.file = L"C:\\file1";
+	cachedIcon.filePath = L"C:\\file1";
 	cachedIcon.iconIndex = 0;
 	cachedIcons.insert(cachedIcon);
 
-	cachedIcon.file = L"C:\\file2";
+	cachedIcon.filePath = L"C:\\file2";
 	cachedIcon.iconIndex = 0;
 	cachedIcons.insert(cachedIcon);
 
 	auto itr = cachedIcons.findByPath(L"C:\\file1");
 	EXPECT_TRUE(itr != cachedIcons.end());
 
-	cachedIcon.file = L"C:\\file3";
+	cachedIcon.filePath = L"C:\\file3";
 	cachedIcon.iconIndex = 0;
 	cachedIcons.insert(cachedIcon);
 
@@ -40,7 +40,7 @@ TEST(TestCachedIcons, TestLookup)
 	CachedIcons cachedIcons(2);
 
 	CachedIcon cachedIcon;
-	cachedIcon.file = L"C:\\file1";
+	cachedIcon.filePath = L"C:\\file1";
 	cachedIcon.iconIndex = 0;
 	cachedIcons.insert(cachedIcon);
 
@@ -56,11 +56,11 @@ TEST(TestCachedIcons, TestReplace)
 	CachedIcons cachedIcons(2);
 
 	CachedIcon cachedIcon;
-	cachedIcon.file = L"C:\\file1";
+	cachedIcon.filePath = L"C:\\file1";
 	cachedIcon.iconIndex = 0;
 	cachedIcons.insert(cachedIcon);
 
-	cachedIcon.file = L"C:\\file2";
+	cachedIcon.filePath = L"C:\\file2";
 	cachedIcon.iconIndex = 0;
 	cachedIcons.insert(cachedIcon);
 
@@ -72,7 +72,7 @@ TEST(TestCachedIcons, TestReplace)
 	itr = cachedIcons.findByPath(L"C:\\file1");
 	EXPECT_EQ(itr->iconIndex, 1);
 
-	cachedIcon.file = L"C:\\file3";
+	cachedIcon.filePath = L"C:\\file3";
 	cachedIcon.iconIndex = 0;
 	cachedIcons.insert(cachedIcon);
 

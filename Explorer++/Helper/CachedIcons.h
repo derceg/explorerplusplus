@@ -12,7 +12,7 @@
 
 struct CachedIcon
 {
-	std::wstring file;
+	std::wstring filePath;
 	int iconIndex;
 };
 
@@ -24,7 +24,7 @@ public:
 		CachedIcon,
 		boost::multi_index::indexed_by<
 			boost::multi_index::sequenced<>,
-			boost::multi_index::hashed_unique<boost::multi_index::member<CachedIcon, std::wstring, &CachedIcon::file>>
+			boost::multi_index::hashed_unique<boost::multi_index::member<CachedIcon, std::wstring, &CachedIcon::filePath>>
 		>
 	> CachedIconSet;
 
@@ -35,9 +35,10 @@ public:
 
 	iterator end();
 
+	void addOrUpdateFileIcon(const std::wstring &filePath, int iconIndex);
 	void insert(const CachedIcon &cachedIcon);
 	void replace(CachedIconSetByPath::iterator itr, const CachedIcon &cachedIcon);
-	iterator findByPath(const std::wstring &path);
+	iterator findByPath(const std::wstring &filePath);
 
 private:
 

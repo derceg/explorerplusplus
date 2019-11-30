@@ -13,6 +13,8 @@
 #define WM_USER_TREEVIEW				WM_APP + 70
 #define WM_USER_TREEVIEW_GAINEDFOCUS	(WM_USER_TREEVIEW + 2)
 
+class CachedIcons;
+
 class CMyTreeView : public IDropTarget, public IDropSource
 {
 public:
@@ -22,7 +24,7 @@ public:
 	ULONG __stdcall		AddRef(void);
 	ULONG __stdcall		Release(void);
 
-	CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon);
+	CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons);
 	~CMyTreeView();
 
 	/* Drop source functions. */
@@ -90,6 +92,7 @@ private:
 	struct IconResult
 	{
 		HTREEITEM item;
+		int internalIndex;
 		int iconIndex;
 	};
 
@@ -143,9 +146,11 @@ private:
 	void		DirectoryAlteredRenameFile(const TCHAR *szFullFileName);
 
 	/* Icons. */
-	void		QueueIconTask(HTREEITEM item);
-	static std::optional<IconResult>	FindIconAsync(HWND treeView, int iconResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl);
+	void		QueueIconTask(HTREEITEM item, int internalIndex);
+	static std::optional<IconResult>	FindIconAsync(HWND treeView, int iconResultId, HTREEITEM item,
+		int internalIndex, PCIDLIST_ABSOLUTE pidl);
 	void		ProcessIconResult(int iconResultId);
+	std::optional<int>	GetCachedIconIndex(const ItemInfo_t &itemInfo);
 
 	void		QueueSubfoldersTask(HTREEITEM item);
 	static std::optional<SubfoldersResult> CheckSubfoldersAsync(HWND treeView, int subfoldersResultId, HTREEITEM item, PCIDLIST_ABSOLUTE pidl);
@@ -191,6 +196,7 @@ private:
 	/* Item id's and info. */
 	std::unordered_map<int, ItemInfo_t>	m_itemInfoMap;
 	int					m_itemIDCounter;
+	CachedIcons			*m_cachedIcons;
 
 	int					m_iFolderIcon;
 

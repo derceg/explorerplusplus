@@ -531,7 +531,6 @@
     <ClCompile Include="SetDefaultColumnsDialog.cpp" />
     <ClCompile Include="SetFileAttributesDialog.cpp" />
     <ClCompile Include="ShellBrowser\BrowsingHandler.cpp" />
-    <ClCompile Include="ShellBrowser\CachedIcons.cpp" />
     <ClCompile Include="ShellBrowser\ColumnDataRetrieval.cpp" />
     <ClCompile Include="ShellBrowser\ColumnManager.cpp" />
     <ClCompile Include="ShellBrowser\DirectoryModificationHandler.cpp" />
@@ -671,7 +670,6 @@
     <ClInclude Include="SelectColumnsDialog.h" />
     <ClInclude Include="SetDefaultColumnsDialog.h" />
     <ClInclude Include="SetFileAttributesDialog.h" />
-    <ClInclude Include="ShellBrowser\CachedIcons.h" />
     <ClInclude Include="ShellBrowser\ColumnDataRetrieval.h" />
     <ClInclude Include="ShellBrowser\Columns.h" />
     <ClInclude Include="ShellBrowser\FolderSettings.h" />

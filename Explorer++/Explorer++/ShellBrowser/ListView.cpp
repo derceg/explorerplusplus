@@ -4,9 +4,9 @@
 
 #include "stdafx.h"
 #include "ShellBrowser.h"
-#include "CachedIcons.h"
 #include "Config.h"
 #include "MainResource.h"
+#include "../Helper/CachedIcons.h"
 #include <boost/format.hpp>
 
 LRESULT CALLBACK CShellBrowser::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
