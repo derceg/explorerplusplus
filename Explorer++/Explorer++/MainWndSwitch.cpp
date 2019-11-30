@@ -119,10 +119,6 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 	}
 		break;
 
-	case WM_USER_TREEVIEW_GAINEDFOCUS:
-		m_hLastActiveWindow = m_hTreeView;
-		break;
-
 	case WM_USER_DISPLAYWINDOWRESIZED:
 		OnDisplayWindowResized(wParam);
 		break;

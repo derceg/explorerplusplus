@@ -260,7 +260,6 @@ private:
 	void					OnTreeViewFileDelete(BOOL bPermanent);
 	void					OnTreeViewRightClick(WPARAM wParam,LPARAM lParam);
 	void					OnTreeViewShowFileProperties(void) const;
-	BOOL					OnTreeViewItemExpanding(LPARAM lParam);
 	void					OnTreeViewSelChanged(LPARAM lParam);
 	int						OnTreeViewBeginLabelEdit(LPARAM lParam);
 	int						OnTreeViewEndLabelEdit(LPARAM lParam);

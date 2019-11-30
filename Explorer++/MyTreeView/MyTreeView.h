@@ -7,11 +7,9 @@
 #include "../Helper/DropHandler.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ShellHelper.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <optional>
-
-#define WM_USER_TREEVIEW				WM_APP + 70
-#define WM_USER_TREEVIEW_GAINEDFOCUS	(WM_USER_TREEVIEW + 2)
 
 class CachedIcons;
 
@@ -31,13 +29,9 @@ public:
 	HRESULT _stdcall	QueryContinueDrag(BOOL fEscapePressed,DWORD gfrKeyState);
 	HRESULT _stdcall	GiveFeedback(DWORD dwEffect);
 
-	LRESULT CALLBACK	TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 	/* User functions. */
-	HRESULT				AddDirectory(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlDirectory);
 	unique_pidl_absolute	BuildPath(HTREEITEM hTreeItem);
 	HTREEITEM			LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
-	void				EraseItems(HTREEITEM hParent);
 	BOOL				QueryDragging(void);
 	void				SetShowHidden(BOOL bShowHidden);
 	void				RefreshAllIcons(void);
@@ -54,6 +48,9 @@ public:
 	void				MonitorDrivePublic(const TCHAR *szDrive);
 
 private:
+
+	static const UINT_PTR SUBCLASS_ID = 0;
+	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
 	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 1;
 	static const UINT WM_APP_SUBFOLDERS_RESULT_READY = WM_APP + 2;
@@ -114,9 +111,13 @@ private:
 		int		iMonitorId;
 	} DriveEvent_t;
 
-	/* Message handlers. */
-	LRESULT CALLBACK	OnNotify(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK TreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	static LRESULT CALLBACK ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	HRESULT		ExpandDirectory(HTREEITEM hParent);
 	void		AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory, HTREEITEM hParent);
 	void		DirectoryModified(DWORD dwAction, const TCHAR *szFullFileName);
 	void		DirectoryAltered(void);
@@ -127,10 +128,12 @@ private:
 	void		RenameItem(HTREEITEM hItem, const TCHAR *szFullFileName);
 	void		RemoveItem(const TCHAR *szFullFileName);
 	void		RemoveItem(HTREEITEM hItem);
+	void		EraseItems(HTREEITEM hParent);
 	void		UpdateParent(const TCHAR *szParent);
 	void		UpdateParent(HTREEITEM hParent);
 	LRESULT CALLBACK	OnDeviceChange(WPARAM wParam,LPARAM lParam);
 	void		OnGetDisplayInfo(NMTVDISPINFO *pnmtvdi);
+	void		OnItemExpanding(const NMTREEVIEW *nmtv);
 	void		UpdateChildren(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlParent);
 	PCIDLIST_ABSOLUTE UpdateItemInfo(PCIDLIST_ABSOLUTE pidlParent, int iItemId);
 	HTREEITEM	LocateDeletedItem(const TCHAR *szFullFileName);
@@ -179,10 +182,10 @@ private:
 	BOOL		IsDesktopSubChild(const TCHAR *szFullFileName);
 
 	HWND				m_hTreeView;
-	HWND				m_hParent;
 	int					m_iRefCount;
 	IDirectoryMonitor	*m_pDirMon;
 	BOOL				m_bShowHidden;
+	std::vector<WindowSubclassWrapper>	m_windowSubclasses;
 
 	ctpl::thread_pool	m_iconThreadPool;
 	std::unordered_map<int, std::future<std::optional<IconResult>>>	m_iconResults;

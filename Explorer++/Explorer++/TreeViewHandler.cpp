@@ -45,7 +45,7 @@ void Explorerplusplus::CreateFolderControls(void)
 	SetWindowTheme(m_hTreeView,L"Explorer",NULL);
 
 	SetWindowLongPtr(m_hTreeView,GWL_EXSTYLE,WS_EX_CLIENTEDGE);
-	m_pMyTreeView = new CMyTreeView(m_hTreeView, m_hContainer, m_pDirMon, &m_cachedIcons);
+	m_pMyTreeView = new CMyTreeView(m_hTreeView, m_hHolder, m_pDirMon, &m_cachedIcons);
 
 	/* Now, subclass the treeview again. This is needed for messages
 	such as WM_MOUSEWHEEL, which need to be intercepted before they
@@ -109,6 +109,7 @@ WPARAM wParam,LPARAM lParam)
 	{
 	case WM_SETFOCUS:
 		m_mainToolbar->UpdateToolbarButtonStates();
+		m_hLastActiveWindow = m_hTreeView;
 		break;
 
 	case WM_MBUTTONDOWN:
@@ -279,63 +280,6 @@ void Explorerplusplus::OnTreeViewShowFileProperties(void) const
 	/* Get the path of the currently selected item. */
 	auto pidlDirectory = m_pMyTreeView->BuildPath(hItem);
 	ShowMultipleFileProperties(pidlDirectory.get(), NULL, m_hContainer, 0);
-}
-
-BOOL Explorerplusplus::OnTreeViewItemExpanding(LPARAM lParam)
-{
-	NMTREEVIEW *pnmtv;
-	TVITEM *tvItem;
-	HTREEITEM *pItem;
-	NMHDR *nmhdr;
-
-	nmhdr = (NMHDR *)lParam;
-
-	pnmtv = (LPNMTREEVIEW)lParam;
-
-	tvItem = &pnmtv->itemNew;
-
-	pItem = &tvItem->hItem;
-
-	if(TreeView_GetParent(nmhdr->hwndFrom,*pItem) == NULL)
-	{
-		return FALSE;
-	}
-
-	if(pnmtv->action == TVE_EXPAND)
-	{
-		auto pidl = m_pMyTreeView->BuildPath(tvItem->hItem);
-		m_pMyTreeView->AddDirectory(tvItem->hItem, pidl.get());
-	}
-	else
-	{
-		HTREEITEM hSelection = TreeView_GetSelection(m_hTreeView);
-
-		if(hSelection != NULL)
-		{
-			/* We may collapse multiple levels (not just the parent folder), so we need 
-			to search up the tree for the parent item. */
-			HTREEITEM hItem = hSelection;
-
-			do 
-			{
-				hItem = TreeView_GetParent(m_hTreeView,hItem);
-			} while (hItem != tvItem->hItem && hItem != NULL);
-
-			if(hItem == tvItem->hItem)
-			{
-				auto pidl = m_pMyTreeView->BuildPath(tvItem->hItem);
-				m_navigation->BrowseFolderInCurrentTab(pidl.get(),0);
-			}
-		}
-
-		m_pMyTreeView->EraseItems(tvItem->hItem);
-
-		SendMessage(nmhdr->hwndFrom,TVM_EXPAND,
-		(WPARAM)TVE_COLLAPSE|TVE_COLLAPSERESET,
-		(LPARAM)tvItem->hItem);
-	}
-
-	return FALSE;
 }
 
 void Explorerplusplus::OnTreeViewCopyItemPath(void) const
@@ -628,10 +572,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(HWND hwnd,
 {
 	switch(((LPNMHDR)lParam)->code)
 	{
-	case TVN_ITEMEXPANDING:
-		return OnTreeViewItemExpanding(lParam);
-		break;
-
 	case TVN_SELCHANGED:
 		OnTreeViewSelChanged(lParam);
 		break;
@@ -650,15 +590,6 @@ LRESULT CALLBACK Explorerplusplus::TreeViewHolderWindowNotifyHandler(HWND hwnd,
 
 	case TVN_KEYDOWN:
 		return OnTreeViewKeyDown(lParam);
-		break;
-
-	case TVN_BEGINDRAG:
-		/* Forward the message to the treeview for it to handle. */
-		SendMessage(m_hTreeView,WM_NOTIFY,0,lParam);
-		break;
-
-	case TVN_GETDISPINFO:
-		SendMessage(m_hTreeView,WM_NOTIFY,0,lParam);
 		break;
 
 	case NM_RCLICK:

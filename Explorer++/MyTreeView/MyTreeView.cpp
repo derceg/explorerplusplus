@@ -24,13 +24,11 @@
 #include <wil/com.h>
 #include <wil/common.h>
 
-LRESULT CALLBACK	TreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
 int CALLBACK		CompareItemsStub(LPARAM lParam1,LPARAM lParam2,LPARAM lParamSort);
 DWORD WINAPI		Thread_MonitorAllDrives(LPVOID pParam);
 
 CMyTreeView::CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMon, CachedIcons *cachedIcons) :
 	m_hTreeView(hTreeView),
-	m_hParent(hParent),
 	m_pDirMon(pDirMon),
 	m_cachedIcons(cachedIcons),
 	m_iRefCount(1),
@@ -41,7 +39,10 @@ CMyTreeView::CMyTreeView(HWND hTreeView, HWND hParent, IDirectoryMonitor *pDirMo
 	m_subfoldersThreadPool(1),
 	m_subfoldersResultIDCounter(0)
 {
-	SetWindowSubclass(m_hTreeView,TreeViewProcStub,0,(DWORD_PTR)this);
+	m_windowSubclasses.push_back(WindowSubclassWrapper(m_hTreeView, TreeViewProcStub,
+		SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+	m_windowSubclasses.push_back(WindowSubclassWrapper(hParent, ParentWndProcStub,
+		PARENT_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
 
 	InitializeCriticalSection(&m_cs);
 
@@ -86,25 +87,20 @@ CMyTreeView::~CMyTreeView()
 	m_subfoldersThreadPool.push(uninitializeComTask);
 }
 
-LRESULT CALLBACK TreeViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,
-UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+LRESULT CALLBACK CMyTreeView::TreeViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	CMyTreeView *pMyTreeView = (CMyTreeView *)dwRefData;
+	CMyTreeView *pMyTreeView = reinterpret_cast<CMyTreeView *>(dwRefData);
 
 	return pMyTreeView->TreeViewProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK CMyTreeView::TreeViewProc(HWND hwnd,
-UINT msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK CMyTreeView::TreeViewProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch(msg)
 	{
-		case WM_SETFOCUS:
-			SendMessage(m_hParent,WM_USER_TREEVIEW_GAINEDFOCUS,0,0);
-			break;
-
 		case WM_TIMER:
 			DirectoryAltered();
 			break;
@@ -184,10 +180,6 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 			}
 			break;
 
-		case WM_NOTIFY:
-			return OnNotify(hwnd, msg, wParam, lParam);
-			break;
-
 		case WM_APP_ICON_RESULT_READY:
 			ProcessIconResult(static_cast<int>(wParam));
 			break;
@@ -208,88 +200,96 @@ UINT msg,WPARAM wParam,LPARAM lParam)
 	return DefSubclassProc(hwnd,msg,wParam,lParam);
 }
 
-LRESULT CALLBACK CMyTreeView::OnNotify(HWND hwnd,
-	UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK CMyTreeView::ParentWndProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
-	NMHDR *pnmhdr = reinterpret_cast<NMHDR *>(lParam);
+	UNREFERENCED_PARAMETER(uIdSubclass);
 
-	switch(pnmhdr->code)
+	CMyTreeView *treeView = reinterpret_cast<CMyTreeView *>(dwRefData);
+	return treeView->ParentWndProc(hwnd, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK CMyTreeView::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	switch (uMsg)
 	{
-	case TVN_BEGINDRAG:
+	case WM_NOTIFY:
+		if (reinterpret_cast<LPNMHDR>(lParam)->hwndFrom == m_hTreeView)
 		{
-			NMTREEVIEW *pnmTreeView = reinterpret_cast<NMTREEVIEW *>(pnmhdr);
-			OnBeginDrag(static_cast<int>(pnmTreeView->itemNew.lParam), DRAG_TYPE_LEFTCLICK);
-		}
-		break;
+			switch (reinterpret_cast<LPNMHDR>(lParam)->code)
+			{
+			case TVN_BEGINDRAG:
+			{
+				NMTREEVIEW *pnmTreeView = reinterpret_cast<NMTREEVIEW *>(lParam);
+				OnBeginDrag(static_cast<int>(pnmTreeView->itemNew.lParam), DRAG_TYPE_LEFTCLICK);
+			}
+			break;
 
-	case TVN_GETDISPINFO:
-		OnGetDisplayInfo(reinterpret_cast<NMTVDISPINFO *>(pnmhdr));
+			case TVN_GETDISPINFO:
+				OnGetDisplayInfo(reinterpret_cast<NMTVDISPINFO *>(lParam));
+				break;
+
+			case TVN_ITEMEXPANDING:
+				OnItemExpanding(reinterpret_cast<NMTREEVIEW *>(lParam));
+				break;
+			}
+		}
 		break;
 	}
 
-	return DefSubclassProc(hwnd, msg, wParam, lParam);
+	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
 }
 
 HTREEITEM CMyTreeView::AddRoot()
 {
-	HTREEITEM hDesktop = nullptr;
 	TreeView_DeleteAllItems(m_hTreeView);
 
 	unique_pidl_absolute pidl;
-	HRESULT hr = SHGetFolderLocation(NULL,CSIDL_DESKTOP,NULL,0,wil::out_param(pidl));
+	HRESULT hr = SHGetFolderLocation(NULL, CSIDL_DESKTOP, NULL, 0, wil::out_param(pidl));
 
-	if(SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		TCHAR szDesktopDisplayName[MAX_PATH];
-		GetDisplayName(pidl.get(),szDesktopDisplayName,SIZEOF_ARRAY(szDesktopDisplayName),SHGDN_INFOLDER);
+		return nullptr;
+	}
 
-		int itemId = GenerateUniqueItemId();
-		m_itemInfoMap[itemId].pidl.reset(ILCloneFull(pidl.get()));
+	TCHAR szDesktopDisplayName[MAX_PATH];
+	GetDisplayName(pidl.get(), szDesktopDisplayName, SIZEOF_ARRAY(szDesktopDisplayName), SHGDN_INFOLDER);
 
-		TVITEMEX tvItem;
-		tvItem.mask				= TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
-		tvItem.pszText			= szDesktopDisplayName;
-		tvItem.cchTextMax		= lstrlen(szDesktopDisplayName);
-		tvItem.iImage			= I_IMAGECALLBACK;
-		tvItem.iSelectedImage	= I_IMAGECALLBACK;
-		tvItem.cChildren		= 1;
-		tvItem.lParam			= (LPARAM)itemId;
+	int itemId = GenerateUniqueItemId();
+	m_itemInfoMap[itemId].pidl.reset(ILCloneFull(pidl.get()));
 
-		TVINSERTSTRUCT tvis;
-		tvis.hParent			= NULL;
-		tvis.hInsertAfter		= TVI_LAST;
-		tvis.itemex				= tvItem;
+	TVITEMEX tvItem;
+	tvItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
+	tvItem.pszText = szDesktopDisplayName;
+	tvItem.iImage = I_IMAGECALLBACK;
+	tvItem.iSelectedImage = I_IMAGECALLBACK;
+	tvItem.cChildren = 1;
+	tvItem.lParam = itemId;
 
-		hDesktop = TreeView_InsertItem(m_hTreeView,&tvis);
+	TVINSERTSTRUCT tvis;
+	tvis.hParent = nullptr;
+	tvis.hInsertAfter = TVI_LAST;
+	tvis.itemex = tvItem;
 
-		if(hDesktop != NULL)
-		{
-			IShellFolder *pDesktopFolder = NULL;
-			hr = SHGetDesktopFolder(&pDesktopFolder);
+	HTREEITEM hDesktop = TreeView_InsertItem(m_hTreeView, &tvis);
 
-			if(SUCCEEDED(hr))
-			{
-				AddDirectoryInternal(pDesktopFolder,pidl.get(),hDesktop);
-
-				SendMessage(m_hTreeView,TVM_EXPAND,(WPARAM)TVE_EXPAND,
-					(LPARAM)hDesktop);
-
-				pDesktopFolder->Release();
-			}
-		}
+	if (hDesktop != nullptr)
+	{
+		SendMessage(m_hTreeView, TVM_EXPAND, TVE_EXPAND, reinterpret_cast<LPARAM>(hDesktop));
 	}
 
 	return hDesktop;
 }
 
-HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlDirectory)
+HRESULT CMyTreeView::ExpandDirectory(HTREEITEM hParent)
 {
+	auto pidlDirectory = BuildPath(hParent);
+
 	wil::com_ptr<IShellFolder> pShellFolder;
-	HRESULT hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
+	HRESULT hr = BindToIdl(pidlDirectory.get(), IID_PPV_ARGS(&pShellFolder));
 
 	if (SUCCEEDED(hr))
 	{
-		AddDirectoryInternal(pShellFolder.get(), pidlDirectory, hParent);
+		AddDirectoryInternal(pShellFolder.get(), pidlDirectory.get(), hParent);
 	}
 
 	return hr;
@@ -507,6 +507,42 @@ void CMyTreeView::ProcessSubfoldersResult(int subfoldersResultId)
 	tvItem.hItem = result->item;
 	tvItem.cChildren = 0;
 	TreeView_SetItem(m_hTreeView, &tvItem);
+}
+
+void CMyTreeView::OnItemExpanding(const NMTREEVIEW *nmtv)
+{
+	HTREEITEM parentItem = nmtv->itemNew.hItem;
+
+	if (nmtv->action == TVE_EXPAND)
+	{
+		ExpandDirectory(parentItem);
+	}
+	else
+	{
+		HTREEITEM hSelection = TreeView_GetSelection(m_hTreeView);
+
+		if (hSelection != NULL)
+		{
+			HTREEITEM hItem = hSelection;
+
+			do
+			{
+				hItem = TreeView_GetParent(m_hTreeView, hItem);
+			} while (hItem != parentItem && hItem != NULL);
+
+			// If the currently selected item is below the item being
+			// collapsed, the selection should be adjusted to the parent item.
+			if (hItem == parentItem)
+			{
+				TreeView_SelectItem(m_hTreeView, parentItem);
+			}
+		}
+
+		EraseItems(parentItem);
+
+		SendMessage(m_hTreeView, TVM_EXPAND, TVE_COLLAPSE | TVE_COLLAPSERESET,
+			reinterpret_cast<LPARAM>(parentItem));
+	}
 }
 
 /* Sorts items in the following order:
