@@ -133,7 +133,7 @@ HRESULT Explorerplusplus::GetTreeViewSelectionAttributes(SFGAOF *pItemAttributes
 
 	if (hItem != NULL)
 	{
-		auto pidl = m_pMyTreeView->BuildPath(hItem);
+		auto pidl = m_pMyTreeView->GetItemPidl(hItem);
 		hr = GetItemAttributes(pidl.get(), pItemAttributes);
 	}
 
@@ -170,7 +170,7 @@ BOOL Explorerplusplus::CanPaste() const
 
 		if (hItem != NULL)
 		{
-			auto pidl = m_pMyTreeView->BuildPath(hItem);
+			auto pidl = m_pMyTreeView->GetItemPidl(hItem);
 
 			SFGAOF attributes = SFGAO_FILESYSTEM;
 			HRESULT hr = GetItemAttributes(pidl.get(), &attributes);

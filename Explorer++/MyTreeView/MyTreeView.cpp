@@ -282,7 +282,7 @@ HTREEITEM CMyTreeView::AddRoot()
 
 HRESULT CMyTreeView::ExpandDirectory(HTREEITEM hParent)
 {
-	auto pidlDirectory = BuildPath(hParent);
+	auto pidlDirectory = GetItemPidl(hParent);
 
 	wil::com_ptr<IShellFolder> pShellFolder;
 	HRESULT hr = BindToIdl(pidlDirectory.get(), IID_PPV_ARGS(&pShellFolder));
@@ -433,7 +433,7 @@ void CMyTreeView::ProcessIconResult(int iconResultId)
 void CMyTreeView::QueueSubfoldersTask(HTREEITEM item)
 {
 	BasicItemInfo basicItemInfo;
-	basicItemInfo.pidl = BuildPath(item);
+	basicItemInfo.pidl = GetItemPidl(item);
 
 	int subfoldersResultID = m_subfoldersResultIDCounter++;
 
@@ -797,7 +797,7 @@ HTREEITEM CMyTreeView::DetermineDriveSortedPosition(HTREEITEM hParent, const TCH
 	return htItem;
 }
 
-unique_pidl_absolute CMyTreeView::BuildPath(HTREEITEM hTreeItem)
+unique_pidl_absolute CMyTreeView::GetItemPidl(HTREEITEM hTreeItem)
 {
 	TVITEMEX tvItemEx;
 	tvItemEx.mask = TVIF_HANDLE | TVIF_PARAM;

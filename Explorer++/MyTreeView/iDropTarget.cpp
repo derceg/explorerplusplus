@@ -218,7 +218,7 @@ int iDroppedItem)
 
 			if(iDroppedItem < nDroppedFiles)
 			{
-				auto pidlDest = BuildPath(hItem);
+				auto pidlDest = GetItemPidl(hItem);
 
 				if(pidlDest)
 				{
@@ -265,7 +265,7 @@ POINTL pt,DWORD *pdwEffect)
 	/* Is the mouse actually over an item? */
 	if(!(tvht.flags & LVHT_NOWHERE) && (tvht.hItem != NULL) && m_bDataAccept)
 	{
-		auto pidlDirectory = BuildPath(tvht.hItem);
+		auto pidlDirectory = GetItemPidl(tvht.hItem);
 
 		TCHAR szDestDirectory[MAX_PATH];
 		GetDisplayName(pidlDirectory.get(),szDestDirectory,SIZEOF_ARRAY(szDestDirectory),SHGDN_FORPARSING);

@@ -30,7 +30,7 @@ public:
 	HRESULT _stdcall	GiveFeedback(DWORD dwEffect);
 
 	/* User functions. */
-	unique_pidl_absolute	BuildPath(HTREEITEM hTreeItem);
+	unique_pidl_absolute	GetItemPidl(HTREEITEM hTreeItem);
 	HTREEITEM			LocateItem(PCIDLIST_ABSOLUTE pidlDirectory);
 	BOOL				QueryDragging(void);
 	void				SetShowHidden(BOOL bShowHidden);
