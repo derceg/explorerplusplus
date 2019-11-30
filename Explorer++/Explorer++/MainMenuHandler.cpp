@@ -26,6 +26,7 @@
 #include "../Helper/ProcessHelper.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/scope_exit.hpp>
+#include <wil/com.h>
 
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
@@ -209,17 +210,13 @@ void Explorerplusplus::OnCreateNewFolder()
 {
 	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
 
-	IShellItem *directoryShellItem = nullptr;
+	wil::com_ptr<IShellItem> directoryShellItem;
 	HRESULT hr = SHCreateItemFromIDList(pidlDirectory.get(), IID_PPV_ARGS(&directoryShellItem));
 
 	if (FAILED(hr))
 	{
 		return;
 	}
-
-	BOOST_SCOPE_EXIT(directoryShellItem) {
-		directoryShellItem->Release();
-	} BOOST_SCOPE_EXIT_END
 
 	FileProgressSink *sink = FileProgressSink::CreateNew();
 	sink->SetPostNewItemObserver([this] (PIDLIST_ABSOLUTE pidl) {
@@ -232,7 +229,7 @@ void Explorerplusplus::OnCreateNewFolder()
 
 	TCHAR newFolderName[128];
 	LoadString(m_hLanguageModule, IDS_NEW_FOLDER_NAME, newFolderName, SIZEOF_ARRAY(newFolderName));
-	hr = NFileOperations::CreateNewFolder(directoryShellItem, newFolderName, sink);
+	hr = NFileOperations::CreateNewFolder(directoryShellItem.get(), newFolderName, sink);
 	sink->Release();
 
 	if(FAILED(hr))

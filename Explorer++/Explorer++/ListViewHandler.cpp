@@ -30,6 +30,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/MenuHelper.h"
 #include "../Helper/ShellHelper.h"
+#include <wil/com.h>
 
 const DWORD MAIN_LISTVIEW_STYLES = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |
 WS_CLIPCHILDREN | LVS_ICON | LVS_EDITLABELS | LVS_SHOWSELALWAYS |
@@ -73,13 +74,12 @@ HWND Explorerplusplus::CreateMainListView(HWND hParent)
 		return NULL;
 	}
 
-	IImageList *pImageList = NULL;
+	wil::com_ptr<IImageList> pImageList;
 	HRESULT hr = SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
 
 	if(SUCCEEDED(hr))
 	{
-		ListView_SetImageList(hListView, reinterpret_cast<HIMAGELIST>(pImageList), LVSIL_SMALL);
-		pImageList->Release();
+		ListView_SetImageList(hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_SMALL);
 	}
 
 	DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
@@ -917,27 +917,23 @@ void Explorerplusplus::OnListViewBackgroundRClick(POINT *pCursorPos)
 
 	PCUITEMID_CHILD pidlChildFolder = ILFindLastID(pidlDirectory.get());
 
-	IShellFolder *pShellFolder = NULL;
+	wil::com_ptr<IShellFolder> pShellFolder;
 	HRESULT hr = BindToIdl(pidlParent.get(), IID_PPV_ARGS(&pShellFolder));
 
 	if(SUCCEEDED(hr))
 	{
-		IDataObject *pDataObject = NULL;
-		hr = GetUIObjectOf(pShellFolder, NULL, 1, &pidlChildFolder, IID_PPV_ARGS(&pDataObject));
+		wil::com_ptr<IDataObject> pDataObject;
+		hr = GetUIObjectOf(pShellFolder.get(), NULL, 1, &pidlChildFolder, IID_PPV_ARGS(&pDataObject));
 
 		if(SUCCEEDED(hr))
 		{
 			CServiceProvider ServiceProvider(this);
 			CContextMenuManager cmm(CContextMenuManager::CONTEXT_MENU_TYPE_BACKGROUND, pidlDirectory.get(),
-				pDataObject, &ServiceProvider, BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES);
+				pDataObject.get(), &ServiceProvider, BLACKLISTED_BACKGROUND_MENU_CLSID_ENTRIES);
 
 			cmm.ShowMenu(m_hContainer,hMenu,IDM_FILE_COPYFOLDERPATH,MIN_SHELL_MENU_ID,
 				MAX_SHELL_MENU_ID,*pCursorPos,*m_pStatusBar);
-
-			pDataObject->Release();
 		}
-
-		pShellFolder->Release();
 	}
 
 	DestroyMenu(hMenu);

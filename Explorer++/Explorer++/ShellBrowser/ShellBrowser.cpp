@@ -18,6 +18,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <boost/scope_exit.hpp>
+#include <wil/com.h>
 #include <list>
 
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
@@ -235,21 +236,17 @@ void CShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	{
 	case ViewMode::ExtraLargeIcons:
 	{
-		IImageList *pImageList = NULL;
-
+		wil::com_ptr<IImageList> pImageList;
 		SHGetImageList(SHIL_JUMBO, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, (HIMAGELIST)pImageList, LVSIL_NORMAL);
-		pImageList->Release();
+		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
 	}
 	break;
 
 	case ViewMode::LargeIcons:
 	{
-		IImageList *pImageList = NULL;
-
+		wil::com_ptr<IImageList> pImageList;
 		SHGetImageList(SHIL_EXTRALARGE, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, (HIMAGELIST)pImageList, LVSIL_NORMAL);
-		pImageList->Release();
+		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
 	}
 	break;
 
@@ -263,11 +260,9 @@ void CShellBrowser::SetViewModeInternal(ViewMode viewMode)
 	case ViewMode::List:
 	case ViewMode::Details:
 	{
-		IImageList *pImageList = NULL;
-
+		wil::com_ptr<IImageList> pImageList;
 		SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, (HIMAGELIST)pImageList, LVSIL_NORMAL);
-		pImageList->Release();
+		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
 	}
 	break;
 	}

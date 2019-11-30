@@ -12,6 +12,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/StringHelper.h"
 #include <boost\date_time\posix_time\posix_time.hpp>
+#include <wil/com.h>
 #include <IPHlpApi.h>
 #include <propkey.h>
 
@@ -498,13 +499,12 @@ HRESULT GetItemDetails(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid,
 
 HRESULT GetItemDetailsRawData(const BasicItemInfo_t &itemInfo, const SHCOLUMNID *pscid, VARIANT *vt)
 {
-	IShellFolder2 *pShellFolder = NULL;
+	wil::com_ptr<IShellFolder2> pShellFolder;
 	HRESULT hr = SHBindToParent(itemInfo.pidlComplete.get(), IID_PPV_ARGS(&pShellFolder), nullptr);
 
 	if (SUCCEEDED(hr))
 	{
 		hr = pShellFolder->GetDetailsEx(itemInfo.pridl.get(), pscid, vt);
-		pShellFolder->Release();
 	}
 
 	return hr;
