@@ -284,15 +284,12 @@ HTREEITEM CMyTreeView::AddRoot()
 
 HRESULT CMyTreeView::AddDirectory(HTREEITEM hParent, PCIDLIST_ABSOLUTE pidlDirectory)
 {
-	IShellFolder	*pShellFolder = NULL;
-	HRESULT			hr;
+	wil::com_ptr<IShellFolder> pShellFolder;
+	HRESULT hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
-	hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
-
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
-		AddDirectoryInternal(pShellFolder,pidlDirectory,hParent);
-		pShellFolder->Release();
+		AddDirectoryInternal(pShellFolder.get(), pidlDirectory, hParent);
 	}
 
 	return hr;
