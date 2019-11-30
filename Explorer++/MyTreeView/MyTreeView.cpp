@@ -578,82 +578,73 @@ int CALLBACK CMyTreeView::CompareItems(LPARAM lParam1,LPARAM lParam2)
 void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
 	HTREEITEM hParent)
 {
-	IEnumIDList		*pEnumIDList = NULL;
-	PITEMID_CHILD	rgelt = NULL;
-	SHCONTF			EnumFlags;
-	TCHAR			szDirectory[MAX_PATH];
-	ULONG			uFetched;
-	TVINSERTSTRUCT	tvis;
-	TVITEMEX		tvItem;
-	HRESULT			hr;
-	BOOL			bVirtualFolder;
+	TCHAR szDirectory[MAX_PATH];
+	BOOL bVirtualFolder = !SHGetPathFromIDList(pidlDirectory, szDirectory);
 
-	bVirtualFolder = !SHGetPathFromIDList(pidlDirectory,szDirectory);
-
-	if(IsNamespaceRoot(pidlDirectory))
+	if (IsNamespaceRoot(pidlDirectory))
 	{
 		bVirtualFolder = TRUE;
 	}
 
-	EnumFlags = SHCONTF_FOLDERS;
+	SHCONTF EnumFlags = SHCONTF_FOLDERS;
 
 	if (m_bShowHidden)
 	{
 		EnumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
 	}
 
-	hr = pShellFolder->EnumObjects(NULL,EnumFlags,&pEnumIDList);
+	wil::com_ptr<IEnumIDList> pEnumIDList;
+	HRESULT hr = pShellFolder->EnumObjects(NULL, EnumFlags, &pEnumIDList);
 
-	if (FAILED(hr) || pEnumIDList == nullptr)
+	if (FAILED(hr) || !pEnumIDList)
 	{
 		return;
 	}
 
-	SendMessage(m_hTreeView, WM_SETREDRAW, (WPARAM)FALSE, (LPARAM)NULL);
+	SendMessage(m_hTreeView, WM_SETREDRAW, FALSE, 0);
 
-	std::vector<ItemStore_t> vItems;
-	std::vector<ItemStore_t>::iterator itr;
-	ItemStore_t ItemStore;
+	std::vector<ItemStore_t> items;
 
-	/* Iterate over the subfolders items, and place them in the tree. */
-	uFetched = 1;
-	while(pEnumIDList->Next(1,&rgelt,&uFetched) == S_OK && (uFetched == 1))
+	unique_pidl_child rgelt;
+	ULONG uFetched = 1;
+
+	while (pEnumIDList->Next(1, wil::out_param(rgelt), &uFetched) == S_OK && (uFetched == 1))
 	{
-		STRRET			str;
-		TCHAR			ItemName[MAX_PATH];
+		STRRET str;
+		hr = pShellFolder->GetDisplayNameOf(rgelt.get(), SHGDN_NORMAL, &str);
 
-		hr = pShellFolder->GetDisplayNameOf(rgelt,SHGDN_NORMAL,&str);
-
-		if(SUCCEEDED(hr))
+		if (SUCCEEDED(hr))
 		{
-			StrRetToBuf(&str,rgelt,ItemName,SIZEOF_ARRAY(ItemName));
+			TCHAR itemName[MAX_PATH];
+			StrRetToBuf(&str, rgelt.get(), itemName, SIZEOF_ARRAY(itemName));
 
-			unique_pidl_absolute pidlComplete(ILCombine(pidlDirectory,rgelt));
+			unique_pidl_absolute pidlComplete(ILCombine(pidlDirectory, rgelt.get()));
 
 			int itemId = GenerateUniqueItemId();
 			m_itemInfoMap[itemId].pidl.reset(ILCloneFull(pidlComplete.get()));
-			m_itemInfoMap[itemId].pridl.reset(ILCloneChild(rgelt));
+			m_itemInfoMap[itemId].pridl.reset(ILCloneChild(rgelt.get()));
 
-			ItemStore.iItemId = itemId;
-			StringCchCopy(ItemStore.ItemName,SIZEOF_ARRAY(ItemStore.ItemName),ItemName);
+			ItemStore_t itemStore;
+			itemStore.iItemId = itemId;
+			StringCchCopy(itemStore.ItemName, SIZEOF_ARRAY(itemStore.ItemName), itemName);
 
 			/* If this is a virtual directory, we'll post sort the items,
 			otherwise we'll pre-sort. */
-			if(bVirtualFolder)
+			if (bVirtualFolder)
 			{
-				vItems.push_back(ItemStore);
+				items.push_back(itemStore);
 			}
 			else
 			{
-				itr = vItems.end();
+				auto itr = items.end();
 
 				/* Compare to the last item in the array and work
 				backwards. */
-				if(vItems.size() > 0)
+				if (items.size() > 0)
 				{
 					itr--;
 
-					while(StrCmpLogicalW(ItemName,itr->ItemName) < 0 && itr != vItems.begin())
+					while (StrCmpLogicalW(itemName, itr->ItemName) < 0 && itr != items.begin())
 					{
 						itr--;
 					}
@@ -664,50 +655,44 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 					inserting an item at the start of the list,
 					in which case we need to insert BEFORE the
 					first item. */
-					if(itr != vItems.begin() || StrCmpLogicalW(ItemName,itr->ItemName) > 0)
+					if (itr != items.begin() || StrCmpLogicalW(itemName, itr->ItemName) > 0)
 						itr++;
 				}
 
-				vItems.insert(itr,ItemStore);
+				items.insert(itr, itemStore);
 			}
 		}
-
-		CoTaskMemFree(rgelt);
 	}
 
-	pEnumIDList->Release();
 
-
-	for(itr = vItems.begin();itr != vItems.end();itr++)
+	for (auto &item : items)
 	{
-		UINT ItemMask = TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_CHILDREN;
+		TVITEMEX tvItem;
+		tvItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
+		tvItem.pszText = item.ItemName;
+		tvItem.iImage = I_IMAGECALLBACK;
+		tvItem.iSelectedImage = I_IMAGECALLBACK;
+		tvItem.lParam = item.iItemId;
+		tvItem.cChildren = I_CHILDRENCALLBACK;
 
-		tvItem.mask				= ItemMask;
-		tvItem.pszText			= itr->ItemName;
-		tvItem.iImage			= I_IMAGECALLBACK;
-		tvItem.iSelectedImage	= I_IMAGECALLBACK;
-		tvItem.lParam			= (LPARAM)itr->iItemId;
-		tvItem.cChildren		= I_CHILDRENCALLBACK;
+		TVINSERTSTRUCT tvis;
+		tvis.hInsertAfter = TVI_LAST;
+		tvis.hParent = hParent;
+		tvis.itemex = tvItem;
 
-		tvis.hInsertAfter		= TVI_LAST;
-		tvis.hParent			= hParent;
-		tvis.itemex				= tvItem;
-
-		TreeView_InsertItem(m_hTreeView,&tvis);
+		TreeView_InsertItem(m_hTreeView, &tvis);
 	}
 
-	if(bVirtualFolder)
+	if (bVirtualFolder)
 	{
 		TVSORTCB tvscb;
-
-		tvscb.hParent		= hParent;
-		tvscb.lpfnCompare	= CompareItemsStub;
-		tvscb.lParam		= (LPARAM)this;
-
-		TreeView_SortChildrenCB(m_hTreeView,&tvscb,0);
+		tvscb.hParent = hParent;
+		tvscb.lpfnCompare = CompareItemsStub;
+		tvscb.lParam = reinterpret_cast<LPARAM>(this);
+		TreeView_SortChildrenCB(m_hTreeView, &tvscb, 0);
 	}
 
-	SendMessage(m_hTreeView,WM_SETREDRAW,(WPARAM)TRUE,(LPARAM)NULL);
+	SendMessage(m_hTreeView, WM_SETREDRAW, TRUE, 0);
 }
 
 int CMyTreeView::GenerateUniqueItemId()
