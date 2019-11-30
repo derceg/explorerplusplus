@@ -578,14 +578,6 @@ int CALLBACK CMyTreeView::CompareItems(LPARAM lParam1,LPARAM lParam2)
 void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSOLUTE pidlDirectory,
 	HTREEITEM hParent)
 {
-	TCHAR szDirectory[MAX_PATH];
-	BOOL bVirtualFolder = !SHGetPathFromIDList(pidlDirectory, szDirectory);
-
-	if (IsNamespaceRoot(pidlDirectory))
-	{
-		bVirtualFolder = TRUE;
-	}
-
 	SHCONTF EnumFlags = SHCONTF_FOLDERS;
 
 	if (m_bShowHidden)
@@ -628,39 +620,7 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 			itemStore.iItemId = itemId;
 			StringCchCopy(itemStore.ItemName, SIZEOF_ARRAY(itemStore.ItemName), itemName);
 
-			/* If this is a virtual directory, we'll post sort the items,
-			otherwise we'll pre-sort. */
-			if (bVirtualFolder)
-			{
-				items.push_back(itemStore);
-			}
-			else
-			{
-				auto itr = items.end();
-
-				/* Compare to the last item in the array and work
-				backwards. */
-				if (items.size() > 0)
-				{
-					itr--;
-
-					while (StrCmpLogicalW(itemName, itr->ItemName) < 0 && itr != items.begin())
-					{
-						itr--;
-					}
-
-					/* itr in this case is the item AFTER
-					which the current item should be inserted.
-					The only exception to this is when we are
-					inserting an item at the start of the list,
-					in which case we need to insert BEFORE the
-					first item. */
-					if (itr != items.begin() || StrCmpLogicalW(itemName, itr->ItemName) > 0)
-						itr++;
-				}
-
-				items.insert(itr, itemStore);
-			}
+			items.push_back(itemStore);
 		}
 	}
 
@@ -683,14 +643,11 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 		TreeView_InsertItem(m_hTreeView, &tvis);
 	}
 
-	if (bVirtualFolder)
-	{
-		TVSORTCB tvscb;
-		tvscb.hParent = hParent;
-		tvscb.lpfnCompare = CompareItemsStub;
-		tvscb.lParam = reinterpret_cast<LPARAM>(this);
-		TreeView_SortChildrenCB(m_hTreeView, &tvscb, 0);
-	}
+	TVSORTCB tvscb;
+	tvscb.hParent = hParent;
+	tvscb.lpfnCompare = CompareItemsStub;
+	tvscb.lParam = reinterpret_cast<LPARAM>(this);
+	TreeView_SortChildrenCB(m_hTreeView, &tvscb, 0);
 
 	SendMessage(m_hTreeView, WM_SETREDRAW, TRUE, 0);
 }
