@@ -595,8 +595,6 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 		bVirtualFolder = TRUE;
 	}
 
-	SendMessage(m_hTreeView,WM_SETREDRAW,(WPARAM)FALSE,(LPARAM)NULL);
-
 	EnumFlags = SHCONTF_FOLDERS;
 
 	if (m_bShowHidden)
@@ -606,116 +604,107 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 
 	hr = pShellFolder->EnumObjects(NULL,EnumFlags,&pEnumIDList);
 
+	if (FAILED(hr) || pEnumIDList == nullptr)
+	{
+		return;
+	}
+
+	SendMessage(m_hTreeView, WM_SETREDRAW, (WPARAM)FALSE, (LPARAM)NULL);
+
 	std::vector<ItemStore_t> vItems;
 	std::vector<ItemStore_t>::iterator itr;
 	ItemStore_t ItemStore;
 
-	if(SUCCEEDED(hr) && pEnumIDList != NULL)
+	/* Iterate over the subfolders items, and place them in the tree. */
+	uFetched = 1;
+	while(pEnumIDList->Next(1,&rgelt,&uFetched) == S_OK && (uFetched == 1))
 	{
-		/* Iterate over the subfolders items, and place them in the tree. */
-		uFetched = 1;
-		while(pEnumIDList->Next(1,&rgelt,&uFetched) == S_OK && (uFetched == 1))
+		STRRET			str;
+		TCHAR			ItemName[MAX_PATH];
+
+		hr = pShellFolder->GetDisplayNameOf(rgelt,SHGDN_NORMAL,&str);
+
+		if(SUCCEEDED(hr))
 		{
-			ULONG Attributes = SFGAO_FOLDER|SFGAO_FILESYSTEM;
+			StrRetToBuf(&str,rgelt,ItemName,SIZEOF_ARRAY(ItemName));
 
-			/* Only retrieve the attributes for this item. */
-			hr = pShellFolder->GetAttributesOf(1,const_cast<PCITEMID_CHILD *>(&rgelt),&Attributes);
+			unique_pidl_absolute pidlComplete(ILCombine(pidlDirectory,rgelt));
 
-			if(SUCCEEDED(hr))
+			int itemId = GenerateUniqueItemId();
+			m_itemInfoMap[itemId].pidl.reset(ILCloneFull(pidlComplete.get()));
+			m_itemInfoMap[itemId].pridl.reset(ILCloneChild(rgelt));
+
+			ItemStore.iItemId = itemId;
+			StringCchCopy(ItemStore.ItemName,SIZEOF_ARRAY(ItemStore.ItemName),ItemName);
+
+			/* If this is a virtual directory, we'll post sort the items,
+			otherwise we'll pre-sort. */
+			if(bVirtualFolder)
 			{
-				/* Is the item a folder? (SFGAO_STREAM is set on .zip files, along with
-				SFGAO_FOLDER). */
-				if((Attributes & SFGAO_FOLDER))
-				{
-					STRRET			str;
-					TCHAR			ItemName[MAX_PATH];
-
-					hr = pShellFolder->GetDisplayNameOf(rgelt,SHGDN_NORMAL,&str);
-
-					if(SUCCEEDED(hr))
-					{
-						StrRetToBuf(&str,rgelt,ItemName,SIZEOF_ARRAY(ItemName));
-
-						unique_pidl_absolute pidlComplete(ILCombine(pidlDirectory,rgelt));
-
-						int itemId = GenerateUniqueItemId();
-						m_itemInfoMap[itemId].pidl.reset(ILCloneFull(pidlComplete.get()));
-						m_itemInfoMap[itemId].pridl.reset(ILCloneChild(rgelt));
-
-						ItemStore.iItemId = itemId;
-						StringCchCopy(ItemStore.ItemName,SIZEOF_ARRAY(ItemStore.ItemName),ItemName);
-
-						/* If this is a virtual directory, we'll post sort the items,
-						otherwise we'll pre-sort. */
-						if(bVirtualFolder)
-						{
-							vItems.push_back(ItemStore);
-						}
-						else
-						{
-							itr = vItems.end();
-
-							/* Compare to the last item in the array and work
-							backwards. */
-							if(vItems.size() > 0)
-							{
-								itr--;
-
-								while(StrCmpLogicalW(ItemName,itr->ItemName) < 0 && itr != vItems.begin())
-								{
-									itr--;
-								}
-
-								/* itr in this case is the item AFTER
-								which the current item should be inserted.
-								The only exception to this is when we are
-								inserting an item at the start of the list,
-								in which case we need to insert BEFORE the
-								first item. */
-								if(itr != vItems.begin() || StrCmpLogicalW(ItemName,itr->ItemName) > 0)
-									itr++;
-							}
-
-							vItems.insert(itr,ItemStore);
-						}
-					}
-				}
+				vItems.push_back(ItemStore);
 			}
+			else
+			{
+				itr = vItems.end();
 
-			CoTaskMemFree(rgelt);
+				/* Compare to the last item in the array and work
+				backwards. */
+				if(vItems.size() > 0)
+				{
+					itr--;
+
+					while(StrCmpLogicalW(ItemName,itr->ItemName) < 0 && itr != vItems.begin())
+					{
+						itr--;
+					}
+
+					/* itr in this case is the item AFTER
+					which the current item should be inserted.
+					The only exception to this is when we are
+					inserting an item at the start of the list,
+					in which case we need to insert BEFORE the
+					first item. */
+					if(itr != vItems.begin() || StrCmpLogicalW(ItemName,itr->ItemName) > 0)
+						itr++;
+				}
+
+				vItems.insert(itr,ItemStore);
+			}
 		}
 
-		pEnumIDList->Release();
+		CoTaskMemFree(rgelt);
+	}
+
+	pEnumIDList->Release();
 
 
-		for(itr = vItems.begin();itr != vItems.end();itr++)
-		{
-			UINT ItemMask = TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_CHILDREN;
+	for(itr = vItems.begin();itr != vItems.end();itr++)
+	{
+		UINT ItemMask = TVIF_TEXT|TVIF_IMAGE|TVIF_SELECTEDIMAGE|TVIF_PARAM|TVIF_CHILDREN;
 
-			tvItem.mask				= ItemMask;
-			tvItem.pszText			= itr->ItemName;
-			tvItem.iImage			= I_IMAGECALLBACK;
-			tvItem.iSelectedImage	= I_IMAGECALLBACK;
-			tvItem.lParam			= (LPARAM)itr->iItemId;
-			tvItem.cChildren		= I_CHILDRENCALLBACK;
+		tvItem.mask				= ItemMask;
+		tvItem.pszText			= itr->ItemName;
+		tvItem.iImage			= I_IMAGECALLBACK;
+		tvItem.iSelectedImage	= I_IMAGECALLBACK;
+		tvItem.lParam			= (LPARAM)itr->iItemId;
+		tvItem.cChildren		= I_CHILDRENCALLBACK;
 
-			tvis.hInsertAfter		= TVI_LAST;
-			tvis.hParent			= hParent;
-			tvis.itemex				= tvItem;
+		tvis.hInsertAfter		= TVI_LAST;
+		tvis.hParent			= hParent;
+		tvis.itemex				= tvItem;
 
-			TreeView_InsertItem(m_hTreeView,&tvis);
-		}
+		TreeView_InsertItem(m_hTreeView,&tvis);
+	}
 
-		if(bVirtualFolder)
-		{
-			TVSORTCB tvscb;
+	if(bVirtualFolder)
+	{
+		TVSORTCB tvscb;
 
-			tvscb.hParent		= hParent;
-			tvscb.lpfnCompare	= CompareItemsStub;
-			tvscb.lParam		= (LPARAM)this;
+		tvscb.hParent		= hParent;
+		tvscb.lpfnCompare	= CompareItemsStub;
+		tvscb.lParam		= (LPARAM)this;
 
-			TreeView_SortChildrenCB(m_hTreeView,&tvscb,0);
-		}
+		TreeView_SortChildrenCB(m_hTreeView,&tvscb,0);
 	}
 
 	SendMessage(m_hTreeView,WM_SETREDRAW,(WPARAM)TRUE,(LPARAM)NULL);
