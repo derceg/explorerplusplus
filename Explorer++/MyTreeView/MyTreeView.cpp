@@ -595,7 +595,7 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 
 	SendMessage(m_hTreeView, WM_SETREDRAW, FALSE, 0);
 
-	std::vector<ItemStore_t> items;
+	std::vector<EnumeratedItem> items;
 
 	unique_pidl_child rgelt;
 	ULONG uFetched = 1;
@@ -608,19 +608,19 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 		if (SUCCEEDED(hr))
 		{
 			TCHAR itemName[MAX_PATH];
-			StrRetToBuf(&str, rgelt.get(), itemName, SIZEOF_ARRAY(itemName));
+			hr = StrRetToBuf(&str, rgelt.get(), itemName, SIZEOF_ARRAY(itemName));
 
-			unique_pidl_absolute pidlComplete(ILCombine(pidlDirectory, rgelt.get()));
+			if (SUCCEEDED(hr))
+			{
+				int itemId = GenerateUniqueItemId();
+				m_itemInfoMap[itemId].pidl.reset(ILCombine(pidlDirectory, rgelt.get()));
+				m_itemInfoMap[itemId].pridl.reset(ILCloneChild(rgelt.get()));
 
-			int itemId = GenerateUniqueItemId();
-			m_itemInfoMap[itemId].pidl.reset(ILCloneFull(pidlComplete.get()));
-			m_itemInfoMap[itemId].pridl.reset(ILCloneChild(rgelt.get()));
-
-			ItemStore_t itemStore;
-			itemStore.iItemId = itemId;
-			StringCchCopy(itemStore.ItemName, SIZEOF_ARRAY(itemStore.ItemName), itemName);
-
-			items.push_back(itemStore);
+				EnumeratedItem item;
+				item.internalIndex = itemId;
+				item.name = itemName;
+				items.push_back(item);
+			}
 		}
 	}
 
@@ -629,10 +629,10 @@ void CMyTreeView::AddDirectoryInternal(IShellFolder *pShellFolder, PCIDLIST_ABSO
 	{
 		TVITEMEX tvItem;
 		tvItem.mask = TVIF_TEXT | TVIF_IMAGE | TVIF_SELECTEDIMAGE | TVIF_PARAM | TVIF_CHILDREN;
-		tvItem.pszText = item.ItemName;
+		tvItem.pszText = item.name.data();
 		tvItem.iImage = I_IMAGECALLBACK;
 		tvItem.iSelectedImage = I_IMAGECALLBACK;
-		tvItem.lParam = item.iItemId;
+		tvItem.lParam = item.internalIndex;
 		tvItem.cChildren = I_CHILDRENCALLBACK;
 
 		TVINSERTSTRUCT tvis;

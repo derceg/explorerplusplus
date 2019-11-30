@@ -64,12 +64,11 @@ private:
 		unique_pidl_child pridl;
 	} ItemInfo_t;
 
-	/* Used to store the tree items as you enumerate them ready for sorting. */
 	typedef struct
 	{
-		TCHAR		ItemName[MAX_PATH];
-		int			iItemId;
-	} ItemStore_t;
+		int internalIndex;
+		std::wstring name;
+	} EnumeratedItem;
 
 	typedef struct
 	{
