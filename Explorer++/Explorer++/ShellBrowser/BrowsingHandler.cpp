@@ -574,7 +574,7 @@ BOOL *bStoreHistory)
 		Ignores the supplied Path argument.*/
 		*bStoreHistory		= FALSE;
 
-		*pidlDirectory = m_pathManager.RetrieveAndValidateIdl(-1);
+		*pidlDirectory = m_pathManager.RetrievePath(-1);
 	}
 	else if((uFlags & SBSP_NAVIGATEFORWARD) == SBSP_NAVIGATEFORWARD)
 	{
@@ -588,7 +588,7 @@ BOOL *bStoreHistory)
 		this one. Ignores the supplied Path argument.*/
 		*bStoreHistory		= FALSE;
 
-		*pidlDirectory = m_pathManager.RetrieveAndValidateIdl(1);
+		*pidlDirectory = m_pathManager.RetrievePath(1);
 	}
 	else
 	{

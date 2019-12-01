@@ -21,7 +21,6 @@ public:
 	void			StoreIdl(PCIDLIST_ABSOLUTE pidl);
 	PIDLIST_ABSOLUTE	RetrievePath(int iIndex);
 	PIDLIST_ABSOLUTE	RetrievePathWithoutUpdate(int iIndex);
-	PIDLIST_ABSOLUTE	RetrieveAndValidateIdl(int iIndex);
 
 private:
 
@@ -36,8 +35,6 @@ private:
 
 	/* Number of paths allocated.  */
 	int m_nAllocated;
-
-	void ShiftIdlArray(int iStart);
 
 	PIDLIST_ABSOLUTE *ppidlList;
 };

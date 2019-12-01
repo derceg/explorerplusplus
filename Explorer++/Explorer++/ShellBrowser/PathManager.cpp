@@ -43,18 +43,6 @@ void PathManager::StoreIdl(PCIDLIST_ABSOLUTE pidl)
 	m_nTotal = m_iCurrent;
 }
 
-void PathManager::ShiftIdlArray(int iStart)
-{
-	int i = 0;
-
-	for(i = iStart;i < m_nTotal - 1;i++)
-	{
-		ppidlList[i] = ppidlList[i + 1];
-	}
-
-	m_nTotal--;
-}
-
 PIDLIST_ABSOLUTE PathManager::RetrievePath(int iIndex)
 {
 	if((m_iCurrent + iIndex) < 0 ||
@@ -79,29 +67,6 @@ PIDLIST_ABSOLUTE PathManager::RetrievePathWithoutUpdate(int iIndex)
 	}
 
 	return ILCloneFull(ppidlList[m_iCurrent + iIndex - 1]);
-}
-
-PIDLIST_ABSOLUTE PathManager::RetrieveAndValidateIdl(int iIndex)
-{
-	if((m_iCurrent + iIndex) < 0 ||
-	(m_iCurrent + iIndex) > m_nTotal)
-	{
-		return NULL;
-	}
-
-	if(!CheckIdl(ppidlList[m_iCurrent + iIndex - 1]))
-	{
-		CoTaskMemFree(ppidlList[m_iCurrent + iIndex - 1]);
-		ShiftIdlArray(m_iCurrent + iIndex - 1);
-
-		return NULL;
-	}
-
-	/* Update the current folder pointer to point to the
-	folder that was selected. */
-	m_iCurrent += iIndex;
-
-	return ILCloneFull(ppidlList[m_iCurrent - 1]);
 }
 
 int PathManager::GetNumBackPathsStored(void) const
