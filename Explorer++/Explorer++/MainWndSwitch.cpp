@@ -301,47 +301,6 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 	{
 		/* TODO: [Bookmarks] Open bookmark. */
 	}
-	else if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_HEADER_STARTID &&
-		LOWORD(wParam) <= MENU_HEADER_ENDID)
-	{
-		int iOffset;
-
-		iOffset = LOWORD(wParam) - MENU_HEADER_STARTID;
-
-		int							iItem = 0;
-		unsigned int *pHeaderList = NULL;
-
-		auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
-
-		GetColumnHeaderMenuList(&pHeaderList);
-
-		/* Loop through all current items to find the item that was clicked, and
-		flip its active state. */
-		for (auto itr = currentColumns.begin(); itr != currentColumns.end(); itr++)
-		{
-			if (itr->id == pHeaderList[iOffset])
-			{
-				itr->bChecked = !itr->bChecked;
-				break;
-			}
-
-			iItem++;
-		}
-
-		/* If it was the first column that was changed, need to refresh
-		all columns. */
-		if (iOffset == 0)
-		{
-			m_pActiveShellBrowser->ImportColumns(currentColumns);
-
-			Tab &tab = m_tabContainer->GetSelectedTab();
-			RefreshTab(tab);
-		}
-		else
-		{
-			m_pActiveShellBrowser->ImportColumns(currentColumns);
-		}
-	}
 	else if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_PLUGIN_STARTID &&
 		LOWORD(wParam) < MENU_PLUGIN_ENDID)
 	{

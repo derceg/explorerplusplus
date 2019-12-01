@@ -14,6 +14,7 @@
 #include "MassRenameDialog.h"
 #include "MenuRanges.h"
 #include "Navigation.h"
+#include "ResourceHelper.h"
 #include "SetFileAttributesDialog.h"
 #include "ShellBrowser/Columns.h"
 #include "ShellBrowser/ViewModes.h"
@@ -36,30 +37,30 @@ const DWORD MAIN_LISTVIEW_STYLES = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |
 WS_CLIPCHILDREN | LVS_ICON | LVS_EDITLABELS | LVS_SHOWSELALWAYS |
 LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | WS_TABSTOP | LVS_ALIGNTOP;
 
-static unsigned int g_RealFolderHeaderList[] =
+const std::vector<unsigned int> COMMON_REAL_FOLDER_COLUMNS =
 {CM_NAME, CM_TYPE, CM_SIZE, CM_DATEMODIFIED,
 CM_AUTHORS, CM_TITLE};
 
-static unsigned int g_ControlPanelHeaderList[] =
+const std::vector<unsigned int> COMMON_CONTROL_PANEL_COLUMNS =
 {CM_NAME, CM_VIRTUALCOMMENTS};
 
-static unsigned int g_MyComputerHeaderList[] =
+const std::vector<unsigned int> COMMON_MY_COMPUTER_COLUMNS =
 {CM_NAME, CM_TYPE, CM_TOTALSIZE,
 CM_FREESPACE, CM_VIRTUALCOMMENTS,
 CM_FILESYSTEM};
 
-static unsigned int g_NetworkConnectionsHeaderList[] =
+const std::vector<unsigned int> COMMON_NETWORK_CONNECTIONS_COLUMNS =
 {CM_NAME, CM_TYPE, CM_NETWORKADAPTER_STATUS,
 CM_OWNER};
 
-static unsigned int g_NetworkHeaderList[] =
+const std::vector<unsigned int> COMMON_NETWORK_COLUMNS =
 {CM_NAME, CM_VIRTUALCOMMENTS};
 
-static unsigned int g_PrintersHeaderList[] =
+const std::vector<unsigned int> COMMON_PRINTERS_COLUMNS =
 {CM_NAME, CM_NUMPRINTERDOCUMENTS, CM_PRINTERSTATUS,
 CM_PRINTERCOMMENTS, CM_PRINTERLOCATION};
 
-static unsigned int g_RecycleBinHeaderList[] =
+const std::vector<unsigned int> COMMON_RECYCLE_BIN_COLUMNS =
 {CM_NAME, CM_ORIGINALLOCATION, CM_DATEDELETED,
 CM_SIZE, CM_TYPE, CM_DATEMODIFIED};
 
@@ -1017,100 +1018,137 @@ void Explorerplusplus::OnListViewItemRClick(POINT *pCursorPos)
 	}
 }
 
-void Explorerplusplus::OnListViewHeaderRClick(POINT *pCursorPos)
+void Explorerplusplus::OnListViewHeaderRClick(const POINT *pCursorPos)
 {
-	HMENU						hHeaderPopupMenu;
-	HMENU						hMenu;
-	MENUITEMINFO				mii;
-	TCHAR						szColumnText[256];
-	unsigned int				*pHeaderList = NULL;
-	int							nItems = 0;
-	int							iItem = 0;
-	int							i = 0;
-
-	hHeaderPopupMenu = LoadMenu(m_hLanguageModule,MAKEINTRESOURCE(IDR_HEADER_MENU));
-
-	hMenu = GetSubMenu(hHeaderPopupMenu,0);
+	wil::unique_hmenu headerPopupMenu(LoadMenu(m_hLanguageModule, MAKEINTRESOURCE(IDR_HEADER_MENU)));
+	HMENU headerMenu = GetSubMenu(headerPopupMenu.get(), 0);
 
 	auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
+	auto commonColumns = GetColumnHeaderMenuList();
 
-	nItems = GetColumnHeaderMenuList(&pHeaderList);
+	std::unordered_map<int, UINT> menuItemMappings;
+	int totalInserted = 0;
+	int commonColumnPosition = 0;
 
-	for(i = 0;i < nItems;i++)
+	for (const auto &column : currentColumns)
 	{
-		for(auto itr = currentColumns.begin();itr != currentColumns.end();itr++)
+		auto itr = std::find(commonColumns.begin(), commonColumns.end(), column.id);
+		bool inCommonColumns = (itr != commonColumns.end());
+
+		if (!column.bChecked && !inCommonColumns)
 		{
-			if(itr->id == pHeaderList[i])
-			{
-				LoadString(m_hLanguageModule,CShellBrowser::LookupColumnNameStringIndex(itr->id),
-					szColumnText,SIZEOF_ARRAY(szColumnText));
-
-				if(itr->bChecked)
-					mii.fState	= MFS_CHECKED;
-				else
-					mii.fState	= MFS_ENABLED;
-
-				/* Build a list of the current columns, and add them
-				to the menu. */
-				mii.cbSize			= sizeof(mii);
-				mii.fMask			= MIIM_STRING|MIIM_STATE|MIIM_ID;
-				mii.dwTypeData		= szColumnText;
-				mii.wID				= MENU_HEADER_STARTID + iItem;
-				InsertMenuItem(hMenu,iItem,TRUE,&mii);
-
-				iItem++;
-				break;
-			}
+			continue;
 		}
+
+		MENUITEMINFO mii;
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_STRING | MIIM_STATE | MIIM_ID;
+
+		std::wstring columnText = ResourceHelper::LoadString(m_hLanguageModule,
+			CShellBrowser::LookupColumnNameStringIndex(column.id));
+
+		if (column.bChecked)
+		{
+			mii.fState = MFS_CHECKED;
+		}
+		else
+		{
+			mii.fState = MFS_ENABLED;
+		}
+
+		int currentPosition;
+
+		if (inCommonColumns)
+		{
+			// The common columns always appear first, whether they're checked
+			// or not.
+			currentPosition = commonColumnPosition;
+			commonColumnPosition++;
+		}
+		else
+		{
+			currentPosition = totalInserted;
+		}
+
+		int id = totalInserted + 1;
+
+		mii.dwTypeData = columnText.data();
+		mii.wID = id;
+		InsertMenuItem(headerMenu, currentPosition, TRUE, &mii);
+
+		menuItemMappings.insert({id, column.id});
+
+		totalInserted++;
 	}
 
-	TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RIGHTBUTTON|TPM_VERTICAL,
-		pCursorPos->x,pCursorPos->y,0,m_hContainer,NULL);
+	int cmd = TrackPopupMenu(headerMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
+		pCursorPos->x, pCursorPos->y, 0, m_hContainer, NULL);
 
-	DestroyMenu(hHeaderPopupMenu);
+	if (cmd == 0)
+	{
+		return;
+	}
+
+	OnListViewHeaderMenuItemSelected(cmd, menuItemMappings);
 }
 
-int Explorerplusplus::GetColumnHeaderMenuList(unsigned int **pHeaderList)
+std::vector<unsigned int> Explorerplusplus::GetColumnHeaderMenuList()
 {
-	int nItems;
-
 	if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_DRIVES))
 	{
-		*pHeaderList = g_MyComputerHeaderList;
-		nItems = sizeof(g_MyComputerHeaderList) / sizeof(g_MyComputerHeaderList[0]);
+		return COMMON_MY_COMPUTER_COLUMNS;
 	}
 	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_CONTROLS))
 	{
-		*pHeaderList = g_ControlPanelHeaderList;
-		nItems = sizeof(g_ControlPanelHeaderList) / sizeof(g_ControlPanelHeaderList[0]);
+		return COMMON_CONTROL_PANEL_COLUMNS;
 	}
 	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_BITBUCKET))
 	{
-		*pHeaderList = g_RecycleBinHeaderList;
-		nItems = sizeof(g_RecycleBinHeaderList) / sizeof(g_RecycleBinHeaderList[0]);
+		return COMMON_RECYCLE_BIN_COLUMNS;
 	}
 	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_CONNECTIONS))
 	{
-		*pHeaderList = g_NetworkConnectionsHeaderList;
-		nItems = sizeof(g_NetworkConnectionsHeaderList) / sizeof(g_NetworkConnectionsHeaderList[0]);
+		return COMMON_NETWORK_CONNECTIONS_COLUMNS;
 	}
 	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_NETWORK))
 	{
-		*pHeaderList = g_NetworkHeaderList;
-		nItems = sizeof(g_NetworkHeaderList) / sizeof(g_NetworkHeaderList[0]);
+		return COMMON_NETWORK_COLUMNS;
 	}
 	else if(CompareVirtualFolders(m_CurrentDirectory.c_str(), CSIDL_PRINTERS))
 	{
-		*pHeaderList = g_PrintersHeaderList;
-		nItems = sizeof(g_PrintersHeaderList) / sizeof(g_PrintersHeaderList[0]);
+		return COMMON_PRINTERS_COLUMNS;
 	}
 	else
 	{
-		*pHeaderList = g_RealFolderHeaderList;
-		nItems = sizeof(g_RealFolderHeaderList) / sizeof(g_RealFolderHeaderList[0]);
+		return COMMON_REAL_FOLDER_COLUMNS;
+	}
+}
+
+void Explorerplusplus::OnListViewHeaderMenuItemSelected(int menuItemId,
+	const std::unordered_map<int, UINT> &menuItemMappings)
+{
+	auto currentColumns = m_pActiveShellBrowser->ExportCurrentColumns();
+
+	UINT columnId = menuItemMappings.at(menuItemId);
+	auto itr = std::find_if(currentColumns.begin(), currentColumns.end(), [columnId] (const Column_t &column) {
+		return column.id == columnId;
+	});
+
+	if (itr == currentColumns.end())
+	{
+		return;
 	}
 
-	return nItems;
+	itr->bChecked = !itr->bChecked;
+
+	m_pActiveShellBrowser->ImportColumns(currentColumns);
+
+	// If it was the first column that was changed, need to refresh all columns.
+	if (menuItemId == 1)
+	{
+		Tab &tab = m_tabContainer->GetSelectedTab();
+		RefreshTab(tab);
+	}
 }
 
 HRESULT Explorerplusplus::OnListViewBeginDrag(LPARAM lParam,DragTypes_t DragType)
