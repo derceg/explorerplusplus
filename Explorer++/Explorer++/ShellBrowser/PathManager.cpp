@@ -25,7 +25,7 @@ PathManager::PathManager()
 	m_nTotal = 0;
 }
 
-void PathManager::StoreIdl(PCIDLIST_ABSOLUTE pidl)
+void PathManager::AddEntry(PCIDLIST_ABSOLUTE pidl)
 {
 	/* Check if the number of idl's stored has reached the number of
 	spaces allocated. If so, allocate a new block. */
@@ -43,7 +43,7 @@ void PathManager::StoreIdl(PCIDLIST_ABSOLUTE pidl)
 	m_nTotal = m_iCurrent;
 }
 
-PIDLIST_ABSOLUTE PathManager::RetrievePath(int iIndex)
+PIDLIST_ABSOLUTE PathManager::GetEntry(int iIndex)
 {
 	if((m_iCurrent + iIndex) < 0 ||
 	(m_iCurrent + iIndex) > m_nTotal)
@@ -58,7 +58,7 @@ PIDLIST_ABSOLUTE PathManager::RetrievePath(int iIndex)
 	return ILCloneFull(ppidlList[m_iCurrent - 1]);
 }
 
-PIDLIST_ABSOLUTE PathManager::RetrievePathWithoutUpdate(int iIndex)
+PIDLIST_ABSOLUTE PathManager::GetEntryWithoutUpdate(int iIndex)
 {
 	if((m_iCurrent + iIndex) < 0 ||
 	(m_iCurrent + iIndex) > m_nTotal)
@@ -69,7 +69,7 @@ PIDLIST_ABSOLUTE PathManager::RetrievePathWithoutUpdate(int iIndex)
 	return ILCloneFull(ppidlList[m_iCurrent + iIndex - 1]);
 }
 
-int PathManager::GetNumBackPathsStored(void) const
+int PathManager::GetNumBackEntriesStored(void) const
 {
 	/* CurrentPath pointer points to the current path in the array.
 	All items before this one are 'back' paths, all items after
@@ -77,7 +77,7 @@ int PathManager::GetNumBackPathsStored(void) const
 	return m_iCurrent - 1;
 }
 
-int PathManager::GetNumForwardPathsStored(void) const
+int PathManager::GetNumForwardEntriesStored(void) const
 {
 	/* iNumStoredPaths indexes the end of the array.
 	Difference between it and the iCurrentPath index
@@ -129,7 +129,7 @@ UINT PathManager::CreateHistoryPopupMenu(HWND Parent,POINT *Origin,BOOL bBack)
 
 	if(bBack)
 	{
-		NumMenuPaths = GetNumBackPathsStored();
+		NumMenuPaths = GetNumBackEntriesStored();
 
 		iEndIndex = m_iCurrent - 1;
 
@@ -143,7 +143,7 @@ UINT PathManager::CreateHistoryPopupMenu(HWND Parent,POINT *Origin,BOOL bBack)
 	}
 	else
 	{
-		NumMenuPaths = GetNumForwardPathsStored();
+		NumMenuPaths = GetNumForwardEntriesStored();
 
 		iStartIndex = m_iCurrent;
 

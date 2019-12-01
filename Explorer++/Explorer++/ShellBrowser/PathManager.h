@@ -12,19 +12,19 @@ public:
 
 	PathManager();
 
-	int				GetNumBackPathsStored(void) const;
-	int				GetNumForwardPathsStored(void) const;
-	UINT			CreateHistoryPopupMenu(HWND,POINT *,BOOL);
-	std::list<PIDLIST_ABSOLUTE>	GetBackHistory() const;
-	std::list<PIDLIST_ABSOLUTE>	GetForwardHistory() const;
+	int GetNumBackEntriesStored(void) const;
+	int GetNumForwardEntriesStored(void) const;
+	UINT CreateHistoryPopupMenu(HWND, POINT *, BOOL);
+	std::list<PIDLIST_ABSOLUTE> GetBackHistory() const;
+	std::list<PIDLIST_ABSOLUTE> GetForwardHistory() const;
 
-	void			StoreIdl(PCIDLIST_ABSOLUTE pidl);
-	PIDLIST_ABSOLUTE	RetrievePath(int iIndex);
-	PIDLIST_ABSOLUTE	RetrievePathWithoutUpdate(int iIndex);
+	void AddEntry(PCIDLIST_ABSOLUTE pidl);
+	PIDLIST_ABSOLUTE GetEntry(int iIndex);
+	PIDLIST_ABSOLUTE GetEntryWithoutUpdate(int iIndex);
 
 private:
 
-	#define DEFAULT_ALLOCATION	10
+	#define DEFAULT_ALLOCATION 10
 
 	/* Points one past the "current" path. */
 	int m_iCurrent;

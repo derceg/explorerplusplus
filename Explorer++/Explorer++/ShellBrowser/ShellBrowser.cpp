@@ -464,7 +464,7 @@ HRESULT CShellBrowser::CreateHistoryPopup(HWND hParent, PIDLIST_ABSOLUTE *pidl,
 	if(bBackOrForward)
 		iSel = -iSel;
 
-	*pidl = m_pathManager.RetrievePath(iSel);
+	*pidl = m_pathManager.GetEntry(iSel);
 
 	return S_OK;
 }
@@ -473,7 +473,7 @@ BOOL CShellBrowser::CanBrowseBack(void) const
 {
 	int nBackPathsStored;
 
-	nBackPathsStored = m_pathManager.GetNumBackPathsStored();
+	nBackPathsStored = m_pathManager.GetNumBackEntriesStored();
 
 	if(nBackPathsStored == 0)
 		return FALSE;
@@ -485,7 +485,7 @@ BOOL CShellBrowser::CanBrowseForward(void) const
 {
 	int nForwardPathsStored;
 
-	nForwardPathsStored = m_pathManager.GetNumForwardPathsStored();
+	nForwardPathsStored = m_pathManager.GetNumForwardEntriesStored();
 
 	if(nForwardPathsStored == 0)
 		return FALSE;
@@ -505,12 +505,12 @@ std::list<PIDLIST_ABSOLUTE> CShellBrowser::GetForwardHistory() const
 
 PIDLIST_ABSOLUTE CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)
 {
-	return m_pathManager.RetrievePathWithoutUpdate(iItem);
+	return m_pathManager.GetEntryWithoutUpdate(iItem);
 }
 
 PIDLIST_ABSOLUTE CShellBrowser::RetrieveHistoryItem(int iItem)
 {
-	return m_pathManager.RetrievePath(iItem);
+	return m_pathManager.GetEntry(iItem);
 }
 
 BOOL CShellBrowser::CanBrowseUp(void) const
