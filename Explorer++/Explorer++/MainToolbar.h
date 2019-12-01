@@ -53,6 +53,12 @@ private:
 
 	static const UINT_PTR PARENT_SUBCLASS_ID = 0;
 
+	enum class HistoryType
+	{
+		Back,
+		Forward
+	};
+
 	MainToolbar(HWND parent, HINSTANCE instance, IExplorerplusplus *pexpp,
 		Navigation *navigation, std::shared_ptr<Config> config);
 	~MainToolbar() = default;
@@ -82,7 +88,8 @@ private:
 	void OnTBReset();
 	void OnTBChange();
 	void OnTBGetInfoTip(LPARAM lParam);
-	LRESULT OnTbnDropDown(LPARAM lParam);
+	LRESULT OnTbnDropDown(const NMTOOLBAR *nmtb);
+	void ShowHistoryMenu(HistoryType historyType, const POINT &pt);
 	void ShowToolbarViewsDropdown();
 	void CreateViewsMenu(POINT *ptOrigin);
 

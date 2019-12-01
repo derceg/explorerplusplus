@@ -93,8 +93,8 @@ public:
 	BOOL				SetShowHidden(BOOL bShowHidden);
 	BOOL				CanBrowseBack(void) const;
 	BOOL				CanBrowseForward(void) const;
-	std::list<PIDLIST_ABSOLUTE>	GetBackHistory() const;
-	std::list<PIDLIST_ABSOLUTE>	GetForwardHistory() const;
+	std::vector<unique_pidl_absolute>	GetBackHistory() const;
+	std::vector<unique_pidl_absolute>	GetForwardHistory() const;
 	PIDLIST_ABSOLUTE	RetrieveHistoryItemWithoutUpdate(int iItem);
 	PIDLIST_ABSOLUTE	RetrieveHistoryItem(int iItem);
 	BOOL				CanBrowseUp(void) const;
@@ -136,7 +136,6 @@ public:
 	void				SetFilterCaseSensitive(BOOL bCaseSensitive);
 
 	void				UpdateFileSelectionInfo(int,BOOL);
-	HRESULT				CreateHistoryPopup(HWND hParent, PIDLIST_ABSOLUTE *pidl, POINT *pt, BOOL bBackOrForward);
 	int					SelectFiles(const TCHAR *FileNamePattern);
 	void				GetFolderInfo(FolderInfo_t *pFolderInfo);
 	int					LocateFileItemIndex(const TCHAR *szFileName) const;

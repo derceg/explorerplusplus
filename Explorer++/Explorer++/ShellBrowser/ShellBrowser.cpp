@@ -451,24 +451,6 @@ unique_pidl_absolute CShellBrowser::GetDirectoryIdl() const
 	return pidlDirectory;
 }
 
-HRESULT CShellBrowser::CreateHistoryPopup(HWND hParent, PIDLIST_ABSOLUTE *pidl,
-	POINT *pt, BOOL bBackOrForward)
-{
-	int iSel;
-
-	iSel = m_pathManager.CreateHistoryPopupMenu(hParent,pt,bBackOrForward);
-
-	if(iSel == 0)
-		return E_FAIL;
-
-	if(bBackOrForward)
-		iSel = -iSel;
-
-	*pidl = m_pathManager.GetEntry(iSel);
-
-	return S_OK;
-}
-
 BOOL CShellBrowser::CanBrowseBack(void) const
 {
 	int nBackPathsStored;
@@ -493,12 +475,12 @@ BOOL CShellBrowser::CanBrowseForward(void) const
 	return TRUE;
 }
 
-std::list<PIDLIST_ABSOLUTE> CShellBrowser::GetBackHistory() const
+std::vector<unique_pidl_absolute> CShellBrowser::GetBackHistory() const
 {
 	return m_pathManager.GetBackHistory();
 }
 
-std::list<PIDLIST_ABSOLUTE> CShellBrowser::GetForwardHistory() const
+std::vector<unique_pidl_absolute> CShellBrowser::GetForwardHistory() const
 {
 	return m_pathManager.GetForwardHistory();
 }

@@ -253,7 +253,7 @@ LRESULT CALLBACK MainToolbar::ParentWndProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 				break;
 
 			case TBN_DROPDOWN:
-				return OnTbnDropDown(lParam);
+				return OnTbnDropDown(reinterpret_cast<NMTOOLBAR *>(lParam));
 				break;
 
 			case TBN_INITCUSTOMIZE:
@@ -676,52 +676,33 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 	}
 }
 
-LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
+LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 {
-	NMTOOLBAR		*nmTB = NULL;
-	PIDLIST_ABSOLUTE	pidl = NULL;
-	POINT			ptOrigin;
-	RECT			rc;
-	HRESULT			hr;
+	RECT toolbarRect;
+	GetWindowRect(m_hwnd, &toolbarRect);
 
-	nmTB = (NMTOOLBAR *)lParam;
+	POINT ptOrigin;
+	ptOrigin.x = toolbarRect.left;
+	ptOrigin.y = toolbarRect.bottom - 4;
 
-	GetWindowRect(m_hwnd, &rc);
-
-	ptOrigin.x = rc.left;
-	ptOrigin.y = rc.bottom - 4;
-
-	if (nmTB->iItem == ToolbarButton::Back)
+	if (nmtb->iItem == ToolbarButton::Back)
 	{
-		hr = m_pexpp->GetActiveShellBrowser()->CreateHistoryPopup(m_hwnd, &pidl, &ptOrigin, TRUE);
-
-		if (SUCCEEDED(hr))
-		{
-			m_navigation->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
-
-			CoTaskMemFree(pidl);
-		}
+		ShowHistoryMenu(HistoryType::Back, ptOrigin);
 
 		return TBDDRET_DEFAULT;
 	}
-	else if (nmTB->iItem == ToolbarButton::Forward)
+	else if (nmtb->iItem == ToolbarButton::Forward)
 	{
-		SendMessage(m_hwnd, TB_GETRECT, (WPARAM)ToolbarButton::Back, (LPARAM)&rc);
+		RECT backButtonRect;
+		SendMessage(m_hwnd, TB_GETRECT, ToolbarButton::Back, reinterpret_cast<LPARAM>(&backButtonRect));
 
-		ptOrigin.x += rc.right;
+		ptOrigin.x += backButtonRect.right;
 
-		hr = m_pexpp->GetActiveShellBrowser()->CreateHistoryPopup(m_hwnd, &pidl, &ptOrigin, FALSE);
-
-		if (SUCCEEDED(hr))
-		{
-			m_navigation->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
-
-			CoTaskMemFree(pidl);
-		}
+		ShowHistoryMenu(HistoryType::Forward, ptOrigin);
 
 		return TBDDRET_DEFAULT;
 	}
-	else if (nmTB->iItem == ToolbarButton::Views)
+	else if (nmtb->iItem == ToolbarButton::Views)
 	{
 		ShowToolbarViewsDropdown();
 
@@ -729,6 +710,60 @@ LRESULT MainToolbar::OnTbnDropDown(LPARAM lParam)
 	}
 
 	return TBDDRET_NODEFAULT;
+}
+
+void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
+{
+	std::vector<unique_pidl_absolute> history;
+
+	if (historyType == HistoryType::Back)
+	{
+		history = m_pexpp->GetActiveShellBrowser()->GetBackHistory();
+	}
+	else
+	{
+		history = m_pexpp->GetActiveShellBrowser()->GetForwardHistory();
+	}
+
+	if (history.empty())
+	{
+		return;
+	}
+
+	wil::unique_hmenu menu(CreatePopupMenu());
+	int numInserted = 0;
+
+	for (const auto &pidl : history)
+	{
+		TCHAR szDisplayName[MAX_PATH];
+		GetDisplayName(pidl.get(), szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
+
+		MENUITEMINFO mii;
+		mii.cbSize = sizeof(mii);
+		mii.fMask = MIIM_ID | MIIM_STRING;
+		mii.wID = numInserted + 1;
+		mii.dwTypeData = szDisplayName;
+		InsertMenuItem(menu.get(), numInserted, TRUE, &mii);
+
+		numInserted++;
+	}
+
+	int cmd = TrackPopupMenu(menu.get(), TPM_LEFTALIGN | TPM_VERTICAL | TPM_RETURNCMD,
+		pt.x, pt.y, 0, m_hwnd, nullptr);
+
+	if (cmd == 0)
+	{
+		return;
+	}
+
+	if (historyType == HistoryType::Back)
+	{
+		cmd = -cmd;
+	}
+
+	PIDLIST_ABSOLUTE pidl = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItem(cmd);
+	m_navigation->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+	CoTaskMemFree(pidl);
 }
 
 void MainToolbar::ShowToolbarViewsDropdown()

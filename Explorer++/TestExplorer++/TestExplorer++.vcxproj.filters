@@ -8,6 +8,9 @@
       <Filter>ShellBrowser</Filter>
     </ClCompile>
     <ClCompile Include="TestViewModeHelper.cpp" />
+    <ClCompile Include="TestPathManager.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />

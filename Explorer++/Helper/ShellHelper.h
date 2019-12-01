@@ -6,6 +6,8 @@
 
 #include <boost/optional.hpp>
 #include <wil/resource.h>
+#include <ShlGuid.h>
+#include <ShObjIdl.h>
 #include <list>
 #include <vector>
 

@@ -11,153 +11,98 @@
 
 #include "stdafx.h"
 #include "PathManager.h"
-#include "../Helper/Helper.h"
-#include "../Helper/Macros.h"
-#include "../Helper/ShellHelper.h"
 
-PathManager::PathManager()
+PathManager::PathManager() :
+	m_currentEntry(-1)
 {
-	m_iCurrent = 0;
 
-	m_nAllocated = DEFAULT_ALLOCATION;
-	ppidlList = (PIDLIST_ABSOLUTE *)malloc(m_nAllocated * sizeof(PIDLIST_ABSOLUTE));
-
-	m_nTotal = 0;
 }
 
 void PathManager::AddEntry(PCIDLIST_ABSOLUTE pidl)
 {
-	/* Check if the number of idl's stored has reached the number of
-	spaces allocated. If so, allocate a new block. */
-	if(m_iCurrent >= (m_nAllocated - 1))
-	{
-		m_nAllocated += DEFAULT_ALLOCATION;
+	// This will implicitly remove all "forward" entries.
+	m_entries.resize(m_currentEntry + 1);
 
-		ppidlList = (PIDLIST_ABSOLUTE *)realloc(ppidlList,
-		m_nAllocated * sizeof(PIDLIST_ABSOLUTE));
+	m_entries.push_back(unique_pidl_absolute(ILCloneFull(pidl)));
+	m_currentEntry++;
+}
+
+PIDLIST_ABSOLUTE PathManager::GetEntry(int offset)
+{
+	int index = m_currentEntry + offset;
+
+	if(index < 0 || index >= m_entries.size())
+	{
+		return nullptr;
 	}
 
-	ppidlList[m_iCurrent++] = ILCloneFull(pidl);
+	m_currentEntry = index;
 
-	/* "Erases" idl's forward of the current one. */
-	m_nTotal = m_iCurrent;
+	return ILCloneFull(m_entries[index].get());
 }
 
-PIDLIST_ABSOLUTE PathManager::GetEntry(int iIndex)
+PIDLIST_ABSOLUTE PathManager::GetEntryWithoutUpdate(int offset) const
 {
-	if((m_iCurrent + iIndex) < 0 ||
-	(m_iCurrent + iIndex) > m_nTotal)
+	int index = m_currentEntry + offset;
+
+	if (index < 0 || index >= m_entries.size())
 	{
-		return NULL;
+		return nullptr;
 	}
 
-	/* Update the current folder pointer to point to the
-	folder that was selected. */
-	m_iCurrent += iIndex;
-
-	return ILCloneFull(ppidlList[m_iCurrent - 1]);
+	return ILCloneFull(m_entries[index].get());
 }
 
-PIDLIST_ABSOLUTE PathManager::GetEntryWithoutUpdate(int iIndex)
+int PathManager::GetNumBackEntriesStored() const
 {
-	if((m_iCurrent + iIndex) < 0 ||
-	(m_iCurrent + iIndex) > m_nTotal)
+	if (m_currentEntry == -1)
 	{
-		return NULL;
+		return 0;
 	}
 
-	return ILCloneFull(ppidlList[m_iCurrent + iIndex - 1]);
+	return m_currentEntry;
 }
 
-int PathManager::GetNumBackEntriesStored(void) const
+int PathManager::GetNumForwardEntriesStored() const
 {
-	/* CurrentPath pointer points to the current path in the array.
-	All items before this one are 'back' paths, all items after
-	this one are 'forward' paths. */
-	return m_iCurrent - 1;
-}
-
-int PathManager::GetNumForwardEntriesStored(void) const
-{
-	/* iNumStoredPaths indexes the end of the array.
-	Difference between it and the iCurrentPath index
-	gives the number of 'forward' paths stored. */
-	return m_nTotal - m_iCurrent;
-}
-
-std::list<PIDLIST_ABSOLUTE> PathManager::GetBackHistory() const
-{
-	std::list<PIDLIST_ABSOLUTE> history;
-
-	int iStartIndex = m_iCurrent > 10 ? m_iCurrent - 10 : 0;
-	int iEndIndex = m_iCurrent - 1;
-
-	for(int i = iEndIndex - 1;i >= iStartIndex;i--)
+	if (m_currentEntry == -1)
 	{
-		history.push_back(ILCloneFull(ppidlList[i]));
+		return 0;
+	}
+
+	return m_entries.size() - m_currentEntry - 1;
+}
+
+std::vector<unique_pidl_absolute> PathManager::GetBackHistory() const
+{
+	std::vector<unique_pidl_absolute> history;
+
+	if (m_currentEntry == -1)
+	{
+		return history;
+	}
+
+	for (int i = m_currentEntry - 1; i >= 0; i--)
+	{
+		history.push_back(unique_pidl_absolute(ILCloneFull(m_entries[i].get())));
 	}
 
 	return history;
 }
 
-std::list<PIDLIST_ABSOLUTE> PathManager::GetForwardHistory() const
+std::vector<unique_pidl_absolute> PathManager::GetForwardHistory() const
 {
-	std::list<PIDLIST_ABSOLUTE> history;
+	std::vector<unique_pidl_absolute> history;
 
-	int iStartIndex = m_iCurrent;
-	int iEndIndex = (m_nTotal - m_iCurrent) > 10 ? m_iCurrent + 10 : m_nTotal;
-
-	for(int i = iStartIndex;i < iEndIndex;i++)
+	if (m_currentEntry == -1)
 	{
-		history.push_back(ILCloneFull(ppidlList[i]));
+		return history;
+	}
+
+	for (int i = m_currentEntry + 1; i < m_entries.size(); i++)
+	{
+		history.push_back(unique_pidl_absolute(ILCloneFull(m_entries[i].get())));
 	}
 
 	return history;
-}
-
-UINT PathManager::CreateHistoryPopupMenu(HWND Parent,POINT *Origin,BOOL bBack)
-{
-	HMENU	hMenu;
-	TCHAR	szMenuText[MAX_PATH];
-	UINT	ItemReturned;
-	int		NumMenuPaths;
-	int		iStartIndex;
-	int		iEndIndex;
-	int		i = 0;
-
-	hMenu = CreatePopupMenu();
-
-	if(bBack)
-	{
-		NumMenuPaths = GetNumBackEntriesStored();
-
-		iEndIndex = m_iCurrent - 1;
-
-		iStartIndex = m_iCurrent > 10 ? m_iCurrent - 10 : 0;
-
-		for(i = iEndIndex - 1;i >= iStartIndex;i--)
-		{
-			GetDisplayName(ppidlList[i],szMenuText,SIZEOF_ARRAY(szMenuText),SHGDN_INFOLDER);
-			AppendMenu(hMenu,MF_STRING,iEndIndex - i,szMenuText);
-		}
-	}
-	else
-	{
-		NumMenuPaths = GetNumForwardEntriesStored();
-
-		iStartIndex = m_iCurrent;
-
-		iEndIndex = (m_nTotal - m_iCurrent) > 10 ? m_iCurrent + 10 : m_nTotal;
-
-		for(i = iStartIndex;i < iEndIndex;i++)
-		{
-			GetDisplayName(ppidlList[i],szMenuText,SIZEOF_ARRAY(szMenuText),SHGDN_INFOLDER);
-			AppendMenu(hMenu,MF_STRING,i - iStartIndex + 1,szMenuText);
-		}
-	}
-
-	/* Show the popup menu. */
-	ItemReturned = TrackPopupMenu(hMenu,TPM_LEFTALIGN|TPM_RETURNCMD,Origin->x,Origin->y,0,Parent,0);
-
-	return ItemReturned;
 }

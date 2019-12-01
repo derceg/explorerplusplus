@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <list>
+#include "../Helper/ShellHelper.h"
 
 class PathManager
 {
@@ -12,29 +12,17 @@ public:
 
 	PathManager();
 
-	int GetNumBackEntriesStored(void) const;
-	int GetNumForwardEntriesStored(void) const;
-	UINT CreateHistoryPopupMenu(HWND, POINT *, BOOL);
-	std::list<PIDLIST_ABSOLUTE> GetBackHistory() const;
-	std::list<PIDLIST_ABSOLUTE> GetForwardHistory() const;
+	int GetNumBackEntriesStored() const;
+	int GetNumForwardEntriesStored() const;
+	std::vector<unique_pidl_absolute> GetBackHistory() const;
+	std::vector<unique_pidl_absolute> GetForwardHistory() const;
 
 	void AddEntry(PCIDLIST_ABSOLUTE pidl);
-	PIDLIST_ABSOLUTE GetEntry(int iIndex);
-	PIDLIST_ABSOLUTE GetEntryWithoutUpdate(int iIndex);
+	PIDLIST_ABSOLUTE GetEntry(int offset);
+	PIDLIST_ABSOLUTE GetEntryWithoutUpdate(int offset) const;
 
 private:
 
-	#define DEFAULT_ALLOCATION 10
-
-	/* Points one past the "current" path. */
-	int m_iCurrent;
-
-	/* Points one past the end of the valid
-	paths. */
-	int m_nTotal;
-
-	/* Number of paths allocated.  */
-	int m_nAllocated;
-
-	PIDLIST_ABSOLUTE *ppidlList;
+	std::vector<unique_pidl_absolute> m_entries;
+	int m_currentEntry;
 };
