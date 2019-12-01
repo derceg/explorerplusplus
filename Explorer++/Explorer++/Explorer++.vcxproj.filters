@@ -211,9 +211,6 @@
     <ClCompile Include="ShellBrowser\iDropTarget.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowser\iPathManager.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowser\SortManager.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -360,6 +357,9 @@
     </ClCompile>
     <ClCompile Include="SortMenuHandler.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ShellBrowser\PathManager.cpp">
+      <Filter>ShellBrowser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -515,9 +515,6 @@
     </ClInclude>
     <ClInclude Include="HolderWindowInternal.h">
       <Filter>Holder Window</Filter>
-    </ClInclude>
-    <ClInclude Include="ShellBrowser\iPathManager.h">
-      <Filter>ShellBrowser</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\SortModes.h">
       <Filter>ShellBrowser</Filter>
@@ -719,6 +716,9 @@
     </ClInclude>
     <ClInclude Include="ValueWrapper.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\PathManager.h">
+      <Filter>ShellBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

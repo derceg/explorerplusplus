@@ -7,7 +7,7 @@
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
 #include "FolderSettings.h"
-#include "iPathManager.h"
+#include "PathManager.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/DropHandler.h"
@@ -468,7 +468,7 @@ private:
 	mutable std::unordered_map<int, ULONGLONG>	m_cachedFolderSizes;
 
 	/* Manages browsing history. */
-	CPathManager		m_pathManager;
+	PathManager			m_pathManager;
 
 	/* Internal state. */
 	const HINSTANCE		m_hResourceModule;

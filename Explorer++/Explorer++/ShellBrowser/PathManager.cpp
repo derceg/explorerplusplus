@@ -10,14 +10,12 @@
  */
 
 #include "stdafx.h"
-#include <list>
-#include "iPathManager.h"
+#include "PathManager.h"
 #include "../Helper/Helper.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/Macros.h"
+#include "../Helper/ShellHelper.h"
 
-
-CPathManager::CPathManager()
+PathManager::PathManager()
 {
 	m_iCurrent = 0;
 
@@ -27,7 +25,7 @@ CPathManager::CPathManager()
 	m_nTotal = 0;
 }
 
-void CPathManager::StoreIdl(PCIDLIST_ABSOLUTE pidl)
+void PathManager::StoreIdl(PCIDLIST_ABSOLUTE pidl)
 {
 	/* Check if the number of idl's stored has reached the number of
 	spaces allocated. If so, allocate a new block. */
@@ -45,7 +43,7 @@ void CPathManager::StoreIdl(PCIDLIST_ABSOLUTE pidl)
 	m_nTotal = m_iCurrent;
 }
 
-void CPathManager::ShiftIdlArray(int iStart)
+void PathManager::ShiftIdlArray(int iStart)
 {
 	int i = 0;
 
@@ -57,7 +55,7 @@ void CPathManager::ShiftIdlArray(int iStart)
 	m_nTotal--;
 }
 
-PIDLIST_ABSOLUTE CPathManager::RetrievePath(int iIndex)
+PIDLIST_ABSOLUTE PathManager::RetrievePath(int iIndex)
 {
 	if((m_iCurrent + iIndex) < 0 ||
 	(m_iCurrent + iIndex) > m_nTotal)
@@ -72,7 +70,7 @@ PIDLIST_ABSOLUTE CPathManager::RetrievePath(int iIndex)
 	return ILCloneFull(ppidlList[m_iCurrent - 1]);
 }
 
-PIDLIST_ABSOLUTE CPathManager::RetrievePathWithoutUpdate(int iIndex)
+PIDLIST_ABSOLUTE PathManager::RetrievePathWithoutUpdate(int iIndex)
 {
 	if((m_iCurrent + iIndex) < 0 ||
 	(m_iCurrent + iIndex) > m_nTotal)
@@ -83,7 +81,7 @@ PIDLIST_ABSOLUTE CPathManager::RetrievePathWithoutUpdate(int iIndex)
 	return ILCloneFull(ppidlList[m_iCurrent + iIndex - 1]);
 }
 
-PIDLIST_ABSOLUTE CPathManager::RetrieveAndValidateIdl(int iIndex)
+PIDLIST_ABSOLUTE PathManager::RetrieveAndValidateIdl(int iIndex)
 {
 	if((m_iCurrent + iIndex) < 0 ||
 	(m_iCurrent + iIndex) > m_nTotal)
@@ -106,7 +104,7 @@ PIDLIST_ABSOLUTE CPathManager::RetrieveAndValidateIdl(int iIndex)
 	return ILCloneFull(ppidlList[m_iCurrent - 1]);
 }
 
-int CPathManager::GetNumBackPathsStored(void) const
+int PathManager::GetNumBackPathsStored(void) const
 {
 	/* CurrentPath pointer points to the current path in the array.
 	All items before this one are 'back' paths, all items after
@@ -114,7 +112,7 @@ int CPathManager::GetNumBackPathsStored(void) const
 	return m_iCurrent - 1;
 }
 
-int CPathManager::GetNumForwardPathsStored(void) const
+int PathManager::GetNumForwardPathsStored(void) const
 {
 	/* iNumStoredPaths indexes the end of the array.
 	Difference between it and the iCurrentPath index
@@ -122,7 +120,7 @@ int CPathManager::GetNumForwardPathsStored(void) const
 	return m_nTotal - m_iCurrent;
 }
 
-std::list<PIDLIST_ABSOLUTE> CPathManager::GetBackHistory() const
+std::list<PIDLIST_ABSOLUTE> PathManager::GetBackHistory() const
 {
 	std::list<PIDLIST_ABSOLUTE> history;
 
@@ -137,7 +135,7 @@ std::list<PIDLIST_ABSOLUTE> CPathManager::GetBackHistory() const
 	return history;
 }
 
-std::list<PIDLIST_ABSOLUTE> CPathManager::GetForwardHistory() const
+std::list<PIDLIST_ABSOLUTE> PathManager::GetForwardHistory() const
 {
 	std::list<PIDLIST_ABSOLUTE> history;
 
@@ -152,7 +150,7 @@ std::list<PIDLIST_ABSOLUTE> CPathManager::GetForwardHistory() const
 	return history;
 }
 
-UINT CPathManager::CreateHistoryPopupMenu(HWND Parent,POINT *Origin,BOOL bBack)
+UINT PathManager::CreateHistoryPopupMenu(HWND Parent,POINT *Origin,BOOL bBack)
 {
 	HMENU	hMenu;
 	TCHAR	szMenuText[MAX_PATH];

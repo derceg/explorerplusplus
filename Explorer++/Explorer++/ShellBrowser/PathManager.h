@@ -6,11 +6,11 @@
 
 #include <list>
 
-class CPathManager
+class PathManager
 {
 public:
 
-	CPathManager();
+	PathManager();
 
 	int				GetNumBackPathsStored(void) const;
 	int				GetNumForwardPathsStored(void) const;
