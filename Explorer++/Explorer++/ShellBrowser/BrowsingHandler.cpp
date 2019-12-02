@@ -543,20 +543,7 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 HRESULT CShellBrowser::ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,
 BOOL *bStoreHistory)
 {
-	if((uFlags & SBSP_RELATIVE) == SBSP_RELATIVE)
-	{
-		if(pidlDirectory == NULL)
-			return E_INVALIDARG;
-
-		/* This is a relative path. Add it on to the end of the current directory
-		name to get a fully qualified path. */
-		PIDLIST_ABSOLUTE pidlComplete = ILCombine(m_directoryState.pidlDirectory.get(),*pidlDirectory);
-
-		*pidlDirectory = ILClone(pidlComplete);
-
-		CoTaskMemFree(pidlComplete);
-	}
-	else if((uFlags & SBSP_PARENT) == SBSP_PARENT)
+	if((uFlags & SBSP_PARENT) == SBSP_PARENT)
 	{
 		HRESULT hr;
 
