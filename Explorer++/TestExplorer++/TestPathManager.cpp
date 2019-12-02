@@ -20,9 +20,9 @@ TEST(PathManagerTest, TestInitial)
 	auto forwardHistory = pathManager.GetForwardHistory();
 	EXPECT_TRUE(forwardHistory.empty());
 
-	EXPECT_EQ(pathManager.GetEntry(0), nullptr);
-	EXPECT_EQ(pathManager.GetEntry(-1), nullptr);
-	EXPECT_EQ(pathManager.GetEntry(1), nullptr);
+	EXPECT_FALSE(pathManager.GetEntry(0));
+	EXPECT_FALSE(pathManager.GetEntry(-1));
+	EXPECT_FALSE(pathManager.GetEntry(1));
 }
 
 TEST(PathManagerTest, TestAdd)
@@ -31,7 +31,7 @@ TEST(PathManagerTest, TestAdd)
 
 	unique_pidl_absolute pidl;
 	SHParseDisplayName(L"C:\\", nullptr, wil::out_param(pidl), 0, nullptr);
-	pathManager.AddEntry(pidl.get());
+	pathManager.AddEntry(HistoryEntry(pidl.get(), L"C:\\"));
 
 	auto backHistory = pathManager.GetBackHistory();
 	EXPECT_TRUE(backHistory.empty());
@@ -46,13 +46,13 @@ TEST(PathManagerTest, TestAddMultiple)
 
 	unique_pidl_absolute pidl;
 	SHParseDisplayName(L"C:\\", nullptr, wil::out_param(pidl), 0, nullptr);
-	pathManager.AddEntry(pidl.get());
+	pathManager.AddEntry(HistoryEntry(pidl.get(), L"C:\\"));
 
 	SHParseDisplayName(L"C:\\Windows", nullptr, wil::out_param(pidl), 0, nullptr);
-	pathManager.AddEntry(pidl.get());
+	pathManager.AddEntry(HistoryEntry(pidl.get(), L"C:\\Windows"));
 
 	SHParseDisplayName(L"C:\\Windows\\System32", nullptr, wil::out_param(pidl), 0, nullptr);
-	pathManager.AddEntry(pidl.get());
+	pathManager.AddEntry(HistoryEntry(pidl.get(), L"C:\\Windows\\System32"));
 
 	auto backHistory = pathManager.GetBackHistory();
 	EXPECT_EQ(backHistory.size(), 2);
@@ -61,8 +61,7 @@ TEST(PathManagerTest, TestAddMultiple)
 	EXPECT_TRUE(forwardHistory.empty());
 
 	// Go back by one entry.
-	auto previousPidl = pathManager.GetEntry(-1);
-	CoTaskMemFree(previousPidl);
+	pathManager.GetEntry(-1);
 
 	backHistory = pathManager.GetBackHistory();
 	EXPECT_EQ(backHistory.size(), 1);
@@ -71,7 +70,7 @@ TEST(PathManagerTest, TestAddMultiple)
 	EXPECT_EQ(forwardHistory.size(), 1);
 
 	SHParseDisplayName(L"C:\\Users", nullptr, wil::out_param(pidl), 0, nullptr);
-	pathManager.AddEntry(pidl.get());
+	pathManager.AddEntry(HistoryEntry(pidl.get(), L"C:\\Users"));
 
 	backHistory = pathManager.GetBackHistory();
 	EXPECT_EQ(backHistory.size(), 2);
@@ -80,8 +79,7 @@ TEST(PathManagerTest, TestAddMultiple)
 	EXPECT_TRUE(forwardHistory.empty());
 
 	// Go back two entries.
-	previousPidl = pathManager.GetEntry(-2);
-	CoTaskMemFree(previousPidl);
+	pathManager.GetEntry(-2);
 
 	backHistory = pathManager.GetBackHistory();
 	EXPECT_TRUE(backHistory.empty());
@@ -90,8 +88,7 @@ TEST(PathManagerTest, TestAddMultiple)
 	EXPECT_EQ(forwardHistory.size(), 2);
 
 	// Go forward two entries.
-	previousPidl = pathManager.GetEntry(2);
-	CoTaskMemFree(previousPidl);
+	pathManager.GetEntry(2);
 
 	backHistory = pathManager.GetBackHistory();
 	EXPECT_EQ(backHistory.size(), 2);

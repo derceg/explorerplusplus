@@ -475,22 +475,22 @@ BOOL CShellBrowser::CanBrowseForward(void) const
 	return TRUE;
 }
 
-std::vector<unique_pidl_absolute> CShellBrowser::GetBackHistory() const
+std::vector<HistoryEntry> CShellBrowser::GetBackHistory() const
 {
 	return m_pathManager.GetBackHistory();
 }
 
-std::vector<unique_pidl_absolute> CShellBrowser::GetForwardHistory() const
+std::vector<HistoryEntry> CShellBrowser::GetForwardHistory() const
 {
 	return m_pathManager.GetForwardHistory();
 }
 
-PIDLIST_ABSOLUTE CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)
+std::optional<HistoryEntry> CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)
 {
 	return m_pathManager.GetEntryWithoutUpdate(iItem);
 }
 
-PIDLIST_ABSOLUTE CShellBrowser::RetrieveHistoryItem(int iItem)
+std::optional<HistoryEntry> CShellBrowser::RetrieveHistoryItem(int iItem)
 {
 	return m_pathManager.GetEntry(iItem);
 }

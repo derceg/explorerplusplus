@@ -1674,11 +1674,12 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 							iCmd = iCmd - ID_REBAR_MENU_FORWARD_START;
 						}
 
-						PIDLIST_ABSOLUTE pidl = m_pActiveShellBrowser->RetrieveHistoryItem(iCmd);
+						auto entry = m_pActiveShellBrowser->RetrieveHistoryItem(iCmd);
 
-						m_navigation->BrowseFolderInCurrentTab(pidl,SBSP_ABSOLUTE|SBSP_WRITENOHISTORY);
-
-						CoTaskMemFree(pidl);
+						if (entry)
+						{
+							m_navigation->BrowseFolderInCurrentTab(entry->pidl.get(), SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+						}
 					}
 					else
 					{

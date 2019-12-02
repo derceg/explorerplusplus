@@ -5,6 +5,29 @@
 #pragma once
 
 #include "../Helper/ShellHelper.h"
+#include <ShlObj.h>
+#include <optional>
+
+struct HistoryEntry
+{
+	HistoryEntry() = default;
+
+	HistoryEntry(PCIDLIST_ABSOLUTE pidl, std::wstring_view displayName) :
+		pidl(unique_pidl_absolute(ILCloneFull(pidl))),
+		displayName(displayName)
+	{
+
+	}
+
+	HistoryEntry(const HistoryEntry &other)
+	{
+		pidl.reset(ILCloneFull(other.pidl.get()));
+		displayName = other.displayName;
+	}
+
+	unique_pidl_absolute pidl;
+	std::wstring displayName;
+};
 
 class PathManager
 {
@@ -12,17 +35,17 @@ public:
 
 	PathManager();
 
+	void AddEntry(const HistoryEntry &entry);
+	std::optional<HistoryEntry> GetEntry(int offset);
+	std::optional<HistoryEntry> GetEntryWithoutUpdate(int offset) const;
+
 	int GetNumBackEntriesStored() const;
 	int GetNumForwardEntriesStored() const;
-	std::vector<unique_pidl_absolute> GetBackHistory() const;
-	std::vector<unique_pidl_absolute> GetForwardHistory() const;
-
-	void AddEntry(PCIDLIST_ABSOLUTE pidl);
-	PIDLIST_ABSOLUTE GetEntry(int offset);
-	PIDLIST_ABSOLUTE GetEntryWithoutUpdate(int offset) const;
+	std::vector<HistoryEntry> GetBackHistory() const;
+	std::vector<HistoryEntry> GetForwardHistory() const;
 
 private:
 
-	std::vector<unique_pidl_absolute> m_entries;
+	std::vector<HistoryEntry> m_entries;
 	int m_currentEntry;
 };

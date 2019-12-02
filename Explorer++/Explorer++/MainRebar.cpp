@@ -348,7 +348,7 @@ void Explorerplusplus::OnUseLargeToolbarIconsUpdated(BOOL newValue)
 HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 {
 	HMENU hSubMenu = NULL;
-	std::vector<unique_pidl_absolute> history;
+	std::vector<HistoryEntry> history;
 	int iBase;
 
 	if (bBack)
@@ -368,16 +368,13 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 
 		hSubMenu = CreateMenu();
 
-		for (auto itr = history.begin(); itr != history.end(); itr++)
+		for (auto &entry : history)
 		{
-			TCHAR szDisplayName[MAX_PATH];
-			GetDisplayName(itr->get(), szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
-
 			MENUITEMINFO mii;
 			mii.cbSize = sizeof(mii);
 			mii.fMask = MIIM_ID | MIIM_STRING;
 			mii.wID = iBase + i + 1;
-			mii.dwTypeData = szDisplayName;
+			mii.dwTypeData = entry.displayName.data();
 			InsertMenuItem(hSubMenu, i, TRUE, &mii);
 
 			i++;

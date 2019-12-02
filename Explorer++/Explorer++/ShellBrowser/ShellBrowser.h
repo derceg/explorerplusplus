@@ -93,10 +93,10 @@ public:
 	BOOL				SetShowHidden(BOOL bShowHidden);
 	BOOL				CanBrowseBack(void) const;
 	BOOL				CanBrowseForward(void) const;
-	std::vector<unique_pidl_absolute>	GetBackHistory() const;
-	std::vector<unique_pidl_absolute>	GetForwardHistory() const;
-	PIDLIST_ABSOLUTE	RetrieveHistoryItemWithoutUpdate(int iItem);
-	PIDLIST_ABSOLUTE	RetrieveHistoryItem(int iItem);
+	std::vector<HistoryEntry>	GetBackHistory() const;
+	std::vector<HistoryEntry>	GetForwardHistory() const;
+	std::optional<HistoryEntry>	RetrieveHistoryItemWithoutUpdate(int iItem);
+	std::optional<HistoryEntry>	RetrieveHistoryItem(int iItem);
 	BOOL				CanBrowseUp(void) const;
 	int					GetNumItems(void) const;
 	int					GetNumSelectedFiles(void) const;

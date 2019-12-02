@@ -638,38 +638,28 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 	if (ptbgit->iItem == ToolbarButton::Back)
 	{
-		if (m_pexpp->GetActiveShellBrowser()->CanBrowseBack())
+		auto entry = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(-1);
+
+		if (entry)
 		{
-			PIDLIST_ABSOLUTE pidl = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(-1);
-
-			TCHAR szPath[MAX_PATH];
-			GetDisplayName(pidl, szPath, SIZEOF_ARRAY(szPath), SHGDN_INFOLDER);
-
-			CoTaskMemFree(pidl);
-
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
 			LoadString(m_instance, IDS_MAIN_TOOLBAR_BACK, szTemp, SIZEOF_ARRAY(szTemp));
-			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, szPath);
+			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, entry->displayName.c_str());
 
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
 		}
 	}
 	else if (ptbgit->iItem == ToolbarButton::Forward)
 	{
-		if (m_pexpp->GetActiveShellBrowser()->CanBrowseForward())
+		auto entry = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(1);
+
+		if (entry)
 		{
-			PIDLIST_ABSOLUTE pidl = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(1);
-
-			TCHAR szPath[MAX_PATH];
-			GetDisplayName(pidl, szPath, SIZEOF_ARRAY(szPath), SHGDN_INFOLDER);
-
-			CoTaskMemFree(pidl);
-
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
 			LoadString(m_instance, IDS_MAIN_TOOLBAR_FORWARD, szTemp, SIZEOF_ARRAY(szTemp));
-			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, szPath);
+			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, entry->displayName.c_str());
 
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
 		}
@@ -714,7 +704,7 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 
 void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 {
-	std::vector<unique_pidl_absolute> history;
+	std::vector<HistoryEntry> history;
 
 	if (historyType == HistoryType::Back)
 	{
@@ -733,16 +723,13 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 	wil::unique_hmenu menu(CreatePopupMenu());
 	int numInserted = 0;
 
-	for (const auto &pidl : history)
+	for (auto &entry : history)
 	{
-		TCHAR szDisplayName[MAX_PATH];
-		GetDisplayName(pidl.get(), szDisplayName, SIZEOF_ARRAY(szDisplayName), SHGDN_INFOLDER);
-
 		MENUITEMINFO mii;
 		mii.cbSize = sizeof(mii);
 		mii.fMask = MIIM_ID | MIIM_STRING;
 		mii.wID = numInserted + 1;
-		mii.dwTypeData = szDisplayName;
+		mii.dwTypeData = entry.displayName.data();
 		InsertMenuItem(menu.get(), numInserted, TRUE, &mii);
 
 		numInserted++;
@@ -761,9 +748,12 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 		cmd = -cmd;
 	}
 
-	PIDLIST_ABSOLUTE pidl = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItem(cmd);
-	m_navigation->BrowseFolderInCurrentTab(pidl, SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
-	CoTaskMemFree(pidl);
+	auto selectedEntry = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItem(cmd);
+
+	if (selectedEntry)
+	{
+		m_navigation->BrowseFolderInCurrentTab(selectedEntry->pidl.get(), SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+	}
 }
 
 void MainToolbar::ShowToolbarViewsDropdown()

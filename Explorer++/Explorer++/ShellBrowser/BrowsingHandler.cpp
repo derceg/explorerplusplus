@@ -79,7 +79,11 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags
 
 	if(StoreHistory)
 	{
-		m_pathManager.AddEntry(pidl);
+		TCHAR displayName[MAX_PATH];
+		GetDisplayName(pidl, displayName, static_cast<UINT>(std::size(displayName)), SHGDN_INFOLDER);
+
+		HistoryEntry entry(pidl, displayName);
+		m_pathManager.AddEntry(entry);
 	}
 
 	/* Stop the list view from redrawing itself each time is inserted.
@@ -561,7 +565,8 @@ BOOL *bStoreHistory)
 		Ignores the supplied Path argument.*/
 		*bStoreHistory		= FALSE;
 
-		*pidlDirectory = m_pathManager.GetEntry(-1);
+		auto entry = m_pathManager.GetEntry(-1);
+		*pidlDirectory = ILCloneFull(entry->pidl.get());
 	}
 	else if((uFlags & SBSP_NAVIGATEFORWARD) == SBSP_NAVIGATEFORWARD)
 	{
@@ -575,7 +580,8 @@ BOOL *bStoreHistory)
 		this one. Ignores the supplied Path argument.*/
 		*bStoreHistory		= FALSE;
 
-		*pidlDirectory = m_pathManager.GetEntry(1);
+		auto entry = m_pathManager.GetEntry(1);
+		*pidlDirectory = ILCloneFull(entry->pidl.get());
 	}
 	else
 	{
