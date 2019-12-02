@@ -229,9 +229,6 @@
     <ClCompile Include="FileSelectionTests.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowser\IconRetrieval.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="ScriptingDialog.cpp">
       <Filter>General Dialogs</Filter>
     </ClCompile>

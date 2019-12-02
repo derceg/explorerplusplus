@@ -85,9 +85,9 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 	m_folderColumns(initialColumns ? *initialColumns : config->globalFolderSettings.folderColumns),
 	m_columnThreadPool(1),
 	m_columnResultIDCounter(0),
-	m_itemImageThreadPool(1),
+	m_iconFetcher(hListView, cachedIcons),
+	m_thumbnailThreadPool(1),
 	m_thumbnailResultIDCounter(0),
-	m_iconResultIDCounter(0),
 	m_infoTipsThreadPool(1),
 	m_infoTipResultIDCounter(0)
 {
@@ -141,7 +141,7 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 		m_ListViewParentSubclassed = FALSE;
 	}
 
-	m_itemImageThreadPool.push([] (int id) {
+	m_thumbnailThreadPool.push([] (int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
@@ -163,10 +163,10 @@ CShellBrowser::~CShellBrowser()
 	}
 
 	m_columnThreadPool.clear_queue();
-	m_itemImageThreadPool.clear_queue();
+	m_thumbnailThreadPool.clear_queue();
 	m_infoTipsThreadPool.clear_queue();
 
-	m_itemImageThreadPool.push([] (int id) {
+	m_thumbnailThreadPool.push([] (int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		CoUninitialize();

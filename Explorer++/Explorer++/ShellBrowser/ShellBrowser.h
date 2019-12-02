@@ -12,6 +12,7 @@
 #include "ViewModes.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
+#include "../Helper/IconFetcher.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
@@ -236,12 +237,6 @@ private:
 		std::wstring columnText;
 	};
 
-	struct IconResult_t
-	{
-		int itemInternalIndex;
-		int iconIndex;
-	};
-
 	struct ThumbnailResult_t
 	{
 		int itemInternalIndex;
@@ -268,8 +263,7 @@ private:
 
 	static const UINT WM_APP_COLUMN_RESULT_READY = WM_APP + 150;
 	static const UINT WM_APP_THUMBNAIL_RESULT_READY = WM_APP + 151;
-	static const UINT WM_APP_ICON_RESULT_READY = WM_APP + 152;
-	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 153;
+	static const UINT WM_APP_INFO_TIP_READY = WM_APP + 152;
 
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
@@ -383,9 +377,7 @@ private:
 	void				MoveItemsIntoGroups(void);
 
 	/* Listview icons. */
-	void				QueueIconTask(int internalIndex);
-	static boost::optional<IconResult_t>	FindIconAsync(HWND listView, int iconResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo);
-	void				ProcessIconResult(int iconResultId);
+	void				ProcessIconResult(int internalIndex, int iconIndex);
 	boost::optional<int>	GetCachedIconIndex(const ItemInfo_t &itemInfo);
 
 	/* Thumbnails view. */
@@ -450,12 +442,10 @@ private:
 	std::unordered_map<int, std::future<ColumnResult_t>> m_columnResults;
 	int					m_columnResultIDCounter;
 
-	ctpl::thread_pool	m_itemImageThreadPool;
-
-	std::unordered_map<int, std::future<boost::optional<IconResult_t>>> m_iconResults;
-	int					m_iconResultIDCounter;
+	IconFetcher			m_iconFetcher;
 	CachedIcons			*m_cachedIcons;
 
+	ctpl::thread_pool	m_thumbnailThreadPool;
 	std::unordered_map<int, std::future<boost::optional<ThumbnailResult_t>>> m_thumbnailResults;
 	int					m_thumbnailResultIDCounter;
 

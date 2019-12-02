@@ -57,8 +57,9 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags
 	m_columnThreadPool.clear_queue();
 	m_columnResults.clear();
 
-	m_itemImageThreadPool.clear_queue();
-	m_iconResults.clear();
+	m_iconFetcher.ClearQueue();
+
+	m_thumbnailThreadPool.clear_queue();
 	m_thumbnailResults.clear();
 
 	m_infoTipsThreadPool.clear_queue();

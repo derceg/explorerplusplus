@@ -303,6 +303,7 @@
     <ClCompile Include="FileOperations.cpp" />
     <ClCompile Include="FolderSize.cpp" />
     <ClCompile Include="Helper.cpp" />
+    <ClCompile Include="IconFetcher.cpp" />
     <ClCompile Include="iDataObject.cpp" />
     <ClCompile Include="iDirectoryMonitor.cpp" />
     <ClCompile Include="iDropSource.cpp" />
@@ -360,6 +361,7 @@
     <ClInclude Include="FileOperations.h" />
     <ClInclude Include="FolderSize.h" />
     <ClInclude Include="Helper.h" />
+    <ClInclude Include="IconFetcher.h" />
     <ClInclude Include="iDataObject.h" />
     <ClInclude Include="iDirectoryMonitor.h" />
     <ClInclude Include="iDropSource.h" />

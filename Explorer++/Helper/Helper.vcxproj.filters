@@ -124,6 +124,9 @@
     <ClCompile Include="CachedIcons.cpp">
       <Filter>Shell</Filter>
     </ClCompile>
+    <ClCompile Include="IconFetcher.cpp">
+      <Filter>Shell</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseDialog.h">
@@ -256,6 +259,9 @@
       <Filter>Control Support</Filter>
     </ClInclude>
     <ClInclude Include="CachedIcons.h">
+      <Filter>Shell</Filter>
+    </ClInclude>
+    <ClInclude Include="IconFetcher.h">
       <Filter>Shell</Filter>
     </ClInclude>
   </ItemGroup>

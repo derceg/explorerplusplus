@@ -29,10 +29,6 @@ LRESULT CALLBACK CShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam
 		ProcessThumbnailResult(static_cast<int>(wParam));
 		break;
 
-	case WM_APP_ICON_RESULT_READY:
-		ProcessIconResult(static_cast<int>(wParam));
-		break;
-
 	case WM_APP_INFO_TIP_READY:
 		ProcessInfoTipResult(static_cast<int>(wParam));
 		break;
@@ -87,6 +83,8 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	plvItem = &pnmv->item;
 	nmhdr = &pnmv->hdr;
 
+	int internalIndex = static_cast<int>(plvItem->lParam);
+
 	/* Construct an image here using the items
 	actual icon. This image will be shown initially.
 	If the item also has a thumbnail image, this
@@ -98,22 +96,22 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 	image. */
 	if (m_folderSettings.viewMode == +ViewMode::Thumbnails && (plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
-		plvItem->iImage = GetIconThumbnail((int)plvItem->lParam);
+		plvItem->iImage = GetIconThumbnail(internalIndex);
 		plvItem->mask |= LVIF_DI_SETITEM;
 
-		QueueThumbnailTask(static_cast<int>(plvItem->lParam));
+		QueueThumbnailTask(internalIndex);
 
 		return;
 	}
 
 	if (m_folderSettings.viewMode == +ViewMode::Details && (plvItem->mask & LVIF_TEXT) == LVIF_TEXT)
 	{
-		QueueColumnTask(static_cast<int>(plvItem->lParam), plvItem->iSubItem);
+		QueueColumnTask(internalIndex, plvItem->iSubItem);
 	}
 
 	if ((plvItem->mask & LVIF_IMAGE) == LVIF_IMAGE)
 	{
-		const ItemInfo_t &itemInfo = m_itemInfoMap.at(static_cast<int>(plvItem->lParam));
+		const ItemInfo_t &itemInfo = m_itemInfoMap.at(internalIndex);
 		auto cachedIconIndex = GetCachedIconIndex(itemInfo);
 
 		if (cachedIconIndex)
@@ -147,7 +145,11 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 			}
 		}
 
-		QueueIconTask(static_cast<int>(plvItem->lParam));
+		m_iconFetcher.QueueIconTask(itemInfo.pidlComplete.get(), [this, internalIndex] (PCIDLIST_ABSOLUTE pidl, int iconIndex) {
+			UNREFERENCED_PARAMETER(pidl);
+
+			ProcessIconResult(internalIndex, iconIndex);
+		});
 	}
 
 	plvItem->mask |= LVIF_DI_SETITEM;
@@ -172,6 +174,25 @@ boost::optional<int> CShellBrowser::GetCachedIconIndex(const ItemInfo_t &itemInf
 	}
 
 	return cachedItr->iconIndex;
+}
+
+void CShellBrowser::ProcessIconResult(int internalIndex, int iconIndex)
+{
+	auto index = LocateItemByInternalIndex(internalIndex);
+
+	if (!index)
+	{
+		return;
+	}
+
+	LVITEM lvItem;
+	lvItem.mask = LVIF_IMAGE | LVIF_STATE;
+	lvItem.iItem = *index;
+	lvItem.iSubItem = 0;
+	lvItem.iImage = iconIndex;
+	lvItem.stateMask = LVIS_OVERLAYMASK;
+	lvItem.state = INDEXTOOVERLAYMASK(iconIndex >> 24);
+	ListView_SetItem(m_hListView, &lvItem);
 }
 
 LRESULT CShellBrowser::OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip)

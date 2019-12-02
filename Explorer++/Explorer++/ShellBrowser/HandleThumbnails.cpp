@@ -73,7 +73,7 @@ void CShellBrowser::RemoveThumbnailsView(void)
 
 	nItems = ListView_GetItemCount(m_hListView);
 
-	m_itemImageThreadPool.clear_queue();
+	m_thumbnailThreadPool.clear_queue();
 	m_thumbnailResults.clear();
 
 	for(i = 0;i < nItems;i++)
@@ -99,7 +99,7 @@ void CShellBrowser::QueueThumbnailTask(int internalIndex)
 
 	BasicItemInfo_t basicItemInfo = getBasicItemInfo(internalIndex);
 
-	auto result = m_itemImageThreadPool.push([this, thumbnailResultID, internalIndex, basicItemInfo](int id) {
+	auto result = m_thumbnailThreadPool.push([this, thumbnailResultID, internalIndex, basicItemInfo](int id) {
 		UNREFERENCED_PARAMETER(id);
 
 		return FindThumbnailAsync(m_hListView, thumbnailResultID, internalIndex, basicItemInfo);
