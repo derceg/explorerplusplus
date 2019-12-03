@@ -9,18 +9,15 @@
 
 int SortByName(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2, const GlobalFolderSettings &globalFolderSettings)
 {
-	BOOL IsRoot1 = PathIsRoot(itemInfo1.getFullPath().c_str());
-	BOOL IsRoot2 = PathIsRoot(itemInfo2.getFullPath().c_str());
-
-	if (IsRoot1 && !IsRoot2)
+	if (itemInfo1.isRoot && !itemInfo2.isRoot)
 	{
 		return -1;
 	}
-	else if (!IsRoot1 && IsRoot2)
+	else if (!itemInfo1.isRoot && itemInfo2.isRoot)
 	{
 		return 1;
 	}
-	else if (IsRoot1 && IsRoot2)
+	else if (itemInfo1.isRoot && itemInfo2.isRoot)
 	{
 		/* If the items been compared are both drives,
 		sort by drive letter, rather than display name. */
@@ -90,14 +87,11 @@ int SortBySize(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo
 
 int SortByType(const BasicItemInfo_t &itemInfo1, const BasicItemInfo_t &itemInfo2)
 {
-	BOOL IsRoot1 = PathIsRoot(itemInfo1.getFullPath().c_str());
-	BOOL IsRoot2 = PathIsRoot(itemInfo2.getFullPath().c_str());
-
-	if (IsRoot1 && !IsRoot2)
+	if (itemInfo1.isRoot && !itemInfo2.isRoot)
 	{
 		return -1;
 	}
-	else if (!IsRoot1 && IsRoot2)
+	else if (!itemInfo1.isRoot && itemInfo2.isRoot)
 	{
 		return 1;
 	}

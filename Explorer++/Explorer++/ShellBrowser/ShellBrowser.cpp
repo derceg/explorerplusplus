@@ -1507,6 +1507,7 @@ BasicItemInfo_t CShellBrowser::getBasicItemInfo(int internalIndex) const
 	basicItemInfo.pridl.reset(ILCloneChild(itemInfo.pridl.get()));
 	basicItemInfo.wfd = itemInfo.wfd;
 	StringCchCopy(basicItemInfo.szDisplayName, SIZEOF_ARRAY(basicItemInfo.szDisplayName), itemInfo.szDisplayName);
+	basicItemInfo.isRoot = itemInfo.bDrive;
 
 	return basicItemInfo;
 }

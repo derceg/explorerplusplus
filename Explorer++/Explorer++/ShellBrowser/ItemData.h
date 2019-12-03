@@ -24,12 +24,14 @@ struct BasicItemInfo_t
 		pridl.reset(ILCloneChild(other.pridl.get()));
 		wfd = other.wfd;
 		StringCchCopy(szDisplayName, SIZEOF_ARRAY(szDisplayName), other.szDisplayName);
+		isRoot = other.isRoot;
 	}
 
 	unique_pidl_absolute pidlComplete;
 	unique_pidl_child pridl;
 	WIN32_FIND_DATA wfd;
 	TCHAR szDisplayName[MAX_PATH];
+	bool isRoot;
 
 	std::wstring getFullPath() const
 	{
