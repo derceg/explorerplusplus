@@ -54,7 +54,7 @@ void CShellBrowser::DirectoryAltered(void)
 		index on the modified item and current folder match up
 		(i.e. ensure the directory has not changed since these
 		files were modified). */
-		if(af.iFolderIndex == m_iUniqueFolderIndex)
+		if(af.iFolderIndex == m_uniqueFolderId)
 		{
 			switch(af.dwAction)
 			{

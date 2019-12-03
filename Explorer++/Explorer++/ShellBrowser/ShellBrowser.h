@@ -115,7 +115,7 @@ public:
 	void				DirectoryAltered(void);
 	void				SetDirMonitorId(int iDirMonitorId);
 	int					GetDirMonitorId(void) const;
-	int					GetFolderIndex(void) const;
+	int					GetUniqueFolderId() const;
 
 	/* Item information. */
 	WIN32_FIND_DATA		GetItemFileFindData(int iItem) const;
@@ -481,7 +481,7 @@ private:
 	This may be needed so that folders can be
 	told apart when adding files from directory
 	modification. */
-	int					m_iUniqueFolderIndex;
+	int					m_uniqueFolderId;
 
 	std::shared_ptr<const Config>	m_config;
 	FolderSettings		m_folderSettings;

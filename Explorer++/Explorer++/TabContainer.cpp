@@ -703,7 +703,7 @@ void TabContainer::SetTabIcon(const Tab &tab)
 		auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 
 		m_iconFetcher.QueueIconTask(pidlDirectory.get(),
-			[this, tabId = tab.GetId(), folderId = tab.GetShellBrowser()->GetId()] (PCIDLIST_ABSOLUTE pidl, int iconIndex) {
+			[this, tabId = tab.GetId(), folderId = tab.GetShellBrowser()->GetUniqueFolderId()] (PCIDLIST_ABSOLUTE pidl, int iconIndex) {
 				UNREFERENCED_PARAMETER(pidl);
 
 				auto tab = GetTabOptional(tabId);
@@ -713,7 +713,7 @@ void TabContainer::SetTabIcon(const Tab &tab)
 					return;
 				}
 
-				if (tab->GetShellBrowser()->GetId() != folderId)
+				if (tab->GetShellBrowser()->GetUniqueFolderId() != folderId)
 				{
 					return;
 				}

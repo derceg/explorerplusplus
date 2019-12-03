@@ -161,7 +161,7 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHis
 
 	PlayNavigationSound();
 
-	m_iUniqueFolderIndex++;
+	m_uniqueFolderId++;
 
 	return S_OK;
 }

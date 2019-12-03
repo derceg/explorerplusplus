@@ -111,7 +111,7 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 	m_bNewItemCreated = FALSE;
 	m_iDropped = -1;
 
-	m_iUniqueFolderIndex = 0;
+	m_uniqueFolderId = 0;
 
 	m_PreviousSortColumnExists = false;
 
@@ -1493,9 +1493,9 @@ void CShellBrowser::RemoveDrive(const TCHAR *szDrive)
 		RemoveItem(iItemInternal);
 }
 
-int CShellBrowser::GetFolderIndex(void) const
+int CShellBrowser::GetUniqueFolderId() const
 {
-	return m_iUniqueFolderIndex;
+	return m_uniqueFolderId;
 }
 
 BasicItemInfo_t CShellBrowser::getBasicItemInfo(int internalIndex) const
