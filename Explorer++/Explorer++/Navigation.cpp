@@ -131,11 +131,6 @@ HRESULT Navigation::BrowseFolder(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, UINT
 	{
 		hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory, wFlags);
 
-		if(SUCCEEDED(hr))
-		{
-			PlayNavigationSound();
-		}
-
 		resultingTabId = tab.GetId();
 	}
 	else
@@ -163,13 +158,4 @@ void Navigation::OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory)
 	StringCchPrintf(szParameters, SIZEOF_ARRAY(szParameters), _T("\"%s\""), szPath);
 
 	ExecuteAndShowCurrentProcess(m_expp->GetMainWindow(), szParameters);
-}
-
-void Navigation::PlayNavigationSound() const
-{
-	if(m_config->playNavigationSound)
-	{
-		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART), NULL,
-			SND_RESOURCE | SND_ASYNC);
-	}
 }

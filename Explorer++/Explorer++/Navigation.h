@@ -25,7 +25,6 @@ public:
 	HRESULT BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags);
 	HRESULT BrowseFolderInCurrentTab(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags);
 	HRESULT BrowseFolder(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags);
-	void PlayNavigationSound() const;
 
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
 

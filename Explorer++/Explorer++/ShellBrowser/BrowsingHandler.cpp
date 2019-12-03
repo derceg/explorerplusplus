@@ -135,6 +135,8 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags
 
 	SetCursor(LoadCursor(NULL,IDC_ARROW));
 
+	PlayNavigationSound();
+
 	m_iUniqueFolderIndex++;
 
 	return S_OK;
@@ -607,4 +609,13 @@ BOOL *bStoreHistory)
 HRESULT CShellBrowser::Refresh()
 {
 	return BrowseFolder(m_directoryState.pidlDirectory.get(), SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+}
+
+void CShellBrowser::PlayNavigationSound() const
+{
+	if (m_config->playNavigationSound)
+	{
+		PlaySound(MAKEINTRESOURCE(IDR_WAVE_NAVIGATIONSTART), NULL,
+			SND_RESOURCE | SND_ASYNC);
+	}
 }
