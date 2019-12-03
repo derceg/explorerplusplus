@@ -669,7 +669,7 @@ void Explorerplusplus::HandleDirectoryMonitoring(int iTabId)
 		pDirectoryAltered = (DirectoryAltered_t *)malloc(sizeof(DirectoryAltered_t));
 
 		pDirectoryAltered->iIndex		= iTabId;
-		pDirectoryAltered->iFolderIndex	= tab.GetShellBrowser()->GetFolderIndex();
+		pDirectoryAltered->iFolderIndex	= tab.GetShellBrowser()->GetUniqueFolderId();
 		pDirectoryAltered->pData		= this;
 
 		/* Start monitoring the directory that was opened. */
