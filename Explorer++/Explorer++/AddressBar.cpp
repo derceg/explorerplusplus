@@ -296,9 +296,6 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 
 	SendMessage(m_hwnd, CB_RESETCONTENT, 0, 0);
 
-	TCHAR displayText[MAX_PATH];
-	StringCchCopy(displayText, SIZEOF_ARRAY(displayText), text->c_str());
-
 	COMBOBOXEXITEM cbItem;
 	cbItem.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
 	cbItem.iItem = -1;
@@ -306,6 +303,6 @@ void AddressBar::UpdateTextAndIcon(const Tab &tab)
 	cbItem.iSelectedImage = shfi.iIcon;
 	cbItem.iIndent = 1;
 	cbItem.iOverlay = 1;
-	cbItem.pszText = displayText;
+	cbItem.pszText = text->data();
 	SendMessage(m_hwnd, CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
 }
