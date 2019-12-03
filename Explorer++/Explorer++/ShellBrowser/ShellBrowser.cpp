@@ -89,7 +89,8 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 	m_thumbnailThreadPool(1),
 	m_thumbnailResultIDCounter(0),
 	m_infoTipsThreadPool(1),
-	m_infoTipResultIDCounter(0)
+	m_infoTipResultIDCounter(0),
+	m_pathManager(&m_iconFetcher)
 {
 	m_iRefCount = 1;
 
@@ -475,22 +476,22 @@ BOOL CShellBrowser::CanBrowseForward(void) const
 	return TRUE;
 }
 
-std::vector<HistoryEntry> CShellBrowser::GetBackHistory() const
+std::vector<HistoryEntry *> CShellBrowser::GetBackHistory() const
 {
 	return m_pathManager.GetBackHistory();
 }
 
-std::vector<HistoryEntry> CShellBrowser::GetForwardHistory() const
+std::vector<HistoryEntry *> CShellBrowser::GetForwardHistory() const
 {
 	return m_pathManager.GetForwardHistory();
 }
 
-std::optional<HistoryEntry> CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)
+HistoryEntry *CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)
 {
 	return m_pathManager.GetEntryWithoutUpdate(iItem);
 }
 
-std::optional<HistoryEntry> CShellBrowser::RetrieveHistoryItem(int iItem)
+HistoryEntry *CShellBrowser::RetrieveHistoryItem(int iItem)
 {
 	return m_pathManager.GetEntry(iItem);
 }

@@ -1678,7 +1678,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 
 						if (entry)
 						{
-							m_navigation->BrowseFolderInCurrentTab(entry->pidl.get(), SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+							m_navigation->BrowseFolderInCurrentTab(entry->GetPidl().get(), SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
 						}
 					}
 					else

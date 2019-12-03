@@ -4,48 +4,28 @@
 
 #pragma once
 
-#include "../Helper/ShellHelper.h"
-#include <ShlObj.h>
-#include <optional>
-
-struct HistoryEntry
-{
-	HistoryEntry() = default;
-
-	HistoryEntry(PCIDLIST_ABSOLUTE pidl, std::wstring_view displayName) :
-		pidl(unique_pidl_absolute(ILCloneFull(pidl))),
-		displayName(displayName)
-	{
-
-	}
-
-	HistoryEntry(const HistoryEntry &other)
-	{
-		pidl.reset(ILCloneFull(other.pidl.get()));
-		displayName = other.displayName;
-	}
-
-	unique_pidl_absolute pidl;
-	std::wstring displayName;
-};
+#include "HistoryEntry.h"
+#include "../Helper/IconFetcher.h"
 
 class PathManager
 {
 public:
 
-	PathManager();
+	PathManager(IconFetcher *iconFetcher);
 
-	void AddEntry(const HistoryEntry &entry);
-	std::optional<HistoryEntry> GetEntry(int offset);
-	std::optional<HistoryEntry> GetEntryWithoutUpdate(int offset) const;
+	void AddEntry(std::unique_ptr<HistoryEntry> entry);
+	HistoryEntry *GetEntry(int offset);
+	HistoryEntry *GetEntryWithoutUpdate(int offset) const;
 
 	int GetNumBackEntriesStored() const;
 	int GetNumForwardEntriesStored() const;
-	std::vector<HistoryEntry> GetBackHistory() const;
-	std::vector<HistoryEntry> GetForwardHistory() const;
+	std::vector<HistoryEntry *> GetBackHistory() const;
+	std::vector<HistoryEntry *> GetForwardHistory() const;
 
 private:
 
-	std::vector<HistoryEntry> m_entries;
+	std::vector<std::unique_ptr<HistoryEntry>> m_entries;
 	int m_currentEntry;
+
+	IconFetcher *m_iconFetcher;
 };

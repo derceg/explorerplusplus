@@ -12,6 +12,7 @@
 #include "ShellBrowser/ViewModes.h"
 #include "TabContainer.h"
 #include "../Helper/Controls.h"
+#include "../Helper/ImageHelper.h"
 #include "../Helper/Macros.h"
 #include "../Helper/XMLSettings.h"
 #include <boost/bimap.hpp>
@@ -134,6 +135,10 @@ void MainToolbar::Initialize(HWND parent)
 	assert(TOOLBAR_BUTTON_ICON_MAPPINGS.size() == (ToolbarButton::_size() - 1));
 
 	SendMessage(m_hwnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+
+	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
+
+	m_defaultFolderIconBitmap = SystemImageIconToBitmap(GetDefaultFolderIconIndex());
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
 
@@ -645,7 +650,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
 			LoadString(m_instance, IDS_MAIN_TOOLBAR_BACK, szTemp, SIZEOF_ARRAY(szTemp));
-			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, entry->displayName.c_str());
+			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, entry->GetDisplayName().c_str());
 
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
 		}
@@ -659,7 +664,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 			TCHAR szInfoTip[1024];
 			TCHAR szTemp[64];
 			LoadString(m_instance, IDS_MAIN_TOOLBAR_FORWARD, szTemp, SIZEOF_ARRAY(szTemp));
-			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, entry->displayName.c_str());
+			StringCchPrintf(szInfoTip, SIZEOF_ARRAY(szInfoTip), szTemp, entry->GetDisplayName().c_str());
 
 			StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, szInfoTip);
 		}
@@ -704,7 +709,7 @@ LRESULT MainToolbar::OnTbnDropDown(const NMTOOLBAR *nmtb)
 
 void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 {
-	std::vector<HistoryEntry> history;
+	std::vector<HistoryEntry *> history;
 
 	if (historyType == HistoryType::Back)
 	{
@@ -721,15 +726,43 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 	}
 
 	wil::unique_hmenu menu(CreatePopupMenu());
+	std::vector<wil::unique_hbitmap> menuImages;
 	int numInserted = 0;
 
 	for (auto &entry : history)
 	{
+		std::wstring displayName = entry->GetDisplayName();
+
 		MENUITEMINFO mii;
 		mii.cbSize = sizeof(mii);
 		mii.fMask = MIIM_ID | MIIM_STRING;
 		mii.wID = numInserted + 1;
-		mii.dwTypeData = entry.displayName.data();
+		mii.dwTypeData = displayName.data();
+
+		HBITMAP bitmap = nullptr;
+		auto iconIndex = entry->GetSystemIconIndex();
+
+		if (iconIndex)
+		{
+			wil::unique_hbitmap iconBitmap = SystemImageIconToBitmap(*iconIndex);
+
+			if (iconBitmap)
+			{
+				bitmap = iconBitmap.get();
+				menuImages.push_back(std::move(iconBitmap));
+			}
+		}
+		else
+		{
+			bitmap = m_defaultFolderIconBitmap.get();
+		}
+
+		if (bitmap)
+		{
+			mii.fMask |= MIIM_BITMAP;
+			mii.hbmpItem = bitmap;
+		}
+
 		InsertMenuItem(menu.get(), numInserted, TRUE, &mii);
 
 		numInserted++;
@@ -752,8 +785,30 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 
 	if (selectedEntry)
 	{
-		m_navigation->BrowseFolderInCurrentTab(selectedEntry->pidl.get(), SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+		m_navigation->BrowseFolderInCurrentTab(selectedEntry->GetPidl().get(), SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
 	}
+}
+
+wil::unique_hbitmap MainToolbar::SystemImageIconToBitmap(int iconIndex)
+{
+	wil::unique_hicon icon;
+	HRESULT hr = m_systemImageList->GetIcon(iconIndex, ILD_NORMAL, &icon);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	int iconWidth;
+	int iconHeight;
+	hr = m_systemImageList->GetIconSize(&iconWidth, &iconHeight);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	return wil::unique_hbitmap(ImageHelper::IconToBitmapPARGB32(icon.get(), iconWidth, iconHeight));
 }
 
 void MainToolbar::ShowToolbarViewsDropdown()

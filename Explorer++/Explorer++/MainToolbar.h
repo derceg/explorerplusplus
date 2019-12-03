@@ -11,6 +11,7 @@
 #include "../Helper/BaseWindow.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
+#include <wil/com.h>
 #include <wil/resource.h>
 #include <unordered_map>
 
@@ -90,6 +91,7 @@ private:
 	void OnTBGetInfoTip(LPARAM lParam);
 	LRESULT OnTbnDropDown(const NMTOOLBAR *nmtb);
 	void ShowHistoryMenu(HistoryType historyType, const POINT &pt);
+	wil::unique_hbitmap SystemImageIconToBitmap(int iconIndex);
 	void ShowToolbarViewsDropdown();
 	void CreateViewsMenu(POINT *ptOrigin);
 
@@ -108,6 +110,8 @@ private:
 	std::shared_ptr<Config> m_config;
 
 	DpiCompatibility m_dpiCompat;
+	wil::com_ptr<IImageList> m_systemImageList;
+	wil::unique_hbitmap m_defaultFolderIconBitmap;
 	wil::unique_himagelist m_imageListSmall;
 	wil::unique_himagelist m_imageListLarge;
 	std::unordered_map<int, int> m_toolbarImageMapSmall;

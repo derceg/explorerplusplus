@@ -358,6 +358,9 @@
     <ClCompile Include="ShellBrowser\PathManager.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="ShellBrowser\HistoryEntry.cpp">
+      <Filter>ShellBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -715,6 +718,9 @@
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="ShellBrowser\PathManager.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\HistoryEntry.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
   </ItemGroup>
