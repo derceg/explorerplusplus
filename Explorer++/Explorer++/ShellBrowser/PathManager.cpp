@@ -21,7 +21,7 @@ void PathManager::AddEntry(std::unique_ptr<HistoryEntry> entry)
 	(PCIDLIST_ABSOLUTE pidl, int iconIndex) {
 		UNREFERENCED_PARAMETER(pidl);
 
-		if (index >= m_entries.size())
+		if (index >= static_cast<int>(m_entries.size()))
 		{
 			return;
 		}
@@ -42,7 +42,7 @@ HistoryEntry *PathManager::GetEntry(int offset)
 {
 	int index = m_currentEntry + offset;
 
-	if(index < 0 || index >= m_entries.size())
+	if(index < 0 || index >= static_cast<int>(m_entries.size()))
 	{
 		return nullptr;
 	}
@@ -56,7 +56,7 @@ HistoryEntry *PathManager::GetEntryWithoutUpdate(int offset) const
 {
 	int index = m_currentEntry + offset;
 
-	if (index < 0 || index >= m_entries.size())
+	if (index < 0 || index >= static_cast<int>(m_entries.size()))
 	{
 		return nullptr;
 	}
@@ -110,7 +110,7 @@ std::vector<HistoryEntry *> PathManager::GetForwardHistory() const
 		return history;
 	}
 
-	for (int i = m_currentEntry + 1; i < m_entries.size(); i++)
+	for (int i = m_currentEntry + 1; i < static_cast<int>(m_entries.size()); i++)
 	{
 		history.push_back(m_entries[i].get());
 	}
