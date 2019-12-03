@@ -200,68 +200,72 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	m_AwaitingAddList.clear();
 }
 
-void CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
+HRESULT CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	DetermineFolderVirtual(pidlDirectory);
 
 	wil::com_ptr<IShellFolder> pShellFolder;
 	HRESULT hr = BindToIdl(pidlDirectory, IID_PPV_ARGS(&pShellFolder));
 
-	if (SUCCEEDED(hr))
+	if (FAILED(hr))
 	{
-		m_directoryState.pidlDirectory.reset(ILCloneFull(pidlDirectory));
+		return hr;
+	}
 
-		SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
+	m_directoryState.pidlDirectory.reset(ILCloneFull(pidlDirectory));
 
-		if (m_folderSettings.showHidden)
+	SHCONTF enumFlags = SHCONTF_FOLDERS | SHCONTF_NONFOLDERS;
+
+	if (m_folderSettings.showHidden)
+	{
+		enumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
+	}
+
+	wil::com_ptr<IEnumIDList> pEnumIDList;
+	hr = pShellFolder->EnumObjects(m_hOwner, enumFlags, &pEnumIDList);
+
+	if (FAILED(hr) || !pEnumIDList)
+	{
+		return hr;
+	}
+
+	ULONG uFetched = 1;
+	unique_pidl_child pidlItem;
+
+	while (pEnumIDList->Next(1, wil::out_param(pidlItem), &uFetched) == S_OK && (uFetched == 1))
+	{
+		ULONG uAttributes = SFGAO_FOLDER;
+		PCITEMID_CHILD items[] = { pidlItem.get() };
+		pShellFolder->GetAttributesOf(1, items, &uAttributes);
+
+		STRRET str;
+
+		/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
+		a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
+		so that items in real folders can still be shown with extensions, even
+		if the global, Explorer option is disabled.
+		Also use only SHGDN_INFOLDER if this item is a folder. This is to ensure
+		that specific folders in Windows 7 (those under C:\Users\Username) appear
+		correctly. */
+		if (m_bVirtualFolder || (uAttributes & SFGAO_FOLDER))
 		{
-			enumFlags |= SHCONTF_INCLUDEHIDDEN | SHCONTF_INCLUDESUPERHIDDEN;
+			hr = pShellFolder->GetDisplayNameOf(pidlItem.get(), SHGDN_INFOLDER, &str);
+		}
+		else
+		{
+			hr = pShellFolder->GetDisplayNameOf(pidlItem.get(), SHGDN_INFOLDER | SHGDN_FORPARSING, &str);
 		}
 
-		wil::com_ptr<IEnumIDList> pEnumIDList;
-		hr = pShellFolder->EnumObjects(m_hOwner, enumFlags, &pEnumIDList);
-
-		if (SUCCEEDED(hr) && pEnumIDList)
+		if (SUCCEEDED(hr))
 		{
-			ULONG uFetched = 1;
-			PITEMID_CHILD rgelt;
+			TCHAR szFileName[MAX_PATH];
+			StrRetToBuf(&str, pidlItem.get(), szFileName, SIZEOF_ARRAY(szFileName));
 
-			while (pEnumIDList->Next(1, &rgelt, &uFetched) == S_OK && (uFetched == 1))
-			{
-				ULONG uAttributes = SFGAO_FOLDER;
-
-				pShellFolder->GetAttributesOf(1, const_cast<PCITEMID_CHILD *>(&rgelt), &uAttributes);
-
-				STRRET str;
-
-				/* If this is a virtual folder, only use SHGDN_INFOLDER. If this is
-				a real folder, combine SHGDN_INFOLDER with SHGDN_FORPARSING. This is
-				so that items in real folders can still be shown with extensions, even
-				if the global, Explorer option is disabled.
-				Also use only SHGDN_INFOLDER if this item is a folder. This is to ensure
-				that specific folders in Windows 7 (those under C:\Users\Username) appear
-				correctly. */
-				if (m_bVirtualFolder || (uAttributes & SFGAO_FOLDER))
-				{
-					hr = pShellFolder->GetDisplayNameOf(rgelt, SHGDN_INFOLDER, &str);
-				}
-				else
-				{
-					hr = pShellFolder->GetDisplayNameOf(rgelt, SHGDN_INFOLDER | SHGDN_FORPARSING, &str);
-				}
-
-				if (SUCCEEDED(hr))
-				{
-					TCHAR szFileName[MAX_PATH];
-					StrRetToBuf(&str, rgelt, szFileName, SIZEOF_ARRAY(szFileName));
-
-					AddItemInternal(pidlDirectory, rgelt, szFileName, -1, FALSE);
-				}
-
-				CoTaskMemFree(rgelt);
-			}
+			AddItemInternal(pidlDirectory, pidlItem.get(), szFileName, -1, FALSE);
 		}
 	}
+
+	return hr;
 }
 
 HRESULT CShellBrowser::AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory,

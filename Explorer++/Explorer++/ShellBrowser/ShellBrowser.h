@@ -282,7 +282,7 @@ private:
 	void				VerifySortMode(void);
 
 	/* Browsing support. */
-	void				BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory);
+	HRESULT				BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory);
 	void				InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(const ItemInfo_t &itemInfo) const;
 	HRESULT				AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
