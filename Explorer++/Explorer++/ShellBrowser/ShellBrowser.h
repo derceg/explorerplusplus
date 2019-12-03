@@ -282,13 +282,14 @@ private:
 	void				VerifySortMode(void);
 
 	/* Browsing support. */
-	HRESULT				BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory);
+	HRESULT				EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory);
+	void				ClearPendingResults();
+	void				ResetFolderState();
 	void				InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(const ItemInfo_t &itemInfo) const;
 	HRESULT				AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);
 	HRESULT				AddItemInternal(int iItemIndex,int iItemId,BOOL bPosition);
 	int					SetItemInformation(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName);
-	void				ResetFolderMemoryAllocations(void);
 	void				SetViewModeInternal(ViewMode viewMode);
 	void				ApplyFolderEmptyBackgroundImage(bool apply);
 	void				ApplyFilteringBackgroundImage(bool apply);

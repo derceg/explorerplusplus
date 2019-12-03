@@ -128,6 +128,9 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 
 	InitializeCriticalSection(&m_csDirectoryAltered);
 
+	m_iFolderIcon = GetDefaultFolderIconIndex();
+	m_iFileIcon = GetDefaultFileIconIndex();
+
 	m_ListViewSubclassed = SetWindowSubclass(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
 
 	HWND hParent = GetParent(hListView);

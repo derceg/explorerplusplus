@@ -67,27 +67,18 @@ HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath, bool addHistoryEntry)
 
 HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
 {
-	SetCursor(LoadCursor(NULL,IDC_WAIT));
+	SetCursor(LoadCursor(NULL, IDC_WAIT));
 
-	PIDLIST_ABSOLUTE pidl = ILCloneFull(pidlDirectory);
+	auto resetCursor = wil::scope_exit([] {
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
+	});
 
 	if(m_bFolderVisited)
 	{
 		SaveColumnWidths();
 	}
 
-	/* TODO: Wait for any background threads to finish processing. */
-
-	m_columnThreadPool.clear_queue();
-	m_columnResults.clear();
-
-	m_iconFetcher.ClearQueue();
-
-	m_thumbnailThreadPool.clear_queue();
-	m_thumbnailResults.clear();
-
-	m_infoTipsThreadPool.clear_queue();
-	m_infoTipResults.clear();
+	ClearPendingResults();
 
 	EnterCriticalSection(&m_csDirectoryAltered);
 	m_FilesAdded.clear();
@@ -95,7 +86,7 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHis
 	LeaveCriticalSection(&m_csDirectoryAltered);
 
 	TCHAR szParsingPath[MAX_PATH];
-	GetDisplayName(pidl,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
+	GetDisplayName(pidlDirectory,szParsingPath,SIZEOF_ARRAY(szParsingPath),SHGDN_FORPARSING);
 
 	/* TODO: Method callback. */
 	SendMessage(m_hOwner,WM_USER_STARTEDBROWSING,m_ID,reinterpret_cast<WPARAM>(szParsingPath));
@@ -105,9 +96,9 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHis
 	if(addHistoryEntry)
 	{
 		TCHAR displayName[MAX_PATH];
-		GetDisplayName(pidl, displayName, static_cast<UINT>(std::size(displayName)), SHGDN_INFOLDER);
+		GetDisplayName(pidlDirectory, displayName, static_cast<UINT>(std::size(displayName)), SHGDN_INFOLDER);
 
-		auto entry = std::make_unique<HistoryEntry>(pidl, displayName);
+		auto entry = std::make_unique<HistoryEntry>(pidlDirectory, displayName);
 		m_pathManager.AddEntry(std::move(entry));
 	}
 
@@ -120,21 +111,16 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHis
 
 	if(m_bFolderVisited)
 	{
-		ResetFolderMemoryAllocations();
+		ResetFolderState();
 	}
-
-	m_iFolderIcon = GetDefaultFolderIconIndex();
-	m_iFileIcon = GetDefaultFileIconIndex();
 
 	m_nTotalItems = 0;
 
-	BrowseVirtualFolder(pidl);
-
-	CoTaskMemFree(pidl);
+	EnumerateFolder(pidlDirectory);
 
 	/* Window updates needs these to be set. */
-	m_NumFilesSelected		= 0;
-	m_NumFoldersSelected	= 0;
+	m_NumFilesSelected = 0;
+	m_NumFoldersSelected = 0;
 
 	m_ulTotalDirSize.QuadPart = 0;
 	m_ulFileSelectionSize.QuadPart = 0;
@@ -157,8 +143,6 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHis
 
 	m_bFolderVisited = TRUE;
 
-	SetCursor(LoadCursor(NULL,IDC_ARROW));
-
 	PlayNavigationSound();
 
 	m_uniqueFolderId++;
@@ -166,29 +150,39 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHis
 	return S_OK;
 }
 
-void CShellBrowser::ResetFolderMemoryAllocations(void)
+void CShellBrowser::ClearPendingResults()
 {
-	HIMAGELIST himl;
-	HIMAGELIST himlOld;
-	int nItems;
+	m_columnThreadPool.clear_queue();
+	m_columnResults.clear();
 
-	m_directoryState = DirectoryState();
+	m_iconFetcher.ClearQueue();
 
+	m_thumbnailThreadPool.clear_queue();
+	m_thumbnailResults.clear();
+
+	m_infoTipsThreadPool.clear_queue();
+	m_infoTipResults.clear();
+}
+
+void CShellBrowser::ResetFolderState()
+{
 	/* If we're in thumbnails view, destroy the current
 	imagelist, and create a new one. */
 	if (m_folderSettings.viewMode == +ViewMode::Thumbnails)
 	{
-		himlOld = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
+		HIMAGELIST himlOld = ListView_GetImageList(m_hListView, LVSIL_NORMAL);
 
-		nItems = ListView_GetItemCount(m_hListView);
+		int nItems = ListView_GetItemCount(m_hListView);
 
 		/* Create and set the new imagelist. */
-		himl = ImageList_Create(THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT,
+		HIMAGELIST himl = ImageList_Create(THUMBNAIL_ITEM_WIDTH, THUMBNAIL_ITEM_HEIGHT,
 			ILC_COLOR32, nItems, nItems + 100);
 		ListView_SetImageList(m_hListView, himl, LVSIL_NORMAL);
 
 		ImageList_Destroy(himlOld);
 	}
+
+	m_directoryState = DirectoryState();
 
 	EnterCriticalSection(&m_csDirectoryAltered);
 	m_AlteredList.clear();
@@ -200,7 +194,7 @@ void CShellBrowser::ResetFolderMemoryAllocations(void)
 	m_AwaitingAddList.clear();
 }
 
-HRESULT CShellBrowser::BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory)
+HRESULT CShellBrowser::EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	DetermineFolderVirtual(pidlDirectory);
 
