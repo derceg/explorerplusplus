@@ -15,6 +15,7 @@
 #include "../Helper/WindowSubclassWrapper.h"
 #include <boost/optional.hpp>
 #include <boost/signals2.hpp>
+#include <wil/com.h>
 #include <wil/resource.h>
 #include <functional>
 #include <unordered_map>
@@ -91,6 +92,7 @@ private:
 
 	void Initialize(HWND parent);
 	void AddDefaultTabIcons(HIMAGELIST himlTab);
+	bool IsDefaultIcon(int iconIndex);
 
 	void OnTabCtrlLButtonDown(POINT *pt);
 	void OnTabCtrlLButtonUp(void);
@@ -126,6 +128,9 @@ private:
 	void OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType);
 	void UpdateTabNameInWindow(const Tab &tab);
 	void SetTabIcon(const Tab &tab);
+	void SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex);
+	int AddSystemImageListIconToTabImageList(int systemIconIndex);
+	void SetTabIconFromImageList(const Tab &tab, int imageIndex);
 
 	SortMode GetDefaultSortMode(PCIDLIST_ABSOLUTE pidlDirectory) const;
 	void InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, boost::optional<std::wstring> customName);
@@ -137,7 +142,12 @@ private:
 
 	std::unordered_map<int, Tab> m_tabs;
 	int m_tabIdCounter;
+
+	IconFetcher m_iconFetcher;
 	CachedIcons *m_cachedIcons;
+	wil::com_ptr<IImageList> m_systemImageList;
+	int m_defaultFolderIconSystemImageListIndex;
+	int m_defaultFolderIconIndex;
 	int m_tabIconLockIndex;
 
 	TabContainerInterface *m_tabContainerInterface;

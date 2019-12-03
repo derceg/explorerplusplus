@@ -14,7 +14,9 @@
 #include "ResourceHelper.h"
 #include "TabBacking.h"
 #include "TabDropHandler.h"
+#include "../Helper/CachedIcons.h"
 #include "../Helper/Controls.h"
+#include "../Helper/IconFetcher.h"
 #include "../Helper/iDirectoryMonitor.h"
 #include "../Helper/ImageHelper.h"
 #include "../Helper/MenuHelper.h"
@@ -53,7 +55,9 @@ TabContainer::TabContainer(HWND parent, TabContainerInterface *tabContainer, Tab
 	m_instance(instance),
 	m_config(config),
 	m_bTabBeenDragged(FALSE),
-	m_iPreviousTabSelectionId(-1)
+	m_iPreviousTabSelectionId(-1),
+	m_iconFetcher(m_hwnd, cachedIcons),
+	m_defaultFolderIconSystemImageListIndex(GetDefaultFolderIconIndex())
 {
 	Initialize(parent);
 }
@@ -84,10 +88,13 @@ void TabContainer::Initialize(HWND parent)
 		SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(m_tabFont.get()), MAKELPARAM(TRUE, 0));
 	}
 
+	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
+
 	int dpiScaledSize = MulDiv(ICON_SIZE_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
 	m_tabCtrlImageList.reset(ImageList_Create(dpiScaledSize, dpiScaledSize, ILC_COLOR32 | ILC_MASK, 0, 100));
-	AddDefaultTabIcons(m_tabCtrlImageList.get());
 	TabCtrl_SetImageList(m_hwnd, m_tabCtrlImageList.get());
+
+	AddDefaultTabIcons(m_tabCtrlImageList.get());
 
 	CTabDropHandler *pTabDropHandler = new CTabDropHandler(m_hwnd, this);
 	RegisterDragDrop(m_hwnd, pTabDropHandler);
@@ -111,6 +118,18 @@ void TabContainer::AddDefaultTabIcons(HIMAGELIST himlTab)
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
 	wil::unique_hbitmap bitmap = m_expp->GetIconResourceLoader()->LoadBitmapFromPNGForDpi(Icon::Lock, ICON_SIZE_96DPI, ICON_SIZE_96DPI, dpi);
 	m_tabIconLockIndex = ImageList_Add(himlTab, bitmap.get(), nullptr);
+
+	m_defaultFolderIconIndex = AddSystemImageListIconToTabImageList(m_defaultFolderIconSystemImageListIndex);
+}
+
+bool TabContainer::IsDefaultIcon(int iconIndex)
+{
+	if (iconIndex == m_tabIconLockIndex || iconIndex == m_defaultFolderIconIndex)
+	{
+		return true;
+	}
+
+	return false;
 }
 
 TabContainer::~TabContainer()
@@ -661,56 +680,106 @@ void TabContainer::UpdateTabNameInWindow(const Tab &tab)
 	TabCtrl_SetItemText(m_hwnd, index, name.c_str());
 }
 
-/* Sets a tabs icon. Normally, this icon
-is the folders icon, however if the tab
-is locked, the icon will be a lock. */
 void TabContainer::SetTabIcon(const Tab &tab)
 {
-	TCITEM			tcItem;
-	SHFILEINFO		shfi;
-	ICONINFO		IconInfo;
-	int				iImage;
-	int				iRemoveImage;
-
 	/* If the tab is locked, use a lock icon. */
 	if (tab.GetAddressLocked() || tab.GetLocked())
 	{
-		iImage = m_tabIconLockIndex;
+		SetTabIconFromImageList(tab, m_tabIconLockIndex);
 	}
 	else
 	{
+		auto itr = m_cachedIcons->findByPath(tab.GetShellBrowser()->GetDirectory());
+
+		if (itr != m_cachedIcons->end())
+		{
+			SetTabIconFromSystemImageList(tab, itr->iconIndex);
+		}
+		else
+		{
+			SetTabIconFromImageList(tab, m_defaultFolderIconIndex);
+		}
+
 		auto pidlDirectory = tab.GetShellBrowser()->GetDirectoryIdl();
 
-		SHGetFileInfo((LPCTSTR)pidlDirectory.get(), 0, &shfi, sizeof(shfi),
-			SHGFI_PIDL | SHGFI_ICON | SHGFI_SMALLICON);
+		m_iconFetcher.QueueIconTask(pidlDirectory.get(),
+			[this, tabId = tab.GetId(), folderId = tab.GetShellBrowser()->GetId()] (PCIDLIST_ABSOLUTE pidl, int iconIndex) {
+				UNREFERENCED_PARAMETER(pidl);
 
-		GetIconInfo(shfi.hIcon, &IconInfo);
-		iImage = ImageList_Add(TabCtrl_GetImageList(m_hwnd),
-			IconInfo.hbmColor, IconInfo.hbmMask);
+				auto tab = GetTabOptional(tabId);
 
-		DeleteObject(IconInfo.hbmColor);
-		DeleteObject(IconInfo.hbmMask);
-		DestroyIcon(shfi.hIcon);
+				if (!tab)
+				{
+					return;
+				}
+
+				if (tab->GetShellBrowser()->GetId() != folderId)
+				{
+					return;
+				}
+
+				SetTabIconFromSystemImageList(*tab, iconIndex);
+			}
+		);
+	}
+}
+
+void TabContainer::SetTabIconFromSystemImageList(const Tab &tab, int systemIconIndex)
+{
+	if (systemIconIndex == m_defaultFolderIconSystemImageListIndex)
+	{
+		SetTabIconFromImageList(tab, m_defaultFolderIconIndex);
+		return;
 	}
 
-	int index = GetTabIndex(tab);
+	int index = AddSystemImageListIconToTabImageList(systemIconIndex);
 
-	/* Get the index of the current image. This image
-	will be removed after the new image is set. */
-	tcItem.mask = TCIF_IMAGE;
-	TabCtrl_GetItem(m_hwnd, index, &tcItem);
-
-	iRemoveImage = tcItem.iImage;
-
-	/* Set the new image. */
-	tcItem.mask = TCIF_IMAGE;
-	tcItem.iImage = iImage;
-	TabCtrl_SetItem(m_hwnd, index, &tcItem);
-
-	if (iRemoveImage != m_tabIconLockIndex)
+	if (index != -1)
 	{
-		/* Remove the old image. */
-		TabCtrl_RemoveImage(m_hwnd, iRemoveImage);
+		SetTabIconFromImageList(tab, index);
+	}
+}
+
+int TabContainer::AddSystemImageListIconToTabImageList(int systemIconIndex)
+{
+	wil::unique_hicon icon;
+	HRESULT hr = m_systemImageList->GetIcon(systemIconIndex, ILD_NORMAL, &icon);
+
+	if (FAILED(hr))
+	{
+		return - 1;
+	}
+
+	return ImageList_AddIcon(TabCtrl_GetImageList(m_hwnd), icon.get());
+}
+
+void TabContainer::SetTabIconFromImageList(const Tab &tab, int imageIndex)
+{
+	int tabIndex = GetTabIndex(tab);
+
+	TCITEM tcItem;
+	tcItem.mask = TCIF_IMAGE;
+	BOOL res = TabCtrl_GetItem(m_hwnd, tabIndex, &tcItem);
+
+	if (!res)
+	{
+		return;
+	}
+
+	int previousImageIndex = tcItem.iImage;
+
+	tcItem.mask = TCIF_IMAGE;
+	tcItem.iImage = imageIndex;
+	res = TabCtrl_SetItem(m_hwnd, tabIndex, &tcItem);
+
+	if (!res)
+	{
+		return;
+	}
+
+	if (!IsDefaultIcon(previousImageIndex))
+	{
+		TabCtrl_RemoveImage(m_hwnd, previousImageIndex);
 	}
 }
 
@@ -1035,7 +1104,10 @@ void TabContainer::RemoveTabFromControl(const Tab &tab)
 
 	TabCtrl_DeleteItem(m_hwnd, index);
 
-	TabCtrl_RemoveImage(m_hwnd, tcItemRemoved.iImage);
+	if (!IsDefaultIcon(tcItemRemoved.iImage))
+	{
+		TabCtrl_RemoveImage(m_hwnd, tcItemRemoved.iImage);
+	}
 }
 
 Tab &TabContainer::GetTab(int tabId)
