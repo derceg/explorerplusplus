@@ -739,13 +739,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\About Image.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\Display Window.ico">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\Explorer++ Small.ico">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\Explorer++.ico">
@@ -757,13 +751,7 @@
     <None Include="res\Folder Empty.bmp">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="res\Folder Locked.bmp">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="res\Navigation Start.wav">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="res\Tab Close.bmp">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="res\No Preview Available.bmp">

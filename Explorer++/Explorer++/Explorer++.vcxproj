@@ -708,16 +708,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="res\About Image.bmp" />
     <None Include="res\Display Window.ico" />
-    <None Include="res\Explorer++ Small.ico" />
     <None Include="res\Explorer++.ico" />
     <None Include="res\Filtering Applied.bmp" />
     <None Include="res\Folder Empty.bmp" />
-    <None Include="res\Folder Locked.bmp" />
     <None Include="res\Navigation Start.wav" />
     <None Include="res\No Preview Available.bmp" />
-    <None Include="res\Tab Close.bmp" />
     <None Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
