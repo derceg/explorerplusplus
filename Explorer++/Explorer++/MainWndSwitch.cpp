@@ -1674,12 +1674,7 @@ LRESULT CALLBACK Explorerplusplus::NotifyHandler(HWND hwnd, UINT msg, WPARAM wPa
 							iCmd = iCmd - ID_REBAR_MENU_FORWARD_START;
 						}
 
-						auto entry = m_pActiveShellBrowser->RetrieveHistoryItem(iCmd);
-
-						if (entry)
-						{
-							m_navigation->BrowseFolderInCurrentTab(entry->GetPidl().get(), SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
-						}
+						m_navigation->OnGoToOffset(iCmd);
 					}
 					else
 					{

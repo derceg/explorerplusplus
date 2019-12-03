@@ -242,7 +242,7 @@ void CBookmarksToolbar::OnRightClickMenuItemSelected(int menuItemId, const Varia
 		if (variantBookmark.type() == typeid(CBookmark))
 		{
 			const CBookmark &bookmark = boost::get<CBookmark>(variantBookmark);
-			m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+			m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str());
 		}
 	}
 		break;
@@ -325,7 +325,7 @@ bool CBookmarksToolbar::OnButtonClick(int command)
 	else
 	{
 		CBookmark &bookmark = boost::get<CBookmark>(*variantBookmarkItem);
-		m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+		m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str());
 	}
 
 	return true;
@@ -371,7 +371,7 @@ void CBookmarksToolbar::ShowBookmarkFolderMenu(const CBookmarkFolder &bookmarkFo
 
 void CBookmarksToolbar::OnBookmarkMenuItemClicked(const CBookmark &bookmark)
 {
-	m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str(), SBSP_ABSOLUTE);
+	m_navigation->BrowseFolderInCurrentTab(bookmark.GetLocation().c_str());
 }
 
 void CBookmarksToolbar::OnNewBookmark()

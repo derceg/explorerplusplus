@@ -63,8 +63,12 @@ public:
 	ULONG __stdcall		Release(void);
 
 	/* Navigation. */
-	HRESULT				BrowseFolder(const TCHAR *szPath,UINT wFlags);
-	HRESULT				BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags);
+	HRESULT				GoBack();
+	HRESULT				GoForward();
+	HRESULT				GoToOffset(int offset);
+	HRESULT				GoUp();
+	HRESULT				BrowseFolder(const TCHAR *szPath, bool addHistoryEntry = true);
+	HRESULT				BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true);
 	HRESULT				Refresh(void);
 
 	/* Drag and Drop. */
@@ -97,7 +101,6 @@ public:
 	std::vector<HistoryEntry *>	GetBackHistory() const;
 	std::vector<HistoryEntry *>	GetForwardHistory() const;
 	HistoryEntry		*RetrieveHistoryItemWithoutUpdate(int iItem);
-	HistoryEntry		*RetrieveHistoryItem(int iItem);
 	BOOL				CanBrowseUp(void) const;
 	int					GetNumItems(void) const;
 	int					GetNumSelectedFiles(void) const;
@@ -280,7 +283,6 @@ private:
 
 	/* Browsing support. */
 	void				BrowseVirtualFolder(PCIDLIST_ABSOLUTE pidlDirectory);
-	HRESULT				ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,BOOL *bWriteHistory);
 	void				InsertAwaitingItems(BOOL bInsertIntoGroup);
 	BOOL				IsFileFiltered(const ItemInfo_t &itemInfo) const;
 	HRESULT				AddItemInternal(PCIDLIST_ABSOLUTE pidlDirectory, PCITEMID_CHILD pidlChild, const TCHAR *szFileName, int iItemIndex, BOOL bPosition);

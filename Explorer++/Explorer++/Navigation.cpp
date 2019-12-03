@@ -29,37 +29,87 @@ void Navigation::OnTabCreated(int tabId, BOOL switchToNewTab)
 
 void Navigation::OnBrowseBack()
 {
-	BrowseFolderInCurrentTab(EMPTY_STRING, SBSP_NAVIGATEBACK);
+	OnGoToOffset(-1);
 }
 
 void Navigation::OnBrowseForward()
 {
-	BrowseFolderInCurrentTab(EMPTY_STRING, SBSP_NAVIGATEFORWARD);
+	OnGoToOffset(1);
+}
+
+void Navigation::OnGoToOffset(int offset)
+{
+	Tab &tab = m_tabContainer->GetSelectedTab();
+	HRESULT hr = E_FAIL;
+	int resultingTabId = -1;
+
+	if (!tab.GetAddressLocked())
+	{
+		hr = tab.GetShellBrowser()->GoToOffset(offset);
+
+		resultingTabId = tab.GetId();
+	}
+	else
+	{
+		auto entry = tab.GetShellBrowser()->RetrieveHistoryItemWithoutUpdate(offset);
+
+		if (entry)
+		{
+			hr = m_tabContainer->CreateNewTab(entry->GetPidl().get(), TabSettings(_selected = true), nullptr, boost::none, &resultingTabId);
+		}
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		const Tab &resultingTab = m_tabContainer->GetTab(resultingTabId);
+		navigationCompletedSignal.m_signal(resultingTab);
+	}
 }
 
 void Navigation::OnNavigateHome()
 {
-	HRESULT hr = BrowseFolderInCurrentTab(m_config->defaultTabDirectory.c_str(), SBSP_ABSOLUTE);
+	HRESULT hr = BrowseFolderInCurrentTab(m_config->defaultTabDirectory.c_str());
 
 	if(FAILED(hr))
 	{
-		BrowseFolderInCurrentTab(m_config->defaultTabDirectoryStatic.c_str(), SBSP_ABSOLUTE);
+		BrowseFolderInCurrentTab(m_config->defaultTabDirectoryStatic.c_str());
 	}
 }
 
 void Navigation::OnNavigateUp()
 {
-	HRESULT hr = BrowseFolderInCurrentTab(EMPTY_STRING, SBSP_PARENT);
+	Tab &tab = m_tabContainer->GetSelectedTab();
+	HRESULT hr = E_FAIL;
+	int resultingTabId = -1;
 
-	if(SUCCEEDED(hr))
+	if (!tab.GetAddressLocked())
 	{
-		Tab &tab = m_tabContainer->GetSelectedTab();
-		std::wstring directory = tab.GetShellBrowser()->GetDirectory();
+		hr = tab.GetShellBrowser()->GoUp();
+
+		resultingTabId = tab.GetId();
+	}
+	else
+	{
+		unique_pidl_absolute pidlParent;
+		hr = GetVirtualParentPath(tab.GetShellBrowser()->GetDirectoryIdl().get(), wil::out_param(pidlParent));
+
+		if (SUCCEEDED(hr))
+		{
+			hr = m_tabContainer->CreateNewTab(pidlParent.get(), TabSettings(_selected = true), nullptr, boost::none, &resultingTabId);
+		}
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		const Tab &resultingTab = m_tabContainer->GetTab(resultingTabId);
+		navigationCompletedSignal.m_signal(resultingTab);
+
+		std::wstring directory = resultingTab.GetShellBrowser()->GetDirectory();
 
 		TCHAR directoryFileName[MAX_PATH];
 		StringCchCopy(directoryFileName, std::size(directoryFileName), directory.c_str());
 		PathStripPath(directoryFileName);
-		tab.GetShellBrowser()->SelectFiles(directoryFileName);
+		resultingTab.GetShellBrowser()->SelectFiles(directoryFileName);
 	}
 }
 
@@ -75,14 +125,14 @@ void Navigation::OnGotoFolder(int FolderCSIDL)
 	/* Don't use SUCCEEDED(hr). */
 	if(hr == S_OK)
 	{
-		BrowseFolderInCurrentTab(pidl.get(), SBSP_ABSOLUTE);
+		BrowseFolderInCurrentTab(pidl.get());
 	}
 }
 
-HRESULT Navigation::BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags)
+HRESULT Navigation::BrowseFolderInCurrentTab(const TCHAR *szPath)
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
-	return BrowseFolder(tab, szPath, wFlags);
+	return BrowseFolder(tab, szPath);
 }
 
 /*
@@ -99,7 +149,7 @@ The ONLY times an idl should be sent are:
 - When loading directories on startup
 - When navigating to a folder on the 'Go' menu
 */
-HRESULT Navigation::BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags)
+HRESULT Navigation::BrowseFolder(Tab &tab, const TCHAR *szPath)
 {
 	/* Doesn't matter if we can't get the pidl here,
 	as some paths will be relative, or will be filled
@@ -107,29 +157,29 @@ HRESULT Navigation::BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags)
 	unique_pidl_absolute pidl;
 	HRESULT hr = SHParseDisplayName(szPath, nullptr, wil::out_param(pidl), 0, nullptr);
 
-	BrowseFolder(tab, pidl.get(), wFlags);
+	BrowseFolder(tab, pidl.get());
 
 	return hr;
 }
 
-HRESULT Navigation::BrowseFolderInCurrentTab(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags)
+HRESULT Navigation::BrowseFolderInCurrentTab(PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	Tab &tab = m_tabContainer->GetSelectedTab();
-	return BrowseFolder(tab, pidlDirectory, wFlags);
+	return BrowseFolder(tab, pidlDirectory);
 }
 
 /* ALL calls to browse a folder in a particular tab MUST
 pass through this function. This ensures that tabs that
 have their addresses locked will not change directory (a
 new tab will be created instead). */
-HRESULT Navigation::BrowseFolder(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags)
+HRESULT Navigation::BrowseFolder(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory)
 {
 	HRESULT hr = E_FAIL;
 	int resultingTabId = -1;
 
 	if(!tab.GetAddressLocked())
 	{
-		hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory, wFlags);
+		hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory);
 
 		resultingTabId = tab.GetId();
 	}

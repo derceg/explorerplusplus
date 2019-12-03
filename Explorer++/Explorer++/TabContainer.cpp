@@ -898,7 +898,7 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 		selected = *tabSettings.selected;
 	}
 
-	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory, SBSP_ABSOLUTE);
+	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory);
 
 	if (hr != S_OK)
 	{

@@ -171,7 +171,7 @@ LRESULT CALLBACK CDrivesToolbar::DrivesToolbarParentProc(HWND hwnd,UINT uMsg,WPA
 			if(iIndex != -1)
 			{
 				std::wstring Path = GetDrivePath(iIndex);
-				m_navigation->BrowseFolderInCurrentTab(Path.c_str(),SBSP_ABSOLUTE);
+				m_navigation->BrowseFolderInCurrentTab(Path.c_str());
 			}
 
 			return 0;

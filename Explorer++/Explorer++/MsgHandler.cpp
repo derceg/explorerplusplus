@@ -286,7 +286,7 @@ void Explorerplusplus::OpenFolderItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNe
 	else if(m_config->alwaysOpenNewTab || bOpenInNewTab)
 		m_tabContainer->CreateNewTab(pidlItem, TabSettings(_selected = true));
 	else
-		m_navigation->BrowseFolderInCurrentTab(pidlItem,0);
+		m_navigation->BrowseFolderInCurrentTab(pidlItem);
 }
 
 void Explorerplusplus::OpenFileItem(PCIDLIST_ABSOLUTE pidlItem,const TCHAR *szParameters)

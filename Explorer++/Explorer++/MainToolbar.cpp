@@ -781,12 +781,7 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 		cmd = -cmd;
 	}
 
-	auto selectedEntry = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItem(cmd);
-
-	if (selectedEntry)
-	{
-		m_navigation->BrowseFolderInCurrentTab(selectedEntry->GetPidl().get(), SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
-	}
+	m_navigation->OnGoToOffset(cmd);
 }
 
 wil::unique_hbitmap MainToolbar::SystemImageIconToBitmap(int iconIndex)

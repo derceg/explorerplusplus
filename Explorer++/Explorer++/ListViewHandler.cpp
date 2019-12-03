@@ -511,7 +511,7 @@ LRESULT Explorerplusplus::OnListViewKeyDown(LPARAM lParam)
 					if(bRes)
 					{
 						/* Go to the root of this directory. */
-						m_navigation->BrowseFolderInCurrentTab(szRoot, SBSP_ABSOLUTE);
+						m_navigation->BrowseFolderInCurrentTab(szRoot);
 					}
 				}
 			}

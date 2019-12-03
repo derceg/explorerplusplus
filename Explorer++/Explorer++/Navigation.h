@@ -17,14 +17,15 @@ public:
 
 	void OnBrowseBack();
 	void OnBrowseForward();
+	void OnGoToOffset(int offset);
 	void OnNavigateHome();
 	void OnNavigateUp();
 	void OnGotoFolder(int FolderCSIDL);
 
-	HRESULT BrowseFolderInCurrentTab(const TCHAR *szPath, UINT wFlags);
-	HRESULT BrowseFolder(Tab &tab, const TCHAR *szPath, UINT wFlags);
-	HRESULT BrowseFolderInCurrentTab(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags);
-	HRESULT BrowseFolder(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags);
+	HRESULT BrowseFolderInCurrentTab(const TCHAR *szPath);
+	HRESULT BrowseFolder(Tab &tab, const TCHAR *szPath);
+	HRESULT BrowseFolderInCurrentTab(PCIDLIST_ABSOLUTE pidlDirectory);
+	HRESULT BrowseFolder(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory);
 
 	void OpenDirectoryInNewWindow(PCIDLIST_ABSOLUTE pidlDirectory);
 

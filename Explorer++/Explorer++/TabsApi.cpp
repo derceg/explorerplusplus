@@ -197,7 +197,7 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 
 	if (location && !location->empty())
 	{
-		m_navigation->BrowseFolder(*tabInternal, location->c_str(), SBSP_ABSOLUTE);
+		m_navigation->BrowseFolder(*tabInternal, location->c_str());
 	}
 
 	boost::optional<std::wstring> name = properties[TabConstants::NAME];

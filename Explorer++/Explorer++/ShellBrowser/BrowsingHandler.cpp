@@ -17,20 +17,55 @@
 #include <wil/com.h>
 #include <list>
 
-HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath,UINT wFlags)
+HRESULT CShellBrowser::GoBack()
+{
+	return GoToOffset(-1);
+}
+
+HRESULT CShellBrowser::GoForward()
+{
+	return GoToOffset(1);
+}
+
+HRESULT CShellBrowser::GoToOffset(int offset)
+{
+	auto entry = m_pathManager.GetEntry(offset);
+
+	if (!entry)
+	{
+		return E_FAIL;
+	}
+
+	return BrowseFolder(entry->GetPidl().get(), false);
+}
+
+HRESULT CShellBrowser::GoUp()
+{
+	unique_pidl_absolute pidlParent;
+	HRESULT hr = GetVirtualParentPath(m_directoryState.pidlDirectory.get(), wil::out_param(pidlParent));
+
+	if (FAILED(hr))
+	{
+		return hr;
+	}
+
+	return BrowseFolder(pidlParent.get());
+}
+
+HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath, bool addHistoryEntry)
 {
 	unique_pidl_absolute pidlDirectory;
 	HRESULT hr = SHParseDisplayName(szPath, nullptr, wil::out_param(pidlDirectory), 0, nullptr);
 
-	if(SUCCEEDED(hr))
+	if (SUCCEEDED(hr))
 	{
-		hr = BrowseFolder(pidlDirectory.get(),wFlags);
+		hr = BrowseFolder(pidlDirectory.get(), addHistoryEntry);
 	}
 
 	return hr;
 }
 
-HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags)
+HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)
 {
 	SetCursor(LoadCursor(NULL,IDC_WAIT));
 
@@ -39,17 +74,6 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags
 	if(m_bFolderVisited)
 	{
 		SaveColumnWidths();
-	}
-
-	/* The path may not be absolute, in which case it will
-	need to be completed. */
-	BOOL StoreHistory = TRUE;
-	HRESULT hr = ParsePath(&pidl,wFlags,&StoreHistory);
-
-	if(hr != S_OK)
-	{
-		SetCursor(LoadCursor(NULL,IDC_ARROW));
-		return E_FAIL;
 	}
 
 	/* TODO: Wait for any background threads to finish processing. */
@@ -78,7 +102,7 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, UINT wFlags
 
 	StringCchCopy(m_CurDir,SIZEOF_ARRAY(m_CurDir),szParsingPath);
 
-	if(StoreHistory)
+	if(addHistoryEntry)
 	{
 		TCHAR displayName[MAX_PATH];
 		GetDisplayName(pidl, displayName, static_cast<UINT>(std::size(displayName)), SHGDN_INFOLDER);
@@ -547,68 +571,9 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 	}
 }
 
-HRESULT CShellBrowser::ParsePath(LPITEMIDLIST *pidlDirectory,UINT uFlags,
-BOOL *bStoreHistory)
-{
-	if((uFlags & SBSP_PARENT) == SBSP_PARENT)
-	{
-		HRESULT hr;
-
-		hr = GetVirtualParentPath(m_directoryState.pidlDirectory.get(),pidlDirectory);
-	}
-	else if((uFlags & SBSP_NAVIGATEBACK) == SBSP_NAVIGATEBACK)
-	{
-		if(m_pathManager.GetNumBackEntriesStored() == 0)
-		{
-			SetFocus(m_hListView);
-			return E_FAIL;
-		}
-
-		/*Gets the path of the folder that was last visited.
-		Ignores the supplied Path argument.*/
-		*bStoreHistory		= FALSE;
-
-		auto entry = m_pathManager.GetEntry(-1);
-		*pidlDirectory = ILCloneFull(entry->GetPidl().get());
-	}
-	else if((uFlags & SBSP_NAVIGATEFORWARD) == SBSP_NAVIGATEFORWARD)
-	{
-		if(m_pathManager.GetNumForwardEntriesStored() == 0)
-		{
-			SetFocus(m_hListView);
-			return E_FAIL;
-		}
-
-		/*Gets the path of the folder that is 'forward' of
-		this one. Ignores the supplied Path argument.*/
-		*bStoreHistory		= FALSE;
-
-		auto entry = m_pathManager.GetEntry(1);
-		*pidlDirectory = ILCloneFull(entry->GetPidl().get());
-	}
-	else
-	{
-		/* Assume that SBSP_ABSOLUTE was passed. */
-		if(pidlDirectory == NULL)
-			return E_INVALIDARG;
-	}
-	
-	if((uFlags & SBSP_WRITENOHISTORY) == SBSP_WRITENOHISTORY)
-	{
-		/* Client has requested that the folder to be browsed to will have
-		no history item associated with it. */
-		*bStoreHistory		= FALSE;
-	}
-
-	if(!CheckIdl(*pidlDirectory))
-		return E_FAIL;
-
-	return S_OK;
-}
-
 HRESULT CShellBrowser::Refresh()
 {
-	return BrowseFolder(m_directoryState.pidlDirectory.get(), SBSP_ABSOLUTE | SBSP_WRITENOHISTORY);
+	return BrowseFolder(m_directoryState.pidlDirectory.get(), false);
 }
 
 void CShellBrowser::PlayNavigationSound() const

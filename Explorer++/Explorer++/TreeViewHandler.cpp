@@ -380,7 +380,7 @@ void Explorerplusplus::OnTreeViewHolderWindowTimer(void)
 	if(!m_bSelectingTreeViewDirectory && !m_bTreeViewRightClick &&
 		!CompareIdls(pidlDirectory.get(),pidlCurrentDirectory.get()))
 	{
-		m_navigation->BrowseFolderInCurrentTab(pidlDirectory.get(),0);
+		m_navigation->BrowseFolderInCurrentTab(pidlDirectory.get());
 
 		if(m_config->treeViewAutoExpandSelected)
 		{

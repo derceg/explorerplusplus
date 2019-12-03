@@ -491,11 +491,6 @@ HistoryEntry *CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)
 	return m_pathManager.GetEntryWithoutUpdate(iItem);
 }
 
-HistoryEntry *CShellBrowser::RetrieveHistoryItem(int iItem)
-{
-	return m_pathManager.GetEntry(iItem);
-}
-
 BOOL CShellBrowser::CanBrowseUp(void) const
 {
 	return !IsNamespaceRoot(m_directoryState.pidlDirectory.get());
