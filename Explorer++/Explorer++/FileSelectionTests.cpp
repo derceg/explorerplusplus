@@ -6,6 +6,26 @@
 #include "Explorer++.h"
 #include "../MyTreeView/MyTreeView.h"
 
+BOOL Explorerplusplus::AnyItemsSelected()
+{
+	HWND hFocus;
+
+	hFocus = GetFocus();
+
+	if (hFocus == m_hActiveListView)
+	{
+		if (ListView_GetSelectedCount(m_hActiveListView) > 0)
+			return TRUE;
+	}
+	else if (hFocus == m_hTreeView)
+	{
+		if (TreeView_GetSelection(m_hTreeView) != NULL)
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
 bool Explorerplusplus::CanCreate() const
 {
 	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();

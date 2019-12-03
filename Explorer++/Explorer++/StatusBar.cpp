@@ -197,3 +197,35 @@ HRESULT Explorerplusplus::UpdateStatusBarText(void)
 
 	return S_OK;
 }
+
+int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer)
+{
+	ULARGE_INTEGER	TotalNumberOfBytes;
+	ULARGE_INTEGER	TotalNumberOfFreeBytes;
+	ULARGE_INTEGER	BytesAvailableToCaller;
+	TCHAR			szFreeSpace[32];
+	TCHAR			szFree[16];
+	TCHAR			szFreeSpaceString[512];
+
+	if (GetDiskFreeSpaceEx(szPath, &BytesAvailableToCaller,
+		&TotalNumberOfBytes, &TotalNumberOfFreeBytes) == 0)
+	{
+		szBuffer = NULL;
+		return -1;
+	}
+
+	FormatSizeString(TotalNumberOfFreeBytes, szFreeSpace,
+		SIZEOF_ARRAY(szFreeSpace));
+
+	LoadString(m_hLanguageModule, IDS_GENERAL_FREE, szFree, SIZEOF_ARRAY(szFree));
+
+	StringCchPrintf(szFreeSpaceString, SIZEOF_ARRAY(szFreeSpace),
+		_T("%s %s (%.0f%%)"), szFreeSpace, szFree, TotalNumberOfFreeBytes.QuadPart * 100.0 / TotalNumberOfBytes.QuadPart);
+
+	if (nBuffer > lstrlen(szFreeSpaceString))
+		StringCchCopy(szBuffer, nBuffer, szFreeSpaceString);
+	else
+		szBuffer = NULL;
+
+	return lstrlen(szFreeSpaceString);
+}

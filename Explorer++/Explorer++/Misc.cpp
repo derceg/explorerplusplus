@@ -5,24 +5,15 @@
 #include "stdafx.h"
 #include "Explorer++.h"
 #include "Config.h"
-#include "DefaultColumns.h"
 #include "Explorer++_internal.h"
 #include "HardwareChangeNotifier.h"
 #include "MainResource.h"
 #include "SelectColumnsDialog.h"
 #include "../Helper/Controls.h"
-#include "../Helper/FileOperations.h"
-#include "../Helper/Helper.h"
-#include "../Helper/ListViewHelper.h"
 #include "../Helper/Logging.h"
 #include "../Helper/Macros.h"
-#include "../Helper/ProcessHelper.h"
-#include "../Helper/ShellHelper.h"
 #include "../Helper/WindowHelper.h"
-#include "../MyTreeView/MyTreeView.h"
 #include <boost/range/adaptor/map.hpp>
-#include <shobjidl.h>
-#include <list>
 
 void Explorerplusplus::ValidateLoadedSettings()
 {
@@ -340,63 +331,6 @@ int nFolders,int nFiles,PULARGE_INTEGER lTotalFolderSize)
 	be shown. */
 	PostMessage(m_hContainer,WM_APP_FOLDERSIZECOMPLETED,
 		(WPARAM)pDWFolderSizeCompletion,0);
-}
-
-int Explorerplusplus::CreateDriveFreeSpaceString(const TCHAR *szPath, TCHAR *szBuffer, int nBuffer)
-{
-	ULARGE_INTEGER	TotalNumberOfBytes;
-	ULARGE_INTEGER	TotalNumberOfFreeBytes;
-	ULARGE_INTEGER	BytesAvailableToCaller;
-	TCHAR			szFreeSpace[32];
-	TCHAR			szFree[16];
-	TCHAR			szFreeSpaceString[512];
-
-	if(GetDiskFreeSpaceEx(szPath,&BytesAvailableToCaller,
-	&TotalNumberOfBytes,&TotalNumberOfFreeBytes) == 0)
-	{
-		szBuffer = NULL;
-		return -1;
-	}
-
-	FormatSizeString(TotalNumberOfFreeBytes,szFreeSpace,
-		SIZEOF_ARRAY(szFreeSpace));
-
-	LoadString(m_hLanguageModule,IDS_GENERAL_FREE,szFree,SIZEOF_ARRAY(szFree));
-
-	StringCchPrintf(szFreeSpaceString,SIZEOF_ARRAY(szFreeSpace),
-	_T("%s %s (%.0f%%)"),szFreeSpace,szFree,TotalNumberOfFreeBytes.QuadPart * 100.0 / TotalNumberOfBytes.QuadPart);
-
-	if(nBuffer > lstrlen(szFreeSpaceString))
-		StringCchCopy(szBuffer,nBuffer,szFreeSpaceString);
-	else
-		szBuffer = NULL;
-
-	return lstrlen(szFreeSpaceString);
-}
-
-/*
- * Returns TRUE if there are any selected items
- * in the window that currently has focus; FALSE
- * otherwise.
- */
-BOOL Explorerplusplus::AnyItemsSelected(void)
-{
-	HWND hFocus;
-
-	hFocus = GetFocus();
-
-	if(hFocus == m_hActiveListView)
-	{
-		if(ListView_GetSelectedCount(m_hActiveListView) > 0)
-			return TRUE;
-	}
-	else if(hFocus == m_hTreeView)
-	{
-		if(TreeView_GetSelection(m_hTreeView) != NULL)
-			return TRUE;
-	}
-
-	return FALSE;
 }
 
 void Explorerplusplus::OnSelectColumns()
