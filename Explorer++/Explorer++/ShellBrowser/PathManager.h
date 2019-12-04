@@ -17,8 +17,8 @@ public:
 	HistoryEntry *GetEntry(int offset);
 	HistoryEntry *GetEntryWithoutUpdate(int offset) const;
 
-	int GetNumBackEntriesStored() const;
-	int GetNumForwardEntriesStored() const;
+	bool CanGoBack() const;
+	bool CanGoForward() const;
 	std::vector<HistoryEntry *> GetBackHistory() const;
 	std::vector<HistoryEntry *> GetForwardHistory() const;
 

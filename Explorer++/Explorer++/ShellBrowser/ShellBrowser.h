@@ -96,8 +96,8 @@ public:
 	BOOL				SetSortAscending(BOOL bAscending);
 	BOOL				GetShowHidden(void) const;
 	BOOL				SetShowHidden(BOOL bShowHidden);
-	BOOL				CanBrowseBack(void) const;
-	BOOL				CanBrowseForward(void) const;
+	bool				CanGoBack() const;
+	bool				CanGoForward() const;
 	std::vector<HistoryEntry *>	GetBackHistory() const;
 	std::vector<HistoryEntry *>	GetForwardHistory() const;
 	HistoryEntry		*RetrieveHistoryItemWithoutUpdate(int iItem);

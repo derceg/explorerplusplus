@@ -847,8 +847,8 @@ void MainToolbar::UpdateToolbarButtonStates()
 {
 	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Up, m_pexpp->GetActiveShellBrowser()->CanBrowseUp());
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Back, m_pexpp->GetActiveShellBrowser()->CanBrowseBack());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Forward, m_pexpp->GetActiveShellBrowser()->CanBrowseForward());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Back, m_pexpp->GetActiveShellBrowser()->CanGoBack());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Forward, m_pexpp->GetActiveShellBrowser()->CanGoForward());
 
 	BOOL bVirtualFolder = m_pexpp->GetActiveShellBrowser()->InVirtualFolder();
 

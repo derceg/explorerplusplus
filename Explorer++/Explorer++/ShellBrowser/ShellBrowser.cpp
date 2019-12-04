@@ -455,28 +455,14 @@ unique_pidl_absolute CShellBrowser::GetDirectoryIdl() const
 	return pidlDirectory;
 }
 
-BOOL CShellBrowser::CanBrowseBack(void) const
+bool CShellBrowser::CanGoBack() const
 {
-	int nBackPathsStored;
-
-	nBackPathsStored = m_pathManager.GetNumBackEntriesStored();
-
-	if(nBackPathsStored == 0)
-		return FALSE;
-
-	return TRUE;
+	return m_pathManager.CanGoBack();
 }
 
-BOOL CShellBrowser::CanBrowseForward(void) const
+bool CShellBrowser::CanGoForward() const
 {
-	int nForwardPathsStored;
-
-	nForwardPathsStored = m_pathManager.GetNumForwardEntriesStored();
-
-	if(nForwardPathsStored == 0)
-		return FALSE;
-
-	return TRUE;
+	return m_pathManager.CanGoForward();
 }
 
 std::vector<HistoryEntry *> CShellBrowser::GetBackHistory() const

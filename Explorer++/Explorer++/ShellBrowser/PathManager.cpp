@@ -64,24 +64,24 @@ HistoryEntry *PathManager::GetEntryWithoutUpdate(int offset) const
 	return m_entries[index].get();
 }
 
-int PathManager::GetNumBackEntriesStored() const
+bool PathManager::CanGoBack() const
 {
 	if (m_currentEntry == -1)
 	{
-		return 0;
+		return false;
 	}
 
-	return m_currentEntry;
+	return m_currentEntry > 0;
 }
 
-int PathManager::GetNumForwardEntriesStored() const
+bool PathManager::CanGoForward() const
 {
 	if (m_currentEntry == -1)
 	{
-		return 0;
+		return false;
 	}
 
-	return static_cast<int>(m_entries.size()) - m_currentEntry - 1;
+	return (static_cast<int>(m_entries.size()) - m_currentEntry - 1) > 0;
 }
 
 std::vector<HistoryEntry *> PathManager::GetBackHistory() const
