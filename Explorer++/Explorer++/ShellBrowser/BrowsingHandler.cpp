@@ -571,7 +571,10 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 
 HRESULT CShellBrowser::Refresh()
 {
-	return BrowseFolder(m_directoryState.pidlDirectory.get(), false);
+	// It's important that the pidl is copied, as the stored version will be
+	// reset when navigating.
+	unique_pidl_absolute pidl(ILCloneFull(m_directoryState.pidlDirectory.get()));
+	return BrowseFolder(pidl.get(), false);
 }
 
 void CShellBrowser::PlayNavigationSound() const
