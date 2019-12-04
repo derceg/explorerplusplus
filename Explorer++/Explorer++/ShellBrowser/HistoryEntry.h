@@ -16,9 +16,9 @@ public:
 	HistoryEntry(PCIDLIST_ABSOLUTE pidl, std::wstring_view displayName, std::optional<int> systemIconIndex = std::nullopt);
 
 	int GetId() const;
-	unique_pidl_absolute GetPidl();
-	std::wstring GetDisplayName();
-	std::optional<int> GetSystemIconIndex();
+	unique_pidl_absolute GetPidl() const;
+	std::wstring GetDisplayName() const;
+	std::optional<int> GetSystemIconIndex() const;
 	void SetSystemIconIndex(int iconIndex);
 
 private:

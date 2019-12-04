@@ -22,17 +22,17 @@ int HistoryEntry::GetId() const
 	return m_id;
 }
 
-unique_pidl_absolute HistoryEntry::GetPidl()
+unique_pidl_absolute HistoryEntry::GetPidl() const
 {
 	return unique_pidl_absolute(ILCloneFull(m_pidl.get()));
 }
 
-std::wstring HistoryEntry::GetDisplayName()
+std::wstring HistoryEntry::GetDisplayName() const
 {
 	return m_displayName;
 }
 
-std::optional<int> HistoryEntry::GetSystemIconIndex()
+std::optional<int> HistoryEntry::GetSystemIconIndex() const
 {
 	return m_systemIconIndex;
 }
