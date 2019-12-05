@@ -50,25 +50,17 @@
 #include <dwmapi.h>
 #include <WinInet.h>
 #include <VersionHelpers.h>
-
-#pragma warning(push)
-#pragma warning(disable:4091)
 #include <Imagehlp.h>
-#pragma warning(pop)
 
 #pragma warning(push)
 #pragma warning(disable:4458)
 #include <gdiplus.h>
 #pragma warning(pop)
 
-#pragma warning(push)
-#pragma warning(disable:4995)
-#include <iostream>
-#include <sstream>
-#pragma warning(pop)
-
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 #include <memory>
+#include <sstream>
 #include <unordered_map>
 #include <vector>
