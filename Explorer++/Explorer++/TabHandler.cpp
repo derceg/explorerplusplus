@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "LoadSaveInterface.h"
 #include "MainResource.h"
+#include "MenuRanges.h"
 #include "RenameTabDialog.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "ShellBrowser/SortModes.h"
@@ -42,6 +43,8 @@ void Explorerplusplus::InitializeTabs()
 	SetWindowPos(m_tabContainer->GetHWND(), nullptr, 0, 0, 0, tabWindowHeight, SWP_NOMOVE | SWP_NOZORDER);
 
 	m_tabRestorer = std::make_unique<TabRestorer>(m_tabContainer);
+	m_tabRestorerUI = std::make_unique<TabRestorerUI>(m_hLanguageModule, this, m_tabRestorer.get(),
+		MENU_RECENT_TABS_STARTID, MENU_RECENT_TABS_ENDID);
 
 	m_tabsInitializedSignal();
 }

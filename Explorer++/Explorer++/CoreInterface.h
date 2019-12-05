@@ -9,6 +9,7 @@
 #include <boost/signals2.hpp>
 
 typedef boost::signals2::signal<void()> TabsInitializedSignal;
+typedef boost::signals2::signal<void(HMENU mainMenu)> MainMenuPreShowSignal;
 typedef boost::signals2::signal<void(HMENU menu, HWND sourceWindow)> ToolbarContextMenuSignal;
 
 enum MousewheelSource_t
@@ -71,6 +72,6 @@ __interface IExplorerplusplus
 	void			SetLanguage(DWORD language);
 
 	boost::signals2::connection	AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer);
-
+	boost::signals2::connection	AddMainMenuPreShowObserver(const MainMenuPreShowSignal::slot_type &observer);
 	boost::signals2::connection	AddToolbarContextMenuObserver(const ToolbarContextMenuSignal::slot_type &observer);
 };

@@ -138,7 +138,7 @@ void MainToolbar::Initialize(HWND parent)
 
 	SHGetImageList(SHIL_SYSSMALL, IID_PPV_ARGS(&m_systemImageList));
 
-	m_defaultFolderIconBitmap = SystemImageIconToBitmap(GetDefaultFolderIconIndex());
+	m_defaultFolderIconBitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), GetDefaultFolderIconIndex());
 
 	UINT dpi = m_dpiCompat.GetDpiForWindow(m_hwnd);
 
@@ -744,7 +744,7 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 
 		if (iconIndex)
 		{
-			wil::unique_hbitmap iconBitmap = SystemImageIconToBitmap(*iconIndex);
+			wil::unique_hbitmap iconBitmap = ImageHelper::ImageListIconToBitmap(m_systemImageList.get(), *iconIndex);
 
 			if (iconBitmap)
 			{
@@ -782,28 +782,6 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 	}
 
 	m_navigation->OnGoToOffset(cmd);
-}
-
-wil::unique_hbitmap MainToolbar::SystemImageIconToBitmap(int iconIndex)
-{
-	wil::unique_hicon icon;
-	HRESULT hr = m_systemImageList->GetIcon(iconIndex, ILD_NORMAL, &icon);
-
-	if (FAILED(hr))
-	{
-		return nullptr;
-	}
-
-	int iconWidth;
-	int iconHeight;
-	hr = m_systemImageList->GetIconSize(&iconWidth, &iconHeight);
-
-	if (FAILED(hr))
-	{
-		return nullptr;
-	}
-
-	return wil::unique_hbitmap(ImageHelper::IconToBitmapPARGB32(icon.get(), iconWidth, iconHeight));
 }
 
 void MainToolbar::ShowToolbarViewsDropdown()

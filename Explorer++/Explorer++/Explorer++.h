@@ -16,6 +16,7 @@
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
 #include "TabRestorer.h"
+#include "TabRestorerUI.h"
 #include "UiTheming.h"
 #include "ValueWrapper.h"
 #include "../Helper/CachedIcons.h"
@@ -469,6 +470,7 @@ private:
 	void					InitializeMainMenu();
 	void					SetGoMenuName(HMENU hMenu, UINT uMenuID, UINT csidl);
 	void					SetMainMenuImages();
+	boost::signals2::connection	AddMainMenuPreShowObserver(const MainMenuPreShowSignal::slot_type &observer);
 	HMENU					BuildViewsMenu();
 	void					AddViewModesToMenu(HMENU menu);
 
@@ -534,9 +536,12 @@ private:
 
 	CachedIcons				m_cachedIcons;
 
+	MainMenuPreShowSignal	m_mainMenuPreShowSignal;
+
 	/* Tabs. */
 	TabContainer			*m_tabContainer;
 	std::unique_ptr<TabRestorer>	m_tabRestorer;
+	std::unique_ptr<TabRestorerUI>	m_tabRestorerUI;
 	TabsInitializedSignal	m_tabsInitializedSignal;
 
 	ToolbarContextMenuSignal	m_toolbarContextMenuSignal;

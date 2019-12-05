@@ -138,3 +138,8 @@ void Explorerplusplus::SetGoMenuName(HMENU hMenu, UINT uMenuID, UINT csidl)
 
 	DeleteMenu(hMenu, uMenuID, MF_BYCOMMAND);
 }
+
+boost::signals2::connection Explorerplusplus::AddMainMenuPreShowObserver(const MainMenuPreShowSignal::slot_type &observer)
+{
+	return m_mainMenuPreShowSignal.connect(observer);
+}

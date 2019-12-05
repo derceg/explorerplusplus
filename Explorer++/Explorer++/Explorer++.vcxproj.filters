@@ -364,6 +364,9 @@
     <ClCompile Include="TabRestorer.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
+    <ClCompile Include="TabRestorerUI.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -733,6 +736,9 @@
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="TabRestorer.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="TabRestorerUI.h">
       <Filter>Tabs</Filter>
     </ClInclude>
   </ItemGroup>

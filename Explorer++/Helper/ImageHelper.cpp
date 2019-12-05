@@ -6,6 +6,28 @@
 #include "ImageHelper.h"
 #include <wil/com.h>
 
+wil::unique_hbitmap ImageHelper::ImageListIconToBitmap(IImageList *imageList, int iconIndex)
+{
+	wil::unique_hicon icon;
+	HRESULT hr = imageList->GetIcon(iconIndex, ILD_NORMAL, &icon);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	int iconWidth;
+	int iconHeight;
+	hr = imageList->GetIconSize(&iconWidth, &iconHeight);
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
+
+	return wil::unique_hbitmap(IconToBitmapPARGB32(icon.get(), iconWidth, iconHeight));
+}
+
 void ImageHelper::InitBitmapInfo(__out_bcount(cbInfo) BITMAPINFO *pbmi, ULONG cbInfo, LONG cx, LONG cy, WORD bpp)
 {
 	ZeroMemory(pbmi, cbInfo);

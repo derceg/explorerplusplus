@@ -573,6 +573,7 @@
     <ClCompile Include="TabProperties.cpp" />
     <ClCompile Include="TabRemoved.cpp" />
     <ClCompile Include="TabRestorer.cpp" />
+    <ClCompile Include="TabRestorerUI.cpp" />
     <ClCompile Include="TabsApi.cpp" />
     <ClCompile Include="TabUpdated.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
@@ -698,6 +699,7 @@
     <ClInclude Include="TabProperties.h" />
     <ClInclude Include="TabRemoved.h" />
     <ClInclude Include="TabRestorer.h" />
+    <ClInclude Include="TabRestorerUI.h" />
     <ClInclude Include="TabsApi.h" />
     <ClInclude Include="TabUpdated.h" />
     <ClInclude Include="TaskbarThumbnails.h" />

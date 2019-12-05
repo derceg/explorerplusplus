@@ -17,6 +17,7 @@ public:
 
 	const std::vector<std::unique_ptr<PreservedTab>> &GetClosedTabs() const;
 	void RestoreLastTab();
+	void RestoreTabById(int id);
 
 private:
 

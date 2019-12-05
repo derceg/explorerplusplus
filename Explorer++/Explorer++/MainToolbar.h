@@ -91,7 +91,6 @@ private:
 	void OnTBGetInfoTip(LPARAM lParam);
 	LRESULT OnTbnDropDown(const NMTOOLBAR *nmtb);
 	void ShowHistoryMenu(HistoryType historyType, const POINT &pt);
-	wil::unique_hbitmap SystemImageIconToBitmap(int iconIndex);
 	void ShowToolbarViewsDropdown();
 	void CreateViewsMenu(POINT *ptOrigin);
 

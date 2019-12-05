@@ -86,7 +86,12 @@ LRESULT CALLBACK Explorerplusplus::WindowProcedure(HWND hwnd,UINT Msg,WPARAM wPa
 		break;
 
 	case WM_INITMENU:
-		SetProgramMenuItemStates((HMENU)wParam);
+		SetProgramMenuItemStates(reinterpret_cast<HMENU>(wParam));
+
+		if (reinterpret_cast<HMENU>(wParam) == GetMenu(m_hContainer))
+		{
+			m_mainMenuPreShowSignal(reinterpret_cast<HMENU>(wParam));
+		}
 		break;
 
 	case WM_MENUSELECT:
@@ -300,6 +305,12 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		LOWORD(wParam) <= MENU_BOOKMARK_ENDID)
 	{
 		/* TODO: [Bookmarks] Open bookmark. */
+	}
+	else if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_RECENT_TABS_STARTID &&
+		LOWORD(wParam) < MENU_RECENT_TABS_ENDID)
+	{
+		m_tabRestorerUI->OnMenuItemClicked(LOWORD(wParam));
+		return 0;
 	}
 	else if (HIWORD(wParam) == 0 && LOWORD(wParam) >= MENU_PLUGIN_STARTID &&
 		LOWORD(wParam) < MENU_PLUGIN_ENDID)

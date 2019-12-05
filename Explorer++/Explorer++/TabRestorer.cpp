@@ -35,3 +35,19 @@ void TabRestorer::RestoreLastTab()
 	m_tabContainer->CreateNewTab(*lastClosedTab);
 	m_closedTabs.erase(itr);
 }
+
+void TabRestorer::RestoreTabById(int id)
+{
+	auto itr = std::find_if(m_closedTabs.begin(), m_closedTabs.end(), [id] (const std::unique_ptr<PreservedTab> &preservedTab) {
+		return preservedTab->id == id;
+	});
+
+	if (itr == m_closedTabs.end())
+	{
+		return;
+	}
+
+	auto closedTab = itr->get();
+	m_tabContainer->CreateNewTab(*closedTab);
+	m_closedTabs.erase(itr);
+}
