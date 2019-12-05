@@ -1361,6 +1361,10 @@ LRESULT Explorerplusplus::HandleMenuOrAccelerator(HWND hwnd, WPARAM wParam)
 		OnSelectTabByIndex(-1);
 		break;
 
+	case IDA_RESTORE_LAST_TAB:
+		m_tabRestorer->RestoreLastTab();
+		break;
+
 	case ToolbarButton::Views:
 		OnToolbarViews();
 		break;

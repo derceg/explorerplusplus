@@ -41,6 +41,8 @@ void Explorerplusplus::InitializeTabs()
 	int tabWindowHeight = MulDiv(TAB_WINDOW_HEIGHT_96DPI, dpi, USER_DEFAULT_SCREEN_DPI);
 	SetWindowPos(m_tabContainer->GetHWND(), nullptr, 0, 0, 0, tabWindowHeight, SWP_NOMOVE | SWP_NOZORDER);
 
+	m_tabRestorer = std::make_unique<TabRestorer>(m_tabContainer);
+
 	m_tabsInitializedSignal();
 }
 

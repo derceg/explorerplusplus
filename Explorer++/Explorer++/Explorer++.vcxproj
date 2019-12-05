@@ -572,6 +572,7 @@
     <ClCompile Include="TabMoved.cpp" />
     <ClCompile Include="TabProperties.cpp" />
     <ClCompile Include="TabRemoved.cpp" />
+    <ClCompile Include="TabRestorer.cpp" />
     <ClCompile Include="TabsApi.cpp" />
     <ClCompile Include="TabUpdated.cpp" />
     <ClCompile Include="TaskbarThumbnails.cpp" />
@@ -661,6 +662,7 @@
     <ClInclude Include="PluginManager.h" />
     <ClInclude Include="PluginMenuManager.h" />
     <ClInclude Include="FileProgressSink.h" />
+    <ClInclude Include="PreservedTab.h" />
     <ClInclude Include="RegistrySettings.h" />
     <ClInclude Include="RenameTabDialog.h" />
     <ClInclude Include="resource.h" />
@@ -675,6 +677,7 @@
     <ClInclude Include="ShellBrowser\FolderSettings.h" />
     <ClInclude Include="ShellBrowser\HistoryEntry.h" />
     <ClInclude Include="ShellBrowser\PathManager.h" />
+    <ClInclude Include="ShellBrowser\PreservedHistoryEntry.h" />
     <ClInclude Include="ShellBrowser\ShellBrowser.h" />
     <ClInclude Include="ShellBrowser\ItemData.h" />
     <ClInclude Include="ShellBrowser\SortHelper.h" />
@@ -694,6 +697,7 @@
     <ClInclude Include="TabMoved.h" />
     <ClInclude Include="TabProperties.h" />
     <ClInclude Include="TabRemoved.h" />
+    <ClInclude Include="TabRestorer.h" />
     <ClInclude Include="TabsApi.h" />
     <ClInclude Include="TabUpdated.h" />
     <ClInclude Include="TaskbarThumbnails.h" />

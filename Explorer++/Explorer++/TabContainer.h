@@ -23,6 +23,7 @@
 class CachedIcons;
 struct Config;
 class Navigation;
+struct PreservedTab;
 
 class TabContainer : public CBaseWindow
 {
@@ -35,6 +36,7 @@ public:
 	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none,
 		int *newTabId = nullptr);
+	HRESULT CreateNewTab(const PreservedTab &preservedTab, int *newTabId = nullptr);
 	HRESULT CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none,
 		int *newTabId = nullptr);
@@ -68,6 +70,7 @@ public:
 	SignalWrapper<TabContainer, void(const Tab &tab, Tab::PropertyType propertyType)> tabUpdatedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab, int fromIndex, int toIndex)> tabMovedSignal;
 	SignalWrapper<TabContainer, void(const Tab &tab)> tabSelectedSignal;
+	SignalWrapper<TabContainer, void(const Tab &tab)> tabPreRemovalSignal;
 	SignalWrapper<TabContainer, void(int tabId)> tabRemovedSignal;
 
 private:

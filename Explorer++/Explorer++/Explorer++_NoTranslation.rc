@@ -62,7 +62,6 @@ BEGIN
     "D",            IDA_ADDRESSBAR,         VIRTKEY, ALT, NOINVERT
     "L",            IDA_ADDRESSBAR,         VIRTKEY, CONTROL, NOINVERT
     VK_F4,          IDA_COMBODROPDOWN,      VIRTKEY, NOINVERT
-    VK_F2,          IDM_FILE_RENAME,        VIRTKEY, NOINVERT
     VK_HOME,        IDA_HOME,               VIRTKEY, ALT, NOINVERT
     "9",            IDA_LASTTAB,            VIRTKEY, CONTROL, NOINVERT
     VK_NEXT,        IDA_NEXTTAB,            VIRTKEY, CONTROL, NOINVERT
@@ -102,6 +101,7 @@ BEGIN
     VK_DELETE,      IDM_FILE_DELETEPERMANENTLY, VIRTKEY, SHIFT, NOINVERT
     "T",            IDM_FILE_NEWTAB,        VIRTKEY, CONTROL, NOINVERT
     VK_RETURN,      IDM_FILE_PROPERTIES,    VIRTKEY, ALT, NOINVERT
+    VK_F2,          IDM_FILE_RENAME,        VIRTKEY, NOINVERT
     "G",            IDM_FILTER_APPLYFILTER, VIRTKEY, CONTROL, NOINVERT
     "F",            IDM_FILTER_FILTERRESULTS, VIRTKEY, SHIFT, CONTROL, NOINVERT
     VK_LEFT,        IDM_GO_BACK,            VIRTKEY, ALT, NOINVERT
@@ -113,6 +113,7 @@ BEGIN
     "R",            IDM_VIEW_REFRESH,       VIRTKEY, CONTROL, NOINVERT
     VK_F5,          IDM_VIEW_REFRESH,       VIRTKEY, NOINVERT
     "H",            IDM_VIEW_SHOWHIDDENFILES, VIRTKEY, CONTROL, NOINVERT
+    "T",            IDA_RESTORE_LAST_TAB,   VIRTKEY, SHIFT, CONTROL, NOINVERT
 END
 
 
@@ -284,13 +285,13 @@ IDB_NEW_TAB_32          PNG                     "res\\icons\\color\\32x32\\new-t
 
 IDB_NEW_TAB_48          PNG                     "res\\icons\\color\\48x48\\new-tab.png"
 
-IDB_DELETE_PERMANENTLY_16 PNG                   "res\\icons\\color\\16x16\\delete-permanently.png"
+IDB_DELETE_PERMANENTLY_16 PNG                     "res\\icons\\color\\16x16\\delete-permanently.png"
 
-IDB_DELETE_PERMANENTLY_24 PNG                   "res\\icons\\color\\24x24\\delete-permanently.png"
+IDB_DELETE_PERMANENTLY_24 PNG                     "res\\icons\\color\\24x24\\delete-permanently.png"
 
-IDB_DELETE_PERMANENTLY_32 PNG                   "res\\icons\\color\\32x32\\delete-permanently.png"
+IDB_DELETE_PERMANENTLY_32 PNG                     "res\\icons\\color\\32x32\\delete-permanently.png"
 
-IDB_DELETE_PERMANENTLY_48 PNG                   "res\\icons\\color\\48x48\\delete-permanently.png"
+IDB_DELETE_PERMANENTLY_48 PNG                     "res\\icons\\color\\48x48\\delete-permanently.png"
 
 IDB_FILTER_16           PNG                     "res\\icons\\color\\16x16\\filter.png"
 
@@ -348,13 +349,13 @@ IDB_LOCK_32             PNG                     "res\\icons\\color\\32x32\\lock.
 
 IDB_LOCK_48             PNG                     "res\\icons\\color\\48x48\\lock.png"
 
-IDB_COMMAND_LINE_ADMIN_16 PNG                   "res\\icons\\color\\16x16\\command-line-admin.png"
+IDB_COMMAND_LINE_ADMIN_16 PNG                     "res\\icons\\color\\16x16\\command-line-admin.png"
 
-IDB_COMMAND_LINE_ADMIN_24 PNG                   "res\\icons\\color\\24x24\\command-line-admin.png"
+IDB_COMMAND_LINE_ADMIN_24 PNG                     "res\\icons\\color\\24x24\\command-line-admin.png"
 
-IDB_COMMAND_LINE_ADMIN_32 PNG                   "res\\icons\\color\\32x32\\command-line-admin.png"
+IDB_COMMAND_LINE_ADMIN_32 PNG                     "res\\icons\\color\\32x32\\command-line-admin.png"
 
-IDB_COMMAND_LINE_ADMIN_48 PNG                   "res\\icons\\color\\48x48\\command-line-admin.png"
+IDB_COMMAND_LINE_ADMIN_48 PNG                     "res\\icons\\color\\48x48\\command-line-admin.png"
 
 IDB_PASTE_SHORTCUT_16   PNG                     "res\\icons\\color\\16x16\\paste-shortcut.png"
 
@@ -436,195 +437,195 @@ IDB_MERGE_FILES_48      PNG                     "res\\icons\\color\\48x48\\merge
 
 IDB_SELECT_COLUMNS_16   PNG                     "res\\icons\\color\\16x16\\select-columns.png"
 
-IDB_SELECT_COLUMNS_24   PNG                    "res\\icons\\color\\24x24\\select-columns.png"
+IDB_SELECT_COLUMNS_24   PNG                     "res\\icons\\color\\24x24\\select-columns.png"
 
-IDB_SELECT_COLUMNS_32   PNG                    "res\\icons\\color\\32x32\\select-columns.png"
+IDB_SELECT_COLUMNS_32   PNG                     "res\\icons\\color\\32x32\\select-columns.png"
 
-IDB_SELECT_COLUMNS_48   PNG                    "res\\icons\\color\\48x48\\select-columns.png"
+IDB_SELECT_COLUMNS_48   PNG                     "res\\icons\\color\\48x48\\select-columns.png"
 
-IDB_CLOSE_BUTTON_16     PNG                    "res\\icons\\color\\16x16\\close-button.png"
+IDB_CLOSE_BUTTON_16     PNG                     "res\\icons\\color\\16x16\\close-button.png"
 
-IDB_CLOSE_BUTTON_24     PNG                    "res\\icons\\color\\24x24\\close-button.png"
+IDB_CLOSE_BUTTON_24     PNG                     "res\\icons\\color\\24x24\\close-button.png"
 
-IDB_CLOSE_BUTTON_32     PNG                    "res\\icons\\color\\32x32\\close-button.png"
+IDB_CLOSE_BUTTON_32     PNG                     "res\\icons\\color\\32x32\\close-button.png"
 
-IDB_CLOSE_BUTTON_48     PNG                    "res\\icons\\color\\48x48\\close-button.png"
+IDB_CLOSE_BUTTON_48     PNG                     "res\\icons\\color\\48x48\\close-button.png"
 
-IDB_CUT_WINDOWS_10_16              PNG                     "res\\icons\\windows-10\\16x16\\cut.png"
+IDB_CUT_WINDOWS_10_16   PNG                     "res\\icons\\windows-10\\16x16\\cut.png"
 
-IDB_CUT_WINDOWS_10_24              PNG                     "res\\icons\\windows-10\\24x24\\cut.png"
+IDB_CUT_WINDOWS_10_24   PNG                     "res\\icons\\windows-10\\24x24\\cut.png"
 
-IDB_CUT_WINDOWS_10_32              PNG                     "res\\icons\\windows-10\\32x32\\cut.png"
+IDB_CUT_WINDOWS_10_32   PNG                     "res\\icons\\windows-10\\32x32\\cut.png"
 
-IDB_CUT_WINDOWS_10_48              PNG                     "res\\icons\\windows-10\\48x48\\cut.png"
+IDB_CUT_WINDOWS_10_48   PNG                     "res\\icons\\windows-10\\48x48\\cut.png"
 
-IDB_BACK_WINDOWS_10_16             PNG                     "res\\icons\\windows-10\\16x16\\back.png"
+IDB_BACK_WINDOWS_10_16  PNG                     "res\\icons\\windows-10\\16x16\\back.png"
 
-IDB_BACK_WINDOWS_10_24             PNG                     "res\\icons\\windows-10\\24x24\\back.png"
+IDB_BACK_WINDOWS_10_24  PNG                     "res\\icons\\windows-10\\24x24\\back.png"
 
-IDB_BACK_WINDOWS_10_32             PNG                     "res\\icons\\windows-10\\32x32\\back.png"
+IDB_BACK_WINDOWS_10_32  PNG                     "res\\icons\\windows-10\\32x32\\back.png"
 
-IDB_BACK_WINDOWS_10_48             PNG                     "res\\icons\\windows-10\\48x48\\back.png"
+IDB_BACK_WINDOWS_10_48  PNG                     "res\\icons\\windows-10\\48x48\\back.png"
 
-IDB_FORWARD_WINDOWS_10_16          PNG                     "res\\icons\\windows-10\\16x16\\forward.png"
+IDB_FORWARD_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\forward.png"
 
-IDB_FORWARD_WINDOWS_10_24          PNG                     "res\\icons\\windows-10\\24x24\\forward.png"
+IDB_FORWARD_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\forward.png"
 
-IDB_FORWARD_WINDOWS_10_32          PNG                     "res\\icons\\windows-10\\32x32\\forward.png"
+IDB_FORWARD_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\forward.png"
 
-IDB_FORWARD_WINDOWS_10_48          PNG                     "res\\icons\\windows-10\\48x48\\forward.png"
+IDB_FORWARD_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\forward.png"
 
-IDB_COPY_WINDOWS_10_16             PNG                     "res\\icons\\windows-10\\16x16\\copy.png"
+IDB_COPY_WINDOWS_10_16  PNG                     "res\\icons\\windows-10\\16x16\\copy.png"
 
-IDB_COPY_WINDOWS_10_24             PNG                     "res\\icons\\windows-10\\24x24\\copy.png"
+IDB_COPY_WINDOWS_10_24  PNG                     "res\\icons\\windows-10\\24x24\\copy.png"
 
-IDB_COPY_WINDOWS_10_32             PNG                     "res\\icons\\windows-10\\32x32\\copy.png"
+IDB_COPY_WINDOWS_10_32  PNG                     "res\\icons\\windows-10\\32x32\\copy.png"
 
-IDB_COPY_WINDOWS_10_48             PNG                     "res\\icons\\windows-10\\48x48\\copy.png"
+IDB_COPY_WINDOWS_10_48  PNG                     "res\\icons\\windows-10\\48x48\\copy.png"
 
-IDB_PASTE_WINDOWS_10_16            PNG                     "res\\icons\\windows-10\\16x16\\paste.png"
+IDB_PASTE_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\paste.png"
 
-IDB_PASTE_WINDOWS_10_24            PNG                     "res\\icons\\windows-10\\24x24\\paste.png"
+IDB_PASTE_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\paste.png"
 
-IDB_PASTE_WINDOWS_10_32            PNG                     "res\\icons\\windows-10\\32x32\\paste.png"
+IDB_PASTE_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\paste.png"
 
-IDB_PASTE_WINDOWS_10_48            PNG                     "res\\icons\\windows-10\\48x48\\paste.png"
+IDB_PASTE_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\paste.png"
 
-IDB_DELETE_WINDOWS_10_16           PNG                     "res\\icons\\windows-10\\16x16\\delete.png"
+IDB_DELETE_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\delete.png"
 
-IDB_DELETE_WINDOWS_10_24           PNG                     "res\\icons\\windows-10\\24x24\\delete.png"
+IDB_DELETE_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\delete.png"
 
-IDB_DELETE_WINDOWS_10_32           PNG                     "res\\icons\\windows-10\\32x32\\delete.png"
+IDB_DELETE_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\delete.png"
 
-IDB_DELETE_WINDOWS_10_48           PNG                     "res\\icons\\windows-10\\48x48\\delete.png"
+IDB_DELETE_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\delete.png"
 
-IDB_PROPERTIES_WINDOWS_10_16       PNG                     "res\\icons\\windows-10\\16x16\\properties.png"
+IDB_PROPERTIES_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\properties.png"
 
-IDB_PROPERTIES_WINDOWS_10_24       PNG                     "res\\icons\\windows-10\\24x24\\properties.png"
+IDB_PROPERTIES_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\properties.png"
 
-IDB_PROPERTIES_WINDOWS_10_32       PNG                     "res\\icons\\windows-10\\32x32\\properties.png"
+IDB_PROPERTIES_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\properties.png"
 
-IDB_PROPERTIES_WINDOWS_10_48       PNG                     "res\\icons\\windows-10\\48x48\\properties.png"
+IDB_PROPERTIES_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\properties.png"
 
-IDB_REFRESH_WINDOWS_10_16          PNG                     "res\\icons\\windows-10\\16x16\\refresh.png"
+IDB_REFRESH_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\refresh.png"
 
-IDB_REFRESH_WINDOWS_10_24          PNG                     "res\\icons\\windows-10\\24x24\\refresh.png"
+IDB_REFRESH_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\refresh.png"
 
-IDB_REFRESH_WINDOWS_10_32          PNG                     "res\\icons\\windows-10\\32x32\\refresh.png"
+IDB_REFRESH_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\refresh.png"
 
-IDB_REFRESH_WINDOWS_10_48          PNG                     "res\\icons\\windows-10\\48x48\\refresh.png"
+IDB_REFRESH_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\refresh.png"
 
-IDB_NEW_FOLDER_WINDOWS_10_16       PNG                     "res\\icons\\windows-10\\16x16\\new-folder.png"
+IDB_NEW_FOLDER_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\new-folder.png"
 
-IDB_NEW_FOLDER_WINDOWS_10_24       PNG                     "res\\icons\\windows-10\\24x24\\new-folder.png"
+IDB_NEW_FOLDER_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\new-folder.png"
 
-IDB_NEW_FOLDER_WINDOWS_10_32       PNG                     "res\\icons\\windows-10\\32x32\\new-folder.png"
+IDB_NEW_FOLDER_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\new-folder.png"
 
-IDB_NEW_FOLDER_WINDOWS_10_48       PNG                     "res\\icons\\windows-10\\48x48\\new-folder.png"
+IDB_NEW_FOLDER_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\new-folder.png"
 
-IDB_UP_WINDOWS_10_16               PNG                     "res\\icons\\windows-10\\16x16\\up.png"
+IDB_UP_WINDOWS_10_16    PNG                     "res\\icons\\windows-10\\16x16\\up.png"
 
-IDB_UP_WINDOWS_10_24               PNG                     "res\\icons\\windows-10\\24x24\\up.png"
+IDB_UP_WINDOWS_10_24    PNG                     "res\\icons\\windows-10\\24x24\\up.png"
 
-IDB_UP_WINDOWS_10_32               PNG                     "res\\icons\\windows-10\\32x32\\up.png"
+IDB_UP_WINDOWS_10_32    PNG                     "res\\icons\\windows-10\\32x32\\up.png"
 
-IDB_UP_WINDOWS_10_48               PNG                     "res\\icons\\windows-10\\48x48\\up.png"
+IDB_UP_WINDOWS_10_48    PNG                     "res\\icons\\windows-10\\48x48\\up.png"
 
-IDB_VIEWS_WINDOWS_10_16            PNG                     "res\\icons\\windows-10\\16x16\\views.png"
+IDB_VIEWS_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\views.png"
 
-IDB_VIEWS_WINDOWS_10_24            PNG                     "res\\icons\\windows-10\\24x24\\views.png"
+IDB_VIEWS_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\views.png"
 
-IDB_VIEWS_WINDOWS_10_32            PNG                     "res\\icons\\windows-10\\32x32\\views.png"
+IDB_VIEWS_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\views.png"
 
-IDB_VIEWS_WINDOWS_10_48            PNG                     "res\\icons\\windows-10\\48x48\\views.png"
+IDB_VIEWS_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\views.png"
 
-IDB_BOOKMARKS_WINDOWS_10_16        PNG                     "res\\icons\\windows-10\\16x16\\bookmarks.png"
+IDB_BOOKMARKS_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\bookmarks.png"
 
-IDB_BOOKMARKS_WINDOWS_10_24        PNG                     "res\\icons\\windows-10\\24x24\\bookmarks.png"
+IDB_BOOKMARKS_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\bookmarks.png"
 
-IDB_BOOKMARKS_WINDOWS_10_32        PNG                     "res\\icons\\windows-10\\32x32\\bookmarks.png"
+IDB_BOOKMARKS_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\bookmarks.png"
 
-IDB_BOOKMARKS_WINDOWS_10_48        PNG                     "res\\icons\\windows-10\\48x48\\bookmarks.png"
+IDB_BOOKMARKS_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\bookmarks.png"
 
-IDB_ADD_BOOKMARK_WINDOWS_10_16     PNG                     "res\\icons\\windows-10\\16x16\\add-bookmark.png"
+IDB_ADD_BOOKMARK_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\add-bookmark.png"
 
-IDB_ADD_BOOKMARK_WINDOWS_10_24     PNG                     "res\\icons\\windows-10\\24x24\\add-bookmark.png"
+IDB_ADD_BOOKMARK_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\add-bookmark.png"
 
-IDB_ADD_BOOKMARK_WINDOWS_10_32     PNG                     "res\\icons\\windows-10\\32x32\\add-bookmark.png"
+IDB_ADD_BOOKMARK_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\add-bookmark.png"
 
-IDB_ADD_BOOKMARK_WINDOWS_10_48     PNG                     "res\\icons\\windows-10\\48x48\\add-bookmark.png"
+IDB_ADD_BOOKMARK_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\add-bookmark.png"
 
-IDB_COMMAND_LINE_WINDOWS_10_16     PNG                     "res\\icons\\windows-10\\16x16\\command-line.png"
+IDB_COMMAND_LINE_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\command-line.png"
 
-IDB_COMMAND_LINE_WINDOWS_10_24     PNG                     "res\\icons\\windows-10\\24x24\\command-line.png"
+IDB_COMMAND_LINE_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\command-line.png"
 
-IDB_COMMAND_LINE_WINDOWS_10_32     PNG                     "res\\icons\\windows-10\\32x32\\command-line.png"
+IDB_COMMAND_LINE_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\command-line.png"
 
-IDB_COMMAND_LINE_WINDOWS_10_48     PNG                     "res\\icons\\windows-10\\48x48\\command-line.png"
+IDB_COMMAND_LINE_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\command-line.png"
 
-IDB_SEARCH_WINDOWS_10_16           PNG                     "res\\icons\\windows-10\\16x16\\search.png"
+IDB_SEARCH_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\search.png"
 
-IDB_SEARCH_WINDOWS_10_24           PNG                     "res\\icons\\windows-10\\24x24\\search.png"
+IDB_SEARCH_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\search.png"
 
-IDB_SEARCH_WINDOWS_10_32           PNG                     "res\\icons\\windows-10\\32x32\\search.png"
+IDB_SEARCH_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\search.png"
 
-IDB_SEARCH_WINDOWS_10_48           PNG                     "res\\icons\\windows-10\\48x48\\search.png"
+IDB_SEARCH_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\search.png"
 
-IDB_NEW_TAB_WINDOWS_10_16          PNG                     "res\\icons\\windows-10\\16x16\\new-tab.png"
+IDB_NEW_TAB_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\new-tab.png"
 
-IDB_NEW_TAB_WINDOWS_10_24          PNG                     "res\\icons\\windows-10\\24x24\\new-tab.png"
+IDB_NEW_TAB_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\new-tab.png"
 
-IDB_NEW_TAB_WINDOWS_10_32          PNG                     "res\\icons\\windows-10\\32x32\\new-tab.png"
+IDB_NEW_TAB_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\new-tab.png"
 
-IDB_NEW_TAB_WINDOWS_10_48          PNG                     "res\\icons\\windows-10\\48x48\\new-tab.png"
+IDB_NEW_TAB_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\new-tab.png"
 
-IDB_DELETE_PERMANENTLY_WINDOWS_10_16 PNG                   "res\\icons\\windows-10\\16x16\\delete-permanently.png"
+IDB_DELETE_PERMANENTLY_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\delete-permanently.png"
 
-IDB_DELETE_PERMANENTLY_WINDOWS_10_24 PNG                   "res\\icons\\windows-10\\24x24\\delete-permanently.png"
+IDB_DELETE_PERMANENTLY_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\delete-permanently.png"
 
-IDB_DELETE_PERMANENTLY_WINDOWS_10_32 PNG                   "res\\icons\\windows-10\\32x32\\delete-permanently.png"
+IDB_DELETE_PERMANENTLY_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\delete-permanently.png"
 
-IDB_DELETE_PERMANENTLY_WINDOWS_10_48 PNG                   "res\\icons\\windows-10\\48x48\\delete-permanently.png"
+IDB_DELETE_PERMANENTLY_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\delete-permanently.png"
 
-IDB_FILTER_WINDOWS_10_16           PNG                     "res\\icons\\windows-10\\16x16\\filter.png"
+IDB_FILTER_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\filter.png"
 
-IDB_FILTER_WINDOWS_10_24           PNG                     "res\\icons\\windows-10\\24x24\\filter.png"
+IDB_FILTER_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\filter.png"
 
-IDB_FILTER_WINDOWS_10_32           PNG                     "res\\icons\\windows-10\\32x32\\filter.png"
+IDB_FILTER_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\filter.png"
 
-IDB_FILTER_WINDOWS_10_48           PNG                     "res\\icons\\windows-10\\48x48\\filter.png"
+IDB_FILTER_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\filter.png"
 
-IDB_HELP_WINDOWS_10_16             PNG                     "res\\icons\\windows-10\\16x16\\help.png"
+IDB_HELP_WINDOWS_10_16  PNG                     "res\\icons\\windows-10\\16x16\\help.png"
 
-IDB_HELP_WINDOWS_10_24             PNG                     "res\\icons\\windows-10\\24x24\\help.png"
+IDB_HELP_WINDOWS_10_24  PNG                     "res\\icons\\windows-10\\24x24\\help.png"
 
-IDB_HELP_WINDOWS_10_32             PNG                     "res\\icons\\windows-10\\32x32\\help.png"
+IDB_HELP_WINDOWS_10_32  PNG                     "res\\icons\\windows-10\\32x32\\help.png"
 
-IDB_HELP_WINDOWS_10_48             PNG                     "res\\icons\\windows-10\\48x48\\help.png"
+IDB_HELP_WINDOWS_10_48  PNG                     "res\\icons\\windows-10\\48x48\\help.png"
 
-IDB_RENAME_WINDOWS_10_16           PNG                     "res\\icons\\windows-10\\16x16\\rename.png"
+IDB_RENAME_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\rename.png"
 
-IDB_RENAME_WINDOWS_10_24           PNG                     "res\\icons\\windows-10\\24x24\\rename.png"
+IDB_RENAME_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\rename.png"
 
-IDB_RENAME_WINDOWS_10_32           PNG                     "res\\icons\\windows-10\\32x32\\rename.png"
+IDB_RENAME_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\rename.png"
 
-IDB_RENAME_WINDOWS_10_48           PNG                     "res\\icons\\windows-10\\48x48\\rename.png"
+IDB_RENAME_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\rename.png"
 
-IDB_OPTIONS_WINDOWS_10_16          PNG                     "res\\icons\\windows-10\\16x16\\options.png"
+IDB_OPTIONS_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\options.png"
 
-IDB_OPTIONS_WINDOWS_10_24          PNG                     "res\\icons\\windows-10\\24x24\\options.png"
+IDB_OPTIONS_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\options.png"
 
-IDB_OPTIONS_WINDOWS_10_32          PNG                     "res\\icons\\windows-10\\32x32\\options.png"
+IDB_OPTIONS_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\options.png"
 
-IDB_OPTIONS_WINDOWS_10_48          PNG                     "res\\icons\\windows-10\\48x48\\options.png"
+IDB_OPTIONS_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\options.png"
 
-IDB_UNDO_WINDOWS_10_16             PNG                     "res\\icons\\windows-10\\16x16\\undo.png"
+IDB_UNDO_WINDOWS_10_16  PNG                     "res\\icons\\windows-10\\16x16\\undo.png"
 
-IDB_UNDO_WINDOWS_10_24             PNG                     "res\\icons\\windows-10\\24x24\\undo.png"
+IDB_UNDO_WINDOWS_10_24  PNG                     "res\\icons\\windows-10\\24x24\\undo.png"
 
-IDB_UNDO_WINDOWS_10_32             PNG                     "res\\icons\\windows-10\\32x32\\undo.png"
+IDB_UNDO_WINDOWS_10_32  PNG                     "res\\icons\\windows-10\\32x32\\undo.png"
 
-IDB_UNDO_WINDOWS_10_48             PNG                     "res\\icons\\windows-10\\48x48\\undo.png"
+IDB_UNDO_WINDOWS_10_48  PNG                     "res\\icons\\windows-10\\48x48\\undo.png"
 
 IDB_CUSTOMIZE_COLORS_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\customize-colors.png"
 
@@ -634,115 +635,115 @@ IDB_CUSTOMIZE_COLORS_WINDOWS_10_32 PNG                     "res\\icons\\windows-
 
 IDB_CUSTOMIZE_COLORS_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\customize-colors.png"
 
-IDB_LOCK_WINDOWS_10_16             PNG                     "res\\icons\\windows-10\\16x16\\lock.png"
+IDB_LOCK_WINDOWS_10_16  PNG                     "res\\icons\\windows-10\\16x16\\lock.png"
 
-IDB_LOCK_WINDOWS_10_24             PNG                     "res\\icons\\windows-10\\24x24\\lock.png"
+IDB_LOCK_WINDOWS_10_24  PNG                     "res\\icons\\windows-10\\24x24\\lock.png"
 
-IDB_LOCK_WINDOWS_10_32             PNG                     "res\\icons\\windows-10\\32x32\\lock.png"
+IDB_LOCK_WINDOWS_10_32  PNG                     "res\\icons\\windows-10\\32x32\\lock.png"
 
-IDB_LOCK_WINDOWS_10_48             PNG                     "res\\icons\\windows-10\\48x48\\lock.png"
+IDB_LOCK_WINDOWS_10_48  PNG                     "res\\icons\\windows-10\\48x48\\lock.png"
 
-IDB_COMMAND_LINE_ADMIN_WINDOWS_10_16 PNG                   "res\\icons\\windows-10\\16x16\\command-line-admin.png"
+IDB_COMMAND_LINE_ADMIN_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\command-line-admin.png"
 
-IDB_COMMAND_LINE_ADMIN_WINDOWS_10_24 PNG                   "res\\icons\\windows-10\\24x24\\command-line-admin.png"
+IDB_COMMAND_LINE_ADMIN_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\command-line-admin.png"
 
-IDB_COMMAND_LINE_ADMIN_WINDOWS_10_32 PNG                   "res\\icons\\windows-10\\32x32\\command-line-admin.png"
+IDB_COMMAND_LINE_ADMIN_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\command-line-admin.png"
 
-IDB_COMMAND_LINE_ADMIN_WINDOWS_10_48 PNG                   "res\\icons\\windows-10\\48x48\\command-line-admin.png"
+IDB_COMMAND_LINE_ADMIN_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\command-line-admin.png"
 
-IDB_PASTE_SHORTCUT_WINDOWS_10_16   PNG                     "res\\icons\\windows-10\\16x16\\paste-shortcut.png"
+IDB_PASTE_SHORTCUT_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\paste-shortcut.png"
 
-IDB_PASTE_SHORTCUT_WINDOWS_10_24   PNG                     "res\\icons\\windows-10\\24x24\\paste-shortcut.png"
+IDB_PASTE_SHORTCUT_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\paste-shortcut.png"
 
-IDB_PASTE_SHORTCUT_WINDOWS_10_32   PNG                     "res\\icons\\windows-10\\32x32\\paste-shortcut.png"
+IDB_PASTE_SHORTCUT_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\paste-shortcut.png"
 
-IDB_PASTE_SHORTCUT_WINDOWS_10_48   PNG                     "res\\icons\\windows-10\\48x48\\paste-shortcut.png"
+IDB_PASTE_SHORTCUT_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\paste-shortcut.png"
 
-IDB_FOLDER_WINDOWS_10_16           PNG                     "res\\icons\\windows-10\\16x16\\folder.png"
+IDB_FOLDER_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\folder.png"
 
-IDB_FOLDER_WINDOWS_10_24           PNG                     "res\\icons\\windows-10\\24x24\\folder.png"
+IDB_FOLDER_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\folder.png"
 
-IDB_FOLDER_WINDOWS_10_32           PNG                     "res\\icons\\windows-10\\32x32\\folder.png"
+IDB_FOLDER_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\folder.png"
 
-IDB_FOLDER_WINDOWS_10_48           PNG                     "res\\icons\\windows-10\\48x48\\folder.png"
+IDB_FOLDER_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\folder.png"
 
-IDB_ARROW_RIGHT_WINDOWS_10_16      PNG                     "res\\icons\\windows-10\\16x16\\arrow-right.png"
+IDB_ARROW_RIGHT_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\arrow-right.png"
 
-IDB_ARROW_RIGHT_WINDOWS_10_24      PNG                     "res\\icons\\windows-10\\24x24\\arrow-right.png"
+IDB_ARROW_RIGHT_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\arrow-right.png"
 
-IDB_ARROW_RIGHT_WINDOWS_10_32      PNG                     "res\\icons\\windows-10\\32x32\\arrow-right.png"
+IDB_ARROW_RIGHT_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\arrow-right.png"
 
-IDB_ARROW_RIGHT_WINDOWS_10_48      PNG                     "res\\icons\\windows-10\\48x48\\arrow-right.png"
+IDB_ARROW_RIGHT_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\arrow-right.png"
 
-IDB_COPY_TO_WINDOWS_10_16          PNG                     "res\\icons\\windows-10\\16x16\\copy-to.png"
+IDB_COPY_TO_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\copy-to.png"
 
-IDB_COPY_TO_WINDOWS_10_24          PNG                     "res\\icons\\windows-10\\24x24\\copy-to.png"
+IDB_COPY_TO_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\copy-to.png"
 
-IDB_COPY_TO_WINDOWS_10_32          PNG                     "res\\icons\\windows-10\\32x32\\copy-to.png"
+IDB_COPY_TO_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\copy-to.png"
 
-IDB_COPY_TO_WINDOWS_10_48          PNG                     "res\\icons\\windows-10\\48x48\\copy-to.png"
+IDB_COPY_TO_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\copy-to.png"
 
-IDB_MOVE_TO_WINDOWS_10_16          PNG                     "res\\icons\\windows-10\\16x16\\move-to.png"
+IDB_MOVE_TO_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\move-to.png"
 
-IDB_MOVE_TO_WINDOWS_10_24          PNG                     "res\\icons\\windows-10\\24x24\\move-to.png"
+IDB_MOVE_TO_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\move-to.png"
 
-IDB_MOVE_TO_WINDOWS_10_32          PNG                     "res\\icons\\windows-10\\32x32\\move-to.png"
+IDB_MOVE_TO_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\move-to.png"
 
-IDB_MASS_RENAME_WINDOWS_10_16      PNG                     "res\\icons\\windows-10\\16x16\\mass-rename.png"
+IDB_MASS_RENAME_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\mass-rename.png"
 
-IDB_MASS_RENAME_WINDOWS_10_24      PNG                     "res\\icons\\windows-10\\24x24\\mass-rename.png"
+IDB_MASS_RENAME_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\mass-rename.png"
 
-IDB_MASS_RENAME_WINDOWS_10_32      PNG                     "res\\icons\\windows-10\\32x32\\mass-rename.png"
+IDB_MASS_RENAME_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\mass-rename.png"
 
-IDB_MASS_RENAME_WINDOWS_10_48      PNG                     "res\\icons\\windows-10\\48x48\\mass-rename.png"
+IDB_MASS_RENAME_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\mass-rename.png"
 
-IDB_FOLDER_TREE_WINDOWS_10_16      PNG                     "res\\icons\\windows-10\\16x16\\folder-tree.png"
+IDB_FOLDER_TREE_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\folder-tree.png"
 
-IDB_FOLDER_TREE_WINDOWS_10_24      PNG                     "res\\icons\\windows-10\\24x24\\folder-tree.png"
+IDB_FOLDER_TREE_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\folder-tree.png"
 
-IDB_FOLDER_TREE_WINDOWS_10_32      PNG                     "res\\icons\\windows-10\\32x32\\folder-tree.png"
+IDB_FOLDER_TREE_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\folder-tree.png"
 
-IDB_FOLDER_TREE_WINDOWS_10_48      PNG                     "res\\icons\\windows-10\\48x48\\folder-tree.png"
+IDB_FOLDER_TREE_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\folder-tree.png"
 
-IDB_CLOSE_TAB_WINDOWS_10_16        PNG                     "res\\icons\\windows-10\\16x16\\close-tab.png"
+IDB_CLOSE_TAB_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\close-tab.png"
 
-IDB_CLOSE_TAB_WINDOWS_10_24        PNG                     "res\\icons\\windows-10\\24x24\\close-tab.png"
+IDB_CLOSE_TAB_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\close-tab.png"
 
-IDB_CLOSE_TAB_WINDOWS_10_32        PNG                     "res\\icons\\windows-10\\32x32\\close-tab.png"
+IDB_CLOSE_TAB_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\close-tab.png"
 
-IDB_CLOSE_TAB_WINDOWS_10_48        PNG                     "res\\icons\\windows-10\\48x48\\close-tab.png"
+IDB_CLOSE_TAB_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\close-tab.png"
 
-IDB_SPLIT_FILES_WINDOWS_10_16      PNG                     "res\\icons\\windows-10\\16x16\\split-files.png"
+IDB_SPLIT_FILES_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\split-files.png"
 
-IDB_SPLIT_FILES_WINDOWS_10_24      PNG                     "res\\icons\\windows-10\\24x24\\split-files.png"
+IDB_SPLIT_FILES_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\split-files.png"
 
-IDB_SPLIT_FILES_WINDOWS_10_32      PNG                     "res\\icons\\windows-10\\32x32\\split-files.png"
+IDB_SPLIT_FILES_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\split-files.png"
 
-IDB_SPLIT_FILES_WINDOWS_10_48      PNG                     "res\\icons\\windows-10\\48x48\\split-files.png"
+IDB_SPLIT_FILES_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\split-files.png"
 
-IDB_MERGE_FILES_WINDOWS_10_16      PNG                     "res\\icons\\windows-10\\16x16\\merge-files.png"
+IDB_MERGE_FILES_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\merge-files.png"
 
-IDB_MERGE_FILES_WINDOWS_10_24      PNG                     "res\\icons\\windows-10\\24x24\\merge-files.png"
+IDB_MERGE_FILES_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\merge-files.png"
 
-IDB_MERGE_FILES_WINDOWS_10_32      PNG                     "res\\icons\\windows-10\\32x32\\merge-files.png"
+IDB_MERGE_FILES_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\merge-files.png"
 
-IDB_MERGE_FILES_WINDOWS_10_48      PNG                     "res\\icons\\windows-10\\48x48\\merge-files.png"
+IDB_MERGE_FILES_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\merge-files.png"
 
-IDB_SELECT_COLUMNS_WINDOWS_10_16   PNG                     "res\\icons\\windows-10\\16x16\\select-columns.png"
+IDB_SELECT_COLUMNS_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\select-columns.png"
 
-IDB_SELECT_COLUMNS_WINDOWS_10_24   PNG                    "res\\icons\\windows-10\\24x24\\select-columns.png"
+IDB_SELECT_COLUMNS_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\select-columns.png"
 
-IDB_SELECT_COLUMNS_WINDOWS_10_32   PNG                    "res\\icons\\windows-10\\32x32\\select-columns.png"
+IDB_SELECT_COLUMNS_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\select-columns.png"
 
-IDB_SELECT_COLUMNS_WINDOWS_10_48   PNG                    "res\\icons\\windows-10\\48x48\\select-columns.png"
+IDB_SELECT_COLUMNS_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\select-columns.png"
 
-IDB_CLOSE_BUTTON_WINDOWS_10_16     PNG                    "res\\icons\\windows-10\\16x16\\close-button.png"
+IDB_CLOSE_BUTTON_WINDOWS_10_16 PNG                     "res\\icons\\windows-10\\16x16\\close-button.png"
 
-IDB_CLOSE_BUTTON_WINDOWS_10_24     PNG                    "res\\icons\\windows-10\\24x24\\close-button.png"
+IDB_CLOSE_BUTTON_WINDOWS_10_24 PNG                     "res\\icons\\windows-10\\24x24\\close-button.png"
 
-IDB_CLOSE_BUTTON_WINDOWS_10_32     PNG                    "res\\icons\\windows-10\\32x32\\close-button.png"
+IDB_CLOSE_BUTTON_WINDOWS_10_32 PNG                     "res\\icons\\windows-10\\32x32\\close-button.png"
 
-IDB_CLOSE_BUTTON_WINDOWS_10_48     PNG                    "res\\icons\\windows-10\\48x48\\close-button.png"
+IDB_CLOSE_BUTTON_WINDOWS_10_48 PNG                     "res\\icons\\windows-10\\48x48\\close-button.png"
 
 #endif    // English (Australia) resources
 /////////////////////////////////////////////////////////////////////////////

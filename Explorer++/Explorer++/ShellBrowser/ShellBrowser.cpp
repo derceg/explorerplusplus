@@ -475,9 +475,24 @@ std::vector<HistoryEntry *> CShellBrowser::GetForwardHistory() const
 	return m_pathManager.GetForwardHistory();
 }
 
-HistoryEntry *CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem)
+HistoryEntry *CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem) const
 {
 	return m_pathManager.GetEntryWithoutUpdate(iItem);
+}
+
+int CShellBrowser::GetNumHistoryEntries() const
+{
+	return m_pathManager.GetNumHistoryEntries();
+}
+
+int CShellBrowser::GetCurrentHistoryIndex() const
+{
+	return m_pathManager.GetCurrentIndex();
+}
+
+HistoryEntry *CShellBrowser::GetHistoryEntryAtIndex(int index) const
+{
+	return m_pathManager.GetEntryAtIndex(index);
 }
 
 BOOL CShellBrowser::CanBrowseUp(void) const

@@ -14,8 +14,11 @@ public:
 	PathManager(IconFetcher *iconFetcher);
 
 	void AddEntry(std::unique_ptr<HistoryEntry> entry);
+	int GetNumHistoryEntries() const;
+	int GetCurrentIndex() const;
 	HistoryEntry *GetEntry(int offset);
 	HistoryEntry *GetEntryWithoutUpdate(int offset) const;
+	HistoryEntry *GetEntryAtIndex(int index) const;
 
 	bool CanGoBack() const;
 	bool CanGoForward() const;

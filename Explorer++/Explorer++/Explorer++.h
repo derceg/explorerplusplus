@@ -15,6 +15,7 @@
 #include "Tab.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
+#include "TabRestorer.h"
 #include "UiTheming.h"
 #include "ValueWrapper.h"
 #include "../Helper/CachedIcons.h"
@@ -535,6 +536,7 @@ private:
 
 	/* Tabs. */
 	TabContainer			*m_tabContainer;
+	std::unique_ptr<TabRestorer>	m_tabRestorer;
 	TabsInitializedSignal	m_tabsInitializedSignal;
 
 	ToolbarContextMenuSignal	m_toolbarContextMenuSignal;

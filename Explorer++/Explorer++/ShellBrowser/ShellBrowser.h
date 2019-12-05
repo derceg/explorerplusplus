@@ -100,7 +100,10 @@ public:
 	bool				CanGoForward() const;
 	std::vector<HistoryEntry *>	GetBackHistory() const;
 	std::vector<HistoryEntry *>	GetForwardHistory() const;
-	HistoryEntry		*RetrieveHistoryItemWithoutUpdate(int iItem);
+	HistoryEntry		*RetrieveHistoryItemWithoutUpdate(int iItem) const;
+	int					GetNumHistoryEntries() const;
+	int					GetCurrentHistoryIndex() const;
+	HistoryEntry		*GetHistoryEntryAtIndex(int index) const;
 	BOOL				CanBrowseUp(void) const;
 	int					GetNumItems(void) const;
 	int					GetNumSelectedFiles(void) const;

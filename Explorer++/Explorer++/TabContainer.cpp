@@ -10,6 +10,7 @@
 #include "IconResourceLoader.h"
 #include "MainResource.h"
 #include "Navigation.h"
+#include "PreservedTab.h"
 #include "RenameTabDialog.h"
 #include "ResourceHelper.h"
 #include "TabBacking.h"
@@ -810,6 +811,21 @@ HRESULT TabContainer::CreateNewTab(const TCHAR *TabDirectory,
 	return hr;
 }
 
+HRESULT TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTabId)
+{
+	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
+
+	TabSettings tabSettings(_index = preservedTab.index, _selected = true,
+		_locked = preservedTab.locked, _addressLocked = preservedTab.addressLocked);
+
+	if (preservedTab.useCustomName)
+	{
+		tabSettings.name = preservedTab.customName;
+	}
+
+	return CreateNewTab(entry->pidl.get(), tabSettings, nullptr, boost::none, newTabId);
+}
+
 HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 	const TabSettings &tabSettings, const FolderSettings *folderSettings,
 	boost::optional<FolderColumns> initialColumns, int *newTabId)
@@ -1036,6 +1052,8 @@ bool TabContainer::CloseTab(const Tab &tab)
 	{
 		return false;
 	}
+
+	tabPreRemovalSignal.m_signal(tab);
 
 	RemoveTabFromControl(tab);
 

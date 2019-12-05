@@ -361,6 +361,9 @@
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="TabRestorer.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationToolbar.h">
@@ -722,6 +725,15 @@
     </ClInclude>
     <ClInclude Include="ShellBrowser\HistoryEntry.h">
       <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ShellBrowser\PreservedHistoryEntry.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="PreservedTab.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="TabRestorer.h">
+      <Filter>Tabs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
