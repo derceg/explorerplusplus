@@ -208,7 +208,7 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	/* Hide the old listview. */
 	ShowWindow(m_hActiveListView,SW_HIDE);
 
-	m_hActiveListView = tab.listView;
+	m_hActiveListView = tab.GetListView();
 	m_pActiveShellBrowser = tab.GetShellBrowser();
 
 	/* The selected tab has changed, so update the current

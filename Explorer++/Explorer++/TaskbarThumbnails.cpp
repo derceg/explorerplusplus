@@ -314,7 +314,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 		break;
 
 	case WM_SETFOCUS:
-		SetFocus(tab->listView);
+		SetFocus(tab->GetListView());
 		break;
 
 	case WM_SYSCOMMAND:
@@ -324,7 +324,7 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 			break;
 
 		default:
-			SendMessage(tab->listView,WM_SYSCOMMAND,wParam,lParam);
+			SendMessage(tab->GetListView(),WM_SYSCOMMAND,wParam,lParam);
 			break;
 		}
 		break;
@@ -355,8 +355,8 @@ LRESULT CALLBACK TaskbarThumbnails::TabProxyWndProc(HWND hwnd,UINT Msg,WPARAM wP
 				wil::unique_hbitmap bitmap = GetTabLivePreviewBitmap(*tab);
 
 				RECT rcTab;
-				GetClientRect(tab->listView, &rcTab);
-				MapWindowPoints(tab->listView, m_expp->GetMainWindow(), reinterpret_cast<LPPOINT>(&rcTab), 2);
+				GetClientRect(tab->GetListView(), &rcTab);
+				MapWindowPoints(tab->GetListView(), m_expp->GetMainWindow(), reinterpret_cast<LPPOINT>(&rcTab), 2);
 
 				MENUBARINFO mbi;
 				mbi.cbSize = sizeof(mbi);
@@ -484,29 +484,29 @@ wil::unique_hbitmap TaskbarThumbnails::CaptureTabScreenshot(const Tab &tab)
 
 	/* Now draw the tab onto the main window. */
 	RECT rcTab;
-	GetClientRect(tab.listView, &rcTab);
+	GetClientRect(tab.GetListView(), &rcTab);
 
-	wil::unique_hdc_window hdcTab = wil::GetDC(tab.listView);
+	wil::unique_hdc_window hdcTab = wil::GetDC(tab.GetListView());
 	wil::unique_hdc hdcTabSrc(CreateCompatibleDC(hdcTab.get()));
 	wil::unique_hbitmap hbmTab(CreateCompatibleBitmap(hdcTab.get(), GetRectWidth(&rcTab), GetRectHeight(&rcTab)));
 
 	auto tabPreviousBitmap = wil::SelectObject(hdcTabSrc.get(), hbmTab.get());
 
-	BOOL bVisible = IsWindowVisible(tab.listView);
+	BOOL bVisible = IsWindowVisible(tab.GetListView());
 
 	if (!bVisible)
 	{
-		ShowWindow(tab.listView, SW_SHOW);
+		ShowWindow(tab.GetListView(), SW_SHOW);
 	}
 
-	PrintWindow(tab.listView, hdcTabSrc.get(), PW_CLIENTONLY);
+	PrintWindow(tab.GetListView(), hdcTabSrc.get(), PW_CLIENTONLY);
 
 	if (!bVisible)
 	{
-		ShowWindow(tab.listView, SW_HIDE);
+		ShowWindow(tab.GetListView(), SW_HIDE);
 	}
 
-	MapWindowPoints(tab.listView, m_expp->GetMainWindow(), reinterpret_cast<LPPOINT>(&rcTab), 2);
+	MapWindowPoints(tab.GetListView(), m_expp->GetMainWindow(), reinterpret_cast<LPPOINT>(&rcTab), 2);
 	BitBlt(hdcSrc.get(), rcTab.left, rcTab.top, GetRectWidth(&rcTab), GetRectHeight(&rcTab), hdcTabSrc.get(), 0, 0, SRCCOPY);
 
 
@@ -532,11 +532,11 @@ wil::unique_hbitmap TaskbarThumbnails::CaptureTabScreenshot(const Tab &tab)
 
 wil::unique_hbitmap TaskbarThumbnails::GetTabLivePreviewBitmap(const Tab &tab)
 {
-	wil::unique_hdc_window hdcTab = wil::GetDC(tab.listView);
+	wil::unique_hdc_window hdcTab = wil::GetDC(tab.GetListView());
 	wil::unique_hdc hdcTabSrc(CreateCompatibleDC(hdcTab.get()));
 
 	RECT rcTab;
-	GetClientRect(tab.listView, &rcTab);
+	GetClientRect(tab.GetListView(), &rcTab);
 
 	wil::unique_hbitmap hbmTab;
 	Gdiplus::Color color(0, 0, 0);
@@ -545,18 +545,18 @@ wil::unique_hbitmap TaskbarThumbnails::GetTabLivePreviewBitmap(const Tab &tab)
 
 	auto tabPreviousBitmap = wil::SelectObject(hdcTabSrc.get(), hbmTab.get());
 
-	BOOL bVisible = IsWindowVisible(tab.listView);
+	BOOL bVisible = IsWindowVisible(tab.GetListView());
 
 	if (!bVisible)
 	{
-		ShowWindow(tab.listView, SW_SHOW);
+		ShowWindow(tab.GetListView(), SW_SHOW);
 	}
 
-	PrintWindow(tab.listView, hdcTabSrc.get(), PW_CLIENTONLY);
+	PrintWindow(tab.GetListView(), hdcTabSrc.get(), PW_CLIENTONLY);
 
 	if (!bVisible)
 	{
-		ShowWindow(tab.listView, SW_HIDE);
+		ShowWindow(tab.GetListView(), SW_HIDE);
 	}
 
 	SetStretchBltMode(hdcTabSrc.get(), HALFTONE);

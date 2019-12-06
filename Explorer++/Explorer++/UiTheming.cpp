@@ -55,11 +55,11 @@ bool UiTheming::ApplyListViewColorsForAllTabs(COLORREF backgroundColor, COLORREF
 
 bool UiTheming::ApplyListViewColorsForTab(const Tab &tab, COLORREF backgroundColor, COLORREF textColor)
 {
-	BOOL bkRes = ListView_SetBkColor(tab.listView, backgroundColor);
-	BOOL textBkRes = ListView_SetTextBkColor(tab.listView, backgroundColor);
-	BOOL textRes = ListView_SetTextColor(tab.listView, textColor);
+	BOOL bkRes = ListView_SetBkColor(tab.GetListView(), backgroundColor);
+	BOOL textBkRes = ListView_SetTextBkColor(tab.GetListView(), backgroundColor);
+	BOOL textRes = ListView_SetTextColor(tab.GetListView(), textColor);
 
-	InvalidateRect(tab.listView, nullptr, TRUE);
+	InvalidateRect(tab.GetListView(), nullptr, TRUE);
 
 	if (!bkRes || !textBkRes || !textRes)
 	{

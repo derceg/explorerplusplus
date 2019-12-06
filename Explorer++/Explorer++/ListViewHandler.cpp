@@ -593,7 +593,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	if(tab.GetShellBrowser()->IsDragging())
 		return;
 
-	HWND listView = tab.listView;
+	HWND listView = tab.GetListView();
 
 	if(ItemChanged->uChanged == LVIF_STATE &&
 		((LVIS_STATEIMAGEMASK & ItemChanged->uNewState) >> 12) != 0 &&
@@ -687,7 +687,7 @@ int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
 	for (auto &item : m_tabContainer->GetAllTabs())
 	{
-		if (item.second.listView == hListView)
+		if (item.second.GetListView() == hListView)
 		{
 			return item.first;
 		}

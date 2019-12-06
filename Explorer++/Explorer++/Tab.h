@@ -79,6 +79,9 @@ public:
 	CShellBrowser *GetShellBrowser() const;
 	void SetShellBrowser(CShellBrowser *shellBrowser);
 
+	HWND GetListView() const;
+	void SetListView(HWND listView);
+
 	std::wstring GetName() const;
 	bool GetUseCustomName() const;
 	void SetCustomName(const std::wstring &name);
@@ -90,8 +93,6 @@ public:
 	void SetAddressLocked(bool addressLocked);
 
 	boost::signals2::connection AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer);
-
-	HWND	listView;
 
 	/* Although each tab manages its
 	own columns, it does not know
@@ -108,6 +109,8 @@ private:
 
 	std::unique_ptr<NavigationController> m_navigationController;
 	CShellBrowser *m_shellBrowser;
+
+	HWND m_listView;
 
 	bool m_useCustomName;
 	std::wstring m_customName;
