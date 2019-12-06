@@ -643,7 +643,8 @@ INT_PTR CALLBACK OptionsDialog::FilesFoldersProc(HWND hDlg,UINT uMsg,WPARAM wPar
 						{
 							m_tabInterface->RefreshTab(tab);
 
-							NListView::ListView_ActivateOneClickSelect(tab.GetListView(), m_config->globalFolderSettings.oneClickActivate,
+							NListView::ListView_ActivateOneClickSelect(tab.GetShellBrowser()->GetListView(),
+								m_config->globalFolderSettings.oneClickActivate,
 								m_config->globalFolderSettings.oneClickActivateHoverTime);
 						}
 
@@ -795,7 +796,7 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 					{
 						for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 						{
-							DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(tab.GetListView());
+							DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(tab.GetShellBrowser()->GetListView());
 
 							if(bCheckBoxSelection)
 							{
@@ -806,7 +807,7 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 								dwExtendedStyle &= ~LVS_EX_CHECKBOXES;
 							}
 
-							ListView_SetExtendedListViewStyle(tab.GetListView(), dwExtendedStyle);
+							ListView_SetExtendedListViewStyle(tab.GetShellBrowser()->GetListView(), dwExtendedStyle);
 						}
 
 						m_config->checkBoxSelection = (IsDlgButtonChecked(hDlg,IDC_OPTION_CHECKBOXSELECTION)
@@ -825,7 +826,7 @@ INT_PTR CALLBACK OptionsDialog::WindowProc(HWND hDlg,UINT uMsg,WPARAM wParam,LPA
 						changes itself. */
 						tab.GetShellBrowser()->OnGridlinesSettingChanged();
 
-						NListView::ListView_AddRemoveExtendedStyle(tab.GetListView(),
+						NListView::ListView_AddRemoveExtendedStyle(tab.GetShellBrowser()->GetListView(),
 							LVS_EX_FULLROWSELECT,m_config->useFullRowSelect);
 					}
 

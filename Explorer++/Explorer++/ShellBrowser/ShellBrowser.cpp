@@ -64,34 +64,35 @@ ULONG __stdcall CShellBrowser::Release(void)
 	return m_iRefCount;
 }
 
-CShellBrowser *CShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
-	CachedIcons *cachedIcons, std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+CShellBrowser *CShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
+	std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
 	boost::optional<FolderColumns> initialColumns)
 {
-	return new CShellBrowser(id, resourceInstance, hOwner, hListView, cachedIcons, config,
+	return new CShellBrowser(id, resourceInstance, hOwner, cachedIcons, config,
 		folderSettings, initialColumns);
 }
 
-CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
-	CachedIcons *cachedIcons, std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
+	std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
 	boost::optional<FolderColumns> initialColumns) :
 	m_ID(id),
 	m_hResourceModule(resourceInstance),
 	m_hOwner(hOwner),
-	m_hListView(hListView),
 	m_cachedIcons(cachedIcons),
 	m_config(config),
 	m_folderSettings(folderSettings),
 	m_folderColumns(initialColumns ? *initialColumns : config->globalFolderSettings.folderColumns),
 	m_columnThreadPool(1),
 	m_columnResultIDCounter(0),
-	m_iconFetcher(hListView, cachedIcons),
 	m_thumbnailThreadPool(1),
 	m_thumbnailResultIDCounter(0),
 	m_infoTipsThreadPool(1),
 	m_infoTipResultIDCounter(0)
 {
 	m_iRefCount = 1;
+
+	m_hListView = SetUpListView(hOwner);
+	m_iconFetcher = std::make_unique<IconFetcher>(m_hListView, cachedIcons);
 
 	InitializeDragDropHelpers();
 
@@ -114,35 +115,10 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 
 	m_PreviousSortColumnExists = false;
 
-	NListView::ListView_SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
-	NListView::ListView_SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
-
-	if (m_folderSettings.applyFilter)
-	{
-		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
-	}
-
-	NListView::ListView_ActivateOneClickSelect(m_hListView, m_config->globalFolderSettings.oneClickActivate,
-		m_config->globalFolderSettings.oneClickActivateHoverTime);
-
 	InitializeCriticalSection(&m_csDirectoryAltered);
 
 	m_iFolderIcon = GetDefaultFolderIconIndex();
 	m_iFileIcon = GetDefaultFileIconIndex();
-
-	m_ListViewSubclassed = SetWindowSubclass(hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this));
-
-	HWND hParent = GetParent(hListView);
-
-	if (hParent != NULL)
-	{
-		m_listViewParentSubclassId = listViewParentSubclassIdCounter++;
-		m_ListViewParentSubclassed = SetWindowSubclass(hParent, ListViewParentProcStub, m_listViewParentSubclassId, reinterpret_cast<DWORD_PTR>(this));
-	}
-	else
-	{
-		m_ListViewParentSubclassed = FALSE;
-	}
 
 	m_thumbnailThreadPool.push([] (int id) {
 		UNREFERENCED_PARAMETER(id);
@@ -153,18 +129,6 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 
 CShellBrowser::~CShellBrowser()
 {
-	HWND hParent = GetParent(m_hListView);
-
-	if (m_ListViewParentSubclassed && hParent != NULL)
-	{
-		RemoveWindowSubclass(hParent, ListViewParentProcStub, m_listViewParentSubclassId);
-	}
-
-	if (m_ListViewSubclassed)
-	{
-		RemoveWindowSubclass(m_hListView, ListViewProcStub, LISTVIEW_SUBCLASS_ID);
-	}
-
 	m_columnThreadPool.clear_queue();
 	m_thumbnailThreadPool.clear_queue();
 	m_infoTipsThreadPool.clear_queue();
@@ -182,6 +146,53 @@ CShellBrowser::~CShellBrowser()
 	DeleteCriticalSection(&m_csDirectoryAltered);
 
 	/* TODO: Also destroy the thumbnails imagelist. */
+}
+
+HWND CShellBrowser::SetUpListView(HWND parent)
+{
+	HWND hListView = CreateListView(parent, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |
+		WS_CLIPCHILDREN | LVS_ICON | LVS_EDITLABELS | LVS_SHOWSELALWAYS |
+		LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | WS_TABSTOP | LVS_ALIGNTOP);
+
+	if (hListView == nullptr)
+	{
+		return nullptr;
+	}
+
+	DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
+
+	if (m_config->useFullRowSelect)
+	{
+		dwExtendedStyle |= LVS_EX_FULLROWSELECT;
+	}
+
+	if (m_config->checkBoxSelection)
+	{
+		dwExtendedStyle |= LVS_EX_CHECKBOXES;
+	}
+
+	ListView_SetExtendedListViewStyle(hListView, dwExtendedStyle);
+
+	NListView::ListView_SetAutoArrange(m_hListView, m_folderSettings.autoArrange);
+	NListView::ListView_SetGridlines(m_hListView, m_config->globalFolderSettings.showGridlines);
+
+	if (m_folderSettings.applyFilter)
+	{
+		NListView::ListView_SetBackgroundImage(m_hListView, IDB_FILTERINGAPPLIED);
+	}
+
+	NListView::ListView_ActivateOneClickSelect(m_hListView, m_config->globalFolderSettings.oneClickActivate,
+		m_config->globalFolderSettings.oneClickActivateHoverTime);
+
+	SetWindowTheme(hListView, L"Explorer", NULL);
+
+	m_windowSubclasses.push_back(WindowSubclassWrapper(hListView, ListViewProcStub,
+		LISTVIEW_SUBCLASS_ID, reinterpret_cast<DWORD_PTR>(this)));
+
+	m_windowSubclasses.push_back(WindowSubclassWrapper(parent, ListViewParentProcStub,
+		listViewParentSubclassIdCounter++, reinterpret_cast<DWORD_PTR>(this)));
+
+	return hListView;
 }
 
 BOOL CShellBrowser::GetAutoArrange(void) const
@@ -259,13 +270,20 @@ void CShellBrowser::SetViewModeInternal(ViewMode viewMode)
 
 	case ViewMode::Tiles:
 	case ViewMode::Icons:
+	{
+		wil::com_ptr<IImageList> pImageList;
+		SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
+		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
+	}
+	break;
+
 	case ViewMode::SmallIcons:
 	case ViewMode::List:
 	case ViewMode::Details:
 	{
 		wil::com_ptr<IImageList> pImageList;
-		SHGetImageList(SHIL_LARGE, IID_PPV_ARGS(&pImageList));
-		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_NORMAL);
+		SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
+		ListView_SetImageList(m_hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_SMALL);
 	}
 	break;
 	}
@@ -1477,5 +1495,5 @@ HWND CShellBrowser::GetListView() const
 
 IconFetcher *CShellBrowser::GetIconFetcher()
 {
-	return &m_iconFetcher;
+	return m_iconFetcher.get();
 }

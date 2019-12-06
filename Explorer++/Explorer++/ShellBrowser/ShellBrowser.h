@@ -16,6 +16,7 @@
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include "../Helper/StringHelper.h"
+#include "../Helper/WindowSubclassWrapper.h"
 #include "../ThirdParty/CTPL/cpl_stl.h"
 #include <boost/optional.hpp>
 #include <wil/resource.h>
@@ -53,8 +54,8 @@ class CShellBrowser : public IDropTarget, public IDropFilesCallback
 {
 public:
 
-	static CShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
-		CachedIcons *cachedIcons, std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+	static CShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
+		std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
 		boost::optional<FolderColumns> initialColumns);
 
 	/* IUnknown methods. */
@@ -266,11 +267,12 @@ private:
 	static const int THUMBNAIL_ITEM_WIDTH = 120;
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
-	CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HWND hListView,
-		CachedIcons *cachedIcons, std::shared_ptr<const Config> config,
-		const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns);
+	CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
+		std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+		boost::optional<FolderColumns> initialColumns);
 	~CShellBrowser();
 
+	HWND				SetUpListView(HWND parent);
 	int					GenerateUniqueItemId();
 	BOOL				GhostItemInternal(int iItem,BOOL bGhost);
 	void				DetermineFolderVirtual(PCIDLIST_ABSOLUTE pidlDirectory);
@@ -417,16 +419,15 @@ private:
 	int					m_iRefCount;
 
 	HWND				m_hListView;
-	BOOL				m_ListViewSubclassed;
-	BOOL				m_ListViewParentSubclassed;
 	HWND				m_hOwner;
+
+	std::vector<WindowSubclassWrapper>	m_windowSubclasses;
 
 	// Each instance of this class will subclass the parent window. As
 	// they'll all use the same static procedure, it's important that
 	// they use different subclass IDs (as the procedure and ID uniquely
 	// identify a subclass).
 	static int listViewParentSubclassIdCounter;
-	int m_listViewParentSubclassId;
 
 	BOOL				m_bPerformingDrag;
 	HIMAGELIST			m_hListViewImageList;
@@ -441,7 +442,7 @@ private:
 	std::unordered_map<int, std::future<ColumnResult_t>> m_columnResults;
 	int					m_columnResultIDCounter;
 
-	IconFetcher			m_iconFetcher;
+	std::unique_ptr<IconFetcher> m_iconFetcher;
 	CachedIcons			*m_cachedIcons;
 
 	ctpl::thread_pool	m_thumbnailThreadPool;

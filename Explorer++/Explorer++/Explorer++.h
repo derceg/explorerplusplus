@@ -83,8 +83,6 @@ public:
 	Explorerplusplus(HWND);
 	~Explorerplusplus();
 
-	LRESULT CALLBACK	ListViewSubclassProc(HWND ListView,UINT msg,WPARAM wParam,LPARAM lParam);
-
 	LRESULT CALLBACK	RebarSubclass(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
 
 	LRESULT CALLBACK	TreeViewHolderProc(HWND hwnd,UINT msg,WPARAM wParam,LPARAM lParam);
@@ -159,6 +157,10 @@ private:
 	};
 
 	LRESULT CALLBACK		WindowProcedure(HWND hwnd,UINT Msg,WPARAM wParam,LPARAM lParam);
+
+	static LRESULT CALLBACK	ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
+		UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+	LRESULT CALLBACK		ListViewSubclassProc(HWND ListView, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	/* Main window message handlers. */
 	LRESULT CALLBACK		CommandHandler(HWND hwnd, WPARAM wParam);
@@ -287,6 +289,7 @@ private:
 	/* Tabs. */
 	void					InitializeTabs();
 	boost::signals2::connection	AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer);
+	void					OnTabCreated(int tabId, BOOL switchToNewTab);
 	void					OnTabSelected(const Tab &tab);
 	void					ShowTabBar();
 	void					HideTabBar();

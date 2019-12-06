@@ -79,9 +79,6 @@ public:
 	CShellBrowser *GetShellBrowser() const;
 	void SetShellBrowser(CShellBrowser *shellBrowser);
 
-	HWND GetListView() const;
-	void SetListView(HWND listView);
-
 	std::wstring GetName() const;
 	bool GetUseCustomName() const;
 	void SetCustomName(const std::wstring &name);
@@ -109,8 +106,6 @@ private:
 
 	std::unique_ptr<NavigationController> m_navigationController;
 	CShellBrowser *m_shellBrowser;
-
-	HWND m_listView;
 
 	bool m_useCustomName;
 	std::wstring m_customName;

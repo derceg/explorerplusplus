@@ -33,10 +33,6 @@
 #include "../Helper/ShellHelper.h"
 #include <wil/com.h>
 
-const DWORD MAIN_LISTVIEW_STYLES = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS |
-WS_CLIPCHILDREN | LVS_ICON | LVS_EDITLABELS | LVS_SHOWSELALWAYS |
-LVS_SHAREIMAGELISTS | LVS_AUTOARRANGE | WS_TABSTOP | LVS_ALIGNTOP;
-
 const std::vector<unsigned int> COMMON_REAL_FOLDER_COLUMNS =
 {CM_NAME, CM_TYPE, CM_SIZE, CM_DATEMODIFIED,
 CM_AUTHORS, CM_TITLE};
@@ -64,51 +60,8 @@ const std::vector<unsigned int> COMMON_RECYCLE_BIN_COLUMNS =
 {CM_NAME, CM_ORIGINALLOCATION, CM_DATEDELETED,
 CM_SIZE, CM_TYPE, CM_DATEMODIFIED};
 
-LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData);
-
-HWND Explorerplusplus::CreateMainListView(HWND hParent)
-{
-	HWND hListView = CreateListView(hParent, MAIN_LISTVIEW_STYLES);
-
-	if(hListView == NULL)
-	{
-		return NULL;
-	}
-
-	wil::com_ptr<IImageList> pImageList;
-	HRESULT hr = SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&pImageList));
-
-	if(SUCCEEDED(hr))
-	{
-		ListView_SetImageList(hListView, reinterpret_cast<HIMAGELIST>(pImageList.get()), LVSIL_SMALL);
-	}
-
-	DWORD dwExtendedStyle = ListView_GetExtendedListViewStyle(hListView);
-
-	if(m_config->useFullRowSelect)
-	{
-		dwExtendedStyle |= LVS_EX_FULLROWSELECT;
-	}
-
-	if(m_config->checkBoxSelection)
-	{
-		dwExtendedStyle |= LVS_EX_CHECKBOXES;
-	}
-
-	ListView_SetExtendedListViewStyle(hListView,dwExtendedStyle);
-
-	/* TODO: This subclass needs to be removed. */
-	SetWindowSubclass(hListView, ListViewProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
-
-	SetWindowTheme(hListView,L"Explorer",NULL);
-
-	SetListViewInitialPosition(hListView);
-
-	return hListView;
-}
-
-LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,
-	WPARAM wParam,LPARAM lParam,UINT_PTR uIdSubclass,DWORD_PTR dwRefData)
+LRESULT CALLBACK Explorerplusplus::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam,
+	LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
 	UNREFERENCED_PARAMETER(uIdSubclass);
 
@@ -117,8 +70,8 @@ LRESULT CALLBACK ListViewProcStub(HWND hwnd,UINT uMsg,
 	return pexpp->ListViewSubclassProc(hwnd,uMsg,wParam,lParam);
 }
 
-LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView,
-UINT msg,WPARAM wParam,LPARAM lParam)
+LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
+	WPARAM wParam, LPARAM lParam)
 {
 	switch(msg)
 	{
@@ -593,7 +546,7 @@ void Explorerplusplus::OnListViewItemChanged(LPARAM lParam)
 	if(tab.GetShellBrowser()->IsDragging())
 		return;
 
-	HWND listView = tab.GetListView();
+	HWND listView = tab.GetShellBrowser()->GetListView();
 
 	if(ItemChanged->uChanged == LVIF_STATE &&
 		((LVIS_STATEIMAGEMASK & ItemChanged->uNewState) >> 12) != 0 &&
@@ -687,7 +640,7 @@ int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
 	for (auto &item : m_tabContainer->GetAllTabs())
 	{
-		if (item.second.GetListView() == hListView)
+		if (item.second.GetShellBrowser()->GetListView() == hListView)
 		{
 			return item.first;
 		}

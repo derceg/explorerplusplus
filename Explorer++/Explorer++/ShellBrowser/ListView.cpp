@@ -145,7 +145,7 @@ void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
 			}
 		}
 
-		m_iconFetcher.QueueIconTask(itemInfo.pidlComplete.get(), [this, internalIndex] (PCIDLIST_ABSOLUTE pidl, int iconIndex) {
+		m_iconFetcher->QueueIconTask(itemInfo.pidlComplete.get(), [this, internalIndex] (PCIDLIST_ABSOLUTE pidl, int iconIndex) {
 			UNREFERENCED_PARAMETER(pidl);
 
 			ProcessIconResult(internalIndex, iconIndex);

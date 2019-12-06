@@ -30,8 +30,6 @@ __interface IExplorerplusplus
 {
 	HWND			GetMainWindow() const;
 
-	HWND			CreateMainListView(HWND hParent);
-
 	HWND			GetActiveListView() const;
 	CShellBrowser	*GetActiveShellBrowser() const;
 

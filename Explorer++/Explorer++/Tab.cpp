@@ -39,16 +39,6 @@ void Tab::SetShellBrowser(CShellBrowser *shellBrowser)
 	m_navigationController = std::make_unique<NavigationController>(shellBrowser);
 }
 
-HWND Tab::GetListView() const
-{
-	return m_listView;
-}
-
-void Tab::SetListView(HWND listView)
-{
-	m_listView = listView;
-}
-
 // If a custom name has been set, that will be returned. Otherwise, the
 // display name of the current directory will be returned.
 std::wstring Tab::GetName() const

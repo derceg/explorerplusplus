@@ -459,7 +459,7 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 
 		if(!m_config->showTabBarAtBottom)
 		{
-			SetWindowPos(tab.GetListView(),NULL,IndentLeft,IndentTop,
+			SetWindowPos(tab.GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
 				MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
 				uFlags);
 		}
@@ -467,13 +467,13 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		{
 			if(m_bShowTabBar)
 			{
-				SetWindowPos(tab.GetListView(),NULL,IndentLeft,IndentTop,
+				SetWindowPos(tab.GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
 					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - tabWindowHeight,
 					uFlags);
 			}
 			else
 			{
-				SetWindowPos(tab.GetListView(),NULL,IndentLeft,IndentTop,
+				SetWindowPos(tab.GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
 					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
 					uFlags);
 			}

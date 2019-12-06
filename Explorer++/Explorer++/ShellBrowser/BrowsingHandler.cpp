@@ -113,7 +113,7 @@ void CShellBrowser::ClearPendingResults()
 	m_columnThreadPool.clear_queue();
 	m_columnResults.clear();
 
-	m_iconFetcher.ClearQueue();
+	m_iconFetcher->ClearQueue();
 
 	m_thumbnailThreadPool.clear_queue();
 	m_thumbnailResults.clear();

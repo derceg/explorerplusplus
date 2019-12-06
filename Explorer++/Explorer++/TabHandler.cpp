@@ -34,6 +34,7 @@ void Explorerplusplus::InitializeTabs()
 	CreateTabBacking();
 
 	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, m_navigation.get(), this, &m_cachedIcons, m_hLanguageModule, m_config);
+	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
 	m_tabContainer->tabSelectedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
 
 	m_navigation->navigationCompletedSignal.AddObserver(boost::bind(&Explorerplusplus::OnNavigationCompleted, this, _1), boost::signals2::at_front);
@@ -47,6 +48,18 @@ void Explorerplusplus::InitializeTabs()
 		MENU_RECENT_TABS_STARTID, MENU_RECENT_TABS_ENDID);
 
 	m_tabsInitializedSignal();
+}
+
+void Explorerplusplus::OnTabCreated(int tabId, BOOL switchToNewTab)
+{
+	UNREFERENCED_PARAMETER(switchToNewTab);
+
+	const Tab &tab = m_tabContainer->GetTab(tabId);
+
+	/* TODO: This subclass needs to be removed. */
+	SetWindowSubclass(tab.GetShellBrowser()->GetListView(), ListViewProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
+
+	SetListViewInitialPosition(tab.GetShellBrowser()->GetListView());
 }
 
 boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer)
@@ -208,7 +221,7 @@ void Explorerplusplus::OnTabSelected(const Tab &tab)
 	/* Hide the old listview. */
 	ShowWindow(m_hActiveListView,SW_HIDE);
 
-	m_hActiveListView = tab.GetListView();
+	m_hActiveListView = tab.GetShellBrowser()->GetListView();
 	m_pActiveShellBrowser = tab.GetShellBrowser();
 
 	/* The selected tab has changed, so update the current

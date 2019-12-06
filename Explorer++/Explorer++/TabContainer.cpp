@@ -855,15 +855,6 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 		tab.SetCustomName(*tabSettings.name);
 	}
 
-	HWND listView = m_expp->CreateMainListView(m_expp->GetMainWindow());
-
-	if (listView == NULL)
-	{
-		return E_FAIL;
-	}
-
-	tab.SetListView(listView);
-
 	FolderSettings folderSettingsFinal;
 
 	if (folderSettings)
@@ -876,8 +867,8 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 	}
 
 	tab.SetShellBrowser(CShellBrowser::CreateNew(tab.GetId(), m_instance,
-		m_expp->GetMainWindow(), listView, m_cachedIcons, m_config,
-		folderSettingsFinal, initialColumns));
+		m_expp->GetMainWindow(), m_cachedIcons, m_config, folderSettingsFinal,
+		initialColumns));
 
 	int index;
 
@@ -1063,7 +1054,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 
 	tab.GetShellBrowser()->Release();
 
-	DestroyWindow(tab.GetListView());
+	DestroyWindow(tab.GetShellBrowser()->GetListView());
 
 	// This is needed, as the erase() call below will remove the element
 	// from the tabs container (which will invalidate the reference
