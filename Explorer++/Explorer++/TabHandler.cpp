@@ -269,7 +269,7 @@ void Explorerplusplus::HideTabBar()
 
 HRESULT Explorerplusplus::RefreshTab(const Tab &tab)
 {
-	HRESULT hr = tab.GetShellBrowser()->Refresh();
+	HRESULT hr = tab.GetNavigationController()->Refresh();
 
 	if (SUCCEEDED(hr))
 	{

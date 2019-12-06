@@ -355,9 +355,6 @@
     <ClCompile Include="SortMenuHandler.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="ShellBrowser\PathManager.cpp">
-      <Filter>ShellBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp">
       <Filter>ShellBrowser</Filter>
     </ClCompile>
@@ -365,6 +362,9 @@
       <Filter>Tabs</Filter>
     </ClCompile>
     <ClCompile Include="TabRestorerUI.cpp">
+      <Filter>Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="NavigationController.cpp">
       <Filter>Tabs</Filter>
     </ClCompile>
   </ItemGroup>
@@ -723,9 +723,6 @@
     <ClInclude Include="ValueWrapper.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="ShellBrowser\PathManager.h">
-      <Filter>ShellBrowser</Filter>
-    </ClInclude>
     <ClInclude Include="ShellBrowser\HistoryEntry.h">
       <Filter>ShellBrowser</Filter>
     </ClInclude>
@@ -739,6 +736,9 @@
       <Filter>Tabs</Filter>
     </ClInclude>
     <ClInclude Include="TabRestorerUI.h">
+      <Filter>Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="NavigationController.h">
       <Filter>Tabs</Filter>
     </ClInclude>
   </ItemGroup>

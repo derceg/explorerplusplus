@@ -20,6 +20,11 @@ int Tab::GetId() const
 	return m_id;
 }
 
+NavigationController *Tab::GetNavigationController() const
+{
+	return m_navigationController.get();
+}
+
 CShellBrowser *Tab::GetShellBrowser() const
 {
 	return m_shellBrowser;
@@ -30,6 +35,8 @@ during construction of the tab object). */
 void Tab::SetShellBrowser(CShellBrowser *shellBrowser)
 {
 	m_shellBrowser = shellBrowser;
+
+	m_navigationController = std::make_unique<NavigationController>(shellBrowser);
 }
 
 // If a custom name has been set, that will be returned. Otherwise, the

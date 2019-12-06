@@ -89,8 +89,7 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, HW
 	m_thumbnailThreadPool(1),
 	m_thumbnailResultIDCounter(0),
 	m_infoTipsThreadPool(1),
-	m_infoTipResultIDCounter(0),
-	m_pathManager(&m_iconFetcher)
+	m_infoTipResultIDCounter(0)
 {
 	m_iRefCount = 1;
 
@@ -453,51 +452,6 @@ unique_pidl_absolute CShellBrowser::GetDirectoryIdl() const
 {
 	unique_pidl_absolute pidlDirectory(ILCloneFull(m_directoryState.pidlDirectory.get()));
 	return pidlDirectory;
-}
-
-bool CShellBrowser::CanGoBack() const
-{
-	return m_pathManager.CanGoBack();
-}
-
-bool CShellBrowser::CanGoForward() const
-{
-	return m_pathManager.CanGoForward();
-}
-
-std::vector<HistoryEntry *> CShellBrowser::GetBackHistory() const
-{
-	return m_pathManager.GetBackHistory();
-}
-
-std::vector<HistoryEntry *> CShellBrowser::GetForwardHistory() const
-{
-	return m_pathManager.GetForwardHistory();
-}
-
-HistoryEntry *CShellBrowser::RetrieveHistoryItemWithoutUpdate(int iItem) const
-{
-	return m_pathManager.GetEntryWithoutUpdate(iItem);
-}
-
-int CShellBrowser::GetNumHistoryEntries() const
-{
-	return m_pathManager.GetNumHistoryEntries();
-}
-
-int CShellBrowser::GetCurrentHistoryIndex() const
-{
-	return m_pathManager.GetCurrentIndex();
-}
-
-HistoryEntry *CShellBrowser::GetHistoryEntryAtIndex(int index) const
-{
-	return m_pathManager.GetEntryAtIndex(index);
-}
-
-BOOL CShellBrowser::CanBrowseUp(void) const
-{
-	return !IsNamespaceRoot(m_directoryState.pidlDirectory.get());
 }
 
 /* TODO: Convert to using pidl's here, rather than
@@ -1514,4 +1468,14 @@ BasicItemInfo_t CShellBrowser::getBasicItemInfo(int internalIndex) const
 	basicItemInfo.isRoot = itemInfo.bDrive;
 
 	return basicItemInfo;
+}
+
+HWND CShellBrowser::GetListView() const
+{
+	return m_hListView;
+}
+
+IconFetcher *CShellBrowser::GetIconFetcher()
+{
+	return &m_iconFetcher;
 }

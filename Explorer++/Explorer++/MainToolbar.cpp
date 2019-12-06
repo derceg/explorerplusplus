@@ -641,9 +641,11 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 
 	StringCchCopy(ptbgit->pszText, ptbgit->cchTextMax, EMPTY_STRING);
 
+	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
+
 	if (ptbgit->iItem == ToolbarButton::Back)
 	{
-		auto entry = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(-1);
+		auto entry = tab.GetNavigationController()->GetEntry(-1);
 
 		if (entry)
 		{
@@ -657,7 +659,7 @@ void MainToolbar::OnTBGetInfoTip(LPARAM lParam)
 	}
 	else if (ptbgit->iItem == ToolbarButton::Forward)
 	{
-		auto entry = m_pexpp->GetActiveShellBrowser()->RetrieveHistoryItemWithoutUpdate(1);
+		auto entry = tab.GetNavigationController()->GetEntry(1);
 
 		if (entry)
 		{
@@ -711,13 +713,15 @@ void MainToolbar::ShowHistoryMenu(HistoryType historyType, const POINT &pt)
 {
 	std::vector<HistoryEntry *> history;
 
+	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
+
 	if (historyType == HistoryType::Back)
 	{
-		history = m_pexpp->GetActiveShellBrowser()->GetBackHistory();
+		history = tab.GetNavigationController()->GetBackHistory();
 	}
 	else
 	{
-		history = m_pexpp->GetActiveShellBrowser()->GetForwardHistory();
+		history = tab.GetNavigationController()->GetForwardHistory();
 	}
 
 	if (history.empty())
@@ -823,10 +827,11 @@ void MainToolbar::UpdateConfigDependentButtonStates()
 
 void MainToolbar::UpdateToolbarButtonStates()
 {
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Up, m_pexpp->GetActiveShellBrowser()->CanBrowseUp());
+	const Tab &tab = m_pexpp->GetTabContainer()->GetSelectedTab();
 
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Back, m_pexpp->GetActiveShellBrowser()->CanGoBack());
-	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Forward, m_pexpp->GetActiveShellBrowser()->CanGoForward());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Back, tab.GetNavigationController()->CanGoBack());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Forward, tab.GetNavigationController()->CanGoForward());
+	SendMessage(m_hwnd, TB_ENABLEBUTTON, ToolbarButton::Up, tab.GetNavigationController()->CanGoUp());
 
 	BOOL bVirtualFolder = m_pexpp->GetActiveShellBrowser()->InVirtualFolder();
 

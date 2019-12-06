@@ -7,7 +7,7 @@
 #include "ColumnDataRetrieval.h"
 #include "Columns.h"
 #include "FolderSettings.h"
-#include "PathManager.h"
+#include "SignalWrapper.h"
 #include "SortModes.h"
 #include "ViewModes.h"
 #include "../Helper/DropHandler.h"
@@ -62,14 +62,12 @@ public:
 	ULONG __stdcall		AddRef(void);
 	ULONG __stdcall		Release(void);
 
+	HWND				GetListView() const;
+	IconFetcher			*GetIconFetcher();
+
 	/* Navigation. */
-	HRESULT				GoBack();
-	HRESULT				GoForward();
-	HRESULT				GoToOffset(int offset);
-	HRESULT				GoUp();
 	HRESULT				BrowseFolder(const TCHAR *szPath, bool addHistoryEntry = true);
 	HRESULT				BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry = true);
-	HRESULT				Refresh(void);
 
 	/* Drag and Drop. */
 	void				DragStarted(int iFirstItem,POINT *ptCursor);
@@ -96,15 +94,6 @@ public:
 	BOOL				SetSortAscending(BOOL bAscending);
 	BOOL				GetShowHidden(void) const;
 	BOOL				SetShowHidden(BOOL bShowHidden);
-	bool				CanGoBack() const;
-	bool				CanGoForward() const;
-	std::vector<HistoryEntry *>	GetBackHistory() const;
-	std::vector<HistoryEntry *>	GetForwardHistory() const;
-	HistoryEntry		*RetrieveHistoryItemWithoutUpdate(int iItem) const;
-	int					GetNumHistoryEntries() const;
-	int					GetCurrentHistoryIndex() const;
-	HistoryEntry		*GetHistoryEntryAtIndex(int index) const;
-	BOOL				CanBrowseUp(void) const;
 	int					GetNumItems(void) const;
 	int					GetNumSelectedFiles(void) const;
 	int					GetNumSelectedFolders(void) const;
@@ -166,6 +155,9 @@ public:
 	void				OnDeviceChange(WPARAM wParam,LPARAM lParam);
 
 	void				OnGridlinesSettingChanged();
+
+	// Signals
+	SignalWrapper<CShellBrowser, void(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)> navigationCompletedSignal;
 
 private:
 
@@ -462,9 +454,6 @@ private:
 
 	/* Cached folder size data. */
 	mutable std::unordered_map<int, ULONGLONG>	m_cachedFolderSizes;
-
-	/* Manages browsing history. */
-	PathManager			m_pathManager;
 
 	/* Internal state. */
 	const HINSTANCE		m_hResourceModule;

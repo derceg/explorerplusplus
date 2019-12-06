@@ -351,15 +351,17 @@ HMENU Explorerplusplus::CreateRebarHistoryMenu(BOOL bBack)
 	std::vector<HistoryEntry *> history;
 	int iBase;
 
+	const Tab &tab = m_tabContainer->GetSelectedTab();
+
 	if (bBack)
 	{
 		iBase = ID_REBAR_MENU_BACK_START;
-		history = m_pActiveShellBrowser->GetBackHistory();
+		history = tab.GetNavigationController()->GetBackHistory();
 	}
 	else
 	{
 		iBase = ID_REBAR_MENU_FORWARD_START;
-		history = m_pActiveShellBrowser->GetForwardHistory();
+		history = tab.GetNavigationController()->GetForwardHistory();
 	}
 
 	if (history.size() > 0)

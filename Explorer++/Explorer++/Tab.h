@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "NavigationController.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Macros.h"
 #include <boost/optional.hpp>
@@ -73,6 +74,8 @@ public:
 
 	int GetId() const;
 
+	NavigationController *GetNavigationController() const;
+
 	CShellBrowser *GetShellBrowser() const;
 	void SetShellBrowser(CShellBrowser *shellBrowser);
 
@@ -102,7 +105,10 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(Tab);
 
 	const int m_id;
+
+	std::unique_ptr<NavigationController> m_navigationController;
 	CShellBrowser *m_shellBrowser;
+
 	bool m_useCustomName;
 	std::wstring m_customName;
 	bool m_locked;

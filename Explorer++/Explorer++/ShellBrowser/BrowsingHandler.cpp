@@ -17,41 +17,6 @@
 #include <wil/com.h>
 #include <list>
 
-HRESULT CShellBrowser::GoBack()
-{
-	return GoToOffset(-1);
-}
-
-HRESULT CShellBrowser::GoForward()
-{
-	return GoToOffset(1);
-}
-
-HRESULT CShellBrowser::GoToOffset(int offset)
-{
-	auto entry = m_pathManager.GetEntry(offset);
-
-	if (!entry)
-	{
-		return E_FAIL;
-	}
-
-	return BrowseFolder(entry->GetPidl().get(), false);
-}
-
-HRESULT CShellBrowser::GoUp()
-{
-	unique_pidl_absolute pidlParent;
-	HRESULT hr = GetVirtualParentPath(m_directoryState.pidlDirectory.get(), wil::out_param(pidlParent));
-
-	if (FAILED(hr))
-	{
-		return hr;
-	}
-
-	return BrowseFolder(pidlParent.get());
-}
-
 HRESULT CShellBrowser::BrowseFolder(const TCHAR *szPath, bool addHistoryEntry)
 {
 	unique_pidl_absolute pidlDirectory;
@@ -92,15 +57,6 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHis
 	SendMessage(m_hOwner,WM_USER_STARTEDBROWSING,m_ID,reinterpret_cast<WPARAM>(szParsingPath));
 
 	StringCchCopy(m_CurDir,SIZEOF_ARRAY(m_CurDir),szParsingPath);
-
-	if(addHistoryEntry)
-	{
-		TCHAR displayName[MAX_PATH];
-		GetDisplayName(pidlDirectory, displayName, static_cast<UINT>(std::size(displayName)), SHGDN_INFOLDER);
-
-		auto entry = std::make_unique<HistoryEntry>(pidlDirectory, displayName);
-		m_pathManager.AddEntry(std::move(entry));
-	}
 
 	/* Stop the list view from redrawing itself each time is inserted.
 	Redrawing will be allowed once all items have being inserted.
@@ -146,6 +102,8 @@ HRESULT CShellBrowser::BrowseFolder(PCIDLIST_ABSOLUTE pidlDirectory, bool addHis
 	PlayNavigationSound();
 
 	m_uniqueFolderId++;
+
+	navigationCompletedSignal.m_signal(pidlDirectory, addHistoryEntry);
 
 	return S_OK;
 }
@@ -567,14 +525,6 @@ void CShellBrowser::RemoveItem(int iItemInternal)
 	{
 		ApplyFolderEmptyBackgroundImage(true);
 	}
-}
-
-HRESULT CShellBrowser::Refresh()
-{
-	// It's important that the pidl is copied, as the stored version will be
-	// reset when navigating.
-	unique_pidl_absolute pidl(ILCloneFull(m_directoryState.pidlDirectory.get()));
-	return BrowseFolder(pidl.get(), false);
 }
 
 void CShellBrowser::PlayNavigationSound() const

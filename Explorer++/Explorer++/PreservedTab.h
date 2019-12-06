@@ -14,7 +14,7 @@ struct PreservedTab
 		id(tab.GetId()),
 		index(index),
 		history(CopyHistoryEntries(tab)),
-		currentEntry(tab.GetShellBrowser()->GetCurrentHistoryIndex()),
+		currentEntry(tab.GetNavigationController()->GetCurrentIndex()),
 		useCustomName(tab.GetUseCustomName()),
 		customName(tab.GetUseCustomName() ? tab.GetName() : std::wstring()),
 		locked(tab.GetLocked()),
@@ -42,9 +42,9 @@ private:
 	{
 		std::vector<std::unique_ptr<PreservedHistoryEntry>> history;
 
-		for (int i = 0; i < tab.GetShellBrowser()->GetNumHistoryEntries(); i++)
+		for (int i = 0; i < tab.GetNavigationController()->GetNumHistoryEntries(); i++)
 		{
-			auto entry = std::make_unique<PreservedHistoryEntry>(*tab.GetShellBrowser()->GetHistoryEntryAtIndex(i));
+			auto entry = std::make_unique<PreservedHistoryEntry>(*tab.GetNavigationController()->GetEntryAtIndex(i));
 			history.push_back(std::move(entry));
 		}
 

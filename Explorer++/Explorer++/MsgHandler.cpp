@@ -1213,7 +1213,7 @@ void Explorerplusplus::OnAssocChanged()
 	/* Now, go through each tab, and refresh each icon. */
 	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 	{
-		tab.GetShellBrowser()->Refresh();
+		tab.GetNavigationController()->Refresh();
 	}
 
 	/* Now, refresh the treeview. */

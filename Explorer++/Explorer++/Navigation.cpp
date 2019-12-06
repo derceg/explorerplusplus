@@ -45,13 +45,13 @@ void Navigation::OnGoToOffset(int offset)
 
 	if (!tab.GetAddressLocked())
 	{
-		hr = tab.GetShellBrowser()->GoToOffset(offset);
+		hr = tab.GetNavigationController()->GoToOffset(offset);
 
 		resultingTabId = tab.GetId();
 	}
 	else
 	{
-		auto entry = tab.GetShellBrowser()->RetrieveHistoryItemWithoutUpdate(offset);
+		auto entry = tab.GetNavigationController()->GetEntry(offset);
 
 		if (entry)
 		{
@@ -84,7 +84,7 @@ void Navigation::OnNavigateUp()
 
 	if (!tab.GetAddressLocked())
 	{
-		hr = tab.GetShellBrowser()->GoUp();
+		hr = tab.GetNavigationController()->GoUp();
 
 		resultingTabId = tab.GetId();
 	}

@@ -459,6 +459,7 @@
     <ClCompile Include="ApplicationToolbar.cpp" />
     <ClCompile Include="ApplicationToolbarButtonDialog.cpp" />
     <ClCompile Include="ApplicationToolbarDropHandler.cpp" />
+    <ClCompile Include="NavigationController.cpp" />
     <ClCompile Include="ShellBrowser\HistoryEntry.cpp" />
     <ClCompile Include="SortMenuHandler.cpp" />
     <ClCompile Include="BookmarkHandler.cpp" />
@@ -538,7 +539,6 @@
     <ClCompile Include="ShellBrowser\GroupManager.cpp" />
     <ClCompile Include="ShellBrowser\HandleThumbnails.cpp" />
     <ClCompile Include="ShellBrowser\iDropTarget.cpp" />
-    <ClCompile Include="ShellBrowser\PathManager.cpp" />
     <ClCompile Include="ShellBrowser\ShellBrowser.cpp" />
     <ClCompile Include="ShellBrowser\ListView.cpp" />
     <ClCompile Include="ShellBrowser\SortHelper.cpp" />
@@ -654,6 +654,7 @@
     <ClInclude Include="MergeFilesDialog.h" />
     <ClInclude Include="ModelessDialogs.h" />
     <ClInclude Include="Navigation.h" />
+    <ClInclude Include="NavigationController.h" />
     <ClInclude Include="NewBookmarkFolderDialog.h" />
     <ClInclude Include="NoTranslationResource.h" />
     <ClInclude Include="Config.h" />
@@ -677,7 +678,6 @@
     <ClInclude Include="ShellBrowser\Columns.h" />
     <ClInclude Include="ShellBrowser\FolderSettings.h" />
     <ClInclude Include="ShellBrowser\HistoryEntry.h" />
-    <ClInclude Include="ShellBrowser\PathManager.h" />
     <ClInclude Include="ShellBrowser\PreservedHistoryEntry.h" />
     <ClInclude Include="ShellBrowser\ShellBrowser.h" />
     <ClInclude Include="ShellBrowser\ItemData.h" />
