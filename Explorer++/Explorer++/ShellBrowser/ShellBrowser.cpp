@@ -127,6 +127,8 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, Ca
 
 CShellBrowser::~CShellBrowser()
 {
+	DestroyWindow(m_hListView);
+
 	m_columnThreadPool.clear_queue();
 	m_thumbnailThreadPool.clear_queue();
 	m_infoTipsThreadPool.clear_queue();
