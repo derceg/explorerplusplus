@@ -536,8 +536,8 @@ void Explorerplusplus::SaveTabSettingsToRegistry(void)
 				}
 
 				/* High-level settings. */
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("Locked"),tab.GetLocked());
-				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AddressLocked"),tab.GetAddressLocked());
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("Locked"),tab.GetLockState() == Tab::LockState::Locked);
+				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("AddressLocked"),tab.GetLockState() == Tab::LockState::AddressLocked);
 				NRegistrySettings::SaveDwordToRegistry(hTabKey,_T("UseCustomName"),tab.GetUseCustomName());
 
 				if(tab.GetUseCustomName())
@@ -665,10 +665,18 @@ int Explorerplusplus::LoadTabSettingsFromRegistry()
 			tabSettings.selected = true;
 
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("Locked"),&value);
-			tabSettings.locked = value;
+
+			if (value)
+			{
+				tabSettings.lockState = Tab::LockState::Locked;
+			}
 
 			NRegistrySettings::ReadDwordFromRegistry(hTabKey,_T("AddressLocked"),&value);
-			tabSettings.addressLocked = value;
+
+			if (value)
+			{
+				tabSettings.lockState = Tab::LockState::AddressLocked;
+			}
 
 			TCHAR customName[64];
 			NRegistrySettings::ReadStringFromRegistry(hTabKey,_T("CustomName"),customName,SIZEOF_ARRAY(customName));

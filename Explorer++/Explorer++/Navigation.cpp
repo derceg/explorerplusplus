@@ -43,7 +43,7 @@ void Navigation::OnGoToOffset(int offset)
 	HRESULT hr = E_FAIL;
 	int resultingTabId = -1;
 
-	if (!tab.GetAddressLocked())
+	if (tab.GetLockState() != Tab::LockState::AddressLocked)
 	{
 		hr = tab.GetNavigationController()->GoToOffset(offset);
 
@@ -82,7 +82,7 @@ void Navigation::OnNavigateUp()
 	HRESULT hr = E_FAIL;
 	int resultingTabId = -1;
 
-	if (!tab.GetAddressLocked())
+	if (tab.GetLockState() != Tab::LockState::AddressLocked)
 	{
 		hr = tab.GetNavigationController()->GoUp();
 
@@ -177,7 +177,7 @@ HRESULT Navigation::BrowseFolder(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory)
 	HRESULT hr = E_FAIL;
 	int resultingTabId = -1;
 
-	if(!tab.GetAddressLocked())
+	if (tab.GetLockState() != Tab::LockState::AddressLocked)
 	{
 		hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory);
 

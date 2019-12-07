@@ -877,9 +877,9 @@ void Explorerplusplus::SaveTabSettingsToXMLnternal(IXMLDOMDocument *pXMLDom,IXML
 
 		/* High-level settings. */
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("Locked"),
-			NXMLSettings::EncodeBoolValue(tab.GetLocked()));
+			NXMLSettings::EncodeBoolValue(tab.GetLockState() == Tab::LockState::Locked));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("AddressLocked"),
-			NXMLSettings::EncodeBoolValue(tab.GetAddressLocked()));
+			NXMLSettings::EncodeBoolValue(tab.GetLockState() == Tab::LockState::AddressLocked));
 		NXMLSettings::AddAttributeToNode(pXMLDom,pParentNode,_T("UseCustomName"),
 			NXMLSettings::EncodeBoolValue(tab.GetUseCustomName()));
 
@@ -1824,11 +1824,21 @@ void Explorerplusplus::MapTabAttributeValue(WCHAR *wszName,WCHAR *wszValue,
 	}
 	else if(lstrcmp(wszName,L"Locked") == 0)
 	{
-		tabSettings.locked = NXMLSettings::DecodeBoolValue(wszValue);
+		BOOL locked = NXMLSettings::DecodeBoolValue(wszValue);
+
+		if (locked)
+		{
+			tabSettings.lockState = Tab::LockState::Locked;
+		}
 	}
 	else if(lstrcmp(wszName,L"AddressLocked") == 0)
 	{
-		tabSettings.addressLocked = NXMLSettings::DecodeBoolValue(wszValue);
+		BOOL addressLocked = NXMLSettings::DecodeBoolValue(wszValue);
+
+		if (addressLocked)
+		{
+			tabSettings.lockState = Tab::LockState::AddressLocked;
+		}
 	}
 	else if(lstrcmp(wszName,L"CustomName") == 0)
 	{

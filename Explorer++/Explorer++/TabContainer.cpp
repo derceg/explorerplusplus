@@ -380,9 +380,9 @@ void TabContainer::CreateTabContextMenu(Tab &tab, const POINT &pt)
 	std::vector<wil::unique_hbitmap> menuImages;
 	AddImagesToTabContextMenu(menu, menuImages);
 
-	lCheckMenuItem(menu, IDM_TAB_LOCKTAB, tab.GetLocked());
-	lCheckMenuItem(menu, IDM_TAB_LOCKTABANDADDRESS, tab.GetAddressLocked());
-	lEnableMenuItem(menu, IDM_TAB_CLOSETAB, !(tab.GetLocked() || tab.GetAddressLocked()));
+	lCheckMenuItem(menu, IDM_TAB_LOCKTAB, tab.GetLockState() == Tab::LockState::Locked);
+	lCheckMenuItem(menu, IDM_TAB_LOCKTABANDADDRESS, tab.GetLockState() == Tab::LockState::AddressLocked);
+	lEnableMenuItem(menu, IDM_TAB_CLOSETAB, tab.GetLockState() == Tab::LockState::NotLocked);
 
 	UINT Command = TrackPopupMenu(menu, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_VERTICAL | TPM_RETURNCMD,
 		pt.x, pt.y, 0, m_hwnd, nullptr);
@@ -482,12 +482,26 @@ void TabContainer::OnRenameTab(const Tab &tab)
 
 void TabContainer::OnLockTab(Tab &tab)
 {
-	tab.SetLocked(!tab.GetLocked());
+	if (tab.GetLockState() == Tab::LockState::Locked)
+	{
+		tab.SetLockState(Tab::LockState::NotLocked);
+	}
+	else
+	{
+		tab.SetLockState(Tab::LockState::Locked);
+	}
 }
 
 void TabContainer::OnLockTabAndAddress(Tab &tab)
 {
-	tab.SetAddressLocked(!tab.GetAddressLocked());
+	if (tab.GetLockState() == Tab::LockState::AddressLocked)
+	{
+		tab.SetLockState(Tab::LockState::NotLocked);
+	}
+	else
+	{
+		tab.SetLockState(Tab::LockState::AddressLocked);
+	}
 }
 
 void TabContainer::OnCloseOtherTabs(int index)
@@ -659,12 +673,11 @@ void TabContainer::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyType)
 {
 	switch (propertyType)
 	{
-	case Tab::PropertyType::LOCKED:
-	case Tab::PropertyType::ADDRESS_LOCKED:
+	case Tab::PropertyType::LockState:
 		SetTabIcon(tab);
 		break;
 
-	case Tab::PropertyType::NAME:
+	case Tab::PropertyType::Name:
 		UpdateTabNameInWindow(tab);
 		break;
 	}
@@ -684,7 +697,7 @@ void TabContainer::UpdateTabNameInWindow(const Tab &tab)
 void TabContainer::SetTabIcon(const Tab &tab)
 {
 	/* If the tab is locked, use a lock icon. */
-	if (tab.GetAddressLocked() || tab.GetLocked())
+	if (tab.GetLockState() == Tab::LockState::Locked || tab.GetLockState() == Tab::LockState::AddressLocked)
 	{
 		SetTabIconFromImageList(tab, m_tabIconLockIndex);
 	}
@@ -816,7 +829,7 @@ HRESULT TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTab
 	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
 
 	TabSettings tabSettings(_index = preservedTab.index, _selected = true,
-		_locked = preservedTab.locked, _addressLocked = preservedTab.addressLocked);
+		_lockState = preservedTab.lockState);
 
 	if (preservedTab.useCustomName)
 	{
@@ -837,9 +850,19 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 
 	int tabId = m_tabIdCounter++;
 	auto item = m_tabs.emplace(std::piecewise_construct, std::make_tuple(tabId),
-		std::make_tuple(tabId, m_expp, tabSettings, folderSettings, initialColumns));
+		std::make_tuple(tabId, m_expp, folderSettings, initialColumns));
 
 	Tab &tab = item.first->second;
+
+	if (tabSettings.lockState)
+	{
+		tab.SetLockState(*tabSettings.lockState);
+	}
+
+	if (tabSettings.name && !tabSettings.name->empty())
+	{
+		tab.SetCustomName(*tabSettings.name);
+	}
 
 	int index;
 
@@ -952,7 +975,7 @@ bool TabContainer::CloseTab(const Tab &tab)
 	}
 
 	/* The tab is locked. Don't close it. */
-	if (tab.GetLocked() || tab.GetAddressLocked())
+	if (tab.GetLockState() == Tab::LockState::Locked || tab.GetLockState() == Tab::LockState::AddressLocked)
 	{
 		return false;
 	}

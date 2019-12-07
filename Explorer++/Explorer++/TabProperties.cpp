@@ -9,8 +9,7 @@ const char Plugins::TabConstants::LOCATION[] = "location";
 const char Plugins::TabConstants::NAME[] = "name";
 const char Plugins::TabConstants::INDEX[] = "index";
 const char Plugins::TabConstants::ACTIVE[] = "active";
-const char Plugins::TabConstants::LOCKED[] = "locked";
-const char Plugins::TabConstants::ADDRESS_LOCKED[] = "addressLocked";
+const char Plugins::TabConstants::LOCK_STATE[] = "lockState";
 const char Plugins::TabConstants::FOLDER_SETTINGS[] = "folderSettings";
 
 const char Plugins::FolderSettingsConstants::SORT_MODE[] = "sortMode";

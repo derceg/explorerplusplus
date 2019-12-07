@@ -12,8 +12,7 @@ namespace Plugins
 		extern const char NAME[];
 		extern const char INDEX[];
 		extern const char ACTIVE[];
-		extern const char LOCKED[];
-		extern const char ADDRESS_LOCKED[];
+		extern const char LOCK_STATE[];
 		extern const char FOLDER_SETTINGS[];
 	}
 

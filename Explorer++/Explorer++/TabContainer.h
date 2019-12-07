@@ -25,6 +25,48 @@ struct Config;
 class Navigation;
 struct PreservedTab;
 
+BOOST_PARAMETER_NAME(name)
+BOOST_PARAMETER_NAME(index)
+BOOST_PARAMETER_NAME(selected)
+BOOST_PARAMETER_NAME(lockState)
+
+// The use of Boost Parameter here allows values to be set by name
+// during construction. It would be better (and simpler) for this to be
+// done using designated initializers, but that feature's not due to be
+// introduced until C++20.
+struct TabSettingsImpl
+{
+	template <class ArgumentPack>
+	TabSettingsImpl(const ArgumentPack &args)
+	{
+		name = args[_name | boost::none];
+		lockState = args[_lockState | boost::none];
+		index = args[_index | boost::none];
+		selected = args[_selected | boost::none];
+	}
+
+	boost::optional<std::wstring> name;
+	boost::optional<Tab::LockState> lockState;
+	boost::optional<int> index;
+	boost::optional<bool> selected;
+};
+
+// Used when creating a tab.
+struct TabSettings : TabSettingsImpl
+{
+	BOOST_PARAMETER_CONSTRUCTOR(
+		TabSettings,
+		(TabSettingsImpl),
+		tag,
+		(optional
+			(name, (std::wstring))
+			(lockState, (Tab::LockState))
+			(index, (int))
+			(selected, (bool))
+		)
+	)
+};
+
 class TabContainer : public CBaseWindow
 {
 public:

@@ -56,8 +56,7 @@ void Explorerplusplus::OnTabUpdated(const Tab &tab, Tab::PropertyType propertyTy
 {
 	switch (propertyType)
 	{
-	case Tab::PropertyType::LOCKED:
-	case Tab::PropertyType::ADDRESS_LOCKED:
+	case Tab::PropertyType::LockState:
 		/* If the tab that was locked/unlocked is the
 		currently selected tab, then the tab close
 		button on the toolbar will need to be updated. */
@@ -75,7 +74,7 @@ void Explorerplusplus::UpdateTabToolbar()
 
 	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
 
-	if (nTabs > 1 && !(selectedTab.GetLocked() || selectedTab.GetAddressLocked()))
+	if (nTabs > 1 && selectedTab.GetLockState() == Tab::LockState::NotLocked)
 	{
 		/* Enable the tab close button. */
 		SendMessage(m_hTabWindowToolbar, TB_SETSTATE,

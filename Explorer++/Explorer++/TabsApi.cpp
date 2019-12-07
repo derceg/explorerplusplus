@@ -126,18 +126,12 @@ void Plugins::TabsApi::extractTabPropertiesForCreation(sol::table createProperti
 		tabSettings.selected = *active;
 	}
 
-	boost::optional<bool> locked = createProperties[TabConstants::LOCKED];
+	boost::optional<int> lockState = createProperties[TabConstants::LOCK_STATE];
 
-	if (locked)
+	// TODO: Verify that lockState has a valid value.
+	if (lockState)
 	{
-		tabSettings.locked = *locked;
-	}
-
-	boost::optional<bool> addressLocked = createProperties[TabConstants::ADDRESS_LOCKED];
-
-	if (addressLocked)
-	{
-		tabSettings.addressLocked = *addressLocked;
+		tabSettings.lockState = static_cast<::Tab::LockState>(*lockState);
 	}
 }
 
@@ -216,18 +210,12 @@ void Plugins::TabsApi::update(int tabId, sol::table properties)
 		}
 	}
 
-	boost::optional<bool> locked = properties[TabConstants::LOCKED];
+	boost::optional<int> lockState = properties[TabConstants::LOCK_STATE];
 
-	if (locked)
+	// TODO: Verify that lockState has a valid value.
+	if (lockState)
 	{
-		tabInternal->SetLocked(*locked);
-	}
-
-	boost::optional<bool> addressLocked = properties[TabConstants::ADDRESS_LOCKED];
-
-	if (addressLocked)
-	{
-		tabInternal->SetAddressLocked(*addressLocked);
+		tabInternal->SetLockState(static_cast<::Tab::LockState> (*lockState));
 	}
 
 	boost::optional<bool> active = properties[TabConstants::ACTIVE];

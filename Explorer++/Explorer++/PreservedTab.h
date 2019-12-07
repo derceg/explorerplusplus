@@ -17,8 +17,7 @@ struct PreservedTab
 		currentEntry(tab.GetNavigationController()->GetCurrentIndex()),
 		useCustomName(tab.GetUseCustomName()),
 		customName(tab.GetUseCustomName() ? tab.GetName() : std::wstring()),
-		locked(tab.GetLocked()),
-		addressLocked(tab.GetAddressLocked())
+		lockState(tab.GetLockState())
 	{
 		
 	}
@@ -31,8 +30,7 @@ struct PreservedTab
 
 	bool useCustomName;
 	std::wstring customName;
-	bool locked;
-	bool addressLocked;
+	Tab::LockState lockState;
 
 private:
 

@@ -7,28 +7,12 @@
 #include "Config.h"
 #include <wil/resource.h>
 
-Tab::Tab(int id, IExplorerplusplus *expp, const TabSettings &tabSettings, const FolderSettings *folderSettings,
+Tab::Tab(int id, IExplorerplusplus *expp, const FolderSettings *folderSettings,
 	boost::optional<FolderColumns> initialColumns) :
 	m_id(id),
 	m_useCustomName(false),
-	m_locked(false),
-	m_addressLocked(false)
+	m_lockState(LockState::NotLocked)
 {
-	if (tabSettings.locked)
-	{
-		SetLocked(*tabSettings.locked);
-	}
-
-	if (tabSettings.addressLocked)
-	{
-		SetAddressLocked(*tabSettings.addressLocked);
-	}
-
-	if (tabSettings.name && !tabSettings.name->empty())
-	{
-		SetCustomName(*tabSettings.name);
-	}
-
 	FolderSettings folderSettingsFinal;
 
 	if (folderSettings)
@@ -94,7 +78,7 @@ void Tab::SetCustomName(const std::wstring &name)
 	m_useCustomName = true;
 	m_customName = name;
 
-	m_tabUpdatedSignal(*this, PropertyType::NAME);
+	m_tabUpdatedSignal(*this, PropertyType::Name);
 }
 
 void Tab::ClearCustomName()
@@ -102,53 +86,24 @@ void Tab::ClearCustomName()
 	m_useCustomName = false;
 	m_customName.erase();
 
-	m_tabUpdatedSignal(*this, PropertyType::NAME);
+	m_tabUpdatedSignal(*this, PropertyType::Name);
 }
 
-bool Tab::GetLocked() const
+Tab::LockState Tab::GetLockState() const
 {
-	return m_locked;
+	return m_lockState;
 }
 
-void Tab::SetLocked(bool locked)
+void Tab::SetLockState(LockState lockState)
 {
-	if (locked == m_locked)
+	if (lockState == m_lockState)
 	{
 		return;
 	}
 
-	m_locked = locked;
+	m_lockState = lockState;
 
-	/* The "Lock Tab" and "Lock Tab and Address" options are mutually
-	exclusive. */
-	if (locked)
-	{
-		m_addressLocked = false;
-	}
-
-	m_tabUpdatedSignal(*this, PropertyType::LOCKED);
-}
-
-bool Tab::GetAddressLocked() const
-{
-	return m_addressLocked;
-}
-
-void Tab::SetAddressLocked(bool addressLocked)
-{
-	if (addressLocked == m_addressLocked)
-	{
-		return;
-	}
-
-	m_addressLocked = addressLocked;
-
-	if (addressLocked)
-	{
-		m_locked = false;
-	}
-
-	m_tabUpdatedSignal(*this, PropertyType::ADDRESS_LOCKED);
+	m_tabUpdatedSignal(*this, PropertyType::LockState);
 }
 
 boost::signals2::connection Tab::AddTabUpdatedObserver(const TabUpdatedSignal::slot_type &observer)

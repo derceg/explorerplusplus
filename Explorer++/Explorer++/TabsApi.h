@@ -54,6 +54,8 @@ namespace Plugins
 			int id;
 			std::wstring location;
 			std::wstring name;
+
+			// TODO: Use the Tab::LockState enum instead of these values.
 			bool locked;
 			bool addressLocked;
 
@@ -65,8 +67,8 @@ namespace Plugins
 				id = tabInternal.GetId();
 				location = tabInternal.GetShellBrowser()->GetDirectory();
 				name = tabInternal.GetName();
-				locked = tabInternal.GetLocked();
-				addressLocked = tabInternal.GetAddressLocked();
+				locked = (tabInternal.GetLockState() == ::Tab::LockState::Locked);
+				addressLocked = (tabInternal.GetLockState() == ::Tab::LockState::AddressLocked);
 			}
 
 			std::wstring toString()

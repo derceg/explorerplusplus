@@ -29,16 +29,12 @@ void Plugins::TabUpdated::onTabUpdated(sol::protected_function observer, sol::th
 
 	switch (propertyType)
 	{
-	case Tab::PropertyType::LOCKED:
-		changeInfo["locked"] = tab.GetLocked();
-		break;
-
-	case Tab::PropertyType::ADDRESS_LOCKED:
-		changeInfo["addressLocked"] = tab.GetAddressLocked();
-		break;
-
-	case Tab::PropertyType::NAME:
+	case Tab::PropertyType::Name:
 		changeInfo["name"] = tab.GetName();
+		break;
+
+	case Tab::PropertyType::LockState:
+		changeInfo["lockState"] = tab.GetLockState();
 		break;
 	}
 
