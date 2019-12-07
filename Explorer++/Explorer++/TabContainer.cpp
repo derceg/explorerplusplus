@@ -836,39 +836,10 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 	}
 
 	int tabId = m_tabIdCounter++;
-	auto item = m_tabs.emplace(std::make_pair(tabId, tabId));
+	auto item = m_tabs.emplace(std::piecewise_construct, std::make_tuple(tabId),
+		std::make_tuple(tabId, m_expp, tabSettings, folderSettings, initialColumns));
 
 	Tab &tab = item.first->second;
-
-	if (tabSettings.locked)
-	{
-		tab.SetLocked(*tabSettings.locked);
-	}
-
-	if (tabSettings.addressLocked)
-	{
-		tab.SetAddressLocked(*tabSettings.addressLocked);
-	}
-
-	if (tabSettings.name && !tabSettings.name->empty())
-	{
-		tab.SetCustomName(*tabSettings.name);
-	}
-
-	FolderSettings folderSettingsFinal;
-
-	if (folderSettings)
-	{
-		folderSettingsFinal = *folderSettings;
-	}
-	else
-	{
-		folderSettingsFinal = GetDefaultFolderSettings(pidlDirectory);
-	}
-
-	tab.SetShellBrowser(CShellBrowser::CreateNew(tab.GetId(), m_instance,
-		m_expp->GetMainWindow(), m_cachedIcons, m_config, folderSettingsFinal,
-		initialColumns));
 
 	int index;
 
@@ -942,66 +913,6 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 	tabCreatedSignal.m_signal(tab.GetId(), selected);
 
 	return S_OK;
-}
-
-FolderSettings TabContainer::GetDefaultFolderSettings(PCIDLIST_ABSOLUTE pidlDirectory) const
-{
-	FolderSettings folderSettings = m_config->defaultFolderSettings;
-	folderSettings.sortMode = GetDefaultSortMode(pidlDirectory);
-
-	return folderSettings;
-}
-
-SortMode TabContainer::GetDefaultSortMode(PCIDLIST_ABSOLUTE pidlDirectory) const
-{
-	const std::vector<Column_t> *pColumns = nullptr;
-
-	TCHAR szDirectory[MAX_PATH];
-	GetDisplayName(pidlDirectory, szDirectory, SIZEOF_ARRAY(szDirectory), SHGDN_FORPARSING);
-
-	const auto &defaultFolderColumns = m_config->globalFolderSettings.folderColumns;
-
-	if (CompareVirtualFolders(szDirectory, CSIDL_CONTROLS))
-	{
-		pColumns = &defaultFolderColumns.controlPanelColumns;
-	}
-	else if (CompareVirtualFolders(szDirectory, CSIDL_DRIVES))
-	{
-		pColumns = &defaultFolderColumns.myComputerColumns;
-	}
-	else if (CompareVirtualFolders(szDirectory, CSIDL_BITBUCKET))
-	{
-		pColumns = &defaultFolderColumns.recycleBinColumns;
-	}
-	else if (CompareVirtualFolders(szDirectory, CSIDL_PRINTERS))
-	{
-		pColumns = &defaultFolderColumns.printersColumns;
-	}
-	else if (CompareVirtualFolders(szDirectory, CSIDL_CONNECTIONS))
-	{
-		pColumns = &defaultFolderColumns.networkConnectionsColumns;
-	}
-	else if (CompareVirtualFolders(szDirectory, CSIDL_NETWORK))
-	{
-		pColumns = &defaultFolderColumns.myNetworkPlacesColumns;
-	}
-	else
-	{
-		pColumns = &defaultFolderColumns.realFolderColumns;
-	}
-
-	SortMode sortMode = SortMode::Name;
-
-	for (const auto &Column : *pColumns)
-	{
-		if (Column.bChecked)
-		{
-			sortMode = CShellBrowser::DetermineColumnSortMode(Column.id);
-			break;
-		}
-	}
-
-	return sortMode;
 }
 
 void TabContainer::InsertNewTab(int index, int tabId, PCIDLIST_ABSOLUTE pidlDirectory, boost::optional<std::wstring> customName)

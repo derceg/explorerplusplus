@@ -299,6 +299,7 @@ private:
 	void					OnNavigationCompleted(const Tab &tab);
 
 	/* PluginInterface. */
+	IExplorerplusplus		*GetCoreInterface();
 	TabContainer			*GetTabContainer();
 	TabInterface			*GetTabInterface();
 	Navigation				*GetNavigation();
@@ -457,6 +458,8 @@ private:
 	void					ToggleFilterStatus();
 
 	/* IExplorerplusplus methods. */
+	Config					*GetConfig() const;
+	HMODULE					GetLanguageModule() const;
 	HWND					GetMainWindow() const;
 	HWND					GetActiveListView() const;
 	CShellBrowser			*GetActiveShellBrowser() const;
@@ -464,6 +467,7 @@ private:
 	HWND					GetTreeView() const;
 	IDirectoryMonitor		*GetDirectoryMonitor() const;
 	IconResourceLoader		*GetIconResourceLoader() const;
+	CachedIcons				*GetCachedIcons();
 	BOOL					GetSavePreferencesToXmlFile() const;
 	void					SetSavePreferencesToXmlFile(BOOL savePreferencesToXmlFile);
 	DWORD					GetLanguage() const;

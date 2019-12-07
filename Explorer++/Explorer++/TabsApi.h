@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "CoreInterface.h"
 #include "Navigation.h"
 #include "ShellBrowser/SortModes.h"
 #include "ShellBrowser/ViewModes.h"
@@ -79,7 +80,7 @@ namespace Plugins
 			}
 		};
 
-		TabsApi(TabContainer *tabContainer, TabInterface *tabInterface, Navigation *navigation);
+		TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer, TabInterface *tabInterface, Navigation *navigation);
 
 		std::vector<Tab> getAll();
 		boost::optional<Tab> get(int tabId);
@@ -94,6 +95,7 @@ namespace Plugins
 		void extractTabPropertiesForCreation(sol::table createProperties, TabSettings &tabSettings);
 		void extractFolderSettingsForCreation(sol::table folderSettingsTable, ::FolderSettings &folderSettings);
 
+		IExplorerplusplus *m_expp;
 		TabContainer *m_tabContainer;
 		TabInterface *m_tabInterface;
 		Navigation *m_navigation;

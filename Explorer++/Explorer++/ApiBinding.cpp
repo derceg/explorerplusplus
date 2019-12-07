@@ -19,7 +19,7 @@
 #include "UiApi.h"
 #include "UiTheming.h"
 
-void BindTabsAPI(sol::state &state, TabContainer *tabContainer, TabInterface *tabInterface, Navigation *navigation);
+void BindTabsAPI(sol::state &state, IExplorerplusplus *expp, TabContainer *tabContainer, TabInterface *tabInterface, Navigation *navigation);
 void BindMenuApi(sol::state &state, Plugins::PluginMenuManager *pluginMenuManager);
 void BindUiApi(sol::state &state, UiTheming *uiTheming);
 void BindCommandApi(int pluginId, sol::state &state, Plugins::PluginCommandManager *pluginCommandManager);
@@ -32,15 +32,16 @@ int deny(lua_State *state);
 
 void Plugins::BindAllApiMethods(int pluginId, sol::state &state, PluginInterface *pluginInterface)
 {
-	BindTabsAPI(state, pluginInterface->GetTabContainer(), pluginInterface->GetTabInterface(), pluginInterface->GetNavigation());
+	BindTabsAPI(state, pluginInterface->GetCoreInterface(), pluginInterface->GetTabContainer(),
+		pluginInterface->GetTabInterface(), pluginInterface->GetNavigation());
 	BindMenuApi(state, pluginInterface->GetPluginMenuManager());
 	BindUiApi(state, pluginInterface->GetUiTheming());
 	BindCommandApi(pluginId, state, pluginInterface->GetPluginCommandManager());
 }
 
-void BindTabsAPI(sol::state &state, TabContainer *tabContainer, TabInterface *tabInterface, Navigation *navigation)
+void BindTabsAPI(sol::state &state, IExplorerplusplus *expp, TabContainer *tabContainer, TabInterface *tabInterface, Navigation *navigation)
 {
-	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(tabContainer, tabInterface, navigation);
+	std::shared_ptr<Plugins::TabsApi> tabsApi = std::make_shared<Plugins::TabsApi>(expp, tabContainer, tabInterface, navigation);
 
 	sol::table tabsTable = state.create_named_table("tabs");
 	sol::table tabsMetaTable = MarkTableReadOnly(state, tabsTable);

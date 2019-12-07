@@ -1423,6 +1423,16 @@ void Explorerplusplus::SaveAllSettings()
 	delete pLoadSave;
 }
 
+Config *Explorerplusplus::GetConfig() const
+{
+	return m_config.get();
+}
+
+HMODULE Explorerplusplus::GetLanguageModule() const
+{
+	return m_hLanguageModule;
+}
+
 HWND Explorerplusplus::GetMainWindow() const
 {
 	return m_hContainer;
@@ -1436,6 +1446,11 @@ HWND Explorerplusplus::GetActiveListView() const
 CShellBrowser *Explorerplusplus::GetActiveShellBrowser() const
 {
 	return m_pActiveShellBrowser;
+}
+
+IExplorerplusplus *Explorerplusplus::GetCoreInterface()
+{
+	return this;
 }
 
 TabContainer *Explorerplusplus::GetTabContainer() const
@@ -1456,6 +1471,11 @@ IDirectoryMonitor *Explorerplusplus::GetDirectoryMonitor() const
 IconResourceLoader *Explorerplusplus::GetIconResourceLoader() const
 {
 	return m_iconResourceLoader.get();
+}
+
+CachedIcons *Explorerplusplus::GetCachedIcons()
+{
+	return &m_cachedIcons;
 }
 
 BOOL Explorerplusplus::GetSavePreferencesToXmlFile() const

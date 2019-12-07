@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AcceleratorUpdater.h"
+#include "CoreInterface.h"
 #include "Navigation.h"
 #include "PluginCommandManager.h"
 #include "PluginMenuManager.h"
@@ -14,6 +15,7 @@
 
 __interface PluginInterface
 {
+	IExplorerplusplus *GetCoreInterface();
 	TabContainer *GetTabContainer();
 	TabInterface *GetTabInterface();
 	Navigation *GetNavigation();

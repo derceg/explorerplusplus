@@ -12,7 +12,9 @@
 
 #pragma warning(disable:4459) // declaration of 'boost_scope_exit_aux_args' hides global declaration
 
-Plugins::TabsApi::TabsApi(TabContainer *tabContainer, TabInterface *tabInterface, Navigation *navigation) :
+Plugins::TabsApi::TabsApi(IExplorerplusplus *expp, TabContainer *tabContainer,
+	TabInterface *tabInterface, Navigation *navigation) :
+	m_expp(expp),
 	m_tabContainer(tabContainer),
 	m_tabInterface(tabInterface),
 	m_navigation(navigation)
@@ -67,7 +69,7 @@ int Plugins::TabsApi::create(sol::table createProperties)
 		return -1;
 	}
 
-	::FolderSettings folderSettings = m_tabContainer->GetDefaultFolderSettings(pidlDirectory.get());
+	::FolderSettings folderSettings = m_expp->GetConfig()->defaultFolderSettings;
 
 	boost::optional<sol::table> folderSettingsTable = createProperties[TabConstants::FOLDER_SETTINGS];
 

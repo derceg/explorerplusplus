@@ -54,8 +54,8 @@ class CShellBrowser : public IDropTarget, public IDropFilesCallback
 {
 public:
 
-	static CShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
-		std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+	static CShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
+		CachedIcons *cachedIcons, const Config *config, const FolderSettings &folderSettings,
 		boost::optional<FolderColumns> initialColumns);
 
 	/* IUnknown methods. */
@@ -268,7 +268,7 @@ private:
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
 	CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
-		std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
+		const Config *config, const FolderSettings &folderSettings,
 		boost::optional<FolderColumns> initialColumns);
 	~CShellBrowser();
 
@@ -276,7 +276,7 @@ private:
 	int					GenerateUniqueItemId();
 	BOOL				GhostItemInternal(int iItem,BOOL bGhost);
 	void				DetermineFolderVirtual(PCIDLIST_ABSOLUTE pidlDirectory);
-	void				VerifySortMode(void);
+	void				VerifySortMode();
 
 	/* Browsing support. */
 	HRESULT				EnumerateFolder(PCIDLIST_ABSOLUTE pidlDirectory);
@@ -477,7 +477,7 @@ private:
 	modification. */
 	int					m_uniqueFolderId;
 
-	std::shared_ptr<const Config>	m_config;
+	const Config		*m_config;
 	FolderSettings		m_folderSettings;
 
 	/* ID. */

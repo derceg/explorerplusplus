@@ -4,15 +4,47 @@
 
 #include "stdafx.h"
 #include "Tab.h"
+#include "Config.h"
 #include <wil/resource.h>
 
-Tab::Tab(int id) :
+Tab::Tab(int id, IExplorerplusplus *expp, const TabSettings &tabSettings, const FolderSettings *folderSettings,
+	boost::optional<FolderColumns> initialColumns) :
 	m_id(id),
 	m_useCustomName(false),
 	m_locked(false),
 	m_addressLocked(false)
 {
+	if (tabSettings.locked)
+	{
+		SetLocked(*tabSettings.locked);
+	}
 
+	if (tabSettings.addressLocked)
+	{
+		SetAddressLocked(*tabSettings.addressLocked);
+	}
+
+	if (tabSettings.name && !tabSettings.name->empty())
+	{
+		SetCustomName(*tabSettings.name);
+	}
+
+	FolderSettings folderSettingsFinal;
+
+	if (folderSettings)
+	{
+		folderSettingsFinal = *folderSettings;
+	}
+	else
+	{
+		folderSettingsFinal = expp->GetConfig()->defaultFolderSettings;
+	}
+
+	m_shellBrowser = CShellBrowser::CreateNew(id, expp->GetLanguageModule(),
+		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(), folderSettingsFinal,
+		initialColumns);
+
+	m_navigationController = std::make_unique<NavigationController>(m_shellBrowser);
 }
 
 int Tab::GetId() const
@@ -28,15 +60,6 @@ NavigationController *Tab::GetNavigationController() const
 CShellBrowser *Tab::GetShellBrowser() const
 {
 	return m_shellBrowser;
-}
-
-/* TODO: Ideally, this method wouldn't exist (the value would be set
-during construction of the tab object). */
-void Tab::SetShellBrowser(CShellBrowser *shellBrowser)
-{
-	m_shellBrowser = shellBrowser;
-
-	m_navigationController = std::make_unique<NavigationController>(shellBrowser);
 }
 
 // If a custom name has been set, that will be returned. Otherwise, the

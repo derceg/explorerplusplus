@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include "CoreInterface.h"
 #include "NavigationController.h"
+#include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include "../Helper/Macros.h"
 #include <boost/optional.hpp>
@@ -70,14 +72,14 @@ public:
 
 	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)> TabUpdatedSignal;
 
-	explicit Tab(int id);
+	Tab(int id, IExplorerplusplus *expp, const TabSettings &tabSettings, const FolderSettings *folderSettings,
+		boost::optional<FolderColumns> initialColumns);
 
 	int GetId() const;
 
 	NavigationController *GetNavigationController() const;
 
 	CShellBrowser *GetShellBrowser() const;
-	void SetShellBrowser(CShellBrowser *shellBrowser);
 
 	std::wstring GetName() const;
 	bool GetUseCustomName() const;

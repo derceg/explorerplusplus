@@ -65,16 +65,14 @@ ULONG __stdcall CShellBrowser::Release(void)
 }
 
 CShellBrowser *CShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
-	std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
-	boost::optional<FolderColumns> initialColumns)
+	const Config *config, const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns)
 {
 	return new CShellBrowser(id, resourceInstance, hOwner, cachedIcons, config,
 		folderSettings, initialColumns);
 }
 
 CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
-	std::shared_ptr<const Config> config, const FolderSettings &folderSettings,
-	boost::optional<FolderColumns> initialColumns) :
+	const Config *config, const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns) :
 	m_ID(id),
 	m_hResourceModule(resourceInstance),
 	m_hOwner(hOwner),
@@ -1070,107 +1068,55 @@ void CShellBrowser::UnfilterAllItems(void)
 	SendMessage(m_hOwner,WM_USER_UPDATEWINDOWS,0,0);
 }
 
-void CShellBrowser::VerifySortMode(void)
+void CShellBrowser::VerifySortMode()
 {
-	BOOL	bValid = FALSE;
-	int		i = 0;
+	const std::vector<Column_t> *columns = nullptr;
 
 	if(CompareVirtualFolders(CSIDL_CONTROLS))
 	{
-		/* Control panel. */
-
-		for(i = 0;i < sizeof(ControlPanelSortModes) / sizeof(int);i++)
-		{
-			if(m_folderSettings.sortMode == ControlPanelSortModes[i])
-			{
-				bValid = TRUE;
-				break;
-			}
-		}
-
-		if(!bValid)
-			m_folderSettings.sortMode = SortMode::Name;
+		columns = &m_folderColumns.controlPanelColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_DRIVES))
 	{
-		/* My Computer. */
-
-		for(i = 0;i < sizeof(MyComputerSortModes) / sizeof(int);i++)
-		{
-			if(m_folderSettings.sortMode == MyComputerSortModes[i])
-			{
-				bValid = TRUE;
-				break;
-			}
-		}
-
-		if(!bValid)
-			m_folderSettings.sortMode = SortMode::Name;
+		columns = &m_folderColumns.myComputerColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_BITBUCKET))
 	{
-		/* Recycle Bin. */
-
-		for(i = 0;i < sizeof(RecycleBinSortModes) / sizeof(int);i++)
-		{
-			if(m_folderSettings.sortMode == RecycleBinSortModes[i])
-			{
-				bValid = TRUE;
-				break;
-			}
-		}
-
-		if(!bValid)
-			m_folderSettings.sortMode = SortMode::Name;
+		columns = &m_folderColumns.recycleBinColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_PRINTERS))
 	{
-		/* Printers virtual folder. */
-
-		for(i = 0;i < sizeof(PrintersSortModes) / sizeof(int);i++)
-		{
-			if(m_folderSettings.sortMode == PrintersSortModes[i])
-			{
-				bValid = TRUE;
-				break;
-			}
-		}
-
-		if(!bValid)
-			m_folderSettings.sortMode = SortMode::Name;
+		columns = &m_folderColumns.printersColumns;
 	}
 	else if(CompareVirtualFolders(CSIDL_CONNECTIONS))
 	{
-		/* Network connections virtual folder. */
-
-		for(i = 0;i < sizeof(NetworkConnectionsSortModes) / sizeof(int);i++)
-		{
-			if(m_folderSettings.sortMode == NetworkConnectionsSortModes[i])
-			{
-				bValid = TRUE;
-				break;
-			}
-		}
-
-		if(!bValid)
-			m_folderSettings.sortMode = SortMode::Name;
+		columns = &m_folderColumns.networkConnectionsColumns;
+	}
+	else if (CompareVirtualFolders(CSIDL_NETWORK))
+	{
+		columns = &m_folderColumns.myNetworkPlacesColumns;
 	}
 	else
 	{
-		/* Real folder. */
-
-		for(i = 0;i < sizeof(RealFolderSortModes) / sizeof(int);i++)
-		{
-			if(m_folderSettings.sortMode == RealFolderSortModes[i])
-			{
-				bValid = TRUE;
-				break;
-			}
-		}
-
-		if(!bValid)
-			m_folderSettings.sortMode = SortMode::Name;
+		columns = &m_folderColumns.realFolderColumns;
 	}
+
+	auto itr = std::find_if(columns->begin(), columns->end(), [sortMode = m_folderSettings.sortMode] (const Column_t &column) {
+		return column.id == static_cast<unsigned int>(sortMode);
+	});
+
+	if (itr != columns->end())
+	{
+		return;
+	}
+
+	auto firstChecked = std::find_if(columns->begin(), columns->end(), [] (const Column_t &column) {
+		return column.bChecked;
+	});
+
+	// There should always be at least one checked column, so firstChecked
+	// should always be valid here.
+	m_folderSettings.sortMode = DetermineColumnSortMode(firstChecked->id);
 }
 
 BOOL CShellBrowser::GetSortAscending(void) const

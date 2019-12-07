@@ -19,6 +19,8 @@ enum MousewheelSource_t
 	MOUSEWHEEL_SOURCE_OTHER
 };
 
+class CachedIcons;
+struct Config;
 class CShellBrowser;
 __interface IDirectoryMonitor;
 class TabContainer;
@@ -28,6 +30,9 @@ and some of the other components (such as the
 dialogs and toolbars). */
 __interface IExplorerplusplus
 {
+	Config			*GetConfig() const;
+	HMODULE			GetLanguageModule() const;
+
 	HWND			GetMainWindow() const;
 
 	HWND			GetActiveListView() const;
@@ -37,13 +42,14 @@ __interface IExplorerplusplus
 	IDirectoryMonitor	*GetDirectoryMonitor() const;
 
 	IconResourceLoader	*GetIconResourceLoader() const;
+	CachedIcons		*GetCachedIcons();
 
 	HWND			GetTreeView() const;
 
 	void			OpenItem(const TCHAR *szItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
 	void			OpenItem(PCIDLIST_ABSOLUTE pidlItem, BOOL bOpenInNewTab, BOOL bOpenInNewWindow);
 
-	CStatusBar *GetStatusBar();
+	CStatusBar		*GetStatusBar();
 
 	void			OpenFileItem(PCIDLIST_ABSOLUTE pidlItem, const TCHAR *szParameters);
 
