@@ -13,6 +13,8 @@
 #include <boost/parameter.hpp>
 #include <boost/signals2.hpp>
 
+struct PreservedTab;
+
 class Tab
 {
 public:
@@ -32,8 +34,9 @@ public:
 
 	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)> TabUpdatedSignal;
 
-	Tab(int id, IExplorerplusplus *expp, const FolderSettings *folderSettings,
+	Tab(IExplorerplusplus *expp, const FolderSettings *folderSettings,
 		boost::optional<FolderColumns> initialColumns);
+	Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp);
 
 	int GetId() const;
 
@@ -62,6 +65,7 @@ private:
 
 	DISALLOW_COPY_AND_ASSIGN(Tab);
 
+	static int idCounter;
 	const int m_id;
 
 	std::unique_ptr<NavigationController> m_navigationController;

@@ -190,7 +190,7 @@ HRESULT Explorerplusplus::RestoreTabs(ILoadSave *pLoadSave)
 	states. */
 	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 	{
-		HandleDirectoryMonitoring(tab.GetId());
+		HandleDirectoryMonitoring(tab->GetId());
 	}
 
 	if(!m_config->alwaysShowTabBar.get())

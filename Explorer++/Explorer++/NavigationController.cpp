@@ -9,8 +9,36 @@ NavigationController::NavigationController(CShellBrowser *shellBrowser) :
 	m_shellBrowser(shellBrowser),
 	m_currentEntry(-1)
 {
-	m_connections.push_back(shellBrowser->navigationCompletedSignal.AddObserver(
+	Initialize();
+}
+
+NavigationController::NavigationController(CShellBrowser *shellBrowser,
+	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries, int currentEntry) :
+	m_shellBrowser(shellBrowser),
+	m_entries(CopyPreservedHistoryEntries(preservedEntries)),
+	m_currentEntry(currentEntry)
+{
+	Initialize();
+}
+
+void NavigationController::Initialize()
+{
+	m_connections.push_back(m_shellBrowser->navigationCompletedSignal.AddObserver(
 		boost::bind(&NavigationController::OnNavigationCompleted, this, _1, _2)));
+}
+
+std::vector<std::unique_ptr<HistoryEntry>> NavigationController::CopyPreservedHistoryEntries(
+	const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries)
+{
+	std::vector<std::unique_ptr<HistoryEntry>> entries;
+
+	for (const auto &preservedEntry : preservedEntries)
+	{
+		auto entry = std::make_unique<HistoryEntry>(*preservedEntry);
+		entries.push_back(std::move(entry));
+	}
+
+	return entries;
 }
 
 void NavigationController::OnNavigationCompleted(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry)

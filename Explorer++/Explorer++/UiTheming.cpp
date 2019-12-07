@@ -42,7 +42,7 @@ bool UiTheming::ApplyListViewColorsForAllTabs(COLORREF backgroundColor, COLORREF
 
 	for (const auto &item : m_tabContainer->GetAllTabs())
 	{
-		bool res = ApplyListViewColorsForTab(item.second, backgroundColor, textColor);
+		bool res = ApplyListViewColorsForTab(*item.second, backgroundColor, textColor);
 
 		if (!res)
 		{

@@ -99,11 +99,11 @@ public:
 	bool CloseTab(const Tab &tab);
 
 	// Eventually, this should be removed.
-	std::unordered_map<int, Tab> &GetTabs();
+	std::unordered_map<int, std::unique_ptr<Tab>> &GetTabs();
 
 	/* TODO: Ideally, there would be a method of iterating over the tabs without
 	having access to the underlying container. */
-	const std::unordered_map<int, Tab> &GetAllTabs() const;
+	const std::unordered_map<int, std::unique_ptr<Tab>> &GetAllTabs() const;
 	std::vector<std::reference_wrapper<const Tab>> GetAllTabsInOrder() const;
 
 	// Signals
@@ -137,6 +137,9 @@ private:
 	void Initialize(HWND parent);
 	void AddDefaultTabIcons(HIMAGELIST himlTab);
 	bool IsDefaultIcon(int iconIndex);
+
+	HRESULT SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory, const TabSettings &tabSettings,
+		bool addHistoryEntry, int *newTabId);
 
 	void OnTabCtrlLButtonDown(POINT *pt);
 	void OnTabCtrlLButtonUp(void);
@@ -183,8 +186,7 @@ private:
 	wil::unique_hfont m_tabFont;
 	wil::unique_himagelist m_tabCtrlImageList;
 
-	std::unordered_map<int, Tab> m_tabs;
-	int m_tabIdCounter;
+	std::unordered_map<int, std::unique_ptr<Tab>> m_tabs;
 
 	IconFetcher m_iconFetcher;
 	CachedIcons *m_cachedIcons;

@@ -640,7 +640,7 @@ int Explorerplusplus::DetermineListViewObjectIndex(HWND hListView)
 {
 	for (auto &item : m_tabContainer->GetAllTabs())
 	{
-		if (item.second.GetShellBrowser()->GetListView() == hListView)
+		if (item.second->GetShellBrowser()->GetListView() == hListView)
 		{
 			return item.first;
 		}

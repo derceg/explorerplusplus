@@ -452,14 +452,14 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 	{
 		uFlags = SWP_NOZORDER;
 
-		if (m_tabContainer->IsTabSelected(tab))
+		if (m_tabContainer->IsTabSelected(*tab))
 		{
 			uFlags |= SWP_SHOWWINDOW;
 		}
 
 		if(!m_config->showTabBarAtBottom)
 		{
-			SetWindowPos(tab.GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
+			SetWindowPos(tab->GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
 				MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
 				uFlags);
 		}
@@ -467,13 +467,13 @@ BOOL Explorerplusplus::OnSize(int MainWindowWidth,int MainWindowHeight)
 		{
 			if(m_bShowTabBar)
 			{
-				SetWindowPos(tab.GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
+				SetWindowPos(tab->GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
 					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop - tabWindowHeight,
 					uFlags);
 			}
 			else
 			{
-				SetWindowPos(tab.GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
+				SetWindowPos(tab->GetShellBrowser()->GetListView(),NULL,IndentLeft,IndentTop,
 					MainWindowWidth - IndentLeft,MainWindowHeight - IndentBottom - IndentTop,
 					uFlags);
 			}
@@ -1213,7 +1213,7 @@ void Explorerplusplus::OnAssocChanged()
 	/* Now, go through each tab, and refresh each icon. */
 	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 	{
-		tab.GetNavigationController()->Refresh();
+		tab->GetNavigationController()->Refresh();
 	}
 
 	/* Now, refresh the treeview. */

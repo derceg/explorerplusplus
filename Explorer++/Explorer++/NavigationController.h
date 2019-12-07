@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ShellBrowser/HistoryEntry.h"
+#include "ShellBrowser/PreservedHistoryEntry.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include <boost/signals2.hpp>
 
@@ -13,6 +14,8 @@ class NavigationController
 public:
 
 	NavigationController(CShellBrowser *shellBrowser);
+	NavigationController(CShellBrowser *shellBrowser, const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries,
+		int currentEntry);
 
 	int GetNumHistoryEntries() const;
 	int GetCurrentIndex() const;
@@ -33,6 +36,11 @@ public:
 	HRESULT Refresh();
 
 private:
+
+	void Initialize();
+
+	static std::vector<std::unique_ptr<HistoryEntry>> NavigationController::CopyPreservedHistoryEntries(
+		const std::vector<std::unique_ptr<PreservedHistoryEntry>> &preservedEntries);
 
 	void OnNavigationCompleted(PCIDLIST_ABSOLUTE pidlDirectory, bool addHistoryEntry);
 	void AddEntry(std::unique_ptr<HistoryEntry> entry);

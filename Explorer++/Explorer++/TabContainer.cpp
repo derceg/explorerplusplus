@@ -47,7 +47,6 @@ TabContainer::TabContainer(HWND parent, TabContainerInterface *tabContainer, Tab
 	Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons, HINSTANCE instance,
 	std::shared_ptr<Config> config) :
 	CBaseWindow(CreateTabControl(parent, config->forceSameTabWidth.get())),
-	m_tabIdCounter(1),
 	m_tabContainerInterface(tabContainer),
 	m_tabInterface(tabInterface),
 	m_navigation(navigation),
@@ -469,7 +468,7 @@ void TabContainer::OnRefreshAllTabs()
 {
 	for (auto &tab : GetAllTabs() | boost::adaptors::map_values)
 	{
-		m_tabInterface->RefreshTab(tab);
+		m_tabInterface->RefreshTab(*tab);
 	}
 }
 
@@ -828,15 +827,19 @@ HRESULT TabContainer::CreateNewTab(const PreservedTab &preservedTab, int *newTab
 {
 	PreservedHistoryEntry *entry = preservedTab.history.at(preservedTab.currentEntry).get();
 
-	TabSettings tabSettings(_index = preservedTab.index, _selected = true,
-		_lockState = preservedTab.lockState);
-
-	if (preservedTab.useCustomName)
+	if (!CheckIdl(entry->pidl.get()) || !IsIdlDirectory(entry->pidl.get()))
 	{
-		tabSettings.name = preservedTab.customName;
+		return E_FAIL;
 	}
 
-	return CreateNewTab(entry->pidl.get(), tabSettings, nullptr, boost::none, newTabId);
+	auto tabTemp = std::make_unique<Tab>(preservedTab, m_expp);
+	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
+
+	Tab &tab = *item.first->second;
+
+	TabSettings tabSettings(_index = preservedTab.index, _selected = true);
+
+	return SetUpNewTab(tab, entry->pidl.get(), tabSettings, false, newTabId);
 }
 
 HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
@@ -848,11 +851,10 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 		return E_FAIL;
 	}
 
-	int tabId = m_tabIdCounter++;
-	auto item = m_tabs.emplace(std::piecewise_construct, std::make_tuple(tabId),
-		std::make_tuple(tabId, m_expp, folderSettings, initialColumns));
+	auto tabTemp = std::make_unique<Tab>(m_expp, folderSettings, initialColumns);
+	auto item = m_tabs.insert({ tabTemp->GetId(), std::move(tabTemp) });
 
-	Tab &tab = item.first->second;
+	Tab &tab = *item.first->second;
 
 	if (tabSettings.lockState)
 	{
@@ -864,6 +866,12 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 		tab.SetCustomName(*tabSettings.name);
 	}
 
+	return SetUpNewTab(tab, pidlDirectory, tabSettings, true, newTabId);
+}
+
+HRESULT TabContainer::SetUpNewTab(Tab &tab, PCIDLIST_ABSOLUTE pidlDirectory,
+	const TabSettings &tabSettings, bool addHistoryEntry, int *newTabId)
+{
 	int index;
 
 	if (tabSettings.index)
@@ -901,7 +909,7 @@ HRESULT TabContainer::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory,
 		selected = *tabSettings.selected;
 	}
 
-	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory);
+	HRESULT hr = tab.GetShellBrowser()->BrowseFolder(pidlDirectory, addHistoryEntry);
 
 	if (hr != S_OK)
 	{
@@ -1055,7 +1063,7 @@ void TabContainer::RemoveTabFromControl(const Tab &tab)
 
 Tab &TabContainer::GetTab(int tabId)
 {
-	return m_tabs.at(tabId);
+	return *m_tabs.at(tabId);
 }
 
 Tab *TabContainer::GetTabOptional(int tabId)
@@ -1067,7 +1075,7 @@ Tab *TabContainer::GetTabOptional(int tabId)
 		return nullptr;
 	}
 
-	return &itr->second;
+	return itr->second.get();
 }
 
 void TabContainer::SelectTab(const Tab &tab)
@@ -1186,12 +1194,12 @@ int TabContainer::MoveTab(const Tab &tab, int newIndex)
 	return TabCtrl_MoveItem(m_hwnd, index, newIndex);
 }
 
-std::unordered_map<int, Tab> &TabContainer::GetTabs()
+std::unordered_map<int, std::unique_ptr<Tab>> &TabContainer::GetTabs()
 {
 	return m_tabs;
 }
 
-const std::unordered_map<int, Tab> &TabContainer::GetAllTabs() const
+const std::unordered_map<int, std::unique_ptr<Tab>> &TabContainer::GetAllTabs() const
 {
 	return m_tabs;
 }
@@ -1202,7 +1210,7 @@ std::vector<std::reference_wrapper<const Tab>> TabContainer::GetAllTabsInOrder()
 
 	for (const auto &tab : m_tabs | boost::adaptors::map_values)
 	{
-		sortedTabs.push_back(tab);
+		sortedTabs.push_back(*tab);
 	}
 
 	// The Tab class is non-copyable, so there are essentially two ways of

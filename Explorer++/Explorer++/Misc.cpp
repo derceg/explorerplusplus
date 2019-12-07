@@ -247,7 +247,7 @@ LRESULT Explorerplusplus::OnDeviceChange(WPARAM wParam,LPARAM lParam)
 	update its contents). */
 	for (auto &tab : m_tabContainer->GetAllTabs() | boost::adaptors::map_values)
 	{
-		tab.GetShellBrowser()->OnDeviceChange(wParam,lParam);
+		tab->GetShellBrowser()->OnDeviceChange(wParam,lParam);
 	}
 
 	/* Forward the message to the treeview, so that

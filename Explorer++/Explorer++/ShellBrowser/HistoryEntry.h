@@ -9,11 +9,14 @@
 #include <ShlObj.h>
 #include <optional>
 
+struct PreservedHistoryEntry;
+
 class HistoryEntry
 {
 public:
 
 	HistoryEntry(PCIDLIST_ABSOLUTE pidl, std::wstring_view displayName, std::optional<int> systemIconIndex = std::nullopt);
+	HistoryEntry(const PreservedHistoryEntry &preservedHistoryEntry);
 
 	int GetId() const;
 	unique_pidl_absolute GetPidl() const;

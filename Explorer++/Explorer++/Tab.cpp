@@ -5,11 +5,14 @@
 #include "stdafx.h"
 #include "Tab.h"
 #include "Config.h"
+#include "PreservedTab.h"
 #include <wil/resource.h>
 
-Tab::Tab(int id, IExplorerplusplus *expp, const FolderSettings *folderSettings,
+int Tab::idCounter = 1;
+
+Tab::Tab(IExplorerplusplus *expp, const FolderSettings *folderSettings,
 	boost::optional<FolderColumns> initialColumns) :
-	m_id(id),
+	m_id(idCounter++),
 	m_useCustomName(false),
 	m_lockState(LockState::NotLocked)
 {
@@ -24,11 +27,25 @@ Tab::Tab(int id, IExplorerplusplus *expp, const FolderSettings *folderSettings,
 		folderSettingsFinal = expp->GetConfig()->defaultFolderSettings;
 	}
 
-	m_shellBrowser = CShellBrowser::CreateNew(id, expp->GetLanguageModule(),
+	m_shellBrowser = CShellBrowser::CreateNew(m_id, expp->GetLanguageModule(),
 		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(), folderSettingsFinal,
 		initialColumns);
 
 	m_navigationController = std::make_unique<NavigationController>(m_shellBrowser);
+}
+
+Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp) :
+	m_id(idCounter++),
+	m_useCustomName(preservedTab.useCustomName),
+	m_customName(preservedTab.customName),
+	m_lockState(preservedTab.lockState)
+{
+	m_shellBrowser = CShellBrowser::CreateNew(m_id, expp->GetLanguageModule(),
+		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(),
+		expp->GetConfig()->defaultFolderSettings, boost::none);
+
+	m_navigationController = std::make_unique<NavigationController>(m_shellBrowser,
+		preservedTab.history, preservedTab.currentEntry);
 }
 
 int Tab::GetId() const
