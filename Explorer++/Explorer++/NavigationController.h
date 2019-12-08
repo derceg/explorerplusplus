@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "ShellBrowser/HistoryEntry.h"
-#include "ShellBrowser/PreservedHistoryEntry.h"
+#include "HistoryEntry.h"
+#include "PreservedHistoryEntry.h"
 #include "ShellBrowser/ShellBrowser.h"
 #include <boost/signals2.hpp>
 

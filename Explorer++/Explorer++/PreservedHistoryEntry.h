@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ShellBrowser/HistoryEntry.h"
+#include "HistoryEntry.h"
 #include "../Helper/Macros.h"
 #include "../Helper/ShellHelper.h"
 #include <optional>

@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "PreservedHistoryEntry.h"
 #include "ShellBrowser/PreservedFolderState.h"
-#include "ShellBrowser/PreservedHistoryEntry.h"
 #include "Tab.h"
 #include "../Helper/Macros.h"
 
