@@ -10,6 +10,7 @@
 #include "../Helper/BaseWindow.h"
 #include "../Helper/Macros.h"
 #include "../Helper/WindowSubclassWrapper.h"
+#include <optional>
 
 class AddressBar : public CBaseWindow
 {
@@ -41,10 +42,15 @@ private:
 	void OnTabSelected(const Tab &tab);
 	void OnNavigationCompleted(const Tab &tab);
 	void UpdateTextAndIcon(const Tab &tab);
+	void UpdateTextAndIconInUI(std::wstring *text, int iconIndex);
+	void OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType);
 
 	IExplorerplusplus *m_expp;
 	Navigation *m_navigation;
 	MainToolbar *m_mainToolbar;
+
+	boost::signals2::scoped_connection m_historyEntryUpdatedConnection;
+	int m_defaultFolderIconIndex;
 
 	std::vector<WindowSubclassWrapper> m_windowSubclasses;
 	std::vector<boost::signals2::scoped_connection> m_connections;

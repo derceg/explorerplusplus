@@ -810,14 +810,14 @@ HRESULT ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t
 // Returns either the parsing path for the specified item, or its in
 // folder name. The in folder name will be returned when the parsing
 // path is a GUID (which typically shouldn't be displayed to the user).
-boost::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl)
+std::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl)
 {
 	TCHAR parsingPath[MAX_PATH];
 	HRESULT hr = GetDisplayName(pidl, parsingPath, SIZEOF_ARRAY(parsingPath), SHGDN_FORPARSING);
 
 	if (FAILED(hr))
 	{
-		return boost::none;
+		return std::nullopt;
 	}
 
 	if (IsPathGUID(parsingPath))
@@ -826,7 +826,7 @@ boost::optional<std::wstring> GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl)
 
 		if (FAILED(hr))
 		{
-			return boost::none;
+			return std::nullopt;
 		}
 	}
 

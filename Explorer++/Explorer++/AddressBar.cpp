@@ -9,7 +9,9 @@
 #include "../Helper/iDataObject.h"
 #include "../Helper/iDropSource.h"
 #include "../Helper/ShellHelper.h"
+#include <wil/common.h>
 #include <wil/resource.h>
+#include <functional>
 
 AddressBar *AddressBar::Create(HWND parent, IExplorerplusplus *expp,
 	Navigation *navigation, MainToolbar *mainToolbar)
@@ -22,7 +24,8 @@ AddressBar::AddressBar(HWND parent, IExplorerplusplus *expp, Navigation *navigat
 	CBaseWindow(CreateAddressBar(parent)),
 	m_expp(expp),
 	m_navigation(navigation),
-	m_mainToolbar(mainToolbar)
+	m_mainToolbar(mainToolbar),
+	m_defaultFolderIconIndex(GetDefaultFolderIconIndex())
 {
 	Initialize(parent);
 }
@@ -277,32 +280,84 @@ void AddressBar::OnNavigationCompleted(const Tab &tab)
 
 void AddressBar::UpdateTextAndIcon(const Tab &tab)
 {
-	auto pidl = tab.GetShellBrowser()->GetDirectoryIdl();
-	auto text = GetFolderPathForDisplay(pidl.get());
+	// At this point, the text and icon in the address bar are being updated
+	// because the current folder has changed (e.g. because another tab has been
+	// selected). Therefore, any icon updates for the last history entry can be
+	// ignored. If that history entry becomes the current one again (e.g.
+	// because the original tab is re-selected), the listener can be set back up
+	// (if necessary).
+	m_historyEntryUpdatedConnection.disconnect();
+
+	auto entry = tab.GetNavigationController()->GetEntryAtIndex(tab.GetNavigationController()->GetCurrentIndex());
+
+	auto cachedFullPath = entry->GetFullPathForDisplay();
+	std::optional<std::wstring> text;
+
+	if (cachedFullPath)
+	{
+		text = cachedFullPath;
+	}
+	else
+	{
+		text = GetFolderPathForDisplay(entry->GetPidl().get());
+
+		if (text)
+		{
+			entry->SetFullPathForDisplay(*text);
+		}
+	}
 
 	if (!text)
 	{
 		return;
 	}
 
-	SHFILEINFO shfi;
-	DWORD_PTR dwRet = SHGetFileInfo(reinterpret_cast<LPTSTR>(pidl.get()), NULL, &shfi,
-		NULL, SHGFI_PIDL | SHGFI_SYSICONINDEX);
+	auto cachedIconIndex = entry->GetSystemIconIndex();
+	int iconIndex;
 
-	if (dwRet == 0)
+	if (cachedIconIndex)
 	{
-		return;
+		iconIndex = *cachedIconIndex;
+	}
+	else
+	{
+		iconIndex = m_defaultFolderIconIndex;
+
+		entry->historyEntryUpdatedSignal.AddObserver(boost::bind(&AddressBar::OnHistoryEntryUpdated, this, _1, _2));
 	}
 
 	SendMessage(m_hwnd, CB_RESETCONTENT, 0, 0);
 
+	UpdateTextAndIconInUI(&*text, iconIndex);
+}
+
+void AddressBar::UpdateTextAndIconInUI(std::wstring *text, int iconIndex)
+{
 	COMBOBOXEXITEM cbItem;
-	cbItem.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_INDENT | CBEIF_SELECTEDIMAGE;
+	cbItem.mask = CBEIF_IMAGE | CBEIF_SELECTEDIMAGE | CBEIF_INDENT;
 	cbItem.iItem = -1;
-	cbItem.iImage = shfi.iIcon;
-	cbItem.iSelectedImage = shfi.iIcon;
+	cbItem.iImage = (iconIndex & 0x0FFF);
+	cbItem.iSelectedImage = (iconIndex & 0x0FFF);
 	cbItem.iIndent = 1;
-	cbItem.iOverlay = 1;
-	cbItem.pszText = text->data();
+
+	if (text)
+	{
+		WI_SetFlag(cbItem.mask, CBEIF_TEXT);
+		cbItem.pszText = text->data();
+	}
+
 	SendMessage(m_hwnd, CBEM_SETITEM, 0, reinterpret_cast<LPARAM>(&cbItem));
+}
+
+void AddressBar::OnHistoryEntryUpdated(const HistoryEntry &entry, HistoryEntry::PropertyType propertyType)
+{
+	switch (propertyType)
+	{
+	case HistoryEntry::PropertyType::SystemIconIndex:
+		if (entry.GetSystemIconIndex())
+		{
+			UpdateTextAndIconInUI(nullptr, *entry.GetSystemIconIndex());
+		}
+		break;
+	}
 }

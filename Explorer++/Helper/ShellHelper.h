@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include <boost/optional.hpp>
 #include <wil/resource.h>
 #include <ShlGuid.h>
 #include <ShObjIdl.h>
 #include <list>
+#include <optional>
 #include <vector>
 
 #define CONTROL_PANEL_CATEGORY_VIEW	_T("::{26EE0668-A00A-44D7-9371-BEB064C98683}")
@@ -68,7 +68,7 @@ HRESULT			ConvertVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchM
 HRESULT			ConvertVariantStringArrayToString(SAFEARRAY *array, TCHAR *szDetail, size_t cchMax);
 HRESULT			ConvertGenericVariantToString(const VARIANT *vt, TCHAR *szDetail, size_t cchMax);
 HRESULT			ConvertDateVariantToString(DATE date, TCHAR *szDetail, size_t cchMax, BOOL friendlyDate);
-boost::optional<std::wstring>	GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl);
+std::optional<std::wstring>	GetFolderPathForDisplay(PCIDLIST_ABSOLUTE pidl);
 BOOL			IsPathGUID(const TCHAR *szPath);
 BOOL			CompareIdls(PCIDLIST_ABSOLUTE pidl1, PCIDLIST_ABSOLUTE pidl2);
 HRESULT			AddJumpListTasks(const std::list<JumpListTaskInformation> &TaskList);

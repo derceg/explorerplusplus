@@ -42,6 +42,16 @@ std::wstring HistoryEntry::GetDisplayName() const
 	return m_displayName;
 }
 
+std::optional<std::wstring> HistoryEntry::GetFullPathForDisplay() const
+{
+	return m_fullPathForDisplay;
+}
+
+void HistoryEntry::SetFullPathForDisplay(const std::wstring &fullPathForDisplay)
+{
+	m_fullPathForDisplay = fullPathForDisplay;
+}
+
 std::optional<int> HistoryEntry::GetSystemIconIndex() const
 {
 	return m_systemIconIndex;
@@ -49,5 +59,12 @@ std::optional<int> HistoryEntry::GetSystemIconIndex() const
 
 void HistoryEntry::SetSystemIconIndex(int iconIndex)
 {
+	if (iconIndex == m_systemIconIndex)
+	{
+		return;
+	}
+
 	m_systemIconIndex = iconIndex;
+
+	historyEntryUpdatedSignal.m_signal(*this, PropertyType::SystemIconIndex);
 }
