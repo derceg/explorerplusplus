@@ -68,6 +68,8 @@ __interface IExplorerplusplus
 	void			ShowTabBar();
 	void			HideTabBar();
 
+	void			SetListViewInitialPosition(HWND hListView);
+
 	// Used to support the options dialog.
 	void			SaveAllSettings();
 	BOOL			GetSavePreferencesToXmlFile() const;

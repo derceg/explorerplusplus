@@ -58,8 +58,6 @@ void Explorerplusplus::OnTabCreated(int tabId, BOOL switchToNewTab)
 
 	/* TODO: This subclass needs to be removed. */
 	SetWindowSubclass(tab.GetShellBrowser()->GetListView(), ListViewProcStub, 0, reinterpret_cast<DWORD_PTR>(this));
-
-	SetListViewInitialPosition(tab.GetShellBrowser()->GetListView());
 }
 
 boost::signals2::connection Explorerplusplus::AddTabsInitializedObserver(const TabsInitializedSignal::slot_type &observer)
