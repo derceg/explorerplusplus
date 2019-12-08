@@ -1445,3 +1445,8 @@ IconFetcher *CShellBrowser::GetIconFetcher()
 {
 	return m_iconFetcher.get();
 }
+
+FolderSettings CShellBrowser::GetFolderSettings() const
+{
+	return m_folderSettings;
+}

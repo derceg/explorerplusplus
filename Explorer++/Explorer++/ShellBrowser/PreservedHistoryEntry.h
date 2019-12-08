@@ -11,6 +11,8 @@
 
 struct PreservedHistoryEntry
 {
+public:
+
 	PreservedHistoryEntry(const HistoryEntry &entry) :
 		id(entry.GetId()),
 		pidl(ILCloneFull(entry.GetPidl().get())),

@@ -42,7 +42,7 @@ Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp) :
 {
 	m_shellBrowser = CShellBrowser::CreateNew(m_id, expp->GetLanguageModule(),
 		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(),
-		expp->GetConfig()->defaultFolderSettings, boost::none);
+		preservedTab.preservedFolderState.folderSettings, boost::none);
 
 	m_navigationController = std::make_unique<NavigationController>(m_shellBrowser,
 		preservedTab.history, preservedTab.currentEntry);

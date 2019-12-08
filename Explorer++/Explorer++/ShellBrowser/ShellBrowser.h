@@ -65,6 +65,7 @@ public:
 
 	HWND				GetListView() const;
 	IconFetcher			*GetIconFetcher();
+	FolderSettings		GetFolderSettings() const;
 
 	/* Navigation. */
 	HRESULT				BrowseFolder(const TCHAR *szPath, bool addHistoryEntry = true);

@@ -741,6 +741,9 @@
     <ClInclude Include="NavigationController.h">
       <Filter>Tabs</Filter>
     </ClInclude>
+    <ClInclude Include="ShellBrowser\PreservedFolderState.h">
+      <Filter>ShellBrowser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

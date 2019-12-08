@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ShellBrowser/PreservedFolderState.h"
 #include "ShellBrowser/PreservedHistoryEntry.h"
 #include "Tab.h"
 #include "../Helper/Macros.h"
@@ -17,7 +18,8 @@ struct PreservedTab
 		currentEntry(tab.GetNavigationController()->GetCurrentIndex()),
 		useCustomName(tab.GetUseCustomName()),
 		customName(tab.GetUseCustomName() ? tab.GetName() : std::wstring()),
-		lockState(tab.GetLockState())
+		lockState(tab.GetLockState()),
+		preservedFolderState(tab.GetShellBrowser())
 	{
 		
 	}
@@ -31,6 +33,8 @@ struct PreservedTab
 	bool useCustomName;
 	std::wstring customName;
 	Tab::LockState lockState;
+
+	PreservedFolderState preservedFolderState;
 
 private:
 
