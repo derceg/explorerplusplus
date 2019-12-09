@@ -117,6 +117,8 @@ public:
 	unique_pidl_child	GetItemChildIdl(int iItem) const;
 	int					GetItemDisplayName(int iItem,UINT BufferSize,TCHAR *Buffer) const;
 	HRESULT				GetItemFullName(int iIndex,TCHAR *FullItemPath,UINT cchMax) const;
+
+	void				ShowPropertiesForSelectedFiles() const;
 	
 	/* Column support. */
 	std::vector<Column_t>	ExportCurrentColumns();

@@ -1363,25 +1363,6 @@ void Explorerplusplus::OnListViewFileRenameMultiple()
 	CMassRenameDialog.ShowModalDialog();
 }
 
-void Explorerplusplus::OnListViewShowFileProperties(void) const
-{
-	std::vector<unique_pidl_child> pidls;
-	std::vector<PCITEMID_CHILD> rawPidls;
-
-	int item = -1;
-
-	while ((item = ListView_GetNextItem(m_hActiveListView, item, LVNI_SELECTED)) != -1)
-	{
-		auto pidl = m_pActiveShellBrowser->GetItemChildIdl(item);
-
-		rawPidls.push_back(pidl.get());
-		pidls.push_back(std::move(pidl));
-	}
-
-	auto pidlDirectory = m_pActiveShellBrowser->GetDirectoryIdl();
-	ShowMultipleFileProperties(pidlDirectory.get(), rawPidls.data(), m_hContainer, static_cast<int>(rawPidls.size()));
-}
-
 void Explorerplusplus::OnListViewCopyItemPath(void) const
 {
 	if(ListView_GetSelectedCount(m_hActiveListView) == 0)

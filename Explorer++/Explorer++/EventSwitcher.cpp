@@ -124,7 +124,8 @@ void Explorerplusplus::OnShowFileProperties() const
 
 	if(hFocus == m_hActiveListView)
 	{
-		OnListViewShowFileProperties();
+		const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+		selectedTab.GetShellBrowser()->ShowPropertiesForSelectedFiles();
 	}
 	else if(hFocus == m_hTreeView)
 	{

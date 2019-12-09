@@ -254,7 +254,6 @@ private:
 	void					OnListViewHeaderRClick(const POINT *pCursorPos);
 	std::vector<unsigned int>	GetColumnHeaderMenuList();
 	void					OnListViewHeaderMenuItemSelected(int menuItemId, const std::unordered_map<int, UINT> &menuItemMappings);
-	void					OnListViewShowFileProperties(void) const;
 	void					OnListViewCopyItemPath(void) const;
 	void					OnListViewCopyUniversalPaths(void) const;
 	void					OnListViewSetFileAttributes(void) const;

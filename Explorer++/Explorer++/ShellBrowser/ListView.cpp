@@ -7,6 +7,7 @@
 #include "Config.h"
 #include "MainResource.h"
 #include "../Helper/CachedIcons.h"
+#include "../Helper/ShellHelper.h"
 #include <boost/format.hpp>
 
 LRESULT CALLBACK CShellBrowser::ListViewProcStub(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
@@ -373,4 +374,28 @@ BOOL CShellBrowser::GhostItemInternal(int iItem, BOOL bGhost)
 	}
 
 	return TRUE;
+}
+
+void CShellBrowser::ShowPropertiesForSelectedFiles() const
+{
+	std::vector<unique_pidl_child> pidls;
+	std::vector<PCITEMID_CHILD> rawPidls;
+
+	int item = -1;
+
+	while ((item = ListView_GetNextItem(m_hListView, item, LVNI_SELECTED)) != -1)
+	{
+		auto pidl = GetItemChildIdl(item);
+
+		rawPidls.push_back(pidl.get());
+		pidls.push_back(std::move(pidl));
+	}
+
+	if (rawPidls.empty())
+	{
+		return;
+	}
+
+	auto pidlDirectory = GetDirectoryIdl();
+	ShowMultipleFileProperties(pidlDirectory.get(), rawPidls.data(), m_hOwner, static_cast<int>(rawPidls.size()));
 }
