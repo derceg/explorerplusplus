@@ -88,34 +88,33 @@ void Explorerplusplus::OnNavigationCompleted(const Tab &tab)
 */
 void Explorerplusplus::OnNewTab()
 {
-	int		iSelected;
-	HRESULT	hr;
-	BOOL	bFolderSelected = FALSE;
+	bool folderSelected = false;
 
-	iSelected = ListView_GetNextItem(m_hActiveListView,
+	const Tab &selectedTab = m_tabContainer->GetSelectedTab();
+	int selectionIndex = ListView_GetNextItem(selectedTab.GetShellBrowser()->GetListView(),
 		-1, LVNI_FOCUSED | LVNI_SELECTED);
 
-	if(iSelected != -1)
+	if(selectionIndex != -1)
 	{
 		TCHAR FullItemPath[MAX_PATH];
 
 		/* An item is selected, so get its full pathname. */
-		m_pActiveShellBrowser->GetItemFullName(iSelected, FullItemPath, SIZEOF_ARRAY(FullItemPath));
+		selectedTab.GetShellBrowser()->GetItemFullName(selectionIndex, FullItemPath, SIZEOF_ARRAY(FullItemPath));
 
 		/* If the selected item is a folder, open that folder
 		in a new tab, else just use the default new tab directory. */
 		if(PathIsDirectory(FullItemPath))
 		{
-			bFolderSelected = TRUE;
+			folderSelected = true;
 			m_tabContainer->CreateNewTab(FullItemPath, TabSettings(_selected = true));
 		}
 	}
 
 	/* Either no items are selected, or the focused + selected
 	item was not a folder; open the default tab directory. */
-	if(!bFolderSelected)
+	if(!folderSelected)
 	{
-		hr = m_tabContainer->CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
+		HRESULT hr = m_tabContainer->CreateNewTab(m_config->defaultTabDirectory.c_str(), TabSettings(_selected = true));
 
 		if (FAILED(hr))
 		{
