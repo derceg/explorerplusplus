@@ -170,14 +170,14 @@ HRESULT GetVirtualParentPath(PCIDLIST_ABSOLUTE pidlDirectory, PIDLIST_ABSOLUTE *
 	if(IsNamespaceRoot(pidlDirectory))
 	{
 		*pidlParent = NULL;
+		return E_FAIL;
 	}
 	else
 	{
 		*pidlParent = ILCloneFull(pidlDirectory);
 		ILRemoveLastID(*pidlParent);
+		return S_OK;
 	}
-
-	return S_OK;
 }
 
 BOOL IsNamespaceRoot(PCIDLIST_ABSOLUTE pidl)
