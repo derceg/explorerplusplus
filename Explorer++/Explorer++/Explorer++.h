@@ -15,6 +15,7 @@
 #include "Tab.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
+#include "TabNavigationInterface.h"
 #include "TabRestorer.h"
 #include "TabRestorerUI.h"
 #include "UiTheming.h"
@@ -70,8 +71,9 @@ __interface IDirectoryMonitor;
 
 class CMyTreeView;
 
-class Explorerplusplus : public IExplorerplusplus, public TabContainerInterface, public TabInterface,
-	public IFileContextMenuExternal, public PluginInterface
+class Explorerplusplus : public IExplorerplusplus, public TabContainerInterface,
+	public TabInterface, public TabNavigationInterface, public IFileContextMenuExternal,
+	public PluginInterface
 {
 	friend CLoadSaveRegistry;
 	friend CLoadSaveXML;
@@ -235,8 +237,6 @@ private:
 	void					OnToolbarViews();
 
 	/* ListView private message handlers. */
-	void					OnListViewMButtonDown(POINT *pt);
-	void					OnListViewMButtonUp(POINT *pt);
 	void					OnListViewLButtonDown(WPARAM wParam,LPARAM lParam);
 	void					OnListViewDoubleClick(NMHDR *nmhdr);
 	void					OnListViewFileRename();
@@ -294,6 +294,9 @@ private:
 	void					HideTabBar();
 	HRESULT					RestoreTabs(ILoadSave *pLoadSave);
 	HRESULT					RefreshTab(const Tab &tab);
+
+	/* TabNavigationInterface methods. */
+	HRESULT					CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected);
 
 	void					OnNavigationCompleted(const Tab &tab);
 
@@ -601,7 +604,6 @@ private:
 	BOOL					m_bSelectionFromNowhere;
 	int						m_nSelected;
 	int						m_nSelectedOnInvert;
-	int						m_ListViewMButtonItem;
 
 	/* Copy/cut. */
 	IDataObject				*m_pClipboardDataObject;

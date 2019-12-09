@@ -9,6 +9,7 @@
 #include "FolderSettings.h"
 #include "SignalWrapper.h"
 #include "SortModes.h"
+#include "TabNavigationInterface.h"
 #include "ViewModes.h"
 #include "../Helper/DropHandler.h"
 #include "../Helper/Helper.h"
@@ -55,8 +56,8 @@ class CShellBrowser : public IDropTarget, public IDropFilesCallback
 public:
 
 	static CShellBrowser *CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
-		CachedIcons *cachedIcons, const Config *config, const FolderSettings &folderSettings,
-		boost::optional<FolderColumns> initialColumns);
+		CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
+		const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns);
 
 	/* IUnknown methods. */
 	HRESULT __stdcall	QueryInterface(REFIID iid,void **ppvObject);
@@ -271,7 +272,7 @@ private:
 	static const int THUMBNAIL_ITEM_HEIGHT = 120;
 
 	CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
-		const Config *config, const FolderSettings &folderSettings,
+		const Config *config, TabNavigationInterface *tabNavigation, const FolderSettings &folderSettings,
 		boost::optional<FolderColumns> initialColumns);
 	~CShellBrowser();
 
@@ -307,11 +308,15 @@ private:
 	void				ColumnClicked(int iClickedColumn);
 
 	/* Listview. */
+	void				OnListViewMButtonDown(const POINT *pt);
+	void				OnListViewMButtonUp(const POINT *pt);
 	void				OnListViewGetDisplayInfo(LPARAM lParam);
 	LRESULT				OnListViewGetInfoTip(NMLVGETINFOTIP *getInfoTip);
 	void				QueueInfoTipTask(int internalIndex, const std::wstring &existingInfoTip);
 	static boost::optional<InfoTipResult>	GetInfoTipAsync(HWND listView, int infoTipResultId, int internalIndex, const BasicItemInfo_t &basicItemInfo, const Config &config, HINSTANCE instance, bool virtualFolder);
 	void				ProcessInfoTipResult(int infoTipResultId);
+
+	ItemInfo_t			&GetItemByIndex(int index);
 	int					GetItemInternalIndex(int item) const;
 
 	BasicItemInfo_t		getBasicItemInfo(int internalIndex) const;
@@ -424,6 +429,8 @@ private:
 	HWND				m_hListView;
 	HWND				m_hOwner;
 
+	TabNavigationInterface	*m_tabNavigation;
+
 	std::vector<WindowSubclassWrapper>	m_windowSubclasses;
 
 	// Each instance of this class will subclass the parent window. As
@@ -497,6 +504,8 @@ private:
 	been created and are awaiting insertion
 	into the listview. */
 	std::list<AwaitingAdd_t>	m_AwaitingAddList;
+
+	int					m_middleButtonItem;
 
 	/* Shell new. */
 	BOOL				m_bNewItemCreated;

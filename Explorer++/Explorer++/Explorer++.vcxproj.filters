@@ -744,6 +744,9 @@
     <ClInclude Include="PreservedHistoryEntry.h">
       <Filter>Tabs</Filter>
     </ClInclude>
+    <ClInclude Include="TabNavigationInterface.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Explorer++.rc">

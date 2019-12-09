@@ -33,7 +33,7 @@ void Explorerplusplus::InitializeTabs()
 	/* The tab backing will hold the tab window. */
 	CreateTabBacking();
 
-	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, m_navigation.get(), this, &m_cachedIcons, m_hLanguageModule, m_config);
+	m_tabContainer = TabContainer::Create(m_hTabBacking, this, this, this, m_navigation.get(), this, &m_cachedIcons, m_hLanguageModule, m_config);
 	m_tabContainer->tabCreatedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabCreated, this, _1, _2), boost::signals2::at_front);
 	m_tabContainer->tabSelectedSignal.AddObserver(boost::bind(&Explorerplusplus::OnTabSelected, this, _1), boost::signals2::at_front);
 
@@ -285,4 +285,9 @@ HRESULT Explorerplusplus::RefreshTab(const Tab &tab)
 	}
 
 	return hr;
+}
+
+HRESULT Explorerplusplus::CreateNewTab(PCIDLIST_ABSOLUTE pidlDirectory, bool selected)
+{
+	return m_tabContainer->CreateNewTab(pidlDirectory, TabSettings(_selected = selected));
 }

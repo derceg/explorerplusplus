@@ -171,22 +171,6 @@ LRESULT CALLBACK Explorerplusplus::ListViewSubclassProc(HWND ListView, UINT msg,
 			m_bBlockNext = FALSE;
 			break;
 
-		case WM_MBUTTONDOWN:
-			{
-				POINT pt;
-				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-				OnListViewMButtonDown(&pt);
-			}
-			break;
-
-		case WM_MBUTTONUP:
-			{
-				POINT pt;
-				POINTSTOPOINT(pt, MAKEPOINTS(lParam));
-				OnListViewMButtonUp(&pt);
-			}
-			break;
-
 		/* If no item is currently been dragged, and the last drag
 		has not just finished (i.e. item was dragged, but was cancelled
 		with escape, but mouse button is still down), and when the right
@@ -337,79 +321,6 @@ void Explorerplusplus::OnListViewLButtonDown(WPARAM wParam,LPARAM lParam)
 	else
 	{
 		m_bSelectionFromNowhere = FALSE;
-	}
-}
-
-void Explorerplusplus::OnListViewMButtonDown(POINT *pt)
-{
-	LV_HITTESTINFO ht;
-	ht.pt = *pt;
-	ListView_HitTest(m_hActiveListView,&ht);
-
-	if(ht.flags != LVHT_NOWHERE && ht.iItem != -1)
-	{
-		m_ListViewMButtonItem = ht.iItem;
-
-		ListView_SetItemState(m_hActiveListView,ht.iItem,LVIS_FOCUSED,LVIS_FOCUSED);
-	}
-	else
-	{
-		m_ListViewMButtonItem = -1;
-	}
-}
-
-void Explorerplusplus::OnListViewMButtonUp(POINT *pt)
-{
-	LV_HITTESTINFO	ht;
-	ht.pt = *pt;
-	ListView_HitTest(m_hActiveListView,&ht);
-
-	if(ht.flags != LVHT_NOWHERE)
-	{
-		/* Only open an item if it was the one
-		on which the middle mouse button was
-		initially clicked on. */
-		if(ht.iItem == m_ListViewMButtonItem)
-		{
-			IShellFolder *pShellFolder		= NULL;
-			SFGAOF uAttributes				= SFGAO_FOLDER | SFGAO_STREAM;
-			TCHAR szParsingPath[MAX_PATH];
-			STRRET str;
-			HRESULT hr;
-
-			auto pidl = m_pActiveShellBrowser->GetDirectoryIdl();
-			hr = BindToIdl(pidl.get(), IID_PPV_ARGS(&pShellFolder));
-
-			if(SUCCEEDED(hr))
-			{
-				auto ridl = m_pActiveShellBrowser->GetItemChildIdl(ht.iItem);
-				PCITEMID_CHILD items[] = { const_cast<PCUITEMID_CHILD>(ridl.get()) };
-
-				hr = pShellFolder->GetAttributesOf(1,items,&uAttributes);
-
-				if(SUCCEEDED(hr))
-				{
-					/* Is this a folder? */
-					if((uAttributes & SFGAO_FOLDER) &&
-						!(uAttributes & SFGAO_STREAM))
-					{
-						hr = pShellFolder->GetDisplayNameOf(ridl.get(),SHGDN_FORPARSING,&str);
-
-						if(SUCCEEDED(hr))
-						{
-							hr = StrRetToBuf(&str, ridl.get(), szParsingPath, SIZEOF_ARRAY(szParsingPath));
-
-							if(SUCCEEDED(hr))
-							{
-								m_tabContainer->CreateNewTab(szParsingPath);
-							}
-						}
-					}
-				}
-
-				pShellFolder->Release();
-			}
-		}
 	}
 }
 

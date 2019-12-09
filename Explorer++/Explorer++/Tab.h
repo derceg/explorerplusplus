@@ -8,6 +8,7 @@
 #include "NavigationController.h"
 #include "ShellBrowser/FolderSettings.h"
 #include "ShellBrowser/ShellBrowser.h"
+#include "TabNavigationInterface.h"
 #include "../Helper/Macros.h"
 #include <boost/optional.hpp>
 #include <boost/parameter.hpp>
@@ -34,9 +35,9 @@ public:
 
 	typedef boost::signals2::signal<void(const Tab &tab, PropertyType propertyType)> TabUpdatedSignal;
 
-	Tab(IExplorerplusplus *expp, const FolderSettings *folderSettings,
+	Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation, const FolderSettings *folderSettings,
 		boost::optional<FolderColumns> initialColumns);
-	Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp);
+	Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp, TabNavigationInterface *tabNavigation);
 
 	int GetId() const;
 

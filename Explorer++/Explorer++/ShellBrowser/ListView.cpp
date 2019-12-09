@@ -22,6 +22,22 @@ LRESULT CALLBACK CShellBrowser::ListViewProc(HWND hwnd, UINT uMsg, WPARAM wParam
 {
 	switch (uMsg)
 	{
+	case WM_MBUTTONDOWN:
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnListViewMButtonDown(&pt);
+	}
+	break;
+
+	case WM_MBUTTONUP:
+	{
+		POINT pt;
+		POINTSTOPOINT(pt, MAKEPOINTS(lParam));
+		OnListViewMButtonUp(&pt);
+	}
+	break;
+
 	case WM_APP_COLUMN_RESULT_READY:
 		ProcessColumnResult(static_cast<int>(wParam));
 		break;
@@ -72,6 +88,52 @@ LRESULT CALLBACK CShellBrowser::ListViewParentProc(HWND hwnd, UINT uMsg, WPARAM 
 	}
 
 	return DefSubclassProc(hwnd, uMsg, wParam, lParam);
+}
+
+void CShellBrowser::OnListViewMButtonDown(const POINT *pt)
+{
+	LV_HITTESTINFO ht;
+	ht.pt = *pt;
+	ListView_HitTest(m_hListView, &ht);
+
+	if (ht.flags != LVHT_NOWHERE && ht.iItem != -1)
+	{
+		m_middleButtonItem = ht.iItem;
+
+		ListView_SetItemState(m_hListView, ht.iItem, LVIS_FOCUSED, LVIS_FOCUSED);
+	}
+	else
+	{
+		m_middleButtonItem = -1;
+	}
+}
+
+void CShellBrowser::OnListViewMButtonUp(const POINT *pt)
+{
+	LV_HITTESTINFO	ht;
+	ht.pt = *pt;
+	ListView_HitTest(m_hListView, &ht);
+
+	if (ht.flags == LVHT_NOWHERE)
+	{
+		return;
+	}
+
+	// Only open an item if it was the one on which the middle mouse button was
+	// initially clicked on.
+	if (ht.iItem != m_middleButtonItem)
+	{
+		return;
+	}
+
+	const ItemInfo_t &itemInfo = GetItemByIndex(m_middleButtonItem);
+
+	if (!WI_IsAnyFlagSet(itemInfo.wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_ARCHIVE))
+	{
+		return;
+	}
+
+	m_tabNavigation->CreateNewTab(itemInfo.pidlComplete.get(), false);
 }
 
 void CShellBrowser::OnListViewGetDisplayInfo(LPARAM lParam)
@@ -318,6 +380,12 @@ void CShellBrowser::ProcessInfoTipResult(int infoTipResultId)
 	infoTip.iSubItem = 0;
 	infoTip.pszText = infoTipText;
 	ListView_SetInfoTip(m_hListView, &infoTip);
+}
+
+CShellBrowser::ItemInfo_t &CShellBrowser::GetItemByIndex(int index)
+{
+	int internalIndex = GetItemInternalIndex(index);
+	return m_itemInfoMap.at(internalIndex);
 }
 
 int CShellBrowser::GetItemInternalIndex(int item) const

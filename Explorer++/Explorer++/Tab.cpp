@@ -10,8 +10,8 @@
 
 int Tab::idCounter = 1;
 
-Tab::Tab(IExplorerplusplus *expp, const FolderSettings *folderSettings,
-	boost::optional<FolderColumns> initialColumns) :
+Tab::Tab(IExplorerplusplus *expp, TabNavigationInterface *tabNavigation,
+	const FolderSettings *folderSettings, boost::optional<FolderColumns> initialColumns) :
 	m_id(idCounter++),
 	m_useCustomName(false),
 	m_lockState(LockState::NotLocked)
@@ -28,13 +28,13 @@ Tab::Tab(IExplorerplusplus *expp, const FolderSettings *folderSettings,
 	}
 
 	m_shellBrowser = CShellBrowser::CreateNew(m_id, expp->GetLanguageModule(),
-		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(), folderSettingsFinal,
-		initialColumns);
+		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(), tabNavigation,
+		folderSettingsFinal, initialColumns);
 
 	m_navigationController = std::make_unique<NavigationController>(m_shellBrowser);
 }
 
-Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp) :
+Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp, TabNavigationInterface *tabNavigation) :
 	m_id(idCounter++),
 	m_useCustomName(preservedTab.useCustomName),
 	m_customName(preservedTab.customName),
@@ -42,7 +42,7 @@ Tab::Tab(const PreservedTab &preservedTab, IExplorerplusplus *expp) :
 {
 	m_shellBrowser = CShellBrowser::CreateNew(m_id, expp->GetLanguageModule(),
 		expp->GetMainWindow(), expp->GetCachedIcons(), expp->GetConfig(),
-		preservedTab.preservedFolderState.folderSettings, boost::none);
+		tabNavigation, preservedTab.preservedFolderState.folderSettings, boost::none);
 
 	m_navigationController = std::make_unique<NavigationController>(m_shellBrowser,
 		preservedTab.history, preservedTab.currentEntry);

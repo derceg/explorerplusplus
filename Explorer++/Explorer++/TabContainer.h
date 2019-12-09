@@ -10,6 +10,7 @@
 #include "Tab.h"
 #include "TabContainerInterface.h"
 #include "TabInterface.h"
+#include "TabNavigationInterface.h"
 #include "../Helper/BaseWindow.h"
 #include "../Helper/DpiCompatibility.h"
 #include "../Helper/WindowSubclassWrapper.h"
@@ -72,8 +73,9 @@ class TabContainer : public CBaseWindow
 public:
 
 	static TabContainer *Create(HWND parent, TabContainerInterface *tabContainer,
-		TabInterface *tabInterface, Navigation *navigation, IExplorerplusplus *expp,
-		CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config);
+		TabInterface *tabInterface, TabNavigationInterface *tabNavigation,
+		Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
+		HINSTANCE instance, std::shared_ptr<Config> config);
 
 	HRESULT CreateNewTab(const TCHAR *TabDirectory, const TabSettings &tabSettings = {},
 		const FolderSettings *folderSettings = nullptr, boost::optional<FolderColumns> initialColumns = boost::none,
@@ -122,8 +124,8 @@ private:
 	static const int ICON_SIZE_96DPI = 16;
 
 	TabContainer(HWND parent, TabContainerInterface *tabContainer, TabInterface *tabInterface,
-		Navigation *navigation, IExplorerplusplus *expp, CachedIcons *cachedIcons,
-		HINSTANCE instance, std::shared_ptr<Config> config);
+		TabNavigationInterface *tabNavigation, Navigation *navigation, IExplorerplusplus *expp,
+		CachedIcons *cachedIcons, HINSTANCE instance, std::shared_ptr<Config> config);
 	~TabContainer();
 
 	static HWND CreateTabControl(HWND parent, BOOL forceSameTabWidth);
@@ -197,6 +199,7 @@ private:
 
 	TabContainerInterface *m_tabContainerInterface;
 	TabInterface *m_tabInterface;
+	TabNavigationInterface *m_tabNavigation;
 	Navigation *m_navigation;
 	IExplorerplusplus *m_expp;
 

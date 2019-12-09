@@ -64,20 +64,23 @@ ULONG __stdcall CShellBrowser::Release(void)
 	return m_iRefCount;
 }
 
-CShellBrowser *CShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
-	const Config *config, const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns)
+CShellBrowser *CShellBrowser::CreateNew(int id, HINSTANCE resourceInstance, HWND hOwner,
+	CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
+	const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns)
 {
-	return new CShellBrowser(id, resourceInstance, hOwner, cachedIcons, config,
+	return new CShellBrowser(id, resourceInstance, hOwner, cachedIcons, config, tabNavigation,
 		folderSettings, initialColumns);
 }
 
-CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, CachedIcons *cachedIcons,
-	const Config *config, const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns) :
+CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner,
+	CachedIcons *cachedIcons, const Config *config, TabNavigationInterface *tabNavigation,
+	const FolderSettings &folderSettings, boost::optional<FolderColumns> initialColumns) :
 	m_ID(id),
 	m_hResourceModule(resourceInstance),
 	m_hOwner(hOwner),
 	m_cachedIcons(cachedIcons),
 	m_config(config),
+	m_tabNavigation(tabNavigation),
 	m_folderSettings(folderSettings),
 	m_folderColumns(initialColumns ? *initialColumns : config->globalFolderSettings.folderColumns),
 	m_columnThreadPool(1),
@@ -108,6 +111,7 @@ CShellBrowser::CShellBrowser(int id, HINSTANCE resourceInstance, HWND hOwner, Ca
 	m_nActiveColumns = 0;
 	m_bNewItemCreated = FALSE;
 	m_iDropped = -1;
+	m_middleButtonItem = -1;
 
 	m_uniqueFolderId = 0;
 
